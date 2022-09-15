@@ -57,3 +57,4 @@ static const timer_conf_t timer_config[] = {
 #endif
 
 #endif /* CFG_TIMER_01_H */
+/** @} */

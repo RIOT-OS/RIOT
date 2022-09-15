@@ -112,7 +112,6 @@ typedef struct __attribute__((packed)) {
      */
     ipv6_addr_t peer_address;
 } dhcpv6_relay_msg_t;
-/** @} */
 
 /**
  * @brief   Generic storage DUID

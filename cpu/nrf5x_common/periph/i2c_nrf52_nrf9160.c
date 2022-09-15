@@ -102,8 +102,18 @@ static void _init_pins(i2c_t dev)
 {
     gpio_init(i2c_config[dev].scl, GPIO_IN_OD_PU);
     gpio_init(i2c_config[dev].sda, GPIO_IN_OD_PU);
+}
+
+/* Beware: This needs to be kept in sync with the SPI version of this.
+ * Specifically, when registers are configured that are valid to the peripheral
+ * in both SPI and I2C mode, the register needs to be configured in both the I2C
+ * and the SPI variant of _setup_shared_peripheral() to avoid from parameters
+ * leaking from one bus into the other */
+static void _setup_shared_peripheral(i2c_t dev)
+{
     bus(dev)->PSEL.SCL = i2c_config[dev].scl;
     bus(dev)->PSEL.SDA = i2c_config[dev].sda;
+    bus(dev)->FREQUENCY = i2c_config[dev].speed;
 }
 
 void i2c_init(i2c_t dev)
@@ -111,7 +121,6 @@ void i2c_init(i2c_t dev)
     assert(dev < I2C_NUMOF);
 
     /* Initialize mutex */
-    mutex_init(&locks[dev]);
     mutex_init(&busy[dev]);
     mutex_lock(&busy[dev]);
 
@@ -122,8 +131,8 @@ void i2c_init(i2c_t dev)
     /* configure pins */
     _init_pins(dev);
 
-    /* configure dev clock speed */
-    bus(dev)->FREQUENCY = i2c_config[dev].speed;
+    /* configure shared periphal speed */
+    _setup_shared_peripheral(dev);
 
     spi_twi_irq_register_i2c(bus(dev), i2c_isr_handler, (void *)(uintptr_t)dev);
 
@@ -158,7 +167,13 @@ void i2c_acquire(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
 
-    mutex_lock(&locks[dev]);
+    if (IS_USED(MODULE_PERIPH_I2C_RECONFIGURE)) {
+        mutex_lock(&locks[dev]);
+    }
+
+    nrf5x_i2c_acquire(bus(dev), i2c_isr_handler, (void *)(uintptr_t)dev);
+    _setup_shared_peripheral(dev);
+
     bus(dev)->ENABLE = TWIM_ENABLE_ENABLE_Enabled;
 
     DEBUG("[i2c] acquired dev %i\n", (int)dev);
@@ -169,7 +184,12 @@ void i2c_release(i2c_t dev)
     assert(dev < I2C_NUMOF);
 
     bus(dev)->ENABLE = TWIM_ENABLE_ENABLE_Disabled;
-    mutex_unlock(&locks[dev]);
+
+    if (IS_USED(MODULE_PERIPH_I2C_RECONFIGURE)) {
+        mutex_unlock(&locks[dev]);
+    }
+
+    nrf5x_i2c_release(bus(dev));
 
     DEBUG("[i2c] released dev %i\n", (int)dev);
 }

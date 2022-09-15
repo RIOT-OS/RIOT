@@ -157,16 +157,6 @@ void mutex_unlock(mutex_t *mutex)
         return;
     }
 
-#ifdef MODULE_CORE_MUTEX_PRIORITY_INHERITANCE
-    thread_t *owner = thread_get(mutex->owner);
-    if ((owner) && (owner->priority != mutex->owner_original_priority)) {
-        DEBUG("PID[%" PRIkernel_pid "] prio %u --> %u\n",
-              owner->pid,
-              (unsigned)owner->priority, (unsigned)owner->priority);
-        sched_change_priority(owner, mutex->owner_original_priority);
-    }
-#endif
-
     if (mutex->queue.next == MUTEX_LOCKED) {
         mutex->queue.next = NULL;
         /* the mutex was locked and no thread was waiting for it */
@@ -187,6 +177,16 @@ void mutex_unlock(mutex_t *mutex)
     }
 
     uint16_t process_priority = process->priority;
+
+#ifdef MODULE_CORE_MUTEX_PRIORITY_INHERITANCE
+    thread_t *owner = thread_get(mutex->owner);
+    if ((owner) && (owner->priority != mutex->owner_original_priority)) {
+        DEBUG("PID[%" PRIkernel_pid "] prio %u --> %u\n",
+              owner->pid,
+              (unsigned)owner->priority, (unsigned)owner->priority);
+        sched_change_priority(owner, mutex->owner_original_priority);
+    }
+#endif
 
     irq_restore(irqstate);
     sched_switch(process_priority);

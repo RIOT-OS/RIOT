@@ -1,0 +1,32 @@
+' to generate SVG run plantuml -tsvg gnrc_ipv6_auto_subnets-with_rio.puml
+
+@startuml
+
+skinparam responseMessageBelowArrow true
+
+participant "2001:db8:0:0:<color:#9a9a9a>c8f4:13ff:fece:3f43\n2001:db8:0:8:<color:#9a9a9a>3c27:6dff:fe25:e95d" as A << (A,#ADD1B2) >>
+participant "2001:db8:0:0:<color:#9a9a9a>a7a2:12e0:48bc:7487" as B << (B,#ADD1B2) >>
+participant "2001:db8:0:8:<color:#9a9a9a>5075:35ff:fefa:30bc" as C << (C,#ADD1B2) >>
+
+A -> C: RA: I'm a default router, PIO: You can use 2001:db8:0:8::/61 **[broadcast]**
+A -> B: RA: I'm <i>not</i> a default router (ltime = 0), RIO: You can reach 2001:db8:0:8::/61 through me  **[broadcast]**
+group C sends request to B
+C -> A: forward PING request to 2001:db8:0:0:<color:#9a9a9a>a7a2:12e0:48bc:7487
+note right
+destination of off-link
+use default router to forward it
+end note
+A --> B: NS: Who has 2001:db8:0:0:<color:#9a9a9a>a7a2:12e0:48bc:7487</color>?  **[broadcast]**
+B -> A: NA: Me!
+A -> B: PING request from 2001:db8:0:8:<color:#9a9a9a>5075:35ff:fefa:30bc
+end
+group B sends reply to C
+B -> A: forward PING response to 2001:db8:0:8:<color:#9a9a9a>5075:35ff:fefa:30bc
+note right
+destination is in 2001:db8::/60
+but 2001:db8:0:8::/61 is a stronger match
+end note
+A -> C: PING response from 2001:db8:0:0:<color:#9a9a9a>a7a2:12e0:48bc:7487</color>
+
+end
+@enduml

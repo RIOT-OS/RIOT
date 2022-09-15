@@ -1,0 +1,26 @@
+From a55827ad8d6563212670c53994b9beb8e1033938 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Tue, 23 Aug 2022 17:03:13 +0200
+Subject: [PATCH 5/5] src/ccn-core: declare gettimeofday function as weak
+ symbol
+
+The definition of gettimeofday in this file leads to multiple definitions on platforms where gettimeofday is compiled in in newlib. Therefore, the gettimeofday function in this file is declared as weak symbol.
+---
+ src/ccnl-core/src/ccnl-os-time.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/ccnl-core/src/ccnl-os-time.c b/src/ccnl-core/src/ccnl-os-time.c
+index 0087b9dc156..bd05cd8df97 100644
+--- a/src/ccnl-core/src/ccnl-os-time.c
++++ b/src/ccnl-core/src/ccnl-os-time.c
+@@ -42,6 +42,7 @@ struct ccnl_timer_s *eventqueue;
+ #include <timex.h>
+ #include <div.h>
+ 
++__attribute__((weak))
+ int gettimeofday(struct timeval *__restrict __p, void *__restrict __tz)
+ {
+     (void) __tz;
+-- 
+2.17.1
+

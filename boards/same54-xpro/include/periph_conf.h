@@ -392,6 +392,7 @@ static const sam0_common_gmac_config_t sam_gmac_config[] = {
         .int_pin = GPIO_PIN(PD, 12),
     }
 };
+/** @} */
 
 #ifdef __cplusplus
 }

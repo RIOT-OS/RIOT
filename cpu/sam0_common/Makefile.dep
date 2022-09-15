@@ -14,9 +14,10 @@ endif
 USEMODULE += sam0_common_periph
 
 ifneq (,$(filter sam0_eth,$(USEMODULE)))
-  USEMODULE += netdev_eth
-  USEMODULE += netopt
   USEMODULE += iolist
+  USEMODULE += netdev_eth
+  USEMODULE += netdev_legacy_api
+  USEMODULE += netopt
   FEATURES_REQUIRED += periph_eth
 endif
 include $(RIOTCPU)/cortexm_common/Makefile.dep

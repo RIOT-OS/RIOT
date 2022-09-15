@@ -22,14 +22,17 @@
 #ifndef FS_LITTLEFS_FS_H
 #define FS_LITTLEFS_FS_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <stdalign.h>
 
 #include "vfs.h"
 #include "lfs.h"
 #include "mtd.h"
 #include "mutex.h"
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @name    littlefs configuration
@@ -79,21 +82,21 @@ typedef struct {
      * total number of block is defined in @p config.
      * if set to 0, the total number of sectors from the mtd is used */
     uint32_t base_addr;
-    uint16_t sectors_per_block; /**< number of sectors per block */
 #if LITTLEFS_FILE_BUFFER_SIZE || DOXYGEN
     /** file buffer to use internally if LITTLEFS_FILE_BUFFER_SIZE is set */
-    uint8_t file_buf[LITTLEFS_FILE_BUFFER_SIZE];
+    alignas(uint32_t) uint8_t file_buf[LITTLEFS_FILE_BUFFER_SIZE];
 #endif
 #if LITTLEFS_READ_BUFFER_SIZE || DOXYGEN
     /** read buffer to use internally if LITTLEFS_READ_BUFFER_SIZE is set */
-    uint8_t read_buf[LITTLEFS_READ_BUFFER_SIZE];
+    alignas(uint32_t) uint8_t read_buf[LITTLEFS_READ_BUFFER_SIZE];
 #endif
 #if LITTLEFS_PROG_BUFFER_SIZE || DOXYGEN
     /** prog buffer to use internally if LITTLEFS_PROG_BUFFER_SIZE is set */
-    uint8_t prog_buf[LITTLEFS_PROG_BUFFER_SIZE];
+    alignas(uint32_t) uint8_t prog_buf[LITTLEFS_PROG_BUFFER_SIZE];
 #endif
     /** lookahead buffer to use internally */
-    uint8_t lookahead_buf[LITTLEFS_LOOKAHEAD_SIZE / 8];
+    alignas(uint32_t) uint8_t lookahead_buf[LITTLEFS_LOOKAHEAD_SIZE / 8];
+    uint16_t sectors_per_block; /**< number of sectors per block */
 } littlefs_desc_t;
 
 /** The littlefs vfs driver */

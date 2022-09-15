@@ -88,7 +88,7 @@ typedef unsigned int gpio_t;
  * @brief   Define a CPU specific GPIO pin generator macro
  * @{
  */
-#define GPIO_PIN(x, y)      ((x & 0) | y)
+#define GPIO_PIN(x, y)      ((x << 5) | y)
 /** @} */
 
 /**
@@ -118,7 +118,7 @@ typedef enum {
     GPIO_FALLING,   /**< emit interrupt on falling flank */
     GPIO_BOTH,      /**< emit interrupt on both flanks */
     GPIO_LOW,       /**< emit interrupt on low level */
-    GPIO_HIGH       /**< emit interrupt on low level */
+    GPIO_HIGH       /**< emit interrupt on high level */
 } gpio_flank_t;
 /** @} */
 
@@ -141,6 +141,84 @@ typedef enum {
 } gpio_mode_t;
 /** @} */
 
+/* BEGIN: GPIO LL overwrites */
+
+#if SOC_GPIO_PIN_COUNT > 32
+
+#define GPIO_PORT_NUMOF         2
+#define GPIO_PORT_0             GPIO_PORT(0)
+#define GPIO_PORT_1             GPIO_PORT(1)
+#define GPIO_PORT_0_PIN_NUMOF   (32)
+#define GPIO_PORT_1_PIN_NUMOF   (SOC_GPIO_PIN_COUNT - 32)
+#define GPIO_PORT_PIN_NUMOF(p)  ((p == GPIO_PORT_0) ? GPIO_PORT_0_PIN_NUMOF \
+                                                    : GPIO_PORT_1_PIN_NUMOF)
+#else
+
+#define GPIO_PORT_NUMOF         1
+#define GPIO_PORT_0             GPIO_PORT(0)
+#define GPIO_PORT_0_PIN_NUMOF   (SOC_GPIO_PIN_COUNT)
+#define GPIO_PORT_PIN_NUMOF(p)  ((p == GPIO_PORT_0) ? GPIO_PORT_0_PIN_NUMOF : 0)
+
+#endif
+
+#define HAVE_GPIO_PORT_T
+typedef uintptr_t gpio_port_t;
+
+#define HAVE_GPIO_SLEW_T
+typedef enum {
+    GPIO_SLEW_SLOWEST = 0,
+    GPIO_SLEW_SLOW = 0,
+    GPIO_SLEW_FAST = 0,
+    GPIO_SLEW_FASTEST = 0,
+} gpio_slew_t;
+
+#define HAVE_GPIO_PULL_STRENGTH_T
+typedef enum {
+    GPIO_PULL_WEAKEST = 0,
+    GPIO_PULL_WEAK = 0,
+    GPIO_PULL_STRONG = 0,
+    GPIO_PULL_STRONGEST = 0
+} gpio_pull_strength_t;
+
+#define HAVE_GPIO_PULL_T
+typedef enum {
+    GPIO_FLOATING = 0,
+    GPIO_PULL_UP = 1,
+    GPIO_PULL_DOWN = 2,
+    GPIO_PULL_KEEP = 0xff   /*< not supported */
+} gpio_pull_t;
+
+/**
+ * @brief   Current an output pin can drive in active and sleep modes
+ */
+#define HAVE_GPIO_DRIVE_STRENGTH_T
+typedef enum {
+    GPIO_DRIVE_WEAKEST   = 0,    /**<  5 mA */
+    GPIO_DRIVE_WEAK      = 1,    /**< 10 mA */
+    GPIO_DRIVE_STRONG    = 2,    /**< 20 mA (default) */
+    GPIO_DRIVE_STRONGEST = 3,    /**< 30 mA */
+} gpio_drive_strength_t;
+
+/*
+ * @brief   Map former enumeration values the new enumeration values for compatibility.
+ */
+#define GPIO_DRIVE_5    GPIO_DRIVE_WEAKEST      /**<  5 mA */
+#define GPIO_DRIVE_10   GPIO_DRIVE_WEAK         /**< 10 mA */
+#define GPIO_DRIVE_20   GPIO_DRIVE_STRONG       /**< 20 mA (default) */
+#define GPIO_DRIVE_30   GPIO_DRIVE_STRONGEST    /**< 30 mA */
+
+#define HAVE_GPIO_IRQ_TRIG_T
+typedef enum {
+    GPIO_TRIGGER_NONE = 0,
+    GPIO_TRIGGER_EDGE_RISING = 1,
+    GPIO_TRIGGER_EDGE_FALLING = 2,
+    GPIO_TRIGGER_EDGE_BOTH = 3,
+    GPIO_TRIGGER_LEVEL_LOW = 4,
+    GPIO_TRIGGER_LEVEL_HIGH = 5
+} gpio_irq_trig_t;
+
+/* END: GPIO LL overwrites */
+
 #endif /* ndef DOXYGEN */
 /** @} */
 
@@ -154,6 +232,7 @@ typedef enum {
  *
  * - \ref esp32_adc_channels_esp32 "ESP32"
  * - \ref esp32_adc_channels_esp32c3 "ESP32-C3"
+ * - \ref esp32_adc_channels_esp32s3 "ESP32-S3"
  *
  * #ADC_GPIOS in the board-specific peripheral configuration defines the
  * list of GPIOs that can be used as ADC channels on the board, for example:
@@ -211,6 +290,7 @@ typedef enum {
  *
  * - \ref esp32_adc_channels_esp32 "ESP32"
  * - \ref esp32_adc_channels_esp32c3 "ESP32-C3"
+ * - \ref esp32_adc_channels_esp32s3 "ESP32-S3"
  *
  * @{
  */
@@ -559,7 +639,7 @@ typedef struct {
  *   That is, if SPI_DEV(1) is used by defining the `SPI1_*` symbols,
  *   SPI_DEV(0) must also be used by defining the `SPI0_*` symbols.
  * - The order in which the available interfaces `SPI2_HOST` (alias `HSPI` or
- *   `FSP`) and `SPI3_HOST` (alias `HSPI`) are assigned doesn't matter.
+ *   `FSPI`) and `SPI3_HOST` (alias `VPSI` or `HSPI`) are assigned doesn't matter.
  * - The GPIOs listed in the configuration are only initialized as SPI
  *   signals when the `periph_spi` module is used. Otherwise they are not
  *   allocated and can be used for other purposes.
@@ -597,9 +677,15 @@ typedef spi_host_device_t spi_ctrl_t;
  * sheets. These alias names have been declared obsolete in ESP-IDF. For
  * source code compatibility reasons these alias names are defined here.
  */
+#if defined(CPU_FAM_ESP32)
 #define HSPI    SPI2_HOST   /**< Alias name for SPI2_HOST as used in former ESP-IDF versions */
-#define FSPI    SPI2_HOST   /**< Alias name for SPI2_HOST as used in former ESP-IDF versions */
 #define VSPI    SPI3_HOST   /**< Alias name for SPI3_HOST as used in former ESP-IDF versions */
+#elif defined(CPU_FAM_ESP32S2)
+#define FSPI    SPI2_HOST   /**< Alias name for SPI2_HOST as used in former ESP-IDF versions */
+#define HSPI    SPI3_HOST   /**< Alias name for SPI3_HOST as used in former ESP-IDF versions */
+#else
+#define FSPI    SPI2_HOST   /**< Alias name for SPI2_HOST as used in former ESP-IDF versions */
+#endif
 
 /**
  * @brief   SPI configuration structure type
@@ -739,6 +825,10 @@ typedef struct {
 #include "periph_cpu_esp32.h"
 #elif defined(CPU_FAM_ESP32C3)
 #include "periph_cpu_esp32c3.h"
+#elif defined(CPU_FAM_ESP32S2)
+#include "periph_cpu_esp32s2.h"
+#elif defined(CPU_FAM_ESP32S3)
+#include "periph_cpu_esp32s3.h"
 #else
 #error "ESP32x family implementation missing"
 #endif

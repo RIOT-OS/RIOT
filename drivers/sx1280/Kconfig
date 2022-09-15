@@ -10,6 +10,7 @@ config MODULE_SX1280
     depends on TEST_KCONFIG
     select PACKAGE_LORABASICS
     select MODULE_LORABASICS_SX1280_DRIVER
+    select MODULE_NETDEV_LEGACY_API
 
 config HAVE_SX1280
     bool

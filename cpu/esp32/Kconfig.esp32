@@ -5,26 +5,26 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-config CPU_CORE_XTENSA_LX6
-    bool
-    select CPU_ARCH_XTENSA
-
-config CPU_CORE
-    default "xtensa-lx6" if CPU_CORE_XTENSA_LX6
-
 config CPU_FAM_ESP32
     bool
     select CPU_COMMON_ESP
     select CPU_CORE_XTENSA_LX6
     select HAS_ARCH_ESP32
     select HAS_CPU_ESP32
+    select HAS_BLE_NIMBLE
+    select HAS_BLE_NIMBLE_NETIF
+    select HAS_ESP_BLE
+    select HAS_ESP_BLE_ESP32
     select HAS_ESP_HW_COUNTER
     select HAS_ESP_WIFI_ENTERPRISE
+    select HAS_PERIPH_GPIO_LL
+    select HAS_PERIPH_GPIO_LL_IRQ
+    select HAS_PERIPH_GPIO_LL_IRQ_LEVEL_TRIGGERED_HIGH
+    select HAS_PERIPH_GPIO_LL_IRQ_LEVEL_TRIGGERED_LOW
     select HAS_PUF_SRAM
 
     select PACKAGE_ESP32_SDK if TEST_KCONFIG
 
-    select MODULE_MALLOC_THREAD_SAFE if !MODULE_ESP_IDF_HEAP && TEST_KCONFIG
     select MODULE_PERIPH_RTT if HAS_PERIPH_RTT && MODULE_PM_LAYERED
     select MODULE_PS if MODULE_SHELL
     select MODULE_PTHREAD if MODULE_CPP

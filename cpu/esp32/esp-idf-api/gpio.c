@@ -31,6 +31,11 @@ esp_err_t esp_idf_gpio_config(const gpio_config_t *cfg)
     return gpio_config(cfg);
 }
 
+esp_err_t esp_idf_gpio_reset_pin(gpio_num_t gpio_num)
+{
+    return gpio_reset_pin(gpio_num);
+}
+
 esp_err_t esp_idf_gpio_intr_enable(gpio_num_t gpio_num)
 {
     return gpio_intr_enable(gpio_num);
@@ -87,6 +92,12 @@ esp_err_t esp_idf_gpio_deep_sleep_hold(void)
 #endif
 }
 #endif /* ESP_PM_GPIO_HOLD */
+
+esp_err_t esp_idf_gpio_set_drive_capability(gpio_num_t gpio_num,
+                                            gpio_drive_cap_t strength)
+{
+    return gpio_set_drive_capability(gpio_num, strength);
+}
 
 #if SOC_RTCIO_INPUT_OUTPUT_SUPPORTED
 esp_err_t esp_idf_rtc_gpio_deinit(gpio_num_t gpio_num)

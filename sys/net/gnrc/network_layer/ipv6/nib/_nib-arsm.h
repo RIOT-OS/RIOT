@@ -248,4 +248,5 @@ bool _is_reachable(_nib_onl_entry_t *entry);
 #endif
 
 #endif /* PRIV_NIB_ARSM_H */
-/** @} */
+/** @internal
+ * @} */

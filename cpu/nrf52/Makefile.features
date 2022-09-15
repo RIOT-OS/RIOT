@@ -33,4 +33,6 @@ ifneq (,$(filter nrf52811% nrf52820% nrf52833% nrf52840%,$(CPU_MODEL)))
   FEATURES_PROVIDED += ble_phy_coded
 endif
 
+FEATURES_PROVIDED += ble_adv_ext
+
 include $(RIOTCPU)/nrf5x_common/Makefile.features

@@ -3,8 +3,6 @@ USEMODULE += sema
 USEMODULE += event_callback
 USEMODULE += ztimer_msec
 
-USEPKG += nrfx
-
 # Requires nimble feature
 FEATURES_REQUIRED += ble_nimble
 
@@ -63,6 +61,10 @@ endif
 # RIOT specific submodule dependencies
 ifneq (,$(filter nimble_addr,$(USEMODULE)))
   USEMODULE += bluetil_addr
+endif
+
+ifneq (,$(filter nimble_adv_ext,$(USEMODULE)))
+  FEATURES_REQUIRED += ble_adv_ext
 endif
 
 ifneq (,$(filter nimble_autoadv,$(USEMODULE)))

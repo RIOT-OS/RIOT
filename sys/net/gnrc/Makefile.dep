@@ -1,3 +1,7 @@
+ifneq (,$(filter bhp,$(USEMODULE)))
+  USEMODULE += bhp_event
+endif
+
 ifneq (,$(filter gcoap,$(USEMODULE)))
   USEMODULE += gnrc_sock_async
 endif

@@ -11,7 +11,9 @@ config MODULE_CPP11-COMPAT
     depends on HAS_CPP
     depends on HAS_LIBSTDCPP
 
+
     select MODULE_CPP
+    select MODULE_LIBSTDCPP
     select MODULE_CPP_NEW_DELETE
     select MODULE_XTIMER
     select MODULE_TIMEX

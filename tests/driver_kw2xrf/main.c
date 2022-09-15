@@ -20,15 +20,16 @@
 
 #include <stdio.h>
 
+#include "common.h"
 #include "fmt.h"
 #include "init_dev.h"
 #include "kw2xrf.h"
 #include "kw2xrf_tm.h"
-#include "kw2xrf_params.h"
 #include "shell.h"
 #include "test_utils/netdev_ieee802154_minimal.h"
+#include "net/netdev/ieee802154_submac.h"
 
-static kw2xrf_t kw2xrf[KW2XRF_NUM];
+static netdev_ieee802154_submac_t kw2xrf_netdev[KW2XRF_NUM];
 
 /* utility functions */
 static void _set_test_mode(int argc, char **argv, uint8_t mode)
@@ -41,8 +42,8 @@ static void _set_test_mode(int argc, char **argv, uint8_t mode)
             return;
         }
 
-        netdev_t *dev = &(kw2xrf[idx].netdev.netdev);
-        dev->driver->set(dev, NETOPT_RF_TESTMODE, &mode, sizeof(mode));
+        kw2xrf_t *dev = kw2xrf_netdev[idx].submac.dev.priv;
+        kw2xrf_set_test_mode(dev, mode);
         return;
     }
     printf("usage: %s <if_id>\n", argv[0]);
@@ -115,19 +116,32 @@ static int _tm_ctx_nm1(int argc, char **argv)
     return 0;
 }
 
+static ieee802154_dev_t *_reg_callback(ieee802154_dev_type_t type, void *opaque)
+{
+    if (type != IEEE802154_DEV_TYPE_KW2XRF) {
+        assert(false);
+    }
+    int *c = opaque;
+    return &kw2xrf_netdev[(*(c))++].submac.dev;
+}
+
 int netdev_ieee802154_minimal_init_devs(netdev_event_cb_t cb) {
     puts("Initializing KW2XRF devices");
 
+    int c = 0;
+    /* This function will iterate through all kw2xrf radios */
+    ieee802154_hal_test_init_devs(_reg_callback, &c);
+
     for (unsigned i = 0; i < KW2XRF_NUM; i++) {
         printf("%d out of %d\n", i + 1, KW2XRF_NUM);
-        /* setup the specific driver */
-        kw2xrf_setup(&kw2xrf[i], &kw2xrf_params[i], i);
+        netdev_register(&kw2xrf_netdev[i].dev.netdev, NETDEV_KW2XRF, 0);
+        netdev_ieee802154_submac_init(&kw2xrf_netdev[i]);
 
         /* set the application-provided callback */
-        kw2xrf[i].netdev.netdev.event_callback = cb;
+        kw2xrf_netdev[i].dev.netdev.event_callback = cb;
 
         /* initialize the device driver */
-        int res = kw2xrf[i].netdev.netdev.driver->init(&kw2xrf[i].netdev.netdev);
+        int res = kw2xrf_netdev[i].dev.netdev.driver->init(&kw2xrf_netdev[i].dev.netdev);
         if (res != 0) {
             return -1;
         }

@@ -20,6 +20,11 @@
 #define NANOCOAP_INTERNAL_H
 
 #include "net/nanocoap.h"
+#if defined(MODULE_SOCK_UDP) || defined(DOXYGEN)
+#include "net/sock/udp.h"
+#else
+typedef void sock_udp_ep_t;
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,8 +35,16 @@ extern "C" {
  */
 struct _coap_request_ctx {
     const coap_resource_t *resource;    /**< resource of the request */
-    void *context;                      /**< request context, needed to supply
-                                             the remote for the forward proxy */
+#if defined(MODULE_GCOAP) || DOXYGEN
+    /**
+     * @brief   transport the packet was received over
+     * @see     @ref gcoap_socket_type_t for values.
+     * @note    @ref gcoap_socket_type_t can not be used, as this would
+     *          cyclically include the @ref net_gcoap header.
+     */
+    uint32_t tl_type;
+    sock_udp_ep_t *remote;              /**< remote endpoint of the request */
+#endif
 };
 
 #ifdef __cplusplus

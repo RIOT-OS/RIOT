@@ -14,7 +14,6 @@
  * @brief       Register Definitions for the AT86RF215 chip
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
- * @}
  */
 
 #ifndef AT86RF215_REGISTERS_H
@@ -609,10 +608,9 @@ static const struct at86rf215_BBC_regs BBC1_regs = {
 /** Lower values increase the preamble detector sensitivity. */
 #define FSKC3_PDT(n)  (((n) << FSKC3_PDT_SHIFT) & FSKC3_PDT_MASK)
 
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* AT86RF215_REGISTERS_H */
+/** @} */

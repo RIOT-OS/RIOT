@@ -98,6 +98,8 @@ typedef struct {
      * @see     [Device state definitions](@ref drivers_slipdev_states)
      */
     uint8_t state;
+    uint8_t rx_queued;                      /**< pkt queued in inbuf */
+    uint8_t rx_done;                        /**< pkt processed */
 } slipdev_t;
 
 /**

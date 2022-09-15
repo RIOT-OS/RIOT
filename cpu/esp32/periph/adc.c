@@ -215,6 +215,8 @@ int adc_line_vref_to_gpio(adc_t line, gpio_t gpio)
 
     /* the GPIO for the output must be a channel of ADC2 */
     assert(_adc_hw[rtcio_out].adc_ctrl == ADC_UNIT_2);
+    /* given ADC line has to be a channel of ADC2  */
+    assert(_adc_hw[rtcio_vref].adc_ctrl == ADC_UNIT_2);
 
     esp_err_t res = ESP_OK;
 

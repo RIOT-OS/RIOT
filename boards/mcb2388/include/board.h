@@ -99,8 +99,8 @@ extern "C" {
 #define HD44780_PARAM_PIN_RS            GPIO_PIN(1, 28)
 #define HD44780_PARAM_PIN_RW            GPIO_PIN(1, 29)
 #define HD44780_PARAM_PIN_ENABLE        GPIO_PIN(1, 31)
-#define HD44780_PARAM_PINS_DATA         {   GPIO_PIN(1,24), GPIO_PIN(1,25), \
-                                            GPIO_PIN(1,26), GPIO_PIN(1,27), \
+#define HD44780_PARAM_PINS_DATA         {   GPIO_PIN(1, 24), GPIO_PIN(1, 25), \
+                                            GPIO_PIN(1, 26), GPIO_PIN(1, 27), \
                                             GPIO_UNDEF,     GPIO_UNDEF,     \
                                             GPIO_UNDEF,     GPIO_UNDEF      }
 /** @} */

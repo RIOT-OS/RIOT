@@ -247,7 +247,11 @@ void IRAM_ATTR thread_yield_isr(void* arg)
     ETS_NMI_UNLOCK();
 #else
     /* clear the interrupt first */
+#ifdef DPORT_CPU_INTR_FROM_CPU_0_REG
     DPORT_WRITE_PERI_REG(DPORT_CPU_INTR_FROM_CPU_0_REG, 0);
+#else
+    DPORT_WRITE_PERI_REG(SYSTEM_CPU_INTR_FROM_CPU_0_REG, 0);
+#endif
     /* set the context switch flag (indicates that context has to be switched
        is switch on exit from interrupt in _frxt_int_exit */
 
@@ -277,14 +281,17 @@ void IRAM_ATTR thread_yield_higher(void)
     }
 #endif
     if (!irq_is_in()) {
-#ifdef MCU_ESP8266
+#if defined(MCU_ESP8266)
         critical_enter();
         ets_soft_int_type = ETS_SOFT_INT_YIELD;
         WSR(BIT(ETS_SOFT_INUM), interrupt);
         critical_exit();
-#else /* MCU_ESP8266 */
+#elif defined(DPORT_CPU_INTR_FROM_CPU_0_REG)
         /* generate the software interrupt to switch the context */
         DPORT_WRITE_PERI_REG(DPORT_CPU_INTR_FROM_CPU_0_REG, DPORT_CPU_INTR_FROM_CPU_0);
+#else
+        /* generate the software interrupt to switch the context */
+        DPORT_WRITE_PERI_REG(SYSTEM_CPU_INTR_FROM_CPU_0_REG, SYSTEM_CPU_INTR_FROM_CPU_0);
 #endif /* MCU_ESP8266 */
     }
     else {

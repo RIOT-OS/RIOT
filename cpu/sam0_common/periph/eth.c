@@ -323,6 +323,11 @@ int sam0_eth_receive_blocking(char *data, unsigned max_len)
     return _try_receive(data, max_len, 1);
 }
 
+bool sam0_eth_has_queued_pkt(void)
+{
+    return _try_receive(NULL, 0, 0) > 0;
+}
+
 int sam0_eth_init(void)
 {
     /* Enable clocks */

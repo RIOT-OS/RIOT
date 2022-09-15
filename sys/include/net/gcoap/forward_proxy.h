@@ -53,7 +53,7 @@ void gcoap_forward_proxy_init(void);
  * @return    -EINVAL        if Proxy-Uri is malformed
  */
 int gcoap_forward_proxy_request_process(coap_pkt_t *pkt,
-                                        sock_udp_ep_t *client);
+                                        const sock_udp_ep_t *client);
 
 /**
  * @brief  Finds the memo for an outstanding request within the

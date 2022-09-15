@@ -231,8 +231,9 @@ int sdcard_spi_init(sdcard_spi_t *card, const sdcard_spi_params_t *params);
  *
  * @return                number of successfully read blocks (0 if no block was read).
  */
-int sdcard_spi_read_blocks(sdcard_spi_t *card, int blockaddr, uint8_t *data, int blocksize,
-                           int nblocks, sd_rw_response_t *state);
+int sdcard_spi_read_blocks(sdcard_spi_t *card, uint32_t blockaddr,
+                           void *data, uint16_t blocksize,
+                           uint16_t nblocks, sd_rw_response_t *state);
 
 /**
  * @brief                 Writes data blocks (usually multiples of 512 Bytes) from buffer to card.
@@ -253,8 +254,9 @@ int sdcard_spi_read_blocks(sdcard_spi_t *card, int blockaddr, uint8_t *data, int
  *
  * @return                number of successfully written blocks (0 if no block was written).
  */
-int sdcard_spi_write_blocks(sdcard_spi_t *card, int blockaddr, const uint8_t *data, int blocksize,
-                            int nblocks, sd_rw_response_t *state);
+int sdcard_spi_write_blocks(sdcard_spi_t *card, uint32_t blockaddr,
+                            const void *data, uint16_t blocksize,
+                            uint16_t nblocks, sd_rw_response_t *state);
 
 /**
  * @brief                 Gets the capacity of the card.

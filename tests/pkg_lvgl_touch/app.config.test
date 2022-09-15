@@ -9,6 +9,9 @@ CONFIG_MODULE_LVGL_EXTRA_THEME_DEFAULT=y
 # Add touch capabilities
 CONFIG_MODULE_LVGL_CONTRIB_TOUCH=y
 
+# enable random positioning
+CONFIG_MODULE_RANDOM=y
+
 # Uncomment the following Kconfig symbols to configure LVGL using Kconfig. This
 # requires the LVGL package to be already downloaded (e.g. built once already)
 # LVGL specific configuration

@@ -3,9 +3,13 @@ MENUCONFIG ?= $(RIOTTOOLS)/kconfiglib/riot_menuconfig.py
 BASE_MENUCONFIG ?= $(RIOTTOOLS)/kconfiglib/menuconfig.py
 GENCONFIG := $(RIOTTOOLS)/kconfiglib/genconfig.py
 
+ifeq ($(RIOT_CI_BUILD),1)
+  QUIETMESSAGES=\#
+endif
 $(BASE_MENUCONFIG):
-	@echo "[INFO] Kconfiglib not found - getting it"
-	@$(MAKE) -C $(RIOTTOOLS)/kconfiglib
-	@echo "[INFO] Kconfiglib downloaded"
+	@$(QUIETMESSAGES) echo "[INFO] Kconfiglib not found - getting it"
+	@$(MAKE) -C $(RIOTTOOLS)/kconfiglib > /dev/null
+	@$(QUIETMESSAGES) echo "[INFO] Kconfiglib downloaded"
+
 
 $(GENCONFIG): $(BASE_MENUCONFIG)

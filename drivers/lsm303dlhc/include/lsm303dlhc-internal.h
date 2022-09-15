@@ -103,7 +103,7 @@ extern "C" {
 #define LSM303DLHC_STATUS_ZDA               (0x04)
 #define LSM303DLHC_STATUS_YDA               (0x02)
 #define LSM303DLHC_STATUS_XDA               (0x01)
-/** *} */
+/** @} */
 
 /**
  * @name Masks for the LSM303DLHC CTRL4_A register

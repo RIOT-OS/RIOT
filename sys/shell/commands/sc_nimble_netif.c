@@ -229,6 +229,7 @@ static void _cmd_info(void)
     bluetil_addr_swapped_cp(tmp_addr, own_addr);
     printf("Own Address: ");
     bluetil_addr_print(own_addr);
+    printf(" (%s)", nimble_riot_own_addr_type ? "static random" : "public");
 #ifdef MODULE_GNRC_IPV6
     printf(" -> ");
     bluetil_addr_ipv6_l2ll_print(own_addr);

@@ -83,13 +83,16 @@ static size_t _len_set(uint8_t *buf, size_t len)
     }
 }
 
-static size_t _len_get(uint8_t *buf, size_t *len)
+static ssize_t _len_get(uint8_t *buf, size_t pkt_len, size_t *len)
 {
     if (buf[0] != 0x01) {
         *len = (uint16_t)buf[0];
         return 1;
     }
     else {
+        if (pkt_len < 3) {
+            return -1;
+        }
         *len = byteorder_bebuftohs(&buf[1]);
         return 3;
     }
@@ -107,8 +110,10 @@ static uint16_t _msg_id_next(asymcute_con_t *con)
 static uint8_t _req_type(asymcute_req_t *req)
 {
     size_t len;
-    size_t pos = _len_get(req->data, &len);
-    return req->data[pos];
+    ssize_t pos = _len_get(req->data, req->data_len, &len);
+    /* requests are created by us and should thus always be valid */
+    assert(pos != -1 && (size_t)pos < req->data_len);
+    return req->data[(size_t)pos];
 }
 
 /* @pre con is locked */
@@ -590,7 +595,12 @@ void _on_pkt(sock_udp_t *sock, sock_async_flags_t type, void *arg)
                                         CONFIG_ASYMCUTE_BUFSIZE, 0, NULL);
         if (pkt_len >= MIN_PKT_LEN) {
             size_t len;
-            size_t pos = _len_get(con->rxbuf, &len);
+            ssize_t lret = _len_get(con->rxbuf, pkt_len, &len);
+            if (lret == -1) {
+                /* first octet was 0x01 but pkt does not have more than 3 octets */
+                return;
+            }
+            size_t pos = (size_t)lret;
 
             /* validate incoming data: verify message length */
             if (((size_t)pkt_len <= pos) || ((size_t)pkt_len < len)) {

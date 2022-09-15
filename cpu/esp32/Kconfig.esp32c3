@@ -5,38 +5,27 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-config CPU_ARCH_RISCV
-    bool
-    select HAS_ARCH_32BIT
-    select HAS_ARCH_ESP
-    select HAS_ARCH_ESP_RISCV
-    help
-        RISC-V based ESP32x SoC variant is used.
-
-config CPU_ARCH
-    default "rv32" if CPU_ARCH_RISCV
-
-config CPU_CORE_RV32IMC
-    bool
-    select CPU_ARCH_RISCV
-    help
-        CPU core of the ESP32x SoC is a RISC-V core.
-
-config CPU_CORE
-    default "rv32imc" if CPU_CORE_RV32IMC
-
 config CPU_FAM_ESP32C3
     bool
     select CPU_COMMON_ESP
     select CPU_CORE_RV32IMC
     select HAS_ARCH_ESP32
     select HAS_CPU_ESP32
+    select HAS_BLE_ADV_EXT
+    select HAS_BLE_NIMBLE
+    select HAS_BLE_NIMBLE_NETIF
+    select HAS_BLE_PHY_2MBIT
+    select HAS_ESP_BLE
+    select HAS_ESP_BLE_ESP32C3
     select HAS_ESP_WIFI_ENTERPRISE
+    select HAS_PERIPH_GPIO_LL
+    select HAS_PERIPH_GPIO_LL_IRQ
+    select HAS_PERIPH_GPIO_LL_IRQ_LEVEL_TRIGGERED_HIGH
+    select HAS_PERIPH_GPIO_LL_IRQ_LEVEL_TRIGGERED_LOW
     select HAS_PUF_SRAM
 
     select PACKAGE_ESP32_SDK if TEST_KCONFIG
 
-    select MODULE_MALLOC_THREAD_SAFE if !MODULE_ESP_IDF_HEAP && TEST_KCONFIG
     select MODULE_PERIPH_RTT if HAS_PERIPH_RTT && MODULE_PM_LAYERED
     select MODULE_PS if MODULE_SHELL
     select MODULE_PTHREAD if MODULE_CPP

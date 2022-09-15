@@ -173,6 +173,7 @@ endif
 
 ifneq (,$(filter netdev_ieee802154_submac,$(USEMODULE)))
   USEMODULE += netdev_ieee802154
+  USEMODULE += netdev_legacy_api
   USEMODULE += ieee802154
   USEMODULE += ieee802154_submac
 endif
@@ -320,6 +321,10 @@ ifneq (,$(filter shell_commands,$(USEMODULE)))
 
   ifneq (,$(gnrc_udp_cmd,$(USEMODULE)))
     USEMODULE += netutils
+  endif
+
+  ifneq (,$(filter nanocoap_vfs,$(USEMODULE)))
+    USEMODULE += vfs_util
   endif
 
   ifneq (,$(filter nimble_netif,$(USEMODULE)))
@@ -960,6 +965,10 @@ endif
 
 ifneq (,$(filter ecc_%,$(USEMODULE)))
   USEMODULE += ecc
+endif
+
+ifneq (,$(filter bhp_%,$(USEMODULE)))
+  USEMODULE += bhp
 endif
 
 ifneq (,$(filter dbgpin,$(USEMODULE)))

@@ -94,7 +94,7 @@ extern "C" {
 #define BACKLIGHT_MASK         (1 << 5)                             /**< Backlight pin mask */
 #define BACKLIGHT_ON           (NRF_P1->OUTSET = BACKLIGHT_MASK)    /**< Turn backlight on */
 #define BACKLIGHT_OFF          (NRF_P1->OUTCLR = BACKLIGHT_MASK)    /**< Turn backlight off */
-/** @ */
+/** @} */
 
 /**
  * @name    Display configuration

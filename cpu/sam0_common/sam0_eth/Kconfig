@@ -11,6 +11,7 @@ config MODULE_SAM0_ETH
     depends on CPU_COMMON_SAM0
     depends on HAS_PERIPH_ETH
     select MODULE_NETDEV_ETH
+    select MODULE_NETDEV_LEGACY_API
     select MODULE_NETOPT
     select MODULE_IOLIST
     select MODULE_PERIPH_ETH

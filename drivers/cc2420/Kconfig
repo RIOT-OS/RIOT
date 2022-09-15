@@ -11,13 +11,14 @@ config MODULE_CC2420
     depends on HAS_PERIPH_GPIO
     depends on HAS_PERIPH_GPIO_IRQ
     depends on HAS_PERIPH_SPI
+    select MODULE_IEEE802154
+    select MODULE_NETDEV
+    select MODULE_NETDEV_IEEE802154
+    select MODULE_NETDEV_LEGACY_API
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_GPIO_IRQ
     select MODULE_PERIPH_SPI
     select MODULE_XTIMER
-    select MODULE_IEEE802154
-    select MODULE_NETDEV
-    select MODULE_NETDEV_IEEE802154
 
 config HAVE_CC2420
     bool

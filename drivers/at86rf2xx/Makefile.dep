@@ -4,6 +4,7 @@ DEFAULT_MODULE += netdev_ieee802154_oqpsk
 USEMODULE += xtimer
 USEMODULE += ieee802154
 USEMODULE += netdev_ieee802154
+USEMODULE += netdev_legacy_api
 
 # only needed for SPI based variants
 ifeq (,$(filter at86rfa1 at86rfr2,$(USEMODULE)))

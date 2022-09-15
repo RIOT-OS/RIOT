@@ -3,6 +3,11 @@
 All security bugs reported will be silently fixed in `master` and backported
 to the previous release.
 
+When CVE numbers are assigned to RIOT vulnerabilities, they are associated with
+[CPE] identifiers in the shape of `cpe:2.3:o:riot-os:riot:<VERSION>`.
+
+[CPE]: https://nvd.nist.gov/products/cpe
+
 ## Reporting a Vulnerability
 
 If a security issue is discovered, please report it to security@riot-os.org.

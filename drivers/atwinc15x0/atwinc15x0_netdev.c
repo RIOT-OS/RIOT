@@ -59,6 +59,7 @@
 static void _atwinc15x0_wifi_cb(uint8_t event, void *msg);
 static void _atwinc15x0_eth_cb(uint8_t type, void *msg, void *ctrl);
 static int _atwinc15x0_connect(void);
+static int _atwinc15x0_init(netdev_t *netdev);
 static int _set_state(atwinc15x0_t *dev, netopt_state_t state);
 
 /**
@@ -455,6 +456,10 @@ static int _set_state(atwinc15x0_t *dev, netopt_state_t state)
         dev->state = state;
         _atwinc15x0_connect();
         return sizeof(netopt_state_t);
+    case NETOPT_STATE_RESET:
+        _atwinc15x0_init(&dev->netdev);
+        dev->state = NETOPT_STATE_IDLE;
+        return sizeof(netopt_state_t);
     default:
         break;
     }
@@ -588,7 +593,10 @@ static void _atwinc15x0_isr(netdev_t *netdev)
     DEBUG("%s dev=%p\n", __func__, (void *)dev);
 
     /* handle pending ATWINC15x0 module events */
-    while (m2m_wifi_handle_events(NULL) != M2M_SUCCESS) { }
+    if (m2m_wifi_handle_events(NULL) != M2M_SUCCESS) {
+        DEBUG("%s handle events failed, reset device\n", __func__);
+        _atwinc15x0_init(netdev);
+    }
 }
 
 const netdev_driver_t atwinc15x0_netdev_driver = {

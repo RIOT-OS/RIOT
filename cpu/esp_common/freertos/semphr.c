@@ -66,6 +66,11 @@ BaseType_t xSemaphoreGive(SemaphoreHandle_t xSemaphore)
 {
     DEBUG("%s mutex=%p\n", __func__, xSemaphore);
 
+    /* if scheduler is not running, we must not lock the mutex */
+    if (thread_getpid() == KERNEL_PID_UNDEF) {
+        return pdPASS;
+    }
+
     assert(xSemaphore != NULL);
 
     _sem_t* sem = (_sem_t*)xSemaphore;
@@ -90,6 +95,11 @@ BaseType_t xSemaphoreTake(SemaphoreHandle_t xSemaphore,
                           TickType_t xTicksToWait)
 {
     DEBUG("%s mutex=%p wait=%"PRIu32"\n", __func__, xSemaphore, xTicksToWait);
+
+    /* if scheduler is not running, we must not lock the mutex */
+    if (thread_getpid() == KERNEL_PID_UNDEF) {
+        return pdPASS;
+    }
 
     assert(xSemaphore != NULL);
 
@@ -139,6 +149,11 @@ BaseType_t xSemaphoreGiveRecursive(SemaphoreHandle_t xSemaphore)
 {
     DEBUG("%s rmutex=%p\n", __func__, xSemaphore);
 
+    /* if scheduler is not running, we must not lock the mutex */
+    if (thread_getpid() == KERNEL_PID_UNDEF) {
+        return pdPASS;
+    }
+
     _rsem_t* rsem = (_rsem_t*)xSemaphore;
 
     assert(rsem != NULL);
@@ -155,6 +170,11 @@ BaseType_t xSemaphoreTakeRecursive(SemaphoreHandle_t xSemaphore,
                                    TickType_t xTicksToWait)
 {
     DEBUG("%s rmutex=%p wait=%"PRIu32"\n", __func__, xSemaphore, xTicksToWait);
+
+    /* if scheduler is not running, we must not lock the rmutex */
+    if (thread_getpid() == KERNEL_PID_UNDEF) {
+        return pdPASS;
+    }
 
     _rsem_t* rsem = (_rsem_t*)xSemaphore;
 

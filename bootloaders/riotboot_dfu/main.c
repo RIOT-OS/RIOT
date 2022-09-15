@@ -64,15 +64,15 @@ void kernel_init(void)
         }
     }
 
+    /* Init ztimer before starting DFU mode */
+    ztimer_init();
+
     /* Flash the unused slot if magic word is set */
     riotboot_usb_dfu_init(0);
 
     if (slot != -1 && !_bootloader_alternative_mode()) {
         riotboot_slot_jump(slot);
     }
-
-    /* Init ztimer before starting DFU mode */
-    ztimer_init();
 
     /* Nothing to boot, stay in DFU mode to flash a slot */
     riotboot_usb_dfu_init(1);

@@ -61,7 +61,7 @@ void gcoap_forward_proxy_init(void)
     gcoap_register_listener(&forward_proxy_listener);
 }
 
-static client_ep_t *_allocate_client_ep(sock_udp_ep_t *ep)
+static client_ep_t *_allocate_client_ep(const sock_udp_ep_t *ep)
 {
     client_ep_t *cep;
     for (cep = _client_eps;
@@ -102,7 +102,7 @@ static ssize_t _forward_proxy_handler(coap_pkt_t *pdu, uint8_t *buf,
                                       size_t len, coap_request_ctx_t *ctx)
 {
     int pdu_len;
-    sock_udp_ep_t *remote = coap_request_ctx_get_context(ctx);
+    const sock_udp_ep_t *remote = coap_request_ctx_get_remote_udp(ctx);
 
     pdu_len = gcoap_forward_proxy_request_process(pdu, remote);
 
@@ -376,7 +376,7 @@ static int _gcoap_forward_proxy_via_coap(coap_pkt_t *client_pkt,
 }
 
 int gcoap_forward_proxy_request_process(coap_pkt_t *pkt,
-                                        sock_udp_ep_t *client) {
+                                        const sock_udp_ep_t *client) {
     char *uri;
     uri_parser_result_t urip;
     ssize_t optlen = 0;

@@ -85,6 +85,9 @@ install_arch()
         esp32c3)
             TARGET_ARCH="riscv32-esp-elf"
             ;;
+        esp32s2)
+            TARGET_ARCH="xtensa-esp32s2-elf"
+            ;;
         esp32s3)
             TARGET_ARCH="xtensa-esp32s3-elf"
             ;;
@@ -158,10 +161,10 @@ install_qemu()
 
 if [ -z $1 ]; then
     echo "Usage: install.sh <tool>"
-    echo "tool = all | esp32 | esp32c3 | esp32s3 | openocd | qemu"
+    echo "tool = all | esp32 | esp32c3 | esp32s2 | esp32s3 | openocd | qemu"
     exit 1
 elif [ "$1" = "all" ]; then
-    ARCH_ALL="esp32 esp32c3 esp32s3"
+    ARCH_ALL="esp32 esp32c3 esp32s2 esp32s3"
     for arch in ${ARCH_ALL}; do
         install_arch $arch
     done

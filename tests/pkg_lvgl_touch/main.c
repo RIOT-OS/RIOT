@@ -24,13 +24,22 @@
 #include "lvgl_riot.h"
 
 #include "disp_dev.h"
+#include "random.h"
 
+static lv_obj_t *btn;
+static const lv_coord_t x_size = 100;
+static const lv_coord_t y_size = 50;
 
 static void btn_event_cb(lv_event_t *event)
 {
     lv_event_code_t code = lv_event_get_code(event);
     if (code == LV_EVENT_CLICKED) {
         puts("Button clicked!");
+
+        lv_coord_t x_pos = random_uint32_range(0, lv_obj_get_width(lv_scr_act()) - x_size);
+        lv_coord_t y_pos = random_uint32_range(0, lv_obj_get_height(lv_scr_act()) - y_size);
+
+        lv_obj_set_pos(btn, x_pos, y_pos);
     }
 }
 
@@ -40,11 +49,9 @@ int main(void)
     disp_dev_backlight_on();
 
     /* Add a button to the current screen */
-    lv_obj_t *btn = lv_btn_create(lv_scr_act());
+    btn = lv_btn_create(lv_scr_act());
 
     /* Set the button position and size */
-    lv_coord_t x_size = 100;
-    lv_coord_t y_size = 50;
     lv_coord_t x_pos = (lv_obj_get_width(lv_scr_act()) - x_size) / 2;
     lv_coord_t y_pos = (lv_obj_get_height(lv_scr_act()) - y_size) / 2;
     lv_obj_set_pos(btn, x_pos, y_pos);

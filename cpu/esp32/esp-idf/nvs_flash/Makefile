@@ -18,6 +18,7 @@ ESP32_SDK_SRCXX = \
 
 # additional include pathes required by this module
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_rom/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/nvs_flash/include
 
 include $(RIOTBASE)/Makefile.base
 

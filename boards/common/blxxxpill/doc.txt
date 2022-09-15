@@ -88,8 +88,9 @@ development version of OpenOCD.
 
 ## Connecting via Serial
 
-The default UART port used is UART2, which uses pins A2 (TX) and A3 (RX).
-To use it, configure your UART to operate at a baudrate of 115200/8N1.
+The default UART port used is UART1, which uses pins A9 (TX) and A10 (RX).
+To use it, configure your UART to operate at a symbol rate of 115200 baud,
+1 stop bit and no parity (8N1).
 
 ## Using PWM
 

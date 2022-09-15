@@ -298,6 +298,7 @@ typedef enum {
     AT86RF215_CLKO_2_MHz,           /**<  2 MHz */
     AT86RF215_CLKO_1_MHz,           /**<  1 MHz */
 } at86rf215_clko_freq_t;
+/** @} */
 
 /**
  * @name    Internal device option flags

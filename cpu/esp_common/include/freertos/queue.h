@@ -108,6 +108,11 @@ UBaseType_t uxQueueMessagesWaiting( QueueHandle_t xQueue );
                                   ( pxHigherPriorityTaskWoken ), \
                                   queueSEND_TO_BACK )
 
+#define xQueueSendToBackFromISR( xQueue, pvItemToQueue, pxHigherPriorityTaskWoken ) \
+        xQueueGenericSendFromISR( ( xQueue ), ( pvItemToQueue ), \
+                                  ( pxHigherPriorityTaskWoken ), \
+                                  queueSEND_TO_BACK )
+
 #define xQueueOverwriteFromISR( xQueue, pvItemToQueue, pxHigherPriorityTaskWoken ) \
         xQueueGenericSendFromISR( ( xQueue ), ( pvItemToQueue ), \
                                   ( pxHigherPriorityTaskWoken ), \

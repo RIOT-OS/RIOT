@@ -22,6 +22,7 @@
 #include "kernel_defines.h"
 #include "net/ieee802154/radio.h"
 #include "common.h"
+#include "bhp/event.h"
 
 #ifdef MODULE_CC2538_RF
 #include "cc2538_rf.h"
@@ -34,6 +35,17 @@
 #ifdef MODULE_SOCKET_ZEP
 #include "socket_zep.h"
 #include "socket_zep_params.h"
+#endif
+
+#ifdef MODULE_KW2XRF
+#include "kw2xrf.h"
+#include "kw2xrf_params.h"
+#include "event/thread.h"
+#define KW2XRF_NUM   ARRAY_SIZE(kw2xrf_params)
+extern void auto_init_event_thread(void);
+static kw2xrf_t kw2xrf_dev[KW2XRF_NUM];
+static bhp_event_t kw2xrf_bhp[KW2XRF_NUM];
+
 #endif
 
 void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
@@ -53,6 +65,18 @@ void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
     if ((radio = cb(IEEE802154_DEV_TYPE_NRF802154, opaque)) ){
         nrf802154_hal_setup(radio);
         nrf802154_init();
+    }
+#endif
+
+#ifdef MODULE_KW2XRF
+    auto_init_event_thread();
+    if ((radio = cb(IEEE802154_DEV_TYPE_KW2XRF, opaque)) ){
+        for (unsigned i = 0; i < KW2XRF_NUM; i++) {
+            const kw2xrf_params_t *p = &kw2xrf_params[i];
+            bhp_event_init(&kw2xrf_bhp[i], EVENT_PRIO_HIGHEST, &kw2xrf_radio_hal_irq_handler, radio);
+            kw2xrf_init(&kw2xrf_dev[i], p, radio, bhp_event_isr_cb, &kw2xrf_bhp[i]);
+            break;
+        }
     }
 #endif
 

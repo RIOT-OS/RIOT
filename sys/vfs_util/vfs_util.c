@@ -245,7 +245,7 @@ int vfs_unlink_recursive(const char *root, char *path_buf, size_t max_size)
             return err;
         }
         while (vfs_readdir(&dir, &entry) > 0) {
-            if (!strcmp(entry.d_name, "..")) {
+            if (!strcmp(entry.d_name, ".") || !strcmp(entry.d_name, "..")) {
                 continue;
             }
             seg_len = strlen(entry.d_name);

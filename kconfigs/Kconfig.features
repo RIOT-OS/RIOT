@@ -42,10 +42,31 @@ config HAS_BACKUP_RAM
     help
         Indicates that Backup RAM is supported.
 
-config HAS_RUST_TARGET
+config HAS_BLE_ADV_EXT
     bool
     help
-        Indicates that a Rust target definition ("triple") is known.
+        Indicates the current platform supports Bluetooth 5 Advertising
+        Extension
+
+config HAS_BLE_NIMBLE
+    bool
+    help
+        Indicates that the NimBLE stack is supported on the current platform.
+
+config HAS_BLE_NIMBLE_NETIF
+    bool
+    help
+        Indicates that NimBLE netif is supported on the current platform.
+
+config HAS_BLE_PHY_2MBIT
+    bool
+    help
+        Indicates that the BLE radio supports the 2Mbit PHY mode
+
+config HAS_BLE_PHY_CODED
+    bool
+    help
+        Indicates that the BLE radio supports the CODED PHY mode
 
 config HAS_CPP
     bool
@@ -437,6 +458,11 @@ config HAS_RIOTBOOT
     bool
     help
         Indicates that the riotboot booloader is supported.
+
+config HAS_RUST_TARGET
+    bool
+    help
+        Indicates that a Rust target definition ("triple") is known.
 
 config HAS_SDCARD_SPI
     bool

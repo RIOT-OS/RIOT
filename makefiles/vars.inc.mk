@@ -97,6 +97,7 @@ export WPEDANTIC             # Issue all (extensive) compiler warnings demanded 
 export FLASH_ADDR            # Define an offset to flash code into ROM memory.
 # TERMPROG                   # The command to call on "make term".
 # TERMFLAGS                  # Additional parameters to supply to TERMPROG.
+# TERMENV                    # Environment variables passed to TERMPROG
 # TERMLOG                    # Optional file to log "make term" output to.
 # TERMTEE                    # Optional pipe to redirect "make term" output. Default: '| tee -a ${TERMLOG}' when TERMLOG is defined else undefined.
 # PORT                       # The port to connect the TERMPROG to.

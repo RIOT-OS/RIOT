@@ -18,7 +18,7 @@ ifneq (,$(filter esp32,$(CPU_FAM)))
   ESP32_SDK_SRC += components/spi_flash/esp_flash_spi_init.c
 endif
 
-ifneq (,$(filter esp32 esp32s3,$(CPU_FAM)))
+ifneq (,$(filter esp32 esp32s2 esp32s3,$(CPU_FAM)))
   ESP32_SDK_SRC += components/spi_flash/flash_mmap.c
 endif
 

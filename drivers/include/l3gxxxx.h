@@ -898,9 +898,9 @@
  * | I2C address            | #L3GXXXX_I2C_ADDR | #L3GXXXX_I2C_ADDR_2 |
  * | SPI device             | #L3GXXXX_SPI_DEV  | SPI_DEV(0)          |
  * | SPI clock frequency    | #L3GXXXX_SPI_CLK  | SPI_CLK_1MHZ        |
- * | SPI CS signal          | #L3GXXXX_SPI_CS   | GPIO_PIN(0,0)       |
- * | `INT1` MCU pin         | #L3GXXXX_INT1_PIN | GPIO_PIN(0,1)       |
- * | `INT2/DRDY` MCU pin    | #L3GXXXX_INT2_PIN | GPIO_PIN(0,2)       |
+ * | SPI CS signal          | #L3GXXXX_SPI_CS   | GPIO_PIN(0, 0)      |
+ * | `INT1` MCU pin         | #L3GXXXX_INT1_PIN | GPIO_PIN(0, 1)      |
+ * | `INT2/DRDY` MCU pin    | #L3GXXXX_INT2_PIN | GPIO_PIN(0, 2)      |
  * </center><br>
  *
  * These hardware configurations can be overridden either by the board
@@ -909,7 +909,7 @@
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * DRIVER=l3gd20h USEMODULE='l3gxxxx_irq_data` \
- * CLFAGS='-DL3GXXXX_INT2_PIN=GPIO_PIN\(0,5\)' \
+ * CLFAGS='-DL3GXXXX_INT2_PIN=GPIO_PIN\(0, 5\)' \
  * BOARD=... make -C tests/driver_l3gxxxx
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *

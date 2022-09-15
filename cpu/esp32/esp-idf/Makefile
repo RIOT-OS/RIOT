@@ -8,6 +8,10 @@ ifneq (,$(filter esp_idf_adc,$(USEMODULE)))
   DIRS += adc
 endif
 
+ifneq (,$(filter esp_idf_ble,$(USEMODULE)))
+  DIRS += ble
+endif
+
 ifneq (,$(filter esp_idf_common,$(USEMODULE)))
   DIRS += common
 endif

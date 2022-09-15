@@ -31,10 +31,10 @@ extern "C" {
  * @{
  */
 #ifndef SRF04_PARAM_TRIGGER
-#define SRF04_PARAM_TRIGGER     GPIO_PIN(0,13)
+#define SRF04_PARAM_TRIGGER     GPIO_PIN(0, 13)
 #endif
 #ifndef SRF04_PARAM_ECHO
-#define SRF04_PARAM_ECHO        GPIO_PIN(0,14)
+#define SRF04_PARAM_ECHO        GPIO_PIN(0, 14)
 #endif
 
 #ifndef SRF04_PARAMS

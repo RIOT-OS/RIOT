@@ -76,3 +76,4 @@ bool gnrc_lorawan_validate_dr(uint8_t dr);
 #endif
 
 #endif /* NET_GNRC_LORAWAN_REGION_H */
+/** @} */

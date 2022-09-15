@@ -9,6 +9,7 @@ config CPU_FAM_NRF52
     select CPU_COMMON_NRF5X
 # The ADC does not depend on any board configuration, so always available
     select HAS_PERIPH_ADC
+    select HAS_BLE_ADV_EXT
 # So far, NimBLE netif does not support nrf51 platforms, so we use a dedicated
 # feature to mark this
     select HAS_BLE_NIMBLE_NETIF

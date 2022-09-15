@@ -30,6 +30,7 @@
 #include <fcntl.h>
 
 #include "shell.h"
+#include "macros/units.h"
 #include "vfs.h"
 #include "vfs_util.h"
 
@@ -79,6 +80,9 @@ static void _vfs_usage(char **argv)
     if (MOUNTPOINTS_NUMOF > 0) {
         printf("%s remount [path]\n", argv[0]);
     }
+    if (MOUNTPOINTS_NUMOF > 0) {
+        printf("%s format [path]\n", argv[0]);
+    }
     puts("r: Read [bytes] bytes at [offset] in file <path>");
     puts("w: Write (<a>: append, <o> overwrite) <ascii> or <hex> string <data> in file <path>");
     puts("ls: List files in <path>");
@@ -112,6 +116,7 @@ static int _errno_string(int err, char *buf, size_t buflen)
         err = -err;
     }
     switch (err) {
+        _case_snprintf_errno_name(EBUSY);
         _case_snprintf_errno_name(EACCES);
         _case_snprintf_errno_name(ENOENT);
         _case_snprintf_errno_name(EINVAL);
@@ -133,6 +138,37 @@ static int _errno_string(int err, char *buf, size_t buflen)
 }
 #undef _case_snprintf_errno_name
 
+static void _print_size(uint64_t size)
+{
+    unsigned long len;
+    const char *unit;
+
+    if (size == 0) {
+        len = 0;
+        unit = NULL;
+    } else if ((size & (GiB(1) - 1)) == 0) {
+        len = size / GiB(1);
+        unit = "GiB";
+    }
+    else if ((size & (MiB(1) - 1)) == 0) {
+        len = size / MiB(1);
+        unit = "MiB";
+    }
+    else if ((size & (KiB(1) - 1)) == 0) {
+        len = size / KiB(1);
+        unit = "KiB";
+    } else {
+        len = size;
+        unit = NULL;
+    }
+
+    if (unit) {
+        printf("%8lu %s ", len, unit);
+    } else {
+        printf("%10lu B ", len);
+    }
+}
+
 static void _print_df(vfs_DIR *dir)
 {
     struct statvfs buf;
@@ -144,14 +180,16 @@ static void _print_df(vfs_DIR *dir)
         printf("statvfs failed: %s\n", err);
         return;
     }
-    printf("%12lu %12lu %12lu %7lu%%\n", (unsigned long)buf.f_blocks,
-        (unsigned long)(buf.f_blocks - buf.f_bfree), (unsigned long)buf.f_bavail,
-        (unsigned long)(((buf.f_blocks - buf.f_bfree) * 100) / buf.f_blocks));
+
+    _print_size(buf.f_blocks * buf.f_bsize);
+    _print_size((buf.f_blocks - buf.f_bfree) * buf.f_bsize);
+    _print_size(buf.f_bavail * buf.f_bsize);
+    printf("%7lu%%\n", (unsigned long)(((buf.f_blocks - buf.f_bfree) * 100) / buf.f_blocks));
 }
 
 static int _df_handler(int argc, char **argv)
 {
-    puts("Mountpoint              Total         Used    Available     Capacity");
+    puts("Mountpoint              Total         Used    Available     Use%");
     if (argc > 1) {
         const char *path = argv[1];
         /* Opening a directory just to statfs is somewhat odd, but it is the
@@ -185,9 +223,13 @@ static int _mount_handler(int argc, char **argv)
         return -1;
     }
 
-    uint8_t buf[16];
+    char buf[16];
     int res = vfs_mount_by_path(argv[1]);
-    _errno_string(res, (char *)buf, sizeof(buf));
+    if (res < 0) {
+        _errno_string(res, buf, sizeof(buf));
+        puts(buf);
+    }
+
     return res;
 }
 
@@ -199,10 +241,13 @@ static int _umount_handler(int argc, char **argv)
         return -1;
     }
 
-    uint8_t buf[16];
+    char buf[16];
     int res = vfs_unmount_by_path(argv[1]);
+    if (res < 0) {
+        _errno_string(res, buf, sizeof(buf));
+        puts(buf);
+    }
 
-    _errno_string(res, (char *)buf, sizeof(buf));
     return res;
 }
 
@@ -214,10 +259,32 @@ static int _remount_handler(int argc, char **argv)
         return -1;
     }
 
-    uint8_t buf[16];
+    char buf[16];
     vfs_unmount_by_path(argv[1]);
     int res = vfs_mount_by_path(argv[1]);
-    _errno_string(res, (char *)buf, sizeof(buf));
+    if (res < 0) {
+        _errno_string(res, buf, sizeof(buf));
+        puts(buf);
+    }
+
+    return res;
+}
+
+static int _format_handler(int argc, char **argv)
+{
+    if (argc < 2) {
+        printf("usage: %s [path]\n", argv[0]);
+        puts("format pre-configured mount point");
+        return -1;
+    }
+
+    char buf[16];
+    int res = vfs_format_by_path(argv[1]);
+    if (res < 0) {
+        _errno_string(res, buf, sizeof(buf));
+        puts(buf);
+    }
+
     return res;
 }
 
@@ -718,6 +785,9 @@ static int _vfs_handler(int argc, char **argv)
     }
     else if (MOUNTPOINTS_NUMOF > 0 && strcmp(argv[1], "remount") == 0) {
         return _remount_handler(argc - 1, &argv[1]);
+    }
+    else if (MOUNTPOINTS_NUMOF > 0 && strcmp(argv[1], "format") == 0) {
+        return _format_handler(argc - 1, &argv[1]);
     }
     else {
         printf("vfs: unsupported sub-command \"%s\"\n", argv[1]);

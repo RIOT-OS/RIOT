@@ -56,7 +56,7 @@ extern "C" {
 #define DHCPV6_INFO_REQUEST         (11U)   /**< INFORMATION-REQUEST */
 #define DHCPV6_RELAY_FORW           (12U)   /**< RELAY-FORW */
 #define DHCPV6_RELAY_REPL           (13U)   /**< RELAY-REPL */
-/** @ } */
+/** @} */
 
 /**
  * @name    DHCPv6 option codes

@@ -101,7 +101,6 @@ extern "C" {
  /** @todo Work around missing RESET pin on Mulle v0.6x
  *
  * {spi bus, spi speed, cs pin, int pin, reset pin, sleep pin}
- * @{
  */
 #define AT86RF2XX_PARAM_CS             SPI_HWCS(1)
 #define AT86RF2XX_PARAM_INT            GPIO_PIN(PORT_B, 9)

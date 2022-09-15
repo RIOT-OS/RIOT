@@ -14,14 +14,15 @@ menuconfig MODULE_SX127X
     depends on HAS_PERIPH_GPIO_IRQ
     depends on HAS_PERIPH_SPI
     depends on HAS_PERIPH_TIMER
-    select MODULE_PERIPH_GPIO
-    select MODULE_PERIPH_GPIO_IRQ
-    select MODULE_PERIPH_SPI_GPIO_MODE if HAS_PERIPH_SPI_GPIO_MODE
-    select MODULE_PERIPH_SPI
-    select MODULE_ZTIMER
-    select MODULE_ZTIMER_MSEC
     select MODULE_IOLIST
     select MODULE_LORA
+    select MODULE_NETDEV_LEGACY_API
+    select MODULE_PERIPH_GPIO
+    select MODULE_PERIPH_GPIO_IRQ
+    select MODULE_PERIPH_SPI
+    select MODULE_PERIPH_SPI_GPIO_MODE if HAS_PERIPH_SPI_GPIO_MODE
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_MSEC
     help
         Only LoRa long range modem is supported at the moment.
 

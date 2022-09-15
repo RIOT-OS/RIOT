@@ -82,6 +82,23 @@ config MODULE_NETDEV_REGISTER
 
 endif # MODULE_NETDEV
 
+# This does not depend on MODULE_NETDEV, as it is merely a flag to say if a
+# given network driver is used via the netdev API, it provides the new netdev
+# API. However, the driver may also provide a API other than netdev that might
+# be used directly.
+config MODULE_NETDEV_NEW_API
+    bool
+    help
+        Support for new API (non-blocking send). With this, netdev
+        drivers implementing `netdev_driver_t::confirm_send()` can be used.
+
+# Comment above MODULE_NETDEV_NEW_API also applies here.
+config MODULE_NETDEV_LEGACY_API
+    bool
+    help
+        Support for legacy netdev API (blocking send). With this, netdev drivers
+        **NOT** implementing `netdev_driver_t::confirm_send()` can be used.
+
 endif # TEST_KCONFIG
 
 config HAVE_NON_NETDEV_INTERFACE

@@ -23,3 +23,4 @@ config BOARD_SAMR34_XPRO
 
     select HAVE_SX1276
     select HAVE_SAUL_GPIO
+    select HAVE_MTD_SPI_NOR

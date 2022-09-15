@@ -1,0 +1,8 @@
+PSEUDOMODULES += esp32s2_devkitm_1
+PSEUDOMODULES += esp32s2_devkitm_1r
+PSEUDOMODULES += esp32s2_devkitc_1
+PSEUDOMODULES += esp32s2_devkitc_1r
+PSEUDOMODULES += esp32s2_saola_1
+PSEUDOMODULES += esp32s2_saola_1r
+
+include $(RIOTBOARD)/common/esp32s2/Makefile.include

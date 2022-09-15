@@ -16,6 +16,7 @@ BOARD_WHITELIST :=  \
 					remote-pa \
 					remote-reva \
 					remote-revb \
+					pba-d-01-kw2x \
 					#
 USEMODULE += od
 USEMODULE += shell
@@ -39,4 +40,9 @@ endif
 CFLAGS += -DEVENT_THREAD_MEDIUM_STACKSIZE=1024
 
 include $(RIOTBASE)/Makefile.include
+
+ifneq (,$(filter bhp,$(USEMODULE)))
+  USEMODULE += bhp_event
+endif
+
 include $(RIOTMAKE)/default-radio-settings.inc.mk

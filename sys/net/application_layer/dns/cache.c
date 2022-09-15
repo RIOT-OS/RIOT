@@ -174,14 +174,21 @@ void dns_cache_add(const char *domain_name, const void *addr_out,
     DEBUG("dns_cache: lifetime of %s is %"PRIu32" s\n", domain_name, ttl);
 
     mutex_lock(&cache_mutex);
+    /* iterate even if TTL = 0 just in case we need to expire */
     for (unsigned i = 0; i < CONFIG_DNS_CACHE_SIZE; ++i) {
-        if (now > cache[i].expires || _is_empty(i)) {
+        if (ttl && (now > cache[i].expires || _is_empty(i))) {
             _add_entry(i, hash, addr_out, addr_len, now + ttl);
             goto exit;
         }
         if (cache[i].hash == hash && _get_len(i) == addr_len) {
             DEBUG("dns_cache[%u] update ttl\n", i);
-            cache[i].expires = now + ttl;
+            if (ttl) {
+                cache[i].expires = now + ttl;
+            }
+            else {
+                /* put one second into past so that it is immediately expired */
+                cache[i].expires = now - 1;
+            }
             goto exit;
         }
         uint32_t _ttl = cache[i].expires - now;
@@ -191,7 +198,7 @@ void dns_cache_add(const char *domain_name, const void *addr_out,
         }
     }
 
-    if (idx >= 0) {
+    if (ttl && idx >= 0) {
         DEBUG("dns_cache: evict first entry to expire\n");
         _add_entry(idx, hash, addr_out, addr_len, now + ttl);
     }

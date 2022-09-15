@@ -53,7 +53,8 @@ extern "C" {
 #define KW2XRF_PARAMS            { .spi = KW2XRF_PARAM_SPI,         \
                                    .spi_clk = KW2XRF_PARAM_SPI_CLK, \
                                    .cs_pin = KW2XRF_PARAM_CS,       \
-                                   .int_pin = KW2XRF_PARAM_INT }
+                                   .int_pin = KW2XRF_PARAM_INT, \
+                                   .rst_pin = KW2XRF_PARAM_RESET }
 #endif
 /**@}*/
 

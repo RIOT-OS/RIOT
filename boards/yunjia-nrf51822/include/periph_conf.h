@@ -93,3 +93,4 @@ static const adc_conf_t adc_config[] = {4, 5, 6, 7};
 #endif
 
 #endif /* PERIPH_CONF_H */
+/** @} */

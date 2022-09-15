@@ -55,6 +55,7 @@ extern "C" {
  *          is 0.
  */
 #define SIXLOWPAN_ND_OPT_ABR_LTIME_DEFAULT      (10000U)
+/** @} */
 
 /**
  * @{

@@ -263,7 +263,6 @@ typedef struct {
     /* Only radios with the XAH_CTRL_2 register support frame retry reporting */
     int8_t tx_retries;                  /**< Number of NOACK retransmissions */
 #endif
-    /** @} */
 } at86rf2xx_t;
 
 /**

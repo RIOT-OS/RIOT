@@ -15,7 +15,7 @@ In order to clone the RIOT repository, you need the
 command:
 
 ~~~~~~~~ {.sh}
-git clone git://github.com/RIOT-OS/RIOT.git
+git clone https://github.com/RIOT-OS/RIOT.git
 ~~~~~~~~
 
 Compiling RIOT                                                {#compiling-riot}
