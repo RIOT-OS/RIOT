@@ -36,6 +36,7 @@
 #include <stdint.h>
 
 #include <avr/interrupt.h>
+#include "architecture.h"
 #include "cpu_conf.h"
 #include "cpu_clock.h"
 #include "sched.h"
@@ -167,14 +168,14 @@ void avr8_exit_isr(void);
 void avr8_clk_init(void);
 
 /**
- * @brief   Print the last instruction's address
+ * @brief   Get the last instruction's address
  *
  * @details This works only if called in a function as first statement, as
  *          it relies on the return address to be the topmost item on the stack.
  */
-static inline void __attribute__((always_inline)) cpu_print_last_instruction(void)
+static inline uinttxtptr_t __attribute__((always_inline)) cpu_get_caller_pc(void)
 {
-        uint32_t addr;
+        uinttxtptr_t addr;
     __asm__ volatile(
         "ldi %D[dest], 0"                   "\n\t"
 #if __AVR_3_BYTE_PC__
@@ -198,7 +199,7 @@ static inline void __attribute__((always_inline)) cpu_print_last_instruction(voi
      * the instruction that called this function. Also multiply by two to get
      * the byte position, rather than the (16 bit) instruction position */
     addr = (addr - 1 ) * 2;
-    printf("0x%" PRIx32 "\n", addr);
+    return addr;
 }
 
 /**

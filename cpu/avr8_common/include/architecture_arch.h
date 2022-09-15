@@ -29,6 +29,10 @@ extern "C" {
 /* Doc is provided centrally in platform.h, hide this from Doxygen */
 #ifndef DOXYGEN
 #define ARCHITECTURE_WORD_BITS      (8U)
+
+#define ARCHITECTURE_LARGE_TXT_PTR  1
+typedef uint32_t   uinttxtptr_t;
+#define PRIxTXTPTR PRIx32
 #endif /* DOXYGEN */
 
 #ifdef __cplusplus

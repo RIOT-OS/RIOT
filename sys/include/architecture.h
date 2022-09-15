@@ -25,6 +25,7 @@
 #define ARCHITECTURE_H
 
 #include <stdint.h>
+#include <inttypes.h>
 
 #include "architecture_arch.h"
 
@@ -77,6 +78,18 @@ typedef uint32_t    uword_t;
 typedef int32_t     sword_t;
 #else
 #error  "Unsupported word size (check ARCHITECTURE_WORD_BITS in architecture_arch.h)"
+#endif
+
+#if !defined(ARCHITECTURE_LARGE_TXT_PTR) || DOXYGEN
+/**
+ * @brief   Pointer type to point anywhere in the .text section
+ */
+typedef uintptr_t   uinttxtptr_t;
+
+/**
+ * @brief   Format string macro for text section pointer
+ */
+#define PRIxTXTPTR PRIxPTR
 #endif
 
 /**

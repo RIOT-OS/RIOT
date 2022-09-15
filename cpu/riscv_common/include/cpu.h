@@ -47,13 +47,14 @@ void riscv_fpu_init(void);
 void riscv_irq_init(void);
 
 /**
- * @brief   Print the last instruction's address
+ * @brief   Gets the last instruction's address
  *
  * @todo:   Not supported
  */
-static inline void cpu_print_last_instruction(void)
+static inline uintptr_t cpu_get_caller_pc(void)
 {
     /* This function must exist else RIOT won't compile */
+    return 0;
 }
 
 /**
