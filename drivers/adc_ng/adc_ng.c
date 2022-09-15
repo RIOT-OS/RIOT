@@ -24,6 +24,24 @@
 #include "kernel_defines.h"
 #include "xfa.h"
 
+int adc_ng_select_res(uint8_t adc, uint8_t *res, uint8_t *shift)
+{
+    assert(adc < XFA_LEN(adc_ng_backend_t, adc_ng_backends));
+    assert(res != NULL);
+    uint8_t res_selected = *res;
+    while (!adc_ng_supports_res(adc, res_selected)) {
+        if (++res_selected > ADC_NG_MAX_RES) {
+            return -ENOTSUP;
+        }
+    }
+
+    if (shift) {
+        *shift = res_selected - *res;
+    }
+    *res = res_selected;
+    return 0;
+}
+
 int adc_ng_init(uint8_t adc, uint8_t chan, uint8_t res, int16_t *ref)
 {
     assert(adc < XFA_LEN(adc_ng_backend_t, adc_ng_backends));
@@ -113,5 +131,29 @@ int adc_ng_measure_ref(uint8_t adc, uint8_t ref_idx, int16_t *dest)
     vref += sample >> 1; /* <- Scientific rounding */
     vref /= sample;
     *dest = (int16_t)vref;
+    return 0;
+}
+
+int adc_ng_quick(uint8_t adc, uint8_t chan, int32_t *dest)
+{
+    int16_t ref = ADC_NG_MAX_REF;
+    int retval = adc_ng_init(adc, chan, adc_ng_max_res(adc), &ref);
+    if (retval) {
+        return retval;
+    }
+    retval = adc_ng_single(adc, dest);
+    adc_ng_off(adc);
+    return retval;
+}
+
+int adc_ng_voltage(uint8_t adc, int16_t *dest_mv)
+{
+    int32_t sample;
+    int retval = adc_ng_single(adc, &sample);
+    if (retval) {
+        return retval;
+    }
+
+    *dest_mv = adc_ng_convert(adc, sample);
     return 0;
 }

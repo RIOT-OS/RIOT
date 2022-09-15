@@ -146,11 +146,11 @@ typedef struct {
  *                          (refers to @ref adc_ng_driver_t::refs)
  *
  * @retval  0               Success
- * @retval  -ENXIO          Invalid channel given in @p channel
+ * @retval  -ENXIO          Invalid channel given in @p chan
  * @retval  -EALREADY       The ADC is already powered and configured
  * @retval  <0              Other error (see device driver doc)
  *
- * @post    When 0 is returned, the channel @p channel is ready take samples
+ * @post    When 0 is returned, the channel @p chan is ready take samples
  * @post    If @p res contains an unsupported resolution, an assert blows up
  * @post    If `-EALREADY` is returned, the ADC is state remains unchanged
  * @post    On other error codes the ADC is powered down
@@ -160,6 +160,27 @@ typedef struct {
  */
 typedef int (*adc_ng_init_t)(void *handle, uint8_t chan, uint8_t res,
                              uint8_t ref);
+
+/**
+ * @brief   Signature of @ref adc_ng_driver_t::mux
+ *
+ * @param           handle  Handle of the ADC
+ * @param[in]       chan    The ADC channel to initialize
+ *
+ * @retval  0               Success
+ * @retval  -ENXIO          Invalid channel given in @p chan
+ * @retval  -ENOTSUP        Cannot switch to channel @p chan using the
+ *                          current configuration of the ADC
+ * @retval  -EIO            The ADC is not powered up and configured
+ * @retval  <0              Other error (see device driver doc)
+ *
+ * @pre     The ADC is up and running (see @ref adc_ng_init). Otherwise
+ *          `-EIO` will be returned
+ * @post    Except for the ADC MUX, no ADC setting is changed by this
+ * @post    On success, the ADC MUX is set to @p chan
+ * @post    On failure, the ADC MUX setting is left unchanged
+ */
+typedef int (*adc_ng_mux_t)(void *handle, uint8_t chan);
 
 /**
  * @brief   Signature of @ref adc_ng_driver_t::off
@@ -196,6 +217,13 @@ typedef struct {
      *          channel again and preserve power
      */
     adc_ng_init_t init;
+    /**
+     * @brief   Switch the ADC MUX to a different channel
+     *
+     * @note    This is only allowed while the ADC is up and running and to
+     *          channels that are compatible with the current ADC settings
+     */
+    adc_ng_mux_t mux;
     /**
      * @brief   Disable the given ADC channel again and bring the ADC into a low
      *          power state

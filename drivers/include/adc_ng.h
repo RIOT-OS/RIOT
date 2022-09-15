@@ -145,23 +145,7 @@ static inline uint8_t adc_ng_min_res(uint8_t adc)
  *          For single ended ("normal") ADC channels samples are always positive
  *          (or zero), and both flavours of right shift are fine.
  */
-static inline int adc_ng_select_res(uint8_t adc, uint8_t *res, uint8_t *shift)
-{
-    assert(adc < XFA_LEN(adc_ng_backend_t, adc_ng_backends));
-    assert(res != NULL);
-    uint8_t res_selected = *res;
-    while (!adc_ng_supports_res(adc, res_selected)) {
-        if (++res_selected > ADC_NG_MAX_RES) {
-            return -ENOTSUP;
-        }
-    }
-
-    if (shift) {
-        *shift = res_selected - *res;
-    }
-    *res = res_selected;
-    return 0;
-}
+int adc_ng_select_res(uint8_t adc, uint8_t *res, uint8_t *shift);
 
 /** @} */
 
@@ -198,6 +182,32 @@ static inline int adc_ng_select_res(uint8_t adc, uint8_t *res, uint8_t *shift)
  * -1.3V is requested -2.56V is chosen over -1.1V.
  */
 int adc_ng_init(uint8_t adc, uint8_t chan, uint8_t res, int16_t *ref);
+
+/**
+ * @brief   Chance the ADC MUX settings to switch to a different ADC channel
+ *
+ * @param[in]       adc     Running ADC device to change the MUX settings of
+ * @param[in]       chan    Channel to switch to
+ *
+ * @retval  0               Success
+ * @retval  -ENXIO          Invalid channel given in @p chan
+ * @retval  -ENOTSUP        Cannot switch to channel @p chan using the
+ *                          current configuration of the ADC
+ * @retval  -EIO            The ADC is not powered up and configured
+ * @retval  <0              Other error (see device driver doc)
+ *
+ * @pre     The ADC is up and running (see @ref adc_ng_init). Otherwise
+ *          `-EIO` will be returned
+ * @post    Except for the ADC MUX, no ADC setting is changed by this
+ * @post    On success, the ADC MUX is set to @p chan
+ * @post    On failure, the ADC MUX setting is left unchanged
+ */
+static inline int adc_ng_mux(uint8_t adc, uint8_t chan)
+{
+    assert(adc < XFA_LEN(adc_ng_backend_t, adc_ng_backends));
+    const adc_ng_backend_t be = adc_ng_backends[adc];
+    return be.driver->mux(be.handle, chan);
+}
 
 /**
  * @brief   Turn of the given ADC device
@@ -286,18 +296,7 @@ static inline int adc_ng_single(uint8_t adc, int32_t *dest)
  *
  * Refer to the documentation of @ref adc_init for details on @p ref
  */
-static inline int adc_ng_quick(uint8_t adc, uint8_t chan,
-                               int32_t *dest)
-{
-    int16_t ref = ADC_NG_MAX_REF;
-    int retval = adc_ng_init(adc, chan, adc_ng_max_res(adc), &ref);
-    if (retval) {
-        return retval;
-    }
-    retval = adc_ng_single(adc, dest);
-    adc_ng_off(adc);
-    return retval;
-}
+int adc_ng_quick(uint8_t adc, uint8_t chan, int32_t *dest);
 
 /** @} */
 
@@ -323,17 +322,7 @@ static inline int adc_ng_quick(uint8_t adc, uint8_t chan,
  *          is with the right setup and ADC technically feasible, the accuracy
  *          of the result is more likely in the order of mV.
  */
-static inline int adc_ng_voltage(uint8_t adc, int16_t *dest_mv)
-{
-    int32_t sample;
-    int retval = adc_ng_single(adc, &sample);
-    if (retval) {
-        return retval;
-    }
-
-    *dest_mv = adc_ng_convert(adc, sample);
-    return 0;
-}
+int adc_ng_voltage(uint8_t adc, int16_t *dest_mv);
 /** @} */
 
 #ifdef __cplusplus
