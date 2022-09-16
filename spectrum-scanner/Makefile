@@ -12,6 +12,7 @@ USEMODULE += gnrc
 USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += xtimer
+USEMODULE += ztimer64_xtimer_compat
 USEMODULE += fmt
 
 # Change this to 0 show compiler invocation lines by default:
