@@ -29,7 +29,7 @@
 extern "C" {
 #endif
 
-/*
+/**
  * @brief   Use periph_timer as the base timer for ZTIMER_USEC
  */
 #define CONFIG_ZTIMER_USEC_TYPE_PERIPH_TIMER (1)
