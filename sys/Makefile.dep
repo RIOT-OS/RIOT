@@ -86,6 +86,7 @@ ifneq (,$(filter ieee802154_security,$(USEMODULE)))
   USEMODULE += crypto
   USEMODULE += crypto_aes_128
   USEMODULE += cipher_modes
+  USEMODULE += bitfield
 endif
 
 ifneq (,$(filter rtt_cmd,$(USEMODULE)))

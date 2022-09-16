@@ -77,6 +77,9 @@ endif
 ifneq (,$(filter gnrc_sixlowpan_frag_stats,$(USEMODULE)))
   SRC += sc_gnrc_6lo_frag_stats.c
 endif
+ifneq (,$(filter ieee802154_security,$(USEMODULE)))
+  SRC += sc_iwpansec.c
+endif
 ifneq (,$(filter saul_reg,$(USEMODULE)))
   SRC += sc_saul_reg.c
 endif

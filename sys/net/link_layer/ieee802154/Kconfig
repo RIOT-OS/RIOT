@@ -123,4 +123,25 @@ menuconfig KCONFIG_USEMODULE_IEEE802154_SECURITY
         default "pizza_margherita"
         depends on KCONFIG_USEMODULE_IEEE802154_SECURITY
 
+    config IEEE802154_SEC_DEFAULT_KEYLOOKUP_SIZE
+        int "Maximum number of key lookup descriptors per interface"
+        range 1 255
+        default 1
+        depends on KCONFIG_USEMODULE_IEEE802154_SECURITY
+
+    config IEEE802154_SEC_DEFAULT_DEVSTORE_SIZE
+        int "Maximum number of device descriptors per interface"
+        range 1 255
+        depends on KCONFIG_USEMODULE_IEEE802154_SECURITY
+
+    config IEEE802154_SEC_DEFAULT_KEYSTORE_SIZE
+        int "Maximum number of keys per interface"
+        range 1 255
+        depends on KCONFIG_USEMODULE_IEEE802154_SECURITY
+
+    config IEEE802154_SEC_DEFAULT_REPLAY_PROTECTION
+        bool "Enable replay protection"
+        default 0
+        depends on KCONFIG_USEMODULE_IEEE802154_SECURITY
+
 endif # KCONFIG_USEMODULE_IEEE802154
