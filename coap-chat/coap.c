@@ -30,7 +30,7 @@
 
 #define COAP_CHAT_PATH      "/chat"
 
-static ssize_t _chat_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, void *ctx);
+static ssize_t _chat_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx);
 
 /* CoAP resources */
 static const coap_resource_t _resources[] = {
@@ -43,7 +43,7 @@ static gcoap_listener_t _listener = {
     .next = NULL,
 };
 
-static ssize_t _chat_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, void *ctx)
+static ssize_t _chat_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx)
 {
     (void)ctx;
 
