@@ -125,9 +125,8 @@ int16_t sht1x_humidity(const sht1x_dev_t *dev, uint16_t raw, int16_t temp);
  *
  * @retval  0         Success
  * @retval -EIO       IO failure (`gpio_init()` failed)
- * @retval -EBADMSG   CRC-8 checksum didn't match (--> Retry)
+ * @retval -EBADMSG   CRC-8 checksum didn't match
  * @retval -EINVAL    Passed `NULL` for dev or for both `temp` and `hum`
- * @retval -EBADMSG   CRC checksum didn't match
  * @retval -ECANCELED Measurement timed out
  * @retval -EPROTO    Sensor did not acknowledge command
  *
