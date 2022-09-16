@@ -334,7 +334,7 @@ static int _init(netdev_t *netdev)
 
     netdev_tap_t *dev = container_of(netdev, netdev_tap_t, netdev);
 
-    /* check device parametrs */
+    /* check device parameters */
     if (dev == NULL) {
         return -ENODEV;
     }

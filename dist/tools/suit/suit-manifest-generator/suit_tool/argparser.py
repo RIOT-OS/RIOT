@@ -54,7 +54,7 @@ class MainArgumentParser(object):
 
         # create_parser.add_argument('-v', '--manifest-version', choices=['1'], default='1')
         create_parser.add_argument('-i', '--input-file', metavar='FILE', type=argparse.FileType('r'),
-            help='An input file describing the update. The file must be formatted as JSON. The overal structure is described in README.')
+            help='An input file describing the update. The file must be formatted as JSON. The overall structure is described in README.')
         create_parser.add_argument('-o', '--output-file', metavar='FILE', type=argparse.FileType('wb'), required=True)
         create_parser.add_argument('-f', '--format', metavar='FMT', choices=['suit', 'suit-debug', 'json'], default='suit')
         create_parser.add_argument('-s', '--severable', action='store_true', help='Convert large elements to severable fields.')
