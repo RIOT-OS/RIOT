@@ -33,7 +33,6 @@ extern "C" {
  * @{
  */
 #define XTIMER_BACKOFF              (8)
-#define XTIMER_OVERHEAD             (6)
 /** @} */
 
 /**
