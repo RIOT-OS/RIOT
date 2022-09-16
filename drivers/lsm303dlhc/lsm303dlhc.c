@@ -156,7 +156,7 @@ int lsm303dlhc_read_mag(const lsm303dlhc_t *dev, lsm303dlhc_3d_data_t *data)
     }
     DEBUG("[done]\n");
 
-    /* interchange y and z axis and fix endiness */
+    /* interchange y and z axis and fix endianness */
     int16_t tmp = data->y_axis;
     data->x_axis = ((data->x_axis<<8)|((data->x_axis>>8)&0xff));
     data->y_axis = ((data->z_axis<<8)|((data->z_axis>>8)&0xff));

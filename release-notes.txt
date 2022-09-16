@@ -9686,7 +9686,7 @@ Networking related issues
        address
 #5016: gnrc_rpl: Rejoining RPL instance as root after reboot messes up rooting
 #5051: Forwarding a packet back to its link layer source should not be allowed
-#5230: gnrc_ipv6: multicast packes are not dispatched to the upper layers
+#5230: gnrc_ipv6: multicast packets are not dispatched to the upper layers
 #5748: gnrc: nodes crashing with too small packet buffer
 #6123: gnrc: crash with (excessive) traffic in native
 #7474: 6lo: gnrc fragmentation expects driver to block on TX
@@ -9979,7 +9979,7 @@ Networking related issues
        address
 #5016: gnrc_rpl: Rejoining RPL instance as root after reboot messes up rooting
 #5051: Forwarding a packet back to its link layer source should not be allowed
-#5230: gnrc_ipv6: multicast packes are not dispatched to the upper layers
+#5230: gnrc_ipv6: multicast packets are not dispatched to the upper layers
 #5748: gnrc: nodes crashing with too small packet buffer
 #6123: gnrc: crash with (excessive) traffic in native
 #7474: 6lo: gnrc fragmentation expects driver to block on TX
@@ -10909,7 +10909,7 @@ Core
 API changes
 -----------
 * renamed NTOH*() -> ntoh*(), HTON*() -> hton*()
-- removed gpioint API, which was unnused and obsoleted by periph/gpio
+- removed gpioint API, which was unused and obsoleted by periph/gpio
 * renamed uuid module to luid
 
 System libraries

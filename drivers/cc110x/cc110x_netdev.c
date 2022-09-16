@@ -583,7 +583,7 @@ static int cc110x_get(netdev_t *netdev, netopt_t opt,
 /**
  * @brief   Set the given address as the device's layer 2 address
  *
- * @param   dev     Device descripter of the transceiver
+ * @param   dev     Device descriptor of the transceiver
  * @param   addr    Address to set
  */
 static int cc110x_set_addr(cc110x_t *dev, uint8_t addr)

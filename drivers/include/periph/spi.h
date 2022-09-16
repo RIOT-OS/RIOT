@@ -324,7 +324,7 @@ typedef struct {
  * @brief   Initialize MOSI/MISO/SCLK pins with adapted GPIO modes
  *
  * @param[in]   bus     SPI device that is used with the given CS line
- * @param[in]   mode    a pointer to a truct containing the 3 modes to use on
+ * @param[in]   mode    a pointer to a struct containing the 3 modes to use on
  *                      each pin
  *
  * @retval  0           success

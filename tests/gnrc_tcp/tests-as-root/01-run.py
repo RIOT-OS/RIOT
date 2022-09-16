@@ -145,7 +145,7 @@ def test_gnrc_tcp_garbage_packets_short_header(child):
 
 @Runner(timeout=5)
 def test_gnrc_tcp_garbage_packets_ack_instead_of_sym(child):
-    """ This test verfies that sending and ACK instead of a SYN.
+    """ This test verifies that sending and ACK instead of a SYN.
         doesn't break GNRC_TCP.
     """
     # Setup RIOT as server
@@ -189,7 +189,7 @@ def test_gnrc_tcp_garbage_packets_ack_instead_of_sym(child):
 
 @Runner(timeout=5)
 def test_gnrc_tcp_garbage_packets_option_parsing(child):
-    """ This test verfies that malformed option don't break TCP
+    """ This test verifies that malformed option don't break TCP
         doesn't break GNRC_TCP. See: https://github.com/RIOT-OS/RIOT/issues/12086
     """
     # Setup RIOT as server

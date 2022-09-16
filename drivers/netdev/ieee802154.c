@@ -254,7 +254,7 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *va
         case NETOPT_ENCRYPTION_KEY:
             assert(len >= IEEE802154_SEC_KEY_LENGTH);
             if (memcmp(dev->sec_ctx.cipher.context.context, value, len)) {
-                /* If the key changes, the frame conter can be reset to 0*/
+                /* If the key changes, the frame counter can be reset to 0*/
                 dev->sec_ctx.frame_counter = 0;
             }
             memcpy(dev->sec_ctx.cipher.context.context, value,

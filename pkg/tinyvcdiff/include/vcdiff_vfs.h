@@ -35,7 +35,7 @@ extern const vcdiff_driver_t vcdiff_vfs_driver;
  */
 typedef struct {
     int fd;          /**< File descriptor of the VFS file */
-    size_t max_size; /**< Maxmimum file size for vcdiff target files */
+    size_t max_size; /**< Maximum file size for vcdiff target files */
 } vcdiff_vfs_t;
 
 /**
