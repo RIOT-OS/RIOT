@@ -107,7 +107,7 @@
  * is also included in the build.
  *
  * Alternatively, to enable full-POSIX TLS/DTLS, select the `wolfssl_socket` module by
- * adding the followint to the application's Makefile:
+ * adding the following to the application's Makefile:
  *
  * ```makefile
  * USEMODULE += wolfssl_socket

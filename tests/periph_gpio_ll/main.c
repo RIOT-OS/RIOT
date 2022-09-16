@@ -63,7 +63,7 @@ static void print_cabling(unsigned port1, unsigned pin1,
 
 static void print_details(void)
 {
-    puts_optional("Test / Hardware Deatils:\n"
+    puts_optional("Test / Hardware Details:\n"
                   "========================\n"
                   "Cabling:");
     print_cabling(PORT_IN, PIN_IN_0, PORT_OUT, PIN_OUT_0);

@@ -34,7 +34,7 @@ extern "C" {
  *
  * Default values are adapted for mbed shield used with to nucleo64 boards
  * @see https://github.com/donsez/RIOT/blob/pr/sx1280/drivers/sx1280/include/sx1280_hal.h
- * @see 'board/commun/nucleo64/include/arduino_pinmap.h'
+ * @see 'board/common/nucleo64/include/arduino_pinmap.h'
  *
  * ARDUINO_PIN_10 -> GPIO_PIN(PORT_B, 6) -> GPIO_PIN(1, 6)
  * ARDUINO_PIN_7 -> GPIO_PIN(PORT_A, 8) -> GPIO_PIN(0, 8)

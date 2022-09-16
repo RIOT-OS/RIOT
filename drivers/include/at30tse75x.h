@@ -119,7 +119,7 @@ typedef enum {
   *
   * The device can run in continuous or one-shot mode. While in one-shot mode it
   * is effectively shutdown and only wakes up to perform a single measurement.
-  * When in comparator or interrupt mode, the device samples contiously the
+  * When in comparator or interrupt mode, the device samples continuously the
   * temperature and sets the ALERT pin according to the chosen mode.
   */
 typedef enum {

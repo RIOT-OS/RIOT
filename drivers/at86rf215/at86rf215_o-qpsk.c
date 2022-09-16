@@ -202,7 +202,7 @@ static inline uint8_t _get_ack_psdu_duration_syms(uint8_t chips, uint8_t mode)
     static const uint8_t sym_len[] = { 32, 32, 64, 128 };
     const uint8_t Ns = sym_len[chips];
     const uint8_t Rspread = _get_spreading(chips, mode);
-    /* Nd == 63, since ACK length is 5 or 7 octects only */
+    /* Nd == 63, since ACK length is 5 or 7 octets only */
     const uint16_t Npsdu = Rspread * 2 * 63;
 
     /* phyPSDUDuration = ceiling(Npsdu / Ns) + ceiling(Npsdu / Mp) */

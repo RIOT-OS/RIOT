@@ -115,7 +115,7 @@ int sht3x_init (sht3x_dev_t *dev, const sht3x_params_t *params)
 
     int res = SHT3X_OK;
 
-    /* inititalize sensor data structure */
+    /* initialize sensor data structure */
     dev->i2c_dev  = params->i2c_dev;
     dev->i2c_addr = params->i2c_addr;
     dev->mode     = params->mode;

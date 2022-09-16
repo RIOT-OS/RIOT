@@ -459,7 +459,7 @@ int gnrc_tcp_listen(gnrc_tcp_tcb_queue_t *queue, gnrc_tcp_tcb_t *tcbs, size_t tc
     assert(local != NULL);
     assert(local->port != PORT_UNSPEC);
 
-    /* Verfiy given endpoint */
+    /* Verify given endpoint */
 #ifdef MODULE_GNRC_IPV6
     if (local->family != AF_INET6) {
         TCP_DEBUG_ERROR("-EAFNOSUPPORT: AF-Family not supported.");
