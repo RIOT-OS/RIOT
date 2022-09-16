@@ -8117,7 +8117,6 @@ drivers/include/pn532\.h:[0-9]+: warning: Member PN532_FW_FEATURES\(fwver\) \(ma
 drivers/include/pn532\.h:[0-9]+: warning: Member PN532_FW_REVISION\(fwver\) \(macro definition\) of group drivers_pn532 is not documented\.
 drivers/include/pn532\.h:[0-9]+: warning: Member PN532_FW_VERSION\(fwver\) \(macro definition\) of group drivers_pn532 is not documented\.
 drivers/include/pn532\.h:[0-9]+: warning: Member PN532_IC_VERSION\(fwver\) \(macro definition\) of group drivers_pn532 is not documented\.
-drivers/include/sht1x\.h:[0-9]+: warning: return value '\-EBADMSG' of sht1x_read has multiple documentation sections
 drivers/include/sht2x\.h:[0-9]+: warning: Member SHT2X_USER_EOB_MASK \(macro definition\) of group drivers_sht2x is not documented\.
 drivers/include/sht2x\.h:[0-9]+: warning: Member SHT2X_USER_HEATER_MASK \(macro definition\) of group drivers_sht2x is not documented\.
 drivers/include/sht2x\.h:[0-9]+: warning: Member SHT2X_USER_OTP_MASK \(macro definition\) of group drivers_sht2x is not documented\.
@@ -10026,11 +10025,6 @@ drivers/seesaw_soil/include/seesaw_soil_regs\.h:[0-9]+: warning: Member SEESAW_S
 drivers/sgp30/include/sgp30_params\.h:[0-9]+: warning: Member SGP30_PARAMS \(macro definition\) of file sgp30_params\.h is not documented\.
 drivers/sgp30/include/sgp30_params\.h:[0-9]+: warning: Member SGP30_PARAM_I2C_DEV \(macro definition\) of file sgp30_params\.h is not documented\.
 drivers/sgp30/include/sgp30_params\.h:[0-9]+: warning: Member SGP30_SAUL_INFO \(macro definition\) of file sgp30_params\.h is not documented\.
-drivers/sht1x/include/sht1x_params\.h:[0-9]+: warning: Member SHT1X_PARAMS \(macro definition\) of file sht1x_params\.h is not documented\.
-drivers/sht1x/include/sht1x_params\.h:[0-9]+: warning: Member SHT1X_PARAM_CLK \(macro definition\) of file sht1x_params\.h is not documented\.
-drivers/sht1x/include/sht1x_params\.h:[0-9]+: warning: Member SHT1X_PARAM_DATA \(macro definition\) of file sht1x_params\.h is not documented\.
-drivers/sht1x/include/sht1x_params\.h:[0-9]+: warning: Member SHT1X_PARAM_VDD \(macro definition\) of file sht1x_params\.h is not documented\.
-drivers/sht1x/include/sht1x_params\.h:[0-9]+: warning: Member SHT1X_SAULINFO \(macro definition\) of file sht1x_params\.h is not documented\.
 drivers/sht2x/include/sht2x_params\.h:[0-9]+: warning: Member SHT2X_PARAMS_DEFAULT \(macro definition\) of file sht2x_params\.h is not documented\.
 drivers/sht2x/include/sht2x_params\.h:[0-9]+: warning: Member SHT2X_PARAM_CRC_MODE \(macro definition\) of file sht2x_params\.h is not documented\.
 drivers/sht2x/include/sht2x_params\.h:[0-9]+: warning: Member SHT2X_PARAM_I2C_ADDR \(macro definition\) of file sht2x_params\.h is not documented\.

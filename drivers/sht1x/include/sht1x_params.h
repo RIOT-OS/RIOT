@@ -32,15 +32,29 @@ extern "C" {
  * @{
  */
 #ifndef SHT1X_PARAM_CLK
+/**
+ * @brief   SHT1x the clock pin
+ */
 #define SHT1X_PARAM_CLK               (GPIO_PIN(1, 25))
 #endif
 #ifndef SHT1X_PARAM_DATA
+/**
+ * @brief   SHT1x the data pin
+ */
 #define SHT1X_PARAM_DATA              (GPIO_PIN(1, 26))
 #endif
 #ifndef SHT1X_PARAM_VDD
+/**
+ * @brief   SHT1x the supply voltage
+ *
+ * @see sht1x_vdd_t
+ */
 #define SHT1X_PARAM_VDD               (SHT1X_VDD_3_5V)
 #endif
 #ifndef SHT1X_PARAMS
+/**
+ * @brief   The initialization parameters for the SHT1x driver
+ */
 #define SHT1X_PARAMS                  { .clk = SHT1X_PARAM_CLK,  \
                                         .data = SHT1X_PARAM_DATA, \
                                         .vdd = SHT1X_PARAM_VDD }
