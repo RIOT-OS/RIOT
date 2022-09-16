@@ -43,8 +43,8 @@ static int free_cmd(int argc, char **argv)
 
     unsigned int p = strtoul(argv[1], NULL, 16);
     void *ptr = (void *)p;
+    printf("freeing %p\n", ptr);
     free(ptr);
-    printf("freed %p\n", ptr);
     return 0;
 }
 
