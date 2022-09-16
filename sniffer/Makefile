@@ -16,6 +16,7 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += xtimer
+USEMODULE += ztimer64_xtimer_compat
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1

@@ -26,7 +26,6 @@
 #include "thread.h"
 #include "xtimer.h"
 #include "shell.h"
-#include "shell_commands.h"
 #include "net/gnrc.h"
 
 /**
@@ -63,14 +62,14 @@ void dump_pkt(gnrc_pktsnip_t *pkt)
             pkt = gnrc_pktbuf_remove_snip(pkt, pkt->next);
         }
     }
-    uint64_t now_us = xtimer_usec_from_ticks64(xtimer_now64());
+    uint64_t now = xtimer_now64();
 
     print_str("rftest-rx --- len ");
     print_u32_hex((uint32_t)gnrc_pkt_len(pkt));
     print_str(" lqi ");
     print_byte_hex(lqi);
     print_str(" rx_time ");
-    print_u64_hex(now_us);
+    print_u64_hex(now);
     print_str("\n");
     while (snip) {
         for (size_t i = 0; i < snip->size; i++) {
