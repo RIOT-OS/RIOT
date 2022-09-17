@@ -147,7 +147,7 @@ void i2c_init(i2c_t dev)
     cfg.scl_io_num = i2c_config[dev].scl;
     cfg.sda_pullup_en = i2c_config[dev].sda_pullup;
     cfg.scl_pullup_en = i2c_config[dev].scl_pullup;
-#if SOC_I2C_SUPPORT_RTC
+#if defined(SOC_I2C_SUPPORT_RTC) && !defined(CPU_FAM_ESP32S3)
     cfg.clk_flags = I2C_SCLK_SRC_FLAG_LIGHT_SLEEP;
 #endif
 

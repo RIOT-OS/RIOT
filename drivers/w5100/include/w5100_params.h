@@ -56,7 +56,6 @@ extern "C" {
 static const  w5100_params_t w5100_params[] = {
     W5100_PARAMS
 };
-/** @} */
 
 #ifdef __cplusplus
 }

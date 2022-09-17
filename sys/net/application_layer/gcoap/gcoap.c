@@ -706,19 +706,12 @@ static size_t _handle_req(gcoap_socket_t *sock, coap_pkt_t *pdu, uint8_t *buf,
     }
 
     ssize_t pdu_len;
-    char *offset;
 
     coap_request_ctx_t ctx = {
         .resource = resource,
         .tl_type = (uint32_t)sock->type,
+        .remote = remote,
     };
-
-    if (coap_get_proxy_uri(pdu, &offset) > 0) {
-        ctx.context = remote;
-    }
-    else {
-        ctx.context = resource->context;
-    }
 
     pdu_len = resource->handler(pdu, buf, len, &ctx);
     if (pdu_len < 0) {

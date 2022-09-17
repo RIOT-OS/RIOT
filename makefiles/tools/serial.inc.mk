@@ -1,7 +1,11 @@
 # Select the most recently attached tty interface
 ifeq (1,$(MOST_RECENT_PORT))
+  ifneq (,$(filter stdio_cdc_acm,$(USEMODULE)))
+    TTY_BOARD_FILTER ?= --model $(BOARD) --vendor 'RIOT-os\.org'
+  endif
   TTYS_FLAGS := --most-recent --format path $(TTY_BOARD_FILTER)
-  PORT ?= $(shell $(RIOTTOOLS)/usb-serial/ttys.py $(TTYS_FLAGS))
+  PORT_DETECTED := $(shell $(RIOTTOOLS)/usb-serial/ttys.py $(TTYS_FLAGS))
+  PORT ?= $(PORT_DETECTED)
 endif
 # Otherwise, use as default the most commonly used ports on Linux and OSX
 PORT_LINUX ?= /dev/ttyACM0
@@ -18,6 +22,16 @@ endif
 PROG_DEV ?= $(PORT)
 
 export BAUD ?= 115200
+
+ifneq (,$(filter stdio_rtt,$(USEMODULE)))
+  ifeq (${PROGRAMMER},openocd)
+    RIOT_TERMINAL ?= openocd-rtt
+  else ifeq (${PROGRAMMER},jlink)
+    RIOT_TERMINAL ?= jlink
+  else ifeq (${RIOT_TERMINAL},)
+    $(warning "Warning: No RIOT_TERMINAL set, but using stdio_rtt: The default terminal is likely not to work.")
+  endif
+endif
 
 RIOT_TERMINAL ?= pyterm
 ifeq ($(RIOT_TERMINAL),pyterm)
@@ -43,4 +57,8 @@ else ifeq ($(RIOT_TERMINAL),semihosting)
   TERMFLAGS = $(DEBUGGER_FLAGS)
   OPENOCD_DBG_EXTRA_CMD += -c 'arm semihosting enable'
   $(call target-export-variables,term cleanterm,OPENOCD_DBG_EXTRA_CMD)
+else ifeq (${RIOT_TERMINAL},openocd-rtt)
+  TERMENV = RAM_START_ADDR=${RAM_START_ADDR} RAM_LEN=${RAM_LEN}
+  TERMPROG = $(RIOTTOOLS)/openocd/openocd.sh
+  TERMFLAGS = term-rtt
 endif

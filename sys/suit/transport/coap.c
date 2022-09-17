@@ -53,7 +53,7 @@ static ssize_t _trigger_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
         else {
             code = COAP_CODE_CREATED;
             LOG_INFO("suit: received URL: \"%s\"\n", (char *)pkt->payload);
-            suit_coap_trigger(pkt->payload, payload_len);
+            suit_worker_trigger((char *)pkt->payload, payload_len);
         }
     }
     else {

@@ -155,7 +155,7 @@ void sixlowpan_print(uint8_t *data, size_t size)
 
         if (data[1] & SIXLOWPAN_IPHC2_M) {
             if (data[1] & SIXLOWPAN_IPHC2_DAC) {
-                puts("Stateful destinaton multicast address compression:");
+                puts("Stateful destination multicast address compression:");
 
                 switch (data[1] & SIXLOWPAN_IPHC2_DAM) {
                     case 0x00:
@@ -170,7 +170,7 @@ void sixlowpan_print(uint8_t *data, size_t size)
                 }
             }
             else {
-                puts("Stateless destinaton multicast address compression:");
+                puts("Stateless destination multicast address compression:");
 
                 switch (data[1] & SIXLOWPAN_IPHC2_DAM) {
                     case 0x00:
@@ -193,7 +193,7 @@ void sixlowpan_print(uint8_t *data, size_t size)
         }
         else {
             if (data[1] & SIXLOWPAN_IPHC2_DAC) {
-                printf("Stateful destinaton address compression: ");
+                printf("Stateful destination address compression: ");
 
                 switch (data[1] & SIXLOWPAN_IPHC2_DAM) {
                     case 0x00:
@@ -214,7 +214,7 @@ void sixlowpan_print(uint8_t *data, size_t size)
                 }
             }
             else {
-                printf("Stateless destinaton address compression: ");
+                printf("Stateless destination address compression: ");
 
                 switch (data[1] & SIXLOWPAN_IPHC2_DAM) {
                     case 0x00:

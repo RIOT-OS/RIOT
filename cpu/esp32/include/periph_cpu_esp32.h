@@ -19,9 +19,14 @@
 #ifndef PERIPH_CPU_ESP32_H
 #define PERIPH_CPU_ESP32_H
 
+#include "sdkconfig.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/** Mapping configured ESP32 default clock to CLOCK_CORECLOCK define */
+#define CLOCK_CORECLOCK     (1000000UL * CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ)
 
 /**
  * @name   Predefined GPIO names

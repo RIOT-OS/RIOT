@@ -98,6 +98,7 @@ extern "C" {
 
 /**
  * @name    Digital proximity and ambient light sensor configuration (ADPS9960)
+ * @{
  */
 #define ADPS9960_PARAM_I2C      I2C_DEV(0)
 #define ADPS9960_PARAM_ADDR     (0x29)

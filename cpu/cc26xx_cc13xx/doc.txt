@@ -69,7 +69,7 @@ make -C examples/hello-world flash BOARD=cc1350-launchpad
 @note Once flashed, there's no need to flash it again, unless the configuration
 needs to be changed.
 
-# <a name="cc26xx_cc13xx_debugging"> Debuggging </a> &nbsp;[[TOC]](#cc26xx_cc13xx_toc)
+# <a name="cc26xx_cc13xx_debugging"> Debugging </a> &nbsp;[[TOC]](#cc26xx_cc13xx_toc)
 
 Development kits from Texas Instruments come with an XDS110 on-board debug probe
 that provides programming, flashing and debugging capabilities.

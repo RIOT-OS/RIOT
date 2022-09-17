@@ -146,9 +146,6 @@ int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
         return -1;
     }
 
-    /* make sure the timer is not running */
-    timer_stop(tim);
-
     sam0_gclk_enable(cfg->gclk_src);
 #ifdef MCLK
     GCLK->PCHCTRL[cfg->gclk_id].reg = GCLK_PCHCTRL_GEN(cfg->gclk_src) | GCLK_PCHCTRL_CHEN;
@@ -157,6 +154,9 @@ int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
     GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN(cfg->gclk_src) | cfg->gclk_ctrl;
     PM->APBCMASK.reg |= cfg->pm_mask;
 #endif
+
+    /* make sure the timer is not running */
+    timer_stop(tim);
 
     /* reset the timer */
     dev(tim)->CTRLA.bit.SWRST = 1;

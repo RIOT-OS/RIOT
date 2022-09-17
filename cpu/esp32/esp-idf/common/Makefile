@@ -103,6 +103,17 @@ ifeq (esp32c3,$(CPU_FAM))
   ESP32_SDK_SRC += components/hal/systimer_hal.c
 endif
 
+ifeq (esp32s2,$(CPU_FAM))
+  ESP32_SDK_SRC += components/esp_hw_support/port/$(CPU_FAM)/regi2c_ctrl.c
+  ESP32_SDK_SRC += components/esp_hw_support/port/$(CPU_FAM)/memprot.c
+  ESP32_SDK_SRC += components/esp_hw_support/sleep_retention.c
+  ESP32_SDK_SRC += components/esp_system/port/brownout.c
+  ESP32_SDK_SRC += components/esp_timer/src/esp_timer_impl_systimer.c
+  ESP32_SDK_SRC += components/hal/$(CPU_FAM)/brownout_hal.c
+  ESP32_SDK_SRC += components/hal/$(CPU_FAM)/touch_sensor_hal.c
+  ESP32_SDK_SRC += components/hal/systimer_hal.c
+endif
+
 ifeq (esp32s3,$(CPU_FAM))
   ESP32_SDK_SRC += components/esp_hw_support/sleep_retention.c
   ESP32_SDK_SRC += components/esp_timer/src/esp_timer_impl_systimer.c

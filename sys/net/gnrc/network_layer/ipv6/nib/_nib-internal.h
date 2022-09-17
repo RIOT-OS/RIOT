@@ -23,13 +23,13 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
-#include <kernel_defines.h>
 
 #include "bitfield.h"
 #include "evtimer_msg.h"
 #include "sched.h"
 #include "mutex.h"
 #include "net/eui64.h"
+#include "kernel_defines.h"
 #include "net/ipv6/addr.h"
 #ifdef MODULE_GNRC_IPV6
 #include "net/gnrc/ipv6.h"
@@ -836,6 +836,16 @@ int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *ctx,
 uint32_t _evtimer_lookup(const void *ctx, uint16_t type);
 
 /**
+ * @brief   Removes an event from the event timer
+ *
+ * @param[in] event Representation of the event.
+ */
+static inline void _evtimer_del(evtimer_msg_event_t *event)
+{
+    evtimer_del(&_nib_evtimer, &event->event);
+}
+
+/**
  * @brief   Adds an event to the event timer
  *
  * @param[in] ctx       The context of the event
@@ -851,7 +861,7 @@ static inline void _evtimer_add(void *ctx, int16_t type,
 #else
     kernel_pid_t target_pid = KERNEL_PID_LAST;  /* just for testing */
 #endif
-    evtimer_del((evtimer_t *)(&_nib_evtimer), (evtimer_event_t *)event);
+    _evtimer_del(event);
     event->event.next = NULL;
     event->event.offset = offset;
     event->msg.type = type;
@@ -864,4 +874,5 @@ static inline void _evtimer_add(void *ctx, int16_t type,
 #endif
 
 #endif /* PRIV_NIB_INTERNAL_H */
-/** @} */
+/** @internal
+ * @} */

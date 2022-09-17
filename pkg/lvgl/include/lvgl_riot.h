@@ -57,3 +57,4 @@ void lvgl_wakeup(void);
 #endif
 
 #endif /* LVGL_RIOT_H */
+/** @} */

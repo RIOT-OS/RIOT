@@ -181,8 +181,12 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize);
  * @returns     0 on success
  * @returns     <0 on error
  */
-int nanocoap_sock_connect(nanocoap_sock_t *sock, sock_udp_ep_t *local,
-                          sock_udp_ep_t *remote);
+static inline int nanocoap_sock_connect(nanocoap_sock_t *sock,
+                                        const sock_udp_ep_t *local,
+                                        const sock_udp_ep_t *remote)
+{
+    return sock_udp_create(sock, local, remote, 0);
+}
 
 /**
  * @brief   Create a CoAP client socket by URL
@@ -206,7 +210,7 @@ static inline void nanocoap_sock_close(nanocoap_sock_t *sock)
 }
 
 /**
- * @brief   Simple synchronous CoAP (confirmable) get
+ * @brief   Simple synchronous CoAP (confirmable) GET
  *
  * @param[in]   sock    socket to use for the request
  * @param[in]   path    remote path
@@ -218,6 +222,40 @@ static inline void nanocoap_sock_close(nanocoap_sock_t *sock)
  */
 ssize_t nanocoap_sock_get(nanocoap_sock_t *sock, const char *path, void *buf,
                           size_t len);
+
+/**
+ * @brief   Simple synchronous CoAP (confirmable) PUT
+ *
+ * @param[in]   sock    socket to use for the request
+ * @param[in]   path    remote path
+ * @param[in]   request buffer containing the payload
+ * @param[in]   len     length of the payload to send
+ * @param[out]  response buffer for the response, may be NULL
+ * @param[in]   len_max length of @p response
+ *
+ * @returns     length of response payload on success
+ * @returns     <0 on error
+ */
+ssize_t nanocoap_sock_put(nanocoap_sock_t *sock, const char *path,
+                          const void *request, size_t len,
+                          void *response, size_t len_max);
+
+/**
+ * @brief   Simple synchronous CoAP (confirmable) POST
+ *
+ * @param[in]   sock    socket to use for the request
+ * @param[in]   path    remote path
+ * @param[in]   request buffer containing the payload
+ * @param[in]   len     length of the payload to send
+ * @param[out]  response buffer for the response, may be NULL
+ * @param[in]   len_max length of @p response
+ *
+ * @returns     length of response payload on success
+ * @returns     <0 on error
+ */
+ssize_t nanocoap_sock_post(nanocoap_sock_t *sock, const char *path,
+                           const void *request, size_t len,
+                           void *response, size_t len_max);
 
 /**
  * @brief    Performs a blockwise coap get request on a socket.
@@ -274,8 +312,9 @@ int nanocoap_get_blockwise_url(const char *url,
  * @param[in]   buf        Target buffer
  * @param[in]   len        Target buffer length
  *
+ * @returns     <0 on error
  * @returns     -EINVAL    if an invalid url is provided
- * @returns     -1         if failed to fetch the url content
+ * @returns     -ENOBUFS   if the provided buffer was too small
  * @returns     size of the response payload on success
  */
 ssize_t nanocoap_get_blockwise_url_to_buf(const char *url,
@@ -327,8 +366,8 @@ ssize_t nanocoap_sock_request_cb(sock_udp_t *sock, coap_pkt_t *pkt,
  * @returns     length of response on success
  * @returns     <0 on error
  */
-ssize_t nanocoap_request(coap_pkt_t *pkt, sock_udp_ep_t *local,
-                         sock_udp_ep_t *remote, size_t len);
+ssize_t nanocoap_request(coap_pkt_t *pkt, const sock_udp_ep_t *local,
+                         const sock_udp_ep_t *remote, size_t len);
 
 /**
  * @brief   Simple synchronous CoAP (confirmable) get
@@ -341,8 +380,8 @@ ssize_t nanocoap_request(coap_pkt_t *pkt, sock_udp_ep_t *local,
  * @returns     length of response payload on success
  * @returns     <0 on error
  */
-ssize_t nanocoap_get(sock_udp_ep_t *remote, const char *path, void *buf,
-                     size_t len);
+ssize_t nanocoap_get(const sock_udp_ep_t *remote, const char *path,
+                     void *buf, size_t len);
 
 /**
  * @brief   Initialize block request context
@@ -357,7 +396,7 @@ ssize_t nanocoap_get(sock_udp_ep_t *remote, const char *path, void *buf,
  * @retval      <0      Error (see @ref nanocoap_sock_connect for details)
  */
 static inline int nanocoap_block_request_init(coap_block_request_t *ctx,
-                                              sock_udp_ep_t *remote,
+                                              const sock_udp_ep_t *remote,
                                               const char *path,
                                               uint8_t method,
                                               coap_blksize_t blksize)

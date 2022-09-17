@@ -194,7 +194,8 @@ extern "C" {
 /** @} */
 
 /**
- * @name    ERXFCON bits
+ * @brief    ERXFCON bits
+ * @{
  */
 #define ENC_MCEN        (1<<1)
 /** @} */

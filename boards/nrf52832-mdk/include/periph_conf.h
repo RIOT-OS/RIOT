@@ -36,8 +36,8 @@ extern "C" {
  * @{
  */
 #define UART_NUMOF          (1U)
-#define UART_PIN_RX         GPIO_PIN(0,19)
-#define UART_PIN_TX         GPIO_PIN(0,20)
+#define UART_PIN_RX         GPIO_PIN(0, 19)
+#define UART_PIN_TX         GPIO_PIN(0, 20)
 /** @} */
 
 #ifdef __cplusplus
@@ -45,3 +45,4 @@ extern "C" {
 #endif
 
 #endif /* PERIPH_CONF_H */
+/** @} */

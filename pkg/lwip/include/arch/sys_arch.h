@@ -40,7 +40,6 @@ extern "C" {
  */
 /* prefer mutexes rather than binary semaphores */
 #define LWIP_COMPAT_MUTEX   (0)
-/** @} */
 
 /**
  * @name    Critical sections protection definitions
@@ -55,6 +54,7 @@ extern "C" {
 /**
  * @name    Semaphores definitions
  * @see     https://www.nongnu.org/lwip/2_1_x/group__sys__sem.html
+ * @{
  */
 typedef sema_t sys_sem_t;               /**< Platform specific semaphore type */
 
@@ -71,6 +71,7 @@ static inline bool sys_sem_valid(sys_sem_t *sem)
 /**
  * @name    Mutexes definitions
  * @see     https://www.nongnu.org/lwip/2_1_x/group__sys__mutex.html
+ * @{
  */
 typedef mutex_t sys_mutex_t;            /**< Platform specific mutex type */
 

@@ -112,6 +112,7 @@
 #define OPENWSN_DEBUGPIN_FSM    GPIO_PIN(1, 2) /* B2 */
 #define OPENWSN_DEBUGPIN_TASK   GPIO_PIN(1, 1) /* B1 */
 #define OPENWSN_DEBUGPIN_RADIO  GPIO_PIN(1, 0) /* B0 */
+/** @} */
 
 /**
  * @name    AT86RF215 configuration

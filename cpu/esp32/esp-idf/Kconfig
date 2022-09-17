@@ -18,6 +18,7 @@ config MODULE_ESP_IDF
       Espressif IoT Development Framework.
 
 rsource "adc/Kconfig"
+rsource "ble/Kconfig"
 rsource "common/Kconfig"
 rsource "efuse/Kconfig"
 rsource "eth/Kconfig"

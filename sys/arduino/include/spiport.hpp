@@ -55,7 +55,7 @@
  * @name    Arduino compatible bit order values for SPI
  * @{
  */
-#define MSBFIRST        (1)     /**< most significat bit first */
+#define MSBFIRST        (1)     /**< most significant bit first */
 /** @} */
 
 /**

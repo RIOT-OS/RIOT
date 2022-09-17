@@ -54,7 +54,7 @@ IoT-lab), and also directly as a process on your Linux/FreeBSD/macOS machine (we
 call this the `native` port). Try it right now in your terminal window:
 
 ~~~~~~~{.sh}
-git clone git://github.com/RIOT-OS/RIOT.git # assumption: git is pre-installed
+git clone https://github.com/RIOT-OS/RIOT.git # assumption: git is pre-installed
 cd RIOT
 git checkout <LATEST_RELEASE>
 sudo ./dist/tools/tapsetup/tapsetup         # create virtual Ethernet

@@ -50,6 +50,10 @@ endif
 # include transport headers
 INCLUDES += $(NIMIBASE)/nimble/transport/include
 
+ifneq (,$(filter nimble_transport_hci_h4,$(USEMODULE)))
+  INCLUDES += $(NIMIBASE)/nimble/transport/common/hci_h4/include
+endif
+
 # include services
 ifneq (,$(filter nimble_svc_ans,$(USEMODULE)))
   INCLUDES += $(NIMIBASE)/nimble/host/services/ans/include

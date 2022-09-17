@@ -237,6 +237,7 @@ typedef struct {
     uint8_t chan_numof;     /**< number of actually configured channels */
     uint8_t tpm_num;        /**< FTM number used */
 } pwm_conf_t;
+/** @} */
 
 /**
  * @name    PWM configuration

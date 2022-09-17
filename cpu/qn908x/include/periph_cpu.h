@@ -328,7 +328,6 @@ typedef enum {
  * lines in the board, just using different adc_conf_t entries.
  */
 typedef uint16_t adc_conf_t;
-/** @} */
 
 /**
  * @brief   CPU specific timer Counter/Timers (CTIMER) configuration

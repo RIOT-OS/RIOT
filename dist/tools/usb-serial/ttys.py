@@ -213,11 +213,14 @@ def print_ttys(args):
             ttys.append(tty)
 
     if args.most_recent:
-        most_recent = ttys[0]
-        for tty in ttys:
-            if tty["ctime"] > most_recent["ctime"]:
-                most_recent = tty
-        ttys = [most_recent]
+        if len(ttys) > 0:
+            most_recent = ttys[0]
+            for tty in ttys:
+                if tty["ctime"] > most_recent["ctime"]:
+                    most_recent = tty
+            ttys = [most_recent]
+        else:
+            ttys = []
 
     print_results(args, ttys)
 

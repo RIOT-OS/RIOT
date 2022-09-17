@@ -4,7 +4,7 @@ ifeq (esp32,$(CPU_FAM))
 else ifneq (,$(filter esp32c3,$(CPU_FAM)))
   CPU_ARCH = rv32
   CPU_CORE = rv32imc
-else ifneq (,$(filter esp32s3,$(CPU_FAM)))
+else ifneq (,$(filter esp32s2 esp32s3,$(CPU_FAM)))
   CPU_ARCH = xtensa
   CPU_CORE = xtensa-lx7
 else
@@ -17,13 +17,31 @@ include $(RIOTCPU)/esp_common/Makefile.features
 
 FEATURES_PROVIDED += arch_esp32
 FEATURES_PROVIDED += esp_wifi_enterprise
+FEATURES_PROVIDED += periph_gpio_ll
+FEATURES_PROVIDED += periph_gpio_ll_irq
+FEATURES_PROVIDED += periph_gpio_ll_irq_level_triggered_high
+FEATURES_PROVIDED += periph_gpio_ll_irq_level_triggered_low
 FEATURES_PROVIDED += puf_sram
 
 ifeq (xtensa,$(CPU_ARCH))
   FEATURES_PROVIDED += esp_hw_counter
 endif
 
-ifneq (,$(filter esp32-wrover% esp32s3%r2 esp32s3%r8 esp32s3%r8v,$(CPU_MODEL)))
+ifeq (esp32,$(CPU_FAM))
+  FEATURES_PROVIDED += ble_nimble
+  FEATURES_PROVIDED += ble_nimble_netif
+  FEATURES_PROVIDED += esp_ble
+  FEATURES_PROVIDED += esp_ble_esp32
+else ifneq (,$(filter esp32c3 esp32s3,$(CPU_FAM)))
+  FEATURES_PROVIDED += ble_adv_ext
+  FEATURES_PROVIDED += ble_nimble
+  FEATURES_PROVIDED += ble_nimble_netif
+  FEATURES_PROVIDED += ble_phy_2mbit
+  FEATURES_PROVIDED += esp_ble
+  FEATURES_PROVIDED += esp_ble_esp32c3
+endif
+
+ifneq (,$(filter esp32-wrover% esp32s2%r2 esp32s3%r2 esp32s3%r8 esp32s3%r8v,$(CPU_MODEL)))
   FEATURES_PROVIDED += esp_spi_ram
   ifneq (,$(filter esp32s3%r8 esp32s3%r8v,$(CPU_MODEL)))
     FEATURES_PROVIDED += esp_spi_oct

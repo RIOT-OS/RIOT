@@ -10,3 +10,7 @@ USEMODULE += cpu_common
 FEATURES_OPTIONAL += vdd_lc_filter_reg1
 # reg0 feature denotes stage 0 two-stage regulator models
 FEATURES_OPTIONAL += vdd_lc_filter_reg0
+
+ifneq (,$(filter nimble,$(USEPKG)))
+  USEPKG += nrfx
+endif

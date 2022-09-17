@@ -108,6 +108,9 @@ static int _init(netdev_t *netdev)
     /* reset device to default values and put it into RX state */
     at86rf2xx_reset(dev);
 
+    /* signal link UP */
+    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+
     return 0;
 }
 

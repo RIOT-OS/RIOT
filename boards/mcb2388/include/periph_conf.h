@@ -111,6 +111,7 @@ static const adc_conf_t adc_config[] = {
 };
 
 #define ADC_NUMOF           (1)
+/** @} */
 
 /**
  * @name I2C configuration

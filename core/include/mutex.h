@@ -67,7 +67,7 @@
  *    blocking.
  * 2. If the mutex has a value of `MUTEX_LOCKED`, it will be changed to point to
  *    the `thread_t` of the running thread. The single item list is terminated
- *    be setting the `thread_t::rq_entry.next` of the running thread to `NULL`.
+ *    by setting the `thread_t::rq_entry.next` of the running thread to `NULL`.
  *    The running thread blocks as described below.
  * 3. Otherwise, the current thread is inserted into the list of waiting
  *    threads sorted by thread priority. The running thread blocks as described

@@ -62,7 +62,7 @@ extern "C" {
 #define LED2_ON             (LED_PORT |=  LED2_MASK)
 #define LED2_OFF            (LED_PORT &= ~LED2_MASK)
 #define LED2_TOGGLE         (LED_PORT ^=  LED2_MASK)
-/* @} */
+/** @} */
 
 /**
  * @name    ztimer configuration

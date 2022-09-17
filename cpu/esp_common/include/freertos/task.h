@@ -31,6 +31,7 @@ extern "C" {
 #define taskENTER_CRITICAL          portENTER_CRITICAL
 #define taskEXIT_CRITICAL           portEXIT_CRITICAL
 
+#define taskSCHEDULER_NOT_STARTED   1
 #define taskSCHEDULER_RUNNING       2
 
 typedef enum {

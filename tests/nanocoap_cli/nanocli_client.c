@@ -184,6 +184,7 @@ int nanotest_client_url_cmd(int argc, char **argv)
 {
     /* Ordered like the RFC method code numbers, but off by 1. GET is code 0. */
     const char *method_codes[] = {"get", "post", "put"};
+    int res;
 
     if (argc < 3) {
         goto error;
@@ -200,13 +201,44 @@ int nanotest_client_url_cmd(int argc, char **argv)
         goto error;
     }
 
-    if (code_pos != 0) {
+    switch (code_pos) {
+    case 0:
+        return nanocoap_get_blockwise_url(argv[2], COAP_BLOCKSIZE_32,
+                                          _blockwise_cb, NULL);
+    case 1:
+    case 2:
+        ;
+        char response[32];
+        nanocoap_sock_t sock;
+        res = nanocoap_sock_url_connect(argv[2], &sock);
+        if (res) {
+            break;
+        }
+        if (code_pos == 1) {
+            res = nanocoap_sock_post(&sock, sock_urlpath(argv[2]),
+                                     argv[3], strlen(argv[3]),
+                                     response, sizeof(response));
+        } else {
+            res = nanocoap_sock_put(&sock, sock_urlpath(argv[2]),
+                                    argv[3], strlen(argv[3]),
+                                    response, sizeof(response));
+        }
+        nanocoap_sock_close(&sock);
+        if (res > 0) {
+            response[res] = 0;
+            printf("response: %s\n", response);
+        }
+        break;
+    default:
         printf("TODO: implement %s request\n", method_codes[code_pos]);
         return -1;
     }
 
-    return nanocoap_get_blockwise_url(argv[2], COAP_BLOCKSIZE_32,
-                                      _blockwise_cb, NULL);
+    if (res) {
+        printf("res: %d\n", res);
+    }
+    return res;
+
 error:
     printf("usage: %s <get|post|put> <url> [data]\n", argv[0]);
     return -1;

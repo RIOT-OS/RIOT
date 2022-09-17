@@ -23,7 +23,7 @@
  *     1. [Sensor modes](#l3gxxxx_sensor_modes)
  *     2. [Output Data Rates and Filters](#l3gxxxx_odr_filters)
  * 3. [Using the driver (basic functionality)](#l3gxxxx_using_driver)
- *     1. [Initializaton](#l3gxxxx_initialization)
+ *     1. [Initialization](#l3gxxxx_initialization)
  *     2. [Output data format](#l3gxxxx_output_data)
  *     3. [Fetching data](#l3gxxxx_fetching_data)
  * 4. [Using the FIFO](#l3gxxxx_fifo)
@@ -373,7 +373,7 @@
  *
  * # Using the driver {#l3gxxxx_using_driver}
  *
- * ## Initializaton {#l3gxxxx_initialization}
+ * ## Initialization {#l3gxxxx_initialization}
  *
  * The **easiest way to use the driver** is simply to initialize the sensor
  * with function #l3gxxxx_init using the default configuration parameter set
@@ -898,9 +898,9 @@
  * | I2C address            | #L3GXXXX_I2C_ADDR | #L3GXXXX_I2C_ADDR_2 |
  * | SPI device             | #L3GXXXX_SPI_DEV  | SPI_DEV(0)          |
  * | SPI clock frequency    | #L3GXXXX_SPI_CLK  | SPI_CLK_1MHZ        |
- * | SPI CS signal          | #L3GXXXX_SPI_CS   | GPIO_PIN(0,0)       |
- * | `INT1` MCU pin         | #L3GXXXX_INT1_PIN | GPIO_PIN(0,1)       |
- * | `INT2/DRDY` MCU pin    | #L3GXXXX_INT2_PIN | GPIO_PIN(0,2)       |
+ * | SPI CS signal          | #L3GXXXX_SPI_CS   | GPIO_PIN(0, 0)      |
+ * | `INT1` MCU pin         | #L3GXXXX_INT1_PIN | GPIO_PIN(0, 1)      |
+ * | `INT2/DRDY` MCU pin    | #L3GXXXX_INT2_PIN | GPIO_PIN(0, 2)      |
  * </center><br>
  *
  * These hardware configurations can be overridden either by the board
@@ -909,7 +909,7 @@
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * DRIVER=l3gd20h USEMODULE='l3gxxxx_irq_data` \
- * CLFAGS='-DL3GXXXX_INT2_PIN=GPIO_PIN\(0,5\)' \
+ * CLFAGS='-DL3GXXXX_INT2_PIN=GPIO_PIN\(0, 5\)' \
  * BOARD=... make -C tests/driver_l3gxxxx
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
@@ -1301,7 +1301,7 @@ typedef union {
         uint8_t y_high:1; /**< true on |Y| > Y threshold (Y high event) */
         uint8_t z_low :1; /**< true on |Z| < Z threshold (Z low event) */
         uint8_t z_high:1; /**< true on |Z| > Z threshold (Z high event) */
-        uint8_t active:1; /**< true when one ore more events have been generated */
+        uint8_t active:1; /**< true when one or more events have been generated */
         uint8_t unused:1; /**< not used */
     };
     uint8_t val;          /**< event interrupt sources as value that

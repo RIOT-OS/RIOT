@@ -108,6 +108,7 @@
 /pkg/openthread/                            @Hyungsin @jia200x
 /pkg/semtech-loramac/                       @aabadie @jia200x
 /pkg/tinydtls/                              @rfuentess @leandrolanzieri
+/pkg/tinyvcdiff/                            @jue89
 /pkg/u8g2/                                  @basilfx
 /pkg/ucglib/                                @basilfx
 /pkg/wakaama/                               @leandrolanzieri

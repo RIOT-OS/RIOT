@@ -37,8 +37,8 @@ extern "C" {
 static const uart_conf_t uart_config[] = {
     {
         .dev        = NRF_UARTE0,
-        .rx_pin     = GPIO_PIN(0,24),
-        .tx_pin     = GPIO_PIN(0,25),
+        .rx_pin     = GPIO_PIN(0, 24),
+        .tx_pin     = GPIO_PIN(0, 25),
 #ifdef MODULE_PERIPH_UART_HW_FC
         .rts_pin    = GPIO_UNDEF,
         .cts_pin    = GPIO_UNDEF,
@@ -88,3 +88,4 @@ static const i2c_conf_t i2c_config[] = {
 #endif
 
 #endif /* PERIPH_CONF_H */
+/** @} */

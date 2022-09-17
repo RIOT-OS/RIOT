@@ -175,14 +175,11 @@ __attribute__((used)) void _exit(int n)
 {
     LOG_INFO("#! exit %i: powering off\n", n);
     pm_off();
-    while(1);
+    while (1) {}
 }
 
 /**
  * @brief Allocate memory from the heap.
- *
- * The current heap implementation is very rudimentary, it is only able to allocate
- * memory. But it does not have any means to free memory again
  *
  * @return      pointer to the newly allocated memory on success
  * @return      pointer set to address `-1` on failure
@@ -606,7 +603,7 @@ int _isatty_r(struct _reent *r, int fd)
 {
     r->_errno = 0;
 
-    if(fd == STDIN_FILENO || fd == STDOUT_FILENO || fd == STDERR_FILENO) {
+    if (fd == STDIN_FILENO || fd == STDOUT_FILENO || fd == STDERR_FILENO) {
         return 1;
     }
 

@@ -149,6 +149,10 @@ static int _init(netdev_t *netdev)
     }
 
     DEBUG("[sx1280] netdev: initialization successful\n");
+
+    /* signal link UP */
+    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+
     return 0;
 }
 

@@ -83,7 +83,7 @@ static void cb(void *arg)
 {
     (void) arg;
     printf("Button pressed! Triggering suit update! \n");
-    suit_coap_trigger((uint8_t *) SUIT_MANIFEST_RESOURCE, sizeof(SUIT_MANIFEST_RESOURCE));
+    suit_worker_trigger(SUIT_MANIFEST_RESOURCE, sizeof(SUIT_MANIFEST_RESOURCE));
 }
 #endif
 
@@ -211,8 +211,8 @@ int main(void)
 #endif
     /* initialize suit storage */
     suit_storage_init_all();
-    /* start suit coap updater thread */
-    suit_coap_run();
+    /* start suit updater thread */
+    suit_worker_run();
 
     /* start nanocoap server thread */
     thread_create(_nanocoap_server_stack, sizeof(_nanocoap_server_stack),

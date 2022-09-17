@@ -122,3 +122,18 @@ vas
 
 # Sur (macOS version alias) => Sure, sir
 sur
+
+# unsecure (unlocked, protection disabled) => insecure
+unsecure
+
+# nce (neighbor cache entry) => once, nice
+nce
+
+# warmup => warm up, warm-up
+warmup
+
+# clen => clean, clan
+clen
+
+# RO (read only) => to, row, rob, rod, roe, rot
+ro

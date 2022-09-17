@@ -57,12 +57,12 @@
 #endif
 #include "controller/ble_ll.h"
 
+static char _stack_controller[NIMBLE_CONTROLLER_STACKSIZE];
+#endif
+
 #ifdef MODULE_NIMBLE_RPBLE
 #include "nimble_rpble.h"
 #include "nimble_rpble_params.h"
-#endif
-
-static char _stack_controller[NIMBLE_CONTROLLER_STACKSIZE];
 #endif
 
 #ifdef MODULE_NIMBLE_HOST

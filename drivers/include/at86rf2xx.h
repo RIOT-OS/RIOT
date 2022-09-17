@@ -85,7 +85,7 @@ extern "C" {
 #elif MODULE_AT86RF212B
 /**
  * @note for the default settings in RIOT for the at86rf212b,
- *       for other seetings this value may change.
+ *       for other settings this value may change.
  */
 #   define RSSI_BASE_VAL                   (-98)
 #elif MODULE_AT86RFA1 || MODULE_AT86RFR2
@@ -263,7 +263,6 @@ typedef struct {
     /* Only radios with the XAH_CTRL_2 register support frame retry reporting */
     int8_t tx_retries;                  /**< Number of NOACK retransmissions */
 #endif
-    /** @} */
 } at86rf2xx_t;
 
 /**

@@ -113,6 +113,11 @@ endif
 ifneq (,$(filter esp32,$(CPU_FAM)))
   ESP_SDK_BOOTLOADER_SRCS += components/efuse/src/esp_efuse_api_key_esp32.c
   ESP_SDK_BOOTLOADER_ASMSRC = components/esp_rom/patches/esp_rom_longjmp.S
+else ifneq (,$(filter esp32s2,$(CPU_FAM)))
+  ESP_SDK_BOOTLOADER_SRCS += components/efuse/src/esp_efuse_api_key_esp32xx.c
+  ESP_SDK_BOOTLOADER_SRCS += components/esp_hw_support/port/$(CPU_FAM)/regi2c_ctrl.c
+  ESP_SDK_BOOTLOADER_SRCS += components/soc/$(CPU_FAM)/dedic_gpio_periph.c
+  ESP_SDK_BOOTLOADER_SRCS += components/soc/soc_include_legacy_warn.c
 else
   ESP_SDK_BOOTLOADER_SRCS += components/efuse/src/esp_efuse_api_key_esp32xx.c
   ESP_SDK_BOOTLOADER_SRCS += components/soc/$(CPU_FAM)/dedic_gpio_periph.c
@@ -228,7 +233,6 @@ LINKFLAGS += \
   -Wno-frame-address \
   -o $(ESP_SDK_BOOTLOADER_DIR)/bootloader.elf \
   -Wl,--cref \
-  -Wl,--defsym=IDF_TARGET_ESP32=0 \
   -Wl,--gc-sections \
   -fno-lto \
   -fno-rtti \

@@ -127,7 +127,7 @@ void hugemem_write32(hugemem_ptr_t to, uint32_t val);
 /**
  * @brief Read byte stream from external memory to internal memory
  *
- * @param to       intenal memory pointer
+ * @param to       internal memory pointer
  * @param from     24-bit external memory pointer
  * @param size     number of bytes to read
  *
@@ -139,7 +139,7 @@ void hugemem_read_block(void *to, const hugemem_ptr_t from, size_t size);
  * @brief Write byte stream from internal memory to external memory
  *
  * @param to       24-bit external memory pointer
- * @param from     intenal memory pointer
+ * @param from     internal memory pointer
  * @param size     number of bytes to write
  *
  * @note  The address range to copy to is within 64 kB boundary

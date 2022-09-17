@@ -31,6 +31,7 @@ extern "C" {
 
 /**
  * @name Auto-initialization parameters
+ * @{
  */
 #ifndef DHCPV6_CLIENT_STACK_SIZE
 #define DHCPV6_CLIENT_STACK_SIZE    (THREAD_STACKSIZE_DEFAULT)  /**< stack size */

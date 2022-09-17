@@ -322,7 +322,7 @@ void timer_print_config(void)
 extern void os_timer_arm_us(os_timer_t *ptimer, uint32_t time, bool repeat_flag);
 
 /* Since hardware timer FRC1 is needed to implement PWM, we have to map our */
-/* timer using the exsting ETS timer with 1 us clock rate */
+/* timer using the existing ETS timer with 1 us clock rate */
 
 struct phy_channel_t
 {

@@ -13,6 +13,11 @@ else ifneq (,$(filter esp32c3 esp32s3,$(CPU_FAM)))
   export FLASH_FREQ ?= 80m
   export FLASH_SIZE ?= 2
   BOOTLOADER_POS = 0x0000
+else ifneq (,$(filter esp32s2,$(CPU_FAM)))
+  export FLASH_MODE ?= qio
+  export FLASH_FREQ ?= 80m
+  export FLASH_SIZE ?= 4
+  BOOTLOADER_POS = 0x1000
 else
   $(error Unkwnown ESP32x SoC variant (family))
 endif
@@ -31,6 +36,7 @@ else
   $(error Unkwnown ESP32x SoC architecture)
 endif
 
+PSEUDOMODULES += esp_ble
 PSEUDOMODULES += esp_bootloader
 PSEUDOMODULES += esp_gdbstub
 PSEUDOMODULES += esp_hw_counter
@@ -73,6 +79,15 @@ endif
 ifneq (,$(filter xtensa%,$(TARGET_ARCH)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/xtensa/include
   INCLUDES += -I$(ESP32_SDK_DIR)/components/xtensa/$(CPU_FAM)/include
+endif
+
+ifneq (,$(filter esp_ble,$(USEMODULE)))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/bt/include/$(CPU_FAM)/include
+endif
+
+ifneq (,$(filter esp_ble_nimble,$(USEMODULE)))
+  INCLUDES += -I$(RIOTCPU)/$(CPU)/include/esp_ble_nimble
+  INCLUDES += $(NIMIBASE)/nimble/transport/common/hci_h4/include
 endif
 
 ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
@@ -145,13 +160,19 @@ ifneq (,$(filter xtensa%,$(TARGET_ARCH)))
 endif
 
 LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ld/$(CPU_FAM)/
-LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/$(CPU_FAM)/memory.ld
+
+ifneq (,$(filter esp32_sdk_lib_bt_esp32,$(USEPKG)))
+  LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/$(CPU_FAM)/memory_bt.ld
+else
+  LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/$(CPU_FAM)/memory.ld
+endif
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/$(CPU_FAM)/sections.ld
+
 LINKFLAGS += -T$(ESP32_SDK_DIR)/components/soc/$(CPU_FAM)/ld/$(CPU_FAM).peripherals.ld
 LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.api.ld
 LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.ld
 
-ifeq (esp32,$(CPU_FAM))
+ifneq (,$(filter esp32 esp32s2,$(CPU_FAM)))
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.newlib-data.ld
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.newlib-funcs.ld
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.newlib-time.ld
@@ -177,7 +198,7 @@ ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
   LINKFLAGS += -L$(ESP32_SDK_LIB_PHY_DIR)/$(CPU_FAM)
   ARCHIVES += -lcoexist -lcore -lmesh -lnet80211 -lpp
   ARCHIVES += -lphy -lstdc++
-  ifneq (,$(filter esp32,$(CPU_FAM)))
+  ifeq (esp32,$(CPU_FAM))
     ARCHIVES += -lrtc
   endif
 endif
@@ -185,6 +206,19 @@ endif
 # Libraries needed when using esp_now module
 ifneq (,$(filter esp_now,$(USEMODULE)))
   ARCHIVES += -lespnow -lmesh
+endif
+
+# Libraries needed when using esp_ble
+ifneq (,$(filter esp_ble,$(USEMODULE)))
+  LINKFLAGS += -L$(ESP32_SDK_LIB_PHY_DIR)/$(CPU_FAM)
+  LINKFLAGS += -L$(ESP32_SDK_LIB_BT_DIR)/$(CPU_FAM)
+  ARCHIVES += -lbtdm_app
+  ARCHIVES += -lphy -lstdc++
+  ifeq (esp32,$(CPU_FAM))
+    ARCHIVES += -lrtc
+  else ifneq (,$(filter esp32c3 esp32s3,$(CPU_FAM)))
+    ARCHIVES += -lbtbb
+  endif
 endif
 
 ifneq (,$(filter cpp,$(USEMODULE)))

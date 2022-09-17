@@ -118,13 +118,13 @@ static inline void __attribute__((always_inline)) __exit_isr(void)
 }
 
 /**
- * @brief   Print the last instruction's address
+ * @brief   Returns the last instruction's address
  *
  * @todo:   Not supported
  */
-static inline void cpu_print_last_instruction(void)
+static inline uintptr_t cpu_get_caller_pc(void)
 {
-    puts("n/a");
+    return 0;
 }
 
 #ifdef __cplusplus

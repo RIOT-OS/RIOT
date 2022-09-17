@@ -66,6 +66,7 @@ static const timer_conf_t timer_config[] = {
 
 #define TIMER_0_ISR         isr_wtimer0a
 #define TIMER_1_ISR         isr_wtimer1a
+/** @} */
 
 /**
  * @name UART configuration

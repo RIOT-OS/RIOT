@@ -37,6 +37,10 @@ esp32-heltec-lora32-v2
 esp32-olimex-evb
 esp32c3-ci
 esp32c3-devkit
+esp32s3-ci
+esp32s3-devkit
+esp32s2-ci
+esp32s2-devkit
 esp8266-ci
 esp8266-esp-12x
 hamilton
@@ -61,6 +65,7 @@ nucleo-l073rz
 nucleo-l152re
 nucleo-l433rc
 nucleo-l552ze-q
+pba-d-01-kw2x
 p-nucleo-wb55
 qn9080dk
 remote-revb
@@ -138,8 +143,8 @@ export CFLAGS_DBG=""
 export DLCACHE_DIR=${DLCACHE_DIR:-~/.dlcache}
 export ENABLE_TEST_CACHE=${ENABLE_TEST_CACHE:-1}
 export MURDOCK_REDIS_HOST=${MURDOCK_REDIS_HOST:-127.0.0.1}
+
 NIGHTLY=${NIGHTLY:-0}
-RUN_TESTS=${RUN_TESTS:-${NIGHTLY}}
 FULL_BUILD=${FULL_BUILD:-${NIGHTLY}}
 
 # This is a work around for a bug in CCACHE which interacts very badly with
@@ -224,9 +229,16 @@ check_label() {
     return $?
 }
 
-[ "$RUN_TESTS" != "1" ] && {
-    check_label "CI: run tests" && RUN_TESTS=1
-}
+# if RUN_TESTS is unset (e.g., not passed from the outside),
+# set to 1 if NIGHTLY=1 or if the label "CI: run tests" is set,
+# otherwise set 0.
+if [ -z "$RUN_TESTS" ]; then
+    if [ "$NIGHTLY" = "1" ] || check_label "CI: run tests" ; then
+        RUN_TESTS=1
+    else
+        RUN_TESTS=0
+    fi
+fi
 
 [ "$ENABLE_TEST_CACHE" = "1" ] && {
     check_label "CI: disable test cache" && export ENABLE_TEST_CACHE=0
@@ -367,7 +379,7 @@ get_app_board_toolchain_pairs() {
     local prefix="$*"
 
     if [ "$boards" = makefile_broken ]; then
-        echo "$appdir makefile_broken"
+        echo "$0 error \"error: ${DWQ_WORKER}: get_supported_boards failed in $appdir\""
         return
     fi
 

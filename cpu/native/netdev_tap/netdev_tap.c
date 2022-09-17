@@ -334,7 +334,7 @@ static int _init(netdev_t *netdev)
 
     netdev_tap_t *dev = container_of(netdev, netdev_tap_t, netdev);
 
-    /* check device parametrs */
+    /* check device parameters */
     if (dev == NULL) {
         return -ENODEV;
     }
@@ -404,5 +404,9 @@ static int _init(netdev_t *netdev)
     native_async_read_add_handler(dev->tap_fd, netdev, _tap_isr);
 
     DEBUG("gnrc_tapnet: initialized.\n");
+
+    /* signal link UP */
+    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+
     return 0;
 }

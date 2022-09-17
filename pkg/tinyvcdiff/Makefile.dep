@@ -1,0 +1,7 @@
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE += tinyvcdiff_mtd
+endif
+
+ifneq (,$(filter vfs,$(USEMODULE)))
+  USEMODULE += tinyvcdiff_vfs
+endif

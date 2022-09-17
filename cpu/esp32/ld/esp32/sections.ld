@@ -298,7 +298,7 @@ SECTIONS
     KEEP (*(SORT(.esp_system_init_fn) SORT(.esp_system_init_fn.*)))
     _esp_system_init_fn_array_end = ABSOLUTE(.);
 
-    *(EXCLUDE_FILE(*libbt.a *libbtdm_app.a *libnimble.a) .data EXCLUDE_FILE(*libbt.a *libbtdm_app.a *libnimble.a) .data.*)
+    *(EXCLUDE_FILE(*components/bt/* *libbtdm_app.a) .data EXCLUDE_FILE(*components/bt/* *libbtdm_app.a) .data.*)
     *(.dram1 .dram1.*)
     _coredump_dram_start = ABSOLUTE(.);
     *(.dram1.coredump .dram1.coredump.*)
@@ -306,7 +306,7 @@ SECTIONS
     *components/app_trace/app_trace.*(.rodata .rodata.*)
     *components/app_trace/app_trace_util.*(.rodata .rodata.*)
     _bt_data_start = ABSOLUTE(.);
-    *libbt.a:(.data .data.*)
+    *components/bt/*(.data .data.*)
     . = ALIGN(4);
     _bt_data_end = ABSOLUTE(.);
     _btdm_data_start = ABSOLUTE(.);
@@ -416,7 +416,7 @@ SECTIONS
     *(.dynbss .dynsbss .gnu.linkonce.b .gnu.linkonce.b.* .gnu.linkonce.sb .gnu.linkonce.sb.* .gnu.linkonce.sb2 .gnu.linkonce.sb2.* .sbss .sbss.* .sbss2 .sbss2.* .scommon .share.mem)
     *(COMMON)
     _bt_bss_start = ABSOLUTE(.);
-    *libbt.a:(.bss .bss.* COMMON)
+    *components/bt/*(.bss .bss.* COMMON)
     . = ALIGN(4);
     _bt_bss_end = ABSOLUTE(.);
     _btdm_bss_start = ABSOLUTE(.);

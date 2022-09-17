@@ -8,7 +8,7 @@
  * directory for more details.
  */
 
-/*
+/**
  * @defgroup    boards_common_arduino-atmega Arduino Atmega Common
  * @ingroup     boards_common
  * @brief       Shared files and configuration for Arduino Atmega boards.
@@ -93,7 +93,7 @@ extern "C" {
 
 /**
  * @name CPU clock scale for arduino boards
- *
+ * @{
  */
 #define CPU_ATMEGA_CLK_SCALE_INIT    CPU_ATMEGA_CLK_SCALE_DIV1
 /** @} */

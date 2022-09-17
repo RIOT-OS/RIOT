@@ -23,7 +23,7 @@ def testfunc(child):
     child.expect_exact("NH: LOWPAN_NHC")
     child.expect_exact("HLIM: 255")
     child.expect_exact("Stateless source address compression: elided (use L2 address)")
-    child.expect_exact("Stateless destinaton address compression: 128 bits inline")
+    child.expect_exact("Stateless destination address compression: 128 bits inline")
 
     # 2nd 6LoWPAN fragment
     child.expect_exact("PKTDUMP: data received:")

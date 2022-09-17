@@ -211,9 +211,11 @@ static void _isr(netdev_t *netdev)
     netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
 }
 
-static int _init(netdev_t *encdev)
+static int _init(netdev_t *netdev)
 {
-    (void)encdev;
+    /* signal link UP */
+    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+
     return 0;
 }
 

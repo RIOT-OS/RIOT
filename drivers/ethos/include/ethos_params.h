@@ -29,7 +29,6 @@ extern "C" {
 #define ETHOS_PARAMS        { .uart = ETHOS_UART,   \
                               .baudrate = ETHOS_BAUDRATE }
 #endif
-/** @} */
 
 /**
  * @brief   ethos configuration

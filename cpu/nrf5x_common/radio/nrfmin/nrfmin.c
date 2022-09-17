@@ -448,6 +448,9 @@ static int nrfmin_init(netdev_t *dev)
 
     DEBUG("[nrfmin] initialization successful\n");
 
+    /* signal link UP */
+    dev->event_callback(dev, NETDEV_EVENT_LINK_UP);
+
     return 0;
 }
 

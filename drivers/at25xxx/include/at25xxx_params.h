@@ -14,7 +14,6 @@
  * @brief       Default configuration for the M95M01 EEPROM
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
- * @}
  */
 
 #ifndef AT25XXX_PARAMS_H
@@ -65,6 +64,7 @@ extern "C" {
                                   .size = AT25XXX_PARAM_SIZE,       \
                                   .page_size = AT25XXX_PARAM_PAGE_SIZE }
 #endif
+/** @} */
 
 /**
  * @brief   AT25XXX configuration
@@ -79,3 +79,4 @@ static const at25xxx_params_t at25xxx_params[] =
 #endif
 
 #endif /* AT25XXX_PARAMS_H */
+/** @} */

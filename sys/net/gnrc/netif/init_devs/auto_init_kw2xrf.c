@@ -56,10 +56,10 @@ void auto_init_kw2xrf(void)
         LOG_DEBUG("[auto_init_netif] initializing kw2xrf #%u\n", i);
 
         /* Init Bottom Half Processor (with events module) and radio */
-        bhp_event_init(&kw2xrf_bhp[i], &_netif[i].evq, &kw2xrf_radio_hal_irq_handler, &kw2xrf_netdev[i].submac.dev);
-        kw2xrf_init(&kw2xrf_devs[i], (kw2xrf_params_t*) p,&kw2xrf_netdev[i].submac.dev,
+        bhp_event_init(&kw2xrf_bhp[i], &_netif[i].evq[GNRC_NETIF_EVQ_INDEX_PRIO_HIGH],
+                       &kw2xrf_radio_hal_irq_handler, &kw2xrf_netdev[i].submac.dev);
+        kw2xrf_init(&kw2xrf_devs[i], p, &kw2xrf_netdev[i].submac.dev,
                         bhp_event_isr_cb, &kw2xrf_bhp[i]);
-
 
         netdev_register(&kw2xrf_netdev[i].dev.netdev, NETDEV_KW2XRF, i);
         netdev_ieee802154_submac_init(&kw2xrf_netdev[i]);

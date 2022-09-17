@@ -15,7 +15,7 @@
  * provided for tests independent of format or medium. The intention is to have
  * a test that expects some data, for example, reading some registers,
  * output the results in a know way, for example json.  This should help
- * keeping the test results stable and not lock anyone into a perticular
+ * keeping the test results stable and not lock anyone into a particular
  * format. If JSON is too heavy all tests using this can be swapped out for
  * something lighter, for example CBOR. Then the tests should not have to be
  * adapted. There can also be python layers that coordinate the output results,

@@ -231,7 +231,7 @@ extern "C" {
 
 /**
  * @name    LoRa modulation available values
- *
+ * @{
  */
 /**
  * @brief   LoRa modulation bandwidth.

@@ -45,3 +45,4 @@
 #endif
 
 #endif /* CFG_CLOCK_16_0_H */
+/** @} */

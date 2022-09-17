@@ -38,11 +38,14 @@ nimble_porting_nimble:
 	$(QQ)"$(MAKE)" -C $(PDIR)/porting/nimble/src/ -f $(RIOTPKG)/$(PKG_NAME)/nimble.porting.mk MODULE=$@
 
 nimble_npl_riot:
-	$(QQ)"$(MAKE)" -C $(PDIR)/porting/npl/riot/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
+	$(QQ)"$(MAKE)" -C $(PDIR)/porting/npl/riot/src/ -f $(RIOTPKG)/$(PKG_NAME)/nimble.npl.mk MODULE=$@
 
 # generic modules
 nimble_transport:
 	$(QQ)"$(MAKE)" -C $(PDIR)/nimble/transport/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
+
+nimble_transport_hci_h4:
+	$(QQ)"$(MAKE)" -C $(PDIR)/nimble/transport/common/hci_h4/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
 # host modules
 nimble_host:

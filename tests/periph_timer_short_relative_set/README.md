@@ -26,6 +26,8 @@ timeouts.
 For example, as of this writing (30-Oct-19), samr21-xpro fails for values below
 8, nrf52dk for values below 2.
 
+Note: _THIS IS EXPECTED TO FAIL ON MOST BOARDS_.
+
 ## Expected Result
 
 After 100 "interval N ok" messages the test should print "TEST SUCCEEDED".

@@ -39,7 +39,15 @@ static int _count;
 #define ZTIMER_CLOCKS { ZTIMER_MSEC, ZTIMER_USEC }
 static const char *_names[] = { "ZTIMER_MSEC", "ZTIMER_USEC" };
 static uint32_t _intervals[] = { 100, 10000 };
-static uint32_t _max_offsets[] = { 2, 100 };
+static uint32_t _max_offsets[] = {
+    2,
+#ifdef BOARD_NATIVE
+    /* native is running on top of a multi-media OS, not a real-time OS */
+    1000
+#else
+    100
+#endif
+};
 
 static bool callback(void *arg)
 {
@@ -81,7 +89,7 @@ int main(void)
         uint32_t last = t.last - _intervals[j];
 
         if (!ztimer_is_set(clock, &t.timer)) {
-            print_str("Test failed\n");
+            print_str("Test failed, timer not set\n");
             return 1;
         }
 
@@ -93,6 +101,7 @@ int main(void)
             printf("i: %u time: %" PRIu32 " offset: %" PRIu32 "\n",
                    i, _times[i], offset);
             if (offset > _max_offsets[j]) {
+                print_str("Offset too large, failure\n");
                 failed = 1;
             }
             last = _times[i];

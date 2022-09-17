@@ -67,6 +67,7 @@ static void _slip_rx_cb(void *arg, uint8_t byte)
 check_end:
     if (byte == SLIPDEV_END) {
         if (dev->state == SLIPDEV_STATE_NET) {
+            dev->rx_queued++;
             netdev_trigger_event_isr(&dev->netdev);
         }
         dev->state = SLIPDEV_STATE_NONE;
@@ -87,6 +88,10 @@ static int _init(netdev_t *netdev)
                   dev->config.uart, dev->config.baudrate);
         return -ENODEV;
     }
+
+    /* signal link UP */
+    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+
     return 0;
 }
 
@@ -207,6 +212,11 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                 return -ENOBUFS;
             }
         } while (byte != SLIPDEV_END);
+
+        if (++dev->rx_done != dev->rx_queued) {
+            DEBUG("slipdev: pkt still in queue");
+            netdev_trigger_event_isr(&dev->netdev);
+        }
     }
     return res;
 }

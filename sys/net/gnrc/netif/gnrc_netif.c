@@ -1675,6 +1675,18 @@ static void _process_receive_stats(gnrc_netif_t *netdev, gnrc_pktsnip_t *pkt)
     netstats_nb_update_rx(&netdev->netif, src, src_len, hdr->rssi, hdr->lqi);
 }
 
+static event_t *_gnrc_netif_fetch_event(gnrc_netif_t *netif)
+{
+    event_t *ev;
+    /* Iterate from highest priority to lowest priority */
+    for (int i = 0; i < GNRC_NETIF_EVQ_NUMOF; i++) {
+        if ((ev = event_get(&netif->evq[i]))) {
+            return ev;
+        }
+    }
+    return NULL;
+}
+
 /**
  * @brief   Process any pending events and wait for IPC messages
  *
@@ -1697,8 +1709,7 @@ static void _process_events_await_msg(gnrc_netif_t *netif, msg_t *msg)
         event_t *evp;
         /* We can not use event_loop() or event_wait() because then we would not
          * wake up when a message arrives */
-        event_queue_t *evq = &netif->evq;
-        while ((evp = event_get(evq))) {
+        while ((evp = _gnrc_netif_fetch_event(netif))) {
             DEBUG("gnrc_netif: event %p\n", (void *)evp);
             if (evp->handler) {
                 evp->handler(evp);
@@ -1844,7 +1855,7 @@ static void *_gnrc_netif_thread(void *args)
 
     netif->event_isr.handler = _event_handler_isr,
     /* set up the event queue */
-    event_queue_init(&netif->evq);
+    event_queues_init(netif->evq, GNRC_NETIF_EVQ_NUMOF);
 
     /* setup the link-layer's message queue */
     msg_init_queue(msg_queue, GNRC_NETIF_MSG_QUEUE_SIZE);
@@ -1957,12 +1968,20 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
     gnrc_netif_t *netif = (gnrc_netif_t *) dev->context;
 
     if (event == NETDEV_EVENT_ISR) {
-        event_post(&netif->evq, &netif->event_isr);
+        event_post(&netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_LOW], &netif->event_isr);
     }
     else {
         DEBUG("gnrc_netif: event triggered -> %i\n", event);
         gnrc_pktsnip_t *pkt = NULL;
         switch (event) {
+#if IS_USED(MODULE_GNRC_IPV6_NIB)
+            case NETDEV_EVENT_LINK_UP:
+                gnrc_ipv6_nib_iface_up(netif);
+                break;
+            case NETDEV_EVENT_LINK_DOWN:
+                gnrc_ipv6_nib_iface_down(netif, false);
+                break;
+#endif
             case NETDEV_EVENT_RX_COMPLETE:
                 pkt = netif->ops->recv(netif);
                 /* send packet previously queued within netif due to the lower

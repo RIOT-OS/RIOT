@@ -194,6 +194,7 @@ static const sam0_common_usb_config_t sam_usbdev_config[] = {
         .gclk_src = SAM0_GCLK_48MHZ,
     }
 };
+/** @} */
 
 #ifdef __cplusplus
 }

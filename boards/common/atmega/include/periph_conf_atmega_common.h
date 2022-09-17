@@ -226,3 +226,4 @@ extern "C" {
 #endif
 
 #endif /* PERIPH_CONF_ATMEGA_COMMON_H */
+/** @} */

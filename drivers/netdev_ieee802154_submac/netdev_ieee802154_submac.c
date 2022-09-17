@@ -365,6 +365,10 @@ static int _init(netdev_t *netdev)
                           &enable, sizeof(enable));
 
     netdev_submac->dev.txpower = tx_power;
+
+    /* signal link UP */
+    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+
     return 0;
 }
 

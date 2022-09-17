@@ -86,7 +86,7 @@ extern "C" {
  * @brief USB peripheral product string
  */
 #ifndef CONFIG_USB_PRODUCT_STR
-#define CONFIG_USB_PRODUCT_STR  "USB device"
+#define CONFIG_USB_PRODUCT_STR  RIOT_BOARD
 #endif
 
 /**

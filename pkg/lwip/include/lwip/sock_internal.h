@@ -69,7 +69,7 @@ static inline ssize_t lwip_sock_send(struct netconn *conn,
 
     return lwip_sock_sendv(conn, &snip, proto, remote, type);
 }
-/**
+/** @internal
  * @}
  */
 
@@ -78,4 +78,5 @@ static inline ssize_t lwip_sock_send(struct netconn *conn,
 #endif
 
 #endif /* LWIP_SOCK_INTERNAL_H */
-/** @} */
+/** @internal
+ * @} */

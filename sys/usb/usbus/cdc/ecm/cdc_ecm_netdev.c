@@ -22,10 +22,9 @@
 
 #include "kernel_defines.h"
 #include "iolist.h"
-#include "luid.h"
 #include "mutex.h"
 #include "net/ethernet.h"
-#include "net/eui48.h"
+#include "net/eui_provider.h"
 #include "net/netdev.h"
 #include "net/netdev/eth.h"
 #include "usb/usbus/cdc/ecm.h"
@@ -53,6 +52,7 @@ static usbus_cdcecm_device_t *_netdev_to_cdcecm(netdev_t *netdev)
 void cdcecm_netdev_setup(usbus_cdcecm_device_t *cdcecm)
 {
     cdcecm->netdev.driver = &netdev_driver_cdcecm;
+    netdev_register(&cdcecm->netdev, NETDEV_CDC_ECM, 0);
 }
 
 static int _send(netdev_t *netdev, const iolist_t *iolist)
@@ -153,7 +153,11 @@ static int _init(netdev_t *netdev)
 {
     usbus_cdcecm_device_t *cdcecm = _netdev_to_cdcecm(netdev);
 
-    luid_get_eui48((eui48_t*)cdcecm->mac_netdev);
+    netdev_eui48_get(netdev, (eui48_t*)&cdcecm->mac_netdev);
+
+    /* signal link UP */
+    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+
     return 0;
 }
 
