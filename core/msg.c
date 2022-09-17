@@ -492,6 +492,7 @@ void msg_queue_print(void)
 
     if (msg_counter < 1) {
         /* no msg queue */
+        irq_restore(state);
         printf("No messages or no message queue\n");
         return;
     }
