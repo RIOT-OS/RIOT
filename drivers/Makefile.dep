@@ -136,6 +136,10 @@ ifneq (,$(filter pcf857%,$(USEMODULE)))
   USEMODULE += pcf857x
 endif
 
+ifneq (,$(filter periph_flashpage_aux,$(FEATURES_USED)))
+  FEATURES_REQUIRED += periph_flashpage_pagewise
+endif
+
 ifneq (,$(filter periph_ptp_timer periph_ptp_speed_adjustment,$(FEATURES_USED)))
   FEATURES_REQUIRED += periph_ptp
 endif

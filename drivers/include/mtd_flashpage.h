@@ -35,7 +35,7 @@ extern "C"
 #endif
 
 /**
- * @brief   Macro helper to initialize a mtd_t with flash-age driver
+ * @brief   Macro helper to initialize a mtd_t with flashpage driver
  */
 #define MTD_FLASHPAGE_INIT_VAL(_pages_per_sector) { \
     .base = {                                       \
@@ -45,6 +45,23 @@ extern "C"
         .page_size = FLASHPAGE_SIZE / _pages_per_sector, \
         .write_size = 1                             \
     },                                              \
+}
+
+/**
+ * @brief   Macro helper to initialize a mtd_t with a portion of the flash
+ *
+ * @param[in] start     Start address of the flash section
+ * @param[in] len       Size of the flash section in bytes
+ */
+#define MTD_FLASHPAGE_AUX_INIT_VAL(start, len) {    \
+    .base = {                                       \
+        .driver = &mtd_flashpage_driver,            \
+        .sector_count = len / FLASHPAGE_SIZE,       \
+        .pages_per_sector = 1,                      \
+        .page_size = FLASHPAGE_SIZE,                \
+        .write_size = 1,                            \
+    },                                              \
+    .offset = start / FLASHPAGE_SIZE,               \
 }
 
 /**
@@ -61,6 +78,40 @@ typedef struct {
                              a whole number of sectors from the start of the
                              flash */
 } mtd_flashpage_t;
+
+#if CONFIG_SLOT_AUX_LEN || DOXYGEN
+/**
+ * @brief   MTD device representing the auxiliary flash slot
+ */
+extern mtd_flashpage_t mtd_flash_aux_slot;
+
+/**
+ * @brief   Generic MTD device backed by the auxiliary flash slot
+ */
+extern mtd_dev_t *mtd_aux;
+#endif
+
+/**
+ * @brief   Size of the auxiliary slot on the internal flash
+ *          Must align with the flash page size.
+ *
+ * @note    Don't set this config value directly!
+ *          Instead set `SLOT_AUX_LEN` in the board's `Makefile.include`
+ *
+ * This value is fixed and can not be changed in the field / via firmware
+ * updates. Changing this value requires re-flashing of riotboot.
+ *
+ */
+#ifndef CONFIG_SLOT_AUX_LEN
+#define CONFIG_SLOT_AUX_LEN 0
+#endif
+
+/**
+ * @brief   Default MTD offset for the AUX slot
+ */
+#ifndef CONFIG_SLOT_AUX_MTD_OFFSET
+#define CONFIG_SLOT_AUX_MTD_OFFSET  1
+#endif
 
 #ifdef __cplusplus
 }
