@@ -137,7 +137,7 @@ typedef struct {
     const gnrc_netif_ops_t *ops;            /**< Operations of the network interface */
     netdev_t *dev;                          /**< Network device of the network interface */
     rmutex_t mutex;                         /**< Mutex of the interface */
-#ifdef MODULE_NETSTATS_L2
+#if IS_USED(MODULE_NETSTATS_L2) || defined(DOXYGEN)
     netstats_t stats;                       /**< transceiver's statistics */
 #endif
 #if IS_USED(MODULE_GNRC_NETIF_LORAWAN) || defined(DOXYGEN)
@@ -166,6 +166,22 @@ typedef struct {
      * @brief   ISR event for the network device
      */
     event_t event_isr;
+#if IS_USED(MODULE_NETDEV_NEW_API) || defined(DOXYGEN)
+    /**
+     * @brief   TX done event for the network device
+     *
+     * @details Only provided with module `netdev_new_api`
+     */
+    event_t event_tx_done;
+    /**
+     * @brief   Outgoing frame that is currently transmitted
+     *
+     * @details Only provided with module `netdev_new_api`
+     *
+     * This needs to be freed by gnrc_netif once TX is done
+     */
+    gnrc_pktsnip_t *tx_pkt;
+#endif
 #if (GNRC_NETIF_L2ADDR_MAXLEN > 0) || DOXYGEN
     /**
      * @brief   The link-layer address currently used as the source address

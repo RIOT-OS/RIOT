@@ -120,8 +120,10 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 #endif
 
     res = dev->driver->send(dev, (iolist_t *)pkt);
-    /* release old data */
-    gnrc_pktbuf_release(pkt);
+    if (gnrc_netif_netdev_legacy_api(netif)) {
+        /* only for legacy drivers we need to release pkt here */
+        gnrc_pktbuf_release(pkt);
+    }
     return res;
 }
 
