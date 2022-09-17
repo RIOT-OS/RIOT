@@ -304,6 +304,26 @@ void gnrc_ipv6_nib_init(void);
 void gnrc_ipv6_nib_init_iface(gnrc_netif_t *netif);
 
 /**
+ * @brief   Call bring-up functions when the interface comes online
+ *
+ * @pre `netif != NULL`
+ *
+ * @param[in,out] netif The interface that just got online
+ */
+void gnrc_ipv6_nib_iface_up(gnrc_netif_t *netif);
+
+/**
+ * @brief   Clean up when the interface goes offline
+ *
+ * @pre `netif != NULL`
+ *
+ * @param[in,out] netif         The interface that has just got offline
+ * @param[in]     send_final_ra Whether to advertise router disappearance
+ *                              in a final router advertisement
+ */
+void gnrc_ipv6_nib_iface_down(gnrc_netif_t *netif, bool send_final_ra);
+
+/**
  * @brief   Gets link-layer address of next hop to a destination address
  *
  * @pre `(dst != NULL) && (nce != NULL)`

@@ -100,6 +100,9 @@ static int kw41zrf_netdev_init(netdev_t *netdev)
         return -1;
     }
 
+    /* signal link UP */
+    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+
     return 0;
 }
 

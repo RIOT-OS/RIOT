@@ -136,7 +136,13 @@ static int _init(netdev_t *netdev)
         return -1;
     }
 
-    return cc2420_init(dev);
+    int res = cc2420_init(dev);
+    if (res == 0) {
+        /* signal link UP */
+        netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+    }
+
+    return res;
 }
 
 static void _isr(netdev_t *netdev)

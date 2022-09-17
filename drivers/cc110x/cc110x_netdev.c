@@ -343,6 +343,10 @@ static int cc110x_init(netdev_t *netdev)
     }
 
     DEBUG("[cc110x] netdev_driver_t::init(): Success\n");
+
+    /* signal link UP */
+    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+
     return 0;
 }
 

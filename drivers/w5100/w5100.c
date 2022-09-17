@@ -180,6 +180,9 @@ static int init(netdev_t *netdev)
     /* release the SPI bus again */
     spi_release(dev->p.spi);
 
+    /* signal link UP */
+    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+
     return 0;
 }
 

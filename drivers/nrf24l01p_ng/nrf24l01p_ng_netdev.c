@@ -255,6 +255,10 @@ static int _init(netdev_t *netdev)
         DEBUG_PUTS("[nrf24l01p_ng] _init(): gpio_init_int() failed");
         return -EIO;
     }
+
+    /* signal link UP */
+    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+
     return 0;
 }
 
