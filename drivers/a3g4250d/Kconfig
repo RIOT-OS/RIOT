@@ -1,0 +1,18 @@
+# Copyright (c) 2022 samkno1
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config MODULE_A3G4250D
+    bool "drivers_a3g4250d"
+    depends on TEST_KCONFIG
+    depends on HAS_ PERIPH_GPIO
+    depends on HAS_ PERIPH_SPI
+    depends on HAS_PERIPH_I2C
+    select PACKAGE_DRIVER_A3G4250D
+    select MODULE_ PERIPH_GPIO
+    select MODULE_ PERIPH_SPI
+    select MODULE_PERIPH_I2C
+    select MODULE_ A3G4250D_I2C
+    select MODULE_A3G4250D_SPI

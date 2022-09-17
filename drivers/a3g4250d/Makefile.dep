@@ -1,0 +1,15 @@
+USE_PKG += driver_a3g4250d
+
+ifneq (,$(filter saul%,$(USEMODULE)))
+  USEMODULE += ztimer
+  USEMODULE += ztimer_msec
+endif
+
+ifneq (,$(filter a3g4250d_i2c,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
+
+ifneq (,$(filter a3g4250d_spi,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_spi
+endif
