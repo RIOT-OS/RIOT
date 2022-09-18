@@ -311,6 +311,28 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
         res = netif->dev->driver->get(netif->dev, opt->opt, opt->data,
                                       opt->data_len);
     }
+    if (res == -ENOTSUP) {
+        /* handle default values */
+        switch (opt->opt) {
+            case NETOPT_LINK: {
+                netopt_state_t state;
+                res = netif->dev->driver->get(netif->dev, NETOPT_STATE, &state, sizeof(state));
+                if (res < 0) {
+                    break;
+                }
+                res = sizeof(netopt_enable_t);
+                if ((state == NETOPT_STATE_SLEEP) || (state == NETOPT_STATE_OFF) ||
+                    (state == NETOPT_STATE_STANDBY)) {
+                    *((netopt_enable_t *)opt->data) = NETOPT_DISABLE;
+                } else {
+                    *((netopt_enable_t *)opt->data) = NETOPT_ENABLE;
+                }
+                break;
+            }
+        default:
+            break;
+        }
+    }
     gnrc_netif_release(netif);
     return res;
 }
