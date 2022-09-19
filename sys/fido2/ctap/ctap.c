@@ -19,10 +19,11 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#include "byteorder.h"
 #include "errno.h"
 #include "fmt.h"
+#include "string_utils.h"
 #include "ztimer.h"
-#include "byteorder.h"
 
 #include "fido2/ctap/transport/ctap_transport.h"
 #include "fido2/ctap.h"
@@ -433,7 +434,7 @@ static int _reset(void)
     _rem_pin_att_boot = CTAP_PIN_MAX_ATTS_BOOT;
 
     /* invalidate AES CCM key */
-    memset(_state.cred_key, 0, sizeof(_state.cred_key));
+    explicit_bzero(_state.cred_key, sizeof(_state.cred_key));
     _state.cred_key_is_initialized = false;
 
     _state.config.options |= CTAP_INFO_OPTIONS_FLAG_PLAT;
@@ -589,7 +590,7 @@ static int _make_credential(ctap_req_t *req_raw)
 
 done:
     /* clear rk to remove private key from memory */
-    memset(&k, 0, sizeof(k));
+    explicit_bzero(&k, sizeof(k));
     return ret;
 }
 
@@ -748,7 +749,7 @@ static int _get_assertion(ctap_req_t *req_raw)
 done:
     /* clear rk to remove private key from memory */
     if (rk) {
-        memset(rk, 0, sizeof(*rk));
+        explicit_bzero(rk, sizeof(*rk));
     }
     return ret;
 }
@@ -831,7 +832,7 @@ static int _get_next_assertion(void)
 done:
     /* clear rk to remove private key from memory */
     if (rk) {
-        memset(rk, 0, sizeof(*rk));
+        explicit_bzero(rk, sizeof(*rk));
     }
     return ret;
 }
@@ -1018,7 +1019,7 @@ static int _set_pin(ctap_client_pin_req_t *req)
 
 done:
     /* clear key agreement key */
-    memset(&_state.ag_key, 0, sizeof(_state.ag_key));
+    explicit_bzero(&_state.ag_key, sizeof(_state.ag_key));
     return ret;
 }
 
@@ -1159,7 +1160,7 @@ static int _change_pin(ctap_client_pin_req_t *req)
 
 done:
     /* clear key agreement key */
-    memset(&_state.ag_key, 0, sizeof(_state.ag_key));
+    explicit_bzero(&_state.ag_key, sizeof(_state.ag_key));
     return ret;
 }
 
@@ -1254,7 +1255,7 @@ static int _get_pin_token(ctap_client_pin_req_t *req)
 
 done:
     /* clear key agreement key */
-    memset(&_state.ag_key, 0, sizeof(_state.ag_key));
+    explicit_bzero(&_state.ag_key, sizeof(_state.ag_key));
     return ret;
 }
 
