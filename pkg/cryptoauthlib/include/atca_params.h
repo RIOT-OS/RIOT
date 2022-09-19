@@ -52,6 +52,9 @@ extern "C" {
  */
 
 #ifndef ATCA_PARAM_I2C_DEV0
+/**
+ * @brief   ATCA device connected to I2C bus 0
+ */
 #define ATCA_PARAM_I2C_DEV0      I2C_DEV(0)
 #endif
 
@@ -77,6 +80,9 @@ extern "C" {
 #endif
 
 #ifndef ATCA_PARAMS_DEV0
+/**
+ * @brief   Configuration parameters for the primary ATCA device
+ */
 #define ATCA_PARAMS_DEV0                {   .iface_type = ATCA_I2C_IFACE, \
                                             .devtype = ATCA_DEVTYPE, \
                                             .atcai2c.address = ATCA_PARAM_ADDR, \
@@ -107,7 +113,7 @@ typedef struct {
 #if IS_ACTIVE(CONFIG_PSA_SE_ATECCX08A)
     psa_key_location_t atca_loc;
 #endif
-    ATCAIfaceCfg cfg;
+    ATCAIfaceCfg cfg;   /**< ATCA configuration parameters */
 } atca_params_t;
 
 /**
