@@ -6,7 +6,7 @@ BOARD ?= msba2
 USEMODULE += $(DRIVER)
 USEMODULE += shell
 USEMODULE += saul_default
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 
 include $(RIOTBASE)/Makefile.include

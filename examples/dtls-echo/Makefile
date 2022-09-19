@@ -17,7 +17,7 @@ USEMODULE += sock_udp
 
 # Add also the shell, some shell commands
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 
 USEPKG += tinydtls
 # tinydtls needs crypto secure PRNG

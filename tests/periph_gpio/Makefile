@@ -8,7 +8,7 @@ FEATURES_OPTIONAL += periph_gpio_fast_read
 FEATURES_OPTIONAL += periph_gpio_tamper_wake
 
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += benchmark
 
 # disable native GPIOs for automatic test

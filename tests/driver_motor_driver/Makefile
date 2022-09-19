@@ -4,7 +4,7 @@ include ../Makefile.tests_common
 
 USEMODULE += motor_driver
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += xtimer
 
 FEATURES_REQUIRED += periph_qdec

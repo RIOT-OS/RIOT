@@ -28,7 +28,7 @@ ifneq (,$(DEFAULT_MQTT_PWD))
 endif
 
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 USEMODULE += netdev_default
 USEPKG += paho-mqtt

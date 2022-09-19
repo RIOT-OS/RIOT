@@ -23,7 +23,7 @@ USEMODULE += prng_sha1prng
 
 # Add also the shell, some shell commands
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 
 # Bitfield to log open sessions
 USEMODULE += bitfield

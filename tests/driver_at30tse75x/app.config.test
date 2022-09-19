@@ -2,4 +2,4 @@
 # application configuration. This is only needed during migration.
 CONFIG_MODULE_AT30TSE75X=y
 CONFIG_MODULE_SHELL=y
-CONFIG_MODULE_SHELL_COMMANDS=y
+CONFIG_MODULE_SHELL_CMDS_DEFAULT=y

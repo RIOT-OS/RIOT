@@ -5,7 +5,7 @@ USEMODULE += shell
 
 #for testing
 #USEMODULE += ps
-#USEMODULE += shell_commands
+#USEMODULE += shell_cmds_default
 
 # microbit qemu failing currently
 TEST_ON_CI_BLACKLIST += microbit

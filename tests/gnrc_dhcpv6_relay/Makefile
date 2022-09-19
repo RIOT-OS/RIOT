@@ -24,7 +24,7 @@ USEMODULE += auto_init_gnrc_netif
 
 USEMODULE += ps
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 
 # The test requires some setup and to be run as root
 # So it cannot currently be run

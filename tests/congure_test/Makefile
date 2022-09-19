@@ -4,7 +4,7 @@ USEMODULE += congure_mock
 USEMODULE += congure_test
 USEMODULE += fmt
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 
 INCLUDES += -I$(CURDIR)
 

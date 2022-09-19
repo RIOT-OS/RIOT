@@ -20,7 +20,7 @@ USEMODULE += gnrc_pktdump
 
 # Include the shell and shell commands.
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 
 # Use GNRC Txtsnd to transmit LoRaWAN from the shell
 USEMODULE += gnrc_txtsnd

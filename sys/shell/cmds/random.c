@@ -27,24 +27,22 @@
 #include "random.h"
 #include "shell.h"
 
-#ifdef MODULE_XTIMER
-#include "xtimer.h"
-#endif
+#include "ztimer.h"
 
 static int _random_init(int argc, char **argv)
 {
     int initval;
 
     if (argc == 1) {
-#ifdef MODULE_XTIMER
-        initval = _xtimer_now();
-        printf("PRNG initialized to current time: %d\n", initval);
-#else
-        (void)initval;
-        puts("xtimer module not compiled in, can't initialize by time.\n"
-             "Please provide a seed.\n");
-        return 1;
-#endif
+        if (IS_USED(MODULE_ZTIMER_USEC)) {
+            initval = ztimer_now(ZTIMER_USEC);
+            printf("PRNG initialized to current time: %d\n", initval);
+        }
+        else {
+            puts("xtimer module not compiled in, can't initialize by time.\n"
+                 "Please provide a seed.\n");
+            return 1;
+        }
     }
     else {
         initval = atoi(argv[1]);

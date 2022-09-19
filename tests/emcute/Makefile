@@ -22,7 +22,7 @@ USEMODULE += gnrc_netif_single          # Only one interface used and it makes
 USEMODULE += emcute
 USEMODULE += od
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += sock_util
 
 CFLAGS += -DSTDIO_UART_RX_BUFSIZE="512" # Adapt to SHELL_BUFSIZE in app

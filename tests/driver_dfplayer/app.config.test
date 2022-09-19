@@ -2,10 +2,11 @@
 # application configuration. This is only needed during migration.
 CONFIG_MODULE_DFPLAYER=y
 
-# enable event thread in lowest priority
+# enable event thread
 CONFIG_MODULE_EVENT=y
 CONFIG_MODULE_EVENT_THREAD=y
 
-# enable shell with basic commands
+# enable shell
 CONFIG_MODULE_SHELL=y
-CONFIG_MODULE_SHELL_COMMANDS=y
+# pull in default commands for selected modules
+CONFIG_MODULE_SHELL_CMDS_DEFAULT=y

@@ -25,7 +25,7 @@ USEMODULE += gnrc_icmpv6_echo
 
 # include this for printing IP addresses
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 
 # Set this to 1 to enable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the

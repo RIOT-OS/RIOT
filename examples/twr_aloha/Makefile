@@ -32,7 +32,7 @@ USEMODULE += uwb-core_twr_ds_ext
 
 # System modules used by this application
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 USEMODULE += l2util
 USEMODULE += event_callback

@@ -1,7 +1,7 @@
 include ../Makefile.tests_common
 
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 
 USEMODULE += od
 USEMODULE += mtd

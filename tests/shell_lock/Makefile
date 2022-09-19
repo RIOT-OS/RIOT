@@ -2,7 +2,7 @@ DEVELHELP=0
 include ../Makefile.tests_common
 
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 
 USEMODULE += shell_lock
 USEMODULE += shell_lock_auto_locking

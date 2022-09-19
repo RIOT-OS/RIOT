@@ -4,7 +4,7 @@ include ../Makefile.tests_common
 
 USEMODULE += od
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 
 DRIVER ?= sx1276

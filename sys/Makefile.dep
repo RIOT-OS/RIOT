@@ -57,10 +57,6 @@ ifneq (,$(filter fmt_table,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
-ifneq (,$(filter i2c_scan,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_i2c
-endif
-
 ifneq (,$(filter prng_fortuna,$(USEMODULE)))
   USEMODULE += crypto_aes_128
 endif
@@ -86,10 +82,6 @@ ifneq (,$(filter ieee802154_security,$(USEMODULE)))
   USEMODULE += crypto
   USEMODULE += crypto_aes_128
   USEMODULE += cipher_modes
-endif
-
-ifneq (,$(filter rtt_cmd,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_rtt
 endif
 
 ifneq (,$(filter trace,$(USEMODULE)))
@@ -289,8 +281,25 @@ ifneq (,$(filter posix_sockets,$(USEMODULE)))
   USEMODULE += posix_headers
 endif
 
-ifneq (,$(filter shell,$(USEMODULE)))
+ifneq (,$(filter md5sum ,$(USEMODULE)))
+  USEMODULE += shell_cmd_md5sum
+endif
+
+ifneq (,$(filter sha1sum,$(USEMODULE)))
+  USEMODULE += shell_cmd_sha1sum
+endif
+
+ifneq (,$(filter sha256sum,$(USEMODULE)))
+  USEMODULE += shell_cmd_sha256sum
+endif
+
+ifneq (,$(filter random_cmd,$(USEMODULE)))
+  USEMODULE += shell_cmd_random
+endif
+
+ifneq (,$(filter shell%,$(USEMODULE)))
   USEMODULE += stdin
+  include $(RIOTBASE)/sys/shell/Makefile.dep
 endif
 
 # Include all stdio_% dependencies after all USEMODULE += stdio_%
@@ -303,49 +312,6 @@ endif
 ifneq (,$(filter isrpipe_read_timeout,$(USEMODULE)))
   USEMODULE += isrpipe
   USEMODULE += xtimer
-endif
-
-ifneq (,$(filter shell_commands,$(USEMODULE)))
-  ifneq (,$(filter dfplayer,$(USEMODULE)))
-    USEMODULE += auto_init_multimedia
-    USEMODULE += fmt
-  endif
-
-  ifneq (,$(filter fib,$(USEMODULE)))
-    USEMODULE += posix_inet
-  endif
-
-  ifneq (,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
-    USEMODULE += netutils ztimer_usec
-  endif
-
-  ifneq (,$(gnrc_udp_cmd,$(USEMODULE)))
-    USEMODULE += netutils
-  endif
-
-  ifneq (,$(filter nanocoap_vfs,$(USEMODULE)))
-    USEMODULE += vfs_util
-  endif
-
-  ifneq (,$(filter nimble_netif,$(USEMODULE)))
-    USEMODULE += nimble_scanner
-    USEMODULE += nimble_scanlist
-    USEMODULE += fmt
-  endif
-
-  ifneq (,$(filter openwsn_%,$(USEMODULE)))
-    USEMODULE += netif
-    USEMODULE += ipv6_addr
-  endif
-
-  ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
-    USEMODULE += gnrc_netif_cmd_lora
-  endif
-endif
-
-ifneq (,$(filter shell_democommands,$(USEMODULE)))
-  USEMODULE += rust_riotmodules
-  USEMODULE += shell
 endif
 
 ifneq (,$(filter md5sum sha1sum sha256sum,$(USEMODULE)))
@@ -776,9 +742,6 @@ endif
 ifneq (,$(filter cord_lc cord_ep,$(USEMODULE)))
   USEMODULE += core_thread_flags
   USEMODULE += cord_common
-  ifneq (,$(filter shell_commands,$(USEMODULE)))
-    USEMODULE += sock_util
-  endif
   ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
     # requires 64bit timestamps when using xtimer
     USEMODULE += ztimer64_xtimer_compat

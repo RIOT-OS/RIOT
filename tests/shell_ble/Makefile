@@ -4,7 +4,7 @@ include ../Makefile.tests_common
 
 USEMODULE += app_metadata
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 
 USEMODULE += stdio_nimble stdio_nimble_debug

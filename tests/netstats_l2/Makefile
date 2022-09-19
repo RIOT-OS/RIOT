@@ -4,7 +4,7 @@ include $(RIOTBASE)/tests/Makefile.boards.netif
 BOARD_WHITELIST += $(BOARD_PROVIDES_NETIF)
 
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += gnrc
 USEMODULE += netdev_default
 USEMODULE += auto_init_gnrc_netif

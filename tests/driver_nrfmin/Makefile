@@ -9,7 +9,7 @@ USEMODULE += gnrc_ipv6
 USEMODULE += gnrc_icmpv6_echo
 # also add the shell with some basic shell commands
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 
 # microbit qemu failing currently
 TEST_ON_CI_BLACKLIST += microbit

@@ -3,7 +3,7 @@ DEBUG ?= 0
 include ../Makefile.tests_common
 
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 USEMODULE += gnrc
 USEMODULE += auto_init_gnrc_netif

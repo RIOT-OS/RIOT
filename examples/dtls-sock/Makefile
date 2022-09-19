@@ -32,7 +32,7 @@ USEMODULE += prng_sha1prng
 
 # Add also the shell, some shell commands
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 
 # UDP Port to use (20220 is default for DTLS).
 DTLS_PORT ?= 20220

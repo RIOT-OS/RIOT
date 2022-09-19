@@ -22,7 +22,7 @@ endif
 USEMODULE += auto_init_gnrc_netif
 
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 
 USEMODULE += posix_inet
 

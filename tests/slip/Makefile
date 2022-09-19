@@ -6,7 +6,7 @@ USEMODULE += gnrc_pktdump
 USEMODULE += gnrc_txtsnd
 USEMODULE += slipdev
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 
 # set slip parameters to default values if unset
 SLIP_UART     ?= "UART_NUMOF-1"

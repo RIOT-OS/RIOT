@@ -3,7 +3,7 @@ include ../Makefile.tests_common
 
 # we want shell support
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 # setup NimBLE specific modules
 USEMODULE += nimble_scanner
 USEMODULE += nimble_scanlist

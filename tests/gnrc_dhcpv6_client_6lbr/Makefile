@@ -11,7 +11,7 @@ USEMODULE += gnrc_pktdump
 USEMODULE += gnrc_sixlowpan_border_router_default
 USEMODULE += ps
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 
 # use Ethernet as link-layer protocol
 ifeq (native,$(BOARD))
