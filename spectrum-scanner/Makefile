@@ -9,7 +9,7 @@ RIOTBASE ?= $(CURDIR)/../RIOT
 
 # Define modules that are used
 USEMODULE += gnrc
-USEMODULE += gnrc_netdev_default
+USEMODULE += netdev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += xtimer
 USEMODULE += ztimer64_xtimer_compat
