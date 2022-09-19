@@ -54,7 +54,7 @@ psa_status_t common_aes_setup(SaSiAesUserContext_t *ctx,
         return SaSi_to_psa_error(ret);
     }
 
-    ret = SaSi_AesSetIv(ctx, iv);
+    ret = SaSi_AesSetIv(ctx, (uint8_t *)iv);
     if (ret != SASI_OK) {
         DEBUG("AES Setup SaSi Error: %x\n", ret);
         return SaSi_to_psa_error(ret);
@@ -67,7 +67,7 @@ psa_status_t common_aes_encrypt(SaSiAesUserContext_t *ctx,
                                 const uint8_t *input,
                                 size_t input_length,
                                 uint8_t *output,
-                                size_t output_buffer_size,
+                                size_t output_size,
                                 size_t *output_length)
 {
     int ret = 0;

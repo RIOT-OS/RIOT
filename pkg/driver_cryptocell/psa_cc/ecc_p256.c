@@ -62,7 +62,7 @@ psa_status_t psa_ecc_p256r1_verify_hash(const psa_key_attributes_t *attributes,
                                         const uint8_t *hash,
                                         size_t hash_length,
                                         const uint8_t *signature,
-                                        ize_t signature_length)
+                                        size_t signature_length)
 {
     CRYS_ECPKI_HASH_OpMode_t hash_mode = MAP_PSA_HASH_TO_CRYS_HASH(PSA_ALG_GET_HASH(alg));
 

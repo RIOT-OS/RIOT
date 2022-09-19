@@ -1,0 +1,6 @@
+/**
+ * @defgroup pkg_driver_crypotocell ARM CryptoCell 310 Driver
+ * @ingroup  pkg drivers_misc
+ * @brief    Provides the driver for the ARM CryptoCell 310 hardware accelerator
+ * @see      https://infocenter.nordicsemi.com/topic/sdk_nrf5_v17.1.0/group__cryptocell__api.html
+ */
