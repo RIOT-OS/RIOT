@@ -10,12 +10,12 @@ RIOTBASE ?= $(CURDIR)/../RIOT
 # Define modules that are used
 USEMODULE += fmt
 USEMODULE += gnrc
-USEMODULE += gnrc_netdev_default
+USEMODULE += netdev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
-USEMODULE += xtimer
+USEMODULE += ztimer64_usec
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
