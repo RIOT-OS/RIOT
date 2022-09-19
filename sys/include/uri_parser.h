@@ -67,15 +67,16 @@ typedef struct {
      */
     const char *zoneid;
 
-    const char *port;               /**< port */
+    const char *port_str;           /**< port as str */
     const char *path;               /**< path */
     const char *query;              /**< query */
+    uint16_t port;                  /**< port as uint16_t */
     uint16_t scheme_len;            /**< length of @ref scheme */
     uint16_t userinfo_len;          /**< length of @ref userinfo */
     uint16_t host_len;              /**< length of @ref host */
     uint16_t ipv6addr_len;          /**< length of @ref ipv6addr */
     uint16_t zoneid_len;            /**< length of @ref zoneid */
-    uint16_t port_len;              /**< length of @ref port */
+    uint16_t port_str_len;          /**< length of @ref port_str */
     uint16_t path_len;              /**< length of @ref path */
     uint16_t query_len;             /**< length of @ref query */
 } uri_parser_result_t;

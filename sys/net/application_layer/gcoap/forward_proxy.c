@@ -174,16 +174,8 @@ static bool _parse_endpoint(sock_udp_ep_t *remote,
     }
     memcpy(&remote->addr.ipv6[0], &addr.u8[0], sizeof(addr.u8));
 
-    if (urip->port_len) {
-        /* copy port string into scratch for atoi */
-        memcpy(scratch, urip->port, urip->port_len);
-        scratch[urip->port_len] = '\0';
-
-        remote->port = atoi(scratch);
-
-        if (remote->port == 0) {
-          return false;
-        }
+    if (urip->port != 0) {
+        remote->port = urip->port;
     }
     else {
         remote->port = COAP_PORT;

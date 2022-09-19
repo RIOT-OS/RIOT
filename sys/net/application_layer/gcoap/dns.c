@@ -466,7 +466,7 @@ static int _set_remote(const uri_parser_result_t *uri_comp,
               _uri);
         return -EHOSTUNREACH;
     }
-    if (uri_comp->port == NULL) {
+    if (uri_comp->port == 0) {
         if (strncmp(_uri, "coap:", sizeof("coap:") - 1) == 0) {
             remote->port = CONFIG_GCOAP_PORT;
         }
@@ -475,15 +475,7 @@ static int _set_remote(const uri_parser_result_t *uri_comp,
         }
     }
     else {
-        char port_str[uri_comp->port_len + 1];
-
-        strncpy(port_str, uri_comp->port, uri_comp->port_len);
-        port_str[uri_comp->port_len] = '\0';
-        remote->port = atoi(port_str);
-        if (remote->port == 0U) {
-            DEBUG("gcoap_dns: invalid port %s\n", port_str);
-            return -EINVAL;
-        }
+        remote->port = uri_comp->port;
     }
     return 0;
 }
