@@ -15,8 +15,7 @@ USEMODULE += auto_init_gnrc_netif
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
-USEMODULE += xtimer
-USEMODULE += ztimer64_xtimer_compat
+USEMODULE += ztimer64_usec
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
