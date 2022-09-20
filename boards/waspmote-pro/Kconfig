@@ -19,4 +19,8 @@ config BOARD_WASPMOTE_PRO
     select HAS_PERIPH_UART
     select HAS_SDCARD_SPI
 
+    select MODULE_FATFS_VFS if MODULE_VFS_DEFAULT
+    select MODULE_MTD if MODULE_VFS_DEFAULT
+    select MODULE_SDCARD_SPI if MODULE_MTD
+
 source "$(RIOTKCONFIG)/Kconfig.ztimer_only"
