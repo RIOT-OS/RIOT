@@ -28,6 +28,8 @@
 #include "byteorder.h"
 #include "mutex.h"
 
+#include "sys/time.h"
+
 #ifdef MODULE_LOG
 #include "log.h"
 #endif

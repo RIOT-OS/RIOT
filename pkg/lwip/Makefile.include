@@ -1,5 +1,6 @@
 INCLUDES += -I$(RIOTBASE)/pkg/lwip/include \
-            -I$(PKGDIRBASE)/lwip/src/include
+            -I$(PKGDIRBASE)/lwip/src/include \
+            -I$(PKGDIRBASE)/lwip/src/include/compat/posix
 
 PSEUDOMODULES += lwip_arp
 PSEUDOMODULES += lwip_autoip

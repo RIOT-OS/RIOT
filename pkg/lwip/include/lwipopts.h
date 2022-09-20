@@ -144,7 +144,12 @@ extern "C" {
 #endif /* MODULE_LWIP_SOCK */
 
 #ifdef MODULE_SHELL_COMMANDS
+#if LWIP_DEBUG_ENABLED == 1
+#define LWIP_DEBUG              0
+#define SOCKETS_DEBUG   LWIP_DBG_ON
+#else
 #define LWIP_DEBUG              1
+#endif
 #endif
 
 #ifndef TCP_LISTEN_BACKLOG
@@ -155,7 +160,7 @@ extern "C" {
 # endif
 #endif /* TCP_LISTEN_BACKLOG */
 
-#define LWIP_SOCKET             0
+#define LWIP_SOCKET             1
 
 #define LWIP_DONT_PROVIDE_BYTEORDER_FUNCTIONS
 #define MEMP_MEM_MALLOC         1
@@ -169,6 +174,13 @@ extern "C" {
 #ifndef MEM_SIZE
 /* packet buffer size of GNRC + stack for TCP/IP */
 #define MEM_SIZE                (TCPIP_THREAD_STACKSIZE + 6144)
+#endif
+
+#if MBEDTLS_ENABLED == 1
+#define LWIP_DNS                    1
+#define LWIP_TIMEVAL_PRIVATE        0
+#define LWIP_POSIX_SOCKETS_IO_NAMES 1
+#define SO_REUSE                    1
 #endif
 
 #ifdef DEVELHELP
