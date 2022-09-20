@@ -27,7 +27,6 @@
 
 #include "event/callback.h"
 #include "event/periodic.h"
-#include "event/thread.h"
 
 #ifdef __cplusplus
 extern "C" {

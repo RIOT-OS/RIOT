@@ -528,7 +528,6 @@ endif
 ifneq (,$(filter event_periodic_callback,$(USEMODULE)))
   USEMODULE += event_callback
   USEMODULE += event_periodic
-  USEMODULE += event_thread
 endif
 
 ifneq (,$(filter emcute,$(USEMODULE)))

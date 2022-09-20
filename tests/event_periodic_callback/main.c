@@ -21,6 +21,7 @@
 #include <stdio.h>
 
 #include "event/periodic_callback.h"
+#include "event/thread.h"
 
 static void _event_cb(void *ctx)
 {
