@@ -70,7 +70,7 @@ developing for:
 
 For example, in Ubuntu the above tools can be installed with the following command:
 
-    sudo apt install git gcc-arm-none-eabi make gcc-multilib openocd gdb-multiarch doxygen wget unzip python3-serial
+    sudo apt install git gcc-arm-none-eabi make gcc-multilib libstdc++-arm-none-eabi-newlib openocd gdb-multiarch doxygen wget unzip python3-serial
 
 @details Running `BOARD=<INSERT_TARGET_BOARD_HERE> make info-programmers-supported` in your
          application folder lists the programmers supported by RIOT for the given board.
