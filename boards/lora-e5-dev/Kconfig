@@ -23,6 +23,7 @@ config BOARD_LORA_E5_DEV
     select HAS_PERIPH_UART
 
     # Put other features for this board (in alphabetical order)
+    select HAS_ARDUINO
     select HAS_RIOTBOOT
 
     # Clock configuration
