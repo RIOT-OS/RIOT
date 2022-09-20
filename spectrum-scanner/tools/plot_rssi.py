@@ -26,7 +26,6 @@ import matplotlib.animation as animation
 
 
 class SpectrumEmitter(object):
-
     def __init__(self, port):
         self.port = port
 
@@ -35,7 +34,10 @@ class SpectrumEmitter(object):
         while True:
             # Read one line from the spectrum device
             line = self.port.readline().rstrip()
-            pkt_data = re.match(r"\[([-+]?\d+),\s*([-+]?\d+),\s*([-+]?\d+)\]\s*(.*)", line.decode(errors='replace'))
+            pkt_data = re.match(
+                r"\[([-+]?\d+),\s*([-+]?\d+),\s*([-+]?\d+)\]\s*(.*)",
+                line.decode(errors="replace"),
+            )
             if pkt_data:
                 ed = {}
                 try:
@@ -60,7 +62,6 @@ class SpectrumEmitter(object):
 
 
 class RSSIPlot(object):
-
     def __init__(self, ax, *args, tlen=120, dt=0.5, nchannels=27):
         self.ax = ax
         self.count = 0
@@ -68,13 +69,17 @@ class RSSIPlot(object):
         self.tlen = tlen
         # Generate mesh for plotting, this creates a grid of nchannel rows and
         # (tlen / dt) columns
-        self.Y, self.X = np.mgrid[slice(0 - .5, nchannels + 0.5, 1),
-                                  slice(-self.tlen - self.dt / 2, 0 + 1 - self.dt / 2, self.dt)]
+        self.Y, self.X = np.mgrid[
+            slice(0 - 0.5, nchannels + 0.5, 1),
+            slice(-self.tlen - self.dt / 2, 0 + 1 - self.dt / 2, self.dt),
+        ]
         Z = np.zeros_like(self.X)
         # X and Y are the bounds, so Z should be the value *inside* those bounds.
         # Therefore, remove the last row and column from the Z array.
         self.Z = Z[:-1, :-1]
-        self.pcm = self.ax.pcolormesh(self.X, self.Y, self.Z, vmin=-100, vmax=-20, cmap=plt.cm.get_cmap('jet'))
+        self.pcm = self.ax.pcolormesh(
+            self.X, self.Y, self.Z, vmin=-100, vmax=-20, cmap=plt.cm.get_cmap("jet")
+        )
         self.ax.get_figure().colorbar(self.pcm, label="Measured signal level [dB]")
         self.ax.set_ylabel("Channel number")
         self.ax.set_xlabel("Time [s]")
@@ -95,29 +100,42 @@ class RSSIPlot(object):
             col[ch, 0] = ed[ch]
         self.Z = np.hstack((self.Z[:, 1:], col))
         if resize:
-            self.ax.set_ylim([self.ch_min - .5, self.ch_max + 0.5])
+            self.ax.set_ylim([self.ch_min - 0.5, self.ch_max + 0.5])
             self.ax.set_yticks(range(self.ch_min, self.ch_max + 1))
         self.pcm.set_array(self.Z.ravel())
-        return self.pcm,
+        return (self.pcm,)
 
 
 def main(argv):
-    loglevels = [logging.CRITICAL, logging.ERROR, logging.WARN, logging.INFO, logging.DEBUG]
+    loglevels = [
+        logging.CRITICAL,
+        logging.ERROR,
+        logging.WARN,
+        logging.INFO,
+        logging.DEBUG,
+    ]
     parser = argparse.ArgumentParser(argv)
-    parser.add_argument('-v', '--verbosity', type=int, default=4,
-                        help='set logging verbosity, 1=CRITICAL, 5=DEBUG')
-    parser.add_argument('tty',
-                        help='Serial port device file name')
-    parser.add_argument('-b', '--baudrate', default=115200, type=int,
-                        help='Serial port baudrate')
+    parser.add_argument(
+        "-v",
+        "--verbosity",
+        type=int,
+        default=4,
+        help="set logging verbosity, 1=CRITICAL, 5=DEBUG",
+    )
+    parser.add_argument("tty", help="Serial port device file name")
+    parser.add_argument(
+        "-b", "--baudrate", default=115200, type=int, help="Serial port baudrate"
+    )
     args = parser.parse_args()
     # logging setup
-    logging.basicConfig(level=loglevels[args.verbosity-1])
+    logging.basicConfig(level=loglevels[args.verbosity - 1])
 
     # open serial port
     try:
         logging.debug("Open serial port %s, baud=%d", args.tty, args.baudrate)
-        port = serial.Serial(port=args.tty, baudrate=9600, dsrdtr=0, rtscts=0, timeout=0.3)
+        port = serial.Serial(
+            port=args.tty, baudrate=9600, dsrdtr=0, rtscts=0, timeout=0.3
+        )
         # This baudrate reconfiguration is necessary for certain USB to serial
         # adapters, the Linux cdc_acm driver will keep repeating stale buffer
         # contents otherwise. No idea about the cause, but this fixes the symptom.
@@ -131,7 +149,9 @@ def main(argv):
         fig, ax = plt.subplots()
         graph = RSSIPlot(ax)
         emitter = SpectrumEmitter(port)
-        animation.FuncAnimation(fig, graph.update, emitter.data_gen, interval=10, blit=True)
+        animation.FuncAnimation(
+            fig, graph.update, emitter.data_gen, interval=10, blit=True
+        )
         plt.show()
     except KeyboardInterrupt:
         port.close()
