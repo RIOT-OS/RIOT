@@ -58,7 +58,6 @@ extern "C"
  * @name Macro for button S1/S2.
  * @{
  */
-#define BTN0_PORT           PORTD
 #define BTN0_PIN            GPIO_PIN(PORT_D, 1)
 #define BTN0_MODE           GPIO_IN_PU
 /** @} */

@@ -75,7 +75,6 @@ extern "C" {
  * @name    SW0 (Button) pin definitions
  * @{
  */
-#define BTN0_PORT           PORT->Group[0]
 #define BTN0_PIN            GPIO_PIN(0, 28)
 #define BTN0_MODE           GPIO_IN_PU
 /** @} */
