@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 '''
 (C) 2012, Mariano Alvira <mar@devl.org>
@@ -56,10 +56,10 @@ DEFAULT_BAUDRATE = 115200
 def configure_interface(port, channel):
     line = ""
     iface = 0
-    port.write(b'ifconfig\n')
+    port.write('ifconfig\n'.encode())
     while True:
         line = port.readline()
-        if line == '':
+        if line == b'':
             print("Application has no network interface defined",
                   file=sys.stderr)
             sys.exit(2)
