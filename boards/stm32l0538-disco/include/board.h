@@ -48,7 +48,6 @@ extern "C" {
  * @{
  */
 #define BTN0_PIN            GPIO_PIN(PORT_A, 0)
-#define BTN0_PORT           GPIOA
 #define BTN0_MODE           GPIO_IN
 /** @} */
 
