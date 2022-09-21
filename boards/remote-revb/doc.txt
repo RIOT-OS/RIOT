@@ -6,11 +6,11 @@
 The `RE-Mote` has three versions, a first prototype A (`remote-pa`) only
 distributed to beta testers, its following revision A (`remote-reva`), and the
 latest revision B (`remote-revb`) which are commercially available. The
-following section focuses on the revision A.
+following section focuses on the revision B.
 
 The official RE-Mote wiki page is maintained by Zolertia at:
 
-https://github.com/Zolertia/Resources/wiki
+https://github.com/Zolertia/Resources/wiki/RE-Mote
 
 # Components
 
@@ -64,10 +64,9 @@ Bash
 $ make BOARD=remote-reva flash
 ```
 
-The RE-Mote in its current Revision A has the following pin-out:
+The RE-Mote Revision B has the following pin-out:
 
-![RE-Mote pin-out (front)](https://raw.githubusercontent.com/contiki-os/contiki/master/platform/zoul/images/remote-reva-pinout-front.png)
-![RE-Mote pin-out (back)](https://raw.githubusercontent.com/contiki-os/contiki/master/platform/zoul/images/remote-reva-pinout-back.png)
+![RE-Mote pin-out](https://i.imgur.com/PpWzzRJ.png)
 
 # Pin out and connectors
 
