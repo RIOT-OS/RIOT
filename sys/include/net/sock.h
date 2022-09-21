@@ -106,6 +106,8 @@
 #include <stddef.h>
 #include "iolist.h"
 
+#include "net/ipv6/addr.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -190,9 +192,11 @@ typedef struct {
          * @note only available if @ref SOCK_HAS_IPV6 is defined.
          */
         uint8_t ipv6[16];
+        ipv6_addr_t ipv6_addr;  /**< IPv6 address struct */
 #endif
         uint8_t ipv4[4];        /**< IPv4 address mode */
         uint32_t ipv4_u32;      /**< IPv4 address *in network byte order* */
+        ipv4_addr_t ipv4_addr;  /**< IPv4 address struct */
     } addr;                 /**< address */
 
     /**
@@ -227,9 +231,11 @@ struct _sock_tl_ep {
          * @note only available if @ref SOCK_HAS_IPV6 is defined.
          */
         uint8_t ipv6[16];
+        ipv6_addr_t ipv6_addr;  /**< IPv6 address struct */
 #endif
         uint8_t ipv4[4];        /**< IPv4 address mode */
         uint32_t ipv4_u32;      /**< IPv4 address *in network byte order* */
+        ipv4_addr_t ipv4_addr;  /**< IPv4 address struct */
     } addr;                 /**< address */
 
     /**
