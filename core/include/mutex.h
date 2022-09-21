@@ -110,14 +110,11 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "kernel_defines.h"
 #include "list.h"
 #include "thread.h"
-
-#ifndef __cplusplus
-#include "irq.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -152,6 +149,27 @@ typedef struct {
     uint8_t owner_original_priority;
 #endif
 } mutex_t;
+
+/**
+ * @brief   Internal function implementing @ref mutex_lock and
+ *          @ref mutex_trylock
+ *
+ * @details Do not call this function, use @ref mutex_lock or @ref mutex_trylock
+ *          instead
+ *
+ * @param[in,out]   mutex   Mutex object to lock.
+ * @param[in]       block   Whether to block
+ *
+ * @pre     @p mutex is not `NULL`
+ * @pre     Mutex at @p mutex has been initialized
+ * @pre     Must be called in thread context
+ *
+ * @post    The mutex @p is locked and held by the calling thread.
+ *
+ * @retval  true    Mutex obtained
+ * @retval  false   Mutex not obtained (only possible if @p block is `false`)
+ */
+bool mutex_lock_internal(mutex_t *mutex, bool block);
 
 /**
  * @brief   A cancellation structure for use with @ref mutex_lock_cancelable
@@ -222,25 +240,6 @@ static inline mutex_cancel_t mutex_cancel_init(mutex_t *mutex)
 /**
  * @brief   Tries to get a mutex, non-blocking.
  *
- * @internal
- * @note    This function is intended for use by languages incompatible
- *          with C (such as C++). Code in C should use @ref mutex_trylock
- *          instead
- *
- * @param[in,out]   mutex   Mutex object to lock.
- *
- * @retval  1               if mutex was unlocked, now it is locked.
- * @retval  0               if the mutex was locked.
- *
- * @pre     @p mutex is not `NULL`
- * @pre     Mutex at @p mutex has been initialized
- * @pre     Must be called in thread context
- */
-int mutex_trylock_ffi(mutex_t *mutex);
-
-/**
- * @brief   Tries to get a mutex, non-blocking.
- *
  * @param[in,out]   mutex   Mutex object to lock.
  *
  * @retval  1               if mutex was unlocked, now it is locked.
@@ -252,28 +251,7 @@ int mutex_trylock_ffi(mutex_t *mutex);
  */
 static inline int mutex_trylock(mutex_t *mutex)
 {
-#ifdef __cplusplus
-    return mutex_trylock_ffi(mutex);
-#else
-    unsigned irq_state = irq_disable();
-    int retval = 0;
-
-    if (mutex->queue.next == NULL) {
-        mutex->queue.next = MUTEX_LOCKED;
-#ifdef MODULE_CORE_MUTEX_PRIORITY_INHERITANCE
-        mutex->owner = KERNEL_PID_UNDEF;
-        thread_t *t = thread_get_active();
-        /* in case mutex_trylock() is not called from thread context */
-        if (t) {
-            mutex->owner = t->pid;
-            mutex->owner_original_priority = t->priority;
-        }
-#endif
-        retval = 1;
-    }
-    irq_restore(irq_state);
-    return retval;
-#endif
+    return mutex_lock_internal(mutex, false);
 }
 
 /**
@@ -287,14 +265,12 @@ static inline int mutex_trylock(mutex_t *mutex)
  *
  * @post    The mutex @p is locked and held by the calling thread.
  */
-#if (MAXTHREADS > 1) || DOXYGEN
-void mutex_lock(mutex_t *mutex);
-#else
-/**
- * @brief   dummy implementation for when no scheduler is used
- */
 static inline void mutex_lock(mutex_t *mutex)
 {
+#if (MAXTHREADS > 1)
+    mutex_lock_internal(mutex, true);
+#else
+    /* dummy implementation for when no scheduler is used */
     /* (ab)use next pointer as lock variable */
     volatile uintptr_t *lock = (void *)&mutex->queue.next;
 
@@ -310,8 +286,8 @@ static inline void mutex_lock(mutex_t *mutex)
 
     /* set lock variable */
     *lock = 1;
-}
 #endif
+}
 
 /**
  * @brief   Locks a mutex, blocking. This function can be canceled.
