@@ -37,6 +37,7 @@ rsource "fs/Kconfig"
 rsource "hashes/Kconfig"
 rsource "iolist/Kconfig"
 rsource "isrpipe/Kconfig"
+rsource "libc/Kconfig"
 
 menu "Libc"
 
