@@ -1,0 +1,31 @@
+name: welcome
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  welcome-message:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+    - uses: actions/first-interaction@v1
+    env:
+        GREETER_MESSAGE: >
+          Beep boop beep... I am a real human... for real.\n\n
+          Welcome to the RIOT community, we will try to address this as soon as we can.
+          As I mentioned before, we are human, many of us do this in our free time, and sometimes we get distracted with life.
+          I can try to ping someone like this.\n\n
+          ping @riot-ci\n\n
+          Feel free to do the same for other [maintainers](https://github.com/orgs/RIOT-OS/teams/maintainers/members) if things are taking a while.
+    with:
+      repo-token: ${{ secrets.GITHUB_TOKEN }}
+      issue-message: ${{ env.GREETER_MESSAGE }}
+      pr-message: ${{ env.GREETER_MESSAGE }}
