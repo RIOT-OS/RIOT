@@ -30,6 +30,7 @@
 #include "log.h"
 #include "sched.h"
 #include "thread.h"
+#include "panic.h"
 
 #ifdef MODULE_MPU_STACK_GUARD
 #include "mpu.h"
@@ -130,9 +131,10 @@ static void _unschedule(thread_t *active_thread)
      */
     if (*((uintptr_t *)(uintptr_t)active_thread->stack_start) !=
         (uintptr_t)active_thread->stack_start) {
-        LOG_WARNING(
+        LOG_ERROR(
             "scheduler(): stack overflow detected, pid=%" PRIkernel_pid "\n",
             active_thread->pid);
+        core_panic(PANIC_STACK_OVERFLOW, "STACK OVERFLOW");
     }
 #endif
 #ifdef MODULE_SCHED_CB
