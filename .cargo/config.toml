@@ -6,4 +6,4 @@
 
 [patch.crates-io]
 riot-sys = { git = "https://github.com/RIOT-OS/rust-riot-sys" }
-riot-wrappers = { git = "https://github.com/RIOT-OS/rust-riot-wrappers" }
+riot-wrappers = { git = "https://github.com/RIOT-OS/rust-riot-wrappers", branch = "remove-deprecations" }
