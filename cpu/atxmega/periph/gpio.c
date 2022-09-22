@@ -19,13 +19,14 @@
  * @}
  */
 
-#include <stdio.h>
 #include <avr/interrupt.h>
+#include <stdio.h>
 
-#include "cpu.h"
-#include "periph_conf.h"
-#include "periph/gpio.h"
 #include "bitarithm.h"
+#include "cpu.h"
+#include "irq.h"
+#include "periph/gpio.h"
+#include "periph_conf.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
