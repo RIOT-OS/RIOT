@@ -415,16 +415,36 @@ typedef enum {
  */
 #define PERIPH_EBI_SDRAM_CS (3)
 
+/* for compatibility between different versions of AVR libc: Legacy versions
+ * occasionally use ASPACE instead of ASIZE for some MCUs, while new AVR libc
+ * uses ASIZE as name consistently */
+#ifdef EBI_CS_ASPACE_gm
+typedef EBI_CS_ASPACE_t EBI_CS_ASIZE_t;
+#define EBI_CS_ASIZE_256B_gc EBI_CS_ASPACE_256B_gc
+#define EBI_CS_ASIZE_512B_gc EBI_CS_ASPACE_512B_gc
+#define EBI_CS_ASIZE_1KB_gc EBI_CS_ASPACE_1KB_gc
+#define EBI_CS_ASIZE_2KB_gc EBI_CS_ASPACE_2KB_gc
+#define EBI_CS_ASIZE_4KB_gc EBI_CS_ASPACE_4KB_gc
+#define EBI_CS_ASIZE_8KB_gc EBI_CS_ASPACE_8KB_gc
+#define EBI_CS_ASIZE_16KB_gc EBI_CS_ASPACE_16KB_gc
+#define EBI_CS_ASIZE_32KB_gc EBI_CS_ASPACE_32KB_gc
+#define EBI_CS_ASIZE_64KB_gc EBI_CS_ASPACE_64KB_gc
+#define EBI_CS_ASIZE_128KB_gc EBI_CS_ASPACE_128KB_gc
+#define EBI_CS_ASIZE_256KB_gc EBI_CS_ASPACE_256KB_gc
+#define EBI_CS_ASIZE_512KB_gc EBI_CS_ASPACE_512KB_gc
+#define EBI_CS_ASIZE_1MB_gc EBI_CS_ASPACE_1MB_gc
+#define EBI_CS_ASIZE_2MB_gc EBI_CS_ASPACE_2MB_gc
+#define EBI_CS_ASIZE_4MB_gc EBI_CS_ASPACE_4MB_gc
+#define EBI_CS_ASIZE_8MB_gc EBI_CS_ASPACE_8MB_gc
+#define EBI_CS_ASIZE_16MB_gc EBI_CS_ASPACE_16MB_gc
+#endif
+
 /**
  * @brief   EBI Chip Select configuration structure
  */
 typedef struct {
     EBI_CS_MODE_t   mode;               /**< Chip Select address mode */
-#if defined (__AVR_ATxmega64A1U__) || defined (__AVR_ATxmega128A1U__)
-    EBI_CS_ASPACE_t space;              /**< Chip Select address space */
-#else
     EBI_CS_ASIZE_t  space;              /**< Chip Select address space */
-#endif
     EBI_CS_SRWS_t   wait;               /**< SRAM Wait State Selection */
     uint32_t        address;            /**< Chip Select Base Address */
 } ebi_cs_t;
@@ -508,7 +528,7 @@ typedef struct {
  *                                0x0UL,
  *                              },
  *                              { EBI_CS_MODE_LPC_gc,
- *                                EBI_CS_ASPACE_256KB_gc,
+ *                                EBI_CS_ASIZE_256KB_gc,
  *                                EBI_CS_SRWS_1CLK_gc,
  *                                0x0UL,
  *                              },
@@ -542,12 +562,12 @@ typedef struct {
  *                                0x0UL,
  *                              },
  *                              { EBI_CS_MODE_LPC_gc,
- *                                EBI_CS_ASPACE_32KB_gc,
+ *                                EBI_CS_ASIZE_32KB_gc,
  *                                EBI_CS_SRWS_1CLK_gc,
  *                                0x0UL,
  *                              },
  *                              { EBI_CS_MODE_LPC_gc,
- *                                EBI_CS_ASPACE_256B_gc,
+ *                                EBI_CS_ASIZE_256B_gc,
  *                                EBI_CS_SRWS_5CLK_gc,
  *                                0x100000UL,
  *                              },
