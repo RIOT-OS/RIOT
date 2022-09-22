@@ -82,7 +82,7 @@ info-build:
 	@echo -e 'INCLUDES:$(patsubst %, \n\t%, $(INCLUDES))'
 	@echo ''
 	@echo 'CC:      $(CC)'
-	@echo -e 'CFLAGS:$(patsubst %, \n\t%, $(CFLAGS))'
+	@echo 'CFLAGS:$(patsubst %, \n\t%, $(subst ','"'"',$(CFLAGS)))'
 	@echo ''
 	@echo 'CXX:     $(CXX)'
 	@echo -e 'CXXUWFLAGS:$(patsubst %, \n\t%, $(CXXUWFLAGS))'
