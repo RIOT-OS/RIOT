@@ -8,6 +8,12 @@ resolver = "2"
 [lib]
 crate-type = ["staticlib"]
 
+[profile.release]
+# Setting the panic mode has little effect on the built code (as Rust on RIOT
+# supports no unwinding), but setting it allows builds on native without using
+# the nightly-only lang_items feature.
+panic = "abort"
+
 [dependencies]
 # `default-features = false` can be removed with 0.8, and enables building on stable during the 0.7 series
 riot-wrappers = { version = "0.7", features = [ "set_panic_handler" ], default-features = false }
