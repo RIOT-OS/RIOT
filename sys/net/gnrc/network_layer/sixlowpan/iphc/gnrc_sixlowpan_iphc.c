@@ -737,6 +737,12 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
     if (rbuf != NULL) {
         ipv6 = rbuf->pkt;
         assert(ipv6 != NULL);
+        if ((ipv6->size < sizeof(ipv6_hdr_t)) &&
+            (gnrc_pktbuf_realloc_data(ipv6, sizeof(ipv6_hdr_t)) != 0)) {
+            DEBUG("6lo iphc: no space to decompress IPHC\n");
+            _recv_error_release(sixlo, ipv6, rbuf);
+            return;
+        }
     }
     else {
         ipv6 = gnrc_pktbuf_add(NULL, NULL, sizeof(ipv6_hdr_t),
@@ -828,7 +834,7 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
 #endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_VRB */
         }
         else {
-        /* for a fragmented datagram we know the overall length already */
+            /* for a fragmented datagram we know the overall length already */
             payload_len = (uint16_t)(rbuf->super.datagram_size - sizeof(ipv6_hdr_t));
         }
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_VRB
@@ -872,13 +878,23 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
         payload_len = (sixlo->size + uncomp_hdr_len -
                        payload_offset - sizeof(ipv6_hdr_t));
     }
-    if ((rbuf == NULL) &&
+    if (rbuf == NULL) {
         /* (rbuf == NULL) => forwarding is not affected by this */
-        (gnrc_pktbuf_realloc_data(ipv6, uncomp_hdr_len + payload_len) != 0)) {
-        DEBUG("6lo iphc: no space left to copy payload\n");
-        _recv_error_release(sixlo, ipv6, rbuf);
-        return;
+        if (gnrc_pktbuf_realloc_data(ipv6, uncomp_hdr_len + payload_len) != 0) {
+            DEBUG("6lo iphc: no space left to copy payload\n");
+            _recv_error_release(sixlo, ipv6, rbuf);
+            return;
+        }
     }
+    else {
+        if (ipv6->size < (uncomp_hdr_len + (sixlo->size - payload_offset))) {
+            DEBUG("6lo iphc: not enough space to copy payload.\n");
+            DEBUG("6lo iphc: potentially malicious datagram size received.\n");
+            _recv_error_release(sixlo, ipv6, rbuf);
+            return;
+        }
+    }
+
     /* re-assign IPv6 header in case realloc changed the address */
     ipv6_hdr = ipv6->data;
     ipv6_hdr->len = byteorder_htons(payload_len);
