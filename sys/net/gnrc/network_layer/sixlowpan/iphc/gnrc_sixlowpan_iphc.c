@@ -1650,6 +1650,11 @@ static gnrc_pktsnip_t *_iphc_encode(gnrc_pktsnip_t *pkt,
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
     while (_compressible_nh(nh)) {
         ssize_t local_pos = 0;
+        if (pkt->next->next == NULL) {
+            DEBUG("6lo iphc: packet next header missing data");
+            gnrc_pktbuf_release(dispatch);
+            return NULL;
+        }
         switch (nh) {
             case PROTNUM_UDP:
                 local_pos = _nhc_udp_encode_snip(pkt, &iphc_hdr[inline_pos]);
