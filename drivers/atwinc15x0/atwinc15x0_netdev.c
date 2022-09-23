@@ -30,6 +30,7 @@
 #include "driver/include/m2m_wifi.h"
 
 #include "assert.h"
+#include "irq.h"
 #include "log.h"
 #include "net/netdev/eth.h"
 #include "od.h"
