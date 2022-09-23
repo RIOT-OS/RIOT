@@ -1017,10 +1017,6 @@ static bool _parse_reply(uint8_t *rep, size_t len, uint8_t request_type)
             default:
                 break;
         }
-        /* 0 option is used as an end marker, len can include bogus bytes */
-        if (!byteorder_ntohs(opt->type)) {
-            break;
-        }
     }
     if ((cid == NULL) || (sid == NULL)) {
         DEBUG("DHCPv6 client: ADVERTISE does not contain either server ID "
@@ -1079,10 +1075,6 @@ static bool _parse_reply(uint8_t *rep, size_t len, uint8_t request_type)
                  }
             default:
                 break;
-        }
-        /* 0 option is used as an end marker, len can include bogus bytes */
-        if (!byteorder_ntohs(opt->type)) {
-            break;
         }
     }
     return true;
