@@ -5,6 +5,7 @@
         info-debug-variable-% info-toolchains-supported \
         check-toolchain-supported \
         info-programmers-supported \
+        info-rust \
         create-Makefile.ci \
         #
 
@@ -82,13 +83,16 @@ info-build:
 	@echo -e 'INCLUDES:$(patsubst %, \n\t%, $(INCLUDES))'
 	@echo ''
 	@echo 'CC:      $(CC)'
-	@echo -e 'CFLAGS:$(patsubst %, \n\t%, $(CFLAGS))'
+	@echo 'CFLAGS:$(patsubst %, \n\t%, $(subst ','"'"',$(CFLAGS)))'
 	@echo ''
 	@echo 'CXX:     $(CXX)'
 	@echo -e 'CXXUWFLAGS:$(patsubst %, \n\t%, $(CXXUWFLAGS))'
 	@echo -e 'CXXEXFLAGS:$(patsubst %, \n\t%, $(CXXEXFLAGS))'
 	@echo ''
 	@echo 'RUST_TARGET: $(RUST_TARGET)'
+	@echo 'CARGO_CHANNEL: $(CARGO_CHANNEL)'
+	@echo 'CARGO_PROFILE: $(CARGO_PROFILE)'
+	@echo 'CARGO_OPTIONS: $(CARGO_OPTIONS)'
 	@echo ''
 	@echo 'LINK:    $(LINK)'
 	@echo -e 'LINKFLAGS:$(patsubst %, \n\t%, $(LINKFLAGS))'
@@ -241,3 +245,7 @@ check-toolchain-supported:
 
 info-programmers-supported:
 	@echo $(sort $(PROGRAMMERS_SUPPORTED))
+
+info-rust:
+	cargo $(patsubst +,,+${CARGO_CHANNEL}) version
+	c2rust --version
