@@ -406,7 +406,8 @@ size_t fido2_ctap_reset(ctap_resp_t *resp)
     return 0;
 }
 
-static uint32_t get_id(void) {
+static uint32_t get_id(void)
+{
     return _state.id_cnt++;
 }
 
@@ -476,8 +477,8 @@ static int _make_credential(ctap_req_t *req_raw)
 
     if (req.exclude_list_len > 0) {
         if (_find_matching_rks(_assert_state.rks, CTAP_MAX_EXCLUDE_LIST_SIZE,
-                       req.exclude_list, req.exclude_list_len, req.rp.id,
-                       req.rp.id_len) > 0x0) {
+                               req.exclude_list, req.exclude_list_len, req.rp.id,
+                               req.rp.id_len) > 0x0) {
             if (!IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP)) {
                 fido2_ctap_utils_user_presence_test();
             }
@@ -1400,6 +1401,7 @@ static int _find_matching_rks(ctap_resident_key_t *rks, size_t rks_len,
 
     ctap_resident_key_t rk = { 0 };
     uint32_t addr = 0x0;
+
     while (fido2_ctap_mem_read_rk_from_flash(&rk, rp_id_hash, &addr) == CTAP2_OK) {
         if (allow_list_len == 0) {
             memcpy(&rks[index], &rk, sizeof(rk));

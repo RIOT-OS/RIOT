@@ -146,9 +146,9 @@ int fido2_ctap_mem_erase_flash(void)
 }
 
 /**
-* CTAP state information is stored at flashpage 0 of the memory area
-* dedicated for storing CTAP data
-*/
+ * CTAP state information is stored at flashpage 0 of the memory area
+ * dedicated for storing CTAP data
+ */
 int fido2_ctap_mem_read_state_from_flash(ctap_state_t *state)
 {
     uint32_t addr = (uint32_t)flashpage_addr(_flash_start());
@@ -176,7 +176,7 @@ int fido2_ctap_mem_write_rk_to_flash(ctap_resident_key_t *rk)
 
         if (ret < 0) {
             DEBUG("%s, %d: mtd_read failed", RIOT_FILE_RELATIVE,
-              __LINE__);
+                  __LINE__);
             return false;
         }
 
@@ -216,6 +216,7 @@ int fido2_ctap_mem_read_rk_from_flash(ctap_resident_key_t *key, uint8_t *rp_id_h
 {
     uint16_t end;
     uint16_t amt_stored = fido2_ctap_get_state()->rk_amount_stored;
+
     if (*addr == 0x0) {
         end = amt_stored;
         *addr = (uint32_t)flashpage_addr(_flash_start() + CTAP_FLASH_RK_OFF);
@@ -236,7 +237,7 @@ int fido2_ctap_mem_read_rk_from_flash(ctap_resident_key_t *key, uint8_t *rp_id_h
 
         if (ret < 0) {
             DEBUG("%s, %d: mtd_read failed", RIOT_FILE_RELATIVE,
-              __LINE__);
+                  __LINE__);
             return CTAP1_ERR_OTHER;
         }
 

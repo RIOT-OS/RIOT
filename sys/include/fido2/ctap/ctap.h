@@ -55,12 +55,12 @@ extern "C" {
  *
  * @{
  */
-#define CTAP_MAKE_CREDENTIAL                0x01 /**< authenticatorMakeCredential method */
-#define CTAP_GET_ASSERTION                  0x02 /**< authenticatorGetAssertion method */
-#define CTAP_GET_INFO                       0x04 /**< authenticatorGetInfo method */
-#define CTAP_CLIENT_PIN                     0x06 /**< authenticatorClientPIN method */
-#define CTAP_RESET                          0x07 /**< authenticatorReset method */
-#define CTAP_GET_NEXT_ASSERTION             0x08 /**< authenticatorGetNextAssertion method */
+#define CTAP_MAKE_CREDENTIAL                0x01    /**< authenticatorMakeCredential method */
+#define CTAP_GET_ASSERTION                  0x02    /**< authenticatorGetAssertion method */
+#define CTAP_GET_INFO                       0x04    /**< authenticatorGetInfo method */
+#define CTAP_CLIENT_PIN                     0x06    /**< authenticatorClientPIN method */
+#define CTAP_RESET                          0x07    /**< authenticatorReset method */
+#define CTAP_GET_NEXT_ASSERTION             0x08    /**< authenticatorGetNextAssertion method */
 /** @} */
 
 /**
@@ -79,9 +79,9 @@ extern "C" {
  *
  * @{
  */
-#define CTAP_VERSION_FLAG_FIDO_PRE  0x01 /**< FIDO 2.1 flag */
-#define CTAP_VERSION_FLAG_FIDO      0x02 /**< FIDO 2 flag */
-#define CTAP_VERSION_FLAG_U2F_V2    0x04 /**< U2F V2 flag */
+#define CTAP_VERSION_FLAG_FIDO_PRE  0x01    /**< FIDO 2.1 flag */
+#define CTAP_VERSION_FLAG_FIDO      0x02    /**< FIDO 2 flag */
+#define CTAP_VERSION_FLAG_U2F_V2    0x04    /**< U2F V2 flag */
 /** @} */
 
 /**
@@ -103,11 +103,11 @@ extern "C" {
  *
  * @{
  */
-#define CTAP_INFO_OPTIONS_FLAG_PLAT         (1 << 0) /**< platform device flag  */
-#define CTAP_INFO_OPTIONS_FLAG_RK           (1 << 1) /**< resident key flag  */
-#define CTAP_INFO_OPTIONS_FLAG_CLIENT_PIN   (1 << 2) /**< clientPIN flag */
-#define CTAP_INFO_OPTIONS_FLAG_UP           (1 << 3) /**< user presence flag */
-#define CTAP_INFO_OPTIONS_FLAG_UV           (1 << 4) /**< user verification flag */
+#define CTAP_INFO_OPTIONS_FLAG_PLAT         (1 << 0)    /**< platform device flag  */
+#define CTAP_INFO_OPTIONS_FLAG_RK           (1 << 1)    /**< resident key flag  */
+#define CTAP_INFO_OPTIONS_FLAG_CLIENT_PIN   (1 << 2)    /**< clientPIN flag */
+#define CTAP_INFO_OPTIONS_FLAG_UP           (1 << 3)    /**< user presence flag */
+#define CTAP_INFO_OPTIONS_FLAG_UV           (1 << 4)    /**< user verification flag */
 /** @} */
 
 /**
@@ -115,11 +115,11 @@ extern "C" {
  *
  * @{
  */
-#define CTAP_CP_REQ_SUB_COMMAND_GET_RETRIES         0x01 /**< getRetries subCommand */
-#define CTAP_CP_REQ_SUB_COMMAND_GET_KEY_AGREEMENT   0x02 /**< getKeyAgreement subCommand */
-#define CTAP_CP_REQ_SUB_COMMAND_SET_PIN             0x03 /**< setPIN subCommand */
-#define CTAP_CP_REQ_SUB_COMMAND_CHANGE_PIN          0x04 /**< changePIN subCommand */
-#define CTAP_CP_REQ_SUB_COMMAND_GET_PIN_TOKEN       0x05 /**< getPinToken subCommand */
+#define CTAP_CP_REQ_SUB_COMMAND_GET_RETRIES         0x01    /**< getRetries subCommand */
+#define CTAP_CP_REQ_SUB_COMMAND_GET_KEY_AGREEMENT   0x02    /**< getKeyAgreement subCommand */
+#define CTAP_CP_REQ_SUB_COMMAND_SET_PIN             0x03    /**< setPIN subCommand */
+#define CTAP_CP_REQ_SUB_COMMAND_CHANGE_PIN          0x04    /**< changePIN subCommand */
+#define CTAP_CP_REQ_SUB_COMMAND_GET_PIN_TOKEN       0x05    /**< getPinToken subCommand */
 /** @} */
 
 /**
