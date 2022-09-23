@@ -35,6 +35,9 @@
 #if IS_USED(MODULE_SPIFFS)
 #include "fs/spiffs_fs.h"
 #endif
+#if IS_USED(MODULE_LWEXT4)
+#include "fs/lwext4_fs.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {

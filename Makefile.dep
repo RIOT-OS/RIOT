@@ -72,6 +72,11 @@ ifneq (,$(filter fatfs_vfs,$(USEMODULE)))
   USEMODULE += vfs
 endif
 
+ifneq (,$(filter lwext%_vfs,$(USEMODULE)))
+  USEPKG += lwext4
+  USEMODULE += vfs
+endif
+
 ifneq (,$(filter nimble_%,$(USEMODULE)))
   USEPKG += nimble
 endif

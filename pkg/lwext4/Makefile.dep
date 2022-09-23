@@ -1,0 +1,5 @@
+USEMODULE += lwext_fs
+
+ifneq (,$(filter vfs_auto_format,$(USEMODULE)))
+  DEFAULT_MODULE += lwext4_vfs_format
+endif

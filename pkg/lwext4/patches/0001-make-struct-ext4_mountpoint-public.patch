@@ -1,0 +1,104 @@
+From 51440950b0a26b010bd7aa9bb44ed382e19b120b Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benjamin.valentin@ml-pa.com>
+Date: Mon, 26 Sep 2022 23:37:23 +0200
+Subject: [PATCH] make struct ext4_mountpoint public
+
+---
+ include/ext4.h | 27 +++++++++++++++++++++++++++
+ src/ext4.c     | 28 ++--------------------------
+ 2 files changed, 29 insertions(+), 26 deletions(-)
+
+diff --git a/include/ext4.h b/include/ext4.h
+index 516bbdd..b8694fe 100644
+--- a/include/ext4.h
++++ b/include/ext4.h
+@@ -51,6 +51,8 @@ extern "C" {
+ #include <ext4_oflags.h>
+ #include <ext4_debug.h>
+ 
++#include <ext4_fs.h>
++#include <ext4_journal.h>
+ #include <ext4_blockdev.h>
+ 
+ /********************************OS LOCK INFERFACE***************************/
+@@ -65,6 +67,31 @@ struct ext4_lock {
+ 	void (*unlock)(void);
+ };
+ 
++/**@brief   Mount point descriptor.*/
++struct ext4_mountpoint {
++
++    /**@brief   Mount done flag.*/
++    bool mounted;
++
++    /**@brief   Mount point name (@ref ext4_mount)*/
++    char name[CONFIG_EXT4_MAX_MP_NAME + 1];
++
++    /**@brief   OS dependent lock/unlock functions.*/
++    const struct ext4_lock *os_locks;
++
++    /**@brief   Ext4 filesystem internals.*/
++    struct ext4_fs fs;
++
++    /**@brief   JBD fs.*/
++    struct jbd_fs jbd_fs;
++
++    /**@brief   Journal.*/
++    struct jbd_journal jbd_journal;
++
++    /**@brief   Block cache.*/
++    struct ext4_bcache bc;
++};
++
+ /********************************FILE DESCRIPTOR*****************************/
+ 
+ /**@brief   File descriptor. */
+diff --git a/src/ext4.c b/src/ext4.c
+index b270361..4f8a48a 100644
+--- a/src/ext4.c
++++ b/src/ext4.c
+@@ -71,31 +71,6 @@
+ 			(_m)->os_locks->unlock();                              \
+ 	} while (0)
+ 
+-/**@brief   Mount point descriptor.*/
+-struct ext4_mountpoint {
+-
+-	/**@brief   Mount done flag.*/
+-	bool mounted;
+-
+-	/**@brief   Mount point name (@ref ext4_mount)*/
+-	char name[CONFIG_EXT4_MAX_MP_NAME + 1];
+-
+-	/**@brief   OS dependent lock/unlock functions.*/
+-	const struct ext4_lock *os_locks;
+-
+-	/**@brief   Ext4 filesystem internals.*/
+-	struct ext4_fs fs;
+-
+-	/**@brief   JBD fs.*/
+-	struct jbd_fs jbd_fs;
+-
+-	/**@brief   Journal.*/
+-	struct jbd_journal jbd_journal;
+-
+-	/**@brief   Block cache.*/
+-	struct ext4_bcache bc;
+-};
+-
+ /**@brief   Block devices descriptor.*/
+ struct ext4_block_devices {
+ 
+@@ -471,7 +446,8 @@ Finish:
+ 	return r;
+ }
+ 
+-static struct ext4_mountpoint *ext4_get_mount(const char *path)
++__attribute__((weak))
++struct ext4_mountpoint *ext4_get_mount(const char *path)
+ {
+ 	for (size_t i = 0; i < CONFIG_EXT4_MOUNTPOINTS_COUNT; ++i) {
+ 
+-- 
+2.34.1
+

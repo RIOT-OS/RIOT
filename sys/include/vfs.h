@@ -89,8 +89,11 @@ extern "C" {
 #ifndef _MAX
 #define _MAX(a, b) ((a) > (b) ? (a) : (b))
 #endif
-#ifndef MAX4
-#define MAX4(a, b, c, d) _MAX(_MAX((a), (b)), _MAX((c),(d)))
+#ifndef MAX5
+/**
+ * @brief   MAX5 Function to get the largest of 5 values
+ */
+#define MAX5(a, b, c, d, e) _MAX(_MAX(_MAX((a), (b)), _MAX((c),(d))), (e))
 #endif
 /** @} */
 
@@ -174,6 +177,19 @@ extern "C" {
 #endif
 /** @} */
 
+/**
+ * @brief   VFS parameters for lwext4
+ * @{
+ */
+#if defined(MODULE_LWEXT4) || DOXYGEN
+#define LWEXT4_VFS_DIR_BUFFER_SIZE      (308)   /**< sizeof(ext4_dir)  */
+#define LWEXT4_VFS_FILE_BUFFER_SIZE     (32)    /**< sizeof(ext4_file) */
+#else
+#define LWEXT4_VFS_DIR_BUFFER_SIZE      (1)
+#define LWEXT4_VFS_FILE_BUFFER_SIZE     (1)
+#endif
+/** @} */
+
 #ifndef VFS_MAX_OPEN_FILES
 /**
  * @brief Maximum number of simultaneous open files
@@ -209,10 +225,11 @@ extern "C" {
  * @attention Put the check in the public header file (.h), do not put the check in the
  * implementation (.c) file.
  */
-#define VFS_DIR_BUFFER_SIZE MAX4(FATFS_VFS_DIR_BUFFER_SIZE,     \
+#define VFS_DIR_BUFFER_SIZE MAX5(FATFS_VFS_DIR_BUFFER_SIZE,     \
                                  LITTLEFS_VFS_DIR_BUFFER_SIZE,  \
                                  LITTLEFS2_VFS_DIR_BUFFER_SIZE, \
-                                 SPIFFS_VFS_DIR_BUFFER_SIZE     \
+                                 SPIFFS_VFS_DIR_BUFFER_SIZE,    \
+                                 LWEXT4_VFS_DIR_BUFFER_SIZE     \
                                 )
 #endif
 
@@ -236,10 +253,11 @@ extern "C" {
  * @attention Put the check in the public header file (.h), do not put the check in the
  * implementation (.c) file.
  */
-#define VFS_FILE_BUFFER_SIZE MAX4(FATFS_VFS_FILE_BUFFER_SIZE,    \
+#define VFS_FILE_BUFFER_SIZE MAX5(FATFS_VFS_FILE_BUFFER_SIZE,    \
                                   LITTLEFS_VFS_FILE_BUFFER_SIZE, \
                                   LITTLEFS2_VFS_FILE_BUFFER_SIZE,\
-                                  SPIFFS_VFS_FILE_BUFFER_SIZE    \
+                                  SPIFFS_VFS_FILE_BUFFER_SIZE,   \
+                                  LWEXT4_VFS_FILE_BUFFER_SIZE    \
                                  )
 #endif
 
