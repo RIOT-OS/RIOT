@@ -52,21 +52,24 @@ int fido2_ctap_utils_init_gpio_pin(gpio_t pin, gpio_mode_t mode, gpio_flank_t fl
 int fido2_ctap_utils_user_presence_test(void);
 
 /**
- * @brief Compare fido2 credentials based on creation time
+ * @brief Compare fido2 credentials based on id to find more recent one
+ *
+ * The more recent credential has a higher id. Therefore we sort in
+ * descending order.
  *
  * @param[in] k1    first resident key
  * @param[in] k2    second resident key
  *
- * @return <0 if k2 has a bigger sign_count
- * @return 0 if equal k1 and k2 have equal sign_count
- * @return >0 if k1 has a bigger sign_count
+ * @return <0 if k1 > k2
+ * @return >0 if k1 < k2
  */
 static inline int fido2_ctap_utils_cred_cmp(const void *k1, const void *k2)
 {
     ctap_resident_key_t *_k1 = (ctap_resident_key_t *)k1;
     ctap_resident_key_t *_k2 = (ctap_resident_key_t *)k2;
 
-    return _k2->creation_time - _k1->creation_time;
+    /* multiply by -1 because we want descending order. */
+    return (_k1->id - _k2->id) * -1;
 }
 
 /**

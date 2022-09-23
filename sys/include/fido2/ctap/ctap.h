@@ -380,7 +380,7 @@ extern "C" {
 /**
  * @brief Max size of allow list
  */
-#define CTAP_MAX_EXCLUDE_LIST_SIZE 0x10
+#define CTAP_MAX_EXCLUDE_LIST_SIZE 0x14
 
 /**
  * @brief CTAP cred struct forward declaration
@@ -420,6 +420,7 @@ typedef struct {
     uint8_t cred_key[CTAP_CRED_KEY_LEN];        /**< AES CCM encryption key for cred */
     bool cred_key_is_initialized;               /**< AES CCM key initialized flag */
     bool pin_is_set;                            /**< PIN is set or not */
+    uint32_t id_cnt;                            /**< id counter for credential id */
 } ctap_state_t;
 
 /**
@@ -498,12 +499,11 @@ struct __attribute__((packed)) ctap_resident_key {
     uint8_t user_id[CTAP_USER_ID_MAX_SIZE];     /**< id of user */
     uint8_t user_id_len;                        /**< length of the user id */
     uint8_t priv_key[CTAP_CRYPTO_KEY_SIZE];     /**< private key */
+    uint16_t id;                                /**< internal id of key */
     uint32_t sign_count;                        /**< signature counter.
                                                    See webauthn specification
                                                    (version 20190304) section 6.1.1
                                                    for details. */
-    uint32_t creation_time;                     /**< timestamp for when credential
-                                                     was created */
     ctap_cred_desc_t cred_desc;                 /**< credential descriptor */
 };
 
@@ -680,6 +680,13 @@ int fido2_ctap_encrypt_rk(ctap_resident_key_t *rk, uint8_t *nonce,
  * @return false otherwise
  */
 bool fido2_ctap_pin_is_set(void);
+
+/**
+ * @brief Get a pointer to the authenticator state
+ *
+ * @return pointer to @ref ctap_state_t
+ */
+ctap_state_t *fido2_ctap_get_state(void);
 
 #ifdef __cplusplus
 }
