@@ -1613,16 +1613,7 @@ static gnrc_pktsnip_t *_iphc_encode(gnrc_pktsnip_t *pkt,
         else {
             dispatch->next = ptr;
         }
-        if (ptr->type == GNRC_NETTYPE_UNDEF) {
-            /* most likely UDP for now so use that (XXX: extend if extension
-             * headers make problems) */
-            dispatch_size += sizeof(udp_hdr_t);
-            break;  /* nothing special after UDP so quit even if more UNDEF
-                     * come */
-        }
-        else {
-            dispatch_size += ptr->size;
-        }
+        dispatch_size += ptr->size;
         dispatch = ptr; /* use dispatch as temporary point for prev */
         ptr = ptr->next;
     }
