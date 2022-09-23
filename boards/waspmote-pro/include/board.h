@@ -21,6 +21,7 @@
 #define BOARD_H
 
 #include "cpu.h"
+#include "mtd.h"
 #include "waspmote_pinmap.h"
 
 #ifdef __cplusplus
@@ -179,6 +180,27 @@ extern "C" {
 #define CONFIG_ZTIMER_USEC_FREQ     (230400LU)
 #define CONFIG_ZTIMER_USEC_WIDTH    (16)
 /** @} */
+
+/**
+ * @name Onboard micro-sd slot pin definitions
+ * @{
+ */
+#define SDCARD_SPI_PARAM_SPI        SPI_DEV(0)  /**< SPI device */
+#define SDCARD_SPI_PARAM_CS         SD_SS       /**< Chip Select */
+#define SDCARD_SPI_PARAM_CLK        SD_SCK      /**< Serial Clock */
+#define SDCARD_SPI_PARAM_MOSI       SD_MOSI     /**< Master Output, Slave Input */
+#define SDCARD_SPI_PARAM_MISO       SD_MISO     /**< Master Input, Slave Output */
+#define SDCARD_SPI_PARAM_POWER      MEM_PW      /**< Powen on/off */
+#define SDCARD_SPI_PARAM_POWER_AH   (true)      /**< Power on with power pin high */
+#define CARD_DETECT_PIN             SD_PRESENT  /**< Pin for card detect */
+
+/** @} */
+
+/** Default MTD device */
+#define MTD_0 mtd0
+
+/** mtd flash emulation device */
+extern mtd_dev_t *mtd0;
 
 #ifdef __cplusplus
 }
