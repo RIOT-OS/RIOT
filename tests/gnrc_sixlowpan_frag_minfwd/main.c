@@ -310,6 +310,7 @@ static void _set_up(void)
            sizeof(_mock_netif->ipv6.addrs_flags));
     gnrc_ipv6_nib_init();
     gnrc_ipv6_nib_init_iface(_mock_netif);
+    gnrc_ipv6_nib_iface_up(_mock_netif);
     /* re-init for syncing */
     mutex_init(&_target_buf_filled);
     mutex_lock(&_target_buf_filled);

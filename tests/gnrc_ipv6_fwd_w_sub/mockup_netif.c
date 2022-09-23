@@ -69,10 +69,11 @@ void _tests_init(void)
         );
     _mock_netif = &_netif;
     expect(res == 0);
+
     gnrc_ipv6_nib_init();
-    gnrc_netif_acquire(_mock_netif);
     gnrc_ipv6_nib_init_iface(_mock_netif);
-    gnrc_netif_release(_mock_netif);
+    gnrc_ipv6_nib_iface_up(_mock_netif);
+
     /* we do not want to test for SLAAC here so just assure the configured
      * address is valid */
     expect(!ipv6_addr_is_unspecified(&_mock_netif->ipv6.addrs[0]));

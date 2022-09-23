@@ -39,9 +39,8 @@ void _common_set_up(void)
 {
     expect(_mock_netif != NULL);
     gnrc_ipv6_nib_init();
-    gnrc_netif_acquire(_mock_netif);
     gnrc_ipv6_nib_init_iface(_mock_netif);
-    gnrc_netif_release(_mock_netif);
+    gnrc_ipv6_nib_iface_up(_mock_netif);
 }
 
 int _get_device_type(netdev_t *dev, void *value, size_t max_len)
