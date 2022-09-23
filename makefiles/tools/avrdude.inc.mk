@@ -3,9 +3,15 @@ DIST_PATH = $(BOARDDIR)/dist
 AVARICE_PATH = $(RIOTTOOLS)/avarice
 DEBUGSERVER_PORT = 4242
 DEBUGSERVER ?= $(AVARICE_PATH)/debug_srv.sh
-# Allow choosing debugger hardware via AVR_DEBUGDEVICE, default to Atmel ICE,
-# which is compatible to all AVR devices and since the AVR Dragon is no longer
-# produced, the least expensive option
+# Allow choosing debugger hardware via AVR_DEBUGDEVICE. If the
+# AVRDUDE_PROGRAMMER however is also capable of debugging, use that by default
+ifneq (,$(filter $(AVRDUDE_PROGRAMMER),atmelice xplainedpro xplainedpro_pdi))
+  AVR_DEBUGDEVICE ?= --edbg
+endif
+ifneq (,$(filter dragon%,$(AVRDUDE_PROGRAMMER)))
+  AVR_DEBUGDEVICE ?= --dragon
+endif
+# Atmel ICE / EDBG is the most sensible fallback
 AVR_DEBUGDEVICE ?= --edbg
 AVR_DEBUGINTERFACE ?= usb
 ifneq (,$(filter $(CPU),atmega328p))
