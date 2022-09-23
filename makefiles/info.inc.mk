@@ -5,6 +5,7 @@
         info-debug-variable-% info-toolchains-supported \
         check-toolchain-supported \
         info-programmers-supported \
+        info-rust \
         create-Makefile.ci \
         #
 
@@ -244,3 +245,7 @@ check-toolchain-supported:
 
 info-programmers-supported:
 	@echo $(sort $(PROGRAMMERS_SUPPORTED))
+
+info-rust:
+	cargo $(patsubst +,,+${CARGO_CHANNEL}) version
+	c2rust --version
