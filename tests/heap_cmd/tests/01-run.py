@@ -24,7 +24,7 @@ def testfunc(child):
     child.sendline('heap')
     child.expect(r'heap: \d+ \(used \d+, free \d+\) \[bytes\]')
     child.sendline('free 0x' + addr)
-    child.expect('freed 0x' + addr)
+    child.expect('freeing 0x' + addr)
     child.expect_exact('>')
     child.sendline('heap')
     child.expect(r'heap: \d+ \(used \d+, free \d+\) \[bytes\]')
