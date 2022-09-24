@@ -10,6 +10,7 @@ config MODULE_PERIPH
     default y
     select MODULE_ZTIMER if MODULE_PERIPH_USBDEV
     select MODULE_ZTIMER_MSEC if MODULE_PERIPH_USBDEV
+    select MODULE_USBDEV_SYNOPSYS_DWC2 if MODULE_PERIPH_USBDEV && !HAS_CPU_STM32WB
     help
         stm32 common peripheral code.
 

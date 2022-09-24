@@ -63,9 +63,9 @@ extern "C" {
  *        including the control endpoint
  */
 #ifdef STM32_USB_OTG_CID_1x
-#define STM32_USB_OTG_FS_NUM_EP (4) /**< OTG FS with 4 endpoints */
+#define DWC2_USB_OTG_FS_NUM_EP (4) /**< OTG FS with 4 endpoints */
 #elif defined(STM32_USB_OTG_CID_2x)
-#define STM32_USB_OTG_FS_NUM_EP (6) /**< OTG FS with 6 endpoints */
+#define DWC2_USB_OTG_FS_NUM_EP (6) /**< OTG FS with 6 endpoints */
 #endif
 
 /**
@@ -73,9 +73,9 @@ extern "C" {
  *        including the control endpoint
  */
 #ifdef STM32_USB_OTG_CID_1x
-#define STM32_USB_OTG_HS_NUM_EP (6) /**< OTG HS with 6 endpoints */
+#define DWC2_USB_OTG_HS_NUM_EP (6) /**< OTG HS with 6 endpoints */
 #elif defined(STM32_USB_OTG_CID_2x)
-#define STM32_USB_OTG_HS_NUM_EP (9) /**< OTG HS with 9 endpoints */
+#define DWC2_USB_OTG_HS_NUM_EP (9) /**< OTG HS with 9 endpoints */
 #endif
 
 /**
@@ -86,8 +86,8 @@ extern "C" {
  * @note The application might have to increase this when dealing with large
  *       isochronous transfers
  */
-#ifndef STM32_USB_OTG_FS_RX_FIFO_SIZE
-#define STM32_USB_OTG_FS_RX_FIFO_SIZE   (128U)
+#ifndef DWC2_USB_OTG_FS_RX_FIFO_SIZE
+#define DWC2_USB_OTG_FS_RX_FIFO_SIZE   (128U)
 #endif
 
 /**
@@ -95,8 +95,8 @@ extern "C" {
  *
  * Used as shared FIFO for reception of all OUT transfers from the host
  */
-#ifndef STM32_USB_OTG_HS_RX_FIFO_SIZE
-#define STM32_USB_OTG_HS_RX_FIFO_SIZE   (512U)
+#ifndef DWC2_USB_OTG_HS_RX_FIFO_SIZE
+#define DWC2_USB_OTG_HS_RX_FIFO_SIZE   (512U)
 #endif
 
 /**
@@ -111,26 +111,6 @@ extern "C" {
 #define STM32_USB_OTG_HS_USE_DMA        (1)
 #endif
 #endif
-
-/**
- * @brief stm32 USB OTG peripheral device out endpoint struct
- */
-typedef struct {
-    usbdev_ep_t ep;     /**< Inherited usbdev endpoint struct */
-    uint8_t *out_buf;   /**< Requested data output buffer */
-} stm32_usb_otg_fshs_out_ep_t;
-
-/**
- * @brief stm32 USB OTG peripheral device context
- */
-typedef struct {
-    usbdev_t usbdev;                            /**< Inherited usbdev struct */
-    const stm32_usb_otg_fshs_config_t *config;  /**< USB peripheral config   */
-    size_t fifo_pos;                            /**< FIFO space occupied */
-    usbdev_ep_t *in;                            /**< In endpoints */
-    stm32_usb_otg_fshs_out_ep_t *out;           /**< Out endpoints */
-    bool suspend;                               /**< Suspend status */
-} stm32_usb_otg_fshs_t;
 
 /**
  * @brief stm32 USB Device FS only peripheral device context
