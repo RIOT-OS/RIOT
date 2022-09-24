@@ -3,7 +3,7 @@ include ../Makefile.tests_common
 
 USEMODULE += gnrc_ipv6_router_default
 USEMODULE += gnrc_netif
-USEMODULE += gnrc_pktbuf_cmd
+USEMODULE += shell_cmd_gnrc_pktbuf
 USEMODULE += netdev_eth
 USEMODULE += netdev_test
 USEMODULE += od
