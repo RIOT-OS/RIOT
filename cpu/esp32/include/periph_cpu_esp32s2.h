@@ -215,10 +215,6 @@ extern "C" {
  *
  */
 
-#ifdef MODULE_PERIPH_CAN
-#include "can_esp.h"
-#endif
-
 #ifdef __cplusplus
 }
 #endif
