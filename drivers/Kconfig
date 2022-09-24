@@ -57,6 +57,7 @@ rsource "periph_common/Kconfig"
 rsource "rtt_rtc/Kconfig"
 rsource "soft_spi/Kconfig"
 rsource "soft_uart/Kconfig"
+rsource "usbdev_synopsys_dwc2/Kconfig"
 endmenu # Peripherals drivers
 
 menu "Sensor Device Drivers"
