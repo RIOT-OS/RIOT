@@ -105,9 +105,7 @@ extern "C" {
 /**
  * ESP32-S2 specific PHY configuration
  */
-#define CONFIG_USB_OTG_SUPPORTED 0
-#define CONFIG_USB_HOST_CONTROL_TRANSFER_MAX_SIZE 256
-#define CONFIG_USB_HOST_HW_BUFFER_BIAS_BALANCED 1
+#define CONFIG_USB_OTG_SUPPORTED                1
 
 /**
  * ESP32-S2 specific SPI RAM configuration
