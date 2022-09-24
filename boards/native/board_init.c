@@ -35,7 +35,7 @@ mtd_native_dev_t mtd0_dev = {
 mtd_dev_t *mtd0 = &mtd0_dev.base;
 #endif
 
-#ifdef MODULE_VFS
+#ifdef MODULE_VFS_DEFAULT
 #include "vfs_default.h"
 
 /*
@@ -62,8 +62,12 @@ VFS_AUTO_MOUNT(spiffs, VFS_MTD(mtd0_dev), VFS_DEFAULT_NVM(0), 0);
 #elif defined(MODULE_FATFS_VFS)
 VFS_AUTO_MOUNT(fatfs, VFS_MTD(mtd0_dev), VFS_DEFAULT_NVM(0), 0);
 
+/* ext2/3/4 support */
+#elif defined(MODULE_LWEXT4)
+VFS_AUTO_MOUNT(lwext4, VFS_MTD(mtd0_dev), VFS_DEFAULT_NVM(0), 0);
+
 #endif
-#endif /* MODULE_VFS */
+#endif /* MODULE_VFS_DEFAULT */
 
 /**
  * Nothing to initialize at the moment.
