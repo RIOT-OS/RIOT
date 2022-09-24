@@ -16,6 +16,7 @@
  * @}
  */
 
+#include <stdint.h>
 #include <stdio.h>
 #include "arm_cpu.h"
 #include "irq.h"
@@ -42,37 +43,54 @@ __attribute__((used, section(".svc_stack"), aligned(4))) uint8_t svc_stack[ISR_S
  *--------------------------------------------------------------------------*/
 char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stack_size)
 {
-    unsigned int *stk;
-    int i;
-    stk = (unsigned int *)((uintptr_t)stack_start + stack_size);
-    stk--;
+    uint32_t *stk;
+    uintptr_t sp;
+    stk = (uint32_t *)((uintptr_t)stack_start + stack_size);
 
+    /* adjust to 32 bit boundary by clearing the last two bits in the address */
+    stk = (uint32_t *)(((uintptr_t)stk) & ~((uintptr_t)0x3));
+
+    /* stack start marker */
+    stk--;
     *stk = STACK_MARKER;
+
+    /* make sure the stack is double word aligned (8 bytes) */
+    /* This is required in order to conform with Procedure Call Standard for the
+     * ARM® Architecture (AAPCS) */
+    /* https://web.archive.org/web/20150316114702/http://infocenter.arm.com/help/topic/com.arm.doc.ihi0042e/IHI0042E_aapcs.pdf
+     */
+    if (((uint32_t) stk & 0x7) != 0) {
+        /* add a single word padding */
+        --stk;
+        *stk = ~((uint32_t)STACK_MARKER);
+    }
+
+    sp = (uintptr_t)stk;
 
     /* set the return address (LR) */
     stk--;
-    *stk = (unsigned int) sched_task_exit;
+    *stk = (uintptr_t)sched_task_exit;
 
     /* set the stack pointer (SP) */
     stk--;
-    *stk = (unsigned int)((unsigned int)stack_start + stack_size) - 4;
+    *stk = sp;
 
     /* build base stack */
-    for (i = REGISTER_CNT; i > 0 ; i--) {
+    for (int i = REGISTER_CNT; i > 0 ; i--) {
         stk--;
         *stk = i;
     }
 
     /* set argument to task_func */
     stk--;
-    *stk = ((unsigned int) arg);
+    *stk = (uintptr_t)arg;
 
     /* set the entry point */
     stk--;
-    *stk = ((unsigned int) task_func);
+    *stk = (uintptr_t)task_func;
     /* set the saved program status register */
     stk--;
-    *stk = (unsigned int) NEW_TASK_CPSR;
+    *stk = (uint32_t)NEW_TASK_CPSR;
 
     return (char *)stk;
 }
