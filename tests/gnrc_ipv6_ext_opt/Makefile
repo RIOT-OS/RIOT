@@ -18,7 +18,7 @@ USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_default
 USEMODULE += gnrc_icmpv6_error
 USEMODULE += gnrc_pktdump
-USEMODULE += gnrc_pktbuf_cmd
+USEMODULE += shell_cmd_gnrc_pktbuf
 # IPv6 extension headers
 USEMODULE += gnrc_ipv6_ext_opt
 USEMODULE += od
