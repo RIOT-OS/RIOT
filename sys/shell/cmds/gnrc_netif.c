@@ -214,7 +214,7 @@ static void _set_usage(char *cmd_name)
          "       * \"pan\" - alias for \"nid\"\n"
          "       * \"pan_id\" - alias for \"nid\"\n"
          "       * \"phy_busy\" - set busy mode on-off\n"
-#ifdef MODULE_GNRC_NETIF_CMD_LORA
+#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN)
          "       * \"bw\" - alias for channel bandwidth\n"
          "       * \"sf\" - alias for spreading factor\n"
          "       * \"cr\" - alias for coding rate\n"
@@ -390,7 +390,7 @@ static void _print_netopt(netopt_t opt)
         printf("encryption key");
         break;
 
-#ifdef MODULE_GNRC_NETIF_CMD_LORA
+#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN)
     case NETOPT_BANDWIDTH:
         printf("bandwidth");
         break;
@@ -402,7 +402,7 @@ static void _print_netopt(netopt_t opt)
     case NETOPT_CODING_RATE:
         printf("coding rate");
         break;
-#endif /* MODULE_GNRC_NETIF_CMD_LORA */
+#endif /* MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN */
 #ifdef MODULE_NETDEV_IEEE802154_MULTIMODE
 
     case NETOPT_IEEE802154_PHY:
@@ -503,7 +503,7 @@ static const char *_netopt_state_str[] = {
     [NETOPT_STATE_STANDBY] = "STANDBY"
 };
 
-#ifdef MODULE_GNRC_NETIF_CMD_LORA
+#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN)
 static const char *_netopt_bandwidth_str[] = {
     [LORA_BW_125_KHZ] = "125",
     [LORA_BW_250_KHZ] = "250",
@@ -675,7 +675,7 @@ static void _netif_list(netif_t *iface)
     if (res >= 0) {
         printf(" RSSI: %d ", i16);
     }
-#ifdef MODULE_GNRC_NETIF_CMD_LORA
+#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN)
     res = netif_get_opt(iface, NETOPT_BANDWIDTH, 0, &u8, sizeof(u8));
     if (res >= 0) {
         printf(" BW: %skHz ", _netopt_bandwidth_str[u8]);
@@ -688,7 +688,7 @@ static void _netif_list(netif_t *iface)
     if (res >= 0) {
         printf(" CR: %s ", _netopt_coding_rate_str[u8]);
     }
-#endif /* MODULE_GNRC_NETIF_CMD_LORA */
+#endif /* MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN */
 #ifdef MODULE_NETDEV_IEEE802154
     res = netif_get_opt(iface, NETOPT_IEEE802154_PHY, 0, &u8, sizeof(u8));
     if (res >= 0) {
@@ -808,7 +808,7 @@ static void _netif_list(netif_t *iface)
         }
         line_thresh++;
     }
-#ifdef MODULE_GNRC_NETIF_CMD_LORA
+#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN)
     res = netif_get_opt(iface, NETOPT_DEMOD_MARGIN, 0, &u8, sizeof(u8));
     if (res >= 0) {
         printf(" Demod margin.: %u ", (unsigned)u8);
@@ -998,7 +998,7 @@ static int _netif_set_u32(netif_t *iface, netopt_t opt, uint32_t context,
     return 0;
 }
 
-#ifdef MODULE_GNRC_NETIF_CMD_LORA
+#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN)
 static int _netif_set_bandwidth(netif_t *iface, char *value)
 {
     uint8_t bw;
@@ -1059,7 +1059,7 @@ static int _netif_set_coding_rate(netif_t *iface, char *value)
 
     return 0;
 }
-#endif /* MODULE_GNRC_NETIF_CMD_LORA */
+#endif /* MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN */
 
 #ifdef MODULE_NETDEV_IEEE802154_MR_FSK
 static int _netif_set_fsk_fec(netif_t *iface, char *value)
@@ -1251,7 +1251,7 @@ static int _netif_set_flag(netif_t *iface, netopt_t opt, netopt_enable_t set)
     return 0;
 }
 
-#ifdef MODULE_GNRC_NETIF_CMD_LORA
+#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN)
 static int _netif_set_lw_key(netif_t *iface, netopt_t opt, char *key_str)
 {
     /* This is the longest key */
@@ -1503,7 +1503,7 @@ static int _netif_set(char *cmd_name, netif_t *iface, char *key, char *value)
     else if ((strcmp("frequency", key) == 0) || (strcmp("freq", key) == 0)) {
         return _netif_set_u32(iface, NETOPT_CHANNEL_FREQUENCY, 0, value);
     }
-#ifdef MODULE_GNRC_NETIF_CMD_LORA
+#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN)
     else if ((strcmp("bandwidth", key) == 0) || (strcmp("bw", key) == 0)) {
         return _netif_set_bandwidth(iface, value);
     }
@@ -1553,7 +1553,7 @@ static int _netif_set(char *cmd_name, netif_t *iface, char *key, char *value)
     else if (strcmp("rx2_dr", key) == 0) {
         return _netif_set_u8(iface, NETOPT_LORAWAN_RX2_DR, 0, value);
     }
-#endif /* MODULE_GNRC_NETIF_CMD_LORA */
+#endif /* MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN */
 #ifdef MODULE_NETDEV_IEEE802154_MULTIMODE
     else if ((strcmp("phy_mode", key) == 0) || (strcmp("phy", key) == 0)) {
         return _netif_set_ieee802154_phy_mode(iface, value);

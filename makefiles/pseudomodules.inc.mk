@@ -227,6 +227,7 @@ PSEUDOMODULES += shell_cmd_gnrc_ipv6_frag_stats
 PSEUDOMODULES += shell_cmd_gnrc_ipv6_nib
 PSEUDOMODULES += shell_cmd_gnrc_ipv6_whitelist
 PSEUDOMODULES += shell_cmd_gnrc_netif
+PSEUDOMODULES += shell_cmd_gnrc_netif_lorawan
 PSEUDOMODULES += shell_cmd_gnrc_pktbuf
 PSEUDOMODULES += shell_cmd_gnrc_rpl
 PSEUDOMODULES += shell_cmd_gnrc_sixlowpan_ctx
