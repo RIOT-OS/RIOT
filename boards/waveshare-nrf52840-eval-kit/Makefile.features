@@ -12,3 +12,4 @@ FEATURES_PROVIDED += periph_usbdev
 # Other features
 FEATURES_PROVIDED += arduino
 FEATURES_PROVIDED += arduino_pwm
+FEATURES_PROVIDED += tinyusb_device
