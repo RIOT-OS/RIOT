@@ -285,8 +285,7 @@ class SerCmd(cmd.Cmd):
             self.onecmd(self.precmd(command))
 
         # start serial->console thread
-        receiver_thread = threading.Thread(target=self.reader)
-        receiver_thread.setDaemon(1)
+        receiver_thread = threading.Thread(target=self.reader, daemon=True)
         receiver_thread.start()
 
     def precmd(self, line):
