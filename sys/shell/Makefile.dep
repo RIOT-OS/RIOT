@@ -56,6 +56,9 @@ ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
   endif
   ifneq (,$(filter gnrc_netif,$(USEMODULE)))
     USEMODULE += shell_cmd_gnrc_netif
+    ifneq (,$(filter gnrc_netif_lorawan,$(USEMODULE)))
+      USEMODULE += gnrc_netif_cmd_lora
+    endif
   endif
   ifneq (,$(filter gnrc_pktbuf_cmd,$(USEMODULE)))
       USEMODULE += shell_cmd_gnrc_pktbuf
