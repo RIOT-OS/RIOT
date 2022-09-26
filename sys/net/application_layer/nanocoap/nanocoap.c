@@ -454,18 +454,14 @@ ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf,
         }
 
         int res = coap_match_path(resource, uri);
-        if (res > 0) {
+        if (res != 0) {
             continue;
         }
-        else if (res < 0) {
-            break;
-        }
-        else {
-            coap_request_ctx_t ctx = {
-                .resource = resource,
-            };
-            return resource->handler(pkt, resp_buf, resp_buf_len, &ctx);
-        }
+
+        coap_request_ctx_t ctx = {
+            .resource = resource,
+        };
+        return resource->handler(pkt, resp_buf, resp_buf_len, &ctx);
     }
 
     return coap_build_reply(pkt, COAP_CODE_404, resp_buf, resp_buf_len, 0);
