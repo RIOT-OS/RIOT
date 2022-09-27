@@ -61,7 +61,7 @@ psa_status_t psa_crypto_init(void)
 {
     lib_initialized = 1;
 
-#if IS_ACTIVE(CONFIG_MODULE_PSA_KEY_SLOT_MGMT)
+#if (IS_ACTIVE(CONFIG_MODULE_PSA_KEY_SLOT_MGMT))
     psa_init_key_slots();
 #endif
 
@@ -580,7 +580,7 @@ psa_status_t psa_cipher_generate_iv(psa_cipher_operation_t *operation,
     }
 
     operation->iv_set = 1;
-    *iv_length = operation->default_iv_length;
+    *iv_length = iv_size;
 
     return status;
 }
@@ -883,7 +883,7 @@ static psa_status_t psa_validate_key_for_key_generation(psa_key_type_t type, siz
     if (PSA_KEY_TYPE_IS_UNSTRUCTURED(type)) {
         return psa_validate_unstructured_key_size(type, bits);
     }
-#if IS_ACTIVE(CONFIG_PSA_ASYMMETRIC) || IS_ACTIVE(CONFIG_PSA_SECURE_ELEMENT_ASYMMETRIC)
+#if (IS_ACTIVE(CONFIG_PSA_ASYMMETRIC)) || (IS_ACTIVE(CONFIG_PSA_SECURE_ELEMENT_ASYMMETRIC))
     else if (PSA_KEY_TYPE_IS_ECC_KEY_PAIR(type)) {
         return PSA_ECC_KEY_SIZE_IS_VALID(bits) ? PSA_SUCCESS : PSA_ERROR_INVALID_ARGUMENT;
     }
@@ -980,7 +980,7 @@ static psa_status_t psa_start_key_creation(psa_key_creation_method_t method,
         slot->attr.id = key_id;
     }
 
-#if IS_ACTIVE(CONFIG_PSA_SECURE_ELEMENT)
+#if (IS_ACTIVE(CONFIG_PSA_SECURE_ELEMENT))
     /* Find a free slot on a secure element and store SE slot number in key_data */
     if (*p_drv != NULL) {
         psa_key_slot_number_t *slot_number = psa_key_slot_get_slot_number(slot);
@@ -1121,7 +1121,7 @@ psa_status_t psa_export_public_key(psa_key_id_t key,
     psa_status_t unlock_status = PSA_ERROR_CORRUPTION_DETECTED;
     psa_key_slot_t *slot;
     uint8_t *pubkey_data = NULL;
-    size_t *pubkey_bytes = NULL;
+    size_t *pubkey_data_len = NULL;
 
     if (!lib_initialized) {
         return PSA_ERROR_BAD_STATE;
@@ -1147,10 +1147,10 @@ psa_status_t psa_export_public_key(psa_key_id_t key,
         unlock_status = psa_unlock_key_slot(slot);
         return status;
     }
-    psa_get_public_key_data_from_key_slot(slot, &pubkey_data, &pubkey_bytes);
+    psa_get_public_key_data_from_key_slot(slot, &pubkey_data, &pubkey_data_len);
 
     status =
-        psa_builtin_export_public_key(pubkey_data, *pubkey_bytes, data, data_size, data_length);
+        psa_builtin_export_public_key(pubkey_data, *pubkey_data_len, data, data_size, data_length);
 
     unlock_status = psa_unlock_key_slot(slot);
     return ((status == PSA_SUCCESS) ? unlock_status : status);
@@ -1206,7 +1206,7 @@ psa_status_t psa_generate_key(const psa_key_attributes_t *attributes,
             return status;
         }
 
-        slot->key.bytes = PSA_MAX_KEY_DATA_SIZE;
+        slot->key.data_len = PSA_MAX_KEY_DATA_SIZE;
     }
 
     status = psa_location_dispatch_generate_key(attributes, slot);

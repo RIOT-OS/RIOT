@@ -32,15 +32,15 @@
 psa_status_t psa_location_dispatch_generate_key(const psa_key_attributes_t *attributes,
                                                 psa_key_slot_t *slot)
 {
-#if IS_ACTIVE(CONFIG_PSA_SECURE_ELEMENT)
+#if (IS_ACTIVE(CONFIG_PSA_SECURE_ELEMENT))
     const psa_drv_se_t *drv;
     psa_drv_se_context_t *drv_context;
     psa_key_slot_number_t *slot_number = psa_key_slot_get_slot_number(slot);
 
     uint8_t *pubkey_data = NULL;
-    size_t *pubkey_bytes = NULL;
+    size_t *pubkey_data_len = NULL;
 
-    psa_get_public_key_data_from_key_slot(slot, &pubkey_data, &pubkey_bytes);
+    psa_get_public_key_data_from_key_slot(slot, &pubkey_data, &pubkey_data_len);
 
     if (psa_get_se_driver(attributes->lifetime, &drv, &drv_context)) {
         if (drv->key_management == NULL || drv->key_management->p_generate == NULL) {
@@ -48,7 +48,7 @@ psa_status_t psa_location_dispatch_generate_key(const psa_key_attributes_t *attr
         }
 
         return drv->key_management->p_generate(drv_context, *slot_number, attributes, pubkey_data,
-                                               *pubkey_bytes, pubkey_bytes);
+                                               *pubkey_data_len, pubkey_data_len);
     }
 #endif /* CONFIG_PSA_SECURE_ELEMENT */
 
@@ -66,7 +66,7 @@ psa_status_t psa_location_dispatch_import_key( const psa_key_attributes_t *attri
 
     psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
 
-#if IS_ACTIVE(CONFIG_PSA_SECURE_ELEMENT)
+#if (IS_ACTIVE(CONFIG_PSA_SECURE_ELEMENT))
     const psa_drv_se_t *drv;
     psa_drv_se_context_t *drv_context;
     psa_key_slot_number_t *slot_number = psa_key_slot_get_slot_number(slot);
@@ -103,7 +103,7 @@ psa_status_t psa_location_dispatch_cipher_encrypt_setup(   psa_cipher_operation_
                                                            const psa_key_slot_t *slot,
                                                            psa_algorithm_t alg)
 {
-#if IS_ACTIVE(CONFIG_PSA_SECURE_ELEMENT)
+#if (IS_ACTIVE(CONFIG_PSA_SECURE_ELEMENT))
     psa_key_location_t location = PSA_KEY_LIFETIME_GET_LOCATION(attributes->lifetime);
     if (location != PSA_KEY_LOCATION_LOCAL_STORAGE) {
         const psa_drv_se_t *drv;
@@ -148,7 +148,7 @@ psa_status_t psa_location_dispatch_cipher_decrypt_setup(psa_cipher_operation_t *
     return PSA_ERROR_NOT_SUPPORTED;
 }
 
-#if IS_ACTIVE(CONFIG_PSA_SECURE_ELEMENT)
+#if (IS_ACTIVE(CONFIG_PSA_SECURE_ELEMENT))
 /**
  * @brief   Single part function for cipher encryption and decryption on a secure element
  *
@@ -254,7 +254,7 @@ psa_status_t psa_location_dispatch_cipher_encrypt(  const psa_key_attributes_t *
                                                     size_t *output_length)
 {
 
-#if IS_ACTIVE(CONFIG_PSA_SECURE_ELEMENT)
+#if (IS_ACTIVE(CONFIG_PSA_SECURE_ELEMENT))
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
     const psa_drv_se_t *drv;
     psa_drv_se_context_t *drv_context;
@@ -296,7 +296,7 @@ psa_status_t psa_location_dispatch_cipher_decrypt(  const psa_key_attributes_t *
                                                     size_t *output_length)
 {
 
-#if IS_ACTIVE(CONFIG_PSA_SECURE_ELEMENT)
+#if (IS_ACTIVE(CONFIG_PSA_SECURE_ELEMENT))
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
     const psa_drv_se_t *drv;
     psa_drv_se_context_t *drv_context;
@@ -344,7 +344,7 @@ psa_status_t psa_location_dispatch_sign_hash(  const psa_key_attributes_t *attri
                                                size_t signature_size,
                                                size_t *signature_length)
 {
-#if IS_ACTIVE(CONFIG_PSA_SECURE_ELEMENT)
+#if (IS_ACTIVE(CONFIG_PSA_SECURE_ELEMENT))
     const psa_drv_se_t *drv;
     psa_drv_se_context_t *drv_context;
     psa_key_slot_number_t *slot_number = psa_key_slot_get_slot_number(slot);
@@ -376,7 +376,7 @@ psa_status_t psa_location_dispatch_verify_hash(const psa_key_attributes_t *attri
                                                const uint8_t *signature,
                                                size_t signature_length)
 {
-#if IS_ACTIVE(CONFIG_PSA_SECURE_ELEMENT)
+#if (IS_ACTIVE(CONFIG_PSA_SECURE_ELEMENT))
     const psa_drv_se_t *drv;
     psa_drv_se_context_t *drv_context;
     psa_key_slot_number_t *slot_number = psa_key_slot_get_slot_number(slot);
@@ -409,7 +409,7 @@ psa_status_t psa_location_dispatch_mac_compute(const psa_key_attributes_t *attri
                                                size_t mac_size,
                                                size_t *mac_length)
 {
-#if IS_ACTIVE(CONFIG_PSA_SECURE_ELEMENT)
+#if (IS_ACTIVE(CONFIG_PSA_SECURE_ELEMENT))
     const psa_drv_se_t *drv;
     psa_drv_se_context_t *drv_context;
     psa_key_slot_number_t *slot_number = psa_key_slot_get_slot_number(slot);

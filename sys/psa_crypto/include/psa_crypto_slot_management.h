@@ -80,10 +80,9 @@ typedef struct {
     /** Structure containing key data */
     struct key_data {
         uint8_t data[PSA_MAX_KEY_DATA_SIZE];    /**< Key data buffer */
-        size_t bytes;                           /**< Size of actual key data in bytes */
+        size_t data_len;                           /**< Size of actual key data in bytes */
     } key;                                      /**< Key data structure */
 } psa_key_slot_t;
-
 
 /**
  * @brief   Initializes the allocated key slots and prepares the internal key slot lists.
@@ -250,11 +249,11 @@ void psa_get_key_data_from_key_slot(const psa_key_slot_t *slot,
  *
  * @param   slot            Slot the desired key is stored in
  * @param   pubkey_data     Pointer to key data
- * @param   pubkey_bytes    Pointer to key data size in bytes
+ * @param   pubkey_data_len    Pointer to key data size in bytes
  */
 void psa_get_public_key_data_from_key_slot( const psa_key_slot_t *slot,
                                             uint8_t **pubkey_data,
-                                            size_t **pubkey_bytes);
+                                            size_t **pubkey_data_len);
 
 #ifdef __cplusplus
 }

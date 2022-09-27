@@ -34,7 +34,7 @@ psa_status_t psa_algorithm_dispatch_hash_setup(psa_hash_operation_t *operation,
     psa_status_t status = PSA_ERROR_NOT_SUPPORTED;
 
     switch (alg) {
-    #if IS_ACTIVE(CONFIG_HASHES_MD5)
+    #if (IS_ACTIVE(CONFIG_HASHES_MD5))
     case PSA_ALG_MD5:
         status = psa_hashes_md5_setup(&operation->ctx.md5);
         if (status != PSA_SUCCESS) {
@@ -42,7 +42,7 @@ psa_status_t psa_algorithm_dispatch_hash_setup(psa_hash_operation_t *operation,
         }
         break;
     #endif
-    #if IS_ACTIVE(CONFIG_HASHES_SHA1)
+    #if (IS_ACTIVE(CONFIG_HASHES_SHA1))
     case PSA_ALG_SHA_1:
         status = psa_hashes_sha1_setup(&operation->ctx.sha1);
         if (status != PSA_SUCCESS) {
@@ -50,7 +50,7 @@ psa_status_t psa_algorithm_dispatch_hash_setup(psa_hash_operation_t *operation,
         }
         break;
     #endif
-    #if IS_ACTIVE(CONFIG_HASHES_SHA224)
+    #if (IS_ACTIVE(CONFIG_HASHES_SHA224))
     case PSA_ALG_SHA_224:
         status = psa_hashes_sha224_setup(&operation->ctx.sha224);
         if (status != PSA_SUCCESS) {
@@ -58,7 +58,7 @@ psa_status_t psa_algorithm_dispatch_hash_setup(psa_hash_operation_t *operation,
         }
         break;
     #endif
-    #if IS_ACTIVE(CONFIG_HASHES_SHA256)
+    #if (IS_ACTIVE(CONFIG_HASHES_SHA256))
     case PSA_ALG_SHA_256:
         status = psa_hashes_sha256_setup(&operation->ctx.sha256);
         if (status != PSA_SUCCESS) {
@@ -66,7 +66,7 @@ psa_status_t psa_algorithm_dispatch_hash_setup(psa_hash_operation_t *operation,
         }
         break;
     #endif
-    #if IS_ACTIVE(CONFIG_HASHES_SHA512)
+    #if (IS_ACTIVE(CONFIG_HASHES_SHA512))
     case PSA_ALG_SHA_512:
         status = psa_hashes_sha512_setup(&operation->ctx.sha512);
         if (status != PSA_SUCCESS) {
@@ -89,23 +89,23 @@ psa_status_t psa_algorithm_dispatch_hash_update(psa_hash_operation_t *operation,
                                                 size_t input_length)
 {
     switch (operation->alg) {
-    #if IS_ACTIVE(CONFIG_HASHES_MD5)
+    #if (IS_ACTIVE(CONFIG_HASHES_MD5))
     case PSA_ALG_MD5:
         return psa_hashes_md5_update(&operation->ctx.md5, input, input_length);
     #endif
-    #if IS_ACTIVE(CONFIG_HASHES_SHA1)
+    #if (IS_ACTIVE(CONFIG_HASHES_SHA1))
     case PSA_ALG_SHA_1:
         return psa_hashes_sha1_update(&operation->ctx.sha1, input, input_length);
     #endif
-    #if IS_ACTIVE(CONFIG_HASHES_SHA224)
+    #if (IS_ACTIVE(CONFIG_HASHES_SHA224))
     case PSA_ALG_SHA_224:
         return psa_hashes_sha224_update(&operation->ctx.sha224, input, input_length);
     #endif
-    #if IS_ACTIVE(CONFIG_HASHES_SHA256)
+    #if (IS_ACTIVE(CONFIG_HASHES_SHA256))
     case PSA_ALG_SHA_256:
         return psa_hashes_sha256_update(&operation->ctx.sha256, input, input_length);
     #endif
-    #if IS_ACTIVE(CONFIG_HASHES_SHA512)
+    #if (IS_ACTIVE(CONFIG_HASHES_SHA512))
     case PSA_ALG_SHA_512:
         return psa_hashes_sha512_update(&operation->ctx.sha512, input, input_length);
     #endif
@@ -123,23 +123,23 @@ psa_status_t psa_algorithm_dispatch_hash_finish(psa_hash_operation_t *operation,
                                                 size_t *hash_length)
 {
     switch (operation->alg) {
-    #if IS_ACTIVE(CONFIG_HASHES_MD5)
+    #if (IS_ACTIVE(CONFIG_HASHES_MD5))
     case PSA_ALG_MD5:
         return psa_hashes_md5_finish(&operation->ctx.md5, hash, hash_size, hash_length);
     #endif
-    #if IS_ACTIVE(CONFIG_HASHES_SHA1)
+    #if (IS_ACTIVE(CONFIG_HASHES_SHA1))
     case PSA_ALG_SHA_1:
         return psa_hashes_sha1_finish(&operation->ctx.sha1, hash, hash_size, hash_length);
     #endif
-    #if IS_ACTIVE(CONFIG_HASHES_SHA224)
+    #if (IS_ACTIVE(CONFIG_HASHES_SHA224))
     case PSA_ALG_SHA_224:
         return psa_hashes_sha224_finish(&operation->ctx.sha224, hash, hash_size, hash_length);
     #endif
-    #if IS_ACTIVE(CONFIG_HASHES_SHA256)
+    #if (IS_ACTIVE(CONFIG_HASHES_SHA256))
     case PSA_ALG_SHA_256:
         return psa_hashes_sha256_finish(&operation->ctx.sha256, hash, hash_size, hash_length);
     #endif
-    #if IS_ACTIVE(CONFIG_HASHES_SHA512)
+    #if (IS_ACTIVE(CONFIG_HASHES_SHA512))
     case PSA_ALG_SHA_512:
         return psa_hashes_sha512_finish(&operation->ctx.sha512, hash, hash_size, hash_length);
     #endif
@@ -177,12 +177,12 @@ psa_status_t psa_algorithm_dispatch_sign_hash(  const psa_key_attributes_t *attr
     psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
 
     switch (asym_key) {
-#if IS_ACTIVE(CONFIG_PSA_ECC_P192_R1_DRIVER)
+#if (IS_ACTIVE(CONFIG_PSA_ECC_P192_R1_DRIVER))
     case PSA_ECC_P192_R1:
         return psa_ecc_p192r1_sign_hash(attributes, alg, key_data, *key_bytes, hash, hash_length,
                                         signature, signature_size, signature_length);
 #endif
-#if IS_ACTIVE(CONFIG_PSA_ECC_P256_R1_DRIVER)
+#if (IS_ACTIVE(CONFIG_PSA_ECC_P256_R1_DRIVER))
     case PSA_ECC_P256_R1:
         return psa_ecc_p256r1_sign_hash(attributes, alg, key_data, *key_bytes, hash, hash_length,
                                         signature, signature_size, signature_length);
@@ -209,7 +209,7 @@ psa_status_t psa_algorithm_dispatch_verify_hash(  const psa_key_attributes_t *at
 {
     psa_asym_key_t asym_key = PSA_INVALID_OPERATION;
     uint8_t *pubkey_data = NULL;
-    size_t *pubkey_bytes = NULL;
+    size_t *pubkey_data_len = NULL;
 
     if (PSA_KEY_TYPE_IS_ECC(attributes->type)) {
         asym_key =
@@ -220,17 +220,17 @@ psa_status_t psa_algorithm_dispatch_verify_hash(  const psa_key_attributes_t *at
         }
     }
 
-    psa_get_public_key_data_from_key_slot(slot, &pubkey_data, &pubkey_bytes);
+    psa_get_public_key_data_from_key_slot(slot, &pubkey_data, &pubkey_data_len);
 
     switch (asym_key) {
-#if IS_ACTIVE(CONFIG_PSA_ECC_P192_R1_DRIVER)
+#if (IS_ACTIVE(CONFIG_PSA_ECC_P192_R1_DRIVER))
     case PSA_ECC_P192_R1:
-        return psa_ecc_p192r1_verify_hash(attributes, alg, pubkey_data, *pubkey_bytes, hash,
+        return psa_ecc_p192r1_verify_hash(attributes, alg, pubkey_data, *pubkey_data_len, hash,
                                           hash_length, signature, signature_length);
 #endif
-#if IS_ACTIVE(CONFIG_PSA_ECC_P256_R1_DRIVER)
+#if (IS_ACTIVE(CONFIG_PSA_ECC_P256_R1_DRIVER))
     case PSA_ECC_P256_R1:
-        return psa_ecc_p256r1_verify_hash(attributes, alg, pubkey_data, *pubkey_bytes, hash,
+        return psa_ecc_p256r1_verify_hash(attributes, alg, pubkey_data, *pubkey_data_len, hash,
                                           hash_length, signature, signature_length);
 #endif
     default:
@@ -257,8 +257,8 @@ psa_status_t psa_algorithm_dispatch_generate_key(   const psa_key_attributes_t *
     if (PSA_KEY_TYPE_IS_ASYMMETRIC(attributes->type)) {
         psa_asym_key_t asym_key = PSA_INVALID_OPERATION;
         uint8_t *pubkey_data = NULL;
-        size_t *pubkey_bytes = NULL;
-        psa_get_public_key_data_from_key_slot(slot, &pubkey_data, &pubkey_bytes);
+        size_t *pubkey_data_len = NULL;
+        psa_get_public_key_data_from_key_slot(slot, &pubkey_data, &pubkey_data_len);
 
         if (PSA_KEY_TYPE_IS_ECC_KEY_PAIR(attributes->type)) {
             asym_key =
@@ -271,15 +271,15 @@ psa_status_t psa_algorithm_dispatch_generate_key(   const psa_key_attributes_t *
         }
 
         switch (asym_key) {
-#if IS_ACTIVE(CONFIG_PSA_ECC_P192_R1_DRIVER)
+#if (IS_ACTIVE(CONFIG_PSA_ECC_P192_R1_DRIVER))
         case PSA_ECC_P192_R1:
             return psa_generate_ecc_p192r1_key_pair(attributes, key_data, pubkey_data, key_bytes,
-                                                    pubkey_bytes);
+                                                    pubkey_data_len);
 #endif
-#if IS_ACTIVE(CONFIG_PSA_ECC_P256_R1_DRIVER)
+#if (IS_ACTIVE(CONFIG_PSA_ECC_P256_R1_DRIVER))
         case PSA_ECC_P256_R1:
             return psa_generate_ecc_p256r1_key_pair(attributes, key_data, pubkey_data, key_bytes,
-                                                    pubkey_bytes);
+                                                    pubkey_data_len);
 #endif
         default:
             (void)status;
@@ -311,17 +311,17 @@ psa_status_t psa_algorithm_dispatch_cipher_encrypt( const psa_key_attributes_t *
     }
 
     switch (op) {
-#if IS_ACTIVE(CONFIG_PSA_CIPHER_AES_128)
+#if (IS_ACTIVE(CONFIG_PSA_CIPHER_AES_128))
     case PSA_CBC_NO_PAD_AES_128:
         return psa_cipher_cbc_aes_128_encrypt(attributes, key_data, *key_bytes, alg, input,
                                               input_length, output, output_size, output_length);
 #endif
-#if IS_ACTIVE(CONFIG_PSA_CIPHER_AES_192)
+#if (IS_ACTIVE(CONFIG_PSA_CIPHER_AES_192))
     case PSA_CBC_NO_PAD_AES_192:
         return psa_cipher_cbc_aes_192_encrypt(attributes, key_data, *key_bytes, alg, input,
                                               input_length, output, output_size, output_length);
 #endif
-#if IS_ACTIVE(CONFIG_PSA_CIPHER_AES_256)
+#if (IS_ACTIVE(CONFIG_PSA_CIPHER_AES_256))
     case PSA_CBC_NO_PAD_AES_256:
         return psa_cipher_cbc_aes_256_encrypt(attributes, key_data, *key_bytes, alg, input,
                                               input_length, output, output_size, output_length);
@@ -353,7 +353,7 @@ psa_status_t psa_algorithm_dispatch_mac_compute(const psa_key_attributes_t *attr
     psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
 
     switch (alg) {
-    #if IS_ACTIVE(CONFIG_PSA_MAC_HMAC_SHA_256)
+    #if (IS_ACTIVE(CONFIG_PSA_MAC_HMAC_SHA_256))
     case PSA_ALG_HMAC(PSA_ALG_SHA_256):
         status = psa_mac_compute_hmac_sha256(attributes, key_data, *key_bytes, input, input_length,
                                              mac, mac_size, mac_length);
