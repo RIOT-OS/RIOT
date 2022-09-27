@@ -36,6 +36,10 @@
     #define ADC_GAIN_FACTOR_DEFAULT (0)
 #endif
 
+#ifndef ADC_NEG_INPUT
+    #define ADC_NEG_INPUT (0)
+#endif
+
 /* Prototypes */
 static void _adc_poweroff(Adc *dev);
 static void _setup_clock(Adc *dev);
@@ -252,9 +256,33 @@ int adc_init(adc_t line)
         return -1;
     }
 
+#ifdef ADC0
+    const uint8_t adc = adc_channels[line].dev == ADC1 ? 1 : 0;
+#else
+    const uint8_t adc = 0;
+#endif
+
     _prep();
-    gpio_init(adc_channels[line].pin, GPIO_IN);
-    gpio_init_mux(adc_channels[line].pin, GPIO_MUX_B);
+
+    uint8_t muxpos = (adc_channels[line].muxpos & ADC_INPUTCTRL_MUXPOS_Msk)
+                   >> ADC_INPUTCTRL_MUXPOS_Pos;
+    uint8_t muxneg = (adc_channels[line].muxpos & ADC_INPUTCTRL_MUXNEG_Msk)
+                   >> ADC_INPUTCTRL_MUXNEG_Pos;
+
+    /* configure positive input pin */
+    if (muxpos < 0x18) {
+        assert(muxpos < ARRAY_SIZE(sam0_adc_pins[adc]));
+        gpio_init(sam0_adc_pins[adc][muxpos], GPIO_IN);
+        gpio_init_mux(sam0_adc_pins[adc][muxpos], GPIO_MUX_B);
+    }
+
+    /* configure negative input pin */
+    if (adc_channels[line].muxpos & ADC_INPUTCTRL_DIFFMODE) {
+        assert(muxneg < ARRAY_SIZE(sam0_adc_pins[adc]));
+        gpio_init(sam0_adc_pins[adc][muxneg], GPIO_IN);
+        gpio_init_mux(sam0_adc_pins[adc][muxneg], GPIO_MUX_B);
+    }
+
     _done();
 
     return 0;
@@ -274,6 +302,8 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     Adc *dev = ADC;
 #endif
 
+    bool diffmode = adc_channels[line].muxpos & ADC_INPUTCTRL_DIFFMODE;
+
     _prep();
 
     if (_adc_configure(dev, res) != 0) {
@@ -283,8 +313,12 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     }
 
     dev->INPUTCTRL.reg = ADC_GAIN_FACTOR_DEFAULT
-                           | adc_channels[line].muxpos
-                           | ADC_NEG_INPUT;
+                       | adc_channels[line].muxpos
+                       | (diffmode ? 0 : ADC_NEG_INPUT);
+#ifdef ADC_CTRLB_DIFFMODE
+    dev->CTRLB.bit.DIFFMODE = diffmode;
+#endif
+
     _wait_syncbusy(dev);
 
     /* Start the conversion */
@@ -293,10 +327,15 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     /* Wait for the result */
     while (!(dev->INTFLAG.reg & ADC_INTFLAG_RESRDY)) {}
 
-    int result = dev->RESULT.reg;
+    int16_t result = dev->RESULT.reg;
 
     _adc_poweroff(dev);
     _done();
+
+    /* in differential mode we lose one bit for the sign */
+    if (diffmode) {
+        result *= 2;
+    }
 
     return result;
 }
