@@ -172,7 +172,7 @@ static void _print_equalizer(dfplayer_t *dev)
 
 static void _print_mode(dfplayer_t *dev)
 {
-    dfplayer_mode_t mode;
+    dfplayer_mode_t mode = {0};
     int retval = dfplayer_get_mode(dev, &mode);
     if (retval) {
         _print_error(retval);
