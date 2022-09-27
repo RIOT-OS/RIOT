@@ -32,6 +32,6 @@ FEATURES_OPTIONAL += periph_spi
 TESTRUNNER_RESET_AFTER_TERM ?= 1
 
 # failing on native with floating point exception (#15870)
-TEST_ON_CI_BLACKLIST = all
+TEST_ON_CI_BLACKLIST = native
 
 include $(RIOTBASE)/Makefile.include
