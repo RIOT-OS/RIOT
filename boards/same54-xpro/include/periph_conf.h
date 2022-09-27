@@ -340,9 +340,9 @@ static const sam0_common_usb_config_t sam_usbdev_config[] = {
 
 static const adc_conf_chan_t adc_channels[] = {
     /* port, pin, muxpos, dev */
-    {GPIO_PIN(PA, 3), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN1), ADC0},
-    {GPIO_PIN(PA, 5), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN5), ADC0},
-    {GPIO_PIN(PA, 7), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN7), ADC0}
+    { .inputctrl = ADC0_INPUTCTRL_MUXPOS_PA03, .dev = ADC0 },
+    { .inputctrl = ADC0_INPUTCTRL_MUXPOS_PA05, .dev = ADC0 },
+    { .inputctrl = ADC0_INPUTCTRL_MUXPOS_PA07, .dev = ADC0 }
 };
 
 #define ADC_NUMOF                           ARRAY_SIZE(adc_channels)
