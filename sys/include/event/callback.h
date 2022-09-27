@@ -61,6 +61,24 @@ typedef struct {
 void event_callback_init(event_callback_t *event_callback, void (*callback)(void *), void *arg);
 
 /**
+ * @brief   Generate a one-shot callback event on @p queue
+ *
+ * This will initialize @p event and post it immediately
+ *
+ * @param[in]   event           event_callback object to initialize
+ * @param[in]   queue           queue that the event will be added to
+ * @param[in]   callback        callback to set up
+ * @param[in]   arg             callback argument to set up
+ */
+static inline void event_callback_oneshot(event_callback_t *event,
+                                          event_queue_t *queue,
+                                          void (*callback)(void *), void *arg)
+{
+    event_callback_init(event, callback, arg);
+    event_post(queue, &event->super);
+}
+
+/**
  * @brief   event callback handler function (used internally)
  *
  * @internal
