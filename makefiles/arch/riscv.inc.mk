@@ -24,6 +24,12 @@ _TRIPLES_TO_TEST := \
     riscv64-unknown-elf \
     riscv64-elf
 
+# Do not test at run time if building with docker: The host may have no
+# RISC-V toolchain installed or a different one
+ifeq (1,$(BUILD_IN_DOCKER))
+  TARGET_ARCH_RISCV := riscv-none-embed
+endif
+
 TARGET_ARCH_RISCV ?= \
   $(strip \
     $(subst -gcc,,\
@@ -61,8 +67,14 @@ ifeq ($(TOOLCHAIN),llvm)
   TARGET_ARCH_LLVM := riscv32-none-elf
 else
   CFLAGS_CPU += -mcmodel=medlow -msmall-data-limit=8
-  ifneq (,$(shell $(TARGET_ARCH)-gcc --help=target | grep '\-malign-data='))
+  # We cannot invoke the compiler on the host system if build in docker.
+  # Instead, hard-code the required flags for the docker toolchain here
+  ifeq (1,$(BUILD_IN_DOCKER))
     CFLAGS_CPU += -malign-data=natural
+  else
+    ifneq (,$(shell $(TARGET_ARCH)-gcc --help=target | grep '\-malign-data='))
+      CFLAGS_CPU += -malign-data=natural
+    endif
   endif
 endif
 CFLAGS_LINK  = -ffunction-sections -fdata-sections
