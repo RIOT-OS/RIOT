@@ -264,9 +264,9 @@ int adc_init(adc_t line)
 
     _prep();
 
-    uint8_t muxpos = (adc_channels[line].muxpos & ADC_INPUTCTRL_MUXPOS_Msk)
+    uint8_t muxpos = (adc_channels[line].inputctrl & ADC_INPUTCTRL_MUXPOS_Msk)
                    >> ADC_INPUTCTRL_MUXPOS_Pos;
-    uint8_t muxneg = (adc_channels[line].muxpos & ADC_INPUTCTRL_MUXNEG_Msk)
+    uint8_t muxneg = (adc_channels[line].inputctrl & ADC_INPUTCTRL_MUXNEG_Msk)
                    >> ADC_INPUTCTRL_MUXNEG_Pos;
 
     /* configure positive input pin */
@@ -277,7 +277,7 @@ int adc_init(adc_t line)
     }
 
     /* configure negative input pin */
-    if (adc_channels[line].muxpos & ADC_INPUTCTRL_DIFFMODE) {
+    if (adc_channels[line].inputctrl & ADC_INPUTCTRL_DIFFMODE) {
         assert(muxneg < ARRAY_SIZE(sam0_adc_pins[adc]));
         gpio_init(sam0_adc_pins[adc][muxneg], GPIO_IN);
         gpio_init_mux(sam0_adc_pins[adc][muxneg], GPIO_MUX_B);
@@ -302,7 +302,7 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     Adc *dev = ADC;
 #endif
 
-    bool diffmode = adc_channels[line].muxpos & ADC_INPUTCTRL_DIFFMODE;
+    bool diffmode = adc_channels[line].inputctrl & ADC_INPUTCTRL_DIFFMODE;
 
     _prep();
 
@@ -313,7 +313,7 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     }
 
     dev->INPUTCTRL.reg = ADC_GAIN_FACTOR_DEFAULT
-                       | adc_channels[line].muxpos
+                       | adc_channels[line].inputctrl
                        | (diffmode ? 0 : ADC_NEG_INPUT);
 #ifdef ADC_CTRLB_DIFFMODE
     dev->CTRLB.bit.DIFFMODE = diffmode;
