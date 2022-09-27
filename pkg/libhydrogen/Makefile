@@ -9,5 +9,8 @@ include $(RIOTBASE)/pkg/pkg.mk
 CFLAGS += -Wno-type-limits
 CFLAGS += -Wno-cast-align
 
+# Silence warning popping up since `gcc version 11.2.0 (Ubuntu 11.2.0-19ubuntu1)`
+CFLAGS += -Wno-stringop-overflow
+
 all:
 	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR) -f $(RIOTBASE)/Makefile.base

@@ -31,4 +31,7 @@ FEATURES_OPTIONAL += periph_spi
 # a terminal is opened to synchronize.
 TESTRUNNER_RESET_AFTER_TERM ?= 1
 
+# failing on native with floating point exception (#15870)
+TEST_ON_CI_BLACKLIST = all
+
 include $(RIOTBASE)/Makefile.include
