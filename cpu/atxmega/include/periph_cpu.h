@@ -418,7 +418,7 @@ typedef enum {
 /* for compatibility between different versions of AVR libc: Legacy versions
  * occasionally use ASPACE instead of ASIZE for some MCUs, while new AVR libc
  * uses ASIZE as name consistently */
-#ifdef EBI_CS_ASPACE_gm
+#ifndef EBI_CS_ASIZE_gm
 typedef EBI_CS_ASPACE_t EBI_CS_ASIZE_t;
 #define EBI_CS_ASIZE_256B_gc EBI_CS_ASPACE_256B_gc
 #define EBI_CS_ASIZE_512B_gc EBI_CS_ASPACE_512B_gc
