@@ -496,7 +496,6 @@ static psa_status_t psa_cipher_encrypt_decrypt( psa_key_id_t key,
                                                       output, output_size, output_length);
     }
 
-
     unlock_status = psa_unlock_key_slot(slot);
     return ((status == PSA_SUCCESS) ? unlock_status : status);
     return PSA_ERROR_NOT_SUPPORTED;
@@ -610,8 +609,6 @@ psa_status_t psa_cipher_update(psa_cipher_operation_t *operation,
     (void)output_length;
     return PSA_ERROR_NOT_SUPPORTED;
 }
-
-
 
 psa_status_t psa_hash_setup(psa_hash_operation_t *operation,
                             psa_algorithm_t alg)
@@ -831,10 +828,10 @@ static psa_status_t psa_validate_key_policy(const psa_key_policy_t *policy)
                            PSA_KEY_USAGE_SIGN_HASH |
                            PSA_KEY_USAGE_VERIFY_HASH |
                            PSA_KEY_USAGE_DERIVE)) != 0) {
-        return(PSA_ERROR_INVALID_ARGUMENT);
+        return PSA_ERROR_INVALID_ARGUMENT;
     }
 
-    return(PSA_SUCCESS);
+    return PSA_SUCCESS;
 }
 
 /**
@@ -1104,8 +1101,10 @@ static psa_status_t psa_builtin_export_public_key( const uint8_t *key_buffer,
     if (key_buffer_size == 0 || data_size == 0) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
-    /* Some implementations and drivers can generate a public key from existing private key material. This implementation does not support the recalculation of a public key, yet.
-       It requires the key to already exist in local memory and just copies it into the data output. */
+    /** Some implementations and drivers can generate a public key from existing private key
+     * material. This implementation does not support the recalculation of a public key, yet.
+     * It requires the key to already exist in local memory and just copies it into the data
+     * output. */
     memcpy(data, key_buffer, key_buffer_size);
     *data_length = key_buffer_size;
 
@@ -1714,7 +1713,11 @@ psa_status_t psa_verify_hash(psa_key_id_t key,
         return status;
     }
 
-    /* When key location is a secure element, this implementation only supports the use of public keys stored on the secure element, not key pairs in which the public key is stored locally. */
+    /**
+     * When key location is a secure element, this implementation only supports
+     * the use of public keys stored on the secure element, not key pairs in
+     * which the public key is stored locally.
+     */
     if ((PSA_KEY_LIFETIME_GET_LOCATION(slot->attr.lifetime) != PSA_KEY_LOCATION_LOCAL_STORAGE) &&
         PSA_KEY_TYPE_IS_ECC_KEY_PAIR(slot->attr.type)) {
         unlock_status = psa_unlock_key_slot(slot);

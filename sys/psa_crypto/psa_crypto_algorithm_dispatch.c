@@ -27,7 +27,6 @@
 #include "psa_ciphers.h"
 #include "psa_crypto_operation_encoder.h"
 
-
 psa_status_t psa_algorithm_dispatch_hash_setup(psa_hash_operation_t *operation,
                                                psa_algorithm_t alg)
 {
@@ -253,7 +252,10 @@ psa_status_t psa_algorithm_dispatch_generate_key(   const psa_key_attributes_t *
 
     psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
 
-    /* Only asymmetric key generation needs special key generation algorithms. Symmetric keys can be created by generating random bytes. */
+    /**
+     * Only asymmetric key generation needs special key generation algorithms. Symmetric keys can
+     * be created by generating random bytes.
+     */
     if (PSA_KEY_TYPE_IS_ASYMMETRIC(attributes->type)) {
         psa_asym_key_t asym_key = PSA_INVALID_OPERATION;
         uint8_t *pubkey_data = NULL;
