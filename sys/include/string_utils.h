@@ -22,11 +22,13 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
+#include <errno.h>
+#include <stdint.h>
 /* if explicit_bzero() is provided by standard C lib, it may be defined in
  * either `string.h` or `strings.h`, so just include both here */
-#include <stdint.h>
 #include <string.h>
 #include <strings.h>
+#include <sys/types.h>
 
 #include "kernel_defines.h"
 
@@ -45,7 +47,7 @@ extern "C" {
  *
  * for all other cases, we provide it here
  */
-#if !defined(BOARD_NATIVE) \
+#if !defined(CPU_NATIVE) \
     && !(IS_USED(MODULE_PICOLIBC) && __BSD_VISIBLE) \
     && !(IS_USED(MODULE_NEWLIB) && __BSD_VISIBLE && !defined(MCU_ESP8266))
 
@@ -69,6 +71,26 @@ static inline void explicit_bzero(void *dest, size_t n_bytes)
     }
 }
 #endif
+
+/**
+ * @brief Copy the string, or as much of it as fits, into the dest buffer.
+ *
+ * Preferred to `strncpy` since it always returns a valid string, and doesn't
+ * unnecessarily force the tail of the destination buffer to be zeroed.
+ * If the zeroing is desired, it's likely cleaner to use `strscpy` with an
+ * overflow test, then just memset the tail of the dest buffer.
+ *
+ * @param[out] dest     Where to copy the string to
+ * @param[in]   src     Where to copy the string from
+ * @param[in] count     Size of destination buffer
+ *
+ * @pre       The destination buffer is at least one byte large, as
+ *            otherwise the terminating zero byte won't fit
+ *
+ * @return the number of characters copied (not including the trailing zero)
+ * @retval  -E2BIG      the destination buffer wasn't big enough
+ */
+ssize_t strscpy(char *dest, const char *src, size_t count);
 
 #ifdef __cplusplus
 }
