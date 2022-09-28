@@ -202,8 +202,19 @@ static void _forward_resp_handler(const gcoap_request_memo_t *memo,
             /* check if we can just send 2.03 Valid instead */
             if ((cep->req_etag_len == coap_opt_get_opaque(pdu, COAP_OPT_ETAG, &resp_etag)) &&
                 (memcmp(cep->req_etag, resp_etag, cep->req_etag_len) == 0)) {
+                uint32_t max_age;
+
+                if (coap_opt_get_uint(pdu, COAP_OPT_MAX_AGE, &max_age) < 0) {
+                    /* use default,
+                     * see https://datatracker.ietf.org/doc/html/rfc7252#section-5.10.5 */
+                    max_age = 60U;
+                }
                 gcoap_resp_init(pdu, (uint8_t *)pdu->hdr, buf_len, COAP_CODE_VALID);
                 coap_opt_add_opaque(pdu, COAP_OPT_ETAG, cep->req_etag, cep->req_etag_len);
+                if (max_age != 60U) {
+                    /* only include Max-Age option if it is not the default value */
+                    coap_opt_add_uint(pdu, COAP_OPT_MAX_AGE, max_age);
+                }
                 coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
             }
         }
