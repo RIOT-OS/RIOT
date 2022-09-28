@@ -744,12 +744,8 @@ static int _request_matcher_default(gcoap_listener_t *listener,
         int res = coap_match_path(*resource, uri);
 
         /* URI mismatch */
-        if (res > 0) {
+        if (res != 0) {
             continue;
-        }
-        /* resources expected in alphabetical order */
-        else if (res < 0) {
-            break;
         }
 
         /* potential match, check for method */

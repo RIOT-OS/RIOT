@@ -750,8 +750,7 @@ typedef struct {
  * @brief   A modular collection of resources for a server
  */
 struct gcoap_listener {
-    const coap_resource_t *resources;   /**< First element in the array of
-                                         *   resources; must order alphabetically */
+    const coap_resource_t *resources;   /**< First element in the array of resources */
     size_t resources_len;               /**< Length of array */
     /**
      * @brief   Transport type for the listener
