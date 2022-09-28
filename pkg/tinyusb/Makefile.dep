@@ -55,6 +55,13 @@ ifneq (,$(filter tinyusb_class_video,$(USEMODULE)))
   FEATURES_REQUIRED += tinyusb_device
 endif
 
+# tinyUSB hardware driver selection
+ifneq (,$(filter esp32s2 esp32s3,$(CPU_FAM)))
+  USEMODULE += tinyusb_portable_espressif
+else
+  $(error CPU family not supported)
+endif
+
 # other module dependencies
 USEMODULE += periph_usbdev_clk
 USEMODULE += sema

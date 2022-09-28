@@ -6,6 +6,14 @@ INCLUDES += -I$(PKGDIRBASE)/tinyusb/src
 CFLAGS += -DCFG_TUSB_OS=OPT_OS_CUSTOM
 CFLAGS += -Wno-format-nonliteral
 
+ifeq (esp32s2,$(CPU_FAM))
+  CFLAGS += -DCFG_TUSB_MCU=OPT_MCU_ESP32S2
+else ifeq (esp32s3,$(CPU_FAM))
+  CFLAGS += -DCFG_TUSB_MCU=OPT_MCU_ESP32S3
+else
+  $(error CPU family not supported)
+endif
+
 ifneq (,$(filter tinyusb_class_net_ecm_rndis,$(USEMODULE)))
   INCLUDES += -I$(PKGDIRBASE)/tinyusb/lib/networking
 endif

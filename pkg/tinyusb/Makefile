@@ -67,3 +67,6 @@ tinyusb_device:
 
 tinyusb_host:
 	$(QQ)"$(MAKE)" -C $(PSRC)/host -f $(RIOTBASE)/Makefile.base MODULE=$@
+
+tinyusb_portable_espressif:
+	$(QQ)"$(MAKE)" -C $(PSRC)/portable/espressif/esp32sx -f $(RIOTBASE)/Makefile.base MODULE=$@
