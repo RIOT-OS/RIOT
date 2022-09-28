@@ -182,15 +182,19 @@ static void *printer(void *arg)
         do {
             c = (int)ringbuffer_get_one(&(ctx[dev].rx_buf));
             if (c == '\n') {
-                puts("]\\n");
+                printf("\\n");
+            }
+            else if (c == '\r') {
+                printf("\\r");
             }
             else if (c >= ' ' && c <= '~') {
                 printf("%c", c);
             }
             else {
-                printf("0x%02x", (unsigned char)c);
+                printf("\\x%02x", (unsigned char)c);
             }
         } while (c != '\n');
+        printf("]\n");
     }
 
     /* this should never be reached */
