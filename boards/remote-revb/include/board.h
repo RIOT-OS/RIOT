@@ -23,6 +23,7 @@
 #define BOARD_H
 
 #include "cpu.h"
+#include "mtd.h"
 #include "board_common.h"
 
 #ifdef __cplusplus
@@ -121,6 +122,12 @@
 #define SDCARD_SPI_PARAM_POWER     GPIO_PIN(0, 6)
 #define SDCARD_SPI_PARAM_POWER_AH  false
 /** @} */
+
+/** Default MTD device */
+#define MTD_0 mtd0
+
+/** mtd flash emulation device */
+extern mtd_dev_t *mtd0;
 
 #ifdef __cplusplus
 } /* end extern "C" */
