@@ -66,6 +66,8 @@ static char printer_stack[THREAD_STACKSIZE_MAIN];
 
 static bool test_mode;
 
+static char *endline = "\n";
+
 #ifdef MODULE_PERIPH_UART_MODECFG
 static uart_data_bits_t data_bits_lut[] = { UART_DATA_BITS_5, UART_DATA_BITS_6,
                                             UART_DATA_BITS_7, UART_DATA_BITS_8 };
@@ -204,6 +206,30 @@ static void sleep_test(int num, uart_t uart)
     puts("[OK]");
 }
 
+static int cmd_eol_cr(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+    endline = "\r";
+    return 0;
+}
+
+static int cmd_eol_lf(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+    endline = "\n";
+    return 0;
+}
+
+static int cmd_eol_crlf(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+    endline = "\r\n";
+    return 0;
+}
+
 static int cmd_init(int argc, char **argv)
 {
     int dev, res;
@@ -310,7 +336,6 @@ static int cmd_mode(int argc, char **argv)
 static int cmd_send(int argc, char **argv)
 {
     int dev;
-    uint8_t endline = (uint8_t)'\n';
 
     if (argc < 3) {
         printf("usage: %s <dev> <data (string)>\n", argv[0]);
@@ -324,7 +349,7 @@ static int cmd_send(int argc, char **argv)
 
     printf("UART_DEV(%i) TX: %s\n", dev, argv[2]);
     uart_write(UART_DEV(dev), (uint8_t *)argv[2], strlen(argv[2]));
-    uart_write(UART_DEV(dev), &endline, 1);
+    uart_write(UART_DEV(dev), (uint8_t *)endline, strlen(endline));
     return 0;
 }
 
@@ -357,6 +382,9 @@ static int cmd_test(int argc, char **argv)
 }
 
 static const shell_command_t shell_commands[] = {
+    { "eol_cr", "Set CR as the end-of-line for send", cmd_eol_cr },
+    { "eol_crlf", "Set CRLF as the end-of-line for send", cmd_eol_crlf },
+    { "eol_lf", "Set LF as the end-of-line for send (default)", cmd_eol_lf },
     { "init", "Initialize a UART device with a given baudrate", cmd_init },
 #ifdef MODULE_PERIPH_UART_MODECFG
     { "mode", "Setup data bits, stop bits and parity for a given UART device", cmd_mode },
