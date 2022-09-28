@@ -43,4 +43,5 @@ FEATURES_PROVIDED += arduino
 
 ifneq (,$(filter esp32s2-devkitc-%,$(BOARD_VERSION)))
   FEATURES_PROVIDED += periph_usbdev
+  FEATURES_PROVIDED += tinyusb_device
 endif

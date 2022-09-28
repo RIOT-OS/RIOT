@@ -39,3 +39,4 @@ FEATURES_PROVIDED += esp_jtag
 
 FEATURES_PROVIDED += arduino
 FEATURES_PROVIDED += periph_usbdev
+FEATURES_PROVIDED += tinyusb_device
