@@ -10,3 +10,14 @@ must be sent to this port.
 
 Since DTLS has higher memory and and ROM requirements, more boards are blacklisted
 for this example compared to the non-DTLS gcoap example.
+
+### CoAP query with DTLS enabled
+
+With DTLS enabled the server can be queried
+using the default DTLS pre-shared key from the `tinydtls_keys.h` file.
+
+    ./coap-client coaps://[fe80::1843:8eff:fe40:4eaa%tap0]/.well-known/core -k "secretPSK" -u "Client_identity"
+
+Example response:
+
+    </cli/stats>;ct=0;rt="count";obs,</riot/board>
