@@ -339,12 +339,12 @@ static const i2c_conf_t i2c_config[] = {
 
 static const adc_conf_chan_t adc_channels[] = {
     /* port, pin, muxpos */
-    {GPIO_PIN(PB, 0), ADC_INPUTCTRL_MUXPOS_PIN8},      /* EXT1, pin 3 */
-    {GPIO_PIN(PB, 1), ADC_INPUTCTRL_MUXPOS_PIN9},      /* EXT1, pin 4 */
-    {GPIO_PIN(PA, 10), ADC_INPUTCTRL_MUXPOS_PIN18},    /* EXT2, pin 3 */
-    {GPIO_PIN(PA, 11), ADC_INPUTCTRL_MUXPOS_PIN19},    /* EXT2, pin 4 */
-    {GPIO_PIN(PA, 2), ADC_INPUTCTRL_MUXPOS_PIN0},      /* EXT3, pin 3 */
-    {GPIO_PIN(PA, 3), ADC_INPUTCTRL_MUXPOS_PIN1}       /* EXT3, pin 4. This is
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PB00 },      /* EXT1, pin 3 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PB01 },      /* EXT1, pin 4 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA10 },    /* EXT2, pin 3 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA11 },    /* EXT2, pin 4 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA02 },      /* EXT3, pin 3 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA03 }       /* EXT3, pin 4. This is
                         disconnected by default. PA3 is connected to USB_ID.
                         Move PA03 SELECT jumper to EXT3 to connect. */
 };
