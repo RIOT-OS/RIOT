@@ -5,8 +5,19 @@
 # and / or
 #export APPS="examples/hello-world tests/unittests"
 
-#
-: ${TEST_BOARDS_AVAILABLE:="esp32-wroom-32 samr21-xpro"}
+# this configures boards that are available via pifleet
+case "${CI_MURDOCK_PROJECT}" in
+    riot)
+        : ${TEST_BOARDS_AVAILABLE:="esp32-wroom-32 samr21-xpro"}
+        ;;
+    riot-staging)
+        : ${TEST_BOARDS_AVAILABLE:=""}
+        ;;
+    *)
+        : ${TEST_BOARDS_AVAILABLE:=""}
+        ;;
+esac
+
 #: ${EMULATED_BOARDS_AVAILABLE:="microbit"}
 
 # temporarily disabling llvm builds until https://github.com/RIOT-OS/RIOT/pull/15595
@@ -166,7 +177,8 @@ export OPTIONAL_CFLAGS_BLACKLIST="-gz"
 
 DWQ_ENV="-E BOARDS -E APPS -E NIGHTLY -E RUN_TESTS -E ENABLE_TEST_CACHE
          -E TEST_HASH -E CI_PULL_LABELS -ECI_BASE_BRANCH -ECI_BASE_COMMIT
-         -EPKG_USE_MIRROR -EAPPS_CHANGED -EBOARDS_CHANGED -ESTATIC_TESTS"
+         -EPKG_USE_MIRROR -EAPPS_CHANGED -EBOARDS_CHANGED -ESTATIC_TESTS
+         -E CI_MURDOCK_PROJECT"
 
 if [ ${NIGHTLY} -eq 1 ]; then
     export PKG_USE_MIRROR=0
