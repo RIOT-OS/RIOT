@@ -298,3 +298,22 @@ int nanotest_client_put_cmd(int argc, char **argv)
     nanocoap_block_request_done(&ctx);
     return res;
 }
+
+int nanotest_client_put_non_cmd(int argc, char **argv)
+{
+    int res;
+
+    if (argc < 3) {
+        printf("usage: %s <url> <data>\n", argv[0]);
+        return 1;
+    }
+
+    nanocoap_sock_t sock;
+    nanocoap_sock_url_connect(argv[1], &sock);
+
+    res = nanocoap_sock_put_non(&sock, sock_urlpath(argv[1]), argv[2], strlen(argv[2]),
+                                NULL, 0);
+    nanocoap_sock_close(&sock);
+
+    return res;
+}
