@@ -97,6 +97,10 @@ static inline void cortexm_init_fpu(void)
 #if (defined(CPU_CORE_CORTEX_M33) || defined(CPU_CORE_CORTEX_M4F) || defined(CPU_CORE_CORTEX_M7)) && defined(MODULE_CORTEXM_FPU)
     /* give full access to the FPU */
     SCB->CPACR |= (uint32_t)CORTEXM_SCB_CPACR_FPU_ACCESS_FULL;
+    /* Disable hardware backup of FPU registers. As a result, the FPU must not
+     * be used in ISRs. During context switch registers are saved and restored
+     * in software, so threads can safely use the FPU. */
+    FPU->FPCCR = 0x0;
 #endif
 }
 
