@@ -1,7 +1,8 @@
 push:
   branches:
+    # these two enable potential bors support:
     - staging
-    - testing
+    - trying
 
 pr:
   enable_comments: true
