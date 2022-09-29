@@ -317,12 +317,18 @@ typedef struct vfs_mount_struct vfs_mount_t;
 extern const vfs_file_ops_t mtd_vfs_ops;
 
 /**
+ * @brief   File system always wants the full VFS path
+ */
+#define VFS_FS_FLAG_WANT_ABS_PATH   (1 << 0)
+
+/**
  * @brief A file system driver
  */
 typedef struct {
     const vfs_file_ops_t *f_op;         /**< File operations table */
     const vfs_dir_ops_t *d_op;          /**< Directory operations table */
     const vfs_file_system_ops_t *fs_op; /**< File system operations table */
+    const uint32_t flags;               /**< File system flags */
 } vfs_file_system_t;
 
 /**
