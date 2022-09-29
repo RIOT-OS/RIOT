@@ -95,6 +95,7 @@ const char* (*real_gai_strerror)(int errcode);
 FILE* (*real_fopen)(const char *path, const char *mode);
 int (*real_fclose)(FILE *stream);
 int (*real_fseek)(FILE *stream, long offset, int whence);
+long (*real_ftell)(FILE *stream);
 int (*real_fputc)(int c, FILE *stream);
 int (*real_fgetc)(FILE *stream);
 mode_t (*real_umask)(mode_t cmask);
@@ -540,6 +541,7 @@ void _native_init_syscalls(void)
     *(void **)(&real_send) = dlsym(RTLD_NEXT, "send");
     *(void **)(&real_fclose) = dlsym(RTLD_NEXT, "fclose");
     *(void **)(&real_fseek) = dlsym(RTLD_NEXT, "fseek");
+    *(void **)(&real_ftell) = dlsym(RTLD_NEXT, "ftell");
     *(void **)(&real_fputc) = dlsym(RTLD_NEXT, "fputc");
     *(void **)(&real_fgetc) = dlsym(RTLD_NEXT, "fgetc");
 #ifdef __MACH__
