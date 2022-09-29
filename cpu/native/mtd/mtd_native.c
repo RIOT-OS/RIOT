@@ -47,6 +47,10 @@ static int _init(mtd_dev_t *dev)
         for (size_t i = 0; i < size; i++) {
             real_fputc(0xff, f);
         }
+    } else {
+        real_fseek(f, 0, SEEK_END);
+        size_t size = real_ftell(f);
+        dev->sector_count = size / (dev->pages_per_sector * dev->page_size);
     }
 
     real_fclose(f);
