@@ -701,8 +701,8 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         }
         /* UINT16_MAX * 60 * 1000 < UINT32_MAX so there are no overflows */
         next_timeout = _min(next_timeout,
-                            byteorder_ntohs(abro->ltime) * SEC_PER_MIN *
-                            MS_PER_SEC);
+                            MS_PER_SEC * SEC_PER_MIN *
+                            gnrc_sixlowpan_nd_opt_get_ltime(abro));
     }
 #if !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)
     else if (gnrc_netif_is_6lr(netif)) {
