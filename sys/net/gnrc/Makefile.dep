@@ -41,6 +41,11 @@ ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
   USEMODULE += crypto_aes_128
 endif
 
+ifneq (,$(filter gnrc_lorawan_1_1,$(USEMODULE)))
+  USEMODULE += gnrc_lorawan
+  FEATURES_REQUIRED += periph_flashpage
+endif
+
 ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
   # enable default network devices on the platform
   USEMODULE += netdev_default
@@ -78,7 +83,7 @@ ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
-ifneq (,$(filter gnrc_%,$(filter-out gnrc_lorawan gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pkt%,$(USEMODULE))))
+ifneq (,$(filter gnrc_%,$(filter-out gnrc_lorawan gnrc_lorawan_1_1 gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pkt%,$(USEMODULE))))
   USEMODULE += gnrc
 endif
 

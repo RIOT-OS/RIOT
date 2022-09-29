@@ -217,13 +217,21 @@ static void _set_usage(char *cmd_name)
          "       * \"bw\" - alias for channel bandwidth\n"
          "       * \"sf\" - alias for spreading factor\n"
          "       * \"cr\" - alias for coding rate\n"
-         "       * \"appeui\" - sets Application EUI\n"
          "       * \"appkey\" - sets Application key\n"
          "       * \"appskey\" - sets Application session key\n"
+#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+         "       * \"joineui\" - sets Join EUI\n"
+         "       * \"nwkkey\"  - sets Network key\n"
+         "       * \"nwksenckey\" - sets Network session encryption key\n"
+         "       * \"snwksintkey\" - sets Serving network session integrity key\n"
+         "       * \"fnwksintkey\" - sets Forwarding network session integrity key\n"
+#else
+         "       * \"appeui\" - sets Application EUI\n"
+         "       * \"nwkskey\" - sets Network Session Key\n"
+#endif
          "       * \"deveui\" - sets Device EUI\n"
          "       * \"dr\" - sets datarate\n"
          "       * \"rx2_dr\" - sets datarate of RX2 (lorawan)\n"
-         "       * \"nwkskey\" - sets Network Session Key\n"
 #endif
 #ifdef MODULE_NETDEV_IEEE802154_MULTIMODE
          "       * \"phy_mode\" - select PHY mode\n"
@@ -300,13 +308,34 @@ static void _print_netopt(netopt_t opt)
             printf("AppSKey");
             break;
 
-        case NETOPT_LORAWAN_NWKSKEY:
-            printf("NwkSKey");
+#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+        case NETOPT_LORAWAN_JOINEUI:
+            printf("JoinEUI");
             break;
 
+        case NETOPT_LORAWAN_NWKKEY:
+            printf("NwkKey");
+            break;
+
+        case NETOPT_LORAWAN_NWKSENCKEY:
+            printf("NwkSEncKey");
+            break;
+
+        case NETOPT_LORAWAN_SNWKSINTKEY:
+            printf("SNwkSIntKey");
+            break;
+
+        case NETOPT_LORAWAN_FNWKSINTKEY:
+            printf("FNwkSIntKey");
+            break;
+#else
         case NETOPT_LORAWAN_APPEUI:
             printf("AppEUI");
             break;
+        case NETOPT_LORAWAN_NWKSKEY:
+            printf("NwkSKey");
+            break;
+#endif /* IS_USED(MODULE_GNRC_LORAWAN_1_1) */
 
         case NETOPT_SRC_LEN:
             printf("source address length");
@@ -1228,6 +1257,10 @@ static int _netif_set_lw_key(netif_t *iface, netopt_t opt, char *key_str)
         case NETOPT_LORAWAN_APPKEY:
         case NETOPT_LORAWAN_APPSKEY:
         case NETOPT_LORAWAN_NWKSKEY:
+        case NETOPT_LORAWAN_NWKKEY:
+        case NETOPT_LORAWAN_SNWKSINTKEY:
+        case NETOPT_LORAWAN_FNWKSINTKEY:
+        case NETOPT_LORAWAN_NWKSENCKEY:
             /* All keys have the same length as the APP KEY */
             expected_len = LORAMAC_APPKEY_LEN;
             break;
@@ -1472,8 +1505,32 @@ static int _netif_set(char *cmd_name, netif_t *iface, char *key, char *value)
     else if ((strcmp("coding_rate", key) == 0) || (strcmp("cr", key) == 0)) {
         return _netif_set_coding_rate(iface, value);
     }
+#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+    else if (strcmp("joineui", key) == 0) {
+        return _netif_set_lw_key(iface, NETOPT_LORAWAN_JOINEUI, value);
+    }
+    else if (strcmp("fnwksintkey", key) == 0) {
+        return _netif_set_lw_key(iface, NETOPT_LORAWAN_FNWKSINTKEY, value);
+    }
+    else if (strcmp("snwksintkey", key) == 0) {
+        return _netif_set_lw_key(iface, NETOPT_LORAWAN_SNWKSINTKEY, value);
+    }
+    else if (strcmp("nwksenckey", key) == 0) {
+        return _netif_set_lw_key(iface, NETOPT_LORAWAN_NWKSENCKEY, value);
+    }
+    else if (strcmp("nwkkey", key) == 0) {
+        return _netif_set_lw_key(iface, NETOPT_LORAWAN_NWKKEY, value);
+    }
+#else
     else if (strcmp("appeui", key) == 0) {
         return _netif_set_lw_key(iface, NETOPT_LORAWAN_APPEUI, value);
+    }
+    else if (strcmp("nwkskey", key) == 0) {
+        return _netif_set_addr(iface, NETOPT_LORAWAN_NWKSKEY, value);
+    }
+#endif /* IS_USED(MODULE_GNRC_LORAWAN_1_1) */
+    else if (strcmp("appskey", key) == 0) {
+        return _netif_set_addr(iface, NETOPT_LORAWAN_APPSKEY, value);
     }
     else if (strcmp("appkey", key) == 0) {
         return _netif_set_lw_key(iface, NETOPT_LORAWAN_APPKEY, value);
@@ -1481,12 +1538,7 @@ static int _netif_set(char *cmd_name, netif_t *iface, char *key, char *value)
     else if (strcmp("deveui", key) == 0) {
         return _netif_set_addr(iface, NETOPT_ADDRESS_LONG, value);
     }
-    else if (strcmp("appskey", key) == 0) {
-        return _netif_set_addr(iface, NETOPT_LORAWAN_APPSKEY, value);
-    }
-    else if (strcmp("nwkskey", key) == 0) {
-        return _netif_set_addr(iface, NETOPT_LORAWAN_NWKSKEY, value);
-    }
+
     else if (strcmp("dr", key) == 0) {
         return _netif_set_u8(iface, NETOPT_LORAWAN_DR, 0, value);
     }

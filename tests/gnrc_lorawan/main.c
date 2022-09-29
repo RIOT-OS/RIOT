@@ -70,7 +70,12 @@ static void test_gnrc_lorawan__validate_mic(void)
     /* Uplink packet */
     le_uint32_t calc_mic;
 
-    gnrc_lorawan_calculate_mic(&dev_addr, fcnt, 0, &pkt, nwkskey, &calc_mic);
+    gnrc_lorawan_t mac = {0};
+    memcpy(&mac.dev_addr, &dev_addr, sizeof(dev_addr));
+    mac.ctx.fnwksintkey = nwkskey;
+    mac.mcps.fcnt = fcnt;
+
+    gnrc_lorawan_calculate_mic_uplink(&pkt, 0x00, &mac, &calc_mic);
 
     TEST_ASSERT(memcmp(&calc_mic, mic, sizeof(le_uint32_t)) == 0);
 }
@@ -84,7 +89,12 @@ static void test_gnrc_lorawan__wrong_mic(void)
     /* Uplink packet */
     le_uint32_t calc_mic;
 
-    gnrc_lorawan_calculate_mic(&dev_addr, fcnt, 0, &pkt, nwkskey, &calc_mic);
+    gnrc_lorawan_t mac = {0};
+    memcpy(&mac.dev_addr, &dev_addr, sizeof(dev_addr));
+    mac.ctx.fnwksintkey = nwkskey;
+    mac.mcps.fcnt = fcnt;
+
+    gnrc_lorawan_calculate_mic_uplink(&pkt, 0x00, &mac, &calc_mic);
 
     TEST_ASSERT(memcmp(&calc_mic, mic, sizeof(le_uint32_t)) != 0);
 }
