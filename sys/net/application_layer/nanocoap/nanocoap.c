@@ -529,7 +529,7 @@ ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, uint8_t *token, size_t to
     assert(!(token_len & ~0x1f));
 
     memset(hdr, 0, sizeof(coap_hdr_t));
-    hdr->ver_t_tkl = (0x1 << 6) | (type << 4) | token_len;
+    hdr->ver_t_tkl = (COAP_V1 << 6) | (type << 4) | token_len;
     hdr->code = code;
     hdr->id = htons(id);
 
