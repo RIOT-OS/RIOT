@@ -31,6 +31,8 @@ extern "C" {
  */
 #define COAP_PORT               (5683)
 
+#define COAP_V1                 (1)     /**< Identifier for CoAP version 1 (RFC 7252) */
+
 /**
  * @name    CoAP option numbers
  * @{
