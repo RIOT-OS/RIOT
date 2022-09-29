@@ -1,17 +1,17 @@
 # default board version if not defined
-BOARD_VERSION ?= esp32s2-devkitm-1
+BOARD_VERSION ?= esp32s2-devkitc-1
 
 ifeq (esp32s2-devkitm-1,$(BOARD_VERSION))
   CPU_MODEL = esp32s2_mini_1x_n4
 else ifeq (esp32s2-devkitm-1u,$(BOARD_VERSION))
   CPU_MODEL = esp32s2_mini_1x_n4
 else ifeq (esp32s2-devkitm-1r,$(BOARD_VERSION))
-  CPU_MODEL = esp32s2_mini-1x_n4r2
+  CPU_MODEL = esp32s2_mini_1x_n4r2
 else ifeq (esp32s2-devkitm-1ru,$(BOARD_VERSION))
-  CPU_MODEL = esp32s2_mini-1x_n4r2
-else ifeq (esp32s2-devkitc_1,$(BOARD_VERSION))
+  CPU_MODEL = esp32s2_mini_1x_n4r2
+else ifeq (esp32s2-devkitc-1,$(BOARD_VERSION))
   CPU_MODEL = esp32s2_solo_n4
-else ifeq (esp32s2-devkitc_1u,$(BOARD_VERSION))
+else ifeq (esp32s2-devkitc-1u,$(BOARD_VERSION))
   CPU_MODEL = esp32s2_solo_n4
 else ifeq (esp32s2-devkitc-1r,$(BOARD_VERSION))
   CPU_MODEL = esp32s2_solo_n4r2
@@ -40,3 +40,7 @@ FEATURES_PROVIDED += periph_pwm
 FEATURES_PROVIDED += periph_spi
 
 FEATURES_PROVIDED += arduino
+
+ifneq (,$(filter esp32s2-devkitc-%,$(BOARD_VERSION)))
+  FEATURES_PROVIDED += periph_usbdev
+endif

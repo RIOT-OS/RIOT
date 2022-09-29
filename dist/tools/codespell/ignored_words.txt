@@ -137,3 +137,6 @@ clen
 
 # RO (read only) => to, row, rob, rod, roe, rot
 ro
+
+# Synopsys (vendor name) => Synopsis
+synopsys

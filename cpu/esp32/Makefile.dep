@@ -157,6 +157,12 @@ ifneq (,$(filter periph_rtt,$(USEMODULE)))
   USEMODULE += periph_rtt_hw_rtc
 endif
 
+ifneq (,$(filter periph_usbdev,$(USEMODULE)))
+  USEMODULE += esp_idf_usb
+  USEMODULE += usbdev_synopsys_dwc2
+  USEMODULE += ztimer_msec
+endif
+
 ifneq (,$(filter shell,$(USEMODULE)))
   USEMODULE += ps
 endif

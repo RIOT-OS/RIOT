@@ -212,12 +212,68 @@ extern "C" {
  * UART_DEV(2) | RxD  | -      |`UART2_RXD` | optional, can be overridden (no direct I/O)
  *
  * </center><br>
- *
  */
 
-#ifdef MODULE_PERIPH_CAN
-#include "can_esp.h"
+/**
+ * @name   USB device configuration
+ *
+ * ESP32x SoCs have:
+ * - a bidirectional control endpoint EP0 IN and EP0 OUT
+ * - six additional endpoints EP1 .. EP6 that can be configured as IN our OUT
+ * - a maximum of five IN endpoints concurrently active at any time (including EP0 IN)
+ * - all OUT endpoints share a single RX FIFO
+ * - each IN endpoint has a dedicated TX FIFO
+ *
+ * To avoid a lot of special case handling, the maximum number of IN an OUT
+ * endpoints including the control endpoint EP0 is 5.
+ *
+ * @{
+ */
+
+/**
+ * @brief   Enable the USB OTG FS peripheral
+ *
+ * At the moment, only FS is supported on ESP32x SoCs.
+ */
+#define DWC2_USB_OTG_FS_ENABLED         1
+
+/**
+ * @brief   Number of USB OTG FS IN endpoints including the control endpoint
+ */
+#define DWC2_USB_OTG_FS_NUM_EP          (5)
+
+/**
+ * @brief   Number of USB OTG HS OUT endpoints including the control endpoint
+ */
+#define DWC2_USB_OTG_HS_NUM_EP          (5)
+
+/**
+ * @brief   Size of the FIFO shared by all USB OTG FS OUT endpoints
+ */
+#ifndef DWC2_USB_OTG_FS_RX_FIFO_SIZE
+#define DWC2_USB_OTG_FS_RX_FIFO_SIZE    (128U)
 #endif
+
+/**
+ * @brief   Size of the FIFO shared by all USB OTG HS OUT endpoints
+ */
+#ifndef DWC2_USB_OTG_HS_RX_FIFO_SIZE
+#define DWC2_USB_OTG_HS_RX_FIFO_SIZE    (512U)
+#endif
+
+/**
+ * @brief   Total size of the FIFO
+ */
+#ifndef DWC2_USB_OTG_FS_TOTAL_FIFO_SIZE
+#define DWC2_USB_OTG_FS_TOTAL_FIFO_SIZE (1024U)
+#endif
+
+/**
+ * @brief   Buffers have to be word aligned for DMA
+ */
+#define USBDEV_CPU_DMA_ALIGNMENT        (4)
+/** @} */
+
 
 #ifdef __cplusplus
 }

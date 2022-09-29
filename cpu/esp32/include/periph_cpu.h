@@ -811,7 +811,21 @@ typedef struct {
 /**
  * @brief   Maximum number of UART interfaces
  */
-#define UART_NUMOF_MAX  (SOC_UART_NUM)
+#define UART_NUMOF_MAX      (SOC_UART_NUM)
+/** @} */
+
+/**
+ * @name   USB device configuration
+ * @{
+ *
+ * ESP32x SoCs integrate depending on the specific ESP32x SoC variant (family) an USB OTG FS controller based on the Synopsys DWC2 IP core.
+ */
+#include "usbdev_synopsys_dwc2.h"
+
+/**
+ * @brief   Maximum number of USB OTG FS interfaces
+ */
+#define USBDEV_NUMOF_MAX    (SOC_USB_PERIPH_NUM)
 /** @} */
 
 #ifdef __cplusplus

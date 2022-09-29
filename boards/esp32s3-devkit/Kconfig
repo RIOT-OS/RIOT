@@ -43,6 +43,7 @@ config BOARD_ESP32S3_DEVKIT
     select HAS_PERIPH_I2C
     select HAS_PERIPH_PWM
     select HAS_PERIPH_SPI
+    select HAS_PERIPH_USBDEV
 
     choice
         bool "ESP32-S3-DevKit board version"

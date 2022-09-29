@@ -53,8 +53,6 @@ endif
 ifneq (,$(filter periph_usbdev,$(USEMODULE)))
   ifeq (wb,$(CPU_FAM))
     SRC += usbdev_fs.c
-  else
-    SRC += usbdev_otg.c
   endif
 endif
 

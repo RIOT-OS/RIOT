@@ -38,3 +38,4 @@ FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += esp_jtag
 
 FEATURES_PROVIDED += arduino
+FEATURES_PROVIDED += periph_usbdev

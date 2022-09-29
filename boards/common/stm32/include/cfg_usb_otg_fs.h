@@ -20,6 +20,7 @@
 #define CFG_USB_OTG_FS_H
 
 #include "periph_cpu.h"
+#include "usbdev_synopsys_dwc2.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,18 +29,17 @@ extern "C" {
 /**
  * @brief Enable the full speed USB OTG peripheral
  */
-#define STM32_USB_OTG_FS_ENABLED
+#define DWC2_USB_OTG_FS_ENABLED
 
 /**
- * @name common USB OTG FS configuration
- * @{
+ * @brief Common USB OTG FS configuration
  */
-static const stm32_usb_otg_fshs_config_t stm32_usb_otg_fshs_config[] = {
+static const dwc2_usb_otg_fshs_config_t dwc2_usb_otg_fshs_config[] = {
     {
         .periph   = USB_OTG_FS_PERIPH_BASE,
+        .type     = DWC2_USB_OTG_FS,
+        .phy      = DWC2_USB_OTG_PHY_BUILTIN,
         .rcc_mask = RCC_AHB2ENR_OTGFSEN,
-        .phy      = STM32_USB_OTG_PHY_BUILTIN,
-        .type     = STM32_USB_OTG_FS,
         .irqn     = OTG_FS_IRQn,
         .ahb      = AHB2,
         .dm       = GPIO_PIN(PORT_A, 11),
@@ -47,12 +47,11 @@ static const stm32_usb_otg_fshs_config_t stm32_usb_otg_fshs_config[] = {
         .af       = GPIO_AF10,
     }
 };
-/** @} */
 
 /**
  * @brief Number of available USB OTG peripherals
  */
-#define USBDEV_NUMOF           ARRAY_SIZE(stm32_usb_otg_fshs_config)
+#define USBDEV_NUMOF           ARRAY_SIZE(dwc2_usb_otg_fshs_config)
 
 #ifdef __cplusplus
 }
