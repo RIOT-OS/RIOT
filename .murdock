@@ -407,7 +407,9 @@ get_app_board_toolchain_pairs() {
 # use dwqc to create full "appdir board toolchain" compile job list
 get_compile_jobs() {
     check_label "CI: skip compile test" && return
-    update_changed_modules || return
+    #update_changed_modules || return
+    BOARDS_CHANGED="samr21-xpro esp32-wroom-32"
+    APPS_CHANGED="examples/hello-world"
 
     get_apps | \
         maybe_filter_changed_apps | \
