@@ -39,11 +39,11 @@ static int constfs_statvfs(vfs_mount_t *mountp, const char *restrict path, struc
 /* File operations */
 static int constfs_fstat(vfs_file_t *filp, struct stat *buf);
 static off_t constfs_lseek(vfs_file_t *filp, off_t off, int whence);
-static int constfs_open(vfs_file_t *filp, const char *name, int flags, mode_t mode, const char *abs_path);
+static int constfs_open(vfs_file_t *filp, const char *name, int flags, mode_t mode);
 static ssize_t constfs_read(vfs_file_t *filp, void *dest, size_t nbytes);
 
 /* Directory operations */
-static int constfs_opendir(vfs_DIR *dirp, const char *dirname, const char *abs_path);
+static int constfs_opendir(vfs_DIR *dirp, const char *dirname);
 static int constfs_readdir(vfs_DIR *dirp, vfs_dirent_t *entry);
 
 static const vfs_file_system_ops_t constfs_fs_ops = {
@@ -162,12 +162,11 @@ static off_t constfs_lseek(vfs_file_t *filp, off_t off, int whence)
     return off;
 }
 
-static int constfs_open(vfs_file_t *filp, const char *name, int flags, mode_t mode, const char *abs_path)
+static int constfs_open(vfs_file_t *filp, const char *name, int flags, mode_t mode)
 {
     (void) mode;
-    (void) abs_path;
     constfs_t *fs = filp->mp->private_data;
-    DEBUG("constfs_open: %p, \"%s\", 0x%x, 0%03lo, \"%s\"\n", (void *)filp, name, flags, (unsigned long)mode, abs_path);
+    DEBUG("constfs_open: %p, \"%s\", 0x%x, 0%03lo\"\n", (void *)filp, name, flags, (unsigned long)mode);
     /* We only support read access */
     if ((flags & O_ACCMODE) != O_RDONLY) {
         return -EROFS;
@@ -203,10 +202,9 @@ static ssize_t constfs_read(vfs_file_t *filp, void *dest, size_t nbytes)
     return nbytes;
 }
 
-static int constfs_opendir(vfs_DIR *dirp, const char *dirname, const char *abs_path)
+static int constfs_opendir(vfs_DIR *dirp, const char *dirname)
 {
-    (void) abs_path;
-    DEBUG("constfs_opendir: %p, \"%s\", \"%s\"\n", (void *)dirp, dirname, abs_path);
+    DEBUG("constfs_opendir: %p, \"%s\"\n", (void *)dirp, dirname);
     if (strncmp(dirname, "/", 2) != 0) {
         /* We keep it simple and only support a flat file system, only a root directory */
         return -ENOENT;

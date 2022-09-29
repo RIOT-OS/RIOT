@@ -291,11 +291,10 @@ static inline lfs_file_t * _get_lfs_file(vfs_file_t *f)
     return (lfs_file_t *)(uintptr_t)f->private_data.buffer;
 }
 
-static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode, const char *abs_path)
+static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode)
 {
     littlefs2_desc_t *fs = filp->mp->private_data;
     lfs_file_t *fp = _get_lfs_file(filp);
-    (void) abs_path;
     (void) mode;
 
     mutex_lock(&fs->lock);
@@ -325,7 +324,7 @@ static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode, con
         l_flags |= LFS_O_EXCL;
     }
 
-    DEBUG("littlefs: open: %s (abs_path: %s), flags: 0x%x\n", name, abs_path, (int) l_flags);
+    DEBUG("littlefs: open: %s, flags: 0x%x\n", name, (int) l_flags);
 
     int ret = lfs_file_open(&fs->fs, fp, name, l_flags);
     mutex_unlock(&fs->lock);
@@ -482,16 +481,15 @@ static inline lfs_dir_t * _get_lfs_dir(vfs_DIR *dirp)
     return (lfs_dir_t *)(uintptr_t)dirp->private_data.buffer;
 }
 
-static int _opendir(vfs_DIR *dirp, const char *dirname, const char *abs_path)
+static int _opendir(vfs_DIR *dirp, const char *dirname)
 {
-    (void)abs_path;
     littlefs2_desc_t *fs = dirp->mp->private_data;
     lfs_dir_t *dir = _get_lfs_dir(dirp);
 
     mutex_lock(&fs->lock);
 
-    DEBUG("littlefs: opendir: dirp=%p, dirname=%s (abs_path=%s)\n",
-          (void *)dirp, dirname, abs_path);
+    DEBUG("littlefs: opendir: dirp=%p, dirname=%s\n",
+          (void *)dirp, dirname);
 
     int ret = lfs_dir_open(&fs->fs, dir, dirname);
     mutex_unlock(&fs->lock);

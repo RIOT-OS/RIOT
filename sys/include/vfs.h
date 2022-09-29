@@ -476,12 +476,11 @@ struct vfs_file_ops {
      * @param[in]  name     null-terminated name of the file to open, relative to the file system root, including a leading slash
      * @param[in]  flags    flags for opening, see man 2 open, man 3p open
      * @param[in]  mode     mode for creating a new file, see man 2 open, man 3p open
-     * @param[in]  abs_path null-terminated name of the file to open, relative to the VFS root ("/")
      *
      * @return 0 on success
      * @return <0 on error
      */
-    int (*open) (vfs_file_t *filp, const char *name, int flags, mode_t mode, const char *abs_path);
+    int (*open) (vfs_file_t *filp, const char *name, int flags, mode_t mode);
 
     /**
      * @brief Read bytes from an open file
@@ -528,12 +527,11 @@ struct vfs_dir_ops {
      *
      * @param[in]  dirp     pointer to open directory
      * @param[in]  name     null-terminated name of the dir to open, relative to the file system root, including a leading slash
-     * @param[in]  abs_path null-terminated name of the dir to open, relative to the VFS root ("/")
      *
      * @return 0 on success
      * @return <0 on error
      */
-    int (*opendir) (vfs_DIR *dirp, const char *dirname, const char *abs_path);
+    int (*opendir) (vfs_DIR *dirp, const char *dirname);
 
     /**
      * @brief Read a single entry from the open directory dirp and advance the

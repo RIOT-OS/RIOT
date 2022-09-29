@@ -246,10 +246,9 @@ static int _statvfs(vfs_mount_t *mountp, const char *restrict path, struct statv
     return 0;
 }
 
-static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode, const char *abs_path)
+static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode)
 {
     spiffs_desc_t *fs_desc = filp->mp->private_data;
-    (void) abs_path;
     DEBUG("spiffs: open: private_data = %p\n", filp->mp->private_data);
 
     spiffs_flags s_flags = 0;
@@ -280,7 +279,7 @@ static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode, con
         s_flags |= SPIFFS_O_EXCL;
     }
 
-    DEBUG("spiffs: open: %s (abs_path: %s), flags: 0x%x, mode: %d\n", name, abs_path, (int) s_flags, (int) mode);
+    DEBUG("spiffs: open: %s, flags: 0x%x, mode: %d\n", name, (int) s_flags, (int) mode);
 
     s32_t ret = SPIFFS_open(&fs_desc->fs, name, s_flags, mode);
     if (ret >= 0) {
@@ -368,11 +367,10 @@ static spiffs_DIR * _get_spifs_dir(vfs_DIR *dirp)
     return (spiffs_DIR *)(uintptr_t)&dirp->private_data.buffer[0];
 }
 
-static int _opendir(vfs_DIR *dirp, const char *dirname, const char *abs_path)
+static int _opendir(vfs_DIR *dirp, const char *dirname)
 {
     spiffs_desc_t *fs_desc = dirp->mp->private_data;
     spiffs_DIR *d = _get_spifs_dir(dirp);
-    (void) abs_path;
 
     spiffs_DIR *res = SPIFFS_opendir(&fs_desc->fs, dirname, d);
     if (res == NULL) {
