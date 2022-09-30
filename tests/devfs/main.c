@@ -25,7 +25,7 @@
 
 #include "embUnit.h"
 
-static int _mock_open(vfs_file_t *filp, const char *name, int flags, mode_t mode, const char *abs_path);
+static int _mock_open(vfs_file_t *filp, const char *name, int flags, mode_t mode);
 static ssize_t _mock_read(vfs_file_t *filp, void *dest, size_t nbytes);
 static ssize_t _mock_write(vfs_file_t *filp, const void *src, size_t nbytes);
 
@@ -55,12 +55,11 @@ static vfs_mount_t _test_devfs_mount = {
     .private_data = &_mock_private_data,
 };
 
-static int _mock_open(vfs_file_t *filp, const char *name, int flags, mode_t mode, const char *abs_path)
+static int _mock_open(vfs_file_t *filp, const char *name, int flags, mode_t mode)
 {
     (void) name;
     (void) flags;
     (void) mode;
-    (void) abs_path;
     if (filp->private_data.ptr != &_mock_private_data_tag) {
         return -4321;
     }

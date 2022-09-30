@@ -298,7 +298,7 @@ int vfs_open(const char *name, int flags, mode_t mode)
     }
     vfs_file_t *filp = &_vfs_open_files[fd];
     if (filp->f_op->open != NULL) {
-        res = filp->f_op->open(filp, rel_path, flags, mode, name);
+        res = filp->f_op->open(filp, rel_path, flags, mode);
         if (res < 0) {
             /* something went wrong during open */
             DEBUG("vfs_open: open: ERR %d!\n", res);
@@ -420,7 +420,7 @@ int vfs_opendir(vfs_DIR *dirp, const char *dirname)
     dirp->mp = mountp;
     dirp->d_op = mountp->fs->d_op;
     if (dirp->d_op->opendir != NULL) {
-        int res = dirp->d_op->opendir(dirp, rel_path, dirname);
+        int res = dirp->d_op->opendir(dirp, rel_path);
         if (res < 0) {
             /* remember to decrement the open_files count */
             atomic_fetch_sub(&mountp->open_files, 1);
@@ -1114,7 +1114,7 @@ static bool _is_dir(vfs_mount_t *mountp, vfs_DIR *dir, const char *restrict path
     dir->d_op = ops;
     dir->mp = mountp;
 
-    int res = ops->opendir(dir, path, path);
+    int res = ops->opendir(dir, path);
     if (res < 0) {
         return false;
     }
@@ -1140,7 +1140,7 @@ int vfs_sysop_stat_from_fstat(vfs_mount_t *mountp, const char *restrict path, st
         },
     };
 
-    int err = f_op->open(&filedir.file, path, 0, 0, NULL);
+    int err = f_op->open(&filedir.file, path, 0, 0);
     if (err < 0) {
         if (_is_dir(mountp, &filedir.dir, path)) {
             buf->st_mode = S_IFDIR;

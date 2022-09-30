@@ -222,14 +222,12 @@ static fatfs_file_desc_t * _get_fatfs_file_desc(vfs_file_t *f)
     return (fatfs_file_desc_t *)(uintptr_t)f->private_data.buffer;
 }
 
-static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode,
-                 const char *abs_path)
+static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode)
 {
     fatfs_file_desc_t *fd = _get_fatfs_file_desc(filp);
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)filp->mp->private_data;
     _build_abs_path(fs_desc, name);
 
-    (void) abs_path;
     (void) mode; /* fatfs can't use mode param with f_open*/
     DEBUG("fatfs_vfs.c: _open: private_data = %p, name = %s; flags = 0x%x\n",
           filp->mp->private_data, name, flags);
@@ -416,11 +414,10 @@ static inline DIR * _get_DIR(vfs_DIR *d)
     return (DIR *)(uintptr_t)d->private_data.buffer;
 }
 
-static int _opendir(vfs_DIR *dirp, const char *dirname, const char *abs_path)
+static int _opendir(vfs_DIR *dirp, const char *dirname)
 {
     DIR *dir = _get_DIR(dirp);
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)dirp->mp->private_data;
-    (void) abs_path;
 
     _build_abs_path(fs_desc, dirname);
 
