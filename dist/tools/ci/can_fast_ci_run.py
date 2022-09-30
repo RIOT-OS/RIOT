@@ -24,7 +24,7 @@ OTHER_CLASSIFIERS = [
     [re.compile(r"^(.*\.cff|doc\/.*|.*\.md|.*\.txt)$"), "doc"],
     [re.compile(r"^(CODEOWNERS|.mailmap|.gitignore|.github\/.*)$"), "git"],
     [re.compile(r"^(\.murdock|dist\/ls\/.*|\.drone.yml)$"), "ci-murdock"],
-    [re.compile(r"^(\.bandit|\.circleci\/.*|\.drone.yml)$"), "ci-other"],
+    [re.compile(r"^(\.bandit|\.drone.yml)$"), "ci-other"],
     [re.compile(r"^(dist\/.*|Vagrantfile)$"), "tools"],
 ]
 
