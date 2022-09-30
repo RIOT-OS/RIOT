@@ -17,7 +17,6 @@
   - "**/*.mk"
 
 "Area: CI":
-  - ".circleci/**/*"
   - ".github/**/*.yml"
   - ".murdock"
   - ".murdock.yml"
