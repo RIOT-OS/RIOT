@@ -124,7 +124,7 @@ printf "%s\n" "-----------------------------"
 printf "%25s: %s\n" "native gcc" "$(get_cmd_version gcc)"
 for p in \
          arm-none-eabi \
-         avr mips-mti-elf \
+         avr \
          msp430-elf \
          riscv-none-elf \
          riscv64-unknown-elf \
@@ -141,7 +141,6 @@ printf "%s\n" "-----------------------"
 # platform specific newlib version
 for p in \
          arm-none-eabi \
-         mips-mti-elf \
          msp430-elf \
          riscv-none-elf \
          riscv64-unknown-elf \

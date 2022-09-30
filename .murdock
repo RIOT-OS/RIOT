@@ -132,8 +132,6 @@ tests/ieee802154_hal
 # Eventually this list will be removed...
 #
 : ${TEST_KCONFIG_BOARD_BLOCKLIST:="
-6lowpan-clicker
-pic32-wifire
 "}
 
 # This list will force all boards that are not in the TEST_KCONFIG_BOARD_BLOCKLIST

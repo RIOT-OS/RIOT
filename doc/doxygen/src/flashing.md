@@ -102,10 +102,6 @@ support multiple platforms are given in section
 
 - `lpc2k_pgm`
 
-### MIPS32r2
-
-- `pic32prog`
-
 ### MSP430
 
 - `mspdebug`

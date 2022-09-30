@@ -53,7 +53,6 @@
 /cpu/fe310/                                 @aabadie @kaspar030 @bergzand
 /cpu/kinetis/                               @fjmolinas
 /cpu/lpc2387/                               @benpicco @maribu
-/cpu/mips*/                                 @kaspar030 @francois-berder
 /cpu/msp430*/                               @kaspar030 @gschorcht
 /cpu/nrf*/                                  @aabadie @haukepetersen
 /cpu/nrf52/radio/nrf802154/                 @bergzand @SemjonKerner @jia200x

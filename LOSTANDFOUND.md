@@ -42,6 +42,15 @@ This way, their names are never removed from the RIOT repository.
 
 # Removed Features
 
+### cpu/mips* [6cad5d24771ba6199228351a11b5062cd2e9b36d]
+
+Author:
+- Neil Jones <Neil.Jones@imgtec.com>
+
+Reasons for removal:
+- Not maintained anymore
+- Current state is not very useful and nobody claimed to use it
+
 ### pkg/libcoap [d83d08f0995a88f399e70a7d07b44dd780082436]
 
 Author:

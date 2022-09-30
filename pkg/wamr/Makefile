@@ -25,7 +25,7 @@ RIOT_INCLUDES = $(filter-out -%,$(subst -I,,$(INCLUDES)))
 
 #translate (CPU_ARCH) to Build Target
 #WAMR_BUILD_TARGET is "X86_32" "AARCH64[sub]", "ARM[sub]",
-#                     "THUMB[sub]", "MIPS" or "XTENSA"
+#                     "THUMB[sub]", "XTENSA"
 #no msp430, no AVR support for now
 
 ifeq ($(CPU),native)
@@ -41,8 +41,6 @@ ifeq ($(findstring aarch,$(OS_ARCH)),aarch)
 endif
 else ifeq ($(findstring arm,$(CPU_ARCH)),arm)
   WAMR_BUILD_TARGET = THUMB
-else ifeq ($(CPU_ARCH),mips32r2)
-  WAMR_BUILD_TARGET = MIPS
 else ifeq ($(CPU_ARCH),xtensa)
   WAMR_BUILD_TARGET = XTENSA
 else ifeq ($(CPU_ARCH),rv32)

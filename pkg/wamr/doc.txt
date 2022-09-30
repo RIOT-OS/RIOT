@@ -16,7 +16,7 @@
  * WAMR integration into RIOT should be considered experimental.
  * Changes that had to be done in WAMR are send to and integrated into upstream.
  * WAMR provides support for numerous architectures:
- * "X86_32/64", "AARCH64", "ARM", "THUMB", "MIPS", "XTENSA" and "RISCV"
+ * "X86_32/64", "AARCH64", "ARM", "THUMB", "XTENSA" and "RISCV"
  * this Package will build for native (x86,arm, aarch(using arm)), cortex-m, esp32 and riscv
  *
  * support for other architectures might provideable using the generic

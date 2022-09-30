@@ -143,10 +143,6 @@
 "Platform: ESP":
   - "cpu/esp*/**/*"
 
-"Platform: MIPS":
-  - "cpu/mips*/**/*"
-  - "makefiles/arch/mips.inc.mk"
-
 "Platform: MSP":
   - "cpu/msp*/**/*"
   - "makefiles/arch/msp430.inc.mk"
