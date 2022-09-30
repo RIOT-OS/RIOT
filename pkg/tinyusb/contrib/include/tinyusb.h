@@ -20,6 +20,7 @@
 #define TINYUSB_H
 
 #include "periph_conf.h"
+#include "tinyusb_hw_defaults.h"
 
 #ifndef TINYUSB_THREAD_STACKSIZE_MAIN
 /** Stack size used for the tinyUSB thread */

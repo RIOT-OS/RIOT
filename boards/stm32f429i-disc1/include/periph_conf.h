@@ -34,22 +34,6 @@
 #include "cfg_timer_tim5.h"
 #include "cfg_usb_otg_hs_fs.h"
 
-#ifdef MODULE_TINYUSB
-/**
- * @brief   tinyUSB device stack uses the USB OTG HS port on this board
- */
-#ifndef TINYUSB_TUD_RHPORT
-#define TINYUSB_TUD_RHPORT      1
-#endif /* TINYUSB_TUD_RHPORT */
-
-/**
- * @brief   tinyUSB host stack uses the USB OTG HS port on this board
- */
-#ifndef TINYUSB_TUH_RHPORT
-#define TINYUSB_TUH_RHPORT      1
-#endif /* TINYUSB_TUH_RHPORT */
-#endif /* MODULE_TINYUSB */
-
 #ifdef __cplusplus
 extern "C" {
 #endif
