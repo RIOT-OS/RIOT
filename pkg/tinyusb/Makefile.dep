@@ -1,10 +1,10 @@
 # Package tinyUSB has its own USB device driver. Therefore, it cannot be used
 # together with periph/usbdev for now.
 ifneq (,$(filter periph_usbdev,$(USEMODULE)))
-  $(error "Package tinyUSB is not yet compatible with periph/usdev")
+  $(error "Package tinyUSB is not yet compatible with periph/usbdev")
 endif
 
-# tinyUSB muteces use priority inheritance
+# tinyUSB mutexes use priority inheritance
 # USEMODULE += core_mutex_priority_inheritance
 
 # tinyUSB modules always needed

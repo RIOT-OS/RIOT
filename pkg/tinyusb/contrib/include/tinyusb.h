@@ -32,12 +32,12 @@
 #endif
 
 #ifndef TINYUSB_TUD_RHPORT
-/** tinyUSB RHPort number used for device, default value is 0 */
+/** tinyUSB RHPort number used for the device stack, default value is 0 */
 #define TINYUSB_TUD_RHPORT              0
 #endif
 
 #ifndef TINYUSB_TUH_RHPORT
-/** tinyUSB RHPort number used for host, defaults value is 0 */
+/** tinyUSB RHPort number used for the host stack, defaults value is 0 */
 #define TINYUSB_TUH_RHPORT              0
 #endif
 
