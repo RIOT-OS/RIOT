@@ -19,21 +19,29 @@
 #include "net/gnrc/lorawan.h"
 #include "net/lorawan/hdr.h"
 
-static uint8_t nwkskey[] =
-{ 0x44, 0x02, 0x42, 0x41, 0xed, 0x4c, 0xe9, 0xa6, 0x8c, 0x6a, 0x8b, 0xc0, 0x55, 0x23, 0x3f, 0xd3 };
-static uint8_t lorawan_packet_no_mic[] =
-{ 0x40, 0xF1, 0x7D, 0xBE, 0x49, 0x00, 0x02, 0x00, 0x01, 0x95, 0x43, 0x78, 0x76 };
-static uint8_t lorawan_packet_wrong[] =
-{ 0x40, 0xF1, 0x7D, 0x00, 0x49, 0x00, 0x02, 0xAA, 0x01, 0x95, 0x43, 0x78, 0x76 };
-static uint8_t mic[] = { 0x2B, 0x11, 0xFF, 0x0D };
-static le_uint32_t dev_addr = {
-    .u8 =  { 0xF1, 0x7D, 0xBE, 0x49 }
-};
+static uint8_t fnwksintkey[] =
+{ 0x59, 0x42, 0x2d, 0x58, 0x68, 0x5f, 0x7d, 0x6e, 0x9f, 0xb6, 0x91, 0x9a, 0x7b, 0x3f, 0x44, 0x8a };
+static uint8_t snwksintkey[] =
+{ 0xc0, 0x9f, 0x9e, 0x9a, 0x13, 0x91, 0xae, 0xcc, 0x54, 0xdb, 0x49, 0x0e, 0x11, 0x26, 0x1f, 0x21 };
 
+static uint8_t lorawan_packet_no_mic[] =
+{ 0x40, 0x30, 0xe2, 0xde, 0x00, 0x00, 0x00, 0x00, 0x01, 0x3b, 0xc5, 0xf0, 0xa0, 0x69, 0x49, 0x66,
+  0xee, 0x00, 0xc1, 0xaa, 0x0d, 0xee, 0x20 };
+static uint8_t lorawan_packet_wrong[] =
+{ 0x40, 0x30, 0xe2, 0xde, 0x00, 0x00, 0x00, 0xaa, 0x01, 0x3b, 0xc5, 0xf0, 0xa0, 0x69, 0x49, 0x66,
+  0xee, 0x00, 0xc1, 0xaa, 0x0d, 0xee, 0x20 };
+
+static uint8_t mic[] = { 0x12, 0xcd, 0x3c, 0x8a };
+static le_uint32_t dev_addr = {
+    .u8 = { 0x30, 0xe2, 0xde, 0x00 }
+};
 static uint8_t fopts[] = { 0x02, 0x41, 0x5 };
 static uint8_t wrong_fopts[] = { 0x00, 0x41, 0x5 };
+static uint16_t fcnt = 0x00;
 
-static uint16_t fcnt = 2;
+static uint16_t conf_fcnt = 0x00;
+static uint8_t tx_dr = 0x00;
+static uint8_t tx_ch = 0x04;
 
 static void (*mlme_confirm_cb)(gnrc_lorawan_t *mac, mlme_confirm_t *confirm);
 static bool mlme_confirm_exec;
@@ -73,10 +81,14 @@ static void test_gnrc_lorawan__validate_mic(void)
     gnrc_lorawan_t mac = { 0 };
 
     memcpy(&mac.dev_addr, &dev_addr, sizeof(dev_addr));
-    mac.ctx.fnwksintkey = nwkskey;
+    mac.ctx.fnwksintkey = fnwksintkey;
+    mac.ctx.snwksintkey = snwksintkey;
+    mac.last_dr = tx_dr;
+    mac.last_chan_idx = tx_ch;
     mac.mcps.fcnt = fcnt;
+    mac.optneg = true;
 
-    gnrc_lorawan_calculate_mic_uplink(&pkt, 0x00, &mac, &calc_mic);
+    gnrc_lorawan_calculate_mic_uplink(&pkt, conf_fcnt, &mac, &calc_mic);
 
     TEST_ASSERT(memcmp(&calc_mic, mic, sizeof(le_uint32_t)) == 0);
 }
@@ -93,10 +105,13 @@ static void test_gnrc_lorawan__wrong_mic(void)
     gnrc_lorawan_t mac = { 0 };
 
     memcpy(&mac.dev_addr, &dev_addr, sizeof(dev_addr));
-    mac.ctx.fnwksintkey = nwkskey;
+    mac.ctx.fnwksintkey = fnwksintkey;
+    mac.ctx.snwksintkey = snwksintkey;
+    mac.last_dr = tx_dr;
+    mac.last_chan_idx = tx_ch;
     mac.mcps.fcnt = fcnt;
 
-    gnrc_lorawan_calculate_mic_uplink(&pkt, 0x00, &mac, &calc_mic);
+    gnrc_lorawan_calculate_mic_uplink(&pkt, conf_fcnt, &mac, &calc_mic);
 
     TEST_ASSERT(memcmp(&calc_mic, mic, sizeof(le_uint32_t)) != 0);
 }
@@ -111,7 +126,7 @@ static void test_gnrc_lorawan__build_hdr(void)
         .index = 0
     };
 
-    size_t size = gnrc_lorawan_build_hdr(MTYPE_UNCNF_UPLINK, &dev_addr, 2, 0, 0, &lw_buf);
+    size_t size = gnrc_lorawan_build_hdr(MTYPE_UNCNF_UPLINK, &dev_addr, fcnt, 0, 0, &lw_buf);
 
     TEST_ASSERT(size == sizeof(lorawan_hdr_t));
     TEST_ASSERT(memcmp(lw_buf.data, lorawan_packet_no_mic, sizeof(lorawan_hdr_t)) == 0);

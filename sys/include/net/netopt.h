@@ -585,18 +585,50 @@ typedef enum {
     NETOPT_LORAWAN_APPEUI,
 
     /**
+     * @brief (uint8_t*) LoRaWAN join EUI (8 bytes length)
+     */
+    NETOPT_LORAWAN_JOINEUI,
+
+    /**
      * @brief   (uint8_t*) LoRaWAN application key (16 bytes length)
      */
     NETOPT_LORAWAN_APPKEY,
 
     /**
+     * @brief   (uint8_t*) LoRaWAN network key (16 bytes length)
+     */
+    NETOPT_LORAWAN_NWKKEY,
+
+    /**
      * @brief   (uint8_t*) LoRaWAN network session key (16 bytes length)
      */
     NETOPT_LORAWAN_NWKSKEY,
+
     /**
      * @brief   (uint8_t*) LoRaWAN application session key (16 bytes length)
      */
     NETOPT_LORAWAN_APPSKEY,
+
+    /**
+     * @brief   (uint8_t*) LoRaWAN forwarding network session integrity key (16 bytes length)
+     *
+     * This key is only valid when using LoRaWAN 1.1x.
+     */
+    NETOPT_LORAWAN_FNWKSINTKEY,
+
+    /**
+     * @brief (uint8_t*) LoRaWAN serving network session integrity key (16 bytes length)
+     *
+     * This key is only valid when using LoRaWAN 1.1x.
+     */
+    NETOPT_LORAWAN_SNWKSINTKEY,
+
+    /**
+     * @brief (uint8_t*) LoRaWAN network session encryption key buffer (16 bytes length)
+     *
+     * This key is only valid when using LoRaWAN 1.1x.
+     */
+    NETOPT_LORAWAN_NWKSENCKEY,
 
      /**
      * @brief   (uint8_t) LoRaWAN device class (A, B, C)

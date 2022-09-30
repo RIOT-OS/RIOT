@@ -86,6 +86,7 @@ static const struct {
 static void _print_iface_name(netif_t *iface)
 {
     char name[CONFIG_NETIF_NAMELENMAX];
+
     netif_get_name(iface, name);
     printf("%s", name);
 }
@@ -94,7 +95,7 @@ __attribute__ ((unused))
 static void str_toupper(char *str)
 {
     while (*str) {
-        *str = toupper((unsigned) *str);
+        *str = toupper((unsigned)*str);
         ++str;
     }
 }
@@ -132,21 +133,21 @@ __attribute__ ((unused))
 static void frac_extend(uint8_t *a, uint8_t *b, uint8_t base)
 {
     *a *= base / *b;
-    *b  = base;
+    *b = base;
 }
 
 #ifdef MODULE_NETSTATS
 static const char *_netstats_module_to_str(uint8_t module)
 {
     switch (module) {
-        case NETSTATS_LAYER2:
-            return "Layer 2";
-        case NETSTATS_IPV6:
-            return "IPv6";
-        case NETSTATS_ALL:
-            return "all";
-        default:
-            return "Unknown";
+    case NETSTATS_LAYER2:
+        return "Layer 2";
+    case NETSTATS_IPV6:
+        return "IPv6";
+    case NETSTATS_ALL:
+        return "all";
+    default:
+        return "Unknown";
     }
 }
 
@@ -217,13 +218,21 @@ static void _set_usage(char *cmd_name)
          "       * \"bw\" - alias for channel bandwidth\n"
          "       * \"sf\" - alias for spreading factor\n"
          "       * \"cr\" - alias for coding rate\n"
-         "       * \"appeui\" - sets Application EUI\n"
          "       * \"appkey\" - sets Application key\n"
          "       * \"appskey\" - sets Application session key\n"
+#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+         "       * \"joineui\" - sets Join EUI\n"
+         "       * \"nwkkey\"  - sets Network key\n"
+         "       * \"nwksenckey\" - sets Network session encryption key\n"
+         "       * \"snwksintkey\" - sets Serving network session integrity key\n"
+         "       * \"fnwksintkey\" - sets Forwarding network session integrity key\n"
+#else
+         "       * \"appeui\" - sets Application EUI\n"
+         "       * \"nwkskey\" - sets Network Session Key\n"
+#endif
          "       * \"deveui\" - sets Device EUI\n"
          "       * \"dr\" - sets datarate\n"
          "       * \"rx2_dr\" - sets datarate of RX2 (lorawan)\n"
-         "       * \"nwkskey\" - sets Network Session Key\n"
 #endif
 #ifdef MODULE_NETDEV_IEEE802154_MULTIMODE
          "       * \"phy_mode\" - select PHY mode\n"
@@ -284,182 +293,203 @@ static void _stats_usage(char *cmd_name)
 static void _print_netopt(netopt_t opt)
 {
     switch (opt) {
-        case NETOPT_ADDRESS:
-            printf("(short) address");
-            break;
+    case NETOPT_ADDRESS:
+        printf("(short) address");
+        break;
 
-        case NETOPT_ADDRESS_LONG:
-            printf("long address");
-            break;
+    case NETOPT_ADDRESS_LONG:
+        printf("long address");
+        break;
 
-        case NETOPT_LORAWAN_APPKEY:
-            printf("AppKey");
-            break;
+    case NETOPT_LORAWAN_APPKEY:
+        printf("AppKey");
+        break;
 
-        case NETOPT_LORAWAN_APPSKEY:
-            printf("AppSKey");
-            break;
+    case NETOPT_LORAWAN_APPSKEY:
+        printf("AppSKey");
+        break;
 
-        case NETOPT_LORAWAN_NWKSKEY:
-            printf("NwkSKey");
-            break;
+#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+    case NETOPT_LORAWAN_JOINEUI:
+        printf("JoinEUI");
+        break;
 
-        case NETOPT_LORAWAN_APPEUI:
-            printf("AppEUI");
-            break;
+    case NETOPT_LORAWAN_NWKKEY:
+        printf("NwkKey");
+        break;
 
-        case NETOPT_SRC_LEN:
-            printf("source address length");
-            break;
+    case NETOPT_LORAWAN_NWKSENCKEY:
+        printf("NwkSEncKey");
+        break;
 
-        case NETOPT_CHANNEL:
-            printf("channel");
-            break;
+    case NETOPT_LORAWAN_SNWKSINTKEY:
+        printf("SNwkSIntKey");
+        break;
 
-        case NETOPT_CHANNEL_FREQUENCY:
-            printf("frequency [in Hz]");
-            break;
+    case NETOPT_LORAWAN_FNWKSINTKEY:
+        printf("FNwkSIntKey");
+        break;
+#else
+    case NETOPT_LORAWAN_APPEUI:
+        printf("AppEUI");
+        break;
+    case NETOPT_LORAWAN_NWKSKEY:
+        printf("NwkSKey");
+        break;
+#endif /* IS_USED(MODULE_GNRC_LORAWAN_1_1) */
 
-        case NETOPT_CHANNEL_PAGE:
-            printf("page");
-            break;
+    case NETOPT_SRC_LEN:
+        printf("source address length");
+        break;
 
-        case NETOPT_HOP_LIMIT:
-            printf("hop limit");
-            break;
+    case NETOPT_CHANNEL:
+        printf("channel");
+        break;
 
-        case NETOPT_MAX_PDU_SIZE:
-            printf("MTU");
-            break;
+    case NETOPT_CHANNEL_FREQUENCY:
+        printf("frequency [in Hz]");
+        break;
 
-        case NETOPT_NID:
-            printf("network identifier");
-            break;
+    case NETOPT_CHANNEL_PAGE:
+        printf("page");
+        break;
 
-        case NETOPT_TX_POWER:
-            printf("TX power [in dBm]");
-            break;
+    case NETOPT_HOP_LIMIT:
+        printf("hop limit");
+        break;
 
-        case NETOPT_RETRANS:
-            printf("max. retransmissions");
-            break;
+    case NETOPT_MAX_PDU_SIZE:
+        printf("MTU");
+        break;
 
-        case NETOPT_CSMA_RETRIES:
-            printf("CSMA retries");
-            break;
+    case NETOPT_NID:
+        printf("network identifier");
+        break;
 
-        case NETOPT_CCA_THRESHOLD:
-            printf("CCA threshold [in dBm]");
-            break;
+    case NETOPT_TX_POWER:
+        printf("TX power [in dBm]");
+        break;
 
-        case NETOPT_ENCRYPTION:
-            printf("encryption");
-            break;
+    case NETOPT_RETRANS:
+        printf("max. retransmissions");
+        break;
 
-        case NETOPT_ENCRYPTION_KEY:
-            printf("encryption key");
-            break;
+    case NETOPT_CSMA_RETRIES:
+        printf("CSMA retries");
+        break;
+
+    case NETOPT_CCA_THRESHOLD:
+        printf("CCA threshold [in dBm]");
+        break;
+
+    case NETOPT_ENCRYPTION:
+        printf("encryption");
+        break;
+
+    case NETOPT_ENCRYPTION_KEY:
+        printf("encryption key");
+        break;
 
 #ifdef MODULE_GNRC_NETIF_CMD_LORA
-        case NETOPT_BANDWIDTH:
-            printf("bandwidth");
-            break;
+    case NETOPT_BANDWIDTH:
+        printf("bandwidth");
+        break;
 
-        case NETOPT_SPREADING_FACTOR:
-            printf("spreading factor");
-            break;
+    case NETOPT_SPREADING_FACTOR:
+        printf("spreading factor");
+        break;
 
-        case NETOPT_CODING_RATE:
-            printf("coding rate");
-            break;
+    case NETOPT_CODING_RATE:
+        printf("coding rate");
+        break;
 #endif /* MODULE_GNRC_NETIF_CMD_LORA */
 #ifdef MODULE_NETDEV_IEEE802154_MULTIMODE
 
-        case NETOPT_IEEE802154_PHY:
-            printf("PHY mode");
-            break;
+    case NETOPT_IEEE802154_PHY:
+        printf("PHY mode");
+        break;
 
 #endif /* MODULE_NETDEV_IEEE802154_MULTIMODE */
 #ifdef MODULE_NETDEV_IEEE802154_OQPSK
 
-        case NETOPT_OQPSK_RATE:
-            printf("high rate");
-            break;
+    case NETOPT_OQPSK_RATE:
+        printf("high rate");
+        break;
 
 #endif /* MODULE_NETDEV_IEEE802154_OQPSK */
 #ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
 
-        case NETOPT_MR_OQPSK_CHIPS:
-            printf("chip rate");
-            break;
+    case NETOPT_MR_OQPSK_CHIPS:
+        printf("chip rate");
+        break;
 
-        case NETOPT_MR_OQPSK_RATE:
-            printf("rate mode");
-            break;
+    case NETOPT_MR_OQPSK_RATE:
+        printf("rate mode");
+        break;
 
 #endif /* MODULE_NETDEV_IEEE802154_MR_OQPSK */
 #ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
 
-        case NETOPT_MR_OFDM_OPTION:
-            printf("OFDM option");
-            break;
+    case NETOPT_MR_OFDM_OPTION:
+        printf("OFDM option");
+        break;
 
-        case NETOPT_MR_OFDM_MCS:
-            printf("modulation/coding scheme");
-            break;
+    case NETOPT_MR_OFDM_MCS:
+        printf("modulation/coding scheme");
+        break;
 
 #endif /* MODULE_NETDEV_IEEE802154_MR_OFDM */
 #ifdef MODULE_NETDEV_IEEE802154_MR_FSK
 
-        case NETOPT_MR_FSK_MODULATION_INDEX:
-            printf("FSK modulation index");
-            break;
+    case NETOPT_MR_FSK_MODULATION_INDEX:
+        printf("FSK modulation index");
+        break;
 
-        case NETOPT_MR_FSK_MODULATION_ORDER:
-            printf("FSK modulation order");
-            break;
+    case NETOPT_MR_FSK_MODULATION_ORDER:
+        printf("FSK modulation order");
+        break;
 
-        case NETOPT_MR_FSK_SRATE:
-            printf("FSK symbol rate");
-            break;
+    case NETOPT_MR_FSK_SRATE:
+        printf("FSK symbol rate");
+        break;
 
-        case NETOPT_MR_FSK_FEC:
-            printf("FSK Forward Error Correction");
-            break;
+    case NETOPT_MR_FSK_FEC:
+        printf("FSK Forward Error Correction");
+        break;
 
-        case NETOPT_CHANNEL_SPACING:
-            printf("Channel Spacing");
-            break;
+    case NETOPT_CHANNEL_SPACING:
+        printf("Channel Spacing");
+        break;
 
 #endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
 
-        case NETOPT_CHECKSUM:
-            printf("checksum");
-            break;
+    case NETOPT_CHECKSUM:
+        printf("checksum");
+        break;
 
-        case NETOPT_OTAA:
-            printf("otaa");
-            break;
+    case NETOPT_OTAA:
+        printf("otaa");
+        break;
 
-        case NETOPT_LINK_CHECK:
-            printf("link check");
-            break;
+    case NETOPT_LINK_CHECK:
+        printf("link check");
+        break;
 
-        case NETOPT_PHY_BUSY:
-            printf("PHY busy");
-            break;
+    case NETOPT_PHY_BUSY:
+        printf("PHY busy");
+        break;
 
-        case NETOPT_LORAWAN_DR:
-            printf("datarate");
-            break;
+    case NETOPT_LORAWAN_DR:
+        printf("datarate");
+        break;
 
-        case NETOPT_LORAWAN_RX2_DR:
-            printf("RX2 datarate");
-            break;
+    case NETOPT_LORAWAN_RX2_DR:
+        printf("RX2 datarate");
+        break;
 
-        default:
-            /* we don't serve these options here */
-            break;
+    default:
+        /* we don't serve these options here */
+        break;
     }
 }
 
@@ -536,7 +566,7 @@ static unsigned _netif_list_flag(netif_t *iface, netopt_t opt, char *str,
 {
     netopt_enable_t enable = NETOPT_DISABLE;
     int res = netif_get_opt(iface, opt, 0, &enable,
-                              sizeof(enable));
+                            sizeof(enable));
 
     if ((res >= 0) && (enable == NETOPT_ENABLE)) {
         printf("%s", str);
@@ -574,15 +604,15 @@ static void _netif_list_ipv6(ipv6_addr_t *addr, uint8_t flags)
     }
     else {
         switch (flags & GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_MASK) {
-            case GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_DEPRECATED:
-                printf("  DPR");
-                break;
-            case GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID:
-                printf("  VAL");
-                break;
-            default:
-                printf("  UNK");
-                break;
+        case GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_DEPRECATED:
+            printf("  DPR");
+            break;
+        case GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID:
+            printf("  VAL");
+            break;
+        default:
+            printf("  UNK");
+            break;
         }
     }
     _newline(0U, _LINE_THRESHOLD);
@@ -714,7 +744,8 @@ static void _netif_list(netif_t *iface)
                 frac_short(&u8, hwaddr);
                 if (hwaddr[0] == 1) {
                     printf(" modulation index: %u ", u8);
-                } else {
+                }
+                else {
                     printf(" modulation index: %u/%u ", u8, hwaddr[0]);
                 }
             }
@@ -780,12 +811,12 @@ static void _netif_list(netif_t *iface)
 #ifdef MODULE_GNRC_NETIF_CMD_LORA
     res = netif_get_opt(iface, NETOPT_DEMOD_MARGIN, 0, &u8, sizeof(u8));
     if (res >= 0) {
-        printf(" Demod margin.: %u ", (unsigned) u8);
+        printf(" Demod margin.: %u ", (unsigned)u8);
         line_thresh++;
     }
     res = netif_get_opt(iface, NETOPT_NUM_GATEWAYS, 0, &u8, sizeof(u8));
     if (res >= 0) {
-        printf(" Num gateways.: %u ", (unsigned) u8);
+        printf(" Num gateways.: %u ", (unsigned)u8);
         line_thresh++;
     }
 #endif
@@ -859,24 +890,24 @@ static void _netif_list(netif_t *iface)
 #ifdef MODULE_GNRC_IPV6
     printf("Link type: %s",
            (netif_get_opt(iface, NETOPT_IS_WIRED, 0, &u16, sizeof(u16)) > 0) ?
-            "wired" : "wireless");
+           "wired" : "wireless");
     _newline(0U, ++line_thresh);
     res = netif_get_opt(iface, NETOPT_IPV6_ADDR, 0, ipv6_addrs,
-                          sizeof(ipv6_addrs));
+                        sizeof(ipv6_addrs));
     if (res >= 0) {
         uint8_t ipv6_addrs_flags[CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF];
 
         memset(ipv6_addrs_flags, 0, sizeof(ipv6_addrs_flags));
         /* assume it to succeed (otherwise array will stay 0) */
         netif_get_opt(iface, NETOPT_IPV6_ADDR_FLAGS, 0, ipv6_addrs_flags,
-                        sizeof(ipv6_addrs_flags));
+                      sizeof(ipv6_addrs_flags));
         /* yes, the res of NETOPT_IPV6_ADDR is meant to be here ;-) */
         for (unsigned i = 0; i < (res / sizeof(ipv6_addr_t)); i++) {
             _netif_list_ipv6(&ipv6_addrs[i], ipv6_addrs_flags[i]);
         }
     }
     res = netif_get_opt(iface, NETOPT_IPV6_GROUP, 0, ipv6_groups,
-                          sizeof(ipv6_groups));
+                        sizeof(ipv6_groups));
     if (res >= 0) {
         for (unsigned i = 0; i < (res / sizeof(ipv6_addr_t)); i++) {
             _netif_list_groups(&ipv6_groups[i]);
@@ -1058,11 +1089,13 @@ static int _netif_set_fsk_fec(netif_t *iface, char *value)
 static int _netif_set_fsk_modulation_index(netif_t *iface, char *value)
 {
     uint8_t a, b;
-    char* frac = strchr(value, '/');
+    char *frac = strchr(value, '/');
+
     if (frac) {
         *frac = 0;
         b = atoi(frac + 1);
-    } else {
+    }
+    else {
         b = 1;
     }
     a = atoi(value);
@@ -1070,10 +1103,12 @@ static int _netif_set_fsk_modulation_index(netif_t *iface, char *value)
     frac_extend(&a, &b, 64);
 
     int res = netif_set_opt(iface, NETOPT_MR_FSK_MODULATION_INDEX, 0, &a, sizeof(uint8_t));
+
     if (res < 0) {
         printf("error: unable to set modulation index to %d/%d\n", a, b);
         return 1;
-    } else {
+    }
+    else {
         printf("success: set modulation index to %d/%d\n", res, b);
     }
 
@@ -1224,16 +1259,21 @@ static int _netif_set_lw_key(netif_t *iface, netopt_t opt, char *key_str)
 
     size_t key_len = fmt_hex_bytes(key, key_str);
     size_t expected_len;
+
     switch (opt) {
-        case NETOPT_LORAWAN_APPKEY:
-        case NETOPT_LORAWAN_APPSKEY:
-        case NETOPT_LORAWAN_NWKSKEY:
-            /* All keys have the same length as the APP KEY */
-            expected_len = LORAMAC_APPKEY_LEN;
-            break;
-        default:
-            /* Same rationale here */
-            expected_len = LORAMAC_DEVEUI_LEN;
+    case NETOPT_LORAWAN_APPKEY:
+    case NETOPT_LORAWAN_APPSKEY:
+    case NETOPT_LORAWAN_NWKSKEY:
+    case NETOPT_LORAWAN_NWKKEY:
+    case NETOPT_LORAWAN_SNWKSINTKEY:
+    case NETOPT_LORAWAN_FNWKSINTKEY:
+    case NETOPT_LORAWAN_NWKSENCKEY:
+        /* All keys have the same length as the APP KEY */
+        expected_len = LORAMAC_APPKEY_LEN;
+        break;
+    default:
+        /* Same rationale here */
+        expected_len = LORAMAC_DEVEUI_LEN;
     }
     if (!key_len || key_len != expected_len) {
         puts("error: unable to parse key.\n");
@@ -1325,7 +1365,8 @@ static int _netif_set_state(netif_t *iface, char *state_str)
     return 0;
 }
 
-static int _hex_to_int(char c) {
+static int _hex_to_int(char c)
+{
     if ('0' <= c && c <= '9') {
         return c - '0';
     }
@@ -1472,8 +1513,32 @@ static int _netif_set(char *cmd_name, netif_t *iface, char *key, char *value)
     else if ((strcmp("coding_rate", key) == 0) || (strcmp("cr", key) == 0)) {
         return _netif_set_coding_rate(iface, value);
     }
+#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+    else if (strcmp("joineui", key) == 0) {
+        return _netif_set_lw_key(iface, NETOPT_LORAWAN_JOINEUI, value);
+    }
+    else if (strcmp("fnwksintkey", key) == 0) {
+        return _netif_set_lw_key(iface, NETOPT_LORAWAN_FNWKSINTKEY, value);
+    }
+    else if (strcmp("snwksintkey", key) == 0) {
+        return _netif_set_lw_key(iface, NETOPT_LORAWAN_SNWKSINTKEY, value);
+    }
+    else if (strcmp("nwksenckey", key) == 0) {
+        return _netif_set_lw_key(iface, NETOPT_LORAWAN_NWKSENCKEY, value);
+    }
+    else if (strcmp("nwkkey", key) == 0) {
+        return _netif_set_lw_key(iface, NETOPT_LORAWAN_NWKKEY, value);
+    }
+#else
     else if (strcmp("appeui", key) == 0) {
         return _netif_set_lw_key(iface, NETOPT_LORAWAN_APPEUI, value);
+    }
+    else if (strcmp("nwkskey", key) == 0) {
+        return _netif_set_addr(iface, NETOPT_LORAWAN_NWKSKEY, value);
+    }
+#endif /* IS_USED(MODULE_GNRC_LORAWAN_1_1) */
+    else if (strcmp("appskey", key) == 0) {
+        return _netif_set_addr(iface, NETOPT_LORAWAN_APPSKEY, value);
     }
     else if (strcmp("appkey", key) == 0) {
         return _netif_set_lw_key(iface, NETOPT_LORAWAN_APPKEY, value);
@@ -1481,12 +1546,7 @@ static int _netif_set(char *cmd_name, netif_t *iface, char *key, char *value)
     else if (strcmp("deveui", key) == 0) {
         return _netif_set_addr(iface, NETOPT_ADDRESS_LONG, value);
     }
-    else if (strcmp("appskey", key) == 0) {
-        return _netif_set_addr(iface, NETOPT_LORAWAN_APPSKEY, value);
-    }
-    else if (strcmp("nwkskey", key) == 0) {
-        return _netif_set_addr(iface, NETOPT_LORAWAN_NWKSKEY, value);
-    }
+
     else if (strcmp("dr", key) == 0) {
         return _netif_set_u8(iface, NETOPT_LORAWAN_DR, 0, value);
     }
@@ -1818,7 +1878,8 @@ int _gnrc_netif_config(int argc, char **argv)
                 (strcmp(argv[1], "--help") == 0)) {
                 _usage(argv[0]);
                 return 0;
-            } else {
+            }
+            else {
                 puts("error: invalid interface given");
                 return 1;
             }

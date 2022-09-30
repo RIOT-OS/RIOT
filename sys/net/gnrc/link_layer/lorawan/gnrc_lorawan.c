@@ -29,6 +29,10 @@
 #include "net/gnrc/lorawan/region.h"
 #include "timex.h"
 
+#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#include "periph/flashpage.h"
+#endif
+
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
@@ -43,6 +47,7 @@ static inline void gnrc_lorawan_mlme_reset(gnrc_lorawan_t *mac)
     mac->mlme.pending_mlme_opts = 0;
     mac->rx_delay = (CONFIG_LORAMAC_DEFAULT_RX1_DELAY / MS_PER_SEC);
     mac->mlme.nid = CONFIG_LORAMAC_DEFAULT_NETID;
+    memset(mac->mlme.dev_nonce, 0x00, sizeof(mac->mlme.dev_nonce));
 }
 
 static inline void gnrc_lorawan_mlme_backoff_init(gnrc_lorawan_t *mac)
@@ -76,13 +81,43 @@ static void _sleep_radio(gnrc_lorawan_t *mac)
     dev->driver->set(dev, NETOPT_STATE, &state, sizeof(state));
 }
 
-void gnrc_lorawan_init(gnrc_lorawan_t *mac, uint8_t *nwkskey, uint8_t *appskey)
+static void _load_persistent_state(gnrc_lorawan_t *mac)
 {
-    mac->nwkskey = nwkskey;
-    mac->appskey = appskey;
+    (void) mac;
+#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+    void *addr = flashpage_addr(GNRC_LORAWAN_STATE_FLASHPAGE_NUM);
+    gnrc_lorawan_persistent_state_t state = { 0 };
+
+    memcpy(&state, addr, sizeof(state));
+
+    if (state.initialized_marker != GNRC_LORAWAN_INITIALIZED_MARKER) {
+        memset(&state, 0x0, sizeof(state));
+        state.initialized_marker = GNRC_LORAWAN_INITIALIZED_MARKER;
+
+        flashpage_erase(GNRC_LORAWAN_STATE_FLASHPAGE_NUM);
+        /* ensure written length is multiple of FLASHPAGE_WRITE_BLOCK_SIZE */
+        flashpage_write(addr, &state, (sizeof(state) /
+                                           FLASHPAGE_WRITE_BLOCK_SIZE + 0x1) *
+                            FLASHPAGE_WRITE_BLOCK_SIZE);
+    }
+    memcpy(mac->mlme.dev_nonce, state.dev_nonce, sizeof(mac->mlme.dev_nonce));
+#endif
+}
+
+void gnrc_lorawan_init(gnrc_lorawan_t *mac, uint8_t *joineui, const gnrc_lorawan_key_ctx_t *ctx)
+{
+    DEBUG("Lorawan init !\n");
+    mac->joineui = joineui;
+
+    memcpy(&mac->ctx, ctx, sizeof(gnrc_lorawan_key_ctx_t));
+
     mac->busy = false;
     gnrc_lorawan_mlme_backoff_init(mac);
     gnrc_lorawan_reset(mac);
+
+    if (IS_USED(MODULE_GNRC_LORAWAN_1_1)) {
+        _load_persistent_state(mac);
+    }
 }
 
 void gnrc_lorawan_reset(gnrc_lorawan_t *mac)
@@ -108,6 +143,24 @@ void gnrc_lorawan_reset(gnrc_lorawan_t *mac)
     gnrc_lorawan_mcps_reset(mac);
     gnrc_lorawan_mlme_reset(mac);
     gnrc_lorawan_channels_init(mac);
+}
+
+void gnrc_lorawan_store_dev_nonce(uint8_t *dev_nonce)
+{
+    (void) dev_nonce;
+#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+    void *addr = flashpage_addr(GNRC_LORAWAN_STATE_FLASHPAGE_NUM);
+    gnrc_lorawan_persistent_state_t state = { 0 };
+    memcpy(&state, addr, sizeof(state));
+
+    memcpy(state.dev_nonce, dev_nonce, sizeof(state.dev_nonce));
+
+    flashpage_erase(GNRC_LORAWAN_STATE_FLASHPAGE_NUM);
+    /* ensure written length is multiple of FLASHPAGE_WRITE_BLOCK_SIZE */
+    flashpage_write(addr, &state, (sizeof(state) /
+                    FLASHPAGE_WRITE_BLOCK_SIZE + 0x1) *
+                    FLASHPAGE_WRITE_BLOCK_SIZE);
+#endif
 }
 
 static void _config_radio(gnrc_lorawan_t *mac, uint32_t channel_freq,
@@ -157,20 +210,20 @@ void gnrc_lorawan_open_rx_window(gnrc_lorawan_t *mac)
 
 void gnrc_lorawan_timeout_cb(gnrc_lorawan_t *mac)
 {
-    switch(mac->state) {
-        case LORAWAN_STATE_RX_1:
-        case LORAWAN_STATE_RX_2:
-            gnrc_lorawan_open_rx_window(mac);
-            break;
-        case LORAWAN_STATE_JOIN:
-            gnrc_lorawan_trigger_join(mac);
-            break;
-        case LORAWAN_STATE_IDLE:
-            gnrc_lorawan_event_retrans_timeout(mac);
-            break;
-        default:
-            assert(false);
-            break;
+    switch (mac->state) {
+    case LORAWAN_STATE_RX_1:
+    case LORAWAN_STATE_RX_2:
+        gnrc_lorawan_open_rx_window(mac);
+        break;
+    case LORAWAN_STATE_JOIN:
+        gnrc_lorawan_trigger_join(mac);
+        break;
+    case LORAWAN_STATE_IDLE:
+        gnrc_lorawan_event_retrans_timeout(mac);
+        break;
+    default:
+        assert(false);
+        break;
     }
 }
 
@@ -200,32 +253,31 @@ void gnrc_lorawan_radio_rx_timeout_cb(gnrc_lorawan_t *mac)
 {
     (void)mac;
     switch (mac->state) {
-        case LORAWAN_STATE_RX_1:
-            DEBUG("gnrc_lorawan: RX1 timeout.\n");
-            _configure_rx_window(mac, CONFIG_LORAMAC_DEFAULT_RX2_FREQ,
-                                 mac->dl_settings &
-                                 GNRC_LORAWAN_DL_RX2_DR_MASK);
-            mac->state = LORAWAN_STATE_RX_2;
-            break;
-        case LORAWAN_STATE_RX_2:
-            DEBUG("gnrc_lorawan: RX2 timeout.\n");
-            gnrc_lorawan_event_no_rx(mac);
-            mac->state = LORAWAN_STATE_IDLE;
-            break;
-        default:
-            assert(false);
-            break;
+    case LORAWAN_STATE_RX_1:
+        DEBUG("gnrc_lorawan: RX1 timeout.\n");
+        _configure_rx_window(mac, CONFIG_LORAMAC_DEFAULT_RX2_FREQ,
+                             mac->dl_settings &
+                             GNRC_LORAWAN_DL_RX2_DR_MASK);
+        mac->state = LORAWAN_STATE_RX_2;
+        break;
+    case LORAWAN_STATE_RX_2:
+        DEBUG("gnrc_lorawan: RX2 timeout.\n");
+        gnrc_lorawan_event_no_rx(mac);
+        mac->state = LORAWAN_STATE_IDLE;
+        break;
+    default:
+        assert(false);
+        break;
     }
     _sleep_radio(mac);
 }
 
-void gnrc_lorawan_send_pkt(gnrc_lorawan_t *mac, iolist_t *psdu, uint8_t dr)
+void gnrc_lorawan_send_pkt(gnrc_lorawan_t *mac, iolist_t *psdu, uint8_t dr,
+                           uint32_t chan)
 {
     netdev_t *dev = gnrc_lorawan_get_netdev(mac);
 
     mac->state = LORAWAN_STATE_TX;
-
-    uint32_t chan = gnrc_lorawan_pick_channel(mac);
 
     DEBUG("gnrc_lorawan: Channel: %" PRIu32 "Hz \n", chan);
 
@@ -254,14 +306,14 @@ void gnrc_lorawan_radio_rx_done_cb(gnrc_lorawan_t *mac, uint8_t *psdu,
     uint8_t mtype = (*psdu & MTYPE_MASK) >> 5;
 
     switch (mtype) {
-        case MTYPE_JOIN_ACCEPT:
-            gnrc_lorawan_mlme_process_join(mac, psdu, size);
-            break;
-        case MTYPE_CNF_DOWNLINK:
-        case MTYPE_UNCNF_DOWNLINK:
-            gnrc_lorawan_mcps_process_downlink(mac, psdu, size);
-            break;
-        default:
-            break;
+    case MTYPE_JOIN_ACCEPT:
+        gnrc_lorawan_mlme_process_join(mac, psdu, size);
+        break;
+    case MTYPE_CNF_DOWNLINK:
+    case MTYPE_UNCNF_DOWNLINK:
+        gnrc_lorawan_mcps_process_downlink(mac, psdu, size);
+        break;
+    default:
+        break;
     }
 }

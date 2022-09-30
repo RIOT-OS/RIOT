@@ -89,7 +89,7 @@ config LORAMAC_DEFAULT_JOIN_PROCEDURE_ABP
 
 endchoice
 
-if USEMODULE_GNRC_LORAWAN || USEPKG_SEMTECH_LORAMAC
+if (USEMODULE_GNRC_LORAWAN || USEPKG_SEMTECH_LORAMAC)
 
 menu "OTAA credentials"
 
@@ -99,17 +99,37 @@ config LORAMAC_DEV_EUI_DEFAULT
     help
         Configure the default device EUI for join procedure.
 
+config LORAMAC_APP_KEY_DEFAULT
+    string "Application key"
+    default "00000000000000000000000000000000"
+    help
+        Configure the default application key for join procedure.
+
+if USEMODULE_GNRC_LORAWAN_1_1
+
+config LORAMAC_JOIN_EUI_DEFAULT
+    string "Join EUI"
+    default "0000000000000000"
+    help
+        Configure the default join EUI for join procedure.
+
+config LORAMAC_NWK_KEY_DEFAULT
+    string "Network key"
+    default "00000000000000000000000000000000"
+    help
+        Configure the default network key for join procedure.
+
+endif # GNRC_LORAWAN_1_1
+
+if !USEMODULE_GNRC_LORAWAN_1_1
+
 config LORAMAC_APP_EUI_DEFAULT
     string "Application EUI"
     default "0000000000000000"
     help
         Configure the default application EUI for join procedure.
 
-config LORAMAC_APP_KEY_DEFAULT
-    string "Application key"
-    default "00000000000000000000000000000000"
-    help
-        Configure the default application key for join procedure.
+endif # !USEMODULE_GNRC_LORAWAN_1_1
 
 endmenu # OTAA credentials
 
@@ -125,17 +145,49 @@ config LORAMAC_DEV_ADDR_DEFAULT
     help
         Configure the default device address for ABP.
 
-config LORAMAC_NWK_SKEY_DEFAULT
-    string "Network session key"
-    default "00000000000000000000000000000000"
-    help
-        Configure the default network session key for ABP.
-
 config LORAMAC_APP_SKEY_DEFAULT
     string "Application session key"
     default "00000000000000000000000000000000"
     help
         Configure the default application session key for ABP.
+
+if USEMODULE_GNRC_LORAWAN_1_1
+
+config LORAMAC_FNWKSINT_KEY_DEFAULT
+    string "Forwarding network session integrity key"
+    default "00000000000000000000000000000000"
+    help
+        Configure the default forwarding network session integrity key for ABP.
+
+config LORAMAC_SNWKSINT_KEY_DEFAULT
+    string "Serving network session integrity key"
+    default "00000000000000000000000000000000"
+    help
+        Configure the default serving network session integrity key for ABP.
+
+config LORAMAC_NWKSENC_KEY_DEFAULT
+    string "Network session encryption key"
+    default "00000000000000000000000000000000"
+    help
+        Configure the default network session encryption key for ABP.
+
+config LORAMAC_NWK_KEY_DEFAULT
+    string "Network key"
+    default "00000000000000000000000000000000"
+    help
+        Configure the default network key for ABP.
+
+endif # USEMODULE_GNRC_LORAWAN_1_1
+
+if !USEMODULE_GNRC_LORAWAN_1_1
+
+    config LORAMAC_NWK_SKEY_DEFAULT
+    string "Network session key"
+    default "00000000000000000000000000000000"
+    help
+        Configure the default network session key for ABP.
+
+endif # !USEMODULE_GNRC_LORAWAN_1_1
 
 endmenu # ABP credentials
 

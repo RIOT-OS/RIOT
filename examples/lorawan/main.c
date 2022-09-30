@@ -72,7 +72,7 @@ static uint8_t appskey[LORAMAC_APPSKEY_LEN];
 
 static void _alarm_cb(void *arg)
 {
-    (void) arg;
+    (void)arg;
     msg_t msg;
     msg_send(&msg, sender_pid);
 }
@@ -98,7 +98,7 @@ static void _send_message(void)
     /* Try to send the message */
     uint8_t ret = semtech_loramac_send(&loramac,
                                        (uint8_t *)message, strlen(message));
-    if (ret != SEMTECH_LORAMAC_TX_DONE)  {
+    if (ret != SEMTECH_LORAMAC_TX_DONE) {
         printf("Cannot send message '%s', ret code: %d\n", message, ret);
         return;
     }

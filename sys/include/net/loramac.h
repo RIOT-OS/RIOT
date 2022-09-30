@@ -47,6 +47,15 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Default join EUI
+ *
+ * 8 bytes key, required for join procedure
+ */
+#ifndef CONFIG_LORAMAC_JOIN_EUI_DEFAULT
+#define CONFIG_LORAMAC_JOIN_EUI_DEFAULT          "0000000000000000"
+#endif
+
+/**
  * @brief   Default application EUI
  *
  * 8 bytes key, required for join procedure
@@ -65,6 +74,15 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Default network key
+ *
+ * 16 bytes key, required for join procedure
+ */
+#ifndef CONFIG_LORAMAC_NWK_KEY_DEFAULT
+#define CONFIG_LORAMAC_NWK_KEY_DEFAULT          "00000000000000000000000000000000"
+#endif
+
+/**
  * @brief   Default application session key
  *
  * 16 bytes key, only required for ABP join procedure type
@@ -80,6 +98,33 @@ extern "C" {
  */
 #ifndef CONFIG_LORAMAC_NWK_SKEY_DEFAULT
 #define CONFIG_LORAMAC_NWK_SKEY_DEFAULT         "00000000000000000000000000000000"
+#endif
+
+/**
+ * @brief   Default network session integrity key
+ *
+ * 16 bytes key, required for join procedure
+ */
+#ifndef CONFIG_LORAMAC_FNWKSINT_KEY_DEFAULT
+#define CONFIG_LORAMAC_FNWKSINT_KEY_DEFAULT          "00000000000000000000000000000000"
+#endif
+
+/**
+ * @brief   Default serving network session integrity key
+ *
+ * 16 bytes key, required for join procedure
+ */
+#ifndef CONFIG_LORAMAC_SNWKSINT_KEY_DEFAULT
+#define CONFIG_LORAMAC_SNWKSINT_KEY_DEFAULT          "00000000000000000000000000000000"
+#endif
+
+/**
+ * @brief   Default network session encryption key
+ *
+ * 16 bytes key, required for join procedure
+ */
+#ifndef CONFIG_LORAMAC_NWKSENC_KEY_DEFAULT
+#define CONFIG_LORAMAC_NWKSENC_KEY_DEFAULT          "00000000000000000000000000000000"
 #endif
 
 /**
@@ -515,9 +560,19 @@ extern "C" {
 #define LORAMAC_APPEUI_LEN                      (8U)
 
 /**
+ * @brief   Join EUI length in bytes
+ */
+#define LORAMAC_JOINEUI_LEN                     (8U)
+
+/**
  * @brief   Application key length in bytes
  */
 #define LORAMAC_APPKEY_LEN                      (16U)
+
+/**
+ * @brief   Network key length in bytes
+ */
+#define LORAMAC_NWKKEY_LEN                      (16U)
 
 /**
  * @brief   Application session key length in bytes
@@ -528,6 +583,36 @@ extern "C" {
  * @brief   Network session key length in bytes
  */
 #define LORAMAC_NWKSKEY_LEN                     (16U)
+
+/**
+ * @brief   Forwarding Network session integrity key length in bytes
+ */
+#define LORAMAC_FNWKSINTKEY_LEN                 (16U)
+
+/**
+ * @brief   Serving Network session integrity key length in bytes
+ */
+#define LORAMAC_SNWKSINTKEY_LEN                 (16U)
+
+/**
+ * @brief   Network session encryption key length in bytes
+ */
+#define LORAMAC_NWKSENCKEY_LEN                  (16U)
+
+/**
+ * @brief   Join session integrity key length in bytes
+ */
+#define LORAMAC_JSINTKEY_LEN                  (16U)
+
+/**
+ * @brief   Join session encryption key length in bytes
+ */
+#define LORAMAC_JSENCKEY_LEN                  (16U)
+
+/**
+ * @brief   Network session encryption key length in bytes
+ */
+#define LORAMAC_JSINTKEY_LEN                  (16U)
 
 /**
  * @brief   Minimum port value
@@ -543,6 +628,11 @@ extern "C" {
  * @brief Application Nonce length in bytes
  */
 #define LORAMAC_APP_NONCE_LEN                   (3U)
+
+/**
+ * @brief Join nonce length in bytes
+ */
+#define LORAMAC_JOIN_NONCE_LEN                  (3U)
 
 /**
  * @brief Network ID length in bytes
