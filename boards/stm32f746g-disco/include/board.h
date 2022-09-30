@@ -58,6 +58,14 @@ extern "C" {
 /** @} */
 
 /**
+ * @name Macros for controlling the on-board LEDs.
+ * @{
+ */
+#define LED0_PIN_NUM        1           /**< LD1 pin number */
+#define LED0_PORT_NUM       PORT_I      /**< LD1 port */
+/** @} */
+
+/**
  * @name User button
  * @{
  */
@@ -79,6 +87,8 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#include "stm32_leds.h"
 
 #endif /* BOARD_H */
 /** @} */
