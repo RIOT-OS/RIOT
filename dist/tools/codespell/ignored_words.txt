@@ -140,3 +140,10 @@ ro
 
 # Synopsys (vendor name) => Synopsis
 synopsys
+
+# nam (part of lorem ipsum "Velit scelerisque in dictum non consectetur a erat nam.")
+# => name
+nam
+
+# donot (part of bloom filter test vector) => do not
+donot
