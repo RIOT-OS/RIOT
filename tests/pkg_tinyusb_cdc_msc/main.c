@@ -88,9 +88,12 @@ int main(void)
                   THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
                   led_thread_impl, NULL, "led");
 
-    /* initialize the tinyUSB stack including used peripherals and
-     * start the tinyUSB thread */
-    tinyusb_setup();
+    if (!IS_USED(MODULE_AUTO_INIT)) {
+        /* If auto-initialization is not used (module `auto_init`),
+         * initialize the tinyUSB stack including used peripherals and
+         * start the tinyUSB thread. Auto-initialization is used by default. */
+        tinyusb_setup();
+    }
 
     while (1) {
         ztimer_sleep(ZTIMER_MSEC, 10);

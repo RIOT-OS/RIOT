@@ -16,6 +16,10 @@
 #include "tinyusb.h"
 #include "tinyusb_hw.h"
 
+#if IS_USED(MODULE_AUTO_INIT)
+#include "auto_init_utils.h"
+#endif
+
 #define ENABLE_DEBUG    0
 #include "debug.h"
 
@@ -79,3 +83,12 @@ int tinyusb_setup(void)
 
     return 0;
 }
+
+void tinyusb_auto_init(void)
+{
+    tinyusb_setup();
+}
+
+#if IS_USED(MODULE_AUTO_INIT_TINYUSB)
+AUTO_INIT(tinyusb_auto_init, AUTO_INIT_PRIO_MOD_TINYUSB);
+#endif

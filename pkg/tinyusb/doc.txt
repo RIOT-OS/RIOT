@@ -26,14 +26,17 @@
  *   USEMODULE += tinyusb_class_cdc tinyusb_class_msc
  *   ```
  *
- * Add `tinyusb_setup()` to your main function to initialize the tinyUSB stack
- * including used peripherals and to start the tinyUSB thread.
+ * Either add `tinyusb_setup()` to your main function to explicitly initialize
+ * the tinyUSB stack including the used peripherals and start the tinyUSB
+ * thread, or use the `auto_init` module (**default**).
+ *
  * ```c
  * int main(void)
  * {
  *     ...
+ *     // If auto-initialization is not used (module `auto_init`),
  *     // initialize the tinyUSB stack including used peripherals and
- *     // start the tinyUSB thread
+ *     // start the tinyUSB thread. Auto-initialization is used by default.
  *     tinyusb_setup();
  *
  *     while (1) {

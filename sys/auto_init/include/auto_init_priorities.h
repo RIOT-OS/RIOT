@@ -239,6 +239,12 @@ extern "C" {
  */
 #define AUTO_INIT_PRIO_MOD_USBUS                        1350
 #endif
+#ifndef AUTO_INIT_PRIO_MOD_TINYUSB
+/**
+ * @brief   tinyUSB priority
+ */
+#define AUTO_INIT_PRIO_MOD_TINYUSB                      1350
+#endif
 #ifndef AUTO_INIT_PRIO_MOD_GNRC_NETIF
 /**
  * @brief   GNRC netif priority

@@ -6,6 +6,8 @@ USEMODULE += tinyusb_common
 USEMODULE += tinyusb_contrib
 USEMODULE += tinyusb_hw
 
+DEFAULT_MODULE += auto_init_tinyusb
+
 ifeq (,$(filter tinyusb_class_%,$(USEMODULE)))
   $(error At least one tinyusb_class_* module has to be enabled)
 endif

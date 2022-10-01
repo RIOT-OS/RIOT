@@ -42,6 +42,15 @@ menuconfig PACKAGE_TINYUSB
 
 if PACKAGE_TINYUSB
 
+config MODULE_AUTO_INIT_TINYUSB
+    bool "Auto-initialize the tinyUSB package"
+    default y
+    depends on MODULE_AUTO_INIT
+    help
+        The tinyUSB stack including the used peripherals are initialized
+        automatically at startup. Additionally, the auto-initialization
+        starts the tinyUSB thread.
+
 config MODULE_TINYUSB_COMMON
     bool
     help
