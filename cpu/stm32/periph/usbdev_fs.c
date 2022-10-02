@@ -147,12 +147,11 @@ static void _enable_usb_clk(void)
 
 static void _enable_gpio(const stm32_usbdev_fs_config_t *conf)
 {
-    gpio_init(conf->dp, GPIO_IN);
-    gpio_init(conf->dm, GPIO_IN);
-    /* Configure AF for the pins */
-    gpio_init_af(conf->dp, conf->af);
-    gpio_init_af(conf->dm, conf->af);
-}
+    if (conf->af != GPIO_AF_UNDEF) {
+        /* Configure AF for the pins */
+        gpio_init_af(conf->dp, conf->af);
+        gpio_init_af(conf->dm, conf->af);
+    }
 
 static void _set_ep_in_status(uint16_t *val, uint16_t mask)
 {
