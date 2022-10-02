@@ -424,6 +424,11 @@ config HAS_PERIPH_USBDEV
     help
         Indicates that an USBDEV peripheral is present.
 
+config HAS_PERIPH_USBDEV_HS_ULPI
+    bool
+    help
+        Indicates that an USBDEV HS peripheral with ULPI HS PHY is present.
+
 config HAS_PERIPH_VBAT
     bool
     help

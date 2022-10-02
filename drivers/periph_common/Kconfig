@@ -168,6 +168,17 @@ config MODULE_PERIPH_INIT_USBDEV
     default y if MODULE_PERIPH_INIT
     depends on MODULE_PERIPH_USBDEV
 
+config MODULE_PERIPH_USBDEV_HS_ULPI
+    bool "Use USB HS pripheral with UPLI HS PHY"
+    depends on HAS_PERIPH_USBDEV_HS_ULPI
+    depends on MODULE_PERIPH_USBDEV
+
+config MODULE_PERIPH_INIT_USBDEV_HS_ULPI
+    bool
+    default y if MODULE_PERIPH_INIT && MODULE_PERIPH_USBDEV_HS_ULPI
+    depends on HAS_PERIPH_USBDEV_HS_ULPI
+    depends on MODULE_PERIPH_USBDEV
+
 config MODULE_PERIPH_USBDEV_CLK
     bool
     depends on HAS_PERIPH_USBDEV

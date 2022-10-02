@@ -141,6 +141,10 @@ ifneq (,$(filter periph_usbdev,$(USEMODULE)))
   USEMODULE += periph_usbdev_clk
 endif
 
+ifneq (,$(filter periph_usbdev_hs_ulpi,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_usbdev_hs_ulpi
+endif
+
 ifneq (,$(filter pn532_i2c,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
   USEMODULE += pn532
