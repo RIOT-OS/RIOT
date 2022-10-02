@@ -26,7 +26,7 @@ Current hardware support:
 | I2C |  X | I2C1 on PB8/PB9    |
 | Ethernet | X |  |
 | USB OTG FS | X |  |
-| USB OTG HS | - |  |
+| USB OTG HS | X |  |
 | TFT LCD | X |  |
 | Capacitive touch screen | X | |
 | User microphones | - | |

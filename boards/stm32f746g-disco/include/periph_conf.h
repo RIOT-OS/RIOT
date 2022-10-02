@@ -38,7 +38,11 @@
 #include "clk_conf.h"
 #include "cfg_rtt_default.h"
 #include "cfg_timer_tim2.h"
+#if defined(MODULE_PERIPH_USBDEV_HS_ULPI)
+#include "usbdev_synopsys_dwc2.h"
+#else
 #include "cfg_usb_otg_fs.h"
+#endif
 #include "mii.h"
 
 #ifdef __cplusplus
@@ -264,6 +268,56 @@ static const ltdc_conf_t ltdc_config = {
     .vfp        = 2,
 };
 /** @} */
+
+#if defined(MODULE_PERIPH_USBDEV_HS_ULPI) || DOXYGEN
+/**
+ * @name USB OTG FS configuration using ULPI HS PHY
+ *
+ * The USB OTG HS peripheral uses a ULPI HS PHY. The configuration of the
+ * ULPI HS PHY interface is board-specific.
+ *
+ * @{
+ */
+
+/**
+ * @brief Enable the high speed USB OTG peripheral
+ */
+#define DWC2_USB_OTG_HS_ENABLED
+
+/**
+ * @brief Common USB OTG HS configuration with ULPI HS PHY
+ */
+static const dwc2_usb_otg_fshs_config_t dwc2_usb_otg_fshs_config[] = {
+    {
+        .periph   = USB_OTG_HS_PERIPH_BASE,
+        .type     = DWC2_USB_OTG_HS,
+        .phy      = DWC2_USB_OTG_PHY_ULPI,
+        .rcc_mask = RCC_AHB1ENR_OTGHSEN,
+        .irqn     = OTG_HS_IRQn,
+        .ahb      = AHB1,
+        .ulpi_af  = GPIO_AF10,
+        .ulpi_clk = GPIO_PIN(PORT_A, 5),
+        .ulpi_d0  = GPIO_PIN(PORT_A, 3),
+        .ulpi_d1  = GPIO_PIN(PORT_B, 0),
+        .ulpi_d2  = GPIO_PIN(PORT_B, 1),
+        .ulpi_d3  = GPIO_PIN(PORT_B, 10),
+        .ulpi_d4  = GPIO_PIN(PORT_B, 11),
+        .ulpi_d5  = GPIO_PIN(PORT_B, 12),
+        .ulpi_d6  = GPIO_PIN(PORT_B, 13),
+        .ulpi_d7  = GPIO_PIN(PORT_B, 5),
+        .ulpi_dir = GPIO_PIN(PORT_C, 2),
+        .ulpi_stp = GPIO_PIN(PORT_C, 0),
+        .ulpi_nxt = GPIO_PIN(PORT_H, 4),
+    }
+};
+
+/**
+ * @brief Number of available USB OTG peripherals
+ */
+#define USBDEV_NUMOF           ARRAY_SIZE(dwc2_usb_otg_fshs_config)
+
+/** @} */
+#endif /* defined(MODULE_PERIPH_USBDEV_HS_ULPI) || DOXYGEN */
 
 #ifdef __cplusplus
 }
