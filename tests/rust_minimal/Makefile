@@ -5,9 +5,8 @@ BASELIBS += $(APPLICATION_RUST_MODULE).module
 
 FEATURES_REQUIRED += rust_target
 
-# This example can, on all platforms, be built with a stable version of Rust.
-# For most advanced features (eg. when using CoAP, SAUL or the shell with
-# Rust), this needs to be set to "nightly" for the time being.
+# Testing on stable to ensure that no nightly features are needed for basic
+# Rust usage.
 CARGO_CHANNEL = stable
 
 # Currently unknown, something related to the LED_PORT definition that doesn't

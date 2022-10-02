@@ -200,13 +200,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "cstr"
-version = "0.2.11"
+name = "cstr_core"
+version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8aa998c33a6d3271e3678950a22134cd7dd27cef86dee1b611b5b14207d1d90b"
+checksum = "dd98742e4fdca832d40cab219dc2e3048de17d873248f83f17df47c1bea70956"
 dependencies = [
- "proc-macro2",
- "quote",
+ "cty",
+ "memchr",
 ]
 
 [[package]]
@@ -338,9 +338,9 @@ checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
 
 [[package]]
 name = "libc"
-version = "0.2.133"
+version = "0.2.134"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c0f80d65747a3e43d1596c7c5492d95d5edddaabd45a7fcdb02b95f644164966"
+checksum = "329c933548736bc49fd575ee68c89e8be4d260064184389a5b77517cddd99ffb"
 
 [[package]]
 name = "libloading"
@@ -449,9 +449,9 @@ checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.43"
+version = "1.0.46"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0a2ca2c61bc9f3d74d2886294ab7b9853abd9c1ad903a3ac7815c58989bb7bab"
+checksum = "94e2ef8dbfc347b10c094890f778ee2e36ca9bb4262e86dc99cd217e35f3470b"
 dependencies = [
  "unicode-ident",
 ]
@@ -484,8 +484,9 @@ checksum = "a3f87b73ce11b1619a3c6332f45341e0047173771e8b8b73f87bfeefb7b56244"
 
 [[package]]
 name = "riot-sys"
-version = "0.7.8"
-source = "git+https://github.com/RIOT-OS/rust-riot-sys#1035e93ad24d007effe79a5764d8c307150503e3"
+version = "0.7.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c0186f82eb1cf9f9127d7ac4ca7a5d9315dec7d4a24420723d2a3132f73c88b1"
 dependencies = [
  "bindgen",
  "c2rust-asm-casts",
@@ -500,10 +501,11 @@ dependencies = [
 [[package]]
 name = "riot-wrappers"
 version = "0.7.23"
-source = "git+https://github.com/RIOT-OS/rust-riot-wrappers#83f15ef7d3504836a889894463608f6a094525d9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1b11fc0cd528fb848b4abdefa332f4163052edf0bcc3a2ee9cd95e4256e1edc7"
 dependencies = [
  "bare-metal 1.0.0",
- "cstr",
+ "cstr_core",
  "embedded-graphics",
  "embedded-hal",
  "heapless",
@@ -672,9 +674,9 @@ checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
 
 [[package]]
 name = "syn"
-version = "1.0.100"
+version = "1.0.101"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "52205623b1b0f064a4e71182c3b18ae902267282930c6d5462c91b859668426e"
+checksum = "e90cde112c4b9690b8cbe810cba9ddd8bc1d7472e2cae317b69e9438c1cba7d2"
 dependencies = [
  "proc-macro2",
  "quote",
