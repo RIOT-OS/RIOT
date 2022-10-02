@@ -138,8 +138,11 @@ static void _enable_usb_clk(void)
 #elif defined(RCC_APB1SMENR1_USBSMEN)
     RCC->APB1SMENR1 |= RCC_APB1SMENR1_USBSMEN;
 #endif
+
+#if defined(CRS_CR_AUTOTRIMEN) && defined(CRS_CR_CEN)
     /* Enable CRS with auto trim enabled */
     CRS->CR |=  (CRS_CR_AUTOTRIMEN |  CRS_CR_CEN);
+#endif
 }
 
 static void _enable_gpio(const stm32_usbdev_fs_config_t *conf)
