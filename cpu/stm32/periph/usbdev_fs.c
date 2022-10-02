@@ -135,7 +135,7 @@ static void _enable_usb_clk(void)
 
 #if defined(RCC_APB1SMENR_USBSMEN)
     RCC->APB1SMENR |= RCC_APB1SMENR_USBSMEN;
-#elif defined(RCC_APB1SMENR_USBSMEN)
+#elif defined(RCC_APB1SMENR1_USBSMEN)
     RCC->APB1SMENR1 |= RCC_APB1SMENR1_USBSMEN;
 #endif
     /* Enable CRS with auto trim enabled */
