@@ -11,13 +11,17 @@
  * @{
  *
  * @file
- * @brief       Common configuration for STM32 OTG HS peripheral with FS phy
+ * @brief       Common configuration for STM32 OTG HS peripheral with on-chip FS PHY
+ *
+ * All STM32 boards which use the on-chip FS PHY for the USB OTG HS peripheral
+ * use the same configuration. Therefore a common configuration file can be
+ * used for these boards.
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-#ifndef CFG_USB_OTG_HS_FS_H
-#define CFG_USB_OTG_HS_FS_H
+#ifndef CFG_USB_OTG_HS_PHY_FS_H
+#define CFG_USB_OTG_HS_PHY_FS_H
 
 #include "periph_cpu.h"
 #include "usbdev_synopsys_dwc2.h"
@@ -57,5 +61,5 @@ static const dwc2_usb_otg_fshs_config_t dwc2_usb_otg_fshs_config[] = {
 }
 #endif
 
-#endif /* CFG_USB_OTG_HS_FS_H */
+#endif /* CFG_USB_OTG_HS_PHY_FS_H */
 /** @} */
