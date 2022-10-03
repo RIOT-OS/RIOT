@@ -25,6 +25,7 @@
 
 #include "bme680.h"
 #include "bme680_hal.h"
+#include "irq.h"
 
 #ifdef MODULE_PERIPH_I2C
 #include "periph/i2c.h"

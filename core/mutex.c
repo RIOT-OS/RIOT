@@ -82,11 +82,12 @@ static inline __attribute__((always_inline)) void _block(mutex_t *mutex,
     /* We were woken up by scheduler. Waker removed us from queue. */
 }
 
-void mutex_lock(mutex_t *mutex)
+bool mutex_lock_internal(mutex_t *mutex, bool block)
 {
     unsigned irq_state = irq_disable();
 
-    DEBUG("PID[%" PRIkernel_pid "] mutex_lock().\n", thread_getpid());
+    DEBUG("PID[%" PRIkernel_pid "] mutex_lock_internal(block=%u).\n",
+          thread_getpid(), (unsigned)block);
 
     if (mutex->queue.next == NULL) {
         /* mutex is unlocked. */
@@ -101,8 +102,14 @@ void mutex_lock(mutex_t *mutex)
         irq_restore(irq_state);
     }
     else {
+        if (!block) {
+            irq_restore(irq_state);
+            return false;
+        }
         _block(mutex, irq_state);
     }
+
+    return true;
 }
 
 int mutex_lock_cancelable(mutex_cancel_t *mc)
@@ -252,12 +259,6 @@ void mutex_cancel(mutex_cancel_t *mc)
     }
 
     irq_restore(irq_state);
-}
-
-/* Helper for compatibility with C++ or other non-C languages */
-int mutex_trylock_ffi(mutex_t *mutex)
-{
-    return mutex_trylock(mutex);
 }
 
 #else /* MAXTHREADS < 2 */

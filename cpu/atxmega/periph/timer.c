@@ -19,18 +19,16 @@
  * @}
  */
 
+#include <assert.h>
 #include <avr/interrupt.h>
 
-#include <assert.h>
-
+#include "board.h"
 #include "cpu.h"
 #include "cpu_pm.h"
-#include "thread.h"
-
+#include "irq.h"
 #include "periph/timer.h"
-
-#include "board.h"
 #include "periph_conf.h"
+#include "thread.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"

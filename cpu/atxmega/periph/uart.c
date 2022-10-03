@@ -30,10 +30,11 @@
 #include "board.h"
 #include "cpu.h"
 #include "cpu_pm.h"
+#include "irq.h"
+#include "periph/gpio.h"
+#include "periph/uart.h"
 #include "sched.h"
 #include "thread.h"
-#include "periph/uart.h"
-#include "periph/gpio.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"

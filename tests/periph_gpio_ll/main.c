@@ -23,12 +23,13 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "irq.h"
 #include "mutex.h"
 #include "periph/gpio_ll.h"
 #include "periph/gpio_ll_irq.h"
 #include "test_utils/expect.h"
-#include "ztimer.h"
 #include "timex.h"
+#include "ztimer.h"
 
 #ifndef LOW_ROM
 #define LOW_ROM 0

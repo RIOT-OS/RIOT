@@ -21,9 +21,10 @@
 
 #include <avr/sleep.h>
 
-#include "periph_conf.h"
-#include "periph/pm.h"
 #include "cpu_pm.h"
+#include "irq.h"
+#include "periph/pm.h"
+#include "periph_conf.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
