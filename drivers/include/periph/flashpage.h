@@ -52,6 +52,7 @@
 #include <stdint.h>
 
 #include "cpu_conf.h"
+#include "kernel_defines.h"
 #include "periph_cpu.h"
 
 #ifdef __cplusplus
