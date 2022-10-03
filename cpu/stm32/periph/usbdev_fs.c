@@ -153,6 +153,14 @@ static void _enable_gpio(const stm32_usbdev_fs_config_t *conf)
         gpio_init_af(conf->dm, conf->af);
     }
 
+    if (conf->disconn != GPIO_UNDEF) {
+        /* In case the MCU has no internal D+ pullup, a GPIO is used to
+         * connect/disconnect from USB bus */
+        gpio_init(conf->disconn, GPIO_OUT);
+        gpio_clear(conf->disconn);
+    }
+}
+
 static void _set_ep_in_status(uint16_t *val, uint16_t mask)
 {
     /* status endpoints bits can only be toggled, writing 0
@@ -181,28 +189,36 @@ static void _set_ep_out_status(uint16_t *val, uint16_t mask)
 
 static inline void _usb_attach(stm32_usbdev_fs_t *usbdev)
 {
+    const stm32_usbdev_fs_config_t *conf = usbdev->config;
+
     /* Some ST USB IP doesn't have this feature */
 #ifdef USB_BCDR_DPPU
-    const stm32_usbdev_fs_config_t *conf = usbdev->config;
     /* Enable DP pullup to signal connection */
     _global_regs(conf)->BCDR |= USB_BCDR_DPPU;
     while (!(CRS->ISR & CRS_ISR_ESYNCF));
 #else
-    (void)usbdev;
+    /* If configuration uses a GPIO for USB connect/disconnect */
+    if (conf->disconn != GPIO_UNDEF) {
+        gpio_set(conf->disconn);
+    }
 #endif /* USB_BCDR_DPPU */
 }
 
 static inline void _usb_detach(stm32_usbdev_fs_t *usbdev)
 {
+    const stm32_usbdev_fs_config_t *conf = usbdev->config;
+
     /* Some ST USB IP doesn't have this feature */
 #ifdef USB_BCDR_DPPU
-    const stm32_usbdev_fs_config_t *conf = usbdev->config;
     DEBUG_PUTS("usbdev_fs: Detaching from host");
 
     /* Disable DP pullup to signal disconnection */
     CLRBIT(_global_regs(conf)->BCDR, USB_BCDR_DPPU);
 #else
-    (void)usbdev;
+    /* If configuration uses a GPIO for USB connect/disconnect */
+    if (conf->disconn != GPIO_UNDEF) {
+        gpio_clear(conf->disconn);
+    }
 #endif
 }
 

@@ -50,6 +50,7 @@ typedef struct {
     gpio_t dm;                      /**< Data- gpio */
     gpio_t dp;                      /**< Data+ gpio */
     gpio_af_t af;                   /**< Alternative function */
+    gpio_t disconn;                 /**< GPIO if used for USB disconnect */
 } stm32_usbdev_fs_config_t;
 
 #ifdef __cplusplus
