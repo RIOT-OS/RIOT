@@ -12,6 +12,6 @@ publish = false
 
 [dependencies]
 lsm303agr = "^0.2"
-riot-wrappers = "^0.7.17"
+riot-wrappers = "^0.8"
 # Whatever lsm uses
 nb = "*"
