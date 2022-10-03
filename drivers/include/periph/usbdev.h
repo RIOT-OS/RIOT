@@ -79,6 +79,7 @@
 #include <stddef.h>
 
 #include "assert.h"
+#include "kernel_defines.h"
 #include "periph_cpu.h"
 #include "usb.h"
 #include "usb/usbopt.h"
