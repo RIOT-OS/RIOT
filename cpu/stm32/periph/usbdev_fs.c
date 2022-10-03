@@ -279,10 +279,12 @@ static void _usbdev_init(usbdev_t *dev)
     /* Configure GPIOs */
     _enable_gpio(conf);
 
-    /* Reset USB IP */
-    _global_regs(conf)->CNTR = USB_CNTR_FRES;
+    /* Reset and power down USB IP */
+    _global_regs(conf)->CNTR = USB_CNTR_FRES | USB_CNTR_PDWN;
+    /* Clear power down */
+    _global_regs(conf)->CNTR &= ~USB_CNTR_PDWN;
     /* Clear reset */
-    _global_regs(conf)->CNTR = 0;
+    _global_regs(conf)->CNTR &= ~USB_CNTR_FRES;
     /* Clear interrupt register */
     _global_regs(conf)->ISTR = 0x0000;
     /* Set BTABLE at start of USB SRAM */
@@ -291,6 +293,12 @@ static void _usbdev_init(usbdev_t *dev)
     _global_regs(conf)->DADDR = USB_DADDR_EF;
     /* Unmask the interrupt in the NVIC */
     _enable_irq();
+
+    /* Disable remapping of USB IRQs if remapping defined */
+#ifdef SYSCFG_CFGR1_USB_IT_RMP
+    SYSCFG->CFGR1 &= ~SYSCFG_CFGR1_USB_IT_RMP;
+#endif
+
     /* Enable USB IRQ */
     NVIC_EnableIRQ(conf->irqn);
     /* fill USB SRAM with zeroes */
