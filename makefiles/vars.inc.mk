@@ -86,6 +86,7 @@ export SIZE                  # The command to read to size of the ELF sections.
 export SIZEFLAGS             # The optional size flags.
 export UNDEF                 # Object files that the linker must include in the ELFFILE even if no call to the functions or symbols (ex: interrupt vectors).
 export WERROR                # Treat all compiler warnings as errors if set to 1 (see -Werror flag in GCC manual)
+export FORBID_DEPRECATED     # Treat the use of deprecated items in C code as errors if set to 1
 export WPEDANTIC             # Issue all (extensive) compiler warnings demanded by strict C/C++
 # EEPROM_FILE                # (Native only!) file path where the content of the EEPROM is stored
 

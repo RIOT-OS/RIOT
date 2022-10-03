@@ -9,6 +9,10 @@ FEATURES_OPTIONAL += periph_flashpage_rwee
 USEMODULE += od
 USEMODULE += shell
 
+# This test still runs deprecated functions (flashpage_first_free,
+# flashpage_last_free) until they are actually removed.
+FORBID_DEPRECATED = 0
+
 # avoid running Kconfig by default
 SHOULD_RUN_KCONFIG ?=
 

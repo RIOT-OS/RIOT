@@ -88,5 +88,17 @@ ifeq (,$(filter -DDEVELHELP,$(CFLAGS)))
   endif
 endif
 
+# Deprecations are warnings unless FORBID_DEPRECATED is set. Flags are only set
+# on demand to avoid CFLAG clutter.
+ifneq ($(FORBID_DEPRECATED),1)
+  ifeq (1,$(WERROR))
+    CFLAGS += -Wno-error=deprecated-declarations
+  endif
+else
+  ifneq (1,$(WERROR))
+    CFLAGS += -Werror=deprecated-declarations
+  endif
+endif
+
 # Add the optional flags that are not architecture/toolchain blacklisted
 CFLAGS += $(filter-out $(OPTIONAL_CFLAGS_BLACKLIST),$(OPTIONAL_CFLAGS))
