@@ -87,6 +87,12 @@ static mtd_sam0_sdhc_t sdhc_dev = {
 mtd_dev_t *mtd2 = (mtd_dev_t *)&sdhc_dev;
 
 #ifdef MODULE_VFS_DEFAULT
+/* default to FAT */
+#if defined(MODULE_FATFS_VFS)
 VFS_AUTO_MOUNT(fatfs, VFS_MTD(sdhc_dev), VFS_DEFAULT_SD(0), 1);
+/* but also support ext2/3/4 */
+#elif defined(MODULE_LWEXT4)
+VFS_AUTO_MOUNT(lwext4, VFS_MTD(sdhc_dev), VFS_DEFAULT_SD(0), 1);
 #endif
+#endif /* MODULE_VFS_DEFAULT */
 #endif /* MODULE_SAM0_SDHC */

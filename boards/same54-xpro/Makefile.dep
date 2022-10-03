@@ -21,6 +21,9 @@ endif
 # default to using littlefs2 on the external flash and fatfs on SD card
 ifneq (,$(filter vfs_default,$(USEMODULE)))
   USEPKG += littlefs2
-  USEMODULE += fatfs_vfs
+  # if ext2/3/4 is used, don't use FAT
+  ifeq (,$(filter lwext%_vfs,$(USEMODULE)))
+    USEMODULE += fatfs_vfs
+  endif
   USEMODULE += mtd
 endif
