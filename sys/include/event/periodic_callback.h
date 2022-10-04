@@ -41,6 +41,17 @@ typedef struct {
 } event_periodic_callback_t;
 
 /**
+ * @brief   Get user context from Periodic Callback Event
+ *
+ * @param[in]   event           event_periodic_callback object to initialize
+ * @return      User supplied argument to the event
+ */
+static inline void *event_periodic_callback_get_arg(event_periodic_callback_t *event)
+{
+    return event->event.arg;
+}
+
+/**
  * @brief   Initialize a periodic callback event
  *
  * @note: On init the periodic event is to to run forever.
