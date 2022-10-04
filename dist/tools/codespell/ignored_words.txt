@@ -147,3 +147,6 @@ nam
 
 # donot (part of bloom filter test vector) => do not
 donot
+
+# Didi (Ayman El Didi) => Did
+didi
