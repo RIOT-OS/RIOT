@@ -54,6 +54,8 @@ endif
 # tinyUSB hardware driver selection
 ifneq (,$(filter esp32s2 esp32s3,$(CPU_FAM)))
   USEMODULE += tinyusb_portable_espressif
+else ifneq (,$(filter saml21 samd5x samd21,$(CPU)))
+  USEMODULE += tinyusb_portable_microchip
 else ifeq (stm32,$(CPU))
   ifneq (,$(filter f2 f4 f7 h7 l4,$(CPU_FAM)))
     USEMODULE += tinyusb_portable_synopsys_dwc2
