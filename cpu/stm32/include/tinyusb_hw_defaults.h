@@ -90,6 +90,16 @@ extern "C" {
 #endif
 /** @} */
 
+#ifdef USB_HS_PHYC
+/**
+ * @brief    Definition of HSE clock value
+ *
+ * If the CMSIS defines that the internal UTMI HS PHY is used, the Synopsys DWC2
+ * driver needs the definition of the HSE clock value.
+ */
+#define HSE_VALUE           CLOCK_HSE
+#endif
+
 #ifdef __cplusplus
 }
 #endif
