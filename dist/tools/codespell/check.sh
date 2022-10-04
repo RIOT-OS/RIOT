@@ -41,6 +41,7 @@ ${CODESPELL_CMD} --version &> /dev/null || {
 CODESPELL_OPTS="-q 2"  # Disable "WARNING: Binary file"
 CODESPELL_OPTS+=" --check-hidden"
 CODESPELL_OPTS+=" --ignore-words ${RIOTTOOLS}/codespell/ignored_words.txt"
+CODESPELL_OPTS+=" --exclude-file ${RIOTTOOLS}/codespell/ignored_words.txt"
 CODESPELL_OPTS+=" -c"   # Enable colored output
 
 if [ "${CODESPELL_INTERACTIVE}" = "1" ]; then
