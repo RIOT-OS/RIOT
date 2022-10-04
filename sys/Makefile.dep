@@ -49,6 +49,10 @@ ifneq (,$(filter congure_reno_methods,$(USEMODULE)))
   USEMODULE += seq
 endif
 
+ifneq (,$(filter crc32_fast,$(USEMODULE)))
+  USEMODULE += checksum
+endif
+
 ifneq (,$(filter eepreg,$(USEMODULE)))
   FEATURES_REQUIRED += periph_eeprom
 endif
