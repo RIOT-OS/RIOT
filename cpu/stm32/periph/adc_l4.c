@@ -29,9 +29,20 @@
 #include "ztimer.h"
 
 /**
+ * @brief Not all STM32 L4 boards have 3 ADC devices
+ * for example, L4R5ZI has only one ADC
+ */
+#if defined ADC_DEVS && ADC_DEVS == 1
+#define ADC ADC1_COMMON
+#endif
+#if defined ADC_DEVS && ADC_DEVS == 3
+#define ADC ADC123_COMMON
+#endif
+
+/**
  * @brief map CPU specific register/value names
  */
-#if defined(CPU_MODEL_STM32L476RG)
+#if defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L4R5ZI)
 #define ADC_CR_REG      CR
 #define ADC_ISR_REG     ISR
 #define ADC_PERIPH_CLK  AHB2
@@ -117,16 +128,16 @@ int adc_init(adc_t line)
     prep(line);
 
     /* set prescaler to 0 to let the ADC run with maximum speed */
-    ADC123_COMMON->CCR &= ~(ADC_CCR_PRESC);
+    ADC->CCR &= ~(ADC_CCR_PRESC);
 
     /* Setting ADC clock to HCLK/1 is only allowed if AHB clock prescaler is 1*/
     if (!(RCC->CFGR & RCC_CFGR_HPRE_3)) {
         /* set ADC clock to HCLK/1 */
-        ADC123_COMMON->CCR |= (ADC_CCR_CKMODE_0);
+        ADC->CCR |= (ADC_CCR_CKMODE_0);
     }
     else {
         /* set ADC clock to HCLK/2 otherwise */
-        ADC123_COMMON->CCR |= (ADC_CCR_CKMODE_1);
+        ADC->CCR |= (ADC_CCR_CKMODE_1);
     }
 
     /* configure the pin */

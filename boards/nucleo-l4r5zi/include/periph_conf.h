@@ -117,6 +117,49 @@ static const spi_conf_t spi_config[] = {
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
+/**
+ * @brief   ADC configuration
+ *
+ * Note that we do not configure all ADC channels,
+ * and not in the STM32L4R5 order.  Instead, we
+ * just define 6 ADC channels, for the Nucleo
+ * Arduino header pins A0-A5 and the internal VBAT channel.
+ *
+ * To find appropriate device and channel find in the
+ * board manual, table showing pin assignments and
+ * information about ADC - a text similar to ADC[X]_IN[Y],
+ * where:
+ * [X] - describes used device - indexed from 0,
+ * for example ADC1_IN10 is device 0,
+ * [Y] - describes used channel - indexed from 1,
+ * for example ADC1_IN10 is channel 10
+ *
+ * For Nucleo-L4R5ZI this information is in board manual,
+ * Table 11, page 38.
+ * @{
+ */
+static const adc_conf_t adc_config[] = {
+    { .pin = GPIO_PIN(PORT_A, 3), .dev = 0, .chan =  8 }, /* ADC12_IN8   */
+    { .pin = GPIO_PIN(PORT_C, 0), .dev = 0, .chan =  1 }, /* ADC123_IN1  */
+    { .pin = GPIO_PIN(PORT_C, 3), .dev = 0, .chan =  4 }, /* ADC123_IN4  */
+    { .pin = GPIO_PIN(PORT_C, 1), .dev = 0, .chan =  2 }, /* ADC123_IN2  */
+    { .pin = GPIO_PIN(PORT_C, 4), .dev = 0, .chan = 13 }, /* ADC12_IN13  */
+    { .pin = GPIO_PIN(PORT_C, 5), .dev = 0, .chan = 14 }, /* ADC12_IN14  */
+    { .pin = GPIO_UNDEF, .dev = 0, .chan = 18 }, /* VBAT */
+};
+
+/**
+ * @brief Number of ADC devices
+ */
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
+
+/**
+ * @brief VBAT ADC line
+ */
+#define VBAT_ADC            ADC_LINE(6)
+
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
