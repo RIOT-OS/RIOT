@@ -243,7 +243,9 @@ void flashpage_erase(unsigned page);
  * If riotboot is used in two slot mode, this number will change across
  * firmware updates as the firmware slots alternate.
  */
-DEPRECATED("Use FLASH_WRITABLE_INIT instead, which is usable in modules as well as applications. The function will be removed after the 2022.04 release.")
+RIOT_DEPRECATED_FUNCTION("Use FLASH_WRITABLE_INIT instead, which is usable in \
+modules as well as applications. The function will be removed after the \
+2022.04 release.")
 unsigned flashpage_first_free(void);
 
 /**
@@ -252,7 +254,9 @@ unsigned flashpage_first_free(void);
  * If riotboot is used in two slot mode, this number will change across
  * firmware updates as the firmware slots alternate.
  */
-DEPRECATED("Use FLASH_WRITABLE_INIT instead, which is usable in modules as well as applications. The function will be removed after the 2022.04 release.")
+RIOT_DEPRECATED_FUNCTION("Use FLASH_WRITABLE_INIT instead, which is usable in \
+modules as well as applications. The function will be removed after the \
+2022.04 release.")
 unsigned flashpage_last_free(void);
 
 /**

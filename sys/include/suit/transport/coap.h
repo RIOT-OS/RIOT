@@ -36,7 +36,8 @@ extern "C" {
 /**
  * @brief    Start SUIT CoAP thread
  */
-DEPRECATED("This is an alias for suit_worker_run and will be removed after after the 2023.01 release.")
+RIOT_DEPRECATED_FUNCTION("This is an alias for suit_worker_run and will be \
+removed after after the 2023.01 release.")
 static inline void suit_coap_run(void)
 {
     suit_worker_run();
@@ -91,7 +92,8 @@ extern const coap_resource_subtree_t coap_resource_subtree_suit;
  * @param[in] url       url pointer containing the full coap url to the manifest
  * @param[in] len       length of the url
  */
-DEPRECATED("This is an alias for suit_worker_trigger and will be removed after after the 2023.01 release.")
+RIOT_DEPRECATED_FUNCTION("This is an alias for suit_worker_trigger and will be \
+removed after after the 2023.01 release.")
 static inline void suit_coap_trigger(const uint8_t *url, size_t len)
 {
     suit_worker_trigger((const char *)url, len);
