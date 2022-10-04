@@ -65,6 +65,13 @@ Test *tests_checksum_crc16_ccitt_false_tests(void);
 Test *tests_checksum_crc16_ccitt_aug_tests(void);
 
 /**
+ * @brief   Generates tests for checksum/crc32.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_checksum_crc32_tests(void);
+
+/**
  * @brief   Generates tests for checksum/fletcher16.h
  *
  * @return  embUnit tests if successful, NULL if not.

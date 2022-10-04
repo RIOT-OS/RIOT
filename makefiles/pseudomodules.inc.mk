@@ -45,6 +45,7 @@ PSEUDOMODULES += cortexm_fpu
 PSEUDOMODULES += cortexm_svc
 PSEUDOMODULES += cpp
 PSEUDOMODULES += cpu_check_address
+PSEUDOMODULES += crc32_fast
 PSEUDOMODULES += credman_load
 PSEUDOMODULES += dbgpin
 PSEUDOMODULES += devfs_%
