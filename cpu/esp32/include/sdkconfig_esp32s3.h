@@ -107,10 +107,12 @@ extern "C" {
 #define CONFIG_ESP_SLEEP_GPIO_RESET_WORKAROUND  1
 
 /**
- * ESP32-S3 specific PHY configuration
+ * ESP32-S3 specific USB configuration
  */
+#ifdef MODULE_ESP_IDF_USB
 #define CONFIG_ESP_PHY_ENABLE_USB               1
 #define CONFIG_USB_OTG_SUPPORTED                1
+#endif
 
 /**
  * ESP32-S3 specific SPI RAM configuration

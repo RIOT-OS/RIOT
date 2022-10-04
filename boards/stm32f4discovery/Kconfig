@@ -27,6 +27,7 @@ config BOARD_STM32F4DISCOVERY
 
     # Various other features (if any)
     select HAS_ARDUINO
+    select HAS_TINYUSB_DEVICE
 
     # Clock configuration
     select BOARD_HAS_HSE

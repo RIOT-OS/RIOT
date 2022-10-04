@@ -1,0 +1,82 @@
+/**
+ * @defgroup pkg_tinyusb TinyUSB package
+ * @ingroup  pkg
+ * @brief    Provides the tinyUSB stack as package
+ * @author   Gunar Schorcht <gunar@schorcht.net>
+ * @see https://github.com/hathach/tinyusb
+ *
+ * # TinyUSB
+ *
+ * tinyUSB is an open-source cross-platform USB Host/Device stack for
+ * embedded systems.
+ *
+ * # Usage
+ *
+ * Add the following entries to your application makefile:
+ * - Enable tinyUSB package
+ *   ```makefile
+ *   USEPKG += tinyusb
+ *   ```
+ * - Select whether to use the tinyUSB device stack or the tinyUSB host stack or both:
+ *   ```makefile
+ *   USEMODULE += tinyusb_device
+ *   ```
+ * - Select the device/host classes to be used, for example:
+ *   ```makefile
+ *   USEMODULE += tinyusb_class_cdc tinyusb_class_msc
+ *   ```
+ *
+ * Either add `tinyusb_setup()` to your main function to explicitly initialize
+ * the tinyUSB stack including the used peripherals and start the tinyUSB
+ * thread, or use the `auto_init` module (**default**).
+ *
+ * ```c
+ * int main(void)
+ * {
+ *     ...
+ *     // If auto-initialization is not used (module `auto_init`),
+ *     // initialize the tinyUSB stack including used peripherals and
+ *     // start the tinyUSB thread. Auto-initialization is used by default.
+ *     tinyusb_setup();
+ *
+ *     while (1) {
+ *         ...
+ *     }
+ *
+ *     return 0;
+ * }
+ * ```
+ *
+ * Create a file `tusb_config.h` in your application directory which includes
+ * at least the file `tinyusb_config.h` from the tinyUSB package. This file is
+ * required by the tinyUSB stack and can be used to override the default
+ * configuration defined in `tinyusb_config.h`.
+ * ```c
+ * #define CFG_TUD_CDC              2
+ * #define CFG_TUD_CDC_EP_BUFSIZE   128
+ *
+ * #include "tinyusb_config.h"
+ * ```
+ *
+ * Add the application path to the include paths at the end of your
+ * application's Makefile. This is necessary so that the tinyUSB stack
+ * uses the file `tusb_config.h` from your application directory and thus the
+ * file `tinyusb_config.h` from the tinyUSB package.
+ * ```makefile
+ * USEPKG += tinyusb
+ * USEMODULE += tinyusb_class_cdc
+ * USEMODULE += tinyusb_class_msc
+ * USEMODULE += tinyusb_device
+ *
+ * include $(RIOTBASE)/Makefile.include
+ *
+ * INCLUDES += -I$(APPDIR)
+ * ```
+ *
+ * Implement required device descriptors and descriptor callbacks as well as
+ * the callbacks of the enabled classes.
+ *
+ * Please refer `$RIOTBASE/tests/pkg_tinyusb_cdc_msc` and the
+ * [tinyUSB documentation](https://docs.tinyusb.org/en/latest/reference/getting_started.html)
+ * for details.
+ */

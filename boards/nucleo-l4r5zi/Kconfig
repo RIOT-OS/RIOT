@@ -28,5 +28,6 @@ config BOARD_NUCLEO_L4R5ZI
 
     # Put other features for this board (in alphabetical order)
     select HAS_RIOTBOOT
+    select HAS_TINYUSB_DEVICE
 
 source "$(RIOTBOARD)/common/nucleo144/Kconfig"

@@ -1,0 +1,147 @@
+# Copyright (c) 2022 Gunar Schorcht
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config HAS_TINYUSB_DEVICE
+    bool
+    help
+        Indicates that the hardware supports tinyUSB device stack
+
+config HAS_TINYUSB_HOST
+    bool
+    help
+        Indicates that the hardware supports tinyUSB host stack
+
+menuconfig PACKAGE_TINYUSB
+    bool "TinyUSB stack package"
+    depends on HAS_ARCH_32BIT
+    depends on HAS_TINYUSB_DEVICE || HAS_TINYUSB_HOST
+    select MODULE_PERIPH_USBDEV_CLK
+    select MODULE_SEMA
+    select MODULE_TINYUSB_COMMON
+    select MODULE_TINYUSB_CONTRIB
+    select MODULE_TINYUSB_HW
+    select MODULE_TINYUSB_PORTABLE_ESPRESSIF if CPU_FAM_ESP32S2 || CPU_FAM_ESP32S3
+    select MODULE_TINYUSB_PORTABLE_SYNOPSYS_DWC2 if CPU_STM32 && CPU_FAM_F2
+    select MODULE_TINYUSB_PORTABLE_SYNOPSYS_DWC2 if CPU_STM32 && CPU_FAM_F4
+    select MODULE_TINYUSB_PORTABLE_SYNOPSYS_DWC2 if CPU_STM32 && CPU_FAM_F7
+    select MODULE_TINYUSB_PORTABLE_SYNOPSYS_DWC2 if CPU_STM32 && CPU_FAM_H7
+    select MODULE_TINYUSB_PORTABLE_SYNOPSYS_DWC2 if CPU_STM32 && CPU_FAM_L4
+    select MODULE_TINYUSB_PORTABLE_STM32_FSEDV if CPU_STM32 && CPU_FAM_F0
+    select MODULE_TINYUSB_PORTABLE_STM32_FSEDV if CPU_STM32 && CPU_FAM_F1
+    select MODULE_TINYUSB_PORTABLE_STM32_FSEDV if CPU_STM32 && CPU_FAM_G4
+    select MODULE_TINYUSB_PORTABLE_STM32_FSEDV if CPU_STM32 && CPU_FAM_L0
+    select MODULE_TINYUSB_PORTABLE_STM32_FSEDV if CPU_STM32 && CPU_FAM_WB
+    select MODULE_ZTIMER_MSEC
+    help
+        tinyUSB is an open-source cross-platform USB Host/Device stack for
+        embedded systems.
+
+if PACKAGE_TINYUSB
+
+config MODULE_AUTO_INIT_TINYUSB
+    bool "Auto-initialize the tinyUSB package"
+    default y
+    depends on MODULE_AUTO_INIT
+    help
+        The tinyUSB stack including the used peripherals are initialized
+        automatically at startup. Additionally, the auto-initialization
+        starts the tinyUSB thread.
+
+config MODULE_TINYUSB_COMMON
+    bool
+    help
+        Common tinyUSB files
+
+config MODULE_TINYUSB_CONTRIB
+    bool
+    help
+        RIOT support for tinyUSB
+
+config MODULE_TINYUSB_HW
+    bool
+    help
+        tinyUSB hardware driver implementation
+
+config MODULE_TINYUSB_DEVICE
+    bool "Device Stack"
+    depends on HAS_TINYUSB_DEVICE
+    help
+        Select to enable tinyUSB device stack
+
+config MODULE_TINYUSB_HOST
+    bool "Host Stack"
+    depends on HAS_TINYUSB_HOST
+    help
+        Select to enable tinyUSB host stack
+
+config MODULE_TINYUSB_PORTABLE_ESPRESSIF
+    bool
+    help
+        tinyUSB driver for ESP32Sx is used
+
+config MODULE_TINYUSB_PORTABLE_SYNOPSYS_DWC2
+    bool
+    help
+        tinyUSB Sysnopsys DCW2 driver is used
+
+config MODULE_TINYUSB_PORTABLE_STM32_FSDEV
+    bool
+    help
+        tinyUSB STM32 FS device driver is used
+
+menu "Device Classes"
+    config MODULE_TINYUSB_CLASS_AUDIO
+        bool "Audio Class 2.0 (UAC2)"
+        depends on MODULE_TINYUSB_DEVICE
+
+    config MODULE_TINYUSB_CLASS_BTH
+        bool "Bluetooth Host Controller Interface (BTH HCI)"
+        depends on MODULE_TINYUSB_DEVICE
+
+    config MODULE_TINYUSB_CLASS_CDC
+        bool "Communication Device Class (CDC)"
+
+    config MODULE_TINYUSB_CLASS_DFU
+        bool "Device Firmware Update (DFU) Runtime"
+        depends on MODULE_TINYUSB_DEVICE
+
+    config MODULE_TINYUSB_CLASS_DFU_RUNTIME
+        bool "Device Firmware Update (DFU)"
+        depends on MODULE_TINYUSB_DEVICE
+
+    config MODULE_TINYUSB_CLASS_HID
+        bool "Human Interface Device (HID)"
+
+    config MODULE_TINYUSB_CLASS_MSC
+        bool "Mass Storage Class (MSC)"
+
+    config MODULE_TINYUSB_CLASS_MIDI
+        bool "Musical Instrument Digital Interface (MIDI)"
+        depends on MODULE_TINYUSB_DEVICE
+
+    config MODULE_TINYUSB_CLASS_NET_ECM_RNDIS
+        bool "Network with RNDIS, Ethernet Control Model (ECM)"
+        depends on MODULE_TINYUSB_DEVICE
+
+    config MODULE_TINYUSB_CLASS_NET_NCM
+        bool "Network with Network Control Model (NCM)"
+        depends on MODULE_TINYUSB_DEVICE
+
+    config MODULE_TINYUSB_CLASS_USBTMC
+        bool "Test and Measurement Class (USBTMC)"
+        depends on MODULE_TINYUSB_DEVICE
+
+    config MODULE_TINYUSB_CLASS_VENDOR
+        bool "Vendor-specific class support with generic IN & OUT endpoints"
+
+    config MODULE_TINYUSB_CLASS_VIDEO
+        bool "Video class 1.5 (UVC)"
+        depends on MODULE_TINYUSB_DEVICE
+
+endmenu
+
+endif # PACKAGE_TINYUSB

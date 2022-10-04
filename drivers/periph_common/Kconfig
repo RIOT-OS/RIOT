@@ -161,11 +161,23 @@ config MODULE_PERIPH_USBDEV
     bool "USBDEV peripheral driver"
     depends on HAS_PERIPH_USBDEV
     select MODULE_PERIPH_COMMON
+    select MODULE_PERIPH_USBDEV_CLK
 
 config MODULE_PERIPH_INIT_USBDEV
     bool "Auto initialize USBDEV peripheral"
     default y if MODULE_PERIPH_INIT
     depends on MODULE_PERIPH_USBDEV
+
+config MODULE_PERIPH_USBDEV_CLK
+    bool
+    depends on HAS_PERIPH_USBDEV
+    help
+        Enable the USB device specific clock settings, if there are any
+
+config MODULE_PERIPH_INIT_USBDEV_CLK
+    bool
+    default y if MODULE_PERIPH_INIT && MODULE_PERIPH_USBDEV_CLK
+    depends on HAS_PERIPH_USBDEV
 
 endif # TEST_KCONFIG
 

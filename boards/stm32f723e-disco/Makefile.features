@@ -12,5 +12,8 @@ FEATURES_PROVIDED += periph_uart
 FEATURES_PROVIDED += periph_uart_hw_fc
 FEATURES_PROVIDED += periph_usbdev
 
+# Put other features for this board (in alphabetical order)
+FEATURES_PROVIDED += tinyusb_device
+
 # stm32f723e-disco provides a custom default Kconfig clock configuration
 KCONFIG_BOARD_CONFIG += $(RIOTBOARD)/stm32f723e-disco/clock.config
