@@ -195,7 +195,7 @@ static inline void _usb_attach(stm32_usbdev_fs_t *usbdev)
 #ifdef USB_BCDR_DPPU
     /* Enable DP pullup to signal connection */
     _global_regs(conf)->BCDR |= USB_BCDR_DPPU;
-    while (!(CRS->ISR & CRS_ISR_ESYNCF));
+    while (!(CRS->ISR & CRS_ISR_ESYNCF)) {}
 #else
     /* If configuration uses a GPIO for USB connect/disconnect */
     if (conf->disconn != GPIO_UNDEF) {
