@@ -200,13 +200,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "cstr_core"
-version = "0.2.6"
+name = "cstr"
+version = "0.2.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd98742e4fdca832d40cab219dc2e3048de17d873248f83f17df47c1bea70956"
+checksum = "8aa998c33a6d3271e3678950a22134cd7dd27cef86dee1b611b5b14207d1d90b"
 dependencies = [
- "cty",
- "memchr",
+ "proc-macro2",
+ "quote",
 ]
 
 [[package]]
@@ -500,12 +500,12 @@ dependencies = [
 
 [[package]]
 name = "riot-wrappers"
-version = "0.7.23"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1b11fc0cd528fb848b4abdefa332f4163052edf0bcc3a2ee9cd95e4256e1edc7"
+checksum = "4482b7376de29de4b9d4e5dd8a6bf32da617f93be43dfe1ae5aff24ccc318f4f"
 dependencies = [
  "bare-metal 1.0.0",
- "cstr_core",
+ "cstr",
  "embedded-graphics",
  "embedded-hal",
  "heapless",

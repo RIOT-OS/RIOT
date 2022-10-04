@@ -16,6 +16,6 @@ panic = "abort"
 codegen-units = 1
 
 [dependencies]
-riot-wrappers = { version = "0.7", default-features = false, features = [ "set_panic_handler" ] }
+riot-wrappers = { version = "0.8", features = [ "set_panic_handler" ] }
 
 rust_riotmodules = { path = "../rust_riotmodules" }

@@ -189,7 +189,7 @@ checksum = "16fbe39cc8c18a07e97f3fbf16e6771946f5cded9800db0ab2698c5a2409ddb2"
 dependencies = [
  "byteorder",
  "coap-message",
- "coap-numbers 0.2.0",
+ "coap-numbers",
  "crc",
  "serde",
  "serde_cbor",
@@ -204,7 +204,7 @@ checksum = "620e584e19bd2432640d73fc29b5c8ac0904a903b863f7c3ad5cd989917c55e5"
 dependencies = [
  "coap-handler",
  "coap-message",
- "coap-numbers 0.2.0",
+ "coap-numbers",
  "crc",
  "minicbor",
  "serde",
@@ -226,17 +226,11 @@ dependencies = [
  "coap-handler",
  "coap-handler-implementations",
  "coap-message",
- "coap-numbers 0.2.0",
+ "coap-numbers",
  "heapless",
  "serde",
  "serde_cbor",
 ]
-
-[[package]]
-name = "coap-numbers"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "846c9bba4f1a98e6b3e26f67d96414eb2b1534a702c87d65c3a52c994c690d6a"
 
 [[package]]
 name = "coap-numbers"
@@ -278,13 +272,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "cstr_core"
-version = "0.2.6"
+name = "cstr"
+version = "0.2.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd98742e4fdca832d40cab219dc2e3048de17d873248f83f17df47c1bea70956"
+checksum = "8aa998c33a6d3271e3678950a22134cd7dd27cef86dee1b611b5b14207d1d90b"
 dependencies = [
- "cty",
- "memchr",
+ "proc-macro2",
+ "quote",
 ]
 
 [[package]]
@@ -590,12 +584,12 @@ checksum = "a3f87b73ce11b1619a3c6332f45341e0047173771e8b8b73f87bfeefb7b56244"
 [[package]]
 name = "riot-coap-handler-demos"
 version = "0.1.0"
-source = "git+https://gitlab.com/etonomy/riot-module-examples/#630a3b0af6dadf10da0583ac2faa54d5297b7bf4"
+source = "git+https://gitlab.com/etonomy/riot-module-examples/#75132650a5c8dfe16cd62eb3dcc91f8fd1630648"
 dependencies = [
  "coap-handler",
  "coap-handler-implementations",
  "coap-message",
- "coap-numbers 0.2.0",
+ "coap-numbers",
  "embedded-graphics",
  "embedded-hal",
  "heapless",
@@ -625,15 +619,15 @@ dependencies = [
 
 [[package]]
 name = "riot-wrappers"
-version = "0.7.23"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1b11fc0cd528fb848b4abdefa332f4163052edf0bcc3a2ee9cd95e4256e1edc7"
+checksum = "4482b7376de29de4b9d4e5dd8a6bf32da617f93be43dfe1ae5aff24ccc318f4f"
 dependencies = [
  "bare-metal 1.0.0",
  "coap-handler",
  "coap-message",
- "coap-numbers 0.1.2",
- "cstr_core",
+ "coap-numbers",
+ "cstr",
  "embedded-graphics",
  "embedded-hal",
  "heapless",

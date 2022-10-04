@@ -15,8 +15,7 @@ crate-type = ["staticlib"]
 panic = "abort"
 
 [dependencies]
-# `default-features = false` can be removed with 0.8, and enables building on stable during the 0.7 series
-riot-wrappers = { version = "0.7", features = [ "set_panic_handler" ], default-features = false }
+riot-wrappers = { version = "0.8", features = [ "set_panic_handler" ] }
 
 # While currently this test does not use any RIOT modules implemented in Rust,
 # that may change; it is best practice for any RIOT application that has its
