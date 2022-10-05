@@ -173,3 +173,7 @@ PSEUDOMODULES += shell_democommands
 ifneq (,$(filter rust_riotmodules,$(USEMODULE)))
   include $(RIOTBASE)/sys/rust_riotmodules/Makefile.include
 endif
+
+ifneq (,$(filter tiny_strerror,$(USEMODULE)))
+  include $(RIOTBASE)/sys/tiny_strerror/Makefile.include
+endif

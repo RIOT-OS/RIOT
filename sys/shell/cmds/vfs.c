@@ -29,8 +29,9 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#include "shell.h"
 #include "macros/units.h"
+#include "shell.h"
+#include "tiny_strerror.h"
 #include "vfs.h"
 #include "vfs_util.h"
 
@@ -93,51 +94,6 @@ static void _vfs_usage(char **argv)
     puts("df: Show file system space utilization stats");
 }
 
-/* Macro used by _errno_string to expand errno labels to string and print it */
-#define _case_snprintf_errno_name(x) \
-    case x: \
-        res = snprintf(buf, buflen, #x); \
-        break
-
-static int _errno_string(int err, char *buf, size_t buflen)
-{
-    int len = 0;
-    int res;
-    if (err < 0) {
-        res = snprintf(buf, buflen, "-");
-        if (res < 0) {
-            return res;
-        }
-        if ((size_t)res <= buflen) {
-            buf += res;
-            buflen -= res;
-        }
-        len += res;
-        err = -err;
-    }
-    switch (err) {
-        _case_snprintf_errno_name(EBUSY);
-        _case_snprintf_errno_name(EACCES);
-        _case_snprintf_errno_name(ENOENT);
-        _case_snprintf_errno_name(EINVAL);
-        _case_snprintf_errno_name(EFAULT);
-        _case_snprintf_errno_name(EROFS);
-        _case_snprintf_errno_name(EIO);
-        _case_snprintf_errno_name(ENAMETOOLONG);
-        _case_snprintf_errno_name(EPERM);
-
-        default:
-            res = snprintf(buf, buflen, "%d", err);
-            break;
-    }
-    if (res < 0) {
-        return res;
-    }
-    len += res;
-    return len;
-}
-#undef _case_snprintf_errno_name
-
 static void _print_size(uint64_t size)
 {
     unsigned long len;
@@ -175,9 +131,7 @@ static void _print_df(vfs_DIR *dir)
     int res = vfs_dstatvfs(dir, &buf);
     printf("%-16s ", dir->mp->mount_point);
     if (res < 0) {
-        char err[16];
-        _errno_string(res, err, sizeof(err));
-        printf("statvfs failed: %s\n", err);
+        printf("statvfs failed: %s\n", tiny_strerror(res));
         return;
     }
 
@@ -200,9 +154,7 @@ static int _df_handler(int argc, char **argv)
             _print_df(&dir);
             vfs_closedir(&dir);
         } else {
-            char err[16];
-            _errno_string(res, err, sizeof(err));
-            printf("Failed to open `%s`: %s\n", path, err);
+            printf("Failed to open `%s`: %s\n", path, tiny_strerror(res));
         }
     }
     else {
@@ -223,11 +175,9 @@ static int _mount_handler(int argc, char **argv)
         return -1;
     }
 
-    char buf[16];
     int res = vfs_mount_by_path(argv[1]);
     if (res < 0) {
-        _errno_string(res, buf, sizeof(buf));
-        puts(buf);
+        puts(tiny_strerror(res));
     }
 
     return res;
@@ -241,11 +191,9 @@ static int _umount_handler(int argc, char **argv)
         return -1;
     }
 
-    char buf[16];
     int res = vfs_unmount_by_path(argv[1]);
     if (res < 0) {
-        _errno_string(res, buf, sizeof(buf));
-        puts(buf);
+        puts(tiny_strerror(res));
     }
 
     return res;
@@ -259,12 +207,10 @@ static int _remount_handler(int argc, char **argv)
         return -1;
     }
 
-    char buf[16];
     vfs_unmount_by_path(argv[1]);
     int res = vfs_mount_by_path(argv[1]);
     if (res < 0) {
-        _errno_string(res, buf, sizeof(buf));
-        puts(buf);
+        puts(tiny_strerror(res));
     }
 
     return res;
@@ -278,11 +224,9 @@ static int _format_handler(int argc, char **argv)
         return -1;
     }
 
-    char buf[16];
     int res = vfs_format_by_path(argv[1]);
     if (res < 0) {
-        _errno_string(res, buf, sizeof(buf));
-        puts(buf);
+        puts(tiny_strerror(res));
     }
 
     return res;
@@ -308,22 +252,19 @@ static int _read_handler(int argc, char **argv)
     int res;
     res = vfs_normalize_path(path, path, strlen(path) + 1);
     if (res < 0) {
-        _errno_string(res, (char *)buf, sizeof(buf));
-        printf("Invalid path \"%s\": %s\n", path, buf);
+        printf("Invalid path \"%s\": %s\n", path, tiny_strerror(res));
         return 5;
     }
 
     int fd = vfs_open(path, O_RDONLY, 0);
     if (fd < 0) {
-        _errno_string(fd, (char *)buf, sizeof(buf));
-        printf("Error opening file \"%s\": %s\n", path, buf);
+        printf("Error opening file \"%s\": %s\n", path, tiny_strerror(fd));
         return 3;
     }
 
     res = vfs_lseek(fd, offset, SEEK_SET);
     if (res < 0) {
-        _errno_string(res, (char *)buf, sizeof(buf));
-        printf("Seek error: %s\n", buf);
+        printf("Seek error: %s\n", tiny_strerror(res));
         vfs_close(fd);
         return 4;
     }
@@ -333,8 +274,7 @@ static int _read_handler(int argc, char **argv)
         size_t line_len = (nbytes < sizeof(buf) ? nbytes : sizeof(buf));
         res = vfs_read(fd, buf, line_len);
         if (res < 0) {
-            _errno_string(res, (char *)buf, sizeof(buf));
-            printf("Read error: %s\n", buf);
+            printf("Read error: %s\n", tiny_strerror(res));
             vfs_close(fd);
             return 5;
         }
@@ -400,7 +340,6 @@ static inline int _dehex(char c)
 static int _write_handler(int argc, char **argv)
 {
     char *w_buf;
-    char buf[16];
     size_t nbytes = 0;
     size_t nb_str = 0;
     char *path = argv[1];
@@ -475,15 +414,13 @@ static int _write_handler(int argc, char **argv)
     int res;
     res = vfs_normalize_path(path, path, strlen(path) + 1);
     if (res < 0) {
-        _errno_string(res, (char *)buf, sizeof(buf));
-        printf("Invalid path \"%s\": %s\n", path, buf);
+        printf("Invalid path \"%s\": %s\n", path, tiny_strerror(res));
         return 5;
     }
 
     int fd = vfs_open(path, flag, 0);
     if (fd < 0) {
-        _errno_string(fd, (char *)buf, sizeof(buf));
-        printf("Error opening file \"%s\": %s\n", path, buf);
+        printf("Error opening file \"%s\": %s\n", path, tiny_strerror(fd));
         return 3;
     }
 
@@ -491,8 +428,7 @@ static int _write_handler(int argc, char **argv)
         while (nb_str > 0) {
             res = vfs_write(fd, w_buf, nbytes);
             if (res < 0) {
-                _errno_string(res, (char *)buf, sizeof(buf));
-                printf("Write error: %s\n", buf);
+                printf("Write error: %s\n", tiny_strerror(res));
                 vfs_close(fd);
                 return 4;
             }
@@ -511,8 +447,7 @@ static int _write_handler(int argc, char **argv)
                 uint8_t byte = _dehex(*w_buf) << 4 | _dehex(*(w_buf + 1));
                 res = vfs_write(fd, &byte, 1);
                 if (res < 0) {
-                    _errno_string(res, (char *)buf, sizeof(buf));
-                    printf("Write error: %s\n", buf);
+                    printf("Write error: %s\n", tiny_strerror(res));
                     vfs_close(fd);
                     return 4;
                 }
@@ -529,7 +464,6 @@ static int _write_handler(int argc, char **argv)
 
 static int _cp_handler(int argc, char **argv)
 {
-    char errbuf[16];
     if (argc < 3) {
         _vfs_usage(argv);
         return 1;
@@ -540,14 +474,14 @@ static int _cp_handler(int argc, char **argv)
 
     int fd_in = vfs_open(src_name, O_RDONLY, 0);
     if (fd_in < 0) {
-        _errno_string(fd_in, (char *)errbuf, sizeof(errbuf));
-        printf("Error opening file for reading \"%s\": %s\n", src_name, errbuf);
+        printf("Error opening file for reading \"%s\": %s\n", src_name,
+               tiny_strerror(fd_in));
         return 2;
     }
     int fd_out = vfs_open(dest_name, O_WRONLY | O_TRUNC | O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO);
     if (fd_out < 0) {
-        _errno_string(fd_out, (char *)errbuf, sizeof(errbuf));
-        printf("Error opening file for writing \"%s\": %s\n", dest_name, errbuf);
+        printf("Error opening file for writing \"%s\": %s\n", dest_name,
+               tiny_strerror(fd_out));
         return 2;
     }
     int eof = 0;
@@ -557,9 +491,9 @@ static int _cp_handler(int argc, char **argv)
         while (bufspace > 0) {
             int res = vfs_read(fd_in, &_shell_vfs_data_buffer[pos], bufspace);
             if (res < 0) {
-                _errno_string(res, (char *)errbuf, sizeof(errbuf));
                 printf("Error reading %lu bytes @ 0x%lx in \"%s\" (%d): %s\n",
-                    (unsigned long)bufspace, (unsigned long)pos, src_name, fd_in, errbuf);
+                       (unsigned long)bufspace, (unsigned long)pos, src_name,
+                       fd_in, tiny_strerror(res));
                 vfs_close(fd_in);
                 vfs_close(fd_out);
                 return 2;
@@ -583,9 +517,9 @@ static int _cp_handler(int argc, char **argv)
         while (bufspace > 0) {
             int res = vfs_write(fd_out, &_shell_vfs_data_buffer[pos], bufspace);
             if (res <= 0) {
-                _errno_string(res, (char *)errbuf, sizeof(errbuf));
                 printf("Error writing %lu bytes @ 0x%lx in \"%s\" (%d): %s\n",
-                    (unsigned long)bufspace, (unsigned long)pos, dest_name, fd_out, errbuf);
+                       (unsigned long)bufspace, (unsigned long)pos, dest_name,
+                       fd_out, tiny_strerror(res));
                 vfs_close(fd_in);
                 vfs_close(fd_out);
                 return 4;
@@ -617,9 +551,7 @@ static int _mv_handler(int argc, char **argv)
 
     int res = vfs_rename(src_name, dest_name);
     if (res < 0) {
-        char errbuf[16];
-        _errno_string(res, (char *)errbuf, sizeof(errbuf));
-        printf("mv ERR: %s\n", errbuf);
+        printf("mv ERR: %s\n", tiny_strerror(res));
         return 2;
     }
     return 0;
@@ -647,9 +579,7 @@ static int _rm_handler(int argc, char **argv)
         res = vfs_unlink(rm_name);
     }
     if (res < 0) {
-        char errbuf[16];
-        _errno_string(res, (char *)errbuf, sizeof(errbuf));
-        printf("rm ERR: %s\n", errbuf);
+        printf("rm ERR: %s\n", tiny_strerror(res));
         return 2;
     }
     return 0;
@@ -666,9 +596,7 @@ static int _mkdir_handler(int argc, char **argv)
 
     int res = vfs_mkdir(dir_name, 0);
     if (res < 0) {
-        char errbuf[16];
-        _errno_string(res, (char *)errbuf, sizeof(errbuf));
-        printf("mkdir ERR: %s\n", errbuf);
+        printf("mkdir ERR: %s\n", tiny_strerror(res));
         return 2;
     }
     return 0;
@@ -681,20 +609,17 @@ static int _ls_handler(int argc, char **argv)
         return 1;
     }
     char *path = argv[1];
-    uint8_t buf[16];
     int res;
     int ret = 0;
     res = vfs_normalize_path(path, path, strlen(path) + 1);
     if (res < 0) {
-        _errno_string(res, (char *)buf, sizeof(buf));
-        printf("Invalid path \"%s\": %s\n", path, buf);
+        printf("Invalid path \"%s\": %s\n", path, tiny_strerror(res));
         return 5;
     }
     vfs_DIR dir;
     res = vfs_opendir(&dir, path);
     if (res < 0) {
-        _errno_string(res, (char *)buf, sizeof(buf));
-        printf("vfs_opendir error: %s\n", buf);
+        printf("vfs_opendir error: %s\n", tiny_strerror(res));
         return 1;
     }
     unsigned int nfiles = 0;
@@ -706,8 +631,7 @@ static int _ls_handler(int argc, char **argv)
 
         res = vfs_readdir(&dir, &entry);
         if (res < 0) {
-            _errno_string(res, (char *)buf, sizeof(buf));
-            printf("vfs_readdir error: %s\n", buf);
+            printf("vfs_readdir error: %s\n", tiny_strerror(res));
             if (res == -EAGAIN) {
                 /* try again */
                 continue;
@@ -737,8 +661,7 @@ static int _ls_handler(int argc, char **argv)
 
     res = vfs_closedir(&dir);
     if (res < 0) {
-        _errno_string(res, (char *)buf, sizeof(buf));
-        printf("vfs_closedir error: %s\n", buf);
+        printf("vfs_closedir error: %s\n", tiny_strerror(res));
         return 2;
     }
     return ret;
@@ -797,6 +720,7 @@ static int _vfs_handler(int argc, char **argv)
 
 SHELL_COMMAND(vfs, "virtual file system operations", _vfs_handler);
 
+__attribute__((used)) /* only used if md5sum / sha1sum / sha256sum is used */
 static inline void _print_digest(const uint8_t *digest, size_t len, const char *file)
 {
     for (unsigned i = 0; i < len; ++i) {
@@ -867,7 +791,6 @@ SHELL_COMMAND(sha1sum, "Compute and check SHA1 message digest", _vfs_sha1sum_cmd
 #include "hashes/sha256.h"
 static int _vfs_sha256sum_cmd(int argc, char **argv)
 {
-    int res;
     uint8_t digest[SHA256_DIGEST_LENGTH];
 
     if (argc < 2) {
@@ -877,10 +800,10 @@ static int _vfs_sha256sum_cmd(int argc, char **argv)
 
     for (int i = 1; i < argc; ++i) {
         const char *file = argv[i];
-        res = vfs_file_sha256(file, digest,
-                              _shell_vfs_data_buffer, sizeof(_shell_vfs_data_buffer));
+        int res = vfs_file_sha256(file, digest, _shell_vfs_data_buffer,
+                                  sizeof(_shell_vfs_data_buffer));
         if (res < 0) {
-            printf("%s: error %d\n", file, res);
+            printf("%s: error %s\n", file, tiny_strerror(res));
         } else {
             _print_digest(digest, sizeof(digest), file);
         }

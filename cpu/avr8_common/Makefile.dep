@@ -9,6 +9,9 @@ USEMODULE += avr8_common
 # instead.
 USEMODULE += malloc_thread_safe
 
+# The AVR-libc provides no strerror, so we provide it via tiny_strerror
+USEMODULE += tiny_strerror_as_strerror
+
 # the atmel port uses stdio_uart by default
 ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
   USEMODULE += stdio_uart
