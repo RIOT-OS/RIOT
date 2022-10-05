@@ -18,6 +18,7 @@ config BOARD_COMMON_ARDUINO_ZERO
     select HAS_PERIPH_USBDEV
     select HAS_ARDUINO
     select HAS_ARDUINO_PWM
+    select HAS_TINYUSB_DEVICE
 
     select HAVE_SAUL_GPIO
 

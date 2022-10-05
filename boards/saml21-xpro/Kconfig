@@ -22,5 +22,6 @@ config BOARD_SAML21_XPRO
     select HAS_PERIPH_UART
     select HAS_PERIPH_USBDEV
     select HAS_RIOTBOOT
+    select HAS_TINYUSB_DEVICE
 
     select HAVE_SAUL_GPIO
