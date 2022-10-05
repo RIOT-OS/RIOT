@@ -135,20 +135,30 @@ static void _enable_usb_clk(void)
 
 #if defined(RCC_APB1SMENR_USBSMEN)
     RCC->APB1SMENR |= RCC_APB1SMENR_USBSMEN;
-#elif defined(RCC_APB1SMENR_USBSMEN)
+#elif defined(RCC_APB1SMENR1_USBSMEN)
     RCC->APB1SMENR1 |= RCC_APB1SMENR1_USBSMEN;
 #endif
+
+#if defined(CRS_CR_AUTOTRIMEN) && defined(CRS_CR_CEN)
     /* Enable CRS with auto trim enabled */
     CRS->CR |=  (CRS_CR_AUTOTRIMEN |  CRS_CR_CEN);
+#endif
 }
 
 static void _enable_gpio(const stm32_usbdev_fs_config_t *conf)
 {
-    gpio_init(conf->dp, GPIO_IN);
-    gpio_init(conf->dm, GPIO_IN);
-    /* Configure AF for the pins */
-    gpio_init_af(conf->dp, conf->af);
-    gpio_init_af(conf->dm, conf->af);
+    if (conf->af != GPIO_AF_UNDEF) {
+        /* Configure AF for the pins */
+        gpio_init_af(conf->dp, conf->af);
+        gpio_init_af(conf->dm, conf->af);
+    }
+
+    if (conf->disconn != GPIO_UNDEF) {
+        /* In case the MCU has no internal D+ pullup, a GPIO is used to
+         * connect/disconnect from USB bus */
+        gpio_init(conf->disconn, GPIO_OUT);
+        gpio_clear(conf->disconn);
+    }
 }
 
 static void _set_ep_in_status(uint16_t *val, uint16_t mask)
@@ -179,28 +189,36 @@ static void _set_ep_out_status(uint16_t *val, uint16_t mask)
 
 static inline void _usb_attach(stm32_usbdev_fs_t *usbdev)
 {
+    const stm32_usbdev_fs_config_t *conf = usbdev->config;
+
     /* Some ST USB IP doesn't have this feature */
 #ifdef USB_BCDR_DPPU
-    const stm32_usbdev_fs_config_t *conf = usbdev->config;
     /* Enable DP pullup to signal connection */
     _global_regs(conf)->BCDR |= USB_BCDR_DPPU;
-    while (!(CRS->ISR & CRS_ISR_ESYNCF));
+    while (!(CRS->ISR & CRS_ISR_ESYNCF)) {}
 #else
-    (void)usbdev;
+    /* If configuration uses a GPIO for USB connect/disconnect */
+    if (conf->disconn != GPIO_UNDEF) {
+        gpio_set(conf->disconn);
+    }
 #endif /* USB_BCDR_DPPU */
 }
 
 static inline void _usb_detach(stm32_usbdev_fs_t *usbdev)
 {
+    const stm32_usbdev_fs_config_t *conf = usbdev->config;
+
     /* Some ST USB IP doesn't have this feature */
 #ifdef USB_BCDR_DPPU
-    const stm32_usbdev_fs_config_t *conf = usbdev->config;
     DEBUG_PUTS("usbdev_fs: Detaching from host");
 
     /* Disable DP pullup to signal disconnection */
     CLRBIT(_global_regs(conf)->BCDR, USB_BCDR_DPPU);
 #else
-    (void)usbdev;
+    /* If configuration uses a GPIO for USB connect/disconnect */
+    if (conf->disconn != GPIO_UNDEF) {
+        gpio_clear(conf->disconn);
+    }
 #endif
 }
 
@@ -261,10 +279,12 @@ static void _usbdev_init(usbdev_t *dev)
     /* Configure GPIOs */
     _enable_gpio(conf);
 
-    /* Reset USB IP */
-    _global_regs(conf)->CNTR = USB_CNTR_FRES;
+    /* Reset and power down USB IP */
+    _global_regs(conf)->CNTR = USB_CNTR_FRES | USB_CNTR_PDWN;
+    /* Clear power down */
+    _global_regs(conf)->CNTR &= ~USB_CNTR_PDWN;
     /* Clear reset */
-    _global_regs(conf)->CNTR = 0;
+    _global_regs(conf)->CNTR &= ~USB_CNTR_FRES;
     /* Clear interrupt register */
     _global_regs(conf)->ISTR = 0x0000;
     /* Set BTABLE at start of USB SRAM */
@@ -273,6 +293,12 @@ static void _usbdev_init(usbdev_t *dev)
     _global_regs(conf)->DADDR = USB_DADDR_EF;
     /* Unmask the interrupt in the NVIC */
     _enable_irq();
+
+    /* Disable remapping of USB IRQs if remapping defined */
+#ifdef SYSCFG_CFGR1_USB_IT_RMP
+    SYSCFG->CFGR1 &= ~SYSCFG_CFGR1_USB_IT_RMP;
+#endif
+
     /* Enable USB IRQ */
     NVIC_EnableIRQ(conf->irqn);
     /* fill USB SRAM with zeroes */

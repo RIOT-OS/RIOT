@@ -116,6 +116,7 @@ static const stm32_usbdev_fs_config_t stm32_usbdev_fs_config[] = {
         .dm         = GPIO_PIN(PORT_A, 11),
         .dp         = GPIO_PIN(PORT_A, 12),
         .af         = GPIO_AF10,
+        .disconn    = GPIO_UNDEF,
     },
 };
 
