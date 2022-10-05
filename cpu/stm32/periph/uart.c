@@ -28,6 +28,7 @@
 
 #include "cpu.h"
 #include "sched.h"
+#include "mutex.h"
 #include "thread.h"
 #include "assert.h"
 #include "periph/uart.h"
@@ -90,6 +91,9 @@ static struct {
     uart_rx_cb_t rx_cb;   /**< data received interrupt callback */
     void *arg;            /**< argument to both callback routines */
     uint8_t data_mask;    /**< mask applied to the data register */
+#if defined(MODULE_PERIPH_UART_NONBLOCKING) || defined(DOXYGEN)
+    mutex_t tx_empty;     /**< lock for waiting for an empty tx buffer */
+#endif
 } isr_ctx[UART_NUMOF];
 
 static inline USART_TypeDef *dev(uart_t uart)
@@ -183,6 +187,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
     /* set up the TX buffer */
+    mutex_init(&isr_ctx[uart].tx_empty);
     tsrb_init(&uart_tx_rb[uart], uart_tx_rb_buf[uart], UART_TXBUF_SIZE);
 #endif
 
@@ -439,7 +444,11 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
             tsrb_add_one(&uart_tx_rb[uart], data[i]);
         }
         else {
-            while (tsrb_add_one(&uart_tx_rb[uart], data[i]) < 0) {}
+            while (tsrb_add_one(&uart_tx_rb[uart], data[i]) < 0) {
+                /* Wait until the buffer is empty */
+                mutex_trylock(&isr_ctx[uart].tx_empty);
+                mutex_lock(&isr_ctx[uart].tx_empty);
+            }
         }
     }
 #else
@@ -496,6 +505,8 @@ static inline void irq_handler_tx(uart_t uart)
     /* disable the interrupt if there are no more bytes to send */
     if (tsrb_empty(&uart_tx_rb[uart])) {
         dev(uart)->CR1 &= ~(USART_CR1_TCIE);
+    } else if(tsrb_avail(&uart_tx_rb[uart]) == (UART_TXBUF_SIZE>>1)) {
+        mutex_unlock(&isr_ctx[uart].tx_empty);
     }
 }
 #endif
