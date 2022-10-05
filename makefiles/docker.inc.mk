@@ -1,4 +1,4 @@
-export DOCKER_IMAGE ?= riot/riotbuild:latest
+export DOCKER_IMAGE ?= docker.io/riot/riotbuild:latest
 export DOCKER_BUILD_ROOT ?= /data/riotbuild
 DOCKER_RIOTBASE ?= $(DOCKER_BUILD_ROOT)/riotbase
 # List of Docker-enabled make goals
@@ -118,13 +118,15 @@ DOCKER_OVERRIDE_CMDLINE += $(strip $(DOCKER_OVERRIDE_CMDLINE_AUTO))
 
 # Overwrite if you want to use `docker` with sudo
 DOCKER ?= docker
+_docker_is_podman = $(shell $(DOCKER) --version | grep podman 2>/dev/null)
 
 # Set default run flags:
 # - allocate a pseudo-tty
 # - remove container on exit
 # - set username/UID to executor
 DOCKER_USER ?= $$(id -u)
-DOCKER_RUN_FLAGS ?= --rm --tty --user $(DOCKER_USER)
+DOCKER_USER_OPT = $(if $(_docker_is_podman),--userns keep-id,--user $(DOCKER_USER))
+DOCKER_RUN_FLAGS ?= --rm --tty $(DOCKER_USER_OPT)
 
 # allow setting make args from command line like '-j'
 DOCKER_MAKE_ARGS ?=
