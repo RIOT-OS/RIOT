@@ -97,6 +97,10 @@ you can of course write your own software, but you may have to bind the
 socket to a specific interface (tap0 in this case). To do so, have a
 look at [setting the `SO_BINDTODEVICE` option using `setsocketopt()`][sso].
 
+## Using as an LPWAN/SCHC device
+
+TODO
+
 ## Connecting two RIOT instances
 
 When using native (i.e. when you're trying this on your Linux machine),
