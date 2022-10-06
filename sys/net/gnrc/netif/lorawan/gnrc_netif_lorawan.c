@@ -409,6 +409,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *payload)
     res = conf.status;
 
     if (res < 0) {
+        DEBUG("gnrc_netif: unable to send (%s)\n", strerror(-res));
         gnrc_pktbuf_release_error(payload, res);
     }
 
