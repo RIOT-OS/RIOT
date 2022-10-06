@@ -87,6 +87,7 @@ static bool _ep_isany(const struct _sock_tl_ep *ep)
     if (ep == NULL) {
         return true;
     }
+
     ep_addr = (uint8_t *)&ep->addr;
     for (unsigned i = 0; i < sizeof(ep->addr); i++) {
 #if LWIP_IPV4
@@ -99,6 +100,7 @@ static bool _ep_isany(const struct _sock_tl_ep *ep)
             return false;
         }
     }
+
     return true;
 }
 
@@ -108,6 +110,7 @@ static const ip_addr_t *_netif_to_bind_addr(int family, uint16_t netif_num)
     if (netif_num > UINT8_MAX) {
         return NULL;
     }
+
     /* cppcheck-suppress uninitvar ; assigned by macro */
     NETIF_FOREACH(netif) {
         if (netif->num == (netif_num - 1)) {
@@ -126,6 +129,7 @@ static const ip_addr_t *_netif_to_bind_addr(int family, uint16_t netif_num)
             }
         }
     }
+
     return NULL;
 }
 
@@ -156,6 +160,7 @@ static bool _addr_on_netif(int family, int netif_num, const ip_addr_t *addr)
             }
         }
     }
+
     return false;
 }
 
@@ -177,6 +182,7 @@ static void _convert_ip_addr(ip_addr_t *lwip_addr, int family,
     if (family == AF_INET6) {
         ip6_addr_clear_zone(&lwip_addr->u_addr.ip6);
     }
+
     lwip_addr->type = lwip_af_to_ip_addr_type(family);
 #elif LWIP_IPV6
     (void)family;
@@ -212,9 +218,11 @@ static int _sock_ep_to_netconn_pars(const struct _sock_tl_ep *local,
         if (_af_not_supported(local->family)) {
             return -EAFNOSUPPORT;
         }
+
         if (local->netif != SOCK_ADDR_ANY_NETIF) {
             netif = local->netif;
         }
+
         family = local->family;
         _set_port(*local_port, local, *type);
     }
@@ -223,16 +231,20 @@ static int _sock_ep_to_netconn_pars(const struct _sock_tl_ep *local,
             ((local != NULL) && (local->family != remote->family))) {
             return -EAFNOSUPPORT;
         }
+
         if ((remote->netif != SOCK_ADDR_ANY_NETIF) &&
             (local != NULL) && (local->netif != SOCK_ADDR_ANY_NETIF)) {
             netif = remote->netif;
         }
+
         family = remote->family;
         _convert_ip_addr(remote_addr, family, &remote->addr,
                          sizeof(remote->addr));
+
         if (ip_addr_isany(remote_addr)) {
             return -EINVAL;
         }
+
         _set_port(*remote_port, remote, *type);
     }
 
@@ -278,6 +290,7 @@ static void _netconn_cb(struct netconn *conn, enum netconn_evt evt,
 {
 #if IS_ACTIVE(SOCK_HAS_ASYNC)
     lwip_sock_base_t *sock = netconn_get_callback_arg(conn);
+
     if (sock && conn->pcb.raw &&
         /* lwIP's TCP implementation initializes callback_arg.socket with -1
          * when not provided */
@@ -298,9 +311,11 @@ static void _netconn_cb(struct netconn *conn, enum netconn_evt evt,
                 default:
                     break;
                 }
+
                 if (mbox_avail(&conn->acceptmbox.mbox)) {
                     flags |= SOCK_ASYNC_CONN_RECV;
                 }
+
                 if (mbox_avail(&conn->recvmbox.mbox)) {
                     flags |= SOCK_ASYNC_MSG_RECV;
                 }
@@ -326,6 +341,7 @@ static void _netconn_cb(struct netconn *conn, enum netconn_evt evt,
             LWIP_ASSERT("unknown event", 0);
             break;
         }
+
         if (flags && sock->async_cb.gen) {
             sock->async_cb.gen(sock, flags, sock->async_cb_arg);
         }
@@ -344,6 +360,7 @@ static int _create(int type, int proto, uint16_t flags, struct netconn **out)
             IS_ACTIVE(SOCK_HAS_ASYNC) ? _netconn_cb : NULL)) == NULL) {
         return -ENOMEM;
     }
+
     netconn_set_callback_arg(*out, NULL);
 #if SO_REUSE
     if (flags & SOCK_FLAGS_REUSE_EP) {
@@ -376,15 +393,18 @@ int lwip_sock_create(struct netconn **conn, const struct _sock_tl_ep *local,
     if (bind < 0) {
         return bind;
     }
+
     if ((remote != NULL) && ip_addr_isany_val(remote_addr)) {
         return -EINVAL;
     }
     /* if local or remote parameters are given */
     else if ((local != NULL) || (remote != NULL)) {
         int res = 0;
+
         if ((res = _create(type, proto, flags, conn)) < 0) {
             return res;
         }
+
         /* if parameters (local->netif, remote->netif, local->addr or
          * local->port) demand binding */
         if (bind) {
@@ -403,11 +423,13 @@ int lwip_sock_create(struct netconn **conn, const struct _sock_tl_ep *local,
             default:
                 break;
             }
+
             if (res < 0) {
                 netconn_delete(*conn);
                 return res;
             }
         }
+
         if (remote != NULL) {
             switch (netconn_connect(*conn, &remote_addr, remote_port)) {
 #if LWIP_TCP
@@ -437,12 +459,14 @@ int lwip_sock_create(struct netconn **conn, const struct _sock_tl_ep *local,
             default:
                 break;
             }
+
             if (res < 0) {
                 netconn_delete(*conn);
                 return res;
             }
         }
     }
+
     return 0;
 }
 
@@ -474,6 +498,7 @@ uint16_t lwip_sock_bind_addr_to_netif(const ip_addr_t *bind_addr)
         }
         UNLOCK_TCPIP_CORE();
     }
+
     return SOCK_ADDR_ANY_NETIF;
 }
 
@@ -495,6 +520,7 @@ int lwip_sock_get_addr(struct netconn *conn, struct _sock_tl_ep *ep, u8_t local)
     if (conn == NULL) {
         return 1;
     }
+
 #ifdef MODULE_LWIP_SOCK_IP
     if (!(conn->type & NETCONN_RAW)) {
         port_ptr = &ep->port;
@@ -509,6 +535,7 @@ int lwip_sock_get_addr(struct netconn *conn, struct _sock_tl_ep *ep, u8_t local)
         ) {
         return res;
     }
+
     if (NETCONNTYPE_ISIPV6(conn->type)) {
         ep->family = AF_INET6;
     }
@@ -518,13 +545,16 @@ int lwip_sock_get_addr(struct netconn *conn, struct _sock_tl_ep *ep, u8_t local)
     else {
         ep->family = AF_UNSPEC;
     }
+
     if (local) {
         ep->netif = lwip_sock_bind_addr_to_netif(&addr);
     }
     else {
         ep->netif = SOCK_ADDR_ANY_NETIF;
     }
+
     memcpy(&ep->addr, &addr, sizeof(ep->addr));
+
     return 0;
 }
 
@@ -536,6 +566,7 @@ int lwip_sock_recv(struct netconn *conn, uint32_t timeout, struct netbuf **buf)
     if (conn == NULL) {
         return -EADDRNOTAVAIL;
     }
+
 #if LWIP_SO_RCVTIMEO
     if ((timeout != 0) && (timeout != SOCK_NO_TIMEOUT)) {
         netconn_set_recvtimeout(conn, timeout / US_PER_MS);
@@ -545,6 +576,7 @@ int lwip_sock_recv(struct netconn *conn, uint32_t timeout, struct netbuf **buf)
     if ((timeout == 0) && !mbox_avail(&conn->recvmbox.mbox)) {
         return -EAGAIN;
     }
+
     switch (netconn_recv(conn, buf)) {
     case ERR_OK:
         res = 0;
@@ -561,6 +593,7 @@ int lwip_sock_recv(struct netconn *conn, uint32_t timeout, struct netbuf **buf)
         res = -EPROTO;
         break;
     }
+
     /* unset flags */
 #if LWIP_SO_RCVTIMEO
     netconn_set_recvtimeout(conn, 0);
@@ -596,6 +629,7 @@ ssize_t lwip_sock_sendv(struct netconn *conn, const iolist_t *snips,
                                             &type)) < 0) {
             return res;
         }
+
         if (ip_addr_isany_val(remote_addr)) {
             DEBUG("[lwip_sock_sendv] remote_addr is all zero\n");
             return -EINVAL;
@@ -603,6 +637,7 @@ ssize_t lwip_sock_sendv(struct netconn *conn, const iolist_t *snips,
     }
 
     buf = netbuf_new();
+
     if (netbuf_alloc(buf, iolist_size(snips)) == NULL) {
         netbuf_delete(buf);
         return -ENOMEM;
@@ -655,7 +690,9 @@ ssize_t lwip_sock_sendv(struct netconn *conn, const iolist_t *snips,
         netbuf_delete(buf);
         return -ENOTCONN;
     }
+
     res = payload_len;  /* set for non-TCP calls */
+
     if (remote != NULL) {
         err = netconn_sendto(tmp, buf, &remote_addr, remote_port);
     }
@@ -667,6 +704,7 @@ ssize_t lwip_sock_sendv(struct netconn *conn, const iolist_t *snips,
     else {
         err = netconn_send(tmp, buf);
     }
+
     switch (err) {
     case ERR_OK:
         break;
@@ -683,10 +721,13 @@ ssize_t lwip_sock_sendv(struct netconn *conn, const iolist_t *snips,
         res = -EINVAL;
         break;
     }
+
     netbuf_delete(buf);
+
     if (conn == NULL) {
         netconn_delete(tmp);
     }
+
     return res;
 }
 
