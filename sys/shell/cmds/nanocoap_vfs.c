@@ -184,7 +184,16 @@ static int _nanocoap_put_handler(int argc, char **argv)
         url = buffer;
     }
 
-    res = nanocoap_vfs_put_url(url, file, work_buf, sizeof(work_buf));
+    if (strcmp(file, "-") == 0) {
+        if (argc < 4) {
+            printf("Usage: %s - <url> <data>\n", argv[0]);
+            return -EINVAL;
+        }
+        res = nanocoap_sock_put_url(url, argv[3], strlen(argv[3]), NULL, 0);
+    } else {
+        res = nanocoap_vfs_put_url(url, file, work_buf, sizeof(work_buf));
+    }
+
     if (res < 0) {
         printf("Upload failed: %s\n", strerror(-res));
     }

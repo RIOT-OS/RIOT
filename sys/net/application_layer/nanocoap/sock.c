@@ -361,6 +361,36 @@ ssize_t nanocoap_sock_post(nanocoap_sock_t *sock, const char *path,
     return _sock_put_post(sock, path, COAP_METHOD_POST, request, len, response, len_max);
 }
 
+static ssize_t _sock_put_post_url(const char *url, unsigned code,
+                                  const void *request, size_t len,
+                                  void *response, size_t len_max)
+{
+    nanocoap_sock_t sock;
+    int res = nanocoap_sock_url_connect(url, &sock);
+    if (res) {
+        return res;
+    }
+
+    res = _sock_put_post(&sock, sock_urlpath(url), code, request, len, response, len_max);
+    nanocoap_sock_close(&sock);
+
+    return res;
+}
+
+ssize_t nanocoap_sock_put_url(const char *url,
+                              const void *request, size_t len,
+                              void *response, size_t len_max)
+{
+    return _sock_put_post_url(url, COAP_METHOD_PUT, request, len, response, len_max);
+}
+
+ssize_t nanocoap_sock_post_url(const char *url,
+                               const void *request, size_t len,
+                               void *response, size_t len_max)
+{
+    return _sock_put_post_url(url, COAP_METHOD_POST, request, len, response, len_max);
+}
+
 ssize_t nanocoap_request(coap_pkt_t *pkt, const sock_udp_ep_t *local,
                          const sock_udp_ep_t *remote, size_t len)
 {
