@@ -352,6 +352,7 @@ static const dwc2_usb_otg_fshs_config_t dwc2_usb_otg_fshs_config[] = {
     {
         .periph = USB_OTG_FS_PERIPH_BASE,
         .type = DWC2_USB_OTG_FS,
+        .phy = DWC2_USB_OTG_PHY_BUILTIN,
     }
 };
 

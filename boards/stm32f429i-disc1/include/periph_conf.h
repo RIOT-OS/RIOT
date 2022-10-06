@@ -32,7 +32,7 @@
 #include "periph_cpu.h"
 #include "clk_conf.h"
 #include "cfg_timer_tim5.h"
-#include "cfg_usb_otg_hs_fs.h"
+#include "cfg_usb_otg_hs_phy_fs.h"
 
 #ifdef __cplusplus
 extern "C" {

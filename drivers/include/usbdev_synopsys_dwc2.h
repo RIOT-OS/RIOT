@@ -41,18 +41,30 @@ typedef enum {
     DWC2_USB_OTG_HS = 1,   /**< High speed peripheral */
 } dwc2_usb_otg_fshs_type_t;
 
-#if defined(MCU_STM32)
 /**
- * @brief Type of USB OTG peripheral phy.
+ * @brief Device speed used
+ */
+enum {
+    DWC2_USB_OTG_DSPD_HS = 0,           /**< High speed */
+    DWC2_USB_OTG_DSPD_FS_PHY_HS = 1,    /**< Full speed on HS PHY */
+    DWC2_USB_OTG_DSPD_LS = 2,           /**< Low speed */
+    DWC2_USB_OTG_DSPD_FS = 3,           /**< Full speed */
+};
+
+/**
+ * @brief Type of USB OTG peripheral PHY.
  *
- * The FS type only supports the built-in type, the HS phy can have either the
- * FS built-in phy enabled or the HS ULPI interface enabled.
+ * The FS type only supports the built-in PHY, the HS type can have enabled
+ * either
+ * - the on-chip FS PHY,
+ * - the external ULPI HS PHY interface, or
+ * - the internal UTMI HS PHY.
  */
 typedef enum {
-    DWC2_USB_OTG_PHY_BUILTIN,
-    DWC2_USB_OTG_PHY_ULPI,
+    DWC2_USB_OTG_PHY_BUILTIN,   /**< on-chip FS PHY */
+    DWC2_USB_OTG_PHY_ULPI,      /**< ULPI for external HS PHY */
+    DWC2_USB_OTG_PHY_UTMI,      /**< UTMI for internal HS PHY */
 } dwc2_usb_otg_fshs_phy_t;
-#endif
 
 /**
  * @brief stm32 USB OTG configuration
@@ -60,15 +72,30 @@ typedef enum {
 typedef struct {
     uintptr_t periph;               /**< USB peripheral base address */
     dwc2_usb_otg_fshs_type_t type;  /**< FS or HS type */
-#if defined(MCU_STM32)
-    dwc2_usb_otg_fshs_phy_t phy;    /**< Built-in or ULPI phy */
+    dwc2_usb_otg_fshs_phy_t phy;    /**< on-chip FS, ULPI HS or UTMI HS PHY */
+#if defined(MODULE_PERIPH_USBDEV_HS_ULPI) || DOXYGEN
+    gpio_t ulpi_clk;                /**< ULPI CLK gpio */
+    gpio_t ulpi_d0;                 /**< ULPI D0 gpio */
+    gpio_t ulpi_d1;                 /**< ULPI D1 gpio */
+    gpio_t ulpi_d2;                 /**< ULPI D2 gpio */
+    gpio_t ulpi_d3;                 /**< ULPI D3 gpio */
+    gpio_t ulpi_d4;                 /**< ULPI D4 gpio */
+    gpio_t ulpi_d5;                 /**< ULPI D5 gpio */
+    gpio_t ulpi_d6;                 /**< ULPI D6 gpio */
+    gpio_t ulpi_d7;                 /**< ULPI D7 gpio */
+    gpio_t ulpi_dir;                /**< ULPI DIR gpio */
+    gpio_t ulpi_stp;                /**< ULPI STP gpio */
+    gpio_t ulpi_nxt;                /**< ULPI NXT gpio */
+    gpio_af_t ulpi_af;              /**< Alternative function for ULPI */
+#endif
+#if defined(MCU_STM32) || DOXYGEN
     uint32_t rcc_mask;              /**< bit in clock enable register */
     uint8_t irqn;                   /**< IRQ channel */
     uint8_t ahb;                    /**< AHB bus */
     gpio_t dm;                      /**< Data- gpio */
     gpio_t dp;                      /**< Data+ gpio */
     gpio_af_t af;                   /**< Alternative function */
-#endif /* defined(MCU_STM32) */
+#endif /* defined(MCU_STM32) || DOXYGEN */
 } dwc2_usb_otg_fshs_config_t;
 
 #ifdef __cplusplus
