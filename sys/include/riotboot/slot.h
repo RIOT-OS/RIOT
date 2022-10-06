@@ -79,10 +79,7 @@ const riotboot_hdr_t *riotboot_slot_get_hdr(unsigned slot);
  *
  * @returns 0 if ok.
  */
-static inline int riotboot_slot_validate(unsigned slot)
-{
-    return riotboot_hdr_validate(riotboot_slot_get_hdr(slot));
-}
+int riotboot_slot_validate(unsigned slot);
 
 /**
  * @brief  Print formatted slot header to STDIO
@@ -136,6 +133,18 @@ extern const unsigned riotboot_slot_numof;
  * @brief   Storage for header pointers of the configured slots
  */
 extern const riotboot_hdr_t *const riotboot_slots[];
+
+/**
+ * @brief       Verify the digest of an image from header
+ *
+ * @param[in]   hdr             riotboot hdr
+ *
+ * @returns     0 if the digest is valid
+ * @returns     -1 if the digest is invalid
+ */
+#if defined(MODULE_RIOTBOOT_SLOT_VERIFY_SHA256) || DOXYGEN
+int riotboot_slot_verify_sha256(const riotboot_hdr_t *hdr);
+#endif
 
 #ifdef __cplusplus
 }

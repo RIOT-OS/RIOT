@@ -70,7 +70,8 @@ $(HEADER_TOOL): FORCE
 # It must be always regenerated in case of any changes, so FORCE
 .PRECIOUS: %.bin
 %.hdr: $(HEADER_TOOL) %.bin FORCE
-	$(Q)$(HEADER_TOOL) generate $< $(APP_VER) $$(($(ROM_START_ADDR)+$(OFFSET))) $(RIOTBOOT_HDR_LEN) - > $@
+	$(Q)DIGEST=$$(shasum -a 256 -b $(word 2,$^) | awk '{print $$1}'); \
+	$(HEADER_TOOL) generate $(word 2,$^) $(APP_VER) $$(($(ROM_START_ADDR)+$(OFFSET))) $(RIOTBOOT_HDR_LEN) $${DIGEST} - > $@
 
 $(BINDIR_RIOTBOOT)/slot0.hdr: OFFSET=$(SLOT0_IMAGE_OFFSET)
 $(BINDIR_RIOTBOOT)/slot1.hdr: OFFSET=$(SLOT1_IMAGE_OFFSET)

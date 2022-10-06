@@ -195,7 +195,16 @@ PSEUDOMODULES += prng
 PSEUDOMODULES += prng_%
 PSEUDOMODULES += fortuna_reseed
 PSEUDOMODULES += random_cmd
-PSEUDOMODULES += riotboot_%
+PSEUDOMODULES += riotboot_hdr
+PSEUDOMODULES += riotboot_slot
+## @defgroup pseudomodule_riotboot_slot_verify_sha256 riotboot_slot_verify_sha256
+## @brief Extends @ref riotboot_slot_validate to also verify the image digest
+##
+PSEUDOMODULES += riotboot_slot_verify_sha256
+PSEUDOMODULES += riotboot_flashwrite
+PSEUDOMODULES += riotboot_reset
+PSEUDOMODULES += riotboot_serial
+PSEUDOMODULES += riotboot_usb_dfu
 PSEUDOMODULES += rtt_cmd
 PSEUDOMODULES += saul_adc
 PSEUDOMODULES += saul_default

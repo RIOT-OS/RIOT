@@ -47,7 +47,13 @@ void riotboot_hdr_print(const riotboot_hdr_t *riotboot_hdr)
            (unsigned)riotboot_hdr->magic_number);
     printf("Image Version: 0x%08x\n", (unsigned)riotboot_hdr->version);
     printf("Image start address: 0x%08x\n", (unsigned)riotboot_hdr->start_addr);
+    printf("Image size: 0x%08x\n", (unsigned)riotboot_hdr->img_size);
     printf("Header chksum: 0x%08x\n", (unsigned)riotboot_hdr->chksum);
+    printf("Header digest: ");
+    for (uint8_t i = 0; i < SHA256_DIGEST_LENGTH; i++) {
+        printf("%02x", riotboot_hdr->digest[i]);
+    }
+    printf("\n");
     printf("\n");
 }
 
@@ -70,7 +76,13 @@ int riotboot_hdr_validate(const riotboot_hdr_t *riotboot_hdr)
 
 uint32_t riotboot_hdr_checksum(const riotboot_hdr_t *riotboot_hdr)
 {
+    return fletcher32((uint16_t *)riotboot_hdr, riotboot_hdr->header_len /
+                      sizeof(uint16_t));
+}
+
+uint32_t riotboot_hdr_checksum_legacy(const riotboot_hdr_t *riotboot_hdr)
+{
     return fletcher32((uint16_t *)riotboot_hdr, offsetof(riotboot_hdr_t,
-                                                         chksum) /
+                                                         chksum_legacy) /
                       sizeof(uint16_t));
 }
