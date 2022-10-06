@@ -35,6 +35,7 @@
 #include <string.h>
 
 #include "cpu_conf.h"
+#include "kernel_defines.h"
 #include "mutex.h"
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/neterr.h"
@@ -61,7 +62,11 @@ extern "C" {
  *          management to allocate packets.
  */
 #ifndef CONFIG_GNRC_PKTBUF_SIZE
-#define CONFIG_GNRC_PKTBUF_SIZE    (6144)
+# if !IS_USED(MODULE_GNRC_SCHC)
+#  define CONFIG_GNRC_PKTBUF_SIZE  (6144)
+# else
+#  define CONFIG_GNRC_PKTBUF_SIZE  (4096) /* libSCHC uses its own buffers */
+# endif
 #endif
 /** @} */
 
