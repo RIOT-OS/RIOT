@@ -7,6 +7,7 @@ ifneq (,$(filter dose_watchdog,$(USEMODULE)))
   FEATURES_REQUIRED += periph_timer_periodic
 endif
 
+USEMODULE += checksum
 USEMODULE += chunked_ringbuffer
 USEMODULE += eui_provider
 USEMODULE += iolist

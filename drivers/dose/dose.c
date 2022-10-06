@@ -27,6 +27,7 @@
 #include "irq.h"
 #include "periph/timer.h"
 
+#include "checksum/crc16_ccitt.h"
 #include "net/eui_provider.h"
 #include "net/netdev/eth.h"
 #include "timex.h"
@@ -38,7 +39,6 @@
 #error "DOSE_TIMER_DEV needs to be set by the board"
 #endif
 
-static uint16_t crc16_update(uint16_t crc, uint8_t octet);
 static dose_signal_t state_transit_blocked(dose_t *ctx, dose_signal_t signal);
 static dose_signal_t state_transit_idle(dose_t *ctx, dose_signal_t signal);
 static dose_signal_t state_transit_recv(dose_t *ctx, dose_signal_t signal);
@@ -59,22 +59,10 @@ static int _init(netdev_t *dev);
 static void _poweron(dose_t *dev);
 static void _poweroff(dose_t *dev, dose_state_t sleep_state);
 
-static uint16_t crc16_update(uint16_t crc, uint8_t octet)
-{
-    crc = (uint8_t)(crc >> 8) | (crc << 8);
-    crc ^= octet;
-    crc ^= (uint8_t)(crc & 0xff) >> 4;
-    crc ^= (crc << 8) << 4;
-    crc ^= ((crc & 0xff) << 4) << 1;
-    return crc;
-}
-
 static void _crc_cb(void *ctx, uint8_t *data, size_t len)
 {
     uint16_t *crc = ctx;
-    for (uint8_t *end = data + len; data != end; ++data) {
-        *crc = crc16_update(*crc, *data);
-    }
+    *crc = crc16_ccitt_false_update(*crc, data, len);
 }
 
 static void _init_standby(dose_t *ctx, const dose_params_t *params)
@@ -571,14 +559,12 @@ send:
         size_t n = iol->iol_len;
         pktlen += n;
         uint8_t *ptr = iol->iol_base;
+        crc = crc16_ccitt_false_update(crc, ptr, n);
         while (n--) {
             /* Send data octet */
             if (send_data_octet(ctx, *ptr)) {
                 goto collision;
             }
-
-            /* Update CRC */
-            crc = crc16_update(crc, *ptr);
 
             ptr++;
         }

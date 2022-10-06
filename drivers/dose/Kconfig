@@ -28,6 +28,7 @@ menuconfig MODULE_DOSE
     depends on HAS_PERIPH_GPIO
     depends on HAS_PERIPH_GPIO_IRQ
     depends on HAS_PERIPH_UART
+    select MODULE_CHECKSUM
     select MODULE_CHUNKED_RINGBUFFER
     select MODULE_EUI_PROVIDER
     select MODULE_IOLIST
