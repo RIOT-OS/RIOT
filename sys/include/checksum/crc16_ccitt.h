@@ -18,6 +18,9 @@
  *              do (and is thus also far more memory efficient). Its caveat
  *              however is that it is slower by about factor 8 than these versions.
  *
+ *              @note enable the `crc32_fast` module for a look-up table based
+ *              implementation that trades code size for speed.
+ *
  * @{
  * @file
  * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
