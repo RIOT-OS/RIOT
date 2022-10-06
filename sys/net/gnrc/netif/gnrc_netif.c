@@ -126,6 +126,10 @@ bool gnrc_netif_dev_is_6lo(const gnrc_netif_t *netif)
 bool gnrc_netif_dev_is_schc(const gnrc_netif_t *netif)
 {
     switch (netif->device_type) {
+#ifdef MODULE_GNRC_SCHC_ETH
+    case NETDEV_TYPE_ETHERNET:
+        return (netif->flags & GNRC_NETIF_FLAGS_SCHC);
+#endif
     default:
         return false;
     }
@@ -1653,6 +1657,9 @@ int gnrc_netif_default_init(gnrc_netif_t *netif)
     netif_register(&netif->netif);
     _check_netdev_capabilities(dev);
     _init_from_device(netif);
+    if (IS_USED(MODULE_GNRC_SCHC_ETH)) {
+        netif->flags |= GNRC_NETIF_FLAGS_SCHC;
+    }
     gnrc_schc_netif_init(netif);
 #ifdef DEVELHELP
     _test_options(netif);

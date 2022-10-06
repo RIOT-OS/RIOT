@@ -108,6 +108,11 @@ void libschc_gnrc_netif_init(gnrc_netif_t *netif)
     }
     netif->flags |= GNRC_NETIF_FLAGS_SCHC;
     switch (netif->device_type) {
+#ifdef MODULE_GNRC_SCHC_ETH
+    case NETDEV_TYPE_ETHERNET:
+        netif->schc.upstream_mode = NO_ACK;
+        break;
+#endif
     default:
         netif->schc.upstream_mode = NO_ACK;
 #ifdef MODULE_GNRC_NETIF_IPV6
@@ -230,6 +235,10 @@ static int _get_appiid(uint32_t device_id, uint8_t *iid)
 static uint32_t _get_duty_cycle(gnrc_netif_t *netif, size_t payload_len)
 {
     switch (netif->device_type) {
+#if IS_USED(MODULE_GNRC_SCHC_ETH)
+    case NETDEV_TYPE_ETHERNET:
+        return 1000;
+#endif
     default:
         DEBUG("schc: Unknown device type\n");
         return 0;
@@ -239,6 +248,10 @@ static uint32_t _get_duty_cycle(gnrc_netif_t *netif, size_t payload_len)
 static uint32_t _upstream_timeout(gnrc_netif_t *netif)
 {
     switch (netif->device_type) {
+#if IS_USED(MODULE_GNRC_SCHC_ETH)
+    case NETDEV_TYPE_ETHERNET:
+        return 1000;
+#endif
     default:
         return 15000;
     }
@@ -258,6 +271,12 @@ static uint8_t send_callback(uint8_t* data, uint16_t length, uint32_t device_id)
     assert(netif != NULL);
 
     switch (netif->device_type) {
+#ifdef MODULE_GNRC_SCHC_ETH
+    case NETDEV_TYPE_ETHERNET:
+        memset(dst, 0xff, ETHERNET_ADDR_LEN);
+        dst_len = ETHERNET_ADDR_LEN;
+        break;
+#endif
     default:
         break;
     }

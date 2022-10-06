@@ -277,6 +277,13 @@ PSEUDOMODULES += gnrc_sixlowpan_router_default
 ##              will be removed after 2023.07 release.
 PSEUDOMODULES += gnrc_udp_cmd
 ## @}
+## @defgroup  net_gnrc_schc_eth  gnrc_schc_eth: Experimental SCHC-support for Ethernet
+## @ingroup   net_gnrc_schc
+##
+## Uses @ref ETHERTYPE_802EXP to encode SCHC packets in Ethernet frames.
+## @{
+PSEUDOMODULES += gnrc_schc_eth
+## @}
 PSEUDOMODULES += gnrc_sock_async
 PSEUDOMODULES += gnrc_sock_check_reuse
 PSEUDOMODULES += gnrc_txtsnd

@@ -520,6 +520,13 @@ ifneq (,$(filter gnrc_lwmac,$(USEMODULE)))
   FEATURES_REQUIRED += periph_rtt
 endif
 
+ifneq (,$(filter gnrc_schc_eth,$(USEMODULE)))
+  USEPKG += libschc    # XXX remove, if there are more SCHC implementations
+  USEMODULE += libschc_gnrc
+  ifneq (,$(filter gcoap% nanocoap%,$(USEMODULE)))
+    USEMODULE += libschc_coap
+  endif
+endif
 
 ifneq (,$(filter gnrc_schc,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_gnrc_schc
