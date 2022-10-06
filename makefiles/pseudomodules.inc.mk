@@ -60,6 +60,13 @@ PSEUDOMODULES += dns_msg
 PSEUDOMODULES += ecc_%
 PSEUDOMODULES += ethos_stdio
 PSEUDOMODULES += event_%
+## @defgroup sys_event_thread_lowest event_thread_lowest
+## @ingroup sys_event
+## @{
+## @deprecated  Use module `event_thread` instead (see @ref event/thread.h);
+##              Will be removed after 2021.10 release.
+PSEUDOMODULES += event_thread_lowest
+## @}
 PSEUDOMODULES += event_timeout
 PSEUDOMODULES += event_timeout_ztimer
 PSEUDOMODULES += evtimer_mbox
@@ -71,10 +78,13 @@ PSEUDOMODULES += gcoap_fileserver
 PSEUDOMODULES += gcoap_fileserver_delete
 PSEUDOMODULES += gcoap_fileserver_put
 PSEUDOMODULES += gcoap_dtls
+## @addtogroup net_gcoap_dns
+## @{
 ## Enable @ref net_gcoap_dns
 PSEUDOMODULES += gcoap_dns
 ## Enable the @ref gcoap_dns_server_proxy_set function
 PSEUDOMODULES += gcoap_dns_proxied
+## @}
 PSEUDOMODULES += fido2_tests
 PSEUDOMODULES += gnrc_dhcpv6_%
 PSEUDOMODULES += gnrc_ipv6_auto_subnets_auto_init
@@ -91,13 +101,25 @@ PSEUDOMODULES += gnrc_ipv6_nib_rio
 PSEUDOMODULES += gnrc_ipv6_nib_router
 PSEUDOMODULES += gnrc_ipv6_nib_rtr_adv_pio_cb
 PSEUDOMODULES += gnrc_lorawan_1_1
+## @defgroup net_gnrc_netdev_default  gnrc_netdev_default
+## @ingroup net_gnrc_netif
+## @{
+## @deprecated  Use module `netdev_default` with `gnrc` or a `gnrc` submodule
+##              instead; will be removed after 2022.07 release.
 PSEUDOMODULES += gnrc_netdev_default
+## @}
 PSEUDOMODULES += gnrc_neterr
 PSEUDOMODULES += gnrc_netapi_callbacks
 PSEUDOMODULES += gnrc_netapi_mbox
 PSEUDOMODULES += gnrc_netif_bus
 PSEUDOMODULES += gnrc_netif_timestamp
+## @defgroup net_gnrc_pktbuf_cmd  gnrc_pktbuf_cmd
+## @ingroup net_gnrc_pktbuf
+## @{
+## @deprecated  Use module `shell_cmd_gnrc_pktbuf` instead;
+##              will be removed after 2023.07 release.
 PSEUDOMODULES += gnrc_pktbuf_cmd
+## @}
 PSEUDOMODULES += gnrc_netif_6lo
 PSEUDOMODULES += gnrc_netif_ipv6
 PSEUDOMODULES += gnrc_netif_mac
@@ -113,12 +135,30 @@ PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_stats
 PSEUDOMODULES += gnrc_sixlowpan_iphc_nhc
 PSEUDOMODULES += gnrc_sixlowpan_nd_border_router
 PSEUDOMODULES += gnrc_sixlowpan_router_default
+## @defgroup net_gnrc_udp_cmd  gnrc_udp_cmd
+## @ingroup net_gnrc_udp
+## @{
+## @deprecated  Use module `shell_cmd_gnrc_udp` instead;
+##              will be removed after 2023.07 release.
 PSEUDOMODULES += gnrc_udp_cmd
+## @}
 PSEUDOMODULES += gnrc_sock_async
 PSEUDOMODULES += gnrc_sock_check_reuse
 PSEUDOMODULES += gnrc_txtsnd
+## @defgroup pseudomodule_heap_cmd heap_cmd
+## @ingroup sys_shell_commands
+## @{
+## @deprecated  Use module `shell_cmd_heap` instead;
+##              will be removed after 2023.07 release.
 PSEUDOMODULES += heap_cmd
+## @}
+## @defgroup pseudomodule_i2c_scan i2c_scan
+## @ingroup sys_shell_commands
+## @{
+## @deprecated  Use module `shell_cmd_i2c_scan` instead;
+##              will be removed after 2023.07 release.
 PSEUDOMODULES += i2c_scan
+## @}
 PSEUDOMODULES += ieee802154_security
 PSEUDOMODULES += ieee802154_submac
 PSEUDOMODULES += ipv4
@@ -143,13 +183,21 @@ PSEUDOMODULES += libc_gettimeofday
 PSEUDOMODULES += mpu_stack_guard
 
 ## @defgroup pseudomodule_mpu_noexec_ram mpu_noexec_ram
+## @{
 ## @brief Mark RAM as non-executable using the MPU
 ##
 ## Mark the RAM non executable.
 ## This is a protection mechanism which makes exploitation of buffer overflows significantly harder.
 PSEUDOMODULES += mpu_noexec_ram
+## @}
 
+## @defgroup pseudomodule_md5sum md5sum
+## @ingroup sys_shell_commands
+## @{
+## @deprecated  Use module `shell_cmd_md5sum` instead;
+##              will be removed after 2023.07 release.
 PSEUDOMODULES += md5sum
+## @}
 PSEUDOMODULES += mtd_write_page
 PSEUDOMODULES += nanocoap_%
 PSEUDOMODULES += netdev_default
@@ -183,7 +231,13 @@ PSEUDOMODULES += nrfx
 PSEUDOMODULES += newlib
 PSEUDOMODULES += newlib_gnu_source
 PSEUDOMODULES += newlib_nano
+## @defgroup pseudomodule_nice nice
+## @ingroup sys_shell_commands
+## @{
+## @deprecated  Use module `shell_cmd_nice` instead;
+##              will be removed after 2023.07 release.
 PSEUDOMODULES += nice
+## @}
 PSEUDOMODULES += nrf24l01p_ng_diagnostics
 PSEUDOMODULES += openthread
 PSEUDOMODULES += picolibc
@@ -194,7 +248,13 @@ PSEUDOMODULES += printf_float
 PSEUDOMODULES += prng
 PSEUDOMODULES += prng_%
 PSEUDOMODULES += fortuna_reseed
+## @defgroup pseudomodule_random_cmd random_cmd
+## @ingroup sys_shell_commands
+## @{
+## @deprecated  Use module `shell_cmd_random` instead;
+##              will be removed after 2023.07 release.
 PSEUDOMODULES += random_cmd
+## @}
 PSEUDOMODULES += riotboot_%
 PSEUDOMODULES += rtt_cmd
 PSEUDOMODULES += saul_adc
@@ -206,13 +266,30 @@ PSEUDOMODULES += saul_pwm
 PSEUDOMODULES += scanf_float
 PSEUDOMODULES += sched_cb
 PSEUDOMODULES += sched_runq_callback
+## @defgroup pseudomodule_sema_deprecated sema_deprecated
+## @ingroup sys_sema
+## @{
+## @deprecated  Will be removed after 2021.07 release.
 PSEUDOMODULES += sema_deprecated
+## @}
 PSEUDOMODULES += semtech_loramac_rx
 PSEUDOMODULES += senml_cbor
 PSEUDOMODULES += senml_phydat
 PSEUDOMODULES += senml_saul
+## @defgroup pseudomodule_sha1sum sha1sum
+## @ingroup sys_shell_commands
+## @{
+## @deprecated  Use module `shell_cmd_sha1sum` instead;
+##              will be removed after 2023.07 release.
 PSEUDOMODULES += sha1sum
+## @}
+## @defgroup pseudomodule_sha256sum sha256sum
+## @ingroup sys_shell_commands
+## @{
+## @deprecated  Use module `shell_cmd_sha256sum` instead;
+##              will be removed after 2023.07 release.
 PSEUDOMODULES += sha256sum
+## @}
 PSEUDOMODULES += shell_cmd_app_metadata
 PSEUDOMODULES += shell_cmd_at30tse75x
 PSEUDOMODULES += shell_cmd_benchmark_udp
@@ -259,7 +336,12 @@ PSEUDOMODULES += shell_cmd_suit
 PSEUDOMODULES += shell_cmd_sys
 PSEUDOMODULES += shell_cmd_vfs
 PSEUDOMODULES += shell_cmds_default
+## @addtogroup sys_shell_commands
+## @{
+## @deprecated  Use module `shell_cmds_default` instead;
+##              will be removed after 2023.07 release.
 PSEUDOMODULES += shell_commands
+## @}
 PSEUDOMODULES += shell_hooks
 PSEUDOMODULES += shell_lock_auto_locking
 PSEUDOMODULES += slipdev_stdio

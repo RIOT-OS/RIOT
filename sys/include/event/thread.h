@@ -42,8 +42,8 @@
  * event queue gets its own thread. So higher priority events will always
  * preempt events of lower priority in this case.
  *
- * Finally, the module `event_thread_lowest` is provided for backward
- * compatibility and has no effect.
+ * Finally, the module [event_thread_lowest](@ref sys_event_thread_lowest) is
+ * provided for backward compatibility and has no effect.
  *
  * @{
  *
