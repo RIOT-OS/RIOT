@@ -130,6 +130,8 @@ bool gnrc_netif_dev_is_schc(const gnrc_netif_t *netif)
     case NETDEV_TYPE_ETHERNET:
         return (netif->flags & GNRC_NETIF_FLAGS_SCHC);
 #endif
+    case NETDEV_TYPE_LORA:
+        return true;
     default:
         return false;
     }

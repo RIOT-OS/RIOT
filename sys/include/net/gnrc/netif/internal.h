@@ -23,6 +23,9 @@
 
 #include "modules.h"
 
+#if IS_USED(MODULE_GNRC_NETIF_LORAWAN)
+#include "net/gnrc/netif/lorawan.h"
+#endif
 #include "net/gnrc/netif.h"
 #include "net/l2util.h"
 #include "net/netopt.h"
@@ -682,6 +685,12 @@ static inline int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *iid)
 {
 #if GNRC_NETIF_L2ADDR_MAXLEN > 0
     if (netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR) {
+#if IS_USED(MODULE_GNRC_NETIF_LORAWAN)
+        if (IS_USED(MODULE_GNRC_SCHC) &&
+            (netif->device_type == NETDEV_TYPE_LORA)) {
+            return gnrc_netif_lorawan_ipv6_iid(&netif->lorawan, iid);
+        }
+#endif
         return gnrc_netif_ipv6_iid_from_addr(netif,
                                              netif->l2addr, netif->l2addr_len,
                                              iid);

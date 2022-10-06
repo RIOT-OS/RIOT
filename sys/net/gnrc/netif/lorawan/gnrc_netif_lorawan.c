@@ -14,6 +14,7 @@
  */
 
 #include <assert.h>
+#include "hashes/cmac.h"
 #include "fmt.h"
 
 #include "net/gnrc/ipv6.h"
@@ -123,9 +124,20 @@ static inline void _set_be_addr(gnrc_lorawan_t *mac, uint8_t *be_addr)
 void gnrc_lorawan_mcps_indication(gnrc_lorawan_t *mac, mcps_indication_t *ind)
 {
     gnrc_netif_t *netif = container_of(mac, gnrc_netif_t, lorawan.mac);
-    gnrc_nettype_t nettype = IS_ACTIVE(CONFIG_GNRC_NETIF_LORAWAN_NETIF_HDR)
-                     ? GNRC_NETTYPE_UNDEF
-                     : GNRC_NETTYPE_LORAWAN;
+    gnrc_nettype_t nettype;
+
+    if (IS_ACTIVE(CONFIG_GNRC_NETIF_LORAWAN_NETIF_HDR)) {
+#if IS_ACTIVE(MODULE_GNRC_NETTYPE_SCHC)
+        /* TODO if both LoRaWAN and SCHC are required on top, this needs to be implemented in SCHC:
+         * If FPort, i.e. SCHC RuleID, unknown, send to LoRaWAN */
+        nettype = GNRC_NETTYPE_SCHC;
+#else
+        nettype = GNRC_NETTYPE_UNDEF;
+#endif
+    }
+    else {
+        nettype = GNRC_NETTYPE_LORAWAN;
+    }
     uint32_t demux = IS_ACTIVE(CONFIG_GNRC_NETIF_LORAWAN_NETIF_HDR)
                      ? GNRC_NETREG_DEMUX_CTX_ALL
                      : ind->data.port;
@@ -435,6 +447,30 @@ static void _msg_handler(gnrc_netif_t *netif, msg_t *msg)
     }
 }
 
+#if IS_USED(MODULE_GNRC_SCHC)
+static mutex_t _iid_mutex = MUTEX_INIT;
+
+int gnrc_netif_lorawan_ipv6_iid(gnrc_netif_lorawan_t *netif, eui64_t *iid)
+{
+    if (!IS_USED(MODULE_GNRC_SCHC)) {
+        return -ENOTSUP;
+    }
+    mutex_lock(&_iid_mutex);
+    static aes128_cmac_context_t cmac_ctx;
+    static uint8_t cmac[CMAC_BLOCK_SIZE];
+    int res;
+
+    res = cmac_init(&cmac_ctx, netif->appskey, sizeof(netif->appskey));
+    assert(res == CIPHER_INIT_SUCCESS);
+    cmac_update(&cmac_ctx, netif->deveui, sizeof(netif->deveui));
+    cmac_final(&cmac_ctx, cmac);
+    res = sizeof(eui64_t);
+    memcpy(iid, cmac, res);
+    mutex_unlock(&_iid_mutex);
+    return res;
+}
+#endif /* IS_ACTIVE(MODULE_GNRC_SCHC) */
+
 static int _get(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
 {
     int res = 0;
@@ -444,6 +480,12 @@ static int _get(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
     mlme_request_t mlme_request;
 
     switch (opt->opt) {
+    case NETOPT_SCHC:
+        assert(opt->data_len >= sizeof(netopt_enable_t));
+        *((netopt_enable_t *)opt->data) = (netif->flags & GNRC_NETIF_FLAGS_SCHC)
+                                        ? (NETOPT_ENABLE)
+                                        : (NETOPT_DISABLE);
+        break;
     case NETOPT_OTAA:
         assert(opt->data_len >= sizeof(netopt_enable_t));
         *((netopt_enable_t *)opt->data) = netif->lorawan.otaa;
@@ -481,6 +523,90 @@ static int _get(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
         memcpy(opt->data, &tmp, sizeof(uint32_t));
         res = sizeof(uint32_t);
         break;
+    case NETOPT_MAX_PDU_SIZE:
+        assert(opt->data_len == sizeof(uint16_t));
+#if IS_USED(MODULE_GNRC_NETIF_IPV6) && IS_USED(MODULE_GNRC_SCHC)
+        if (opt->context == GNRC_NETTYPE_IPV6) {
+            *((uint16_t *)opt->data) = netif->ipv6.mtu;
+            res = sizeof(uint16_t);
+            break;
+        }
+#endif
+        *((uint16_t *)opt->data) = gnrc_lorawan_region_mac_payload_max(netif->lorawan.datarate)
+                                 - sizeof(lorawan_hdr_t) - 1U; /* exclude FPort */
+        break;
+#if IS_USED(MODULE_GNRC_NETIF_IPV6) && IS_USED(MODULE_GNRC_SCHC)
+        case NETOPT_IPV6_ADDR: {
+                assert(opt->data_len >= sizeof(ipv6_addr_t));
+                ipv6_addr_t *tgt = opt->data;
+
+                res = 0;
+                for (unsigned i = 0;
+                     (res < (int)opt->data_len) &&
+                     (i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF);
+                     i++) {
+                    if (netif->ipv6.addrs_flags[i] != 0) {
+                        memcpy(tgt, &netif->ipv6.addrs[i], sizeof(ipv6_addr_t));
+                        res += sizeof(ipv6_addr_t);
+                        tgt++;
+                    }
+                }
+            }
+            break;
+        case NETOPT_IPV6_ADDR_FLAGS: {
+                assert(opt->data_len >= sizeof(uint8_t));
+                uint8_t *tgt = opt->data;
+
+                res = 0;
+                for (unsigned i = 0;
+                     (res < (int)opt->data_len) &&
+                     (i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF);
+                     i++) {
+                    if (netif->ipv6.addrs_flags[i] != 0) {
+                        *tgt = netif->ipv6.addrs_flags[i];
+                        res += sizeof(uint8_t);
+                        tgt++;
+                    }
+                }
+            }
+            break;
+        case NETOPT_IPV6_GROUP: {
+                assert(opt->data_len >= sizeof(ipv6_addr_t));
+                ipv6_addr_t *tgt = opt->data;
+
+                res = 0;
+                for (unsigned i = 0;
+                     (res < (int)opt->data_len) &&
+                     (i < GNRC_NETIF_IPV6_GROUPS_NUMOF);
+                     i++) {
+                    if (!ipv6_addr_is_unspecified(&netif->ipv6.groups[i])) {
+                        memcpy(tgt, &netif->ipv6.groups[i],
+                               sizeof(ipv6_addr_t));
+                        res += sizeof(ipv6_addr_t);
+                        tgt++;
+                    }
+                }
+            }
+            break;
+        case NETOPT_IPV6_IID:
+            assert(opt->data_len >= sizeof(eui64_t));
+            res = gnrc_netif_lorawan_ipv6_iid(&netif->lorawan, opt->data);
+            break;
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
+        case NETOPT_IPV6_FORWARDING:
+            assert(opt->data_len == sizeof(netopt_enable_t));
+            *((netopt_enable_t *)opt->data) = (gnrc_netif_is_rtr(netif)) ?
+                                              NETOPT_ENABLE : NETOPT_DISABLE;
+            res = sizeof(netopt_enable_t);
+            break;
+        case NETOPT_IPV6_SND_RTR_ADV:
+            assert(opt->data_len == sizeof(netopt_enable_t));
+            *((netopt_enable_t *)opt->data) = (gnrc_netif_is_rtr_adv(netif)) ?
+                                              NETOPT_ENABLE : NETOPT_DISABLE;
+            res = sizeof(netopt_enable_t);
+            break;
+#endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
+#endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) && IS_USED(MODULE_GNRC_SCHC) */
     default:
         res = netif->dev->driver->get(netif->dev, opt->opt, opt->data,
                                       opt->data_len);
@@ -497,6 +623,81 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
 
     gnrc_netif_acquire(netif);
     switch (opt->opt) {
+    case NETOPT_HOP_LIMIT:
+        assert(opt->data_len == sizeof(uint8_t));
+        netif->cur_hl = *((uint8_t *)opt->data);
+        res = sizeof(uint8_t);
+        break;
+#if IS_USED(MODULE_GNRC_NETIF_IPV6)
+    case NETOPT_IPV6_ADDR: {
+            assert(opt->data_len == sizeof(ipv6_addr_t));
+            /* always assume manually added */
+            uint8_t flags = ((((uint8_t)opt->context & 0xff) &
+                              ~GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_MASK) |
+                             GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
+            uint8_t pfx_len = (uint8_t)(opt->context >> 8U);
+            /* acquire locks a recursive mutex so we are safe calling this
+             * public function */
+            res = gnrc_netif_ipv6_addr_add_internal(netif, opt->data,
+                                                    pfx_len, flags);
+            if (res >= 0) {
+                res = sizeof(ipv6_addr_t);
+            }
+        }
+        break;
+    case NETOPT_IPV6_ADDR_REMOVE:
+        assert(opt->data_len == sizeof(ipv6_addr_t));
+        /* acquire locks a recursive mutex so we are safe calling this
+         * public function */
+        gnrc_netif_ipv6_addr_remove_internal(netif, opt->data);
+        res = sizeof(ipv6_addr_t);
+        break;
+    case NETOPT_IPV6_GROUP:
+        assert(opt->data_len == sizeof(ipv6_addr_t));
+        /* acquire locks a recursive mutex so we are safe calling this
+         * public function */
+        res = gnrc_netif_ipv6_group_join_internal(netif, opt->data);
+        if (res >= 0) {
+            res = sizeof(ipv6_addr_t);
+        }
+        break;
+    case NETOPT_IPV6_GROUP_LEAVE:
+        assert(opt->data_len == sizeof(ipv6_addr_t));
+        /* acquire locks a recursive mutex so we are safe calling this
+         * public function */
+        gnrc_netif_ipv6_group_leave_internal(netif, opt->data);
+        res = sizeof(ipv6_addr_t);
+        break;
+    case NETOPT_MAX_PDU_SIZE:
+        if (opt->context == GNRC_NETTYPE_IPV6) {
+            assert(opt->data_len == sizeof(uint16_t));
+            netif->ipv6.mtu = *((uint16_t *)opt->data);
+            res = sizeof(uint16_t);
+        }
+        /* else set device */
+        break;
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
+    case NETOPT_IPV6_FORWARDING:
+        assert(opt->data_len == sizeof(netopt_enable_t));
+        if (*(((netopt_enable_t *)opt->data)) == NETOPT_ENABLE) {
+            netif->flags |= GNRC_NETIF_FLAGS_IPV6_FORWARDING;
+        }
+        else {
+            if (gnrc_netif_is_rtr_adv(netif)) {
+                gnrc_ipv6_nib_change_rtr_adv_iface(netif, false);
+            }
+            netif->flags &= ~GNRC_NETIF_FLAGS_IPV6_FORWARDING;
+        }
+        res = sizeof(netopt_enable_t);
+        break;
+    case NETOPT_IPV6_SND_RTR_ADV:
+        assert(opt->data_len == sizeof(netopt_enable_t));
+        gnrc_ipv6_nib_change_rtr_adv_iface(netif,
+                (*(((netopt_enable_t *)opt->data)) == NETOPT_ENABLE));
+        res = sizeof(netopt_enable_t);
+        break;
+#endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
+#endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) */
     case NETOPT_LORAWAN_DR:
         assert(opt->data_len == sizeof(uint8_t));
         if (!gnrc_lorawan_validate_dr(*((uint8_t *)opt->data))) {

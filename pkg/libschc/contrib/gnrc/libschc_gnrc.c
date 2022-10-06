@@ -37,6 +37,12 @@
 #define GNRC_SCHC_TIMER_CB_MSG  0x02FA
 #define MAX_PACKET_LENGTH       128
 
+static_assert(
+    IS_ACTIVE(CONFIG_GNRC_NETIF_LORAWAN_NETIF_HDR),
+    "SCHC assumes LoRaWAN port to be encoded in GNRC netif header "
+    "(CONFIG_GNRC_NETIF_LORAWAN_NETIF_HDR = 1)"
+);
+
 typedef struct {
     void (*callback)(void *arg);
     void *arg;
@@ -111,6 +117,15 @@ void libschc_gnrc_netif_init(gnrc_netif_t *netif)
 #ifdef MODULE_GNRC_SCHC_ETH
     case NETDEV_TYPE_ETHERNET:
         netif->schc.upstream_mode = NO_ACK;
+        break;
+#endif
+#ifdef MODULE_GNRC_LORAWAN
+    case NETDEV_TYPE_LORA:
+        /* see https://datatracker.ietf.org/doc/html/rfc9011#section-5.6.2 */
+        netif->schc.upstream_mode = ACK_ON_ERROR;
+#ifdef MODULE_GNRC_NETIF_IPV6
+        netif->ipv6.mtu = 1280;
+#endif
         break;
 #endif
     default:
@@ -224,6 +239,11 @@ static int _get_appiid(uint32_t device_id, uint8_t *iid)
 
     gnrc_netif_acquire(netif);
     switch (netif->device_type) {
+#if IS_USED(MODULE_GNRC_NETIF_LORAWAN)
+    case NETDEV_TYPE_LORA:
+        memcpy(iid, netif->lorawan.joineui, sizeof(netif->lorawan.joineui));
+        break;
+#endif
     default:
         (void)iid;
         return -ENOTSUP;
@@ -239,6 +259,22 @@ static uint32_t _get_duty_cycle(gnrc_netif_t *netif, size_t payload_len)
     case NETDEV_TYPE_ETHERNET:
         return 1000;
 #endif
+#if IS_USED(MODULE_GNRC_NETIF_LORAWAN)
+    case NETDEV_TYPE_LORA: {
+        int res;
+        uint8_t cr;
+
+        res = netif->dev->driver->get(netif->dev, NETOPT_CODING_RATE, &cr, sizeof(cr));
+        if (res < 0) {
+            DEBUG("schc: Unable to get code rate from device\n");
+            return 0;
+        }
+        /* pkt_len = payload_len + LoRaWAN header + MIC + FPort */
+        return (lora_time_on_air(payload_len + sizeof(lorawan_hdr_t) + 4 + 1,
+                                 /* round up to milliseconds */
+                                 netif->lorawan.datarate, cr) + (US_PER_MS - 1)) / US_PER_MS;
+   }
+#endif
     default:
         DEBUG("schc: Unknown device type\n");
         return 0;
@@ -251,6 +287,11 @@ static uint32_t _upstream_timeout(gnrc_netif_t *netif)
 #if IS_USED(MODULE_GNRC_SCHC_ETH)
     case NETDEV_TYPE_ETHERNET:
         return 1000;
+#endif
+#if IS_USED(MODULE_GNRC_NETIF_LORAWAN)
+    case NETDEV_TYPE_LORA:
+        /* see https://datatracker.ietf.org/doc/html/rfc9011#section-5.6.2 */
+        return 12 * SEC_PER_HOUR * MS_PER_SEC;
 #endif
     default:
         return 15000;
@@ -275,6 +316,14 @@ static uint8_t send_callback(uint8_t* data, uint16_t length, uint32_t device_id)
     case NETDEV_TYPE_ETHERNET:
         memset(dst, 0xff, ETHERNET_ADDR_LEN);
         dst_len = ETHERNET_ADDR_LEN;
+        break;
+#endif
+#ifdef MODULE_GNRC_NETIF_LORAWAN
+    case NETDEV_TYPE_LORA:
+        dst[0] = data[0];
+        dst_len = sizeof(dst[0]);
+        data++;
+        length--;
         break;
 #endif
     default:
@@ -324,6 +373,37 @@ static void _receive(gnrc_pktsnip_t *pkt)
         return;
     } else {
         netif = gnrc_netif_hdr_get_netif(netif_snip->data);
+    }
+
+    if (IS_USED(MODULE_GNRC_NETIF_LORAWAN) && (netif->device_type == NETDEV_TYPE_LORA)) {
+        gnrc_netif_hdr_t *netif_hdr = netif_snip->data;
+        gnrc_pktsnip_t *tmp;
+        uint8_t *data;
+
+        if (netif_hdr->dst_l2addr_len != 1) {
+            DEBUG("schc: Unexpected FPort length\n");
+            gnrc_pktbuf_release(pkt);
+            return;
+        }
+
+        tmp = gnrc_pktbuf_start_write(pkt);
+        if (!tmp) {
+            DEBUG("schc: Unable to write protect packet\n");
+            gnrc_pktbuf_release(pkt);
+            return;
+        }
+        pkt = tmp;
+        if (gnrc_pktbuf_realloc_data(pkt, pkt->size + 1)) {
+            DEBUG("schc: Unable resize payload to prepend FPort\n");
+            gnrc_pktbuf_release(pkt);
+            return;
+        }
+        data = pkt->data;
+
+        for (int i = (pkt->size - 2); i >= 0; i--) {
+            data[i + 1] = data[i];
+        }
+        data[0] = *gnrc_netif_hdr_get_dst_addr(netif_hdr);
     }
 
     uint32_t device_id = _get_device_id(netif);
@@ -457,6 +537,10 @@ static void _send(gnrc_pktsnip_t *pkt)
     }
     gnrc_netif_release(netif);
     switch (netif->device_type) {
+#if IS_USED(MODULE_GNRC_NETIF_LORAWAN)
+    case NETDEV_TYPE_LORA:
+        schc_conn.mtu++;    /* rule ID goes into FPort field, so we have one byte more of PDU */
+#endif
     default:
         break;
     }

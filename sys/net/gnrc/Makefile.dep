@@ -172,6 +172,17 @@ ifneq (,$(filter gnrc_netif_bus,$(USEMODULE)))
   USEMODULE += core_msg_bus
 endif
 
+ifneq (,$(filter lora,$(USEMODULE)))
+  USEMODULE += gnrc_lorawan
+  ifneq (,$(filter gnrc_ipv6, $(USEMODULE)))
+    USEPKG += libschc    # XXX remove, if there are more SCHC implementations
+    USEMODULE += libschc_gnrc
+    ifneq (,$(filter gcoap% nanocoap%,$(USEMODULE)))
+      USEMODULE += libschc_coap
+    endif
+  endif
+endif
+
 ifneq (,$(filter gnrc_netif_lorawan,$(USEMODULE)))
   ifneq (,$(filter gnrc_schc,$(USEMODULE)))
     USEMODULE += hashes
@@ -321,9 +332,15 @@ ifneq (,$(filter gnrc_ipv6_default,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_ipv6_router_default,$(USEMODULE)))
-  USEMODULE += gnrc_ipv6_nib_rio
-  USEMODULE += gnrc_ipv6_router
-  USEMODULE += gnrc_icmpv6
+  ifneq (,$(filter lora,$(USEMODULE)))
+    # LoRa nodes are never routers
+    USEMODULE := $(filter-out gnrc_ipv6_router_default gnrc_ipv6_nib_rio gnrc_ipv6_router gnrc_ipv6_nib_router,$(USEMODULE))
+    USEMODULE += gnrc_ipv6_default
+  else
+    USEMODULE += gnrc_ipv6_nib_rio
+    USEMODULE += gnrc_ipv6_router
+    USEMODULE += gnrc_icmpv6
+  endif
 endif
 
 ifneq (,$(filter gnrc_ndp,$(USEMODULE)))
