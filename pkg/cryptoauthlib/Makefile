@@ -24,6 +24,7 @@ CFLAGS += -Wno-unused-function
 CFLAGS += -Wno-unused-parameter
 CFLAGS += -Wno-unused-variable
 CFLAGS += -Wno-format-nonliteral
+CFLAGS += -Wno-maybe-uninitialized
 
 TOOLCHAIN_FILE=$(PKG_SOURCE_DIR)/xcompile-toolchain.cmake
 
@@ -40,6 +41,7 @@ cryptoauth: $(PKG_BUILD_DIR)/Makefile
 $(PKG_BUILD_DIR)/Makefile: $(TOOLCHAIN_FILE)
 	cmake -DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE) \
 		  -Wno-dev \
+		  -DATCA_NO_HEAP:BOOL=TRUE \
 		  -B$(PKG_BUILD_DIR) \
 		  -H$(PKG_SOURCE_DIR)/lib
 
