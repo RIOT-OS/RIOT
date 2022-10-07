@@ -38,7 +38,7 @@ typedef struct {
      *  - 8: DAM2 / Stream0
      *  - ...
      *  - 15: DMA2 / Stream7
-     * STM32F0/1/L0/1/4:
+     * STM32F0/1/3/L0/1/4:
      *  - 0: DMA1 / Channel1
      *  - ...
      *  - 4: DMA1 / Channel5

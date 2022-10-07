@@ -193,22 +193,28 @@ static IRQn_Type dma_get_irqn(int stream)
         return ((IRQn_Type)((int)DMA1_Channel1_IRQn + stream));
     }
 #if defined(DMA2_BASE)
+    /* stream 7 is invalid for these CPU families */
+    else if (stream == 7) {
+        return -1;
+    }
 #if defined(CPU_FAM_STM32F1)
     else if (stream < 11) {
 #else
     else if (stream < 13 ) {
 #endif
-        return ((IRQn_Type)((int)DMA2_Channel1_IRQn + stream));
+        /* magic number 8 is first DMA2 stream */
+        return ((IRQn_Type)((int)DMA2_Channel1_IRQn + stream - 8));
     }
-#if !defined(CPU_FAM_STM32L1)
+#if !defined(CPU_FAM_STM32L1) && !defined(CPU_FAM_STM32F3)
     else {
 #if defined(CPU_FAM_STM32F1)
         return (DMA2_Channel4_5_IRQn);
 #else
-        return ((IRQn_Type)((int)DMA2_Channel6_IRQn + stream));
+        /* magic number 13 is 8 (first DMA2 stream) + 5 (Channel6) */
+        return ((IRQn_Type)((int)DMA2_Channel6_IRQn + stream - 13));
 #endif
     }
-#endif /* !defined(CPU_FAM_STM32L1) */
+#endif /* !defined(CPU_FAM_STM32L1) && !defined(CPU_FAM_STM32F3) */
 #endif /* defined(DMA2_BASE) */
 #endif
 
