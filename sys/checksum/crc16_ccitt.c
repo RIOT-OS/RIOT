@@ -21,6 +21,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "byteorder.h"
+#include "kernel_defines.h"
 #include "checksum/crc16_ccitt.h"
 
 static const uint16_t crc_ccitt_lookuptable[256] = {
@@ -96,7 +98,16 @@ static const uint16_t _crc16_ccitt_false_lookuptable[256] = {
 uint16_t crc16_ccitt_kermit_update(uint16_t crc, const unsigned char *buf, size_t len)
 {
     while (len--) {
-        crc = (crc >> 8) ^ crc_ccitt_lookuptable[(crc ^ (*buf++)) & 0xff];
+        uint8_t e = crc ^= *buf++;
+        if (IS_USED(MODULE_CRC16_FAST)) {
+            crc = (crc >> 8) ^ crc_ccitt_lookuptable[e];
+        } else {
+            uint8_t f = e ^ (e << 4);
+            crc = (crc >> 8)
+                ^ ((uint16_t)f << 8)
+                ^ ((uint16_t)f << 3)
+                ^ ((uint16_t)f >> 4);
+        }
     }
 
     return crc;
@@ -115,7 +126,14 @@ uint16_t crc16_ccitt_mcrf4xx_calc(const unsigned char *buf, size_t len)
 uint16_t crc16_ccitt_false_update(uint16_t crc, const unsigned char *buf, size_t len)
 {
     while (len--) {
-        crc = ((crc << 8) ^ _crc16_ccitt_false_lookuptable[((crc >> 8) ^ ((*buf++) & 0x00FF))]);
+        crc = byteorder_swaps(crc) ^ *buf++;
+        if (IS_USED(MODULE_CRC16_FAST)) {
+            crc = (crc & 0xFF00) ^ _crc16_ccitt_false_lookuptable[crc & 0xFF];
+        } else {
+            crc ^= (uint8_t)(crc & 0xff) >> 4;
+            crc ^= (crc << 8) << 4;
+            crc ^= ((crc & 0xff) << 4) << 1;
+        }
     }
 
     return crc;
