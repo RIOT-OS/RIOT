@@ -45,6 +45,7 @@
 #include "soc/rtc.h"
 
 #include "esp_idf_api/periph_ctrl.h"
+#include "esp_idf_api/gpio.h"
 
 #undef MHZ
 #include "macros/units.h"
@@ -72,7 +73,7 @@ static struct _spi_bus_t _spi[] = {
 #ifdef SPI0_CTRL
     {
         .pins_initialized = false,
-        .lock = MUTEX_INIT,
+        .lock = MUTEX_INIT_LOCKED,
         .hostid = spi_config[0].ctrl,
         .periph = &spi_periph_signal[spi_config[0].ctrl],
         .clk_last = 0,
@@ -82,7 +83,7 @@ static struct _spi_bus_t _spi[] = {
 #ifdef SPI1_CTRL
     {
         .pins_initialized = false,
-        .lock = MUTEX_INIT,
+        .lock = MUTEX_INIT_LOCKED,
         .hostid = spi_config[1].ctrl,
         .periph = &spi_periph_signal[spi_config[1].ctrl],
         .clk_last = 0,
@@ -176,6 +177,8 @@ void spi_init_pins(spi_t bus)
     /* connect MISO input signal to the MISO pin through the GPIO matrix */
     esp_rom_gpio_connect_in_signal(spi_config[bus].miso,
                                    _spi[bus].periph->spiq_in, false);
+
+    mutex_unlock(&_spi[bus].lock);
 }
 
 int spi_init_cs(spi_t bus, spi_cs_t cs)
@@ -202,6 +205,39 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
     gpio_set_pin_usage(cs, _SPI);
 
     return SPI_OK;
+}
+
+void spi_deinit_pins(spi_t bus)
+{
+    assert(bus < SPI_NUMOF);
+
+    /* avoid multiple pin deinitializations */
+    if (!_spi[bus].pins_initialized) {
+        return;
+    }
+    _spi[bus].pins_initialized = false;
+
+    if (gpio_is_valid(spi_config[bus].sck)) {
+        esp_idf_gpio_reset_pin(spi_config[bus].sck);
+        gpio_set_pin_usage(spi_config[bus].sck, _GPIO);
+    }
+
+    if (gpio_is_valid(spi_config[bus].mosi)) {
+        esp_idf_gpio_reset_pin(spi_config[bus].mosi);
+        gpio_set_pin_usage(spi_config[bus].mosi, _GPIO);
+    }
+
+    if (gpio_is_valid(spi_config[bus].miso)) {
+        esp_idf_gpio_reset_pin(spi_config[bus].miso);
+        gpio_set_pin_usage(spi_config[bus].miso, _GPIO);
+    }
+
+    if (gpio_is_valid(spi_config[bus].cs)) {
+        esp_idf_gpio_reset_pin(spi_config[bus].cs);
+        gpio_set_pin_usage(spi_config[bus].cs, _GPIO);
+    }
+
+    mutex_lock(&_spi[bus].lock);
 }
 
 void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
