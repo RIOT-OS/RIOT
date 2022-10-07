@@ -59,7 +59,7 @@ extern "C" {
  * @brief   Default stack size to use for the UDP thread
  */
 #ifndef GNRC_UDP_STACK_SIZE
-#define GNRC_UDP_STACK_SIZE     (THREAD_STACKSIZE_DEFAULT)
+#define GNRC_UDP_STACK_SIZE     (THREAD_STACKSIZE_SMALL)
 #endif
 /** @} */
 
