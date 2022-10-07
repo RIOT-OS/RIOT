@@ -244,6 +244,12 @@ static void *_event_loop(void *args)
                 DEBUG("ipv6: NIB timer event received\n");
                 gnrc_ipv6_nib_handle_timer_event(msg.content.ptr, msg.type);
                 break;
+            case GNRC_IPV6_NIB_IFACE_UP:
+                gnrc_ipv6_nib_iface_up(msg.content.ptr);
+                break;
+            case GNRC_IPV6_NIB_IFACE_DOWN:
+                gnrc_ipv6_nib_iface_down(msg.content.ptr, false);
+                break;
             default:
                 break;
         }

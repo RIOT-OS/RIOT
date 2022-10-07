@@ -233,6 +233,16 @@ extern "C" {
  * @note    Only handled with @ref CONFIG_GNRC_IPV6_NIB_DNS != 0
  */
 #define GNRC_IPV6_NIB_RDNSS_TIMEOUT         (0x4fd3U)
+
+/**
+ * @brief   Interface up event
+ */
+#define GNRC_IPV6_NIB_IFACE_UP              (0x4fd4U)
+
+/**
+ * @brief   Interface down event
+ */
+#define GNRC_IPV6_NIB_IFACE_DOWN            (0x4fd5U)
 /** @} */
 
 /**
