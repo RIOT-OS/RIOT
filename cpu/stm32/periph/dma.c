@@ -14,6 +14,7 @@
  * @brief       Low-level DMA driver implementation
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
+ * @author      Joshua DeWeese <jdeweese@primecontrols.com>
  *
  * @}
  */
@@ -83,6 +84,9 @@
 #define DMA1_Channel4_5_6_7_IRQn    DMA1_Channel4_5_IRQn
 #endif
 #endif /* CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7 */
+
+#define DMA_DATA_WIDTH_MASK      (0x03)
+#define DMA_DATA_WIDTH_SHIFT     (0)
 
 struct dma_ctx {
     STM32_DMA_Stream_Type *stream;
@@ -485,10 +489,30 @@ void dma_resume(dma_t dma, uint16_t remaining)
     int stream_n = dma_config[dma].stream;
     STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
 
+#ifdef DMA_SxCR_MINC
+    const bool mem_inc    = stream->CONTROL_REG & DMA_SxCR_MINC;
+    const bool periph_inc = stream->CONTROL_REG & DMA_SxCR_PINC;
+    const int msize_reg =
+        (stream->CONTROL_REG & DMA_SxCR_MSIZE) >> DMA_SxCR_MSIZE_Pos;
+    const int psize_reg =
+        (stream->CONTROL_REG & DMA_SxCR_MSIZE) >> DMA_SxCR_MSIZE_Pos;
+#else
+    const bool mem_inc    = stream->CONTROL_REG & DMA_CCR_MINC;
+    const bool periph_inc = stream->CONTROL_REG & DMA_CCR_PINC;
+    const int msize_reg =
+        (stream->CONTROL_REG & DMA_CCR_MSIZE) >> DMA_CCR_MSIZE_Pos;
+    const int psize_reg =
+        (stream->CONTROL_REG & DMA_CCR_PSIZE) >> DMA_CCR_PSIZE_Pos;
+#endif
+
+    const int mpitch = (mem_inc)    ? msize_reg + 1 : 0;
+    const int ppitch = (periph_inc) ? psize_reg + 1 : 0;
+
     if (remaining > 0) {
         dma_isr_enable(stream_n);
         stream->NDTR_REG = remaining;
-        stream->MEM_ADDR += dma_ctx[dma].len - remaining;
+        stream->MEM_ADDR    += mpitch * (dma_ctx[dma].len - remaining);
+        stream->PERIPH_ADDR += ppitch * (dma_ctx[dma].len - remaining);
         dma_ctx[dma].len = remaining;
         stream->CONTROL_REG |= DMA_EN;
     }
