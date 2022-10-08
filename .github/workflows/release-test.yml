@@ -44,7 +44,7 @@ env:
 # to hit Github Limit of 6h per job.
 jobs:
   tasks:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 360
     strategy:
       fail-fast: false
@@ -120,7 +120,7 @@ jobs:
       if: ${{ matrix.pytest_mark == 'not iotlab_creds' }}
       run: |
         sudo apt-get update
-        sudo apt-get install lib32asan5
+        sudo apt-get install lib32asan6
     - name: Run release tests
       timeout-minutes: 350
       run: |
