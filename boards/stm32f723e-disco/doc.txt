@@ -28,4 +28,10 @@ Use the `term` target to open a terminal:
 
     make BOARD=stm32f723e-disco -C examples/hello-world term
 
+### USB OTG Peripheral Device Driver
+
+By default, the USB OTG FS port is used. To use the USB OTG HS port with the
+internal UTMI+ HS PHY, enable the module `periph_usbdev_hs_utmi`:
+
+    make BOARD=stm32f723e-disco USEMODULE=periph_usbdev_hs_utmi -C examples/usbus_minimal
  */
