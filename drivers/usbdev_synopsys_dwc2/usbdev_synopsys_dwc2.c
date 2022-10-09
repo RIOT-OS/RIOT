@@ -730,16 +730,18 @@ static void _usbdev_init(usbdev_t *dev)
             /* enable ULPI clock */
             periph_clk_en(conf->ahb, RCC_AHB1ENR_OTGHSULPIEN);
 
-#if !defined(MCU_STM32)
-            /* TODO following settings are required for DWC2 HS but are not
-             * defined for STM32 MCUs where these settings correspond to the
-             * reset value of the GUSBCFG register */
+#ifdef USB_OTG_GUSBCFG_ULPI_UTMI_SEL
             /* select ULPI PHY */
-            _global_regs(usbdev->config)->GUSBCFG |= USB_OTG_GUSBCFG_ULPI_UTMI_SEL
-            /* use the 8-bit interface and single data rate */
-            _global_regs(usbdev->config)->GUSBCFG &= ~(USB_OTG_GUSBCFG_PHYIF16 |
-                                                       USB_OTG_GUSBCFG_DDRSEL);
-#endif /* !defined(MCU_STM32) */
+            _global_regs(usbdev->config)->GUSBCFG |= USB_OTG_GUSBCFG_ULPI_UTMI_SEL;
+#endif
+#ifdef USB_OTG_GUSBCFG_PHYIF
+            /* use the 8-bit interface */
+            _global_regs(usbdev->config)->GUSBCFG &= ~USB_OTG_GUSBCFG_PHYIF;
+#endif /* USB_OTG_GUSBCFG_PHYIF */
+#ifdef USB_OTG_GUSBCFG_DDRSEL
+            /* use single data rate */
+            _global_regs(usbdev->config)->GUSBCFG &= ~USB_OTG_GUSBCFG_DDRSEL;
+#endif /* USB_OTG_GUSBCFG_DDRSEL */
 
             /* disable the on-chip FS transceiver */
             _global_regs(usbdev->config)->GUSBCFG &= ~USB_OTG_GUSBCFG_PHYSEL;
