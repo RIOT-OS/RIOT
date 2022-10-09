@@ -634,14 +634,17 @@ static void _reset_periph(dwc2_usb_otg_fshs_t *usbdev)
 #ifdef MCU_STM32
 static void _enable_gpio(const dwc2_usb_otg_fshs_config_t *conf)
 {
+    (void)conf;
+#ifndef MODULE_PERIPH_USBDEV_HS_ULPI
     /* Enables clock on the GPIO bus */
     gpio_init(conf->dp, GPIO_IN);
     gpio_init(conf->dm, GPIO_IN);
     /* Configure AF for the pins */
     gpio_init_af(conf->dp, conf->af);
     gpio_init_af(conf->dm, conf->af);
+#endif /* MODULE_PERIPH_USBDEV_HS_ULPI */
 }
-#endif
+#endif /* MCU_STM32 */
 
 static void _set_mode_device(dwc2_usb_otg_fshs_t *usbdev)
 {
