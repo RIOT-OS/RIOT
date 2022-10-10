@@ -505,7 +505,7 @@ static int _fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *ipv6)
                   icmpv6_hdr->type != ICMPV6_NBR_SOL)) {
             ipv6_addr_t *src = gnrc_netif_ipv6_addr_best_src(netif, &hdr->dst, false);
             if (!src) {
-                /**
+                /*
                  * Unspecified source is intended for some NDP message types.
                  * If the source address for those type is set to unspecified,
                  * we want to keep it unspecified, and not rely on the case that
