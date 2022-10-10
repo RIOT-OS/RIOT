@@ -391,8 +391,8 @@ static void _uart_config(uart_t uart)
     }
 
     /* set number of data bits, stop bits and parity mode */
-    if (_uart_set_mode(uart, _uarts[uart].data, _uarts[uart].stop,
-                             _uarts[uart].parity) != UART_OK) {
+    if (_uart_set_mode(uart, _uarts[uart].data, _uarts[uart].parity,
+                             _uarts[uart].stop) != UART_OK) {
         return;
     }
 
