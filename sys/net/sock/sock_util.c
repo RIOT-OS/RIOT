@@ -98,7 +98,6 @@ static char* _find_hoststart(const char *url)
             }
             break;
         }
-        urlpos++;
     }
     return NULL;
 }
