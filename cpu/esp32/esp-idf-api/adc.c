@@ -39,7 +39,7 @@ esp_err_t esp_idf_adc1_config_width(adc_bits_width_t width_bit)
 esp_err_t esp_idf_adc1_config_channel_atten(adc_channel_t channel,
                                             adc_atten_t atten)
 {
-    return adc1_config_channel_atten(channel, atten);
+    return adc1_config_channel_atten((adc1_channel_t)channel, atten);
 }
 
 int esp_idf_adc1_get_raw(adc1_channel_t channel)
@@ -50,7 +50,7 @@ int esp_idf_adc1_get_raw(adc1_channel_t channel)
 esp_err_t esp_idf_adc2_config_channel_atten(adc_channel_t channel,
                                             adc_atten_t atten)
 {
-    return adc2_config_channel_atten(channel, atten);
+    return adc2_config_channel_atten((adc2_channel_t)channel, atten);
 }
 
 esp_err_t esp_idf_adc2_get_raw(adc2_channel_t channel,

@@ -58,7 +58,9 @@ extern uint32_t rtc_clk_slow_freq_get_hz(void);
 /* forward declaration of functions */
 void rtt_restore_counter(bool sys_time);
 static void _rtt_update_hw_alarm(void);
-static void IRAM_ATTR _rtt_isr(void *arg);
+/* IRAM_ATTR cannot be present in both forward declaration and implementation,
+ * it is present in the implementation */
+static void /* IRAM_ATTR */ _rtt_isr(void *arg);
 
 /* forward declarations of driver functions */
 uint64_t _rtc_get_counter(void);

@@ -240,8 +240,8 @@ static NORETURN void IRAM system_init (void)
 
     /* set log levels for SDK library outputs */
     extern void esp_log_level_set(const char* tag, esp_log_level_t level);
-    esp_log_level_set("wifi", LOG_DEBUG);
-    esp_log_level_set("gpio", LOG_DEBUG);
+    esp_log_level_set("wifi", ESP_LOG_DEBUG);
+    esp_log_level_set("gpio", ESP_LOG_DEBUG);
 
     /* init watchdogs */
     system_wdt_init();

@@ -138,6 +138,9 @@ CFLAGS += -DCONFIG_IDF_TARGET_$(call uppercase_and_underscore,$(CPU_FAM))
 CFLAGS += -DESP_PLATFORM
 CFLAGS += -DLOG_TAG_IN_BRACKETS
 
+# newlib configurations
+CFLAGS += -D__DYNAMIC_REENT__
+
 # extend CFLAGS by the corresponding FLASH_FREQ
 ifeq (20m,$(FLASH_FREQ))
   CFLAGS += -DCONFIG_ESPTOOLPY_FLASHFREQ_20M
