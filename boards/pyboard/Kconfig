@@ -35,7 +35,7 @@ config CLOCK_PLL_M
     default 12
 
 config CLOCK_PLL_N
-    default 336 if MODULE_PERIPH_USBDEV && TEST_KCONFIG
+    default 336 if MODULE_PERIPH_USBDEV_CLK && TEST_KCONFIG
     default 360
 
 
