@@ -117,11 +117,8 @@ class CordEp(ShellInteraction):
     def cord_ep_info(self, timeout=-1, async_=False):
         return self.cord_ep_cmd(self.INFO, None, timeout, async_)
 
-    def cord_ep_register(self, uri, regif=None, timeout=-1, async_=False):
-        args = [uri]
-        if regif is not None:
-            args.append(regif)
-        return self.cord_ep_cmd(self.REGISTER, args, timeout, async_)
+    def cord_ep_register(self, uri, timeout=-1, async_=False):
+        return self.cord_ep_cmd(self.REGISTER, (uri,), timeout, async_)
 
     def cord_ep_discover(self, uri, timeout=-1, async_=False):
         return self.cord_ep_cmd(self.DISCOVER, (uri,), timeout, async_)
