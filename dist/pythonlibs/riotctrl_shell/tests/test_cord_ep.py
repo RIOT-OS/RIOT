@@ -55,18 +55,18 @@ def test_cord_ep_parser_empty():
 
 
 @pytest.mark.parametrize(
-    "uri,regif,expected",
+    "uri,expected",
     [
-        ("[fe80::1]", None, "cord_ep register [fe80::1]"),
-        ("[fe80::1%iface0]", None, "cord_ep register [fe80::1%iface0]"),
-        ("[fe80::1]:5684", None, "cord_ep register [fe80::1]:5684"),
-        ("[fe80::1]", "/regif", "cord_ep register [fe80::1] /regif"),
+        ("coap://[fe80::1]", "cord_ep register coap://[fe80::1]"),
+        ("coap://[fe80::1%iface0]", "cord_ep register coap://[fe80::1%iface0]"),
+        ("coap://[fe80::1]:5684", "cord_ep register coap://[fe80::1]:5684"),
+        ("coap://[fe80::1]/regif", "cord_ep register coap://[fe80::1]/regif"),
     ]
 )
-def test_cord_ep_register(uri, regif, expected):
+def test_cord_ep_register(uri, expected):
     rc = init_ctrl()
     si = riotctrl_shell.cord_ep.CordEp(rc)
-    res = si.cord_ep_register(uri, regif)
+    res = si.cord_ep_register(uri)
     assert res == expected
 
 
@@ -108,5 +108,5 @@ def test_cord_ep_error(error_msg):
     rc = init_ctrl(error_msg)
     si = riotctrl_shell.cord_ep.CordEp(rc)
     with pytest.raises(RuntimeError):
-        si.cord_ep_register("[abcde]:1234", "lalala")
-    assert rc.term.last_command == "cord_ep register [abcde]:1234 lalala"
+        si.cord_ep_register("coap://[abcde]:1234")
+    assert rc.term.last_command == "cord_ep register coap://[abcde]:1234"
