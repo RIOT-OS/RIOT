@@ -1,0 +1,66 @@
+From 5b62cf49d7ef21474b2b467801ddb95df7a5abcb Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Mon, 10 Oct 2022 13:09:07 +0200
+Subject: [PATCH 1/4] components: fix format specifier
+
+In various places `"%u"` or `"%x"` are used instead of `"%" PRIu32` and
+`"%" PRIx32` to print `uint32_t`. This fixes the issue.
+---
+ components/driver/gpio.c                  | 2 +-
+ components/efuse/esp32/esp_efuse_fields.c | 4 ++--
+ components/log/include/esp_log.h          | 3 ++-
+ 3 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/components/driver/gpio.c b/components/driver/gpio.c
+index 5e43aff6..3edcac51 100644
+--- a/components/driver/gpio.c
++++ b/components/driver/gpio.c
+@@ -371,7 +371,7 @@ esp_err_t gpio_config(const gpio_config_t *pGPIOConfig)
+                 gpio_pulldown_dis(io_num);
+             }
+ 
+-            ESP_LOGI(GPIO_TAG, "GPIO[%d]| InputEn: %d| OutputEn: %d| OpenDrain: %d| Pullup: %d| Pulldown: %d| Intr:%d ", io_num, input_en, output_en, od_en, pu_en, pd_en, pGPIOConfig->intr_type);
++            ESP_LOGI(GPIO_TAG, "GPIO[%" PRIu32 "]| InputEn: %d| OutputEn: %d| OpenDrain: %d| Pullup: %d| Pulldown: %d| Intr:%d ", io_num, input_en, output_en, od_en, pu_en, pd_en, pGPIOConfig->intr_type);
+             gpio_set_intr_type(io_num, pGPIOConfig->intr_type);
+ 
+             if (pGPIOConfig->intr_type) {
+diff --git a/components/efuse/esp32/esp_efuse_fields.c b/components/efuse/esp32/esp_efuse_fields.c
+index 7d45cfd6..1171e2ae 100644
+--- a/components/efuse/esp32/esp_efuse_fields.c
++++ b/components/efuse/esp32/esp_efuse_fields.c
+@@ -107,9 +107,9 @@ void esp_efuse_write_random_key(uint32_t blk_wdata0_reg)
+         assert(r == ESP_OK);
+     }
+ 
+-    ESP_LOGV(TAG, "Writing random values to address 0x%08x", blk_wdata0_reg);
++    ESP_LOGV(TAG, "Writing random values to address 0x%08" PRIx32, blk_wdata0_reg);
+     for (int i = 0; i < 8; i++) {
+-        ESP_LOGV(TAG, "EFUSE_BLKx_WDATA%d_REG = 0x%08x", i, buf[i]);
++        ESP_LOGV(TAG, "EFUSE_BLKx_WDATA%d_REG = 0x%08" PRIx32, i, buf[i]);
+         REG_WRITE(blk_wdata0_reg + 4*i, buf[i]);
+     }
+     bzero(buf, sizeof(buf));
+diff --git a/components/log/include/esp_log.h b/components/log/include/esp_log.h
+index f2b30d7c..07ea0380 100644
+--- a/components/log/include/esp_log.h
++++ b/components/log/include/esp_log.h
+@@ -7,6 +7,7 @@
+ #ifndef __ESP_LOG_H__
+ #define __ESP_LOG_H__
+ 
++#include <inttypes.h>
+ #include <stdint.h>
+ #include <stdarg.h>
+ #include "sdkconfig.h"
+@@ -292,7 +293,7 @@ void esp_log_writev(esp_log_level_t level, const char* tag, const char* format,
+ #define LOG_RESET_COLOR
+ #endif //CONFIG_LOG_COLORS
+ 
+-#define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%u) %s: " format LOG_RESET_COLOR "\n"
++#define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") %s: " format LOG_RESET_COLOR "\n"
+ #define LOG_SYSTEM_TIME_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%s) %s: " format LOG_RESET_COLOR "\n"
+ 
+ /** @endcond */
+-- 
+2.38.0
+

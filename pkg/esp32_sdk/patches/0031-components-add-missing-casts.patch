@@ -1,0 +1,103 @@
+From 2f68147d322d65b2d9a27fc3df4d265ad76e884c Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Mon, 10 Oct 2022 14:09:06 +0200
+Subject: [PATCH] components: add missing casts
+
+Adding a bunch of explicit casts to compile with GCC 12.2.0 where
+previously none was required.
+---
+ components/driver/rtc_io.c                   |  2 +-
+ components/esp_system/port/soc/esp32/clk.c   | 10 +++++-----
+ components/esp_system/port/soc/esp32s2/clk.c |  4 ++--
+ components/esp_system/port/soc/esp32s3/clk.c |  4 ++--
+ 4 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/components/driver/rtc_io.c b/components/driver/rtc_io.c
+index 84515814..bbc44135 100644
+--- a/components/driver/rtc_io.c
++++ b/components/driver/rtc_io.c
+@@ -205,7 +205,7 @@ esp_err_t rtc_gpio_wakeup_enable(gpio_num_t gpio_num, gpio_int_type_t intr_type)
+         return ESP_ERR_INVALID_ARG; // Dont support this mode.
+     }
+     RTCIO_ENTER_CRITICAL();
+-    rtcio_hal_wakeup_enable(rtc_io_number_get(gpio_num), intr_type);
++    rtcio_hal_wakeup_enable(rtc_io_number_get(gpio_num), (rtcio_ll_wake_type_t)intr_type);
+     RTCIO_EXIT_CRITICAL();
+     return ESP_OK;
+ }
+diff --git a/components/esp_system/port/soc/esp32/clk.c b/components/esp_system/port/soc/esp32/clk.c
+index c891224a..6837927b 100644
+--- a/components/esp_system/port/soc/esp32/clk.c
++++ b/components/esp_system/port/soc/esp32/clk.c
+@@ -150,13 +150,13 @@ static void select_rtc_slow_clk(slow_clk_sel_t slow_clk)
+ #endif
+ 
+ #if defined(CONFIG_ESP32_RTC_CLK_SRC_EXT_CRYS)
+-    select_rtc_slow_clk(SLOW_CLK_32K_XTAL);
++    select_rtc_slow_clk((slow_clk_sel_t)SLOW_CLK_32K_XTAL);
+ #elif defined(CONFIG_ESP32_RTC_CLK_SRC_EXT_OSC)
+-    select_rtc_slow_clk(SLOW_CLK_32K_EXT_OSC);
++    select_rtc_slow_clk((slow_clk_sel_t)SLOW_CLK_32K_EXT_OSC);
+ #elif defined(CONFIG_ESP32_RTC_CLK_SRC_INT_8MD256)
+-    select_rtc_slow_clk(SLOW_CLK_8MD256);
++    select_rtc_slow_clk((slow_clk_sel_t)SLOW_CLK_8MD256);
+ #else
+-    select_rtc_slow_clk(RTC_SLOW_FREQ_RTC);
++    select_rtc_slow_clk((slow_clk_sel_t)RTC_SLOW_FREQ_RTC);
+ #endif
+ 
+ #ifdef CONFIG_BOOTLOADER_WDT_ENABLE
+@@ -308,5 +308,5 @@ __attribute__((weak)) void esp_perip_clk_init(void)
+ 
+ void rtc_clk_select_rtc_slow_clk(void)
+ {
+-    select_rtc_slow_clk(RTC_SLOW_FREQ_32K_XTAL);
++    select_rtc_slow_clk((slow_clk_sel_t)RTC_SLOW_FREQ_32K_XTAL);
+ }
+diff --git a/components/esp_system/port/soc/esp32s2/clk.c b/components/esp_system/port/soc/esp32s2/clk.c
+index 4fa1aac0..7b48d721 100644
+--- a/components/esp_system/port/soc/esp32s2/clk.c
++++ b/components/esp_system/port/soc/esp32s2/clk.c
+@@ -98,7 +98,7 @@ static void select_rtc_slow_clk(slow_clk_sel_t slow_clk);
+ #elif defined(CONFIG_ESP32S2_RTC_CLK_SRC_INT_8MD256)
+     select_rtc_slow_clk(SLOW_CLK_8MD256);
+ #else
+-    select_rtc_slow_clk(RTC_SLOW_FREQ_RTC);
++    select_rtc_slow_clk((slow_clk_sel_t)RTC_SLOW_FREQ_RTC);
+ #endif
+ 
+ #ifdef CONFIG_BOOTLOADER_WDT_ENABLE
+@@ -191,7 +191,7 @@ static void select_rtc_slow_clk(slow_clk_sel_t slow_clk)
+ 
+ void rtc_clk_select_rtc_slow_clk(void)
+ {
+-    select_rtc_slow_clk(RTC_SLOW_FREQ_32K_XTAL);
++    select_rtc_slow_clk((slow_clk_sel_t)RTC_SLOW_FREQ_32K_XTAL);
+ }
+ 
+ /* This function is not exposed as an API at this point.
+diff --git a/components/esp_system/port/soc/esp32s3/clk.c b/components/esp_system/port/soc/esp32s3/clk.c
+index a5b2ddf3..476c7d36 100644
+--- a/components/esp_system/port/soc/esp32s3/clk.c
++++ b/components/esp_system/port/soc/esp32s3/clk.c
+@@ -101,7 +101,7 @@ static void select_rtc_slow_clk(slow_clk_sel_t slow_clk);
+ #elif defined(CONFIG_ESP32S3_RTC_CLK_SRC_INT_8MD256)
+     select_rtc_slow_clk(SLOW_CLK_8MD256);
+ #else
+-    select_rtc_slow_clk(RTC_SLOW_FREQ_RTC);
++    select_rtc_slow_clk((slow_clk_sel_t)RTC_SLOW_FREQ_RTC);
+ #endif
+ 
+ #ifdef CONFIG_BOOTLOADER_WDT_ENABLE
+@@ -191,7 +191,7 @@ static void select_rtc_slow_clk(slow_clk_sel_t slow_clk)
+ 
+ void rtc_clk_select_rtc_slow_clk(void)
+ {
+-    select_rtc_slow_clk(RTC_SLOW_FREQ_32K_XTAL);
++    select_rtc_slow_clk((slow_clk_sel_t)RTC_SLOW_FREQ_32K_XTAL);
+ }
+ 
+ /* This function is not exposed as an API at this point.
+-- 
+2.38.0
+

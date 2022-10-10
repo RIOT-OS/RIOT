@@ -1,0 +1,39 @@
+From 4d29cbee919f399a2d9c0faf95e96ee8a1e3be8b Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Mon, 10 Oct 2022 13:53:28 +0200
+Subject: [PATCH 2/4] components/esp_hw_support: fix use of IRAM_ATTR
+
+An inline function cannot be placed into instruction RAM, as it will
+be inlined into the calling function. It seems that all callers have in
+fact the IRAM_ATTR. To be sure that the inline function is also placed
+along the caller into instruction RAM, an
+`__attribute__((always_inline))` was added instead.
+
+This fixes
+
+    /home/maribu/Repos/software/RIOT/build/pkg/esp32_sdk/components/esp_hw_support/sleep_modes.c:513:1: error: ignoring attribute 'section (".iram1.42")' because it conflicts with previous 'section (".iram1.40")' [-Werror=attributes]
+      513 | {
+          | ^
+    /home/maribu/Repos/software/RIOT/build/pkg/esp32_sdk/components/esp_hw_support/sleep_modes.c:359:34: note: previous declaration here
+      359 | inline static uint32_t IRAM_ATTR call_rtc_sleep_start(uint32_t reject_triggers, uint32_t lslp_mem_inf_fpu);
+---
+ components/esp_hw_support/sleep_modes.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/components/esp_hw_support/sleep_modes.c b/components/esp_hw_support/sleep_modes.c
+index 6f9fd2b1..fa9875ae 100644
+--- a/components/esp_hw_support/sleep_modes.c
++++ b/components/esp_hw_support/sleep_modes.c
+@@ -509,7 +509,8 @@ static uint32_t IRAM_ATTR esp_sleep_start(uint32_t pd_flags)
+     return result;
+ }
+ 
+-inline static uint32_t IRAM_ATTR call_rtc_sleep_start(uint32_t reject_triggers, uint32_t lslp_mem_inf_fpu)
++__attribute__((always_inline))
++inline static uint32_t call_rtc_sleep_start(uint32_t reject_triggers, uint32_t lslp_mem_inf_fpu)
+ {
+ #ifdef CONFIG_IDF_TARGET_ESP32
+     return rtc_sleep_start(s_config.wakeup_triggers, reject_triggers);
+-- 
+2.38.0
+
