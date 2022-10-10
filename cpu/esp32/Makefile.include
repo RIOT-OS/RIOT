@@ -1,6 +1,8 @@
 # ESP32x specific flashing options
 FLASH_CHIP  = $(CPU_FAM)
 
+export ESP32_SDK_DIR ?= $(PKGDIRBASE)/esp32_sdk
+
 # Serial flasher config as used by the ESP-IDF, be careful when overriding them.
 # They have to be exported to use same values in subsequent makefiles.
 ifeq (esp32,$(CPU_FAM))
