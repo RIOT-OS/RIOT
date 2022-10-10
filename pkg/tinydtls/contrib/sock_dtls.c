@@ -814,6 +814,71 @@ ssize_t sock_dtls_recv_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
     }
 }
 
+ssize_t sock_dtls_recv_buf_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
+                               void **data, void **buf_ctx, uint32_t timeout,
+                               sock_dtls_aux_rx_t *aux)
+{
+    assert(sock);
+    assert(data);
+    assert(buf_ctx);
+    assert(remote);
+
+    sock_udp_ep_t ep;
+
+    /* 2nd call to the function (with ctx set) will free the data */
+    if (*buf_ctx) {
+        int res = sock_udp_recv_buf_aux(sock->udp_sock, data, buf_ctx,
+                                        timeout, &ep, (sock_udp_aux_rx_t *)aux);
+        assert(res == 0);
+        return res;
+    }
+
+    /* loop breaks when timeout or application data read */
+    while (1) {
+        ssize_t res;
+        uint32_t start_recv = ztimer_now(ZTIMER_USEC);
+        msg_t msg;
+
+        if (sock->buffer.data != NULL) {
+            *data = sock->buffer.data;
+            sock->buffer.data = NULL;
+            _copy_session(sock, remote);
+
+            return sock->buffer.datalen;
+        }
+        else if (mbox_try_get(&sock->mbox, &msg) &&
+                 msg.type == DTLS_EVENT_CONNECTED) {
+            return _complete_handshake(sock, remote, msg.content.ptr);
+        }
+        /* Crude way to somewhat test that `sock_dtls_aux_rx_t` and
+         * `sock_udp_aux_rx_t` remain compatible: */
+        static_assert(sizeof(sock_dtls_aux_rx_t) == sizeof(sock_udp_aux_rx_t),
+                      "sock_dtls_aux_rx_t became incompatible with "
+                      "sock_udp_aux_rx_t");
+        res = sock_udp_recv_buf_aux(sock->udp_sock, data, buf_ctx,
+                                    timeout, &ep, (sock_udp_aux_rx_t *)aux);
+        if (res == 0) {
+            continue;
+        }
+        if (res < 0) {
+            DEBUG("sock_dtls: error receiving UDP packet: %d\n", (int)res);
+            return res;
+        }
+
+        _ep_to_session(&ep, &remote->dtls_session);
+        res = dtls_handle_message(sock->dtls_ctx, &remote->dtls_session,
+                                  *data, res);
+
+        if ((timeout != SOCK_NO_TIMEOUT) && (timeout != 0)) {
+            timeout = _update_timeout(start_recv, timeout);
+        }
+        if (timeout == 0) {
+            DEBUG("sock_dtls: timed out while decrypting message\n");
+            return -ETIMEDOUT;
+        }
+    }
+}
+
 void sock_dtls_close(sock_dtls_t *sock)
 {
     dtls_free_context(sock->dtls_ctx);
