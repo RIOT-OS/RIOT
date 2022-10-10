@@ -45,6 +45,7 @@
 #include "soc/rtc.h"
 
 #include "esp_idf_api/periph_ctrl.h"
+#include "esp_idf_api/gpio.h"
 
 #undef MHZ
 #include "macros/units.h"
@@ -72,7 +73,7 @@ static struct _spi_bus_t _spi[] = {
 #ifdef SPI0_CTRL
     {
         .pins_initialized = false,
-        .lock = MUTEX_INIT,
+        .lock = MUTEX_INIT_LOCKED,
         .hostid = spi_config[0].ctrl,
         .periph = &spi_periph_signal[spi_config[0].ctrl],
         .clk_last = 0,
@@ -82,7 +83,7 @@ static struct _spi_bus_t _spi[] = {
 #ifdef SPI1_CTRL
     {
         .pins_initialized = false,
-        .lock = MUTEX_INIT,
+        .lock = MUTEX_INIT_LOCKED,
         .hostid = spi_config[1].ctrl,
         .periph = &spi_periph_signal[spi_config[1].ctrl],
         .clk_last = 0,
@@ -133,6 +134,24 @@ void IRAM_ATTR spi_init(spi_t bus)
     return;
 }
 
+static int _init_spi_pin(gpio_t pin, gpio_mode_t mode)
+{
+    int res;
+
+    if (!gpio_is_valid(pin)) {
+        return 0;
+    }
+
+    res = gpio_init(pin, mode);
+    if (res) {
+        return res;
+    }
+
+    /* store the usage type in GPIO table */
+    gpio_set_pin_usage(pin, _SPI);
+    return 0;
+}
+
 void spi_init_pins(spi_t bus)
 {
     assert(bus < SPI_NUMOF);
@@ -145,9 +164,9 @@ void spi_init_pins(spi_t bus)
 
     DEBUG("%s bus=%u\n", __func__, bus);
 
-    if (gpio_init(spi_config[bus].sck, GPIO_OUT) ||
-        gpio_init(spi_config[bus].mosi, GPIO_OUT) ||
-        gpio_init(spi_config[bus].miso, GPIO_IN)) {
+    if (_init_spi_pin(spi_config[bus].sck, GPIO_OUT) ||
+        _init_spi_pin(spi_config[bus].mosi, GPIO_OUT) ||
+        _init_spi_pin(spi_config[bus].miso, GPIO_IN)) {
         LOG_TAG_ERROR("spi",
                       "SPI_DEV(%d) pins could not be initialized\n", bus);
         return;
@@ -159,23 +178,26 @@ void spi_init_pins(spi_t bus)
         return;
     }
 
-    /* store the usage type in GPIO table */
-    gpio_set_pin_usage(spi_config[bus].sck, _SPI);
-    gpio_set_pin_usage(spi_config[bus].mosi, _SPI);
-    gpio_set_pin_usage(spi_config[bus].miso, _SPI);
-
     /* TODO  the IO_MUX should be used instead of GPIO matrix routing for
              lower delays and higher clock rates whenever possible */
 
     /* connect SCK and MOSI pins to the output signal through the GPIO matrix */
-    esp_rom_gpio_connect_out_signal(spi_config[bus].sck,
-                                    _spi[bus].periph->spiclk_out, false, false);
-    esp_rom_gpio_connect_out_signal(spi_config[bus].mosi,
-                                    _spi[bus].periph->spid_out, false, false);
+    if (gpio_is_valid(spi_config[bus].sck)) {
+        esp_rom_gpio_connect_out_signal(spi_config[bus].sck,
+                                        _spi[bus].periph->spiclk_out, false, false);
+    }
+    if (gpio_is_valid(spi_config[bus].mosi)) {
+        esp_rom_gpio_connect_out_signal(spi_config[bus].mosi,
+                                        _spi[bus].periph->spid_out, false, false);
+    }
 
     /* connect MISO input signal to the MISO pin through the GPIO matrix */
-    esp_rom_gpio_connect_in_signal(spi_config[bus].miso,
-                                   _spi[bus].periph->spiq_in, false);
+    if (gpio_is_valid(spi_config[bus].miso)) {
+        esp_rom_gpio_connect_in_signal(spi_config[bus].miso,
+                                       _spi[bus].periph->spiq_in, false);
+    }
+
+    mutex_unlock(&_spi[bus].lock);
 }
 
 int spi_init_cs(spi_t bus, spi_cs_t cs)
@@ -183,6 +205,10 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
     DEBUG("%s bus=%u cs=%u\n", __func__, bus, cs);
 
     assert(bus < SPI_NUMOF);
+
+    if (!gpio_is_valid(cs)) {
+        return SPI_OK;
+    }
 
     /* return if pin is already initialized as SPI CS signal */
     if (gpio_get_pin_usage(cs) == _SPI) {
@@ -202,6 +228,39 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
     gpio_set_pin_usage(cs, _SPI);
 
     return SPI_OK;
+}
+
+void spi_deinit_pins(spi_t bus)
+{
+    assert(bus < SPI_NUMOF);
+
+    /* avoid multiple pin deinitializations */
+    if (!_spi[bus].pins_initialized) {
+        return;
+    }
+    _spi[bus].pins_initialized = false;
+
+    if (gpio_is_valid(spi_config[bus].sck)) {
+        esp_idf_gpio_reset_pin(spi_config[bus].sck);
+        gpio_set_pin_usage(spi_config[bus].sck, _GPIO);
+    }
+
+    if (gpio_is_valid(spi_config[bus].mosi)) {
+        esp_idf_gpio_reset_pin(spi_config[bus].mosi);
+        gpio_set_pin_usage(spi_config[bus].mosi, _GPIO);
+    }
+
+    if (gpio_is_valid(spi_config[bus].miso)) {
+        esp_idf_gpio_reset_pin(spi_config[bus].miso);
+        gpio_set_pin_usage(spi_config[bus].miso, _GPIO);
+    }
+
+    if (gpio_is_valid(spi_config[bus].cs)) {
+        esp_idf_gpio_reset_pin(spi_config[bus].cs);
+        gpio_set_pin_usage(spi_config[bus].cs, _GPIO);
+    }
+
+    mutex_lock(&_spi[bus].lock);
 }
 
 void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)

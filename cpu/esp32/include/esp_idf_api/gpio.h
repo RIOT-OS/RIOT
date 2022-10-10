@@ -21,6 +21,7 @@
 #define ESP_IDF_API_GPIO_H
 
 #include "esp_err.h"
+#include "hal/gpio_types.h"
 
 #ifndef DOXYGEN     /* Hide implementation details from doxygen */
 

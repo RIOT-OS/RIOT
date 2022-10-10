@@ -664,6 +664,16 @@ typedef enum {
     SPI_CLK_10MHZ  = 10000000           /**< drive the SPI bus with 10MHz */
 } spi_clk_t;
 /** @} */
+
+/**
+ * @brief   SPI pin getters
+ * @{
+ */
+#define spi_pin_mosi(dev) spi_config[dev].mosi
+#define spi_pin_miso(dev) spi_config[dev].miso
+#define spi_pin_clk(dev)  spi_config[dev].sck
+/** @} */
+
 #endif /* !DOXYGEN */
 
 /**
