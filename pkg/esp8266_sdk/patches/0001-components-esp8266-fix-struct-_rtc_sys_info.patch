@@ -1,0 +1,38 @@
+From 3a04f824c737f59a0396f0b62b1cd977032d15b5 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Tue, 11 Oct 2022 13:31:50 +0200
+Subject: [PATCH] components/esp8266: fix struct _rtc_sys_info
+
+The RTC system RAM is 256 bytes (or 64 words) in size, but the structure
+was defined to only be 4 bytes (or one word) in size. This triggers
+the `-Warray-bounds` warning on GCC 12.2.0:
+
+    In function 'esp_reset_reason_get_hint',
+        inlined from 'esp_reset_reason_init' at /home/maribu/Repos/software/RIOT/cpu/esp8266/vendor/esp-idf/esp8266/source/reset_reason.c:118:27:
+    /home/maribu/Repos/software/RIOT/cpu/esp8266/vendor/esp-idf/esp8266/source/reset_reason.c:50:18: error: '__builtin_memset' forming offset [252, 255] is out of the bounds [0, 252] of object 'rtc_sys_info' with type 'struct _rtc_sys_info' [-Werror=array-bounds]
+       50 |             *p++ = 0;
+          |             ~~~~~^~~
+    In file included from /home/maribu/Repos/software/RIOT/cpu/esp8266/vendor/esp-idf/esp8266/source/reset_reason.c:18:
+    /home/maribu/Repos/software/RIOT/build/pkg/esp8266_sdk/components/esp8266/include/internal/esp_system_internal.h: In function 'esp_reset_reason_init':
+    /home/maribu/Repos/software/RIOT/build/pkg/esp8266_sdk/components/esp8266/include/internal/esp_system_internal.h:33:29: note: 'rtc_sys_info' declared here
+       33 | extern struct _rtc_sys_info rtc_sys_info;
+          |                             ^~~~~~~~~~~~
+---
+ components/esp8266/include/internal/esp_system_internal.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/components/esp8266/include/internal/esp_system_internal.h b/components/esp8266/include/internal/esp_system_internal.h
+index 89bacd7..9f8012a 100644
+--- a/components/esp8266/include/internal/esp_system_internal.h
++++ b/components/esp8266/include/internal/esp_system_internal.h
+@@ -27,6 +27,7 @@ extern "C" {
+  */
+ struct _rtc_sys_info {
+     uint32_t        hint;   // software reset reason
++    uint32_t        __padding[63];  // fill up the rest of RTC_SYS_RAM_SIZE
+ };
+ 
+ extern struct _rtc_sys_info rtc_sys_info;
+-- 
+2.38.0
+
