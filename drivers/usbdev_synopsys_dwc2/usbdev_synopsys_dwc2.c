@@ -85,8 +85,7 @@
      USB_OTG_GINTMSK_USBRST   | \
      USB_OTG_GINTMSK_OTGINT   | \
      USB_OTG_GINTMSK_IEPINT   | \
-     USB_OTG_GINTMSK_OEPINT   | \
-     USB_OTG_GINTMSK_RXFLVLM)
+     USB_OTG_GINTMSK_OEPINT)
 
 #define DWC2_PKTSTS_GONAK          0x01    /**< Rx fifo global out nak */
 #define DWC2_PKTSTS_DATA_UPDT      0x02    /**< Rx fifo data update    */
@@ -855,9 +854,14 @@ static void _usbdev_init(usbdev_t *dev)
         _device_regs(conf)->DIEPMSK |= USB_OTG_DIEPMSK_XFRCM;
     }
 
+    uint32_t gint_mask = DWC2_FSHS_USB_GINT_MASK;
+    if (!_uses_dma(conf)) {
+        gint_mask |= USB_OTG_GINTMSK_RXFLVLM;
+    }
+
     /* Clear the interrupt flags and unmask those interrupts */
-    _global_regs(conf)->GINTSTS |= DWC2_FSHS_USB_GINT_MASK;
-    _global_regs(conf)->GINTMSK |= DWC2_FSHS_USB_GINT_MASK;
+    _global_regs(conf)->GINTSTS |= gint_mask;
+    _global_regs(conf)->GINTMSK |= gint_mask;
 
     DEBUG("usbdev: USB peripheral currently in %s mode\n",
           (_global_regs(
@@ -1277,7 +1281,7 @@ void _isr_common(dwc2_usb_otg_fshs_t *usbdev)
     uint32_t status = _global_regs(conf)->GINTSTS;
 
     if (status) {
-        if (status & USB_OTG_GINTSTS_RXFLVL) {
+        if ((status & USB_OTG_GINTSTS_RXFLVL) && !_uses_dma(conf)) {
             unsigned epnum = _global_regs(conf)->GRXSTSR &
                              USB_OTG_GRXSTSP_EPNUM_Msk;
             usbdev->usbdev.epcb(&usbdev->out[epnum].ep, USBDEV_EVENT_ESR);
