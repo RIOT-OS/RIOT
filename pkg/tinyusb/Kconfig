@@ -36,7 +36,8 @@ menuconfig PACKAGE_TINYUSB
     select MODULE_TINYUSB_PORTABLE_STM32_FSEDV if CPU_STM32 && CPU_FAM_L0
     select MODULE_TINYUSB_PORTABLE_STM32_FSEDV if CPU_STM32 && CPU_FAM_WB
     select MODULE_TINYUSB_PORTABLE_MICROCHIP if CPU_FAM_SAMD21 || CPU_FAM_SAMR21 \
-           || CPU_COMMON_SAMD5X || CPU_FAM_SAML21
+           || CPU_COMMON_SAMD5X || CPU_FAM_SAML21 || CPU_FAM_SAMR34 \
+           || CPU_FAM_SAMR30
     select MODULE_ZTIMER_MSEC
     help
         tinyUSB is an open-source cross-platform USB Host/Device stack for
