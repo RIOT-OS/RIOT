@@ -29,6 +29,7 @@
 
 #include "esp/xtensa_ops.h"
 #include "xtensa/xtensa_context.h"
+#include "xtensa/config/core-isa.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -46,7 +47,7 @@ unsigned int IRAM irq_disable(void)
        interrupt level (bits 3..0) */
     state &= 0xf;
 
-    DEBUG("%s %02x(%02x)\n", __func__, XCHAL_EXCM_LEVEL, state);
+    DEBUG("%s %02x(%02" PRIx32 ")\n", __func__, XCHAL_EXCM_LEVEL, state);
     return state;
 }
 
@@ -63,7 +64,7 @@ unsigned int IRAM irq_enable(void)
        interrupt level (bits 3..0) */
     state &= 0xf;
 
-    DEBUG("%s %02x(%02x)\n", __func__, 0, state);
+    DEBUG("%s %02x(%02" PRIx32 ")\n", __func__, 0, state);
     return state;
 }
 
@@ -84,7 +85,7 @@ void IRAM irq_restore(unsigned int state)
                       "rsync                \n"
                      : "+a" (old) : "a" (state) : "memory");
 
-    DEBUG("%s %02x(%02x)\n", __func__, state, old & 0xf);
+    DEBUG("%s %02x(%02" PRIx32 ")\n", __func__, state, old & 0xf);
 }
 
 /**

@@ -267,7 +267,7 @@ const esp_partition_t* esp_partition_find_first(esp_partition_type_t type,
 }
 
 esp_err_t esp_partition_erase_range(const esp_partition_t* part,
-                                    size_t addr, size_t size)
+                                    uint32_t addr, uint32_t size)
 {
     CHECK_PARAM_RET(part != NULL, ESP_ERR_INVALID_ARG);
 
