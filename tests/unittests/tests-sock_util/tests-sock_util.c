@@ -47,7 +47,7 @@
 #define TEST_URL_DNS_HOSTPART       "test.local"
 #define TEST_URL_INVALID            "[2001:db8::1]://local"
 #define TEST_URL_INVALID2           "[2001:db8::1]/local"
-#define TEST_URL_LONG_HOSTPORT      "http://veryveryvery.long.hostname.that." \
+#define TEST_URL_LONG_HOSTPORT      "https://veryveryvery.long.hostname.that." \
                                     "doesnt.fit.inside.sixtyfour.characters." \
                                     "of.buffer.space/localpart"
 #define TEST_URL_LONG_URLPATH       "http://shorthostname/very/very/long/ " \

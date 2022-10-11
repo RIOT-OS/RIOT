@@ -90,7 +90,7 @@ static char* _find_hoststart(const char *url)
      */
     size_t remaining = CONFIG_SOCK_SCHEME_MAXLEN + 1;
     char *urlpos = (char*)url;
-    while(*urlpos && remaining) {
+    while (*urlpos && remaining) {
         remaining--;
         if (*urlpos++ == ':') {
             if (strncmp(urlpos, "//", 2) == 0) {
@@ -98,7 +98,6 @@ static char* _find_hoststart(const char *url)
             }
             break;
         }
-        urlpos++;
     }
     return NULL;
 }
@@ -107,7 +106,7 @@ static char* _find_pathstart(const char *url)
 {
     size_t remaining = CONFIG_SOCK_HOSTPORT_MAXLEN;
     char *urlpos = (char*)url;
-    while(*urlpos && remaining) {
+    while (*urlpos && remaining) {
         remaining--;
         if (*urlpos == '/') {
             return urlpos;
@@ -184,7 +183,7 @@ int _parse_netif(sock_udp_ep_t *ep_out, char *netifstart)
     char netifbuf[NETIF_STR_LEN + 1] = {0};
 
     for (netifend = netifstart; *netifend && *netifend != ']';
-         netifend++);
+         netifend++) {}
     netiflen = netifend - netifstart;
     if (!*netifend || (netiflen >= NETIF_STR_LEN) || (netiflen == 0)) {
         /* no netif found, bail out */
@@ -213,7 +212,7 @@ int sock_tl_str2ep(struct _sock_tl_ep *ep_out, const char *str)
         brackets_flag = 1;
         for (hostend = ++hoststart;
              *hostend && *hostend != ']' && *hostend != '%';
-             hostend++);
+             hostend++) {}
         if (! *hostend || ((size_t)(hostend - hoststart) >= sizeof(hostbuf))) {
             /* none found, bail out */
             return -EINVAL;
