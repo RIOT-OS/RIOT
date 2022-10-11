@@ -275,7 +275,13 @@ static ssize_t _put_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         if ((ret = vfs_lseek(fd, 0, SEEK_END)) < 0) {
             goto close_on_error;
         }
-        if (block1.offset != (unsigned)ret) {
+        if (block1.offset < (unsigned)ret) {
+            /* ignore duplicate packet */
+            create = false; /* don't delete file */
+            ret = COAP_CODE_CONTINUE;
+            goto close_on_error;
+        }
+        if (block1.offset > (unsigned)ret) {
             /* expect block to be in the correct order during initial creation */
             ret = COAP_CODE_REQUEST_ENTITY_INCOMPLETE;
             goto close_on_error;
