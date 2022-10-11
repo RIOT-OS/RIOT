@@ -98,10 +98,17 @@ def test_linear_topology(factory, zep_dispatch):
 
     # Download file from CoAP server
     B.cmd("vfs rm /nvm0/song.txt")
+    B.cmd("vfs rm /nvm0/song2.txt")
     B.cmd("ncget coap://[2001:db8::1]/const/song.txt", timeout=60)
 
     # make sure the content matches
     assert A.cmd("md5sum /const/song.txt").split()[2] == B.cmd("md5sum /nvm0/song.txt").split()[2]
+
+    # upload the file to node B (only one node should write MEMORY.bin)
+    A.cmd("ncput /const/song.txt coap://[" + global_addr(B.cmd("ifconfig 7"))[1] + "]/vfs/song2.txt", timeout=60)
+
+    # make sure the content matches
+    assert B.cmd("md5sum /nvm0/song.txt").split()[2] == B.cmd("md5sum /nvm0/song2.txt").split()[2]
 
     # terminate nodes
     for n in nodes:

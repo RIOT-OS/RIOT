@@ -10,6 +10,8 @@ USEMODULE += shell
 USEMODULE += shell_commands
 
 USEMODULE += gcoap_fileserver
+USEMODULE += gcoap_fileserver_put
+
 USEMODULE += nanocoap_vfs
 
 USEMODULE += constfs
