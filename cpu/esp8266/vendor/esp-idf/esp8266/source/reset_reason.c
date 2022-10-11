@@ -122,7 +122,7 @@ void esp_reset_reason_init(void)
         esp_reset_reason_clear_hint();
     }
 
-    ESP_LOGD(TAG, "RTC reset %u wakeup %u store %u, reason is %u", hw_reset, hw_wakeup, hint, s_reset_reason);
+    ESP_LOGD(TAG, "RTC reset %" PRIu32 " wakeup %" PRIu32 " store %" PRIu32 ", reason is %" PRIu32, hw_reset, hw_wakeup, hint, s_reset_reason);
 }
 
 /**

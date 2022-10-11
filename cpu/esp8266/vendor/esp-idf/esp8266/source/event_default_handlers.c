@@ -216,7 +216,8 @@ static esp_err_t esp_system_event_debug(system_event_t *event)
     case SYSTEM_EVENT_SCAN_DONE: {
         system_event_sta_scan_done_t *scan_done = &event->event_info.scan_done;
         (void)scan_done; /* to avoid compile error: unused variable */
-        ESP_LOGD(TAG, "SYSTEM_EVENT_SCAN_DONE, status:%d, number:%d",  scan_done->status, scan_done->number);
+        ESP_LOGD(TAG, "SYSTEM_EVENT_SCAN_DONE, status:%" PRIu32 ", number:%d",
+                 scan_done->status, scan_done->number);
         break;
     }
     case SYSTEM_EVENT_STA_START: {

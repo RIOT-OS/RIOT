@@ -200,7 +200,7 @@ esp_err_t esp_phy_load_cal_data_from_nvs(esp_phy_calibration_data_t *out_cal_dat
         ESP_LOGE(TAG, "%s: NVS has not been initialized. "
                  "Call nvs_flash_init before starting WiFi/BT.", __func__);
     } else if (err != ESP_OK) {
-        ESP_LOGD(TAG, "%s: failed to open NVS namespace (0x%x)", __func__, err);
+        ESP_LOGD(TAG, "%s: failed to open NVS namespace (0x%x)", __func__, (unsigned)err);
         return err;
     }
 
@@ -215,7 +215,7 @@ esp_err_t esp_phy_store_cal_data_to_nvs(const esp_phy_calibration_data_t *cal_da
     esp_err_t err = nvs_open(PHY_NAMESPACE, NVS_READWRITE, &handle);
 
     if (err != ESP_OK) {
-        ESP_LOGD(TAG, "%s: failed to open NVS namespace (0x%x)", __func__, err);
+        ESP_LOGD(TAG, "%s: failed to open NVS namespace (0x%x)", __func__, (unsigned)err);
         return err;
     } else {
         err = store_cal_data_to_nvs_handle(handle, cal_data);
@@ -234,7 +234,7 @@ static esp_err_t load_cal_data_from_nvs_handle(nvs_handle handle,
     err = nvs_get_blob(handle, PHY_CAL_DATA_KEY, out_cal_data->rf_cal_data, &length);
 
     if (err != ESP_OK) {
-        ESP_LOGE(TAG, "%s: failed to get cal_data(0x%x)", __func__, err);
+        ESP_LOGE(TAG, "%s: failed to get cal_data(0x%x)", __func__, (unsigned)err);
         return err;
     }
 
@@ -247,7 +247,7 @@ static esp_err_t load_cal_data_from_nvs_handle(nvs_handle handle,
     err = nvs_get_blob(handle, PHY_RX_GAIN_DC_TABLE_KEY, out_cal_data->rx_gain_dc_table, &length);
 
     if (err != ESP_OK) {
-        ESP_LOGE(TAG, "%s: failed to get rx_gain_dc_table(0x%x)", __func__, err);
+        ESP_LOGE(TAG, "%s: failed to get rx_gain_dc_table(0x%x)", __func__, (unsigned)err);
         return err;
     }
 
@@ -267,21 +267,21 @@ static esp_err_t store_cal_data_to_nvs_handle(nvs_handle handle,
     err = nvs_set_blob(handle, PHY_CAL_DATA_KEY, cal_data->rf_cal_data, sizeof(cal_data->rf_cal_data));
 
     if (err != ESP_OK) {
-        ESP_LOGE(TAG, "%s: store calibration data failed(0x%x)\n", __func__, err);
+        ESP_LOGE(TAG, "%s: store calibration data failed(0x%x)\n", __func__, (unsigned)err);
         return err;
     }
 
     err = nvs_set_blob(handle, PHY_RX_GAIN_DC_TABLE_KEY, cal_data->rx_gain_dc_table, sizeof(cal_data->rx_gain_dc_table));
 
     if (err != ESP_OK) {
-        ESP_LOGE(TAG, "%s: store rx gain dc table failed(0x%x)\n", __func__, err);
+        ESP_LOGE(TAG, "%s: store rx gain dc table failed(0x%x)\n", __func__, (unsigned)err);
         return err;
     }
 
     err = nvs_commit(handle);
 
     if (err != ESP_OK) {
-        ESP_LOGE(TAG, "%s: store calibration nvs commit failed(0x%x)\n", __func__, err);
+        ESP_LOGE(TAG, "%s: store calibration nvs commit failed(0x%x)\n", __func__, (unsigned)err);
     }
 
     return err;
@@ -314,7 +314,7 @@ void esp_phy_load_cal_and_init(phy_rf_module_t module)
     esp_err_t err = esp_phy_load_cal_data_from_nvs(cal_data);
 
     if (err != ESP_OK) {
-        ESP_LOGW(TAG, "failed to load RF calibration data (0x%x), falling back to full calibration", err);
+        ESP_LOGW(TAG, "failed to load RF calibration data (0x%x), falling back to full calibration", (unsigned)err);
         calibration_mode = PHY_RF_CAL_FULL;
     }
 

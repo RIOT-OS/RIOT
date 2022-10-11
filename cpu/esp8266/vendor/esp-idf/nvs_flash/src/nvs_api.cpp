@@ -87,7 +87,7 @@ extern "C" void nvs_dump(const char *partName)
 
 extern "C" esp_err_t nvs_flash_init_custom(const char *partName, uint32_t baseSector, uint32_t sectorCount)
 {
-    ESP_LOGD(TAG, "nvs_flash_init_custom partition=%s start=%d count=%d", partName, baseSector, sectorCount);
+    ESP_LOGD(TAG, "nvs_flash_init_custom partition=%s start=%" PRIu32 " count=%" PRIu32, partName, baseSector, sectorCount);
     nvs::Storage* new_storage = NULL;
     nvs::Storage* storage = lookup_storage_from_name(partName);
     if (storage == NULL) {
@@ -149,7 +149,7 @@ extern "C" esp_err_t nvs_flash_deinit_partition(const char* partition_name)
     while(it != s_nvs_handles.end()) {
         next++;
         if (it->mStoragePtr == storage) {
-            ESP_LOGD(TAG, "Deleting handle %d (ns=%d) related to partition \"%s\" (missing call to nvs_close?)",
+            ESP_LOGD(TAG, "Deleting handle %" PRIu32 " (ns=%d) related to partition \"%s\" (missing call to nvs_close?)",
                     it->mHandle, it->mNsIndex, partition_name);
             s_nvs_handles.erase(it);
             delete static_cast<HandleEntry*>(it);
@@ -235,7 +235,7 @@ extern "C" esp_err_t nvs_open(const char* name, nvs_open_mode open_mode, nvs_han
 extern "C" void nvs_close(nvs_handle handle)
 {
     Lock lock;
-    ESP_LOGD(TAG, "%s %d", __func__, handle);
+    ESP_LOGD(TAG, "%s %" PRIu32, __func__, handle);
     auto it = find_if(begin(s_nvs_handles), end(s_nvs_handles), [=](HandleEntry& e) -> bool {
         return e.mHandle == handle;
     });
@@ -280,7 +280,7 @@ template<typename T>
 static esp_err_t nvs_set(nvs_handle handle, const char* key, T value)
 {
     Lock lock;
-    ESP_LOGD(TAG, "%s %s %d %d", __func__, key, sizeof(T), (uint32_t) value);
+    ESP_LOGD(TAG, "%s %s %u %" PRIu32, __func__, key, (unsigned)sizeof(T), (uint32_t)value);
     HandleEntry entry;
     auto err = nvs_find_ns_handle(handle, entry);
     if (err != ESP_OK) {

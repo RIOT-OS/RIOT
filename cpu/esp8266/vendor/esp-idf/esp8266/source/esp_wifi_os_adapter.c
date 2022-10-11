@@ -400,6 +400,11 @@ void *osi_task_top_sp(void)
     return active_thread ? active_thread->sp : 0;
 }
 
+static int32_t _nvs_open(const char *name, uint32_t mode, uint32_t *handle)
+{
+    return nvs_open(name, mode, handle);
+}
+
 const wifi_osi_funcs_t s_wifi_osi_funcs = {
     .version = ESP_WIFI_OS_ADAPTER_VERSION,
 
@@ -461,7 +466,7 @@ const wifi_osi_funcs_t s_wifi_osi_funcs = {
     .nvs_get_u8 = nvs_get_u8,
     .nvs_set_u16 = nvs_set_u16,
     .nvs_get_u16 = nvs_get_u16,
-    .nvs_open = nvs_open,
+    .nvs_open = _nvs_open,
     .nvs_close = nvs_close,
     .nvs_commit = nvs_commit,
     .nvs_set_blob = nvs_set_blob,

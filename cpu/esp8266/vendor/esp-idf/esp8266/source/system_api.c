@@ -148,14 +148,14 @@ static esp_err_t load_backup_mac_data(uint8_t *mac)
                  "Call nvs_flash_init before starting WiFi/BT.", __func__);
         return ESP_ERR_INVALID_MAC;
     } else if (err != ESP_OK) {
-        ESP_LOGD(TAG, "%s: failed to open NVS namespace (0x%x)", __func__, err);
+        ESP_LOGD(TAG, "%s: failed to open NVS namespace (0x%x)", __func__, (unsigned)err);
         return ESP_ERR_INVALID_MAC;
     }
 
     size_t length = MAC_DATA_LEN_WITH_CRC;
     err = nvs_get_blob(handle, BACKUP_MAC_DATA_KEY, efuse, &length);
     if (err != ESP_OK) {
-        ESP_LOGD(TAG, "%s: failed to get backup mac (0x%x)", __func__, err);
+        ESP_LOGD(TAG, "%s: failed to get backup mac (0x%x)", __func__, (unsigned)err);
         return ESP_ERR_INVALID_MAC;
     }
     if (length != MAC_DATA_LEN_WITH_CRC) {
@@ -225,21 +225,21 @@ static esp_err_t store_backup_mac_data(void)
     err = nvs_open(BACKUP_MAC_NAMESPACE, NVS_READWRITE, &handle);
 
     if (err != ESP_OK) {
-        ESP_LOGD(TAG, "%s: failed to open NVS namespace (0x%x)", __func__, err);
+        ESP_LOGD(TAG, "%s: failed to open NVS namespace (0x%x)", __func__, (unsigned)err);
         return err;
     }
 
     err = nvs_set_blob(handle, BACKUP_MAC_DATA_KEY, efuse, MAC_DATA_LEN_WITH_CRC);
 
     if (err != ESP_OK) {
-        ESP_LOGE(TAG, "%s: store backup mac data failed(0x%x)\n", __func__, err);
+        ESP_LOGE(TAG, "%s: store backup mac data failed(0x%x)\n", __func__, (unsigned)err);
         return err;
     }
 
     err = nvs_commit(handle);
 
     if (err != ESP_OK) {
-        ESP_LOGE(TAG, "%s: store backup mac data failed(0x%x)\n", __func__, err);
+        ESP_LOGE(TAG, "%s: store backup mac data failed(0x%x)\n", __func__, (unsigned)err);
     }
 
     return err;

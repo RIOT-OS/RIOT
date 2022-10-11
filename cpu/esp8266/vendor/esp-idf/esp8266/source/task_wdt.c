@@ -68,7 +68,7 @@ esp_err_t esp_task_wdt_init(void)
 
     WDT_EDGE_INT_ENABLE();
 
-    ESP_LOGD(TAG, "Enable task watch dog panic, panic time parameter is %u", panic_time_param);
+    ESP_LOGD(TAG, "Enable task watch dog panic, panic time parameter is %" PRIu32, panic_time_param);
 #else
     const uint32_t panic_time_param = 1;
 #endif

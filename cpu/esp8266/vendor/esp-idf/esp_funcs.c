@@ -51,7 +51,8 @@ void IRAM_ATTR HDL_MAC_SIG_IN_LV1_ISR(void)
 
 void __attribute__((noreturn)) _esp_error_check_failed(esp_err_t rc, const char *file, int line, const char *function, const char *expression)
 {
-    printf("ESP_ERROR_CHECK failed: esp_err_t 0x%x at %p\n", rc, __builtin_return_address(0));
+    printf("ESP_ERROR_CHECK failed: esp_err_t 0x%" PRIx32" at %p\n",
+           rc, __builtin_return_address(0));
     printf("file: \"%s\" line %d\nfunc: %s\nexpression: %s\n", file, line, function, expression);
     abort();
 }
@@ -77,7 +78,7 @@ unsigned int IRAM_ATTR _xt_isr_mask(unsigned int mask)
 
 void IRAM_ATTR _xt_clear_ints(uint32_t mask)
 {
-    DEBUG("%s %08x\n", __func__, mask);
+    DEBUG("%s %08" PRIx32 "\n", __func__, mask);
     xt_set_intclear(mask);
 }
 

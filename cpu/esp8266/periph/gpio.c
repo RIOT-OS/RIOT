@@ -150,6 +150,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 
         case GPIO_OD_PU: iomux_conf |= IOMUX_PIN_PULLUP;
                          iomux_conf |= IOMUX_PIN_PULLUP_SLEEP;
+                         /* falls through */
         case GPIO_OD:    iomux_conf |= IOMUX_PIN_OUTPUT_ENABLE;
                          iomux_conf |= IOMUX_PIN_OUTPUT_ENABLE_SLEEP;
                          GPIO.CONF[pin] |= GPIO_CONF_OPEN_DRAIN;
@@ -158,6 +159,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 
         case GPIO_IN_PU: iomux_conf |= IOMUX_PIN_PULLUP;
                          iomux_conf |= IOMUX_PIN_PULLUP_SLEEP;
+                         /* falls through */
         case GPIO_IN:    GPIO.CONF[pin] |= GPIO_CONF_OPEN_DRAIN;
                          GPIO.ENABLE_OUT_CLEAR = BIT(pin);
                          break;

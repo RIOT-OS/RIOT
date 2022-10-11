@@ -26,7 +26,7 @@
 
 void pm_set_lowest(void)
 {
-    DEBUG("%s enter to sleep @%u\n", __func__, system_get_time());
+    DEBUG("%s enter to sleep @%" PRIu32 "\n", __func__, system_get_time());
 
     /* reset system watchdog timer */
     system_wdt_feed();
@@ -36,7 +36,7 @@ void pm_set_lowest(void)
     __asm__ volatile ("waiti 0");
     #endif
 
-    DEBUG("%s exit from sleep @%u\n", __func__, system_get_time());
+    DEBUG("%s exit from sleep @%" PRIu32 "\n", __func__, system_get_time());
 
     /* reset system watchdog timer */
     system_wdt_feed();

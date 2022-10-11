@@ -23,6 +23,7 @@
 #endif
 #include <cstdio>
 #include <cstring>
+#include <cinttypes>
 
 namespace nvs
 {
@@ -863,7 +864,7 @@ const char* Page::pageStateToName(PageState ps)
 
 void Page::debugDump() const
 {
-    printf("state=%x (%s) addr=%x seq=%d\nfirstUsed=%d nextFree=%d used=%d erased=%d\n", (uint32_t) mState, pageStateToName(mState), mBaseAddress, mSeqNumber, static_cast<int>(mFirstUsedEntry), static_cast<int>(mNextFreeEntry), mUsedEntryCount, mErasedEntryCount);
+    printf("state=%" PRIx32 " (%s) addr=%" PRIx32 " seq=%" PRIu32 "\nfirstUsed=%d nextFree=%d used=%d erased=%d\n", (uint32_t) mState, pageStateToName(mState), mBaseAddress, mSeqNumber, static_cast<int>(mFirstUsedEntry), static_cast<int>(mNextFreeEntry), mUsedEntryCount, mErasedEntryCount);
     size_t skip = 0;
     for (size_t i = 0; i < ENTRY_COUNT; ++i) {
         printf("%3d: ", static_cast<int>(i));

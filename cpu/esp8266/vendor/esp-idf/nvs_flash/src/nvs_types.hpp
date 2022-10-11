@@ -100,7 +100,11 @@ public:
 
     void getKey(char* dst, size_t dstSize)
     {
-        strncpy(dst, key, (dstSize<MAX_KEY_LENGTH)?dstSize:MAX_KEY_LENGTH);
+        if (dstSize >= MAX_KEY_LENGTH) {
+            dstSize = MAX_KEY_LENGTH - 1;
+        }
+        memcpy(dst, key, dstSize);
+        dst[dstSize] = '\0';
     }
 
     template<typename T>
