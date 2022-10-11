@@ -22,22 +22,27 @@ LOW_MEMORY_BOARDS := \
   blackpill-stm32f103c8 \
   bluepill-stm32f103c8 \
   derfmega128 \
+  im880b \
   nucleo-f302r8 \
   saml10-xpro \
   saml11-xpro \
+  spark-core \
   stm32f7508-dk \
   stm32mp157c-dk2 \
   #
 
-# Don't enable VFS functions on small boards
+# Don't enable VFS, DTLS functions on small boards
 ifeq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
+  USEMODULE += nanocoap_dtls
+  USEMODULE += prng_sha256prng
+
   USEMODULE += nanocoap_vfs
   USEMODULE += vfs_default
   # USEMODULE += vfs_auto_format
   USEMODULE += shell_cmds_default
 
-  # VFS operations require more stack on the main thread
-  CFLAGS += -DTHREAD_STACKSIZE_MAIN=THREAD_STACKSIZE_LARGE
+  # DTLS and VFS operations require more stack on the main thread
+  CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(3*THREAD_STACKSIZE_DEFAULT\)
 
   # always enable auto-format for native
   ifeq ($(BOARD),native)
