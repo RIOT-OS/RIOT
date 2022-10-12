@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    net_dhcpv6_client_simple_pd     DHCPv6 client for simple prefix
- *                                              delegation
+ * @defgroup    net_dhcpv6_client_simple_pd     gnrc_dhcpv6_client_simple_pd: DHCPv6 client for
+ *                                              simple prefix delegation
  * @ingroup     net_dhcpv6_client
  * @brief       DHCPv6 client bootstrapping for prefix deligation with routers &
  *              6LoWPAN border routers
