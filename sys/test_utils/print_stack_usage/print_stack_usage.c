@@ -22,6 +22,8 @@
 
 #if MODULE_FMT
 #include "fmt.h"
+#else
+#include <stdio.h>
 #endif
 
 #if MODULE_FMT
