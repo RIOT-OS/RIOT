@@ -402,7 +402,7 @@ void dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem)
     STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
     uint32_t ctr_reg = stream->CONTROL_REG;
 
-#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
+#ifdef DMA_SxCR_MINC
     stream->CONTROL_REG = (ctr_reg & ~(DMA_SxCR_MINC)) |
                           (incr_mem << DMA_SxCR_MINC_Pos);
 #else
