@@ -60,10 +60,6 @@ typedef enum {
     GNRC_NETTYPE_NETIF = -1,
     GNRC_NETTYPE_UNDEF = 0,     /**< Protocol is undefined */
 
-#if IS_USED(MODULE_GNRC_NETTYPE_SIXLOWPAN) || defined(DOXYGEN)
-    GNRC_NETTYPE_SIXLOWPAN,     /**< Protocol is 6LoWPAN */
-#endif
-
     /**
      * @{
      * @name Link layer
@@ -71,31 +67,21 @@ typedef enum {
 #if IS_USED(MODULE_GNRC_NETTYPE_GOMACH) || defined(DOXYGEN)
     GNRC_NETTYPE_GOMACH,         /**< Protocol is GoMacH */
 #endif
-    /**
-     * @}
-     */
-
-    /**
-     * @{
-     * @name Link layer
-     */
 #if IS_USED(MODULE_GNRC_NETTYPE_LWMAC) || defined(DOXYGEN)
     GNRC_NETTYPE_LWMAC,          /**< Protocol is lwMAC */
 #endif
-    /**
-     * @}
-     */
-
-    /**
-     * @{
-     * @name Link layer
-     */
 #if IS_USED(MODULE_GNRC_NETTYPE_CUSTOM) || defined(DOXYGEN)
-    GNRC_NETTYPE_CUSTOM,            /**< Custom ethertype */
+    GNRC_NETTYPE_CUSTOM,         /**< Custom ethertype */
 #endif
-    /**
-     * @}
-     */
+    /** @} */
+
+#if IS_USED(MODULE_GNRC_NETTYPE_SIXLOWPAN) || defined(DOXYGEN)
+    GNRC_NETTYPE_SIXLOWPAN,     /**< Protocol is 6LoWPAN */
+#endif
+
+#if IS_USED(MODULE_GNRC_NETTYPE_LORAWAN) || defined(DOXYGEN)
+    GNRC_NETTYPE_LORAWAN,       /**< Protocol is LoRaWAN */
+#endif
 
     /**
      * @{
@@ -110,9 +96,17 @@ typedef enum {
 #if IS_USED(MODULE_GNRC_NETTYPE_ICMPV6) || defined(DOXYGEN)
     GNRC_NETTYPE_ICMPV6,        /**< Protocol is ICMPv6 */
 #endif
-    /**
-     * @}
-     */
+
+#if IS_USED(MODULE_GNRC_NETTYPE_CCN) || defined(DOXYGEN)
+    GNRC_NETTYPE_CCN,           /**< Protocol is CCN */
+    GNRC_NETTYPE_CCN_CHUNK,     /**< Protocol is CCN, packet contains a content
+                                     chunk */
+#endif
+
+#if IS_USED(MODULE_GNRC_NETTYPE_NDN) || defined(DOXYGEN)
+    GNRC_NETTYPE_NDN,           /**< Protocol is NDN */
+#endif
+    /** @} */
 
     /**
      * @{
@@ -124,23 +118,7 @@ typedef enum {
 #if IS_USED(MODULE_GNRC_NETTYPE_UDP) || defined(DOXYGEN)
     GNRC_NETTYPE_UDP,           /**< Protocol is UDP */
 #endif
-    /**
-     * @}
-     */
-
-#if IS_USED(MODULE_GNRC_NETTYPE_CCN) || defined(DOXYGEN)
-    GNRC_NETTYPE_CCN,           /**< Protocol is CCN */
-    GNRC_NETTYPE_CCN_CHUNK,     /**< Protocol is CCN, packet contains a content
-                                     chunk */
-#endif
-
-#if IS_USED(MODULE_GNRC_NETTYPE_NDN) || defined(DOXYGEN)
-    GNRC_NETTYPE_NDN,           /**< Protocol is NDN */
-#endif
-
-#if IS_USED(MODULE_GNRC_NETTYPE_LORAWAN) || defined(DOXYGEN)
-    GNRC_NETTYPE_LORAWAN,       /**< Protocol is LoRaWAN */
-#endif
+    /** @} */
 
     /**
      * @{
@@ -149,9 +127,7 @@ typedef enum {
 #ifdef TEST_SUITES
     GNRC_NETTYPE_TEST,
 #endif
-    /**
-     * @}
-     */
+    /** @} */
 
     GNRC_NETTYPE_NUMOF,         /**< maximum number of available protocols */
 } gnrc_nettype_t;
@@ -207,6 +183,10 @@ static inline gnrc_nettype_t gnrc_nettype_from_ethertype(uint16_t type)
 static inline uint16_t gnrc_nettype_to_ethertype(gnrc_nettype_t type)
 {
     switch (type) {
+#if IS_USED(MODULE_GNRC_NETTYPE_CUSTOM)
+        case GNRC_NETTYPE_CUSTOM:
+            return ETHERTYPE_CUSTOM;
+#endif
 #if IS_USED(MODULE_GNRC_SIXLOENC) && IS_USED(MODULE_GNRC_NETTYPE_SIXLOWPAN)
         case GNRC_NETTYPE_SIXLOWPAN:
             return ETHERTYPE_6LOENC;
@@ -222,10 +202,6 @@ static inline uint16_t gnrc_nettype_to_ethertype(gnrc_nettype_t type)
 #if IS_USED(MODULE_GNRC_NETTYPE_NDN)
         case GNRC_NETTYPE_NDN:
             return ETHERTYPE_NDN;
-#endif
-#if IS_USED(MODULE_GNRC_NETTYPE_CUSTOM)
-        case GNRC_NETTYPE_CUSTOM:
-            return ETHERTYPE_CUSTOM;
 #endif
         default:
             return ETHERTYPE_UNKNOWN;
@@ -291,13 +267,13 @@ static inline gnrc_nettype_t gnrc_nettype_from_protnum(uint8_t num)
 static inline uint8_t gnrc_nettype_to_protnum(gnrc_nettype_t type)
 {
     switch (type) {
-#if IS_USED(MODULE_GNRC_NETTYPE_ICMPV6)
-        case GNRC_NETTYPE_ICMPV6:
-            return PROTNUM_ICMPV6;
-#endif
 #if IS_USED(MODULE_GNRC_NETTYPE_IPV6)
         case GNRC_NETTYPE_IPV6:
             return PROTNUM_IPV6;
+#endif
+#if IS_USED(MODULE_GNRC_NETTYPE_ICMPV6)
+        case GNRC_NETTYPE_ICMPV6:
+            return PROTNUM_ICMPV6;
 #endif
 #if IS_USED(MODULE_GNRC_NETTYPE_TCP)
         case GNRC_NETTYPE_TCP:
