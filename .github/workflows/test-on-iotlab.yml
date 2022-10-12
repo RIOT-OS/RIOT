@@ -110,7 +110,7 @@ jobs:
         run: |
           docker pull riot/riotbuild:latest
       - name: Checkout RIOT
-        uses: actions/checkout@v2
+        uses: actions/checkout@main
         with:
           ref: ${{ github.event.inputs.riot_version }}
       - name: Launch IoT-LAB experiment

@@ -21,7 +21,7 @@ jobs:
       matrix:
         check: [commit-msg, pr_check]
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@main
       with:
         # Use the SHA of the PR branch as-is, not the PR branch merged
         # in master (default behavior in GH actions)
