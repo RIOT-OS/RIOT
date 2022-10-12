@@ -15,4 +15,7 @@ USEMODULE += ipv6_addr
 # pretend to include sock_dns
 CFLAGS += -DMODULE_SOCK_DNS=1
 
+# We don't actually run the mock netifs
+CFLAGS += -DGNRC_NETIF_MSG_QUEUE_SIZE=1
+
 include $(RIOTBASE)/Makefile.include
