@@ -15,8 +15,9 @@
  * the @ref net_gnrc_netreg, and the @ref net_gnrc_pkt to identify network protocols
  * throughout the network stack.
  *
- * To include a nettype into your build, use the corresponding pseudo-module
- * e.g. to use `GNRC_NETTYPE_IPV6` in your code, use
+ *
+ * To include a nettype into your build, use the corresponding module of the same name in
+ * lower-case, e.g., to use @ref GNRC_NETTYPE_IPV6 in your code, use:
  *
  * ```
  * USEMODULE += gnrc_nettype_ipv6
@@ -125,7 +126,7 @@ typedef enum {
      * @name Testing
      */
 #ifdef TEST_SUITES
-    GNRC_NETTYPE_TEST,
+    GNRC_NETTYPE_TEST,          /**< Usable with test vectors */
 #endif
     /** @} */
 
@@ -133,13 +134,12 @@ typedef enum {
 } gnrc_nettype_t;
 
 /**
- * @brief   Translates an Ether Type number to @ref net_gnrc_nettype
- * @see     [IANA, ETHER TYPES]
- *          (http://www.iana.org/assignments/ieee-802-numbers/ieee-802-numbers.xhtml)
+ * @brief   Translates an Ether Type number to @ref gnrc_nettype_t
+ * @see     [IANA, ETHER TYPES](http://www.iana.org/assignments/ieee-802-numbers/ieee-802-numbers.xhtml)
  *
  * @param[in] type  An Ether Type number
  *
- * @return  The corresponding @ref net_gnrc_nettype to @p type.
+ * @return  The corresponding @ref gnrc_nettype_t to @p type.
  * @return  @ref GNRC_NETTYPE_UNDEF if @p type not translatable.
  */
 static inline gnrc_nettype_t gnrc_nettype_from_ethertype(uint16_t type)
@@ -171,9 +171,8 @@ static inline gnrc_nettype_t gnrc_nettype_from_ethertype(uint16_t type)
 }
 
 /**
- * @brief   Translates @ref net_gnrc_nettype to an Ether Type number
- * @see     [IANA, ETHER TYPES]
- *          (http://www.iana.org/assignments/ieee-802-numbers/ieee-802-numbers.xhtml)
+ * @brief   Translates @ref gnrc_nettype_t to an Ether Type number
+ * @see     [IANA, ETHER TYPES](http://www.iana.org/assignments/ieee-802-numbers/ieee-802-numbers.xhtml)
  *
  * @param[in] type  A protocol type
  *
@@ -209,14 +208,14 @@ static inline uint16_t gnrc_nettype_to_ethertype(gnrc_nettype_t type)
 }
 
 /**
- * @brief   Translates a Protocol Number to @ref net_gnrc_nettype
+ * @brief   Translates a Protocol Number to @ref gnrc_nettype_t
  * @see     <a href="http://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml">
  *              IANA, Assigned Internet Protocol Numbers
  *          </a>
  *
  * @param[in] num   A Protocol Number
  *
- * @return  The corresponding @ref net_gnrc_nettype to @p num.
+ * @return  The corresponding @ref gnrc_nettype_t to @p num.
  * @return  @ref GNRC_NETTYPE_UNDEF if @p num not translatable.
  */
 static inline gnrc_nettype_t gnrc_nettype_from_protnum(uint8_t num)
@@ -254,7 +253,7 @@ static inline gnrc_nettype_t gnrc_nettype_from_protnum(uint8_t num)
 }
 
 /**
- * @brief   Translates @ref net_gnrc_nettype to a Protocol Number
+ * @brief   Translates @ref gnrc_nettype_t to a Protocol Number
  * @see     <a href="http://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml">
  *              IANA, Assigned Internet Protocol Numbers
  *          </a>
