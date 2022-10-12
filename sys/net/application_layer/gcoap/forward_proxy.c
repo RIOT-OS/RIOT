@@ -337,8 +337,8 @@ static int _gcoap_forward_proxy_copy_options(coap_pkt_t *pkt,
         if (optlen >= 0) {
             if (IS_USED(MODULE_NANOCOAP_CACHE) && !etag_added && (opt.opt_num >= COAP_OPT_ETAG)) {
                 static const uint8_t tmp[COAP_ETAG_LENGTH_MAX] = { 0 };
-                /* add slack to maybe add an ETag on stale cache hit later, as is done in gcoap_req_send()
-                 * (which we circumvented in _gcoap_forward_proxy_via_coap()) */
+                /* add slack to maybe add an ETag on stale cache hit later, as is done in
+                 * gcoap_req_send() (which we circumvented in _gcoap_forward_proxy_via_coap()) */
                 if (coap_opt_add_opaque(pkt, COAP_OPT_ETAG, tmp, sizeof(tmp))) {
                     etag_added = true;
                 }

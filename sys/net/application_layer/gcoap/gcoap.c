@@ -839,7 +839,8 @@ static bool _memo_ep_is_multicast(const gcoap_request_memo_t *memo)
  * memo_ptr[out] -- Registered request memo, or NULL if not found
  * src_pdu[in] -- PDU for token to match
  * remote[in] -- Remote endpoint to match
- * by_mid[in] -- true if matches are to be done based on Message ID, otherwise they are done by token
+ * by_mid[in] -- true if matches are to be done based on Message ID, otherwise they are done by
+ *               token
  */
 static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *src_pdu,
                            const sock_udp_ep_t *remote, bool by_mid)
@@ -1125,7 +1126,8 @@ static ssize_t _tl_authenticate(gcoap_socket_t *sock, const sock_udp_ep_t *remot
         uint32_t start = ztimer_now(ZTIMER_MSEC);
         res = ztimer_msg_receive_timeout(ZTIMER_MSEC, &msg, timeout);
 
-        /* ensure whole timeout time for the case we receive other messages than DTLS_EVENT_CONNECTED */
+        /* ensure whole timeout time for the case we receive other messages than
+         * DTLS_EVENT_CONNECTED */
         if (timeout != SOCK_NO_TIMEOUT) {
             uint32_t diff = (ztimer_now(ZTIMER_MSEC) - start);
             timeout = (diff > timeout) ? 0: timeout - diff;
