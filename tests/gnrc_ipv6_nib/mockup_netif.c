@@ -85,6 +85,7 @@ void _tests_init(void)
         );
     _mock_netif = &_netif;
     expect(res == 0);
+    _common_set_up();
     /* we do not want to test for SLAAC here so just assure the configured
      * address is valid */
     expect(!ipv6_addr_is_unspecified(&_mock_netif->ipv6.addrs[0]));
