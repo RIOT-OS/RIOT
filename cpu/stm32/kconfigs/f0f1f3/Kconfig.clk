@@ -1,0 +1,20 @@
+# Copyright (c) 2022 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CLOCK_PLL_PREDIV
+    int "PLLIN division factor" if CUSTOM_PLL_PARAMS && !CPU_LINE_STM32F031X6 && !CPU_LINE_STM32F042X6 && !CPU_LINE_STM32F303X8
+    default 2 if CPU_LINE_STM32F031X6 || CPU_LINE_STM32F042X6 || CPU_LINE_STM32F303X8 || CPU_LINE_STM32F303XC
+    default 1
+    range 1 16
+
+config CLOCK_PLL_MUL
+    int "PLLIN multiply factor" if CUSTOM_PLL_PARAMS
+    default 16 if CPU_LINE_STM32F303X8
+    default 12 if CPU_LINE_STM32F031X6 || CPU_LINE_STM32F042X6
+    default 9 if CPU_FAM_F1 || CPU_FAM_F3
+    default 6 if CPU_FAM_F0
+    range 2 16
