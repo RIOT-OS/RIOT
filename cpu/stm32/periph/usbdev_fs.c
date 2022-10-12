@@ -31,6 +31,8 @@
 #include "periph/usbdev.h"
 #include "usbdev_stm32.h"
 #include "pm_layered.h"
+#include "ztimer.h"
+
 #include <string.h>
 /**
  * Be careful with enabling debug here. As with all timing critical systems it
@@ -147,6 +149,18 @@ static void _enable_usb_clk(void)
 
 static void _enable_gpio(const stm32_usbdev_fs_config_t *conf)
 {
+    if (conf->af == GPIO_AF_UNDEF && conf->disconn == GPIO_UNDEF) {
+        /* If the MCU does not have an internal D+ pullup and there is no
+         * dedicated GPIO on the board to simulate a USB disconnect, the D+ GPIO
+         * is temporarily configured as an output and pushed down to simulate
+         * a disconnect/connect cycle to allow the host to recognize the device.
+         * This requires an external pullup on D+ signal to work. */
+        gpio_init(conf->dp, GPIO_OUT);
+        gpio_clear(conf->dp);
+        /* wait a 1 ms */
+        ztimer_sleep(ZTIMER_MSEC, 1);
+        gpio_init(conf->dp, GPIO_IN);
+    }
     if (conf->af != GPIO_AF_UNDEF) {
         /* Configure AF for the pins */
         gpio_init_af(conf->dp, conf->af);
