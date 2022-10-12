@@ -239,14 +239,21 @@ int msg_send_int(msg_t *m, kernel_pid_t target_pid)
     return res;
 }
 
-int msg_send_bus(msg_t *m, msg_bus_t *bus)
+static int _send_bus(msg_t *m, msg_bus_t *bus, bool broadcast)
 {
     const bool in_irq = irq_is_in();
-    const uint32_t event_mask = (1UL << (m->type & 0x1F));
+    uint32_t event_mask;
     int count = 0;
 
-    m->sender_pid = (in_irq ? KERNEL_PID_ISR : thread_getpid())
-                    | MSB_BUS_PID_FLAG;
+    m->sender_pid = in_irq ? KERNEL_PID_ISR : thread_getpid();
+
+    if (broadcast) {
+        event_mask = ~0U;
+    }
+    else {
+        m->sender_pid |= MSB_BUS_PID_FLAG;
+        event_mask = 1UL << (m->type & 0x1F);
+    }
 
     unsigned state = irq_disable();
 
@@ -269,6 +276,16 @@ int msg_send_bus(msg_t *m, msg_bus_t *bus)
     }
 
     return count;
+}
+
+int msg_send_bus(msg_t *m, msg_bus_t *bus)
+{
+    return _send_bus(m, bus, false);
+}
+
+int msg_send_broadcast(msg_t *m, msg_bus_t *bus)
+{
+    return _send_bus(m, bus, true);
 }
 
 int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid)

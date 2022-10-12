@@ -235,6 +235,20 @@ static inline void msg_bus_unsubscribe(msg_bus_entry_t *entry, uint8_t type)
 int msg_send_bus(msg_t *m, msg_bus_t *bus);
 
 /**
+ * @brief Send a normal message to all subscribers of a bus.
+ *
+ * This function sends a message to all threads listening on the bus.
+ * The message will not encode the bus in it's type and can not be
+ * differentiated from a non-bus message.
+ *
+ * @param[in] m             The message to post the bus
+ * @param[in] bus           The message bus to post the message on
+ *
+ * @return                  The number of threads the message was sent to.
+ */
+int msg_send_broadcast(msg_t *m, msg_bus_t *bus);
+
+/**
  * @brief Post a message to a bus.
  *
  * This function sends a message to all threads listening on the bus which are
