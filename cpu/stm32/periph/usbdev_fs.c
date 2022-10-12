@@ -56,9 +56,12 @@ static stm32_usbdev_fs_t _usbdevs[USBDEV_NUMOF];
 static usbdev_ep_t _ep_in[_ENDPOINT_NUMOF];
 static usbdev_ep_t _ep_out[_ENDPOINT_NUMOF];
 
-static uint8_t* _ep_out_buf[_ENDPOINT_NUMOF];
+/* 16-bit addresses used by the USB IP as endpoint buffers in the PMA SRAM */
+static uint16_t _ep_in_buf[_ENDPOINT_NUMOF];
+static uint16_t _ep_out_buf[_ENDPOINT_NUMOF];
+
+/* Buffers used for receiving packets on OUT EPs. */
 static uint8_t* _app_pbuf[_ENDPOINT_NUMOF];
-static uint32_t _ep_in_buf[_ENDPOINT_NUMOF];
 
 /* Forward declaration for the usb device driver */
 const usbdev_driver_t driver;
@@ -426,7 +429,7 @@ static usbdev_ep_t *_usbdev_new_ep(usbdev_t *dev, usb_ep_type_t type,
             if (dir == USB_EP_DIR_IN) {
                 _ep_in_buf[new_ep->num] = (BUF_BASE_OFFSET + usbdev->used);
             } else {
-                _ep_out_buf[new_ep->num] = (uint8_t*)(BUF_BASE_OFFSET + usbdev->used);
+                _ep_out_buf[new_ep->num] = (BUF_BASE_OFFSET + usbdev->used);
             }
             usbdev->used += len;
             new_ep->len = len;
@@ -533,7 +536,7 @@ static void _usbdev_ep_init(usbdev_ep_t *ep)
         EP_DESC[ep->num].addr_tx = _ep_in_buf[ep->num];
         EP_DESC[ep->num].count_tx = 64;
     } else {
-        EP_DESC[ep->num].addr_rx = (uint32_t)_ep_out_buf[ep->num];
+        EP_DESC[ep->num].addr_rx = _ep_out_buf[ep->num];
         /* Set BLSIZE + NUM_BLOCK (1) */
         EP_DESC[ep->num].count_rx = (1 << 10) | (1 << 15);
     }
