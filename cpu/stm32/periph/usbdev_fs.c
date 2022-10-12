@@ -272,6 +272,21 @@ static void _usbdev_init(usbdev_t *dev)
     /* Block STOP/STANDBY */
     pm_block(STM32_PM_STOP);
     pm_block(STM32_PM_STANDBY);
+
+#if defined(RCC_CFGR_USBPRE)
+    /* If `RCC_CFGR_USBPRE` is defined, the USB device FS clock of 48 MHz is
+     * derived from the PLL clock. In this case the PLL clock must be configured
+     * and must be either 48 MHz or 72 MHz. If the PLL clock is 72 MHz it is
+     * pre-divided by 1.5, the PLL clock of 48 MHz is used directly. */
+#if defined(CLOCK_PLL_SRC) && (CLOCK_CORECLOCK == MHZ(72))
+    RCC->CFGR &= ~RCC_CFGR_USBPRE;
+#elif defined(CLOCK_PLL_SRC) && (CLOCK_CORECLOCK == MHZ(48))
+    RCC->CFGR |= RCC_CFGR_USBPRE;
+#else
+#error "PLL must be configured to output 48 or 72 MHz"
+#endif
+#endif
+
     /* Enable the clock to the peripheral */
     periph_clk_en(conf->apb, conf->rcc_mask);
     /* Enable USB clock */
