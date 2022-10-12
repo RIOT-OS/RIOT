@@ -15,7 +15,14 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
+#ifdef MODULE_ESP_COMMON
+/* ESP_COMMON provides its own log_module implementation see
+ * - cpu/esp_common/include/log_module.h
+ * - cpu/esp_common/include/esp_common_log.h */
 
+typedef int dont_be_pedantic; /* this c-file is not empty */
+
+#else /*MODULE_ESP_COMMON*/
 #include <assert.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -96,4 +103,6 @@ void log_write(unsigned level, const char *format, ...)
     fflush(stdout);
 #endif
 }
+
+#endif /*MODULE_ESP_COMMON*/
 /**@}*/
