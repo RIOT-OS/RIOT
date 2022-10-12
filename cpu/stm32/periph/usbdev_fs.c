@@ -46,10 +46,43 @@
 #define USB1_PMAADDR USB_PMAADDR
 #endif /* ndef USB1_PMAADDR */
 
-#define _ENDPOINT_NUMOF     (8) /* IP specific */
-#define STM32_FS_BUF_SPACE (1024)
-/* Base Buffer address located in USB SRAM area */
-#define BUF_BASE_OFFSET   (_ENDPOINT_NUMOF * 8)
+/**
+ * There are two schemes for accessing the packet buffer area (PMA) from the CPU:
+ *
+ * - 2 x 16 bit/word access scheme where two 16-bit half-words per word can be
+ *   accessed. With this scheme the access can be half-word aligned and the
+ *   PMA address offset corresponds therefore to the local USB IP address.
+ *   The size of the PMA SRAM is usually 1024 byte.
+ * - 1 x 16 bit/word access scheme where one 16-bit half word per word can be
+ *   accessed. With this scheme the access can only be word-aligned and the
+ *   PMA address offset to a half-word is therefore twice the local USB IP
+ *   address. The size of the PMA SRAM is usually 512 byte.
+ *
+ * Which access scheme is used depends on the STM32 model.
+ */
+#if defined(CPU_LINE_STM32F303xD) || defined(CPU_LINE_STM32F303xE) || \
+    defined(CPU_LINE_STM32WB35xx) || defined(CPU_LINE_STM32WB55xx)
+
+#define _ENDPOINT_NUMOF         (8)     /* Number of endpoints */
+#define _PMA_SRAM_SIZE          (1024)  /* Size of Packet buffer Memory Area (PMA) SRAM */
+#define _PMA_ACCESS_SCHEME      (2)     /* 2 x 16-bit/word */
+#define _PMA_ACCESS_STEP_SIZE   (1)     /* Step size in 16-bit half-words when
+                                         * accessing the PMA SRAM from CPU */
+#elif defined(CPU_LINE_STM32F103xB) || \
+      defined(CPU_LINE_STM32F303xB) || defined(CPU_LINE_STM32F303xC)
+
+#define _ENDPOINT_NUMOF         (8)     /* Number of endpoints */
+#define _PMA_SRAM_SIZE          (512)   /* Size of Packet buffer Memory Area (PMA) SRAM */
+#define _PMA_ACCESS_SCHEME      (1)     /* 1 x 16-bit/word */
+#define _PMA_ACCESS_STEP_SIZE   (2)     /* Step size in 16-bit half-words when
+                                         * accessing the PMA SRAM from CPU */
+#else
+#error "STM32 line is not supported"
+#endif
+
+/* UUSB IP local base address for the endpoints buffers in PMA SRAM */
+#define _PMA_BUF_BASE_OFFSET    (_ENDPOINT_NUMOF * 8)
+
 /* List of instantiated USB peripherals */
 static stm32_usbdev_fs_t _usbdevs[USBDEV_NUMOF];
 
@@ -71,13 +104,33 @@ static USB_TypeDef *_global_regs(const stm32_usbdev_fs_config_t *conf)
     return (USB_TypeDef *)conf->base_addr;
 }
 
-/* Endpoint Buffer Descriptor */
+#if _PMA_ACCESS_SCHEME == 1
+
+/* Endpoint Buffer Descriptor for the 1 x 16-bit/word access scheme
+ * (word-aligned access). Even though the members define 16-bit USB IP local
+ * addresses, they have to be defined as 32-bit unsigned for word-aligned
+ * access */
+typedef struct {
+    uint32_t addr_tx;       /* buffer address (16-bit USB IP local address) */
+    uint32_t count_tx;      /* byte count (16-bit) */
+    uint32_t addr_rx;       /* buffer address (16-bit USB IP local address) */
+    uint32_t count_rx;      /* byte count (16-bit) */
+} ep_buf_desc_t;
+
+#elif _PMA_ACCESS_SCHEME == 2
+
+/* Endpoint Buffer Descriptor for the 2 x 16-bits/word access scheme
+ * (half-word-aligned access) */
 typedef struct {
     uint16_t addr_tx;
     uint16_t count_tx;
     uint16_t addr_rx;
     uint16_t count_rx;
 } ep_buf_desc_t;
+
+#else
+#error "_PMA_ACCESS_SCHEME is not defined"
+#endif
 
 #define EP_DESC ((ep_buf_desc_t*)USB1_PMAADDR)
 #define EP_REG(x) (*((volatile uint32_t*) (((uintptr_t)(USB)) + (4*x))))
@@ -425,11 +478,11 @@ static usbdev_ep_t *_usbdev_new_ep(usbdev_t *dev, usb_ep_type_t type,
         }
     }
     if (new_ep) {
-        if (usbdev->used + len < STM32_FS_BUF_SPACE) {
+        if (usbdev->used + len < _PMA_SRAM_SIZE) {
             if (dir == USB_EP_DIR_IN) {
-                _ep_in_buf[new_ep->num] = (BUF_BASE_OFFSET + usbdev->used);
+                _ep_in_buf[new_ep->num] = (_PMA_BUF_BASE_OFFSET + usbdev->used);
             } else {
-                _ep_out_buf[new_ep->num] = (BUF_BASE_OFFSET + usbdev->used);
+                _ep_out_buf[new_ep->num] = (_PMA_BUF_BASE_OFFSET + usbdev->used);
             }
             usbdev->used += len;
             new_ep->len = len;
@@ -644,10 +697,23 @@ static int _usbdev_ep_set(usbdev_ep_t *ep, usbopt_ep_t opt,
 static void _usbdev_ep_esr(usbdev_ep_t *ep)
 {
     if (ep->dir == USB_EP_DIR_OUT) {
-        /* Copy SRAM buffer to OUT buffer */
-        uint8_t* tmp_ptr = (uint8_t*)(USB1_PMAADDR + EP_DESC[ep->num].addr_rx);
-        for (uint8_t cpt=0; cpt<64; cpt++) {
-            _app_pbuf[ep->num][cpt] = tmp_ptr[cpt];
+        /* Copy PMA SRAM buffer to OUT buffer */
+        /* `addr_rx` is the USB IP local address offset in half-words. The PMA
+         * address offset depends on the access scheme.
+         * - 2 x 16 bits/word access scheme: `_PMA_ACCESS_STEP_SIZE` is 1
+         *   and the PMA address offset corresponds to USB IP local address.
+         * - 1 x 16 bits/word access scheme: `_PMA_ACCESS_STEP_SIZE` is 2
+         *   and the PMA address offset is the double of the USB IP local
+         *   address. */
+        uint16_t* pma_ptr = (uint16_t *)(USB1_PMAADDR +
+                                         (EP_DESC[ep->num].addr_rx * _PMA_ACCESS_STEP_SIZE));
+        uint16_t hword;
+        uint8_t cpt = 0;
+        while (cpt < 64) {
+            hword = *pma_ptr;
+            _app_pbuf[ep->num][cpt++] = hword & 0x00ff;
+            _app_pbuf[ep->num][cpt++] = (hword & 0xff00) >> 8;
+            pma_ptr += _PMA_ACCESS_STEP_SIZE;
         }
     }
     ep->dev->epcb(ep, USBDEV_EVENT_TR_COMPLETE);
@@ -679,18 +745,16 @@ static int _usbdev_ep_xmit(usbdev_ep_t *ep, uint8_t* buf, size_t len)
         _set_ep_in_status(&reg, USB_EP_TX_VALID);
         _set_ep_out_status(&reg, USB_EP_RX_VALID);
 
-        /* Transfer IN buffer content to USB SRAM */
-        uint16_t* ptr = (uint16_t*) (USB1_PMAADDR + EP_DESC[ep->num].addr_tx);
-        for (unsigned tmp=0; tmp < len; tmp+=2) {
-            size_t index = tmp/2;
-            size_t off = tmp;
-            ptr[index] = (buf[off+1] << 8) | buf[off];
+        /* Transfer IN buffer content to USB PMA SRAM */
+        uint16_t* pma_ptr = (uint16_t *)(USB1_PMAADDR +
+                                         (EP_DESC[ep->num].addr_tx * _PMA_ACCESS_STEP_SIZE));
+        for (size_t i = 0; i < len; i += 2) {
+            *pma_ptr = (buf[i + 1] << 8) | buf[i];
+            pma_ptr += _PMA_ACCESS_STEP_SIZE;
         }
-
         /* Manage odd transfer size */
         if (len % 2 == 1) {
-            size_t off = (len/2) + 1;
-            ptr[off] = 0x00FF & buf[len-1];
+            *pma_ptr =  0x00ff & buf[len - 1];
         }
 
         EP_DESC[ep->num].count_tx = len;
