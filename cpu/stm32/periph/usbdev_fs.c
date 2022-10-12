@@ -246,9 +246,10 @@ static void _set_ep_in_status(uint16_t *val, uint16_t mask)
 
 static void _set_ep_out_status(uint16_t *val, uint16_t mask)
 {
-       /* status endpoints bits can only be toggled, writing 0
-       as no effect. Thus, check which bits should be set
-       then XOR it with their current value */
+    /* status endpoints bits can only be toggled, writing 0
+     * as no effect. Thus, check which bits should be set
+     * then XOR it with their current value */
+
     if (mask & USB_EPRX_DTOG1) {
         *val ^= USB_EPRX_DTOG1;
     }
