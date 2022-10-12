@@ -16,8 +16,14 @@ def testfunc(child):
     child.expect_exact('T3 recv: Hello Threads! (type=23)')
     child.expect_exact('Posted event 23 to 2 threads')
 
+    child.expect_exact('T1 recv: Hello Threads! (type=24)')
     child.expect_exact('T2 recv: Hello Threads! (type=24)')
-    child.expect_exact('Posted event 24 to 1 threads')
+    child.expect_exact('Posted event 24 to 2 threads')
+
+    child.expect_exact('T1 recv: Hello everyone! (type=4919)')
+    child.expect_exact('T2 recv: Hello everyone! (type=4919)')
+    child.expect_exact('T3 recv: Hello everyone! (type=4919)')
+    child.expect_exact('Posted messgage 0x1337 to 3 threads')
 
     child.expect_exact('SUCCESS')
 

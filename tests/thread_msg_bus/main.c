@@ -52,6 +52,23 @@ void *thread1(void *arg)
     printf("T1 recv: %s (type=%d)\n",
           (char*) msg.content.ptr, msg_bus_get_type(&msg));
 
+    msg_receive(&msg);
+
+    /* check if the message came from the right bus */
+    assert(msg_is_from_bus(arg, &msg));
+    assert(msg_bus_get_sender_pid(&msg) == p_main);
+
+    printf("T1 recv: %s (type=%d)\n",
+          (char*) msg.content.ptr, msg_bus_get_type(&msg));
+
+    msg_receive(&msg);
+
+    /* check if this was a normal message */
+    assert(msg_bus_get_sender_pid(&msg) == p_main);
+
+    printf("T1 recv: %s (type=%d)\n",
+          (char*) msg.content.ptr, msg_bus_get_type(&msg));
+
     msg_bus_detach(arg, &sub);
 
     return NULL;
@@ -70,7 +87,14 @@ void *thread2(void *arg)
     msg_receive(&msg);
 
     /* check if the message came from the right bus */
-    assert(msg_is_from_bus(arg, &msg));
+    assert(msg_bus_get_sender_pid(&msg) == p_main);
+
+    printf("T2 recv: %s (type=%d)\n",
+          (char*) msg.content.ptr, msg_bus_get_type(&msg));
+
+    msg_receive(&msg);
+
+    /* check if this was a normal message */
     assert(msg_bus_get_sender_pid(&msg) == p_main);
 
     printf("T2 recv: %s (type=%d)\n",
@@ -100,6 +124,15 @@ void *thread3(void *arg)
     printf("T3 recv: %s (type=%d)\n",
           (char*) msg.content.ptr, msg_bus_get_type(&msg));
 
+    msg_receive(&msg);
+
+    /* check if this was a normal message */
+    assert(!msg_is_from_bus(arg, &msg));
+    assert(msg_bus_get_sender_pid(&msg) == p_main);
+
+    printf("T3 recv: %s (type=%d)\n",
+          (char*) msg.content.ptr, msg_bus_get_type(&msg));
+
     msg_bus_detach(arg, &sub);
 
     return NULL;
@@ -121,11 +154,20 @@ int main(void)
     puts("THREADS CREATED");
 
     const char hello[] = "Hello Threads!";
+    int woken;
 
     for (int id = 22; id < 25; ++id) {
-        int woken = msg_bus_post(&my_bus, id, (void*)hello);
+        woken = msg_bus_post(&my_bus, id, (void*)hello);
         printf("Posted event %d to %d threads\n", id, woken);
     }
+
+    msg_t msg = {
+        .type = 0x1337,
+        .content.ptr = "Hello everyone!",
+    };
+
+    woken = msg_send_broadcast(&msg, &my_bus);
+    printf("Posted messgage 0x%x to %d threads\n", msg.type, woken);
 
     /* make sure all threads have terminated */
     if (thread_getstatus(p1) != STATUS_NOT_FOUND ||
