@@ -16,6 +16,8 @@
 #include <assert.h>
 #include "fmt.h"
 
+#include "net/gnrc/ipv6.h"
+#include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/netif/hdr.h"
@@ -69,7 +71,14 @@ void gnrc_lorawan_mlme_confirm(gnrc_lorawan_t *mac, mlme_confirm_t *confirm)
 
     if (confirm->type == MLME_JOIN) {
         if (confirm->status == 0) {
-            DEBUG("gnrc_lorawan: join succeeded\n");
+            gnrc_netif_lorawan_t *lw_netif = container_of(mac, gnrc_netif_lorawan_t, mac);
+            gnrc_netif_t *netif = container_of(lw_netif, gnrc_netif_t, lorawan);
+
+            DEBUG("gnrc_lorawan: join succeeded %d\n", netif->pid);
+            if (netif->dev) {
+                netif->flags |= GNRC_NETIF_FLAGS_HAS_L2ADDR;
+                netif->dev->event_callback(netif->dev, NETDEV_EVENT_LINK_UP);
+            }
         }
         else {
             DEBUG("gnrc_lorawan: join failed\n");
@@ -217,6 +226,22 @@ static void _driver_cb(netdev_t *dev, netdev_event_t event)
         case NETDEV_EVENT_TX_COMPLETE:
             gnrc_lorawan_radio_tx_done_cb(mac);
             break;
+        case NETDEV_EVENT_LINK_UP: {
+            if (IS_USED(MODULE_GNRC_IPV6)) {
+                msg_t msg = { .type = GNRC_IPV6_NIB_IFACE_UP, .content = { .ptr = netif } };
+
+                msg_send(&msg, gnrc_ipv6_pid);
+            }
+            break;
+        }
+        case NETDEV_EVENT_LINK_DOWN: {
+            if (IS_USED(MODULE_GNRC_IPV6)) {
+                msg_t msg = { .type = GNRC_IPV6_NIB_IFACE_DOWN, .content = { .ptr = netif } };
+
+                msg_send(&msg, gnrc_ipv6_pid);
+            }
+            break;
+        }
         case NETDEV_EVENT_RX_TIMEOUT:
             gnrc_lorawan_radio_rx_timeout_cb(mac);
             break;
@@ -384,6 +409,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *payload)
     res = conf.status;
 
     if (res < 0) {
+        DEBUG("gnrc_netif: unable to send (%s)\n", strerror(-res));
         gnrc_pktbuf_release_error(payload, res);
     }
 
@@ -578,6 +604,8 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
                                       &mlme_confirm);
             res = mlme_confirm.status;
             if (mlme_confirm.status == 0) {
+                netif->flags &= ~GNRC_NETIF_FLAGS_HAS_L2ADDR;
+                netif->dev->event_callback(netif->dev, NETDEV_EVENT_LINK_DOWN);
                 /* reset netif as well */
                 _reset(netif);
             }
