@@ -33,7 +33,7 @@ config GNRC_SIXLOWPAN_SFR_OPT_FRAG_SIZE
         @ref GNRC_SIXLOWPAN_SFR_MAX_FRAG_SIZE
 
 config GNRC_SIXLOWPAN_SFR_USE_ECN
-    bool "Indicates whether the sender should react to ECN (UseECN)"
+    bool "Indicates whether the sender should react to Explicit Content Notification (UseECN)"
     default false
     help
         When the sender reacts to Explicit Congestion Notification (ECN) its

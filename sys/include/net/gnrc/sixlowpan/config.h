@@ -203,7 +203,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Indicates whether the sender should react to ECN (UseECN)
+ * @brief   Indicates whether the sender should react to Explicit Congestion Notification (UseECN)
  *
  * When the sender reacts to Explicit Congestion Notification (ECN) its window
  * size will vary between @ref CONFIG_GNRC_SIXLOWPAN_SFR_MIN_WIN_SIZE and @ref
