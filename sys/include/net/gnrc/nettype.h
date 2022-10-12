@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_nettype  Protocol type
+ * @defgroup    net_gnrc_nettype  gnrc_nettype: Protocol type
  * @ingroup     net_gnrc
  * @brief       Protocol type definitions and helper functions
  *
