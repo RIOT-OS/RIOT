@@ -5,17 +5,6 @@ ESP32_GCC_VERSION_DIR="8.4.0"
 
 ESP32_OPENOCD_VERSION="v0.11.0-esp32-20211220"
 
-# qemu version depends on the version of ncurses lib
-if [ "$(ldconfig -p | grep libncursesw.so.6)" != "" ]; then
-    ESP32_QEMU_VERSION="esp-develop-20220203"
-else
-    ESP32_QEMU_VERSION="esp-develop-20210220"
-fi
-
-if [ -z ${IDF_TOOLS_PATH} ]; then
-    IDF_TOOLS_PATH=${HOME}/.espressif
-fi
-
 TOOLS_PATH=${IDF_TOOLS_PATH}/tools
 
 export_arch()
@@ -67,6 +56,33 @@ export_openocd()
 
 export_qemu()
 {
+    # determine the platform using python
+    PLATFORM_SYSTEM=$(python3 -c "import platform; print(platform.system())")
+    PLATFORM_MACHINE=$(python3 -c "import platform; print(platform.machine())")
+    PLATFORM=${PLATFORM_SYSTEM}-${PLATFORM_MACHINE}
+
+    # map different platform names to a unique OS name
+    case ${PLATFORM} in
+        linux-amd64|linux64|Linux-x86_64|FreeBSD-amd64)
+            OS=linux-amd64
+            ;;
+        *)
+            echo "error: OS architecture ${PLATFORM} not supported"
+            exit 1
+            ;;
+    esac
+
+    # qemu version depends on the version of ncurses lib
+    if [ "$(ldconfig -p | grep libncursesw.so.6)" != "" ]; then
+        ESP32_QEMU_VERSION="esp-develop-20220203"
+    else
+        ESP32_QEMU_VERSION="esp-develop-20210220"
+    fi
+
+    if [ -z ${IDF_TOOLS_PATH} ]; then
+        IDF_TOOLS_PATH=${HOME}/.espressif
+    fi
+
     TOOLS_DIR=${TOOLS_PATH}/qemu-esp32/${ESP32_QEMU_VERSION}/qemu
     TOOLS_DIR_IN_PATH=`echo $PATH | grep ${TOOLS_DIR}`
 

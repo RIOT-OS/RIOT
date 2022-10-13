@@ -7,13 +7,6 @@ ESP32_GCC_VERSION_DOWNLOAD="gcc8_4_0"
 ESP32_OPENOCD_VERSION="v0.11.0-esp32-20211220"
 ESP32_OPENOCD_VERSION_TGZ="0.11.0-esp32-20211220"
 
-# qemu version depends on the version of ncurses lib
-if [ "$(ldconfig -p | grep libncursesw.so.6)" != "" ]; then
-    ESP32_QEMU_VERSION="esp-develop-20220203"
-else
-    ESP32_QEMU_VERSION="esp-develop-20210220"
-fi
-
 # set the tool path to the default if not already set
 if [ -z ${IDF_TOOLS_PATH} ]; then
     IDF_TOOLS_PATH=${HOME}/.espressif
@@ -58,6 +51,9 @@ case ${PLATFORM} in
         ;;
     linux-i686|linux32|Linux-i686|FreeBSD-i386)
         OS=linux-i686
+        ;;
+    Darwin-x86_64)
+        OS=macos
         ;;
     *)
         echo "error: OS architecture ${PLATFORM} not supported"
@@ -139,6 +135,13 @@ install_qemu()
     if [ ${OS} != "linux-amd64" ]; then
         echo "error: QEMU for ESP32 does not support OS ${OS}"
         exit 1
+    fi
+
+    # qemu version depends on the version of ncurses lib
+    if [ "$(ldconfig -p | grep libncursesw.so.6)" != "" ]; then
+        ESP32_QEMU_VERSION="esp-develop-20220203"
+    else
+        ESP32_QEMU_VERSION="esp-develop-20210220"
     fi
 
     TOOLS_DIR=${TOOLS_PATH}/qemu-esp32/${ESP32_QEMU_VERSION}
