@@ -391,6 +391,38 @@ ssize_t nanocoap_sock_post_url(const char *url,
     return _sock_put_post_url(url, COAP_METHOD_POST, request, len, response, len_max);
 }
 
+ssize_t nanocoap_sock_delete(nanocoap_sock_t *sock, const char *path)
+{
+    /* buffer for CoAP header */
+    uint8_t buffer[CONFIG_NANOCOAP_BLOCK_HEADER_MAX];
+    uint8_t *pktpos = buffer;
+
+    coap_pkt_t pkt = {
+        .hdr = (void *)pktpos,
+    };
+
+    pktpos += coap_build_hdr(pkt.hdr, COAP_TYPE_CON, NULL, 0, COAP_METHOD_DELETE, _get_id());
+    pktpos += coap_opt_put_uri_path(pktpos, 0, path);
+
+    pkt.payload = pktpos;
+
+    return nanocoap_sock_request_cb(sock, &pkt, NULL, NULL);
+}
+
+ssize_t nanocoap_sock_delete_url(const char *url)
+{
+    nanocoap_sock_t sock;
+    int res = nanocoap_sock_url_connect(url, &sock);
+    if (res) {
+        return res;
+    }
+
+    res = nanocoap_sock_delete(&sock, sock_urlpath(url));
+    nanocoap_sock_close(&sock);
+
+    return res;
+}
+
 ssize_t nanocoap_request(coap_pkt_t *pkt, const sock_udp_ep_t *local,
                          const sock_udp_ep_t *remote, size_t len)
 {
