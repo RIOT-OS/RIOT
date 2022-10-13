@@ -85,7 +85,7 @@ jobs:
       APPLICATIONS_EXCLUDE: 'tests/periph_timer_short_relative_set'
     steps:
       - name: Checkout RIOT
-        uses: actions/checkout@v2
+        uses: actions/checkout@main
         with:
           ref: ${{ github.event.inputs.riot_version }}
           # Make sure it runs git clean -xdff before fetching

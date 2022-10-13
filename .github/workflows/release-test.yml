@@ -88,14 +88,14 @@ jobs:
         ssh -oStrictHostKeyChecking=accept-new \
           ${IOTLAB_USER}@lille.iot-lab.info exit
     - name: Checkout Release-Specs
-      uses: actions/checkout@v2
+      uses: actions/checkout@main
       with:
         repository: RIOT-OS/Release-Specs
         path: Release-Specs
         fetch-depth: 1
         ref: ${{ github.event.inputs.release_specs_version }}
     - name: Checkout RIOT
-      uses: actions/checkout@v2
+      uses: actions/checkout@main
       with:
         repository: RIOT-OS/RIOT
         path: RIOT

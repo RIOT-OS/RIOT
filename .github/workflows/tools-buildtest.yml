@@ -14,7 +14,7 @@ jobs:
   tools-build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@main
     - name: Build flatc standalone
       uses: aabadie/riot-action@v1
       with:
