@@ -50,7 +50,7 @@ RIOT is developed by an open community that anyone is welcome to join:
 The quickest start                                        {#the-quickest-start}
 ==================
 You can run RIOT on most IoT devices, on open-access testbed hardware (e.g.
-IoT-lab), and also directly as a process on your Linux/FreeBSD/macOS machine (we
+IoT-lab), and also directly as a process on your Linux or FreeBSD machine (we
 call this the `native` port). Try it right now in your terminal window:
 
 ~~~~~~~{.sh}

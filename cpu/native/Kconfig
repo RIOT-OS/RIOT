@@ -38,7 +38,6 @@ config CPU_FAM_NATIVE
 config CPU_MODEL_NATIVE
     bool
     select CPU_FAM_NATIVE
-    select NATIVE_OS_DARWIN if "$(OS)" = "Darwin"
     select NATIVE_OS_LINUX if "$(OS)" = "Linux"
     select NATIVE_OS_FREEBSD if "$(OS)" = "FreeBSD"
 
@@ -54,9 +53,6 @@ config HAS_CPU_NATIVE
         Indicates that the cpu being used is 'native'.
 
 ## OS Variants
-config NATIVE_OS_DARWIN
-    bool
-
 config NATIVE_OS_LINUX
     bool
     select HAS_PERIPH_CAN

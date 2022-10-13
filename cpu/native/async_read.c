@@ -85,11 +85,6 @@ void native_async_read_add_handler(int fd, void *arg, native_async_read_callback
 
     _add_handler(fd, arg, handler);
 
-    /* tuntap signalled IO is not working in macOS,
-     * * check http://sourceforge.net/p/tuntaposx/bugs/18/ */
-#ifdef __MACH__
-    _sigio_child(_next_index);
-#else
     /* configure fds to send signals on io */
     if (real_fcntl(fd, F_SETOWN, _native_pid) == -1) {
         err(EXIT_FAILURE, "native_async_read_add_handler(): fcntl(F_SETOWN)");
@@ -98,7 +93,6 @@ void native_async_read_add_handler(int fd, void *arg, native_async_read_callback
     if (real_fcntl(fd, F_SETFL, O_NONBLOCK | O_ASYNC) == -1) {
         err(EXIT_FAILURE, "native_async_read_add_handler(): fcntl(F_SETFL)");
     }
-#endif /* not macOS */
 
     _next_index++;
 }

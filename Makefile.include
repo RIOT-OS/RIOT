@@ -205,10 +205,11 @@ include $(RIOTMAKE)/boards.inc.mk
 include $(RIOTMAKE)/dependencies_debug.inc.mk
 
 # Use TOOLCHAIN environment variable to select the toolchain to use.
-# If native, TOOLCHAIN for OSX is llvm
 ifeq ($(BOARD),native)
   ifeq ($(OS),Darwin)
-    TOOLCHAIN ?= llvm
+    $(shell $(COLOR_ECHO) "$(COLOR_RED)"Buildin on macOS is not supported."\
+                          "We recommend vagrant for building:$(COLOR_RESET)"\
+                          "https://github.com/RIOT-OS/RIOT/blob/master/dist/tools/vagrant/README.md 1>&2)
   endif
 endif
 # Use override so that we can redefine a variable set on the command line (as

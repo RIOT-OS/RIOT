@@ -29,14 +29,14 @@ A set of common tools and a toolchain for the hardware you target needs to be in
 ### Choosing an Operating System for the Development PC
 
 Most of the RIOT OS developers are using Linux on their development PCs, so you can expect the
-most streamlined experience here. Other POSIX-compliant OSes such as current versions of macOS or
-the various BSD flavours will also be fine - however, we rely on users to report bugs regarding
-tooling incompatibilities here. So expect occasional issues for the development branch and please
-help testing during the feature freeze period, if you develop on macOS or BSD.
+most streamlined experience here. Other POSIX-compliant OSes such as the various BSD flavours
+will also be fine - however, we rely on users to report bugs regarding tooling incompatibilities
+here. So expect occasional issues for the development branch and please help testing during the
+feature freeze period, if you develop on macOS or BSD.
 
-Native development on Windows machines is not officially supported. What works well is using Linux
-in a virtual machine, but at much lower performance than running Linux natively. For development
-using the
+Native development on Windows and macOS machines is not officially supported. What works well is using Linux
+in a virtual machine, but at much lower performance than running Linux natively. We also offer Docker images.
+For development on Windows, using the
 [Windows Subsystem for Linux (WSL)](https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux)
 is a good option
 ([installation instructions here](https://docs.microsoft.com/en-us/windows/wsl/install)), but it
