@@ -1913,7 +1913,6 @@ static void *_gnrc_netif_thread(void *args)
     gnrc_netif_t *netif;
     int res;
     msg_t reply = { .type = GNRC_NETAPI_MSG_TYPE_ACK };
-    msg_t msg_queue[GNRC_NETIF_MSG_QUEUE_SIZE];
 
     DEBUG("gnrc_netif: starting thread %i\n", thread_getpid());
     netif = ctx->netif;
@@ -1928,7 +1927,7 @@ static void *_gnrc_netif_thread(void *args)
     event_queues_init(netif->evq, GNRC_NETIF_EVQ_NUMOF);
 
     /* setup the link-layer's message queue */
-    msg_init_queue(msg_queue, GNRC_NETIF_MSG_QUEUE_SIZE);
+    msg_init_queue(netif->msg_queue, ARRAY_SIZE(netif->msg_queue));
     /* initialize low-level driver */
     ctx->result = netif->ops->init(netif);
     /* signal that driver init is done */

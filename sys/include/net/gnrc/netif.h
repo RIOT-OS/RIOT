@@ -217,6 +217,10 @@ typedef struct {
      */
     gnrc_netif_pktq_t send_queue;
 #endif
+    /**
+     * @brief   Message queue for the netif thread
+     */
+    msg_t msg_queue[GNRC_NETIF_MSG_QUEUE_SIZE];
     uint8_t cur_hl;                         /**< Current hop-limit for out-going packets */
     uint8_t device_type;                    /**< Device type */
     kernel_pid_t pid;                       /**< PID of the network interface's thread */

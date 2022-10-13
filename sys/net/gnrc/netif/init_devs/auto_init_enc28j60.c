@@ -23,12 +23,13 @@
 #include "enc28j60.h"
 #include "enc28j60_params.h"
 #include "net/gnrc/netif/ethernet.h"
+#include "include/init_devs.h"
 
 /**
  * @brief   Define stack parameters for the MAC layer thread
  * @{
  */
-#define ENC28J60_MAC_STACKSIZE   (THREAD_STACKSIZE_DEFAULT)
+#define ENC28J60_MAC_STACKSIZE   (GNRC_NETIF_STACKSIZE_DEFAULT)
 #ifndef ENC28J60_MAC_PRIO
 #define ENC28J60_MAC_PRIO        (GNRC_NETIF_PRIO)
 #endif

@@ -22,12 +22,13 @@
 #include "encx24j600.h"
 #include "encx24j600_params.h"
 #include "net/gnrc/netif/ethernet.h"
+#include "include/init_devs.h"
 
 /**
  * @brief   Define stack parameters for the MAC layer thread
  * @{
  */
-#define ENCX24J600_MAC_STACKSIZE    (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)
+#define ENCX24J600_MAC_STACKSIZE    (GNRC_NETIF_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)
 #ifndef ENCX24J600_MAC_PRIO
 #define ENCX24J600_MAC_PRIO         (GNRC_NETIF_PRIO)
 #endif

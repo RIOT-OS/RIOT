@@ -23,12 +23,13 @@
 #include "atwinc15x0.h"
 #include "atwinc15x0_params.h"
 #include "net/gnrc/netif/ethernet.h"
+#include "include/init_devs.h"
 
 /**
  * @brief   Define stack parameters for the MAC layer thread
  * @{
  */
-#define ATWINC15X0_MAC_STACKSIZE    (THREAD_STACKSIZE_DEFAULT)
+#define ATWINC15X0_MAC_STACKSIZE    (GNRC_NETIF_STACKSIZE_DEFAULT)
 #ifndef ATWINC15X0_MAC_PRIO
 #define ATWINC15X0_MAC_PRIO         (GNRC_NETIF_PRIO)
 #endif
