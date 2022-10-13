@@ -19,16 +19,26 @@
 #include "architecture.h"
 #include "cpu.h"
 #include "panic.h"
+#if IS_USED(MODULE_BACKTRACE)
+#include "backtrace.h"
+#endif
 
 __NORETURN void _assert_failure(const char *file, unsigned line)
 {
     printf("%s:%u => ", file, line);
+#if IS_USED(MODULE_BACKTRACE)
+    printf("failed assertion. Backtrace:\n");
+    backtrace_print();
+#endif
     core_panic(PANIC_ASSERT_FAIL, "FAILED ASSERTION.");
 }
 
 __NORETURN void _assert_panic(void)
 {
     printf("%" PRIxTXTPTR "\n", cpu_get_caller_pc());
+#if IS_USED(MODULE_BACKTRACE)
+    backtrace_print();
+#endif
     core_panic(PANIC_ASSERT_FAIL, "FAILED ASSERTION.");
 }
 
