@@ -7,9 +7,10 @@
  */
 
 /**
- * @defgroup    sys_log_printfnoformat puts log module
+ * @defgroup    sys_log_printfnoformat log_printfnoformat: puts log module
  * @ingroup     sys
- * @brief       This module implements an example logging module
+ * @brief       This module implements an example logging module using puts to
+ *              just print the format string saving on the number of libraries need
  * @{
  *
  * @file

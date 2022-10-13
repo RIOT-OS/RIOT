@@ -7,29 +7,28 @@
  */
 
 /**
- * @defgroup    sys_log_color Colored log module
- * @ingroup     sys
- * @brief       This module implements a logging module with colored output
+ * @addtogroup  sys_log_color Colored log module
  * @{
  *
  * @file
- * @brief       log_module header
+ * @brief       log_color
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
+#ifdef MODULE_ESP_COMMON
+/* ESP_COMMON provides its own log_module implementation see
+ * - cpu/esp_common/include/log_module.h
+ * - cpu/esp_common/include/esp_common_log.h */
 
-#ifndef LOG_MODULE_H
-#define LOG_MODULE_H
+typedef int dont_be_pedantic; /* this c-file is not empty */
 
+#else /*MODULE_ESP_COMMON*/
 #include <assert.h>
 #include <stdio.h>
 #include <stdarg.h>
 
+#include "kernel_defines.h"
 #include "log.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /**
  * @brief   Default ANSI color escape code for error logs
@@ -72,11 +71,6 @@ extern "C" {
  */
 #define LOG_RESET_ANSI_COLOR_CODE       ("\033[0m")
 
-/**
- * @brief   ANSI color escape codes array
- *
- * Internal use only
- */
 static const char * const _ansi_codes[] =
 {
     [LOG_ERROR] = LOG_ERROR_ANSI_COLOR_CODE,
@@ -85,15 +79,9 @@ static const char * const _ansi_codes[] =
     [LOG_DEBUG] = LOG_DEBUG_ANSI_COLOR_CODE,
 };
 
-/**
- * @brief log_write overridden function for colored output
- *
- * @param[in] level  Logging level
- * @param[in] format String format to print
- */
-static inline void log_write(unsigned level, const char *format, ...)
+void log_write(unsigned level, const char *format, ...)
 {
-    assert(level > 0);
+    assert((level > 0) && (level < ARRAY_SIZE(_ansi_codes)));
 
     printf("%s", _ansi_codes[level]);
     va_list args;
@@ -110,14 +98,11 @@ static inline void log_write(unsigned level, const char *format, ...)
     va_end(args);
     printf(LOG_RESET_ANSI_COLOR_CODE);
 
-#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
+#if !defined(__MSP430__)
     /* no fflush on msp430 */
     fflush(stdout);
 #endif
 }
 
-#ifdef __cplusplus
-}
-#endif
+#endif /*MODULE_ESP_COMMON*/
 /**@}*/
-#endif /* LOG_MODULE_H */

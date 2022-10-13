@@ -74,8 +74,12 @@ ifneq (,$(filter embunit,$(USEMODULE)))
   endif
 endif
 
-ifneq (,$(filter log_%,$(USEMODULE)))
-  include $(RIOTBASE)/sys/log/Makefile.include
+ifneq (,$(filter log_color,$(USEMODULE)))
+  include $(RIOTBASE)/sys/log_color/Makefile.include
+endif
+
+ifneq (,$(filter log_printfnoformat,$(USEMODULE)))
+  include $(RIOTBASE)/sys/log_printfnoformat/Makefile.include
 endif
 
 ifneq (,$(filter newlib,$(USEMODULE)))
