@@ -12,9 +12,6 @@ name: release-tests
 # dispatch.
 
 on:
-  pull_request_review:
-    types:
-      - submitted
   schedule:
     - cron: '0 3 * * 6'
   push:
@@ -48,7 +45,6 @@ env:
 jobs:
   tasks:
     runs-on: ubuntu-22.04
-    if: ${{ !github.event.review || (contains(github.event.review.body, '@riot-ci do release tests'))}}
     timeout-minutes: 360
     strategy:
       fail-fast: false
@@ -136,10 +132,6 @@ jobs:
         fi
         if [ -n "${{ github.event.inputs.filter }}" ]; then
           K="-k"
-          FILTER="${{ github.event.inputs.filter }}"
-        elif echo '${{ github.event.review.body }}' | tr '\n' ' ' | grep -i '@riot-ci do release tests with "[^"]\+"'; then
-          K="-k"
-          FILTER="$(echo '${{ github.event.review.body }}' | tr '\n' ' ' | sed 's/.*@riot-ci do release tests with "\([^"]\+\)".*/\1/i')"
         fi
 
         cd Release-Specs
@@ -162,10 +154,9 @@ jobs:
           TTN_APP_ID="release-tests" \
           TTN_DEV_ID="eui-70b3d57ed00463e7-otaa" \
           TTN_DEV_ID_ABP="eui-70b3d57ed0046d5d-abp" \
-          PULL_REQUEST="${{ github.event.issue.pull_request.html_url }}" \
           RIOTBASE=${RIOTBASE} \
           $(which tox) -e test -- ${TOX_ARGS} \
-            ${K} "${FILTER}" -m "${{ matrix.pytest_mark }}"
+            ${K} "${{ github.event.inputs.filter }}" -m "${{ matrix.pytest_mark }}"
     - name: junit2html and XML deploy
       if: always()
       run: |
