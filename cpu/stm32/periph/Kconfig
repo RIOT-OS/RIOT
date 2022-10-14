@@ -10,7 +10,12 @@ config MODULE_PERIPH
     default y
     select MODULE_ZTIMER if MODULE_PERIPH_USBDEV
     select MODULE_ZTIMER_MSEC if MODULE_PERIPH_USBDEV
-    select MODULE_USBDEV_SYNOPSYS_DWC2 if MODULE_PERIPH_USBDEV && !HAS_CPU_STM32WB && !HAS_CPU_STM32F3
+    # All STM32 families except for STM32F1, STM32F3 and STM32WG use
+    # MODULE_USBDEV_SYNOPSYS_DWC2
+    select MODULE_USBDEV_SYNOPSYS_DWC2 if MODULE_PERIPH_USBDEV && !HAS_CPU_STM32WB && !HAS_CPU_STM32F3 && !HAS_CPU_STM32F1
+    # NOTE: In STM32F1 family STM32F105xx and STM32F107xx also use
+    #       MODULE_USBDEV_SYNOPSYS_DWC2. Add those MCUs once the are added to
+    #       KConfig
     help
         stm32 common peripheral code.
 
