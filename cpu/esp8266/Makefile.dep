@@ -15,6 +15,10 @@ USEMODULE += mtd
 USEMODULE += periph_common
 USEMODULE += ps
 
+ifneq (,$(filter newlib,$(USEMODULE)))
+  DEFAULT_MODULE += newlib_nano
+endif
+
 ifneq (,$(filter periph_i2c,$(USEMODULE)))
   USEMODULE += esp_i2c_sw
   USEMODULE += periph_i2c_sw
