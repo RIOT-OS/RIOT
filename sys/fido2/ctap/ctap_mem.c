@@ -52,14 +52,14 @@ static unsigned _amount_flashpages_rk(void);
 /**
  * @brief Write to flash memory
  */
-static int _flash_write(const void *buf, uint32_t addr, size_t len);
+static ctap_status_code_t _flash_write(const void *buf, uint32_t addr, size_t len);
 
 /**
  * @brief Get start address of reserved flash memory region
  */
 static unsigned _flash_start(void);
 
-int fido2_ctap_mem_init(void)
+ctap_status_code_t fido2_ctap_mem_init(void)
 {
     int ret = mtd_init(_mtd_dev);
 
@@ -75,7 +75,7 @@ static unsigned _amount_flashpages_rk(void)
     return _mtd_dev->sector_count * _mtd_dev->pages_per_sector;
 }
 
-int fido2_ctap_mem_read(void *buf, uint32_t page, uint32_t offset, uint32_t len)
+ctap_status_code_t fido2_ctap_mem_read(void *buf, uint32_t page, uint32_t offset, uint32_t len)
 {
     assert(buf);
 
@@ -90,7 +90,7 @@ int fido2_ctap_mem_read(void *buf, uint32_t page, uint32_t offset, uint32_t len)
     return CTAP2_OK;
 }
 
-static int _flash_write(const void *buf, uint32_t addr, size_t len)
+static ctap_status_code_t _flash_write(const void *buf, uint32_t addr, size_t len)
 {
     assert(buf);
     int ret;
@@ -133,7 +133,7 @@ static unsigned _flash_start(void)
     return flashpage_page((void *)_backing_memory);
 }
 
-int fido2_ctap_mem_erase_flash(void)
+ctap_status_code_t fido2_ctap_mem_erase_flash(void)
 {
     unsigned start = _flash_start();
     unsigned end = start + CONFIG_FIDO2_CTAP_NUM_FLASHPAGES;
@@ -149,11 +149,13 @@ int fido2_ctap_mem_erase_flash(void)
  * CTAP state information is stored at flashpage 0 of the memory area
  * dedicated for storing CTAP data
  */
-int fido2_ctap_mem_read_state_from_flash(ctap_state_t *state)
+ctap_status_code_t fido2_ctap_mem_read_state_from_flash(ctap_state_t *state)
 {
     uint32_t addr = (uint32_t)flashpage_addr(_flash_start());
 
-    return mtd_read(_mtd_dev, state, addr, sizeof(ctap_state_t));
+    int ret = mtd_read(_mtd_dev, state, addr, sizeof(ctap_state_t));
+
+    return ret == 0 ? CTAP2_OK : CTAP1_ERR_OTHER;
 }
 
 /**
@@ -163,7 +165,7 @@ int fido2_ctap_mem_read_state_from_flash(ctap_state_t *state)
  * so rk's can't be deleted, only overwritten => we can be sure that there are
  * no holes when reading keys from flash memory
  */
-int fido2_ctap_mem_write_rk_to_flash(ctap_resident_key_t *rk)
+ctap_status_code_t fido2_ctap_mem_write_rk_to_flash(ctap_resident_key_t *rk)
 {
     int ret;
     uint32_t addr = (uint32_t)flashpage_addr(_flash_start() + CTAP_FLASH_RK_OFF);
@@ -205,14 +207,14 @@ int fido2_ctap_mem_write_rk_to_flash(ctap_resident_key_t *rk)
     return _flash_write(rk, addr, CTAP_FLASH_RK_SZ);
 }
 
-int fido2_ctap_mem_write_state_to_flash(ctap_state_t *state)
+ctap_status_code_t fido2_ctap_mem_write_state_to_flash(ctap_state_t *state)
 {
     uint32_t addr = (uint32_t)flashpage_addr(_flash_start());
 
     return _flash_write(state, addr, CTAP_FLASH_STATE_SZ);
 }
 
-int fido2_ctap_mem_read_rk_from_flash(ctap_resident_key_t *key, uint8_t *rp_id_hash, uint32_t *addr)
+ctap_status_code_t fido2_ctap_mem_read_rk_from_flash(ctap_resident_key_t *key, uint8_t *rp_id_hash, uint32_t *addr)
 {
     uint16_t end;
     uint16_t amt_stored = fido2_ctap_get_state()->rk_amount_stored;
