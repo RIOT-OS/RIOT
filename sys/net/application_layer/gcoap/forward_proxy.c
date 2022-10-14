@@ -17,6 +17,7 @@
 
 #include <stdbool.h>
 
+#include "kernel_defines.h"
 #include "net/gcoap.h"
 #include "net/gcoap/forward_proxy.h"
 #include "uri_parser.h"
@@ -35,6 +36,7 @@ typedef struct {
 } client_ep_t;
 
 static uint8_t proxy_req_buf[CONFIG_GCOAP_PDU_BUF_SIZE];
+static char _proxy_upstream_uri[CONFIG_GCOAP_FORWARD_PROXY_UPSTREAM_URI_MAX];
 static client_ep_t _client_eps[CONFIG_GCOAP_REQ_WAITING_MAX];
 
 static int _request_matcher_forward_proxy(gcoap_listener_t *listener,
@@ -307,8 +309,8 @@ static int _gcoap_forward_proxy_copy_options(coap_pkt_t *pkt,
                 }
                 uri_path_added = true;
             }
-            /* skip PROXY-URI in new packet */
-            if (opt.opt_num == COAP_OPT_PROXY_URI) {
+            /* skip PROXY-URI in new packet if it is not forwarded to an upstream proxy */
+            if (!gcoap_forward_proxy_upstream_is_set() && (opt.opt_num == COAP_OPT_PROXY_URI)) {
                 continue;
             }
             /* the actual copy operation */
@@ -382,7 +384,7 @@ int gcoap_forward_proxy_request_process(coap_pkt_t *pkt,
                                         const sock_udp_ep_t *client) {
     char *uri;
     uri_parser_result_t urip;
-    ssize_t optlen = 0;
+    ssize_t uri_len = 0;
 
     client_ep_t *cep = _allocate_client_ep(client);
 
@@ -390,18 +392,24 @@ int gcoap_forward_proxy_request_process(coap_pkt_t *pkt,
         return -ENOMEM;
     }
 
-    optlen = coap_get_proxy_uri(pkt, &uri);
+    if (gcoap_forward_proxy_upstream_is_set()) {
+        uri_len = strlen(_proxy_upstream_uri);
+        uri = _proxy_upstream_uri;
+    }
+    else {
+        uri_len = coap_get_proxy_uri(pkt, &uri);
 
-    if (optlen < 0) {
-        /* -ENOENT, -EINVAL */
-        _free_client_ep(cep);
-        return optlen;
+        if (uri_len < 0) {
+            /* -ENOENT, -EINVAL */
+            _free_client_ep(cep);
+            return uri_len;
+        }
     }
 
-    int ures = uri_parser_process(&urip, (const char *) uri, optlen);
+    int ures = uri_parser_process(&urip, (const char *) uri, uri_len);
 
     /* cannot parse Proxy-URI option, or URI is relative */
-    if (ures || (!uri_parser_is_absolute((const char *) uri, optlen))) {
+    if (ures || (!uri_parser_is_absolute((const char *) uri, uri_len))) {
         _free_client_ep(cep);
         return -EINVAL;
     }
@@ -421,6 +429,44 @@ int gcoap_forward_proxy_request_process(coap_pkt_t *pkt,
     }
 
     return 0;
+}
+
+int gcoap_forward_proxy_upstream_set(const char *proxy_uri)
+{
+    if (!IS_USED(MODULE_GCOAP_FORWARD_PROXY_UPSTREAM)) {
+        return -ENOTSUP;
+    }
+    if (proxy_uri == NULL) {
+        memset(_proxy_upstream_uri, 0, sizeof(_proxy_upstream_uri));
+        return 0;
+    }
+    int res = strlen(proxy_uri);
+
+    if ((unsigned)(res + 1) >= sizeof(_proxy_upstream_uri)) {
+        return -EINVAL;
+    }
+    strcpy(_proxy_upstream_uri, proxy_uri);
+    return res;
+}
+
+bool gcoap_forward_proxy_upstream_is_set(void)
+{
+    return IS_USED(MODULE_GCOAP_FORWARD_PROXY_UPSTREAM) && (_proxy_upstream_uri[0] != '\0');
+}
+
+ssize_t gcoap_forward_proxy_upstream_get(char *proxy_uri, size_t proxy_uri_len)
+{
+    ssize_t res = 0;
+    if (gcoap_forward_proxy_upstream_is_set()) {
+        res = strlen(_proxy_upstream_uri);
+        if ((size_t)(res + 1) > proxy_uri_len) {
+            res = -ENOBUFS;
+        }
+        else {
+            strcpy(proxy_uri, _proxy_upstream_uri);
+        }
+    }
+    return res;
 }
 
 /** @} */

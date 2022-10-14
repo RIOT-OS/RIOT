@@ -75,6 +75,8 @@ PSEUDOMODULES += evtimer_on_ztimer
 PSEUDOMODULES += fatfs_vfs_format
 PSEUDOMODULES += fmt_%
 PSEUDOMODULES += gcoap_forward_proxy
+## Enable the @ref gcoap_forward_proxy_upstream_set function
+PSEUDOMODULES += gcoap_forward_proxy_upstream
 PSEUDOMODULES += gcoap_fileserver
 PSEUDOMODULES += gcoap_fileserver_delete
 PSEUDOMODULES += gcoap_fileserver_put
