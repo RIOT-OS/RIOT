@@ -839,7 +839,8 @@ static bool _memo_ep_is_multicast(const gcoap_request_memo_t *memo)
  * memo_ptr[out] -- Registered request memo, or NULL if not found
  * src_pdu[in] -- PDU for token to match
  * remote[in] -- Remote endpoint to match
- * by_mid[in] -- true if matches are to be done based on Message ID, otherwise they are done by token
+ * by_mid[in] -- true if matches are to be done based on Message ID, otherwise they are done by
+ *               token
  */
 static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *src_pdu,
                            const sock_udp_ep_t *remote, bool by_mid)
@@ -1125,7 +1126,8 @@ static ssize_t _tl_authenticate(gcoap_socket_t *sock, const sock_udp_ep_t *remot
         uint32_t start = ztimer_now(ZTIMER_MSEC);
         res = ztimer_msg_receive_timeout(ZTIMER_MSEC, &msg, timeout);
 
-        /* ensure whole timeout time for the case we receive other messages than DTLS_EVENT_CONNECTED */
+        /* ensure whole timeout time for the case we receive other messages than
+         * DTLS_EVENT_CONNECTED */
         if (timeout != SOCK_NO_TIMEOUT) {
             uint32_t diff = (ztimer_now(ZTIMER_MSEC) - start);
             timeout = (diff > timeout) ? 0: timeout - diff;
@@ -1301,6 +1303,11 @@ static ssize_t _cache_check(const uint8_t *buf, size_t len,
         DEBUG("gcoap: parse failure for cache lookup: %d\n", (int)res);
         return -EINVAL;
     }
+    if (coap_get_code_class(&req) != COAP_CLASS_REQ) {
+        /* Not a request so ignore, as gcoap_req_send might have been used with
+         * its undocumented function to send a CON response from submodule */
+        return len;
+    }
 
     *cache_hit = _cache_lookup(memo, &req, &ce);
 
@@ -1376,6 +1383,11 @@ kernel_pid_t gcoap_init(void)
     return _pid;
 }
 
+uint16_t gcoap_next_msg_id(void)
+{
+    return (uint16_t)atomic_fetch_add(&_coap_state.next_message_id, 1);
+}
+
 void gcoap_register_listener(gcoap_listener_t *listener)
 {
     /* That item will be overridden, ensure that the user expecting different
@@ -1402,7 +1414,7 @@ int gcoap_req_init_path_buffer(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     pdu->hdr = (coap_hdr_t *)buf;
 
     /* generate token */
-    uint16_t msgid = (uint16_t)atomic_fetch_add(&_coap_state.next_message_id, 1);
+    uint16_t msgid = gcoap_next_msg_id();
     ssize_t res;
     if (code) {
 #if CONFIG_GCOAP_TOKENLEN
@@ -1620,7 +1632,7 @@ int gcoap_obs_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     }
 
     pdu->hdr       = (coap_hdr_t *)buf;
-    uint16_t msgid = (uint16_t)atomic_fetch_add(&_coap_state.next_message_id, 1);
+    uint16_t msgid = gcoap_next_msg_id();
     ssize_t hdrlen = coap_build_hdr(pdu->hdr, COAP_TYPE_NON, &memo->token[0],
                                     memo->token_len, COAP_CODE_CONTENT, msgid);
 
@@ -1761,9 +1773,9 @@ void gcoap_forward_proxy_find_req_memo(gcoap_request_memo_t **memo_ptr,
     _find_req_memo(memo_ptr, src_pdu, remote, false);
 }
 
-ssize_t gcoap_forward_proxy_dispatch(const uint8_t *buf, size_t len, sock_udp_ep_t *remote)
+void gcoap_forward_proxy_post_event(void *arg)
 {
-    return sock_udp_send(&_sock_udp, buf, len, remote);
+    event_post(&_queue, arg);
 }
 
 /** @} */
