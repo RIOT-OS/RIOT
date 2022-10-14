@@ -36,12 +36,12 @@ int netdev_ieee802154_minimal_init_devs(netdev_event_cb_t cb) {
     netdev_register(netdev, NETDEV_CC2538, 0);
     netdev_ieee802154_submac_init(&cc2538_rf);
 
+    /* set the application-provided callback */
+    netdev->event_callback = cb;
+
     /* setup and initialize the specific driver */
     cc2538_rf_hal_setup(&cc2538_rf.submac.dev);
     cc2538_init();
-
-    /* set the application-provided callback */
-    netdev->event_callback = cb;
 
     /* initialize the device driver */
     int res = netdev->driver->init(netdev);
