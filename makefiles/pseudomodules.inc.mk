@@ -87,7 +87,21 @@ PSEUDOMODULES += gcoap_dns
 PSEUDOMODULES += gcoap_dns_proxied
 ## @}
 PSEUDOMODULES += fido2_tests
-PSEUDOMODULES += gnrc_dhcpv6_%
+## @addtogroup net_dhcpv6_client
+## @{
+## @defgroup net_gnrc_dhcpv6_client	gnrc_dhcpv6_client: Basic DHCPv6 client implementation in GNRC
+## @{
+PSEUDOMODULES += gnrc_dhcpv6_client
+## @}
+## @defgroup net_gnrc_dhcpv6_client_6lbr gnrc_dhcpv6_client_6lbr: Basic client for GNRC 6LoWPAN BRs
+## @{
+PSEUDOMODULES += gnrc_dhcpv6_client_6lbr
+## @}
+## @addtogroup net_dhcpv6_client_simple_pd
+## @{
+PSEUDOMODULES += gnrc_dhcpv6_client_simple_pd
+## @}
+## @}
 PSEUDOMODULES += gnrc_ipv6_auto_subnets_auto_init
 PSEUDOMODULES += gnrc_ipv6_auto_subnets_simple
 PSEUDOMODULES += gnrc_ipv6_default
@@ -134,7 +148,79 @@ PSEUDOMODULES += gnrc_netif_single
 PSEUDOMODULES += gnrc_netif_cmd_lora
 ## @}
 PSEUDOMODULES += gnrc_netif_dedup
-PSEUDOMODULES += gnrc_nettype_%
+
+
+## @addtogroup 	net_gnrc_nettype
+## @{
+
+## @defgroup 	net_gnrc_nettype_ccn        gnrc_nettype_ccn
+## @{
+## Enables @ref GNRC_NETTYPE_CCN and @ref GNRC_NETTYPE_CCN_CHUNK
+PSEUDOMODULES += gnrc_nettype_ccn
+## @}
+
+## @defgroup 	net_gnrc_nettype_gomac      gnrc_nettype_gomac
+## @{
+## Enables @ref GNRC_NETTYPE_GOMACH
+PSEUDOMODULES += gnrc_nettype_gomach
+## @}
+
+## @defgroup 	net_gnrc_nettype_icmpv6     gnrc_nettype_icmpv6
+## Enables @ref GNRC_NETTYPE_ICMPV6.
+## @{
+PSEUDOMODULES += gnrc_nettype_icmpv6
+## @}
+
+## @defgroup 	net_gnrc_nettype_ipv6       gnrc_nettype_ipv6
+## Enables @ref GNRC_NETTYPE_IPV6.
+## @{
+PSEUDOMODULES += gnrc_nettype_ipv6
+## @}
+
+## @defgroup 	net_gnrc_nettype_ipv6_ext   gnrc_nettype_ipv6_ext
+## @{
+## Enables @ref GNRC_NETTYPE_IPV6_EXT.
+PSEUDOMODULES += gnrc_nettype_ipv6_ext
+## @}
+
+## @defgroup 	net_gnrc_nettype_lorawan    gnrc_nettype_lorawan
+## Enables @ref GNRC_NETTYPE_LORAWAN
+## @{
+PSEUDOMODULES += gnrc_nettype_lorawan
+## @}
+
+## @defgroup 	net_gnrc_nettype_lwmac      gnrc_nettype_lwmac
+## Enables @ref GNRC_NETTYPE_LWMAC
+## @{
+PSEUDOMODULES += gnrc_nettype_lwmac
+## @}
+
+## @defgroup 	net_gnrc_nettype_ndn        gnrc_nettype_ndn
+## Enables @ref GNRC_NETTYPE_NDN
+## @{
+PSEUDOMODULES += gnrc_nettype_ndn
+## @}
+
+## @defgroup 	net_gnrc_nettype_sixlowpan  gnrc_nettype_sixlowpan
+## Enables @ref GNRC_NETTYPE_SIXLOWPAN
+## @{
+PSEUDOMODULES += gnrc_nettype_sixlowpan
+## @}
+
+## @defgroup 	net_gnrc_nettype_tcp        gnrc_nettype_tcp
+## Enables @ref GNRC_NETTYPE_TCP
+## @{
+PSEUDOMODULES += gnrc_nettype_tcp
+## @}
+
+## @defgroup 	net_gnrc_nettype_udp        gnrc_nettype_udp
+## Enables @ref GNRC_NETTYPE_UDP
+## @{
+PSEUDOMODULES += gnrc_nettype_udp
+## @}
+## @}
+
+
 PSEUDOMODULES += gnrc_sixloenc
 PSEUDOMODULES += gnrc_sixlowpan_border_router_default
 PSEUDOMODULES += gnrc_sixlowpan_default
