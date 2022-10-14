@@ -177,22 +177,17 @@ ssize_t clif_add_attr(clif_attr_t *attr, char *buf, size_t maxlen)
     assert(attr);
     assert(attr->key);
 
-    /* if no length given, calculate it */
-    if (!attr->key_len) {
-        attr->key_len = strlen(attr->key);
-    }
-
     /* count attr name size and separator ';' */
     size_t req_space = attr->key_len + 1;
     size_t pos = 0;
-    int quoted = strcmp(attr->key, LF_ATTR_SIZE) ? 1 : 0;
+    int quoted = 0;
+    if (attr->key_len >= LF_ATTR_SIZE_S) {
+        quoted = strcmp(attr->key, LF_ATTR_SIZE) ? 1 : 0;
+    }
 
     if (attr->value) {
-        if (!attr->value_len) {
-            attr->value_len = strlen(attr->value);
-        }
         /* count also '=' */
-        req_space += attr->value_len +  1;
+        req_space += attr->value_len + 1;
     }
 
     if (quoted) {

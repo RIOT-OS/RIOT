@@ -237,9 +237,7 @@ ssize_t clif_add_target(const char *target, char *buf, size_t maxlen);
  * @note
  *       - If @p buf is NULL this will return the amount of bytes that would be
  *         needed.
- *       - If the lengths of the key or the value of the attribute are not
- *         defined a NULL-terminated string will be assumed, and it will be
- *         calculated.
+ *       - The length of the key must be set in `attr->key_len`.
  *
  * @return amount of bytes used from the buffer if successful
  * @return CLIF_NO_SPACE if there is not enough space in the buffer
