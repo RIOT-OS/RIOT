@@ -87,9 +87,9 @@ static void test_clif_encode_links(void)
     };
 
     clif_t links[] = {
-        { .target = "/sensor/temp", .attrs = attrs, .attrs_len = 2 },
-        { .target = "/node/info", .attrs_len = 0 },
-        { .target = "/node/ep", .attrs = &attrs[2], .attrs_len = 1 }
+        { .target = "/sensor/temp", .target_len = 12, .attrs = attrs, .attrs_len = 2 },
+        { .target = "/node/info", .target_len = 10, .attrs_len = 0 },
+        { .target = "/node/ep", .target_len = 8, .attrs = &attrs[2], .attrs_len = 1 }
     };
 
     const size_t exp_size = sizeof(exp_string) - 1;
@@ -313,6 +313,33 @@ static void test_clif_get_attr_empty(void)
     TEST_ASSERT_EQUAL_INT(CLIF_NOT_FOUND, r);
 }
 
+static void tests_clif_decode_encode_minimal(void)
+{
+    char input_buf[] = "</sensors>";
+
+    /* The required buffer size is (in this case) equal to the input buffer
+     * plus one additional byte to hold the null termination */
+    const size_t output_buf_size = strlen(input_buf) + 1;
+    char output_buf[output_buf_size];
+    clif_t out_link;
+
+    ssize_t input_len = strlen(input_buf);
+
+    ssize_t decode_len = clif_decode_link(&out_link, NULL, 0, input_buf, input_len);
+    if (decode_len == CLIF_NOT_FOUND) {
+        TEST_FAIL("Malformed input string");
+    }
+
+    ssize_t result_len = clif_encode_link(&out_link, output_buf, output_buf_size);
+    if (result_len == CLIF_NO_SPACE) {
+        TEST_FAIL("No space left in the buffer");
+    }
+    output_buf[result_len] = '\0';
+
+    TEST_ASSERT_EQUAL_INT(input_len, result_len);
+    TEST_ASSERT_EQUAL_STRING(input_buf, output_buf);
+}
+
 Test *tests_clif_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -321,7 +348,8 @@ Test *tests_clif_tests(void)
         new_TestFixture(test_clif_get_attr_missing_value),
         new_TestFixture(test_clif_get_attr_missing_quote),
         new_TestFixture(test_clif_get_empty_attr_value),
-        new_TestFixture(test_clif_get_attr_empty)
+        new_TestFixture(test_clif_get_attr_empty),
+        new_TestFixture(tests_clif_decode_encode_minimal)
     };
 
     EMB_UNIT_TESTCALLER(clif_tests, NULL, NULL, fixtures);
