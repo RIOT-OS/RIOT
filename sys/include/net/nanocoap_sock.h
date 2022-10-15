@@ -442,6 +442,9 @@ ssize_t nanocoap_request(coap_pkt_t *pkt, const sock_udp_ep_t *local,
 /**
  * @brief   Simple synchronous CoAP (confirmable) get
  *
+ * @deprecated  Will be removed after the 2023.04 release.
+ *              Please use @ref nanocoap_sock_get instead.
+ *
  * @param[in]   remote  remote UDP endpoint
  * @param[in]   path    remote path
  * @param[out]  buf     buffer to write response to
