@@ -61,4 +61,9 @@ else ifeq (${RIOT_TERMINAL},openocd-rtt)
   TERMENV = RAM_START_ADDR=${RAM_START_ADDR} RAM_LEN=${RAM_LEN}
   TERMPROG = $(RIOTTOOLS)/openocd/openocd.sh
   TERMFLAGS = term-rtt
+else ifeq (${RIOT_TERMINAL},bootterm)
+  TERMENV = BT_PORT_CRLF=1
+  TERMPROG = $(RIOTTOOLS)/bootterm/bt
+  TERMFLAGS = $(BOOTTERMFLAGS) -a -b $(BAUD) $(PORT)
+  TERMDEPS += $(TERMPROG)
 endif
