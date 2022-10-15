@@ -33,7 +33,7 @@ config GNRC_SIXLOWPAN_SFR_OPT_FRAG_SIZE
         @ref GNRC_SIXLOWPAN_SFR_MAX_FRAG_SIZE
 
 config GNRC_SIXLOWPAN_SFR_USE_ECN
-    bool "Indicates whether the sender should react to ECN (UseECN)"
+    bool "Indicates whether the sender should react to Explicit Content Notification (UseECN)"
     default false
     help
         When the sender reacts to Explicit Congestion Notification (ECN) its
@@ -97,5 +97,75 @@ config GNRC_SIXLOWPAN_SFR_FRAG_RETRIES
 config GNRC_SIXLOWPAN_SFR_DG_RETRIES
     int "The maximum number of retries from scratch for a particular datagram (MaxDatagramRetries)"
     default 0
+
+menuconfig KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_IF_IN
+    bool "Configure SFR ECN based on the message queue of the incoming netif"
+    depends on USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_IF_IN
+
+if KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_IF_IN
+config GNRC_SIXLOWPAN_SFR_ECN_IF_IN_NUM
+    int "The numerator for the factor for when to mark ECN on incoming netif queue state"
+    default 1
+    help
+        When `gnrc_sixlowpan_frag_sfr_ecn_if_in` is compiled in, nodes will set
+        the ECN bit of an RFRAG header when the message queue of the incoming `netif`
+        is filled by
+        @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_IN_NUM / @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_IN_DEN
+
+config GNRC_SIXLOWPAN_SFR_ECN_IF_IN_DEN
+    int "The denominator for the factor for when to mark ECN on incoming netif queue state"
+    default 2
+    help
+        When `gnrc_sixlowpan_frag_sfr_ecn_if_in` is compiled in, nodes will set the
+        ECN bit of an RFRAG header when the message queue of the incoming `netif` is
+        filled by
+        @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_IN_NUM / @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_IN_DEN
+endif
+
+menuconfig KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_IF_OUT
+    bool "Configure SFR ECN based on the output queue of the outgoing netif"
+    depends on USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_IF_OUT
+
+if KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_IF_OUT
+config GNRC_SIXLOWPAN_SFR_ECN_IF_OUT_NUM
+    int "The numerator for the factor for when to mark ECN on the outgoing netif's output queue state"
+    default 1
+    help
+        When `gnrc_sixlowpan_frag_sfr_ecn_if_out` is compiled in, nodes will set
+        the ECN bit of an RFRAG header when the output queue of the outgoing `netif`
+        is filled by
+        @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_OUT_NUM / @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_OUT_DEN
+
+config GNRC_SIXLOWPAN_SFR_ECN_IF_OUT_DEN
+    int "The denominator for the factor for when to mark ECN on the outgoing netif output queue state"
+    default 2
+    help
+        When `gnrc_sixlowpan_frag_sfr_ecn_if_out` is compiled in, nodes will set the
+        ECN bit of an RFRAG header when the output queue of the outgoing `netif` is
+        filled by
+        @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_OUT_NUM / @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_OUT_DEN
+endif
+
+menuconfig KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_FQUEUE
+    bool "Configure SFR ECN based on SFR's frame queue"
+    depends on USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_FQUEUE
+
+if KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_FQUEUE
+config GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_NUM
+    int "The numerator for the factor for when to mark ECN on frame queue state"
+    default 1
+    help
+        When `gnrc_sixlowpan_frag_sfr_ecn_fqueue` is compiled in, nodes will set the
+        ECN bit of an RFRAG header when the frame queue for SFR is filled by
+        @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_NUM / @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_DEN
+
+config GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_DEN
+    int "The denominator for the factor for when to mark ECN on frame queue state"
+    default 2
+    help
+        When `gnrc_sixlowpan_frag_sfr_ecn_fqueue` is compiled in, nodes will set the
+        ECN bit of an RFRAG header when the frame queue for SFR is filled by
+        @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_NUM / @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_DEN
+endif
 
 endif
