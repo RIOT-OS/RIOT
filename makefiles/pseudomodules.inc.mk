@@ -459,8 +459,15 @@ PSEUDOMODULES += stdio_available
 PSEUDOMODULES += stdio_cdc_acm
 PSEUDOMODULES += stdio_ethos
 PSEUDOMODULES += stdio_nimble_debug
-PSEUDOMODULES += stdio_uart_rx
 PSEUDOMODULES += stdio_telnet
+## @defgroup sys_stdio_uart_onlcr   Support for DOS line endings in STDIO-UART
+## @ingroup sys_stdio_uart
+## @{
+## Enable this (pseudo-) module to emit DOS style line endings (`\r\n`) instead
+## of UNIX style line endings (`\n`) via STDIO over UART.
+PSEUDOMODULES += stdio_uart_onlcr
+## @}
+PSEUDOMODULES += stdio_uart_rx
 PSEUDOMODULES += stm32_eth
 PSEUDOMODULES += stm32_eth_auto
 PSEUDOMODULES += stm32_eth_link_up

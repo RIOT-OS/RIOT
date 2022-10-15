@@ -34,6 +34,10 @@ config MODULE_STDIO_UART
     depends on HAS_PERIPH_UART
     select MODULE_PERIPH_UART
 
+config MODULE_STDIO_UART_ONLCR
+    bool "Emit DOS line endings for STDIO output via UART"
+    depends on MODULE_STDIO_UART
+
 config MODULE_STDIO_NATIVE
     bool "Native"
     depends on CPU_ARCH_NATIVE
