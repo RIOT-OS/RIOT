@@ -3,6 +3,9 @@ include $(RIOTCPU)/efm32/efm32-features.mk
 
 CPU_CORE = $(EFM32_ARCHITECTURE)
 
+# allow CPU families to add features individually
+-include $(RIOTCPU)/efm32/families/$(CPU_FAM)/Makefile.features
+
 # families without MPU
 ifeq (,$(filter efm32zg efm32hg, $(CPU_FAM)))
   FEATURES_PROVIDED += cortexm_mpu
@@ -21,6 +24,9 @@ FEATURES_PROVIDED += periph_wdt
 
 FEATURES_CONFLICT += periph_rtc:periph_rtt
 FEATURES_CONFLICT_MSG += "On the EFM32, the RTC and RTT map to the same hardware peripheral."
+
+FEATURES_CONFLICT += cortexm_fpu:gecko_sdk_librail_nonfpu
+FEATURES_CONFLICT_MSG += "Using librail with the FPU enabled is not supported on this CPU."
 
 ifeq (1,$(EFM32_TRNG))
   FEATURES_PROVIDED += periph_hwrng

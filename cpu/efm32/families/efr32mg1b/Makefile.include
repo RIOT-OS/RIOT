@@ -3,5 +3,10 @@
 # as easy as adding the header file only.
 EFM32_HEADER = $(wildcard $(RIOTCPU)/efm32/families/efr32mg1b/include/vendor/$(CPU_MODEL).h)
 
+# Names of librail related files
+EFM32_LIBRAIL_BLOB_NAME = efr32xg1
+EFM32_LIBRAIL_HEADER_NAME = efr32xg1x
+EFM32_LIBRAIL_PA_HEADER_NAME = efr32xg1x
+
 # include vendor device headers
 INCLUDES += -I$(RIOTCPU)/efm32/families/efr32mg1b/include/vendor

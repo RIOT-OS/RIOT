@@ -122,8 +122,8 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     isr_ctx[_pin_num(pin)].arg = arg;
 
     /* enable interrupts */
-    GPIO_IntConfig(_port_num(pin), _pin_num(pin),
-                   flank & GPIO_RISING, flank & GPIO_FALLING, true);
+    GPIO_ExtIntConfig(_port_num(pin), _pin_num(pin), _pin_num(pin),
+                      flank & GPIO_RISING, flank & GPIO_FALLING, true);
 
     NVIC_ClearPendingIRQ(GPIO_EVEN_IRQn);
     NVIC_ClearPendingIRQ(GPIO_ODD_IRQn);

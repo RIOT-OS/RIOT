@@ -6,6 +6,9 @@ include $(RIOTCPU)/efm32/efm32-info.mk
 # `cpu_$(CPU_FAM)` for something that is MODULE related.
 include $(RIOTCPU)/efm32/families/$(CPU_FAM)/Makefile.include
 
+# Export vars for Gecko SDK librail Makefile
+export EFM32_LIBRAIL_BLOB_NAME
+
 ifeq (,$(EFM32_HEADER))
   $(error Header file for $(CPU_MODEL) is missing)
 endif
