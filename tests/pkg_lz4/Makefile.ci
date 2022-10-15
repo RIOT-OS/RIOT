@@ -7,6 +7,8 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-nano-33-iot \
     bastwan \
     bluepill-stm32f030c8 \
+    blackpill-128kib \
+    bluepill-128kib \
     calliope-mini \
     feather-m0 \
     feather-m0-lora \
