@@ -1817,6 +1817,13 @@ ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, uint8_t *token,
  * @param[in]   payload_len length of payload
  *
  * @returns     size of reply packet on success
+ *
+ *              Note that this size can be severely shortened if due to a No-Response option there
+ *              is only an empty ACK to be sent back. The caller may just continue populating the
+ *              payload (the space was checked to suffice), but may also skip that needless step
+ *              if the returned length is less than the requested payload length.
+ *
+ * @returns     0 if no response should be sent due to a No-Response option in the request
  * @returns     <0 on error
  * @returns     -ENOSPC if @p rbuf too small
  */

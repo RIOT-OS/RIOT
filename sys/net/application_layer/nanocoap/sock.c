@@ -311,7 +311,7 @@ ssize_t nanocoap_sock_get(nanocoap_sock_t *sock, const char *path, void *buf, si
 }
 
 ssize_t _sock_put_post(nanocoap_sock_t *sock, const char *path, unsigned code,
-                       const void *request, size_t len,
+                       uint8_t type, const void *request, size_t len,
                        void *response, size_t max_len)
 {
     /* buffer for CoAP header */
@@ -333,8 +333,14 @@ ssize_t _sock_put_post(nanocoap_sock_t *sock, const char *path, unsigned code,
         .iov_len  = max_len,
     };
 
-    pktpos += coap_build_hdr(pkt.hdr, COAP_TYPE_CON, NULL, 0, code, _get_id());
+    pktpos += coap_build_hdr(pkt.hdr, type, NULL, 0, code, _get_id());
     pktpos += coap_opt_put_uri_path(pktpos, 0, path);
+
+    if (response == NULL && type == COAP_TYPE_NON) {
+        /* all responses (2.xx, 4.xx and 5.xx) are ignored */
+        pktpos += coap_opt_put_uint(pktpos, COAP_OPT_URI_PATH,
+                                    COAP_OPT_NO_RESPONSE, 26);
+    }
 
     if (len) {
         /* set payload marker */
@@ -351,14 +357,32 @@ ssize_t nanocoap_sock_put(nanocoap_sock_t *sock, const char *path,
                           const void *request, size_t len,
                           void *response, size_t len_max)
 {
-    return _sock_put_post(sock, path, COAP_METHOD_PUT, request, len, response, len_max);
+    return _sock_put_post(sock, path, COAP_METHOD_PUT, COAP_TYPE_CON, request, len,
+                          response, len_max);
 }
 
 ssize_t nanocoap_sock_post(nanocoap_sock_t *sock, const char *path,
                            const void *request, size_t len,
                            void *response, size_t len_max)
 {
-    return _sock_put_post(sock, path, COAP_METHOD_POST, request, len, response, len_max);
+    return _sock_put_post(sock, path, COAP_METHOD_POST, COAP_TYPE_CON, request, len,
+                          response, len_max);
+}
+
+ssize_t nanocoap_sock_put_non(nanocoap_sock_t *sock, const char *path,
+                              const void *request, size_t len,
+                              void *response, size_t len_max)
+{
+    return _sock_put_post(sock, path, COAP_METHOD_PUT, COAP_TYPE_NON, request, len,
+                          response, len_max);
+}
+
+ssize_t nanocoap_sock_post_non(nanocoap_sock_t *sock, const char *path,
+                               const void *request, size_t len,
+                               void *response, size_t len_max)
+{
+    return _sock_put_post(sock, path, COAP_METHOD_POST, COAP_TYPE_NON, request, len,
+                          response, len_max);
 }
 
 static ssize_t _sock_put_post_url(const char *url, unsigned code,
@@ -371,7 +395,8 @@ static ssize_t _sock_put_post_url(const char *url, unsigned code,
         return res;
     }
 
-    res = _sock_put_post(&sock, sock_urlpath(url), code, request, len, response, len_max);
+    res = _sock_put_post(&sock, sock_urlpath(url), code, COAP_TYPE_CON,
+                         request, len, response, len_max);
     nanocoap_sock_close(&sock);
 
     return res;

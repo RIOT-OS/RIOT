@@ -513,6 +513,32 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
         }
     }
 
+    uint32_t no_response;
+    if (coap_opt_get_uint(pkt, COAP_OPT_NO_RESPONSE, &no_response) == 0) {
+
+        const uint8_t no_response_index = (code >> 5) - 1;
+        /* If the handler code misbehaved here, we'd face UB otherwise */
+        assert(no_response_index < 7);
+
+        const uint8_t mask = 1 << no_response_index;
+
+        /* option contains bitmap of disinterest */
+        if (no_response & mask) {
+            switch (coap_get_type(pkt)) {
+            case COAP_TYPE_NON:
+                /* no response and no ACK */
+                return 0;
+            default:
+                 /* There is an immediate ACK response, but it is an empty response */
+                code = COAP_CODE_EMPTY;
+                len = sizeof(coap_hdr_t);
+                tkl = 0;
+                payload_len = 0;
+                break;
+            }
+        }
+    }
+
     coap_build_hdr((coap_hdr_t *)rbuf, type, coap_get_token(pkt), tkl, code,
                    ntohs(pkt->hdr->id));
     coap_hdr_set_type((coap_hdr_t *)rbuf, type);
