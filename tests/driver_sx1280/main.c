@@ -355,12 +355,12 @@ int main(void)
 
     netdev->driver = &sx1280_driver;
 
+    netdev->event_callback = _event_cb;
+
     if (netdev->driver->init(netdev) < 0) {
         puts("Failed to initialize SX1280 device, exiting");
         return 1;
     }
-
-    netdev->event_callback = _event_cb;
 
     _recv_pid = thread_create(stack, sizeof(stack), THREAD_PRIORITY_MAIN - 1,
                               THREAD_CREATE_STACKTEST, _recv_thread, netdev,

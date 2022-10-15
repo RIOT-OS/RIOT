@@ -545,12 +545,12 @@ int main(void)
 
     netdev->driver = &sx127x_driver;
 
+    netdev->event_callback = _event_cb;
+
     if (netdev->driver->init(netdev) < 0) {
         puts("Failed to initialize SX127x device, exiting");
         return 1;
     }
-
-    netdev->event_callback = _event_cb;
 
     _recv_pid = thread_create(stack, sizeof(stack), THREAD_PRIORITY_MAIN - 1,
                               THREAD_CREATE_STACKTEST, _recv_thread, NULL,
