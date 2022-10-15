@@ -3,6 +3,8 @@ BOARD_INSUFFICIENT_MEMORY := \
     b-l072z-lrwan1 \
     blackpill \
     bluepill \
+    blackpill-128kib \
+    bluepill-128kib \
     bluepill-stm32f030c8 \
     calliope-mini \
     cc2650-launchpad \

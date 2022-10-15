@@ -19,6 +19,8 @@ BOARD_BLACKLIST += \
                    weact-f401cc \
                    weact-f401ce \
                    weact-f411ce \
+                   blackpill-128kib \
+                   bluepill-128kib \
                    #
 
 # microbit qemu failing currently
