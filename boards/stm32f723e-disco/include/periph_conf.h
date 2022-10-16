@@ -35,7 +35,11 @@
 #include "periph_cpu.h"
 #include "clk_conf.h"
 #include "cfg_rtt_default.h"
+#if defined(MODULE_PERIPH_USBDEV_HS_UTMI)
+#include "cfg_usb_otg_hs_phy_utmi.h"
+#else
 #include "cfg_usb_otg_fs.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {

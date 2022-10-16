@@ -67,7 +67,7 @@ typedef enum {
 } dwc2_usb_otg_fshs_phy_t;
 
 /**
- * @brief stm32 USB OTG configuration
+ * @brief USB OTG configuration
  */
 typedef struct {
     uintptr_t periph;               /**< USB peripheral base address */
@@ -95,6 +95,11 @@ typedef struct {
     gpio_t dm;                      /**< Data- gpio */
     gpio_t dp;                      /**< Data+ gpio */
     gpio_af_t af;                   /**< Alternative function */
+#if defined(MODULE_PERIPH_USBDEV_HS_UTMI) || DOXYGEN
+    uint32_t phy_tune;              /**< USB HS PHY controller tuning register
+                                      *  value (STM32-specific), see USBPHYC_TUNE
+                                      *  register in STM32 Reference Manual */
+#endif /* defined(MODULE_PERIPH_USBDEV_HS_UTMI) */
 #endif /* defined(MCU_STM32) || DOXYGEN */
 } dwc2_usb_otg_fshs_config_t;
 

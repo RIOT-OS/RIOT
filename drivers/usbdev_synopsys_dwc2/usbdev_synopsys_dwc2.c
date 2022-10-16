@@ -633,14 +633,17 @@ static void _reset_periph(dwc2_usb_otg_fshs_t *usbdev)
 #ifdef MCU_STM32
 static void _enable_gpio(const dwc2_usb_otg_fshs_config_t *conf)
 {
+    (void)conf;
+#ifndef MODULE_PERIPH_USBDEV_HS_ULPI
     /* Enables clock on the GPIO bus */
     gpio_init(conf->dp, GPIO_IN);
     gpio_init(conf->dm, GPIO_IN);
     /* Configure AF for the pins */
     gpio_init_af(conf->dp, conf->af);
     gpio_init_af(conf->dm, conf->af);
+#endif /* MODULE_PERIPH_USBDEV_HS_ULPI */
 }
-#endif
+#endif /* MCU_STM32 */
 
 static void _set_mode_device(dwc2_usb_otg_fshs_t *usbdev)
 {
@@ -693,11 +696,12 @@ static void _usbdev_init(usbdev_t *dev)
     if (conf->type == DWC2_USB_OTG_HS) {
         if (conf->phy == DWC2_USB_OTG_PHY_BUILTIN) {
             /* Disable the ULPI clock in low power mode, this is essential for the
-             * peripheral when using the built-in phy or UTMI phy */
+             * peripheral when using the built-in PHY */
             periph_lpclk_dis(conf->ahb, RCC_AHB1LPENR_OTGHSULPILPEN);
             /* select on-chip builtin PHY */
             _global_regs(usbdev->config)->GUSBCFG |= USB_OTG_GUSBCFG_PHYSEL;
         }
+
 #ifdef MODULE_PERIPH_USBDEV_HS_ULPI
         else if (conf->phy == DWC2_USB_OTG_PHY_ULPI) {
             /* initialize ULPI interface */
@@ -729,16 +733,18 @@ static void _usbdev_init(usbdev_t *dev)
             /* enable ULPI clock */
             periph_clk_en(conf->ahb, RCC_AHB1ENR_OTGHSULPIEN);
 
-#if !defined(MCU_STM32)
-            /* TODO following settings are required for DWC2 HS but are not
-             * defined for STM32 MCUs where these settings correspond to the
-             * reset value of the GUSBCFG register */
+#ifdef USB_OTG_GUSBCFG_ULPI_UTMI_SEL
             /* select ULPI PHY */
-            _global_regs(usbdev->config)->GUSBCFG |= USB_OTG_GUSBCFG_ULPI_UTMI_SEL
-            /* use the 8-bit interface and single data rate */
-            _global_regs(usbdev->config)->GUSBCFG &= ~(USB_OTG_GUSBCFG_PHYIF16 |
-                                                       USB_OTG_GUSBCFG_DDRSEL);
-#endif /* !defined(MCU_STM32) */
+            _global_regs(usbdev->config)->GUSBCFG |= USB_OTG_GUSBCFG_ULPI_UTMI_SEL;
+#endif
+#ifdef USB_OTG_GUSBCFG_PHYIF
+            /* use the 8-bit interface */
+            _global_regs(usbdev->config)->GUSBCFG &= ~USB_OTG_GUSBCFG_PHYIF;
+#endif /* USB_OTG_GUSBCFG_PHYIF */
+#ifdef USB_OTG_GUSBCFG_DDRSEL
+            /* use single data rate */
+            _global_regs(usbdev->config)->GUSBCFG &= ~USB_OTG_GUSBCFG_DDRSEL;
+#endif /* USB_OTG_GUSBCFG_DDRSEL */
 
             /* disable the on-chip FS transceiver */
             _global_regs(usbdev->config)->GUSBCFG &= ~USB_OTG_GUSBCFG_PHYSEL;
@@ -749,12 +755,76 @@ static void _usbdev_init(usbdev_t *dev)
             /* disable ULPI FS/LS serial interface */
             _global_regs(usbdev->config)->GUSBCFG &= ~USB_OTG_GUSBCFG_ULPIFSLS;
         }
+
+#elif defined(MODULE_PERIPH_USBDEV_HS_UTMI)
+        else if (conf->phy == DWC2_USB_OTG_PHY_UTMI) {
+            /* enable ULPI clock */
+            periph_clk_en(conf->ahb, RCC_AHB1ENR_OTGHSULPIEN);
+            /* enable UTMI HS PHY Controller clock */
+            periph_clk_en(APB2, RCC_APB2ENR_OTGPHYCEN);
+
+#ifdef USB_OTG_GUSBCFG_ULPI_UTMI_SEL
+            /* select UTMI+ PHY */
+            _global_regs(usbdev->config)->GUSBCFG &= ~USB_OTG_GUSBCFG_ULPI_UTMI_SEL;
+#endif /* USB_OTG_GUSBCFG_ULPI_UTMI_SEL */
+#ifdef USB_OTG_GUSBCFG_PHYIF
+            /* use the 8-bit interface and single data rate */
+            _global_regs(usbdev->config)->GUSBCFG &= ~USB_OTG_GUSBCFG_PHYIF;
+#endif /* USB_OTG_GUSBCFG_PHYIF */
+
+            /* disable the on-chip FS transceiver */
+            _global_regs(usbdev->config)->GUSBCFG &= ~USB_OTG_GUSBCFG_PHYSEL;
+
+            /* configure the USB HS PHY Controller (USB_HS_PHYC),
+             * USB_HS_PHYC and GCCFG are STM32 specific */
+#ifdef USB_HS_PHYC
+            /* enable USB HS PHY Controller */
+            _global_regs(usbdev->config)->GCCFG |= USB_OTG_GCCFG_PHYHSEN;
+
+            /* determine the PLL input clock of the USB HS PHY from HSE clock */
+            switch (CLOCK_HSE) {
+                case 12000000:
+                    USB_HS_PHYC->USB_HS_PHYC_PLL |= USB_HS_PHYC_PLL1_PLLSEL_12MHZ;
+                    break;
+                case 12500000:
+                    USB_HS_PHYC->USB_HS_PHYC_PLL |= USB_HS_PHYC_PLL1_PLLSEL_12_5MHZ;
+                    break;
+                case 16000000:
+                    USB_HS_PHYC->USB_HS_PHYC_PLL |= USB_HS_PHYC_PLL1_PLLSEL_16MHZ;
+                    break;
+                case 24000000:
+                    USB_HS_PHYC->USB_HS_PHYC_PLL |= USB_HS_PHYC_PLL1_PLLSEL_24MHZ;
+                    break;
+                case 25000000:
+                    USB_HS_PHYC->USB_HS_PHYC_PLL |= USB_HS_PHYC_PLL1_PLLSEL_25MHZ;
+                    break;
+                default:
+                    assert(0);
+            }
+
+            /* configure the tuning interface of the USB HS PHY */
+            USB_HS_PHYC->USB_HS_PHYC_TUNE |= conf->phy_tune;
+
+            /* check whether the LDO regulator is used by on the chip */
+            if (USB_HS_PHYC->USB_HS_PHYC_LDO & USB_HS_PHYC_LDO_USED) {
+                /* enable the LDO */
+                USB_HS_PHYC->USB_HS_PHYC_LDO |= USB_HS_PHYC_LDO_ENABLE;
+                /* wait until the LDO is ready */
+                while (!(USB_HS_PHYC->USB_HS_PHYC_LDO & USB_HS_PHYC_LDO_STATUS)) {}
+            }
+
+            /* enable the PLL of the USB HS PHY */
+            USB_HS_PHYC->USB_HS_PHYC_PLL |= USB_HS_PHYC_PLL_PLLEN;
+#endif /* USB_HS_PHYC */
+        }
+
 #else /* MODULE_PERIPH_USBDEV_HS_ULPI */
         else {
             /* only on-chip PHY support enabled */
             assert(conf->phy == DWC2_USB_OTG_PHY_BUILTIN);
         }
 #endif /* MODULE_PERIPH_USBDEV_HS_ULPI */
+
     }
 #endif /* DWC2_USB_OTG_HS_ENABLED */
 
@@ -782,14 +852,17 @@ static void _usbdev_init(usbdev_t *dev)
                                              USB_OTG_GOTGCTL_BVALOEN |
                                              USB_OTG_GOTGCTL_BVALOVAL;
 #endif /* defined(STM32_USB_OTG_CID_1x) */
-
     if (conf->phy == DWC2_USB_OTG_PHY_BUILTIN) {
         /* set `Power Down Disable` to activate the on-chip FS transceiver */
         _global_regs(usbdev->config)->GCCFG |= USB_OTG_GCCFG_PWRDWN;
     }
     else if (IS_USED(MODULE_PERIPH_USBDEV_HS_ULPI) && (conf->phy == DWC2_USB_OTG_PHY_ULPI)) {
         /* clear `Power Down Disable` to deactivate the on-chip FS transceiver */
-        _global_regs(usbdev->config)->GCCFG &= USB_OTG_GCCFG_PWRDWN;
+        _global_regs(usbdev->config)->GCCFG &= ~USB_OTG_GCCFG_PWRDWN;
+    }
+    else if (IS_USED(MODULE_PERIPH_USBDEV_HS_UTMI) && (conf->phy == DWC2_USB_OTG_PHY_UTMI)) {
+        /* clear `Power Down Disable` to deactivate the on-chip FS transceiver */
+        _global_regs(usbdev->config)->GCCFG &= ~USB_OTG_GCCFG_PWRDWN;
     }
 
 #elif defined(MCU_ESP32)
