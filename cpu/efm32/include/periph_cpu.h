@@ -125,10 +125,9 @@ typedef struct {
  * @{
  */
 /* RTT_MAX_VALUE some are 24bit, some are 32bit */
-#ifdef _RTC_CNT_MASK
+#if defined(_RTC_CNT_MASK)
 #define RTT_MAX_VALUE       _RTC_CNT_MASK        /* mask has all bits set ==> MAX*/
-#endif
-#ifdef _RTCC_CNT_MASK
+#elif defined(_RTCC_CNT_MASK)
 #define RTT_MAX_VALUE       _RTCC_CNT_MASK       /* mask has all bits set ==> MAX*/
 #endif
 #define RTT_MAX_FREQUENCY   (32768U)             /* in Hz */
