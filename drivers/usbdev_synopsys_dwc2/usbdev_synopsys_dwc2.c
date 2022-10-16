@@ -47,6 +47,8 @@
 #include "usbdev_stm32.h"
 #elif defined(MCU_ESP32)
 #include "usbdev_esp32.h"
+#elif defined(MCU_EFM32)
+#include "usbdev_efm32.h"
 #else
 #error "MCU not supported"
 #endif
@@ -578,15 +580,29 @@ static void _sleep_periph(const dwc2_usb_otg_fshs_config_t *conf)
     /* Unblocking STM32_PM_STOP during suspend on the stm32f446 breaks
      * while (un)blocking works on the stm32f401, needs more
      * investigation with a larger set of chips */
-#ifdef STM32_USB_OTG_CID_1x
+#if defined(STM32_USB_OTG_CID_1x)
     pm_unblock(STM32_PM_STOP);
+#elif defined(MCU_EFM32)
+    /* switch USB core clock source either to LFXO or LFRCO */
+    CMU_ClockSelectSet(cmuClock_USB, CLOCK_LFA);
+    pm_unblock(EFM32_PM_MODE_EM2);
 #endif
 }
 
 static void _wake_periph(const dwc2_usb_otg_fshs_config_t *conf)
 {
-#ifdef STM32_USB_OTG_CID_1x
+#if defined(STM32_USB_OTG_CID_1x)
     pm_block(STM32_PM_STOP);
+#elif defined(MCU_EFM32)
+    pm_block(EFM32_PM_MODE_EM2);
+    /* switch USB core clock source either to USHFRCO or HFCLK */
+#if defined(CPU_FAM_EFM32GG12B)
+    CMU_ClockSelectSet(cmuClock_USB, cmuSelect_USHFRCO);
+#elif defined(CPU_FAM_EFM32GG) || defined(CPU_FAM_EFM32LG)
+    CMU_ClockSelectSet(cmuClock_USB, cmuSelect_HFCLK);
+#else
+#error "EFM32 family not yet supported"
+#endif
 #endif
     *_pcgcctl_reg(conf) &= ~USB_OTG_PCGCCTL_STOPCLK;
     _flush_rx_fifo(conf);
@@ -648,6 +664,7 @@ static void _usbdev_init(usbdev_t *dev)
     const dwc2_usb_otg_fshs_config_t *conf = usbdev->config;
 
 #if defined(MCU_STM32)
+
     /* Block both STOP and STANDBY, STOP is unblocked during USB suspend
      * status */
     pm_block(STM32_PM_STOP);
@@ -662,7 +679,9 @@ static void _usbdev_init(usbdev_t *dev)
     periph_clk_en(conf->ahb, conf->rcc_mask);
 
     _enable_gpio(conf);
+
 #elif defined(MCU_ESP32)
+
     usb_phy_handle_t phy_hdl;               /* only needed temporarily */
 
     usb_phy_config_t phy_conf = {
@@ -674,6 +693,42 @@ static void _usbdev_init(usbdev_t *dev)
     if (usb_new_phy(&phy_conf, &phy_hdl) != ESP_OK) {
         LOG_ERROR("usbdev: Install USB PHY failed\n");
     }
+
+#elif defined(MCU_EFM32)
+
+    /* Block EM2 and EM3. In EM2, most USB core registers are reset and the
+     * FIFO content is lost. EM2 is unblocked during USB suspend */
+    pm_block(EFM32_PM_MODE_EM3);
+    pm_block(EFM32_PM_MODE_EM2);
+
+#if defined(CPU_FAM_EFM32GG12B)
+    /* select USHFRCO as USB clock and set the tuning to 48 MHz */
+    CMU_ClockSelectSet(cmuClock_USB, cmuSelect_USHFRCO);
+    CMU_USHFRCOBandSet(cmuUSHFRCOFreq_48M0Hz);
+    /* enable USB clock recovery */
+    CMU->USBCRCTRL = CMU_USBCRCTRL_USBCREN;
+    /* select USHFRCO as USB rate clock source and enable it */
+    CMU_ClockSelectSet(cmuClock_USBR, cmuSelect_USHFRCO);
+    CMU_ClockEnable(cmuClock_USBR, true);
+#elif defined(CPU_FAM_EFM32GG) || defined(CPU_FAM_EFM32LG)
+    /* select HFCLK as USB PHY clock source */
+    CMU_ClockSelectSet(cmuClock_USB, cmuSelect_HFCLK);
+    /* enable USB system clock */
+    CMU_ClockEnable(cmuClock_USB, true);
+    /* enable USB core clock */
+    CMU_ClockEnable(cmuClock_USBC, true);
+#else
+#error "EFM32 family not yet supported"
+#endif
+
+    /* enable USB peripheral clock */
+    CMU_ClockEnable(cmuClock_USB, true);
+
+    /* USB PHY is enabled before core reset */
+    USB->ROUTE = USB_ROUTE_PHYPEN;
+    /* USB VBUSEN pin is not yet used */
+    /* USB_ROUTELOC0 = location */
+
 #else
 #error "MCU not supported"
 #endif
@@ -851,7 +906,8 @@ static void _usbdev_init(usbdev_t *dev)
         _global_regs(usbdev->config)->GCCFG &= ~USB_OTG_GCCFG_PWRDWN;
     }
 
-#elif defined(MCU_ESP32)
+#elif defined(MCU_ESP32) || defined(MCU_EFM32)
+
     /* Force Vbus Detect values and ID detect values to device mode */
     _global_regs(usbdev->config)->GOTGCTL |= USB_OTG_GOTGCTL_VBVALOVAL |
                                              USB_OTG_GOTGCTL_VBVALOEN |
@@ -933,6 +989,9 @@ static void _usbdev_init(usbdev_t *dev)
 #if defined(MCU_STM32)
     /* Unmask the interrupt in the NVIC */
     NVIC_EnableIRQ(conf->irqn);
+#elif defined(MCU_EFM32)
+    /* Unmask the interrupt in the NVIC */
+    NVIC_EnableIRQ(USB_IRQn);
 #elif defined(MCU_ESP32)
     void isr_otg_fs(void *arg);
     /* Allocate the interrupt and connect it with USB interrupt source */
@@ -1249,11 +1308,16 @@ static void _read_packet(dwc2_usb_otg_fshs_out_ep_t *st_ep)
                  USB_OTG_GRXSTSP_BCNT_Pos;
 
     /* Packet is copied on the update status and copied on the transfer
-     * complete status*/
+     * complete status */
     if (pkt_status == DWC2_PKTSTS_DATA_UPDT ||
         pkt_status == DWC2_PKTSTS_SETUP_UPDT) {
+#if defined(MCU_EFM32)
+        /* TODO For some reason a short delay is required here on EFM32. It has
+         * to be investigated further. A delay of 1 msec is inserted for now. */
+        ztimer_sleep(ZTIMER_MSEC, 1);
+#endif
         _copy_rxfifo(usbdev, st_ep->out_buf, len);
-#if defined(STM32_USB_OTG_CID_2x) || defined(MCU_ESP32)
+#if !defined(STM32_USB_OTG_CID_1x)
         /* CID 2x doesn't signal SETUP_COMP on non-zero length packets, signal
          * the TR_COMPLETE event immediately */
         if (st_ep->ep.num == 0 && len) {
@@ -1394,7 +1458,7 @@ void isr_otg_fs(void *arg)
 
     _isr_common(usbdev);
 }
-#endif /* ESP32_USB_OTG_FS_ENABLED */
+#endif /* DWC2_USB_OTG_FS_ENABLED */
 
 #ifdef DWC2_USB_OTG_HS_ENABLED
 void isr_otg_hs(void *arg)
@@ -1406,7 +1470,17 @@ void isr_otg_hs(void *arg)
 
     _isr_common(usbdev);
 }
-#endif /* ESP32_USB_OTG_HS_ENABLED */
+#endif /* DWC2_USB_OTG_HS_ENABLED */
+
+#elif defined(MCU_EFM32)
+
+ void isr_usb(void)
+{
+    /* Take the first device from the list */
+    dwc2_usb_otg_fshs_t *usbdev = &_usbdevs[0];
+
+    _isr_common(usbdev);
+}
 
 #else
 #error "MCU not supported"
