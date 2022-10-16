@@ -9,6 +9,8 @@ include $(RIOTCPU)/efm32/families/$(CPU_FAM)/Makefile.include
 # Export vars for Gecko SDK librail Makefile
 export EFM32_LIBRAIL_BLOB_NAME
 
+INCLUDES += -I$(RIOTCPU)/efm32/include/vendor
+
 ifeq (,$(EFM32_HEADER))
   $(error Header file for $(CPU_MODEL) is missing)
 endif
