@@ -81,7 +81,7 @@ extern "C" {
 /**
  * @brief USB OTG FS FIFO reception buffer space in 32-bit words
  *
- * Used as shared FIFO for reception of all OUT transfers
+ * Used as shared FIFO for reception of all OUT transfers from the host
  *
  * @note The application might have to increase this when dealing with large
  *       isochronous transfers
@@ -98,6 +98,38 @@ extern "C" {
 #ifndef DWC2_USB_OTG_HS_RX_FIFO_SIZE
 #define DWC2_USB_OTG_HS_RX_FIFO_SIZE   (512U)
 #endif
+
+/**
+ * @brief USB OTG FS FIFO total size
+ *
+ * Some device families (F7 and L4) forgot to define the FS device FIFO size
+ * in their vendor headers. This define sets it to the value from the
+ * reference manual.
+ */
+#ifndef USB_OTG_FS_TOTAL_FIFO_SIZE
+#define USB_OTG_FS_TOTAL_FIFO_SIZE      (1280U)
+#endif
+
+/**
+ * @brief USB OTG FS FIFO total size
+ *
+ * Some device families (F7 and L4) forgot to define the HS device FIFO size
+ * in their vendor headers. This define sets it to the value from the
+ * reference manual.
+ */
+#ifndef USB_OTG_HS_TOTAL_FIFO_SIZE
+#define USB_OTG_HS_TOTAL_FIFO_SIZE      (4096U)
+#endif
+
+/**
+ * @brief USB OTG FS FIFO total size
+ */
+#define DWC2_USB_OTG_FS_TOTAL_FIFO_SIZE USB_OTG_FS_TOTAL_FIFO_SIZE
+
+/**
+ * @brief USB OTG HS FIFO total size
+ */
+#define DWC2_USB_OTG_HS_TOTAL_FIFO_SIZE USB_OTG_HS_TOTAL_FIFO_SIZE
 
 /**
  * @brief Use the built-in DMA controller of the HS peripheral when possible

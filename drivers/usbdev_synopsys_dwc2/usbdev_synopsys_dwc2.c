@@ -93,20 +93,6 @@
 #define DWC2_PKTSTS_SETUP_COMP     0x04    /**< Rx fifo setup complete */
 #define DWC2_PKTSTS_SETUP_UPDT     0x06    /**< Rx fifo setup update   */
 
-/* Some device families (F7 and L4) forgot to define the FS device FIFO size  *
- * in their vendor headers. This define sets it to the value from the         *
- * reference manual                                                           */
-#ifndef USB_OTG_FS_TOTAL_FIFO_SIZE
-#define USB_OTG_FS_TOTAL_FIFO_SIZE      (1280U)
-#endif
-
-/* Some device families (F7 and L4) forgot to define the HS device FIFO size  *
- * in their vendor headers. This define sets it to the value from the         *
- * reference manual                                                           */
-#ifndef USB_OTG_HS_TOTAL_FIFO_SIZE
-#define USB_OTG_HS_TOTAL_FIFO_SIZE      (4096U)
-#endif
-
 /* minimum depth of an individual transmit FIFO */
 #define DWC2_USB_OTG_FIFO_MIN_WORD_SIZE (16U)
 /* Offset for OUT endpoints in a shared IN/OUT endpoint bit flag register */
@@ -472,14 +458,14 @@ static size_t _total_fifo_size(const dwc2_usb_otg_fshs_config_t *conf)
 {
     if (conf->type == DWC2_USB_OTG_FS) {
 #ifdef DWC2_USB_OTG_FS_ENABLED
-        return USB_OTG_FS_TOTAL_FIFO_SIZE;
+        return DWC2_USB_OTG_FS_TOTAL_FIFO_SIZE;
 #else
         return 0;
 #endif  /* DWC2_USB_OTG_FS_ENABLED */
     }
     else {
 #ifdef DWC2_USB_OTG_HS_ENABLED
-        return USB_OTG_HS_TOTAL_FIFO_SIZE;
+        return DWC2_USB_OTG_HS_TOTAL_FIFO_SIZE;
 #else
         return 0;
 #endif  /* DWC2_USB_OTG_HS_ENABLED */
