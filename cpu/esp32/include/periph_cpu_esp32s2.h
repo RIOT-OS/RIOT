@@ -264,9 +264,7 @@ extern "C" {
 /**
  * @brief   Total size of the FIFO
  */
-#ifndef DWC2_USB_OTG_FS_TOTAL_FIFO_SIZE
 #define DWC2_USB_OTG_FS_TOTAL_FIFO_SIZE (1024U)
-#endif
 
 /**
  * @brief   Buffers have to be word aligned for DMA
