@@ -866,8 +866,7 @@ static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *src_pdu,
                 break;
             }
         } else if (coap_get_token_len(memo_pdu) == cmplen) {
-            memo_pdu->token = coap_hdr_data_ptr(memo_pdu->hdr);
-            if ((memcmp(coap_get_token(src_pdu), memo_pdu->token, cmplen) == 0)
+            if ((memcmp(coap_get_token(src_pdu), coap_get_token(memo_pdu), cmplen) == 0)
                     && (sock_udp_ep_equal(&memo->remote_ep, remote)
                       /* Multicast addresses are not considered in matching responses */
                       || _memo_ep_is_multicast(memo)
@@ -978,15 +977,14 @@ static int _find_obs_memo(gcoap_observe_memo_t **memo, sock_udp_ep_t *remote,
                 *memo = &_coap_state.observe_memos[i];
                 break;
             }
-
-            if (_coap_state.observe_memos[i].token_len == coap_get_token_len(pdu)) {
-                unsigned cmplen = _coap_state.observe_memos[i].token_len;
-                if (cmplen &&
-                        memcmp(&_coap_state.observe_memos[i].token[0], &pdu->token[0],
-                                                                       cmplen) == 0) {
-                    *memo = &_coap_state.observe_memos[i];
-                    break;
-                }
+            unsigned memo_token_len = _coap_state.observe_memos[i].token_len;
+            if (memo_token_len == coap_get_token_len(pdu)
+                && memo_token_len
+                && memcmp(&_coap_state.observe_memos[i].token[0],
+                          coap_get_token(pdu),
+                          memo_token_len) == 0) {
+                *memo = &_coap_state.observe_memos[i];
+                break;
             }
         }
     }

@@ -256,7 +256,6 @@ static int _request_cb(void *arg, coap_pkt_t *pkt)
     memcpy(buf->iov_base, pkt->hdr, pkt_len);
 
     pkt->hdr = buf->iov_base;
-    pkt->token  = (uint8_t*)pkt->hdr + sizeof(coap_hdr_t);
     pkt->payload = (uint8_t*)pkt->hdr + (pkt_len - pkt->payload_len);
 
     return pkt_len;
