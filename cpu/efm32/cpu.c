@@ -26,6 +26,7 @@
 
 #include "em_chip.h"
 #include "em_cmu.h"
+#include "em_dbg.h"
 #include "em_emu.h"
 
 /**
@@ -159,6 +160,11 @@ static void pm_init(void)
     EMU_EM4Init_TypeDef init_em4 = EMU_EM4INIT;
 
     EMU_EM4Init(&init_em4);
+#endif
+
+#if defined(DEVELHELP) && defined(EMU_CTRL_EM2DBGEN)
+    /* make sure to keep the debug unit active in develhelp */
+    DBG_EM2DebugEnable(true);
 #endif
 }
 
