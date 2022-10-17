@@ -1,0 +1,18 @@
+/**
+ * @defgroup    boards_xg23b-pk6068a xG23B-PK6068A
+ * @ingroup     boards
+ * @brief       Support for the xG23B-PK6068A board.
+ *
+ * ### General information
+ *
+ * Some general information about the board
+ *
+ * ### Pinout
+ *
+ * A detailed description of the board pinout (if available)
+ *
+ * ### Flash the board
+ *
+ * Some notes about how to flash the board
+ *
+ */
