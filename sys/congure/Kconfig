@@ -9,6 +9,7 @@ menu "CongURE congestion control abstraction"
     depends on USEMODULE_CONGURE
 
 rsource "mock/Kconfig"
+rsource "quic/Kconfig"
 rsource "reno/Kconfig"
 rsource "test/Kconfig"
 
@@ -23,6 +24,7 @@ menuconfig MODULE_CONGURE
 if MODULE_CONGURE
 
 rsource "mock/Kconfig"
+rsource "quic/Kconfig"
 rsource "reno/Kconfig"
 rsource "test/Kconfig"
 
