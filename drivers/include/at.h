@@ -249,6 +249,27 @@ int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout
 ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command, char *resp_buf, size_t len, uint32_t timeout);
 
 /**
+ * @brief   Send AT command, wait for response plus OK
+ *
+ * This function sends the supplied @p command, then waits and returns one
+ * line of response.
+ *
+ * A possible empty line will be skipped.
+ *
+ * @param[in]   dev         device to operate on
+ * @param[in]   command     command to send
+ * @param[in]   resp_prefix expected prefix in the response
+ * @param[out]  resp_buf    buffer for storing response
+ * @param[in]   len         len of @p buffer
+ * @param[in]   timeout     timeout (in usec)
+ *
+ * @returns     length of response on success
+ * @returns     <0 on error
+ */
+ssize_t at_send_cmd_get_resp_wait_ok(at_dev_t *dev, const char *command, const char *resp_prefix,
+                                     char *resp_buf, size_t len, uint32_t timeout);
+
+/**
  * @brief   Send AT command, wait for multiline response
  *
  * This function sends the supplied @p command, then returns all response

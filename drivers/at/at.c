@@ -228,6 +228,56 @@ out:
     return res;
 }
 
+ssize_t at_send_cmd_get_resp_wait_ok(at_dev_t *dev, const char *command, const char *resp_prefix,
+                                     char *resp_buf, size_t len, uint32_t timeout)
+{
+    ssize_t res;
+    ssize_t res_ok;
+    char ok_buf[64];
+
+    at_drain(dev);
+
+    res = at_send_cmd(dev, command, timeout);
+    if (res) {
+        goto out;
+    }
+
+    res = at_readline(dev, resp_buf, len, false, timeout);
+    if (res == 0) {
+        /* skip possible empty line */
+        res = at_readline(dev, resp_buf, len, false, timeout);
+    }
+
+    /* Strip the expected prefix */
+    if (res > 0 && resp_prefix && *resp_prefix) {
+        size_t prefix_len = strlen(resp_prefix);
+        if (strncmp(resp_buf, resp_prefix, prefix_len) == 0) {
+            size_t remaining_len = strlen(resp_buf) - prefix_len;
+            /* The one extra byte in the copy is the terminating nul byte */
+            memmove(resp_buf, resp_buf + prefix_len, remaining_len + 1);
+            res -= prefix_len;
+        }
+    }
+
+    /* wait for OK */
+    if (res >= 0) {
+        res_ok = at_readline(dev, ok_buf, sizeof(ok_buf), false, timeout);
+        if (res_ok == 0) {
+            /* skip possible empty line */
+            res_ok = at_readline(dev, ok_buf, sizeof(ok_buf), false, timeout);
+        }
+        ssize_t len_ok = sizeof(CONFIG_AT_RECV_OK) - 1;
+        if ((len_ok != 0) && (strcmp(ok_buf, CONFIG_AT_RECV_OK) == 0)) {
+        }
+        else {
+            /* Something else then OK */
+            res = -1;
+        }
+    }
+out:
+    return res;
+}
+
 ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command,
                               char *resp_buf, size_t len, bool keep_eol, uint32_t timeout)
 {
