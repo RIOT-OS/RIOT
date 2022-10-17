@@ -67,7 +67,18 @@ Murdock currently runs in three instances:
 
 # RIOT HiL
 
-TBD
+The [RIOT HiL] CI tests a subset of supported RIOT boards connected to
+external peripheral testing hardware ([PHiLIP]). Nightly tests are run
+on all Robot Framework tests on all available boards. Specific boards
+and both Robot Framework tests or RIOT tests can be executed via RIOT
+HiL maintainers. These tests focus on the physical aspect of peripheral
+interaction, testing peripherals such as SPI, I2C, UART, etc.
+
+- [RIOT HiL Jenkins] is used for the coordination of the tests
+- [Robot Framework tests] is the test repo
+- List of [RIOT HiL supported boards]
+- [RIOT HiL] nightly results
+- Information about [PHiLIP]
 
 # GitHub Action Workflows
 
@@ -93,6 +104,10 @@ TBD
 [boards]: @ref boards
 [Murdock]: https://ci.riot-os.org
 [RIOT HiL]: https://hil.riot-os.org
+[PHiLIP]: https://philip.riot-apps.net/
+[RIOT HiL supported boards]: https://hil.riot-os.org/jenkins/labelsdashboard/
+[RIOT HiL Jenkins]: https://hil.riot-os.org/jenkins/
+[Robot Framework tests]: https://github.com/RIOT-OS/RobotFW-tests
 [GitHub Action Workflows]: https://github.com/RIOT-OS/RIOT/actions
 [check-pr]: https://github.com/RIOT-OS/RIOT/actions/workflows/check-pr.yml
 [pr-labeler]: https://github.com/RIOT-OS/RIOT/actions/workflows/labeler.yml
