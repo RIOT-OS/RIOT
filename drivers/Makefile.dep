@@ -209,6 +209,7 @@ endif
 
 ifneq (,$(filter usbdev_synopsys_dwc2,$(USEMODULE)))
   FEATURES_REQUIRED += periph_usbdev
+  USEMODULE += ztimer_msec
 endif
 
 ifneq (,$(filter vcnl40%0,$(USEMODULE)))
