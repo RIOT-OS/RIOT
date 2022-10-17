@@ -2,6 +2,10 @@
 # end of the dependency loop. They MAY inlcude new modules, but this modules
 # MUST NOT have dependencies themselfs.
 
+ifneq (,$(filter auto_init%,$(USEMODULE)))
+  USEMODULE += preprocessor preprocessor_successor
+endif
+
 ifneq (,$(filter auto_init_ztimer,$(USEMODULE)))
   USEMODULE += ztimer_init
 endif

@@ -173,6 +173,9 @@ endif
 ifneq (,$(filter pthread,$(USEMODULE)))
   DIRS += posix/pthread
 endif
+ifneq (,$(filter preprocessor_%,$(USEMODULE)))
+  DIRS += preprocessor
+endif
 ifneq (,$(filter routing,$(USEMODULE)))
   DIRS += net/routing
 endif
