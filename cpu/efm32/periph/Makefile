@@ -18,6 +18,15 @@ ifneq (,$(filter periph_rtt,$(USEMODULE)))
   endif
 endif
 
+# Select the correct implementation for `periph_uart`
+ifneq (,$(filter periph_uart,$(USEMODULE)))
+  ifeq (2,$(EFM32_SERIES))
+    SRC += uart_series2.c
+  else ifneq (,$(filter $(EFM32_SERIES),0 1))
+    SRC += uart_series01.c
+  endif
+endif
+
 # Select the correct implementation for `periph_wdt`
 ifneq (,$(filter periph_wdt,$(USEMODULE)))
   ifeq (0,$(EFM32_SERIES))
