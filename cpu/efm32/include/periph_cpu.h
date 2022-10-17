@@ -456,6 +456,15 @@ typedef struct {
 #define PM_NUM_MODES    (3U)
 
 /**
+ * @name   Available power modes
+ * @{
+ */
+#define EFM32_PM_MODE_EM3  (0U)  /**< CPU sleeps, peripherals in EM3 domain are active */
+#define EFM32_PM_MODE_EM2  (1U)  /**< CPU sleeps, peripherals in EM2 + EM3 domain are active */
+#define EFM32_PM_MODE_EM1  (2U)  /**< CPU sleeps, all peripherals are active */
+/** @} */
+
+/**
  * @name    Watchdog timer (WDT) configuration
  * @{
  */
