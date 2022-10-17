@@ -456,7 +456,9 @@ typedef struct {
     void *dev;              /**< UART, USART or LEUART device used */
     gpio_t rx_pin;          /**< pin used for RX */
     gpio_t tx_pin;          /**< pin used for TX */
+#if defined(_SILICON_LABS_32B_SERIES_0) || defined(_SILICON_LABS_32B_SERIES_1) || defined(DOXYGEN)
     uint32_t loc;           /**< location of UART pins */
+#endif
     CMU_Clock_TypeDef cmu;  /**< the device CMU channel */
     IRQn_Type irq;          /**< the devices base IRQ channel */
 } uart_conf_t;
