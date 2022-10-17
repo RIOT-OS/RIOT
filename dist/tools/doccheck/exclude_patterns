@@ -13092,3 +13092,21 @@ boards/esp32\-ttgo\-t\-beam/doc\.txt:[0-9]+: warning: unable to resolve referenc
 boards/esp32\-wemos\-lolin\-d32\-pro/doc\.txt:[0-9]+: warning: explicit link request to 'esp32_wemos_lolin_d32_pro_optional_hardware' could not be resolved
 drivers/include/xbee\.h:[0-9]+: warning: found documented return type for xbee_setup that does not return anything
 boards/nrf52840dongle/doc\.txt:[0-9]+: warning: unable to resolve reference to 'nrf52840dongle_flash' for \\ref command
+boards/sltb009a/include/board\.h:[0-9]+: warning: Member XTIMER_[A-Z]+ \(macro definition\) of file board\.h is not documented.
+boards/sltb009a/include/board\.h:[0-9]+: warning: Member VCOM_EN_PIN \(macro definition\) of file board\.h is not documented.
+boards/sltb009a/include/board\.h:[0-9]+: warning: Member PB[0-1]_PIN \(macro definition) of file board\.h is not documented.
+boards/sltb009a/include/board\.h:[0-9]+: warning: Member LED[0-1][RGB]_PIN \(macro definition) of file board\.h is not documented.
+boards/sltb009a/include/board\.h:[0-9]+: warning: Member CORETEMP_ADC \(macro definition\) of file board\.h is not
+boards/sltb009a/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_[A-Z_]+ \(macro definition) of file periph_conf\.h is not documented.
+boards/sltb009a/include/periph_conf\.h:[0-9]+: warning: Member ADC_[A-Z_]+ \(macro definition) of file periph_conf\.h is not documented.
+boards/sltb009a/include/periph_conf\.h:[0-9]+: warning: Member adc_config\[\] \(variable) of file periph_conf\.h is not documented.
+boards/sltb009a/include/periph_conf\.h:[0-9]+: warning: Member adc_channel_config\[\] \(variable) of file periph_conf\.h is not documented.
+boards/sltb009a/include/periph_conf\.h:[0-9]+: warning: Member I2C_[A-Z0-9_]+ \(macro definition) of file periph_conf\.h is not documented.
+boards/sltb009a/include/periph_conf\.h:[0-9]+: warning: Member i2c_config\[\] \(variable) of file periph_conf\.h is not documented.
+boards/sltb009a/include/periph_conf\.h:[0-9]+: warning: Member RTT_FREQUENCY \(macro definition) of file periph_conf\.h is not documented.
+boards/sltb009a/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition) of file periph_conf\.h is not documented.
+boards/sltb009a/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable) of file periph_conf\.h is not documented.
+boards/sltb009a/include/periph_conf\.h:[0-9]+: warning: Member TIMER_[A-Z0-9_]+ \(macro definition) of file periph_conf\.h is not documented.
+boards/sltb009a/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable) of file periph_conf\.h is not documented.
+boards/sltb009a/include/periph_conf\.h:[0-9]+: warning: Member UART_[A-Z0-9_]+ \(macro definition) of file periph_conf\.h is not documented.
+boards/sltb009a/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable) of file periph_conf\.h is not documented.
