@@ -41,6 +41,22 @@
 extern "C" {
 #endif
 
+/**
+ * @brief   Clock mux configuration
+ */
+typedef struct {
+    CMU_Clock_TypeDef clk;   /**< Clock domain */
+    CMU_Select_TypeDef src;  /**< Source clock */
+} clk_mux_t;
+
+/**
+ * @brief   Clock divider configuration
+ */
+typedef struct {
+    CMU_Clock_TypeDef clk;   /**< Clock domain */
+    CMU_ClkDiv_TypeDef div;  /**< Divisor */
+} clk_div_t;
+
 #if (defined(ADC_COUNT) && (ADC_COUNT > 0)) || defined(DOXYGEN)
 /**
  * @brief   Internal macro for combining ADC resolution (x) with number of
