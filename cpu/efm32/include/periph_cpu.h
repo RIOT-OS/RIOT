@@ -41,6 +41,7 @@
 extern "C" {
 #endif
 
+#if (defined(ADC_COUNT) && (ADC_COUNT > 0)) || defined(DOXYGEN)
 /**
  * @brief   Internal macro for combining ADC resolution (x) with number of
  *          shifts (y).
@@ -90,6 +91,7 @@ typedef struct {
     ADC_Ref_TypeDef reference;        /**< channel voltage reference */
     ADC_AcqTime_TypeDef acq_time;     /**< channel acquisition time */
 } adc_chan_conf_t;
+#endif
 
 /**
  * @brief   Length of CPU ID in octets.
