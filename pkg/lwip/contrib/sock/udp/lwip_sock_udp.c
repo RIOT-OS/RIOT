@@ -42,10 +42,10 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
                                 NETCONN_UDP)) == 0) {
         sock->base.conn = tmp;
 
-        if (IS_USED(MODULE_SOCK_AUX_PEEK)) {
-            sock->last_buf = NULL;
-            sock->peek_buf_avail = false;
-        }
+#if IS_USED(MODULE_SOCK_AUX_PEEK)
+        sock->last_buf = NULL;
+        sock->peek_buf_avail = false;
+#endif
 
 #if IS_ACTIVE(SOCK_HAS_ASYNC)
         sock->base.async_cb.gen = NULL;
@@ -146,6 +146,8 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **ctx,
     assert((sock != NULL) && (data != NULL) && (ctx != NULL));
 
     bool peek = false;
+    (void)peek;
+
     if (aux != NULL) {
         if (IS_USED(MODULE_SOCK_AUX_PEEK)) {
             peek = aux->flags & SOCK_AUX_PEEK;
@@ -153,12 +155,17 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **ctx,
         }
     }
 
+#if IS_USED(MODULE_SOCK_AUX_PEEK)
     buf = sock->last_buf;
+#else
+    buf = *ctx;
+#endif
 
     if (buf != NULL) {
         if (netbuf_next(buf) == -1) { /* check for next part in chain */
             /* this is the last part of the chain (and maybe also the first) */
 
+#if IS_USED(MODULE_SOCK_AUX_PEEK)
             if (sock->peek_buf_avail && IS_USED(MODULE_SOCK_AUX_PEEK)) { /* first element in the chain */
                 /* return data from buffer fetched from sock */
                 sock->peek_buf_avail = false;
@@ -194,6 +201,17 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **ctx,
 
             return res;
         }
+#else
+            *data = NULL;
+            netbuf_delete(buf);
+            *ctx = NULL;
+            return 0;
+        }
+        else {
+            *data = buf->ptr->payload;
+            return buf->ptr->len;
+        }
+#endif
     }
 
     if ((res = lwip_sock_recv(sock->base.conn, timeout, &buf)) < 0) {
@@ -240,14 +258,14 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **ctx,
 #endif /* MODULE_SOCK_AUX_LOCAL */
     }
 
-    *ctx = buf;
-    sock->last_buf = buf;
-
     *data = buf->ptr->payload;
-    res = (ssize_t)buf->ptr->len;
+    *ctx = buf;
 
+#if IS_USED(MODULE_SOCK_AUX_PEEK)
+    sock->last_buf = buf;
+#endif
 
-    return res;
+    return (ssize_t)buf->ptr->len;
 }
 
 ssize_t sock_udp_sendv_aux(sock_udp_t *sock, const iolist_t *snips,
