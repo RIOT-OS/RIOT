@@ -97,8 +97,20 @@ ssize_t sock_udp_recv_aux(sock_udp_t *sock, void *data, size_t max_len,
     }
 
     assert((sock != NULL) && (data != NULL) && (max_len > 0));
+    const void *old_ctx = ctx;
     while ((res = sock_udp_recv_buf_aux(sock, &pkt, (void**)&ctx, timeout,
                                         remote, aux)) > 0) {
+
+        /* sock_udp_recv_buf() is supposed to return multiple packet fragments
+         * when called multiple times with the same context.
+         * In practise, this is not implemented and it will always return a pointer
+         * to the whole packet on the first call and NULL on the second call, which
+         * releases the packet.
+         * This assertion will trigger should the behavior change in the future.
+         */
+        if (old_ctx) {
+            assert(res == 0 && ctx == NULL);
+        }
 
         if (peek) {
             /* SOCK_AUX_PEEK was unset in previous call of sock_udp_recv_buf_aux */
