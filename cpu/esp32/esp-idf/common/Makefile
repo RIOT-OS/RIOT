@@ -25,11 +25,13 @@ ESP32_SDK_SRC = \
   components/esp_system/port/soc/$(CPU_FAM)/cache_err_int.c \
   components/esp_system/port/soc/$(CPU_FAM)/clk.c \
   components/esp_system/port/soc/$(CPU_FAM)/reset_reason.c \
+  components/esp_system/port/soc/$(CPU_FAM)/system_internal.c \
   components/esp_system/system_time.c \
   components/esp_timer/src/esp_timer.c \
   components/esp_timer/src/system_time.c \
   components/hal/cpu_hal.c \
   components/hal/mpu_hal.c \
+  components/hal/soc_hal.c \
   components/hal/timer_hal.c \
   components/hal/uart_hal.c \
   components/hal/wdt_hal_iram.c \

@@ -1,7 +1,7 @@
-From 25509b8b61b329d3c4ae5b3874704dae55d62ccd Mon Sep 17 00:00:00 2001
-From: Gunar Schorcht <gunar@schorcht.net>
-Date: Tue, 8 Mar 2022 11:34:13 +0100
-Subject: [PATCH 15/17] driver/i2c: remove the include gpio.h in i2c.h header
+From 30efe1c3049b34bba70d6496d3d5f6d0489433ae Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benjamin.valentin@ml-pa.com>
+Date: Tue, 18 Oct 2022 19:17:28 +0200
+Subject: [PATCH 15/27] driver/i2c: remove the include gpio.h in i2c.h header
 
 Including driver/i2c.h by RIOT code leads to type conflicts with RIOT gpio_t type.
 ---
@@ -10,19 +10,19 @@ Including driver/i2c.h by RIOT code leads to type conflicts with RIOT gpio_t typ
  2 files changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/components/driver/i2c.c b/components/driver/i2c.c
-index 438d1efc12d..be26fdeffc3 100644
+index d7bf4b95..072d039f 100644
 --- a/components/driver/i2c.c
 +++ b/components/driver/i2c.c
-@@ -21,6 +21,7 @@
- #include "hal/i2c_hal.h"
- #include "hal/gpio_hal.h"
- #include "soc/i2c_periph.h"
-+#include "driver/gpio.h"
- #include "driver/i2c.h"
- #include "driver/periph_ctrl.h"
+@@ -26,6 +26,7 @@
  #include "esp_rom_gpio.h"
+ #include "esp_rom_sys.h"
+ #include <sys/param.h>
++#include "driver/gpio.h"
+ 
+ static const char *I2C_TAG = "i2c";
+ 
 diff --git a/components/driver/include/driver/i2c.h b/components/driver/include/driver/i2c.h
-index 22dcc8ab241..e668bba2acd 100644
+index 57d9091e..c55e5f4f 100644
 --- a/components/driver/include/driver/i2c.h
 +++ b/components/driver/include/driver/i2c.h
 @@ -19,7 +19,6 @@ extern "C" {
@@ -34,5 +34,5 @@ index 22dcc8ab241..e668bba2acd 100644
  #include "hal/i2c_types.h"
  
 -- 
-2.17.1
+2.34.1
 
