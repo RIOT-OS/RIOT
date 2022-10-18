@@ -385,21 +385,33 @@ typedef struct {
 /**
  * @brief   Define timer configuration values
  *
- * @note    The two timers must be adjacent to each other (e.g. TIMER0 and
- *          TIMER1, or TIMER2 and TIMER3, etc.).
+ * @note    For the configuration of series 0 and 1, prescale and actual timer
+ *          must be adjacent to each other (e.g. TIMER0 and TIMER1, or TIMER2
+ *          and TIMER3, etc.).
  * @{
  */
+#if defined(_SILICON_LABS_32B_SERIES_0) || defined(_SILICON_LABS_32B_SERIES_1) || defined(DOXYGEN)
 typedef struct {
     void *dev;              /**< TIMER_TypeDef or LETIMER_TypeDef device used */
     CMU_Clock_TypeDef cmu;  /**< the device CMU channel */
 } timer_dev_t;
+#endif
 
 typedef struct {
+#if defined(_SILICON_LABS_32B_SERIES_0) || defined(_SILICON_LABS_32B_SERIES_1) || defined(DOXYGEN)
     timer_dev_t prescaler;  /**< the lower neighboring timer (not initialized for LETIMER) */
     timer_dev_t timer;      /**< the higher numbered timer */
     IRQn_Type irq;          /**< number of the higher timer IRQ channel */
-    uint8_t channel_numof;       /**< number of channels per timer */
+    uint8_t channel_numof;  /**< number of channels per timer */
+#else
+    void *dev;              /**< TIMER_TypeDef or LETIMER_TypeDef device used */
+    CMU_Clock_TypeDef cmu;  /**< the device CMU channel */
+    IRQn_Type irq;          /**< number of the higher timer IRQ channel */
+#endif
 } timer_conf_t;
+
+#define LETIMER_MAX_VALUE _LETIMER_TOP_MASK  /**< max timer value of LETIMER peripheral */
+#define TIMER_MAX_VALUE _TIMER_TOP_MASK      /**< max timer value of TIMER peripheral */
 /** @} */
 
 /**
