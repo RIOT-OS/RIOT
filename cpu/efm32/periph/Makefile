@@ -18,6 +18,15 @@ ifneq (,$(filter periph_rtt,$(USEMODULE)))
   endif
 endif
 
+# Select the correct implementation for `periph_timer`
+ifneq (,$(filter periph_timer,$(USEMODULE)))
+  ifeq (2,$(EFM32_SERIES))
+    SRC += timer_series2.c
+  else ifneq (,$(filter $(EFM32_SERIES),0 1))
+    SRC += timer_series01.c
+  endif
+endif
+
 # Select the correct implementation for `periph_uart`
 ifneq (,$(filter periph_uart,$(USEMODULE)))
   ifeq (2,$(EFM32_SERIES))
