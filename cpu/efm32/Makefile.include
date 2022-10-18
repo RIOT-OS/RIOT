@@ -16,7 +16,11 @@ ifeq (,$(EFM32_HEADER))
 endif
 
 # the size of riotboot on the EFM32 exceeds the default value
-RIOTBOOT_LEN ?= 0x2000
+ifneq (,$(filter periph_usbdev,$(USEMODULE)))
+  RIOTBOOT_LEN ?= 0x4000
+else
+  RIOTBOOT_LEN ?= 0x2000
+endif
 
 # the em_device.h header requires a global define with the cpu model
 CFLAGS += -D$(call uppercase_and_underscore,$(CPU_MODEL))
