@@ -18,6 +18,7 @@
  */
 
 #include <errno.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "kernel_defines.h"
@@ -111,6 +112,12 @@ const char *tiny_strerror(int errnum)
      */
     const char *retval = "-unknown";
     unsigned offset = 1;
+
+    if (IS_USED(MODULE_TINY_STRERROR_MINIMAL)) {
+        static char buf[4];
+        snprintf(buf, sizeof(buf), "%d", errnum);
+        return buf;
+    }
 
     if (errnum <= 0) {
         offset = 0;

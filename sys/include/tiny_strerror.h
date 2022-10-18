@@ -24,6 +24,13 @@
  * @note        Using module `tiny_strerror_as_strerror` will replace all calls
  *              to `strerror()` by calls to `tiny_strerror()`, which may safe
  *              a bit of ROM.
+ *
+ * @note        Using module `tiny_strerror_minimal` will just print the error
+ *              code value.
+ *              This will save ~1k of ROM, but won't provide much more information.
+ *
+ * @warning     The module `tiny_strerror_minimal` is not thread-safe.
+ *
  * @{
  *
  *
