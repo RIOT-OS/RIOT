@@ -392,6 +392,7 @@ ifneq (,$(filter gnrc_ipv6_nib,$(USEMODULE)))
   USEMODULE += gnrc_ndp
   USEMODULE += gnrc_netif
   USEMODULE += gnrc_netif_ipv6
+  USEMODULE += gnrc_netif_bus
   USEMODULE += ipv6_addr
   USEMODULE += random
 endif

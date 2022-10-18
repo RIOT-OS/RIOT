@@ -2128,21 +2128,11 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
         gnrc_pktsnip_t *pkt = NULL;
         switch (event) {
             case NETDEV_EVENT_LINK_UP:
-                if (IS_USED(MODULE_GNRC_IPV6)) {
-                    msg_t msg = { .type = GNRC_IPV6_NIB_IFACE_UP, .content = { .ptr = netif } };
-
-                    msg_send(&msg, gnrc_ipv6_pid);
-                }
                 gnrc_netif_event_bus_post(netif,
                                           GNRC_NETIF_EVENT_LINK_STATE_CHANGED_UP,
                                           netif);
                 break;
             case NETDEV_EVENT_LINK_DOWN:
-                if (IS_USED(MODULE_GNRC_IPV6)) {
-                    msg_t msg = { .type = GNRC_IPV6_NIB_IFACE_DOWN, .content = { .ptr = netif } };
-
-                    msg_send(&msg, gnrc_ipv6_pid);
-                }
                 gnrc_netif_event_bus_post(netif,
                                           GNRC_NETIF_EVENT_LINK_STATE_CHANGED_DOWN,
                                           netif);

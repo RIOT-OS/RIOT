@@ -186,6 +186,22 @@ static void *_event_loop(void *args)
     /* register interest in all IPv6 packets */
     gnrc_netreg_register(GNRC_NETTYPE_IPV6, &me_reg);
 
+    DEBUG_PUTS("ipv6: wait for interfaces to be ready");
+    while (gnrc_netif_iter(NULL) == NULL) {
+        ztimer_sleep(ZTIMER_MSEC, 250);
+    }
+
+    /* subscribe to interface events */
+    gnrc_netif_t *netif = NULL;
+    while ((netif = gnrc_netif_iter(netif))) {
+        DEBUG("ipv6: subscribe to events on interface %u\n", netif->pid);
+
+        msg_bus_t *bus = gnrc_netif_get_bus(netif, GNRC_NETIF_BUS_IFACE);
+        msg_bus_attach(bus, &netif->ipv6.netif_sub);
+        msg_bus_subscribe(&netif->ipv6.netif_sub, GNRC_NETIF_EVENT_LINK_STATE_CHANGED_UP);
+        msg_bus_subscribe(&netif->ipv6.netif_sub, GNRC_NETIF_EVENT_LINK_STATE_CHANGED_DOWN);
+    }
+
     /* preinitialize ACK */
     reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
 
@@ -194,7 +210,7 @@ static void *_event_loop(void *args)
         DEBUG("ipv6: waiting for incoming message.\n");
         msg_receive(&msg);
 
-        switch (msg.type) {
+        switch (msg_bus_get_type(&msg)) {
             case GNRC_NETAPI_MSG_TYPE_RCV:
                 DEBUG("ipv6: GNRC_NETAPI_MSG_TYPE_RCV received\n");
                 _receive(msg.content.ptr);
@@ -244,10 +260,10 @@ static void *_event_loop(void *args)
                 DEBUG("ipv6: NIB timer event received\n");
                 gnrc_ipv6_nib_handle_timer_event(msg.content.ptr, msg.type);
                 break;
-            case GNRC_IPV6_NIB_IFACE_UP:
+            case GNRC_NETIF_EVENT_LINK_STATE_CHANGED_UP:
                 gnrc_ipv6_nib_iface_up(msg.content.ptr);
                 break;
-            case GNRC_IPV6_NIB_IFACE_DOWN:
+            case GNRC_NETIF_EVENT_LINK_STATE_CHANGED_DOWN:
                 gnrc_ipv6_nib_iface_down(msg.content.ptr, false);
                 break;
             default:
