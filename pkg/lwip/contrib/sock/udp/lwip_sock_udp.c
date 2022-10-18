@@ -40,8 +40,6 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
     if ((res = lwip_sock_create(&tmp, (struct _sock_tl_ep *)local,
                                 (struct _sock_tl_ep *)remote, 0, flags,
                                 NETCONN_UDP)) == 0) {
-        mutex_init(&(sock->mutex));
-        mutex_lock(&(sock->mutex));
         sock->base.conn = tmp;
 
         if (IS_USED(MODULE_SOCK_AUX_PEEK)) {
@@ -53,7 +51,6 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
         sock->base.async_cb.gen = NULL;
         netconn_set_callback_arg(sock->base.conn, &sock->base);
 #endif
-        mutex_unlock(&(sock->mutex));
     }
 
     return res;
@@ -158,15 +155,6 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **ctx,
 
     buf = sock->last_buf;
 
-    if (timeout == 0) {
-        if (!mutex_trylock(&sock->mutex)) {
-            return -EAGAIN;
-        }
-    }
-    else {
-        mutex_lock(&sock->mutex);
-    }
-
     if (buf != NULL) {
         if (netbuf_next(buf) == -1) { /* check for next part in chain */
             /* this is the last part of the chain (and maybe also the first) */
@@ -178,8 +166,6 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **ctx,
                 *data = buf->ptr->payload;
                 res = buf->ptr->len;
 
-                mutex_unlock(&sock->mutex);
-
                 return res;
             }
             else {
@@ -187,8 +173,6 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **ctx,
                     /* reset to the original starting point for later use and finish */
                     netbuf_first(buf);
                     sock->peek_buf_avail = true;
-
-                    mutex_unlock(&sock->mutex);
 
                     return 0;
                 }
@@ -199,8 +183,6 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **ctx,
                     *data = NULL;
                     *ctx = NULL;
 
-                    mutex_unlock(&sock->mutex);
-
                     return 0;
                 }
             }
@@ -210,14 +192,11 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **ctx,
             *data = buf->ptr->payload;
             res = buf->ptr->len;
 
-            mutex_unlock(&sock->mutex);
-
             return res;
         }
     }
 
     if ((res = lwip_sock_recv(sock->base.conn, timeout, &buf)) < 0) {
-        mutex_unlock(&sock->mutex);
         return res;
     }
 
@@ -234,7 +213,6 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **ctx,
         }
         else if (!IS_ACTIVE(LWIP_IPV4)) {
             netbuf_delete(buf);
-            mutex_unlock(&sock->mutex);
             return -EPROTO;
         }
 
@@ -268,7 +246,6 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **ctx,
     *data = buf->ptr->payload;
     res = (ssize_t)buf->ptr->len;
 
-    mutex_unlock(&sock->mutex);
 
     return res;
 }
