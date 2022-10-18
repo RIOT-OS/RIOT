@@ -145,6 +145,11 @@ void vTaskSuspend(TaskHandle_t xTaskToSuspend)
     }
 }
 
+void vTaskSuspendAll(void)
+{
+    /* TODO */
+}
+
 void vTaskResume(TaskHandle_t xTaskToResume)
 {
     extern volatile thread_t *sched_active_thread;
