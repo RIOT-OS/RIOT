@@ -133,7 +133,6 @@ static void atca_cbc_setup(atca_aes_cbc_ctx_t *ctx,
     ctx->key_block = 0;
 }
 
-
 psa_status_t atca_cipher_setup(psa_drv_se_context_t *drv_context,
                                void *op_context,
                                psa_key_slot_number_t key_slot,
@@ -288,7 +287,8 @@ psa_status_t atca_allocate(psa_drv_se_context_t *drv_context,
      */
 
     if (attributes->type == PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1)) {
-        /* At the time of the implementation we are using an SE in which key slot 1 is configured for ECC private keys, so we return key slot nr. 1 */
+        /* At the time of the implementation we are using an SE in which key slot 1
+           is configured for ECC private keys, so we return key slot nr. 1 */
         *key_slot = (psa_key_slot_number_t)1;
     }
     else if (attributes->type == PSA_KEY_TYPE_ECC_PUBLIC_KEY(PSA_ECC_FAMILY_SECP_R1)) {
@@ -327,7 +327,9 @@ psa_status_t atca_import(psa_drv_se_context_t *drv_context,
 
     if (key_slot == ATCA_TEMPKEY_KEYID) {
         uint8_t buf_in[32] = { 0 };
-        /* This implementation only uses the device's TEMPKEY Register for key import, which only accepts input sizes of 32 or 64 Bytes, so we copy a smaller key into a 32 Byte buffer that is padded with zeros */
+        /* This implementation only uses the device's TEMPKEY Register for key import,
+        which only accepts input sizes of 32 or 64 Bytes, so we copy a smaller key into
+        a 32 Byte buffer that is padded with zeros */
         memcpy(buf_in, data, data_length);
 
         status = calib_nonce_load(dev, NONCE_MODE_TARGET_TEMPKEY, buf_in, sizeof(buf_in));
@@ -371,7 +373,9 @@ psa_status_t atca_generate_key(psa_drv_se_context_t *drv_context,
     }
 
     if (pubkey != NULL) {
-        /* The driver already exports the public key, in the correct format (uncompressed binary). We can just write the key into the pubkey buffer. First byte is reserved for format encoding (set below) */
+        /* The driver already exports the public key, in the correct format
+        (uncompressed binary). We can just write the key into the pubkey buffer.
+        First byte is reserved for format encoding (set below) */
         status = calib_genkey(dev, key_slot, &pubkey[1]);
     }
     else {

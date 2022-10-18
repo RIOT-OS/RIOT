@@ -27,7 +27,6 @@
 #include "atca.h"
 #include "atca_params.h"
 
-
 /* Timer functions */
 void atca_delay_us(uint32_t delay)
 {

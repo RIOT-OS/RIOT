@@ -24,7 +24,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#if IS_ACTIVE(CONFIG_MODULE_PSA_CRYPTO)
+#if (IS_ACTIVE(CONFIG_MODULE_PSA_CRYPTO))
 #include "psa_crypto_se_management.h"
 
 extern psa_drv_se_t atca_methods;
@@ -44,7 +44,7 @@ void auto_init_atca(void)
                       i, status);
             continue;
         }
-#if IS_ACTIVE(CONFIG_MODULE_PSA_CRYPTO)
+#if (IS_ACTIVE(CONFIG_MODULE_PSA_CRYPTO))
         if (i >= PSA_MAX_SE_COUNT) {
             LOG_ERROR("[auto_init_atca] PSA Crypto – too many secure elements #%u\n", i + 1);
             continue;
@@ -54,7 +54,8 @@ void auto_init_atca(void)
         status = psa_register_secure_element(atca_params[i].atca_loc, &atca_methods, atca_devs[i]);
         if (status != PSA_SUCCESS) {
             LOG_ERROR(
-                "[auto_init_atca] PSA Crypto – error registering cryptoauth PSA driver for device #%u, status: %d\n", i,
+                "[auto_init_atca] PSA Crypto – error registering cryptoauth PSA driver \
+                for device #%u, status: %d\n", i,
                 status);
             continue;
         }
