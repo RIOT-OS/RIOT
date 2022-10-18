@@ -395,6 +395,10 @@ static psa_status_t psa_cipher_setup(   psa_cipher_operation_t *operation,
         return PSA_ERROR_BAD_STATE;
     }
 
+    if (!operation) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
     if (!PSA_ALG_IS_CIPHER(alg)) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
@@ -461,17 +465,21 @@ static psa_status_t psa_cipher_encrypt_decrypt( psa_key_id_t key,
     psa_status_t unlock_status = PSA_ERROR_CORRUPTION_DETECTED;
     psa_key_slot_t *slot;
 
-    psa_key_usage_t usage = (direction == PSA_CRYPTO_DRIVER_ENCRYPT ?
-                             PSA_KEY_USAGE_ENCRYPT :
-                             PSA_KEY_USAGE_DECRYPT);
-
     if (!lib_initialized) {
         return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!input || !output || !output_length) {
+        return PSA_ERROR_INVALID_ARGUMENT;
     }
 
     if (!PSA_ALG_IS_CIPHER(alg)) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
+
+    psa_key_usage_t usage = (direction == PSA_CRYPTO_DRIVER_ENCRYPT ?
+                             PSA_KEY_USAGE_ENCRYPT :
+                             PSA_KEY_USAGE_DECRYPT);
 
     status = psa_get_and_lock_key_slot_with_policy(key, &slot, usage, alg);
     if (status != PSA_SUCCESS) {
@@ -488,10 +496,16 @@ static psa_status_t psa_cipher_encrypt_decrypt( psa_key_id_t key,
     }
 
     if (direction == PSA_CRYPTO_DRIVER_ENCRYPT) {
+        if (output_size < PSA_CIPHER_ENCRYPT_OUTPUT_SIZE(slot->attr.key_type, alg, input_length)) {
+            return PSA_ERROR_BUFFER_TOO_SMALL;
+        }
         status = psa_location_dispatch_cipher_encrypt(&slot->attr, alg, slot, input, input_length,
                                                       output, output_size, output_length);
     }
     else {
+        if (output_size < PSA_CIPHER_DECRYPT_OUTPUT_SIZE(slot->attr.key_type, alg, input_length)) {
+            return PSA_ERROR_BUFFER_TOO_SMALL;
+        }
         status = psa_location_dispatch_cipher_decrypt(&slot->attr, alg, slot, input, input_length,
                                                       output, output_size, output_length);
     }
@@ -562,6 +576,10 @@ psa_status_t psa_cipher_generate_iv(psa_cipher_operation_t *operation,
         return PSA_ERROR_BAD_STATE;
     }
 
+    if (!operation || !iv || !iv_length) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
     *iv_length = 0;
 
     if (!operation->iv_required || operation->iv_set) {
@@ -617,6 +635,10 @@ psa_status_t psa_hash_setup(psa_hash_operation_t *operation,
         return PSA_ERROR_BAD_STATE;
     }
 
+    if (!operation) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
     if (operation->alg != 0) {
         return PSA_ERROR_BAD_STATE;
     }
@@ -640,6 +662,10 @@ psa_status_t psa_hash_update(psa_hash_operation_t *operation,
         return PSA_ERROR_BAD_STATE;
     }
 
+    if (!operation || !input) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
     if (operation->alg == 0) {
         return PSA_ERROR_BAD_STATE;
     }
@@ -659,6 +685,10 @@ psa_status_t psa_hash_finish(psa_hash_operation_t *operation,
 {
     if (!lib_initialized) {
         return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!operation || !hash || !hash_length) {
+        return PSA_ERROR_INVALID_ARGUMENT;
     }
 
     if (operation->alg == 0) {
@@ -693,6 +723,10 @@ psa_status_t psa_hash_verify(psa_hash_operation_t *operation,
 
     if (!lib_initialized) {
         return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!operation || !hash) {
+        return PSA_ERROR_INVALID_ARGUMENT;
     }
 
     status = psa_hash_finish(operation, digest, PSA_HASH_MAX_SIZE, &actual_hash_length);
@@ -761,6 +795,10 @@ psa_status_t psa_hash_compare(psa_algorithm_t alg,
         return PSA_ERROR_BAD_STATE;
     }
 
+    if (!input || !hash) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
     status = psa_hash_setup(&operation, alg);
     if (status != PSA_SUCCESS) {
         return status;
@@ -789,6 +827,14 @@ psa_status_t psa_hash_compute(psa_algorithm_t alg,
 
     if (!lib_initialized) {
         return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!input || !hash || !hash_length) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (hash_size < PSA_HASH_LENGTH(alg)) {
+        return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
     *hash_length = hash_size;
@@ -1126,8 +1172,8 @@ psa_status_t psa_export_public_key(psa_key_id_t key,
         return PSA_ERROR_BAD_STATE;
     }
 
-    if ((data_size == 0) || (data_size < PSA_EXPORT_PUBLIC_KEY_MAX_SIZE)) {
-        return PSA_ERROR_BUFFER_TOO_SMALL;
+    if (!data || !data_length) {
+        return PSA_ERROR_INVALID_ARGUMENT;
     }
 
     *data_length = 0;
@@ -1139,6 +1185,11 @@ psa_status_t psa_export_public_key(psa_key_id_t key,
             status = unlock_status;
         }
         return status;
+    }
+
+    if ((data_size == 0) ||
+        (data_size < PSA_EXPORT_PUBLIC_KEY_OUTPUT_SIZE(slot->attr.type,slot->attr.bits))) {
+        return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
     if (!PSA_KEY_TYPE_IS_ECC(slot->attr.type)) {
@@ -1188,6 +1239,10 @@ psa_status_t psa_generate_key(const psa_key_attributes_t *attributes,
         return PSA_ERROR_BAD_STATE;
     }
 
+    if (!attributes || !key) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
     if (psa_get_key_bits(attributes) == 0) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
@@ -1227,6 +1282,10 @@ psa_status_t psa_generate_key(const psa_key_attributes_t *attributes,
 psa_status_t psa_builtin_generate_random(   uint8_t *output,
                                             size_t output_size)
 {
+    if (!output) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
     random_bytes(output, output_size);
     return PSA_SUCCESS;
 }
@@ -1238,6 +1297,10 @@ psa_status_t psa_generate_random(uint8_t *output,
         return PSA_ERROR_BAD_STATE;
     }
 
+    if (!output) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
     return psa_location_dispatch_generate_random(output, output_size);
 }
 
@@ -1246,6 +1309,12 @@ psa_status_t psa_get_key_attributes(psa_key_id_t key,
 {
     psa_status_t status;
     psa_key_slot_t *slot = NULL;
+
+    if (!attributes) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    psa_reset_key_attributes(attributes);
 
     status = psa_get_and_lock_key_slot(key, &slot);
     if (status != PSA_SUCCESS) {
@@ -1265,6 +1334,10 @@ psa_status_t psa_builtin_import_key(const psa_key_attributes_t *attributes,
 {
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
     psa_key_type_t type = attributes->type;
+
+    if (!attributes || !data || !key_buffer || !key_buffer_length || !bits) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
 
     if (data_length == 0) {
         return PSA_ERROR_NOT_SUPPORTED;
@@ -1308,6 +1381,14 @@ psa_status_t psa_import_key(const psa_key_attributes_t *attributes,
     size_t bits;
 
     if (!lib_initialized) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!attributes || !data) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (attributes->bits == 0) {
         return PSA_ERROR_BAD_STATE;
     }
 
@@ -1448,19 +1529,21 @@ psa_status_t psa_mac_abort(psa_mac_operation_t *operation)
  *          @ref PSA_ERROR_NOT_SUPPORTED
  *          @ref PSA_ERROR_INVALID_ARGUMENT
  */
-static psa_status_t psa_mac_validate_alg_and_key(psa_key_attributes_t *attr, psa_algorithm_t alg,
-                                                 size_t *mac_size)
+static psa_status_t psa_mac_validate_alg_and_key_and_size(psa_key_attributes_t *attr,
+                                                          psa_algorithm_t alg,
+                                                          size_t mac_size)
 {
     psa_key_type_t type = psa_get_key_type(attr);
     psa_key_bits_t bits = psa_get_key_bits(attr);
+
 
     if (!PSA_ALG_IS_HMAC(alg) || (PSA_ALG_GET_HASH(alg) != PSA_ALG_SHA_256)) {
         return PSA_ERROR_NOT_SUPPORTED;
     }
 
-    *mac_size = PSA_MAC_LENGTH(type, bits, alg);
+    size_t operation_mac_size = PSA_MAC_LENGTH(type, bits, alg);
 
-    if (*mac_size < 4) {
+    if (operation_mac_size < 4) {
         /**
          * A very short MAC is too short for security since it can be
          * brute-forced. Ancient protocols with 32-bit MACs do exist,
@@ -1470,10 +1553,12 @@ static psa_status_t psa_mac_validate_alg_and_key(psa_key_attributes_t *attr, psa
         return PSA_ERROR_NOT_SUPPORTED;
     }
 
-    if (*mac_size > PSA_MAC_LENGTH(type, bits, PSA_ALG_FULL_LENGTH_MAC(alg))) {
-        DEBUG("%s: MAC Size is %d, MAX MAC Length is %d\n", __FILE__, *mac_size,
-              PSA_MAC_LENGTH(type, bits, PSA_ALG_FULL_LENGTH_MAC(alg)));
+    if (operation_mac_size > PSA_MAC_MAX_SIZE) {
         return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (mac_size < operation_mac_size) {
+        return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
     return PSA_SUCCESS;
@@ -1491,11 +1576,13 @@ psa_status_t psa_mac_compute(psa_key_id_t key,
     psa_key_attributes_t attr = psa_key_attributes_init();
     psa_status_t unlock_status = PSA_ERROR_CORRUPTION_DETECTED;
     psa_key_slot_t *slot;
-    size_t operation_mac_size = 0;
 
-    DEBUG("Mac Compute\n");
     if (!lib_initialized) {
         return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!input || !mac || !mac_length) {
+        return PSA_ERROR_INVALID_ARGUMENT;
     }
 
     status = psa_get_key_attributes(key, &attr);
@@ -1503,14 +1590,9 @@ psa_status_t psa_mac_compute(psa_key_id_t key,
         return status;
     }
 
-    status = psa_mac_validate_alg_and_key(&attr, alg, &operation_mac_size);
+    status = psa_mac_validate_alg_and_key_and_size(&attr, alg, mac_size);
     if (status != PSA_SUCCESS) {
         return status;
-    }
-
-    if (mac_size < operation_mac_size) {
-        DEBUG("%s: Buffer Size: %d, Buffer Needed: %d\n", __FILE__, mac_size, operation_mac_size);
-        return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
     status = psa_get_and_lock_key_slot_with_policy(key, &slot, attr.policy.usage, alg);
@@ -1638,6 +1720,10 @@ psa_status_t psa_sign_hash(psa_key_id_t key,
         return PSA_ERROR_BAD_STATE;
     }
 
+    if (!hash || !signature || !signature_length) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
     if (!PSA_ALG_IS_ECDSA(alg)) {
         return PSA_ERROR_NOT_SUPPORTED;
     }
@@ -1650,6 +1736,10 @@ psa_status_t psa_sign_hash(psa_key_id_t key,
     if (status != PSA_SUCCESS) {
         unlock_status = psa_unlock_key_slot(slot);
         return status;
+    }
+
+    if (signature_size < PSA_SIGN_OUTPUT_SIZE(slot->attr.type, slot->attr.bits, alg)) {
+        return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
     if (!PSA_KEY_TYPE_IS_KEY_PAIR(slot->attr.type)) {
@@ -1699,6 +1789,10 @@ psa_status_t psa_verify_hash(psa_key_id_t key,
         return PSA_ERROR_BAD_STATE;
     }
 
+    if (!hash || !signature) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
     if (!PSA_ALG_IS_ECDSA(alg)) {
         return PSA_ERROR_NOT_SUPPORTED;
     }
@@ -1711,6 +1805,10 @@ psa_status_t psa_verify_hash(psa_key_id_t key,
     if (status != PSA_SUCCESS) {
         unlock_status = psa_unlock_key_slot(slot);
         return status;
+    }
+
+    if (signature_length != PSA_SIGN_OUTPUT_SIZE(slot->attr.type, slot->attr.bits, alg)) {
+        return PSA_ERROR_INVALID_ARGUMENT;
     }
 
     /**

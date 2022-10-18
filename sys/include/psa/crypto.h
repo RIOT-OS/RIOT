@@ -1800,10 +1800,11 @@ psa_status_t psa_generate_key(const psa_key_attributes_t *attributes,
  * @details This function is being used to generate a random number if no other driver for random
  *          number generation is present. It uses the RIOT RNG module as a default backend.
  *
- * @param   output      Input buffer of the size of the random number to be generated.
+ * @param   output      Output buffer of the size of the random number to be generated.
  * @param   output_size Size of @c output in bytes
  *
  * @return  @ref PSA_SUCCESS
+ *          @ref PSA_ERROR_INVALID_ARGUMENT @c output is NULL
  */
 psa_status_t psa_builtin_generate_random(   uint8_t *output,
                                             size_t output_size);
@@ -1823,6 +1824,7 @@ psa_status_t psa_builtin_generate_random(   uint8_t *output,
  *                                          of generated random data.
  *          @ref PSA_ERROR_BAD_STATE        The library requires initializing by a call to
  *                                          @ref psa_crypto_init().
+ *          @ref PSA_ERROR_INVALID_ARGUMENT @c output is NULL
  *          @ref PSA_ERROR_NOT_SUPPORTED
  *          @ref PSA_ERROR_INSUFFICIENT_ENTROPY
  *          @ref PSA_ERROR_INSUFFICIENT_MEMORY
@@ -2041,10 +2043,6 @@ static inline void psa_reset_key_attributes(psa_key_attributes_t *attributes)
  *          expects it to be in a valid state. In particular, if this function is called on a newly
  *          allocated attribute object, the attribute object must be initialized before calling
  *          this function.
- *
- * @note    This function might allocate memory or other resources. Once this function has been
- *          called on an attribute object, @ref psa_reset_key_attributes() must be called to free
- *          these resources.
  *
  * @param   key         Identifier of the key to query.
  * @param   attributes  On entry, @c *attributes must be in a valid state. On successful return,
