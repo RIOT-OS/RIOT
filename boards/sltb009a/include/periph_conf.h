@@ -23,7 +23,7 @@
 #include "cpu.h"
 #include "periph_cpu.h"
 #include "em_cmu.h"
-#include "usbdev_synopsys_dwc2.h"
+#include "usbdev_cfg_otg_fs.h"
 
 #ifdef __cplusplus
 extern "C" {
