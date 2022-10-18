@@ -30,7 +30,7 @@ psa_status_t psa_generate_ecc_p192r1_key_pair(  const psa_key_attributes_t *attr
     *priv_key_buffer_length = PSA_BITS_TO_BYTES(attributes->bits);
     *pub_key_buffer_length = PSA_EXPORT_PUBLIC_KEY_OUTPUT_SIZE(attributes->type, attributes->bits);
 
-    struct uECC_Curve_t *curve = (struct uECC_Curve_t *)uECC_secp192r1();
+    struct uECC_Curve_t *curve = uECC_secp192r1();
 
     ret = uECC_make_key(pub_key_buffer, priv_key_buffer, curve);
     if (!ret) {
@@ -47,7 +47,7 @@ psa_status_t psa_ecc_p192r1_sign_hash(  const psa_key_attributes_t *attributes,
                                         size_t signature_size, size_t *signature_length)
 {
     int ret = 0;
-    struct uECC_Curve_t *curve = (struct uECC_Curve_t *)uECC_secp192r1();
+    struct uECC_Curve_t *curve = uECC_secp192r1();
 
     ret = uECC_sign(key_buffer, hash, hash_length, signature, curve);
     if (!ret) {
@@ -69,7 +69,7 @@ psa_status_t psa_ecc_p192r1_verify_hash(const psa_key_attributes_t *attributes,
                                         size_t signature_length)
 {
     int ret = 0;
-    struct uECC_Curve_t *curve = (struct uECC_Curve_t *)uECC_secp192r1();
+    struct uECC_Curve_t *curve = uECC_secp192r1();
 
     ret = uECC_verify(key_buffer, hash, hash_length, signature, curve);
     if (!ret) {
