@@ -367,7 +367,9 @@ typedef struct {
     gpio_t mosi_pin;        /**< pin used for MOSI */
     gpio_t miso_pin;        /**< pin used for MISO */
     gpio_t clk_pin;         /**< pin used for CLK */
-    uint32_t loc;           /**< location of USART pins */
+#if defined(_SILICON_LABS_32B_SERIES_0) || defined(_SILICON_LABS_32B_SERIES_1)
+    uint32_t loc;           /**< location of SPI pins */
+#endif
     CMU_Clock_TypeDef cmu;  /**< the device CMU channel */
     IRQn_Type irq;          /**< the devices base IRQ channel */
 } spi_dev_t;
