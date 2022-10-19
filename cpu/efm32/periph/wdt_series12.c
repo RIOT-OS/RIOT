@@ -16,6 +16,7 @@
  *              EFM32 Series 1 MCUs
  *
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
+ * @author      Juergen Fitschen <me@jue.yt>
  * @}
  */
 
@@ -41,14 +42,23 @@ static wdt_cb_t wdt_cb;
 static void *wdt_arg;
 #endif
 
+static inline uint32_t _get_clock(void)
+{
+#if defined(_SILICON_LABS_32B_SERIES_0) || defined(_SILICON_LABS_32B_SERIES_1)
+    return WDT_CLOCK_HZ;
+#else
+    return CMU_ClockFreqGet(cmuClock_WDOG0);
+#endif
+}
+
 static uint32_t _get_calculated_time(WDOG_PeriodSel_TypeDef period)
 {
-    return ((1 << (3 + (int)period)) + 1) / WDT_CLOCK_HZ * MS_PER_SEC;
+    return ((1 << (3 + (int)period)) + 1) / _get_clock() * MS_PER_SEC;
 }
 
 static  WDOG_PeriodSel_TypeDef _get_period(uint32_t max_time)
 {
-    const uint32_t cycles = (max_time * WDT_CLOCK_HZ) / MS_PER_SEC;
+    const uint32_t cycles = (max_time * _get_clock()) / MS_PER_SEC;
 
     DEBUG("[wdt_series1] _get_period: cycles=%" PRIu32 "\n", cycles);
 
@@ -92,14 +102,25 @@ static void _init(uint32_t min_time, uint32_t max_time, bool warn)
     }
 
     /* initialize clock */
+#if defined(_SILICON_LABS_32B_SERIES_0) || defined(_SILICON_LABS_32B_SERIES_1)
     CMU_ClockEnable(cmuClock_HFLE, true);
+#else
+    CMU_ClockSelectSet(cmuClock_WDOG0CLK, cmuSelect_ULFRCO);
+    CMU_ClockEnable(cmuClock_WDOG0, true);
+#endif
 
     /* initialize watchdog */
     WDOG_Init_TypeDef init = WDOG_INIT_DEFAULT;
 
     init.enable = false;
+#if defined(_WDOG_CFG_EM1RUN_MASK)
+    init.em1Run = true;
+#endif
     init.em2Run = true;
+    init.em3Run = true;
+#if defined(_SILICON_LABS_32B_SERIES_0) || defined(_SILICON_LABS_32B_SERIES_1)
     init.clkSel = wdogClkSelULFRCO;
+#endif
     init.perSel = _get_period(max_time);
 
     uint32_t calculated_time = _get_calculated_time(init.perSel);

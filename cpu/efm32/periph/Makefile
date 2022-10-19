@@ -49,8 +49,8 @@ endif
 ifneq (,$(filter periph_wdt,$(USEMODULE)))
   ifeq (0,$(EFM32_SERIES))
     SRC += wdt_series0.c
-  else ifeq (1,$(EFM32_SERIES))
-    SRC += wdt_series1.c
+  else ifneq (,$(filter $(EFM32_SERIES),1 2))
+    SRC += wdt_series12.c
   endif
 endif
 
