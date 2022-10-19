@@ -41,6 +41,7 @@
 extern "C" {
 #endif
 
+#if (defined(ADC_COUNT) && (ADC_COUNT > 0)) || defined(DOXYGEN)
 /**
  * @brief   Internal macro for combining ADC resolution (x) with number of
  *          shifts (y).
@@ -90,6 +91,7 @@ typedef struct {
     ADC_Ref_TypeDef reference;        /**< channel voltage reference */
     ADC_AcqTime_TypeDef acq_time;     /**< channel acquisition time */
 } adc_chan_conf_t;
+#endif
 
 /**
  * @brief   Length of CPU ID in octets.
@@ -452,6 +454,15 @@ typedef struct {
  * @brief   Number of usable power modes.
  */
 #define PM_NUM_MODES    (3U)
+
+/**
+ * @name   Available power modes
+ * @{
+ */
+#define EFM32_PM_MODE_EM3  (0U)  /**< CPU sleeps, peripherals in EM3 domain are active */
+#define EFM32_PM_MODE_EM2  (1U)  /**< CPU sleeps, peripherals in EM2 + EM3 domain are active */
+#define EFM32_PM_MODE_EM1  (2U)  /**< CPU sleeps, all peripherals are active */
+/** @} */
 
 /**
  * @name    Watchdog timer (WDT) configuration

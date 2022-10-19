@@ -26,6 +26,7 @@
 
 #include "em_chip.h"
 #include "em_cmu.h"
+#include "em_dbg.h"
 #include "em_emu.h"
 
 /**
@@ -106,13 +107,14 @@ static void clk_init(void)
 #endif
 
     /* initialize LFXO with board-specific parameters before switching */
-    if (CLOCK_LFA == cmuSelect_LFXO || CLOCK_LFB == cmuSelect_LFXO ||
 #if defined(_SILICON_LABS_32B_SERIES_1)
-        CLOCK_LFE == cmuSelect_LFXO)
+    if (CLOCK_LFA == cmuSelect_LFXO ||
+        CLOCK_LFB == cmuSelect_LFXO ||
+        CLOCK_LFE == cmuSelect_LFXO) {
 #else
-        false)
+    if (CLOCK_LFA == cmuSelect_LFXO ||
+        CLOCK_LFB == cmuSelect_LFXO) {
 #endif
-    {
         CMU_LFXOInit_TypeDef init_lfxo = CMU_LFXOINIT;
 
         CMU_LFXOInit(&init_lfxo);
@@ -130,13 +132,14 @@ static void clk_init(void)
 #endif
 
     /* disable the LFRCO if external crystal is used */
-    if (CLOCK_LFA == cmuSelect_LFXO && CLOCK_LFB == cmuSelect_LFXO &&
 #if defined(_SILICON_LABS_32B_SERIES_1)
-        CLOCK_LFE == cmuSelect_LFXO)
+    if (CLOCK_LFA == cmuSelect_LFXO &&
+        CLOCK_LFB == cmuSelect_LFXO &&
+        CLOCK_LFE == cmuSelect_LFXO) {
 #else
-        true)
+    if (CLOCK_LFA == cmuSelect_LFXO &&
+        CLOCK_LFB == cmuSelect_LFXO) {
 #endif
-    {
         CMU_OscillatorEnable(cmuOsc_LFRCO, false, false);
     }
 }
@@ -159,6 +162,11 @@ static void pm_init(void)
     EMU_EM4Init_TypeDef init_em4 = EMU_EM4INIT;
 
     EMU_EM4Init(&init_em4);
+#endif
+
+#if defined(DEVELHELP) && defined(EMU_CTRL_EM2DBGEN)
+    /* make sure to keep the debug unit active in develhelp */
+    DBG_EM2DebugEnable(true);
 #endif
 }
 
