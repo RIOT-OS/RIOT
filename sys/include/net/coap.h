@@ -251,6 +251,14 @@ extern "C" {
 #define CONFIG_COAP_RANDOM_FACTOR_1000      (1500)
 #endif
 
+/**
+ * @brief    Timeout in milliseconds for a separate (deferred) response
+ *           sent after an empty ACK.
+ */
+#ifndef CONFIG_COAP_SEPARATE_RESPONSE_TIMEOUT_MS
+#define CONFIG_COAP_SEPARATE_RESPONSE_TIMEOUT_MS    (10 * MS_PER_SEC)
+#endif
+
 /** @brief   Maximum number of retransmissions for a confirmable request */
 #ifndef CONFIG_COAP_MAX_RETRANSMIT
 #define CONFIG_COAP_MAX_RETRANSMIT     (4)
