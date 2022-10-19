@@ -14,17 +14,33 @@ RIOTBASE ?= $(CURDIR)/../..
 USEMODULE += netdev_default
 
 # use GNRC by default
-LWIP ?= 0
+LWIP_IPV4 ?= 0
+LWIP_IPV6 ?= 0
 
-ifeq (0,$(LWIP))
+ifeq (,$(filter 1, $(LWIP_IPV4) $(LWIP_IPV6)))
   USEMODULE += auto_init_gnrc_netif
   # Specify the mandatory networking modules
   USEMODULE += gnrc_ipv6_default
   # Additional networking modules that can be dropped if not needed
   USEMODULE += gnrc_icmpv6_echo
 else
-  USEMODULE += lwip_ipv6
   USEMODULE += lwip_netdev
+
+  ifeq (1,$(LWIP_IPV4))
+    USEMODULE += ipv4_addr
+
+    USEMODULE += lwip_arp
+    USEMODULE += lwip_ipv4
+    USEMODULE += lwip_dhcp_auto
+    CFLAGS += -DETHARP_SUPPORT_STATIC_ENTRIES=1
+  endif
+
+  ifeq (1,$(LWIP_IPV6))
+    USEMODULE += ipv6_addr
+
+    USEMODULE += lwip_ipv6
+    USEMODULE += lwip_ipv6_autoconfig
+  endif
 endif
 
 USEMODULE += gcoap
@@ -33,6 +49,7 @@ USEMODULE += gcoap
 USEMODULE += od
 USEMODULE += fmt
 USEMODULE += netutils
+USEMODULE += random
 # Add also the shell, some shell commands
 USEMODULE += shell
 USEMODULE += shell_cmds_default

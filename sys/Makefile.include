@@ -189,3 +189,7 @@ endif
 ifneq (,$(filter preprocessor_%,$(USEMODULE)))
   include $(RIOTBASE)/sys/preprocessor/Makefile.include
 endif
+
+ifneq (,$(filter gcoap,$(USEMODULE)))
+  include $(RIOTBASE)/sys/net/application_layer/gcoap/Makefile.include
+endif

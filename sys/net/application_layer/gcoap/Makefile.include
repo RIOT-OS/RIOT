@@ -1,0 +1,4 @@
+ifeq (2, $(words $(filter ipv4 ipv6, $(USEMODULE))))
+  $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)Due to limitations in the gcoap API it is currently not \
+                         possible to use a dual stack setup$(COLOR_RESET)" 1>&2)
+endif
