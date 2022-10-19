@@ -507,7 +507,7 @@ typedef struct {
 #define NWDT_TIME_LOWER_LIMIT   ((1U << (3U + wdogPeriod_9)) + 1U)
 #define NWDT_TIME_UPPER_LIMIT   ((1U << (3U + wdogPeriod_256k)) + 1U)
 
-#ifdef _SILICON_LABS_32B_SERIES_1
+#if defined(_SILICON_LABS_32B_SERIES_1) || defined(_SILICON_LABS_32B_SERIES_2)
 #define WDT_TIME_LOWER_LIMIT    NWDT_TIME_LOWER_LIMIT
 #define WDT_TIME_UPPER_LIMIT    NWDT_TIME_UPPER_LIMIT
 #endif

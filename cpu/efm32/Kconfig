@@ -30,6 +30,10 @@ config CPU_EFM32_SERIES1
     bool
     select HAS_PERIPH_WDT_CB
 
+config CPU_EFM32_SERIES2
+    bool
+    select HAS_PERIPH_WDT_CB
+
 ## Definition of specific features
 config HAS_ARCH_EFM32
     bool
