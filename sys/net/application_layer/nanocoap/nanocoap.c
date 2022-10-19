@@ -280,9 +280,9 @@ uint8_t *coap_iterate_option(coap_pkt_t *pkt, uint8_t **optpos,
     }
 }
 
-unsigned coap_get_content_type(coap_pkt_t *pkt)
+static unsigned _get_content_format(coap_pkt_t *pkt, unsigned int opt_num)
 {
-    uint8_t *opt_pos = coap_find_option(pkt, COAP_OPT_CONTENT_FORMAT);
+    uint8_t *opt_pos = coap_find_option(pkt, opt_num);
     unsigned content_type = COAP_FORMAT_NONE;
     if (opt_pos) {
         uint16_t delta;
@@ -300,6 +300,16 @@ unsigned coap_get_content_type(coap_pkt_t *pkt)
     }
 
     return content_type;
+}
+
+unsigned coap_get_content_type(coap_pkt_t *pkt)
+{
+    return _get_content_format(pkt, COAP_OPT_CONTENT_FORMAT);
+}
+
+unsigned coap_get_accept(coap_pkt_t *pkt)
+{
+    return _get_content_format(pkt, COAP_OPT_ACCEPT);
 }
 
 ssize_t coap_opt_get_next(const coap_pkt_t *pkt, coap_optpos_t *opt,
