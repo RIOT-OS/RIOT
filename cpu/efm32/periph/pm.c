@@ -34,9 +34,12 @@ void pm_set(unsigned mode)
             EMU_EnterEM2(true);
             break;
         case EFM32_PM_MODE_EM1:
-        default:
             /* wait for next event or interrupt */
             EMU_EnterEM1();
+            break;
+        default:
+            /* no sleep at all  */
+            break;
     }
 }
 
