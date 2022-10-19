@@ -7,7 +7,7 @@ USEMODULE += gnrc_icmpv6_echo
 USEMODULE += gnrc_rpl
 
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 
 USEMODULE += gcoap_fileserver
 USEMODULE += gcoap_fileserver_put
@@ -18,7 +18,8 @@ USEMODULE += constfs
 USEMODULE += vfs_default
 USEMODULE += vfs_auto_format
 
-USEMODULE += md5sum
+USEMODULE += hashes
+USEMODULE += shell_cmd_md5sum
 
 # automated test only works on native
 TEST_ON_CI_WHITELIST += native

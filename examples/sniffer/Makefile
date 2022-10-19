@@ -13,7 +13,7 @@ USEMODULE += gnrc
 USEMODULE += netdev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 USEMODULE += ztimer64_usec
 
