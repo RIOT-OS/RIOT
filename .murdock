@@ -153,7 +153,7 @@ export DLCACHE_DIR=${DLCACHE_DIR:-~/.dlcache}
 export ENABLE_TEST_CACHE=${ENABLE_TEST_CACHE:-1}
 export MURDOCK_REDIS_HOST=${MURDOCK_REDIS_HOST:-127.0.0.1}
 
-NIGHTLY=${NIGHTLY:-0}
+NIGHTLY=${NIGHTLY:-1}
 FULL_BUILD=${FULL_BUILD:-${NIGHTLY}}
 
 # This is a work around for a bug in CCACHE which interacts very badly with
