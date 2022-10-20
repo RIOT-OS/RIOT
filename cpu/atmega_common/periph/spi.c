@@ -31,6 +31,7 @@
 #include "cpu.h"
 #include "mutex.h"
 #include "periph/spi.h"
+#include "periph/pm.h"
 
 /**
  * @brief   Extract BR0, BR1 and SPI2X bits from speed value
@@ -89,6 +90,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     assert(bus == SPI_DEV(0));
 
     /* lock the bus and power on the SPI peripheral */
+    pm_block(4); /* Require clkIO */
     mutex_lock(&lock);
 #ifdef PRSPI
     power_spi_enable();
@@ -112,6 +114,7 @@ void spi_release(spi_t bus)
     power_spi_disable();
 #endif
     mutex_unlock(&lock);
+    pm_unblock(4);
 }
 
 void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
