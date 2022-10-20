@@ -17,10 +17,14 @@ TESTS ?= $(foreach file,$(wildcard $(APPDIR)/tests/*[^~]),\
 # this. In order to make local builds behave similar, add the term deps here.
 # See #11762.
 TEST_DEPS += $(TERMDEPS)
+# these variables can be used to use e.g. pytest to execute the tests instead of
+# executing them as a script
+TEST_EXECUTOR ?=
+TEST_EXECUTOR_FLAGS ?=
 
 test: $(TEST_DEPS)
 	$(Q) for t in $(TESTS); do \
-		$$t || exit 1; \
+		$(TEST_EXECUTOR) $(TEST_EXECUTOR_FLAGS) $$t || exit 1; \
 	done
 
 test/available:
