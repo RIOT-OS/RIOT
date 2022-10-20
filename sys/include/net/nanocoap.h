@@ -629,6 +629,16 @@ uint8_t *coap_find_option(coap_pkt_t *pkt, unsigned opt_num);
 unsigned coap_get_content_type(coap_pkt_t *pkt);
 
 /**
+ * @brief   Get the Accept option value from a packet if present
+ *
+ * @param[in]   pkt     packet to work on
+ *
+ * @returns     the packet's Accept option value if included,
+ *              COAP_FORMAT_NONE otherwise
+ */
+unsigned coap_get_accept(coap_pkt_t *pkt);
+
+/**
  * @brief   Get a uint32 option value
  *
  * @param[in]   pkt         packet to read from

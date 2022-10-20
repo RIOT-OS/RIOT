@@ -138,6 +138,7 @@ static void test_nanocoap__put_req(void)
     size_t total_hdr_len = 6;
     size_t uri_opt_len = 6;
     size_t fmt_opt_len = 1;
+    size_t accept_opt_len = 2;
 
     size_t len = coap_build_hdr((coap_hdr_t *)&buf[0], COAP_TYPE_NON,
                                 &token[0], 2, COAP_METHOD_PUT, msgid);
@@ -155,8 +156,12 @@ static void test_nanocoap__put_req(void)
     TEST_ASSERT_EQUAL_INT(fmt_opt_len, len);
     TEST_ASSERT_EQUAL_INT(COAP_FORMAT_TEXT, coap_get_content_type(&pkt));
 
+    len = coap_opt_add_uint(&pkt, COAP_OPT_ACCEPT, COAP_FORMAT_CBOR);
+    TEST_ASSERT_EQUAL_INT(accept_opt_len, len);
+    TEST_ASSERT_EQUAL_INT(COAP_FORMAT_CBOR, coap_get_accept(&pkt));
+
     len = coap_opt_finish(&pkt, COAP_OPT_FINISH_PAYLOAD);
-    TEST_ASSERT_EQUAL_INT(total_hdr_len + uri_opt_len + fmt_opt_len + 1, len);
+    TEST_ASSERT_EQUAL_INT(total_hdr_len + uri_opt_len + fmt_opt_len + accept_opt_len + 1, len);
     TEST_ASSERT_EQUAL_INT(0xFF, *(pkt.payload - 1));
     TEST_ASSERT_EQUAL_INT(&buf[0] + _BUF_SIZE - pkt.payload, pkt.payload_len);
 }
