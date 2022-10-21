@@ -27,7 +27,7 @@
 
 #include "async_read.h"
 #include "byteorder.h"
-#include "checksum/ucrc16.h"
+#include "checksum/crc16_ccitt.h"
 #include "native_internal.h"
 
 #include "net/ieee802154/radio.h"
@@ -400,8 +400,7 @@ static int _write(ieee802154_dev_t *dev, const iolist_t *iolist)
 
     for (unsigned i = 0; i < n; i++) {
         memcpy(out, iolist->iol_base, iolist->iol_len);
-        chksum = ucrc16_calc_le(iolist->iol_base, iolist->iol_len,
-                                UCRC16_CCITT_POLY_LE, chksum);
+        chksum = crc16_ccitt_false_update(chksum, iolist->iol_base, iolist->iol_len);
         out += iolist->iol_len;
         iolist = iolist->iol_next;
     }
@@ -484,7 +483,7 @@ static void _send_ack(socket_zep_t *zepdev, const void *frame)
     ack[2] = rxbuf[2];  /* SeqNum */
 
     /* calculate checksum */
-    uint16_t chksum = ucrc16_calc_le(ack, 3, UCRC16_CCITT_POLY_LE, 0);
+    uint16_t chksum = crc16_ccitt_false_update(0, ack, 3);
 
     real_send(zepdev->sock_fd, &hdr, sizeof(hdr), MSG_MORE);
     real_send(zepdev->sock_fd, ack, sizeof(ack), MSG_MORE);
