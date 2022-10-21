@@ -5,6 +5,11 @@
 # directory for more details.
 #
 
+config HAVE_ZTIMER_PERIPH_LPTIMER
+    bool
+    help
+        Indicates that ZTIMER_PERIPH_LPTIMER configuration is available.
+
 menu "ztimer - High level timer abstraction layer"
 
 config ZTIMER_CUSTOM_BACKEND_CONFIGURATION
@@ -39,6 +44,10 @@ config MODULE_ZTIMER_PERIPH_TIMER
     depends on HAS_PERIPH_TIMER
     select MODULE_PERIPH_TIMER
 
+config MODULE_ZTIMER_PERIPH_LPTIMER
+    bool "Low-power Timer peripheral"
+    select MODULE_ZTIMER_PERIPH_TIMER
+
 endmenu # Backends
 
 menu "Clocks"
@@ -62,7 +71,9 @@ config MODULE_ZTIMER_MSEC
 choice
     bool "Backend"
     depends on MODULE_ZTIMER_MSEC
+    default ZTIMER_MSEC_BACKEND_LPTIMER if HAVE_ZTIMER_PERIPH_LPTIMER
     default ZTIMER_MSEC_BACKEND_RTT if !MODULE_ZTIMER_NO_PERIPH_RTT
+    default ZTIMER_MSEC_BACKEND_TIMER
 
 config ZTIMER_MSEC_BACKEND_TIMER
     bool "Timer"
@@ -73,6 +84,11 @@ config ZTIMER_MSEC_BACKEND_RTT
     depends on HAS_PERIPH_RTT
     select MODULE_ZTIMER_PERIPH_RTT
 
+config ZTIMER_MSEC_BACKEND_LPTIMER
+    bool "Low Power Timer"
+    depends on HAVE_ZTIMER_PERIPH_LPTIMER
+    select MODULE_ZTIMER_PERIPH_LPTIMER
+
 endchoice
 
 config MODULE_ZTIMER_SEC
@@ -82,7 +98,9 @@ config MODULE_ZTIMER_SEC
 choice
     bool "Backend"
     depends on MODULE_ZTIMER_SEC
+    default ZTIMER_SEC_BACKEND_LPTIMER if HAVE_ZTIMER_PERIPH_LPTIMER
     default ZTIMER_SEC_BACKEND_RTT if !MODULE_ZTIMER_NO_PERIPH_RTT
+    default ZTIMER_SEC_BACKEND_TIMER
 
 config ZTIMER_SEC_BACKEND_TIMER
     bool "Timer"
@@ -97,6 +115,11 @@ config ZTIMER_SEC_BACKEND_RTC
     bool "RTC"
     depends on HAS_PERIPH_RTC
     select MODULE_ZTIMER_PERIPH_RTC
+
+config ZTIMER_SEC_BACKEND_LPTIMER
+    bool "Low Power Timer"
+    depends on HAVE_ZTIMER_PERIPH_LPTIMER
+    select MODULE_ZTIMER_PERIPH_LPTIMER
 
 endchoice
 
