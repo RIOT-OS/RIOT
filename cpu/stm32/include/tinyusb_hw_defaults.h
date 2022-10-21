@@ -55,6 +55,9 @@ extern "C" {
  * - In all other cases, both the device and the host stack use port 0.
  *   This also applies if only the USB FS controller is used.
  *
+ * @warning
+ * - tinyUSB does not support host mode for STM32 MCUs yet.
+ * - tinyUSB does not support to use multiple ports with device stack
  * @{
  */
 #if defined(DWC2_USB_OTG_HS_ENABLED) && defined(DWC2_USB_OTG_FS_ENABLED)
@@ -67,6 +70,9 @@ extern "C" {
 #define TINYUSB_TUH_RHPORT  1
 #endif
 
+#define CFG_TUSB_RHPORT0_MODE   (OPT_MODE_DEVICE | OPT_MODE_FULL_SPEED)
+#define CFG_TUSB_RHPORT1_MODE   (OPT_MODE_HOST | OPT_MODE_HIGH_SPEED)
+
 #elif defined(DWC2_USB_OTG_HS_ENABLED)
 
 #ifndef TINYUSB_TUD_RHPORT
@@ -77,6 +83,13 @@ extern "C" {
 #define TINYUSB_TUH_RHPORT  1
 #endif
 
+/*
+ * Since tinyUSB does not support host mode for STM32 MCUs yet, only
+ * OPT_MODE_DEVICE is enabled for the port. Once tinyUSB supports the host mode,
+ * OPT_MODE_HOST could be added to CFG_TUSB_RHPORT1_MODE
+ */
+#define CFG_TUSB_RHPORT1_MODE   (OPT_MODE_DEVICE | OPT_MODE_HIGH_SPEED)
+
 #else
 
 #ifndef TINYUSB_TUD_RHPORT
@@ -86,6 +99,13 @@ extern "C" {
 #ifndef TINYUSB_TUH_RHPORT
 #define TINYUSB_TUH_RHPORT  0
 #endif
+
+/*
+ * Since tinyUSB does not support host mode for STM32 MCUs yet, only
+ * OPT_MODE_DEVICE is enabled for the port. Once tinyUSB supports the host mode,
+ * OPT_MODE_HOST could be added to CFG_TUSB_RHPORT0_MODE.
+ */
+#define CFG_TUSB_RHPORT0_MODE   (OPT_MODE_DEVICE | OPT_MODE_FULL_SPEED)
 
 #endif
 /** @} */

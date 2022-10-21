@@ -80,10 +80,6 @@
  */
 #define CFG_TUD_ENABLED             MODULE_TINYUSB_DEVICE
 
-#ifndef CFG_TUD_MAX_SPEED
-#define CFG_TUD_MAX_SPEED           OPT_MODE_DEFAULT_SPEED
-#endif
-
 #ifndef CFG_TUD_ENDPOINT0_SIZE
 #define CFG_TUD_ENDPOINT0_SIZE      64
 #endif
