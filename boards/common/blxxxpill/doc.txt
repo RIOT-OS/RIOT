@@ -13,10 +13,10 @@ There are also versions that only report to have 32 KiB, but actually have
 64 KiB.
 
 
-## Hardware
+## Pinout
 
-![bluepill]
-(https://camo.githubusercontent.com/6122268d77e4677a08d0e13e2e2aaf070a0a6a69/687474703a2f2f73312e62696c642e6d652f62696c6465722f3131303431372f38383135303232313438363837343334302e6a7067)
+![pinout](pinouts/pinout-bluepill.svg)
+
 ### MCU
 
 | MCU       | STM32F103C8               |
