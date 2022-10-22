@@ -45,6 +45,10 @@ typedef struct {
 typedef struct {
     TIM_TypeDef *dev;               /**< Timer used */
     uint32_t rcc_mask;              /**< bit in clock enable register */
+#ifdef CPU_FAM_STM32F1
+    uint32_t remap;                 /**< AFIO remap mask to route periph to other
+                                         pins (or zero, if not needed) */
+#endif
     pwm_chan_t chan[TIMER_CHANNEL_NUMOF]; /**< channel mapping
                                            *   set to {GPIO_UNDEF, 0}
                                            *   if not used */
