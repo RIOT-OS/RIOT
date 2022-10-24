@@ -30,7 +30,8 @@ extern "C" {
 /**
  * @brief Disable all maskable interrupts
  */
-static inline __attribute__((always_inline)) unsigned int irq_disable(void)
+static inline __attribute__((always_inline))
+unsigned int irq_disable(void)
 {
     uint32_t mask = __get_PRIMASK();
 
@@ -41,8 +42,8 @@ static inline __attribute__((always_inline)) unsigned int irq_disable(void)
 /**
  * @brief Enable all maskable interrupts
  */
-static inline __attribute__((always_inline)) __attribute__((used)) unsigned int
-irq_enable(void)
+static inline __attribute__((always_inline)) __attribute__((used))
+unsigned int irq_enable(void)
 {
     unsigned result = __get_PRIMASK();
 
@@ -53,8 +54,8 @@ irq_enable(void)
 /**
  * @brief Restore the state of the IRQ flags
  */
-static inline __attribute__((always_inline)) void irq_restore(
-    unsigned int state)
+static inline __attribute__((always_inline))
+void irq_restore(unsigned int state)
 {
     __set_PRIMASK(state);
 }
@@ -62,7 +63,8 @@ static inline __attribute__((always_inline)) void irq_restore(
 /**
  * @brief See if IRQs are currently enabled
  */
-static inline __attribute__((always_inline)) bool irq_is_enabled(void)
+static inline __attribute__((always_inline))
+bool irq_is_enabled(void)
 {
     /* so far, all existing Cortex-M are only using the least significant bit
      * in the PRIMARK register. If ever any other bit is used for different
@@ -73,7 +75,8 @@ static inline __attribute__((always_inline)) bool irq_is_enabled(void)
 /**
  * @brief See if the current context is inside an ISR
  */
-static inline __attribute__((always_inline)) bool irq_is_in(void)
+static inline __attribute__((always_inline))
+bool irq_is_in(void)
 {
     return (__get_IPSR() & 0xFF);
 }
