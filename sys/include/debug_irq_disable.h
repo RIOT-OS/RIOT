@@ -27,6 +27,16 @@ extern "C" {
 #endif
 
 /**
+ * @brief Threshold (in CPU ticks) below which periods with IRQs
+ *        disabled are not printed.
+ *
+ *        Use this to prevent *a lot* of output when debugging.
+ */
+#ifndef CONFIG_DEBUG_IRQ_DISABLE_THRESHOLD
+#define CONFIG_DEBUG_IRQ_DISABLE_THRESHOLD  (1)
+#endif
+
+/**
  * @brief   Print time spent with IRQ disabled
  * @internal
  *
