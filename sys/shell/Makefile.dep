@@ -208,6 +208,7 @@ endif
 ifneq (,$(filter shell_cmd_gnrc_udp,$(USEMODULE)))
   USEMODULE += gnrc_udp
   USEMODULE += gnrc_pktdump
+  USEMODULE += netutils
 endif
 ifneq (,$(filter shell_cmd_i2c_scan,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
