@@ -8,7 +8,7 @@
 
 /**
  * @ingroup     pkg_lv_drivers
- * @brief       LittlevGL Drivers SDL2 configuration headers
+ * @brief       LVGL Drivers SDL2 configuration headers
  *
  * @note        Based on upstream lv_drv_conf_template.h.
  * @{
@@ -36,28 +36,28 @@ extern "C" {
  *-------------------*/
 
 /**
- * @brief   Internal flag to enable LittlevGL SDL2 based drivers for display, mouse,
+ * @brief   Internal flag to enable LVGL SDL2 based drivers for display, mouse,
  *          mousewheel and keyboard
  */
 #define USE_SDL IS_USED(MODULE_LV_DRIVERS_SDL)
 /**
- * @brief   LittlevGL SDL2 display horizontal resolution
+ * @brief   LVGL SDL2 display horizontal resolution
  */
 #ifndef SDL_HOR_RES
 #define SDL_HOR_RES                 320
 #endif
 /**
- * @brief   LittlevGL SDL2 display vertical resolution
+ * @brief   LVGL SDL2 display vertical resolution
  */
 #ifndef SDL_VER_RES
 #define SDL_VER_RES                 240
 #endif
 /**
- * @brief   LittlevGL display horizontal resolution
+ * @brief   LVGL display horizontal resolution
  */
 #define LV_HOR_RES                  SDL_HOR_RES
 /**
- * @brief   LittlevGL display vertical resolution
+ * @brief   LVGL display vertical resolution
  */
 #define LV_VER_RES                  SDL_VER_RES
 /**
