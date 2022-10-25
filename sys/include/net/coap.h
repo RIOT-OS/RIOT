@@ -65,6 +65,19 @@ extern "C" {
 #define COAP_OPT_PROXY_URI      (35)
 #define COAP_OPT_PROXY_SCHEME   (39)
 /**
+ * @brief Size1 option
+ *
+ * Used by clients to give servers an estimate of the total request
+ * payload size during block-wise server and by servers to indicate
+ * the maximum acceptable payload size in a 4.13 ("Request Entity
+ * Too Large") response.
+ *
+ * @see [RFC 7252](https://datatracker.ietf.org/doc/html/rfc7252)
+ * @see [RFC 7959](https://datatracker.ietf.org/doc/html/rfc7959)
+ * @see [RFC 8613](https://datatracker.ietf.org/doc/html/rfc8613)
+ */
+#define COAP_OPT_SIZE1          (60)
+/**
  * @brief suppress CoAP response
  * @see [RFC 7968](https://datatracker.ietf.org/doc/html/rfc7967)
  */
