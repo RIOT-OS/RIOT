@@ -1,7 +1,7 @@
-LittlevGL sample application
+LVGL sample application
 ============================
 
-This application shows a usage of LittlevGL with touch capabilities.
+This application shows a usage of LVGL with touch capabilities.
 
 ### Flashing the application
 

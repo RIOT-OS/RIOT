@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       LittlevGL example application with clickable button
+ * @brief       LVGL example application with clickable button
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  *
