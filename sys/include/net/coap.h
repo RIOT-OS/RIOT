@@ -51,6 +51,17 @@ extern "C" {
 #define COAP_OPT_LOCATION_QUERY (20)
 #define COAP_OPT_BLOCK2         (23)
 #define COAP_OPT_BLOCK1         (27)
+/**
+ * @brief Size2 option
+ *
+ * Used by clients to request an estimate of a resource's
+ * total size from a server during block-wise transfer and by
+ * servers to inform clients about the size.
+ *
+ * @see [RFC 7959](https://datatracker.ietf.org/doc/html/rfc7959)
+ * @see [RFC 8613](https://datatracker.ietf.org/doc/html/rfc8613)
+ */
+#define COAP_OPT_SIZE2          (28)
 #define COAP_OPT_PROXY_URI      (35)
 #define COAP_OPT_PROXY_SCHEME   (39)
 /**
