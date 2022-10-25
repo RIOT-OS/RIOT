@@ -1,7 +1,7 @@
-LittlevGL sample application
+LVGL sample application
 ============================
 
-This application shows a basic usage of LittlevGL with RIOT. It's simply an
+This application shows a basic usage of LVGL with RIOT. It's simply an
 adaption of one of the upstream examples: the
 [sysmon example](https://github.com/lvgl/lv_apps/tree/master/src/lv_sysmon).
 
