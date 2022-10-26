@@ -340,10 +340,7 @@ static int _init(netdev_t *netdev)
     }
 
     char *name = dev->tap_name;
-#ifdef __MACH__ /* macOS */
-    char clonedev[255] = "/dev/"; /* XXX bad size */
-    strncpy(clonedev + 5, name, 250);
-#elif defined(__FreeBSD__)
+#ifdef __FreeBSD__
     char clonedev[255] = "/dev/"; /* XXX bad size */
     strncpy(clonedev + 5, name, 250);
 #else /* Linux */
@@ -356,7 +353,7 @@ static int _init(netdev_t *netdev)
     if ((dev->tap_fd = real_open(clonedev, O_RDWR | O_NONBLOCK)) == -1) {
         err(EXIT_FAILURE, "open(%s)", clonedev);
     }
-#if (defined(__MACH__) || defined(__FreeBSD__)) /* macOS/FreeBSD */
+#if __FreeBSD__ /* FreeBSD */
     struct ifaddrs *iflist;
     if (real_getifaddrs(&iflist) == 0) {
         for (struct ifaddrs *cur = iflist; cur; cur = cur->ifa_next) {
