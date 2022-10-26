@@ -30,7 +30,6 @@
 #include "driver/include/m2m_wifi.h"
 
 #include "assert.h"
-#include "irq.h"
 #include "log.h"
 #include "net/netdev/eth.h"
 #include "od.h"
@@ -123,12 +122,8 @@ static void _atwinc15x0_eth_cb(uint8_t type, void *msg, void *ctrl_buf)
     /* the buffer shouldn't be used here */
     assert(atwinc15x0->rx_buf == NULL);
 
-    uint32_t state = irq_disable();
-
     atwinc15x0->rx_buf = msg;
     atwinc15x0->rx_len = ctrl->u16DataSize;
-
-    irq_restore(state);
 
     /**
      * This function is executed in the thread context. Therefore
@@ -270,13 +265,11 @@ static int _atwinc15x0_send(netdev_t *netdev, const iolist_t *iolist)
     /* atwinc15x0_eth_buf should not be used for incoming packets here */
     assert(dev->rx_buf == NULL);
 
-    uint32_t state = irq_disable();
     uint16_t tx_len = 0;
 
     /* load packet data into the buffer */
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
         if (tx_len + iol->iol_len > ETHERNET_MAX_LEN) {
-            irq_restore(state);
             return -EOVERFLOW;
         }
         if (iol->iol_len) {
@@ -291,8 +284,6 @@ static int _atwinc15x0_send(netdev_t *netdev, const iolist_t *iolist)
             od_hex_dump(atwinc15x0_eth_buf, tx_len, OD_WIDTH_DEFAULT);
         }
     }
-
-    irq_restore(state);
 
     /* send the the packet */
     if (m2m_wifi_send_ethernet_pkt(atwinc15x0_eth_buf, tx_len) == M2M_SUCCESS) {
@@ -313,12 +304,10 @@ static int _atwinc15x0_recv(netdev_t *netdev, void *buf, size_t len, void *info)
     assert(dev);
     assert(dev == atwinc15x0);
 
-    uint32_t state = irq_disable();
     uint16_t rx_size = dev->rx_len;
 
     if (!rx_size) {
         /* there is nothing in receive buffer */
-        irq_restore(state);
         return 0;
     }
 
@@ -329,7 +318,6 @@ static int _atwinc15x0_recv(netdev_t *netdev, void *buf, size_t len, void *info)
             dev->rx_len = 0;
             dev->rx_buf = NULL;
         }
-        irq_restore(state);
         return rx_size;
     }
 
@@ -339,7 +327,6 @@ static int _atwinc15x0_recv(netdev_t *netdev, void *buf, size_t len, void *info)
         /* newest API requires to drop the frame in that case */
         dev->rx_len = 0;
         dev->rx_buf = NULL;
-        irq_restore(state);
         return -ENOBUFS;
     }
 
@@ -357,8 +344,6 @@ static int _atwinc15x0_recv(netdev_t *netdev, void *buf, size_t len, void *info)
             od_hex_dump(buf, rx_size, OD_WIDTH_DEFAULT);
         }
     }
-
-    irq_restore(state);
 
     return rx_size;
 }
