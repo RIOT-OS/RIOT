@@ -68,7 +68,9 @@ extern "C" {
 #define CONFIG_CLOCK_PLL_MUL            (6)
 #endif
 #else /* CPU_FAM_F1 || CPU_FAM_F3 */
-#if defined(CPU_LINE_STM32F303x8)
+#if defined(CPU_LINE_STM32F303x6) || defined(CPU_LINE_STM32F303x8) || \
+    defined(CPU_LINE_STM32F303xB) || defined(CPU_LINE_STM32F303xC) || \
+    defined(CPU_LINE_STM32F328x8) || defined(CPU_LINE_STM32F358xC)
 #define CONFIG_CLOCK_PLL_MUL            (16)
 #else
 #define CONFIG_CLOCK_PLL_MUL            (9)
