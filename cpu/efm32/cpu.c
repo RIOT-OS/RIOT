@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015-2017 Freie Universität Berlin
+ *               2022 SSV Software Systems GmbH
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
+ * @author      Juergen Fitschen <me@jue.yt>
  *
  * @}
  */
@@ -28,16 +30,6 @@
 #include "em_cmu.h"
 #include "em_dbg.h"
 #include "em_emu.h"
-
-/**
- * @brief   Default settings for CMU initialization.
- */
-#ifndef CMU_HFXOINIT
-#define CMU_HFXOINIT        CMU_HFXOINIT_DEFAULT
-#endif
-#ifndef CMU_LFXOINIT
-#define CMU_LFXOINIT        CMU_LFXOINIT_DEFAULT
-#endif
 
 /**
  * @brief   Default settings for EMU initialization
@@ -68,6 +60,18 @@ static void dcdc_init(void)
     EMU_DCDCInit(&init_dcdc);
 #endif
 }
+#endif
+
+#if (_SILICON_LABS_32B_SERIES < 2)
+
+/**
+ * @brief   Default settings for CMU initialization.
+ */
+#ifndef CMU_HFXOINIT
+#define CMU_HFXOINIT        CMU_HFXOINIT_DEFAULT
+#endif
+#ifndef CMU_LFXOINIT
+#define CMU_LFXOINIT        CMU_LFXOINIT_DEFAULT
 #endif
 
 /**
@@ -144,6 +148,37 @@ static void clk_init(void)
     }
 }
 
+#else /* (_SILICON_LABS_32B_SERIES >= 2) */
+
+static void clk_init(void)
+{
+    /* init oscillators */
+#ifdef CMU_HFXOINIT
+    CMU_HFXOInit_TypeDef init_hfxo = CMU_HFXOINIT;
+    CMU_HFXOInit(&init_hfxo);
+#endif
+#ifdef CMU_LFXOINIT
+    CMU_LFXOInit_TypeDef init_lfxo = CMU_LFXOINIT;
+    CMU_LFXOInit(&init_lfxo);
+#endif
+
+    /* setup clock prescalers */
+#if defined(CLK_DIV_NUMOF)
+    for (size_t i = 0; i < CLK_DIV_NUMOF; i++) {
+        CMU_ClockDivSet(clk_div_config[i].clk, clk_div_config[i].div);
+    }
+#endif
+
+    /* select clock sources */
+#if defined(CLK_MUX_NUMOF)
+    for (size_t i = 0; i < CLK_MUX_NUMOF; i++) {
+        CMU_ClockSelectSet(clk_mux_config[i].clk, clk_mux_config[i].src);
+    }
+#endif
+}
+
+#endif /* (_SILICON_LABS_32B_SERIES >= 2) */
+
 /**
  * @brief   Initialize sleep modes
  *
@@ -157,7 +192,7 @@ static void pm_init(void)
 
     EMU_EM23Init(&init_em23);
 
-#if defined(_SILICON_LABS_32B_SERIES_1)
+#if defined(_SILICON_LABS_32B_SERIES_1) || defined(_SILICON_LABS_32B_SERIES_2)
     /* initialize EM4 */
     EMU_EM4Init_TypeDef init_em4 = EMU_EM4INIT;
 

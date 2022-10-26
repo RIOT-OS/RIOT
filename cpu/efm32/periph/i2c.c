@@ -94,6 +94,9 @@ static int _transfer(i2c_t dev, I2C_TransferSeq_TypeDef *transfer)
     }
 }
 
+#define GET_PIN(x) (x & 0xf)
+#define GET_PORT(x) (x >> 4)
+
 void i2c_init(i2c_t dev)
 {
     /* check if device is valid */
@@ -103,7 +106,9 @@ void i2c_init(i2c_t dev)
     mutex_init(&i2c_lock[dev]);
 
     /* enable clocks */
+#if defined(_SILICON_LABS_32B_SERIES_0) || defined(_SILICON_LABS_32B_SERIES_1)
     CMU_ClockEnable(cmuClock_HFPER, true);
+#endif
     CMU_ClockEnable(i2c_config[dev].cmu, true);
 
     /* configure the pins */
@@ -132,6 +137,15 @@ void i2c_init(i2c_t dev)
 #elif defined(_SILICON_LABS_32B_SERIES_1)
     i2c_config[dev].dev->ROUTEPEN = I2C_ROUTEPEN_SDAPEN | I2C_ROUTEPEN_SCLPEN;
     i2c_config[dev].dev->ROUTELOC0 = i2c_config[dev].loc;
+#else
+    GPIO->I2CROUTE[I2C_NUM(i2c_config[dev].dev)].SCLROUTE =
+        (GET_PORT(i2c_config[dev].scl_pin) << _GPIO_I2C_SCLROUTE_PORT_SHIFT) |
+        (GET_PIN(i2c_config[dev].scl_pin) << _GPIO_I2C_SCLROUTE_PIN_SHIFT);
+    GPIO->I2CROUTE[I2C_NUM(i2c_config[dev].dev)].SDAROUTE =
+        (GET_PORT(i2c_config[dev].sda_pin) << _GPIO_I2C_SDAROUTE_PORT_SHIFT) |
+        (GET_PIN(i2c_config[dev].sda_pin) << _GPIO_I2C_SDAROUTE_PIN_SHIFT);
+    GPIO->I2CROUTE[I2C_NUM(i2c_config[dev].dev)].ROUTEEN =
+        (GPIO_I2C_ROUTEEN_SCLPEN | GPIO_I2C_ROUTEEN_SDAPEN);
 #endif
 
     /* enable interrupts */

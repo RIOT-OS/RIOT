@@ -1,0 +1,78 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config CPU_FAM_EFR32ZG23
+    bool
+    select CPU_CORE_CORTEX_M33
+    select CPU_COMMON_EFM32
+    select CPU_EFM32_SERIES2
+    select HAS_PERIPH_HWRNG
+    select HAS_CORTEXM_MPU
+
+config MODULE_CPU_EFR32ZG23
+    bool
+    depends on CPU_FAM_EFR32ZG23
+    depends on TEST_KCONFIG
+    default y
+    help
+        EFR32ZG23 family-specific code.
+
+## CPU Models
+config CPU_MODEL_EFR32ZG23B020F512IM40
+    bool
+    select CPU_FAM_EFR32ZG23
+
+config CPU_MODEL_EFR32ZG23B020F512IM48
+    bool
+    select CPU_FAM_EFR32ZG23
+
+config CPU_MODEL_EFR32ZG23A010F512GM48
+    bool
+    select CPU_FAM_EFR32ZG23
+
+config CPU_MODEL_EFR32ZG23A010F512GM40
+    bool
+    select CPU_FAM_EFR32ZG23
+
+config CPU_MODEL_EFR32ZG23A020F512GM48
+    bool
+    select CPU_FAM_EFR32ZG23
+
+config CPU_MODEL_EFR32ZG23B010F512IM40
+    bool
+    select CPU_FAM_EFR32ZG23
+
+config CPU_MODEL_EFR32ZG23A020F512GM40
+    bool
+    select CPU_FAM_EFR32ZG23
+
+config CPU_MODEL_EFR32ZG23B011F512IM40
+    bool
+    select CPU_FAM_EFR32ZG23
+
+config CPU_MODEL_EFR32ZG23B010F512IM48
+    bool
+    select CPU_FAM_EFR32ZG23
+
+config CPU_MODEL_EFR32ZG23B021F512IM40
+    bool
+    select CPU_FAM_EFR32ZG23
+
+## Common CPU symbols
+config CPU_FAM
+    default "efr32zg23" if CPU_FAM_EFR32ZG23
+
+config CPU_MODEL
+    default "efr32zg23b020f512im40" if CPU_MODEL_EFR32ZG23B020F512IM40
+    default "efr32zg23b020f512im48" if CPU_MODEL_EFR32ZG23B020F512IM48
+    default "efr32zg23a010f512gm48" if CPU_MODEL_EFR32ZG23A010F512GM48
+    default "efr32zg23a010f512gm40" if CPU_MODEL_EFR32ZG23A010F512GM40
+    default "efr32zg23a020f512gm48" if CPU_MODEL_EFR32ZG23A020F512GM48
+    default "efr32zg23b010f512im40" if CPU_MODEL_EFR32ZG23B010F512IM40
+    default "efr32zg23a020f512gm40" if CPU_MODEL_EFR32ZG23A020F512GM40
+    default "efr32zg23b011f512im40" if CPU_MODEL_EFR32ZG23B011F512IM40
+    default "efr32zg23b010f512im48" if CPU_MODEL_EFR32ZG23B010F512IM48
+    default "efr32zg23b021f512im40" if CPU_MODEL_EFR32ZG23B021F512IM40

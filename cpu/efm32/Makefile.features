@@ -32,7 +32,7 @@ ifeq (1,$(EFM32_TRNG))
   FEATURES_PROVIDED += periph_hwrng
 endif
 
-ifeq (1,$(EFM32_SERIES))
+ifneq (,$(filter $(EFM32_SERIES),1 2))
   FEATURES_PROVIDED += periph_wdt_cb
 endif
 
