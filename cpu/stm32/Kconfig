@@ -48,13 +48,13 @@ choice
     prompt "ReaDout Protection level"
     default RDP0
     help
-    Set minimum running RDP level.
-    RDP0 is full debug permissions, RDP1 disables read from Flash but
-    otherwise leaves debug enabled, RDP2 disables JTAG completely. If
-    there is a mismatch between desired RDP level here and RDP level
-    set on the chip, early cpu init will hang.  This ensures production
-    devices with the wrong RDP level, by fault or malace intent, will
-    not run.  See cpu manual for further details on RDP.
+        Set minimum running RDP level.
+        RDP0 is full debug permissions, RDP1 disables read from Flash but
+        otherwise leaves debug enabled, RDP2 disables JTAG completely. If
+        there is a mismatch between desired RDP level here and RDP level
+        set on the chip, early cpu init will hang.  This ensures production
+        devices with the wrong RDP level, by fault or malace intent, will
+        not run.  See cpu manual for further details on RDP.
 depends on (CPU_FAM_F1 || CPU_FAM_F2 || CPU_FAM_F3 || CPU_FAM_F4 || CPU_FAM_F7)
 config RDP0
     bool "RDP0"
