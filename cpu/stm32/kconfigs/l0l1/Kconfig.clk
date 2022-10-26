@@ -1,0 +1,112 @@
+# Copyright (c) 2022 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+if CPU_FAM_L0 || CPU_FAM_L1
+
+config CLOCK_PLL_DIV
+    int "Main PLL division factor" if CUSTOM_PLL_PARAMS
+    default 2
+    range 2 4
+
+choice
+bool "Main PLL multiply factor" if CUSTOM_PLL_PARAMS
+default PLL_MUL_4
+
+config PLL_MUL_3
+    bool "Multiply by 3"
+
+config PLL_MUL_4
+    bool "Multiply by 4"
+
+config PLL_MUL_6
+    bool "Multiply by 6"
+
+config PLL_MUL_8
+    bool "Multiply by 8"
+
+config PLL_MUL_12
+    bool "Multiply by 12"
+
+config PLL_MUL_16
+    bool "Multiply by 16"
+
+config PLL_MUL_24
+    bool "Multiply by 24"
+
+config PLL_MUL_32
+    bool "Multiply by 32"
+
+config PLL_MUL_48
+    bool "Multiply by 48"
+
+endchoice
+
+config CLOCK_PLL_MUL
+    int
+    default 3 if PLL_MUL_3
+    default 4 if PLL_MUL_4
+    default 6 if PLL_MUL_6
+    default 8 if PLL_MUL_8
+    default 12 if PLL_MUL_12
+    default 16 if PLL_MUL_16
+    default 24 if PLL_MUL_24
+    default 32 if PLL_MUL_32
+    default 48 if PLL_MUL_48
+
+config USE_CLOCK_MSI
+    bool "Use direct multi-speed frequency internal oscillator (MSI)"
+
+choice
+bool "Desired MSI clock frequency" if USE_CLOCK_MSI || (USE_CLOCK_PLL && CLOCK_PLL_SRC_MSI)
+default CLOCK_MSI_4MHZ
+
+config CLOCK_MSI_65KHZ
+    bool "65.536kHz"
+
+config CLOCK_MSI_130KHZ
+    bool "131.072kHz"
+
+config CLOCK_MSI_260KHZ
+    bool "262.144kHz"
+
+config CLOCK_MSI_520KHZ
+    bool "524.288kHz"
+
+config CLOCK_MSI_1MHZ
+    bool
+    prompt "1MHz"
+
+config CLOCK_MSI_2MHZ
+    bool
+    prompt "2MHz"
+
+config CLOCK_MSI_4MHZ
+    bool
+    prompt "4MHz"
+
+endchoice
+
+config CLOCK_MSI
+    int
+    default 65536 if CLOCK_MSI_65KHZ
+    default 131072 if CLOCK_MSI_130KHZ
+    default 262144 if CLOCK_MSI_260KHZ
+    default 524288 if CLOCK_MSI_520KHZ
+    default 100000 if CLOCK_MSI_100KHZ
+    default 200000 if CLOCK_MSI_200KHZ
+    default 400000 if CLOCK_MSI_400KHZ
+    default 800000 if CLOCK_MSI_800KHZ
+    default 1048000 if CLOCK_MSI_1MHZ
+    default 2097000 if CLOCK_MSI_2MHZ
+    default 4194000 if CLOCK_MSI_4MHZ
+    default 8000000 if CLOCK_MSI_8MHZ
+    default 16000000 if CLOCK_MSI_16MHZ
+    default 24000000 if CLOCK_MSI_24MHZ
+    default 32000000 if CLOCK_MSI_32MHZ
+    default 48000000 if CLOCK_MSI_48MHZ
+
+endif # CPU_FAM_L0 || CPU_FAM_L1

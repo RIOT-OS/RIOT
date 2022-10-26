@@ -1,0 +1,24 @@
+# Copyright (c) 2022 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+rsource '../f2f4f7mp1/Kconfig.clk'
+
+if CPU_FAM_F7
+
+config CLOCK_PLL_M
+    int "M: PLLIN division factor" if CUSTOM_PLL_PARAMS
+    default 25 if CLOCK_HSE = 25000000
+    default 4
+
+config CLOCK_PLL_N
+    int "N: PLLIN multiply factor" if CUSTOM_PLL_PARAMS
+    default 216 if CLOCK_HSE = 8000000
+    default 432 if CLOCK_HSE = 25000000
+    default 108
+    range 50 432
+
+endif # CPU_FAM_F7

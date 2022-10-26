@@ -19,6 +19,8 @@ config CPU_STM32
     # This CPU requires periph_rtc when periph_rtc_mem
     select MODULE_PERIPH_RTC if MODULE_PERIPH_RTC_MEM && HAS_PERIPH_RTC
 
+menu "STM32 configuration"
+
 # Common CPU symbol
 config CPU
     default "stm32" if CPU_STM32
@@ -39,10 +41,18 @@ config MODULE_BOOTLOADER_STM32
     depends on HAS_BOOTLOADER_STM32
     depends on TEST_KCONFIG
 
-orsource "kconfigs/Kconfig.clk"
-orsource "kconfigs/*/Kconfig"
-orsource "kconfigs/*/Kconfig.lines"
-orsource "kconfigs/*/Kconfig.models"
+
+menu "STM32 clock configuration"
+    depends on CPU_STM32
+
+rsource "kconfigs/Kconfig.clk"
+rsource "kconfigs/$(CPU_FAM)/Kconfig.clk"
+
+endmenu
+
+rsource "kconfigs/$(CPU_FAM)/Kconfig"
+rsource "kconfigs/$(CPU_FAM)/Kconfig.lines"
+rsource "kconfigs/$(CPU_FAM)/Kconfig.models"
 
 choice
     prompt "ReaDout Protection level"
@@ -71,5 +81,7 @@ rsource "stmclk/Kconfig"
 rsource "vectors/Kconfig"
 
 endif # TEST_KCONFIG
+
+endmenu
 
 source "$(RIOTCPU)/cortexm_common/Kconfig"
