@@ -27,9 +27,8 @@ config BOARD_COMMON_IOTLAB
     select HAVE_L3G4200D
     select HAVE_LSM303DLHC
 
-choice CHOICE_CLOCK_HSE
-    default CLOCK_HSE_16MHZ
-endchoice
+config CLOCK_HSE
+    default 16000000
 
 config MODULE_BOARDS_COMMON_IOTLAB
     bool

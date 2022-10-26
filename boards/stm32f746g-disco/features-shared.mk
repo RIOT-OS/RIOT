@@ -11,6 +11,3 @@ FEATURES_PROVIDED += periph_uart
 FEATURES_PROVIDED += periph_usbdev
 FEATURES_PROVIDED += periph_usbdev_hs_ulpi
 FEATURES_PROVIDED += tinyusb_device
-
-# stm32f746g-disco provides a custom default Kconfig clock configuration
-KCONFIG_BOARD_CONFIG += $(RIOTBOARD)/stm32f746g-disco/clock.config

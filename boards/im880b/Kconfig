@@ -25,8 +25,7 @@ config BOARD_IM880B
     select BOARD_HAS_HSE
     select BOARD_HAS_LSE
 
-choice CHOICE_CLOCK_HSE
-    default CLOCK_HSE_16MHZ
-endchoice
+config CLOCK_HSE
+    default 16000000
 
 source "$(RIOTBOARD)/common/stm32/Kconfig"

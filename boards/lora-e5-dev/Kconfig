@@ -33,9 +33,8 @@ config BOARD_LORA_E5_DEV
     select HAVE_SAUL_GPIO
     select HAVE_LM75A
 
-choice CHOICE_CLOCK_HSE
-    default CLOCK_HSE_32MHZ
-endchoice
+config CLOCK_HSE
+    default 32000000
 
 config LORA_E5_DEV_ENABLE_3P3V
     bool "LoRa-E5 Development Kit - Enable 3.3V output"

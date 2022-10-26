@@ -21,9 +21,8 @@ config BOARD_F4VI1
     select BOARD_HAS_HSE
     select BOARD_HAS_LSE
 
-choice CHOICE_CLOCK_HSE
-    default CLOCK_HSE_16MHZ
-endchoice
+config CLOCK_HSE
+    default 16000000
 
 config CLOCK_PLL_M
     default 16

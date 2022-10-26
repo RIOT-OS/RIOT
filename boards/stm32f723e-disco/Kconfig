@@ -37,9 +37,8 @@ config BOARD_STM32F723E_DISCO
     # Workaround due to stdout only working with stdin enabled
     select MODULE_STDIN if TEST_KCONFIG
 
-choice CHOICE_CLOCK_HSE
-    default CLOCK_HSE_25MHZ
-endchoice
+config CLOCK_HSE
+    default 25000000
 
 config MODULE_PERIPH_INIT_LED0
     default n if MODULE_PERIPH_SPI
