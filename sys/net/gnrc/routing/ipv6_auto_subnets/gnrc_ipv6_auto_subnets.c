@@ -153,6 +153,18 @@
 #define CONFIG_GNRC_IPV6_AUTO_SUBNETS_NUMOF         (1)
 #endif
 
+/**
+ * @brief Enable this if you have a static network that might experience
+ *        high packet loss under certain conditions.
+ *        If enabled, this option causes the module to always assume the highest
+ *        number of subnets it has ever seen.
+ *        This prevents different/conflicting subnets from being configured if
+ *        multiple sync packets got lost.
+ */
+#ifndef CONFIG_GNRC_IPV6_AUTO_SUBNETS_STATIC
+#define CONFIG_GNRC_IPV6_AUTO_SUBNETS_STATIC        (0)
+#endif
+
 /* Code below should not be included by Doxygen */
 #ifndef DOXYGEN
 
@@ -623,6 +635,10 @@ static void *_eventloop(void *arg)
     uint8_t subnets = local_subnets;
     uint8_t tx_period = CONFIG_GNRC_IPV6_AUTO_SUBNETS_TX_PER_PERIOD;
 
+    /* only used with CONFIG_GNRC_IPV6_AUTO_SUBNETS_STATIC set */
+    uint8_t idx_old = 0;
+    uint8_t subnets_old = 0;
+
     DEBUG("auto_subnets: %u local subnets\n", subnets);
 
     if (subnets == 0) {
@@ -648,6 +664,21 @@ static void *_eventloop(void *arg)
                 /* send subnet announcement */
                 _send_announce(local_subnets, &timeout_timer, &timeout_msg);
             } else {
+
+                /* don't re-enumerate subnets of a downstream router goes down */
+                if (CONFIG_GNRC_IPV6_AUTO_SUBNETS_STATIC) {
+                    /* If we got less subnets than before, use the old value */
+                    if (subnets < subnets_old) {
+                        subnets = subnets_old;
+                        idx_start = idx_old;
+                    }
+                    /* Store subnet high water mark for later use */
+                    else {
+                        subnets_old = subnets;
+                        idx_old = idx_start;
+                    }
+                }
+
                 /* config round done, configure subnets */
                 _process_pio_cache(subnets, idx_start, _upstream);
 
