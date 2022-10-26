@@ -10,6 +10,13 @@ ifeq (esp32s2,$(CPU_FAM))
   CFLAGS += -DCFG_TUSB_MCU=OPT_MCU_ESP32S2
 else ifeq (esp32s3,$(CPU_FAM))
   CFLAGS += -DCFG_TUSB_MCU=OPT_MCU_ESP32S3
+else ifeq (nrf52,$(CPU))
+  CFLAGS += -DCFG_TUSB_MCU=OPT_MCU_NRF5X
+  CFLAGS += -Wno-cast-align
+  CFLAGS += -Wno-unused-parameter
+  INCLUDES += -I$(PKGDIRBASE)/nrfx/hal
+  INCLUDES += -I$(PKGDIRBASE)/nrfx/drivers/include
+  INCLUDES += -I$(PKGDIRBASE)/nrfx/drivers/src
 else ifeq (stm32,$(CPU))
   CFLAGS += -DCFG_TUSB_MCU=OPT_MCU_STM32$(call uppercase_and_underscore,$(CPU_FAM))
   CFLAGS += -Dasm=__asm

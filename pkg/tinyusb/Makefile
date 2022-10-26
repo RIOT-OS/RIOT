@@ -74,6 +74,9 @@ tinyusb_portable_espressif:
 tinyusb_portable_microchip:
 	$(QQ)"$(MAKE)" -C $(PSRC)/portable/microchip/samd -f $(RIOTBASE)/Makefile.base MODULE=$@
 
+tinyusb_portable_nrf5x:
+	$(QQ)"$(MAKE)" -C $(PSRC)/portable/nordic/nrf5x -f $(RIOTPKG)/$(PKG_NAME)/Makefile.nrf52
+
 tinyusb_portable_stm32_fsdev:
 	$(QQ)"$(MAKE)" -C $(PSRC)/portable/st/stm32_fsdev -f $(RIOTBASE)/Makefile.base MODULE=$@
 

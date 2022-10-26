@@ -16,6 +16,7 @@ config BOARD_REEL
     select HAS_PERIPH_SPI
     select HAS_PERIPH_UART
     select HAS_PERIPH_USBDEV
+    select HAS_TINYUSB_DEVICE
     select HAS_VDD_LC_FILTER_REG1
 
     select HAVE_MMA8X5X
