@@ -107,7 +107,7 @@ ssize_t clif_encode_link(const clif_t *link, char *buf, size_t maxlen)
     size_t pos = 0;
     ssize_t res = 0;
 
-    res = clif_add_target(link->target, buf, maxlen);
+    res = clif_add_target_from_buffer(link->target, link->target_len, buf, maxlen);
     if (res < 0) {
         return res;
     }
@@ -124,12 +124,12 @@ ssize_t clif_encode_link(const clif_t *link, char *buf, size_t maxlen)
     return pos;
 }
 
-ssize_t clif_add_target(const char *target, char *buf, size_t maxlen)
+ssize_t clif_add_target_from_buffer(const char *target, size_t target_len, char *buf, size_t maxlen)
 {
     assert(target);
 
     size_t pos = 0;
-    size_t target_len = strlen(target);
+    DEBUG("Adding target: %.*s, len: %d\n", target_len, target, target_len);
 
     if (!buf) {
         return target_len + 2; /* size after adding '<' and '>' */
@@ -147,6 +147,15 @@ ssize_t clif_add_target(const char *target, char *buf, size_t maxlen)
     buf[pos++] = LF_PATH_END_C;
 
     return pos;
+}
+
+ssize_t clif_add_target(const char *target, char *buf, size_t maxlen)
+{
+    assert(target);
+
+    size_t target_len = strlen(target);
+    assert(target_len > 0);
+    return clif_add_target_from_buffer(target, target_len, buf, maxlen);
 }
 
 ssize_t clif_add_link_separator(char *buf, size_t maxlen)
