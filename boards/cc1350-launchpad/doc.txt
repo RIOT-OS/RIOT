@@ -72,8 +72,8 @@ board. It provides virtual serials via USB interface - for connecting to RIOT
 shell, use the first one (with TI drivers for Windows named
 "Class Application/User UART").
 
-If a physical connection to UART is needed, disconnect jumpers RXD and TXD 
-joining cc1350 microcontroller with XDS110 and connect UART to pin RXD/DIO2 
+If a physical connection to UART is needed, disconnect jumpers RXD and TXD
+joining cc1350 microcontroller with XDS110 and connect UART to pin RXD/DIO2
 and TXD/DIO3.
 
 The default baud rate is 115 200 - in both connection types.
