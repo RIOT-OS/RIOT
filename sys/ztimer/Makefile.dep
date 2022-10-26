@@ -41,6 +41,10 @@ ifneq (,$(filter ztimer_convert_%,$(USEMODULE)))
   USEMODULE += ztimer_convert
 endif
 
+ifneq (,$(filter ztimer_periph_lptimer,$(USEMODULE)))
+  USEMODULE += ztimer_periph_timer
+endif
+
 ifneq (,$(filter ztimer_periph_timer,$(USEMODULE)))
   FEATURES_REQUIRED += periph_timer
 endif
