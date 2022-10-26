@@ -27,7 +27,9 @@
 #endif
 
 /* The HSE provides a 16MHz clock */
-#define CLOCK_HSE               MHZ(16)
+#ifndef CONFIG_CLOCK_HSE
+#define CONFIG_CLOCK_HSE               MHZ(16)
+#endif
 
 #include "periph_cpu.h"
 #include "clk_conf.h"

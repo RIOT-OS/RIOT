@@ -34,4 +34,10 @@ config BOARD_STM32F746G_DISCO
     select HAVE_STM32_ETH
     select HAVE_FT5X06
 
+
+choice CHOICE_CLOCK_HSE
+    default CLOCK_HSE_25MHZ
+endchoice
+
+
 source "$(RIOTBOARD)/common/stm32/Kconfig"

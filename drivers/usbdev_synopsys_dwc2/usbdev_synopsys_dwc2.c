@@ -768,7 +768,7 @@ static void _usbdev_init(usbdev_t *dev)
             _global_regs(usbdev->config)->GCCFG |= USB_OTG_GCCFG_PHYHSEN;
 
             /* determine the PLL input clock of the USB HS PHY from HSE clock */
-            switch (CLOCK_HSE) {
+            switch (CONFIG_CLOCK_HSE) {
                 case 12000000:
                     USB_HS_PHYC->USB_HS_PHYC_PLL |= USB_HS_PHYC_PLL1_PLLSEL_12MHZ;
                     break;

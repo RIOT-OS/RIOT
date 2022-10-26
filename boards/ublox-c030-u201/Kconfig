@@ -30,4 +30,8 @@ config BOARD_UBLOX_C030_U201
     select HAVE_SAUL_GPIO
     select MODULE_PERIPH_UART_HW_FC if TEST_KCONFIG && HAS_PERIPH_UART_HW_FC
 
+choice CHOICE_CLOCK_HSE
+    default CLOCK_HSE_12MHZ
+endchoice
+
 source "$(RIOTBOARD)/common/stm32/Kconfig"

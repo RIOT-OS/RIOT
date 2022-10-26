@@ -22,6 +22,11 @@ config BOARD_IM880B
     select HAS_PERIPH_UART
 
     # Clock configuration
+    select BOARD_HAS_HSE
     select BOARD_HAS_LSE
+
+choice CHOICE_CLOCK_HSE
+    default CLOCK_HSE_16MHZ
+endchoice
 
 source "$(RIOTBOARD)/common/stm32/Kconfig"

@@ -28,4 +28,8 @@ config BOARD_NUCLEO_WL55JC
 
     select MODULE_PERIPH_LPUART if MODULE_STDIO_UART && HAS_PERIPH_LPUART
 
+choice CHOICE_CLOCK_HSE
+    default CLOCK_HSE_32MHZ
+endchoice
+
 source "$(RIOTBOARD)/common/nucleo64/Kconfig"

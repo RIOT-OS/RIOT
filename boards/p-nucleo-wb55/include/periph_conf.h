@@ -28,7 +28,9 @@
 #define CONFIG_BOARD_HAS_HSE            1
 #endif
 
-#define CLOCK_HSE                       MHZ(32)
+#ifndef CONFIG_CLOCK_HSE
+#define CONFIG_CLOCK_HSE                       MHZ(32)
+#endif
 
 /* EXTAHB (HCLK2) max freq 32 Mhz*/
 #define CLOCK_EXTAHB_DIV    RCC_EXTCFGR_C2HPRE_3

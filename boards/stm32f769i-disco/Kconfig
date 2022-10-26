@@ -29,4 +29,10 @@ config BOARD_STM32F769I_DISCO
 
     select HAVE_SAUL_GPIO
 
+
+choice CHOICE_CLOCK_HSE
+    default CLOCK_HSE_25MHZ
+endchoice
+
+
 source "$(RIOTBOARD)/common/stm32/Kconfig"

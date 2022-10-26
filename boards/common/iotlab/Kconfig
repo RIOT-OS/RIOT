@@ -27,6 +27,10 @@ config BOARD_COMMON_IOTLAB
     select HAVE_L3G4200D
     select HAVE_LSM303DLHC
 
+choice CHOICE_CLOCK_HSE
+    default CLOCK_HSE_16MHZ
+endchoice
+
 config MODULE_BOARDS_COMMON_IOTLAB
     bool
     depends on TEST_KCONFIG
