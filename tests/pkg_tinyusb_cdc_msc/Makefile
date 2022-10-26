@@ -9,5 +9,3 @@ USEMODULE += tinyusb_class_msc
 USEMODULE += tinyusb_device
 
 include $(RIOTBASE)/Makefile.include
-
-INCLUDES += -I$(APPDIR)

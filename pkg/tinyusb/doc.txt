@@ -51,20 +51,27 @@
  * }
  * ```
  *
- * Create a file `tusb_config.h` in your application directory which includes
- * at least the file `tinyusb_config.h` from the tinyUSB package. This file is
- * required by the tinyUSB stack and can be used to override the default
- * configuration defined in `tinyusb_config.h`.
+ * Create a file `tinyusb_app_config.h` in your application directory.
+ * This file is can be used to override the default configuration defined
+ * in `tusb_config.h`.
  * ```c
  * #define CONFIG_TUSBD_CDC_NUMOF   2
- *
- * #include "tinyusb_config.h"
  * ```
+ *
+ * By default, the number of `CONFIG_TUSBD_*_NUMOF` device class and
+ * `CONFIG_TUSBH_*_NUMOF` host class interfaces are defined to 1 if the
+ * corresponding `tinyusb_class_*` and `tinyusb_device`/`tinyusb_host`
+ * module are enabled, and 0 otherwise.
+ * That is, there is one interface of each class.
+ *
+ * For example, if the `tinyusb_device` and `tinyusb_class_cdc` modules are
+ * enabled, `CONFIG_TUSBD_CDC_NUMOF` is defined to 1 by default. The number of
+ * all other `CONFIG_TUSBD_*_NUMOF` device class interfaces are 0.
  *
  * Add the application path to the include paths at the end of your
  * application's Makefile. This is necessary so that the tinyUSB stack
- * uses the file `tusb_config.h` from your application directory and thus the
- * file `tinyusb_config.h` from the tinyUSB package.
+ * uses the file `tinyusb_app_config.h` from your application directory
+ * and thus the file `tusb_config.h` from the tinyUSB package.
  * ```makefile
  * USEPKG += tinyusb
  * USEMODULE += tinyusb_class_cdc
