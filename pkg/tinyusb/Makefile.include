@@ -12,6 +12,7 @@ else ifeq (esp32s3,$(CPU_FAM))
   CFLAGS += -DCFG_TUSB_MCU=OPT_MCU_ESP32S3
 else ifeq (stm32,$(CPU))
   CFLAGS += -DCFG_TUSB_MCU=OPT_MCU_STM32$(call uppercase_and_underscore,$(CPU_FAM))
+  CFLAGS += -Dasm=__asm
 else ifeq (saml21,$(CPU))
   CFLAGS += -DCFG_TUSB_MCU=OPT_MCU_SAML21
 else ifeq (samd21,$(CPU))

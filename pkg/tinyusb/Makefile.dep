@@ -58,9 +58,13 @@ else ifneq (,$(filter saml21 samd5x samd21,$(CPU)))
   USEMODULE += tinyusb_portable_microchip
 else ifeq (stm32,$(CPU))
   ifneq (,$(filter f2 f4 f7 h7 l4,$(CPU_FAM)))
+    # STM32 families F2, F4, F7, H7 and L4 use the Synopsys DWC2 USB OTG IP core
     USEMODULE += tinyusb_portable_synopsys_dwc2
-  else ifneq (,$(filter f0 f1 g4 l0 wb,$(CPU_FAM)))
-    # TODO not yet working, the driver has to be ported
+  else ifneq (,$(filter stm32f105% stm32f107%,$(CPU_MODEL)))
+    # STM32F105xx and STM32F107xx also use the Synopsys DWC2 USB OTG IP core
+    USEMODULE += tinyusb_portable_synopsys_dwc2
+  else
+    # All other STM32 MCUs use the USB Device FS IP core.
     USEMODULE += tinyusb_portable_stm32_fsdev
   endif
 endif

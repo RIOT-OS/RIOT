@@ -11,7 +11,7 @@
  * @brief
  * @{
  *
- * @brief       tinyUSB hardware driver for STM32 MCUs
+ * @brief       tinyUSB hardware driver for STM32 MCUs with USB OTG FS/HS ports
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
