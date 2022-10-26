@@ -9,6 +9,7 @@ STDIO_MODULES = \
   stdio_semihosting \
   stdio_uart \
   stdio_telnet \
+  stdio_tinyusb_cdc_acm \
   #
 
 # select stdio_uart if no other stdio module is slected
@@ -20,6 +21,10 @@ ifneq (,$(filter stdio_cdc_acm,$(USEMODULE)))
   USEMODULE += usbus_cdc_acm
   USEMODULE += isrpipe
   USEMODULE += stdio_available
+endif
+
+ifneq (,$(filter stdio_tinyusb_cdc_acm,$(USEMODULE)))
+  USEPKG += tinyusb
 endif
 
 ifneq (,$(filter stdio_rtt,$(USEMODULE)))

@@ -8,6 +8,11 @@ USEMODULE += tinyusb_hw
 
 DEFAULT_MODULE += auto_init_tinyusb
 
+ifneq (,$(filter stdio_tinyusb_cdc_acm, $(USEMODULE)))
+  USEMODULE += tinyusb_class_cdc
+  USEMODULE += tinyusb_device
+endif
+
 ifeq (,$(filter tinyusb_class_%,$(USEMODULE)))
   $(error At least one tinyusb_class_* module has to be enabled)
 endif
