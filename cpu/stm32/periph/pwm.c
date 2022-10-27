@@ -28,6 +28,7 @@
 #include "assert.h"
 #include "periph/pwm.h"
 #include "periph/gpio.h"
+#include "periph_conf.h"
 
 #define CCMR_MODE1          (TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2 | \
                              TIM_CCMR1_OC2M_1 | TIM_CCMR1_OC2M_2)
@@ -59,6 +60,11 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
     for (unsigned i = 0; i < TIMER_CHANNEL_NUMOF; ++i) {
         TIM_CHAN(pwm, i) = (mode == PWM_RIGHT) ? res : 0;
     }
+
+    /* remap the timer to the configured pins (F1 only) */
+#ifdef CPU_FAM_STM32F1
+    AFIO->MAPR |= pwm_config[pwm].remap;
+#endif
 
     /* configure the used pins */
     unsigned i = 0;

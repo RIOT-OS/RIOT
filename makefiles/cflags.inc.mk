@@ -87,6 +87,13 @@ ifeq (,$(filter -DDEVELHELP,$(CFLAGS)))
     CFLAGS += -DNDEBUG
   endif
 endif
-
 # Add the optional flags that are not architecture/toolchain blacklisted
 CFLAGS += $(filter-out $(OPTIONAL_CFLAGS_BLACKLIST),$(OPTIONAL_CFLAGS))
+
+# Improve C++ compatibility with our C headers: In C it is both valid and good
+# practise to implicitly initialize struct members with zero by omitting them
+# in a initializer list. The C++ compiler greatly frowns upon this, even within
+# `extern "C" { ... }`. The best would be to configure the C++ compiler to
+# accept good C practises within `extern "C" { ... }` while enforcing good C++
+# practises elsewhere. But in absence of this, we disable the warning for now.
+CXXEXFLAGS += -Wno-missing-field-initializers
