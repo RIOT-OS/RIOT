@@ -182,8 +182,11 @@ void gnrc_sixlowpan_frag_sfr_arq_timeout(gnrc_sixlowpan_frag_fb_t *fbuf);
 
 /**
  * @brief   Handles inter frame gap
+ *
+ * @param[in] fbuf  The fragmentation buffer representing the datagram for which
+ *                  the next frame should uphold the inter frame gap
  */
-void gnrc_sixlowpan_frag_sfr_inter_frame_gap(void);
+void gnrc_sixlowpan_frag_sfr_inter_frame_gap(gnrc_sixlowpan_frag_fb_t *fbuf);
 
 #if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)
 /**

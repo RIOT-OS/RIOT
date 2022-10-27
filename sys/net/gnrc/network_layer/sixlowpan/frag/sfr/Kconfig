@@ -34,6 +34,7 @@ config GNRC_SIXLOWPAN_SFR_OPT_FRAG_SIZE
 
 config GNRC_SIXLOWPAN_SFR_USE_ECN
     bool "Indicates whether the sender should react to Explicit Content Notification (UseECN)"
+    default true if KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE
     default false
     help
         When the sender reacts to Explicit Congestion Notification (ECN) its
@@ -41,8 +42,8 @@ config GNRC_SIXLOWPAN_SFR_USE_ECN
         CONFIG_GNRC_SIXLOWPAN_SFR_MIN_WIN_SIZE and @ref
         CONFIG_GNRC_SIXLOWPAN_SFR_MAX_WIN_SIZE.
 
-if GNRC_SIXLOWPAN_SFR_USE_ECN
-comment "Warning: Reaction of sender to ECN is not implemented yet"
+if GNRC_SIXLOWPAN_SFR_USE_ECN && !KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE
+comment "Warning: Reaction to ECN requires module `gnrc_sixlowpan_frag_sfr_congure`"
 endif
 
 config GNRC_SIXLOWPAN_SFR_MIN_WIN_SIZE
@@ -167,5 +168,13 @@ config GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_DEN
         ECN bit of an RFRAG header when the frame queue for SFR is filled by
         @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_NUM / @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_DEN
 endif
+
+config GNRC_SIXLOWPAN_SFR_MOCK_ARQ_TIMER
+    bool "Deactivate automatic handling of ARQ timer"
+    default n
+    help
+        This requires an external source (e.g. a test application) to call
+        @ref gnrc_sixlowpan_frag_sfr_arq_timeout() for
+        @ref net_gnrc_sixlowpan_frag_sfr to still work properly.
 
 endif

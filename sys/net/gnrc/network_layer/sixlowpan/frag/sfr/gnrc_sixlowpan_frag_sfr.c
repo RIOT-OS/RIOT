@@ -39,6 +39,7 @@
 #include "xtimer.h"
 
 #include "net/gnrc/sixlowpan/frag/sfr.h"
+#include "net/gnrc/sixlowpan/frag/sfr/congure.h"
 
 #define ENABLE_DEBUG    0
 #include "debug.h"
@@ -49,14 +50,12 @@
                                  CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_SIZE)
 
 typedef struct {
-    clist_node_t super;     /**< list parent instance */
-    uint32_t last_sent;     /**< last time sent in microseconds */
+    congure_snd_msg_t super;    /**< CongURE message parent */
     /**
      * @brief   Acknowledgment request flag, sequence number, and fragment size
      */
     uint16_t ar_seq_fs;
-    uint16_t offset;        /**< offset of the fragment */
-    uint8_t retries;        /**< how often the fragment was retried */
+    uint16_t offset;            /**< offset of the fragment */
 } _frag_desc_t;
 
 typedef struct {
@@ -175,15 +174,25 @@ static uint16_t _send_nth_fragment(gnrc_netif_t *netif,
  * @brief   Send a abort pseudo fragment for datagram identified by @p tag
  *
  * @param[in] pkt       Datagram that is to be aborted.
- * @param[in] tag       Tag for @p pkt.
+ * @param[in] fbuf      Fragmentation buffer for @p pkt.
  * @param[in] req_ack   Request ACK for pseudo fragment from receive
  * @param[in] page      Current 6Lo dispatch parsing page.
  *
  * @return  true, if abort pseudo fragment was sent.
  * @return  false, if abort pseudo fragment was unable to be sent.
  */
-static bool _send_abort_frag(gnrc_pktsnip_t *pkt, uint8_t tag, bool req_ack,
-                             unsigned page);
+static bool _send_abort_frag(gnrc_pktsnip_t *pkt,
+                             gnrc_sixlowpan_frag_fb_t *fbuf,
+                             bool req_ack, unsigned page);
+
+/**
+ * @brief   Adapts currently sent number of fragments to current window size
+ *
+ * Balances `fbuf->sfr.window` with `fbuf->sfr.congure->cwnd`
+ *
+ * @param[in] fbuf          Fragmentation buffer to adapt window for
+ */
+static void _shrink_window(gnrc_sixlowpan_frag_fb_t *fbuf);
 
 /**
  * @brief   Re-send a fragment
@@ -235,8 +244,11 @@ static void _send_ack(gnrc_netif_t *netif, const uint8_t *dst, uint8_t dst_len,
 /**
  * @brief   Schedule next frame (RFRAG or RFRAG-ACK) with
  *          @ref GNRC_SIXLOWPAN_FRAG_SFR_INTER_FRAG_GAP_MSG
+ *
+ * @param[in] fbuf      A fragmentation buffer holding the state of the datagram
+ *                      and recoverable fragments.
  */
-static void _sched_next_frame(void);
+static void _sched_next_frame(gnrc_sixlowpan_frag_fb_t *fbuf);
 
 /**
  * @brief   Schedule ARQ timeout
@@ -297,13 +309,13 @@ static int _forward_rfrag(gnrc_pktsnip_t *pkt, _generic_rb_entry_t *entry,
 /* ====== PUBLIC FUNCTION DEFINITIONS ====== */
 void gnrc_sixlowpan_frag_sfr_init(void)
 {
-    if (CONFIG_GNRC_SIXLOWPAN_SFR_INTER_FRAME_GAP_US > 0) {
+    if (gnrc_sixlowpan_frag_sfr_congure_snd_has_inter_frame_gap()) {
         for (unsigned i = 0; i < FRAME_QUEUE_POOL_SIZE; i++) {
             clist_rpush(&_frame_queue_free, &_frame_queue_pool[i].super);
         }
     }
     for (unsigned i = 0; i < FRAG_DESCS_POOL_SIZE; i++) {
-        clist_rpush(&_frag_descs_free, &_frag_descs_pool[i].super);
+        clist_rpush(&_frag_descs_free, &_frag_descs_pool[i].super.super);
     }
 }
 
@@ -329,6 +341,7 @@ void gnrc_sixlowpan_frag_sfr_send(gnrc_pktsnip_t *pkt, void *ctx,
 
     if (fbuf->offset == 0) {
         DEBUG("6lo sfr: sending first fragment\n");
+        gnrc_sixlowpan_frag_sfr_congure_snd_setup(fbuf);
         res = _send_1st_fragment(netif, fbuf, page, &tx_sync);
         if (res == 0) {
             DEBUG("6lo sfr: error sending first fragment\n");
@@ -337,12 +350,17 @@ void gnrc_sixlowpan_frag_sfr_send(gnrc_pktsnip_t *pkt, void *ctx,
             goto error;
         }
     }
-    else if (fbuf->sfr.frags_sent >= fbuf->sfr.window_size) {
-        DEBUG("6lo sfr: frags_sent >= fbuf->sfr.window_size: don't send more\n");
+    else if (!gnrc_sixlowpan_frag_sfr_congure_snd_in_cwnd(fbuf)) {
+        DEBUG("6lo sfr: frags_sent not within congestion window: "
+              "don't send more\n");
         return;
     }
     else if (fbuf->offset < fbuf->datagram_size) {
         DEBUG("6lo sfr: sending subsequent fragment\n");
+#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE)
+        assert(fbuf->sfr.congure);
+        assert(fbuf->sfr.congure->driver);
+#endif
         res = _send_nth_fragment(netif, fbuf, page, &tx_sync);
         if (res == 0) {
             DEBUG("6lo sfr: error sending subsequent fragment (offset = %u)\n",
@@ -358,15 +376,17 @@ void gnrc_sixlowpan_frag_sfr_send(gnrc_pktsnip_t *pkt, void *ctx,
          * the fragmentation buffer now) */
         goto error;
     }
+    gnrc_sixlowpan_frag_sfr_congure_snd_report_frag_sent(fbuf);
     fbuf->offset += res;
 
-    if ((fbuf->sfr.frags_sent < fbuf->sfr.window_size) &&
+    if (gnrc_sixlowpan_frag_sfr_congure_snd_in_cwnd(fbuf) &&
         (fbuf->offset < fbuf->datagram_size) &&
         !gnrc_sixlowpan_frag_fb_send(fbuf)) {
         /* the queue of the 6LoWPAN thread is full */
         error_no = ENOMEM;
         /* go back offset to not send abort on first fragment */
         fbuf->offset -= res;
+        gnrc_sixlowpan_frag_sfr_congure_snd_report_frag_discard(fbuf);
         goto error;
     }
     /* check if last fragment sent requested an ACK */
@@ -395,7 +415,7 @@ error:
     /* don't send abort for first fragment, the network does not know about
      * the datagram */
     if ((fbuf->offset > 0) &&
-        _send_abort_frag(fbuf->pkt, (uint8_t)fbuf->tag, true, 0)) {
+        _send_abort_frag(fbuf->pkt, fbuf, true, 0)) {
         /* wait for ACK before fbuf is deleted */
         _sched_abort_timeout(fbuf);
     }
@@ -468,28 +488,48 @@ int gnrc_sixlowpan_frag_sfr_forward(gnrc_pktsnip_t *pkt,
                           page);
 }
 
+static int _report_non_ack_req_window_sent(clist_node_t *node, void *fbuf_ptr)
+{
+    _frag_desc_t *frag_desc = (_frag_desc_t *)node;
+    if (!_frag_ack_req(frag_desc)) {
+        gnrc_sixlowpan_frag_sfr_congure_snd_report_frag_sent(fbuf_ptr);
+    }
+    return 0;
+}
+
 void gnrc_sixlowpan_frag_sfr_arq_timeout(gnrc_sixlowpan_frag_fb_t *fbuf)
 {
-    uint32_t now = xtimer_now_usec();
-    _frag_desc_t * const head = (_frag_desc_t *)fbuf->sfr.window.next;
-    _frag_desc_t *frag_desc = head;
+    uint32_t now = xtimer_now_usec() / US_PER_MS;
+    _frag_desc_t *frag_desc = (_frag_desc_t *)fbuf->sfr.window.next;
     uint32_t next_arq_offset = fbuf->sfr.arq_timeout;
     bool reschedule_arq_timeout = false;
     int error_no = ETIMEDOUT;   /* assume time out for fbuf->pkt */
 
     DEBUG("6lo sfr: ARQ timeout for datagram %u\n", fbuf->tag);
     fbuf->sfr.arq_timeout_event.msg.content.ptr = NULL;
+    if (IS_ACTIVE(CONFIG_GNRC_SIXLOWPAN_SFR_MOCK_ARQ_TIMER)) {
+        /* mock-up to emulate time having passed beyond (1us) the ARQ timeout */
+        now -= (fbuf->sfr.arq_timeout * US_PER_MS) + 1;
+    }
+    if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE) && frag_desc) {
+        /* report timeout to CongURE state */
+        gnrc_sixlowpan_frag_sfr_congure_snd_report_frags_timeout(fbuf);
+        _shrink_window(fbuf);   /* potentially shrink window */
+        /* reassign frag_desc, in case window head changed */
+        frag_desc = (_frag_desc_t *)fbuf->sfr.window.next;
+    }
     /* copying clist_foreach because we can't work just in function context */
+    _frag_desc_t * const head = frag_desc;
     if (frag_desc) {
         do {
             uint32_t diff;
 
-            frag_desc = (_frag_desc_t *)frag_desc->super.next;
-            diff = now - frag_desc->last_sent;
-            if (diff < (fbuf->sfr.arq_timeout * US_PER_MS)) {
+            frag_desc = (_frag_desc_t *)frag_desc->super.super.next;
+            diff = now - frag_desc->super.send_time;
+            if (diff < fbuf->sfr.arq_timeout) {
                 /* this fragment's last was last sent < fbuf->sfr.arq_timeout
                  * ago */
-                uint32_t offset = fbuf->sfr.arq_timeout - (diff / US_PER_MS);
+                uint32_t offset = fbuf->sfr.arq_timeout - diff;
 
                 DEBUG("6lo sfr: wait for fragment %u in next reschedule\n",
                       _frag_seq(frag_desc));
@@ -507,24 +547,31 @@ void gnrc_sixlowpan_frag_sfr_arq_timeout(gnrc_sixlowpan_frag_fb_t *fbuf)
             else if (_frag_ack_req(frag_desc)) {
                 /* for this fragment we requested an ACK which was not received
                  * yet. Try to resend it */
-                if ((frag_desc->retries++) < CONFIG_GNRC_SIXLOWPAN_SFR_FRAG_RETRIES) {
+                if ((frag_desc->super.resends++) < CONFIG_GNRC_SIXLOWPAN_SFR_FRAG_RETRIES) {
                     /* we have retries left for this fragment */
                     DEBUG("6lo sfr: %u retries left for fragment (tag: %u, "
                           "X: %i, seq: %u, frag_size: %u, offset: %u)\n",
                           CONFIG_GNRC_SIXLOWPAN_SFR_FRAG_RETRIES -
-                          (frag_desc->retries - 1), (uint8_t)fbuf->tag,
+                          (frag_desc->super.resends - 1), (uint8_t)fbuf->tag,
                           _frag_ack_req(frag_desc), _frag_seq(frag_desc),
                           _frag_size(frag_desc), frag_desc->offset);
-                    if (_resend_frag(&frag_desc->super, fbuf) != 0) {
+                    if (_resend_frag(&frag_desc->super.super, fbuf) != 0) {
                         /* _resend_frag failed due to a memory resource
                          * problem */
                         error_no = ENOMEM;
                         goto error;
                     }
-                    else if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
-                        /* fragment was resent successfully, note this done in
-                         * the statistics */
-                        _stats.fragment_resends.by_timeout++;
+                    else {
+                        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE)) {
+                            /* fragment was resent successfully, report this to CongURE state
+                             * object */
+                            gnrc_sixlowpan_frag_sfr_congure_snd_report_frag_sent(fbuf);
+                        }
+                        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+                            /* fragment was resent successfully, note this done
+                             * in the statistics */
+                            _stats.fragment_resends.by_timeout++;
+                        }
                     }
                     /* fragment was resent successfully, schedule next ACK
                      * timeout */
@@ -555,6 +602,10 @@ void gnrc_sixlowpan_frag_sfr_arq_timeout(gnrc_sixlowpan_frag_fb_t *fbuf)
                       _frag_seq(frag_desc));
             }
         } while (frag_desc != head);
+        /* report all non-ack_req fragments in window also as sent, since even
+         * the lost fragments are still in flight (even though they were
+         * previously marked as timed out) */
+        clist_foreach(&fbuf->sfr.window, _report_non_ack_req_window_sent, fbuf);
     }
     else {
         /* No fragments to resend, we can assume the packet was delivered
@@ -568,13 +619,13 @@ void gnrc_sixlowpan_frag_sfr_arq_timeout(gnrc_sixlowpan_frag_fb_t *fbuf)
     }
 error:
     /* don't check return value, as we don't want to wait for an ACK again ;-) */
-    _send_abort_frag(fbuf->pkt, (uint8_t)fbuf->tag, false, 0);
+    _send_abort_frag(fbuf->pkt, fbuf, false, 0);
     _clean_up_fbuf(fbuf, error_no);
 }
 
-void gnrc_sixlowpan_frag_sfr_inter_frame_gap(void)
+void gnrc_sixlowpan_frag_sfr_inter_frame_gap(gnrc_sixlowpan_frag_fb_t *fbuf)
 {
-    if (CONFIG_GNRC_SIXLOWPAN_SFR_INTER_FRAME_GAP_US > 0) {
+    if (gnrc_sixlowpan_frag_sfr_congure_snd_has_inter_frame_gap()) {
         _frame_queue_t *node = (_frame_queue_t *)clist_lpop(&_frame_queue);
 
         if (node != NULL) {
@@ -585,7 +636,7 @@ void gnrc_sixlowpan_frag_sfr_inter_frame_gap(void)
             clist_rpush(&_frame_queue_free, &node->super);
         }
         if (clist_lpeek(&_frame_queue) != NULL) {
-            _sched_next_frame();
+            _sched_next_frame(fbuf);
         }
     }
 }
@@ -631,7 +682,7 @@ static void _clean_slate_datagram(gnrc_sixlowpan_frag_fb_t *fbuf)
     evtimer_del((evtimer_t *)(&_arq_timer),
                 &fbuf->sfr.arq_timeout_event.event);
     fbuf->sfr.arq_timeout_event.event.next = NULL;
-    if (CONFIG_GNRC_SIXLOWPAN_SFR_INTER_FRAME_GAP_US > 0) {
+    if (gnrc_sixlowpan_frag_sfr_congure_snd_has_inter_frame_gap()) {
         for (clist_node_t *node = clist_lpop(&_frame_queue);
              node != NULL; node = clist_lpop(&_frame_queue)) {
             _frame_queue_t *entry = (_frame_queue_t *)node;
@@ -652,7 +703,6 @@ static void _clean_slate_datagram(gnrc_sixlowpan_frag_fb_t *fbuf)
     fbuf->offset = 0U;
     fbuf->sfr.cur_seq = 0U;
     fbuf->sfr.frags_sent = 0U;
-    fbuf->sfr.window_size = CONFIG_GNRC_SIXLOWPAN_SFR_OPT_WIN_SIZE;
     for (clist_node_t *node = clist_lpop(&fbuf->sfr.window);
          node != NULL; node = clist_lpop(&fbuf->sfr.window)) {
         clist_rpush(&_frag_descs_free, node);
@@ -719,7 +769,9 @@ static gnrc_pktsnip_t *_build_frag_from_fbuf(gnrc_pktsnip_t *pkt,
 {
     return _build_frag_pkt(pkt->data, (uint8_t)fbuf->tag,
                            ((frag_size + fbuf->offset) >= fbuf->datagram_size) ||
-                           ((fbuf->sfr.frags_sent + 1) >= fbuf->sfr.window_size),
+                           /* we only can send the next fragment we build here,
+                            * so request ACK for it */
+                           !gnrc_sixlowpan_frag_sfr_congure_snd_next_in_cwnd(fbuf),
                            frag_size, fbuf->sfr.cur_seq);
 }
 
@@ -807,14 +859,15 @@ static void _check_for_ecn(gnrc_pktsnip_t *frame)
     }
 }
 
-static bool _send_frame(gnrc_pktsnip_t *frame, void *ctx, unsigned page)
+static bool _send_frame(gnrc_pktsnip_t *frame, gnrc_sixlowpan_frag_fb_t *fbuf,
+                        void *ctx, unsigned page)
 {
     uint32_t now;
+    uint32_t if_gap = gnrc_sixlowpan_frag_sfr_congure_snd_inter_frame_gap(fbuf);
 
     _check_for_ecn(frame);
     now = xtimer_now_usec();
-    if ((CONFIG_GNRC_SIXLOWPAN_SFR_INTER_FRAME_GAP_US == 0) ||
-        ((now - _last_frame_sent) > CONFIG_GNRC_SIXLOWPAN_SFR_INTER_FRAME_GAP_US)) {
+    if ((if_gap == 0) || ((now - _last_frame_sent) > if_gap)) {
         DEBUG("6lo sfr: dispatch frame to network interface\n");
         _last_frame_sent = now;
         gnrc_sixlowpan_dispatch_send(frame, ctx, page);
@@ -831,7 +884,7 @@ static bool _send_frame(gnrc_pktsnip_t *frame, void *ctx, unsigned page)
             node->datagram_tag = hdr->tag;
             node->page = page;
             clist_rpush(&_frame_queue, &node->super);
-            _sched_next_frame();
+            _sched_next_frame(fbuf);
         }
         return (node != NULL);
     }
@@ -851,13 +904,14 @@ static bool _send_fragment(gnrc_pktsnip_t *frag, gnrc_sixlowpan_frag_fb_t *fbuf,
     }
     frag_desc->ar_seq_fs = byteorder_ntohs(hdr->ar_seq_fs);
     frag_desc->offset = offset;
-    frag_desc->retries = 0;
-    clist_rpush(&fbuf->sfr.window, &frag_desc->super);
-    if ((res = _send_frame(frag, NULL, page))) {
+    frag_desc->super.size = 1;
+    frag_desc->super.resends = 0;
+    clist_rpush(&fbuf->sfr.window, &frag_desc->super.super);
+    if ((res = _send_frame(frag, fbuf, NULL, page))) {
         if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
             _stats.fragments_sent.usual++;
         }
-        frag_desc->last_sent = _last_frame_sent;
+        frag_desc->super.send_time = _last_frame_sent / US_PER_MS;
         fbuf->sfr.cur_seq++;
         fbuf->sfr.frags_sent++;
     }
@@ -1188,20 +1242,24 @@ static void _handle_nth_rfrag(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
 
 static int _resend_failed_frag(clist_node_t *node, void *fbuf_ptr)
 {
-    int res;
+    int res = _resend_frag(node, fbuf_ptr);
 
-    if (((res = _resend_frag(node, fbuf_ptr)) == 0) &&
-        IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
-        _stats.fragment_resends.by_nack++;
+    if (res == 0) {
+        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+            _stats.fragment_resends.by_nack++;
+        }
+        gnrc_sixlowpan_frag_sfr_congure_snd_report_frag_sent(fbuf_ptr);
     }
     return res;
 }
 
 static void _check_failed_frags(sixlowpan_sfr_ack_t *ack,
-                                gnrc_sixlowpan_frag_fb_t *fbuf)
+                                gnrc_sixlowpan_frag_fb_t *fbuf,
+                                uint32_t ack_recv_time)
 {
     _frag_desc_t *frag_desc;
     clist_node_t not_received = { .next = NULL };
+    ztimer_now_t earliest_send = UINT32_MAX;
 
     DEBUG("6lo sfr: checking which fragments to resend for datagram %u\n",
           fbuf->tag);
@@ -1211,33 +1269,58 @@ static void _check_failed_frags(sixlowpan_sfr_ack_t *ack,
         uint8_t seq;
 
         seq = _frag_seq(frag_desc);
+        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE) &&
+            (earliest_send > frag_desc->super.send_time)) {
+            earliest_send = frag_desc->super.send_time;
+        }
         if (bf_isset(ack->bitmap, seq)) {
             DEBUG("6lo sfr: fragment %u (offset: %u, frag_size: %u) "
                   "for datagram %u was received\n", seq,
                   frag_desc->offset, _frag_size(frag_desc), fbuf->tag);
             fbuf->sfr.frags_sent--;
-            clist_rpush(&_frag_descs_free, &frag_desc->super);
+            clist_rpush(&_frag_descs_free, &frag_desc->super.super);
+            if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE)) {
+                congure_snd_ack_t ack = {
+                    .recv_time = ack_recv_time,
+                    .id = seq,
+                    .clean = 1U,
+                };
+                gnrc_sixlowpan_frag_sfr_congure_snd_report_frag_acked(
+                    fbuf, &frag_desc->super, &ack
+                );
+            }
         }
         else {
             DEBUG("6lo sfr: fragment %u (offset: %u, frag_size: %u) "
                   "for datagram %u was not received\n", seq,
                   frag_desc->offset, _frag_size(frag_desc), fbuf->tag);
-            if ((frag_desc->retries++) < CONFIG_GNRC_SIXLOWPAN_SFR_FRAG_RETRIES) {
+            if ((frag_desc->super.resends++) < CONFIG_GNRC_SIXLOWPAN_SFR_FRAG_RETRIES) {
                 DEBUG("6lo sfr: %u retries left\n",
                       CONFIG_GNRC_SIXLOWPAN_SFR_FRAG_RETRIES -
-                      (frag_desc->retries - 1));
+                      (frag_desc->super.resends - 1));
                 /* put fragment in "not received" list */
-                clist_rpush(&not_received, &frag_desc->super);
+                clist_rpush(&not_received, &frag_desc->super.super);
                 frag_desc->ar_seq_fs &= ~(SIXLOWPAN_SFR_ACK_REQ << 8U);
             }
             else {
                 DEBUG("6lo sfr: no more retries for fragment %u\n", seq);
-                clist_rpush(&_frag_descs_free, &frag_desc->super);
+                if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE) &&
+                    IS_ACTIVE(CONFIG_GNRC_SIXLOWPAN_SFR_USE_ECN) &&
+                    sixlowpan_sfr_ecn(&ack->base)) {
+                    gnrc_sixlowpan_frag_sfr_congure_snd_report_ecn(
+                        fbuf, earliest_send
+                    );
+                }
+                clist_rpush(&_frag_descs_free, &frag_desc->super.super);
                 /* retry to resend whole datagram */
                 _retry_datagram(fbuf);
                 return;
             }
         }
+    }
+    if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE) &&
+        sixlowpan_sfr_ecn(&ack->base)) {
+        gnrc_sixlowpan_frag_sfr_congure_snd_report_ecn(fbuf, earliest_send);
     }
     /* all fragments were received of the current window were received and
      * the datagram was transmitted completely */
@@ -1248,7 +1331,12 @@ static void _check_failed_frags(sixlowpan_sfr_ack_t *ack,
     }
     /* at least one fragment was not received */
     else {
+        gnrc_sixlowpan_frag_sfr_congure_snd_report_frags_lost(
+            fbuf,
+            (congure_snd_msg_t *)&not_received
+        );
         fbuf->sfr.window = not_received;
+        _shrink_window(fbuf);
         assert(fbuf->sfr.frags_sent == clist_count(&fbuf->sfr.window));
         /* use _resend_failed_frag here instead of loop above, so
          * _resend_frag can know if the fragment is the last in the window by
@@ -1257,7 +1345,7 @@ static void _check_failed_frags(sixlowpan_sfr_ack_t *ack,
             /* XXX: it is unlikely that allocating an abort RFRAG will be
              * successful since the resources missing to cause the abort are
              * still in use, but we should at least try */
-            if (_send_abort_frag(fbuf->pkt, (uint8_t)fbuf->tag, true, 0)) {
+            if (_send_abort_frag(fbuf->pkt, fbuf, true, 0)) {
                 /* wait for ACK before fbuf is deleted */
                 _sched_abort_timeout(fbuf);
             }
@@ -1268,7 +1356,7 @@ static void _check_failed_frags(sixlowpan_sfr_ack_t *ack,
                 _clean_up_fbuf(fbuf, ENOMEM);
             }
         }
-        if ((fbuf->sfr.frags_sent < fbuf->sfr.window_size) &&
+        if (gnrc_sixlowpan_frag_sfr_congure_snd_in_cwnd(fbuf) &&
             (fbuf->offset < fbuf->datagram_size)) {
             DEBUG("6lo sfr: trigger send of further fragments of datagram %u\n",
                   fbuf->tag);
@@ -1311,6 +1399,7 @@ static void _clean_up_fbuf(gnrc_sixlowpan_frag_fb_t *fbuf, int error)
     DEBUG("6lo sfr: removing fragmentation buffer entry for datagram %u\n",
           fbuf->tag);
     _clean_slate_datagram(fbuf);
+    gnrc_sixlowpan_frag_sfr_congure_snd_destroy(fbuf);
     gnrc_pktbuf_release_error(fbuf->pkt, error);
     fbuf->pkt = NULL;
 }
@@ -1347,7 +1436,6 @@ static uint16_t _send_1st_fragment(gnrc_netif_t *netif,
         fbuf->datagram_size++;
     }
     fbuf->sfr.arq_timeout = CONFIG_GNRC_SIXLOWPAN_SFR_OPT_ARQ_TIMEOUT_MS;
-    fbuf->sfr.window_size = CONFIG_GNRC_SIXLOWPAN_SFR_OPT_WIN_SIZE;
 
     frag = _build_frag_from_fbuf(pkt, fbuf, frag_size);
     if (frag == NULL) {
@@ -1425,21 +1513,53 @@ static uint16_t _send_nth_fragment(gnrc_netif_t *netif,
     return local_offset;
 }
 
-static bool _send_abort_frag(gnrc_pktsnip_t *pkt, uint8_t tag, bool req_ack,
-                             unsigned page)
+static bool _send_abort_frag(gnrc_pktsnip_t *pkt,
+                             gnrc_sixlowpan_frag_fb_t *fbuf,
+                             bool req_ack, unsigned page)
 {
     gnrc_pktsnip_t *frag;
 
-    frag = _build_frag_pkt(pkt->data, tag, req_ack, 0, 0);
+    frag = _build_frag_pkt(pkt->data, fbuf->tag, req_ack, 0, 0);
     if (frag != NULL) {
         sixlowpan_sfr_rfrag_set_offset(frag->next->data, 0);
-        _send_frame(frag, NULL, page);
+        _send_frame(frag, fbuf, NULL, page);
         if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
             _stats.fragments_sent.aborts++;
         }
         return true;
     }
     return false;
+}
+
+static void _shrink_window(gnrc_sixlowpan_frag_fb_t *fbuf)
+{
+    if (!IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE)) {
+        /* window does not shrink without congure */
+        return;
+    }
+    if (!gnrc_sixlowpan_frag_sfr_congure_snd_in_cwnd(fbuf)) {
+        /* we are beyond the congestion window, so shrink it to the new size */
+        clist_node_t new_window = { .next = NULL };
+        _frag_desc_t *last;
+
+        fbuf->sfr.frags_sent = 0;   /* temporarily reset fragments sent to count them again*/
+        /* move all fragments within congestion window into new, temporary list */
+        while (gnrc_sixlowpan_frag_sfr_congure_snd_in_cwnd(fbuf)) {
+            clist_rpush(&new_window, clist_lpop(&fbuf->sfr.window));
+            fbuf->sfr.frags_sent++;
+        }
+        /* free all remaining fragments from old congestion window that did not fit into
+         * the shrunk window */
+        for (clist_node_t *node = clist_lpop(&fbuf->sfr.window);
+             node != NULL; node = clist_lpop(&fbuf->sfr.window)) {
+            clist_rpush(&_frag_descs_free, node);
+        }
+        /* the temporary list is now the new, shrunk window */
+        fbuf->sfr.window.next = new_window.next;
+        /* recalculate offset for fragmentation header field */
+        last = (_frag_desc_t *)clist_rpeek(&fbuf->sfr.window);
+        fbuf->offset = last->offset + _frag_size(last);
+    }
 }
 
 static int _resend_frag(clist_node_t *node, void *fbuf_ptr)
@@ -1459,7 +1579,7 @@ static int _resend_frag(clist_node_t *node, void *fbuf_ptr)
     }
     hdr = frag->next->data;
     /* is last fragment in window */
-    if (((fbuf->sfr.frags_sent >= fbuf->sfr.window_size) ||
+    if ((!gnrc_sixlowpan_frag_sfr_congure_snd_in_cwnd(fbuf) ||
          (fbuf->offset >= fbuf->datagram_size)) &&
         (clist_node_t *)frag_desc == clist_rpeek(&fbuf->sfr.window)) {
         frag_desc->ar_seq_fs |= (SIXLOWPAN_SFR_ACK_REQ << 8U);
@@ -1480,14 +1600,14 @@ static int _resend_frag(clist_node_t *node, void *fbuf_ptr)
     /* copy remaining packet snips */
     _copy_pkt_to_frag(data, pkt, frag_size, cur_frag_size);
     DEBUG("6lo sfr: resending fragment (retry: %u, tag: %u, X: %i, seq: %u, "
-          "frag_size: %u, %s: %u)\n", frag_desc->retries,
+          "frag_size: %u, %s: %u)\n", frag_desc->super.resends,
           hdr->base.tag, sixlowpan_sfr_rfrag_ack_req(hdr),
           sixlowpan_sfr_rfrag_get_seq(hdr),
           sixlowpan_sfr_rfrag_get_frag_size(hdr),
           (sixlowpan_sfr_rfrag_get_seq(hdr)) ? "offset" : "datagram_size",
           sixlowpan_sfr_rfrag_get_offset(hdr));
-    if (_send_frame(frag, NULL, 0)) {
-        frag_desc->last_sent = _last_frame_sent;
+    if (_send_frame(frag, fbuf, NULL, 0)) {
+        frag_desc->super.send_time = _last_frame_sent / US_PER_MS;
         return 0;
     }
     else {
@@ -1547,43 +1667,53 @@ static void _send_ack(gnrc_netif_t *netif, const uint8_t *dst, uint8_t dst_len,
           gnrc_netif_addr_to_str(dst, dst_len, addr_str),
           hdr->tag, bitmap[0], bitmap[1], bitmap[2], bitmap[3]);
     if (ack != NULL) {
-        _send_frame(ack, NULL, 0);
+        _send_frame(ack, NULL, NULL, 0);
     }
     else {
         DEBUG("6lo sfr: unable to build ACK for sending\n");
     }
 }
 
-static void _sched_next_frame(void)
+static void _sched_next_frame(gnrc_sixlowpan_frag_fb_t *fbuf)
 {
-    if (CONFIG_GNRC_SIXLOWPAN_SFR_INTER_FRAME_GAP_US > 0) {
-        int state = irq_disable();  /* make timer check atomic */
-        bool already_set = xtimer_is_set(&_if_gap_timer);
+    if (!gnrc_sixlowpan_frag_sfr_congure_snd_has_inter_frame_gap()) {
+        return;
+    }
+    int state = irq_disable();  /* make timer check atomic */
+    bool already_set = xtimer_is_set(&_if_gap_timer);
 
-        irq_restore(state);
-        if (!already_set) {
-            uint32_t last_sent_since = (_last_frame_sent - xtimer_now_usec());
+    irq_restore(state);
+    if (already_set) {
+        DEBUG("6lo sfr: inter-frame timer was already set\n");
+        return;
+    }
+    uint32_t last_sent_since = (_last_frame_sent - xtimer_now_usec());
+    uint32_t if_gap = gnrc_sixlowpan_frag_sfr_congure_snd_inter_frame_gap(fbuf);
 
-            if (last_sent_since <= CONFIG_GNRC_SIXLOWPAN_SFR_INTER_FRAME_GAP_US) {
-                uint32_t offset = CONFIG_GNRC_SIXLOWPAN_SFR_INTER_FRAME_GAP_US -
-                                  last_sent_since;
-                DEBUG("6lo sfr: arming inter-frame timer in %" PRIu32 " us\n",
-                      last_sent_since);
-                xtimer_set_msg(&_if_gap_timer, offset, &_if_gap_msg, _getpid());
-            }
-            else {
-                DEBUG("6lo sfr: send frame immediately\n");
-                gnrc_sixlowpan_frag_sfr_inter_frame_gap();
-            }
-        }
-        else {
-            DEBUG("6lo sfr: inter-frame timer was already set\n");
-        }
+    if (last_sent_since <= if_gap) {
+        uint32_t offset = if_gap - last_sent_since;
+        DEBUG("6lo sfr: arming inter-frame timer in %" PRIu32 " us\n",
+              last_sent_since);
+        _if_gap_msg.content.ptr = fbuf;
+        xtimer_set_msg(&_if_gap_timer, offset, &_if_gap_msg, _getpid());
+    }
+    else {
+        DEBUG("6lo sfr: send frame immediately\n");
+        /* there is no risk of infinite recursion due to the call of `_sched_next_frame` since
+         * we only get here when (_last_frame_sent - now) > if_gap.
+         * Since gnrc_sixlowpan_frag_sfr_inter_frame_gap updates _last_frame_sent when the list is
+         * empty and only calls _sched_next_frame() when the list is still not empty after that this
+         * can not be the case if we came from there (except for misconfigured if_gap). */
+        gnrc_sixlowpan_frag_sfr_inter_frame_gap(fbuf);
     }
 }
 
 static void _sched_arq_timeout(gnrc_sixlowpan_frag_fb_t *fbuf, uint32_t offset)
 {
+    if (IS_ACTIVE(CONFIG_GNRC_SIXLOWPAN_SFR_MOCK_ARQ_TIMER)) {
+        /* mock does not need to be scheduled */
+        return;
+    }
     if (fbuf->sfr.arq_timeout_event.msg.content.ptr != NULL) {
         DEBUG("6lo sfr: ARQ timeout for datagram %u already scheduled\n",
               (uint8_t)fbuf->tag);
@@ -1626,6 +1756,7 @@ static void _handle_ack(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
 {
     gnrc_sixlowpan_frag_vrb_t *vrbe;
     sixlowpan_sfr_ack_t *hdr = pkt->data;
+    uint32_t recv_time = xtimer_now_usec();
 
     (void)page;
     DEBUG("6lo sfr: received ACK for datagram (%s, %02x): %02X%02X%02X%02X\n",
@@ -1653,7 +1784,7 @@ static void _handle_ack(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
             if (CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER > 0) {
                 /* garbage-collect entry after CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER
                  * microseconds */
-                vrbe->super.arrival = xtimer_now_usec() -
+                vrbe->super.arrival = recv_time -
                                       (CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US -
                                        CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER);
             }
@@ -1662,7 +1793,7 @@ static void _handle_ack(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
             }
         }
         else {
-            vrbe->super.arrival = xtimer_now_usec();
+            vrbe->super.arrival = recv_time;
         }
     }
     else {
@@ -1685,7 +1816,7 @@ static void _handle_ack(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
             else {
                 /* Check and resent failed fragments within the current window
                  */
-               _check_failed_frags(hdr, fbuf);
+               _check_failed_frags(hdr, fbuf, recv_time / US_PER_MS);
             }
         }
         else {
@@ -1732,7 +1863,7 @@ static int _forward_rfrag(gnrc_pktsnip_t *pkt, _generic_rb_entry_t *entry,
     hdr->base.tag = entry->entry.vrb->out_tag;
     gnrc_netif_hdr_set_netif(new->data, entry->entry.vrb->out_netif);
     new->next = pkt;
-    _send_frame(new, NULL, page);
+    _send_frame(new, NULL, NULL, page);
     if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
         _stats.fragments_sent.forwarded++;
     }

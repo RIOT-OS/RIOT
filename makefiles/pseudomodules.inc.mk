@@ -230,6 +230,12 @@ PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_ecn_if_in
 PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_ecn_if_out
 PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_ecn_fqueue
 PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_stats
+##
+## @addtogroup net_gnrc_sixlowpan_frag_sfr_congure
+## @{
+##
+PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_congure
+## @}
 PSEUDOMODULES += gnrc_sixlowpan_iphc_nhc
 PSEUDOMODULES += gnrc_sixlowpan_nd_border_router
 PSEUDOMODULES += gnrc_sixlowpan_router_default
