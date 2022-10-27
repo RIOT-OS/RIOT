@@ -1,6 +1,5 @@
 MODULE = tensorflow-lite-kernels
 
-CXXEXFLAGS += -Wno-missing-field-initializers
 CXXEXFLAGS += -Wno-unused-function
 CXXEXFLAGS += -Wno-unused-parameter
 

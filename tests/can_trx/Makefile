@@ -25,7 +25,4 @@ ifneq (,$(filter ncv7356,$(TRX_TO_BUILD)))
 	CFLAGS += -DNCV7356_MODE1_PIN=$(NCV7356_MODE1_PIN)
 endif
 
-# Some boards throw a missing-field-initializers error
-CFLAGS += -Wno-missing-field-initializers
-
 include $(RIOTBASE)/Makefile.include

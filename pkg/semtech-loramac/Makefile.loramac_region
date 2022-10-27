@@ -1,6 +1,7 @@
 MODULE = semtech_loramac_mac_region
 
-CFLAGS += -Wno-missing-field-initializers -Wno-unused-parameter -Wno-sign-compare
+CFLAGS += -Wno-sign-compare
+CFLAGS += -Wno-unused-parameter
 
 INCLUDES += -I$(PKGDIRBASE)/semtech-loramac/src/boards \
             -I$(PKGDIRBASE)/semtech-loramac/src/radio

@@ -1,6 +1,5 @@
 MODULE = tensorflow-lite-micro-kernels
 
-CXXEXFLAGS += -Wno-missing-field-initializers
 CXXEXFLAGS += -Wno-strict-overflow
 CXXEXFLAGS += -Wno-type-limits
 CXXEXFLAGS += -Wno-unused-parameter

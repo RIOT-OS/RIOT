@@ -12,7 +12,6 @@ CFLAGS += -Wno-strict-prototypes
 CFLAGS += -Wno-maybe-uninitialized
 CFLAGS += -Wno-missing-braces
 CFLAGS += -Wno-missing-declarations
-CFLAGS += -Wno-missing-field-initializers
 CFLAGS += -Wno-old-style-definition
 CFLAGS += -Wno-return-type
 CFLAGS += -Wno-sign-compare

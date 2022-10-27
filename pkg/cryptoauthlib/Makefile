@@ -14,7 +14,6 @@ CFLAGS += $(INCLUDES)
 CFLAGS += -DATCA_HAL_I2C
 CFLAGS += -Wno-cast-align
 CFLAGS += -Wno-char-subscripts
-CFLAGS += -Wno-missing-field-initializers
 CFLAGS += -Wno-overflow
 CFLAGS += -Wno-pointer-to-int-cast
 CFLAGS += -Wno-sign-compare

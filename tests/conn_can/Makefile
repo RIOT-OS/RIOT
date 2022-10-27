@@ -37,9 +37,6 @@ endif
 CFLAGS += -DCAN_PKT_BUF_SIZE=64
 CFLAGS += -DCAN_ROUTER_MAX_FILTER=32
 
-# Some boards throw a missing-field-initializers error
-CFLAGS += -Wno-missing-field-initializers
-
 include $(RIOTBASE)/Makefile.include
 
 ifndef CONFIG_GNRC_PKTBUF_SIZE
