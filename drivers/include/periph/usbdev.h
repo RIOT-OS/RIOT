@@ -79,6 +79,7 @@
 #include <stddef.h>
 
 #include "assert.h"
+#include "kernel_defines.h"
 #include "periph_cpu.h"
 #include "usb.h"
 #include "usb/usbopt.h"
@@ -209,13 +210,14 @@ typedef enum {
     /**
      * @brief Transaction fail event.
      *
-     * @deprecated This event is deprecated as only a limited number of devices
-     *             implement and doesn't offer value for upper layer code. This
-     *             event will be removed after the 2022.07 release.
-     *
      * An endpoint should emit this event after a nack reply to the host.
      */
-    USBDEV_EVENT_TR_FAIL,
+    RIOT_DEPRECATED_VARIANT(
+        USBDEV_EVENT_TR_FAIL,
+        "This event is deprecated as only a limited number of devices \
+        implement and doesn't offer value for upper layer code. This event \
+        will be removed after the 2022.07 release."
+    )
     /* expand list if required */
 } usbdev_event_t;
 

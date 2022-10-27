@@ -364,7 +364,11 @@ static void _event_ep_cb(usbdev_ep_t *ep, usbdev_event_t event)
                     handler->driver->transfer_handler(usbus, handler, ep,
                                                       USBUS_EVENT_TRANSFER_COMPLETE);
                     break;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+                /* Needs to be handled during the deprecation period */
                 case USBDEV_EVENT_TR_FAIL:
+#pragma GCC diagnostic pop
                     if (usbus_handler_isset_flag(handler,
                                                  USBUS_HANDLER_FLAG_TR_FAIL)) {
                         handler->driver->transfer_handler(usbus, handler, ep,

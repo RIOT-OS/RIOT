@@ -719,7 +719,11 @@ static void _usbdev_ep_esr(usbdev_ep_t *ep)
         }
         else if (ep_reg->EPINTFLAG.bit.TRFAIL0) {
             ep_reg->EPINTFLAG.reg = USB_DEVICE_EPINTFLAG_TRFAIL0;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+            /* Needs to be emitted during the deprecation period */
             event = USBDEV_EVENT_TR_FAIL;
+#pragma GCC diagnostic pop
         }
         else if (ep_reg->EPINTFLAG.bit.STALL0) {
             ep_reg->EPINTFLAG.reg = USB_DEVICE_EPINTFLAG_STALL0;
@@ -738,7 +742,11 @@ static void _usbdev_ep_esr(usbdev_ep_t *ep)
         }
         else if (ep_reg->EPINTFLAG.bit.TRFAIL1) {
             ep_reg->EPINTFLAG.reg = USB_DEVICE_EPINTFLAG_TRFAIL1;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+            /* Needs to be emitted during the deprecation period */
             event = USBDEV_EVENT_TR_FAIL;
+#pragma GCC diagnostic pop
         }
         else if (ep_reg->EPINTFLAG.bit.STALL1) {
             ep_reg->EPINTFLAG.reg = USB_DEVICE_EPINTFLAG_STALL1;

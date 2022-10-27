@@ -52,6 +52,7 @@
 #include <stdint.h>
 
 #include "cpu_conf.h"
+#include "kernel_defines.h"
 #include "periph_cpu.h"
 
 #ifdef __cplusplus
@@ -238,24 +239,24 @@ void flashpage_erase(unsigned page);
 
 /**
  * @brief Get number of first free flashpage
- * @deprecated Use @ref FLASH_WRITABLE_INIT instead, which is usable in modules
- *             as well as applications. The function will be removed after
- *             the 2022.04 release.
  *
  * If riotboot is used in two slot mode, this number will change across
  * firmware updates as the firmware slots alternate.
  */
+RIOT_DEPRECATED_FUNCTION("Use FLASH_WRITABLE_INIT instead, which is usable in \
+modules as well as applications. The function will be removed after the \
+2022.04 release.")
 unsigned flashpage_first_free(void);
 
 /**
  * @brief Get number of last free flashpage
- * @deprecated Use @ref FLASH_WRITABLE_INIT instead, which is usable in modules
- *             as well as applications. The function will be removed after
- *             the 2022.04 release.
  *
  * If riotboot is used in two slot mode, this number will change across
  * firmware updates as the firmware slots alternate.
  */
+RIOT_DEPRECATED_FUNCTION("Use FLASH_WRITABLE_INIT instead, which is usable in \
+modules as well as applications. The function will be removed after the \
+2022.04 release.")
 unsigned flashpage_last_free(void);
 
 /**

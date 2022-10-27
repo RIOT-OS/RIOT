@@ -280,6 +280,61 @@ extern "C" {
 
 /* end{code-style-ignore} */
 
+/** @brief Declare a function as deprecated
+ *
+ * This needs to be placed before the function declaration.
+ *
+ * On modern (C2x) compilers, this expands to the C++11 style attribute
+ * `[[deprecated(reason)]]`; otherwise to the GNUism
+ * `__((attribute(deprecated))`, or is ignored.
+ *
+ * In Doxygen, it is rendered as a deprecation; note that currently, no Doxygen
+ * commands work in the text (i.e., `RIOT_DEPRECATED_FUNCTION("Use \ref foo
+ * instead")` would not produce a hyperlink).
+ *
+ * Example:
+ *
+ * ```c
+ * RIOT_DEPRECATED_FUNCTION("Use foo_iniit2() instead")
+ * void foo_init(struct foo *);
+ * ```
+ * */
+#if __STDC_VERSION__ >= 202000L
+#define RIOT_DEPRECATED_FUNCTION(reason) [[deprecated(reason)]]
+#elif defined(__GNUC__)
+#define RIOT_DEPRECATED_FUNCTION(reason) __attribute__((deprecated(reason)))
+#endif
+
+/** @brief Declare an enum variant as deprecated
+ *
+ * This needs to be placed around the item declaration, and does not encompass
+ * the value.
+ *
+ * On modern (C2x) compilers, this expands to the C++11 style attribute
+ * `[[deprecated(reason)]]`; otherwise to the GNUism
+ * `__((attribute(deprecated))`, or is ignored.
+ *
+ * In Doxygen, it is rendered as a deprecation; note that currently, no Doxygen
+ * commands work in the text (i.e., `RIOT_DEPRECATED_VARIANT(ENU_TWO, "Use \ref
+ * ENU_THREE instead")` would not produce a hyperlink).
+ *
+ * Example:
+ *
+ * ```c
+ * enum {
+ *     ENU_ONE = 1,
+ *     RIOT_DEPRECATED_VARIANT(ENU_TWO, "Do not count here except to proceed \
+ *         to ENU_THREE") = 2,
+ *     ENU_THREE = 3,
+ * }
+ * ```
+ * */
+#if __STDC_VERSION__ >= 202000L
+#define RIOT_DEPRECATED_VARIANT(variant, reason) variant [[deprecated(reason)]]
+#elif defined(__GNUC__)
+#define RIOT_DEPRECATED_VARIANT(variant, reason) variant __attribute__((deprecated(reason)))
+#endif
+
 #ifdef __cplusplus
 }
 #endif
