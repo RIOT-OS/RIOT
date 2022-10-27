@@ -255,7 +255,7 @@ static inline void _letimer_start(tim_t dev)
 {
     LETIMER_TypeDef *tim = timer_config[dev].dev;
 
-    if (tim->STATUS & LETIMER_STATUS_RUNNING) {
+    if (!(tim->STATUS & LETIMER_STATUS_RUNNING)) {
         pm_block(LETIMER_PM_BLOCKER);
     }
 
@@ -266,7 +266,7 @@ static inline void _timer_start(tim_t dev)
 {
     TIMER_TypeDef *tim = timer_config[dev].dev;
 
-    if (tim->STATUS & TIMER_STATUS_RUNNING) {
+    if (!(tim->STATUS & TIMER_STATUS_RUNNING)) {
         pm_block(TIMER_PM_BLOCKER);
     }
 
