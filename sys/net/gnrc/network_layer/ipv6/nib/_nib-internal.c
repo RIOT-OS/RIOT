@@ -378,6 +378,20 @@ void _nib_drl_remove(_nib_dr_entry_t *nib_dr)
     if (nib_dr->next_hop != NULL) {
         _evtimer_del(&nib_dr->rtr_timeout);
         nib_dr->next_hop->mode &= ~(_DRL);
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DC)
+        /*  When removing a router from the Default
+            Router list, the node MUST update the Destination Cache in such a way
+            that all entries using the router perform next-hop determination
+            again rather than continue sending traffic to the (deleted) router.
+            (https://datatracker.ietf.org/doc/html/rfc4861#section-6.3.5)
+        */
+        _nib_offl_entry_t *dc = NULL;
+        while ((dc = _nib_offl_iter(dc))) {
+            if ((dc->mode & _DC) && dc->next_hop == nib_dr->next_hop) {
+                _nib_dc_remove(dc);
+            }
+        }
+#endif
         _nib_onl_clear(nib_dr->next_hop);
         memset(nib_dr, 0, sizeof(_nib_dr_entry_t));
     }
