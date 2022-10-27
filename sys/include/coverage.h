@@ -26,8 +26,12 @@
  * Which is governed by section 7 of additional permissions.
  */
 
-#ifndef _COVERAGE_H_
-#define _COVERAGE_H_
+#ifndef COVERAGE_H
+#define COVERAGE_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #if (__GNUC__ >= 10)
 #define GCOV_COUNTERS 8U
@@ -37,17 +41,34 @@
 #define GCOV_COUNTERS 10U
 #endif
 
+/* The GCOV 12 gcno/gcda format has slight change,
+ * Please refer to gcov-io.h in the GCC 12 for
+ * more details.
+ *
+ * Following GCC commits introduced these changes:
+ * gcc-mirror/gcc@23eb66d
+ * gcc-mirror/gcc@72e0c74
+ */
+#if (__GNUC__ >= 12)
+#define GCOV_12_FORMAT
+#endif
+
 typedef uint64_t gcov_type;
 
+#ifdef GCOV_12_FORMAT
+#define GCOV_TAG_FUNCTION_LENGTH  12
+#else
 #define GCOV_TAG_FUNCTION_LENGTH  3
+#endif
+
 #define GCOV_DATA_MAGIC   (0x67636461)
 #define GCOV_TAG_FUNCTION (0x01000000)
 #define GCOV_TAG_COUNTER_BASE (0x01a10000)
-#define GCOV_TAG_FOR_COUNTER(count) \
-    (GCOV_TAG_COUNTER_BASE + ((uint32_t) (count) << 17))
+#define GCOV_TAG_FOR_COUNTER(count)         \
+(GCOV_TAG_COUNTER_BASE + ((uint32_t) (count) << 17))
 
-#define FILE_START_INDICATOR '*'
-#define GCOV_DUMP_SEPARATOR  '<'
+#define FILE_START_INDICATOR	'*'
+#define GCOV_DUMP_SEPARATOR	'<'
 
 /**Information about counters for a single function
  *
@@ -55,8 +76,8 @@ typedef uint64_t gcov_type;
  *  at run-time with the exception of the values array.
  */
 struct gcov_ctr_info {
-    unsigned int num;    /* number of counter values for this type */
-    gcov_type *values;   /* array of counter values for this type */
+    unsigned int num;    /**< number of counter values for this type */
+    gcov_type *values;   /**< array of counter values for this type */
 };
 
 /**
@@ -72,11 +93,11 @@ struct gcov_ctr_info {
  * of the object file containing the selected comdat function.
  */
 struct gcov_fn_info {
-    const struct gcov_info *key;     /* comdat key */
-    unsigned int ident;              /* unique ident of function */
-    unsigned int lineno_checksum;    /* function lineo_checksum */
-    unsigned int cfg_checksum;       /* function cfg checksum */
-    struct gcov_ctr_info ctrs[0];    /* instrumented counters */
+    const struct gcov_info *key;     /**< comdat key */
+    unsigned int ident;              /**< unique ident of function */
+    unsigned int lineno_checksum;    /**< function lineo_checksum */
+    unsigned int cfg_checksum;       /**< function cfg checksum */
+    struct gcov_ctr_info ctrs[];    /**< instrumented counters */
 };
 
 /** Profiling data per object file
@@ -85,14 +106,20 @@ struct gcov_fn_info {
  * at run-time with the exception of the next pointer.
  */
 struct gcov_info {
-    unsigned int version;        /* Gcov version (same as GCC version) */
-    struct gcov_info *next;      /* List head for a singly-linked list */
-    unsigned int stamp;          /* Uniquifying time stamp */
-    const char *filename;        /* Name of the associated gcda data file */
-    /* merge functions, null for unused*/
-    void (*merge[GCOV_COUNTERS])(gcov_type *, unsigned int);
-    unsigned int n_functions;         /* number of instrumented functions */
-    struct gcov_fn_info **functions;  /* function information */
+    unsigned int version;             /**< Gcov version (same as GCC version) */
+    struct gcov_info *next;           /**< List head for a singly-linked list */
+    unsigned int stamp;               /**< Uniquifying time stamp */
+#ifdef GCOV_12_FORMAT
+    unsigned int checksum;            /**< unique object checksum */
+#endif
+    const char *filename;             /**< Name of the associated gcda data file */
+    void (*merge[GCOV_COUNTERS])(gcov_type *, unsigned int); /**< merge functions, null for unused */
+    unsigned int n_functions;         /**< number of instrumented functions */
+    struct gcov_fn_info **functions;  /**< function information */
 };
 
-#endif /* _COVERAGE_H_ */
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* COVERAGE_H */
