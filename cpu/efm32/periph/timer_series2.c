@@ -224,26 +224,44 @@ unsigned int timer_read(tim_t dev)
     return _is_letimer(dev) ? _letimer_read(dev) : _timer_read(dev);
 }
 
+static inline bool _letimer_is_running(LETIMER_TypeDef *tim)
+{
+    /* make sure registers are up-to-date and
+     * we can rely on the STATS register */
+    LETIMER_SyncWait(tim);
+
+    return tim->STATUS & LETIMER_STATUS_RUNNING;
+}
+
+static inline bool _timer_is_running(TIMER_TypeDef *tim)
+{
+    /* make sure registers are up-to-date and
+     * we can rely on the STATS register */
+    TIMER_SyncWait(tim);
+
+    return tim->STATUS & TIMER_STATUS_RUNNING;
+}
+
 static inline void _letimer_stop(tim_t dev)
 {
     LETIMER_TypeDef *tim = timer_config[dev].dev;
 
-    if (tim->STATUS & LETIMER_STATUS_RUNNING) {
+    if (_letimer_is_running(tim)) {
         pm_unblock(LETIMER_PM_BLOCKER);
     }
 
-    LETIMER_Enable(timer_config[dev].dev, false);
+    LETIMER_Enable(tim, false);
 }
 
 static inline void _timer_stop(tim_t dev)
 {
     TIMER_TypeDef *tim = timer_config[dev].dev;
 
-    if (tim->STATUS & TIMER_STATUS_RUNNING) {
+    if (_timer_is_running(tim)) {
         pm_unblock(TIMER_PM_BLOCKER);
     }
 
-    TIMER_Enable(timer_config[dev].dev, false);
+    TIMER_Enable(tim, false);
 }
 
 void timer_stop(tim_t dev)
@@ -255,22 +273,22 @@ static inline void _letimer_start(tim_t dev)
 {
     LETIMER_TypeDef *tim = timer_config[dev].dev;
 
-    if (!(tim->STATUS & LETIMER_STATUS_RUNNING)) {
+    if (!_letimer_is_running(tim)) {
         pm_block(LETIMER_PM_BLOCKER);
     }
 
-    LETIMER_Enable(timer_config[dev].dev, true);
+    LETIMER_Enable(tim, true);
 }
 
 static inline void _timer_start(tim_t dev)
 {
     TIMER_TypeDef *tim = timer_config[dev].dev;
 
-    if (!(tim->STATUS & TIMER_STATUS_RUNNING)) {
+    if (!_timer_is_running(tim)) {
         pm_block(TIMER_PM_BLOCKER);
     }
 
-    TIMER_Enable(timer_config[dev].dev, true);
+    TIMER_Enable(tim, true);
 }
 
 void timer_start(tim_t dev)
