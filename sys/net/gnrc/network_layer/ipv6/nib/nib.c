@@ -1312,6 +1312,7 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
             entry = _nib_nc_add(dst, (netif != NULL) ? netif->pid : 0,
                                 GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE);
             if (entry == NULL) {
+                DEBUG("nib: can't resolve address, neighbor cache full\n");
                 gnrc_pktbuf_release(pkt);
                 return false;
             }
