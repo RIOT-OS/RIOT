@@ -204,7 +204,8 @@ static void test_hashes_sha256_hash_sequence_04(void)
 
 static void test_hashes_sha256_hash_sequence_digits_letters(void)
 {
-    static const char *teststring = "0123456789abcde-0123456789abcde-0123456789abcde-0123456789abcde-";
+    static const char *teststring =
+        "0123456789abcde-0123456789abcde-0123456789abcde-0123456789abcde-";
     TEST_ASSERT(calc_and_compare_hash(teststring, hdigits_letters));
     TEST_ASSERT(calc_and_compare_hash_wrapper(teststring, hdigits_letters));
 }

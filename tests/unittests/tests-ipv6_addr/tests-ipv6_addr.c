@@ -1031,7 +1031,8 @@ static void test_ipv6_addr_from_str__success6(void)
     ipv6_addr_t result;
 
 #ifdef MODULE_IPV4_ADDR
-    TEST_ASSERT_NOT_NULL(ipv6_addr_from_str(&result, "ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255"));
+    TEST_ASSERT_NOT_NULL(ipv6_addr_from_str(&result, "ffff:ffff:ffff:ffff:ffff:ffff"
+                                                     ":255.255.255.255"));
 #else
     TEST_ASSERT_NOT_NULL(ipv6_addr_from_str(&result, "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"));
 #endif
@@ -1078,9 +1079,11 @@ static void test_ipv6_addr_from_buf__success(void)
     ipv6_addr_t result;
 
 #ifdef MODULE_IPV4_ADDR
-    TEST_ASSERT_NOT_NULL(ipv6_addr_from_buf(&result, "ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255%tap0", 45));
+    TEST_ASSERT_NOT_NULL(ipv6_addr_from_buf(&result, "ffff:ffff:ffff:ffff:ffff:ffff"
+                                                     ":255.255.255.255%tap0", 45));
 #else
-    TEST_ASSERT_NOT_NULL(ipv6_addr_from_buf(&result, "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff%tap0", 39));
+    TEST_ASSERT_NOT_NULL(ipv6_addr_from_buf(&result, "ffff:ffff:ffff:ffff:ffff:ffff"
+                                                     ":ffff:ffff%tap0", 39));
 #endif
     TEST_ASSERT(ipv6_addr_equal(&a, &result));
 }

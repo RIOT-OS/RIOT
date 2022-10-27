@@ -622,7 +622,6 @@ static void test_nanocoap__option_remove_delta_512(void)
     __test_option_remove(512U);
 }
 
-
 static void test_nanocoap__option_remove_no_payload(void)
 {
     /* header 4, token 2, option length 3, 0 payload marker 1 */

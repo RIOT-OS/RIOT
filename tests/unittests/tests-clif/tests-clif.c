@@ -108,7 +108,7 @@ static void test_clif_encode_links(void)
         }
         pos += res;
 
-        res = clif_encode_link(&links[i],NULL, 0);
+        res = clif_encode_link(&links[i], NULL, 0);
         if (res <= 0) {
             break;
         }
@@ -157,7 +157,8 @@ static void test_clif_decode_links(void)
                           "</sensors/light>;rt=\"light-lux\";if=sensor,"
                           "<http://www.example.com/sensors/t123>;"
                           "anchor=\"/sensors/temp\";rel=\"describedby\";sz=1234,"
-                          "</t>;anchor=\"/sensors/temp\";rel=\"alternate\";a;s=\"This is \\\"escaped and has , \\\"\","
+                          "</t>;anchor=\"/sensors/temp\";rel=\"alternate\";a;s=\""
+                          "This is \\\"escaped and has , \\\"\","
                           "</riot/board>,</riot/info>;obs";
 
     /* ordered expected types to be decoded */

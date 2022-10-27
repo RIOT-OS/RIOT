@@ -250,7 +250,7 @@ static void test_fib_06_remove_one_entry(void)
     TEST_ASSERT_EQUAL_INT(20, fib_get_num_used_entries(&test_fib_table));
     TEST_ASSERT_EQUAL_INT(20, universal_address_get_num_used_entries());
 
-    fib_remove_entry(&test_fib_table, (uint8_t *)addr_dst,add_buf_size - 1);
+    fib_remove_entry(&test_fib_table, (uint8_t *)addr_dst, add_buf_size - 1);
 
 #if (TEST_FIB_SHOW_OUTPUT == 1)
     fib_print_fib_table(&test_fib_table);
@@ -725,7 +725,7 @@ static void test_fib_17_get_entry_set(void)
     size_t arr_size = 20;
     fib_destination_set_entry_t arr_dst[arr_size];
     char prefix[addr_buf_size];
-    memset(prefix,0, addr_buf_size);
+    memset(prefix, 0, addr_buf_size);
     /* cppcheck-suppress redundantCopy
      * (reason: prefix is set to all 0 before adding an address) */
     snprintf(prefix, addr_buf_size, "Test address 1");
@@ -739,7 +739,7 @@ static void test_fib_17_get_entry_set(void)
     TEST_ASSERT_EQUAL_INT(10, arr_size);
     arr_size = 20;
 
-    memset(prefix,0, addr_buf_size);
+    memset(prefix, 0, addr_buf_size);
     /* cppcheck-suppress redundantCopy
      * (reason: prefix is set to all 0 before adding an address) */
     snprintf(prefix, addr_buf_size, "Test address 0");
@@ -768,8 +768,8 @@ static void test_fib_17_get_entry_set(void)
 
 #if (TEST_FIB_SHOW_OUTPUT == 1)
     puts("");
-    for(size_t i = 0; i < arr_size; ++i) {
-        for( size_t j = 0; j < arr_dst[i].dest_size; ++j) {
+    for (size_t i = 0; i < arr_size; ++i) {
+        for (size_t j = 0; j < arr_dst[i].dest_size; ++j) {
             printf("%c", (char)arr_dst[i].dest[j]);
         }
         puts("");
@@ -796,7 +796,7 @@ static void test_fib_18_get_next_hop_invalid_parameters(void)
     _fill_FIB_multiple(entries, 11);
 
     int ret = fib_get_next_hop(&test_fib_table, NULL, NULL,
-                               NULL, NULL,NULL, add_buf_size - 1, 0x13);
+                               NULL, NULL, NULL, add_buf_size - 1, 0x13);
 
     TEST_ASSERT_EQUAL_INT(-EINVAL, ret);
 
@@ -839,7 +839,7 @@ static void test_fib_19_default_gateway(void)
     snprintf(addr_lookup, add_buf_size, "Some address X1");
 
     /* set the bytes to 0x01..0x10 of the next-hop */
-    for(size_t i = 0; i < add_buf_size; i++) {
+    for (size_t i = 0; i < add_buf_size; i++) {
         addr_nxt[i] = i+1;
     }
 
@@ -861,7 +861,7 @@ static void test_fib_19_default_gateway(void)
     memset(addr_nxt_hop, 0, add_buf_size);
 
     /* set the bytes to 0x02..0x11 of the new next-hop for the default gateway */
-    for(size_t i = 0; i < add_buf_size; ++i) {
+    for (size_t i = 0; i < add_buf_size; ++i) {
         addr_nxt[i] = i+2;
     }
 
@@ -906,17 +906,17 @@ static void test_fib_20_replace_prefix(void)
     memset(addr_lookup, 0, add_buf_size);
 
     /* set the bytes to 0x01..0x10 of the next-hop */
-    for(size_t i = 0; i < add_buf_size; i++) {
+    for (size_t i = 0; i < add_buf_size; i++) {
         addr_nxt[i] = i+1;
     }
 
     /* set the bytes to 0x01..0x08 of the destination prefix */
-    for(size_t i = 0; i < add_buf_size/2; i++) {
+    for (size_t i = 0; i < add_buf_size/2; i++) {
         addr_dst[i] = i+1;
     }
 
     /* set the bytes to 0x01..0x0e of the lookup address */
-    for(size_t i = 0; i < 14; i++) {
+    for (size_t i = 0; i < 14; i++) {
         addr_lookup[i] = i+1;
     }
 
@@ -942,12 +942,12 @@ static void test_fib_20_replace_prefix(void)
     memset(addr_nxt_hop, 0, add_buf_size);
 
     /* set the bytes to 0x02..0x11 of the new next-hop */
-    for(size_t i = 0; i < add_buf_size; ++i) {
+    for (size_t i = 0; i < add_buf_size; ++i) {
         addr_nxt[i] = i+2;
     }
 
     /* set the bytes to 0x01..0x0d of the new destination prefix */
-    for(size_t i = 0; i < 13; i++) {
+    for (size_t i = 0; i < 13; i++) {
         addr_dst[i] = i+1;
     }
 

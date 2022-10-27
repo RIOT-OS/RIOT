@@ -150,7 +150,8 @@ static void test_pktbuf_add__pkt_NOT_NULL__data_NULL__size_not_0(void)
 
     TEST_ASSERT_NOT_NULL(next);
 
-    TEST_ASSERT_NOT_NULL((pkt = gnrc_pktbuf_add(next, NULL, sizeof(TEST_STRING8), GNRC_NETTYPE_TEST)));
+    TEST_ASSERT_NOT_NULL((pkt = gnrc_pktbuf_add(next, NULL, sizeof(TEST_STRING8),
+                                                GNRC_NETTYPE_TEST)));
 
     TEST_ASSERT(pkt->next == next);
     TEST_ASSERT_NOT_NULL(pkt->data);
@@ -232,7 +233,8 @@ static void test_pktbuf_add__packed_struct(void)
                                   34, -4469, 149699748, -46590430597
                                 };
     test_pktbuf_struct_t *data_cpy;
-    gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, &data, sizeof(test_pktbuf_struct_t), GNRC_NETTYPE_TEST);
+    gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, &data, sizeof(test_pktbuf_struct_t),
+                                          GNRC_NETTYPE_TEST);
     data_cpy = (test_pktbuf_struct_t *)pkt->data;
 
     TEST_ASSERT_EQUAL_INT(data.u8, data_cpy->u8);
@@ -509,7 +511,8 @@ static void test_pktbuf_realloc_data__size_0(void)
     TEST_ASSERT(gnrc_pktbuf_is_empty());
 }
 
-#ifndef MODULE_GNRC_PKTBUF_MALLOC   /* CONFIG_GNRC_PKTBUF_SIZE does not apply for gnrc_pktbuf_malloc */
+#ifndef MODULE_GNRC_PKTBUF_MALLOC   /* CONFIG_GNRC_PKTBUF_SIZE does not*/
+                                    /* apply for gnrc_pktbuf_malloc */
 static void test_pktbuf_realloc_data__memfull(void)
 {
     gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, NULL, sizeof(TEST_STRING8), GNRC_NETTYPE_TEST);
