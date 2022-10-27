@@ -59,7 +59,7 @@ config MODULE_ZTIMER_MSEC
     bool "Milliseconds"
     select MODULE_ZTIMER
 
-choice
+choice ZTIMER_MSEC_BACKEND
     bool "Backend"
     depends on MODULE_ZTIMER_MSEC
     default ZTIMER_MSEC_BACKEND_RTT if !MODULE_ZTIMER_NO_PERIPH_RTT
