@@ -16,6 +16,7 @@
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Vincent Dupont <vincent@otakeys.com>
+ * @author          Joshua DeWeese <jdeweese@primecontrols.com>
  */
 
 #ifndef PERIPH_CPU_DMA_H
@@ -38,7 +39,7 @@ typedef struct {
      *  - 8: DAM2 / Stream0
      *  - ...
      *  - 15: DMA2 / Stream7
-     * STM32F0/1/L0/1/4:
+     * STM32F0/1/3/L0/1/4:
      *  - 0: DMA1 / Channel1
      *  - ...
      *  - 4: DMA1 / Channel5
@@ -88,10 +89,8 @@ typedef enum {
  * @{
  */
 #define DMA_DATA_WIDTH_BYTE      (0x00) /**< Byte width */
-#define DMA_DATA_WIDTH_HALF_WORD (0x01) /**< Half word width */
-#define DMA_DATA_WIDTH_WORD      (0x02) /**< Word width */
-#define DMA_DATA_WIDTH_MASK      (0x03) /**< Width mask */
-#define DMA_DATA_WIDTH_SHIFT     (0)    /**< Width position */
+#define DMA_DATA_WIDTH_HALF_WORD (0x01) /**< Half word width (2 bytes)*/
+#define DMA_DATA_WIDTH_WORD      (0x02) /**< Word width (4 bytes)*/
 /** @} */
 
 #ifdef MODULE_PERIPH_DMA
@@ -115,7 +114,7 @@ void dma_init(void);
  * @param[in]  chan    DMA channel (on stm32f2/4/7, CxS or unused on others)
  * @param[in]  src     source buffer
  * @param[out] dst     destination buffer
- * @param[in]  len     length to transfer
+ * @param[in]  len     number of transfers to perform
  * @param[in]  mode    DMA mode
  * @param[in]  flags   DMA configuration
  *
@@ -153,7 +152,7 @@ void dma_start(dma_t dma);
  *
  * @param[in] dma     logical DMA stream
  *
- * @return the remaining number of bytes to transfer
+ * @return the remaining number of transfers to perform
  */
 uint16_t dma_suspend(dma_t dma);
 
@@ -161,7 +160,7 @@ uint16_t dma_suspend(dma_t dma);
  * @brief   Resume a suspended DMA transfer on a stream
  *
  * @param[in] dma         logical DMA stream
- * @param[in] reamaining  the remaining number of bytes to transfer
+ * @param[in] reamaining  the remaining number of transfers to perform
  */
 void dma_resume(dma_t dma, uint16_t remaining);
 
@@ -186,7 +185,7 @@ void dma_wait(dma_t dma);
  * @param[in]  chan    DMA channel (on stm32f2/4/7, CxS or unused on others)
  * @param[in]  src     source buffer
  * @param[out] dst     destination buffer
- * @param[in]  len     length to transfer
+ * @param[in]  len     number of transfers to perform
  * @param[in]  mode    DMA mode
  * @param[in]  flags   DMA configuration
  *
@@ -206,7 +205,7 @@ int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *
  * @param[in]   chan        DMA channel (on stm32f2/4/7, CxS or unused on others)
  * @param[in]   periph_addr Peripheral register address
  * @param[in]   mode        DMA direction mode
- * @param[in]   width       DMA transfer width
+ * @param[in]   width       DMA transfer width (one of DMA_DATA_WIDTH_*)
  * @param[in]   inc_periph  Increment peripheral address after read/write
  */
 void dma_setup(dma_t dma, int chan, void *periph_addr, dma_mode_t mode,
@@ -217,8 +216,8 @@ void dma_setup(dma_t dma, int chan, void *periph_addr, dma_mode_t mode,
  *
  * @param[in]   dma         Logical DMA stream
  * @param[in]   mem         Memory address
- * @param[in]   len         Transfer length
- * @param[in]   inc_mem     Increment the memory address after read/write
+ * @param[in]   len         Number of transfers to perform
+ * @param[in]   inc_mem     Increment the memory address (by the transfer width) after read/write
  */
 void dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem);
 
