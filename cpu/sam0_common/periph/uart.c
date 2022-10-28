@@ -162,6 +162,9 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         return UART_NODEV;
     }
 
+    /* enable peripheral clock */
+    sercom_clk_en(dev(uart));
+
     /* must disable here first to ensure idempotency */
     dev(uart)->CTRLA.reg = 0;
 
@@ -172,9 +175,6 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
     /* configure pins */
     _configure_pins(uart);
-
-    /* enable peripheral clock */
-    sercom_clk_en(dev(uart));
 
     /* reset the UART device */
     _reset(dev(uart));
