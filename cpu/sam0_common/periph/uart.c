@@ -303,6 +303,10 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         return;
     }
 
+    if (!dev(uart)->CTRLA.bit.ENABLE) {
+        return;
+    }
+
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
     for (const void* end = data + len; data != end; ++data) {
         if (irq_is_in() || __get_PRIMASK()) {
