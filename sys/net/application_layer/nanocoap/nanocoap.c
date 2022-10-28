@@ -1260,6 +1260,15 @@ unsigned coap_get_len(coap_pkt_t *pkt)
     return pktlen;
 }
 
+void coap_request_ctx_init(coap_request_ctx_t *ctx, sock_udp_ep_t *remote)
+{
+    static_assert(COAP_REQUEST_CTX_SIZE == sizeof(coap_request_ctx_t),
+                  "COAP_REQUEST_CTX_SIZE define does not match actual size");
+
+    memset(ctx, 0, sizeof(*ctx));
+    ctx->remote = remote;
+}
+
 const char *coap_request_ctx_get_path(const coap_request_ctx_t *ctx)
 {
     return ctx->resource->path;
