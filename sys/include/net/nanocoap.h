@@ -353,8 +353,6 @@ uint32_t coap_request_ctx_get_tl_type(const coap_request_ctx_t *ctx);
 /**
  * @brief   Get the remote endpoint from which the request was received
  *
- * @note    This is currently only implemented for GCoAP
- *
  * @param[in]   ctx The request context
  *
  * @return  Remote endpoint from which the request originated
@@ -1846,11 +1844,13 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
  * @param[in]   pkt             pointer to (parsed) CoAP packet
  * @param[out]  resp_buf        buffer for response
  * @param[in]   resp_buf_len    size of response buffer
+ * @param[in]   ctx             CoAP request context information
  *
  * @returns     size of reply packet on success
  * @returns     <0 on error
  */
-ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_len);
+ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_len,
+                        coap_request_ctx_t *ctx);
 
 /**
  * @brief   Pass a coap request to a matching handler
@@ -1861,6 +1861,7 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
  * @param[in]   pkt             pointer to (parsed) CoAP packet
  * @param[out]  resp_buf        buffer for response
  * @param[in]   resp_buf_len    size of response buffer
+ * @param[in]   ctx             CoAP request context information
  * @param[in]   resources       Array of coap endpoint resources
  * @param[in]   resources_numof length of the coap endpoint resources
  *
@@ -1868,7 +1869,7 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
  * @returns     <0 on error
  */
 ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf,
-                          unsigned resp_buf_len,
+                          unsigned resp_buf_len, coap_request_ctx_t *ctx,
                           const coap_resource_t *resources,
                           size_t resources_numof);
 

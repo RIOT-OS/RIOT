@@ -35,6 +35,7 @@ extern "C" {
  */
 struct _coap_request_ctx {
     const coap_resource_t *resource;    /**< resource of the request */
+    sock_udp_ep_t *remote;              /**< remote endpoint of the request */
 #if defined(MODULE_GCOAP) || DOXYGEN
     /**
      * @brief   transport the packet was received over
@@ -43,7 +44,6 @@ struct _coap_request_ctx {
      *          cyclically include the @ref net_gcoap header.
      */
     uint32_t tl_type;
-    sock_udp_ep_t *remote;              /**< remote endpoint of the request */
 #endif
 };
 
