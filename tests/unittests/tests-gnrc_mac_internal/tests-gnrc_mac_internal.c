@@ -93,13 +93,13 @@ static void test_gnrc_mac_queue_tx_packet(void)
 #if CONFIG_GNRC_MAC_NEIGHBOR_COUNT != 0
 
     gnrc_pktsnip_t *pkt_head;
-    TEST_ASSERT(gnrc_mac_queue_tx_packet(&tx,1,pkt1));
+    TEST_ASSERT(gnrc_mac_queue_tx_packet(&tx, 1, pkt1));
     pkt_head = gnrc_priority_pktqueue_head(&tx.neighbors[1].queue);
     TEST_ASSERT(pkt_head == pkt1);
     TEST_ASSERT(1 == gnrc_priority_pktqueue_length(&tx.neighbors[1].queue));
     TEST_ASSERT_EQUAL_STRING(TEST_STRING4, pkt_head->next->data);
 
-    TEST_ASSERT(gnrc_mac_queue_tx_packet(&tx,0,pkt2));
+    TEST_ASSERT(gnrc_mac_queue_tx_packet(&tx, 0, pkt2));
     pkt_head = gnrc_priority_pktqueue_head(&tx.neighbors[1].queue);
     TEST_ASSERT(pkt_head == pkt2);
     TEST_ASSERT(2 == gnrc_priority_pktqueue_length(&tx.neighbors[1].queue));
@@ -114,13 +114,13 @@ static void test_gnrc_mac_queue_tx_packet(void)
     TEST_ASSERT(pkt_head == pkt1);
     TEST_ASSERT_EQUAL_STRING(TEST_STRING4, pkt_head->next->data);
 
-    TEST_ASSERT(gnrc_mac_queue_tx_packet(&tx,0,pkt3));
+    TEST_ASSERT(gnrc_mac_queue_tx_packet(&tx, 0, pkt3));
     pkt_head = gnrc_priority_pktqueue_head(&tx.neighbors[2].queue);
     TEST_ASSERT(pkt_head == pkt3);
     TEST_ASSERT(1 == gnrc_priority_pktqueue_length(&tx.neighbors[2].queue));
     TEST_ASSERT_EQUAL_STRING(TEST_STRING16, pkt_head->next->data);
 
-    TEST_ASSERT(gnrc_mac_queue_tx_packet(&tx,0,pkt_bcast));
+    TEST_ASSERT(gnrc_mac_queue_tx_packet(&tx, 0, pkt_bcast));
     pkt_head = gnrc_priority_pktqueue_head(&tx.neighbors[0].queue);
     TEST_ASSERT(pkt_head == pkt_bcast);
     TEST_ASSERT(1 == gnrc_priority_pktqueue_length(&tx.neighbors[0].queue));
@@ -128,26 +128,26 @@ static void test_gnrc_mac_queue_tx_packet(void)
 
 #else
 
-    TEST_ASSERT(gnrc_mac_queue_tx_packet(&tx,1,pkt1));
+    TEST_ASSERT(gnrc_mac_queue_tx_packet(&tx, 1, pkt1));
     TEST_ASSERT(1 == gnrc_priority_pktqueue_length(&tx.queue));
     gnrc_pktsnip_t *pkt_head;
     pkt_head = gnrc_priority_pktqueue_head(&tx.queue);
     TEST_ASSERT(pkt_head == pkt1);
     TEST_ASSERT_EQUAL_STRING(TEST_STRING4, pkt_head->next->data);
 
-    TEST_ASSERT(gnrc_mac_queue_tx_packet(&tx,1,pkt2));
+    TEST_ASSERT(gnrc_mac_queue_tx_packet(&tx, 1, pkt2));
     TEST_ASSERT(2 == gnrc_priority_pktqueue_length(&tx.queue));
     pkt_head = gnrc_priority_pktqueue_head(&tx.queue);
     TEST_ASSERT(pkt_head == pkt1);
     TEST_ASSERT_EQUAL_STRING(TEST_STRING4, pkt_head->next->data);
 
-    TEST_ASSERT(gnrc_mac_queue_tx_packet(&tx,0,pkt3));
+    TEST_ASSERT(gnrc_mac_queue_tx_packet(&tx, 0, pkt3));
     TEST_ASSERT(3 == gnrc_priority_pktqueue_length(&tx.queue));
     pkt_head = gnrc_priority_pktqueue_head(&tx.queue);
     TEST_ASSERT(pkt_head == pkt3);
     TEST_ASSERT_EQUAL_STRING(TEST_STRING16, pkt_head->next->data);
 
-    TEST_ASSERT(gnrc_mac_queue_tx_packet(&tx,0,pkt_bcast));
+    TEST_ASSERT(gnrc_mac_queue_tx_packet(&tx, 0, pkt_bcast));
     TEST_ASSERT(4 == gnrc_priority_pktqueue_length(&tx.queue));
     pkt_head = gnrc_priority_pktqueue_head(&tx.queue);
     TEST_ASSERT(pkt_head == pkt3);
@@ -198,7 +198,7 @@ static void test_gnrc_mac_queue_rx_packet(void)
     gnrc_pktsnip_t *pkt3 = gnrc_pktbuf_add(NULL, TEST_STRING16, sizeof(TEST_STRING16),
                                            GNRC_NETTYPE_UNDEF);
 
-    TEST_ASSERT(gnrc_mac_queue_rx_packet(&rx,1,pkt1));
+    TEST_ASSERT(gnrc_mac_queue_rx_packet(&rx, 1, pkt1));
     TEST_ASSERT(1 == gnrc_priority_pktqueue_length(&rx.queue));
 
     gnrc_pktsnip_t *pkt_head;
@@ -207,7 +207,7 @@ static void test_gnrc_mac_queue_rx_packet(void)
     TEST_ASSERT(pkt_head == pkt1);
     TEST_ASSERT_EQUAL_STRING(TEST_STRING4, pkt_head->data);
 
-    TEST_ASSERT(gnrc_mac_queue_rx_packet(&rx,1,pkt2));
+    TEST_ASSERT(gnrc_mac_queue_rx_packet(&rx, 1, pkt2));
     TEST_ASSERT(2 == gnrc_priority_pktqueue_length(&rx.queue));
 
     pkt_head = gnrc_priority_pktqueue_head(&rx.queue);
@@ -215,7 +215,7 @@ static void test_gnrc_mac_queue_rx_packet(void)
     TEST_ASSERT(pkt_head == pkt1);
     TEST_ASSERT_EQUAL_STRING(TEST_STRING4, pkt_head->data);
 
-    TEST_ASSERT(gnrc_mac_queue_rx_packet(&rx,0,pkt3));
+    TEST_ASSERT(gnrc_mac_queue_rx_packet(&rx, 0, pkt3));
     TEST_ASSERT(3 == gnrc_priority_pktqueue_length(&rx.queue));
 
     pkt_head = gnrc_priority_pktqueue_head(&rx.queue);

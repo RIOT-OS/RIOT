@@ -151,7 +151,8 @@ static void test_vfs_constfs_read_lseek(void)
     TEST_ASSERT_EQUAL_INT(sizeof(str_data) / 2, pos);
     nbytes = vfs_read(fd, strbuf, sizeof(strbuf));
     TEST_ASSERT_EQUAL_INT((sizeof(str_data) + 1) / 2, nbytes); /* + 1 for rounding up */
-    TEST_ASSERT_EQUAL_STRING((const char *)&str_data[sizeof(str_data) / 2], (const char *)&strbuf[0]);
+    TEST_ASSERT_EQUAL_STRING((const char *)&str_data[sizeof(str_data) / 2],
+                             (const char *)&strbuf[0]);
 
     /* lseek to near the end */
     memset(strbuf, '\0', sizeof(strbuf));
@@ -159,7 +160,8 @@ static void test_vfs_constfs_read_lseek(void)
     TEST_ASSERT_EQUAL_INT(sizeof(str_data) - 1, pos);
     nbytes = vfs_read(fd, strbuf, sizeof(strbuf));
     TEST_ASSERT_EQUAL_INT(1, nbytes);
-    TEST_ASSERT_EQUAL_STRING((const char *)&str_data[sizeof(str_data) - 1], (const char *)&strbuf[0]);
+    TEST_ASSERT_EQUAL_STRING((const char *)&str_data[sizeof(str_data) - 1],
+                             (const char *)&strbuf[0]);
 
     res = vfs_fcntl(fd, F_GETFL, 0);
     TEST_ASSERT_EQUAL_INT(O_RDONLY, res);
