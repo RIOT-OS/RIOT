@@ -40,7 +40,6 @@ void pm_set(unsigned mode)
             _mode = PM_SLEEPCFG_SLEEPMODE_STANDBY;
             deep  = 1;
             break;
-        default: /* Falls through */
         case SAML21_PM_MODE_IDLE:
             DEBUG_PUTS("pm_set(): setting IDLE mode.");
 #if !defined(PM_SLEEPCFG_SLEEPMODE_IDLE2)
@@ -49,6 +48,9 @@ void pm_set(unsigned mode)
             _mode = PM_SLEEPCFG_SLEEPMODE_IDLE2;
 #endif
             break;
+        default:
+            /* don't sleep at all */
+            return;
     }
 
     /* write sleep configuration */
