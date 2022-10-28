@@ -12,13 +12,21 @@ gcda files.
 import argparse
 import os
 import re
+import sys
+
+
+def get_input_stream(input_file):
+    if input_file == "-":
+        return sys.stdin
+    else:
+        return open(input_file, 'r')
 
 
 def retrieve_data(input_file):
     extracted_coverage_info = {}
     capture_data = False
     reached_end = False
-    with open(input_file, 'r') as fp:
+    with get_input_stream(input_file) as fp:
         for line in fp.readlines():
             if re.search("GCOV_COVERAGE_DUMP_START", line):
                 capture_data = True
