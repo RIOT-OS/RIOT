@@ -843,10 +843,10 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
             payload_len = (uint16_t)(rbuf->super.datagram_size - sizeof(ipv6_hdr_t));
         }
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_VRB
-        DEBUG("6lo iphc: VRB present, trying to create entry for dst %s\n",
-              ipv6_addr_to_str(addr_str, &ipv6_hdr->dst, sizeof(addr_str)));
         /* re-assign IPv6 header in case realloc changed the address */
         ipv6_hdr = ipv6->data;
+        DEBUG("6lo iphc: VRB present, trying to create entry for dst %s\n",
+              ipv6_addr_to_str(addr_str, &ipv6_hdr->dst, sizeof(addr_str)));
         /* only create virtual reassembly buffer entry from IPv6 destination if
          * the current first fragment is the only received fragment in the
          * reassembly buffer so far and the hop-limit is larger than 1
