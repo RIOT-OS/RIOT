@@ -42,6 +42,27 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Peripheral power mode requirements
+ * @{
+ */
+#define SAM0_GPIO_PM_BLOCK        SAML21_PM_MODE_BACKUP   /**< GPIO IRQs require STANDBY mode */
+#define SAM0_RTCRTT_PM_BLOCK      SAML21_PM_MODE_BACKUP   /**< RTC/TRR require STANDBY mode */
+#define SAM0_SPI_PM_BLOCK         SAML21_PM_MODE_STANDBY  /**< SPI in DMA mode require IDLE mode */
+#define SAM0_TIMER_PM_BLOCK       SAML21_PM_MODE_STANDBY  /**< Timers require IDLE mode */
+#define SAM0_UART_PM_BLOCK        SAML21_PM_MODE_STANDBY  /**< UART RX IRQ require IDLE mode */
+#define SAM0_USB_IDLE_PM_BLOCK    SAML21_PM_MODE_BACKUP   /**< Idle USB require STANDBY mode */
+#define SAM0_USB_ACTIVE_PM_BLOCK  SAML21_PM_MODE_STANDBY  /**< Active USB require IDLE mode */
+/** @} */
+
+/**
+ * @brief   Override the default initial PM blocker
+ *          All peripheral drivers ensure required pm modes are blocked
+ */
+#ifndef PM_BLOCKER_INITIAL
+#define PM_BLOCKER_INITIAL      { 0, 0, 0 }
+#endif
+
+/**
  * @name   SAML21 GCLK definitions
  * @{
  */
