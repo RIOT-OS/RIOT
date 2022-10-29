@@ -229,6 +229,10 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                 /* call user callback */
                 if (cb) {
                     res = cb(arg, pkt);
+                    /* get another response */
+                    if (res == -EAGAIN) {
+                        state = STATE_RESPONSE_RCVD;
+                    }
                 } else {
                     res = _get_error(pkt);
                 }

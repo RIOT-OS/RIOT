@@ -293,6 +293,10 @@ typedef int (*coap_blockwise_cb_t)(void *arg, size_t offset, uint8_t *buf, size_
  *                     Buffers point to network stack internal memory.
  *
  * @returns   >=0       on success
+ * @returns   -EAGAIN   receive more responses
+ *                      Only use this if the request was to a multicast address
+ *                      and you expect responses from multiple nodes.
+ *                      Callback will be called again if another response is received
  * @returns    <0       on error
  */
 typedef int (*coap_request_cb_t)(void *arg, coap_pkt_t *pkt);
