@@ -54,7 +54,7 @@ static gnrc_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
 
     dst_len = ieee802154_get_dst(mhr, dst, &_pan_tmp);
     src_len = ieee802154_get_src(mhr, src, &_pan_tmp);
-    if ((dst_len < 0) || (src_len < 0)) {
+    if ((dst_len < 0) || (src_len <= 0)) {
         DEBUG("_make_netif_hdr: unable to get addresses\n");
         return NULL;
     }
