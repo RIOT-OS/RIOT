@@ -18,5 +18,6 @@ config BOARD_DWM1001
     select HAS_VDD_LC_FILTER_REG1
 
     select HAVE_LIS2DH12_SPI
+    select HAVE_SAUL_GPIO
 
 source "$(RIOTBOARD)/common/nrf52/Kconfig"
