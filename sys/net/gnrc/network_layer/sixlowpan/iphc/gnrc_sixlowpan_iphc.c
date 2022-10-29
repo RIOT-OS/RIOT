@@ -737,6 +737,12 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
     if (rbuf != NULL) {
         ipv6 = rbuf->pkt;
         assert(ipv6 != NULL);
+        if ((ipv6->size < sizeof(ipv6_hdr_t)) &&
+            (gnrc_pktbuf_realloc_data(ipv6, sizeof(ipv6_hdr_t)) != 0)) {
+            DEBUG("6lo iphc: no space to decompress IPHC\n");
+            _recv_error_release(sixlo, ipv6, rbuf);
+            return;
+        }
     }
     else {
         ipv6 = gnrc_pktbuf_add(NULL, NULL, sizeof(ipv6_hdr_t),
@@ -754,8 +760,9 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
     iface = gnrc_netif_hdr_get_netif(netif->data);
     payload_offset = _iphc_ipv6_decode(iphc_hdr, netif->data, iface,
                                        ipv6->data);
-    if (payload_offset == 0) {
-        /* unable to parse IPHC header */
+    if ((payload_offset == 0) || (payload_offset > sixlo->size)) {
+        /* unable to parse IPHC header or malicious packet */
+        DEBUG("6lo iphc: malformed IPHC header\n");
         _recv_error_release(sixlo, ipv6, rbuf);
         return;
     }
@@ -775,7 +782,9 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
                                                            &prev_nh_offset,
                                                            ipv6,
                                                            &uncomp_hdr_len);
-                    if (payload_offset == 0) {
+                    if ((payload_offset == 0) || (payload_offset > sixlo->size)) {
+                        /* unable to parse IPHC header or malicious packet */
+                        DEBUG("6lo iphc: malformed IPHC NHC IPv6 header\n");
                         _recv_error_release(sixlo, ipv6, rbuf);
                         return;
                     }
@@ -790,7 +799,9 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
                                                           prev_nh_offset,
                                                           ipv6,
                                                           &uncomp_hdr_len);
-                    if (payload_offset == 0) {
+                    if ((payload_offset == 0) || (payload_offset > sixlo->size)) {
+                        /* unable to parse IPHC header or malicious packet */
+                        DEBUG("6lo iphc: malformed IPHC NHC IPv6 header\n");
                         _recv_error_release(sixlo, ipv6, rbuf);
                         return;
                     }
@@ -828,14 +839,14 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
 #endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_VRB */
         }
         else {
-        /* for a fragmented datagram we know the overall length already */
+            /* for a fragmented datagram we know the overall length already */
             payload_len = (uint16_t)(rbuf->super.datagram_size - sizeof(ipv6_hdr_t));
         }
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_VRB
-        DEBUG("6lo iphc: VRB present, trying to create entry for dst %s\n",
-              ipv6_addr_to_str(addr_str, &ipv6_hdr->dst, sizeof(addr_str)));
         /* re-assign IPv6 header in case realloc changed the address */
         ipv6_hdr = ipv6->data;
+        DEBUG("6lo iphc: VRB present, trying to create entry for dst %s\n",
+              ipv6_addr_to_str(addr_str, &ipv6_hdr->dst, sizeof(addr_str)));
         /* only create virtual reassembly buffer entry from IPv6 destination if
          * the current first fragment is the only received fragment in the
          * reassembly buffer so far and the hop-limit is larger than 1
@@ -872,19 +883,31 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
         payload_len = (sixlo->size + uncomp_hdr_len -
                        payload_offset - sizeof(ipv6_hdr_t));
     }
-    if ((rbuf == NULL) &&
+    if (rbuf == NULL) {
         /* (rbuf == NULL) => forwarding is not affected by this */
-        (gnrc_pktbuf_realloc_data(ipv6, uncomp_hdr_len + payload_len) != 0)) {
-        DEBUG("6lo iphc: no space left to copy payload\n");
-        _recv_error_release(sixlo, ipv6, rbuf);
-        return;
+        if (gnrc_pktbuf_realloc_data(ipv6, uncomp_hdr_len + payload_len) != 0) {
+            DEBUG("6lo iphc: no space left to copy payload\n");
+            _recv_error_release(sixlo, ipv6, rbuf);
+            return;
+        }
     }
+    else {
+        if (ipv6->size < (uncomp_hdr_len + (sixlo->size - payload_offset))) {
+            DEBUG("6lo iphc: not enough space to copy payload.\n");
+            DEBUG("6lo iphc: potentially malicious datagram size received.\n");
+            _recv_error_release(sixlo, ipv6, rbuf);
+            return;
+        }
+    }
+
     /* re-assign IPv6 header in case realloc changed the address */
     ipv6_hdr = ipv6->data;
     ipv6_hdr->len = byteorder_htons(payload_len);
-    memcpy(((uint8_t *)ipv6->data) + uncomp_hdr_len,
-           ((uint8_t *)sixlo->data) + payload_offset,
-           sixlo->size - payload_offset);
+    if (sixlo->size > payload_offset) {
+        memcpy(((uint8_t *)ipv6->data) + uncomp_hdr_len,
+               ((uint8_t *)sixlo->data) + payload_offset,
+               sixlo->size - payload_offset);
+    }
     if (rbuf != NULL) {
         rbuf->super.current_size += (uncomp_hdr_len - payload_offset);
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_VRB
@@ -1590,16 +1613,7 @@ static gnrc_pktsnip_t *_iphc_encode(gnrc_pktsnip_t *pkt,
         else {
             dispatch->next = ptr;
         }
-        if (ptr->type == GNRC_NETTYPE_UNDEF) {
-            /* most likely UDP for now so use that (XXX: extend if extension
-             * headers make problems) */
-            dispatch_size += sizeof(udp_hdr_t);
-            break;  /* nothing special after UDP so quit even if more UNDEF
-                     * come */
-        }
-        else {
-            dispatch_size += ptr->size;
-        }
+        dispatch_size += ptr->size;
         dispatch = ptr; /* use dispatch as temporary point for prev */
         ptr = ptr->next;
     }
@@ -1627,6 +1641,11 @@ static gnrc_pktsnip_t *_iphc_encode(gnrc_pktsnip_t *pkt,
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
     while (_compressible_nh(nh)) {
         ssize_t local_pos = 0;
+        if (pkt->next->next == NULL) {
+            DEBUG("6lo iphc: packet next header missing data");
+            gnrc_pktbuf_release(dispatch);
+            return NULL;
+        }
         switch (nh) {
             case PROTNUM_UDP:
                 local_pos = _nhc_udp_encode_snip(pkt, &iphc_hdr[inline_pos]);

@@ -406,105 +406,108 @@ static void test_ieee802154_set_frame_hdr_dst8_src8_pancomp(void)
 
 static void test_ieee802154_get_frame_hdr_len_dst0_src0(void)
 {
-    const uint8_t mhr[] = { 0x00, IEEE802154_FCF_DST_ADDR_VOID |
-                                  IEEE802154_FCF_SRC_ADDR_VOID };
+    const uint8_t mhr[] = { IEEE802154_FCF_TYPE_DATA, IEEE802154_FCF_DST_ADDR_VOID |
+                                                      IEEE802154_FCF_SRC_ADDR_VOID };
 
-    TEST_ASSERT_EQUAL_INT(3, ieee802154_get_frame_hdr_len(mhr));
+    /* either source or destination are required, so expect an error */
+    TEST_ASSERT_EQUAL_INT(0, ieee802154_get_frame_hdr_len(mhr));
 }
 
 static void test_ieee802154_get_frame_hdr_len_dstr(void)
 {
-    const uint8_t mhr[] = { 0x00, IEEE802154_FCF_DST_ADDR_RESV };
+    const uint8_t mhr[] = { IEEE802154_FCF_TYPE_DATA, IEEE802154_FCF_DST_ADDR_RESV };
 
     TEST_ASSERT_EQUAL_INT(0, ieee802154_get_frame_hdr_len(mhr));
 }
 
 static void test_ieee802154_get_frame_hdr_len_srcr(void)
 {
-    const uint8_t mhr[] = { 0x00, IEEE802154_FCF_DST_ADDR_RESV };
+    const uint8_t mhr[] = { IEEE802154_FCF_TYPE_DATA, IEEE802154_FCF_DST_ADDR_RESV };
 
     TEST_ASSERT_EQUAL_INT(0, ieee802154_get_frame_hdr_len(mhr));
 }
 
 static void test_ieee802154_get_frame_hdr_len_dst2_src0(void)
 {
-    const uint8_t mhr[] = { 0x00, IEEE802154_FCF_DST_ADDR_SHORT |
-                                  IEEE802154_FCF_SRC_ADDR_VOID };
+    const uint8_t mhr[] = { IEEE802154_FCF_TYPE_DATA, IEEE802154_FCF_DST_ADDR_SHORT |
+                                                      IEEE802154_FCF_SRC_ADDR_VOID };
 
     TEST_ASSERT_EQUAL_INT(7, ieee802154_get_frame_hdr_len(mhr));
 }
 
 static void test_ieee802154_get_frame_hdr_len_dst8_src0(void)
 {
-    const uint8_t mhr[] = { 0x00, IEEE802154_FCF_DST_ADDR_LONG };
+    const uint8_t mhr[] = { IEEE802154_FCF_TYPE_DATA, IEEE802154_FCF_DST_ADDR_LONG };
 
     TEST_ASSERT_EQUAL_INT(13, ieee802154_get_frame_hdr_len(mhr));
 }
 
 static void test_ieee802154_get_frame_hdr_len_dst0_src2(void)
 {
-    const uint8_t mhr[] = { 0x00, IEEE802154_FCF_SRC_ADDR_SHORT };
+    const uint8_t mhr[] = { IEEE802154_FCF_TYPE_DATA, IEEE802154_FCF_SRC_ADDR_SHORT };
 
     TEST_ASSERT_EQUAL_INT(7, ieee802154_get_frame_hdr_len(mhr));
 }
 
 static void test_ieee802154_get_frame_hdr_len_dst0_src2_pancomp(void)
 {
-    const uint8_t mhr[] = { IEEE802154_FCF_PAN_COMP, IEEE802154_FCF_SRC_ADDR_SHORT };
+    const uint8_t mhr[] = { IEEE802154_FCF_TYPE_DATA | IEEE802154_FCF_PAN_COMP,
+                            IEEE802154_FCF_SRC_ADDR_SHORT };
 
     TEST_ASSERT_EQUAL_INT(0, ieee802154_get_frame_hdr_len(mhr));
 }
 
 static void test_ieee802154_get_frame_hdr_len_dst0_src8(void)
 {
-    const uint8_t mhr[] = { 0x00, IEEE802154_FCF_SRC_ADDR_LONG };
+    const uint8_t mhr[] = { IEEE802154_FCF_TYPE_DATA, IEEE802154_FCF_SRC_ADDR_LONG };
 
     TEST_ASSERT_EQUAL_INT(13, ieee802154_get_frame_hdr_len(mhr));
 }
 
 static void test_ieee802154_get_frame_hdr_len_dst0_src8_pancomp(void)
 {
-    const uint8_t mhr[] = { IEEE802154_FCF_PAN_COMP, IEEE802154_FCF_SRC_ADDR_LONG };
+    const uint8_t mhr[] = { IEEE802154_FCF_TYPE_DATA | IEEE802154_FCF_PAN_COMP,
+                            IEEE802154_FCF_SRC_ADDR_LONG };
 
     TEST_ASSERT_EQUAL_INT(0, ieee802154_get_frame_hdr_len(mhr));
 }
 
 static void test_ieee802154_get_frame_hdr_len_dst2_src2(void)
 {
-    const uint8_t mhr[] = { 0x00, IEEE802154_FCF_DST_ADDR_SHORT |
-                                  IEEE802154_FCF_SRC_ADDR_SHORT };
+    const uint8_t mhr[] = { IEEE802154_FCF_TYPE_DATA,
+                            IEEE802154_FCF_DST_ADDR_SHORT | IEEE802154_FCF_SRC_ADDR_SHORT };
 
     TEST_ASSERT_EQUAL_INT(11, ieee802154_get_frame_hdr_len(mhr));
 }
 
 static void test_ieee802154_get_frame_hdr_len_dst8_src2(void)
 {
-    const uint8_t mhr[] = { 0x00, IEEE802154_FCF_DST_ADDR_LONG |
-                                  IEEE802154_FCF_SRC_ADDR_SHORT };
+    const uint8_t mhr[] = { IEEE802154_FCF_TYPE_DATA,
+                            IEEE802154_FCF_DST_ADDR_LONG | IEEE802154_FCF_SRC_ADDR_SHORT };
 
     TEST_ASSERT_EQUAL_INT(17, ieee802154_get_frame_hdr_len(mhr));
 }
 
 static void test_ieee802154_get_frame_hdr_len_dst8_src8(void)
 {
-    const uint8_t mhr[] = { 0x00, IEEE802154_FCF_DST_ADDR_LONG |
-                                  IEEE802154_FCF_SRC_ADDR_LONG };
+    const uint8_t mhr[] = { IEEE802154_FCF_TYPE_DATA,
+                            IEEE802154_FCF_DST_ADDR_LONG | IEEE802154_FCF_SRC_ADDR_LONG };
 
     TEST_ASSERT_EQUAL_INT(23, ieee802154_get_frame_hdr_len(mhr));
 }
 
 static void test_ieee802154_get_frame_hdr_len_dst2_src2_pancomp(void)
 {
-    const uint8_t mhr[] = { IEEE802154_FCF_PAN_COMP, IEEE802154_FCF_DST_ADDR_SHORT |
-                                                     IEEE802154_FCF_SRC_ADDR_SHORT };
+    const uint8_t mhr[] = { IEEE802154_FCF_TYPE_DATA | IEEE802154_FCF_PAN_COMP,
+                            IEEE802154_FCF_DST_ADDR_SHORT | IEEE802154_FCF_SRC_ADDR_SHORT };
 
     TEST_ASSERT_EQUAL_INT(9, ieee802154_get_frame_hdr_len(mhr));
 }
 
 static void test_ieee802154_get_frame_hdr_len_dst8_src8_pancomp(void)
 {
-    const uint8_t mhr[] = { IEEE802154_FCF_PAN_COMP, IEEE802154_FCF_DST_ADDR_LONG |
-                                                     IEEE802154_FCF_SRC_ADDR_LONG };
+    const uint8_t mhr[] = { IEEE802154_FCF_TYPE_DATA | IEEE802154_FCF_PAN_COMP,
+                            IEEE802154_FCF_DST_ADDR_LONG | IEEE802154_FCF_SRC_ADDR_LONG };
 
     TEST_ASSERT_EQUAL_INT(21, ieee802154_get_frame_hdr_len(mhr));
 }
