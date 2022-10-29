@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
  *               2015 FreshTemp, LLC.
+ *               2022 SSV Software Systems GmbH
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -20,12 +21,14 @@
  * @author      Baptiste Clenet <bapclenet@gmail.com>
  * @author      FWX <FWX@dialine.fr>
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
+ * @author      Juergen Fitschen <me@jue.yt>
  *
  * @}
  */
 
 #include <stdint.h>
 #include <string.h>
+#include "pm_layered.h"
 #include "periph/rtc.h"
 #include "periph/rtt.h"
 #include "periph_conf.h"
@@ -61,6 +64,38 @@ typedef struct {
 
 static rtc_state_t alarm_cb;
 static rtc_state_t overflow_cb;
+
+#if (IS_ACTIVE(MODULE_PERIPH_RTC) || IS_ACTIVE(MODULE_PERIPH_RTT)) && \
+    IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_RTCRTT_PM_BLOCK)
+
+static bool _pm_alarm = false;
+#if IS_ACTIVE(MODULE_PERIPH_RTT)
+static bool _pm_overflow = false;
+#endif
+
+static inline void _pm_block(bool *flag)
+{
+    if (!*flag) {
+        pm_block(SAM0_RTCRTT_PM_BLOCK);
+        *flag = true;
+    }
+}
+
+static inline void _pm_unblock(bool *flag)
+{
+    if (*flag) {
+        pm_unblock(SAM0_RTCRTT_PM_BLOCK);
+        *flag = false;
+    }
+}
+
+#else
+
+/* Use empty stubs if pm is disabled */
+#define _pm_block(x)
+#define _pm_unblock(x)
+
+#endif
 
 #if IS_ACTIVE(MODULE_PERIPH_RTC)
 /* At 1Hz, RTC goes till 63 years (2^5, see 17.8.22 in datasheet)
@@ -311,6 +346,9 @@ static void _rtc_init(void)
 
 void rtc_init(void)
 {
+    /* clear previously set pm mode blockers */
+    _pm_unblock(&_pm_alarm);
+
     _poweroff();
     _rtc_clock_setup();
     _poweron();
@@ -332,6 +370,9 @@ void rtc_init(void)
 #ifdef MODULE_PERIPH_RTT
 void rtt_init(void)
 {
+    /* clear previously set pm mode blockers */
+    _pm_unblock(&_pm_alarm);
+    _pm_unblock(&_pm_overflow);
 
     _rtt_clock_setup();
     _poweron();
@@ -579,6 +620,11 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
     RTC->MODE2.INTFLAG.reg  = RTC_MODE2_INTFLAG_ALARM0;
     RTC->MODE2.INTENSET.reg = RTC_MODE2_INTENSET_ALARM0;
 
+    /* block power mode if callback function is present */
+    if (alarm_cb.cb) {
+        _pm_block(&_pm_alarm);
+    }
+
     return 0;
 }
 
@@ -608,6 +654,8 @@ void rtc_clear_alarm(void)
 {
     /* disable alarm interrupt */
     RTC->MODE2.INTENCLR.reg = RTC_MODE2_INTENCLR_ALARM0;
+
+    _pm_unblock(&_pm_alarm);
 }
 
 void rtc_poweron(void)
@@ -633,11 +681,18 @@ void rtt_set_overflow_cb(rtt_cb_t cb, void *arg)
 
     /* enable overflow interrupt */
     RTC->MODE0.INTENSET.reg = RTC_MODE0_INTENSET_OVF;
+
+    /* block power mode if callback function is present */
+    if (overflow_cb.cb) {
+        _pm_block(&_pm_overflow);
+    }
 }
 void rtt_clear_overflow_cb(void)
 {
     /* disable overflow interrupt */
     RTC->MODE0.INTENCLR.reg = RTC_MODE0_INTENCLR_OVF;
+
+    _pm_unblock(&_pm_overflow);
 }
 
 uint32_t rtt_get_counter(void)
@@ -674,12 +729,19 @@ void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
     /* enable compare interrupt and clear flag */
     RTC->MODE0.INTFLAG.reg = RTC_MODE0_INTFLAG_CMP0;
     RTC->MODE0.INTENSET.reg = RTC_MODE0_INTENSET_CMP0;
+
+    /* block power mode if callback function is present */
+    if (alarm_cb.cb) {
+        _pm_block(&_pm_alarm);
+    }
 }
 
 void rtt_clear_alarm(void)
 {
     /* disable compare interrupt */
     RTC->MODE0.INTENCLR.reg = RTC_MODE0_INTENCLR_CMP0;
+
+    _pm_unblock(&_pm_alarm);
 }
 
 void rtt_poweron(void)
@@ -727,6 +789,7 @@ static void _isr_rtt(void)
         /* disable interrupt */
         RTC->MODE0.INTENCLR.reg = RTC_MODE0_INTENCLR_CMP0;
         if (alarm_cb.cb) {
+            _pm_unblock(&_pm_alarm);
             alarm_cb.cb(alarm_cb.arg);
         }
     }
