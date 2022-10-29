@@ -2,6 +2,7 @@
  * Copyright (C) 2014-2016 Freie Universität Berlin
  *               2015 Kaspar Schleiser <kaspar@schleiser.de>
  *               2015 FreshTemp, LLC.
+ *               2022 SSV Software Systems GmbH
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -22,6 +23,7 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
+ * @author      Juergen Fitschen <me@jue.yt>
  *
  * @}
  */
@@ -459,15 +461,15 @@ static void _blocking_transfer(spi_t bus, const void *out, void *in, size_t len)
 
 static void _dma_execute(spi_t bus)
 {
-#if defined(CPU_COMMON_SAMD21)
-    pm_block(SAMD21_PM_IDLE_1);
+#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_SPI_PM_BLOCK)
+    pm_block(SAM0_SPI_PM_BLOCK);
 #endif
     dma_start(_dma_state[bus].rx_dma);
     dma_start(_dma_state[bus].tx_dma);
 
     dma_wait(_dma_state[bus].rx_dma);
-#if defined(CPU_COMMON_SAMD21)
-    pm_unblock(SAMD21_PM_IDLE_1);
+#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_SPI_PM_BLOCK)
+    pm_unblock(SAM0_SPI_PM_BLOCK);
 #endif
 }
 
