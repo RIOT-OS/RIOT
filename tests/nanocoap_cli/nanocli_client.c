@@ -268,6 +268,7 @@ static const char song[] =
 int nanotest_client_put_cmd(int argc, char **argv)
 {
     int res;
+    nanocoap_sock_t sock;
     coap_block_request_t ctx;
 
     if (argc < 2) {
@@ -275,8 +276,8 @@ int nanotest_client_put_cmd(int argc, char **argv)
         return 1;
     }
 
-    res = nanocoap_block_request_init_url(&ctx, argv[1],
-                                          COAP_METHOD_PUT, COAP_BLOCKSIZE_32);
+    res = nanocoap_block_request_connect_url(&ctx, &sock, argv[1],
+                                             COAP_METHOD_PUT, COAP_BLOCKSIZE_32);
     if (res < 0) {
         printf("error: %d\n", res);
         return res;
@@ -295,7 +296,7 @@ int nanotest_client_put_cmd(int argc, char **argv)
         pos += res;
     }
 
-    nanocoap_block_request_done(&ctx);
+    nanocoap_sock_close(&sock);
     return res;
 }
 

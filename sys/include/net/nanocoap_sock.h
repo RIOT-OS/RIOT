@@ -150,7 +150,7 @@ typedef sock_udp_t nanocoap_sock_t;
  * @brief Blockwise request helper struct
  */
 typedef struct {
-    nanocoap_sock_t sock;           /**< socket used for the request        */
+    nanocoap_sock_t *sock;          /**< socket used for the request        */
     const char *path;               /**< path on the server                 */
     uint32_t blknum;                /**< current block number               */
     uint8_t method;                 /**< request method (GET, POST, PUT)    */
@@ -454,34 +454,10 @@ ssize_t nanocoap_get(const sock_udp_ep_t *remote, const char *path,
                      void *buf, size_t len);
 
 /**
- * @brief   Initialize block request context
+ * @brief   Initialize block request context by URL and connect a socket
  *
  * @param[out]  ctx     The block request context to initialize
- * @param[in]   remote  Server endpoint
- * @param[in]   path    Server path for request
- * @param[in]   method  Request method (`COAP_METHOD_{GET|PUT|POST}`)
- * @param[in]   blksize Request blocksize exponent
- *
- * @retval      0       Success
- * @retval      <0      Error (see @ref nanocoap_sock_connect for details)
- */
-static inline int nanocoap_block_request_init(coap_block_request_t *ctx,
-                                              const sock_udp_ep_t *remote,
-                                              const char *path,
-                                              uint8_t method,
-                                              coap_blksize_t blksize)
-{
-    ctx->path = path;
-    ctx->blknum = 0;
-    ctx->method = method;
-    ctx->blksize = blksize;
-    return nanocoap_sock_connect(&ctx->sock, NULL, remote);
-}
-
-/**
- * @brief   Initialize block request context by URL
- *
- * @param[out]  ctx     The block request context to initialize
+ * @param[out]  sock    Socket to initialize and use for the request
  * @param[in]   url     The request URL
  * @param[in]   method  Request method (`COAP_METHOD_{GET|PUT|POST}`)
  * @param[in]   blksize Request blocksize exponent
@@ -489,26 +465,18 @@ static inline int nanocoap_block_request_init(coap_block_request_t *ctx,
  * @retval      0       Success
  * @retval      <0      Error (see @ref nanocoap_sock_url_connect for details)
  */
-static inline int nanocoap_block_request_init_url(coap_block_request_t *ctx,
-                                                  const char *url,
-                                                  uint8_t method,
-                                                  coap_blksize_t blksize)
+static inline int nanocoap_block_request_connect_url(coap_block_request_t *ctx,
+                                                     nanocoap_sock_t *sock,
+                                                     const char *url,
+                                                     uint8_t method,
+                                                     coap_blksize_t blksize)
 {
+    ctx->sock = sock;
     ctx->path = sock_urlpath(url);
     ctx->blknum = 0;
     ctx->method = method;
     ctx->blksize = blksize;
-    return nanocoap_sock_url_connect(url, &ctx->sock);
-}
-
-/**
- * @brief   Free block request context
- *
- * @param[out]  ctx     The block request context to finalize
- */
-static inline void nanocoap_block_request_done(coap_block_request_t *ctx)
-{
-    nanocoap_sock_close(&ctx->sock);
+    return nanocoap_sock_url_connect(url, ctx->sock);
 }
 
 /**
@@ -517,8 +485,8 @@ static inline void nanocoap_block_request_done(coap_block_request_t *ctx)
  *          This method is expected to be called in a loop until all
  *          payload blocks have been transferred.
  *
- * @pre     @p ctx was initialized with @ref nanocoap_block_request_init or
- *          @ref nanocoap_block_request_init_url
+ * @pre     @p ctx was initialized with @ref nanocoap_block_request_connect_url
+ *          or manually.
  *
  * @param[in]   ctx     blockwise request context
  * @param[in]   data    payload to send

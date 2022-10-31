@@ -527,7 +527,7 @@ int nanocoap_sock_block_request(coap_block_request_t *req,
     pkt.payload = pktpos;
     pkt.payload_len = 0;
 
-    res = nanocoap_sock_request_cb(&req->sock, &pkt, callback, arg);
+    res = nanocoap_sock_request_cb(req->sock, &pkt, callback, arg);
     if (res < 0) {
         return res;
     }
