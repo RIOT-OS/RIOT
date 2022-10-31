@@ -114,8 +114,6 @@ static int _vfs_put(coap_block_request_t *ctx, const char *file, void *buffer)
         vfs_lseek(fd, -1, SEEK_CUR);
     }
 
-    nanocoap_block_request_done(ctx);
-
     vfs_close(fd);
     return res;
 }
@@ -151,9 +149,10 @@ int nanocoap_vfs_put_url(const char *url, const char *src,
     coap_block_request_t ctx;
     int res = nanocoap_block_request_init_url(&ctx, url, COAP_METHOD_PUT,
                                               coap_size2szx(work_buf_len - 1));
-    if (res) {
-        return res;
+    if (res == 0) {
+        res = _vfs_put(&ctx, src, work_buf);
+        nanocoap_block_request_done(&ctx);
     }
 
-    return _vfs_put(&ctx, src, work_buf);
+    return res;
 }
