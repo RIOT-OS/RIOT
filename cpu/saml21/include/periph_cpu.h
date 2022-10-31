@@ -35,7 +35,10 @@ extern "C" {
  * @name    Power mode configuration
  * @{
  */
-#define PM_NUM_MODES        (3)
+#define PM_NUM_MODES           (3)
+#define SAML21_PM_MODE_BACKUP  (0)  /**< Wakeup by some IRQs possible, but no RAM retention */
+#define SAML21_PM_MODE_STANDBY (1)  /**< Just peripherals clocked by 32K OSC are active */
+#define SAML21_PM_MODE_IDLE    (2)  /**< CPU sleeping, peripherals are active */
 /** @} */
 
 /**

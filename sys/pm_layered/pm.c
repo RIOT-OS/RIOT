@@ -79,6 +79,8 @@ void pm_block(unsigned mode)
 {
     assert(pm_blocker.blockers[mode] != 255);
 
+    DEBUG("[pm_layered] pm_block(%d)\n", mode);
+
     unsigned state = irq_disable();
     pm_blocker.blockers[mode]++;
     irq_restore(state);
@@ -87,6 +89,8 @@ void pm_block(unsigned mode)
 void pm_unblock(unsigned mode)
 {
     assert(pm_blocker.blockers[mode] > 0);
+
+    DEBUG("[pm_layered] pm_unblock(%d)\n", mode);
 
     unsigned state = irq_disable();
     pm_blocker.blockers[mode]--;
