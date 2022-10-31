@@ -201,16 +201,19 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                 /* something went wrong, return error */
                 return -EIO;
             }
-            tmp = slipdev_unstuff_readbyte(ptr, byte, &escaped);
-            ptr += tmp;
-            res += tmp;
-            if ((unsigned)res > len) {
+
+            /* frame is larger than expected - lost end marker */
+            if ((unsigned)res >= len) {
                 while (byte != SLIPDEV_END) {
                     /* clear out unreceived packet */
                     byte = tsrb_get_one(&dev->inbuf);
                 }
                 return -ENOBUFS;
             }
+
+            tmp = slipdev_unstuff_readbyte(ptr, byte, &escaped);
+            ptr += tmp;
+            res += tmp;
         } while (byte != SLIPDEV_END);
 
         if (++dev->rx_done != dev->rx_queued) {
