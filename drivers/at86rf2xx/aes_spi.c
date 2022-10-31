@@ -18,7 +18,7 @@
 
 #include <assert.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "periph/spi.h"
 #include "at86rf2xx_aes.h"
 
@@ -55,7 +55,7 @@ uint8_t _aes_status(at86rf2xx_t *dev)
 static inline
 void _aes_wait_for_result(at86rf2xx_t *dev)
 {
-    xtimer_usleep(AT86RF2XX_AES_DELAY_US);
+    ztimer_sleep(ZTIMER_USEC, AT86RF2XX_AES_DELAY_US);
     uint8_t status = _aes_status(dev);
     /*
         If this assert fires, there probably is an implementation error.

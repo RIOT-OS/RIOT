@@ -21,7 +21,7 @@
  * @}
  */
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_registers.h"
 
@@ -127,9 +127,9 @@ void at86rf2xx_assert_awake(at86rf2xx_t *dev)
 #else
         gpio_clear(dev->params.sleep_pin);
 #endif
-        xtimer_usleep(AT86RF2XX_WAKEUP_DELAY);
+        ztimer_sleep(ZTIMER_USEC, AT86RF2XX_WAKEUP_DELAY);
 
-        /* update state: on some platforms, the timer behind xtimer
+        /* update state: on some platforms, the timer behind ztimer
          * may be inaccurate or the radio itself may take longer
          * to wake up due to extra capacitance on the oscillator.
          * Spin until we are actually awake
@@ -149,10 +149,10 @@ void at86rf2xx_hardware_reset(at86rf2xx_t *dev)
     *(AT86RF2XX_REG__TRXPR) |= AT86RF2XX_TRXPR_TRXRST;
 #else
     gpio_clear(dev->params.reset_pin);
-    xtimer_usleep(AT86RF2XX_RESET_PULSE_WIDTH);
+    ztimer_sleep(ZTIMER_USEC, AT86RF2XX_RESET_PULSE_WIDTH);
     gpio_set(dev->params.reset_pin);
 #endif
-    xtimer_usleep(AT86RF2XX_RESET_DELAY);
+    ztimer_sleep(ZTIMER_USEC, AT86RF2XX_RESET_DELAY);
 
     /* update state: if the radio state was P_ON (initialization phase),
      * it remains P_ON. Otherwise, it should go to TRX_OFF

@@ -65,7 +65,7 @@ extern "C" {
 
 /**
  * @brief   Minimum reset pulse width, refer p.190. We use 62us so
- *          that it is at least one tick on platforms with coarse xtimers
+ *          that it is at least one tick on platforms with coarse ztimers
  */
 #define AT86RF2XX_RESET_PULSE_WIDTH     (62U)
 
