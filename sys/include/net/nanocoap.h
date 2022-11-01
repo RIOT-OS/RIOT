@@ -1069,10 +1069,7 @@ bool coap_has_unprocessed_critical_options(const coap_pkt_t *pkt);
  *
  * @returns     SZX value decoded to bytes
  */
-static inline unsigned coap_szx2size(unsigned szx)
-{
-    return (1 << (szx + 4));
-}
+#define coap_szx2size(szx) (1U << ((szx) + 4))
 
 /**
  * @brief   Helper to encode byte size into next equal or smaller SZX value
