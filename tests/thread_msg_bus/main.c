@@ -26,15 +26,30 @@
 #include "msg.h"
 #include "msg_bus.h"
 
+#define MSG_TYPE_EXIT   0
+
 char t1_stack[THREAD_STACKSIZE_MAIN];
 char t2_stack[THREAD_STACKSIZE_MAIN];
 char t3_stack[THREAD_STACKSIZE_MAIN];
 
 kernel_pid_t p_main, p1, p2, p3;
 
-void *thread1(void *arg)
+static bool _recv_msg(const char *name, const msg_bus_t *bus)
 {
     msg_t msg;
+
+    msg_receive(&msg);
+    assert(msg_bus_get_sender_pid(&msg) == p_main);
+
+    printf("%s recv: %s (type=%d)%s\n", name,
+           (char*) msg.content.ptr, msg_bus_get_type(&msg),
+           msg_is_from_bus(bus, &msg) ? " from bus" : "");
+
+    return msg_bus_get_type(&msg) != MSG_TYPE_EXIT;
+}
+
+void *thread1(void *arg)
+{
     msg_bus_entry_t sub;
 
     puts("THREAD 1 start");
@@ -42,15 +57,9 @@ void *thread1(void *arg)
     msg_bus_attach(arg, &sub);
     msg_bus_subscribe(&sub, 23);
     msg_bus_subscribe(&sub, 24);
+    msg_bus_subscribe(&sub, MSG_TYPE_EXIT);
 
-    msg_receive(&msg);
-
-    /* check if the message came from the right bus */
-    assert(msg_is_from_bus(arg, &msg));
-    assert(msg_bus_get_sender_pid(&msg) == p_main);
-
-    printf("T1 recv: %s (type=%d)\n",
-          (char*) msg.content.ptr, msg_bus_get_type(&msg));
+    while (_recv_msg("T1", arg)) {}
 
     msg_bus_detach(arg, &sub);
 
@@ -59,22 +68,15 @@ void *thread1(void *arg)
 
 void *thread2(void *arg)
 {
-    msg_t msg;
     msg_bus_entry_t sub;
 
     puts("THREAD 2 start");
 
     msg_bus_attach(arg, &sub);
     msg_bus_subscribe(&sub, 24);
+    msg_bus_subscribe(&sub, MSG_TYPE_EXIT);
 
-    msg_receive(&msg);
-
-    /* check if the message came from the right bus */
-    assert(msg_is_from_bus(arg, &msg));
-    assert(msg_bus_get_sender_pid(&msg) == p_main);
-
-    printf("T2 recv: %s (type=%d)\n",
-          (char*) msg.content.ptr, msg_bus_get_type(&msg));
+    while (_recv_msg("T2", arg)) {}
 
     msg_bus_detach(arg, &sub);
 
@@ -83,22 +85,15 @@ void *thread2(void *arg)
 
 void *thread3(void *arg)
 {
-    msg_t msg;
     msg_bus_entry_t sub;
 
     puts("THREAD 3 start");
 
     msg_bus_attach(arg, &sub);
     msg_bus_subscribe(&sub, 23);
+    msg_bus_subscribe(&sub, MSG_TYPE_EXIT);
 
-    msg_receive(&msg);
-
-    /* check if the message came from the right bus */
-    assert(msg_is_from_bus(arg, &msg));
-    assert(msg_bus_get_sender_pid(&msg) == p_main);
-
-    printf("T3 recv: %s (type=%d)\n",
-          (char*) msg.content.ptr, msg_bus_get_type(&msg));
+    while (_recv_msg("T3", arg)) {}
 
     msg_bus_detach(arg, &sub);
 
@@ -121,11 +116,24 @@ int main(void)
     puts("THREADS CREATED");
 
     const char hello[] = "Hello Threads!";
+    int woken;
 
     for (int id = 22; id < 25; ++id) {
-        int woken = msg_bus_post(&my_bus, id, (void*)hello);
+        woken = msg_bus_post(&my_bus, id, (void*)hello);
         printf("Posted event %d to %d threads\n", id, woken);
     }
+
+    /* mix non-bus message with bus messages */
+    puts("Post message to thread 1");
+    msg_t msg = {
+        .type = 0x1337,
+        .content.ptr = "Hello Thread 1",
+    };
+    msg_send(&msg, p1);
+
+    puts("Post shutdown request to all threads");
+    woken = msg_bus_post(&my_bus, MSG_TYPE_EXIT, "shutdown request");
+    assert(woken == 3);
 
     /* make sure all threads have terminated */
     if (thread_getstatus(p1) != STATUS_NOT_FOUND ||
