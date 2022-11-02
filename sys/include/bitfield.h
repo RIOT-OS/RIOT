@@ -211,6 +211,14 @@ int bf_find_first_set(const uint8_t field[], size_t size);
  */
 int bf_find_first_unset(const uint8_t field[], size_t size);
 
+/**
+ * @brief  Set all bits in the bitfield to 1
+ *
+ * @param[in]     field The bitfield
+ * @param[in]     size  The size of the bitfield
+ */
+void bf_set_all(uint8_t field[], size_t size);
+
 #ifdef __cplusplus
 }
 #endif

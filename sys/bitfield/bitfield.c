@@ -19,6 +19,7 @@
  */
 
 #include <stdint.h>
+#include <string.h>
 #include "bitfield.h"
 #include "irq.h"
 
@@ -79,4 +80,15 @@ int bf_find_first_unset(const uint8_t field[], size_t size)
     }
 
     return -1;
+}
+
+void bf_set_all(uint8_t field[], size_t size)
+{
+    unsigned bytes = size >> 3;
+    unsigned bits = size & 0x7;
+
+    memset(field, 0xff, bytes);
+    if (bits) {
+        field[bytes] = ~((1U << (8 - bits)) - 1);
+    }
 }
