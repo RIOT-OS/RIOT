@@ -36,6 +36,16 @@ extern "C" {
 #define PM_BLOCKER_INITIAL { 0, 0, 0 }
 
 /**
+ * @name    ztimer configuration
+ * @{
+ */
+#define CONFIG_ZTIMER_LPTIMER_DEV            TIMER_DEV(1)
+#define CONFIG_ZTIMER_LPTIMER_FREQ           LFXO_FREQ
+#define CONFIG_ZTIMER_LPTIMER_WIDTH          24
+#define CONFIG_ZTIMER_LPTIMER_BLOCK_PM_MODE  EFM32_PM_MODE_EM3
+/** @} */
+
+/**
  * @brief   Power mode required for GPIO IRQs
  *
  * If all GPIO IRQs are expected on port A or B, EM3 is the lowest allowed

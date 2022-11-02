@@ -62,6 +62,13 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Default width of ZTIMER_LPTIMER
+ */
+#ifndef CONFIG_ZTIMER_LPTIMER_WIDTH
+#define CONFIG_ZTIMER_LPTIMER_WIDTH     (32)
+#endif
+
+/**
  * @brief   ZTIMER_USEC optimal minimum value for ztimer_set()
  *
  * When scheduling an ISR every timer will be set to:
@@ -112,6 +119,13 @@ extern "C" {
 #  else
 #    define CONFIG_ZTIMER_TIMER_BLOCK_PM_MODE ZTIMER_CLOCK_NO_REQUIRED_PM_MODE
 #  endif
+#endif
+
+/**
+ * @brief   The minimum pm mode required for ZTIMER_LPTIMER to run
+ */
+#ifndef CONFIG_ZTIMER_LPTIMER_BLOCK_PM_MODE
+#  define CONFIG_ZTIMER_LPTIMER_BLOCK_PM_MODE ZTIMER_CLOCK_NO_REQUIRED_PM_MODE
 #endif
 
 /**

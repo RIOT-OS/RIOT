@@ -20,3 +20,4 @@ config BOARD_XG23_PK6068A
 
     # Put other features for this board (in alphabetical order)
     select HAVE_SAUL_GPIO
+    select HAVE_ZTIMER_PERIPH_LPTIMER
