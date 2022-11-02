@@ -39,6 +39,174 @@
 
 #if !DOXYGEN
 
+#ifndef CONFIG_TUSBD_AUDIO_NUMOF
+#if MODULE_TINYUSB_DEVICE && MODULE_TINYUSB_CLASS_AUDIO
+#define CONFIG_TUSBD_AUDIO_NUMOF    1
+#else
+#define CONFIG_TUSBD_AUDIO_NUMOF    0
+#endif
+#endif
+
+#ifndef CONFIG_TUSBD_BTH_NUMOF
+#if MODULE_TINYUSB_DEVICE && MODULE_TINYUSB_CLASS_BTH
+#define CONFIG_TUSBD_BTH_NUMOF      1
+#else
+#define CONFIG_TUSBD_BTH_NUMOF      0
+#endif
+#endif
+
+#ifndef CONFIG_TUSBD_CDC_NUMOF
+#if MODULE_TINYUSB_DEVICE && MODULE_TINYUSB_CLASS_CDC
+#define CONFIG_TUSBD_CDC_NUMOF      1
+#else
+#define CONFIG_TUSBD_CDC_NUMOF      0
+#endif
+#endif
+
+#ifndef CONFIG_TUSBD_DFU_NUMOF
+#if MODULE_TINYUSB_DEVICE && MODULE_TINYUSB_CLASS_DFU
+#define CONFIG_TUSBD_DFU_NUMOF      1
+#else
+#define CONFIG_TUSBD_DFU_NUMOF      0
+#endif
+#endif
+
+#ifndef CONFIG_TUSBD_DFU_RT_NUMOF
+#if MODULE_TINYUSB_DEVICE && MODULE_TINYUSB_CLASS_DFU_RT
+#define CONFIG_TUSBD_DFU_RT_NUMOF   1
+#else
+#define CONFIG_TUSBD_DFU_RT_NUMOF   0
+#endif
+#endif
+
+#ifndef CONFIG_TUSBD_ECM_NUMOF
+#if MODULE_TINYUSB_DEVICE && MODULE_TINYUSB_CLASS_ECM
+#define CONFIG_TUSBD_ECM_NUMOF      1
+#else
+#define CONFIG_TUSBD_ECM_NUMOF      0
+#endif
+#endif
+
+#ifndef CONFIG_TUSBD_HID_NUMOF
+#if MODULE_TINYUSB_DEVICE && MODULE_TINYUSB_CLASS_HID
+#define CONFIG_TUSBD_HID_NUMOF      1
+#else
+#define CONFIG_TUSBD_HID_NUMOF      0
+#endif
+#endif
+
+#ifndef CONFIG_TUSBD_MIDI_NUMOF
+#if MODULE_TINYUSB_DEVICE && MODULE_TINYUSB_CLASS_MIDI
+#define CONFIG_TUSBD_MIDI_NUMOF     1
+#else
+#define CONFIG_TUSBD_MIDI_NUMOF     0
+#endif
+#endif
+
+#ifndef CONFIG_TUSBD_MSC_NUMOF
+#if MODULE_TINYUSB_DEVICE && MODULE_TINYUSB_CLASS_MSC
+#define CONFIG_TUSBD_MSC_NUMOF      1
+#else
+#define CONFIG_TUSBD_MSC_NUMOF      0
+#endif
+#endif
+
+#ifndef CONFIG_TUSBD_NCM_NUMOF
+#if MODULE_TINYUSB_DEVICE && MODULE_TINYUSB_CLASS_NCM
+#define CONFIG_TUSBD_NCM_NUMOF      1
+#else
+#define CONFIG_TUSBD_NCM_NUMOF      0
+#endif
+#endif
+
+#ifndef CONFIG_TUSBD_USBTMC_NUMOF
+#if MODULE_TINYUSB_DEVICE && MODULE_TINYUSB_CLASS_USBTMC
+#define CONFIG_TUSBD_USBTMC_NUMOF   1
+#else
+#define CONFIG_TUSBD_USBTMC_NUMOF   0
+#endif
+#endif
+
+#ifndef CONFIG_TUSBD_VENDOR_NUMOF
+#if MODULE_TINYUSB_DEVICE && MODULE_TINYUSB_CLASS_VENDOR
+#define CONFIG_TUSBD_VENDOR_NUMOF   1
+#else
+#define CONFIG_TUSBD_VENDOR_NUMOF   0
+#endif
+#endif
+
+#ifndef CONFIG_TUSBD_VIDEO_NUMOF
+#if MODULE_TINYUSB_DEVICE && MODULE_TINYUSB_CLASS_VIDEO
+#define CONFIG_TUSBD_VIDEO_NUMOF    1
+#else
+#define CONFIG_TUSBD_VIDEO_NUMOF    0
+#endif
+#endif
+
+#ifndef CONFIG_TUSBH_CDC_NUMOF
+#if MODULE_TINYUSB_HOST && MODULE_TINYUSB_CLASS_CDC
+#define CONFIG_TUSBH_CDC_NUMOF      1
+#else
+#define CONFIG_TUSBH_CDC_NUMOF      0
+#endif
+#endif
+
+#ifndef CONFIG_TUSBH_HID_NUMOF
+#if MODULE_TINYUSB_HOST && MODULE_TINYUSB_CLASS_HID
+#define CONFIG_TUSBH_HID_NUMOF      1
+#else
+#define CONFIG_TUSBH_HID_NUMOF      0
+#endif
+#endif
+
+#ifndef CONFIG_TUSBH_HUB_NUMOF
+#if MODULE_TINYUSB_HOST && MODULE_TINYUSB_CLASS_HUB
+#define CONFIG_TUSBH_HUB_NUMOF      1
+#else
+#define CONFIG_TUSBH_HUB_NUMOF      0
+#endif
+#endif
+
+#ifndef CONFIG_TUSBH_MSC_NUMOF
+#if MODULE_TINYUSB_HOST && MODULE_TINYUSB_CLASS_MSC
+#define CONFIG_TUSBH_MSC_NUMOF      1
+#else
+#define CONFIG_TUSBH_MSC_NUMOF      0
+#endif
+#endif
+
+#ifndef CONFIG_TUSBH_VENDOR_NUMOF
+#if MODULE_TINYUSB_HOST && MODULE_TINYUSB_CLASS_VENDOR
+#define CONFIG_TUSBH_VENDOR_NUMOF   1
+#else
+#define CONFIG_TUSBH_VENDOR_NUMOF   0
+#endif
+#endif
+
+#ifndef CONFIG_TUSBD_EP0_SIZE
+#define CONFIG_TUSBD_EP0_SIZE       64
+#endif
+
+#ifndef CONFIG_TUSBD_MSC_EP_SIZE
+#define CONFIG_TUSBD_MSC_EP_SIZE    512
+#endif
+
+#ifndef CONFIG_TUSBD_HID_EP_SIZE
+#define CONFIG_TUSBD_HID_EP_SIZE    64
+#endif
+
+#ifndef CONFIG_TUSBH_ENUM_SIZE
+#define CONFIG_TUSBH_ENUM_SIZE      256
+#endif
+
+#ifndef CONFIG_TUSBH_HID_EPIN_SIZE
+#define CONFIG_TUSBH_HID_EPIN_SIZE  64
+#endif
+
+#ifndef CONFIG_TUSBH_HID_EPOUT_SIZE
+#define CONFIG_TUSBH_HID_EPOUT_SIZE 64
+#endif
+
 /**
  * @name Common tinyUSB configurations
  * @{
@@ -81,112 +249,60 @@
 #define CFG_TUD_ENABLED             MODULE_TINYUSB_DEVICE
 
 #ifndef CFG_TUD_ENDPOINT0_SIZE
-#define CFG_TUD_ENDPOINT0_SIZE      64
+#define CFG_TUD_ENDPOINT0_SIZE      CONFIG_TUSBD_EP0_SIZE
 #endif
 
 #ifndef CFG_TUD_AUDIO
-#if defined(MODULE_TINYUSB_DEVICE) && defined(MODULE_TINYUSB_CLASS_AUDIO)
-#define CFG_TUD_AUDIO               1
-#else
-#define CFG_TUD_AUDIO               0
-#endif
+#define CFG_TUD_AUDIO               CONFIG_TUSBD_AUDIO_NUMOF
 #endif
 
 #ifndef CFG_TUD_BTH
-#if defined(MODULE_TINYUSB_DEVICE) && defined(MODULE_TINYUSB_CLASS_BTH)
-#define CFG_TUD_BTH                 1
-#else
-#define CFG_TUD_BTH                 0
+#define CFG_TUD_BTH                 CONFIG_TUSBD_BTH_NUMOF
 #endif
-#endif /* CFG_TUD_BTH */
 
 #ifndef CFG_TUD_CDC
-#if defined(MODULE_TINYUSB_DEVICE) && defined(MODULE_TINYUSB_CLASS_CDC)
-#define CFG_TUD_CDC                 1
-#else
-#define CFG_TUD_CDC                 0
+#define CFG_TUD_CDC                 CONFIG_TUSBD_CDC_NUMOF
 #endif
-#endif /* CFG_TUD_CDC */
 
 #ifndef CFG_TUD_DFU
-#if defined(MODULE_TINYUSB_DEVICE) && defined(MODULE_TINYUSB_CLASS_DFU)
-#define CFG_TUD_DFU                 1
-#else
-#define CFG_TUD_DFU                 0
+#define CFG_TUD_DFU                 CONFIG_TUSBD_DFU_NUMOF
 #endif
-#endif /* CFG_TUD_DFU */
 
 #ifndef CFG_TUD_DFU_RUNTIME
-#if defined(MODULE_TINYUSB_DEVICE) && defined(MODULE_TINYUSB_CLASS_DFU_RUNTIME)
-#define CFG_TUD_DFU_RUNTIME         1
-#else
-#define CFG_TUD_DFU_RUNTIME         0
+#define CFG_TUD_DFU_RUNTIME         CONFIG_TUSBD_DFU_RT_NUMOF
 #endif
-#endif /* CFG_TUD_DFU */
 
 #ifndef CFG_TUD_HID
-#if defined(MODULE_TINYUSB_DEVICE) && defined(MODULE_TINYUSB_CLASS_HID)
-#define CFG_TUD_HID                 1
-#else
-#define CFG_TUD_HID                 0
+#define CFG_TUD_HID                 CONFIG_TUSBD_HID_NUMOF
 #endif
-#endif /* CFG_TUD_HID */
 
 #ifndef CFG_TUD_MIDI
-#if defined(MODULE_TINYUSB_DEVICE) && defined(MODULE_TINYUSB_CLASS_MIDI)
-#define CFG_TUD_MIDI                1
-#else
-#define CFG_TUD_MIDI                0
+#define CFG_TUD_MIDI                CONFIG_TUSBD_MIDI_NUMOF
 #endif
-#endif /* CFG_TUD_MIDI */
 
 #ifndef CFG_TUD_MSC
-#if defined(MODULE_TINYUSB_DEVICE) && defined(MODULE_TINYUSB_CLASS_MSC)
-#define CFG_TUD_MSC                 1
-#else
-#define CFG_TUD_MSC                 0
+#define CFG_TUD_MSC                 CONFIG_TUSBD_MSC_NUMOF
 #endif
-#endif /* CFG_TUD_MSC */
 
 #ifndef CFG_TUD_ECM_RNDIS
-#if defined(MODULE_TINYUSB_DEVICE) && defined(MODULE_TINYUSB_CLASS_NET_ECM_RNDIS)
-#define CFG_TUD_ECM_RNDIS           1
-#else
-#define CFG_TUD_ECM_RNDIS           0
+#define CFG_TUD_ECM_RNDIS           CONFIG_TUSBD_ECM_NUMOF
 #endif
-#endif /* CFG_TUD_ECM_RNDIS */
 
 #ifndef CFG_TUD_NCM
-#if defined(MODULE_TINYUSB_DEVICE) && defined(MODULE_TINYUSB_CLASS_NET_NCM)
-#define CFG_TUD_NCM                 1
-#else
-#define CFG_TUD_NCM                 0
+#define CFG_TUD_NCM                 CONFIG_TUSBD_NCM_NUMOF
 #endif
-#endif /* CFG_TUD_NCM */
 
-#ifndef CFG_TUD_USBMTC
-#if defined(MODULE_TINYUSB_DEVICE) && defined(MODULE_TINYUSB_CLASS_USBMTC)
-#define CFG_TUD_USBMTC              1
-#else
-#define CFG_TUD_USBMTC              0
+#ifndef CFG_TUD_USBTMC
+#define CFG_TUD_USBTMC              CONFIG_TUSBD_USBTMC_NUMOF
 #endif
-#endif /* CFG_TUD_USBMTC */
 
 #ifndef CFG_TUD_VENDOR
-#if defined(MODULE_TINYUSB_DEVICE) && defined(MODULE_TINYUSB_CLASS_VENDOR)
-#define CFG_TUD_VENDOR              1
-#else
-#define CFG_TUD_VENDOR              0
+#define CFG_TUD_VENDOR              CONFIG_TUSBD_VENDOR_NUMOF
 #endif
-#endif /* CFG_TUD_VENDOR */
 
 #ifndef CFG_TUD_VIDEO
-#if defined(MODULE_TINYUSB_DEVICE) && defined(MODULE_TINYUSB_CLASS_VIDEO)
-#define CFG_TUD_VIDEO               1
-#else
-#define CFG_TUD_VIDEO               0
+#define CFG_TUD_VIDEO               CONFIG_TUSBD_VIDEO_NUMOF
 #endif
-#endif /* CFG_TUD_VIDEO */
 
 /** @} */
 
@@ -201,7 +317,7 @@
 #endif
 
 #ifndef CFG_TUH_ENUMERATION_BUFSIZE
-#define CFG_TUH_ENUMERATION_BUFSIZE 256
+#define CFG_TUH_ENUMERATION_BUFSIZE CONFIG_TUSBH_ENUM_SIZE
 #endif
 
 /** Hub typically has 4 ports */
@@ -210,36 +326,24 @@
 #endif
 
 #ifndef CFG_TUH_CDC
-#if defined(MODULE_TINYUSB_HOST) && defined(MODULE_TINYUSB_CLASS_CDC)
-#define CFG_TUH_CDC                 1
-#else
-#define CFG_TUH_CDC                 0
+#define CFG_TUH_CDC                 CONFIG_TUSBH_CDC_NUMOF
 #endif
-#endif /* CFG_TUH_CDC */
 
 #ifndef CFG_TUH_HID
-#if defined(MODULE_TINYUSB_HOST) && defined(MODULE_TINYUSB_CLASS_HID)
-#define CFG_TUH_HID                 1
-#else
-#define CFG_TUH_HID                 0
+#define CFG_TUH_HID                 CONFIG_TUSBH_HID_NUMOF
 #endif
-#endif /* CFG_TUH_HID */
+
+#ifndef CFG_TUH_HUB
+#define CFG_TUH_HUB                 CONFIG_TUSBH_HUB_NUMOF
+#endif
 
 #ifndef CFG_TUH_MSC
-#if defined(MODULE_TINYUSB_HOST) && defined(MODULE_TINYUSB_CLASS_MSC)
-#define CFG_TUH_MSC                 1
-#else
-#define CFG_TUH_MSC                 0
+#define CFG_TUH_MSC                 CONFIG_TUSBH_MSC_NUMOF
 #endif
-#endif /* CFG_TUH_MSC */
 
 #ifndef CFG_TUD_VENDOR
-#if defined(MODULE_TINYUSB_HOST) && defined(MODULE_TINYUSB_CLASS_VENDOR)
-#define CFG_TUH_VENDOR              1
-#else
-#define CFG_TUH_VENDOR              0
+#define CFG_TUH_VENDOR              CONFIG_TUSBH_VENDOR_NUMOF
 #endif
-#endif /* CFG_TUD_VENDOR */
 
 /** @} */
 
@@ -269,6 +373,15 @@
 /** @} */
 
 /**
+ * @name Typical required HID device class configurations
+ * @{
+ */
+#ifndef CFG_TUD_HID_EP_BUFSIZE
+#define CFG_TUD_HID_EP_BUFSIZE      CONFIG_TUSBD_HID_EP_SIZE
+#endif
+/** @} */
+
+/**
  * @name Typical required MIDI device class configurations
  * @{
  */
@@ -286,9 +399,23 @@
  * @{
  */
 #ifndef CFG_TUD_MSC_EP_BUFSIZE
-#define CFG_TUD_MSC_EP_BUFSIZE      512
+#define CFG_TUD_MSC_EP_BUFSIZE      CONFIG_TUSBD_MSC_EP_SIZE
 #endif
 /** @} */
+
+/**
+ * @name Typical required HID host class configurations
+ * @{
+ */
+#ifndef CFG_TUH_HID_EPIN_BUFSIZE
+#define CFG_TUH_HID_EPIN_BUFSIZE    CONFIG_TUSBH_HID_EPIN_SIZE
+#endif
+
+#ifndef CFG_TUH_HID_EPOUT_BUFSIZE
+#define CFG_TUH_HID_EPOUT_BUFSIZE   CONFIG_TUSBH_HID_EPOUT_SIZE
+#endif
+/** @} */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

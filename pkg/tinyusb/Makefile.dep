@@ -73,6 +73,8 @@ else ifeq (stm32,$(CPU))
 endif
 
 # other module dependencies
+USEMODULE += fmt
+USEMODULE += luid
 USEMODULE += periph_usbdev_clk
 USEMODULE += sema
 USEMODULE += ztimer_msec
