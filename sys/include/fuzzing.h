@@ -49,6 +49,16 @@ int fuzzing_init(ipv6_addr_t *addr, unsigned pfx_len);
  */
 int fuzzing_read_packet(int fd, gnrc_pktsnip_t *pkt);
 
+/**
+ * @brief Read bytes from the given file descriptor into a new buffer.
+ *
+ * @param fd File descriptor to read bytes from.
+ * @param[out] size The size of the buffer
+ *
+ * @return Pointer to the new buffer, NULL otherwise.
+ */
+uint8_t *fuzzing_read_bytes(int fd, size_t *size);
+
 #ifdef __cplusplus
 }
 #endif

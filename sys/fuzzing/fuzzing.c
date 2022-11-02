@@ -87,3 +87,43 @@ fuzzing_read_packet(int fd, gnrc_pktsnip_t *pkt)
     gnrc_pktbuf_fuzzptr = pkt;
     return 0;
 }
+
+uint8_t *
+fuzzing_read_bytes(int fd, size_t *size)
+{
+    uint8_t *buffer = NULL;
+    ssize_t r;
+    size_t csiz, rsiz;
+
+    csiz = 0;
+    rsiz = FUZZING_BSIZE;
+    if ((buffer = realloc(buffer, rsiz)) == NULL) {
+        return NULL;
+    }
+
+    while ((r = read(fd, &(buffer[csiz]), rsiz)) > 0) {
+        assert((size_t)r <= rsiz);
+
+        csiz += r;
+        rsiz -= r;
+
+        if (rsiz == 0) {
+             if ((buffer = realloc(buffer, csiz + FUZZING_BSTEP)) == NULL) {
+                 return NULL;
+             }
+             rsiz += FUZZING_BSTEP;
+        }
+    }
+    if (r == -1) {
+        return NULL;
+    }
+
+    /* shrink packet to actual size */
+    if ((buffer = realloc(buffer, csiz)) == NULL) {
+        return NULL;
+    }
+
+    *size = csiz; 
+    return buffer;
+}
+
