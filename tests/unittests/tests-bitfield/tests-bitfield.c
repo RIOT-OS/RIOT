@@ -274,8 +274,32 @@ static void test_bf_find_first_unset(void)
     TEST_ASSERT_EQUAL_INT(3, res);
 }
 
-Test *tests_bitfield_tests(void)
+static void test_bf_set_all(void)
 {
+    uint8_t field[5];
+
+    memset(field, 0, sizeof(field));
+    bf_set_all(field, 5);
+    TEST_ASSERT_EQUAL_INT(0xf8, field[0]);
+    TEST_ASSERT_EQUAL_INT(0, field[1]);
+
+    memset(field, 0, sizeof(field));
+    bf_set_all(field, 24);
+    TEST_ASSERT_EQUAL_INT(0xff, field[0]);
+    TEST_ASSERT_EQUAL_INT(0xff, field[1]);
+    TEST_ASSERT_EQUAL_INT(0xff, field[2]);
+    TEST_ASSERT_EQUAL_INT(0, field[3]);
+
+    memset(field, 0, sizeof(field));
+    bf_set_all(field, 30);
+    TEST_ASSERT_EQUAL_INT(0xff, field[0]);
+    TEST_ASSERT_EQUAL_INT(0xff, field[1]);
+    TEST_ASSERT_EQUAL_INT(0xff, field[2]);
+    TEST_ASSERT_EQUAL_INT(0xfc, field[3]);
+    TEST_ASSERT_EQUAL_INT(0, field[4]);
+}
+
+Test *tests_bitfield_tests(void) {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_bf_set),
         new_TestFixture(test_bf_unset),
@@ -288,6 +312,7 @@ Test *tests_bitfield_tests(void)
         new_TestFixture(test_bf_ops),
         new_TestFixture(test_bf_find_first_set),
         new_TestFixture(test_bf_find_first_unset),
+        new_TestFixture(test_bf_set_all),
     };
 
     EMB_UNIT_TESTCALLER(bitfield_tests, NULL, NULL, fixtures);
