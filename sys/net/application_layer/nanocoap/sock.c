@@ -124,11 +124,11 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                                            CONFIG_COAP_ACK_TIMEOUT_MS * CONFIG_COAP_RANDOM_FACTOR_1000);
     uint32_t deadline = _deadline_from_interval(timeout);
 
-    /* add 1 for initial transmit */
-    unsigned tries_left = CONFIG_COAP_MAX_RETRANSMIT + 1;
-
     /* check if we expect a reply */
     const bool confirmable = coap_get_type(pkt) == COAP_TYPE_CON;
+
+    /* add 1 for initial transmit, retry only when CONfirmable */
+    unsigned tries_left = confirmable * CONFIG_COAP_MAX_RETRANSMIT + 1;
 
     /* Create the first payload snip from the request buffer */
     iolist_t head = {
@@ -140,13 +140,14 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
     while (1) {
         switch (state) {
         case STATE_REQUEST_SEND:
-            DEBUG("nanocoap: send %u bytes (%u tries left)\n",
-                  (unsigned)iolist_size(&head), tries_left);
-
-            if (--tries_left == 0) {
+            if (tries_left == 0) {
                 DEBUG("nanocoap: maximum retries reached\n");
                 return -ETIMEDOUT;
             }
+            --tries_left;
+
+            DEBUG("nanocoap: send %u bytes (%u tries left)\n",
+                  (unsigned)iolist_size(&head), tries_left);
 
             res = sock_udp_sendv(sock, &head, NULL);
             if (res <= 0) {
@@ -191,7 +192,7 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
             }
             res = tmp;
             if (res == -ETIMEDOUT) {
-                DEBUG("nanocoap: timeout, %u retries left\n", tries_left - 1);
+                DEBUG("nanocoap: timeout waiting for response\n");
                 timeout *= 2;
                 deadline = _deadline_from_interval(timeout);
                 state = STATE_REQUEST_SEND;
