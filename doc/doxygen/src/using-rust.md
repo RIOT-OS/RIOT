@@ -106,21 +106,23 @@ Toolchain {#toolchain}
 
 To install the necessary Rust components, it is easiest use [**rustup**, installed as described on its website].
 
-Using Rust on RIOT needs the latest stable version of Rust.
-
-Make sure you have the stable **toolchain**
-and the core library for the CPU (**target**) of your choice available:
+While the compiler installed through rustup can generate code for all supported platforms,
+you will still need to download the core libraries for your **target**:
 
 ```
-$ rustup toolchain add stable
-$ rustup target add thumbv7m-none-eabi --toolchain stable
+$ rustup target add thumbv7m-none-eabi
 ```
 
 Substitute thumbv7m-none-eabi with the value of `RUST_TARGET`
 in the output of `make info-build` of an application that has your current board selected
 (or just add it later whenever the Rust compiler complains about not finding the core library for a given target).
-Using a beta or nightly will work just as well,
-but you may need to set `CARGO_CHANNEL=nightly` on your shell or in your Makefiles.
+
+If you prefer to use other **targets** than the default "stable"
+(popular choices are "beta", "nightly" or a particular nightly such as "nightly-2022-10-14"),
+you'll need to make sure that the core library is available for that target
+by running the `target add` line with a parameter of `--toolchain nightly` or similar.
+Note that some tests force the toolchain to "stable",
+so you'll need to either have that available or override the `CARGO_CHANNEL` make variable.
 
 
 While Rust comes with its own [cargo] dependency tracker for any Rust code,
