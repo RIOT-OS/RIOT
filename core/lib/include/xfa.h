@@ -64,7 +64,7 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  *     error: ISO C forbids empty initializer braces
  *     error: ISO C forbids zero-size array ‘xfatest_const_end’
  *
- * @param[in]   type    name of the cross-file array
+ * @param[in]   type    type of the cross-file array
  * @param[in]   name    name of the cross-file array
  */
 #define XFA_INIT_CONST(type, name) \
@@ -86,7 +86,7 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  *     error: ISO C forbids empty initializer braces
  *     error: ISO C forbids zero-size array ‘xfatest_end’
  *
- * @param[in]   type    name of the cross-file array
+ * @param[in]   type    type of the cross-file array
  * @param[in]   name    name of the cross-file array
  */
 #define XFA_INIT(type, name) \
@@ -105,7 +105,7 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  * It is supposed to be used in compilation units where the cross file array is
  * being accessed, but not defined using XFA_INIT.
  *
- * @param[in]   type    name of the cross-file array
+ * @param[in]   type    type of the cross-file array
  * @param[in]   name    name of the cross-file array
  */
 #define XFA_USE_CONST(type, name) \
@@ -120,7 +120,7 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  * It is supposed to be used in compilation units where the cross file array is
  * being accessed, but not defined using XFA_INIT.
  *
- * @param[in]   type    name of the cross-file array
+ * @param[in]   type    type of the cross-file array
  * @param[in]   name    name of the cross-file array
  */
 #define XFA_USE(type, name) \
