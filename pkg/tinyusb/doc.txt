@@ -10,6 +10,10 @@
  * tinyUSB is an open-source cross-platform USB Host/Device stack for
  * embedded systems.
  *
+ * @note This package is distinct from (and incompatible with) the USB stack
+ * provided around USBUS in RIOT (see @ref usb). They differ in the level of
+ * abstraction and in the set of supported devices.
+ *
  * # Usage
  *
  * Add the following entries to your application makefile:
