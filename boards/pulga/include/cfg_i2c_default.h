@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016-2018 Freie Universität Berlin
+ * Copyright (C) 2022 Universidade de São Paulo
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,9 +12,10 @@
  * @{
  *
  * @file
- * @brief       Default I2C config for nRF52 based boards
+ * @brief       I2C config for the pulga board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Geovane Fedrecheski <geonnave@gmail.com>
  *
  */
 

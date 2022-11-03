@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 Freie Universität Berlin
+ * Copyright (C) 2022 Universidade de São Paulo
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,10 +12,11 @@
  * @{
  *
  * @file
- * @brief       Board specific configuration for the nRF52840 DK
+ * @brief       Board specific configuration for the Pulga board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Sebastian Meiling <s@mlng.net>
+ * @author      Geovane Fedrecheski <geonnave@gmail.com>
  */
 
 #ifndef BOARD_H

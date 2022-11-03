@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 Inria Chile
+ * Copyright (C) 2022 Universidade de São Paulo
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -14,6 +15,7 @@
  * @brief       sx127x configuration for nz32-sc15 using modtronix inAir9
  *              LoRa module
  * @author      Francisco Molina <francisco.molina@inria.cl>
+ * @author      Geovane Fedrecheski <geonnave@gmail.com>
 */
 
 #ifndef SX127X_PARAMS_H

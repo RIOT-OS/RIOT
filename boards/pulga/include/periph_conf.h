@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 Inria
+ * Copyright (C) 2022 Universidade de São Paulo
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,9 +12,10 @@
  * @{
  *
  * @file
- * @brief       Peripheral configuration for the nRF52840 DK
+ * @brief       Peripheral configuration for the Pulga board
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Geovane Fedrecheski <geonnave@gmail.com>
  *
  */
 
