@@ -74,7 +74,7 @@ static int _send_ack(nanocoap_sock_t *sock, coap_pkt_t *pkt)
     unsigned tkl = coap_get_token_len(pkt);
 
     coap_build_hdr(&ack, COAP_TYPE_ACK, coap_get_token(pkt), tkl,
-                   COAP_CODE_VALID, ntohs(pkt->hdr->id));
+                   COAP_CODE_EMPTY, ntohs(pkt->hdr->id));
 
     return sock_udp_send(sock, &ack, sizeof(ack), NULL);
 }
