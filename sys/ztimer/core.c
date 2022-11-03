@@ -32,6 +32,7 @@
 #include "pm_layered.h"
 #endif
 #include "ztimer.h"
+#include "log.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -529,3 +530,17 @@ static void _ztimer_print(const ztimer_clock_t *clock)
     } while ((entry = entry->next));
     puts("");
 }
+
+#if MODULE_ZTIMER_ONDEMAND && DEVELHELP
+void _ztimer_assert_clock_active(ztimer_clock_t *clock)
+{
+    if (clock->users == 0) {
+        LOG_WARNING("WARNING! You are accessing ztimer_now() on a non-active clock!\n"
+                    "         Make sure to call ztimer_acquire() before accessing ztimer_now().\n"
+                    "         Once you've finished don't forget to call ztimer_release().\n");
+    }
+#if MODULE_ZTIMER_ONDEMAND_STRICT
+    assert(clock->users > 0);
+#endif
+}
+#endif

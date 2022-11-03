@@ -555,6 +555,17 @@ int ztimer_msg_receive_timeout(ztimer_clock_t *clock, msg_t *msg,
 ztimer_now_t _ztimer_now_extend(ztimer_clock_t *clock);
 
 /**
+ * @brief asserts the given clock to be active
+ *
+ * @internal
+ *
+ * @note  This function is internal
+ *
+ * @param[in]   clock          ztimer clock to operate on
+ */
+void _ztimer_assert_clock_active(ztimer_clock_t *clock);
+
+/**
  * @brief   Get the current time from a clock
  *
  * There are several caveats to consider when using values returned by
@@ -668,9 +679,10 @@ ztimer_now_t _ztimer_now_extend(ztimer_clock_t *clock);
  */
 static inline ztimer_now_t ztimer_now(ztimer_clock_t *clock)
 {
-#if MODULE_ZTIMER_ONDEMAND_STRICT
-    assert(clock->users > 0);
+#if MODULE_ZTIMER_ONDEMAND && DEVELHELP
+    _ztimer_assert_clock_active(clock);
 #endif
+
 #if MODULE_ZTIMER_NOW64
     if (1) {
 #elif MODULE_ZTIMER_EXTEND
