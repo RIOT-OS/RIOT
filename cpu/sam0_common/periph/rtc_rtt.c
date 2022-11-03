@@ -62,11 +62,13 @@ typedef struct {
 static rtc_state_t alarm_cb;
 static rtc_state_t overflow_cb;
 
+#if IS_ACTIVE(MODULE_PERIPH_RTC)
 /* At 1Hz, RTC goes till 63 years (2^5, see 17.8.22 in datasheet)
  * struct tm younts the year since 1900, use the difference to RIOT_EPOCH
  * as an offset so the user can set years in RIOT_EPOCH + 63
  */
-static uint16_t reference_year = RIOT_EPOCH - 1900;
+static const uint16_t reference_year = RIOT_EPOCH - 1900;
+#endif
 
 static void _wait_syncbusy(void)
 {
@@ -318,12 +320,8 @@ void rtc_init(void)
     /* disable all interrupt sources */
     RTC->MODE2.INTENCLR.reg = RTC_MODE2_INTENCLR_MASK;
 
-    /* enable overflow interrupt */
-    RTC->MODE2.INTENSET.reg = RTC_MODE2_INTENSET_OVF;
-
     /* Clear interrupt flags */
-    RTC->MODE2.INTFLAG.reg = RTC_MODE2_INTFLAG_OVF
-                           | RTC_MODE2_INTFLAG_ALARM0;
+    RTC->MODE2.INTFLAG.reg = RTC_MODE2_INTFLAG_ALARM0;
 
     _rtc_set_enabled(1);
 
@@ -708,13 +706,6 @@ static void _isr_rtc(void)
         if (alarm_cb.cb) {
             alarm_cb.cb(alarm_cb.arg);
         }
-    }
-    if (RTC->MODE2.INTFLAG.bit.OVF) {
-        /* clear flag */
-        RTC->MODE2.INTFLAG.reg = RTC_MODE2_INTFLAG_OVF;
-        /* At 1Hz, RTC goes till 63 years (2^5, see 17.8.22 in datasheet)
-        * Start RTC again with reference_year 64 years more (Be careful with alarm set) */
-        reference_year += 64;
     }
 }
 
