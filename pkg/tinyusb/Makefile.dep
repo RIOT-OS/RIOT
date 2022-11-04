@@ -60,14 +60,22 @@ else ifeq (nrf52,$(CPU))
 else ifneq (,$(filter saml21 samd5x samd21,$(CPU)))
   USEMODULE += tinyusb_portable_microchip
 else ifeq (stm32,$(CPU))
-  ifneq (,$(filter f2 f4 f7 h7 l4,$(CPU_FAM)))
-    # STM32 families F2, F4, F7, H7 and L4 use the Synopsys DWC2 USB OTG IP core
+  ifneq (,$(filter f2 f4 f7 h7 u5,$(CPU_FAM)))
+    # Whole STM32 families F2, F4, F7, H7 and U5 use the Synopsys DWC2 USB OTG core
     USEMODULE += tinyusb_portable_synopsys_dwc2
   else ifneq (,$(filter stm32f105% stm32f107%,$(CPU_MODEL)))
-    # STM32F105xx and STM32F107xx also use the Synopsys DWC2 USB OTG IP core
+    # STM32F105xx and STM32F107xx also use the Synopsys DWC2 USB OTG core
+    USEMODULE += tinyusb_portable_synopsys_dwc2
+  else ifneq (,$(filter stm32l47% stm32l48% stm32l49%,$(CPU_MODEL)))
+    # STM32L475xx, STM32L476xx, STM32L485xx, STM32L486xx and STM32L496xx
+    # also use the Synopsys DWC2 USB OTG core
+    USEMODULE += tinyusb_portable_synopsys_dwc2
+  else ifneq (,$(filter stm32l4a% stm32l4p% stm32l4q% stm32l4r% stm32l4s%,$(CPU_MODEL)))
+    # STM32L4Axxx, STM32L4Pxxx, STM32L4Qxxx, STM32L4Rxxx and STM32L4Sxxx
+    # also use the Synopsys DWC2 USB OTG core
     USEMODULE += tinyusb_portable_synopsys_dwc2
   else
-    # All other STM32 MCUs use the USB Device FS IP core.
+    # all other STM32 with USB interface use USB FS Device core
     USEMODULE += tinyusb_portable_stm32_fsdev
   endif
 endif
