@@ -150,6 +150,10 @@ ssize_t _sha256_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, coap_request_
     }
 
     ssize_t reply_len = coap_build_reply(pkt, result, buf, len, 0);
+    if (reply_len <= 0) {
+        return reply_len;
+    }
+
     uint8_t *pkt_pos = (uint8_t*)pkt->hdr + reply_len;
     if (blockwise) {
         pkt_pos += coap_opt_put_block1_control(pkt_pos, 0, &block1);
