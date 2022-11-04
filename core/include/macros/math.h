@@ -31,7 +31,7 @@ extern "C" {
                               unsigned int: 1,           \
                               unsigned long: 1,          \
                               unsigned long long: 1,     \
-                              default: ((a) > 0LL) ? 1 : -1)
+                              default: ((a) <= 0 ? ((a) == 0 ? 1L : -1L ): 1L))
 /**
  * @brief Calculates @p a/ @p b with arithmetic rounding
  */
