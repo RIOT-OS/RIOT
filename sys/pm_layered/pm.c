@@ -19,7 +19,6 @@
  */
 
 #include <assert.h>
-#include <string.h>
 
 #include "board.h"
 #include "irq.h"
@@ -102,7 +101,7 @@ pm_blocker_t pm_get_blocker(void)
     pm_blocker_t result;
 
     unsigned state = irq_disable();
-    memcpy(&result, &pm_blocker, sizeof(result));
+    result = pm_blocker;
     irq_restore(state);
 
     return result;
