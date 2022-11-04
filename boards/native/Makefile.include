@@ -68,6 +68,8 @@ else
   LINKFLAGS += -ldl
 endif
 
+LINKFLAGS += -z noexecstack
+
 # XFA (cross file array) support
 LINKFLAGS += -T$(RIOTBASE)/cpu/native/ldscripts/xfa.ld
 
