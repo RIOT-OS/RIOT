@@ -29,7 +29,7 @@ CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
 ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
 LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts -L$(RIOTCPU)/cortexm_common/ldscripts
 LINKER_SCRIPT ?= $(CPU_MODEL).ld
-LINKFLAGS += -T$(LINKER_SCRIPT) -Wl,--fatal-warnings
+LINKFLAGS += -T$(LINKER_SCRIPT)
 
 LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -static -lgcc -nostartfiles
 LINKFLAGS += -Wl,--gc-sections
