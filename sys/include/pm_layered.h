@@ -37,6 +37,7 @@
 
 #include <stdint.h>
 #include "periph_cpu.h"
+#include "architecture.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,7 +56,7 @@ extern "C" {
  */
 typedef struct {
     uint8_t blockers[PM_NUM_MODES];     /**< number of blockers for the mode */
-} pm_blocker_t;
+} WORD_ALIGNED pm_blocker_t;
 
 /**
  * @brief   Block a power mode
