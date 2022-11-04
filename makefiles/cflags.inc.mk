@@ -57,6 +57,25 @@ ifeq ($(LTO),1)
   LINKFLAGS += $(LTOFLAGS) -ffunction-sections -fdata-sections
 endif
 
+# Cannot test with `BUILD_IN_DOCKER=1`, as this is only the case when the
+# actual build is done in the docker container and we are still running in the
+# host's context.
+ifeq (1,$(BUILD_IN_DOCKER))
+  LINKER_SUPPORTS_NOEXECSTACK := determine-later-inside-docker
+endif
+
+# Check if linker supports `-z noexecstack`. Handle BUILD_IN_DOCKER separately,
+# as this is run in the host environment rather than inside the container. We
+# just hardcode this in the BUILD_IN_DOCKER case for now.
+LINKER_SUPPORTS_NOEXECSTACK ?= $(shell echo "int main(){} void _exit(int n) {(void)n;while(1);}" | LC_ALL=C $(LINK) -xc - -o /dev/null -lc -Wall -Wextra -pedantic -z noexecstack 2> /dev/null && echo 1 || echo 0)
+
+# As we do not use nested functions or other stuff requiring trampoline code,
+# we can safely mark the stack as not executable. This avoids warnings on newer
+# toolchains.
+ifeq (1,$(LINKER_SUPPORTS_NOEXECSTACK))
+  LINKFLAGS += -z noexecstack
+endif
+
 # Forbid common symbols to prevent accidental aliasing.
 CFLAGS += -fno-common
 
