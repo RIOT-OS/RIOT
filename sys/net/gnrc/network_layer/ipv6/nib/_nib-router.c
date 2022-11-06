@@ -137,10 +137,12 @@ static gnrc_pktsnip_t *_offl_to_pio(_nib_offl_entry_t *offl,
     return pio;
 }
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
 static inline uint16_t _nib_abr_entry_valid_offset(const _nib_abr_entry_t *abr)
 {
     return (abr->valid_until_ms - evtimer_now_msec()) / ( MS_PER_SEC * SEC_PER_MIN);
 }
+#endif
 
 static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
                                        _nib_abr_entry_t *abr)
