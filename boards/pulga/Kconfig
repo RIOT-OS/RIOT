@@ -5,9 +5,9 @@
 # directory for more details.
 
 config BOARD
-    default "nrf52840dk" if BOARD_NRF52840DK
+    default "pulga" if BOARD_PULGA
 
-config BOARD_NRF52840DK
+config BOARD_PULGA
     bool
     default y
     select BOARDS_COMMON_NRF52XXXDK

@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2017 Freie Universität Berlin
  * Copyright (C) 2022 Universidade de São Paulo
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -8,14 +7,12 @@
  */
 
 /**
- * @ingroup     boards_nrf52840dk
+ * @ingroup     boards_pulga
  * @{
  *
  * @file
  * @brief       Board specific configuration for the Pulga board
  *
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @author      Sebastian Meiling <s@mlng.net>
  * @author      Geovane Fedrecheski <geonnave@gmail.com>
  */
 
@@ -33,11 +30,11 @@ extern "C" {
  * @name    LED pin configuration
  * @{
  */
-/* FIXME: all LEDs are on by default. */
+/* Note: when using `saul`, all LEDs are on by default. */
 #define LED0_PIN            GPIO_PIN(1, 13)
 #define LED1_PIN            GPIO_PIN(1, 14)
 
-#define LED_PORT            (NRF_P1) /* XXX: maybe use NRF_P1? and change 0 to 1 below? */
+#define LED_PORT            (NRF_P1)
 #define LED0_MASK           (1 << 13)
 #define LED1_MASK           (1 << 14)
 #define LED_MASK            (LED0_MASK | LED1_MASK)

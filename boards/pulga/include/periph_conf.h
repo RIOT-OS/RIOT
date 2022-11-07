@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2018 Inria
  * Copyright (C) 2022 Universidade de São Paulo
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -8,13 +7,12 @@
  */
 
 /**
- * @ingroup     boards_nrf52840dk
+ * @ingroup     boards_pulga
  * @{
  *
  * @file
  * @brief       Peripheral configuration for the Pulga board
  *
- * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Geovane Fedrecheski <geonnave@gmail.com>
  *
  */

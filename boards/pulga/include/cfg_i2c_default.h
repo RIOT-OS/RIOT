@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2016-2018 Freie Universität Berlin
  * Copyright (C) 2022 Universidade de São Paulo
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -14,7 +13,6 @@
  * @file
  * @brief       I2C config for the pulga board
  *
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Geovane Fedrecheski <geonnave@gmail.com>
  *
  */

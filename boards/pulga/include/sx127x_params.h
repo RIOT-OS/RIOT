@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2017 Inria Chile
  * Copyright (C) 2022 Universidade de São Paulo
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
@@ -8,13 +7,11 @@
  */
 
 /**
- * @ingroup     boards_nz32-sc151
+ * @ingroup     boards_pulga
  * @{
  *
  * @file
- * @brief       sx127x configuration for nz32-sc15 using modtronix inAir9
- *              LoRa module
- * @author      Francisco Molina <francisco.molina@inria.cl>
+ * @brief       sx127x configuration for when the pulga-lora shield is mounted
  * @author      Geovane Fedrecheski <geonnave@gmail.com>
 */
 
