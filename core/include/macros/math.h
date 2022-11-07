@@ -35,13 +35,13 @@ extern "C" {
 /**
  * @brief Calculates @p a/ @p b with arithmetic rounding
  */
-#define DIV_ROUND(a, b) (((a) + SIGNOF(a) * (b) / 2) / (b))
+#define DIV_ROUND(a, b) ((((a) / (b))  + (((a) % (b) >= (b) / 2) ? 1 : 0)))
 
 /**
  * @brief Calculates @p a/ @p b, always rounding up to the
  *        next whole number
  */
-#define DIV_ROUND_UP(a, b) (((a) + SIGNOF(a) * ((b) - SIGNOF(b))) / (b))
+#define DIV_ROUND_UP(a, b) (((a) / (b)) + ((a) % (b) ? 1 : 0))
 
 /**
  * @brief Align @p num with the next multiple of @p chunk
