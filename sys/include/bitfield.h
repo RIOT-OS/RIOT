@@ -84,7 +84,7 @@ static inline void bf_toggle(uint8_t field[], size_t idx)
  * @param[in,out] field The bitfield
  * @param[in]     idx   The number of the bit to check
  */
-static inline bool bf_isset(uint8_t field[], size_t idx)
+static inline bool bf_isset(const uint8_t field[], size_t idx)
 {
     return (field[idx / 8] & (1u << (7 - (idx % 8))));
 }
@@ -188,6 +188,36 @@ static inline void bf_inv(uint8_t out[], const uint8_t a[], size_t len)
  * @return      -1 if no bit was unset
  */
 int bf_get_unset(uint8_t field[], size_t len);
+
+/**
+ * @brief  Get the index of the first set bit in the field
+ *
+ * @param[in]     field The bitfield
+ * @param[in]     size  The size of the bitfield
+ *
+ * @return      number of the first set bit
+ * @return      -1 if no bit is set
+ */
+int bf_find_first_set(const uint8_t field[], size_t size);
+
+/**
+ * @brief  Get the index of the zero bit in the field
+ *
+ * @param[in]     field The bitfield
+ * @param[in]     size  The size of the bitfield
+ *
+ * @return      number of the first unset bit
+ * @return      -1 if all bits are set
+ */
+int bf_find_first_unset(const uint8_t field[], size_t size);
+
+/**
+ * @brief  Set all bits in the bitfield to 1
+ *
+ * @param[in]     field The bitfield
+ * @param[in]     size  The size of the bitfield
+ */
+void bf_set_all(uint8_t field[], size_t size);
 
 #ifdef __cplusplus
 }
