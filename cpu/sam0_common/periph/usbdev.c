@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2019 Koen Zandberg
+ *               2022 SSV Software Systems GmbH
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,6 +14,7 @@
  * @brief   Low level USB interface functions for the sam0 class devices
  *
  * @author  Koen Zandberg <koen@bergzand.net>
+ * @author  Juergen Fitschen <me@jue.yt>
  * @}
  */
 
@@ -279,20 +281,6 @@ static usbdev_ep_t *_usbdev_new_ep(usbdev_t *dev, usb_ep_type_t type,
     return res;
 }
 
-static void _block_pm(void)
-{
-#if defined(CPU_COMMON_SAMD21)
-    pm_block(SAMD21_PM_IDLE_1);
-#endif
-}
-
-static void _unblock_pm(void)
-{
-#if defined(CPU_COMMON_SAMD21)
-    pm_unblock(SAMD21_PM_IDLE_1);
-#endif
-}
-
 static void _setup(sam0_common_usb_t *usbdev,
                    const sam0_common_usb_config_t *config)
 {
@@ -318,6 +306,18 @@ static void _usbdev_init(usbdev_t *dev)
     DEBUG("Initializing sam0 usb peripheral\n");
     /* Only one usb device on this board */
     sam0_common_usb_t *usbdev = (sam0_common_usb_t *)dev;
+
+    /* clear previously set pm blockers */
+    if (usbdev->config->device->CTRLA.bit.ENABLE) {
+#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_USB_IDLE_PM_BLOCK)
+        pm_unblock(SAM0_USB_IDLE_PM_BLOCK);
+#endif
+        if (!usbdev->suspended) {
+#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_USB_ACTIVE_PM_BLOCK)
+            pm_unblock(SAM0_USB_ACTIVE_PM_BLOCK);
+#endif
+        }
+    }
 
     /* Set GPIO */
     gpio_init(usbdev->config->dp, GPIO_IN);
@@ -347,7 +347,13 @@ static void _usbdev_init(usbdev_t *dev)
     usbdev->config->device->CTRLB.bit.SPDCONF = USB_DEVICE_CTRLB_SPDCONF_FS;
     _enable_irq(usbdev);
 
-    _block_pm();
+#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_USB_IDLE_PM_BLOCK)
+    pm_block(SAM0_USB_IDLE_PM_BLOCK);
+#endif
+#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_USB_ACTIVE_PM_BLOCK)
+    pm_block(SAM0_USB_ACTIVE_PM_BLOCK);
+#endif
+
     usbdev->usbdev.cb(&usbdev->usbdev, USBDEV_EVENT_HOST_CONNECT);
     /* Interrupt configuration */
 #ifdef CPU_COMMON_SAMD5X
@@ -542,8 +548,10 @@ static void _usbdev_esr(usbdev_t *dev)
                                                   USB_DEVICE_INTFLAG_SUSPEND;
             usbdev->suspended = true;
             usbdev->usbdev.cb(&usbdev->usbdev, USBDEV_EVENT_SUSPEND);
+#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_USB_ACTIVE_PM_BLOCK)
             /* Low power modes are available while suspended */
-            _unblock_pm();
+            pm_unblock(SAM0_USB_ACTIVE_PM_BLOCK);
+#endif
         }
         else if (usbdev->config->device->INTFLAG.bit.WAKEUP &&
                  usbdev->suspended) {
@@ -551,8 +559,10 @@ static void _usbdev_esr(usbdev_t *dev)
                                                   USB_DEVICE_INTFLAG_SUSPEND;
             usbdev->suspended = false;
             usbdev->usbdev.cb(&usbdev->usbdev, USBDEV_EVENT_RESUME);
+#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_USB_ACTIVE_PM_BLOCK)
             /* Device wakeup detected, blocking low power modes */
-            _block_pm();
+            pm_block(SAM0_USB_ACTIVE_PM_BLOCK);
+#endif
         }
         else {
             DEBUG("sam_usb: Unhandled interrupt\n");

@@ -54,6 +54,20 @@ extern "C" {
 /** @} */
 
 /**
+ * @name   SPI configuration
+ * @{
+ */
+#define SAM0_SPI_PM_BLOCK        SAMD21_PM_IDLE_1 /**< Stay in Idle 0 mode */
+/** @} */
+
+/**
+ * @name   USB configuration
+ * @{
+ */
+#define SAM0_USB_ACTIVE_PM_BLOCK SAMD21_PM_IDLE_1 /**< Stay in Idle 0 mode */
+/** @} */
+
+/**
  * @name   SAMD21 GCLK definitions
  * @{
  */

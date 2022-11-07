@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2019 ML!PA Consulting GmbH
+ *               2022 SSV Software Systems GmbH
  *
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -16,6 +17,7 @@
  * @brief       Low-level timer driver implementation
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
+ * @author      Juergen Fitschen <me@jue.yt>
  *
  * @}
  */
@@ -26,6 +28,7 @@
 
 #include "board.h"
 #include "cpu.h"
+#include "pm_layered.h"
 
 #include "periph/timer.h"
 #include "periph_conf.h"
@@ -328,6 +331,14 @@ unsigned int timer_read(tim_t tim)
 
 void timer_stop(tim_t tim)
 {
+#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_TIMER_PM_BLOCK)
+    /* unblock power mode if the timer is running */
+    if (dev(tim)->CTRLA.bit.ENABLE) {
+        DEBUG("[timer %d] pm_unblock\n", tim);
+        pm_unblock(SAM0_TIMER_PM_BLOCK);
+    }
+#endif
+
     dev(tim)->CTRLA.bit.ENABLE = 0;
     wait_synchronization(tim);
 }
@@ -335,6 +346,15 @@ void timer_stop(tim_t tim)
 void timer_start(tim_t tim)
 {
     wait_synchronization(tim);
+
+#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_TIMER_PM_BLOCK)
+    /* block power mode if the timer is not running, yet */
+    if (!dev(tim)->CTRLA.bit.ENABLE) {
+        DEBUG("[timer %d] pm_block\n", tim);
+        pm_block(SAM0_TIMER_PM_BLOCK);
+    }
+#endif
+
     dev(tim)->CTRLA.bit.ENABLE = 1;
 }
 
