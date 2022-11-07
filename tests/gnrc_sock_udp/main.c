@@ -255,6 +255,25 @@ static void test_sock_udp_recv__EPROTO(void)
     expect(_check_net());
 }
 
+static void test_sock_udp_recv__multicast(void)
+{
+    static const ipv6_addr_t src_addr = { .u8 = _TEST_ADDR_WRONG };
+    static const ipv6_addr_t dst_addr = { .u8 = _TEST_ADDR_LOCAL };
+    static const sock_udp_ep_t local = { .family = AF_INET6,
+                                         .port = _TEST_PORT_LOCAL };
+    static const sock_udp_ep_t remote = { .addr = IPV6_ADDR_ALL_NODES_LINK_LOCAL,
+                                          .family = AF_INET6,
+                                          .port = _TEST_PORT_REMOTE };
+
+    expect(0 == sock_udp_create(&_sock, &local, &remote, SOCK_FLAGS_REUSE_EP));
+    expect(_inject_packet(&src_addr, &dst_addr, _TEST_PORT_REMOTE,
+                          _TEST_PORT_LOCAL, "ABCD", sizeof("ABCD"),
+                          _TEST_NETIF));
+    expect(5 == sock_udp_recv(&_sock, _test_buffer, sizeof(_test_buffer),
+                                    SOCK_NO_TIMEOUT, NULL));
+    expect(_check_net());
+}
+
 static void test_sock_udp_recv__ETIMEDOUT(void)
 {
     static const sock_udp_ep_t local = { .family = AF_INET6, .netif = _TEST_NETIF,
@@ -819,6 +838,7 @@ int main(void)
     CALL(test_sock_udp_recv__EAGAIN());
     CALL(test_sock_udp_recv__ENOBUFS());
     CALL(test_sock_udp_recv__EPROTO());
+    CALL(test_sock_udp_recv__multicast());
     CALL(test_sock_udp_recv__ETIMEDOUT());
     CALL(test_sock_udp_recv__socketed());
     CALL(test_sock_udp_recv__socketed_with_remote());
