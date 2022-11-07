@@ -30,6 +30,9 @@
 
 #include "gnrc_sock_internal.h"
 
+#define ENABLE_DEBUG 0
+#include "debug.h"
+
 #ifdef MODULE_GNRC_SOCK_CHECK_REUSE
 static sock_udp_t *_udp_socks = NULL;
 #endif
@@ -197,6 +200,37 @@ ssize_t sock_udp_recv_aux(sock_udp_t *sock, void *data, size_t max_len,
     return (nobufs) ? -ENOBUFS : ((res < 0) ? res : ret);
 }
 
+static bool _remote_mismatch(const sock_udp_t *sock, const udp_hdr_t *hdr, const sock_ip_ep_t *remote)
+{
+    if (sock->remote.family == AF_UNSPEC) {
+        /* socket accepts any remote */
+        return false;
+    }
+
+    if (sock->remote.port != byteorder_ntohs(hdr->src_port)) {
+        DEBUG("gnrc_sock_udp: port mismatch (%u != %u)\n",
+              sock->remote.port, byteorder_ntohs(hdr->src_port));
+        return true;
+    }
+
+    /* We only have IPv6 for now, so just comparing the whole end point should suffice */
+    if (memcmp(&sock->remote.addr, &ipv6_addr_unspecified, sizeof(ipv6_addr_t)) == 0) {
+        /* socket accepts any remote address */
+        return false;
+    }
+
+    if (memcmp(&sock->remote.addr, &remote->addr, sizeof(ipv6_addr_t)) != 0) {
+        char addr_str[IPV6_ADDR_MAX_STR_LEN];
+        DEBUG("gnrc_sock_udp: socket bound to address %s",
+              ipv6_addr_to_str(addr_str, (ipv6_addr_t *)&sock->remote.addr, sizeof(addr_str)));
+        DEBUG(", source (%s) does not match\n",
+              ipv6_addr_to_str(addr_str, (ipv6_addr_t *)&remote->addr, sizeof(addr_str)));
+        return true;
+    }
+
+    return false;
+}
+
 ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
                               uint32_t timeout, sock_udp_ep_t *remote,
                               sock_udp_aux_rx_t *aux)
@@ -246,13 +280,7 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
         memcpy(remote, &tmp, sizeof(tmp));
         remote->port = byteorder_ntohs(hdr->src_port);
     }
-    if ((sock->remote.family != AF_UNSPEC) &&  /* check remote end-point if set */
-        ((sock->remote.port != byteorder_ntohs(hdr->src_port)) ||
-        /* We only have IPv6 for now, so just comparing the whole end point
-         * should suffice */
-        ((memcmp(&sock->remote.addr, &ipv6_addr_unspecified,
-                 sizeof(ipv6_addr_t)) != 0) &&
-         (memcmp(&sock->remote.addr, &tmp.addr, sizeof(ipv6_addr_t)) != 0)))) {
+    if (_remote_mismatch(sock, hdr, &tmp)) {
         gnrc_pktbuf_release(pkt);
         return -EPROTO;
     }
