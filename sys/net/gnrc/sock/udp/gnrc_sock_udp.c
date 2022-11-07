@@ -136,6 +136,12 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
         }
         gnrc_ep_set((sock_ip_ep_t *)&sock->remote,
                     (sock_ip_ep_t *)remote, sizeof(sock_udp_ep_t));
+
+        /* only accept responses from the set remote */
+        if (!ipv6_addr_is_multicast((ipv6_addr_t *)&remote->addr) &&
+            !ipv6_addr_is_unspecified((ipv6_addr_t *)&remote->addr)) {
+            flags |= SOCK_FLAGS_CONNECT_REMOTE;
+        }
     }
     if (local != NULL) {
         /* listen only with local given */
@@ -200,22 +206,22 @@ ssize_t sock_udp_recv_aux(sock_udp_t *sock, void *data, size_t max_len,
     return (nobufs) ? -ENOBUFS : ((res < 0) ? res : ret);
 }
 
-static bool _remote_mismatch(const sock_udp_t *sock, const udp_hdr_t *hdr, const sock_ip_ep_t *remote)
+static bool _remote_accept(const sock_udp_t *sock, const udp_hdr_t *hdr,
+                             const sock_ip_ep_t *remote)
 {
+    if ((sock->flags & SOCK_FLAGS_CONNECT_REMOTE) == 0) {
+        /* socket is not bound to a remote */
+        return true;
+    }
+
     if (sock->remote.family == AF_UNSPEC) {
         /* socket accepts any remote */
-        return false;
+        return true;
     }
 
     if (sock->remote.port != byteorder_ntohs(hdr->src_port)) {
         DEBUG("gnrc_sock_udp: port mismatch (%u != %u)\n",
               sock->remote.port, byteorder_ntohs(hdr->src_port));
-        return true;
-    }
-
-    /* We only have IPv6 for now, so just comparing the whole end point should suffice */
-    if (memcmp(&sock->remote.addr, &ipv6_addr_unspecified, sizeof(ipv6_addr_t)) == 0) {
-        /* socket accepts any remote address */
         return false;
     }
 
@@ -225,10 +231,10 @@ static bool _remote_mismatch(const sock_udp_t *sock, const udp_hdr_t *hdr, const
               ipv6_addr_to_str(addr_str, (ipv6_addr_t *)&sock->remote.addr, sizeof(addr_str)));
         DEBUG(", source (%s) does not match\n",
               ipv6_addr_to_str(addr_str, (ipv6_addr_t *)&remote->addr, sizeof(addr_str)));
-        return true;
+        return false;
     }
 
-    return false;
+    return true;
 }
 
 ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
@@ -280,7 +286,7 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
         memcpy(remote, &tmp, sizeof(tmp));
         remote->port = byteorder_ntohs(hdr->src_port);
     }
-    if (_remote_mismatch(sock, hdr, &tmp)) {
+    if (!_remote_accept(sock, hdr, &tmp)) {
         gnrc_pktbuf_release(pkt);
         return -EPROTO;
     }

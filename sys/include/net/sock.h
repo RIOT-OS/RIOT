@@ -143,7 +143,8 @@ extern "C" {
  * @anchor      net_sock_flags
  * @{
  */
-#define SOCK_FLAGS_REUSE_EP     (0x0001)    /**< allow to reuse end point on bind */
+#define SOCK_FLAGS_REUSE_EP         (0x0001)    /**< allow to reuse end point on bind */
+#define SOCK_FLAGS_CONNECT_REMOTE   (0x0002)    /**< restrict responses to remote address */
 /** @} */
 
 /**
