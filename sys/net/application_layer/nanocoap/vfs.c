@@ -114,8 +114,6 @@ static int _vfs_put(coap_block_request_t *ctx, const char *file, void *buffer)
         vfs_lseek(fd, -1, SEEK_CUR);
     }
 
-    nanocoap_block_request_done(ctx);
-
     vfs_close(fd);
     return res;
 }
@@ -133,7 +131,7 @@ int nanocoap_vfs_put(nanocoap_sock_t *sock, const char *path, const char *src,
         .path = path,
         .method = COAP_METHOD_PUT,
         .blksize = coap_size2szx(work_buf_len - 1),
-        .sock = *sock,
+        .sock = sock,
     };
 
     return _vfs_put(&ctx, src, work_buf);
@@ -148,12 +146,14 @@ int nanocoap_vfs_put_url(const char *url, const char *src,
         return -ENOBUFS;
     }
 
+    nanocoap_sock_t sock;
     coap_block_request_t ctx;
-    int res = nanocoap_block_request_init_url(&ctx, url, COAP_METHOD_PUT,
-                                              coap_size2szx(work_buf_len - 1));
-    if (res) {
-        return res;
+    int res = nanocoap_block_request_connect_url(&ctx, &sock, url, COAP_METHOD_PUT,
+                                                 coap_size2szx(work_buf_len - 1));
+    if (res == 0) {
+        res = _vfs_put(&ctx, src, work_buf);
+        nanocoap_sock_close(&sock);
     }
 
-    return _vfs_put(&ctx, src, work_buf);
+    return res;
 }
