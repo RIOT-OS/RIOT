@@ -29,7 +29,6 @@
 #include "net/coap.h"
 #include "net/gcoap.h"
 #include "net/gcoap/forward_proxy.h"
-#include "nanocoap_internal.h"
 #include "net/nanocoap/cache.h"
 #include "net/sock/async/event.h"
 #include "net/sock/util.h"

@@ -239,11 +239,6 @@ typedef struct {
 /**
  * @brief   Forward declaration of internal CoAP resource request handler context
  */
-struct _coap_request_ctx;
-
-/**
- * @brief   CoAP resource request handler context
- */
 typedef struct _coap_request_ctx coap_request_ctx_t;
 
 /**
@@ -323,31 +318,30 @@ typedef const struct {
 } coap_resource_subtree_t;
 
 /**
- * @brief   Size of the CoAP request context struct
- */
-#define COAP_REQUEST_CTX_SIZE   (2 * sizeof(void *) + \
-                                 IS_USED(MODULE_GCOAP) * sizeof(uint32_t))
-
-/**
- * @brief   Define and initialize CoAP request context struct
- *
- * @param[in] ctx    Name of the request context variable
- * @param[in] remote Remote endpoint that made the request
- */
-#define COAP_REQUEST_CTX_INIT(ctx, remote)                      \
-            uint8_t ctx ## _buffer[COAP_REQUEST_CTX_SIZE];      \
-            coap_request_ctx_t *ctx = (void *)ctx ## _buffer;   \
-            coap_request_ctx_init(ctx, remote)
-
-/**
  * @brief   Initialize CoAP request context
- *          Called by @ref COAP_REQUEST_CTX_INIT
- * @internal
  *
  * @param[in] ctx    Pointer to the request context to initialize
  * @param[in] remote Remote endpoint that made the request
  */
 void coap_request_ctx_init(coap_request_ctx_t *ctx, sock_udp_ep_t *remote);
+
+/**
+ * @brief   CoAP resource request handler context
+ * @internal
+ */
+struct _coap_request_ctx {
+    const coap_resource_t *resource;    /**< resource of the request */
+    sock_udp_ep_t *remote;              /**< remote endpoint of the request */
+#if defined(MODULE_GCOAP) || DOXYGEN
+    /**
+     * @brief   transport the packet was received over
+     * @see     @ref gcoap_socket_type_t for values.
+     * @note    @ref gcoap_socket_type_t can not be used, as this would
+     *          cyclically include the @ref net_gcoap header.
+     */
+    uint32_t tl_type;
+#endif
+};
 
 /**
  * @brief   Get resource path associated with a CoAP request

@@ -27,7 +27,7 @@
 #include <string.h>
 
 #include "bitarithm.h"
-#include "nanocoap_internal.h"
+#include "net/nanocoap.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -1262,9 +1262,6 @@ unsigned coap_get_len(coap_pkt_t *pkt)
 
 void coap_request_ctx_init(coap_request_ctx_t *ctx, sock_udp_ep_t *remote)
 {
-    static_assert(COAP_REQUEST_CTX_SIZE == sizeof(coap_request_ctx_t),
-                  "COAP_REQUEST_CTX_SIZE define does not match actual size");
-
     memset(ctx, 0, sizeof(*ctx));
     ctx->remote = remote;
 }

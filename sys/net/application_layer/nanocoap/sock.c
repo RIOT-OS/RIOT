@@ -26,7 +26,6 @@
 #include <stdio.h>
 
 #include "atomic_utils.h"
-#include "nanocoap_internal.h"
 #include "net/nanocoap_sock.h"
 #include "net/sock/util.h"
 #include "net/sock/udp.h"
