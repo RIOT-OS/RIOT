@@ -31,11 +31,16 @@ extern "C" {
                               unsigned int: 1,           \
                               unsigned long: 1,          \
                               unsigned long long: 1,     \
-                              default: (long long)(a) < 0 ? -1 : 1)
+                              default: ((a) <= 0 ? ((a) == 0 ? 1L : -1L ): 1L))
 /**
  * @brief Calculates @p a/ @p b with arithmetic rounding
  */
-#define DIV_ROUND(a, b) (((a) + SIGNOF(a) * (b) / 2) / (b))
+#define DIV_ROUND(a, b) (((long long)(a) + SIGNOF(a) * SIGNOF(b) * (long long)(b) / 2) / (b))
+
+/**
+ * @brief Calculates @p a/ @p b with arithmetic rounding for natural numbers (unsigned)
+ */
+#define DIV_ROUND_UINT(a, b) (((a) + (b) / 2) / (b))
 
 /**
  * @brief Calculates @p a/ @p b, always rounding up to the
