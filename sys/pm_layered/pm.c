@@ -19,7 +19,6 @@
  */
 
 #include <assert.h>
-#include <string.h>
 
 #include "board.h"
 #include "irq.h"
@@ -75,6 +74,7 @@ void pm_set_lowest(void)
     irq_restore(state);
 }
 
+__attribute__((optimize(3)))
 void pm_block(unsigned mode)
 {
     DEBUG("[pm_layered] pm_block(%d)\n", mode);
@@ -85,6 +85,7 @@ void pm_block(unsigned mode)
     irq_restore(state);
 }
 
+__attribute__((optimize(3)))
 void pm_unblock(unsigned mode)
 {
     DEBUG("[pm_layered] pm_unblock(%d)\n", mode);
@@ -100,7 +101,7 @@ pm_blocker_t pm_get_blocker(void)
     pm_blocker_t result;
 
     unsigned state = irq_disable();
-    memcpy(&result, &pm_blocker, sizeof(result));
+    result = pm_blocker;
     irq_restore(state);
 
     return result;
