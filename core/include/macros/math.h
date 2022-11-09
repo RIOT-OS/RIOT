@@ -33,20 +33,25 @@ extern "C" {
                               unsigned long long: 1,     \
                               default: ((a) <= 0 ? ((a) == 0 ? 1L : -1L ): 1L))
 /**
- * @brief Calculates @p a/ @p b with arithmetic rounding
+ * @brief Calculates @p a/ @p b with arithmetic rounding (.5 away from zero)
  */
-#define DIV_ROUND(a, b) (((a) + SIGNOF(a) * (b) / 2) / (b))
+#define DIV_ROUND(a, b)  ((SIGNOF(a) * ((SIGNOF(a) * (a)) + (SIGNOF(b) * (b)) / 2) / (b)))
 
 /**
- * @brief Calculates @p a/ @p b, always rounding up to the
- *        next whole number
+ * @brief Calculates @p a/ @p b, always rounding up (towards positive infinity)
  */
-#define DIV_ROUND_UP(a, b) (((a) + SIGNOF(a) * ((b) - SIGNOF(b))) / (b))
+#define DIV_ROUND_UP(a, b) ((SIGNOF(a)>0 && SIGNOF(b)>0) ? (((a) + (b) - 1) / (b)):\
+                            (SIGNOF(a)<0 && SIGNOF(b)<0) ? (((a) + (b) + 1) / (b)): (a) / (b))
+
+/**
+ * @brief Calculates @p a/ @p b, always rounding away from zero (towards positive and negative inf)
+ */
+#define DIV_ROUND_INF(a, b) (SIGNOF(a) * (((SIGNOF(a) * (a)) + (SIGNOF(b) * (b)) - 1) / (b)))
 
 /**
  * @brief Align @p num with the next multiple of @p chunk
  */
-#define MATH_ALIGN(num, chunk) ((chunk) * DIV_ROUND_UP(num, chunk))
+#define MATH_ALIGN(num, chunk) ((chunk) * DIV_ROUND_INF(num, chunk))
 
 #ifdef __cplusplus
 }
