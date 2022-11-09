@@ -22,7 +22,9 @@ static void test_math_signof(void)
 
 static void test_math_div_round(void)
 {
-    TEST_ASSERT_EQUAL_INT(3, DIV_ROUND(20, 7));
+    size_t a = 20;
+
+    TEST_ASSERT_EQUAL_INT(3, DIV_ROUND(a, 7));
     TEST_ASSERT_EQUAL_INT(3, DIV_ROUND(21, 7));
     TEST_ASSERT_EQUAL_INT(3, DIV_ROUND(22, 7));
     TEST_ASSERT_EQUAL_INT(0, DIV_ROUND(1, UINT32_MAX));
