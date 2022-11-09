@@ -11,8 +11,11 @@ PSRC = $(PKG_SOURCE_DIR)/src
 
 .PHONY: all
 
-all: $(filter tinyusb_%,$(USEMODULE))
+all: $(filter tinyusb_% stdio_tinyusb_cdc_acm,$(USEMODULE))
 	$(QQ)"$(MAKE)" -C $(PSRC) -f $(RIOTBASE)/Makefile.base MODULE=tinyusb
+
+stdio_tinyusb_cdc_acm:
+	$(QQ)"$(MAKE)" -C $(RIOTPKG)/$(PKG_NAME)/cdc_acm_stdio
 
 tinyusb_contrib:
 	$(QQ)"$(MAKE)" -C $(RIOTPKG)/$(PKG_NAME)/contrib

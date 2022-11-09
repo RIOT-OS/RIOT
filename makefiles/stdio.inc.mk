@@ -2,24 +2,29 @@ STDIO_MODULES = \
   slipdev_stdio \
   stdio_cdc_acm \
   stdio_ethos \
+  stdio_native \
   stdio_nimble \
   stdio_null \
   stdio_rtt \
   stdio_semihosting \
   stdio_uart \
   stdio_telnet \
+  stdio_tinyusb_cdc_acm \
   #
 
-ifneq (,$(filter newlib picolibc,$(USEMODULE)))
-  ifeq (,$(filter $(STDIO_MODULES),$(USEMODULE)))
-    USEMODULE += stdio_uart
-  endif
+# select stdio_uart if no other stdio module is slected
+ifeq (,$(filter $(STDIO_MODULES),$(USEMODULE)))
+  USEMODULE += stdio_uart
 endif
 
 ifneq (,$(filter stdio_cdc_acm,$(USEMODULE)))
   USEMODULE += usbus_cdc_acm
   USEMODULE += isrpipe
   USEMODULE += stdio_available
+endif
+
+ifneq (,$(filter stdio_tinyusb_cdc_acm,$(USEMODULE)))
+  USEPKG += tinyusb
 endif
 
 ifneq (,$(filter stdio_rtt,$(USEMODULE)))

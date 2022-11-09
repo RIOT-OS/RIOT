@@ -31,10 +31,13 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#ifndef TINYUSB_CONFIG_H
-#define TINYUSB_CONFIG_H
+#ifndef TUSB_CONFIG_H
+#define TUSB_CONFIG_H
 
-#include "tusb_config.h"        /* defined by the application */
+/* defined by the application */
+#if __has_include("tinyusb_app_config.h")
+#include "tinyusb_app_config.h"
+#endif
 #include "tinyusb.h"
 
 #if !DOXYGEN
@@ -425,5 +428,5 @@ extern "C" {
 #endif
 
 #endif /* !DOXYGEN */
-#endif /* TINYUSB_CONFIG_H */
+#endif /* TUSB_CONFIG_H */
 /** @} */

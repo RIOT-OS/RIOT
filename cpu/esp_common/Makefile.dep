@@ -16,10 +16,6 @@ ifneq (,$(filter mtd,$(USEMODULE)))
   USEMODULE += periph_flash
 endif
 
-ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
-  USEMODULE += stdio_uart
-endif
-
 ifeq (xtensa,$(CPU_ARCH))
   USEMODULE += esp_xtensa
   USEMODULE += xtensa
