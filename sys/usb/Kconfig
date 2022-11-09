@@ -6,7 +6,7 @@
 #
 menuconfig KCONFIG_USB
     bool "Configure USB"
-    depends on USEMODULE_USBUS
+    depends on MODULE_USBUS || PACKAGE_TINYUSB
     help
         Configure the USB peripheral via Kconfig.
 

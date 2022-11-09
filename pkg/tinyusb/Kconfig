@@ -19,6 +19,8 @@ menuconfig PACKAGE_TINYUSB
     bool "TinyUSB stack package"
     depends on HAS_ARCH_32BIT
     depends on HAS_TINYUSB_DEVICE || HAS_TINYUSB_HOST
+    select MODULE_FMT
+    select MODULE_LUID
     select MODULE_PERIPH_USBDEV_CLK
     select MODULE_SEMA
     select MODULE_TINYUSB_COMMON
@@ -113,6 +115,7 @@ config MODULE_TINYUSB_HW
 config MODULE_TINYUSB_DEVICE
     bool "Device Stack"
     depends on HAS_TINYUSB_DEVICE
+    default y
     help
         Select to enable tinyUSB device stack
 
@@ -156,8 +159,7 @@ menu "Device Classes"
         bool "Bluetooth Host Controller Interface (BTH HCI)"
         depends on MODULE_TINYUSB_DEVICE
 
-    config MODULE_TINYUSB_CLASS_CDC
-        bool "Communication Device Class (CDC)"
+    rsource "Kconfig.cdc"
 
     config MODULE_TINYUSB_CLASS_DFU
         bool "Device Firmware Update (DFU) Runtime"
@@ -167,11 +169,8 @@ menu "Device Classes"
         bool "Device Firmware Update (DFU)"
         depends on MODULE_TINYUSB_DEVICE
 
-    config MODULE_TINYUSB_CLASS_HID
-        bool "Human Interface Device (HID)"
-
-    config MODULE_TINYUSB_CLASS_MSC
-        bool "Mass Storage Class (MSC)"
+    rsource "Kconfig.hid"
+    rsource "Kconfig.msc"
 
     config MODULE_TINYUSB_CLASS_MIDI
         bool "Musical Instrument Digital Interface (MIDI)"
@@ -198,4 +197,32 @@ menu "Device Classes"
 
 endmenu
 
+if MODULE_TINYUSB_DEVICE
+
+config TUSBD_EP0_SIZE
+    int "Device control endpoint (EP0) size [byte]"
+    default 64
+
+config TUSBD_FS_EP_SIZE
+    int "Device endpoint size in Full-Speed mode [byte]"
+    default 64
+
+config TUSBD_HS_EP_SIZE
+    int "Device endpoint Size in High-Speed mode [byte]"
+    default 512
+
+config TUSBD_USE_CUSTOM_DESC
+    bool "Custom device descriptors"
+    depends on MODULE_TINYUSB_DEVICE
+    help
+        Enable this option to define custom descriptors for the selected
+        device classes. Otherwise, generic descriptors will be generated
+        according to the selected device classes.
+        At the moment, the generation of generic descriptors is only supported
+        for all combinations of up to two CDC interfaces, up to two generic
+        In/Out HID interfaces, up to one MSC interface and up to one vendor
+        interface. In all other cases, custom descriptors must be implemented
+        and handled.
+
+endif # MODULE_TINYUSB_DEVICE
 endif # PACKAGE_TINYUSB

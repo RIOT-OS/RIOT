@@ -1,0 +1,42 @@
+# Copyright (c) 2022 Gunar Schorcht
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_TINYUSB_CLASS_HID
+    bool "Human Interface Device (HID)"
+
+if MODULE_TINYUSB_CLASS_HID && MODULE_TINYUSB_DEVICE
+
+config TUSBD_HID_NUMOF
+    int "Number of HID interfaces"
+    default 1
+    range 1 2
+
+config TUSBD_HID_EP_SIZE
+    int "HID endpoint size [byte]"
+    default 64
+
+config TUSBD_HID_0_POLL_INTERVALL
+    int "HID0 polling interval [ms]"
+    depends on TUSBD_HID_NUMOF > 0
+    default 10
+
+config TUSBD_HID_0_STRING
+    string "HID0 descriptor string"
+    depends on TUSBD_HID_NUMOF > 0
+    default "TinyUSB HID0 (Generic In/Out)"
+
+config TUSBD_HID_1_POLL_INTERVALL
+    int "HID1 polling interval [ms]"
+    depends on TUSBD_HID_NUMOF > 1
+    default 10
+
+config TUSBD_HID_1_STRING
+    string "HID1 descriptor string"
+    depends on TUSBD_HID_NUMOF > 1
+    default "TinyUSB HID1 (Generic In/Out)"
+
+endif

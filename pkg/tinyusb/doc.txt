@@ -56,8 +56,7 @@
  * required by the tinyUSB stack and can be used to override the default
  * configuration defined in `tinyusb_config.h`.
  * ```c
- * #define CFG_TUD_CDC              2
- * #define CFG_TUD_CDC_EP_BUFSIZE   128
+ * #define CONFIG_TUSBD_CDC_NUMOF   2
  *
  * #include "tinyusb_config.h"
  * ```
