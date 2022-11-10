@@ -1,0 +1,36 @@
+From 9fd4a05c63495042849089744d83c496bbad1e5f Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Thu, 10 Nov 2022 16:16:06 +0100
+Subject: [PATCH] wolfssl/wolfcrypt: fix signature mismatch to compile with GCC
+ >= 12.x
+
+This brings the signature in the forward declaration in sync with the
+signature in the implementation, which fixes:
+
+    /home/maribu/Repos/software/RIOT/build/pkg/wolfssl/wolfcrypt/src/ge_low_mem.c:179:30: error: argument 1 of type 'unsigned char[64]' with mismatched bound [-Werror=array-parameter=]
+      179 | void sc_reduce(unsigned char x[64])
+          |                ~~~~~~~~~~~~~~^~~~~
+    In file included from /home/maribu/Repos/software/RIOT/build/pkg/wolfssl/wolfcrypt/src/ge_low_mem.c:34:
+    /home/maribu/Repos/software/RIOT/build/pkg/wolfssl/wolfssl/wolfcrypt/ge_operations.h:81:36: note: previously declared as 'byte *' {aka 'unsigned char *'}
+       81 | WOLFSSL_LOCAL void sc_reduce(byte* s);
+          |                              ~~~~~~^
+---
+ wolfssl/wolfcrypt/ge_operations.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/wolfssl/wolfcrypt/ge_operations.h b/wolfssl/wolfcrypt/ge_operations.h
+index 9d89c0a..b761136 100644
+--- a/wolfssl/wolfcrypt/ge_operations.h
++++ b/wolfssl/wolfcrypt/ge_operations.h
+@@ -78,7 +78,7 @@ WOLFSSL_LOCAL int  ge_frombytes_negate_vartime(ge_p3 *,const unsigned char *);
+ WOLFSSL_LOCAL int  ge_double_scalarmult_vartime(ge_p2 *,const unsigned char *,
+                                          const ge_p3 *,const unsigned char *);
+ WOLFSSL_LOCAL void ge_scalarmult_base(ge_p3 *,const unsigned char *);
+-WOLFSSL_LOCAL void sc_reduce(byte* s);
++WOLFSSL_LOCAL void sc_reduce(byte s[64]);
+ WOLFSSL_LOCAL void sc_muladd(byte* s, const byte* a, const byte* b,
+                              const byte* c);
+ WOLFSSL_LOCAL void ge_tobytes(unsigned char *,const ge_p2 *);
+-- 
+2.38.1
+
