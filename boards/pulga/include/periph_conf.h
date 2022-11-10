@@ -37,13 +37,7 @@ static const spi_conf_t spi_config[] = {
         .sclk = GPIO_PIN(0, 8),
         .mosi = GPIO_PIN(0, 4),
         .miso = GPIO_PIN(0, 6),
-    }/*, XXX: apparently, the second SPI is not routed in Pulga X V1.0
-    {
-        .dev  = NRF_SPIM2,
-        .sclk = GPIO_PIN(0, 22),
-        .mosi = GPIO_PIN(0, 17),
-        .miso = GPIO_PIN(0, 20),
-    }*/
+    }
 };
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
