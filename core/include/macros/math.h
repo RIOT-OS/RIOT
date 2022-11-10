@@ -27,11 +27,11 @@ extern "C" {
  * @brief Returns the sign of @p a, either -1 or 1
  */
 #define SIGNOF(a) _Generic(a, unsigned char: 1,          \
-                              unsigned short: 1,         \
-                              unsigned int: 1,           \
-                              unsigned long: 1,          \
-                              unsigned long long: 1,     \
-                              default: ((a) <= 0 ? ((a) == 0 ? 1L : -1L ): 1L))
+                           unsigned short: 1,         \
+                           unsigned int: 1,           \
+                           unsigned long: 1,          \
+                           unsigned long long: 1,     \
+                           default: ((a) <= 0 ? ((a) == 0 ? 1L : -1L): 1L))
 /**
  * @brief Calculates @p a/ @p b with arithmetic rounding (.5 away from zero)
  */
@@ -40,8 +40,8 @@ extern "C" {
 /**
  * @brief Calculates @p a/ @p b, always rounding up (towards positive infinity)
  */
-#define DIV_ROUND_UP(a, b) ((SIGNOF(a)>0 && SIGNOF(b)>0) ? (((a) + (b) - 1) / (b)):\
-                            (SIGNOF(a)<0 && SIGNOF(b)<0) ? (((a) + (b) + 1) / (b)): (a) / (b))
+#define DIV_ROUND_UP(a, b) ((SIGNOF(a) > 0 && SIGNOF(b) > 0) ? (((a) + (b) - 1) / (b)): \
+                            (SIGNOF(a) < 0 && SIGNOF(b) < 0) ? (((a) + (b) + 1) / (b)): (a) / (b))
 
 /**
  * @brief Calculates @p a/ @p b, always rounding away from zero (towards positive and negative inf)
