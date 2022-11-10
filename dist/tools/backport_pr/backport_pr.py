@@ -224,7 +224,7 @@ def main():
             sys.exit(5)
     print(f"Backport based on branch {release_fullname}")
 
-    repo = git.Repo(args.gitdir)
+    repo = git.Repo(args.gitdir, search_parent_directories=True)
     # Fetch current upstream
     upstream_remote = _get_upstream(repo)
     if not upstream_remote:
