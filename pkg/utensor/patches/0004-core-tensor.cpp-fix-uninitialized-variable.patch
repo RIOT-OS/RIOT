@@ -1,0 +1,40 @@
+From 05224d69c81baa9861724890e33f75c26519484f Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Wed, 9 Nov 2022 22:44:41 +0100
+Subject: [PATCH] core/tensor.cpp: fix uninitialized variable
+
+Fixes compilation with modern GCC:
+
+    In file included from /usr/arm-none-eabi/include/c++/12.2.0/vector:64,
+                     from /home/maribu/Repos/software/RIOT/build/pkg/utensor/src/uTensor/util/uTensor_util.hpp:6,
+                     from /home/maribu/Repos/software/RIOT/build/pkg/utensor/src/uTensor/core/tensor.hpp:4,
+                     from /home/maribu/Repos/software/RIOT/build/pkg/utensor/src/uTensor/core/tensor.cpp:1:
+    In member function 'std::vector<_Tp, _Alloc>::reference std::vector<_Tp, _Alloc>::operator[](size_type) [with _Tp = long unsigned int; _Alloc = std::allocator<long unsigned int>]',
+        inlined from 'size_t broadcastIndexTransform::operator[](size_t)' at /home/maribu/Repos/software/RIOT/build/pkg/utensor/src/uTensor/core/tensor.cpp:287:39:
+    /usr/arm-none-eabi/include/c++/12.2.0/bits/stl_vector.h:1124:41: error: 's_dim' may be used uninitialized [-Werror=maybe-uninitialized]
+     1124 |         return *(this->_M_impl._M_start + __n);
+          |                 ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+    /home/maribu/Repos/software/RIOT/build/pkg/utensor/src/uTensor/core/tensor.cpp: In member function 'size_t broadcastIndexTransform::operator[](size_t)':
+    /home/maribu/Repos/software/RIOT/build/pkg/utensor/src/uTensor/core/tensor.cpp:272:12: note: 's_dim' was declared here
+      272 |     size_t s_dim;
+          |            ^~~~~
+---
+ src/uTensor/core/tensor.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/uTensor/core/tensor.cpp b/src/uTensor/core/tensor.cpp
+index 0e3c275..55c0583 100644
+--- a/src/uTensor/core/tensor.cpp
++++ b/src/uTensor/core/tensor.cpp
+@@ -269,7 +269,7 @@ size_t broadcastIndexTransform::operator[](const size_t linear_index) {
+     size_t out_index = 0;
+     size_t rem = linear_index;
+     const size_t d_dim = l_shape.size() - s_shape.size();
+-    size_t s_dim;
++    size_t s_dim = 0;
+ 
+     for (size_t curr_dim = 0; curr_dim < l_shape.size(); curr_dim++) {
+         size_t curr_stride = l_stride[curr_dim];
+-- 
+2.38.1
+
