@@ -161,6 +161,7 @@ static void _poweroff(void)
 #endif
 }
 
+MAYBE_UNUSED
 static inline void _rtc_set_enabled(bool on)
 {
 #ifdef REG_RTC_MODE2_CTRLA
