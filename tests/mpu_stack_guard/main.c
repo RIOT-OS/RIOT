@@ -38,6 +38,16 @@ static struct {
     char stack[THREAD_STACKSIZE_MAIN];
 } buf;
 
+/* Tell modern GCC (12.x) to not complain that this infinite recursion is
+ * bound to overflow the stack - this is exactly what this test wants to do :)
+ *
+ * Also, tell older versions of GCC that do not know about -Winfinit-recursion
+ * that it is safe to ignore `GCC diagnostics ignored "-Winfinit-recursion"`.
+ * They behave as intended in this case :)
+ */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Winfinite-recursion"
 static int recurse(int counter)
 {
     printf("counter =%4d, SP = 0x%08x, canary = 0x%08x\n", counter, (unsigned int)__get_PSP(), buf.canary);
@@ -55,6 +65,7 @@ static int recurse(int counter)
     /* Recursing twice here prevents the compiler from optimizing-out the recursion. */
     return recurse(counter) + recurse(counter);
 }
+#pragma GCC diagnostic pop
 
 static void *thread(void *arg)
 {
