@@ -45,7 +45,9 @@ usage() {
     echo "                                 (ignored on OSX and FreeBSD)" >&2
     echo "   -u, --uplink:                 Optional uplink interface" >&2
     echo "                                 (ignored on OSX and FreeBSD)" >&2
-    echo "   --loss:                       Optional loss %" >&2
+    echo "   --loss <loss>%:               Optional loss %" >&2
+    echo "                                 (ignored on OSX and FreeBSD)" >&2
+    echo "   --delay <delay>ms:            Optional delay ms" >&2
     echo "                                 (ignored on OSX and FreeBSD)" >&2
     echo "   -h, --help:                   Prints this text" >&2
 }
@@ -322,9 +324,7 @@ create_iface() {
             if [ -z "${TUNNAME}" ]; then
                 ip link set dev ${NAME}${N} master ${BRNAME} || exit 1
             fi
-            if [ -n "${LOSS}" ]; then
-                tc qdisc add dev ${NAME}${N} root netem loss ${LOSS}
-            fi
+            tc qdisc add dev ${NAME}${N} root netem ${DELAY} ${LOSS}
             ip link set ${NAME}${N} up || exit 1 ;;
         OSX)
             chown ${SUDO_USER} /dev/${NAME}${N} || exit 1
@@ -487,7 +487,16 @@ while true ; do
                     usage
                     exit 2 ;;
                 *)
-                    LOSS="$2"
+                    LOSS="loss random $2"
+                    shift 2 ;;
+            esac ;;
+        --delay)
+            case "$2" in
+                "")
+                    usage
+                    exit 2 ;;
+                *)
+                    DELAY="delay $2"
                     shift 2 ;;
             esac ;;
         -t|--tap)
