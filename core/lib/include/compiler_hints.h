@@ -54,6 +54,19 @@ extern "C" {
 #endif
 
 /**
+ * @def MAYBE_UNUSED
+ * @brief tell the compiler something may be unused
+ *        static functions, function arguments, local variables
+ */
+#ifndef MAYBE_UNUSED
+#ifdef __GNUC__
+#define MAYBE_UNUSED  __attribute__((unused))
+#else
+#define MAYBE_UNUSED
+#endif
+#endif
+
+/**
  * @def       UNREACHABLE()
  * @brief     Tell the compiler that this line of code cannot be reached.
  * @details   Most useful in junction with #NORETURN.
