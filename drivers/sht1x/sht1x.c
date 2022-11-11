@@ -26,6 +26,7 @@
 #include "sht1x.h"
 #include "sht1x_defines.h"
 #include "bitarithm.h"
+#include "container.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
