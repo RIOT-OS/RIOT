@@ -664,6 +664,12 @@ ssize_t sock_dtls_sendv_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
     return res;
 }
 
+static inline void _copy_session(sock_dtls_t *sock, sock_dtls_session_t *remote)
+{
+    memcpy(&remote->dtls_session, sock->buffer.session,
+           sizeof(remote->dtls_session));
+}
+
 #if SOCK_HAS_ASYNC
 /**
  * @brief   Checks for and iterates for more data chunks within the network
@@ -688,13 +694,6 @@ static void _check_more_chunks(sock_udp_t *udp_sock, void **data,
         }
     }
 }
-#endif
-
-static inline void _copy_session(sock_dtls_t *sock, sock_dtls_session_t *remote)
-{
-    memcpy(&remote->dtls_session, sock->buffer.session,
-           sizeof(remote->dtls_session));
-}
 
 static ssize_t _copy_buffer(sock_dtls_t *sock, sock_dtls_session_t *remote,
                             void *data, size_t max_len)
@@ -706,7 +705,6 @@ static ssize_t _copy_buffer(sock_dtls_t *sock, sock_dtls_session_t *remote,
     if (buflen > max_len) {
         return -ENOBUFS;
     }
-#if SOCK_HAS_ASYNC
     sock_udp_ep_t ep;
     _session_to_ep(&remote->dtls_session, &ep);
 
@@ -729,15 +727,13 @@ static ssize_t _copy_buffer(sock_dtls_t *sock, sock_dtls_session_t *remote,
         }
         return buflen;
     }
-#else
-    (void)remote;
-#endif
     /* use `memmove()` as tinydtls reuses `data` to store decrypted data with an
      * offset in `buf`. This prevents problems with overlapping buffers. */
     memmove(data, buf, buflen);
     _copy_session(sock, remote);
     return buflen;
 }
+#endif
 
 static ssize_t _complete_handshake(sock_dtls_t *sock,
                                    sock_dtls_session_t *remote,
@@ -765,6 +761,7 @@ static ssize_t _complete_handshake(sock_dtls_t *sock,
     return -SOCK_DTLS_HANDSHAKE;
 }
 
+#if SOCK_HAS_ASYNC
 ssize_t sock_dtls_recv_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
                            void *data, size_t max_len, uint32_t timeout,
                            sock_dtls_aux_rx_t *aux)
@@ -813,6 +810,31 @@ ssize_t sock_dtls_recv_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
         }
     }
 }
+#else
+ssize_t sock_dtls_recv_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
+                           void *data, size_t max_len, uint32_t timeout,
+                           sock_dtls_aux_rx_t *aux)
+{
+    void *pkt = NULL, *ctx = NULL;
+    uint8_t *ptr = data;
+    ssize_t res, ret = 0;
+    bool nobufs = false;
+
+    assert((sock != NULL) && (data != NULL) && (max_len > 0));
+    while ((res = sock_dtls_recv_buf_aux(sock, remote, &pkt, &ctx, timeout,
+                                         aux)) > 0) {
+        if (res > (ssize_t)max_len) {
+            nobufs = true;
+            continue;
+        }
+        memcpy(ptr, pkt, res);
+        ptr += res;
+        ret += res;
+    }
+    return (nobufs) ? -ENOBUFS : ((res < 0) ? res : ret);
+
+}
+#endif
 
 ssize_t sock_dtls_recv_buf_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
                                void **data, void **buf_ctx, uint32_t timeout,
