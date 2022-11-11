@@ -27,6 +27,7 @@
 #include "net/ipv6/addr.h"
 #include "net/l2util.h"
 #include "net/netif.h"
+#include "container.h"
 
 #include "openwsn.h"
 #include "opendefs.h"
