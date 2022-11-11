@@ -21,7 +21,7 @@
  * @author      Shuguo Zhuo  <shuguo.zhuo@inria.fr>
  */
 
-#include "kernel_defines.h"
+#include "modules.h"
 
 #ifndef NET_GNRC_MAC_MAC_H
 #define NET_GNRC_MAC_MAC_H

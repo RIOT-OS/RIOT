@@ -24,7 +24,7 @@
 #include "clist.h"
 #include "congure.h"
 #include "evtimer_msg.h"
-#include "kernel_defines.h"
+#include "modules.h"
 #include "msg.h"
 #include "xtimer.h"
 

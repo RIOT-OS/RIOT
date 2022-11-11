@@ -21,7 +21,7 @@
 #ifndef NET_GNRC_SIXLOWPAN_CONFIG_H
 #define NET_GNRC_SIXLOWPAN_CONFIG_H
 
-#include "kernel_defines.h"
+#include "modules.h"
 #include "timex.h"
 
 #ifdef __cplusplus

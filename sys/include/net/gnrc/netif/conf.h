@@ -20,7 +20,7 @@
 #ifndef NET_GNRC_NETIF_CONF_H
 #define NET_GNRC_NETIF_CONF_H
 
-#include <kernel_defines.h>
+#include "modules.h"
 
 #include "net/dhcpv6/client.h"
 #include "net/ieee802154.h"

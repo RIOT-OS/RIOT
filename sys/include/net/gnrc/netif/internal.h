@@ -21,7 +21,7 @@
 #ifndef NET_GNRC_NETIF_INTERNAL_H
 #define NET_GNRC_NETIF_INTERNAL_H
 
-#include <kernel_defines.h>
+#include "modules.h"
 
 #include "net/gnrc/netif.h"
 #include "net/l2util.h"

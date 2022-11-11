@@ -21,7 +21,7 @@
 #ifndef NET_GNRC_IPV6_NIB_CONF_H
 #define NET_GNRC_IPV6_NIB_CONF_H
 
-#include <kernel_defines.h>
+#include "modules.h"
 
 #ifdef __cplusplus
 extern "C" {

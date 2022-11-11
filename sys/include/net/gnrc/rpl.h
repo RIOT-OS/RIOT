@@ -143,7 +143,7 @@
 
 #include <string.h>
 #include <stdint.h>
-#include "kernel_defines.h"
+#include "modules.h"
 #include "net/gnrc.h"
 #include "net/gnrc/ipv6.h"
 #include "net/ipv6/addr.h"
