@@ -39,6 +39,13 @@
 static vcdiff_t vcdiff;
 static fake_mtd_t storage_a = FAKE_MTD_INIT;
 static fake_mtd_t storage_b = FAKE_MTD_INIT;
+static littlefs2_desc_t fs = { .dev = &storage_a.mtd };
+static vfs_mount_t mnt = {
+    .mount_point = "/mnt",
+    .fs = &littlefs2_file_system,
+    .private_data = &fs,
+};
+static uint8_t target_buf[sizeof(target_bin)];
 
 static void test_tinyvcdiff_mtd(void)
 {
@@ -65,7 +72,6 @@ static void test_tinyvcdiff_mtd(void)
     TEST_ASSERT_EQUAL_INT(0, rc);
 
     /* check reconsturcted target */
-    uint8_t target_buf[target_bin_len];
     mtd_read(target_mtd, target_buf, 0, sizeof(target_buf));
     TEST_ASSERT_EQUAL_INT(0, memcmp(target_bin, target_buf, sizeof(target_buf)));
 }
@@ -75,12 +81,6 @@ static void test_tinyvcdiff_vfs(void)
     int rc;
     int source_fd, target_fd;
 
-    littlefs2_desc_t fs = { .dev = &storage_a.mtd };
-    vfs_mount_t mnt = {
-        .mount_point = "/mnt",
-        .fs = &littlefs2_file_system,
-        .private_data = &fs,
-    };
     vfs_format(&mnt);
     vfs_mount(&mnt);
 
@@ -110,8 +110,8 @@ static void test_tinyvcdiff_vfs(void)
     vfs_close(target_fd);
 
     /* check reconsturcted target */
+    memset(target_buf, 0, sizeof(target_buf));
     target_fd = vfs_open("/mnt/target", O_RDONLY, 0);
-    uint8_t target_buf[target_bin_len];
     vfs_read(target_fd, target_buf, sizeof(target_buf));
     TEST_ASSERT_EQUAL_INT(0, memcmp(target_bin, target_buf, sizeof(target_buf)));
     vfs_close(target_fd);
