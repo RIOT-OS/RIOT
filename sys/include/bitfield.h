@@ -219,6 +219,16 @@ int bf_find_first_unset(const uint8_t field[], size_t size);
  */
 void bf_set_all(uint8_t field[], size_t size);
 
+/**
+ * @brief  Count set bits in the bitfield
+ *
+ * @param[in]     field The bitfield
+ * @param[in]     size  The size of the bitfield
+ *
+ * @return number of '1' bits in the bitfield
+ */
+unsigned bf_popcnt(const uint8_t field[], size_t size);
+
 #ifdef __cplusplus
 }
 #endif
