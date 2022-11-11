@@ -1,3 +1,4 @@
+BOARD ?= samr21-xpro
 include ../Makefile.tests_common
 
 USB_VID ?= $(USB_VID_TESTING)
