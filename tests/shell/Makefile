@@ -16,5 +16,7 @@ TEST_ON_CI_BLACKLIST += microbit
 
 include $(RIOTBASE)/Makefile.include
 
+CFLAGS += '-DTHREAD_STACKSIZE_MAIN=(THREAD_STACKSIZE_SMALL+THREAD_EXTRA_STACKSIZE_PRINTF)'
+
 # the test script skips tests if socat is not used
 $(call target-export-variables,$(RIOT_TERMINAL),RIOT_TERMINAL)

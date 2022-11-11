@@ -27,6 +27,12 @@
 #include "xtimer.h"
 #endif
 
+/* define buffer to be used by the shell. Note: This is intentionally
+ * smaller than 64 bytes, as the EDBG integrated UART bridge of the samr21-xpro
+ * (and likely all other EDBG boards) drops chars when sending more than 64
+ * bytes at a time. This results in the buffer overflow test failing. */
+static char line_buf[60];
+
 #if MODULE_SHELL_HOOKS
 void shell_post_readline_hook(void)
 {
@@ -81,7 +87,7 @@ static int print_shell_bufsize(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
-    printf("%d\n", SHELL_DEFAULT_BUFSIZE);
+    printf("%d\n", sizeof(line_buf));
 
     return 0;
 }
@@ -130,20 +136,17 @@ int main(void)
 {
     printf("test_shell.\n");
 
-    /* define buffer to be used by the shell */
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-
     /* define own shell commands */
-    shell_run_once(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run_once(shell_commands, line_buf, sizeof(line_buf));
 
     puts("shell exited");
 
     /* Restart the shell after the previous one exits, so that we can test
      * Ctrl-D exit */
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(shell_commands, line_buf, sizeof(line_buf));
 
     /* or use only system shell commands */
-    /* shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE); */
+    /* shell_run(NULL, line_buf, sizeof(line_buf)); */
 
     return 0;
 }

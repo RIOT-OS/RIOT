@@ -211,7 +211,7 @@ def testfunc(child):
         child.crlf = '\n'
 
     bufsize = check_and_get_bufsize(child)
-    longline = "_"*bufsize + "verylong"
+    longline = "_" * (bufsize - len("verylong")) + "verylong"
 
     check_line_exceeded(child, longline)
 
