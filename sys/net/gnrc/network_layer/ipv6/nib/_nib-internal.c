@@ -660,6 +660,7 @@ int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *pkt,
 
 void _nib_pl_remove(_nib_offl_entry_t *nib_offl)
 {
+    _evtimer_del(&nib_offl->pfx_timeout);
     _nib_offl_remove(nib_offl, _PL);
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
     unsigned idx = _idx_dsts(nib_offl);
