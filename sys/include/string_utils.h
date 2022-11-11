@@ -30,7 +30,7 @@
 #include <strings.h>
 #include <sys/types.h>
 
-#include "kernel_defines.h"
+#include "modules.h"
 
 #ifndef STRING_UTILS_H
 #define STRING_UTILS_H

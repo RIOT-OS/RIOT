@@ -23,7 +23,7 @@
 #include <stdint.h>
 #include "periph/pm.h"
 
-#include "kernel_defines.h"
+#include "modules.h"
 #include "xfa.h"
 
 #ifdef __cplusplus

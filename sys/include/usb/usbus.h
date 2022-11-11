@@ -29,7 +29,7 @@
 #include "clist.h"
 #include "event.h"
 #include "sched.h"
-#include "kernel_defines.h"
+#include "modules.h"
 #include "msg.h"
 #include "thread.h"
 

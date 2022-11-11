@@ -40,7 +40,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "kernel_defines.h"
+#include "modules.h"
 
 #ifdef __cplusplus
 extern "C" {

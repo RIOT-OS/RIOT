@@ -30,7 +30,7 @@
 #include <stdint.h>
 #include "xfa.h"
 #include "macros/xtstr.h"
-#include "kernel_defines.h"
+#include "modules.h"
 #if IS_USED(MODULE_PREPROCESSOR_SUCCESSOR)
 #include "preprocessor_successor.h"
 #endif

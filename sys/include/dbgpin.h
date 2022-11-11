@@ -23,7 +23,7 @@
 #ifndef DBGPIN_H
 #define DBGPIN_H
 
-#include "kernel_defines.h"
+#include "container.h"
 #include "periph/gpio.h"
 
 #ifdef __cplusplus
