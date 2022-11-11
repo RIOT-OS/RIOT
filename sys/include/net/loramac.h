@@ -26,7 +26,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "kernel_defines.h"
+#include "modules.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -20,7 +20,7 @@
 #ifndef NET_DNS_H
 #define NET_DNS_H
 
-#include "kernel_defines.h"
+#include "modules.h"
 #include "net/sock/dns.h"
 #include "net/sock/dodtls.h"
 #include "net/gcoap/dns.h"
