@@ -451,6 +451,14 @@ void print_s32_dec(int32_t val);
 void print_byte_hex(uint8_t byte);
 
 /**
+ * @brief Print bytes as hex to stdout
+ *
+ * @param[in]  bytes Byte array to print
+ * @param[in]  n     Number of bytes to print
+ */
+void print_bytes_hex(const void *bytes, size_t n);
+
+/**
  * @brief Print uint32 value as hex to stdout
  *
  * @param[in]   val  Value to print
