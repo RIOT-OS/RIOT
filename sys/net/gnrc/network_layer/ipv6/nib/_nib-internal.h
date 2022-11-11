@@ -733,6 +733,7 @@ static inline _nib_offl_entry_t *_nib_ft_add(const ipv6_addr_t *next_hop,
  */
 static inline void _nib_ft_remove(_nib_offl_entry_t *nib_offl)
 {
+    _evtimer_del(&nib_offl->route_timeout);
     _nib_offl_remove(nib_offl, _FT);
 }
 #endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
