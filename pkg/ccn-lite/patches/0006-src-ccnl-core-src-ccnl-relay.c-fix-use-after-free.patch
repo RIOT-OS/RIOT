@@ -1,0 +1,49 @@
+From f18b92a5c826d13e8138b4c5e5c9393f26382a69 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Fri, 11 Nov 2022 22:14:49 +0100
+Subject: [PATCH] src/ccnl-core/src/ccnl-relay.c: fix use after free
+
+This fixes compilation with GCC >= 12.x, which previously failed with
+
+    /home/maribu/Repos/software/RIOT/build/pkg/ccn-lite/src/ccnl-core/src/ccnl-relay.c: In function 'ccnl_fib_rem_entry':
+    /home/maribu/Repos/software/RIOT/build/pkg/ccn-lite/src/ccnl-core/src/ccnl-relay.c:916:16: error: pointer 'fwd' used after 'free' [-Werror=use-after-free]
+      916 |         if (fwd->face) {
+          |             ~~~^~~~~~
+    In file included from /home/maribu/Repos/software/RIOT/build/pkg/ccn-lite/src/ccnl-core/src/ccnl-relay.c:33:
+    /home/maribu/Repos/software/RIOT/build/pkg/ccn-lite/src/ccnl-core/../ccnl-riot/include/ccn-lite-riot.h:52:41: note: call to 'free' here
+       52 | #define ccnl_free(p)                    free(p)
+          |                                         ^~~~~~~
+    /home/maribu/Repos/software/RIOT/build/pkg/ccn-lite/src/ccnl-core/src/ccnl-relay.c:910:13: note: in expansion of macro 'ccnl_free'
+      910 |             ccnl_free(fwd);
+          |             ^~~~~~~~~
+    /home/maribu/Repos/software/RIOT/build/pkg/ccn-lite/src/ccnl-core/src/ccnl-relay.c: In function 'ccnl_fib_rem_entry':
+    /home/maribu/Repos/software/RIOT/build/pkg/ccn-lite/src/ccnl-core/src/ccnl-relay.c:916:16: error: pointer 'fwd' used after 'free' [-Werror=use-after-free]
+      916 |         if (fwd->face) {
+          |             ~~~^~~~~~
+    In file included from /home/maribu/Repos/software/RIOT/build/pkg/ccn-lite/src/ccnl-core/src/ccnl-relay.c:33:
+    /home/maribu/Repos/software/RIOT/build/pkg/ccn-lite/src/ccnl-riot/include/ccn-lite-riot.h:52:41: note: call to free' here
+       52 | #define ccnl_free(p)                    free(p)
+          |                                         ^~~~~~~
+    /home/maribu/Repos/software/RIOT/build/pkg/ccn-lite/src/ccnl-core/src/ccnl-relay.c:910:13: note: in expansion of macro 'ccnl_free'
+      910 |             ccnl_free(fwd);
+          |             ^~~~~~~~~
+---
+ src/ccnl-core/src/ccnl-relay.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/ccnl-core/src/ccnl-relay.c b/src/ccnl-core/src/ccnl-relay.c
+index 05e1990..88c05dc 100644
+--- a/src/ccnl-core/src/ccnl-relay.c
++++ b/src/ccnl-core/src/ccnl-relay.c
+@@ -908,7 +908,7 @@ ccnl_fib_rem_entry(struct ccnl_relay_s *relay, struct ccnl_prefix_s *pfx,
+             }
+             ccnl_prefix_free(fwd->prefix);
+             ccnl_free(fwd);
+-            break;
++            return res;
+         }
+     }
+ 
+-- 
+2.38.1
+
