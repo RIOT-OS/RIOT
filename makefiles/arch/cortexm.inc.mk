@@ -26,7 +26,7 @@ CFLAGS_OPT  ?= -Os
 
 CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
 
-ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
+ASFLAGS += $(CFLAGS_CPU)
 LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts -L$(RIOTCPU)/cortexm_common/ldscripts
 LINKER_SCRIPT ?= $(CPU_MODEL).ld
 LINKFLAGS += -T$(LINKER_SCRIPT) -Wl,--fatal-warnings
