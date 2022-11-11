@@ -23,7 +23,6 @@
 #define EMBUNIT_H
 
 #include "embUnit/embUnit.h"
-#include "kernel_defines.h"
 
 #ifdef OUTPUT
 #   define OUTPUT_XML       (1)

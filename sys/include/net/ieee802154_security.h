@@ -31,7 +31,6 @@
 #define NET_IEEE802154_SECURITY_H
 
 #include <stdint.h>
-#include "kernel_defines.h"
 #include "ieee802154.h"
 #include "crypto/ciphers.h"
 
