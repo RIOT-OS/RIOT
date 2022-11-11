@@ -240,7 +240,7 @@ def main():
     if new_branch in repo.branches:
         print(f"ERROR: Branch {new_branch} already exists")
         sys.exit(1)
-    worktree_dir = os.path.join(args.gitdir, WORKTREE_SUBDIR)
+    worktree_dir = os.path.join(repo.working_dir, WORKTREE_SUBDIR)
     repo.git.worktree(
         "add",
         "-b",
