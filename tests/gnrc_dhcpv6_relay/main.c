@@ -13,6 +13,7 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
+#include <stddef.h>
 #include "shell.h"
 
 int main(void)

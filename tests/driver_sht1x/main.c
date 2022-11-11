@@ -20,9 +20,11 @@
  */
 
 #include <stdio.h>
+#include <stddef.h>
 
 #include "shell.h"
 #include "sht1x_params.h"
+#include "container.h"
 
 #define SHT1X_NUM     ARRAY_SIZE(sht1x_params)
 extern sht1x_dev_t sht1x_devs[SHT1X_NUM];

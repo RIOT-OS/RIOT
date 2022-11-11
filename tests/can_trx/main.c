@@ -21,8 +21,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "kernel_defines.h"
 #include "can/can_trx.h"
-
 #include "shell.h"
 
 #ifdef MODULE_TJA1042

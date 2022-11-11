@@ -24,6 +24,7 @@
 #include "mtd.h"
 #include "fatfs_diskio_mtd.h"
 #include "shell.h"
+#include "container.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>

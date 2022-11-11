@@ -6,6 +6,7 @@
  * directory for more details.
  */
 
+#include <stddef.h>
 #include <stdint.h>
 #include <limits.h>
 #include "embUnit.h"
