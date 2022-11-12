@@ -37,8 +37,8 @@
 #include "test_utils/expect.h"
 #include "xtimer.h"
 
-#define TIMEOUT_S (5ul)
-#define TIMEOUT (TIMEOUT_S * US_PER_SEC)
+#define TIMEOUT_MS (200ul)
+#define TIMEOUT (TIMEOUT_MS * US_PER_MS)
 #define PER_ITERATION (4)
 
 #if ARCH_32_BIT
@@ -91,7 +91,7 @@ static void run_test(const char *name, unsigned (*test)(unsigned))
         ++count;
     } while (atomic_load(&done) == false);
 
-    printf("+ %s: %lu iterations per second\r\n", name, (4*PER_ITERATION) * count / TIMEOUT_S);
+    printf("+ %s: %lu iterations per second\r\n", name, (4*PER_ITERATION) * count / TIMEOUT_MS * 1000);
 }
 
 static unsigned do_test_and_clear(unsigned state)
@@ -121,7 +121,7 @@ static void run_test_test_and_clear(void)
         ++count;
     } while (atomic_load(&done) == false);
 
-    printf("+ %s: %lu iterations per second\r\n", "bitarithm_test_and_clear", 2 * count / TIMEOUT_S);
+    printf("+ %s: %lu iterations per second\r\n", "bitarithm_test_and_clear", 2 * count / TIMEOUT_MS * 1000);
 }
 
 #define run_test(test) run_test(#test, test)
