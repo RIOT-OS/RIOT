@@ -85,8 +85,45 @@
  * INCLUDES += -I$(APPDIR)
  * ```
  *
- * Implement required device descriptors and descriptor callbacks as well as
- * the callbacks of the enabled classes.
+ * Implement the callbacks of the enabled classes.
+ *
+ * For most common device classes and their configuration, the tinyUSB
+ * package automatically generates the required descriptors and descriptor
+ * callbacks for any combination of
+ * - up to two interfaces of the class CDC ACM,
+ * - up to two interfaces of the Generic In/Out HID class,
+ * - up to one MSC device interface and,
+ * - up to one interface of the Vendor device class.
+ *
+ * Any other combination, either a different number of these device class
+ * interfaces or the use of a different device class interface, requires the
+ * implementation of custom descriptors and the callbacks.
+ *
+ * All symbols of the generated descriptors and their callback functions are
+ * defined as weak symbols so that the application can override parts of the
+ * descriptors or the callback functions that handle them. For example, the
+ * array `tusb_desc_hid_0_report`, which defines the HID report descriptor for
+ * HID device 0, making the device a generic in/out HID device
+ *
+ * ```c
+ * __attribute__((weak))
+ * uint8_t const tusb_desc_hid_0_report[] =
+ * {
+ *     TUD_HID_REPORT_DESC_GENERIC_INOUT(CONFIG_TUSBD_HID_EP_SIZE),
+ * };
+ * ```
+ *
+ * could be overridden by the application with
+ *
+ * ```c
+ * uint8_t const tusb_desc_hid_0_report[] =
+ * {
+ *     TUD_HID_REPORT_DESC_KEYBOARD(HID_REPORT_ID(REPORT_ID_KEYBOARD)),
+ *     TUD_HID_REPORT_DESC_MOUSE(HID_REPORT_ID(REPORT_ID_MOUSE)),
+ * };
+ * ```
+ *
+ * to make the device to be a composite keyboard/mouse device.
  *
  * Please refer `$RIOTBASE/tests/pkg_tinyusb_cdc_msc` and the
  * [tinyUSB documentation](https://docs.tinyusb.org/en/latest/reference/getting_started.html)
