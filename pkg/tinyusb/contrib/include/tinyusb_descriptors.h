@@ -125,6 +125,12 @@ enum {
                               (CONFIG_TUSBD_VENDOR_NUMOF * TUD_VENDOR_DESC_LEN))
 #endif /* !defined(TUSBD_DESC_TOTAL_LEN) */
 
+#define TUSBD_DESC_ALT_TOTAL_LEN (TUD_CONFIG_DESC_LEN + \
+                                 (CONFIG_TUSBD_CDC_NUMOF * TUD_CDC_DESC_LEN) + \
+                                 (CONFIG_TUSBD_HID_NUMOF * TUD_HID_INOUT_DESC_LEN) + \
+                                 (CONFIG_TUSBD_MSC_NUMOF * TUD_MSC_DESC_LEN) + \
+                                 (CONFIG_TUSBD_VENDOR_NUMOF * TUD_VENDOR_DESC_LEN))
+
 #endif /* !defined(CONFIG_TUSBD_USE_CUSTOM_DESC) */
 
 #ifdef __cplusplus

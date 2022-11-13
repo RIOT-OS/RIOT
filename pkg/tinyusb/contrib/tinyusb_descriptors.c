@@ -52,6 +52,15 @@
        of device class interfaces. Custom descriptors have to be implemented.
 #endif
 
+#define _TUD_CONFIG_DESC_NUMOF  1
+
+enum {
+    _TUD_CONFIG_DESC_ID = 0,
+#if _TUD_CONFIG_DESC_NUMOF == 2
+    _TUD_CONFIG_DESC_ALT_ID = 1,
+#endif
+};
+
 /*
  * --------------------------------------------------------------------+
  * Device Descriptors
@@ -84,7 +93,7 @@ tusb_desc_device_t const tusb_desc_device = {
     .iProduct           = TUSBD_STR_IDX_PRODUCT,
     .iSerialNumber      = TUSBD_STR_IDX_SERIAL,
 
-    .bNumConfigurations = 0x01
+    .bNumConfigurations = _TUD_CONFIG_DESC_NUMOF
 };
 
 /*
@@ -200,10 +209,10 @@ void tud_hid_set_report_cb(uint8_t itf, uint8_t report_id,
 #define _tusb_speed_fs   0
 #define _tusb_speed_hs   1
 
-#define _TUD_CONFIG_DESC(id) \
+#define _TUD_CONFIG_DESC(id, len) \
     /* Config number, interface count, string index, total length, attribute,
      * power in mA */ \
-    TUD_CONFIG_DESCRIPTOR(id, TUSBD_ITF_NUMOF, 0, TUSBD_DESC_TOTAL_LEN, \
+    TUD_CONFIG_DESCRIPTOR(id + 1, TUSBD_ITF_NUMOF, 0, len, \
                           DESC_DEV_ATTR, CONFIG_USB_MAX_POWER)
 
 #define _TUD_CDC_DESC(speed, n) \
@@ -242,7 +251,7 @@ void tud_hid_set_report_cb(uint8_t itf, uint8_t report_id,
 /* FS configuration */
 __attribute__((weak))
 uint8_t const tusb_desc_fs_config[] = {
-    _TUD_CONFIG_DESC(1),
+    _TUD_CONFIG_DESC(_TUD_CONFIG_DESC_ID, TUSBD_DESC_TOTAL_LEN),
 #if CONFIG_TUSBD_CDC_NUMOF > 0
     _TUD_CDC_DESC(_tusb_speed_fs, 0),
 #endif
@@ -263,6 +272,31 @@ uint8_t const tusb_desc_fs_config[] = {
 #endif
 };
 
+#if _TUD_CONFIG_DESC_NUMOF == 2
+__attribute__((weak))
+uint8_t const tusb_desc_fs_config_alt[] = {
+    _TUD_CONFIG_DESC(_TUD_CONFIG_DESC_ALT_ID, TUSBD_DESC_ALT_TOTAL_LEN),
+#if CONFIG_TUSBD_CDC_NUMOF > 0
+    _TUD_CDC_DESC(_tusb_speed_fs, 0),
+#endif
+#if CONFIG_TUSBD_CDC_NUMOF > 1
+    _TUD_CDC_DESC(_tusb_speed_fs, 1),
+#endif
+#if CONFIG_TUSBD_HID_NUMOF > 0
+    _TUD_HID_INOUT_DESC(_tusb_speed_fs, 0),
+#endif
+#if CONFIG_TUSBD_HID_NUMOF > 1
+    _TUD_HID_INOUT_DESC(_tusb_speed_fs, 1),
+#endif
+#if CONFIG_TUSBD_MSC_NUMOF
+    _TUD_MSC_DESC(_tusb_speed_fs),
+#endif
+#if CONFIG_TUSBD_VENDOR_NUMOF
+    _TUD_VENDOR_DESC(_tusb_speed_fs),
+#endif
+};
+#endif /* _TUD_CONFIG_DESC_NUMOF == 2 */
+
 #if TUD_OPT_HIGH_SPEED
 /* Per USB specs: high speed capable device must report device_qualifier
  * and other_speed_configuration descriptors */
@@ -270,7 +304,7 @@ uint8_t const tusb_desc_fs_config[] = {
 /* HS configuration */
 __attribute__((weak))
 uint8_t const tusb_desc_hs_config[] = {
-    _TUD_CONFIG_DESC(1),
+    _TUD_CONFIG_DESC(_TUD_CONFIG_DESC_ID, TUSBD_DESC_TOTAL_LEN),
 #if CONFIG_TUSBD_CDC_NUMOF > 0
     _TUD_CDC_DESC(_tusb_speed_hs, 0),
 #endif
@@ -290,6 +324,31 @@ uint8_t const tusb_desc_hs_config[] = {
     _TUD_VENDOR_DESC(_tusb_speed_hs),
 #endif
 };
+
+#if _TUD_CONFIG_DESC_NUMOF == 2
+__attribute__((weak))
+uint8_t const tusb_desc_hs_config_alt[] = {
+    _TUD_CONFIG_DESC(_TUD_CONFIG_DESC_ALT_ID, TUSBD_DESC_ALT_TOTAL_LEN),
+#if CONFIG_TUSBD_CDC_NUMOF > 0
+    _TUD_CDC_DESC(_tusb_speed_hs, 0),
+#endif
+#if CONFIG_TUSBD_CDC_NUMOF > 1
+    _TUD_CDC_DESC(_tusb_speed_hs, 1),
+#endif
+#if CONFIG_TUSBD_HID_NUMOF > 0
+    _TUD_HID_INOUT_DESC(_tusb_speed_hs, 0),
+#endif
+#if CONFIG_TUSBD_HID_NUMOF > 1
+    _TUD_HID_INOUT_DESC(_tusb_speed_hs, 1),
+#endif
+#if CONFIG_TUSBD_MSC_NUMOF
+    _TUD_MSC_DESC(_tusb_speed_hs),
+#endif
+#if CONFIG_TUSBD_VENDOR_NUMOF
+    _TUD_VENDOR_DESC(_tusb_speed_hs),
+#endif
+};
+#endif /* _TUD_CONFIG_DESC_NUMOF == 2 */
 
 /* other speed configuration */
 uint8_t tusb_desc_other_speed_config[TUSBD_DESC_TOTAL_LEN];
@@ -316,7 +375,7 @@ tusb_desc_device_qualifier_t const tusb_desc_device_qualifier = {
 #endif
 
     .bMaxPacketSize0    = CONFIG_TUSBD_EP0_SIZE,
-    .bNumConfigurations = 0x01,
+    .bNumConfigurations = _TUD_CONFIG_DESC_NUMOF,
     .bReserved          = 0x00
 };
 
@@ -344,16 +403,35 @@ uint8_t const *tud_descriptor_other_speed_configuration_cb(uint8_t index)
 {
     DEBUG("[tinyusb] %s: %u\n", __func__, index);
 
-    /* If the link speed is HS, return the FS config, and vice versa.
-     * Note: the descriptor type is OHER_SPEED_CONFIG instead of CONFIG */
-    memcpy(tusb_desc_other_speed_config,
-           (tud_speed_get() == TUSB_SPEED_HIGH) ? tusb_desc_fs_config
-                                                : tusb_desc_hs_config,
-           TUSBD_DESC_TOTAL_LEN);
+    assert(index < _TUD_CONFIG_DESC_NUMOF);
 
-    tusb_desc_other_speed_config[1] = TUSB_DESC_OTHER_SPEED_CONFIG;
+    if (index == _TUD_CONFIG_DESC_ID) {
+        /* If the link speed is HS, return the FS config, and vice versa.
+         * Note: the descriptor type is OHER_SPEED_CONFIG instead of CONFIG */
+        memcpy(tusb_desc_other_speed_config,
+               (tud_speed_get() == TUSB_SPEED_HIGH) ? tusb_desc_fs_config
+                                                    : tusb_desc_hs_config,
+               TUSBD_DESC_TOTAL_LEN);
 
-    return tusb_desc_other_speed_config;
+        tusb_desc_other_speed_config[1] = TUSB_DESC_OTHER_SPEED_CONFIG;
+
+        return tusb_desc_other_speed_config;
+    }
+#if _TUD_CONFIG_DESC_NUMOF == 2
+    else if (index == _TUD_CONFIG_DESC_ALT_ID) {
+        /* If the link speed is HS, return the FS config, and vice versa.
+         * Note: the descriptor type is OHER_SPEED_CONFIG instead of CONFIG */
+        memcpy(tusb_desc_other_speed_config,
+               (tud_speed_get() == TUSB_SPEED_HIGH) ? tusb_desc_fs_config_alt
+                                                    : tusb_desc_hs_config_alt,
+               TUSBD_DESC_ALT_TOTAL_LEN);
+
+        tusb_desc_other_speed_config[1] = TUSB_DESC_OTHER_SPEED_CONFIG;
+
+        return tusb_desc_other_speed_config;
+    }
+#endif
+    return NULL;
 }
 
 #endif /* TUD_OPT_HIGH_SPEED */
@@ -368,13 +446,31 @@ uint8_t const *tud_descriptor_configuration_cb(uint8_t index)
 {
     DEBUG("[tinyusb] %s: %u\n", __func__, index);
 
+    assert(index < _TUD_CONFIG_DESC_NUMOF);
+
+    if (index == _TUD_CONFIG_DESC_ID) {
 #if TUD_OPT_HIGH_SPEED
-    /* Although we are HS, host may be FS. */
-    return (tud_speed_get() == TUSB_SPEED_HIGH) ? tusb_desc_hs_config
-                                                : tusb_desc_fs_config;
-#else
-    return (uint8_t const *)tusb_desc_fs_config;
-#endif
+        /* Although we are HS, host may be FS. */
+        return (tud_speed_get() == TUSB_SPEED_HIGH) ? tusb_desc_hs_config
+                                                    : tusb_desc_fs_config;
+#else /* TUD_OPT_HIGH_SPEED */
+        return (uint8_t const *)tusb_desc_fs_config;
+#endif /* TUD_OPT_HIGH_SPEED */
+    }
+
+#if _TUD_CONFIG_DESC_NUMOF == 2
+    else if (index == _TUD_CONFIG_DESC_ALT_ID) {
+#if TUD_OPT_HIGH_SPEED
+        /* Although we are HS, host may be FS. */
+        return (tud_speed_get() == TUSB_SPEED_HIGH) ? tusb_desc_hs_config_alt
+                                                    : tusb_desc_fs_config_alt;
+#else /* TUD_OPT_HIGH_SPEED */
+        return (uint8_t const *)tusb_desc_fs_config_alt;
+#endif /* TUD_OPT_HIGH_SPEED */
+    }
+#endif /* _TUD_CONFIG_DESC_NUMOF == 2 */
+
+    return NULL;
 }
 
 /*
