@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Nils Ollrogge
+ * Copyright (C) 2021-2022 Nils Ollrogge
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -57,14 +57,13 @@ void usb_hid_io_write(const void *buffer, size_t len)
     while (len) {
         mutex_lock(&hid.in_lock);
         if (len > max_size) {
-            memmove(buffer_ep + offset, (uint8_t *)buffer + offset, max_size);
+            memmove(buffer_ep, (uint8_t *)buffer + offset, max_size);
             offset += max_size;
             hid.occupied = max_size;
             len -= max_size;
         }
         else {
-            memmove(buffer_ep + offset, (uint8_t *)buffer + offset, len);
-            offset += len;
+            memmove(buffer_ep, (uint8_t *)buffer + offset, len);
             hid.occupied = len;
             len = 0;
         }
