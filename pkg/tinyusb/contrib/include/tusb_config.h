@@ -40,7 +40,15 @@
 #endif
 #include "tinyusb.h"
 
+#if MODULE_TINYUSB_CLASS_NET
+#include "net/ethernet.h"
+#endif
+
 #if !DOXYGEN
+
+#if MODULE_TINYUSB_CLASS_NET_CDC_NCM && (MODULE_TINYUSB_CLASS_NET_CDC_ECM || MODULE_TINYUSB_CLASS_NET_RNDIS)
+#error "CDC NCM device class cannot be used together with CDC ECM or RNDIS device class"
+#endif
 
 #ifndef CONFIG_TUSBD_AUDIO_NUMOF
 #if MODULE_TINYUSB_DEVICE && MODULE_TINYUSB_CLASS_AUDIO
@@ -82,14 +90,6 @@
 #endif
 #endif
 
-#ifndef CONFIG_TUSBD_ECM_NUMOF
-#if MODULE_TINYUSB_DEVICE && MODULE_TINYUSB_CLASS_ECM
-#define CONFIG_TUSBD_ECM_NUMOF      1
-#else
-#define CONFIG_TUSBD_ECM_NUMOF      0
-#endif
-#endif
-
 #ifndef CONFIG_TUSBD_HID_NUMOF
 #if MODULE_TINYUSB_DEVICE && MODULE_TINYUSB_CLASS_HID
 #define CONFIG_TUSBD_HID_NUMOF      1
@@ -111,14 +111,6 @@
 #define CONFIG_TUSBD_MSC_NUMOF      1
 #else
 #define CONFIG_TUSBD_MSC_NUMOF      0
-#endif
-#endif
-
-#ifndef CONFIG_TUSBD_NCM_NUMOF
-#if MODULE_TINYUSB_DEVICE && MODULE_TINYUSB_CLASS_NCM
-#define CONFIG_TUSBD_NCM_NUMOF      1
-#else
-#define CONFIG_TUSBD_NCM_NUMOF      0
 #endif
 #endif
 
@@ -272,12 +264,52 @@
 #define CONFIG_TUSBD_MSC_HS_EP_SIZE         CONFIG_TUSBD_HS_EP_SIZE
 #endif
 
+#ifndef CONFIG_TUSBD_NET_FS_EP_SIZE
+#define CONFIG_TUSBD_NET_FS_EP_SIZE         CONFIG_TUSBD_FS_EP_SIZE
+#endif
+
+#ifndef CONFIG_TUSBD_NET_HS_EP_SIZE
+#define CONFIG_TUSBD_NET_HS_EP_SIZE         CONFIG_TUSBD_HS_EP_SIZE
+#endif
+
 #ifndef CONFIG_TUSBD_VENDOR_FS_EP_SIZE
 #define CONFIG_TUSBD_VENDOR_FS_EP_SIZE      CONFIG_TUSBD_FS_EP_SIZE
 #endif
 
 #ifndef CONFIG_TUSBD_VENDOR_HS_EP_SIZE
 #define CONFIG_TUSBD_VENDOR_HS_EP_SIZE      CONFIG_TUSBD_HS_EP_SIZE
+#endif
+
+#ifndef CONFIG_TUSBD_NET_NOTIF_EP_SIZE
+#define CONFIG_TUSBD_NET_NOTIF_EP_SIZE      64
+#endif
+
+#ifndef CONFIG_TUSBD_NET_MTU_SIZE
+#define CONFIG_TUSBD_NET_MTU_SIZE           ETHERNET_FRAME_LEN
+#endif
+
+#if MODULE_TINYUSB_CLASS_NET_CDC_ECM
+#define CONFIG_TUSBD_NET_CDC_ECM            1
+#else
+#define CONFIG_TUSBD_NET_CDC_ECM            0
+#endif
+
+#if MODULE_TINYUSB_CLASS_NET_CDC_NCM
+#define CONFIG_TUSBD_NET_CDC_NCM            1
+#else
+#define CONFIG_TUSBD_NET_CDC_NCM            0
+#endif
+
+#if MODULE_TINYUSB_CLASS_NET_RNDIS
+#define CONFIG_TUSBD_NET_RNDIS              1
+#else
+#define CONFIG_TUSBD_NET_RNDIS              0
+#endif
+
+#if CONFIG_TUSBD_NET_CDC_ECM || CONFIG_TUSBD_NET_CDC_NCM || CONFIG_TUSBD_NET_RNDIS
+#define CONFIG_TUSBD_NET_NUMOF              1
+#else
+#define CONFIG_TUSBD_NET_NUMOF              0
 #endif
 
 #ifndef CONFIG_TUSBH_ENUM_SIZE
@@ -333,6 +365,7 @@
 #define CFG_TUD_AUDIO               CONFIG_TUSBD_AUDIO_NUMOF
 #define CFG_TUD_BTH                 CONFIG_TUSBD_BTH_NUMOF
 #define CFG_TUD_CDC                 CONFIG_TUSBD_CDC_NUMOF
+#define CFG_TUD_ECM_RNDIS           (CONFIG_TUSBD_NET_CDC_ECM || CONFIG_TUSBD_NET_RNDIS)
 #define CFG_TUD_DFU                 CONFIG_TUSBD_DFU_NUMOF
 #define CFG_TUD_DFU_RUNTIME         CONFIG_TUSBD_DFU_RT_NUMOF
 #define CFG_TUD_HID                 CONFIG_TUSBD_HID_NUMOF
@@ -407,6 +440,12 @@
 #define CFG_TUD_MSC_EP_BUFSIZE      (TUD_OPT_HIGH_SPEED ? CONFIG_TUSBD_MSC_HS_EP_SIZE \
                                                         : CONFIG_TUSBD_MSC_FS_EP_SIZE)
 /** @} */
+
+/**
+ * @name Typical required NET device class configurations
+ * @{
+ */
+#define CFG_TUD_NET_MTU             CONFIG_TUSBD_NET_MTU_SIZE
 
 /**
  * @name Typical required HID host class configurations
