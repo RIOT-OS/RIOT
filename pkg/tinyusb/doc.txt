@@ -51,9 +51,9 @@
  * }
  * ```
  *
- * Create a file `tinyusb_app_config.h` in your application directory.
- * This file is can be used to override the default configuration defined
- * in `tusb_config.h`.
+ * If it is necessary to override the default configuration defined in
+ * `tusb_config.h`, create a file `tinyusb_app_config.h` in your application
+ * directory and override the configuration to be changed.
  * ```c
  * #define CONFIG_TUSBD_CDC_NUMOF   2
  * ```
@@ -68,7 +68,9 @@
  * enabled, `CONFIG_TUSBD_CDC_NUMOF` is defined to 1 by default. The number of
  * all other `CONFIG_TUSBD_*_NUMOF` device class interfaces are 0.
  *
- * Add the application path to the include paths at the end of your
+ * If you add the `tinyusb_app_config.h` file in your application directory
+ * to override the default configuration, add the application path to the
+ * include paths at the end of your
  * application's Makefile. This is necessary so that the tinyUSB stack
  * uses the file `tinyusb_app_config.h` from your application directory
  * and thus the file `tusb_config.h` from the tinyUSB package.
@@ -83,8 +85,45 @@
  * INCLUDES += -I$(APPDIR)
  * ```
  *
- * Implement required device descriptors and descriptor callbacks as well as
- * the callbacks of the enabled classes.
+ * Implement the callbacks of the enabled classes.
+ *
+ * For most common device classes and their configuration, the tinyUSB
+ * package automatically generates the required descriptors and descriptor
+ * callbacks for any combination of
+ * - up to two interfaces of the class CDC ACM,
+ * - up to two interfaces of the Generic In/Out HID class,
+ * - up to one MSC device interface and,
+ * - up to one interface of the Vendor device class.
+ *
+ * Any other combination, either a different number of these device class
+ * interfaces or the use of a different device class interface, requires the
+ * implementation of custom descriptors and the callbacks.
+ *
+ * All symbols of the generated descriptors and their callback functions are
+ * defined as weak symbols so that the application can override parts of the
+ * descriptors or the callback functions that handle them. For example, the
+ * array `tusb_desc_hid_0_report`, which defines the HID report descriptor for
+ * HID device 0, making the device a generic in/out HID device
+ *
+ * ```c
+ * __attribute__((weak))
+ * uint8_t const tusb_desc_hid_0_report[] =
+ * {
+ *     TUD_HID_REPORT_DESC_GENERIC_INOUT(CONFIG_TUSBD_HID_EP_SIZE),
+ * };
+ * ```
+ *
+ * could be overridden by the application with
+ *
+ * ```c
+ * uint8_t const tusb_desc_hid_0_report[] =
+ * {
+ *     TUD_HID_REPORT_DESC_KEYBOARD(HID_REPORT_ID(REPORT_ID_KEYBOARD)),
+ *     TUD_HID_REPORT_DESC_MOUSE(HID_REPORT_ID(REPORT_ID_MOUSE)),
+ * };
+ * ```
+ *
+ * to make the device to be a composite keyboard/mouse device.
  *
  * Please refer `$RIOTBASE/tests/pkg_tinyusb_cdc_msc` and the
  * [tinyUSB documentation](https://docs.tinyusb.org/en/latest/reference/getting_started.html)
