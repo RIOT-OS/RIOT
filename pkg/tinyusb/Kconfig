@@ -126,6 +126,9 @@ config MODULE_TINYUSB_HOST
     help
         Select to enable tinyUSB host stack
 
+config MODULE_TINYUSB_LIB_NETWORKING
+    bool
+
 config MODULE_TINYUSB_PORTABLE_ESPRESSIF
     bool
     help
@@ -170,13 +173,7 @@ menu "Device Classes"
         bool "Musical Instrument Digital Interface (MIDI)"
         depends on MODULE_TINYUSB_DEVICE
 
-    config MODULE_TINYUSB_CLASS_NET_ECM_RNDIS
-        bool "Network with RNDIS, Ethernet Control Model (ECM)"
-        depends on MODULE_TINYUSB_DEVICE
-
-    config MODULE_TINYUSB_CLASS_NET_NCM
-        bool "Network with Network Control Model (NCM)"
-        depends on MODULE_TINYUSB_DEVICE
+    rsource "Kconfig.net"
 
     config MODULE_TINYUSB_CLASS_USBTMC
         bool "Test and Measurement Class (USBTMC)"
