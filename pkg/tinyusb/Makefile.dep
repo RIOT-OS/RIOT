@@ -30,6 +30,21 @@ ifneq (,$(filter tinyusb_dfu,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter tinyusb_class_net_%,$(USEMODULE)))
+  USEMODULE += tinyusb_class_net
+endif
+
+ifneq (,$(filter tinyusb_netdev,$(USEMODULE)))
+  USEMODULE += luid
+  USEMODULE += netdev_eth
+  USEMODULE += tinyusb_class_net
+  USEMODULE += tinyusb_device
+endif
+
+ifneq (,$(filter tinyusb_class_net_rndis,$(USEMODULE)))
+  USEMODULE += tinyusb_lib_networking
+endif
+
 ifeq (,$(filter tinyusb_class_%,$(USEMODULE)))
   $(error At least one tinyusb_class_* module has to be enabled)
 endif
@@ -60,10 +75,7 @@ endif
 ifneq (,$(filter tinyusb_class_midi,$(USEMODULE)))
   USEMODULE += tinyusb_device
 endif
-ifneq (,$(filter tinyusb_class_net_ecm_rndis,$(USEMODULE)))
-  USEMODULE += tinyusb_device
-endif
-ifneq (,$(filter tinyusb_class_net_ncm,$(USEMODULE)))
+ifneq (,$(filter tinyusb_class_net,$(USEMODULE)))
   USEMODULE += tinyusb_device
 endif
 ifneq (,$(filter tinyusb_class_usbtmc,$(USEMODULE)))

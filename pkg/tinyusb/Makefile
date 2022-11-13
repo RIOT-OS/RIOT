@@ -8,10 +8,11 @@ PKG_LICENSE=MIT
 include $(RIOTBASE)/pkg/pkg.mk
 
 PSRC = $(PKG_SOURCE_DIR)/src
+PLIB = $(PKG_SOURCE_DIR)/lib
 
 .PHONY: all
 
-all: $(filter tinyusb_% stdio_tinyusb_cdc_acm,$(USEMODULE))
+all: $(filter tinyusb_% stdio_tinyusb_cdc_acm,$(filter-out tinyusb_class_net_%,$(USEMODULE)))
 	$(QQ)"$(MAKE)" -C $(PSRC) -f $(RIOTBASE)/Makefile.base MODULE=tinyusb
 
 stdio_tinyusb_cdc_acm:
@@ -50,10 +51,7 @@ tinyusb_class_midi:
 tinyusb_class_msc:
 	$(QQ)"$(MAKE)" -C $(PSRC)/class/msc -f $(RIOTBASE)/Makefile.base MODULE=$@
 
-tinyusb_class_net_ecm_rndis:
-	$(QQ)"$(MAKE)" -C $(PSRC)/class/net -f $(RIOTBASE)/Makefile.base MODULE=$@
-
-tinyusb_class_net_ncm:
+tinyusb_class_net:
 	$(QQ)"$(MAKE)" -C $(PSRC)/class/net -f $(RIOTBASE)/Makefile.base MODULE=$@
 
 tinyusb_class_usbtmc:
@@ -73,6 +71,9 @@ tinyusb_device:
 
 tinyusb_host:
 	$(QQ)"$(MAKE)" -C $(PSRC)/host -f $(RIOTBASE)/Makefile.base MODULE=$@
+
+tinyusb_lib_networking:
+	$(QQ)"$(MAKE)" -C $(PLIB)/networking -f $(RIOTPKG)/$(PKG_NAME)/Makefile.lib_networking
 
 tinyusb_portable_espressif:
 	$(QQ)"$(MAKE)" -C $(PSRC)/portable/espressif/esp32sx -f $(RIOTBASE)/Makefile.base MODULE=$@
