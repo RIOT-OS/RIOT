@@ -25,6 +25,7 @@
 #include "net/gnrc/ipv6/nib/nc.h"
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/netif/internal.h"
+#include "net/ipv6/addr.h"
 #include "random.h"
 
 #include "_nib-internal.h"
@@ -552,20 +553,27 @@ static inline bool _in_abrs(const _nib_abr_entry_t *abr)
 
 void _nib_offl_clear(_nib_offl_entry_t *dst)
 {
-    if (dst->next_hop != NULL) {
-        _nib_offl_entry_t *ptr;
-        for (ptr = _dsts; _in_dsts(ptr); ptr++) {
-            /* there is another dst pointing to next-hop => only remove dst */
-            if ((dst != ptr) && (dst->next_hop == ptr->next_hop)) {
-                break;
+    if (dst->mode == _EMPTY) {
+        if (dst->next_hop != NULL) {
+            _nib_offl_entry_t *ptr;
+            for (ptr = _dsts; _in_dsts(ptr); ptr++) {
+                /* there is another dst pointing to next-hop => only remove dst */
+                if ((dst != ptr) && (dst->next_hop == ptr->next_hop)) {
+                    break;
+                }
+            }
+            /* we iterated and found no further dst pointing to next-hop */
+            if (!_in_dsts(ptr)) {
+                dst->next_hop->mode &= ~(_DST);
+                _nib_onl_clear(dst->next_hop);
             }
         }
-        /* we iterated and found no further dst pointing to next-hop */
-        if (!_in_dsts(ptr)) {
-            dst->next_hop->mode &= ~(_DST);
-            _nib_onl_clear(dst->next_hop);
-        }
         memset(dst, 0, sizeof(_nib_offl_entry_t));
+    }
+    else {
+        DEBUG("nib: offlink entry %s/%u with mode %u not cleared\n",
+              ipv6_addr_to_str(addr_str, &dst->pfx, sizeof(addr_str)),
+              dst->pfx_len, dst->mode);
     }
 }
 
