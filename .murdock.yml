@@ -10,9 +10,6 @@ pr:
   comment_artifacts:
   - name: doc-preview/
     readable_name: Documentation preview
-  comment_footer: >
-    **This only reflects a subset of all builds from https://ci-prod.riot-os.org.
-    Please refer to https://ci.riot-os.org for a complete build for now.**
 
 commit:
   skip_keywords: ["ci_skip", "murdock_skip"]
