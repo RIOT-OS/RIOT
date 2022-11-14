@@ -37,8 +37,11 @@ endif
 ifneq (,$(filter tinyusb_netdev,$(USEMODULE)))
   USEMODULE += luid
   USEMODULE += netdev_eth
-  USEMODULE += tinyusb_class_net
   USEMODULE += tinyusb_device
+  ifeq (,$(filter tinyusb_class_net_%,$(USEMODULE)))
+    # default to CDC ECM
+    USEMODULE += tinyusb_class_net_cdc_ecm
+  endif
 endif
 
 ifneq (,$(filter tinyusb_class_net_rndis,$(USEMODULE)))

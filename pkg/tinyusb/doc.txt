@@ -5,7 +5,7 @@
  * @author   Gunar Schorcht <gunar@schorcht.net>
  * @see https://github.com/hathach/tinyusb
  *
- * # TinyUSB
+ * # TinyUSB {#pkg_tinyusb}
  *
  * tinyUSB is an open-source cross-platform USB Host/Device stack for
  * embedded systems.

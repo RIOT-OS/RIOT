@@ -27,6 +27,9 @@ tinyusb_dfu:
 tinyusb_hw:
 	$(QQ)"$(MAKE)" -C $(RIOTPKG)/$(PKG_NAME)/hw
 
+tinyusb_netdev:
+	$(QQ)"$(MAKE)" -C $(RIOTPKG)/$(PKG_NAME)/netdev
+
 tinyusb_class_audio:
 	$(QQ)"$(MAKE)" -C $(PSRC)/class/audio -f $(RIOTBASE)/Makefile.base MODULE=$@
 
