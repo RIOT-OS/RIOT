@@ -152,8 +152,8 @@ https://www.riot-os.org
 [api-link]: https://doc.riot-os.org/
 [license-badge]: https://img.shields.io/github/license/RIOT-OS/RIOT
 [license-link]: https://github.com/RIOT-OS/RIOT/blob/master/LICENSE
-[master-ci-badge]: https://ci.riot-os.org/RIOT-OS/RIOT/master/latest/badge.svg
-[master-ci-link]: https://ci.riot-os.org/nightlies.html#master
+[master-ci-badge]: https://ci.riot-os.org/job/branch/master/badge
+[master-ci-link]: https://ci.riot-os.org/details/branch/master
 [matrix-badge]: https://img.shields.io/badge/chat-Matrix-brightgreen.svg
 [matrix-link]: https://matrix.to/#/#riot-os:matrix.org
 [merge-chance-link]: https://merge-chance.info/target?repo=RIOT-OS/RIOT
