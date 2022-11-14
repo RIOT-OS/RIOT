@@ -47,7 +47,7 @@ $(CARGO_LIB): $(RIOTBUILD_CONFIG_HEADER_C) $(BUILDDEPS) $(CARGO_COMPILE_COMMANDS
 	$(Q)# If distribution installed cargos ever grow the capacity to build RIOT, this absence of `rustup` might be OK. But that'd need them to both have cross tools around and cross core libs, none of which is currently the case.
 	$(Q)# Ad grepping for "std": We're not *actually* checking for std but more for core -- but rust-stc-$TARGET is the name of any standard libraries that'd be available for that target.
 	$(Q)[ x"$(findstring build-std,$(CARGO_OPTIONS))" != x"" ] || \
-		(rustup component list $(patsubst %,--toolchain %,$(CARGO_CHANNEL)) --installed | grep 'rust-std-$(RUST_TARGET)$$' --quiet) || \
+		(rustup component list $(patsubst %,--toolchain %,$(CARGO_CHANNEL)) --installed | grep 'rust-std-$(RUST_TARGET)$$' -q) || \
 		($(COLOR_ECHO) \
 		'$(COLOR_RED)Error: No Rust libraries are installed for the board'"'"'s CPU.$(COLOR_RESET) Run\n    $(COLOR_GREEN)$$$(COLOR_RESET) rustup target add $(RUST_TARGET) $(patsubst %,--toolchain %,$(CARGO_CHANNEL))\nor set `CARGO_OPTIONS=-Zbuild-std=core`.'; \
 		exit 1)
