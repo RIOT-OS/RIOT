@@ -26,12 +26,7 @@
 #include <stdio.h>
 #endif
 
-#if MODULE_FMT
-/* fmt's `print_str()` needs very little stack. ~200 total was fine on Cortex-M. */
-# define MIN_SIZE   (THREAD_STACKSIZE_TINY)
-#else
 # define MIN_SIZE   (THREAD_STACKSIZE_TINY + THREAD_EXTRA_STACKSIZE_PRINTF)
-#endif
 
 void print_stack_usage_metric(const char *name, void *stack, unsigned max_size)
 {
