@@ -1,4 +1,4 @@
-# Copyright (C) 2020 Otto-von-Guericke-Universität Magdeburg
+# Copyright (C) 2020, 2022 Otto-von-Guericke-Universität Magdeburg
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
@@ -16,3 +16,18 @@ config MODULE_MALLOC_THREAD_SAFE
         safe without touching the application code or the c library. This module
         is intended to be pulled in automatically if needed. Hence, applications
         never should manually use it.
+
+config MODULE_MALLOC_TRACING
+    bool
+    depends on TEST_KCONFIG
+    depends on MODULE_MALLOC_THREAD_SAFE
+    help
+        This module enables hooks in the wrappers for malloc(), calloc(),
+        realloc(), and free() provided by MODULE_MALLOC_THREAD_SAFE that print
+        the arguments, caller program counter and return value of those
+        functions. The intent is to aid debugging invalid calls to free(),
+        duplicated calls to free(), or memory leaks.
+
+        Note that generally dynamic memory management is a bad idea on the
+        constrained devices RIOT is targeting. So maybe it is better to just
+        adapt your code to  use static memory management instead.

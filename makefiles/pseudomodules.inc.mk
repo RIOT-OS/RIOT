@@ -277,6 +277,11 @@ PSEUDOMODULES += lora
 ##
 PSEUDOMODULES += libc_gettimeofday
 
+## @defgroup pseudomodule_malloc_tracing malloc_tracing
+## @brief Debug dynamic memory management by hooking in a print into each call
+##        of malloc(), calloc(), realloc() and free
+PSEUDOMODULES += malloc_tracing
+
 ## @defgroup pseudomodule_mpu_stack_guard mpu_stack_guard
 ## @brief MPU based stack guard
 ##
