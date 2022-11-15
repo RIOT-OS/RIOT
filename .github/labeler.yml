@@ -20,6 +20,7 @@
   - ".github/**/*.yml"
   - ".murdock"
   - ".murdock.yml"
+  - "bors.toml"
 
 "Area: CoAP":
   - "sys/net/application_layer/*coap/**/*"
