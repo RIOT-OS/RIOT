@@ -1,0 +1,35 @@
+# Copyright (c) 2022 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+if CPU_FAM_G4 || CPU_FAM_L4 || CPU_FAM_L5
+
+choice
+bool "R: Main PLL division factor for PLL 'R' clock (system clock)" if CUSTOM_PLL_PARAMS
+default PLL_R_DIV_2
+
+config PLL_R_DIV_2
+    bool "Divide by 2"
+
+config PLL_R_DIV_4
+    bool "Divide by 4"
+
+config PLL_R_DIV_6
+    bool "Divide by 6"
+
+config PLL_R_DIV_8
+    bool "Divide by 8"
+
+endchoice
+
+config CLOCK_PLL_R
+    int
+    default 2 if PLL_R_DIV_2
+    default 4 if PLL_R_DIV_4
+    default 6 if PLL_R_DIV_6
+    default 8 if PLL_R_DIV_8
+
+endif # CPU_FAM_G4 || CPU_FAM_L4 || CPU_FAM_L5

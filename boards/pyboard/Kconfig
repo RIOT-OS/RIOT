@@ -31,6 +31,9 @@ config BOARD_PYBOARD
 
     select HAVE_SAUL_GPIO
 
+config CLOCK_HSE
+    default 12000000
+
 config CLOCK_PLL_M
     default 12
 

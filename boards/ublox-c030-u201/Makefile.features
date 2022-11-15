@@ -10,6 +10,3 @@ FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
 FEATURES_PROVIDED += periph_uart_hw_fc
-
-# ublox-c030-u201 provides a custom default Kconfig clock configuration
-KCONFIG_BOARD_CONFIG += $(RIOTBOARD)/ublox-c030-u201/clock.config

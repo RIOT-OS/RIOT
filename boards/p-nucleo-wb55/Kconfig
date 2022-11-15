@@ -33,4 +33,7 @@ config BOARD_P_NUCLEO_WB55
     select BOARD_HAS_HSE
     select BOARD_HAS_LSE
 
+config CLOCK_HSE
+    default 32000000
+
 source "$(RIOTBOARD)/common/nucleo/Kconfig"

@@ -34,7 +34,7 @@ extern "C" {
  * @name    F0/F1/F3 clock settings
  * @{
  */
-#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE < MHZ(4) || CLOCK_HSE > MHZ(32))
+#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CONFIG_CLOCK_HSE < MHZ(4) || CONFIG_CLOCK_HSE > MHZ(32))
 #error "HSE clock frequency must be between 4MHz and 32MHz"
 #endif
 
@@ -50,7 +50,7 @@ extern "C" {
    PLL_MUL to 16, so system clock = (HSI8 / 2) * 16 = 64MHz
 */
 #ifndef CONFIG_CLOCK_PLL_PREDIV
-#if (IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(16))) || \
+#if (IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CONFIG_CLOCK_HSE == MHZ(16))) || \
     defined(CPU_LINE_STM32F303x6) || defined(CPU_LINE_STM32F303x8) || \
     defined(CPU_LINE_STM32F303xB) || defined(CPU_LINE_STM32F303xC) || \
     defined(CPU_LINE_STM32F328x8) || defined(CPU_LINE_STM32F358xC) || \
@@ -68,7 +68,9 @@ extern "C" {
 #define CONFIG_CLOCK_PLL_MUL            (6)
 #endif
 #else /* CPU_FAM_F1 || CPU_FAM_F3 */
-#if defined(CPU_LINE_STM32F303x8)
+#if defined(CPU_LINE_STM32F303x6) || defined(CPU_LINE_STM32F303x8) || \
+    defined(CPU_LINE_STM32F303xB) || defined(CPU_LINE_STM32F303xC) || \
+    defined(CPU_LINE_STM32F328x8) || defined(CPU_LINE_STM32F358xC)
 #define CONFIG_CLOCK_PLL_MUL            (16)
 #else
 #define CONFIG_CLOCK_PLL_MUL            (9)
@@ -77,19 +79,19 @@ extern "C" {
 #endif /* CONFIG_CLOCK_PLL_MUL */
 
 #if IS_ACTIVE(CONFIG_USE_CLOCK_HSI)
-#define CLOCK_CORECLOCK                 (CLOCK_HSI)
+#define CLOCK_CORECLOCK                 (CONFIG_CLOCK_HSI)
 
 #elif IS_ACTIVE(CONFIG_USE_CLOCK_HSE)
 #if !IS_ACTIVE(CONFIG_BOARD_HAS_HSE)
 #error "The board doesn't provide an HSE oscillator"
 #endif
-#define CLOCK_CORECLOCK                 (CLOCK_HSE)
+#define CLOCK_CORECLOCK                 (CONFIG_CLOCK_HSE)
 
 #elif IS_ACTIVE(CONFIG_USE_CLOCK_PLL)
 #if IS_ACTIVE(CONFIG_BOARD_HAS_HSE)
-#define CLOCK_PLL_SRC                   (CLOCK_HSE)
-#else /* CLOCK_HSI */
-#define CLOCK_PLL_SRC                   (CLOCK_HSI)
+#define CLOCK_PLL_SRC                   (CONFIG_CLOCK_HSE)
+#else /* CONFIG_CLOCK_HSI */
+#define CLOCK_PLL_SRC                   (CONFIG_CLOCK_HSI)
 #endif
 /* PLL configuration: make sure your values are legit!
  *

@@ -28,4 +28,7 @@ config BOARD_NUCLEO_WL55JC
 
     select MODULE_PERIPH_LPUART if MODULE_STDIO_UART && HAS_PERIPH_LPUART
 
+config CLOCK_HSE
+    default 32000000
+
 source "$(RIOTBOARD)/common/nucleo64/Kconfig"

@@ -34,16 +34,16 @@ extern "C" {
 /* The following parameters configure a 216MHz system clock with HSE (8MHz,
    16MHz or 25MHz) or HSI (16MHz) as PLL input clock */
 #ifndef CONFIG_CLOCK_PLL_M
-#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(25))
+#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CONFIG_CLOCK_HSE == MHZ(25))
 #define CONFIG_CLOCK_PLL_M              (25)
 #else
 #define CONFIG_CLOCK_PLL_M              (4)
 #endif
 #endif
 #ifndef CONFIG_CLOCK_PLL_N
-#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(25))
+#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CONFIG_CLOCK_HSE == MHZ(25))
 #define CONFIG_CLOCK_PLL_N              (432)
-#elif IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(8))
+#elif IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CONFIG_CLOCK_HSE == MHZ(8))
 #define CONFIG_CLOCK_PLL_N              (216)
 #else
 #define CONFIG_CLOCK_PLL_N              (108)

@@ -33,7 +33,9 @@
 #endif
 
 /* The HSE provides a 25MHz clock */
-#define CLOCK_HSE               MHZ(25)
+#ifndef CONFIG_CLOCK_HSE
+#define CONFIG_CLOCK_HSE               MHZ(25)
+#endif
 
 #include "clk_conf.h"
 #include "cfg_i2c1_pb8_pb9.h"

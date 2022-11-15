@@ -1,0 +1,89 @@
+# Copyright (c) 2022 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+if CPU_FAM_F0 || CPU_FAM_F1 || CPU_FAM_F3 || CPU_FAM_G0 || CPU_FAM_G4 || CPU_FAM_L0 || CPU_FAM_L4 || CPU_FAM_WB || CPU_FAM_WL
+
+config CLOCK_ENABLE_MCO
+    bool "Enable MCU Clock Output (MCO) on PA8"
+
+choice
+bool "MCO source"
+depends on CLOCK_ENABLE_MCO
+default CLOCK_MCO_USE_PLLCLK
+
+config CLOCK_MCO_USE_PLLCLK
+    bool "Use PLLCLK as MCO source"
+
+config CLOCK_MCO_USE_HSE
+    bool "Use HSE as MCO source"
+
+config CLOCK_MCO_USE_HSI
+    bool "Use HSI as MCO source"
+
+config CLOCK_MCO_USE_LSE
+    bool "Use LSE as MCO source"
+    depends on CPU_FAM_G0 || CPU_FAM_G4 || CPU_FAM_L0 || CPU_FAM_L1 || CPU_FAM_L4 || CPU_FAM_WB  || CPU_FAM_WL
+
+config CLOCK_MCO_USE_LSI
+    bool "Use LSI as MCO source"
+    depends on CPU_FAM_G0 || CPU_FAM_G4 || CPU_FAM_L0 || CPU_FAM_L1 || CPU_FAM_L4 || CPU_FAM_WB || CPU_FAM_WL
+
+config CLOCK_MCO_USE_MSI
+    bool "Use MSI as MCO source"
+    depends on CPU_FAM_L0 || CPU_FAM_L1 || CPU_FAM_L4 || CPU_FAM_WB || CPU_FAM_WL
+
+config CLOCK_MCO_USE_SYSCLK
+    bool "Use SYSCLK as MCO source"
+
+endchoice
+
+choice
+bool "MCO prescaler"
+depends on !CLOCK_HAS_NO_MCO_PRE && CLOCK_ENABLE_MCO
+default CLOCK_MCO_PRE_1
+
+config CLOCK_MCO_PRE_1
+    bool "Divide MCO by 1"
+
+config CLOCK_MCO_PRE_2
+    bool "Divide MCO by 2"
+
+config CLOCK_MCO_PRE_4
+    bool "Divide MCO by 4"
+
+config CLOCK_MCO_PRE_8
+    bool "Divide MCO by 8"
+
+config CLOCK_MCO_PRE_16
+    bool "Divide MCO by 16"
+
+config CLOCK_MCO_PRE_32
+    bool "Divide MCO by 32"
+    depends on CPU_FAM_F0 || CPU_FAM_F1 || CPU_FAM_F3 || CPU_FAM_G0
+
+config CLOCK_MCO_PRE_64
+    bool "Divide MCO by 64"
+    depends on CPU_FAM_F0 || CPU_FAM_F1 || CPU_FAM_F3 || CPU_FAM_G0
+
+config CLOCK_MCO_PRE_128
+    bool "Divide MCO by 128"
+    depends on CPU_FAM_F0 || CPU_FAM_F1 || CPU_FAM_F3 || CPU_FAM_G0
+
+endchoice
+
+config CLOCK_MCO_PRE
+    int
+    default 2 if CLOCK_MCO_PRE_2
+    default 4 if CLOCK_MCO_PRE_4
+    default 8 if CLOCK_MCO_PRE_8
+    default 16 if CLOCK_MCO_PRE_16
+    default 32 if CLOCK_MCO_PRE_32
+    default 64 if CLOCK_MCO_PRE_64
+    default 128 if CLOCK_MCO_PRE_128
+    default 1
+
+endif # CPU_FAM_F0 || CPU_FAM_F1 || CPU_FAM_F3 || CPU_FAM_G0 || CPU_FAM_G4 || CPU_FAM_L0 || CPU_FAM_L4 || CPU_FAM_WB || CPU_FAM_WL

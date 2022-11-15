@@ -21,7 +21,7 @@ system clock (but only one can be used at a time):
 
 - HSE (High Speed External): HSE depends on the board configuration and its
   presence is specified by the `CONFIG_BOARD_HAS_HSE` constant at board level.
-  The `CLOCK_HSE` constant specifies the frequency of the external oscillator
+  The `CONFIG_CLOCK_HSE` constant specifies the frequency of the external oscillator
   in Hz.
   To use HSE as system clock (SYSCLK), set `CONFIG_USE_CLOCK_HSE` constant to 1;
 

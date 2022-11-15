@@ -27,15 +27,27 @@ config CPU_LINE_STM32F302XE
     bool
     select CPU_FAM_F3
 
+config CPU_LINE_STM32F303X6
+    bool
+    select CPU_FAM_F3
+    select HAVE_CLOCK_PLL_PREDIV_HARDWIRED_2
+
 config CPU_LINE_STM32F303X8
     bool
     select CPU_FAM_F3
+    select HAVE_CLOCK_PLL_PREDIV_HARDWIRED_2
+
+config CPU_LINE_STM32F303XB
+    bool
+    select CPU_FAM_F3
+    select HAVE_CLOCK_PLL_PREDIV_HARDWIRED_2
 
 config CPU_LINE_STM32F303XC
     bool
     select CPU_FAM_F3
     select HAS_CORTEXM_MPU
     select CLOCK_HAS_NO_MCO_PRE
+    select HAVE_CLOCK_PLL_PREDIV_HARDWIRED_2
 
 config CPU_LINE_STM32F303XE
     bool
@@ -49,6 +61,7 @@ config CPU_LINE_STM32F318XX
 config CPU_LINE_STM32F328XX
     bool
     select CPU_FAM_F3
+    select HAVE_CLOCK_PLL_PREDIV_HARDWIRED_2
 
 config CPU_LINE_STM32F334X8
     bool

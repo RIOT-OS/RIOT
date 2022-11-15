@@ -30,7 +30,9 @@
 #endif
 
 /* The HSE provides a 25MHz clock */
-#define CLOCK_HSE               MHZ(25)
+#ifndef CONFIG_CLOCK_HSE
+#define CONFIG_CLOCK_HSE               MHZ(25)
+#endif
 
 #include "periph_cpu.h"
 #include "clk_conf.h"

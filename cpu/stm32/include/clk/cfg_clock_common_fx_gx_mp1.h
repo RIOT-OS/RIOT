@@ -55,22 +55,24 @@ extern "C" {
 #error "Cannot use HSI as clock source with other clock configurations"
 #endif
 
-#ifndef CLOCK_HSE
+#ifndef CONFIG_CLOCK_HSE
 #if defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32G4) || \
     defined(CPU_FAM_STM32MP1)
-#define CLOCK_HSE                       MHZ(24)
+#define CONFIG_CLOCK_HSE                       MHZ(24)
 #else
-#define CLOCK_HSE                       MHZ(8)
+#define CONFIG_CLOCK_HSE                       MHZ(8)
 #endif
 #endif
 
+#ifndef CONFIG_CLOCK_HSI
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
     defined(CPU_FAM_STM32F3)
-#define CLOCK_HSI                       MHZ(8)
+#define CONFIG_CLOCK_HSI                       MHZ(8)
 #elif defined(CPU_FAM_STM32MP1)
-#define CLOCK_HSI                       MHZ(64)
+#define CONFIG_CLOCK_HSI                       MHZ(64)
 #else
-#define CLOCK_HSI                       MHZ(16)
+#define CONFIG_CLOCK_HSI                       MHZ(16)
+#endif
 #endif
 /** @} */
 

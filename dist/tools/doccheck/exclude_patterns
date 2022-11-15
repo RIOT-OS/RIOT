@@ -795,7 +795,7 @@ boards/common/iotlab/include/openwsn_defs\.h:[0-9]+: warning: Member PORT_maxRxD
 boards/common/iotlab/include/openwsn_defs\.h:[0-9]+: warning: Member PORT_maxTxAckPrepare \(macro definition\) of file openwsn_defs\.h is not documented\.
 boards/common/iotlab/include/openwsn_defs\.h:[0-9]+: warning: Member PORT_maxTxDataPrepare \(macro definition\) of file openwsn_defs\.h is not documented\.
 boards/common/iotlab/include/periph_conf_common\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf_common\.h is not documented\.
-boards/common/iotlab/include/periph_conf_common\.h:[0-9]+: warning: Member CLOCK_HSE \(macro definition\) of file periph_conf_common\.h is not documented\.
+boards/common/iotlab/include/periph_conf_common\.h:[0-9]+: warning: Member CONFIG_CLOCK_HSE \(macro definition\) of file periph_conf_common\.h is not documented\.
 boards/common/iotlab/include/periph_conf_common\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HSE \(macro definition\) of file periph_conf_common\.h is not documented\.
 boards/common/iotlab/include/periph_conf_common\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_LSE \(macro definition\) of file periph_conf_common\.h is not documented\.
 boards/common/iotlab/include/periph_conf_common\.h:[0-9]+: warning: Member DMA_0_ISR \(macro definition\) of file periph_conf_common\.h is not documented\.
@@ -1263,7 +1263,7 @@ boards/common/weact\-f4x1cx/include/board\.h:[0-9]+: warning: Member XTIMER_BACK
 boards/common/weact\-f4x1cx/include/board\.h:[0-9]+: warning: Member XTIMER_OVERHEAD \(macro definition\) of file board\.h is not documented\.
 boards/common/weact\-f4x1cx/include/board\.h:[0-9]+: warning: Member mtd0 \(variable\) of file board\.h is not documented\.
 boards/common/weact\-f4x1cx/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
-boards/common/weact\-f4x1cx/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
+boards/common/weact\-f4x1cx/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/common/weact\-f4x1cx/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/common/weact\-f4x1cx/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_LSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/common/weact\-f4x1cx/include/periph_conf\.h:[0-9]+: warning: Member PWM_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -1389,7 +1389,7 @@ boards/esp32\-wrover\-kit/include/board\.h:[0-9]+: warning: Member LCD_CS \(macr
 boards/esp32\-wrover\-kit/include/board\.h:[0-9]+: warning: Member LCD_DC \(macro definition\) of file board\.h is not documented\.
 boards/esp32\-wrover\-kit/include/board\.h:[0-9]+: warning: Member LCD_RST \(macro definition\) of file board\.h is not documented\.
 boards/f4vi1/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
-boards/f4vi1/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
+boards/f4vi1/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/f4vi1/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/f4vi1/include/periph_conf\.h:[0-9]+: warning: Member TIMER_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/f4vi1/include/periph_conf\.h:[0-9]+: warning: Member TIMER_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
@@ -1797,7 +1797,7 @@ boards/lobaro\-lorabox/include/periph_conf\.h:[0-9]+: warning: Member uart_confi
 boards/lora\-e5\-dev/include/board\.h:[0-9]+: warning: Member FE_CTRL1 \(macro definition\) of file board\.h is not documented\.
 boards/lora\-e5\-dev/include/board\.h:[0-9]+: warning: Member FE_CTRL2 \(macro definition\) of file board\.h is not documented\.
 boards/lora\-e5\-dev/include/board\.h:[0-9]+: warning: Member SX126X_PARAM_SPI \(macro definition\) of file board\.h is not documented\.
-boards/lora\-e5\-dev/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
+boards/lora\-e5\-dev/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/lora\-e5\-dev/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/lora\-e5\-dev/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_LSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/lora\-e5\-dev/include/periph_conf\.h:[0-9]+: warning: Member I2C_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
@@ -2068,7 +2068,7 @@ boards/msba2/include/periph_conf\.h:[0-9]+: warning: Member i2c_config\[\] \(var
 boards/msba2/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/msba2/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/msbiot/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
-boards/msbiot/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
+boards/msbiot/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/msbiot/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/msbiot/include/periph_conf\.h:[0-9]+: warning: Member DAC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/msbiot/include/periph_conf\.h:[0-9]+: warning: Member DMA_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
@@ -2887,7 +2887,7 @@ boards/nucleo\-wl55jc/include/board\.h:[0-9]+: warning: Member FE_CTRL1 \(macro 
 boards/nucleo\-wl55jc/include/board\.h:[0-9]+: warning: Member FE_CTRL2 \(macro definition\) of file board\.h is not documented\.
 boards/nucleo\-wl55jc/include/board\.h:[0-9]+: warning: Member FE_CTRL3 \(macro definition\) of file board\.h is not documented\.
 boards/nucleo\-wl55jc/include/board\.h:[0-9]+: warning: Member SX126X_PARAM_SPI \(macro definition\) of file board\.h is not documented\.
-boards/nucleo\-wl55jc/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
+boards/nucleo\-wl55jc/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/nucleo\-wl55jc/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/nucleo\-wl55jc/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_LSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/nucleo\-wl55jc/include/periph_conf\.h:[0-9]+: warning: Member I2C_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
@@ -3125,7 +3125,7 @@ boards/p\-nucleo\-wb55/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO
 boards/p\-nucleo\-wb55/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_A5 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/p\-nucleo\-wb55/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_EXTAHB \(macro definition\) of file periph_conf\.h is not documented\.
 boards/p\-nucleo\-wb55/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_EXTAHB_DIV \(macro definition\) of file periph_conf\.h is not documented\.
-boards/p\-nucleo\-wb55/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
+boards/p\-nucleo\-wb55/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/p\-nucleo\-wb55/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/p\-nucleo\-wb55/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_LSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/p\-nucleo\-wb55/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -3253,7 +3253,7 @@ boards/pinetime/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro
 boards/pinetime/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/pinetime/include/periph_conf\.h:[0-9]+: warning: Member i2c_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/pinetime/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/pyboard/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
+boards/pyboard/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/pyboard/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/pyboard/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_LSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/pyboard/include/periph_conf\.h:[0-9]+: warning: Member DMA_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
@@ -4513,7 +4513,7 @@ boards/stm32f4discovery/include/periph_conf\.h:[0-9]+: warning: Member pwm_confi
 boards/stm32f4discovery/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/stm32f4discovery/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/stm32f4discovery/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/stm32f723e\-disco/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
+boards/stm32f723e\-disco/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32f723e\-disco/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32f723e\-disco/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_LSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32f723e\-disco/include/periph_conf\.h:[0-9]+: warning: Member I2C_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
@@ -4531,7 +4531,7 @@ boards/stm32f723e\-disco/include/periph_conf\.h:[0-9]+: warning: Member i2c_conf
 boards/stm32f723e\-disco/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/stm32f723e\-disco/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/stm32f723e\-disco/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/stm32f769i\-disco/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
+boards/stm32f769i\-disco/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32f769i\-disco/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32f769i\-disco/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_LSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32f769i\-disco/include/periph_conf\.h:[0-9]+: warning: Member UART_0_DMA_ISR \(macro definition\) of file periph_conf\.h is not documented\.
@@ -4678,7 +4678,7 @@ boards/ublox\-c030\-u201/include/board\.h:[0-9]+: warning: Member SI70XX_SAUL_IN
 boards/ublox\-c030\-u201/include/board\.h:[0-9]+: warning: Member UB_M_RST_PIN \(macro definition\) of group boards_ublox\-c030\-u201 is not documented\.
 boards/ublox\-c030\-u201/include/board\.h:[0-9]+: warning: Member UB_PWRON_PIN \(macro definition\) of group boards_ublox\-c030\-u201 is not documented\.
 boards/ublox\-c030\-u201/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
-boards/ublox\-c030\-u201/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
+boards/ublox\-c030\-u201/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/ublox\-c030\-u201/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/ublox\-c030\-u201/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_LSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/ublox\-c030\-u201/include/periph_conf\.h:[0-9]+: warning: Member DMA_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
@@ -6343,11 +6343,11 @@ cpu/stm32/include/candev_stm32\.h:[0-9]+: warning: Member ISR_CAN3_RX0 \(macro d
 cpu/stm32/include/candev_stm32\.h:[0-9]+: warning: Member ISR_CAN3_RX1 \(macro definition\) of file candev_stm32\.h is not documented\.
 cpu/stm32/include/candev_stm32\.h:[0-9]+: warning: Member ISR_CAN3_SCE \(macro definition\) of file candev_stm32\.h is not documented\.
 cpu/stm32/include/candev_stm32\.h:[0-9]+: warning: Member ISR_CAN3_TX \(macro definition\) of file candev_stm32\.h is not documented\.
-cpu/stm32/include/clk/cfg_clock_common_fx_gx_mp1\.h:[0-9]+: warning: Member CLOCK_HSE \(macro definition\) of file cfg_clock_common_fx_gx_mp1\.h is not documented\.
-cpu/stm32/include/clk/cfg_clock_common_fx_gx_mp1\.h:[0-9]+: warning: Member CLOCK_HSI \(macro definition\) of file cfg_clock_common_fx_gx_mp1\.h is not documented\.
+cpu/stm32/include/clk/cfg_clock_common_fx_gx_mp1\.h:[0-9]+: warning: Member CONFIG_CLOCK_HSE \(macro definition\) of file cfg_clock_common_fx_gx_mp1\.h is not documented\.
+cpu/stm32/include/clk/cfg_clock_common_fx_gx_mp1\.h:[0-9]+: warning: Member CONFIG_CLOCK_HSI \(macro definition\) of file cfg_clock_common_fx_gx_mp1\.h is not documented\.
 cpu/stm32/include/clk/cfg_clock_common_fx_gx_mp1\.h:[0-9]+: warning: Member CONFIG_USE_CLOCK_PLL \(macro definition\) of file cfg_clock_common_fx_gx_mp1\.h is not documented\.
-cpu/stm32/include/clk/cfg_clock_common_lx_wx\.h:[0-9]+: warning: Member CLOCK_HSE \(macro definition\) of file cfg_clock_common_lx_wx\.h is not documented\.
-cpu/stm32/include/clk/cfg_clock_common_lx_wx\.h:[0-9]+: warning: Member CLOCK_HSI \(macro definition\) of file cfg_clock_common_lx_wx\.h is not documented\.
+cpu/stm32/include/clk/cfg_clock_common_lx_wx\.h:[0-9]+: warning: Member CONFIG_CLOCK_HSE \(macro definition\) of file cfg_clock_common_lx_wx\.h is not documented\.
+cpu/stm32/include/clk/cfg_clock_common_lx_wx\.h:[0-9]+: warning: Member CONFIG_CLOCK_HSI \(macro definition\) of file cfg_clock_common_lx_wx\.h is not documented\.
 cpu/stm32/include/clk/cfg_clock_common_lx_wx\.h:[0-9]+: warning: Member CONFIG_CLOCK_MSI \(macro definition\) of file cfg_clock_common_lx_wx\.h is not documented\.
 cpu/stm32/include/clk/cfg_clock_common_lx_wx\.h:[0-9]+: warning: Member CONFIG_USE_CLOCK_PLL \(macro definition\) of file cfg_clock_common_lx_wx\.h is not documented\.
 cpu/stm32/include/clk/f0f1f3/cfg_clock_default\.h:[0-9]+: warning: Member CLOCK_AHB \(macro definition\) of file cfg_clock_default\.h is not documented\.
@@ -12530,7 +12530,7 @@ boards/nucleo\-g431rb/include/periph_conf\.h:[0-9]+: warning: Member PWM_NUMOF \
 boards/nucleo\-g431rb/include/periph_conf\.h:[0-9]+: warning: Member pwm_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_LSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HSE \(macro definition\) of file periph_conf\.h is not documented\.
-boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
+boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member DMA_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member DMA_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member DMA_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -12551,7 +12551,7 @@ boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMO
 boards/stm32f469i\-disco/include/periph_conf\.h:[0-9]+: warning: Member adc_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/stm32f746g\-disco/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_LSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32f746g\-disco/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HSE \(macro definition\) of file periph_conf\.h is not documented\.
-boards/stm32f746g\-disco/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
+boards/stm32f746g\-disco/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32f746g\-disco/include/periph_conf\.h:[0-9]+: warning: Member DMA_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32f746g\-disco/include/periph_conf\.h:[0-9]+: warning: Member DMA_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32f746g\-disco/include/periph_conf\.h:[0-9]+: warning: Member DMA_2_ISR \(macro definition\) of file periph_conf\.h is not documented\.
@@ -12617,8 +12617,8 @@ cpu/stm32/include/clk/u5/cfg_clock_default\.h:[0-9]+: warning: Member CONFIG_CLO
 cpu/stm32/include/clk/u5/cfg_clock_default\.h:[0-9]+: warning: Member CLOCK_APB1 \(macro definition\) of file cfg_clock_default\.h is not documented\.
 cpu/stm32/include/clk/u5/cfg_clock_default\.h:[0-9]+: warning: Member CONFIG_CLOCK_APB2_DIV \(macro definition\) of file cfg_clock_default\.h is not documented\.
 cpu/stm32/include/clk/u5/cfg_clock_default\.h:[0-9]+: warning: Member CLOCK_APB2 \(macro definition\) of file cfg_clock_default\.h is not documented\.
-cpu/stm32/include/clk/cfg_clock_common_lx_u5_wx\.h:[0-9]+: warning: Member CLOCK_HSE \(macro definition\) of file cfg_clock_common_lx_u5_wx\.h is not documented\.
-cpu/stm32/include/clk/cfg_clock_common_lx_u5_wx\.h:[0-9]+: warning: Member CLOCK_HSI \(macro definition\) of file cfg_clock_common_lx_u5_wx\.h is not documented\.
+cpu/stm32/include/clk/cfg_clock_common_lx_u5_wx\.h:[0-9]+: warning: Member CONFIG_CLOCK_HSE \(macro definition\) of file cfg_clock_common_lx_u5_wx\.h is not documented\.
+cpu/stm32/include/clk/cfg_clock_common_lx_u5_wx\.h:[0-9]+: warning: Member CONFIG_CLOCK_HSI \(macro definition\) of file cfg_clock_common_lx_u5_wx\.h is not documented\.
 cpu/stm32/include/clk/cfg_clock_common_lx_u5_wx\.h:[0-9]+: warning: Member CONFIG_CLOCK_MSI \(macro definition\) of file cfg_clock_common_lx_u5_wx\.h is not documented\.
 cpu/stm32/include/clk/cfg_clock_common_lx_u5_wx\.h:[0-9]+: warning: Member CONFIG_USE_CLOCK_PLL \(macro definition\) of file cfg_clock_common_lx_u5_wx\.h is not documented\.
 drivers/ft5x06/include/ft5x06_params\.h:[0-9]+: warning: Member FT5X06_PARAM_I2C_DEV \(macro definition\) of file ft5x06_params\.h is not documented\.

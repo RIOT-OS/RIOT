@@ -31,6 +31,10 @@ config BOARD_STM32F7508_DK
     select BOARD_HAS_LSE
 
     select HAVE_SAUL_GPIO
+    select HAVE_STM32_ETH
     select HAVE_FT5X06
+
+config CLOCK_HSE
+    default 25000000
 
 source "$(RIOTBOARD)/common/stm32/Kconfig"

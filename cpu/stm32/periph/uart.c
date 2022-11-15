@@ -306,10 +306,10 @@ static inline void uart_init_usart(uart_t uart, uint32_t baudrate)
 
     switch (uart_config[uart].clk_src) {
         case RCC_UART35CKSELR_UART35SRC_2:  /* HSI */
-            clk = CLOCK_HSI;
+            clk = CONFIG_CLOCK_HSI;
             break;
         case RCC_UART35CKSELR_UART35SRC_4:  /* HSE */
-            clk = CLOCK_HSE;
+            clk = CONFIG_CLOCK_HSE;
             break;
         default: /* return */
             return;

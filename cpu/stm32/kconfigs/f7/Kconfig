@@ -22,6 +22,7 @@ config CPU_FAM_F7
     select HAS_PERIPH_VBAT
     select HAS_PERIPH_WDT
     select HAS_BOOTLOADER_STM32
+    select HAVE_CLOCK_ALT_48MHZ
 
 config CPU_FAM
     default "f7" if CPU_FAM_F7
