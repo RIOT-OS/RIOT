@@ -22,11 +22,15 @@
 
 #include <stdio.h>
 
+#include "architecture.h"
 #include "thread.h"
 #include "pthread.h"
 #include "mutex.h"
 
-static char dummy_stack[MAXTHREADS][THREAD_STACKSIZE_IDLE];
+/* note: stack statistics are printed for every thread in tests */
+#define STACKSIZE (THREAD_STACKSIZE_TINY + THREAD_EXTRA_STACKSIZE_PRINTF)
+
+static char WORD_ALIGNED dummy_stack[MAXTHREADS][STACKSIZE];
 static pthread_t pthread_ids[MAXTHREADS];
 static mutex_t testing_mutex;
 
@@ -52,7 +56,7 @@ int main(void)
     int pthread_cnt = 0;
     for (uint8_t i = 0; i < MAXTHREADS; i++) {
         pthread_attr_setstackaddr(&th_attr, &(dummy_stack[i]));
-        pthread_attr_setstacksize(&th_attr, THREAD_STACKSIZE_IDLE);
+        pthread_attr_setstacksize(&th_attr, sizeof(dummy_stack[0]));
         if (pthread_create(&(pthread_ids[i]), &th_attr, thread_func, NULL)) {
             break;
         }
