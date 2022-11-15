@@ -206,8 +206,8 @@ ssize_t sock_udp_recv_aux(sock_udp_t *sock, void *data, size_t max_len,
     return (nobufs) ? -ENOBUFS : ((res < 0) ? res : ret);
 }
 
-static bool _remote_accept(const sock_udp_t *sock, const udp_hdr_t *hdr,
-                             const sock_ip_ep_t *remote)
+static bool _accept_remote(const sock_udp_t *sock, const udp_hdr_t *hdr,
+                           const sock_ip_ep_t *remote)
 {
     if ((sock->flags & SOCK_FLAGS_CONNECT_REMOTE) == 0) {
         /* socket is not bound to a remote */
@@ -286,7 +286,7 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
         memcpy(remote, &tmp, sizeof(tmp));
         remote->port = byteorder_ntohs(hdr->src_port);
     }
-    if (!_remote_accept(sock, hdr, &tmp)) {
+    if (!_accept_remote(sock, hdr, &tmp)) {
         gnrc_pktbuf_release(pkt);
         return -EPROTO;
     }
