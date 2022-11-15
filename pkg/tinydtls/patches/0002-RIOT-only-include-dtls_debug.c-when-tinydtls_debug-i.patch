@@ -1,0 +1,126 @@
+From 6f29262638357f5885554b32997e04745581426e Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benjamin.valentin@ml-pa.com>
+Date: Tue, 15 Nov 2022 01:51:56 +0100
+Subject: [PATCH 2/2] RIOT: only include dtls_debug.c when tinydtls_debug is
+ enabled
+
+This saves ~20k ROM.
+
+Signed-off-by: Benjamin Valentin <benjamin.valentin@ml-pa.com>
+---
+ Makefile.riot |  6 ++++--
+ dtls_debug.c  | 31 -------------------------------
+ dtls_debug.h  | 34 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 38 insertions(+), 33 deletions(-)
+
+diff --git a/Makefile.riot b/Makefile.riot
+index 6d5593b..5071010 100644
+--- a/Makefile.riot
++++ b/Makefile.riot
+@@ -1,7 +1,9 @@
+ MODULE = tinydtls
+ 
+-CFLAGS += -DDTLSv12 -DWITH_SHA256
++SRC := ccm.c  crypto.c  dtls.c  dtls_time.c  hmac.c  netq.c  peer.c  session.c dtls_prng.c
+ 
+-SRC := ccm.c  crypto.c  dtls.c  dtls_debug.c  dtls_time.c  hmac.c  netq.c  peer.c  session.c dtls_prng.c
++ifneq (,$(filter tinydtls_debug, $(USEMODULE)))
++  SRC += dtls_debug.c
++endif
+ 
+ include $(RIOTBASE)/Makefile.base
+diff --git a/dtls_debug.c b/dtls_debug.c
+index b33b453..3166b2a 100644
+--- a/dtls_debug.c
++++ b/dtls_debug.c
+@@ -496,35 +496,4 @@ dtls_dsrv_hexdump_log(log_t level, const char *name, const unsigned char *buf, s
+   PRINTF("\n");
+ }
+ #endif /* WITH_CONTIKI */
+-
+-#else /* NDEBUG */
+-
+-void
+-hexdump(const unsigned char *packet, int length) {
+-  (void)packet;
+-  (void)length;
+-}
+-
+-void
+-dump(unsigned char *buf, size_t len) {
+-  (void)buf;
+-  (void)len;
+-}
+-
+-void
+-dtls_dsrv_hexdump_log(log_t level, const char *name, const unsigned char *buf, size_t length, int extend) {
+-  (void)level;
+-  (void)name;
+-  (void)buf;
+-  (void)length;
+-  (void)extend;
+-}
+-
+-void
+-dtls_dsrv_log_addr(log_t level, const char *name, const session_t *addr) {
+-  (void)level;
+-  (void)name;
+-  (void)addr;
+-}
+-
+ #endif /* NDEBUG */
+diff --git a/dtls_debug.h b/dtls_debug.h
+index 8769774..e80ebac 100644
+--- a/dtls_debug.h
++++ b/dtls_debug.h
+@@ -113,6 +113,7 @@ void dsrv_log(log_t level, const char *format, ...);
+ #endif
+ #endif
+ 
++#ifndef NDEBUG
+ /** dumps packets in usual hexdump format */
+ void hexdump(const unsigned char *packet, int length);
+ 
+@@ -122,6 +123,39 @@ void dump(unsigned char *buf, size_t len);
+ void dtls_dsrv_hexdump_log(log_t level, const char *name, const unsigned char *buf, size_t length, int extend);
+ 
+ void dtls_dsrv_log_addr(log_t level, const char *name, const session_t *addr);
++#else
++static inline
++void hexdump(const unsigned char *packet, int length)
++{
++  (void)packet;
++  (void)length;
++}
++
++static inline
++void dump(unsigned char *buf, size_t len)
++{
++  (void)buf;
++  (void)len;
++}
++
++static inline
++void dtls_dsrv_hexdump_log(log_t level, const char *name, const unsigned char *buf, size_t length, int extend)
++{
++  (void)level;
++  (void)name;
++  (void)buf;
++  (void)length;
++  (void)extend;
++}
++
++static inline
++void dtls_dsrv_log_addr(log_t level, const char *name, const session_t *addr)
++{
++  (void)level;
++  (void)name;
++  (void)addr;
++}
++#endif /* NDEBUG */
+ 
+ /* A set of convenience macros for common log levels. */
+ #ifdef WITH_ZEPHYR
+-- 
+2.34.1
+

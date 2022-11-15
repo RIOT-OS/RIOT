@@ -1,0 +1,67 @@
+From 2335c1410102b8f35f45018b15d91f3d8bbfe701 Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benjamin.valentin@ml-pa.com>
+Date: Tue, 15 Nov 2022 01:50:59 +0100
+Subject: [PATCH 1/2] RIOT: make use of log.h for dsrv_log()
+
+Signed-off-by: Benjamin Valentin <benjamin.valentin@ml-pa.com>
+---
+ dtls_debug.c | 2 ++
+ dtls_debug.h | 8 ++++++++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/dtls_debug.c b/dtls_debug.c
+index 70c88ff..b33b453 100644
+--- a/dtls_debug.c
++++ b/dtls_debug.c
+@@ -278,6 +278,7 @@ static dtls_mutex_t static_mutex = DTLS_MUTEX_INITIALIZER;
+ static char message[DTLS_DEBUG_BUF_SIZE];
+ #endif /* DTLS_CONSTRAINED_STACK */
+ 
++#ifndef RIOT_VERSION
+ /*
+  * Caution. If DTLS_CONSTRAINED_STACK is set, then the same mutex will get
+  * locked in dtls_log() and/or dtls_dsrv_hexdump_log() so these functions
+@@ -310,6 +311,7 @@ dsrv_log(log_t level, const char *format, ...) {
+   dtls_mutex_unlock(&static_mutex);
+ #endif /* DTLS_CONSTRAINED_STACK */
+ }
++#endif /* !RIOT_VERSION */
+ 
+ #elif defined (HAVE_VPRINTF) /* WITH_CONTIKI */
+ void
+diff --git a/dtls_debug.h b/dtls_debug.h
+index cf8e193..8769774 100644
+--- a/dtls_debug.h
++++ b/dtls_debug.h
+@@ -28,6 +28,10 @@
+ #include <logging/log.h>
+ #endif /* WITH_ZEPHYR */
+ 
++#ifdef RIOT_VERSION
++#include "log.h"
++#endif
++
+ #ifdef WITH_CONTIKI
+ # ifndef DEBUG
+ #  define DEBUG DEBUG_PRINT
+@@ -95,6 +99,9 @@ void dtls_set_log_handler(dtls_log_handler_t app_handler);
+  * Writes the given text to \c stdout. The text is output only when \p
+  * level is below or equal to the log level that set by
+  * set_log_level(). */
++#ifdef RIOT_VERSION
++#define dsrv_log(level, ...) LOG((unsigned)level, __VA_ARGS__)
++#else
+ #ifdef HAVE_VPRINTF
+ #if (defined(__GNUC__) && !defined(__MINGW32__))
+ void dsrv_log(log_t level, const char *format, ...) __attribute__ ((format(printf, 2, 3)));
+@@ -104,6 +111,7 @@ void dsrv_log(log_t level, const char *format, ...);
+ #else
+ #define dsrv_log(level, format, ...) PRINTF(format, ##__VA_ARGS__)
+ #endif
++#endif
+ 
+ /** dumps packets in usual hexdump format */
+ void hexdump(const unsigned char *packet, int length);
+-- 
+2.34.1
+
