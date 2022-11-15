@@ -144,6 +144,18 @@ void ztimer_set_timeout_flag(ztimer_clock_t *clock, ztimer_t *t,
 }
 #endif
 
+void ztimer_mutex_unlock(ztimer_clock_t *clock, ztimer_t *timer, uint32_t offset,
+                         mutex_t *mutex)
+{
+    unsigned state = irq_disable();
+
+    timer->callback = _callback_unlock_mutex;
+    timer->arg = (void *)mutex;
+
+    irq_restore(state);
+    ztimer_set(clock, timer, offset);
+}
+
 static void _callback_wakeup(void *arg)
 {
     thread_wakeup((kernel_pid_t)((intptr_t)arg));
