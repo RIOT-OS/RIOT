@@ -419,3 +419,31 @@ static void _ztimer_print(const ztimer_clock_t *clock)
     } while ((entry = entry->next));
     puts("");
 }
+
+uint32_t ztimer_until(ztimer_clock_t *clock, ztimer_t *timer)
+{
+    unsigned state = irq_disable();
+
+    if (!_is_set(clock, timer)) {
+        irq_restore(state);
+        return 0;
+    }
+    uint32_t sum = clock->list.offset;
+    ztimer_base_t *i = clock->list.next;
+    ztimer_base_t *timer_base = &timer->base;
+
+    while (i && i != timer_base) {
+        sum += i->offset;
+        i = i->next;
+    }
+    if (i == timer_base) {
+        sum += i->offset;
+        irq_restore(state);
+        uint32_t elapsed = (uint32_t)ztimer_now(clock) - clock->list.offset;
+        return (sum > elapsed) ? (sum - elapsed) : 0;
+    }
+    else {
+        irq_restore(state);
+        return 0;
+    }
+}

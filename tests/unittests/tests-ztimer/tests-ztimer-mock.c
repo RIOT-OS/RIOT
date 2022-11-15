@@ -284,6 +284,54 @@ static void test_ztimer_mock_is_set(void)
     TEST_ASSERT(!ztimer_is_set(z, &alarm2));
 }
 
+/**
+ * @brief   Testing ztimer_until()
+ */
+
+static void do_nothing(void *arg){
+    (void) arg;
+}
+
+static void test_ztimer_mock_until(void)
+{
+    ztimer_mock_t zmock;
+    ztimer_clock_t *z = &zmock.super;
+
+    /* Basic sanity test of the mock implementation */
+    ztimer_mock_init(&zmock, 32);
+
+    ztimer_t zt = { .callback = do_nothing, .arg = &zt, };
+
+    TEST_ASSERT_EQUAL_INT(0, ztimer_until( z, &zt));
+
+    ztimer_set(z, &zt, 1000);
+
+    TEST_ASSERT_EQUAL_INT(1000, ztimer_until( z, &zt));
+
+    ztimer_mock_advance(&zmock, 100);
+
+    TEST_ASSERT_EQUAL_INT(900, ztimer_until( z, &zt));
+
+    ztimer_mock_advance(&zmock, 200);
+
+    TEST_ASSERT_EQUAL_INT(700, ztimer_until( z, &zt));
+
+    ztimer_mock_advance(&zmock, 699);
+
+    TEST_ASSERT_EQUAL_INT(1, ztimer_until( z, &zt));
+    TEST_ASSERT(ztimer_is_set( z, &zt));
+
+    ztimer_mock_advance(&zmock, 1);
+
+    TEST_ASSERT_EQUAL_INT(0, ztimer_until( z, &zt));
+    TEST_ASSERT(!ztimer_is_set( z, &zt));
+
+    ztimer_mock_advance(&zmock, 700);
+
+    TEST_ASSERT_EQUAL_INT(0, ztimer_until( z, &zt));
+    TEST_ASSERT(!ztimer_is_set( z, &zt));
+}
+
 Test *tests_ztimer_mock_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -294,6 +342,7 @@ Test *tests_ztimer_mock_tests(void)
         new_TestFixture(test_ztimer_mock_set32),
         new_TestFixture(test_ztimer_mock_set16),
         new_TestFixture(test_ztimer_mock_is_set),
+        new_TestFixture(test_ztimer_mock_until),
     };
 
     EMB_UNIT_TESTCALLER(ztimer_tests, NULL, NULL, fixtures);

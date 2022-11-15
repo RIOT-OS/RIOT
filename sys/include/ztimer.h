@@ -614,6 +614,24 @@ static inline ztimer_now_t ztimer_now(ztimer_clock_t *clock)
 }
 
 /**
+ * @brief   Get the time until a timer will trigger
+ *
+ *          O(n): iterate over all timers active on the clock until timer is reached.
+ *          n: being the timers active on the clock that are earlier to trigger
+ *             than the timer this is measuring to
+ *
+ * @pre  The timer should be set on clock, see return 0.
+ *
+ * @param[in]   clock          ztimer clock to operate on
+ * @param[in]   timer          ztimer to measure
+ *
+ * @return  Current time until the @p timer will be triggered in clock units
+ * @return  0 if the timer is due to trigger now, or has already triggered or
+ *            is not set (removed / never set / triggered).
+ */
+uint32_t ztimer_until(ztimer_clock_t *clock, ztimer_t *timer);
+
+/**
  * @brief Suspend the calling thread until the time (@p last_wakeup + @p period)
  *
  * This function can be used to create periodic wakeups.

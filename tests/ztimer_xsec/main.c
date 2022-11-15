@@ -52,6 +52,9 @@ void release(void *arg)
     mutex_unlock(&e->mut);
 }
 
+#define _TOSTRING(str) #str
+#define TOSTRING(str) _TOSTRING(str)
+
 int main(void)
 {
     puts("starting ztimers");
@@ -61,6 +64,10 @@ int main(void)
     ztimer_set(ZTIMER_USEC, &usec_tim, 100 * US_PER_MS);
 
     printf("time %s:\t%" PRIu32 "\n", "Wait", (uint32_t)ztimer_now(ZTIMER_USEC));
+
+    printf("until %s:\t%" PRIu32 "\n", TOSTRING(usec_tim), ztimer_until(ZTIMER_USEC, &usec_tim ));
+    printf("until %s:\t%" PRIu32 "\n", TOSTRING(msec_tim), ztimer_until(ZTIMER_MSEC, &msec_tim ));
+    printf("until %s:\t%" PRIu32 "\n", TOSTRING(sec_tim), ztimer_until(ZTIMER_SEC, &sec_tim ));
 
     puts("waiting for locks");
     /* wait for mutexes */
