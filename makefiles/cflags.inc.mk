@@ -95,6 +95,9 @@ OPTIONAL_CFLAGS += -Wformat=2
 OPTIONAL_CFLAGS += -Wformat-overflow
 OPTIONAL_CFLAGS += -Wformat-truncation
 
+# Don't include absolute path in __FILE__ macro
+OPTIONAL_CFLAGS += -fmacro-prefix-map=$(RIOTBASE)/=
+
 # Warn about casts that increase alignment requirements
 OPTIONAL_CFLAGS += -Wcast-align
 
