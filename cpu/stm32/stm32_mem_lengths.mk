@@ -159,11 +159,13 @@ ifeq ($(STM32_TYPE), F)
       RAM_LEN = 32K
     else ifneq (, $(filter $(STM32_MODEL), 411 446))
       RAM_LEN = 128K
-    else ifneq (, $(filter $(STM32_MODEL), 412 427 429 437 439))
+    else ifneq (, $(filter $(STM32_MODEL), 412))
       RAM_LEN = 256K
     else ifneq (, $(filter $(STM32_MODEL), 413 423))
       RAM_LEN = 320K
     else ifneq (, $(filter $(STM32_MODEL), 415 417))
+      RAM_LEN = 192K
+    else ifneq (, $(filter $(STM32_MODEL), 427 429 437 439))
       RAM_LEN = 192K
     else ifneq (, $(filter $(STM32_MODEL), 469 479))
       RAM_LEN = 384K
