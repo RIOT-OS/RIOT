@@ -78,6 +78,11 @@
 #error Not supported CPU family
 #endif
 
+/* add unused backup RAM as extra heap */
+#if !defined(NUM_HEAPS) && CPU_HAS_BACKUP_RAM
+#define NUM_HEAPS   2
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
