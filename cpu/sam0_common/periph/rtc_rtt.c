@@ -612,17 +612,17 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
         (time->tm_year > (reference_year + 63))) {
         return -2;
     }
-    else {
-        RTC->MODE2.Mode2Alarm[0].ALARM.reg = RTC_MODE2_ALARM_YEAR(time->tm_year - reference_year)
-                                           | RTC_MODE2_ALARM_MONTH(time->tm_mon + 1)
-                                           | RTC_MODE2_ALARM_DAY(time->tm_mday)
-                                           | RTC_MODE2_ALARM_HOUR(time->tm_hour)
-                                           | RTC_MODE2_ALARM_MINUTE(time->tm_min)
-                                           | RTC_MODE2_ALARM_SECOND(time->tm_sec);
-        RTC->MODE2.Mode2Alarm[0].MASK.reg = RTC_MODE2_MASK_SEL(6);
-    }
 
+    /* make sure that preceding changes have been applied */
     _wait_syncbusy();
+
+    RTC->MODE2.Mode2Alarm[0].ALARM.reg = RTC_MODE2_ALARM_YEAR(time->tm_year - reference_year)
+                                       | RTC_MODE2_ALARM_MONTH(time->tm_mon + 1)
+                                       | RTC_MODE2_ALARM_DAY(time->tm_mday)
+                                       | RTC_MODE2_ALARM_HOUR(time->tm_hour)
+                                       | RTC_MODE2_ALARM_MINUTE(time->tm_min)
+                                       | RTC_MODE2_ALARM_SECOND(time->tm_sec);
+    RTC->MODE2.Mode2Alarm[0].MASK.reg = RTC_MODE2_MASK_SEL(6);
 
     /* Enable IRQ */
     alarm_cb.cb  = cb;
@@ -738,9 +738,11 @@ void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
     alarm_cb.cb  = cb;
     alarm_cb.arg = arg;
 
+    /* make sure that preceding changes have been applied */
+    _wait_syncbusy();
+
     /* set COMP register */
     RTC->MODE0.COMP[0].reg = alarm;
-    _wait_syncbusy();
 
     /* enable compare interrupt and clear flag */
     RTC->MODE0.INTFLAG.reg = RTC_MODE0_INTFLAG_CMP0;
