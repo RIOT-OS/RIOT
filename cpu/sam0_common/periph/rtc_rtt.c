@@ -588,10 +588,22 @@ int rtc_get_time(struct tm *time)
     return 0;
 }
 
+static void _rtc_clear_alarm(void)
+{
+    /* disable alarm interrupt */
+    RTC->MODE2.INTENCLR.reg = RTC_MODE2_INTENCLR_ALARM0;
+}
+
+void rtc_clear_alarm(void)
+{
+    _rtc_clear_alarm();
+    _pm_unblock(&_pm_alarm);
+}
+
 int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 {
     /* prevent old alarm from ringing */
-    rtc_clear_alarm();
+    _rtc_clear_alarm();
 
     /* normalize input */
     rtc_tm_normalize(time);
@@ -650,14 +662,6 @@ int rtc_set_time(struct tm *time)
     return 0;
 }
 
-void rtc_clear_alarm(void)
-{
-    /* disable alarm interrupt */
-    RTC->MODE2.INTENCLR.reg = RTC_MODE2_INTENCLR_ALARM0;
-
-    _pm_unblock(&_pm_alarm);
-}
-
 void rtc_poweron(void)
 {
     _poweron();
@@ -713,10 +717,22 @@ uint32_t rtt_get_alarm(void)
     return RTC->MODE0.COMP[0].reg;
 }
 
+static void _rtt_clear_alarm(void)
+{
+    /* disable compare interrupt */
+    RTC->MODE0.INTENCLR.reg = RTC_MODE0_INTENCLR_CMP0;
+}
+
+void rtt_clear_alarm(void)
+{
+    _rtt_clear_alarm();
+    _pm_unblock(&_pm_alarm);
+}
+
 void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
 {
     /* disable interrupt to avoid race */
-    rtt_clear_alarm();
+    _rtt_clear_alarm();
 
     /* setup callback */
     alarm_cb.cb  = cb;
@@ -734,14 +750,6 @@ void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
     if (alarm_cb.cb) {
         _pm_block(&_pm_alarm);
     }
-}
-
-void rtt_clear_alarm(void)
-{
-    /* disable compare interrupt */
-    RTC->MODE0.INTENCLR.reg = RTC_MODE0_INTENCLR_CMP0;
-
-    _pm_unblock(&_pm_alarm);
 }
 
 void rtt_poweron(void)
