@@ -19,6 +19,14 @@ config TUSBD_CDC_NOTIF_EP_SIZE
     int "CDC notification endpoint size [byte]"
     default 8
 
+config TUSBD_CDC_FS_EP_SIZE
+    int "CDC Full-Speed endpoint size [byte]"
+    default 64
+
+config TUSBD_CDC_HS_EP_SIZE
+    int "CDC High-Speed endpoint size [byte]"
+    default 512
+
 config TUSBD_CDC_0_STRING
     string "CDC0 descriptor string"
     depends on TUSBD_CDC_NUMOF > 0

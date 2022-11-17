@@ -14,8 +14,12 @@ config TUSBD_MSC_NUMOF
     int
     default 1
 
-config TUSBD_MSC_EP_SIZE
-    int "MSC endpoint size [byte]"
+config TUSBD_MSC_FS_EP_SIZE
+    int "MSC Full-Speed endpoint size [byte]"
+    default 64
+
+config TUSBD_MSC_HS_EP_SIZE
+    int "MSC High-Speed endpoint size [byte]"
     default 512
 
 config TUSBD_MSC_STRING

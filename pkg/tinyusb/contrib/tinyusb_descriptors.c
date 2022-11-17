@@ -30,6 +30,9 @@
 
 #include "tinyusb_descriptors.h"
 
+#define ENABLE_DEBUG    0
+#include "debug.h"
+
 /* don't compile this part if CONFIG_TUSBD_USE_CUSTOM_DESC is set */
 #if !defined(CONFIG_TUSBD_USE_CUSTOM_DESC)
 
@@ -184,26 +187,6 @@ void tud_hid_set_report_cb(uint8_t itf, uint8_t report_id,
  *--------------------------------------------------------------------+
  */
 
-#ifndef CONFIG_TUSBD_FS_EP_SIZE
-#define CONFIG_TUSBD_FS_EP_SIZE             64
-#endif
-
-#ifndef CONFIG_TUSBD_HS_EP_SIZE
-#define CONFIG_TUSBD_HS_EP_SIZE             512
-#endif
-
-#ifndef CONFIG_TUSBD_CDC_NOTIF_EP_SIZE
-#define CONFIG_TUSBD_CDC_NOTIF_EP_SIZE      8
-#endif
-
-#ifndef CONFIG_TUSBD_HID_0_POLL_INTERVALL
-#define CONFIG_TUSBD_HID_0_POLL_INTERVALL   10
-#endif
-
-#ifndef CONFIG_TUSBD_HID_1_POLL_INTERVALL
-#define CONFIG_TUSBD_HID_1_POLL_INTERVALL   10
-#endif
-
 #if CONFIG_USB_SELF_POWERED && CONFIG_USB_REM_WAKEUP
 #define DESC_DEV_ATTR   (USB_CONF_ATTR_SELF_POWERED || USB_CONF_ATTR_REM_WAKEUP)
 #elif CONFIG_USB_SELF_POWERED
@@ -223,35 +206,38 @@ void tud_hid_set_report_cb(uint8_t itf, uint8_t report_id,
     TUD_CONFIG_DESCRIPTOR(id, TUSBD_ITF_NUMOF, 0, TUSBD_DESC_TOTAL_LEN, \
                           DESC_DEV_ATTR, CONFIG_USB_MAX_POWER)
 
-#define _TUD_CDC_DESC(s, n) \
+#define _TUD_CDC_DESC(speed, n) \
     /* Interface number, string index, EP notification address and size,
      * EP Data Out & In, EP size. */ \
     TUD_CDC_DESCRIPTOR(TUSBD_ITF_CDC_##n, TUSBD_STR_IDX_CDC_##n, \
                        TUSBD_EP_CDC_##n##_NOTIF, CONFIG_TUSBD_CDC_NOTIF_EP_SIZE, \
                        TUSBD_EP_CDC_##n##_OUT, TUSBD_EP_CDC_##n##_IN, \
-                       s ? CONFIG_TUSBD_HS_EP_SIZE : CONFIG_TUSBD_FS_EP_SIZE)
+                       speed ? CONFIG_TUSBD_CDC_HS_EP_SIZE \
+                             : CONFIG_TUSBD_CDC_FS_EP_SIZE)
 
-#define _TUD_HID_INOUT_DESC(s, n) \
+#define _TUD_HID_INOUT_DESC(speed, n) \
     /* Interface number, string index, protocol, report descriptor len,
      * EP Out & EP In address, EP size, polling interval */ \
     TUD_HID_INOUT_DESCRIPTOR(TUSBD_ITF_HID_##n, TUSBD_STR_IDX_HID_##n, \
                              HID_ITF_PROTOCOL_NONE, \
                              sizeof(tusb_desc_hid_##n##_report), \
                              TUSBD_EP_HID_##n##_OUT, TUSBD_EP_HID_##n##_IN, \
-                             s ? CONFIG_TUSBD_HS_EP_SIZE : CONFIG_TUSBD_FS_EP_SIZE, \
+                             CONFIG_TUSBD_HID_EP_SIZE, \
                              CONFIG_TUSBD_HID_##n##_POLL_INTERVALL)
 
-#define _TUD_MSC_DESC(s) \
+#define _TUD_MSC_DESC(speed) \
     /* Interface number, string index, EP Out & In address, EP size */ \
     TUD_MSC_DESCRIPTOR(TUSBD_ITF_MSC, TUSBD_STR_IDX_MSC, \
                        TUSBD_EP_MSC_OUT, TUSBD_EP_MSC_IN, \
-                       s ? CONFIG_TUSBD_HS_EP_SIZE : CONFIG_TUSBD_FS_EP_SIZE)
+                       speed ? CONFIG_TUSBD_MSC_HS_EP_SIZE \
+                             : CONFIG_TUSBD_MSC_FS_EP_SIZE)
 
-#define _TUD_VENDOR_DESC(s) \
+#define _TUD_VENDOR_DESC(speed) \
     /* Interface number, string index, EP Out & In address, EP size */ \
     TUD_VENDOR_DESCRIPTOR(TUSBD_ITF_VENDOR, TUSBD_STR_IDX_VENDOR, \
                           TUSBD_EP_VENDOR_OUT, TUSBD_EP_VENDOR_IN, \
-                          s ? CONFIG_TUSBD_HS_EP_SIZE : CONFIG_TUSBD_FS_EP_SIZE)
+                          speed ? CONFIG_TUSBD_VENDOR_HS_EP_SIZE \
+                                : CONFIG_TUSBD_VENDOR_FS_EP_SIZE)
 
 /* FS configuration */
 __attribute__((weak))
@@ -356,7 +342,7 @@ uint8_t const *tud_descriptor_device_qualifier_cb(void)
 __attribute__((weak))
 uint8_t const *tud_descriptor_other_speed_configuration_cb(uint8_t index)
 {
-    (void)index;  /* for multiple configurations */
+    DEBUG("[tinyusb] %s: %u\n", __func__, index);
 
     /* If the link speed is HS, return the FS config, and vice versa.
      * Note: the descriptor type is OHER_SPEED_CONFIG instead of CONFIG */
@@ -380,7 +366,7 @@ uint8_t const *tud_descriptor_other_speed_configuration_cb(uint8_t index)
 __attribute__((weak))
 uint8_t const *tud_descriptor_configuration_cb(uint8_t index)
 {
-    (void)index;  /* for multiple configurations */
+    DEBUG("[tinyusb] %s: %u\n", __func__, index);
 
 #if TUD_OPT_HIGH_SPEED
     /* Although we are HS, host may be FS. */
@@ -435,22 +421,22 @@ char const* tusb_string_desc_array[] = {
     NULL,                           /* 3: Serial number generated during runtime */
 #endif
 #if CONFIG_TUSBD_CDC_NUMOF > 0
-    CONFIG_TUSBD_CDC_0_STRING,       /* CDC Interface 0 */
+    CONFIG_TUSBD_CDC_0_STRING,      /* CDC Interface 0 */
 #endif
 #if CONFIG_TUSBD_CDC_NUMOF > 1
-    CONFIG_TUSBD_CDC_1_STRING,       /* CDC Interface 1 */
+    CONFIG_TUSBD_CDC_1_STRING,      /* CDC Interface 1 */
 #endif
 #if CONFIG_TUSBD_HID_NUMOF > 0
-    CONFIG_TUSBD_HID_0_STRING,       /* HID Interface 0 */
+    CONFIG_TUSBD_HID_0_STRING,      /* HID Interface 0 */
 #endif
 #if CONFIG_TUSBD_HID_NUMOF > 1
-    CONFIG_TUSBD_HID_1_STRING,       /* HID Interface 1 */
+    CONFIG_TUSBD_HID_1_STRING,      /* HID Interface 1 */
 #endif
 #if CONFIG_TUSBD_MSC_NUMOF
-    CONFIG_TUSBD_MSC_STRING,         /* MSC Interface */
+    CONFIG_TUSBD_MSC_STRING,        /* MSC Interface */
 #endif
 #if CONFIG_TUSBD_VENDOR_NUMOF
-    CONFIG_TUSBD_VENDOR_STRING,      /* Vendor Interface */
+    CONFIG_TUSBD_VENDOR_STRING,     /* Vendor Interface */
 #endif
 };
 
