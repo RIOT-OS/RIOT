@@ -94,6 +94,7 @@
  * - up to two interfaces of the Generic In/Out HID class,
  * - up to one DFU interface
  * - up to one MSC device interface and,
+ * - up to one Net device interface with CDC ECM, CDC NCM and RNDIS protocol, and
  * - up to one interface of the Vendor device class.
  *
  * Any other combination, either a different number of these device class

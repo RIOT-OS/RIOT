@@ -30,6 +30,8 @@
 #include "tusb.h"
 #include "usb.h"
 
+#include "net/ethernet.h"
+
 #ifdef MODULE_TINYUSB_DFU
 #include "riotboot/usb_dfu.h"
 #endif
@@ -45,13 +47,12 @@
 #if (MODULE_TINYUSB_CLASS_AUDIO || \
      MODULE_TINYUSB_CLASS_BTH || \
      MODULE_TINYUSB_CLASS_MIDI || \
-     MODULE_TINYUSB_CLASS_NET_ECM_RNDIS || \
-     MODULE_TINYUSB_CLASS_NET_NCM || \
      MODULE_TINYUSB_CLASS_USBTMC || \
      MODULE_TINYUSB_CLASS_VIDEO || \
      (CONFIG_TUSBD_CDC_NUMOF > 2) || \
      (CONFIG_TUSBD_DFU_NUMOF > 1) || \
      (CONFIG_TUSBD_DFU_RT_NUMOF > 1) || \
+     (CONFIG_TUSBD_NET_NUMOF > 1) || \
      (CONFIG_TUSBD_HID_NUMOF > 2) || \
      (CONFIG_TUSBD_MSC_NUMOF > 1) || \
      (CONFIG_TUSBD_VENDOR_NUMOF > 1))
@@ -59,7 +60,13 @@
        of device class interfaces. Custom descriptors have to be implemented.
 #endif
 
+/* If CDC ECM and RNDIS are used simultaneously, an alternative configuration
+ * descriptor is required. */
+#if CONFIG_TUSBD_NET_CDC_ECM && CONFIG_TUSBD_NET_RNDIS
+#define _TUD_CONFIG_DESC_NUMOF  2
+#else
 #define _TUD_CONFIG_DESC_NUMOF  1
+#endif
 
 enum {
     _TUD_CONFIG_DESC_ID = 0,
@@ -266,6 +273,39 @@ void tud_hid_set_report_cb(uint8_t itf, uint8_t report_id,
                        speed ? CONFIG_TUSBD_MSC_HS_EP_SIZE \
                              : CONFIG_TUSBD_MSC_FS_EP_SIZE)
 
+#define _TUD_CDC_ECM_DESC(speed) \
+    /* Interface number, Description string index, MAC address string index,
+     * EP notification address and size, EP Data Out & In, EP size, MTU size. */ \
+    TUD_CDC_ECM_DESCRIPTOR(TUSBD_ITF_NET, \
+                           TUSBD_STR_IDX_NET_CDC_ECM, TUSBD_STR_IDX_NET_MAC, \
+                           TUSBD_EP_NET_NOTIF, \
+                           CONFIG_TUSBD_NET_NOTIF_EP_SIZE, \
+                           TUSBD_EP_NET_OUT, TUSBD_EP_NET_IN, \
+                           speed ? CONFIG_TUSBD_NET_HS_EP_SIZE \
+                                 : CONFIG_TUSBD_NET_FS_EP_SIZE, \
+                           CONFIG_TUSBD_NET_MTU_SIZE)
+
+#define _TUD_CDC_NCM_DESC(speed) \
+    /* Interface number, Description string index, MAC address string index,
+     * EP notification address and size, EP Data Out & In, EP size, MTU size. */ \
+    TUD_CDC_NCM_DESCRIPTOR(TUSBD_ITF_NET, \
+                           TUSBD_STR_IDX_NET_CDC_NCM, TUSBD_STR_IDX_NET_MAC, \
+                           TUSBD_EP_NET_NOTIF, \
+                           CONFIG_TUSBD_NET_NOTIF_EP_SIZE, \
+                           TUSBD_EP_NET_OUT, TUSBD_EP_NET_IN, \
+                           speed ? CONFIG_TUSBD_NET_HS_EP_SIZE \
+                                 : CONFIG_TUSBD_NET_FS_EP_SIZE, \
+                           CONFIG_TUSBD_NET_MTU_SIZE)
+
+#define _TUD_RNDIS_DESC(speed) \
+    /* Interface number, Description string index, EP notification address and
+     * size, EP Data Out & In, EP size */ \
+    TUD_RNDIS_DESCRIPTOR(TUSBD_ITF_NET, TUSBD_STR_IDX_NET_RNDIS, \
+                         TUSBD_EP_NET_NOTIF, 8, TUSBD_EP_NET_OUT, \
+                         TUSBD_EP_NET_IN, \
+                         speed ? CONFIG_TUSBD_NET_HS_EP_SIZE \
+                               : CONFIG_TUSBD_NET_FS_EP_SIZE)
+
 #define _TUD_VENDOR_DESC(speed) \
     /* Interface number, string index, EP Out & In address, EP size */ \
     TUD_VENDOR_DESCRIPTOR(TUSBD_ITF_VENDOR, TUSBD_STR_IDX_VENDOR, \
@@ -298,6 +338,13 @@ uint8_t const tusb_desc_fs_config[] = {
 #if CONFIG_TUSBD_MSC_NUMOF
     _TUD_MSC_DESC(_tusb_speed_fs),
 #endif
+#if CONFIG_TUSBD_NET_CDC_ECM
+    _TUD_CDC_ECM_DESC(_tusb_speed_fs),
+#elif CONFIG_TUSBD_NET_CDC_NCM
+    _TUD_CDC_NCM_DESC(_tusb_speed_fs),
+#elif CONFIG_TUSBD_NET_RNDIS
+    _TUD_RNDIS_DESC(_tusb_speed_fs),
+#endif
 #if CONFIG_TUSBD_VENDOR_NUMOF
     _TUD_VENDOR_DESC(_tusb_speed_fs),
 #endif
@@ -328,6 +375,11 @@ uint8_t const tusb_desc_fs_config_alt[] = {
 #if CONFIG_TUSBD_MSC_NUMOF
     _TUD_MSC_DESC(_tusb_speed_fs),
 #endif
+    /* The alternative configuration descriptor is only required if CDC ECM and
+     * RDNIS are used simultaneously. In this case, the main configuration
+     * descriptor contains the CDC ECM interface descriptor and the alternative
+     * configuration descriptor contains the RNDIS interface descriptor. */
+    _TUD_RNDIS_DESC(_tusb_speed_fs),
 #if CONFIG_TUSBD_VENDOR_NUMOF
     _TUD_VENDOR_DESC(_tusb_speed_fs),
 #endif
@@ -363,6 +415,13 @@ uint8_t const tusb_desc_hs_config[] = {
 #if CONFIG_TUSBD_MSC_NUMOF
     _TUD_MSC_DESC(_tusb_speed_hs),
 #endif
+#if CONFIG_TUSBD_NET_CDC_ECM
+    _TUD_CDC_ECM_DESC(_tusb_speed_hs),
+#elif CONFIG_TUSBD_NET_CDC_NCM
+    _TUD_CDC_NCM_DESC(_tusb_speed_hs),
+#elif CONFIG_TUSBD_NET_RNDIS
+    _TUD_RNDIS_DESC(_tusb_speed_hs),
+#endif
 #if CONFIG_TUSBD_VENDOR_NUMOF
     _TUD_VENDOR_DESC(_tusb_speed_hs),
 #endif
@@ -393,6 +452,11 @@ uint8_t const tusb_desc_hs_config_alt[] = {
 #if CONFIG_TUSBD_MSC_NUMOF
     _TUD_MSC_DESC(_tusb_speed_hs),
 #endif
+    /* The alternative configuration descriptor is only required if CDC ECM and
+     * RDNIS are used simultaneously. In this case, the main configuration
+     * descriptor contains the CDC ECM interface descriptor and the alternative
+     * configuration descriptor contains the RNDIS interface descriptor. */
+    _TUD_RNDIS_DESC(_tusb_speed_hs),
 #if CONFIG_TUSBD_VENDOR_NUMOF
     _TUD_VENDOR_DESC(_tusb_speed_hs),
 #endif
@@ -535,6 +599,14 @@ uint8_t const *tud_descriptor_configuration_cb(uint8_t index)
 #define CONFIG_TUSBD_CDC_1_STRING    "TinyUSB CDC1"
 #endif
 
+#ifndef CONFIG_TUSBD_CDC_ECM_STRING
+#define CONFIG_TUSBD_CDC_ECM_STRING  "TinyUSB CDC ECM"
+#endif
+
+#ifndef CONFIG_TUSBD_CDC_NCM_STRING
+#define CONFIG_TUSBD_CDC_NCM_STRING  "TinyUSB CDC NCM"
+#endif
+
 #ifndef CONFIG_TUSBD_DFU_0_STRING
 #define CONFIG_TUSBD_DFU_0_STRING    USB_DFU_MODE_SLOT0_NAME
 #endif
@@ -557,6 +629,14 @@ uint8_t const *tud_descriptor_configuration_cb(uint8_t index)
 
 #ifndef CONFIG_TUSBD_MSC_STRING
 #define CONFIG_TUSBD_MSC_STRING      "TinyUSB MSC"
+#endif
+
+#ifndef CONFIG_TUSBD_NET_DESC_STRING
+#define CONFIG_TUSBD_NET_DESC_STRING "TinyUSB Net"
+#endif
+
+#ifndef CONFIG_TUSBD_RNDIS_STRING
+#define CONFIG_TUSBD_RNDIS_STRING   "TinyUSB RNDIS"
 #endif
 
 #ifndef CONFIG_TUSBD_VENDOR_STRING
@@ -602,6 +682,23 @@ char const* tusb_string_desc_array[] = {
 #if CONFIG_TUSBD_VENDOR_NUMOF
     CONFIG_TUSBD_VENDOR_STRING,     /* Vendor Interface */
 #endif
+
+#if CONFIG_TUSBD_NET_NUMOF
+#if CONFIG_TUSBD_NET_CDC_ECM
+CONFIG_TUSBD_CDC_ECM_STRING,        /* CDC ECM Interface */
+#endif /* CONFIG_TUSBD_NET_CDC_ECM */
+#if CONFIG_TUSBD_NET_CDC_NCM
+CONFIG_TUSBD_CDC_NCM_STRING,        /* CDC NCM Interface */
+#endif /* CONFIG_TUSBD_NET_CDC_NCM */
+#if CONFIG_TUSBD_NET_RNDIS
+CONFIG_TUSBD_RNDIS_STRING,          /* RNDIS Interface */
+#endif /* CONFIG_TUSBD_NET_RNDIS */
+#ifdef CONFIG_TUSBD_NET_CUSTOM_MAC
+    CONFIG_TUSBD_NET_MAC_STRING,    /* NET Interface MAC address */
+#else
+    NULL,
+#endif /* CONFIG_TUSBD_NET_CUSTOM_MAC */
+#endif /* CONFIG_TUSBD_NET_NUMOF */
 };
 
 static uint16_t _desc_str[32];
@@ -645,6 +742,21 @@ uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid)
             }
             str = _serial_str;
         }
+#if CONFIG_TUSBD_NET_NUMOF
+        else if ((index == TUSBD_STR_IDX_NET_MAC) &&
+                 (tusb_string_desc_array[index] == NULL)) {
+            /* generated MAC address string is used */
+            static char mac_str[(ETHERNET_ADDR_LEN << 1) + 1] = { };
+            if (strlen(mac_str) == 0) {
+                /* generate the serial string if it is not yet generated */
+                uint8_t luid_buf[ETHERNET_ADDR_LEN];
+                luid_get_eui48((eui48_t*)luid_buf);
+                fmt_bytes_hex(mac_str, luid_buf, sizeof(luid_buf));
+                mac_str[(ETHERNET_ADDR_LEN << 1)] = 0;
+            }
+            str = mac_str;
+        }
+#endif
         else {
             str = tusb_string_desc_array[index];
         }
@@ -666,5 +778,27 @@ uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid)
 
     return _desc_str;
 }
+
+#if !CONFIG_TUSBD_RNDIS
+__attribute__((weak))
+void rndis_class_set_handler(uint8_t *data, int size)
+{
+    (void)data;
+    (void)size;
+}
+
+__attribute__((weak))
+void tud_network_init_cb(void)
+{
+    printf("tud_network_init_cb");
+}
+
+__attribute__((weak))
+bool tud_network_recv_cb(const uint8_t *src, uint16_t size)
+{
+    printf("tud_network_init_cb %p %u", src, size);
+    return true;
+}
+#endif
 
 #endif /* !defined(CONFIG_TUSBD_USE_CUSTOM_DESC) */

@@ -46,6 +46,10 @@
 extern "C" {
 #endif
 
+#if MODULE_TINYUSB_CLASS_NET_RNDIS
+#define SIZEOF_ETH_HDR 14
+#endif
+
 /**
  * @brief Initialize the tinyUSB stack including used peripherals and start the tinyUSB thread
  *
