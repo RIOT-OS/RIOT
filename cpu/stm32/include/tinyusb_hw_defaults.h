@@ -84,11 +84,23 @@ extern "C" {
 #endif
 
 /*
+ * Only if the module `periph_usbdev_hs_utmi` or `periph_usbdev_hs_ulpi` is
+ * enabled for the HS port, a HS PHY is used and OPT_MODE_HIGH_SPEED must be
+ * set. Otherwise, the built-in on-chip FS PHY is used and
+ * OPT_MODE_DEFAULT_SPEED should be set so tinyUSB can select the correct speed.
+ */
+#if (MODULE_PERIPH_USBDEV_HS_UTMI || MODULE_PERIPH_USBDEV_HS_ULPI)
+#define TINYUSB_OPT_SPEED       OPT_MODE_HIGH_SPEED
+#else
+#define TINYUSB_OPT_SPEED       OPT_MODE_DEFAULT_SPEED
+#endif
+
+/*
  * Since tinyUSB does not support host mode for STM32 MCUs yet, only
  * OPT_MODE_DEVICE is enabled for the port. Once tinyUSB supports the host mode,
  * OPT_MODE_HOST could be added to CFG_TUSB_RHPORT1_MODE
  */
-#define CFG_TUSB_RHPORT1_MODE   (OPT_MODE_DEVICE | OPT_MODE_HIGH_SPEED)
+#define CFG_TUSB_RHPORT1_MODE   (OPT_MODE_DEVICE | TINYUSB_OPT_SPEED)
 
 #else
 
