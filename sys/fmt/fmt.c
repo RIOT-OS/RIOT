@@ -25,8 +25,9 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "kernel_defines.h"
 #include "fmt.h"
+#include "kernel_defines.h"
+#include "stdio_base.h"
 
 static const char _hex_chars[16] = "0123456789ABCDEF";
 
@@ -517,7 +518,7 @@ void print(const char *s, size_t n)
 
     while (n > 0) {
         ssize_t written;
-        written = fwrite(s, 1, n, stdout);
+        written = stdio_write(s, n);
         if (written < 0) {
             break;
         }

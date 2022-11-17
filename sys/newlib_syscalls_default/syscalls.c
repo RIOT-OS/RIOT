@@ -24,31 +24,31 @@
  * @}
  */
 
-#include <unistd.h>
-#include <reent.h>
 #include <errno.h>
 #include <malloc.h>
+#include <reent.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <sys/times.h>
 #include <sys/unistd.h>
-#include <stdint.h>
+#include <unistd.h>
 
-#include "cpu.h"
 #include "board.h"
-#include "sched.h"
-#include "thread.h"
+#include "cpu.h"
 #include "irq.h"
+#include "kernel_defines.h"
 #include "log.h"
 #include "periph/pm.h"
+#include "sched.h"
+#include "stdio_base.h"
+#include "thread.h"
+
 #if MODULE_VFS
 #include "vfs.h"
 #endif
-
-#include "stdio_base.h"
-
-#include <sys/times.h>
 
 #ifdef MODULE_XTIMER
 #include <sys/time.h>
@@ -149,7 +149,9 @@ static const struct heap heaps[NUM_HEAPS] = {
  */
 void _init(void)
 {
-    /* nothing to do here */
+    if (IS_USED(MODULE_FMT)) {
+        setvbuf(stdout, NULL, _IONBF, 0);
+    }
 }
 
 /**
