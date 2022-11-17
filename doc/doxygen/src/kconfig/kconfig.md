@@ -108,7 +108,7 @@ please set the configuration via `.config` files.
 
 ## A note on the usage of CFLAGS
 When a certain module is being configured via Kconfig the configuration macro
-will not longer be overridable by means of CFLAGS (e.g. set on the
+will no longer be overridable by means of CFLAGS (e.g. set on the
 compilation command or on a Makefile). Consider this if you are getting a
 'redefined warning'.
 
