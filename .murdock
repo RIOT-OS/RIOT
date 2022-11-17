@@ -5,6 +5,8 @@
 # and / or
 #export APPS="examples/hello-world tests/unittests"
 
+QUICKBUILD_BOARDS="nrf52840dk samr21-xpro esp32-wroom-32 native"
+
 # this configures boards that are available via pifleet
 case "${CI_MURDOCK_PROJECT}" in
     riot)
@@ -154,7 +156,44 @@ export ENABLE_TEST_CACHE=${ENABLE_TEST_CACHE:-1}
 export MURDOCK_REDIS_HOST=${MURDOCK_REDIS_HOST:-127.0.0.1}
 
 NIGHTLY=${NIGHTLY:-0}
-FULL_BUILD=${FULL_BUILD:-${NIGHTLY}}
+
+check_label() {
+    local label="${1}"
+    [ -z "${CI_PULL_LABELS}" ] && return 1
+    echo "${CI_PULL_LABELS}" | grep -q "${label}"
+    return $?
+}
+
+# fullbuild logic
+# non-full-builds are those where can_fast_ci_run might reduce the build
+# automatically
+if [ -z "${FULL_BUILD}" ]; then
+    if [ "${NIGHTLY}" = 1 ]; then
+        FULL_BUILD=1
+    elif check_label "CI: full build"; then
+        # full build if requested by label
+        FULL_BUILD=1
+    else
+        FULL_BUILD=0
+    fi
+    export FULL_BUILD
+fi
+
+# quickbuild logic
+# a "quickbuild" is only building a representative subset of all build
+# configurations.
+if [ -z "${QUICK_BUILD}" ]; then
+    export QUICK_BUILD=0
+    if [ "${CI_BUILD_BRANCH}" = "staging" ]; then
+        # always do full build for bors' integration branch
+        true
+    elif [ ${FULL_BUILD} -eq 1 ]; then
+        # full build if building nightly or full build requested by label
+        true
+    else
+        export QUICK_BUILD=1
+    fi
+fi
 
 # This is a work around for a bug in CCACHE which interacts very badly with
 # some features of RIOT and of murdock. The result is that ccache is
@@ -176,7 +215,7 @@ export OPTIONAL_CFLAGS_BLACKLIST="-gz"
 DWQ_ENV="-E BOARDS -E APPS -E NIGHTLY -E RUN_TESTS -E ENABLE_TEST_CACHE
          -E TEST_HASH -E CI_PULL_LABELS -ECI_BASE_BRANCH -ECI_BASE_COMMIT
          -EPKG_USE_MIRROR -EAPPS_CHANGED -EBOARDS_CHANGED -ESTATIC_TESTS
-         -E CI_MURDOCK_PROJECT"
+         -E CI_MURDOCK_PROJECT -EFULL_BUILD -EQUICK_BUILD"
 
 if [ ${NIGHTLY} -eq 1 ]; then
     export PKG_USE_MIRROR=0
@@ -230,13 +269,6 @@ kconfig_module_packages_diff() {
 
 
     bash -c "diff <(echo \"${mmp}\") <(echo \"${kmp}\")"
-}
-
-check_label() {
-    local label="${1}"
-    [ -z "${CI_PULL_LABELS}" ] && return 1
-    echo "${CI_PULL_LABELS}" | grep -q "${label}"
-    return $?
 }
 
 # if RUN_TESTS is unset (e.g., not passed from the outside),
@@ -345,9 +377,14 @@ get_supported_boards() {
         fi
     fi
 
+    BOARDS_=${BOARDS}
     if [ $only_changed -eq 1 ]; then
-        BOARDS_=${BOARDS}
+        # if can_fast_ci_run figured out changes to specific boards,
+        # only consider those
         export BOARDS="$BOARDS_CHANGED"
+    elif [ -z "${BOARDS}" -a ${QUICK_BUILD} -eq 1 ]; then
+        # quickbuild board filter is applied here
+        export BOARDS="${QUICKBUILD_BOARDS}"
     fi
 
     local boards="$(make --no-print-directory -C$appdir info-boards-supported 2>/dev/null || echo broken)"
