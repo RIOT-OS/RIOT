@@ -38,6 +38,7 @@ endif
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-overflow
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-truncation
 OPTIONAL_CFLAGS_BLACKLIST += -gz
+OPTIONAL_CFLAGS_BLACKLIST += -fmacro-prefix-map=$(RIOTBASE)/=
 
 ifeq ($(TOOLCHAIN),gnu)
   # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105523
