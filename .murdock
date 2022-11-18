@@ -225,8 +225,8 @@ kconfig_module_packages_diff() {
     make clean --no-print-directory -C ${appdir} BOARD=${board}
     mmp=$(make --no-print-directory info-modules info-packages -C ${appdir} BOARD=${board})
 
-    make clean --no-print-directory -C ${appdir} BOARD=${board}
-    kmp=$(TEST_KCONFIG=1 make --no-print-directory info-modules info-packages -C ${appdir} BOARD=${board})
+    BINDIR=$(pwd)/build/build_kconfig make clean --no-print-directory -C ${appdir} BOARD=${board}
+    kmp=$(BINDIR=$(pwd)/build/build_kconfig TEST_KCONFIG=1 make --no-print-directory info-modules info-packages -C ${appdir} BOARD=${board})
 
 
     bash -c "diff <(echo \"${mmp}\") <(echo \"${kmp}\")"
@@ -495,6 +495,8 @@ compile() {
                 kconfig_hashes="kconfig-build-failed"
                 echo "An error occurred while compiling using Kconfig";
             fi
+            # move build/ out of the way
+            mv build build_kconfig
         fi
     fi
 
@@ -522,6 +524,14 @@ compile() {
                 echo "Input with KConfig:"
                 echo "${kconfig_hashes}"
                 kconfig_module_packages_diff ${board} ${appdir}
+
+                pip install --user diffoscope
+                mkdir -p "${DWQ_ASSETS}"
+                ~/.local/bin/diffoscope \
+                    --exclude-directory-metadata yes \
+                    --exclude '*.d' \ build build_kconfig \
+                    --html "${DWQ_ASSETS}/diffoscope.html"
+                gzip "${DWQ_ASSETS}/diffoscope.html"
                 RES=1
             fi
         else
