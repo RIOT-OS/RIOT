@@ -1,5 +1,14 @@
 include $(RIOTCPU)/efm32/efm32-info.mk
 
+# Select the correct implementation for `periph_adc`
+ifneq (,$(filter periph_adc,$(USEMODULE)))
+  ifeq (2,$(EFM32_SERIES))
+    SRC += adc_series2.c
+  else
+    SRC += adc_series01.c
+  endif
+endif
+
 # Select the correct implementation for `periph_timer`
 ifneq (,$(filter periph_hwrng,$(USEMODULE)))
   ifeq (1,$(EFM32_SERIES))
