@@ -20,7 +20,7 @@ STM32L476RG microcontroller with 128KiB or RAM and 1MiB of Flash.
 | Flash      | 1MiB              |
 | Frequency  | up to 80MHz       |
 | FPU        | yes               |
-| Timers | 16 (2x watchdog, 1 SysTick, 6x 16-bit, 2x 32-bit [TIM2])  |
+| Timers     | 16 (2x watchdog, 1 SysTick, 6x 16-bit, 2x 32-bit [TIM2])  |
 | ADCs       | 1x 12-bit         |
 | UARTs      | 3 (two UARTs and one Low-Power UART)                 |
 | SPIs       | 3                 |
@@ -28,7 +28,7 @@ STM32L476RG microcontroller with 128KiB or RAM and 1MiB of Flash.
 | RTC        | 1                 |
 | CAN        | 1                 |
 | Vcc        | 1.71 V - 3.6V     |
-| Datasheet  |                   |
+| Datasheet  | [Datasheet](https://www.st.com/resource/en/datasheet/stm32l476je.pdf) |
 | Reference Manual | [Reference Manual](http://www.st.com/content/ccc/resource/technical/document/reference_manual/02/35/09/0c/4f/f7/40/03/DM00083560.pdf/files/DM00083560.pdf/jcr:content/translations/en.DM00083560.pdf) |
 | Programming Manual | [Programming Manual](http://www.st.com/content/ccc/resource/technical/document/programming_manual/6c/3a/cb/e7/e4/ea/44/9b/DM00046982.pdf/files/DM00046982.pdf/jcr:content/translations/en.DM00046982.pdf) |
 | Board Manual   | [Board Manual](https://www.st.com/content/ccc/resource/technical/document/user_manual/98/2e/fa/4b/e0/82/43/b7/DM00105823.pdf/files/DM00105823.pdf/jcr:content/translations/en.DM00105823.pdf) |
