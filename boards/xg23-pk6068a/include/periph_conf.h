@@ -56,6 +56,38 @@ static const clk_div_t clk_div_config[] = {
 /** @} */
 
 /**
+ * @name    ADC configuration
+ * @{
+ */
+static const adc_conf_t adc_config[] = {
+    {
+        .dev = IADC0,
+        .cmu = cmuClock_IADC0,
+        .reference = iadcCfgReferenceInt1V2,
+        .reference_mV = 1210,
+        .gain = iadcCfgAnalogGain0P5x,
+        .available_res = { ADC_RES_10BIT, ADC_RES_16BIT }
+    }
+};
+
+static const adc_chan_conf_t adc_channel_config[] = {
+    {
+        .dev = 0,
+        .input_pos = GPIO_PIN(PA, 10),
+        .input_neg = GPIO_UNDEF
+    },
+    {
+        .dev = 0,
+        .input_pos = GPIO_PIN(PA, 0),
+        .input_neg = GPIO_PIN(PA, 5)
+    },
+};
+
+#define ADC_DEV_NUMOF       ARRAY_SIZE(adc_config)
+#define ADC_NUMOF           ARRAY_SIZE(adc_channel_config)
+/** @} */
+
+/**
  * @name    I2C configuration
  * @{
  */

@@ -67,6 +67,8 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 | Timer      | 0       | TIMER0          |                                | Default ztimer backend           | EM1             |
 |            | 1       | LETIMER0        |                                |                                  | EM3             |
 | UART       | 0       | EUSART1         | RX: PA9, TX: PA8               | Default STDIO output             | EM1             |
+| ADC_LINE   | 0       | IADC0           | IN+: PA10, IN-: GND            | Single-ended, V_ref: 2 * 1.21V   | EM1             |
+|            | 1       | IADC0           | IN+: PA0, IN-:PA5              | Differential, V_ref: 2 * 1.21V   | EM1             |
 
 ### User interface
 | Peripheral | Mapped to | Pin  | Comments   |
