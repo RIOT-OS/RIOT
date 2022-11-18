@@ -486,7 +486,7 @@ compile() {
         # better yet just finish!
         if [ ${NIGHTLY} -eq 1 ]; then
             BOARD=${board} make -C${appdir} clean
-            CCACHE_BASEDIR="$(pwd)" BOARD=${board} TOOLCHAIN=${toolchain} RIOT_CI_BUILD=1 TEST_KCONFIG=1 \
+            CFLAGS="-DTHREAD_STACKSIZE_DEFAULT=1280" CCACHE_BASEDIR="$(pwd)" BOARD=${board} TOOLCHAIN=${toolchain} RIOT_CI_BUILD=1 TEST_KCONFIG=1 \
                             make -C${appdir} all test-input-hash -j${JOBS:-4}
             RES=$?
             if [ $RES -eq 0 ]; then
@@ -523,15 +523,17 @@ compile() {
                 echo "${no_kconfig_hashes}"
                 echo "Input with KConfig:"
                 echo "${kconfig_hashes}"
-                kconfig_module_packages_diff ${board} ${appdir}
+                #kconfig_module_packages_diff ${board} ${appdir}
 
                 pip install --user diffoscope
+
                 mkdir -p "${DWQ_ASSETS}"
                 ~/.local/bin/diffoscope \
                     --exclude-directory-metadata yes \
                     --exclude '*.d' \ build build_kconfig \
                     --html "${DWQ_ASSETS}/diffoscope.html"
                 gzip "${DWQ_ASSETS}/diffoscope.html"
+
                 RES=1
             fi
         else
