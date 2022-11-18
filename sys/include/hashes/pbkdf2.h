@@ -47,8 +47,8 @@ extern "C" {
  *                              recommended 10000
  * @param[out]  output          array of size PBKDF2_KEY_SIZE
  */
-void pbkdf2_sha256(const uint8_t *password, size_t password_len,
-                   const uint8_t *salt, size_t salt_len,
+void pbkdf2_sha256(const void *password, size_t password_len,
+                   const void *salt, size_t salt_len,
                    int iterations,
                    uint8_t *output);
 
