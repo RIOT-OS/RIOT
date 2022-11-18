@@ -148,7 +148,7 @@ static int tinyusb_hw_init_dev(const dwc2_usb_otg_fshs_config_t *conf)
             global_regs->GCCFG |= USB_OTG_GCCFG_PHYHSEN;
 
             /* determine the PLL input clock of the USB HS PHY from HSE clock */
-            switch (CLOCK_HSE) {
+            switch (CONFIG_CLOCK_HSE) {
                 case 12000000:
                     USB_HS_PHYC->USB_HS_PHYC_PLL |= USB_HS_PHYC_PLL1_PLLSEL_12MHZ;
                     break;
