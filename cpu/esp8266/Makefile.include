@@ -52,5 +52,3 @@ LINKFLAGS += -Tesp8266.peripherals.ld
 
 LINKFLAGS += -Wl,-wrap=pp_attach
 LINKFLAGS += -Wl,-wrap=pm_attach
-
-OPTIONAL_CFLAGS_BLACKLIST += -fmacro-prefix-map=$(RIOTBASE)/=
