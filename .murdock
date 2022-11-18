@@ -530,7 +530,8 @@ compile() {
                 mkdir -p "${DWQ_ASSETS}"
                 ~/.local/bin/diffoscope \
                     --exclude-directory-metadata yes \
-                    --exclude '*.d' \ build build_kconfig \
+                    --exclude '*.d' \
+                    build build_kconfig \
                     --html "${DWQ_ASSETS}/diffoscope.html"
                 gzip "${DWQ_ASSETS}/diffoscope.html"
 
