@@ -146,8 +146,7 @@ finish:
     return res;
 }
 
-SHELL_COMMAND(ping6, "Ping via ICMPv6", _gnrc_icmpv6_ping);
-SHELL_COMMAND(ping, "Alias for ping6", _gnrc_icmpv6_ping);
+SHELL_COMMAND(ping, "Ping via ICMPv6", _gnrc_icmpv6_ping);
 
 static void _usage(char *cmdname)
 {
