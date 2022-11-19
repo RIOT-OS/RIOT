@@ -44,10 +44,6 @@ extern "C" {
 #define DEBUG_ASSERT_VERBOSE
 #endif
 
-#ifndef RIOT_FILE_RELATIVE
-#define RIOT_FILE_RELATIVE  (__FILE__)
-#endif
-
 /**
  * @def __NORETURN
  * @brief hidden (__) NORETURN definition
@@ -110,8 +106,7 @@ __NORETURN void _assert_failure(const char *file, unsigned line);
  *
  * @see http://pubs.opengroup.org/onlinepubs/9699919799/functions/assert.html
  */
-#define assert(cond) ((cond) ? (void)0 :  _assert_failure(RIOT_FILE_RELATIVE, \
-                                                          __LINE__))
+#define assert(cond) ((cond) ? (void)0 :  _assert_failure(__FILE__, __LINE__))
 #else /* DEBUG_ASSERT_VERBOSE */
 __NORETURN void _assert_panic(void);
 #define assert(cond) ((cond) ? (void)0 : _assert_panic())

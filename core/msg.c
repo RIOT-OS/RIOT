@@ -105,18 +105,18 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block,
     thread_t *me = thread_get_active();
 
     DEBUG("msg_send() %s:%i: Sending from %" PRIkernel_pid " to %" PRIkernel_pid
-          ". block=%i src->state=%i target->state=%i\n", RIOT_FILE_RELATIVE,
+          ". block=%i src->state=%i target->state=%i\n", __FILE__,
           __LINE__, thread_getpid(), target_pid,
           block, (int)me->status, (int)target->status);
 
     if (target->status != STATUS_RECEIVE_BLOCKED) {
         DEBUG(
             "msg_send() %s:%i: Target %" PRIkernel_pid " is not RECEIVE_BLOCKED.\n",
-            RIOT_FILE_RELATIVE, __LINE__, target_pid);
+            __FILE__, __LINE__, target_pid);
 
         if (queue_msg(target, m)) {
             DEBUG("msg_send() %s:%i: Target %" PRIkernel_pid
-                  " has a msg_queue. Queueing message.\n", RIOT_FILE_RELATIVE,
+                  " has a msg_queue. Queueing message.\n", __FILE__,
                   __LINE__, target_pid);
             irq_restore(state);
             if (me->status == STATUS_REPLY_BLOCKED
