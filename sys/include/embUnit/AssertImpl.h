@@ -49,7 +49,7 @@ void assertImplementationCStr(const char *expected,const char *actual, long line
         const char *____expected__ = expected_; \
         const char *____actual__ = actual_; \
         if (stdimpl_strcmp(____expected__, ____actual__) != 0) { \
-            assertImplementationCStr(____expected__, ____actual__, __LINE__, RIOT_FILE_RELATIVE); \
+            assertImplementationCStr(____expected__, ____actual__, __LINE__, __FILE__); \
             return; \
         } \
     } while (0)
@@ -60,7 +60,7 @@ void assertImplementationCStr(const char *expected,const char *actual, long line
         long long ____actual__ = (long long) (actual_); \
         if (____expected__ != ____actual__) { \
             assertImplementationLongLong(____expected__, ____actual__, \
-                                         __LINE__, RIOT_FILE_RELATIVE); \
+                                         __LINE__, __FILE__); \
             return; \
         } \
     } while (0)
@@ -92,7 +92,7 @@ void assertImplementationCStr(const char *expected,const char *actual, long line
 
 #define TEST_FAIL(message) \
     do { \
-        addFailure((message), __LINE__, RIOT_FILE_RELATIVE); \
+        addFailure((message), __LINE__, __FILE__); \
         return; \
     } while (0)
 
