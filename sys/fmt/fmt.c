@@ -550,6 +550,15 @@ void print_byte_hex(uint8_t byte)
     print(buf, sizeof(buf));
 }
 
+void print_bytes_hex(const void *bytes, size_t num)
+{
+    const uint8_t *b = bytes;
+
+    while (num--) {
+        print_byte_hex(*b++);
+    }
+}
+
 void print_u32_hex(uint32_t val)
 {
     char buf[8];

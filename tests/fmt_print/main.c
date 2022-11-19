@@ -45,6 +45,8 @@ int main(void)
     print_str("\n");
     print_float(1.2345, 5);
     print_str("\n");
+    print_bytes_hex("0123456789", 10);
+    print_str("\n");
     /* test mixing of printf() and fmt's print() works fine */
     printf("%s", "Test");
     /* test fmt's print indeed only honors the length parameter and doesn't
