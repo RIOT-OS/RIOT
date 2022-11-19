@@ -27,7 +27,8 @@ extern "C" {
 /**
  * @brief   Available number of ADC devices
  */
-#if defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L475VG)
+#if defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L475VG) || \
+    defined(CPU_MODEL_STM32L496ZG)
 #define ADC_DEVS            (3U)
 #elif defined(CPU_MODEL_STM32L452RE) || defined(CPU_MODEL_STM32L432KC) || \
  defined(CPU_MODEL_STM32L4R5ZI)
@@ -36,7 +37,7 @@ extern "C" {
 
 #if defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L475VG) || \
     defined(CPU_MODEL_STM32L452RE) || defined(CPU_MODEL_STM32L432KC) || \
-    defined(CPU_MODEL_STM32L4R5ZI)
+    defined(CPU_MODEL_STM32L496ZG) || defined(CPU_MODEL_STM32L4R5ZI)
 /**
  * @brief   ADC voltage regulator start-up time [us]
  */
