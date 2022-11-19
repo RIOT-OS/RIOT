@@ -32,10 +32,6 @@
 extern "C" {
 #endif
 
-#ifndef RIOT_FILE_RELATIVE
-#define RIOT_FILE_RELATIVE  (__FILE__)
-#endif
-
 /**
  * @brief   Function to handle failed expectation
  *
@@ -80,8 +76,7 @@ NORETURN static inline void _expect_failure(const char *file, unsigned line)
  * the condition failed in.
  *
  */
-#define expect(cond) ((cond) ? (void)0 :  _expect_failure(RIOT_FILE_RELATIVE, \
-                                                          __LINE__))
+#define expect(cond) ((cond) ? (void)0 :  _expect_failure(__FILE__, __LINE__))
 
 #ifdef __cplusplus
 }
