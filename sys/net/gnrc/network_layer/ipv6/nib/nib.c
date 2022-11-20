@@ -1264,6 +1264,28 @@ static gnrc_pktqueue_t *_alloc_queue_entry(gnrc_pktsnip_t *pkt)
 }
 #endif  /* CONFIG_GNRC_IPV6_NIB_QUEUE_PKT */
 
+static bool _resolve_addr_from_nc(gnrc_netif_t *netif, _nib_onl_entry_t *entry)
+{
+    if (entry == NULL) {
+        return false;
+    }
+
+    if (!IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)) {
+        return true;
+    }
+
+    if (_is_reachable(entry)) {
+        if (_get_nud_state(entry) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE) {
+            _set_nud_state(netif, entry, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_DELAY);
+            _evtimer_add(entry, GNRC_IPV6_NIB_DELAY_TIMEOUT,
+                         &entry->nud_timeout, NDP_DELAY_FIRST_PROBE_MS);
+        }
+        return true;
+    }
+
+    return false;
+}
+
 static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
                           gnrc_pktsnip_t *pkt, gnrc_ipv6_nib_nc_t *nce,
                           _nib_onl_entry_t *entry)
@@ -1279,28 +1301,13 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
         nce->l2addr_len = 0;
         return true;
     }
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
-    if ((entry != NULL) && _is_reachable(entry)) {
-        if (_get_nud_state(entry) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE) {
-            _set_nud_state(netif, entry, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_DELAY);
-            _evtimer_add(entry, GNRC_IPV6_NIB_DELAY_TIMEOUT,
-                         &entry->nud_timeout, NDP_DELAY_FIRST_PROBE_MS);
-        }
+    else if (_resolve_from_nc(netif, entry)) {
         DEBUG("nib: resolve address %s%%%u from neighbor cache\n",
               ipv6_addr_to_str(addr_str, &entry->ipv6, sizeof(addr_str)),
               _nib_onl_get_if(entry));
         _nib_nc_get(entry, nce);
         res = true;
     }
-#else   /* CONFIG_GNRC_IPV6_NIB_ARSM */
-    if (entry != NULL) {
-        DEBUG("nib: resolve address %s%%%u from neighbor cache\n",
-              ipv6_addr_to_str(addr_str, &entry->ipv6, sizeof(addr_str)),
-              _nib_onl_get_if(entry));
-        _nib_nc_get(entry, nce);
-        res = true;
-    }
-#endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
     else if (!(res = _resolve_addr_from_ipv6(dst, netif, nce))) {
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
         bool reset = false;
