@@ -1266,26 +1266,27 @@ static gnrc_pktqueue_t *_alloc_queue_entry(gnrc_pktsnip_t *pkt)
     return NULL;
 }
 
-static bool _resolve_addr_from_nc(gnrc_netif_t *netif, _nib_onl_entry_t *entry)
+static bool _resolve_addr_from_nc(_nib_onl_entry_t *entry, gnrc_netif_t *netif,
+                                  gnrc_ipv6_nib_nc_t *nce)
 {
     if (entry == NULL) {
         return false;
     }
 
-    if (!IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)) {
-        return true;
-    }
+    if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)) {
+        if (!_is_reachable(entry)) {
+            return false;
+        }
 
-    if (_is_reachable(entry)) {
         if (_get_nud_state(entry) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE) {
             _set_nud_state(netif, entry, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_DELAY);
             _evtimer_add(entry, GNRC_IPV6_NIB_DELAY_TIMEOUT,
                          &entry->nud_timeout, NDP_DELAY_FIRST_PROBE_MS);
         }
-        return true;
     }
 
-    return false;
+    _nib_nc_get(entry, nce);
+    return true;
 }
 
 static bool _enqueue_for_resolve(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
@@ -1332,8 +1333,6 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
                           gnrc_pktsnip_t *pkt, gnrc_ipv6_nib_nc_t *nce,
                           _nib_onl_entry_t *entry)
 {
-    bool res = false;
-
     if ((netif != NULL) && (netif->device_type == NETDEV_TYPE_SLIP)) {
         /* XXX: Linux doesn't do neighbor discovery for SLIP so no use sending
          * NS and since SLIP doesn't have link-layer addresses anyway, we can
@@ -1343,54 +1342,57 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
         nce->l2addr_len = 0;
         return true;
     }
-    else if (_resolve_from_nc(netif, entry)) {
+
+    /* first check if address is cached */
+    if (_resolve_addr_from_nc(entry, netif, nce)) {
         DEBUG("nib: resolve address %s%%%u from neighbor cache\n",
               ipv6_addr_to_str(addr_str, &entry->ipv6, sizeof(addr_str)),
               _nib_onl_get_if(entry));
-        _nib_nc_get(entry, nce);
-        res = true;
+        return true;
     }
-    else if (!(res = _resolve_addr_from_ipv6(dst, netif, nce))) {
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
-        bool reset = false;
-#endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
 
-        DEBUG("nib: resolve address %s by probing neighbors\n",
-              ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
+    /* directly resolve address if it uses 6lo addressing mode */
+    if (_resolve_addr_from_ipv6(dst, netif, nce)) {
+        DEBUG("nib: resolve l2 address from IPv6 address\n");
+        return true;
+    }
+
+    bool reset = false;
+    DEBUG("nib: resolve address %s by probing neighbors\n",
+          ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
+    if (entry == NULL) {
+        entry = _nib_nc_add(dst, netif ? netif->pid : 0,
+                            GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE);
         if (entry == NULL) {
-            entry = _nib_nc_add(dst, (netif != NULL) ? netif->pid : 0,
-                                GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE);
-            if (entry == NULL) {
-                DEBUG("nib: can't resolve address, neighbor cache full\n");
-                gnrc_pktbuf_release(pkt);
-                return false;
-            }
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
-            if (netif != NULL) {
-                _call_route_info_cb(netif,
-                                    GNRC_IPV6_NIB_ROUTE_INFO_TYPE_NSC,
-                                    dst,
-                                    (void *)GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE);
-            }
-#endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
-            reset = true;
-#endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
-        }
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
-        else if (_get_nud_state(entry) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE) {
-            /* reduce back-off to possibly resolve neighbor sooner again */
-            entry->ns_sent = 3;
-        }
-#endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
-        if (pkt != NULL && !_enqueue_for_resolve(netif, pkt, entry)) {
+            DEBUG("nib: can't resolve address, neighbor cache full\n");
+            gnrc_pktbuf_release(pkt);
             return false;
         }
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
-        _probe_nbr(entry, reset);
-#endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
+        if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER) && netif != NULL) {
+            _call_route_info_cb(netif,
+                                GNRC_IPV6_NIB_ROUTE_INFO_TYPE_NSC,
+                                dst,
+                                (void *)GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE);
+        }
+        reset = true;
     }
-    return res;
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
+    else if (_get_nud_state(entry) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE) {
+        /* reduce back-off to possibly resolve neighbor sooner again */
+        entry->ns_sent = 3;
+    }
+#endif
+
+    /* queue packet as we have to do address resolution first */
+    if (pkt != NULL && !_enqueue_for_resolve(netif, pkt, entry)) {
+        return false;
+    }
+
+    if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)) {
+        _probe_nbr(entry, reset);
+    }
+
+    return false;
 }
 
 static void _handle_snd_na(gnrc_pktsnip_t *pkt)
