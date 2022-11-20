@@ -26,7 +26,7 @@ OBJDUMP   ?= $(_OBJDUMP)
 GCC_VERSION := $(shell $(CC) -dumpversion | cut -d . -f 1)
 
 # -fmacro-prefix-map requires GCC 8
-ifneq (8, $(firstword $(shell echo 8 $(GCC_VERSION) | tr ' ' '\n' | sort -n))))
+ifneq (8, $(firstword $(shell echo 8 $(GCC_VERSION) | tr ' ' '\n' | sort -n)))
   OPTIONAL_CFLAGS_BLACKLIST += -fmacro-prefix-map=$(RIOTBASE)/=
 endif
 
