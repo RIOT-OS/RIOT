@@ -1251,18 +1251,20 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     }
 }
 
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
 static gnrc_pktqueue_t *_alloc_queue_entry(gnrc_pktsnip_t *pkt)
 {
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
     for (int i = 0; i < CONFIG_GNRC_IPV6_NIB_NUMOF; i++) {
         if (_queue_pool[i].pkt == NULL) {
             _queue_pool[i].pkt = pkt;
             return &_queue_pool[i];
         }
     }
+#else
+    (void)pkt;
+#endif  /* CONFIG_GNRC_IPV6_NIB_QUEUE_PKT */
     return NULL;
 }
-#endif  /* CONFIG_GNRC_IPV6_NIB_QUEUE_PKT */
 
 static bool _resolve_addr_from_nc(gnrc_netif_t *netif, _nib_onl_entry_t *entry)
 {
@@ -1284,6 +1286,46 @@ static bool _resolve_addr_from_nc(gnrc_netif_t *netif, _nib_onl_entry_t *entry)
     }
 
     return false;
+}
+
+static bool _enqueue_for_resolve(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
+                                 _nib_onl_entry_t *entry)
+{
+    if (!IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT) ||
+        _get_nud_state(entry) != GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE) {
+        gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_ADDR, pkt);
+        gnrc_pktbuf_release_error(pkt, EHOSTUNREACH);
+        return true;
+    }
+
+    gnrc_pktqueue_t *queue_entry = _alloc_queue_entry(pkt);
+
+    if (queue_entry == NULL) {
+        DEBUG("nib: can't allocate entry for packet queue "
+              "dropping packet\n");
+        gnrc_pktbuf_release(pkt);
+        return false;
+    }
+
+    if (netif != NULL) {
+        gnrc_pktsnip_t *netif_hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+
+        if (netif_hdr == NULL) {
+            DEBUG("nib: can't allocate netif header for queue\n");
+            gnrc_pktbuf_release(pkt);
+            queue_entry->pkt = NULL;
+            return false;
+        }
+        gnrc_netif_hdr_set_netif(netif_hdr->data, netif);
+        queue_entry->pkt = gnrc_pkt_prepend(queue_entry->pkt, netif_hdr);
+    }
+
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
+    gnrc_pktqueue_add(&entry->pktqueue, queue_entry);
+#else
+    (void)entry;
+#endif
+    return true;
 }
 
 static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
@@ -1341,46 +1383,8 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
             entry->ns_sent = 3;
         }
 #endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
-        if (pkt != NULL) {
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT)
-            if (_get_nud_state(entry) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE) {
-                gnrc_pktqueue_t *queue_entry = _alloc_queue_entry(pkt);
-
-                if (queue_entry != NULL) {
-                    if (netif != NULL) {
-                        gnrc_pktsnip_t *netif_hdr = gnrc_netif_hdr_build(
-                                NULL, 0, NULL, 0
-                            );
-                        if (netif_hdr == NULL) {
-                            DEBUG("nib: can't allocate netif header for queue\n");
-                            gnrc_pktbuf_release(pkt);
-                            queue_entry->pkt = NULL;
-                            return false;
-                        }
-                        gnrc_netif_hdr_set_netif(netif_hdr->data, netif);
-                        queue_entry->pkt = gnrc_pkt_prepend(queue_entry->pkt,
-                                                            netif_hdr);
-                    }
-                    gnrc_pktqueue_add(&entry->pktqueue, queue_entry);
-                }
-                else {
-                    DEBUG("nib: can't allocate entry for packet queue "
-                          "dropping packet\n");
-                    gnrc_pktbuf_release(pkt);
-                    return false;
-                }
-            }
-            /* pkt != NULL already checked above */
-            else {
-                gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_ADDR,
-                                               pkt);
-                gnrc_pktbuf_release_error(pkt, EHOSTUNREACH);
-            }
-#else   /* CONFIG_GNRC_IPV6_NIB_QUEUE_PKT */
-            gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_ADDR,
-                                           pkt);
-            gnrc_pktbuf_release_error(pkt, EHOSTUNREACH);
-#endif  /* CONFIG_GNRC_IPV6_NIB_QUEUE_PKT */
+        if (pkt != NULL && !_enqueue_for_resolve(netif, pkt, entry)) {
+            return false;
         }
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
         _probe_nbr(entry, reset);
