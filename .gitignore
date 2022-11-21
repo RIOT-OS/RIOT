@@ -37,7 +37,8 @@ cachegrind.out*
 # Codelite (among others) project files
 *.project
 # Visual Studio Code user settings
-.vscode/
+.vscode/*
+!.vscode/settings.json
 # ctags index files
 tags
 # GDB initialization scripts
