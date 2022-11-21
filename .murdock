@@ -523,8 +523,8 @@ compile() {
                 echo "Creating diffoscope report..."
                 pip install --user diffoscope
 
-                mkdir -p "${DWQ_ASSETS}"
-                DIFFOSCOPE_REPORT="${DWQ_ASSETS}/${board}:${toolchain}/${appdir}/diffoscope.json"
+                DIFFOSCOPE_REPORT="${DWQ_ASSETS}/${appdir}/${board}:${toolchain}/diffoscope.html"
+                mkdir -p "$(dirname ${DIFFOSCOPE_REPORT})"
                 ~/.local/bin/diffoscope \
                     --exclude-directory-metadata yes \
                     --exclude '*.d' \
