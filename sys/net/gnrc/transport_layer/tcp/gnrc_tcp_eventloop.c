@@ -42,7 +42,11 @@ static msg_t _eventloop_msg_queue[TCP_EVENTLOOP_MSG_QUEUE_SIZE];
 /**
  * @brief Allocate memory for GNRC TCP thread stack.
  */
-static char _stack[TCP_EVENTLOOP_STACK_SIZE + DEBUG_EXTRA_STACKSIZE];
+static char _stack[TCP_EVENTLOOP_STACK_SIZE
+#if ENABLE_DEBUG || MODULE_GNRC_PKTBUF_TRACING
++ THREAD_EXTRA_STACKSIZE_PRINTF
+#endif
+];
 
 /**
  * @brief Central evtimer for gnrc_tcp event loop
