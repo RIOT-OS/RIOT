@@ -17,3 +17,4 @@ commit:
 artifacts:
   - output.txt
   - doc-preview/
+  - jobs/
