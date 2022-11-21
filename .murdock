@@ -523,14 +523,14 @@ compile() {
                 echo "Creating diffoscope report..."
                 pip install --user diffoscope
 
-                JOB_ASSET_DIR="${DWQ_ASSETS}/${board}/${appdir}"
-                mkdir -p "${JOB_ASSET_DIR}"
+                mkdir -p "${DWQ_ASSETS}"
+                DIFFOSCOPE_REPORT="${DWQ_ASSETS}/$(echo diffoscope_${board}_${appdir}.json | tr / _)"
                 ~/.local/bin/diffoscope \
                     --exclude-directory-metadata yes \
                     --exclude '*.d' \
                     build build_kconfig \
-                    --html "${JOB_ASSET_DIR}/diffoscope.html"
-                gzip "${JOB_ASSET_DIR}/diffoscope.html"
+                    --html "${DIFFOSCOPE_REPORT}"
+                gzip "${DIFFOSCOPE_REPORT}"
 
                 RES=1
             fi
