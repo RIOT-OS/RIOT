@@ -25,7 +25,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "container.h"
 #include "fmt.h"
 #include "hashes/pbkdf2.h"
 #include "hashes/sha256.h"
