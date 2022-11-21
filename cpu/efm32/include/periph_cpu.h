@@ -430,17 +430,32 @@ typedef struct {
  */
 #ifndef DOXYGEN
 /**
+ * @brief   Marker for unsupported UART modes
+ */
+#define UART_MODE_UNSUPPORTED 0xf0
+
+/**
  * @brief   Override parity values
  * @{
  */
 #define HAVE_UART_PARITY_T
+#if defined(_SILICON_LABS_32B_SERIES_0) || defined(_SILICON_LABS_32B_SERIES_1)
 typedef enum {
-   UART_PARITY_NONE = 0,
-   UART_PARITY_ODD = 1,
-   UART_PARITY_EVEN = 2,
-   UART_PARITY_MARK = 3,
-   UART_PARITY_SPACE = 4,
+    UART_PARITY_NONE = 0,
+    UART_PARITY_ODD = 1,
+    UART_PARITY_EVEN = 2,
+    UART_PARITY_MARK = 3,
+    UART_PARITY_SPACE = 4,
 } uart_parity_t;
+#else
+typedef enum {
+    UART_PARITY_NONE = 0,
+    UART_PARITY_EVEN = 2,
+    UART_PARITY_ODD = 3,
+    UART_PARITY_MARK = UART_MODE_UNSUPPORTED | 0,
+    UART_PARITY_SPACE = UART_MODE_UNSUPPORTED | 1,
+} uart_parity_t;
+#endif
 /** @} */
 
 /**
@@ -448,12 +463,21 @@ typedef enum {
  * @{
  */
 #define HAVE_UART_DATA_BITS_T
+#if defined(_SILICON_LABS_32B_SERIES_0) || defined(_SILICON_LABS_32B_SERIES_1)
 typedef enum {
     UART_DATA_BITS_5 = 5,
     UART_DATA_BITS_6 = 6,
     UART_DATA_BITS_7 = 7,
     UART_DATA_BITS_8 = 8,
 } uart_data_bits_t;
+#else
+typedef enum {
+    UART_DATA_BITS_5 = UART_MODE_UNSUPPORTED | 0,
+    UART_DATA_BITS_6 = UART_MODE_UNSUPPORTED | 1,
+    UART_DATA_BITS_7 = 1,
+    UART_DATA_BITS_8 = 2,
+} uart_data_bits_t;
+#endif
 /** @} */
 
 /**
@@ -461,10 +485,17 @@ typedef enum {
  * @{
  */
 #define HAVE_UART_STOP_BITS_T
+#if defined(_SILICON_LABS_32B_SERIES_0) || defined(_SILICON_LABS_32B_SERIES_1)
 typedef enum {
    UART_STOP_BITS_1 = 2,
    UART_STOP_BITS_2 = 4,
 } uart_stop_bits_t;
+#else
+typedef enum {
+   UART_STOP_BITS_1 = 1,
+   UART_STOP_BITS_2 = 3,
+} uart_stop_bits_t;
+#endif
 /** @} */
 #endif /* ndef DOXYGEN */
 

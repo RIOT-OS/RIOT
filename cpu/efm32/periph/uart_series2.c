@@ -86,6 +86,29 @@ static inline void _set_pm_mode(uart_t dev) { (void) dev; }
 static inline void _setup_pm_mode(uart_t dev, uint8_t mode) { (void) dev; (void) mode; }
 #endif /* !IS_ACTIVE(MODULE_PM_LAYERED) */
 
+static void _uart_enable(uart_t dev)
+{
+    EUSART_TypeDef *uart = uart_config[dev].dev;
+
+    /* enable tx */
+    EUSART_Enable_TypeDef enable = eusartEnableTx;
+
+    /* enable rx if needed */
+    if (isr_ctx[dev].rx_cb) {
+        enable |= eusartEnableRx;
+    }
+
+    EUSART_Enable(uart, enable);
+}
+
+static void _uart_disable(uart_t dev)
+{
+    EUSART_TypeDef *uart = uart_config[dev].dev;
+
+    /* disable tx and rx */
+    EUSART_Enable(uart, eusartDisable);
+}
+
 #define GET_PIN(x) (x & 0xf)
 #define GET_PORT(x) (x >> 4)
 
@@ -170,21 +193,34 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     return 0;
 }
 
-void uart_poweron(uart_t dev)
+#ifdef MODULE_PERIPH_UART_MODECFG
+int uart_mode(uart_t dev, uart_data_bits_t data_bits, uart_parity_t parity,
+              uart_stop_bits_t stop_bits)
 {
     EUSART_TypeDef *uart = uart_config[dev].dev;
 
-    CMU_ClockEnable(uart_config[dev].cmu, true);
-
-    /* enable tx */
-    EUSART_Enable_TypeDef enable = eusartEnableTx;
-
-    /* enable rx if needed */
-    if (isr_ctx[dev].rx_cb) {
-        enable |= eusartEnableRx;
+    if (data_bits >= UART_MODE_UNSUPPORTED || parity >= UART_MODE_UNSUPPORTED) {
+        return UART_NOMODE;
     }
 
-    EUSART_Enable(uart, enable);
+    /* uart must be disabled to alter modes */
+    _uart_disable(dev);
+
+    uart->FRAMECFG = (data_bits << _EUSART_FRAMECFG_DATABITS_SHIFT)
+                   | (parity << _EUSART_FRAMECFG_PARITY_SHIFT)
+                   | (stop_bits << _EUSART_FRAMECFG_STOPBITS_SHIFT);
+
+    _uart_enable(dev);
+
+    return UART_OK;
+}
+#endif
+
+void uart_poweron(uart_t dev)
+{
+    CMU_ClockEnable(uart_config[dev].cmu, true);
+
+    _uart_enable(dev);
 
     /* block power mode */
     _set_pm_mode(dev);
@@ -192,13 +228,10 @@ void uart_poweron(uart_t dev)
 
 void uart_poweroff(uart_t dev)
 {
-    EUSART_TypeDef *uart = uart_config[dev].dev;
-
     /* unblock power mode */
     _clear_pm_mode(dev);
 
-    /* disable tx and rx */
-    EUSART_Enable(uart, eusartDisable);
+    _uart_disable(dev);
 
     CMU_ClockEnable(uart_config[dev].cmu, false);
 }
