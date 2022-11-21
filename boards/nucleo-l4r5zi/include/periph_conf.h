@@ -136,6 +136,13 @@ static const spi_conf_t spi_config[] = {
  *
  * For Nucleo-L4R5ZI this information is in board manual,
  * Table 11, page 38.
+ *
+ * VBAT is connected ADC1_IN18 and a voltage divider is used,
+ * so that only 1/3 of the actual VBAT is measured. This
+ * allows for a supply voltage higher than the reference voltage.
+ *
+ * For Nucleo-L4R5ZI more information is provided in MCU datasheet,
+ * in section 3.19.3 - Vbat battery voltage monitoring, page 46.
  * @{
  */
 static const adc_conf_t adc_config[] = {
