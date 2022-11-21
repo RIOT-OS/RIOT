@@ -16,5 +16,6 @@ commit:
 
 artifacts:
   - output.txt
+  - result.json.gz
   - doc-preview/
   - jobs/
