@@ -22,6 +22,8 @@
 #ifndef MBOX_H
 #define MBOX_H
 
+#include <stdbool.h>
+
 #include "list.h"
 #include "cib.h"
 #include "msg.h"
@@ -158,6 +160,18 @@ static inline int mbox_try_get(mbox_t *mbox, msg_t *msg)
 {
     return _mbox_get(mbox, msg, NON_BLOCKING);
 }
+
+/**
+ * @brief Try to get message of the given type from mailbox
+ *
+ * @param[in]   mbox    ptr to mailbox to operate on
+ * @param[out]  msg     ptr to storage for retrieved message
+ * @param[in]   type    type of the message to search for
+ *
+ * @retval  true    A message of type @p type has been stored in @p msg
+ * @retval  false   No message with type @p type currently available
+ */
+bool mbox_try_get_with_type(mbox_t *mbox, msg_t *msg, uint16_t type);
 
 /**
  * @brief Get mbox queue size (capacity)
