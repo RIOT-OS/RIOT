@@ -12,7 +12,7 @@ pr:
     readable_name: Documentation preview
 
 commit:
-  skip_keywords: ["ci_skip", "murdock_skip"]
+  skip_keywords: ["ci_skip", "murdock_skip", "[ci skip]" ]
 
 artifacts:
   - output.txt
