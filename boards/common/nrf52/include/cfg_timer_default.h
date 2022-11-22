@@ -40,7 +40,7 @@ extern "C" {
 static const timer_conf_t timer_config[] = {
     {
         .dev      = NRF_TIMER1,
-        .channels = 4,
+        .channels = 3,
         .bitmode  = TIMER_BITMODE_BITMODE_32Bit,
         .irqn     = TIMER1_IRQn
     },
@@ -50,7 +50,7 @@ static const timer_conf_t timer_config[] = {
          *         networking)!
          */
         .dev      = NRF_TIMER2,
-        .channels = 4,
+        .channels = 3,
         .bitmode  = TIMER_BITMODE_BITMODE_32Bit,
         .irqn     = TIMER2_IRQn
     },
@@ -60,7 +60,7 @@ static const timer_conf_t timer_config[] = {
 #ifdef NRF_TIMER3
     {
         .dev      = NRF_TIMER3,
-        .channels = 6,
+        .channels = 5,
         .bitmode  = TIMER_BITMODE_BITMODE_32Bit,
         .irqn     = TIMER3_IRQn
     },
@@ -68,7 +68,7 @@ static const timer_conf_t timer_config[] = {
 #ifdef NRF_TIMER4
     {
         .dev      = NRF_TIMER4,
-        .channels = 6,
+        .channels = 5,
         .bitmode  = TIMER_BITMODE_BITMODE_32Bit,
         .irqn     = TIMER4_IRQn
     }
