@@ -165,7 +165,29 @@ void timer_start(tim_t tim)
 
 void timer_stop(tim_t tim)
 {
-    dev(tim)->TASKS_STOP = 1;
+    /* Errata: [78] TIMER: High current consumption when using
+     *                     timer STOP task only
+     *
+     * # Symptoms
+     *
+     * Increased current consumption when the timer has been running and the
+     * STOP task is used to stop it.
+     *
+     * # Conditions
+     * The timer has been running (after triggering a START task) and then it is
+     * stopped using a STOP task only.
+     *
+     * # Consequences
+     *
+     * Increased current consumption.
+     *
+     * # Workaround
+     *
+     * Use the SHUTDOWN task after the STOP task or instead of the STOP task
+     *
+     * cf. https://infocenter.nordicsemi.com/pdf/nRF52833_Engineering_A_Errata_v1.4.pdf
+     */
+    dev(tim)->TASKS_SHUTDOWN = 1;
 }
 
 static inline void irq_handler(int num)
