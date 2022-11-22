@@ -218,7 +218,6 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     dev(uart)->ENABLE = UARTE_ENABLE_ENABLE_Enabled;
 #else
     NRF_UART0->ENABLE = UART_ENABLE_ENABLE_Enabled;
-    NRF_UART0->TASKS_STARTTX = 1;
 #endif
 
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
@@ -261,6 +260,7 @@ static void _write_buf(uart_t uart, const uint8_t *data, size_t len)
     /* wait for the end of transmission */
     if (!IS_USED(MODULE_PERIPH_UART_NONBLOCKING)) {
         while (dev(uart)->EVENTS_ENDTX == 0) {}
+        dev(uart)->TASKS_STOPTX = 1;
     }
 }
 
@@ -390,7 +390,9 @@ static inline void irq_handler(uart_t uart)
         dev(uart)->EVENTS_ENDTX = 0;
         dev(uart)->EVENTS_TXSTARTED = 0;
         dev(uart)->INTENCLR = UARTE_INTENSET_ENDTX_Msk;
-        if (!tsrb_empty(&uart_tx_rb[uart])) {
+        if (tsrb_empty(&uart_tx_rb[uart])) {
+            dev(uart)->TASKS_STOPTX = 1;
+        } else {
             tx_buf[uart] = tsrb_get_one(&uart_tx_rb[uart]);
             _write_buf(uart, &tx_buf[uart], 1);
         }
@@ -405,6 +407,8 @@ static inline void irq_handler(uart_t uart)
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     (void)uart;
+
+    NRF_UART0->TASKS_STARTTX = 1;
 
     for (size_t i = 0; i < len; i++) {
         /* This section of the function is not thread safe:
@@ -423,13 +427,14 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         /* wait for any transmission to be done */
         while (NRF_UART0->EVENTS_TXDRDY == 0) {}
     }
+
+    NRF_UART0->TASKS_STOPTX = 1;
 }
 
 void uart_poweron(uart_t uart)
 {
     (void)uart;
 
-    NRF_UART0->TASKS_STARTTX = 1;
     if (isr_ctx.rx_cb) {
         NRF_UART0->TASKS_STARTRX = 1;
     }
@@ -439,7 +444,7 @@ void uart_poweroff(uart_t uart)
 {
     (void)uart;
 
-    NRF_UART0->TASKS_SUSPEND;
+    NRF_UART0->TASKS_STOPRX = 1;
 }
 
 int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
