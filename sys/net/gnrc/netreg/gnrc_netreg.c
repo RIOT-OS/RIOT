@@ -177,7 +177,10 @@ void gnrc_netreg_unregister(gnrc_nettype_t type, gnrc_netreg_entry_t *entry)
     if (entry->type == GNRC_NETREG_TYPE_MBOX) {
         msg_t msg;
         while (mbox_try_get(entry->target.mbox, &msg)) {
-            gnrc_pktbuf_release_error(msg.content.ptr, EBADF);
+            if ((msg.type == GNRC_NETAPI_MSG_TYPE_RCV) ||
+                (msg.type == GNRC_NETAPI_MSG_TYPE_SND)) {
+                gnrc_pktbuf_release_error(msg.content.ptr, EBADF);
+            }
         }
     }
 #endif
