@@ -15,7 +15,7 @@ pr:
     Please refer to https://ci.riot-os.org for a complete build for now.**
 
 commit:
-  skip_keywords: ["ci_skip", "murdock_skip"]
+  skip_keywords: ["ci_skip", "murdock_skip", "[ci skip]" ]
 
 artifacts:
   - output.txt
