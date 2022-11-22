@@ -30,10 +30,12 @@ extern "C" {
  * @brief The *NORETURN* keyword tells the compiler to assume that the function
  *        cannot return.
  */
+#ifndef NORETURN
 #ifdef __GNUC__
 #define NORETURN  __attribute__((noreturn))
 #else
 #define NORETURN
+#endif
 #endif
 
 /**
@@ -43,10 +45,25 @@ extern "C" {
  *        function can be subject to common subexpression elimination and loop
  *        optimization just as an arithmetic operator would be.
  */
+#ifndef PURE
 #ifdef __GNUC__
 #define PURE  __attribute__((pure))
 #else
 #define PURE
+#endif
+#endif
+
+/**
+ * @def MAYBE_UNUSED
+ * @brief tell the compiler something may be unused
+ *        static functions, function arguments, local variables
+ */
+#ifndef MAYBE_UNUSED
+#ifdef __GNUC__
+#define MAYBE_UNUSED  __attribute__((unused))
+#else
+#define MAYBE_UNUSED
+#endif
 #endif
 
 /**
