@@ -43,8 +43,8 @@ static void inplace_xor_digests(uint8_t *d1, const uint8_t *d2)
     }
 }
 
-void pbkdf2_sha256(const uint8_t *password, size_t password_len,
-                   const uint8_t *salt, size_t salt_len,
+void pbkdf2_sha256(const void *password, size_t password_len,
+                   const void *salt, size_t salt_len,
                    int iterations,
                    uint8_t *output)
 {
