@@ -73,7 +73,7 @@ int _mbox_put(mbox_t *mbox, msg_t *msg, int blocking)
         return 1;
     }
     else {
-        if (cib_full(&mbox->cib)) {
+        while (cib_full(&mbox->cib)) {
             if (blocking) {
                 _wait(&mbox->writers, irqstate);
                 irqstate = irq_disable();
