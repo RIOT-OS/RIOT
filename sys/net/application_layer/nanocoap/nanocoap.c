@@ -27,7 +27,7 @@
 #include <string.h>
 
 #include "bitarithm.h"
-#include "nanocoap_internal.h"
+#include "net/nanocoap.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -414,8 +414,11 @@ bool coap_has_unprocessed_critical_options(const coap_pkt_t *pkt)
     return false;
 }
 
-ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_len)
+ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_len,
+                        coap_request_ctx_t *ctx)
 {
+    assert(ctx);
+
     if (coap_get_code_class(pkt) != COAP_REQ) {
         DEBUG("coap_handle_req(): not a request.\n");
         return -EBADMSG;
@@ -424,8 +427,8 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
     if (pkt->hdr->code == 0) {
         return coap_build_reply(pkt, COAP_CODE_EMPTY, resp_buf, resp_buf_len, 0);
     }
-    return coap_tree_handler(pkt, resp_buf, resp_buf_len, coap_resources,
-                             coap_resources_numof);
+    return coap_tree_handler(pkt, resp_buf, resp_buf_len, ctx,
+                             coap_resources, coap_resources_numof);
 }
 
 ssize_t coap_subtree_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
@@ -433,13 +436,12 @@ ssize_t coap_subtree_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
 {
     assert(context);
     coap_resource_subtree_t *subtree = coap_request_ctx_get_context(context);
-    return coap_tree_handler(pkt, buf, len, subtree->resources,
+    return coap_tree_handler(pkt, buf, len, context, subtree->resources,
                              subtree->resources_numof);
 }
 
-ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf,
-                          unsigned resp_buf_len,
-                          const coap_resource_t *resources,
+ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_len,
+                          coap_request_ctx_t *ctx, const coap_resource_t *resources,
                           size_t resources_numof)
 {
     coap_method_flags_t method_flag = coap_method2flag(coap_get_code_detail(pkt));
@@ -461,10 +463,8 @@ ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf,
             continue;
         }
 
-        coap_request_ctx_t ctx = {
-            .resource = resource,
-        };
-        return resource->handler(pkt, resp_buf, resp_buf_len, &ctx);
+        ctx->resource = resource;
+        return resource->handler(pkt, resp_buf, resp_buf_len, ctx);
     }
 
     return coap_build_reply(pkt, COAP_CODE_404, resp_buf, resp_buf_len, 0);
@@ -1260,6 +1260,12 @@ unsigned coap_get_len(coap_pkt_t *pkt)
     return pktlen;
 }
 
+void coap_request_ctx_init(coap_request_ctx_t *ctx, sock_udp_ep_t *remote)
+{
+    memset(ctx, 0, sizeof(*ctx));
+    ctx->remote = remote;
+}
+
 const char *coap_request_ctx_get_path(const coap_request_ctx_t *ctx)
 {
     return ctx->resource->path;
@@ -1282,10 +1288,5 @@ uint32_t coap_request_ctx_get_tl_type(const coap_request_ctx_t *ctx)
 
 const sock_udp_ep_t *coap_request_ctx_get_remote_udp(const coap_request_ctx_t *ctx)
 {
-#ifdef MODULE_GCOAP
     return ctx->remote;
-#else
-    (void)ctx;
-    return NULL;
-#endif
 }
