@@ -187,7 +187,14 @@ typedef enum {
  */
 typedef struct {
     NRF_TIMER_Type *dev;    /**< timer device */
-    uint8_t channels;       /**< number of channels available */
+    /**
+     * @brief   number of hardware channels ***minus one***
+     *
+     * The last hardware channels is implicitly used by timer_read() and not
+     * available to the user. This value, hence, is the number of channels
+     * available to the user.
+     */
+    uint8_t channels;
     uint8_t bitmode;        /**< counter width */
     uint8_t irqn;           /**< IRQ number of the timer device */
 } timer_conf_t;
