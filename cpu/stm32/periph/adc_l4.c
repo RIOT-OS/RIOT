@@ -42,7 +42,8 @@
 /**
  * @brief map CPU specific register/value names
  */
-#if defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L4R5ZI)
+#if defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L4R5ZI) || \
+    defined(CPU_MODEL_STM32L496ZG)
 #define ADC_CR_REG      CR
 #define ADC_ISR_REG     ISR
 #define ADC_PERIPH_CLK  AHB2
