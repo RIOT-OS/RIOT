@@ -72,7 +72,7 @@ static int test_get_addr(void)
 {
     uint8_t tmp[sizeof(_dev_addr)];
 
-    if (gnrc_netapi_get(_mac_pid, NETOPT_ADDRESS, 0, tmp, sizeof(tmp)) != sizeof(_dev_addr)) {
+    if (gnrc_netif_get(gnrc_netif_get_by_pid(_mac_pid), NETOPT_ADDRESS, 0, tmp, sizeof(tmp)) != sizeof(_dev_addr)) {
         puts("Error getting device address");
         return 0;
     }
@@ -232,12 +232,12 @@ static int test_set_addr(void)
     static const uint8_t new_addr[] = { 0x71, 0x29, 0x5b, 0xc8, 0x52, 0x65 };
     uint8_t tmp[sizeof(new_addr)];
 
-    if (gnrc_netapi_set(_mac_pid, NETOPT_ADDRESS, 0, (void *)new_addr,
+    if (gnrc_netif_set(gnrc_netif_get_by_pid(_mac_pid), NETOPT_ADDRESS, 0, (void *)new_addr,
                         sizeof(new_addr)) != sizeof(new_addr)) {
         puts("Error setting device address");
         return 0;
     }
-    if (gnrc_netapi_get(_mac_pid, NETOPT_ADDRESS, 0, tmp,
+    if (gnrc_netif_get(gnrc_netif_get_by_pid(_mac_pid), NETOPT_ADDRESS, 0, tmp,
                         sizeof(tmp)) != sizeof(tmp)) {
         puts("Error setting device address");
         return 0;

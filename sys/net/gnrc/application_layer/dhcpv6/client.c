@@ -47,7 +47,7 @@ unsigned dhcpv6_client_get_duid_l2(unsigned iface, dhcpv6_duid_l2_t *duid)
         netif = gnrc_netif_get_by_pid(iface);
     }
     assert(netif != NULL);
-    if ((res = gnrc_netapi_get(netif->pid, NETOPT_ADDRESS_LONG, 0,
+    if ((res = gnrc_netif_get(netif, NETOPT_ADDRESS_LONG, 0,
                                l2addr, GNRC_NETIF_L2ADDR_MAXLEN)) > 0) {
         duid->l2type = byteorder_htons(ARP_HWTYPE_EUI64);
     }
@@ -61,7 +61,7 @@ unsigned dhcpv6_client_get_duid_l2(unsigned iface, dhcpv6_duid_l2_t *duid)
             case NETDEV_TYPE_ETHERNET:
             case NETDEV_TYPE_BLE:
             case NETDEV_TYPE_ESP_NOW:
-                if ((res = gnrc_netapi_get(netif->pid,
+                if ((res = gnrc_netif_get(netif,
                                            NETOPT_ADDRESS,
                                            0, l2addr,
                                            GNRC_NETIF_L2ADDR_MAXLEN)) > 0) {

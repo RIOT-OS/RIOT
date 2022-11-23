@@ -462,6 +462,18 @@ gnrc_netif_t *gnrc_netif_iter(const gnrc_netif_t *prev);
  */
 gnrc_netif_t *gnrc_netif_get_by_pid(kernel_pid_t pid);
 
+static inline int gnrc_netif_get(gnrc_netif_t *netif, netopt_t opt, uint16_t context,
+                                 void *value, size_t max_len)
+{
+    return gnrc_netapi_get(netif->pid, opt, context, value, max_len);
+}
+
+static inline int gnrc_netif_set(gnrc_netif_t *netif, netopt_t opt, uint16_t context,
+                                 const void *value, size_t value_len)
+{
+    return gnrc_netapi_set(netif->pid, opt, context, value, value_len);
+}
+
 /**
  * @brief   Gets the (unicast on anycast) IPv6 address of an interface (if IPv6
  *          is supported)
@@ -483,14 +495,14 @@ gnrc_netif_t *gnrc_netif_get_by_pid(kernel_pid_t pid);
  *          May be 0 if no addresses are configured.
  * @return  -ENOTSUP, if @p netif doesn't support IPv6.
  */
-static inline int gnrc_netif_ipv6_addrs_get(const gnrc_netif_t *netif,
+static inline int gnrc_netif_ipv6_addrs_get(gnrc_netif_t *netif,
                                             ipv6_addr_t *addrs,
                                             size_t max_len)
 {
     assert(netif != NULL);
     assert(addrs != NULL);
     assert(max_len >= sizeof(ipv6_addr_t));
-    return gnrc_netapi_get(netif->pid, NETOPT_IPV6_ADDR, 0, addrs, max_len);
+    return gnrc_netif_get(netif, NETOPT_IPV6_ADDR, 0, addrs, max_len);
 }
 
 /**
@@ -514,14 +526,14 @@ static inline int gnrc_netif_ipv6_addrs_get(const gnrc_netif_t *netif,
  *          corresponding solicited-nodes multicast address.
  * @return  -ENOTSUP, if @p netif doesn't support IPv6.
  */
-static inline int gnrc_netif_ipv6_addr_add(const gnrc_netif_t *netif,
+static inline int gnrc_netif_ipv6_addr_add(gnrc_netif_t *netif,
                                            const ipv6_addr_t *addr, unsigned pfx_len,
                                            uint8_t flags)
 {
     assert(netif != NULL);
     assert(addr != NULL);
     assert((pfx_len > 0) && (pfx_len <= 128));
-    return gnrc_netapi_set(netif->pid, NETOPT_IPV6_ADDR,
+    return gnrc_netif_set(netif, NETOPT_IPV6_ADDR,
                            ((pfx_len << 8U) | flags), addr,
                            sizeof(ipv6_addr_t));
 }
@@ -539,12 +551,12 @@ static inline int gnrc_netif_ipv6_addr_add(const gnrc_netif_t *netif,
  * @return  sizeof(ipv6_addr_t) on success.
  * @return  -ENOTSUP, if @p netif doesn't support IPv6.
  */
-static inline int gnrc_netif_ipv6_addr_remove(const gnrc_netif_t *netif,
+static inline int gnrc_netif_ipv6_addr_remove(gnrc_netif_t *netif,
                                               const ipv6_addr_t *addr)
 {
     assert(netif != NULL);
     assert(addr != NULL);
-    return gnrc_netapi_set(netif->pid, NETOPT_IPV6_ADDR_REMOVE,
+    return gnrc_netif_set(netif, NETOPT_IPV6_ADDR_REMOVE,
                            0, addr, sizeof(ipv6_addr_t));
 }
 
@@ -568,14 +580,14 @@ static inline int gnrc_netif_ipv6_addr_remove(const gnrc_netif_t *netif,
  *          success (including 0).
  * @return  -ENOTSUP, if @p netif doesn't support IPv6.
  */
-static inline int gnrc_netif_ipv6_groups_get(const gnrc_netif_t *netif,
+static inline int gnrc_netif_ipv6_groups_get(gnrc_netif_t *netif,
                                              ipv6_addr_t *groups,
                                              size_t max_len)
 {
     assert(netif != NULL);
     assert(groups != NULL);
     assert(max_len >= sizeof(ipv6_addr_t));
-    return gnrc_netapi_get(netif->pid, NETOPT_IPV6_GROUP, 0, groups, max_len);
+    return gnrc_netif_get(netif, NETOPT_IPV6_GROUP, 0, groups, max_len);
 }
 
 /**
@@ -592,12 +604,12 @@ static inline int gnrc_netif_ipv6_groups_get(const gnrc_netif_t *netif,
  * @return  -ENOMEM, if no space is left on @p netif to add @p group.
  * @return  -ENOTSUP, if @p netif doesn't support IPv6.
  */
-static inline int gnrc_netif_ipv6_group_join(const gnrc_netif_t *netif,
+static inline int gnrc_netif_ipv6_group_join(gnrc_netif_t *netif,
                                              ipv6_addr_t *group)
 {
     assert(netif != NULL);
     assert(group != NULL);
-    return gnrc_netapi_set(netif->pid, NETOPT_IPV6_GROUP, 0, group,
+    return gnrc_netif_set(netif, NETOPT_IPV6_GROUP, 0, group,
                            sizeof(ipv6_addr_t));
 }
 
@@ -614,12 +626,12 @@ static inline int gnrc_netif_ipv6_group_join(const gnrc_netif_t *netif,
  * @return  sizeof(ipv6_addr_t) on success.
  * @return  -ENOTSUP, if @p netif doesn't support IPv6.
  */
-static inline int gnrc_netif_ipv6_group_leave(const gnrc_netif_t *netif,
+static inline int gnrc_netif_ipv6_group_leave(gnrc_netif_t *netif,
                                               ipv6_addr_t *group)
 {
     assert(netif != NULL);
     assert(group != NULL);
-    return gnrc_netapi_set(netif->pid, NETOPT_IPV6_GROUP_LEAVE, 0, group,
+    return gnrc_netif_set(netif, NETOPT_IPV6_GROUP_LEAVE, 0, group,
                            sizeof(ipv6_addr_t));
 }
 

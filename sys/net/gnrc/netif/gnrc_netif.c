@@ -1284,7 +1284,7 @@ int gnrc_netif_ipv6_add_prefix(gnrc_netif_t *netif,
     assert(netif != NULL);
     DEBUG("gnrc_netif: (re-)configure prefix %s/%d\n",
           ipv6_addr_to_str(addr_str, pfx, sizeof(addr_str)), pfx_len);
-    if (gnrc_netapi_get(netif->pid, NETOPT_IPV6_IID, 0, &iid,
+    if (gnrc_netif_get(netif, NETOPT_IPV6_IID, 0, &iid,
                         sizeof(eui64_t)) >= 0) {
         ipv6_addr_set_aiid(&addr, iid.uint8);
     }

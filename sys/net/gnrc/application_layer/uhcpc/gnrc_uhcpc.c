@@ -30,13 +30,13 @@ static void set_interface_roles(void)
 
     while ((netif = gnrc_netif_iter(netif))) {
         kernel_pid_t dev = netif->pid;
-        int is_wired = gnrc_netapi_get(dev, NETOPT_IS_WIRED, 0, NULL, 0);
+        int is_wired = gnrc_netif_get(netif, NETOPT_IS_WIRED, 0, NULL, 0);
         if ((!gnrc_border_interface) && (is_wired == 1)) {
             ipv6_addr_t addr, defroute = IPV6_ADDR_UNSPECIFIED;
             gnrc_border_interface = dev;
 
             ipv6_addr_from_str(&addr, "fe80::2");
-            gnrc_netapi_set(dev, NETOPT_IPV6_ADDR, 64 << 8, &addr,
+            gnrc_netif_set(netif, NETOPT_IPV6_ADDR, 64 << 8, &addr,
                             sizeof(addr));
             ipv6_addr_from_str(&addr, "fe80::1");
             gnrc_ipv6_nib_ft_add(&defroute, IPV6_ADDR_BIT_LEN, &addr, dev, 0);
