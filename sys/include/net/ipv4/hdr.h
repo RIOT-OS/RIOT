@@ -73,7 +73,7 @@ typedef struct __attribute__((packed)) {
     /**
      * @brief version control flags and Fragment Offset.
      *
-     * @details The flags are the 3 most significant bits, and the remaining 13 bits are the fragment offfset
+     * @details The flags are the 3 most significant bits, and the remaining 13 bits are the fragment offset
      *
      * This module provides helper functions to set, get, and check these
      * fields accordingly:

@@ -12,7 +12,7 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @file
  *
- * This test appliation demonstrates the usage of the MCP47xx driver.
+ * This test application demonstrates the usage of the MCP47xx driver.
  * It can be used to test each MCP47xx DAC channel with shell commands.
  *
  * Functions `init`, `set`, `poweron`, `poweroff` demonstrate the usage of

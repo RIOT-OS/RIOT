@@ -47,7 +47,7 @@ ISR_VECTOR(50) const uint32_t particle_monofirmware_padding[64] = {0, };
 
 #ifdef PARTICLE_MONOFIRMWARE_CHECKSUMLIMIT
 /* Watch the ISR vector sequence here: This is placed *after* the module_info
- * in the flash (52 > 51), but placed before it in the code to be referencable
+ * in the flash (52 > 51), but placed before it in the code to be referenceable
  * from there.
  *
  * The actual value is replaced by monofirmware-tool.py.

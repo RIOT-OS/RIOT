@@ -82,7 +82,7 @@ extern "C" {
 #define SDCARD_SPI_PARAM_POWER  GPIO_UNDEF   /**< power control is not used (fixed) */
 
 #ifndef SDCARD_SPI_PARAM_CS
-#define SDCARD_SPI_PARAM_CS     SPI0_CS0     /**< SD-Card CS signal (overridde it) */
+#define SDCARD_SPI_PARAM_CS     SPI0_CS0     /**< SD-Card CS signal (override it) */
 #endif
 /** @} */
 #endif /* MODULE_SDCARD_SPI || DOXYGEN */
