@@ -202,37 +202,52 @@ static const uart_conf_t uart_config[] = {
 /* PWM0 channels */
 static const pwm_conf_chan_t pwm_chan0_config[] = {
     /* GPIO pin, MUX value, TCC channel */
-    { GPIO_PIN(PA, 12), GPIO_MUX_E, 0 },
-    { GPIO_PIN(PA, 13), GPIO_MUX_E, 1 },
+    { .pin = GPIO_PIN(PA, 12), .mux = GPIO_MUX_E, .chan = 0 },
+    { .pin = GPIO_PIN(PA, 13), .mux = GPIO_MUX_E, .chan = 1 },
 };
 #endif
 #if PWM_1_EN
 /* PWM1 channels */
 static const pwm_conf_chan_t pwm_chan1_config[] = {
     /* GPIO pin, MUX value, TCC channel */
-    { GPIO_PIN(PB, 12), GPIO_MUX_E, 0 },
-    { GPIO_PIN(PB, 13), GPIO_MUX_E, 1 },
+    { .pin = GPIO_PIN(PB, 12), .mux = GPIO_MUX_E, .chan = 0 },
+    { .pin = GPIO_PIN(PB, 13), .mux = GPIO_MUX_E, .chan = 1 },
 };
 #endif
 #if PWM_2_EN
 /* PWM2 channels */
 static const pwm_conf_chan_t pwm_chan2_config[] = {
     /* GPIO pin, MUX value, TCC channel */
-    { GPIO_PIN(PB, 02), GPIO_MUX_E, 0 },
-    { GPIO_PIN(PB, 03), GPIO_MUX_E, 1 },
+    { .pin = GPIO_PIN(PB, 02), .mux = GPIO_MUX_E, .chan = 0 },
+    { .pin = GPIO_PIN(PB, 03), .mux = GPIO_MUX_E, .chan = 1 },
 };
 #endif
 
 /* PWM device configuration */
 static const pwm_conf_t pwm_config[] = {
 #if PWM_0_EN
-    {TCC_CONFIG(TCC2), pwm_chan0_config, ARRAY_SIZE(pwm_chan0_config), SAM0_GCLK_MAIN},
+    {
+        .tim = TCC_CONFIG(TCC2),
+        .chan = pwm_chan0_config,
+        .chan_numof = ARRAY_SIZE(pwm_chan0_config),
+        .gclk_src = SAM0_GCLK_MAIN,
+    },
 #endif
 #if PWM_1_EN
-    {TCC_CONFIG(TC4), pwm_chan1_config, ARRAY_SIZE(pwm_chan1_config), SAM0_GCLK_MAIN},
+    {
+        .tim = TC_CONFIG(TC4),
+        .chan = pwm_chan1_config,
+        .chan_numof = ARRAY_SIZE(pwm_chan1_config),
+        .gclk_src = SAM0_GCLK_MAIN,
+    },
 #endif
 #if PWM_2_EN
-    {TCC_CONFIG(TC6), pwm_chan2_config, ARRAY_SIZE(pwm_chan2_config), SAM0_GCLK_MAIN},
+    {
+        .tim = TC_CONFIG(TC6),
+        .chan = pwm_chan2_config,
+        .chan_numof = ARRAY_SIZE(pwm_chan2_config),
+        .gclk_src = SAM0_GCLK_MAIN,
+    },
 #endif
 };
 
