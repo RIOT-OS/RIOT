@@ -13133,3 +13133,7 @@ boards/xg23\-pk6068a/include/periph_conf\.h:[0-9]+: warning: Member timer_config
 boards/xg23\-pk6068a/include/periph_conf\.h:[0-9]+: warning: Member UART_0_ISR_RX \(macro definition\) of file periph_conf\.h is not documented\.
 boards/xg23\-pk6068a/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/xg23\-pk6068a/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/xg23\-pk6068a/include/periph_conf\.h:[0-9]+: warning: Member ADC_DEV_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/xg23\-pk6068a/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
+boards/xg23\-pk6068a/include/periph_conf\.h:[0-9]+: warning: Member adc_config\[\] \(variable\) of file periph_conf\.h is not documented\.
+boards/xg23\-pk6068a/include/periph_conf\.h:[0-9]+: warning: Member adc_channel_config\[\] \(variable\) of file periph_conf\.h is not documented\.

@@ -25,7 +25,11 @@
 
 #include "cpu_conf.h"
 
+#if defined(_SILICON_LABS_32B_SERIES_2)
+#include "em_iadc.h"
+#else
 #include "em_adc.h"
+#endif
 #include "em_cmu.h"
 #include "em_device.h"
 #include "em_gpio.h"
@@ -57,57 +61,6 @@ typedef struct {
     CMU_ClkDiv_TypeDef div;  /**< Divisor */
 } clk_div_t;
 
-#if (defined(ADC_COUNT) && (ADC_COUNT > 0)) || defined(DOXYGEN)
-/**
- * @brief   Internal macro for combining ADC resolution (x) with number of
- *          shifts (y).
- */
-#define ADC_MODE(x, y)      ((y << 4) | x)
-
-/**
- * @brief   Internal define to note that resolution is not supported.
- */
-#define ADC_MODE_UNDEF(x)   (ADC_MODE(x, 15))
-
-#ifndef DOXYGEN
-/**
- * @brief   Possible ADC resolution settings
- * @{
- */
-#define HAVE_ADC_RES_T
-typedef enum {
-    ADC_RES_6BIT  = ADC_MODE(adcRes6Bit, 0),    /**< ADC resolution: 6 bit */
-    ADC_RES_8BIT  = ADC_MODE(adcRes8Bit, 0),    /**< ADC resolution: 8 bit */
-    ADC_RES_10BIT = ADC_MODE(adcRes12Bit, 2),   /**< ADC resolution: 10 bit (shifted from 12 bit) */
-    ADC_RES_12BIT = ADC_MODE(adcRes12Bit, 0),   /**< ADC resolution: 12 bit */
-    ADC_RES_14BIT = ADC_MODE_UNDEF(0),          /**< ADC resolution: 14 bit (unsupported) */
-    ADC_RES_16BIT = ADC_MODE_UNDEF(1),          /**< ADC resolution: 16 bit (unsupported) */
-} adc_res_t;
-/** @} */
-#endif /* ndef DOXYGEN */
-
-/**
- * @brief   ADC device configuration
- */
-typedef struct {
-    ADC_TypeDef *dev;                 /**< ADC device used */
-    CMU_Clock_TypeDef cmu;            /**< the device CMU channel */
-} adc_conf_t;
-
-/**
- * @brief   ADC channel configuration
- */
-typedef struct {
-    uint8_t dev;                      /**< device index */
-#if defined(_SILICON_LABS_32B_SERIES_0)
-    ADC_SingleInput_TypeDef input;    /**< input channel */
-#elif defined(_SILICON_LABS_32B_SERIES_1)
-    ADC_PosSel_TypeDef input;         /**< input channel */
-#endif
-    ADC_Ref_TypeDef reference;        /**< channel voltage reference */
-    ADC_AcqTime_TypeDef acq_time;     /**< channel acquisition time */
-} adc_chan_conf_t;
-#endif
 
 /**
  * @brief   Length of CPU ID in octets.
@@ -244,6 +197,183 @@ typedef enum {
 } gpio_flank_t;
 /** @} */
 #endif /* ndef DOXYGEN */
+
+#if defined(_SILICON_LABS_32B_SERIES_2)
+/**
+ * @brief   Internal macro for combining over-sampling rate (osr), digital
+ *          averaging count (avg) and output resolution (res).
+ *
+ * @note    The efr32xg23 reference manual provides this folumar:
+ *          res = 11 bit + log_2(osr * avg) bit
+ */
+#if defined(_IADC_CFG_DIGAVG_MASK)
+#define ADC_MODE(osr, avg, res)  ((osr << 16) | (avg << 8) | res)
+#else
+#define ADC_MODE(osr, res)  ((osr << 16) | res)
+#endif
+
+/**
+ * @brief   Internal macro to extract averaging count
+ */
+#define ADC_MODE_OSR(mode)       ((mode & 0xff0000) >> 16)
+
+#if defined(_IADC_CFG_DIGAVG_MASK)
+/**
+ * @brief   Internal macro to extract over-sampling rate
+ */
+#define ADC_MODE_AVG(mode)       ((mode & 0x00ff00) >> 8)
+#endif
+
+/**
+ * @brief   Internal macro to extract output resolution
+ */
+#define ADC_MODE_RES(mode)       ((mode & 0x0000ff) >> 0)
+
+/**
+ * @brief   Possible ADC resolution settings
+ * @{
+ */
+#define HAVE_ADC_RES_T
+#if defined(_IADC_CFG_DIGAVG_MASK)
+typedef enum {
+    ADC_RES_6BIT  = ADC_MODE(iadcCfgOsrHighSpeed2x, iadcDigitalAverage1, 6),
+    ADC_RES_8BIT  = ADC_MODE(iadcCfgOsrHighSpeed2x, iadcDigitalAverage1, 8),
+    ADC_RES_10BIT = ADC_MODE(iadcCfgOsrHighSpeed2x, iadcDigitalAverage1, 10),
+    ADC_RES_12BIT = ADC_MODE(iadcCfgOsrHighSpeed2x, iadcDigitalAverage1, 12),
+    ADC_RES_14BIT = ADC_MODE(iadcCfgOsrHighSpeed8x, iadcDigitalAverage1, 14),
+    ADC_RES_16BIT = ADC_MODE(iadcCfgOsrHighSpeed16x, iadcDigitalAverage2, 16),
+} adc_res_t;
+#else
+typedef enum {
+    ADC_RES_6BIT  = ADC_MODE(iadcCfgOsrHighSpeed2x, 6),
+    ADC_RES_8BIT  = ADC_MODE(iadcCfgOsrHighSpeed2x, 8),
+    ADC_RES_10BIT = ADC_MODE(iadcCfgOsrHighSpeed2x, 10),
+    ADC_RES_12BIT = ADC_MODE(iadcCfgOsrHighSpeed2x, 12),
+    ADC_RES_14BIT = ADC_MODE(iadcCfgOsrHighSpeed8x, 14),
+    ADC_RES_16BIT = ADC_MODE(iadcCfgOsrHighSpeed32x, 16),
+} adc_res_t;
+#endif
+
+/**
+ * @brief   ADC device configuration
+ */
+typedef struct {
+    /**
+     * IADC device configuration
+     */
+    IADC_TypeDef *dev;
+
+    /**
+     * CMU gate for the IADC device
+     */
+    CMU_Clock_TypeDef cmu;
+
+    /**
+     * Voltage reference to use
+     */
+    IADC_CfgReference_t reference;
+
+    /**
+     * Voltage of the reference in mV
+     *
+     * @note  Required internally for offset correction.
+     */
+    uint32_t reference_mV;
+
+    /**
+     * Ampilfication of the analog input signal
+     *
+     * @note  The maximum input voltage is
+     *        \ref adc_conf_t.gain * \ref adc_conf_t.reference_mV
+     */
+    IADC_CfgAnalogGain_t gain;
+
+    /**
+     * Available resoltions
+     *
+     * @note  Resolutions made available to the applications have to be
+     *        specified during \ref adc_init. This will configure the IADC
+     *        accordingly and allows for quick \ref adc_sample calls.
+     */
+    adc_res_t available_res[IADC0_CONFIGNUM];
+} adc_conf_t;
+
+/**
+ * @brief   ADC channel configuration
+ */
+typedef struct {
+    /**
+     * \ref adc_conf_t device index
+     */
+    uint8_t dev;
+
+    /**
+     * Positive analog input
+     */
+    gpio_t input_pos;
+
+    /**
+     * Negative analog input.
+     * Can be set to \ref GPIO_UNDEF for single-ended ADC lines.
+     *
+     * @note  For differential inputs make sure that
+     *        \ref adc_chan_conf_t.input_pos is an even pin number and
+     *        \ref adc_chan_conf_t.input_neg is an odd pin number or the other
+     *        way around.
+     */
+    gpio_t input_neg;
+} adc_chan_conf_t;
+#else  /* defined(_SILICON_LABS_32B_SERIES_2) */
+/**
+ * @brief   Internal macro for combining ADC resolution (x) with number of
+ *          shifts (y).
+ */
+#define ADC_MODE(x, y)      ((y << 4) | x)
+
+/**
+ * @brief   Internal define to note that resolution is not supported.
+ */
+#define ADC_MODE_UNDEF(x)   (ADC_MODE(x, 15))
+
+#ifndef DOXYGEN
+/**
+ * @brief   Possible ADC resolution settings
+ * @{
+ */
+#define HAVE_ADC_RES_T
+typedef enum {
+    ADC_RES_6BIT  = ADC_MODE(adcRes6Bit, 0),    /**< ADC resolution: 6 bit */
+    ADC_RES_8BIT  = ADC_MODE(adcRes8Bit, 0),    /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = ADC_MODE(adcRes12Bit, 2),   /**< ADC resolution: 10 bit (shifted from 12 bit) */
+    ADC_RES_12BIT = ADC_MODE(adcRes12Bit, 0),   /**< ADC resolution: 12 bit */
+    ADC_RES_14BIT = ADC_MODE_UNDEF(0),          /**< ADC resolution: 14 bit (unsupported) */
+    ADC_RES_16BIT = ADC_MODE_UNDEF(1),          /**< ADC resolution: 16 bit (unsupported) */
+} adc_res_t;
+/** @} */
+#endif /* ndef DOXYGEN */
+
+/**
+ * @brief   ADC device configuration
+ */
+typedef struct {
+    ADC_TypeDef *dev;                 /**< ADC device used */
+    CMU_Clock_TypeDef cmu;            /**< the device CMU channel */
+} adc_conf_t;
+
+/**
+ * @brief   ADC channel configuration
+ */
+typedef struct {
+    uint8_t dev;                      /**< device index */
+#if defined(_SILICON_LABS_32B_SERIES_0)
+    ADC_SingleInput_TypeDef input;    /**< input channel */
+#elif defined(_SILICON_LABS_32B_SERIES_1)
+    ADC_PosSel_TypeDef input;         /**< input channel */
+#endif
+    ADC_Ref_TypeDef reference;        /**< channel voltage reference */
+    ADC_AcqTime_TypeDef acq_time;     /**< channel acquisition time */
+} adc_chan_conf_t;
+#endif  /* !defined(_SILICON_LABS_32B_SERIES_2) */
 
 /**
  * @brief   Override hardware crypto supported methods.
