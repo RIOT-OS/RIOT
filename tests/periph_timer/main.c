@@ -25,6 +25,8 @@
 #include "atomic_utils.h"
 #include "clk.h"
 #include "periph/timer.h"
+#include "test_utils/expect.h"
+#include "time_units.h"
 
 /**
  * @brief   Make sure, the maximum number of timers is defined
@@ -47,6 +49,15 @@ static void cb(void *arg, int chan)
     timeouts[chan] = sw_count;
     args[chan] = (unsigned)arg + chan;
     fired++;
+}
+
+static void cb_not_to_be_executed(void *arg, int chan)
+{
+    (void)arg;
+    (void)chan;
+
+    puts("Spurious timer fired");
+    expect(0);
 }
 
 static int test_timer(unsigned num)
@@ -115,6 +126,29 @@ static int test_timer(unsigned num)
             printf(" - diff: %8" PRIu32 "\n",
                    atomic_load_u32(&timeouts[i]) - atomic_load_u32(&timeouts[i - 1]));
         }
+    }
+
+    /* test for spurious timer IRQs */
+    expect(0 == timer_init(TIMER_DEV(num), TIMER_SPEED, cb_not_to_be_executed, NULL));
+
+    const unsigned duration = 2ULL * US_PER_MS * US_PER_SEC / TIMER_SPEED;
+    unsigned target = timer_read(TIMER_DEV(num)) + duration;
+    expect(0 == timer_set_absolute(TIMER_DEV(num), 0, target));
+    expect(0 == timer_clear(TIMER_DEV(num), 0));
+    while (timer_read(TIMER_DEV(num)) < target) {
+        /* busy waiting for the timer to reach it timeout. Timer must not fire,
+         * it was cleared */
+    }
+
+    /* checking again to make sure that any IRQ pending bit that may just was
+     * mask doesn't trigger a timer IRQ on the next set */
+    target = timer_read(TIMER_DEV(num)) + duration;
+    timer_set_absolute(TIMER_DEV(num), 0, target);
+    timer_clear(TIMER_DEV(num), 0);
+
+    while (timer_read(TIMER_DEV(num)) < target) {
+        /* busy waiting for the timer to reach it timeout. Timer must not fire,
+         * it was cleared */
     }
 
     return 1;
