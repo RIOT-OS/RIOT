@@ -169,7 +169,7 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev)
     /* we must be in TRX_OFF before changing the PHY configuration */
     uint8_t prev_state = at86rf2xx_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
 
-#ifdef MODULE_AT86RF212B
+#if AT86RF2XX_HAVE_SUBGHZ
     /* The TX power register must be updated after changing the channel if
      * moving between bands. */
     int16_t txpower = at86rf2xx_get_txpower(dev);
@@ -211,7 +211,7 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev)
     phy_cc_cca |= (dev->netdev.chan & AT86RF2XX_PHY_CC_CCA_MASK__CHANNEL);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_CC_CCA, phy_cc_cca);
 
-#ifdef MODULE_AT86RF212B
+#if AT86RF2XX_HAVE_SUBGHZ
     /* Update the TX power register to achieve the same power (in dBm) */
     at86rf2xx_set_txpower(dev, txpower);
 #endif

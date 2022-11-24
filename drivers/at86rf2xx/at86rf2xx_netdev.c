@@ -533,7 +533,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
         case NETOPT_CHANNEL_PAGE:
             assert(len == sizeof(uint16_t));
             uint8_t page = (((const uint16_t *)val)[0]) & UINT8_MAX;
-#ifdef MODULE_AT86RF212B
+#if AT86RF2XX_HAVE_SUBGHZ
             if ((page != 0) && (page != 2)) {
                 res = -EINVAL;
             }

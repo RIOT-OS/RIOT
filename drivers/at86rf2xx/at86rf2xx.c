@@ -206,7 +206,7 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     /* enable safe mode (protect RX FIFO until reading data starts) */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2,
                         AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE);
-#ifdef MODULE_AT86RF212B
+#if AT86RF2XX_HAVE_SUBGHZ
     at86rf2xx_set_page(dev, AT86RF2XX_DEFAULT_PAGE);
 #endif
 

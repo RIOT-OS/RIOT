@@ -116,6 +116,15 @@ extern "C" {
 #define AT86RF2XX_IS_PERIPH (0)
 #endif
 
+/**
+ * @brief   Support for SubGHz bands
+ */
+#ifdef MODULE_AT86RF212B
+#define AT86RF2XX_HAVE_SUBGHZ (1)
+#else
+#define AT86RF2XX_HAVE_SUBGHZ (0)
+#endif
+
 #if defined(DOXYGEN) || defined(MODULE_AT86RF232) || defined(MODULE_AT86RF233) || defined(MODULE_AT86RFR2)
 /**
  * @brief   Frame retry counter reporting
