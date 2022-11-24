@@ -139,13 +139,23 @@ extern "C" {
  * @brief   Frame retry counter reporting
  *
  * The AT86RF2XX_HAVE_RETRIES flag enables support for NETOPT_TX_RETRIES NEEDED
- * operation. Required for this functionality is the XAH_CTRL_2 register which
- * contains the frame retry counter. Only the at86rf232 and the at86rf233
- * support this register.
+ * operation.
  */
 #define AT86RF2XX_HAVE_RETRIES             (1)
 #else
 #define AT86RF2XX_HAVE_RETRIES             (0)
+#endif
+
+/**
+ * @brief   Frame retry counter register
+ *
+ * Some radios include the XAH_CTRL_2 register which contains the frame retry
+ * counter. Only the at86rf232 and the at86rf233 support this register.
+ */
+#if AT86RF2XX_HAVE_RETRIES && defined(AT86RF2XX_REG__XAH_CTRL_2)
+#define AT86RF2XX_HAVE_RETRIES_REG         (1)
+#else
+#define AT86RF2XX_HAVE_RETRIES_REG         (0)
 #endif
 
 /**

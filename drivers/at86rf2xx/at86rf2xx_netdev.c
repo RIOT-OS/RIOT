@@ -669,7 +669,7 @@ static void _isr_send_complete(at86rf2xx_t *dev, uint8_t trac_status)
         return;
     }
 /* Only radios with the XAH_CTRL_2 register support frame retry reporting */
-#if AT86RF2XX_HAVE_RETRIES && defined(AT86RF2XX_REG__XAH_CTRL_2)
+#if AT86RF2XX_HAVE_RETRIES_REG
     dev->tx_retries = (at86rf2xx_reg_read(dev, AT86RF2XX_REG__XAH_CTRL_2)
                        & AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_MASK) >>
                       AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_OFFSET;
