@@ -81,7 +81,7 @@ void __pthread_cleanup_pop(__pthread_cleanup_datum_t *datum, int execute);
             do { } while (0)
 
 /**
- * @brief       Closes a cleaup frame
+ * @brief       Closes a cleanup frame
  * @details     Must be paired with pthread_cleanup_push().
  * @param[in]   EXECUTE   Iff `!= 0` call cleanup handler.
  */

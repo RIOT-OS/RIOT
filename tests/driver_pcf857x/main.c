@@ -14,7 +14,7 @@
  *
  * ## Overview
  *
- * This test appliation demonstrates the usage of the PCF857X driver interface
+ * This test application demonstrates the usage of the PCF857X driver interface
  * and can be used to test each PCF857X expander I/O pin with shell commands.
  *
  * The application bases on the test application for GPIO peripheral drivers

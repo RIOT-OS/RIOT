@@ -2,7 +2,7 @@
 
 ## Overview
 
-This test appliation demonstrates the usage of the PCA9685 driver interface
+This test application demonstrates the usage of the PCA9685 driver interface
 and can be used to test each PCA9685 PWM device with shell commands.
 
 The application bases on the test application for PWM peripheral drivers
