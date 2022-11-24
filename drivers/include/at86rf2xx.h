@@ -107,6 +107,15 @@ extern "C" {
 #   define MIN_RX_SENSITIVITY              (-101)
 #endif
 
+/**
+ * @brief   Whether there is a periph version of the radio
+ */
+#if IS_USED(MODULE_AT86RFA1) || IS_USED(MODULE_AT86RFR2)
+#define AT86RF2XX_IS_PERIPH (1)
+#else
+#define AT86RF2XX_IS_PERIPH (0)
+#endif
+
 #if defined(DOXYGEN) || defined(MODULE_AT86RF232) || defined(MODULE_AT86RF233) || defined(MODULE_AT86RFR2)
 /**
  * @brief   Frame retry counter reporting
@@ -209,7 +218,7 @@ extern "C" {
 #define AT86RF2XX_PHY_STATE_TX_BUSY  AT86RF2XX_STATE_BUSY_TX_ARET
 #endif /* IS_ACTIVE(AT86RF2XX_BASIC_MODE) */
 
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
 /**
  * @brief   memory mapped radio needs no parameters
  */
@@ -235,7 +244,7 @@ typedef struct at86rf2xx_params {
  */
 typedef struct {
     netdev_ieee802154_t netdev;             /**< netdev parent struct */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
     /* ATmega256rfr2 signals transceiver events with different interrupts
      * they have to be stored to mimic the same flow as external transceiver
      * Use irq_status to map saved interrupts of SOC transceiver,

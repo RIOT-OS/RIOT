@@ -62,7 +62,7 @@ const netdev_driver_t at86rf2xx_driver = {
     .set = _set,
 };
 
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
 /* SOC has radio interrupts, store reference to netdev */
 static netdev_t *at86rfmega_dev;
 #else
@@ -78,7 +78,7 @@ static int _init(netdev_t *netdev)
                           netdev_ieee802154_t, netdev);
     at86rf2xx_t *dev = container_of(netdev_ieee802154, at86rf2xx_t, netdev);
 
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
     at86rfmega_dev = netdev;
 #else
     /* initialize GPIOs */
@@ -161,7 +161,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     at86rf2xx_fb_start(dev);
 
     /* get the size of the received packet */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
     phr = TST_RX_LENGTH;
 #else
     at86rf2xx_fb_read(dev, &phr, 1);
@@ -223,7 +223,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         netdev_ieee802154_rx_info_t *radio_info = info;
         at86rf2xx_fb_read(dev, &(radio_info->lqi), 1);
 
-#if defined(MODULE_AT86RF231) || defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if defined(MODULE_AT86RF231) || IS_ACTIVE(AT86RF2XX_PERIPH)
         /* AT86RF231 does not provide ED at the end of the frame buffer, read
          * from separate register instead */
         at86rf2xx_fb_stop(dev);
@@ -752,7 +752,7 @@ static void _isr(netdev_t *netdev)
     }
 
     /* read (consume) device status */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
     irq_mask = dev->irq_status;
     dev->irq_status = 0;
 #else
@@ -802,7 +802,7 @@ static void _isr(netdev_t *netdev)
     }
 }
 
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
 
 /**
  * @brief ISR for transceiver's TX_START interrupt
@@ -1010,4 +1010,4 @@ ISR(TRX24_AWAKE_vect, ISR_BLOCK)
     avr8_exit_isr();
 }
 
-#endif /* MODULE_AT86RFA1 || MODULE_AT86RFR2 */
+#endif /* AT86RF2XX_IS_PERIPH */

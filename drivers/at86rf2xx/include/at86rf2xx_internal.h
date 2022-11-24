@@ -28,7 +28,7 @@
 
 #include "at86rf2xx.h"
 
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
 #include <string.h>
 #include "at86rf2xx_registers.h"
 #endif
@@ -85,7 +85,7 @@ extern "C" {
  *
  * @return              the value of the specified register
  */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
 static inline uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, volatile uint8_t *addr) {
     (void) dev;
     return *addr;
@@ -101,7 +101,7 @@ uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, uint8_t addr);
  * @param[in] addr      address of the register to write
  * @param[in] value     value to write to the given register
  */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
 static inline void at86rf2xx_reg_write(const at86rf2xx_t *dev, volatile uint8_t *addr,
                                        const uint8_t value) {
     (void) dev;
@@ -119,7 +119,7 @@ void at86rf2xx_reg_write(const at86rf2xx_t *dev, uint8_t addr, uint8_t value);
  * @param[out] data     buffer to read data into
  * @param[in]  len      number of bytes to read from SRAM
  */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
 static inline void at86rf2xx_sram_read(const at86rf2xx_t *dev, uint8_t offset,
                                        uint8_t *data, size_t len) {
     (void)dev;
@@ -137,7 +137,7 @@ void at86rf2xx_sram_read(const at86rf2xx_t *dev, uint8_t offset,
  * @param[in] data      data to copy into SRAM
  * @param[in] len       number of bytes to write to SRAM
  */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
 static inline void at86rf2xx_sram_write(const at86rf2xx_t *dev, uint8_t offset,
                                         const uint8_t *data, size_t len) {
     (void)dev;
@@ -155,7 +155,7 @@ void at86rf2xx_sram_write(const at86rf2xx_t *dev, uint8_t offset,
  *
  * @param[in]  dev      device to start read
  */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
 static inline void at86rf2xx_fb_start(const at86rf2xx_t *dev) {
     (void) dev;
 }
@@ -171,7 +171,7 @@ void at86rf2xx_fb_start(const at86rf2xx_t *dev);
  * @param[out] data     buffer to copy the data to
  * @param[in]  len      number of bytes to read from the frame buffer
  */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
 static inline void at86rf2xx_fb_read(const at86rf2xx_t *dev, uint8_t *data, size_t len) {
     (void)dev;
     memcpy(data, (void*)AT86RF2XX_REG__TRXFBST, len);
@@ -186,7 +186,7 @@ void at86rf2xx_fb_read(const at86rf2xx_t *dev, uint8_t *data, size_t len);
  *
  * @param[in]  dev      device to stop read
  */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
 static inline void at86rf2xx_fb_stop(const at86rf2xx_t *dev) {
     (void) dev;
 }
