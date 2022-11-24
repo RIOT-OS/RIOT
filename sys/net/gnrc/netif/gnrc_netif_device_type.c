@@ -105,13 +105,13 @@ void gnrc_netif_init_6ln(gnrc_netif_t *netif)
         case NETDEV_TYPE_IEEE802154: {
             /* see https://tools.ietf.org/html/rfc6775#section-5.2 */
             uint16_t src_len = IEEE802154_LONG_ADDRESS_LEN;
-            gnrc_netapi_opt_t opt = { .opt = NETOPT_SRC_LEN,
-                                      .data = &src_len,
-                                      .data_len = sizeof(src_len) };
 
             /* XXX we are supposed to be in interface context here, so use driver
              * directly everything else would deadlock anyway */
-            netif->ops->set(netif, &opt);
+            gnrc_netapi_opt_t opt = { .opt = NETOPT_SRC_LEN,
+                                      .data = &src_len,
+                                      .data_len = sizeof(src_len) };
+            _gnrc_netif_set_from_netdev(netif, &opt);
         }
         /* intentionally falls through */
         case NETDEV_TYPE_BLE:
