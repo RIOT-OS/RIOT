@@ -100,6 +100,9 @@ int timer_set_absolute(tim_t tim, int chan, unsigned int value)
         return -1;
     }
 
+    /* clear stale compare event */
+    dev(tim)->EVENTS_COMPARE[chan] = 0;
+
     ctx[tim].flags |= (1 << chan);
     dev(tim)->CC[chan] = value;
     dev(tim)->INTENSET = (TIMER_INTENSET_COMPARE0_Msk << chan);
