@@ -228,7 +228,7 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
                         AT86RF2XX_IRQ_STATUS_MASK__TRX_END);
 
     /* enable TX start interrupt for retry counter */
-#ifdef AT86RF2XX_REG__IRQ_MASK1
+#if AT86RF2XX_HAVE_TX_START_IRQ
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK1,
                              AT86RF2XX_IRQ_STATUS_MASK1__TX_START);
 #endif

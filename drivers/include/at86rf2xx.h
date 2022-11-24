@@ -131,6 +131,15 @@ extern "C" {
 #endif
 
 /**
+ * @brief   TX Start IRQ
+ */
+#ifdef AT86RF2XX_REG__IRQ_MASK1
+#define AT86RF2XX_HAVE_TX_START_IRQ        (1)
+#else
+#define AT86RF2XX_HAVE_TX_START_IRQ        (0)
+#endif
+
+/**
  * @brief   Random Number Generator
  *
  * Most AT86RF radios have the option to use the highest bits of the RSSI
