@@ -102,6 +102,12 @@ int timer_set_absolute(tim_t tim, int chan, unsigned int value)
 
     ctx[tim].flags |= (1 << chan);
     dev(tim)->CC[chan] = value;
+
+    /* clear spurious IRQs */
+    dev(tim)->EVENTS_COMPARE[chan] = 0;
+    (void)dev(tim)->EVENTS_COMPARE[chan];
+
+    /* enable IRQ */
     dev(tim)->INTENSET = (TIMER_INTENSET_COMPARE0_Msk << chan);
 
     return 0;
@@ -126,6 +132,12 @@ int timer_set_periodic(tim_t tim, int chan, unsigned int value, uint8_t flags)
     if (flags & TIM_FLAG_RESET_ON_SET) {
         dev(tim)->TASKS_CLEAR = 1;
     }
+
+    /* clear spurious IRQs */
+    dev(tim)->EVENTS_COMPARE[chan] = 0;
+    (void)dev(tim)->EVENTS_COMPARE[chan];
+
+    /* enable IRQ */
     dev(tim)->INTENSET = (TIMER_INTENSET_COMPARE0_Msk << chan);
 
     /* re-start timer */
