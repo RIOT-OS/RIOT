@@ -223,7 +223,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         netdev_ieee802154_rx_info_t *radio_info = info;
         at86rf2xx_fb_read(dev, &(radio_info->lqi), 1);
 
-#if defined(MODULE_AT86RF231) || IS_ACTIVE(AT86RF2XX_PERIPH)
+#if AT86RF2XX_HAVE_ED_REGISTER
         /* AT86RF231 does not provide ED at the end of the frame buffer, read
          * from separate register instead */
         at86rf2xx_fb_stop(dev);

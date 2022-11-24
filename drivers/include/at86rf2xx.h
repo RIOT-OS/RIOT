@@ -117,6 +117,15 @@ extern "C" {
 #endif
 
 /**
+ * @brief   ED Register
+ */
+#if defined(MODULE_AT86RF231) || IS_ACTIVE(AT86RF2XX_PERIPH)
+#define AT86RF2XX_HAVE_ED_REGISTER (1)
+#else
+#define AT86RF2XX_HAVE_ED_REGISTER (0)
+#endif
+
+/**
  * @brief   Support for SubGHz bands
  */
 #ifdef MODULE_AT86RF212B
