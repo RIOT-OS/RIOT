@@ -61,11 +61,16 @@ extern "C" {
  * Set to true for active-low buttons (go to DFU if the pin is low), otherwise
  * to false (go to DFU if the pin is high).
  *
- * The default value for all boards is inverted (active-low).
- *
- * */
+ * The default value for all boards is inverted (active-low), except if
+ * BTN0_MODE is defined as GPIO_IN_PD. In this case the value is not
+ * inverted (high-active).
+ */
 #ifndef BTN_BOOTLOADER_INVERTED
+#if (BTN0_MODE == GPIO_IN_PD)
+#define BTN_BOOTLOADER_INVERTED false
+#else
 #define BTN_BOOTLOADER_INVERTED true
+#endif
 #endif
 
 /** @brief LED pin for bootloader indication
