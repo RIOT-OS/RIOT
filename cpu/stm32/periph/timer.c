@@ -125,6 +125,7 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
         return -1;
     }
 
+    unsigned irqstate = irq_disable();
     set_oneshot(tim, channel);
 
     TIM_CHAN(tim, channel) = (value & timer_config[tim].max);
@@ -135,7 +136,12 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
     }
 #endif
 
+    /* clear spurious IRQs */
+    dev(tim)->SR &= ~(TIM_SR_CC1IF << channel);
+
+    /* enable IRQ */
     dev(tim)->DIER |= (TIM_DIER_CC1IE << channel);
+    irq_restore(irqstate);
 
     return 0;
 }
@@ -147,6 +153,7 @@ int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags
         return -1;
     }
 
+    unsigned irqstate = irq_disable();
     clear_oneshot(tim, channel);
 
     if (flags & TIM_FLAG_SET_STOPPED) {
@@ -155,22 +162,25 @@ int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags
 
     if (flags & TIM_FLAG_RESET_ON_SET) {
         /* setting COUNT gives us an interrupt on all channels */
-        unsigned state = irq_disable();
         dev(tim)->CNT = 0;
 
         /* wait for the interrupt & clear it */
         while(dev(tim)->SR == 0) {}
         dev(tim)->SR = 0;
-
-        irq_restore(state);
     }
 
     TIM_CHAN(tim, channel) = value;
+
+    /* clear spurious IRQs */
+    dev(tim)->SR &= ~(TIM_SR_CC1IF << channel);
+
+    /* enable IRQ */
     dev(tim)->DIER |= (TIM_DIER_CC1IE << channel);
 
     if (flags & TIM_FLAG_RESET_ON_MATCH) {
         dev(tim)->ARR = value;
     }
+    irq_restore(irqstate);
 
     return 0;
 }
@@ -182,7 +192,9 @@ int timer_clear(tim_t tim, int channel)
         return -1;
     }
 
+    unsigned irqstate = irq_disable();
     dev(tim)->DIER &= ~(TIM_DIER_CC1IE << channel);
+    irq_restore(irqstate);
 
 #ifdef MODULE_PERIPH_TIMER_PERIODIC
     if (dev(tim)->ARR == TIM_CHAN(tim, channel)) {
@@ -200,12 +212,16 @@ unsigned int timer_read(tim_t tim)
 
 void timer_start(tim_t tim)
 {
+    unsigned irqstate = irq_disable();
     dev(tim)->CR1 |= TIM_CR1_CEN;
+    irq_restore(irqstate);
 }
 
 void timer_stop(tim_t tim)
 {
+    unsigned irqstate = irq_disable();
     dev(tim)->CR1 &= ~(TIM_CR1_CEN);
+    irq_restore(irqstate);
 }
 
 static inline void irq_handler(tim_t tim)
