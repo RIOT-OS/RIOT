@@ -857,6 +857,12 @@ ifneq (,$(filter ut_process,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
+ifneq (,$(filter usbus_msc,$(USEMODULE)))
+  USEMODULE += usbus
+  USEMODULE += mtd
+  USEMODULE += mtd_write_page
+endif
+
 ifneq (,$(filter uuid,$(USEMODULE)))
   USEMODULE += hashes
   USEMODULE += random
