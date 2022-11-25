@@ -35,6 +35,7 @@ extern "C" {
 #define MAYBE_INLINE
 #endif /* IRQ_API_INLINED */
 
+#ifndef IRQ_API_INLINED
 /**
  * @brief   This function sets the IRQ disable bit in the status register
  *
@@ -89,7 +90,7 @@ MAYBE_INLINE bool irq_is_enabled(void);
  */
 MAYBE_INLINE bool irq_is_in(void);
 
-#ifdef IRQ_API_INLINED
+#else
 #include "irq_arch.h"
 #endif /* IRQ_API_INLINED */
 
