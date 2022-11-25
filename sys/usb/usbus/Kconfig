@@ -68,3 +68,4 @@ endif # KCONFIG_USEMODULE_USBUS
 rsource "cdc/Kconfig"
 rsource "dfu/Kconfig"
 rsource "hid/Kconfig"
+rsource "msc/Kconfig"
