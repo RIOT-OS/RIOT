@@ -20,10 +20,17 @@
 
 #include "thread_flags.h"
 #include "irq.h"
+#include "list.h"
+#include "sched.h"
 #include "thread.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+
+struct flags_any_or_mbox_data {
+    mbox_t *mbox;
+    thread_flags_t flags;
+};
 
 static inline int __attribute__((always_inline)) _thread_flags_wake(
     thread_t *thread)
@@ -38,6 +45,18 @@ static inline int __attribute__((always_inline)) _thread_flags_wake(
     case STATUS_FLAG_BLOCKED_ALL:
         wakeup = ((thread->flags & mask) == mask);
         break;
+#ifdef MODULE_CORE_MBOX
+    case STATUS_FLAG_MBOX_BLOCKED:
+    {
+        struct flags_any_or_mbox_data *data = thread->wait_data;
+        wakeup = thread->flags & data->flags;
+        if (wakeup) {
+            list_remove(&data->mbox->readers,
+                        (list_node_t *)&thread->rq_entry);
+        }
+        break;
+    }
+#endif
     default:
         wakeup = 0;
         break;
@@ -157,3 +176,39 @@ void thread_flags_set(thread_t *thread, thread_flags_t mask)
         irq_restore(state);
     }
 }
+
+#ifdef MODULE_CORE_MBOX
+thread_flags_t thread_flags_wait_any_or_mbox(mbox_t *mbox, msg_t *msg,
+                                             thread_flags_t mask)
+{
+    thread_t *me = thread_get_active();
+    thread_flags_t flags;
+
+    struct flags_any_or_mbox_data wait_data = {
+        .mbox = mbox,
+        .flags = mask | THREAD_FLAG_MBOX_READY,
+    };
+
+    while (1) {
+        if (mbox_try_get(mbox, msg)) {
+            thread_flags_clear(THREAD_FLAG_MBOX_READY);
+            return 0;
+        }
+
+        flags = _thread_flags_clear_atomic(me, mask);
+        if (flags) {
+            return flags;
+        }
+
+        unsigned irqstate = irq_disable();
+        me->wait_data = &wait_data;
+        sched_set_status(me, STATUS_FLAG_MBOX_BLOCKED);
+        thread_add_to_list(&mbox->readers, me);
+        irq_restore(irqstate);
+        thread_yield_higher();
+        irqstate = irq_disable();
+        sched_set_status(me, STATUS_RUNNING);
+        irq_restore(irqstate);
+    }
+}
+#endif

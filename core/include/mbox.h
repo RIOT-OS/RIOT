@@ -22,8 +22,8 @@
 #ifndef MBOX_H
 #define MBOX_H
 
-#include "list.h"
 #include "cib.h"
+#include "list.h"
 #include "msg.h"
 
 #ifdef __cplusplus
