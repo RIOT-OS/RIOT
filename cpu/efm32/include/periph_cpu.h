@@ -23,6 +23,7 @@
 #include "kernel_defines.h"
 #include "mutex.h"
 
+#include "cpu.h"
 #include "cpu_conf.h"
 
 #if defined(_SILICON_LABS_32B_SERIES_2)
@@ -639,6 +640,11 @@ typedef struct {
     CMU_Clock_TypeDef cmu;  /**< the device CMU channel */
     IRQn_Type irq;          /**< the devices base IRQ channel */
 } uart_conf_t;
+
+/**
+ * @brief   CPU provides own pm_off() function
+ */
+#define PROVIDES_PM_OFF
 
 /**
  * @brief   CPU provides own pm_off() function
