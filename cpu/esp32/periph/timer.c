@@ -230,11 +230,6 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     assert(clk_div >= 2 && clk_div <= 65536);
     assert(cb != NULL);
 
-    if (_timers[dev].initialized) {
-        DEBUG("%s timer dev=%u is already initialized (used)\n", __func__, dev);
-        return -1;
-    }
-
     /* initialize timer data structure */
     _timers[dev].initialized = true;
     _timers[dev].started     = false;

@@ -124,11 +124,6 @@ int timer_init (tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     CHECK_PARAM_RET (freq == HW_TIMER_FREQUENCY, -1);
     CHECK_PARAM_RET (cb   != NULL, -1);
 
-    if (timers[dev].initialized) {
-        DEBUG("%s timer dev=%u is already initialized (used)\n", __func__, dev);
-        return -1;
-    }
-
     timers[dev].initialized = true;
     timers[dev].started     = false;
     timers[dev].isr_ctx.cb  = cb;
