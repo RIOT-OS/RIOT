@@ -158,7 +158,9 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
     unsigned state = irq_disable();
 
     ctx[tim].dev->OCR[channel] = (uint16_t)value;
-    *ctx[tim].flag &= ~(1 << (channel + OCF1A));
+    /* clear spurious IRQs, if any */
+    *ctx[tim].flag = (1 << (channel + OCF1A));
+    /* unmask IRQ */
     *ctx[tim].mask |= (1 << (channel + OCIE1A));
     set_oneshot(tim, channel);
 
@@ -177,6 +179,9 @@ int timer_set(tim_t tim, int channel, unsigned int timeout)
     unsigned absolute = ctx[tim].dev->CNT + timeout;
 
     ctx[tim].dev->OCR[channel] = absolute;
+    /* clear spurious IRQs, if any */
+    *ctx[tim].flag = (1 << (channel + OCF1A));
+    /* unmask IRQ */
     *ctx[tim].mask |= (1 << (channel + OCIE1A));
     set_oneshot(tim, channel);
 
@@ -210,7 +215,9 @@ int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags
 
     ctx[tim].dev->OCR[channel] = (uint16_t)value;
 
-    *ctx[tim].flag &= ~(1 << (channel + OCF1A));
+    /* clear spurious IRQs, if any */
+    *ctx[tim].flag = (1 << (channel + OCF1A));
+    /* unmask IRQ */
     *ctx[tim].mask |=  (1 << (channel + OCIE1A));
 
     clear_oneshot(tim, channel);
