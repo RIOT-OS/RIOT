@@ -207,6 +207,10 @@ static inline int _netdev_init(netdev_t *dev)
     (void)res;
 
     bluetil_addr_swapped_cp(tmp, _netif.l2addr);
+
+    /* signal link UP */
+    dev->event_callback(dev, NETDEV_EVENT_LINK_UP);
+
     return 0;
 }
 
