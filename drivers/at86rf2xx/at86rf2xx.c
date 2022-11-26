@@ -124,7 +124,7 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params, uint8_t
     dev->state = AT86RF2XX_STATE_P_ON;
     dev->pending_tx = 0;
 
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
     (void) params;
     /* set all interrupts off */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, 0x00);
@@ -140,7 +140,7 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params, uint8_t
 
 static void at86rf2xx_disable_clock_output(at86rf2xx_t *dev)
 {
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
     (void) dev;
 #else
     uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_0);
@@ -206,11 +206,11 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     /* enable safe mode (protect RX FIFO until reading data starts) */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2,
                         AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE);
-#ifdef MODULE_AT86RF212B
+#if AT86RF2XX_HAVE_SUBGHZ
     at86rf2xx_set_page(dev, AT86RF2XX_DEFAULT_PAGE);
 #endif
 
-#if !defined(MODULE_AT86RFA1) && !defined(MODULE_AT86RFR2)
+#if !AT86RF2XX_IS_PERIPH
     /* don't populate masked interrupt flags to IRQ_STATUS register */
     tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_1);
     tmp &= ~(AT86RF2XX_TRX_CTRL_1_MASK__IRQ_MASK_MODE);
@@ -228,7 +228,7 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
                         AT86RF2XX_IRQ_STATUS_MASK__TRX_END);
 
     /* enable TX start interrupt for retry counter */
-#ifdef AT86RF2XX_REG__IRQ_MASK1
+#if AT86RF2XX_HAVE_TX_START_IRQ
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK1,
                              AT86RF2XX_IRQ_STATUS_MASK1__TX_START);
 #endif

@@ -63,7 +63,7 @@ extern "C" {
 /**
  * @brief   AT86RF231 configuration
  */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
 static const uint8_t at86rf2xx_params[] =
 {
     0 /* dummy value */

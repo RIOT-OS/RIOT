@@ -62,7 +62,7 @@ const netdev_driver_t at86rf2xx_driver = {
     .set = _set,
 };
 
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
 /* SOC has radio interrupts, store reference to netdev */
 static netdev_t *at86rfmega_dev;
 #else
@@ -78,7 +78,7 @@ static int _init(netdev_t *netdev)
                           netdev_ieee802154_t, netdev);
     at86rf2xx_t *dev = container_of(netdev_ieee802154, at86rf2xx_t, netdev);
 
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
     at86rfmega_dev = netdev;
 #else
     /* initialize GPIOs */
@@ -161,7 +161,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     at86rf2xx_fb_start(dev);
 
     /* get the size of the received packet */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
     phr = TST_RX_LENGTH;
 #else
     at86rf2xx_fb_read(dev, &phr, 1);
@@ -223,7 +223,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         netdev_ieee802154_rx_info_t *radio_info = info;
         at86rf2xx_fb_read(dev, &(radio_info->lqi), 1);
 
-#if defined(MODULE_AT86RF231) || defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_HAVE_ED_REGISTER
         /* AT86RF231 does not provide ED at the end of the frame buffer, read
          * from separate register instead */
         at86rf2xx_fb_stop(dev);
@@ -533,7 +533,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
         case NETOPT_CHANNEL_PAGE:
             assert(len == sizeof(uint16_t));
             uint8_t page = (((const uint16_t *)val)[0]) & UINT8_MAX;
-#ifdef MODULE_AT86RF212B
+#if AT86RF2XX_HAVE_SUBGHZ
             if ((page != 0) && (page != 2)) {
                 res = -EINVAL;
             }
@@ -669,7 +669,7 @@ static void _isr_send_complete(at86rf2xx_t *dev, uint8_t trac_status)
         return;
     }
 /* Only radios with the XAH_CTRL_2 register support frame retry reporting */
-#if AT86RF2XX_HAVE_RETRIES && defined(AT86RF2XX_REG__XAH_CTRL_2)
+#if AT86RF2XX_HAVE_RETRIES_REG
     dev->tx_retries = (at86rf2xx_reg_read(dev, AT86RF2XX_REG__XAH_CTRL_2)
                        & AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_MASK) >>
                       AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_OFFSET;
@@ -752,7 +752,7 @@ static void _isr(netdev_t *netdev)
     }
 
     /* read (consume) device status */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
     irq_mask = dev->irq_status;
     dev->irq_status = 0;
 #else
@@ -802,7 +802,7 @@ static void _isr(netdev_t *netdev)
     }
 }
 
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
 
 /**
  * @brief ISR for transceiver's TX_START interrupt
@@ -1010,4 +1010,4 @@ ISR(TRX24_AWAKE_vect, ISR_BLOCK)
     avr8_exit_isr();
 }
 
-#endif /* MODULE_AT86RFA1 || MODULE_AT86RFR2 */
+#endif /* AT86RF2XX_IS_PERIPH */

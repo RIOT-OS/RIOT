@@ -151,7 +151,7 @@ void at86rf2xx_set_chan(at86rf2xx_t *dev, uint8_t channel)
 
 uint8_t at86rf2xx_get_page(const at86rf2xx_t *dev)
 {
-#ifdef MODULE_AT86RF212B
+#if AT86RF2XX_HAVE_SUBGHZ
     return dev->page;
 #else
     (void) dev;
@@ -161,7 +161,7 @@ uint8_t at86rf2xx_get_page(const at86rf2xx_t *dev)
 
 void at86rf2xx_set_page(at86rf2xx_t *dev, uint8_t page)
 {
-#ifdef MODULE_AT86RF212B
+#if AT86RF2XX_HAVE_SUBGHZ
     if ((page == 0) || (page == 2)) {
         dev->page = page;
         at86rf2xx_configure_phy(dev);
@@ -174,7 +174,7 @@ void at86rf2xx_set_page(at86rf2xx_t *dev, uint8_t page)
 
 uint8_t at86rf2xx_get_phy_mode(at86rf2xx_t *dev)
 {
-#ifdef MODULE_AT86RF212B
+#if AT86RF2XX_HAVE_SUBGHZ
     uint8_t ctrl2;
     ctrl2 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_2);
     if (ctrl2 & AT86RF2XX_TRX_CTRL_2_MASK__BPSK_OQPSK) {
@@ -230,7 +230,7 @@ void at86rf2xx_set_pan(at86rf2xx_t *dev, uint16_t pan)
 
 int16_t at86rf2xx_get_txpower(const at86rf2xx_t *dev)
 {
-#ifdef MODULE_AT86RF212B
+#if AT86RF2XX_HAVE_SUBGHZ
     uint8_t txpower = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_TX_PWR);
     DEBUG("txpower value: %x\n", txpower);
     return _tx_pow_to_dbm_212b(dev->netdev.chan, dev->page, txpower);
@@ -251,7 +251,7 @@ void at86rf2xx_set_txpower(const at86rf2xx_t *dev, int16_t txpower)
     else if (txpower > AT86RF2XX_TXPOWER_MAX) {
         txpower = AT86RF2XX_TXPOWER_MAX;
     }
-#ifdef MODULE_AT86RF212B
+#if AT86RF2XX_HAVE_SUBGHZ
     if (dev->netdev.chan == 0) {
         at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,
                             dbm_to_tx_pow_868[txpower]);
@@ -389,7 +389,7 @@ int8_t at86rf2xx_get_ed_level(at86rf2xx_t *dev)
 {
     uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_ED_LEVEL);
 
-#if MODULE_AT86RF212B
+#if AT86RF2XX_HAVE_SUBGHZ
     /* AT86RF212B has different scale than the other variants */
     int8_t ed = (int8_t)(((int16_t)tmp * 103) / 100) + RSSI_BASE_VAL;
 #else
@@ -524,7 +524,7 @@ uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
             /* Discard all IRQ flags, framebuffer is lost anyway */
             at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
             /* Go to SLEEP mode from TRX_OFF */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
             /* reset interrupts states in device */
             dev->irq_status = 0;
             /* Setting SLPTR bit brings radio transceiver to sleep in in TRX_OFF*/
