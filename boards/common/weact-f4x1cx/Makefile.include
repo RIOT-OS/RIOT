@@ -4,7 +4,7 @@ INCLUDES += -I$(RIOTBOARD)/common/weact-f4x1cx/include
 # default to flashing over USB
 PROGRAMMER ?= dfu-util
 DFU_USB_ID ?= 0483:df11
-DFU_USE_DFUSE = 1
+DFU_USE_DFUSE ?= 1
 ROM_OFFSET ?= 0x0
 
 # CDC ACM is available faster on STM32
