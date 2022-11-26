@@ -461,6 +461,11 @@ else
   include $(RIOTMAKE)/dependency_resolution.inc.mk
 endif
 
+# Include dfu-util configuration when using riotboot_dfu bootloader before
+# including the board's Makefile.include which could define dfu-util
+# configuration for other DFU bootloaders in use.
+include $(RIOTMAKE)/boot/riotboot_dfu-util.mk
+
 # Include Board and CPU configuration
 INCLUDES += $(addprefix -I,$(wildcard $(BOARDDIR)/include))
 include $(BOARDDIR)/Makefile.include
