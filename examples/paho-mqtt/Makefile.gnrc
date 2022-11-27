@@ -1,0 +1,16 @@
+ifneq (0,$(GNRC_IPV6))
+  ifneq (0,$(USE_LWIP))
+    $(error No valid choice: Select either LWIP or GNRC)
+  endif
+  USEMODULE += auto_init_gnrc_netif
+  # Activate ICMPv6 error messages
+  USEMODULE += gnrc_icmpv6_error
+  # Specify the mandatory networking modules for IPv6
+  USEMODULE += gnrc_ipv6_default
+  # Additional networking modules that can be dropped if not needed
+  USEMODULE += gnrc_icmpv6_echo
+else
+  ifeq (0,$(USE_LWIP))
+    $(error No network stack selected. Please choose either GNRC or LWIP)
+  endif
+endif
