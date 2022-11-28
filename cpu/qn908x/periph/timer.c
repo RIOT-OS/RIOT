@@ -66,9 +66,9 @@ static const clock_ip_name_t ctimers_clocks[FSL_FEATURE_SOC_CTIMER_COUNT] =
 #error "ERROR in board timer configuration: too many timers defined"
 #endif
 
-int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
+int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
 {
-    DEBUG("timer_init(%u, %lu)\n", tim, freq);
+    DEBUG("timer_init(%u, %" PRIu32 ")\n", tim, freq);
     if (tim >= TIMER_NUMOF) {
         return -1;
     }
@@ -84,7 +84,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     uint32_t core_freq = CLOCK_GetFreq(kCLOCK_ApbClk);
     uint32_t prescale = (core_freq + freq / 2) / freq - 1;
     if (prescale == (uint32_t)(-1)) {
-        DEBUG("timer_init: Frequency %lu is too fast for core_freq=%lu",
+        DEBUG("timer_init: Frequency %" PRIu32 " is too fast for core_freq=%" PRIu32,
               freq, core_freq);
         return -1;
     }
