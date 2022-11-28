@@ -303,11 +303,13 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
     /* getting these options doesn't require the transceiver to be responsive */
     switch (opt) {
+#if AT86RF2XX_HAVE_SUBGHZ
         case NETOPT_CHANNEL_PAGE:
             assert(max_len >= sizeof(uint16_t));
             ((uint8_t *)val)[1] = 0;
-            ((uint8_t *)val)[0] = at86rf2xx_get_page(dev);
+            ((uint8_t *)val)[0] = dev->page;
             return sizeof(uint16_t);
+#endif
 
         case NETOPT_STATE:
             assert(max_len >= sizeof(netopt_state_t));

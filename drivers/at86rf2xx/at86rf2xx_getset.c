@@ -94,11 +94,6 @@ static const uint8_t dbm_to_tx_pow[] = { 0x0f, 0x0f, 0x0f, 0x0e, 0x0e, 0x0e,
                                          0x05, 0x03, 0x00 };
 #endif
 
-void at86rf2xx_get_addr_short(const at86rf2xx_t *dev, network_uint16_t *addr)
-{
-    memcpy(addr, dev->netdev.short_addr, sizeof(*addr));
-}
-
 void at86rf2xx_set_addr_short(at86rf2xx_t *dev, const network_uint16_t *addr)
 {
     memcpy(dev->netdev.short_addr, addr, sizeof(*addr));
@@ -114,11 +109,6 @@ void at86rf2xx_set_addr_short(at86rf2xx_t *dev, const network_uint16_t *addr)
                         dev->netdev.short_addr[0]);
 }
 
-void at86rf2xx_get_addr_long(const at86rf2xx_t *dev, eui64_t *addr)
-{
-    memcpy(addr, dev->netdev.long_addr, sizeof(*addr));
-}
-
 void at86rf2xx_set_addr_long(at86rf2xx_t *dev, const eui64_t *addr)
 {
     memcpy(dev->netdev.long_addr, addr, sizeof(*addr));
@@ -127,11 +117,6 @@ void at86rf2xx_set_addr_long(at86rf2xx_t *dev, const eui64_t *addr)
         at86rf2xx_reg_write(dev, (AT86RF2XX_REG__IEEE_ADDR_0 + i),
                 dev->netdev.long_addr[IEEE802154_LONG_ADDRESS_LEN - 1 - i]);
     }
-}
-
-uint8_t at86rf2xx_get_chan(const at86rf2xx_t *dev)
-{
-    return dev->netdev.chan;
 }
 
 void at86rf2xx_set_chan(at86rf2xx_t *dev, uint8_t channel)
@@ -147,16 +132,6 @@ void at86rf2xx_set_chan(at86rf2xx_t *dev, uint8_t channel)
     dev->netdev.chan = channel;
 
     at86rf2xx_configure_phy(dev);
-}
-
-uint8_t at86rf2xx_get_page(const at86rf2xx_t *dev)
-{
-#if AT86RF2XX_HAVE_SUBGHZ
-    return dev->page;
-#else
-    (void) dev;
-    return 0;
-#endif
 }
 
 void at86rf2xx_set_page(at86rf2xx_t *dev, uint8_t page)
@@ -212,11 +187,6 @@ uint8_t at86rf2xx_get_rate(at86rf2xx_t *dev)
     rate &= AT86RF2XX_TRX_CTRL_2_MASK__OQPSK_DATA_RATE;
 
     return rate;
-}
-
-uint16_t at86rf2xx_get_pan(const at86rf2xx_t *dev)
-{
-    return dev->netdev.pan;
 }
 
 void at86rf2xx_set_pan(at86rf2xx_t *dev, uint16_t pan)
