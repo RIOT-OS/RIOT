@@ -4,5 +4,7 @@ CFLAGS += \
   -DCONFIG_BOARD_HAS_XTAL_32M \
   #
 
+OPENOCD_DEBUG_ADAPTER ?= dap
+
 # Include default QN908x board config
 include $(RIOTBOARD)/common/qn908x/Makefile.include
