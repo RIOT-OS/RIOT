@@ -243,19 +243,6 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     DEBUG("at86rf2xx_reset(): reset complete.\n");
 }
 
-size_t at86rf2xx_send(at86rf2xx_t *dev, const uint8_t *data, size_t len)
-{
-    /* check data length */
-    if (len > AT86RF2XX_MAX_PKT_LENGTH) {
-        DEBUG("[at86rf2xx] Error: data to send exceeds max packet size\n");
-        return 0;
-    }
-    at86rf2xx_tx_prepare(dev);
-    at86rf2xx_tx_load(dev, data, len, 0);
-    at86rf2xx_tx_exec(dev);
-    return len;
-}
-
 void at86rf2xx_tx_prepare(at86rf2xx_t *dev)
 {
     uint8_t state;

@@ -549,20 +549,6 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state);
 uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state);
 
 /**
- * @brief   Convenience function for simply sending data
- *
- * @note This function ignores the PRELOADING option
- *
- * @param[in,out] dev       device to use for sending
- * @param[in] data          data to send (must include IEEE802.15.4 header)
- * @param[in] len           length of @p data
- *
- * @return                  number of bytes that were actually send
- * @return                  0 on error
- */
-size_t at86rf2xx_send(at86rf2xx_t *dev, const uint8_t *data, size_t len);
-
-/**
  * @brief   Prepare for sending of data
  *
  * This function puts the given device into the TX state, so no receiving of
