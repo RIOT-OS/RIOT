@@ -39,6 +39,9 @@
 #include "at86rf2xx_netdev.h"
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_registers.h"
+#if IS_USED(IEEE802154_SECURITY)
+#include "net/ieee802154_security.h"
+#endif
 #if IS_USED(MODULE_AT86RF2XX_AES_SPI)
 #include "at86rf2xx_aes.h"
 #endif
@@ -61,6 +64,79 @@ const netdev_driver_t at86rf2xx_driver = {
     .get = _get,
     .set = _set,
 };
+
+#if IS_USED(MODULE_AT86RF2XX_AES_SPI) && \
+    IS_USED(MODULE_IEEE802154_SECURITY)
+/**
+ * @brief   Pass the 802.15.4 encryption key to the transceiver hardware
+ *
+ * @param[in] dev               Abstract security device descriptor
+ * @param[in] key               Encryption key to be used
+ * @param[in] key_size          Size of the encryption key in bytes
+ */
+static void _at86rf2xx_set_key(ieee802154_sec_dev_t *dev,
+                               const uint8_t *key, uint8_t key_size)
+{
+    (void)key_size;
+    at86rf2xx_aes_key_write_encrypt((at86rf2xx_t *)dev->ctx, key);
+}
+
+/**
+ * @brief   Compute CBC-MAC from IEEE 802.15.4 security context
+ *
+ * @param[in]       dev         Abstract security device descriptor
+ * @param[out]      cipher      Buffer to store cipher blocks
+ * @param[in]       iv          Initial vector
+ * @param[in]       plain       Input data blocks
+ * @param[in]       nblocks     Number of blocks
+ */
+static void _at86rf2xx_cbc(const ieee802154_sec_dev_t *dev,
+                           uint8_t *cipher,
+                           uint8_t *iv,
+                           const uint8_t *plain,
+                           uint8_t nblocks)
+{
+    at86rf2xx_aes_cbc_encrypt((at86rf2xx_t *)dev->ctx,
+                              (aes_block_t *)cipher,
+                              NULL,
+                              iv,
+                              (aes_block_t *)plain,
+                              nblocks);
+}
+
+/**
+ * @brief   Perform ECB encryption
+ *
+ * @param[in]       dev         Abstract security device descriptor
+ * @param[out]      cipher      Output cipher blocks
+ * @param[in]       plain       Plain blocks
+ * @param[in]       nblocks     Number of blocks
+ */
+static void _at86rf2xx_ecb(const ieee802154_sec_dev_t *dev,
+                           uint8_t *cipher,
+                           const uint8_t *plain,
+                           uint8_t nblocks)
+{
+    at86rf2xx_aes_ecb_encrypt((at86rf2xx_t *)dev->ctx,
+                              (aes_block_t *)cipher,
+                              NULL,
+                              (aes_block_t *)plain,
+                              nblocks);
+
+}
+/**
+ * @brief   Struct that contains IEEE 802.15.4 security operations
+ *          which are implemented, using the transceiver´s hardware
+ *          crypto capabilities
+ */
+static const ieee802154_radio_cipher_ops_t _at86rf2xx_cipher_ops = {
+    .set_key = _at86rf2xx_set_key,
+    .ecb = _at86rf2xx_ecb,
+    .cbc = _at86rf2xx_cbc
+};
+#endif /* IS_USED(MODULE_AT86RF2XX_AES_SPI) && \
+          IS_USED(MODULE_IEEE802154_SECURITY) */
+
 
 /* SOC has radio interrupts, store reference to netdev */
 static netdev_t *at86rfmega_dev;
@@ -100,6 +176,12 @@ static int _init(netdev_t *netdev)
         netdev_ieee802154_set(&dev->netdev, NETOPT_ACK_REQ,
                               &enable, sizeof(enable));
     }
+#if IS_USED(MODULE_IEEE802154_SECURITY) && \
+    IS_USED(MODULE_AT86RF2XX_AES_SPI)
+    dev->netdev.sec_ctx.dev.cipher_ops = &_at86rf2xx_cipher_ops;
+    dev->netdev.sec_ctx.dev.ctx = dev;
+#endif
+
     at86rf2xx_reset(dev);
 
     /* signal link UP */
