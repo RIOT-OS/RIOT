@@ -492,7 +492,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
     switch (opt) {
         case NETOPT_TX_POWER:
             assert(max_len >= sizeof(int16_t));
-            *((uint16_t *)val) = at86rf2xx_get_txpower(dev);
+            *((uint16_t *)val) = netdev_ieee802154->txpower;
             res = sizeof(uint16_t);
             break;
 
@@ -625,9 +625,9 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             }
             dev->netdev.chan = chan;
 #if AT86RF2XX_HAVE_SUBGHZ
-            at86rf2xx_configure_phy(dev, chan, dev->page);
+            at86rf2xx_configure_phy(dev, chan, dev->page, dev->netdev.txpower);
 #else
-            at86rf2xx_configure_phy(dev, chan, 0);
+            at86rf2xx_configure_phy(dev, chan, 0, dev->netdev.txpower);
 #endif
             /* don't set res to set netdev_ieee802154_t::chan */
             break;
@@ -641,7 +641,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             }
             else {
                 dev->page = page;
-                at86rf2xx_configure_phy(dev, dev->netdev.chan, page);
+                at86rf2xx_configure_phy(dev, dev->netdev.chan, page, dev->netdev.txpower);
                 res = sizeof(uint16_t);
             }
 #else
@@ -657,7 +657,8 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 
         case NETOPT_TX_POWER:
             assert(len <= sizeof(int16_t));
-            at86rf2xx_set_txpower(dev, *((const int16_t *)val));
+            netdev_ieee802154->txpower = *((const int16_t *)val);
+            at86rf2xx_set_txpower(dev, *((const int16_t *)val), dev->netdev.chan);
             res = sizeof(uint16_t);
             break;
 

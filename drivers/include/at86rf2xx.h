@@ -379,30 +379,12 @@ uint8_t at86rf2xx_get_rate(at86rf2xx_t *dev);
 int at86rf2xx_set_rate(at86rf2xx_t *dev, uint8_t rate);
 
 /**
- * @brief   Get the configured PAN ID of the given device
- *
- * @param[in] dev           device to read from
- *
- * @return                  the currently set PAN ID
- */
-uint16_t at86rf2xx_get_pan(const at86rf2xx_t *dev);
-
-/**
  * @brief   Set the PAN ID of the given device
  *
  * @param[in,out] dev       device to write to
  * @param[in] pan           PAN ID to set
  */
 void at86rf2xx_set_pan(at86rf2xx_t *dev, uint16_t pan);
-
-/**
- * @brief   Get the configured transmission power of the given device [in dBm]
- *
- * @param[in] dev           device to read from
- *
- * @return                  configured transmission power in dBm
- */
-int16_t at86rf2xx_get_txpower(const at86rf2xx_t *dev);
 
 /**
  * @brief   Set the transmission power of the given device [in dBm]
@@ -414,8 +396,9 @@ int16_t at86rf2xx_get_txpower(const at86rf2xx_t *dev);
  *
  * @param[in] dev           device to write to
  * @param[in] txpower       transmission power in dBm
+ * @param[in] channel       the current channel
  */
-void at86rf2xx_set_txpower(const at86rf2xx_t *dev, int16_t txpower);
+void at86rf2xx_set_txpower(const at86rf2xx_t *dev, int16_t txpower, uint8_t channel);
 
 /**
  * @brief   Get the configured receiver sensitivity of the given device [in dBm]

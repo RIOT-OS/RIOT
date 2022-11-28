@@ -221,7 +221,7 @@ void at86rf2xx_hardware_reset(at86rf2xx_t *dev);
  *
  * @param[in,out] dev   device to configure
  */
-void at86rf2xx_configure_phy(at86rf2xx_t *dev, uint8_t chan, uint8_t page);
+void at86rf2xx_configure_phy(at86rf2xx_t *dev, uint8_t chan, uint8_t page, int16_t txpower);
 
 #if AT86RF2XX_RANDOM_NUMBER_GENERATOR || defined(DOXYGEN)
 /**

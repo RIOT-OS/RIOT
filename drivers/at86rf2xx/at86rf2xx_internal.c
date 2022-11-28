@@ -164,16 +164,17 @@ void at86rf2xx_hardware_reset(at86rf2xx_t *dev)
              && (dev->state != AT86RF2XX_STATE_P_ON));
 }
 
-void at86rf2xx_configure_phy(at86rf2xx_t *dev, uint8_t chan, uint8_t page)
+void at86rf2xx_configure_phy(at86rf2xx_t *dev, uint8_t chan, uint8_t page, int16_t txpower)
 {
     /* we must be in TRX_OFF before changing the PHY configuration */
     uint8_t prev_state = at86rf2xx_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
     (void) page;
+    (void) chan;
+    (void) txpower;
 
 #if AT86RF2XX_HAVE_SUBGHZ
     /* The TX power register must be updated after changing the channel if
      * moving between bands. */
-    int16_t txpower = at86rf2xx_get_txpower(dev);
 
     uint8_t trx_ctrl2 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_2);
     uint8_t rf_ctrl0 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__RF_CTRL_0);
@@ -214,7 +215,7 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev, uint8_t chan, uint8_t page)
 
 #if AT86RF2XX_HAVE_SUBGHZ
     /* Update the TX power register to achieve the same power (in dBm) */
-    at86rf2xx_set_txpower(dev, txpower);
+    at86rf2xx_set_txpower(dev, txpower, chan);
 #endif
 
     /* Return to the state we had before reconfiguring */

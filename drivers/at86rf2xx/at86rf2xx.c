@@ -83,9 +83,9 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     }
 
     /* set default channel and page */
-    at86rf2xx_configure_phy(dev, AT86RF2XX_DEFAULT_CHANNEL, AT86RF2XX_DEFAULT_PAGE);
+    at86rf2xx_configure_phy(dev, AT86RF2XX_DEFAULT_CHANNEL, AT86RF2XX_DEFAULT_PAGE, AT86RF2XX_DEFAULT_TXPOWER);
     /* set default TX power */
-    at86rf2xx_set_txpower(dev, AT86RF2XX_DEFAULT_TXPOWER);
+    at86rf2xx_set_txpower(dev, AT86RF2XX_DEFAULT_TXPOWER, AT86RF2XX_DEFAULT_CHANNEL);
     /* set default options */
 
     if (!IS_ACTIVE(AT86RF2XX_BASIC_MODE)) {

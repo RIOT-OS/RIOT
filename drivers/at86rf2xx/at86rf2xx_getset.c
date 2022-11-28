@@ -51,43 +51,12 @@ static const uint8_t dbm_to_tx_pow_915[] = { 0x1d, 0x1c, 0x1b, 0x1a, 0x19, 0x17,
                                              0x04, 0x03, 0x02, 0x01, 0x00, 0x86,
                                              0x40, 0x84, 0x83, 0x82, 0x80, 0xc1,
                                              0xc0 };
-static int16_t _tx_pow_to_dbm_212b(uint8_t channel, uint8_t page, uint8_t reg)
-{
-    if (page == 0 || page == 2) {
-        const uint8_t *dbm_to_tx_pow;
-        size_t nelem;
-
-        if (channel == 0) {
-            /* Channel 0 is 868.3 MHz */
-            dbm_to_tx_pow = &dbm_to_tx_pow_868[0];
-            nelem = ARRAY_SIZE(dbm_to_tx_pow_868);
-        }
-        else {
-            /* Channels 1+ are 915 MHz */
-            dbm_to_tx_pow = &dbm_to_tx_pow_915[0];
-            nelem = ARRAY_SIZE(dbm_to_tx_pow_915);
-        }
-
-        for (size_t i = 0; i < nelem; ++i) {
-            if (dbm_to_tx_pow[i] == reg) {
-                return (i - AT86RF2XX_TXPOWER_OFF);
-            }
-        }
-    }
-
-    return 0;
-}
-
 #elif MODULE_AT86RF233
-static const int16_t tx_pow_to_dbm[] = { 4, 4, 3, 3, 2, 2, 1,
-                                         0, -1, -2, -3, -4, -6, -8, -12, -17 };
 static const uint8_t dbm_to_tx_pow[] = { 0x0f, 0x0f, 0x0f, 0x0e, 0x0e, 0x0e,
                                          0x0e, 0x0d, 0x0d, 0x0d, 0x0c, 0x0c,
                                          0x0b, 0x0b, 0x0a, 0x09, 0x08, 0x07,
                                          0x06, 0x05, 0x03, 0x00 };
 #else
-static const int16_t tx_pow_to_dbm[] = { 3, 3, 2, 2, 1, 1, 0,
-                                         -1, -2, -3, -4, -5, -7, -9, -12, -17 };
 static const uint8_t dbm_to_tx_pow[] = { 0x0f, 0x0f, 0x0f, 0x0e, 0x0e, 0x0e,
                                          0x0e, 0x0d, 0x0d, 0x0c, 0x0c, 0x0b,
                                          0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06,
@@ -163,21 +132,9 @@ void at86rf2xx_set_pan(at86rf2xx_t *dev, uint16_t pan)
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__PAN_ID_1, le_pan.u8[1]);
 }
 
-int16_t at86rf2xx_get_txpower(const at86rf2xx_t *dev)
+void at86rf2xx_set_txpower(const at86rf2xx_t *dev, int16_t txpower, uint8_t channel)
 {
-#if AT86RF2XX_HAVE_SUBGHZ
-    uint8_t txpower = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_TX_PWR);
-    DEBUG("txpower value: %x\n", txpower);
-    return _tx_pow_to_dbm_212b(dev->netdev.chan, dev->page, txpower);
-#else
-    uint8_t txpower = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_TX_PWR)
-                      & AT86RF2XX_PHY_TX_PWR_MASK__TX_PWR;
-    return tx_pow_to_dbm[txpower];
-#endif
-}
-
-void at86rf2xx_set_txpower(const at86rf2xx_t *dev, int16_t txpower)
-{
+    (void) channel;
     txpower += AT86RF2XX_TXPOWER_OFF;
 
     if (txpower < 0) {
@@ -187,11 +144,11 @@ void at86rf2xx_set_txpower(const at86rf2xx_t *dev, int16_t txpower)
         txpower = AT86RF2XX_TXPOWER_MAX;
     }
 #if AT86RF2XX_HAVE_SUBGHZ
-    if (dev->netdev.chan == 0) {
+    if (channel == 0) {
         at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,
                             dbm_to_tx_pow_868[txpower]);
     }
-    else if (dev->netdev.chan < 11) {
+    else if (channel < 11) {
         at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,
                             dbm_to_tx_pow_915[txpower]);
     }
