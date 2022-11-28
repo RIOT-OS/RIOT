@@ -25,10 +25,11 @@
 
 #include <stdlib.h>
 
-#include "cpu.h"
+#include "bitarithm.h"
 #include "board.h"
-#include "periph_conf.h"
+#include "cpu.h"
 #include "periph/timer.h"
+#include "periph_conf.h"
 
 #include "vendor/drivers/fsl_clock.h"
 
@@ -144,14 +145,15 @@ static inline void isr_ctimer_n(CTIMER_Type *dev, uint32_t ctimer_num)
 {
     DEBUG("isr_ctimer_%" PRIu32 " flags=0x%" PRIx32 "\n",
           ctimer_num, dev->IR);
-    for (uint32_t i = 0; i < TIMER_CHANNELS; i++) {
-        if (dev->IR & (1u << i)) {
-            /* Note: setting the bit to 1 in the flag register will clear the
-             * bit. */
-            dev->IR = 1u << i;
-            dev->MCR &= ~(CTIMER_MCR_MR0I_MASK << (i * 3));
-            isr_ctx[ctimer_num].cb(isr_ctx[ctimer_num].arg, 0);
-        }
+    unsigned state = dev->IR & ((1 << TIMER_CHANNELS) - 1);
+    while (state) {
+        uint8_t channel;
+        state = bitarithm_test_and_clear(state, &channel);
+        /* Note: setting the bit to 1 in the flag register will clear the
+         * bit. */
+        dev->IR = 1u << channel;
+        dev->MCR &= ~(CTIMER_MCR_MR0I_MASK << (channel * 3));
+        isr_ctx[ctimer_num].cb(isr_ctx[ctimer_num].arg, channel);
     }
     cortexm_isr_end();
 }
