@@ -68,6 +68,7 @@ extern "C" {
 #define AT86RF2XX_MIN_CHANNEL           (IEEE802154_CHANNEL_MIN)
 #define AT86RF2XX_MAX_CHANNEL           (IEEE802154_CHANNEL_MAX)
 #define AT86RF2XX_DEFAULT_CHANNEL       (CONFIG_IEEE802154_DEFAULT_CHANNEL)
+#define AT86RF2XX_DEFAULT_PAGE          (0)
 /* Only page 0 is supported in the 2.4 GHz band */
 #endif
 /** @} */
@@ -343,22 +344,6 @@ void at86rf2xx_set_addr_short(at86rf2xx_t *dev, const network_uint16_t *addr);
  * @param[in] addr          (8-byte) long address to set
  */
 void at86rf2xx_set_addr_long(at86rf2xx_t *dev, const eui64_t *addr);
-
-/**
- * @brief   Set the channel number of the given device
- *
- * @param[in,out] dev       device to write to
- * @param[in] chan          channel number to set
- */
-void at86rf2xx_set_chan(at86rf2xx_t *dev, uint8_t chan);
-
-/**
- * @brief   Set the channel page of the given device
- *
- * @param[in,out] dev       device to write to
- * @param[in] page          channel page to set
- */
-void at86rf2xx_set_page(at86rf2xx_t *dev, uint8_t page);
 
 /**
  * @brief   Get the PHY mode of the given device

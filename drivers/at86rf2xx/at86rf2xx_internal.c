@@ -164,10 +164,11 @@ void at86rf2xx_hardware_reset(at86rf2xx_t *dev)
              && (dev->state != AT86RF2XX_STATE_P_ON));
 }
 
-void at86rf2xx_configure_phy(at86rf2xx_t *dev)
+void at86rf2xx_configure_phy(at86rf2xx_t *dev, uint8_t chan, uint8_t page)
 {
     /* we must be in TRX_OFF before changing the PHY configuration */
     uint8_t prev_state = at86rf2xx_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
+    (void) page;
 
 #if AT86RF2XX_HAVE_SUBGHZ
     /* The TX power register must be updated after changing the channel if
@@ -182,17 +183,17 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev)
     /* Clear previous configuration for GC_TX_OFFS */
     rf_ctrl0 &= ~AT86RF2XX_RF_CTRL_0_MASK__GC_TX_OFFS;
 
-    if (dev->netdev.chan != 0) {
+    if (chan != 0) {
         /* Set sub mode bit on 915 MHz as recommended by the data sheet */
         trx_ctrl2 |= AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE;
     }
 
-    if (dev->page == 0) {
+    if (page == 0) {
         /* BPSK coding */
         /* Data sheet recommends using a +2 dB setting for BPSK */
         rf_ctrl0 |= AT86RF2XX_RF_CTRL_0_GC_TX_OFFS__2DB;
     }
-    else if (dev->page == 2) {
+    else if (page == 2) {
         /* O-QPSK coding */
         trx_ctrl2 |= AT86RF2XX_TRX_CTRL_2_MASK__BPSK_OQPSK;
         /* Data sheet recommends using a +1 dB setting for O-QPSK */
@@ -208,7 +209,7 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev)
     phy_cc_cca &= ~(AT86RF2XX_PHY_CC_CCA_MASK__CHANNEL);
 
     /* Update the channel register */
-    phy_cc_cca |= (dev->netdev.chan & AT86RF2XX_PHY_CC_CCA_MASK__CHANNEL);
+    phy_cc_cca |= (chan & AT86RF2XX_PHY_CC_CCA_MASK__CHANNEL);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_CC_CCA, phy_cc_cca);
 
 #if AT86RF2XX_HAVE_SUBGHZ

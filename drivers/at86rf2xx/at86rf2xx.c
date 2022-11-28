@@ -188,8 +188,8 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     at86rf2xx_set_addr_long(dev, (eui64_t *)dev->netdev.long_addr);
     at86rf2xx_set_addr_short(dev, (network_uint16_t *)dev->netdev.short_addr);
 
-    /* set default channel */
-    at86rf2xx_set_chan(dev, AT86RF2XX_DEFAULT_CHANNEL);
+    /* set default channel and page */
+    at86rf2xx_configure_phy(dev, AT86RF2XX_DEFAULT_CHANNEL, AT86RF2XX_DEFAULT_PAGE);
     /* set default TX power */
     at86rf2xx_set_txpower(dev, AT86RF2XX_DEFAULT_TXPOWER);
     /* set default options */
@@ -206,9 +206,6 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     /* enable safe mode (protect RX FIFO until reading data starts) */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2,
                         AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE);
-#if AT86RF2XX_HAVE_SUBGHZ
-    at86rf2xx_set_page(dev, AT86RF2XX_DEFAULT_PAGE);
-#endif
 
 #if !AT86RF2XX_IS_PERIPH
     /* don't populate masked interrupt flags to IRQ_STATUS register */

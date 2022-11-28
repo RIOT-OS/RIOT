@@ -517,7 +517,12 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
                 res = -EINVAL;
                 break;
             }
-            at86rf2xx_set_chan(dev, chan);
+            dev->netdev.chan = chan;
+#if AT86RF2XX_HAVE_SUBGHZ
+            at86rf2xx_configure_phy(dev, chan, dev->page);
+#else
+            at86rf2xx_configure_phy(dev, chan, 0);
+#endif
             /* don't set res to set netdev_ieee802154_t::chan */
             break;
 
@@ -529,7 +534,8 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
                 res = -EINVAL;
             }
             else {
-                at86rf2xx_set_page(dev, page);
+                dev->page = page;
+                at86rf2xx_configure_phy(dev, dev->netdev.chan, page);
                 res = sizeof(uint16_t);
             }
 #else
