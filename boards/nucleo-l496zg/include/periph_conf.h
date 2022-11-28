@@ -176,6 +176,12 @@ static const spi_conf_t spi_config[] = {
  * For Nucleo-L496ZG this information is in board manual,
  * Table 11, page 38.
  *
+ * VBAT is connected ADC1_IN18 or ADC3_IN18 and a voltage divider
+ * is used, so that only 1/3 of the actual VBAT is measured. This
+ * allows for a supply voltage higher than the reference voltage.
+ *
+ * For Nucleo-L496ZG more information is provided in MCU datasheet,
+ * in section 3.17.3 - Vbat battery voltage monitoring, page 43.
  * @{
  */
 static const adc_conf_t adc_config[] = {
@@ -185,13 +191,6 @@ static const adc_conf_t adc_config[] = {
     { .pin = GPIO_PIN(PORT_C, 1), .dev = 0, .chan =  2 }, /* ADC123_IN2  */
     { .pin = GPIO_PIN(PORT_C, 4), .dev = 0, .chan = 13 }, /* ADC12_IN13  */
     { .pin = GPIO_PIN(PORT_C, 5), .dev = 0, .chan = 14 }, /* ADC12_IN14  */
-    /* VBAT is connected ADC1_IN18 or ADC3_IN18 and a voltage divider
-     * is used, so that only 1/3 of the actual VBAT is measured. This
-     * allows for a supply voltage higher than the reference voltage.
-     *
-     * For Nucleo-L496ZG more information is provided in MCU datasheet,
-       in section 3.17.3 - Vbat battery voltaga monioring, page 43.
-     */
     { .pin = GPIO_UNDEF, .dev = 0, .chan = 18 },
 };
 
