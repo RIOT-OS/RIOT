@@ -133,6 +133,9 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     /* send data out directly if pre-loading id disabled */
     if (!(dev->flags & AT86RF2XX_OPT_PRELOADING)) {
         at86rf2xx_tx_exec(dev);
+        if (netdev->event_callback) {
+            netdev->event_callback(netdev, NETDEV_EVENT_TX_STARTED);
+        }
     }
     /* return the number of bytes that were actually loaded into the frame
      * buffer/send out */
@@ -269,6 +272,9 @@ static int _set_state(at86rf2xx_t *dev, netopt_state_t state)
                 }
                 at86rf2xx_set_state(dev, AT86RF2XX_PHY_STATE_TX);
                 at86rf2xx_tx_exec(dev);
+                if (dev->netdev.netdev.event_callback) {
+                    dev->netdev.netdev.event_callback(&dev->netdev.netdev, NETDEV_EVENT_TX_STARTED);
+                }
             }
             break;
         case NETOPT_STATE_RESET:
