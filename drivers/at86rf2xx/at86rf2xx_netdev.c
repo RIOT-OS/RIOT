@@ -486,11 +486,18 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
     switch (opt) {
         case NETOPT_ADDRESS:
             assert(len == sizeof(network_uint16_t));
+            memcpy(dev->netdev.short_addr, val, len);
+#ifdef MODULE_SIXLOWPAN
+            /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
+             * 0 for unicast addresses */
+            dev->netdev.short_addr[0] &= 0x7F;
+#endif
             at86rf2xx_set_addr_short(dev, val);
             /* don't set res to set netdev_ieee802154_t::short_addr */
             break;
         case NETOPT_ADDRESS_LONG:
             assert(len == sizeof(eui64_t));
+            memcpy(dev->netdev.long_addr, val, len);
             at86rf2xx_set_addr_long(dev, val);
             /* don't set res to set netdev_ieee802154_t::long_addr */
             break;

@@ -96,26 +96,19 @@ static const uint8_t dbm_to_tx_pow[] = { 0x0f, 0x0f, 0x0f, 0x0e, 0x0e, 0x0e,
 
 void at86rf2xx_set_addr_short(at86rf2xx_t *dev, const network_uint16_t *addr)
 {
-    memcpy(dev->netdev.short_addr, addr, sizeof(*addr));
-#ifdef MODULE_SIXLOWPAN
-    /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
-     * 0 for unicast addresses */
-    dev->netdev.short_addr[0] &= 0x7F;
-#endif
     /* device use lsb first, not network byte order */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__SHORT_ADDR_0,
-                        dev->netdev.short_addr[1]);
+                        addr->u8[1]);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__SHORT_ADDR_1,
-                        dev->netdev.short_addr[0]);
+                        addr->u8[0]);
 }
 
 void at86rf2xx_set_addr_long(at86rf2xx_t *dev, const eui64_t *addr)
 {
-    memcpy(dev->netdev.long_addr, addr, sizeof(*addr));
     for (int i = 0; i < 8; i++) {
         /* device use lsb first, not network byte order */
         at86rf2xx_reg_write(dev, (AT86RF2XX_REG__IEEE_ADDR_0 + i),
-                dev->netdev.long_addr[IEEE802154_LONG_ADDRESS_LEN - 1 - i]);
+                addr->uint8[IEEE802154_LONG_ADDRESS_LEN - 1 - i]);
     }
 }
 
