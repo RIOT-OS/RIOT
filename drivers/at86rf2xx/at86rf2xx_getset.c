@@ -362,8 +362,6 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
             if (state) {
                 DEBUG("[at86rf2xx] opt: enabling CSMA mode" \
                       "(4 retries, min BE: 3 max BE: 5)\n");
-                /* Initialize CSMA seed with hardware address */
-                at86rf2xx_set_csma_seed(dev, dev->netdev.long_addr);
                 at86rf2xx_set_csma_max_retries(dev, 4);
                 at86rf2xx_set_csma_backoff_exp(dev, 3, 5);
             }

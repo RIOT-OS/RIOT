@@ -184,6 +184,9 @@ static int _init(netdev_t *netdev)
 
     at86rf2xx_reset(dev);
 
+    /* Initialize CSMA seed with hardware address */
+    at86rf2xx_set_csma_seed(dev, dev->netdev.long_addr);
+
     /* signal link UP */
     netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
 
