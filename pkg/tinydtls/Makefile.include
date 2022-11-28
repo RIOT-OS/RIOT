@@ -12,7 +12,7 @@ INCLUDES += -I$(PKG_BUILDDIR)
 CFLAGS += -DDTLSv12 -DWITH_SHA256
 
 # Check that the used PRNG implementation is cryptographically secure
-CRYPTO_SECURE_IMPLEMENTATIONS := prng_sha256prng prng_sha1prng prng_hwrng
+CRYPTO_SECURE_IMPLEMENTATIONS := prng_sha256prng prng_sha1prng prng_hwrng prng_musl_lcg
 USED_PRNG_IMPLEMENTATIONS := $(filter prng_%,$(USEMODULE))
 ifeq (,$(filter $(CRYPTO_SECURE_IMPLEMENTATIONS),$(USEMODULE)))
   $(info TinyDTLS needs a cryptographically secure implementation of the PRNG module.)
