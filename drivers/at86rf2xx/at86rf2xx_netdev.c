@@ -818,6 +818,32 @@ static void _isr(netdev_t *netdev)
     }
 }
 
+void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params, uint8_t index)
+{
+    netdev_t *netdev = &dev->netdev.netdev;
+
+    netdev->driver = &at86rf2xx_driver;
+    /* State to return after receiving or transmitting */
+    dev->idle_state = AT86RF2XX_STATE_TRX_OFF;
+    /* radio state is P_ON when first powered-on */
+    dev->state = AT86RF2XX_STATE_P_ON;
+    dev->pending_tx = 0;
+
+#if AT86RF2XX_IS_PERIPH
+    (void) params;
+    /* set all interrupts off */
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, 0x00);
+#else
+    /* initialize device descriptor */
+    dev->params = *params;
+#endif
+
+    netdev_register(netdev, NETDEV_AT86RF2XX, index);
+    /* set device address */
+    netdev_ieee802154_setup(&dev->netdev);
+}
+
+
 #if AT86RF2XX_IS_PERIPH
 
 /**
