@@ -658,7 +658,11 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
         case NETOPT_TX_POWER:
             assert(len <= sizeof(int16_t));
             netdev_ieee802154->txpower = *((const int16_t *)val);
-            at86rf2xx_set_txpower(dev, *((const int16_t *)val), dev->netdev.chan);
+#if AT86RF2XX_HAVE_SUBGHZ
+            at86rf2xx_configure_phy(dev, dev->netdev.chan, dev->page, *((const int16_t *)val));
+#else
+            at86rf2xx_configure_phy(dev, dev->netdev.chan, 0, *((const int16_t *)val));
+#endif
             res = sizeof(uint16_t);
             break;
 

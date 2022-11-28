@@ -220,6 +220,9 @@ void at86rf2xx_hardware_reset(at86rf2xx_t *dev);
  * @brief   Set PHY parameters based on channel and page number
  *
  * @param[in,out] dev   device to configure
+ * @param[in] chan      channel number to be set
+ * @param[in] page      channel page
+ * @param[in] txpower   TX power in dBm
  */
 void at86rf2xx_configure_phy(at86rf2xx_t *dev, uint8_t chan, uint8_t page, int16_t txpower);
 

@@ -132,7 +132,7 @@ void at86rf2xx_set_pan(at86rf2xx_t *dev, uint16_t pan)
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__PAN_ID_1, le_pan.u8[1]);
 }
 
-void at86rf2xx_set_txpower(const at86rf2xx_t *dev, int16_t txpower, uint8_t channel)
+static inline void _set_txpower(const at86rf2xx_t *dev, int16_t txpower, uint8_t channel)
 {
     (void) channel;
     txpower += AT86RF2XX_TXPOWER_OFF;
@@ -157,6 +157,63 @@ void at86rf2xx_set_txpower(const at86rf2xx_t *dev, int16_t txpower, uint8_t chan
                         dbm_to_tx_pow[txpower]);
 #endif
 }
+
+void at86rf2xx_configure_phy(at86rf2xx_t *dev, uint8_t chan, uint8_t page, int16_t txpower)
+{
+    /* we must be in TRX_OFF before changing the PHY configuration */
+    uint8_t prev_state = at86rf2xx_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
+    (void) page;
+    (void) chan;
+    (void) txpower;
+
+#if AT86RF2XX_HAVE_SUBGHZ
+    /* The TX power register must be updated after changing the channel if
+     * moving between bands. */
+
+    uint8_t trx_ctrl2 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_2);
+    uint8_t rf_ctrl0 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__RF_CTRL_0);
+
+    /* Clear previous configuration for PHY mode */
+    trx_ctrl2 &= ~(AT86RF2XX_TRX_CTRL_2_MASK__FREQ_MODE);
+    /* Clear previous configuration for GC_TX_OFFS */
+    rf_ctrl0 &= ~AT86RF2XX_RF_CTRL_0_MASK__GC_TX_OFFS;
+
+    if (chan != 0) {
+        /* Set sub mode bit on 915 MHz as recommended by the data sheet */
+        trx_ctrl2 |= AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE;
+    }
+
+    if (page == 0) {
+        /* BPSK coding */
+        /* Data sheet recommends using a +2 dB setting for BPSK */
+        rf_ctrl0 |= AT86RF2XX_RF_CTRL_0_GC_TX_OFFS__2DB;
+    }
+    else if (page == 2) {
+        /* O-QPSK coding */
+        trx_ctrl2 |= AT86RF2XX_TRX_CTRL_2_MASK__BPSK_OQPSK;
+        /* Data sheet recommends using a +1 dB setting for O-QPSK */
+        rf_ctrl0 |= AT86RF2XX_RF_CTRL_0_GC_TX_OFFS__1DB;
+    }
+
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2, trx_ctrl2);
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__RF_CTRL_0, rf_ctrl0);
+#endif
+
+    uint8_t phy_cc_cca = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_CC_CCA);
+    /* Clear previous configuration for channel number */
+    phy_cc_cca &= ~(AT86RF2XX_PHY_CC_CCA_MASK__CHANNEL);
+
+    /* Update the channel register */
+    phy_cc_cca |= (chan & AT86RF2XX_PHY_CC_CCA_MASK__CHANNEL);
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_CC_CCA, phy_cc_cca);
+
+    /* Update the TX power register to achieve the same power (in dBm) */
+    _set_txpower(dev, txpower, chan);
+
+    /* Return to the state we had before reconfiguring */
+    at86rf2xx_set_state(dev, prev_state);
+}
+
 
 int8_t at86rf2xx_get_rxsensitivity(const at86rf2xx_t *dev)
 {
