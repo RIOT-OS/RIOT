@@ -240,3 +240,22 @@ void at86rf2xx_get_random(at86rf2xx_t *dev, uint8_t *data, size_t len)
     at86rf2xx_enable_smart_idle(dev);
 }
 #endif
+
+#if !AT86RF2XX_IS_PERIPH
+void at86rf2xx_spi_init(at86rf2xx_t *dev, void (*irq_handler)(void *arg))
+{
+    /* initialize GPIOs */
+    spi_init_cs(dev->params.spi, dev->params.cs_pin);
+    gpio_init(dev->params.sleep_pin, GPIO_OUT);
+    gpio_clear(dev->params.sleep_pin);
+    gpio_init(dev->params.reset_pin, GPIO_OUT);
+    gpio_set(dev->params.reset_pin);
+    gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_RISING, irq_handler, dev);
+
+    /* Intentionally check if bus can be acquired, if assertions are on */
+    if (!IS_ACTIVE(NDEBUG)) {
+        spi_acquire(dev->params.spi, dev->params.cs_pin, SPI_MODE_0, dev->params.spi_clk);
+        spi_release(dev->params.spi);
+    }
+}
+#endif

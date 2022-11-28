@@ -62,15 +62,12 @@ const netdev_driver_t at86rf2xx_driver = {
     .set = _set,
 };
 
-#if AT86RF2XX_IS_PERIPH
 /* SOC has radio interrupts, store reference to netdev */
 static netdev_t *at86rfmega_dev;
-#else
 static void _irq_handler(void *arg)
 {
     netdev_trigger_event_isr(arg);
 }
-#endif
 
 static int _init(netdev_t *netdev)
 {
@@ -78,23 +75,12 @@ static int _init(netdev_t *netdev)
                           netdev_ieee802154_t, netdev);
     at86rf2xx_t *dev = container_of(netdev_ieee802154, at86rf2xx_t, netdev);
 
-#if AT86RF2XX_IS_PERIPH
-    at86rfmega_dev = netdev;
-#else
-    /* initialize GPIOs */
-    spi_init_cs(dev->params.spi, dev->params.cs_pin);
-    gpio_init(dev->params.sleep_pin, GPIO_OUT);
-    gpio_clear(dev->params.sleep_pin);
-    gpio_init(dev->params.reset_pin, GPIO_OUT);
-    gpio_set(dev->params.reset_pin);
-    gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_RISING, _irq_handler, dev);
-
-    /* Intentionally check if bus can be acquired, if assertions are on */
-    if (!IS_ACTIVE(NDEBUG)) {
-        spi_acquire(dev->params.spi, dev->params.cs_pin, SPI_MODE_0, dev->params.spi_clk);
-        spi_release(dev->params.spi);
+    if (AT86RF2XX_IS_PERIPH) {
+        at86rfmega_dev = netdev;
     }
-#endif
+    else {
+        at86rf2xx_spi_init(dev, _irq_handler);
+    }
 
     /* reset hardware into a defined state */
     at86rf2xx_hardware_reset(dev);
@@ -161,11 +147,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     at86rf2xx_fb_start(dev);
 
     /* get the size of the received packet */
-#if AT86RF2XX_IS_PERIPH
-    phr = TST_RX_LENGTH;
-#else
-    at86rf2xx_fb_read(dev, &phr, 1);
-#endif
+    phr = at86rf2xx_get_rx_len(dev);
 
     /* ignore MSB (refer p.80) and subtract length of FCS field */
     pkt_len = (phr & 0x7f) - 2;
@@ -752,12 +734,7 @@ static void _isr(netdev_t *netdev)
     }
 
     /* read (consume) device status */
-#if AT86RF2XX_IS_PERIPH
-    irq_mask = dev->irq_status;
-    dev->irq_status = 0;
-#else
-    irq_mask = at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
-#endif
+    irq_mask = at86rf2xx_get_irq_flags(dev);
 
     trac_status = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATE)
                   & AT86RF2XX_TRX_STATE_MASK__TRAC;
