@@ -177,16 +177,11 @@ void at86rf2xx_disable_smart_idle(at86rf2xx_t *dev)
 void at86rf2xx_reset(at86rf2xx_t *dev)
 {
     uint8_t tmp;
-    netdev_ieee802154_reset(&dev->netdev);
 
     /* Reset state machine to ensure a known state */
     if (dev->state == AT86RF2XX_STATE_P_ON) {
         at86rf2xx_set_state(dev, AT86RF2XX_STATE_FORCE_TRX_OFF);
     }
-
-    /* set short and long address */
-    at86rf2xx_set_addr_long(dev, (eui64_t *)dev->netdev.long_addr);
-    at86rf2xx_set_addr_short(dev, (network_uint16_t *)dev->netdev.short_addr);
 
     /* set default channel and page */
     at86rf2xx_configure_phy(dev, AT86RF2XX_DEFAULT_CHANNEL, AT86RF2XX_DEFAULT_PAGE);
@@ -197,10 +192,6 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     if (!IS_ACTIVE(AT86RF2XX_BASIC_MODE)) {
         at86rf2xx_set_option(dev, AT86RF2XX_OPT_AUTOACK, true);
         at86rf2xx_set_option(dev, AT86RF2XX_OPT_CSMA, true);
-
-        static const netopt_enable_t enable = NETOPT_ENABLE;
-        netdev_ieee802154_set(&dev->netdev, NETOPT_ACK_REQ,
-                              &enable, sizeof(enable));
     }
 
     /* enable safe mode (protect RX FIFO until reading data starts) */

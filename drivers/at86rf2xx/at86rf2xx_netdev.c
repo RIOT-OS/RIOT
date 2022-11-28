@@ -92,6 +92,14 @@ static int _init(netdev_t *netdev)
     }
 
     /* reset device to default values and put it into RX state */
+    netdev_ieee802154_reset(&dev->netdev);
+    at86rf2xx_set_addr_long(dev, (eui64_t *)dev->netdev.long_addr);
+    at86rf2xx_set_addr_short(dev, (network_uint16_t *)dev->netdev.short_addr);
+    if (!IS_ACTIVE(AT86RF2XX_BASIC_MODE)) {
+        static const netopt_enable_t enable = NETOPT_ENABLE;
+        netdev_ieee802154_set(&dev->netdev, NETOPT_ACK_REQ,
+                              &enable, sizeof(enable));
+    }
     at86rf2xx_reset(dev);
 
     /* signal link UP */
@@ -265,6 +273,16 @@ static int _set_state(at86rf2xx_t *dev, netopt_state_t state)
             break;
         case NETOPT_STATE_RESET:
             at86rf2xx_hardware_reset(dev);
+            netdev_ieee802154_reset(&dev->netdev);
+            /* set short and long address */
+            at86rf2xx_set_addr_long(dev, (eui64_t *)dev->netdev.long_addr);
+            at86rf2xx_set_addr_short(dev, (network_uint16_t *)dev->netdev.short_addr);
+
+            if (!IS_ACTIVE(AT86RF2XX_BASIC_MODE)) {
+                static const netopt_enable_t enable = NETOPT_ENABLE;
+                netdev_ieee802154_set(&dev->netdev, NETOPT_ACK_REQ,
+                                      &enable, sizeof(enable));
+            }
             at86rf2xx_reset(dev);
             break;
         default:
