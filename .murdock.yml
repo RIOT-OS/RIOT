@@ -1,8 +1,8 @@
 push:
   branches:
     # these two enable potential bors support:
-    - staging
-    - trying
+    - '^staging$'
+    - '^trying$'
 
 pr:
   enable_comments: true
