@@ -3,8 +3,8 @@ PKG_URL=https://github.com/bytecodealliance/wasm-micro-runtime.git
 ifeq ($(PKG_BLEADING),1)
   PKG_VERSION=main
 else
-  PKG_VERSION=d7a2888b18c478d87ce8094e1419b4e061db289f
-  #release tag: WAMR-05-18-2022
+  PKG_VERSION=dc4dcc3d6fba42dbe93cf9050fad8e0cfa4b88d0
+  #release tag: WAMR-1.1.1
 endif
 PKG_LICENSE=Apache-2.0
 
