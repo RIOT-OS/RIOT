@@ -7964,6 +7964,7 @@ drivers/include/at86rf215\.h:[0-9]+: warning: Member at86rf215_clko_cur_t \(enum
 drivers/include/at86rf215\.h:[0-9]+: warning: Member at86rf215_clko_freq_t \(enumeration\) of group drivers_at86rf215 is not documented\.
 drivers/include/at86rf215\.h:[0-9]+: warning: Member at86rf215_state_t \(enumeration\) of group drivers_at86rf215 is not documented\.
 drivers/include/at86rf2xx\.h:[0-9]+: warning: Member AT86RF2XX_DEFAULT_CHANNEL \(macro definition\) of group drivers_at86rf2xx is not documented\.
+drivers/include/at86rf2xx\.h:[0-9]+: warning: Member AT86RF2XX_DEFAULT_PAGE \(macro definition\) of group drivers_at86rf2xx is not documented\.
 drivers/include/at86rf2xx\.h:[0-9]+: warning: Member AT86RF2XX_MAX_CHANNEL \(macro definition\) of group drivers_at86rf2xx is not documented\.
 drivers/include/at86rf2xx\.h:[0-9]+: warning: Member AT86RF2XX_MIN_CHANNEL \(macro definition\) of group drivers_at86rf2xx is not documented\.
 drivers/include/bh1900nux\.h:[0-9]+: warning: Member BH1900NUX_REG_ADDR \(macro definition\) of group drivers_bh1900nux is not documented\.
