@@ -45,7 +45,6 @@ typedef struct {
     event_t event;
 } client_ep_t;
 
-extern uint16_t gcoap_next_msg_id(void);
 extern void gcoap_forward_proxy_post_event(void *arg);
 
 static uint8_t proxy_req_buf[CONFIG_GCOAP_PDU_BUF_SIZE];
@@ -238,7 +237,7 @@ static void _set_response_type(coap_pkt_t *pdu, uint8_t resp_type)
 {
     coap_hdr_set_type(pdu->hdr, resp_type);
     if (resp_type == COAP_TYPE_CON) {
-        pdu->hdr->id = htons(gcoap_next_msg_id());
+        pdu->hdr->id = htons(coap_next_msg_id());
     }
 }
 
