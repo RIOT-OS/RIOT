@@ -32,6 +32,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <string.h>
 #include "irq.h"
 
 #ifdef __cplusplus
@@ -355,6 +356,30 @@ static inline void bf_set_all_atomic(uint8_t field[], size_t size)
 {
     unsigned state = irq_disable();
     bf_set_all(field, size);
+    irq_restore(state);
+}
+
+/**
+ * @brief  Clear all bits in the bitfield to 0
+ *
+ * @param[in]     field The bitfield
+ * @param[in]     size  The size of the bitfield
+ */
+static inline void bf_clear_all(uint8_t field[], size_t size)
+{
+    memset(field, 0, (size + 7) / 8);
+}
+
+/**
+ * @brief  Atomically clear all bits in the bitfield to 0
+ *
+ * @param[in]     field The bitfield
+ * @param[in]     size  The size of the bitfield
+ */
+static inline void bf_clear_all_atomic(uint8_t field[], size_t size)
+{
+    unsigned state = irq_disable();
+    bf_clear_all(field, size);
     irq_restore(state);
 }
 
