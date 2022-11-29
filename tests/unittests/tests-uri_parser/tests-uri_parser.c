@@ -14,6 +14,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include "container.h"
 #include "embUnit.h"
 
 #include "uri_parser.h"

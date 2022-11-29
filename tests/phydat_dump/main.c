@@ -19,6 +19,7 @@
 #include <stdio.h>
 
 #include "phydat.h"
+#include "container.h"
 
 typedef struct {
     phydat_t dat;

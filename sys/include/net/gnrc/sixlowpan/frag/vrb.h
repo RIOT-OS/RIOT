@@ -25,7 +25,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "kernel_defines.h"
+#include "modules.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/sixlowpan/config.h"
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG

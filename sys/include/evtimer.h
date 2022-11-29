@@ -46,7 +46,7 @@
 #define EVTIMER_H
 
 #include <stdint.h>
-#include "kernel_defines.h"
+#include "modules.h"
 
 #if IS_USED(MODULE_EVTIMER_ON_ZTIMER)
 #include "ztimer.h"

@@ -23,6 +23,7 @@
 #include "cpu.h"
 #include "embUnit.h"
 #include "embUnit/embUnit.h"
+#include "modules.h"
 
 /* need to define these values before including the header */
 #ifndef FLASHPAGE_SIZE

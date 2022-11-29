@@ -9,6 +9,7 @@
 #include <string.h>
 #include "embUnit.h"
 #include "tests-clif.h"
+#include "container.h"
 
 #include "clif.h"
 

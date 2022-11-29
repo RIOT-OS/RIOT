@@ -27,6 +27,7 @@
 #include <string.h>
 
 #include "shell.h"
+#include "container.h"
 #include "sht1x.h"
 #include "sht1x_params.h"
 

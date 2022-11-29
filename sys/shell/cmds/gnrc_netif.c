@@ -33,6 +33,7 @@
 #include "net/loramac.h"
 #include "net/netif.h"
 #include "shell.h"
+#include "container.h"
 
 #ifdef MODULE_NETSTATS
 #include "net/netstats.h"

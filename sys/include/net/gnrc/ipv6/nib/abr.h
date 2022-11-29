@@ -21,7 +21,7 @@
 #ifndef NET_GNRC_IPV6_NIB_ABR_H
 #define NET_GNRC_IPV6_NIB_ABR_H
 
-#include <kernel_defines.h>
+#include "modules.h"
 
 /* prevent cascading include error to xtimer if it is not compiled in or not
  * supported by board */

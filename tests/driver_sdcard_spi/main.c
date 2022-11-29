@@ -22,6 +22,7 @@
 #include "sdcard_spi_internal.h"
 #include "sdcard_spi_params.h"
 #include "fmt.h"
+#include "container.h"
 #include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>

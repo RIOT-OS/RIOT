@@ -9,6 +9,7 @@
 #include "feetech.h"
 #include "shell.h"
 #include "stdio_uart.h"
+#include "container.h"
 
 #include <stdio.h>
 #include <string.h>

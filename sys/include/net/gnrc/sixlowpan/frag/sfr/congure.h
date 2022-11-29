@@ -30,7 +30,7 @@
 #include <stdlib.h>
 
 #include "congure.h"
-#include "kernel_defines.h"
+#include "modules.h"
 #include "net/gnrc/sixlowpan/frag/sfr.h"
 
 #ifdef __cplusplus

@@ -25,6 +25,7 @@
 #include "embUnit/embUnit.h"
 #include "fmt.h"
 #include "cbor.h"
+#include "container.h"
 
 const char *tests[] = {
     "00",                  /* 0                       */
