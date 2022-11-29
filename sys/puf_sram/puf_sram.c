@@ -16,6 +16,8 @@
  *
  * @}
  */
+#include "cpu_conf.h"
+#include "hashes.h"
 #include "puf_sram.h"
 
 /* Allocation of the PUF seed variable */
