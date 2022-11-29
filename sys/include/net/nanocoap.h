@@ -1099,6 +1099,15 @@ static inline unsigned coap_size2szx(unsigned len)
  * full.
  */
 /**@{*/
+
+/**
+ * @brief   Get next consecutive message ID for use when building a new
+ *          CoAP request.
+ *
+ * @return  A new message ID that can be used for a request or response.
+ */
+uint16_t coap_next_msg_id(void);
+
 /**
  * @brief   Add block option in descriptive use from a slicer object
  *

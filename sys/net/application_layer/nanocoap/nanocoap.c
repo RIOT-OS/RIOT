@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "atomic_utils.h"
 #include "bitarithm.h"
 #include "net/nanocoap.h"
 
@@ -44,6 +45,13 @@
 static int _decode_value(unsigned val, uint8_t **pkt_pos_ptr, uint8_t *pkt_end);
 static uint32_t _decode_uint(uint8_t *pkt_pos, unsigned nbytes);
 static size_t _encode_uint(uint32_t *val);
+
+uint16_t coap_next_msg_id(void)
+{
+    __attribute__((section(".noinit")))
+    static uint16_t id;
+    return atomic_fetch_add_u16(&id, 1);
+}
 
 /* http://tools.ietf.org/html/rfc7252#section-3
  *  0                   1                   2                   3
