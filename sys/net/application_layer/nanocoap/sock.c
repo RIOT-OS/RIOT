@@ -25,7 +25,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "atomic_utils.h"
 #include "net/nanocoap_sock.h"
 #include "net/sock/util.h"
 #include "net/sock/udp.h"
@@ -48,13 +47,6 @@ typedef struct {
     void *arg;
     bool more;
 } _block_ctx_t;
-
-static uint16_t _get_id(void)
-{
-    __attribute__((section(".noinit")))
-    static uint16_t id;
-    return atomic_fetch_add_u16(&id, 1);
-}
 
 static int _get_error(const coap_pkt_t *pkt)
 {
@@ -301,7 +293,7 @@ ssize_t nanocoap_sock_get(nanocoap_sock_t *sock, const char *path, void *buf, si
         .iov_len  = len,
     };
 
-    pktpos += coap_build_hdr(pkt.hdr, COAP_TYPE_CON, NULL, 0, COAP_METHOD_GET, _get_id());
+    pktpos += coap_build_hdr(pkt.hdr, COAP_TYPE_CON, NULL, 0, COAP_METHOD_GET, coap_next_msg_id());
     pktpos += coap_opt_put_uri_path(pktpos, 0, path);
 
     pkt.payload = pktpos;
@@ -333,7 +325,7 @@ ssize_t _sock_put_post(nanocoap_sock_t *sock, const char *path, unsigned code,
         .iov_len  = max_len,
     };
 
-    pktpos += coap_build_hdr(pkt.hdr, type, NULL, 0, code, _get_id());
+    pktpos += coap_build_hdr(pkt.hdr, type, NULL, 0, code, coap_next_msg_id());
     pktpos += coap_opt_put_uri_path(pktpos, 0, path);
 
     if (response == NULL && type == COAP_TYPE_NON) {
@@ -478,7 +470,7 @@ static int _fetch_block(nanocoap_sock_t *sock, uint8_t *buf, size_t len,
     };
     uint16_t lastonum = 0;
 
-    buf += coap_build_hdr(pkt.hdr, COAP_TYPE_CON, NULL, 0, COAP_METHOD_GET, _get_id());
+    buf += coap_build_hdr(pkt.hdr, COAP_TYPE_CON, NULL, 0, COAP_METHOD_GET, coap_next_msg_id());
     buf += coap_opt_put_uri_pathquery(buf, &lastonum, path);
     buf += coap_opt_put_uint(buf, lastonum, COAP_OPT_BLOCK2, (num << 4) | blksize);
 
@@ -516,7 +508,7 @@ int nanocoap_sock_block_request(coap_block_request_t *req,
     uint8_t *pktpos = (void *)pkt.hdr;
     uint16_t lastonum = 0;
 
-    pktpos += coap_build_hdr(pkt.hdr, COAP_TYPE_CON, NULL, 0, req->method, _get_id());
+    pktpos += coap_build_hdr(pkt.hdr, COAP_TYPE_CON, NULL, 0, req->method, coap_next_msg_id());
     pktpos += coap_opt_put_uri_pathquery(pktpos, &lastonum, req->path);
     pktpos += coap_opt_put_uint(pktpos, lastonum, COAP_OPT_BLOCK1,
                                 (req->blknum << 4) | req->blksize | (more ? 0x8 : 0));
