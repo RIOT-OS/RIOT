@@ -26,11 +26,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "auto_init_utils.h"
 #include "atomic_utils.h"
 #include "bitarithm.h"
 #include "net/nanocoap.h"
-#include "random.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -48,21 +46,12 @@ static int _decode_value(unsigned val, uint8_t **pkt_pos_ptr, uint8_t *pkt_end);
 static uint32_t _decode_uint(uint8_t *pkt_pos, unsigned nbytes);
 static size_t _encode_uint(uint32_t *val);
 
-__attribute__((section(".noinit")))
-static uint16_t _msg_id;
 uint16_t coap_next_msg_id(void)
 {
-    return atomic_fetch_add_u16(&_msg_id, 1);
+    __attribute__((section(".noinit")))
+    static uint16_t id;
+    return atomic_fetch_add_u16(&id, 1);
 }
-
-static void auto_init_coap_random(void)
-{
-    if (_msg_id == 0) {
-        _msg_id = random_uint32();
-    }
-}
-
-AUTO_INIT(auto_init_coap_random, AUTO_INIT_PRIORITY_AFTER(AUTO_INIT_PRIO_MOD_RANDOM));
 
 /* http://tools.ietf.org/html/rfc7252#section-3
  *  0                   1                   2                   3
