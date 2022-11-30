@@ -150,6 +150,7 @@ extern "C" {
 #define COAP_CODE_REQUEST_ENTITY_TOO_LARGE   ((4 << 5) | 13)
 #define COAP_CODE_UNSUPPORTED_CONTENT_FORMAT ((4 << 5) | 15)
 #define COAP_CODE_UNPROCESSABLE_ENTITY       ((4 << 5) | 22)
+#define COAP_CODE_TOO_MANY_REQUESTS          ((4 << 5) | 29)
 /** @} */
 
 /**

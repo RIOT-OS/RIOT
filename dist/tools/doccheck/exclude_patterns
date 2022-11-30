@@ -12275,6 +12275,7 @@ sys/include/net/coap\.h:[0-9]+: warning: Member COAP_CODE_REQUEST_ENTITY_TOO_LAR
 sys/include/net/coap\.h:[0-9]+: warning: Member COAP_CODE_SERVICE_UNAVAILABLE \(macro definition\) of group net_coap is not documented\.
 sys/include/net/coap\.h:[0-9]+: warning: Member COAP_CODE_UNAUTHORIZED \(macro definition\) of group net_coap is not documented\.
 sys/include/net/coap\.h:[0-9]+: warning: Member COAP_CODE_UNPROCESSABLE_ENTITY \(macro definition\) of group net_coap is not documented\.
+sys/include/net/coap\.h:[0-9]+: warning: Member COAP_CODE_TOO_MANY_REQUESTS \(macro definition\) of group net_coap is not documented\.
 sys/include/net/coap\.h:[0-9]+: warning: Member COAP_CODE_UNSUPPORTED_CONTENT_FORMAT \(macro definition\) of group net_coap is not documented\.
 sys/include/net/coap\.h:[0-9]+: warning: Member COAP_CODE_VALID \(macro definition\) of group net_coap is not documented\.
 sys/include/net/coap\.h:[0-9]+: warning: Member COAP_DEFAULT_LEISURE \(macro definition\) of group net_coap is not documented\.
