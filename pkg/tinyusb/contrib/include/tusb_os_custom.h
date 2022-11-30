@@ -110,6 +110,7 @@ static inline bool osal_mutex_lock(osal_mutex_t mutex_hdl, uint32_t msec)
 
     return mutex_lock_cancelable(&_mc) == 0;
 #else
+    (void)msec;
     assert(msec == OSAL_TIMEOUT_WAIT_FOREVER);
     mutex_lock(mutex_hdl);
     return true;
