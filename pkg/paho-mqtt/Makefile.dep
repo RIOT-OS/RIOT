@@ -1,3 +1,7 @@
+# PAHO does some comparisons against literals that make certain assumptions
+# about the width of integer types which hold only true for 32 bit platforms
+FEATURES_REQUIRED += arch_32bit
+
 USEMODULE += ztimer
 USEMODULE += ztimer_msec
 USEMODULE += paho-mqtt-contrib
