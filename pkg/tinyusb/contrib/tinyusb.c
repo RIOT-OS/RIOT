@@ -6,6 +6,7 @@
  * directory for more details.
  */
 
+#include "log.h"
 #include "kernel_defines.h"
 #include "thread.h"
 
@@ -27,9 +28,15 @@ static void *_tinyusb_thread_impl(void *arg)
 {
     (void)arg;
 
+    if (tinyusb_hw_init() != 0) {
+        LOG_ERROR("tinyUSB peripherals couldn't be initialized\n");
+        assert(0);
+    }
+    DEBUG("tinyUSB peripherals initialized\n");
+
     if (IS_USED(MODULE_TINYUSB_DEVICE)) {
         if (!tud_init(TINYUSB_TUD_RHPORT)) {
-            DEBUG("tinyUSB device stack couldn't be initialized\n");
+            LOG_ERROR("tinyUSB device stack couldn't be initialized\n");
             assert(0);
         }
         DEBUG("tinyUSB device stack initialized\n");
@@ -37,7 +44,7 @@ static void *_tinyusb_thread_impl(void *arg)
 
     if (IS_USED(MODULE_TINYUSB_HOST)) {
         if (!tuh_init(TINYUSB_TUH_RHPORT)) {
-            DEBUG("tinyUSB host stack couldn't be initialized\n");
+            LOG_ERROR("tinyUSB host stack couldn't be initialized\n");
             assert(0);
         }
         DEBUG("tinyUSB host stack initialized\n");
@@ -65,18 +72,12 @@ int tinyusb_setup(void)
 {
     int res;
 
-    if ((res = tinyusb_hw_init()) != 0) {
-        DEBUG("tinyUSB peripherals couldn't be initialized\n");
-        return res;
-    }
-    DEBUG("tinyUSB peripherals initialized\n");
-
     if ((res = thread_create(_tinyusb_thread_stack,
                              sizeof(_tinyusb_thread_stack),
                              TINYUSB_PRIORITY,
                              THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
                              _tinyusb_thread_impl, NULL, "tinyusb")) < 0) {
-        DEBUG("tinyUSB thread couldn't be created, reason %d\n", res);
+        LOG_ERROR("tinyUSB thread couldn't be created, reason %d\n", res);
         return res;
     }
     DEBUG("tinyUSB thread created\n");
