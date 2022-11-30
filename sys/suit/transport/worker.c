@@ -87,7 +87,8 @@ int suit_handle_url(const char *url)
 
     if (0) {}
 #ifdef MODULE_SUIT_TRANSPORT_COAP
-    else if (strncmp(url, "coap://", 7) == 0) {
+    else if ((strncmp(url, "coap://", 7) == 0) ||
+             (IS_USED(MODULE_NANOCOAP_DTLS) && strncmp(url, "coaps://", 8) == 0)) {
         size = nanocoap_get_blockwise_url_to_buf(url,
                                                  CONFIG_SUIT_COAP_BLOCKSIZE,
                                                  _manifest_buf,
