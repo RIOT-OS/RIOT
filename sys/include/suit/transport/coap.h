@@ -35,12 +35,10 @@ extern "C" {
 /**
  * @brief    Start SUIT CoAP thread
  *
- * @deprecated This is an alias for @ref suit_worker_run and will be removed
- *             after after the 2023.01 release.
+ * @deprecated This will be removed after after the 2023.01 release.
  */
 static inline void suit_coap_run(void)
 {
-    suit_worker_run();
 }
 
 /**

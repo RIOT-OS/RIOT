@@ -23,11 +23,12 @@
  */
 
 #include <assert.h>
+#include <errno.h>
 #include <inttypes.h>
 #include <string.h>
 #include <sys/types.h>
 
-#include "msg.h"
+#include "mutex.h"
 #include "log.h"
 #include "thread.h"
 #include "time_units.h"
@@ -73,15 +74,13 @@
 #define SUIT_MANIFEST_BUFSIZE   640
 #endif
 
-#define SUIT_MSG_TRIGGER        0x12345
-
 static char _stack[SUIT_WORKER_STACKSIZE];
 static char _url[CONFIG_SOCK_URLPATH_MAXLEN];
 static uint8_t _manifest_buf[SUIT_MANIFEST_BUFSIZE];
 
-static kernel_pid_t _suit_worker_pid;
+static mutex_t _worker_lock;
 
-static void _suit_handle_url(const char *url)
+int suit_handle_url(const char *url)
 {
     ssize_t size;
     LOG_INFO("suit_worker: downloading \"%s\"\n", url);
@@ -102,46 +101,38 @@ static void _suit_handle_url(const char *url)
 #endif
     else {
         LOG_WARNING("suit_worker: unsupported URL scheme!\n)");
-        return;
+        return -ENOTSUP;
     }
 
-    if (size >= 0) {
-        LOG_INFO("suit_worker: got manifest with size %u\n", (unsigned)size);
+    if (size < 0) {
+        LOG_INFO("suit_worker: error getting manifest\n");
+        return size;
+    }
+
+    LOG_INFO("suit_worker: got manifest with size %u\n", (unsigned)size);
 
 #ifdef MODULE_SUIT
-        suit_manifest_t manifest;
-        memset(&manifest, 0, sizeof(manifest));
+    suit_manifest_t manifest;
+    memset(&manifest, 0, sizeof(manifest));
 
-        manifest.urlbuf = _url;
-        manifest.urlbuf_len = CONFIG_SOCK_URLPATH_MAXLEN;
+    manifest.urlbuf = _url;
+    manifest.urlbuf_len = CONFIG_SOCK_URLPATH_MAXLEN;
 
-        int res;
-        if ((res = suit_parse(&manifest, _manifest_buf, size)) != SUIT_OK) {
-            LOG_INFO("suit_worker: suit_parse() failed. res=%i\n", res);
-            return;
-        }
-
+    int res;
+    if ((res = suit_parse(&manifest, _manifest_buf, size)) != SUIT_OK) {
+        LOG_INFO("suit_worker: suit_parse() failed. res=%i\n", res);
+        return res;
+    }
 #endif
 #ifdef MODULE_SUIT_STORAGE_FLASHWRITE
-        if (res == 0) {
-            const riotboot_hdr_t *hdr = riotboot_slot_get_hdr(
-                riotboot_slot_other());
-            riotboot_hdr_print(hdr);
-            ztimer_sleep(ZTIMER_MSEC, 1 * MS_PER_SEC);
+    const riotboot_hdr_t *hdr = riotboot_slot_get_hdr(riotboot_slot_other());
+    riotboot_hdr_print(hdr);
+    ztimer_sleep(ZTIMER_MSEC, 1 * MS_PER_SEC);
 
-            if (riotboot_hdr_validate(hdr) == 0) {
-                LOG_INFO("suit_worker: rebooting...\n");
-                pm_reboot();
-            }
-            else {
-                LOG_INFO("suit_worker: update failed, hdr invalid\n ");
-            }
-        }
+    return riotboot_hdr_validate(hdr);
 #endif
-    }
-    else {
-        LOG_INFO("suit_worker: error getting manifest\n");
-    }
+
+    return res;
 }
 
 static void *_suit_worker_thread(void *arg)
@@ -149,38 +140,30 @@ static void *_suit_worker_thread(void *arg)
     (void)arg;
 
     LOG_INFO("suit_worker: started.\n");
-    msg_t msg_queue[4];
-    msg_init_queue(msg_queue, 4);
 
-    _suit_worker_pid = thread_getpid();
-
-    msg_t m;
-    while (true) {
-        msg_receive(&m);
-        DEBUG("suit_worker: got msg with type %" PRIu32 "\n", m.content.value);
-        switch (m.content.value) {
-            case SUIT_MSG_TRIGGER:
-                LOG_INFO("suit_worker: trigger received\n");
-                _suit_handle_url(_url);
-                break;
-            default:
-                LOG_WARNING("suit_worker: warning: unhandled msg\n");
+    if (suit_handle_url(_url) == 0) {
+        LOG_INFO("suit_worker: update successful\n");
+        if (IS_USED(MODULE_SUIT_STORAGE_FLASHWRITE)) {
+            LOG_INFO("suit_worker: rebooting...\n");
+            pm_reboot();
         }
     }
-    return NULL;
-}
+    else {
+        LOG_INFO("suit_worker: update failed, hdr invalid\n ");
+    }
 
-void suit_worker_run(void)
-{
-    thread_create(_stack, SUIT_WORKER_STACKSIZE, SUIT_COAP_WORKER_PRIO,
-                  THREAD_CREATE_STACKTEST,
-                  _suit_worker_thread, NULL, "suit worker");
+    mutex_unlock(&_worker_lock);
+    return NULL;
 }
 
 void suit_worker_trigger(const char *url, size_t len)
 {
+    mutex_lock(&_worker_lock);
+
     memcpy(_url, url, len);
     _url[len] = '\0';
-    msg_t m = { .content.value = SUIT_MSG_TRIGGER };
-    msg_send(&m, _suit_worker_pid);
+
+    thread_create(_stack, SUIT_WORKER_STACKSIZE, SUIT_COAP_WORKER_PRIO,
+                  THREAD_CREATE_STACKTEST,
+                  _suit_worker_thread, NULL, "suit worker");
 }

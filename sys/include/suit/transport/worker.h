@@ -32,17 +32,25 @@ extern "C" {
 #endif
 
 /**
- * @brief    Start SUIT worker thread
- */
-void suit_worker_run(void);
-
-/**
- * @brief   Trigger a SUIT udate
+ * @brief   Trigger a SUIT udate via a worker thread
  *
  * @param[in] url       url pointer containing the full coap url to the manifest
  * @param[in] len       length of the url
  */
 void suit_worker_trigger(const char *url, size_t len);
+
+/**
+ * @brief   Trigger a SUIT udate
+ *
+ * @note Make sure the thread calling this function has enough stack space to fit
+ *       a whole flash page.
+ *
+ * @param[in] url       url pointer containing the full coap url to the manifest
+ *
+ * @return 0 on success
+ *        <0 on error
+ */
+int suit_handle_url(const char *url);
 
 #ifdef __cplusplus
 }
