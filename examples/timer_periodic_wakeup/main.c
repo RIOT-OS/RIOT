@@ -19,19 +19,19 @@
  */
 
 #include <stdio.h>
-#include "xtimer.h"
+#include "ztimer.h"
 #include "timex.h"
 
 /* set interval to 1 second */
-#define INTERVAL (1U * US_PER_SEC)
+#define INTERVAL_MS (1U * MS_PER_SEC)
 
 int main(void)
 {
-    xtimer_ticks32_t last_wakeup = xtimer_now();
+    uint32_t last_wakeup = ztimer_now(ZTIMER_MSEC);
 
-    while(1) {
-        xtimer_periodic_wakeup(&last_wakeup, INTERVAL);
-        printf("slept until %" PRIu32 "\n", xtimer_usec_from_ticks(xtimer_now()));
+    while (1) {
+        ztimer_periodic_wakeup(ZTIMER_MSEC, &last_wakeup, INTERVAL_MS);
+        printf("slept until %" PRIu32 "\n", ztimer_now(ZTIMER_MSEC));
     }
 
     return 0;
