@@ -1,0 +1,1139 @@
+From 1f3e757f38b9dda9cc7d2db88448db7ce4950822 Mon Sep 17 00:00:00 2001
+From: Oleg Hahm <oleg+eclipse@riot-os.org>
+Date: Fri, 2 Dec 2022 19:12:40 +0100
+Subject: [PATCH 3/4] MQTTPacket: use int32_t instead of int where necessary
+
+---
+ MQTTClient-C/src/MQTTClient.c                 | 20 +++++-----
+ MQTTClient/src/MQTTClient.h                   | 26 ++++++-------
+ MQTTClient/src/arduino/WifiIPStack.h          |  8 ++--
+ .../samples/baremetalserial/pub0sub1_nb.c     |  6 +--
+ MQTTPacket/samples/pub0sub1.c                 |  6 +--
+ MQTTPacket/samples/pub0sub1_nb.c              |  6 +--
+ MQTTPacket/samples/qos0pub.c                  |  6 +--
+ MQTTPacket/src/MQTTConnect.h                  | 16 ++++----
+ MQTTPacket/src/MQTTConnectClient.c            | 16 ++++----
+ MQTTPacket/src/MQTTConnectServer.c            |  8 ++--
+ MQTTPacket/src/MQTTDeserializePublish.c       | 12 +++---
+ MQTTPacket/src/MQTTFormat.c                   |  4 +-
+ MQTTPacket/src/MQTTFormat.h                   |  4 +-
+ MQTTPacket/src/MQTTPacket.c                   | 37 +++++++++++--------
+ MQTTPacket/src/MQTTPacket.h                   | 24 ++++++------
+ MQTTPacket/src/MQTTPublish.h                  | 12 +++---
+ MQTTPacket/src/MQTTSerializePublish.c         | 18 ++++-----
+ MQTTPacket/src/MQTTSubscribe.h                | 10 ++---
+ MQTTPacket/src/MQTTSubscribeClient.c          | 12 +++---
+ MQTTPacket/src/MQTTSubscribeServer.c          |  8 ++--
+ MQTTPacket/src/MQTTUnsubscribe.h              | 12 +++---
+ MQTTPacket/src/MQTTUnsubscribeClient.c        | 10 ++---
+ MQTTPacket/src/MQTTUnsubscribeServer.c        | 10 ++---
+ MQTTPacket/test/test1.c                       |  2 +-
+ 24 files changed, 152 insertions(+), 141 deletions(-)
+
+diff --git a/MQTTClient-C/src/MQTTClient.c b/MQTTClient-C/src/MQTTClient.c
+index 578a9cc..0fc19ea 100755
+--- a/MQTTClient-C/src/MQTTClient.c
++++ b/MQTTClient-C/src/MQTTClient.c
+@@ -31,7 +31,7 @@ static int getNextPacketId(MQTTClient *c) {
+ }
+ 
+ 
+-static int sendPacket(MQTTClient* c, int length, Timer* timer)
++static int sendPacket(MQTTClient* c, int32_t length, Timer* timer)
+ {
+     int rc = FAILURE,
+         sent = 0;
+@@ -84,7 +84,7 @@ static int decodePacket(MQTTClient* c, int* value, int timeout)
+ {
+     unsigned char i;
+     int multiplier = 1;
+-    int len = 0;
++    int32_t len = 0;
+     const int MAX_NO_OF_REMAINING_LENGTH_BYTES = 4;
+ 
+     *value = 0;
+@@ -111,7 +111,7 @@ exit:
+ static int readPacket(MQTTClient* c, Timer* timer)
+ {
+     MQTTHeader header = {0};
+-    int len = 0;
++    int32_t len = 0;
+     int rem_len = 0;
+ 
+     /* 1. read the header byte.  This has the packet type in it */
+@@ -225,7 +225,7 @@ int keepalive(MQTTClient* c)
+             Timer timer;
+             TimerInit(&timer);
+             TimerCountdownMS(&timer, 1000);
+-            int len = MQTTSerialize_pingreq(c->buf, c->buf_size);
++            int32_t len = MQTTSerialize_pingreq(c->buf, c->buf_size);
+             if (len > 0 && (rc = sendPacket(c, len, &timer)) == SUCCESS) // send the ping packet
+                 c->ping_outstanding = 1;
+         }
+@@ -256,7 +256,7 @@ void MQTTCloseSession(MQTTClient* c)
+ 
+ int cycle(MQTTClient* c, Timer* timer)
+ {
+-    int len = 0,
++    int32_t len = 0,
+         rc = SUCCESS;
+ 
+     int packet_type = readPacket(c, timer);     /* read the socket, see what work is due */
+@@ -415,7 +415,7 @@ int MQTTConnectWithResults(MQTTClient* c, MQTTPacket_connectData* options, MQTTC
+     Timer connect_timer;
+     int rc = FAILURE;
+     MQTTPacket_connectData default_options = MQTTPacket_connectData_initializer;
+-    int len = 0;
++    int32_t len = 0;
+ 
+ #if defined(MQTT_TASK)
+ 	  MutexLock(&c->mutex);
+@@ -519,7 +519,7 @@ int MQTTSubscribeWithResults(MQTTClient* c, const char* topicFilter, enum QoS qo
+ {
+     int rc = FAILURE;
+     Timer timer;
+-    int len = 0;
++    int32_t len = 0;
+     MQTTString topic = MQTTString_initializer;
+     topic.cstring = (char *)topicFilter;
+ 
+@@ -580,7 +580,7 @@ int MQTTUnsubscribe(MQTTClient* c, const char* topicFilter)
+     Timer timer;
+     MQTTString topic = MQTTString_initializer;
+     topic.cstring = (char *)topicFilter;
+-    int len = 0;
++    int32_t len = 0;
+ 
+ #if defined(MQTT_TASK)
+ 	  MutexLock(&c->mutex);
+@@ -624,7 +624,7 @@ int MQTTPublish(MQTTClient* c, const char* topicName, MQTTMessage* message)
+     Timer timer;
+     MQTTString topic = MQTTString_initializer;
+     topic.cstring = (char *)topicName;
+-    int len = 0;
++    int32_t len = 0;
+ 
+ #if defined(MQTT_TASK)
+ 	  MutexLock(&c->mutex);
+@@ -684,7 +684,7 @@ int MQTTDisconnect(MQTTClient* c)
+ {
+     int rc = FAILURE;
+     Timer timer;     // we might wait for incomplete incoming publishes to complete
+-    int len = 0;
++    int32_t len = 0;
+ 
+ #if defined(MQTT_TASK)
+ 	MutexLock(&c->mutex);
+diff --git a/MQTTClient/src/MQTTClient.h b/MQTTClient/src/MQTTClient.h
+index 65dc4d7..07caa4d 100644
+--- a/MQTTClient/src/MQTTClient.h
++++ b/MQTTClient/src/MQTTClient.h
+@@ -241,11 +241,11 @@ private:
+     int cycle(Timer& timer);
+     int waitfor(int packet_type, Timer& timer);
+     int keepalive();
+-    int publish(int len, Timer& timer, enum QoS qos);
++    int publish(int32_t len, Timer& timer, enum QoS qos);
+ 
+     int decodePacket(int* value, int timeout);
+     int readPacket(Timer& timer);
+-    int sendPacket(int length, Timer& timer);
++    int sendPacket(int32_t length, Timer& timer);
+     int deliverMessage(MQTTString& topicName, Message& message);
+     bool isTopicMatched(char* topicFilter, MQTTString& topicName);
+ 
+@@ -377,7 +377,7 @@ void MQTT::Client<Network, Timer, a, b>::freeQoS2msgid(unsigned short id)
+ 
+ 
+ template<class Network, class Timer, int a, int b>
+-int MQTT::Client<Network, Timer, a, b>::sendPacket(int length, Timer& timer)
++int MQTT::Client<Network, Timer, a, b>::sendPacket(int32_t length, Timer& timer)
+ {
+     int rc = FAILURE,
+         sent = 0;
+@@ -414,7 +414,7 @@ int MQTT::Client<Network, Timer, a, b>::decodePacket(int* value, int timeout)
+ {
+     unsigned char c;
+     int multiplier = 1;
+-    int len = 0;
++    int32_t len = 0;
+     const int MAX_NO_OF_REMAINING_LENGTH_BYTES = 4;
+ 
+     *value = 0;
+@@ -449,7 +449,7 @@ int MQTT::Client<Network, Timer, MAX_MQTT_PACKET_SIZE, b>::readPacket(Timer& tim
+ {
+     int rc = FAILURE;
+     MQTTHeader header = {0};
+-    int len = 0;
++    int32_t len = 0;
+     int rem_len = 0;
+ 
+     /* 1. read the header byte.  This has the packet type in it */
+@@ -579,7 +579,7 @@ template<class Network, class Timer, int MAX_MQTT_PACKET_SIZE, int b>
+ int MQTT::Client<Network, Timer, MAX_MQTT_PACKET_SIZE, b>::cycle(Timer& timer)
+ {
+     // get one piece of work off the wire and one pass through
+-    int len = 0,
++    int32_t len = 0,
+         rc = SUCCESS;
+ 
+     int packet_type = readPacket(timer);    // read the socket, see what work is due
+@@ -698,7 +698,7 @@ int MQTT::Client<Network, Timer, MAX_MQTT_PACKET_SIZE, b>::keepalive()
+     else if (last_sent.expired() || last_received.expired())
+     {
+         Timer timer(1000);
+-        int len = MQTTSerialize_pingreq(sendbuf, MAX_MQTT_PACKET_SIZE);
++        int32_t len = MQTTSerialize_pingreq(sendbuf, MAX_MQTT_PACKET_SIZE);
+         if (len > 0 && (rc = sendPacket(len, timer)) == SUCCESS) // send the ping packet
+         {
+             ping_outstanding = true;
+@@ -733,7 +733,7 @@ int MQTT::Client<Network, Timer, MAX_MQTT_PACKET_SIZE, b>::connect(MQTTPacket_co
+ {
+     Timer connect_timer(command_timeout_ms);
+     int rc = FAILURE;
+-    int len = 0;
++    int32_t len = 0;
+ 
+     if (isconnected) // don't send connect packet again if we are already connected
+         goto exit;
+@@ -855,7 +855,7 @@ int MQTT::Client<Network, Timer, MAX_MQTT_PACKET_SIZE, MAX_MESSAGE_HANDLERS>::su
+ {
+     int rc = FAILURE;
+     Timer timer(command_timeout_ms);
+-    int len = 0;
++    int32_t len = 0;
+     MQTTString topic = {(char*)topicFilter, {0, 0}};
+ 
+     if (!isconnected)
+@@ -902,7 +902,7 @@ int MQTT::Client<Network, Timer, MAX_MQTT_PACKET_SIZE, MAX_MESSAGE_HANDLERS>::un
+     int rc = FAILURE;
+     Timer timer(command_timeout_ms);
+     MQTTString topic = {(char*)topicFilter, {0, 0}};
+-    int len = 0;
++    int32_t len = 0;
+ 
+     if (!isconnected)
+         goto exit;
+@@ -932,7 +932,7 @@ exit:
+ 
+ 
+ template<class Network, class Timer, int MAX_MQTT_PACKET_SIZE, int b>
+-int MQTT::Client<Network, Timer, MAX_MQTT_PACKET_SIZE, b>::publish(int len, Timer& timer, enum QoS qos)
++int MQTT::Client<Network, Timer, MAX_MQTT_PACKET_SIZE, b>::publish(int32_t len, Timer& timer, enum QoS qos)
+ {
+     int rc;
+ 
+@@ -986,7 +986,7 @@ int MQTT::Client<Network, Timer, MAX_MQTT_PACKET_SIZE, b>::publish(const char* t
+     int rc = FAILURE;
+     Timer timer(command_timeout_ms);
+     MQTTString topicString = MQTTString_initializer;
+-    int len = 0;
++    int32_t len = 0;
+ 
+     if (!isconnected)
+         goto exit;
+@@ -1042,7 +1042,7 @@ int MQTT::Client<Network, Timer, MAX_MQTT_PACKET_SIZE, b>::disconnect()
+ {
+     int rc = FAILURE;
+     Timer timer(command_timeout_ms);     // we might wait for incomplete incoming publishes to complete
+-    int len = MQTTSerialize_disconnect(sendbuf, MAX_MQTT_PACKET_SIZE);
++    int32_t len = MQTTSerialize_disconnect(sendbuf, MAX_MQTT_PACKET_SIZE);
+     if (len > 0)
+         rc = sendPacket(len, timer);            // send the disconnect packet
+     closeSession();
+diff --git a/MQTTClient/src/arduino/WifiIPStack.h b/MQTTClient/src/arduino/WifiIPStack.h
+index 6761037..d87a961 100644
+--- a/MQTTClient/src/arduino/WifiIPStack.h
++++ b/MQTTClient/src/arduino/WifiIPStack.h
+@@ -19,15 +19,15 @@
+ 
+ #include <WiFi.h>
+ 
+-class WifiIPStack 
++class WifiIPStack
+ {
+-public:    
++public:
+     WifiIPStack()
+     {
+         //WiFi.begin();              // Use DHCP
+-        iface.setTimeout(1000);    // 1 second Timeout 
++        iface.setTimeout(1000);    // 1 second Timeout
+     }
+-    
++
+     int connect(char* hostname, int port)
+     {
+         return iface.connect(hostname, port);
+diff --git a/MQTTPacket/samples/baremetalserial/pub0sub1_nb.c b/MQTTPacket/samples/baremetalserial/pub0sub1_nb.c
+index 9c5995d..2a721b2 100644
+--- a/MQTTPacket/samples/baremetalserial/pub0sub1_nb.c
++++ b/MQTTPacket/samples/baremetalserial/pub0sub1_nb.c
+@@ -54,13 +54,13 @@ int main(int argc, char *argv[])
+ 	int rc = 0;
+ 	int mysock = 0;
+ 	unsigned char buf[200];
+-	int buflen = sizeof(buf);
++	int32_t buflen = sizeof(buf);
+ 	int msgid = 1;
+ 	MQTTString topicString = MQTTString_initializer;
+ 	int req_qos = 0;
+ 	char* payload = "mypayload";
+-	int payloadlen = strlen(payload);
+-	int len = 0;
++	int32_t payloadlen = strlen(payload);
++	int32_t len = 0;
+ 	MQTTTransport mytransport;
+ 	int state = READING;
+ 
+diff --git a/MQTTPacket/samples/pub0sub1.c b/MQTTPacket/samples/pub0sub1.c
+index 37bc2d4..bde7add 100644
+--- a/MQTTPacket/samples/pub0sub1.c
++++ b/MQTTPacket/samples/pub0sub1.c
+@@ -48,13 +48,13 @@ int main(int argc, char *argv[])
+ 	int rc = 0;
+ 	int mysock = 0;
+ 	unsigned char buf[200];
+-	int buflen = sizeof(buf);
++	int32_t buflen = sizeof(buf);
+ 	int msgid = 1;
+ 	MQTTString topicString = MQTTString_initializer;
+ 	int req_qos = 0;
+ 	char* payload = "mypayload";
+-	int payloadlen = strlen(payload);
+-	int len = 0;
++	int32_t payloadlen = strlen(payload);
++	int32_t len = 0;
+ 	char *host = "m2m.eclipse.org";
+ 	int port = 1883;
+ 
+diff --git a/MQTTPacket/samples/pub0sub1_nb.c b/MQTTPacket/samples/pub0sub1_nb.c
+index fdc79ba..a154106 100644
+--- a/MQTTPacket/samples/pub0sub1_nb.c
++++ b/MQTTPacket/samples/pub0sub1_nb.c
+@@ -48,13 +48,13 @@ int main(int argc, char *argv[])
+ 	int rc = 0;
+ 	int mysock = 0;
+ 	unsigned char buf[200];
+-	int buflen = sizeof(buf);
++	size_t buflen = sizeof(buf);
+ 	int msgid = 1;
+ 	MQTTString topicString = MQTTString_initializer;
+ 	int req_qos = 0;
+ 	char* payload = "mypayload";
+-	int payloadlen = strlen(payload);
+-	int len = 0;
++	size_t payloadlen = strlen(payload);
++	int32_t len = 0;
+ 	char *host = "m2m.eclipse.org";
+ 	int port = 1883;
+ 	MQTTTransport mytransport;
+diff --git a/MQTTPacket/samples/qos0pub.c b/MQTTPacket/samples/qos0pub.c
+index 8b0af77..837211f 100644
+--- a/MQTTPacket/samples/qos0pub.c
++++ b/MQTTPacket/samples/qos0pub.c
+@@ -28,12 +28,12 @@ int main(int argc, char *argv[])
+ 	MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
+ 	int rc = 0;
+ 	char buf[200];
+-	int buflen = sizeof(buf);
++	size_t buflen = sizeof(buf);
+ 	int mysock = 0;
+ 	MQTTString topicString = MQTTString_initializer;
+ 	char* payload = "mypayload";
+-	int payloadlen = strlen(payload);
+-	int len = 0;
++	size_t payloadlen = strlen(payload);
++	int32_t len = 0;
+ 	char *host = "m2m.eclipse.org";
+ 	int port = 1883;
+ 
+diff --git a/MQTTPacket/src/MQTTConnect.h b/MQTTPacket/src/MQTTConnect.h
+index 98c2c16..c30946b 100644
+--- a/MQTTPacket/src/MQTTConnect.h
++++ b/MQTTPacket/src/MQTTConnect.h
+@@ -12,7 +12,7 @@
+  *
+  * Contributors:
+  *    Ian Craggs - initial API and implementation and/or initial documentation
+- *    Ian Craggs - add connack return code definitions 
++ *    Ian Craggs - add connack return code definitions
+  *    Xiang Rong - 442039 Add makefile to Embedded C client
+  *    Ian Craggs - fix for issue #64, bit order in connack response
+  *******************************************************************************/
+@@ -20,6 +20,8 @@
+ #ifndef MQTTCONNECT_H_
+ #define MQTTCONNECT_H_
+ 
++#include <stdint.h>
++
+ enum connack_return_codes
+ {
+     MQTT_CONNECTION_ACCEPTED = 0,
+@@ -136,13 +138,13 @@ typedef union
+ #define MQTTPacket_connectData_initializer { {'M', 'Q', 'T', 'C'}, 0, 4, {NULL, {0, NULL}}, 60, 1, 0, \
+ 		MQTTPacket_willOptions_initializer, {NULL, {0, NULL}}, {NULL, {0, NULL}} }
+ 
+-DLLExport int MQTTSerialize_connect(unsigned char* buf, int buflen, MQTTPacket_connectData* options);
+-DLLExport int MQTTDeserialize_connect(MQTTPacket_connectData* data, unsigned char* buf, int len);
++DLLExport int MQTTSerialize_connect(unsigned char* buf, int32_t buflen, MQTTPacket_connectData* options);
++DLLExport int MQTTDeserialize_connect(MQTTPacket_connectData* data, unsigned char* buf, int32_t len);
+ 
+-DLLExport int MQTTSerialize_connack(unsigned char* buf, int buflen, unsigned char connack_rc, unsigned char sessionPresent);
+-DLLExport int MQTTDeserialize_connack(unsigned char* sessionPresent, unsigned char* connack_rc, unsigned char* buf, int buflen);
++DLLExport int MQTTSerialize_connack(unsigned char* buf, int32_t buflen, unsigned char connack_rc, unsigned char sessionPresent);
++DLLExport int MQTTDeserialize_connack(unsigned char* sessionPresent, unsigned char* connack_rc, unsigned char* buf, int32_t buflen);
+ 
+-DLLExport int MQTTSerialize_disconnect(unsigned char* buf, int buflen);
+-DLLExport int MQTTSerialize_pingreq(unsigned char* buf, int buflen);
++DLLExport int MQTTSerialize_disconnect(unsigned char* buf, int32_t buflen);
++DLLExport int MQTTSerialize_pingreq(unsigned char* buf, int32_t buflen);
+ 
+ #endif /* MQTTCONNECT_H_ */
+diff --git a/MQTTPacket/src/MQTTConnectClient.c b/MQTTPacket/src/MQTTConnectClient.c
+index 5f3cc29..cb2b0ed 100644
+--- a/MQTTPacket/src/MQTTConnectClient.c
++++ b/MQTTPacket/src/MQTTConnectClient.c
+@@ -26,7 +26,7 @@
+   */
+ int MQTTSerialize_connectLength(MQTTPacket_connectData* options)
+ {
+-	int len = 0;
++	int32_t len = 0;
+ 
+ 	FUNC_ENTRY;
+ 
+@@ -55,12 +55,12 @@ int MQTTSerialize_connectLength(MQTTPacket_connectData* options)
+   * @param options the options to be used to build the connect packet
+   * @return serialized length, or error if 0
+   */
+-int MQTTSerialize_connect(unsigned char* buf, int buflen, MQTTPacket_connectData* options)
++int MQTTSerialize_connect(unsigned char* buf, int32_t buflen, MQTTPacket_connectData* options)
+ {
+ 	unsigned char *ptr = buf;
+ 	MQTTHeader header = {0};
+ 	MQTTConnectFlags flags = {0};
+-	int len = 0;
++	int32_t len = 0;
+ 	int rc = -1;
+ 
+ 	FUNC_ENTRY;
+@@ -129,12 +129,12 @@ int MQTTSerialize_connect(unsigned char* buf, int buflen, MQTTPacket_connectData
+   * @param len the length in bytes of the data in the supplied buffer
+   * @return error code.  1 is success, 0 is failure
+   */
+-int MQTTDeserialize_connack(unsigned char* sessionPresent, unsigned char* connack_rc, unsigned char* buf, int buflen)
++int MQTTDeserialize_connack(unsigned char* sessionPresent, unsigned char* connack_rc, unsigned char* buf, int32_t buflen)
+ {
+ 	MQTTHeader header = {0};
+ 	unsigned char* curdata = buf;
+ 	unsigned char* enddata = NULL;
+-	int rc = 0;
++	int32_t rc = 0;
+ 	int mylen;
+ 	MQTTConnackFlags flags = {0};
+ 
+@@ -166,7 +166,7 @@ exit:
+   * @param packettype the message type
+   * @return serialized length, or error if 0
+   */
+-int MQTTSerialize_zero(unsigned char* buf, int buflen, unsigned char packettype)
++int MQTTSerialize_zero(unsigned char* buf, int32_t buflen, unsigned char packettype)
+ {
+ 	MQTTHeader header = {0};
+ 	int rc = -1;
+@@ -196,7 +196,7 @@ exit:
+   * @param buflen the length in bytes of the supplied buffer, to avoid overruns
+   * @return serialized length, or error if 0
+   */
+-int MQTTSerialize_disconnect(unsigned char* buf, int buflen)
++int MQTTSerialize_disconnect(unsigned char* buf, int32_t buflen)
+ {
+ 	return MQTTSerialize_zero(buf, buflen, DISCONNECT);
+ }
+@@ -208,7 +208,7 @@ int MQTTSerialize_disconnect(unsigned char* buf, int buflen)
+   * @param buflen the length in bytes of the supplied buffer, to avoid overruns
+   * @return serialized length, or error if 0
+   */
+-int MQTTSerialize_pingreq(unsigned char* buf, int buflen)
++int MQTTSerialize_pingreq(unsigned char* buf, int32_t buflen)
+ {
+ 	return MQTTSerialize_zero(buf, buflen, PINGREQ);
+ }
+diff --git a/MQTTPacket/src/MQTTConnectServer.c b/MQTTPacket/src/MQTTConnectServer.c
+index 07c7cb5..d6dcd1d 100644
+--- a/MQTTPacket/src/MQTTConnectServer.c
++++ b/MQTTPacket/src/MQTTConnectServer.c
+@@ -48,7 +48,7 @@ int MQTTPacket_checkVersion(MQTTString* protocol, int version)
+   * @param len the length in bytes of the data in the supplied buffer
+   * @return error code.  1 is success, 0 is failure
+   */
+-int MQTTDeserialize_connect(MQTTPacket_connectData* data, unsigned char* buf, int len)
++int MQTTDeserialize_connect(MQTTPacket_connectData* data, unsigned char* buf, int32_t len)
+ {
+ 	MQTTHeader header = {0};
+ 	MQTTConnectFlags flags = {0};
+@@ -112,11 +112,11 @@ exit:
+   * Serializes the connack packet into the supplied buffer.
+   * @param buf the buffer into which the packet will be serialized
+   * @param buflen the length in bytes of the supplied buffer
+-  * @param connack_rc the integer connack return code to be used 
++  * @param connack_rc the integer connack return code to be used
+   * @param sessionPresent the MQTT 3.1.1 sessionPresent flag
+   * @return serialized length, or error if 0
+   */
+-int MQTTSerialize_connack(unsigned char* buf, int buflen, unsigned char connack_rc, unsigned char sessionPresent)
++int MQTTSerialize_connack(unsigned char* buf, int32_t buflen, unsigned char connack_rc, unsigned char sessionPresent)
+ {
+ 	MQTTHeader header = {0};
+ 	int rc = 0;
+@@ -137,7 +137,7 @@ int MQTTSerialize_connack(unsigned char* buf, int buflen, unsigned char connack_
+ 
+ 	flags.all = 0;
+ 	flags.bits.sessionpresent = sessionPresent;
+-	writeChar(&ptr, flags.all); 
++	writeChar(&ptr, flags.all);
+ 	writeChar(&ptr, connack_rc);
+ 
+ 	rc = ptr - buf;
+diff --git a/MQTTPacket/src/MQTTDeserializePublish.c b/MQTTPacket/src/MQTTDeserializePublish.c
+index dafb6a3..5687063 100644
+--- a/MQTTPacket/src/MQTTDeserializePublish.c
++++ b/MQTTPacket/src/MQTTDeserializePublish.c
+@@ -34,12 +34,12 @@
+   * @return error code.  1 is success
+   */
+ int MQTTDeserialize_publish(unsigned char* dup, int* qos, unsigned char* retained, unsigned short* packetid, MQTTString* topicName,
+-		unsigned char** payload, int* payloadlen, unsigned char* buf, int buflen)
++		unsigned char** payload, int* payloadlen, unsigned char* buf, int32_t buflen)
+ {
+ 	MQTTHeader header = {0};
+ 	unsigned char* curdata = buf;
+ 	unsigned char* enddata = NULL;
+-	int rc = 0;
++	int32_t rc = 0;
+ 	int mylen = 0;
+ 
+ 	FUNC_ENTRY;
+@@ -65,7 +65,7 @@ int MQTTDeserialize_publish(unsigned char* dup, int* qos, unsigned char* retaine
+ 	rc = 1;
+ exit:
+ 	FUNC_EXIT_RC(rc);
+-	return rc;
++	return (int) rc;
+ }
+ 
+ 
+@@ -79,12 +79,12 @@ exit:
+   * @param buflen the length in bytes of the data in the supplied buffer
+   * @return error code.  1 is success, 0 is failure
+   */
+-int MQTTDeserialize_ack(unsigned char* packettype, unsigned char* dup, unsigned short* packetid, unsigned char* buf, int buflen)
++int MQTTDeserialize_ack(unsigned char* packettype, unsigned char* dup, unsigned short* packetid, unsigned char* buf, int32_t buflen)
+ {
+ 	MQTTHeader header = {0};
+ 	unsigned char* curdata = buf;
+ 	unsigned char* enddata = NULL;
+-	int rc = 0;
++	int32_t rc = 0;
+ 	int mylen;
+ 
+ 	FUNC_ENTRY;
+@@ -102,6 +102,6 @@ int MQTTDeserialize_ack(unsigned char* packettype, unsigned char* dup, unsigned
+ 	rc = 1;
+ exit:
+ 	FUNC_EXIT_RC(rc);
+-	return rc;
++	return (int) rc;
+ }
+ 
+diff --git a/MQTTPacket/src/MQTTFormat.c b/MQTTPacket/src/MQTTFormat.c
+index 2eff31f..6fb8312 100644
+--- a/MQTTPacket/src/MQTTFormat.c
++++ b/MQTTPacket/src/MQTTFormat.c
+@@ -115,7 +115,7 @@ int MQTTStringFormat_unsubscribe(char* strbuf, int strbuflen, unsigned char dup,
+ 
+ 
+ #if defined(MQTT_CLIENT)
+-char* MQTTFormat_toClientString(char* strbuf, int strbuflen, unsigned char* buf, int buflen)
++char* MQTTFormat_toClientString(char* strbuf, int strbuflen, unsigned char* buf, int32_t buflen)
+ {
+ 	int index = 0;
+ 	int rem_length = 0;
+@@ -185,7 +185,7 @@ char* MQTTFormat_toClientString(char* strbuf, int strbuflen, unsigned char* buf,
+ #endif
+ 
+ #if defined(MQTT_SERVER)
+-char* MQTTFormat_toServerString(char* strbuf, int strbuflen, unsigned char* buf, int buflen)
++char* MQTTFormat_toServerString(char* strbuf, int strbuflen, unsigned char* buf, int32_t buflen)
+ {
+ 	int index = 0;
+ 	int rem_length = 0;
+diff --git a/MQTTPacket/src/MQTTFormat.h b/MQTTPacket/src/MQTTFormat.h
+index 47b0c41..ee167d3 100644
+--- a/MQTTPacket/src/MQTTFormat.h
++++ b/MQTTPacket/src/MQTTFormat.h
+@@ -31,7 +31,7 @@ int MQTTStringFormat_subscribe(char* strbuf, int strbuflen, unsigned char dup, u
+ int MQTTStringFormat_suback(char* strbuf, int strbuflen, unsigned short packetid, int count, int* grantedQoSs);
+ int MQTTStringFormat_unsubscribe(char* strbuf, int strbuflen, unsigned char dup, unsigned short packetid,
+ 		int count, MQTTString topicFilters[]);
+-char* MQTTFormat_toClientString(char* strbuf, int strbuflen, unsigned char* buf, int buflen);
+-char* MQTTFormat_toServerString(char* strbuf, int strbuflen, unsigned char* buf, int buflen);
++char* MQTTFormat_toClientString(char* strbuf, int strbuflen, unsigned char* buf, int32_t buflen);
++char* MQTTFormat_toServerString(char* strbuf, int strbuflen, unsigned char* buf, int32_t buflen);
+ 
+ #endif
+diff --git a/MQTTPacket/src/MQTTPacket.c b/MQTTPacket/src/MQTTPacket.c
+index 0723b9a..f118a16 100644
+--- a/MQTTPacket/src/MQTTPacket.c
++++ b/MQTTPacket/src/MQTTPacket.c
+@@ -20,13 +20,20 @@
+ 
+ #include <string.h>
+ 
++/* According to https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901011 */
++#define NUM_OF_DIGITS_1 (128)
++#define NUM_OF_DIGITS_2 (16384)
++#define NUM_OF_DIGITS_3 (2097151)
++
+ /**
+  * Encodes the message length according to the MQTT algorithm
++ *
++ * @note See also https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901011
+  * @param buf the buffer into which the encoded data is written
+  * @param length the length to be encoded
+  * @return the number of bytes written to buffer
+  */
+-int MQTTPacket_encode(unsigned char* buf, int length)
++int MQTTPacket_encode(unsigned char* buf, int32_t length)
+ {
+ 	int rc = 0;
+ 
+@@ -51,11 +58,11 @@ int MQTTPacket_encode(unsigned char* buf, int length)
+  * @param value the decoded length returned
+  * @return the number of bytes read from the socket
+  */
+-int MQTTPacket_decode(int (*getcharfn)(unsigned char*, int), int* value)
++int32_t MQTTPacket_decode(int (*getcharfn)(unsigned char*, int), int* value)
+ {
+ 	unsigned char c;
+ 	int multiplier = 1;
+-	int len = 0;
++	int32_t len = 0;
+ #define MAX_NO_OF_REMAINING_LENGTH_BYTES 4
+ 
+ 	FUNC_ENTRY;
+@@ -81,16 +88,16 @@ exit:
+ }
+ 
+ 
+-int MQTTPacket_len(int rem_len)
++int32_t MQTTPacket_len(int32_t rem_len)
+ {
+ 	rem_len += 1; /* header byte */
+ 
+ 	/* now remaining_length field */
+-	if (rem_len < 128)
++	if (rem_len < NUM_OF_DIGITS_1)
+ 		rem_len += 1;
+-	else if (rem_len < 16384)
++	else if (rem_len < NUM_OF_DIGITS_2)
+ 		rem_len += 2;
+-	else if (rem_len < 2097151)
++	else if (rem_len < NUM_OF_DIGITS_3)
+ 		rem_len += 3;
+ 	else
+ 		rem_len += 4;
+@@ -110,7 +117,7 @@ int bufchar(unsigned char* c, int count)
+ }
+ 
+ 
+-int MQTTPacket_decodeBuf(unsigned char* buf, int* value)
++int32_t MQTTPacket_decodeBuf(unsigned char* buf, int* value)
+ {
+ 	bufptr = buf;
+ 	return MQTTPacket_decode(bufchar, value);
+@@ -125,7 +132,7 @@ int MQTTPacket_decodeBuf(unsigned char* buf, int* value)
+ int readInt(unsigned char** pptr)
+ {
+ 	unsigned char* ptr = *pptr;
+-	int len = 256*(*ptr) + (*(ptr+1));
++	int32_t len = 256*(*ptr) + (*(ptr+1));
+ 	*pptr += 2;
+ 	return len;
+ }
+@@ -177,7 +184,7 @@ void writeInt(unsigned char** pptr, int anInt)
+  */
+ void writeCString(unsigned char** pptr, const char* string)
+ {
+-	int len = strlen(string);
++	int32_t len = strlen(string);
+ 	writeInt(pptr, len);
+ 	memcpy(*pptr, string, len);
+ 	*pptr += len;
+@@ -254,7 +261,7 @@ int MQTTPacket_equals(MQTTString* a, char* bptr)
+ 	int alen = 0,
+ 		blen = 0;
+ 	char *aptr;
+-	
++
+ 	if (a->cstring)
+ 	{
+ 		aptr = a->cstring;
+@@ -266,7 +273,7 @@ int MQTTPacket_equals(MQTTString* a, char* bptr)
+ 		alen = a->lenstring.len;
+ 	}
+ 	blen = strlen(bptr);
+-	
++
+ 	return (alen == blen) && (strncmp(aptr, bptr, alen) == 0);
+ }
+ 
+@@ -279,11 +286,11 @@ int MQTTPacket_equals(MQTTString* a, char* bptr)
+  * @return integer MQTT packet type, or -1 on error
+  * @note  the whole message must fit into the caller's buffer
+  */
+-int MQTTPacket_read(unsigned char* buf, int buflen, int (*getfn)(unsigned char*, int))
++int MQTTPacket_read(unsigned char* buf, int32_t buflen, int (*getfn)(unsigned char*, int))
+ {
+ 	int rc = -1;
+ 	MQTTHeader header = {0};
+-	int len = 0;
++	int32_t len = 0;
+ 	int rem_len = 0;
+ 
+ 	/* 1. read the header byte.  This has the packet type in it */
+@@ -351,7 +358,7 @@ exit:
+  * @return integer MQTT packet type, 0 for call again, or -1 on error
+  * @note  the whole message must fit into the caller's buffer
+  */
+-int MQTTPacket_readnb(unsigned char* buf, int buflen, MQTTTransport *trp)
++int MQTTPacket_readnb(unsigned char* buf, int32_t buflen, MQTTTransport *trp)
+ {
+ 	int rc = -1, frc;
+ 	MQTTHeader header = {0};
+diff --git a/MQTTPacket/src/MQTTPacket.h b/MQTTPacket/src/MQTTPacket.h
+index 0ee4623..5bab30b 100644
+--- a/MQTTPacket/src/MQTTPacket.h
++++ b/MQTTPacket/src/MQTTPacket.h
+@@ -18,6 +18,8 @@
+ #ifndef MQTTPACKET_H_
+ #define MQTTPACKET_H_
+ 
++#include <stdint.h>
++
+ #if defined(__cplusplus) /* If this is a C++ compiler, use C linkage */
+ extern "C" {
+ #endif
+@@ -30,7 +32,7 @@ extern "C" {
+   #define DLLExport  __attribute__ ((visibility ("default")))
+ #else
+   #define DLLImport
+-  #define DLLExport  
++  #define DLLExport
+ #endif
+ 
+ enum errors
+@@ -74,7 +76,7 @@ typedef union
+ 
+ typedef struct
+ {
+-	int len;
++	int32_t len;
+ 	char* data;
+ } MQTTLenString;
+ 
+@@ -94,15 +96,15 @@ int MQTTstrlen(MQTTString mqttstring);
+ #include "MQTTUnsubscribe.h"
+ #include "MQTTFormat.h"
+ 
+-DLLExport int MQTTSerialize_ack(unsigned char* buf, int buflen, unsigned char type, unsigned char dup, unsigned short packetid);
+-DLLExport int MQTTDeserialize_ack(unsigned char* packettype, unsigned char* dup, unsigned short* packetid, unsigned char* buf, int buflen);
++DLLExport int MQTTSerialize_ack(unsigned char* buf, int32_t buflen, unsigned char type, unsigned char dup, unsigned short packetid);
++DLLExport int MQTTDeserialize_ack(unsigned char* packettype, unsigned char* dup, unsigned short* packetid, unsigned char* buf, int32_t buflen);
+ 
+-int MQTTPacket_len(int rem_len);
++int32_t MQTTPacket_len(int32_t rem_len);
+ DLLExport int MQTTPacket_equals(MQTTString* a, char* b);
+ 
+-DLLExport int MQTTPacket_encode(unsigned char* buf, int length);
+-int MQTTPacket_decode(int (*getcharfn)(unsigned char*, int), int* value);
+-int MQTTPacket_decodeBuf(unsigned char* buf, int* value);
++DLLExport int MQTTPacket_encode(unsigned char* buf, int32_t length);
++int32_t MQTTPacket_decode(int (*getcharfn)(unsigned char*, int), int* value);
++int32_t MQTTPacket_decodeBuf(unsigned char* buf, int* value);
+ 
+ int readInt(unsigned char** pptr);
+ char readChar(unsigned char** pptr);
+@@ -112,18 +114,18 @@ int readMQTTLenString(MQTTString* mqttstring, unsigned char** pptr, unsigned cha
+ void writeCString(unsigned char** pptr, const char* string);
+ void writeMQTTString(unsigned char** pptr, MQTTString mqttstring);
+ 
+-DLLExport int MQTTPacket_read(unsigned char* buf, int buflen, int (*getfn)(unsigned char*, int));
++DLLExport int MQTTPacket_read(unsigned char* buf, int32_t buflen, int (*getfn)(unsigned char*, int));
+ 
+ typedef struct {
+ 	int (*getfn)(void *, unsigned char*, int); /* must return -1 for error, 0 for call again, or the number of bytes read */
+ 	void *sck;	/* pointer to whatever the system may use to identify the transport */
+ 	int multiplier;
+ 	int rem_len;
+-	int len;
++	int32_t len;
+ 	char state;
+ }MQTTTransport;
+ 
+-int MQTTPacket_readnb(unsigned char* buf, int buflen, MQTTTransport *trp);
++int MQTTPacket_readnb(unsigned char* buf, int32_t buflen, MQTTTransport *trp);
+ 
+ #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+ }
+diff --git a/MQTTPacket/src/MQTTPublish.h b/MQTTPacket/src/MQTTPublish.h
+index ebe479d..678acc0 100644
+--- a/MQTTPacket/src/MQTTPublish.h
++++ b/MQTTPacket/src/MQTTPublish.h
+@@ -19,20 +19,20 @@
+ #define MQTTPUBLISH_H_
+ 
+ #if !defined(DLLImport)
+-  #define DLLImport 
++  #define DLLImport
+ #endif
+ #if !defined(DLLExport)
+   #define DLLExport
+ #endif
+ 
+-DLLExport int MQTTSerialize_publish(unsigned char* buf, int buflen, unsigned char dup, int qos, unsigned char retained, unsigned short packetid,
++DLLExport int32_t MQTTSerialize_publish(unsigned char* buf, int32_t buflen, unsigned char dup, int qos, unsigned char retained, unsigned short packetid,
+ 		MQTTString topicName, unsigned char* payload, int payloadlen);
+ 
+ DLLExport int MQTTDeserialize_publish(unsigned char* dup, int* qos, unsigned char* retained, unsigned short* packetid, MQTTString* topicName,
+-		unsigned char** payload, int* payloadlen, unsigned char* buf, int len);
++		unsigned char** payload, int* payloadlen, unsigned char* buf, int32_t len);
+ 
+-DLLExport int MQTTSerialize_puback(unsigned char* buf, int buflen, unsigned short packetid);
+-DLLExport int MQTTSerialize_pubrel(unsigned char* buf, int buflen, unsigned char dup, unsigned short packetid);
+-DLLExport int MQTTSerialize_pubcomp(unsigned char* buf, int buflen, unsigned short packetid);
++DLLExport int MQTTSerialize_puback(unsigned char* buf, int32_t buflen, unsigned short packetid);
++DLLExport int MQTTSerialize_pubrel(unsigned char* buf, int32_t buflen, unsigned char dup, unsigned short packetid);
++DLLExport int MQTTSerialize_pubcomp(unsigned char* buf, int32_t buflen, unsigned short packetid);
+ 
+ #endif /* MQTTPUBLISH_H_ */
+diff --git a/MQTTPacket/src/MQTTSerializePublish.c b/MQTTPacket/src/MQTTSerializePublish.c
+index 77a58b5..fe2fbeb 100644
+--- a/MQTTPacket/src/MQTTSerializePublish.c
++++ b/MQTTPacket/src/MQTTSerializePublish.c
+@@ -24,13 +24,13 @@
+ /**
+   * Determines the length of the MQTT publish packet that would be produced using the supplied parameters
+   * @param qos the MQTT QoS of the publish (packetid is omitted for QoS 0)
+-  * @param topicName the topic name to be used in the publish  
++  * @param topicName the topic name to be used in the publish
+   * @param payloadlen the length of the payload to be sent
+   * @return the length of buffer needed to contain the serialized version of the packet
+   */
+-int MQTTSerialize_publishLength(int qos, MQTTString topicName, int payloadlen)
++int32_t MQTTSerialize_publishLength(int qos, MQTTString topicName, int payloadlen)
+ {
+-	int len = 0;
++	int32_t len = 0;
+ 
+ 	len += 2 + MQTTstrlen(topicName) + payloadlen;
+ 	if (qos > 0)
+@@ -52,12 +52,12 @@ int MQTTSerialize_publishLength(int qos, MQTTString topicName, int payloadlen)
+   * @param payloadlen integer - the length of the MQTT payload
+   * @return the length of the serialized data.  <= 0 indicates error
+   */
+-int MQTTSerialize_publish(unsigned char* buf, int buflen, unsigned char dup, int qos, unsigned char retained, unsigned short packetid,
++int32_t MQTTSerialize_publish(unsigned char* buf, int32_t buflen, unsigned char dup, int qos, unsigned char retained, unsigned short packetid,
+ 		MQTTString topicName, unsigned char* payload, int payloadlen)
+ {
+ 	unsigned char *ptr = buf;
+ 	MQTTHeader header = {0};
+-	int rem_len = 0;
++	int32_t rem_len = 0;
+ 	int rc = 0;
+ 
+ 	FUNC_ENTRY;
+@@ -101,7 +101,7 @@ exit:
+   * @param packetid the MQTT packet identifier
+   * @return serialized length, or error if 0
+   */
+-int MQTTSerialize_ack(unsigned char* buf, int buflen, unsigned char packettype, unsigned char dup, unsigned short packetid)
++int MQTTSerialize_ack(unsigned char* buf, int32_t buflen, unsigned char packettype, unsigned char dup, unsigned short packetid)
+ {
+ 	MQTTHeader header = {0};
+ 	int rc = 0;
+@@ -134,7 +134,7 @@ exit:
+   * @param packetid integer - the MQTT packet identifier
+   * @return serialized length, or error if 0
+   */
+-int MQTTSerialize_puback(unsigned char* buf, int buflen, unsigned short packetid)
++int MQTTSerialize_puback(unsigned char* buf, int32_t buflen, unsigned short packetid)
+ {
+ 	return MQTTSerialize_ack(buf, buflen, PUBACK, 0, packetid);
+ }
+@@ -148,7 +148,7 @@ int MQTTSerialize_puback(unsigned char* buf, int buflen, unsigned short packetid
+   * @param packetid integer - the MQTT packet identifier
+   * @return serialized length, or error if 0
+   */
+-int MQTTSerialize_pubrel(unsigned char* buf, int buflen, unsigned char dup, unsigned short packetid)
++int MQTTSerialize_pubrel(unsigned char* buf, int32_t buflen, unsigned char dup, unsigned short packetid)
+ {
+ 	return MQTTSerialize_ack(buf, buflen, PUBREL, dup, packetid);
+ }
+@@ -161,7 +161,7 @@ int MQTTSerialize_pubrel(unsigned char* buf, int buflen, unsigned char dup, unsi
+   * @param packetid integer - the MQTT packet identifier
+   * @return serialized length, or error if 0
+   */
+-int MQTTSerialize_pubcomp(unsigned char* buf, int buflen, unsigned short packetid)
++int MQTTSerialize_pubcomp(unsigned char* buf, int32_t buflen, unsigned short packetid)
+ {
+ 	return MQTTSerialize_ack(buf, buflen, PUBCOMP, 0, packetid);
+ }
+diff --git a/MQTTPacket/src/MQTTSubscribe.h b/MQTTPacket/src/MQTTSubscribe.h
+index aa91826..80c5734 100644
+--- a/MQTTPacket/src/MQTTSubscribe.h
++++ b/MQTTPacket/src/MQTTSubscribe.h
+@@ -19,21 +19,21 @@
+ #define MQTTSUBSCRIBE_H_
+ 
+ #if !defined(DLLImport)
+-  #define DLLImport 
++  #define DLLImport
+ #endif
+ #if !defined(DLLExport)
+   #define DLLExport
+ #endif
+ 
+-DLLExport int MQTTSerialize_subscribe(unsigned char* buf, int buflen, unsigned char dup, unsigned short packetid,
++DLLExport int MQTTSerialize_subscribe(unsigned char* buf, int32_t buflen, unsigned char dup, unsigned short packetid,
+ 		int count, MQTTString topicFilters[], int requestedQoSs[]);
+ 
+ DLLExport int MQTTDeserialize_subscribe(unsigned char* dup, unsigned short* packetid,
+-		int maxcount, int* count, MQTTString topicFilters[], int requestedQoSs[], unsigned char* buf, int len);
++		int maxcount, int* count, MQTTString topicFilters[], int requestedQoSs[], unsigned char* buf, int32_t len);
+ 
+-DLLExport int MQTTSerialize_suback(unsigned char* buf, int buflen, unsigned short packetid, int count, int* grantedQoSs);
++DLLExport int MQTTSerialize_suback(unsigned char* buf, int32_t buflen, unsigned short packetid, int count, int* grantedQoSs);
+ 
+-DLLExport int MQTTDeserialize_suback(unsigned short* packetid, int maxcount, int* count, int grantedQoSs[], unsigned char* buf, int len);
++DLLExport int MQTTDeserialize_suback(unsigned short* packetid, int maxcount, int* count, int grantedQoSs[], unsigned char* buf, int32_t len);
+ 
+ 
+ #endif /* MQTTSUBSCRIBE_H_ */
+diff --git a/MQTTPacket/src/MQTTSubscribeClient.c b/MQTTPacket/src/MQTTSubscribeClient.c
+index 57a0613..e890f14 100644
+--- a/MQTTPacket/src/MQTTSubscribeClient.c
++++ b/MQTTPacket/src/MQTTSubscribeClient.c
+@@ -28,7 +28,7 @@
+ int MQTTSerialize_subscribeLength(int count, MQTTString topicFilters[])
+ {
+ 	int i;
+-	int len = 2; /* packetid */
++	int32_t len = 2; /* packetid */
+ 
+ 	for (i = 0; i < count; ++i)
+ 		len += 2 + MQTTstrlen(topicFilters[i]) + 1; /* length + topic + req_qos */
+@@ -47,12 +47,12 @@ int MQTTSerialize_subscribeLength(int count, MQTTString topicFilters[])
+   * @param requestedQoSs - array of requested QoS
+   * @return the length of the serialized data.  <= 0 indicates error
+   */
+-int MQTTSerialize_subscribe(unsigned char* buf, int buflen, unsigned char dup, unsigned short packetid, int count,
++int MQTTSerialize_subscribe(unsigned char* buf, int32_t buflen, unsigned char dup, unsigned short packetid, int count,
+ 		MQTTString topicFilters[], int requestedQoSs[])
+ {
+ 	unsigned char *ptr = buf;
+ 	MQTTHeader header = {0};
+-	int rem_len = 0;
++	int32_t rem_len = 0;
+ 	int rc = 0;
+ 	int i = 0;
+ 
+@@ -97,12 +97,12 @@ exit:
+   * @param buflen the length in bytes of the data in the supplied buffer
+   * @return error code.  1 is success, 0 is failure
+   */
+-int MQTTDeserialize_suback(unsigned short* packetid, int maxcount, int* count, int grantedQoSs[], unsigned char* buf, int buflen)
++int MQTTDeserialize_suback(unsigned short* packetid, int maxcount, int* count, int grantedQoSs[], unsigned char* buf, int32_t buflen)
+ {
+ 	MQTTHeader header = {0};
+ 	unsigned char* curdata = buf;
+ 	unsigned char* enddata = NULL;
+-	int rc = 0;
++	int32_t rc = 0;
+ 	int mylen;
+ 
+ 	FUNC_ENTRY;
+@@ -131,7 +131,7 @@ int MQTTDeserialize_suback(unsigned short* packetid, int maxcount, int* count, i
+ 	rc = 1;
+ exit:
+ 	FUNC_EXIT_RC(rc);
+-	return rc;
++	return (int) rc;
+ }
+ 
+ 
+diff --git a/MQTTPacket/src/MQTTSubscribeServer.c b/MQTTPacket/src/MQTTSubscribeServer.c
+index 5579645..9553d8d 100644
+--- a/MQTTPacket/src/MQTTSubscribeServer.c
++++ b/MQTTPacket/src/MQTTSubscribeServer.c
+@@ -33,12 +33,12 @@
+   * @return the length of the serialized data.  <= 0 indicates error
+   */
+ int MQTTDeserialize_subscribe(unsigned char* dup, unsigned short* packetid, int maxcount, int* count, MQTTString topicFilters[],
+-	int requestedQoSs[], unsigned char* buf, int buflen)
++	int requestedQoSs[], unsigned char* buf, int32_t buflen)
+ {
+ 	MQTTHeader header = {0};
+ 	unsigned char* curdata = buf;
+ 	unsigned char* enddata = NULL;
+-	int rc = -1;
++	int32_t rc = -1;
+ 	int mylen = 0;
+ 
+ 	FUNC_ENTRY;
+@@ -66,7 +66,7 @@ int MQTTDeserialize_subscribe(unsigned char* dup, unsigned short* packetid, int
+ 	rc = 1;
+ exit:
+ 	FUNC_EXIT_RC(rc);
+-	return rc;
++	return (int) rc;
+ }
+ 
+ 
+@@ -79,7 +79,7 @@ exit:
+   * @param grantedQoSs - array of granted QoS
+   * @return the length of the serialized data.  <= 0 indicates error
+   */
+-int MQTTSerialize_suback(unsigned char* buf, int buflen, unsigned short packetid, int count, int* grantedQoSs)
++int MQTTSerialize_suback(unsigned char* buf, int32_t buflen, unsigned short packetid, int count, int* grantedQoSs)
+ {
+ 	MQTTHeader header = {0};
+ 	int rc = -1;
+diff --git a/MQTTPacket/src/MQTTUnsubscribe.h b/MQTTPacket/src/MQTTUnsubscribe.h
+index 355ca9a..cf45e0c 100644
+--- a/MQTTPacket/src/MQTTUnsubscribe.h
++++ b/MQTTPacket/src/MQTTUnsubscribe.h
+@@ -19,20 +19,20 @@
+ #define MQTTUNSUBSCRIBE_H_
+ 
+ #if !defined(DLLImport)
+-  #define DLLImport 
++  #define DLLImport
+ #endif
+ #if !defined(DLLExport)
+   #define DLLExport
+ #endif
+ 
+-DLLExport int MQTTSerialize_unsubscribe(unsigned char* buf, int buflen, unsigned char dup, unsigned short packetid,
++DLLExport int32_t MQTTSerialize_unsubscribe(unsigned char* buf, int32_t buflen, unsigned char dup, unsigned short packetid,
+ 		int count, MQTTString topicFilters[]);
+ 
+-DLLExport int MQTTDeserialize_unsubscribe(unsigned char* dup, unsigned short* packetid, int max_count, int* count, MQTTString topicFilters[],
+-		unsigned char* buf, int len);
++DLLExport int32_t MQTTDeserialize_unsubscribe(unsigned char* dup, unsigned short* packetid, int max_count, int* count, MQTTString topicFilters[],
++		unsigned char* buf, int32_t len);
+ 
+-DLLExport int MQTTSerialize_unsuback(unsigned char* buf, int buflen, unsigned short packetid);
++DLLExport int MQTTSerialize_unsuback(unsigned char* buf, int32_t buflen, unsigned short packetid);
+ 
+-DLLExport int MQTTDeserialize_unsuback(unsigned short* packetid, unsigned char* buf, int len);
++DLLExport int MQTTDeserialize_unsuback(unsigned short* packetid, unsigned char* buf, int32_t len);
+ 
+ #endif /* MQTTUNSUBSCRIBE_H_ */
+diff --git a/MQTTPacket/src/MQTTUnsubscribeClient.c b/MQTTPacket/src/MQTTUnsubscribeClient.c
+index e7ec530..8c92419 100644
+--- a/MQTTPacket/src/MQTTUnsubscribeClient.c
++++ b/MQTTPacket/src/MQTTUnsubscribeClient.c
+@@ -25,10 +25,10 @@
+   * @param topicFilters the array of topic filter strings to be used in the publish
+   * @return the length of buffer needed to contain the serialized version of the packet
+   */
+-int MQTTSerialize_unsubscribeLength(int count, MQTTString topicFilters[])
++int32_t MQTTSerialize_unsubscribeLength(int count, MQTTString topicFilters[])
+ {
+ 	int i;
+-	int len = 2; /* packetid */
++	int32_t len = 2; /* packetid */
+ 
+ 	for (i = 0; i < count; ++i)
+ 		len += 2 + MQTTstrlen(topicFilters[i]); /* length + topic*/
+@@ -46,12 +46,12 @@ int MQTTSerialize_unsubscribeLength(int count, MQTTString topicFilters[])
+   * @param topicFilters - array of topic filter names
+   * @return the length of the serialized data.  <= 0 indicates error
+   */
+-int MQTTSerialize_unsubscribe(unsigned char* buf, int buflen, unsigned char dup, unsigned short packetid,
++int32_t MQTTSerialize_unsubscribe(unsigned char* buf, int32_t buflen, unsigned char dup, unsigned short packetid,
+ 		int count, MQTTString topicFilters[])
+ {
+ 	unsigned char *ptr = buf;
+ 	MQTTHeader header = {0};
+-	int rem_len = 0;
++	int32_t rem_len = 0;
+ 	int rc = -1;
+ 	int i = 0;
+ 
+@@ -89,7 +89,7 @@ exit:
+   * @param buflen the length in bytes of the data in the supplied buffer
+   * @return error code.  1 is success, 0 is failure
+   */
+-int MQTTDeserialize_unsuback(unsigned short* packetid, unsigned char* buf, int buflen)
++int MQTTDeserialize_unsuback(unsigned short* packetid, unsigned char* buf, int32_t buflen)
+ {
+ 	unsigned char type = 0;
+ 	unsigned char dup = 0;
+diff --git a/MQTTPacket/src/MQTTUnsubscribeServer.c b/MQTTPacket/src/MQTTUnsubscribeServer.c
+index 42b6102..e740cea 100644
+--- a/MQTTPacket/src/MQTTUnsubscribeServer.c
++++ b/MQTTPacket/src/MQTTUnsubscribeServer.c
+@@ -31,13 +31,13 @@
+   * @param buflen the length in bytes of the data in the supplied buffer
+   * @return the length of the serialized data.  <= 0 indicates error
+   */
+-int MQTTDeserialize_unsubscribe(unsigned char* dup, unsigned short* packetid, int maxcount, int* count, MQTTString topicFilters[],
+-		unsigned char* buf, int len)
++int32_t MQTTDeserialize_unsubscribe(unsigned char* dup, unsigned short* packetid, int maxcount, int* count, MQTTString topicFilters[],
++		unsigned char* buf, int32_t len)
+ {
+ 	MQTTHeader header = {0};
+ 	unsigned char* curdata = buf;
+ 	unsigned char* enddata = NULL;
+-	int rc = 0;
++	int32_t rc = 0;
+ 	int mylen = 0;
+ 
+ 	FUNC_ENTRY;
+@@ -62,7 +62,7 @@ int MQTTDeserialize_unsubscribe(unsigned char* dup, unsigned short* packetid, in
+ 	rc = 1;
+ exit:
+ 	FUNC_EXIT_RC(rc);
+-	return rc;
++	return (int) rc;
+ }
+ 
+ 
+@@ -73,7 +73,7 @@ exit:
+   * @param packetid integer - the MQTT packet identifier
+   * @return the length of the serialized data.  <= 0 indicates error
+   */
+-int MQTTSerialize_unsuback(unsigned char* buf, int buflen, unsigned short packetid)
++int MQTTSerialize_unsuback(unsigned char* buf, int32_t buflen, unsigned short packetid)
+ {
+ 	MQTTHeader header = {0};
+ 	int rc = 0;
+diff --git a/MQTTPacket/test/test1.c b/MQTTPacket/test/test1.c
+index 4614ff7..e4187a2 100644
+--- a/MQTTPacket/test/test1.c
++++ b/MQTTPacket/test/test1.c
+@@ -365,7 +365,7 @@ int test1(struct Options options)
+ 
+ int test2(struct Options options)
+ {
+-	int rc = 0;
++	int32_t rc = 0;
+ 	unsigned char buf[100];
+ 	int buflen = sizeof(buf);
+ 
+-- 
+2.38.1
+
