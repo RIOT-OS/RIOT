@@ -28,6 +28,9 @@
 #include "mutex.h"
 #include "paho_mqtt.h"
 #include "MQTTClient.h"
+#ifdef MODULE_GNRC
+#include "msg.h"
+#endif
 
 #define BUF_SIZE                        1024
 #define MQTT_VERSION_v311               4       /* MQTT v3.1.1 version is 4 */
@@ -65,6 +68,12 @@
 
 #define IS_CLEAN_SESSION                1
 #define IS_RETAINED_MSG                 0
+
+#ifdef MODULE_GNRC
+#define MAIN_QUEUE_SIZE                 8
+
+static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
+#endif
 
 static MQTTClient client;
 static Network network;
@@ -296,6 +305,10 @@ int main(void)
 #ifdef MODULE_LWIP
     /* let LWIP initialize */
     ztimer_sleep(ZTIMER_MSEC, 1 * MS_PER_SEC);
+#endif
+
+#ifdef MODULE_GNRC
+    msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
 #endif
 
     NetworkInit(&network);

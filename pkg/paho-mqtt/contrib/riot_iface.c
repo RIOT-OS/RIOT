@@ -33,17 +33,15 @@
 #define ENABLE_DEBUG        0
 #include "debug.h"
 
-#define IP_MAX_LEN_ADDRESS  (39)    /*IPv6 max length */
-
 #ifndef TSRB_MAX_SIZE
 #define TSRB_MAX_SIZE       (1024)
 #endif
 
-#ifdef MODULE_LWIP
+/* The subsequent static variables are only used by the lwip
+ * network stack and will be garbage collected if GNRC is used */
 static uint8_t buffer[TSRB_MAX_SIZE];
 static uint8_t _temp_buf[TSRB_MAX_SIZE];
 static tsrb_t tsrb_lwip_tcp;
-#endif
 
 #ifndef PAHO_MQTT_YIELD_MS
 #define PAHO_MQTT_YIELD_MS  (10)
@@ -64,6 +62,11 @@ static int mqtt_read(struct Network *n, unsigned char *buf, int len,
          */
         _buf = _temp_buf;
         _len = TSRB_MAX_SIZE;
+        _timeout = 0;
+    }
+    else if (IS_USED(MODULE_GNRC)) {
+        _buf = buf;
+        _len = len;
         _timeout = 0;
     }
     else {
@@ -122,20 +125,26 @@ int NetworkConnect(Network *n, char *addr_ip, int port)
 {
     int ret =-1;
     sock_tcp_ep_t remote = SOCK_IPV4_EP_ANY;
-    char _local_ip[IP_MAX_LEN_ADDRESS];
 
-    strncpy(_local_ip, addr_ip, sizeof(_local_ip));
     if (IS_USED(MODULE_IPV4_ADDR) &&
-        ipv4_addr_from_str((ipv4_addr_t *)&remote.addr, _local_ip)) {
+        ipv4_addr_from_str((ipv4_addr_t *)&remote.addr, addr_ip)) {
             remote.port = port;
     }
+    else if (IS_USED(MODULE_IPV6_ADDR)) {
+        if (IS_USED(MODULE_GNRC)) {
+            char *iface = ipv6_addr_split_iface(addr_ip);
+            if ((!iface) && (gnrc_netif_numof() == 1)) {
+                remote.netif = gnrc_netif_iter(NULL)->pid;
+            }
+            else if (iface) {
+                remote.netif = atoi(iface);
+            }
+        }
 
-    /* ipvN_addr_from_str modifies input buffer */
-    strncpy(_local_ip, addr_ip, sizeof(_local_ip));
-    if (IS_USED(MODULE_IPV6_ADDR) && (remote.port == 0)  &&
-        ipv6_addr_from_str((ipv6_addr_t *)&remote.addr, _local_ip)) {
+        if (ipv6_addr_from_str((ipv6_addr_t *)&remote.addr, addr_ip)) {
             remote.port = port;
             remote.family = AF_INET6;
+        }
     }
 
     if (remote.port == 0) {

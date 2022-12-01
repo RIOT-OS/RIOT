@@ -33,25 +33,40 @@ USEMODULE += ps
 USEMODULE += netdev_default
 USEPKG += paho-mqtt
 
-# paho-mqtt depends on TCP support, choose which stacks you want
-LWIP_IPV4 ?= 0
-LWIP_IPV6 ?= 1
+NETWORK_STACK ?= lwip
 
-ifneq (0,$(LWIP_IPV4))
-  USEMODULE += ipv4_addr
-  USEMODULE += lwip_arp
-  USEMODULE += lwip_ipv4
-  USEMODULE += lwip_dhcp_auto
-  CFLAGS += -DETHARP_SUPPORT_STATIC_ENTRIES=1
+# paho-mqtt depends on TCP support, choose the stack you want
+ifeq (,$(filter lwip gnrc,$(NETWORK_STACK)))
+  $(error Supported network stacks are `lwip` and `gnrc`)
 endif
 
-ifneq (0,$(LWIP_IPV6))
-  USEMODULE += ipv6_addr
-  USEMODULE += lwip_ipv6_autoconfig
-endif
+USEMODULE += sock_tcp
 
-USEMODULE += lwip_netdev
-USEMODULE += lwip
+ifeq (lwip,$(NETWORK_STACK))
+  USEMODULE += lwip_netdev
+  USEMODULE += lwip
+
+  LWIP_IPV4 ?= 0
+  LWIP_IPV6 ?= 1
+
+  ifneq (0,$(LWIP_IPV4))
+    USEMODULE += ipv4_addr
+    USEMODULE += lwip_arp
+    USEMODULE += lwip_ipv4
+    USEMODULE += lwip_dhcp_auto
+    CFLAGS += -DETHARP_SUPPORT_STATIC_ENTRIES=1
+  endif
+
+  ifneq (0,$(LWIP_IPV6))
+    USEMODULE += ipv6_addr
+    USEMODULE += lwip_ipv6_autoconfig
+  endif
+else ifeq (gnrc,$(NETWORK_STACK))
+  USEMODULE += netdev_default
+  USEMODULE += auto_init_gnrc_netif
+  USEMODULE += gnrc_ipv6
+  USEMODULE += gnrc_icmpv6_echo
+endif
 
 USEMODULE += sock_async_event
 USEMODULE += sock_ip
