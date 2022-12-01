@@ -465,8 +465,6 @@ static void _reset_handler(void)
 __attribute__((constructor)) static void startup(int argc, char **argv, char **envp)
 {
     _native_init_syscalls();
-    /* initialize stdio as early as possible */
-    early_init();
 
     /* Passing argc, argv, and envp to init_fini handlers is a glibc
      * extension. If we are not running glibc, we parse /proc/self/cmdline
@@ -729,6 +727,9 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
     board_init();
 
     native_register_interrupt(SIGUSR1, _reset_handler);
+
+    /* initialize stdio after signal setup */
+    early_init();
 
     puts("RIOT native hardware initialization complete.\n");
     irq_enable();
