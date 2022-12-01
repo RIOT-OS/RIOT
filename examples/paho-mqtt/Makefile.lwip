@@ -1,0 +1,25 @@
+USE_LWIP := 0
+ifneq (0,$(LWIP_IPV4))
+  USE_LWIP := 1
+endif
+ifneq (0,$(LWIP_IPV6))
+  USE_LWIP := 1
+endif
+
+ifneq (0,$(LWIP_IPV4))
+  USEMODULE += ipv4_addr
+  USEMODULE += lwip_arp
+  USEMODULE += lwip_ipv4
+  USEMODULE += lwip_dhcp_auto
+  CFLAGS += -DETHARP_SUPPORT_STATIC_ENTRIES=1
+endif
+
+ifneq (0,$(LWIP_IPV6))
+  USEMODULE += ipv6_addr
+  USEMODULE += lwip_ipv6_autoconfig
+endif
+
+ifneq (0,$(USE_LWIP))
+  USEMODULE += lwip_netdev
+  USEMODULE += lwip
+endif

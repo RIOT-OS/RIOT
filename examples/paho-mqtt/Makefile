@@ -34,24 +34,12 @@ USEMODULE += netdev_default
 USEPKG += paho-mqtt
 
 # paho-mqtt depends on TCP support, choose which stacks you want
+GNRC_IPV6 ?= 1
 LWIP_IPV4 ?= 0
-LWIP_IPV6 ?= 1
+LWIP_IPV6 ?= 0
 
-ifneq (0,$(LWIP_IPV4))
-  USEMODULE += ipv4_addr
-  USEMODULE += lwip_arp
-  USEMODULE += lwip_ipv4
-  USEMODULE += lwip_dhcp_auto
-  CFLAGS += -DETHARP_SUPPORT_STATIC_ENTRIES=1
-endif
-
-ifneq (0,$(LWIP_IPV6))
-  USEMODULE += ipv6_addr
-  USEMODULE += lwip_ipv6_autoconfig
-endif
-
-USEMODULE += lwip_netdev
-USEMODULE += lwip
+include Makefile.lwip
+include Makefile.gnrc
 
 USEMODULE += sock_async_event
 USEMODULE += sock_ip

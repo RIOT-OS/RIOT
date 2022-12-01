@@ -39,11 +39,9 @@
 #define TSRB_MAX_SIZE       (1024)
 #endif
 
-#ifdef MODULE_LWIP
 static uint8_t buffer[TSRB_MAX_SIZE];
 static uint8_t _temp_buf[TSRB_MAX_SIZE];
 static tsrb_t tsrb_lwip_tcp;
-#endif
 
 #ifndef PAHO_MQTT_YIELD_MS
 #define PAHO_MQTT_YIELD_MS  (10)
@@ -75,7 +73,7 @@ static int mqtt_read(struct Network *n, unsigned char *buf, int len,
     uint32_t send_time = ztimer_now(ZTIMER_MSEC) + timeout_ms;
     do {
         rc = sock_tcp_read(&n->sock, _buf, _len, _timeout);
-        if (rc == -EAGAIN) {
+        if ((rc == -EAGAIN) || (rc == -ETIMEDOUT)) {
             rc = 0;
         }
 
