@@ -21,7 +21,11 @@
 #define PERIPH_CONF_H
 
 #include "kernel_defines.h"
-#include "periph_conf_common.h"
+#include "periph_cpu.h"
+#include "cfg_clock_32_1.h"
+#include "cfg_rtt_default.h"
+#include "cfg_timer_default.h"
+#include "board.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,6 +45,22 @@ static const spi_conf_t spi_config[] = {
 };
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
+
+/**
+ * @name    I2C configuration
+ * @{
+ */
+static const i2c_conf_t i2c_config[] = {
+    {
+        .dev = NRF_TWIM1,
+        .scl = GPIO_PIN(0, 15),
+        .sda = GPIO_PIN(0, 13),
+        .speed = I2C_SPEED_NORMAL
+    }
+};
+#define I2C_NUMOF           ARRAY_SIZE(i2c_config)
+/** @} */
+
 
 /* Config for which pins are used for uart */
 #ifndef PULGA_UART0_RX
@@ -83,6 +103,32 @@ static const uart_conf_t uart_config[] = {
 
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
+
+
+/**
+ * @name   PWM configuration
+ * @{
+ */
+static const pwm_conf_t pwm_config[] = {
+    /* Beware: Keep pwm_params.h in sync with the definitions here */
+    { NRF_PWM0, {
+        /* configure LED0 as PWM */
+#ifdef LED0_PIN
+        LED0_PIN,
+#else
+        GPIO_UNDEF,
+#endif
+        /* configure LED1 as PWM */
+#ifdef LED1_PIN
+        LED1_PIN,
+#else
+        GPIO_UNDEF,
+#endif
+    } },
+};
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
+/** @} */
+
 
 #ifdef __cplusplus
 }

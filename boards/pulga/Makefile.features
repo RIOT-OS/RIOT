@@ -1,7 +1,8 @@
 CPU_MODEL = nrf52840xxaa
 
-include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.features
-
-# Various other features (if any)
+FEATURES_PROVIDED += periph_i2c
 FEATURES_PROVIDED += periph_pwm
-FEATURES_PROVIDED += vdd_lc_filter_reg0
+FEATURES_PROVIDED += periph_spi
+FEATURES_PROVIDED += periph_uart
+
+include $(RIOTBOARD)/common/nrf52/Makefile.features

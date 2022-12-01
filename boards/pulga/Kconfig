@@ -10,11 +10,10 @@ config BOARD
 config BOARD_PULGA
     bool
     default y
-#select BOARDS_COMMON_NRF52XXXDK
-    select CPU_MODEL_NRF52840XXAA
+    select HAS_PERIPH_I2C
     select HAS_PERIPH_PWM
-    select HAS_VDD_LC_FILTER_REG0
-
-#select MODULE_BOARDS_COMMON_NRF52XXXDK if TEST_KCONFIG
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_UART
+    select CPU_MODEL_NRF52840XXAA
 
 source "$(RIOTBOARD)/common/nrf52xxxdk/Kconfig"

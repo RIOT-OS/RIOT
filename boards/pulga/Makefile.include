@@ -1,1 +1,5 @@
-include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.include
+# include this module into the build
+INCLUDES += -I$(RIOTBOARD)/pulga/include
+
+# include common configuration for nrf52 based boards
+include $(RIOTBOARD)/common/nrf52/Makefile.include
