@@ -7,8 +7,13 @@ include ../Makefile.tests_common
 BOARD_WHITELIST += adafruit-clue \
                    adafruit-itsybitsy-nrf52 \
                    arduino-nano-33-ble \
+                   atmega256rfr2-xpro \
+                   avr-rss2 \
                    cc2538dk \
+                   derfmega128 \
+                   derfmega256 \
                    feather-nrf52840 \
+                   microduino-corerf \
                    native \
                    nrf52840dk \
                    nrf52840dongle \
@@ -22,7 +27,9 @@ BOARD_WHITELIST += adafruit-clue \
                    remote-pa \
                    remote-reva \
                    remote-revb \
+                   samr21-xpro \
                    pba-d-01-kw2x \
+                   zigduino \
                    #
 
 ifeq ($(BOARD), native)
