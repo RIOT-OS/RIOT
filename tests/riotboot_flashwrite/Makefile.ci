@@ -5,6 +5,10 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-uno \
     atmega328p \
     atmega328p-xplained-mini \
+    bluepill \
+    bluepill-128kib \
+    blackpill \
+    blackpill-128kib \
     i-nucleo-lrwan1 \
     msb-430 \
     msb-430h \

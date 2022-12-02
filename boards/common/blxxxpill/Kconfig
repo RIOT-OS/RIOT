@@ -18,6 +18,7 @@ config BOARD_COMMON_BLXXXPILL
     select HAS_PERIPH_UART
     select HAS_PERIPH_QDEC
     select HAS_PERIPH_USBDEV
+    select HAS_RIOTBOOT
 
     # Clock configuration
     select BOARD_HAS_HSE

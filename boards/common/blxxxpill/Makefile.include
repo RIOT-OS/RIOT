@@ -5,7 +5,8 @@ INCLUDES += -I$(RIOTBOARD)/common/blxxxpill/include
 # For older versions of the DFU bootloader, set DFU_USB_ID to 1d50:6017
 DFU_USB_ID ?= 1eaf:0003
 DFU_ALT ?= 2
-DFU_USE_DFUSE = 1
+DFU_USE_DFUSE ?= 1
+
 # If using STM32duino bootloader, this change is necessary.
 # Bootloader available at
 # github.com/rogerclarkmelbourne/STM32duino-bootloader/tree/master/binaries

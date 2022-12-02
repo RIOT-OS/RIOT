@@ -5,6 +5,10 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-uno \
     atmega328p \
     b-l072z-lrwan1 \
+    bluepill \
+    bluepill-128kib \
+    blackpill \
+    blackpill-128kib \
     e104-bt5010a-tb \
     e104-bt5011a-tb \
     lsn50 \
