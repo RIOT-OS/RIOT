@@ -52,7 +52,10 @@ void native_async_read_cleanup(void) {
     native_unregister_interrupt(SIGIO);
 
     for (int i = 0; i < _next_index; i++) {
-        real_close(_fds[i].fd);
+        /* don't close stdin */
+        if (_fds[i].fd != STDIN_FILENO) {
+            real_close(_fds[i].fd);
+        }
         if (pollers[i].child_pid) {
             kill(pollers[i].child_pid, SIGKILL);
         }
