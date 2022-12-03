@@ -226,3 +226,5 @@ config TUSBD_USE_CUSTOM_DESC
 
 endif # MODULE_TINYUSB_DEVICE
 endif # PACKAGE_TINYUSB
+
+rsource "cdc_acm_stdio/Kconfig"
