@@ -9,6 +9,7 @@ USEMODULE += tinyusb_hw
 DEFAULT_MODULE += auto_init_tinyusb
 
 ifneq (,$(filter stdio_tinyusb_cdc_acm, $(USEMODULE)))
+  USEMODULE += stdio_available
   USEMODULE += tinyusb_class_cdc
   USEMODULE += tinyusb_device
 endif
