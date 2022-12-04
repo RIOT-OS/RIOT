@@ -50,9 +50,9 @@
 #endif
 
 static int _start(SercomI2cm *dev, uint16_t addr);
-static inline int _write(SercomI2cm *dev, const uint8_t *data, int length,
+static inline int _write(SercomI2cm *dev, const uint8_t *data, size_t length,
                          uint8_t stop);
-static inline int _read(SercomI2cm *dev, uint8_t *data, int length,
+static inline int _read(SercomI2cm *dev, uint8_t *data, size_t length,
                         uint8_t stop);
 static inline void _stop(SercomI2cm *dev);
 static inline int _wait_for_response(SercomI2cm *dev,
@@ -373,10 +373,10 @@ static int _start(SercomI2cm *dev, uint16_t addr)
     return 0;
 }
 
-static inline int _write(SercomI2cm *dev, const uint8_t *data, int length,
+static inline int _write(SercomI2cm *dev, const uint8_t *data, size_t length,
                          uint8_t stop)
 {
-    uint8_t count = 0;
+    size_t count = 0;
 
     /* Write data buffer until the end. */
     DEBUG("Looping through bytes\n");
@@ -413,10 +413,10 @@ static inline int _write(SercomI2cm *dev, const uint8_t *data, int length,
     return 0;
 }
 
-static inline int _read(SercomI2cm *dev, uint8_t *data, int length,
+static inline int _read(SercomI2cm *dev, uint8_t *data, size_t length,
                         uint8_t stop)
 {
-    uint8_t count = 0;
+    size_t count = 0;
 
     /* Set action to ack. */
     dev->CTRLB.reg &= ~SERCOM_I2CM_CTRLB_ACKACT;
