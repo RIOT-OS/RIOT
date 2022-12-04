@@ -12,8 +12,6 @@ FEATURES_PROVIDED += periph_usbdev
 
 # Various other features (if any)
 FEATURES_PROVIDED += highlevel_stdio
-FEATURES_PROVIDED += tinyusb_device
-
 
 # This configuration enables modules that are only available when using Kconfig
 # module modelling

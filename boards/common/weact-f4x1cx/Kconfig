@@ -18,9 +18,6 @@ config BOARD_COMMON_WEACT_F4X1CX
     select HAS_PERIPH_USBDEV
     select HAS_HIGHLEVEL_STDIO
 
-    # Put other features for this board (in alphabetical order)
-    select HAS_TINYUSB_DEVICE
-
     # Clock configuration
     select BOARD_HAS_HSE
     select BOARD_HAS_LSE
