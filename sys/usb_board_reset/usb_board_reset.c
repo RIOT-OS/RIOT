@@ -36,7 +36,12 @@ int usb_board_reset_coding_cb(usbus_cdcacm_device_t *cdcacm,
                               uint32_t baud, uint8_t bits,
                               uint8_t parity, uint8_t stop)
 {
+    /* Note: This function is also used by tinyUSB if module `usb_board_reset`
+     * is used. In this case no USBUS CDC ACM device is defined and parameter
+     * `cdcacm` is NULL. Please keep this in mind if `cdcacm` is to be used
+     * in future versions. */
     (void)cdcacm;
+
     (void)bits;
     (void)parity;
     (void)stop;
