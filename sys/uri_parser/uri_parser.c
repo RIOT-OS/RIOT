@@ -21,6 +21,8 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#include "fmt.h"
+
 #include "uri_parser.h"
 
 #define MAX_PORT_STR_LEN    (5)
@@ -129,15 +131,8 @@ bool _consume_port(uri_parser_result_t *result, const char *ipv6_end,
             }
         }
 
-        /* Verify that the next character, after the port, is an invalid
-         * character for the atol function. Preventing it from reading out-
-         * side of the port section */
-        if ((authority_end[0] >= '0') && (authority_end[0] <= '9')) {
-            return false;
-        }
-
         /* Verify that the port is smaller or equal to UINT16_MAX. */
-        uint32_t port = atol(port_begin);
+        uint32_t port = scn_u32_dec(port_begin, port_str_len);
         if (port > UINT16_MAX) {
             return false;
         }
