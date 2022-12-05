@@ -30,31 +30,31 @@ endif
 
 # Following device classes work only with tinyUSB device stack
 ifneq (,$(filter tinyusb_class_audio,$(USEMODULE)))
-  FEATURES_REQUIRED += tinyusb_device
+  USEMODULE += tinyusb_device
 endif
 ifneq (,$(filter tinyusb_class_bth,$(USEMODULE)))
-  FEATURES_REQUIRED += tinyusb_device
+  USEMODULE += tinyusb_device
 endif
 ifneq (,$(filter tinyusb_class_dfu,$(USEMODULE)))
-  FEATURES_REQUIRED += tinyusb_device
+  USEMODULE += tinyusb_device
 endif
 ifneq (,$(filter tinyusb_class_dfu_runtime,$(USEMODULE)))
-  FEATURES_REQUIRED += tinyusb_device
+  USEMODULE += tinyusb_device
 endif
 ifneq (,$(filter tinyusb_class_midi,$(USEMODULE)))
-  FEATURES_REQUIRED += tinyusb_device
+  USEMODULE += tinyusb_device
 endif
 ifneq (,$(filter tinyusb_class_net_ecm_rndis,$(USEMODULE)))
-  FEATURES_REQUIRED += tinyusb_device
+  USEMODULE += tinyusb_device
 endif
 ifneq (,$(filter tinyusb_class_net_ncm,$(USEMODULE)))
-  FEATURES_REQUIRED += tinyusb_device
+  USEMODULE += tinyusb_device
 endif
 ifneq (,$(filter tinyusb_class_usbtmc,$(USEMODULE)))
-  FEATURES_REQUIRED += tinyusb_device
+  USEMODULE += tinyusb_device
 endif
 ifneq (,$(filter tinyusb_class_video,$(USEMODULE)))
-  FEATURES_REQUIRED += tinyusb_device
+  USEMODULE += tinyusb_device
 endif
 
 # tinyUSB hardware driver selection
