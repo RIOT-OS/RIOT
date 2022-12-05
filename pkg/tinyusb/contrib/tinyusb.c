@@ -75,7 +75,11 @@ int tinyusb_setup(void)
     if ((res = thread_create(_tinyusb_thread_stack,
                              sizeof(_tinyusb_thread_stack),
                              TINYUSB_PRIORITY,
+#if MODULE_RIOTBOOT_TINYUSB_DFU
+                             THREAD_CREATE_STACKTEST,
+#else
                              THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
+#endif
                              _tinyusb_thread_impl, NULL, "tinyusb")) < 0) {
         LOG_ERROR("tinyUSB thread couldn't be created, reason %d\n", res);
         return res;

@@ -33,3 +33,7 @@ endif
 ifneq (,$(filter tinyusb_class_net_ecm_rndis,$(USEMODULE)))
   INCLUDES += -I$(PKGDIRBASE)/tinyusb/lib/networking
 endif
+
+ifneq (,$(filter tinyusb_dfu,$(USEMODULE)))
+  INCLUDES += -I$(RIOTBASE)/pkg/tinyusb/dfu/include
+endif

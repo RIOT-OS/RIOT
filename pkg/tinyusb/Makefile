@@ -20,6 +20,9 @@ stdio_tinyusb_cdc_acm:
 tinyusb_contrib:
 	$(QQ)"$(MAKE)" -C $(RIOTPKG)/$(PKG_NAME)/contrib
 
+tinyusb_dfu:
+	$(QQ)"$(MAKE)" -C $(RIOTPKG)/$(PKG_NAME)/dfu
+
 tinyusb_hw:
 	$(QQ)"$(MAKE)" -C $(RIOTPKG)/$(PKG_NAME)/hw
 

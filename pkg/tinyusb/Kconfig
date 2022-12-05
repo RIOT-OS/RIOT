@@ -17,6 +17,7 @@ config HAS_TINYUSB_HOST
 
 menuconfig PACKAGE_TINYUSB
     bool "TinyUSB stack package"
+    depends on TEST_KCONFIG
     depends on HAS_ARCH_32BIT
     depends on HAS_TINYUSB_DEVICE || HAS_TINYUSB_HOST
     select MODULE_FMT
@@ -90,8 +91,8 @@ if PACKAGE_TINYUSB
 
 config MODULE_AUTO_INIT_TINYUSB
     bool "Auto-initialize the tinyUSB package"
-    default y
     depends on MODULE_AUTO_INIT
+    default y
     help
         The tinyUSB stack including the used peripherals are initialized
         automatically at startup. Additionally, the auto-initialization
@@ -160,15 +161,8 @@ menu "Device Classes"
         depends on MODULE_TINYUSB_DEVICE
 
     rsource "Kconfig.cdc"
-
-    config MODULE_TINYUSB_CLASS_DFU
-        bool "Device Firmware Update (DFU) Runtime"
-        depends on MODULE_TINYUSB_DEVICE
-
-    config MODULE_TINYUSB_CLASS_DFU_RUNTIME
-        bool "Device Firmware Update (DFU)"
-        depends on MODULE_TINYUSB_DEVICE
-
+    rsource "dfu/Kconfig.dfu"
+    rsource "dfu/Kconfig.dfu_rt"
     rsource "Kconfig.hid"
     rsource "Kconfig.msc"
 
@@ -223,6 +217,29 @@ config TUSBD_USE_CUSTOM_DESC
         In/Out HID interfaces, up to one MSC interface and up to one vendor
         interface. In all other cases, custom descriptors must be implemented
         and handled.
+
+config MODULE_TINYUSB_DFU
+    bool "tinyUSB DFU driver module"
+    select MODULE_TINYUSB_CLASS_DFU if MODULE_RIOTBOOT_TINYUSB_DFU
+    select MODULE_TINYUSB_CLASS_DFU_RUNTIME if !MODULE_RIOTBOOT_TINYUSB_DFU
+    help
+        Enable tinyUSB Device Firmware Upgrade driver implementation used
+        either in DFU mode by the bootloader or in DFU runtime mode by the
+        application. It is enabled by default, if the tinyUSB DFU variant
+        of the riotboot bootloader is used.
+
+config MODULE_RIOTBOOT_TINYUSB_DFU
+    # TODO move to sys/riotboot/Kconfig once it is modelled
+    bool "tinyUSB DFU variant of riotboot bootloader"
+    depends on HAS_NO_IDLE_THREAD
+    depends on HAS_PERIPH_PM
+    select MODULE_RIOTBOOT_FLASHWRITE
+    select MODULE_TINYUSB_DFU
+    select MODULE_TINYUSB_CLASS_DFU
+    select MODULE_ZTIMER_SEC
+    help
+        Enable this option to use the tinyUSB DFU variant of the riotboot
+        bootloader.
 
 endif # MODULE_TINYUSB_DEVICE
 endif # PACKAGE_TINYUSB
