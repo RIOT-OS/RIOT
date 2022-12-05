@@ -47,6 +47,9 @@ def filters_match(filters, tty):
     """
 
     for key, regex in filters:
+        if tty[key] is None:
+            return False
+
         if not regex.match(tty[key]):
             return False
 
