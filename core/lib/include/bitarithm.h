@@ -66,6 +66,8 @@ extern "C" {
 #define BIT7  0x00000080 /**< Bit 7 set define */
 #define BIT8  0x00000100 /**< Bit 8 set define */
 #define BIT9  0x00000200 /**< Bit 9 set define */
+#endif
+#ifndef BIT10
 #define BIT10 0x00000400 /**< Bit 10 set define */
 #define BIT11 0x00000800 /**< Bit 11 set define */
 #define BIT12 0x00001000 /**< Bit 12 set define */
