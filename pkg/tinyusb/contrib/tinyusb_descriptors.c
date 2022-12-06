@@ -23,6 +23,8 @@
  * THE SOFTWARE.
  */
 
+#define USB_H_USER_IS_RIOT_INTERNAL
+
 #include "fmt.h"
 #include "luid.h"
 #include "tusb.h"
