@@ -228,6 +228,42 @@ config MODULE_ZTIMER_MOCK
         manually fired to simulate different scenarios and test the ztimer
         implementation using this as a backing timer.
 
+menuconfig MODULE_ZTIMER_ONDEMAND
+    bool "Run ztimer clocks only on demand"
+    help
+        This ztimer extensions keeps track of ztimer users and may disable
+        underlying peripherals if not users are requiring a ztimer clock.
+
+if MODULE_ZTIMER_ONDEMAND
+
+config MODULE_ZTIMER_ONDEMAND_STRICT
+    bool "Strict ztimer on demand"
+    help
+        Enforce ztimer clocks to be running before calling ztimer_now().
+
+config MODULE_ZTIMER_ONDEMAND_TIMER
+    bool "Run Timer only on demand"
+    depends on MODULE_ZTIMER_PERIPH_TIMER
+    help
+        Turn off the underlying Timer peripheral if related ztimer clocks
+        have no users.
+
+config MODULE_ZTIMER_ONDEMAND_RTT
+    bool "Run RTT only on demand"
+    depends on MODULE_ZTIMER_PERIPH_RTT
+    help
+        Turn off the underlying RTT peripheral if related ztimer clocks
+        have no users.
+
+config MODULE_ZTIMER_ONDEMAND_RTC
+    bool "Run RTC only on demand"
+    depends on MODULE_ZTIMER_PERIPH_RTC
+    help
+        Turn off the underlying RTC peripheral if related ztimer clocks
+        have no users.
+
+endif # MODULE_ZTIMER_ONDEMAND
+
 config MODULE_ZTIMER_INIT
     bool
 

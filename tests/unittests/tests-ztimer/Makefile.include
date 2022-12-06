@@ -1,3 +1,5 @@
 USEMODULE += ztimer_core
 USEMODULE += ztimer_mock
 USEMODULE += ztimer_convert_muldiv64
+USEMODULE += ztimer_convert_frac
+USEMODULE += ztimer_ondemand

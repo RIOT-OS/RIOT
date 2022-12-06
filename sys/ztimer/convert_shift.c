@@ -78,6 +78,10 @@ static const ztimer_ops_t _ztimer_convert_shift_ops_up = {
     .set = _ztimer_convert_shift_up_set,
     .now = _ztimer_convert_shift_up_now,
     .cancel = ztimer_convert_cancel,
+#if MODULE_ZTIMER_ONDEMAND
+    .start = ztimer_convert_start,
+    .stop = ztimer_convert_stop,
+#endif
 };
 
 void ztimer_convert_shift_up_init(ztimer_convert_shift_t *clock,

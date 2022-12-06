@@ -152,6 +152,19 @@ extern "C" {
 
 /**
  * @brief   An offset for ZTIMER_USEC allowing to compensate for the offset
+ *          introduced by turning on the underlying peripheral.
+ *
+ * @note    This value can be measured with the
+ *          `tests/ztimer_ondemand_benchmark` tool.
+ *
+ *          This value should be configured in the board.h.
+ */
+#ifndef CONFIG_ZTIMER_USEC_ADJUST_CLOCK_START
+#define CONFIG_ZTIMER_USEC_ADJUST_CLOCK_START   0
+#endif
+
+/**
+ * @brief   An offset for ZTIMER_USEC allowing to compensate for the offset
  *          of @ref ztimer_set(). It can be measured with @ref ztimer_overhead_set()
  *
  *          This value should be configured in the board.h.

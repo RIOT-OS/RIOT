@@ -74,10 +74,28 @@ static void _ztimer_periph_rtt_cancel(ztimer_clock_t *clock)
     rtt_clear_alarm();
 }
 
+#if MODULE_ZTIMER_ONDEMAND_RTT
+static void _ztimer_periph_rtt_start(ztimer_clock_t *clock)
+{
+    (void)clock;
+    rtt_poweron();
+}
+
+static void _ztimer_periph_rtt_stop(ztimer_clock_t *clock)
+{
+    (void)clock;
+    rtt_poweroff();
+}
+#endif /* MODULE_ZTIMER_ONDEMAND_RTT */
+
 static const ztimer_ops_t _ztimer_periph_rtt_ops = {
     .set = _ztimer_periph_rtt_set,
     .now = _ztimer_periph_rtt_now,
     .cancel = _ztimer_periph_rtt_cancel,
+#if MODULE_ZTIMER_ONDEMAND_RTT
+    .start = _ztimer_periph_rtt_start,
+    .stop = _ztimer_periph_rtt_stop,
+#endif
 };
 
 void ztimer_periph_rtt_init(ztimer_periph_rtt_t *clock)
@@ -85,6 +103,13 @@ void ztimer_periph_rtt_init(ztimer_periph_rtt_t *clock)
     clock->ops = &_ztimer_periph_rtt_ops;
     clock->max_value = RTT_MAX_VALUE;
     rtt_init();
+#if MODULE_ZTIMER_ONDEMAND_RTT
+    rtt_poweroff();
+#else
     rtt_poweron();
+#endif
+
+#if !MODULE_ZTIMER_ONDEMAND
     ztimer_init_extend(clock);
+#endif
 }
