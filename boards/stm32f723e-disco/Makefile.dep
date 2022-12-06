@@ -1,4 +1,6 @@
-USEMODULE += periph_uart_hw_fc
+ifneq (,$(filter periph_uart,$(USEMODULE)))
+  USEMODULE += periph_uart_hw_fc
+endif
 
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
