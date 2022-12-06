@@ -186,28 +186,68 @@
 #endif
 #endif
 
-#ifndef CONFIG_TUSBD_EP0_SIZE
-#define CONFIG_TUSBD_EP0_SIZE       64
+#ifndef CONFIG_TUSBD_CDC_NOTIF_EP_SIZE
+#define CONFIG_TUSBD_CDC_NOTIF_EP_SIZE      8
 #endif
 
-#ifndef CONFIG_TUSBD_MSC_EP_SIZE
-#define CONFIG_TUSBD_MSC_EP_SIZE    512
+#ifndef CONFIG_TUSBD_EP0_SIZE
+#define CONFIG_TUSBD_EP0_SIZE               64
+#endif
+
+#ifndef CONFIG_TUSBD_FS_EP_SIZE
+#define CONFIG_TUSBD_FS_EP_SIZE             64
+#endif
+
+#ifndef CONFIG_TUSBD_HS_EP_SIZE
+#define CONFIG_TUSBD_HS_EP_SIZE             512
+#endif
+
+#ifndef CONFIG_TUSBD_CDC_FS_EP_SIZE
+#define CONFIG_TUSBD_CDC_FS_EP_SIZE         CONFIG_TUSBD_FS_EP_SIZE
+#endif
+
+#ifndef CONFIG_TUSBD_CDC_HS_EP_SIZE
+#define CONFIG_TUSBD_CDC_HS_EP_SIZE         CONFIG_TUSBD_HS_EP_SIZE
 #endif
 
 #ifndef CONFIG_TUSBD_HID_EP_SIZE
-#define CONFIG_TUSBD_HID_EP_SIZE    64
+#define CONFIG_TUSBD_HID_EP_SIZE            CONFIG_TUSBD_FS_EP_SIZE
+#endif
+
+#ifndef CONFIG_TUSBD_HID_0_POLL_INTERVALL
+#define CONFIG_TUSBD_HID_0_POLL_INTERVALL   10
+#endif
+
+#ifndef CONFIG_TUSBD_HID_1_POLL_INTERVALL
+#define CONFIG_TUSBD_HID_1_POLL_INTERVALL   10
+#endif
+
+#ifndef CONFIG_TUSBD_MSC_FS_EP_SIZE
+#define CONFIG_TUSBD_MSC_FS_EP_SIZE         CONFIG_TUSBD_FS_EP_SIZE
+#endif
+
+#ifndef CONFIG_TUSBD_MSC_HS_EP_SIZE
+#define CONFIG_TUSBD_MSC_HS_EP_SIZE         CONFIG_TUSBD_HS_EP_SIZE
+#endif
+
+#ifndef CONFIG_TUSBD_VENDOR_FS_EP_SIZE
+#define CONFIG_TUSBD_VENDOR_FS_EP_SIZE      CONFIG_TUSBD_FS_EP_SIZE
+#endif
+
+#ifndef CONFIG_TUSBD_VENDOR_HS_EP_SIZE
+#define CONFIG_TUSBD_VENDOR_HS_EP_SIZE      CONFIG_TUSBD_HS_EP_SIZE
 #endif
 
 #ifndef CONFIG_TUSBH_ENUM_SIZE
-#define CONFIG_TUSBH_ENUM_SIZE      256
+#define CONFIG_TUSBH_ENUM_SIZE              256
 #endif
 
 #ifndef CONFIG_TUSBH_HID_EPIN_SIZE
-#define CONFIG_TUSBH_HID_EPIN_SIZE  64
+#define CONFIG_TUSBH_HID_EPIN_SIZE          CONFIG_TUSBD_HID_EP_SIZE
 #endif
 
 #ifndef CONFIG_TUSBH_HID_EPOUT_SIZE
-#define CONFIG_TUSBH_HID_EPOUT_SIZE 64
+#define CONFIG_TUSBH_HID_EPOUT_SIZE         CONFIG_TUSBD_HID_EP_SIZE
 #endif
 
 /**
@@ -223,9 +263,7 @@
 #define CFG_TUSB_OS                 OPT_OS_CUSTOM
 
 /** Debug log level */
-#ifndef CFG_TUSB_DEBUG
 #define CFG_TUSB_DEBUG              0
-#endif
 
 /**
  * @brief DMA memory section and alignment
@@ -235,13 +273,8 @@
  * - CFG_TUSB_MEM SECTION : __attribute__ (( section(".usb_ram") ))
  * - CFG_TUSB_MEM_ALIGN   : __attribute__ ((aligned(4)))
  */
-#ifndef CFG_TUSB_MEM_SECTION
 #define CFG_TUSB_MEM_SECTION
-#endif
-
-#ifndef CFG_TUSB_MEM_ALIGN
 #define CFG_TUSB_MEM_ALIGN          __attribute__ ((aligned(4)))
-#endif
 
 /** @} */
 
@@ -251,61 +284,20 @@
  */
 #define CFG_TUD_ENABLED             MODULE_TINYUSB_DEVICE
 
-#ifndef CFG_TUD_ENDPOINT0_SIZE
 #define CFG_TUD_ENDPOINT0_SIZE      CONFIG_TUSBD_EP0_SIZE
-#endif
 
-#ifndef CFG_TUD_AUDIO
 #define CFG_TUD_AUDIO               CONFIG_TUSBD_AUDIO_NUMOF
-#endif
-
-#ifndef CFG_TUD_BTH
 #define CFG_TUD_BTH                 CONFIG_TUSBD_BTH_NUMOF
-#endif
-
-#ifndef CFG_TUD_CDC
 #define CFG_TUD_CDC                 CONFIG_TUSBD_CDC_NUMOF
-#endif
-
-#ifndef CFG_TUD_DFU
 #define CFG_TUD_DFU                 CONFIG_TUSBD_DFU_NUMOF
-#endif
-
-#ifndef CFG_TUD_DFU_RUNTIME
 #define CFG_TUD_DFU_RUNTIME         CONFIG_TUSBD_DFU_RT_NUMOF
-#endif
-
-#ifndef CFG_TUD_HID
 #define CFG_TUD_HID                 CONFIG_TUSBD_HID_NUMOF
-#endif
-
-#ifndef CFG_TUD_MIDI
 #define CFG_TUD_MIDI                CONFIG_TUSBD_MIDI_NUMOF
-#endif
-
-#ifndef CFG_TUD_MSC
 #define CFG_TUD_MSC                 CONFIG_TUSBD_MSC_NUMOF
-#endif
-
-#ifndef CFG_TUD_ECM_RNDIS
-#define CFG_TUD_ECM_RNDIS           CONFIG_TUSBD_ECM_NUMOF
-#endif
-
-#ifndef CFG_TUD_NCM
-#define CFG_TUD_NCM                 CONFIG_TUSBD_NCM_NUMOF
-#endif
-
-#ifndef CFG_TUD_USBTMC
+#define CFG_TUD_NCM                 CONFIG_TUSBD_NET_CDC_NCM
 #define CFG_TUD_USBTMC              CONFIG_TUSBD_USBTMC_NUMOF
-#endif
-
-#ifndef CFG_TUD_VENDOR
 #define CFG_TUD_VENDOR              CONFIG_TUSBD_VENDOR_NUMOF
-#endif
-
-#ifndef CFG_TUD_VIDEO
 #define CFG_TUD_VIDEO               CONFIG_TUSBD_VIDEO_NUMOF
-#endif
 
 /** @} */
 
@@ -315,38 +307,18 @@
  */
 #define CFG_TUH_ENABLED             MODULE_TINYUSB_HOST
 
-#ifndef CFG_TUH_MAX_SPEED
 #define CFG_TUH_MAX_SPEED           OPT_MODE_DEFAULT_SPEED
-#endif
 
-#ifndef CFG_TUH_ENUMERATION_BUFSIZE
 #define CFG_TUH_ENUMERATION_BUFSIZE CONFIG_TUSBH_ENUM_SIZE
-#endif
 
 /** Hub typically has 4 ports */
-#ifndef CFG_TUH_DEVICE_MAX
 #define CFG_TUH_DEVICE_MAX          (CFG_TUH_HUB ? 4 : 1)
-#endif
 
-#ifndef CFG_TUH_CDC
 #define CFG_TUH_CDC                 CONFIG_TUSBH_CDC_NUMOF
-#endif
-
-#ifndef CFG_TUH_HID
 #define CFG_TUH_HID                 CONFIG_TUSBH_HID_NUMOF
-#endif
-
-#ifndef CFG_TUH_HUB
 #define CFG_TUH_HUB                 CONFIG_TUSBH_HUB_NUMOF
-#endif
-
-#ifndef CFG_TUH_MSC
 #define CFG_TUH_MSC                 CONFIG_TUSBH_MSC_NUMOF
-#endif
-
-#ifndef CFG_TUD_VENDOR
 #define CFG_TUH_VENDOR              CONFIG_TUSBH_VENDOR_NUMOF
-#endif
 
 /** @} */
 
@@ -354,15 +326,10 @@
  * @name Typical required CDC device class configurations
  * @{
  */
-/** CDC RX FIFO size */
-#ifndef CFG_TUD_CDC_RX_BUFSIZE
+#define CFG_TUD_CDC_EP_BUFSIZE      (TUD_OPT_HIGH_SPEED ? CONFIG_TUSBD_CDC_HS_EP_SIZE \
+                                                        : CONFIG_TUSBD_CDC_FS_EP_SIZE)
 #define CFG_TUD_CDC_RX_BUFSIZE      CFG_TUD_CDC_EP_BUFSIZE
-#endif
-
-/** CDC RX FIFO size */
-#ifndef CFG_TUD_CDC_TX_BUFSIZE
 #define CFG_TUD_CDC_TX_BUFSIZE      CFG_TUD_CDC_EP_BUFSIZE
-#endif
 
 /** @} */
 
@@ -370,53 +337,39 @@
  * @name Typical required DFU device class configurations
  * @{
  */
-#ifndef CFG_TUD_DFU_XFER_BUFSIZE
-#define CFG_TUD_DFU_XFER_BUFSIZE    (TUD_OPT_HIGH_SPEED ? 512 : 64)
-#endif
+#define CFG_TUD_DFU_XFER_BUFSIZE    (TUD_OPT_HIGH_SPEED ? CONFIG_TUSBD_HS_EP_SIZE \
+                                                        : CONFIG_TUSBD_FS_EP_SIZE)
 /** @} */
 
 /**
  * @name Typical required HID device class configurations
  * @{
  */
-#ifndef CFG_TUD_HID_EP_BUFSIZE
 #define CFG_TUD_HID_EP_BUFSIZE      CONFIG_TUSBD_HID_EP_SIZE
-#endif
 /** @} */
 
 /**
  * @name Typical required MIDI device class configurations
  * @{
  */
-#ifndef CFG_TUD_MIDI_RX_BUFSIZE
 #define CFG_TUD_MIDI_RX_BUFSIZE     CFG_TUD_MIDI_EP_BUFSIZE
-#endif
-
-#ifndef CFG_TUD_MIDI_TX_BUFSIZE
 #define CFG_TUD_MIDI_TX_BUFSIZE     CFG_TUD_MIDI_EP_BUFSIZE
-#endif
 /** @} */
 
 /**
  * @name Typical required MSC device class configurations
  * @{
  */
-#ifndef CFG_TUD_MSC_EP_BUFSIZE
-#define CFG_TUD_MSC_EP_BUFSIZE      CONFIG_TUSBD_MSC_EP_SIZE
-#endif
+#define CFG_TUD_MSC_EP_BUFSIZE      (TUD_OPT_HIGH_SPEED ? CONFIG_TUSBD_MSC_HS_EP_SIZE \
+                                                        : CONFIG_TUSBD_MSC_FS_EP_SIZE)
 /** @} */
 
 /**
  * @name Typical required HID host class configurations
  * @{
  */
-#ifndef CFG_TUH_HID_EPIN_BUFSIZE
 #define CFG_TUH_HID_EPIN_BUFSIZE    CONFIG_TUSBH_HID_EPIN_SIZE
-#endif
-
-#ifndef CFG_TUH_HID_EPOUT_BUFSIZE
 #define CFG_TUH_HID_EPOUT_BUFSIZE   CONFIG_TUSBH_HID_EPOUT_SIZE
-#endif
 /** @} */
 
 #ifdef __cplusplus
