@@ -58,8 +58,9 @@
 extern "C" {
 #endif
 
-#include "hashes.h"
-#include "thread.h"
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 /**
  * @brief SRAM length considered for seeding
