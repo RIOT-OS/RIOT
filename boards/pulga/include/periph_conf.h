@@ -62,7 +62,7 @@ static const i2c_conf_t i2c_config[] = {
 /** @} */
 
 
-/* Config for which pins are used for uart */
+/* Default pins for UART0 connection. */
 #ifndef PULGA_UART0_RX
 #define PULGA_UART0_RX GPIO_PIN(0,25)
 #endif
@@ -87,7 +87,10 @@ static const uart_conf_t uart_config[] = {
     },
     {
         .dev        = NRF_UARTE1,
-        // GPS Base pins
+        /* Configuration for the Pulga GPS board.
+         * These definitions are only used/needed when
+         * the Pulga GPS shield is connected.
+         */
         .rx_pin     = GPIO_PIN(0,7),
         .tx_pin     = GPIO_PIN(0,5),
 #ifdef MODULE_PERIPH_UART_HW_FC

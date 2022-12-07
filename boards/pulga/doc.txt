@@ -3,6 +3,14 @@
 @ingroup     boards
 @brief       Support for the Pulga board
 
+This port provides support to the [pulga core v2/v3](https://caninosloucos.org/en/pulgacore-v2-en/).
+
+It also includes default mappings to the LoRa and GPS shield boards
+(still under production and are not on the website yet).
+
+The UART pins are, by default, mapped as follows:
+- RX: P0.25
+- TX: P0.28
 
 ### RESET pin configuration
 

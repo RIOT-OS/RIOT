@@ -16,4 +16,4 @@ config BOARD_PULGA
     select HAS_PERIPH_UART
     select CPU_MODEL_NRF52840XXAA
 
-source "$(RIOTBOARD)/common/nrf52xxxdk/Kconfig"
+source "$(RIOTBOARD)/common/nrf52/Kconfig"

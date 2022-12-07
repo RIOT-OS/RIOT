@@ -30,7 +30,6 @@ extern "C" {
  * @name    LED pin configuration
  * @{
  */
-/* Note: when using `saul`, all LEDs are on by default. */
 #define LED0_PIN            GPIO_PIN(1, 13)
 #define LED1_PIN            GPIO_PIN(1, 14)
 

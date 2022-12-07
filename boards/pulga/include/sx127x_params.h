@@ -25,7 +25,9 @@ extern "C" {
 #endif
 
 /**
- * @brief   Board specific SX127X configuration
+ * @brief   SX127X configuration, as per the pulga board schematic.
+ *          These definitions are only used/needed when
+ *          the Pulga LoRa shield is connected.
  */
 static const sx127x_params_t sx127x_params[] =
 {
