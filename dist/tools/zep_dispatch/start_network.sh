@@ -25,7 +25,9 @@ remove_tap() {
 
 cleanup() {
     echo "Cleaning up..."
-    remove_tap
+    if [ "${CREATE_TAP}" -eq 1 ]; then
+        remove_tap
+    fi
     if [ -n "${UHCPD_PID}" ]; then
         kill "${UHCPD_PID}"
     fi
@@ -64,6 +66,13 @@ start_zep_dispatch() {
     ZEP_DISPATCH_PID=$!
 }
 
+if [ "$1" = "-c" ] || [ "$1" = "--create-tap" ]; then
+    CREATE_TAP=1
+    shift 1
+else
+    CREATE_TAP=0
+fi
+
 if [ "$1" = "-d" ] || [ "$1" = "--use-dhcpv6" ]; then
     USE_DHCPV6=1
     shift 1
@@ -101,7 +110,9 @@ for TAP in "$@"; do :; done
 
 trap "cleanup" INT QUIT TERM EXIT
 
-create_tap
+if [ ${CREATE_TAP} -eq 1 ]; then
+    create_tap
+fi
 
 if [ ${USE_ZEP_DISPATCH} -eq 1 ]; then
     start_zep_dispatch

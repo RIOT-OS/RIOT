@@ -44,6 +44,21 @@ credentials. You can alternatively edit the `Makefile`.
 Currently, `wifi` requires an esp8266 or esp32 for the border router and will default
 to using `esp_now` for the downstream interface.
 
+### Connection sharing with host
+
+If the host (Linux) computer has an IPv6 uplink that can be shard with the RIOT border
+router to provide it with an uplink.
+
+This requires the host network to be bridged with the TAP network by connecting it to
+the TAP bridge:
+
+    sudo dist/tools/tapsetup/tapsetup -u eno1
+
+where `eno1` is the host's uplink interface.
+
+Then specify `REUSE_TAP=1` when building / running the border router application.
+This works with both `native` and the `ethos` uplink.
+
 ## Requirements
 This functionality works only on Linux machines.
 
