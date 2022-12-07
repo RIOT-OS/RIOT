@@ -68,6 +68,7 @@ extern "C" {
 #define AT86RF2XX_MIN_CHANNEL           (IEEE802154_CHANNEL_MIN)
 #define AT86RF2XX_MAX_CHANNEL           (IEEE802154_CHANNEL_MAX)
 #define AT86RF2XX_DEFAULT_CHANNEL       (CONFIG_IEEE802154_DEFAULT_CHANNEL)
+#define AT86RF2XX_DEFAULT_PAGE          (0)
 /* Only page 0 is supported in the 2.4 GHz band */
 #endif
 /** @} */
@@ -329,16 +330,6 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params, uint8_t
 void at86rf2xx_reset(at86rf2xx_t *dev);
 
 /**
- * @brief   Get the short address of the given device
- *
- * @param[in]   dev         device to read from
- * @param[out]  addr        the short address will be stored here
- *
- * @return                  the currently set (2-byte) short address
- */
-void at86rf2xx_get_addr_short(const at86rf2xx_t *dev, network_uint16_t *addr);
-
-/**
  * @brief   Set the short address of the given device
  *
  * @param[in,out] dev       device to write to
@@ -347,56 +338,12 @@ void at86rf2xx_get_addr_short(const at86rf2xx_t *dev, network_uint16_t *addr);
 void at86rf2xx_set_addr_short(at86rf2xx_t *dev, const network_uint16_t *addr);
 
 /**
- * @brief   Get the configured long address of the given device
- *
- * @param[in]   dev         device to read from
- * @param[out]  addr        the long address will be stored here
- *
- * @return                  the currently set (8-byte) long address
- */
-void at86rf2xx_get_addr_long(const at86rf2xx_t *dev, eui64_t *addr);
-
-/**
  * @brief   Set the long address of the given device
  *
  * @param[in,out] dev       device to write to
  * @param[in] addr          (8-byte) long address to set
  */
 void at86rf2xx_set_addr_long(at86rf2xx_t *dev, const eui64_t *addr);
-
-/**
- * @brief   Get the configured channel number of the given device
- *
- * @param[in] dev           device to read from
- *
- * @return                  the currently set channel number
- */
-uint8_t at86rf2xx_get_chan(const at86rf2xx_t *dev);
-
-/**
- * @brief   Set the channel number of the given device
- *
- * @param[in,out] dev       device to write to
- * @param[in] chan          channel number to set
- */
-void at86rf2xx_set_chan(at86rf2xx_t *dev, uint8_t chan);
-
-/**
- * @brief   Get the configured channel page of the given device
- *
- * @param[in] dev           device to read from
- *
- * @return                  the currently set channel page
- */
-uint8_t at86rf2xx_get_page(const at86rf2xx_t *dev);
-
-/**
- * @brief   Set the channel page of the given device
- *
- * @param[in,out] dev       device to write to
- * @param[in] page          channel page to set
- */
-void at86rf2xx_set_page(at86rf2xx_t *dev, uint8_t page);
 
 /**
  * @brief   Get the PHY mode of the given device
@@ -432,30 +379,12 @@ uint8_t at86rf2xx_get_rate(at86rf2xx_t *dev);
 int at86rf2xx_set_rate(at86rf2xx_t *dev, uint8_t rate);
 
 /**
- * @brief   Get the configured PAN ID of the given device
- *
- * @param[in] dev           device to read from
- *
- * @return                  the currently set PAN ID
- */
-uint16_t at86rf2xx_get_pan(const at86rf2xx_t *dev);
-
-/**
  * @brief   Set the PAN ID of the given device
  *
  * @param[in,out] dev       device to write to
  * @param[in] pan           PAN ID to set
  */
 void at86rf2xx_set_pan(at86rf2xx_t *dev, uint16_t pan);
-
-/**
- * @brief   Get the configured transmission power of the given device [in dBm]
- *
- * @param[in] dev           device to read from
- *
- * @return                  configured transmission power in dBm
- */
-int16_t at86rf2xx_get_txpower(const at86rf2xx_t *dev);
 
 /**
  * @brief   Set the transmission power of the given device [in dBm]
@@ -467,8 +396,9 @@ int16_t at86rf2xx_get_txpower(const at86rf2xx_t *dev);
  *
  * @param[in] dev           device to write to
  * @param[in] txpower       transmission power in dBm
+ * @param[in] channel       the current channel
  */
-void at86rf2xx_set_txpower(const at86rf2xx_t *dev, int16_t txpower);
+void at86rf2xx_set_txpower(const at86rf2xx_t *dev, int16_t txpower, uint8_t channel);
 
 /**
  * @brief   Get the configured receiver sensitivity of the given device [in dBm]
@@ -600,20 +530,6 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state);
  * @return                  the previous state before the new state was set
  */
 uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state);
-
-/**
- * @brief   Convenience function for simply sending data
- *
- * @note This function ignores the PRELOADING option
- *
- * @param[in,out] dev       device to use for sending
- * @param[in] data          data to send (must include IEEE802.15.4 header)
- * @param[in] len           length of @p data
- *
- * @return                  number of bytes that were actually send
- * @return                  0 on error
- */
-size_t at86rf2xx_send(at86rf2xx_t *dev, const uint8_t *data, size_t len);
 
 /**
  * @brief   Prepare for sending of data
