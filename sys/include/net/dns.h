@@ -74,6 +74,15 @@ static inline int dns_query(const char *domain_name, void *addr_out, int family)
 {
     int res = -ENOTSUP;
 
+    if (family == AF_UNSPEC) {
+        if (!IS_USED(MODULE_IPV4_ADDR)) {
+            family = AF_INET6;
+        }
+        else if (!IS_USED(MODULE_IPV6_ADDR)) {
+            family = AF_INET;
+        }
+    }
+
     if (res <= 0 && IS_USED(MODULE_GCOAP_DNS)) {
         res = gcoap_dns_query(domain_name, addr_out, family);
     }

@@ -166,7 +166,7 @@ static int _cmd_con(int argc, char **argv)
 
     printf("mqtt_example: Connecting to MQTT Broker from %s %d\n",
             remote_ip, port);
-    printf("mqtt_example: Trying to connect to %s , port: %d\n",
+    printf("mqtt_example: Trying to connect to %s, port: %d\n",
             remote_ip, port);
     ret = NetworkConnect(&network, remote_ip, port);
     if (ret < 0) {
