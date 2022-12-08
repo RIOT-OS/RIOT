@@ -21,6 +21,7 @@ config BOARD_BASTWAN
     select HAS_PERIPH_USBDEV
     select HAS_RIOTBOOT
     select HAS_HIGHLEVEL_STDIO
+    select HAS_TINYUSB_DEVICE
 
     select HAVE_SAUL_GPIO
     select HAVE_SX1276

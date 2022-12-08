@@ -16,6 +16,7 @@ config BOARD_COMMON_SODAQ
     select HAS_PERIPH_USBDEV
     select HAS_ARDUINO
     select HAS_HIGHLEVEL_STDIO
+    select HAS_TINYUSB_DEVICE
 
     select HAVE_SAUL_GPIO
 
