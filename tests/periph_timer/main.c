@@ -22,8 +22,11 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "atomic_utils.h"
 #include "clk.h"
 #include "periph/timer.h"
+#include "test_utils/expect.h"
+#include "time_units.h"
 
 /**
  * @brief   Make sure, the maximum number of timers is defined
@@ -36,10 +39,10 @@
 #define CHAN_OFFSET         (5000U)     /* fire every 5ms */
 #define COOKIE              (100U)      /* for checking if arg is passed */
 
-static volatile int fired;
-static volatile uint32_t sw_count;
-static volatile uint32_t timeouts[MAX_CHANNELS];
-static volatile unsigned args[MAX_CHANNELS];
+static uint8_t fired;
+static uint32_t sw_count;
+static uint32_t timeouts[MAX_CHANNELS];
+static unsigned args[MAX_CHANNELS];
 
 static void cb(void *arg, int chan)
 {
@@ -48,13 +51,23 @@ static void cb(void *arg, int chan)
     fired++;
 }
 
+static void cb_not_to_be_executed(void *arg, int chan)
+{
+    (void)arg;
+    (void)chan;
+
+    puts("Spurious timer fired");
+    expect(0);
+}
+
 static int test_timer(unsigned num)
 {
     int set = 0;
 
     /* reset state */
-    sw_count = 0;
-    fired = 0;
+    atomic_store_u32(&sw_count, 0);
+    atomic_store_u8(&fired, 0);
+
     for (unsigned i = 0; i < MAX_CHANNELS; i++) {
         timeouts[i] = 0;
         args[i] = UINT_MAX;
@@ -68,8 +81,10 @@ static int test_timer(unsigned num)
     else {
         printf("TIMER_%u: initialization successful\n", num);
     }
+
     timer_stop(TIMER_DEV(num));
     printf("TIMER_%u: stopped\n", num);
+
     /* set each available channel */
     for (unsigned i = 0; i < MAX_CHANNELS; i++) {
         unsigned timeout = ((i + 1) * CHAN_OFFSET);
@@ -81,19 +96,23 @@ static int test_timer(unsigned num)
             printf("TIMER_%u: set channel %u to %u\n", num, i, timeout);
         }
     }
+
     if (set == 0) {
         printf("TIMER_%u: ERROR setting any channel\n\n", num);
         return 0;
     }
+
     /* start the timer */
     printf("TIMER_%u: starting\n", num);
     timer_start(TIMER_DEV(num));
+
     /* wait for all channels to fire */
     do {
-        ++sw_count;
-    } while (fired != set);
+        semi_atomic_fetch_add_u32(&sw_count, 1);
+    } while (atomic_load_u8(&fired) != set);
+
     /* collect results */
-    for (int i = 0; i < fired; i++) {
+    for (int i = 0; i < set; i++) {
         if (args[i] != ((COOKIE * num) + i)) {
             printf("TIMER_%u: ERROR callback argument mismatch\n\n", num);
             return 0;
@@ -101,12 +120,37 @@ static int test_timer(unsigned num)
         printf("TIMER_%u: channel %i fired at SW count %8u",
                num, i, (unsigned)timeouts[i]);
         if (i == 0) {
-            printf(" - init: %8u\n", (unsigned)timeouts[i]);
+            printf(" - init: %8" PRIu32 "\n", atomic_load_u32(&timeouts[i]));
         }
         else {
-            printf(" - diff: %8u\n", (unsigned)(timeouts[i] - timeouts[i - 1]));
+            printf(" - diff: %8" PRIu32 "\n",
+                   atomic_load_u32(&timeouts[i]) - atomic_load_u32(&timeouts[i - 1]));
         }
     }
+
+    /* test for spurious timer IRQs */
+    expect(0 == timer_init(TIMER_DEV(num), TIMER_SPEED, cb_not_to_be_executed, NULL));
+
+    const unsigned duration = 2ULL * US_PER_MS * US_PER_SEC / TIMER_SPEED;
+    unsigned target = timer_read(TIMER_DEV(num)) + duration;
+    expect(0 == timer_set_absolute(TIMER_DEV(num), 0, target));
+    expect(0 == timer_clear(TIMER_DEV(num), 0));
+    while (timer_read(TIMER_DEV(num)) < target) {
+        /* busy waiting for the timer to reach it timeout. Timer must not fire,
+         * it was cleared */
+    }
+
+    /* checking again to make sure that any IRQ pending bit that may just was
+     * mask doesn't trigger a timer IRQ on the next set */
+    target = timer_read(TIMER_DEV(num)) + duration;
+    timer_set_absolute(TIMER_DEV(num), 0, target);
+    timer_clear(TIMER_DEV(num), 0);
+
+    while (timer_read(TIMER_DEV(num)) < target) {
+        /* busy waiting for the timer to reach it timeout. Timer must not fire,
+         * it was cleared */
+    }
+
     return 1;
 }
 
