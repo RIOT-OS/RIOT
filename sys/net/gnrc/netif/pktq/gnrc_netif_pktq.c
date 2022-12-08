@@ -87,10 +87,7 @@ void gnrc_netif_pktq_sched_get(gnrc_netif_t *netif)
     irq_restore(state);
 #elif CONFIG_GNRC_NETIF_PKTQ_TIMER_US == 0
     assert(netif != NULL);
-    netif->send_queue.dequeue_msg.type = GNRC_NETIF_PKTQ_DEQUEUE_MSG;
-    if (msg_send(&netif->send_queue.dequeue_msg, netif->pid) < 0) {
-        DEBUG("gnrc_netif_pktq: couldn't schedule packet (msg queue is full)\n");
-    }
+    event_post(&netif->evq, &netif->event_dequeue);
 #else
     (void)netif;
 #endif  /* CONFIG_GNRC_NETIF_PKTQ_TIMER_US >= 0 */

@@ -54,20 +54,76 @@ static void _update_l2addr_from_dev(gnrc_netif_t *netif);
 static void _check_netdev_capabilities(netdev_t *dev);
 static void *_gnrc_netif_thread(void *args);
 static void _event_cb(netdev_t *dev, netdev_event_t event);
+static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back);
+static int _gnrc_netif_default_init(gnrc_netif_t *netif);
+static void _send_queued_pkt(gnrc_netif_t *netif);
+
+/**
+ * @brief   Call the ISR handler from an event
+ *
+ * @param[in]   evp     pointer to the event
+ */
+static void _event_handler_isr(event_t *evp)
+{
+    gnrc_netif_t *netif = container_of(evp, gnrc_netif_t, event_isr);
+    netif->dev->driver->isr(netif->dev);
+}
+static void _event_dequeue(event_t *evp)
+{
+    gnrc_netif_t *netif = container_of(evp, gnrc_netif_t, event_dequeue);
+    _send_queued_pkt(netif);
+}
 
 typedef struct {
+    event_t event;
     gnrc_netif_t *netif;
     mutex_t init_done;
     int result;
+    char *stack;
+    int stacksize;
+    char priority;
+    const char *name;
+    netdev_t *netdev;
 } _netif_ctx_t;
+
+static void _init_wrapper(event_t *event)
+{
+    _netif_ctx_t *ctx = container_of(event, _netif_ctx_t, event);
+    gnrc_netif_t *netif;
+
+    DEBUG("gnrc_netif: starting thread %i\n", thread_getpid());
+    netif = ctx->netif;
+    gnrc_netif_acquire(netif);
+    netif->pid = thread_getpid();
+
+    netif->event_isr.handler = _event_handler_isr;
+    netif->event_dequeue.handler = _event_dequeue;
+#if IS_USED(MODULE_NETDEV_NEW_API)
+    netif->event_tx_done.handler = _event_handler_tx_done;
+#endif
+
+    /* initialize low-level driver */
+    ctx->result = _gnrc_netif_default_init(netif);
+    /* signal that driver init is done */
+    mutex_unlock(&ctx->init_done);
+    if (ctx->result < 0) {
+        LOG_ERROR("gnrc_netif: init failed: %d\n", ctx->result);
+        return;
+    }
+#ifdef MODULE_NETSTATS_L2
+    memset(&netif->stats, 0, sizeof(netstats_t));
+#endif
+    /* now let rest of GNRC use the interface */
+    gnrc_netif_release(netif);
+#if (CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US > 0U)
+    uint32_t last_wakeup = ztimer_now(ZTIMER_USEC);
+#endif
+}
 
 int gnrc_netif_create(gnrc_netif_t *netif, char *stack, int stacksize,
                       char priority, const char *name, netdev_t *netdev,
                       const gnrc_netif_ops_t *ops)
 {
-    int res;
-    _netif_ctx_t ctx;
-
     if (IS_ACTIVE(DEVELHELP) && gnrc_netif_highlander() && netif_iter(NULL)) {
         LOG_WARNING("gnrc_netif: gnrc_netif_highlander() returned true but "
                     "more than one interface is being registered.\n");
@@ -78,29 +134,19 @@ int gnrc_netif_create(gnrc_netif_t *netif, char *stack, int stacksize,
         msg_bus_init(&netif->bus[i]);
     }
 #endif
-    rmutex_init(&netif->mutex);
     netif->ops = ops;
+    _netif_ctx_t ctx = {0};
+    ctx.stack = stack;
+    ctx.stacksize = stacksize;
+    ctx.priority = priority;
+    ctx.name = name;
+    ctx.netdev = netdev;
+    ctx.netif = netif;
     assert(netif->dev == NULL);
     netif->dev = netdev;
+    ctx.event.handler = _init_wrapper;
 
-#ifdef MODULE_NETSTATS_NEIGHBOR
-    netstats_nb_init(&netif->netif);
-#endif
-
-    /* prepare thread context */
-    ctx.netif = netif;
-    mutex_init(&ctx.init_done);
-    mutex_lock(&ctx.init_done);
-
-    res = thread_create(stack, stacksize, priority, THREAD_CREATE_STACKTEST,
-                        _gnrc_netif_thread, &ctx, name);
-    assert(res > 0);
-    (void)res;
-
-    /* wait for result of driver init */
-    mutex_lock(&ctx.init_done);
-
-    return ctx.result;
+    return netif->ops->init(netif, &ctx);
 }
 
 bool gnrc_netif_dev_is_6lo(const gnrc_netif_t *netif)
@@ -166,7 +212,26 @@ gnrc_netif_t *gnrc_netif_get_by_type(netdev_type_t type, uint8_t index)
     return NULL;
 }
 
-int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
+static void _gnrc_netif_get_from_netdev_wrapper(event_t *event);
+
+int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, netopt_t opt, uint16_t context,
+                                 void *value, size_t max_len)
+{
+    gnrc_netif_opt_ctx_t ctx = {0};
+    ctx.opt.opt = opt;
+    ctx.opt.context = context;
+    ctx.opt.data = (void*) value;
+    ctx.opt.data_len = max_len;
+    ctx.pid = thread_getpid();
+    ctx.event.handler = _gnrc_netif_get_from_netdev_wrapper;
+    ctx.netif = netif;
+    thread_flags_clear(0x1);
+    event_post(&netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_LOW], &ctx.event);
+    thread_flags_wait_one(0x1);
+    return ctx.res;
+}
+
+int _gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
 {
     int res = -ENOTSUP;
 
@@ -315,7 +380,61 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
     return res;
 }
 
-int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
+static void _gnrc_netif_set_from_netdev_wrapper(event_t *event)
+{
+    gnrc_netif_opt_ctx_t *ctx = container_of(event, gnrc_netif_opt_ctx_t, event);
+    assert(ctx->pid != thread_getpid());
+    ctx->res = _gnrc_netif_set_from_netdev(ctx->netif, &ctx->opt);
+    thread_flags_set((thread_t*) thread_get(ctx->pid), 0x1);
+}
+
+static void _gnrc_netif_send_wrapper(event_t *event)
+{
+
+    gnrc_netif_schedule_ctx_t *ctx = container_of(event, gnrc_netif_schedule_ctx_t, event);
+    DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_SND received\n");
+    assert(ctx->pid != thread_getpid());
+    _send(ctx->netif, ctx->pkt, false);
+    ctx->res = 1;
+    thread_flags_set((thread_t*) thread_get(ctx->pid), 0x1);
+#if (CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US > 0U)
+    ztimer_periodic_wakeup(
+            ZTIMER_USEC,
+            &last_wakeup,
+            CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US
+        );
+    /* override last_wakeup in case last_wakeup +
+     * CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US was in the past */
+    last_wakeup = ztimer_now(ZTIMER_USEC);
+#endif
+}
+
+static void _gnrc_netif_get_from_netdev_wrapper(event_t *event)
+{
+    gnrc_netif_opt_ctx_t *ctx = container_of(event, gnrc_netif_opt_ctx_t, event);
+    assert(ctx->pid != thread_getpid());
+    ctx->res = _gnrc_netif_get_from_netdev(ctx->netif, &ctx->opt);
+    thread_flags_set((thread_t*) thread_get(ctx->pid), 0x1);
+}
+
+int gnrc_netif_set_from_netdev(gnrc_netif_t *netif, netopt_t opt, uint16_t context,
+                                 const void *value, size_t value_len)
+{
+    gnrc_netif_opt_ctx_t ctx = {0};
+    ctx.opt.opt = opt;
+    ctx.opt.context = context;
+    ctx.opt.data = (void*) value;
+    ctx.opt.data_len = value_len;
+    ctx.pid = thread_getpid();
+    ctx.event.handler = _gnrc_netif_set_from_netdev_wrapper;
+    ctx.netif = netif;
+    thread_flags_clear(0x1);
+    event_post(&netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_LOW], &ctx.event);
+    thread_flags_wait_one(0x1);
+    return ctx.res;
+}
+
+int _gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
                                const gnrc_netapi_opt_t *opt)
 {
     int res = -ENOTSUP;
@@ -802,12 +921,7 @@ gnrc_netif_t *gnrc_netif_get_by_prefix(const ipv6_addr_t *prefix)
 static int _netif_ops_set_helper(gnrc_netif_t *netif, netopt_t opt,
                                  void *data, uint16_t data_len)
 {
-    gnrc_netapi_opt_t netapi_opt = {
-        .opt = opt,
-        .data = data,
-        .data_len = data_len,
-    };
-    return netif->ops->set(netif, &netapi_opt);
+    return netif->ops->set(netif, opt, 0, data, data_len);
 }
 
 int gnrc_netif_ipv6_group_join_internal(gnrc_netif_t *netif,
@@ -1284,7 +1398,7 @@ int gnrc_netif_ipv6_add_prefix(gnrc_netif_t *netif,
     assert(netif != NULL);
     DEBUG("gnrc_netif: (re-)configure prefix %s/%d\n",
           ipv6_addr_to_str(addr_str, pfx, sizeof(addr_str)), pfx_len);
-    if (gnrc_netapi_get(netif->pid, NETOPT_IPV6_IID, 0, &iid,
+    if (gnrc_netif_get(netif, NETOPT_IPV6_IID, 0, &iid,
                         sizeof(eui64_t)) >= 0) {
         ipv6_addr_set_aiid(&addr, iid.uint8);
     }
@@ -1610,7 +1724,30 @@ static void _test_options(gnrc_netif_t *netif)
 }
 #endif /* DEVELHELP */
 
-int gnrc_netif_default_init(gnrc_netif_t *netif)
+int gnrc_netif_default_init(gnrc_netif_t *netif, void *ctx)
+{
+    _netif_ctx_t *_ctx = ctx;
+    int res = thread_create(_ctx->stack, _ctx->stacksize, _ctx->priority, THREAD_CREATE_STACKTEST,
+                        _gnrc_netif_thread, _ctx->netif, _ctx->name);
+    assert(res > 0);
+    (void)res;
+    rmutex_init(&netif->mutex);
+
+#ifdef MODULE_NETSTATS_NEIGHBOR
+    netstats_nb_init(&netif->netif);
+#endif
+
+    /* prepare thread context */
+    mutex_init(&_ctx->init_done);
+    mutex_lock(&_ctx->init_done);
+    event_post(&netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_LOW], &_ctx->event);
+    /* wait for result of driver init */
+    mutex_lock(&_ctx->init_done);
+
+    return _ctx->result;
+}
+
+int _gnrc_netif_default_init(gnrc_netif_t *netif)
 {
     netdev_t *dev = netif->dev;
     /* register the event callback with the device driver */
@@ -1637,19 +1774,6 @@ int gnrc_netif_default_init(gnrc_netif_t *netif)
     assert(options_tested);
 #endif
     return 0;
-}
-
-static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back);
-
-/**
- * @brief   Call the ISR handler from an event
- *
- * @param[in]   evp     pointer to the event
- */
-static void _event_handler_isr(event_t *evp)
-{
-    gnrc_netif_t *netif = container_of(evp, gnrc_netif_t, event_isr);
-    netif->dev->driver->isr(netif->dev);
 }
 
 static void _process_receive_stats(gnrc_netif_t *netdev, gnrc_pktsnip_t *pkt)
@@ -1696,7 +1820,7 @@ static event_t *_gnrc_netif_fetch_event(gnrc_netif_t *netif)
  *
  * @return >0 if msg contains a new message
  */
-static void _process_events_await_msg(gnrc_netif_t *netif, msg_t *msg)
+static void _process_events_await_msg(gnrc_netif_t *netif)
 {
     while (1) {
         /* Using messages for external IPC, and events for internal events */
@@ -1713,14 +1837,9 @@ static void _process_events_await_msg(gnrc_netif_t *netif, msg_t *msg)
                 evp->handler(evp);
             }
         }
-        /* non-blocking msg check */
-        int msg_waiting = msg_try_receive(msg);
-        if (msg_waiting > 0) {
-            return;
-        }
         DEBUG("gnrc_netif: waiting for events\n");
         /* Block the thread until something interesting happens */
-        thread_flags_wait_any(THREAD_FLAG_MSG_WAITING | THREAD_FLAG_EVENT);
+        thread_flags_wait_any(THREAD_FLAG_EVENT);
     }
 }
 
@@ -1908,114 +2027,11 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
 
 static void *_gnrc_netif_thread(void *args)
 {
-    _netif_ctx_t *ctx = args;
-    gnrc_netapi_opt_t *opt;
-    gnrc_netif_t *netif;
-    int res;
-    msg_t reply = { .type = GNRC_NETAPI_MSG_TYPE_ACK };
-
-    DEBUG("gnrc_netif: starting thread %i\n", thread_getpid());
-    netif = ctx->netif;
-    gnrc_netif_acquire(netif);
-    netif->pid = thread_getpid();
-
-    netif->event_isr.handler = _event_handler_isr;
-#if IS_USED(MODULE_NETDEV_NEW_API)
-    netif->event_tx_done.handler = _event_handler_tx_done;
-#endif
-    /* set up the event queue */
+    gnrc_netif_t *netif = args;
+    /* set up thstatic e event queue */
     event_queues_init(netif->evq, GNRC_NETIF_EVQ_NUMOF);
-
-    /* setup the link-layer's message queue */
-    msg_init_queue(netif->msg_queue, ARRAY_SIZE(netif->msg_queue));
-    /* initialize low-level driver */
-    ctx->result = netif->ops->init(netif);
-    /* signal that driver init is done */
-    mutex_unlock(&ctx->init_done);
-    if (ctx->result < 0) {
-        LOG_ERROR("gnrc_netif: init failed: %d\n", ctx->result);
-        return NULL;
-    }
-#ifdef MODULE_NETSTATS_L2
-    memset(&netif->stats, 0, sizeof(netstats_t));
-#endif
-    /* now let rest of GNRC use the interface */
-    gnrc_netif_release(netif);
-#if (CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US > 0U)
-    uint32_t last_wakeup = ztimer_now(ZTIMER_USEC);
-#endif
-
     while (1) {
-        msg_t msg;
-        /* msg will be filled by _process_events_await_msg.
-         * The function will not return until a message has been received. */
-        _process_events_await_msg(netif, &msg);
-
-        /* dispatch netdev, MAC and gnrc_netapi messages */
-        DEBUG("gnrc_netif: message %u\n", (unsigned)msg.type);
-        switch (msg.type) {
-#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
-            case GNRC_NETIF_PKTQ_DEQUEUE_MSG:
-                DEBUG("gnrc_netif: send from packet send queue\n");
-                _send_queued_pkt(netif);
-                break;
-#endif  /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
-            case GNRC_NETAPI_MSG_TYPE_SND:
-                DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_SND received\n");
-                _send(netif, msg.content.ptr, false);
-#if (CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US > 0U)
-                ztimer_periodic_wakeup(
-                        ZTIMER_USEC,
-                        &last_wakeup,
-                        CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US
-                    );
-                /* override last_wakeup in case last_wakeup +
-                 * CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US was in the past */
-                last_wakeup = ztimer_now(ZTIMER_USEC);
-#endif
-                break;
-            case GNRC_NETAPI_MSG_TYPE_SET:
-                opt = msg.content.ptr;
-#ifdef MODULE_NETOPT
-                DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_SET received. opt=%s\n",
-                      netopt2str(opt->opt));
-#else
-                DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_SET received. opt=%d\n",
-                      opt->opt);
-#endif
-                /* set option for device driver */
-                res = netif->ops->set(netif, opt);
-                DEBUG("gnrc_netif: response of netif->ops->set(): %i\n", res);
-                reply.content.value = (uint32_t)res;
-                msg_reply(&msg, &reply);
-                break;
-            case GNRC_NETAPI_MSG_TYPE_GET:
-                opt = msg.content.ptr;
-#ifdef MODULE_NETOPT
-                DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_GET received. opt=%s\n",
-                      netopt2str(opt->opt));
-#else
-                DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_GET received. opt=%d\n",
-                      opt->opt);
-#endif
-                /* get option from device driver */
-                res = netif->ops->get(netif, opt);
-                DEBUG("gnrc_netif: response of netif->ops->get(): %i\n", res);
-                reply.content.value = (uint32_t)res;
-                msg_reply(&msg, &reply);
-                break;
-            default:
-                if (netif->ops->msg_handler) {
-                    DEBUG("gnrc_netif: delegate message of type 0x%04x to "
-                          "netif->ops->msg_handler()\n", msg.type);
-                    netif->ops->msg_handler(netif, &msg);
-                }
-                else {
-                    DEBUG("gnrc_netif: unknown message type 0x%04x"
-                          "(no message handler defined)\n", msg.type);
-                }
-                break;
-        }
+        _process_events_await_msg(netif);
     }
     /* never reached */
     return NULL;
@@ -2030,6 +2046,19 @@ static void _pass_on_packet(gnrc_pktsnip_t *pkt)
         gnrc_pktbuf_release(pkt);
         return;
     }
+}
+
+int gnrc_netif_schedule_netapi_default(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
+{
+    gnrc_netif_schedule_ctx_t ctx = {0};
+    ctx.pkt = pkt;
+    ctx.pid = thread_getpid();
+    ctx.event.handler = _gnrc_netif_send_wrapper;
+    ctx.netif = netif;
+    thread_flags_clear(0x1);
+    event_post(&netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_LOW], &ctx.event);
+    thread_flags_wait_one(0x1);
+    return ctx.res;
 }
 
 static void _event_cb(netdev_t *dev, netdev_event_t event)
