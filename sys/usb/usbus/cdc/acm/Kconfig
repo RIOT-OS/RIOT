@@ -49,6 +49,7 @@ endif # KCONFIG_USEMODULE_USBUS_CDC_ACM
 config MODULE_USBUS_CDC_ACM
     bool "USB CDC ACM support"
     depends on MODULE_USBUS
+    default y if TEST_KCONFIG && HAS_HIGHLEVEL_STDIO
     select MODULE_TSRB
 
 # extend STDIO options
