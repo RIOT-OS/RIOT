@@ -33,3 +33,10 @@ delete_merged_branches = true
 # possible intermediate PR builds into accound.
 # let's try ten hours (36000s)
 timeout_sec = 36000
+
+# "A marker in the PR description that indicates boilerplate that does not
+# belong in the commit message."
+#
+# This basically cuts the whole description, which in our PR template starts
+# with a comment:
+cut_body_after = "<!--"
