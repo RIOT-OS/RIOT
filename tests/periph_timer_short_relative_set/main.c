@@ -75,33 +75,36 @@ int main(void)
     puts("\nTest for peripheral TIMER short timer_set()\n");
 
     printf("This test tries timer_set() with decreasing intervals down to 0.\n"
-           "You should see lines like 'interval <n> ok', followed by a success"
+           "You should see lines like 'interval <n>: OK', followed by a success"
            " message.\n"
            "On failure, this test prints an error message.\n\n");
 
-    printf("testing periph_timer %u, freq %lu\n", TEST_TIMER_DEV, TEST_TIMER_FREQ);
+    printf("testing periph_timer %u, freq %lu, bits = %u\n",
+           TEST_TIMER_DEV, TEST_TIMER_FREQ, TEST_TIMER_WIDTH);
     timer_init(TEST_TIMER_DEV, TEST_TIMER_FREQ, cb, thread_get_active());
 
-    uint32_t interval = 100;
+    uint32_t interval = 16;
+    const unsigned max_repetitions = 128;
     while (interval--) {
-        uint32_t before = timer_read(TEST_TIMER_DEV);
-        timer_set(TEST_TIMER_DEV, 0, interval);
-        while(!thread_flags_clear(1)) {
-            uint32_t diff = (timer_read(TEST_TIMER_DEV) - before)
-                            & TEST_TIMER_MAX;
-            if (diff > TEST_MAX_DIFF) {
-                printf("ERROR: too long delay, aborted after %" PRIu32
-                        " (TEST_MAX_DIFF=%lu)\n"
-                        "TEST FAILED\n"
-                        "Note: This is currently expected to fail on most boards.\n",
-                        diff, TEST_MAX_DIFF);
-                while(1) {}
+        for (unsigned rep = 0; rep < max_repetitions; rep++) {
+            uint32_t before = timer_read(TEST_TIMER_DEV);
+            timer_set(TEST_TIMER_DEV, 0, interval);
+            while (!thread_flags_clear(1)) {
+                uint32_t diff = (timer_read(TEST_TIMER_DEV) - before)
+                                & TEST_TIMER_MAX;
+                if (diff > TEST_MAX_DIFF) {
+                    printf("ERROR: too long delay, aborted after %" PRIu32
+                            " (TEST_MAX_DIFF=%lu) on repetition %u\n"
+                            "TEST FAILED\n",
+                            diff, TEST_MAX_DIFF, rep);
+                    return EXIT_FAILURE;
+                }
             }
         }
-        printf("interval %" PRIu32 " ok\n", interval);
+        printf("interval %" PRIu32 ": OK\n", interval);
     }
 
     puts("\nTEST SUCCEEDED");
 
-    return 0;
+    return EXIT_SUCCESS;
 }
