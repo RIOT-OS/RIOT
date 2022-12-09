@@ -34,7 +34,7 @@
 /**
  * @brief   Allocate one lock per SPI device
  */
-static mutex_t locks[sizeof soft_spi_config];
+static mutex_t locks[SOFT_SPI_NUMOF];
 
 static inline bool soft_spi_bus_is_valid(soft_spi_t bus)
 {

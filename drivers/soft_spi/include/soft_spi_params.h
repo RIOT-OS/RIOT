@@ -48,6 +48,11 @@ static soft_spi_conf_t soft_spi_config[] = {
     SOFT_SPI_PARAMS,
 };
 
+/**
+ * @brief   Number of software SPI buses
+ */
+#define SOFT_SPI_NUMOF             ARRAY_SIZE(soft_spi_config)
+
 #ifdef __cplusplus
 }
 #endif
