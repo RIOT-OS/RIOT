@@ -42,7 +42,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Sotware SPI port descriptor array
+ * @brief   Software SPI port descriptor array
  */
 static soft_spi_conf_t soft_spi_config[] = {
     SOFT_SPI_PARAMS,
