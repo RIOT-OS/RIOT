@@ -430,4 +430,68 @@ vendor or model to only considered TTYs that actually may belong to the selected
 board. E.g. for Nucleo boards this is `--model 'STM32 STLink'`, as they all use
 an integrated STLink as programmer. As long as only one TTY is provided from an
 STLink, this will reliably select the correct TTY for an Nucleo regardless of
-which TTY was most recently connected.
+which TTY was most recently connected. Some boards even provide info that
+allows to always reliably identify them correctly (e.g. the firmware on the
+ATmega16U2 used as USB to UART converted on Arduino Mega2560 will provide
+identification data unique to that board).
+
+Adding Board Filters
+--------------------
+
+After connecting as many variants of the board you target (and maybe some others
+to test that the filter actually filters out non-matching boards). Then first
+run `./dist/tools/usb-serial/ttys.py` without arguments and study the output.
+When a genuine Arduino Mega 2560, a genuine Arduino Mega ADK (a variant of the
+Mega 2560),a cheap Arduino Mega 2560 clone, a BBC micro:bit v2, and a
+Nucleo F767-ZI are connected, the following output is shown:
+
+path         | driver  | vendor                   | model                                | model_db                                             | serial                                           | ctime    | iface_num
+-------------|---------|--------------------------|--------------------------------------|------------------------------------------------------|--------------------------------------------------|----------|----------
+/dev/ttyACM0 | cdc_acm | Arduino (www.arduino.cc) | 0042                                 | Mega 2560 R3 (CDC ACM)                               | 857353134333519002C1                             | 12:13:55 | 0
+/dev/ttyACM1 | cdc_acm | Arduino (www.arduino.cc) | EOS High Power                       | Mega ADK R3 (CDC ACM)                                | 75230313733351110120                             | 15:59:57 | 0
+/dev/ttyACM2 | cdc_acm | STMicroelectronics       | STM32 STLink                         | ST-LINK/V2.1                                         | 0670FF535155878281123912                         | 10:00:39 | 2
+/dev/ttyACM3 | cdc_acm | Arm                      | BBC micro:bit CMSIS-DAP              | ARM mbed                                             | 99053602000528334c41b84da1f2f09d000000006e052820 | 12:21:03 | 1
+/dev/ttyUSB0 | cp210x  | Silicon Labs             | CP2102 USB to UART Bridge Controller | CP2102/CP2109 UART Bridge Controller [CP210x family] | 0001                                             | 16:57:27 | 0
+
+Now we add arguments to the invocation of `ttys.py` to filter the list e.g.
+by model, vendor etc. (note: as regex!) ideally until only the target boards
+are listed. Some boards do not provide enough information to e.g. tell them
+apart from other boards using the same USB to UART bridge or the same debugger.
+In that case we have to live with some "bycatch".
+
+In the case of the Arduino Mega 2560 the parameters
+`--vendor 'Arduino' --model-db 'Mega 2560|Mega ADK'` will narrow down the
+list to only show the genuine Arduino Mega versions. Se we add to the
+`Makefile.include` in `boards/arduino-mega2560`:
+
+```Makefile
+TTY_BOARD_FILTER := --vendor 'Arduino' --model-db 'Mega 2560|Mega ADK'
+```
+
+Note that also matching the `R3` in `Mega 2560 R3` would prevent matching older
+or newer revisions than R3, so we don't add that to the regex.
+
+Advances Board Filters
+----------------------
+
+In most cases, just adding a simple `TTY_BOARD_FILTER` is sufficient. If we
+however have wildly different flavors of the same board (e.g. genuine Arduino
+Mega 2560 with an ATmega16U2 and clones with a cheap USB to UART bridge) that we
+all want to support, we have to instead provide a `TTY_SELECT_CMD` that prints
+the path to the TTY and exists with `0` if a TTY was found, or that exists with
+`1` and prints nothing when no TTY was found. We can still use the `ttys.py`
+script to detect all Arduino Mega 2560 versions: We first try to detect a
+genuine Arduino Mega and fall back to selecting cheap USB UART bridges when that
+fails using the `||` shell operator:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  TTY_SELECT_CMD := $(RIOTTOOLS)/usb-serial/ttys.py \
+                    --most-recent \
+                    --format path \
+                    --vendor 'Arduino' \
+                    --model-db 'Mega 2560|Mega ADK' || \
+                    $(RIOTTOOLS)/usb-serial/ttys.py \
+                    --most-recent \
+                    --format path \
+                    --driver 'cp210x'
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

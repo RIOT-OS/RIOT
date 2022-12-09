@@ -3,8 +3,11 @@ ifeq (1,$(MOST_RECENT_PORT))
   ifneq (,$(filter stdio_cdc_acm,$(USEMODULE)))
     TTY_BOARD_FILTER ?= --model $(BOARD) --vendor 'RIOT-os\.org'
   endif
-  TTYS_FLAGS := --most-recent --format path $(TTY_BOARD_FILTER)
-  PORT_DETECTED := $(shell $(RIOTTOOLS)/usb-serial/ttys.py $(TTYS_FLAGS))
+  TTY_SELECT_CMD ?= $(RIOTTOOLS)/usb-serial/ttys.py \
+                    --most-recent \
+                    --format path \
+                    $(TTY_BOARD_FILTER)
+  PORT_DETECTED := $(shell $(TTY_SELECT_CMD) || echo 'no-tty-detected')
   PORT ?= $(PORT_DETECTED)
 endif
 # Otherwise, use as default the most commonly used ports on Linux and OSX
