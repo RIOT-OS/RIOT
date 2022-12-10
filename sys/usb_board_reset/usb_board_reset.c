@@ -47,11 +47,11 @@ int usb_board_reset_coding_cb(usbus_cdcacm_device_t *cdcacm,
     (void)stop;
     switch (baud) {
         case RESET_IN_BOOTLOADER_TRIGGER_BAUDRATE:
-            LOG_DEBUG("[cdc-acm-stdio] reset in bootloader");
+            LOG_DEBUG("[cdc-acm] reset in bootloader\n");
             usb_board_reset_in_bootloader();
             break;
         case RESET_IN_APPLICATION_TRIGGER_BAUDRATE:
-            LOG_DEBUG("[cdc-acm-stdio] reset in application");
+            LOG_DEBUG("[cdc-acm] reset in application\n");
             usb_board_reset_in_application();
             break;
         default:
