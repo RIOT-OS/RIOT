@@ -32,11 +32,6 @@
 #include "vfs.h"
 #endif
 
-#ifdef MODULE_USB_BOARD_RESET
-#include "usb_board_reset_internal.h"
-#include "class/cdc/cdc.h"
-#endif
-
 static mutex_t data_lock = MUTEX_INIT_LOCKED;
 
 void stdio_init(void)
@@ -81,21 +76,3 @@ void tud_cdc_rx_cb(uint8_t itf)
 
     mutex_unlock(&data_lock);
 }
-
-#ifdef MODULE_USB_BOARD_RESET
-
-void tud_cdc_line_coding_cb(uint8_t itf, cdc_line_coding_t const* p_line_coding)
-{
-    (void)itf;
-    assert(p_line_coding != NULL);
-
-    /* The first parameter is the USBUS CDC ACM device, but this is
-     * not used in `usb_board_reset_coding_cb`. Therefore we can simply
-     * reuse this callback function in tinyUSB without any problems. */
-    usb_board_reset_coding_cb(NULL,
-                              p_line_coding->bit_rate,
-                              p_line_coding->data_bits,
-                              p_line_coding->parity,
-                              p_line_coding->stop_bits);
-}
-#endif
