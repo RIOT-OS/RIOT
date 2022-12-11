@@ -62,6 +62,22 @@ int usb_board_reset_coding_cb(usbus_cdcacm_device_t *cdcacm,
     return 0;
 }
 
+#ifndef MODULE_RIOTBOOT_RESET
+/*
+ * Definition of a function as weak symbol for reset in bootloader which
+ * prints an error message if no real implementation is compiled in and
+ * the `riotboot_reset` module is not used. This is required if the module
+ * `usb_board_reset` is used to restart the board with an application via
+ * an USB CDC ACM interface, but the board's bootloader does not support
+ * a reset in the bootloader.
+ */
+__attribute__((weak))
+void usb_board_reset_in_bootloader(void)
+{
+    LOG_ERROR("[cdc-acm] reset in bootloader is not supported\n");
+}
+#endif
+
 void usb_board_reset_in_application(void)
 {
     pm_reboot();
