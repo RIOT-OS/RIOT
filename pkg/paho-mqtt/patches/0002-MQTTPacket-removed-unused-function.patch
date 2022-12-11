@@ -1,0 +1,31 @@
+From 8b320ad01a06dced43ea6a7119f02cb79ca6054c Mon Sep 17 00:00:00 2001
+From: Oleg Hahm <oleg+eclipse@riot-os.org>
+Date: Fri, 2 Dec 2022 19:12:09 +0100
+Subject: [PATCH 2/4] MQTTPacket: removed unused function
+
+---
+ MQTTPacket/src/MQTTPacket.c | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/MQTTPacket/src/MQTTPacket.c b/MQTTPacket/src/MQTTPacket.c
+index 4f1f95a..0723b9a 100644
+--- a/MQTTPacket/src/MQTTPacket.c
++++ b/MQTTPacket/src/MQTTPacket.c
+@@ -183,14 +183,6 @@ void writeCString(unsigned char** pptr, const char* string)
+ 	*pptr += len;
+ }
+ 
+-
+-int getLenStringLen(char* ptr)
+-{
+-	int len = 256*((unsigned char)(*ptr)) + (unsigned char)(*(ptr+1));
+-	return len;
+-}
+-
+-
+ void writeMQTTString(unsigned char** pptr, MQTTString mqttstring)
+ {
+ 	if (mqttstring.lenstring.len > 0)
+-- 
+2.38.1
+
