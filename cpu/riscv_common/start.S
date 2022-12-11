@@ -19,8 +19,7 @@ _start:
 .option norelax
     csrc CSR_MSTATUS, MSTATUS_MIE
     lui a0, %hi(_start_real)
-    addi a0, a0, %lo(_start_real)
-    jr a0
+    jalr x0, a0, %lo(_start_real)
 
 _start_real:
     la gp, __global_pointer$
