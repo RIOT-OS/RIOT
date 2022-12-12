@@ -425,13 +425,17 @@ static uint8_t sht2x_checkcrc(uint8_t data[], uint8_t nbrOfBytes, uint8_t checks
 }
 
 /**
- * @brief       Initialize the given SHT2X device
+ * @brief       Sleep during measurement
  *
- * @param[in]   res         The resolution bits in the User Register
+ * @param[in]   res     The resolution bits in the User Register
  *
- * @details     Sleep for the typical time it takes to complete the measurement
+ * @details     Sleep for the maximum time it takes to complete the measurement
  *              this depends on the resolution and is taken from the datasheet.
  *              Measurement time differs for temperature and humidity.
+ *
+ * @note        According to the data sheet, typical times are recommended for
+ *              calculating energy consumption, while maximum values should be
+ *              used for calculating waiting times in communication.
  */
 static void sleep_during_temp_measurement(sht2x_res_t res)
 {
@@ -439,16 +443,16 @@ static void sleep_during_temp_measurement(sht2x_res_t res)
 
     switch (res) {
         case SHT2X_RES_12_14BIT:
-            amount_ms = 66;
+            amount_ms = 85;
             break;
         case SHT2X_RES_8_12BIT:
-            amount_ms = 17;
+            amount_ms = 22;
             break;
         case SHT2X_RES_10_13BIT:
-            amount_ms = 33;
+            amount_ms = 43;
             break;
         case SHT2X_RES_11_11BIT:
-            amount_ms = 9;
+            amount_ms = 11;
             break;
     }
     ztimer_sleep(ZTIMER_MSEC, amount_ms);
@@ -460,16 +464,16 @@ static void sleep_during_hum_measurement(sht2x_res_t resolution)
 
     switch (resolution) {
         case SHT2X_RES_12_14BIT:
-            amount_ms = 22;
+            amount_ms = 29;
             break;
         case SHT2X_RES_8_12BIT:
-            amount_ms = 3;
+            amount_ms = 4;
             break;
         case SHT2X_RES_10_13BIT:
-            amount_ms = 7;
+            amount_ms = 9;
             break;
         case SHT2X_RES_11_11BIT:
-            amount_ms = 12;
+            amount_ms = 15;
             break;
     }
     ztimer_sleep(ZTIMER_MSEC, amount_ms);
