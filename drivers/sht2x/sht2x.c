@@ -159,7 +159,7 @@ int16_t sht2x_read_temperature(const sht2x_t* dev)
     if (i2c_result != SHT2X_OK) {
         return INT16_MIN;
     }
-    return (-46.85 + 175.72 / 65536.0 * raw_value) * 100;
+    return ((17572 * raw_value) / 65536) - 4685;
 }
 
 /*
@@ -177,7 +177,7 @@ uint16_t sht2x_read_humidity(const sht2x_t *dev)
     if (i2c_result != SHT2X_OK) {
         return 0;
     }
-    return 100 * (-6.0 + 125.0 / 65536.0 * raw_value);
+    return ((12500 * raw_value) / 65536) - 600;
 }
 
 static size_t _sht2x_add_ident_byte(uint8_t * buffer, size_t buflen, uint8_t b, size_t ix)
