@@ -15,6 +15,7 @@ config CPU_MODEL_ATMEGA256RFR2
     select CPU_FAM_ATMEGA256RF
     select HAS_ATMEGA_PCINT1
     select HAS_CPU_ATMEGA256RFR2
+    select HAVE_AT86RFR2
 
 ## Definition of specific features
 config HAS_CPU_ATMEGA256RFR2
