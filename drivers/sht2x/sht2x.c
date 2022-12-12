@@ -1,7 +1,8 @@
 /*
  * Copyright (C) 2016,2017,2018 Kees Bakker, SODAQ
- * Copyright (C) 2017 George Psimenos
- * Copyright (C) 2018 Steffen Robertz
+ *               2017 George Psimenos
+ *               2018 Steffen Robertz
+ *               2022 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,8 +14,8 @@
  * @{
  *
  * @file
- * @brief       Device driver implementation for the SHT2x temperature and
- *              humidity sensor.
+ * @brief       Device driver implementation for the SHT2x humidity and
+ *              temperature humidity sensor.
  *
  * @author      Kees Bakker <kees@sodaq.com>
  * @author      George Psimenos <gp7g14@soton.ac.uk>
@@ -358,16 +359,23 @@ static int read_sensor_poll(const sht2x_t* dev, cmd_t command, uint16_t *val)
     uint8_t buffer[3];
     int i2c_result;
 
-    /* Acquire exclusive access */
+    /* acquire the bus for exclusive access */
     i2c_acquire(_BUS);
 
     DEBUG("[SHT2x] write command: addr=%02x cmd=%02x\n", _ADDR, (uint8_t)command);
     (void)i2c_write_byte(_BUS, _ADDR, (uint8_t)command, 0);
+    /* release the bus for measurement duration */
+    i2c_release(_BUS);
+
+    /* sleep for measurement duration */
     if (command == temp_no_hold_cmd) {
         sleep_during_temp_measurement(dev->params.resolution);
     } else {
         sleep_during_hum_measurement(dev->params.resolution);
     }
+
+    /* reacquire the bus for exclusive access */
+    i2c_acquire(_BUS);
 
     uint8_t ix = 0;
     for (; ix < MAX_RETRIES; ix++) {
