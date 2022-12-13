@@ -72,7 +72,7 @@
 #include <string.h>
 
 #include "periph/i2c.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "vl53l1x.h"
 
@@ -343,8 +343,7 @@ VL53L1_Error VL53L1_GetTickCount(uint32_t *ptick_count_ms)
     ASSERT_PARAM(ptick_count_ms != NULL);
     DEBUG_NODEV("ptick_count_ms=%p", ptick_count_ms);
 
-    uint64_t time = xtimer_now_usec64();
-    *ptick_count_ms = time / (US_PER_MS);
+    *ptick_count_ms = ztimer_now(ZTIMER_MSEC);
 
     return status;
 }
@@ -367,7 +366,7 @@ VL53L1_Error VL53L1_WaitMs(VL53L1_Dev_t *pdev, int32_t wait_ms){
     ASSERT_PARAM(pdev != NULL);
     DEBUG_NODEV("wait_ms=%d", wait_ms);
 
-    xtimer_usleep (wait_ms * US_PER_MS);
+    ztimer_sleep(ZTIMER_MSEC, wait_ms);
 
     return status;
 }
@@ -379,7 +378,7 @@ VL53L1_Error VL53L1_WaitUs(VL53L1_Dev_t *pdev, int32_t wait_us)
     ASSERT_PARAM(pdev != NULL);
     DEBUG_NODEV("wait_us=%d", wait_us);
 
-    xtimer_usleep (wait_us);
+    ztimer_sleep(ZTIMER_USEC, wait_us);
 
     return status;
 }
@@ -405,7 +404,7 @@ VL53L1_Error VL53L1_WaitValueMaskEx(VL53L1_Dev_t *pdev,
         if ((data & mask) == value) {
             return VL53L1_ERROR_NONE;
         }
-        xtimer_usleep(poll_delay_ms * US_PER_MS);
+        ztimer_sleep(ZTIMER_MSEC, poll_delay_ms);
         timeout_ms -= (poll_delay_ms < timeout_ms) ? poll_delay_ms : timeout_ms;
     }
 
