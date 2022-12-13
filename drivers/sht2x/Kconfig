@@ -15,6 +15,7 @@ menuconfig MODULE_SHT2X
     bool "SHT2x humidity and temperature sensor"
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
+    select MODULE_CHECKSUM
     select MODULE_PERIPH_I2C
     select MODULE_ZTIMER_MSEC
 

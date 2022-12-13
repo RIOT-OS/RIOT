@@ -26,6 +26,7 @@
 
 #include <math.h>
 
+#include "checksum/crc8.h"
 #include "log.h"
 #include "periph/i2c.h"
 #include "ztimer.h"
@@ -407,29 +408,13 @@ static int read_sensor_poll(const sht2x_t* dev, cmd_t command, uint16_t *val)
     return SHT2X_OK;
 }
 
-static const uint16_t POLYNOMIAL = 0x131;       /* P(x)=x^8+x^5+x^4+1 = 100110001 */
+static const uint8_t POLYNOMIAL = 0x31;       /* P(x)=x^8+x^5+x^4+1 = 100110001 */
 /**
  * @brief       Calculate 8-Bit checksum with given polynomial
  */
 static uint8_t sht2x_checkcrc(uint8_t data[], uint8_t nbrOfBytes, uint8_t checksum)
 {
-    uint8_t crc = 0;
-    uint8_t byteCtr;
-    for (byteCtr = 0; byteCtr < nbrOfBytes; ++byteCtr)
-    {
-        crc ^= (data[byteCtr]);
-        for (uint8_t bit = 8; bit > 0; --bit)
-        {
-            if ((crc & 0x80) != 0)
-                crc = (crc << 1) ^ POLYNOMIAL;
-            else
-                crc = (crc << 1);
-        }
-    }
-    if (crc != checksum)
-        return 1;
-    else
-        return 0;
+    return crc8(data, nbrOfBytes, POLYNOMIAL, 0) != checksum;
 }
 
 /**
