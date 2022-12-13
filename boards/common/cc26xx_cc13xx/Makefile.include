@@ -13,5 +13,30 @@ PROGRAMMERS_SUPPORTED += openocd uniflash
 # embedded debugger of these launchpad boards.
 TTY_BOARD_FILTER := --model XDS110 --iface-num 0
 
-OPENOCD_CONFIG ?= $(RIOTBOARD)/common/cc26xx_cc13xx/dist/openocd.cfg
 UNIFLASH_CONFIG ?= $(RIOTBOARD)/common/cc26xx_cc13xx/dist
+
+OPENOCD_DEBUG_ADAPTER ?= xds110
+
+ifneq (,$(filter cc13x0%,$(CPU_MODEL)))
+  DEFAULT_OPENOCD_CONFIG := $(RIOTBASE)/boards/common/cc26xx_cc13xx/dist/openocd_cc13x0.cfg
+endif
+ifneq (,$(filter cc13x2%,$(CPU_MODEL)))
+  DEFAULT_OPENOCD_CONFIG := $(RIOTBASE)/boards/common/cc26xx_cc13xx/dist/openocd_cc13x2.cfg
+endif
+ifneq (,$(filter cc26x0%,$(CPU_MODEL)))
+  DEFAULT_OPENOCD_CONFIG := $(RIOTBASE)/boards/common/cc26xx_cc13xx/dist/openocd_cc26x0.cfg
+endif
+ifneq (,$(filter cc26x2%,$(CPU_MODEL)))
+  DEFAULT_OPENOCD_CONFIG := $(RIOTBASE)/boards/common/cc26xx_cc13xx/dist/openocd_cc26x2.cfg
+endif
+
+# if no openocd specific configuration file, check for default locations:
+# 1. Using the default dist/openocd.cfg (automatically set by openocd.sh)
+# 2. Using the common cpu specific config file
+ifeq (,$(OPENOCD_CONFIG))
+  # if no openocd default configuration is provided by the board,
+  # use the default cc26xx / cc13xx config
+  ifeq (0,$(words $(wildcard $(BOARDDIR)/dist/openocd.cfg)))
+    OPENOCD_CONFIG := $(DEFAULT_OPENOCD_CONFIG)
+  endif
+endif
