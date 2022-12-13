@@ -1,5 +1,6 @@
 ifneq (,$(filter vl53l1x_st_api,$(USEMODULE)))
   USEMODULE += driver_vl53l1x_st_api_platform
+  USEMODULE += ztimer_usec
   USEPKG += driver_vl53l1x_st_api
 endif
 
