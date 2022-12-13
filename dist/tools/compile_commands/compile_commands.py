@@ -27,9 +27,11 @@ def detect_includes_and_version_gcc(compiler):
     :rtype: tuple
     """
     try:
+        process_env = dict(os.environ)
+        process_env["LC_MESSAGES"] = "C"
         with subprocess.Popen([compiler, "-v", "-E", "-"],
                               stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                              stderr=subprocess.PIPE) as proc:
+                              stderr=subprocess.PIPE, env=process_env) as proc:
             inputdata = b"typedef int dont_be_pedantic;"
             _, stderrdata = proc.communicate(input=inputdata)
     except FileNotFoundError:
