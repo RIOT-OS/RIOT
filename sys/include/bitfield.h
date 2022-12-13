@@ -320,7 +320,7 @@ int bf_get_unset(uint8_t field[], size_t len);
  * @brief  Get the index of the first set bit in the field
  *
  * @param[in]     field The bitfield
- * @param[in]     size  The size of the bitfield
+ * @param[in]     size  The number of bits in the bitfield
  *
  * @return      number of the first set bit
  * @return      -1 if no bit is set
@@ -331,7 +331,7 @@ int bf_find_first_set(const uint8_t field[], size_t size);
  * @brief  Get the index of the zero bit in the field
  *
  * @param[in]     field The bitfield
- * @param[in]     size  The size of the bitfield
+ * @param[in]     size  The number of bits in the bitfield
  *
  * @return      number of the first unset bit
  * @return      -1 if all bits are set
@@ -342,7 +342,7 @@ int bf_find_first_unset(const uint8_t field[], size_t size);
  * @brief  Set all bits in the bitfield to 1
  *
  * @param[in]     field The bitfield
- * @param[in]     size  The size of the bitfield
+ * @param[in]     size  The number of bits in the bitfield
  */
 void bf_set_all(uint8_t field[], size_t size);
 
@@ -350,7 +350,7 @@ void bf_set_all(uint8_t field[], size_t size);
  * @brief  Atomically set all bits in the bitfield to 1
  *
  * @param[in]     field The bitfield
- * @param[in]     size  The size of the bitfield
+ * @param[in]     size  The number of bits in the bitfield
  */
 static inline void bf_set_all_atomic(uint8_t field[], size_t size)
 {
@@ -363,7 +363,7 @@ static inline void bf_set_all_atomic(uint8_t field[], size_t size)
  * @brief  Clear all bits in the bitfield to 0
  *
  * @param[in]     field The bitfield
- * @param[in]     size  The size of the bitfield
+ * @param[in]     size  The number of bits in the bitfield
  */
 static inline void bf_clear_all(uint8_t field[], size_t size)
 {
@@ -374,7 +374,7 @@ static inline void bf_clear_all(uint8_t field[], size_t size)
  * @brief  Atomically clear all bits in the bitfield to 0
  *
  * @param[in]     field The bitfield
- * @param[in]     size  The size of the bitfield
+ * @param[in]     size  The number of bits in the bitfield
  */
 static inline void bf_clear_all_atomic(uint8_t field[], size_t size)
 {
@@ -387,7 +387,7 @@ static inline void bf_clear_all_atomic(uint8_t field[], size_t size)
  * @brief  Count set bits in the bitfield
  *
  * @param[in]     field The bitfield
- * @param[in]     size  The size of the bitfield
+ * @param[in]     size  The number of bits in the bitfield
  *
  * @return number of '1' bits in the bitfield
  */
