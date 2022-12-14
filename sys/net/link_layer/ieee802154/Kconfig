@@ -112,6 +112,10 @@ if KCONFIG_USEMODULE_IEEE802154
         bool "Disable Auto ACK support" if !USEPKG_OPENWSN
         default y if USEPKG_OPENWSN
 
+    config IEEE802154_DEFAULT_ACK_REQ
+        bool "Request ACKs by default"
+        default y
+
 menuconfig KCONFIG_USEMODULE_IEEE802154_SECURITY
     bool "Configure IEEE802.15.4 Security"
     depends on USEMODULE_IEEE802154_SECURITY
