@@ -99,8 +99,10 @@ static int _gnrc_icmpv6_ping(int argc, char **argv)
     };
     int res;
 
+    ztimer_acquire(ZTIMER_USEC);
+
     if ((res = _configure(argc, argv, &data)) != 0) {
-        return res;
+        goto ret;
     }
     gnrc_netreg_register(GNRC_NETTYPE_ICMPV6, &data.netreg);
     _pinger(&data);
@@ -143,6 +145,8 @@ finish:
             msg_send(&msg, thread_getpid());
         }
     }
+ret:
+    ztimer_release(ZTIMER_USEC);
     return res;
 }
 
