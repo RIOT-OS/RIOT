@@ -19,13 +19,14 @@
  * Using the according module, the driver can be used in different variants
  * which differ in functionality and size:
  *
- * Module Name         | Driver                | Short Description
- * :-------------------|:----------------------|:----------------------------
- * \ref vl53l1x_std    | Standard driver       | Common functionality and medium size
- * \ref vl53l1x_st_api | ST VL53L1X API driver | Complete functionality and large size
- * \ref vl53l1x_basic  | Basic driver          | Minimum functionality and small size
+ * Module Name         | Driver                    | Short Description
+ * :-------------------|:--------------------------|:----------------------------
+ * \ref vl53l1x_std    | Standard driver (default) | Common functionality and medium size
+ * \ref vl53l1x_st_api | ST VL53L1X API driver     | Complete functionality and large size
+ * \ref vl53l1x_basic  | Basic driver              | Minimum functionality and small size
  *
- * All driver variants provide @ref drivers_saul capabilities for distance.
+ * If no driver variant is explicitly specified, \ref vl53l1x_std is used by
+ * default. All driver variants provide \ref drivers_saul capabilities for distance.
  *
  * ## ST VL53L1X API driver (vl53l1x_st_api) {#vl53l1x_st_api}
  *
@@ -54,6 +55,11 @@
  *          very large, this driver variant should only be used when memory
  *          requirements are not an issue.
  *
+ * @warning The ST STSW-IMG007 VL53L1X API package functions use a significant
+ *          amount of memory in the stack. If you have crashes due to memory
+ *          access errors, try increasing the default thread stack size
+ *          \ref THREAD_STACKSIZE_DEFAULT.
+ *
  * ## Standard driver (vl53l1x_std) {#vl53l1x_std}
  *
  * This driver variant is a compromise of size and functionality. It provides
@@ -79,24 +85,25 @@
  *
  * ## Driver Comparison Sheet
  *
- * Function / Property             | vl53l1x_basic | vl53l1x | vl53l1x_st_api
- * :--------------------------------------|:------:|:----:|:--------------:
- * Distance results in mm                 | X      | X    | X
- * Signal rate results in MCPS            |        | X    | X
- * Measurement status information         |        | X    | X
- * SAUL capability                        | X      | X    | X
- * Distance mode configuration            |        | X    | X
- * Timing budget configuration            |        | X    | X
- * Inter-measurement period configuration |        | X    | X
- * Region of Interest (ROI) configuration |        | X    | X
- * Data-ready interrupts                  | X      | X    | X
- * Threshold interrupts                   |        |      | X
- * Calibration functions                  |        |      | X [1]
- * Limit check configuration              |        |      | X [1]
- * Accuracy                               | medium | high | high
- * Size on reference platform in kByte    | 1.3    | 4.2  | 27.9
+ * Function / Property                     | vl53l1x_basic | vl53l1x_std | vl53l1x_st_api
+ * :---------------------------------------|:-------------:|:-----------:|:--------------:
+ * Distance results in mm                  | X             | X           | X
+ * Signal rate results in MCPS             |               | X           | X
+ * Measurement status information          |               | X           | X
+ * SAUL capability                         | X             | X           | X
+ * Distance mode configuration             |               | X           | X
+ * Timing budget configuration             |               | X           | X
+ * Inter-measurement period configuration  |               | X           | X
+ * Region of Interest (ROI) configuration  |               | X           | X
+ * Data-ready interrupts                   | X             | X           | X
+ * Threshold interrupts                    |               |             | X
+ * Calibration functions                   |               |             | X [1]
+ * Limit check configuration               |               |             | X [1]
+ * Accuracy                                | medium        | high        | high
+ * Size on reference platform in kByte [2] | 1.0           | 2.9         | 19.8
  *
- * [1] These functions are available by using the ST VL53L1X API directly.
+ * [1] These functions are available by using the ST VL53L1X API directly.<br>
+ * [2] Reference platform: STM32F411RE
  *
  * @{
  *
