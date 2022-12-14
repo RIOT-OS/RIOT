@@ -71,6 +71,7 @@
 
 #include <string.h>
 
+#include "macros/units.h"
 #include "periph/i2c.h"
 #include "ztimer.h"
 
@@ -355,7 +356,7 @@ VL53L1_Error VL53L1_GetTimerFrequency(int32_t *ptimer_freq_hz)
     ASSERT_PARAM(ptimer_freq_hz != NULL);
     DEBUG_NODEV("ptimer_freq_hz=%p", ptimer_freq_hz);
 
-    *ptimer_freq_hz = (US_PER_MS * MS_PER_SEC);
+    *ptimer_freq_hz = MHZ(1);
 
     return status;
 }
