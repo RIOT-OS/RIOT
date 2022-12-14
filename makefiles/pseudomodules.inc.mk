@@ -337,7 +337,13 @@ PSEUDOMODULES += md5sum
 ## @}
 PSEUDOMODULES += mtd_write_page
 PSEUDOMODULES += nanocoap_%
+PSEUDOMODULES += netif_dev_default
+## @defgroup net_netdev_default  netdev_default
+## @ingroup net_netif
+## @{
+## @deprecated  Use module `netif_dev_default` instead; will be removed after 2023.07 release.
 PSEUDOMODULES += netdev_default
+## @}
 PSEUDOMODULES += netdev_ieee802154_%
 PSEUDOMODULES += netdev_ieee802154_rx_timestamp
 PSEUDOMODULES += netdev_ieee802154

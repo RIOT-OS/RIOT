@@ -17,3 +17,13 @@ config NETIF_NAMELENMAX
     default 8
 
 endif # KCONFIG_USEMODULE_NETIF
+
+if TEST_KCONFIG
+
+config MODULE_NETIF_DEV_DEFAULT
+    bool
+    help
+        Say y to enable the drivers for the default network devices present on
+        your platform.
+
+endif # TEST_KCONFIG

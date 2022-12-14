@@ -45,7 +45,7 @@ USEMODULE += openthread-$(OPENTHREAD_TYPE)
 # Comment the following line in order to disable the OpenThread CLI
 USEMODULE += openthread-cli-$(OPENTHREAD_TYPE)
 
-USEMODULE += netdev_default
+USEMODULE += netif_dev_default
 
 #Define PANID, CHANNEL and UART_BAUDRATE used by default
 OPENTHREAD_PANID ?= 0xbeef

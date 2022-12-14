@@ -30,7 +30,7 @@ USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += ps
 USEMODULE += od
-USEMODULE += netdev_default
+USEMODULE += netif_dev_default
 USEMODULE += ztimer_usec
 
 ifeq ($(BOARD),native)

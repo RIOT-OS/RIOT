@@ -2,7 +2,7 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
 endif
 
-ifneq (,$(filter netdev_default,$(USEMODULE)))
+ifneq (,$(filter netif_dev_default,$(USEMODULE)))
   USEMODULE += stm32_eth
 endif
 

@@ -50,7 +50,7 @@ endif
 
 ifneq (,$(filter openwsn_radio,$(USEMODULE)))
   # enable default network devices on the platform
-  USEMODULE += netdev_default
+  USEMODULE += netif_dev_default
   USEMODULE += netdev
   USEMODULE += luid
   ifneq (,$(filter cc2538_rf nrf802154,$(USEMODULE)))

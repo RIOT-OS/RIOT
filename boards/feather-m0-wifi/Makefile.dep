@@ -1,4 +1,4 @@
-ifneq (,$(filter netdev_default,$(USEMODULE)))
+ifneq (,$(filter netif_dev_default,$(USEMODULE)))
   USEMODULE += atwinc15x0
 endif
 

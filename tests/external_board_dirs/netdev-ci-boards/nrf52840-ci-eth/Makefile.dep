@@ -1,6 +1,6 @@
 USEMODULE += board_nrf52840_ci_eth
 
-ifneq (,$(filter netdev_default,$(USEMODULE)))
+ifneq (,$(filter netif_dev_default,$(USEMODULE)))
   USEMODULE += w5100
   USEMODULE += ethos
   USEMODULE += dose

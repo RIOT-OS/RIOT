@@ -45,7 +45,7 @@ USEMODULE += ps
 USEMODULE += event_thread
 USEMODULE += event_callback
 USEMODULE += xtimer
-USEMODULE += netdev_default
+USEMODULE += netif_dev_default
 
 CFLAGS += -DEVENT_THREAD_MEDIUM_STACKSIZE=1024
 
