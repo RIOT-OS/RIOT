@@ -172,9 +172,10 @@ static int _init(netdev_t *netdev)
     at86rf2xx_set_addr_long(dev, (eui64_t *)dev->netdev.long_addr);
     at86rf2xx_set_addr_short(dev, (network_uint16_t *)dev->netdev.short_addr);
     if (!IS_ACTIVE(AT86RF2XX_BASIC_MODE)) {
-        static const netopt_enable_t enable = NETOPT_ENABLE;
+        static const netopt_enable_t ack_req =
+            IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_ACK_REQ) ? NETOPT_ENABLE : NETOPT_DISABLE;
         netdev_ieee802154_set(&dev->netdev, NETOPT_ACK_REQ,
-                              &enable, sizeof(enable));
+                              &ack_req, sizeof(ack_req));
     }
 #if IS_USED(MODULE_IEEE802154_SECURITY) && \
     IS_USED(MODULE_AT86RF2XX_AES_SPI)
@@ -370,9 +371,10 @@ static int _set_state(at86rf2xx_t *dev, netopt_state_t state)
             at86rf2xx_set_addr_short(dev, (network_uint16_t *)dev->netdev.short_addr);
 
             if (!IS_ACTIVE(AT86RF2XX_BASIC_MODE)) {
-                static const netopt_enable_t enable = NETOPT_ENABLE;
+                static const netopt_enable_t ack_req =
+                    IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_ACK_REQ) ? NETOPT_ENABLE : NETOPT_DISABLE;
                 netdev_ieee802154_set(&dev->netdev, NETOPT_ACK_REQ,
-                                      &enable, sizeof(enable));
+                                      &ack_req, sizeof(ack_req));
             }
             at86rf2xx_reset(dev);
             break;
