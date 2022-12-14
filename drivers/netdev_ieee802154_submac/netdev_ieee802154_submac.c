@@ -356,13 +356,14 @@ static int _init(netdev_t *netdev)
 
     uint16_t chan = submac->channel_num;
     int16_t tx_power = submac->tx_pow;
-    netopt_enable_t enable = NETOPT_ENABLE;
+    static const netopt_enable_t ack_req =
+        IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_ACK_REQ) ? NETOPT_ENABLE : NETOPT_DISABLE;
 
     /* Initialise netdev_ieee802154_t struct */
     netdev_ieee802154_set(netdev_ieee802154, NETOPT_CHANNEL,
                           &chan, sizeof(chan));
     netdev_ieee802154_set(netdev_ieee802154, NETOPT_ACK_REQ,
-                          &enable, sizeof(enable));
+                          &ack_req, sizeof(ack_req));
 
     netdev_submac->dev.txpower = tx_power;
 
