@@ -593,7 +593,7 @@ static inline int gnrc_netif_ipv6_groups_get(const gnrc_netif_t *netif,
  * @return  -ENOTSUP, if @p netif doesn't support IPv6.
  */
 static inline int gnrc_netif_ipv6_group_join(const gnrc_netif_t *netif,
-                                             ipv6_addr_t *group)
+                                             const ipv6_addr_t *group)
 {
     assert(netif != NULL);
     assert(group != NULL);
@@ -615,7 +615,7 @@ static inline int gnrc_netif_ipv6_group_join(const gnrc_netif_t *netif,
  * @return  -ENOTSUP, if @p netif doesn't support IPv6.
  */
 static inline int gnrc_netif_ipv6_group_leave(const gnrc_netif_t *netif,
-                                              ipv6_addr_t *group)
+                                              const ipv6_addr_t *group)
 {
     assert(netif != NULL);
     assert(group != NULL);
