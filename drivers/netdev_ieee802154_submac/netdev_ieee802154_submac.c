@@ -141,7 +141,7 @@ void ieee802154_submac_ack_timer_set(ieee802154_submac_t *submac, uint16_t us)
                                                              netdev_ieee802154_submac_t,
                                                              submac);
 
-    xtimer_set(&netdev_submac->ack_timer, us);
+    ztimer_set(ZTIMER_USEC, &netdev_submac->ack_timer, us);
 }
 
 void ieee802154_submac_ack_timer_cancel(ieee802154_submac_t *submac)
@@ -150,7 +150,7 @@ void ieee802154_submac_ack_timer_cancel(ieee802154_submac_t *submac)
                                                              netdev_ieee802154_submac_t,
                                                              submac);
 
-    xtimer_remove(&netdev_submac->ack_timer);
+    ztimer_remove(ZTIMER_USEC, &netdev_submac->ack_timer);
     /* Prevent a race condition between the RX_DONE event and the ACK timeout */
     netdev_submac->isr_flags &= ~NETDEV_SUBMAC_FLAGS_ACK_TIMEOUT;
 
