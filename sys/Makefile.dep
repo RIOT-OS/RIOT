@@ -203,6 +203,10 @@ ifneq (,$(filter netif_dev_default,$(USEMODULE)))
   USEMODULE += netif_dev_default
 endif
 
+ifneq (,$(filter netif_dev_default,$(USEMODULE)))
+  USEMODULE += netif_dev_ieee802154_default
+endif
+
 ifneq (,$(filter netdev_ieee802154,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += random

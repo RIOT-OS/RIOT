@@ -7,8 +7,8 @@
 
 menuconfig MODULE_AT86RF2XX
     bool
-    prompt "AT86RF2xx series radios" if !(MODULE_NETDEV_DEFAULT && HAVE_AT86RF2XX)
-    default (MODULE_NETDEV_DEFAULT && HAVE_AT86RF2XX)
+    prompt "AT86RF2xx series radios" if !(MODULE_NETIF_DEV_IEEE802154_DEFAULT && HAVE_AT86RF2XX)
+    default (MODULE_NETIF_DEV_IEEE802154_DEFAULT && HAVE_AT86RF2XX)
     depends on TEST_KCONFIG
     select MODULE_IEEE802154
     select MODULE_NETDEV

@@ -22,8 +22,15 @@ if TEST_KCONFIG
 
 config MODULE_NETIF_DEV_DEFAULT
     bool
+    select MODULE_NETIF_DEV_IEEE802154_DEFAULT
     help
         Say y to enable the drivers for the default network devices present on
         your platform.
+
+config MODULE_NETIF_DEV_IEEE802154_DEFAULT
+    bool "Enable default IEEE 802.15.4 devices on the platform"
+    help
+        Say y to enable the drivers for the default IEEE 802.15.4 devices
+        present on your platform.
 
 endif # TEST_KCONFIG

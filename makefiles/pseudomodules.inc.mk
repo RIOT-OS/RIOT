@@ -338,6 +338,7 @@ PSEUDOMODULES += md5sum
 PSEUDOMODULES += mtd_write_page
 PSEUDOMODULES += nanocoap_%
 PSEUDOMODULES += netif_dev_default
+PSEUDOMODULES += netif_dev_ieee802154_default
 ## @defgroup net_netdev_default  netdev_default
 ## @ingroup net_netif
 ## @{

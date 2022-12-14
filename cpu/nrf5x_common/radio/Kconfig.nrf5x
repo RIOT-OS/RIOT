@@ -7,7 +7,10 @@
 
 config HAVE_NRF5X_RADIO
     bool
-    select NRF5X_RADIO if MODULE_NETDEV_DEFAULT
+    ## TODO: Since MODULE_NETIF_DEV_BLE_DEFAULT does not exist yet, we just
+    #        fallback to the old scenario if someone selects
+    #        MODULE_NETIF_DEV_DEFAULT.
+    select NRF5X_RADIO if (MODULE_NETIF_DEV_IEEE802154_DEFAULT)
     help
         Indicates that an NRF5X radio is present.
 
