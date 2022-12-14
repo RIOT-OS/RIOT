@@ -34,13 +34,13 @@
 /**
  * @brief   Allocate one lock per SPI device
  */
-static mutex_t locks[sizeof soft_spi_config];
+static mutex_t locks[SOFT_SPI_NUMOF];
 
 static inline bool soft_spi_bus_is_valid(soft_spi_t bus)
 {
     unsigned int soft_spi_num = (unsigned int) bus;
 
-    if (ARRAY_SIZE(soft_spi_config) < soft_spi_num) {
+    if (SOFT_SPI_NUMOF <= soft_spi_num) {
         return false;
     }
     return true;
