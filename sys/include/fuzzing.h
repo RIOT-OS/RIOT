@@ -26,16 +26,10 @@
 extern "C" {
 #endif
 
-
 #include <stdint.h>
 
 #include "net/ipv6/addr.h"
 #include "net/gnrc/pkt.h"
-
-
-/* buffer sizes for reading from an fd */
-#define FUZZING_BSIZE 1024
-#define FUZZING_BSTEP 128
 
 /**
  * @brief Initialize dummy network interface with given address.
@@ -63,7 +57,7 @@ int fuzzing_read_packet(int fd, gnrc_pktsnip_t *pkt);
  *
  * @param fd File descriptor to read data from.
  * @param size Byte count of the data read.
- *            
+ *
  * @return pointer to the data on success, NULL otherwise.
  */
 uint8_t *fuzzing_read_bytes(int fd, size_t *size);

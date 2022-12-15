@@ -23,6 +23,10 @@
 extern int fuzzing_netdev(gnrc_netif_t *);
 extern void fuzzing_netdev_wait(void);
 
+/* buffer sizes for reading from an fd */
+#define FUZZING_BSIZE 1024
+#define FUZZING_BSTEP 128
+
 /* used by gnrc_pktbuf_malloc to exit on free */
 gnrc_pktsnip_t *gnrc_pktbuf_fuzzptr = NULL;
 
@@ -48,39 +52,21 @@ fuzzing_init(ipv6_addr_t *addr, unsigned pfx_len)
 int
 fuzzing_read_packet(int fd, gnrc_pktsnip_t *pkt)
 {
-    ssize_t r;
-    size_t csiz, rsiz;
+    size_t rsiz;
 
     /* can only be called once currently */
     assert(gnrc_pktbuf_fuzzptr == NULL);
 
-    csiz = 0;
-    rsiz = FUZZING_BSIZE;
+    uint8_t *input = fuzzing_read_bytes(fd, &rsiz);
+    if (input == NULL) {
+        return -errno;
+    }
+
     if (gnrc_pktbuf_realloc_data(pkt, rsiz)) {
         return -ENOMEM;
     }
 
-    while ((r = read(fd, &((char *)pkt->data)[csiz], rsiz)) > 0) {
-        assert((size_t)r <= rsiz);
-
-        csiz += r;
-        rsiz -= r;
-
-        if (rsiz == 0) {
-            if (gnrc_pktbuf_realloc_data(pkt, csiz + FUZZING_BSTEP)) {
-                return -ENOMEM;
-            }
-            rsiz += FUZZING_BSTEP;
-        }
-    }
-    if (r == -1) {
-        return -errno;
-    }
-
-    /* shrink packet to actual size */
-    if (gnrc_pktbuf_realloc_data(pkt, csiz)) {
-        return -ENOMEM;
-    }
+    memcpy(pkt->data, input, rsiz);
 
     gnrc_pktbuf_fuzzptr = pkt;
     return 0;
@@ -116,7 +102,7 @@ fuzzing_read_bytes(int fd, size_t *size)
         return NULL;
     }
 
-    /* shrink packet to actual size */
+    /* shrink buffer to actual size */
     if ((buffer = realloc(buffer, csiz)) == NULL) {
         return NULL;
     }
