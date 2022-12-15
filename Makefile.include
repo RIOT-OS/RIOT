@@ -904,7 +904,7 @@ include $(RIOTMAKE)/tests/tests.inc.mk
 .PHONY: fuzz
 fuzz:
 	env FLASHFILE="$(FLASHFILE)" PORT="$(PORT)" TERMFLAGS="$(TERMFLAGS)" \
-		"$(RIOTBASE)"/dist/tools/fuzzing/afl.sh $(AFL_FLAGS)
+		"$(RIOTBASE)"/dist/tools/fuzzing/afl.sh $(FLAGS_FOR_AFL)
 
 # Default OBJDUMPFLAGS for platforms which do not specify it:
 OBJDUMPFLAGS ?= -S -D -h
