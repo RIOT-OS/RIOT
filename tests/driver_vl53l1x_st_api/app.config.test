@@ -2,3 +2,4 @@
 # application configuration. This is only needed during migration.
 CONFIG_MODULE_VL53L1X=y
 CONFIG_MODULE_VL53L1X_ST_API=y
+CONFIG_MODULE_ZTIMER_MSEC=y
