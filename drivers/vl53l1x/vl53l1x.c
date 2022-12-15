@@ -979,7 +979,8 @@ static int _reset(vl53l1x_t *dev)
     /* wait until the sensor has been booted in 1 ms steps*/
     unsigned timeout = VL53L1X_BOOT_TIMEOUT;
     uint8_t res;
-    while (timeout--) {
+    while (timeout) {
+        timeout--;
         if ((_read_byte(dev, VL53L1X_FIRMWARE__SYSTEM_STATUS, &res) == VL53L1X_OK) &&
             (res & 0x01) == 1) {
             break;

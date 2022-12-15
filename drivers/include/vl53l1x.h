@@ -332,7 +332,7 @@ typedef struct {
  * avalanche diode) array. The ROI is a square or rectangle defined by two
  * corners: top left and bottom right.
  */
-typedef struct{
+typedef struct {
     uint8_t x_tl; /**< ROI top left x coordinate [0...15] (default 0)  */
     uint8_t y_tl; /**< ROI top left y coordinate [0...15] (default 15) */
     uint8_t x_br; /**< ROI bottom right x coordinate [0...15] (default 15) */
