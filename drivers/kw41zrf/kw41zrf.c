@@ -252,9 +252,10 @@ int kw41zrf_reset(kw41zrf_t *dev)
     kw41zrf_set_option(dev, KW41ZRF_OPT_AUTOACK, 1);
     kw41zrf_set_option(dev, KW41ZRF_OPT_CSMA, 1);
 
-    static const netopt_enable_t enable = NETOPT_ENABLE;
+    static const netopt_enable_t ack_req =
+        IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_ACK_REQ) ? NETOPT_ENABLE : NETOPT_DISABLE;
     netdev_ieee802154_set(&dev->netdev, NETOPT_ACK_REQ,
-                          &enable, sizeof(enable));
+                          &ack_req, sizeof(ack_req));
 
     kw41zrf_abort_sequence(dev);
     kw41zrf_set_sequence(dev, dev->idle_seq);
