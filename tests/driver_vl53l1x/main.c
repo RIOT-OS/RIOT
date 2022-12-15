@@ -15,24 +15,24 @@
  * The test application demonstrates the usage of different functions
  * dependent on the used driver variant:
  *
- * - module vl53l1x         standard driver with most functionality is used
- * - module vl53l1x_st_api  ST API driver with complete functionality is used
- * - module vl53l1x_basic   basic driver with only very basic functionality is
- *                          used
+ * - vl53l1x         Standard driver with most functionality
+ * - vl53l1x_basic   Basic driver with only very basic functionality
+ * - vl53l1x_st_api  ST VL53L1X API driver with complete functionality
  *
- * What driver variant is used can be defined at make command line. By default,
- * the standard driver variant vl53l1x is used:
+ * The driver variant used is defined by my variable DRIVER, which is set to
+ * vl53l1x by default. In this case, it is not necessary to specify the DRIVER
+ * variable in the make command:
  *
  *     make flash -C tests/driver_vl53l1x BOARD=...
  *
  * To use other driver variants, module vl53l1x_st_api or module vl53l1x_basic
  * have to be specified at make command line
  *
- *     USEMODULE=vl53l1x_st_api make flash -C tests/driver_vl53l1x BOARD=...
+ *     DRIVER=vl53l1x_st_api make flash -C tests/driver_vl53l1x BOARD=...
  *
  * or
  *
- *     USEMODULE=vl53l1x_basic make flash -C tests/driver_vl53l1x BOARD=...
+ *     DRIVER=vl53l1x_basic make flash -C tests/driver_vl53l1x BOARD=...
  *
  * If the configuration parameter VL53L1X_PARAM_PIN_INT is defined, interrupts
  * are used to get data instead of polling for new data. In the case of driver
@@ -101,7 +101,6 @@ int main(void)
         printf("new ROI top left [%d, %d], ROI bottom right [%d, %d]\n",
                roi.x_tl, roi.y_tl, roi.x_br, roi.y_br);
     }
-
 #endif /* !IS_USED(MODULE_VL53L1X_BASIC) */
 
     mutex_t mtx = MUTEX_INIT_LOCKED;
