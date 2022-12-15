@@ -330,7 +330,9 @@ VL53L1_Error VL53L1_RdDWord(VL53L1_DEV Dev, uint16_t index, uint32_t *data)
         i2c_read_bytes(VL53L1_I2C_DEV, VL53L1_I2C_ADDR, bytes, 4, 0) != 0) {
         Status = VL5321_ERROR_I2C;
     }
-    *data = (bytes[0] << 24) + (bytes[1] << 16) + (bytes[2] << 8) + (bytes[3]);
+    *data = ((uint32_t)bytes[0] << 24) +
+            ((uint32_t)bytes[1] << 16) +
+            ((uint32_t)bytes[2] <<  8) + bytes[3];
 
     i2c_release(VL53L1_I2C_DEV);
 
