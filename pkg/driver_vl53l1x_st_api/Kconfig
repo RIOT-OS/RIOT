@@ -14,6 +14,6 @@ config PACKAGE_DRIVER_VL53L1X_ST_API
 
 config MODULE_DRIVER_VL53L1X_ST_API_PLATFORM
     bool
-    select MODULE_ZTIMER_USEC
+    select ZTIMER_USEC
     help
         Platform implementation for the ST VL53L1X Driver API package
