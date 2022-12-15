@@ -25,9 +25,9 @@
 
 #include "sht2x_params.h"
 #include "sht2x.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
-#define SLEEP_2S   (2 * 1000 * 1000u) /* 2 seconds delay between printf */
+#define SLEEP_2S   (2)  /* 2 seconds delay between printf */
 
 static void dump_buffer(const char* txt, uint8_t* buffer, size_t len);
 
@@ -94,7 +94,7 @@ int main(void)
                    );
         }
 
-        xtimer_usleep(SLEEP_2S);
+        ztimer_sleep(ZTIMER_SEC, SLEEP_2S);
     }
 
     return 0;
