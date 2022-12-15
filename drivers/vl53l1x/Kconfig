@@ -5,7 +5,7 @@
 # directory for more details.
 #
 
-config MODULE_VL53L1X
+menuconfig MODULE_VL53L1X
     bool "VL53L1X Time-of-Flight (ToF) ranging sensor"
     depends on HAS_PERIPH_GPIO
     depends on HAS_PERIPH_GPIO_IRQ
@@ -38,6 +38,7 @@ config MODULE_VL53L1X_STD
 
 config MODULE_VL53L1X_ST_API
     bool "Full functionality using the ST VL53L1X Full API"
+    select PACKAGE_DRIVER_VL53L1X_ST_API
     help
         This driver variant uses ST STSW-IMG007 VL53L1X API as package. In
         this case, the driver is simply a wrapper for the API which provides
