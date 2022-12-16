@@ -9,6 +9,9 @@ USEMODULE += esp_idf_common
 USEMODULE += esp_idf_efuse
 USEMODULE += esp_bootloader
 
+# _div_mulhi64() used by HAL
+USEMODULE += div
+
 ifneq (,$(filter newlib,$(USEMODULE)))
   DEFAULT_MODULE += newlib_nano
 endif
