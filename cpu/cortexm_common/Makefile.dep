@@ -4,10 +4,10 @@ USEMODULE += cortexm_common
 # include common periph code
 USEMODULE += cortexm_common_periph
 
-FEATURES_REQUIRED_ANY += newlib|picolibc
-ifneq (,$(filter newlib,$(USEMODULE)))
-  # use the nano-specs of Newlib when available
-  DEFAULT_MODULE += newlib_nano
+FEATURES_REQUIRED_ANY += picolibc|newlib
+ifneq (,$(filter newlib newlib_nano,$(USEMODULE)))
+  # use the picolibc when available
+  DEFAULT_MODULE += picolibc
 endif
 
 # Export the peripheral drivers to be linked into the final binary:
