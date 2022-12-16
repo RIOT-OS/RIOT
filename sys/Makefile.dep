@@ -266,15 +266,14 @@ ifneq (,$(filter newlib,$(USEMODULE)))
   ifeq (,$(filter newlib_syscalls_%,$(USEMODULE)))
     USEMODULE += newlib_syscalls_default
   endif
-  ifneq (,$(filter newlib_syscalls_default,$(USEMODULE)))
-    USEMODULE += div
-    ifneq (,$(filter libc_gettimeofday,$(USEMODULE)))
-      USEMODULE += xtimer
-      ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
-        # requires 64bit timestamps
-        USEMODULE += ztimer64_xtimer_compat
-      endif
-    endif
+endif
+
+ifneq (,$(filter libc_gettimeofday,$(USEMODULE)))
+  USEMODULE += div
+  USEMODULE += xtimer
+  ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+    # requires 64bit timestamps
+    USEMODULE += ztimer64_xtimer_compat
   endif
 endif
 

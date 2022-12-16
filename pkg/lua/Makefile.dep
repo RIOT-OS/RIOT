@@ -10,10 +10,6 @@ FEATURES_REQUIRED += arch_32bit
 # newlib nano).
 FEATURES_BLACKLIST += arch_riscv
 
-ifneq (,$(filter newlib_syscalls_default,$(USEMODULE)))
-  USEMODULE += libc_gettimeofday
-endif
-
-ifneq (,$(filter native,$(CPU)))
+ifneq (native,$(CPU))
   USEMODULE += libc_gettimeofday
 endif

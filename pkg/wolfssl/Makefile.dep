@@ -82,11 +82,7 @@ ifneq (,$(filter wolfcrypt_random,$(USEMODULE)))
   USEMODULE += random
 endif
 
-ifneq (,$(filter newlib_syscalls_default,$(USEMODULE)))
-  USEMODULE += libc_gettimeofday
-endif
-
-ifneq (,$(filter native,$(CPU)))
+ifneq (native,$(CPU))
   USEMODULE += libc_gettimeofday
 endif
 
