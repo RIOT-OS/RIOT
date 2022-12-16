@@ -19,15 +19,19 @@ OPENOCD_DEBUG_ADAPTER ?= xds110
 
 ifneq (,$(filter cc13x0%,$(CPU_MODEL)))
   DEFAULT_OPENOCD_CONFIG := $(RIOTBASE)/boards/common/cc26xx_cc13xx/dist/openocd_cc13x0.cfg
+  DEFAULT_JLINK_DEVICE := CC13xx
 endif
 ifneq (,$(filter cc13x2%,$(CPU_MODEL)))
   DEFAULT_OPENOCD_CONFIG := $(RIOTBASE)/boards/common/cc26xx_cc13xx/dist/openocd_cc13x2.cfg
+  DEFAULT_JLINK_DEVICE := CC13xx
 endif
 ifneq (,$(filter cc26x0%,$(CPU_MODEL)))
   DEFAULT_OPENOCD_CONFIG := $(RIOTBASE)/boards/common/cc26xx_cc13xx/dist/openocd_cc26x0.cfg
+  DEFAULT_JLINK_DEVICE := CC26xx
 endif
 ifneq (,$(filter cc26x2%,$(CPU_MODEL)))
   DEFAULT_OPENOCD_CONFIG := $(RIOTBASE)/boards/common/cc26xx_cc13xx/dist/openocd_cc26x2.cfg
+  DEFAULT_JLINK_DEVICE := CC26xx
 endif
 
 # if no openocd specific configuration file, check for default locations:
@@ -40,3 +44,6 @@ ifeq (,$(OPENOCD_CONFIG))
     OPENOCD_CONFIG := $(DEFAULT_OPENOCD_CONFIG)
   endif
 endif
+
+JLINK_DEVICE ?= $(DEFAULT_JLINK_DEVICE)
+JLINK_IF ?= jtag
