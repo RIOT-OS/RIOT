@@ -79,8 +79,7 @@ int main(void)
     uint8_t buffer[CONFIG_USBUS_HID_INTERRUPT_EP_SIZE];
 
     for (;;) {
-        ssize_t len =
-            usb_hid_io_read(buffer, CONFIG_USBUS_HID_INTERRUPT_EP_SIZE);
+        int len = usb_hid_io_read(buffer, CONFIG_USBUS_HID_INTERRUPT_EP_SIZE);
 
         puts("Msg received via USB HID: ");
         for (int i = 0; i < len; i++) {
