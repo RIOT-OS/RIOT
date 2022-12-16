@@ -22,6 +22,8 @@
 
 #include <errno.h>
 #include <stdio.h>
+#include <string.h>
+#include <sys/time.h>
 #include <sys/times.h>
 #include <unistd.h>
 
@@ -29,6 +31,8 @@
 #include "log.h"
 #include "periph/pm.h"
 #include "stdio_base.h"
+#include "random.h"
+#include "xtimer.h"
 
 #ifndef NUM_HEAPS
 #define NUM_HEAPS 1
@@ -268,7 +272,7 @@ pid_t getpid(void)
 }
 
 #if MODULE_VFS
-#include "vfs.h"
+#include "vfs_default.h"
 #else
 #include <sys/stat.h>
 #endif
@@ -619,3 +623,57 @@ int remove(const char *path)
 
     return rmdir(path);
 }
+
+int rename(const char *oldpath, const char *newpath)
+{
+#ifdef MODULE_VFS
+    return vfs_rename(oldpath, newpath);
+#else
+    (void)oldpath;
+    (void)newpath;
+    return -ENOTSUP;
+#endif
+}
+
+MAYBE_UNUSED
+static void _random_chars(uint8_t *c, size_t size)
+{
+    random_bytes(c, size);
+
+    for (uint8_t *end = c + size; c != end; ++c) {
+        *c = (*c > 128)
+           ? 'A' + (*c % 26)
+           : 'a' + (*c % 26);
+    }
+}
+
+FILE *tmpfile(void)
+{
+#ifdef VFS_DEFAULT_DATA
+    char buffer[32];
+    char *s = buffer;
+    strncpy(buffer, VFS_DEFAULT_DATA, sizeof(buffer));
+    s += sizeof(VFS_DEFAULT_DATA) - 1;
+    *s++ = '/';
+
+    size_t len = sizeof(buffer) - sizeof(".tmp") - (s - buffer);
+    _random_chars((void *)s, len);
+    s += len;
+    strcpy(s, ".tmp");
+
+    return fopen(buffer, "w+b");
+#else
+    return NULL;
+#endif
+}
+
+#ifdef MODULE_LIBC_GETTIMEOFDAY
+int gettimeofday(struct timeval *tp, void *tz)
+{
+    (void)tz;
+    uint64_t now = xtimer_now_usec64();
+    tp->tv_sec = div_u64_by_1000000(now);
+    tp->tv_usec = now - (tp->tv_sec * US_PER_SEC);
+    return 0;
+}
+#endif
