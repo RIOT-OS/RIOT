@@ -184,8 +184,8 @@ fi
 # configurations.
 if [ -z "${QUICK_BUILD}" ]; then
     export QUICK_BUILD=0
-    if [ "${CI_BUILD_BRANCH}" = "staging" ]; then
-        # always do full build for bors' integration branch
+    if [ "${CI_BUILD_BRANCH}" = "staging" ] || [ "${CI_BUILD_BRANCH}" = "trying" ]; then
+        # always do full build for bors' branches
         true
     elif [ ${FULL_BUILD} -eq 1 ]; then
         # full build if building nightly or full build requested by label
