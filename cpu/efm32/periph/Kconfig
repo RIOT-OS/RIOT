@@ -8,3 +8,4 @@
 config MODULE_PERIPH
     bool
     default y
+    select MODULE_USBDEV_SYNOPSYS_DWC2 if MODULE_PERIPH_USBDEV

@@ -13,4 +13,8 @@ endif
 # include CPU family module
 USEMODULE += cpu_$(CPU_FAM)
 
+ifneq (,$(filter periph_usbdev,$(USEMODULE)))
+  USEMODULE += usbdev_synopsys_dwc2
+endif
+
 include $(RIOTCPU)/cortexm_common/Makefile.dep
