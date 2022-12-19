@@ -105,18 +105,6 @@ extern "C" {
 int fido2_ctap_mem_init(void);
 
 /**
- * @brief Write to flash memory
- *
- * @param[in] buf       buffer to write
- * @param[in] page      page to write to
- * @param[in] offset    offset from the start of the page (in bytes)
- * @param[in] len       number of bytes to write
- *
- * @return @ref ctap_status_codes_t
- */
-int fido2_ctap_mem_write(const void *buf, uint32_t page, uint32_t offset, uint32_t len);
-
-/**
  * @brief Read from flash memory
  *
  * @param[out] buf        buffer to fil in
@@ -129,46 +117,55 @@ int fido2_ctap_mem_write(const void *buf, uint32_t page, uint32_t offset, uint32
 int fido2_ctap_mem_read(void *buf, uint32_t page, uint32_t offset, uint32_t len);
 
 /**
- * @brief Get flashpage number resident key with index @p rk_idx.
- *
- * @param[in] rk_idx    index of resident key
- *
- * @return page number if no error
- * @return -1 if @p rk_idx is invalid
- */
-int fido2_ctap_mem_get_flashpage_number_of_rk(uint16_t rk_idx);
-
-/**
- * @brief Get offset of resident key into flashpage where flashpage =
- * fido2_ctap_mem_get_flashpage_number_of_r(i)
- *
- * @param[in] rk_idx    index of resident key
- *
- * @return page number if no error
- * @return -1 if @p rk_idx is invalid
- */
-int fido2_ctap_mem_get_offset_of_rk_into_flashpage(uint16_t rk_idx);
-
-/**
- * @brief Get page number for storing authenticator state information
- *
- * @return page number
- */
-unsigned fido2_ctap_mem_flash_page(void);
-
-/**
- * @brief Get start page for storing resident keys
- *
- * @return page number
- */
-unsigned fido2_ctap_mem_get_rk_start_page(void);
-
-/**
  * @brief Erase all flashpages containing CTAP data
  *
  * @return @ref ctap_status_codes_t
  */
 int fido2_ctap_mem_erase_flash(void);
+
+/**
+ * @brief Read authenticator state from flash
+ *
+ * @param[in]  state       pointer to authenticator state
+ *
+ * @return @ref ctap_status_codes_t
+ */
+int fido2_ctap_mem_read_state_from_flash(ctap_state_t *state);
+
+/**
+ * @brief Write authenticator state to flash
+ *
+ * @param[in]  state       pointer to authenticator state
+ *
+ * @return @ref ctap_status_codes_t
+ */
+int fido2_ctap_mem_write_state_to_flash(ctap_state_t *state);
+
+/**
+ * @brief Find resident credential for @p rp_id_hash in flash
+ *
+ * The function stores the flash address of the next credential in @p addr.
+ * This allows for consecutive calls of the function in order to find all
+ * stored credentials stored for the relying party identified by
+ * @p rp_id_hash.
+ *
+ * @param[in]  key       pointer to authenticator state
+ * @param[in]   rp_id_hash pointer to hash of rp domain string
+ * @param[in] addr pointer to address where to read from
+ *
+ * @return @ref ctap_status_codes_t
+ */
+int fido2_ctap_mem_read_rk_from_flash(ctap_resident_key_t *key, uint8_t *rp_id_hash,
+                                      uint32_t *addr);
+
+/**
+ * @brief Write resident credential to flash
+ *
+ * @param[in]  rk      pointer to resident credential
+ *
+ * @return @ref ctap_status_codes_t
+ */
+int fido2_ctap_mem_write_rk_to_flash(ctap_resident_key_t *rk);
 
 #ifdef __cplusplus
 }
