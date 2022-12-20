@@ -125,3 +125,33 @@ int _mbox_get(mbox_t *mbox, msg_t *msg, int blocking)
         return 0;
     }
 }
+
+bool mbox_try_get_with_type(mbox_t *mbox, msg_t *msg, uint16_t type)
+{
+    unsigned irqstate = irq_disable();
+    unsigned end_pos = mbox->cib.read_count + cib_avail(&mbox->cib);
+    const unsigned mask = mbox->cib.mask;
+
+    for (unsigned pos = mbox->cib.read_count; pos != end_pos; pos++) {
+        msg_t *iter = &mbox->msg_array[pos & mask];
+        if (iter->type != type) {
+            continue;
+        }
+
+        *msg = *iter;
+
+        /* move messages in front of the one popped one position backwards
+         * to not have a hole in the data */
+        for (; pos != mbox->cib.read_count; pos--) {
+            mbox->msg_array[pos & mask] = mbox->msg_array[(pos - 1) & mask];
+        }
+
+        /* bump reading pos to mark retrieved message as fetched */
+        mbox->cib.read_count++;
+        irq_restore(irqstate);
+        return true;
+    }
+
+    irq_restore(irqstate);
+    return false;
+}

@@ -65,6 +65,13 @@ Test *tests_core_clist_tests(void);
 Test *tests_core_list_tests(void);
 
 /**
+ * @brief   Generates tests for mbox.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_core_mbox_tests(void);
+
+/**
  * @brief   Generates tests for priority_queue.h
  *
  * @return  embUnit tests if successful, NULL if not.

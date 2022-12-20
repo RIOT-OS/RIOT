@@ -162,6 +162,19 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
 #elif IS_USED(MODULE_XTIMER)
     xtimer_remove(&timeout_timer);
 #endif
+
+#if IS_USED(MODULE_XTIMER) || IS_USED(MODULE_ZTIMER_USEC)
+    /* The timeout may have fired after the message was received but
+     * before the timer was removed. In this case, the mbox contains the
+     * expected message followed by the unexpected timeout message. We need
+     * to drain the unexpected timeout message to not have a bogus timeout
+     * error on the next call or confusing other places in the code */
+    {
+        msg_t garbage_bin;
+        mbox_try_get_with_type(&reg->mbox, &garbage_bin, _TIMEOUT_MSG_TYPE);
+    }
+#endif
+
     switch (msg.type) {
         case GNRC_NETAPI_MSG_TYPE_RCV:
             pkt = msg.content.ptr;
