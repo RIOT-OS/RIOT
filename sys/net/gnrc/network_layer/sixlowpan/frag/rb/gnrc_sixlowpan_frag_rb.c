@@ -31,7 +31,7 @@
 #include "net/sixlowpan.h"
 #include "net/sixlowpan/sfr.h"
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "utlist.h"
 
 #include "net/gnrc/sixlowpan/frag/rb.h"
@@ -65,7 +65,7 @@ static gnrc_sixlowpan_frag_rb_t rbuf[CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_SIZE];
 
 static char l2addr_str[3 * IEEE802154_LONG_ADDRESS_LEN];
 
-static xtimer_t _gc_timer;
+static ztimer_t _gc_timer;
 static msg_t _gc_timer_msg = { .type = GNRC_SIXLOWPAN_FRAG_RB_GC_MSG };
 
 /* ------------------------------------
@@ -566,14 +566,14 @@ static void _gc_pkt(gnrc_sixlowpan_frag_rb_t *rbuf)
 
 void gnrc_sixlowpan_frag_rb_gc(void)
 {
-    uint32_t now_usec = xtimer_now_usec();
+    uint32_t now_msec = ztimer_now(ZTIMER_MSEC);
     unsigned int i;
 
     for (i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
         /* since pkt occupies pktbuf, aggressivly collect garbage */
         if (!gnrc_sixlowpan_frag_rb_entry_empty(&rbuf[i]) &&
-              ((now_usec - rbuf[i].super.arrival) >
-               CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)) {
+              ((now_msec - rbuf[i].super.arrival) >
+               CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US / US_PER_MS)) {
             DEBUG("6lo rfrag: entry (%s, ",
                   gnrc_netif_addr_to_str(rbuf[i].super.src,
                                          rbuf[i].super.src_len,
@@ -595,7 +595,8 @@ void gnrc_sixlowpan_frag_rb_gc(void)
 
 static inline void _set_rbuf_timeout(void)
 {
-    xtimer_set_msg(&_gc_timer, CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US,
+    ztimer_set_msg(ZTIMER_MSEC, &_gc_timer,
+                   CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US / US_PER_MS,
                    &_gc_timer_msg, thread_getpid());
 }
 
@@ -605,7 +606,7 @@ static int _rbuf_get(const void *src, size_t src_len,
                      unsigned page)
 {
     gnrc_sixlowpan_frag_rb_t *res = NULL, *oldest = NULL;
-    uint32_t now_usec = xtimer_now_usec();
+    uint32_t now_msec = ztimer_now(ZTIMER_MSEC);
 
     for (unsigned int i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
         /* check first if entry already available */
@@ -637,7 +638,7 @@ static int _rbuf_get(const void *src, size_t src_len,
                 return -1;
             }
 #endif
-            rbuf[i].super.arrival = now_usec;
+            rbuf[i].super.arrival = now_msec;
             _set_rbuf_timeout();
             return i;
         }
@@ -648,7 +649,7 @@ static int _rbuf_get(const void *src, size_t src_len,
         }
 
         /* remember oldest slot */
-        /* note that xtimer_now will overflow in ~1.2 hours */
+        /* note that ztimer_now may overflow */
         if ((oldest == NULL) ||
             (oldest->super.arrival - rbuf[i].super.arrival < UINT32_MAX / 2)) {
             oldest = &(rbuf[i]);
@@ -662,8 +663,8 @@ static int _rbuf_get(const void *src, size_t src_len,
          * oldest could have been picked as res) */
         assert(!gnrc_sixlowpan_frag_rb_entry_empty(oldest));
         if (!IS_ACTIVE(CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE) ||
-            ((now_usec - oldest->super.arrival) >
-            CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)) {
+            ((now_msec - oldest->super.arrival) >
+            CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US / US_PER_MS)) {
             DEBUG("6lo rfrag: reassembly buffer full, remove oldest entry\n");
             gnrc_pktbuf_release(oldest->pkt);
             gnrc_sixlowpan_frag_rb_remove(oldest);
@@ -722,7 +723,7 @@ static int _rbuf_get(const void *src, size_t src_len,
         memset(res->pkt->data, 0, sizeof(uint64_t));
     }
     res->super.datagram_size = size;
-    res->super.arrival = now_usec;
+    res->super.arrival = now_msec;
     memcpy(res->super.src, src, src_len);
     memcpy(res->super.dst, dst, dst_len);
     res->super.src_len = src_len;
@@ -750,7 +751,7 @@ static int _rbuf_get(const void *src, size_t src_len,
 #ifdef TEST_SUITES
 void gnrc_sixlowpan_frag_rb_reset(void)
 {
-    xtimer_remove(&_gc_timer);
+    ztimer_remove(ZTIMER_MSEC, &_gc_timer);
     memset(rbuf_int, 0, sizeof(rbuf_int));
     for (unsigned int i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
         if ((rbuf[i].pkt != NULL) &&
@@ -788,9 +789,9 @@ static void _tmp_rm(gnrc_sixlowpan_frag_rb_t *rbuf)
          * setting the arrival time to
          * (CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US - CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER)
          * microseconds in the past */
-        rbuf->super.arrival = xtimer_now_usec() -
+        rbuf->super.arrival = ztimer_now(ZTIMER_MSEC) -
                               (CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US -
-                               CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER);
+                               CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER) / US_PER_MS;
         /* reset current size to prevent late duplicates to trigger another
          * dispatch */
         rbuf->super.current_size = 0;

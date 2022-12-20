@@ -41,7 +41,7 @@
 #include "od.h"
 #endif
 #include "utlist.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define SEND_PACKET_TIMEOUT                         (500U)
 
@@ -331,7 +331,7 @@ static int _mock_netdev_send(netdev_t *dev, const iolist_t *iolist);
 static void _set_up(void)
 {
     /* reset data-structures */
-    _last_sent_frame = xtimer_now_usec() - CONFIG_GNRC_SIXLOWPAN_SFR_INTER_FRAME_GAP_US;
+    _last_sent_frame = ztimer_now(ZTIMER_USEC) - CONFIG_GNRC_SIXLOWPAN_SFR_INTER_FRAME_GAP_US;
     gnrc_sixlowpan_frag_rb_reset();
     gnrc_sixlowpan_frag_vrb_reset();
     gnrc_pktbuf_init();
@@ -2167,7 +2167,7 @@ static void test_sixlo_recv_ep__complete_datagram(void)
     for (unsigned i = 0; i < 5U; i++) {
         msg_t msg;
 
-        if (xtimer_msg_receive_timeout(&msg, 1000) < 0) {
+        if (ztimer_msg_receive_timeout(ZTIMER_USEC, &msg, 1000) < 0) {
             continue;
         }
         if (msg.type == GNRC_NETAPI_MSG_TYPE_RCV) {
@@ -2196,7 +2196,7 @@ static void test_sixlo_recv_ep__complete_datagram(void)
             gnrc_pktbuf_release(msg.content.ptr);
         }
     }
-    xtimer_usleep(1000);    /* give GNRC time to clean up */
+    ztimer_sleep(ZTIMER_USEC, 1000);    /* give GNRC time to clean up */
     TEST_ASSERT(gnrc_pktbuf_is_sane());
     TEST_ASSERT(gnrc_pktbuf_is_empty());
 }
@@ -2839,10 +2839,10 @@ static size_t _wait_for_packet(size_t exp_size)
     size_t mhr_len;
     uint32_t now = 0U;
 
-    xtimer_mutex_lock_timeout(&_target_buf_filled,
+    ztimer_mutex_lock_timeout(ZTIMER_USEC, &_target_buf_filled,
                               SEND_PACKET_TIMEOUT);
     while ((mhr_len = ieee802154_get_frame_hdr_len(_target_buf))) {
-        now = xtimer_now_usec();
+        now = ztimer_now(ZTIMER_USEC);
         size_t size = _target_buf_len - mhr_len;
 #ifdef MODULE_OD
         if (_target_buf_len > 0) {
@@ -2862,7 +2862,7 @@ static size_t _wait_for_packet(size_t exp_size)
         /* let packets in again at the device */
         mutex_unlock(&_target_buf_barrier);
         /* wait for next packet */
-        if (xtimer_mutex_lock_timeout(&_target_buf_filled,
+        if (ztimer_mutex_lock_timeout(ZTIMER_USEC, &_target_buf_filled,
                                       SEND_PACKET_TIMEOUT) < 0) {
             return 0;
         }
@@ -2881,7 +2881,7 @@ static size_t _wait_for_packet(size_t exp_size)
 static inline void _wait_arq_timeout(gnrc_sixlowpan_frag_fb_t *fbuf)
 {
     /* wait 1.25 * arq_timeout of datagram fbuf->tag */
-    xtimer_usleep((fbuf->sfr.arq_timeout +
+    ztimer_sleep(ZTIMER_USEC, (fbuf->sfr.arq_timeout +
                    (fbuf->sfr.arq_timeout >> 2)) * US_PER_MS);
 }
 

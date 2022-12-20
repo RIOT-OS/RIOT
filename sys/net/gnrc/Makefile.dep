@@ -228,7 +228,7 @@ ifneq (,$(filter gnrc_sixlowpan_frag_minfwd,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_frag_rb,$(USEMODULE)))
-  USEMODULE += xtimer
+  USEMODULE += ztimer_msec
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_frag_sfr,$(USEMODULE)))
@@ -237,7 +237,7 @@ ifneq (,$(filter gnrc_sixlowpan_frag_sfr,$(USEMODULE)))
   USEMODULE += gnrc_sixlowpan_frag_vrb
   USEMODULE += gnrc_sixlowpan_frag_rb
   USEMODULE += evtimer
-  USEMODULE += xtimer
+  USEMODULE += ztimer_msec
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_frag_sfr_congure_%,$(USEMODULE)))

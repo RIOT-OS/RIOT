@@ -2,6 +2,7 @@ include ../Makefile.tests_common
 
 USEMODULE += gnrc_sixlowpan_frag
 USEMODULE += embunit
+USEMODULE += ztimer_usec
 
 # GNRC modules should not be initialized unless we want to
 DISABLE_MODULE += auto_init_gnrc_%

@@ -39,7 +39,7 @@
 /* for debugging _target_buf */
 #include "od.h"
 #include "utlist.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define SEND_PACKET_TIMEOUT                         (500U)
 
@@ -432,7 +432,7 @@ static void test_minfwd_vrbe_from_route__vrb_full(void)
     TEST_ASSERT_EQUAL_INT(0, _set_route_and_nce(&ipv6_hdr.dst, REM_GB_PFX_LEN));
     /* fill up VRB */
     for (unsigned i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_SIZE; i++) {
-        base.arrival = xtimer_now_usec();
+        base.arrival = ztimer_now(ZTIMER_MSEC);
         TEST_ASSERT_NOT_NULL(gnrc_sixlowpan_frag_vrb_add(&base,
                                                          _mock_netif,
                                                          _rem_l2,
@@ -453,7 +453,7 @@ static void test_minfwd_forward__success__1st_frag_sixlo(void)
     gnrc_pktsnip_t *pkt, *frag;
     size_t mhr_len;
 
-    vrbe->super.arrival = xtimer_now_usec();
+    vrbe->super.arrival = ztimer_now(ZTIMER_MSEC);
     TEST_ASSERT_NOT_NULL((pkt = gnrc_pktbuf_add(NULL, _test_1st_frag_uncomp,
                                                 sizeof(_test_1st_frag_uncomp),
                                                 GNRC_NETTYPE_SIXLOWPAN)));
@@ -493,7 +493,7 @@ static void test_minfwd_forward__success__1st_frag_iphc(void)
     gnrc_pktsnip_t *pkt, *frag;
     size_t mhr_len;
 
-    vrbe->super.arrival = xtimer_now_usec();
+    vrbe->super.arrival = ztimer_now(ZTIMER_MSEC);
     TEST_ASSERT_NOT_NULL((pkt = gnrc_pktbuf_add(NULL, _test_1st_frag_comp,
                                                 sizeof(_test_1st_frag_comp),
                                                 GNRC_NETTYPE_SIXLOWPAN)));
@@ -537,7 +537,7 @@ static void test_minfwd_forward__success__nth_frag_incomplete(void)
     gnrc_pktsnip_t *pkt, *frag;
     size_t mhr_len;
 
-    vrbe->super.arrival = xtimer_now_usec();
+    vrbe->super.arrival = ztimer_now(ZTIMER_MSEC);
     TEST_ASSERT_NOT_NULL((pkt = gnrc_pktbuf_add(NULL, _test_nth_frag,
                                                 sizeof(_test_nth_frag),
                                                 GNRC_NETTYPE_SIXLOWPAN)));
@@ -582,7 +582,7 @@ static void test_minfwd_forward__success__nth_frag_complete(void)
         );
     gnrc_pktsnip_t *pkt, *frag;
 
-    vrbe->super.arrival = xtimer_now_usec();
+    vrbe->super.arrival = ztimer_now(ZTIMER_MSEC);
     TEST_ASSERT_NOT_NULL((pkt = gnrc_pktbuf_add(NULL, _test_nth_frag,
                                                 sizeof(_test_nth_frag),
                                                 GNRC_NETTYPE_SIXLOWPAN)));
@@ -623,7 +623,7 @@ static void test_minfwd_forward__ENOMEM__netif_hdr_build_fail(void)
         );
     gnrc_pktsnip_t *pkt, *frag, *filled_space;
 
-    vrbe->super.arrival = xtimer_now_usec();
+    vrbe->super.arrival = ztimer_now(ZTIMER_MSEC);
     TEST_ASSERT_NOT_NULL((filled_space = gnrc_pktbuf_add(
             NULL, NULL,
             /* 115U == 2 * sizeof(gnrc_pktsnip_t) + movement due to mark */
@@ -1210,7 +1210,7 @@ static void test_sixlo_recv__nth_frag(void)
             (vrbe = gnrc_sixlowpan_frag_vrb_add(&_vrbe_base, _mock_netif,
                                                 _rem_l2, sizeof(_rem_l2)))
         );
-    vrbe->super.arrival = xtimer_now_usec();
+    vrbe->super.arrival = ztimer_now(ZTIMER_MSEC);
     netdev_ieee802154_t *netdev_ieee802154 = container_of(_mock_netif->dev,
                                                           netdev_ieee802154_t,
                                                           netdev);
@@ -1256,7 +1256,7 @@ static void test_sixlo_recv__nth_frag__datagram_complete(void)
         );
     /* simulate current_size only missing the created fragment */
     vrbe->super.current_size = _vrbe_base.datagram_size - TEST_NTH_FRAG_SIZE;
-    vrbe->super.arrival = xtimer_now_usec();
+    vrbe->super.arrival = ztimer_now(ZTIMER_MSEC);
     netdev_ieee802154_t *netdev_ieee802154 = container_of(_mock_netif->dev,
                                                           netdev_ieee802154_t,
                                                           netdev);
@@ -1334,7 +1334,7 @@ static void test_sixlo_recv__nth_frag__duplicate(void)
             (vrbe = gnrc_sixlowpan_frag_vrb_add(&_vrbe_base, _mock_netif,
                                                 _rem_l2, sizeof(_rem_l2)))
         );
-    vrbe->super.arrival = xtimer_now_usec();
+    vrbe->super.arrival = ztimer_now(ZTIMER_MSEC);
     netdev_ieee802154_t *netdev_ieee802154 = container_of(_mock_netif->dev,
                                                           netdev_ieee802154_t,
                                                           netdev);
@@ -1389,7 +1389,7 @@ static void test_sixlo_recv__nth_frag__overlap(void)
             (vrbe = gnrc_sixlowpan_frag_vrb_add(&_vrbe_base, _mock_netif,
                                                 _rem_l2, sizeof(_rem_l2)))
         );
-    vrbe->super.arrival = xtimer_now_usec();
+    vrbe->super.arrival = ztimer_now(ZTIMER_MSEC);
     netdev_ieee802154_t *netdev_ieee802154 = container_of(_mock_netif->dev,
                                                           netdev_ieee802154_t,
                                                           netdev);
@@ -1599,7 +1599,7 @@ static size_t _wait_for_packet(size_t exp_size)
 {
     size_t mhr_len;
 
-    xtimer_mutex_lock_timeout(&_target_buf_filled,
+    ztimer_mutex_lock_timeout(ZTIMER_USEC, &_target_buf_filled,
                               SEND_PACKET_TIMEOUT);
     while ((mhr_len = ieee802154_get_frame_hdr_len(_target_buf))) {
         if (IS_USED(MODULE_OD) && _target_buf_len > 0) {
@@ -1613,7 +1613,7 @@ static size_t _wait_for_packet(size_t exp_size)
         /* let packets in again at the device */
         mutex_unlock(&_target_buf_barrier);
         /* wait for next packet */
-        if (xtimer_mutex_lock_timeout(&_target_buf_filled,
+        if (ztimer_mutex_lock_timeout(ZTIMER_USEC, &_target_buf_filled,
                                       SEND_PACKET_TIMEOUT) < 0) {
             return 0;
         }

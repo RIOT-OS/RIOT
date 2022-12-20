@@ -85,7 +85,7 @@ typedef struct {
      * @brief   The number of bytes currently received of the complete datagram
      */
     uint16_t current_size;
-    uint32_t arrival;                           /**< time in microseconds of arrival of
+    uint32_t arrival;                           /**< time in millseconds of arrival of
                                                  *   last received fragment */
 } gnrc_sixlowpan_frag_rb_base_t;
 
