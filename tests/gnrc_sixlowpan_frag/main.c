@@ -32,7 +32,7 @@
 #define TEST_NETIF_IFACE        (9)
 #define TEST_TAG                (0x690e)
 #define TEST_PAGE               (0)
-#define TEST_RECEIVE_TIMEOUT    (100U)
+#define TEST_RECEIVE_TIMEOUT    (1000U)
 #define TEST_GC_TIMEOUT         (CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US + TEST_RECEIVE_TIMEOUT)
 
 /* test date taken from an experimental run (uncompressed ICMPv6 echo reply with
