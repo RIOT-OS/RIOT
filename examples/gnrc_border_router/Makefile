@@ -43,7 +43,7 @@ USEMODULE += ps
 #USEMODULE += gnrc_ipv6_nib_dns     # include RDNSS option handling
 
 # When using a regular network uplink we should use DHCPv6
-ifneq (,$(filter cdc-ecm wifi ethernet,$(UPLINK)) $(REUSE_TAP))
+ifneq (,$(filter cdc-ecm wifi ethernet,$(UPLINK))$(REUSE_TAP))
   PREFIX_CONF ?= dhcpv6
 else
   PREFIX_CONF ?= uhcp
