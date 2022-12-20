@@ -13,4 +13,6 @@ USEMODULE += gnrc_udp
 # Dumps packets
 USEMODULE += gnrc_pktdump
 
+USEMODULE += ztimer_usec
+
 include $(RIOTBASE)/Makefile.include
