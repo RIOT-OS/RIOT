@@ -43,7 +43,7 @@
 #include "utlist.h"
 #include "ztimer.h"
 
-#define SEND_PACKET_TIMEOUT                         (500U)
+#define SEND_PACKET_TIMEOUT                         (1U)
 
 #define LOC_L2  { _LL0, _LL1, _LL2, _LL3, _LL4, _LL5, _LL6, _LL7 }
 #define LOC_LL  { 0xfe,         0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
@@ -2167,7 +2167,7 @@ static void test_sixlo_recv_ep__complete_datagram(void)
     for (unsigned i = 0; i < 5U; i++) {
         msg_t msg;
 
-        if (ztimer_msg_receive_timeout(ZTIMER_USEC, &msg, 1000) < 0) {
+        if (ztimer_msg_receive_timeout(ZTIMER_MSEC, &msg, 1) < 0) {
             continue;
         }
         if (msg.type == GNRC_NETAPI_MSG_TYPE_RCV) {
@@ -2196,7 +2196,7 @@ static void test_sixlo_recv_ep__complete_datagram(void)
             gnrc_pktbuf_release(msg.content.ptr);
         }
     }
-    ztimer_sleep(ZTIMER_USEC, 1000);    /* give GNRC time to clean up */
+    ztimer_sleep(ZTIMER_MSEC, 1);    /* give GNRC time to clean up */
     TEST_ASSERT(gnrc_pktbuf_is_sane());
     TEST_ASSERT(gnrc_pktbuf_is_empty());
 }
@@ -2839,7 +2839,7 @@ static size_t _wait_for_packet(size_t exp_size)
     size_t mhr_len;
     uint32_t now = 0U;
 
-    ztimer_mutex_lock_timeout(ZTIMER_USEC, &_target_buf_filled,
+    ztimer_mutex_lock_timeout(ZTIMER_MSEC, &_target_buf_filled,
                               SEND_PACKET_TIMEOUT);
     while ((mhr_len = ieee802154_get_frame_hdr_len(_target_buf))) {
         now = ztimer_now(ZTIMER_USEC);
@@ -2862,7 +2862,7 @@ static size_t _wait_for_packet(size_t exp_size)
         /* let packets in again at the device */
         mutex_unlock(&_target_buf_barrier);
         /* wait for next packet */
-        if (ztimer_mutex_lock_timeout(ZTIMER_USEC, &_target_buf_filled,
+        if (ztimer_mutex_lock_timeout(ZTIMER_MSEC, &_target_buf_filled,
                                       SEND_PACKET_TIMEOUT) < 0) {
             return 0;
         }
@@ -2881,8 +2881,7 @@ static size_t _wait_for_packet(size_t exp_size)
 static inline void _wait_arq_timeout(gnrc_sixlowpan_frag_fb_t *fbuf)
 {
     /* wait 1.25 * arq_timeout of datagram fbuf->tag */
-    ztimer_sleep(ZTIMER_USEC, (fbuf->sfr.arq_timeout +
-                   (fbuf->sfr.arq_timeout >> 2)) * US_PER_MS);
+    ztimer_sleep(ZTIMER_MSEC, fbuf->sfr.arq_timeout + (fbuf->sfr.arq_timeout >> 2));
 }
 
 static void _check_vrbe_values(gnrc_sixlowpan_frag_vrb_t *vrbe,

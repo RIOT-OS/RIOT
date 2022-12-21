@@ -41,7 +41,7 @@
 #include "utlist.h"
 #include "ztimer.h"
 
-#define SEND_PACKET_TIMEOUT                         (500U)
+#define SEND_PACKET_TIMEOUT                         (1U)
 
 #define LOC_L2  { _LL0, _LL1, _LL2, _LL3, _LL4, _LL5, _LL6, _LL7 }
 #define LOC_LL  { 0xfe,         0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
@@ -1599,7 +1599,7 @@ static size_t _wait_for_packet(size_t exp_size)
 {
     size_t mhr_len;
 
-    ztimer_mutex_lock_timeout(ZTIMER_USEC, &_target_buf_filled,
+    ztimer_mutex_lock_timeout(ZTIMER_MSEC, &_target_buf_filled,
                               SEND_PACKET_TIMEOUT);
     while ((mhr_len = ieee802154_get_frame_hdr_len(_target_buf))) {
         if (IS_USED(MODULE_OD) && _target_buf_len > 0) {
@@ -1613,7 +1613,7 @@ static size_t _wait_for_packet(size_t exp_size)
         /* let packets in again at the device */
         mutex_unlock(&_target_buf_barrier);
         /* wait for next packet */
-        if (ztimer_mutex_lock_timeout(ZTIMER_USEC, &_target_buf_filled,
+        if (ztimer_mutex_lock_timeout(ZTIMER_MSEC, &_target_buf_filled,
                                       SEND_PACKET_TIMEOUT) < 0) {
             return 0;
         }

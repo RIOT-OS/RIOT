@@ -1781,12 +1781,12 @@ static void _handle_ack(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         }
         if ((unaligned_get_u32(hdr->bitmap) == _full_bitmap.u32) ||
             (unaligned_get_u32(hdr->bitmap) == _null_bitmap.u32)) {
-            if (CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER > 0) {
-                /* garbage-collect entry after CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER
-                 * microseconds */
+            if (CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER_MS > 0) {
+                /* garbage-collect entry after CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER_MS
+                 * milliseconds */
                 vrbe->super.arrival = recv_time -
-                                      (CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US -
-                                       CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER) / US_PER_MS;
+                                      (CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_MS -
+                                       CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER_MS)
             }
             else {
                 gnrc_sixlowpan_frag_vrb_rm(vrbe);

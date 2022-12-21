@@ -81,12 +81,29 @@ extern "C" {
 #endif
 
 /**
- * @brief   Timeout for reassembly buffer entries in microseconds
+ * @brief   Timeout for reassembly buffer entries in milliseconds
  *
  * @note    Only applicable with
  *          [gnrc_sixlowpan_frag_rb](@ref net_gnrc_sixlowpan_frag_rb) module
  */
+#ifndef CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_MS
 #ifndef CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_MS (3U)
+#else
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_MS (CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US / US_PER_SEC)
+#endif
+#endif
+
+/**
+ * @brief   Timeout for reassembly buffer entries in microseconds
+ *
+ * @note    Only applicable with
+ *          [gnrc_sixlowpan_frag_rb](@ref net_gnrc_sixlowpan_frag_rb) module
+ *
+ * @deprecated Use @ref CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_MS instead.
+ *          Will be removed after 2023.01 release.
+ */
+#ifdef DOXYGEN
 #define CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US (3U * US_PER_SEC)
 #endif
 
@@ -99,7 +116,7 @@ extern "C" {
  * When not set, it will cause the reassembly buffer to override the oldest
  * entry when a fragment for a new datagram is received. When set, only the
  * oldest entry that is older than @ref
- * CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US will be overwritten (they will
+ * CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_MS will be overwritten (they will
  * still timeout normally if reassembly buffer is not full).
  */
 #ifdef DOXYGEN
@@ -112,13 +129,30 @@ extern "C" {
  * @note    Only applicable with
  *          [gnrc_sixlowpan_frag_rb](@ref net_gnrc_sixlowpan_frag_rb) module
  *
+ * @deprecated Use @ref CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER_MS instead.
+ *          Will be removed after 2023.01 release.
+ */
+#ifdef DOXYGEN
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER              (0U)
+#endif
+
+/**
+ * @brief   Deletion timer for reassembly buffer entries in milliseconds
+ *
+ * @note    Only applicable with
+ *          [gnrc_sixlowpan_frag_rb](@ref net_gnrc_sixlowpan_frag_rb) module
+ *
  * Time to pass between completion of a datagram and the deletion of its
  * reassembly buffer entry. If this value is 0, the entry is dropped
  * immediately. Use this value to prevent re-creation of a reassembly buffer
  * entry on late arriving link-layer duplicates.
  */
+#ifndef CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER_MS
 #ifndef CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER
-#define CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER              (0U)
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER_MS           (0U)
+#else
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER_MS           (CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER / US_PER_MS)
+#endif
 #endif
 
 /**
@@ -154,14 +188,33 @@ extern "C" {
 #endif  /* CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_SIZE */
 
 /**
- * @brief   Timeout for a VRB entry in microseconds
+ * @brief   Timeout for a VRB entry in milliseconds
  *
  * @see     https://tools.ietf.org/html/draft-ietf-lwig-6lowpan-virtual-reassembly-01
  *
  * @note    Only applicable with
  *          [gnrc_sixlowpan_frag_vrb](@ref net_gnrc_sixlowpan_frag_vrb) module.
  */
+#ifndef CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_MS
 #ifndef CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_MS  (CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_MS)
+#else
+#define CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_MS  (CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US / US_PER_MS)
+#endif
+#endif  /* CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_MS */
+
+/**
+ * @brief   Timeout for a VRB entry in microseconds
+ *
+ * @see     https://tools.ietf.org/html/draft-ietf-lwig-6lowpan-virtual-reassembly-01
+ *
+ * @note    Only applicable with
+ *          [gnrc_sixlowpan_frag_vrb](@ref net_gnrc_sixlowpan_frag_vrb) module.
+ *
+ * @deprecated Use @ref CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_MS instead.
+ *          Will be removed after 2023.01 release.
+ */
+#ifdef DOXYGEN
 #define CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US  (CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)
 #endif  /* CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US */
 

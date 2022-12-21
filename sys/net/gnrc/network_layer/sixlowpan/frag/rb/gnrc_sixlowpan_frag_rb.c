@@ -554,7 +554,7 @@ static bool _rbuf_update_ints(gnrc_sixlowpan_frag_rb_base_t *entry,
 
 static void _gc_pkt(gnrc_sixlowpan_frag_rb_t *rbuf)
 {
-#if CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER > 0
+#if CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER_MS > 0
     if (rbuf->super.current_size == 0) {
         /* packet is scheduled for deletion, but was complete, i.e. pkt is
          * already handed up to other layer, i.e. no need to release */
@@ -573,7 +573,7 @@ void gnrc_sixlowpan_frag_rb_gc(void)
         /* since pkt occupies pktbuf, aggressivly collect garbage */
         if (!gnrc_sixlowpan_frag_rb_entry_empty(&rbuf[i]) &&
               ((now_msec - rbuf[i].super.arrival) >=
-               CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US / US_PER_MS)) {
+               CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_MS)) {
             DEBUG("6lo rfrag: entry (%s, ",
                   gnrc_netif_addr_to_str(rbuf[i].super.src,
                                          rbuf[i].super.src_len,
@@ -596,7 +596,7 @@ void gnrc_sixlowpan_frag_rb_gc(void)
 static inline void _set_rbuf_timeout(void)
 {
     ztimer_set_msg(ZTIMER_MSEC, &_gc_timer,
-                   CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US / US_PER_MS,
+                   CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_MS,
                    &_gc_timer_msg, thread_getpid());
 }
 
@@ -663,8 +663,8 @@ static int _rbuf_get(const void *src, size_t src_len,
          * oldest could have been picked as res) */
         assert(!gnrc_sixlowpan_frag_rb_entry_empty(oldest));
         if (!IS_ACTIVE(CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE) ||
-            ((now_msec - oldest->super.arrival) >
-            CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US / US_PER_MS)) {
+            ((now_msec - oldest->super.arrival) >=
+            CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_MS)) {
             DEBUG("6lo rfrag: reassembly buffer full, remove oldest entry\n");
             gnrc_pktbuf_release(oldest->pkt);
             gnrc_sixlowpan_frag_rb_remove(oldest);
@@ -783,21 +783,21 @@ void gnrc_sixlowpan_frag_rb_base_rm(gnrc_sixlowpan_frag_rb_base_t *entry)
 
 static void _tmp_rm(gnrc_sixlowpan_frag_rb_t *rbuf)
 {
-#if CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER > 0U
+#if CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER_MS > 0U
         /* use garbage-collection to leave the entry for at least
-         * CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER in the reassembly buffer by
+         * CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER_MS in the reassembly buffer by
          * setting the arrival time to
-         * (CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US - CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER)
+         * (CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_MS - CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER_MS)
          * microseconds in the past */
         rbuf->super.arrival = ztimer_now(ZTIMER_MSEC) -
-                              (CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US -
-                               CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER) / US_PER_MS;
+                              (CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_MS -
+                               CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER_MS);
         /* reset current size to prevent late duplicates to trigger another
          * dispatch */
         rbuf->super.current_size = 0;
-#else   /* CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER == 0U */
+#else   /* CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER_MS == 0U */
         gnrc_sixlowpan_frag_rb_remove(rbuf);
-#endif  /* CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER */
+#endif  /* CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER_MS */
 }
 
 #if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_STATS)
