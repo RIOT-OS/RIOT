@@ -246,18 +246,13 @@ void init_exceptions (void)
     xt_set_exception_handler(EXCCAUSE_PRIVILEGED, exception_handler);
 }
 
-void IRAM NORETURN panic_arch(void)
+void panic_arch(void)
 {
 #if defined(DEVELHELP)
     heap_stats();
     /* break in debugger or reboot after WDT */
     __asm__ volatile ("break 0,0");
-#else /* DEVELHELP */
-    /* restart */
-    pm_reboot();
 #endif /* DEVELHELP */
-
-    UNREACHABLE();
 }
 
 void _panic_handler(uint32_t addr)
