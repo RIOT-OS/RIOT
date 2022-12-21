@@ -106,6 +106,14 @@ void panic_arch(void)
                    _frame->mepc, exceptions[_frame->mcause]);
     }
 #if defined(DEVELHELP)
+    /* print heap statistics */
     heap_stats();
+    /* break in debugger if attached or busy wait until WDT resets the MCU */
+    if (cpu_ll_is_debugger_attached()) {
+        cpu_ll_break();
+    }
+    else {
+        while (1) { }
+    }
 #endif
 }
