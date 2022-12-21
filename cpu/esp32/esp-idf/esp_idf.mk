@@ -16,6 +16,7 @@ INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_timer/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_timer/private_include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/newlib/priv_include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/spi_flash/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/spi_flash/include/spi_flash
 
 ifneq (,$(filter xtensa%,$(TARGET_ARCH)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/xtensa/include
