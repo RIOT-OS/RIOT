@@ -118,7 +118,7 @@ static void _init_interface(void)
     addr.u8[1] = 0x01;
     addr.u8[15] = 0x01;
 
-    ztimer_sleep(ZTIMER_USEC, 500); /* wait for thread to start */
+    ztimer_sleep(ZTIMER_MSEC, 1); /* wait for thread to start */
     if (gnrc_netapi_set(_netif.pid, NETOPT_IPV6_ADDR, 64U << 8U, &addr,
                         sizeof(addr)) < 0) {
         printf("error: unable to add IPv6 address fd01::1/64 to interface %u\n",
