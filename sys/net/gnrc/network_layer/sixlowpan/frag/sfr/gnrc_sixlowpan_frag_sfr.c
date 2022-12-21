@@ -87,7 +87,7 @@ static char addr_str[GNRC_NETIF_HDR_L2ADDR_PRINT_LEN];
 static evtimer_msg_t _arq_timer;
 static ztimer_t _if_gap_timer = { 0 };
 static msg_t _if_gap_msg = { .type = GNRC_SIXLOWPAN_FRAG_SFR_INTER_FRAG_GAP_MSG };
-static uint32_t _last_frame_sent = 0U;
+static uint32_t _last_frame_sent_msec = 0U;
 
 static _frag_desc_t _frag_descs_pool[FRAG_DESCS_POOL_SIZE];
 static _frame_queue_t _frame_queue_pool[FRAME_QUEUE_POOL_SIZE];
@@ -499,7 +499,7 @@ static int _report_non_ack_req_window_sent(clist_node_t *node, void *fbuf_ptr)
 
 void gnrc_sixlowpan_frag_sfr_arq_timeout(gnrc_sixlowpan_frag_fb_t *fbuf)
 {
-    uint32_t now = ztimer_now(ZTIMER_MSEC);
+    uint32_t now_msec = ztimer_now(ZTIMER_MSEC);
     _frag_desc_t *frag_desc = (_frag_desc_t *)fbuf->sfr.window.next;
     uint32_t next_arq_offset = fbuf->sfr.arq_timeout;
     bool reschedule_arq_timeout = false;
@@ -509,7 +509,7 @@ void gnrc_sixlowpan_frag_sfr_arq_timeout(gnrc_sixlowpan_frag_fb_t *fbuf)
     fbuf->sfr.arq_timeout_event.msg.content.ptr = NULL;
     if (IS_ACTIVE(CONFIG_GNRC_SIXLOWPAN_SFR_MOCK_ARQ_TIMER)) {
         /* mock-up to emulate time having passed beyond (1us) the ARQ timeout */
-        now -= (fbuf->sfr.arq_timeout * US_PER_MS) + 1;
+        now_msec -= fbuf->sfr.arq_timeout + 1;
     }
     if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE) && frag_desc) {
         /* report timeout to CongURE state */
@@ -522,14 +522,14 @@ void gnrc_sixlowpan_frag_sfr_arq_timeout(gnrc_sixlowpan_frag_fb_t *fbuf)
     _frag_desc_t * const head = frag_desc;
     if (frag_desc) {
         do {
-            uint32_t diff;
+            uint32_t diff_msec;
 
             frag_desc = (_frag_desc_t *)frag_desc->super.super.next;
-            diff = now - frag_desc->super.send_time;
-            if (diff < fbuf->sfr.arq_timeout) {
+            diff_msec = now_msec - frag_desc->super.send_time;
+            if (diff_msec < fbuf->sfr.arq_timeout) {
                 /* this fragment's last was last sent < fbuf->sfr.arq_timeout
                  * ago */
-                uint32_t offset = fbuf->sfr.arq_timeout - diff;
+                uint32_t offset = fbuf->sfr.arq_timeout - diff_msec;
 
                 DEBUG("6lo sfr: wait for fragment %u in next reschedule\n",
                       _frag_seq(frag_desc));
@@ -629,7 +629,7 @@ void gnrc_sixlowpan_frag_sfr_inter_frame_gap(gnrc_sixlowpan_frag_fb_t *fbuf)
         _frame_queue_t *node = (_frame_queue_t *)clist_lpop(&_frame_queue);
 
         if (node != NULL) {
-            _last_frame_sent = ztimer_now(ZTIMER_MSEC);
+            _last_frame_sent_msec = ztimer_now(ZTIMER_MSEC);
             gnrc_sixlowpan_dispatch_send(node->frame, NULL, node->page);
             /* unset packet just to be safe */
             node->frame = NULL;
@@ -862,14 +862,14 @@ static void _check_for_ecn(gnrc_pktsnip_t *frame)
 static bool _send_frame(gnrc_pktsnip_t *frame, gnrc_sixlowpan_frag_fb_t *fbuf,
                         void *ctx, unsigned page)
 {
-    uint32_t now;
-    uint32_t if_gap = gnrc_sixlowpan_frag_sfr_congure_snd_inter_frame_gap(fbuf) / US_PER_MS;
+    uint32_t now_msec;
+    uint32_t if_gap_msec = gnrc_sixlowpan_frag_sfr_congure_snd_inter_frame_gap(fbuf) / US_PER_MS;
 
     _check_for_ecn(frame);
-    now = ztimer_now(ZTIMER_MSEC);
-    if ((if_gap == 0) || ((now - _last_frame_sent) > if_gap)) {
+    now_msec = ztimer_now(ZTIMER_MSEC);
+    if ((if_gap_msec == 0) || ((now_msec - _last_frame_sent_msec) > if_gap_msec)) {
         DEBUG("6lo sfr: dispatch frame to network interface\n");
-        _last_frame_sent = now;
+        _last_frame_sent_msec = now_msec;
         gnrc_sixlowpan_dispatch_send(frame, ctx, page);
         return true;
     }
@@ -911,7 +911,7 @@ static bool _send_fragment(gnrc_pktsnip_t *frag, gnrc_sixlowpan_frag_fb_t *fbuf,
         if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
             _stats.fragments_sent.usual++;
         }
-        frag_desc->super.send_time = _last_frame_sent;
+        frag_desc->super.send_time = _last_frame_sent_msec;
         fbuf->sfr.cur_seq++;
         fbuf->sfr.frags_sent++;
     }
@@ -1607,7 +1607,7 @@ static int _resend_frag(clist_node_t *node, void *fbuf_ptr)
           (sixlowpan_sfr_rfrag_get_seq(hdr)) ? "offset" : "datagram_size",
           sixlowpan_sfr_rfrag_get_offset(hdr));
     if (_send_frame(frag, fbuf, NULL, 0)) {
-        frag_desc->super.send_time = _last_frame_sent;
+        frag_desc->super.send_time = _last_frame_sent_msec;
         return 0;
     }
     else {
@@ -1687,21 +1687,21 @@ static void _sched_next_frame(gnrc_sixlowpan_frag_fb_t *fbuf)
         DEBUG("6lo sfr: inter-frame timer was already set\n");
         return;
     }
-    uint32_t last_sent_since = (_last_frame_sent - ztimer_now(ZTIMER_MSEC));
-    uint32_t if_gap = gnrc_sixlowpan_frag_sfr_congure_snd_inter_frame_gap(fbuf) / US_PER_MS;
+    uint32_t last_sent_since_msec = (_last_frame_sent_msec - ztimer_now(ZTIMER_MSEC));
+    uint32_t if_gap_msec = gnrc_sixlowpan_frag_sfr_congure_snd_inter_frame_gap(fbuf) / US_PER_MS;
 
-    if (last_sent_since <= if_gap) {
-        uint32_t offset = if_gap - last_sent_since;
+    if (last_sent_since_msec <= if_gap_msec) {
+        uint32_t offset = if_gap_msec - last_sent_since_msec;
         DEBUG("6lo sfr: arming inter-frame timer in %" PRIu32 " ms\n",
-              last_sent_since);
+              last_sent_since_msec);
         _if_gap_msg.content.ptr = fbuf;
         ztimer_set_msg(ZTIMER_MSEC, &_if_gap_timer, offset, &_if_gap_msg, _getpid());
     }
     else {
         DEBUG("6lo sfr: send frame immediately\n");
         /* there is no risk of infinite recursion due to the call of `_sched_next_frame` since
-         * we only get here when (_last_frame_sent - now) > if_gap.
-         * Since gnrc_sixlowpan_frag_sfr_inter_frame_gap updates _last_frame_sent when the list is
+         * we only get here when (_last_frame_sent_msec - now) > if_gap.
+         * Since gnrc_sixlowpan_frag_sfr_inter_frame_gap updates _last_frame_sent_msec when the list is
          * empty and only calls _sched_next_frame() when the list is still not empty after that this
          * can not be the case if we came from there (except for misconfigured if_gap). */
         gnrc_sixlowpan_frag_sfr_inter_frame_gap(fbuf);
