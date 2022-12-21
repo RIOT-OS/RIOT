@@ -16,6 +16,13 @@ TTY_BOARD_FILTER := --model XDS110 --iface-num 0
 UNIFLASH_CONFIG ?= $(RIOTBOARD)/common/cc26xx_cc13xx/dist
 
 OPENOCD_DEBUG_ADAPTER ?= xds110
+# Work around a bug in the CC26xx / CC13xx that is triggered by 'reset halt'.
+# This results in the CC26xx / CC13xx being flash-able again, but it may race
+# against the target firmware installing IRQ handlers that may trigger while
+# the device is being flashed, which is bound to cause unpleasantness. But
+# flashing working fine most of the time is better than flashing working not
+# at all...
+OPENOCD_CMD_RESET_HALT ?= -c 'halt'
 
 ifneq (,$(filter cc13x0%,$(CPU_MODEL)))
   DEFAULT_OPENOCD_CONFIG := $(RIOTBASE)/boards/common/cc26xx_cc13xx/dist/openocd_cc13x0.cfg
