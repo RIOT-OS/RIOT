@@ -572,7 +572,7 @@ void gnrc_sixlowpan_frag_rb_gc(void)
     for (i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
         /* since pkt occupies pktbuf, aggressivly collect garbage */
         if (!gnrc_sixlowpan_frag_rb_entry_empty(&rbuf[i]) &&
-              ((now_msec - rbuf[i].super.arrival) >
+              ((now_msec - rbuf[i].super.arrival) >=
                CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US / US_PER_MS)) {
             DEBUG("6lo rfrag: entry (%s, ",
                   gnrc_netif_addr_to_str(rbuf[i].super.src,
