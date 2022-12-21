@@ -1786,7 +1786,7 @@ static void _handle_ack(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
                  * milliseconds */
                 vrbe->super.arrival = recv_time -
                                       (CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_MS -
-                                       CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER_MS)
+                                       CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER_MS);
             }
             else {
                 gnrc_sixlowpan_frag_vrb_rm(vrbe);
