@@ -23,6 +23,7 @@
  * @}
  */
 
+#include "irq.h"
 #include "periph/timer.h"
 
 #define F_TIMER             (16000000U)     /* the timer is clocked at 16MHz */
@@ -100,8 +101,10 @@ int timer_set_absolute(tim_t tim, int chan, unsigned int value)
         return -1;
     }
 
+    unsigned irq_state = irq_disable();
     ctx[tim].flags |= (1 << chan);
     ctx[tim].is_periodic &= ~(1 << chan);
+    irq_restore(irq_state);
     dev(tim)->CC[chan] = value;
 
     /* clear spurious IRQs */
@@ -124,8 +127,10 @@ int timer_set_periodic(tim_t tim, int chan, unsigned int value, uint8_t flags)
     /* stop timer to avoid race condition */
     dev(tim)->TASKS_STOP = 1;
 
+    unsigned irq_state = irq_disable();
     ctx[tim].flags |= (1 << chan);
     ctx[tim].is_periodic |= (1 << chan);
+    irq_restore(irq_state);
     dev(tim)->CC[chan] = value;
     if (flags & TIM_FLAG_RESET_ON_MATCH) {
         dev(tim)->SHORTS |= (1 << chan);
