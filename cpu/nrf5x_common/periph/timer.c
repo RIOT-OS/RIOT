@@ -101,6 +101,7 @@ int timer_set_absolute(tim_t tim, int chan, unsigned int value)
     }
 
     ctx[tim].flags |= (1 << chan);
+    ctx[tim].is_periodic &= ~(1 << chan);
     dev(tim)->CC[chan] = value;
 
     /* clear spurious IRQs */
