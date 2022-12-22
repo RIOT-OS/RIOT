@@ -5,7 +5,21 @@
 # and / or
 #export APPS="examples/hello-world tests/unittests"
 
-QUICKBUILD_BOARDS="nrf52840dk samr21-xpro esp32-wroom-32 native"
+QUICKBUILD_BOARDS="
+adafruit-itsybitsy-m4
+atmega256rfr2-xpro
+esp32-wroom-32
+esp32s3-devkit
+frdm-k64f
+hifive1b
+msb-430
+msba2
+native
+nrf52840dk
+qn9080dk
+samr21-xpro
+stk3200
+stm32f429i-disc1"
 
 # this configures boards that are available via pifleet
 case "${CI_MURDOCK_PROJECT}" in
