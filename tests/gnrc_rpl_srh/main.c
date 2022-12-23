@@ -120,6 +120,27 @@ static void test_rpl_srh_route_multicast(void)
     TEST_ASSERT_NULL(err_ptr);
 }
 
+static void test_rpl_srh_inconsistent_hdr(void)
+{
+    static const ipv6_addr_t dst = IPV6_DST;
+    gnrc_rpl_srh_t srh;
+    void *err_ptr;
+    int res;
+
+    memset(&srh, 0, sizeof(srh));
+    memcpy(&hdr.dst, &dst, sizeof(hdr.dst));
+    srh.nh = 128U;
+    srh.len = 0U;
+    srh.type = 3U;
+    srh.seg_left = 220U;
+    srh.compr = 0xc0;
+    srh.pad_resv = 0xf0;
+
+    res = gnrc_rpl_srh_process(&hdr, &srh, &err_ptr);
+    TEST_ASSERT_EQUAL_INT(res, GNRC_IPV6_EXT_RH_ERROR);
+    TEST_ASSERT((&srh.len) == err_ptr);
+}
+
 static void test_rpl_srh_too_many_seg_left(void)
 {
     static const ipv6_addr_t a1 = IPV6_ADDR1;
@@ -239,6 +260,7 @@ static void run_unittests(void)
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_rpl_srh_dst_multicast),
         new_TestFixture(test_rpl_srh_route_multicast),
+        new_TestFixture(test_rpl_srh_inconsistent_hdr),
         new_TestFixture(test_rpl_srh_too_many_seg_left),
         new_TestFixture(test_rpl_srh_nexthop_no_prefix_elided),
         new_TestFixture(test_rpl_srh_nexthop_prefix_elided),
