@@ -23,6 +23,7 @@
  * @}
  */
 
+#include "irq.h"
 #include "periph/timer.h"
 
 #define F_TIMER             (16000000U)     /* the timer is clocked at 16MHz */
@@ -100,7 +101,10 @@ int timer_set_absolute(tim_t tim, int chan, unsigned int value)
         return -1;
     }
 
+    unsigned irq_state = irq_disable();
     ctx[tim].flags |= (1 << chan);
+    ctx[tim].is_periodic &= ~(1 << chan);
+    irq_restore(irq_state);
     dev(tim)->CC[chan] = value;
 
     /* clear spurious IRQs */
@@ -109,6 +113,55 @@ int timer_set_absolute(tim_t tim, int chan, unsigned int value)
 
     /* enable IRQ */
     dev(tim)->INTENSET = (TIMER_INTENSET_COMPARE0_Msk << chan);
+
+    return 0;
+}
+
+int timer_set(tim_t tim, int chan, unsigned int timeout)
+{
+    static const uint32_t max_mask[] = {
+        [TIMER_BITMODE_BITMODE_08Bit] = 0x000000ff,
+        [TIMER_BITMODE_BITMODE_16Bit] = 0x0000ffff,
+        [TIMER_BITMODE_BITMODE_24Bit] = 0x00ffffff,
+        [TIMER_BITMODE_BITMODE_32Bit] = 0xffffffff,
+    };
+    /* see if channel is valid */
+    if (chan >= timer_config[tim].channels) {
+        return -1;
+    }
+
+    unsigned value = timer_read(tim) + timeout;
+
+    unsigned irq_state = irq_disable();
+    ctx[tim].flags |= (1 << chan);
+    ctx[tim].is_periodic &= ~(1 << chan);
+    dev(tim)->CC[chan] = value;
+
+    /* clear spurious IRQs */
+    dev(tim)->EVENTS_COMPARE[chan] = 0;
+    (void)dev(tim)->EVENTS_COMPARE[chan];
+
+    /* enable IRQ */
+    dev(tim)->INTENSET = (TIMER_INTENSET_COMPARE0_Msk << chan);
+
+    unsigned expires = value - timer_read(tim);
+    expires &= max_mask[timer_config[tim].bitmode];
+    if (expires > timeout) {
+        /* timer already expired, check if IRQ flag is set */
+        if (!dev(tim)->EVENTS_COMPARE[chan]) {
+            /* timer has expired but IRQ flag is not set. The only way to not
+             * wait *a full period* is now to set a new target to the next tick.
+             * (Setting it to the current timer value will not trigger the IRQ
+             * flag.) We briefly stop the timer to avoid a race, losing one
+             * timer tick in accuracy. But that is better than a timer firing
+             * a whole period too late */
+            dev(tim)->TASKS_STOP = 1;
+            dev(tim)->CC[chan] = timer_read(tim) + 1;
+            dev(tim)->TASKS_START = 1;
+        }
+    }
+
+    irq_restore(irq_state);
 
     return 0;
 }
@@ -123,8 +176,10 @@ int timer_set_periodic(tim_t tim, int chan, unsigned int value, uint8_t flags)
     /* stop timer to avoid race condition */
     dev(tim)->TASKS_STOP = 1;
 
+    unsigned irq_state = irq_disable();
     ctx[tim].flags |= (1 << chan);
     ctx[tim].is_periodic |= (1 << chan);
+    irq_restore(irq_state);
     dev(tim)->CC[chan] = value;
     if (flags & TIM_FLAG_RESET_ON_MATCH) {
         dev(tim)->SHORTS |= (1 << chan);

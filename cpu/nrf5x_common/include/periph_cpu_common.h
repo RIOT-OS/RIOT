@@ -199,6 +199,11 @@ typedef struct {
     uint8_t irqn;           /**< IRQ number of the timer device */
 } timer_conf_t;
 
+/**
+ * @brief   The nRF5x periph_timer implements timer_set()
+ */
+#define PERIPH_TIMER_PROVIDES_SET   1
+
 #ifndef DOXYGEN
 /**
  * @brief   Override SPI mode values
