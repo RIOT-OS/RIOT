@@ -32,7 +32,7 @@ else
   FFLAGS += --flash_size detect
   FFLAGS += $(BOOTLOADER_POS) $(BOOTLOADER_BIN)
   FFLAGS += 0x8000 $(BINDIR)/partitions.bin
-  FFLAGS += 0x10000 $(FLASHFILE)
+  FFLAGS += $(FLASHFILE_POS) $(FLASHFILE)
 endif
 
 .PHONY: esp-qemu
@@ -44,7 +44,7 @@ ifeq (esp32,$(CPU))
 		"--flash_size $(FLASH_SIZE)MB" \
 		"$(BOOTLOADER_POS) $(BOOTLOADER_BIN)" \
 		"0x8000 $(BINDIR)/partitions.bin" \
-		"0x10000 $(FLASHFILE)" > $(BINDIR)/qemu_flash_args
+		"$(FLASHFILE_POS) $(FLASHFILE)" > $(BINDIR)/qemu_flash_args
 	$(Q)$(ESPTOOL) \
 		--chip $(CPU_FAM) merge_bin \
 		--fill-flash-size 4MB \
@@ -58,7 +58,7 @@ else
 		cat - $(BOOTLOADER_BIN) tmp.bin | \
 		head -c $$((0x8000)) | \
 		cat - $(BINDIR)/partitions.bin tmp.bin | \
-		head -c $$((0x10000)) | \
+		head -c $$(($(FLASHFILE_POS))) | \
 		cat - $(FLASHFILE) tmp.bin | \
 		head -c $(FLASH_SIZE)MB > $(BINDIR)/$(CPU)flash.bin && rm tmp.bin
 endif

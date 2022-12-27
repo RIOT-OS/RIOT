@@ -23,6 +23,7 @@ else ifneq (,$(filter esp32s2,$(CPU_FAM)))
 else
   $(error Unkwnown ESP32x SoC variant (family))
 endif
+FLASHFILE_POS ?= 0x10000
 
 ESPTOOL ?= $(RIOTTOOLS)/esptools/esptool_v3.2.py
 
@@ -244,7 +245,7 @@ ifneq (,$(filter esp_jtag,$(USEMODULE)))
     -c 'flash write_image erase "$(BOOTLOADER_BIN)" $(BOOTLOADER_POS) bin' \
     -c 'echo "Installing partition table at $(PARTITION_POS)"' \
     -c 'flash write_image erase "$(BINDIR)/partitions.bin" $(PARTITION_POS) bin'
-  IMAGE_OFFSET = 0x10000
+  IMAGE_OFFSET = $(FLASHFILE_POS)
   # Flash checksumming not supported on xtensa
   OPENOCD_SKIP_VERIFY = yes
   # Without resets debug target fails with 'Target not examined yet'

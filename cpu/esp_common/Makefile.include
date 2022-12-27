@@ -140,7 +140,6 @@ $(ELFFILE).bin: $(ELFFILE)
 		--flash_size $(FLASH_SIZE)MB --flash_freq $(FLASH_FREQ) $(FLASH_OPTS) \
 		-o $@ $<
 
-
 # Convert .elf and .csv to .bin files at build time, but make them available for
 # tests at flash time. These can't be added to FLASHDEPS because they depend on
 # on ELFFILE and would trigger a rebuild with "flash-only".
@@ -155,7 +154,7 @@ $(BINDIR)/partitions.csv: $(FLASHFILE)
 	$(Q)printf "\n" > $(BINDIR)/partitions.csv
 	$(Q)printf "nvs, data, nvs, 0x9000, 0x6000\n" >> $@
 	$(Q)printf "phy_init, data, phy, 0xf000, 0x1000\n" >> $@
-	$(Q)printf "factory, app, factory, 0x10000, " >> $@
+	$(Q)printf "factory, app, factory, $(FLASHFILE_POS), " >> $@
 	$(Q)ls -l $< | awk '{ print $$5 }' >> $@
 
 $(BINDIR)/partitions.bin: $(PARTITION_TABLE_CSV)
