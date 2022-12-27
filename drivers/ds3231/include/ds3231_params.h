@@ -33,7 +33,7 @@ extern "C" {
 #define DS3231_PARAM_OPT        (DS3231_OPT_BAT_ENABLE)
 #endif
 #ifndef DS3231_PARAM_INT_PIN
-#define DS3231_PARAM_INT_PIN    (GPIO_UNDEF)
+#define DS3231_PARAM_INT_PIN    (GPIO_UNDEF)    /**< Interrupt pin */
 #endif
 
 #ifndef DS3231_PARAMS

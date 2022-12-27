@@ -19,7 +19,7 @@
  * registers as well as reading the temperature register and configuring the
  * aging offset.
  *
- * Setting alarms and configuring the square wave output is not yet supported.
+ * Configuring the square wave output is not yet supported.
  *
  * @{
  * @file

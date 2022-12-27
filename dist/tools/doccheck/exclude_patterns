@@ -7266,7 +7266,6 @@ drivers/ds18/include/ds18_params\.h:[0-9]+: warning: Member DS18_PARAMS_DEFAULT 
 drivers/ds18/include/ds18_params\.h:[0-9]+: warning: Member DS18_PARAM_PULL \(macro definition\) of file ds18_params\.h is not documented\.
 drivers/ds3231/include/ds3231_params\.h:[0-9]+: warning: Member DS3231_PARAMS \(macro definition\) of file ds3231_params\.h is not documented\.
 drivers/ds3231/include/ds3231_params\.h:[0-9]+: warning: Member DS3231_PARAM_I2C \(macro definition\) of file ds3231_params\.h is not documented\.
-drivers/ds3231/include/ds3231_params\.h:[0-9]+: warning: Member DS3231_PARAM_INT_PIN \(macro definition\) of file ds3231_params\.h is not documented\.
 drivers/ds3231/include/ds3231_params\.h:[0-9]+: warning: Member DS3231_PARAM_OPT \(macro definition\) of file ds3231_params\.h is not documented\.
 drivers/ds3234/include/ds3234_params\.h:[0-9]+: warning: Member DS3234_PARAMS \(macro definition\) of file ds3234_params\.h is not documented\.
 drivers/ds3234/include/ds3234_params\.h:[0-9]+: warning: Member DS3234_PARAM_CLK \(macro definition\) of file ds3234_params\.h is not documented\.
