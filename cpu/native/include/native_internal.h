@@ -26,7 +26,7 @@
  * check here for more:
  * http://sourceforge.net/p/predef/wiki/OperatingSystems/
  */
-#if (defined(__FreeBSD__) || defined(__MACH__))
+#ifdef __FreeBSD__
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE
 #include <ucontext.h>
@@ -136,10 +136,7 @@ extern mode_t (*real_umask)(mode_t cmask);
 extern ssize_t (*real_writev)(int fildes, const struct iovec *iov, int iovcnt);
 extern ssize_t (*real_send)(int sockfd, const void *buf, size_t len, int flags);
 
-#ifdef __MACH__
-#else
 extern int (*real_clock_gettime)(clockid_t clk_id, struct timespec *tp);
-#endif
 
 /**
  * data structures

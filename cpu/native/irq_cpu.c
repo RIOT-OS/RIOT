@@ -345,15 +345,7 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
     /* disable interrupts in context */
     isr_set_sigmask((ucontext_t *)context);
     _native_in_isr = 1;
-    /*
-     * For register access on new platforms see:
-     * http://google-glog.googlecode.com/svn/trunk/m4/pc_from_ucontext.m4
-     * (URL added on Fri Aug 29 17:17:45 CEST 2014)
-     */
-#ifdef __MACH__
-    _native_saved_eip = ((ucontext_t *)context)->uc_mcontext->__ss.__eip;
-    ((ucontext_t *)context)->uc_mcontext->__ss.__eip = (unsigned int)&_native_sig_leave_tramp;
-#elif defined(__FreeBSD__)
+#if defined(__FreeBSD__)
     _native_saved_eip = ((struct sigcontext *)context)->sc_eip;
     ((struct sigcontext *)context)->sc_eip = (unsigned int)&_native_sig_leave_tramp;
 #else /* Linux */

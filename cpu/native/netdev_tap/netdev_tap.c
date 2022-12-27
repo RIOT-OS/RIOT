@@ -32,12 +32,7 @@
 /* needs to be included before native's declarations of ntohl etc. */
 #include "byteorder.h"
 
-#ifdef __MACH__
-#include <net/if.h>
-#include <sys/types.h>
-#include <ifaddrs.h>
-#include <net/if_dl.h>
-#elif defined(__FreeBSD__)
+#ifdef __FreeBSD__
 #include <sys/socket.h>
 #include <net/if.h>
 #include <ifaddrs.h>

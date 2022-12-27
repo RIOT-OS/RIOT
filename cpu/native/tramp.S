@@ -9,33 +9,7 @@
 
 .text
 
-#ifdef __MACH__
-.globl __native_sig_leave_tramp
-__native_sig_leave_tramp:
-    pushl __native_saved_eip
-    pushfl
-    pushal
-
-    pushl __native_isr_ctx
-    pushl __native_cur_ctx
-    call _swapcontext
-    addl $8, %esp
-
-    call _irq_enable
-
-    movl $0x0, __native_in_isr
-    popal
-    popfl
-
-    ret
-
-.globl __native_sig_leave_handler
-__native_sig_leave_handler:
-    pushl __native_saved_eip
-    movl $0x0, __native_in_isr
-    ret
-
-#elif __arm__
+#ifdef __arm__
 
 .globl _native_sig_leave_tramp
 _native_sig_leave_tramp:
