@@ -49,6 +49,12 @@ config MODULE_STDIO_ETHOS
     select MODULE_ETHOS_STDIO
     select USE_STDOUT_BUFFERED
 
+config MODULE_STDIO_USB_SERIAL_JTAG
+    bool "STDIO via ESP32 Debug USB Serial/JTAG interface"
+    depends on TEST_KCONFIG
+    depends on CPU_FAM_ESP32C3 || CPU_FAM_ESP32S3
+    select MODULE_TSRB
+
 endchoice
 
 config MODULE_STDIN
@@ -62,6 +68,15 @@ config MODULE_STDIO_UART_RX
     default y if MODULE_STDIN
     help
         Reception when using UART-based STDIO needs to be enabled.
+
+config MODULE_STDIO_USB_SERIAL_JTAG_RX
+    bool
+    depends on MODULE_STDIO_USB_SERIAL_JTAG
+    select MODULE_ISRPIPE
+    select MODULE_STDIO_AVAILABLE
+    default y if MODULE_STDIN
+    help
+        Reception when using ESP32 USB Serial/JTAG STDIO needs to be enabled.
 
 config MODULE_STDIO_AVAILABLE
     bool

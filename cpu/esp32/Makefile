@@ -25,6 +25,10 @@ ifneq (, $(filter esp_freertos, $(USEMODULE)))
     DIRS += freertos
 endif
 
+ifneq (, $(filter stdio_usb_serial_jtag, $(USEMODULE)))
+    DIRS += stdio_usb_serial_jtag
+endif
+
 ifneq (,$(filter esp_wifi% esp_eth, $(USEMODULE)))
     SRC += esp_ztimer.c
 endif

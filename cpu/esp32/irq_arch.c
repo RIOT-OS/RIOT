@@ -83,6 +83,9 @@ static const struct intr_handle_data_t _irq_data_table[] = {
 #if defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3)
     { ETS_USB_INTR_SOURCE, CPU_INUM_USB, 1 },
 #endif
+#if defined(ETS_USB_SERIAL_JTAG_INTR_SOURCE)
+    { ETS_USB_SERIAL_JTAG_INTR_SOURCE, CPU_INUM_SERIAL_JTAG, 1 },
+#endif
 };
 
 #define IRQ_DATA_TABLE_SIZE        ARRAY_SIZE(_irq_data_table)
