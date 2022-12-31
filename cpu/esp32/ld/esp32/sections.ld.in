@@ -466,7 +466,6 @@ SECTIONS
     . = ALIGN(ALIGNOF(.flash.rodata));
   } >default_rodata_seg
 
-  _rodata_start = ABSOLUTE(.);
   .flash.rodata : ALIGN(0x10)
   {
     _flash_rodata_start = ABSOLUTE(.);
@@ -617,6 +616,17 @@ SECTIONS
     _heap_start = ABSOLUTE(.);
     _sheap = ABSOLUTE(.);
   } > dram0_0_seg
+
+#ifdef MODULE_PERIPH_FLASHPAGE
+  .flash_writable (NOLOAD) : ALIGN(65536)
+  {
+    _fp_mem_start = . ;
+    KEEP(*(SORT(.flash_writable.*)))
+    _fp_mem_end = . ;
+    . = ALIGN(4096);
+    _end_fw = . ;
+  } > drom0_1_seg
+#endif
 }
 
 ASSERT(((_iram_end - ORIGIN(iram0_0_seg)) <= LENGTH(iram0_0_seg)),
