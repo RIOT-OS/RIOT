@@ -22,6 +22,10 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
+#if !defined(__ASSEMBLER__)
+#include <stdint.h>
+#endif
+
 /**
  * @name   Stack size configuration
  * @{
@@ -59,6 +63,41 @@
  * @brief   Attribute for memory sections required by SRAM PUF
  */
 #define PUF_SRAM_ATTRIBUTES __attribute__((used, section(".noinit")))
+
+/**
+ * @brief   Support of unaligned access
+ *
+ * All ESP32x SoCs allow unaligned read/write access to the RAM as well as
+ * unaligned read access to the constant data in the flash, which is accessible
+ * via the data bus and mapped by the MMU into the data address space of
+ * the CPU.
+ */
+#define CPU_HAS_UNALIGNED_ACCESS        1
+
+/**
+ * @name   Flash page configuration
+ * @{
+ */
+#if !DOXYGEN && !defined(__ASSEMBLER__)
+/* start address of flash pages in CPU address space as determined by the linker */
+extern uint8_t _fp_mem_start;
+#endif
+
+#define FLASHPAGE_SIZE                  (4096U) /**< Size of pages (flash sectors) in bytes */
+#define FLASHPAGE_WRITE_BLOCK_SIZE      (4U)    /**< Minimum write block size */
+#define FLASHPAGE_WRITE_BLOCK_ALIGNMENT (4U)    /**< Write block alignment */
+
+/**
+ * @brief   Number of pages
+ */
+#define FLASHPAGE_NUMOF                 (CONFIG_ESP_FLASHPAGE_CAPACITY / FLASHPAGE_SIZE)
+
+/**
+ * @brief   CPU base address for flash page access as determined by the linker
+ */
+#define CPU_FLASH_BASE                  ((uint32_t)&_fp_mem_start)
+
+/** @} */
 
 /* include ESP32x SoC specific compile time configurations */
 #if defined(CPU_FAM_ESP32)
