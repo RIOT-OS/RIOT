@@ -731,7 +731,7 @@ else
 link: ..compiler-check ..build-message $(BASELIBS) $(ARCHIVES) ..module-check
 endif # RIOTNOLINK
 
-$(ELFFILE): $(BASELIBS) $(ARCHIVES)
+$(ELFFILE): $(BASELIBS) $(ARCHIVES) $(LD_SCRIPTS)
 	$(Q)$(_LINK) -o $@
 
 .PHONY: $(APPLICATION_MODULE).module
