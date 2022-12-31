@@ -37,7 +37,7 @@ endif
 
 .PHONY: esp-qemu
 
-esp-qemu:
+esp-qemu: $(FLASHFILE)
 ifeq (esp32,$(CPU))
 	$(Q)echo \
 		"--flash_mode $(FLASH_MODE) --flash_freq $(FLASH_FREQ) " \
