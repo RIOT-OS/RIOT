@@ -168,12 +168,8 @@ endif
 
 LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ld/$(CPU_FAM)/
 
-ifneq (,$(filter esp32_sdk_lib_bt_esp32,$(USEPKG)))
-  LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/$(CPU_FAM)/memory_bt.ld
-else
-  LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/$(CPU_FAM)/memory.ld
-endif
-LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/$(CPU_FAM)/sections.ld
+LINKFLAGS += -T$(BINDIR)/memory.ld
+LINKFLAGS += -T$(BINDIR)/sections.ld
 
 LINKFLAGS += -T$(ESP32_SDK_DIR)/components/soc/$(CPU_FAM)/ld/$(CPU_FAM).peripherals.ld
 LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.api.ld
@@ -250,5 +246,15 @@ ifneq (,$(filter esp_jtag,$(USEMODULE)))
   # Without resets debug target fails with 'Target not examined yet'
   OPENOCD_DBG_EXTRA_CMD += -c 'reset halt'
 endif
+
+LD_SCRIPTS += $(BINDIR)/memory.ld $(BINDIR)/sections.ld
+
+$(BINDIR)/memory.ld: $(RIOTCPU)/$(CPU)/ld/$(CPU_FAM)/memory.ld.in \
+                     $(BINDIR)/riotbuild/riotbuild.h pkg-prepare
+	$(Q)$(CC) -DLD_FILE_GEN $(INCLUDES) -include '$(BINDIR)/riotbuild/riotbuild.h' \
+				-I$(RIOTCPU)/$(CPU)/ld -P -x c -E $< -o $@
+$(BINDIR)/sections.ld: $(RIOTCPU)/$(CPU)/ld/$(CPU_FAM)/sections.ld.in \
+                       $(BINDIR)/riotbuild/riotbuild.h pkg-prepare
+	$(Q)$(CC) -DLD_FILE_GEN -include '$(BINDIR)/riotbuild/riotbuild.h' -C -P -x c -E $< -o $@
 
 $(BOOTLOADER_BIN):
