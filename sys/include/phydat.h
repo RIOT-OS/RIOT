@@ -288,6 +288,35 @@ void phydat_fit(phydat_t *dat, const int32_t *values, unsigned int dim);
  */
 size_t phydat_to_json(const phydat_t *data, size_t dim, char *buf);
 
+/**
+ * @brief   Convert a date and time contained in phydat structs to a Unix timestamp.
+ *          See phydat_unix() for the date notation and peculiarities.
+ *
+ * @param date              Date to use in the timestamp.
+ * @param time              Time to use in the timestamp.
+ * @param offset_seconds    Timezone offset in seconds to use in the timestamp.
+ *
+ * @return  A unix timestamp
+ */
+int64_t phydat_date_time_to_unix(phydat_t *date, phydat_t *time, int32_t offset_seconds);
+
+/**
+ * @brief   Convert a date and time (per ISO8601) to a Unix timestamp (seconds since 1970).
+ *
+ * @param year      Year in the Common Era (CE). Note that 0 is 1 BCE, 1 is 2 BCE, etc.
+ * @param month     Month of the year.
+ * @param day       Day of the month.
+ * @param hour      Hour of the day.
+ * @param minute    Minute of the hour.
+ * @param second    Second of the minute.
+ * @param offset    Timezone offset in seconds.
+ *
+ * @return          A Unix timestamp (seconds since 1970).
+ */
+int64_t phydat_unix(int16_t year, int16_t month, int16_t day,
+                    int16_t hour, int16_t minute, int16_t second,
+                    int32_t offset);
+
 #ifdef __cplusplus
 }
 #endif
