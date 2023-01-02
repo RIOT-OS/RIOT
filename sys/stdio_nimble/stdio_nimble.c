@@ -39,10 +39,6 @@
 #include "periph/uart.h"
 #endif /* IS_USED(MODULE_STDIO_NIMBLE_DEBUG) */
 
-#if IS_USED(MODULE_VFS)
-#include "vfs.h"
-#endif
-
 #include "tsrb.h"
 #include "isrpipe.h"
 #include "stdio_nimble.h"
@@ -312,10 +308,6 @@ static int gatt_svr_chr_access_stdin(
 
 void stdio_init(void)
 {
-#if IS_USED(MODULE_VFS)
-    vfs_bind_stdio();
-#endif
-
 #if IS_USED(MODULE_STDIO_NIMBLE_DEBUG)
     uart_init(STDIO_UART_DEV, STDIO_UART_BAUDRATE, NULL, NULL);
 #endif

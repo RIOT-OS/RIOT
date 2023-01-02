@@ -31,6 +31,10 @@
 #include "thread.h"
 #include "stdio_base.h"
 
+#if IS_USED(MODULE_VFS)
+#include "vfs.h"
+#endif
+
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
@@ -113,4 +117,8 @@ void early_init(void)
     }
 
     stdio_init();
+
+#if MODULE_VFS
+    vfs_bind_stdio();
+#endif
 }

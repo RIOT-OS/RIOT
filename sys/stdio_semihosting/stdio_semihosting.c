@@ -27,10 +27,6 @@
 #include "stdio_semihosting.h"
 #include "ztimer.h"
 
-#if MODULE_VFS
-#include "vfs.h"
-#endif
-
 /**
  * @brief Rate at which the stdin read polls (breaks) the debugger for input
  * data in milliseconds
@@ -149,9 +145,6 @@ static ssize_t _semihosting_read(uint8_t *buffer, size_t len)
 
 void stdio_init(void)
 {
-#if MODULE_VFS
-    vfs_bind_stdio();
-#endif
 }
 
 ssize_t stdio_read(void* buffer, size_t count)

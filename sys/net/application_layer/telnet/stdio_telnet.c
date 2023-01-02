@@ -29,9 +29,6 @@
 #include "stdio_uart.h"
 #include "periph/uart.h"
 #endif
-#if IS_USED(MODULE_VFS)
-#include "vfs.h"
-#endif
 #ifdef CPU_NATIVE
 #include "native_internal.h"
 #endif
@@ -62,10 +59,6 @@ static inline int _write_fallback(const void* buffer, size_t len)
 void stdio_init(void)
 {
     _init_fallback();
-
-#if IS_USED(MODULE_VFS)
-    vfs_bind_stdio();
-#endif
 }
 
 ssize_t stdio_read(void* buffer, size_t count)
