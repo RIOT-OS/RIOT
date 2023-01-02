@@ -71,7 +71,8 @@ static const adc_conf_t adc_config[] = {
      * Also, this conflicts with PWM. We prefer PWM over ADC here to provide
      * 6 external ADC inputs, and 4 PWM outputs (instead of 8 ADC inputs and
      * 2 PWM outputs). */
-#if !defined(BOARD_BLACKPILL) && !defined(BOARD_BLACKPILL_128KIB) \
+#if !defined(BOARD_BLACKPILL_STM32F103C8) \
+    && !defined(BOARD_BLACKPILL_STM32F103CB) \
     && !defined(MODULE_PERIPH_PWM)
     { .pin = GPIO_PIN(PORT_B, 0), .dev = 0, .chan = 8 },
     { .pin = GPIO_PIN(PORT_B, 1), .dev = 0, .chan = 9 },
@@ -280,7 +281,8 @@ static const pwm_conf_t pwm_config[] = {
         .chan     = {
                         { .pin = GPIO_PIN(PORT_B, 4), .cc_chan = 0 },
                         { .pin = GPIO_PIN(PORT_B, 5), .cc_chan = 1 },
-#if !defined(BOARD_BLACKPILL) && !defined(BOARD_BLACKPILL_128KIB)
+#if !defined(BOARD_BLACKPILL_STM32F103C8) \
+    && !defined(BOARD_BLACKPILL_STM32F103CB)
                         /* The blackpill has a few pins less. PB0 and PB1 are
                          * among the GPIOs not exposed due to the lower
                          * pincount */

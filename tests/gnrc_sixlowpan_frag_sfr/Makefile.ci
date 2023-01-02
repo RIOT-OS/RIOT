@@ -8,11 +8,11 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega328p \
     atmega328p-xplained-mini \
     atxmega-a3bu-xplained \
-    blackpill \
-    bluepill \
-    blackpill-128kib \
-    bluepill-128kib \
+    blackpill-stm32f103c8 \
+    blackpill-stm32f103cb \
     bluepill-stm32f030c8 \
+    bluepill-stm32f103c8 \
+    bluepill-stm32f103cb \
     derfmega128 \
     hifive1 \
     hifive1b \

@@ -6,9 +6,9 @@
 #
 
 config BOARD
-    default "blackpill" if BOARD_BLACKPILL
+    default "blackpill-stm32f103c8" if BOARD_BLACKPILL_STM32F103C8
 
-config BOARD_BLACKPILL
+config BOARD_BLACKPILL_STM32F103C8
     bool
     default y
     select BOARD_COMMON_BLXXXPILL

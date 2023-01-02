@@ -12,19 +12,18 @@ MCU nominally has 64 KiB flash, most [actually have 128 KiB flash][Flashsize].
 There are also versions that only report to have 32 KiB, but actually have
 64 KiB.
 
-
 ## Pinout
 
 ![pinout](pinouts/pinout-bluepill.svg)
 
-### MCU
+## MCU
 
-| MCU       | STM32F103C8               |
+| MCU       | STM32F103C8 / STM32F103CB |
 |:----------|:--------------------------|
 | Family    | ARM Cortex-M3             |
 | Vendor    | STMicroelectronics        |
 | RAM       | 20 KiB                    |
-| Flash     | 32 KiB/ 64 KiB / 128 KiB  |
+| Flash     | 32 KiB / 64 KiB / 128 KiB |
 | Frequency | up to 72 MHz              |
 | Timer     | 3x 16-Bit                 |
 | ADC       | 2x 12-bit, 10 channels    |
@@ -34,7 +33,6 @@ There are also versions that only report to have 32 KiB, but actually have
 | CAN       | 1                         |
 | Vcc       | 2.0 to 3.6 V              |
 | Datasheet | [Datasheet][Datasheet]    |
-
 
 ## Implementation Status
 
@@ -61,30 +59,30 @@ mode. Therefore not only SWDIO and SWCLK, but also the RST pin of your
 debugger need to be connected to the board. Once the device is connected to
 the debugger and OpenOCD is installed, you can flash the device with:
 
-    $ make BOARD=bluepill flash
+    $ make BOARD=bluepill-stm32f103c8 flash
 
 Or for the blackpill with:
 
-    $ make BOARD=blackpill flash
+    $ make BOARD=blackpill-stm32f103c8 flash
 
 ### Additional Flash
 
-To make use of the entire 128 KiB flash, compile and flash your application
-with:
+Typically, the STM32F103C8 does actually have 128 KiB flash. To make use of
+this, just flash with
 
-    $ make BOARD=bluepill-128kib flash
+    $ make BOARD=bluepill-stm32f103cb flash
 
 Or for the blackpill with:
 
-    $ make BOARD=blackpill-128kib flash
+    $ make BOARD=blackpill-stm32f103cb flash
 
 This sets the `CPU_MODEL` make variable to `stm32f103cb`, the default
 value is `stm32f103c8`. These two CPU models basically only have one
 major difference, the former has 128 KiB flash while the latter has 64
 KiB.
 
-Flashing for the 128KiB version  currently (as of September 2019) requires the
-development version of OpenOCD.
+In order to flash the *cb variant onto *c8 hardware requires OpenOCD in version
+0.11 or later.
 
 ## Connecting via Serial
 
@@ -137,7 +135,6 @@ The board is sold under different names. On some sites it is called
 `stm32f103c8` or `stm32f103c8t6`.
 
 Try [eBay][eBay] or [AliExpress][AliExpress].
-
 
 ## Further reading
 

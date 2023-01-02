@@ -33,7 +33,7 @@ with bootloader installed), it produces the following output after the normal
 compilation:
 
 ```
-make BOARD=bluepill  PROGRAMMER=dfu-util
+make BOARD=bluepill-stm32f103c8  PROGRAMMER=dfu-util
 ...
 Test rom offset 1 byte overflow detection: [OK]
 Test rom offset subtracted from rom length in elffile: [OK]

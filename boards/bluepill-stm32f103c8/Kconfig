@@ -6,9 +6,9 @@
 #
 
 config BOARD
-    default "bluepill" if BOARD_BLUEPILL
+    default "bluepill-stm32f103c8" if BOARD_BLUEPILL_STM32F103C8
 
-config BOARD_BLUEPILL
+config BOARD_BLUEPILL_STM32F103C8
     bool
     default y
     select BOARD_COMMON_BLXXXPILL

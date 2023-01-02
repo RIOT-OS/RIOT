@@ -8,8 +8,8 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega328p \
     atmega328p-xplained-mini \
     atxmega-a3bu-xplained \
-    blackpill \
-    bluepill \
+    blackpill-stm32f103c8 \
+    bluepill-stm32f103c8 \
     bluepill-stm32f030c8 \
     derfmega128 \
     i-nucleo-lrwan1 \

@@ -6,9 +6,9 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-mkrzero \
     arduino-nano-33-iot \
     bastwan \
+    blackpill-stm32f103cb \
     bluepill-stm32f030c8 \
-    blackpill-128kib \
-    bluepill-128kib \
+    bluepill-stm32f103cb \
     calliope-mini \
     feather-m0 \
     feather-m0-lora \

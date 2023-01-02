@@ -12,8 +12,8 @@ BOARD_INSUFFICIENT_MEMORY := \
     atxmega-a1u-xpro \
     atxmega-a3bu-xplained \
     avr-rss2 \
-    blackpill \
-    bluepill \
+    blackpill-stm32f103c8 \
+    bluepill-stm32f103c8 \
     bluepill-stm32f030c8 \
     derfmega128 \
     derfmega256 \

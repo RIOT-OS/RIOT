@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     boards_bluepill
+ * @ingroup     boards_bluepill_stm32f103c8
  *
  * This board can be bought very cheaply on sides like eBay or
  * AliExpress. Although the MCU nominally has 64 KiB ROM, most of them
