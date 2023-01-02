@@ -11,6 +11,7 @@ FLASH_MODE  = dout
 FLASH_FREQ  = 26m
 FLASH_SIZE ?= 1
 BOOTLOADER_POS = 0x0000
+FLASHFILE_POS = 0x10000
 
 include $(RIOTCPU)/esp_common/Makefile.include
 
