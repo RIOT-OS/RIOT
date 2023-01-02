@@ -56,6 +56,15 @@ void kernel_init(void);
  */
 void board_init(void);
 
+/**
+ * @brief   Initialize debug LEDs and stdio
+ */
+#ifdef MODULE_CORE_INIT
+void early_init(void);
+#else
+static inline void early_init(void) {}
+#endif
+
 #ifdef __cplusplus
 }
 #endif

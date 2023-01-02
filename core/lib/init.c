@@ -29,6 +29,7 @@
 #include "log.h"
 #include "periph/pm.h"
 #include "thread.h"
+#include "stdio_base.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -101,4 +102,15 @@ void kernel_init(void)
     }
 
     cpu_switch_context_exit();
+}
+
+void early_init(void)
+{
+    /* initialize leds */
+    if (IS_USED(MODULE_PERIPH_INIT_LEDS)) {
+        extern void led_init(void);
+        led_init();
+    }
+
+    stdio_init();
 }
