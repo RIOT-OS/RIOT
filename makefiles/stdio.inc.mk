@@ -8,6 +8,7 @@ STDIO_MODULES = \
   stdio_rtt \
   stdio_semihosting \
   stdio_uart \
+  stdio_udp \
   stdio_telnet \
   stdio_tinyusb_cdc_acm \
   stdio_usb_serial_jtag \
@@ -73,6 +74,10 @@ endif
 ifneq (,$(filter stdio_telnet,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_telnet
   USEMODULE += telnet
+endif
+
+ifneq (,$(filter stdio_udp,$(USEMODULE)))
+  USEMODULE += sock_udp
 endif
 
 # enable stdout buffering for modules that benefit from sending out buffers in larger chunks

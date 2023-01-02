@@ -80,4 +80,17 @@ else
                             "don't run this on public networks!$(COLOR_RESET)" 1>&2)
     endif
   endif
+
+  # Warn about STDIO UDP
+  ifneq (,$(filter stdio_udp,$(USEMODULE)))
+    ifneq (1,$(I_UNDERSTAND_THAT_STDIO_UDP_IS_INSECURE))
+      $(shell $(COLOR_ECHO) "$(COLOR_RED)stdio via UDP will be started automatically,"\
+                            "make sure you understand why this almost certainly"\
+                            "is a REALLY BAD idea before proceeding!$(COLOR_RESET)" 1>&2)
+      $(error I_UNDERSTAND_THAT_STDIO_UDP_IS_INSECURE must be set to 1 to proceed)
+    else
+      $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)stdio via UDP will be started automatically,"\
+                            "don't run this on public networks!$(COLOR_RESET)" 1>&2)
+    endif
+  endif
 endif
