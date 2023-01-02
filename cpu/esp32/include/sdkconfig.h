@@ -27,7 +27,7 @@
  * header. To avoid having to patch all these files, `stdlib.h` is included
  * in this header file, which in turn is included by every ESP-IDF file.
  */
-#ifndef __ASSEMBLER__
+#if !defined(__ASSEMBLER__) && !defined(LD_FILE_GEN)
 #include <stdlib.h>
 #endif
 
