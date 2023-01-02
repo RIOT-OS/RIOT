@@ -708,6 +708,11 @@ BUILDDEPS += pkg-prepare
 BUILDDEPS += $(APPDEPS)
 BUILDDEPS += $(MODULE_LIST_DIR)
 
+# Build dependencies depend on clean (if a make goal), as clean may wipe them.
+# Without them depending on clean parallel builds occasionally fail due to
+# clean removing dependencies that make previously considered as up to date.
+$(BUILDDEPS): $(CLEAN)
+
 # Save value to verify it is not modified later
 _BASELIBS_VALUE_BEFORE_USAGE := $(BASELIBS)
 
