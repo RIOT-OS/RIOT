@@ -149,7 +149,7 @@ static NORETURN void IRAM system_startup_cpu0(void)
 
     /* initialize stdio */
     esp_rom_uart_tx_wait_idle(CONFIG_ESP_CONSOLE_UART_NUM);
-    stdio_init();
+    early_init();
 
     RESET_REASON reset_reason = rtc_get_reset_reason(PRO_CPU_NUM);
 

@@ -18,6 +18,7 @@
  */
 
 #include "cpu.h"
+#include "kernel_init.h"
 #include "nrf_clock.h"
 #include "nrfx_riot.h"
 #include "periph_conf.h"
@@ -36,7 +37,7 @@ void cpu_init(void)
     /* setup the HF clock */
     clock_init_hf();
     /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
-    stdio_init();
+    early_init();
     /* trigger static peripheral initialization */
     periph_init();
 }
