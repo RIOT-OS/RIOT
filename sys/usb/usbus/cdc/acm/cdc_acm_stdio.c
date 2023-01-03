@@ -34,10 +34,6 @@
 #include "vfs.h"
 #endif
 
-#ifdef MODULE_USB_BOARD_RESET
-#include "usb_board_reset_internal.h"
-#endif
-
 static usbus_cdcacm_device_t cdcacm;
 static uint8_t _cdc_tx_buf_mem[CONFIG_USBUS_CDC_ACM_STDIO_BUF_SIZE];
 static uint8_t _cdc_rx_buf_mem[CONFIG_USBUS_CDC_ACM_STDIO_BUF_SIZE];
@@ -91,7 +87,4 @@ void usb_cdc_acm_stdio_init(usbus_t *usbus)
 {
     usbus_cdc_acm_init(usbus, &cdcacm, _cdc_acm_rx_pipe, NULL,
                        _cdc_tx_buf_mem, sizeof(_cdc_tx_buf_mem));
-#ifdef MODULE_USB_BOARD_RESET
-    usbus_cdc_acm_set_coding_cb(&cdcacm, usb_board_reset_coding_cb);
-#endif
 }

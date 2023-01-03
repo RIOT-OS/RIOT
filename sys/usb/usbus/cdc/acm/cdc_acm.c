@@ -29,6 +29,8 @@
 #include "usb/usbus/cdc/acm.h"
 #include "usb/usbus/control.h"
 
+#include "usb_board_reset_internal.h"
+
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
@@ -259,7 +261,7 @@ static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
     usbus_cdcacm_device_t *cdcacm = (usbus_cdcacm_device_t*)handler;
     switch (setup->request) {
         case USB_CDC_MGNT_REQUEST_SET_LINE_CODING:
-            if (!(cdcacm->coding_cb)) {
+            if (!(cdcacm->coding_cb) && !IS_USED(MODULE_USB_BOARD_RESET)) {
                 /* Line coding not supported, return STALL */
                 DEBUG("CDCACM: line coding not supported\n");
                 return -1;
@@ -278,6 +280,12 @@ static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
                           ", expected: %u, got: %u",
                           sizeof(usb_req_cdcacm_coding_t), len);
                     return -1;
+                }
+                if (IS_USED(MODULE_USB_BOARD_RESET)) {
+                    /* call board reset function first if reset is received */
+                    usb_board_reset_coding_cb(cdcacm, coding->baud,
+                                              coding->databits, coding->parity,
+                                              coding->format);
                 }
                 if (cdcacm->coding_cb) {
                     DEBUG("Setting line coding to baud rate %" PRIu32 ", "
