@@ -1,19 +1,7 @@
-ifeq ($(CPU),esp8266)
-  ifneq (,$(filter esp_log_colored,$(USEMODULE)))
-    BOOTLOADER_COLOR = _colors
-  endif
-  ifneq (,$(filter esp_log_startup,$(USEMODULE)))
-    BOOTLOADER_INFO = _info
-  endif
-  # Full path to the bootloader binary. In the ESP32 case this is set by the
-  # esp_bootloader module.
-  BOOTLOADER_BIN ?= $(RIOTCPU)/$(CPU)/bin/bootloader$(BOOTLOADER_COLOR)$(BOOTLOADER_INFO).bin
-else
-  # ESP-IDF uses dio as flash mode for esptool.py when qout or qio mode are
-  # configured to always boot in dual SPI mode
-  ifneq (,$(filter qout qio,$(FLASH_MODE)))
-    FLASH_MODE = dio
-  endif
+# ESP-IDF uses dio as flash mode for esptool.py when qout or qio mode are
+# configured to always boot in dual SPI mode
+ifneq (,$(filter qout qio,$(FLASH_MODE)))
+  FLASH_MODE = dio
 endif
 
 ESPTOOL ?= $(RIOTTOOLS)/esptools/esptool.py
