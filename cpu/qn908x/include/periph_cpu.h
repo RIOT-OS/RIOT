@@ -335,6 +335,10 @@ typedef uint16_t adc_conf_t;
  */
 #define TIMER_CHANNELS      (4)
 #define TIMER_MAX_VALUE     (0xffffffff)
+/**
+ * @brief   The nRF5x periph_timer implements timer_set()
+ */
+#define PERIPH_TIMER_PROVIDES_SET   1
 /** @} */
 
 /**

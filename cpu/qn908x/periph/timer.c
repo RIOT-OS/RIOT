@@ -112,6 +112,31 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
     return 0;
 }
 
+int timer_set(tim_t tim, int channel, unsigned int value)
+{
+    DEBUG("timer_set(%u, %u, %u)\n", tim, channel, value);
+    if ((tim >= TIMER_NUMOF) || (channel >= TIMER_CHANNELS)) {
+        return -1;
+    }
+    CTIMER_Type* const dev = ctimers[tim];
+
+    /* no IRQ will be generated on value == 0, so bump it here */
+    value = (value != 0) ? value : 1;
+
+    unsigned irq_state = irq_disable();
+
+    /* briefly pause timer */
+    ctimers[tim]->TCR &= ~CTIMER_TCR_CEN_MASK;
+    /* set absolute timeout based on given value and enable IRQ */
+    dev->MR[channel] = dev->TC + value;
+    dev->MCR |= (CTIMER_MCR_MR0I_MASK << (channel * 3));
+    /* and resume timer */
+    ctimers[tim]->TCR |= CTIMER_TCR_CEN_MASK;
+    irq_restore(irq_state);
+
+    return 0;
+}
+
 int timer_clear(tim_t tim, int channel)
 {
     DEBUG("timer_clear(%u, %d)\n", tim, channel);
