@@ -9,6 +9,7 @@ menuconfig MODULE_USBUS
     bool "USB Unified Stack (USBUS)"
     depends on TEST_KCONFIG
     depends on HAS_PERIPH_USBDEV || MODULE_USBDEV_MOCK
+    default y if TEST_KCONFIG && HAS_HIGHLEVEL_STDIO && !MODULE_TINYUSB_DEVICE
     select MODULE_CORE_THREAD_FLAGS
     select MODULE_EVENT
     select MODULE_LUID
