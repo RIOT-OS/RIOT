@@ -35,6 +35,11 @@ extern "C" {
 #define TIMER_CHANNEL_NUMOF (4U)
 
 /**
+ * @brief   The driver provides a relative set function
+ */
+#define PERIPH_TIMER_PROVIDES_SET
+
+/**
  * @brief   Define a macro for accessing a timer channel
  */
 #define TIM_CHAN(tim, chan) *(&dev(tim)->CCR1 + chan)
