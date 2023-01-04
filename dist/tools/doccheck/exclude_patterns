@@ -1586,8 +1586,6 @@ boards/hamilton/include/board\.h:[0-9]+: warning: Member HDC1000_PARAM_ADDR \(ma
 boards/hamilton/include/board\.h:[0-9]+: warning: Member HDC1000_PARAM_I2C \(macro definition\) of group boards_hamilton is not documented\.
 boards/hamilton/include/board\.h:[0-9]+: warning: Member HDC1000_PARAM_RENEW_INTERVAL \(macro definition\) of group boards_hamilton is not documented\.
 boards/hamilton/include/board\.h:[0-9]+: warning: Member HDC1000_PARAM_RES \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member PIR_PARAM_ACTIVE_HIGH \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member PIR_PARAM_GPIO \(macro definition\) of group boards_hamilton is not documented\.
 boards/hamilton/include/board\.h:[0-9]+: warning: Member PULSE_COUNTER_GPIO \(macro definition\) of group boards_hamilton is not documented\.
 boards/hamilton/include/board\.h:[0-9]+: warning: Member PULSE_COUNTER_GPIO_FLANK \(macro definition\) of group boards_hamilton is not documented\.
 boards/hamilton/include/board\.h:[0-9]+: warning: Member TMP006_PARAM_ADDR \(macro definition\) of group boards_hamilton is not documented\.
@@ -9827,9 +9825,6 @@ drivers/ph_oem/include/ph_oem_params\.h:[0-9]+: warning: Member PH_OEM_PARAM_INT
 drivers/ph_oem/include/ph_oem_params\.h:[0-9]+: warning: Member PH_OEM_PARAM_INTERRUPT_OPTION \(macro definition\) of file ph_oem_params\.h is not documented\.
 drivers/ph_oem/include/ph_oem_params\.h:[0-9]+: warning: Member PH_OEM_PARAM_INTERRUPT_PIN \(macro definition\) of file ph_oem_params\.h is not documented\.
 drivers/ph_oem/include/ph_oem_params\.h:[0-9]+: warning: Member PH_OEM_SAUL_INFO \(macro definition\) of file ph_oem_params\.h is not documented\.
-drivers/pir/include/pir_params\.h:[0-9]+: warning: Member PIR_PARAMS \(macro definition\) of file pir_params\.h is not documented\.
-drivers/pir/include/pir_params\.h:[0-9]+: warning: Member PIR_PARAM_ACTIVE_HIGH \(macro definition\) of file pir_params\.h is not documented\.
-drivers/pir/include/pir_params\.h:[0-9]+: warning: Member PIR_SAUL_INFO \(macro definition\) of file pir_params\.h is not documented\.
 drivers/pulse_counter/include/pulse_counter_params\.h:[0-9]+: warning: Member PULSE_COUNTER_GPIO \(macro definition\) of file pulse_counter_params\.h is not documented\.
 drivers/pulse_counter/include/pulse_counter_params\.h:[0-9]+: warning: Member PULSE_COUNTER_GPIO_FLANK \(macro definition\) of file pulse_counter_params\.h is not documented\.
 drivers/pulse_counter/include/pulse_counter_params\.h:[0-9]+: warning: Member PULSE_COUNTER_PARAMS \(macro definition\) of file pulse_counter_params\.h is not documented\.
