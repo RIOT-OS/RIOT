@@ -29,3 +29,10 @@ warning: Member SHT1X_SAULINFO \(macro definition\) of
 warning: Member TMP00X_PARAM_ADDR \(macro definition\) of
 warning: Member TMP00X_PARAM_I2C \(macro definition\) of
 warning: Member TMP00X_PARAM_RATE \(macro definition\) of
+warning: Member XTIMER_BACKOFF \(macro definition\) of
+warning: Member XTIMER_CHAN \(macro definition\) of
+warning: Member XTIMER_DEV \(macro definition\) of
+warning: Member XTIMER_HZ \(macro definition\) of
+warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of
+warning: Member XTIMER_OVERHEAD \(macro definition\) of
+warning: Member XTIMER_WIDTH \(macro definition\) of
