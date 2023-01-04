@@ -3148,7 +3148,6 @@ boards/pba\-d\-01\-kw2x/include/board\.h:[0-9]+: warning: Member KW2XRF_PARAM_SP
 boards/pba\-d\-01\-kw2x/include/board\.h:[0-9]+: warning: Member KW2XRF_PARAM_SPI_CLK \(macro definition\) of file board\.h is not documented\.
 boards/pba\-d\-01\-kw2x/include/board\.h:[0-9]+: warning: Member KW2XRF_PARAM_RESET \(macro definition\) of file board\.h is not documented\.
 boards/pba\-d\-01\-kw2x/include/board\.h:[0-9]+: warning: Member KW2XRF_SHARED_SPI \(macro definition\) of file board\.h is not documented\.
-boards/pba\-d\-01\-kw2x/include/board\.h:[0-9]+: warning: Member TMP00X_PARAM_ADDR \(macro definition\) of file board\.h is not documented\.
 boards/pba\-d\-01\-kw2x/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/pba\-d\-01\-kw2x/include/periph_conf\.h:[0-9]+: warning: Member ADC_REF_SETTING \(macro definition\) of file periph_conf\.h is not documented\.
 boards/pba\-d\-01\-kw2x/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_BUSCLOCK \(macro definition\) of file periph_conf\.h is not documented\.
@@ -11418,11 +11417,6 @@ drivers/tcs37727/include/tcs37727_params\.h:[0-9]+: warning: Member TCS37727_PAR
 drivers/tcs37727/include/tcs37727_params\.h:[0-9]+: warning: Member TCS37727_PARAM_ATIME \(macro definition\) of file tcs37727_params\.h is not documented\.
 drivers/tcs37727/include/tcs37727_params\.h:[0-9]+: warning: Member TCS37727_PARAM_I2C \(macro definition\) of file tcs37727_params\.h is not documented\.
 drivers/tcs37727/include/tcs37727_params\.h:[0-9]+: warning: Member TCS37727_SAUL_INFO \(macro definition\) of file tcs37727_params\.h is not documented\.
-drivers/tmp00x/include/tmp00x_params\.h:[0-9]+: warning: Member TMP00X_PARAMS \(macro definition\) of file tmp00x_params\.h is not documented\.
-drivers/tmp00x/include/tmp00x_params\.h:[0-9]+: warning: Member TMP00X_PARAM_ADDR \(macro definition\) of file tmp00x_params\.h is not documented\.
-drivers/tmp00x/include/tmp00x_params\.h:[0-9]+: warning: Member TMP00X_PARAM_I2C \(macro definition\) of file tmp00x_params\.h is not documented\.
-drivers/tmp00x/include/tmp00x_params\.h:[0-9]+: warning: Member TMP00X_PARAM_RATE \(macro definition\) of file tmp00x_params\.h is not documented\.
-drivers/tmp00x/include/tmp00x_params\.h:[0-9]+: warning: Member TMP00X_SAUL_INFO \(macro definition\) of file tmp00x_params\.h is not documented\.
 drivers/tps6274x/include/tps6274x_params\.h:[0-9]+: warning: Member TPS6274X_PARAMS \(macro definition\) of file tps6274x_params\.h is not documented\.
 drivers/tsl2561/include/tsl2561_internals\.h:[0-9]+: warning: Member TSL2561_B1T \(macro definition\) of file tsl2561_internals\.h is not documented\.
 drivers/tsl2561/include/tsl2561_internals\.h:[0-9]+: warning: Member TSL2561_B2T \(macro definition\) of file tsl2561_internals\.h is not documented\.

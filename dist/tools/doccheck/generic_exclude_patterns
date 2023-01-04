@@ -26,3 +26,6 @@ warning: Member PULSE_COUNTER_SAUL_INFO \(macro definition\) of
 warning: Member SHT1X_PARAMS \(macro definition\) of
 warning: Member SHT1X_PARAM_[A-Z0-9_]* \(macro definition\) of
 warning: Member SHT1X_SAULINFO \(macro definition\) of
+warning: Member TMP00X_PARAM_ADDR \(macro definition\) of
+warning: Member TMP00X_PARAM_I2C \(macro definition\) of
+warning: Member TMP00X_PARAM_RATE \(macro definition\) of
