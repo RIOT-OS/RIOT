@@ -720,10 +720,6 @@ boards/common/esp8266/include/board_common\.h:[0-9]+: warning: Member SPIFFS_HAL
 boards/common/esp8266/include/board_common\.h:[0-9]+: warning: Member SPIFFS_READ_ONLY \(macro definition\) of file board_common\.h is not documented\.
 boards/common/esp8266/include/board_common\.h:[0-9]+: warning: Member SPIFFS_SINGLETON \(macro definition\) of file board_common\.h is not documented\.
 boards/common/esp8266/include/periph_conf_common\.h:[0-9]+: warning: Member BIT\(X\) \(macro definition\) of file periph_conf_common\.h is not documented\.
-boards/common/iotlab/include/board_common\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_CS \(macro definition\) of group boards_common_iotlab is not documented\.
-boards/common/iotlab/include/board_common\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_INT \(macro definition\) of group boards_common_iotlab is not documented\.
-boards/common/iotlab/include/board_common\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_RESET \(macro definition\) of group boards_common_iotlab is not documented\.
-boards/common/iotlab/include/board_common\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_SLEEP \(macro definition\) of group boards_common_iotlab is not documented\.
 boards/common/iotlab/include/board_common\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_DEV \(macro definition\) of group boards_common_iotlab is not documented\.
 boards/common/iotlab/include/board_common\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_MIN \(macro definition\) of group boards_common_iotlab is not documented\.
 boards/common/iotlab/include/board_common\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_TYPE \(macro definition\) of group boards_common_iotlab is not documented\.
@@ -1473,12 +1469,6 @@ boards/frdm\-kw41z/include/periph_conf\.h:[0-9]+: warning: Member ADC_REF_SETTIN
 boards/frdm\-kw41z/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/frdm\-kw41z/include/periph_conf\.h:[0-9]+: warning: Member adc_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/frdm\-kw41z/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_CS \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_INT \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_RESET \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_SLEEP \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_SPI \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_SPI_CLK \(macro definition\) of group boards_hamilton is not documented\.
 boards/hamilton/include/board\.h:[0-9]+: warning: Member FXOS8700_PARAM_ADDR \(macro definition\) of group boards_hamilton is not documented\.
 boards/hamilton/include/board\.h:[0-9]+: warning: Member FXOS8700_PARAM_I2C \(macro definition\) of group boards_hamilton is not documented\.
 boards/hamilton/include/board\.h:[0-9]+: warning: Member FXOS8700_PARAM_RENEW_INTERVAL \(macro definition\) of group boards_hamilton is not documented\.
@@ -1968,9 +1958,6 @@ boards/msbiot/include/periph_conf\.h:[0-9]+: warning: Member pwm_config\[\] \(va
 boards/msbiot/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/msbiot/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/msbiot/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/mulle/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_INT \(macro definition\) of file board\.h is not documented\.
-boards/mulle/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_RESET \(macro definition\) of file board\.h is not documented\.
-boards/mulle/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_SLEEP \(macro definition\) of file board\.h is not documented\.
 boards/mulle/include/board\.h:[0-9]+: warning: Member LED0_BIT \(macro definition\) of file board\.h is not documented\.
 boards/mulle/include/board\.h:[0-9]+: warning: Member LED1_BIT \(macro definition\) of file board\.h is not documented\.
 boards/mulle/include/board\.h:[0-9]+: warning: Member LED2_BIT \(macro definition\) of file board\.h is not documented\.
@@ -3450,10 +3437,6 @@ boards/saml21\-xpro/include/periph_conf\.h:[0-9]+: warning: Member sam_usbdev_co
 boards/saml21\-xpro/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/saml21\-xpro/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/saml21\-xpro/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/samr21\-xpro/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_CS \(macro definition\) of file board\.h is not documented\.
-boards/samr21\-xpro/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_INT \(macro definition\) of file board\.h is not documented\.
-boards/samr21\-xpro/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_RESET \(macro definition\) of file board\.h is not documented\.
-boards/samr21\-xpro/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_SLEEP \(macro definition\) of file board\.h is not documented\.
 boards/samr21\-xpro/include/board\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_DEV \(macro definition\) of file board\.h is not documented\.
 boards/samr21\-xpro/include/board\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_MIN \(macro definition\) of file board\.h is not documented\.
 boards/samr21\-xpro/include/board\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_TYPE \(macro definition\) of file board\.h is not documented\.
@@ -3503,12 +3486,6 @@ boards/samr21\-xpro/include/periph_conf\.h:[0-9]+: warning: Member sam_usbdev_co
 boards/samr21\-xpro/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/samr21\-xpro/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/samr21\-xpro/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/samr30\-xpro/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_CS \(macro definition\) of group boards_samr30\-xpro is not documented\.
-boards/samr30\-xpro/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_INT \(macro definition\) of group boards_samr30\-xpro is not documented\.
-boards/samr30\-xpro/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_RESET \(macro definition\) of group boards_samr30\-xpro is not documented\.
-boards/samr30\-xpro/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_SLEEP \(macro definition\) of group boards_samr30\-xpro is not documented\.
-boards/samr30\-xpro/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_SPI \(macro definition\) of group boards_samr30\-xpro is not documented\.
-boards/samr30\-xpro/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_SPI_CLK \(macro definition\) of group boards_samr30\-xpro is not documented\.
 boards/samr30\-xpro/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of group boards_samr30\-xpro is not documented\.
 boards/samr30\-xpro/include/board\.h:[0-9]+: warning: Member RFCTL1_PIN \(macro definition\) of group boards_samr30\-xpro is not documented\.
 boards/samr30\-xpro/include/board\.h:[0-9]+: warning: Member RFCTL2_PIN \(macro definition\) of group boards_samr30\-xpro is not documented\.
@@ -6505,13 +6482,6 @@ drivers/at86rf2xx/include/at86rf2xx_aes\.h:[0-9]+: warning: Member AT86RF2XX_REG
 drivers/at86rf2xx/include/at86rf2xx_aes\.h:[0-9]+: warning: Member AT86RF2XX_REG__AES_KEY_END \(macro definition\) of file at86rf2xx_aes\.h is not documented\.
 drivers/at86rf2xx/include/at86rf2xx_aes\.h:[0-9]+: warning: Member AT86RF2XX_REG__AES_KEY_START \(macro definition\) of file at86rf2xx_aes\.h is not documented\.
 drivers/at86rf2xx/include/at86rf2xx_aes\.h:[0-9]+: warning: Member AT86RF2XX_REG__AES_STATUS \(macro definition\) of file at86rf2xx_aes\.h is not documented\.
-drivers/at86rf2xx/include/at86rf2xx_params\.h:[0-9]+: warning: Member AT86RF2XX_PARAMS \(macro definition\) of file at86rf2xx_params\.h is not documented\.
-drivers/at86rf2xx/include/at86rf2xx_params\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_CS \(macro definition\) of file at86rf2xx_params\.h is not documented\.
-drivers/at86rf2xx/include/at86rf2xx_params\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_INT \(macro definition\) of file at86rf2xx_params\.h is not documented\.
-drivers/at86rf2xx/include/at86rf2xx_params\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_RESET \(macro definition\) of file at86rf2xx_params\.h is not documented\.
-drivers/at86rf2xx/include/at86rf2xx_params\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_SLEEP \(macro definition\) of file at86rf2xx_params\.h is not documented\.
-drivers/at86rf2xx/include/at86rf2xx_params\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_SPI \(macro definition\) of file at86rf2xx_params\.h is not documented\.
-drivers/at86rf2xx/include/at86rf2xx_params\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_SPI_CLK \(macro definition\) of file at86rf2xx_params\.h is not documented\.
 drivers/at86rf2xx/include/at86rf2xx_registers\.h:[0-9]+: warning: Member AT86RF212B_PARTNUM \(macro definition\) of file at86rf2xx_registers\.h is not documented\.
 drivers/at86rf2xx/include/at86rf2xx_registers\.h:[0-9]+: warning: Member AT86RF231_PARTNUM \(macro definition\) of file at86rf2xx_registers\.h is not documented\.
 drivers/at86rf2xx/include/at86rf2xx_registers\.h:[0-9]+: warning: Member AT86RF232_PARTNUM \(macro definition\) of file at86rf2xx_registers\.h is not documented\.

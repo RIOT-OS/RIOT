@@ -1,3 +1,9 @@
+warning: Member AT86RF2XX_PARAM_CS \(macro definition\) of
+warning: Member AT86RF2XX_PARAM_INT \(macro definition\) of
+warning: Member AT86RF2XX_PARAM_RESET \(macro definition\) of
+warning: Member AT86RF2XX_PARAM_SLEEP \(macro definition\) of
+warning: Member AT86RF2XX_PARAM_SPI \(macro definition\) of
+warning: Member AT86RF2XX_PARAM_SPI_CLK \(macro definition\) of
 warning: Member BTN[0-9]_INT_FLANK \(macro definition\) of
 warning: Member BTN[0-9]_MASK \(macro definition\) of
 warning: Member BTN[0-9]_MODE \(macro definition\) of
