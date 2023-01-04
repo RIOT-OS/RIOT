@@ -23,10 +23,14 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "thread.h"
+#include "board.h"
+#include "clk.h"
+#include "macros/units.h"
 #include "msg.h"
+#include "periph_conf.h"
+#include "thread.h"
+#include "time_units.h"
 #include "ztimer.h"
-#include "timex.h"
 
 static char t1_stack[THREAD_STACKSIZE_MAIN];
 static char t2_stack[THREAD_STACKSIZE_MAIN];
@@ -36,15 +40,13 @@ static kernel_pid_t p1, p2, p3;
 
 static ztimer_t timer;
 
-#define OFFSET (100)
-
 static mutex_t lock = MUTEX_INIT;
 
 static void timer_cb(void *arg)
 {
-    (void)arg;
+    uint32_t *timeout = arg;
     thread_yield();
-    ztimer_set(ZTIMER_USEC, &timer, OFFSET);
+    ztimer_set(ZTIMER_USEC, &timer, *timeout);
 }
 
 static void *thread_1_2_3(void *_arg)
@@ -81,6 +83,16 @@ int main(void)
     const char *t2_name = "t2";
     const char *t3_name = "t3";
 
+    /* Let's not overwhelm boards by firing IRQs faster than they can handle and
+     * give them 50 billion CPU cycles per timeout.
+     *
+     * (Note: The `static` is required as this variable will be accessed from
+     * the ISR, which will occur even after the main thread has exited.) */
+    static uint32_t timeout = 0;
+    /* Note: It must be initialized dynamically, as coreclk() is not
+     * constant. */
+    timeout = 50000000000U / coreclk();
+
     p1 = thread_create(t1_stack, sizeof(t1_stack), THREAD_PRIORITY_MAIN + 1,
                        THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
                        thread_1_2_3, (void *)t1_name, t1_name);
@@ -92,8 +104,11 @@ int main(void)
                        thread_1_2_3, (void *)t3_name, t3_name);
     puts("THREADS CREATED\n");
 
+    printf("Context switch every %" PRIu32 " µs\n", timeout);
+
     timer.callback = timer_cb;
-    ztimer_set(ZTIMER_USEC, &timer, OFFSET);
+    timer.arg = &timeout;
+    ztimer_set(ZTIMER_USEC, &timer, timeout);
 
     return 0;
 }
