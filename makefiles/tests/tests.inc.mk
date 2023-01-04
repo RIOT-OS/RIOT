@@ -28,6 +28,16 @@ test: $(TEST_DEPS)
 	done
 
 test/available:
+ifneq (,$(TEST_ON_CI_WHITELIST))
+  ifeq (,$(filter $(BOARD),$(TEST_ON_CI_WHITELIST)))
+	@echo "Board $(BOARD) not in TEST_ON_CI_WHITELIST"
+	$(Q)false
+  endif
+endif
+ifneq (,$(filter $(BOARD) all,$(TEST_ON_CI_BLACKLIST)))
+	@echo "Board $(BOARD) is in TEST_ON_CI_BLACKLIST"
+	$(Q)false
+endif
 	$(Q)test -n "$(strip $(TESTS))"
 
 # Tests that require root privileges
