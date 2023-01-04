@@ -1463,10 +1463,6 @@ boards/frdm\-kw41z/include/periph_conf\.h:[0-9]+: warning: Member ADC_REF_SETTIN
 boards/frdm\-kw41z/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/frdm\-kw41z/include/periph_conf\.h:[0-9]+: warning: Member adc_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/frdm\-kw41z/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member HDC1000_PARAM_ADDR \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member HDC1000_PARAM_I2C \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member HDC1000_PARAM_RENEW_INTERVAL \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member HDC1000_PARAM_RES \(macro definition\) of group boards_hamilton is not documented\.
 boards/hamilton/include/board\.h:[0-9]+: warning: Member TMP006_PARAM_ADDR \(macro definition\) of group boards_hamilton is not documented\.
 boards/hamilton/include/board\.h:[0-9]+: warning: Member TMP006_PARAM_I2C \(macro definition\) of group boards_hamilton is not documented\.
 boards/hamilton/include/board\.h:[0-9]+: warning: Member TMP006_PARAM_RATE \(macro definition\) of group boards_hamilton is not documented\.
@@ -7404,12 +7400,6 @@ drivers/hd44780/include/hd44780_params\.h:[0-9]+: warning: Member HD44780_PARAM_
 drivers/hd44780/include/hd44780_params\.h:[0-9]+: warning: Member HD44780_PARAM_PIN_RS \(macro definition\) of file hd44780_params\.h is not documented\.
 drivers/hd44780/include/hd44780_params\.h:[0-9]+: warning: Member HD44780_PARAM_PIN_RW \(macro definition\) of file hd44780_params\.h is not documented\.
 drivers/hd44780/include/hd44780_params\.h:[0-9]+: warning: Member HD44780_PARAM_ROWS \(macro definition\) of file hd44780_params\.h is not documented\.
-drivers/hdc1000/include/hdc1000_params\.h:[0-9]+: warning: Member HDC1000_PARAMS \(macro definition\) of file hdc1000_params\.h is not documented\.
-drivers/hdc1000/include/hdc1000_params\.h:[0-9]+: warning: Member HDC1000_PARAM_ADDR \(macro definition\) of file hdc1000_params\.h is not documented\.
-drivers/hdc1000/include/hdc1000_params\.h:[0-9]+: warning: Member HDC1000_PARAM_I2C \(macro definition\) of file hdc1000_params\.h is not documented\.
-drivers/hdc1000/include/hdc1000_params\.h:[0-9]+: warning: Member HDC1000_PARAM_RENEW_INTERVAL \(macro definition\) of file hdc1000_params\.h is not documented\.
-drivers/hdc1000/include/hdc1000_params\.h:[0-9]+: warning: Member HDC1000_PARAM_RES \(macro definition\) of file hdc1000_params\.h is not documented\.
-drivers/hdc1000/include/hdc1000_params\.h:[0-9]+: warning: Member HDC1000_SAUL_INFO \(macro definition\) of file hdc1000_params\.h is not documented\.
 drivers/hdc1000/include/hdc1000_regs\.h:[0-9]+: warning: Member HDC1000_BTST_LOW \(macro definition\) of file hdc1000_regs\.h is not documented\.
 drivers/hdc1000/include/hdc1000_regs\.h:[0-9]+: warning: Member HDC1000_CONFIG \(macro definition\) of file hdc1000_regs\.h is not documented\.
 drivers/hdc1000/include/hdc1000_regs\.h:[0-9]+: warning: Member HDC1000_DEVICE_ID \(macro definition\) of file hdc1000_regs\.h is not documented\.
