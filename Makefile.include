@@ -727,8 +727,15 @@ else
   _LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $$(find $(BASELIBS:%.module=$(BINDIR)/%/) -name "*.o" 2> /dev/null | sort) $(ARCHIVES_GROUP) $(LINKFLAGS) $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map
 endif # BUILDOSXNATIVE
 
+COMPILE_COMMANDS_PATH ?= $(RIOTBASE)/compile_commands.json
+COMPILE_COMMANDS_FLAGS ?= --clangd
+.PHONY: compile-commands
+
 ifeq ($(BUILD_IN_DOCKER),1)
 link: ..in-docker-container
+compile-commands: ..in-docker-container
+	@echo "Trying to patch paths in compile_commands.json: s!/data/riotbuild/riotbase!$(RIOTBASE)!g"
+	$(Q)sed -e "s!/data/riotbuild/riotbase!$(RIOTBASE)!g" -i "$(COMPILE_COMMANDS_PATH)"
 else
 ifeq (,$(RIOTNOLINK))
 link: ..compiler-check ..build-message $(BUILD_FILES) print-size ..module-check
@@ -750,9 +757,6 @@ $(APPLICATION_MODULE).module: pkg-build $(BUILDDEPS)
 	  "$(MAKE)" -C $(APPDIR) -f $(RIOTMAKE)/application.inc.mk
 $(APPLICATION_MODULE).module: FORCE
 
-COMPILE_COMMANDS_PATH ?= $(RIOTBASE)/compile_commands.json
-COMPILE_COMMANDS_FLAGS ?= --clangd
-.PHONY: compile-commands
 compile-commands: $(BUILDDEPS)
 	$(Q)DIRS="$(DIRS)" APPLICATION_BLOBS="$(BLOBS)" \
 	  "$(MAKE)" -C $(APPDIR) -f $(RIOTMAKE)/application.inc.mk compile-commands

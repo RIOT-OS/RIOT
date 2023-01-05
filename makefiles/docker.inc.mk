@@ -5,6 +5,7 @@ DOCKER_RIOTBASE ?= $(DOCKER_BUILD_ROOT)/riotbase
 export DOCKER_MAKECMDGOALS_POSSIBLE = \
   all \
   buildtest-indocker \
+  compile-commands \
   scan-build \
   scan-build-analyze \
   tests-% \
