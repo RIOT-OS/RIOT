@@ -58,3 +58,10 @@ jobs:
       uses: aabadie/riot-action@main
       with:
         cmd: make -C ${{ matrix.tools.path }}/${{ matrix.tools.name }}
+  tools-build-success:
+    # this is only run if all jobs in tools-build succeeded
+    needs: tools-build
+    runs-on: ubuntu-latest
+    steps:
+    - name: tools-build succeeded
+      run: exit 0
