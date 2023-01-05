@@ -1,0 +1,36 @@
+From 77c23db76384d2192b9abc6f2ac8c8bf1d4b2caf Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Thu, 5 Jan 2023 07:49:14 +0100
+Subject: [PATCH 1/1] bootloader: remove compile time from banner
+
+---
+ components/bootloader_support/src/bootloader_init.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/components/bootloader_support/src/bootloader_init.c b/components/bootloader_support/src/bootloader_init.c
+index 2ecf0a58..a1f3f1aa 100644
+--- a/components/bootloader_support/src/bootloader_init.c
++++ b/components/bootloader_support/src/bootloader_init.c
+@@ -144,7 +144,9 @@ static esp_err_t bootloader_main()
+     wdt_reset_check();
+     ESP_LOGI(TAG, "ESP-IDF %s 2nd stage bootloader", IDF_VER);
+ 
++#if 0 /* not used in RIOT */
+     ESP_LOGI(TAG, "compile time " __TIME__ );
++#endif
+     ets_set_appcpu_boot_addr(0);
+ 
+     /* disable watch dog here */
+@@ -623,7 +625,9 @@ static esp_err_t bootloader_main()
+ 
+     ESP_LOGI(TAG, "ESP-IDF %s 2nd stage bootloader", IDF_VER);
+ 
++#if 0 /* not used in RIOT */
+     ESP_LOGI(TAG, "compile time " __TIME__ );
++#endif
+ 
+ #if defined(CONFIG_FLASHMODE_QIO) || defined(CONFIG_FLASHMODE_QOUT)
+     fhdr.spi_mode = CONFIG_SPI_FLASH_MODE;
+-- 
+2.17.1
+
