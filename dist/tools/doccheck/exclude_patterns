@@ -12,8 +12,6 @@ boards/adafruit\-itsybitsy\-m4/include/board\.h:[0-9]+: warning: Member APA102_P
 boards/adafruit\-itsybitsy\-m4/include/board\.h:[0-9]+: warning: Member APA102_PARAM_LED_NUMOF \(macro definition\) of file board\.h is not documented\.
 boards/adafruit\-itsybitsy\-m4/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
 boards/adafruit\-itsybitsy\-m4/include/board\.h:[0-9]+: warning: Member MTD_0 \(macro definition\) of file board\.h is not documented\.
-boards/adafruit\-itsybitsy\-m4/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/adafruit\-itsybitsy\-m4/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/adafruit\-itsybitsy\-m4/include/board\.h:[0-9]+: warning: Member mtd0 \(variable\) of file board\.h is not documented\.
 boards/adafruit\-itsybitsy\-m4/include/periph_conf\.h:[0-9]+: warning: Member ADC_DEV \(macro definition\) of file periph_conf\.h is not documented\.
 boards/adafruit\-itsybitsy\-m4/include/periph_conf\.h:[0-9]+: warning: Member ADC_NEG_INPUT \(macro definition\) of file periph_conf\.h is not documented\.
@@ -128,33 +126,16 @@ boards/arduino\-nano\-33\-iot/include/periph_conf\.h:[0-9]+: warning: Member spi
 boards/arduino\-nano\-33\-iot/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/arduino\-nano\-33\-iot/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/atmega1284p/include/board\.h:[0-9]+: warning: Member STDIO_UART_BAUDRATE \(macro definition\) of file board\.h is not documented\.
-boards/atmega1284p/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/atmega1284p/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/atmega1284p/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/atmega1284p/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file periph_conf\.h is not documented\.
 boards/atmega256rfr2\-xpro/include/board\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_ADJUST_SET \(macro definition\) of file board\.h is not documented\.
 boards/atmega256rfr2\-xpro/include/board\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_ADJUST_SLEEP \(macro definition\) of file board\.h is not documented\.
-boards/atmega256rfr2\-xpro/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/atmega256rfr2\-xpro/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/atmega256rfr2\-xpro/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/atmega328p/include/board\.h:[0-9]+: warning: Member STDIO_UART_BAUDRATE \(macro definition\) of file board\.h is not documented\.
-boards/atmega328p/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/atmega328p/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/atmega328p/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/atmega328p/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file periph_conf\.h is not documented\.
 boards/atmega328p\-xplained\-mini/include/board\.h:[0-9]+: warning: Member STDIO_UART_BAUDRATE \(macro definition\) of file board\.h is not documented\.
-boards/atmega328p\-xplained\-mini/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/atmega328p\-xplained\-mini/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/atmega328p\-xplained\-mini/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/atmega328p\-xplained\-mini/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file periph_conf\.h is not documented\.
 boards/atxmega\-a1\-xplained/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
 boards/atxmega\-a1\-xplained/include/board\.h:[0-9]+: warning: Member LED_PORT_MASK \(macro definition\) of file board\.h is not documented\.
 boards/atxmega\-a1\-xplained/include/board\.h:[0-9]+: warning: Member STDIO_UART_BAUDRATE \(macro definition\) of file board\.h is not documented\.
-boards/atxmega\-a1\-xplained/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/atxmega\-a1\-xplained/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of file board\.h is not documented\.
-boards/atxmega\-a1\-xplained/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of file board\.h is not documented\.
-boards/atxmega\-a1\-xplained/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/atxmega\-a1\-xplained/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/atxmega\-a1\-xplained/include/periph_conf\.h:[0-9]+: warning: Member I2C_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/atxmega\-a1\-xplained/include/periph_conf\.h:[0-9]+: warning: Member I2C_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/atxmega\-a1\-xplained/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -183,11 +164,6 @@ boards/atxmega\-a1\-xplained/include/periph_conf\.h:[0-9]+: warning: Member uart
 boards/atxmega\-a1u\-xpro/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
 boards/atxmega\-a1u\-xpro/include/board\.h:[0-9]+: warning: Member LED_PORT_MASK \(macro definition\) of file board\.h is not documented\.
 boards/atxmega\-a1u\-xpro/include/board\.h:[0-9]+: warning: Member STDIO_UART_BAUDRATE \(macro definition\) of file board\.h is not documented\.
-boards/atxmega\-a1u\-xpro/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/atxmega\-a1u\-xpro/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of file board\.h is not documented\.
-boards/atxmega\-a1u\-xpro/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of file board\.h is not documented\.
-boards/atxmega\-a1u\-xpro/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/atxmega\-a1u\-xpro/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/atxmega\-a1u\-xpro/include/periph_conf\.h:[0-9]+: warning: Member I2C_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/atxmega\-a1u\-xpro/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/atxmega\-a1u\-xpro/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -209,11 +185,6 @@ boards/atxmega\-a1u\-xpro/include/periph_conf\.h:[0-9]+: warning: Member uart_co
 boards/atxmega\-a3bu\-xplained/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
 boards/atxmega\-a3bu\-xplained/include/board\.h:[0-9]+: warning: Member LED_PORT_MASK \(macro definition\) of file board\.h is not documented\.
 boards/atxmega\-a3bu\-xplained/include/board\.h:[0-9]+: warning: Member STDIO_UART_BAUDRATE \(macro definition\) of file board\.h is not documented\.
-boards/atxmega\-a3bu\-xplained/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/atxmega\-a3bu\-xplained/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of file board\.h is not documented\.
-boards/atxmega\-a3bu\-xplained/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of file board\.h is not documented\.
-boards/atxmega\-a3bu\-xplained/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/atxmega\-a3bu\-xplained/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/atxmega\-a3bu\-xplained/include/periph_conf\.h:[0-9]+: warning: Member I2C_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/atxmega\-a3bu\-xplained/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/atxmega\-a3bu\-xplained/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -244,10 +215,6 @@ boards/avr\-rss2/include/board\.h:[0-9]+: warning: Member LED_PANIC \(macro defi
 boards/avr\-rss2/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
 boards/avr\-rss2/include/board\.h:[0-9]+: warning: Member LED_PORT_DDR \(macro definition\) of file board\.h is not documented\.
 boards/avr\-rss2/include/board\.h:[0-9]+: warning: Member MODULE_ATMEGA_PCINT0 \(macro definition\) of file board\.h is not documented\.
-boards/avr\-rss2/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of file board\.h is not documented\.
-boards/avr\-rss2/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of file board\.h is not documented\.
-boards/avr\-rss2/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/avr\-rss2/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/avr\-rss2/include/eui_provider_params\.h:[0-9]+: warning: Member EUI64_PROVIDER_FUNC \(macro definition\) of file eui_provider_params\.h is not documented\.
 boards/avr\-rss2/include/eui_provider_params\.h:[0-9]+: warning: Member EUI64_PROVIDER_INDEX \(macro definition\) of file eui_provider_params\.h is not documented\.
 boards/avr\-rss2/include/eui_provider_params\.h:[0-9]+: warning: Member EUI64_PROVIDER_TYPE \(macro definition\) of file eui_provider_params\.h is not documented\.
@@ -268,7 +235,6 @@ boards/b\-l072z\-lrwan1/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_DI
 boards/b\-l072z\-lrwan1/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_RESET \(macro definition\) of file board\.h is not documented\.
 boards/b\-l072z\-lrwan1/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_SPI \(macro definition\) of file board\.h is not documented\.
 boards/b\-l072z\-lrwan1/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_SPI_NSS \(macro definition\) of file board\.h is not documented\.
-boards/b\-l072z\-lrwan1/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/b\-l072z\-lrwan1/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_LSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/b\-l072z\-lrwan1/include/periph_conf\.h:[0-9]+: warning: Member DMA_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/b\-l072z\-lrwan1/include/periph_conf\.h:[0-9]+: warning: Member DMA_SHARED_ISR_0 \(macro definition\) of file periph_conf\.h is not documented\.
@@ -345,7 +311,6 @@ boards/bastwan/include/periph_conf\.h:[0-9]+: warning: Member sam_usbdev_config\
 boards/bastwan/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/bastwan/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/bastwan/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/bluepill\-stm32f030c8/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/bluepill\-stm32f030c8/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/bluepill\-stm32f030c8/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/bluepill\-stm32f030c8/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_LSE \(macro definition\) of file periph_conf\.h is not documented\.
@@ -381,9 +346,6 @@ boards/calliope\-mini/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF 
 boards/calliope\-mini/include/periph_conf\.h:[0-9]+: warning: Member UART_PIN_RX \(macro definition\) of file periph_conf\.h is not documented\.
 boards/calliope\-mini/include/periph_conf\.h:[0-9]+: warning: Member UART_PIN_TX \(macro definition\) of file periph_conf\.h is not documented\.
 boards/calliope\-mini/include/periph_conf\.h:[0-9]+: warning: Member i2c_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/cc1312\-launchpad/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/cc1312\-launchpad/include/board\.h:[0-9]+: warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/cc1312\-launchpad/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/cc1312\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file periph_conf\.h is not documented\.
 boards/cc1312\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/cc1312\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member I2C_SCL_PIN \(macro definition\) of file periph_conf\.h is not documented\.
@@ -392,9 +354,6 @@ boards/cc1312\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member TIMER_NU
 boards/cc1312\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/cc1312\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/cc1312\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/cc1350\-launchpad/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/cc1350\-launchpad/include/board\.h:[0-9]+: warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/cc1350\-launchpad/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/cc1350\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file periph_conf\.h is not documented\.
 boards/cc1350\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/cc1350\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member I2C_SCL_PIN \(macro definition\) of file periph_conf\.h is not documented\.
@@ -403,9 +362,6 @@ boards/cc1350\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member TIMER_NU
 boards/cc1350\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/cc1350\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/cc1350\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/cc1352\-launchpad/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/cc1352\-launchpad/include/board\.h:[0-9]+: warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/cc1352\-launchpad/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/cc1352\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file periph_conf\.h is not documented\.
 boards/cc1352\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/cc1352\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member I2C_SCL_PIN \(macro definition\) of file periph_conf\.h is not documented\.
@@ -414,9 +370,6 @@ boards/cc1352\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member TIMER_NU
 boards/cc1352\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/cc1352\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/cc1352\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/cc1352p\-launchpad/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/cc1352p\-launchpad/include/board\.h:[0-9]+: warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/cc1352p\-launchpad/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/cc1352p\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file periph_conf\.h is not documented\.
 boards/cc1352p\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/cc1352p\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member I2C_SCL_PIN \(macro definition\) of file periph_conf\.h is not documented\.
@@ -428,9 +381,6 @@ boards/cc1352p\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member uart_co
 boards/cc2538dk/include/board\.h:[0-9]+: warning: Member CCA_BACKDOOR_ENABLE \(macro definition\) of file board\.h is not documented\.
 boards/cc2538dk/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
 boards/cc2538dk/include/board\.h:[0-9]+: warning: Member UPDATE_CCA \(macro definition\) of file board\.h is not documented\.
-boards/cc2538dk/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/cc2538dk/include/board\.h:[0-9]+: warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/cc2538dk/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/cc2538dk/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/cc2538dk/include/periph_conf\.h:[0-9]+: warning: Member I2C_IRQ_PRIO \(macro definition\) of file periph_conf\.h is not documented\.
 boards/cc2538dk/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -442,9 +392,6 @@ boards/cc2538dk/include/periph_conf\.h:[0-9]+: warning: Member adc_config\[\] \(
 boards/cc2538dk/include/periph_conf\.h:[0-9]+: warning: Member i2c_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/cc2538dk/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/cc2538dk/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/cc2650\-launchpad/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/cc2650\-launchpad/include/board\.h:[0-9]+: warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/cc2650\-launchpad/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/cc2650\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file periph_conf\.h is not documented\.
 boards/cc2650\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/cc2650\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member I2C_SCL_PIN \(macro definition\) of file periph_conf\.h is not documented\.
@@ -453,9 +400,6 @@ boards/cc2650\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member TIMER_NU
 boards/cc2650\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/cc2650\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/cc2650\-launchpad/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/cc2650stk/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/cc2650stk/include/board\.h:[0-9]+: warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/cc2650stk/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/cc2650stk/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file periph_conf\.h is not documented\.
 boards/cc2650stk/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/cc2650stk/include/periph_conf\.h:[0-9]+: warning: Member I2C_SCL_PIN \(macro definition\) of file periph_conf\.h is not documented\.
@@ -679,8 +623,6 @@ boards/common/arduino\-zero/include/arduino_pinmap\.h:[0-9]+: warning: Member AR
 boards/common/arduino\-zero/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_A4 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/common/arduino\-zero/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_A5 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/common/arduino\-zero/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of group boards_common_arduino_zero is not documented\.
-boards/common/arduino\-zero/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of group boards_common_arduino_zero is not documented\.
-boards/common/arduino\-zero/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of group boards_common_arduino_zero is not documented\.
 boards/common/arduino\-zero/include/periph_conf\.h:[0-9]+: warning: Member ADC_GAIN_FACTOR_DEFAULT \(macro definition\) of file periph_conf\.h is not documented\.
 boards/common/arduino\-zero/include/periph_conf\.h:[0-9]+: warning: Member ADC_NEG_INPUT \(macro definition\) of file periph_conf\.h is not documented\.
 boards/common/arduino\-zero/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -714,8 +656,6 @@ boards/common/arduino\-zero/include/periph_conf\.h:[0-9]+: warning: Member timer
 boards/common/arduino\-zero/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/common/atmega/include/periph_conf_atmega_common\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file periph_conf_atmega_common\.h is not documented\.
 boards/common/atxmega/include/periph_conf_common\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file periph_conf_common\.h is not documented\.
-boards/common/blxxxpill/include/board_common\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board_common\.h is not documented\.
-boards/common/blxxxpill/include/board_common\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board_common\.h is not documented\.
 boards/common/blxxxpill/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/common/blxxxpill/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/common/blxxxpill/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_LSE \(macro definition\) of file periph_conf\.h is not documented\.
@@ -780,15 +720,10 @@ boards/common/esp8266/include/board_common\.h:[0-9]+: warning: Member SPIFFS_HAL
 boards/common/esp8266/include/board_common\.h:[0-9]+: warning: Member SPIFFS_READ_ONLY \(macro definition\) of file board_common\.h is not documented\.
 boards/common/esp8266/include/board_common\.h:[0-9]+: warning: Member SPIFFS_SINGLETON \(macro definition\) of file board_common\.h is not documented\.
 boards/common/esp8266/include/periph_conf_common\.h:[0-9]+: warning: Member BIT\(X\) \(macro definition\) of file periph_conf_common\.h is not documented\.
-boards/common/iotlab/include/board_common\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_CS \(macro definition\) of group boards_common_iotlab is not documented\.
-boards/common/iotlab/include/board_common\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_INT \(macro definition\) of group boards_common_iotlab is not documented\.
-boards/common/iotlab/include/board_common\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_RESET \(macro definition\) of group boards_common_iotlab is not documented\.
-boards/common/iotlab/include/board_common\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_SLEEP \(macro definition\) of group boards_common_iotlab is not documented\.
 boards/common/iotlab/include/board_common\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_DEV \(macro definition\) of group boards_common_iotlab is not documented\.
 boards/common/iotlab/include/board_common\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_MIN \(macro definition\) of group boards_common_iotlab is not documented\.
 boards/common/iotlab/include/board_common\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_TYPE \(macro definition\) of group boards_common_iotlab is not documented\.
 boards/common/iotlab/include/board_common\.h:[0-9]+: warning: Member STDIO_UART_BAUDRATE \(macro definition\) of group boards_common_iotlab is not documented\.
-boards/common/iotlab/include/board_common\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of group boards_common_iotlab is not documented\.
 boards/common/iotlab/include/openwsn_defs\.h:[0-9]+: warning: Member PORT_delayTx \(macro definition\) of file openwsn_defs\.h is not documented\.
 boards/common/iotlab/include/openwsn_defs\.h:[0-9]+: warning: Member PORT_maxRxAckPrepare \(macro definition\) of file openwsn_defs\.h is not documented\.
 boards/common/iotlab/include/openwsn_defs\.h:[0-9]+: warning: Member PORT_maxRxDataPrepare \(macro definition\) of file openwsn_defs\.h is not documented\.
@@ -837,10 +772,6 @@ boards/common/kw41z/include/periph_conf_common\.h:[0-9]+: warning: Member clock_
 boards/common/kw41z/include/periph_conf_common\.h:[0-9]+: warning: Member spi_clk_config\[\] \(variable\) of file periph_conf_common\.h is not documented\.
 boards/common/kw41z/include/periph_conf_common\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf_common\.h is not documented\.
 boards/common/msb\-430/include/board_common\.h:[0-9]+: warning: Member LED_OUT_REG \(macro definition\) of group boards_common_msb\-430 is not documented\.
-boards/common/msb\-430/include/board_common\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of group boards_common_msb\-430 is not documented\.
-boards/common/msb\-430/include/board_common\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of group boards_common_msb\-430 is not documented\.
-boards/common/nrf51/include/board_common\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of group boards_common_nrf51 is not documented\.
-boards/common/nrf51/include/board_common\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of group boards_common_nrf51 is not documented\.
 boards/common/nrf51/include/cfg_clock_16_0\.h:[0-9]+: warning: Member CLOCK_HFCLK \(macro definition\) of file cfg_clock_16_0\.h is not documented\.
 boards/common/nrf51/include/cfg_clock_16_0\.h:[0-9]+: warning: Member CLOCK_LFCLK \(macro definition\) of file cfg_clock_16_0\.h is not documented\.
 boards/common/nrf51/include/cfg_clock_16_1\.h:[0-9]+: warning: Member CLOCK_HFCLK \(macro definition\) of file cfg_clock_16_1\.h is not documented\.
@@ -983,9 +914,6 @@ boards/common/remote/include/board_common\.h:[0-9]+: warning: Member CCA_BACKDOO
 boards/common/remote/include/board_common\.h:[0-9]+: warning: Member LED_ALL_OFF \(macro definition\) of group boards_common_remote is not documented\.
 boards/common/remote/include/board_common\.h:[0-9]+: warning: Member LED_ALL_ON \(macro definition\) of group boards_common_remote is not documented\.
 boards/common/remote/include/board_common\.h:[0-9]+: warning: Member UPDATE_CCA \(macro definition\) of group boards_common_remote is not documented\.
-boards/common/remote/include/board_common\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of group boards_common_remote is not documented\.
-boards/common/remote/include/board_common\.h:[0-9]+: warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of group boards_common_remote is not documented\.
-boards/common/remote/include/board_common\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of group boards_common_remote is not documented\.
 boards/common/remote/include/cfg_adc_default\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file cfg_adc_default\.h is not documented\.
 boards/common/remote/include/cfg_adc_default\.h:[0-9]+: warning: Member SOC_ADC_ADCCON3_EREF \(macro definition\) of file cfg_adc_default\.h is not documented\.
 boards/common/remote/include/cfg_adc_default\.h:[0-9]+: warning: Member adc_config\[\] \(variable\) of file cfg_adc_default\.h is not documented\.
@@ -1002,7 +930,6 @@ boards/common/remote/include/fancy_leds\.h:[0-9]+: warning: Member LED_FADE\(led
 boards/common/remote/include/fancy_leds\.h:[0-9]+: warning: Member LED_FADE_EXPAND\(led\) \(macro definition\) of file fancy_leds\.h is not documented\.
 boards/common/remote/include/fancy_leds\.h:[0-9]+: warning: Member LED_RAINBOW\(\) \(macro definition\) of file fancy_leds\.h is not documented\.
 boards/common/saml1x/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of group boards_common_saml1x is not documented\.
-boards/common/saml1x/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of group boards_common_saml1x is not documented\.
 boards/common/saml1x/include/board\.h:[0-9]+: warning: Member _PORT \(macro definition\) of group boards_common_saml1x is not documented\.
 boards/common/saml1x/include/periph_conf\.h:[0-9]+: warning: Member ADC_NEG_INPUT \(macro definition\) of file periph_conf\.h is not documented\.
 boards/common/saml1x/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -1055,10 +982,6 @@ boards/common/slwstk6000b/include/board\.h:[0-9]+: warning: Member PB1_PIN \(mac
 boards/common/slwstk6000b/include/board\.h:[0-9]+: warning: Member SI7021_EN_PIN \(macro definition\) of file board\.h is not documented\.
 boards/common/slwstk6000b/include/board\.h:[0-9]+: warning: Member SI7021_I2C \(macro definition\) of file board\.h is not documented\.
 boards/common/slwstk6000b/include/board\.h:[0-9]+: warning: Member SI70XX_PARAM_I2C_DEV \(macro definition\) of file board\.h is not documented\.
-boards/common/slwstk6000b/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of file board\.h is not documented\.
-boards/common/slwstk6000b/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of file board\.h is not documented\.
-boards/common/slwstk6000b/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/common/slwstk6000b/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/common/slwstk6000b/include/periph_conf\.h:[0-9]+: warning: Member ADC_DEV_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/common/slwstk6000b/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/common/slwstk6000b/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORE_DIV \(macro definition\) of file periph_conf\.h is not documented\.
@@ -1217,8 +1140,6 @@ boards/common/slwstk6000b/modules/slwrb4162a/include/board_module\.h:[0-9]+: war
 boards/common/slwstk6000b/modules/slwrb4162a/include/board_module\.h:[0-9]+: warning: Member MODULE_PIN_P7 \(macro definition\) of file board_module\.h is not documented\.
 boards/common/slwstk6000b/modules/slwrb4162a/include/board_module\.h:[0-9]+: warning: Member MODULE_PIN_P8 \(macro definition\) of file board_module\.h is not documented\.
 boards/common/slwstk6000b/modules/slwrb4162a/include/board_module\.h:[0-9]+: warning: Member MODULE_PIN_P9 \(macro definition\) of file board_module\.h is not documented\.
-boards/common/sodaq/include/board_common\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of group boards_common_sodaq is not documented\.
-boards/common/sodaq/include/board_common\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of group boards_common_sodaq is not documented\.
 boards/common/sodaq/include/cfg_clock_default\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file cfg_clock_default\.h is not documented\.
 boards/common/sodaq/include/cfg_clock_default\.h:[0-9]+: warning: Member CLOCK_PLL_DIV \(macro definition\) of file cfg_clock_default\.h is not documented\.
 boards/common/sodaq/include/cfg_clock_default\.h:[0-9]+: warning: Member CLOCK_PLL_MUL \(macro definition\) of file cfg_clock_default\.h is not documented\.
@@ -1259,8 +1180,6 @@ boards/common/weact\-f4x1cx/include/board\.h:[0-9]+: warning: Member WEACT_4X1CX
 boards/common/weact\-f4x1cx/include/board\.h:[0-9]+: warning: Member WEACT_4X1CX_NOR_SPI_CS \(macro definition\) of file board\.h is not documented\.
 boards/common/weact\-f4x1cx/include/board\.h:[0-9]+: warning: Member WEACT_4X1CX_NOR_SPI_DEV \(macro definition\) of file board\.h is not documented\.
 boards/common/weact\-f4x1cx/include/board\.h:[0-9]+: warning: Member WEACT_4X1CX_NOR_SPI_MODE \(macro definition\) of file board\.h is not documented\.
-boards/common/weact\-f4x1cx/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/common/weact\-f4x1cx/include/board\.h:[0-9]+: warning: Member XTIMER_OVERHEAD \(macro definition\) of file board\.h is not documented\.
 boards/common/weact\-f4x1cx/include/board\.h:[0-9]+: warning: Member mtd0 \(variable\) of file board\.h is not documented\.
 boards/common/weact\-f4x1cx/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/common/weact\-f4x1cx/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_CLOCK_HSE \(macro definition\) of file periph_conf\.h is not documented\.
@@ -1275,12 +1194,6 @@ boards/common/weact\-f4x1cx/include/periph_conf\.h:[0-9]+: warning: Member adc_c
 boards/common/weact\-f4x1cx/include/periph_conf\.h:[0-9]+: warning: Member pwm_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/common/weact\-f4x1cx/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/common/weact\-f4x1cx/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/derfmega128/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/derfmega128/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/derfmega128/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
-boards/derfmega256/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/derfmega256/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/derfmega256/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/derfmega256/include/eui_provider_params\.h:[0-9]+: warning: Member EEPROM_MAC_ADDR \(macro definition\) of file eui_provider_params\.h is not documented\.
 boards/derfmega256/include/eui_provider_params\.h:[0-9]+: warning: Member EUI64_PROVIDER_FUNC \(macro definition\) of file eui_provider_params\.h is not documented\.
 boards/derfmega256/include/eui_provider_params\.h:[0-9]+: warning: Member EUI64_PROVIDER_INDEX \(macro definition\) of file eui_provider_params\.h is not documented\.
@@ -1302,10 +1215,6 @@ boards/e180\-zg120b\-tb/include/board\.h:[0-9]+: warning: Member CORETEMP_ADC \(
 boards/e180\-zg120b\-tb/include/board\.h:[0-9]+: warning: Member PB0_PIN \(macro definition\) of file board\.h is not documented\.
 boards/e180\-zg120b\-tb/include/board\.h:[0-9]+: warning: Member PB1_PIN \(macro definition\) of file board\.h is not documented\.
 boards/e180\-zg120b\-tb/include/board\.h:[0-9]+: warning: Member PB2_PIN \(macro definition\) of file board\.h is not documented\.
-boards/e180\-zg120b\-tb/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of file board\.h is not documented\.
-boards/e180\-zg120b\-tb/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of file board\.h is not documented\.
-boards/e180\-zg120b\-tb/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/e180\-zg120b\-tb/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/e180\-zg120b\-tb/include/periph_conf\.h:[0-9]+: warning: Member ADC_DEV_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/e180\-zg120b\-tb/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/e180\-zg120b\-tb/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORE_DIV \(macro definition\) of file periph_conf\.h is not documented\.
@@ -1462,8 +1371,6 @@ boards/firefly/include/board\.h:[0-9]+: warning: Member CC1200_SCLK_GPIO \(macro
 boards/firefly/include/board\.h:[0-9]+: warning: Member CC1200_SPI_DEV \(macro definition\) of file board\.h is not documented\.
 boards/firefly/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/firefly/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/frdm\-k22f/include/board\.h:[0-9]+: warning: Member FXOS8700_PARAM_ADDR \(macro definition\) of file board\.h is not documented\.
-boards/frdm\-k22f/include/board\.h:[0-9]+: warning: Member FXOS8700_PARAM_I2C \(macro definition\) of file board\.h is not documented\.
 boards/frdm\-k22f/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/frdm\-k22f/include/periph_conf\.h:[0-9]+: warning: Member ADC_REF_SETTING \(macro definition\) of file periph_conf\.h is not documented\.
 boards/frdm\-k22f/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_BUSCLOCK \(macro definition\) of file periph_conf\.h is not documented\.
@@ -1492,8 +1399,6 @@ boards/frdm\-k22f/include/periph_conf\.h:[0-9]+: warning: Member pwm_config\[\] 
 boards/frdm\-k22f/include/periph_conf\.h:[0-9]+: warning: Member spi_clk_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/frdm\-k22f/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/frdm\-k22f/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/frdm\-k64f/include/board\.h:[0-9]+: warning: Member FXOS8700_PARAM_ADDR \(macro definition\) of file board\.h is not documented\.
-boards/frdm\-k64f/include/board\.h:[0-9]+: warning: Member FXOS8700_PARAM_I2C \(macro definition\) of file board\.h is not documented\.
 boards/frdm\-k64f/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/frdm\-k64f/include/periph_conf\.h:[0-9]+: warning: Member ADC_REF_SETTING \(macro definition\) of file periph_conf\.h is not documented\.
 boards/frdm\-k64f/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_BUSCLOCK \(macro definition\) of file periph_conf\.h is not documented\.
@@ -1526,13 +1431,6 @@ boards/frdm\-kl43z/include/board\.h:[0-9]+: warning: Member MAG3110_PARAM_I2C \(
 boards/frdm\-kl43z/include/board\.h:[0-9]+: warning: Member MMA8X5X_PARAM_ADDR \(macro definition\) of group boards_frdm\-kl43z is not documented\.
 boards/frdm\-kl43z/include/board\.h:[0-9]+: warning: Member MMA8X5X_PARAM_I2C \(macro definition\) of group boards_frdm\-kl43z is not documented\.
 boards/frdm\-kl43z/include/board\.h:[0-9]+: warning: Member MMA8X5X_PARAM_TYPE \(macro definition\) of group boards_frdm\-kl43z is not documented\.
-boards/frdm\-kl43z/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of group boards_frdm\-kl43z is not documented\.
-boards/frdm\-kl43z/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of group boards_frdm\-kl43z is not documented\.
-boards/frdm\-kl43z/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of group boards_frdm\-kl43z is not documented\.
-boards/frdm\-kl43z/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of group boards_frdm\-kl43z is not documented\.
-boards/frdm\-kl43z/include/board\.h:[0-9]+: warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of group boards_frdm\-kl43z is not documented\.
-boards/frdm\-kl43z/include/board\.h:[0-9]+: warning: Member XTIMER_OVERHEAD \(macro definition\) of group boards_frdm\-kl43z is not documented\.
-boards/frdm\-kl43z/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of group boards_frdm\-kl43z is not documented\.
 boards/frdm\-kl43z/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/frdm\-kl43z/include/periph_conf\.h:[0-9]+: warning: Member ADC_REF_SETTING \(macro definition\) of file periph_conf\.h is not documented\.
 boards/frdm\-kl43z/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_BUSCLOCK \(macro definition\) of file periph_conf\.h is not documented\.
@@ -1560,41 +1458,14 @@ boards/frdm\-kw41z/include/board\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_D
 boards/frdm\-kw41z/include/board\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_TYPE \(macro definition\) of file board\.h is not documented\.
 boards/frdm\-kw41z/include/board\.h:[0-9]+: warning: Member FRDM_NOR_SPI_CLK \(macro definition\) of file board\.h is not documented\.
 boards/frdm\-kw41z/include/board\.h:[0-9]+: warning: Member FRDM_NOR_SPI_DEV \(macro definition\) of file board\.h is not documented\.
-boards/frdm\-kw41z/include/board\.h:[0-9]+: warning: Member FXOS8700_PARAM_ADDR \(macro definition\) of file board\.h is not documented\.
-boards/frdm\-kw41z/include/board\.h:[0-9]+: warning: Member FXOS8700_PARAM_I2C \(macro definition\) of file board\.h is not documented\.
-boards/frdm\-kw41z/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/frdm\-kw41z/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of file board\.h is not documented\.
-boards/frdm\-kw41z/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of file board\.h is not documented\.
-boards/frdm\-kw41z/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/frdm\-kw41z/include/board\.h:[0-9]+: warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/frdm\-kw41z/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/frdm\-kw41z/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/frdm\-kw41z/include/periph_conf\.h:[0-9]+: warning: Member ADC_REF_SETTING \(macro definition\) of file periph_conf\.h is not documented\.
 boards/frdm\-kw41z/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/frdm\-kw41z/include/periph_conf\.h:[0-9]+: warning: Member adc_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/frdm\-kw41z/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_CS \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_INT \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_RESET \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_SLEEP \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_SPI \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_SPI_CLK \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member FXOS8700_PARAM_ADDR \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member FXOS8700_PARAM_I2C \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member FXOS8700_PARAM_RENEW_INTERVAL \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member HDC1000_PARAM_ADDR \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member HDC1000_PARAM_I2C \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member HDC1000_PARAM_RENEW_INTERVAL \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member HDC1000_PARAM_RES \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member PIR_PARAM_ACTIVE_HIGH \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member PIR_PARAM_GPIO \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member PULSE_COUNTER_GPIO \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member PULSE_COUNTER_GPIO_FLANK \(macro definition\) of group boards_hamilton is not documented\.
 boards/hamilton/include/board\.h:[0-9]+: warning: Member TMP006_PARAM_ADDR \(macro definition\) of group boards_hamilton is not documented\.
 boards/hamilton/include/board\.h:[0-9]+: warning: Member TMP006_PARAM_I2C \(macro definition\) of group boards_hamilton is not documented\.
 boards/hamilton/include/board\.h:[0-9]+: warning: Member TMP006_PARAM_RATE \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of group boards_hamilton is not documented\.
-boards/hamilton/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of group boards_hamilton is not documented\.
 boards/hamilton/include/periph_conf\.h:[0-9]+: warning: Member ADC_GAIN_FACTOR_DEFAULT \(macro definition\) of file periph_conf\.h is not documented\.
 boards/hamilton/include/periph_conf\.h:[0-9]+: warning: Member ADC_NEG_INPUT \(macro definition\) of file periph_conf\.h is not documented\.
 boards/hamilton/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -1622,7 +1493,6 @@ boards/hamilton/include/periph_conf\.h:[0-9]+: warning: Member pwm_chan1_config\
 boards/hamilton/include/periph_conf\.h:[0-9]+: warning: Member pwm_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/hamilton/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/hamilton/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/hifive1/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of group boards_hifive1 is not documented\.
 boards/hifive1/include/periph_conf\.h:[0-9]+: warning: Member PWM_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/hifive1/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/hifive1/include/periph_conf\.h:[0-9]+: warning: Member TIMER_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -1649,7 +1519,6 @@ boards/hifive1b/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_6 
 boards/hifive1b/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_7 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/hifive1b/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_8 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/hifive1b/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_9 \(macro definition\) of file arduino_pinmap\.h is not documented\.
-boards/hifive1b/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of group boards_hifive1b is not documented\.
 boards/hifive1b/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/hifive1b/include/periph_conf\.h:[0-9]+: warning: Member PWM_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/hifive1b/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -1665,7 +1534,6 @@ boards/i\-nucleo\-lrwan1/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_D
 boards/i\-nucleo\-lrwan1/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_PASELECT \(macro definition\) of file board\.h is not documented\.
 boards/i\-nucleo\-lrwan1/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_RESET \(macro definition\) of file board\.h is not documented\.
 boards/i\-nucleo\-lrwan1/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_SPI_NSS \(macro definition\) of file board\.h is not documented\.
-boards/i\-nucleo\-lrwan1/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/i\-nucleo\-lrwan1/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_LSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/i\-nucleo\-lrwan1/include/periph_conf\.h:[0-9]+: warning: Member I2C_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/i\-nucleo\-lrwan1/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -1685,10 +1553,6 @@ boards/ikea\-tradfri/include/board\.h:[0-9]+: warning: Member IKEA_TRADFRI_NOR_S
 boards/ikea\-tradfri/include/board\.h:[0-9]+: warning: Member IKEA_TRADFRI_NOR_SPI_DEV \(macro definition\) of file board\.h is not documented\.
 boards/ikea\-tradfri/include/board\.h:[0-9]+: warning: Member IKEA_TRADFRI_NOR_SPI_MODE \(macro definition\) of file board\.h is not documented\.
 boards/ikea\-tradfri/include/board\.h:[0-9]+: warning: Member MTD_0 \(macro definition\) of file board\.h is not documented\.
-boards/ikea\-tradfri/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of file board\.h is not documented\.
-boards/ikea\-tradfri/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of file board\.h is not documented\.
-boards/ikea\-tradfri/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/ikea\-tradfri/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/ikea\-tradfri/include/board\.h:[0-9]+: warning: Member mtd0 \(variable\) of file board\.h is not documented\.
 boards/ikea\-tradfri/include/periph_conf\.h:[0-9]+: warning: Member ADC_DEV_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/ikea\-tradfri/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -1719,8 +1583,6 @@ boards/im880b/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_RESET \(macr
 boards/im880b/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_RX_SWITCH \(macro definition\) of file board\.h is not documented\.
 boards/im880b/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_SPI_NSS \(macro definition\) of file board\.h is not documented\.
 boards/im880b/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_TX_SWITCH \(macro definition\) of file board\.h is not documented\.
-boards/im880b/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/im880b/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/im880b/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/im880b/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_LSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/im880b/include/periph_conf\.h:[0-9]+: warning: Member I2C_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
@@ -1754,7 +1616,6 @@ boards/iotlab\-m3/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(mac
 boards/iotlab\-m3/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/limifrog\-v1/include/board\.h:[0-9]+: warning: Member LIS3MDL_PARAM_ADDR \(macro definition\) of file board\.h is not documented\.
 boards/limifrog\-v1/include/board\.h:[0-9]+: warning: Member LIS3MDL_PARAM_I2C \(macro definition\) of file board\.h is not documented\.
-boards/limifrog\-v1/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/limifrog\-v1/include/periph_conf\.h:[0-9]+: warning: Member I2C_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/limifrog\-v1/include/periph_conf\.h:[0-9]+: warning: Member I2C_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/limifrog\-v1/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -1780,9 +1641,6 @@ boards/lobaro\-lorabox/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_DIO
 boards/lobaro\-lorabox/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_DIO3 \(macro definition\) of file board\.h is not documented\.
 boards/lobaro\-lorabox/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_RESET \(macro definition\) of file board\.h is not documented\.
 boards/lobaro\-lorabox/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_SPI_NSS \(macro definition\) of file board\.h is not documented\.
-boards/lobaro\-lorabox/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/lobaro\-lorabox/include/board\.h:[0-9]+: warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/lobaro\-lorabox/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/lobaro\-lorabox/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_LSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/lobaro\-lorabox/include/periph_conf\.h:[0-9]+: warning: Member I2C_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/lobaro\-lorabox/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -1820,7 +1678,6 @@ boards/lsn50/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_PASELECT \(ma
 boards/lsn50/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_RESET \(macro definition\) of file board\.h is not documented\.
 boards/lsn50/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_SPI \(macro definition\) of file board\.h is not documented\.
 boards/lsn50/include/board\.h:[0-9]+: warning: Member SX127X_PARAM_SPI_NSS \(macro definition\) of file board\.h is not documented\.
-boards/lsn50/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/lsn50/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_LSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/lsn50/include/periph_conf\.h:[0-9]+: warning: Member DMA_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/lsn50/include/periph_conf\.h:[0-9]+: warning: Member DMA_SHARED_ISR_0 \(macro definition\) of file periph_conf\.h is not documented\.
@@ -1838,8 +1695,6 @@ boards/lsn50/include/periph_conf\.h:[0-9]+: warning: Member i2c_config\[\] \(var
 boards/lsn50/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/lsn50/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/maple\-mini/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
-boards/maple\-mini/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/maple\-mini/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/maple\-mini/include/periph_conf\.h:[0-9]+: warning: Member I2C_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/maple\-mini/include/periph_conf\.h:[0-9]+: warning: Member I2C_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/maple\-mini/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -1967,9 +1822,6 @@ boards/microbit\-v2/include/periph_conf\.h:[0-9]+: warning: Member i2c_config\[\
 boards/microbit\-v2/include/periph_conf\.h:[0-9]+: warning: Member pwm_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/microbit\-v2/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/microbit\-v2/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/microduino\-corerf/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/microduino\-corerf/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/microduino\-corerf/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/msb\-430/include/board\.h:[0-9]+: warning: Member F_CPU \(macro definition\) of file board\.h is not documented\.
 boards/msb\-430/include/board\.h:[0-9]+: warning: Member F_RC_OSCILLATOR \(macro definition\) of file board\.h is not documented\.
 boards/msb\-430/include/board\.h:[0-9]+: warning: Member MSP430_HAS_DCOR \(macro definition\) of file board\.h is not documented\.
@@ -2093,9 +1945,6 @@ boards/msbiot/include/periph_conf\.h:[0-9]+: warning: Member pwm_config\[\] \(va
 boards/msbiot/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/msbiot/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/msbiot/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/mulle/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_INT \(macro definition\) of file board\.h is not documented\.
-boards/mulle/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_RESET \(macro definition\) of file board\.h is not documented\.
-boards/mulle/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_SLEEP \(macro definition\) of file board\.h is not documented\.
 boards/mulle/include/board\.h:[0-9]+: warning: Member LED0_BIT \(macro definition\) of file board\.h is not documented\.
 boards/mulle/include/board\.h:[0-9]+: warning: Member LED1_BIT \(macro definition\) of file board\.h is not documented\.
 boards/mulle/include/board\.h:[0-9]+: warning: Member LED2_BIT \(macro definition\) of file board\.h is not documented\.
@@ -2111,10 +1960,6 @@ boards/mulle/include/board\.h:[0-9]+: warning: Member MULLE_NVRAM_SPI_CLK \(macr
 boards/mulle/include/board\.h:[0-9]+: warning: Member MULLE_NVRAM_SPI_DEV \(macro definition\) of file board\.h is not documented\.
 boards/mulle/include/board\.h:[0-9]+: warning: Member MULLE_VBAT_ADC_LINE \(macro definition\) of file board\.h is not documented\.
 boards/mulle/include/board\.h:[0-9]+: warning: Member MULLE_VCHR_ADC_LINE \(macro definition\) of file board\.h is not documented\.
-boards/mulle/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/mulle/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of file board\.h is not documented\.
-boards/mulle/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of file board\.h is not documented\.
-boards/mulle/include/board\.h:[0-9]+: warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of file board\.h is not documented\.
 boards/mulle/include/board\.h:[0-9]+: warning: Member mtd0 \(variable\) of file board\.h is not documented\.
 boards/mulle/include/mulle\-nvram\.h:[0-9]+: warning: Member MULLE_NVRAM_MAGIC_EXPECTED \(macro definition\) of file mulle\-nvram\.h is not documented\.
 boards/mulle/include/mulle\-nvram\.h:[0-9]+: warning: Member mulle_nvram \(variable\) of file mulle\-nvram\.h is not documented\.
@@ -2916,8 +2761,6 @@ boards/nz32\-sc151/include/periph_conf\.h:[0-9]+: warning: Member pwm_config\[\]
 boards/nz32\-sc151/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/nz32\-sc151/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/olimexino\-stm32/include/board\.h:[0-9]+: warning: Member LED_PANIC \(macro definition\) of file board\.h is not documented\.
-boards/olimexino\-stm32/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/olimexino\-stm32/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/olimexino\-stm32/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/olimexino\-stm32/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/olimexino\-stm32/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_LSE \(macro definition\) of file periph_conf\.h is not documented\.
@@ -2947,9 +2790,6 @@ boards/omote/include/board\.h:[0-9]+: warning: Member INTERNAL_PERIPHERAL_VID \(
 boards/omote/include/board\.h:[0-9]+: warning: Member LED_ALL_OFF \(macro definition\) of file board\.h is not documented\.
 boards/omote/include/board\.h:[0-9]+: warning: Member LED_ALL_ON \(macro definition\) of file board\.h is not documented\.
 boards/omote/include/board\.h:[0-9]+: warning: Member UPDATE_CCA \(macro definition\) of file board\.h is not documented\.
-boards/omote/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/omote/include/board\.h:[0-9]+: warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/omote/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/omote/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/omote/include/periph_conf\.h:[0-9]+: warning: Member I2C_IRQ_PRIO \(macro definition\) of file periph_conf\.h is not documented\.
 boards/omote/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -2964,8 +2804,6 @@ boards/omote/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(var
 boards/omote/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/opencm904/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
 boards/opencm904/include/board\.h:[0-9]+: warning: Member STDIO_UART_BAUDRATE \(macro definition\) of file board\.h is not documented\.
-boards/opencm904/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/opencm904/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/opencm904/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/opencm904/include/periph_conf\.h:[0-9]+: warning: Member TIMER_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/opencm904/include/periph_conf\.h:[0-9]+: warning: Member TIMER_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
@@ -2977,12 +2815,6 @@ boards/opencm904/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(mac
 boards/opencm904/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/opencm904/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/openlabs\-kw41z\-mini/include/board\.h:[0-9]+: warning: Member KINETIS_FOPT \(macro definition\) of file board\.h is not documented\.
-boards/openlabs\-kw41z\-mini/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/openlabs\-kw41z\-mini/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of file board\.h is not documented\.
-boards/openlabs\-kw41z\-mini/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of file board\.h is not documented\.
-boards/openlabs\-kw41z\-mini/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/openlabs\-kw41z\-mini/include/board\.h:[0-9]+: warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/openlabs\-kw41z\-mini/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/openlabs\-kw41z\-mini/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/openlabs\-kw41z\-mini/include/periph_conf\.h:[0-9]+: warning: Member ADC_REF_SETTING \(macro definition\) of file periph_conf\.h is not documented\.
 boards/openlabs\-kw41z\-mini/include/periph_conf\.h:[0-9]+: warning: Member ADC_REF_VOLTAGE \(macro definition\) of file periph_conf\.h is not documented\.
@@ -3051,9 +2883,6 @@ boards/openmote\-b/include/board\.h:[0-9]+: warning: Member RF24_SWITCH_CC2538_O
 boards/openmote\-b/include/board\.h:[0-9]+: warning: Member RF24_SWITCH_CC2538_TOGGLE \(macro definition\) of file board\.h is not documented\.
 boards/openmote\-b/include/board\.h:[0-9]+: warning: Member RF_SWITCH_PORT \(macro definition\) of file board\.h is not documented\.
 boards/openmote\-b/include/board\.h:[0-9]+: warning: Member UPDATE_CCA \(macro definition\) of file board\.h is not documented\.
-boards/openmote\-b/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/openmote\-b/include/board\.h:[0-9]+: warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/openmote\-b/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/openmote\-b/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/openmote\-b/include/periph_conf\.h:[0-9]+: warning: Member I2C_IRQ_PRIO \(macro definition\) of file periph_conf\.h is not documented\.
 boards/openmote\-b/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -3071,9 +2900,6 @@ boards/openmote\-cc2538/include/board\.h:[0-9]+: warning: Member CONFIG_CC2538_R
 boards/openmote\-cc2538/include/board\.h:[0-9]+: warning: Member CONFIG_CC2538_RF_OBS_SIG_2_PCX \(macro definition\) of file board\.h is not documented\.
 boards/openmote\-cc2538/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
 boards/openmote\-cc2538/include/board\.h:[0-9]+: warning: Member UPDATE_CCA \(macro definition\) of file board\.h is not documented\.
-boards/openmote\-cc2538/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/openmote\-cc2538/include/board\.h:[0-9]+: warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/openmote\-cc2538/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/openmote\-cc2538/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/openmote\-cc2538/include/periph_conf\.h:[0-9]+: warning: Member I2C_IRQ_PRIO \(macro definition\) of file periph_conf\.h is not documented\.
 boards/openmote\-cc2538/include/periph_conf\.h:[0-9]+: warning: Member I2C_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -3152,7 +2978,6 @@ boards/pba\-d\-01\-kw2x/include/board\.h:[0-9]+: warning: Member KW2XRF_PARAM_SP
 boards/pba\-d\-01\-kw2x/include/board\.h:[0-9]+: warning: Member KW2XRF_PARAM_SPI_CLK \(macro definition\) of file board\.h is not documented\.
 boards/pba\-d\-01\-kw2x/include/board\.h:[0-9]+: warning: Member KW2XRF_PARAM_RESET \(macro definition\) of file board\.h is not documented\.
 boards/pba\-d\-01\-kw2x/include/board\.h:[0-9]+: warning: Member KW2XRF_SHARED_SPI \(macro definition\) of file board\.h is not documented\.
-boards/pba\-d\-01\-kw2x/include/board\.h:[0-9]+: warning: Member TMP00X_PARAM_ADDR \(macro definition\) of file board\.h is not documented\.
 boards/pba\-d\-01\-kw2x/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/pba\-d\-01\-kw2x/include/periph_conf\.h:[0-9]+: warning: Member ADC_REF_SETTING \(macro definition\) of file periph_conf\.h is not documented\.
 boards/pba\-d\-01\-kw2x/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_BUSCLOCK \(macro definition\) of file periph_conf\.h is not documented\.
@@ -3196,12 +3021,6 @@ boards/phynode\-kw41z/include/board\.h:[0-9]+: warning: Member V_PERIPH_MASK \(m
 boards/phynode\-kw41z/include/board\.h:[0-9]+: warning: Member V_PERIPH_OFF \(macro definition\) of file board\.h is not documented\.
 boards/phynode\-kw41z/include/board\.h:[0-9]+: warning: Member V_PERIPH_ON \(macro definition\) of file board\.h is not documented\.
 boards/phynode\-kw41z/include/board\.h:[0-9]+: warning: Member V_PERIPH_PIN \(macro definition\) of file board\.h is not documented\.
-boards/phynode\-kw41z/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/phynode\-kw41z/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of file board\.h is not documented\.
-boards/phynode\-kw41z/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of file board\.h is not documented\.
-boards/phynode\-kw41z/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/phynode\-kw41z/include/board\.h:[0-9]+: warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/phynode\-kw41z/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/phynode\-kw41z/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/phynode\-kw41z/include/periph_conf\.h:[0-9]+: warning: Member ADC_REF_SETTING \(macro definition\) of file periph_conf\.h is not documented\.
 boards/phynode\-kw41z/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -3448,8 +3267,6 @@ boards/samd10\-xmini/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[
 boards/samd10\-xmini/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/samd10\-xmini/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/samd20\-xpro/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
-boards/samd20\-xpro/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of file board\.h is not documented\.
-boards/samd20\-xpro/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of file board\.h is not documented\.
 boards/samd20\-xpro/include/periph_conf\.h:[0-9]+: warning: Member ADC_GAIN_FACTOR_DEFAULT \(macro definition\) of file periph_conf\.h is not documented\.
 boards/samd20\-xpro/include/periph_conf\.h:[0-9]+: warning: Member ADC_NEG_INPUT \(macro definition\) of file periph_conf\.h is not documented\.
 boards/samd20\-xpro/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -3483,8 +3300,6 @@ boards/samd20\-xpro/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\
 boards/samd20\-xpro/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/samd20\-xpro/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/samd21\-xpro/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
-boards/samd21\-xpro/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of file board\.h is not documented\.
-boards/samd21\-xpro/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of file board\.h is not documented\.
 boards/samd21\-xpro/include/periph_conf\.h:[0-9]+: warning: Member ADC_GAIN_FACTOR_DEFAULT \(macro definition\) of file periph_conf\.h is not documented\.
 boards/samd21\-xpro/include/periph_conf\.h:[0-9]+: warning: Member ADC_NEG_INPUT \(macro definition\) of file periph_conf\.h is not documented\.
 boards/samd21\-xpro/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -3532,8 +3347,6 @@ boards/same54\-xpro/include/board\.h:[0-9]+: warning: Member MTD_0 \(macro defin
 boards/same54\-xpro/include/board\.h:[0-9]+: warning: Member MTD_1 \(macro definition\) of file board\.h is not documented\.
 boards/same54\-xpro/include/board\.h:[0-9]+: warning: Member MTD_2 \(macro definition\) of file board\.h is not documented\.
 boards/same54\-xpro/include/board\.h:[0-9]+: warning: Member MTD_NUMOF \(macro definition\) of file board\.h is not documented\.
-boards/same54\-xpro/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/same54\-xpro/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/same54\-xpro/include/board\.h:[0-9]+: warning: Member mtd0 \(variable\) of file board\.h is not documented\.
 boards/same54\-xpro/include/board\.h:[0-9]+: warning: Member mtd1 \(variable\) of file board\.h is not documented\.
 boards/same54\-xpro/include/board\.h:[0-9]+: warning: Member mtd2 \(variable\) of file board\.h is not documented\.
@@ -3611,10 +3424,6 @@ boards/saml21\-xpro/include/periph_conf\.h:[0-9]+: warning: Member sam_usbdev_co
 boards/saml21\-xpro/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/saml21\-xpro/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/saml21\-xpro/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/samr21\-xpro/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_CS \(macro definition\) of file board\.h is not documented\.
-boards/samr21\-xpro/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_INT \(macro definition\) of file board\.h is not documented\.
-boards/samr21\-xpro/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_RESET \(macro definition\) of file board\.h is not documented\.
-boards/samr21\-xpro/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_SLEEP \(macro definition\) of file board\.h is not documented\.
 boards/samr21\-xpro/include/board\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_DEV \(macro definition\) of file board\.h is not documented\.
 boards/samr21\-xpro/include/board\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_MIN \(macro definition\) of file board\.h is not documented\.
 boards/samr21\-xpro/include/board\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_TYPE \(macro definition\) of file board\.h is not documented\.
@@ -3622,8 +3431,6 @@ boards/samr21\-xpro/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro de
 boards/samr21\-xpro/include/board\.h:[0-9]+: warning: Member RFCTL1_PIN \(macro definition\) of file board\.h is not documented\.
 boards/samr21\-xpro/include/board\.h:[0-9]+: warning: Member RFCTL2_PIN \(macro definition\) of file board\.h is not documented\.
 boards/samr21\-xpro/include/board\.h:[0-9]+: warning: Member RFCTL_ANTENNA_DEFAULT \(macro definition\) of file board\.h is not documented\.
-boards/samr21\-xpro/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of file board\.h is not documented\.
-boards/samr21\-xpro/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of file board\.h is not documented\.
 boards/samr21\-xpro/include/eui_provider_params\.h:[0-9]+: warning: Member EUI64_PROVIDER_FUNC \(macro definition\) of file eui_provider_params\.h is not documented\.
 boards/samr21\-xpro/include/eui_provider_params\.h:[0-9]+: warning: Member EUI64_PROVIDER_INDEX \(macro definition\) of file eui_provider_params\.h is not documented\.
 boards/samr21\-xpro/include/eui_provider_params\.h:[0-9]+: warning: Member EUI64_PROVIDER_TYPE \(macro definition\) of file eui_provider_params\.h is not documented\.
@@ -3666,12 +3473,6 @@ boards/samr21\-xpro/include/periph_conf\.h:[0-9]+: warning: Member sam_usbdev_co
 boards/samr21\-xpro/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/samr21\-xpro/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/samr21\-xpro/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/samr30\-xpro/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_CS \(macro definition\) of group boards_samr30\-xpro is not documented\.
-boards/samr30\-xpro/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_INT \(macro definition\) of group boards_samr30\-xpro is not documented\.
-boards/samr30\-xpro/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_RESET \(macro definition\) of group boards_samr30\-xpro is not documented\.
-boards/samr30\-xpro/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_SLEEP \(macro definition\) of group boards_samr30\-xpro is not documented\.
-boards/samr30\-xpro/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_SPI \(macro definition\) of group boards_samr30\-xpro is not documented\.
-boards/samr30\-xpro/include/board\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_SPI_CLK \(macro definition\) of group boards_samr30\-xpro is not documented\.
 boards/samr30\-xpro/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of group boards_samr30\-xpro is not documented\.
 boards/samr30\-xpro/include/board\.h:[0-9]+: warning: Member RFCTL1_PIN \(macro definition\) of group boards_samr30\-xpro is not documented\.
 boards/samr30\-xpro/include/board\.h:[0-9]+: warning: Member RFCTL2_PIN \(macro definition\) of group boards_samr30\-xpro is not documented\.
@@ -3732,8 +3533,6 @@ boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member sam_usbdev_co
 boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/samr34\-xpro/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/seeedstudio\-gd32/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of group boards_seeedstudio\-gd32 is not documented\.
-boards/seeedstudio\-gd32/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of group boards_seeedstudio\-gd32 is not documented\.
 boards/seeedstudio\-gd32/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HXTAL \(macro definition\) of file periph_conf\.h is not documented\.
 boards/seeedstudio\-gd32/include/periph_conf\.h:[0-9]+: warning: Member TIMER_0_IRQN \(macro definition\) of file periph_conf\.h is not documented\.
 boards/seeedstudio\-gd32/include/periph_conf\.h:[0-9]+: warning: Member TIMER_1_IRQN \(macro definition\) of file periph_conf\.h is not documented\.
@@ -3901,10 +3700,6 @@ boards/slstk3400a/include/board\.h:[0-9]+: warning: Member PB1_PIN \(macro defin
 boards/slstk3400a/include/board\.h:[0-9]+: warning: Member SI7021_EN_PIN \(macro definition\) of file board\.h is not documented\.
 boards/slstk3400a/include/board\.h:[0-9]+: warning: Member SI7021_I2C \(macro definition\) of file board\.h is not documented\.
 boards/slstk3400a/include/board\.h:[0-9]+: warning: Member SI70XX_PARAM_I2C_DEV \(macro definition\) of file board\.h is not documented\.
-boards/slstk3400a/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of file board\.h is not documented\.
-boards/slstk3400a/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of file board\.h is not documented\.
-boards/slstk3400a/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/slstk3400a/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/slstk3400a/include/periph_conf\.h:[0-9]+: warning: Member ADC_DEV_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/slstk3400a/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/slstk3400a/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORE_DIV \(macro definition\) of file periph_conf\.h is not documented\.
@@ -3937,10 +3732,6 @@ boards/slstk3401a/include/board\.h:[0-9]+: warning: Member PB1_PIN \(macro defin
 boards/slstk3401a/include/board\.h:[0-9]+: warning: Member SI7021_EN_PIN \(macro definition\) of file board\.h is not documented\.
 boards/slstk3401a/include/board\.h:[0-9]+: warning: Member SI7021_I2C \(macro definition\) of file board\.h is not documented\.
 boards/slstk3401a/include/board\.h:[0-9]+: warning: Member SI70XX_PARAM_I2C_DEV \(macro definition\) of file board\.h is not documented\.
-boards/slstk3401a/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of file board\.h is not documented\.
-boards/slstk3401a/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of file board\.h is not documented\.
-boards/slstk3401a/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/slstk3401a/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/slstk3401a/include/periph_conf\.h:[0-9]+: warning: Member ADC_DEV_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/slstk3401a/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/slstk3401a/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORE_DIV \(macro definition\) of file periph_conf\.h is not documented\.
@@ -3975,10 +3766,6 @@ boards/slstk3402a/include/board\.h:[0-9]+: warning: Member PB1_PIN \(macro defin
 boards/slstk3402a/include/board\.h:[0-9]+: warning: Member SI7021_EN_PIN \(macro definition\) of file board\.h is not documented\.
 boards/slstk3402a/include/board\.h:[0-9]+: warning: Member SI7021_I2C \(macro definition\) of file board\.h is not documented\.
 boards/slstk3402a/include/board\.h:[0-9]+: warning: Member SI70XX_PARAM_I2C_DEV \(macro definition\) of file board\.h is not documented\.
-boards/slstk3402a/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of file board\.h is not documented\.
-boards/slstk3402a/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of file board\.h is not documented\.
-boards/slstk3402a/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/slstk3402a/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/slstk3402a/include/periph_conf\.h:[0-9]+: warning: Member ADC_DEV_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/slstk3402a/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/slstk3402a/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORE_DIV \(macro definition\) of file periph_conf\.h is not documented\.
@@ -4038,10 +3825,6 @@ boards/sltb001a/include/board\.h:[0-9]+: warning: Member SI7021_I2C \(macro defi
 boards/sltb001a/include/board\.h:[0-9]+: warning: Member SI70XX_PARAM_I2C_DEV \(macro definition\) of file board\.h is not documented\.
 boards/sltb001a/include/board\.h:[0-9]+: warning: Member SI7210_ENABLED \(macro definition\) of file board\.h is not documented\.
 boards/sltb001a/include/board\.h:[0-9]+: warning: Member SI7210_I2C \(macro definition\) of file board\.h is not documented\.
-boards/sltb001a/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of file board\.h is not documented\.
-boards/sltb001a/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of file board\.h is not documented\.
-boards/sltb001a/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/sltb001a/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/sltb001a/include/periph_conf\.h:[0-9]+: warning: Member ADC_DEV_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/sltb001a/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/sltb001a/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORE_DIV \(macro definition\) of file periph_conf\.h is not documented\.
@@ -4077,10 +3860,6 @@ boards/slwstk6220a/include/board\.h:[0-9]+: warning: Member PB1_PIN \(macro defi
 boards/slwstk6220a/include/board\.h:[0-9]+: warning: Member SI7021_EN_PIN \(macro definition\) of file board\.h is not documented\.
 boards/slwstk6220a/include/board\.h:[0-9]+: warning: Member SI7021_I2C \(macro definition\) of file board\.h is not documented\.
 boards/slwstk6220a/include/board\.h:[0-9]+: warning: Member SI70XX_PARAM_I2C_DEV \(macro definition\) of file board\.h is not documented\.
-boards/slwstk6220a/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of file board\.h is not documented\.
-boards/slwstk6220a/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of file board\.h is not documented\.
-boards/slwstk6220a/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/slwstk6220a/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/slwstk6220a/include/periph_conf\.h:[0-9]+: warning: Member ADC_DEV_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/slwstk6220a/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/slwstk6220a/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORE_DIV \(macro definition\) of file periph_conf\.h is not documented\.
@@ -4287,7 +4066,6 @@ boards/spark\-core/include/board\.h:[0-9]+: warning: Member CC3000_SPI \(macro d
 boards/spark\-core/include/board\.h:[0-9]+: warning: Member EXTFLASH \(macro definition\) of file board\.h is not documented\.
 boards/spark\-core/include/board\.h:[0-9]+: warning: Member EXTFLASH_SPI \(macro definition\) of file board\.h is not documented\.
 boards/spark\-core/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
-boards/spark\-core/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/spark\-core/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/spark\-core/include/periph_conf\.h:[0-9]+: warning: Member TIMER_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/spark\-core/include/periph_conf\.h:[0-9]+: warning: Member TIMER_1_ISR \(macro definition\) of file periph_conf\.h is not documented\.
@@ -4306,10 +4084,6 @@ boards/stk3200/include/board\.h:[0-9]+: warning: Member DISP_SELECT_PIN \(macro 
 boards/stk3200/include/board\.h:[0-9]+: warning: Member DISP_SPI \(macro definition\) of file board\.h is not documented\.
 boards/stk3200/include/board\.h:[0-9]+: warning: Member PB0_PIN \(macro definition\) of file board\.h is not documented\.
 boards/stk3200/include/board\.h:[0-9]+: warning: Member PB1_PIN \(macro definition\) of file board\.h is not documented\.
-boards/stk3200/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of file board\.h is not documented\.
-boards/stk3200/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of file board\.h is not documented\.
-boards/stk3200/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/stk3200/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/stk3200/include/periph_conf\.h:[0-9]+: warning: Member ADC_DEV_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stk3200/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stk3200/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORE_DIV \(macro definition\) of file periph_conf\.h is not documented\.
@@ -4334,10 +4108,6 @@ boards/stk3600/include/board\.h:[0-9]+: warning: Member BC_PIN \(macro definitio
 boards/stk3600/include/board\.h:[0-9]+: warning: Member CORETEMP_ADC \(macro definition\) of file board\.h is not documented\.
 boards/stk3600/include/board\.h:[0-9]+: warning: Member PB0_PIN \(macro definition\) of file board\.h is not documented\.
 boards/stk3600/include/board\.h:[0-9]+: warning: Member PB1_PIN \(macro definition\) of file board\.h is not documented\.
-boards/stk3600/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of file board\.h is not documented\.
-boards/stk3600/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of file board\.h is not documented\.
-boards/stk3600/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/stk3600/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/stk3600/include/periph_conf\.h:[0-9]+: warning: Member ADC_DEV_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stk3600/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stk3600/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORE_DIV \(macro definition\) of file periph_conf\.h is not documented\.
@@ -4373,10 +4143,6 @@ boards/stk3700/include/board\.h:[0-9]+: warning: Member BC_PIN \(macro definitio
 boards/stk3700/include/board\.h:[0-9]+: warning: Member CORETEMP_ADC \(macro definition\) of file board\.h is not documented\.
 boards/stk3700/include/board\.h:[0-9]+: warning: Member PB0_PIN \(macro definition\) of file board\.h is not documented\.
 boards/stk3700/include/board\.h:[0-9]+: warning: Member PB1_PIN \(macro definition\) of file board\.h is not documented\.
-boards/stk3700/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of file board\.h is not documented\.
-boards/stk3700/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of file board\.h is not documented\.
-boards/stk3700/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/stk3700/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/stk3700/include/periph_conf\.h:[0-9]+: warning: Member ADC_DEV_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stk3700/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stk3700/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORE_DIV \(macro definition\) of file periph_conf\.h is not documented\.
@@ -4408,7 +4174,6 @@ boards/stk3700/include/periph_conf\.h:[0-9]+: warning: Member pwm_config\[\] \(v
 boards/stk3700/include/periph_conf\.h:[0-9]+: warning: Member spi_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/stk3700/include/periph_conf\.h:[0-9]+: warning: Member timer_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/stk3700/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/stm32f030f4\-demo/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/stm32f030f4\-demo/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32f030f4\-demo/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32f030f4\-demo/include/periph_conf\.h:[0-9]+: warning: Member PWM_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -4486,7 +4251,6 @@ boards/stm32f4discovery/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUIN
 boards/stm32f4discovery/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_6 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/stm32f4discovery/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_7 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/stm32f4discovery/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
-boards/stm32f4discovery/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
 boards/stm32f4discovery/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32f4discovery/include/periph_conf\.h:[0-9]+: warning: Member CONFIG_BOARD_HAS_HSE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32f4discovery/include/periph_conf\.h:[0-9]+: warning: Member DAC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -4538,7 +4302,6 @@ boards/stm32f769i\-disco/include/periph_conf\.h:[0-9]+: warning: Member UART_0_D
 boards/stm32f769i\-disco/include/periph_conf\.h:[0-9]+: warning: Member UART_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32f769i\-disco/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32f769i\-disco/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
-boards/stm32l0538\-disco/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/stm32l0538\-disco/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32l0538\-disco/include/periph_conf\.h:[0-9]+: warning: Member TIMER_0_ISR \(macro definition\) of file periph_conf\.h is not documented\.
 boards/stm32l0538\-disco/include/periph_conf\.h:[0-9]+: warning: Member TIMER_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -4562,10 +4325,6 @@ boards/stm32mp157c\-dk2/include/periph_conf\.h:[0-9]+: warning: Member UART_NUMO
 boards/stm32mp157c\-dk2/include/periph_conf\.h:[0-9]+: warning: Member uart_config\[\] \(variable\) of file periph_conf\.h is not documented\.
 boards/teensy31/include/board\.h:[0-9]+: warning: Member LED0_BIT \(macro definition\) of file board\.h is not documented\.
 boards/teensy31/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
-boards/teensy31/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/teensy31/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of file board\.h is not documented\.
-boards/teensy31/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of file board\.h is not documented\.
-boards/teensy31/include/board\.h:[0-9]+: warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of file board\.h is not documented\.
 boards/teensy31/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_BUSCLOCK \(macro definition\) of file periph_conf\.h is not documented\.
 boards/teensy31/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file periph_conf\.h is not documented\.
 boards/teensy31/include/periph_conf\.h:[0-9]+: warning: Member LPTMR_CONFIG \(macro definition\) of file periph_conf\.h is not documented\.
@@ -4597,8 +4356,6 @@ boards/telosb/include/board\.h:[0-9]+: warning: Member LED_OUT_REG \(macro defin
 boards/telosb/include/board\.h:[0-9]+: warning: Member MSP430_HAS_DCOR \(macro definition\) of file board\.h is not documented\.
 boards/telosb/include/board\.h:[0-9]+: warning: Member MSP430_HAS_EXTERNAL_CRYSTAL \(macro definition\) of file board\.h is not documented\.
 boards/telosb/include/board\.h:[0-9]+: warning: Member STDIO_UART_BAUDRATE \(macro definition\) of file board\.h is not documented\.
-boards/telosb/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/telosb/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/telosb/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CMCLK \(macro definition\) of file periph_conf\.h is not documented\.
 boards/telosb/include/periph_conf\.h:[0-9]+: warning: Member SPI_BASE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/telosb/include/periph_conf\.h:[0-9]+: warning: Member SPI_IE \(macro definition\) of file periph_conf\.h is not documented\.
@@ -4703,12 +4460,6 @@ boards/usb\-kw41z/include/board\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_FR
 boards/usb\-kw41z/include/board\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_TYPE \(macro definition\) of file board\.h is not documented\.
 boards/usb\-kw41z/include/board\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/usb\-kw41z/include/board\.h:[0-9]+: warning: Member KINETIS_FOPT \(macro definition\) of file board\.h is not documented\.
-boards/usb\-kw41z/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/usb\-kw41z/include/board\.h:[0-9]+: warning: Member XTIMER_CHAN \(macro definition\) of file board\.h is not documented\.
-boards/usb\-kw41z/include/board\.h:[0-9]+: warning: Member XTIMER_DEV \(macro definition\) of file board\.h is not documented\.
-boards/usb\-kw41z/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/usb\-kw41z/include/board\.h:[0-9]+: warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/usb\-kw41z/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/usb\-kw41z/include/periph_conf\.h:[0-9]+: warning: Member ADC_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/usb\-kw41z/include/periph_conf\.h:[0-9]+: warning: Member ADC_REF_SETTING \(macro definition\) of file periph_conf\.h is not documented\.
 boards/usb\-kw41z/include/periph_conf\.h:[0-9]+: warning: Member SPI_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
@@ -4821,10 +4572,6 @@ boards/waspmote\-pro/include/board\.h:[0-9]+: warning: Member SET_MUX_GPS \(macr
 boards/waspmote\-pro/include/board\.h:[0-9]+: warning: Member SET_MUX_SOCKET0 \(macro definition\) of file board\.h is not documented\.
 boards/waspmote\-pro/include/board\.h:[0-9]+: warning: Member SET_MUX_SOCKET1 \(macro definition\) of file board\.h is not documented\.
 boards/waspmote\-pro/include/board\.h:[0-9]+: warning: Member SET_MUX_USB_MODULE \(macro definition\) of file board\.h is not documented\.
-boards/waspmote\-pro/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/waspmote\-pro/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/waspmote\-pro/include/board\.h:[0-9]+: warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/waspmote\-pro/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/waspmote\-pro/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CORECLOCK \(macro definition\) of file periph_conf\.h is not documented\.
 boards/waspmote\-pro/include/waspmote_pinmap\.h:[0-9]+: warning: Member ANA0 \(macro definition\) of file waspmote_pinmap\.h is not documented\.
 boards/waspmote\-pro/include/waspmote_pinmap\.h:[0-9]+: warning: Member ANA1 \(macro definition\) of file waspmote_pinmap\.h is not documented\.
@@ -4922,8 +4669,6 @@ boards/z1/include/board\.h:[0-9]+: warning: Member F_RC_OSCILLATOR \(macro defin
 boards/z1/include/board\.h:[0-9]+: warning: Member LED_OUT_REG \(macro definition\) of file board\.h is not documented\.
 boards/z1/include/board\.h:[0-9]+: warning: Member MSP430_HAS_DCOR \(macro definition\) of file board\.h is not documented\.
 boards/z1/include/board\.h:[0-9]+: warning: Member MSP430_HAS_EXTERNAL_CRYSTAL \(macro definition\) of file board\.h is not documented\.
-boards/z1/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/z1/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 boards/z1/include/periph_conf\.h:[0-9]+: warning: Member CLOCK_CMCLK \(macro definition\) of file periph_conf\.h is not documented\.
 boards/z1/include/periph_conf\.h:[0-9]+: warning: Member SPI_BASE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/z1/include/periph_conf\.h:[0-9]+: warning: Member SPI_IE \(macro definition\) of file periph_conf\.h is not documented\.
@@ -4955,9 +4700,6 @@ boards/z1/include/periph_conf\.h:[0-9]+: warning: Member UART_TX_PORT \(macro de
 boards/z1/include/periph_conf\.h:[0-9]+: warning: Member UART_USE_USCI \(macro definition\) of file periph_conf\.h is not documented\.
 boards/zigduino/include/board\.h:[0-9]+: warning: Member PIR_MOTION_MODE \(macro definition\) of file board\.h is not documented\.
 boards/zigduino/include/board\.h:[0-9]+: warning: Member PIR_MOTION_PIN \(macro definition\) of file board\.h is not documented\.
-boards/zigduino/include/board\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of file board\.h is not documented\.
-boards/zigduino/include/board\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of file board\.h is not documented\.
-boards/zigduino/include/board\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of file board\.h is not documented\.
 core/include/bitarithm\.h:[0-9]+: warning: Member BIT0 \(macro definition\) of file bitarithm\.h is not documented\.
 core/include/bitarithm\.h:[0-9]+: warning: Member BIT1 \(macro definition\) of file bitarithm\.h is not documented\.
 core/include/bitarithm\.h:[0-9]+: warning: Member BIT10 \(macro definition\) of file bitarithm\.h is not documented\.
@@ -6185,7 +5927,6 @@ cpu/native/include/native_cli_eui_provider\.h:[0-9]+: warning: Member native_cli
 cpu/native/include/periph_conf\.h:[0-9]+: warning: Member NATIVE_TIMER_MIN_RES \(macro definition\) of file periph_conf\.h is not documented\.
 cpu/native/include/periph_conf\.h:[0-9]+: warning: Member RANDOM_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 cpu/native/include/periph_conf\.h:[0-9]+: warning: Member TIMER_NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
-cpu/native/include/periph_conf\.h:[0-9]+: warning: Member XTIMER_ISR_BACKOFF \(macro definition\) of file periph_conf\.h is not documented\.
 cpu/native/include/periph_cpu\.h:[0-9]+: warning: Member EEPROM_SIZE \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/native/include/periph_cpu\.h:[0-9]+: warning: Member GPIOHANDLE_REQUEST_PULL_DOWN \(macro definition\) of file periph_cpu\.h is not documented\.
 cpu/native/include/periph_cpu\.h:[0-9]+: warning: Member GPIOHANDLE_REQUEST_PULL_UP \(macro definition\) of file periph_cpu\.h is not documented\.
@@ -6728,13 +6469,6 @@ drivers/at86rf2xx/include/at86rf2xx_aes\.h:[0-9]+: warning: Member AT86RF2XX_REG
 drivers/at86rf2xx/include/at86rf2xx_aes\.h:[0-9]+: warning: Member AT86RF2XX_REG__AES_KEY_END \(macro definition\) of file at86rf2xx_aes\.h is not documented\.
 drivers/at86rf2xx/include/at86rf2xx_aes\.h:[0-9]+: warning: Member AT86RF2XX_REG__AES_KEY_START \(macro definition\) of file at86rf2xx_aes\.h is not documented\.
 drivers/at86rf2xx/include/at86rf2xx_aes\.h:[0-9]+: warning: Member AT86RF2XX_REG__AES_STATUS \(macro definition\) of file at86rf2xx_aes\.h is not documented\.
-drivers/at86rf2xx/include/at86rf2xx_params\.h:[0-9]+: warning: Member AT86RF2XX_PARAMS \(macro definition\) of file at86rf2xx_params\.h is not documented\.
-drivers/at86rf2xx/include/at86rf2xx_params\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_CS \(macro definition\) of file at86rf2xx_params\.h is not documented\.
-drivers/at86rf2xx/include/at86rf2xx_params\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_INT \(macro definition\) of file at86rf2xx_params\.h is not documented\.
-drivers/at86rf2xx/include/at86rf2xx_params\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_RESET \(macro definition\) of file at86rf2xx_params\.h is not documented\.
-drivers/at86rf2xx/include/at86rf2xx_params\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_SLEEP \(macro definition\) of file at86rf2xx_params\.h is not documented\.
-drivers/at86rf2xx/include/at86rf2xx_params\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_SPI \(macro definition\) of file at86rf2xx_params\.h is not documented\.
-drivers/at86rf2xx/include/at86rf2xx_params\.h:[0-9]+: warning: Member AT86RF2XX_PARAM_SPI_CLK \(macro definition\) of file at86rf2xx_params\.h is not documented\.
 drivers/at86rf2xx/include/at86rf2xx_registers\.h:[0-9]+: warning: Member AT86RF212B_PARTNUM \(macro definition\) of file at86rf2xx_registers\.h is not documented\.
 drivers/at86rf2xx/include/at86rf2xx_registers\.h:[0-9]+: warning: Member AT86RF231_PARTNUM \(macro definition\) of file at86rf2xx_registers\.h is not documented\.
 drivers/at86rf2xx/include/at86rf2xx_registers\.h:[0-9]+: warning: Member AT86RF232_PARTNUM \(macro definition\) of file at86rf2xx_registers\.h is not documented\.
@@ -7624,144 +7358,6 @@ drivers/feetech/include/feetech_protocol\.h:[0-9]+: warning: Member scs15_regist
 drivers/feetech/include/feetech_protocol\.h:[0-9]+: warning: Member scs15_register8_t \(enumeration\) of file feetech_protocol\.h is not documented\.
 drivers/feetech/include/feetech_reader\.h:[0-9]+: warning: Member FEETECH_ACK_SIZE \(macro definition\) of file feetech_reader\.h is not documented\.
 drivers/feetech/include/feetech_reader\.h:[0-9]+: warning: Member FEETECH_RESPONSE_SIZE\(len\) \(macro definition\) of file feetech_reader\.h is not documented\.
-drivers/fxos8700/include/fxos8700_params\.h:[0-9]+: warning: Member FXOS8700_PARAMS \(macro definition\) of file fxos8700_params\.h is not documented\.
-drivers/fxos8700/include/fxos8700_params\.h:[0-9]+: warning: Member FXOS8700_PARAM_ACC_RANGE \(macro definition\) of file fxos8700_params\.h is not documented\.
-drivers/fxos8700/include/fxos8700_params\.h:[0-9]+: warning: Member FXOS8700_PARAM_ADDR \(macro definition\) of file fxos8700_params\.h is not documented\.
-drivers/fxos8700/include/fxos8700_params\.h:[0-9]+: warning: Member FXOS8700_PARAM_RENEW_INTERVAL \(macro definition\) of file fxos8700_params\.h is not documented\.
-drivers/fxos8700/include/fxos8700_params\.h:[0-9]+: warning: Member FXOS8700_SAUL_INFO \(macro definition\) of file fxos8700_params\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_ASLP_COUNT \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_A_FFMT_CFG \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_A_FFMT_COUNT \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_A_FFMT_SRC \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_A_FFMT_THS \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_A_FFMT_THS_X_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_A_FFMT_THS_X_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_A_FFMT_THS_Y_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_A_FFMT_THS_Y_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_A_FFMT_THS_Z_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_A_FFMT_THS_Z_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_A_VECM_CFG \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_A_VECM_CNT \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_A_VECM_INITX_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_A_VECM_INITX_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_A_VECM_INITY_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_A_VECM_INITY_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_A_VECM_INITZ_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_A_VECM_INITZ_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_A_VECM_THS_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_A_VECM_THS_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_CMP_X_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_CMP_X_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_CMP_Y_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_CMP_Y_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_CMP_Z_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_CMP_Z_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_CTRL_REG1 \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_CTRL_REG1_MASK__ACTIVE \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_CTRL_REG1_MASK__ODR \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_CTRL_REG1_ODR__100HZ \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_CTRL_REG1_ODR__200HZ \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_CTRL_REG1_ODR__25HZ \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_CTRL_REG1_ODR__400HZ \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_CTRL_REG1_ODR__50HZ \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_CTRL_REG2 \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_CTRL_REG3 \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_CTRL_REG4 \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_CTRL_REG5 \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_F_SETUP \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_HP_FILTER_CUTOFF \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_INT_SOURCE \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_MAX_X_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_MAX_X_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_MAX_Y_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_MAX_Y_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_MAX_Z_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_MAX_Z_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_MIN_X_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_MIN_X_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_MIN_Y_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_MIN_Y_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_MIN_Z_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_MIN_Z_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_CTRL_REG1 \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_CTRL_REG1_HMS__ACC_ONLY \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_CTRL_REG1_HMS__HYBRID \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_CTRL_REG1_HMS__MAG_ONLY \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_CTRL_REG1_MASK__HMS \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_CTRL_REG2 \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_CTRL_REG2_MASK__HYB_AUTOINC_MODE \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_CTRL_REG3 \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_DR_STATUS \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_DR_STATUS_MASK__XYZ_READY \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_INT_SRC \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_OFF_X_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_OFF_X_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_OFF_Y_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_OFF_Y_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_OFF_Z_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_OFF_Z_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_OUT_X_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_OUT_X_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_OUT_Y_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_OUT_Y_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_OUT_Z_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_OUT_Z_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_THS_CFG \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_THS_COUNT \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_THS_SRC \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_THS_X_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_THS_X_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_THS_Y_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_THS_Y_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_THS_Z_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_THS_Z_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_VECM_CFG \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_VECM_CNT \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_VECM_INITX_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_VECM_INITX_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_VECM_INITY_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_VECM_INITY_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_VECM_INITZ_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_VECM_INITZ_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_VECM_THS_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_M_VECM_THS_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_OFF_X \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_OFF_Y \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_OFF_Z \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_OUT_X_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_OUT_X_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_OUT_Y_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_OUT_Y_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_OUT_Z_LSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_OUT_Z_MSB \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_PL_BF_ZCOMP \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_PL_CFG \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_PL_COUNT \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_PL_STATUS \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_PL_THS_REG \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_PULSE_CFG \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_PULSE_LTCY \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_PULSE_SRC \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_PULSE_THSX \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_PULSE_THSY \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_PULSE_THSZ \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_PULSE_TMLT \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_PULSE_WIND \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_STATUS \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_STATUS_MASK__XYZ_READY \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_SYSMOD \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_TEMP \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_TRANSIENT_CFG \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_TRANSIENT_COUNT \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_TRANSIENT_SRC \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_TRANSIENT_THS \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_TRIG_CFG \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_WHO_AM_I \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_XYZ_DATA_CFG \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_XYZ_DATA_CFG_FS__2G \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_XYZ_DATA_CFG_FS__4G \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_XYZ_DATA_CFG_FS__8G \(macro definition\) of file fxos8700_regs\.h is not documented\.
-drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_REG_XYZ_DATA_CFG_MASK__FS \(macro definition\) of file fxos8700_regs\.h is not documented\.
 drivers/fxos8700/include/fxos8700_regs\.h:[0-9]+: warning: Member FXOS8700_WHO_AM_I_VAL \(macro definition\) of file fxos8700_regs\.h is not documented\.
 drivers/hd44780/include/hd44780_internal\.h:[0-9]+: warning: Member HD44780_1LINE \(macro definition\) of file hd44780_internal\.h is not documented\.
 drivers/hd44780/include/hd44780_internal\.h:[0-9]+: warning: Member HD44780_2LINE \(macro definition\) of file hd44780_internal\.h is not documented\.
@@ -7804,12 +7400,6 @@ drivers/hd44780/include/hd44780_params\.h:[0-9]+: warning: Member HD44780_PARAM_
 drivers/hd44780/include/hd44780_params\.h:[0-9]+: warning: Member HD44780_PARAM_PIN_RS \(macro definition\) of file hd44780_params\.h is not documented\.
 drivers/hd44780/include/hd44780_params\.h:[0-9]+: warning: Member HD44780_PARAM_PIN_RW \(macro definition\) of file hd44780_params\.h is not documented\.
 drivers/hd44780/include/hd44780_params\.h:[0-9]+: warning: Member HD44780_PARAM_ROWS \(macro definition\) of file hd44780_params\.h is not documented\.
-drivers/hdc1000/include/hdc1000_params\.h:[0-9]+: warning: Member HDC1000_PARAMS \(macro definition\) of file hdc1000_params\.h is not documented\.
-drivers/hdc1000/include/hdc1000_params\.h:[0-9]+: warning: Member HDC1000_PARAM_ADDR \(macro definition\) of file hdc1000_params\.h is not documented\.
-drivers/hdc1000/include/hdc1000_params\.h:[0-9]+: warning: Member HDC1000_PARAM_I2C \(macro definition\) of file hdc1000_params\.h is not documented\.
-drivers/hdc1000/include/hdc1000_params\.h:[0-9]+: warning: Member HDC1000_PARAM_RENEW_INTERVAL \(macro definition\) of file hdc1000_params\.h is not documented\.
-drivers/hdc1000/include/hdc1000_params\.h:[0-9]+: warning: Member HDC1000_PARAM_RES \(macro definition\) of file hdc1000_params\.h is not documented\.
-drivers/hdc1000/include/hdc1000_params\.h:[0-9]+: warning: Member HDC1000_SAUL_INFO \(macro definition\) of file hdc1000_params\.h is not documented\.
 drivers/hdc1000/include/hdc1000_regs\.h:[0-9]+: warning: Member HDC1000_BTST_LOW \(macro definition\) of file hdc1000_regs\.h is not documented\.
 drivers/hdc1000/include/hdc1000_regs\.h:[0-9]+: warning: Member HDC1000_CONFIG \(macro definition\) of file hdc1000_regs\.h is not documented\.
 drivers/hdc1000/include/hdc1000_regs\.h:[0-9]+: warning: Member HDC1000_DEVICE_ID \(macro definition\) of file hdc1000_regs\.h is not documented\.
@@ -9827,13 +9417,6 @@ drivers/ph_oem/include/ph_oem_params\.h:[0-9]+: warning: Member PH_OEM_PARAM_INT
 drivers/ph_oem/include/ph_oem_params\.h:[0-9]+: warning: Member PH_OEM_PARAM_INTERRUPT_OPTION \(macro definition\) of file ph_oem_params\.h is not documented\.
 drivers/ph_oem/include/ph_oem_params\.h:[0-9]+: warning: Member PH_OEM_PARAM_INTERRUPT_PIN \(macro definition\) of file ph_oem_params\.h is not documented\.
 drivers/ph_oem/include/ph_oem_params\.h:[0-9]+: warning: Member PH_OEM_SAUL_INFO \(macro definition\) of file ph_oem_params\.h is not documented\.
-drivers/pir/include/pir_params\.h:[0-9]+: warning: Member PIR_PARAMS \(macro definition\) of file pir_params\.h is not documented\.
-drivers/pir/include/pir_params\.h:[0-9]+: warning: Member PIR_PARAM_ACTIVE_HIGH \(macro definition\) of file pir_params\.h is not documented\.
-drivers/pir/include/pir_params\.h:[0-9]+: warning: Member PIR_SAUL_INFO \(macro definition\) of file pir_params\.h is not documented\.
-drivers/pulse_counter/include/pulse_counter_params\.h:[0-9]+: warning: Member PULSE_COUNTER_GPIO \(macro definition\) of file pulse_counter_params\.h is not documented\.
-drivers/pulse_counter/include/pulse_counter_params\.h:[0-9]+: warning: Member PULSE_COUNTER_GPIO_FLANK \(macro definition\) of file pulse_counter_params\.h is not documented\.
-drivers/pulse_counter/include/pulse_counter_params\.h:[0-9]+: warning: Member PULSE_COUNTER_PARAMS \(macro definition\) of file pulse_counter_params\.h is not documented\.
-drivers/pulse_counter/include/pulse_counter_params\.h:[0-9]+: warning: Member PULSE_COUNTER_SAUL_INFO \(macro definition\) of file pulse_counter_params\.h is not documented\.
 drivers/qmc5883l/include/qmc5883l_params\.h:[0-9]+: warning: Member QMC5883L_PARAMS \(macro definition\) of file qmc5883l_params\.h is not documented\.
 drivers/qmc5883l/include/qmc5883l_params\.h:[0-9]+: warning: Member QMC5883L_PARAM_I2C \(macro definition\) of file qmc5883l_params\.h is not documented\.
 drivers/qmc5883l/include/qmc5883l_params\.h:[0-9]+: warning: Member QMC5883L_PARAM_ODR \(macro definition\) of file qmc5883l_params\.h is not documented\.
@@ -11429,11 +11012,6 @@ drivers/tcs37727/include/tcs37727_params\.h:[0-9]+: warning: Member TCS37727_PAR
 drivers/tcs37727/include/tcs37727_params\.h:[0-9]+: warning: Member TCS37727_PARAM_ATIME \(macro definition\) of file tcs37727_params\.h is not documented\.
 drivers/tcs37727/include/tcs37727_params\.h:[0-9]+: warning: Member TCS37727_PARAM_I2C \(macro definition\) of file tcs37727_params\.h is not documented\.
 drivers/tcs37727/include/tcs37727_params\.h:[0-9]+: warning: Member TCS37727_SAUL_INFO \(macro definition\) of file tcs37727_params\.h is not documented\.
-drivers/tmp00x/include/tmp00x_params\.h:[0-9]+: warning: Member TMP00X_PARAMS \(macro definition\) of file tmp00x_params\.h is not documented\.
-drivers/tmp00x/include/tmp00x_params\.h:[0-9]+: warning: Member TMP00X_PARAM_ADDR \(macro definition\) of file tmp00x_params\.h is not documented\.
-drivers/tmp00x/include/tmp00x_params\.h:[0-9]+: warning: Member TMP00X_PARAM_I2C \(macro definition\) of file tmp00x_params\.h is not documented\.
-drivers/tmp00x/include/tmp00x_params\.h:[0-9]+: warning: Member TMP00X_PARAM_RATE \(macro definition\) of file tmp00x_params\.h is not documented\.
-drivers/tmp00x/include/tmp00x_params\.h:[0-9]+: warning: Member TMP00X_SAUL_INFO \(macro definition\) of file tmp00x_params\.h is not documented\.
 drivers/tps6274x/include/tps6274x_params\.h:[0-9]+: warning: Member TPS6274X_PARAMS \(macro definition\) of file tps6274x_params\.h is not documented\.
 drivers/tsl2561/include/tsl2561_internals\.h:[0-9]+: warning: Member TSL2561_B1T \(macro definition\) of file tsl2561_internals\.h is not documented\.
 drivers/tsl2561/include/tsl2561_internals\.h:[0-9]+: warning: Member TSL2561_B2T \(macro definition\) of file tsl2561_internals\.h is not documented\.
@@ -12507,7 +12085,6 @@ sys/include/xtimer/implementation\.h:[0-9]+: warning: Member _xtimer_periodic_wa
 sys/include/xtimer/implementation\.h:[0-9]+: warning: Member _xtimer_set64\(xtimer_t \*timer, uint32_t offset, uint32_t long_offset\) \(function\) of file implementation\.h is not documented\.
 sys/include/xtimer/implementation\.h:[0-9]+: warning: Member _xtimer_set_wakeup64\(xtimer_t \*timer, uint64_t offset, kernel_pid_t pid\) \(function\) of file implementation\.h is not documented\.
 sys/include/xtimer/implementation\.h:[0-9]+: warning: Member _xtimer_set_wakeup\(xtimer_t \*timer, uint32_t offset, kernel_pid_t pid\) \(function\) of file implementation\.h is not documented\.
-sys/include/xtimer\.h:[0-9]+: warning: Member XTIMER_SHIFT \(macro definition\) of group sys_xtimer is not documented\.
 sys/include/ztimer/config\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_TYPE_PERIPH_TIMER \(macro definition\) of file config\.h is not documented\.
 sys/net/gnrc/network_layer/ipv6/nib/_nib\-6ln\.h:[0-9]+: warning: Member _handle_6co\(const icmpv6_hdr_t \*icmpv6, const sixlowpan_nd_opt_6ctx_t \*sixco, _nib_abr_entry_t \*abr\) \(function\) of file _nib\-6ln\.h is not documented\.
 sys/net/gnrc/network_layer/ipv6/nib/_nib\-6ln\.h:[0-9]+: warning: Member _handle_abro\(const sixlowpan_nd_opt_abr_t \*abro\) \(function\) of file _nib\-6ln\.h is not documented\.
@@ -12944,9 +12521,6 @@ boards/waveshare\-nrf52840\-eval\-kit/include/periph_conf\.h:[0-9]+: warning: Me
 boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member STDIO_UART_BAUDRATE \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
 boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member LED_PANIC \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
 boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member CPU_ATMEGA_CLK_SCALE_INIT \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
-boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
-boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
-boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
 boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_TYPE \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
 boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_DEV \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
 boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_FREQ \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
@@ -12983,9 +12557,6 @@ drivers/include/at86rf2xx\.h:[0-9]+: warning: found documented return type for a
 boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member STDIO_UART_BAUDRATE \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
 boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member LED_PANIC \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
 boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member CPU_ATMEGA_CLK_SCALE_INIT \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
-boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member XTIMER_WIDTH \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
-boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member XTIMER_HZ \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
-boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member XTIMER_BACKOFF \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
 boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_TYPE \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
 boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_DEV \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
 boards/common/arduino\-atmega/include/board_common\.h:[0-9]+: warning: Member CONFIG_ZTIMER_USEC_FREQ \(macro definition\) of group boards_common_arduino\-atmega is not documented\.
@@ -13093,7 +12664,6 @@ boards/esp32\-ttgo\-t\-beam/doc\.txt:[0-9]+: warning: unable to resolve referenc
 boards/esp32\-wemos\-lolin\-d32\-pro/doc\.txt:[0-9]+: warning: explicit link request to 'esp32_wemos_lolin_d32_pro_optional_hardware' could not be resolved
 drivers/include/xbee\.h:[0-9]+: warning: found documented return type for xbee_setup that does not return anything
 boards/nrf52840dongle/doc\.txt:[0-9]+: warning: unable to resolve reference to 'nrf52840dongle_flash' for \\ref command
-boards/sltb009a/include/board\.h:[0-9]+: warning: Member XTIMER_[A-Z]+ \(macro definition\) of file board\.h is not documented.
 boards/sltb009a/include/board\.h:[0-9]+: warning: Member VCOM_EN_PIN \(macro definition\) of file board\.h is not documented.
 boards/sltb009a/include/board\.h:[0-9]+: warning: Member PB[0-1]_PIN \(macro definition) of file board\.h is not documented.
 boards/sltb009a/include/board\.h:[0-9]+: warning: Member LED[0-1][RGB]_PIN \(macro definition) of file board\.h is not documented.

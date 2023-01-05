@@ -28,29 +28,51 @@ extern "C" {
 #endif
 
 /**
- * @name    Set default configuration parameters for the HDC1000 driver
+ * @name    Default configuration parameters for the HDC1000 driver
  * @{
  */
 #ifndef HDC1000_PARAM_I2C
+/**
+ * @brief   I2C bus the HDC1000 is connected to
+ */
 #define HDC1000_PARAM_I2C            I2C_DEV(0)
 #endif
+
 #ifndef HDC1000_PARAM_ADDR
+/**
+ * @brief   I2C address of the HDC1000
+ */
 #define HDC1000_PARAM_ADDR           (CONFIG_HDC1000_I2C_ADDRESS)
 #endif
+
 #ifndef HDC1000_PARAM_RES
+/**
+ * @brief   Resolution to sample the humidity and temperature at
+ */
 #define HDC1000_PARAM_RES            HDC1000_14BIT
 #endif
+
 #ifndef HDC1000_PARAM_RENEW_INTERVAL
+/**
+ * @brief   Interval at which the driver should renew the sensor data cache
+ */
 #define HDC1000_PARAM_RENEW_INTERVAL (1000000ul)
 #endif
 
 #ifndef HDC1000_PARAMS
+/**
+ * @brief   Parameters to initialize the HDC1000 driver with
+ */
 #define HDC1000_PARAMS               { .i2c  = HDC1000_PARAM_I2C,  \
                                        .addr = HDC1000_PARAM_ADDR, \
                                        .res  = HDC1000_PARAM_RES, \
                                        .renew_interval = HDC1000_PARAM_RENEW_INTERVAL }
 #endif
+
 #ifndef HDC1000_SAUL_INFO
+/**
+ * @brief   SAUL info to register HDC1000 driver instances with
+ */
 #define HDC1000_SAUL_INFO            { .name = "hdc1000" }
 #endif
 /**@}*/
