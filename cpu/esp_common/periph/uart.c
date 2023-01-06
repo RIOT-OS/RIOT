@@ -59,6 +59,7 @@
 
 #else /* defined(MCU_ESP8266) */
 
+#include "esp_rom_gpio.h"
 #include "hal/interrupt_controller_types.h"
 #include "hal/interrupt_controller_ll.h"
 #include "soc/gpio_reg.h"
@@ -164,53 +165,33 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     assert(uart < UART_NUMOF_MAX);
     assert(uart < UART_NUMOF);
 
-    /* UART1 and UART2 have configurable pins */
-    if ((UART_NUMOF > 1 && uart == UART_DEV(1)) ||
-        (UART_NUMOF > 2 && uart == UART_DEV(2))) {
-
-        /* reset the pins when they were already used as UART pins */
-        if (gpio_get_pin_usage(uart_config[uart].txd) == _UART) {
-            gpio_set_pin_usage(uart_config[uart].txd, _GPIO);
-        }
-        if (gpio_get_pin_usage(uart_config[uart].rxd) == _UART) {
-            gpio_set_pin_usage(uart_config[uart].rxd, _GPIO);
-        }
-
-        /* try to initialize the pins as GPIOs first */
-        if ((uart_config[uart].txd != GPIO_UNDEF &&
-             gpio_init(uart_config[uart].txd, GPIO_OUT)) ||
-            (uart_config[uart].rxd != GPIO_UNDEF &&
-             gpio_init(uart_config[uart].rxd, GPIO_IN))) {
-            return -1;
-        }
-
-        /* store the usage type in GPIO table */
-        gpio_set_pin_usage(uart_config[uart].txd, _UART);
-        gpio_set_pin_usage(uart_config[uart].rxd, _UART);
-
-#ifdef MCU_ESP8266
-        if (uart_config[uart].txd != GPIO_UNDEF) {
-            uint8_t mux = _gpio_to_iomux[uart_config[uart].txd];
-            IOMUX.PIN[mux] = (IOMUX.PIN[mux] & ~IOMUX_PIN_FUNC_MASK) |
-                             IOMUX_FUNC(uart_config[uart].txd == GPIO2 ? 2 : 4);
-        }
-        if (uart_config[uart].rxd != GPIO_UNDEF) {
-            /* There's really only GPIO8 / FUNC(4) for this, but it is normally
-             * unusable because it is used by the internal flash. */
-            uint8_t mux = _gpio_to_iomux[uart_config[uart].rxd];
-            IOMUX.PIN[mux] = (IOMUX.PIN[mux] & ~IOMUX_PIN_FUNC_MASK) |
-                             IOMUX_FUNC(4);
-        }
-#else /* MCU_ESP8266 */
-        /* connect TxD pin to the TxD output signal through the GPIO matrix */
-        GPIO.func_out_sel_cfg[uart_config[uart].txd].func_sel = _uarts[uart].signal_txd;
-
-        /* connect RxD input signal to the RxD pin through the GPIO matrix */
-        GPIO.func_in_sel_cfg[_uarts[uart].signal_rxd].sig_in_sel = 1;
-        GPIO.func_in_sel_cfg[_uarts[uart].signal_rxd].sig_in_inv = 0;
-        GPIO.func_in_sel_cfg[_uarts[uart].signal_rxd].func_sel = uart_config[uart].rxd;
-#endif /* MCU_ESP8266 */
+#ifndef MCU_ESP8266
+    /* reset the pins when they were already used as UART pins */
+    if (gpio_get_pin_usage(uart_config[uart].txd) == _UART) {
+        gpio_set_pin_usage(uart_config[uart].txd, _GPIO);
     }
+    if (gpio_get_pin_usage(uart_config[uart].rxd) == _UART) {
+        gpio_set_pin_usage(uart_config[uart].rxd, _GPIO);
+    }
+
+    /* try to initialize the pins as GPIOs first */
+    if ((uart_config[uart].txd != GPIO_UNDEF &&
+         gpio_init(uart_config[uart].txd, GPIO_OUT)) ||
+        (uart_config[uart].rxd != GPIO_UNDEF &&
+         gpio_init(uart_config[uart].rxd, GPIO_IN_PU))) {
+        return -1;
+    }
+
+    /* store the usage type in GPIO table */
+    gpio_set_pin_usage(uart_config[uart].txd, _UART);
+    gpio_set_pin_usage(uart_config[uart].rxd, _UART);
+
+    esp_rom_gpio_connect_out_signal(uart_config[uart].txd,
+                                    _uarts[uart].signal_txd, false, false);
+    esp_rom_gpio_connect_in_signal(uart_config[uart].rxd,
+                                   _uarts[uart].signal_rxd, false);
+#endif /* MCU_ESP8266 */
+
     _uarts[uart].baudrate = baudrate;
 
     /* register interrupt context */

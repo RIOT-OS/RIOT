@@ -46,6 +46,11 @@
 
 #define POWEROFF_DELAY      (250U * US_PER_MS)      /* quarter of a second */
 
+/* if stdio is not done via UART, allow to use the stdio UART for the test */
+#ifndef MODULE_STDIO_UART
+#undef STDIO_UART_DEV
+#endif
+
 #ifndef STDIO_UART_DEV
 #define STDIO_UART_DEV      (UART_UNDEF)
 #endif

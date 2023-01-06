@@ -33,6 +33,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief   UART device used for STDIO
+ */
+#define STDIO_UART_DEV  CONFIG_ESP_CONSOLE_UART_NUM
+
+/**
  * @name    Power management configuration
  * @{
  */

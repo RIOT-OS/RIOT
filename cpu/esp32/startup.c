@@ -148,7 +148,7 @@ static NORETURN void IRAM system_startup_cpu0(void)
 #endif
 
     /* initialize stdio */
-    esp_rom_uart_tx_wait_idle(CONFIG_CONSOLE_UART_NUM);
+    esp_rom_uart_tx_wait_idle(CONFIG_ESP_CONSOLE_UART_NUM);
     stdio_init();
 
     RESET_REASON reset_reason = rtc_get_reset_reason(PRO_CPU_NUM);
@@ -315,7 +315,7 @@ static NORETURN void IRAM system_init (void)
     /* starting RIOT */
 #if IS_USED(MODULE_ESP_LOG_STARTUP)
     LOG_STARTUP("Starting RIOT kernel on PRO cpu\n");
-    esp_rom_uart_tx_wait_idle(CONFIG_CONSOLE_UART_NUM);
+    esp_rom_uart_tx_wait_idle(CONFIG_ESP_CONSOLE_UART_NUM);
 #else
     puts("");
 #endif
