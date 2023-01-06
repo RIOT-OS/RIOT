@@ -95,6 +95,11 @@ extern "C" {
 #define CONFIG_ESP_SLEEP_GPIO_RESET_WORKAROUND  1
 
 /**
+ * ESP32-C3 specific USB configuration
+ */
+#define CONFIG_ESP_PHY_ENABLE_USB               1
+
+/**
  * ESP32-C3 BLE driver configuration (DO NOT CHANGE)
  */
 #ifdef MODULE_ESP_BLE
