@@ -55,15 +55,15 @@
 /**
  * Default console configuration
  *
- * STDIO_UART_BAUDRATE is used as CONFIG_CONSOLE_UART_BAUDRATE and
+ * STDIO_UART_BAUDRATE is used as CONFIG_ESP_CONSOLE_UART_BAUDRATE and
  * can be overridden by an application specific configuration.
  */
-#define CONFIG_CONSOLE_UART_NUM 0
-#define CONFIG_ESP_CONSOLE_UART_NUM     CONFIG_CONSOLE_UART_NUM
-
-#ifndef CONFIG_CONSOLE_UART_BAUDRATE
-#define CONFIG_CONSOLE_UART_BAUDRATE    STDIO_UART_BAUDRATE
+#ifdef CONFIG_CONSOLE_UART_NUM
+#define CONFIG_ESP_CONSOLE_UART_NUM         CONFIG_CONSOLE_UART_NUM
+#else
+#define CONFIG_ESP_CONSOLE_UART_NUM         0
 #endif
+#define CONFIG_ESP_CONSOLE_UART_BAUDRATE    STDIO_UART_BAUDRATE
 
 /**
  * Log output configuration (DO NOT CHANGE)
