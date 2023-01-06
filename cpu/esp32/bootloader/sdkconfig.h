@@ -85,7 +85,25 @@ extern "C" {
  * Bootloader output baudrate, defined by the app settings as BAUD or
  * BOOTLOADER_BAUD.
  */
-#define CONFIG_ESP_CONSOLE_UART_BAUDRATE (RIOT_BOOTLOADER_BAUD)
+#define CONFIG_ESP_CONSOLE_UART_BAUDRATE    (RIOT_BOOTLOADER_BAUD)
+
+/*
+ * If custom TX and RX are defined, use custom UART configuration for 2nd stage
+ * bootloader.
+ */
+#if defined(CONFIG_CONSOLE_UART_RX) && defined(CONFIG_CONSOLE_UART_RX)
+#define CONFIG_ESP_CONSOLE_UART_CUSTOM      1
+#define CONFIG_ESP_CONSOLE_UART_TX_GPIO     CONFIG_CONSOLE_UART_TX
+#define CONFIG_ESP_CONSOLE_UART_RX_GPIO     CONFIG_CONSOLE_UART_RX
+#else
+#define CONFIG_ESP_CONSOLE_UART_DEFAULT     1
+#endif
+
+#if defined(CONFIG_CONSOLE_UART_NUM)
+#define CONFIG_ESP_CONSOLE_UART_NUM         CONFIG_CONSOLE_UART_NUM
+#else
+#define CONFIG_ESP_CONSOLE_UART_NUM         0
+#endif
 
 #ifdef __cplusplus
 }
