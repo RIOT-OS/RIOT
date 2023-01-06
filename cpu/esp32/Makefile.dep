@@ -184,3 +184,10 @@ endif
 ifneq (,$(filter esp_jtag,$(USEMODULE)))
   FEATURES_REQUIRED += esp_jtag
 endif
+
+# enable bootloader reset over USB, requires CDC ACM to be used
+ifneq (,$(filter usbus_cdc_acm tinyusb_class_cdc,$(USEMODULE)))
+  USEMODULE += usb_board_reset
+
+  include $(RIOTMAKE)/tools/usb_board_reset.mk
+endif
