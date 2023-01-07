@@ -15,7 +15,7 @@ It is available on sites like AliExpress for less than 4€.
 ![WeAct-F411CE](https://user-images.githubusercontent.com/1301112/69389644-eb5fb080-0ccc-11ea-8002-67d3db851250.png)
 
 ### MCU
-| MCU              | STM32F411CE           |
+| MCU              | STM32F411CEU6           |
 |:---------------- |:--------------------- |
 | Family           | ARM Cortex-M4F        |
 | Vendor           | ST Microelectronics   |
@@ -32,6 +32,19 @@ It is available on sites like AliExpress for less than 4€.
 | Vcc              | 2.0V - 3.6V           |
 | Datasheet        | [Datasheet](https://www.st.com/resource/en/datasheet/stm32f411ce.pdf) |
 | Reference Manual | [Reference Manual](https://www.st.com/content/ccc/resource/technical/document/reference_manual/9b/53/39/1c/f7/01/4a/79/DM00119316.pdf/files/DM00119316.pdf/jcr:content/translations/en.DM00119316.pdf) |
+
+## Implementation Status
+
+| Device            | ID            | Supported                 | Comments                                                  |
+|:----------------- |:------------- |:------------------------- |:--------------------------------------------------------- |
+| MCU               | STM32F411CE   | partly                    | Energy saving modes not fully utilized                    |
+| Low-level driver  | GPIO          | yes                       |                                                           |
+|                   | PWM           | yes (4 pins available))   |                                                           |
+|                   | UART          | 2 UARTs                   | USART2 via  PA3(RX)/PA2(TX), USART1 on PA10(RX)/PA9(TX)   |
+|                   | I2C           | 1 I2C                     |                                                           |
+|                   | SPI           | 1 SPI                     |                                                           |
+|                   | USB           | yes                       |                                                           |
+|                   | Timer         | 1 32 bit timer (TIM5)     |                                                           |
 
 ## Flashing the device
 The device comes with a bootloader that allows flashing via `dfu-util`.
