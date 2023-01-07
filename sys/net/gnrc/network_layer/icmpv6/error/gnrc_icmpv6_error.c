@@ -14,13 +14,13 @@
 
 #include <assert.h>
 
-#include "net/ipv6.h"
-#include "net/gnrc/netreg.h"
+#include "macros/utils.h"
 #include "net/gnrc/icmpv6.h"
-#include "net/gnrc/netif.h"
-#include "net/gnrc/pktbuf.h"
-
 #include "net/gnrc/icmpv6/error.h"
+#include "net/gnrc/netif.h"
+#include "net/gnrc/netreg.h"
+#include "net/gnrc/pktbuf.h"
+#include "net/ipv6.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -29,9 +29,6 @@
 #define ICMPV6_ERROR_SZ (sizeof(icmpv6_error_dst_unr_t))
 #define ICMPV6_ERROR_SET_VALUE(data, value) \
     ((icmpv6_error_pkt_too_big_t *)(data))->mtu = byteorder_htonl(value)
-
-#undef MIN
-#define MIN(a, b)   ((a) < (b)) ? (a) : (b)
 
 /**
  * @brief   Get packet fit.

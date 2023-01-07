@@ -23,6 +23,7 @@
 #include <stdio.h>
 
 #include "atomic_utils.h"
+#include "macros/utils.h"
 #include "xtimer.h"
 
 /* On fast CPUs: 1.000.000 loops */
@@ -32,10 +33,6 @@
 /* Else 100.000 loops */
 #define LOOPS 100000
 #endif
-
-#define CONCAT(a, b) a ## b
-#define CONCAT3(a, b, c) a ## b ## c
-#define CONCAT4(a, b, c, d) a ## b ## c ## d
 
 enum {
     IMPL_VOLATILE,

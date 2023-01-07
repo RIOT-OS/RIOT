@@ -20,17 +20,17 @@
 #include <errno.h>
 #include <string.h>
 
-#include "net/gnrc/pktbuf.h"
-
-#include "can/isotp.h"
 #include "can/common.h"
+#include "can/isotp.h"
 #include "can/raw.h"
 #include "can/router.h"
-#include "thread.h"
+#include "macros/utils.h"
 #include "mutex.h"
+#include "net/gnrc/pktbuf.h"
+#include "thread.h"
 #include "timex.h"
-#include "ztimer.h"
 #include "utlist.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -87,8 +87,6 @@ enum {
 static kernel_pid_t isotp_pid = KERNEL_PID_UNDEF;
 static struct isotp *isotp_list = NULL;
 static mutex_t lock = MUTEX_INIT;
-
-#define MIN(a, b)   (((a) < (b)) ? (a) : (b))
 
 static void _rx_timeout(void *arg);
 static int _isotp_send_fc(struct isotp *isotp, int ae, uint8_t status);

@@ -16,17 +16,16 @@
  */
 
 #include <stdio.h>
+
+#include "macros/utils.h"
 #include "net/sock/udp.h"
 #include "net/utils.h"
 #include "sema_inv.h"
-#include "xtimer.h"
-
 #include "test_utils/benchmark_udp.h"
+#include "xtimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
-
-#define MIN(a, b) ((a) > (b) ? (b) : (a))
 
 static sock_udp_t sock;
 static uint32_t delay_us = US_PER_SEC;

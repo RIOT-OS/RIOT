@@ -12,18 +12,16 @@
  * @file
  * @author  José Ignacio Alamos <jose.alamos@haw-hamburg.de>
  */
-#include "kernel_defines.h"
 #include "bitarithm.h"
-#include "random.h"
+#include "kernel_defines.h"
+#include "macros/utils.h"
 #include "net/gnrc/lorawan/region.h"
+#include "random.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define GNRC_LORAWAN_DATARATES_NUMOF (6U)
-
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
 
 static uint8_t dr_sf[GNRC_LORAWAN_DATARATES_NUMOF] =
 { LORA_SF12, LORA_SF11, LORA_SF10, LORA_SF9, LORA_SF8, LORA_SF7 };

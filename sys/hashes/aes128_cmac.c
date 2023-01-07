@@ -24,8 +24,7 @@
 
 #include "crypto/ciphers.h"
 #include "hashes/aes128_cmac.h"
-
-#define MIN(a, b) a < b ? a : b
+#include "macros/utils.h"
 
 static void _xor128(uint8_t *x, uint8_t *y)
 {

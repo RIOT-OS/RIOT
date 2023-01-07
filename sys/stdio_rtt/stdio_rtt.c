@@ -76,9 +76,10 @@
 
 #include <string.h>
 
+#include "macros/utils.h"
+#include "mutex.h"
 #include "stdio_rtt.h"
 #include "thread.h"
-#include "mutex.h"
 #include "ztimer.h"
 
 #if MODULE_VFS
@@ -90,9 +91,6 @@
 #ifndef STDIO_POLL_INTERVAL_MS
 #define STDIO_POLL_INTERVAL_MS 50U
 #endif
-
-#define MIN(a, b)        (((a) < (b)) ? (a) : (b))
-#define MAX(a, b)        (((a) > (b)) ? (a) : (b))
 
 #ifndef STDIO_TX_BUFSIZE
 #define STDIO_TX_BUFSIZE    (512)

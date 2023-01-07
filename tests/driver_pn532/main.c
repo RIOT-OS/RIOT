@@ -19,15 +19,13 @@
  */
 
 #include "board.h"
-
+#include "macros/utils.h"
 #include "pn532.h"
 #include "pn532_params.h"
 #include "ztimer.h"
 
 #define LOG_LEVEL LOG_INFO
 #include "log.h"
-
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 static void printbuff(char *buff, unsigned len)
 {

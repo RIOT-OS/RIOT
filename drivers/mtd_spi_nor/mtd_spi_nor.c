@@ -25,16 +25,18 @@
 #include <string.h>
 #include <errno.h>
 
+#include "byteorder.h"
 #include "kernel_defines.h"
+#include "macros/utils.h"
 #include "mtd.h"
+#include "mtd_spi_nor.h"
+#include "thread.h"
+
 #if IS_USED(MODULE_ZTIMER_USEC)
 #include "ztimer.h"
 #elif IS_USED(MODULE_XTIMER)
 #include "xtimer.h"
 #endif
-#include "thread.h"
-#include "byteorder.h"
-#include "mtd_spi_nor.h"
 
 #define ENABLE_DEBUG    0
 #include "debug.h"
@@ -60,8 +62,6 @@
 #define MTD_4K_ADDR_MASK    (0xFFF)
 
 #define MBIT_AS_BYTES       ((1024 * 1024) / 8)
-
-#define MIN(a, b) ((a) > (b) ? (b) : (a))
 
 /**
  * @brief   JEDEC memory manufacturer ID codes.

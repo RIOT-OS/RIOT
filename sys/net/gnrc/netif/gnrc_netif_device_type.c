@@ -19,20 +19,20 @@
 #include <kernel_defines.h>
 
 #include "log.h"
+#include "macros/utils.h"
+#include "net/ethernet.h"
+#include "net/eui48.h"
+#include "net/gnrc/netif.h"
+#include "net/ieee802154.h"
+#include "net/l2util.h"
+
 #if IS_USED(MODULE_GNRC_NETIF_IPV6)
 #include "net/ipv6.h"
 #endif
-#include "net/gnrc/netif.h"
-#include "net/eui48.h"
-#include "net/ethernet.h"
-#include "net/ieee802154.h"
-#include "net/l2util.h"
+
 #if IS_USED(MODULE_GNRC_NETIF_6LO)
 #include "net/sixlowpan.h"
 #endif
-
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 netopt_t gnrc_netif_get_l2addr_opt(const gnrc_netif_t *netif)
 {
