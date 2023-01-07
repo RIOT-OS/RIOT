@@ -107,6 +107,7 @@ INCLUDES += -I$(ESP32_SDK_DIR)/components/log/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/newlib/platform_include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/soc/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/soc/$(CPU_FAM)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/spi_flash/include
 
 ifneq (,$(filter riscv32%,$(TARGET_ARCH)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/riscv/include

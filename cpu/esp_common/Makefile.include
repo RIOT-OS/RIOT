@@ -150,12 +150,22 @@ TEST_EXTRA_FILES += $(FLASHFILE) $(BINDIR)/partitions.bin $(BOOTLOADER_BIN)
 # table setting PARTITION_TABLE_CSV.
 PARTITION_TABLE_CSV ?= $(BINDIR)/partitions.csv
 
+ifneq (,$(filter periph_flashpage_in_address_space,$(USEMODULE)))
+$(BINDIR)/partitions.csv: $(FLASHFILE)
+	$(Q)printf "\n" > $(BINDIR)/partitions.csv
+	$(Q)printf "nvs, data, nvs, 0x9000, 0x6000\n" >> $@
+	$(Q)printf "phy_init, data, phy, 0xf000, 0x1000\n" >> $@
+	$(Q)printf "flashpage, data, phy, $(FLASHPAGE_ADDR_START), $(FLASHPAGE_CAP)\n" >> $@
+	$(Q)printf "factory, app, factory, $(FLASHFILE_POS), " >> $@
+	$(Q)ls -l $< | awk '{ print $$5 }' >> $@
+else
 $(BINDIR)/partitions.csv: $(FLASHFILE)
 	$(Q)printf "\n" > $(BINDIR)/partitions.csv
 	$(Q)printf "nvs, data, nvs, 0x9000, 0x6000\n" >> $@
 	$(Q)printf "phy_init, data, phy, 0xf000, 0x1000\n" >> $@
 	$(Q)printf "factory, app, factory, $(FLASHFILE_POS), " >> $@
 	$(Q)ls -l $< | awk '{ print $$5 }' >> $@
+endif
 
 $(BINDIR)/partitions.bin: $(PARTITION_TABLE_CSV)
 	$(Q)python3 $(RIOTTOOLS)/esptools/gen_esp32part.py --verify $< $@
