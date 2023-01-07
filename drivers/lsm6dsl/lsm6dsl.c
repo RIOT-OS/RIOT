@@ -23,14 +23,13 @@
 #include <assert.h>
 
 #include "ztimer.h"
+#include "macros/utils.h"
 
 #include "lsm6dsl.h"
 #include "lsm6dsl_internal.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
-
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
 
 #define BUS         (dev->params.i2c)
 #define ADDR        (dev->params.addr)

@@ -23,7 +23,7 @@
 #include <string.h>
 
 #include "embUnit.h"
-
+#include "macros/utils.h"
 #include "mtd.h"
 #include "mtd_mapper.h"
 
@@ -48,8 +48,6 @@
 #define REGION_FLASH_SIZE    MEMORY_SIZE / 2
 
 #define REGION_PAGE_COUNT    MEMORY_PAGE_COUNT / 2
-
-#define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
 static uint8_t _dummy_memory[MEMORY_SIZE];
 

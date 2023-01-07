@@ -15,19 +15,17 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
 
-#include <stdio.h>
-#include <inttypes.h>
 #include <errno.h>
+#include <inttypes.h>
+#include <stdio.h>
 
+#include "macros/utils.h"
 #include "mtd.h"
 #include "mtd_native.h"
-
 #include "native_internal.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
-
-#define MIN(a, b) ((a) > (b) ? (b) : (a))
 
 static int _init(mtd_dev_t *dev)
 {

@@ -28,6 +28,7 @@ extern "C" {
 
 #include "log.h"
 #include "esp_common_log.h"
+#include "macros/utils.h"
 #include "macros/xtstr.h"
 
 #if !defined(ICACHE_FLASH)
@@ -92,16 +93,6 @@ extern "C" {
 #define CHECK_PARAM(cond)          if (!(cond)) { return; }
 
 #endif /* ENABLE_DEBUG */
-
-/** gives the minimum of a and b */
-#ifndef MIN
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-#endif
-
-/** gives the maximum of a and b */
-#ifndef MAX
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-#endif
 
 /**
   * @brief  function name mappings for source code compatibility with ESP8266 port

@@ -30,13 +30,12 @@
 #include <string.h>
 
 #include "cpu.h"
+#include "macros/utils.h"
 #include "periph/flashpage.h"
 #include "unaligned.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
-
-#define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
 /* Write Quad Word is the only allowed operation on AUX pages */
 #if defined(NVMCTRL_CTRLB_CMD_WQW)

@@ -139,6 +139,7 @@
 #include <stdint.h>
 
 #include "irq.h"
+#include "macros/utils.h"
 #include "sched.h"
 
 #include "atomic_utils_arch.h"
@@ -848,16 +849,6 @@ static inline uint64_t semi_atomic_fetch_and_u64(volatile uint64_t *dest,
 /** @} */
 
 /* Fallback implementations of atomic utility functions: */
-
-/**
- * @brief   Concatenate two tokens
- */
-#define CONCAT(a, b) a ## b
-
-/**
- * @brief   Concatenate four tokens
- */
-#define CONCAT4(a, b, c, d) a ## b ## c ## d
 
 /**
  * @brief   Generates a static inline function implementing

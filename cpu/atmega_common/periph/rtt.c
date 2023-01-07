@@ -48,6 +48,7 @@
 #include "byteorder.h"
 #include "cpu.h"
 #include "irq.h"
+#include "macros/utils.h"
 #include "periph/rtt.h"
 #include "periph_conf.h"
 
@@ -90,11 +91,6 @@ static inline void reg32_write(volatile uint8_t *reg_ll, uint32_t _val)
     reg_ll[0] = val.u8[0];
     irq_restore(state);
 }
-
-/* To build proper register names */
-#ifndef CONCAT
-#define CONCAT(a, b) (a##b)
-#endif
 
 /* To read the whole 32-bit register */
 #define RG_READ32(reg)  (reg32_read(&CONCAT(reg, LL)))

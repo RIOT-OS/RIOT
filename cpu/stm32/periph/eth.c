@@ -27,6 +27,7 @@
 #include "bitarithm.h"
 #include "board.h"
 #include "iolist.h"
+#include "macros/utils.h"
 #include "mii.h"
 #include "mutex.h"
 #include "net/ethernet.h"
@@ -34,7 +35,7 @@
 #include "net/netdev/eth.h"
 #include "periph/gpio.h"
 #include "periph/gpio_ll.h"
-#include "timex.h"
+#include "time_units.h"
 
 #define ENABLE_DEBUG            0
 #define ENABLE_DEBUG_VERBOSE    0
@@ -90,8 +91,6 @@ static ztimer_t _link_status_timer;
 #if ETH_RX_DESCRIPTOR_COUNT * ETH_RX_BUFFER_SIZE < 1524U
 #warning "Total RX buffers lower than MTU, you won't receive huge frames!"
 #endif
-
-#define MIN(a, b) (((a) <= (b)) ? (a) : (b))
 
 /**
  * @name    GPIOs to use for tracing STM32 Ethernet state via module

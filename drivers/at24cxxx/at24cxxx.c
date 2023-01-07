@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include "assert.h"
+#include "macros/utils.h"
 #include "xtimer.h"
 
 #include "at24cxxx_defines.h"
@@ -29,10 +30,6 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
-
-#ifndef MIN
-#define MIN(a, b) ((a) > (b) ? (b) : (a))
-#endif
 
 /**
  * @brief Calculate x mod y, if y is a power of 2

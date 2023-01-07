@@ -23,9 +23,8 @@
 
 #include "base64.h"
 #include "fmt.h"
+#include "macros/utils.h"
 #include "xtimer.h"
-
-#define MIN(a, b) (a < b) ? a : b
 
 static char buf[128];
 

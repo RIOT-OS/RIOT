@@ -20,17 +20,16 @@
  */
 #define ENABLE_DEBUG 0
 #include "debug.h"
+#include "kernel_defines.h"
+#include "macros/utils.h"
 #include "mtd.h"
 #include "mtd_sdcard.h"
 #include "sdcard_spi.h"
 #include "sdcard_spi_internal.h"
-#include "kernel_defines.h"
 
 #include <inttypes.h>
 #include <errno.h>
 #include <string.h>
-
-#define MIN(a, b) ((a) > (b) ? (b) : (a))
 
 static int mtd_sdcard_init(mtd_dev_t *dev)
 {
