@@ -12,10 +12,10 @@ endif
 PROGRAMMERS_SUPPORTED += openocd bmp
 # keep name of `JLINK` in sync with script jlink.sh in $(RIOTTOOLS)/jlink
 JLINK ?= JLinkExe
-ifneq (,$(command -v $(JLINK)))
-PROGRAMMER ?= jlink
+ifneq (,$(shell command -v $(JLINK)))
+  PROGRAMMER ?= jlink
 else
-PROGRAMMER ?= openocd
+  PROGRAMMER ?= openocd
 endif
 
 # setup JLink for flashing
