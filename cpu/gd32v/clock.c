@@ -119,7 +119,8 @@ void gd32vf103_clock_init(void)
            (RCU_CFG0_SCS_IRC8 << RCU_CFG0_SCSS_Pos)) {}
 
     /* disable all active clocks except IRC8 -> resets the clk configuration */
-    RCU->CTL = (RCU_CTL_IRC8MEN_Msk);
+    RCU->CTL &= (RCU_CTL_IRC8MCALIB_Msk | RCU_CTL_IRC8MADJ_Msk);
+    RCU->CTL |= RCU_CTL_IRC8MEN_Msk;
 
     if (IS_ACTIVE(CONFIG_BOARD_HAS_HXTAL)) {
         cpu_reg_enable_bits(&RCU->CTL, RCU_CTL_HXTALEN_Msk);

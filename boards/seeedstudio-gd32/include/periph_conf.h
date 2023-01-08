@@ -32,7 +32,7 @@ extern "C" {
 #endif
 
 #define CLOCK_HXTAL         MHZ(8)             /**< HXTAL frequency */
-#define CLOCK_CORECLOCK     MHZ(104)           /**< CPU clock frequency in Hz */
+#define CLOCK_CORECLOCK     MHZ(108)           /**< CPU clock frequency in Hz */
 
 /**
  * @name   Timer configuration
