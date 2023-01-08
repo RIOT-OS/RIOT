@@ -34,8 +34,12 @@
 #define CLOCK_APB2_DIV_CONF  (CLOCK_APB2_DIV << RCU_CFG0_APB2PSC_Pos)
 
 #define PREDV0_CONF          1  /* Divide by 2 */
+#ifdef CONFIG_BOARD_HAS_HXTAL
 #define PLL_MULT_FACTOR      (CLOCK_CORECLOCK / \
                                 (CLOCK_HXTAL / (PREDV0_CONF + 1)) - 1)
+#else
+#define PLL_MULT_FACTOR      (CLOCK_CORECLOCK / (MHZ(8) / 2 ) - 1)
+#endif
 
 #define RCU_CFG0_SCS_IRC8    (0 << RCU_CFG0_SCS_Pos)
 #define RCU_CFG0_SCS_HXTAL   (1 << RCU_CFG0_SCS_Pos)
@@ -123,17 +127,21 @@ void gd32vf103_clock_init(void)
     RCU->CTL |= RCU_CTL_IRC8MEN_Msk;
 
     if (IS_ACTIVE(CONFIG_BOARD_HAS_HXTAL)) {
+        /* if the board has an HXTAL, HXTAL is used as PLL input and PREDEV0 is set */
         cpu_reg_enable_bits(&RCU->CTL, RCU_CTL_HXTALEN_Msk);
         while (!(RCU->CTL & RCU_CTL_HXTALSTB_Msk)) {}
+
+        RCU->CFG1 = PREDV0_CONF;
+        RCU->CFG0 |= RCU_CFG0_PLLSEL_Msk;
     }
-
-    RCU->CFG1 = (PREDV0_CONF);
-
-    RCU->CFG0 |= RCU_CFG0_PLLSEL_Msk |
-                 ((PLL_MULT_FACTOR & 0xf) << RCU_CFG0_PLLMF_3_0_Pos) |
+    else {
+        /* if the board doesn't have HXTAL, IRCM8/2 is used as PLL input */
+        RCU->CFG0 &= ~RCU_CFG0_PLLSEL_Msk;
+    }
+    RCU->CFG0 |= ((PLL_MULT_FACTOR & 0xf) << RCU_CFG0_PLLMF_3_0_Pos) |
                  ((PLL_MULT_FACTOR & 0x10) << (RCU_CFG0_PLLMF_4_Pos - 4));
 
-    RCU->CTL |= (RCU_CTL_PLLEN_Msk);
+    RCU->CTL |= RCU_CTL_PLLEN_Msk;
 
     /* Wait for PLL to stabilize */
     while ((RCU->CTL & RCU_CTL_PLLSTB_Msk) != RCU_CTL_PLLSTB_Msk) {}
@@ -145,6 +153,11 @@ void gd32vf103_clock_init(void)
 
     while ((RCU->CFG0 & RCU_CFG0_SCSS_Msk) !=
            (RCU_CFG0_SCS_PLL << RCU_CFG0_SCSS_Pos)) {}
-    gd32v_disable_irc8();
+
+    if (IS_ACTIVE(CONFIG_BOARD_HAS_HXTAL)) {
+        /* disable IRCM8 clock if HXTAL is used */
+        gd32v_disable_irc8();
+    }
+
     irq_restore(is);
 }
