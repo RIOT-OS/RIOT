@@ -129,7 +129,7 @@ void gd32vf103_clock_init(void)
 
     RCU->CFG1 = (PREDV0_CONF);
 
-    RCU->CFG0 |= (CLOCK_HXTAL << RCU_CFG0_PLLSEL_Pos) |
+    RCU->CFG0 |= RCU_CFG0_PLLSEL_Msk |
                  ((PLL_MULT_FACTOR & 0xf) << RCU_CFG0_PLLMF_3_0_Pos) |
                  ((PLL_MULT_FACTOR & 0x10) << (RCU_CFG0_PLLMF_4_Pos - 4));
 
