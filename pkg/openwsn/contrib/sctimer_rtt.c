@@ -11,7 +11,7 @@
  * @ingroup     pkg_openwsn
  * @{
  *
- * For details on the implementation check pkg/openwsn/doc.txt
+ * For details on the implementation check pkg/openwsn/doc.md
  *
  * @file
  * @brief       RTT based adaptation of "sctimer" bsp module

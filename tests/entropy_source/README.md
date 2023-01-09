@@ -2,7 +2,7 @@
 This test compiles and runs entropy sources. The first `zero entropy` source can be run on
 `native` and does not provide real entropy values, though, it tests execution of the main
 module and its common components including the optional health tests. Additional sources are
-requested subsequently. As indicated in the documentation of the [entropy module](../../sys/entropy_source/doc.txt),
+requested subsequently. As indicated in the documentation of the [entropy module](../../sys/entropy_source/doc.md),
 entropy is vulnerable and specific hardware sources require a priori validation.
 The `ADC noise` source requires the `periph_adc` feature of a board. Its properties can vary widely as
 depicted in the documentation of the [`ADC noise`](../../sys/include/entropy_source/adc_noise.h)

@@ -228,7 +228,7 @@ to [sensors group](@ref config_drivers_sensors).
 @endcode
 
 Sub-groups defined for different types of drivers can be found in
-[drivers/doc.txt](https://github.com/RIOT-OS/RIOT/blob/master/drivers/doc.txt)
+[drivers/doc.md](https://github.com/RIOT-OS/RIOT/blob/master/drivers/doc.md)
 
 ## Initialization                                {#driver-guide-initialization}
 

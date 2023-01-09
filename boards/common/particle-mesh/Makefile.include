@@ -1,4 +1,4 @@
-# See doc.txt on nRF antenna selection
+# See doc.md on nRF antenna selection
 BOARD_NRFANTENNA_DEFAULT ?= BUILTIN
 CFLAGS += -DBOARD_NRFANTENNA_DEFAULT=BOARD_NRFANTENNA_$(BOARD_NRFANTENNA_DEFAULT)
 

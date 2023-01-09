@@ -12,13 +12,13 @@ A tun interface can also be set to allow traffic out of the network. This
 allows pinging nodes in the network from the host.
 
 Please note that this port is still in experimental status. For further information
-about the port refer to the [pkg documentation](../../pkg/openwsn/doc.txt).
+about the port refer to the [pkg documentation](../../pkg/openwsn/doc.md).
 
 ## Experimental setups
 
 The following setup act as a starting point for testing and debugging. Either
 build and flash local nodes or incorporate the [FIT IoT-LAB](https://www.iot-lab.info/)
-Testbed. Please check the ports [documentation](../../pkg/openwsn/doc.txt) for information
+Testbed. Please check the ports [documentation](../../pkg/openwsn/doc.md) for information
 about supported hardware platforms.
 
 This port currently needs `openvisualizer`, please make sure you follow the
@@ -71,7 +71,7 @@ Beware that this could have an impact on the MSF (Minimal Scheduling Function).
 
     $ export CFLAGS=-DSLOTFRAME_LENGTH=51
 
-See [documentation](../../pkg/openwsn/doc.txt#Synchronization) for more on
+See [documentation](../../pkg/openwsn/doc.md#Synchronization) for more on
 synchronization.
 
 ## IMPORTANT!
@@ -91,7 +91,7 @@ Currently these are the tested configurations:
     - leaf nodes using `openwsn_sctimer_rtt` or `sctimer_ztimer`
     - root node using `openwsn_sctimer_rtt` and 57600 baudrate
 
-For more details on this please refer to [pkg documentation](../../pkg/openwsn/doc.txt).
+For more details on this please refer to [pkg documentation](../../pkg/openwsn/doc.md).
 
 ## Testing configuration (a) (three local samr21-xpro nodes)
 
@@ -195,7 +195,7 @@ On the root node Openvisualizer is launched and the DAGroot is setup.
 
 The root node will now start sending beacons and other nodes will synchronize, and
 join. If channel hopping is enabled this can take quite some time (see
-[Synchronization](../../pkg/openwsn/doc.txt#Synchronization). Once leaf nodes
+[Synchronization](../../pkg/openwsn/doc.md#Synchronization). Once leaf nodes
 have joined the network when issuing `ifconfig` you should see:
 
     ifconfig

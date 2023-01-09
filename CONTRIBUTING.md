@@ -212,7 +212,7 @@ Documentation improvements are always welcome and a good starting point for
 new contributors. This kind of contribution is merged quite quickly in general.
 
 RIOT documentation is built with [doxygen][doxygen]. Doxygen is configured to
-parse header (.h) and `doc.txt` files in the RIOT source code to generate
+parse header (.h) and `doc.md` files in the RIOT source code to generate
 the modules, cpus, boards and packages documentation.
 General documentation pages are written in Markdown and located in
 `doc/doxygen/src`.

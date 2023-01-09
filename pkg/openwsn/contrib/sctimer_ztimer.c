@@ -13,7 +13,7 @@
  * @file
  * @brief       Ztimer based adaptation of "sctimer" bsp module
  *
- * For details on the implementation check pkg/openwsn/doc.txt
+ * For details on the implementation check pkg/openwsn/doc.md
  *
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  *

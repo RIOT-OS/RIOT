@@ -12569,42 +12569,42 @@ sys/include/bloom\.h:[0-9]+: warning: found documented return type for bloom_add
 sys/include/bloom\.h:[0-9]+: warning: found documented return type for bloom_del that does not return anything
 drivers/include/cc2420\.h:[0-9]+: warning: found documented return type for cc2420_get_addr_long that does not return anything
 drivers/include/cc2420\.h:[0-9]+: warning: found documented return type for cc2420_setup that does not return anything
-cpu/cc26xx_cc13xx/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc26xx_cc13xx_overview' for \\ref command
-cpu/cc26xx_cc13xx/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc26xx_cc13xx_ccfg' for \\ref command
-cpu/cc26xx_cc13xx/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc26xx_cc13xx_debugging' for \\ref command
-cpu/cc26xx_cc13xx/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc26xx_cc13xx_openocd' for \\ref command
-cpu/cc26xx_cc13xx/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc26xx_cc13xx_uniflash' for \\ref command
-cpu/cc26xx_cc13xx/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc26xx_cc13xx_ccfg' for \\ref command
-cpu/cc26xx_cc13xx/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc26xx_cc13xx_uniflash' for \\ref command
+cpu/cc26xx_cc13xx/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc26xx_cc13xx_overview' for \\ref command
+cpu/cc26xx_cc13xx/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc26xx_cc13xx_ccfg' for \\ref command
+cpu/cc26xx_cc13xx/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc26xx_cc13xx_debugging' for \\ref command
+cpu/cc26xx_cc13xx/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc26xx_cc13xx_openocd' for \\ref command
+cpu/cc26xx_cc13xx/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc26xx_cc13xx_uniflash' for \\ref command
+cpu/cc26xx_cc13xx/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc26xx_cc13xx_ccfg' for \\ref command
+cpu/cc26xx_cc13xx/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc26xx_cc13xx_uniflash' for \\ref command
 drivers/include/motor_driver\.h:[0-9]+: warning: found documented return type for motor_disable that does not return anything
 drivers/include/motor_driver\.h:[0-9]+: warning: found documented return type for motor_enable that does not return anything
-boards/esp32\-wrover\-kit/doc\.txt:[0-9]+: warning: explicit link request to 'esp32_local_toolchain_installation' could not be resolved
-cpu/esp32/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_esp_qemu' for \\ref command
-cpu/esp32/doc\.txt:[0-9]+: warning: explicit link request to 'esp32_application_specific_configurations' could not be resolved
-cpu/esp32/doc\.txt:[0-9]+: warning: explicit link request to 'esp32_application_specific_configurations' could not be resolved
-cpu/esp32/doc\.txt:[0-9]+: warning: explicit link request to 'esp32_application_specific_configurations' could not be resolved
-cpu/esp32/doc\.txt:[0-9]+: warning: explicit link request to 'esp32_application_specific_board_configuration' could not be resolved
+boards/esp32\-wrover\-kit/doc\.md:[0-9]+: warning: explicit link request to 'esp32_local_toolchain_installation' could not be resolved
+cpu/esp32/doc\.md:[0-9]+: warning: unable to resolve reference to 'esp32_esp_qemu' for \\ref command
+cpu/esp32/doc\.md:[0-9]+: warning: explicit link request to 'esp32_application_specific_configurations' could not be resolved
+cpu/esp32/doc\.md:[0-9]+: warning: explicit link request to 'esp32_application_specific_configurations' could not be resolved
+cpu/esp32/doc\.md:[0-9]+: warning: explicit link request to 'esp32_application_specific_configurations' could not be resolved
+cpu/esp32/doc\.md:[0-9]+: warning: explicit link request to 'esp32_application_specific_board_configuration' could not be resolved
 cpu/esp32/doc_esp32\.txt:[0-9]+: warning: explicit link request to 'esp32_application_specific_configurations' could not be resolved
 cpu/esp32/doc_esp32c3\.txt:[0-9]+: warning: explicit link request to 'esp32_application_specific_configurations' could not be resolved
-boards/esp32c3\-devkit/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32c3_devkit_optional_hardware' for \\ref command
+boards/esp32c3\-devkit/doc\.md:[0-9]+: warning: unable to resolve reference to 'esp32c3_devkit_optional_hardware' for \\ref command
 boards/esp32\-ethernet\-kit\-v1_0/doc_common\.txt:[0-9]+: warning: explicit link request to 'esp32_local_toolchain_installation' could not be resolved
-boards/esp32\-ethernet\-kit\-v1_1/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_overview' for \\ref command
-boards/esp32\-ethernet\-kit\-v1_1/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_hardware' for \\ref command
-boards/esp32\-ethernet\-kit\-v1_1/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_board_configuration' for \\ref command
-boards/esp32\-ethernet\-kit\-v1_1/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_pinout' for \\ref command
-boards/esp32\-ethernet\-kit\-v1_1/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_other\-resources' for \\ref command
-boards/esp32\-ethernet\-kit\-v1_1/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_toc' for \\ref command
-boards/esp32\-ethernet\-kit\-v1_1/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_board_configuration' for \\ref command
-boards/esp32\-ethernet\-kit\-v1_1/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_pinout' for \\ref command
-boards/esp32\-ethernet\-kit\-v1_1/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_toc' for \\ref command
-boards/esp32\-ethernet\-kit\-v1_1/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_toc' for \\ref command
-boards/esp32\-ethernet\-kit\-v1_1/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_toc' for \\ref command
-boards/esp32\-ethernet\-kit\-v1_1/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_toc' for \\ref command
+boards/esp32\-ethernet\-kit\-v1_1/doc\.md:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_overview' for \\ref command
+boards/esp32\-ethernet\-kit\-v1_1/doc\.md:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_hardware' for \\ref command
+boards/esp32\-ethernet\-kit\-v1_1/doc\.md:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_board_configuration' for \\ref command
+boards/esp32\-ethernet\-kit\-v1_1/doc\.md:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_pinout' for \\ref command
+boards/esp32\-ethernet\-kit\-v1_1/doc\.md:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_other\-resources' for \\ref command
+boards/esp32\-ethernet\-kit\-v1_1/doc\.md:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_toc' for \\ref command
+boards/esp32\-ethernet\-kit\-v1_1/doc\.md:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_board_configuration' for \\ref command
+boards/esp32\-ethernet\-kit\-v1_1/doc\.md:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_pinout' for \\ref command
+boards/esp32\-ethernet\-kit\-v1_1/doc\.md:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_toc' for \\ref command
+boards/esp32\-ethernet\-kit\-v1_1/doc\.md:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_toc' for \\ref command
+boards/esp32\-ethernet\-kit\-v1_1/doc\.md:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_toc' for \\ref command
+boards/esp32\-ethernet\-kit\-v1_1/doc\.md:[0-9]+: warning: unable to resolve reference to 'esp32_ethernet_kit_v1_1_toc' for \\ref command
 cpu/esp32/doc_esp32s2\.txt:[0-9]+: warning: explicit link request to 'esp32_application_specific_configurations' could not be resolved
-boards/esp32s2\-devkit/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32s2_devkit_optional_hardware' for \\ref command
+boards/esp32s2\-devkit/doc\.md:[0-9]+: warning: unable to resolve reference to 'esp32s2_devkit_optional_hardware' for \\ref command
 cpu/esp32/doc_esp32s3\.txt:[0-9]+: warning: explicit link request to 'esp32_application_specific_configurations' could not be resolved
-boards/esp32s3\-devkit/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32s3_devkit_optional_hardware' for \\ref command
-boards/esp32\-heltec\-lora32\-v2/doc\.txt:[0-9]+: warning: explicit link request to 'esp32_heltec_lora32_v2_optional_hardware' could not be resolved
+boards/esp32s3\-devkit/doc\.md:[0-9]+: warning: unable to resolve reference to 'esp32s3_devkit_optional_hardware' for \\ref command
+boards/esp32\-heltec\-lora32\-v2/doc\.md:[0-9]+: warning: explicit link request to 'esp32_heltec_lora32_v2_optional_hardware' could not be resolved
 cpu/kinetis/include/mcg\.h:[0-9]+: warning: unable to resolve reference to 'clock_config_t' for \\ref command
 cpu/kinetis/include/mcg\.h:[0-9]+: warning: unable to resolve reference to 'clock_config_t::clkdiv1' for \\ref command
 cpu/kinetis/include/mcg\.h:[0-9]+: warning: unable to resolve reference to 'clock_config_t::clkdiv1' for \\ref command
@@ -12615,7 +12615,7 @@ drivers/include/mcp47xx\.h:[0-9]+: warning: found documented return type for mcp
 drivers/include/mcp47xx\.h:[0-9]+: warning: found documented return type for mcp47xx_dac_poweroff that does not return anything
 drivers/include/mcp47xx\.h:[0-9]+: warning: found documented return type for mcp47xx_dac_poweron that does not return anything
 drivers/include/mcp47xx\.h:[0-9]+: warning: found documented return type for mcp47xx_dac_set that does not return anything
-boards/esp32\-mh\-et\-live\-minikit/doc\.txt:[0-9]+: warning: explicit link request to 'esp32_mh_et_live_minikit_optional_hardware' could not be resolved
+boards/esp32\-mh\-et\-live\-minikit/doc\.md:[0-9]+: warning: explicit link request to 'esp32_mh_et_live_minikit_optional_hardware' could not be resolved
 pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_sem_valid\(sys_sem_t \*sem\) \(function\) of group pkg_lwip_sys is not documented\.
 pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_sem_valid\(sem\) \(macro definition\) of group pkg_lwip_sys is not documented\.
 pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member sys_sem_set_invalid\(sem\) \(macro definition\) of group pkg_lwip_sys is not documented\.
@@ -12637,33 +12637,33 @@ pkg/lwip/include/arch/sys_arch\.h:[0-9]+: warning: Member SYS_ARCH_DECL_PROTECT\
 drivers/include/sx127x\.h:[0-9]+: warning: found documented return type for sx127x_set_state that does not return anything
 sys/include/senml\.h:[0-9]+: warning: found documented return type for senml_set_duration_ms that does not return anything
 sys/include/senml\.h:[0-9]+: warning: found documented return type for senml_set_duration_us that does not return anything
-boards/cc1312\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1312_launchpad_overview' for \\ref command
-boards/cc1312\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1312_launchpad_hardware' for \\ref command
-boards/cc1312\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1312_launchpad_pinout' for \\ref command
-boards/cc1312\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1312_launchpad_flashing' for \\ref command
-boards/cc1350\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1350_launchpad_overview' for \\ref command
-boards/cc1350\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1350_launchpad_hardware' for \\ref command
-boards/cc1350\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1350_launchpad_pinout' for \\ref command
-boards/cc1350\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1350_launchpad_flashing' for \\ref command
-boards/cc1352\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1352_launchpad_overview' for \\ref command
-boards/cc1352\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1352_launchpad_hardware' for \\ref command
-boards/cc1352\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1352_launcpad_pinout' for \\ref command
-boards/cc1352\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1352_launchpad_flashing' for \\ref command
-boards/cc1352\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1352_launchpad_shell' for \\ref command
-boards/cc1352\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1352_launchpad_moreinfo' for \\ref command
-boards/cc1352p\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1352p_launchpad_overview' for \\ref command
-boards/cc1352p\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1352p_launchpad_hardware' for \\ref command
-boards/cc1352p\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1352p_launcpad_pinout' for \\ref command
-boards/cc1352p\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc1352p_launchpad_flashing' for \\ref command
-boards/cc2650\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc2650_launchpad_overview' for \\ref command
-boards/cc2650\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc2650_launchpad_hardware' for \\ref command
-boards/cc2650\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc2650_launchpad_pinout' for \\ref command
-boards/cc2650\-launchpad/doc\.txt:[0-9]+: warning: unable to resolve reference to 'cc2650_launchpad_flashing' for \\ref command
-boards/esp32\-ttgo\-t\-beam/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ttgo_t_beam_optional_hardware' for \\ref command
-boards/esp32\-ttgo\-t\-beam/doc\.txt:[0-9]+: warning: unable to resolve reference to 'esp32_ttgo_t_beam_optional_hardware' for \\ref command
-boards/esp32\-wemos\-lolin\-d32\-pro/doc\.txt:[0-9]+: warning: explicit link request to 'esp32_wemos_lolin_d32_pro_optional_hardware' could not be resolved
+boards/cc1312\-launchpad/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc1312_launchpad_overview' for \\ref command
+boards/cc1312\-launchpad/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc1312_launchpad_hardware' for \\ref command
+boards/cc1312\-launchpad/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc1312_launchpad_pinout' for \\ref command
+boards/cc1312\-launchpad/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc1312_launchpad_flashing' for \\ref command
+boards/cc1350\-launchpad/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc1350_launchpad_overview' for \\ref command
+boards/cc1350\-launchpad/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc1350_launchpad_hardware' for \\ref command
+boards/cc1350\-launchpad/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc1350_launchpad_pinout' for \\ref command
+boards/cc1350\-launchpad/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc1350_launchpad_flashing' for \\ref command
+boards/cc1352\-launchpad/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc1352_launchpad_overview' for \\ref command
+boards/cc1352\-launchpad/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc1352_launchpad_hardware' for \\ref command
+boards/cc1352\-launchpad/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc1352_launcpad_pinout' for \\ref command
+boards/cc1352\-launchpad/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc1352_launchpad_flashing' for \\ref command
+boards/cc1352\-launchpad/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc1352_launchpad_shell' for \\ref command
+boards/cc1352\-launchpad/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc1352_launchpad_moreinfo' for \\ref command
+boards/cc1352p\-launchpad/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc1352p_launchpad_overview' for \\ref command
+boards/cc1352p\-launchpad/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc1352p_launchpad_hardware' for \\ref command
+boards/cc1352p\-launchpad/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc1352p_launcpad_pinout' for \\ref command
+boards/cc1352p\-launchpad/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc1352p_launchpad_flashing' for \\ref command
+boards/cc2650\-launchpad/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc2650_launchpad_overview' for \\ref command
+boards/cc2650\-launchpad/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc2650_launchpad_hardware' for \\ref command
+boards/cc2650\-launchpad/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc2650_launchpad_pinout' for \\ref command
+boards/cc2650\-launchpad/doc\.md:[0-9]+: warning: unable to resolve reference to 'cc2650_launchpad_flashing' for \\ref command
+boards/esp32\-ttgo\-t\-beam/doc\.md:[0-9]+: warning: unable to resolve reference to 'esp32_ttgo_t_beam_optional_hardware' for \\ref command
+boards/esp32\-ttgo\-t\-beam/doc\.md:[0-9]+: warning: unable to resolve reference to 'esp32_ttgo_t_beam_optional_hardware' for \\ref command
+boards/esp32\-wemos\-lolin\-d32\-pro/doc\.md:[0-9]+: warning: explicit link request to 'esp32_wemos_lolin_d32_pro_optional_hardware' could not be resolved
 drivers/include/xbee\.h:[0-9]+: warning: found documented return type for xbee_setup that does not return anything
-boards/nrf52840dongle/doc\.txt:[0-9]+: warning: unable to resolve reference to 'nrf52840dongle_flash' for \\ref command
+boards/nrf52840dongle/doc\.md:[0-9]+: warning: unable to resolve reference to 'nrf52840dongle_flash' for \\ref command
 boards/sltb009a/include/board\.h:[0-9]+: warning: Member VCOM_EN_PIN \(macro definition\) of file board\.h is not documented.
 boards/sltb009a/include/board\.h:[0-9]+: warning: Member PB[0-1]_PIN \(macro definition) of file board\.h is not documented.
 boards/sltb009a/include/board\.h:[0-9]+: warning: Member LED[0-1][RGB]_PIN \(macro definition) of file board\.h is not documented.

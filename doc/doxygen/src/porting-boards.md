@@ -29,7 +29,7 @@ makefiles. Usually a `BOARD` directory has the following structure
   |----dist/
       |----scripts
   |----board.c
-  |----doc.txt
+  |----doc.md
   |----include/
       |----periph_conf.h
       |----board.h
@@ -211,7 +211,7 @@ The last two lines can be added as defines to the new board `board.h`:
 /** @} */
 ```
 
-## doc.txt                                                          {#board-doc}
+## doc.md                                                          {#board-doc}
 
 Although not explicitly needed, if upstreamed and as a general good
 practice, this file holds all `BOARD` documentation. This can include
@@ -338,7 +338,7 @@ specify multiple directories separated by spaces.
         |----dist/
             |----scripts
         |----board.c
-        |----doc.txt
+        |----doc.md
         |----include/
             |----periph_conf.h
             |----board.h
