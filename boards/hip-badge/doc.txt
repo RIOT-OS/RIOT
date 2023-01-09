@@ -1,17 +1,8 @@
-/*
- * Copyright (C) 2023 Benjamin Valentin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- */
-
 /**
- * @defgroup    boards_hip_badge HiP Badge
- * @ingroup     boards_esp32c3
- * @brief       Support for the Hacking in Parallel Badge
- * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
- */
+@defgroup    boards_hip_badge HiP Badge
+@ingroup     boards_esp32c3
+@brief       Support for the Hacking in Parallel Badge
+@author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
 
 The HiP Badge is a board that was given to participants of the 2022 *Hacking in Parallel* event.
 
@@ -60,3 +51,5 @@ The event (and badge) were organized on short notice (6 Weeks), so there are som
 
  - [Badge Clinic](https://wiki.hip-berlin.de/index.php?title=Badge_Clinic)
  - [Design files](https://gitlab.com/tidklaas/hip-badge/)
+
+ */
