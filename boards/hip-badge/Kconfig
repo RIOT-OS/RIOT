@@ -1,0 +1,21 @@
+# Copyright (c) 2023 Benjamin Valentin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "hip-badge" if BOARD_HIP_BADGE
+
+config BOARD_HIP_BADGE
+    bool
+    default y
+    select BOARD_COMMON_ESP32C3
+    select CPU_MODEL_ESP32C3
+    select HAS_ESP_JTAG
+    select HAS_PERIPH_I2C
+
+    select HAVE_SAUL_GPIO
+    select HAVE_SGP30
+
+source "$(RIOTBOARD)/common/esp32c3/Kconfig"

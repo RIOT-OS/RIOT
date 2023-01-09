@@ -166,6 +166,17 @@ ifneq (,$(filter shell,$(USEMODULE)))
   USEMODULE += ps
 endif
 
+ifneq (,$(filter stdio_usb_serial_jtag, $(USEMODULE)))
+  USEMODULE += tsrb
+  ifneq (,$(filter stdin,$(USEMODULE)))
+    USEMODULE += stdio_usb_serial_jtag_rx
+  endif
+endif
+ifneq (,$(filter stdio_usb_serial_jtag_rx, $(USEMODULE)))
+  USEMODULE += isrpipe
+  USEMODULE += stdio_available
+endif
+
 ifneq (,$(filter tinyusb_portable_espressif,$(USEMODULE)))
   USEMODULE += esp_idf_usb
 endif

@@ -50,6 +50,7 @@ PSEUDOMODULES += esp_rtc_timer_32k
 PSEUDOMODULES += esp_spi_ram
 PSEUDOMODULES += esp_spi_oct
 PSEUDOMODULES += esp_wifi_enterprise
+PSEUDOMODULES += stdio_usb_serial_jtag_rx
 
 INCLUDES += -I$(RIOTCPU)/$(CPU)/esp-idf/include
 INCLUDES += -I$(RIOTCPU)/$(CPU)/esp-idf/include/log
