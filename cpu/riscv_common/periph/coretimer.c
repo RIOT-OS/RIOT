@@ -131,6 +131,7 @@ int timer_clear(tim_t dev, int channel)
         return -1;
     }
 
+    clear_csr(mie, MIP_MTIP);
     return 0;
 }
 
