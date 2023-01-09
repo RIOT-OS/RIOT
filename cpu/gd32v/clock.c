@@ -36,7 +36,7 @@
 #define PREDV0_CONF          1  /* Divide by 2 */
 #ifdef CONFIG_BOARD_HAS_HXTAL
 #define PLL_MULT_FACTOR      (CLOCK_CORECLOCK / \
-                                (CLOCK_HXTAL / (PREDV0_CONF + 1)) - 1)
+                                (CONFIG_CLOCK_HXTAL / (PREDV0_CONF + 1)) - 1)
 #else
 #define PLL_MULT_FACTOR      (CLOCK_CORECLOCK / (MHZ(8) / 2 ) - 1)
 #endif

@@ -28,11 +28,14 @@ extern "C" {
 
 /* This board provides an high frequency oscillator */
 #ifndef CONFIG_BOARD_HAS_HXTAL
-#define CONFIG_BOARD_HAS_HXTAL        1
+#define CONFIG_BOARD_HAS_HXTAL  1
 #endif
 
-#define CLOCK_HXTAL         MHZ(8)             /**< HXTAL frequency */
-#define CLOCK_CORECLOCK     MHZ(108)           /**< CPU clock frequency in Hz */
+#ifndef CONFIG_CLOCK_HXTAL
+#define CONFIG_CLOCK_HXTAL      MHZ(8)      /**< HXTAL frequency */
+#endif
+
+#define CLOCK_CORECLOCK         MHZ(108)    /**< CPU clock frequency in Hz */
 
 /**
  * @name   Timer configuration
