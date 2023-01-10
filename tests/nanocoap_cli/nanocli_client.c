@@ -183,7 +183,7 @@ static int _blockwise_cb(void *arg, size_t offset, uint8_t *buf, size_t len, int
 int nanotest_client_url_cmd(int argc, char **argv)
 {
     /* Ordered like the RFC method code numbers, but off by 1. GET is code 0. */
-    const char *method_codes[] = {"get", "post", "put"};
+    const char *method_codes[] = { "get", "post", "put", "delete" };
     int res;
 
     if (argc < 3) {
@@ -202,11 +202,12 @@ int nanotest_client_url_cmd(int argc, char **argv)
     }
 
     switch (code_pos) {
-    case 0:
-        return nanocoap_get_blockwise_url(argv[2], COAP_BLOCKSIZE_32,
-                                          _blockwise_cb, NULL);
-    case 1:
-    case 2:
+    case COAP_METHOD_GET - 1:
+        res = nanocoap_get_blockwise_url(argv[2], COAP_BLOCKSIZE_32,
+                                         _blockwise_cb, NULL);
+        break;
+    case COAP_METHOD_POST - 1:
+    case COAP_METHOD_PUT - 1:
         ;
         char response[32];
         nanocoap_sock_t sock;
@@ -229,6 +230,9 @@ int nanotest_client_url_cmd(int argc, char **argv)
             printf("response: %s\n", response);
         }
         break;
+    case COAP_METHOD_DELETE - 1:
+        res = nanocoap_sock_delete_url(argv[2]);
+        break;
     default:
         printf("TODO: implement %s request\n", method_codes[code_pos]);
         return -1;
@@ -240,7 +244,7 @@ int nanotest_client_url_cmd(int argc, char **argv)
     return res;
 
 error:
-    printf("usage: %s <get|post|put> <url> [data]\n", argv[0]);
+    printf("usage: %s <get|post|put|delete> <url> [data]\n", argv[0]);
     return -1;
 }
 

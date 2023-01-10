@@ -225,6 +225,7 @@ endif
 ifneq (,$(filter shell_cmd_nanocoap_vfs,$(USEMODULE)))
   USEMODULE += nanocoap_vfs
   USEMODULE += vfs_util
+  USEMODULE += nanocoap_link_format
 endif
 ifneq (,$(filter shell_cmd_netstats_neighbor,$(USEMODULE)))
   USEMODULE += netstats_neighbor

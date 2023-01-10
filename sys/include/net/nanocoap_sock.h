@@ -328,6 +328,27 @@ ssize_t nanocoap_sock_post_url(const char *url,
                                void *response, size_t len_max);
 
 /**
+ * @brief   Simple synchronous CoAP (confirmable) DELETE
+ *
+ * @param[in]   sock    socket to use for the request
+ * @param[in]   path    remote path to delete
+ *
+ * @returns     0 on success
+ * @returns     <0 on error
+ */
+ssize_t nanocoap_sock_delete(nanocoap_sock_t *sock, const char *path);
+
+/**
+ * @brief   Simple synchronous CoAP (confirmable) DELETE for URL
+ *
+ * @param[in]   url     URL of the resource that should be deleted
+ *
+ * @returns     0 on success
+ * @returns     <0 on error
+ */
+ssize_t nanocoap_sock_delete_url(const char *url);
+
+/**
  * @brief    Performs a blockwise coap get request on a socket.
  *
  * This function will fetch the content of the specified resource path via

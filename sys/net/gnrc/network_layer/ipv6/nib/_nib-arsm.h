@@ -249,7 +249,7 @@ bool _is_reachable(_nib_onl_entry_t *entry);
 #define _set_reachable(netif, nce)                  (void)netif; (void)nce
 
 #define _get_nud_state(nbr)                 (GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNMANAGED)
-#define _set_nud_state(netif, nce, state)   (void)netif; (void)nbr; (void)state
+#define _set_nud_state(netif, nce, state)   (void)netif; (void)nce; (void)state
 #define _is_reachable(entry)                (true)
 #endif  /* CONFIG_GNRC_IPV6_NIB_ARSM || defined(DOXYGEN) */
 
