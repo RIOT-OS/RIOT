@@ -478,20 +478,20 @@ In most cases, just adding a simple `TTY_BOARD_FILTER` is sufficient. If we
 however have wildly different flavors of the same board (e.g. genuine Arduino
 Mega 2560 with an ATmega16U2 and clones with a cheap USB to UART bridge) that we
 all want to support, we have to instead provide a `TTY_SELECT_CMD` that prints
-the path to the TTY and exists with `0` if a TTY was found, or that exists with
-`1` and prints nothing when no TTY was found. We can still use the `ttys.py`
-script to detect all Arduino Mega 2560 versions: We first try to detect a
-genuine Arduino Mega and fall back to selecting cheap USB UART bridges when that
-fails using the `||` shell operator:
+the path to and the serial of the TTY (separated by a space) and exists with
+`0` if a TTY was found, or that exists with `1` and prints nothing when no TTY
+was found. We can still use the `ttys.py` script to detect all Arduino Mega
+2560 versions: We first try to detect a genuine Arduino Mega and fall back to
+selecting cheap USB UART bridges when that fails using the `||` shell operator:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   TTY_SELECT_CMD := $(RIOTTOOLS)/usb-serial/ttys.py \
                     --most-recent \
-                    --format path \
+                    --format path serial \
                     --vendor 'Arduino' \
                     --model-db 'Mega 2560|Mega ADK' || \
                     $(RIOTTOOLS)/usb-serial/ttys.py \
                     --most-recent \
-                    --format path \
+                    --format path serial \
                     --driver 'cp210x'
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

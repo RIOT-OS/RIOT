@@ -25,11 +25,11 @@ ARDUINO_MEGA2560_COMPAT_WITH_CLONES ?= 1
 ifeq (1,$(ARDUINO_MEGA2560_COMPAT_WITH_CLONES))
   TTY_SELECT_CMD := $(RIOTTOOLS)/usb-serial/ttys.py \
                     --most-recent \
-                    --format path \
+                    --format path serial \
                     $(TTY_BOARD_FILTER) || \
                     $(RIOTTOOLS)/usb-serial/ttys.py \
                     --most-recent \
-                    --format path \
+                    --format path serial \
                     $(TTY_BOARD_FILTER_CLONE)
 endif
 
