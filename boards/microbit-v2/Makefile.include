@@ -7,6 +7,10 @@ PROGRAMMERS_SUPPORTED += pyocd
 # programmer firmware revisions "fix" that.
 TTY_BOARD_FILTER := --model ".?BBC micro:bit CMSIS-DAP.?"
 
+# The TTY serial also is the ID of the debug adapter, as the TTY is provided by
+# the debug adapter
+DEBUG_ADAPTER_ID_IS_TTY_SERIAL := 1
+
 # The board is not recognized automatically by pyocd, so the CPU target
 # option is passed explicitly
 PYOCD_FLASH_TARGET_TYPE ?= -t $(CPU)
