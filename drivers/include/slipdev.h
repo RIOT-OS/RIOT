@@ -72,6 +72,14 @@ enum {
      * @brief   Device writes received data to stdin
      */
     SLIPDEV_STATE_STDIN,
+    /**
+     * @brief   Device is in standby, will wake up when sending data
+     */
+    SLIPDEV_STATE_STANDBY,
+    /**
+     * @brief   Device is in sleep mode
+     */
+    SLIPDEV_STATE_SLEEP,
 };
 /** @} */
 

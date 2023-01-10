@@ -32,6 +32,8 @@
 #include "mutex.h"
 #include "stdio_uart.h"
 
+static int _check_state(slipdev_t *dev);
+
 static inline void slipdev_lock(void)
 {
     if (IS_USED(MODULE_SLIPDEV_STDIO)) {
@@ -72,6 +74,23 @@ check_end:
         }
         dev->state = SLIPDEV_STATE_NONE;
     }
+}
+
+static void _poweron(slipdev_t *dev)
+{
+    if ((dev->state != SLIPDEV_STATE_STANDBY) ||
+        (dev->state != SLIPDEV_STATE_SLEEP)) {
+        return;
+    }
+
+    dev->state = 0;
+    uart_init(dev->config.uart, dev->config.baudrate, _slip_rx_cb, dev);
+}
+
+static inline void _poweroff(slipdev_t *dev, uint8_t state)
+{
+    uart_poweroff(dev->config.uart);
+    dev->state = state;
 }
 
 static int _init(netdev_t *netdev)
@@ -150,10 +169,33 @@ unsigned slipdev_unstuff_readbyte(uint8_t *buf, uint8_t byte, bool *escaped)
     return res;
 }
 
+static int _check_state(slipdev_t *dev)
+{
+    /* power states not supported when multiplexing stdio */
+    if (IS_USED(MODULE_SLIPDEV_STDIO)) {
+        return 0;
+    }
+
+    /* discard data when interface is in SLEEP mode */
+    if (dev->state == SLIPDEV_STATE_SLEEP) {
+        return -ENETDOWN;
+    }
+
+    /* sending data wakes the interface from STANDBY */
+    if (dev->state == SLIPDEV_STATE_STANDBY) {
+        _poweron(dev);
+    }
+
+    return 0;
+}
+
 static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
     slipdev_t *dev = (slipdev_t *)netdev;
-    int bytes = 0;
+    int bytes = _check_state(dev);
+    if (bytes) {
+        return bytes;
+    }
 
     DEBUG("slipdev: sending iolist\n");
     slipdev_lock();
@@ -233,6 +275,45 @@ static void _isr(netdev_t *netdev)
     }
 }
 
+#if !IS_USED(MODULE_SLIPDEV_STDIO)
+static int _set_state(slipdev_t *dev, netopt_state_t state)
+{
+    if (IS_USED(MODULE_SLIPDEV_STDIO)) {
+        return -ENOTSUP;
+    }
+
+    switch (state) {
+    case NETOPT_STATE_STANDBY:
+        _poweroff(dev, SLIPDEV_STATE_STANDBY);
+        break;
+    case NETOPT_STATE_SLEEP:
+        _poweroff(dev, SLIPDEV_STATE_SLEEP);
+        break;
+    case NETOPT_STATE_IDLE:
+        _poweron(dev);
+        break;
+    default:
+        return -ENOTSUP;
+    }
+
+    return sizeof(netopt_state_t);
+}
+
+static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t max_len)
+{
+    (void)max_len;
+
+    slipdev_t *dev = (slipdev_t *)netdev;
+    switch (opt) {
+    case NETOPT_STATE:
+        assert(max_len <= sizeof(netopt_state_t));
+        return _set_state(dev, *((const netopt_state_t *)value));
+    default:
+        return -ENOTSUP;
+    }
+}
+#endif /* !MODULE_SLIPDEV_STDIO */
+
 static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 {
     (void)netdev;
@@ -262,7 +343,11 @@ static const netdev_driver_t slip_driver = {
     .init = _init,
     .isr = _isr,
     .get = _get,
+#if IS_USED(MODULE_SLIPDEV_STDIO)
     .set = netdev_set_notsup,
+#else
+    .set = _set,
+#endif
 };
 
 void slipdev_setup(slipdev_t *dev, const slipdev_params_t *params, uint8_t index)
