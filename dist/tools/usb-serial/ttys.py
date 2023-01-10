@@ -61,9 +61,7 @@ def parse_args(args):
     Parse the given command line style arguments with argparse
     """
     desc = "List and filter TTY interfaces that might belong to boards"
-    supported_formats = {
-        "table",
-        "json",
+    formats_combinable = {
         "path",
         "serial",
         "vendor",
@@ -74,13 +72,20 @@ def parse_args(args):
         "ctime",
         "iface_num",
     }
+    formats_uncombinable = {
+        "table",
+        "json",
+    }
+    supported_formats = formats_combinable.union(formats_uncombinable)
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("--most-recent", action="store_true",
                         help="Print only the most recently connected matching "
                              + "TTY")
-    parser.add_argument("--format", default="table", type=str,
+    parser.add_argument("--format", default=["table"], type=str, nargs='+',
                         help=f"How to format the TTYs. Supported formats: "
                              f"{sorted(supported_formats)}")
+    parser.add_argument("--format-sep", default=" ", type=str,
+                        help="Separator between formats (default: space)")
     parser.add_argument("--serial", default=None, type=str,
                         help="Print only devices matching this serial")
     parser.add_argument("--driver", default=None, type=str,
@@ -108,8 +113,17 @@ def parse_args(args):
 
     args = parser.parse_args()
 
-    if args.format not in supported_formats:
-        sys.exit(f"Format \"{args.format}\" not supported")
+    if len(args.format) == 1:
+        if args.format[0] not in supported_formats:
+            sys.exit(f"Format \"{args.format[0]}\" not supported")
+    else:
+        for fmt in args.format:
+            if fmt not in formats_combinable:
+                if fmt in formats_uncombinable:
+                    sys.exit(f"Format \"{fmt}\" cannot be combined with " +
+                             "other formats")
+                else:
+                    sys.exit(f"Format \"{fmt}\" not supported")
 
     if args.exclude_serial is None:
         if "EXCLUDE_TTY_SERIAL" in os.environ:
@@ -154,21 +168,31 @@ def print_results(args, ttys):
     """
     Print the given TTY devices according to the given args
     """
-    if args.format == "json":
-        print(json.dumps(ttys, indent=2))
-        return
+    if len(args.format) == 1:
+        if args.format[0] == "json":
+            print(json.dumps(ttys, indent=2))
+            return
 
-    if args.format == "table":
-        for tty in ttys:
-            tty["ctime"] = time.strftime("%H:%M:%S",
-                                         time.localtime(tty["ctime"]))
-        headers = ["path", "driver", "vendor", "model", "model_db", "serial",
-                   "ctime", "iface_num"]
-        print_table(ttys, headers)
-        return
+        if args.format[0] == "table":
+            for tty in ttys:
+                tty["ctime"] = time.strftime("%H:%M:%S",
+                                             time.localtime(tty["ctime"]))
+            headers = ["path", "driver", "vendor", "model", "model_db",
+                       "serial", "ctime", "iface_num"]
+            print_table(ttys, headers)
+            return
 
     for tty in ttys:
-        print(tty[args.format])
+        line = ""
+        for fmt in args.format:
+            item = tty[fmt]
+            if item.rfind(args.format_sep) >= 0:
+                # item contains separator --> quote it
+                # using json.dumps to also escape quotation chars and other
+                # unsafe stuff
+                item = json.dumps(item)
+            line += f"{args.format_sep}{item}"
+        print(line[len(args.format_sep):])
 
 
 def generate_filters(args):

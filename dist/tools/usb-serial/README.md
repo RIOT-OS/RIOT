@@ -23,7 +23,19 @@ With the parameter `--format FORMAT` a different format than the default
 markdown table can be selected, e.g. `json` results in JSON output and `path`
 will print the paths of the matching TTYs without any formatting (useful for
 scripting). The full list of formats can be obtained by running the script with
-the `--help` parameter
+the `--help` parameter.
+
+Note: Formats other than `json` and `table` can be combined. A script that
+required both path and serial of TTYs could use:
+
+```
+./ttys.py --format path serial
+```
+
+This will output one TTY per line with the selected fields separated by space.
+To use a different separator than space (e.g. to create CSV files), the option
+`--format-sep` can be used. If a field value contains the separator, it will
+be quoted and quotation chars inside will be escaped.
 
 ### Filtering
 
