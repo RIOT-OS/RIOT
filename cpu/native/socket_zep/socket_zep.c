@@ -235,18 +235,10 @@ static void _send_zep_hello(socket_zep_t *dev)
 static void _socket_isr(int fd, void *arg)
 {
     ieee802154_dev_t *dev = arg;
-    socket_zep_t *zepdev = dev->priv;
 
     DEBUG("socket_zep::_socket_isr: bytes on %d\n", fd);
 
-    if (zepdev->rx) {
-        dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
-    } else {
-        /* discard frame */
-        uint8_t tmp;
-        real_recv(fd, &tmp, sizeof(tmp), 0);
-        _continue_reading(zepdev);
-    }
+    dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
 }
 
 void socket_zep_setup(socket_zep_t *dev, const socket_zep_params_t *params)
