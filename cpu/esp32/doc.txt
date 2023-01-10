@@ -28,7 +28,7 @@ This document describes the RIOT implementation for supported variants
     3. [Limitations of the RIOT-port](#esp32_limitations)
 4. [Toolchain](#esp32_toolchain)
     1. [RIOT Docker Toolchain (riotdocker)](#esp32_riot_docker_toolchain)
-    2. [Manual Toolchain Installation](#esp32_local_toolchain_installation)
+    2. [Local Toolchain Installation](#esp32_local_toolchain_installation)
 5. [Flashing the Device](#esp32_flashing_the_device)
     1. [Toolchain Usage](#esp32_toolchain_usage)
     2. [Compile Options](#esp32_compile_options)
