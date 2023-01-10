@@ -94,6 +94,7 @@ extern int (*real_accept)(int socket, ...);
 /* The ... is a hack to save includes: */
 extern int (*real_bind)(int socket, ...);
 extern int (*real_connect)(int socket, ...);
+extern int (*real_recv)(int sockfd, void *buf, size_t len, int flags);
 extern int (*real_chdir)(const char *path);
 extern int (*real_close)(int);
 extern int (*real_fcntl)(int, int, ...);

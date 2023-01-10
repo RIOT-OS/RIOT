@@ -51,6 +51,7 @@
 ssize_t (*real_read)(int fd, void *buf, size_t count);
 ssize_t (*real_write)(int fd, const void *buf, size_t count);
 size_t (*real_fread)(void *ptr, size_t size, size_t nmemb, FILE *stream);
+ssize_t (*real_recv)(int sockfd, void *buf, size_t len, int flags);
 void (*real_clearerr)(FILE *stream);
 __attribute__((noreturn)) void (*real_exit)(int status);
 void (*real_free)(void *ptr);
@@ -505,6 +506,7 @@ void _native_init_syscalls(void)
     *(void **)(&real_accept) = dlsym(RTLD_NEXT, "accept");
     *(void **)(&real_bind) = dlsym(RTLD_NEXT, "bind");
     *(void **)(&real_connect) = dlsym(RTLD_NEXT, "connect");
+    *(void **)(&real_recv) = dlsym(RTLD_NEXT, "recv");
     *(void **)(&real_printf) = dlsym(RTLD_NEXT, "printf");
     *(void **)(&real_gai_strerror) = dlsym(RTLD_NEXT, "gai_strerror");
     *(void **)(&real_getaddrinfo) = dlsym(RTLD_NEXT, "getaddrinfo");
