@@ -27,7 +27,8 @@ $(ESP8266_SDK_BUILD_DIR): $(PKG_PATCHED)
 
 # Set the SDK version from the SDK hash/tag. For example "v3.1-51-g913a06a9".
 $(ESP8266_SDK_BUILD_DIR)/esp8266_idf_version.h: | $(ESP8266_SDK_BUILD_DIR)
-	$(Q)echo "#define IDF_VER \"$(shell git -C $(PKG_SOURCE_DIR) describe --tags)\"" \
+	$(Q)echo -n "#define IDF_VER" \
+	  "\"$(shell git -C $(PKG_SOURCE_DIR) describe --tags $(PKG_VERSION))\"" \
 	  > $@
 
 $(ESP8266_SDK_BUILD_DIR)/lib%.a: \
