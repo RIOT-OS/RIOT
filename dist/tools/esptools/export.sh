@@ -5,6 +5,10 @@ ESP32_GCC_VERSION_DIR="8.4.0"
 
 ESP32_OPENOCD_VERSION="v0.11.0-esp32-20211220"
 
+if [ -z ${IDF_TOOLS_PATH} ]; then
+    IDF_TOOLS_PATH=${HOME}/.espressif
+fi
+
 TOOLS_PATH=${IDF_TOOLS_PATH}/tools
 
 export_arch()
