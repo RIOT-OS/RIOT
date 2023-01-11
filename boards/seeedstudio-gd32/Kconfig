@@ -28,4 +28,4 @@ config BOARD_HAS_LXTAL
 
 config CLOCK_HXTAL
     int
-    default 80000000
+    default 8000000
