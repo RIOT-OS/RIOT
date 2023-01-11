@@ -8,4 +8,9 @@ ifeq (,$(filter-out stdio_cdc_acm,$(filter stdio_% slipdev_stdio,$(USEMODULE))))
     USEMODULE += stdio_cdc_acm
   endif
   FEATURES_REQUIRED += highlevel_stdio
+
+  # Enforce tests to wait a bit for the serial port after reset
+  TERM_DELAY ?= 2
+  TESTRUNNER_CONNECT_DELAY ?= $(TERM_DELAY)
+  $(call target-export-variables,test,TESTRUNNER_CONNECT_DELAY)
 endif
