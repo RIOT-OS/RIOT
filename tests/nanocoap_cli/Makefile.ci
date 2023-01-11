@@ -8,6 +8,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega328p-xplained-mini \
     bluepill-stm32f030c8 \
     i-nucleo-lrwan1 \
+    m1284p \
     mega-xplained \
     microduino-corerf \
     msb-430 \
@@ -29,8 +30,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32l0538-disco \
     telosb \
     waspmote-pro \
-    wsn430-v1_3b \
-    wsn430-v1_4 \
     z1 \
     zigduino \
     #
