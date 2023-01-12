@@ -7,8 +7,8 @@ lowercase = $(subst A,a,$(subst B,b,$(subst C,c,$(subst D,d,$(subst E,e,$(subst 
 uppercase = $(subst a,A,$(subst b,B,$(subst c,C,$(subst d,D,$(subst e,E,$(subst f,F,$(subst g,G,$(subst h,H,$(subst i,I,$(subst j,J,$(subst k,K,$(subst l,L,$(subst m,M,$(subst n,N,$(subst o,O,$(subst p,P,$(subst q,Q,$(subst r,R,$(subst s,S,$(subst t,T,$(subst u,U,$(subst v,V,$(subst w,W,$(subst x,X,$(subst y,Y,$(subst z,Z,$1))))))))))))))))))))))))))
 uppercase_and_underscore = $(call uppercase,$(subst -,_,$1))
 
-# Padds $2 number to $1 digits
-_pad_number = $(shell printf '%0$1d' $2)
+# Padds number $2 to $1 digits. If $2 is empty, zero will be printed instead.
+_pad_number = $(shell printf '%0$1d' $(if $2,$2,0))
 
 # Gets major, minor, patch from 'major.minor.patch', e.g.: 4.2.1 by index
 #   $1: index
