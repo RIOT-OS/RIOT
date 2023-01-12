@@ -28,6 +28,8 @@
 extern "C" {
 #endif
 
+#ifdef BOARD_RPI_PICO
+
 /**
  * @brief    GPIO pin configuration
  */
@@ -39,6 +41,17 @@ static const  saul_gpio_params_t saul_gpio_params[] =
         .mode = GPIO_OUT,
     }
 };
+
+#endif
+
+#ifdef BOARD_RPI_PICO_W
+
+/**
+ * @brief    Empty GPIO pin configuration
+ */
+#define SAUL_GPIO_NUMOF 0
+
+#endif
 
 #ifdef __cplusplus
 }
