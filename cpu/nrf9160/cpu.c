@@ -19,6 +19,7 @@
  */
 
 #include "cpu.h"
+#include "kernel_init.h"
 #include "nrf_clock.h"
 #include "periph_conf.h"
 #include "periph/init.h"
@@ -44,7 +45,7 @@ void cpu_init(void)
     SCB->SCR |= SCB_SCR_SEVONPEND_Msk;
 
     /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
-    stdio_init();
+    early_init();
 
     /* trigger static peripheral initialization */
     periph_init();

@@ -129,3 +129,14 @@
  * [tinyUSB documentation](https://docs.tinyusb.org/en/latest/reference/getting_started.html)
  * for details.
  */
+
+/**
+ * @defgroup     pkg_tinyusb_stdio_cdc_acm STDIO over USB CDC-ACM (tinyUSB)
+ * @ingroup      sys_stdio
+ * @brief        Standard input/output backend using tinyUSB CDC ACM
+ * @see          pkg_tinyusb
+ *
+ * To enable this, select the `tinyusb_stdio_cdc_acm` module:
+ *
+ *     USEMODULE += stdio_tinyusb_cdc_acm
+ */

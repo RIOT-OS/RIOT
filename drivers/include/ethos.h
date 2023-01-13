@@ -7,6 +7,21 @@
  */
 
 /**
+ * @defgroup    drivers_ethos_stdio   STDIO via ethos
+ * @ingroup     sys_stdio
+ * @brief       Standard input/output backend multiplexed via ethernet-over-serial
+ *
+ * This will multiplex STDIO via ethos.
+ * The shell can be accessed via the `ethos` tool.
+ *
+ * To enable this stdio implementation, select
+ *
+ *     USEMODULE += stdio_ethos
+ *
+ * @see         drivers_ethos
+ */
+
+/**
  * @defgroup    drivers_ethos Ethernet-over-serial driver
  * @ingroup     drivers_netdev
  * @brief       Driver for the ethernet-over-serial module

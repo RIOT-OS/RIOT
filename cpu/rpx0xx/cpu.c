@@ -19,6 +19,7 @@
  */
 
 #include "cpu.h"
+#include "kernel_init.h"
 #include "macros/units.h"
 #include "periph/init.h"
 #include "periph_cpu.h"
@@ -87,7 +88,7 @@ void cpu_init(void)
     _cpu_reset();
 
     /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
-    stdio_init();
+    early_init();
 
     DEBUG_PUTS("[rpx0xx] GPOUT0 (GPIO pin 21) is clocked from XOSC (typically 12 MHz)");
 

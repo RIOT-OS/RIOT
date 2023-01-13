@@ -30,10 +30,6 @@
 #include "usb/usbus.h"
 #include "usb/usbus/cdc/acm.h"
 
-#if MODULE_VFS
-#include "vfs.h"
-#endif
-
 static usbus_cdcacm_device_t cdcacm;
 static uint8_t _cdc_tx_buf_mem[CONFIG_USBUS_CDC_ACM_STDIO_BUF_SIZE];
 static uint8_t _cdc_rx_buf_mem[CONFIG_USBUS_CDC_ACM_STDIO_BUF_SIZE];
@@ -41,10 +37,6 @@ static isrpipe_t _cdc_stdio_isrpipe = ISRPIPE_INIT(_cdc_rx_buf_mem);
 
 void stdio_init(void)
 {
-    /* Initialize this side of the CDC ACM pipe */
-#if MODULE_VFS
-    vfs_bind_stdio();
-#endif
 }
 
 #if IS_USED(MODULE_STDIO_AVAILABLE)

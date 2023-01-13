@@ -51,7 +51,7 @@ __attribute__((constructor)) static void startup(void)
 #endif
 
     /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
-    stdio_init();
+    early_init();
     /* trigger static peripheral initialization */
     periph_init();
     /* continue with kernel initialization */

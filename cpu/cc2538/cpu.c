@@ -20,6 +20,7 @@
 #include "stdio_base.h"
 
 #include "cpu.h"
+#include "kernel_init.h"
 #include "periph/init.h"
 #include "periph_conf.h"
 
@@ -37,7 +38,7 @@ void cpu_init(void)
     /* initialize the clock system */
     cpu_clock_init();
     /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
-    stdio_init();
+    early_init();
     /* trigger static peripheral initialization */
     periph_init();
 }

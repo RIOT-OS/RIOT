@@ -15,15 +15,11 @@
 
 #include "kernel_defines.h"
 #include "native_internal.h"
-#include "vfs.h"
 
 #include "stdio_base.h"
 
 void stdio_init(void)
 {
-    if (IS_USED(MODULE_VFS)) {
-        vfs_bind_stdio();
-    }
 }
 
 ssize_t stdio_read(void* buffer, size_t max_len)

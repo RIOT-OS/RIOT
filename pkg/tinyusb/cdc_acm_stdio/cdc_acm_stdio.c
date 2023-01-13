@@ -28,18 +28,10 @@
 #include "tusb.h"
 #include "tinyusb.h"
 
-#if MODULE_VFS
-#include "vfs.h"
-#endif
-
 static mutex_t data_lock = MUTEX_INIT_LOCKED;
 
 void stdio_init(void)
 {
-    /* Initialize this side of the CDC ACM pipe */
-#if MODULE_VFS
-    vfs_bind_stdio();
-#endif
 }
 
 #if IS_USED(MODULE_STDIO_AVAILABLE)

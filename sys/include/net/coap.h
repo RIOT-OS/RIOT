@@ -31,6 +31,11 @@ extern "C" {
  */
 #define COAP_PORT               (5683)
 
+/**
+ * @brief   Default CoAP DTLS port
+ */
+#define COAPS_PORT              (5684)
+
 #define COAP_V1                 (1)     /**< Identifier for CoAP version 1 (RFC 7252) */
 
 /**

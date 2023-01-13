@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     sys
+ * @ingroup     sys_stdio_null
  * @{
  *
  * @file
@@ -22,18 +22,11 @@
 
 #include "stdio_base.h"
 
-#if MODULE_VFS
-#include "vfs.h"
-#endif
-
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
 void stdio_init(void)
 {
-#if MODULE_VFS
-    vfs_bind_stdio();
-#endif
 }
 
 ssize_t stdio_read(void* buffer, size_t count)

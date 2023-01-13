@@ -14,6 +14,7 @@
  *
  * @author          Koen Zandberg <koen@bergzand.net>
  */
+#include "kernel_init.h"
 #include "stdio_uart.h"
 #include "periph/init.h"
 #include "irq_arch.h"
@@ -30,6 +31,6 @@ void cpu_init(void)
     gd32vf103_clock_init();
     /* Common RISC-V initialization */
     riscv_init();
-    stdio_init();
+    early_init();
     periph_init();
 }

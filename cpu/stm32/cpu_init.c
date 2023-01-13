@@ -33,6 +33,7 @@
  */
 
 #include "cpu.h"
+#include "kernel_init.h"
 #include "stdio_base.h"
 #include "stmclk.h"
 #include "periph_cpu.h"
@@ -359,7 +360,7 @@ void cpu_init(void)
     dma_init();
 #endif
     /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
-    stdio_init();
+    early_init();
 
 #ifdef STM32F1_DISABLE_JTAG
     RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;

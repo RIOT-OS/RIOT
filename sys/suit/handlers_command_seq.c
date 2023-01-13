@@ -438,7 +438,8 @@ static int _dtv_fetch(suit_manifest_t *manifest, int key,
 
     if (0) {}
 #ifdef MODULE_SUIT_TRANSPORT_COAP
-    else if (strncmp(manifest->urlbuf, "coap://", 7) == 0) {
+    else if ((strncmp(manifest->urlbuf, "coap://", 7) == 0) ||
+             (IS_USED(MODULE_NANOCOAP_DTLS) && strncmp(manifest->urlbuf, "coaps://", 8) == 0)) {
         res = nanocoap_get_blockwise_url(manifest->urlbuf, CONFIG_SUIT_COAP_BLOCKSIZE,
                                          _storage_helper,
                                          manifest);

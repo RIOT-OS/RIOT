@@ -8,7 +8,11 @@
 
 /**
  * @defgroup     sys_stdio_nimble STDIO over NimBLE
- * @ingroup      sys
+ * @ingroup      sys_stdio
+ *
+ * To enable stdio over nimBLE, add the module `stdio_nimble`:
+ *
+ *     USEMODULE += stdio_nimble
  *
  * @experimental This feature is experimental as some use-cases, such as examples/twr_aloha, show
  *               unexpected behaviour.

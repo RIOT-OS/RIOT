@@ -18,6 +18,7 @@
  */
 
 #include "cpu.h"
+#include "kernel_init.h"
 #include "periph_conf.h"
 #include "periph/init.h"
 #include "stdio_base.h"
@@ -104,7 +105,7 @@ void cpu_init(void)
 #endif
 
     /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
-    stdio_init();
+    early_init();
 
     /* trigger static peripheral initialization */
     periph_init();

@@ -466,7 +466,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
 {
     _native_init_syscalls();
     /* initialize stdio as early as possible */
-    stdio_init();
+    early_init();
 
     _native_argv = argv;
     _progname = argv[0];

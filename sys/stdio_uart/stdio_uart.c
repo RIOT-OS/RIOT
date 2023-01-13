@@ -36,10 +36,6 @@
 #include "periph/uart.h"
 #include "stdio_uart.h"
 
-#if MODULE_VFS
-#include "vfs.h"
-#endif
-
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
@@ -62,10 +58,6 @@ void stdio_init(void)
     }
 
     uart_init(STDIO_UART_DEV, STDIO_UART_BAUDRATE, cb, arg);
-
-#if MODULE_VFS
-    vfs_bind_stdio();
-#endif
 }
 
 #if IS_USED(MODULE_STDIO_AVAILABLE)

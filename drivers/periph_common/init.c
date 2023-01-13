@@ -58,11 +58,6 @@
 void periph_init(void)
 {
 #ifdef MODULE_PERIPH_INIT
-    /* initialize leds */
-    if (IS_USED(MODULE_PERIPH_INIT_LEDS)) {
-        extern void led_init(void);
-        led_init();
-    }
     /* initialize buttonss */
     if (IS_USED(MODULE_PERIPH_INIT_BUTTONS)) {
         extern void button_init(void);

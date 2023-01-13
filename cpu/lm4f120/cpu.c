@@ -18,6 +18,7 @@
  */
 
 #include "cpu.h"
+#include "kernel_init.h"
 #include "irq.h"
 #include "sched.h"
 #include "thread.h"
@@ -38,7 +39,7 @@ void cpu_init(void)
     cpu_clock_init(CLOCK_SOURCE);
 
     /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
-    stdio_init();
+    early_init();
 
     /* trigger static peripheral initialization */
     periph_init();

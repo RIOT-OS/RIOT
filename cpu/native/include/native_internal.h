@@ -11,6 +11,17 @@
  */
 
 /**
+ * @defgroup    cpu_native_stdio    STDIO for native
+ * @ingroup     sys_stdio
+ * @brief       Standard input/output backend for native
+ *
+ * This will hook up RIOT's stdio to the host's stdio fds. It is the default
+ * stdio implementation of the board `native`.
+ *
+ * @see         cpu_native
+ */
+
+/**
  * @ingroup    cpu_native
  * @{
  * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>

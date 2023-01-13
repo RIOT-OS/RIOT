@@ -82,10 +82,6 @@
 #include "thread.h"
 #include "ztimer.h"
 
-#if MODULE_VFS
-#include "vfs.h"
-#endif
-
 /* This parameter affects the bandwidth of both input and output. Decreasing
    it will significantly improve bandwidth at the cost of CPU time. */
 #ifndef STDIO_POLL_INTERVAL_MS
@@ -281,10 +277,6 @@ void stdio_init(void) {
     #ifdef STDIO_RTT_ENABLE_BLOCKING_STDOUT
     blocking_stdout = 1;
     #endif
-
-#if MODULE_VFS
-    vfs_bind_stdio();
-#endif
 
     /* the mutex should start locked */
     mutex_lock(&_rx_mutex);

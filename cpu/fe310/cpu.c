@@ -19,6 +19,7 @@
 
 #include "clk.h"
 #include "cpu.h"
+#include "kernel_init.h"
 #include "periph/init.h"
 #include "periph_conf.h"
 
@@ -108,7 +109,7 @@ void cpu_init(void)
     riscv_init();
 
     /* Initialize stdio */
-    stdio_init();
+    early_init();
 
     /* Initialize static peripheral */
     periph_init();

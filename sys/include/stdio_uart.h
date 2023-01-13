@@ -9,9 +9,16 @@
 
 /**
  * @defgroup    sys_stdio_uart STDIO over UART
- * @ingroup     sys
+ * @ingroup     sys_stdio
  *
  * @brief       Standard input/output backend using UART
+ *
+ * To enable stdio over UART, enable the `stdio_uart` module:
+ *
+ *     USEMODULE += stdio_uart
+ *
+ * @note    For many board, `stdio_uart` is already the default stdio backend
+ *          and therefore already enabled.
  *
  * ## Input
  *

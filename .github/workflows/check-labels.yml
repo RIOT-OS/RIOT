@@ -1,7 +1,7 @@
 name: check-labels
 on:
   pull_request:
-    types: [opened, reopened, labeled, unlabeled]
+    types: [opened, reopened, labeled, unlabeled, synchronize]
   pull_request_review:
     types: [submitted, dismissed]
 jobs:
