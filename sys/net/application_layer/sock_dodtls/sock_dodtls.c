@@ -29,6 +29,7 @@
 #include "net/iana/portrange.h"
 #include "net/sock/dtls.h"
 #include "net/sock/udp.h"
+#include "net/sock/util.h"
 #include "net/sock/dodtls.h"
 #include "random.h"
 #include "ztimer.h"
@@ -170,28 +171,16 @@ static void _close_session(credman_tag_t creds_tag, credman_type_t creds_type)
 static int _connect_server(const sock_udp_ep_t *server,
                            const credman_credential_t *creds)
 {
-    int res = -EADDRINUSE;
-    uint32_t start, try_start, timeout = SOCK_DODTLS_SESSION_RECV_TIMEOUT_MS;
+    int res;
     sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
 
     /* server != NULL is checked in sock_dodtls_set_server() */
     assert(creds != NULL);
     mutex_lock(&_server_mutex);
-    while (res == -EADDRINUSE) {
-        /* choose random ephemeral port, since DTLS requires a local port */
-        local.port = IANA_DYNAMIC_PORTRANGE_MIN +
-            (random_uint32() % (IANA_SYSTEM_PORTRANGE_MAX - IANA_DYNAMIC_PORTRANGE_MIN));
-        if ((res = sock_udp_create(&_udp_sock, &local, server, 0)) < 0) {
-            if (res != -EADDRINUSE) {
-                DEBUG("Unable to create UDP sock\n");
-                goto exit;
-            }
-        }
-    }
+
     res = credman_add(creds);
     if (res < 0 && res != CREDMAN_EXIST) {
         DEBUG("Unable to add credential to credman\n");
-        _close_session(creds->tag, creds->type);
         switch (res) {
             case CREDMAN_NO_SPACE:
                 res = -ENOSPC;
@@ -205,55 +194,14 @@ static int _connect_server(const sock_udp_ep_t *server,
         }
         goto exit;
     }
-    if ((res = sock_dtls_create(&_dtls_sock, &_udp_sock, creds->tag,
-                                SOCK_DTLS_1_2, SOCK_DTLS_CLIENT)) < 0) {
-        puts("Unable to create DTLS sock\n");
-        _close_session(creds->tag, creds->type);
-        goto exit;
-    }
 
-    start = _now_ms();
-    try_start = start;
-    while (((try_start = _now_ms()) - start) < SOCK_DODTLS_SESSION_TIMEOUT_MS) {
-        memset(&_server_session, 0, sizeof(_server_session));
-        if ((res = sock_dtls_session_init(&_dtls_sock, server,
-                                          &_server_session)) >= 0) {
-            uint32_t try_duration;
-
-            res = sock_dtls_recv(&_dtls_sock, &_server_session, _dns_buf,
-                                 sizeof(_dns_buf), timeout * US_PER_MS);
-            if (res == -SOCK_DTLS_HANDSHAKE) {
-                break;
-            }
-            DEBUG("Unable to establish DTLS handshake: %d (timeout: %luus)\n",
-                  -res, (long unsigned)timeout * US_PER_MS);
-            sock_dtls_session_destroy(&_dtls_sock, &_server_session);
-            try_duration = _now_ms() - try_start;
-            if (try_duration < timeout) {
-                _sleep_ms(timeout - try_duration);
-            }
-            /* see https://datatracker.ietf.org/doc/html/rfc6347#section-4.2.4.1 */
-            timeout *= 2U;
-        }
-        else {
-            DEBUG("Unable to initialize DTLS session: %d\n", -res);
-            sock_dtls_session_destroy(&_dtls_sock, &_server_session);
-        }
-    }
-    if (res != -SOCK_DTLS_HANDSHAKE) {
-        res = -ETIMEDOUT;
-        _close_session(creds->tag, creds->type);
-        goto exit;
-    }
-    else {
-        res = 0;
-    }
-
+    res = sock_dtls_establish_session(&_udp_sock, &_dtls_sock, &_server_session,
+                                      creds->tag, &local, server, _dns_buf,
+                                      sizeof(_dns_buf));
     _cred_type = creds->type;
     _cred_tag = creds->tag;
     _id = (uint16_t)(random_uint32() & 0xffff);
 exit:
-    memset(_dns_buf, 0, sizeof(_dns_buf));  /* flush-out unencrypted data */
     mutex_unlock(&_server_mutex);
     return (res > 0) ? 0 : res;
 }
