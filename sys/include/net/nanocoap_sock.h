@@ -146,20 +146,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Timeout for CoAP over DTLS queries in milliseconds
- */
-#ifndef CONFIG_NANOCOAP_SOCK_DTLS_TIMEOUT_MS
-#define CONFIG_NANOCOAP_SOCK_DTLS_TIMEOUT_MS    (1000U)
-#endif
-
-/**
- * @brief   Number of CoAP over DTLS handshake retries
- */
-#ifndef CONFIG_NANOCOAP_SOCK_DTLS_RETRIES
-#define CONFIG_NANOCOAP_SOCK_DTLS_RETRIES       (2)
-#endif
-
-/**
  * @brief   Credman tag used for NanoCoAP
  *          Tag together with the credential type (PSK) needs to be unique
  */

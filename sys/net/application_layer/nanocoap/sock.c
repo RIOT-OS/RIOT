@@ -62,92 +62,23 @@ typedef struct {
     bool more;
 } _block_ctx_t;
 
-#if IS_USED(MODULE_NANOCOAP_DTLS)
 int nanocoap_sock_dtls_connect(nanocoap_sock_t *sock, sock_udp_ep_t *local,
                                const sock_udp_ep_t *remote, credman_tag_t tag)
 {
-    int res;
-    uint32_t timeout_ms = CONFIG_NANOCOAP_SOCK_DTLS_TIMEOUT_MS;
-    uint8_t retries = CONFIG_NANOCOAP_SOCK_DTLS_RETRIES;
+#if IS_USED(MODULE_NANOCOAP_DTLS)
+    uint8_t buf[CONFIG_NANOCOAP_DTLS_HANDSHAKE_BUF_SIZE];
 
-    bool auto_port = local->port == 0;
-    do {
-        if (auto_port) {
-            /* choose random ephemeral port, since DTLS requires a local port */
-            local->port = random_uint32_range(IANA_DYNAMIC_PORTRANGE_MIN,
-                                              IANA_DYNAMIC_PORTRANGE_MAX);
-        }
-        /* connect UDP socket */
-        res = nanocoap_sock_connect(sock, local, remote);
-    } while (auto_port && (res == -EADDRINUSE));
-
-    if (res < 0) {
-        return res;
-    }
-
-    /* create DTLS socket on to of UDP socket */
-    res = sock_dtls_create(&sock->dtls, &sock->udp, tag,
-                           SOCK_DTLS_1_2, SOCK_DTLS_CLIENT);
-    if (res < 0) {
-        DEBUG("Unable to create DTLS sock: %s\n", strerror(-res));
-        nanocoap_sock_close(sock);
-        return res;
-    }
     sock->type = COAP_SOCKET_TYPE_DTLS;
-
-    while (1) {
-        uint8_t buf[CONFIG_NANOCOAP_DTLS_HANDSHAKE_BUF_SIZE];
-        mutex_t lock = MUTEX_INIT_LOCKED;
-        ztimer_t timeout;
-
-        /* unlock lock after timeout */
-        ztimer_mutex_unlock(ZTIMER_MSEC, &timeout, timeout_ms, &lock);
-
-        /* create DTLS session */
-        res = sock_dtls_session_init(&sock->dtls, remote, &sock->dtls_session);
-        if (res >= 0) {
-            /* handle handshake */
-            res = sock_dtls_recv(&sock->dtls, &sock->dtls_session, buf,
-                                 sizeof(buf), timeout_ms * US_PER_MS);
-            if (res == -SOCK_DTLS_HANDSHAKE) {
-                DEBUG("DTLS handshake successful\n");
-                ztimer_remove(ZTIMER_MSEC, &timeout);
-                return 0;
-            }
-            DEBUG("Unable to establish DTLS handshake: %s\n", strerror(-res));
-
-        } else {
-            DEBUG("Unable to initialize DTLS session: %s\n", strerror(-res));
-        }
-
-        sock_dtls_session_destroy(&sock->dtls, &sock->dtls_session);
-
-        if (retries--) {
-            /* wait for timeout to expire */
-            mutex_lock(&lock);
-        } else {
-            ztimer_remove(ZTIMER_MSEC, &timeout);
-            break;
-        }
-
-        /* see https://datatracker.ietf.org/doc/html/rfc6347#section-4.2.4.1 */
-        timeout_ms *= 2U;
-    }
-
-    nanocoap_sock_close(sock);
-    return res;
-}
+    return sock_dtls_establish_session(&sock->udp, &sock->dtls, &sock->dtls_session,
+                                       tag, local, remote, buf, sizeof(buf));
 #else
-int nanocoap_sock_dtls_connect(nanocoap_sock_t *sock, const sock_udp_ep_t *local,
-                               const sock_udp_ep_t *remote, credman_tag_t tag)
-{
     (void)sock;
     (void)local;
     (void)remote;
     (void)tag;
     return -ENOTSUP;
-}
 #endif
+}
 
 static int _get_error(const coap_pkt_t *pkt)
 {
@@ -179,7 +110,7 @@ static int _sock_sendv(nanocoap_sock_t *sock, const iolist_t *snips)
 #if IS_USED(MODULE_NANOCOAP_DTLS)
     case COAP_SOCKET_TYPE_DTLS:
         return sock_dtls_sendv(&sock->dtls, &sock->dtls_session, snips,
-                               CONFIG_NANOCOAP_SOCK_DTLS_TIMEOUT_MS);
+                               CONFIG_SOCK_DTLS_TIMEOUT_MS);
 #endif
     default:
         assert(0);
