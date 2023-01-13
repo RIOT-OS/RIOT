@@ -25,6 +25,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "container.h"
 #include "periph/rtc.h"
 #include "shell.h"
 
@@ -39,10 +40,24 @@ static int dow(int year, int month, int day)
 {
     /* calculate the day of week using Tøndering's algorithm */
     static int t[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
+    if (month < 1 || month > (int) ARRAY_SIZE(t)) {
+        /* This will be a wrong answer, but error handling is not this
+         * function's task (whereas memory safety is). */
+        return 7;
+    }
     year -= month < 3;
     return (year + year/4 - year/100 + year/400 + t[month-1] + day) % 7;
 }
 
+/** Read a ["YYYY-MM-DD", "hh:mm:ss"] formatted value from a string array.
+ *
+ * This performs no validation on the entered time -- that'd be trivial on some
+ * fields (month), but excessive on others (day of month -- we don't do leap
+ * year calculation otherwise) and need information we don't have (leap
+ * seconds) on yet others.
+ *
+ * Invalid inputs merely lead to out-of-range values inside the time struct.
+ */
 static int _parse_time(char **argv, struct tm *time)
 {
     short i;
