@@ -113,6 +113,8 @@
 : ${OPENOCD_DBG_EXTRA_CMD:=}
 # command used to reset the board
 : ${OPENOCD_CMD_RESET_RUN:="-c 'reset run'"}
+# command used to halt the board
+: ${OPENOCD_CMD_RESET_HALT:="-c 'reset halt'"}
 # Select core on multi-core processors.
 : ${OPENOCD_CORE:=}
 # Set to any value to skip verifying after flashing.
@@ -241,7 +243,7 @@ _flash_list_raw() {
             ${OPENOCD_EXTRA_RESET_INIT} \
             -c 'init' \
             -c 'targets' \
-            -c 'reset halt' \
+            ${OPENOCD_CMD_RESET_HALT} \
             -c 'flash probe 0' \
             -c 'flash list' \
             -c 'shutdown'" 2>&1 && return
@@ -366,7 +368,7 @@ do_flash() {
             -c 'gdb_port 0' \
             -c 'init' \
             -c 'targets' \
-            -c 'reset halt' \
+            ${OPENOCD_CMD_RESET_HALT} \
             ${OPENOCD_PRE_FLASH_CMDS} \
             -c 'flash write_image erase \"${IMAGE_FILE}\" ${IMAGE_OFFSET} ${IMAGE_TYPE}' \
             ${OPENOCD_PRE_VERIFY_CMDS} \
