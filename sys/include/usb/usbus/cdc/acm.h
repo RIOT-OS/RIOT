@@ -7,6 +7,19 @@
  */
 
 /**
+ * @defgroup    usbus_cdc_acm_stdio  STDIO over CDC ACM (usbus)
+ * @ingroup     sys_stdio
+ * @brief       Standard input/output backend using usbus CDC ACM.
+ *
+ * This will provide STDIO via a virtual COM port over USB.
+ * It can be enabled with
+ *
+ *    USEMODULE += stdio_cdc_acm
+ *
+ * @see         usbus_cdc_acm
+ */
+
+/**
  * @defgroup    usbus_cdc_acm USBUS CDC ACM - USBUS CDC abstract control model
  * @ingroup     usb
  * @brief       USBUS CDC ACM interface module

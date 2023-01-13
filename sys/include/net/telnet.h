@@ -7,6 +7,26 @@
  */
 
 /**
+ * @defgroup    net_telnet_stdio    STDIO over telnet
+ * @ingroup     sys_stdio
+ * @brief       Standard input/output via telnet
+ *
+ * This will make RIOT's stdio available over telnet.
+ *
+ * To enable it, add
+ *
+ *     USEMODULE += stdio_telnet
+ *
+ * to your application.
+ * You will also have to set `I_UNDERSTAND_THAT_TELNET_IS_INSECURE = 1` to
+ * acknowledge that you will only use this for debugging in an isolated network.
+ *
+ * You can then use any standard `telnet` client to connect to your node.
+ *
+ * @see         net_telnet
+ */
+
+/**
  * @defgroup    net_telnet basic Telnet server implementation
  * @ingroup     net_ipv6
  * @brief       Telnet server functions

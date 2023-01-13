@@ -7,7 +7,8 @@
  */
 
 /**
- * @ingroup     sys
+ * @defgroup    net_telnet_stdio    STDIO via telnet
+ * @ingroup     sys_stdio
  * @{
  *
  * @file
