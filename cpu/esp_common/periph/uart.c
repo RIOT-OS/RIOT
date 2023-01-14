@@ -179,11 +179,14 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         gpio_set_pin_usage(uart_config[uart].rxd, _GPIO);
     }
 
-    /* try to initialize the pins as GPIOs first */
-    if ((uart_config[uart].txd != GPIO_UNDEF &&
-         gpio_init(uart_config[uart].txd, GPIO_OUT)) ||
-        (uart_config[uart].rxd != GPIO_UNDEF &&
-         gpio_init(uart_config[uart].rxd, GPIO_IN_PU))) {
+    /* Try to initialize the pins where the TX line is set and temporarily
+     * configured as a pull-up open-drain output before configuring it as
+     * a push-pull output to avoid a several msec long LOW pulse resulting
+     * in some garbage */
+    gpio_set(uart_config[uart].txd);
+    if (gpio_init(uart_config[uart].txd, GPIO_OD_PU) ||
+        gpio_init(uart_config[uart].txd, GPIO_OUT) ||
+        gpio_init(uart_config[uart].rxd, GPIO_IN_PU)) {
         return -1;
     }
 
