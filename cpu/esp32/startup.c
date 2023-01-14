@@ -147,6 +147,13 @@ static NORETURN void IRAM system_startup_cpu0(void)
     puf_sram_init((uint8_t *)&_sheap, SEED_RAM_LEN);
 #endif
 
+    /* initialize system call tables of ESP32x rom and newlib */
+    syscalls_init();
+
+    /* systemwide UART initialization */
+    extern void uart_system_init (void);
+    uart_system_init();
+
     /* initialize stdio */
     esp_rom_uart_tx_wait_idle(CONFIG_ESP_CONSOLE_UART_NUM);
     early_init();
@@ -228,15 +235,8 @@ static NORETURN void IRAM system_init (void)
     /* initialize the ISR stack for usage measurements */
     thread_isr_stack_init();
 
-    /* initialize system call tables of ESP32x rom and newlib */
-    syscalls_init();
-
     /* install exception handlers */
     init_exceptions();
-
-    /* systemwide UART initialization */
-    extern void uart_system_init (void);
-    uart_system_init();
 
     /* set log levels for SDK library outputs */
     extern void esp_log_level_set(const char* tag, esp_log_level_t level);
