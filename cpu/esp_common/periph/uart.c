@@ -171,34 +171,31 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     assert(uart_config[uart].txd != GPIO_UNDEF);
     assert(uart_config[uart].rxd != GPIO_UNDEF);
 
-    /* reset the pin usage when they were already used as UART pins */
-    if (gpio_get_pin_usage(uart_config[uart].txd) == _UART) {
-        gpio_set_pin_usage(uart_config[uart].txd, _GPIO);
-    }
-    if (gpio_get_pin_usage(uart_config[uart].rxd) == _UART) {
-        gpio_set_pin_usage(uart_config[uart].rxd, _GPIO);
-    }
+    /* don't reinitialize the pins if they are already configured as UART pins */
+    if ((gpio_get_pin_usage(uart_config[uart].txd) != _UART) ||
+        (gpio_get_pin_usage(uart_config[uart].rxd) != _UART)) {
 
-    /* Try to initialize the pins where the TX line is set and temporarily
-     * configured as a pull-up open-drain output before configuring it as
-     * a push-pull output to avoid a several msec long LOW pulse resulting
-     * in some garbage */
-    gpio_set(uart_config[uart].txd);
-    if (gpio_init(uart_config[uart].txd, GPIO_OD_PU) ||
-        gpio_init(uart_config[uart].txd, GPIO_OUT) ||
-        gpio_init(uart_config[uart].rxd, GPIO_IN_PU)) {
-        return -1;
+        /* try to initialize the pins where the TX line is set and temporarily
+         * configured as a pull-up open-drain output before configuring it as
+         * a push-pull output to avoid a several msec long LOW pulse resulting
+         * in some garbage */
+        gpio_set(uart_config[uart].txd);
+        if (gpio_init(uart_config[uart].txd, GPIO_OD_PU) ||
+            gpio_init(uart_config[uart].txd, GPIO_OUT) ||
+            gpio_init(uart_config[uart].rxd, GPIO_IN_PU)) {
+            return -1;
+        }
+
+        /* store the usage type in GPIO table */
+        gpio_set_pin_usage(uart_config[uart].txd, _UART);
+        gpio_set_pin_usage(uart_config[uart].rxd, _UART);
+
+        esp_rom_uart_tx_wait_idle(uart);
+        esp_rom_gpio_connect_out_signal(uart_config[uart].txd,
+                                        _uarts[uart].signal_txd, false, false);
+        esp_rom_gpio_connect_in_signal(uart_config[uart].rxd,
+                                       _uarts[uart].signal_rxd, false);
     }
-
-    /* store the usage type in GPIO table */
-    gpio_set_pin_usage(uart_config[uart].txd, _UART);
-    gpio_set_pin_usage(uart_config[uart].rxd, _UART);
-
-    esp_rom_uart_tx_wait_idle(uart);
-    esp_rom_gpio_connect_out_signal(uart_config[uart].txd,
-                                    _uarts[uart].signal_txd, false, false);
-    esp_rom_gpio_connect_in_signal(uart_config[uart].rxd,
-                                   _uarts[uart].signal_rxd, false);
 #endif /* MCU_ESP8266 */
 
     _uarts[uart].baudrate = baudrate;
