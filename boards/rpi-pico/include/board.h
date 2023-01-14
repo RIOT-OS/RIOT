@@ -28,6 +28,7 @@
 extern "C" {
 #endif
 
+#ifdef BOARD_RPI_PICO
 /**
  * @name    LED configuration
  * @{
@@ -38,6 +39,8 @@ extern "C" {
 #define LED0_TOGGLE     do {SIO->GPIO_OUT_XOR.reg = 1UL << 25;} while (0)
 #define LED0_NAME       "LED(Green)"
 /** @} */
+
+#endif
 
 #ifdef __cplusplus
 }
