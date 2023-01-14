@@ -8,12 +8,15 @@
 
 import logging
 import sys
+import time
 import unittest
 
 from riotctrl.ctrl import RIOTCtrl
 from riotctrl.shell.json import RapidJSONShellInteractionParser, rapidjson
 
 from riotctrl_shell.congure_test import CongureTest
+
+from testrunner.spawn import MAKE_TERM_CONNECT_DELAY
 
 
 class TestCongUREBase(unittest.TestCase):
@@ -25,6 +28,7 @@ class TestCongUREBase(unittest.TestCase):
     def setUpClass(cls):
         cls.ctrl = RIOTCtrl()
         cls.ctrl.reset()
+        time.sleep(MAKE_TERM_CONNECT_DELAY)
         cls.ctrl.start_term()
         if cls.DEBUG:
             cls.ctrl.term.logfile = sys.stdout
