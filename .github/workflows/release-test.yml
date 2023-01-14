@@ -179,7 +179,7 @@ jobs:
       id: generate_results
       run: |
         if [ "${{ steps.tests.conclusion }}" == "success" ]; then
-          nice_str=echo "&#x2705; **PASSED**"
+          nice_str="&#x2705; **PASSED**"
         elif [ "${{ steps.tests.conclusion }}" == "failure" ]; then
           nice_str="&#x274C; **FAILED**"
         fi
