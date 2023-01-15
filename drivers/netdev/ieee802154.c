@@ -19,12 +19,14 @@
 #include <string.h>
 #include <stdbool.h>
 
+#include "macros/utils.h"
 #include "net/eui64.h"
 #include "net/ieee802154.h"
 #include "net/netdev.h"
 #include "random.h"
 
 #include "net/netdev/ieee802154.h"
+#include "net/ieee802154_security.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -172,6 +174,33 @@ int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
             res = sizeof(l2filter_t **);
             break;
 #endif
+        case NETOPT_PDU_SIZE:
+            assert(max_len >= sizeof(int16_t));
+
+            uint16_t context = *((uint16_t *)value);
+
+            uint8_t src_len, dst_len, flags;
+            netopt_pdu_size_ctx_unpack(context, &src_len, &dst_len, &flags);
+
+            uint8_t ieee802154_hdr_len = 2 + 1 /* frame_contol, seq_no */
+                                       + 2     /* dst_pan */
+                                       + (dst_len ? dst_len : 2) /* bcast is 0xffff */
+                                       + 0     /* src_pan, only set when != dst_pan */
+                                       + MAX(1, src_len); /* src_len or IEEE802154_FCF_SRC_ADDR_VOID */
+
+            if (IS_USED(MODULE_IEEE802154_SECURITY) &&
+                (flags & NETDEV_IEEE802154_SECURITY_EN)) {
+                ieee802154_hdr_len += IEEE802154_SEC_MAX_AUX_HDR_LEN;
+            }
+
+            DEBUG("ieee802154_hdr_len = %u\n", ieee802154_hdr_len);
+
+            *((uint16_t *)value) = _get_ieee802154_pdu(dev)
+                                 - ieee802154_hdr_len
+                                 - IEEE802154_FCS_LEN;
+
+            res = sizeof(uint16_t);
+            break;
         case NETOPT_MAX_PDU_SIZE:
             assert(max_len >= sizeof(int16_t));
 

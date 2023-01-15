@@ -25,6 +25,8 @@
 #ifndef NET_NETOPT_H
 #define NET_NETOPT_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -867,6 +869,42 @@ typedef enum {
                                  *   not listening to packets. */
     /* add other states if needed */
 } netopt_state_t;
+
+/**
+ * @brief   Prepare context value for NETOPT_PDU_SIZE
+ *
+ * @param[in] src_len   length of the l2 src address
+ * @param[in] dst_len   length of the l2 dst address
+ * @param[in] flags     l2 flags
+ *
+ * @return context for NETOPT_PDU_SIZE - needs to be passed in value pointer
+ */
+static inline uint16_t netopt_pdu_size_ctx_pack(uint8_t src_len, uint8_t dst_len, uint8_t flags)
+{
+    uint16_t out = 0;
+
+    out |= src_len & 0xF;
+    out |= (dst_len & 0xF) << 4;
+    out |= flags << 8;
+
+    return out;
+}
+
+/**
+ * @brief   Parse context value of NETOPT_PDU_SIZE
+ *
+ * @param[in]  ctx      context that was passwd via the value pointer
+ * @param[out] src_len  length of the l2 src address
+ * @param[out] dst_len  length of the l2 dst address
+ * @param[out] flags    l2 flags
+ */
+static inline void netopt_pdu_size_ctx_unpack(uint16_t ctx, uint8_t *src_len,
+                                              uint8_t *dst_len, uint8_t *flags)
+{
+    *src_len = ctx & 0xF;
+    *dst_len = (ctx & 0xF0) >> 4;
+    *flags = ctx >> 8;
+}
 
 /**
  * @brief   Option parameter to be used with @ref NETOPT_RF_TESTMODE
