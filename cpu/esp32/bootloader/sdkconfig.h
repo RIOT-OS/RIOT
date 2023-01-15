@@ -91,7 +91,7 @@ extern "C" {
  * If custom TX and RX are defined, use custom UART configuration for 2nd stage
  * bootloader.
  */
-#if defined(CONFIG_CONSOLE_UART_RX) && defined(CONFIG_CONSOLE_UART_RX)
+#if defined(CONFIG_CONSOLE_UART_TX) && defined(CONFIG_CONSOLE_UART_RX)
 #define CONFIG_ESP_CONSOLE_UART_CUSTOM      1
 #define CONFIG_ESP_CONSOLE_UART_TX_GPIO     CONFIG_CONSOLE_UART_TX
 #define CONFIG_ESP_CONSOLE_UART_RX_GPIO     CONFIG_CONSOLE_UART_RX
