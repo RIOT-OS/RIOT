@@ -70,8 +70,8 @@ else
 endif
 
 # Configure riotboot bootloader and slot lengths
-# 4KB are currently enough, set it to 16KB if USB-DFU is used
-ifneq (,$(filter usbus_dfu,$(USEMODULE)))
+# 4KB are currently enough, set it to 16KB if USB-DFU or tinyUSB DFU is used
+ifneq (,$(filter usbus_dfu tinyusb_dfu,$(USEMODULE)))
   RIOTBOOT_LEN ?= 0x4000
 else
   RIOTBOOT_LEN ?= 0x1000

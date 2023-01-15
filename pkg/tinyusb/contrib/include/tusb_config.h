@@ -75,7 +75,7 @@
 #endif
 
 #ifndef CONFIG_TUSBD_DFU_RT_NUMOF
-#if MODULE_TINYUSB_DEVICE && MODULE_TINYUSB_CLASS_DFU_RT
+#if MODULE_TINYUSB_DEVICE && MODULE_TINYUSB_CLASS_DFU_RUNTIME
 #define CONFIG_TUSBD_DFU_RT_NUMOF   1
 #else
 #define CONFIG_TUSBD_DFU_RT_NUMOF   0
@@ -186,10 +186,6 @@
 #endif
 #endif
 
-#ifndef CONFIG_TUSBD_CDC_NOTIF_EP_SIZE
-#define CONFIG_TUSBD_CDC_NOTIF_EP_SIZE      8
-#endif
-
 #ifndef CONFIG_TUSBD_EP0_SIZE
 #define CONFIG_TUSBD_EP0_SIZE               64
 #endif
@@ -202,12 +198,58 @@
 #define CONFIG_TUSBD_HS_EP_SIZE             512
 #endif
 
+#ifndef CONFIG_TUSBD_CDC_NOTIF_EP_SIZE
+#define CONFIG_TUSBD_CDC_NOTIF_EP_SIZE      8
+#endif
+
 #ifndef CONFIG_TUSBD_CDC_FS_EP_SIZE
 #define CONFIG_TUSBD_CDC_FS_EP_SIZE         CONFIG_TUSBD_FS_EP_SIZE
 #endif
 
 #ifndef CONFIG_TUSBD_CDC_HS_EP_SIZE
 #define CONFIG_TUSBD_CDC_HS_EP_SIZE         CONFIG_TUSBD_HS_EP_SIZE
+#endif
+
+#ifndef CONFIG_TUSBD_DFU_ATTR
+#define CONFIG_TUSBD_DFU_ATTR               (DFU_ATTR_CAN_DOWNLOAD | \
+                                             DFU_ATTR_WILL_DETACH | \
+                                             DFU_ATTR_MANIFESTATION_TOLERANT)
+#endif
+
+#ifndef CONFIG_TUSBD_DFU_DETACH_TIMEOUT
+#define CONFIG_TUSBD_DFU_DETACH_TIMEOUT     1000
+#endif
+
+#ifndef CONFIG_TUSBD_DFU_POLL_TIMEOUT
+#define CONFIG_TUSBD_DFU_POLL_TIMEOUT       1
+#endif
+
+#ifndef CONFIG_TUSBD_DFU_RESET_DELAY
+#define CONFIG_TUSBD_DFU_RESET_DELAY        2
+#endif
+
+#ifndef CONFIG_TUSBD_DFU_FS_XFER_SIZE
+#define CONFIG_TUSBD_DFU_FS_XFER_SIZE       CONFIG_TUSBD_FS_EP_SIZE
+#endif
+
+#ifndef CONFIG_TUSBD_DFU_HS_XFER_SIZE
+#define CONFIG_TUSBD_DFU_HS_XFER_SIZE       CONFIG_TUSBD_HS_EP_SIZE
+#endif
+
+#ifndef CONFIG_TUSBD_HID_EP_SIZE
+#define CONFIG_TUSBD_HID_EP_SIZE            CONFIG_TUSBD_FS_EP_SIZE
+#endif
+
+#ifndef CONFIG_TUSBD_DFU_RT_DETACH_TIMEOUT
+#define CONFIG_TUSBD_DFU_RT_DETACH_TIMEOUT  1000
+#endif
+
+#ifndef CONFIG_TUSBD_DFU_RT_FS_XFER_SIZE
+#define CONFIG_TUSBD_DFU_RT_FS_XFER_SIZE    CONFIG_TUSBD_FS_EP_SIZE
+#endif
+
+#ifndef CONFIG_TUSBD_DFU_RT_HS_XFER_SIZE
+#define CONFIG_TUSBD_DFU_RT_HS_XFER_SIZE    CONFIG_TUSBD_HS_EP_SIZE
 #endif
 
 #ifndef CONFIG_TUSBD_HID_EP_SIZE
@@ -263,7 +305,9 @@
 #define CFG_TUSB_OS                 OPT_OS_CUSTOM
 
 /** Debug log level */
+#ifndef CFG_TUSB_DEBUG
 #define CFG_TUSB_DEBUG              0
+#endif
 
 /**
  * @brief DMA memory section and alignment
@@ -337,8 +381,8 @@
  * @name Typical required DFU device class configurations
  * @{
  */
-#define CFG_TUD_DFU_XFER_BUFSIZE    (TUD_OPT_HIGH_SPEED ? CONFIG_TUSBD_HS_EP_SIZE \
-                                                        : CONFIG_TUSBD_FS_EP_SIZE)
+#define CFG_TUD_DFU_XFER_BUFSIZE    (TUD_OPT_HIGH_SPEED ? CONFIG_TUSBD_DFU_HS_XFER_SIZE \
+                                                        : CONFIG_TUSBD_DFU_FS_XFER_SIZE)
 /** @} */
 
 /**

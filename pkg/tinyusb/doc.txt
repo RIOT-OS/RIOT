@@ -92,6 +92,7 @@
  * callbacks for any combination of
  * - up to two interfaces of the class CDC ACM,
  * - up to two interfaces of the Generic In/Out HID class,
+ * - up to one DFU interface
  * - up to one MSC device interface and,
  * - up to one interface of the Vendor device class.
  *

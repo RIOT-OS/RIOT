@@ -8,10 +8,26 @@ USEMODULE += tinyusb_hw
 
 DEFAULT_MODULE += auto_init_tinyusb
 
+ifneq (,$(filter riotboot_tinyusb_dfu, $(USEMODULE)))
+  FEATURES_REQUIRED += no_idle_thread
+  FEATURES_REQUIRED += periph_pm
+  USEMODULE += riotboot_flashwrite
+  USEMODULE += tinyusb_dfu
+  USEMODULE += ztimer_sec
+endif
+
 ifneq (,$(filter stdio_tinyusb_cdc_acm, $(USEMODULE)))
   USEMODULE += stdio_available
   USEMODULE += tinyusb_class_cdc
   USEMODULE += tinyusb_device
+endif
+
+ifneq (,$(filter tinyusb_dfu,$(USEMODULE)))
+  ifneq (,$(filter riotboot_tinyusb_dfu,$(USEMODULE)))
+    USEMODULE += tinyusb_class_dfu
+  else
+    USEMODULE += tinyusb_class_dfu_runtime
+  endif
 endif
 
 ifeq (,$(filter tinyusb_class_%,$(USEMODULE)))
@@ -30,31 +46,31 @@ endif
 
 # Following device classes work only with tinyUSB device stack
 ifneq (,$(filter tinyusb_class_audio,$(USEMODULE)))
-  FEATURES_REQUIRED += tinyusb_device
+  USEMODULE += tinyusb_device
 endif
 ifneq (,$(filter tinyusb_class_bth,$(USEMODULE)))
-  FEATURES_REQUIRED += tinyusb_device
+  USEMODULE += tinyusb_device
 endif
 ifneq (,$(filter tinyusb_class_dfu,$(USEMODULE)))
-  FEATURES_REQUIRED += tinyusb_device
+  USEMODULE += tinyusb_device
 endif
 ifneq (,$(filter tinyusb_class_dfu_runtime,$(USEMODULE)))
-  FEATURES_REQUIRED += tinyusb_device
+  USEMODULE += tinyusb_device
 endif
 ifneq (,$(filter tinyusb_class_midi,$(USEMODULE)))
-  FEATURES_REQUIRED += tinyusb_device
+  USEMODULE += tinyusb_device
 endif
 ifneq (,$(filter tinyusb_class_net_ecm_rndis,$(USEMODULE)))
-  FEATURES_REQUIRED += tinyusb_device
+  USEMODULE += tinyusb_device
 endif
 ifneq (,$(filter tinyusb_class_net_ncm,$(USEMODULE)))
-  FEATURES_REQUIRED += tinyusb_device
+  USEMODULE += tinyusb_device
 endif
 ifneq (,$(filter tinyusb_class_usbtmc,$(USEMODULE)))
-  FEATURES_REQUIRED += tinyusb_device
+  USEMODULE += tinyusb_device
 endif
 ifneq (,$(filter tinyusb_class_video,$(USEMODULE)))
-  FEATURES_REQUIRED += tinyusb_device
+  USEMODULE += tinyusb_device
 endif
 
 # tinyUSB hardware driver selection

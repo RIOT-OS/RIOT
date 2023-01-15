@@ -20,6 +20,14 @@ bottom of this file.
 
 [security-gpg]: https://riot-os.org/assets/keys/security.asc
 
+### Classification of a vulnerability
+
+Unless the reporter explicitly requests not to do so,
+the RIOT security maintainers may declassify an issue
+if the issue is not deemed critical --
+for example when it requires an unlikely combination of circumstances and/or configuration options,
+or when it can only be exploited by a user who gains no additional privileges.
+
 ## Notification of a Vulnerability
 
 After a fix is provided the security issue will be privately disclosed to the

@@ -19,7 +19,7 @@
 
 #include "periph_conf.h"
 #include "periph/gpio.h"
-#include "periph/pm.h"
+#include "pm_layered.h"
 
 #include "tusb.h"
 #include "device/usbd.h"

@@ -869,6 +869,10 @@ ifneq (,$(filter riotboot_usb_dfu, $(USEMODULE)))
   FEATURES_REQUIRED += periph_pm
 endif
 
+ifneq (,$(filter riotboot_tinyusb_dfu, $(USEMODULE)))
+  USEPKG += tinyusb
+endif
+
 ifneq (,$(filter irq_handler,$(USEMODULE)))
   USEMODULE += event
 endif

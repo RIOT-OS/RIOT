@@ -84,6 +84,10 @@ ifneq (,$(filter tinydtls_sock_dtls, $(USEMODULE)))
     USEPKG += tinydtls
 endif
 
+ifneq (,$(filter tinyusb_%, $(USEMODULE)))
+  USEPKG += tinyusb
+endif
+
 # always select gpio (until explicit dependencies are sorted out)
 FEATURES_OPTIONAL += periph_gpio
 

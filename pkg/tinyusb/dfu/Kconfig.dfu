@@ -1,0 +1,50 @@
+# Copyright (c) 2022 Gunar Schorcht
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_TINYUSB_CLASS_DFU
+    bool "Device Firmware Update (DFU)"
+    depends on MODULE_TINYUSB_DEVICE && MODULE_TINYUSB_DFU && MODULE_RIOTBOOT_TINYUSB_DFU
+
+if MODULE_TINYUSB_CLASS_DFU
+
+config TUSBD_DFU_NUMOF
+    int
+    default 1
+
+config TUSBD_DFU_FS_XFER_SIZE
+    int "DFU Full-Speed transfer size [byte]"
+    default 64
+
+config TUSBD_DFU_HS_XFER_SIZE
+    int "DFU High-Speed transfer size [byte]"
+    default 512
+
+config TUSBD_DFU_ALT_NUMOF
+    int
+    default 2
+    help
+        Number of alternative DFU firmware slots.
+
+config TUSBD_DFU_DETACH_TIMEOUT
+    int "DFU detach timeout [ms]"
+    default 1000
+
+config TUSBD_DFU_POLL_TIMEOUT
+    int "DFU poll timeout [ms]"
+    default 1
+    help
+        DFU Poll Timeout is the time before the host requests the status
+        from the device during a firmware download or manifestation operation.
+
+config TUSBD_DFU_RESET_DELAY
+    int "DFU reset delay [s]"
+    default 2
+    help
+        DFU reset delay is the time before the device is restarted after
+        a firmware download.
+
+endif # MODULE_TINYUSB_CLASS_DFU

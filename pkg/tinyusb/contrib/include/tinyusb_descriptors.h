@@ -41,6 +41,12 @@ enum {
     TUSBD_ITF_CDC_1,        /**< CDC1 Notification interface */
     TUSBD_ITF_CDC_1_DATA,   /**< CDC1 Data interface */
 #endif
+#if CONFIG_TUSBD_DFU_NUMOF
+    TUSBD_ITF_DFU,          /**< DFU interface */
+#endif
+#if CONFIG_TUSBD_DFU_RT_NUMOF
+    TUSBD_ITF_DFU_RT,       /**< DFU Runtime interface */
+#endif
 #if CONFIG_TUSBD_HID_NUMOF > 0
     TUSBD_ITF_HID_0,        /**< HID0 interface */
 #endif
@@ -101,6 +107,13 @@ enum {
 #if CONFIG_TUSBD_CDC_NUMOF > 1
     TUSBD_STR_IDX_CDC_1,
 #endif
+#if CONFIG_TUSBD_DFU_NUMOF
+    TUSBD_STR_IDX_DFU_SLOT_0,
+    TUSBD_STR_IDX_DFU_SLOT_1,
+#endif
+#if CONFIG_TUSBD_DFU_RT_NUMOF
+    TUSBD_STR_IDX_DFU_RT,
+#endif
 #if CONFIG_TUSBD_HID_NUMOF > 0
     TUSBD_STR_IDX_HID_0,
 #endif
@@ -117,9 +130,14 @@ enum {
 };
 #endif /* !defined(HAVE_TUSBD_STR_IDX_TYPE) */
 
+/* only two slots are supported */
+#define CONFIG_TUSBD_DFU_ALT_NUMOF  2
+
 #if !defined(TUSBD_DESC_TOTAL_LEN)
 #define TUSBD_DESC_TOTAL_LEN (TUD_CONFIG_DESC_LEN + \
                               (CONFIG_TUSBD_CDC_NUMOF * TUD_CDC_DESC_LEN) + \
+                              (CONFIG_TUSBD_DFU_NUMOF * TUD_DFU_DESC_LEN(CONFIG_TUSBD_DFU_ALT_NUMOF)) + \
+                              (CONFIG_TUSBD_DFU_RT_NUMOF * TUD_DFU_RT_DESC_LEN) + \
                               (CONFIG_TUSBD_HID_NUMOF * TUD_HID_INOUT_DESC_LEN) + \
                               (CONFIG_TUSBD_MSC_NUMOF * TUD_MSC_DESC_LEN) + \
                               (CONFIG_TUSBD_VENDOR_NUMOF * TUD_VENDOR_DESC_LEN))
@@ -127,6 +145,8 @@ enum {
 
 #define TUSBD_DESC_ALT_TOTAL_LEN (TUD_CONFIG_DESC_LEN + \
                                  (CONFIG_TUSBD_CDC_NUMOF * TUD_CDC_DESC_LEN) + \
+                                 (CONFIG_TUSBD_DFU_NUMOF * TUD_DFU_DESC_LEN(CONFIG_TUSBD_DFU_ALT_NUMOF)) + \
+                                 (CONFIG_TUSBD_DFU_RT_NUMOF * TUD_DFU_RT_DESC_LEN) + \
                                  (CONFIG_TUSBD_HID_NUMOF * TUD_HID_INOUT_DESC_LEN) + \
                                  (CONFIG_TUSBD_MSC_NUMOF * TUD_MSC_DESC_LEN) + \
                                  (CONFIG_TUSBD_VENDOR_NUMOF * TUD_VENDOR_DESC_LEN))

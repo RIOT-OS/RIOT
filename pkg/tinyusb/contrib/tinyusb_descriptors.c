@@ -30,6 +30,10 @@
 #include "tusb.h"
 #include "usb.h"
 
+#ifdef MODULE_TINYUSB_DFU
+#include "riotboot/usb_dfu.h"
+#endif
+
 #include "tinyusb_descriptors.h"
 
 #define ENABLE_DEBUG    0
@@ -40,16 +44,17 @@
 
 #if (MODULE_TINYUSB_CLASS_AUDIO || \
      MODULE_TINYUSB_CLASS_BTH || \
-     MODULE_TINYUSB_CLASS_DFU || \
-     MODULE_TINYUSB_CLASS_DFU_RUNTIME || \
      MODULE_TINYUSB_CLASS_MIDI || \
      MODULE_TINYUSB_CLASS_NET_ECM_RNDIS || \
      MODULE_TINYUSB_CLASS_NET_NCM || \
      MODULE_TINYUSB_CLASS_USBTMC || \
      MODULE_TINYUSB_CLASS_VIDEO || \
      (CONFIG_TUSBD_CDC_NUMOF > 2) || \
+     (CONFIG_TUSBD_DFU_NUMOF > 1) || \
+     (CONFIG_TUSBD_DFU_RT_NUMOF > 1) || \
      (CONFIG_TUSBD_HID_NUMOF > 2) || \
-     (CONFIG_TUSBD_MSC_NUMOF > 1))
+     (CONFIG_TUSBD_MSC_NUMOF > 1) || \
+     (CONFIG_TUSBD_VENDOR_NUMOF > 1))
 #error Using generic descriptors is not possible for the selected combination \
        of device class interfaces. Custom descriptors have to be implemented.
 #endif
@@ -226,6 +231,24 @@ void tud_hid_set_report_cb(uint8_t itf, uint8_t report_id,
                        speed ? CONFIG_TUSBD_CDC_HS_EP_SIZE \
                              : CONFIG_TUSBD_CDC_FS_EP_SIZE)
 
+#define _TUD_DFU_DESC(speed) \
+    /* Interface number, alternate count, starting string index, attributes,
+     * detach timeout, transfer size */ \
+    TUD_DFU_DESCRIPTOR(TUSBD_ITF_DFU, CONFIG_TUSBD_DFU_ALT_NUMOF, \
+                       TUSBD_STR_IDX_DFU_SLOT_0, CONFIG_TUSBD_DFU_ATTR, \
+                       CONFIG_TUSBD_DFU_DETACH_TIMEOUT, \
+                       speed ? CONFIG_TUSBD_DFU_HS_XFER_SIZE \
+                             : CONFIG_TUSBD_DFU_FS_XFER_SIZE)
+
+#define _TUD_DFU_RT_DESC(speed) \
+    /* Interface number, alternate count, starting string index, attributes,
+     * detach timeout, transfer size */ \
+    TUD_DFU_RT_DESCRIPTOR(TUSBD_ITF_DFU_RT, \
+                          TUSBD_STR_IDX_DFU_RT, DFU_ATTR_WILL_DETACH, \
+                          CONFIG_TUSBD_DFU_RT_DETACH_TIMEOUT, \
+                          speed ? CONFIG_TUSBD_DFU_RT_HS_XFER_SIZE \
+                                : CONFIG_TUSBD_DFU_RT_FS_XFER_SIZE)
+
 #define _TUD_HID_INOUT_DESC(speed, n) \
     /* Interface number, string index, protocol, report descriptor len,
      * EP Out & EP In address, EP size, polling interval */ \
@@ -260,6 +283,12 @@ uint8_t const tusb_desc_fs_config[] = {
 #if CONFIG_TUSBD_CDC_NUMOF > 1
     _TUD_CDC_DESC(_tusb_speed_fs, 1),
 #endif
+#if CONFIG_TUSBD_DFU_NUMOF
+    _TUD_DFU_DESC(_tusb_speed_fs),
+#endif
+#if CONFIG_TUSBD_DFU_RT_NUMOF
+    _TUD_DFU_RT_DESC(_tusb_speed_fs),
+#endif
 #if CONFIG_TUSBD_HID_NUMOF > 0
     _TUD_HID_INOUT_DESC(_tusb_speed_fs, 0),
 #endif
@@ -283,6 +312,12 @@ uint8_t const tusb_desc_fs_config_alt[] = {
 #endif
 #if CONFIG_TUSBD_CDC_NUMOF > 1
     _TUD_CDC_DESC(_tusb_speed_fs, 1),
+#endif
+#if CONFIG_TUSBD_DFU_NUMOF
+    _TUD_DFU_DESC(_tusb_speed_fs),
+#endif
+#if CONFIG_TUSBD_DFU_RT_NUMOF
+    _TUD_DFU_RT_DESC(_tusb_speed_fs),
 #endif
 #if CONFIG_TUSBD_HID_NUMOF > 0
     _TUD_HID_INOUT_DESC(_tusb_speed_fs, 0),
@@ -313,6 +348,12 @@ uint8_t const tusb_desc_hs_config[] = {
 #if CONFIG_TUSBD_CDC_NUMOF > 1
     _TUD_CDC_DESC(_tusb_speed_hs, 1),
 #endif
+#if CONFIG_TUSBD_DFU
+    _TUD_DFU_DESC(_tusb_speed_hs),
+#endif
+#if CONFIG_TUSBD_DFU_RT_NUMOF
+    _TUD_DFU_RT_DESC(_tusb_speed_hs),
+#endif
 #if CONFIG_TUSBD_HID_NUMOF > 0
     _TUD_HID_INOUT_DESC(_tusb_speed_hs, 0),
 #endif
@@ -336,6 +377,12 @@ uint8_t const tusb_desc_hs_config_alt[] = {
 #endif
 #if CONFIG_TUSBD_CDC_NUMOF > 1
     _TUD_CDC_DESC(_tusb_speed_hs, 1),
+#endif
+#if CONFIG_TUSBD_DFU
+    _TUD_DFU_DESC(_tusb_speed_hs),
+#endif
+#if CONFIG_TUSBD_DFU_RT_NUMOF
+    _TUD_DFU_RT_DESC(_tusb_speed_hs),
 #endif
 #if CONFIG_TUSBD_HID_NUMOF > 0
     _TUD_HID_INOUT_DESC(_tusb_speed_hs, 0),
@@ -488,6 +535,18 @@ uint8_t const *tud_descriptor_configuration_cb(uint8_t index)
 #define CONFIG_TUSBD_CDC_1_STRING    "TinyUSB CDC1"
 #endif
 
+#ifndef CONFIG_TUSBD_DFU_0_STRING
+#define CONFIG_TUSBD_DFU_0_STRING    USB_DFU_MODE_SLOT0_NAME
+#endif
+
+#ifndef CONFIG_TUSBD_DFU_1_STRING
+#define CONFIG_TUSBD_DFU_1_STRING    USB_DFU_MODE_SLOT1_NAME
+#endif
+
+#ifndef CONFIG_TUSBD_DFU_RT_STRING
+#define CONFIG_TUSBD_DFU_RT_STRING   USB_APP_MODE_SLOT_NAME
+#endif
+
 #ifndef CONFIG_TUSBD_HID_0_STRING
 #define CONFIG_TUSBD_HID_0_STRING    "TinyUSB HID0 (Generic In/Out)"
 #endif
@@ -523,6 +582,13 @@ char const* tusb_string_desc_array[] = {
 #endif
 #if CONFIG_TUSBD_CDC_NUMOF > 1
     CONFIG_TUSBD_CDC_1_STRING,      /* CDC Interface 1 */
+#endif
+#if CONFIG_TUSBD_DFU_NUMOF
+    CONFIG_TUSBD_DFU_0_STRING,      /* DFU Firmware Slot 0 */
+    CONFIG_TUSBD_DFU_1_STRING,      /* DFU Firmware Slot 1 */
+#endif
+#if CONFIG_TUSBD_DFU_RT_NUMOF
+    CONFIG_TUSBD_DFU_RT_STRING,     /* APP mode */
 #endif
 #if CONFIG_TUSBD_HID_NUMOF > 0
     CONFIG_TUSBD_HID_0_STRING,      /* HID Interface 0 */
