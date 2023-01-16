@@ -21,6 +21,7 @@ USEMODULE += shell_cmds_default
 
 # enable the fileserver module
 USEMODULE += gcoap_fileserver
+USEMODULE += gcoap_fileserver_callback
 USEMODULE += gcoap_fileserver_delete
 USEMODULE += gcoap_fileserver_put
 
