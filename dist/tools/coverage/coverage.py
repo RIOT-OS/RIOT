@@ -28,10 +28,10 @@ def retrieve_data(input_file):
     reached_end = False
     with get_input_stream(input_file) as fp:
         for line in fp.readlines():
-            if re.search("GCOV_COVERAGE_DUMP_START", line):
+            if re.search("^GCOV_COVERAGE_DUMP_START$", line):
                 capture_data = True
                 continue
-            if re.search("GCOV_COVERAGE_DUMP_END", line):
+            if re.search("^GCOV_COVERAGE_DUMP_END$", line):
                 reached_end = True
                 break
             # Loop until the coverage data is found.
