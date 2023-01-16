@@ -74,7 +74,6 @@ void pm_set_lowest(void)
     irq_restore(state);
 }
 
-__attribute__((optimize(3)))
 void pm_block(unsigned mode)
 {
     DEBUG("[pm_layered] pm_block(%d)\n", mode);
@@ -85,7 +84,6 @@ void pm_block(unsigned mode)
     irq_restore(state);
 }
 
-__attribute__((optimize(3)))
 void pm_unblock(unsigned mode)
 {
     DEBUG("[pm_layered] pm_unblock(%d)\n", mode);

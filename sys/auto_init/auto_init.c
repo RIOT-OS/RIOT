@@ -332,6 +332,11 @@ extern void auto_init_sock_dns(void);
 AUTO_INIT(auto_init_sock_dns,
           AUTO_INIT_PRIO_MOD_DOCK_DNS);
 #endif
+#if IS_USED(MODULE_GNRC_IPV6_STATIC_ADDR)
+extern void auto_init_gnrc_ipv6_static_addr(void);
+AUTO_INIT(auto_init_gnrc_ipv6_static_addr,
+          AUTO_INIT_PRIO_MOD_GNRC_IPV6_STATIC_ADDR);
+#endif
 
 void auto_init(void)
 {

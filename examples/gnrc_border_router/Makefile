@@ -50,8 +50,8 @@ else
 endif
 
 # Check if the selected method for prefix configuration is valid
-ifeq (,$(filter dhcpv6 uhcp auto_subnets,$(PREFIX_CONF)))
-  $(error Supported methods for prefix configuration are `dhcpv6`, `uhcp` and `auto_subnets`)
+ifeq (,$(filter dhcpv6 uhcp auto_subnets static,$(PREFIX_CONF)))
+  $(error Supported methods for prefix configuration are `dhcpv6`, `uhcp` `static` and `auto_subnets`)
 endif
 
 ifeq (dhcpv6,$(PREFIX_CONF))
@@ -62,6 +62,10 @@ else ifeq (uhcp,$(PREFIX_CONF))
   USEMODULE += gnrc_uhcpc
 else ifeq (auto_subnets,$(PREFIX_CONF))
   USEMODULE += gnrc_ipv6_auto_subnets_simple
+else ifeq (static,$(PREFIX_CONF))
+  IPV6_ADDR ?= 2001:db8:1::1
+  IPV6_DEFAULT_ROUTER ?= fe80::1
+  USEMODULE += gnrc_ipv6_static_addr
 endif
 
 # Comment this out to disable code in RIOT that does safety checking
@@ -125,6 +129,16 @@ ifeq (dhcpv6,$(PREFIX_CONF))
       # for `fe80::2`.
       CFLAGS += -DCONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF=3
     endif
+  endif
+else ifeq (static,$(PREFIX_CONF))
+  ifndef CONFIG_GNRC_IPV6_STATIC_ADDR
+    CFLAGS += -DCONFIG_GNRC_IPV6_STATIC_ADDR=\"$(IPV6_ADDR)\"
+  endif
+  ifndef CONFIG_GNRC_IPV6_STATIC_PREFIX
+    CFLAGS += -DCONFIG_GNRC_IPV6_STATIC_PREFIX=\"$(IPV6_PREFIX)\"
+  endif
+  ifndef CONFIG_GNRC_IPV6_STATIC_DEFAULT_ROUTER
+    CFLAGS += -DCONFIG_GNRC_IPV6_STATIC_DEFAULT_ROUTER=\"$(IPV6_DEFAULT_ROUTER)\"
   endif
 endif
 
