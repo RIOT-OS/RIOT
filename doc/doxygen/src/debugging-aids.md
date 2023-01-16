@@ -1,5 +1,33 @@
 # Debugging Tools {#debugging-tools}
 
+## Coverage
+
+When writing new test cases or updating existing ones it can be useful
+to estimate the achieved coverage.
+
+### Overview
+
+The `sys/coverage` module can be used to collect coverage information
+directly on the microcontroller. When the `main` thread terminates,
+this information is dumped on the UART and can be extracted using a
+Python script. The tooling for doing so has been initially imported from
+the [Zephyr][zephyr coverage] operating system.
+
+### How to use
+
+1. Add `USEMODULE += coverage` to your application `Makefile`.
+
+2. Flash the application to your board.
+
+3. Ideally wait a few seconds (to ensure we don't start reading from the
+   UART in the middle of a coverage dump) and run `make coverage` and
+   reset the board. This will generate Gcov `.gcda` files automatically.
+   This may take a few seconds, `make coverage` will terminate when it is done.
+
+4. Usage a Gcov frontend to generate a visualization (e.g. HTML) from the `.gcda` files.
+   For example, [gcovr][gcovr web]:
+   `gcovr -r . --gcov-executable ${TRIPLET}-gcov --html -o coverage.html --html-details`
+
 ## Undefined Behavior Sanitizer (ubsan) {#ubsan}
 
 RIOT contains makefile convenience support for gcc/clang's undefined
@@ -46,3 +74,6 @@ The default is `trap`, or `msg_exit` if available (currently, on native:gnu only
 
 2. build with `UBSAN_MODE=[trap|msg_exit|msg_recover] make all-ubsan` to
    override the ubsan mode.
+
+[zephyr coverage]: https://docs.zephyrproject.org/latest/develop/test/coverage.html
+[gcovr web]: https://gcovr.com/en/stable/
