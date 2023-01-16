@@ -1,5 +1,5 @@
 include ../Makefile.fuzzing_common
 
-USEMODULE += gcoap
+USEMODULE += uri_parser
 
 include $(RIOTBASE)/Makefile.include

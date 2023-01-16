@@ -294,6 +294,11 @@ int gcoap_cli_cmd(int argc, char **argv)
             uri_len = strlen(argv[apos+1]);
         }
 
+        if (uri && ((uri_len <= 0) || (uri[0] != '/'))) {
+            puts("ERROR: URI-Path must start with a \"/\"");
+            return _print_usage(argv);
+        }
+
         if (_proxied) {
             sock_udp_ep_t tmp_remote;
             if (sock_udp_name2ep(&tmp_remote, argv[apos]) != 0) {
@@ -329,7 +334,7 @@ int gcoap_cli_cmd(int argc, char **argv)
 
             gcoap_req_init(&pdu, &buf[0], CONFIG_GCOAP_PDU_BUF_SIZE, code_pos, NULL);
         }
-        else{
+        else {
             gcoap_req_init(&pdu, &buf[0], CONFIG_GCOAP_PDU_BUF_SIZE, code_pos, uri);
         }
         coap_hdr_set_type(pdu.hdr, msg_type);
