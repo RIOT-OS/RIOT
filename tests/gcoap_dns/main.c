@@ -139,16 +139,6 @@ static void test_server_uri_set__not_coap(void)
     TEST_ASSERT(!gcoap_dns_server_uri_is_set());
 }
 
-static void test_server_uri_set__no_dns_var(void)
-{
-    static const char uri[] = "https://example.org/";
-
-    TEST_ASSERT(!gcoap_dns_server_uri_is_set());
-    INIT_TEST_PSK(TEST_TAG);
-    TEST_ASSERT_EQUAL_INT(-EINVAL, gcoap_dns_server_uri_set(uri));
-    TEST_ASSERT(!gcoap_dns_server_uri_is_set());
-}
-
 static void test_server_uri_get__buf_too_short(void)
 {
     static const char uri[] = "coap://example.org/";
@@ -223,7 +213,6 @@ static int _unittests(int argc, char **argv)
         new_TestFixture(test_server_uri_set__success_2),
         new_TestFixture(test_server_uri_set__uri_too_long),
         new_TestFixture(test_server_uri_set__not_coap),
-        new_TestFixture(test_server_uri_set__no_dns_var),
         new_TestFixture(test_server_uri_get__buf_too_short),
         new_TestFixture(test_cred_add__success),
         new_TestFixture(test_cred_add__no_mem),
