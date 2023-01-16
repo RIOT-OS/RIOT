@@ -81,35 +81,23 @@ static bool __attribute__((optimize("O0"))) _safe_strcmp(const char* input, cons
 {
     bool the_same = true;
 
-    int input_len = strlen(input);
-    int pwd_len = strlen(pwd);
-
     int input_index = 0;
     int pwd_index = 0;
 
     do {
-        if (input[input_index] != pwd[pwd_index]) {
-            the_same &= false;
-        }
-        else {
-            the_same &= true;
-        }
+        the_same &= input[input_index] == pwd[pwd_index];
 
         /* keep indices at last index of respective string */
-        if (input_index < input_len) {
-            input_index++;
-        }
+        input_index += input[input_index] != '\0';
+        pwd_index += pwd[pwd_index] != '\0';
 
-        if (pwd_index < pwd_len) {
-            pwd_index++;
-        }
+    } while (input[input_index] != '\0' );
 
-    } while (input[input_index] != '\0');
+    /* ensure last char is the same */
+    the_same &= input[input_index] == pwd[pwd_index];
 
-    if (input_len != pwd_len) {
-        /* substring of the password doesn't count */
-        return false;
-    }
+    /* ensure last index is the same */
+    the_same &= input_index == pwd_index;
 
     return the_same;
 }
