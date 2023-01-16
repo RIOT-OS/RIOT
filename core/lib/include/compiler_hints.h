@@ -21,6 +21,8 @@
 #ifndef COMPILER_HINTS_H
 #define COMPILER_HINTS_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -129,6 +131,24 @@ extern "C" {
 #else
 #define IS_CT_CONSTANT(expr) 0
 #endif
+
+/**
+ * @brief   Hint to the compiler that the condition @p x is likely taken
+ *
+ * @param[in] x     Condition that is likely taken
+ *
+ * @return result of @p x
+ */
+#define likely(x)       __builtin_expect((uintptr_t)(x), 1)
+
+/**
+ * @brief   Hint to the compiler that the condition @p x is likely not taken
+ *
+ * @param[in] x     Condition that is unlikely
+ *
+ * @return result of @p x
+ */
+#define unlikely(x)     __builtin_expect((uintptr_t)(x), 0)
 
 #ifdef __cplusplus
 }
