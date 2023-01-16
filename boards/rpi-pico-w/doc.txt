@@ -12,9 +12,10 @@ chip.
 
 ## Hardware
 
-Raspberry Pi Pico W (third from left) and Pico WH (forth from right).
+![Raspberry Pi Pico W](https://www.raspberrypi.com/app/uploads/2022/06/Copy-of-PICO-W-HERO-800x533.jpg)
 
-![Raspberry Pi Pico family](https://www.raspberrypi.com/documentation/microcontrollers/images/four_picos.jpg)
+Raspberry Pi Pico W is provided in two versions - without and with headers,
+the second one is called Pico WH. Detailed photos can be found at [Raspberry Pi Pico family](https://www.raspberrypi.com/documentation/microcontrollers/images/four_picos.jpg).
 
 ### MCU
 
