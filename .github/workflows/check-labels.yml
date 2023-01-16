@@ -1,6 +1,6 @@
 name: check-labels
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, reopened, labeled, unlabeled, synchronize]
   pull_request_review:
     types: [submitted, dismissed]
@@ -8,8 +8,9 @@ jobs:
   check-labels:
     runs-on: ubuntu-latest
     steps:
-    - uses: RIOT-OS/check-labels-action@v1.0.0
+    - uses: RIOT-OS/check-labels-action@v1.1.0
       with:
         access_token: ${{ secrets.GITHUB_TOKEN }}
         unset_labels: 'CI: needs squashing,State: waiting for CI update,State: waiting for other PR,Process: blocked by feature freeze'
         cond_labels: '(Process: needs >1 ACK,review.approvals>1),(Area: RDM,review.approvals>2)'
+        missing_approvals_label: 'Process: missing approvals'
