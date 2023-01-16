@@ -3,7 +3,8 @@
 pr_status = [
  "python-tests",
  "tools-build-success",
- "check-labels",
+# temporarily disabling while testing updated check-labels-action (#19101)
+# "check-labels",
  "static-tests",
  "check-commits (commit-msg)",
  "check-commits (pr_check)",
