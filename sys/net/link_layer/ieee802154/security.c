@@ -408,7 +408,7 @@ void ieee802154_sec_init(ieee802154_sec_context_t *ctx)
 }
 
 int ieee802154_sec_encrypt_frame(ieee802154_sec_context_t *ctx,
-                                 const uint8_t *header, uint8_t *header_size,
+                                 uint8_t *header, uint8_t *header_size,
                                  uint8_t *payload, uint16_t payload_size,
                                  uint8_t *mic, uint8_t *mic_size,
                                  const uint8_t *src_address)
@@ -419,6 +419,7 @@ int ieee802154_sec_encrypt_frame(ieee802154_sec_context_t *ctx,
 
     if (ctx->security_level == IEEE802154_SEC_SCF_SECLEVEL_NONE) {
         *mic_size = 0;
+        header[0] &= ~IEEE802154_FCF_SECURITY_EN;
         return IEEE802154_SEC_OK;
     }
     if (ctx->frame_counter == 0xFFFFFFFF) {

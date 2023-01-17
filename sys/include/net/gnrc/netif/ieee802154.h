@@ -19,6 +19,7 @@
 #define NET_GNRC_NETIF_IEEE802154_H
 
 #include "net/gnrc/netif.h"
+#include "net/gnrc/netif/hdr.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,6 +42,19 @@ extern "C" {
  */
 int gnrc_netif_ieee802154_create(gnrc_netif_t *netif, char *stack, int stacksize,
                                  char priority, const char *name, netdev_t *dev);
+
+/**
+ * @brief   Convert GNRC netif header to an IEEE 802.15.4 header
+ *
+ * @param[out]  mhr     Destination IEEE 802.15.4 header
+ * @param[in]   netif   IEEE 802.15.4 network interface
+ * @param[in]   hdr     GNRC netif header
+ *
+ * @return  IEEE 802.15.4 header on success
+ * @return  negative number on error
+ */
+int gnrc_netif_hdr_to_ieee802154(uint8_t *mhr, const gnrc_netif_t *netif,
+                                 const gnrc_netif_hdr_t *hdr);
 
 #ifdef __cplusplus
 }
