@@ -91,7 +91,7 @@ int matrix_keypad_init(matrix_keypad_t *dev, const matrix_keypad_params_t *param
         (CONFIG_MATRIX_KEYPAD_DEBOUNCE_PATTERN_BEGIN & CONFIG_MATRIX_KEYPAD_DEBOUNCE_PATTERN_END) == 0,
         "Debounce patterns must not overlap");
     memset(dev, 0, sizeof(matrix_keypad_t));
-    memcpy(&dev->params, params, sizeof(matrix_keypad_params_t));
+    dev->params = params;
     dev->callback = callback;
     dev->arg = arg;
     _setup_columns(dev);
