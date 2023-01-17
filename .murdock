@@ -1,9 +1,9 @@
 #!/bin/sh
 
 # uncomment and change this to limit builds, e.g.,
-#export BOARDS="samr21-xpro native"
+export BOARDS="samr21-xpro native"
 # and / or
-#export APPS="examples/hello-world tests/unittests"
+export APPS="examples/hello-world tests/shell"
 
 QUICKBUILD_BOARDS="
 adafruit-itsybitsy-m4
@@ -163,6 +163,7 @@ tests/mtd_mapper
 # and make.  If different, the app will be build and tested with both kconfig
 # and make.
 : ${TEST_KCONFIG_DISSIMILAR_BUILD:="
+tests/shell
 "}
 
 : ${TEST_WITH_CONFIG_SUPPORTED:="examples/suit_update tests/driver_at86rf2xx_aes"}

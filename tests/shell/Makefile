@@ -5,6 +5,8 @@ USEMODULE += app_metadata
 USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += ps
+USEMODULE += fmt
+
 
 # Use a terminal that does not introduce extra characters into the stream.
 RIOT_TERMINAL ?= socat
