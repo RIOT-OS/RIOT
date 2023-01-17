@@ -159,6 +159,12 @@ tests/saul
 tests/mtd_mapper
 "}
 
+# This list will allow apps to have different dep resolutions between kconfig
+# and make.  If different, the app will be build and tested with both kconfig
+# and make.
+: ${TEST_KCONFIG_DISSIMILAR_BUILD:="
+"}
+
 : ${TEST_WITH_CONFIG_SUPPORTED:="examples/suit_update tests/driver_at86rf2xx_aes"}
 
 export RIOT_CI_BUILD=1
@@ -527,6 +533,76 @@ compile() {
 
     should_check_kconfig_hash=0
 
+    # compile without Kconfig
+    BOARD=${board} make -C${appdir} clean
+    CCACHE_BASEDIR="$(pwd)" \
+    BOARD=$board \
+    TOOLCHAIN=$toolchain \
+    RIOT_CI_BUILD=1 \
+    make -C${appdir} all test-input-hash -j${JOBS:-4}
+
+    RES=$?
+
+    # Save make hash for kconfig compare
+    no_kconfig_hashes="$(cat ${BINDIR}/test-input-hash.sha1)"
+
+    # test hash is used to cache test results, not for comparing binaries
+    # generated with and without KConfig
+    test_hash=$(test_hash_calc "$BINDIR")
+
+    # run make based tests
+    if [ $RES -eq 0 ]; then
+        if is_in_list "$board" "$EMULATED_BOARDS_AVAILABLE"; then
+            EMULATED=1
+        else
+            EMULATED=0
+        fi
+
+        if [ $RUN_TESTS -eq 1 -o "$board" = "native" -o "$EMULATED" = "1" ]; then
+            if [ -f "${BINDIR}/.test" ]; then
+                if [ "$board" = "native" -o "${EMULATED}" = "1" ]; then
+                    EMULATE=${EMULATED} \
+                    BOARD=$board \
+                    make -C${appdir} test
+
+                    RES=$?
+
+                elif is_in_list "$board" "$TEST_BOARDS_AVAILABLE"; then
+                    echo "-- test_hash=$test_hash"
+                    if test_cache_get $test_hash && [run_test_with_kconfig -eq 0] ; then
+                        echo "-- skipping test due to positive cache hit"
+                    else
+                        BOARD=$board \
+                        TOOLCHAIN=$toolchain \
+                        TEST_HASH=$test_hash \
+                        make -C${appdir} test-murdock
+
+                        RES=$?
+                    fi
+                fi
+            fi
+        fi
+    fi
+
+    # If make fails then exit
+    if [ ${RES} -ne 0 ]; then
+        # log some build stats
+        if [ -d ${BINDIR} ]
+        then
+            echo "{\"build/\": $(du -s ${BINDIR} | cut -f1)}"
+            # cleanup
+            rm -rf ${BINDIR}
+        fi
+
+        return $RES
+    fi
+
+    expect_dissimilar_build=0
+    if is_in_list "$appdir" "$TEST_KCONFIG_DISSIMILAR_BUILD"; then
+        expect_dissimilar_build=1
+    fi
+
+    # Start evaluating the with kconfig
     if get_supported_kconfig_board_app "${board}" "${appdir}"; then
         should_check_kconfig_hash=1
         # As we have some issues with occasional unrelated hash mismatches
@@ -535,10 +611,15 @@ compile() {
         # Only nightlies will check the hash...
         # Once we figure out the problem we can check the hashes again or
         # better yet just finish!
-        if [ ${NIGHTLY} -eq 1 ]; then
+        if [ ${NIGHTLY} -eq 1 -o ${expect_dissimilar_build} -eq 1 ]; then
             BOARD=${board} make -C${appdir} clean
-            CCACHE_BASEDIR="$(pwd)" BOARD=${board} TOOLCHAIN=${toolchain} RIOT_CI_BUILD=1 TEST_KCONFIG=1 \
-                            make -C${appdir} all test-input-hash -j${JOBS:-4}
+            CCACHE_BASEDIR="$(pwd)" \
+            BOARD=${board} \
+            TOOLCHAIN=${toolchain} \
+            RIOT_CI_BUILD=1 \
+            TEST_KCONFIG=1 \
+            make -C${appdir} all test-input-hash -j${JOBS:-4}
+
             RES=$?
             if [ $RES -eq 0 ]; then
                 kconfig_hashes="$(cat ${BINDIR}/test-input-hash.sha1)"
@@ -549,22 +630,20 @@ compile() {
         fi
     fi
 
-    # compile without Kconfig
-    BOARD=${board} make -C${appdir} clean
-    CCACHE_BASEDIR="$(pwd)" BOARD=$board TOOLCHAIN=$toolchain RIOT_CI_BUILD=1 \
-        make -C${appdir} all test-input-hash -j${JOBS:-4}
-    RES=$?
-
-    if [ ${NIGHTLY} -eq 1 ]; then
-        no_kconfig_hashes="$(cat ${BINDIR}/test-input-hash.sha1)"
-    fi
-    # test hash is used to cache test results, not for comparing binaries
-    # generated with and without KConfig
-    test_hash=$(test_hash_calc "$BINDIR")
-
-
+    # Check to see if kconfig is matches or needs further testing
+    run_test_with_kconfig=0
     if [ ${should_check_kconfig_hash} != 0 ]; then
-        if [ ${NIGHTLY} -eq 1 ]; then
+        if [ ${expect_dissimilar_build} -eq 1 ]; then
+            if [ "${kconfig_hashes}" != "${no_kconfig_hashes}" ]; then
+                run_test_with_kconfig=1
+                echo "Allowing dissimilar kconfig and make builds";
+                echo "Input without KConfig:"
+                echo "${no_kconfig_hashes}"
+                echo "Input with KConfig:"
+                echo "${kconfig_hashes}"
+
+            fi
+        elif [ ${NIGHTLY} -eq 1 ]; then
             if [ "${kconfig_hashes}" != "${no_kconfig_hashes}" ]; then
                 echo "Hashes of binaries with and without Kconfig mismatch for ${appdir} with ${board}";
                 echo "Please check that all used modules are modelled in Kconfig and enabled";
@@ -581,28 +660,26 @@ compile() {
         fi
     fi
 
-    # run tests
-    if [ $RES -eq 0 ]; then
-        if is_in_list "$board" "$EMULATED_BOARDS_AVAILABLE"; then
-            EMULATED=1
-        else
-            EMULATED=0
-        fi
-
+    # Run kconfig tests if needed
+    if [ $RES -eq 0 -a ${expect_dissimilar_build} -eq 1 ]; then
         if [ $RUN_TESTS -eq 1 -o "$board" = "native" -o "$EMULATED" = "1" ]; then
             if [ -f "${BINDIR}/.test" ]; then
+                echo "Running kconfig test"
                 if [ "$board" = "native" -o "${EMULATED}" = "1" ]; then
-                    EMULATE=${EMULATED} BOARD=$board make -C${appdir} test
+                    TEST_KCONFIG=1 \
+                    EMULATE=${EMULATED} \
+                    BOARD=$board \
+                    make -C${appdir} test
+
                     RES=$?
                 elif is_in_list "$board" "$TEST_BOARDS_AVAILABLE"; then
-                    echo "-- test_hash=$test_hash"
-                    if test_cache_get $test_hash; then
-                        echo "-- skipping test due to positive cache hit"
-                    else
-                        BOARD=$board TOOLCHAIN=$toolchain TEST_HASH=$test_hash \
-                            make -C${appdir} test-murdock
-                        RES=$?
-                    fi
+                    TEST_KCONFIG=1 \
+                    BOARD=$board \
+                    TOOLCHAIN=$toolchain \
+                    TEST_HASH=$test_hash \
+                    make -C${appdir} test-murdock
+
+                    RES=$?
                 fi
             fi
         fi
