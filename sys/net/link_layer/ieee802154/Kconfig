@@ -19,7 +19,7 @@ config MODULE_IEEE802154_SECURITY
 
 config MODULE_IEEE802154_SUBMAC
     bool "IEEE 802.15.4 submac"
-    select MODULE_XTIMER
+    select ZTIMER_USEC
     help
         This module defines a common layer for handling the lower part of the IEEE 802.15.4 MAC layer.
 
