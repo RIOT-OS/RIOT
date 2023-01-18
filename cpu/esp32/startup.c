@@ -289,6 +289,11 @@ static NORETURN void IRAM system_init (void)
     print_board_config();
 #endif
 
+#if IS_USED(MODULE_PERIPH_FLASHPAGE)
+    extern void esp_flashpage_init(void);
+    esp_flashpage_init();
+#endif
+
 #if IS_USED(MODULE_MTD)
     /* init flash drive */
     extern void spi_flash_drive_init (void);

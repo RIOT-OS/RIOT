@@ -13,7 +13,7 @@ config MODULE_ESP_IDF
     default y
     select MODULE_ESP_IDF_COMMON
     select MODULE_ESP_IDF_EFUSE
-    select MODULE_ESP_IDF_SPI_FLASH if MODULE_MTD
+    select MODULE_ESP_IDF_SPI_FLASH if MODULE_MTD || MODULE_PERIPH_FLASHPAGE
     select MODULE_ESP_IDF_USB if MODULE_TINYUSB_PORTABLE_ESPRESSIF
     help
       Espressif IoT Development Framework.

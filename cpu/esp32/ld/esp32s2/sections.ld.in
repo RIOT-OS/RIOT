@@ -592,6 +592,17 @@ SECTIONS
 
   . = _heap_end;
   _eheap = ABSOLUTE(.);
+
+#ifdef MODULE_PERIPH_FLASHPAGE
+  .flash_writable (NOLOAD) : ALIGN(65536)
+  {
+    _fp_mem_start = . ;
+    KEEP(*(SORT(.flash_writable.*)))
+    _fp_mem_end = . ;
+    . = ALIGN(4096);
+    _end_fw = . ;
+  } > drom0_1_seg
+#endif
 }
 
 ASSERT(((_iram_text_end - ORIGIN(iram0_0_seg)) <= LENGTH(iram0_0_seg)),

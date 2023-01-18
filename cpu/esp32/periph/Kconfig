@@ -31,4 +31,22 @@ config MODULE_ESP_HW_COUNTER
         registers that can be used as low-level timer peripherals. Use this
         option to enable these CCOUNT and CCOMPARE register as low-level timer.
 
+choice ESP_FLASHPAGE_CAPACITY
+    bool "Flashpage capacity"
+    default ESP_FLASHPAGE_CAPACITY_512K
+    depends on MODULE_PERIPH_FLASHPAGE
+    config ESP_FLASHPAGE_CAPACITY_64K
+        bool "64 kByte"
+    config ESP_FLASHPAGE_CAPACITY_128K
+        bool "128 kByte"
+    config ESP_FLASHPAGE_CAPACITY_256K
+        bool "256 kByte"
+    config ESP_FLASHPAGE_CAPACITY_512K
+        bool "512 kByte"
+    config ESP_FLASHPAGE_CAPACITY_1M
+        bool "1 MByte"
+    config ESP_FLASHPAGE_CAPACITY_2M
+        bool "2 MByte"
+endchoice
+
 endif # TEST_KCONFIG

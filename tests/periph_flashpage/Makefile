@@ -7,6 +7,7 @@ FEATURES_OPTIONAL += periph_flashpage_pagewise
 FEATURES_OPTIONAL += periph_flashpage_rwee
 
 USEMODULE += od
+USEMODULE += od_string
 USEMODULE += shell
 
 # avoid running Kconfig by default

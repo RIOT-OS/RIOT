@@ -81,31 +81,9 @@ static int getpage(const char *str)
 }
 
 #ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
-static void dumpchar(uint8_t mem)
-{
-    if (mem >= ' ' && mem <= '~') {
-        printf("  %c  ", mem);
-    }
-    else {
-        printf("  ?? ");
-    }
-}
-
 static void memdump(void *addr, size_t len)
 {
-    unsigned pos = 0;
-    uint8_t *mem = (uint8_t *)addr;
-
-    while (pos < (unsigned)len) {
-        for (unsigned i = 0; i < LINE_LEN; i++) {
-            printf("0x%02x ", mem[pos + i]);
-        }
-        puts("");
-        for (unsigned i = 0; i < LINE_LEN; i++) {
-            dumpchar(mem[pos++]);
-        }
-        puts("");
-    }
+    od_hex_dump	(addr, len, LINE_LEN);
 }
 
 static void dump_local(void)
