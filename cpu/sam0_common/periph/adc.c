@@ -203,12 +203,10 @@ static int _adc_configure(Adc *dev, adc_res_t res)
     /* Set ADC resolution */
 #ifdef ADC_CTRLC_RESSEL
     /* Reset resolution bits in CTRLC */
-    dev->CTRLC.reg &= ~ADC_CTRLC_RESSEL_Msk;
-    dev->CTRLC.reg |= res;
+    dev->CTRLC.bit.RESSEL = res;
 #else
     /* Reset resolution bits in CTRLB */
-    dev->CTRLB.reg &= ~ADC_CTRLB_RESSEL_Msk;
-    dev->CTRLB.reg |= res;
+    dev->CTRLB.bit.RESSEL = res;
 #endif
 
     /* Set Voltage Reference */

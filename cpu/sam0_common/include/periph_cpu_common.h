@@ -719,12 +719,13 @@ static inline void sercom_clk_dis(void *sercom)
 
 #ifdef CPU_COMMON_SAMD5X
 static inline uint8_t _sercom_gclk_id_core(uint8_t sercom_id) {
-    if (sercom_id < 2)
+    if (sercom_id < 2) {
         return sercom_id + 7;
-    if (sercom_id < 4)
+    } else if (sercom_id < 4) {
         return sercom_id + 21;
-    else
+    } else {
         return sercom_id + 30;
+    }
 }
 #endif
 
@@ -806,6 +807,24 @@ typedef struct {
  */
 #define ADC_REFSEL_AREFC_PIN    GPIO_PIN(PA, 6)
 #endif
+
+#ifndef DOXYGEN
+#define HAVE_ADC_RES_T
+typedef enum {
+    ADC_RES_6BIT  = 0xff,                       /**< not supported */
+#if defined(ADC_CTRLB_RESSEL)
+    ADC_RES_8BIT  = ADC_CTRLB_RESSEL_8BIT_Val,  /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = ADC_CTRLB_RESSEL_10BIT_Val, /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = ADC_CTRLB_RESSEL_12BIT_Val, /**< ADC resolution: 12 bit */
+#elif defined(ADC_CTRLC_RESSEL)
+    ADC_RES_8BIT  = ADC_CTRLC_RESSEL_8BIT_Val,  /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = ADC_CTRLC_RESSEL_10BIT_Val, /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = ADC_CTRLC_RESSEL_12BIT_Val, /**< ADC resolution: 12 bit */
+#endif
+    ADC_RES_14BIT = 0xfe,                       /**< not supported */
+    ADC_RES_16BIT = 0xfd                        /**< not supported */
+} adc_res_t;
+#endif /* DOXYGEN */
 
 /**
  * @name Ethernet peripheral parameters

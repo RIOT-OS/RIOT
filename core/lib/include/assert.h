@@ -104,6 +104,9 @@ __NORETURN void _assert_failure(const char *file, unsigned line);
  * or `gdb` (with the command `info line *(0x89abcdef)`) to identify the line
  * the assertion failed in.
  *
+ * If the `backtrace` module is enabled (and implemented for architecture in use)
+ * a backtrace will be printed in addition to the location of the failed assertion.
+ *
  * @see http://pubs.opengroup.org/onlinepubs/9699919799/functions/assert.html
  */
 #define assert(cond) ((cond) ? (void)0 :  _assert_failure(__FILE__, __LINE__))
