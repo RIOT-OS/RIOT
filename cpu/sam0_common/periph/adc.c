@@ -23,6 +23,7 @@
 #include "periph/gpio.h"
 #include "periph/adc.h"
 #include "periph_conf.h"
+#include "macros/utils.h"
 #include "mutex.h"
 
 #define ENABLE_DEBUG 0
@@ -181,11 +182,7 @@ static void _setup_calibration(Adc *dev)
 
 static int _adc_configure(Adc *dev, adc_res_t res)
 {
-    /* Individual comparison necessary because ADC Resolution Bits are not
-     * numerically in order and 16Bit (averaging - not currently supported)
-     * falls between 12bit and 10bit.  See datasheet for details */
-    if (!((res == ADC_RES_8BIT) || (res == ADC_RES_10BIT) ||
-          (res == ADC_RES_12BIT))){
+    if ((res == ADC_RES_6BIT) || (res == ADC_RES_14BIT)) {
         return -1;
     }
 
@@ -203,10 +200,10 @@ static int _adc_configure(Adc *dev, adc_res_t res)
     /* Set ADC resolution */
 #ifdef ADC_CTRLC_RESSEL
     /* Reset resolution bits in CTRLC */
-    dev->CTRLC.bit.RESSEL = res;
+    dev->CTRLC.bit.RESSEL = res & 0x3;
 #else
     /* Reset resolution bits in CTRLB */
-    dev->CTRLB.bit.RESSEL = res;
+    dev->CTRLB.bit.RESSEL = res & 0x3;
 #endif
 
     /* Set Voltage Reference */
@@ -240,6 +237,12 @@ static int _adc_configure(Adc *dev, adc_res_t res)
         gpio_init_mux(ADC_REFSEL_AREFC_PIN, GPIO_MUX_B);
     }
 #endif
+
+    if ((res & 0x3) == 1) {
+        dev->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM(res >> 2);
+    } else {
+        dev->AVGCTRL.reg = 0;
+    }
 
     /*  Enable ADC Module */
     dev->CTRLA.reg |= ADC_CTRLA_ENABLE;
@@ -325,14 +328,23 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     /* Wait for the result */
     while (!(dev->INTFLAG.reg & ADC_INTFLAG_RESRDY)) {}
 
-    int16_t result = dev->RESULT.reg;
+    uint16_t sample = dev->RESULT.reg;
+    int result;
 
     _adc_poweroff(dev);
     _done();
 
     /* in differential mode we lose one bit for the sign */
     if (diffmode) {
-        result *= 2;
+        result = 2 * (int16_t)sample;
+    } else {
+        result = sample;
+    }
+
+    /* 16 bit mode is implemented as oversampling */
+    if ((res & 0x3) == 1) {
+        /* ADC does automatic right shifts beyond 16 samples */
+        result <<= (4 - MIN(4, res >> 2));
     }
 
     return result;
