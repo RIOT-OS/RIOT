@@ -719,12 +719,13 @@ static inline void sercom_clk_dis(void *sercom)
 
 #ifdef CPU_COMMON_SAMD5X
 static inline uint8_t _sercom_gclk_id_core(uint8_t sercom_id) {
-    if (sercom_id < 2)
+    if (sercom_id < 2) {
         return sercom_id + 7;
-    if (sercom_id < 4)
+    } else if (sercom_id < 4) {
         return sercom_id + 21;
-    else
+    } else {
         return sercom_id + 30;
+    }
 }
 #endif
 
