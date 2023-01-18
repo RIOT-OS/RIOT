@@ -11529,8 +11529,8 @@ typedef struct {                                /*!< (@ 0x40002C00) WWDGT Struct
   * @{
   */
 
-//#define ADC0_BASE                   0x40012400UL
-//#define ADC1_BASE                   0x40012800UL
+#define ADC0_BASE                   0x40012400UL
+#define ADC1_BASE                   0x40012800UL
 //#define AFIO_BASE                   0x40010000UL
 //#define BKP_BASE                    0x40006C00UL
 //#define CAN0_BASE                   0x40006400UL
