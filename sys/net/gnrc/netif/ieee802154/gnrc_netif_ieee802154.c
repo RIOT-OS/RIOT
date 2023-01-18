@@ -28,12 +28,13 @@
 
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif);
+int _get(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt);
 
 static const gnrc_netif_ops_t ieee802154_ops = {
     .init = gnrc_netif_default_init,
     .send = _send,
     .recv = _recv,
-    .get = gnrc_netif_get_from_netdev,
+    .get = _get,
     .set = gnrc_netif_set_from_netdev,
 };
 
@@ -436,4 +437,46 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     }
     return res;
 }
+
+int _get(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
+{
+    int res = -ENOTSUP;
+
+    gnrc_netif_acquire(netif);
+    switch (opt->opt) {
+        case NETOPT_MAX_SDU_SIZE:
+            if (opt->data_len >= sizeof(iolist_t)) {
+                const iolist_t *in = opt->data;
+                const gnrc_netif_hdr_t *l2 = in->iol_base;
+                gnrc_netapi_opt_t opt_dev = { .context = 0 };
+                uint16_t sdu;
+                opt_dev.data = &sdu;
+                opt_dev.data_len = sizeof(sdu);
+                opt_dev.opt = NETOPT_MAX_PDU_SIZE;
+                if (gnrc_netif_get_from_netdev(netif, &opt_dev) <= 0) {
+                    goto release;
+                }
+                uint8_t mhr[IEEE802154_MAX_HDR_LEN];
+                int hdr_len = gnrc_netif_hdr_to_ieee802154(mhr, netif, l2);
+                if (hdr_len < 0) {
+                    goto release;
+                }
+                sdu += (IEEE802154_MAX_HDR_LEN - hdr_len);
+#if IS_USED(MODULE_IEEE802154_SECURITY)
+                netdev_ieee802154_t *dev = container_of(netif->dev, netdev_ieee802154_t, netdev);
+                hdr_len = ieee802154_sec_get_aux_hdr_len(&dev->sec_ctx, mhr, hdr_len);
+                sdu += ((IEEE802154_SEC_MAX_AUX_HDR_LEN + IEEE802154_SEC_MAX_MAC_SIZE) - hdr_len);
+#endif
+                *((uint16_t *)opt->data) = sdu;
+                res = sizeof(uint16_t);
+            }
+            break;
+        default:
+            res = gnrc_netif_get_from_netdev(netif, opt);
+    }
+release:
+    gnrc_netif_release(netif);
+    return res;
+}
+
 /** @} */

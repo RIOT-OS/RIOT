@@ -56,6 +56,10 @@ typedef struct {
     uint16_t tag;           /**< Tag used for the fragment */
     uint16_t offset;        /**< Offset of the Nth fragment from the beginning of the
                              *   payload datagram */
+    /**
+     * @brief  Per packet computed fragment size;
+     */
+    uint16_t best_frag_size;
 #if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR)
     /**
      * @brief   Extension for selective fragment recovery.

@@ -176,6 +176,10 @@ typedef enum {
      */
     NETOPT_TX_POWER,
     /**
+     * @brief   (uint16_t) Given a packet, maximum L2 Service Data Unit
+     */
+    NETOPT_MAX_SDU_SIZE,
+    /**
      * @brief   (uint16_t) maximum protocol data unit
      */
     NETOPT_MAX_PDU_SIZE,
