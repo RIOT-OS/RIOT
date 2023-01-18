@@ -1,0 +1,113 @@
+/**
+@defgroup   boards_seeedstudio-gd32 SeeedStudio GD32 RISC-V board
+@ingroup    boards
+@brief      Support for the SeeedStudio GD32 RISC-V board
+@author     Koen Zandberg <koen@bergzand.net>
+@author     Gunar Schorcht <gunar@schorcht.net>
+
+## Overview
+
+The [Seedstudio GD32 RISC-V Dev Board]
+(https://wiki.seeedstudio.com/SeeedStudio-GD32-RISC-V-Dev-Board/) is a
+development board for the GigaDevice GD32VF103VBT6 MCU with the following
+on-board components:
+
+- GD32VF103VBT6 RISC-V MCU @108MHz
+- 8MB on-board Flash W25Q64
+- 256 byte EEPROM
+- LCD Interface: 16-bit 8080 interface and SPI touch screen control interface
+- USB Type C
+- TF card slot
+- 2 user buttons
+- 3 user LEDs
+
+@image html "https://files.seeedstudio.com/wiki/GD32VF103/img/GD32VF-103VBT6-pin.jpg" "Seeedstudio GD32 RISC-V Dev Board" width=600
+
+## Hardware:
+
+| MCU         | GD32VF103VBT6                          | Supported |
+|:----------- |:-------------------------------------- | --------- |
+| Family      | RISC-V with ECLIC                      |           |
+| Vendor      | GigaDevice                             |           |
+| RAM         | 32 kByte                               |           |
+| Flash       | 128 KByte                              |           |
+| Frequency   | 108 MHz                                |           |
+| Power Modes | 3 (Sleep, Deep Sleep, Standby)         |   no      |
+| GPIOs       | 80                                     |   yes     |
+| Timers      | 5 x 16-bit timer                       |   yes     |
+| RTC         | 1 x 32-bit counter, 20-bit prescaler   |   no      |
+| WDT         | 2 x 12-bit counter, 3-bit prescaler    |   yes     |
+| ADC         | 2 x 12-bit units, 16 channels, 1 Msps  |   no      |
+| DAC         | 2 x 12-bit channel                     |   no      |
+| UART        | 2                                      |   yes     |
+| USART       | 3                                      |   yes     |
+| SPI         | 3                                      |   no      |
+| I2C         | 2 x Fast Mode 400 kHz                  |   no      |
+| I2S         | 2                                      |   no      |
+| CAN         | 2 x CAN 2.0B with up to 1 Mbps         |   no      |
+| PWM         | 6 Channels                             |   no      |
+| USB         | 1 x USB FS OTG                         |   no      |
+| Vcc         | 3.0V - 3.6V                            |           |
+| Datasheet   | [Datasheet](https://gd32mcu.com/data/documents/datasheet/GD32VF103_Datasheet_Rev1.6.pdf) | |
+| Reference Manual | [Reference Manual](https://gd32mcu.com/download/down/document_id/222/path_type/1) | |
+| Board Manual | [Board Manual](https://wiki.seeedstudio.com/SeeedStudio-GD32-RISC-V-Dev-Board/) | |
+| Board Schematic | [Board Schematic](https://github.com/SeeedDocument/GD32VF103/raw/master/res/GD32VF103VBT6-dev-board.pdf) | |
+
+## Pin Layout / Configuration
+
+The general pin layout is shown below.
+
+@image html "https://raw.githubusercontent.com/SeeedDocument/GD32VF103/master/img/GD32VF-103VBT6-c.jpg" "Seeedstudio GD32 RISC-V Dev Board Pinout" width=600
+
+The following table shows the connection of the on-board components with the
+MCU pins and their configuration in RIOT.
+
+| MCU Pin | MCU Peripheral | RIOT Peripheral     | Board Function        |
+|:--------|:---------------|:--------------------|:----------------------|
+| PA0     |                |                     | BTN0                  |
+| PA9     | USART0 TX      | UART_DEV(0) TX      | UART TX               |
+| PA10    | USART0 RX      | UART_DEV(0) RX      | UART RX               |
+| PB0     |                |                     | LED1                  |
+| PB1     |                |                     | LED2                  |
+| PB5     |                |                     | LED0                  |
+| PC13    |                |                     | BTN1                  |
+
+## Flash the board
+
+The board is flashed via a JTAG interface with OpenOCD (at least [release version 0.12.0]
+(https://github.com/openocd-org/openocd/tree/9ea7f3d647c8ecf6b0f1424002dfc3f4504a162c)).
+By default, an FTDI adapter according to the configuration defined in
+[`interface/openocd-usb.cfg`]
+(https://github.com/openocd-org/openocd/blob/9ea7f3d647c8ecf6b0f1424002dfc3f4504a162c/tcl/interface/ftdi/openocd-usb.cfg)
+is assumed.
+```
+BOARD=seeedstudio-gd32 make -C examples/hello-world flash
+```
+To use an FTDI adapter with a different configuration, the configuration can be
+defined using the variable `OPENOCD_FTDI_ADAPTER`, for example:
+```
+OPENOCD_FTDI_ADAPTER=tigar BOARD=seeedstudio-gd32 make -C examples/hello-world flash
+```
+If another adapter is used, it can be specified using variable
+`OPENOCD_DEBUG_ADAPTER`, for example for a Segger J-Link adapter:
+```
+OPENOCD_DEBUG_ADAPTER=jlink BOARD=seeedstudio-gd32 make -C examples/hello-world flash
+```
+
+## Accessing STDIO via UART
+
+The `stdio` is directly accessible through the first UART interface. If an
+external USB-to-UART interface is used, this interface is mapped to
+`/dev/ttyUSB<n>` on a Linux host, where `<n>` is the index of the UART
+interface, which is 0 by default.
+
+Use the `term` target to connect to the board using `/dev/ttyUSB0`:
+```
+BOARD=seeedstudio-gd32 make -C examples/hello-world term
+```
+If the UART interface index of board's USB to UART bridge is not 0, use
+the following command to connect:
+```
+BOARD=seeedstudio-gd32 make -C examples/hello-world term PORT=/dev/ttyUSB<n>
+```
+ */

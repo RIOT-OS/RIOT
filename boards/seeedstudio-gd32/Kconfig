@@ -15,6 +15,7 @@ config BOARD_SEEEDSTUDIO_GD32
     select HAS_PERIPH_UART
     select BOARD_HAS_HXTAL
     select BOARD_HAS_LXTAL
+    select HAVE_SAUL_GPIO
 
 config BOARD_HAS_HXTAL
     bool

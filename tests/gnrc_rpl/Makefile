@@ -28,3 +28,6 @@ host-tools:
 TERMDEPS += host-tools
 
 include $(RIOTBASE)/Makefile.include
+
+# Test is flaky and regularly derails unrelated merge trains
+TEST_ON_CI_BLACKLIST += native
