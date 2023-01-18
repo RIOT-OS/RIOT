@@ -1,0 +1,7 @@
+CPU_MODEL = gd32vf103cbt6
+
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_uart
+
+include $(RIOTBOARD)/common/gd32v/Makefile.features
