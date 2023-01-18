@@ -49,6 +49,10 @@ ifneq (,$(filter fmt_table,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
+ifneq (,$(filter iec62056,$(USEMODULE)))
+  USEMODULE += fmt
+endif
+
 ifneq (,$(filter prng_fortuna,$(USEMODULE)))
   USEMODULE += crypto_aes_128
 endif
