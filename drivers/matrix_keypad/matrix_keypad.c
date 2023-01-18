@@ -39,7 +39,7 @@ static void _setup_columns(matrix_keypad_t *dev)
 {
     for (size_t i = 0; i < CONFIG_MATRIX_KEYPAD_NUM_COLUMNS; i++) {
         gpio_t column = dev->params->columns[i];
-        if (column != GPIO_UNDEF) {
+        if (gpio_is_valid(column)) {
             gpio_init(column, GPIO_IN_PU);
         }
     }
@@ -49,7 +49,7 @@ static void _setup_rows(matrix_keypad_t *dev)
 {
     for (size_t i = 0; i < CONFIG_MATRIX_KEYPAD_NUM_ROWS; i++) {
         gpio_t row = dev->params->rows[i];
-        if (row != GPIO_UNDEF) {
+        if (gpio_is_valid(row)) {
             gpio_init(row, MATRIX_KEYPAD_ROWS_GPIO_MODE); /* Open drain to ensure rows don't conflict */
             gpio_set(row);
         }
@@ -91,7 +91,7 @@ int matrix_keypad_init(matrix_keypad_t *dev, const matrix_keypad_params_t *param
         (CONFIG_MATRIX_KEYPAD_DEBOUNCE_PATTERN_BEGIN & CONFIG_MATRIX_KEYPAD_DEBOUNCE_PATTERN_END) == 0,
         "Debounce patterns must not overlap");
     memset(dev, 0, sizeof(matrix_keypad_t));
-    memcpy(&dev->params, params, sizeof(matrix_keypad_params_t));
+    dev->params = params;
     dev->callback = callback;
     dev->arg = arg;
     _setup_columns(dev);
@@ -107,7 +107,7 @@ size_t matrix_keypad_scan(matrix_keypad_t *dev)
     for (size_t i = 0; i < CONFIG_MATRIX_KEYPAD_NUM_ROWS; i++) {
         gpio_t row = dev->params->rows[i];
 
-        if (row == GPIO_UNDEF) {
+        if (!gpio_is_valid(row)) {
             continue;
         }
 
@@ -122,7 +122,7 @@ size_t matrix_keypad_scan(matrix_keypad_t *dev)
         /* Scan columns */
         for (size_t j = 0; j < CONFIG_MATRIX_KEYPAD_NUM_COLUMNS; j++) {
             gpio_t column = dev->params->columns[j];
-            if (column == GPIO_UNDEF) {
+            if (!gpio_is_valid(column)) {
                 continue;
             }
             bool status = !gpio_read(column);
