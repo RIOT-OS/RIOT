@@ -37,7 +37,7 @@ on-board components:
 | Timers      | 5 x 16-bit timer                       |   yes     |
 | RTC         | 1 x 32-bit counter, 20-bit prescaler   |   yes     |
 | WDT         | 2 x 12-bit counter, 3-bit prescaler    |   yes     |
-| ADC         | 2 x 12-bit units, 16 channels, 1 Msps  |   no      |
+| ADC         | 2 x 12-bit units, 16 channels @ 1 Msps |   yes     |
 | DAC         | 2 x 12-bit channel                     |   no      |
 | UART        | 2                                      |   yes     |
 | USART       | 3                                      |   yes     |
@@ -65,6 +65,9 @@ MCU pins and their configuration in RIOT.
 | MCU Pin | MCU Peripheral | RIOT Peripheral  | Board Function | Remark                       |
 |:--------|:---------------|:-----------------|:---------------|:-----------------------------|
 | PA0     | BOOT0          | BTN0             | KEY1           |                              |
+| PA1     | ADC01_IN1      | ADC_LINE(0)      |                |                              |
+| PA2     | ADC01_IN2      | ADC_LINE(1)      |                |                              |
+| PA3     | ADC01_IN3      | ADC_LINE(2)      |                |                              |
 | PA9     | USART0 TX      | UART_DEV(0) TX   | UART TX        |                              |
 | PA10    | USART0 RX      | UART_DEV(0) RX   | UART RX        |                              |
 | PA4     | SPI1 CS        | SPI_DEV(1) CS    |                |                              |
@@ -84,7 +87,15 @@ MCU pins and their configuration in RIOT.
 | PB13    | SPI0 SCLK      | SPI_DEV(0) SCLK  |                |                              |
 | PB14    | SPI0 MISO      | SPI_DEV(0) MISO  |                |                              |
 | PB15    | SPI0 MOSI      | SPI_DEV(0) MOSI  |                |                              |
+| PC0     | ADC01_IN10     | ADC_LINE(3)      |                |                              |
+| PC1     | ADC01_IN11     | ADC_LINE(4)      |                |                              |
+| PC2     | ADC01_IN12     | ADC_LINE(5)      |                |                              |
+| PC3     | ADC01_IN13     | ADC_LINE(6)      |                |                              |
+| PC4     | ADC01_IN14     | ADC_LINE(7)      |                |                              |
+| PC5     | ADC01_IN15     | ADC_LINE(8)      |                |                              |
 | PC13    |                | BTN1             | KEY2           |                              |
+| -       | ADC01_IN16     | ADC_LINE(9)      |                | internal Temperature channel |
+| -       | ADC01_IN17     | ADC_LINE(10)     |                | internal VFEF channel        |
 
 ## Flashing the Device
 
