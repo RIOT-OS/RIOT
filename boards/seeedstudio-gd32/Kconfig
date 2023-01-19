@@ -12,21 +12,10 @@ config BOARD_SEEEDSTUDIO_GD32
     bool
     default y
     select CPU_MODEL_GD32VF103VBT6
-    select HAS_PERIPH_UART
     select BOARD_HAS_HXTAL
     select BOARD_HAS_LXTAL
+    select HAS_PERIPH_TIMER
+    select HAS_PERIPH_UART
     select HAVE_SAUL_GPIO
 
-config BOARD_HAS_HXTAL
-    bool
-    help
-        Indicates that the board is providing an HXTAL oscillator
-
-config BOARD_HAS_LXTAL
-    bool
-    help
-        Indicates that the board is providing an LXTAL oscillator
-
-config CLOCK_HXTAL
-    int
-    default 8000000
+source "$(RIOTBOARD)/common/gd32v/Kconfig"
