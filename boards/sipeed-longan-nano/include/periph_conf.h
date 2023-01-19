@@ -46,6 +46,38 @@ extern "C" {
 #endif
 
 /**
+ * @name    ADC configuration
+ * @{
+ */
+static const adc_conf_t adc_config[] = {
+    { .pin = GPIO_PIN(PORT_A, 0), .dev = 0, .chan = 0 },
+    { .pin = GPIO_PIN(PORT_A, 3), .dev = 0, .chan = 3 },
+    /* ADC Temperature channel */
+    { .pin = GPIO_UNDEF, .dev = 0, .chan = 16 },
+    /* ADC VREF channel */
+    { .pin = GPIO_UNDEF, .dev = 0, .chan = 17 },
+#if !defined(CONFIG_SIPEED_LONGAN_NANO_WITH_TFT)
+    /* This conflicts with TFT pins if connected. */
+    { .pin = GPIO_PIN(PORT_B, 0), .dev = 0, .chan = 8 },
+    { .pin = GPIO_PIN(PORT_B, 1), .dev = 0, .chan = 9 },
+#endif
+#if !defined(MODULE_PERIPH_SPI)
+    /* This conflicts with the SPI0 controller which is used for TFT if connected */
+    { .pin = GPIO_PIN(PORT_A, 4), .dev = 0, .chan = 4 },
+#if !defined(CONFIG_SIPEED_LONGAN_NANO_WITH_TFT)
+    { .pin = GPIO_PIN(PORT_A, 5), .dev = 0, .chan = 5 },
+#endif /* !defined(CONFIG_SIPEED_LONGAN_NANO_WITH_TFT) */
+    { .pin = GPIO_PIN(PORT_A, 6), .dev = 0, .chan = 6 },
+#if !defined(CONFIG_SIPEED_LONGAN_NANO_WITH_TFT)
+    { .pin = GPIO_PIN(PORT_A, 7), .dev = 0, .chan = 7 },
+#endif /* !defined(CONFIG_SIPEED_LONGAN_NANO_WITH_TFT) */
+#endif
+};
+
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
+/** @} */
+
+/**
  * @name   PWM configuration
  * @{
  */

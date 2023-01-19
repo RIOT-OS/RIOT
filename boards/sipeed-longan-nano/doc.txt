@@ -31,7 +31,7 @@ on-board components:
 | Timers      | 5 x 16-bit timer                       |   yes     |
 | RTC         | 1 x 32-bit counter, 20-bit prescaler   |   yes     |
 | WDT         | 2 x 12-bit counter, 3-bit prescaler    |   yes     |
-| ADC         | 2 x 12-bit units, 16 channels, 1 Msps  |   no      |
+| ADC         | 2 x 12-bit units, 16 channels @ 1 Msps |   yes     |
 | DAC         | 2 x 12-bit channel                     |   no      |
 | UART        | -                                      |   yes     |
 | USART       | 3                                      |   yes     |
@@ -61,12 +61,19 @@ MCU pins and their configuration in RIOT.
 | PA0     | BOOT0          | BTN0             | BOOT           |                              |
 | PA1     |                | PWM_DEV(0) CH0   | LED1 green     |                              |
 | PA2     |                | PWM_DEV(0) CH1   | LED2 blue      |                              |
-| PA4     | SPI1 CS        | SPI_DEV(1) CS    |                |                              |
-| PA5     | SPI1 SCLK      | SPI_DEV(1) SCLK  |                |                              |
-| PA6     | SPI1 MISO      | SPI_DEV(1) MISO  |                |                              |
-| PA7     | SPI1 MOSI      | SPI_DEV(1) MOSI  |                |                              |
+| PA3     | ADC01_IN3      | ADC_LINE(1)      |                |                              |
+| PA4     | ADC01_IN4      | ADC_LINE(6)      |                | N/A if SPI is used           |
+| PA5     | ADC01_IN5      | ADC_LINE(7)      |                | N/A if SPI or TFT is used    |
+| PA6     | ADC01_IN6      | ADC_LINE(8)      |                | N/A if SPI is used           |
+| PA7     | ADC01_IN7      | ADC_LINE(9)      |                | N/A if SPI or TFT is used    |
+| PA4     | SPI1 CS        | SPI_DEV(1) CS    |                | N/A if ADC_LINE(6) is used   |
+| PA5     | SPI1 SCLK      | SPI_DEV(1) SCLK  |                | N/A if ADC_LINE(7) is used   |
+| PA6     | SPI1 MISO      | SPI_DEV(1) MISO  |                | N/A if ADC_LINE(8) is used   |
+| PA7     | SPI1 MOSI      | SPI_DEV(1) MOSI  |                | N/A if ADC_LINE(9) is used   |
 | PA9     | USART0 TX      | UART_DEV(0) TX   | UART TX        |                              |
 | PA10    | USART0 RX      | UART_DEV(0) RX   | UART RX        |                              |
+| PB0     | ADC01_IN8      | ADC_LINE(4)      |                | N/A if TFT is used           |
+| PB1     | ADC01_IN8      | ADC_LINE(5)      |                | N/A if TFT is used           |
 | PB6     | I2C0 SCL       | I2C_DEV(0) SCL   |                |                              |
 | PB7     | I2C0 SDA       | I2C_DEV(0) SDA   |                |                              |
 | PB8     |                | PWM_DEV(1) CH0   |                | N/A if CAN is used           |
@@ -78,6 +85,11 @@ MCU pins and their configuration in RIOT.
 | PB14    | SPI0 MISO      | SPI_DEV(0) MISO  |                |                              |
 | PB15    | SPI0 MOSI      | SPI_DEV(0) MOSI  |                |                              |
 | PC13    |                |                  | LED0 red       |                              |
+| -       | ADC01_IN16     | ADC_LINE(2)      |                | internal Temperature channel |
+| -       | ADC01_IN17     | ADC_LINE(3)      |                | internal VFEF channel        |
+
+@note Since the availability of `ADC_LINE(4)` to `ADC_LINE(9)` depends on other
+peripheral configurations, their index may vary.
 
 ## Flashing the Device
 
