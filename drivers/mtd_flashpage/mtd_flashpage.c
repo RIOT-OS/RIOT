@@ -49,26 +49,26 @@ static int _init(mtd_dev_t *dev)
 
 static int _read(mtd_dev_t *dev, void *buf, uint32_t addr, uint32_t size)
 {
-    addr = _mtd_to_flashpage_addr(addr);
+    const uword_t flash_addr = _mtd_to_flashpage_addr(addr);
 
-    assert(addr < MTD_FLASHPAGE_END_ADDR);
+    assert(flash_addr < MTD_FLASHPAGE_END_ADDR);
 
     (void)dev;
 
 #ifndef CPU_HAS_UNALIGNED_ACCESS
-    if (addr % sizeof(uword_t)) {
+    if (flash_addr % sizeof(uword_t)) {
         return -EINVAL;
     }
 #endif
 
-    memcpy(buf, (void *)addr, size);
+    memcpy(buf, (void *)flash_addr, size);
 
     return 0;
 }
 
 static int _write(mtd_dev_t *dev, const void *buf, uint32_t addr, uint32_t size)
 {
-    addr = _mtd_to_flashpage_addr(addr);
+    const uword_t flash_addr = _mtd_to_flashpage_addr(addr);
 
     (void)dev;
 
@@ -77,30 +77,30 @@ static int _write(mtd_dev_t *dev, const void *buf, uint32_t addr, uint32_t size)
         return -EINVAL;
     }
 #endif
-    if (addr % FLASHPAGE_WRITE_BLOCK_ALIGNMENT) {
+    if (flash_addr % FLASHPAGE_WRITE_BLOCK_ALIGNMENT) {
         return -EINVAL;
     }
     if (size % FLASHPAGE_WRITE_BLOCK_SIZE) {
         return -EOVERFLOW;
     }
-    if (addr + size > MTD_FLASHPAGE_END_ADDR) {
+    if (flash_addr + size > MTD_FLASHPAGE_END_ADDR) {
         return -EOVERFLOW;
     }
 
-    flashpage_write((void *)addr, buf, size);
+    flashpage_write((void *)flash_addr, buf, size);
 
     return 0;
 }
 
 int _erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)
 {
-    addr = _mtd_to_flashpage_addr(addr);
+    const uword_t flash_addr = _mtd_to_flashpage_addr(addr);
     size_t sector_size = dev->page_size * dev->pages_per_sector;
 
     if (size % sector_size) {
         return -EOVERFLOW;
     }
-    if (addr + size > MTD_FLASHPAGE_END_ADDR) {
+    if (flash_addr + size > MTD_FLASHPAGE_END_ADDR) {
         return -EOVERFLOW;
     }
     if (addr % sector_size) {
@@ -108,7 +108,7 @@ int _erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)
     }
 
     for (size_t i = 0; i < size; i += sector_size) {
-        flashpage_erase(flashpage_page((void *)(addr + i)));
+        flashpage_erase(flashpage_page((void *)(flash_addr + i)));
     }
 
     return 0;
