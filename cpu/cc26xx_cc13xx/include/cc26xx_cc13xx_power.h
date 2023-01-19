@@ -87,6 +87,16 @@ void power_clock_enable_uart(uart_t uart);
  */
 void power_clock_disable_uart(uart_t uart);
 
+/**
+ * @brief   Enable RF Core clock
+ */
+void power_clock_enable_rfc(void);
+
+/**
+ * @brief   Disable RF Core clock
+ */
+void power_clock_disable_rfc(void);
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
