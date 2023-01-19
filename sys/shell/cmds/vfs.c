@@ -720,6 +720,97 @@ static int _vfs_handler(int argc, char **argv)
 
 SHELL_COMMAND(vfs, "virtual file system operations", _vfs_handler);
 
+#if MODULE_SHELL_CMD_GENFILE
+static char _get_char(unsigned i)
+{
+    i %= 62; /* a-z, A-Z, 0..9, -> 62 characters */
+
+    if (i < 10) {
+        return '0' + i;
+    }
+    i -= 10;
+
+    if (i <= 'z' - 'a') {
+        return 'a' + i;
+    }
+    i -= 1 + 'z' - 'a';
+
+    return 'A' + i;
+}
+
+static void _write_block(int fd, unsigned bs, unsigned i)
+{
+    char block[bs];
+    char *buf = block;
+
+    buf += snprintf(buf, bs, "|%03u|", i);
+
+    memset(buf, _get_char(i), &block[bs] - buf);
+    block[bs - 1] = '\n';
+
+    vfs_write(fd, block, bs);
+}
+
+static int _vfs_genfile_cmd(int argc, char **argv)
+{
+    unsigned blocksize = 64;
+    unsigned blocks = 32;
+    int fd = STDOUT_FILENO;
+
+    const char *cmdname = argv[0];
+    while (argc > 1 && argv[1][0] == '-') {
+        char *optarg = argc > 2 ? argv[2] : NULL;
+        char opt = argv[1][1];
+
+        if (optarg == NULL) {
+            printf("missing argument\n");
+            opt = '?';
+        }
+
+        switch (opt) {
+        case '?':
+            printf("usage: %s [-o <file>] [-b <block size>] [-n num blocks]\n",
+                   cmdname);
+            return 0;
+        case 'o':
+            fd = vfs_open(optarg, O_CREAT | O_TRUNC | O_WRONLY, 0644);
+            if (fd < 0) {
+                printf("can't create %s\n", optarg);
+                return fd;
+            }
+            break;
+        case 'b':
+            blocksize = atoi(optarg);
+            break;
+        case 'n':
+            blocks = atoi(optarg);
+            break;
+        default:
+            printf("unknown option '%s'\n", argv[1]);
+            return 1;
+        }
+        argc -= 2;
+        argv += 2;
+    }
+
+    if (!blocksize || !blocks || argc > 1) {
+        printf("invalid argument\n");
+        return -EINVAL;
+    }
+
+    for (unsigned i = 0; i < blocks; ++i) {
+        _write_block(fd, blocksize, i);
+    }
+
+    if (fd != STDOUT_FILENO) {
+        vfs_close(fd);
+        printf("%u bytes written.\n", blocksize * blocks);
+    }
+    return 0;
+}
+SHELL_COMMAND(genfile, "generate dummy file", _vfs_genfile_cmd);
+#endif
+
 __attribute__((used)) /* only used if md5sum / sha1sum / sha256sum is used */
 static inline void _print_digest(const uint8_t *digest, size_t len, const char *file)
 {
