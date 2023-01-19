@@ -48,6 +48,15 @@ static bhp_event_t kw2xrf_bhp[KW2XRF_NUM];
 
 #endif
 
+#ifdef MODULE_SX126X
+#include "sx126x.h"
+#include "sx126x_params.h"
+
+#define SX126X_NUMOF                ARRAY_SIZE(sx126x_params)
+
+static sx126x_t sx126x_devs[SX126X_NUMOF];
+#endif
+
 void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
 {
     /* Call the init function of the device (this should be handled by
@@ -86,5 +95,15 @@ void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
         socket_zep_hal_setup(&_socket_zeps[0], radio);
         socket_zep_setup(&_socket_zeps[0], &socket_zep_params[0]);
     }
+#endif
+
+#ifdef MODULE_SX126X
+    if((radio = cb(IEEE802154_DEV_TYPE_SX126X, opaque))){
+        for (unsigned i = 0; i < SX126X_NUMOF; ++i) {
+        sx126x_hal_setup(&sx126x_devs[i], radio);
+        sx126x_init(&sx126x_devs[i], &sx126x_params[i]);
+        sx126x_setup(&sx126x_devs[i],  i);
+        }
+    };
 #endif
 }

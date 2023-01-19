@@ -2,3 +2,15 @@ USEMODULE += iolist
 USEMODULE += netdev_legacy_api
 USEPKG += driver_sx126x
 FEATURES_REQUIRED += periph_gpio_irq
+USEMODULE += checksum
+
+
+USEMODULE += event_thread
+USEMODULE += event_callback
+
+ifneq (,$(filter netdev,$(USEMODULE)))
+USEMODULE += netdev_ieee802154_submac
+USEMODULE += lora
+  
+endif
+

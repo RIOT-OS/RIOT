@@ -27,8 +27,12 @@
 
 #include "net/netdev.h"
 
+#include "net/ieee802154/radio.h"
+
 #include "periph/gpio.h"
 #include "periph/spi.h"
+
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -110,6 +114,8 @@ struct sx126x {
     uint32_t channel;                       /**< Current channel frequency (in Hz) */
     uint16_t rx_timeout;                    /**< Rx Timeout in terms of symbols */
     bool radio_sleep;                       /**< Radio sleep status */
+    sx126x_cad_params_t cad_params;         /**< Radio Channel Activity Detection parametres */
+    bool cad_detected;                      /**< Channel Activity Detected Flag*/
 };
 
 /**
@@ -120,8 +126,11 @@ struct sx126x {
  * @param[in] index                     Index of @p params in a global parameter struct array.
  *                                      If initialized manually, pass a unique identifier instead.
  */
-void sx126x_setup(sx126x_t *dev, const sx126x_params_t *params, uint8_t index);
+void sx126x_setup(sx126x_t *dev, uint8_t index);
 
+void sx126x_hal_setup(sx126x_t *dev, ieee802154_dev_t *hal);
+
+void sx126x_hal_task_handler(ieee802154_dev_t* hal);
 /**
  * @brief   Initialize the given device
  *
@@ -129,7 +138,7 @@ void sx126x_setup(sx126x_t *dev, const sx126x_params_t *params, uint8_t index);
  *
  * @return                  0 on success
  */
-int sx126x_init(sx126x_t *dev);
+int sx126x_init(sx126x_t *dev, const sx126x_params_t *params);
 
 /**
  * @brief   Converts symbol value to time in milliseconds.
