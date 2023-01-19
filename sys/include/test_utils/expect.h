@@ -26,6 +26,7 @@
 #define TEST_UTILS_EXPECT_H
 
 #include <stdio.h>
+#include "compiler_hints.h"
 #include "panic.h"
 
 #ifdef __cplusplus
@@ -76,7 +77,7 @@ NORETURN static inline void _expect_failure(const char *file, unsigned line)
  * the condition failed in.
  *
  */
-#define expect(cond) ((cond) ? (void)0 :  _expect_failure(__FILE__, __LINE__))
+#define expect(cond) (likely(cond) ? (void)0 :  _expect_failure(__FILE__, __LINE__))
 
 #ifdef __cplusplus
 }

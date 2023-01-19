@@ -217,9 +217,11 @@ int cmd_init(int argc, char **argv)
     else {
         printf("Trying to initialize SPI_DEV(%i): mode: %i, clk: %i, cs_port: %i, cs_pin: %i\n",
                dev, mode, clk, port, pin);
-        puts("Note: Failed assertion (crash) means configuration not supported");
+        puts("(if below the program crashes with a failed assertion, then it means the"
+             " configuration is not supported)");
         spi_acquire(spiconf.dev, spiconf.cs, spiconf.mode, spiconf.clk);
         spi_release(spiconf.dev);
+        puts("Success.");
     }
 
     return 0;

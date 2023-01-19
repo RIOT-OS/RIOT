@@ -22,6 +22,8 @@
 #ifndef ASSERT_H
 #define ASSERT_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -42,6 +44,9 @@ extern "C" {
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 #define DEBUG_ASSERT_VERBOSE
+#else
+/* we should not include custom headers in standard headers */
+#define _likely(x)      __builtin_expect((uintptr_t)(x), 1)
 #endif
 
 /**
@@ -109,10 +114,10 @@ __NORETURN void _assert_failure(const char *file, unsigned line);
  *
  * @see http://pubs.opengroup.org/onlinepubs/9699919799/functions/assert.html
  */
-#define assert(cond) ((cond) ? (void)0 :  _assert_failure(__FILE__, __LINE__))
+#define assert(cond) (_likely(cond) ? (void)0 :  _assert_failure(__FILE__, __LINE__))
 #else /* DEBUG_ASSERT_VERBOSE */
 __NORETURN void _assert_panic(void);
-#define assert(cond) ((cond) ? (void)0 : _assert_panic())
+#define assert(cond) (_likely(cond) ? (void)0 : _assert_panic())
 #endif /* DEBUG_ASSERT_VERBOSE */
 
 #if !defined __cplusplus
