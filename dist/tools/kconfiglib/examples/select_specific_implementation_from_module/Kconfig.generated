@@ -1,0 +1,50 @@
+menuconfig MODULE_FOO
+    bool "Module FOO"
+
+if MODULE_FOO
+
+config REQUIRES_FOO_0
+    bool
+
+config REQUIRES_FOO_1
+    bool
+
+config REQUIRES_FOO_2
+    bool
+
+config ERROR_FOO
+    bool
+    default y if !MODULE_FOO_0 && REQUIRES_FOO_0
+    default y if !MODULE_FOO_1 && REQUIRES_FOO_1
+    default y if !MODULE_FOO_2 && REQUIRES_FOO_2
+
+choice FOO_IMPLEMENTATION
+    bool
+    prompt "FOO Implementation"
+    default MODULE_FOO_0 if REQUIRES_FOO_0
+    default MODULE_FOO_1 if REQUIRES_FOO_1
+    default MODULE_FOO_2 if REQUIRES_FOO_2
+    default MODULE_FOO_0 if HAS_FOO_0
+    default MODULE_FOO_1 if HAS_FOO_1
+    default MODULE_FOO_2 if HAS_FOO_2
+
+config MODULE_FOO_0
+bool "Implementation 0"
+
+config MODULE_FOO_1
+bool "Implementation 1"
+
+config MODULE_FOO_2
+bool "Implementation 2"
+
+endchoice # FOO_IMPLEMENTATION
+endif # MODULE_FOO
+
+config HAS_FOO_0
+    bool
+
+config HAS_FOO_1
+    bool
+
+config HAS_FOO_2
+    bool

@@ -1,0 +1,19 @@
+config MODULE_BAR_0
+    bool "Module Bar 0"
+    select MODULE_FOO
+    select REQUIRES_FOO_0
+    help
+        This specifically brings in the 0 implementation of FOO.
+
+config MODULE_BAR_1
+    bool "Module Bar 1"
+    select MODULE_FOO
+    select REQUIRES_FOO_1
+    help
+        This specifically brings in the 1 implementation of FOO.
+
+config BOARD_HAS_FOO_2
+    bool "Example of HAS_FOO_2"
+    select HAS_FOO_2
+
+source "Kconfig.generated"
