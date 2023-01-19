@@ -205,22 +205,84 @@ typedef struct {
 #define UART_ISR_PRIO       (2)
 
 /**
- * @name    This CPU makes use of the following shared SPI functions
+ * @brief   Define a magic number that tells us to use hardware chip select
+ *
+ * We use a random value here, that does clearly differentiate from any possible
+ * GPIO_PIN(x) value.
+ */
+#define SPI_HWCS_MASK       (0xffffff00)
+
+/**
+ * @brief   Override the default SPI hardware chip select access macro
+ *
+ * Since the CPU does only support one single hardware chip select line, we can
+ * detect the usage of non-valid lines by comparing to SPI_HWCS_VALID.
+ */
+#define SPI_HWCS(x)         (SPI_HWCS_MASK | x)
+
+/**
+ * @brief   Define value for unused CS line
+ */
+#define SPI_CS_UNDEF        (GPIO_UNDEF)
+
+#ifndef DOXYGEN
+/**
+ * @brief   Overwrite the default spi_cs_t type definition
  * @{
  */
-#define PERIPH_SPI_NEEDS_TRANSFER_BYTE  1
-#define PERIPH_SPI_NEEDS_TRANSFER_REG   1
-#define PERIPH_SPI_NEEDS_TRANSFER_REGS  1
+#define HAVE_SPI_CS_T
+typedef uint32_t spi_cs_t;
+/** @} */
+#endif
+
+/**
+ * @brief   Use the shared SPI functions
+ * @{
+ */
+/** Use transfer byte function from periph common */
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTE
+/** Use transfer reg function from periph common */
+#define PERIPH_SPI_NEEDS_TRANSFER_REG
+/** Use transfer regs function from periph common */
+#define PERIPH_SPI_NEEDS_TRANSFER_REGS
+/** @} */
+
+/**
+ * @brief   Override SPI clock speed values
+ * @{
+ */
+#define HAVE_SPI_CLK_T
+enum {
+    SPI_CLK_100KHZ = KHZ(100), /**< drive the SPI bus with 100KHz */
+    SPI_CLK_400KHZ = KHZ(400), /**< drive the SPI bus with 400KHz */
+    SPI_CLK_1MHZ   = MHZ(1),   /**< drive the SPI bus with 1MHz */
+    SPI_CLK_5MHZ   = MHZ(5),   /**< drive the SPI bus with 5MHz */
+    SPI_CLK_10MHZ  = MHZ(10),  /**< drive the SPI bus with 10MHz */
+};
+
+/**
+ * @brief   SPI clock type
+ */
+typedef uint32_t spi_clk_t;
 /** @} */
 
 /**
  * @brief   Structure for SPI configuration data
  */
 typedef struct {
-    uint32_t addr;          /**< SPI control register address */
-    gpio_t mosi;            /**< MOSI pin */
-    gpio_t miso;            /**< MISO pin */
-    gpio_t sclk;            /**< SCLK pin */
+    SPI_Type *dev;          /**< SPI device base register address */
+    gpio_t mosi_pin;        /**< MOSI pin */
+    gpio_t miso_pin;        /**< MISO pin */
+    gpio_t sclk_pin;        /**< SCLK pin */
+    spi_cs_t cs_pin;        /**< HWCS pin, set to SPI_CS_UNDEF if not mapped */
+    uint32_t rcumask;       /**< bit in the RCC peripheral enable register */
+    uint8_t apbbus;         /**< APBx bus the device is connected to */
+#ifdef MODULE_PERIPH_DMA
+    dma_t tx_dma;           /**< Logical DMA stream used for TX */
+    uint8_t tx_dma_chan;    /**< DMA channel used for TX */
+    dma_t rx_dma;           /**< Logical DMA stream used for RX */
+    uint8_t rx_dma_chan;    /**< DMA channel used for RX */
+#endif
 } spi_conf_t;
 
 /**
