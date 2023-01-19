@@ -902,6 +902,12 @@ boards/common/nucleo64/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO
 boards/common/nucleo64/include/arduino_pinmap\.h:[0-9]+: warning: Member ARDUINO_PIN_A5 \(macro definition\) of file arduino_pinmap\.h is not documented\.
 boards/common/nucleo64/include/board\.h:[0-9]+: warning: Member MOTOR_DRIVER_NUMOF \(macro definition\) of group boards_common_nucleo64 is not documented\.
 boards/common/nucleo64/include/board\.h:[0-9]+: warning: Member motor_driver_config\[\] \(variable\) of group boards_common_nucleo64 is not documented\.
+boards/common/nucleo64/include/board\.h:[0-9]+: warning: Member MRF24J40_PARAMS \(macro definition\) of group boards_common_nucleo64 is not documented\.
+boards/common/nucleo64/include/board\.h:[0-9]+: warning: Member MRF24J40_PARAM_CS \(macro definition\) of group boards_common_nucleo64 is not documented\.
+boards/common/nucleo64/include/board\.h:[0-9]+: warning: Member MRF24J40_PARAM_INT \(macro definition\) of group boards_common_nucleo64 is not documented\.
+boards/common/nucleo64/include/board\.h:[0-9]+: warning: Member MRF24J40_PARAM_RESET \(macro definition\) of group boards_common_nucleo64 is not documented\.
+boards/common/nucleo64/include/board\.h:[0-9]+: warning: Member MRF24J40_PARAM_SPI \(macro definition\) of group boards_common_nucleo64 is not documented\.
+boards/common/nucleo64/include/board\.h:[0-9]+: warning: Member MRF24J40_PARAM_SPI_CLK \(macro definition\) of group boards_common_nucleo64 is not documented\.
 boards/common/particle\-mesh/include/board\.h:[0-9]+: warning: Member LED_MASK \(macro definition\) of file board\.h is not documented\.
 boards/common/particle\-mesh/include/board\.h:[0-9]+: warning: Member LED_PORT \(macro definition\) of file board\.h is not documented\.
 boards/common/particle\-mesh/include/periph_conf_common\.h:[0-9]+: warning: Member PWM_NUMOF \(macro definition\) of file periph_conf_common\.h is not documented\.
@@ -9100,6 +9106,13 @@ drivers/mrf24j40/include/mrf24j40_registers\.h:[0-9]+: warning: Member MRF24J40_
 drivers/mrf24j40/include/mrf24j40_registers\.h:[0-9]+: warning: Member MRF24J40_PACON2_TXONTS2 \(macro definition\) of file mrf24j40_registers\.h is not documented\.
 drivers/mrf24j40/include/mrf24j40_registers\.h:[0-9]+: warning: Member MRF24J40_PACON2_TXONTS3 \(macro definition\) of file mrf24j40_registers\.h is not documented\.
 drivers/mrf24j40/include/mrf24j40_registers\.h:[0-9]+: warning: Member MRF24J40_REG_ACKTMOUT \(macro definition\) of file mrf24j40_registers\.h is not documented\.
+drivers/mrf24j40/include/mrf24j40_registers\.h:[0-9]+: warning: Member MRF24J40_ACKTMOUT_MAWD0 \(macro definition\) of file mrf24j40_registers\.h is not documented\.
+drivers/mrf24j40/include/mrf24j40_registers\.h:[0-9]+: warning: Member MRF24J40_ACKTMOUT_MAWD1 \(macro definition\) of file mrf24j40_registers\.h is not documented\.
+drivers/mrf24j40/include/mrf24j40_registers\.h:[0-9]+: warning: Member MRF24J40_ACKTMOUT_MAWD2 \(macro definition\) of file mrf24j40_registers\.h is not documented\.
+drivers/mrf24j40/include/mrf24j40_registers\.h:[0-9]+: warning: Member MRF24J40_ACKTMOUT_MAWD3 \(macro definition\) of file mrf24j40_registers\.h is not documented\.
+drivers/mrf24j40/include/mrf24j40_registers\.h:[0-9]+: warning: Member MRF24J40_ACKTMOUT_MAWD4 \(macro definition\) of file mrf24j40_registers\.h is not documented\.
+drivers/mrf24j40/include/mrf24j40_registers\.h:[0-9]+: warning: Member MRF24J40_ACKTMOUT_MAWD5 \(macro definition\) of file mrf24j40_registers\.h is not documented\.
+drivers/mrf24j40/include/mrf24j40_registers\.h:[0-9]+: warning: Member MRF24J40_ACKTMOUT_MAWD6 \(macro definition\) of file mrf24j40_registers\.h is not documented\.
 drivers/mrf24j40/include/mrf24j40_registers\.h:[0-9]+: warning: Member MRF24J40_REG_ASSOEADR0 \(macro definition\) of file mrf24j40_registers\.h is not documented\.
 drivers/mrf24j40/include/mrf24j40_registers\.h:[0-9]+: warning: Member MRF24J40_REG_ASSOEADR1 \(macro definition\) of file mrf24j40_registers\.h is not documented\.
 drivers/mrf24j40/include/mrf24j40_registers\.h:[0-9]+: warning: Member MRF24J40_REG_ASSOEADR2 \(macro definition\) of file mrf24j40_registers\.h is not documented\.

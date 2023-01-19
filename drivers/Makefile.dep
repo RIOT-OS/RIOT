@@ -122,7 +122,6 @@ endif
 ifneq (,$(filter nrfmin,$(USEMODULE)))
   FEATURES_REQUIRED += radio_nrfmin
   FEATURES_REQUIRED += periph_cpuid
-  USEMODULE += netif
 endif
 
 ifneq (,$(filter nrf24l01p_ng_%,$(USEMODULE)))
