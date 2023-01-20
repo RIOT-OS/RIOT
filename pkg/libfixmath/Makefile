@@ -9,4 +9,4 @@ all: $(filter libfixmath-unittests,$(USEMODULE))
 	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/$(PKG_NAME) -f $(CURDIR)/Makefile.$(PKG_NAME)
 
 libfixmath-unittests:
-	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/unittests -f $(CURDIR)/Makefile.$(PKG_NAME)-unittests
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/tests -f $(CURDIR)/Makefile.$(PKG_NAME)-unittests

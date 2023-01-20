@@ -14,5 +14,6 @@ CFLAGS += $(libfixmath_options:CONFIG_FIXMATH_%=-DFIXMATH_%)
 INCLUDES += -I$(PKG_SOURCE_DIR)/libfixmath
 
 ifneq (,$(filter libfixmath-unittests,$(USEMODULE)))
-  INCLUDES += -I$(PKG_SOURCE_DIR)/unittests
+  INCLUDES += -I$(PKG_SOURCE_DIR)
+  INCLUDES += -I$(PKG_SOURCE_DIR)/tests
 endif
