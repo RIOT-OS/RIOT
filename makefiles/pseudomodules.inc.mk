@@ -581,6 +581,7 @@ PSEUDOMODULES += crypto_aes_unroll
 
 # declare shell version of test_utils_interactive_sync
 PSEUDOMODULES += test_utils_interactive_sync_shell
+PSEUDOMODULES += test_utils_main_exit_cb
 
 # All auto_init modules are pseudomodules
 PSEUDOMODULES += auto_init_%
