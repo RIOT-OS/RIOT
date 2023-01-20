@@ -1,7 +1,7 @@
 PKG_NAME=nanopb
 PKG_URL=https://github.com/nanopb/nanopb
-# 0.4.6
-PKG_VERSION=afc499f9a410fc9bbf6c9c48cdd8d8b199d49eb4
+# 0.4.7
+PKG_VERSION=b97aa657a706d3ba4a9a6ccca7043c9d6fe41cba
 PKG_LICENSE=MIT
 
 include $(RIOTBASE)/pkg/pkg.mk
