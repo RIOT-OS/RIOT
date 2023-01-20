@@ -33,17 +33,12 @@ const uint8_t sx126x_max_sf = LORA_SF12;
 #define MAC_TIMER_CHAN_ACK  (0U)    /**< MAC timer channel for transmitting an ACK frame */
 #define MAC_TIMER_CHAN_IFS  (1U)    /**< MAC timer channel for handling IFS logic */
 
-static uint8_t rxbuf[IEEE802154_FRAME_LEN_MAX]; /* len PHR + PSDU + LQI */
-static uint8_t txbuf[IEEE802154_FRAME_LEN_MAX]; /* len PHR + PSDU + LQI */
-static uint8_t ack[IEEE802154_ACK_FRAME_LEN];
-static uint8_t _size;
-static sx126x_pkt_status_lora_t _pkt_status;
+
 static uint8_t sx126x_short_addr[IEEE802154_SHORT_ADDRESS_LEN];
 static uint8_t sx126x_long_addr[IEEE802154_LONG_ADDRESS_LEN];
 static uint16_t sx126x_pan_id;
 
-#define SX126X_TIMER                        TIMER_DEV(1)
-#define TIMER_FREQ                          (65000UL) // 1/time of 1 symbol
+
 static struct {
     bool ifs        : 1;    /**< if true, the device is currently inside the IFS period */
     bool cca_send   : 1;    /**< whether the next transmission uses CCA or not */
@@ -95,51 +90,8 @@ void isr_subghz_radio(void)
 #endif 
 
 
- static void _set_ifs_timer(bool lifs)
-{
-    uint8_t timeout;
-    cfg.ifs = true;
-    if (lifs) {
-        timeout = IEEE802154_LIFS_SYMS;
-    }
-    else {
-        timeout = IEEE802154_SIFS_SYMS;
-    }
 
-    timer_set(SX126X_TIMER, MAC_TIMER_CHAN_IFS, timeout);
-    timer_start(SX126X_TIMER);
-} 
 
- static void _timer_cb(void *arg, int chan)
-{
-    (void)arg;
-    ieee802154_dev_t *hal = _sx126x_hal_dev;
-    sx126x_t* dev = hal->priv;
-
-    if (chan == MAC_TIMER_CHAN_ACK) {
-        _set_state(dev, STATE_IDLE);
-        uint16_t chksum = 0;
-        /* Copy sqn */
-        ack[0] = IEEE802154_FCF_TYPE_ACK;
-        if (cfg.pending) {
-            ack[0] |= IEEE802154_FCF_FRAME_PEND;
-        }
-        ack[1] = 0x00;
-        ack[2] = rxbuf[2];
-        chksum = ucrc16_calc_le(ack, IEEE802154_ACK_FRAME_LEN-2, UCRC16_CCITT_POLY_LE, chksum);
-        memcpy(&ack[3], &chksum, 2);
-        sx126x_set_buffer_base_address(dev, 0x00, 0x00);
-        sx126x_write_buffer(dev, 0x00, ack, IEEE802154_ACK_FRAME_LEN);
-        sx126x_set_lora_payload_length(dev, IEEE802154_ACK_FRAME_LEN);
-        _set_state(dev, STATE_TX);
-        _state = STATE_ACK;
-    }
-    else if (chan == MAC_TIMER_CHAN_IFS) {
-        cfg.ifs = false;
-    }
-    
-    timer_stop(SX126X_TIMER);
-}
  
 
 void sx126x_hal_setup(sx126x_t *dev, ieee802154_dev_t *hal)
@@ -156,50 +108,9 @@ void sx126x_setup(sx126x_t *dev, uint8_t index)
     (void)dev;
     (void)index;
     /* reset buffer */
-    rxbuf[0] = 0;
-    txbuf[0] = 0;
-
-    ack[0] = IEEE802154_FCF_TYPE_ACK; /* FCF */
-    ack[1] = 0; /* FCF */
-
-    int result = timer_init(SX126X_TIMER, TIMER_FREQ, _timer_cb, NULL);
-    assert(result >= 0);
-    (void)result;
-    timer_stop(SX126X_TIMER);
 }
 
-static bool _l2filter(uint8_t *mhr)
-{
-    uint8_t dst_addr[IEEE802154_LONG_ADDRESS_LEN];
-    le_uint16_t dst_pan;
-    uint8_t pan_bcast[] = IEEE802154_PANID_BCAST;
 
-    int addr_len = ieee802154_get_dst(mhr, dst_addr, &dst_pan);
-
-    if ((mhr[0] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_BEACON) {
-        if ((memcmp(&sx126x_pan_id, pan_bcast, 2) == 0)) {
-            return true;
-        }
-    }
-    /* filter PAN ID */
-    /* Will only work on little endian platform (all?) */
-
-    if ((memcmp(pan_bcast, dst_pan.u8, 2) != 0) &&
-        (memcmp(&sx126x_pan_id, dst_pan.u8, 2) != 0)) {
-        return false;
-    }
-
-    /* check destination address */
-    if (((addr_len == IEEE802154_SHORT_ADDRESS_LEN) &&
-          (memcmp(sx126x_short_addr, dst_addr, addr_len) == 0 ||
-           memcmp(ieee802154_addr_bcast, dst_addr, addr_len) == 0)) ||
-        ((addr_len == IEEE802154_LONG_ADDRESS_LEN) &&
-          (memcmp(sx126x_long_addr, dst_addr, addr_len) == 0))) {
-        return true;
-    }
-
-    return false;
-}
 
 static int _set_state(sx126x_t *dev, sx126x_state_t state)
 {
@@ -283,79 +194,16 @@ void sx126x_hal_task_handler(ieee802154_dev_t *hal)
     sx126x_get_and_clear_irq_status(dev, &irq_mask);
 
     if (sx126x_is_stm32wl(dev)) {
-/* #if IS_USED(MODULE_SX126X_STM32WL)
+    #if IS_USED(MODULE_SX126X_STM32WL)
         NVIC_EnableIRQ(SUBGHZ_Radio_IRQn);
-#endif */
- 
+    #endif  
     if (irq_mask & SX126X_IRQ_TX_DONE) {
-        if(_state != STATE_ACK){
         DEBUG("[sx126x] netdev: SX126X_IRQ_TX_DONE\n");
-        _set_ifs_timer(txbuf[0] > IEEE802154_SIFS_MAX_FRAME_SIZE);
         hal->cb(hal, IEEE802154_RADIO_CONFIRM_TX_DONE);
         }
-        else {
-            _state = STATE_IDLE;
-            DEBUG("[sx126x] TX ACK done.\n");
-            _set_ifs_timer(false);
-            hal->cb(hal, IEEE802154_RADIO_INDICATION_RX_DONE);
-        }
-    }
     else if (irq_mask & SX126X_IRQ_RX_DONE) {
         DEBUG("[sx126x] netdev: SX126X_IRQ_RX_DONE\n");
-
-    
-
-    sx126x_rx_buffer_status_t rx_buffer_status;
-    sx126x_get_rx_buffer_status(dev, &rx_buffer_status);
-    _size = rx_buffer_status.pld_len_in_bytes;
-    sx126x_read_buffer(dev, rx_buffer_status.buffer_start_pointer, (uint8_t*)rxbuf, _size);
-    sx126x_get_lora_pkt_status(dev, &_pkt_status);
-                bool l2filter_passed = _l2filter(rxbuf);
-                bool is_auto_ack_en = !IS_ACTIVE(CONFIG_IEEE802154_AUTO_ACK_DISABLE);
-                bool is_ack = (rxbuf[0] & IEEE802154_FCF_TYPE_ACK)&&(rxbuf[1] == 0x00);
-                bool ack_req = rxbuf[0] & IEEE802154_FCF_ACK_REQ;
-
-            uint16_t chksum = 0;
-            uint16_t exp_chksum;
-            memcpy(&exp_chksum, (uint8_t*)rxbuf+_size-2, 2);
-            chksum = ucrc16_calc_le(rxbuf, _size-2, UCRC16_CCITT_POLY_LE, chksum);
-            chksum = byteorder_htols(chksum).u16;
-            if (chksum != exp_chksum) {
-                hal->cb(hal, IEEE802154_RADIO_INDICATION_CRC_ERROR);
-            }
-
-                /* If radio is in promiscuos mode, indicate packet and
-                 * don't event think of sending an ACK frame :) */
-                if (cfg.promisc) {
-                    DEBUG("[sx126x] Promiscuous mode is enabled.\n");
-                    hal->cb(hal, IEEE802154_RADIO_INDICATION_RX_DONE);
-                }
-                /* If the L2 filter passes, device if the frame is indicated
-                 * directly or if the driver should send an ACK frame before
-                 * the indication */
-                else if (l2filter_passed) {
-                    if (ack_req && is_auto_ack_en) {
-                        timer_set(SX126X_TIMER, MAC_TIMER_CHAN_ACK, IEEE802154_SIFS_SYMS);
-                        timer_start(SX126X_TIMER);
-                    }
-                    else {
-                        DEBUG("[sx126x] RX frame doesn't require ACK frame.\n");
-                        hal->cb(hal, IEEE802154_RADIO_INDICATION_RX_DONE);
-                    }
-                }
-                /* In case the packet is an ACK and the ACK filter is disabled,
-                 * indicate the frame reception */
-                else if (is_ack && !cfg.ack_filter) {
-                    DEBUG("[sx126x] Received ACK.\n");
-                    hal->cb(hal, IEEE802154_RADIO_INDICATION_RX_DONE);
-                }
-                /* If all failed, simply drop the frame and continue listening
-                 * to incoming frames */
-                else {
-                    DEBUG("[sx126x] Addr filter failed or ACK filter on.\n");
-                    _set_state(dev, STATE_RX);
-                   
-                }
+        hal->cb(hal, IEEE802154_RADIO_INDICATION_RX_DONE);   
     }
     else if (irq_mask & SX126X_IRQ_PREAMBLE_DETECTED) {
         DEBUG("[sx126x] netdev: SX126X_IRQ_PREAMBLE_DETECTED\n");
@@ -391,9 +239,7 @@ void sx126x_hal_task_handler(ieee802154_dev_t *hal)
     else {
         DEBUG("[sx126x] netdev: SX126X_IRQ_NONE\n");
     }
-      #if IS_USED(MODULE_SX126X_STM32WL)
-        NVIC_EnableIRQ(SUBGHZ_Radio_IRQn);
-    #endif  
+
 
 }
 }
@@ -405,28 +251,18 @@ static int _write(ieee802154_dev_t *hal, const iolist_t *iolist){
     sx126x_t *dev = hal->priv;
     (void)dev;
     size_t pos = 0;
-    uint16_t chksum = 0;
     /* Full buffer used for Tx */
     sx126x_set_buffer_base_address(dev, 0x00, 0x00);
     /* Write payload buffer */
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
         if (iol->iol_len > 0) {
             sx126x_write_buffer(dev, pos, iol->iol_base, iol->iol_len);
-            memcpy((&txbuf[pos]), iol->iol_base, iol->iol_len);
             DEBUG("[sx126x] netdev: send: wrote data to payload buffer.\n");
-            chksum = ucrc16_calc_le(iol->iol_base, iol->iol_len, UCRC16_CCITT_POLY_LE, chksum);
             pos += iol->iol_len;
         }
     }
-    
-    /* Ignore send if packet size is 0 */
-    if (!pos) {
-        return 0;
-    }
 
-    chksum = byteorder_htols(chksum).u16;
-    sx126x_write_buffer(dev, pos, (uint8_t*) &chksum, sizeof(chksum));
-    sx126x_set_lora_payload_length(dev, pos+2);
+    sx126x_set_lora_payload_length(dev, pos);
     DEBUG("[sx126x] writing (size: %d).\n", (pos));
     return 0;
 }
@@ -437,9 +273,7 @@ static int _request_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
     (void)ctx;
     switch (op) {
         case IEEE802154_HAL_OP_TRANSMIT:
-        if (cfg.ifs) {
-            return 0;
-        }
+
         _set_state(dev, STATE_TX);
 
         break;
@@ -526,7 +360,7 @@ static int _len(ieee802154_dev_t *hal){
     sx126x_t *dev = hal->priv;
     sx126x_rx_buffer_status_t rx_buffer_status;
     sx126x_get_rx_buffer_status(dev, &rx_buffer_status);
-    return rx_buffer_status.pld_len_in_bytes-2;
+    return rx_buffer_status.pld_len_in_bytes;
 }
 
 static int _read(ieee802154_dev_t *hal, void *buf, size_t max_size, ieee802154_rx_info_t *info)
@@ -534,31 +368,42 @@ static int _read(ieee802154_dev_t *hal, void *buf, size_t max_size, ieee802154_r
     (void)hal;
     (void)buf;
     (void)info;
-    DEBUG("[sx126x] first 3 bytes of received packet: ");
-    uint8_t size = 0;
-    netdev_lora_rx_info_t *packet_info = (void*)info;
 
+    sx126x_t* dev = hal->priv;
+    
+    uint8_t size = 0;
+
+
+        /* Getting information about last received packet */
+    netdev_lora_rx_info_t *packet_info = (void*)info;
+    sx126x_rx_buffer_status_t rx_buffer_status;
+    sx126x_pkt_status_lora_t pkt_status;
+    sx126x_get_rx_buffer_status(dev, &rx_buffer_status);
+    size = rx_buffer_status.pld_len_in_bytes;
+    sx126x_get_lora_pkt_status(dev, &pkt_status);
     if (packet_info) {
-        packet_info->snr = _pkt_status.snr_pkt_in_db;
-        packet_info->rssi = _pkt_status.rssi_pkt_in_dbm;
+        packet_info->snr = pkt_status.snr_pkt_in_db;
+        packet_info->rssi = pkt_status.rssi_pkt_in_dbm;
     }
 
-    size = _size;
+      /* Put PSDU to the output buffer */
+    sx126x_read_buffer(dev, rx_buffer_status.buffer_start_pointer, (uint8_t*)buf, size);
+    
     if (buf == NULL) {
-        return size-2;
+        DEBUG("Buf in NULL\n");
+        return size;
     }
 
     if (size > max_size) {
         return -ENOBUFS;
     }
 
-    if (size < 5) {
+    if (size < 3) {
         return -EBADMSG;
     }
 
-    memcpy(buf, rxbuf, size-2);
-    DEBUG("%d %d %d\n", *(uint8_t*)buf, *((uint8_t*)buf+1), *((uint8_t*)buf+2));
-    return size-2;
+    DEBUG("[sx126x] first 3 bytes of received packet: %d %d %d\n", *(uint8_t*)buf, *((uint8_t*)buf+1), *((uint8_t*)buf+2));
+    return size;
 }
 
 static int _set_cca_threshold(ieee802154_dev_t *hal, int8_t threshold)
