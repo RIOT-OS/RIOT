@@ -99,60 +99,48 @@ static inline void _pm_unblock(bool *flag)
 
 #if IS_ACTIVE(MODULE_PERIPH_RTC)
 /* At 1Hz, RTC goes till 63 years (2^5, see 17.8.22 in datasheet)
- * struct tm younts the year since 1900, use the difference to RIOT_EPOCH
+ * struct tm counts the year since 1900, use the difference to RIOT_EPOCH
  * as an offset so the user can set years in RIOT_EPOCH + 63
  */
 static const uint16_t reference_year = RIOT_EPOCH - 1900;
 #endif
 
+/* using mode 0 syncbusy mode 2 uses the same bit */
 static void _wait_syncbusy(void)
 {
-    if (IS_ACTIVE(MODULE_PERIPH_RTT)) {
 #ifdef REG_RTC_MODE0_SYNCBUSY
     while (RTC->MODE0.SYNCBUSY.reg) {}
 #else
     while (RTC->MODE0.STATUS.bit.SYNCBUSY) {}
 #endif
-    } else {
-#ifdef REG_RTC_MODE2_SYNCBUSY
-    while (RTC->MODE2.SYNCBUSY.reg) {}
-#else
-    while (RTC->MODE2.STATUS.bit.SYNCBUSY) {}
-#endif
-    }
 }
 
 #if defined(MODULE_PERIPH_RTC) || defined(MODULE_PERIPH_RTT)
 static void _read_req(void)
 {
 #ifdef RTC_READREQ_RREQ
-    RTC->MODE0.READREQ.reg = RTC_READREQ_RREQ;
+    if (!(RTC->MODE0.READREQ.reg & RTC_READREQ_RCONT)){
+        RTC->MODE0.READREQ.reg = RTC_READREQ_RCONT;
+        //old:RTC->MODE0.READREQ.reg = RTC_READREQ_RCONT;
+    }
 #endif
     _wait_syncbusy();
 }
 #endif
 
-static void _poweron(void)
+MAYBE_UNUSED
+static void _apbon(void)
 {
 #ifdef MCLK
     MCLK->APBAMASK.reg |= MCLK_APBAMASK_RTC;
 #else
     PM->APBAMASK.reg |= PM_APBAMASK_RTC;
 #endif
+
 }
 
-__attribute__((unused))
-static bool _power_is_on(void)
-{
-#ifdef MCLK
-    return MCLK->APBAMASK.reg & MCLK_APBAMASK_RTC;
-#else
-    return PM->APBAMASK.reg & PM_APBAMASK_RTC;
-#endif
-}
-
-__attribute__((unused))
-static void _poweroff(void)
+MAYBE_UNUSED
+static void _abpoff(void)
 {
 #ifdef MCLK
     MCLK->APBAMASK.reg &= ~MCLK_APBAMASK_RTC;
@@ -162,14 +150,45 @@ static void _poweroff(void)
 }
 
 MAYBE_UNUSED
+static bool _is_abpon(void)
+{
+#ifdef MCLK
+    return MCLK->APBAMASK.reg & MCLK_APBAMASK_RTC;
+#else
+    return PM->APBAMASK.reg & PM_APBAMASK_RTC;
+#endif
+}
+
+MAYBE_UNUSED
 static inline void _rtc_set_enabled(bool on)
 {
-#ifdef REG_RTC_MODE2_CTRLA
-    RTC->MODE2.CTRLA.bit.ENABLE = on;
+#ifdef REG_RTC_MODE0_CTRLA
+    RTC->MODE0.CTRLA.bit.ENABLE = on;
 #else
-    RTC->MODE2.CTRL.bit.ENABLE = on;
+    RTC->MODE0.CTRL.bit.ENABLE = on;
 #endif
     _wait_syncbusy();
+}
+
+MAYBE_UNUSED
+static void _poweron(void){
+    _rtc_set_enabled(1);
+}
+
+__attribute__((unused))
+static void _poweroff(void)
+{
+    _rtc_set_enabled(0);
+}
+
+MAYBE_UNUSED
+bool _power_is_on(void)
+{
+#ifdef REG_RTC_MODE0_CTRLA
+    return RTC->MODE0.CTRLA.bit.ENABLE;
+#else
+    return RTC->MODE0.CTRL.bit.ENABLE;
+#endif
 }
 
 static inline void _rtt_reset(void)
@@ -349,10 +368,9 @@ void rtc_init(void)
 {
     /* clear previously set pm mode blockers */
     _pm_unblock(&_pm_alarm);
-
+    _apbon();
     _poweroff();
     _rtc_clock_setup();
-    _poweron();
 
     _rtc_init();
 
@@ -374,9 +392,9 @@ void rtt_init(void)
     /* clear previously set pm mode blockers */
     _pm_unblock(&_pm_alarm);
     _pm_unblock(&_pm_overflow);
-
+    _apbon();
+    _rtc_set_enabled(0);
     _rtt_clock_setup();
-    _poweron();
 
 #ifdef MODULE_PERIPH_RTC_MEM
     uint32_t backup[RTC_GPR_NUM_AVAIL];
@@ -386,10 +404,10 @@ void rtt_init(void)
     _rtt_reset();
 
 #ifdef MODULE_PERIPH_RTC_MEM
-#ifdef RTC_MODE2_CTRLB_GP2EN
+#ifdef RTC_MODE0_CTRLB_GP2EN
     /* RTC driver does not use COMP[1] or ALARM[1] */
     /* Use second set of Compare registers as general purpose register */
-    RTC->MODE2.CTRLB.reg = RTC_MODE2_CTRLB_GP2EN;
+    RTC->MODE0.CTRLB.reg = RTC_MODE0_CTRLB_GP2EN;
 #endif
     _write_gp(backup);
 #endif /* MODULE_PERIPH_RTC_MEM */
@@ -625,7 +643,7 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
                                        | RTC_MODE2_ALARM_SECOND(time->tm_sec);
     RTC->MODE2.Mode2Alarm[0].MASK.reg = RTC_MODE2_MASK_SEL(6);
 
-    /* Enable IRQ */
+    /* enable IRQ */
     alarm_cb.cb  = cb;
     alarm_cb.arg = arg;
 
@@ -692,6 +710,7 @@ void rtt_set_overflow_cb(rtt_cb_t cb, void *arg)
         _pm_block(&_pm_overflow);
     }
 }
+
 void rtt_clear_overflow_cb(void)
 {
     /* disable overflow interrupt */
@@ -804,6 +823,7 @@ static void _isr_rtt(void)
             alarm_cb.cb(alarm_cb.arg);
         }
     }
+
 }
 
 static void _isr_tamper(void)
@@ -818,11 +838,29 @@ static void _isr_tamper(void)
 #endif
 }
 
+/* samd* and samr21 have no continuous read control but continuous read request,
+ * that is disabled when a rtc register is written,
+ * this activates the register when a sync is completed */
+static void _isr_syncrdy(void)
+{
+#ifdef RTC_MODE0_INTFLAG_SYNCRDY
+    if (RTC->MODE0.INTFLAG.bit.SYNCRDY) {
+        RTC->MODE0.INTFLAG.reg = RTC_MODE0_INTFLAG_SYNCRDY;
+#ifdef RTC_READREQ_RCONT
+        if (!(RTC->MODE0.READREQ.reg & RTC_READREQ_RCONT)){
+            RTC->MODE0.READREQ.reg = RTC_READREQ_RCONT;
+        }
+#endif
+    }
+#endif
+}
+
 void isr_rtc(void)
 {
     _isr_rtc();
     _isr_rtt();
     _isr_tamper();
+    _isr_syncrdy();
 
     cortexm_isr_end();
 }
