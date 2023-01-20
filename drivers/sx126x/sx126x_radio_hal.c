@@ -387,10 +387,9 @@ static int _read(ieee802154_dev_t *hal, void *buf, size_t max_size, ieee802154_r
     }
 
       /* Put PSDU to the output buffer */
-    sx126x_read_buffer(dev, rx_buffer_status.buffer_start_pointer, (uint8_t*)buf, size);
+    
     
     if (buf == NULL) {
-        DEBUG("Buf in NULL\n");
         return size;
     }
 
@@ -401,7 +400,7 @@ static int _read(ieee802154_dev_t *hal, void *buf, size_t max_size, ieee802154_r
     if (size < 3) {
         return -EBADMSG;
     }
-
+    sx126x_read_buffer(dev, rx_buffer_status.buffer_start_pointer, (uint8_t*)buf, size);
     DEBUG("[sx126x] first 3 bytes of received packet: %d %d %d\n", *(uint8_t*)buf, *((uint8_t*)buf+1), *((uint8_t*)buf+2));
     return size;
 }
@@ -478,7 +477,7 @@ static int _confirm_on(ieee802154_dev_t *hal)
 {
     (void)hal;
 
-    return 0;
+    return -ENOTSUP;
 }
 
 static int _set_cca_mode(ieee802154_dev_t *hal, ieee802154_cca_mode_t mode)
@@ -502,7 +501,7 @@ static int _config_src_addr_match(ieee802154_dev_t *hal, ieee802154_src_match_t 
     (void)cmd;
     (void)value;
 
-    return 0;
+    return -ENOTSUP;
 }
 
 static int _set_frame_filter_mode(ieee802154_dev_t *hal, ieee802154_filter_mode_t mode)
@@ -539,7 +538,7 @@ static int _set_csma_params(ieee802154_dev_t *hal, const ieee802154_csma_be_t *b
     (void)bd;
     (void)retries;
 
-    return 0;
+    return -ENOTSUP;
 }
 
 
