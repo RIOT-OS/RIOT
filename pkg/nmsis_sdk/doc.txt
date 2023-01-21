@@ -1,0 +1,9 @@
+/**
+ * @defgroup pkg_nmsis_sdk Nuclei MCU Software Interface Standard
+ * @ingroup  pkg
+ * @brief    Vendor SDK from Nuclei System Technology for Nuclei-based MCUs
+ *
+ * The NMSIS SDK is required for Nuclei-based MCUs, for example the GDVF103.
+ *
+ * @see      https://github.com/Nuclei-Software/nuclei-sdk
+ */
