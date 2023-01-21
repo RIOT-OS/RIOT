@@ -1,5 +1,6 @@
 CPU_CORE := rv32imac
 
+FEATURES_PROVIDED += arch_nuclei
 FEATURES_PROVIDED += periph_clic
 FEATURES_PROVIDED += periph_gpio
 FEATURES_PROVIDED += periph_timer
