@@ -60,7 +60,12 @@ static void *main_trampoline(void *arg)
         LOG_INFO(CONFIG_BOOT_MSG_STRING "\n");
     }
 
-    main();
+    int res = main();
+
+    if (IS_USED(MODULE_TEST_UTILS_MAIN_EXIT_CB)) {
+        void test_utils_main_exit_cb(int res);
+        test_utils_main_exit_cb(res);
+    }
 
 #ifdef MODULE_TEST_UTILS_PRINT_STACK_USAGE
     void print_stack_usage_metric(const char *name, void *stack, unsigned max_size);

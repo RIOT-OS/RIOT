@@ -29,17 +29,12 @@
  */
 
 #include <stdio.h>
-#include "libfixmath-unittests.h"
 
-#define RUN(x)  if (x() != 0) { return 1; }
-
-int main(void)
+void test_utils_main_exit_cb(int res)
 {
-    RUN(fix16_exp_unittests);
-    RUN(fix16_macros_unittests);
-    RUN(fix16_str_unittests);
-    RUN(fix16_unittests);
-
-    puts("SUCCESS");
-    return 0;
+    if (res) {
+        puts("FAILED");
+    } else {
+        puts("SUCCESS");
+    }
 }

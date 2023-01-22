@@ -39,12 +39,6 @@ ifeq (,$(CONFIG_KCONFIG_USEPKG_TINYDTLS))
   endif
 endif
 
-ifneq (,$(or $(CONFIG_DTLS_DEBUG),$(filter -DCONFIG_DTLS_DEBUG,$(CFLAGS))))
-  CFLAGS += -DTINYDTLS_LOG_LVL=6
-else
-  CFLAGS += -DTINYDTLS_LOG_LVL=0
-endif
-
 # For now contrib only contains sock_dtls adaption
 ifneq (,$(filter tinydtls_sock_dtls,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/tinydtls/contrib

@@ -887,7 +887,6 @@ void sock_dtls_close(sock_dtls_t *sock)
 void sock_dtls_init(void)
 {
     dtls_init();
-    dtls_set_log_level(TINYDTLS_LOG_LVL);
 }
 
 static void _ep_to_session(const sock_udp_ep_t *ep, session_t *session)
