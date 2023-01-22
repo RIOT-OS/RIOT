@@ -35,7 +35,7 @@ on-board components:
 | Power Modes | 3 (Sleep, Deep Sleep, Standby)         |   no      |
 | GPIOs       | 80                                     |   yes     |
 | Timers      | 5 x 16-bit timer                       |   yes     |
-| RTC         | 1 x 32-bit counter, 20-bit prescaler   |   no      |
+| RTC         | 1 x 32-bit counter, 20-bit prescaler   |   yes     |
 | WDT         | 2 x 12-bit counter, 3-bit prescaler    |   yes     |
 | ADC         | 2 x 12-bit units, 16 channels, 1 Msps  |   no      |
 | DAC         | 2 x 12-bit channel                     |   no      |
