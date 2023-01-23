@@ -757,6 +757,69 @@ void pio_sm_set_pins_with_mask(pio_t pio, pio_sm_t sm, gpio_t values, gpio_t mas
     ctrl->pinctrl = pinctrl;
 }
 
+static void _pio_pins_configure(pio_t pio, pio_sm_t sm, const pio_gpio_init_t *pin_init)
+{
+    for (unsigned i = 0; i < pin_init->gpio_count; i++) {
+        gpio_pad_ctrl_t pad = pin_init->pad;
+        gpio_io_ctrl_t io = pin_init->io;
+        io.function_select = pio ? FUNCTION_SELECT_PIO1 : FUNCTION_SELECT_PIO0;
+        if (pin_init->gpio_direction & (1u << i)) { /* pin is output */
+            pad.output_disable = 0;
+        }
+        else {
+            pad.input_enable = 1;
+        }
+        gpio_set_pad_config(pin_init->gpio_base + i, pad);
+        gpio_set_io_config(pin_init->gpio_base + i, io);
+        pio_sm_set_pindirs_with_mask(pio, sm,
+                                     pin_init->gpio_direction << (pin_init->gpio_base + i),
+                                     0x1u << (pin_init->gpio_base + i));
+        pio_sm_set_pins_with_mask(pio, sm,
+                                  pin_init->gpio_state << (pin_init->gpio_base + i),
+                                  0x1u << (pin_init->gpio_base + i));
+    }
+}
+
+void pio_sm_set_set_pins_init(pio_t pio, pio_sm_t sm, const pio_gpio_init_t *pin_init)
+{
+    assert(pio <= PIO_NUMOF);
+    assert((unsigned)sm < PIO_SM_NUMOF);
+    assert(pin_init->gpio_base < 32);
+    assert(pin_init->gpio_count <= 5);
+    assert(pin_init->gpio_base + pin_init->gpio_count <= 32);
+
+    pio_sm_set_set_pins(pio, sm, pin_init->gpio_base, pin_init->gpio_count);
+    _pio_pins_configure(pio, sm, pin_init);
+
+}
+
+void pio_sm_set_out_pins_init(pio_t pio, pio_sm_t sm, const pio_gpio_init_t *pin_init)
+{
+    assert(pio <= PIO_NUMOF);
+    assert((unsigned)sm < PIO_SM_NUMOF);
+    assert(pin_init);
+    assert(pin_init->gpio_base < 32);
+    assert(pin_init->gpio_count <= 32);
+    assert(pin_init->gpio_base + pin_init->gpio_count <= 32);
+
+    pio_sm_set_out_pins(pio, sm, pin_init->gpio_base, pin_init->gpio_count);
+    _pio_pins_configure(pio, sm, pin_init);
+
+}
+
+void pio_sm_set_sideset_pins_init(pio_t pio, pio_sm_t sm, const pio_gpio_init_t *pin_init)
+{
+    assert(pio <= PIO_NUMOF);
+    assert((unsigned)sm < PIO_SM_NUMOF);
+    assert(pin_init);
+    assert(pin_init->gpio_base < 32);
+    assert(pin_init->gpio_count <= 5);
+    assert(pin_init->gpio_base + pin_init->gpio_count <= 32);
+
+    pio_sm_set_sideset_pins(pio, sm, pin_init->gpio_base);
+    _pio_pins_configure(pio, sm, pin_init);
+}
+
 void pio_print_status(pio_t pio)
 {
     assert(pio <= PIO_NUMOF);
