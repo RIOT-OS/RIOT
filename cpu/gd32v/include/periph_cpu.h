@@ -94,6 +94,7 @@ typedef uint32_t gpio_t;
  * - bit   4: output type (0: push-pull, 1: open-drain)
  */
 #define GPIO_MODE(io, pr, ot)   ((io << 0) | (pr << 2) | (ot << 4))
+
 /**
  * @brief   Override GPIO mode options
  *
@@ -109,6 +110,18 @@ typedef enum {
     GPIO_OD     = GPIO_MODE(3, 1, 0),   /**< open-drain w/o pull R */
     GPIO_OD_PU  = (0xff)                /**< not supported by HW */
 } gpio_mode_t;
+/** @} */
+
+/**
+ * @brief   Override flank configuration values
+ * @{
+ */
+#define HAVE_GPIO_FLANK_T
+typedef enum {
+    GPIO_RISING = 1,        /**< emit interrupt on rising flank */
+    GPIO_FALLING = 2,       /**< emit interrupt on falling flank */
+    GPIO_BOTH = 3           /**< emit interrupt on both flanks */
+} gpio_flank_t;
 /** @} */
 #endif /* ndef DOXYGEN */
 
