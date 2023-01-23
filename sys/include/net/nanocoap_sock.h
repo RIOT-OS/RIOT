@@ -132,6 +132,7 @@
 #include <stdint.h>
 #include <unistd.h>
 
+#include "random.h"
 #include "net/nanocoap.h"
 #include "net/sock/udp.h"
 #include "net/sock/util.h"
@@ -186,6 +187,7 @@ typedef struct {
                                                  functions. */
     nanocoap_socket_type_t type;            /**< Socket type (UDP, DTLS) */
 #endif
+    uint16_t msg_id;                        /**< next CoAP message ID */
 } nanocoap_sock_t;
 
 /**
@@ -198,6 +200,19 @@ typedef struct {
     uint8_t method;                 /**< request method (GET, POST, PUT)    */
     uint8_t blksize;                /**< CoAP blocksize exponent            */
 } coap_block_request_t;
+
+/**
+ * @brief   Get next consecutive message ID for use when building a new
+ *          CoAP request.
+ *
+ * @param[in]   sock    CoAP socket on which the ID is used
+ *
+ * @return  A new message ID that can be used for a request or response.
+ */
+static inline uint16_t nanocoap_sock_next_msg_id(nanocoap_sock_t *sock)
+{
+    return sock->msg_id++;
+}
 
 /**
  * @brief   Start a nanocoap server instance
@@ -230,6 +245,7 @@ static inline int nanocoap_sock_connect(nanocoap_sock_t *sock,
 #if IS_USED(MODULE_NANOCOAP_DTLS)
     sock->type = COAP_SOCKET_TYPE_UDP;
 #endif
+    sock->msg_id = random_uint32();
 
     return sock_udp_create(&sock->udp, local, remote, 0);
 }

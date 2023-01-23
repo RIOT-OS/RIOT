@@ -62,13 +62,6 @@ typedef struct {
     bool more;
 } _block_ctx_t;
 
-static uint16_t _get_id(void)
-{
-    __attribute__((section(".noinit")))
-    static uint16_t id;
-    return atomic_fetch_add_u16(&id, 1);
-}
-
 #if IS_USED(MODULE_NANOCOAP_DTLS)
 int nanocoap_sock_dtls_connect(nanocoap_sock_t *sock, sock_udp_ep_t *local,
                                const sock_udp_ep_t *remote, credman_tag_t tag)
@@ -456,7 +449,8 @@ ssize_t nanocoap_sock_get(nanocoap_sock_t *sock, const char *path, void *buf, si
         .iov_len  = len,
     };
 
-    pktpos += coap_build_hdr(pkt.hdr, COAP_TYPE_CON, NULL, 0, COAP_METHOD_GET, _get_id());
+    pktpos += coap_build_hdr(pkt.hdr, COAP_TYPE_CON, NULL, 0, COAP_METHOD_GET,
+                             nanocoap_sock_next_msg_id(sock));
     pktpos += coap_opt_put_uri_path(pktpos, 0, path);
 
     pkt.payload = pktpos;
@@ -488,7 +482,7 @@ ssize_t _sock_put_post(nanocoap_sock_t *sock, const char *path, unsigned code,
         .iov_len  = max_len,
     };
 
-    pktpos += coap_build_hdr(pkt.hdr, type, NULL, 0, code, _get_id());
+    pktpos += coap_build_hdr(pkt.hdr, type, NULL, 0, code, nanocoap_sock_next_msg_id(sock));
     pktpos += coap_opt_put_uri_path(pktpos, 0, path);
 
     if (response == NULL && type == COAP_TYPE_NON) {
@@ -581,7 +575,8 @@ ssize_t nanocoap_sock_delete(nanocoap_sock_t *sock, const char *path)
         .hdr = (void *)pktpos,
     };
 
-    pktpos += coap_build_hdr(pkt.hdr, COAP_TYPE_CON, NULL, 0, COAP_METHOD_DELETE, _get_id());
+    pktpos += coap_build_hdr(pkt.hdr, COAP_TYPE_CON, NULL, 0, COAP_METHOD_DELETE,
+                             nanocoap_sock_next_msg_id(sock));
     pktpos += coap_opt_put_uri_path(pktpos, 0, path);
 
     pkt.payload = pktpos;
@@ -665,7 +660,8 @@ static int _fetch_block(nanocoap_sock_t *sock, uint8_t *buf, size_t len,
     };
     uint16_t lastonum = 0;
 
-    buf += coap_build_hdr(pkt.hdr, COAP_TYPE_CON, NULL, 0, COAP_METHOD_GET, _get_id());
+    buf += coap_build_hdr(pkt.hdr, COAP_TYPE_CON, NULL, 0, COAP_METHOD_GET,
+                          nanocoap_sock_next_msg_id(sock));
     buf += coap_opt_put_uri_pathquery(buf, &lastonum, path);
     buf += coap_opt_put_uint(buf, lastonum, COAP_OPT_BLOCK2, (num << 4) | blksize);
 
@@ -703,7 +699,8 @@ int nanocoap_sock_block_request(coap_block_request_t *req,
     uint8_t *pktpos = (void *)pkt.hdr;
     uint16_t lastonum = 0;
 
-    pktpos += coap_build_hdr(pkt.hdr, COAP_TYPE_CON, NULL, 0, req->method, _get_id());
+    pktpos += coap_build_hdr(pkt.hdr, COAP_TYPE_CON, NULL, 0, req->method,
+                             nanocoap_sock_next_msg_id(req->sock));
     pktpos += coap_opt_put_uri_pathquery(pktpos, &lastonum, req->path);
     pktpos += coap_opt_put_uint(pktpos, lastonum, COAP_OPT_BLOCK1,
                                 (req->blknum << 4) | req->blksize | (more ? 0x8 : 0));

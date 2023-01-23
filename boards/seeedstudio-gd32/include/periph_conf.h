@@ -26,9 +26,12 @@
 extern "C" {
 #endif
 
-/* This board provides an high frequency oscillator */
 #ifndef CONFIG_BOARD_HAS_HXTAL
-#define CONFIG_BOARD_HAS_HXTAL  1
+#define CONFIG_BOARD_HAS_HXTAL  1   /**< This board provides an high frequency oscillator */
+#endif
+
+#ifndef CONFIG_BOARD_HAS_LXTAL
+#define CONFIG_BOARD_HAS_LXTAL  1   /**< The board provides a low frequency oscillator. */
 #endif
 
 #ifndef CONFIG_CLOCK_HXTAL
