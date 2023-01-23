@@ -22,7 +22,9 @@ config CPU_FAM_GD32V
 
     select MODULE_PERIPH_CLIC if TEST_KCONFIG
     select MODULE_PERIPH_WDT if MODULE_PERIPH_PM && HAS_PERIPH_WDT
-    select PACKAGE_NUCLEI_SDK
+    select PACKAGE_NMSIS_SDK
+
+menu "GD32V configuration"
 
 config CPU_MODEL_GD32VF103VBT6
     bool
@@ -47,5 +49,7 @@ config CPU_CORE
     default "rv32imac" if CPU_CORE_RV32IMAC
 
 rsource "periph/Kconfig"
+
+endmenu
 
 source "$(RIOTCPU)/riscv_common/Kconfig"

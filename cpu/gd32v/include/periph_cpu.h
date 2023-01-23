@@ -33,7 +33,39 @@ extern "C" {
  * @name    Power management configuration
  * @{
  */
-#define PROVIDES_PM_SET_LOWEST
+/**
+ * @brief   Number of usable low power modes
+ */
+#define PM_NUM_MODES    (3U)    /**< Number of usable low power modes */
+
+/**
+ * @brief   Power modes
+ *
+ * The GD32V has three power modes (terminology as defined by GigaDevice).
+ * - Sleep:      Only the clock of the RISC-V core is switched off.
+ * - Deep sleep: The RISC-V core including all AHB and APB peripheralsa and all
+ *               high speed clocks are off. The LDO is in operation and the
+ *               SRAM is retained.
+ *               The MCU can be woken up by external interrupts or events
+ *               without restart.
+ * - Standby:    The RISC-V core including all AHB and APB peripherals, all
+ *               high-speed clocks, and the LDO are off. The SRAM is not
+ *               retained.
+ *               The MCU can be woken up by WKUP or the NRST pin, watchdog
+ *               reset and RTC alarms with restart.
+ */
+enum {
+    GD32V_PM_STANDBY = 0,       /**< STANDBY mode,  */
+    GD32V_PM_DEEPSLEEP = 1,     /**< DEEPSLEEP mode, corresponds to STOP mode of STM32 */
+    GD32V_PM_IDLE = 2           /**< IDLE mode */
+};
+
+/**
+ * @brief   Wake-up pin used
+ */
+#ifndef CONFIG_PM_EWUP_USED
+#define CONFIG_PM_EWUP_USED     (0U)
+#endif
 /** @} */
 
 /**

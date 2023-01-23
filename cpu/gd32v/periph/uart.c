@@ -22,6 +22,7 @@
 #include "periph_cpu.h"
 #include "cpu.h"
 #include "clic.h"
+#include "pm_layered.h"
 
 #define RXENABLE            (USART_CTL0_REN_Msk | USART_CTL0_RBNEIE_Msk)
 
@@ -56,14 +57,18 @@ static inline void uart_init_pins(uart_t uart, uart_rx_cb_t rx_cb)
 
 static inline void uart_enable_clock(uart_t uart)
 {
-    /* TODO: add pm blocker */
+    if (isr_ctx[uart].rx_cb) {
+        pm_block(GD32V_PM_DEEPSLEEP);
+    }
     periph_clk_en(uart_config[uart].bus, uart_config[uart].rcu_mask);
 }
 
 static inline void uart_disable_clock(uart_t uart)
 {
     periph_clk_dis(uart_config[uart].bus, uart_config[uart].rcu_mask);
-    /* TODO remove pm blocker */
+    if (isr_ctx[uart].rx_cb) {
+        pm_unblock(GD32V_PM_DEEPSLEEP);
+    }
 }
 
 static inline void uart_init_usart(uart_t uart, uint32_t baudrate)

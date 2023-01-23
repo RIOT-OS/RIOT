@@ -8,3 +8,9 @@
 config MODULE_PERIPH
     bool
     default y
+
+config PM_EWUP_USED
+    bool "Use PA0/WKUP pin"
+    depends on MODULE_PM_LAYERED
+    help
+        If enabled, the PA0/WKUP pin can be used to wake up the MCU from standby mode.
