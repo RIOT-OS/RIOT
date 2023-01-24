@@ -37,7 +37,7 @@
 #include "test_utils/expect.h"
 #include "xtimer.h"
 
-#define SYMBOL_TIME (256U) /**< 16 us */
+#define SYMBOL_TIME (1024U) /**< 16 us */
 #define ACK_TIMEOUT_TIME (54 * SYMBOL_TIME)
 #define TX_RX_TURNAROUND (12 * SYMBOL_TIME)
 

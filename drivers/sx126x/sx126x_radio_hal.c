@@ -13,7 +13,8 @@
 #include "net/ieee802154/radio.h"
 
 #include "event/thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
+
 #include "thread.h"
 #include "periph/timer.h"
 
@@ -33,7 +34,7 @@ const uint8_t sx126x_max_sf = LORA_SF12;
 #define MAC_TIMER_CHAN_ACK  (0U)    /**< MAC timer channel for transmitting an ACK frame */
 #define MAC_TIMER_CHAN_IFS  (1U)    /**< MAC timer channel for handling IFS logic */
 #define LORA_LIFS_SYMS          5
-#define LORA_SIFS_SYMS          1
+#define LORA_ACK_REPLY          1
 
 static uint8_t sx126x_short_addr[IEEE802154_SHORT_ADDRESS_LEN];
 static uint8_t sx126x_long_addr[IEEE802154_LONG_ADDRESS_LEN];
@@ -44,6 +45,16 @@ static ieee802154_dev_t *_sx126x_hal_dev;
 
 static int _set_state(sx126x_t *dev, sx126x_state_t state);
 static int _get_state(sx126x_t *dev, void* val);
+
+
+void sx126x_hal_setup(sx126x_t *dev, ieee802154_dev_t *hal)
+{
+    hal->driver = &sx126x_ops;
+    hal->priv = dev;
+
+    _sx126x_hal_dev = hal;
+
+}
 
 #if IS_USED(MODULE_SX126X_STM32WL)
 
@@ -66,20 +77,35 @@ void isr_subghz_radio(void)
 }
 #endif 
 
-void sx126x_hal_setup(sx126x_t *dev, ieee802154_dev_t *hal)
+static void ack_timer_cb(void *arg)
 {
-    hal->driver = &sx126x_ops;
-    hal->priv = dev;
-
-    _sx126x_hal_dev = hal;
-
+    sx126x_t *dev = arg;
+    (void)dev;
+    _set_state(dev, STATE_IDLE);
+    uint8_t ack[3] = {
+        IEEE802154_FCF_TYPE_ACK,
+        0x00, 
+        dev->seq_num
+    };
+    sx126x_set_buffer_base_address(dev, 0x80, 0x00);
+    sx126x_write_buffer(dev, 0x80, ack, IEEE802154_ACK_FRAME_LEN-2);
+    sx126x_set_lora_payload_length(dev, IEEE802154_ACK_FRAME_LEN-2);
+    _set_state(dev, STATE_TX);
+    DEBUG("%d %d %d\n", ack[0], ack[1], ack[2]);
+    dev->ack_filter = true;
+    
+    ztimer_remove(ZTIMER_USEC, &dev->ack_timer);
 }
 
 void sx126x_setup(sx126x_t *dev, uint8_t index)
 {
     (void)dev;
     (void)index;
-    /* reset buffer */
+
+    dev->ack_timer.arg = dev;
+    dev->ack_timer.callback = ack_timer_cb;
+    
+    dev->ack_filter = false;
 }
 
 static bool _l2filter(uint8_t *mhr)
@@ -201,8 +227,15 @@ void sx126x_hal_task_handler(ieee802154_dev_t *hal)
     if (sx126x_is_stm32wl(dev)) {
 
     if (irq_mask & SX126X_IRQ_TX_DONE) {
+        if(dev->ack_filter == false){
         DEBUG("[sx126x] netdev: SX126X_IRQ_TX_DONE\n");
         hal->cb(hal, IEEE802154_RADIO_CONFIRM_TX_DONE);
+        }
+        else {
+           dev->ack_filter = false;
+            DEBUG("[sx126x] TX ACK done.\n");
+            hal->cb(hal, IEEE802154_RADIO_INDICATION_RX_DONE);
+        }
         }
     else if (irq_mask & SX126X_IRQ_RX_DONE) {
         DEBUG("[sx126x] netdev: SX126X_IRQ_RX_DONE\n");
@@ -217,7 +250,7 @@ void sx126x_hal_task_handler(ieee802154_dev_t *hal)
         bool is_auto_ack_en = !IS_ACTIVE(CONFIG_IEEE802154_AUTO_ACK_DISABLE);
         bool is_ack = (rxbuf[0] & IEEE802154_FCF_TYPE_ACK)&&(rxbuf[1] == 0x00);
         bool ack_req = rxbuf[0] & IEEE802154_FCF_ACK_REQ;
-        
+        DEBUG("%d %d %d\n", rxbuf[0], rxbuf[1], rxbuf[2]);
     /* If radio is in promiscuos mode, indicate packet and
             * don't event think of sending an ACK frame :) */
             if (dev->promisc) {
@@ -230,8 +263,9 @@ void sx126x_hal_task_handler(ieee802154_dev_t *hal)
             * the indication */
             else if (l2filter_passed) {
                     if (ack_req && is_auto_ack_en) {
+                        dev->seq_num = rxbuf[2];
                        DEBUG("Received valid frame, need ack\n");
-                       hal->cb(hal, IEEE802154_RADIO_INDICATION_RX_DONE); //TODO
+                       ztimer_set(ZTIMER_USEC, &dev->ack_timer, LORA_ACK_REPLY);
                     }
                     else {
                         DEBUG("[sx126x] RX frame doesn't require ACK frame.\n");

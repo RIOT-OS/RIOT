@@ -34,6 +34,7 @@
 
 #include "kernel_defines.h"
 
+#include "ztimer.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -135,6 +136,9 @@ struct sx126x {
 
     uint8_t size;                           /**< size of the last received packet */
     sx126x_state_t state;
+
+    ztimer_t ack_timer;
+    uint8_t seq_num;
 };
 
 /**
