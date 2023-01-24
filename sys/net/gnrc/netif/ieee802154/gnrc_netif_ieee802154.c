@@ -462,6 +462,10 @@ int _get(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
                 if (hdr_len < 0) {
                     goto release;
                 }
+                /* The value obtained from NETOPT_MAX_PDU_SIZE is the smalles number of
+                   L2 payload bytes, resulting from the most possible header overhead.
+                   To get the actual possible payload size, we add the saving we gain,
+                   from the actual header size. */
                 sdu += (IEEE802154_MAX_HDR_LEN - hdr_len);
 #if IS_USED(MODULE_IEEE802154_SECURITY)
                 netdev_ieee802154_t *dev = container_of(netif->dev, netdev_ieee802154_t, netdev);
