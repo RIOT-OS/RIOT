@@ -147,6 +147,14 @@ static NORETURN void IRAM system_startup_cpu0(void)
     puf_sram_init((uint8_t *)&_sheap, SEED_RAM_LEN);
 #endif
 
+#if IS_USED(MODULE_ESP_IDF_HEAP)
+    /* init heap */
+    heap_caps_init();
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        ets_printf("Heap free: %u byte\n", get_free_heap_size());
+    }
+#endif
+
     /* initialize system call tables of ESP32x rom and newlib */
     syscalls_init();
 
@@ -205,14 +213,6 @@ static NORETURN void IRAM system_startup_cpu0(void)
     }
 
     LOG_STARTUP("PRO cpu is up (single core mode, only PRO cpu is used)\n");
-
-#if IS_USED(MODULE_ESP_IDF_HEAP)
-    /* init heap */
-    heap_caps_init();
-    if (IS_ACTIVE(ENABLE_DEBUG)) {
-        ets_printf("Heap free: %u byte\n", get_free_heap_size());
-    }
-#endif
 
     /* init esp_timer implementation */
     esp_timer_early_init();
