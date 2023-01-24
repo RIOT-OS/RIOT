@@ -199,7 +199,7 @@ ifneq (,$(filter sock_%,$(USEMODULE)))
   USEMODULE += iolist
 endif
 
-ifneq (,$(filter netif_dev_default,$(USEMODULE)))
+ifneq (,$(filter netif_default,$(USEMODULE)))
   USEMODULE += netif_dev_default
 endif
 

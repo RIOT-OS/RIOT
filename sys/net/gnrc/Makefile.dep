@@ -46,7 +46,7 @@ ifneq (,$(filter gnrc_lorawan_1_1,$(USEMODULE)))
   FEATURES_REQUIRED += periph_flashpage
 endif
 
-ifneq (,$(filter gnrc_netif_dev_default,$(USEMODULE)))
+ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
   # enable default network devices on the platform
   USEMODULE += netif_dev_default
 endif
