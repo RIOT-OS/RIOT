@@ -1,0 +1,20 @@
+# Copyright (c) 2023 Gunar Schorcht
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config BOARD_HAS_HXTAL
+    bool
+    help
+        Indicates that the board is providing an HXTAL oscillator
+
+config BOARD_HAS_LXTAL
+    bool
+    help
+        Indicates that the board is providing an LXTAL oscillator
+
+config CLOCK_HXTAL
+    int
+    default 8000000

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Koen Zandberg <koen@bergzand.net>
+ * Copyright (C) 2023 Gunar Schorcht <gunar@schorcht.net>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,13 +7,13 @@
  */
 
 /**
- * @ingroup     boards_seeedstudio-gd32
+ * @ingroup     boards_sipeed_longan_nano
  * @{
  *
  * @file
  * @brief       Board specific definitions for the SeeedStudio GD32 RISC-V board
  *
- * @author      Koen Zandberg <koen@bergzand.net>
+ * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
 #ifndef PERIPH_CONF_H

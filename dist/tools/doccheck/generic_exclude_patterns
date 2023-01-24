@@ -41,9 +41,15 @@ warning: Member PULSE_COUNTER_SAUL_INFO \(macro definition\) of
 warning: Member SHT1X_PARAMS \(macro definition\) of
 warning: Member SHT1X_PARAM_[A-Z0-9_]* \(macro definition\) of
 warning: Member SHT1X_SAULINFO \(macro definition\) of
+warning: Member TIMER_[0-9]_IRQN \(macro definition\) of
+warning: Member TIMER_NUMOF \(macro definition\) of
+warning: Member timer_config\[\] \(variable\) of
 warning: Member TMP00X_PARAM_ADDR \(macro definition\) of
 warning: Member TMP00X_PARAM_I2C \(macro definition\) of
 warning: Member TMP00X_PARAM_RATE \(macro definition\) of
+warning: Member UART_[0-9]_IRQN \(macro definition\) of
+warning: Member UART_NUMOF \(macro definition\) of
+warning: Member uart_config\[\] \(variable\) of
 warning: Member XTIMER_BACKOFF \(macro definition\) of
 warning: Member XTIMER_CHAN \(macro definition\) of
 warning: Member XTIMER_DEV \(macro definition\) of

@@ -25,8 +25,6 @@
 extern "C" {
 #endif
 
-#include "macros/units.h"
-
 /**
  * @name    Button pin definitions
  * @{
@@ -65,14 +63,6 @@ extern "C" {
 #define LED_RED_PIN         LED0_PIN    /**< LED0 is red */
 #define LED_GREEN_PIN       LED1_PIN    /**< LED1 is green */
 #define LED_BLUE_PIN        LED2_PIN    /**< LED2 is blue */
-/** @} */
-
-/**
- * @name    Xtimer configuration
- * @{
- */
-#define XTIMER_HZ                   MHZ(1)
-#define XTIMER_WIDTH                (16)
 /** @} */
 
 #ifdef __cplusplus

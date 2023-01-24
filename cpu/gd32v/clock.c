@@ -21,10 +21,6 @@
 #include "cpu.h"
 #include "periph_conf.h"
 
-#define CLOCK_AHB            CLOCK_CORECLOCK /* Equal to the CPU clock */
-#define CLOCK_APB1           CLOCK_AHB/2     /* Half AHB clock */
-#define CLOCK_APB2           CLOCK_AHB       /* Equal to the AHB clock */
-
 #define CLOCK_AHB_DIV        0          /* Max speed at 108 MHz */
 #define CLOCK_APB1_DIV       (0x04 | 0) /* Max speed at 54 MHz */
 #define CLOCK_APB2_DIV       (0x0 | 0)  /* Max speed at 108 MHz */

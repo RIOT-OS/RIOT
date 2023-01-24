@@ -6,4 +6,6 @@ ROM_LEN ?= 128K
 
 LINKER_SCRIPT ?= riscv.ld
 
+CFLAGS += -DCPU_MODEL_$(call uppercase_and_underscore,$(CPU_MODEL))
+
 include $(RIOTCPU)/riscv_common/Makefile.include
