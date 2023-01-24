@@ -177,6 +177,13 @@ typedef enum {
     NETOPT_TX_POWER,
     /**
      * @brief   (uint16_t) Given a packet, maximum L2 Service Data Unit
+     *
+     * Note that this option differs from the others, as it takes as
+     * input an @ref iolist_t, which holds a pointer to the corresponding
+     * @ref gnrc_netif_hdr_t of the packet to be framented.
+     * The output stored in a uint16_t differs from @ref NETOPT_MAX_PDU_SIZE
+     * in the way that it is the actual maximal payload size for the computed
+     * L2 header, instead of the worst case minimum guaranteed payload size.
      */
     NETOPT_MAX_SDU_SIZE,
     /**
