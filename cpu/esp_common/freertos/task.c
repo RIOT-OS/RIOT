@@ -116,6 +116,9 @@ void vTaskDelete(TaskHandle_t xTaskToDelete)
     DEBUG("%s pid=%d task=%p\n", __func__, thread_getpid(), xTaskToDelete);
 
     uint32_t pid = (uint32_t)xTaskToDelete;
+    if (pid == 0) {
+        pid = thread_getpid();
+    }
     assert(pid_is_valid(pid));
 
     /* remove the task from scheduling */
