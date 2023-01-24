@@ -65,7 +65,7 @@ static int tls_session_create(sock_tls_t *sk)
 
 static void tls_session_destroy(sock_tls_t *sk)
 {
-    if (!sk || sk->ssl)
+    if (!sk || !sk->ssl)
         return;
     wolfSSL_free(sk->ssl);
 }
