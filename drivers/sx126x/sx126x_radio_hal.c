@@ -82,6 +82,7 @@ static void ack_timer_cb(void *arg)
     sx126x_t *dev = arg;
     (void)dev;
     _set_state(dev, STATE_IDLE);
+    ztimer_remove(ZTIMER_USEC, &dev->ack_timer);
     uint8_t ack[3] = {
         IEEE802154_FCF_TYPE_ACK,
         0x00, 
@@ -91,10 +92,9 @@ static void ack_timer_cb(void *arg)
     sx126x_write_buffer(dev, 0x80, ack, IEEE802154_ACK_FRAME_LEN-2);
     sx126x_set_lora_payload_length(dev, IEEE802154_ACK_FRAME_LEN-2);
     _set_state(dev, STATE_TX);
-    DEBUG("%d %d %d\n", ack[0], ack[1], ack[2]);
     dev->ack_filter = true;
     
-    ztimer_remove(ZTIMER_USEC, &dev->ack_timer);
+    
 }
 
 void sx126x_setup(sx126x_t *dev, uint8_t index)
@@ -229,11 +229,13 @@ void sx126x_hal_task_handler(ieee802154_dev_t *hal)
     if (irq_mask & SX126X_IRQ_TX_DONE) {
         if(dev->ack_filter == false){
         DEBUG("[sx126x] netdev: SX126X_IRQ_TX_DONE\n");
+        ztimer_remove(ZTIMER_USEC, &dev->ack_timer);
         hal->cb(hal, IEEE802154_RADIO_CONFIRM_TX_DONE);
         }
         else {
-           dev->ack_filter = false;
+            dev->ack_filter = false;
             DEBUG("[sx126x] TX ACK done.\n");
+            ztimer_remove(ZTIMER_USEC, &dev->ack_timer);
             hal->cb(hal, IEEE802154_RADIO_INDICATION_RX_DONE);
         }
         }
@@ -250,7 +252,6 @@ void sx126x_hal_task_handler(ieee802154_dev_t *hal)
         bool is_auto_ack_en = !IS_ACTIVE(CONFIG_IEEE802154_AUTO_ACK_DISABLE);
         bool is_ack = (rxbuf[0] & IEEE802154_FCF_TYPE_ACK)&&(rxbuf[1] == 0x00);
         bool ack_req = rxbuf[0] & IEEE802154_FCF_ACK_REQ;
-        DEBUG("%d %d %d\n", rxbuf[0], rxbuf[1], rxbuf[2]);
     /* If radio is in promiscuos mode, indicate packet and
             * don't event think of sending an ACK frame :) */
             if (dev->promisc) {
@@ -355,7 +356,7 @@ static int _request_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
     (void)ctx;
     switch (op) {
         case IEEE802154_HAL_OP_TRANSMIT:
-
+        dev->ack_filter = false;
         _set_state(dev, STATE_TX);
 
         break;

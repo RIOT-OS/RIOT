@@ -28,8 +28,8 @@
 #include "debug.h"
 
 #define CSMA_SENDER_BACKOFF_PERIOD_UNIT_US  (320U)
-#define ACK_TIMEOUT_US                      (864U)
-
+//#define ACK_TIMEOUT_US                      (864U)
+#define ACK_TIMEOUT_US                      (50000U)
 static char *str_states[IEEE802154_FSM_STATE_NUMOF] = {
     "INVALID",
     "RX",

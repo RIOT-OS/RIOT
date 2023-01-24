@@ -17,6 +17,7 @@ BOARD_WHITELIST :=  \
 					remote-reva \
 					remote-revb \
 					pba-d-01-kw2x \
+          rak3172 \
 					#
 USEMODULE += od
 USEMODULE += shell
