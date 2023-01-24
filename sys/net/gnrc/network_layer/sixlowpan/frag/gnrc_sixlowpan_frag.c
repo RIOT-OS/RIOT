@@ -54,8 +54,9 @@ static inline uint8_t _max_frag_size(gnrc_netif_t *iface,
                : fbuf->hint.fragsz;
     }
 #endif /* MODULE_GNRC_SIXLOWPAN_FRAG_HINT */
-    (void)fbuf;
-    return fbuf->best_frag_size ? fbuf->best_frag_size : iface->sixlo.max_frag_size;
+    (void)iface;
+    assert(fbuf->best_frag_size > 0);
+    return fbuf->best_frag_size;
 }
 
 static inline int _payload_diff(gnrc_sixlowpan_frag_fb_t *fbuf,
