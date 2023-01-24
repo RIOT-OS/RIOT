@@ -29,6 +29,8 @@ extern void __libc_init_array(void);
 void cpu_init(void)
 {
     gd32vf103_clock_init();
+    /* enable PMU required for pm_layered */
+    periph_clk_en(APB1, RCU_APB1EN_PMUEN_Msk);
     /* Common RISC-V initialization */
     riscv_init();
     early_init();

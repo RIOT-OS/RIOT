@@ -8,9 +8,11 @@
 config CPU_FAM_GD32V
     bool
     select CPU_CORE_RV32IMAC
+    select HAS_ARCH_NUCLEI
     select HAS_CPU_GD32V
     select HAS_PERIPH_CLIC
     select HAS_PERIPH_GPIO
+    select HAS_PERIPH_GPIO_IRQ
     select HAS_PERIPH_FLASHPAGE
     select HAS_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
     select HAS_PERIPH_FLASHPAGE_PAGEWISE
@@ -22,6 +24,9 @@ config CPU_FAM_GD32V
 
     select MODULE_PERIPH_CLIC if TEST_KCONFIG
     select MODULE_PERIPH_WDT if MODULE_PERIPH_PM && HAS_PERIPH_WDT
+    select PACKAGE_NMSIS_SDK
+
+menu "GD32V configuration"
 
 config CPU_MODEL_GD32VF103CBT6
     bool
@@ -53,5 +58,7 @@ config CPU_CORE
     default "rv32imac" if CPU_CORE_RV32IMAC
 
 rsource "periph/Kconfig"
+
+endmenu
 
 source "$(RIOTCPU)/riscv_common/Kconfig"

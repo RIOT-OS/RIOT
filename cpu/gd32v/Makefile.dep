@@ -1,4 +1,5 @@
 USEMODULE += periph
+USEPKG += nmsis_sdk
 
 FEATURES_REQUIRED += periph_clic
 
