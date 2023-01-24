@@ -431,7 +431,7 @@ int ieee802154_sec_decrypt_frame(ieee802154_sec_context_t *ctx,
                                  const uint8_t *src_address);
 
 /**
- * @brief   Get auxiliary security headeer size extimation
+ * @brief   Get auxiliary security header size estimation
  *
  * @param[in]       ctx                     IEEE 802.15.4 security context
  * @param[in]       header                  Pointer to IEEE 802.15.4 header
