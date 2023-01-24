@@ -448,11 +448,12 @@ int _get(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
             if (opt->data_len >= sizeof(iolist_t)) {
                 const iolist_t *in = opt->data;
                 const gnrc_netif_hdr_t *l2 = in->iol_base;
-                gnrc_netapi_opt_t opt_dev = { .context = 0 };
                 uint16_t sdu;
-                opt_dev.data = &sdu;
-                opt_dev.data_len = sizeof(sdu);
-                opt_dev.opt = NETOPT_MAX_PDU_SIZE;
+                gnrc_netapi_opt_t opt_dev = {
+                    .data = &sdu,
+                    .data_len = sizeof(sdu),
+                    .opt = NETOPT_MAX_PDU_SIZE,
+                };
                 if (gnrc_netif_get_from_netdev(netif, &opt_dev) <= 0) {
                     goto release;
                 }
