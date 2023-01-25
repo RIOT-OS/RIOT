@@ -341,7 +341,7 @@ static void _send(gnrc_pktsnip_t *pkt)
                 fbuf->datagram_size = datagram_size;
                 fbuf->tag = gnrc_sixlowpan_frag_fb_next_tag();
                 fbuf->offset = 0;
-                fbuf->best_frag_size = 0;
+                fbuf->best_frag_size = gnrc_sixlowpan_get_l2_frag_size(netif, pkt);
                 /* fbuf->hint only exists with the `gnrc_sixlowpan_frag_hint`
                  * module, so despite already specifying that this `if` block
                  * only works with `IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_HINT)`
