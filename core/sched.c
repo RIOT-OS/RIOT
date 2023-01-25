@@ -320,6 +320,8 @@ NORETURN void sched_task_exit(void)
     sched_num_threads--;
 
     thread_zombify();
+    /* We're in a thread, so thread_zombify is really NORETURN. */
+    UNREACHABLE();
 }
 
 #ifdef MODULE_SCHED_CB
