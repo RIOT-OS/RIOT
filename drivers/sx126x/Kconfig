@@ -48,9 +48,7 @@ config MODULE_SX126X_STM32WL
 endchoice
 
 config MODULE_SX126X_RF_SWITCH
-    bool "Enable RF switch support"
-    default y if HAVE_SX126X_RF_SWITCH
-    depends on MODULE_SX126X
+    bool
     depends on HAS_PERIPH_GPIO
     select MODULE_PERIPH_GPIO
 
@@ -90,8 +88,3 @@ config HAVE_SX126X
     bool
     help
       Indicates that an sx126x transceiver is present.
-
-config HAVE_SX126X_RF_SWITCH
-    bool
-    help
-      Indicates that an sx126x rf switch pin is wired.
