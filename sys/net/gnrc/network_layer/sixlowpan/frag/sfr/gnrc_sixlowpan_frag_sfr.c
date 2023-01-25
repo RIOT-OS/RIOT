@@ -1408,12 +1408,13 @@ static uint16_t _send_1st_fragment(gnrc_netif_t *netif,
                                    gnrc_sixlowpan_frag_fb_t *fbuf,
                                    unsigned page, gnrc_pktsnip_t **tx_sync)
 {
+    (void)netif;
     gnrc_pktsnip_t *frag, *pkt = fbuf->pkt;
     sixlowpan_sfr_rfrag_t *hdr;
     uint8_t *data;
     size_t comp_form_size = gnrc_pkt_len(pkt->next);
-    uint16_t frag_size = (uint16_t)netif->sixlo.max_frag_size -
-                         sizeof(sixlowpan_sfr_rfrag_t);
+    assert(fbuf->best_frag_size > sizeof(sixlowpan_sfr_rfrag_t));
+    uint16_t frag_size = fbuf->best_frag_size - sizeof(sixlowpan_sfr_rfrag_t);
 
     assert((fbuf->sfr.cur_seq == 0) && (fbuf->sfr.frags_sent == 0));
     assert(fbuf->sfr.window.next == NULL);
@@ -1469,11 +1470,12 @@ static uint16_t _send_nth_fragment(gnrc_netif_t *netif,
                                    unsigned page,
                                    gnrc_pktsnip_t **tx_sync)
 {
+    (void)netif;
     gnrc_pktsnip_t *frag, *pkt = fbuf->pkt;
     sixlowpan_sfr_rfrag_t *hdr;
     uint8_t *data;
-    uint16_t frag_size = (uint16_t)netif->sixlo.max_frag_size -
-                         sizeof(sixlowpan_sfr_rfrag_t);
+    assert(fbuf->best_frag_size > sizeof(sixlowpan_sfr_rfrag_t));
+    uint16_t frag_size = fbuf->best_frag_size - sizeof(sixlowpan_sfr_rfrag_t);
     uint16_t local_offset;
 
     assert((fbuf->sfr.cur_seq > 0) &&
