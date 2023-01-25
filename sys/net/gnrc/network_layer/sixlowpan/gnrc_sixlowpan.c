@@ -102,16 +102,10 @@ void gnrc_sixlowpan_dispatch_send(gnrc_pktsnip_t *pkt, void *context,
     }
 }
 
-void gnrc_sixlowpan_multiplex_by_size(gnrc_pktsnip_t *pkt,
-                                      size_t orig_datagram_size,
-                                      gnrc_netif_t *netif,
-                                      unsigned page)
-{
-    assert(pkt != NULL);
-    assert(netif != NULL);
-    size_t datagram_size = gnrc_pkt_len(pkt->next);
+size_t gnrc_sixlowpan_get_l2_frag_size(const gnrc_netif_t *netif,
+                                       gnrc_pktsnip_t *pkt) {
     /* worst case fragment size if NETOPT_MAX_SDU_SIZE is not supported */
-    uint16_t best_frag_size = netif->sixlo.max_frag_size;
+    size_t best_frag_size = netif->sixlo.max_frag_size;
     union {
         iolist_t in;
         uint16_t out;
@@ -122,7 +116,19 @@ void gnrc_sixlowpan_multiplex_by_size(gnrc_pktsnip_t *pkt,
         best_frag_size = value.out;
         assert(netif->sixlo.max_frag_size <= best_frag_size);
     }
-    DEBUG("6lo: packet size = %u, fragment size = %u for interface %i\n",
+    return best_frag_size;
+}
+
+void gnrc_sixlowpan_multiplex_by_size(gnrc_pktsnip_t *pkt,
+                                      size_t orig_datagram_size,
+                                      gnrc_netif_t *netif,
+                                      unsigned page)
+{
+    assert(pkt != NULL);
+    assert(netif != NULL);
+    size_t datagram_size = gnrc_pkt_len(pkt->next);
+    size_t best_frag_size = gnrc_sixlowpan_get_l2_frag_size(netif, pkt);
+    DEBUG("6lo: packet size = %zu, fragment size = %zu for interface %i\n",
           datagram_size, best_frag_size, netif->pid);
     if ((netif->sixlo.max_frag_size == 0) || (datagram_size <= best_frag_size)) {
         DEBUG("6lo: Dispatch for sending\n");

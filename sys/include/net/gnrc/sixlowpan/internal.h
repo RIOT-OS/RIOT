@@ -69,6 +69,18 @@ void gnrc_sixlowpan_multiplex_by_size(gnrc_pktsnip_t *pkt,
                                       size_t orig_datagram_size,
                                       gnrc_netif_t *netif,
                                       unsigned page);
+
+/**
+ * @brief   Given packet @p pkt, query the maximum resulting layer-2
+ *          payload fragment size
+ *
+ * @param[in] netif     The interface to fit @p pkt over. Must not be NULL.
+ * @param[in] pkt       A packet
+ *
+ * @return  Best layer-2 fragment size
+ */
+size_t gnrc_sixlowpan_get_l2_frag_size(const gnrc_netif_t *netif,
+                                       gnrc_pktsnip_t *pkt);
 #ifdef __cplusplus
 }
 #endif
