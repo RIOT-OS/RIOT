@@ -580,7 +580,7 @@ dependencies = [
 [[package]]
 name = "riot-wrappers"
 version = "0.8.0"
-source = "git+https://github.com/RIOT-OS/rust-riot-wrappers#d2629c9d46a023f6f40bf214400ff6b5cb2f30cf"
+source = "git+https://github.com/RIOT-OS/rust-riot-wrappers#fef42fadc02f4f0cf2bb7d8e6b7b522b91bba058"
 dependencies = [
  "bare-metal",
  "coap-handler",
@@ -597,6 +597,7 @@ dependencies = [
  "pin-utils",
  "riot-sys",
  "shlex 0.1.1",
+ "switch-hal",
 ]
 
 [[package]]
@@ -729,6 +730,15 @@ name = "strsim"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
+
+[[package]]
+name = "switch-hal"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "90a4adc8cbd1726249b161898e48e0f3f1ce74d34dc784cbbc98fba4ed283fbf"
+dependencies = [
+ "embedded-hal",
+]
 
 [[package]]
 name = "syn"
