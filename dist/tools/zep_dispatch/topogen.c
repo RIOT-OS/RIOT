@@ -66,8 +66,8 @@ static void node_name(struct node *n, unsigned idx)
 
     do {
         uint8_t rem = idx % 26;
+        idx /= 26;
         *s++ = 'A' + rem;
-        idx -= rem;
     } while (idx && s != end);
     *s = 0;
 }
