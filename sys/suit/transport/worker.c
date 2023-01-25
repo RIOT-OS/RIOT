@@ -79,6 +79,8 @@ static char _url[CONFIG_SOCK_URLPATH_MAXLEN];
 static uint8_t _manifest_buf[SUIT_MANIFEST_BUFSIZE];
 
 static mutex_t _worker_lock;
+/* PID of the worker thread, guarded by */
+static kernel_pid_t _worker_pid = KERNEL_PID_UNDEF;
 
 int suit_handle_url(const char *url)
 {
@@ -154,17 +156,27 @@ static void *_suit_worker_thread(void *arg)
     }
 
     mutex_unlock(&_worker_lock);
+    thread_zombify();
+    /* Actually unreachable, given we're in a thread */
     return NULL;
 }
 
 void suit_worker_trigger(const char *url, size_t len)
 {
     mutex_lock(&_worker_lock);
+    if (_worker_pid != KERNEL_PID_UNDEF) {
+        if (thread_kill_zombie(_worker_pid) != 1) {
+            /* This will only happen if the SUIT thread runs on a lower
+             * priority than the caller */
+            LOG_WARNING("Ignoring SUIT trigger: worker is still busy.\n");
+            return;
+        }
+    }
 
     memcpy(_url, url, len);
     _url[len] = '\0';
 
-    thread_create(_stack, SUIT_WORKER_STACKSIZE, SUIT_COAP_WORKER_PRIO,
+    _worker_pid = thread_create(_stack, SUIT_WORKER_STACKSIZE, SUIT_COAP_WORKER_PRIO,
                   THREAD_CREATE_STACKTEST,
                   _suit_worker_thread, NULL, "suit worker");
 }
