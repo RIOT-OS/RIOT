@@ -11,6 +11,7 @@ menu "Standard Input/Output (STDIO)"
 choice STDIO_IMPLEMENTATION
     bool "STDIO implementation"
     default MODULE_STDIO_NATIVE if CPU_ARCH_NATIVE
+    default MODULE_STDIO_CDC_ACM if TEST_KCONFIG && HAS_HIGHLEVEL_STDIO
     default MODULE_STDIO_UART
 
 config MODULE_STDIO_RTT
