@@ -778,6 +778,7 @@ INPUT                  = ../../doc.txt \
                          src/changelog.md \
                          ../../LOSTANDFOUND.md \
                          ../../makefiles/pseudomodules.inc.mk \
+                         ../../makefiles/blob.inc.mk \
                          ../../sys/net/gnrc/routing/ipv6_auto_subnets/gnrc_ipv6_auto_subnets.c
 
 # This tag can be used to specify the character encoding of the source files
