@@ -17,3 +17,5 @@ config BOARD_HAS_FOO_2
     select HAS_FOO_2
 
 source "Kconfig.generated"
+
+source "Kconfig.use_case"

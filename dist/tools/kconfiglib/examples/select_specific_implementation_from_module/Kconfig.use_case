@@ -1,0 +1,120 @@
+config BOARD
+    bool
+    default y
+    select HAS_STDIO_USB
+    select HAS_PERIPH_UART
+    select HAS_PERIPH_USB
+
+config HAS_PERIPH_UART
+    bool
+
+config HAS_PERIPH_USB
+    bool
+
+config HAS_STDIO_USB
+    bool
+
+###############################################################################
+config APP
+    bool
+    default y
+    select MODULE_STDIO
+
+###############################################################################
+menuconfig MODULE_STDIO
+    bool "Enable STDIO"
+
+if MODULE_STDIO
+
+choice STDIO_IMPL
+    bool "STDIO implementation"
+    default MODULE_STDIO_UART if HAS_STDIO_UART
+    default MODULE_STDIO_USB if HAS_STDIO_USB
+
+config MODULE_STDIO_UART
+    bool "UART"
+    depends on HAS_PERIPH_UART
+
+config MODULE_STDIO_USB
+    bool "USB"
+    depends on HAS_PERIPH_USB
+    select MODULE_USB
+    select REQUIRES_USB_CDC_ACM
+
+endchoice # STDIO_IMPL
+
+endif # MODULE_STDIO
+
+###############################################################################
+menuconfig MODULE_USB
+    bool "Enable USB"
+
+if MODULE_USB
+
+choice USB_IMPL
+    bool "USB implementation"
+
+###############
+menuconfig MODULE_MIN_USB
+    bool "A basic USB stack"
+    depends on !REQUIRES_USB_CDC_ACM
+
+if MODULE_MIN_USB
+
+config MODULE_USB_MSD
+    bool "Enable USB MSD"
+
+endif # MODULE_MIN_USB
+
+###############
+menuconfig MODULE_RIOT_USB
+    bool "RIOT USB stack"
+    depends on HAS_PERIPH_USB
+    select MODULE_RIOT_USB_CDC_ACM if REQUIRES_USB_CDC_ACM
+    depends on MISSING_DEP
+
+if MODULE_RIOT_USB
+
+config MODULE_RIOT_USB_CDC_ACM
+    bool "Enable USB ACM CDC"
+    select PROVIDE_USB_CDC_ACM
+
+config MODULE_RIOT_USB_MSD
+    bool "Enable USB MSD"
+
+endif # MODULE_RIOT_USB
+
+###############
+menuconfig PACKAGE_USB
+    bool "External USB stack"
+    depends on HAS_PERIPH_USB
+    depends on MISSING_DEP
+    select MODULE_PACKAGE_USB_CDC_ACM if REQUIRES_USB_CDC_ACM
+
+if PACKAGE_USB
+
+config MODULE_PACKAGE_USB_CDC_ACM
+    bool "Enable USB ACM CDC"
+
+config MODULE_PACKAGE_USB_MSD
+    bool "Enable USB MSD"
+
+endif # PACKAGE_USB
+
+config ERROR_USB_IMPL
+    bool "Missing implementation."
+    help
+        The selected USB implementation does not provide USB CDC ACM support.
+        Please select a USB implementation that provides this feature.
+
+endchoice # USB_IMPL
+
+endif # MODULE_USB
+
+config REQUIRES_USB_CDC_ACM
+    bool
+
+###############################################################################
+
+config MISSING_DEP
+    bool "Missing dependency"

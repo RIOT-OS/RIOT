@@ -21,8 +21,17 @@ and preference is not possible.
 ### Use case
 
 The use case is for something like having `MODULE_STDIO` selecting a specific
-`USB` implementation because it `REQUIRES_CDC_ACM` feature that may not exist
+`USB` implementation because it `REQUIRES_USB_CDC_ACM` feature that may not exist
 in all `USB` implementations.
+
+Let's step through resolving the error of the use case:
+
+```
+./../../riot_menuconfig.py Kconfig.use_case
+```
+
+1. Press `/` then find `ERROR_USB_CDC_ACM` is `y`
+2. Press `?` to find
 
 ## Usage
 
