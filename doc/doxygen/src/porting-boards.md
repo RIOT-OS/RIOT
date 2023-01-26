@@ -221,7 +221,7 @@ The documentation must be under the proper doxygen group, you can compile the
 documentation by calling `make doc` and then open the generated html file on
 any browser.
 
-@code
+```c
 /**
 @defgroup    boards_foo FooBoard
 @ingroup     boards
@@ -241,7 +241,7 @@ any browser.
   ...
 
 */
-@endcode
+```
 
 # Helper tools
 
@@ -279,29 +279,28 @@ To avoid code duplication, common code across boards has been grouped in
 In the case of source files this means some functions like `board_init` can be
 already defined in the common code. Unless having specific configurations or
 initialization you might not need a `board.c` or `board.h`. Another common use
-case is common peripheral configurations:
+case is common peripheral configurations, for example in the `cfg_timer_tim5.h`:
 
-@code
--\#include "cfg_timer_tim5.h"
-+/**
-+ * @name   Timer configuration
-+ * @{
-+ */
-+static const timer_conf_t timer_config[] = {
-+    {
-+        .dev      = TIM5,
-+        .max      = 0xffffffff,
-+        .rcc_mask = RCC_APB1ENR_TIM5EN,
-+        .bus      = APB1,
-+        .irqn     = TIM5_IRQn
-+    }
-+};
-+
-+#define TIMER_0_ISR         isr_tim5
-+
-+#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
-+/** @} */
-@endcode
+```c
+/**
+ * @name   Timer configuration
+ * @{
+ */
+static const timer_conf_t timer_config[] = {
+    {
+        .dev      = TIM5,
+        .max      = 0xffffffff,
+        .rcc_mask = RCC_APB1ENR_TIM5EN,
+        .bus      = APB1,
+        .irqn     = TIM5_IRQn
+    }
+};
+
+#define TIMER_0_ISR         isr_tim5
+
+#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
+/** @} */
+```
 
 If you want to use common makefiles, include them at the end of the specific
 `Makefile`, e.g. for a `Makefile.features`:
