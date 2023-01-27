@@ -64,8 +64,14 @@ else ifeq (auto_subnets,$(PREFIX_CONF))
   USEMODULE += gnrc_ipv6_auto_subnets_simple
 else ifeq (static,$(PREFIX_CONF))
   IPV6_ADDR ?= 2001:db8:1::1
-  IPV6_DEFAULT_ROUTER ?= fe80::1
+# Only set this if the default router does not send router advertisements
+# IPV6_DEFAULT_ROUTER ?= fe80::1
   USEMODULE += gnrc_ipv6_static_addr
+
+  # configure static DNS server
+  ifneq (,$(filter sock_dns,$(USEMODULE)))
+    USEMODULE += auto_init_sock_dns
+  endif
 endif
 
 # Comment this out to disable code in RIOT that does safety checking

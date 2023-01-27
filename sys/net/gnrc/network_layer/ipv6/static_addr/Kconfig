@@ -30,6 +30,5 @@ config GNRC_IPV6_STATIC_ADDR_DOWNSTREAM
 
 config GNRC_IPV6_STATIC_DEFAULT_ROUTER
     string "Static IPv6 address of the default router"
-    default "2001:db8::1"
 
 endif # KCONFIG_USEMODULE_GNRC_IPV6_STATIC_ADDR
