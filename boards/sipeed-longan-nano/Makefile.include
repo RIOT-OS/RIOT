@@ -1,1 +1,2 @@
+PROGRAMMER ?= dfu-util
 include $(RIOTBOARD)/common/gd32v/Makefile.include
