@@ -64,26 +64,39 @@ MCU pins and their configuration in RIOT.
 | PB1     |                |                     | LED2                  |
 | PB5     |                |                     | LED0                  |
 
-## Flash the board
+## Flashing the Device
 
-The board is flashed via a JTAG interface with OpenOCD (at least [release version 0.12.0]
+### Using the DFU bootloader
+
+The board is flashed via the in-ROM DFU bootloader by default.
+To enter bootloader mode, hold the BOOT0 button while pressing the RESET button.
+
+```
+BOARD=seeedstudio-gd32 make -C examples/hello-world flash
+```
+
+After flashing you need to leave bootloader mode again by pressing the RESET button.
+
+### Using an external debug adapter
+
+The board can also be flashed via a JTAG interface with OpenOCD (at least [release version 0.12.0]
 (https://github.com/openocd-org/openocd/tree/9ea7f3d647c8ecf6b0f1424002dfc3f4504a162c)).
 By default, an FTDI adapter according to the configuration defined in
 [`interface/openocd-usb.cfg`]
 (https://github.com/openocd-org/openocd/blob/9ea7f3d647c8ecf6b0f1424002dfc3f4504a162c/tcl/interface/ftdi/openocd-usb.cfg)
 is assumed.
 ```
-BOARD=seeedstudio-gd32 make -C examples/hello-world flash
+PROGRAMMER=openocd BOARD=seeedstudio-gd32 make -C examples/hello-world flash
 ```
 To use an FTDI adapter with a different configuration, the configuration can be
 defined using the variable `OPENOCD_FTDI_ADAPTER`, for example:
 ```
-OPENOCD_FTDI_ADAPTER=tigar BOARD=seeedstudio-gd32 make -C examples/hello-world flash
+PROGRAMMER=openocd OPENOCD_FTDI_ADAPTER=tigard BOARD=seeedstudio-gd32 make -C examples/hello-world flash
 ```
 If another adapter is used, it can be specified using variable
 `OPENOCD_DEBUG_ADAPTER`, for example for a Segger J-Link adapter:
 ```
-OPENOCD_DEBUG_ADAPTER=jlink BOARD=seeedstudio-gd32 make -C examples/hello-world flash
+PROGRAMMER=openocd OPENOCD_DEBUG_ADAPTER=jlink BOARD=seeedstudio-gd32 make -C examples/hello-world flash
 ```
 
 ## Accessing STDIO via UART
