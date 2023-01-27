@@ -19,11 +19,7 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
-#include "periph_cpu.h"
-#include "periph_common_conf.h"
-
-#include "cfg_timer_default.h"
-#include "cfg_uart_default.h"
+#include "macros/units.h"
 
 #ifndef CONFIG_BOARD_HAS_HXTAL
 #define CONFIG_BOARD_HAS_HXTAL  1   /**< The board provides a high frequency oscillator. */
@@ -36,6 +32,12 @@
 #ifndef CONFIG_CLOCK_HXTAL
 #define CONFIG_CLOCK_HXTAL      MHZ(8)      /**< HXTAL frequency */
 #endif
+
+#include "periph_cpu.h"
+#include "periph_common_conf.h"
+
+#include "cfg_timer_default.h"
+#include "cfg_uart_default.h"
 
 #ifdef __cplusplus
 extern "C" {
