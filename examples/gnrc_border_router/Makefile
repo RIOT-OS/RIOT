@@ -67,6 +67,11 @@ else ifeq (static,$(PREFIX_CONF))
 # Only set this if the default router does not send router advertisements
 # IPV6_DEFAULT_ROUTER ?= fe80::1
   USEMODULE += gnrc_ipv6_static_addr
+
+  # configure static DNS server
+  ifneq (,$(filter sock_dns,$(USEMODULE)))
+    USEMODULE += auto_init_sock_dns
+  endif
 endif
 
 # Comment this out to disable code in RIOT that does safety checking
