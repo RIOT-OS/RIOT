@@ -151,6 +151,8 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
     }
 #endif
 
+    /* clear a possibly pending interrupt and enable the interrupt */
+    dev(tim)->INTF &= ~(TIMER0_DMAINTEN_CH0IE_Msk << channel);
     dev(tim)->DMAINTEN |= (TIMER0_DMAINTEN_CH0IE_Msk << channel);
 
     return 0;
@@ -182,7 +184,10 @@ int timer_set_periodic(tim_t tim, int channel, unsigned int value,
         irq_restore(state);
     }
 
-    TIM_CHAN(tim, channel) = value;
+    TIMER_CHANNEL(tim, channel) = value;
+
+    /* clear a possibly pending interrupt before the interrupt is enabled */
+    dev(tim)->INTF &= ~(TIMER0_DMAINTEN_CH0IE_Msk << channel);
     dev(tim)->DMAINTEN |= (TIMER0_DMAINTEN_CH0IE_Msk << channel);
 
     if (flags & TIM_FLAG_RESET_ON_MATCH) {
