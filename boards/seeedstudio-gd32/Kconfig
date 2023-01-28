@@ -14,6 +14,7 @@ config BOARD_SEEEDSTUDIO_GD32
     select CPU_MODEL_GD32VF103VBT6
     select BOARD_HAS_HXTAL
     select BOARD_HAS_LXTAL
+    select HAS_PERIPH_PWM
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
     select HAVE_SAUL_GPIO
