@@ -111,7 +111,12 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     dev(tim)->CAR = timer_config[tim].max;
 
     /* set prescaler */
-    dev(tim)->PSC = (((periph_apb_clk(timer_config[tim].bus) * 2) / freq) - 1);
+    if (dev(tim) == TIMER0) {
+        dev(tim)->PSC = ((periph_apb_clk(timer_config[tim].bus) / freq) - 1);
+    }
+    else {
+        dev(tim)->PSC = (((periph_apb_clk(timer_config[tim].bus) * 2) / freq) - 1);
+    }
     DEBUG("[timer]: %" PRIu32 "/%lu =  %" PRIu16 "\n",
           periph_apb_clk(timer_config[tim].bus), freq, dev(tim)->PSC);
 
@@ -275,6 +280,11 @@ static void _timer_isr(unsigned irq)
 #ifdef TIMER_3_IRQN
     case TIMER_3_IRQN:
         _irq_handler(TIMER_DEV(3));
+        break;
+#endif
+#ifdef TIMER_4_IRQN
+    case TIMER_4_IRQN:
+        _irq_handler(TIMER_DEV(4));
         break;
 #endif
     default:
