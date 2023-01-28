@@ -260,6 +260,29 @@ typedef struct {
 } i2c_conf_t;
 
 /**
+ * @brief   PWM channel
+ */
+typedef struct {
+    gpio_t pin;             /**< GPIO pin mapped to this channel */
+    uint8_t cc_chan;        /**< capture compare channel used */
+} pwm_chan_t;
+
+/**
+ * @brief   PWM configuration
+ */
+typedef struct {
+    TIMER_Type *dev;                        /**< Timer used */
+    uint32_t rcu_mask;                      /**< bit in clock enable register */
+    uint32_t remap;                         /**< AFIO remap mask to route periph
+                                                 to other pins (or zero, if not
+                                                 needed) */
+    pwm_chan_t chan[TIMER_CHANNEL_NUMOF];   /**< channel mapping set to
+                                                 {GPIO_UNDEF, 0} if not used */
+    gpio_af_t af;                           /**< alternate function used */
+    uint8_t bus;                            /**< APB bus */
+} pwm_conf_t;
+
+/**
  * @name    WDT upper and lower bound times in ms
  * @{
  */
