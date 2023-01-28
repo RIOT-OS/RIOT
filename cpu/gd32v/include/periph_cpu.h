@@ -166,6 +166,16 @@ typedef enum {
 } gpio_af_t;
 
 /**
+ * @brief   GD32V timers have 4 capture-compare channels
+ */
+#define TIMER_CHANNEL_NUMOF (4U)
+
+/**
+ * @brief   Macro for accessing the capture/compare register of a timer channel
+ */
+#define TIMER_CHANNEL(tim, chan) *(&dev(tim)->CH0CV + (chan * 2))
+
+/**
  * @brief   Timer configuration
  */
 typedef struct {

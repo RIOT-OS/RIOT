@@ -25,12 +25,6 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-/**
- * @brief   Define a macro for accessing a timer channel
- */
-#define TIM_CHAN(tim, chan) *(&dev(tim)->CH0CV + chan)
-#define TIMER_CHANNEL_NUMOF     (4)
-
 static void _timer_isr(unsigned irq);
 
 /**
@@ -143,10 +137,10 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 
     set_oneshot(tim, channel);
 
-    TIM_CHAN(tim, channel) = (value & timer_config[tim].max);
+    TIMER_CHANNEL(tim, channel) = (value & timer_config[tim].max);
 
 #ifdef MODULE_PERIPH_TIMER_PERIODIC
-    if (dev(tim)->CAR == TIM_CHAN(tim, channel)) {
+    if (dev(tim)->CAR == TIMER_CHANNEL(tim, channel)) {
         dev(tim)->CAR = timer_config[tim].max;
     }
 #endif
@@ -207,7 +201,7 @@ int timer_clear(tim_t tim, int channel)
     dev(tim)->DMAINTEN &= ~(TIMER0_DMAINTEN_CH0IE_Msk << channel);
 
 #ifdef MODULE_PERIPH_TIMER_PERIODIC
-    if (dev(tim)->CAR == TIM_CHAN(tim, channel)) {
+    if (dev(tim)->CAR == TIMER_CHANNEL(tim, channel)) {
         dev(tim)->CAR = timer_config[tim].max;
     }
 #endif
@@ -247,7 +241,7 @@ static void _irq_handler(tim_t tim)
         status &= ~msk;
 
         /* interrupt flag gets set for all channels > ARR */
-        if (TIM_CHAN(tim, i) > top) {
+        if (TIMER_CHANNEL(tim, i) > top) {
             continue;
         }
 
