@@ -38,12 +38,20 @@ extern "C" {
  */
 static const timer_conf_t timer_config[] = {
     {
+        .dev      = TIMER0,
+        .max      = 0x0000ffff,
+        .rcu_mask = RCU_APB2EN_TIMER0EN_Msk,
+        .bus      = APB2,
+        .irqn     = TIMER0_Channel_IRQn
+    },
+    {
         .dev      = TIMER1,
         .max      = 0x0000ffff,
         .rcu_mask = RCU_APB1EN_TIMER1EN_Msk,
         .bus      = APB1,
         .irqn     = TIMER1_IRQn
     },
+#if !defined(MODULE_PERIPH_PM)
     {
         .dev      = TIMER2,
         .max      = 0x0000ffff,
@@ -70,12 +78,22 @@ static const timer_conf_t timer_config[] = {
         .irqn     = TIMER4_IRQn
     }
 #endif
+#endif /* !defined(MODULE_PERIPH_PWM) */
 };
 
-#define TIMER_0_IRQN        TIMER1_IRQn
-#define TIMER_1_IRQN        TIMER2_IRQn
-#define TIMER_2_IRQN        TIMER3_IRQn
-#define TIMER_3_IRQN        TIMER4_IRQn
+#define TIMER_0_IRQN        TIMER0_Channel_IRQn
+#define TIMER_1_IRQN        TIMER1_IRQn
+
+#if !defined(MODULE_PERIPH_PWM)
+#define TIMER_2_IRQN        TIMER2_IRQn
+#if defined(CPU_MODEL_GD32VF103C8T6) || defined(CPU_MODEL_GD32VF103CBT6) || \
+    defined(CPU_MODEL_GD32VF103R8T6) || defined(CPU_MODEL_GD32VF103RBT6) || \
+    defined(CPU_MODEL_GD32VF103T8U6) || defined(CPU_MODEL_GD32VF103TBU6) || \
+    defined(CPU_MODEL_GD32VF103V8T6) || defined(CPU_MODEL_GD32VF103VBT6)
+#define TIMER_3_IRQN        TIMER3_IRQn
+#define TIMER_4_IRQN        TIMER4_IRQn
+#endif
+#endif /* !defined(MODULE_PERIPH_PWM) */
 
 #define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
