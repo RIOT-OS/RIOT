@@ -34,6 +34,23 @@ extern "C" {
 #define CLOCK_APB1              CLOCK_AHB/2     /**< Half AHB clock */
 #define CLOCK_APB2              CLOCK_AHB       /**< Equal to the AHB clock */
 
+/**
+ * @name    RTT/RTC configuration
+ * @{
+ */
+#if CONFIG_BOARD_HAS_LXTAL
+#define RTT_CLOCK_FREQUENCY (32768U)        /**< Low frequency XTAL is used as clock source */
+#else
+#define RTT_CLOCK_FREQUENCY (40000U)        /**< IRC40K is used as clock source */
+#endif
+
+#define RTT_MAX_FREQUENCY   (RTT_CLOCK_FREQUENCY)   /* maximum RTT frequency in Hz */
+
+#ifndef RTT_FREQUENCY
+#define RTT_FREQUENCY       (RTT_MAX_FREQUENCY)     /* RTT frequency in Hz */
+#endif
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
