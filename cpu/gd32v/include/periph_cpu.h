@@ -306,27 +306,16 @@ typedef struct {
 
 /**
  * @name    RTT/RTC configuration
- *
  * @{
  */
 #define RTT_DEV             RTC             /**< RTC is used as RTT device */
 
 #define RTT_IRQ             RTC_ALARM_IRQn  /**< RTC_ALARM_IRQn is used as IRQ number */
 #define RTT_IRQ_PRIORITY    (2)             /**< RTT interrupt priority */
+#define RTT_MAX_VALUE       (0xffffffff)    /**< maximum RTT value */
 
-#if CONFIG_BOARD_HAS_LXTAL
-#define RTT_CLOCK_FREQUENCY (32768U)        /**< Low frequency XTAL is used as clock source */
-#else
-#define RTT_CLOCK_FREQUENCY (40000U)        /**< IRC40K is used as clock source */
-#endif
-
-#define RTT_MIN_FREQUENCY   (1U)                    /* in Hz */
-#define RTT_MAX_FREQUENCY   (RTT_CLOCK_FREQUENCY)   /* in Hz */
-#define RTT_MAX_VALUE       (0xffffffff)
-
-#ifndef RTT_FREQUENCY
-#define RTT_FREQUENCY       (RTT_MAX_FREQUENCY)     /* in Hz */
-#endif
+#define RTT_MIN_FREQUENCY   (1U)            /**< minimum RTT frequency in Hz */
+/** @} */
 
 /**
  * @brief   Enable the given peripheral clock
@@ -364,8 +353,6 @@ void gpio_init_af(gpio_t pin, gpio_af_t af);
 void gd32vf103_clock_init(void);
 void gd32v_enable_irc8(void);
 void gd32v_disable_irc8(void);
-
-/** @} */
 
 #ifdef __cplusplus
 }
