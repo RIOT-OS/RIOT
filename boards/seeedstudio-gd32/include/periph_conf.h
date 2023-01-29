@@ -43,6 +43,44 @@
 extern "C" {
 #endif
 
+/**
+ * @name   PWM configuration
+ * @{
+ */
+static const pwm_conf_t pwm_config[] = {
+    {
+        .dev      = TIMER2,
+        .rcu_mask = RCU_APB1EN_TIMER2EN_Msk,
+        .chan     = {
+                        { .pin = GPIO_PIN(PORT_B, 0), .cc_chan = 2 },
+                        { .pin = GPIO_PIN(PORT_B, 1), .cc_chan = 3 },
+                        /* unused channels have to be defined by GPIO_UNDEF */
+                        { .pin = GPIO_UNDEF, .cc_chan = 0 },
+                        { .pin = GPIO_UNDEF, .cc_chan = 1 },
+                    },
+        .af       = GPIO_AF_OUT_PP,
+        .bus      = APB1,
+    },
+#if !defined(MODULE_PERIPH_CAN)
+    {
+        .dev      = TIMER3,
+        .rcu_mask = RCU_APB1EN_TIMER3EN_Msk,
+        .chan     = {
+                        { .pin = GPIO_PIN(PORT_B, 8), .cc_chan = 2 },
+                        { .pin = GPIO_PIN(PORT_B, 9), .cc_chan = 3 },
+                        /* unused channels have to be defined by GPIO_UNDEF */
+                        { .pin = GPIO_UNDEF, .cc_chan = 0 },
+                        { .pin = GPIO_UNDEF, .cc_chan = 1 },
+                    },
+        .af       = GPIO_AF_OUT_PP,
+        .bus      = APB1,
+    },
+#endif
+};
+
+#define PWM_NUMOF ARRAY_SIZE(pwm_config)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

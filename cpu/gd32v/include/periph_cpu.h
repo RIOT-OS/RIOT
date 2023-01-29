@@ -166,6 +166,16 @@ typedef enum {
 } gpio_af_t;
 
 /**
+ * @brief   GD32V timers have 4 capture-compare channels
+ */
+#define TIMER_CHANNEL_NUMOF (4U)
+
+/**
+ * @brief   Macro for accessing the capture/compare register of a timer channel
+ */
+#define TIMER_CHANNEL(tim, chan) *(&dev(tim)->CH0CV + (chan * 2))
+
+/**
  * @brief   Timer configuration
  */
 typedef struct {
@@ -248,6 +258,29 @@ typedef struct {
     gpio_t sda;                 /**< SDA pin */
     i2c_speed_t speed;          /**< I2C speed */
 } i2c_conf_t;
+
+/**
+ * @brief   PWM channel
+ */
+typedef struct {
+    gpio_t pin;             /**< GPIO pin mapped to this channel */
+    uint8_t cc_chan;        /**< capture compare channel used */
+} pwm_chan_t;
+
+/**
+ * @brief   PWM configuration
+ */
+typedef struct {
+    TIMER_Type *dev;                        /**< Timer used */
+    uint32_t rcu_mask;                      /**< bit in clock enable register */
+    uint32_t remap;                         /**< AFIO remap mask to route periph
+                                                 to other pins (or zero, if not
+                                                 needed) */
+    pwm_chan_t chan[TIMER_CHANNEL_NUMOF];   /**< channel mapping set to
+                                                 {GPIO_UNDEF, 0} if not used */
+    gpio_af_t af;                           /**< alternate function used */
+    uint8_t bus;                            /**< APB bus */
+} pwm_conf_t;
 
 /**
  * @name    WDT upper and lower bound times in ms
