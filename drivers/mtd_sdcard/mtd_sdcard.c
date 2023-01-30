@@ -221,3 +221,37 @@ const mtd_desc_t mtd_sdcard_driver = {
     .erase_sector = mtd_sdcard_erase_sector,
     .power = mtd_sdcard_power,
 };
+
+#if IS_USED(MODULE_MTD_SDCARD_DEFAULT)
+#include "sdcard_spi_params.h"
+#include "vfs_default.h"
+
+#define SDCARD_NUMOF ARRAY_SIZE(sdcard_spi_params)
+
+#ifndef CONFIG_SDCARD_GENERIC_MTD_OFFSET
+#define CONFIG_SDCARD_GENERIC_MTD_OFFSET 0
+#endif
+
+#define MTD_SDCARD_DEV(n, m)                \
+    mtd_sdcard_t mtd_sdcard_dev ## n = {    \
+        .base = {                           \
+           .driver = &mtd_sdcard_driver,    \
+        },                                  \
+        .sd_card = &sdcard_spi_devs[n],     \
+        .params = &sdcard_spi_params[n]     \
+    };                                      \
+                                            \
+    mtd_dev_t CONCAT(*mtd, m) = (mtd_dev_t *)&mtd_sdcard_dev ## n
+
+#define MTD_SDCARD_DEV_FS(n, m, filesystem) \
+    VFS_AUTO_MOUNT(filesystem, VFS_MTD(mtd_sdcard_dev ## n), VFS_DEFAULT_SD(n), m)
+
+/* this is provided by the sdcard_spi driver see drivers/sdcard_spi/sdcard_spi.c */
+extern sdcard_spi_t sdcard_spi_devs[SDCARD_NUMOF];
+
+MTD_SDCARD_DEV(0, CONFIG_SDCARD_GENERIC_MTD_OFFSET);
+#ifdef MODULE_FATFS_VFS
+MTD_SDCARD_DEV_FS(0, CONFIG_SDCARD_GENERIC_MTD_OFFSET, fatfs);
+#endif
+
+#endif
