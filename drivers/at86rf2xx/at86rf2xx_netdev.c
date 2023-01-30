@@ -65,6 +65,9 @@ const netdev_driver_t at86rf2xx_driver = {
     .set = _set,
 };
 
+/* Default AT86RF2XX channel */
+static const uint16_t at86rf2xx_chan_default = AT86RF2XX_DEFAULT_CHANNEL;
+
 #if IS_USED(MODULE_AT86RF2XX_AES_SPI) && \
     IS_USED(MODULE_IEEE802154_SECURITY)
 /**
@@ -171,6 +174,10 @@ static int _init(netdev_t *netdev)
     netdev_ieee802154_reset(&dev->netdev);
     at86rf2xx_set_addr_long(dev, (eui64_t *)dev->netdev.long_addr);
     at86rf2xx_set_addr_short(dev, (network_uint16_t *)dev->netdev.short_addr);
+
+    /* `netdev_ieee802154_reset` does not set the default channel. */
+    netdev_ieee802154_set(&dev->netdev, NETOPT_CHANNEL, &at86rf2xx_chan_default, sizeof(at86rf2xx_chan_default));
+
     if (!IS_ACTIVE(AT86RF2XX_BASIC_MODE)) {
         static const netopt_enable_t ack_req =
             IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_ACK_REQ) ? NETOPT_ENABLE : NETOPT_DISABLE;
