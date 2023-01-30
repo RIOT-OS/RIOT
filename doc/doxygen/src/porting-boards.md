@@ -221,7 +221,7 @@ The documentation must be under the proper doxygen group, you can compile the
 documentation by calling `make doc` and then open the generated html file on
 any browser.
 
-```c
+```
 /**
 @defgroup    boards_foo FooBoard
 @ingroup     boards
