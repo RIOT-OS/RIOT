@@ -37,6 +37,7 @@
 #include "periph_common_conf.h"
 
 #include "cfg_i2c_default.h"
+#include "cfg_spi_default.h"
 #include "cfg_timer_default.h"
 #include "cfg_uart_default.h"
 
