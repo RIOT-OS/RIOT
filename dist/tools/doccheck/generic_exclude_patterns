@@ -50,6 +50,7 @@ warning: Member SHT1X_PARAM_[A-Z0-9_]* \(macro definition\) of
 warning: Member SHT1X_SAULINFO \(macro definition\) of
 warning: Member spi_config\[\] \(variable\) of
 warning: Member SPI_NUMOF \(macro definition\) of
+warning: Member ST7735_PARAM_[A-Z0-9_]* \(macro definition\) of
 warning: Member TIMER_[0-9]_IRQN \(macro definition\) of
 warning: Member TIMER_NUMOF \(macro definition\) of
 warning: Member timer_config\[\] \(variable\) of
