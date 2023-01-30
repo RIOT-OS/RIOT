@@ -14,13 +14,8 @@ config BOARD_REMOTE_REVB
     select HAS_ARDUINO
     select HAVE_SAUL_ADC
     select HAVE_SAUL_GPIO
-    select HAS_SDCARD_SPI
 
-    select HAVE_MTD_SDCARD
-    select HAVE_SDCARD_SPI
-
+    select HAVE_MTD_SDCARD_DEFAULT
     select MODULE_FATFS_VFS if MODULE_VFS_DEFAULT
-    select MODULE_MTD if MODULE_VFS_DEFAULT
-    select MODULE_SDCARD_SPI if MODULE_MTD
 
 source "$(RIOTBOARD)/common/remote/Kconfig"

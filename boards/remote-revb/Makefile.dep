@@ -1,7 +1,7 @@
 USEMODULE += boards_common_remote
 
 ifneq (,$(filter mtd,$(USEMODULE)))
-  USEMODULE += mtd_sdcard
+  USEMODULE += mtd_sdcard_default
 endif
 
 # default to using fatfs on SD card
