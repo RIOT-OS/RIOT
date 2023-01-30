@@ -154,7 +154,7 @@ static void _calc_connections(struct node *nodes, unsigned num)
     }
 }
 
-static void _print_distance(struct node *nodes, unsigned num, bool recursive)
+static void _print_distance(struct node *nodes, unsigned num, bool recursive, bool binary)
 {
     struct node *start = nodes;
 
@@ -164,12 +164,19 @@ static void _print_distance(struct node *nodes, unsigned num, bool recursive)
         double to_node   = node_distance_weight(start, n);
         double from_node = node_distance_weight(n, start);
 
-        if (to_node > 0 || from_node > 0) {
+        if (binary) {
+            if (to_node >= 0.5) {
+                printf("%s\t%s\n", start->name, n->name);
+            }
+            if (from_node >= 0.5) {
+                printf("%s\t%s\n", n->name, start->name);
+            }
+        } else if (to_node > 0 || from_node > 0) {
             printf("%s\t%s\t%.2f\t%.2f\n", start->name, n->name, to_node, from_node);
         }
 
         if (recursive) {
-            _print_distance(n, num - i, false);
+            _print_distance(n, num - i, false, binary);
         }
     }
 }
@@ -183,6 +190,7 @@ static void _print_help(const char *name)
                     " [-r <range>]"
                     " [-v <variance of range>]"
                     " [-n <nodes>]"
+                    " [-b]"
                     "\n", name);
 }
 
@@ -196,10 +204,14 @@ int main(int argc, char** argv)
     unsigned range  = 25;
     unsigned var    = 0;
     unsigned num    = 10;
+    bool binary     = false;
     char c;
 
-    while ((c = getopt(argc, argv, "s:w:h:r:v:n:")) != -1) {
+    while ((c = getopt(argc, argv, "s:w:h:r:v:n:b")) != -1) {
         switch (c) {
+        case 'b':
+            binary = true;
+            break;
         case 's':
             seed = atoi(optarg);
             break;
@@ -231,7 +243,7 @@ int main(int argc, char** argv)
 
     printf("# seed = %u\n", seed);
     puts("# Connections");
-    _print_distance(w.nodes, w.num_nodes, true);
+    _print_distance(w.nodes, w.num_nodes, true, binary);
     puts("");
     puts("");
     puts("# Node\tX\tY\trange\tcolor");
