@@ -44,6 +44,7 @@ warning: Member pwm_config\[\] \(variable\) of
 warning: Member PWM_NUMOF \(macro definition\) of
 warning: Member RTT_FREQUENCY \(macro definition\) of
 warning: Member RTT_MAX_FREQUENCY \(macro definition\) of
+warning: Member SDCARD_SPI_PARAM_[A-Z0-9_]* \(macro definition\) of
 warning: Member SHT1X_PARAMS \(macro definition\) of
 warning: Member SHT1X_PARAM_[A-Z0-9_]* \(macro definition\) of
 warning: Member SHT1X_SAULINFO \(macro definition\) of
