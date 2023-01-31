@@ -257,26 +257,30 @@ void dhcpv6_client_start(void)
     }
 }
 
-void dhcpv6_client_req_ia_pd(unsigned netif, unsigned pfx_len)
+int dhcpv6_client_req_ia_pd(unsigned netif, unsigned pfx_len)
 {
     pfx_lease_t *lease = NULL;
 
     assert(IS_USED(MODULE_DHCPV6_CLIENT_IA_PD));
     assert(pfx_len <= 128);
+
     if (!IS_USED(MODULE_DHCPV6_CLIENT_IA_PD)) {
         LOG_WARNING("DHCPv6 client: Unable to request IA_PD as module "
                     "`dhcpv6_client_ia_pd` is not used\n");
-        return;
+        return -ENOTSUP;
     }
+
     for (unsigned i = 0; i < CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX; i++) {
         if (pfx_leases[i].parent.ia_id.id == 0) {
             lease = &pfx_leases[i];
             lease->parent.ia_id.info.netif = netif;
             lease->parent.ia_id.info.type = DHCPV6_OPT_IA_PD;
             lease->pfx_len = pfx_len;
-            break;
+            return 0;
         }
     }
+
+    return -ENOMEM;
 }
 
 int dhcpv6_client_req_ia_na(unsigned netif)
