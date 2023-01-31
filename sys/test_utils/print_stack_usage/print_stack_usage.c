@@ -54,12 +54,13 @@ void print_stack_usage_metric(const char *name, void *stack, unsigned max_size)
 void test_utils_print_stack_usage(void)
 {
     for (kernel_pid_t i = KERNEL_PID_FIRST; i <= KERNEL_PID_LAST; i++) {
-        thread_t *p = (thread_t *)sched_threads[i];
+        thread_t *p = thread_get(i);
 
         if (p == NULL) {
             continue;
         }
-        print_stack_usage_metric(p->name, p->stack_start, p->stack_size);
+        print_stack_usage_metric(thread_get_name(p), thread_get_stackstart(
+                                     p), thread_get_stacksize(p));
     }
 }
 #endif
