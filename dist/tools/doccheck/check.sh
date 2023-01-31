@@ -15,6 +15,10 @@ RIOTBASE="$(cd "${SCRIPTDIR}"/../../..; pwd)"
 EXCLUDE_PATTERN_FILE="${SCRIPTDIR}/exclude_patterns"
 GENERIC_EXCLUDE_PATTERN_FILE="${SCRIPTDIR}/generic_exclude_patterns"
 
+if [[ -z ${DOCUMENTATION_FORMAT+x} ]]; then
+export DOCUMENTATION_FORMAT=check
+fi
+
 . "${RIOTBASE}"/dist/tools/ci/github_annotate.sh
 
 github_annotate_setup
@@ -32,7 +36,6 @@ fi
 DOXY_OUTPUT=$(make -C "${RIOTBASE}" doc 2>&1 | grep -Evf "${EXCLUDE_PATTERN_FILE}" -f"${GENERIC_EXCLUDE_PATTERN_FILE}")
 DOXY_ERRCODE=$?
 RESULT=0
-
 
 if [ "${DOXY_ERRCODE}" -ne 0 ] ; then
     echo "'make doc' exited with non-zero code (${DOXY_ERRCODE})"
@@ -53,6 +56,8 @@ else
                           sed -e 's/^[ \t]*//' -e 's/[ \t]*$//')
                 github_annotate_error "${FILENAME}" "${LINENR}" "${DETAILS}"
             done
+            # show errors not matching the pattern above
+            echo "${ERRORS}" | grep -v "^.\+:[0-9]\+: warning:"
         else
             echo -e "${CERROR}ERROR: Doxygen generates the following warnings:${CRESET}"
             echo "${ERRORS}"

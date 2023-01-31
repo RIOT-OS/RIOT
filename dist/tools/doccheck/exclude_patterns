@@ -12743,3 +12743,4 @@ boards/xg23\-pk6068a/include/periph_conf\.h:[0-9]+: warning: Member TIMER_1_ISR 
 boards/xg23\-pk6068a/include/periph_conf\.h:[0-9]+: warning: Member TIMER_0_MAX_VALUE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/xg23\-pk6068a/include/periph_conf\.h:[0-9]+: warning: Member TIMER_1_MAX_VALUE \(macro definition\) of file periph_conf\.h is not documented\.
 boards/xg23\-pk6068a/include/periph_conf\.h:[0-9]+: warning: Member UART_0_ISR_RX \(macro definition\) of file periph_conf\.h is not documented\.
+warning: No output formats selected! Set at least one of the main GENERATE_\* options to YES\.
