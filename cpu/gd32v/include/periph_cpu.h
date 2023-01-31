@@ -24,6 +24,7 @@
 #include "cpu.h"
 #include "clic.h"
 #include "kernel_defines.h"
+#include "macros/units.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -243,8 +244,10 @@ typedef struct {
  */
 #define HAVE_I2C_SPEED_T
 typedef enum {
-    I2C_SPEED_NORMAL,       /**< normal mode:  ~100kbit/s */
-    I2C_SPEED_FAST,         /**< fast mode:    ~400kbit/s */
+    I2C_SPEED_LOW       = KHZ(10),      /**< low speed mode: ~10kit/s */
+    I2C_SPEED_NORMAL    = KHZ(100),     /**< normal mode:    ~100kbit/s */
+    I2C_SPEED_FAST      = KHZ(400),     /**< fast mode:      ~400kbit/s */
+    I2C_SPEED_FAST_PLUS = MHZ(1),       /**< fast plus mode: ~1Mbit/s */
 } i2c_speed_t;
 /** @} */
 #endif /* ndef DOXYGEN */
@@ -253,10 +256,12 @@ typedef enum {
  * @brief   I2C configuration options
  */
 typedef struct {
-    uint32_t addr;              /**< device base address */
-    gpio_t scl;                 /**< SCL pin */
-    gpio_t sda;                 /**< SDA pin */
-    i2c_speed_t speed;          /**< I2C speed */
+    I2C_Type *dev;              /**< i2c device */
+    i2c_speed_t speed;          /**< i2c bus speed */
+    gpio_t scl_pin;             /**< scl pin number */
+    gpio_t sda_pin;             /**< sda pin number */
+    uint32_t rcu_mask;          /**< bit in clock enable register */
+    uint8_t irqn;               /**< I2C event interrupt number */
 } i2c_conf_t;
 
 /**

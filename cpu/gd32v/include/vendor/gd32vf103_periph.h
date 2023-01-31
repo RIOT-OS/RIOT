@@ -11549,8 +11549,8 @@ typedef struct {                                /*!< (@ 0x40002C00) WWDGT Struct
 //#define GPIOC_BASE                  0x40011000UL
 //#define GPIOD_BASE                  0x40011400UL
 //#define GPIOE_BASE                  0x40011800UL
-//#define I2C0_BASE                   0x40005400UL
-//#define I2C1_BASE                   0x40005800UL
+#define I2C0_BASE                   0x40005400UL
+#define I2C1_BASE                   0x40005800UL
 //#define ECLIC_BASE                  0xD2000000UL
 //#define PMU_BASE                    0x40007000UL
 //#define RCU_BASE                    0x40021000UL

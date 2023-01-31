@@ -42,7 +42,7 @@ on-board components:
 | UART        | 2                                      |   yes     |
 | USART       | 3                                      |   yes     |
 | SPI         | 3                                      |   no      |
-| I2C         | 2 x Fast Mode 400 kHz                  |   no      |
+| I2C         | 2 x Fast Mode 400 kHz                  |   yes     |
 | I2S         | 2                                      |   no      |
 | CAN         | 2 x CAN 2.0B with up to 1 Mbps         |   no      |
 | PWM         | 6 Channels                             |   yes     |
@@ -64,15 +64,19 @@ MCU pins and their configuration in RIOT.
 
 | MCU Pin | MCU Peripheral | RIOT Peripheral  | Board Function | Remark                       |
 |:--------|:---------------|:-----------------|:---------------|:-----------------------------|
-| PA0     |                |                  | BTN0           |                              |
+| PA0     |                | BTN0             | KEY1           |                              |
 | PA9     | USART0 TX      | UART_DEV(0) TX   | UART TX        |                              |
 | PA10    | USART0 RX      | UART_DEV(0) RX   | UART RX        |                              |
 | PB0     |                | PWM_DEV(0) CH0   | LED1 green     |                              |
 | PB1     |                | PWM_DEV(0) CH1   | LED2 blue      |                              |
 | PB5     |                |                  | LED0 red       |                              |
+| PB6     | I2C0 SCL       | I2C_DEV(0) SCL   |                |                              |
+| PB7     | I2C0 SDA       | I2C_DEV(0) SDA   |                |                              |
 | PB8     |                | PWM_DEV(1) CH0   |                | N/A if CAN is used           |
-| PB9     |                | PWM_DEV(2) CH1   |                | N/A if CAN is used           |
-| PC13    |                |                  | BTN1           |                              |
+| PB9     |                | PWM_DEV(1) CH1   |                | N/A if CAN is used           |
+| PB10    | I2C1 SCL       | I2C_DEV(1) SCL   |                |                              |
+| PB11    | I2C1 SDA       | I2C_DEV(1) SDA   |                |                              |
+| PC13    |                | BTN1             | KEY2           |                              |
 
 ## Flash the board
 

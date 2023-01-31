@@ -14,6 +14,7 @@ config BOARD_SIPEED_LONGAN_NANO
     select CPU_MODEL_GD32VF103CBT6
     select BOARD_HAS_HXTAL
     select BOARD_HAS_LXTAL
+    select HAS_PERIPH_I2C
     select HAS_PERIPH_PWM
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
