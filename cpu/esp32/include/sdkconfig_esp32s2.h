@@ -106,7 +106,6 @@ extern "C" {
  * ESP32-S2 specific USB configuration
  */
 #ifdef MODULE_ESP_IDF_USB
-#define CONFIG_ESP_PHY_ENABLE_USB               1
 #define CONFIG_USB_OTG_SUPPORTED                1
 #endif
 /**
