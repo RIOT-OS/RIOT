@@ -25,6 +25,12 @@ extern "C" {
 
 #ifdef DOXYGEN
 /**
+ * @brief   Returns a string literal unmodified, but fails to compile for
+ *          non string literals
+ */
+#define ASSERT_IS_STR_LITERAL(x)    /* implementation details */
+
+/**
  * @brief   Expands the arguments and concatenates them afterwards
  *
  * @details This is currently only implemented for up to 8 arguments.
@@ -43,6 +49,15 @@ extern "C" {
 
 /**
  * @brief   Takes a number of tokens as argument and is replaced by
+ *          `SINGLEARG` if only one argument was passed or by `MULTIARG` if
+ *          more than one is passed
+ *
+ * @warning This only works for up to 64 tokens as argument
+ */
+#define SINGLEARG_OR_MULTIARG(...)  /* implementation details */
+
+/**
+ * @brief   Takes a number of tokens as argument and is replaced by
  *          the decimal number of arguments
  *
  * @warning This only works for up to 64 tokens as argument
@@ -52,6 +67,8 @@ extern "C" {
 #else
 #define EXPAND(x) x
 
+#define ASSERT_IS_STR_LITERAL(x)    EXPAND("" x)
+
 #define _TAKE_65TH_TOKEN( _1,  _2,  _3,  _4,  _5,  _6,  _7,  _8,  _9, _10, \
                           _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, \
                           _21, _22, _23, _24, _25, _26, _27, _28, _29, _30, \
@@ -59,6 +76,25 @@ extern "C" {
                           _41, _42, _43, _44, _45, _46, _47, _48, _49, _50, \
                           _51, _52, _53, _54, _55, _56, _57, _58, _59, _60, \
                           _61, _62, _63, _64, N, ...) N
+
+#define SINGLEARG_OR_MULTIARG(...) \
+    _TAKE_65TH_TOKEN(__VA_ARGS__, \
+            MULTIARG, MULTIARG, MULTIARG, MULTIARG, \
+            MULTIARG, MULTIARG, MULTIARG, MULTIARG, \
+            MULTIARG, MULTIARG, MULTIARG, MULTIARG, \
+            MULTIARG, MULTIARG, MULTIARG, MULTIARG, \
+            MULTIARG, MULTIARG, MULTIARG, MULTIARG, \
+            MULTIARG, MULTIARG, MULTIARG, MULTIARG, \
+            MULTIARG, MULTIARG, MULTIARG, MULTIARG, \
+            MULTIARG, MULTIARG, MULTIARG, MULTIARG, \
+            MULTIARG, MULTIARG, MULTIARG, MULTIARG, \
+            MULTIARG, MULTIARG, MULTIARG, MULTIARG, \
+            MULTIARG, MULTIARG, MULTIARG, MULTIARG, \
+            MULTIARG, MULTIARG, MULTIARG, MULTIARG, \
+            MULTIARG, MULTIARG, MULTIARG, MULTIARG, \
+            MULTIARG, MULTIARG, MULTIARG, MULTIARG, \
+            MULTIARG, MULTIARG, MULTIARG, MULTIARG, \
+            MULTIARG, MULTIARG, MULTIARG, SINGLEARG)
 
 #define COUNT_ARGS(...) \
         _TAKE_65TH_TOKEN(__VA_ARGS__,        64, 63, 62, 61, 60, \
