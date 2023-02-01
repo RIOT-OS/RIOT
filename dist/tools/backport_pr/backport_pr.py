@@ -269,10 +269,10 @@ def main():
         # the worktree was deleted
         repo.delete_head(new_branch)
         raise exc
-    else:
-        # Delete worktree
-        print(f"Pruning temporary workdir at {worktree_dir}")
-        _delete_worktree(repo, worktree_dir)
+
+    # Delete worktree
+    print(f"Pruning temporary workdir at {worktree_dir}")
+    _delete_worktree(repo, worktree_dir)
 
     labels = _get_labels(pulldata)
     merger = pulldata["merged_by"]["login"]
