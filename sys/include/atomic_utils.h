@@ -918,7 +918,7 @@ ATOMIC_STORE_IMPL(u64, uint64_t)
  * @param   type    Variable type, e.g. `uint8_t`
  */
 #define ATOMIC_FETCH_OP_IMPL(opname, op, name, type)                           \
-    static inline type CONCAT4(atomic_fetch_, opname, _, name)                 \
+    static inline type CONCAT(atomic_fetch_, opname, _, name)                 \
             (volatile type *dest, type val)                                    \
     {                                                                          \
         unsigned state = irq_disable();                                        \

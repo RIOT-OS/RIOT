@@ -126,7 +126,7 @@ BENCH_ATOMIC_LOAD(u32, uint32_t, atomic_uint_least32_t)
 BENCH_ATOMIC_LOAD(u64, uint64_t, atomic_uint_least64_t)
 
 #define BENCH_ATOMIC_FETCH_OP(opname, op, name, type, c11type) \
-    static void CONCAT4(bench_atomic_fetch_, opname, _, name)(uint32_t *result_us) \
+    static void CONCAT(bench_atomic_fetch_, opname, _, name)(uint32_t *result_us) \
     {                                                                          \
         uint32_t start, stop;                                                  \
                                                                                \
@@ -145,7 +145,7 @@ BENCH_ATOMIC_LOAD(u64, uint64_t, atomic_uint_least64_t)
             type val = 0;                                                      \
             start = xtimer_now_usec();                                         \
             for (uint32_t i = 0; i < LOOPS; i++) {                             \
-                CONCAT4(atomic_fetch_, opname, _, name)(&val, 1);              \
+                CONCAT(atomic_fetch_, opname, _, name)(&val, 1);              \
             }                                                                  \
             stop = xtimer_now_usec();                                          \
             result_us[IMPL_ATOMIC_UTIL] = stop - start;                        \
@@ -183,7 +183,7 @@ BENCH_ATOMIC_FETCH_OP(and, &, u32, uint32_t, atomic_uint_least32_t)
 BENCH_ATOMIC_FETCH_OP(and, &, u64, uint64_t, atomic_uint_least64_t)
 
 #define BENCH_ATOMIC_SET_CLEAR_BIT(name, type, c11type, opname, set_or_clear) \
-    static void CONCAT4(bench_atomic_, opname, _bit_, name)(uint32_t *result_us) \
+    static void CONCAT(bench_atomic_, opname, _bit_, name)(uint32_t *result_us) \
     {                                                                          \
         uint32_t start, stop;                                                  \
         static const uint8_t _bit = 5;                                         \
@@ -207,11 +207,11 @@ BENCH_ATOMIC_FETCH_OP(and, &, u64, uint64_t, atomic_uint_least64_t)
                                                                                \
         {                                                                      \
             static type val = 0;                                               \
-            CONCAT3(atomic_bit_, name, _t) bit =                               \
+            CONCAT(atomic_bit_, name, _t) bit =                               \
                 CONCAT(atomic_bit_, name)(&val, _bit);                         \
             start = xtimer_now_usec();                                         \
             for (uint32_t i = 0; i < LOOPS; i++) {                             \
-                CONCAT4(atomic_, opname, _bit_, name)(bit);                    \
+                CONCAT(atomic_, opname, _bit_, name)(bit);                    \
             }                                                                  \
             stop = xtimer_now_usec();                                          \
             result_us[IMPL_ATOMIC_UTIL] = stop - start;                        \
@@ -242,7 +242,7 @@ BENCH_ATOMIC_SET_CLEAR_BIT(u32, uint32_t, atomic_uint_least32_t, clear, 0)
 BENCH_ATOMIC_SET_CLEAR_BIT(u64, uint64_t, atomic_uint_least64_t, clear, 0)
 
 #define BENCH_SEMI_ATOMIC_FETCH_OP(opname, op, name, type, c11type) \
-    static void CONCAT4(bench_semi_atomic_fetch_, opname, _, name)(uint32_t *result_us) \
+    static void CONCAT(bench_semi_atomic_fetch_, opname, _, name)(uint32_t *result_us) \
     {                                                                          \
         uint32_t start, stop;                                                  \
                                                                                \
@@ -261,7 +261,7 @@ BENCH_ATOMIC_SET_CLEAR_BIT(u64, uint64_t, atomic_uint_least64_t, clear, 0)
             type val = 0;                                                      \
             start = xtimer_now_usec();                                         \
             for (uint32_t i = 0; i < LOOPS; i++) {                             \
-                CONCAT4(semi_atomic_fetch_, opname, _, name)(&val, 1);         \
+                CONCAT(semi_atomic_fetch_, opname, _, name)(&val, 1);         \
             }                                                                  \
             stop = xtimer_now_usec();                                          \
             result_us[IMPL_ATOMIC_UTIL] = stop - start;                        \
