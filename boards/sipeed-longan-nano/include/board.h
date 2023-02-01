@@ -53,6 +53,27 @@ extern "C" {
 #define LED_BLUE_PIN        LED2_PIN    /**< LED2 is blue */
 /** @} */
 
+#if defined(MODULE_SDCARD_SPI)
+#define SDCARD_SPI_PARAM_SPI         SPI_DEV(0)
+#define SDCARD_SPI_PARAM_CS          GPIO_PIN(PORT_B, 12)
+#define SDCARD_SPI_PARAM_CLK         GPIO_PIN(PORT_B, 13)
+#define SDCARD_SPI_PARAM_MISO        GPIO_PIN(PORT_B, 14)
+#define SDCARD_SPI_PARAM_MOSI        GPIO_PIN(PORT_B, 15)
+#endif
+
+#if defined(MODULE_ST7735) && defined(CONFIG_SIPEED_LONGAN_NANO_WITH_TFT)
+#define ST7735_PARAM_SPI          SPI_DEV(1)            /**< SPI device */
+#define ST7735_PARAM_SPI_CLK      SPI_CLK_5MHZ          /**< SPI clock frequency */
+#define ST7735_PARAM_SPI_MODE     SPI_MODE_0            /**< SPI mode */
+#define ST7735_PARAM_CS           GPIO_PIN(PORT_B, 2)   /**< Chip Select pin */
+#define ST7735_PARAM_DCX          GPIO_PIN(PORT_B, 0)   /**< DCX pin */
+#define ST7735_PARAM_RST          GPIO_PIN(PORT_B, 1)   /**< Reset pin */
+#define ST7735_PARAM_RGB          1                     /**< RGB mode enable */
+#define ST7735_PARAM_INVERTED     0                     /**< Inverted mode enable */
+#define ST7735_PARAM_NUM_LINES    160U                  /**< Number of lines */
+#define ST7735_PARAM_RGB_CHANNELS 80U                   /**< Number of columns */
+#endif
+
 #ifdef __cplusplus
 }
 #endif

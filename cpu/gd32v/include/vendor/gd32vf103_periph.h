@@ -11555,9 +11555,9 @@ typedef struct {                                /*!< (@ 0x40002C00) WWDGT Struct
 //#define PMU_BASE                    0x40007000UL
 //#define RCU_BASE                    0x40021000UL
 //#define RTC_BASE                    0x40002800UL
-//#define SPI0_BASE                   0x40013000UL
-//#define SPI1_BASE                   0x40003800UL
-//#define SPI2_BASE                   0x40003C00UL
+#define SPI0_BASE                   0x40013000UL
+#define SPI1_BASE                   0x40003800UL
+#define SPI2_BASE                   0x40003C00UL
 #define TIMER0_BASE                 0x40012C00UL
 #define TIMER1_BASE                 0x40000000UL
 #define TIMER2_BASE                 0x40000400UL
