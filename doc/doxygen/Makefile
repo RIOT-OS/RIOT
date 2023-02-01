@@ -9,13 +9,19 @@ export STRIP_FROM_INC_PATH_LIST=$(shell \
 # It can also be installed in ubuntu with the `node-less` package
 LESSC ?= $(shell command -v lessc 2>/dev/null)
 
+DOCUMENTATION_FORMAT ?= html
+
 .PHONY: doc
-doc: html
+doc: $(DOCUMENTATION_FORMAT)
 
 # by marking html as phony we force make to re-run Doxygen even if the directory exists.
 .PHONY: html
 html: src/css/riot.css src/changelog.md
 	( cat riot.doxyfile ; echo "GENERATE_HTML = yes" ) | doxygen -
+
+.PHONY: check
+check: src/changelog.md
+	( cat riot.doxyfile) | doxygen -
 
 .PHONY: man
 man: src/changelog.md
