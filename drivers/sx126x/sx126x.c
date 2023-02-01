@@ -119,9 +119,9 @@ static void sx126x_init_default_config(sx126x_t *dev)
 #endif
     sx126x_set_tx_params(dev, CONFIG_SX126X_TX_POWER_DEFAULT, CONFIG_SX126X_RAMP_TIME_DEFAULT);
 
-    dev->mod_params.bw = (sx126x_lora_bw_t)(CONFIG_LORA_BW_DEFAULT + SX126X_LORA_BW_500);
-    dev->mod_params.sf = (sx126x_lora_sf_t)CONFIG_LORA_SF_DEFAULT;
-    dev->mod_params.cr = (sx126x_lora_cr_t)(CONFIG_LORA_CR_DEFAULT);
+    dev->mod_params.bw = (sx126x_lora_bw_t)(SX126X_LORA_BW_500);
+    dev->mod_params.sf = (sx126x_lora_sf_t)LORA_SF7;
+    dev->mod_params.cr = (sx126x_lora_cr_t)(LORA_CR_4_5);
     dev->mod_params.ldro = _compute_ldro(dev);
     sx126x_set_lora_mod_params(dev, &dev->mod_params);
 

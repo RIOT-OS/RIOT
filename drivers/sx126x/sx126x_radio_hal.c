@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2023 Inria
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @ingroup     drivers_sx126x
+ * @{
+ * @file
+ * @brief       Radio HAL implementation for the Semtech SX126x 
+ *
+ * @author      Klim Evdokimov <klimevdokimov@mail.ru>
+ * @}
+ */
+
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>
@@ -7,34 +25,23 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#include "net/netdev/lora.h"
-#include "net/lora.h"
-
 #include "net/ieee802154/radio.h"
 
 #include "event/thread.h"
 #include "ztimer.h"
 
 #include "thread.h"
-#include "periph/timer.h"
 
 #include "kernel_defines.h"
 #include "event.h"
-
-const uint8_t llcc68_max_sf = LORA_SF11;
-const uint8_t sx126x_max_sf = LORA_SF12;
 
 #include "sx126x.h"
 #include "sx126x_params.h"
 #include "sx126x_internal.h"
 
-#include "checksum/ucrc16.h"
-
-
-#define MAC_TIMER_CHAN_ACK  (0U)    /**< MAC timer channel for transmitting an ACK frame */
-#define MAC_TIMER_CHAN_IFS  (1U)    /**< MAC timer channel for handling IFS logic */
-#define LORA_LIFS_SYMS          5
 #define LORA_ACK_REPLY          1
+
+
 
 static uint8_t sx126x_short_addr[IEEE802154_SHORT_ADDRESS_LEN];
 static uint8_t sx126x_long_addr[IEEE802154_LONG_ADDRESS_LEN];
@@ -441,8 +448,7 @@ static int _len(ieee802154_dev_t *hal){
     sx126x_t *dev = hal->priv;
     sx126x_rx_buffer_status_t rx_buffer_status;
     sx126x_get_rx_buffer_status(dev, &rx_buffer_status);
-    dev->size = rx_buffer_status.pld_len_in_bytes;
-    return dev->size;
+    return rx_buffer_status.pld_len_in_bytes;
 }
 
 static int _read(ieee802154_dev_t *hal, void *buf, size_t max_size, ieee802154_rx_info_t *info)
@@ -452,36 +458,33 @@ static int _read(ieee802154_dev_t *hal, void *buf, size_t max_size, ieee802154_r
     (void)info;
 
     sx126x_t* dev = hal->priv;
-
         /* Getting information about last received packet */
-    netdev_lora_rx_info_t *packet_info = (void*)info;
+    
     sx126x_rx_buffer_status_t rx_buffer_status;
     sx126x_pkt_status_lora_t pkt_status;
     sx126x_get_rx_buffer_status(dev, &rx_buffer_status);
-
-    dev->size = rx_buffer_status.pld_len_in_bytes;
     sx126x_get_lora_pkt_status(dev, &pkt_status);
-    if (packet_info) {
-        packet_info->snr = pkt_status.snr_pkt_in_db;
-        packet_info->rssi = pkt_status.rssi_pkt_in_dbm;
+    if (info) {
+        info->lqi = pkt_status.snr_pkt_in_db;
+        info->rssi = pkt_status.rssi_pkt_in_dbm;
     }
 
       /* Put PSDU to the output buffer */
     
     if (buf == NULL) {
-        return dev->size;
+        return rx_buffer_status.pld_len_in_bytes;
     }
 
-    if (dev->size > max_size) {
+    if (rx_buffer_status.pld_len_in_bytes > max_size) {
         return -ENOBUFS;
     }
 
-    if (dev->size < 3) {
+    if (rx_buffer_status.pld_len_in_bytes < 3) {
         return -EBADMSG;
     }
-    sx126x_read_buffer(dev, rx_buffer_status.buffer_start_pointer, (uint8_t*)buf, dev->size);
+    sx126x_read_buffer(dev, rx_buffer_status.buffer_start_pointer, (uint8_t*)buf, rx_buffer_status.pld_len_in_bytes);
     DEBUG("[sx126x] first 3 bytes of received packet: %d %d %d\n", *(uint8_t*)buf, *((uint8_t*)buf+1), *((uint8_t*)buf+2));
-    return dev->size;
+    return rx_buffer_status.pld_len_in_bytes;
 }
 
 static int _set_cca_threshold(ieee802154_dev_t *hal, int8_t threshold)
@@ -498,7 +501,7 @@ static int _config_phy(ieee802154_dev_t *hal, const ieee802154_phy_conf_t *conf)
     sx126x_t *dev = hal->priv;
     uint8_t channel = conf->channel;
     int8_t pow = conf->pow;
-    assert(channel >= 11 && channel <= 26);
+    //assert(channel >= 11 && channel <= 26);
 
     if (channel == 26) {
         sx126x_set_channel(dev, 869525000LU);
@@ -507,7 +510,7 @@ static int _config_phy(ieee802154_dev_t *hal, const ieee802154_phy_conf_t *conf)
         sx126x_set_channel(dev, (channel-11)*200000LU + 865500000LU);
     }
 
-    assert(pow >= -14 && pow <= 22);
+    //assert(pow >= -14 && pow <= 22);
 
     DEBUG("FREQ = %ld, POWER = %d \n", (channel-11)*200000LU + 865500000LU, pow);
     sx126x_set_tx_params(dev, pow, SX126X_RAMP_10_US);

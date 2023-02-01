@@ -34,7 +34,7 @@ USEMODULE += ps
 
 # Optionally include RPL as a routing protocol. When includede gnrc_uhcpc will
 # configure the node as a RPL DODAG root when receiving a prefix.
-#USEMODULE += gnrc_rpl
+USEMODULE += gnrc_rpl
 
 # Optionally include DNS support. This includes resolution of names at an
 # upstream DNS server and the handling of RDNSS options in Router Advertisements
@@ -43,7 +43,7 @@ USEMODULE += ps
 #USEMODULE += gnrc_ipv6_nib_dns     # include RDNSS option handling
 
 # When using a regular network uplink we should use DHCPv6
-ifneq (,$(filter cdc-ecm wifi ethernet,$(UPLINK))$(REUSE_TAP))
+ifneq (,$(filter cdc-ecm wifi ethernet ethos,$(UPLINK))$(REUSE_TAP))
   PREFIX_CONF ?= dhcpv6
 else
   PREFIX_CONF ?= uhcp

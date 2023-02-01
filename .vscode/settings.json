@@ -8,7 +8,8 @@
     "files.associations": {
         "Makefile.*": "makefile",
         "*.mk": "makefile",
-        "kernel_defines.h": "c"
+        "kernel_defines.h": "c",
+        "sx126x_internal.h": "c"
     },
     "[shellscript][c][cpp]": {
         "editor.tabSize": 4,
