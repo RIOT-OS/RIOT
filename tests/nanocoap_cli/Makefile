@@ -26,6 +26,7 @@ LOW_MEMORY_BOARDS := \
   nucleo-f302r8 \
   saml10-xpro \
   saml11-xpro \
+  sipeed-longan-nano \
   spark-core \
   stm32f7508-dk \
   stm32mp157c-dk2 \
