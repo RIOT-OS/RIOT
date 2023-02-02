@@ -473,7 +473,7 @@ static void _cancel_tcc(const void *ctx)
     tcc->COUNT.reg = 0;
 }
 
-static void __set_cb_tcc(const void *ctx, countdown_cb_t cb, void *arg)
+static void _set_cb_tcc(const void *ctx, countdown_cb_t cb, void *arg)
 {
     unsigned idx = index_of(countdown_config_tcc, ctx);
 
