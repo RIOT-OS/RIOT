@@ -7,6 +7,7 @@ DISABLE_MODULE += auto_init_xtimer
 
 # Boards that can't run only on xtimer or that always select ztimer
 BOARD_BLACKLIST += \
+                   esp32s2-wemos-mini \
                    feather-nrf52840 \
                    hamilton \
                    mulle \
