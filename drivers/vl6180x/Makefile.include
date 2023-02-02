@@ -1,0 +1,9 @@
+# include variants of VL6180x drivers as pseudomodules
+PSEUDOMODULES += vl6180x_rng
+PSEUDOMODULES += vl6180x_als
+PSEUDOMODULES += vl6180x_irq
+PSEUDOMODULES += vl6180x_shutdown
+PSEUDOMODULES += vl6180x_config
+
+USEMODULE_INCLUDES_vl6180x:= $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_vl6180x)

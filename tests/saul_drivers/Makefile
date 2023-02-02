@@ -46,6 +46,10 @@ endif
 ifneq (,$(filter tmp00x,$(DRIVERS)))
   USEMODULE += tmp006
 endif
+ifneq (,$(filter vl6180x,$(DRIVERS)))
+  USEMODULE += vl6180x_als
+  USEMODULE += vl6180x_rng
+endif
 
 USEMODULE += saul_default
 

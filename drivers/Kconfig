@@ -149,6 +149,7 @@ rsource "tsl2561/Kconfig"
 rsource "tsl4531x/Kconfig"
 rsource "vcnl40x0/Kconfig"
 rsource "veml6070/Kconfig"
+rsource "vl6180x/Kconfig"
 endmenu # Sensor Device Drivers
 
 menu "Storage Device Drivers"
