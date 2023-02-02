@@ -399,7 +399,7 @@ static inline void _tcc_syncbusy(Tcc *tcc)
     while (tcc->SYNCBUSY.reg) {}
 }
 
-static uint32_t __init_tcc(const void *ctx, uint32_t max_range, unsigned flags, uint32_t *mask)
+static uint32_t _init_tcc(const void *ctx, uint32_t max_range, unsigned flags, uint32_t *mask)
 {
     const countdown_conf_t *cfg = ctx;
     *mask = TC_COUNT16_COUNT_MASK;
