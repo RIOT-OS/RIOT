@@ -269,7 +269,7 @@ static void _set_tc(const void *ctx, uint32_t alarm, bool one_shot)
     }
 }
 
-static void __start_tc(const void *ctx)
+static void _start_tc(const void *ctx)
 {
     Tc *tc = _tc(ctx);
     DEBUG("Tc[%u] start\n", index_of(countdown_config_tc, ctx));
