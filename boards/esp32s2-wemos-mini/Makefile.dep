@@ -1,0 +1,2 @@
+include $(RIOTBOARD)/common/makefiles/stdio_tinyusb_cdc_acm.dep.mk
+include $(RIOTBOARD)/common/esp32s2/Makefile.dep

@@ -8,6 +8,7 @@ USEMODULE += xtimer_no_ztimer_default
 TEST_ON_CI_BLACKLIST += native
 # Boards that can't run only on xtimer or that always select ztimer
 BOARD_BLACKLIST += \
+                   esp32s2-wemos-mini \
                    feather-nrf52840 \
                    hamilton \
                    mulle \
