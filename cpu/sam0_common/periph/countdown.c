@@ -298,7 +298,7 @@ static void _set_cb_tc(const void *ctx, countdown_cb_t cb, void *arg)
     irq_restore(state);
 }
 
-static void __get_cb_tc(const void *ctx, countdown_cb_t *cb, void **arg)
+static void _get_cb_tc(const void *ctx, countdown_cb_t *cb, void **arg)
 {
     unsigned idx = index_of(countdown_config_tc, ctx);
 
