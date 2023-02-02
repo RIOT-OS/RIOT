@@ -277,7 +277,7 @@ static void _start_tc(const void *ctx)
     tc->COUNT16.CTRLA.reg |= TC_CTRLA_ENABLE;
 }
 
-static void __cancel_tc(const void *ctx)
+static void _cancel_tc(const void *ctx)
 {
     Tc *tc = _tc(ctx);
     DEBUG("Tc[%u] cancel\n", index_of(countdown_config_tc, ctx));
