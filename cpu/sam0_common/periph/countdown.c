@@ -453,7 +453,7 @@ static void __set_tcc(const void *ctx, uint32_t alarm, bool one_shot)
     }
 }
 
-static void __start_tcc(const void *ctx)
+static void _start_tcc(const void *ctx)
 {
     Tcc *tcc = _tcc(ctx);
     DEBUG("Tcc[%u] start\n", index_of(countdown_config_tcc, ctx));
