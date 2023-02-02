@@ -288,7 +288,7 @@ static void _cancel_tc(const void *ctx)
     tc->COUNT16.COUNT.reg = 0;
 }
 
-static void __set_cb_tc(const void *ctx, countdown_cb_t cb, void *arg)
+static void _set_cb_tc(const void *ctx, countdown_cb_t cb, void *arg)
 {
     unsigned idx = index_of(countdown_config_tc, ctx);
 
