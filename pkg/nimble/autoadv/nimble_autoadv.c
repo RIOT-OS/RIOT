@@ -192,11 +192,11 @@ void nimble_autoadv_start(ble_addr_t *addr)
     if (addr != NULL) {
         mode = BLE_GAP_CONN_MODE_DIR;
     }
-    else if (_cfg.flags && NIMBLE_AUTOADV_FLAG_CONNECTABLE) {
+    else if (_cfg.flags & NIMBLE_AUTOADV_FLAG_CONNECTABLE) {
         mode = BLE_GAP_CONN_MODE_UND;
     }
-    uint8_t disc = (_cfg.flags && NIMBLE_AUTOADV_FLAG_SCANNABLE) ? BLE_GAP_CONN_MODE_DIR
-                                                                 : BLE_GAP_CONN_MODE_UND;
+    uint8_t disc = (_cfg.flags & NIMBLE_AUTOADV_FLAG_SCANNABLE) ? BLE_GAP_CONN_MODE_DIR
+                                                                : BLE_GAP_CONN_MODE_UND;
     struct ble_gap_adv_params advp = {
         .conn_mode = mode,
         .disc_mode = disc,

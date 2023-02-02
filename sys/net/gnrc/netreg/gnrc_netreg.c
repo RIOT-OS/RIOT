@@ -152,6 +152,13 @@ int gnrc_netreg_register(gnrc_nettype_t type, gnrc_netreg_entry_t *entry)
     }
 
     _gnrc_netreg_acquire_exclusive();
+
+    /* don't add the same entry twice */
+    gnrc_netreg_entry_t *e;
+    LL_FOREACH(netreg[type], e) {
+        assert(entry != e);
+    }
+
     LL_PREPEND(netreg[type], entry);
     _gnrc_netreg_release_exclusive();
 
