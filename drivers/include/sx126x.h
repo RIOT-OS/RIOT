@@ -139,6 +139,10 @@ struct sx126x {
 
     ztimer_t ack_timer;
     uint8_t seq_num;
+
+    uint8_t short_addr[IEEE802154_SHORT_ADDRESS_LEN];    /**< Short (2 bytes) device address */
+    uint8_t long_addr[IEEE802154_LONG_ADDRESS_LEN];     /**< Long (8 bytes) device address */
+    uint16_t pan_id;                                    /**< PAN ID */
 };
 
 /**
@@ -149,7 +153,7 @@ struct sx126x {
  * @param[in] index                     Index of @p params in a global parameter struct array.
  *                                      If initialized manually, pass a unique identifier instead.
  */
-void sx126x_setup(sx126x_t *dev, uint8_t index);
+void sx126x_setup(ieee802154_dev_t *hal, uint8_t index);
 
 void sx126x_hal_setup(sx126x_t *dev, ieee802154_dev_t *hal);
 

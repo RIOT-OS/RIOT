@@ -42,7 +42,7 @@
 #endif
 
 #ifndef CONFIG_SX126X_TX_POWER_DEFAULT
-#define CONFIG_SX126X_TX_POWER_DEFAULT          (22U)           /* in dBm */
+#define CONFIG_SX126X_TX_POWER_DEFAULT          (0U)           /* in dBm */
 #endif
 
 #ifndef CONFIG_SX126X_RAMP_TIME_DEFAULT

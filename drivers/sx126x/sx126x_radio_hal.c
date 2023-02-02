@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Inria
+ * Copyright (C) 2023 
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -39,13 +39,17 @@
 #include "sx126x_params.h"
 #include "sx126x_internal.h"
 
-#define LORA_ACK_REPLY          1
+#define LORA_ACK_REPLY_US          1024
 
+#define SX126X_HAL_CHAN_26 (869525000LU)
+#define SX126X_HAL_CHAN_BASE (865500000LU)
+#define SX126X_HAL_CHAN_SPACING (200000LU)
 
+#define SX126X_CHAN_MIN (11)
+#define SX126X_CHAN_MAX (26)
 
-static uint8_t sx126x_short_addr[IEEE802154_SHORT_ADDRESS_LEN];
-static uint8_t sx126x_long_addr[IEEE802154_LONG_ADDRESS_LEN];
-static uint16_t sx126x_pan_id;
+#define SX126X_POWER_MIN (-9)
+#define SX126X_POWER_MAX (22)
 
 static const ieee802154_radio_ops_t sx126x_ops;
 static ieee802154_dev_t *_sx126x_hal_dev;
@@ -58,9 +62,6 @@ void sx126x_hal_setup(sx126x_t *dev, ieee802154_dev_t *hal)
 {
     hal->driver = &sx126x_ops;
     hal->priv = dev;
-
-    _sx126x_hal_dev = hal;
-
 }
 
 #if IS_USED(MODULE_SX126X_STM32WL)
@@ -100,23 +101,24 @@ static void ack_timer_cb(void *arg)
     sx126x_set_lora_payload_length(dev, IEEE802154_ACK_FRAME_LEN-2);
     _set_state(dev, STATE_TX);
     dev->ack_filter = true;
-    
-    
 }
 
-void sx126x_setup(sx126x_t *dev, uint8_t index)
+void sx126x_setup(ieee802154_dev_t *hal, uint8_t index)
 {
-    (void)dev;
+    sx126x_t *dev = hal->priv;
     (void)index;
 
     dev->ack_timer.arg = dev;
     dev->ack_timer.callback = ack_timer_cb;
-    
     dev->ack_filter = false;
+
+     _sx126x_hal_dev = hal;
 }
 
 static bool _l2filter(uint8_t *mhr)
 {
+    ieee802154_dev_t *hal = _sx126x_hal_dev;
+    sx126x_t *dev = hal->priv;
     uint8_t dst_addr[IEEE802154_LONG_ADDRESS_LEN];
     le_uint16_t dst_pan;
     uint8_t pan_bcast[] = IEEE802154_PANID_BCAST;
@@ -124,7 +126,7 @@ static bool _l2filter(uint8_t *mhr)
     int addr_len = ieee802154_get_dst(mhr, dst_addr, &dst_pan);
 
     if ((mhr[0] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_BEACON) {
-        if ((memcmp(&sx126x_pan_id, pan_bcast, 2) == 0)) {
+        if ((memcmp(&dev->pan_id, pan_bcast, 2) == 0)) {
             return true;
         }
     }
@@ -132,16 +134,16 @@ static bool _l2filter(uint8_t *mhr)
     /* Will only work on little endian platform (all?) */
 
     if ((memcmp(pan_bcast, dst_pan.u8, 2) != 0) &&
-        (memcmp(&sx126x_pan_id, dst_pan.u8, 2) != 0)) {
+        (memcmp(&dev->pan_id, dst_pan.u8, 2) != 0)) {
         return false;
     }
 
     /* check destination address */
     if (((addr_len == IEEE802154_SHORT_ADDRESS_LEN) &&
-          (memcmp(sx126x_short_addr, dst_addr, addr_len) == 0 ||
+          (memcmp(dev->short_addr, dst_addr, addr_len) == 0 ||
            memcmp(ieee802154_addr_bcast, dst_addr, addr_len) == 0)) ||
         ((addr_len == IEEE802154_LONG_ADDRESS_LEN) &&
-          (memcmp(sx126x_long_addr, dst_addr, addr_len) == 0))) {
+          (memcmp(dev->long_addr, dst_addr, addr_len) == 0))) {
         return true;
     }
 
@@ -273,7 +275,7 @@ void sx126x_hal_task_handler(ieee802154_dev_t *hal)
                     if (ack_req && is_auto_ack_en) {
                         dev->seq_num = rxbuf[2];
                        DEBUG("Received valid frame, need ack\n");
-                       ztimer_set(ZTIMER_USEC, &dev->ack_timer, LORA_ACK_REPLY);
+                       ztimer_set(ZTIMER_USEC, &dev->ack_timer, LORA_ACK_REPLY_US);
                     }
                     else {
                         DEBUG("[sx126x] RX frame doesn't require ACK frame.\n");
@@ -501,18 +503,19 @@ static int _config_phy(ieee802154_dev_t *hal, const ieee802154_phy_conf_t *conf)
     sx126x_t *dev = hal->priv;
     uint8_t channel = conf->channel;
     int8_t pow = conf->pow;
-    //assert(channel >= 11 && channel <= 26);
+    if((channel < SX126X_CHAN_MIN) && (channel > SX126X_CHAN_MAX))
+        return -EINVAL;
 
     if (channel == 26) {
-        sx126x_set_channel(dev, 869525000LU);
+        sx126x_set_channel(dev, SX126X_HAL_CHAN_26);
     }
     else {
-        sx126x_set_channel(dev, (channel-11)*200000LU + 865500000LU);
+        sx126x_set_channel(dev, (channel-11)*SX126X_HAL_CHAN_SPACING + SX126X_HAL_CHAN_BASE);
     }
 
-    //assert(pow >= -14 && pow <= 22);
+    if((pow < SX126X_POWER_MIN) && (pow > SX126X_POWER_MAX))
+        return -EINVAL;
 
-    DEBUG("FREQ = %ld, POWER = %d \n", (channel-11)*200000LU + 865500000LU, pow);
     sx126x_set_tx_params(dev, pow, SX126X_RAMP_10_US);
     return 0;
 }
@@ -527,19 +530,19 @@ static int _off(ieee802154_dev_t *hal)
 
 static int _config_addr_filter(ieee802154_dev_t *hal, ieee802154_af_cmd_t cmd, const void *value)
 {
-    (void)hal;
     (void)cmd;
     (void)value;
-    const uint16_t *pan_id = value;
+    uint16_t pan_id = *(uint16_t*)value;
+    sx126x_t *dev = hal->priv;
     switch(cmd) {
         case IEEE802154_AF_SHORT_ADDR:
-            memcpy(sx126x_short_addr, value, IEEE802154_SHORT_ADDRESS_LEN);
+            memcpy(dev->short_addr, value, IEEE802154_SHORT_ADDRESS_LEN);
             break;
         case IEEE802154_AF_EXT_ADDR:
-            memcpy(sx126x_long_addr, value, IEEE802154_LONG_ADDRESS_LEN);
+            memcpy(dev->long_addr, value, IEEE802154_LONG_ADDRESS_LEN);
             break;
         case IEEE802154_AF_PANID:
-            sx126x_pan_id = *pan_id;
+            dev->pan_id = pan_id;
             break;
         case IEEE802154_AF_PAN_COORD:
             return -ENOTSUP;
@@ -630,7 +633,6 @@ static const ieee802154_radio_ops_t sx126x_ops = {
           | IEEE802154_CAP_IRQ_RX_START
           | IEEE802154_CAP_IRQ_TX_DONE
           | IEEE802154_CAP_IRQ_CCA_DONE
-          //| IEEE802154_CAP_IRQ_ACK_TIMEOUT
           | IEEE802154_CAP_PHY_BPSK,
     .write = _write,
     .read = _read,
