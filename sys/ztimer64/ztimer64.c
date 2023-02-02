@@ -187,10 +187,7 @@ uint64_t ztimer64_now(ztimer64_clock_t *clock)
         clock->checkpoint += ZTIMER64_CHECKPOINT_INTERVAL;
     }
 
-    now = clock->checkpoint | base_now;
-    if (clock->offset) {
-        now += clock->offset;
-    }
+    now = (clock->checkpoint | base_now) + clock->offset;
 
     irq_restore(state);
     return now;
