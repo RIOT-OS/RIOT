@@ -520,6 +520,7 @@ static inline void ztimer64_clock_offset_set(ztimer64_clock_t *clock, uint64_t o
  */
 static inline void ztimer64_clock_adjust(ztimer64_clock_t *clock, int64_t adjust_value)
 {
+    /* TODO: check for overflow? */
     ztimer64_clock_offset_set(clock, clock->offset + adjust_value);
 }
 
