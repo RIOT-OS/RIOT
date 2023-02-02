@@ -249,7 +249,7 @@ static uint32_t _init_tc(const void *ctx, uint32_t max_range, unsigned flags, ui
     return f_out;
 }
 
-static void __set_tc(const void *ctx, uint32_t alarm, bool one_shot)
+static void _set_tc(const void *ctx, uint32_t alarm, bool one_shot)
 {
     Tc *tc = _tc(ctx);
 
