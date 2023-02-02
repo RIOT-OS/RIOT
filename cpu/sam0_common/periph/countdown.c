@@ -461,7 +461,7 @@ static void _start_tcc(const void *ctx)
     tcc->CTRLA.reg |= TCC_CTRLA_ENABLE;
 }
 
-static void __cancel_tcc(const void *ctx)
+static void _cancel_tcc(const void *ctx)
 {
     Tcc *tcc = _tcc(ctx);
     DEBUG("Tcc[%u] cancel\n", index_of(countdown_config_tcc, ctx));
