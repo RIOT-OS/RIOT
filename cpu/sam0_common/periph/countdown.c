@@ -227,15 +227,15 @@ static uint32_t __init_tc(const void *ctx, uint32_t max_range, unsigned flags, u
 
     /* configure the TC device */
     tc->COUNT16.CTRLA.reg = TC_CTRLA_MODE_COUNT16
-                         | TC_CTRLA_PRESCALER(prescaler)
-                         | TC_CTRLA_PRESCSYNC_RESYNC
+                          | TC_CTRLA_PRESCALER(prescaler)
+                          | TC_CTRLA_PRESCSYNC_RESYNC
 #ifdef TC_CTRLA_WAVEGEN_MFRQ
-                         | TC_CTRLA_WAVEGEN_MFRQ
+                          | TC_CTRLA_WAVEGEN_MFRQ
 #endif
 #ifdef TC_CTRLA_ONDEMAND
-                         | TC_CTRLA_ONDEMAND
+                          | TC_CTRLA_ONDEMAND
 #endif
-                         ;
+                          ;
 #ifndef TC_CTRLA_WAVEGEN_MFRQ
     /* MFRQ -> MC0 will be TOP value */
     tc->COUNT16.WAVE.reg = TC_WAVE_WAVEGEN_MFRQ;
