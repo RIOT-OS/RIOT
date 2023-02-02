@@ -23,6 +23,7 @@
 #include <fcntl.h> /* for O_ACCMODE, ..., fcntl */
 #include <unistd.h> /* for STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO */
 
+#include "container.h"
 #include "modules.h"
 #include "vfs.h"
 #include "mutex.h"
