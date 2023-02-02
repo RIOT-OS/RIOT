@@ -14,6 +14,8 @@
 
 #include <inttypes.h>
 #include <stdio.h>
+
+#include "modules.h"
 #include "od.h"
 #include "net/inet_csum.h"
 
