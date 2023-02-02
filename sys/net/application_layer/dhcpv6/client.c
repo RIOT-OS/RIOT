@@ -257,26 +257,30 @@ void dhcpv6_client_start(void)
     }
 }
 
-void dhcpv6_client_req_ia_pd(unsigned netif, unsigned pfx_len)
+int dhcpv6_client_req_ia_pd(unsigned netif, unsigned pfx_len)
 {
     pfx_lease_t *lease = NULL;
 
     assert(IS_USED(MODULE_DHCPV6_CLIENT_IA_PD));
     assert(pfx_len <= 128);
+
     if (!IS_USED(MODULE_DHCPV6_CLIENT_IA_PD)) {
         LOG_WARNING("DHCPv6 client: Unable to request IA_PD as module "
                     "`dhcpv6_client_ia_pd` is not used\n");
-        return;
+        return -ENOTSUP;
     }
+
     for (unsigned i = 0; i < CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX; i++) {
         if (pfx_leases[i].parent.ia_id.id == 0) {
             lease = &pfx_leases[i];
             lease->parent.ia_id.info.netif = netif;
             lease->parent.ia_id.info.type = DHCPV6_OPT_IA_PD;
             lease->pfx_len = pfx_len;
-            break;
+            return 0;
         }
     }
+
+    return -ENOMEM;
 }
 
 int dhcpv6_client_req_ia_na(unsigned netif)
@@ -423,15 +427,32 @@ static inline size_t _compose_oro_opt(dhcpv6_opt_oro_t *oro, uint16_t *opts,
 }
 
 static inline size_t _compose_ia_pd_opt(dhcpv6_opt_ia_pd_t *ia_pd,
-                                        uint32_t ia_id, uint16_t opts_len)
+                                        const pfx_lease_t *lease)
 {
-    uint16_t len = 12U + opts_len;
+    uint16_t len = 12;
 
+    /* add IA Prefix Option if length was given*/
+    if (lease->pfx_len != 0) {
+        dhcpv6_opt_iapfx_t *iapfx = (dhcpv6_opt_iapfx_t *)ia_pd->opts;
+        uint16_t iapfx_len = 25;
+
+        /* set all unused/requested fields to 0 */
+        memset(iapfx, 0, sizeof(*iapfx));
+
+        iapfx->type = byteorder_htons(DHCPV6_OPT_IAPFX);
+        iapfx->len = byteorder_htons(iapfx_len);
+        iapfx->pfx_len = lease->pfx_len;
+
+        len += iapfx_len + sizeof(dhcpv6_opt_t);
+    }
+
+    /* write Identity Association for Prefix Delegation Option */
     ia_pd->type = byteorder_htons(DHCPV6_OPT_IA_PD);
     ia_pd->len = byteorder_htons(len);
-    ia_pd->ia_id = byteorder_htonl(ia_id);
+    ia_pd->ia_id = byteorder_htonl(lease->parent.ia_id.id);
     ia_pd->t1.u32 = 0;
     ia_pd->t2.u32 = 0;
+
     return len + sizeof(dhcpv6_opt_t);
 }
 
@@ -486,12 +507,15 @@ static inline size_t _add_ia_pd_from_config(uint8_t *buf, size_t len_max)
     size_t msg_len = 0;
 
     for (unsigned i = 0; i < CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX; i++) {
-        uint32_t ia_id = pfx_leases[i].parent.ia_id.id;
-        if (ia_id != 0) {
-            dhcpv6_opt_ia_pd_t *ia_pd = (dhcpv6_opt_ia_pd_t *)(&buf[msg_len]);
+        pfx_lease_t *lease = &pfx_leases[i];
 
-            msg_len += _compose_ia_pd_opt(ia_pd, ia_id, 0U);
+        if (lease->parent.ia_id.id == 0) {
+            continue;
         }
+
+        /* add Identity Association for Prefix Delegation Option */
+        dhcpv6_opt_ia_pd_t *ia_pd = (dhcpv6_opt_ia_pd_t *)(&buf[msg_len]);
+        msg_len += _compose_ia_pd_opt(ia_pd, lease);
     }
 
     if (msg_len > len_max) {

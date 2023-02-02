@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2020 Koen Zandberg <koen@bergzand.net>
+ *               2023 Gunar Schorcht <gunar@schorcht.net>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Board specific definitions for the SeeedStudio GD32 RISC-V board
  *
  * @author      Koen Zandberg <koen@bergzand.net>
+ * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
 #ifndef PERIPH_CONF_H
@@ -44,6 +46,29 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @name    ADC configuration
+ * @{
+ */
+static const adc_conf_t adc_config[] = {
+    { .pin = GPIO_PIN(PORT_A, 1), .dev = 0, .chan = 1 },
+    { .pin = GPIO_PIN(PORT_A, 2), .dev = 0, .chan = 2 },
+    { .pin = GPIO_PIN(PORT_A, 3), .dev = 0, .chan = 3 },
+    { .pin = GPIO_PIN(PORT_C, 0), .dev = 0, .chan = 10 },
+    { .pin = GPIO_PIN(PORT_C, 1), .dev = 0, .chan = 11 },
+    { .pin = GPIO_PIN(PORT_C, 2), .dev = 0, .chan = 12 },
+    { .pin = GPIO_PIN(PORT_C, 3), .dev = 0, .chan = 13 },
+    { .pin = GPIO_PIN(PORT_C, 4), .dev = 0, .chan = 14 },
+    { .pin = GPIO_PIN(PORT_C, 5), .dev = 0, .chan = 15 },
+    /* ADC Temperature channel */
+    { .pin = GPIO_UNDEF, .dev = 0, .chan = 16 },
+    /* ADC VREF channel */
+    { .pin = GPIO_UNDEF, .dev = 0, .chan = 17 },
+};
+
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
+/** @} */
 
 /**
  * @name   PWM configuration

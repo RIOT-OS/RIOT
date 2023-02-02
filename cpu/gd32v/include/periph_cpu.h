@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2020 Koen Zandberg <koen@bergzand.net>
+ *               2023 Gunar Schorcht <gunar@schorcht.net>
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -14,6 +15,7 @@
  * @brief           CPU specific definitions for internal peripheral handling
  *
  * @author          Koen Zandberg <koen@bergzand.net>
+ * @author          Gunar Schorcht <gunar@schorcht.net>
  */
 
 #ifndef PERIPH_CPU_H
@@ -165,6 +167,35 @@ typedef enum {
     GPIO_AF_OUT_PP  = 0xb,  /**< alternate function output - push-pull */
     GPIO_AF_OUT_OD  = 0xf,  /**< alternate function output - open-drain */
 } gpio_af_t;
+
+/**
+ * @brief   Configure the alternate function for the given pin
+ *
+ * @param[in] pin       pin to configure
+ * @param[in] af        alternate function to use
+ */
+void gpio_init_af(gpio_t pin, gpio_af_t af);
+
+/**
+ * @brief   Configure the given pin to be used as ADC input
+ *
+ * @param[in] pin       pin to configure
+ */
+void gpio_init_analog(gpio_t pin);
+
+/**
+ * @brief   Available number of ADC devices
+ */
+#define ADC_DEVS            (2U)
+
+/**
+ * @brief   ADC channel configuration data
+ */
+typedef struct {
+    gpio_t pin;             /**< pin connected to the channel */
+    uint8_t dev;            /**< ADCx - 1 device used for the channel */
+    uint8_t chan;           /**< CPU ADC channel connected to the pin */
+} adc_conf_t;
 
 /**
  * @brief   GD32V timers have 4 capture-compare channels

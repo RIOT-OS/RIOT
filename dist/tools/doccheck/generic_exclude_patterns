@@ -1,3 +1,5 @@
+warning: Member adc_config\[\] \(variable\) of
+warning: Member ADC_NUMOF \(macro definition\) of
 warning: Member AT86RF2XX_PARAM_CS \(macro definition\) of
 warning: Member AT86RF2XX_PARAM_INT \(macro definition\) of
 warning: Member AT86RF2XX_PARAM_RESET \(macro definition\) of
