@@ -506,12 +506,12 @@ static inline void _isr_tcc(unsigned idx)
 }
 
 const countdown_desc_t _driver_timer_tcc = {
-    .init   = __init_tcc,
-    .set_cb = __set_cb_tcc,
-    .get_cb = __get_cb_tcc,
-    .set    = __set_tcc,
-    .start  = __start_tcc,
-    .cancel = __cancel_tcc,
+    .init   = _init_tcc,
+    .set_cb = _set_cb_tcc,
+    .get_cb = _get_cb_tcc,
+    .set    = _set_tcc,
+    .start  = _start_tcc,
+    .cancel = _cancel_tcc,
 };
 
 XFA_CONST(countdown_timers_xfa, 1)
