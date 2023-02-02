@@ -321,12 +321,12 @@ static inline void _isr_tc(unsigned idx)
 }
 
 const countdown_desc_t _driver_timer_tc = {
-    .init   = __init_tc,
-    .set_cb = __set_cb_tc,
-    .get_cb = __get_cb_tc,
-    .set    = __set_tc,
-    .start  = __start_tc,
-    .cancel = __cancel_tc,
+    .init   = _init_tc,
+    .set_cb = _set_cb_tc,
+    .get_cb = _get_cb_tc,
+    .set    = _set_tc,
+    .start  = _start_tc,
+    .cancel = _cancel_tc,
 };
 
 XFA_CONST(countdown_timers_xfa, 1)
