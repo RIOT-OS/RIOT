@@ -434,7 +434,7 @@ static uint32_t _init_tcc(const void *ctx, uint32_t max_range, unsigned flags, u
     return f_out;
 }
 
-static void __set_tcc(const void *ctx, uint32_t alarm, bool one_shot)
+static void _set_tcc(const void *ctx, uint32_t alarm, bool one_shot)
 {
     Tcc *tcc = _tcc(ctx);
     DEBUG("Tcc[%u] alarm: %lu\n", index_of(countdown_config_tcc, ctx), alarm);
