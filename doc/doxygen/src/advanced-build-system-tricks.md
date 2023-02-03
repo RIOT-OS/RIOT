@@ -72,3 +72,17 @@ To do a repository wide analysis, you can use the script
 `dist/tools/buildsystem_sanity_check/save_all_dependencies_resolution_variables.sh`
 that will generate the output for all boards and applications.
 It currently take around 2 hours on an 8 cores machine with ssd.
+
+Generate Makefile.ci content                             {#generate-makefileci}
+============================
+
+Most applications and tests include a `Makefile.ci` to indicate which boards can
+not compile the application or test. The content for these files can be
+generated via the script in
+~~~~~~~~~~~~~~~~~~~
+make -C $APPLICATION_DIRECTORY generate-Makefile.ci
+~~~~~~~~~~~~~~~~~~~
+This will compile and link the application for every board available and record
+the result in the Makefile.ci. This requires the toolchain for every target to
+be available. The target supports using docker via the `BUILD_IN_DOCKER=1`
+variable.
