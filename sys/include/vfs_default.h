@@ -21,7 +21,13 @@
 #define VFS_DEFAULT_H
 
 #include "board.h"
+#include "modules.h"
+#if IS_USED(MODULE_VFS) || DOXYGEN
 #include "vfs.h"
+#else
+/* don't try to create auto-mounts if there is no VFS module */
+#define VFS_AUTO_MOUNT(type, mtd, path, idx)
+#endif
 
 #if IS_USED(MODULE_FATFS_VFS)
 #include "fs/fatfs.h"
