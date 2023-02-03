@@ -1,0 +1,5 @@
+MODULE = tinyusb_lib_networking
+
+SRC = rndis_reports.c
+
+include $(RIOTBASE)/Makefile.base

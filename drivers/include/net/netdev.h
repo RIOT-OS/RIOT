@@ -332,6 +332,7 @@ typedef enum {
     NETDEV_ESP_ETH,
     NETDEV_ESP_WIFI,
     NETDEV_CDC_ECM,
+    NETDEV_TINYUSB,
     /* add more if needed */
 } netdev_type_t;
 /** @} */
