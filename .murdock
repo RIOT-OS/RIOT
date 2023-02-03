@@ -178,6 +178,15 @@ check_label() {
     return $?
 }
 
+is_bors_build() {
+    test "${CI_BUILD_BRANCH}" = "staging" || test "${CI_BUILD_BRANCH}" = "trying"
+}
+
+if test -z "${CI_BASE_COMMIT}" && is_bors_build ; then
+    previous_merge="$(git log --merges --max-count 1 --skip 1 --pretty=format:%H)"
+    export CI_BASE_COMMIT="${previous_merge}"
+fi
+
 # fullbuild logic
 # non-full-builds are those where can_fast_ci_run might reduce the build
 # automatically
@@ -193,12 +202,13 @@ if [ -z "${FULL_BUILD}" ]; then
     export FULL_BUILD
 fi
 
+
 # quickbuild logic
 # a "quickbuild" is only building a representative subset of all build
 # configurations.
 if [ -z "${QUICK_BUILD}" ]; then
     export QUICK_BUILD=0
-    if [ "${CI_BUILD_BRANCH}" = "staging" ] || [ "${CI_BUILD_BRANCH}" = "trying" ]; then
+    if is_bors_build ; then
         # always do full build for bors' branches
         true
     elif [ ${FULL_BUILD} -eq 1 ]; then
