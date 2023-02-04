@@ -235,7 +235,7 @@ GLOBAL_GOALS += buildtest \
                 info-boards-features-missing \
                 info-boards-supported \
                 info-buildsizes info-buildsizes-diff \
-                create-Makefile.ci \
+                generate-Makefile.ci \
                 #
 
 ifneq (, $(filter $(GLOBAL_GOALS), $(MAKECMDGOALS)))

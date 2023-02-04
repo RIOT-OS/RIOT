@@ -149,8 +149,9 @@ info-boards-features-blacklisted:
 info-boards-features-conflicting:
 	@for f in $(BOARDS_FEATURES_CONFLICTING); do echo $${f}; done | column -t
 
-create-Makefile.ci:
-	@$(RIOTTOOLS)/insufficient_memory/create_makefile.ci.sh --no-docker
+generate-Makefile.ci:
+	@$(RIOTTOOLS)/insufficient_memory/create_makefile.ci.sh
+
 
 # Reset BOARDSDIR so unchanged for makefiles included after, for now only
 # needed for buildtests.inc.mk

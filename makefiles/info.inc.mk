@@ -6,7 +6,7 @@
         check-toolchain-supported \
         info-programmers-supported \
         info-rust \
-        create-Makefile.ci \
+        generate-Makefile.ci \
         #
 
 info-objsize:
