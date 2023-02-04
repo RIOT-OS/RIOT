@@ -150,7 +150,7 @@ info-boards-features-conflicting:
 	@for f in $(BOARDS_FEATURES_CONFLICTING); do echo $${f}; done | column -t
 
 generate-Makefile.ci:
-	@$(RIOTTOOLS)/insufficient_memory/create_makefile.ci.sh --no-docker
+	@$(RIOTTOOLS)/insufficient_memory/create_makefile.ci.sh
 
 
 # Reset BOARDSDIR so unchanged for makefiles included after, for now only
