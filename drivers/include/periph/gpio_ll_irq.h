@@ -117,9 +117,10 @@ void gpio_ll_irq_mask(gpio_port_t port, uint8_t pin);
 /**
  * @brief   Unmask IRQs on the given GPIO pin
  *
- * Same as @ref gpio_ll_irq_unmask_and_clear except that IRQs that came in during
+ * Same as @ref gpio_ll_irq_unmask_and_clear except that IRQs that came in while
+ * masked are not lost.
  *
- * @warning On same MCUs (most notably STM32) this is impossible to implement.
+ * @warning On some MCUs (most notably STM32) this is impossible to implement.
  *          The feature `periph_gpio_ll_irq_unmask` is provided, if this
  *          function is available.
  *
