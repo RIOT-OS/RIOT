@@ -178,6 +178,23 @@ check_label() {
     return $?
 }
 
+# this function returns 0 when this is build is building one of the two bors
+# branches ("staging" or "trying", 1 otherwise.
+is_bors_build() {
+    test "${CI_BUILD_BRANCH}" = "staging" || test "${CI_BUILD_BRANCH}" = "trying"
+}
+
+# Set CI_BASE_COMMIT in case of a bors build.
+# This assumes that bors always adds a single merge commit (possibly itself
+# including multiple merges for PRs) on the base branch.
+# That git command outputs the hash of the second merge commit (the one before
+# the topmost merge), which should be the base branch HEAD.
+# (CI_BASE_COMMIT is used by `can_fast_ci_run.py` to only build changes.)
+if test -z "${CI_BASE_COMMIT}" && is_bors_build ; then
+    previous_merge="$(git log --merges --max-count 1 --skip 1 --pretty=format:%H)"
+    export CI_BASE_COMMIT="${previous_merge}"
+fi
+
 # fullbuild logic
 # non-full-builds are those where can_fast_ci_run might reduce the build
 # automatically
@@ -193,12 +210,13 @@ if [ -z "${FULL_BUILD}" ]; then
     export FULL_BUILD
 fi
 
+
 # quickbuild logic
 # a "quickbuild" is only building a representative subset of all build
 # configurations.
 if [ -z "${QUICK_BUILD}" ]; then
     export QUICK_BUILD=0
-    if [ "${CI_BUILD_BRANCH}" = "staging" ] || [ "${CI_BUILD_BRANCH}" = "trying" ]; then
+    if is_bors_build ; then
         # always do full build for bors' branches
         true
     elif [ ${FULL_BUILD} -eq 1 ]; then
