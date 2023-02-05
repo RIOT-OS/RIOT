@@ -8,17 +8,7 @@
  */
 
 /**
- * @defgroup    sys_stdio_rtt STDIO over SEGGER RTT
- * @ingroup     sys_stdio
- *
- * @brief       STDIO mapping for running the STDIO over SEGGER's RTT interface
- *
- * To enable stdio over SEGGER's RTT, enable the module `stdio_rtt`:
- *
- *     USEMODULE += stdio_rtt
- *
- * @note    Currently, `stdio_rtt` is only supported when OpenOCD or J-Link is
- *          used as programmer.
+ * @ingroup     sys_stdio_rtt
  *
  * @{
  * @file
