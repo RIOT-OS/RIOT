@@ -33,6 +33,10 @@
 #define CONFIG_CLOCK_HXTAL      MHZ(8)      /**< HXTAL frequency */
 #endif
 
+#if CONFIG_SIPEED_LONGAN_NANO_WITH_TFT
+#define SPI_DEV_1_USED              /**< Enable SPI_DEV(1) if TFT is connected */
+#endif
+
 #include "periph_cpu.h"
 #include "periph_common_conf.h"
 
@@ -56,22 +60,18 @@ static const adc_conf_t adc_config[] = {
     { .pin = GPIO_UNDEF, .dev = 0, .chan = 16 },
     /* ADC VREF channel */
     { .pin = GPIO_UNDEF, .dev = 0, .chan = 17 },
-#if !defined(CONFIG_SIPEED_LONGAN_NANO_WITH_TFT)
+#if !CONFIG_SIPEED_LONGAN_NANO_WITH_TFT
     /* This conflicts with TFT pins if connected. */
     { .pin = GPIO_PIN(PORT_B, 0), .dev = 0, .chan = 8 },
     { .pin = GPIO_PIN(PORT_B, 1), .dev = 0, .chan = 9 },
-#endif
-#if !defined(MODULE_PERIPH_SPI)
-    /* This conflicts with the SPI0 controller which is used for TFT if connected */
-    { .pin = GPIO_PIN(PORT_A, 4), .dev = 0, .chan = 4 },
-#if !defined(CONFIG_SIPEED_LONGAN_NANO_WITH_TFT)
-    { .pin = GPIO_PIN(PORT_A, 5), .dev = 0, .chan = 5 },
-#endif /* !defined(CONFIG_SIPEED_LONGAN_NANO_WITH_TFT) */
+    /* This conflicts with the SPI0 controller which is used is TFT is connected */
     { .pin = GPIO_PIN(PORT_A, 6), .dev = 0, .chan = 6 },
-#if !defined(CONFIG_SIPEED_LONGAN_NANO_WITH_TFT)
     { .pin = GPIO_PIN(PORT_A, 7), .dev = 0, .chan = 7 },
-#endif /* !defined(CONFIG_SIPEED_LONGAN_NANO_WITH_TFT) */
-#endif
+#if !defined(MODULE_PERIPH_DAC)
+    { .pin = GPIO_PIN(PORT_A, 4), .dev = 0, .chan = 4 },
+    { .pin = GPIO_PIN(PORT_A, 5), .dev = 0, .chan = 5 },
+#endif /* !defined(MODULE_PERIPH_DAC) */
+#endif /* !CONFIG_SIPEED_LONGAN_NANO_WITH_TFT */
 };
 
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
