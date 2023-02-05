@@ -13,3 +13,4 @@ FEATURES_PROVIDED += periph_usbdev
 FEATURES_PROVIDED += arduino
 FEATURES_PROVIDED += arduino_pwm
 FEATURES_PROVIDED += tinyusb_device
+FEATURES_PROVIDED += sdcard_spi

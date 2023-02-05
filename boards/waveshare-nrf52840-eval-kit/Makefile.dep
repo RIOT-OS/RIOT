@@ -3,7 +3,7 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
 endif
 
 ifneq (,$(filter mtd,$(USEMODULE)))
-  USEMODULE += mtd_sdcard
+  USEMODULE += mtd_sdcard_default
 endif
 
 # default to using fatfs on SD card

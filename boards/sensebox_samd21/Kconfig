@@ -23,4 +23,7 @@ config BOARD_SENSEBOX_SAMD21
 
     select HAVE_SAUL_GPIO
 
+    select HAVE_MTD_SDCARD_DEFAULT
+    select MODULE_FATFS_VFS if MODULE_VFS_DEFAULT
+
 source "$(RIOTBOARD)/common/samdx1-arduino-bootloader/Kconfig"
