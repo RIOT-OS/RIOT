@@ -140,3 +140,114 @@ target used.
 
 **Testrunner:** when using the `make generate-test`, you can also automatically
 add a testrunner Python script. Just answer 'y' when prompted.
+
+# Creating an out of tree application structure
+
+Applications written for RIOT do not have to reside in the RIOT tree. Out of
+tree applications, modules and boards are supported.
+
+For a full application with custom board and modules, the following directory
+tree can be used:
+
+```
+├── apps
+│   └── my_app
+│       └── Makefile
+├── boards
+│   └── my_board
+├── modules
+│   └── my_module
+│       ├── include
+│       │   └── my_module.h
+│       ├── Makefile
+│       ├── Makefile.include
+│       └── my_module.c
+└── RIOT
+```
+
+In this example tree, the `apps` directory contains a collection of applications
+for the project. The modules directory could contain extra modules for the
+applications.
+
+The make file inside the application needs at least the following as bare minimum:
+
+```
+APPLICATION = my_app
+PROJECT_BASE ?= $(CURDIR)/../..
+RIOTBASE ?= $(PROJECT_BASE)/RIOT
+
+# Optionally, provide paths to where external boards and/or modules
+# reside, so that they can be included in the app
+EXTERNAL_MODULE_DIRS += $(PROJECT_BASE)/modules
+EXTERNAL_BOARD_DIRS += $(PROJECT_BASE)/boards
+
+include $(RIOTBASE)/Makefile.include
+```
+
+The `RIOTBASE` variable tells the build system where to find the RIOT source
+tree and to need to point to the RIOT source tree used for the application for
+the application to work.
+
+The RIOT directory contains the sources of RIOT here. This can be either a
+direct checkout of the sources or a git submodule, whichever has your
+preference.
+
+If your project has separate modules or separate boards, these can be contained
+inside a modules os boards directory. The RIOT build system has both
+`EXTERNAL_MODULE_DIRS` and `EXTERNAL_BOARD_DIRS` variables to specify
+directories that contain extra modules and extra boards.
+
+## External Boards
+
+External boards can be ported in an identical way as porting a regular board to
+RIOT, see @ref porting-boards.
+
+One approach can be to copy over an existing board and modify it to suit the
+needs. Boards in the RIOT tree can be included and used as dependency in the
+custom boards. In case you connect additional hardware to an upstream board
+(such as e.g. an Arduino shield) or you require a different hardware
+configuration (e.g. configuring some of the pins configured as ADC as
+additional PWM outputs instead) a copy of the upstream board that is then
+customized to the application needs is the best course of action.
+
+## External Modules
+
+Similar to the external boards, external modules can be written in a similar way
+as regular in-tree modules.
+
+One modification is the include directory inside the module directory. For this
+include directory to be added to the include path during compilation, the
+following snippet is required in the modules `Makefile.include`:
+
+```
+USEMODULE_INCLUDES_my_module := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_my_module)
+```
+
+Note that the make variable (here `USEMODULE_INCLUDES_my_module`) must be unique
+for every module to make this work. Including the module name here is usually
+sufficient.
+
+## Extra Makefile Scaffolding
+
+A bit of extra, but optional, Makefile scaffolding can help to keep the project
+easy to maintain. An extra `Makefile.include` in the root directory of the
+project that sets the necessary variables can help to deduplicate settings.
+This includes the `RIOTBASE` variable and the include to the RIOT
+`Makefile.include`:
+
+```
+EXTERNAL_MODULE_DIRS += $(PROJECT_BASE)/modules
+EXTERNAL_BOARD_DIRS += $(PROJECT_BASE)/boards
+RIOTBASE ?= $(PROJECT_BASE)/RIOT
+include $(RIOTBASE)/Makefile.include
+```
+Applications then just have to set the `PROJECT_BASE` variable and include this
+makefile and don't have to each add the external board and module directories.
+
+The application makefile would then look like this:
+```
+APPLICATION = my_app
+PROJECT_BASE ?= $(CURDIR)/../..
+include $(PROJECT_BASE)/Makefile.include
+```
