@@ -31,6 +31,26 @@ extern "C" {
  * @note    This board may require external pullup resistors for i2c operation.
  * @{
  */
+
+/**
+ * @brief   Enable the second I2C device `I2C_DEV(1)` by default
+ *
+ */
+#ifndef I2C_DEV_1_USED
+#define I2C_DEV_1_USED
+#endif
+
+/**
+ * @brief   Default I2C device configuration
+ *
+ * The default I2C device configuration allows to define up to two I2C devices
+ * `I2C_DEV(0)` and `I2C_DEV(1)`. `I2C_DEV(0)` is always defined if the I2C
+ * peripheral is enabled by the module `periph_spi`. The second I2C device
+ * `I2C_DEV(1)` is only defined if `I2C_DEV_1_USED` is defined by the board.
+ * This allows to use the default configuration with one or two I2C devices
+ * depending on whether other peripherals are enabled that would collide with
+ * the I2C devices.
+ */
 static const i2c_conf_t i2c_config[] = {
     {
         .dev            = I2C0,
