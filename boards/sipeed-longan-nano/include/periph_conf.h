@@ -40,6 +40,7 @@
 #include "cfg_spi_default.h"
 #include "cfg_timer_default.h"
 #include "cfg_uart_default.h"
+#include "cfg_usbdev_default.h"
 
 #ifdef __cplusplus
 extern "C" {

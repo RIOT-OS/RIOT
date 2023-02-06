@@ -9,4 +9,8 @@ FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
 FEATURES_PROVIDED += sdcard_spi
 
+# Other features provided by the board (in alphabetical order)
+FEATURES_PROVIDED += highlevel_stdio
+FEATURES_PROVIDED += tinyusb_device
+
 include $(RIOTBOARD)/common/gd32v/Makefile.features
