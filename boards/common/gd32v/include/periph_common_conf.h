@@ -28,7 +28,14 @@
 extern "C" {
 #endif
 
+#if defined(MODULE_USBDEV_SYNOPSYS_DWC2) || defined(MODULE_TINYUSB_DEVICE)
+/* If the USB OTG peripheral is used, the USB clock of 48 MHz is derived by
+ * dividing the PLL clock by 1, 1.5, 2, or 2.5. That is the maximum core clock
+ * frequency can be 96 MHz. */
+#define CLOCK_CORECLOCK         MHZ(96)     /**< CPU clock frequency in Hz */
+#else
 #define CLOCK_CORECLOCK         MHZ(108)    /**< CPU clock frequency in Hz */
+#endif
 
 #define CLOCK_AHB               CLOCK_CORECLOCK /**< Equal to the CPU clock */
 #define CLOCK_APB1              CLOCK_AHB/2     /**< Half AHB clock */
