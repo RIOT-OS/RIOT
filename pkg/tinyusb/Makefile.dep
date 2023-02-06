@@ -115,6 +115,8 @@ else ifeq (stm32,$(CPU))
     # all other STM32 with USB interface use USB FS Device core
     USEMODULE += tinyusb_portable_stm32_fsdev
   endif
+else ifeq (gd32v,$(CPU))
+  USEMODULE += tinyusb_portable_synopsys_dwc2
 endif
 
 # other module dependencies
