@@ -26,7 +26,7 @@ on-board components:
 | RAM         | 32 kByte                               |           |
 | Flash       | 128 KByte                              |           |
 | Frequency   | 108 MHz                                |           |
-| Power Modes | 3 (Sleep, Deep Sleep, Standby)         |   no      |
+| Power Modes | 3 (Sleep, Deep Sleep, Standby)         |   yes     |
 | GPIOs       | 37                                     |   yes     |
 | Timers      | 5 x 16-bit timer                       |   yes     |
 | RTC         | 1 x 32-bit counter, 20-bit prescaler   |   yes     |
@@ -53,40 +53,89 @@ The general pin layout is shown below.
 
 @image html "https://longan.sipeed.com/assets/longan_nano_pinout_v1.1.0_w5676_h4000_large.png" "Sipeed Longan Nano Pinout" width=800
 
-The following table shows the connection of the on-board components with the
-MCU pins and their configuration in RIOT.
+The following tables show the connection of the on-board components with the
+MCU pins and their configuration in RIOT sorted by RIOT peripherals and
+by pins.
 
-| MCU Pin | MCU Peripheral | RIOT Peripheral  | Board Function | Remark                       |
-|:--------|:---------------|:-----------------|:---------------|:-----------------------------|
-| PA0     | BOOT0          | BTN0             | BOOT           |                              |
-| PA1     |                | PWM_DEV(0) CH0   | LED1 green     |                              |
-| PA2     |                | PWM_DEV(0) CH1   | LED2 blue      |                              |
-| PA3     | ADC01_IN3      | ADC_LINE(1)      |                |                              |
-| PA4     | ADC01_IN4      | ADC_LINE(6)      |                | N/A if SPI is used           |
-| PA5     | ADC01_IN5      | ADC_LINE(7)      |                | N/A if SPI or TFT is used    |
-| PA6     | ADC01_IN6      | ADC_LINE(8)      |                | N/A if SPI is used           |
-| PA7     | ADC01_IN7      | ADC_LINE(9)      |                | N/A if SPI or TFT is used    |
-| PA4     | SPI1 CS        | SPI_DEV(1) CS    |                | N/A if ADC_LINE(6) is used   |
-| PA5     | SPI1 SCLK      | SPI_DEV(1) SCLK  |                | N/A if ADC_LINE(7) is used   |
-| PA6     | SPI1 MISO      | SPI_DEV(1) MISO  |                | N/A if ADC_LINE(8) is used   |
-| PA7     | SPI1 MOSI      | SPI_DEV(1) MOSI  |                | N/A if ADC_LINE(9) is used   |
-| PA9     | USART0 TX      | UART_DEV(0) TX   | UART TX        |                              |
-| PA10    | USART0 RX      | UART_DEV(0) RX   | UART RX        |                              |
-| PB0     | ADC01_IN8      | ADC_LINE(4)      |                | N/A if TFT is used           |
-| PB1     | ADC01_IN8      | ADC_LINE(5)      |                | N/A if TFT is used           |
-| PB6     | I2C0 SCL       | I2C_DEV(0) SCL   |                |                              |
-| PB7     | I2C0 SDA       | I2C_DEV(0) SDA   |                |                              |
-| PB8     |                | PWM_DEV(1) CH0   |                | N/A if CAN is used           |
-| PB9     |                | PWM_DEV(1) CH1   |                | N/A if CAN is used           |
-| PB10    | I2C1 SCL       | I2C_DEV(1) SCL   |                |                              |
-| PB11    | I2C1 SDA       | I2C_DEV(1) SDA   |                |                              |
-| PB12    | SPI0 CS        | SPI_DEV(0) CS    |                |                              |
-| PB13    | SPI0 SCLK      | SPI_DEV(0) SCLK  |                |                              |
-| PB14    | SPI0 MISO      | SPI_DEV(0) MISO  |                |                              |
-| PB15    | SPI0 MOSI      | SPI_DEV(0) MOSI  |                |                              |
-| PC13    |                |                  | LED0 red       |                              |
-| -       | ADC01_IN16     | ADC_LINE(2)      |                | internal Temperature channel |
-| -       | ADC01_IN17     | ADC_LINE(3)      |                | internal VFEF channel        |
+| RIOT Peripheral  | MCU Pin | MCU Peripheral | Board Function | Remark                         |
+|:-----------------|:--------|:---------------|:---------------|:-------------------------------|
+| ADC_LINE(0)      | PA0     | ADC01_IN0      |                |                                |
+| ADC_LINE(1)      | PA3     | ADC01_IN3      |                |                                |
+| ADC_LINE(2)      | -       | ADC01_IN16     |                | internal Temperature channel   |
+| ADC_LINE(3)      | -       | ADC01_IN17     |                | internal VFEF channel          |
+| ADC_LINE(4)      | PB0     | ADC01_IN8      | TFT RS         | N/A if TFT is used             |
+| ADC_LINE(5)      | PB1     | ADC01_IN9      | TFT RST        | N/A if TFT is used             |
+| ADC_LINE(6)      | PA6     | ADC01_IN6      |                | N/A if TFT is used             |
+| ADC_LINE(7)      | PA7     | ADC01_IN7      |                | N/A if TFT is used             |
+| ADC_LINE(8)      | PA8     | ADC01_IN4      |                | N/A if TFT is used             |
+| ADC_LINE(9)      | PA9     | ADC01_IN5      |                | N/A if TFT is used             |
+| BTN0             | PA0     | BOOT0          | BOOT           |                                |
+| DAC_LINE(0)      | PA4     | DAC0           |                | N/A if TFT is used             |
+| DAC_LINE(1)      | PA5     | DAC1           |                | N/A if TFT is used             |
+| GPIO_PIN(1, 2)   | PB2     |                | TFT CS         |                                |
+| I2C_DEV(0) SCL   | PB6     | I2C0 SCL       |                |                                |
+| I2C_DEV(0) SDA   | PB7     | I2C0 SDA       |                |                                |
+| I2C_DEV(1) SCL   | PB10    | I2C1 SCL       |                |                                |
+| I2C_DEV(1) SDA   | PB11    | I2C1 SDA       |                |                                |
+| LED0             | PC13    |                | LED red        |                                |
+| LED1             | PA1     |                | LED green      |                                |
+| LED2             | PA2     |                | LED blue       |                                |
+| PWM_DEV(0) CH0   | PA1     |                | LED green      |                                |
+| PWM_DEV(0) CH1   | PA2     |                | LED blue       |                                |
+| PWM_DEV(1) CH0   | PB8     |                |                | N/A if CAN is used             |
+| PWM_DEV(1) CH1   | PB9     |                |                | N/A if CAN is used             |
+| SPI_DEV(0) CS    | PB12    | SPI1 CS        | SD CS          |                                |
+| SPI_DEV(0) SCLK  | PB13    | SPI1 SCLK      | SD SCK         |                                |
+| SPI_DEV(0) MISO  | PB14    | SPI1 MISO      | SD MISO        |                                |
+| SPI_DEV(0) MOSI  | PB15    | SPI1 MOSI      | SD MOSI        |                                |
+| SPI_DEV(1) CS    | PA4     | SPI0 CS        |                |                                |
+| SPI_DEV(1) SCLK  | PA5     | SPI0 SCLK      | TFT SCL        |                                |
+| SPI_DEV(1) MISO  | PA6     | SPI0 MISO      |                |                                |
+| SPI_DEV(1) MOSI  | PA7     | SPI0 MOSI      | TFT SDA        |                                |
+| UART_DEV(0) TX   | PA9     | USART0 TX      | UART TX        |                                |
+| UART_DEV(0) RX   | PA10    | USART0 RX      | UART RX        |                                |
+
+| Pin  | Board Function | RIOT Function 1 | RIOT Function 2 | RIOT Function 3 |
+|:-----|:---------------|:----------------|:----------------|:----------------|
+| PA0  |                |                 | ADC_LINE(0)     |                 |
+| PA1  | LED green      | PWM_DEV(0) CH0  |                 | LED0            |
+| PA2  | LED blue       | PWM_DEV(0) CH1  |                 | LED1            |
+| PA3  |                |                 | ADC_LINE(1)     |                 |
+| PA4  |                | SPI_DEV(1) CS   | ADC_LINE(8)*    | DAC_LINE(0)*    |
+| PA5  | TFT SCL        | SPI_DEV(1) SCLK | ADC_LINE(9)*    | DAC_LINE(1)*    |
+| PA6  |                | SPI_DEV(1) MISO | ADC_LINE(6)*    |                 |
+| PA7  | TFT SDA        | SPI_DEV(1) MOSI | ADC_LINE(7)*    |                 |
+| PA8  |                |                 |                 |                 |
+| PA9  |                | UART_DEV(0) TX  |                 |                 |
+| PA10 |                | UART_DEV(0) RX  |                 |                 |
+| PA11 | USB D-         |                 |                 |                 |
+| PA12 | USB D+         |                 |                 |                 |
+| PA13 | JTAG TMS       |                 |                 |                 |
+| PA14 | JTAG TCK       |                 |                 |                 |
+| PA15 | JTAG TDI       |                 |                 |                 |
+| PB0  | TFT RS         |                 | ADC_LINE(4)     |                 |
+| PB1  | TFT RST        |                 | ADC_LINE(5)     |                 |
+| PB2  | TFT CS         |                 |                 |                 |
+| PB3  | JTAG TDO       |                 |                 |                 |
+| PB4  | JTAG NRST      |                 |                 |                 |
+| PB5  |                |                 |                 |                 |
+| PB6  |                | I2C_DEV(0) SCL  |                 |                 |
+| PB7  |                | I2C_DEV(0) SDA  |                 |                 |
+| PB8  |                | PWM_DEV(1) CH0  |                 |                 |
+| PB9  |                | PWM_DEV(1) CH1  |                 |                 |
+| PB10 |                | I2C_DEV(1) SCL  |                 |                 |
+| PB11 |                | I2C_DEV(1) SDA  |                 |                 |
+| PB12 | SD CS          | SPI_DEV(0) CS   |                 |                 |
+| PB13 | SD SCK         | SPI_DEV(0) SCLK |                 |                 |
+| PB14 | SD MISO        | SPI_DEV(0) MISO |                 |                 |
+| PB15 | SD MOSI        | SPI_DEV(0) MOSI |                 |                 |
+| PC13 | LED red        |                 |                 | LED3            |
+| PC14 | OSC32IN        |                 |                 |                 |
+| PC15 | OSC32OUT       |                 |                 |                 |
+| -    | Temperature    |                 | ADC_LINE(2)     |                 |
+| -    | VREF           |                 | ADC_LINE(3)     |                 |
+
+(*) The availability of these peripherals depend on the use of other peripherals.
 
 @note Since the availability of `ADC_LINE(4)` to `ADC_LINE(9)` depends on other
 peripheral configurations, their index may vary.

@@ -120,6 +120,15 @@ void spi_init(spi_t bus)
 
 void spi_init_pins(spi_t bus)
 {
+    if (spi_config[bus].sclk_pin == GPIO_PIN(PORT_B, 3) &&
+        spi_config[bus].miso_pin == GPIO_PIN(PORT_B, 4) &&
+        spi_config[bus].mosi_pin == GPIO_PIN(PORT_B, 5)) {
+        /* The remapping periph clock must first be enabled */
+        RCU->APB2EN |= RCU_APB2EN_AFEN_Msk;
+        /* Then the remap can occur */
+        AFIO->PCF0 |= AFIO_PCF0_SPI0_REMAP_Msk;
+    }
+
     if (gpio_is_valid(spi_config[bus].sclk_pin)) {
         gpio_init_af(spi_config[bus].sclk_pin, GPIO_AF_OUT_PP);
     }

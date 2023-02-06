@@ -25,9 +25,13 @@ config BOARD_SIPEED_LONGAN_NANO
     select HAVE_MTD_SDCARD_DEFAULT
     select MODULE_FATFS_VFS if MODULE_VFS_DEFAULT
 
-config SIPEED_LONGAN_NANO_WITH_TFT
-    bool "Board with TFT display"
-    help
-        Indicates that a Sipeed Longan Nano board with TFT display is used.
+menu "Sipeed Longan Nano Board Configuration"
+
+    config SIPEED_LONGAN_NANO_WITH_TFT
+        bool "Board with TFT display"
+        help
+            Indicates that a Sipeed Longan Nano board with TFT display is used.
+
+endmenu
 
 source "$(RIOTBOARD)/common/gd32v/Kconfig"
