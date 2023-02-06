@@ -65,7 +65,7 @@ static void _set_rtc_mem(void)
 
 static void _get_rtc_mem(void)
 {
-    char buf[4];
+    char buf[sizeof(riot_msg) - 1];
     rtc_mem_read(riot_msg_offset, buf, sizeof(buf));
 
     if (memcmp(buf, riot_msg, sizeof(buf))) {
