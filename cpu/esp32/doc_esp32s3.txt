@@ -138,6 +138,8 @@ GPIO48 | In/Out | -   | -    | X       | SPICLK_N           | -
 <b>RTC:</b> Pins that are RTC GPIOs and can be used in deep-sleep mode.<br>
 <b>PU/PD:</b> Pins that have software configurable pull-up/pull-down functionality.<br>
 
+### Strapping pins {#esp32_gpio_pins_esp32s3_strapping}
+
 GPIO0, GPIO3, GPIO45 and GPIO46 are bootstrapping. GPIO0 and GPIO46 pins are
 used to boot ESP32-S3 in different modes:
 
