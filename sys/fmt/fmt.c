@@ -27,6 +27,7 @@
 
 #include "kernel_defines.h"
 #include "fmt.h"
+#include "stdio_base.h"
 
 static const char _hex_chars[16] = "0123456789ABCDEF";
 
@@ -506,25 +507,24 @@ uint32_t scn_u32_hex(const char *str, size_t n)
     return res;
 }
 
+/* native gets special treatment as native's stdio code is ... special.
+ * And when not building for RIOT, there's no `stdio_write()`.
+ * In those cases, just defer to `printf()`.
+ */
+#if IS_USED(MODULE_STDIO_NATIVE) || !defined(RIOT_VERSION)
 void print(const char *s, size_t n)
 {
-    if (IS_USED(MODULE_STDIO_NATIVE)) {
-        /* native gets special treatment as native's stdio code is ...
-         * special */
-        printf("%.*s", (int)n, s);
-        return;
-    }
-
-    while (n > 0) {
-        ssize_t written;
-        written = fwrite(s, 1, n, stdout);
-        if (written < 0) {
-            break;
-        }
-        n -= written;
-        s += written;
-    }
+    printf("%.*s", (int)n, s);
 }
+#else
+void print(const char *s, size_t n)
+{
+    /* flush the libc's output buffer so output is not intermingled. */
+    fflush(stdout);
+
+    stdio_write(s, n);
+}
+#endif
 
 void print_u32_dec(uint32_t val)
 {
