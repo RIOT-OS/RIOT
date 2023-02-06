@@ -198,6 +198,19 @@ typedef struct {
 } adc_conf_t;
 
 /**
+ * @brief   GD32V DAC has 2 channels
+ */
+#define DAC_CHANNEL_NUMOF (2)
+
+/**
+ * @brief   DAC line configuration data
+ */
+typedef struct {
+    gpio_t pin;             /**< pin connected to the line */
+    uint8_t chan;           /**< DAC device used for this line */
+} dac_conf_t;
+
+/**
  * @brief   GD32V timers have 4 capture-compare channels
  */
 #define TIMER_CHANNEL_NUMOF (4U)
