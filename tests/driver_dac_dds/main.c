@@ -98,24 +98,17 @@ typedef void (*sample_gen_t)(uint8_t *dst, size_t len, uint16_t period);
 
 static void _fill_saw_samples_8(uint8_t *buf, size_t len, uint16_t period)
 {
-    uint8_t x = 0;
-    unsigned step = 0xFF / period;
-
     for (uint16_t i = 0; i < len; ++i) {
-        x += step;
-        buf[i] = x;
+        buf[i] = (i * 0xFFUL) / period;
     }
 }
 
 static void _fill_saw_samples_16(uint8_t *buf, size_t len, uint16_t period)
 {
-    uint16_t x = 0;
-    unsigned step = 0xFFFF / period;
-
     for (uint16_t i = 0; i < len; ++i) {
-        x += step;
-        buf[i]   = x;
-        buf[++i] = x >> 8;
+        uint16_t y = (i * 0xFFFFUL) / period;
+        buf[i]   = y;
+        buf[++i] = y >> 8;
     }
 }
 
@@ -126,8 +119,7 @@ static void _fill_sine_samples_8(uint8_t *buf, size_t len, uint16_t period)
 
     for (uint16_t i = 0; i < period; ++i) {
         x += step;
-        buf[i] = isin(x) >> 5;
-        buf[i] += INT8_MAX + 1;
+        buf[i] = (isin(x) + 4096) >> 6;
     }
 
     for (uint16_t i = period; i < len; i += period) {
@@ -145,8 +137,7 @@ static void _fill_sine_samples_16(uint8_t *buf, size_t len, uint16_t period)
     for (uint16_t i = 0; i < period; ++i) {
         x += step;
 
-        uint16_t y = isin(x);
-        y += INT16_MAX + 1;
+        uint16_t y = (isin(x) + 4096) << 2;
         buf[i]   = y;
         buf[++i] = y >> 8;
     }
