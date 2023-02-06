@@ -77,7 +77,6 @@ if MODULE_RIOT_USB
 
 config MODULE_RIOT_USB_CDC_ACM
     bool "Enable USB ACM CDC"
-    select PROVIDE_USB_CDC_ACM
 
 config MODULE_RIOT_USB_MSD
     bool "Enable USB MSD"
@@ -101,6 +100,7 @@ config MODULE_PACKAGE_USB_MSD
 
 endif # PACKAGE_USB
 
+###############
 config ERROR_USB_IMPL
     bool "Missing implementation."
     help

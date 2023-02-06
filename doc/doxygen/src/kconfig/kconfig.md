@@ -504,12 +504,13 @@ reserved for the cases described below:
 | `CPU_FAM_` | Models a family of CPUs |
 | `CPU_MODEL_` | Models a particular model of CPU |
 | `ERROR_` | Raises an error in the build system to indicate something is configured wrong |
-| `HAS_` | Models a [feature](build-system-basics.html#features) |
-| `HAVE_` | Models a feature not present in makefiles, will be unified in the future |
+| `HAS_` | Models a hardware specific [feature](build-system-basics.html#features) |
+| `HAVE_` | Models a hardware specific feature not present in makefiles, will be unified in the future |
 | `KCONFIG_USEMODULE_` | Used during transition to enable configuration of a module via Kconfig |
 | `KCONFIG_USEPKG_` | Used during transition to enable configuration of a package via Kconfig |
 | `MODULE_` | Exports to `USEMODULE` if using kconfig dependency resolution |
 | `PACKAGE_` | Exports to `USEPKG` if using kconfig dependency resolution |
+| `REQUIRES_` | A hidden symbol indicating some requirements a certain feature that may be provided by multiple modules, most useful when selecting `choice` options |
 | `USEMODULE_` | Models a [RIOT module](creating-modules.html#creating-modules). Generated from `USEMODULE` variable |
 | `USEPKG_` | Models an [external package](group__pkg.html). Generated from `USEPKG` variable |
 
