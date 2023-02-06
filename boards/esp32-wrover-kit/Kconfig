@@ -22,5 +22,7 @@ config BOARD_ESP32_WROVER_KIT
     select HAS_SDCARD_SPI
 
     select HAVE_ILI9341
+    select HAVE_MTD_SDCARD_DEFAULT
+    select MODULE_FATFS_VFS if MODULE_VFS_DEFAULT
 
 source "$(RIOTBOARD)/common/esp32/Kconfig"
