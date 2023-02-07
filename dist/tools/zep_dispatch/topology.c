@@ -232,7 +232,7 @@ void topology_send(const topology_t *t, int sock,
         if (memcmp(&super->a->addr, src_addr, sizeof(*src_addr)) == 0) {
             /* packet loss */
             if (random() > super->weight_a_b * RAND_MAX) {
-                return;
+                continue;
             }
             zep_set_lqi(buffer, super->weight_a_b * 0xFF);
             sendto(sock, buffer, len, 0,
@@ -242,7 +242,7 @@ void topology_send(const topology_t *t, int sock,
         else if (memcmp(&super->b->addr, src_addr, sizeof(*src_addr)) == 0) {
             /* packet loss */
             if (random() > super->weight_b_a * RAND_MAX) {
-                return;
+                continue;
             }
             zep_set_lqi(buffer, super->weight_b_a * 0xFF);
             sendto(sock, buffer, len, 0,
