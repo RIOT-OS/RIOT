@@ -26,7 +26,11 @@
 #include <stdio.h>
 #endif
 
+#if MODULE_FMT
+# define MIN_SIZE   (THREAD_STACKSIZE_TINY)
+#else
 # define MIN_SIZE   (THREAD_STACKSIZE_TINY + THREAD_EXTRA_STACKSIZE_PRINTF)
+#endif
 
 void print_stack_usage_metric(const char *name, void *stack, unsigned max_size)
 {
@@ -37,7 +41,7 @@ void print_stack_usage_metric(const char *name, void *stack, unsigned max_size)
 #if MODULE_FMT
         print_str("{ \"threads\": [{ \"name\": \"");
         print_str(name);
-        print_str(", \"stack_size\": ");
+        print_str("\", \"stack_size\": ");
         print_u32_dec(max_size);
         print_str(", \"stack_used\": ");
         print_u32_dec(max_size - free);
