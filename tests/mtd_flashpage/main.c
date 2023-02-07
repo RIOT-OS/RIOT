@@ -28,13 +28,13 @@
 #endif
 
 #if (__SIZEOF_POINTER__ == 2)
-#define TEST_ADDRESS1       (uint16_t)flashpage_addr(LAST_AVAILABLE_PAGE)
-#define TEST_ADDRESS2       (uint16_t)flashpage_addr(LAST_AVAILABLE_PAGE - 1)
+#define TEST_ADDRESS1       (uint16_t)((uintptr_t)flashpage_addr(LAST_AVAILABLE_PAGE) - (uintptr_t)CPU_FLASH_BASE)
+#define TEST_ADDRESS2       (uint16_t)((uintptr_t)flashpage_addr(LAST_AVAILABLE_PAGE - 1) - (uintptr_t)CPU_FLASH_BASE)
 #else
-#define TEST_ADDRESS1       (uint32_t)flashpage_addr(LAST_AVAILABLE_PAGE)
-#define TEST_ADDRESS2       (uint32_t)flashpage_addr(LAST_AVAILABLE_PAGE - 1)
+#define TEST_ADDRESS1       (uint32_t)((uintptr_t)flashpage_addr(LAST_AVAILABLE_PAGE) - (uintptr_t)CPU_FLASH_BASE)
+#define TEST_ADDRESS2       (uint32_t)((uintptr_t)flashpage_addr(LAST_AVAILABLE_PAGE - 1) - (uintptr_t)CPU_FLASH_BASE)
 #endif
-#define TEST_ADDRESS0       (FLASHPAGE_NUMOF - 1)
+#define TEST_ADDRESS0       ((FLASHPAGE_NUMOF - 1) - flashpage_page((void *)CPU_FLASH_BASE))
 
 static mtd_flashpage_t _dev = MTD_FLASHPAGE_INIT_VAL(8);
 static mtd_dev_t *dev = &_dev.base;
