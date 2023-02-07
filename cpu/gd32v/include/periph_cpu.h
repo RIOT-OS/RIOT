@@ -211,7 +211,7 @@ typedef enum {
     GPIO_SLEW_FASTEST = 2,
 } gpio_slew_t;
 
-#endif DOXYGEN
+#endif /* !DOXYGEN */
 
 /**
  * @brief   Available number of ADC devices
