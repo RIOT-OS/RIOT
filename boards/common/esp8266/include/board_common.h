@@ -95,6 +95,15 @@ extern "C" {
 /** Pointer to the default MTD device structure */
 extern mtd_dev_t *mtd0;
 
+/**
+ * @brief   MTD offset for SD Card interfaces
+ *
+ * MTD_1 is used for SD Card.
+ */
+#ifndef CONFIG_SDCARD_GENERIC_MTD_OFFSET
+#define CONFIG_SDCARD_GENERIC_MTD_OFFSET    1
+#endif
+
 /** @} */
 #endif /* defined(MODULE_MTD) || defined(DOXYGEN) */
 

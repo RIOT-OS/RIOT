@@ -78,6 +78,20 @@ static const adc_conf_t adc_config[] = {
 /** @} */
 
 /**
+ * @name    DAC configuration
+ * @{
+ */
+static const dac_conf_t dac_config[] = {
+#if !CONFIG_SIPEED_LONGAN_NANO_WITH_TFT
+    { .pin = GPIO_PIN(PORT_A, 4), .chan = 0 },
+    { .pin = GPIO_PIN(PORT_A, 5), .chan = 1 },
+};
+#endif /* !CONFIG_SIPEED_LONGAN_NANO_WITH_TFT */
+
+#define DAC_NUMOF           ARRAY_SIZE(dac_config)
+/** @} */
+
+/**
  * @name   PWM configuration
  * @{
  */

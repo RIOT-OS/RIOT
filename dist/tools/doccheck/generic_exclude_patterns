@@ -13,6 +13,8 @@ warning: Member BTN[0-9]_PIN \(macro definition\) of
 warning: Member BTN[0-9]_PORT \(macro definition\) of
 warning: Member BTN[0-9]_PRESSED \(macro definition\) of
 warning: Member BTN[0-9]_RELEASED \(macro definition\) of
+warning: Member dac_config\[\] \(variable\) of
+warning: Member DAC_NUMOF \(macro definition\) of
 warning: Member EPD_BW_SPI_CMD_[A-Z0-9_]* \(macro definition\) of
 warning: Member EPD_BW_SPI_DISPLAY_UPDATE_OPTION_[A-Z0-9_]* \(macro definition\) of
 warning: Member EPD_BW_SPI_WAIT_[A-Z0-9_]* \(macro definition\) of

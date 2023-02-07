@@ -38,7 +38,7 @@ on-board components:
 | RTC         | 1 x 32-bit counter, 20-bit prescaler   |   yes     |
 | WDT         | 2 x 12-bit counter, 3-bit prescaler    |   yes     |
 | ADC         | 2 x 12-bit units, 16 channels @ 1 Msps |   yes     |
-| DAC         | 2 x 12-bit channel                     |   no      |
+| DAC         | 2 x 12-bit channel                     |   yes     |
 | UART        | 2                                      |   yes     |
 | USART       | 3                                      |   yes     |
 | SPI         | 3                                      |   yes     |

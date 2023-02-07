@@ -15,6 +15,7 @@ config BOARD_SIPEED_LONGAN_NANO
     select BOARD_HAS_HXTAL
     select BOARD_HAS_LXTAL
     select HAS_PERIPH_ADC
+    select HAS_PERIPH_DAC
     select HAS_PERIPH_I2C
     select HAS_PERIPH_PWM
     select HAS_PERIPH_SPI
