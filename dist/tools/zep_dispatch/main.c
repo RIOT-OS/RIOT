@@ -133,15 +133,18 @@ static topology_t topology;
 static const char *graphviz_file = "example.gv";
 static void _info_handler(int signal)
 {
-    if (signal != SIGUSR1) {
-        return;
-    }
-
-    if (topology_print(graphviz_file, &topology)) {
-        fprintf(stderr, "can't open %s\n", graphviz_file);
-    }
-    else {
-        printf("graph written to %s\n", graphviz_file);
+    switch (signal) {
+    case SIGUSR1:
+        if (topology_print(graphviz_file, &topology)) {
+            fprintf(stderr, "can't open %s\n", graphviz_file);
+        }
+        else {
+            printf("graph written to %s\n", graphviz_file);
+        }
+        break;
+    case SIGUSR2:
+        topology_print_stats(&topology, true);
+        break;
     }
 }
 
@@ -257,6 +260,7 @@ int main(int argc, char **argv)
     if (graphviz_file) {
         signal(SIGUSR1, _info_handler);
     }
+    signal(SIGUSR2, _info_handler);
 
     struct addrinfo *server_addr;
     int res = getaddrinfo(argv[0], argv[1],

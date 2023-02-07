@@ -26,6 +26,8 @@ struct node {
     char name[NODE_NAME_MAX_LEN];
     uint8_t mac[HW_ADDR_MAX_LEN];
     struct sockaddr_in6 addr;
+    uint32_t num_tx;
+    uint32_t num_rx;
     uint8_t mac_len;
 };
 
@@ -182,6 +184,26 @@ int topology_print(const char *file, const topology_t *t)
     return 0;
 }
 
+void topology_print_stats(const topology_t *t, bool reset)
+{
+    uint32_t tx_total = 0;
+
+    puts("{ nodes: [");
+    for (list_node_t *node = t->nodes.next; node; node = node->next) {
+        struct node *super = container_of(node, struct node, next);
+
+        tx_total += super->num_tx;
+
+        printf("\t{ name: %s, tx: %u, rx: %u }%c\n",
+               super->name, super->num_tx, super->num_rx, node->next ? ',' : ' ');
+        if (reset) {
+            super->num_tx = 0;
+            super->num_rx = 0;
+        }
+    }
+    printf("], tx_total: %u }\n", tx_total);
+}
+
 int topology_parse(const char *file, topology_t *out)
 {
     FILE *in;
@@ -217,6 +239,8 @@ void topology_send(const topology_t *t, int sock,
                    const struct sockaddr_in6 *src_addr,
                    void *buffer, size_t len)
 {
+    struct node *sender = NULL;
+
     if (t->has_sniffer) {
         sendto(sock, buffer, len, 0,
                (struct sockaddr *)&t->sniffer_addr, sizeof(t->sniffer_addr));
@@ -230,6 +254,11 @@ void topology_send(const topology_t *t, int sock,
         }
 
         if (memcmp(&super->a->addr, src_addr, sizeof(*src_addr)) == 0) {
+            if (sender == NULL) {
+                sender = super->a;
+                sender->num_tx++;
+            }
+
             /* packet loss */
             if (random() > super->weight_a_b * RAND_MAX) {
                 continue;
@@ -238,8 +267,14 @@ void topology_send(const topology_t *t, int sock,
             sendto(sock, buffer, len, 0,
                    (struct sockaddr *)&super->b->addr,
                    sizeof(super->b->addr));
+            super->b->num_rx++;
         }
         else if (memcmp(&super->b->addr, src_addr, sizeof(*src_addr)) == 0) {
+            if (sender == NULL) {
+                sender = super->b;
+                sender->num_tx++;
+            }
+
             /* packet loss */
             if (random() > super->weight_b_a * RAND_MAX) {
                 continue;
@@ -248,6 +283,7 @@ void topology_send(const topology_t *t, int sock,
             sendto(sock, buffer, len, 0,
                    (struct sockaddr *)&super->a->addr,
                    sizeof(super->a->addr));
+            super->a->num_rx++;
         }
     }
 }
