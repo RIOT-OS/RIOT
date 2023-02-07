@@ -58,7 +58,11 @@ arbitrary and can be altered by editing the
 LEDs LD7 and LD8 are used by the USB connector for over-current (LD8) and
 data (LD7) indication.
 
+### USB Device Interface
 
+The board has a micro USB port that can be used for USB device mode.
+As the ST-Link on the board does not provide a USB-UART interface, the STDIO is
+mapped to the micro USB port by default (via CDC ACM).
 
 ### Accelerometer
 
