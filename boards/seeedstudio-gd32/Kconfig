@@ -24,4 +24,10 @@ config BOARD_SEEEDSTUDIO_GD32
     select HAS_TINYUSB_DEVICE
     select HAVE_SAUL_GPIO
 
+    select PACKAGE_TINYUSB if TEST_KCONFIG
+
+choice STDIO_IMPLEMENTATION
+    default MODULE_STDIO_TINYUSB_CDC_ACM if PACKAGE_TINYUSB
+endchoice
+
 source "$(RIOTBOARD)/common/gd32v/Kconfig"
