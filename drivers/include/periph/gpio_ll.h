@@ -454,7 +454,7 @@ static inline bool is_gpio_port_num_valid(uint_fast8_t num);
  *          value will be chosen instead and `0` is returned.
  * @warning Note that hardware GPIO peripherals may have shared building
  *          blocks. Those *SHOULD* be handed out by the implementation in
- *          first-come-fist-served fashion. (E.g. if there is only one pull up
+ *          first-come-first-served fashion. (E.g. if there is only one pull up
  *          resistor per port that can be connected to any pin of that port,
  *          typically the first pin on the port configured as pull up will
  *          succeed and subsequent configuration as pull ups for other pins on

@@ -33,6 +33,10 @@ ifneq (,$(filter auto_init_sock_dns,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter coding,$(USEMODULE)))
+  USEMODULE += bitfield
+endif
+
 ifneq (,$(filter congure_%,$(USEMODULE)))
   USEMODULE += congure
 endif
