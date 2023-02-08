@@ -183,6 +183,12 @@ static size_t _write_sector(mtd_dev_t *mtd, const void *data, uint32_t sector,
         len = sector_size - offset;
     }
 
+    /* fast path: skip reading the sector if we overwrite it completely */
+    if (offset == 0 && len == sector_size) {
+        work = (void *)data;
+        goto write;
+    }
+
     /* copy sector to RAM */
     res = mtd_read_page(mtd, work, sector_page, 0, sector_size);
     if (res < 0) {
@@ -198,6 +204,7 @@ static size_t _write_sector(mtd_dev_t *mtd, const void *data, uint32_t sector,
     /* modify sector in RAM */
     memcpy(work + offset, data, len);
 
+write:
     /* write back modified sector copy */
     res = mtd_write_page_raw(mtd, work, sector_page, 0, sector_size);
     if (res < 0) {
