@@ -39,11 +39,64 @@
 #include "nimble_riot.h"
 #include "nimble_autoadv.h"
 
+#include "thread.h"
+#include "shell.h"
+#include "ztimer.h"
+
+#include "periph/i2c.h"
+
+#include "bmi160.h"
 #include "host/ble_hs.h"
 #include "host/util/util.h"
 #include "host/ble_gatt.h"
 #include "services/gap/ble_svc_gap.h"
 #include "services/gatt/ble_svc_gatt.h"
+
+/* Macros for frames to be read */
+
+#define ACC_FRAMES	10 /* 10 Frames are available every 100ms @ 100Hz */
+#define GYR_FRAMES	10
+#define MAG_FRAMES	10
+/* 10 frames containing a 1 byte header, 6 bytes of accelerometer,
+ * 6 bytes of gyroscope and 8 bytes of magnetometer data. This results in
+ * 21 bytes per frame. Additional 40 bytes in case sensor time readout is enabled */
+#define FIFO_SIZE	250
+
+/* Variable declarations */
+
+struct bmi160_dev bmi;
+
+uint8_t fifo_buff[FIFO_SIZE];
+struct bmi160_fifo_frame fifo_frame;
+struct bmi160_sensor_data gyro_data[GYR_FRAMES], accel_data[ACC_FRAMES];
+
+int8_t rslt;
+
+int dev = I2C_DEV(0);
+
+int8_t user_i2c_read(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, uint16_t len)
+{
+    // printf("i2c_read_regs(%d, %x, %x, ...)\n", dev, dev_addr, reg_addr);
+    return i2c_read_regs(dev, dev_addr, reg_addr, data, len, 0);
+}
+
+int8_t user_i2c_write(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, uint16_t len)
+{
+    // printf("i2c_write_regs(%d, %x, %x, ...)\n", dev, dev_addr, reg_addr);
+    return i2c_write_regs(dev, dev_addr, reg_addr, data, len, 0);
+}
+
+void user_delay(uint32_t period)
+{
+    ztimer_sleep(ZTIMER_MSEC, period);
+}
+
+/* accel params and conversion constants */
+#define AC 2048.0 // for 16G
+// #define AC 16384.0 // for 2G
+/* gyro params and conversion constants */
+#define GC 16.4 // for 2000 DPS
+// #define GC 131.2 // for 250 DPS
 
 #define GATT_DEVICE_INFO_UUID                   0x180A
 #define GATT_MANUFACTURER_NAME_UUID             0x2A29
@@ -66,7 +119,7 @@ static const ble_uuid128_t gatt_svr_chr_rw_demo_readonly_uuid
         = BLE_UUID128_INIT(0xaa, 0xf4, 0x82, 0xdd, 0x28, 0xa7, 0xac, 0x86, 0x68,
                 0x4d, 0xd5, 0x40, 0x3f, 0x11, 0xdd, 0xcc);
 
-static char rm_demo_write_data[64] = "This characteristic is read- and writeable!";
+static char rm_demo_write_data[64] = "Take it";
 
 static int gatt_svr_chr_access_device_info_manufacturer(
         uint16_t conn_handle, uint16_t attr_handle,
@@ -271,6 +324,12 @@ static int gatt_svr_chr_access_rw_demo(
 
 int main(void)
 {
+
+    (void) puts("Welcome to RIOT!");
+
+    i2c_init(dev);
+    i2c_acquire(dev);
+
     puts("NimBLE GATT Server Example");
 
     int rc = 0;
