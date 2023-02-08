@@ -1,4 +1,4 @@
-ifeq (,$(filter stdio_% slipdev_stdio usbus tinyusb_device,$(USEMODULE)))
+ifeq (,$(filter stdio_% slipdev_stdio usbus usbus% tinyusb_device,$(USEMODULE)))
   # Use stdio_usb_serial_jtag if no other stdio is requested explicitly
   # and neither USBUS nor tinyusb_device are used
   USEMODULE += stdio_usb_serial_jtag
