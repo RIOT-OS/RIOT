@@ -119,7 +119,7 @@ static const ble_uuid128_t gatt_svr_chr_rw_demo_readonly_uuid
         = BLE_UUID128_INIT(0xaa, 0xf4, 0x82, 0xdd, 0x28, 0xa7, 0xac, 0x86, 0x68,
                 0x4d, 0xd5, 0x40, 0x3f, 0x11, 0xdd, 0xcc);
 
-static char rm_demo_write_data[64] = "Take it";
+static char rm_demo_write_data[64] = "Get it done!";
 
 static int gatt_svr_chr_access_device_info_manufacturer(
         uint16_t conn_handle, uint16_t attr_handle,
@@ -329,6 +329,123 @@ int main(void)
 
     i2c_init(dev);
     i2c_acquire(dev);
+    
+    /* Initialize your host interface to the BMI160 */
+
+    /* This example uses I2C as the host interface */
+    bmi.id = BMI160_I2C_ADDR;
+    bmi.read = user_i2c_read;
+    bmi.write = user_i2c_write;
+    bmi.delay_ms = user_delay;
+    bmi.intf = BMI160_I2C_INTF;
+
+    rslt = bmi160_init(&bmi);
+    if (rslt == BMI160_OK) {
+        printf("Success initializing BMI160 - Chip ID 0x%X\n", bmi.chip_id);
+    } else if (rslt == BMI160_E_DEV_NOT_FOUND) {
+        printf("Error initializing BMI160: device not found\n");
+        return 1;
+    } else {
+        printf("Error initializing BMI160 - %d\n", rslt);
+        return 1;
+    }
+
+    /* Select the Output data rate, range of accelerometer sensor */
+    bmi.accel_cfg.odr = BMI160_ACCEL_ODR_1600HZ;
+    bmi.accel_cfg.range = BMI160_ACCEL_RANGE_16G;
+    // bmi.accel_cfg.range = BMI160_ACCEL_RANGE_2G;
+    bmi.accel_cfg.bw = BMI160_ACCEL_BW_NORMAL_AVG4;
+
+    /* Select the power mode of accelerometer sensor */
+    bmi.accel_cfg.power = BMI160_ACCEL_NORMAL_MODE;
+
+    /* Select the Output data rate, range of Gyroscope sensor */
+    bmi.gyro_cfg.odr = BMI160_GYRO_ODR_3200HZ;
+    bmi.gyro_cfg.range = BMI160_GYRO_RANGE_2000_DPS;
+    // bmi.gyro_cfg.range = BMI160_GYRO_RANGE_250_DPS;
+    bmi.gyro_cfg.bw = BMI160_GYRO_BW_NORMAL_MODE;
+
+    /* Select the power mode of Gyroscope sensor */
+    bmi.gyro_cfg.power = BMI160_GYRO_NORMAL_MODE;
+
+    /* Set the sensor configuration */
+    rslt = bmi160_set_sens_conf(&bmi);
+    if (rslt != BMI160_OK) {
+        printf("Error configuring BMI160 - %d\n", rslt);
+        return 1;
+    }
+
+    /* Link the FIFO memory location */
+    fifo_frame.data = fifo_buff;
+    fifo_frame.length = FIFO_SIZE;
+    bmi.fifo = &fifo_frame;
+    /* Clear all existing FIFO configurations */
+    rslt = bmi160_set_fifo_config(BMI160_FIFO_CONFIG_1_MASK , BMI160_DISABLE, &bmi);
+    if (rslt != BMI160_OK) {
+        printf("Error clearing fifo - %d\n", rslt);
+        return 1;
+    }
+
+    uint8_t fifo_config = BMI160_FIFO_HEADER |  BMI160_FIFO_ACCEL | BMI160_FIFO_GYRO;
+    rslt = bmi160_set_fifo_config(fifo_config, BMI160_ENABLE, &bmi);
+    if (rslt != BMI160_OK) {
+        printf("Error enabling fifo - %d\n", rslt);
+        return 1;
+    }
+    /* Check rslt for any error codes */
+    i2c_release(dev);
+
+    int cont =0;
+    while(rslt == 0 && cont < 10) {
+        /* Wait for 100ms for the FIFO to fill */
+        user_delay(100);
+
+        /* It is VERY important to reload the length of the FIFO memory as after the
+         * call to bmi160_get_fifo_data(), the bmi.fifo->length contains the
+         * number of bytes read from the FIFO */
+        bmi.fifo->length = FIFO_SIZE;
+        i2c_acquire(dev);
+        rslt = bmi160_get_fifo_data(&bmi);
+        if (rslt != BMI160_OK) {
+            printf("Error getting fifo data - %d\n", rslt);
+            return 1;
+        }
+        i2c_release(dev);
+
+        uint8_t gyr_inst = GYR_FRAMES, acc_inst = ACC_FRAMES;
+        rslt = bmi160_extract_gyro(gyro_data, &gyr_inst, &bmi);
+        if (rslt != BMI160_OK) {
+            printf("Error extracting gyro data - %d\n", rslt);
+            return 1;
+        }
+
+        rslt = bmi160_extract_accel(accel_data, &acc_inst, &bmi);
+        if (rslt != BMI160_OK) {
+            printf("Error extracting accel data - %d\n", rslt);
+            return 1;
+        }
+
+        for (size_t i = 0; i < acc_inst && i < gyr_inst; i++) {
+            printf("Accel & gyro txyz is:     ");
+            printf("%"PRIu32" %6.2f %6.2f %6.2f    ",
+                accel_data[i].sensortime,
+                accel_data[i].x / AC,
+                accel_data[i].y / AC,
+                accel_data[i].z / AC);
+            printf("%"PRIu32" %6.2f %6.2f %6.2f    ",
+                gyro_data[i].sensortime,
+                gyro_data[i].x / AC,
+                gyro_data[i].y / AC,
+                gyro_data[i].z / AC);
+            printf("\n");
+        }
+
+        cont++;
+    }
+
+    /*rm_demo_write_data[64] = (char)(accel_data[0].x/ AC);*/
+
+    printf("passou por aqui5\n");
 
     puts("NimBLE GATT Server Example");
 
