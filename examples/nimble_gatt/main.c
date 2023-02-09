@@ -443,7 +443,7 @@ int main(void)
         cont++;
     }
 
-    int lenki = sprintf(rm_demo_write_data, "%f", accel_data[1].x / AC);
+    int lenki = sprintf(rm_demo_write_data, "%f, %f, %f", (accel_data[1].x / AC), (accel_data[1].y /AC), (accel_data[1].z /AC));
     printf("%d \n", lenki);
 
     printf("passou por aqui5\n");
