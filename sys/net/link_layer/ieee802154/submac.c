@@ -27,9 +27,9 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#define CSMA_SENDER_BACKOFF_PERIOD_UNIT_US  (320U)
-//#define ACK_TIMEOUT_US                      (864U)
-#define ACK_TIMEOUT_US                      (50000U)
+#define CSMA_SENDER_BACKOFF_PERIOD_UNIT_US   (320U)
+#define ACK_TIMEOUT_SYMS                     (54U)
+
 static char *str_states[IEEE802154_FSM_STATE_NUMOF] = {
     "INVALID",
     "RX",
@@ -282,7 +282,9 @@ static ieee802154_fsm_state_t _fsm_state_tx_process_tx_done(ieee802154_submac_t 
             assert (res >= 0);
 
             /* Handle ACK reception */
-            ieee802154_submac_ack_timer_set(submac, ACK_TIMEOUT_US);
+            uint8_t symbol_time = ieee802154_get_symbol_time(submac->channel_page,
+                                                             submac->channel_num);
+            ieee802154_submac_ack_timer_set(submac, symbol_time * ACK_TIMEOUT_SYMS);
             return IEEE802154_FSM_STATE_WAIT_FOR_ACK;
         }
         break;

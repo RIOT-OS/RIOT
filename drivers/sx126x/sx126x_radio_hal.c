@@ -39,14 +39,13 @@
 #include "sx126x_params.h"
 #include "sx126x_internal.h"
 
-#define LORA_ACK_REPLY_US          1024
+#define LORA_ACK_REPLY_US          100
 
-#define SX126X_HAL_CHAN_26 (869525000LU)
-#define SX126X_HAL_CHAN_BASE (865500000LU)
+#define SX126X_HAL_CHAN_BASE (868100000LU)
 #define SX126X_HAL_CHAN_SPACING (200000LU)
 
-#define SX126X_CHAN_MIN (11)
-#define SX126X_CHAN_MAX (26)
+#define SX126X_CHAN_MIN (IEEE802154_CHANNEL_MIN_SUBGHZ)
+#define SX126X_CHAN_MAX (8)
 
 #define SX126X_POWER_MIN (-9)
 #define SX126X_POWER_MAX (22)
@@ -80,7 +79,7 @@ void isr_subghz_radio(void)
     /* Disable NVIC to avoid ISR conflict in CPU. */
     NVIC_DisableIRQ(SUBGHZ_Radio_IRQn);
     NVIC_ClearPendingIRQ(SUBGHZ_Radio_IRQn);
-    event_post(EVENT_PRIO_HIGHEST, &sx126x_ev);
+    event_post(EVENT_PRIO_MEDIUM, &sx126x_ev);
     cortexm_isr_end();
 }
 #endif 
@@ -412,7 +411,7 @@ switch (op){
        if (info) {
             info->status = (dev->cad_detected) ? TX_STATUS_MEDIUM_BUSY : TX_STATUS_SUCCESS;
         }
-    while(state == STATE_TX)
+
         _get_state(dev, &state);
         
     break;
@@ -438,7 +437,7 @@ switch (op){
 }
 
     if (eagain) {
-        DEBUG("EAGAIN");
+       
         return -EAGAIN;
     }
 
@@ -503,16 +502,10 @@ static int _config_phy(ieee802154_dev_t *hal, const ieee802154_phy_conf_t *conf)
     sx126x_t *dev = hal->priv;
     uint8_t channel = conf->channel;
     int8_t pow = conf->pow;
-    if((channel < SX126X_CHAN_MIN) && (channel > SX126X_CHAN_MAX))
+    if((channel > SX126X_CHAN_MAX))
         return -EINVAL;
-
-    if (channel == 26) {
-        sx126x_set_channel(dev, SX126X_HAL_CHAN_26);
-    }
-    else {
-        sx126x_set_channel(dev, (channel-11)*SX126X_HAL_CHAN_SPACING + SX126X_HAL_CHAN_BASE);
-    }
-
+    
+    sx126x_set_channel(dev, (channel)*SX126X_HAL_CHAN_SPACING + SX126X_HAL_CHAN_BASE);
     if((pow < SX126X_POWER_MIN) && (pow > SX126X_POWER_MAX))
         return -EINVAL;
 
@@ -628,7 +621,7 @@ static int _set_csma_params(ieee802154_dev_t *hal, const ieee802154_csma_be_t *b
 
 
 static const ieee802154_radio_ops_t sx126x_ops = {
-    .caps =  IEEE802154_CAP_24_GHZ
+    .caps =  IEEE802154_CAP_SUB_GHZ
           | IEEE802154_CAP_IRQ_CRC_ERROR
           | IEEE802154_CAP_IRQ_RX_START
           | IEEE802154_CAP_IRQ_TX_DONE

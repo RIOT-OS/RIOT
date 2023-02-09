@@ -39,7 +39,6 @@ extern "C" {
 extern void lora_e5_dev_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_mode);
 #define SX126X_PARAM_SET_RF_MODE_CB         lora_e5_dev_sx126x_set_rf_mode
 #define SX126X_PARAM_TYPE                   SX126X_TYPE_STM32WL
-#define CONFIG_SX126X_TX_POWER_DEFAULT		(22)
 #endif
 /** @} */
 

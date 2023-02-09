@@ -9,7 +9,8 @@
         "Makefile.*": "makefile",
         "*.mk": "makefile",
         "kernel_defines.h": "c",
-        "sx126x_internal.h": "c"
+        "sx126x_internal.h": "c",
+        "submac.h": "c"
     },
     "[shellscript][c][cpp]": {
         "editor.tabSize": 4,
