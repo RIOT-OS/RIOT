@@ -177,9 +177,7 @@ int timer_set(tim_t tim, int channel, unsigned int timeout)
     if (value > timeout) {
         /* time till timeout is larger than requested --> timer already expired
          * ==> let's make sure we have an IRQ pending :) */
-        dev(tim)->CR1 &= ~(TIM_CR1_CEN);
-        TIM_CHAN(tim, channel) = dev(tim)->CNT;
-        dev(tim)->CR1 |= TIM_CR1_CEN;
+        dev(tim)->EGR |= (TIM_EGR_CC1G << channel);
     }
 
     irq_restore(irqstate);
