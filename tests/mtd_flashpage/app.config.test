@@ -2,4 +2,5 @@
 # application configuration. This is only needed during migration.
 CONFIG_MODULE_MTD=y
 CONFIG_MODULE_MTD_FLASHPAGE=y
+CONFIG_MODULE_MTD_WRITE_PAGE=y
 CONFIG_MODULE_EMBUNIT=y
