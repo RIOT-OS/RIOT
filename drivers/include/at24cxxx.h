@@ -96,8 +96,7 @@ int at24cxxx_read_byte(const at24cxxx_t *dev, uint32_t pos, void *dest);
  * @return          -ERANGE if @p pos + @p len is out of bounds
  * @return          @see i2c_read_regs
  */
-int at24cxxx_read(const at24cxxx_t *dev, uint32_t pos, void *data,
-                  size_t len);
+int at24cxxx_read(const at24cxxx_t *dev, uint32_t pos, void *data, size_t len);
 
 /**
  * @brief   Write a byte at a given position @p pos

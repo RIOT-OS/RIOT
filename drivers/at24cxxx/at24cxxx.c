@@ -97,8 +97,34 @@ int _read(const at24cxxx_t *dev, uint32_t pos, void *data, size_t len)
         }
         xtimer_usleep(AT24CXXX_POLL_DELAY_US);
     }
+
     DEBUG("[at24cxxx] i2c_read_regs(): %d; polls: %d\n", check, polls);
+
     return check;
+}
+
+static int _read_max(const at24cxxx_t *dev, uint32_t pos, void *data, size_t len)
+{
+#ifdef PERIPH_I2C_MAX_BYTES_PER_FRAME
+    uint8_t *data_p = data;
+
+    while (len) {
+        size_t clen = MIN(len, PERIPH_I2C_MAX_BYTES_PER_FRAME);
+
+        if (_read(dev, pos, data_p, clen) == AT24CXXX_OK) {
+            len -= clen;
+            pos += clen;
+            data_p += clen;
+        }
+        else {
+            return -EIO;
+        }
+    }
+
+    return AT24CXXX_OK;
+#else
+    return _read(dev, pos, data, len);
+#endif
 }
 
 static
@@ -107,7 +133,6 @@ int _write_page(const at24cxxx_t *dev, uint32_t pos, const void *data, size_t le
     int check;
     uint8_t polls = DEV_MAX_POLLS;
     uint8_t dev_addr;
-    uint16_t _pos;
     uint8_t flags = 0;
 
     if (DEV_EEPROM_SIZE > 2048) {
@@ -115,17 +140,17 @@ int _write_page(const at24cxxx_t *dev, uint32_t pos, const void *data, size_t le
            used for addressing */
         /* append page address bits to device address (if any) */
         dev_addr  = (DEV_I2C_ADDR | ((pos & 0xFF0000) >> 16));
-        _pos = (pos & 0xFFFF);
+        pos &= 0xFFFF;
         flags = I2C_REG16;
     }
     else {
         /* append page address bits to device address (if any) */
         dev_addr = (DEV_I2C_ADDR | ((pos & 0xFF00) >> 8));
-        _pos = pos & 0xFF;
+        pos &= 0xFF;
     }
 
     while (-ENXIO == (check = i2c_write_regs(DEV_I2C_BUS, dev_addr,
-                                             _pos, data, len, flags))) {
+                                             pos, data, len, flags))) {
         if (--polls == 0) {
             break;
         }
@@ -209,8 +234,7 @@ int at24cxxx_read_byte(const at24cxxx_t *dev, uint32_t pos, void *dest)
     return check;
 }
 
-int at24cxxx_read(const at24cxxx_t *dev, uint32_t pos, void *data,
-                      size_t len)
+int at24cxxx_read(const at24cxxx_t *dev, uint32_t pos, void *data, size_t len)
 {
     if (pos + len > DEV_EEPROM_SIZE) {
         return -ERANGE;
@@ -219,9 +243,10 @@ int at24cxxx_read(const at24cxxx_t *dev, uint32_t pos, void *data,
     int check = AT24CXXX_OK;
     if (len) {
         i2c_acquire(DEV_I2C_BUS);
-        check = _read(dev, pos, data, len);
+        check = _read_max(dev, pos, data, len);
         i2c_release(DEV_I2C_BUS);
     }
+
     return check;
 }
 
