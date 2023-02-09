@@ -52,27 +52,6 @@ static int _init(mtd_dev_t *dev)
     return 0;
 }
 
-static int _read(mtd_dev_t *dev, void *buf, uint32_t addr, uint32_t size)
-{
-    mtd_flashpage_t *super = container_of(dev, mtd_flashpage_t, base);
-
-    addr += (uintptr_t)flashpage_addr(super->offset);
-
-    DEBUG("flashpage: read %"PRIu32" bytes from 0x%"PRIx32" to %p\n", size, addr, buf);
-    assert(addr < MTD_FLASHPAGE_END_ADDR);
-
-#ifndef CPU_HAS_UNALIGNED_ACCESS
-    if (addr % sizeof(uword_t)) {
-        return -EINVAL;
-    }
-#endif
-
-    uword_t dst_addr = addr;
-    memcpy(buf, (void *)dst_addr, size);
-
-    return 0;
-}
-
 static int _read_page(mtd_dev_t *dev, void *buf, uint32_t page,
                       uint32_t offset, uint32_t size)
 {
@@ -107,35 +86,6 @@ static int _read_page(mtd_dev_t *dev, void *buf, uint32_t page,
 
     memcpy(buf, (void *)addr, size);
     return size;
-}
-
-static int _write(mtd_dev_t *dev, const void *buf, uint32_t addr, uint32_t size)
-{
-    mtd_flashpage_t *super = container_of(dev, mtd_flashpage_t, base);
-
-    addr += (uintptr_t)flashpage_addr(super->offset);
-
-    DEBUG("flashpage: write %"PRIu32" bytes from %p to 0x%"PRIx32"\n", size, buf, addr);
-
-#ifndef CPU_HAS_UNALIGNED_ACCESS
-    if ((uintptr_t)buf % sizeof(uword_t)) {
-        return -EINVAL;
-    }
-#endif
-    if (addr % FLASHPAGE_WRITE_BLOCK_ALIGNMENT) {
-        return -EINVAL;
-    }
-    if (size % FLASHPAGE_WRITE_BLOCK_SIZE) {
-        return -EOVERFLOW;
-    }
-    if (addr + size > MTD_FLASHPAGE_END_ADDR) {
-        return -EOVERFLOW;
-    }
-
-    uword_t dst_addr = addr;
-    flashpage_write((void *)dst_addr, buf, size);
-
-    return 0;
 }
 
 static int _write_page(mtd_dev_t *dev, const void *buf, uint32_t page, uint32_t offset,
@@ -202,9 +152,7 @@ static int _erase_sector(mtd_dev_t *dev, uint32_t sector, uint32_t count)
 
 const mtd_desc_t mtd_flashpage_driver = {
     .init = _init,
-    .read = _read,
     .read_page = _read_page,
-    .write = _write,
     .write_page = _write_page,
     .erase_sector = _erase_sector,
 };
