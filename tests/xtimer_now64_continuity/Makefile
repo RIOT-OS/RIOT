@@ -15,6 +15,7 @@ BOARD_BLACKLIST += \
                    pinetime \
                    ruuvitag \
                    stm32f429i-disco \
+                   stm32f4discovery \
                    thingy52 \
                    waspmote-pro  \
                    weact-f401cc \

@@ -28,11 +28,20 @@ config BOARD_STM32F4DISCOVERY
     # Various other features (if any)
     select HAS_ARDUINO
     select HAS_TINYUSB_DEVICE
+    select HAS_HIGHLEVEL_STDIO
 
     # Clock configuration
     select BOARD_HAS_HSE
 
     select HAVE_SAUL_GPIO
+
+    select MODULE_USBUS if TEST_KCONFIG && !PACKAGE_TINYUSB
+    select MODULE_USBUS_CDC_ACM if TEST_KCONFIG && !PACKAGE_TINYUSB
+
+choice STDIO_IMPLEMENTATION
+    default MODULE_STDIO_CDC_ACM if MODULE_USBUS
+    default MODULE_STDIO_TINYUSB_CDC_ACM if PACKAGE_TINYUSB
+endchoice
 
 source "$(RIOTBOARD)/common/stm32/Kconfig"
 
