@@ -26,6 +26,7 @@
 #define XFA_H
 
 #include <inttypes.h>
+#include "compiler_hints.h"
 
 /*
  * Unfortunately, current gcc trips over accessing XFA's because of their
@@ -42,16 +43,18 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  *
  * @internal
  */
-#define _XFA(name, prio) __attribute__((used, section(".xfa." #name "." #prio)))
+#define _XFA(name, prio) \
+    NO_SANITIZE_ARRAY \
+    __attribute__((used, section(".xfa." #name "." #prio)))
 
 /**
  * @brief helper macro for other XFA_* macros
  *
  * @internal
  */
-#define _XFA_CONST(name, \
-                   prio) __attribute__((used, \
-                                        section(".roxfa." #name "." #prio)))
+#define _XFA_CONST(name, prio) \
+    NO_SANITIZE_ARRAY \
+    __attribute__((used, section(".roxfa." #name "." #prio)))
 
 /**
  * @brief Define a read-only cross-file array
