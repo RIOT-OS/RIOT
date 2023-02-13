@@ -85,6 +85,7 @@ static void _cache_process(gcoap_request_memo_t *memo,
 static ssize_t _cache_build_response(nanocoap_cache_entry_t *ce, coap_pkt_t *pdu,
                                      uint8_t *buf, size_t len);
 static void _receive_from_cache_cb(void *arg);
+static bool _ep_is_multicast(const sock_udp_ep_t *remote_ep);
 
 static int _request_matcher_default(gcoap_listener_t *listener,
                                     const coap_resource_t **resource,
@@ -835,16 +836,16 @@ static int _find_resource(gcoap_socket_type_t tl_type,
     return ret;
 }
 
-static bool _memo_ep_is_multicast(const gcoap_request_memo_t *memo)
+static bool _ep_is_multicast(const sock_udp_ep_t *remote_ep)
 {
-    switch (memo->remote_ep.family) {
+    switch (remote_ep->family) {
 #ifdef SOCK_HAS_IPV6
     case AF_INET6:
-        return ipv6_addr_is_multicast((const ipv6_addr_t *)&memo->remote_ep.addr.ipv6);
+        return ipv6_addr_is_multicast((const ipv6_addr_t *)&remote_ep->addr.ipv6);
 #endif
 #ifdef SOCK_HAS_IPV4
     case AF_INET:
-        return ipv4_addr_is_multicast((const ipv4_addr_t *)&memo->remote_ep.addr.ipv4);
+        return ipv4_addr_is_multicast((const ipv4_addr_t *)&remote_ep->addr.ipv4);
 #endif
     default:
         assert(0);
@@ -890,7 +891,7 @@ static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *src_pdu,
             if ((memcmp(coap_get_token(src_pdu), coap_get_token(memo_pdu), cmplen) == 0)
                     && (sock_udp_ep_equal(&memo->remote_ep, remote)
                       /* Multicast addresses are not considered in matching responses */
-                      || _memo_ep_is_multicast(memo)
+                      || _ep_is_multicast(&memo->remote_ep)
                     )) {
                 *memo_ptr = memo;
                 break;
