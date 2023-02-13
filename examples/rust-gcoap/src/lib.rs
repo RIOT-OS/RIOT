@@ -14,7 +14,7 @@ extern crate rust_riotmodules;
 
 riot_main!(main);
 
-fn main() {
+fn main(tokens: riot_wrappers::thread::StartToken) -> ! {
     extern "C" {
         fn do_vfs_init();
     }
@@ -35,7 +35,9 @@ fn main() {
 
         println!("CoAP server ready; waiting for interfaces to settle before reporting addresses...");
 
-        let sectimer = ztimer::Clock::sec();
+        // Packing the clock for a single sleep doesn't save measurable runtime; this would be more
+        // relevant if sleep were repeated.
+        let sectimer = tokens.in_thread().promote(ztimer::Clock::sec());
         sectimer.sleep_ticks(2);
 
         for netif in gnrc::Netif::all() {
