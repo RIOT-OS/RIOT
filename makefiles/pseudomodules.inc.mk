@@ -591,6 +591,8 @@ NO_PSEUDOMODULES += auto_init_multimedia
 NO_PSEUDOMODULES += auto_init_security
 NO_PSEUDOMODULES += auto_init_usbus
 NO_PSEUDOMODULES += auto_init_screen
+NO_PSEUDOMODULES += auto_init_wdt_event
+NO_PSEUDOMODULES += auto_init_wdt_thread
 
 # Packages and drivers may also add modules to PSEUDOMODULES in their `Makefile.include`.
 

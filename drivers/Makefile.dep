@@ -257,6 +257,10 @@ ifneq (,$(filter periph_timer_periodic,$(USEMODULE)))
   FEATURES_REQUIRED += periph_timer
 endif
 
+ifneq (,$(filter periph_wdt_auto_start,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_wdt
+endif
+
 ifneq (,$(filter-out netdev_default netdev_new_api netdev_legacy_api, $(filter netdev_%,$(USEMODULE))))
   USEMODULE += netdev
   # Don't register netdevs if there is only a single one of them
