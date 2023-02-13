@@ -346,18 +346,27 @@ static void _on_sock_udp_evt(sock_udp_t *sock, sock_async_flags_t type, void *ar
             cursor += res;
         }
 
-        /* make sure we reply with the same address that the request was destined for */
+        /* make sure we reply with the same address that the request was
+         * destined for -- except in the multicast case */
+        sock_udp_aux_tx_t *aux_out_ptr;
         sock_udp_aux_tx_t aux_out = {
             .flags = SOCK_AUX_SET_LOCAL,
             .local = aux_in.local,
         };
+        if (_ep_is_multicast(&aux_in.local)) {
+            /* This eventually gets passed to sock_udp_send_aux, where NULL
+             * simply does not set any flags */
+            aux_out_ptr = NULL;
+        } else {
+            aux_out_ptr = &aux_out;
+        }
 
         gcoap_socket_t socket = {
             .type = GCOAP_SOCKET_TYPE_UDP,
             .socket.udp = sock,
          };
 
-        _process_coap_pdu(&socket, &remote, &aux_out, _listen_buf, cursor, truncated);
+        _process_coap_pdu(&socket, &remote, aux_out_ptr, _listen_buf, cursor, truncated);
     }
 }
 
