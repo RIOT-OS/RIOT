@@ -327,25 +327,6 @@ int main(void)
 
     (void) puts("Welcome to RIOT!");
 
-    puts("NimBLE GATT Server Example");
-
-    int rc = 0;
-    (void)rc;
-
-    /* verify and add our custom services */
-    rc = ble_gatts_count_cfg(gatt_svr_svcs);
-    assert(rc == 0);
-    rc = ble_gatts_add_svcs(gatt_svr_svcs);
-    assert(rc == 0);
-
-    /* set the device name */
-    ble_svc_gap_device_name_set(NIMBLE_AUTOADV_DEVICE_NAME);
-    /* reload the GATT server to link our added services */
-    ble_gatts_start();
-
-    /* start to advertise this node */
-    nimble_autoadv_start();
-
     i2c_init(dev);
     i2c_acquire(dev);
     
@@ -445,21 +426,15 @@ int main(void)
         }
 
         for (size_t i = 0; i < acc_inst && i < gyr_inst; i++) {
-            printf("Accel & gyro txyz is:     ");
+            printf("Accel txyz is:     ");
             printf("%"PRIu32" %6.2f %6.2f %6.2f    ",
                 accel_data[i].sensortime,
                 accel_data[i].x / AC,
                 accel_data[i].y / AC,
                 accel_data[i].z / AC);
-            printf("%"PRIu32" %6.2f %6.2f %6.2f    ",
-                gyro_data[i].sensortime,
-                gyro_data[i].x / AC,
-                gyro_data[i].y / AC,
-                gyro_data[i].z / AC);
             printf("\n");
         }
-        int lenki = sprintf(rm_demo_write_data, "%f, %f, %f", (accel_data[1].x / AC), (accel_data[1].y /AC), (accel_data[1].z /AC));
-        printf("%d \n", lenki);
+
         //cont++;
     }
 
@@ -467,6 +442,25 @@ int main(void)
     printf("%d \n", lenki);
 
     printf("passou por aqui5\n");
+
+    puts("NimBLE GATT Server Example");
+
+    int rc = 0;
+    (void)rc;
+
+    /* verify and add our custom services */
+    rc = ble_gatts_count_cfg(gatt_svr_svcs);
+    assert(rc == 0);
+    rc = ble_gatts_add_svcs(gatt_svr_svcs);
+    assert(rc == 0);
+
+    /* set the device name */
+    ble_svc_gap_device_name_set(NIMBLE_AUTOADV_DEVICE_NAME);
+    /* reload the GATT server to link our added services */
+    ble_gatts_start();
+
+    /* start to advertise this node */
+    nimble_autoadv_start();
 
     return 0;
 }
