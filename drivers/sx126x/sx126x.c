@@ -73,16 +73,23 @@ const sx126x_pa_cfg_params_t hpa_cfg = {
 
 
 
-static const uint16_t _bw_khz[3] = {
-    [LORA_BW_125_KHZ] = 125,
-    [LORA_BW_250_KHZ] = 250,
-    [LORA_BW_500_KHZ] = 500,
+static const uint16_t _bw_khz[11] = {
+    [SX126X_LORA_BW_007] = 7,
+    [SX126X_LORA_BW_010] = 10,
+    [SX126X_LORA_BW_015] = 15,
+    [SX126X_LORA_BW_020] = 20,
+    [SX126X_LORA_BW_031] = 31,
+    [SX126X_LORA_BW_041] = 41,
+    [SX126X_LORA_BW_062] = 62,
+    [SX126X_LORA_BW_125] = 125,
+    [SX126X_LORA_BW_250] = 250,
+    [SX126X_LORA_BW_500] = 500,
 };
 
 static uint8_t _compute_ldro(sx126x_t *dev)
 {
     uint32_t symbol_len =
-        (uint32_t)(1 << dev->mod_params.sf) / _bw_khz[dev->mod_params.bw - SX126X_LORA_BW_125];
+        (uint32_t)(1 << dev->mod_params.sf) / _bw_khz[dev->mod_params.bw];
 
     if (symbol_len >= 16) {
         return 0x01;
@@ -119,7 +126,7 @@ static void sx126x_init_default_config(sx126x_t *dev)
 #endif
     sx126x_set_tx_params(dev, CONFIG_SX126X_TX_POWER_DEFAULT, CONFIG_SX126X_RAMP_TIME_DEFAULT);
 
-    dev->mod_params.bw = (sx126x_lora_bw_t)(SX126X_LORA_BW_500);
+    dev->mod_params.bw = (sx126x_lora_bw_t)(SX126X_LORA_BW_125);
     dev->mod_params.sf = (sx126x_lora_sf_t)LORA_SF7;
     dev->mod_params.cr = (sx126x_lora_cr_t)(LORA_CR_4_5);
     dev->mod_params.ldro = _compute_ldro(dev);

@@ -519,8 +519,8 @@ int config_phy(int argc, char **argv)
     uint8_t channel = atoi(argv[2]);
     int8_t tx_pow = atoi(argv[3]);
 
-    if (channel < 11 || channel > 26) {
-        puts("Wrong channel configuration (11 <= channel <= 26).");
+    if ( channel > 26) {
+        puts("Wrong channel configuration (0 <= channel <= 26).");
         return 1;
     }
 

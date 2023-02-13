@@ -20,8 +20,6 @@
 #include <errno.h>
 #include <stdio.h>
 
-#include "net/gnrc.h"
-
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
@@ -39,7 +37,7 @@
 #include "sx126x_params.h"
 #include "sx126x_internal.h"
 
-#define LORA_ACK_REPLY_US          100
+#define LORA_ACK_REPLY_US          1024
 
 #define SX126X_HAL_CHAN_BASE (868100000LU)
 #define SX126X_HAL_CHAN_SPACING (200000LU)
@@ -364,6 +362,7 @@ static int _request_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
     (void)ctx;
     switch (op) {
         case IEEE802154_HAL_OP_TRANSMIT:
+        ieee802154_radio_cca(hal);
         dev->ack_filter = false;
         _set_state(dev, STATE_TX);
 
@@ -412,7 +411,6 @@ switch (op){
             info->status = (dev->cad_detected) ? TX_STATUS_MEDIUM_BUSY : TX_STATUS_SUCCESS;
         }
 
-        _get_state(dev, &state);
         
     break;
 
@@ -431,7 +429,6 @@ switch (op){
 
     default:
         eagain = false;
-        assert(false);
         break;
     
 }

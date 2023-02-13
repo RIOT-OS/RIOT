@@ -330,7 +330,10 @@ static inline uint8_t _get_bpsk_symbol_time(uint16_t channel)
     }
     return SYMTIME_BPSK_COMMON;
 }
-
+static inline uint8_t _get_lora_symbol_time(uint16_t channel){
+    (void)channel;
+    return 0xFF;
+}
 uint32_t ieee802154_get_symbol_time(uint8_t channel_page, uint16_t channel_num)
 {
     /* BPSK for SubGHZ, O-QPSK for 2.4 GHz (see IEEE 802.15.4-2015 standard, section 10.1.2.2) */
@@ -352,6 +355,11 @@ uint32_t ieee802154_get_symbol_time(uint8_t channel_page, uint16_t channel_num)
     else if (channel_page == 2) {
         if (channel_num <= IEEE802154_CHANNEL_MAX_SUBGHZ) {
             return _get_oqpsk_symbol_time(channel_num);
+        }
+    }
+    else if (channel_page == 3) {
+        if (channel_num <= IEEE802154_CHANNEL_MAX_SUBGHZ) {
+            return _get_lora_symbol_time(channel_num);
         }
     }
     /* add more channel pages as needed */

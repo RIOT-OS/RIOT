@@ -28,7 +28,10 @@
 #include "debug.h"
 
 #define CSMA_SENDER_BACKOFF_PERIOD_UNIT_US   (320U)
+
+#ifndef ACK_TIMEOUT_SYMS
 #define ACK_TIMEOUT_SYMS                     (54U)
+#endif
 
 static char *str_states[IEEE802154_FSM_STATE_NUMOF] = {
     "INVALID",
