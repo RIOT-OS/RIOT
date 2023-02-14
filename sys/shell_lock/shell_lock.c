@@ -143,9 +143,14 @@ static void _login_barrier(char *line_buf, size_t buf_size)
 #ifdef MODULE_STDIO_TELNET
 void telnet_cb_disconneced(void)
 {
-    _shell_is_locked = true;
+    shell_lock_do_lock();
 }
 #endif
+
+void shell_lock_do_lock(void)
+{
+    _shell_is_locked = true;
+}
 
 #ifdef MODULE_SHELL_LOCK_AUTO_LOCKING
 static void _shell_auto_lock_ztimer_callback(void *arg)
