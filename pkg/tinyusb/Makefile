@@ -1,7 +1,7 @@
 PKG_NAME=tinyusb
 PKG_URL=https://github.com/hathach/tinyusb
-# TinyUSB 0.14.0
-PKG_VERSION=9e91b02ec7fb3502747b5c413a4824654fa7fc7e
+# TinyUSB 0.15.0
+PKG_VERSION=86c416d4c0fb38432460b3e11b08b9de76941bf5
 
 PKG_LICENSE=MIT
 
