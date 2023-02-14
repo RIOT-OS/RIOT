@@ -39,14 +39,25 @@
 
 #define LORA_ACK_REPLY_US          1024
 
+#ifndef SX126X_HAL_CHAN_BASE
 #define SX126X_HAL_CHAN_BASE (868100000LU)
+#endif
+
+#ifndef SX126X_HAL_CHAN_SPACING
 #define SX126X_HAL_CHAN_SPACING (200000LU)
+#endif
 
 #define SX126X_CHAN_MIN (IEEE802154_CHANNEL_MIN_SUBGHZ)
+
+#ifndef SX126X_CHAN_MAX
 #define SX126X_CHAN_MAX (8)
+#endif
 
 #define SX126X_POWER_MIN (-9)
+
+#ifndef SX126X_POWER_MAX
 #define SX126X_POWER_MAX (22)
+#endif
 
 static const ieee802154_radio_ops_t sx126x_ops;
 static ieee802154_dev_t *_sx126x_hal_dev;
