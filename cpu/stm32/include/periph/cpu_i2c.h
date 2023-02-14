@@ -161,6 +161,19 @@ static const i2c_timing_param_t timing_params[] = {
             CPU_FAM_STM32G0 || CPU_FAM_STM32G4 || CPU_FAM_STM32U5 ||
             CPU_FAM_STM32WB || CPU_FAM_STM32WL */
 
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3) || \
+    defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32G0) || \
+    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L0) || \
+    defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32L5) || \
+    defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32WB) || \
+    defined(CPU_FAM_STM32WL)
+/**
+ * @brief   The I2C implementation supports only a limited frame size.
+ *          See i2c_1.c
+ */
+#define PERIPH_I2C_MAX_BYTES_PER_FRAME  (256U)
+#endif
+
 #ifdef __cplusplus
 }
 #endif

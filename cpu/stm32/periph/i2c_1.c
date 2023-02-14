@@ -51,7 +51,6 @@
 #include "debug.h"
 
 #define TICK_TIMEOUT    (0xFFFF)
-#define MAX_BYTES_PER_FRAME (256)
 
 #define I2C_IRQ_PRIO    (1)
 #define I2C_FLAG_READ   (I2C_READ << I2C_CR2_RD_WRN_Pos)
@@ -217,7 +216,7 @@ int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
 int i2c_read_bytes(i2c_t dev, uint16_t address, void *data,
                    size_t length, uint8_t flags)
 {
-    assert(dev < I2C_NUMOF && length < MAX_BYTES_PER_FRAME);
+    assert(dev < I2C_NUMOF && length < PERIPH_I2C_MAX_BYTES_PER_FRAME);
 
     I2C_TypeDef *i2c = i2c_config[dev].dev;
     assert(i2c != NULL);
@@ -275,7 +274,7 @@ int i2c_write_bytes(i2c_t dev, uint16_t address, const void *data,
 static int _write(I2C_TypeDef *i2c, uint16_t addr, const void *data,
                     size_t length, uint8_t flags, uint32_t cr2_flags)
 {
-    assert(i2c != NULL && length < MAX_BYTES_PER_FRAME);
+    assert(i2c != NULL && length < PERIPH_I2C_MAX_BYTES_PER_FRAME);
 
     /* If reload was NOT set, must either stop or start */
     if ((i2c->ISR & I2C_ISR_TC) && (flags & I2C_NOSTART)) {
