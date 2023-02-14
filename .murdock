@@ -538,6 +538,11 @@ compile() {
     [ $# -ne 2 ] && error "$0: compile: invalid parameters (expected \$appdir \$board:\$toolchain)"
     [ ! -d "$appdir" ] && error "$0: compile: error: application directory \"$appdir\" doesn't exist"
 
+    # use our checkout as ccache temporary folder.
+    # On CI, this is a tmpfs, so using that instead of the `/cache/.ccache` volume
+    # reduces disk IO.
+    export CCACHE_TEMPDIR="$(pwd)/.ccache/tmp"
+
     # We compile a first time with Kconfig based dependency
     # resolution for regression purposes. $TEST_KCONFIG contains a
     # list of board-application tuples that are currently modeled to
