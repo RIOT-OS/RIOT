@@ -72,6 +72,18 @@ struct bmi160_sensor_data gyro_data[GYR_FRAMES], accel_data[ACC_FRAMES];
 
 int8_t rslt;
 
+typedef struct {
+    uint16_t accelerometerX;
+    uint16_t accelerometerY;
+    uint16_t accelerometerZ;
+    uint16_t dummy;
+} reading_t;
+
+#define MAX_READINGS 1024
+reading_t readings_buffer[MAX_READINGS];
+
+reading_t get_reading(void);
+
 int dev = I2C_DEV(0);
 
 int8_t user_i2c_read(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, uint16_t len)
@@ -412,12 +424,7 @@ int main(void)
         }
         i2c_release(dev);
 
-        uint8_t gyr_inst = GYR_FRAMES, acc_inst = ACC_FRAMES;
-        rslt = bmi160_extract_gyro(gyro_data, &gyr_inst, &bmi);
-        if (rslt != BMI160_OK) {
-            printf("Error extracting gyro data - %d\n", rslt);
-            return 1;
-        }
+        uint8_t acc_inst = ACC_FRAMES;
 
         rslt = bmi160_extract_accel(accel_data, &acc_inst, &bmi);
         if (rslt != BMI160_OK) {
@@ -425,7 +432,7 @@ int main(void)
             return 1;
         }
 
-        for (size_t i = 0; i < acc_inst && i < gyr_inst; i++) {
+        for (size_t i = 0; i < acc_inst; i++) {
             printf("Accel txyz is:     ");
             printf("%"PRIu32" %6.2f %6.2f %6.2f    ",
                 accel_data[i].sensortime,
@@ -440,8 +447,6 @@ int main(void)
 
     int lenki = sprintf(rm_demo_write_data, "%f, %f, %f", (accel_data[1].x / AC), (accel_data[1].y /AC), (accel_data[1].z /AC));
     printf("%d \n", lenki);
-
-    printf("passou por aqui5\n");
 
     puts("NimBLE GATT Server Example");
 
@@ -463,4 +468,19 @@ int main(void)
     nimble_autoadv_start();
 
     return 0;
+}
+
+reading_t get_reading(void)
+{
+    reading_t reading = {0, 0, 0, 0};
+#ifdef DPULGA_ENABLE_ACCELEROMETER
+    reading.accelerometerX = (accel_data[0].x / AC);
+    reading.accelerometerY = (accel_data[0].y / AC)
+    reading.accelerometerz = (accel_data[0].z / AC)
+#endif
+#ifdef PULGA_ENABLE_DUMMY
+    reading.dummy = debug_dummy++;
+#endif
+
+    return reading;
 }

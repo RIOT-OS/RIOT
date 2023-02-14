@@ -734,7 +734,7 @@ int8_t bmi160_set_fifo_wm(uint8_t fifo_wm, const struct bmi160_dev *dev);
  *  @retval Any non zero value -> Fail
  *
  */
-int8_t bmi160_extract_accel(struct bmi160_sensor_data *accel_data, uint8_t *accel_length, struct bmi160_dev const *dev);
+int16_t bmi160_extract_accel(struct bmi160_sensor_data *accel_data, uint8_t *accel_length, struct bmi160_dev const *dev);
 
 /*!
  * \ingroup bmi160ApiFIFO

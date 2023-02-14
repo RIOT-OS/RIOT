@@ -2336,9 +2336,9 @@ int8_t bmi160_set_fifo_wm(uint8_t fifo_wm, const struct bmi160_dev *dev)
  *  FIFO data read by the "bmi160_get_fifo_data" API and stores it in
  *  the "accel_data" structure instance.
  */
-int8_t bmi160_extract_accel(struct bmi160_sensor_data *accel_data, uint8_t *accel_length, struct bmi160_dev const *dev)
+int16_t bmi160_extract_accel(struct bmi160_sensor_data *accel_data, uint8_t *accel_length, struct bmi160_dev const *dev)
 {
-    int8_t rslt = 0;
+    int16_t rslt = 0;
     uint16_t data_index = 0;
     uint16_t data_read_length = 0;
     uint8_t accel_index = 0;
