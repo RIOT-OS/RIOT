@@ -32,6 +32,7 @@
 
 #include "net/ieee802154/radio.h"
 #include "socket_zep.h"
+#include "random.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -46,6 +47,26 @@
 
 /* dummy packet to register with ZEP dispatcher */
 #define SOCKET_ZEP_V2_TYPE_HELLO   (255)
+
+/* simulate RSSI by calculating error function of LQI */
+static const uint8_t lqi_to_rssi[256] = {
+     74,  74,  74,  74,  74,  74,  74,  74,  74,  75,  75,  75,  75,  75,  75,  75,
+     75,  75,  75,  75,  75,  75,  75,  75,  75,  75,  75,  75,  75,  75,  75,  75,
+     75,  76,  76,  76,  76,  76,  76,  76,  76,  76,  76,  76,  76,  76,  76,  76,
+     77,  77,  77,  77,  77,  77,  77,  77,  77,  77,  77,  77,  78,  78,  78,  78,
+     78,  78,  78,  78,  78,  79,  79,  79,  79,  79,  79,  79,  79,  80,  80,  80,
+     80,  80,  80,  80,  81,  81,  81,  81,  81,  81,  82,  82,  82,  82,  82,  83,
+     83,  83,  83,  83,  83,  84,  84,  84,  84,  85,  85,  85,  85,  85,  86,  86,
+     86,  86,  87,  87,  87,  87,  88,  88,  88,  88,  89,  89,  89,  90,  90,  90,
+     90,  91,  91,  91,  92,  92,  92,  93,  93,  93,  94,  94,  94,  95,  95,  95,
+     96,  96,  96,  97,  97,  97,  98,  98,  98,  99,  99, 100, 100, 100, 101, 101,
+    102, 102, 102, 103, 103, 104, 104, 104, 105, 105, 106, 106, 107, 107, 107, 108,
+    108, 109, 109, 110, 110, 111, 111, 112, 112, 112, 113, 113, 114, 114, 115, 115,
+    116, 116, 117, 117, 118, 118, 119, 119, 120, 120, 121, 121, 122, 122, 123, 123,
+    124, 124, 125, 125, 126, 126, 127, 127, 128, 128, 129, 129, 130, 130, 131, 131,
+    132, 132, 133, 133, 134, 135, 135, 136, 136, 137, 137, 138, 138, 139, 139, 140,
+    140, 141, 141, 142, 142, 143, 143, 144, 144, 145, 145, 146, 146, 147, 147, 148,
+};
 
 static size_t _zep_hdr_fill_v2_data(socket_zep_t *dev, zep_v2_data_hdr_t *hdr,
                                     size_t payload_len)
@@ -245,12 +266,14 @@ static void _send_ack(void *arg)
     uint8_t ack[3];
     zep_v2_data_hdr_t hdr;
 
+    /* sending ACK should only happen if we received a frame */
     assert(zepdev->state == ZEPDEV_STATE_RX_RECV);
+    /* ACK request bit should be set if we get here */
     assert((rxbuf[0] & IEEE802154_FCF_ACK_REQ) != 0);
 
     DEBUG("socket_zep::send_ack: seq_no: %u\n", rxbuf[2]);
 
-    _zep_hdr_fill(zepdev, &hdr.hdr, sizeof(ack) + 2);
+    _zep_hdr_fill(zepdev, &hdr.hdr, sizeof(ack) + IEEE802154_FCF_LEN);
 
     ack[0] = IEEE802154_FCF_TYPE_ACK; /* FCF */
     ack[1] = 0; /* FCF */
@@ -561,12 +584,12 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t max_size,
                  ieee802154_rx_info_t *info)
 {
     socket_zep_t *zepdev = dev->priv;
-    int res = 0;
+    size_t res;
 
     DEBUG("socket_zep::read: reading up to %zu bytes into %p\n", max_size, buf);
 
     if (buf == NULL || zepdev->rcv_len == 0) {
-        goto out;
+        return 0;
     }
 
     DEBUG("socket_zep::read: %zu/%zu bytes into %p\n",
@@ -574,22 +597,26 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t max_size,
 
     if (max_size != zepdev->rcv_len - sizeof(zep_v2_data_hdr_t) - IEEE802154_FCS_LEN) {
         DEBUG("socket_zep::read: size mismatch!\n");
-        res = -EINVAL;
-        goto out;
+        return -EINVAL;
     }
 
     zep_v2_data_hdr_t *zep = (zep_v2_data_hdr_t *)zepdev->rcv_buf;
 
     if (info) {
         info->lqi = zep->lqi_val;
-        info->rssi = -IEEE802154_RADIO_RSSI_OFFSET;
+        info->rssi = lqi_to_rssi[zep->lqi_val]
+                   /* slightly randomize simulated RSSI */
+                   + ((random_uint32() & 0x3) - 2);
     }
 
     /* return payload size without frame checksum */
     res = zep->length - IEEE802154_FCS_LEN;
+    if (res > max_size) {
+        return -ENOBUFS;
+    }
+
     /* skip the ZEP header, just copy payload without FCS */
     memcpy(buf, zep + 1, res);
-out:
     return res;
 }
 
