@@ -37,6 +37,25 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Interface type of the upstream interface
+ *
+ * See @ref netdev_type_t for possible values
+ */
+#ifndef CONFIG_GNRC_DHCPV6_CLIENT_6LBR_UPSTREAM_TYPE
+#define CONFIG_GNRC_DHCPV6_CLIENT_6LBR_UPSTREAM_TYPE NETDEV_ANY
+#endif
+
+/**
+ * @brief   Interface index of the upstream interface
+ *
+ * If there are multiple interfaces of the same type, set this to select
+ * which one to use for the upstream.
+ */
+#ifndef CONFIG_GNRC_DHCPV6_CLIENT_6LBR_UPSTREAM_IDX
+#define CONFIG_GNRC_DHCPV6_CLIENT_6LBR_UPSTREAM_IDX (0)
+#endif
+
+/**
  * @brief   6LoWPAN compression context lifetime for configured prefixes in
  *          minutes
  *

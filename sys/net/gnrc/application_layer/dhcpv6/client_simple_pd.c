@@ -48,6 +48,12 @@ static gnrc_netif_t *_find_upstream_netif(void)
     if (CONFIG_GNRC_DHCPV6_CLIENT_6LBR_UPSTREAM) {
         return gnrc_netif_get_by_pid(CONFIG_GNRC_DHCPV6_CLIENT_6LBR_UPSTREAM);
     }
+
+    if (CONFIG_GNRC_DHCPV6_CLIENT_6LBR_UPSTREAM_TYPE != NETDEV_ANY) {
+        return gnrc_netif_get_by_type(CONFIG_GNRC_DHCPV6_CLIENT_6LBR_UPSTREAM_TYPE,
+                                      CONFIG_GNRC_DHCPV6_CLIENT_6LBR_UPSTREAM_IDX);
+    }
+
     while ((netif = gnrc_netif_iter(netif))) {
         if (!gnrc_netif_is_6lo(netif)) {
             LOG_WARNING("DHCPv6: Selecting interface %d as upstream\n",
