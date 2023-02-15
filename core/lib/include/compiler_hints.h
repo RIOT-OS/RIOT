@@ -69,6 +69,20 @@ extern "C" {
 #endif
 
 /**
+ * @def       NO_SANITIZE_ARRAY
+ * @brief     Tell the compiler that this array should be ignored during sanitizing.
+ * @details   In special cases, e.g. XFA, the address sanitizer might interfere
+ *            in a way that breaks the application. Use this macro to disable
+ *            address sanitizing for a given variable. Currently only utilised
+ *            by llvm.
+ */
+#if defined(__llvm__) || defined(__clang__)
+#define NO_SANITIZE_ARRAY __attribute__((no_sanitize("address")))
+#else
+#define NO_SANITIZE_ARRAY
+#endif
+
+/**
  * @def       UNREACHABLE()
  * @brief     Tell the compiler that this line of code cannot be reached.
  * @details   Most useful in junction with #NORETURN.

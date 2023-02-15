@@ -57,6 +57,11 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   Maximum bytes per frame for I2C operations
+ */
+#define PERIPH_I2C_MAX_BYTES_PER_FRAME 256
+
+/**
  * @brief   Override GPIO type
  * @{
  */
