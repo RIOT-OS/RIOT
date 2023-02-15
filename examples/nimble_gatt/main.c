@@ -79,10 +79,15 @@ typedef struct {
     uint16_t dummy;
 } reading_t;
 
-#define MAX_READINGS 1024
+#define MAX_READINGS 256
 reading_t readings_buffer[MAX_READINGS];
+size_t rlen = 0;
 
 reading_t get_reading(void);
+void right_shift_readings_buffer(void);
+void do_read(void);
+void log_readings(void);
+void read_and_show_Acc_values(void);
 
 int dev = I2C_DEV(0);
 
@@ -407,8 +412,8 @@ int main(void)
     /* Check rslt for any error codes */
     i2c_release(dev);
 
-    //int cont =0;
-    while(rslt == 0) {
+    int cont =0;
+    while(rslt == 0 && cont<10) {
         /* Wait for 100ms for the FIFO to fill */
         user_delay(100);
 
@@ -432,7 +437,7 @@ int main(void)
             return 1;
         }
 
-        for (size_t i = 0; i < acc_inst; i++) {
+        /*for (size_t i = 0; i < acc_inst; i++) {
             printf("Accel txyz is:     ");
             printf("%"PRIu32" %6.2f %6.2f %6.2f    ",
                 accel_data[i].sensortime,
@@ -440,9 +445,10 @@ int main(void)
                 accel_data[i].y / AC,
                 accel_data[i].z / AC);
             printf("\n");
-        }
+        }*/
 
-        //cont++;
+        read_and_show_Acc_values();
+        cont++;
     }
 
     int lenki = sprintf(rm_demo_write_data, "%f, %f, %f", (accel_data[1].x / AC), (accel_data[1].y /AC), (accel_data[1].z /AC));
@@ -483,4 +489,48 @@ reading_t get_reading(void)
 #endif
 
     return reading;
+}
+
+void right_shift_readings_buffer(void)
+{
+    size_t max = rlen < MAX_READINGS ? rlen++ : MAX_READINGS-1;
+    for (size_t i = max; i > 0; i--) {
+        readings_buffer[i] = readings_buffer[i-1];
+    }
+}
+
+void do_read(void)
+{
+    reading_t reading = get_reading();
+#ifdef PULGA_USE_RINGBUFFER
+    right_shift_readings_buffer();
+#endif
+    readings_buffer[0] = reading;
+}
+
+void log_readings(void)
+{
+    reading_t reading;
+    
+    for (size_t i = 0; i < rlen; i++) {
+        reading = readings_buffer[i];
+        printf("[Acc_readings] readings_buffer[%d]: ", i);
+        if (reading.accelerometerX)
+            printf("Acc_x: %u ", reading.accelerometerX);
+        if (reading.accelerometerY)
+            printf("Acc_y: %u ", reading.accelerometerY);
+        if (reading.accelerometerZ)
+            printf("Acc_z: %u ", reading.accelerometerZ);
+        if (reading.dummy)
+            printf("d: %u ", reading.dummy);
+        printf("\n");
+    }
+}
+
+void read_and_show_Acc_values(void)
+{
+    do_read();
+#if(LOG_LEVEL==4)
+    log_readings();
+#endif
 }
