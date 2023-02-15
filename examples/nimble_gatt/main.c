@@ -73,9 +73,9 @@ struct bmi160_sensor_data gyro_data[GYR_FRAMES], accel_data[ACC_FRAMES];
 int8_t rslt;
 
 typedef struct {
-    uint16_t accelerometerX;
-    uint16_t accelerometerY;
-    uint16_t accelerometerZ;
+    int16_t accelerometerX;
+    int16_t accelerometerY;
+    int16_t accelerometerZ;
     uint16_t dummy;
 } reading_t;
 
@@ -412,8 +412,8 @@ int main(void)
     /* Check rslt for any error codes */
     i2c_release(dev);
 
-    int cont =0;
-    while(rslt == 0 && cont<10) {
+    //int cont =0;
+    while(rslt == 0) {
         /* Wait for 100ms for the FIFO to fill */
         user_delay(100);
 
@@ -437,7 +437,7 @@ int main(void)
             return 1;
         }
 
-        /*for (size_t i = 0; i < acc_inst; i++) {
+        for (size_t i = 0; i < acc_inst; i++) {
             printf("Accel txyz is:     ");
             printf("%"PRIu32" %6.2f %6.2f %6.2f    ",
                 accel_data[i].sensortime,
@@ -445,10 +445,10 @@ int main(void)
                 accel_data[i].y / AC,
                 accel_data[i].z / AC);
             printf("\n");
-        }*/
+        }
 
         read_and_show_Acc_values();
-        cont++;
+        //cont++;
     }
 
     int lenki = sprintf(rm_demo_write_data, "%f, %f, %f", (accel_data[1].x / AC), (accel_data[1].y /AC), (accel_data[1].z /AC));
@@ -479,11 +479,11 @@ int main(void)
 reading_t get_reading(void)
 {
     reading_t reading = {0, 0, 0, 0};
-#ifdef DPULGA_ENABLE_ACCELEROMETER
+//#ifdef DPULGA_ENABLE_ACCELEROMETER
     reading.accelerometerX = (accel_data[0].x / AC);
-    reading.accelerometerY = (accel_data[0].y / AC)
-    reading.accelerometerz = (accel_data[0].z / AC)
-#endif
+    reading.accelerometerY = (accel_data[0].y / AC);
+    reading.accelerometerZ = (accel_data[0].z / AC);
+//#endif
 #ifdef PULGA_ENABLE_DUMMY
     reading.dummy = debug_dummy++;
 #endif
@@ -515,12 +515,12 @@ void log_readings(void)
     for (size_t i = 0; i < rlen; i++) {
         reading = readings_buffer[i];
         printf("[Acc_readings] readings_buffer[%d]: ", i);
-        if (reading.accelerometerX)
-            printf("Acc_x: %u ", reading.accelerometerX);
+        //if ((float)reading.accelerometerX)
+        printf("Acc_x: %f ", (float)reading.accelerometerX);
         if (reading.accelerometerY)
-            printf("Acc_y: %u ", reading.accelerometerY);
+            printf("Acc_y: %f ", (float)reading.accelerometerY);
         if (reading.accelerometerZ)
-            printf("Acc_z: %u ", reading.accelerometerZ);
+            printf("Acc_z: %f ", (float)reading.accelerometerZ);
         if (reading.dummy)
             printf("d: %u ", reading.dummy);
         printf("\n");
@@ -530,7 +530,7 @@ void log_readings(void)
 void read_and_show_Acc_values(void)
 {
     do_read();
-#if(LOG_LEVEL==4)
+//#if(LOG_LEVEL==4)
     log_readings();
-#endif
+//#endif
 }
