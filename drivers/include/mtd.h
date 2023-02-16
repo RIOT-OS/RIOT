@@ -251,25 +251,6 @@ struct mtd_desc {
                      uint32_t size);
 
     /**
-     * @brief   Write to the Memory Technology Device (MTD)
-     *
-     * @p addr + @p size must be inside a page boundary. @p addr can be anywhere
-     * but the buffer cannot overlap two pages.
-     *
-     * @param[in] dev       Pointer to the selected driver
-     * @param[in] buff      Pointer to the data to be written
-     * @param[in] addr      Starting address
-     * @param[in] size      Number of bytes
-     *
-     * @retval 0 on success
-     * @retval <0 value on error
-     */
-    int (*write)(mtd_dev_t *dev,
-                 const void *buff,
-                 uint32_t addr,
-                 uint32_t size);
-
-    /**
      * @brief   Write to the Memory Technology Device (MTD) using
      *          pagewise addressing.
      *
