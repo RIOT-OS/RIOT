@@ -43,9 +43,7 @@ extern "C"
         .sector_count = FLASHPAGE_NUMOF,            \
         .pages_per_sector = _pages_per_sector,      \
         .page_size = FLASHPAGE_SIZE / _pages_per_sector, \
-        .write_size = FLASHPAGE_WRITE_BLOCK_SIZE >= FLASHPAGE_WRITE_BLOCK_ALIGNMENT \
-            ? FLASHPAGE_WRITE_BLOCK_SIZE            \
-            : FLASHPAGE_WRITE_BLOCK_ALIGNMENT,      \
+        .write_size = 1                             \
     },                                              \
 }
 
@@ -59,6 +57,9 @@ extern const mtd_desc_t mtd_flashpage_driver;
  */
 typedef struct {
     mtd_dev_t base;     /**< MTD generic device */
+    uint32_t offset;    /**< Offset in terms of MTD pages, which must comprise
+                             a whole number of sectors from the start of the
+                             flash */
 } mtd_flashpage_t;
 
 #ifdef __cplusplus

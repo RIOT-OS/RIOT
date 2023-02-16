@@ -28,15 +28,18 @@
 #endif
 
 #if (__SIZEOF_POINTER__ == 2)
-#define TEST_ADDRESS1       (uint16_t)flashpage_addr(LAST_AVAILABLE_PAGE)
-#define TEST_ADDRESS2       (uint16_t)flashpage_addr(LAST_AVAILABLE_PAGE - 1)
+#define TEST_ADDRESS1       (uint16_t)((uintptr_t)flashpage_addr(LAST_AVAILABLE_PAGE) - (uintptr_t)CPU_FLASH_BASE)
+#define TEST_ADDRESS2       (uint16_t)((uintptr_t)flashpage_addr(LAST_AVAILABLE_PAGE - 1) - (uintptr_t)CPU_FLASH_BASE)
 #else
-#define TEST_ADDRESS1       (uint32_t)flashpage_addr(LAST_AVAILABLE_PAGE)
-#define TEST_ADDRESS2       (uint32_t)flashpage_addr(LAST_AVAILABLE_PAGE - 1)
+#define TEST_ADDRESS1       (uint32_t)((uintptr_t)flashpage_addr(LAST_AVAILABLE_PAGE) - (uintptr_t)CPU_FLASH_BASE)
+#define TEST_ADDRESS2       (uint32_t)((uintptr_t)flashpage_addr(LAST_AVAILABLE_PAGE - 1) - (uintptr_t)CPU_FLASH_BASE)
 #endif
-#define TEST_ADDRESS0       (FLASHPAGE_NUMOF - 1)
+/* Address of last flash page and not last available flashpage */
+#define TEST_ADDRESS0       (uint32_t)((uintptr_t)flashpage_addr((FLASHPAGE_NUMOF - 1)) - (uintptr_t)CPU_FLASH_BASE)
 
-static mtd_flashpage_t _dev = MTD_FLASHPAGE_INIT_VAL(8);
+#define PAGES_PER_SECTOR    8
+
+static mtd_flashpage_t _dev = MTD_FLASHPAGE_INIT_VAL(PAGES_PER_SECTOR);
 static mtd_dev_t *dev = &_dev.base;
 
 static void setup(void)
@@ -134,14 +137,83 @@ static void test_mtd_write_read(void)
     ret = mtd_erase(dev, TEST_ADDRESS1, dev->pages_per_sector * dev->page_size);
     TEST_ASSERT_EQUAL_INT(0, ret);
 
+    /* Out of bounds read */
+    ret = mtd_read(dev, buf_read, TEST_ADDRESS0 + FLASHPAGE_SIZE - 1, sizeof(buf_read));
+    TEST_ASSERT_EQUAL_INT(-EOVERFLOW, ret);
+
+    /* Out of bounds write */
+    ret = mtd_write(dev, buf, TEST_ADDRESS0 + FLASHPAGE_SIZE - 1, sizeof(buf));
+    TEST_ASSERT_EQUAL_INT(-EOVERFLOW, ret);
+
     /* Unaligned write / read */
-    ret = mtd_write(dev, buf, TEST_ADDRESS1 + sizeof(buf_empty), sizeof(buf));
-    TEST_ASSERT_EQUAL_INT(-EINVAL, ret);
+    ret = mtd_write(dev, &buf[1], TEST_ADDRESS1 + sizeof(buf_empty), sizeof(buf) - 1);
+    TEST_ASSERT_EQUAL_INT(0, ret);
 
     /* Only Cortex-M0 doesn't allow unaligned reads */
-#if defined(CPU_CORE_CORTEX_M0)
-    ret = mtd_read(dev, buf_read, TEST_ADDRESS1 + sizeof(buf_empty), sizeof(buf_read));
-    TEST_ASSERT_EQUAL_INT(-EINVAL, ret);
+    ret = mtd_read(dev, &buf_read[1], TEST_ADDRESS1 + sizeof(buf_empty), sizeof(buf_read) - 1);
+    TEST_ASSERT_EQUAL_INT(0, ret);
+}
+
+static void test_mtd_write_read_page(void)
+{
+#ifdef MODULE_MTD_WRITE_PAGE
+        const char buf[] __attribute__ ((aligned (FLASHPAGE_WRITE_BLOCK_ALIGNMENT)))
+            = "abcdefghijklmno";
+
+        uint8_t buf_empty[3];
+        memset(buf_empty, FLASHPAGE_ERASE_STATE, sizeof(buf_empty));
+        char buf_read[sizeof(buf) + sizeof(buf_empty)];
+        memset(buf_read, 0, sizeof(buf_read));
+        int ret;
+        /* convert last flash page to MTD page */
+        uint32_t last_vpage = LAST_AVAILABLE_PAGE * dev->pages_per_sector;
+        size_t vpage_size = dev->page_size;
+
+        /* write to the beginning of last available page */
+        ret = mtd_write_page(dev, buf, last_vpage, 0, sizeof(buf));
+        TEST_ASSERT_EQUAL_INT(0, ret);
+
+        /* read back data from which some is erased */
+        ret = mtd_read_page(dev, buf_read, last_vpage, 0, sizeof(buf_read));
+        TEST_ASSERT_EQUAL_INT(0, ret);
+        TEST_ASSERT_EQUAL_INT(0, memcmp(buf, buf_read, sizeof(buf)));
+        TEST_ASSERT_EQUAL_INT(0, memcmp(buf_empty, buf_read + sizeof(buf), sizeof(buf_empty)));
+
+        /* clean */
+        ret = mtd_erase_sector(dev, LAST_AVAILABLE_PAGE, 1);
+
+        /* write to the beginning of the MTD page before the last available flash page */
+        ret = mtd_write_page(dev, buf, last_vpage - 1, 0, sizeof(buf));
+        TEST_ASSERT_EQUAL_INT(0, ret);
+
+        /* read back data from which some is erased */
+        ret = mtd_read_page(dev, buf_read, last_vpage - 1, 0, sizeof(buf_read));
+        TEST_ASSERT_EQUAL_INT(0, ret);
+        TEST_ASSERT_EQUAL_INT(0, memcmp(buf, buf_read, sizeof(buf)));
+        TEST_ASSERT_EQUAL_INT(0, memcmp(buf_empty, buf_read + sizeof(buf), sizeof(buf_empty)));
+
+        /* clean*/
+        ret = mtd_erase_sector(dev, LAST_AVAILABLE_PAGE, 1);
+
+        /* write across flash page boundary */
+        ret = mtd_write_page(dev, buf, last_vpage - 1, vpage_size - sizeof(buf) + 1, sizeof(buf));
+        TEST_ASSERT_EQUAL_INT(0, ret);
+
+        /* read back data from which some is erased */
+        ret = mtd_read_page(dev, buf_read, last_vpage - 1, vpage_size - sizeof(buf) + 1, sizeof(buf_read));
+        TEST_ASSERT_EQUAL_INT(0, ret);
+        TEST_ASSERT_EQUAL_INT(0, memcmp(buf, buf_read, sizeof(buf)));
+        TEST_ASSERT_EQUAL_INT(0, memcmp(buf_empty, buf_read + sizeof(buf), sizeof(buf_empty)));
+
+        /* Out of bounds read */
+        ret = mtd_read_page(dev, buf_read,
+                            FLASHPAGE_NUMOF * dev->pages_per_sector, 0, sizeof(buf_read));
+        TEST_ASSERT_EQUAL_INT(-EOVERFLOW, ret);
+
+        /* Out of bounds write */
+        ret = mtd_write_page(dev, buf,
+                             FLASHPAGE_NUMOF * dev->pages_per_sector, 0, sizeof(buf));
+        TEST_ASSERT_EQUAL_INT(-EOVERFLOW, ret);
 #endif
 }
 
@@ -152,6 +224,7 @@ Test *tests_mtd_flashpage_tests(void)
         new_TestFixture(test_mtd_erase),
         new_TestFixture(test_mtd_write_erase),
         new_TestFixture(test_mtd_write_read),
+        new_TestFixture(test_mtd_write_read_page),
     };
 
     EMB_UNIT_TESTCALLER(mtd_flashpage_tests, setup, teardown, fixtures);
