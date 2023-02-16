@@ -139,10 +139,6 @@ int mtd_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t count)
         return -ENODEV;
     }
 
-    if (mtd->driver->write) {
-        return mtd->driver->write(mtd, src, addr, count);
-    }
-
     /* page size is always a power of two */
     const uint32_t page_shift = bitarithm_msb(mtd->page_size);
     const uint32_t page_mask = mtd->page_size - 1;
@@ -252,15 +248,6 @@ int mtd_write_page_raw(mtd_dev_t *mtd, const void *src, uint32_t page, uint32_t 
 {
     if (!mtd || !mtd->driver) {
         return -ENODEV;
-    }
-
-    if (mtd->driver->write_page == NULL) {
-        /* TODO: remove when all backends implement write_page */
-        if (mtd->driver->write) {
-            return mtd->driver->write(mtd, src, mtd->page_size * page + offset, count);
-        } else {
-            return -ENOTSUP;
-        }
     }
 
     /* Implementation assumes page size is <= INT_MAX and a power of two. */
