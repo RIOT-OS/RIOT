@@ -80,7 +80,9 @@ typedef struct {
 } reading_t;
 
 #define MAX_READINGS 256
-reading_t readings_buffer[MAX_READINGS];
+int16_t readings_bufferX[MAX_READINGS];
+int16_t readings_bufferY[MAX_READINGS];
+int16_t readings_bufferZ[MAX_READINGS];
 size_t rlen = 0;
 
 reading_t get_reading(void);
@@ -437,15 +439,15 @@ int main(void)
             return 1;
         }
 
-        for (size_t i = 0; i < acc_inst; i++) {
-            printf("Accel txyz is:     ");
+        /*for (size_t i = 0; i < acc_inst; i++) {
+            printf("Accel txyz %d is:   ", i);
             printf("%"PRIu32" %6.2f %6.2f %6.2f    ",
                 accel_data[i].sensortime,
                 accel_data[i].x / AC,
                 accel_data[i].y / AC,
                 accel_data[i].z / AC);
             printf("\n");
-        }
+        }*/
 
         read_and_show_Acc_values();
         //cont++;
@@ -476,57 +478,76 @@ int main(void)
     return 0;
 }
 
-reading_t get_reading(void)
+/*int16_t* get_readingX(void)
 {
-    reading_t reading = {0, 0, 0, 0};
+    int16_t readingX[ACC_FRAMES];
+
 //#ifdef DPULGA_ENABLE_ACCELEROMETER
-    reading.accelerometerX = (accel_data[0].x / AC);
-    reading.accelerometerY = (accel_data[0].y / AC);
-    reading.accelerometerZ = (accel_data[0].z / AC);
+    readingX[0] = (accel_data->x);
+
+    for (size_t i = 0; i < ACC_FRAMES; i++) {
+            printf("Accel txyz %d is:   ", i);
+            printf("%f ",
+                //accel_data[i].sensortime,
+                ((float)readingX[i] / AC));
+                //accel_data[i].y / AC,
+                //accel_data[i].z / AC);
+            printf("\n");
+    }
 //#endif
 #ifdef PULGA_ENABLE_DUMMY
     reading.dummy = debug_dummy++;
 #endif
 
-    return reading;
-}
+    return readingX;
+}*/
 
 void right_shift_readings_buffer(void)
 {
     size_t max = rlen < MAX_READINGS ? rlen++ : MAX_READINGS-1;
     for (size_t i = max; i > 0; i--) {
-        readings_buffer[i] = readings_buffer[i-1];
+        readings_bufferX[i] = readings_bufferX[i-ACC_FRAMES];
+        readings_bufferY[i] = readings_bufferY[i-ACC_FRAMES];
+        readings_bufferZ[i] = readings_bufferZ[i-ACC_FRAMES];
     }
 }
 
 void do_read(void)
 {
-    reading_t reading = get_reading();
+    //int16_t readingX[ACC_FRAMES];
+    //readingX[0] = accel_data->x;
+    //reading_t readingY = get_readingY();
+    //reading_t readingZ = get_readingZ();
 #ifdef PULGA_USE_RINGBUFFER
     right_shift_readings_buffer();
 #endif
-    readings_buffer[0] = reading;
+    for(size_t i=0; i<ACC_FRAMES; i++){
+        readings_bufferX[i] = accel_data[i].x;
+        readings_bufferY[i] = accel_data[i].y;
+        readings_bufferZ[i] = accel_data[i].z;
+    }
 }
 
 void log_readings(void)
 {
-    reading_t reading;
-    
+#ifdef PULGA_USE_RINGBUFFER
     for (size_t i = 0; i < rlen; i++) {
-        reading = readings_buffer[i];
         printf("[Acc_readings] readings_buffer[%d]: ", i);
-        //if ((float)reading.accelerometerX)
-        printf("Acc_x: %f ", (float)reading.accelerometerX);
-        if (reading.accelerometerY)
-            printf("Acc_y: %f ", (float)reading.accelerometerY);
-        if (reading.accelerometerZ)
-            printf("Acc_z: %f ", (float)reading.accelerometerZ);
-        if (reading.dummy)
-            printf("d: %u ", reading.dummy);
+        printf("Acc_x: %f ", ((float)readings_bufferX[i])/ AC);
+        printf("Acc_y: %f ", ((float)readings_bufferY[i])/ AC);
+        printf("Acc_z: %f ", ((float)readings_bufferZ[i])/ AC);
         printf("\n");
     }
+#else
+    for (size_t i = 0; i < ACC_FRAMES; i++) {
+        printf("[Acc_readings] readings_buffer[%d]: ", i);
+        printf("Acc_x: %f ", ((float)readings_bufferX[i])/ AC);
+        printf("Acc_y: %f ", ((float)readings_bufferY[i])/ AC);
+        printf("Acc_z: %f ", ((float)readings_bufferZ[i])/ AC);
+        printf("\n");
+    }
+#endif
 }
-
 void read_and_show_Acc_values(void)
 {
     do_read();

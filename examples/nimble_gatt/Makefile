@@ -19,7 +19,6 @@ USEMODULE += nimble_svc_gatt
 USEMODULE += nimble_autoadv
 CFLAGS += -DNIMBLE_AUTOADV_DEVICE_NAME='"NimBLE GATT Example"'
 CFLAGS += -DNIMBLE_AUTOADV_START_MANUALLY=1
-CFLAGS += -DPULGA_USE_RINGBUFFER=1
 
 SENSORS += accelerometer
 
@@ -40,6 +39,8 @@ USEMODULE += ztimer_msec
 ifneq (,$(filter accelerometer,$(SENSORS)))
 CFLAGS += -DPULGA_ENABLE_ACCELEROMETER=1
 endif
+
+CFLAGS += -DPULGA_USE_RINGBUFFER=0
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
