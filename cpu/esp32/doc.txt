@@ -858,7 +858,7 @@ as DAC channels with the #dac_init function, they can be used for other
 purposes.
 
 DACs are currently only supported for the \ref esp32_dac_channels_esp32
-"ESP32 SoC" variant.
+"ESP32 SoC" and the \ref esp32_dac_channels_esp32s2 "ESP32-S2 SoC" variant.
 
 [Back to table of contents](#esp32_toc)
 
