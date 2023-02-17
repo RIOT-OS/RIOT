@@ -1,0 +1,7 @@
+PSEUDOMODULES += esp32s2-lilygo-ttgo-t8-usb
+
+ifneq (,$(filter esp32s2-lilygo-ttgo-t8-usb,$(USEMODULE)))
+  PORT_LINUX ?= /dev/ttyACM0
+endif
+
+include $(RIOTBOARD)/common/esp32s2/Makefile.include
