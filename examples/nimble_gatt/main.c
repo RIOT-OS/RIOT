@@ -54,7 +54,7 @@
 
 /* Macros for frames to be read */
 
-#define ACC_FRAMES	10 /* 10 Frames are available every 100ms @ 100Hz */
+#define ACC_FRAMES	10 /* 10 Frames are available every 100ms @ 100Hz */ //Datasheet says you can take measurementes at 1600 Hz
 #define GYR_FRAMES	10
 #define MAG_FRAMES	10
 /* 10 frames containing a 1 byte header, 6 bytes of accelerometer,
@@ -318,13 +318,10 @@ static int gatt_svr_chr_access_rw_demo(
 
         puts("access to characteristic 'rw demo (read-only)'");
 
-        if (ctxt->op == BLE_GATT_ACCESS_OP_READ_CHR) {
-            char random_digit;
-            /* get random char between '0' and '9' */
-            random_digit = 48 + (rand() % 10);
-
+        if (ctxt->op == BLE_GATT_ACCESS_OP_READ_CHR && strcmp(rm_demo_write_data, "oi") ==0 ) {
+            
             snprintf(str_answer, STR_ANSWER_BUFFER_SIZE,
-                     "new random number: %c", random_digit);
+                     "Hello World!"); //A crude way to display a command recognition 
             puts(str_answer);
 
             rc = os_mbuf_append(ctxt->om, &str_answer, strlen(str_answer));
@@ -333,7 +330,17 @@ static int gatt_svr_chr_access_rw_demo(
 
             return rc;
         }
+        else{
+           snprintf(str_answer, STR_ANSWER_BUFFER_SIZE,
+                     "Nope");
+            puts(str_answer);
 
+            rc = os_mbuf_append(ctxt->om, &str_answer, strlen(str_answer)); 
+
+            puts("");
+
+            return rc;
+        }
         return 0;
     }
 
@@ -414,10 +421,9 @@ int main(void)
     /* Check rslt for any error codes */
     i2c_release(dev);
 
-    //int cont =0;
-    while(rslt == 0) {
+    while(rslt == 0 && 0) {
         /* Wait for 100ms for the FIFO to fill */
-        user_delay(100);
+        user_delay(10);
 
         /* It is VERY important to reload the length of the FIFO memory as after the
          * call to bmi160_get_fifo_data(), the bmi.fifo->length contains the
@@ -439,18 +445,10 @@ int main(void)
             return 1;
         }
 
-        /*for (size_t i = 0; i < acc_inst; i++) {
-            printf("Accel txyz %d is:   ", i);
-            printf("%"PRIu32" %6.2f %6.2f %6.2f    ",
-                accel_data[i].sensortime,
-                accel_data[i].x / AC,
-                accel_data[i].y / AC,
-                accel_data[i].z / AC);
-            printf("\n");
-        }*/
+        
 
         read_and_show_Acc_values();
-        //cont++;
+
     }
 
     int lenki = sprintf(rm_demo_write_data, "%f, %f, %f", (accel_data[1].x / AC), (accel_data[1].y /AC), (accel_data[1].z /AC));
@@ -478,29 +476,6 @@ int main(void)
     return 0;
 }
 
-/*int16_t* get_readingX(void)
-{
-    int16_t readingX[ACC_FRAMES];
-
-//#ifdef DPULGA_ENABLE_ACCELEROMETER
-    readingX[0] = (accel_data->x);
-
-    for (size_t i = 0; i < ACC_FRAMES; i++) {
-            printf("Accel txyz %d is:   ", i);
-            printf("%f ",
-                //accel_data[i].sensortime,
-                ((float)readingX[i] / AC));
-                //accel_data[i].y / AC,
-                //accel_data[i].z / AC);
-            printf("\n");
-    }
-//#endif
-#ifdef PULGA_ENABLE_DUMMY
-    reading.dummy = debug_dummy++;
-#endif
-
-    return readingX;
-}*/
 
 void right_shift_readings_buffer(void)
 {
@@ -518,9 +493,9 @@ void do_read(void)
     //readingX[0] = accel_data->x;
     //reading_t readingY = get_readingY();
     //reading_t readingZ = get_readingZ();
-#ifdef PULGA_USE_RINGBUFFER
-    right_shift_readings_buffer();
-#endif
+//#ifdef PULGA_USE_RINGBUFFER
+  //  right_shift_readings_buffer();
+//#endif
     for(size_t i=0; i<ACC_FRAMES; i++){
         readings_bufferX[i] = accel_data[i].x;
         readings_bufferY[i] = accel_data[i].y;
@@ -530,15 +505,15 @@ void do_read(void)
 
 void log_readings(void)
 {
-#ifdef PULGA_USE_RINGBUFFER
-    for (size_t i = 0; i < rlen; i++) {
+//#ifdef PULGA_USE_RINGBUFFER
+    /*for (size_t i = 0; i < rlen; i++) {
         printf("[Acc_readings] readings_buffer[%d]: ", i);
         printf("Acc_x: %f ", ((float)readings_bufferX[i])/ AC);
         printf("Acc_y: %f ", ((float)readings_bufferY[i])/ AC);
         printf("Acc_z: %f ", ((float)readings_bufferZ[i])/ AC);
         printf("\n");
-    }
-#else
+    }*/
+//#else
     for (size_t i = 0; i < ACC_FRAMES; i++) {
         printf("[Acc_readings] readings_buffer[%d]: ", i);
         printf("Acc_x: %f ", ((float)readings_bufferX[i])/ AC);
@@ -546,7 +521,7 @@ void log_readings(void)
         printf("Acc_z: %f ", ((float)readings_bufferZ[i])/ AC);
         printf("\n");
     }
-#endif
+//#endif
 }
 void read_and_show_Acc_values(void)
 {
