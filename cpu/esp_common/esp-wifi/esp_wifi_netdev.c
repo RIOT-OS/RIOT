@@ -947,20 +947,32 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
 
 #if defined(MODULE_ESP_WIFI_ENTERPRISE) && !defined(MODULE_ESP_WIFI_AP)
 
-#ifdef ESP_WIFI_EAP_ID
-    esp_wifi_sta_wpa2_ent_set_identity((const unsigned char *)ESP_WIFI_EAP_ID,
-                                       strlen(ESP_WIFI_EAP_ID));
-#endif /* ESP_WIFI_EAP_ID */
-#if defined(ESP_WIFI_EAP_USER) && defined(ESP_WIFI_EAP_PASS)
+#if !defined(WIFI_EAP_ID) && defined(ESP_WIFI_EAP_ID)
+#define WIFI_EAP_ID     ESP_WIFI_EAP_ID
+#endif
+
+#if !defined(WIFI_EAP_USER) && defined(ESP_WIFI_EAP_USER)
+#define WIFI_EAP_USER   ESP_WIFI_EAP_USER
+#endif
+
+#if !defined(WIFI_EAP_PASS) && defined(ESP_WIFI_EAP_PASS)
+#define WIFI_EAP_PASS   ESP_WIFI_EAP_PASS
+#endif
+
+#ifdef WIFI_EAP_ID
+    esp_wifi_sta_wpa2_ent_set_identity((const unsigned char *)WIFI_EAP_ID,
+                                       strlen(WIFI_EAP_ID));
+#endif /* WIFI_EAP_ID */
+#if defined(WIFI_EAP_USER) && defined(WIFI_EAP_PASS)
     ESP_WIFI_DEBUG("eap_user=%s eap_pass=%s\n",
-                   ESP_WIFI_EAP_USER, ESP_WIFI_EAP_PASS);
-    esp_wifi_sta_wpa2_ent_set_username((const unsigned char *)ESP_WIFI_EAP_USER,
-                                       strlen(ESP_WIFI_EAP_USER));
-    esp_wifi_sta_wpa2_ent_set_password((const unsigned char *)ESP_WIFI_EAP_PASS,
-                                       strlen(ESP_WIFI_EAP_PASS));
-#else /* defined(ESP_WIFI_EAP_USER) && defined(ESP_WIFI_EAP_PASS) */
-#error "ESP_WIFI_EAP_USER and ESP_WIFI_EAP_PASS have to be defined for EAP phase 2 authentication"
-#endif /* defined(ESP_WIFI_EAP_USER) && defined(ESP_WIFI_EAP_PASS) */
+                   WIFI_EAP_USER, WIFI_EAP_PASS);
+    esp_wifi_sta_wpa2_ent_set_username((const unsigned char *)WIFI_EAP_USER,
+                                       strlen(WIFI_EAP_USER));
+    esp_wifi_sta_wpa2_ent_set_password((const unsigned char *)WIFI_EAP_PASS,
+                                       strlen(WIFI_EAP_PASS));
+#else /* defined(WIFI_EAP_USER) && defined(WIFI_EAP_PASS) */
+#error "WIFI_EAP_USER and WIFI_EAP_PASS have to be defined for EAP phase 2 authentication"
+#endif /* defined(WIFI_EAP_USER) && defined(WIFI_EAP_PASS) */
     esp_wifi_sta_wpa2_ent_enable();
 #endif /* defined(MODULE_ESP_WIFI_ENTERPRISE) && !defined(MODULE_ESP_WIFI_AP) */
 

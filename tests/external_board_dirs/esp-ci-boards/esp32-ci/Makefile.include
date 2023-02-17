@@ -2,9 +2,9 @@
 # to also include the main board header
 INCLUDES += $(addprefix -I,$(wildcard $(RIOTBOARD)/esp32-wrover-kit/include))
 
-# ESP_WIFI_EAP_USER and ESP_WIFI_EAP_PASS have to be defined to compile the
+# WIFI_EAP_USER and WIFI_EAP_PASS have to be defined to compile the
 # optional module esp_wifi_enterprise in CI
-CFLAGS += -DESP_WIFI_EAP_USER=\"riot@riot-os.org\"
-CFLAGS += -DESP_WIFI_EAP_PASS=\"riot\"
+CFLAGS += -DWIFI_EAP_USER=\"riot@riot-os.org\"
+CFLAGS += -DWIFI_EAP_PASS=\"riot\"
 
 include $(RIOTBOARD)/esp32-wrover-kit/Makefile.include
