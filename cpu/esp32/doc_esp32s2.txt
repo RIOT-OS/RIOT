@@ -91,8 +91,8 @@ GPIO13 | In/Out | X   | X    | X       | -                | -
 GPIO14 | In/Out | X   | X    | X       | -                | -
 GPIO15 | In/Out | X   | X    | X       | XTAL_32K_P       | External 32k crystal
 GPIO16 | In/Out | X   | X    | X       | XTAL_32K_N       | External 32k crystal
-GPIO17 | In/Out | X   | X    | X       | -                | -
-GPIO18 | In/Out | X   | X    | X       | -                | -
+GPIO17 | In/Out | X   | X    | X       | DAC1             | -
+GPIO18 | In/Out | X   | X    | X       | DAC2             | -
 GPIO19 | In/Out | X   | X    | X       | USB D-           | USB 2.0 OTG / USB-JTAG bridge
 GPIO20 | In/Out | X   | X    | X       | USB D+           | USB 2.0 OTG / USB-JTAG bridge
 GPIO21 | In/Out | -   | X    | X       | -                | -
@@ -173,6 +173,10 @@ total:
 - Vref can be read with function #adc_line_vref_to_gpio at any ADC2 channel,
   that is at GPIO11 ... GPIO20.
 - GPIO3 is a strapping pin und shouldn't be used as ADC channel
+
+## DAC Channels {#esp32_dac_channels_esp32s2}
+
+ESP32 SoC supports 2 DAC lines at GPIO17 and GPIO18.
 
 ## I2C Interfaces {#esp32_i2c_interfaces_esp32s2}
 

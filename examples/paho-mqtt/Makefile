@@ -60,6 +60,6 @@ USEMODULE += ztimer_msec
 include $(RIOTBASE)/Makefile.include
 
 ifneq (,$(filter arch_esp,$(FEATURES_USED)))
-  CFLAGS += -DESP_WIFI_SSID=\"$(WIFI_SSID)\"
-  CFLAGS += -DESP_WIFI_PASS=\"$(WIFI_PASS)\"
+  CFLAGS += -DWIFI_SSID=\"$(WIFI_SSID)\"
+  CFLAGS += -DWIFI_PASS=\"$(WIFI_PASS)\"
 endif

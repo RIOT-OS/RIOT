@@ -59,7 +59,7 @@ static uint32_t fill_memory(struct node *head)
 
     total = 0;
     while (head && (head->ptr = malloc(CHUNK_SIZE)) && total < MAX_MEM) {
-        printf("Allocated %"PRIu32" Bytes at 0x%p, total %"PRIu32"\n",
+        printf("Allocated %"PRIu32" Bytes at %p, total %"PRIu32"\n",
                (uint32_t)CHUNK_SIZE, head->ptr, total += CHUNK_SIZE);
         memset(head->ptr, '@', CHUNK_SIZE);
         head = head->next = malloc(sizeof(struct node));
@@ -88,7 +88,7 @@ static void free_memory(struct node *head)
                 total -= CHUNK_SIZE;
                 freed++;
             }
-            printf("Free %"PRIu32" Bytes at 0x%p, total %"PRIu32"\n",
+            printf("Free %"PRIu32" Bytes at %p, total %"PRIu32"\n",
                    (uint32_t)CHUNK_SIZE, head->ptr, total);
             free(head->ptr);
         }

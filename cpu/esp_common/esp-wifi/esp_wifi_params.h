@@ -44,15 +44,23 @@
 /**
  * @brief   SSID of the AP to be used.
  */
-#ifndef ESP_WIFI_SSID
-#define ESP_WIFI_SSID       "RIOT_AP"
+#ifndef WIFI_SSID
+#ifdef ESP_WIFI_SSID
+#define WIFI_SSID           ESP_WIFI_SSID
+#else
+#define WIFI_SSID           "RIOT_AP"
+#endif
 #endif
 
 /**
  * @brief   Passphrase used for the AP as clear text (max. 64 chars).
  */
 #ifdef DOXYGEN
-#define ESP_WIFI_PASS       "ThisistheRIOTporttoESP"
+#define WIFI_PASS           "ThisistheRIOTporttoESP"
+#endif
+
+#if !defined(WIFI_PASS) && defined(ESP_WIFI_PASS)
+#define WIFI_PASS           ESP_WIFI_PASS
 #endif
 
 #if defined(MODULE_ESP_WIFI_AP) || defined(DOXYGEN)
@@ -61,7 +69,7 @@
  * @brief   Use dynamic SSID for the SoftAP
  *
  * If set to 1, the SSID for the SoftAP is generated dynamically by extending
- * the defined SSID (`ESP_WIFI_SSID`) with the MAC address of the SoftAP
+ * the defined SSID (`WIFI_SSID`) with the MAC address of the SoftAP
  * interface used, e.g.: `RIOT_AP_aabbccddeeff`
  */
 #ifndef ESP_WIFI_SSID_DYNAMIC

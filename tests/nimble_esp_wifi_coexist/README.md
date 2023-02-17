@@ -8,7 +8,7 @@ ESP32x WiFi interface simultaneously.
 
 Comile and flash the application with command
 ```
-CFLAGS='-DESP_WIFI_SSID=\"myssid\" -DESP_WIFI_PASS=\"mypass\"'
+CFLAGS='-DWIFI_SSID=\"myssid\" -DWIFI_PASS=\"mypass\"'
 BOARD=esp32-wroom-32 make -C tests/nimble_esp_wifi_coexist flash term
 ```
 Once the test application is flashed and the WiFi connection is established,
