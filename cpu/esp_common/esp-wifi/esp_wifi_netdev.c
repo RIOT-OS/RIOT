@@ -797,9 +797,9 @@ static const netdev_driver_t _esp_wifi_driver =
  */
 static wifi_config_t wifi_config_sta = {
     .sta = {
-        .ssid = ESP_WIFI_SSID,
-#if !defined(MODULE_ESP_WIFI_ENTERPRISE) && defined(ESP_WIFI_PASS)
-        .password = ESP_WIFI_PASS,
+        .ssid = WIFI_SSID,
+#if !defined(MODULE_ESP_WIFI_ENTERPRISE) && defined(WIFI_PASS)
+        .password = WIFI_PASS,
 #endif
         .channel = 0,
         .scan_method = WIFI_ALL_CHANNEL_SCAN,
@@ -830,12 +830,12 @@ static wifi_config_t wifi_config_sta = {
  */
 static wifi_config_t wifi_config_ap = {
     .ap = {
-#ifdef ESP_WIFI_SSID
-        .ssid = ESP_WIFI_SSID,
-        .ssid_len = ARRAY_SIZE(ESP_WIFI_SSID) - 1,
+#ifdef WIFI_SSID
+        .ssid = WIFI_SSID,
+        .ssid_len = sizeof(WIFI_SSID) - 1,
 #endif
-#ifdef ESP_WIFI_PASS
-        .password = ESP_WIFI_PASS,
+#ifdef WIFI_PASS
+        .password = WIFI_PASS,
         .authmode = WIFI_AUTH_WPA2_PSK,
 #else
         .authmode = WIFI_AUTH_OPEN,
@@ -923,7 +923,7 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
     uint8_t mac[ETHERNET_ADDR_LEN];
     esp_wifi_get_mac(ESP_MAC_WIFI_SOFTAP, mac);
     sprintf((char*)wifi_config_ap.ap.ssid, "%s_%02x%02x%02x%02x%02x%02x",
-            ESP_WIFI_SSID, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+            WIFI_SSID, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     wifi_config_ap.ap.ssid_len = strlen((char*)wifi_config_ap.ap.ssid);
 #endif /* IS_ACTIVE(ESP_WIFI_SSID_DYNAMIC) */
     /* set the SoftAP configuration */
