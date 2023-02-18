@@ -99,9 +99,16 @@ static void _configure_dhcpv6_client(void)
 {
     gnrc_netif_t *netif = NULL;
     gnrc_netif_t *upstream = _find_upstream_netif();
+
+    if (upstream == NULL) {
+        LOG_ERROR("DHCPv6: No upstream interface found!\n");
+        return;
+    }
+
     if (IS_ACTIVE(MODULE_DHCPV6_CLIENT_IA_NA)) {
         upstream->ipv6.aac_mode |= GNRC_NETIF_AAC_DHCP;
     }
+
     while ((netif = gnrc_netif_iter(netif))) {
         if (IS_USED(MODULE_GNRC_DHCPV6_CLIENT_6LBR)
             && !gnrc_netif_is_6lo(netif)) {
