@@ -72,11 +72,11 @@ can also be used by other devices.
 The LILYGO TTGO T8 ESP32-S2 has a USB-to-UART bridge on board. The USB D-/D+
 signals of the USB-C connector are connected via DIP switches either to this
 USB-to-UART bridge (default) or to GPIO19/GPIO20 of the ESP32-S2. To use the
-USB-OTG interface of the ESP32-S2, the USB D-/D+ signals must be connected to
+USB OTG interface of the ESP32-S2, the USB D-/D+ signals must be connected to
 GPIO19 and GPIO20, see section \ref esp32s2_lilygo_ttgo_t8_pinout "Pinout".
-If the USB-to-UART bridge is used, module `stdio_cdc_acm` or module
-`stdio_tinyusb_cdc_acm` can be enabled to use the USB interface also for the
-console.
+To use the USB OTG interface also for the console in this case, either the
+`stdio_cdc_acm` or the `stdio_tinyusb_cdc_acm` module must be enabled.
+This is automatically the case if the USBUS or tinyUSB stack is used.
 
 The LILYGO TTGO T8 ESP32-S2 has a 32.768 kHz crystal on the board, which is
 connected to GPIO15 and GPIO16 via DIP switches (default). The crystal can
