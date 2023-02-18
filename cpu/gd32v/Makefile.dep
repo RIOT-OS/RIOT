@@ -7,4 +7,8 @@ ifneq (,$(filter periph_pm,$(USEMODULE)))
   FEATURES_REQUIRED += periph_wdt
 endif
 
+ifneq (,$(filter periph_i2c,$(USEMODULE)))
+  USEMODULE += ztimer_usec
+endif
+
 include $(RIOTCPU)/riscv_common/Makefile.dep

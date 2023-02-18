@@ -30,6 +30,7 @@ config CPU_FAM_GD32V
 
     select MODULE_PERIPH_CLIC if TEST_KCONFIG
     select MODULE_PERIPH_WDT if MODULE_PERIPH_PM && HAS_PERIPH_WDT
+    select ZTIMER_USEC if MODULE_PERIPH_I2C
     select PACKAGE_NMSIS_SDK
 
 menu "GD32V configuration"

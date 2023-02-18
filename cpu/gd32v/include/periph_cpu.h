@@ -397,7 +397,7 @@ typedef struct {
     gpio_t scl_pin;             /**< scl pin number */
     gpio_t sda_pin;             /**< sda pin number */
     uint32_t rcu_mask;          /**< bit in clock enable register */
-    uint8_t irqn;               /**< I2C event interrupt number */
+    IRQn_Type irqn;             /**< I2C event interrupt number */
 } i2c_conf_t;
 
 /**
