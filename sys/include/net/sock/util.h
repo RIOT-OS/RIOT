@@ -31,6 +31,11 @@
 #include "net/sock/udp.h"
 #include "net/sock/tcp.h"
 
+#ifdef MODULE_SOCK_DTLS
+#include "net/credman.h"
+#include "net/sock/dtls.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -268,6 +273,29 @@ static inline bool sock_udp_ep_equal(const sock_udp_ep_t *a,
     return sock_tl_ep_equal(a, b);
 }
 
+#if defined(MODULE_SOCK_DTLS) || DOXYGEN
+/**
+ * @brief   Helper function to establish a DTLS connection
+ *
+ * @param[out]  sock_udp     Struct to store the underlying UDP socket
+ * @param[out]  sock_dtls    Struct for the actual DTLS socket
+ * @param[out]  session      Struct to store DTLS session information
+ * @param[in]   tag          Credential tag to use
+ * @param[in]   local        Local endpoint, must not be NULL
+ * @param[in]   remote       Server endpoint to connect to
+ * @param[in]   work_buf     Buffer used to negotiate connection
+ * @param[in]   work_buf_len Size of @p work buf. Should be at least
+ *                           160 bytes for AES_128_CCM_8 with PSK
+ *
+ * @return  0 on success
+ * @return negative error otherwise (see @ref sock_dtls_recv_aux)
+ */
+int sock_dtls_establish_session(sock_udp_t *sock_udp, sock_dtls_t *sock_dtls,
+                                sock_dtls_session_t *session, credman_tag_t tag,
+                                sock_udp_ep_t *local, const sock_udp_ep_t *remote,
+                                void *work_buf, size_t work_buf_len);
+#endif
+
 /**
  * @defgroup    net_sock_util_conf SOCK utility functions compile configurations
  * @ingroup     net_sock_conf
@@ -296,6 +324,20 @@ static inline bool sock_udp_ep_equal(const sock_udp_ep_t *a,
 #define CONFIG_SOCK_URLPATH_MAXLEN     (64U)
 #endif
 /** @} */
+
+/**
+ * @brief   Timeout in milliseconds for sock_dtls_establish_session()
+ */
+#ifndef CONFIG_SOCK_DTLS_TIMEOUT_MS
+#define CONFIG_SOCK_DTLS_TIMEOUT_MS    (1000U)
+#endif
+
+/**
+ * @brief   Number of DTLS handshake retries for sock_dtls_establish_session()
+ */
+#ifndef CONFIG_SOCK_DTLS_RETRIES
+#define CONFIG_SOCK_DTLS_RETRIES       (2)
+#endif
 
 #ifdef __cplusplus
 }

@@ -28,14 +28,22 @@
 
 #include "net/sock/udp.h"
 #include "net/sock/util.h"
+#include "net/iana/portrange.h"
 
 #if defined(MODULE_DNS)
 #include "net/dns.h"
 #endif
 
+#ifdef MODULE_RANDOM
+#include "random.h"
+#endif
+
 #ifdef MODULE_FMT
 #include "fmt.h"
 #endif
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 #define PORT_STR_LEN    (5)
 #define NETIF_STR_LEN   (5)
@@ -347,3 +355,81 @@ bool sock_tl_ep_equal(const struct _sock_tl_ep *a,
         return false;
     }
 }
+
+#if defined(MODULE_SOCK_DTLS)
+int sock_dtls_establish_session(sock_udp_t *sock_udp, sock_dtls_t *sock_dtls,
+                                sock_dtls_session_t *session, credman_tag_t tag,
+                                sock_udp_ep_t *local, const sock_udp_ep_t *remote,
+                                void *work_buf, size_t work_buf_len)
+{
+    int res;
+    uint32_t timeout_ms = CONFIG_SOCK_DTLS_TIMEOUT_MS;
+    uint8_t retries = CONFIG_SOCK_DTLS_RETRIES;
+
+    bool auto_port = local->port == 0;
+    do {
+        if (auto_port) {
+            /* choose random ephemeral port, since DTLS requires a local port */
+            local->port = random_uint32_range(IANA_DYNAMIC_PORTRANGE_MIN,
+                                              IANA_DYNAMIC_PORTRANGE_MAX);
+        }
+        /* connect UDP socket */
+        res = sock_udp_create(sock_udp, local, remote, 0);
+    } while (auto_port && (res == -EADDRINUSE));
+
+    if (res < 0) {
+        return res;
+    }
+
+    /* create DTLS socket on to of UDP socket */
+    res = sock_dtls_create(sock_dtls, sock_udp, tag,
+                           SOCK_DTLS_1_2, SOCK_DTLS_CLIENT);
+    if (res < 0) {
+        DEBUG("Unable to create DTLS sock: %s\n", strerror(-res));
+        sock_udp_close(sock_udp);
+        return res;
+    }
+
+    while (1) {
+        mutex_t lock = MUTEX_INIT_LOCKED;
+        ztimer_t timeout;
+
+        /* unlock lock after timeout */
+        ztimer_mutex_unlock(ZTIMER_MSEC, &timeout, timeout_ms, &lock);
+
+        /* create DTLS session */
+        res = sock_dtls_session_init(sock_dtls, remote, session);
+        if (res >= 0) {
+            /* handle handshake */
+            res = sock_dtls_recv(sock_dtls, session, work_buf,
+                                 work_buf_len, timeout_ms * US_PER_MS);
+            if (res == -SOCK_DTLS_HANDSHAKE) {
+                DEBUG("DTLS handshake successful\n");
+                ztimer_remove(ZTIMER_MSEC, &timeout);
+                return 0;
+            }
+            DEBUG("Unable to establish DTLS handshake: %s\n", strerror(-res));
+
+        } else {
+            DEBUG("Unable to initialize DTLS session: %s\n", strerror(-res));
+        }
+
+        sock_dtls_session_destroy(sock_dtls, session);
+
+        if (retries--) {
+            /* wait for timeout to expire */
+            mutex_lock(&lock);
+        } else {
+            ztimer_remove(ZTIMER_MSEC, &timeout);
+            break;
+        }
+
+        /* see https://datatracker.ietf.org/doc/html/rfc6347#section-4.2.4.1 */
+        timeout_ms *= 2U;
+    }
+
+    sock_dtls_close(sock_dtls);
+    sock_udp_close(sock_udp);
+    return res;
+}
+#endif
