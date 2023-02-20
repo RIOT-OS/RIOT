@@ -30,10 +30,6 @@
 #ifndef CRYPTO_AES_H
 #define CRYPTO_AES_H
 
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
-#include <stdlib.h>
 #include <stdint.h>
 #include "crypto/ciphers.h"
 
@@ -63,17 +59,6 @@ typedef uint8_t u8;
 #define AES_KEY_SIZE_192    24
 #define AES_KEY_SIZE_256    32
 /** @} */
-
-/**
- * @brief AES key
- * @see cipher_context_t
- */
-typedef struct aes_key_st {
-    /** @cond INTERNAL */
-    uint32_t rd_key[4 * (AES_MAXNR + 1)];
-    int rounds;
-    /** @endcond */
-} AES_KEY;
 
 /**
  * @brief the cipher_context_t-struct adapted for AES
