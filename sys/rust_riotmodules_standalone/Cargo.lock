@@ -446,7 +446,6 @@ checksum = "456c603be3e8d448b072f410900c09faf164fbce2d480456f50eea6e25f9c848"
 [[package]]
 name = "riot-sys"
 version = "0.7.9"
-source = "git+https://github.com/RIOT-OS/rust-riot-sys#81d791789e07a2e1019385ef2d1665348dea1df4"
 dependencies = [
  "bindgen",
  "c2rust-asm-casts",
@@ -461,7 +460,6 @@ dependencies = [
 [[package]]
 name = "riot-wrappers"
 version = "0.8.1"
-source = "git+https://github.com/RIOT-OS/rust-riot-wrappers#9c29faf55d4c14d2d7f55f8df5059c52af4e5317"
 dependencies = [
  "bare-metal",
  "cstr",
@@ -476,6 +474,7 @@ dependencies = [
  "riot-sys",
  "shlex 0.1.1",
  "switch-hal",
+ "syn",
 ]
 
 [[package]]
