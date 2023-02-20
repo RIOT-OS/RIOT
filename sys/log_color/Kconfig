@@ -10,6 +10,9 @@ choice LOG
 config MODULE_LOG_COLOR
     bool "log_color: colored log output"
     select MODULE_LOG
+    # log_color fails to compile with -Wformat-nonliteral but this is required
+    # for the wrapped stdio that pushes the format string into progmem
+    depends on !CPU_ARCH_AVR8
     help
       Implements a logging module with colored output.
 
