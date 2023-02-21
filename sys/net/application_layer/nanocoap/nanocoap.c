@@ -41,6 +41,24 @@
 #define COAP_RST                (3)
 /** @} */
 
+#ifdef MODULE_NANOCOAP_RESOURCES
+/**
+ * @brief   CoAP resources XFA
+ */
+XFA_INIT_CONST(coap_resource_t, coap_resources_xfa);
+
+/**
+ * @brief   Add well-known .core handler
+ */
+#if CONFIG_NANOCOAP_SERVER_WELL_KNOWN_CORE
+NANOCOAP_RESOURCE(well_known_core) COAP_WELL_KNOWN_CORE_DEFAULT_HANDLER;
+#endif
+
+/* re-define coap_resources for compatibility with non-XFA version */
+#define coap_resources ((const coap_resource_t *)coap_resources_xfa)
+#define coap_resources_numof XFA_LEN(coap_resource_t, coap_resources_xfa)
+#endif
+
 static int _decode_value(unsigned val, uint8_t **pkt_pos_ptr, uint8_t *pkt_end);
 static uint32_t _decode_uint(uint8_t *pkt_pos, unsigned nbytes);
 static size_t _encode_uint(uint32_t *val);

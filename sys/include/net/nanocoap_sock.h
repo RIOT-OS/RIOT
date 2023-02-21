@@ -22,16 +22,22 @@
  *
  * ## Server Operation ##
  *
- * See the nanocoap_server example, which is built on the nanocoap_server()
- * function. A server must define an array of coap_resource_t resources for
- * which it responds. See the declarations of `coap_resources` and
- * `coap_resources_numof`. The array contents must be ordered by the resource
- * path, specifically the ASCII encoding of the path characters (digit and
- * capital precede lower case). Also see _Server path matching_ in the base
- * [nanocoap](group__net__nanocoap.html) documentation.
+ * See the nanocoap_server example, which is built on the `nanocoap_server()`
+ * function. A server must define CoAP resources for which it responds.
+ *
+ * Each @ref coap_resource_t is added to the XFA with NANOCOAP_RESOURCE(name)
+ * followed by the declaration of the CoAP resource, e.g.:
+ *
+ * ```C
+ * NANOCOAP_RESOURCE(board) {
+ *   .path = "/board", .methods = COAP_GET, .handler = _board_handler,
+ * };
+ * ```
  *
  * nanocoap itself provides the COAP_WELL_KNOWN_CORE_DEFAULT_HANDLER entry for
  * `/.well-known/core`.
+ *
+ * To use the CoAP resource XFA, enable the `nanocoap_resources` module.
  *
  * ### Handler functions ###
  *
