@@ -552,7 +552,8 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
     return len;
 }
 
-ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, uint8_t *token, size_t token_len, unsigned code, uint16_t id)
+ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, uint8_t *token,
+                       size_t token_len, unsigned code, uint16_t id)
 {
     assert(!(type & ~0x3));
     assert(!(token_len & ~0x1f));
@@ -658,7 +659,7 @@ static size_t _encode_uint(uint32_t *val)
 
     /* count number of used bytes */
     uint32_t tmp = *val;
-    while(tmp) {
+    while (tmp) {
         size++;
         tmp >>= 8;
     }
