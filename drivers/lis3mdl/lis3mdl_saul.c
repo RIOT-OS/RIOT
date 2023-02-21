@@ -29,7 +29,7 @@ static int read_mag(const void *dev, phydat_t *res)
 
     lis3mdl_read_mag(d, (lis3mdl_3d_data_t *)res);
 
-    res->unit = UNIT_GS;
+    res->unit = UNIT_GAUSS;
     res->scale = -3;
     return 3;
 }

@@ -31,7 +31,7 @@ static int read_mag(const void *dev, phydat_t *res)
         /* Read failure */
         return -ECANCELED;
     }
-    res->unit = UNIT_GS;
+    res->unit = UNIT_GAUSS;
     res->scale = -3;
     return 3;
 }
@@ -48,7 +48,7 @@ static int read_acc(const void *dev, phydat_t *res)
         res->scale = 0;
     }
     else {
-        res->unit = UNIT_G;
+        res->unit = UNIT_G_FORCE;
         if (((fxos8700_t *)dev)->p.acc_range == FXOS8700_REG_XYZ_DATA_CFG_FS__2G) {
             res->scale = -4;
         }

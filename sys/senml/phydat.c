@@ -24,7 +24,7 @@ static uint8_t phydat_unit_to_senml_unit(uint8_t unit)
     case UNIT_M:       return SENML_UNIT_METER;
     case UNIT_M2:      return SENML_UNIT_SQUARE_METER;
     case UNIT_M3:      return SENML_UNIT_CUBIC_METER;
-    case UNIT_GR:      return SENML_UNIT_GRAM;
+    case UNIT_GRAM:    return SENML_UNIT_GRAM;
     case UNIT_A:       return SENML_UNIT_AMPERE;
     case UNIT_V:       return SENML_UNIT_VOLT;
     case UNIT_W:       return SENML_UNIT_WATT;
@@ -45,8 +45,8 @@ static uint8_t phydat_unit_to_senml_unit(uint8_t unit)
 
     /* Incompatible units */
     case UNIT_TEMP_F:  return SENML_UNIT_NONE;      /* use K or Cel instead */
-    case UNIT_GS:      return SENML_UNIT_NONE;      /* use T instead */
-    case UNIT_G:       return SENML_UNIT_NONE;      /* use m/s2 instead */
+    case UNIT_GAUSS:   return SENML_UNIT_NONE;      /* use T instead */
+    case UNIT_G_FORCE: return SENML_UNIT_NONE;      /* use m/s2 instead */
     case UNIT_BAR:     return SENML_UNIT_NONE;      /* use Pa or hPa instead */
     case UNIT_TIME:    return SENML_UNIT_NONE;      /* split into second/minute/hour */
     case UNIT_DATE:    return SENML_UNIT_NONE;      /* split into day/month/year */
@@ -87,7 +87,7 @@ void phydat_to_senml_float(senml_value_t *senml, const phydat_t *phydat, const u
         value = (value + 459.67) * (5. / 9.);
         senml->attr.unit = SENML_UNIT_KELVIN;
         break;
-    case UNIT_G:
+    case UNIT_G_FORCE:
         /* convert gravitational acceleration to acceleration */
         value *= 9.80665;
         senml->attr.unit = SENML_UNIT_METER_PER_SQUARE_SECOND;
@@ -100,7 +100,7 @@ void phydat_to_senml_float(senml_value_t *senml, const phydat_t *phydat, const u
         value *= 0.001;
         senml->attr.unit = SENML_UNIT_KILOGRAM_PER_CUBIC_METER;
         break;
-    case UNIT_GS:
+    case UNIT_GAUSS:
         value *= 0.0001;
         senml->attr.unit = SENML_UNIT_TESLA;
         break;
@@ -138,7 +138,7 @@ void phydat_to_senml_decimal(senml_value_t *senml, const phydat_t *phydat, const
         e -= 3;
         senml->attr.unit = SENML_UNIT_KILOGRAM_PER_CUBIC_METER;
         break;
-    case UNIT_GS:
+    case UNIT_GAUSS:
         e -= 4;
         senml->attr.unit = SENML_UNIT_TESLA;
         break;

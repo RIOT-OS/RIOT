@@ -106,14 +106,14 @@ const char *phydat_unit_to_str(uint8_t unit)
         case UNIT_M:        return "m";
         case UNIT_M2:       return "m^2";
         case UNIT_M3:       return "m^3";
-        case UNIT_G:        return "g";
+        case UNIT_G_FORCE:  return "gₙ";
         case UNIT_DPS:      return "dps";
-        case UNIT_GR:       return "G";
+        case UNIT_GRAM:     return "g";
         case UNIT_A:        return "A";
         case UNIT_V:        return "V";
         case UNIT_W:        return "W";
         case UNIT_DBM:      return "dBm";
-        case UNIT_GS:       return "Gs";
+        case UNIT_GAUSS:    return "Gs";
         case UNIT_T:        return "T";
         case UNIT_BAR:      return "Bar";
         case UNIT_PA:       return "Pa";
