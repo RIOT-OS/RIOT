@@ -1100,8 +1100,7 @@ uint8_t gcoap_op_state(void);
  *                      (i.e. usage of modules no `gcoap_dtls`, ...) this will
  *                      be ignored and @ref GCOAP_SOCKET_TYPE_UDP assumed.
  *
- * @todo    add support for `JSON CoRE Link Format`
- * @todo    add support for 'CBOR CoRE Link Format`
+ * @todo    add support for CoRAL once it is done
  *
  * @return  the number of bytes written to @p buf
  * @return  -1 on error
