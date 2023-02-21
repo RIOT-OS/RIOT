@@ -946,7 +946,7 @@ static ssize_t _well_known_core_handler(coap_pkt_t* pdu, uint8_t *buf, size_t le
     coap_opt_add_format(pdu, COAP_FORMAT_LINK);
     ssize_t plen = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
 
-    plen += gcoap_get_resource_list_tl(pdu->payload, (size_t)pdu->payload_len,
+    plen += gcoap_get_resource_list(pdu->payload, (size_t)pdu->payload_len,
                                        COAP_FORMAT_LINK,
                                        (gcoap_socket_type_t)coap_request_ctx_get_tl_type(ctx));
     return plen;
@@ -1706,7 +1706,7 @@ uint8_t gcoap_op_state(void)
     return count;
 }
 
-int gcoap_get_resource_list_tl(void *buf, size_t maxlen, uint8_t cf,
+int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf,
                                gcoap_socket_type_t tl_type)
 {
     assert(cf == COAP_FORMAT_LINK);

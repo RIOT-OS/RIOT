@@ -129,9 +129,6 @@ ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
   ifneq (,$(filter sht1x,$(USEMODULE)))
     USEMODULE += shell_cmd_sht1x
   endif
-  ifneq (,$(filter suit_transport_worker,$(USEMODULE)))
-    USEMODULE += shell_cmd_suit
-  endif
   ifneq (,$(filter vfs,$(USEMODULE)))
     USEMODULE += shell_cmd_vfs
   endif

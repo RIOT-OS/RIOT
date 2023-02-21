@@ -286,7 +286,7 @@ int cord_ep_register(const sock_udp_ep_t *remote, const char *regif)
 
     /* add the resource description as payload */
     res = gcoap_get_resource_list(pkt.payload, pkt.payload_len,
-                                  COAP_FORMAT_LINK);
+                                  COAP_FORMAT_LINK, GCOAP_SOCKET_TYPE_UNDEF);
     if (res < 0) {
         retval = CORD_EP_ERR;
         goto end;
