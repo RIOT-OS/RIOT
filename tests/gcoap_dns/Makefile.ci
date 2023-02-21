@@ -21,6 +21,8 @@ BOARD_INSUFFICIENT_MEMORY := \
     samd10-xmini \
     saml10-xpro \
     saml11-xpro \
+    seeedstudio-gd32 \
+    sipeed-longan-nano \
     slstk3400a \
     stk3200 \
     stm32f030f4-demo \
