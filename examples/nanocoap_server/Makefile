@@ -18,6 +18,7 @@ USEMODULE += sock_udp
 USEMODULE += gnrc_icmpv6_echo
 
 USEMODULE += nanocoap_sock
+USEMODULE += nanocoap_server
 
 USEMODULE += xtimer
 
