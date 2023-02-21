@@ -32,9 +32,11 @@ BOARD_INSUFFICIENT_MEMORY := \
     samd10-xmini \
     saml10-xpro \
     saml11-xpro \
+    seeedstudio-gd32 \
     seeeduino_xiao \
     sensebox_samd21 \
     serpente \
+    sipeed-longan-nano \
     slstk3400a \
     sodaq-autonomo \
     sodaq-explorer \

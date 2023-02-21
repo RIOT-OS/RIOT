@@ -13,6 +13,8 @@ BOARD_BLACKLIST += \
                    mulle \
                    pinetime \
                    ruuvitag \
+                   seeedstudio-gd32 \
+                   sipeed-longan-nano \
                    stm32f429i-disco \
                    stm32f4discovery \
                    thingy52 \

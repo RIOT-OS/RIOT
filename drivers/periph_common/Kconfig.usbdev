@@ -44,7 +44,6 @@ endif
 
 config MODULE_PERIPH_USBDEV_CLK
     bool
-    depends on HAS_PERIPH_USBDEV
     help
         Enable the USB device specific clock settings, if there are any
 

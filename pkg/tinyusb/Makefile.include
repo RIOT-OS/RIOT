@@ -30,6 +30,8 @@ else ifeq (samd21,$(CPU))
   CFLAGS += -DCFG_TUSB_MCU=OPT_MCU_SAMD21
 else ifeq (samd5x,$(CPU))
   CFLAGS += -DCFG_TUSB_MCU=OPT_MCU_SAME5X
+else ifeq (gd32v,$(CPU))
+  CFLAGS += -DCFG_TUSB_MCU=OPT_MCU_GD32VF103
 else
   $(error CPU $(CPU) or CPU family $(CPU_FAM) not supported)
 endif

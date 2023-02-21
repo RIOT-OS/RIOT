@@ -14,12 +14,20 @@ config BOARD_SEEEDSTUDIO_GD32
     select CPU_MODEL_GD32VF103VBT6
     select BOARD_HAS_HXTAL
     select BOARD_HAS_LXTAL
+    select HAS_HIGHLEVEL_STDIO
     select HAS_PERIPH_ADC
     select HAS_PERIPH_I2C
     select HAS_PERIPH_PWM
     select HAS_PERIPH_SPI
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
+    select HAS_TINYUSB_DEVICE
     select HAVE_SAUL_GPIO
+
+    select PACKAGE_TINYUSB if TEST_KCONFIG
+
+choice STDIO_IMPLEMENTATION
+    default MODULE_STDIO_TINYUSB_CDC_ACM if PACKAGE_TINYUSB
+endchoice
 
 source "$(RIOTBOARD)/common/gd32v/Kconfig"

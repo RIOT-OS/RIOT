@@ -1,1 +1,2 @@
+PORT_LINUX ?= /dev/ttyACM0
 include $(RIOTBOARD)/common/gd32v/Makefile.include

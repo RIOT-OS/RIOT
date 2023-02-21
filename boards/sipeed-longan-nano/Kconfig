@@ -14,6 +14,7 @@ config BOARD_SIPEED_LONGAN_NANO
     select CPU_MODEL_GD32VF103CBT6
     select BOARD_HAS_HXTAL
     select BOARD_HAS_LXTAL
+    select HAS_HIGHLEVEL_STDIO
     select HAS_PERIPH_ADC
     select HAS_PERIPH_DAC
     select HAS_PERIPH_I2C
@@ -21,10 +22,12 @@ config BOARD_SIPEED_LONGAN_NANO
     select HAS_PERIPH_SPI
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
+    select HAS_TINYUSB_DEVICE
     select HAVE_SAUL_GPIO
 
     select HAVE_MTD_SDCARD_DEFAULT
     select MODULE_FATFS_VFS if MODULE_VFS_DEFAULT
+    select PACKAGE_TINYUSB if TEST_KCONFIG
 
 menu "Sipeed Longan Nano Board Configuration"
 
@@ -34,5 +37,9 @@ menu "Sipeed Longan Nano Board Configuration"
             Indicates that a Sipeed Longan Nano board with TFT display is used.
 
 endmenu
+
+choice STDIO_IMPLEMENTATION
+    default MODULE_STDIO_TINYUSB_CDC_ACM if PACKAGE_TINYUSB
+endchoice
 
 source "$(RIOTBOARD)/common/gd32v/Kconfig"
