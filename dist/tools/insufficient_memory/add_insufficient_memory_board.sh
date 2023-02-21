@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 #
 # Copyright (C) 2019 Benjamin Valentin <benjamin.valentin@ml-pa.com>
 #
@@ -7,14 +7,16 @@
 # directory for more details.
 #
 
-MAKE_ARGS="-j4"
+if nproc > /dev/null 2>&1; then
+    MAKE_ARGS="-j$(nproc)"
+fi
 
-if [ -z $1 ]; then
+if [ -z "$1" ]; then
     echo "usage: $0 <board>"
     exit 1
 fi
 
-if tput colors &> /dev/null && [ $(tput colors) -ge 8 ]; then
+if tput colors > /dev/null 2>&1 && [ "$(tput colors)" -ge 8 ]; then
     COK="\e[1;32m"
     CBIG="\e[1;34m"
     CNORMAL="\e[1m"
@@ -32,38 +34,41 @@ else
     CRESET=
 fi
 
-if [ "$1" == "--no-docker" ]; then
+if [ "$1" = "--no-docker" ]; then
     LOCAL_MAKE_ARGS=${MAKE_ARGS}
     shift 1
 else
     # Use a standardized build within Docker and with minimal output
-    export DOCKER_MAKE_ARGS=${MAKE_ARGS}
+    export DOCKER_MAKE_ARGS="${MAKE_ARGS}"
     export BUILD_IN_DOCKER=1
 fi
 
 export RIOT_CI_BUILD=1
 
 BOARD=$1
-RIOTBASE=$(dirname $0)/../../..
-APPLICATIONS+=examples/*/Makefile
-APPLICATIONS+=" "
-APPLICATIONS+=tests/*/Makefile
+RIOTBASE="$(dirname "$0")/../../.."
+APPLICATIONS="$APPLICATIONS examples/*/Makefile"
+APPLICATIONS="$APPLICATIONS tests/*/Makefile"
+TMPFILE="$(mktemp)"
 
 for app in ${APPLICATIONS}; do
-    application=$(dirname ${app})
-    printf "${CNORMAL}%-40s${CRESET}" ${application}
-    output=$(make BOARD=${BOARD} ${LOCAL_MAKE_ARGS} -C ${RIOTBASE}/${application} 2>&1)
-    if [ $? != 0 ]; then
-        if echo ${output} | grep -e overflowed -e "not within region" > /dev/null; then
+    application="$(dirname "${app}")"
+    printf "${CNORMAL}%-40s${CRESET}" "${application}"
+    # disable warning about globbing and word splitting for ${LOCAL_MAKE_ARGS}
+    # as this is exactly what we want here
+    # shellcheck disable=SC2086
+    if ! make BOARD="${BOARD}" ${LOCAL_MAKE_ARGS} -C "${RIOTBASE}/${application}" > "$TMPFILE" 2>&1; then
+        if grep -e overflowed -e "not within region" "$TMPFILE" > /dev/null; then
             printf "${CBIG}%s${CRESET}\n" "too big"
-            make -f $(dirname $0)/Makefile.for_sh DIR=${RIOTBASE}/${application} BOARD=${BOARD} Makefile.ci > /dev/null
-        elif echo ${output} | grep -e "not whitelisted" -e "unsatisfied feature requirements" > /dev/null; then
+            make -f "$(dirname "$0")"/Makefile.for_sh DIR="${RIOTBASE}/${application}" BOARD="${BOARD}" Makefile.ci > /dev/null
+        elif grep -e "not whitelisted" -e "unsatisfied feature requirements" "$TMPFILE" > /dev/null; then
             printf "${CWARN}%s${CRESET}\n" "not supported"
         else
             printf "${CERROR}%s${CRESET}\n" "build failed"
+            cat "$TMPFILE"
         fi
     else
-        if echo ${output} | grep -e "skipping link step" > /dev/null; then
+        if grep -e "skipping link step" "$TMPFILE" > /dev/null; then
             printf "${CSKIP}%s${CRESET}\n" "skipped"
         else
             printf "${COK}%s${CRESET}\n" "OK"
