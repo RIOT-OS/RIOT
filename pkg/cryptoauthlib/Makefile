@@ -22,7 +22,6 @@ CFLAGS += -Wno-type-limits
 CFLAGS += -Wno-unused-function
 CFLAGS += -Wno-unused-parameter
 CFLAGS += -Wno-unused-variable
-CFLAGS += -Wno-format-nonliteral
 CFLAGS += -Wno-maybe-uninitialized
 
 TOOLCHAIN_FILE=$(PKG_SOURCE_DIR)/xcompile-toolchain.cmake
