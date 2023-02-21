@@ -462,7 +462,7 @@ int _get(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
                 if (hdr_len < 0) {
                     goto release;
                 }
-                /* The value obtained from NETOPT_MAX_PDU_SIZE is the smalles number of
+                /* The value obtained from NETOPT_MAX_PDU_SIZE is the smallest number of
                    L2 payload bytes, resulting from the most possible header overhead.
                    To get the actual possible payload size, we add the saving we gain,
                    from the actual header size. */
