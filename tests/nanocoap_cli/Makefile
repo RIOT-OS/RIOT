@@ -14,6 +14,7 @@ USEMODULE += gnrc_ipv6_default
 # USEMODULE += gnrc_ipv6_nib_dns     # include RDNSS option handling
 
 USEMODULE += nanocoap_sock
+USEMODULE += nanocoap_resources
 
 # boards where basic nanocoap functionality fits, but no VFS
 LOW_MEMORY_BOARDS := \
