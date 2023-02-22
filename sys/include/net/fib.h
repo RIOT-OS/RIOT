@@ -10,6 +10,7 @@
  * @defgroup    net_fib Forwarding Information Base (FIB)
  * @ingroup     net
  * @brief       FIB implementation
+ * @deprecated  No known users of this exist, will be removed after 2024.01
  *
  * @{
  *
