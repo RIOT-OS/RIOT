@@ -11,6 +11,8 @@
  * @ingroup     net
  * @brief       FIB implementation
  *
+ * This module is unused by RIOT's networking stacks, see @ref net_gnrc_ipv6_nib_ft
+ * instead.
  * @{
  *
  * @file
