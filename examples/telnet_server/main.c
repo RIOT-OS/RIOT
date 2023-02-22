@@ -79,7 +79,7 @@ int main(void)
 
     /* start shell */
     printf("All up, awaiting connection on port %u\n", CONFIG_TELNET_PORT);
-    printf("Local shell disabled");
+    puts("Local shell disabled");
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
