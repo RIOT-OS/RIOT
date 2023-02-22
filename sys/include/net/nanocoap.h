@@ -2071,7 +2071,7 @@ extern ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, \
  * @brief   Respond to `/.well-known/core` to list all resources on the server
  */
 #ifndef CONFIG_NANOCOAP_SERVER_WELL_KNOWN_CORE
-#define CONFIG_NANOCOAP_SERVER_WELL_KNOWN_CORE (1)
+#define CONFIG_NANOCOAP_SERVER_WELL_KNOWN_CORE !IS_USED(MODULE_GCOAP)
 #endif
 
 /**
