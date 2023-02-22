@@ -384,6 +384,21 @@ PSEUDOMODULES += semtech_loramac_rx
 PSEUDOMODULES += senml_cbor
 PSEUDOMODULES += senml_phydat
 PSEUDOMODULES += senml_saul
+## @defgroup drivers_servo_pwm PWM based servo driver
+## @ingroup drivers_servo
+## @{
+PSEUDOMODULES += servo_pwm
+## @}
+## @defgroup drivers_servo_timer periph_timer_periodic based servo driver
+## @ingroup drivers_servo
+## @{
+PSEUDOMODULES += servo_timer
+## @}
+## @defgroup drivers_servo_saul SAUL integration of the servo driver
+## @ingroup drivers_servo
+## @{
+PSEUDOMODULES += servo_saul
+## @}
 ## @defgroup pseudomodule_sha1sum sha1sum
 ## @ingroup sys_shell_commands
 ## @{
