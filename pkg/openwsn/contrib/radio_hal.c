@@ -225,7 +225,7 @@ void radio_rfOff(void)
 void radio_loadPacket(uint8_t *packet, uint16_t len)
 {
     /* OpenWSN `len` accounts for the FCS field which is set by default by
-       netdev, so remove from the actual packet `len` */
+       the Radio HAL, so remove from the actual packet `len` */
     iolist_t pkt = {
         .iol_base = (void *)packet,
         .iol_len = (size_t)(len - IEEE802154_FCS_LEN),
