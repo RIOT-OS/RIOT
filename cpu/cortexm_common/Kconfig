@@ -152,6 +152,6 @@ endmenu # Cortex-M
 rsource "periph/Kconfig"
 
 choice LIBC_IMPLEMENTATION
-    default MODULE_NEWLIB
     default MODULE_PICOLIBC
+    default MODULE_NEWLIB
 endchoice

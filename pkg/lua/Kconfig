@@ -10,13 +10,12 @@ config PACKAGE_LUA
     depends on TEST_KCONFIG
     depends on HAS_ARCH_32BIT
     depends on !HAS_ARCH_RISCV
-    depends on !MODULE_PICOLIBC
 
     select PACKAGE_TLSF
     select MODULE_PRINTF_FLOAT
     select MODULE_LUA-CONTRIB
 
-    select MODULE_LIBC_GETTIMEOFDAY if !CPU_NATIVE
+    select MODULE_LIBC_GETTIMEOFDAY if !CPU_ARCH_NATIVE
 
 config MODULE_LUA-CONTRIB
     bool

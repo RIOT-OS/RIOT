@@ -10,15 +10,6 @@ FEATURES_REQUIRED += arch_32bit
 # newlib nano).
 FEATURES_BLACKLIST += arch_riscv
 
-# LUA is not compatible with picolibc and raises errors at compile time:
-# - lua/liolib.c:671:38: error: '_IOFBF' undeclared (first use in this function)
-# - lua/liolib.c:671:46: error: '_IOLBF' undeclared (first use in this function)
-FEATURES_BLACKLIST += picolibc
-
-ifneq (,$(filter newlib_syscalls_default,$(USEMODULE)))
-  USEMODULE += libc_gettimeofday
-endif
-
-ifneq (,$(filter native,$(CPU)))
+ifneq (native,$(CPU))
   USEMODULE += libc_gettimeofday
 endif
