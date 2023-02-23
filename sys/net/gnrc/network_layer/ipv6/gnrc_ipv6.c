@@ -84,7 +84,8 @@ kernel_pid_t gnrc_ipv6_init(void)
 {
     if (gnrc_ipv6_pid == KERNEL_PID_UNDEF) {
         gnrc_ipv6_pid = thread_create(_stack, sizeof(_stack), GNRC_IPV6_PRIO,
-                                      THREAD_CREATE_STACKTEST,
+                                      THREAD_CREATE_STACKTEST |
+                                      mqsize_for(GNRC_IPV6_MSG_QUEUE_SIZE),
                                       _event_loop, NULL, "ipv6");
     }
 
@@ -172,12 +173,11 @@ static void _dispatch_next_header(gnrc_pktsnip_t *pkt, unsigned nh,
 
 static void *_event_loop(void *args)
 {
-    msg_t msg, reply, msg_q[GNRC_IPV6_MSG_QUEUE_SIZE];
+    msg_t msg, reply;
     gnrc_netreg_entry_t me_reg = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
                                                             thread_getpid());
 
     (void)args;
-    msg_init_queue(msg_q, GNRC_IPV6_MSG_QUEUE_SIZE);
 
     /* initialize fragmentation data-structures */
 #ifdef MODULE_GNRC_IPV6_EXT_FRAG
