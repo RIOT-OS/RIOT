@@ -60,6 +60,36 @@ static int _init(mtd_dev_t *dev)
     return 0;
 }
 
+/*
+ * If SDHC fails to execute a command, re-init usually helps
+ */
+static int _read_blocks_safe(sdhc_state_t *state, uint32_t block, void *dst, uint16_t num)
+{
+    if (sdhc_read_blocks(state, block, dst, num) == 0) {
+        return 0;
+    }
+
+    return sdhc_init(state) || sdhc_read_blocks(state, block, dst, num);
+}
+
+static int _write_blocks_safe(sdhc_state_t *state, uint32_t block, const void *dst, uint16_t num)
+{
+    if (sdhc_write_blocks(state, block, dst, num) == 0) {
+        return 0;
+    }
+
+    return sdhc_init(state) || sdhc_write_blocks(state, block, dst, num);
+}
+
+static int _erase_blocks_safe(sdhc_state_t *state, uint32_t sector, uint32_t count)
+{
+    if (sdhc_erase_blocks(state, sector, count) == 0) {
+        return 0;
+    }
+
+    return sdhc_init(state) || sdhc_erase_blocks(state, sector, count);
+}
+
 static int _read_page(mtd_dev_t *dev, void *buff, uint32_t page,
                       uint32_t offset, uint32_t size)
 {
@@ -78,7 +108,7 @@ static int _read_page(mtd_dev_t *dev, void *buff, uint32_t page,
 
         size = min(SD_MMC_BLOCK_SIZE - offset, size);
 
-        if (sdhc_read_blocks(&ctx->state, page, dev->work_area, 1)) {
+        if (_read_blocks_safe(&ctx->state, page, dev->work_area, 1)) {
             return -EIO;
         }
 
@@ -89,7 +119,7 @@ static int _read_page(mtd_dev_t *dev, void *buff, uint32_t page,
 #endif
     }
 
-    if (sdhc_read_blocks(&ctx->state, page, buff, pages)) {
+    if (_read_blocks_safe(&ctx->state, page, buff, pages)) {
         return -EIO;
     }
 
@@ -114,7 +144,7 @@ static int _write_page(mtd_dev_t *dev, const void *buff, uint32_t page,
 
         size = min(SD_MMC_BLOCK_SIZE - offset, size);
 
-        if (sdhc_read_blocks(&ctx->state, page, dev->work_area, 1)) {
+        if (_read_blocks_safe(&ctx->state, page, dev->work_area, 1)) {
             return -EIO;
         }
 
@@ -127,7 +157,7 @@ static int _write_page(mtd_dev_t *dev, const void *buff, uint32_t page,
 #endif
     }
 
-    if (sdhc_write_blocks(&ctx->state, page, buff, pages)) {
+    if (_write_blocks_safe(&ctx->state, page, buff, pages)) {
         return -EIO;
     }
 
@@ -138,7 +168,7 @@ static int _erase_sector(mtd_dev_t *dev, uint32_t sector, uint32_t count)
 {
     mtd_sam0_sdhc_t *ctx = container_of(dev, mtd_sam0_sdhc_t, base);
 
-    if (sdhc_erase_blocks(&ctx->state, sector, count)) {
+    if (_erase_blocks_safe(&ctx->state, sector, count)) {
         return -EIO;
     }
 
