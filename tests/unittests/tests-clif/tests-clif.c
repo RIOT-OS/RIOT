@@ -82,9 +82,9 @@ static void test_clif_encode_links(void)
     const char exp_string[] = "</sensor/temp>;rt=\"temperature\";if=\"sensor\","
                               "</node/info>,</node/ep>;ct=\"40\"";
     clif_attr_t attrs[] = {
-        { .key = "rt", .value = "temperature" },
-        { .key = "if", .value = "sensor" },
-        { .key = "ct", .value = "40" }
+        { .key = "rt", .key_len = 2, .value = "temperature", .value_len = 11 },
+        { .key = "if", .key_len = 2, .value = "sensor", .value_len = 6 },
+        { .key = "ct", .key_len = 2, .value = "40", .value_len = 2 }
     };
 
     clif_t links[] = {
@@ -317,12 +317,10 @@ static void test_clif_get_attr_empty(void)
 
 static void tests_clif_decode_encode_minimal(void)
 {
-    char input_buf[] = "</sensors>";
+    #define BUFF_SIZE 50
 
-    /* The required buffer size is (in this case) equal to the input buffer
-     * plus one additional byte to hold the null termination */
-    const size_t output_buf_size = strlen(input_buf) + 1;
-    char output_buf[output_buf_size];
+    char input_buf[] = "</sensors>";
+    char output_buf[BUFF_SIZE];
     clif_t out_link;
 
     ssize_t input_len = strlen(input_buf);
@@ -332,7 +330,7 @@ static void tests_clif_decode_encode_minimal(void)
         TEST_FAIL("Malformed input string");
     }
 
-    ssize_t result_len = clif_encode_link(&out_link, output_buf, output_buf_size);
+    ssize_t result_len = clif_encode_link(&out_link, output_buf, BUFF_SIZE);
     if (result_len == CLIF_NO_SPACE) {
         TEST_FAIL("No space left in the buffer");
     }

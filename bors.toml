@@ -3,8 +3,7 @@
 pr_status = [
  "python-tests",
  "tools-build-success",
-# temporarily disabling while testing updated check-labels-action (#19101)
-# "check-labels",
+ "check-labels",
  "static-tests",
  "check-commits (commit-msg)",
  "check-commits (pr_check)",
@@ -18,6 +17,8 @@ status = [
   "static-tests",
   "tools-build-success",
   ]
+
+block_labels = [ "Process: missing approvals" ]
 
 # Number of project members who must approve the PR (using GitHub Reviews)
 # before it is pushed to master.
