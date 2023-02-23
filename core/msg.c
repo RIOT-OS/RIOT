@@ -479,7 +479,8 @@ unsigned msg_queue_capacity(kernel_pid_t pid)
  * and just verifies that the queue is initialized exactly as before
  */
 void msg_init_queue(msg_t *array, int num) {
-    thread_t *thread = thread_get(pid);
+    (void)array;
+    thread_t *thread = thread_get_active();
     expect(thread_has_msg_queue(thread) && cib_size(&(thread->msg_queue) == num));
 }
 
