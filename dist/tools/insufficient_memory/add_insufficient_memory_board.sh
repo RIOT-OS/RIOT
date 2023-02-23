@@ -61,7 +61,12 @@ for app in ${APPLICATIONS}; do
         if grep -e overflowed -e "not within region" "$TMPFILE" > /dev/null; then
             printf "${CBIG}%s${CRESET}\n" "too big"
             make -f "$(dirname "$0")"/Makefile.for_sh DIR="${RIOTBASE}/${application}" BOARD="${BOARD}" Makefile.ci > /dev/null
-        elif grep -e "not whitelisted" -e "unsatisfied feature requirements" "$TMPFILE" > /dev/null; then
+        elif grep -e "not whitelisted" \
+                  -e "unsatisfied feature requirements" \
+                  -e "Some feature requirements are blacklisted:" \
+                  -e "not supported.  Stop." \
+                  -e "let the build continue on expected errors by setting CONTINUE_ON_EXPECTED_ERRORS=1" \
+                  "$TMPFILE" > /dev/null; then
             printf "${CWARN}%s${CRESET}\n" "not supported"
         else
             printf "${CERROR}%s${CRESET}\n" "build failed"
