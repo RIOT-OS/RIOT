@@ -220,14 +220,11 @@ static void *_event_loop(void *arg)
 {
     (void)arg;
     msg_t msg, reply;
-    msg_t msg_queue[GNRC_UDP_MSG_QUEUE_SIZE];
     gnrc_netreg_entry_t netreg = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
                                                             thread_getpid());
     /* preset reply message */
     reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
     reply.content.value = (uint32_t)-ENOTSUP;
-    /* initialize message queue */
-    msg_init_queue(msg_queue, GNRC_UDP_MSG_QUEUE_SIZE);
     /* register UPD at netreg */
     gnrc_netreg_register(GNRC_NETTYPE_UDP, &netreg);
 
@@ -303,7 +300,9 @@ int gnrc_udp_init(void)
     if (_pid == KERNEL_PID_UNDEF) {
         /* start UDP thread */
         _pid = thread_create(_stack, sizeof(_stack), GNRC_UDP_PRIO,
-                             THREAD_CREATE_STACKTEST, _event_loop, NULL, "udp");
+                             THREAD_CREATE_STACKTEST |
+                             mqsize_for(GNRC_UDP_MSG_QUEUE_SIZE),
+                             _event_loop, NULL, "udp");
     }
     return _pid;
 }
