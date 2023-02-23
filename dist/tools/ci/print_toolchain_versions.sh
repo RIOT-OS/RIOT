@@ -24,7 +24,7 @@ get_define() {
     local cc="$1"
     local line=
     if command -v "$cc" 2>&1 >/dev/null; then
-        line=$(echo "$3" | "$cc" -x c -include "$2" -E -o - - 2>&1 | sed -e '/^[   ]*#/d' -e '/^[  ]*$/d')
+        line=$(echo "$3" | "$cc" -x c -include "$2" -E -o - - 2>/dev/null | sed -e '/^[   ]*#/d' -e '/^[  ]*$/d')
     fi
     if [ -z "$line" ]; then
         line=missing
