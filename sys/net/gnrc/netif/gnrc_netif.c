@@ -1926,8 +1926,6 @@ static void *_gnrc_netif_thread(void *args)
     /* set up the event queue */
     event_queues_init(netif->evq, GNRC_NETIF_EVQ_NUMOF);
 
-    /* setup the link-layer's message queue */
-    msg_init_queue(netif->msg_queue, ARRAY_SIZE(netif->msg_queue));
     /* initialize low-level driver */
     ctx->result = netif->ops->init(netif);
     /* signal that driver init is done */
