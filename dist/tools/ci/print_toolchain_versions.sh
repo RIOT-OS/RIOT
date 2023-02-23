@@ -129,7 +129,10 @@ for p in \
          riscv-none-elf \
          riscv64-unknown-elf \
          riscv-none-embed \
+         riscv32-esp-elf \
          xtensa-esp32-elf \
+         xtensa-esp32s2-elf \
+         xtensa-esp32s3-elf \
          xtensa-esp8266-elf \
          ; do
     printf "%25s: %s\n" "$p-gcc" "$(get_cmd_version ${p}-gcc)"
@@ -145,7 +148,10 @@ for p in \
          riscv-none-elf \
          riscv64-unknown-elf \
          riscv-none-embed \
+         riscv32-esp-elf \
          xtensa-esp32-elf \
+         xtensa-esp32s2-elf \
+         xtensa-esp32s3-elf \
          xtensa-esp8266-elf \
          ; do
     printf "%25s: %s\n" "$p-newlib" "$(newlib_version ${p}-gcc)"
