@@ -375,6 +375,7 @@ bool sdhc_send_cmd(sdhc_state_t *state, uint32_t cmd, uint32_t arg)
             if (--timeout == 0) {
                 SDHC_DEV->SRR.reg = SDHC_SRR_SWRSTCMD; /* reset command */
                 while (SDHC_DEV->SRR.bit.SWRSTCMD) {}
+                state->need_init = true;
                 return false;
             }
         } while (!(SDHC_DEV->PSR.reg & SDHC_PSR_DATLL(1))); /* DAT[0] is busy bit */
