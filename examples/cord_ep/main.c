@@ -27,9 +27,6 @@
 #include "net/cord/common.h"
 #include "net/cord/ep_standalone.h"
 
-#define MAIN_QUEUE_SIZE     (8)
-static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
-
 #define NODE_INFO  "SOME NODE INFORMATION"
 
 /* we will use a custom event handler for dumping cord_ep events */
@@ -89,10 +86,6 @@ static gcoap_listener_t _listener = {
 
 int main(void)
 {
-    /* we need a message queue for the thread running the shell in order to
-     * receive potentially fast incoming networking packets */
-    msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
-
     puts("CoRE RD client example!\n");
 
     /* setup CoAP resources */

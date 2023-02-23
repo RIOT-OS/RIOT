@@ -15,6 +15,8 @@ BOARD_WHITELIST := samr21-xpro iotlab-m3 avr-rss2 atmega256rfr2-xpro derfmega256
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
+CFLAGS += -DCONFIG_MSG_QUEUE_SIZE_MAIN=8
+
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 USEMODULE += netdev_default

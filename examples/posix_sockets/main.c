@@ -23,9 +23,6 @@
 #include "msg.h"
 #include "shell.h"
 
-#define MAIN_MSG_QUEUE_SIZE (4)
-static msg_t main_msg_queue[MAIN_MSG_QUEUE_SIZE];
-
 extern int udp_cmd(int argc, char **argv);
 
 static const shell_command_t shell_commands[] = {
@@ -35,9 +32,6 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-    /* a sendto() call performs an implicit bind(), hence, a message queue is
-     * required for the thread executing the shell */
-    msg_init_queue(main_msg_queue, MAIN_MSG_QUEUE_SIZE);
     puts("RIOT socket example application");
     /* start shell */
     puts("All up, running the shell now");

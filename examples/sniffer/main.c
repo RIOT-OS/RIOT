@@ -90,10 +90,7 @@ void dump_pkt(gnrc_pktsnip_t *pkt)
  */
 void *rawdump(void *arg)
 {
-    msg_t msg_q[RAWDUMP_MSG_Q_SIZE];
-
     (void)arg;
-    msg_init_queue(msg_q, RAWDUMP_MSG_Q_SIZE);
     while (1) {
         msg_t msg;
 
@@ -124,7 +121,9 @@ int main(void)
     /* start and register rawdump thread */
     puts("Run the rawdump thread and register it");
     dump.target.pid = thread_create(rawdmp_stack, sizeof(rawdmp_stack), RAWDUMP_PRIO,
-                                    THREAD_CREATE_STACKTEST, rawdump, NULL, "rawdump");
+                                    THREAD_CREATE_STACKTEST |
+                                    mqsize_for(RAWDUMP_MSG_Q_SIZE),
+                                    rawdump, NULL, "rawdump");
     dump.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
     gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
 

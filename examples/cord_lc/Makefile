@@ -18,6 +18,8 @@ USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += ps
 
+CFLAGS += -DCONFIG_MSG_QUEUE_SIZE_MAIN=8
+
 # The default size of GCOAP_PDU_BUF_SIZE can be too small for the response
 # from the RD server. Use a larger value if the client drops response packet
 # from RD server.

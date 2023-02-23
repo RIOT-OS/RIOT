@@ -23,6 +23,8 @@ USEPKG += tinydtls
 # tinydtls needs crypto secure PRNG
 USEMODULE += prng_sha1prng
 
+CFLAGS += -DCONFIG_MSG_QUEUE_SIZE_MAIN=8
+
 # UDP Port to use (20220 is default for DTLS).
 DTLS_PORT ?= 20220
 CFLAGS += -DDTLS_DEFAULT_PORT=$(DTLS_PORT)

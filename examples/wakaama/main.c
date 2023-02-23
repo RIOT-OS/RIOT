@@ -27,9 +27,6 @@
 #include "msg.h"
 #include "shell.h"
 
-#define SHELL_QUEUE_SIZE (8)
-static msg_t _shell_queue[SHELL_QUEUE_SIZE];
-
 extern void lwm2m_cli_init(void);
 extern int lwm2m_cli_cmd(int argc, char **argv);
 static const shell_command_t my_commands[] = {
@@ -42,7 +39,6 @@ int main(void)
     /* initiates LwM2M client */
     lwm2m_cli_init();
 
-    msg_init_queue(_shell_queue, SHELL_QUEUE_SIZE);
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(my_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 

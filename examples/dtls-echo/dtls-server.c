@@ -315,7 +315,6 @@ void *_dtls_server_wrapper(void *arg)
     (void) arg;
 
     bool active = true;
-    msg_t _reader_queue[READER_QUEUE_SIZE];
     msg_t msg;
 
     sock_udp_t udp_socket;
@@ -327,9 +326,6 @@ void *_dtls_server_wrapper(void *arg)
 
     remote_peer.sock = &udp_socket;
     remote_peer.remote = &remote;
-
-    /* Prepare (thread) messages reception */
-    msg_init_queue(_reader_queue, READER_QUEUE_SIZE);
 
     /* NOTE: dtls_init() must be called previous to this (see main.c) */
 
@@ -379,7 +375,8 @@ static void start_server(void)
     _dtls_server_pid = thread_create(_dtls_server_stack,
                                      sizeof(_dtls_server_stack),
                                      THREAD_PRIORITY_MAIN - 1,
-                                     THREAD_CREATE_STACKTEST,
+                                     THREAD_CREATE_STACKTEST |
+                                     mqsize_for(READER_QUEUE_SIZE),
                                      _dtls_server_wrapper, NULL, "DTLS_Server");
 
     /* Uncommon but better be sure */

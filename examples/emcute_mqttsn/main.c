@@ -38,7 +38,6 @@
 #define TOPIC_MAXLEN        (64U)
 
 static char stack[THREAD_STACKSIZE_DEFAULT];
-static msg_t queue[8];
 
 static emcute_sub_t subscriptions[NUMOFSUBS];
 static char topics[NUMOFSUBS][TOPIC_MAXLEN];
@@ -263,9 +262,6 @@ int main(void)
     puts("MQTT-SN example application\n");
     puts("Type 'help' to get started. Have a look at the README.md for more"
          "information.");
-
-    /* the main thread needs a msg queue to be able to run `ping`*/
-    msg_init_queue(queue, ARRAY_SIZE(queue));
 
     /* initialize our subscription buffers */
     memset(subscriptions, 0, (NUMOFSUBS * sizeof(emcute_sub_t)));

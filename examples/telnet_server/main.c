@@ -26,9 +26,6 @@
 #include "shell.h"
 #include "msg.h"
 
-#define MAIN_QUEUE_SIZE     (8)
-static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
-
 static void _print_motd(void)
 {
     puts("RIOT telnet example application");
@@ -66,10 +63,6 @@ void telnet_cb_connected(sock_tcp_t *sock)
 
 int main(void)
 {
-    /* we need a message queue for the thread running the shell in order to
-     * receive potentially fast incoming networking packets */
-    msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
-
     _print_motd();
 
     /* print address(es) so we can connect to it */

@@ -46,13 +46,11 @@
 static int server_socket = -1;
 static char server_buffer[SERVER_BUFFER_SIZE];
 static char server_stack[THREAD_STACKSIZE_DEFAULT];
-static msg_t server_msg_queue[SERVER_MSG_QUEUE_SIZE];
 
 static void *_server_thread(void *args)
 {
     struct sockaddr_in6 server_addr;
     uint16_t port;
-    msg_init_queue(server_msg_queue, SERVER_MSG_QUEUE_SIZE);
     server_socket = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
     /* parse port */
     port = atoi((char *)args);
@@ -154,7 +152,8 @@ static int udp_start_server(char *port_str)
     }
     /* start server (which means registering pktdump for the chosen port) */
     if (thread_create(server_stack, sizeof(server_stack), THREAD_PRIORITY_MAIN - 1,
-                      THREAD_CREATE_STACKTEST,
+                      THREAD_CREATE_STACKTEST |
+                      mqsize_for(SERVER_MSG_QUEUE_SIZE),
                       _server_thread, port_str, "UDP server") <= KERNEL_PID_UNDEF) {
         server_socket = -1;
         puts("error initializing thread");

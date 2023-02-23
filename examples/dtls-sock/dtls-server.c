@@ -123,12 +123,8 @@ void *dtls_server_wrapper(void *arg)
 
     ssize_t res;
     bool active = true;
-    msg_t _reader_queue[READER_QUEUE_SIZE];
     msg_t msg;
     uint8_t rcv[512];
-
-    /* Prepare (thread) messages reception */
-    msg_init_queue(_reader_queue, READER_QUEUE_SIZE);
 
     sock_dtls_t sock;
     sock_udp_t udp_sock;
@@ -218,7 +214,8 @@ static void start_server(void)
     _dtls_server_pid = thread_create(_dtls_server_stack,
                                      sizeof(_dtls_server_stack),
                                      THREAD_PRIORITY_MAIN - 1,
-                                     THREAD_CREATE_STACKTEST,
+                                     THREAD_CREATE_STACKTEST |
+                                     mqsize_for(READER_QUEUE_SIZE),
                                      dtls_server_wrapper, NULL, "dtls_server");
 
     /* Uncommon but better be sure */

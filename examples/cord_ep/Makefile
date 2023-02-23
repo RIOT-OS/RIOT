@@ -7,6 +7,8 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
+CFLAGS += -DCONFIG_MSG_QUEUE_SIZE_MAIN=8
+
 USEMODULE += netdev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_default

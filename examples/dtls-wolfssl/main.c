@@ -29,9 +29,6 @@
 #error RIOT-OS is set to use sockets but this DTLS app is configured for socks.
 #endif
 
-#define MAIN_QUEUE_SIZE     (8)
-static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
-
 extern int dtls_client(int argc, char **argv);
 extern int dtls_server(int argc, char **argv);
 
@@ -57,9 +54,6 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-    /* we need a message queue for the thread running the shell in order to
-     * receive potentially fast incoming networking packets */
-    msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
     LOG(LOG_INFO, "RIOT wolfSSL DTLS testing implementation\n");
     wolfSSL_Init();
     wolfSSL_Debugging_ON();

@@ -48,10 +48,6 @@
 /* Extend stacksize of nanocoap server thread */
 static char _nanocoap_server_stack[THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE_PRINTF];
 #define NANOCOAP_SERVER_QUEUE_SIZE     (8)
-static msg_t _nanocoap_server_msg_queue[NANOCOAP_SERVER_QUEUE_SIZE];
-
-#define MAIN_QUEUE_SIZE     (8)
-static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
 /* add handled storages */
 #if IS_USED(MODULE_SUIT_STORAGE_VFS)
@@ -65,9 +61,6 @@ XFA(suit_storage_files_reg, 1) char* _slot1 = VFS_DEFAULT_DATA "/SLOT1.txt";
 static void *_nanocoap_server_thread(void *arg)
 {
     (void)arg;
-
-    /* nanocoap_server uses gnrc sock which uses gnrc which needs a msg queue */
-    msg_init_queue(_nanocoap_server_msg_queue, NANOCOAP_SERVER_QUEUE_SIZE);
 
     /* initialize nanocoap server instance */
     uint8_t buf[COAP_INBUF_SIZE];
@@ -215,12 +208,9 @@ int main(void)
     /* start nanocoap server thread */
     thread_create(_nanocoap_server_stack, sizeof(_nanocoap_server_stack),
                   THREAD_PRIORITY_MAIN - 1,
-                  THREAD_CREATE_STACKTEST,
+                  THREAD_CREATE_STACKTEST |
+                  mqsize_for(NANOCOAP_SERVER_QUEUE_SIZE),
                   _nanocoap_server_thread, NULL, "nanocoap server");
-
-    /* the shell contains commands that receive packets via GNRC and thus
-       needs a msg queue */
-    msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
 
     puts("Starting the shell");
     char line_buf[SHELL_DEFAULT_BUFSIZE];

@@ -31,9 +31,6 @@
 #error TinyDTLS is set to use sockets but the app is configured for socks.
 #endif
 
-#define MAIN_QUEUE_SIZE     (8)
-static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
-
 extern int udp_client_cmd(int argc, char **argv);
 extern int udp_server_cmd(int argc, char **argv);
 
@@ -45,9 +42,6 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-    /* we need a message queue for the thread running the shell in order to
-     * receive potentially fast incoming networking packets */
-    msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
     puts("RIOT (Tiny)DTLS testing implementation");
 
     /* TinyDTLS settings (Universal and called only one time by reboot) */

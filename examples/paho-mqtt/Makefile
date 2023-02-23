@@ -63,3 +63,7 @@ ifneq (,$(filter arch_esp,$(FEATURES_USED)))
   CFLAGS += -DWIFI_SSID=\"$(WIFI_SSID)\"
   CFLAGS += -DWIFI_PASS=\"$(WIFI_PASS)\"
 endif
+
+ifneq(,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MSG_QUEUE_SIZE_MAIN=8
+endif

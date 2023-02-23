@@ -22,6 +22,9 @@ USEMODULE += ps
 # For testing we also include the ping command and some stats
 USEMODULE += gnrc_icmpv6_echo
 
+# ping needs a message queue
+CFLAGS += -DCONFIG_MSG_QUEUE_SIZE_MAIN=8
+
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:

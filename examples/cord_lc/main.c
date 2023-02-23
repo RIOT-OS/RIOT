@@ -23,9 +23,6 @@
 #include "shell.h"
 #include "msg.h"
 
-#define MAIN_QUEUE_SIZE     (8)
-static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
-
 extern int cord_lc_cli_cmd(int argc, char **argv);
 
 static const shell_command_t shell_commands[] = {
@@ -35,10 +32,6 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-    /* we need a message queue for the thread running the shell in order to
-     * receive potentially fast incoming networking packets */
-    msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
-
     puts("CoRE RD lookup client example!\n");
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);

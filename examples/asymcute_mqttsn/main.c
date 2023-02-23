@@ -44,10 +44,6 @@
 #define TOPIC_BUF_NUMOF     (8U + SUB_CTX_NUMOF)
 #endif
 
-/* needed for the `ping` shell command */
-#define MAIN_QUEUE_SIZE     (8)
-static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
-
 static asymcute_con_t _connection;
 static asymcute_req_t _reqs[REQ_CTX_NUMOF];
 static asymcute_sub_t _subscriptions[SUB_CTX_NUMOF];
@@ -554,9 +550,6 @@ int main(void)
     puts("Type 'help' to get started and have a look at the README.md for more"
          "information.");
 
-    /* we need a message queue for the thread running the shell in order to
-     * receive potentially fast incoming networking packets */
-    msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
     /* start shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);

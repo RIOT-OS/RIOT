@@ -109,8 +109,6 @@ static void *sender(void *arg)
     (void)arg;
 
     msg_t msg;
-    msg_t msg_queue[8];
-    msg_init_queue(msg_queue, 8);
 
     while (1) {
         msg_receive(&msg);
@@ -200,7 +198,7 @@ int main(void)
 
     /* start the sender thread */
     sender_pid = thread_create(sender_stack, sizeof(sender_stack),
-                               SENDER_PRIO, 0, sender, NULL, "sender");
+                               SENDER_PRIO, mqsize_for(8), sender, NULL, "sender");
 
     /* trigger the first send */
     msg_t msg;

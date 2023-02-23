@@ -24,15 +24,9 @@
 
 #define COAP_INBUF_SIZE (256U)
 
-#define MAIN_QUEUE_SIZE     (8)
-static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
-
 int main(void)
 {
     puts("RIOT nanocoap example application");
-
-    /* nanocoap_server uses gnrc sock which uses gnrc which needs a msg queue */
-    msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
 
     puts("Waiting for address autoconfiguration...");
     xtimer_sleep(3);

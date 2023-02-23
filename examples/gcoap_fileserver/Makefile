@@ -7,6 +7,8 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
+CFLAGS += -DCONFIG_MSG_QUEUE_SIZE_MAIN=4
+
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:

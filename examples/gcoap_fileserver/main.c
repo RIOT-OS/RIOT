@@ -24,9 +24,6 @@
 #include "shell.h"
 #include "vfs_default.h"
 
-#define MAIN_QUEUE_SIZE (4)
-static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
-
 /* CoAP resources. Must be sorted by path (ASCII order). */
 static const coap_resource_t _resources[] = {
     { "/vfs",
@@ -69,7 +66,6 @@ static void _event_cb(gcoap_fileserver_event_t event, gcoap_fileserver_event_ctx
 
 int main(void)
 {
-    msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
     gcoap_register_listener(&_listener);
 
     if (IS_USED(MODULE_GCOAP_FILESERVER_CALLBACK)) {
