@@ -478,10 +478,11 @@ unsigned msg_queue_capacity(kernel_pid_t pid)
 /* this is used for migration to initializing queues at thread creation time,
  * and just verifies that the queue is initialized exactly as before
  */
+#include "test_utils/expect.h"
 void msg_init_queue(msg_t *array, int num) {
     (void)array;
     thread_t *thread = thread_get_active();
-    expect(thread_has_msg_queue(thread) && cib_size(&(thread->msg_queue) == num));
+    expect(thread_has_msg_queue(thread) && cib_size(&thread->msg_queue) == (unsigned)num);
 }
 
 void msg_queue_print(void)
