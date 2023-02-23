@@ -188,6 +188,25 @@ uintptr_t thread_measure_stack_free(const char *stack)
     return space_free;
 }
 
+static void *_alloc_from_stack(char *stack, int *stacksize, size_t size, size_t alignment)
+{
+    /* allocate object*/
+    *stacksize -= size;
+
+    /* align */
+    *stacksize -= *stacksize % alignment;
+
+    if (*stacksize < 0) {
+        DEBUG("thread_create(): _alloc_from_stack(): stacksize is too small!\n");
+    }
+
+    /* allocate our object at the top of our stackspace. Cast to (uintptr_t)
+     * intermediately to silence -Wcast-align. (We made sure alignment is
+     * correct above.) */
+    return (char *)(uintptr_t)(stack + *stacksize);
+
+}
+
 kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
                            int flags, thread_task_func_t function, void *arg,
                            const char *name)
@@ -211,19 +230,8 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
         stacksize -= misalignment;
     }
 
-    /* make room for the thread control block */
-    stacksize -= sizeof(thread_t);
-
-    /* round down the stacksize to a multiple of thread_t alignments (usually 16/32bit) */
-    stacksize -= stacksize % alignof(thread_t);
-
-    if (stacksize < 0) {
-        DEBUG("thread_create: stacksize is too small!\n");
-    }
-    /* allocate our thread control block at the top of our stackspace. Cast to
-     * (uintptr_t) intermediately to silence -Wcast-align. (We manually made
-     * sure alignment is correct above.) */
-    thread_t *thread = (thread_t *)(uintptr_t)(stack + stacksize);
+    thread_t *thread = _alloc_from_stack(stack, &stacksize, sizeof(thread_t),
+                                         alignof(thread_t));
 
 #ifdef PICOLIBC_TLS
     stacksize -= _tls_size();
