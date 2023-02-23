@@ -475,12 +475,12 @@ unsigned msg_queue_capacity(kernel_pid_t pid)
     return queue_cap;
 }
 
-void msg_init_queue(msg_t *array, int num)
-{
-    thread_t *me = thread_get_active();
-
-    me->msg_array = array;
-    cib_init(&(me->msg_queue), num);
+/* this is used for migration to initializing queues at thread creation time,
+ * and just verifies that the queue is initialized exactly as before
+ */
+void msg_init_queue(msg_t *array, int num) {
+    thread_t *thread = thread_get(pid);
+    expect(thread_has_msg_queue(thread) && cib_size(&(thread->msg_queue) == num));
 }
 
 void msg_queue_print(void)

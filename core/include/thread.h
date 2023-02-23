@@ -239,6 +239,24 @@ struct _thread {
  *        debugging and profiling purposes)
  */
 #define THREAD_CREATE_STACKTEST         (8)
+
+/**
+ * @brief Create thread with message queue
+ *
+ * This is basically `(flags >> 4) & 0xFF`.
+ *
+ * @{
+ */
+#define THREAD_CREATE_MSG_QUEUE_SIZE_1       (16)
+#define THREAD_CREATE_MSG_QUEUE_SIZE_2       (32)
+#define THREAD_CREATE_MSG_QUEUE_SIZE_4       (64)
+#define THREAD_CREATE_MSG_QUEUE_SIZE_8       (128)
+#define THREAD_CREATE_MSG_QUEUE_SIZE_16      (256)
+#define THREAD_CREATE_MSG_QUEUE_SIZE_32      (512)
+#define THREAD_CREATE_MSG_QUEUE_SIZE_64      (1024)
+#define THREAD_CREATE_MSG_QUEUE_SIZE_128     (2048)
+#define THREAD_CREATE_MSG_QUEUE_SIZE_256     (4096)
+/** @} */
 /** @} */
 
 /**
@@ -623,6 +641,10 @@ static inline const char *thread_get_name(const thread_t *thread)
     (void)thread;
     return NULL;
 #endif
+}
+
+static inline int mqsize_for(uint8_t size) {
+    return ((unsigned)size) << 4;
 }
 
 #ifdef __cplusplus

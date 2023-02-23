@@ -188,7 +188,8 @@ uintptr_t thread_measure_stack_free(const char *stack)
     return space_free;
 }
 
-static void *_alloc_from_stack(char *stack, int *stacksize, size_t size, size_t alignment)
+static void *_alloc_from_stack(char *stack, int *stacksize, size_t size,
+                               size_t alignment)
 {
     /* allocate object*/
     *stacksize -= size;
@@ -205,6 +206,11 @@ static void *_alloc_from_stack(char *stack, int *stacksize, size_t size, size_t 
      * correct above.) */
     return (char *)(uintptr_t)(stack + *stacksize);
 
+}
+
+static size_t _mq_size_from_flags(int flags)
+{
+    return (flags >> 4) & 0xFF;
 }
 
 kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
@@ -238,6 +244,16 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
 
     thread->tls = stack + stacksize;
     _init_tls(thread->tls);
+#endif
+
+#if MODULE_CORE_MSG
+    size_t mq_size = _mq_size_from_flags(flags);
+    if (mq_size > 0) {
+        thread->msg_array = _alloc_from_stack(stack, &stacksize,
+                                      sizeof(msg_t) * mq_size, alignof(msg_t));
+
+        cib_init(&(thread->msg_queue), mq_size);
+    }
 #endif
 
 #if defined(DEVELHELP) || defined(SCHED_TEST_STACK) \

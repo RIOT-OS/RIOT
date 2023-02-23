@@ -108,9 +108,9 @@
  *
  * Asynchronous IPC
  * ----------------
- * To use asynchronous IPC one needs to initialize a message queue using
- * @ref msg_init_queue() (note that it **must** be of a size equal to a power of
- * two). Messages sent to a thread with a message queue that isn't full are
+ * To use asynchronous IPC one needs to initialize a message queue *at thread
+ * creation time (@ref thread_create())*.
+ * Messages sent to a thread with a message queue that isn't full are
  * never dropped and the sending never blocks, even when using @ref msg_send().
  * If the queue is full and the sending thread has a higher priority than the
  * receiving thread the send-behavior is equivalent to synchronous mode.
@@ -126,14 +126,12 @@
  *
  * static kernel_pid_t rcv_pid;
  * static char rcv_stack[THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE_PRINTF];
- * static msg_t rcv_queue[RCV_QUEUE_SIZE];
  *
  * static void *rcv(void *arg)
  * {
  *     msg_t msg;
  *
  *     (void)arg;
- *     msg_init_queue(rcv_queue, RCV_QUEUE_SIZE);
  *     while (1) {
  *         msg_receive(&msg);
  *         printf("Received %" PRIu32 "\n", msg.content.value);
@@ -147,7 +145,8 @@
  *
  *     msg.content.value = 0;
  *     rcv_pid = thread_create(rcv_stack, sizeof(rcv_stack),
- *                             THREAD_PRIORITY_MAIN - 1, 0, rcv, NULL, "rcv");
+ *                             THREAD_PRIORITY_MAIN - 1,
+ *                             mqsize_for(RCV_QUEUE_SIZE), rcv, NULL, "rcv");
  *     while (1) {
  *         if (msg_try_send(&msg, rcv_pid) == 0) {
  *             printf("Receiver queue full.\n");
@@ -399,15 +398,7 @@ unsigned msg_queue_capacity(kernel_pid_t pid);
 /**
  * @brief Initialize the current thread's message queue.
  *
- * @pre @p num **MUST BE A POWER OF TWO!**
- *
- * @param[in] array Pointer to preallocated array of ``msg_t`` structures, must
- *                  not be NULL.
- * @param[in] num   Number of ``msg_t`` structures in array.
- *                  **MUST BE POWER OF TWO!**
- *
- * If array resides on the stack, the containing stack frame must never be
- * left, not even if it is the current thread's entry function.
+ * @note this will be removed soon, create queue using `thread_create()`!
  */
 void msg_init_queue(msg_t *array, int num);
 

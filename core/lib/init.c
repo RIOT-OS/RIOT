@@ -43,6 +43,10 @@
     RIOT_VERSION ")"
 #endif
 
+#ifndef CONFIG_MSG_QUEUE_SIZE_MAIN
+#define CONFIG_MSG_QUEUE_SIZE_MAIN 0
+#endif
+
 extern int main(void);
 
 static char main_stack[THREAD_STACKSIZE_MAIN];
@@ -102,7 +106,8 @@ void kernel_init(void)
     if (IS_USED(MODULE_CORE_THREAD)) {
         thread_create(main_stack, sizeof(main_stack),
                       THREAD_PRIORITY_MAIN,
-                      THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
+                      THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST |
+                      mqsize_for(CONFIG_MSG_QUEUE_SIZE_MAIN),
                       main_trampoline, NULL, "main");
     }
     else {
