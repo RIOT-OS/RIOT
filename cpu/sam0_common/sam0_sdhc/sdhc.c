@@ -208,6 +208,9 @@ int sdhc_init(sdhc_state_t *state)
     bool f8;
     uint32_t response;
 
+    /* set power control bits to 0 to power off the SD card */
+    SDHC_DEV->PCR.reg = 0;
+
     /* set the initial clock slow, single bit and normal speed */
     state->type = CARD_TYPE_SD;
     state->version = CARD_VER_UNKNOWN;
