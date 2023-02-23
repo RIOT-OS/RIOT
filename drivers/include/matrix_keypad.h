@@ -11,12 +11,6 @@
  * @ingroup     drivers_sensors
  * @brief       Matrix keypad driver for row/column keypads
  *
- * @{
- *
- * @file
- *
- * @author      Koen Zandberg <koen@bergzand.net>
- *
  * This module implements a simple matrix keypad driver where keys are connected
  * between GPIO columns and rows. It works best with diodes in series with the
  * switches to prevent key ghosting, but it can be used without these diodes.
@@ -46,6 +40,13 @@
  * When a state change is detected on a switch, the @ref matrix_keypad_cb_t
  * callback is called with the row and column number together with the new state
  * of the switch (pressed or not pressed).
+ *
+ * @{
+ *
+ * @file
+ * @brief       Interface definition for the matrix keypad
+ *
+ * @author      Koen Zandberg <koen@bergzand.net>
  */
 
 #ifndef MATRIX_KEYPAD_H
