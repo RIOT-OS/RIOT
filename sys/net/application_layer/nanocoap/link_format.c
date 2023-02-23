@@ -85,7 +85,7 @@ int nanocoap_link_format_get(nanocoap_sock_t *sock, const char *path,
     char buffer[CONFIG_NANOCOAP_QS_MAX];
     struct dir_list_ctx ctx = {
         .buf = buffer,
-        .end = buffer + sizeof(buffer),
+        .end = buffer + sizeof(buffer) - 1,
         .cur = buffer,
         .cb = cb,
         .ctx = arg,

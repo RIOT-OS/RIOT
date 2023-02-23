@@ -58,10 +58,10 @@ void phydat_to_senml_bool(senml_bool_value_t *senml, const phydat_t *phydat, con
  *
  * - @ref UNIT_TIME is converted to @ref SENML_UNIT_SECOND.
  * - @ref UNIT_F is converted to @ref SENML_UNIT_KELVIN.
- * - @ref UNIT_G is converted to @ref SENML_UNIT_METER_PER_SQUARE_SECOND.
+ * - @ref UNIT_G_FORCE is converted to @ref SENML_UNIT_METER_PER_SQUARE_SECOND.
  * - @ref UNIT_BAR is converted to @ref SENML_UNIT_PASCAL.
  * - @ref UNIT_GPM3 is converted to @ref SENML_UNIT_KILOGRAM_PER_CUBIC_METER.
- * - @ref UNIT_GS is converted to @ref SENML_UNIT_TESLA.
+ * - @ref UNIT_GAUSS is converted to @ref SENML_UNIT_TESLA.
  * - Compatible units are set to their SenML equivalent.
  * - Incompatible (or unknown) units are set to @ref SENML_UNIT_NONE.
  *
@@ -80,7 +80,7 @@ void phydat_to_senml_float(senml_value_t *senml, const phydat_t *phydat, const u
  * - @ref UNIT_TIME is converted to @ref SENML_UNIT_SECOND.
  * - @ref UNIT_BAR is converted to @ref SENML_UNIT_PASCAL.
  * - @ref UNIT_GPM3 is converted to @ref SENML_UNIT_KILOGRAM_PER_CUBIC_METER.
- * - @ref UNIT_GS is converted to @ref SENML_UNIT_TESLA.
+ * - @ref UNIT_GAUSS is converted to @ref SENML_UNIT_TESLA.
  * - Compatible units are set to their SenML equivalent.
  * - Incompatible (or unknown) units are set to @ref SENML_UNIT_NONE.
  *

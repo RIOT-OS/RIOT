@@ -39,7 +39,7 @@ static int read_acc(const void *dev, phydat_t *res)
     res->val[2] = xyz.acc_z;
     /* unit: milli-G */
     res->scale = -3;
-    res->unit = UNIT_G;
+    res->unit = UNIT_G_FORCE;
 
     return 3;
 }

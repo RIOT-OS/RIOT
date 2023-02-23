@@ -34,7 +34,7 @@ static int read_acc(const void *dev, phydat_t *res)
         res->val[i] *= fac;
     }
 
-    res->unit = UNIT_G;
+    res->unit = UNIT_G_FORCE;
     res->scale = -3;
     return 3;
 }
@@ -63,7 +63,7 @@ static int read_mag(const void *dev, phydat_t *res)
         res->val[i] = (int16_t)tmp;
     }
 
-    res->unit = UNIT_GS;
+    res->unit = UNIT_GAUSS;
     res->scale = -3;
     return 3;
 }

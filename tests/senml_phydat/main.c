@@ -84,7 +84,7 @@ static value_test_t value_tests[] = {
         .senml2 = senml_df(0, 3, SENML_UNIT_NONE),
     },
     {
-        .phydat = { { 314, 0, 0 }, UNIT_G, -2 },
+        .phydat = { { 314, 0, 0 }, UNIT_G_FORCE, -2 },
         .senml1 = senml_f(30.792881, SENML_UNIT_METER_PER_SQUARE_SECOND),
         .senml2 = senml_df(314, -2, SENML_UNIT_NONE),
     },
@@ -99,7 +99,7 @@ static value_test_t value_tests[] = {
         .senml2 = senml_df(193, 2, SENML_UNIT_KILOGRAM_PER_CUBIC_METER),
     },
     {
-        .phydat = { { 220, 0, 0 }, UNIT_GS, 3 },
+        .phydat = { { 220, 0, 0 }, UNIT_GAUSS, 3 },
         .senml1 = senml_f(22, SENML_UNIT_TESLA),
         .senml2 = senml_df(220, -1, SENML_UNIT_TESLA),
     }

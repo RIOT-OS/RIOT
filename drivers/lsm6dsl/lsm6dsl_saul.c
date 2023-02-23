@@ -31,7 +31,7 @@ static int read_acc(const void *dev, phydat_t *res)
     }
 
     res->scale = -3;
-    res->unit = UNIT_G;
+    res->unit = UNIT_G_FORCE;
 
     return 3;
 }

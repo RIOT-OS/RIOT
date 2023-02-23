@@ -29,7 +29,7 @@ static int read_mag(const void *dev, phydat_t *res)
     if (bmx055_mag_read(mydev, res->val) != BMX055_OK) {
         return 0;
     }
-    res->unit = UNIT_GS;
+    res->unit = UNIT_GAUSS;
     res->scale = 0;
     return 3;
 }
@@ -41,7 +41,7 @@ static int read_acc(const void *dev, phydat_t *res)
     if (bmx055_acc_read(mydev, res->val) != BMX055_OK) {
         return 0;
     }
-    res->unit = UNIT_G;
+    res->unit = UNIT_G_FORCE;
     res->scale = -3;
     return 3;
 }

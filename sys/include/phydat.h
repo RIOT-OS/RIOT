@@ -87,16 +87,19 @@ enum {
     UNIT_M2,        /**< square meters */
     UNIT_M3,        /**< cubic meters */
     /* kinetic */
-    UNIT_G,         /**< gravitational force */
+    UNIT_G_FORCE,   /**< gravitational force equivalent */
+    UNIT_G = UNIT_G_FORCE, /**< @deprecated, use UNIT_G_FORCE instead */
     UNIT_DPS,       /**< degree per second */
     /* weight */
-    UNIT_GR,        /**< grams - not using the SI unit (kg) here to make scale
+    UNIT_GRAM,      /**< grams - not using the SI unit (kg) here to make scale
                      *   handling simpler */
+    UNIT_GR = UNIT_GRAM, /**< @deprecated, use UNIT_GRAM instead */
     /* electricity */
     UNIT_A,         /**< Ampere */
     UNIT_V,         /**< Volts */
     UNIT_W,         /**< Watt */
-    UNIT_GS,        /**< gauss */
+    UNIT_GAUSS,     /**< gauss */
+    UNIT_GS = UNIT_GAUSS, /**< @deprecated, use UNIT_GAUSS instead */
     UNIT_T,         /**< Tesla */
     UNIT_DBM,       /**< decibel-milliwatts */
     UNIT_COULOMB,   /**< coulomb */
