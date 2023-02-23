@@ -1,6 +1,4 @@
 BOARD_INSUFFICIENT_MEMORY := \
-    arduino-duemilanove \
-    arduino-uno \
     chronos \
     msb-430 \
     msb-430h \

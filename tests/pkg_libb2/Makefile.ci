@@ -1,16 +1,5 @@
 BOARD_INSUFFICIENT_MEMORY := \
-    arduino-duemilanove \
-    arduino-leonardo \
-    arduino-nano \
-    arduino-uno \
-    atmega1284p \
     atmega256rfr2-xpro \
-    atmega328p \
-    atmega328p-xplained-mini \
-    derfmega128 \
-    derfmega256 \
-    mega-xplained \
-    microduino-corerf \
     msb-430 \
     msb-430h \
     nucleo-f031k6 \
@@ -22,7 +11,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32f030f4-demo \
     stm32g0316-disco \
     telosb \
-    waspmote-pro \
     z1 \
     zigduino \
     #
