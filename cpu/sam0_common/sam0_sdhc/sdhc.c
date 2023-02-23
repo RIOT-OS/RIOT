@@ -319,7 +319,7 @@ int sdhc_init(sdhc_state_t *state)
 
 bool sdhc_send_cmd(sdhc_state_t *state, uint32_t cmd, uint32_t arg)
 {
-    uint32_t timeout = 0xFFFFFFFF;
+    uint32_t timeout = 0xFFFF;
     uint32_t command;
     uint32_t eis;
 
