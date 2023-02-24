@@ -244,22 +244,10 @@ extern "C" {
 #define DWC2_USB_OTG_FS_NUM_EP          (5)
 
 /**
- * @brief   Number of USB OTG HS OUT endpoints including the control endpoint
- */
-#define DWC2_USB_OTG_HS_NUM_EP          (5)
-
-/**
  * @brief   Size of the FIFO shared by all USB OTG FS OUT endpoints
  */
 #ifndef DWC2_USB_OTG_FS_RX_FIFO_SIZE
 #define DWC2_USB_OTG_FS_RX_FIFO_SIZE    (128U)
-#endif
-
-/**
- * @brief   Size of the FIFO shared by all USB OTG HS OUT endpoints
- */
-#ifndef DWC2_USB_OTG_HS_RX_FIFO_SIZE
-#define DWC2_USB_OTG_HS_RX_FIFO_SIZE    (512U)
 #endif
 
 /**
