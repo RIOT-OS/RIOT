@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup fido2_ctap_transport_hid
+ * @ingroup sys_fido2_ctap_transport_hid
  * @{
  * @file
  *
