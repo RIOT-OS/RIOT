@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    fido2_ctap_crypto FIDO2 CTAP crypto
- * @ingroup     fido2_ctap
+ * @defgroup    sys_fido2_ctap_crypto FIDO2 CTAP crypto
+ * @ingroup     sys_fido2_ctap
  * @brief       FIDO2 CTAP crypto helper
  *
  * @{

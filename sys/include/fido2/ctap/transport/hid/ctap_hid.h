@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    fido2_ctap_transport_hid FIDO2 CTAPHID
- * @ingroup     fido2_ctap_transport
+ * @defgroup    sys_fido2_ctap_transport_hid FIDO2 CTAPHID
+ * @ingroup     sys_fido2_ctap_transport
  * @brief       FIDO2 CTAP USB_HID transport binding
  *
  * @{
