@@ -997,7 +997,7 @@ static void _usbdev_init(usbdev_t *dev)
     _flush_tx_fifo(conf, 0x10);
 
     /* Values from the reference manual tables on TRDT configuration        *
-     * 0x09 for 24Mhz ABH frequency, 0x06 for 32Mhz or higher AHB frequency */
+     * 0x09 for 24Mhz AHB frequency, 0x06 for 32Mhz or higher AHB frequency */
     uint8_t trdt = conf->type == DWC2_USB_OTG_FS ? 0x06 : 0x09;
     _global_regs(conf)->GUSBCFG =
         (_global_regs(conf)->GUSBCFG & ~USB_OTG_GUSBCFG_TRDT) |
