@@ -29,7 +29,7 @@
  * in the absence of a hardware random number generator. The API, however, is not meant to face a user.
  *
  * A common component provides optional access to health tests and conditioning
- * (@ref sys_entropy_source_config) that can be run on
+ * (@ref sys_entropy_source_conf) that can be run on
  * parallel instantiations. The conditioning currently implements a von Neumann extractor to
  * unbias samples. It adds a variable runtime (dependent on the input samples) but is lightweight.
  * In future, other conditioning mechanisms such as hash based derivation functions might be
