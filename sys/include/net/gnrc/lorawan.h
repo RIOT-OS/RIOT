@@ -10,7 +10,7 @@
 #pragma once
 
 /**
- * @defgroup    net_gnrc_lorawan GNRC LoRaWAN
+ * @defgroup    net_gnrc_lorawan gnrc_lorawan: GNRC LoRaWAN
  * @ingroup     net_gnrc
  * @brief       GNRC LoRaWAN stack implementation
  *

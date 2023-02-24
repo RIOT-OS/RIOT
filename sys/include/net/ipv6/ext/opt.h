@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_ipv6_ext_opt IPv6 destination and hop-by-hop options
+ * @defgroup    net_ipv6_ext_opt ipv6_ext_opt: IPv6 destination and hop-by-hop options
  * @ingroup     net_ipv6_ext
  * @brief       Definitions for IPv6 destination and hop-by-hop options
  *              extension headers

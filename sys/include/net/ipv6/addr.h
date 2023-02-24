@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_ipv6_addr    IPv6 addresses
+ * @defgroup    net_ipv6_addr    ipv6_addr: IPv6 addresses
  * @ingroup     net_ipv6
  * @brief       IPv6 address architecture
  *

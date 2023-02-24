@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_gnrc_sixlowpan_frag_vrb Virtual reassembly buffer
+ * @defgroup    net_gnrc_sixlowpan_frag_vrb gnrc_sixlowpan_frag_vrb: Virtual reassembly buffer
  * @ingroup     net_gnrc_sixlowpan_frag
  * @brief       Virtual reassembly buffer
  * @{

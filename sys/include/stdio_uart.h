@@ -10,7 +10,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_stdio_uart STDIO over UART
+ * @defgroup    sys_stdio_uart stdio_uart: STDIO over UART
  * @ingroup     sys_stdio
  *
  * @brief       Standard input/output backend using UART

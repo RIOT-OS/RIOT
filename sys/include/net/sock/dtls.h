@@ -13,7 +13,7 @@
 #pragma once
 
 /**
- * @defgroup    net_sock_dtls    DTLS sock API
+ *
  * @ingroup     net_sock net_dtls
  * @brief       Sock submodule for DTLS
  *

@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_fmt_table Table extension of the string formatting API (fmt_table)
+ * @defgroup    sys_fmt_table fmt_table: Table extension of the string formatting API (fmt_table)
  * @ingroup     sys_fmt
  * @brief       Provides utilities to print tables.
  *

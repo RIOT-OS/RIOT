@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_cord CoRE RD Endpoint and Lookup Client
+ * @defgroup    net_cord cord: CoRE RD Endpoint and Lookup Client
  * @ingroup     net
  * @brief       Library for interacting as endpoint and lookup client with CoRE
  *              Resource Directories

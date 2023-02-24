@@ -10,7 +10,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_fuzzing FUZZING utilities
+ * @defgroup    sys_fuzzing fuzzing: FUZZING utilities
  * @ingroup     sys
  *
  * @brief       Various utilities for fuzzing network applications.

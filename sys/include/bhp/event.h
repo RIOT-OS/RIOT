@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup     sys_bhp_event Event based implementation of Bottom Half Processor
+ * @defgroup     sys_bhp_event bhp_event: Event based implementation of Bottom Half Processor
  * @ingroup      sys_bhp
 
  * @brief        Bottom Half Processor module for generic IRQ offloading.

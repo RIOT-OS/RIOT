@@ -11,7 +11,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_ztimer_overhead  ztimer overhead utility
+ * @defgroup    sys_ztimer_overhead  ztimer_overhead: ztimer overhead utility
  * @ingroup     sys_ztimer
  * @brief       ztimer overhead measurement functionality
  *

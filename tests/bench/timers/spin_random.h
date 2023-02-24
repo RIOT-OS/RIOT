@@ -6,7 +6,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_spin_random Spin_random - random CPU delays
+ * @defgroup    sys_spin_random spin_random: Spin_random - random CPU delays
  * @ingroup     sys
  * @brief       CPU spinning routines for random runtime delays
  *

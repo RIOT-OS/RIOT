@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_gcoap_forward_proxy    GCoAP Forward Proxy
+ * @defgroup    net_gcoap_forward_proxy    gcoap_forward_proxy: GCoAP Forward Proxy
  * @ingroup     net_gcoap
  * @brief       Forward proxy implementation for GCoAP
  * @note Does not support CoAPS yet.

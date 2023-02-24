@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup   sys_entropy_source_zero Zero Entropy Source
+ * @defgroup   sys_entropy_source_zero entropy_source_zero_entropy: Zero Entropy Source
  * @ingroup    sys_entropy_source
  * @brief      Zero Entropy Source for testing.
  *
@@ -29,7 +29,7 @@ extern "C" {
 #include <stddef.h>
 
 /**
- * @ingroup    sys_entropy_source_config
+ * @ingroup    sys_entropy_source_conf
  * @{
  */
 

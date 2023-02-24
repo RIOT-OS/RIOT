@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_gnrc_ipv6_nib   Neighbor Information Base for IPv6
+ * @defgroup    net_gnrc_ipv6_nib   gnrc_ipv6_nib: Neighbor Information Base for IPv6
  * @ingroup     net_gnrc_ipv6
  * @brief       Neighbor Information Base (NIB) for IPv6
  *

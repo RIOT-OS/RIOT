@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_universal_address Universal Address Container
+ * @defgroup    sys_universal_address universal_address: Universal Address Container
  * @ingroup     sys
  * @brief       universal address container
  *

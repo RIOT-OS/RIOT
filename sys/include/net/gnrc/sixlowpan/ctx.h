@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_gnrc_sixlowpan_ctx    Contexts for 6LoWPAN address compression
+ * @defgroup    net_gnrc_sixlowpan_ctx    gnrc_sixlowpan_ctx: Contexts for 6LoWPAN address compression
  * @ingroup     net_gnrc_sixlowpan
  * @brief       Context buffer for stateful 6LoWPAN address compression
  * @see         <a href="https://tools.ietf.org/html/rfc6282#section-3.1.2">

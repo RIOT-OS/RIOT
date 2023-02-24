@@ -10,7 +10,7 @@
 
 /**
  * @experimental
- * @defgroup    net_l2filter Link layer address filter
+ * @defgroup    net_l2filter l2filter: Link layer address filter
  * @ingroup     net
  * @brief       Module for filtering (black- or white-listing) link layer
  *              addresses

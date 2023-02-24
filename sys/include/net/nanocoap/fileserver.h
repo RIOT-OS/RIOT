@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_nanocoap_fileserver CoAP file server
+ * @defgroup    net_nanocoap_fileserver nanocoap_fileserver: CoAP file server
  * @ingroup     net_nanocoap
  * @brief       Library for serving files from the VFS to CoAP clients
  *

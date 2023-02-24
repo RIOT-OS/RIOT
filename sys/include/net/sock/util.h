@@ -10,7 +10,7 @@
 #pragma once
 
 /**
- * @defgroup    net_sock_util   sock utility functions
+ *
  * @ingroup     net_sock
  *
  * @brief       sock utility function

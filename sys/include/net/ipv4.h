@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_ipv4    IPv4
+ * @defgroup    net_ipv4    ipv4: IPv4
  * @ingroup     net
  * @brief       IPv4 types and helper functions
  * @{

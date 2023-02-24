@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_hashes Hashes
+ * @defgroup    sys_hashes hashes: Hashes
  * @ingroup     sys
  *
  * @brief       A collection of hash algorithms. RIOT supports some checksum

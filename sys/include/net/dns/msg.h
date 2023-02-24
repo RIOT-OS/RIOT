@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_dns_msg DNS message parser and composer
+ * @defgroup    net_dns_msg dns_msg: DNS message parser and composer
  * @ingroup     net_dns
  * @brief       Parsing and composition of DNS messages
  * @{

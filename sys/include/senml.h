@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_senml SenML
+ * @defgroup    sys_senml senml: SenML
  * @ingroup     sys
  * @brief       Basic SenML types.
  *

@@ -10,7 +10,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_ztimer_periph_ptp  ztimer periph/ptp backend
+ * @defgroup    sys_ztimer_periph_ptp  ztimer_periph_ptp: ztimer periph/ptp backend
  * @ingroup     sys_ztimer
  * @brief       ztimer periph/ptp backend
  *

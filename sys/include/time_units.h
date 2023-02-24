@@ -10,7 +10,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_time_units Time unit representations
+ * @defgroup    sys_time_units time_units: Time unit representations
  * @brief       Timestamp representation, computation, and conversion
  * @ingroup     sys
  *

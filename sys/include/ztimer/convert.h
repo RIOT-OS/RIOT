@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_ztimer_convert ztimer frequency conversion modules
+ * @defgroup    sys_ztimer_convert ztimer_convert: ztimer frequency conversion modules
  * @ingroup     sys_ztimer
  * @brief       ztimer frequency conversion modules
  *

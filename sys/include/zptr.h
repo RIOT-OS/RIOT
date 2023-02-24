@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_util_zptr Pointer Compression
+ * @defgroup    sys_zptr zptr: Pointer Compression
  * @ingroup     sys
  * @brief       Provides 32bit -> 16bit pointer compression
  *
