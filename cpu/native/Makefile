@@ -22,6 +22,10 @@ ifneq (,$(filter mtd_native,$(USEMODULE)))
   DIRS += mtd
 endif
 
+ifneq (,$(filter fs_native,$(USEMODULE)))
+  DIRS += fs
+endif
+
 ifneq (,$(filter backtrace,$(USEMODULE)))
   DIRS += backtrace
 endif
