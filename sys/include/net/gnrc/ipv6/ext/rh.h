@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_ipv6_ext_rh Support for IPv6 routing header extension
+ * @defgroup    net_gnrc_ipv6_ext_rh gnrc_ipv6_ext_rh: Support for IPv6 routing header extension
  * @ingroup     net_gnrc_ipv6_ext
  * @brief       GNRC implementation of IPv6 routing header extension.
  * @{

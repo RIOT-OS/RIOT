@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_rtc_utils RTC helpers
+ * @defgroup    sys_rtc_utils rtc_utils: RTC helpers
  * @ingroup     sys
  * @brief       Common RTC helper functions
  * @{

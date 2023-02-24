@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup   sys_entropy_source_adc ADC Noise Entropy Source
+ * @defgroup   sys_entropy_source_adc entropy_source_adc_noise: ADC Noise Entropy Source
  * @ingroup    sys_entropy_source
  * @brief      Entropy Source based on LSB of ADC samples
  *
@@ -44,7 +44,7 @@ extern "C" {
 #include "periph/adc.h"
 
 /**
- * @ingroup    sys_entropy_source_config
+ * @ingroup    sys_entropy_source_conf
  * @{
  */
 /**

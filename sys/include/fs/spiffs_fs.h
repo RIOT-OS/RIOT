@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_spiffs  SPIFFS integration
+ * @defgroup    sys_spiffs  spiffs: SPIFFS integration
  * @ingroup     pkg_spiffs
  * @brief       RIOT integration of SPIFFS
  *

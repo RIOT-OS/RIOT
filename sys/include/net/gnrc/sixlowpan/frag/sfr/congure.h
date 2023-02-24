@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup net_gnrc_sixlowpan_frag_sfr_congure Congestion control for 6LoWPAN SFR
+ * @defgroup net_gnrc_sixlowpan_frag_sfr_congure gnrc_sixlowpan_frag_sfr_congure: Congestion control for 6LoWPAN SFR
  * @ingroup net_gnrc_sixlowpan_frag_sfr
  *
  * @brief Congestion control for 6LoWPAN SFR using the @ref sys_congure

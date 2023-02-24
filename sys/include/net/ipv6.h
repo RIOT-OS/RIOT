@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_ipv6    IPv6
+ * @defgroup    net_ipv6    ipv6: IPv6
  * @ingroup     net
  * @brief       Provides types and helper functions related to Internet Protocol
  *              version 6 (IPv6)

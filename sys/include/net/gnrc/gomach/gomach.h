@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_gomach GoMacH
+ * @defgroup    net_gnrc_gomach gnrc_gomach: GoMacH
  * @ingroup     net_gnrc
  * @brief       A traffic-adaptive multi-channel MAC
  *

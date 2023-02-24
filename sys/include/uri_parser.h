@@ -6,7 +6,7 @@
  * directory for more details.
  */
 /**
- * @defgroup    sys_uri_parser A minimal, non-destructive URI parser
+ * @defgroup    sys_uri_parser uri_parser: A minimal, non-destructive URI parser
  * @ingroup     sys
  * @brief       A minimal, non-destructive parser for URI references
  *

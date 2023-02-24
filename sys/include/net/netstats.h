@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_netstats Packet statistics per module
+ * @defgroup    net_netstats netstats: Packet statistics per module
  * @ingroup     net
  * @brief       Each module may store information about sent and received packets
  * @{

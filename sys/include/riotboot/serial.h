@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_riotboot_serial Serial Bootloader Protocol
+ * @defgroup    sys_riotboot_serial riotboot_serial: Serial Bootloader Protocol
  * @ingroup     sys
  * @{
  *

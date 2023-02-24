@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_sock_dodtls     DNS over DTLS sock API
+ *
  * @ingroup     net_sock
  *
  * @brief       Sock DNS over DTLS client

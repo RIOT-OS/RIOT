@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup     sys_bhp Bottom Half Processor
+ * @defgroup     sys_bhp bhp: Bottom Half Processor
  * @ingroup      sys
 
  * @brief        Base implementation of Bottom Half Processor module for generic

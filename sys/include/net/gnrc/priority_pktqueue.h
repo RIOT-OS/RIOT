@@ -8,7 +8,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_priority_pktqueue Priority packet queue for GNRC
+ * @defgroup    net_gnrc_priority_pktqueue gnrc_priority_pktqueue: Priority packet queue for GNRC
  * @ingroup     net_gnrc
  * @brief       Wrapper for priority_queue that holds gnrc_pktsnip_t*
  * @{

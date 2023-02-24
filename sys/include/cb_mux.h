@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_cb_mux Callback multiplexer
+ * @defgroup    sys_cb_mux cb_mux: Callback multiplexer
  * @ingroup     sys
  * @brief       cb_mux provides utilities for storing, retrieving, and managing
  *              callback information in a singly linked list.

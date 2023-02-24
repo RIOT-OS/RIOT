@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_coding Error correction codes
+ * @defgroup    sys_coding coding: Error correction codes
  * @ingroup     sys
  * @brief       Error correction function libraries
  *

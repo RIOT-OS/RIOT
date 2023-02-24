@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup net_dhcpv6_client  DHCPv6 client
+ * @defgroup net_dhcpv6_client  dhcpv6_client: DHCPv6 client
  * @ingroup  net_dhcpv6
  * @brief   DHCPv6 client implementation
  * @{

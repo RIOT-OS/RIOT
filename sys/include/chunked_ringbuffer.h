@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_chunk_buffer    chunked Ringbuffer
+ * @defgroup    sys_chunk_buffer    chunk_buffer: chunked Ringbuffer
  * @ingroup     sys
  * @brief       Implementation of a Ringbuffer to store chunks of data
  * @{

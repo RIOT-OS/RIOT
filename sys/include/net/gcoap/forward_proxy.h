@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gcoap_forward_proxy    Gcoap Forward Proxy
+ * @defgroup    net_gcoap_forward_proxy    gcoap_forward_proxy: Gcoap Forward Proxy
  * @ingroup     net_gcoap
  * @brief       Forward proxy implementation for Gcoap
  * @note Does not support CoAPS yet.

@@ -10,7 +10,7 @@
 
 /**
  * @ingroup     sys_suit
- * @defgroup    sys_suit_transport_worker SUIT firmware worker thread
+ * @defgroup    sys_suit_transport_worker suit_transport_worker: SUIT firmware worker thread
  * @brief       SUIT secure firmware updates worker thread
  *
  * @{

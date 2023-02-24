@@ -10,7 +10,7 @@
  */
 
 /**
- * @defgroup sys_trickle Trickle Timer
+ * @defgroup sys_trickle trickle: Trickle Timer
  * @ingroup sys
  * @brief   Implementation of a generic Trickle Algorithm (RFC 6206)
  *

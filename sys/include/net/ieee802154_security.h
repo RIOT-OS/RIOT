@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_ieee802154_security  IEEE 802.15.4 security
+ * @defgroup    net_ieee802154_security  ieee802154_security: IEEE 802.15.4 security
  * @ingroup     net_ieee802154
  * @brief       IEEE 802.15.4 security header
  *

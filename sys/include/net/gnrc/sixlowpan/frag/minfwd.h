@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_sixlowpan_frag_minfwd  Minimal fragment forwarding
+ * @defgroup    net_gnrc_sixlowpan_frag_minfwd  gnrc_sixlowpan_frag_minfwd: Minimal fragment forwarding
  * @ingroup     net_gnrc_sixlowpan_frag
  * @brief       Provides minimal fragment forwarding using the VRB
  * @see         [RFC 8930](https://tools.ietf.org/html/rfc8930)

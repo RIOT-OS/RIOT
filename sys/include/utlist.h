@@ -22,7 +22,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**
- * @defgroup    sys_ut utlist
+ * @defgroup    sys_utlist utlist
  * @ingroup     sys
  * @brief       Basic linked list operation definitions
  * @{

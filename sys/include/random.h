@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_random Random
+ * @defgroup    sys_random random: Random
  * @ingroup     sys
  * @brief       Pseudo Random Number Generator (PRNG)
  * @{

@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_netif_hdr Generic network interface header
+ * @defgroup    net_gnrc_netif_hdr gnrc_netif_hdr: Generic network interface header
  * @ingroup     net_gnrc_netif
  * @{
  *

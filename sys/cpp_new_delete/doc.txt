@@ -1,5 +1,5 @@
 /**
-@defgroup   sys_cpp_new_delete  C++ new and delete operator module
+@defgroup   sys_cpp_new_delete  cpp_new_delete: C++ new and delete operator module
 @ingroup    sys
 @brief      This module provides the `new` and `delete` operators for platforms
             that do not use `libstdc++`.

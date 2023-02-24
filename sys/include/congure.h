@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_congure CongURE - A Congestion control framework
+ * @defgroup    sys_congure congure: CongURE - A Congestion control framework
  * @ingroup     sys
  * @brief       <b>Cong</b>estion control <b>u</b>tilizing <b>r</b>e-usable
  *              <b>e</b>lements

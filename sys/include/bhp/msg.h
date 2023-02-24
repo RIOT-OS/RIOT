@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup     sys_bhp_msg Message based implementation of Bottom Half Processor
+ * @defgroup     sys_bhp_msg bhp_msg: Message based implementation of Bottom Half Processor
  * @ingroup      sys_bhp
  *
  * @note         Offloading ISRs with messages is in general a terrible idea,

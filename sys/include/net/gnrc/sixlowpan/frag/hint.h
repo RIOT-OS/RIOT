@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_sixlowpan_frag_hint    Fragment size hint
+ * @defgroup    net_gnrc_sixlowpan_frag_hint    gnrc_sixlowpan_frag_hint: Fragment size hint
  * @ingroup     net_gnrc_sixlowpan_frag
  * @brief       Provides a hint for smaller fragment sizes than the link-layer
  *              PDU for the next fragment to sent

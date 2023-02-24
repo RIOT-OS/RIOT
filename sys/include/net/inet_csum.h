@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_inet_csum    Internet Checksum
+ * @defgroup    net_inet_csum    inet_csum: Internet Checksum
  * @ingroup     net
  * @brief   Provides a function to calculate the Internet Checksum
  * @{

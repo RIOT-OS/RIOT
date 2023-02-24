@@ -8,7 +8,7 @@
 
 
 /**
- * @defgroup     sys_entropy_source Entropy Sources
+ * @defgroup     sys_entropy_source entropy_source: Entropy Sources
  * @ingroup      sys
  * @brief        Collection of different Entropy Sources
  * @warning      Entropy sources need to be thoroughly evaluated before deployment!

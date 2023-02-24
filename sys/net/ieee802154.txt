@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_ieee802154 IEEE 802.15.4
+ * @defgroup    net_ieee802154 ieee802154: IEEE 802.15.4
  * @ingroup     net
  * @brief       IEEE 802.15.4 components
  *

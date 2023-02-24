@@ -10,7 +10,7 @@
  */
 
 /**
- * @defgroup    net_nanocoap Nanocoap small CoAP library
+ * @defgroup    net_nanocoap nanocoap: Nanocoap small CoAP library
  * @ingroup     net
  * @brief       CoAP library optimized for minimal resource usage
  *

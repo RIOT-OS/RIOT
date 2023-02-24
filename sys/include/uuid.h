@@ -8,7 +8,7 @@
  */
 
 /**
- * @defgroup    sys_uuid RFC 4122 compliant UUID's
+ * @defgroup    sys_uuid uuid: RFC 4122 compliant UUID's
  * @ingroup     sys
  * @brief       Provides RFC 4122 compliant UUID's
  *

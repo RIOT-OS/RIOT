@@ -1,5 +1,5 @@
 /**
- * @defgroup    sys_arduino Arduino
+ * @defgroup    sys_arduino arduino: Arduino compatibility layer
  * @ingroup     sys
  * @brief       Arduino in RIOT
  *

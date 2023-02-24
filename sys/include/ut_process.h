@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup sys_ut_process URI template processor
+ * @defgroup sys_ut_process ut_process: URI template processor
  * @ingroup  sys
  * @brief   URI template processor
  *

@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_stdio_rtt STDIO over SEGGER RTT
+ * @defgroup    sys_stdio_rtt stdio_rtt: STDIO over SEGGER RTT
  * @ingroup     sys_stdio
  *
  * @brief       STDIO mapping for running the STDIO over SEGGER's RTT interface

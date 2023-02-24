@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gcoap_fileserver GCoAP file server
+ * @defgroup    net_gcoap_fileserver gcoap_fileserver: GCoAP file server
  * @ingroup     net_gcoap
  * @brief       Library for serving files from the VFS to CoAP clients
  *

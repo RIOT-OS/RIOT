@@ -7,7 +7,7 @@
  * directory for more details.
  */
 /**
- * @defgroup    sys_suit_transport_mock SUIT secure firmware OTA mock transport
+ * @defgroup    sys_suit_transport_mock suit_transport_mock: SUIT secure firmware OTA mock transport
  * @ingroup     sys_suit
  * @brief       SUIT firmware mock transport
  *

@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_senml_cbor SenML CBOR
+ * @defgroup    sys_senml_cbor senml_cbor: SenML CBOR
  * @ingroup     sys_senml
  * @brief       Functionality for encoding SenML values as CBOR
  *

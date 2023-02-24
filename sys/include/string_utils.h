@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_string_utils    Utility functions that are missing in
+ * @defgroup    sys_string_utils    string_utils: Utility functions that are missing in
  *                                  `string.h`
  * @ingroup     sys
  *

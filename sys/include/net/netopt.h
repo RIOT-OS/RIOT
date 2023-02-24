@@ -8,7 +8,7 @@
  */
 
 /**
- * @defgroup    net_netopt   Netopt - Configuration options for network APIs
+ * @defgroup    net_netopt   netopt: Netopt - Configuration options for network APIs
  * @ingroup     net
  * @brief       List of available configuration options for the
  *              @ref drivers_netdev_api and the @ref net_gnrc_netapi

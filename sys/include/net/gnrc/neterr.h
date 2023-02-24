@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_neterr Error reporting
+ * @defgroup    net_gnrc_neterr gnrc_neterr: Error reporting
  * @ingroup     net_gnrc
  * @brief       Allows for asynchronous error reporting in the network stack.
  * @{

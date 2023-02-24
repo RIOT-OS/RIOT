@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup net_gcoap_dns  DNS over CoAP client implementation
+ * @defgroup net_gcoap_dns  gcoap_dns: DNS over CoAP client implementation
  * @ingroup  net_gcoap
  *
  * @brief   A DNS over CoAP client prototype based on gCoAP.
@@ -41,7 +41,7 @@ extern "C" {
 #endif
 
 /**
- * @defgroup    gcoap_dns_config    GCoAP DNS over CoAP client configuration
+ * @defgroup    gcoap_dns_conf    GCoAP DNS over CoAP client configuration
  * @ingroup     config
  * @{
  */

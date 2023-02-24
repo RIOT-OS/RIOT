@@ -8,7 +8,7 @@
  */
 
 /**
- * @defgroup    net_ipv6_ext_rh IPv6 routing header extension
+ * @defgroup    net_ipv6_ext_rh ipv6_ext_rh: IPv6 routing header extension
  * @ingroup     net_ipv6_ext
  * @brief       Definitions for IPv6 routing header extension.
  * @{

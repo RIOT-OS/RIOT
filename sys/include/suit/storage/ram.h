@@ -7,7 +7,7 @@
  * directory for more details.
  */
 /**
- * @defgroup    sys_suit_storage_ram  ram storage backend
+ * @defgroup    sys_suit_storage_ram  suit_storage_ram: ram storage backend
  * @ingroup     sys_suit_storage
  * @brief       RAM blob SUIT payload storage backends
  *

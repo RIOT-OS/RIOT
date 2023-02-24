@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_eui48 IEEE EUI-48 identifier
+ * @defgroup    net_eui48 eui48: IEEE EUI-48 identifier
  * @ingroup     net
  * @brief       Definition and IPv6 IID conversion for IEEE EUI-48 identifiers
  * @{

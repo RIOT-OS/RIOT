@@ -8,7 +8,7 @@
  */
 
 /**
- * @defgroup    sys_tiny_strerror   Tiny strerror() implementation
+ * @defgroup    sys_tiny_strerror   tiny_strerror: Tiny strerror() implementation
  * @ingroup     sys
  * @brief       Tiny strerror() implementation
  *

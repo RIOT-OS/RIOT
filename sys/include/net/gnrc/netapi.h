@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_netapi   GNRC communication interface
+ * @defgroup    net_gnrc_netapi   gnrc_netapi: GNRC communication interface
  * @ingroup     net_gnrc
  * @brief       Generic interface for IPC communication between GNRC modules
  *
@@ -24,7 +24,7 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
- * @defgroup    net_gnrc_netapi_mbox   Mailbox IPC extension
+ * @defgroup    net_gnrc_netapi_mbox   gnrc_netapi_mbox: Mailbox IPC extension
  * @ingroup     net_gnrc_netapi
  * @brief       @ref core_mbox "Mailbox IPC" extension for @ref net_gnrc_netapi
  * @{
@@ -40,7 +40,7 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * @}
  *
- * @defgroup    net_gnrc_netapi_callbacks   Callback extension
+ * @defgroup    net_gnrc_netapi_callbacks   gnrc_netapi_callbacks: Callback extension
  * @ingroup     net_gnrc_netapi
  * @brief       Callback extension for @ref net_gnrc_netapi
  * @{

@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup  sys_fs_devfs DevFS device file system
+ * @defgroup  sys_fs_devfs fs_devfs: DevFS device file system
  * @ingroup   sys_fs
  * @brief     Dynamic device file system
  *

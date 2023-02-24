@@ -8,7 +8,7 @@
  */
 
 /**
- * @defgroup    sys_evtimer Millisecond interval event timers
+ * @defgroup    sys_evtimer evtimer: Millisecond interval event timers
  * @ingroup     sys
  * @brief       Provides timers for events up to @$2^{32}@$ milliseconds in the
  *              future

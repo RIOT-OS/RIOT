@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_loramac LoRaMAC
+ * @defgroup    net_loramac loramac: LoRaMAC
  * @ingroup     net
  * @brief       LoRaMAC definitions
  *

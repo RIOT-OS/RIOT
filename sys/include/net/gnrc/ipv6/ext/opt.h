@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_ipv6_ext_opt Support for IPv6 option extension headers
+ * @defgroup    net_gnrc_ipv6_ext_opt gnrc_ipv6_ext_opt: Support for IPv6 option extension headers
  * @ingroup     net_gnrc_ipv6_ext
  * @brief       GNRC implementation of IPv6 hop-by-hop and destination option
  *              header extension

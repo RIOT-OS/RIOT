@@ -8,7 +8,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_sixlowpan_frag   6LoWPAN Fragmentation
+ * @defgroup    net_gnrc_sixlowpan_frag   gnrc_sixlowpan_frag: 6LoWPAN Fragmentation
  * @ingroup     net_gnrc_sixlowpan
  * @brief       6LoWPAN Fragmentation headers and functionality
  * @see <a href="https://tools.ietf.org/html/rfc4944#section-5.3">

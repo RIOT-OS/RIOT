@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup  sys_vfs Virtual File System (VFS) layer
+ * @defgroup  sys_vfs vfs: Virtual File System (VFS) layer
  * @ingroup   sys
  * @brief     Provides an interface for accessing files and directories from
  *            different devices and file systems

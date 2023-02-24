@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_l2util Stack-independent helpers for IPv6 over X
+ * @defgroup    net_l2util l2util: Stack-independent helpers for IPv6 over X
  * @ingroup     net
  * @brief       This implements some common helper functions for IPv6 over X
  *              implementations based on [network device types]

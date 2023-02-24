@@ -10,7 +10,7 @@
 
 /**
  * @ingroup     sys_suit
- * @defgroup    sys_suit_transport_coap SUIT firmware CoAP transport
+ * @defgroup    sys_suit_transport_coap suit_transport_coap: SUIT firmware CoAP transport
  * @brief       SUIT secure firmware updates over CoAP
  *
  * @{

@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_tsrb Thread safe ringbuffer
+ * @defgroup    sys_tsrb tsrb: Thread safe ringbuffer
  * @ingroup     sys
  * @brief       Thread-safe ringbuffer implementation
  * @{
