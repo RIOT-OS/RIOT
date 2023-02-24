@@ -1546,7 +1546,8 @@ void _isr_common(dwc2_usb_otg_fshs_t *usbdev)
         }
         _global_regs(conf)->GAHBCFG &= ~USB_OTG_GAHBCFG_GINT;
     }
-#ifdef MCU_STM32
+
+#ifdef MODULE_CORTEXM_COMMON
     cortexm_isr_end();
 #endif
 }
