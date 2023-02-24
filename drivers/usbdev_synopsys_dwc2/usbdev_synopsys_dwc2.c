@@ -207,9 +207,17 @@ static __IO uint32_t *_pcgcctl_reg(const dwc2_usb_otg_fshs_config_t *conf)
  */
 static size_t _max_endpoints(const dwc2_usb_otg_fshs_config_t *config)
 {
-    return (config->type == DWC2_USB_OTG_FS) ?
-           DWC2_USB_OTG_FS_NUM_EP :
-           DWC2_USB_OTG_HS_NUM_EP;
+    (void)config;
+#if defined(DWC2_USB_OTG_FS_ENABLED) && defined(DWC2_USB_OTG_HS_ENABLED)
+    return config->type == DWC2_USB_OTG_FS ? DWC2_USB_OTG_FS_NUM_EP
+                                           : DWC2_USB_OTG_HS_NUM_EP
+#elif defined(DWC2_USB_OTG_FS_ENABLED)
+    return DWC2_USB_OTG_FS_NUM_EP;
+#elif defined(DWC2_USB_OTG_HS_ENABLED)
+    return DWC2_USB_OTG_HS_NUM_EP;
+#else
+    return 0;
+#endif
 }
 
 static bool _uses_dma(const dwc2_usb_otg_fshs_config_t *config)
@@ -471,21 +479,17 @@ static usbdev_ep_t *_get_ep(dwc2_usb_otg_fshs_t *usbdev, unsigned num,
 #if defined(DEVELHELP) && !defined(NDEBUG)
 static size_t _total_fifo_size(const dwc2_usb_otg_fshs_config_t *conf)
 {
-    if (conf->type == DWC2_USB_OTG_FS) {
-#ifdef DWC2_USB_OTG_FS_ENABLED
-        return DWC2_USB_OTG_FS_TOTAL_FIFO_SIZE;
+    (void)conf;
+#if defined(DWC2_USB_OTG_FS_ENABLED) && defined(DWC2_USB_OTG_HS_ENABLED)
+    return conf->type == DWC2_USB_OTG_FS ? DWC2_USB_OTG_FS_TOTAL_FIFO_SIZE
+                                         : DWC2_USB_OTG_HS_TOTAL_FIFO_SIZE;
+#elif defined(DWC2_USB_OTG_FS_ENABLED)
+    return DWC2_USB_OTG_FS_TOTAL_FIFO_SIZE;
+#elif defined(DWC2_USB_OTG_HS_ENABLED)
+    return DWC2_USB_OTG_HS_TOTAL_FIFO_SIZE;
 #else
-        return 0;
-#endif  /* DWC2_USB_OTG_FS_ENABLED */
-    }
-    else {
-#ifdef DWC2_USB_OTG_HS_ENABLED
-        return DWC2_USB_OTG_HS_TOTAL_FIFO_SIZE;
-#else
-        return 0;
-#endif  /* DWC2_USB_OTG_HS_ENABLED */
-    }
-
+    return 0;
+#endif
 }
 #endif /* defined(DEVELHELP) && !defined(NDEBUG) */
 
@@ -513,9 +517,16 @@ static void _configure_fifo(dwc2_usb_otg_fshs_t *usbdev)
 {
     /* TODO: cleanup, more dynamic, etc */
     const dwc2_usb_otg_fshs_config_t *conf = usbdev->config;
-    size_t rx_size = conf->type == DWC2_USB_OTG_FS
-                     ? DWC2_USB_OTG_FS_RX_FIFO_SIZE
-                     : DWC2_USB_OTG_HS_RX_FIFO_SIZE;
+
+    size_t rx_size = 0;
+#if defined(DWC2_USB_OTG_FS_ENABLED) && defined(DWC2_USB_OTG_HS_ENABLED)
+    rx_size = (conf->type == DWC2_USB_OTG_FS) ? DWC2_USB_OTG_FS_RX_FIFO_SIZE
+                                              : DWC2_USB_OTG_HS_RX_FIFO_SIZE;
+#elif defined(DWC2_USB_OTG_FS_ENABLED)
+    rx_size = DWC2_USB_OTG_FS_RX_FIFO_SIZE;
+#elif defined(DWC2_USB_OTG_HS_ENABLED)
+    rx_size = DWC2_USB_OTG_HS_RX_FIFO_SIZE;
+#endif
 
     _global_regs(conf)->GRXFSIZ =
         (_global_regs(conf)->GRXFSIZ & ~USB_OTG_GRXFSIZ_RXFD) |
@@ -1564,7 +1575,6 @@ void isr_otg_hs(void)
 
 #elif defined(MCU_ESP32)
 
-#ifdef DWC2_USB_OTG_FS_ENABLED
 void isr_otg_fs(void *arg)
 {
     (void)arg;
@@ -1574,23 +1584,10 @@ void isr_otg_fs(void *arg)
 
     _isr_common(usbdev);
 }
-#endif /* DWC2_USB_OTG_FS_ENABLED */
-
-#ifdef DWC2_USB_OTG_HS_ENABLED
-void isr_otg_hs(void *arg)
-{
-    (void)arg;
-
-    /* Take the last usbdev device from the list */
-    dwc2_usb_otg_fshs_t *usbdev = &_usbdevs[USBDEV_NUMOF - 1];
-
-    _isr_common(usbdev);
-}
-#endif /* DWC2_USB_OTG_HS_ENABLED */
 
 #elif defined(MCU_EFM32)
 
- void isr_usb(void)
+void isr_usb(void)
 {
     /* Take the first device from the list */
     dwc2_usb_otg_fshs_t *usbdev = &_usbdevs[0];
