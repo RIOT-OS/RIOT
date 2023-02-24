@@ -18,14 +18,26 @@ affect more than one module.
 
 ## ARM Cortex-M
 
+### Atmel Sam0 line (SAM D1x/D2x, L1x, L2x, D5x)
+
+ - Benjamin Valentin (@benpicco)
+
 ## Atmel AVR (Atmega)
 
 ## Native
+
+### ZEP radio simulation & ZEP dispatcher
+
+ - Benjamin Valentin (@benpicco)
 
 # Hardware modules
 
 ## Network devices
 ### IEEE 802.15.4
+
+#### AT86RF215
+
+ - Benjamin Valentin (@benpicco)
 
 ### BLE
 
@@ -47,6 +59,10 @@ affect more than one module.
 
 ## Power Management
 
+## MTD Subsystem
+
+ - Benjamin Valentin (@benpicco)
+
 ## File Systems
 
 ## USB support
@@ -65,6 +81,10 @@ affect more than one module.
 
 ## Network stacks
 ### GNRC
+
+#### IPv6 Auto-Subnetting
+
+ - Benjamin Valentin (@benpicco)
 
 ### CCN-Lite
 
@@ -92,6 +112,10 @@ affect more than one module.
 
 ## Application protocols
 ### CoAP
+
+#### nanoCoAP
+
+ - Benjamin Valentin (@benpicco)
 
 ### MQTT
 
