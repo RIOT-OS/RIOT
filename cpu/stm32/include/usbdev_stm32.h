@@ -80,7 +80,7 @@ extern "C" {
 #endif
 
 /**
- * @brief USB OTG FS FIFO total size
+ * @brief USB OTG FS FIFO total size in bytes
  *
  * Some device families (F7 and L4) forgot to define the FS device FIFO size
  * in their vendor headers. This define sets it to the value from the
@@ -91,7 +91,7 @@ extern "C" {
 #endif
 
 /**
- * @brief USB OTG FS FIFO total size
+ * @brief USB OTG FS FIFO total size in bytes
  *
  * Some device families (F7 and L4) forgot to define the HS device FIFO size
  * in their vendor headers. This define sets it to the value from the
@@ -102,12 +102,12 @@ extern "C" {
 #endif
 
 /**
- * @brief USB OTG FS FIFO total size
+ * @brief USB OTG FS FIFO total size in bytes
  */
 #define DWC2_USB_OTG_FS_TOTAL_FIFO_SIZE USB_OTG_FS_TOTAL_FIFO_SIZE
 
 /**
- * @brief USB OTG HS FIFO total size
+ * @brief USB OTG HS FIFO total size in bytes
  */
 #define DWC2_USB_OTG_HS_TOTAL_FIFO_SIZE USB_OTG_HS_TOTAL_FIFO_SIZE
 
