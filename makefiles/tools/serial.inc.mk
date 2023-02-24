@@ -5,10 +5,15 @@ ifeq (1,$(MOST_RECENT_PORT))
   endif
   TTY_SELECT_CMD ?= $(RIOTTOOLS)/usb-serial/ttys.py \
                     --most-recent \
-                    --format path \
+                    --format path serial \
                     $(TTY_BOARD_FILTER)
-  PORT_DETECTED := $(shell $(TTY_SELECT_CMD) || echo 'no-tty-detected')
-  PORT ?= $(PORT_DETECTED)
+  TTY_DETECTED := $(shell $(TTY_SELECT_CMD) || echo 'no-tty-detected no-serial-detected')
+  PORT_DETECTED := $(firstword $(TTY_DETECTED))
+  PORT_SERIAL_DETECTED := $(lastword $(TTY_DETECTED))
+  PORT ?= $(firstword $(TTY_DETECTED))
+  ifeq (1,$(DEBUG_ADAPTER_ID_IS_TTY_SERIAL))
+    DEBUG_ADAPTER_ID ?= $(PORT_SERIAL_DETECTED)
+  endif
 endif
 # Otherwise, use as default the most commonly used ports on Linux and OSX
 PORT_LINUX ?= /dev/ttyACM0

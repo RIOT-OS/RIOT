@@ -60,10 +60,9 @@ static void _config_upstream(gnrc_netif_t *upstream)
     DEBUG("gnrc_ipv6_static_addr: interface %u selected as upstream\n", upstream->pid);
 
     /* configure static address */
-    int addr_len;
     if (static_addr != NULL &&
-        (addr_len = ipv6_prefix_from_str(&addr, static_addr)) > 0) {
-        gnrc_netif_ipv6_addr_add_internal(upstream, &addr, addr_len,
+        ipv6_addr_from_str(&addr, static_addr) != NULL) {
+        gnrc_netif_ipv6_addr_add_internal(upstream, &addr, 128,
                                           GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
     }
 
