@@ -513,9 +513,29 @@ static void _configure_tx_fifo(dwc2_usb_otg_fshs_t *usbdev, size_t num,
     usbdev->fifo_pos += wordlen;
 }
 
+/*
+ * GRFXSIZ, DWC2_USB_OTG_{HS,FS}_RX_FIFO_SIZE, DWC2_USB_OTG_FIFO_MIN_WORD_SIZE
+ * are given in 32-bit words
+ *
+ * +--------------------+
+ * |   TX FIFO EPn IN   |
+ * +--------------------+ GRFXSIZ + (n * DWC2_USB_OTG_FIFO_MIN_WORD_SIZE)
+ * |         ...        |
+ * +--------------------+ GRFXSIZ + (2 * DWC2_USB_OTG_FIFO_MIN_WORD_SIZE)
+ * |   TX FIFO EP1 IN   |
+ * +--------------------+ GRFXSIZ + (1 * DWC2_USB_OTG_FIFO_MIN_WORD_SIZE)
+ * |   TX FIFO EP0 IN   |
+ * +--------------------+ GRXFSIZ = DWC2_USB_OTG_{HS,FS}_RX_FIFO_SIZE
+ * |                    |
+ * |                    |
+ * | RX FIFO Shared OUT |
+ * |                    |
+ * |                    |
+ * +--------------------+ 0
+ */
 static void _configure_fifo(dwc2_usb_otg_fshs_t *usbdev)
 {
-    /* TODO: cleanup, more dynamic, etc */
+    /* TODO: dynamic FIFO size handling */
     const dwc2_usb_otg_fshs_config_t *conf = usbdev->config;
 
     size_t rx_size = 0;
@@ -531,9 +551,11 @@ static void _configure_fifo(dwc2_usb_otg_fshs_t *usbdev)
     _global_regs(conf)->GRXFSIZ =
         (_global_regs(conf)->GRXFSIZ & ~USB_OTG_GRXFSIZ_RXFD) |
         rx_size;
+    /* set size and position of TX FIFO for EP0 IN */
     _global_regs(conf)->DIEPTXF0_HNPTXFSIZ =
         (DWC2_USB_OTG_FIFO_MIN_WORD_SIZE << USB_OTG_TX0FD_Pos) |
         rx_size;
+    /* position of TX FIFO for EP1 IN */
     usbdev->fifo_pos = (rx_size + DWC2_USB_OTG_FIFO_MIN_WORD_SIZE);
 }
 
