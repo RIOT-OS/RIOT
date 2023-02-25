@@ -40,6 +40,10 @@
 #define PAGE_SIZE 64
 #endif
 
+#ifndef HAVE_DIRS
+#define HAVE_DIRS 1
+#endif
+
 static uint8_t dummy_memory[PAGE_PER_SECTOR * PAGE_SIZE * SECTOR_COUNT];
 
 static int _init(mtd_dev_t *dev)
@@ -235,6 +239,7 @@ static void tests_vfs_unlink(void)
     TEST_ASSERT_EQUAL_INT(0, res);
 }
 
+#if HAVE_DIRS
 static void tests_vfs_readdir(void)
 {
     const char buf0[] = "TESTSTRING";
@@ -283,6 +288,7 @@ static void tests_vfs_readdir(void)
     int nb_files = 0;
     do {
         res = vfs_readdir(&dirp, &entry);
+        puts(entry.d_name);
         if (res == 1 && (strcmp("test0.txt", &(entry.d_name[0])) == 0 ||
                          strcmp("test1.txt", &(entry.d_name[0])) == 0)) {
             nb_files++;
@@ -323,6 +329,7 @@ static void tests_vfs_readdir(void)
     res = vfs_rmdir("/test-vfs/a");
     TEST_ASSERT_EQUAL_INT(0, res);
 }
+#endif
 
 static void tests_vfs_rename(void)
 {
@@ -413,7 +420,9 @@ Test *tests_vfs(void)
         new_TestFixture(tests_vfs_open_close),
         new_TestFixture(tests_vfs_write),
         new_TestFixture(tests_vfs_unlink),
+#if HAVE_DIRS
         new_TestFixture(tests_vfs_readdir),
+#endif
         new_TestFixture(tests_vfs_rename),
         new_TestFixture(tests_vfs_statvfs),
     };
