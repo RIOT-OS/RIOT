@@ -66,7 +66,7 @@ void dac_set(dac_t line, uint16_t value)
 
     DAC_ChannelOutputSet(dac_config[dev].dev,
                          dac_channel_config[line].index,
-                         value & 0xfff);
+                         value >> 4);
 }
 
 void dac_poweron(dac_t line)
