@@ -60,21 +60,25 @@ void _native_LED_RED_TOGGLE(void);
  * @{
  */
 #ifndef MTD_PAGE_SIZE
-#ifdef MODULE_FATFS
+#if defined(MODULE_FATFS) || defined(MODULE_LWEXT4)
 #define MTD_PAGE_SIZE           (512)
 #else
 #define MTD_PAGE_SIZE           (256)
 #endif
 #endif
 #ifndef MTD_SECTOR_SIZE
-#ifdef MODULE_FATFS
+#if defined(MODULE_FATFS) || defined(MODULE_LWEXT4)
 #define MTD_SECTOR_SIZE         (512)
 #else
 #define MTD_SECTOR_SIZE         (4096)
 #endif
 #endif
 #ifndef MTD_SECTOR_NUM
+#if defined(MODULE_FATFS) || defined(MODULE_LWEXT4)
+#define MTD_SECTOR_NUM          (32768)
+#else
 #define MTD_SECTOR_NUM          (2048)
+#endif
 #endif
 /** Advertised write size. While the file system backend supports single byte
  * granularity, this can be increased to mimic other media. */

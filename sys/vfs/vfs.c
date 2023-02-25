@@ -1085,8 +1085,13 @@ static inline int _find_mount(vfs_mount_t **mountpp, const char *name, const cha
     atomic_fetch_add(&mountp->open_files, 1);
     mutex_unlock(&_mount_mutex);
     *mountpp = mountp;
+
     if (rel_path != NULL) {
-        *rel_path = name + longest_match;
+        if (mountp->fs->flags & VFS_FS_FLAG_WANT_ABS_PATH) {
+            *rel_path = name;
+        } else {
+            *rel_path = name + longest_match;
+        }
     }
     return 0;
 }

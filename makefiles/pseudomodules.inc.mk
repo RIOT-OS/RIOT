@@ -273,6 +273,11 @@ PSEUDOMODULES += l2filter_whitelist
 PSEUDOMODULES += libstdcpp
 PSEUDOMODULES += log
 PSEUDOMODULES += lora
+PSEUDOMODULES += lwext4_no_gpl
+PSEUDOMODULES += lwext2_vfs
+PSEUDOMODULES += lwext3_vfs
+PSEUDOMODULES += lwext4_vfs
+PSEUDOMODULES += lwext4_vfs_format
 ## @defgroup pseudomodule_libc_gettimeofday libc_gettimeofday
 ## @brief Includes implementation of gettimeofday()
 ##
