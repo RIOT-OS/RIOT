@@ -969,11 +969,12 @@ int vfs_mount_by_path(const char *path);
  * @note This assumes mount points have been configured with @ref VFS_AUTO_MOUNT.
  *
  * @param[in]  path     Path of the pre-configured mount point
+ * @param[in]  force    Unmount the filesystem even if there are still open files
  *
  * @return 0 on success
  * @return <0 on error
  */
-int vfs_unmount_by_path(const char *path);
+int vfs_unmount_by_path(const char *path, bool force);
 
 /**
  * @brief Rename a file
@@ -996,11 +997,12 @@ int vfs_rename(const char *from_path, const char *to_path);
  * This will fail if there are any open files or directories on the mounted file system
  *
  * @param[in]  mountp    pointer to the mount structure of the file system to unmount
+ * @param[in]  force    Unmount the filesystem even if there are still open files
  *
  * @return 0 on success
  * @return <0 on error
  */
-int vfs_umount(vfs_mount_t *mountp);
+int vfs_umount(vfs_mount_t *mountp, bool force);
 
 /**
  * @brief Unlink (delete) a file from a mounted file system

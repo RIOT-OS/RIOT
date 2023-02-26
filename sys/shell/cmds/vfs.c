@@ -191,7 +191,7 @@ static int _umount_handler(int argc, char **argv)
         return -1;
     }
 
-    int res = vfs_unmount_by_path(argv[1]);
+    int res = vfs_unmount_by_path(argv[1], false);
     if (res < 0) {
         puts(tiny_strerror(res));
     }
@@ -207,7 +207,7 @@ static int _remount_handler(int argc, char **argv)
         return -1;
     }
 
-    vfs_unmount_by_path(argv[1]);
+    vfs_unmount_by_path(argv[1], false);
     int res = vfs_mount_by_path(argv[1]);
     if (res < 0) {
         puts(tiny_strerror(res));
