@@ -72,7 +72,7 @@ static void test_vfs_mount_umount(void)
     int res;
     res = vfs_mount(&_test_vfs_mount);
     TEST_ASSERT_EQUAL_INT(0, res);
-    res = vfs_umount(&_test_vfs_mount);
+    res = vfs_umount(&_test_vfs_mount, false);
     TEST_ASSERT_EQUAL_INT(0, res);
 }
 
@@ -89,9 +89,9 @@ static void test_vfs_mount__invalid(void)
 static void test_vfs_umount__invalid_mount(void)
 {
     int res;
-    res = vfs_umount(NULL);
+    res = vfs_umount(NULL, false);
     TEST_ASSERT(res < 0);
-    res = vfs_umount(&_test_vfs_mount);
+    res = vfs_umount(&_test_vfs_mount, false);
     TEST_ASSERT(res < 0);
 }
 
@@ -124,7 +124,7 @@ static void test_vfs_constfs_open(void)
         TEST_ASSERT_EQUAL_INT(0, res);
     }
 
-    res = vfs_umount(&_test_vfs_mount);
+    res = vfs_umount(&_test_vfs_mount, false);
     TEST_ASSERT_EQUAL_INT(0, res);
 }
 
@@ -169,7 +169,7 @@ static void test_vfs_constfs_read_lseek(void)
     res = vfs_close(fd);
     TEST_ASSERT_EQUAL_INT(0, res);
 
-    res = vfs_umount(&_test_vfs_mount);
+    res = vfs_umount(&_test_vfs_mount, false);
     TEST_ASSERT_EQUAL_INT(0, res);
 }
 
@@ -199,7 +199,7 @@ static void test_vfs_constfs__posix(void)
     res = close(fd);
     TEST_ASSERT_EQUAL_INT(0, res);
 
-    res = vfs_umount(&_test_vfs_mount);
+    res = vfs_umount(&_test_vfs_mount, false);
     TEST_ASSERT_EQUAL_INT(0, res);
 }
 #endif

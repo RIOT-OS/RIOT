@@ -96,7 +96,7 @@ int main(void) {
     /* N1N2, unmount 3, N4E */
     iter_and_report(&iter);
     iter_and_report(&iter);
-    res |= vfs_umount(&mount3);
+    res |= vfs_umount(&mount3, false);
     iter_and_report(&iter);
     iter_and_report(&iter);
 
@@ -104,19 +104,19 @@ int main(void) {
     /* It is OK that 1 is reported twice, because its first occurrence is its
      * old mounting, and later it reappears */
     iter_and_report(&iter);
-    res |= vfs_umount(&mount2);
+    res |= vfs_umount(&mount2, false);
     iter_and_report(&iter);
     res |= vfs_mount(&mount3);
     iter_and_report(&iter);
-    res |= vfs_umount(&mount1);
+    res |= vfs_umount(&mount1, false);
     res |= vfs_mount(&mount1);
     iter_and_report(&iter);
     iter_and_report(&iter);
 
     /* This ensures we're not leaking locks */
-    res |= vfs_umount(&mount1);
-    res |= vfs_umount(&mount3);
-    res |= vfs_umount(&mount4);
+    res |= vfs_umount(&mount1, false);
+    res |= vfs_umount(&mount3, false);
+    res |= vfs_umount(&mount4, false);
     printf("All unmounted\n");
 
     /* Only O */

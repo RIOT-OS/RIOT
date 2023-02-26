@@ -116,7 +116,7 @@ static void test_tinyvcdiff_vfs(void)
     TEST_ASSERT_EQUAL_INT(0, memcmp(target_bin, target_buf, sizeof(target_buf)));
     vfs_close(target_fd);
 
-    vfs_umount(&mnt);
+    vfs_umount(&mnt, false);
 }
 
 Test *tests_tinyvcdiff(void)

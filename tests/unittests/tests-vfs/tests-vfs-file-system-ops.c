@@ -71,7 +71,7 @@ static void setup(void)
 
 static void teardown(void)
 {
-    vfs_umount(&_test_vfs_mount_null);
+    vfs_umount(&_test_vfs_mount_null, false);
 }
 
 static void test_vfs_null_fs_ops_mount(void)
@@ -85,9 +85,9 @@ static void test_vfs_null_fs_ops_mount(void)
 static void test_vfs_null_fs_ops_umount(void)
 {
     TEST_ASSERT_EQUAL_INT(0, _test_vfs_fs_op_mount_res);
-    int res = vfs_umount(&_test_vfs_mount_null);
+    int res = vfs_umount(&_test_vfs_mount_null, false);
     TEST_ASSERT_EQUAL_INT(0, res);
-    res = vfs_umount(&_test_vfs_mount_null);
+    res = vfs_umount(&_test_vfs_mount_null, false);
     /* Not mounted */
     TEST_ASSERT_EQUAL_INT(-EINVAL, res);
 }

@@ -142,13 +142,13 @@ static void test_littlefs_teardown(void)
     vfs_unlink("/test-littlefs/test1.txt");
     vfs_unlink("/test-littlefs/a/test2.txt");
     vfs_rmdir("/test-littlefs/a");
-    vfs_umount(&_test_littlefs_mount);
+    vfs_umount(&_test_littlefs_mount, false);
 }
 
 static void tests_littlefs_format(void)
 {
     int res;
-    vfs_umount(&_test_littlefs_mount);
+    vfs_umount(&_test_littlefs_mount, false);
     res = mtd_erase(_dev, 0, _dev->page_size * _dev->pages_per_sector * _dev->sector_count);
     TEST_ASSERT_EQUAL_INT(0, res);
 
@@ -162,7 +162,7 @@ static void tests_littlefs_format(void)
     res = vfs_mount(&_test_littlefs_mount);
     TEST_ASSERT_EQUAL_INT(0, res);
 
-    res = vfs_umount(&_test_littlefs_mount);
+    res = vfs_umount(&_test_littlefs_mount, false);
     TEST_ASSERT_EQUAL_INT(0, res);
 
     /* 2. format a valid file system */
@@ -173,7 +173,7 @@ static void tests_littlefs_format(void)
 static void tests_littlefs_mount_umount(void)
 {
     int res;
-    res = vfs_umount(&_test_littlefs_mount);
+    res = vfs_umount(&_test_littlefs_mount, false);
     TEST_ASSERT_EQUAL_INT(0, res);
 
     res = vfs_mount(&_test_littlefs_mount);
