@@ -1,6 +1,7 @@
 /**
  * @defgroup pkg_lz4   LZ4 compression library
  * @ingroup  pkg
+ * @ingroup  sys_compression
  * @brief    LZ4 is a fast compression library
  *
  * # Note about memory

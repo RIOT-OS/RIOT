@@ -24,6 +24,12 @@
  */
 
 /**
+ * @defgroup    sys_compression Data Compression Libraries
+ * @ingroup     sys
+ * @brief       Provides compression libraries and utilities for RIOT
+ */
+
+/**
  * @defgroup    sys_math Math libraries and utilities
  * @ingroup     sys
  * @brief       Provides math libraries and utilities for RIOT
