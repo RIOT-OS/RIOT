@@ -1,6 +1,7 @@
 /**
  * @defgroup pkg_uzlib   uzlib
  * @ingroup  pkg
+ * @ingroup  sys_compression
  * @brief    Deflate/Zlib-compatible LZ77 compression/decompression library
  *
  * # License
