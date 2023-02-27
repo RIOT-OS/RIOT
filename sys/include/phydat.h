@@ -37,6 +37,8 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <sys/types.h>
+
 #include "modules.h"
 
 #ifdef __cplusplus
@@ -177,29 +179,54 @@ void phydat_dump(phydat_t *data, uint8_t dim);
 /**
  * @brief   Convert the given unit to a string
  *
- * @param[in] unit      unit to convert
+ * @param[in]   unit    unit to convert
  *
  * @return  string representation of given unit (e.g. V or m)
  * @return  NULL if unit was not recognized
+ *
+ * @deprecated  Use @ref phydat_unit_print or @ref phydat_unit_write instead
+ *
+ * @warning For classic Harvard architectures a small buffer is used to store
+ *          the string, so that subsequent (or concurrent!) calls will
+ *          overwrite the output.
  */
 const char *phydat_unit_to_str(uint8_t unit);
 
 /**
- * @brief   Return a string representation for every unit, including
- *          non-physical units like 'none' or 'time'
+ * @brief   Same as @ref phydat_unit_to_str
  *
- * This function is useful when converting phydat_t structures to non-binary
- * representations like JSON or XML.
+ * In practise all users used the verbose function anyway. Hence,
+ * @ref phydat_unit_to_str just covers all units and this is just a backward
+ * compatibility wrapper.
  *
- * In practice, this function extends phydat_unit_to_str() with additional
- * identifiers for non physical units.
- *
- * @param[in] unit      unit to convert
- *
- * @return  string representation of given unit
- * @return  empty string ("") if unit was not recognized
+ * @deprecated  Use @ref phydat_unit_print or @ref phydat_unit_write instead
  */
 const char *phydat_unit_to_str_verbose(uint8_t unit);
+
+/**
+ * @brief   Print a unit
+ *
+ * @param[in] unit          unit to print
+ */
+void phydat_unit_print(uint8_t unit);
+
+/**
+ * @brief   Write the string representation of the given unit into the given
+ *          buffer
+ *
+ * @param[out]  dest        destination buffer to write to
+ * @param[in]   max_size    size of the buffer at @p dest
+ * @param[in]   unit        unit to convert
+ *
+ * @return  Number of bytes written
+ * @retval  -EOVERFLOW      buffer at @p dest is too small
+ * @retval  -EINVAL         invalid unit in @p unit
+ *
+ * @warning The function will never write a terminating zero byte
+ * @note    If you pass `NULL` for @p dest, it will return the number of bytes
+ *          it would write (regardless of @p max_size)
+ */
+ssize_t phydat_unit_write(char *dest, size_t max_size, uint8_t unit);
 
 /**
  * @brief   Convert the given scale factor to an SI prefix

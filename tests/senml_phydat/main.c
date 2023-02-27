@@ -23,6 +23,7 @@
 #include <math.h>
 
 #include "embUnit.h"
+#include "flash_utils.h"
 #include "senml/phydat.h"
 
 #define ENABLE_DEBUG (0)
@@ -114,7 +115,7 @@ void test_phydat_to_senml_float(void)
 
         phydat_to_senml_float(&res, &(value_tests[i].phydat), value_tests[i].dim);
 
-        DEBUG("Float: %" PRIi16 "e%" PRIi16 " %s -> %.f %s\n",
+        DEBUG("Float: %" PRIi16 "e%" PRIi16 " %" PRIsflash " -> %.f %s\n",
               value_tests[i].phydat.val[value_tests[i].dim], value_tests[i].phydat.scale,
               phydat_unit_to_str(value_tests[i].phydat.unit),
               res.value.value.f,
@@ -137,7 +138,7 @@ void test_phydat_to_senml_decimal(void)
 
         phydat_to_senml_decimal(&res, &(value_tests[i].phydat), value_tests[i].dim);
 
-        DEBUG("Decimal: %" PRIi16 "e%" PRIi16 " %s -> %" PRIi32 "e%" PRIi32 " %s\n",
+        DEBUG("Decimal: %" PRIi16 "e%" PRIi16 " %s -> %" PRIi32 "e%" PRIi32 " %" PRIsflash"\n",
               value_tests[i].phydat.val[value_tests[i].dim], value_tests[i].phydat.scale,
               phydat_unit_to_str(value_tests[i].phydat.unit),
               res.value.value.df.m, res.value.value.df.e,

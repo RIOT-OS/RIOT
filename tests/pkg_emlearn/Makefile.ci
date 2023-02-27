@@ -3,16 +3,11 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-leonardo \
     arduino-nano \
     arduino-uno \
-    atmega1284p \
     atmega328p \
     atmega328p-xplained-mini \
-    atxmega-a3bu-xplained \
     blackpill-stm32f103c8 \
     bluepill-stm32f103c8 \
-    derfmega128 \
     i-nucleo-lrwan1 \
-    mega-xplained \
-    microduino-corerf \
     msb-430 \
     msb-430h \
     nucleo-f030r8 \
@@ -32,6 +27,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32f0discovery \
     stm32g0316-disco \
     stm32l0538-disco \
-    waspmote-pro \
     zigduino \
     #

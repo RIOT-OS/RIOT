@@ -42,7 +42,7 @@
 /**
  * @brief   Possible prescaler values, encoded as 2 ^ val
  */
-static const uint8_t prescalers[] = { 0, 3, 6, 8, 10 };
+static const __flash uint8_t prescalers[] = { 0, 3, 6, 8, 10 };
 
 /**
  * @brief   Timer state context

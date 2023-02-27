@@ -1,10 +1,4 @@
 BOARD_INSUFFICIENT_MEMORY := \
-    arduino-duemilanove \
-    arduino-leonardo \
-    arduino-mega2560 \
-    arduino-uno \
-    atmega328p \
-    atmega328p-xplained-mini \
     blackpill-stm32f103c8 \
     blackpill-stm32f103cb \
     bluepill-stm32f103c8 \
@@ -30,6 +24,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     stk3200 \
     stm32f0discovery \
     telosb \
-    waspmote-pro \
     z1 \
     #

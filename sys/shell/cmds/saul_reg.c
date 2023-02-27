@@ -24,6 +24,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "flash_utils.h"
 #include "saul_reg.h"
 #include "shell.h"
 
@@ -47,8 +48,9 @@ static void probe(int num, saul_reg_t *dev)
         return;
     }
     /* print results */
-    printf("Reading from #%i (%s|%s)\n", num, _devname(dev),
-           saul_class_to_str(dev->driver->type));
+    printf("Reading from #%i (%s|", num, _devname(dev));
+    saul_class_print(dev->driver->type);
+    printf(")\n");
     phydat_dump(&res, dim);
 }
 
@@ -70,14 +72,15 @@ static void list(void)
     int i = 0;
 
     if (dev) {
-        puts("ID\tClass\t\tName");
+        printf("ID\tClass\t\tName\n");
     }
     else {
-        puts("No devices found");
+        printf("No devices found\n");
     }
     while (dev) {
-        printf("#%i\t%s\t%s\n",
-               i++, saul_class_to_str(dev->driver->type), _devname(dev));
+        printf("#%i\t", i++);
+        saul_class_print(dev->driver->type);
+        printf("\t%s\n", _devname(dev));
         dev = dev->next;
     }
 }
@@ -88,10 +91,11 @@ static void read(int argc, char **argv)
     saul_reg_t *dev;
 
     if (argc < 3) {
-        printf("usage: %s %s <device id>|all\n", argv[0], argv[1]);
+        printf("usage: %s %s <device id>|all\n",
+                     argv[0], argv[1]);
         return;
     }
-    if (strcmp(argv[2], "all") == 0) {
+    if (flash_strcmp(argv[2], TO_FLASH("all")) == 0) {
         probe_all();
         return;
     }
@@ -99,7 +103,7 @@ static void read(int argc, char **argv)
     num = atoi(argv[2]);
     dev = saul_reg_find_nth(num);
     if (dev == NULL) {
-        puts("error: undefined device id given");
+        printf("error: undefined device id given\n");
         return;
     }
     probe(num, dev);
@@ -113,13 +117,13 @@ static void write(int argc, char **argv)
 
     if (argc < 4) {
         printf("usage: %s %s <device id> <value 0> [<value 1> [<value 2]]\n",
-               argv[0], argv[1]);
+                     argv[0], argv[1]);
         return;
     }
     num = atoi(argv[2]);
     dev = saul_reg_find_nth(num);
     if (dev == NULL) {
-        puts("error: undefined device given");
+        printf("error: undefined device given\n");
         return;
     }
     /* parse value(s) */
@@ -151,10 +155,10 @@ static int _saul(int argc, char **argv)
         list();
     }
     else {
-        if (strcmp(argv[1], "read") == 0) {
+        if (flash_strcmp(argv[1], TO_FLASH("read")) == 0) {
             read(argc, argv);
         }
-        else if (strcmp(argv[1], "write") == 0) {
+        else if (flash_strcmp(argv[1], TO_FLASH("write")) == 0) {
             write(argc, argv);
         }
         else {

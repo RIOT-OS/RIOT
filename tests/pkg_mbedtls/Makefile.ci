@@ -1,10 +1,9 @@
 BOARD_INSUFFICIENT_MEMORY := \
     arduino-duemilanove \
-    arduino-leonardo \
     arduino-nano \
     arduino-uno \
-    atmega328p-xplained-mini \
     atmega328p \
+    atmega328p-xplained-mini \
     nucleo-f302r8 \
     nucleo-f303k8 \
     nucleo-f303re \

@@ -41,7 +41,7 @@
 #include "shell_lock.h"
 
 /* define shell command cross file array */
-XFA_INIT_CONST(shell_command_t*, shell_commands_xfa);
+XFA_INIT_CONST(shell_command_xfa_t*, shell_commands_xfa);
 
 #define ETX '\x03'  /** ASCII "End-of-Text", or Ctrl-C */
 #define EOT '\x04'  /** ASCII "End-of-Transmission", or Ctrl-D */
@@ -99,8 +99,8 @@ static shell_command_handler_t search_commands_xfa(char *command)
     unsigned n = XFA_LEN(shell_command_t*, shell_commands_xfa);
 
     for (unsigned i = 0; i < n; i++) {
-        const volatile shell_command_t *entry = shell_commands_xfa[i];
-        if (strcmp(entry->name, command) == 0) {
+        const volatile shell_command_xfa_t *entry = shell_commands_xfa[i];
+        if (flash_strcmp(command, entry->name) == 0) {
             return entry->handler;
         }
     }
@@ -132,17 +132,18 @@ static void print_commands(const shell_command_t *entry)
 
 static void print_commands_xfa(void)
 {
-    unsigned n = XFA_LEN(shell_command_t*, shell_commands_xfa);
+    unsigned n = XFA_LEN(shell_command_xfa_t*, shell_commands_xfa);
     for (unsigned i = 0; i < n; i++) {
-        const volatile shell_command_t *entry = shell_commands_xfa[i];
-        printf("%-20s %s\n", entry->name, entry->desc);
+        const volatile shell_command_xfa_t *entry = shell_commands_xfa[i];
+        printf("%-20" PRIsflash " %" PRIsflash "\n",
+                     entry->name, entry->desc);
     }
 }
 
 static void print_help(const shell_command_t *command_list)
 {
-    puts("Command              Description"
-         "\n---------------------------------------");
+    printf("Command              Description\n"
+           "---------------------------------------\n");
     if (command_list != NULL) {
         print_commands(command_list);
     }
@@ -294,7 +295,7 @@ static void handle_input_line(const shell_command_t *command_list, char *line)
     *writepos = '\0';
 
     if (pstate != PARSE_BLANK && pstate != PARSE_UNQUOTED) {
-        puts("shell: incorrect quoting");
+        printf("shell: incorrect quoting\n");
         return;
     }
 
@@ -503,7 +504,7 @@ void shell_run_once(const shell_command_t *shell_commands,
                 return;
 
             case -ENOBUFS:
-                puts("shell: maximum line length exceeded");
+                printf("shell: maximum line length exceeded\n");
                 break;
 
             default:

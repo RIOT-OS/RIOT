@@ -14,6 +14,9 @@ CFLAGS_LINK  = -ffunction-sections -fdata-sections -fno-builtin -fshort-enums
 CFLAGS_DBG  ?= -ggdb -g3
 CFLAGS_OPT  ?= -Os
 
+# Use of __flash requires gnu11 instead of c11
+CFLAGS    += -std=gnu11
+
 CFLAGS    += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
 ASFLAGS   += $(CFLAGS_CPU) $(CFLAGS_DBG)
 

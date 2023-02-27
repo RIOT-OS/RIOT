@@ -1,12 +1,5 @@
 BOARD_INSUFFICIENT_MEMORY := \
     airfy-beacon \
-    arduino-duemilanove \
-    arduino-leonardo \
-    arduino-mega2560 \
-    arduino-nano \
-    arduino-uno \
-    atmega328p \
-    atmega328p-xplained-mini \
     calliope-mini \
     hifive1 \
     hifive1b \
@@ -34,7 +27,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32f030f4-demo \
     stm32l0538-disco \
     telosb \
-    waspmote-pro \
     yunjia-nrf51822 \
     z1 \
     #

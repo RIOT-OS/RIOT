@@ -3,18 +3,13 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-leonardo \
     arduino-mega2560 \
     arduino-nano \
-    arduino-nano-33-iot \
     arduino-uno \
-    atmega1284p \
     atmega328p \
     atmega328p-xplained-mini \
     atxmega-a3bu-xplained \
     bluepill-stm32f030c8 \
     calliope-mini \
-    derfmega128 \
     i-nucleo-lrwan1 \
-    mega-xplained \
-    microduino-corerf \
     msb-430 \
     msb-430h \
     nucleo-f030r8 \
