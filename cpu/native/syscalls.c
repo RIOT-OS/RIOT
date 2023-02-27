@@ -308,6 +308,10 @@ int fgetc(FILE *fp)
     return getc(fp);
 }
 
+int getchar(void) {
+    return getc(stdin);
+}
+
 int getc(FILE *fp)
 {
     char c;
