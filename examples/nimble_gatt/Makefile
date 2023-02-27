@@ -36,11 +36,13 @@ USEMODULE += printf_float
 USEMODULE += ztimer
 USEMODULE += ztimer_msec
 
+USEMODULE += event_timeout_ztimer
+
 ifneq (,$(filter accelerometer,$(SENSORS)))
 CFLAGS += -DPULGA_ENABLE_ACCELEROMETER=1
 endif
 
-CFLAGS += -DPULGA_USE_RINGBUFFER=0
+CFLAGS += -DPULGA_USE_RINGBUFFER=1
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
