@@ -36,7 +36,7 @@ int _gnrc_rpl_init(char *arg)
 {
     kernel_pid_t iface_pid = atoi(arg);
     if (gnrc_netif_get_by_pid(iface_pid) == NULL) {
-        puts("unknown interface specified");
+        printf("unknown interface specified\n");
         return 1;
     }
 
@@ -51,7 +51,7 @@ int _gnrc_rpl_dodag_root(char *arg1, char *arg2)
     ipv6_addr_t dodag_id;
 
     if (ipv6_addr_from_str(&dodag_id, arg2) == NULL) {
-        puts("error: <dodag_id> must be a valid IPv6 address");
+        printf("error: <dodag_id> must be a valid IPv6 address\n");
         return 1;
     }
 
@@ -75,12 +75,12 @@ int _gnrc_rpl_find(char *arg1, char *arg2)
     ipv6_addr_t target;
 
     if (ipv6_addr_from_str(&dodag_id, arg1) == NULL) {
-        puts("<dodag_id> must be a valid IPv6 address");
+        printf("<dodag_id> must be a valid IPv6 address\n");
         return 1;
     }
 
     if (ipv6_addr_from_str(&target, arg2) == NULL) {
-        puts("<target> must be a valid IPv6 address");
+        printf("<target> must be a valid IPv6 address\n");
         return 1;
     }
 
@@ -122,7 +122,7 @@ int _gnrc_rpl_trickle_reset(char *arg1)
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
     if ((inst = gnrc_rpl_instance_get(instance_id)) == NULL) {
-        puts("error: could not find the <instance_id>");
+        printf("error: could not find the <instance_id>\n");
         return 1;
     }
 
@@ -141,7 +141,7 @@ int _gnrc_rpl_trickle_stop(char *arg1)
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
     if ((inst = gnrc_rpl_instance_get(instance_id)) == NULL) {
-        puts("error: could not find the <instance_id>");
+        printf("error: could not find the <instance_id>\n");
         return 1;
     }
     trickle_stop(&(inst->dodag.trickle));
@@ -159,7 +159,7 @@ int _gnrc_rpl_trickle_start(char *arg1)
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
     if ((inst = gnrc_rpl_instance_get(instance_id)) == NULL) {
-        puts("error: could not find the <instance_id>");
+        printf("error: could not find the <instance_id>\n");
         return 1;
     }
 
@@ -190,7 +190,7 @@ int _gnrc_rpl_send_dis_w_sol_opt(char* VID, char* version, char* instance, char*
     {
         gnrc_rpl_internal_opt_t* opt[] = {(gnrc_rpl_internal_opt_t*)&sol};
         gnrc_rpl_send_DIS(NULL, (ipv6_addr_t *) &ipv6_addr_all_rpl_nodes, opt, 1);
-        puts("success: send a DIS with SOL option\n");
+        printf("success: send a DIS with SOL option\n\n");
     }
     return 0;
 }
@@ -199,7 +199,7 @@ int _gnrc_rpl_send_dis(void)
 {
     gnrc_rpl_send_DIS(NULL, (ipv6_addr_t *) &ipv6_addr_all_rpl_nodes, NULL, 0);
 
-    puts("success: send a DIS\n");
+    printf("success: send a DIS\n\n");
     return 0;
 }
 
@@ -242,7 +242,7 @@ static void _print_stats_block(netstats_rpl_block_t *block, const char *name)
 
 int _stats(void)
 {
-    puts(  "Statistics        (ucast) RX / TX                  RX / TX (mcast)");
+   printf(  "Statistics        (ucast) RX / TX                  RX / TX (mcast)\n");
     _print_stats_block(&gnrc_rpl_netstats.dio, "DIO");
     _print_stats_block(&gnrc_rpl_netstats.dis, "DIS");
     _print_stats_block(&gnrc_rpl_netstats.dao, "DAO");
@@ -450,25 +450,25 @@ static int _gnrc_rpl(int argc, char **argv)
 #endif
 
 #ifdef MODULE_GNRC_RPL_P2P
-    puts("* find <dodag_id> <target>\t\t\t- initiate a P2P-RPL route discovery");
+    printf("* find <dodag_id> <target>\t\t\t- initiate a P2P-RPL route discovery\n");
 #endif
-    puts("* help\t\t\t\t\t- show usage");
-    puts("* init <if_id>\t\t\t\t- initialize RPL on the given interface");
-    puts("* leaf <instance_id>\t\t\t- operate as leaf in the instance");
-    puts("* trickle reset <instance_id>\t\t- reset the trickle timer");
-    puts("* trickle start <instance_id>\t\t- start the trickle timer");
-    puts("* trickle stop <instance_id>\t\t- stop the trickle timer");
-    puts("* rm <instance_id>\t\t\t- delete the given instance and related dodag");
-    puts("* root <inst_id> <dodag_id>\t\t- add a dodag to a new or existing instance");
-    puts("* router <instance_id>\t\t\t- operate as router in the instance");
-    puts("* send dis\t\t\t\t- send a multicast DIS");
-    puts("* send dis <VID_flags> <version> <instance_id> <dodag_id> - send a multicast DIS with SOL option");
+    printf("* help\t\t\t\t\t- show usage\n");
+    printf("* init <if_id>\t\t\t\t- initialize RPL on the given interface\n");
+    printf("* leaf <instance_id>\t\t\t- operate as leaf in the instance\n");
+    printf("* trickle reset <instance_id>\t\t- reset the trickle timer\n");
+    printf("* trickle start <instance_id>\t\t- start the trickle timer\n");
+    printf("* trickle stop <instance_id>\t\t- stop the trickle timer\n");
+    printf("* rm <instance_id>\t\t\t- delete the given instance and related dodag\n");
+    printf("* root <inst_id> <dodag_id>\t\t- add a dodag to a new or existing instance\n");
+    printf("* router <instance_id>\t\t\t- operate as router in the instance\n");
+    printf("* send dis\t\t\t\t- send a multicast DIS\n");
+    printf("* send dis <VID_flags> <version> <instance_id> <dodag_id> - send a multicast DIS with SOL option\n");
 
     if (!IS_ACTIVE(CONFIG_GNRC_RPL_WITHOUT_PIO)) {
-        puts("* set pio <on/off> <instance_id>\t- (de-)activate PIO transmissions in DIOs");
+        printf("* set pio <on/off> <instance_id>\t- (de-)activate PIO transmissions in DIOs\n");
     }
 
-    puts("* show\t\t\t\t\t- show instance and dodag tables");
+    printf("* show\t\t\t\t\t- show instance and dodag tables\n");
     return 0;
 }
 

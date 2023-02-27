@@ -13,7 +13,4 @@ ifneq (,$(filter u8g2_sdl,$(USEMODULE)))
   LINKFLAGS += $(shell sdl2-config --libs)
 endif
 
-# https://github.com/olikraus/u8g2/pull/2101
-CFLAGS += -Wno-error=sign-compare
-
 PSEUDOMODULES += u8g2

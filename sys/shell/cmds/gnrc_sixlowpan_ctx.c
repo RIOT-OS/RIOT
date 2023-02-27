@@ -45,14 +45,14 @@ void _del_cb(void *ptr)
 static void _usage(char *cmd_str)
 {
     printf("usage: %s [{add <0-15> <prefix>/<prefix_len> <ltime in min>|del <ctx>}]\n", cmd_str);
-    puts("       `del` will only invalidate the context for compression. It can be");
-    puts("       reassigned after 5 min.");
+    printf("       `del` will only invalidate the context for compression. It can be\n");
+    printf("       reassigned after 5 min.\n");
 }
 
 static int _gnrc_6ctx_list(void)
 {
-    puts("cid|prefix                                     |C|ltime");
-    puts("-----------------------------------------------------------");
+    printf("cid|prefix                                     |C|ltime\n");
+    printf("-----------------------------------------------------------\n");
     for (uint8_t cid = 0; cid < GNRC_SIXLOWPAN_CTX_SIZE; cid++) {
         gnrc_sixlowpan_ctx_t *ctx = gnrc_sixlowpan_ctx_lookup_id(cid);
         if (ctx != NULL) {
@@ -78,7 +78,7 @@ static int _gnrc_6ctx_add(char *cmd_str, char *ctx_str, char *prefix_str, char *
         return 1;
     }
     if (!IS_USED(MODULE_GNRC_IPV6_NIB_6LBR)) {
-        puts("WARNING: context dissemination by non-6LBR not supported");
+        printf("WARNING: context dissemination by non-6LBR not supported\n");
     }
     addr_str = strtok_r(prefix_str, "/", &save_ptr);
     if (addr_str == NULL) {
@@ -92,18 +92,18 @@ static int _gnrc_6ctx_add(char *cmd_str, char *ctx_str, char *prefix_str, char *
     }
     prefix_len = atoi(prefix_len_str);
     if ((prefix_len - 1U) > 128U) {
-        puts("ERROR: prefix_len < 1 || prefix_len > 128");
+        printf("ERROR: prefix_len < 1 || prefix_len > 128\n");
         return 1;
     }
     ipv6_addr_from_str(&prefix, addr_str);
     if (ipv6_addr_is_unspecified(&prefix)) {
-        puts("ERROR: prefix may not be ::");
+        printf("ERROR: prefix may not be ::\n");
         return 1;
     }
     ltime = atoi(ltime_str);
     if (gnrc_sixlowpan_ctx_update((uint8_t)ctx, &prefix, (uint8_t)prefix_len, ltime,
                                   true) == NULL) {
-        puts("ERROR: can not add context");
+        printf("ERROR: can not add context\n");
         return 1;
     }
     return 0;
@@ -118,7 +118,7 @@ static int _gnrc_6ctx_del(char *cmd_str, char *ctx_str)
         return 1;
     }
     if (!IS_USED(MODULE_GNRC_IPV6_NIB_6LBR)) {
-        puts("WARNING: context dissemination by non-6LBR not supported");
+        printf("WARNING: context dissemination by non-6LBR not supported\n");
     }
     if (del_timer[cid].callback == NULL) {
         ctx = gnrc_sixlowpan_ctx_lookup_id(cid);

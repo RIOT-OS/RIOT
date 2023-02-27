@@ -8,7 +8,7 @@ ESP32_OPENOCD_VERSION="v0.11.0-esp32-20211220"
 ESP32_OPENOCD_VERSION_TGZ="0.11.0-esp32-20211220"
 
 # set the tool path to the default if not already set
-if [ -z ${IDF_TOOLS_PATH} ]; then
+if [ -z "${IDF_TOOLS_PATH}" ]; then
     IDF_TOOLS_PATH=${HOME}/.espressif
 fi
 
@@ -64,9 +64,9 @@ esac
 download()
 {
     if [ "${URL_GET}" = "curl" ]; then
-        curl -L $1 -o $2
+        curl -L "$1" -o "$2"
     elif [ "${URL_GET}" = "wget" ]; then
-        wget $1 -O $2
+        wget "$1" -O "$2"
     else
         exit 1
     fi
@@ -99,8 +99,8 @@ install_arch()
     URL=${URL_PATH}/${ESP32_GCC_RELEASE}/${URL_TGZ}
 
     echo "Creating directory ${TOOLS_DIR} ..." && \
-    mkdir -p ${TOOLS_DIR} && \
-    cd ${TOOLS_DIR} && \
+    mkdir -p "${TOOLS_DIR}" && \
+    cd "${TOOLS_DIR}" && \
     echo "Downloading ${URL_TGZ} ..." && \
     download ${URL} ${URL_TGZ} && \
     echo "Extracting ${URL_TGZ} in ${TOOLS_DIR} ..." && \
@@ -119,8 +119,8 @@ install_openocd()
     URL=${URL_PATH}/${ESP32_OPENOCD_VERSION}/${URL_TGZ}
 
     echo "Creating directory ${TOOLS_DIR} ..." && \
-    mkdir -p ${TOOLS_DIR} && \
-    cd ${TOOLS_DIR} && \
+    mkdir -p "${TOOLS_DIR}" && \
+    cd "${TOOLS_DIR}" && \
     echo "Downloading ${URL_TGZ} ..." && \
     download ${URL} ${URL_TGZ} && \
     echo "Extracting ${URL_TGZ} in ${TOOLS_DIR} ..." && \
@@ -151,8 +151,8 @@ install_qemu()
     URL=${URL_PATH}/${ESP32_QEMU_VERSION}/${URL_TGZ}
 
     echo "Creating directory ${TOOLS_DIR} ..." && \
-    mkdir -p ${TOOLS_DIR} && \
-    cd ${TOOLS_DIR} && \
+    mkdir -p "${TOOLS_DIR}" && \
+    cd "${TOOLS_DIR}" && \
     echo "Downloading ${URL_TGZ} ..." && \
     download ${URL} ${URL_TGZ} && \
     echo "Extracting ${URL_TGZ} in ${TOOLS_DIR} ..." && \
@@ -162,14 +162,14 @@ install_qemu()
     echo "QEMU for ESP32 installed in ${TOOLS_DIR}"
 }
 
-if [ -z $1 ]; then
+if [ -z "$1" ]; then
     echo "Usage: install.sh <tool>"
     echo "tool = all | esp32 | esp32c3 | esp32s2 | esp32s3 | openocd | qemu"
     exit 1
 elif [ "$1" = "all" ]; then
     ARCH_ALL="esp32 esp32c3 esp32s2 esp32s3"
     for arch in ${ARCH_ALL}; do
-        install_arch $arch
+        install_arch "$arch"
     done
     install_openocd
     install_qemu
@@ -178,7 +178,7 @@ elif [ "$1" = "openocd" ]; then
 elif [ "$1" = "qemu" ]; then
     install_qemu
 else
-    install_arch $1
+    install_arch "$1"
 fi
 
 echo "Use following command to extend the PATH variable:"
