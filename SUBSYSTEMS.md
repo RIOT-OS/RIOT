@@ -84,15 +84,31 @@ affect more than one module.
 ## Network stacks
 ### GNRC
 
-#### IPv6 Auto-Subnetting
+- Martine S. Lenders (@miri64)
+
+#### 6LowPAN
+
+- Martine S. Lenders (@miri64)
+
+#### IPv6
+
+- Martine S. Lenders (@miri64)
+
+##### Auto-Subnetting
 
  - Benjamin Valentin (@benpicco)
+
+#### UDP
+
+- Martine S. Lenders (@miri64)
 
 ### CCN-Lite
 
 ### OpenThread
 
 ### LWIP
+
+- Martine S. Lenders (@miri64)
 
 ### OpenWSN
 
@@ -106,11 +122,11 @@ affect more than one module.
 ## Interfaces
 ### Sock
 
+- Martine S. Lenders (@miri64)
+
 ### Netif
 
 ### Netdev
-
-## 6LowPAN
 
 ## Application protocols
 ### CoAP
@@ -126,6 +142,8 @@ affect more than one module.
 ## Others
 
 ### DTLS
+
+- Martine S. Lenders (@miri64)
 
 ### RPL
 
