@@ -73,6 +73,8 @@ affect more than one module.
 
 ## RUST support
 
+  - Christian Amsüss (@chrysn)
+
 ## C++ support
 
 ## Crypto
