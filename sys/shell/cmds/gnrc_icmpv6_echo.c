@@ -155,17 +155,17 @@ static void _usage(char *cmdname)
 {
     printf("%s [-c <count>] [-h] [-i <ms interval>] [-s <packetsize>]\n",
            cmdname);
-    puts("     [-t hoplimit] [-W <ms timeout>] <host>[%<interface>]");
-    puts("     count: number of pings (default: 3)");
-    puts("     ms interval: wait interval milliseconds between sending "
-              "(default: 1000)");
-    puts("     packetsize: number of bytes in echo payload; must be >= 4 to "
-              "measure round trip time (default: 4)");
-    puts("     hoplimit: Set the IP time to life/hoplimit "
-              "(default: interface config)");
-    puts("     ms timeout: Time to wait for a response in milliseconds "
+    printf("     [-t hoplimit] [-W <ms timeout>] <host>[%%<interface>]\n");
+    printf("     count: number of pings (default: 3)\n");
+    printf("     ms interval: wait interval milliseconds between sending "
+              "(default: 1000)\"");
+    printf("     packetsize: number of bytes in echo payload; must be >= 4 to "
+              "measure round trip time (default: 4)\n");
+    printf("     hoplimit: Set the IP time to life/hoplimit "
+              "(default: interface config)\n");
+    printf("     ms timeout: Time to wait for a response in milliseconds "
               "(default: 1000). The option affects only timeout in absence "
-              "of any responses, otherwise wait for two RTTs");
+              "of any responses, otherwise wait for two RTTs\n");
 }
 
 static int _configure(int argc, char **argv, _ping_data_t *data)
@@ -277,7 +277,7 @@ static void _pinger(_ping_data_t *data)
     case 0:
         break;
     case ENOMEM:
-        puts("error: packet buffer full");
+        printf("error: packet buffer full\n");
         break;
     default:
         printf("error: %d\n", res);
