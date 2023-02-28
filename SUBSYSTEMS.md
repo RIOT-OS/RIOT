@@ -21,6 +21,7 @@ affect more than one module.
 ### Atmel Sam0 line (SAM D1x/D2x, L1x, L2x, D5x)
 
  - Benjamin Valentin (@benpicco)
+ - Dylan Laduranty (@dylad)
 
 ## Atmel AVR (Atmega)
 
@@ -66,6 +67,8 @@ affect more than one module.
 ## File Systems
 
 ## USB support
+
+  - Dylan Laduranty (@dylad)
 
 ## POSIX support
 
