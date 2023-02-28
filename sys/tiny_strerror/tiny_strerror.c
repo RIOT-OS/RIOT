@@ -21,102 +21,195 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "flash_utils.h"
 #include "kernel_defines.h"
 #include "tiny_strerror.h"
 
-static const char *lookup[] = {
-    [0]                 = "OK",
-    [E2BIG]             = "-E2BIG",
-    [EACCES]            = "-EACCES",
-    [EADDRINUSE]        = "-EADDRINUSE",
-    [EADDRNOTAVAIL]     = "-EADDRNOTAVAIL",
-    [EAFNOSUPPORT]      = "-EAFNOSUPPORT",
-    [EAGAIN]            = "-EAGAIN",
-    [EALREADY]          = "-EALREADY",
-    [EBADF]             = "-EBADF",
-    [EBADMSG]           = "-EBADMSG",
-    [EBUSY]             = "-EBUSY",
-    [ECANCELED]         = "-ECANCELED",
-    [ECHILD]            = "-ECHILD",
-    [ECONNABORTED]      = "-ECONNABORTED",
-    [ECONNREFUSED]      = "-ECONNREFUSED",
-    [ECONNRESET]        = "-ECONNRESET",
-    [EDEADLK]           = "-EDEADLK",
-    [EDESTADDRREQ]      = "-EDESTADDRREQ",
-    [EDOM]              = "-EDOM",
-    [EDQUOT]            = "-EDQUOT",
-    [EEXIST]            = "-EEXIST",
-    [EFAULT]            = "-EFAULT",
-    [EFBIG]             = "-EFBIG",
-    [EHOSTDOWN]         = "-EHOSTDOWN",
-    [EHOSTUNREACH]      = "-EHOSTUNREACH",
-    [EIDRM]             = "-EIDRM",
-    [EILSEQ]            = "-EILSEQ",
-    [EINPROGRESS]       = "-EINPROGRESS",
-    [EINTR]             = "-EINTR",
-    [EINVAL]            = "-EINVAL",
-    [EIO]               = "-EIO",
-    [EISCONN]           = "-EISCONN",
-    [EISDIR]            = "-EISDIR",
-    [ELOOP]             = "-ELOOP",
-    [EMFILE]            = "-EMFILE",
-    [EMLINK]            = "-EMLINK",
-    [EMSGSIZE]          = "-EMSGSIZE",
-    [EMULTIHOP]         = "-EMULTIHOP",
-    [ENAMETOOLONG]      = "-ENAMETOOLONG",
-    [ENETDOWN]          = "-ENETDOWN",
-    [ENETRESET]         = "-ENETRESET",
-    [ENETUNREACH]       = "-ENETUNREACH",
-    [ENFILE]            = "-ENFILE",
-    [ENOBUFS]           = "-ENOBUFS",
-    [ENODATA]           = "-ENODATA",
-    [ENODEV]            = "-ENODEV",
-    [ENOENT]            = "-ENOENT",
-    [ENOEXEC]           = "-ENOEXEC",
-    [ENOLCK]            = "-ENOLCK",
-    [ENOLINK]           = "-ENOLILNK",
-    [ENOMEM]            = "-ENOMEM",
-    [ENOMSG]            = "-ENOMSG",
-    [ENOPROTOOPT]       = "-ENOPROTOOPT",
-    [ENOSPC]            = "-ENOSPC",
-    [ENOSR]             = "-ENOSR",
-    [ENOSTR]            = "-ENOSTR",
-    [ENOSYS]            = "-ENOSYS",
-    [ENOTCONN]          = "-ENOTCONN",
-    [ENOTDIR]           = "-ENOTDIR",
-    [ENOTEMPTY]         = "-ENOTEMPTY",
-    [ENOTRECOVERABLE]   = "-ENOTRECOVERABLE",
-    [ENOTSOCK]          = "-ENOTSOCK",
-    [ENOTSUP]           = "-ENOTSUP",
-    [ENOTTY]            = "-ENOTTY",
-    [ENXIO]             = "-ENXIO",
-    [EOVERFLOW]         = "-EOVERFLOW",
-    [EOWNERDEAD ]       = "-EOWNERDEAD ",
-    [EPERM]             = "-EPERM",
-    [EPFNOSUPPORT]      = "-EPFNOSUPPORT",
-    [EPIPE]             = "-EPIPE",
-    [EPROTONOSUPPORT]   = "-EPROTONOSUPPORT",
-    [EPROTOTYPE]        = "-EPROTOTYPE",
-    [EPROTO]            = "-EPROTO",
-    [ERANGE]            = "-ERANGE",
-    [EROFS]             = "-EROFS",
-    [ESPIPE]            = "-ESPIPE",
-    [ESRCH]             = "-ESRCH",
-    [ESTALE]            = "-ESTALE",
-    [ETIMEDOUT]         = "-ETIMEDOUT",
-    [ETIME]             = "-ETIME",
-    [ETOOMANYREFS]      = "-ETOOMANYREFS",
-    [ETXTBSY]           = "-ETXTBSY",
-    [EXDEV]             = "-EXDEV",
-    /* EAGAIN and EWOULDBLOCK have the exact same meaning and consequently may
-     * have the same numeric value */
+static FLASH_ATTR const char _ok[] = "OK";
+static FLASH_ATTR const char _e2big[] = "-E2BIG";
+static FLASH_ATTR const char _eacces[] = "-EACCES";
+static FLASH_ATTR const char _eaddrinuse[] = "-EADDRINUSE";
+static FLASH_ATTR const char _eaddrnotavail[] = "-EADDRNOTAVAIL";
+static FLASH_ATTR const char _eafnosupport[] = "-EAFNOSUPPORT";
+static FLASH_ATTR const char _eagain[] = "-EAGAIN";
+static FLASH_ATTR const char _ealready[] = "-EALREADY";
+static FLASH_ATTR const char _ebadf[] = "-EBADF";
+static FLASH_ATTR const char _ebadmsg[] = "-EBADMSG";
+static FLASH_ATTR const char _ebusy[] = "-EBUSY";
+static FLASH_ATTR const char _ecanceled[] = "-ECANCELED";
+static FLASH_ATTR const char _echild[] = "-ECHILD";
+static FLASH_ATTR const char _econnaborted[] = "-ECONNABORTED";
+static FLASH_ATTR const char _econnrefused[] = "-ECONNREFUSED";
+static FLASH_ATTR const char _econnreset[] = "-ECONNRESET";
+static FLASH_ATTR const char _edeadlk[] = "-EDEADLK";
+static FLASH_ATTR const char _edestaddrreq[] = "-EDESTADDRREQ";
+static FLASH_ATTR const char _edom[] = "-EDOM";
+static FLASH_ATTR const char _edquot[] = "-EDQUOT";
+static FLASH_ATTR const char _eexist[] = "-EEXIST";
+static FLASH_ATTR const char _efault[] = "-EFAULT";
+static FLASH_ATTR const char _efbig[] = "-EFBIG";
+static FLASH_ATTR const char _ehostdown[] = "-EHOSTDOWN";
+static FLASH_ATTR const char _ehostunreach[] = "-EHOSTUNREACH";
+static FLASH_ATTR const char _eidrm[] = "-EIDRM";
+static FLASH_ATTR const char _eilseq[] = "-EILSEQ";
+static FLASH_ATTR const char _einprogress[] = "-EINPROGRESS";
+static FLASH_ATTR const char _eintr[] = "-EINTR";
+static FLASH_ATTR const char _einval[] = "-EINVAL";
+static FLASH_ATTR const char _eio[] = "-EIO";
+static FLASH_ATTR const char _eisconn[] = "-EISCONN";
+static FLASH_ATTR const char _eisdir[] = "-EISDIR";
+static FLASH_ATTR const char _eloop[] = "-ELOOP";
+static FLASH_ATTR const char _emfile[] = "-EMFILE";
+static FLASH_ATTR const char _emlink[] = "-EMLINK";
+static FLASH_ATTR const char _emsgsize[] = "-EMSGSIZE";
+static FLASH_ATTR const char _emultihop[] = "-EMULTIHOP";
+static FLASH_ATTR const char _enametoolong[] = "-ENAMETOOLONG";
+static FLASH_ATTR const char _enetdown[] = "-ENETDOWN";
+static FLASH_ATTR const char _enetreset[] = "-ENETRESET";
+static FLASH_ATTR const char _enetunreach[] = "-ENETUNREACH";
+static FLASH_ATTR const char _enfile[] = "-ENFILE";
+static FLASH_ATTR const char _enobufs[] = "-ENOBUFS";
+static FLASH_ATTR const char _enodata[] = "-ENODATA";
+static FLASH_ATTR const char _enodev[] = "-ENODEV";
+static FLASH_ATTR const char _enoent[] = "-ENOENT";
+static FLASH_ATTR const char _enoexec[] = "-ENOEXEC";
+static FLASH_ATTR const char _enolck[] = "-ENOLCK";
+static FLASH_ATTR const char _enolink[] = "-ENOLINK";
+static FLASH_ATTR const char _enomem[] = "-ENOMEM";
+static FLASH_ATTR const char _enomsg[] = "-ENOMSG";
+static FLASH_ATTR const char _enoprotoopt[] = "-ENOPROTOOPT";
+static FLASH_ATTR const char _enospc[] = "-ENOSPC";
+static FLASH_ATTR const char _enosr[] = "-ENOSR";
+static FLASH_ATTR const char _enostr[] = "-ENOSTR";
+static FLASH_ATTR const char _enosys[] = "-ENOSYS";
+static FLASH_ATTR const char _enotconn[] = "-ENOTCONN";
+static FLASH_ATTR const char _enotdir[] = "-ENOTDIR";
+static FLASH_ATTR const char _enotempty[] = "-ENOTEMPTY";
+static FLASH_ATTR const char _enotrecoverable[] = "-ENOTRECOVERABLE";
+static FLASH_ATTR const char _enotsock[] = "-ENOTSOCK";
+static FLASH_ATTR const char _enotsup[] = "-ENOTSUP";
+static FLASH_ATTR const char _enotty[] = "-ENOTTY";
+static FLASH_ATTR const char _enxio[] = "-ENXIO";
+static FLASH_ATTR const char _eoverflow[] = "-EOVERFLOW";
+static FLASH_ATTR const char _eownerdead[] = "-EOWNERDEAD";
+static FLASH_ATTR const char _eperm[] = "-EPERM";
+static FLASH_ATTR const char _epfnosupport[] = "-EPFNOSUPPORT";
+static FLASH_ATTR const char _epipe[] = "-EPIPE";
+static FLASH_ATTR const char _eprotonosupport[] = "-EPROTONOSUPPORT";
+static FLASH_ATTR const char _eprototype[] = "-EPROTOTYPE";
+static FLASH_ATTR const char _eproto[] = "-EPROTO";
+static FLASH_ATTR const char _erange[] = "-ERANGE";
+static FLASH_ATTR const char _erofs[] = "-EROFS";
+static FLASH_ATTR const char _espipe[] = "-ESPIPE";
+static FLASH_ATTR const char _esrch[] = "-ESRCH";
+static FLASH_ATTR const char _estale[] = "-ESTALE";
+static FLASH_ATTR const char _etimedout[] = "-ETIMEDOUT";
+static FLASH_ATTR const char _etime[] = "-ETIME";
+static FLASH_ATTR const char _etoomanyrefs[] = "-ETOOMANYREFS";
+static FLASH_ATTR const char _etxtbsy[] = "-ETXTBSY";
+static FLASH_ATTR const char _exdev[] = "-EXDEV";
+/* EAGAIN and EWOULDBLOCK have the exact same meaning and consequently may
+ * have the same numeric value */
 #if EAGAIN != EWOULDBLOCK
-    [EWOULDBLOCK]       = "-EWOULDBLOCK",
+static FLASH_ATTR const char _ewouldblock[] = "-EWOULDBLOCK";
 #endif
-    /* ENOTSUP and EOPNOTSUPP do not have the exact same meaning. Still, they
-     * have the same numeric value on Linux, breaking POSIX standard */
+/* ENOTSUP and EOPNOTSUPP do not have the exact same meaning. Still, they
+ * have the same numeric value on Linux, breaking POSIX standard */
 #if ENOTSUP != EOPNOTSUPP
-    [EOPNOTSUPP]        = "-EOPNOTSUPP",
+static FLASH_ATTR const char _eopnotsupp[] = "-EOPNOTSUPP";
+#endif
+
+static FLASH_ATTR const char * FLASH_ATTR const lookup[] = {
+    [0]                 = _ok,
+    [E2BIG]             = _e2big,
+    [EACCES]            = _eacces,
+    [EADDRINUSE]        = _eaddrinuse,
+    [EADDRNOTAVAIL]     = _eaddrnotavail,
+    [EAFNOSUPPORT]      = _eafnosupport,
+    [EAGAIN]            = _eagain,
+    [EALREADY]          = _ealready,
+    [EBADF]             = _ebadf,
+    [EBADMSG]           = _ebadmsg,
+    [EBUSY]             = _ebusy,
+    [ECANCELED]         = _ecanceled,
+    [ECHILD]            = _echild,
+    [ECONNABORTED]      = _econnaborted,
+    [ECONNREFUSED]      = _econnrefused,
+    [ECONNRESET]        = _econnreset,
+    [EDEADLK]           = _edeadlk,
+    [EDESTADDRREQ]      = _edestaddrreq,
+    [EDOM]              = _edom,
+    [EDQUOT]            = _edquot,
+    [EEXIST]            = _eexist,
+    [EFAULT]            = _efault,
+    [EFBIG]             = _efbig,
+    [EHOSTDOWN]         = _ehostdown,
+    [EHOSTUNREACH]      = _ehostunreach,
+    [EIDRM]             = _eidrm,
+    [EILSEQ]            = _eilseq,
+    [EINPROGRESS]       = _einprogress,
+    [EINTR]             = _eintr,
+    [EINVAL]            = _einval,
+    [EIO]               = _eio,
+    [EISCONN]           = _eisconn,
+    [EISDIR]            = _eisdir,
+    [ELOOP]             = _eloop,
+    [EMFILE]            = _emfile,
+    [EMLINK]            = _emlink,
+    [EMSGSIZE]          = _emsgsize,
+    [EMULTIHOP]         = _emultihop,
+    [ENAMETOOLONG]      = _enametoolong,
+    [ENETDOWN]          = _enetdown,
+    [ENETRESET]         = _enetreset,
+    [ENETUNREACH]       = _enetunreach,
+    [ENFILE]            = _enfile,
+    [ENOBUFS]           = _enobufs,
+    [ENODATA]           = _enodata,
+    [ENODEV]            = _enodev,
+    [ENOENT]            = _enoent,
+    [ENOEXEC]           = _enoexec,
+    [ENOLCK]            = _enolck,
+    [ENOLINK]           = _enolink,
+    [ENOMEM]            = _enomem,
+    [ENOMSG]            = _enomsg,
+    [ENOPROTOOPT]       = _enoprotoopt,
+    [ENOSPC]            = _enospc,
+    [ENOSR]             = _enosr,
+    [ENOSTR]            = _enostr,
+    [ENOSYS]            = _enosys,
+    [ENOTCONN]          = _enotconn,
+    [ENOTDIR]           = _enotdir,
+    [ENOTEMPTY]         = _enotempty,
+    [ENOTRECOVERABLE]   = _enotrecoverable,
+    [ENOTSOCK]          = _enotsock,
+    [ENOTSUP]           = _enotsup,
+    [ENOTTY]            = _enotty,
+    [ENXIO]             = _enxio,
+    [EOVERFLOW]         = _eoverflow,
+    [EOWNERDEAD ]       = _eownerdead,
+    [EPERM]             = _eperm,
+    [EPFNOSUPPORT]      = _epfnosupport,
+    [EPIPE]             = _epipe,
+    [EPROTONOSUPPORT]   = _eprotonosupport,
+    [EPROTOTYPE]        = _eprototype,
+    [EPROTO]            = _eproto,
+    [ERANGE]            = _erange,
+    [EROFS]             = _erofs,
+    [ESPIPE]            = _espipe,
+    [ESRCH]             = _esrch,
+    [ESTALE]            = _estale,
+    [ETIMEDOUT]         = _etimedout,
+    [ETIME]             = _etime,
+    [ETOOMANYREFS]      = _etoomanyrefs,
+    [ETXTBSY]           = _etxtbsy,
+    [EXDEV]             = _exdev,
+#if EAGAIN != EWOULDBLOCK
+    [EWOULDBLOCK]       = _ewouldblock,
+#endif
+/* ENOTSUP and EOPNOTSUPP do not have the exact same meaning. Still, they
+ * have the same numeric value on Linux, breaking POSIX standard */
+#if ENOTSUP != EOPNOTSUPP
+    [EOPNOTSUPP]        = _eopnotsupp,
 #endif
 };
 
@@ -144,6 +237,12 @@ const char *tiny_strerror(int errnum)
     if (((unsigned)errnum < ARRAY_SIZE(lookup))
             && (lookup[(unsigned)errnum] != NULL)) {
         retval = lookup[(unsigned)errnum];
+    }
+
+    if (IS_ACTIVE(HAS_FLASH_UTILS_ARCH)) {
+        static char buf[16];
+        flash_strncpy(buf, retval + offset, sizeof(buf));
+        return buf;
     }
 
     return retval + offset;

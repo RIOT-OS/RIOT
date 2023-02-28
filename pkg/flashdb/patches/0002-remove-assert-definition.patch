@@ -1,0 +1,52 @@
+From 8c798a4fb33dbafec6a05735537f77e281bf11db Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benjamin.valentin@ml-pa.com>
+Date: Wed, 2 Feb 2022 22:03:41 +0100
+Subject: [PATCH] remove assert() definition
+
+---
+ port/fal/inc/fal_def.h | 15 +--------------
+ 1 file changed, 1 insertion(+), 14 deletions(-)
+
+diff --git a/port/fal/inc/fal_def.h b/port/fal/inc/fal_def.h
+index f432c26..6ba206b 100644
+--- a/port/fal/inc/fal_def.h
++++ b/port/fal/inc/fal_def.h
+@@ -25,6 +25,7 @@
+ #ifndef _FAL_DEF_H_
+ #define _FAL_DEF_H_
+ 
++#include <assert.h>
+ #include <stdint.h>
+ #include <stdio.h>
+ 
+@@ -64,15 +65,6 @@
+ #endif
+ 
+ #if FAL_DEBUG
+-#ifdef assert
+-#undef assert
+-#endif
+-#define assert(EXPR)                                                           \
+-if (!(EXPR))                                                                   \
+-{                                                                              \
+-    FAL_PRINTF("(%s) has assert failed at %s.\n", #EXPR, __FUNCTION__);        \
+-    while (1);                                                                 \
+-}
+ 
+ /* debug level log */
+ #ifdef  log_d
+@@ -82,11 +74,6 @@ if (!(EXPR))                                                                   \
+ 
+ #else
+ 
+-#ifdef assert
+-#undef assert
+-#endif
+-#define assert(EXPR)                   ((void)0);
+-
+ /* debug level log */
+ #ifdef  log_d
+ #undef  log_d
+-- 
+2.32.0
+

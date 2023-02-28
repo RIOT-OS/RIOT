@@ -89,6 +89,10 @@ ifneq (,$(filter tinydtls_sock_dtls, $(USEMODULE)))
     USEPKG += tinydtls
 endif
 
+ifneq (,$(filter flashdb_%,$(USEMODULE)))
+  USEPKG += flashdb
+endif
+
 ifneq (,$(filter tinyusb_%, $(USEMODULE)))
   USEPKG += tinyusb
 endif

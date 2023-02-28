@@ -1,0 +1,3 @@
+MODULE := flashdb
+
+include $(RIOTBASE)/Makefile.base

@@ -1,0 +1,12 @@
+INCLUDES += -I$(PKGDIRBASE)/flashdb/inc
+INCLUDES += -I$(PKGDIRBASE)/flashdb/port/fal/inc
+INCLUDES += -I$(RIOTBASE)/pkg/flashdb/include
+
+PSEUDOMODULES += flashdb_tsdb
+PSEUDOMODULES += flashdb_kvdb
+PSEUDOMODULES += flashdb_kvdb_auto_update
+PSEUDOMODULES += flashdb_vfs
+
+ifneq (,$(filter flashdb_mtd,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/flashdb/mtd
+endif
