@@ -72,6 +72,7 @@ static void setup(void)
 static void teardown(void)
 {
     vfs_umount(&_test_vfs_mount_null, false);
+    atomic_store(&_test_vfs_mount_null.open_files, 0);
 }
 
 static void test_vfs_null_fs_ops_mount(void)
@@ -90,6 +91,17 @@ static void test_vfs_null_fs_ops_umount(void)
     res = vfs_umount(&_test_vfs_mount_null, false);
     /* Not mounted */
     TEST_ASSERT_EQUAL_INT(-EINVAL, res);
+}
+
+static void test_vfs_null_fs_ops_umount__EBUSY(void)
+{
+    TEST_ASSERT_EQUAL_INT(0, _test_vfs_fs_op_mount_res);
+    atomic_fetch_add(&_test_vfs_mount_null.open_files, 1);
+    int res = vfs_umount(&_test_vfs_mount_null, false);
+    TEST_ASSERT_EQUAL_INT(-EBUSY, res);
+    /* force unmount */
+    res = vfs_umount(&_test_vfs_mount_null, true);
+    TEST_ASSERT_EQUAL_INT(0, res);
 }
 
 static void test_vfs_null_fs_ops_rename(void)
@@ -151,6 +163,7 @@ Test *tests_vfs_null_file_system_ops_tests(void)
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_vfs_null_fs_ops_mount),
         new_TestFixture(test_vfs_null_fs_ops_umount),
+        new_TestFixture(test_vfs_null_fs_ops_umount__EBUSY),
         new_TestFixture(test_vfs_null_fs_ops_rename),
         new_TestFixture(test_vfs_null_fs_ops_unlink),
         new_TestFixture(test_vfs_null_fs_ops_mkdir),
