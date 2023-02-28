@@ -142,7 +142,7 @@ static void test_spiffs_teardown(void)
     vfs_unlink("/test-spiffs/test0.txt");
     vfs_unlink("/test-spiffs/test1.txt");
     vfs_unlink("/test-spiffs/a/test2.txt");
-    vfs_umount(&_test_spiffs_mount);
+    vfs_umount(&_test_spiffs_mount, false);
 
     spiffs_desc.base_addr = 0;
     spiffs_desc.block_count = 0;
@@ -151,7 +151,7 @@ static void test_spiffs_teardown(void)
 static void tests_spiffs_format(void)
 {
     int res;
-    vfs_umount(&_test_spiffs_mount);
+    vfs_umount(&_test_spiffs_mount, false);
     res = mtd_erase(_dev, 0, _dev->page_size * _dev->pages_per_sector * _dev->sector_count);
     TEST_ASSERT_EQUAL_INT(0, res);
 
@@ -165,7 +165,7 @@ static void tests_spiffs_format(void)
     res = vfs_mount(&_test_spiffs_mount);
     TEST_ASSERT_EQUAL_INT(0, res);
 
-    res = vfs_umount(&_test_spiffs_mount);
+    res = vfs_umount(&_test_spiffs_mount, false);
     TEST_ASSERT_EQUAL_INT(0, res);
 
     /* 2. format a valid file system */
@@ -176,7 +176,7 @@ static void tests_spiffs_format(void)
 static void tests_spiffs_mount_umount(void)
 {
     int res;
-    res = vfs_umount(&_test_spiffs_mount);
+    res = vfs_umount(&_test_spiffs_mount, false);
     TEST_ASSERT_EQUAL_INT(0, res);
 
     res = vfs_mount(&_test_spiffs_mount);
@@ -387,7 +387,7 @@ static void tests_spiffs_statvfs(void)
 
 static void tests_spiffs_partition(void)
 {
-    vfs_umount(&_test_spiffs_mount);
+    vfs_umount(&_test_spiffs_mount, false);
 
     spiffs_desc.base_addr = _dev->page_size * _dev->pages_per_sector;
     spiffs_desc.block_count = 2;

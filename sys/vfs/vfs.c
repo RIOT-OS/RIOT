@@ -547,7 +547,7 @@ int vfs_mount(vfs_mount_t *mountp)
     return 0;
 }
 
-int vfs_umount(vfs_mount_t *mountp)
+int vfs_umount(vfs_mount_t *mountp, bool force)
 {
     DEBUG("vfs_umount: %p\n", (void *)mountp);
     int ret = check_mount(mountp);
@@ -564,7 +564,7 @@ int vfs_umount(vfs_mount_t *mountp)
         return -EINVAL;
     }
     DEBUG("vfs_umount: -> \"%s\" open=%d\n", mountp->mount_point, atomic_load(&mountp->open_files));
-    if (atomic_load(&mountp->open_files) > 0) {
+    if (atomic_load(&mountp->open_files) > 0 && !force) {
         mutex_unlock(&_mount_mutex);
         return -EBUSY;
     }
@@ -1204,11 +1204,11 @@ int vfs_mount_by_path(const char *path)
     return -ENOENT;
 }
 
-int vfs_unmount_by_path(const char *path)
+int vfs_unmount_by_path(const char *path, bool force)
 {
     for (unsigned i = 0; i < MOUNTPOINTS_NUMOF; ++i) {
         if (strcmp(path, vfs_mountpoints_xfa[i].mount_point) == 0) {
-            return vfs_umount(&vfs_mountpoints_xfa[i]);
+            return vfs_umount(&vfs_mountpoints_xfa[i], force);
         }
     }
 

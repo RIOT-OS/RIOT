@@ -136,7 +136,7 @@ static void test_devfs_mount_open(void)
     res = devfs_unregister(&_mock_devfs_node);
     TEST_ASSERT_EQUAL_INT(0, res);
 
-    res = vfs_umount(&_test_devfs_mount);
+    res = vfs_umount(&_test_devfs_mount, false);
     TEST_ASSERT_EQUAL_INT(0, res);
 }
 

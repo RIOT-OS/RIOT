@@ -80,7 +80,7 @@ static void teardown(void)
         vfs_close(_test_vfs_file_op_my_fd);
         _test_vfs_file_op_my_fd = -1;
     }
-    vfs_umount(&_test_vfs_mount_null);
+    vfs_umount(&_test_vfs_mount_null, false);
 }
 
 static void test_vfs_null_file_ops_close(void)

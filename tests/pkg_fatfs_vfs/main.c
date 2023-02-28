@@ -90,7 +90,7 @@ static void test_format(void)
 static void test_mount(void)
 {
     print_test_result("test_mount__mount", vfs_mount(&_test_vfs_mount) == 0);
-    print_test_result("test_mount__umount", vfs_umount(&_test_vfs_mount) == 0);
+    print_test_result("test_mount__umount", vfs_umount(&_test_vfs_mount, false) == 0);
 }
 
 static void test_open(void)
@@ -113,7 +113,7 @@ static void test_open(void)
     print_test_result("test_open__open_rw", fd >= 0);
     print_test_result("test_open__close_rw", vfs_close(fd) == 0);
 
-    print_test_result("test_open__umount", vfs_umount(&_test_vfs_mount) == 0);
+    print_test_result("test_open__umount", vfs_umount(&_test_vfs_mount, false) == 0);
 }
 
 static void test_rw(void)
@@ -193,7 +193,7 @@ static void test_rw(void)
                       (strncmp(buf, test_txt3, sizeof(test_txt3)) == 0));
 
     print_test_result("test_rw__close_rwc", vfs_close(fd) == 0);
-    print_test_result("test_rw__umount", vfs_umount(&_test_vfs_mount) == 0);
+    print_test_result("test_rw__umount", vfs_umount(&_test_vfs_mount, false) == 0);
 }
 
 static void test_dir(void)
@@ -216,7 +216,7 @@ static void test_dir(void)
 
     print_test_result("test_dir__readdir3", vfs_readdir(&dir, &entry2) == 0);
     print_test_result("test_dir__closedir", vfs_closedir(&dir) == 0);
-    print_test_result("test_dir__umount", vfs_umount(&_test_vfs_mount) == 0);
+    print_test_result("test_dir__umount", vfs_umount(&_test_vfs_mount, false) == 0);
 }
 
 static void test_rename(void)
@@ -243,7 +243,7 @@ static void test_rename(void)
 
     print_test_result("test_rename__readdir3", vfs_readdir(&dir, &entry2) == 0);
     print_test_result("test_rename__closedir", vfs_closedir(&dir) == 0);
-    print_test_result("test_rename__umount", vfs_umount(&_test_vfs_mount) == 0);
+    print_test_result("test_rename__umount", vfs_umount(&_test_vfs_mount, false) == 0);
 }
 
 static void test_unlink(void)
@@ -257,7 +257,7 @@ static void test_unlink(void)
     print_test_result("test_unlink__opendir", vfs_opendir(&dir, MNT_PATH) == 0);
     print_test_result("test_unlink__readdir", vfs_readdir(&dir, &entry) == 0);
     print_test_result("test_unlink__closedir", vfs_closedir(&dir) == 0);
-    print_test_result("test_unlink__umount", vfs_umount(&_test_vfs_mount) == 0);
+    print_test_result("test_unlink__umount", vfs_umount(&_test_vfs_mount, false) == 0);
 }
 
 static void test_mkrmdir(void)
@@ -281,7 +281,7 @@ static void test_mkrmdir(void)
                       vfs_opendir(&dir, MNT_PATH"/"DIR_NAME) < 0);
 
     print_test_result("test_mkrmdir__umount",
-                      vfs_umount(&_test_vfs_mount) == 0);
+                      vfs_umount(&_test_vfs_mount, false) == 0);
 }
 
 static void test_create(void)
@@ -305,7 +305,7 @@ static void test_create(void)
     print_test_result("test_create__write_wo2", nw == sizeof(test_txt));
     print_test_result("test_create__close_wo2", vfs_close(fd) == 0);
 
-    print_test_result("test_create__umount", vfs_umount(&_test_vfs_mount) == 0);
+    print_test_result("test_create__umount", vfs_umount(&_test_vfs_mount, false) == 0);
 }
 
 static void test_fstat(void)
@@ -328,7 +328,7 @@ static void test_fstat(void)
     print_test_result("test_stat__stat", vfs_fstat(fd, &stat_buf) == 0);
     print_test_result("test_stat__close", vfs_close(fd) == 0);
     print_test_result("test_stat__size", stat_buf.st_size == sizeof(test_txt));
-    print_test_result("test_stat__umount", vfs_umount(&_test_vfs_mount) == 0);
+    print_test_result("test_stat__umount", vfs_umount(&_test_vfs_mount, false) == 0);
 }
 
 #if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
@@ -393,7 +393,7 @@ static void test_libc(void)
     }
     print_test_result("test_libc__remove", remove(FULL_FNAME2) == 0);
 
-    print_test_result("test_libc__umount", vfs_umount(&_test_vfs_mount) == 0);
+    print_test_result("test_libc__umount", vfs_umount(&_test_vfs_mount, false) == 0);
 }
 #endif
 
