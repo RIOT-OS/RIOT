@@ -13,7 +13,7 @@ include $(BOARDDIR)/Makefile.features
 
 # Sanity check
 ifeq (,$(CPU))
-  $(error CPU must be defined by board / board_common Makefile.features)
+  $(error $(BOARD): CPU must be defined by board / board_common Makefile.features)
 endif
 
 include $(RIOTCPU)/$(CPU)/Makefile.features

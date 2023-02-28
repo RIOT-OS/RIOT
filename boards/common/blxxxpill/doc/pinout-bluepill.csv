@@ -77,8 +77,8 @@ PINSET, LEFT, PACKED, CENTER, CENTER, 74.75, 30, 45, 60, 10, 0
 #           wire,       type,   group,  pin-name,   comment,    analog, PWM,    SPI,    I2C,    POWER,  UART,   QDEC
 PIN,        ANALOG,     INPUT,  NONE,   ,           "VAT"
 PIN,        DIGITAL,    OUTPUT, NONE,   "PC 13",    "LED1"
-PIN,        DIGITAL,    IO,     NONE,   "PC 14"
-PIN,        DIGITAL,    IO,     NONE,   "PC 15"
+PIN,        DIGITAL,    IO,     NONE,   "PC 14",    "OSC32"
+PIN,        DIGITAL,    IO,     NONE,   "PC 15",    "OSC32"
 PIN,        ANALOG,     IO,     NONE,   "PA 0",     ,           "A0"
 PIN,        DIGITAL,    IO,     NONE,   "PA 1",     ,           "A1"
 PIN,        DIGITAL,    OUTPUT, NONE,   "PA 2",     ,           ,       ,       ,       ,       ,       "TX1"
