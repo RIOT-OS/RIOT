@@ -244,6 +244,10 @@ ifneq (,$(filter gnrc_sixlowpan_frag_sfr_congure_%,$(USEMODULE)))
   USEMODULE += gnrc_sixlowpan_frag_sfr_congure
 endif
 
+ifneq (,$(filter gnrc_sixlowpan_frag_sfr_congure_quic,$(USEMODULE)))
+  USEMODULE += congure_quic
+endif
+
 ifneq (,$(filter gnrc_sixlowpan_frag_sfr_congure,$(USEMODULE)))
   USEMODULE += gnrc_sixlowpan_frag_sfr
   ifeq (,$(filter gnrc_sixlowpan_frag_sfr_congure_% congure_mock,$(USEMODULE)))
