@@ -455,7 +455,6 @@ static usbdev_ep_t *_get_ep(dwc2_usb_otg_fshs_t *usbdev, unsigned num,
     return dir == USB_EP_DIR_IN ? &usbdev->in[num] : &usbdev->out[num].ep;
 }
 
-#if defined(DEVELHELP) && !defined(NDEBUG)
 static size_t _total_fifo_size(const dwc2_usb_otg_fshs_config_t *conf)
 {
     if (conf->type == DWC2_USB_OTG_FS) {
@@ -474,7 +473,6 @@ static size_t _total_fifo_size(const dwc2_usb_otg_fshs_config_t *conf)
     }
 
 }
-#endif /* defined(DEVELHELP) && !defined(NDEBUG) */
 
 static void _configure_tx_fifo(dwc2_usb_otg_fshs_t *usbdev, size_t num,
                                size_t len)
