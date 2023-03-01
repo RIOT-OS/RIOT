@@ -203,7 +203,6 @@ static gnrc_sixlowpan_frag_rb_t *_rbuf_get_by_tag(const gnrc_netif_hdr_t *netif_
     return NULL;
 }
 
-#ifndef NDEBUG
 static bool _valid_offset(gnrc_pktsnip_t *pkt, size_t offset)
 {
     return (
@@ -219,7 +218,6 @@ static bool _valid_offset(gnrc_pktsnip_t *pkt, size_t offset)
         (sixlowpan_sfr_rfrag_get_offset(pkt->data) != 0)
     );
 }
-#endif
 
 static uint8_t *_6lo_frag_payload(gnrc_pktsnip_t *pkt)
 {
