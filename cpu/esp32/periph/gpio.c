@@ -177,20 +177,20 @@ static inline void _gpio_reg_out_xor(gpio_t pin)
 #error "Platform implementation is missing"
 #endif
 
-#ifndef NDEBUG
-int _gpio_init_mode_check(gpio_t pin, gpio_mode_t mode)
+static int _gpio_init_mode_check(gpio_t pin, gpio_mode_t mode)
 {
     assert(pin < GPIO_PIN_NUMOF);
 
     /* check if the pin can be used as GPIO or if it is used for something else */
     if (_gpio_pin_usage[pin] != _GPIO) {
+#ifndef NDEBUG
         LOG_TAG_ERROR("gpio", "GPIO%d is already used as %s signal\n", pin,
                       _gpio_pin_usage_str[_gpio_pin_usage[pin]]);
+#endif
         return -1;
     }
     return 0;
 }
-#endif
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
