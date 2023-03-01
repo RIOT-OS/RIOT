@@ -14,6 +14,14 @@
  * @file
  * @brief       POSIX.1-2008 compliant version of the assert macro
  *
+ *              This version of `assert()` slightly deviates from the one
+ *              described in the standard in that it turns into a compiler
+ *              hint when `NDEBUG` is set.
+ *              This allows the compiler to assume that the asserted condition
+ *              is always true (as it would do in the `!NDEBUG` case where the
+ *              `assert()` function is marked as `noreturn`) and optimize the
+ *              code accordingly.
+ *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
@@ -67,7 +75,7 @@ extern "C" {
 #endif /*__NORETURN*/
 
 #ifdef NDEBUG
-#define assert(ignore)((void)0)
+#define assert(cond) ((cond) ? (void)0 : __builtin_unreachable())
 #elif defined(DEBUG_ASSERT_VERBOSE)
 /**
  * @brief   Function to handle failed assertion
@@ -114,7 +122,7 @@ __NORETURN void _assert_failure(const char *file, unsigned line);
  *
  * @see http://pubs.opengroup.org/onlinepubs/9699919799/functions/assert.html
  */
-#define assert(cond) (_likely(cond) ? (void)0 :  _assert_failure(__FILE__, __LINE__))
+#define assert(cond) (_likely(cond) ? (void)0 : _assert_failure(__FILE__, __LINE__))
 #else /* DEBUG_ASSERT_VERBOSE */
 __NORETURN void _assert_panic(void);
 #define assert(cond) (_likely(cond) ? (void)0 : _assert_panic())
