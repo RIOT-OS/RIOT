@@ -246,6 +246,10 @@ endif
 
 ifneq (,$(filter gnrc_sixlowpan_frag_sfr_congure,$(USEMODULE)))
   USEMODULE += gnrc_sixlowpan_frag_sfr
+  ifeq (,$(filter gnrc_sixlowpan_frag_sfr_congure_% congure_mock,$(USEMODULE)))
+	# pick Appendix C as default congestion control
+    USEMODULE += gnrc_sixlowpan_frag_sfr_congure_sfr
+  endif
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_frag_sfr_ecn_%,$(USEMODULE)))
