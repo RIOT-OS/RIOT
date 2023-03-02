@@ -38,6 +38,8 @@ USEMODULE += ztimer_msec
 
 USEMODULE += event_timeout_ztimer
 
+USEMODULE += xtimer
+
 ifneq (,$(filter accelerometer,$(SENSORS)))
 CFLAGS += -DPULGA_ENABLE_ACCELEROMETER=1
 endif
