@@ -11,7 +11,8 @@
         "kernel_defines.h": "c",
         "sx126x_internal.h": "c",
         "submac.h": "c",
-        "thread.h": "c"
+        "thread.h": "c",
+        "callback.h": "c"
     },
     "[shellscript][c][cpp]": {
         "editor.tabSize": 4,

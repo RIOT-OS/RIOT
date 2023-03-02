@@ -102,7 +102,7 @@ void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
         for (unsigned i = 0; i < SX126X_NUMOF; ++i) {
         sx126x_hal_setup(&sx126x_devs[i], radio);
         sx126x_init(&sx126x_devs[i], &sx126x_params[i]);
-        sx126x_setup(radio,  i);
+        sx126x_setup(&sx126x_devs[i],  i);
         }
     };
 #endif

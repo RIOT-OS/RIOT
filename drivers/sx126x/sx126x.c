@@ -20,8 +20,6 @@
 
 #include <errno.h>
 
-//#include "sx126x_netdev.h"
-
 #include "net/lora.h"
 #include "periph/spi.h"
 
@@ -86,6 +84,8 @@ static const uint16_t _bw_khz[11] = {
     [SX126X_LORA_BW_500] = 500,
 };
 
+extern void _sx126x_handler(void* arg);
+
 static uint8_t _compute_ldro(sx126x_t *dev)
 {
     uint32_t symbol_len =
@@ -149,7 +149,7 @@ static void sx126x_init_default_config(sx126x_t *dev)
 #if IS_ACTIVE(SX126X_SPI)
 static void _dio1_isr(void *arg)
 {
-    netdev_trigger_event_isr(arg);
+    _sx126x_handler(arg);
 }
 #endif
 

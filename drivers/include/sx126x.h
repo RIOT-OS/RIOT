@@ -153,7 +153,7 @@ struct sx126x {
  * @param[in] index                     Index of @p params in a global parameter struct array.
  *                                      If initialized manually, pass a unique identifier instead.
  */
-void sx126x_setup(ieee802154_dev_t *hal, uint8_t index);
+void sx126x_setup(sx126x_t *dev, uint8_t index);
 
 void sx126x_hal_setup(sx126x_t *dev, ieee802154_dev_t *hal);
 

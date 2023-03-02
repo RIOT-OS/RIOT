@@ -24,7 +24,7 @@
 #include "debug.h"
 
 #include "net/ieee802154/radio.h"
-
+#include "event/callback.h"
 #include "event/thread.h"
 #include "ztimer.h"
 
@@ -60,38 +60,38 @@
 #endif
 
 static const ieee802154_radio_ops_t sx126x_ops;
-static ieee802154_dev_t *_sx126x_hal_dev;
 
 static int _set_state(sx126x_t *dev, sx126x_state_t state);
 static int _get_state(sx126x_t *dev, void* val);
 
-
-void sx126x_hal_setup(sx126x_t *dev, ieee802154_dev_t *hal)
+void _sx126x_handler(void* arg)
 {
-    hal->driver = &sx126x_ops;
-    hal->priv = dev;
+    ieee802154_dev_t *hal = arg;
+    sx126x_hal_task_handler(hal);
 }
 
 #if IS_USED(MODULE_SX126X_STM32WL)
 
-void _sx126x_handler(event_t *event)
-{
-    (void) event;
-    ieee802154_dev_t *hal = _sx126x_hal_dev;
-    sx126x_hal_task_handler(hal);
-}
-
-event_t sx126x_ev = {.handler = _sx126x_handler};
+event_callback_t sx126x_ev_callback;
 
 void isr_subghz_radio(void)
 {
     /* Disable NVIC to avoid ISR conflict in CPU. */
     NVIC_DisableIRQ(SUBGHZ_Radio_IRQn);
     NVIC_ClearPendingIRQ(SUBGHZ_Radio_IRQn);
-    event_post(EVENT_PRIO_MEDIUM, &sx126x_ev);
+    event_post(EVENT_PRIO_MEDIUM, (event_t*)&sx126x_ev_callback);
     cortexm_isr_end();
 }
 #endif 
+
+void sx126x_hal_setup(sx126x_t *dev, ieee802154_dev_t *hal)
+{
+    hal->driver = &sx126x_ops;
+    hal->priv = dev;
+#if IS_USED(MODULE_SX126X_STM32WL)
+    event_callback_init(&sx126x_ev_callback, (void*)_sx126x_handler, (void*)hal);
+#endif
+}
 
 static void ack_timer_cb(void *arg)
 {
@@ -111,21 +111,18 @@ static void ack_timer_cb(void *arg)
     dev->ack_filter = true;
 }
 
-void sx126x_setup(ieee802154_dev_t *hal, uint8_t index)
+void sx126x_setup(sx126x_t *dev, uint8_t index)
 {
-    sx126x_t *dev = hal->priv;
     (void)index;
 
     dev->ack_timer.arg = dev;
     dev->ack_timer.callback = ack_timer_cb;
     dev->ack_filter = false;
 
-     _sx126x_hal_dev = hal;
 }
 
-static bool _l2filter(uint8_t *mhr)
+static bool _l2filter(ieee802154_dev_t *hal, uint8_t *mhr)
 {
-    ieee802154_dev_t *hal = _sx126x_hal_dev;
     sx126x_t *dev = hal->priv;
     uint8_t dst_addr[IEEE802154_LONG_ADDRESS_LEN];
     le_uint16_t dst_pan;
@@ -265,7 +262,7 @@ void sx126x_hal_task_handler(ieee802154_dev_t *hal)
     dev->size = rx_buffer_status.pld_len_in_bytes;
  
     sx126x_read_buffer(dev, rx_buffer_status.buffer_start_pointer, (uint8_t*)rxbuf, dev->size);
-        bool l2filter_passed = _l2filter(rxbuf);
+        bool l2filter_passed = _l2filter(hal, rxbuf);
         bool is_auto_ack_en = !IS_ACTIVE(CONFIG_IEEE802154_AUTO_ACK_DISABLE);
         bool is_ack = (rxbuf[0] & IEEE802154_FCF_TYPE_ACK)&&(rxbuf[1] == 0x00);
         bool ack_req = rxbuf[0] & IEEE802154_FCF_ACK_REQ;
