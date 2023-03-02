@@ -33,3 +33,8 @@ ifneq (,$(filter gcoap,$(USEMODULE)))
     # default configuration; adding some to be safe against variable size fields.
     CFLAGS += "-DDTLS_MAX_BUF=($(CONFIG_GCOAP_PDU_BUF_SIZE) + 36)"
 endif
+
+# TinyDTLS emits several messages during connection establishment at the info
+# level; this is way more verbose than common in RIOT.
+TINYDTLS_LOG_LEVEL ?= LOG_WARNING
+CFLAGS += -DLOG_LEVEL=$(TINYDTLS_LOG_LEVEL)
