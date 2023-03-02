@@ -22,6 +22,7 @@
 #include "thread.h"
 #include "msg.h"
 #include "net/gnrc/netif/conf.h"    /* <- GNRC_NETIF_MSG_QUEUE_SIZE */
+#include "macros/utils.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,7 +54,7 @@ extern "C" {
 /**
  * @brief   stack size of an ieee802154 device
  */
-#define IEEE802154_STACKSIZE_DEFAULT    (GNRC_NETIF_STACKSIZE_DEFAULT + \
+#define IEEE802154_STACKSIZE_DEFAULT    (MAX(520, GNRC_NETIF_STACKSIZE_DEFAULT) + \
                                          IEEE802154_SECURITY_EXTRA_STACKSIZE)
 #endif
 
