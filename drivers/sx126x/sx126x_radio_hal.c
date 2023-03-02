@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 
+ * Copyright (C) ??? 2023 
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -38,7 +38,7 @@
 #define LORA_ACK_REPLY_US          1024
 
 #ifndef SX126X_HAL_CHAN_BASE
-#define SX126X_HAL_CHAN_BASE (868100000LU)
+#define SX126X_HAL_CHAN_BASE (868300000LU)
 #endif
 
 #ifndef SX126X_HAL_CHAN_SPACING
@@ -57,7 +57,6 @@
 #define SX126X_POWER_MAX (22)
 #endif
 
-#define SX126X_HAL 1
 
 static const ieee802154_radio_ops_t sx126x_ops;
 
@@ -66,7 +65,7 @@ static int _get_state(sx126x_t *dev, void* val);
 
 void _sx126x_handler(void* arg)
 {
-#if SX126X_HAL
+#if IS_USED(MODULE_IEEE802154)
     ieee802154_dev_t *hal = arg;
     sx126x_hal_task_handler(hal);
 #else

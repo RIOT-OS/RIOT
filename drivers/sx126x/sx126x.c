@@ -142,8 +142,6 @@ static void sx126x_init_default_config(sx126x_t *dev)
         IS_ACTIVE(CONFIG_LORA_IQ_INVERTED_DEFAULT) ? true : false
         );
     sx126x_set_lora_pkt_params(dev, &dev->pkt_params);
-
-    
 }
 
 #if IS_ACTIVE(SX126X_SPI)
