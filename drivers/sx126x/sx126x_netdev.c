@@ -42,6 +42,7 @@ const uint8_t sx126x_max_sf = LORA_SF12;
 
 extern void _sx126x_handler(void* arg);
 extern event_callback_t sx126x_ev_callback;
+
 static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
     sx126x_t *dev = container_of(netdev, sx126x_t, netdev);
@@ -120,7 +121,6 @@ static int _init(netdev_t *netdev)
     sx126x_t *dev = container_of(netdev, sx126x_t, netdev);
     if (sx126x_is_stm32wl(dev)) {
 #if IS_USED(MODULE_SX126X_STM32WL)
-        //_dev = netdev;
         event_callback_init(&sx126x_ev_callback, (void*)_sx126x_handler, (void*)netdev);
 #endif
     }

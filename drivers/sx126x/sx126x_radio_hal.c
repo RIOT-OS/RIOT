@@ -57,6 +57,8 @@
 #define SX126X_POWER_MAX (22)
 #endif
 
+#define SX126X_HAL 1
+
 static const ieee802154_radio_ops_t sx126x_ops;
 
 static int _set_state(sx126x_t *dev, sx126x_state_t state);
@@ -64,8 +66,14 @@ static int _get_state(sx126x_t *dev, void* val);
 
 void _sx126x_handler(void* arg)
 {
+#if SX126X_HAL
     ieee802154_dev_t *hal = arg;
     sx126x_hal_task_handler(hal);
+#else
+    netdev_t *dev = arg;
+    netdev_trigger_event_isr(dev);
+    
+#endif
 }
 
 #if IS_USED(MODULE_SX126X_STM32WL)

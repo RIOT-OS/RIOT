@@ -1,7 +1,7 @@
 include ../Makefile.tests_common
-
+DISABLE_MODULE += auto_init_sx126x
 # other values supported are sx1262, sx1268 and llcc68
-LORA_DRIVER ?= sx1261
+LORA_DRIVER ?= sx126x_stm32wl
 USEMODULE += $(LORA_DRIVER)
 
 USEMODULE += shell
