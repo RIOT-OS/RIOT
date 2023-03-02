@@ -8698,3 +8698,29 @@ warning: unable to resolve reference to 'esp32s2_devkit_optional_hardware' for \
 warning: unable to resolve reference to 'esp32s3_devkit_optional_hardware' for \ref command
 warning: unable to resolve reference to 'esp32_ttgo_t_beam_optional_hardware' for \ref command
 warning: unable to resolve reference to 'nrf52840dongle_flash' for \ref command
+warning: Member USBUS_MSC_BUFFER_SIZE (macro definition) of file msc.h is not documented.
+warning: Member USBUS_MSC_EXPORTED_DEV (macro definition) of file msc.h is not documented.
+warning: Member usbus_msc_state_t (enumeration) of file msc.h is not documented.
+warning: Member USBUS_MSC_VENDOR_ID (macro definition) of file scsi.h is not documented.
+warning: Member USBUS_MSC_PRODUCT_ID (macro definition) of file scsi.h is not documented.
+warning: Member USBUS_MSC_PRODUCT_REV (macro definition) of file scsi.h is not documented.
+warning: Member SCSI_VERSION_NONE (macro definition) of file scsi.h is not documented.
+warning: Member SCSI_VERSION_SCSI1 (macro definition) of file scsi.h is not documented.
+warning: Member SCSI_VERSION_SCSI2 (macro definition) of file scsi.h is not documented.
+warning: Member SCSI_READ_FMT_CAPA_TYPE_RESERVED (macro definition) of file scsi.h is not documented.
+warning: Member SCSI_READ_FMT_CAPA_TYPE_UNFORMATTED (macro definition) of file scsi.h is not documented.
+warning: Member SCSI_READ_FMT_CAPA_TYPE_FORMATTED (macro definition) of file scsi.h is not documented.
+warning: Member SCSI_READ_FMT_CAPA_TYPE_NO_MEDIA (macro definition) of file scsi.h is not documented.
+warning: Member SCSI_SENSE_KEY_NO_SENSE (macro definition) of file scsi.h is not documented.
+warning: Member SCSI_SENSE_KEY_RECOVERED_ERROR (macro definition) of file scsi.h is not documented.
+warning: Member SCSI_SENSE_KEY_NOT_READY (macro definition) of file scsi.h is not documented.
+warning: Member SCSI_SENSE_KEY_MEDIUM_ERROR (macro definition) of file scsi.h is not documented.
+warning: Member SCSI_SENSE_KEY_HARDWARE_ERROR (macro definition) of file scsi.h is not documented.
+warning: Member SCSI_SENSE_KEY_ILLEGAL_REQUEST (macro definition) of file scsi.h is not documented.
+warning: Member SCSI_SENSE_KEY_UNIT_ATTENTION (macro definition) of file scsi.h is not documented.
+warning: Member SCSI_SENSE_KEY_DATA_PROTECT (macro definition) of file scsi.h is not documented.
+warning: Member SCSI_SENSE_KEY_BLANK_CHECK (macro definition) of file scsi.h is not documented.
+warning: Member SCSI_SENSE_KEY_VENDOR_SPECIFIC (macro definition) of file scsi.h is not documented.
+warning: Member SCSI_SENSE_KEY_ABORTED_COMMAND (macro definition) of file scsi.h is not documented.
+warning: Member SCSI_SENSE_KEY_VOLUME_OVERFLOW (macro definition) of file scsi.h is not documented.
+warning: Member SCSI_SENSE_KEY_MISCOMPARE (macro definition) of file scsi.h is not documented.
