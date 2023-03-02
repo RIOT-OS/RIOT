@@ -618,7 +618,9 @@ static inline int gnrc_netif_ipv6_iid_to_addr(const gnrc_netif_t *netif,
                                               const eui64_t *iid, uint8_t *addr)
 {
     assert(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR);
-    return l2util_ipv6_iid_to_addr(netif->device_type, iid, addr);
+    int res = l2util_ipv6_iid_to_addr(netif->device_type, iid, addr);
+    assert(res != -ENOTSUP);
+    return res;
 }
 
 /**
@@ -685,7 +687,9 @@ static inline int gnrc_netif_ndp_addr_len_from_l2ao(gnrc_netif_t *netif,
                                                     const ndp_opt_t *opt)
 {
     assert(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR);
-    return l2util_ndp_addr_len_from_l2ao(netif->device_type, opt);
+    int res = l2util_ndp_addr_len_from_l2ao(netif->device_type, opt);
+    assert(res != -ENOTSUP);
+    return res;
 }
 
 /**
