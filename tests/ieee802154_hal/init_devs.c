@@ -101,8 +101,8 @@ void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
     if((radio = cb(IEEE802154_DEV_TYPE_SX126X, opaque))){
         for (unsigned i = 0; i < SX126X_NUMOF; ++i) {
         sx126x_hal_setup(&sx126x_devs[i], radio);
-        sx126x_init(&sx126x_devs[i], &sx126x_params[i]);
-        sx126x_setup(&sx126x_devs[i],  i);
+        sx126x_setup(&sx126x_devs[i], &sx126x_params[i],  i);
+        sx126x_init(&sx126x_devs[i]);
         }
     };
 #endif

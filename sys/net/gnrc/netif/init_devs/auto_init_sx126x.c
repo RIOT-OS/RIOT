@@ -62,8 +62,8 @@ void auto_init_sx126x(void)
         netdev_ieee802154_submac_init(&sx126x_netdev[i]);
         
         sx126x_hal_setup(&sx126x_devs[i], &sx126x_netdev[i].submac.dev);
-        sx126x_init(&sx126x_devs[i], &sx126x_params[i]);
-        sx126x_setup(&sx126x_devs[i], i);
+        sx126x_setup(&sx126x_devs[i], &sx126x_params[i], i);
+        sx126x_init(&sx126x_devs[i]);
         
             gnrc_netif_ieee802154_create(&_netif[i], sx126x_stacks[i],
                                   SX126X_STACKSIZE, SX126X_PRIO,

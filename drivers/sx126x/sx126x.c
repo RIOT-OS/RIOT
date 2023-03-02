@@ -153,10 +153,9 @@ static void _dio1_isr(void *arg)
 }
 #endif
 
-int sx126x_init(sx126x_t *dev, const sx126x_params_t *params)
+int sx126x_init(sx126x_t *dev)
 {
     /* Setup SPI for SX126X */
-    dev->params = (sx126x_params_t *)params;
     int res = spi_init_cs(dev->params->spi, dev->params->nss_pin);
 
     if (res != SPI_OK) {

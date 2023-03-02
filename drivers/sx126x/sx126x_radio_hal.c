@@ -28,8 +28,6 @@
 #include "event/thread.h"
 #include "ztimer.h"
 
-#include "thread.h"
-
 #include "kernel_defines.h"
 #include "event.h"
 
@@ -111,10 +109,10 @@ static void ack_timer_cb(void *arg)
     dev->ack_filter = true;
 }
 
-void sx126x_setup(sx126x_t *dev, uint8_t index)
+void sx126x_setup(sx126x_t *dev, const sx126x_params_t *params, uint8_t index)
 {
     (void)index;
-
+    dev->params = (sx126x_params_t *)params;
     dev->ack_timer.arg = dev;
     dev->ack_timer.callback = ack_timer_cb;
     dev->ack_filter = false;
@@ -370,8 +368,8 @@ static int _request_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
     (void)ctx;
     switch (op) {
         case IEEE802154_HAL_OP_TRANSMIT:
-        ieee802154_radio_cca(hal);
         dev->ack_filter = false;
+        ieee802154_radio_cca(hal);
         _set_state(dev, STATE_TX);
 
         break;
