@@ -99,6 +99,7 @@
 /drivers/include/periph/ptp.h               @maribu
 
 /pkg/cryptoauthlib/                         @Einhornhool @PeterKietzmann
+/pkg/libschc/                               @bartmoons @miri64
 /pkg/lua/                                   @jcarrano
 /pkg/lwip/                                  @miri64
 /pkg/gecko_sdk/                             @basilfx
@@ -145,6 +146,7 @@
 /tests/driver_dht/                          @wosym
 /tests/gnrc*                                @miri64
 /tests/lwip*                                @miri64
+/tests/pkg_libschc/                         @miri64
 /tests/slip/                                @miri64
 /tests/unittests                            @miri64
 /tests/*/tests/*.py                         @miri64
