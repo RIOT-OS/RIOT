@@ -93,7 +93,7 @@ typedef struct
     int  timestamp;
 } leitura;
 
-#define MAX_READINGS 256
+#define MAX_READINGS 4096
 leitura readings_buffer[MAX_READINGS];
 size_t rlen = 0;
 
@@ -135,7 +135,7 @@ void user_delay(uint32_t period)
 #define GATT_MANUFACTURER_NAME_UUID             0x2A29
 #define GATT_MODEL_NUMBER_UUID                  0x2A24
 
-#define STR_ANSWER_BUFFER_SIZE 1000
+#define STR_ANSWER_BUFFER_SIZE 250
 
 /* UUID = 1bce38b3-d137-48ff-a13e-033e14c7a335 */
 static const ble_uuid128_t gatt_svr_svc_rw_demo_uuid
@@ -344,31 +344,47 @@ static int gatt_svr_chr_access_rw_demo(
         if (ctxt->op == BLE_GATT_ACCESS_OP_READ_CHR && strcmp(rm_demo_write_data, "oi") == 0)
         {
 
-            snprintf(str_answer, STR_ANSWER_BUFFER_SIZE,
-                     "Hello World!"); // A crude way to display a command recognition
-            puts(str_answer);
+            //snprintf(str_answer, STR_ANSWER_BUFFER_SIZE,
+              //       "Hello World!"); // A crude way to display a command recognition
+           // puts(str_answer);
             
             //do_read();
 
             //char bufferk[10]; 
-            printf("passou por aqui1\n %c", 13);
+            //printf("passou por aqui1\n %c", 13);
             //snprintf(str_answer, STR_ANSWER_BUFFER_SIZE, "%c", (char)(accel_data[1].x / AC));
-            printf("passou por aqui2\n %c", 13);
+            //printf("passou por aqui2\n %c", 13);
 
             //printf("%d \n %c", 13, lenki);
             
             //snprintf(str_answer, STR_ANSWER_BUFFER_SIZE,
             //         bufferk); // A crude way to display a command recognition
             //puts(str_answer);
-            float myvar= 3.14;
-            char test[7];
-            memcpy(test, &myvar, sizeof(myvar));
-            //rc = os_mbuf_append(ctxt->om, &rm_demo_write_data, strlen(rm_demo_write_data));
-            rc = os_mbuf_append(ctxt->om, test, sizeof(test)+1);
-            printf("Sent: %s\n %c", test, 13);
-            printf("Sent: %d\n %c", sizeof(test), 13);
-            puts("");
+            
+            float auxf= 27.3;
+            memcpy(str_answer, &auxf, sizeof(float));
+            auxf= 3.14;
+            memcpy(str_answer + sizeof(float), &auxf, sizeof(float));
+            auxf= 2.71;
+            memcpy(str_answer + 2*sizeof(float), &auxf, sizeof(float));
+            int auxi= 152152;
+            memcpy(str_answer + 3*sizeof(float), &auxi, sizeof(int));
+            str_answer[16]='\0';
+            
+            auxi=0;
+            if(auxi==0)
+                printf("Honesty check!!\n%c",13); //Prevents compiler optimization from ignoring pointless auxi=0 instruction
 
+            //rc = os_mbuf_append(ctxt->om, &rm_demo_write_data, strlen(rm_demo_write_data));
+            rc = os_mbuf_append(ctxt->om, &str_answer, 3*sizeof(float)+sizeof(int));
+            
+            printf("Sent: %s\n %c", str_answer, 13); //This might never look pretty
+
+            printf("SIze: %d\n %c", strlen(str_answer), 13); //TODO: find something that really sends the adequate size of what is sent
+            /*strlen will not work with this array, since it has the posssibility of multiple terminators '\0'
+             nor will sizeof work, since it only returns the array's full size sizeof(char)*lenght */
+            auxi = str_answer[12] + (str_answer[13] <<8) + (str_answer[14] <<16) + (str_answer[15] <<24); //VERY SENSIBLE BIT SHIFT OPERATION
+            printf("Timestamp: %d\n", auxi);
             return rc;
         }
         else
@@ -492,7 +508,7 @@ void read_and_show_Acc_values(void)
 {
     do_read();
     // #if(LOG_LEVEL==4)
-   // log_readings();
+    //  log_readings();
     // #endif
 }
 
