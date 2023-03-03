@@ -110,6 +110,10 @@ def test_linear_topology(factory, zep_dispatch):
     # make sure the content matches
     assert B.cmd("md5sum /nvm0/song.txt").split()[2] == B.cmd("md5sum /nvm0/song2.txt").split()[2]
 
+    # clean up after run
+    B.cmd("vfs rm /nvm0/song.txt")
+    B.cmd("vfs rm /nvm0/song2.txt")
+
     # terminate nodes
     for n in nodes:
         n.stop_term()
