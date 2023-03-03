@@ -30,6 +30,7 @@
 #include "sched.h"
 #include "plic.h"
 #include "clic.h"
+#include "architecture.h"
 
 #include "vendor/riscv_csr.h"
 
@@ -83,13 +84,13 @@ void riscv_irq_init(void)
  * @brief Global trap and interrupt handler
  */
 __attribute((used))
-static void handle_trap(uint32_t mcause)
+static void handle_trap(uword_t mcause)
 {
     /*  Tell RIOT to set sched_context_switch_request instead of
      *  calling thread_yield(). */
     riscv_in_isr = 1;
 
-    uint32_t trap = mcause & CPU_CSR_MCAUSE_CAUSE_MSK;
+    uword_t trap = mcause & CPU_CSR_MCAUSE_CAUSE_MSK;
 
     /* Check for INT or TRAP */
     if ((mcause & MCAUSE_INT) == MCAUSE_INT) {
@@ -129,7 +130,7 @@ static void handle_trap(uint32_t mcause)
             sched_context_switch_request = 1;
             /* Increment the return program counter past the ecall
              * instruction */
-            uint32_t return_pc = read_csr(mepc);
+            uword_t return_pc = read_csr(mepc);
             write_csr(mepc, return_pc + 4);
             break;
         }
@@ -137,8 +138,8 @@ static void handle_trap(uint32_t mcause)
 #ifdef DEVELHELP
             printf("Unhandled trap:\n");
             printf("  mcause: 0x%" PRIx32 "\n", trap);
-            printf("  mepc:   0x%lx\n", read_csr(mepc));
-            printf("  mtval:  0x%lx\n", read_csr(mtval));
+            printf("  mepc:   0x%" PRIx32 "\n", read_csr(mepc));
+            printf("  mtval:  0x%" PRIx32 "\n", read_csr(mtval));
 #endif
             /* Unknown trap */
             core_panic(PANIC_GENERAL_ERROR, "Unhandled trap");
