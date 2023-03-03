@@ -19,11 +19,14 @@ def testfunc(child):
     child.expect(r'This test will display \'Alarm\!\' every 2 seconds '
                  r'for (\d{1}) times')
     alarm_count = int(child.match.group(1))
+    child.expect(r'Clock value is now   ({})'.format(DATE_PATTERN))
+    clock_reboot = child.match.group(1)
     child.expect(r'  Setting clock to   ({})'.format(DATE_PATTERN))
     clock_set = child.match.group(1)
     child.expect(r'Clock value is now   ({})'.format(DATE_PATTERN))
     clock_value = child.match.group(1)
     assert clock_set == clock_value
+    assert clock_reboot != clock_value
 
     child.expect(r'  Setting alarm to   ({})'.format(DATE_PATTERN))
     alarm_set = child.match.group(1)
