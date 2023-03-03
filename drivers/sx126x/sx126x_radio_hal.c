@@ -119,6 +119,9 @@ static void ack_timer_cb(void *arg)
 void sx126x_setup(sx126x_t *dev, const sx126x_params_t *params, uint8_t index)
 {
     (void)index;
+#ifdef SX126X_LED_PIN
+    gpio_init(SX126X_LED_PIN, GPIO_OUT);
+#endif
     dev->params = (sx126x_params_t *)params;
     dev->ack_timer.arg = dev;
     dev->ack_timer.callback = ack_timer_cb;
@@ -165,11 +168,17 @@ static int _set_state(sx126x_t *dev, sx126x_state_t state)
     switch (state) {
     case STATE_IDLE:
         DEBUG("[sx126x] netdev: set STATE_STANDBY\n");
+#ifdef SX126X_LED_PIN
+        gpio_clear(SX126X_LED_PIN);
+#endif
         sx126x_set_standby(dev, SX126X_CHIP_MODE_STBY_XOSC);
         break;
 
     case STATE_RX:
         DEBUG("[sx126x] netdev: set STATE_RX\n");
+#ifdef SX126X_LED_PIN
+        gpio_clear(SX126X_LED_PIN);
+#endif
 #if IS_USED(MODULE_SX126X_RF_SWITCH)
         /* Refer Section 4.2 RF Switch in Application Note (AN5406) */
         if (dev->params->set_rf_mode) {
@@ -188,6 +197,9 @@ static int _set_state(sx126x_t *dev, sx126x_state_t state)
 
     case STATE_TX:
         DEBUG("[sx126x] netdev: set STATE_TX\n");
+#ifdef SX126X_LED_PIN
+        gpio_set(SX126X_LED_PIN);
+#endif
 #if IS_USED(MODULE_SX126X_RF_SWITCH)
         if (dev->params->set_rf_mode) {
             dev->params->set_rf_mode(dev, dev->params->tx_pa_mode);

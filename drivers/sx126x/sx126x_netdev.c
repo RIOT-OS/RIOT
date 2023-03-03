@@ -301,6 +301,9 @@ static int _set_state(sx126x_t *dev, netopt_state_t state)
     switch (state) {
     case NETOPT_STATE_STANDBY:
         DEBUG("[sx126x] netdev: set NETOPT_STATE_STANDBY state\n");
+#ifdef SX126X_LED_PIN
+        gpio_clear(SX126X_LED_PIN);
+#endif
         sx126x_set_standby(dev, SX126X_CHIP_MODE_STBY_XOSC);
         break;
 
@@ -312,6 +315,9 @@ static int _set_state(sx126x_t *dev, netopt_state_t state)
         if (dev->params->set_rf_mode) {
             dev->params->set_rf_mode(dev, SX126X_RF_MODE_RX);
         }
+#endif
+#ifdef SX126X_LED_PIN
+        gpio_clear(SX126X_LED_PIN);
 #endif
         sx126x_cfg_rx_boosted(dev, true);
         int _timeout = (sx126x_symbol_to_msec(dev, dev->rx_timeout));
@@ -325,6 +331,9 @@ static int _set_state(sx126x_t *dev, netopt_state_t state)
 
     case NETOPT_STATE_TX:
         DEBUG("[sx126x] netdev: set NETOPT_STATE_TX state\n");
+#ifdef SX126X_LED_PIN
+        gpio_set(SX126X_LED_PIN);
+#endif
 #if IS_USED(MODULE_SX126X_RF_SWITCH)
         if (dev->params->set_rf_mode) {
             dev->params->set_rf_mode(dev, dev->params->tx_pa_mode);

@@ -34,7 +34,10 @@ void board_init(void)
         /* Initialize the GPIO control for RF 3-port switch (SP3T) */
         gpio_init(FE_CTRL1, GPIO_OUT);
         gpio_init(FE_CTRL2, GPIO_OUT);
+        gpio_init(SX126X_LED_PIN, GPIO_OUT);
     }
+    gpio_init(LED_STATUS, GPIO_OUT);
+    gpio_set(LED_STATUS);
 }
 
 #if IS_USED(MODULE_SX126X_STM32WL)
