@@ -125,14 +125,8 @@ static inline void _get_rtc_mem(void) {}
 
 int main(void)
 {
-    struct tm time = {
-        .tm_year = 2020 - TM_YEAR_OFFSET,   /* years are counted from 1900 */
-        .tm_mon  =  1,                      /* 0 = January, 11 = December */
-        .tm_mday = 28,
-        .tm_hour = 23,
-        .tm_min  = 59,
-        .tm_sec  = 57
-    };
+    struct tm time = (struct tm){0};
+    uint16_t ms;
 
     mutex_t rtc_mtx = MUTEX_INIT_LOCKED;
 
@@ -145,13 +139,33 @@ int main(void)
     _set_rtc_mem();
     _get_rtc_mem();
 
+    /* read RTC to retrieve initial */
+    if (IS_USED(MODULE_PERIPH_RTC_MS)) {
+        rtc_get_time_ms(&time, &ms);
+        print_time_ms("Clock value is now ", &time, ms);
+    } else {
+        rtc_get_time(&time);
+        print_time("Clock value is now ", &time);
+    }
+
+    time = (struct tm){
+        .tm_year = 2020 - TM_YEAR_OFFSET,   /* years are counted from 1900 */
+        .tm_mon  =  1,                      /* 0 = January, 11 = December */
+        .tm_mday = 28,
+        .tm_hour = 23,
+        .tm_min  = 59,
+        .tm_sec  = 57
+    };
+
     /* set RTC */
     print_time("  Setting clock to ", &time);
     rtc_set_time(&time);
 
+    time = (struct tm){0};
+    ms = 0;
+
     /* read RTC to confirm value */
     if (IS_USED(MODULE_PERIPH_RTC_MS)) {
-        uint16_t ms;
         rtc_get_time_ms(&time, &ms);
         print_time_ms("Clock value is now ", &time, ms);
     } else {
@@ -164,14 +178,19 @@ int main(void)
     print_time("  Setting alarm to ", &time);
     rtc_set_alarm(&time, cb, &rtc_mtx);
 
+    time = (struct tm){0};
+    ms = 0;
+
     /* verify alarm */
     rtc_get_alarm(&time);
     print_time("   Alarm is set to ", &time);
 
+    time = (struct tm){0};
+    ms = 0;
+
     /* clear alarm */
     rtc_clear_alarm();
     if (IS_USED(MODULE_PERIPH_RTC_MS)) {
-        uint16_t ms;
         rtc_get_time_ms(&time, &ms);
         print_time_ms("  Alarm cleared at ", &time, ms);
     } else {
@@ -189,14 +208,19 @@ int main(void)
         message = "       No alarm at ";
     }
 
+    time = (struct tm){0};
+    ms = 0;
+
     if (IS_USED(MODULE_PERIPH_RTC_MS)) {
-        uint16_t ms;
         rtc_get_time_ms(&time, &ms);
         print_time_ms(message, &time, ms);
     } else {
         rtc_get_time(&time);
         print_time(message, &time);
     }
+
+    time = (struct tm){0};
+    ms = 0;
 
     /* set alarm */
     rtc_get_time(&time);
