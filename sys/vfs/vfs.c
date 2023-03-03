@@ -1193,6 +1193,13 @@ void auto_init_vfs(void)
     }
 }
 
+void auto_unmount_vfs(void)
+{
+    for (unsigned i = 0; i < MOUNTPOINTS_NUMOF; ++i) {
+        vfs_umount(&vfs_mountpoints_xfa[i], true);
+    }
+}
+
 int vfs_mount_by_path(const char *path)
 {
     for (unsigned i = 0; i < MOUNTPOINTS_NUMOF; ++i) {
