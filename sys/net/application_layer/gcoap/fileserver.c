@@ -312,7 +312,7 @@ static ssize_t _put_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     }
     ret = O_WRONLY;
     ret |= (create ? O_CREAT | O_APPEND : 0);
-    if ((fd = vfs_open(request->namebuf, ret, 0)) < 0) {
+    if ((fd = vfs_open(request->namebuf, ret, 0666)) < 0) {
         ret = fd;
         goto unlink_on_error;
     }
@@ -511,7 +511,7 @@ static ssize_t _put_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         if (request->options.exists.if_match) {
             return gcoap_fileserver_error_handler(pdu, buf, len, COAP_CODE_PRECONDITION_FAILED);
         }
-        if ((err = vfs_mkdir(request->namebuf, 0)) < 0) {
+        if ((err = vfs_mkdir(request->namebuf, 0777)) < 0) {
             return gcoap_fileserver_error_handler(pdu, buf, len, err);
         }
         gcoap_resp_init(pdu, buf, len, COAP_CODE_CREATED);
