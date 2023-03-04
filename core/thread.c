@@ -226,9 +226,19 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
     thread_t *thread = (thread_t *)(uintptr_t)(stack + stacksize);
 
 #ifdef PICOLIBC_TLS
-    stacksize -= _tls_size();
+#if __PICOLIBC_MAJOR__ > 1 || __PICOLIBC_MINOR__ >= 8
+#define TLS_ALIGN       (alignof(thread_t) > _tls_align() ? alignof(thread_t) : _tls_align())
+#else
+#define TLS_ALIGN       alignof(thread_t)
+#endif
+    char *tls = stack + stacksize - _tls_size();
+    /*
+     * Make sure the TLS area is aligned as required and that the
+     * resulting stack will also be aligned as required
+     */
+    thread->tls = (void *) ((uintptr_t) tls & ~ (TLS_ALIGN - 1));
+    stacksize = (char *) thread->tls - stack;
 
-    thread->tls = stack + stacksize;
     _init_tls(thread->tls);
 #endif
 
