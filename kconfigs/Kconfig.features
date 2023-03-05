@@ -483,3 +483,26 @@ config HAS_SSP
     bool
     help
         Indicates that Stack Smashing Protection is supported.
+
+config HAS_BOARD_TIER_2
+    bool
+    default y
+    help
+        Indicates that the select board is flagged at least as tier 2. Hence,
+        CI runs requiring a higher (= lower numeric value) tier will skip
+        this board.
+
+config HAS_BOARD_TIER_1
+    bool
+    select HAS_BOARD_TIER_2
+    help
+        Indicates that the select board is flagged at least as tier 1. Hence,
+        CI runs requiring a higher (= lower numeric value) tier will skip
+        this board.
+
+config HAS_BOARD_TIER_0
+    bool
+    select HAS_BOARD_TIER_1
+    help
+        Indicates that the select board is flagged at least as tier 0. Hence,
+        CI runs will never skip this board.

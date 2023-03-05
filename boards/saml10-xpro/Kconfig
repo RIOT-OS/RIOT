@@ -12,5 +12,6 @@ config BOARD_SAML10_XPRO
     default y
     select BOARD_COMMON_SAML1X
     select CPU_MODEL_SAML10E16A
+    select HAS_BOARD_TIER_1
 
 source "$(RIOTBOARD)/common/saml1x/Kconfig"

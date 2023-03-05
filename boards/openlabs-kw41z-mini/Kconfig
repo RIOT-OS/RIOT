@@ -11,6 +11,7 @@ config BOARD_OPENLABS_KW41Z_MINI
     bool
     default y
     select CPU_MODEL_MKW41Z512VHT4
+    select HAS_BOARD_TIER_1
     select HAS_PERIPH_ADC
     select HAS_PERIPH_DAC
     select HAS_PERIPH_I2C

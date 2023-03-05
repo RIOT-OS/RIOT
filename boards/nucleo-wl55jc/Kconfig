@@ -15,6 +15,7 @@ config BOARD_NUCLEO_WL55JC
     select CPU_MODEL_STM32WL55JC
 
     # Put defined MCU peripherals here (in alphabetical order)
+    select HAS_BOARD_TIER_1
     select HAS_PERIPH_I2C
     select HAS_PERIPH_LPUART
     select HAS_PERIPH_RTT

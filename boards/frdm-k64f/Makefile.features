@@ -2,6 +2,7 @@ CPU = kinetis
 CPU_MODEL = mk64fn1m0vll12
 
 # Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += board_tier_1
 FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_i2c
 FEATURES_PROVIDED += periph_pwm

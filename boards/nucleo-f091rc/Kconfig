@@ -13,6 +13,7 @@ config BOARD_NUCLEO_F091RC
     default y
     select BOARD_COMMON_NUCLEO64
     select CPU_MODEL_STM32F091RC
+    select HAS_BOARD_TIER_1
     select HAS_PERIPH_ADC
     select HAS_PERIPH_DMA
     select HAS_PERIPH_I2C

@@ -12,5 +12,6 @@ config BOARD_ESP8266_ESP_12X
     default y
     select BOARD_COMMON_ESP8266
     select CPU_MODEL_ESP8266_ESP_12X
+    select HAS_BOARD_TIER_1
 
 source "$(RIOTBOARD)/common/esp8266/Kconfig"

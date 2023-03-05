@@ -13,6 +13,7 @@ config BOARD_ESP32_WROOM_32
     select BOARD_COMMON_ESP32
     select CPU_MODEL_ESP32_WROOM_32
     select HAS_ARDUINO
+    select HAS_BOARD_TIER_0
     select HAS_PERIPH_ADC
     select HAS_PERIPH_DAC
     select HAS_PERIPH_I2C

@@ -2,6 +2,7 @@ CPU = saml21
 CPU_MODEL = saml21j18a
 
 # Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += board_tier_1
 FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_dac
 FEATURES_PROVIDED += periph_i2c
