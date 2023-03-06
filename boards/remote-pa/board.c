@@ -22,20 +22,6 @@
 
 #include "board.h"
 #include "cpu.h"
-#include "fancy_leds.h"
-
-static inline void rf_switch_init(void);
-
-void board_init(void)
-{
-
-
-    /* initialize the 2.4GHz RF switch */
-    rf_switch_init();
-
-    /* Shoot rainbows */
-    LED_RAINBOW();
-}
 
 /**
  * @brief Initialize the 2.4GHz Radio Frequency SW-controlled Switch
@@ -50,4 +36,10 @@ static void rf_switch_init(void)
     /* Set RF 2.4GHz as default */
     gpio_init(RF_SWITCH_GPIO, GPIO_OUT);
     RF_SWITCH_2_4_GHZ;
+}
+
+void board_init(void)
+{
+    /* initialize the 2.4GHz RF switch */
+    rf_switch_init();
 }
