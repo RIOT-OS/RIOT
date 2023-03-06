@@ -16,6 +16,13 @@ menuconfig MODULE_USBUS_MSC
 
 if MODULE_USBUS_MSC
 
+config USBUS_MSC_AUTO_MTD
+    bool "Automatically export all MTD devices via USB"
+    default true
+    help
+        This will automatically export all MTD devices that follow
+        the default naming scheme on startup.
+
 config USBUS_MSC_VENDOR_ID
     string "MSC Vendor ID"
     default "RIOT-OS"
