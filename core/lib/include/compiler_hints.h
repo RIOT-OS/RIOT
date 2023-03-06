@@ -90,7 +90,7 @@ extern "C" {
  *            Use this if the compiler cannot tell that e.g.
  *            an assembler instruction causes a longjmp, or a write causes a reboot.
  */
-#if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ >= 5)
+#if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ >= 5) || defined(__clang__)
 #define UNREACHABLE() __builtin_unreachable()
 #else
 #define UNREACHABLE() do { /* nothing */ } while (1)
