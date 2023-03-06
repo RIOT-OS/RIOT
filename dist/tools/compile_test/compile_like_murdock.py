@@ -140,10 +140,12 @@ def _all_apps(cwd):
     return out.decode("utf-8", errors="replace").split()
 
 
-def _supported_boards(boards, env, cwd):
+def _supported_boards(boards, env, cwd, all_boards=False):
     cmd = ['make', 'info-boards-supported', '--no-print-directory']
     out = subprocess.check_output(cmd, env=env, cwd=cwd, stderr=subprocess.DEVNULL)
     supported_boards = out.decode("utf-8", errors="replace").split()
+    if all_boards:
+        return supported_boards
     return [brd for brd in supported_boards if brd in boards]
 
 
@@ -181,7 +183,8 @@ def main():
                         help=("Optional boards list, will test all supported "
                               "boards on the list. Will override the cpu "
                               "filter.  If empty, a subset of boards will be "
-                              "selected for you..."))
+                              "selected for you. If 'all' then it will test "
+                              "all supported boards."))
     parser.add_argument("-c", "--cpu", type=str,
                         help=("Optional filter for all supported boards "
                               "belonging to the cpu family, for example, "
@@ -217,8 +220,10 @@ def main():
         if args.cpu:
             target_boards = _supported_boards_from_cpu(args.cpu, full_env,
                                                        test_dir)
+        elif args.boards[0] == "all":
+            target_boards = _supported_boards(boards, full_env, test_dir, True)
         else:
-            target_boards = _supported_boards(boards, full_env, test_dir)
+            target_boards = _supported_boards(boards, full_env, test_dir, False)
         for board in target_boards:
             if args.dry_run:
                 print(f"{app: <30} {board: <30}")
