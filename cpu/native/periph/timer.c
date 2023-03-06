@@ -18,7 +18,7 @@
  * Uses POSIX realtime clock and POSIX itimer to mimic hardware.
  *
  * This is based on native's hwtimer implementation by Ludwig Knüpfer.
- * I removed the multiplexing, as xtimer does the same. (kaspar)
+ * I removed the multiplexing, as ztimer does the same. (kaspar)
  *
  * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>

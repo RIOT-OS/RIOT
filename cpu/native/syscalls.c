@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
-#ifdef MODULE_XTIMER
+#ifdef MODULE_LIBC_GETTIMEOFDAY
 #include <sys/time.h>
 #endif
 #include <ifaddrs.h>
@@ -39,7 +39,10 @@
 
 #include "cpu.h"
 #include "irq.h"
-#include "xtimer.h"
+#ifdef MODULE_LIBC_GETTIMEOFDAY
+#include "time_units.h"
+#include "ztimer64.h"
+#endif
 #include "stdio_base.h"
 
 #include "kernel_defines.h"
@@ -485,7 +488,7 @@ int getpid(void)
 int _gettimeofday(struct timeval *tp, void *restrict tzp)
 {
     (void)tzp;
-    uint64_t now = xtimer_now_usec64();
+    uint64_t now = ztimer64_now(ZTIMER64_USEC);
     tp->tv_sec  = now / US_PER_SEC;
     tp->tv_usec = now - tp->tv_sec;
     return 0;
