@@ -136,13 +136,13 @@ def _end(sec, job):
 
 def _all_apps(cwd):
     cmd = ['make', 'info-applications', '--no-print-directory']
-    out = subprocess.check_output(cmd, cwd=cwd)
+    out = subprocess.check_output(cmd, cwd=cwd, stderr=subprocess.DEVNULL)
     return out.decode("utf-8", errors="replace").split()
 
 
 def _supported_boards(boards, env, cwd):
     cmd = ['make', 'info-boards-supported', '--no-print-directory']
-    out = subprocess.check_output(cmd, env=env, cwd=cwd)
+    out = subprocess.check_output(cmd, env=env, cwd=cwd, stderr=subprocess.DEVNULL)
     supported_boards = out.decode("utf-8", errors="replace").split()
     return [brd for brd in supported_boards if brd in boards]
 
@@ -150,7 +150,7 @@ def _supported_boards(boards, env, cwd):
 def _supported_boards_from_cpu(cpu, env, cwd):
     cmd = (f'FEATURES_REQUIRED=cpu_{cpu} make info-boards-supported '
            '--no-print-directory')
-    out = subprocess.check_output(cmd, shell=True, env=env, cwd=cwd)
+    out = subprocess.check_output(cmd, shell=True, env=env, cwd=cwd, stderr=subprocess.DEVNULL)
     return out.decode("utf-8", errors="replace").split()
 
 
