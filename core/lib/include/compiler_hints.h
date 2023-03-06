@@ -21,6 +21,7 @@
 #ifndef COMPILER_HINTS_H
 #define COMPILER_HINTS_H
 
+#include <assert.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -163,6 +164,22 @@ extern "C" {
  * @return result of @p x
  */
 #define unlikely(x)     __builtin_expect((uintptr_t)(x), 0)
+
+/**
+ * @brief   Behaves like an `assert()`, but tells the compiler that @p cond can
+ *          never be false.
+ *          This allows the compiler to optimize the code accordingly even when
+ *          `NDEBUG` is set / with `DEVELHELP=0`.
+ *
+ *          @p cond being false will result in undefined behavior.
+ *
+ * @param[in] cond  Condition that is guaranteed to be true
+ */
+#ifdef NDEBUG
+#define assume(cond)    ((cond) ? (void)0 : UNREACHABLE())
+#else
+#define assume(cond)    assert(cond)
+#endif
 
 #ifdef __cplusplus
 }
