@@ -18,8 +18,6 @@ USEMODULE += ps
 USEMODULE += shell
 USEMODULE += usbus_msc
 USEMODULE += ztimer_msec
-# Purposely disable auto_attach for this application
-CFLAGS += -DCONFIG_USBUS_AUTO_ATTACH=0
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1

@@ -78,3 +78,8 @@ void auto_init_usb(void)
     /* Finally initialize USBUS thread */
     usbus_create(_stack, USBUS_STACKSIZE, USBUS_PRIO, USBUS_TNAME, &usbus);
 }
+
+usbus_t *usbus_auto_init_get(void)
+{
+    return &usbus;
+}
