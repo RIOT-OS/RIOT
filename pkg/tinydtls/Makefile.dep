@@ -5,7 +5,7 @@ USEMODULE += hashes
 USEMODULE += random
 USEMODULE += tinydtls_aes
 USEMODULE += tinydtls_ecc
-USEMODULE += ztimer64_msec
+USEMODULE += ztimer_msec
 
 # TinyDTLS only has support for 32-bit architectures ATM
 FEATURES_REQUIRED += arch_32bit
