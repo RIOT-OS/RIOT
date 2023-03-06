@@ -156,19 +156,28 @@ def _supported_boards_from_cpu(cpu, env, cwd):
     return out.decode("utf-8", errors="replace").split()
 
 
-def _build(app, board, jobs, env, cwd):
+def _build(app, board, jobs, env, cwd, args):
     cmd = (f'/bin/bash -c "source .murdock; JOBS={jobs} '
            f'compile {app} {board}:gnu"')
     try:
         out = subprocess.check_output(cmd, env=env, shell=True,
                                       cwd=cwd, stderr=subprocess.STDOUT)
         out = out.decode("utf-8", errors="replace")
+        if args.very_very_verbose:
+            print(out)
         print(f"{app: <30} {board: <30} PASS")
     except subprocess.CalledProcessError as err:
         err.output = err.output.decode("utf-8", errors="replace")
         lines = err.output.split("\n")
-
+        if args.very_very_verbose or args.very_verbose:
+            print(err.output)
         if lines[-3].startswith('< ') or lines[-3].startswith('> '):
+            if args.verbose:
+                for line in lines:
+                    if line.startswith('< '):
+                        print("make has:", line[2:])
+                    if line.startswith('> '):
+                        print("kconfig has:", line[2:])
             print(f"{app: <30} {board: <30} FAIL: Kconfig module or pkg "
                   "mismatch")
         elif "mismatch" in err.output:
@@ -200,6 +209,13 @@ def main():
                               " without spending super long to compile them"))
     parser.add_argument("-j", "--jobs", type=int, default=4,
                         help=("The amount of jobs to use when compiling."))
+    parser.add_argument("-v", "--verbose", action="store_true",
+                        help=("Shows mismatch info."))
+    parser.add_argument("-vv", "--very-verbose", action="store_true",
+                        help=("Shows extra output on failures."))
+    parser.add_argument("-vvv", "--very-very-verbose", action="store_true",
+                        help=("Shows all output info."))
+
     args = parser.parse_args()
 
     start_time = datetime.datetime.now()
@@ -228,7 +244,7 @@ def main():
             if args.dry_run:
                 print(f"{app: <30} {board: <30}")
             else:
-                _build(app, board, args.jobs, full_env, riot_dir)
+                _build(app, board, args.jobs, full_env, riot_dir, args)
     elapse_time = datetime.datetime.now() - start_time
     _end(elapse_time.total_seconds(), args.jobs)
 
