@@ -9,5 +9,6 @@ FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
 FEATURES_PROVIDED += periph_usbdev
+FEATURES_PROVIDED += periph_usbdev_hs
 FEATURES_PROVIDED += periph_usbdev_hs_ulpi
 FEATURES_PROVIDED += tinyusb_device
