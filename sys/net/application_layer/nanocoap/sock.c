@@ -796,23 +796,44 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
     }
 
     while (1) {
-        res = sock_udp_recv(&sock.udp, buf, bufsize, -1, &remote);
-        if (res < 0) {
+
+        sock_udp_aux_rx_t *aux_in_ptr = NULL;
+#ifdef MODULE_SOCK_AUX_LOCAL
+        sock_udp_aux_rx_t aux_in = {
+            .flags = SOCK_AUX_GET_LOCAL,
+        };
+        aux_in_ptr = &aux_in;
+#endif
+
+        res = sock_udp_recv_aux(&sock.udp, buf, bufsize, SOCK_NO_TIMEOUT,
+                                &remote, aux_in_ptr);
+        if (res <= 0) {
             DEBUG("error receiving UDP packet %d\n", (int)res);
+            continue;
         }
-        else if (res > 0) {
-            coap_pkt_t pkt;
-            if (coap_parse(&pkt, (uint8_t *)buf, res) < 0) {
-                DEBUG("error parsing packet\n");
-                continue;
-            }
-            if ((res = coap_handle_req(&pkt, buf, bufsize, &ctx)) > 0) {
-                sock_udp_send(&sock.udp, buf, res, &remote);
-            }
-            else {
-                DEBUG("error handling request %d\n", (int)res);
-            }
+        coap_pkt_t pkt;
+        if (coap_parse(&pkt, (uint8_t *)buf, res) < 0) {
+            DEBUG("error parsing packet\n");
+            continue;
         }
+        if ((res = coap_handle_req(&pkt, buf, bufsize, &ctx)) <= 0) {
+            DEBUG("error handling request %d\n", (int)res);
+            continue;
+        }
+
+        sock_udp_aux_tx_t *aux_out_ptr = NULL;
+#ifdef MODULE_SOCK_AUX_LOCAL
+        /* make sure we reply with the same address that the request was
+         * destined for -- except in the multicast case */
+        sock_udp_aux_tx_t aux_out = {
+            .flags = SOCK_AUX_SET_LOCAL,
+            .local = aux_in.local,
+        };
+        if (!sock_udp_ep_is_multicast(&aux_in.local)) {
+            aux_out_ptr = &aux_out;
+        }
+#endif
+        sock_udp_send_aux(&sock.udp, buf, res, &remote, aux_out_ptr);
     }
 
     return 0;
