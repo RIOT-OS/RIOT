@@ -1209,6 +1209,13 @@ static void _usbdev_esr(usbdev_t *dev)
             usbdev->usbdev.cb(&usbdev->usbdev, USBDEV_EVENT_RESUME);
         }
     }
+    else if (int_status & USB_OTG_GINTMSK_OTGINT) {
+        /* not handled yet, just clear GOTGINT to clear the interrupt */
+        event = USB_OTG_GINTMSK_OTGINT;
+        int_status = _global_regs(conf)->GOTGINT;
+        _global_regs(conf)->GOTGINT |= int_status;
+        DEBUG("usbdev: OTG interrupt reg %08"PRIx32"\n", int_status);
+    }
 
     _global_regs(conf)->GINTSTS |= event;
     _global_regs(conf)->GAHBCFG |= USB_OTG_GAHBCFG_GINT;
