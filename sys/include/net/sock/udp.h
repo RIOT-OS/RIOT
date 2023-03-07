@@ -268,6 +268,7 @@
 #ifndef NET_SOCK_UDP_H
 #define NET_SOCK_UDP_H
 
+#include <assert.h>
 #include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -280,7 +281,10 @@
 # pragma clang diagnostic ignored "-Wtypedef-redefinition"
 #endif
 
+#include "net/af.h"
 #include "net/sock.h"
+#include "net/ipv4/addr.h"
+#include "net/ipv6/addr.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -783,6 +787,31 @@ static inline ssize_t sock_udp_sendv(sock_udp_t *sock,
                                      const sock_udp_ep_t *remote)
 {
     return sock_udp_sendv_aux(sock, snips, remote, NULL);
+}
+
+/**
+ * @brief   Checks if the IP address of an endpoint is multicast
+ *
+ * @param[in] ep end point to check
+ *
+ * @returns true if end point is multicast
+ */
+static inline bool sock_udp_ep_is_multicast(const sock_udp_ep_t *ep)
+{
+    switch (ep->family) {
+#ifdef SOCK_HAS_IPV6
+    case AF_INET6:
+        return ipv6_addr_is_multicast((const ipv6_addr_t *)&ep->addr.ipv6);
+#endif
+#ifdef SOCK_HAS_IPV4
+    case AF_INET:
+        return ipv4_addr_is_multicast((const ipv4_addr_t *)&ep->addr.ipv4);
+#endif
+    default:
+        assert(0);
+    }
+
+    return false;
 }
 
 #include "sock_types.h"
