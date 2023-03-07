@@ -424,6 +424,11 @@ config HAS_PERIPH_USBDEV
     help
         Indicates that an USBDEV peripheral is present.
 
+config HAS_PERIPH_USBDEV_HS
+    bool
+    help
+        Indicates that the USBDEV peripheral supports High-Speed.
+
 config HAS_PERIPH_USBDEV_HS_UTMI
     bool
     help
