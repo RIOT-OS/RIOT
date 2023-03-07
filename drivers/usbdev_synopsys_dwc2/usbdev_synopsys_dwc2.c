@@ -795,6 +795,12 @@ static void _usbdev_init(usbdev_t *dev)
 #error "MCU not supported"
 #endif
 
+#if ENABLE_DEBUG
+    uint32_t *_otg_core = (uint32_t *)&_global_regs(usbdev->config)->CID;
+    DEBUG("CID: %04" PRIx32 ", HWREV: %08" PRIx32 ", HWCFG: %08" PRIx32 "\n",
+          _otg_core[0], _otg_core[1], _otg_core[3]);
+#endif
+
 #ifdef DWC2_USB_OTG_HS_ENABLED
     if (conf->type == DWC2_USB_OTG_HS) {
         if (conf->phy == DWC2_USB_OTG_PHY_BUILTIN) {
