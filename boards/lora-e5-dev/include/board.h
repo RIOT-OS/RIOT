@@ -56,8 +56,20 @@ extern void lora_e5_dev_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_mo
  */
 #define BTN0_PIN            GPIO_PIN(PORT_B, 13)
 #define BTN0_MODE           GPIO_IN_PU
+#if !IS_USED(MODULE_BOARD_BOOTLOADER_PIN)
 #define BTN1_PIN            GPIO_PIN(PORT_A, 0)
 #define BTN1_MODE           GPIO_IN_PU
+#endif
+/** @} */
+
+/**
+ * @name    Bootloader button
+ * @{
+ */
+#if IS_USED(MODULE_BOARD_BOOTLOADER_PIN)
+#define BTN_BOOTLOADER_PIN          GPIO_PIN(PORT_A, 0)
+#define BTN_BOOTLOADER_MODE         GPIO_IN_PU
+#endif
 /** @} */
 
 /**

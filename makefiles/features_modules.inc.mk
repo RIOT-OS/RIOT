@@ -97,3 +97,6 @@ USEMODULE += $(filter vdd_lc_filter_%,$(FEATURES_USED))
 
 # select arduino_pwm pseudomodule if the corresponding feature is used
 USEMODULE += $(filter arduino_pwm, $(FEATURES_USED))
+
+# select bootloader_pin pseudomodule if the corresponding feature is used
+USEMODULE += $(filter board_bootloader_pin,$(FEATURES_USED))

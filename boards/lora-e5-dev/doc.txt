@@ -47,9 +47,9 @@
  *
  * 3 Buttons:
  *
- * | NAME   | BOOT     | D0        | RESET |
- * |:------ |:---------|:--------- |:----- |
- * | Pin    | PA0 (IN) | PB13 (IN) | NRST  |
+ * | NAME   | BOOT            | D0        | RESET |
+ * |:------ |:----------------|:--------- |:----- |
+ * | Pin    | Bootloader Mode | PB13 (IN) | NRST  |
  *
  * 1 LED:
  *
@@ -115,6 +115,45 @@
  *
  * ```
  * BOARD=lora-e5-dev make flash
+ * ```
+ *
+ * #### Programing with `riotboot-serial`
+ *
+ * As all STM32 devices `openocd`, `stm32flash` are supported, but these all
+ * require an external programmer. An alternative to be able to flash through
+ * the serial PORT is to load the `riotboot-serial` bootloader which will allow
+ * to flash it over serial.
+ *
+ * But first the device needs to be flashed with the `riotboot_serial` application:
+ *
+ * ```
+ * BOARD=lora-e5-dev make -C bootloaders/riotboot_serial/ flash
+ * ```
+ *
+ * Once the riotboot bootloader is loaded then `riotboot_serial` can be used to
+ * program the device:
+ *
+ * ```
+ * BOARD=lora-e5-dev make -C bootloaders/riotboot_serial/ flash
+ * ```
+ *
+ * You can then flash the board with the `riotboot_serial` programmer. Note that the
+ * boards reset button needs to be held down while the `connecting [-]` shows. e.g.:
+ *
+ * ```
+ *   # hold reset button
+ *   $ PROGRAMMER=riotboot_serial BOARD=lora-e5-dev make -C tests/rng/ flash
+ *   ...
+ *   connecting [-]
+ *   # release reset button
+ *   connected. [/]
+ *   ...
+ *   erasing pages 2031618 to 2031627
+ *   1: unknown record type 4
+ *   ...
+ *   0x2550: 16 bytes
+ *   ...
+ *   Done Flashing
  * ```
  *
  * ### Serial connection

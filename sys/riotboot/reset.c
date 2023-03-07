@@ -32,3 +32,21 @@ void usb_board_reset_in_bootloader(void)
     *magic = RIOTBOOT_MAGIC;
     pm_reboot();
 }
+
+
+#if IS_USED(MODULE_RIOTBOOT_RESET) && IS_USED(MODULE_SHELL) && \
+    !IS_USED(MODULE_SHELL_COMMANDS)
+#include "xfa.h"
+#include "shell.h"
+int _bootloader_handler(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
+
+    usb_board_reset_in_bootloader();
+
+    return 0;
+}
+
+SHELL_COMMAND(bootloader, "Reset to bootloader", _bootloader_handler);
+#endif

@@ -331,7 +331,7 @@ int main(int argc, char** argv)
 
     /* flash the firmware */
     _parse_ihex(hex, _write_out, &fd);
-
+    puts("Done flashing");
     cmd_boot(fd);
 
     close(fd);

@@ -32,7 +32,7 @@ PSEUDOMODULES += base64url
 ## If this module is active, the button will be configured thusly (and then not
 ## be advertised in any other capacity, e.g. through @ref sys_auto_init_saul).
 PSEUDOMODULES += board_software_reset
-
+PSEUDOMODULES += board_bootloader_pin
 PSEUDOMODULES += can_mbox
 PSEUDOMODULES += can_pm
 PSEUDOMODULES += can_raw
