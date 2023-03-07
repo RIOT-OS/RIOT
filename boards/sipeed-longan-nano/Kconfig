@@ -22,6 +22,7 @@ config BOARD_SIPEED_LONGAN_NANO
     select HAS_PERIPH_SPI
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
+    select HAS_PERIPH_USBDEV
     select HAS_TINYUSB_DEVICE
     select HAVE_SAUL_GPIO
 
