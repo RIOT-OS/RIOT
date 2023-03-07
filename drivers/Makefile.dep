@@ -142,10 +142,16 @@ endif
 
 ifneq (,$(filter periph_usbdev_hs_ulpi,$(USEMODULE)))
   FEATURES_REQUIRED += periph_usbdev_hs_ulpi
+  USEMODULE += periph_usbdev_hs
 endif
 
 ifneq (,$(filter periph_usbdev_hs_utmi,$(USEMODULE)))
   FEATURES_REQUIRED += periph_usbdev_hs_utmi
+  USEMODULE += periph_usbdev_hs
+endif
+
+ifneq (,$(filter periph_usbdev_hs,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_usbdev_hs
 endif
 
 ifneq (,$(filter pn532_i2c,$(USEMODULE)))

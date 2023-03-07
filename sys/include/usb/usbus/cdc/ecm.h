@@ -76,7 +76,11 @@ extern "C" {
  *
  * Used for the transfer of network frames.
  */
+#ifndef MODULE_PERIPH_USBDEV_HS
 #define USBUS_CDCECM_EP_DATA_SIZE  64
+#else
+#define USBUS_CDCECM_EP_DATA_SIZE  512
+#endif
 
 /**
  * @brief Full ethernet frame rounded up to a whole number of transfers
