@@ -1628,12 +1628,12 @@ ssize_t gcoap_req_send_tl(const uint8_t *buf, size_t len,
 
 int gcoap_resp_init(coap_pkt_t *pdu, uint8_t *buf, size_t len, unsigned code)
 {
-    if (coap_get_type(pdu) == COAP_TYPE_CON) {
-        coap_hdr_set_type(pdu->hdr, COAP_TYPE_ACK);
-    }
-    coap_hdr_set_code(pdu->hdr, code);
+    int header_len = coap_build_reply(pdu, code, buf, len, 0);
 
-    unsigned header_len  = coap_get_total_hdr_len(pdu);
+    /* request contained no-response option or not enough space for response */
+    if (header_len <= 0) {
+        return -1;
+    }
 
     pdu->options_len = 0;
     pdu->payload     = buf + header_len;
