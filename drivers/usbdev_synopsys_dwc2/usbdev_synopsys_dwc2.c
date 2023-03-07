@@ -623,10 +623,19 @@ static void _flush_rx_fifo(const dwc2_usb_otg_fshs_config_t *conf)
 static void _sleep_periph(const dwc2_usb_otg_fshs_config_t *conf)
 {
     *_pcgcctl_reg(conf) |= USB_OTG_PCGCCTL_STOPCLK;
-    /* Unblocking STM32_PM_STOP during suspend on the stm32f446 breaks
-     * while (un)blocking works on the stm32f401, needs more
-     * investigation with a larger set of chips */
-#if defined(STM32_USB_OTG_CID_1x)
+#if defined(MCU_STM32)
+    /* Unblocking STM32_PM_STOP during suspend on the stm32f446 breaks while
+     * (un)blocking works on the stm32f401, needs more investigation.
+     * Works with:
+     * stm32f407vg  FS  CID: 1200, HWREV: 4f54281a, HWCFG: 229dcd20
+     * stm32f429zi  HS  CID: 1100, HWREV: 4f54281a, HWCFG: 229ed590
+     * stm32f439zi  FS  CID: 1200, HWREV: 4f54281a, HWCFG: 229dcd20
+     * stm32f723ie  FS  CID: 3000, HWREV: 4f54330a, HWCFG: 229ed520
+     * stm32f723ie  HS  CID: 3100, HWREV: 4f54330a, HWCFG: 229fe1d0
+     * stm32f746ng  FS  CID: 2000, HWREV: 4f54320a, HWCFG: 229ed520
+     * stm32f746ng  HS  CID: 2100, HWREV: 4f54320a, HWCFG: 229fe190
+     * stm32f767zi  FS  CID: 2000, HWREV: 4f54320a, HWCFG: 229ed520
+     */
     pm_unblock(STM32_PM_STOP);
 #elif defined(MCU_EFM32)
     /* switch USB core clock source either to LFXO or LFRCO */
@@ -639,7 +648,7 @@ static void _sleep_periph(const dwc2_usb_otg_fshs_config_t *conf)
 
 static void _wake_periph(const dwc2_usb_otg_fshs_config_t *conf)
 {
-#if defined(STM32_USB_OTG_CID_1x)
+#if defined(MCU_STM32)
     pm_block(STM32_PM_STOP);
 #elif defined(MCU_EFM32)
     pm_block(EFM32_PM_MODE_EM2);
