@@ -22,7 +22,6 @@
 
 #include "cpu.h"
 #include "periph/timer.h"
-#include <sys/_intsup.h>
 
 /**
  * @brief   Interrupt context for each configured timer
