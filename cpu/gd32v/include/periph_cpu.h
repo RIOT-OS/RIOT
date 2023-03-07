@@ -462,7 +462,8 @@ typedef struct {
  * @name    USB device definitions
  * @{
  */
-#define USBDEV_NUM_ENDPOINTS    4   /**< Number of USB OTG FS endpoints including EP0 */
+#define USBDEV_SET_ADDR_AFTER_STATUS    0   /**< Set device address after SETUP stage */
+#define USBDEV_NUM_ENDPOINTS            4   /**< Number of USB OTG FS endpoints including EP0 */
 /** @} */
 
 /**
