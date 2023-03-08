@@ -136,7 +136,7 @@ void user_delay(uint32_t period)
 #define GATT_MANUFACTURER_NAME_UUID             0x2A29
 #define GATT_MODEL_NUMBER_UUID                  0x2A24
 
-#define STR_ANSWER_BUFFER_SIZE 250
+#define STR_ANSWER_BUFFER_SIZE 4096
 
 /* UUID = 1bce38b3-d137-48ff-a13e-033e14c7a335 */
 static const ble_uuid128_t gatt_svr_svc_rw_demo_uuid
@@ -210,7 +210,7 @@ static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
              /* Characteristic: Read/Write Demo read only */
              .uuid = (ble_uuid_t *)&gatt_svr_chr_rw_demo_readonly_uuid.u,
              .access_cb = gatt_svr_chr_access_rw_demo,
-             .flags = BLE_GATT_CHR_F_READ,
+             .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_NOTIFY,
          },
          {
              0, /* No more characteristics in this service */
@@ -363,24 +363,26 @@ static int gatt_svr_chr_access_rw_demo(
             //puts(str_answer);
 
             float auxf;
+            int auxi;
+            uint16_t contador = 12;
             //do_read();
-            for(int i=0; i<13; i++){
+            for(int i=0; i < contador; i++){
                 auxf= (readings_buffer[i].X_axis / AC);
-                memcpy(str_answer + (4*i)*sizeof(float), &auxf, sizeof(float));
+                memcpy(str_answer + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
                 auxf= (readings_buffer[i].Y_axis / AC); 
-                memcpy(str_answer + (4*i+1)*sizeof(float), &auxf, sizeof(float));
+                memcpy(str_answer + (3*i+1)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
                 auxf= (readings_buffer[i].Z_axis / AC);
-                memcpy(str_answer + (4*i+2)*sizeof(float), &auxf, sizeof(float));
-                auxf= 27.3; //time stamp está estourando o programa
-                memcpy(str_answer + (4*i+3)*sizeof(float), &auxf, sizeof(float));
+                memcpy(str_answer + (3*i+2)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+                auxi= 273; //time stamp está estourando o programa
+                memcpy(str_answer + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
                 //str_answer[16*i]='\0';
             }
             //auxi=0;
             //if(auxi==0)
-            printf("Honesty check 0!!\n"); //Prevents compiler optimization from ignoring pointless auxi=0 instruction
+            //printf("Honesty check 0!!\n"); //Prevents compiler optimization from ignoring pointless auxi=0 instruction
 
             //rc = os_mbuf_append(ctxt->om, &rm_demo_write_data, strlen(rm_demo_write_data));
-            rc = os_mbuf_append(ctxt->om, &str_answer, 44*sizeof(float));
+            rc = os_mbuf_append(ctxt->om, &str_answer, contador*(3*sizeof(float)+sizeof(int)));
             
             //printf("Sent: %s\n %c", str_answer, 13); //This might never look pretty
 
@@ -591,7 +593,7 @@ void init_and_run_BLE(void)
 
 void acquire_ACC_Values(void){
     /* Wait for 100ms for the FIFO to fill */
-    user_delay(10);
+    user_delay(100);
 
     /* It is VERY important to reload the length of the FIFO memory as after the
         * call to bmi160_get_fifo_data(), the bmi.fifo->length contains the
