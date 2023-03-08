@@ -36,9 +36,19 @@
 
 static bool _bootloader_alternative_mode(void)
 {
-#ifdef BTN_BOOTLOADER_PIN
+#if defined (BTN_BOOTLOADER_PIN) && defined (BTN_BOOTLOADER_MODE)
+    bool state;
+
     gpio_init(BTN_BOOTLOADER_PIN, BTN_BOOTLOADER_MODE);
-    return (bool)gpio_read(BTN_BOOTLOADER_PIN) != BTN_BOOTLOADER_INVERTED;
+    state = gpio_read(BTN_BOOTLOADER_PIN);
+    /* If button configures w/ internal or external pullup, then it is an
+       active-low, thus reverts the logic */
+    if (BTN_BOOTLOADER_EXT_PULLUP || BTN_BOOTLOADER_MODE == GPIO_IN_PU ||
+        BTN_BOOTLOADER_MODE == GPIO_OD_PU ) {
+       return !state;
+    } else {
+        return state;
+    }
 #else
     return false;
 #endif

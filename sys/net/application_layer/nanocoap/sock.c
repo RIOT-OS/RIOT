@@ -136,14 +136,13 @@ static int _sock_recv_buf(nanocoap_sock_t *sock, void **data, void **ctx, uint32
 static int _send_ack(nanocoap_sock_t *sock, coap_pkt_t *pkt)
 {
     coap_hdr_t ack;
-    unsigned tkl = coap_get_token_len(pkt);
 
     const iolist_t snip = {
         .iol_base = &ack,
         .iol_len  = sizeof(ack),
     };
 
-    coap_build_hdr(&ack, COAP_TYPE_ACK, coap_get_token(pkt), tkl,
+    coap_build_hdr(&ack, COAP_TYPE_ACK, NULL, 0,
                    COAP_CODE_EMPTY, ntohs(pkt->hdr->id));
 
     return _sock_sendv(sock, &snip);
