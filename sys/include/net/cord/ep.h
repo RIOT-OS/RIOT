@@ -15,7 +15,7 @@
  * allows RIOT nodes to register themselves with resource directories.
  * It implements the standard endpoint functionality as defined in
  * draft-ietf-core-resource-directory-27.
- * @see https://tools.ietf.org/html/draft-ietf-core-resource-directory-27
+ * @see https://datatracker.ietf.org/doc/html/rfc9176
  *
  * # Design Decisions
  * - all operations provided by this module are fully synchronous, meaning that
