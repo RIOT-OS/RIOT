@@ -93,6 +93,8 @@ typedef struct
     int  timestamp;
 } leitura;
 
+uint16_t conta_requisicoes=0;
+ 
 #define MAX_READINGS 4096
 leitura readings_buffer[MAX_READINGS];
 size_t rlen = 0;
@@ -350,7 +352,7 @@ static int gatt_svr_chr_access_rw_demo(
            // puts(str_answer);
             
             //do_read();
-
+///
             //char bufferk[10]; 
             //printf("passou por aqui1\n %c", 13);
             //snprintf(str_answer, STR_ANSWER_BUFFER_SIZE, "%c", (char)(accel_data[1].x / AC));
@@ -362,11 +364,20 @@ static int gatt_svr_chr_access_rw_demo(
             //         bufferk); // A crude way to display a command recognition
             //puts(str_answer);
 
+            if((conta_requisicoes < MAX_READINGS/16) /**/)
+            {
+                conta_requisicoes=0;
+            }
+            else
+            {
+                conta_requisicoes++;
+            }
+
             float auxf;
             int auxi;
-            uint16_t contador = 12;
+            uint16_t contador = 15;
             //do_read();
-            for(int i=0; i < contador; i++){
+            for(int i=contador*conta_requisicoes; i < contador*(1+conta_requisicoes); i++){
                 auxf= (readings_buffer[i].X_axis / AC);
                 memcpy(str_answer + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
                 auxf= (readings_buffer[i].Y_axis / AC); 
@@ -389,7 +400,7 @@ static int gatt_svr_chr_access_rw_demo(
             //printf("SIze: %d\n %c", strlen(str_answer), 13); //TODO: find something that really sends the adequate size of what is sent
             /*strlen will not work with this array, since it has the posssibility of multiple terminators '\0'
              nor will sizeof work, since it only returns the array's full size sizeof(char)*lenght */
-            //auxi = str_answer[12] + (str_answer[13] <<8) + (str_answer[14] <<16) + (str_answer[15] <<24); //VERY SENSIBLE BIT SHIFT OPERATION
+            //auxi = str_answer[12] + (str_answer[13] <</8) + (str_answer[14] <<16) + (str_answer[15] <<24); //VERY SENSIBLE BIT SHIFT OPERATION
             //printf("Timestamp: %f\n", auxf);
             return rc;
         }
@@ -593,7 +604,7 @@ void init_and_run_BLE(void)
 
 void acquire_ACC_Values(void){
     /* Wait for 100ms for the FIFO to fill */
-    user_delay(100);
+    user_delay(10);
 
     /* It is VERY important to reload the length of the FIFO memory as after the
         * call to bmi160_get_fifo_data(), the bmi.fifo->length contains the
