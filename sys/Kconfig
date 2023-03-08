@@ -57,8 +57,7 @@ endchoice
 
 config MODULE_LIBC_GETTIMEOFDAY
     bool "Support for gettimeofday()"
-    select MODULE_XTIMER
-    select MODULE_ZTIMER64_XTIMER_COMPAT if MODULE_ZTIMER_XTIMER_COMPAT
+    select ZTIMER64_USEC
 
 rsource "Kconfig.newlib"
 rsource "Kconfig.picolibc"

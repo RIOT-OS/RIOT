@@ -41,11 +41,7 @@ ifneq (,$(filter socket_zep,$(USEMODULE)))
 endif
 
 ifneq (,$(filter libc_gettimeofday,$(USEMODULE)))
-  USEMODULE += xtimer
-  ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
-    # requires 64bit timestamps
-    USEMODULE += ztimer64_xtimer_compat
-  endif
+  USEMODULE += ztimer64_usec
 endif
 
 USEMODULE += periph
