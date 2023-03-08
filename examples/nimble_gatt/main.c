@@ -154,6 +154,12 @@ static const ble_uuid128_t gatt_svr_chr_rw_demo_write_uuid
 static const ble_uuid128_t gatt_svr_chr_rw_demo_readonly_uuid
         = BLE_UUID128_INIT(0xaa, 0xf4, 0x82, 0xdd, 0x28, 0xa7, 0xac, 0x86, 0x68,
                 0x4d, 0xd5, 0x40, 0x3f, 0x11, 0xdd, 0xcc);
+
+/* UUID = ccdd113f-40d5-4d68-86ac-a728dd82f4ab */
+static const ble_uuid128_t latest_mesurement_uuid
+        = BLE_UUID128_INIT(0xab, 0xf4, 0x82, 0xdd, 0x28, 0xa7, 0xac, 0x86, 0x68,
+                0x4d, 0xd5, 0x40, 0x3f, 0x11, 0xdd, 0xcc);
+
                 
 static char rm_demo_write_data[64] = "Get it done!";
 
@@ -166,6 +172,10 @@ static int gatt_svr_chr_access_device_info_model(
     struct ble_gatt_access_ctxt *ctxt, void *arg);
 
 static int gatt_svr_chr_access_rw_demo(
+    uint16_t conn_handle, uint16_t attr_handle,
+    struct ble_gatt_access_ctxt *ctxt, void *arg);
+
+static int get_latest_measurement(
     uint16_t conn_handle, uint16_t attr_handle,
     struct ble_gatt_access_ctxt *ctxt, void *arg);
 
@@ -215,6 +225,12 @@ static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
              .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_NOTIFY,
          },
          {
+            /* Characteristic: Read only latest measurement */
+            .uuid = (ble_uuid_t *)&latest_mesurement_uuid.u,
+            .access_cb = get_latest_measurement,
+            .flags = BLE_GATT_CHR_F_READ,
+         },
+         {
              0, /* No more characteristics in this service */
          },
      }},
@@ -222,6 +238,38 @@ static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
         0, /* No more services */
     },
 };
+
+static int get_latest_measurement(
+    uint16_t conn_handle, uint16_t attr_handle,
+    struct ble_gatt_access_ctxt *ctxt, void *arg)
+{
+    (void)conn_handle;
+    (void)attr_handle;
+    (void)arg;
+    char myarray[15*16];
+     float auxf;
+            int auxi;
+            uint16_t contador = 15;
+            //do_read();
+            for(int i=0; i < contador; i++){
+                auxf= (readings_buffer[i].X_axis / AC);
+                memcpy(myarray + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+                auxf= (readings_buffer[i].Y_axis / AC); 
+                memcpy(myarray + (3*i+1)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+                auxf= (readings_buffer[i].Z_axis / AC);
+                memcpy(myarray + (3*i+2)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+                auxi= 273; //time stamp está estourando o programa
+                memcpy(myarray + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
+                //myarray[16*i]='\0';
+            }
+
+    int rc = os_mbuf_append(ctxt->om, "Bom dia", strlen("Bom dia"));
+
+    puts("new service working");
+
+    return rc;
+
+}
 
 static int gatt_svr_chr_access_device_info_manufacturer(
     uint16_t conn_handle, uint16_t attr_handle,
@@ -364,7 +412,8 @@ static int gatt_svr_chr_access_rw_demo(
             //         bufferk); // A crude way to display a command recognition
             //puts(str_answer);
 
-            if((conta_requisicoes < MAX_READINGS/16) /**/)
+            // conta_requisicoes*(3*sizeof(float)+sizeof(int)) < rlen
+            if((conta_requisicoes >= MAX_READINGS/16))
             {
                 conta_requisicoes=0;
             }
@@ -372,6 +421,8 @@ static int gatt_svr_chr_access_rw_demo(
             {
                 conta_requisicoes++;
             }
+
+            printf("reqs = %d %c", conta_requisicoes, 13);
 
             float auxf;
             int auxi;
