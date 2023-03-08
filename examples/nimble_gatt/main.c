@@ -363,7 +363,7 @@ static int gatt_svr_chr_access_rw_demo(
             
             float auxf= 27.3;
             memcpy(str_answer, &auxf, sizeof(float));
-            auxf= 3.14;
+            auxf= 3.14; //m
             memcpy(str_answer + sizeof(float), &auxf, sizeof(float));
             auxf= 2.71;
             memcpy(str_answer + 2*sizeof(float), &auxf, sizeof(float));
@@ -385,6 +385,9 @@ static int gatt_svr_chr_access_rw_demo(
              nor will sizeof work, since it only returns the array's full size sizeof(char)*lenght */
             auxi = str_answer[12] + (str_answer[13] <<8) + (str_answer[14] <<16) + (str_answer[15] <<24); //VERY SENSIBLE BIT SHIFT OPERATION
             printf("Timestamp: %d\n", auxi);
+
+            //do_read();
+
             return rc;
         }
         else
@@ -447,9 +450,6 @@ int main(void)
         cont++;
     }
 
-    //int lenki = sprintf(rm_demo_write_data, "%f, %f, %f", (accel_data[1].x / AC), (accel_data[1].y / AC), (accel_data[1].z / AC));
-    //printf("%d \n", lenki);
-
     return 0;
 }
 
@@ -471,9 +471,9 @@ void do_read(void)
     // readingX[0] = accel_data->x;
     // reading_t readingY = get_readingY();
     // reading_t readingZ = get_readingZ();
-    #ifdef PULGA_USE_RINGBUFFER
+    //#ifdef PULGA_USE_RINGBUFFER
        right_shift_readings_buffer();
-    #endif
+    //#endif
     for (size_t i = 0; i < ACC_FRAMES; i++)
     {
         readings_buffer[i].X_axis = accel_data[i].x;
@@ -481,11 +481,22 @@ void do_read(void)
         readings_buffer[i].Z_axis = accel_data[i].z;
         readings_buffer[i].timestamp = (int)(xtimer_now_usec()/1000); 
     }
+    /*for (size_t i = 0; i < ACC_FRAMES; i++)
+    {
+        readings_generic_buffer[i] = readings_buffer[i].X_axis;
+        readings_generic_buffer[i] = (int)0xFF;
+        readings_generic_buffer[i] = readings_buffer[i].Y_axis;
+        readings_generic_buffer[i] = (int)0xFF;
+        readings_generic_buffer[i] = readings_buffer[i].Z_axis;
+        readings_generic_buffer[i] = (int)0xFF; 
+        readings_buffer[i].timestamp = (int)(xtimer_now_usec()/1000);
+        readings_generic_buffer[i] = 0xFF; 
+    }*/
 }
 
 void log_readings(void)
 {
-    #ifdef PULGA_USE_RINGBUFFER
+    //#ifdef PULGA_USE_RINGBUFFER
     for (size_t i = 0; i < rlen; i++)
     {
         printf("[Acc_readings] readings_buffer[%d]: ", i);
@@ -494,15 +505,15 @@ void log_readings(void)
         printf("Acc_z: %f ", ((float)readings_buffer[i].Z_axis)/ AC);
         printf("\n %c", 13);
     }
-    #else
-    for (size_t i = 0; i < ACC_FRAMES; i++) {
+    //#else
+    /*for (size_t i = 0; i < ACC_FRAMES; i++) {
         printf("[Acc_readings] readings_buffer[%d]: ", i);
         printf("Acc_x: %f ", ((float)readings_buffer[i].X_axis)/ AC);
         printf("Acc_y: %f ", ((float)readings_buffer[i].Y_axis)/ AC);
         printf("Acc_z: %f ", ((float)readings_buffer[i].Z_axis)/ AC);
         printf("\n %c", 13);
-    }
-    #endif
+    }*/
+    //#endif
 }
 void read_and_show_Acc_values(void)
 {
