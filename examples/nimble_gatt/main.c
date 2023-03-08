@@ -104,6 +104,7 @@ void right_shift_readings_buffer(void);
 void do_read(void);
 void log_readings(void);
 void read_and_show_Acc_values(void);
+void acquire_ACC_Values(void);
 
 int dev = I2C_DEV(0);
 
@@ -360,34 +361,34 @@ static int gatt_svr_chr_access_rw_demo(
             //snprintf(str_answer, STR_ANSWER_BUFFER_SIZE,
             //         bufferk); // A crude way to display a command recognition
             //puts(str_answer);
-            
-            float auxf= 27.3;
-            memcpy(str_answer, &auxf, sizeof(float));
-            auxf= 3.14; //m
-            memcpy(str_answer + sizeof(float), &auxf, sizeof(float));
-            auxf= 2.71;
-            memcpy(str_answer + 2*sizeof(float), &auxf, sizeof(float));
-            int auxi= 152152;
-            memcpy(str_answer + 3*sizeof(float), &auxi, sizeof(int));
-            str_answer[16]='\0';
-            
-            auxi=0;
-            if(auxi==0)
-                printf("Honesty check!!\n%c",13); //Prevents compiler optimization from ignoring pointless auxi=0 instruction
+
+            float auxf;
+            //do_read();
+            for(int i=0; i<13; i++){
+                auxf= (readings_buffer[i].X_axis / AC);
+                memcpy(str_answer + (4*i)*sizeof(float), &auxf, sizeof(float));
+                auxf= (readings_buffer[i].Y_axis / AC); 
+                memcpy(str_answer + (4*i+1)*sizeof(float), &auxf, sizeof(float));
+                auxf= (readings_buffer[i].Z_axis / AC);
+                memcpy(str_answer + (4*i+2)*sizeof(float), &auxf, sizeof(float));
+                auxf= 27.3; //time stamp está estourando o programa
+                memcpy(str_answer + (4*i+3)*sizeof(float), &auxf, sizeof(float));
+                //str_answer[16*i]='\0';
+            }
+            //auxi=0;
+            //if(auxi==0)
+            printf("Honesty check 0!!\n"); //Prevents compiler optimization from ignoring pointless auxi=0 instruction
 
             //rc = os_mbuf_append(ctxt->om, &rm_demo_write_data, strlen(rm_demo_write_data));
-            rc = os_mbuf_append(ctxt->om, &str_answer, 3*sizeof(float)+sizeof(int));
+            rc = os_mbuf_append(ctxt->om, &str_answer, 44*sizeof(float));
             
-            printf("Sent: %s\n %c", str_answer, 13); //This might never look pretty
+            //printf("Sent: %s\n %c", str_answer, 13); //This might never look pretty
 
-            printf("SIze: %d\n %c", strlen(str_answer), 13); //TODO: find something that really sends the adequate size of what is sent
+            //printf("SIze: %d\n %c", strlen(str_answer), 13); //TODO: find something that really sends the adequate size of what is sent
             /*strlen will not work with this array, since it has the posssibility of multiple terminators '\0'
              nor will sizeof work, since it only returns the array's full size sizeof(char)*lenght */
-            auxi = str_answer[12] + (str_answer[13] <<8) + (str_answer[14] <<16) + (str_answer[15] <<24); //VERY SENSIBLE BIT SHIFT OPERATION
-            printf("Timestamp: %d\n", auxi);
-
-            //do_read();
-
+            //auxi = str_answer[12] + (str_answer[13] <<8) + (str_answer[14] <<16) + (str_answer[15] <<24); //VERY SENSIBLE BIT SHIFT OPERATION
+            //printf("Timestamp: %f\n", auxf);
             return rc;
         }
         else
@@ -415,39 +416,17 @@ int main(void)
     (void)puts("Welcome to RIOT!");
 
     init_bmiSensor();
-
+    
     init_and_run_BLE();
-
-    int cont=0;
+    
+    //int cont=0;
     while (rslt == 0)
     {
-        /* Wait for 100ms for the FIFO to fill */
-        user_delay(10);
-
-        /* It is VERY important to reload the length of the FIFO memory as after the
-         * call to bmi160_get_fifo_data(), the bmi.fifo->length contains the
-         * number of bytes read from the FIFO */
-        bmi.fifo->length = FIFO_SIZE;
-        i2c_acquire(dev);
-        rslt = bmi160_get_fifo_data(&bmi);
-        if (rslt != BMI160_OK)
-        {
-            printf("Error getting fifo data - %d\n %c", rslt, 13);
-            return 1;
-        }
-        i2c_release(dev);
-
-        uint8_t acc_inst = ACC_FRAMES;
-
-        rslt = bmi160_extract_accel(accel_data, &acc_inst, &bmi);
-        if (rslt != BMI160_OK)
-        {
-            printf("Error extracting accel data - %d\n %c", rslt, 13);
-            return 1;
-        }
+        acquire_ACC_Values();
+        
         //printf("teste\n");
         read_and_show_Acc_values();
-        cont++;
+        //cont++;
     }
 
     return 0;
@@ -467,10 +446,6 @@ void right_shift_readings_buffer(void)
 
 void do_read(void)
 {
-    // int16_t readingX[ACC_FRAMES];
-    // readingX[0] = accel_data->x;
-    // reading_t readingY = get_readingY();
-    // reading_t readingZ = get_readingZ();
     //#ifdef PULGA_USE_RINGBUFFER
        right_shift_readings_buffer();
     //#endif
@@ -481,17 +456,6 @@ void do_read(void)
         readings_buffer[i].Z_axis = accel_data[i].z;
         readings_buffer[i].timestamp = (int)(xtimer_now_usec()/1000); 
     }
-    /*for (size_t i = 0; i < ACC_FRAMES; i++)
-    {
-        readings_generic_buffer[i] = readings_buffer[i].X_axis;
-        readings_generic_buffer[i] = (int)0xFF;
-        readings_generic_buffer[i] = readings_buffer[i].Y_axis;
-        readings_generic_buffer[i] = (int)0xFF;
-        readings_generic_buffer[i] = readings_buffer[i].Z_axis;
-        readings_generic_buffer[i] = (int)0xFF; 
-        readings_buffer[i].timestamp = (int)(xtimer_now_usec()/1000);
-        readings_generic_buffer[i] = 0xFF; 
-    }*/
 }
 
 void log_readings(void)
@@ -503,6 +467,7 @@ void log_readings(void)
         printf("Acc_x: %f ", ((float)readings_buffer[i].X_axis)/ AC);
         printf("Acc_y: %f ", ((float)readings_buffer[i].Y_axis)/ AC);
         printf("Acc_z: %f ", ((float)readings_buffer[i].Z_axis)/ AC);
+        printf("Acc_timeStamp: %f ", ((float)readings_buffer[i].timestamp));
         printf("\n %c", 13);
     }
     //#else
@@ -519,7 +484,7 @@ void read_and_show_Acc_values(void)
 {
     do_read();
     // #if(LOG_LEVEL==4)
-    //  log_readings();
+    //log_readings();
     // #endif
 }
 
@@ -622,4 +587,31 @@ void init_and_run_BLE(void)
 
     /* start to advertise this node */
     nimble_autoadv_start();
+}
+
+void acquire_ACC_Values(void){
+    /* Wait for 100ms for the FIFO to fill */
+    user_delay(10);
+
+    /* It is VERY important to reload the length of the FIFO memory as after the
+        * call to bmi160_get_fifo_data(), the bmi.fifo->length contains the
+        * number of bytes read from the FIFO */
+    bmi.fifo->length = FIFO_SIZE;
+    i2c_acquire(dev);
+    rslt = bmi160_get_fifo_data(&bmi);
+    if (rslt != BMI160_OK)
+    {
+        printf("Error getting fifo data - %d\n %c", rslt, 13);
+        return;
+    }
+    i2c_release(dev);
+
+    uint8_t acc_inst = ACC_FRAMES;
+
+    rslt = bmi160_extract_accel(accel_data, &acc_inst, &bmi);
+    if (rslt != BMI160_OK)
+    {
+        printf("Error extracting accel data - %d\n %c", rslt, 13);
+        return;
+    }
 }
