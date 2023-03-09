@@ -682,6 +682,13 @@ typedef struct {
 #define WDT_HAS_STOP            (1U)
 /** @} */
 
+/**
+ * @name    USB device definitions
+ * @{
+ */
+#define USBDEV_NUM_ENDPOINTS    7   /**< Number of USB OTG FS endpoints including EP0 */
+/** @} */
+
 /* GPIO_LL's overrides */
 #ifndef DOXYGEN
 
