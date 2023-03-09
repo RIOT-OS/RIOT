@@ -25,39 +25,11 @@
 #include <string.h>
 
 #include "od.h"
-#include "mtd.h"
+#include "mtd_default.h"
 #include "shell.h"
 #include "board.h"
 #include "macros/units.h"
 #include "test_utils/expect.h"
-
-#ifndef MTD_NUMOF
-#ifdef MTD_0
-#define MTD_NUMOF 1
-#else
-#define MTD_NUMOF 0
-#endif
-#endif
-
-static mtd_dev_t *_get_mtd_dev(unsigned idx)
-{
-    switch (idx) {
-#ifdef MTD_0
-    case 0: return MTD_0;
-#endif
-#ifdef MTD_1
-    case 1: return MTD_1;
-#endif
-#ifdef MTD_2
-    case 2: return MTD_2;
-#endif
-#ifdef MTD_3
-    case 3: return MTD_3;
-#endif
-    }
-
-    return NULL;
-}
 
 static mtd_dev_t *_get_dev(int argc, char **argv)
 {
@@ -73,7 +45,7 @@ static mtd_dev_t *_get_dev(int argc, char **argv)
         return NULL;
     }
 
-    return _get_mtd_dev(idx);
+    return mtd_default_get_dev(idx);
 }
 
 static uint64_t _get_size(mtd_dev_t *dev)
@@ -311,7 +283,7 @@ static int cmd_info(int argc, char **argv)
 
         for (int i = 0; i < MTD_NUMOF; ++i) {
             printf(" -=[ MTD_%d ]=-\n", i);
-            _print_info(_get_mtd_dev(i));
+            _print_info(mtd_default_get_dev(i));
         }
         return 0;
     }
@@ -481,7 +453,7 @@ int main(void)
     for (int i = 0; i < MTD_NUMOF; ++i) {
         printf("init MTD_%d… ", i);
 
-        mtd_dev_t *dev = _get_mtd_dev(i);
+        mtd_dev_t *dev = mtd_default_get_dev(i);
         int res = mtd_init(dev);
         if (res) {
             printf("error: %d\n", res);

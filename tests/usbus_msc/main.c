@@ -22,39 +22,13 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "mtd.h"
+#include "mtd_default.h"
 #include "shell.h"
 #include "usb/usbus.h"
 #include "usb/usbus/msc.h"
 #include "ztimer.h"
 
-#ifndef MTD_NUMOF
-#define MTD_NUMOF 0
-#endif
-
-static char _stack[USBUS_STACKSIZE];
-static usbus_t usbus;
-static usbus_msc_device_t msc;
-
-static mtd_dev_t *_get_mtd_dev(unsigned idx)
-{
-    switch (idx) {
-#ifdef MTD_0
-    case 0: return MTD_0;
-#endif
-#ifdef MTD_1
-    case 1: return MTD_1;
-#endif
-#ifdef MTD_2
-    case 2: return MTD_2;
-#endif
-#ifdef MTD_3
-    case 3: return MTD_3;
-#endif
-    }
-
-    return NULL;
-}
+static usbus_t *usbus;
 
 static int _cmd_add_lun(int argc, char **argv)
 {
@@ -76,8 +50,8 @@ static int _cmd_add_lun(int argc, char **argv)
         puts("error: invalid MTD device specified");
         return -2;
     }
-    mtd_dev = _get_mtd_dev(dev);
-    ret = usbus_msc_add_lun(&usbus, mtd_dev);
+    mtd_dev = mtd_default_get_dev(dev);
+    ret = usbus_msc_add_lun(usbus, mtd_dev);
     if (ret != 0) {
         printf("Cannot add LUN device (error:%d %s)\n", ret, strerror(-ret));
     }
@@ -104,8 +78,8 @@ static int _cmd_remove_lun(int argc, char **argv)
         puts("error: invalid MTD device specified");
         return -2;
     }
-    mtd_dev = _get_mtd_dev(dev);
-    ret = usbus_msc_remove_lun(&usbus, mtd_dev);
+    mtd_dev = mtd_default_get_dev(dev);
+    ret = usbus_msc_remove_lun(usbus, mtd_dev);
     if (ret == -EAGAIN) {
         printf("MTD device was not registered\n");
     }
@@ -118,7 +92,7 @@ static int _cmd_usb_attach(int argc, char **argv)
     (void)argv;
     static const usbopt_enable_t _enable = USBOPT_ENABLE;
 
-    usbdev_set(usbus.dev, USBOPT_ATTACH, &_enable,
+    usbdev_set(usbus->dev, USBOPT_ATTACH, &_enable,
                sizeof(usbopt_enable_t));
     return 0;
 }
@@ -129,7 +103,7 @@ static int _cmd_usb_detach(int argc, char **argv)
     (void)argv;
     static const usbopt_enable_t _enable = USBOPT_DISABLE;
 
-    usbdev_set(usbus.dev, USBOPT_ATTACH, &_enable,
+    usbdev_set(usbus->dev, USBOPT_ATTACH, &_enable,
                sizeof(usbopt_enable_t));
     return 0;
 }
@@ -160,16 +134,11 @@ int main(void)
 
     /* Get driver context */
     usbdev_t *usbdev = usbdev_get_ctx(0);
-
     assert(usbdev);
 
-    /* Initialize basic usbus struct, don't start the thread yet */
-    usbus_init(&usbus, usbdev);
+    usbus_t *usbus_auto_init_get(void);
+    usbus = usbus_auto_init_get();
 
-    /* Initialize Mass Storage Class */
-    usbus_msc_init(&usbus, &msc);
-    /* Create USBUS thread */
-    usbus_create(_stack, USBUS_STACKSIZE, USBUS_PRIO, USBUS_TNAME, &usbus);
     /* start shell */
     puts("All up, running the shell now");
     char line_buf[SHELL_DEFAULT_BUFSIZE];

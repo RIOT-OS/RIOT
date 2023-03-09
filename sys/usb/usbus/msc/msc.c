@@ -354,6 +354,13 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
 
     /* Prepare to receive first bytes from Host */
     usbdev_ep_xmit(msc->ep_out->ep, msc->out_buf, CONFIG_USBUS_EP0_SIZE);
+
+    /* Auto-configure all MTD devices */
+    if (CONFIG_USBUS_MSC_AUTO_MTD) {
+        for (int i = 0; i < USBUS_MSC_EXPORTED_NUMOF; i++) {
+            usbus_msc_add_lun(usbus, mtd_default_get_dev(i));
+        }
+    }
 }
 
 static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,

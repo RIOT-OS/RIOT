@@ -74,6 +74,16 @@ extern "C" {
 #endif
 
 /**
+ * @brief USBUS MSC auto MTD setting
+ *
+ * When set to 1, the USBUS MSC module will automatically create a LUN for
+ * each MTD device defined in `board.h`.
+ */
+#ifndef CONFIG_USBUS_MSC_AUTO_MTD
+#define CONFIG_USBUS_MSC_AUTO_MTD           1
+#endif
+
+/**
  * @brief USBUS endpoint 0 buffer size
  *
  * This configures the buffer size of the control endpoint. Unless you transfer

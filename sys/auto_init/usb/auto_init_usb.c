@@ -39,6 +39,10 @@ usbus_cdcecm_device_t cdcecm;
 #include "usb/usbus/dfu.h"
 static usbus_dfu_device_t dfu;
 #endif
+#ifdef MODULE_USBUS_MSC
+#include "usb/usbus/msc.h"
+static usbus_msc_device_t msc;
+#endif
 
 static char _stack[USBUS_STACKSIZE];
 static usbus_t usbus;
@@ -66,6 +70,16 @@ void auto_init_usb(void)
     usbus_dfu_init(&usbus, &dfu, USB_DFU_PROTOCOL_RUNTIME_MODE);
 #endif
 
+#ifdef MODULE_USBUS_MSC
+    /* Initialize Mass Storage Class */
+    usbus_msc_init(&usbus, &msc);
+#endif
+
     /* Finally initialize USBUS thread */
     usbus_create(_stack, USBUS_STACKSIZE, USBUS_PRIO, USBUS_TNAME, &usbus);
+}
+
+usbus_t *usbus_auto_init_get(void)
+{
+    return &usbus;
 }
