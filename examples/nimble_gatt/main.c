@@ -67,6 +67,15 @@
  * 21 bytes per frame. Additional 40 bytes in case sensor time readout is enabled */
 #define FIFO_SIZE	250
 
+#define UPDATE_INTERVAL         (250U)
+
+static event_queue_t _eq;
+static event_t _update_evt;
+static event_timeout_t _update_timeout_evt;
+
+static uint16_t _conn_handle;
+static uint16_t _hrs_val_handle;
+
 /* Variable declarations */
 
 struct bmi160_dev bmi;
@@ -412,8 +421,12 @@ static int gatt_svr_chr_access_rw_demo(
             //         bufferk); // A crude way to display a command recognition
             //puts(str_answer);
 
-            // conta_requisicoes*(3*sizeof(float)+sizeof(int)) < rlen
-            if((conta_requisicoes >= MAX_READINGS/16))
+            float auxf;
+            int auxi;
+            uint16_t contador = 15;
+
+            if((conta_requisicoes >= MAX_READINGS/contador) && /* */
+                conta_requisicoes*contador < (int)rlen )
             {
                 conta_requisicoes=0;
             }
@@ -424,9 +437,7 @@ static int gatt_svr_chr_access_rw_demo(
 
             printf("reqs = %d %c", conta_requisicoes, 13);
 
-            float auxf;
-            int auxi;
-            uint16_t contador = 15;
+            
             //do_read();
             for(int i=contador*conta_requisicoes; i < contador*(1+conta_requisicoes); i++){
                 auxf= (readings_buffer[i].X_axis / AC);
@@ -435,7 +446,7 @@ static int gatt_svr_chr_access_rw_demo(
                 memcpy(str_answer + (3*i+1)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
                 auxf= (readings_buffer[i].Z_axis / AC);
                 memcpy(str_answer + (3*i+2)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-                auxi= 273; //time stamp está estourando o programa
+                auxi= (readings_buffer[i].timestamp);
                 memcpy(str_answer + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
                 //str_answer[16*i]='\0';
             }
@@ -474,6 +485,27 @@ static int gatt_svr_chr_access_rw_demo(
     return 1;
 }
 
+static void _hr_update(event_t *e)
+{
+    (void)e;
+    struct os_mbuf *om;
+
+    /* from here, we code the event */
+    
+
+    printf("[NOTIFY] heart rate service: measurement \n");
+
+    /* send heart rate data notification to GATT client */
+    om = ble_hs_mbuf_from_flat(&_hr_data, sizeof(_hr_data));
+    assert(om != NULL);
+    int res = ble_gattc_notify_custom(_conn_handle, _hrs_val_handle, om);
+    assert(res == 0);
+    (void)res;
+
+    /* schedule next update event */
+    event_timeout_set(&_update_timeout_evt, UPDATE_INTERVAL);
+}
+
 int main(void)
 {
 
@@ -481,17 +513,27 @@ int main(void)
 
     init_bmiSensor();
     
+    /* setup local event queue (for handling heart rate updates) */
+    event_queue_init(&_eq);
+    _update_evt.handler = _hr_update;
+    event_timeout_ztimer_init(&_update_timeout_evt, ZTIMER_MSEC, &_eq, &_update_evt);
+
     init_and_run_BLE();
     
     //int cont=0;
     while (rslt == 0)
     {
+        /* Wait for 100ms for the FIFO to fill */
+        user_delay(10);
         acquire_ACC_Values();
         
         //printf("teste\n");
         read_and_show_Acc_values();
         //cont++;
     }
+
+    /* run an event loop for handling the heart rate update events */
+    event_loop(&_eq);
 
     return 0;
 }
@@ -631,6 +673,52 @@ void init_bmiSensor(void)
     i2c_release(dev);
 }
 
+static void _start_updating(void)
+{
+    event_timeout_set(&_update_timeout_evt, UPDATE_INTERVAL);
+    puts("[NOTIFY_ENABLED] heart rate service");
+}
+
+static void _stop_updating(void)
+{
+    event_timeout_clear(&_update_timeout_evt);
+    puts("[NOTIFY_DISABLED] heart rate service");
+}
+
+static int gap_event_cb(struct ble_gap_event *event, void *arg)
+{
+    (void)arg;
+
+    switch (event->type) {
+        case BLE_GAP_EVENT_CONNECT:
+            if (event->connect.status) {
+                _stop_updating();
+                nimble_autoadv_start();
+                return 0;
+            }
+            _conn_handle = event->connect.conn_handle;
+            break;
+
+        case BLE_GAP_EVENT_DISCONNECT:
+            _stop_updating();
+            nimble_autoadv_start();
+            break;
+
+        case BLE_GAP_EVENT_SUBSCRIBE:
+            if (event->subscribe.attr_handle == _hrs_val_handle) {
+                if (event->subscribe.cur_notify == 1) {
+                    _start_updating();
+                }
+                else {
+                    _stop_updating();
+                }
+            }
+            break;
+    }
+
+    return 0;
+}
+
 void init_and_run_BLE(void)
 {
     puts("NimBLE GATT Server Example");
@@ -649,13 +737,29 @@ void init_and_run_BLE(void)
     /* reload the GATT server to link our added services */
     ble_gatts_start();
 
+    struct ble_gap_adv_params advp;
+    memset(&advp, 0, sizeof(advp));
+
+    advp.conn_mode = BLE_GAP_CONN_MODE_UND;
+    advp.disc_mode = BLE_GAP_DISC_MODE_GEN;
+    advp.itvl_min  = BLE_GAP_ADV_FAST_INTERVAL1_MIN;
+    advp.itvl_max  = BLE_GAP_ADV_FAST_INTERVAL1_MAX;
+
+    /* set advertise params */
+    nimble_autoadv_set_ble_gap_adv_params(&advp);
+
+    /* configure and set the advertising data */
+    uint16_t hrs_uuid = BLE_GATT_SVC_HRS;
+    nimble_autoadv_add_field(BLE_GAP_AD_UUID16_INCOMP, &hrs_uuid, sizeof(hrs_uuid));
+
+    nimble_auto_adv_set_gap_cb(&gap_event_cb, NULL);
+
     /* start to advertise this node */
     nimble_autoadv_start();
 }
 
 void acquire_ACC_Values(void){
-    /* Wait for 100ms for the FIFO to fill */
-    user_delay(10);
+
 
     /* It is VERY important to reload the length of the FIFO memory as after the
         * call to bmi160_get_fifo_data(), the bmi.fifo->length contains the
