@@ -76,6 +76,10 @@ static event_timeout_t _update_timeout_evt;
 static uint16_t _conn_handle;
 static uint16_t _hrs_val_handle;
 
+void make_data_package(void);
+uint16_t contador = 15;
+char myarray[16*15];
+
 /* Variable declarations */
 
 struct bmi160_dev bmi;
@@ -184,7 +188,7 @@ static int gatt_svr_chr_access_rw_demo(
     uint16_t conn_handle, uint16_t attr_handle,
     struct ble_gatt_access_ctxt *ctxt, void *arg);
 
-static int get_latest_measurement(
+static int send_latest_measurements(
     uint16_t conn_handle, uint16_t attr_handle,
     struct ble_gatt_access_ctxt *ctxt, void *arg);
 
@@ -236,8 +240,9 @@ static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
          {
             /* Characteristic: Read only latest measurement */
             .uuid = (ble_uuid_t *)&latest_mesurement_uuid.u,
-            .access_cb = get_latest_measurement,
-            .flags = BLE_GATT_CHR_F_READ,
+            .access_cb = send_latest_measurements,
+            .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_NOTIFY,
+            .val_handle = &_hrs_val_handle,
          },
          {
              0, /* No more characteristics in this service */
@@ -248,36 +253,42 @@ static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
     },
 };
 
-static int get_latest_measurement(
+static int send_latest_measurements(
     uint16_t conn_handle, uint16_t attr_handle,
     struct ble_gatt_access_ctxt *ctxt, void *arg)
 {
     (void)conn_handle;
     (void)attr_handle;
     (void)arg;
-    char myarray[15*16];
-     float auxf;
-            int auxi;
-            uint16_t contador = 15;
-            //do_read();
-            for(int i=0; i < contador; i++){
-                auxf= (readings_buffer[i].X_axis / AC);
-                memcpy(myarray + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-                auxf= (readings_buffer[i].Y_axis / AC); 
-                memcpy(myarray + (3*i+1)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-                auxf= (readings_buffer[i].Z_axis / AC);
-                memcpy(myarray + (3*i+2)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-                auxi= 273; //time stamp está estourando o programa
-                memcpy(myarray + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
-                //myarray[16*i]='\0';
-            }
 
+    make_data_package();
+    
     int rc = os_mbuf_append(ctxt->om, "Bom dia", strlen("Bom dia"));
 
     puts("new service working");
 
+
+
     return rc;
 
+}
+
+void make_data_package(void)
+{
+    int auxi;
+    float auxf;
+
+    for(int i=0; i < contador; i++)
+    {
+        auxf= (readings_buffer[i].X_axis / AC);
+        memcpy(myarray + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+        auxf= (readings_buffer[i].Y_axis / AC); 
+        memcpy(myarray + (3*i+1)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+        auxf= (readings_buffer[i].Z_axis / AC);
+        memcpy(myarray + (3*i+2)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+        auxi= (readings_buffer[i].timestamp);
+        memcpy(myarray + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
+    }
 }
 
 static int gatt_svr_chr_access_device_info_manufacturer(
@@ -491,12 +502,13 @@ static void _hr_update(event_t *e)
     struct os_mbuf *om;
 
     /* from here, we code the event */
-    
+    acquire_ACC_Values();
+    do_read();
 
     printf("[NOTIFY] heart rate service: measurement \n");
-
+    make_data_package();
     /* send heart rate data notification to GATT client */
-    om = ble_hs_mbuf_from_flat(&_hr_data, sizeof(_hr_data));
+    om = ble_hs_mbuf_from_flat(&myarray, sizeof(myarray));
     assert(om != NULL);
     int res = ble_gattc_notify_custom(_conn_handle, _hrs_val_handle, om);
     assert(res == 0);
@@ -521,16 +533,16 @@ int main(void)
     init_and_run_BLE();
     
     //int cont=0;
-    while (rslt == 0)
-    {
-        /* Wait for 100ms for the FIFO to fill */
-        user_delay(10);
-        acquire_ACC_Values();
+    // while (rslt == 0)
+    // {
+    //     /* Wait for 100ms for the FIFO to fill */
+    //     user_delay(10);
+    //     acquire_ACC_Values();
         
-        //printf("teste\n");
-        read_and_show_Acc_values();
-        //cont++;
-    }
+    //     //printf("teste\n");
+    //     read_and_show_Acc_values();
+    //     //cont++;
+    // }
 
     /* run an event loop for handling the heart rate update events */
     event_loop(&_eq);
