@@ -17,12 +17,10 @@
  *
  * @}
  */
-
-#include "xtimer.h"
-
 #include <cerrno>
 #include <system_error>
 
+#include "ztimer64.h"
 #include "riot/thread.hpp"
 
 using namespace std;
@@ -73,7 +71,8 @@ namespace this_thread {
 void sleep_for(const chrono::nanoseconds& ns) {
   using namespace chrono;
   if (ns > nanoseconds::zero()) {
-    xtimer_usleep64(static_cast<uint64_t>(duration_cast<microseconds>(ns).count()));
+    ztimer64_sleep(ZTIMER64_USEC,
+        static_cast<uint64_t>(duration_cast<microseconds>(ns).count()));
   }
 }
 

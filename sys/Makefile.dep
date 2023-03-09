@@ -417,7 +417,7 @@ endif
 
 ifneq (,$(filter cpp11-compat,$(USEMODULE)))
   USEMODULE += cpp_new_delete
-  USEMODULE += xtimer
+  USEMODULE += ztimer64_usec
   USEMODULE += timex
   FEATURES_REQUIRED += cpp
   FEATURES_REQUIRED += libstdcpp
