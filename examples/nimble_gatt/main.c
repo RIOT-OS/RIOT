@@ -235,14 +235,14 @@ static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
              /* Characteristic: Read/Write Demo read only */
              .uuid = (ble_uuid_t *)&gatt_svr_chr_rw_demo_readonly_uuid.u,
              .access_cb = gatt_svr_chr_access_rw_demo,
-             .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_NOTIFY,
+             .flags = BLE_GATT_CHR_F_READ,
          },
          {
             /* Characteristic: Read only latest measurement */
             .uuid = (ble_uuid_t *)&latest_mesurement_uuid.u,
             .access_cb = send_latest_measurements,
-            .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_NOTIFY,
             .val_handle = &_hrs_val_handle,
+            .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_NOTIFY,
          },
          {
              0, /* No more characteristics in this service */
@@ -263,7 +263,7 @@ static int send_latest_measurements(
 
     make_data_package();
     
-    int rc = os_mbuf_append(ctxt->om, "Bom dia", strlen("Bom dia"));
+    int rc = os_mbuf_append(ctxt->om, myarray, sizeof(myarray));
 
     puts("new service working");
 
@@ -473,7 +473,7 @@ static int gatt_svr_chr_access_rw_demo(
             //printf("SIze: %d\n %c", strlen(str_answer), 13); //TODO: find something that really sends the adequate size of what is sent
             /*strlen will not work with this array, since it has the posssibility of multiple terminators '\0'
              nor will sizeof work, since it only returns the array's full size sizeof(char)*lenght */
-            //auxi = str_answer[12] + (str_answer[13] <</8) + (str_answer[14] <<16) + (str_answer[15] <<24); //VERY SENSIBLE BIT SHIFT OPERATION
+            //auxi = str_answer[12] + (str_answer[13] <<8) + (str_answer[14] <<16) + (str_answer[15] <<24); //VERY SENSIBLE BIT SHIFT OPERATION
             //printf("Timestamp: %f\n", auxf);
             return rc;
         }
@@ -500,19 +500,34 @@ static void _hr_update(event_t *e)
 {
     (void)e;
     struct os_mbuf *om;
+    char myarray2[16];
 
     /* from here, we code the event */
     acquire_ACC_Values();
     do_read();
 
-    printf("[NOTIFY] heart rate service: measurement \n");
-    make_data_package();
-    /* send heart rate data notification to GATT client */
-    om = ble_hs_mbuf_from_flat(&myarray, sizeof(myarray));
+    int auxi;
+    float auxf;
+
+    int i=0;
+        auxf= (readings_buffer[i].X_axis / AC);
+        memcpy(myarray2 + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+        auxf= (readings_buffer[i].Y_axis / AC); 
+        memcpy(myarray2 + (3*i+1)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+        auxf= (readings_buffer[i].Z_axis / AC);
+        memcpy(myarray2 + (3*i+2)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+        auxi= (readings_buffer[i].timestamp);
+        memcpy(myarray2 + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
+
+    /* send data notification to GATT client */
+    om = ble_hs_mbuf_from_flat(myarray2, sizeof(myarray2));
     assert(om != NULL);
     int res = ble_gattc_notify_custom(_conn_handle, _hrs_val_handle, om);
     assert(res == 0);
     (void)res;
+
+    auxi = myarray2[12] + (myarray2[13] <<8) + (myarray2[14] <<16) + (myarray2[15] <<24); //VERY SENSIBLE BIT SHIFT OPERATION
+    printf("[NOTIFY] Latest measurement: %d \n %c", auxi, 13);
 
     /* schedule next update event */
     event_timeout_set(&_update_timeout_evt, UPDATE_INTERVAL);
@@ -761,8 +776,8 @@ void init_and_run_BLE(void)
     nimble_autoadv_set_ble_gap_adv_params(&advp);
 
     /* configure and set the advertising data */
-    uint16_t hrs_uuid = BLE_GATT_SVC_HRS;
-    nimble_autoadv_add_field(BLE_GAP_AD_UUID16_INCOMP, &hrs_uuid, sizeof(hrs_uuid));
+
+    nimble_autoadv_add_field(BLE_GAP_AD_UUID16_INCOMP, &latest_mesurement_uuid, sizeof(latest_mesurement_uuid));
 
     nimble_auto_adv_set_gap_cb(&gap_event_cb, NULL);
 
@@ -771,7 +786,6 @@ void init_and_run_BLE(void)
 }
 
 void acquire_ACC_Values(void){
-
 
     /* It is VERY important to reload the length of the FIFO memory as after the
         * call to bmi160_get_fifo_data(), the bmi.fifo->length contains the
