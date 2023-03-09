@@ -30,7 +30,7 @@
 #include "net/lora.h"
 #include "net/netdev.h"
 #include "net/netdev/lora.h"
-
+#include "od.h"
 #include "sx126x.h"
 #include "sx126x_params.h"
 #include "sx126x_netdev.h"
@@ -73,6 +73,7 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
                 packet_info.rssi, (int)packet_info.snr,
                 sx126x_get_lora_time_on_air_in_ms(&sx126x.pkt_params, &sx126x.mod_params)
                 );
+                od_hex_dump(message, len, 0);
             netopt_state_t state = NETOPT_STATE_RX;
             dev->driver->set(dev, NETOPT_STATE, &state, sizeof(state));
         }

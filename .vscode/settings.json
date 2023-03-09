@@ -12,7 +12,12 @@
         "sx126x_internal.h": "c",
         "submac.h": "c",
         "thread.h": "c",
-        "callback.h": "c"
+        "callback.h": "c",
+        "array": "c",
+        "string_view": "c",
+        "initializer_list": "c",
+        "ranges": "c",
+        "utility": "c"
     },
     "[shellscript][c][cpp]": {
         "editor.tabSize": 4,
