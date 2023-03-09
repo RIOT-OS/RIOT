@@ -60,14 +60,12 @@
 /* Macros for frames to be read */
 
 #define ACC_FRAMES	10 /* 10 Frames are available every 100ms @ 100Hz */ //Datasheet says you can take measurementes at 1600 Hz
-#define GYR_FRAMES	10
-#define MAG_FRAMES	10
 /* 10 frames containing a 1 byte header, 6 bytes of accelerometer,
  * 6 bytes of gyroscope and 8 bytes of magnetometer data. This results in
  * 21 bytes per frame. Additional 40 bytes in case sensor time readout is enabled */
 #define FIFO_SIZE	250
 
-#define UPDATE_INTERVAL         (250U)
+#define UPDATE_INTERVAL         (100U)
 
 static event_queue_t _eq;
 static event_t _update_evt;
@@ -86,7 +84,7 @@ struct bmi160_dev bmi;
 
 uint8_t fifo_buff[FIFO_SIZE];
 struct bmi160_fifo_frame fifo_frame;
-struct bmi160_sensor_data gyro_data[GYR_FRAMES], accel_data[ACC_FRAMES];
+struct bmi160_sensor_data accel_data[ACC_FRAMES];
 
 int8_t rslt;
 
@@ -496,6 +494,8 @@ static int gatt_svr_chr_access_rw_demo(
     return 1;
 }
 
+static int auxi2 = 0;
+
 static void _hr_update(event_t *e)
 {
     (void)e;
@@ -505,8 +505,10 @@ static void _hr_update(event_t *e)
     /* from here, we code the event */
     acquire_ACC_Values();
     do_read();
+    log_readings();
 
     int auxi;
+
     float auxf;
 
     int i=0;
@@ -527,8 +529,8 @@ static void _hr_update(event_t *e)
     (void)res;
 
     auxi = myarray2[12] + (myarray2[13] <<8) + (myarray2[14] <<16) + (myarray2[15] <<24); //VERY SENSIBLE BIT SHIFT OPERATION
-    printf("[NOTIFY] Latest measurement: %d \n %c", auxi, 13);
-
+    printf("[NOTIFY] Latest measurement: %d \n %c", auxi - auxi2, 13);
+    auxi2 = auxi;
     /* schedule next update event */
     event_timeout_set(&_update_timeout_evt, UPDATE_INTERVAL);
 }
@@ -570,10 +572,10 @@ void right_shift_readings_buffer(void)
     size_t max = rlen < MAX_READINGS ? rlen++ : MAX_READINGS - 1;
     for (size_t i = max; i > 0; i--)
     {
-        readings_buffer[i].X_axis = readings_buffer[i - ACC_FRAMES].X_axis;
-        readings_buffer[i].Y_axis = readings_buffer[i - ACC_FRAMES].Y_axis;
-        readings_buffer[i].Z_axis = readings_buffer[i - ACC_FRAMES].Z_axis;
-        readings_buffer[i].timestamp = readings_buffer[i - ACC_FRAMES].timestamp;
+        readings_buffer[i].X_axis = readings_buffer[i - 1].X_axis;
+        readings_buffer[i].Y_axis = readings_buffer[i - 1].Y_axis;
+        readings_buffer[i].Z_axis = readings_buffer[i - 1].Z_axis;
+        readings_buffer[i].timestamp = readings_buffer[i - 1].timestamp;
     }
 }
 
@@ -594,15 +596,16 @@ void do_read(void)
 void log_readings(void)
 {
     //#ifdef PULGA_USE_RINGBUFFER
-    for (size_t i = 0; i < rlen; i++)
-    {
+    //for (size_t i = 0; i < rlen; i++)
+   // {
+    int i= 0;
         printf("[Acc_readings] readings_buffer[%d]: ", i);
         printf("Acc_x: %f ", ((float)readings_buffer[i].X_axis)/ AC);
         printf("Acc_y: %f ", ((float)readings_buffer[i].Y_axis)/ AC);
         printf("Acc_z: %f ", ((float)readings_buffer[i].Z_axis)/ AC);
         printf("Acc_timeStamp: %f ", ((float)readings_buffer[i].timestamp));
         printf("\n %c", 13);
-    }
+   // }
     //#else
     /*for (size_t i = 0; i < ACC_FRAMES; i++) {
         printf("[Acc_readings] readings_buffer[%d]: ", i);
@@ -617,7 +620,7 @@ void read_and_show_Acc_values(void)
 {
     do_read();
     // #if(LOG_LEVEL==4)
-    //log_readings();
+    log_readings();
     // #endif
 }
 
