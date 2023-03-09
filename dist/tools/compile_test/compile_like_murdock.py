@@ -134,41 +134,83 @@ def _end(sec, job):
     print(f"You could have {val} {thing}")
 
 
+def __exec_cmd(cmd, shell=False, env=None, cwd=None,
+               stderr=subprocess.DEVNULL):
+    out = subprocess.run(
+        cmd,
+        shell=shell,
+        env=env,
+        cwd=cwd,
+        stderr=stderr,
+        check=True,
+        stdout=subprocess.PIPE,
+    ).stdout
+    return out.decode("utf-8", errors="replace")
+
+
 def _all_apps(cwd):
-    cmd = ['make', 'info-applications', '--no-print-directory']
-    out = subprocess.check_output(cmd, cwd=cwd)
-    return out.decode("utf-8", errors="replace").split()
+    cmd = ('make', 'info-applications', '--no-print-directory')
+    return __exec_cmd(cmd, cwd=cwd).split()
 
 
-def _supported_boards(boards, env, cwd):
-    cmd = ['make', 'info-boards-supported', '--no-print-directory']
-    out = subprocess.check_output(cmd, env=env, cwd=cwd)
-    supported_boards = out.decode("utf-8", errors="replace").split()
+def _supported_boards(boards, env, cwd, all_boards=False):
+    cmd = ('make', 'info-boards-supported', '--no-print-directory')
+    supported_boards = __exec_cmd(cmd, env=env, cwd=cwd).split()
+    if all_boards:
+        return supported_boards
     return [brd for brd in supported_boards if brd in boards]
 
 
 def _supported_boards_from_cpu(cpu, env, cwd):
     cmd = (f'FEATURES_REQUIRED=cpu_{cpu} make info-boards-supported '
            '--no-print-directory')
-    out = subprocess.check_output(cmd, shell=True, env=env, cwd=cwd)
-    return out.decode("utf-8", errors="replace").split()
+    __exec_cmd(cmd, shell=True, env=env, cwd=cwd).split()
 
 
-def _build(app, board, jobs, env, cwd):
+def _print_module_or_pkg_mismatch(app, board, lines, args):
+    if args.verbose:
+        for line in lines:
+            # Reprint the < and > from diff to show if kconfig or make are
+            # responsible
+            if line.startswith('< '):
+                print("    make has:", line[2:])
+            if line.startswith('> '):
+                print("    kconfig has:", line[2:])
+    print(f"{app: <30} {board: <30} FAIL: Kconfig module or pkg mismatch")
+
+
+def _modules_packages(app, board, jobs, env, cwd, args):
     cmd = (f'/bin/bash -c "source .murdock; JOBS={jobs} '
-           f'compile {app} {board}:gnu"')
+           f'kconfig_module_packages_diff {board} {app}"')
     try:
-        out = subprocess.check_output(cmd, env=env, shell=True,
-                                      cwd=cwd, stderr=subprocess.STDOUT)
-        out = out.decode("utf-8", errors="replace")
+        out = __exec_cmd(cmd, shell=True, env=env, cwd=cwd,
+                         stderr=subprocess.STDOUT)
+        if args.very_very_verbose:
+            print(out)
         print(f"{app: <30} {board: <30} PASS")
     except subprocess.CalledProcessError as err:
         err.output = err.output.decode("utf-8", errors="replace")
         lines = err.output.split("\n")
+        _print_module_or_pkg_mismatch(app, board, lines, args)
 
+
+def _build(app, board, jobs, env, cwd, args):
+    cmd = (f'/bin/bash -c "source .murdock; JOBS={jobs} '
+           f'compile {app} {board}:gnu"')
+    try:
+        out = __exec_cmd(cmd, shell=True, env=env, cwd=cwd,
+                         stderr=subprocess.STDOUT)
+        if args.very_very_verbose:
+            print(out)
+        print(f"{app: <30} {board: <30} PASS")
+    except subprocess.CalledProcessError as err:
+        err.output = err.output.decode("utf-8", errors="replace")
+        lines = err.output.split("\n")
+        if args.very_very_verbose or args.very_verbose:
+            print(err.output)
+        # Check for known diff error outputs
         if lines[-3].startswith('< ') or lines[-3].startswith('> '):
-            print(f"{app: <30} {board: <30} FAIL: Kconfig module or pkg "
-                  "mismatch")
+            _print_module_or_pkg_mismatch(app, board, lines, args)
         elif "mismatch" in err.output:
             print(f"{app: <30} {board: <30} FAIL: Kconfig hash mismatch")
         else:
@@ -181,7 +223,8 @@ def main():
                         help=("Optional boards list, will test all supported "
                               "boards on the list. Will override the cpu "
                               "filter.  If empty, a subset of boards will be "
-                              "selected for you..."))
+                              "selected for you. If 'all' then it will test "
+                              "all supported boards."))
     parser.add_argument("-c", "--cpu", type=str,
                         help=("Optional filter for all supported boards "
                               "belonging to the cpu family, for example, "
@@ -197,6 +240,15 @@ def main():
                               " without spending super long to compile them"))
     parser.add_argument("-j", "--jobs", type=int, default=4,
                         help=("The amount of jobs to use when compiling."))
+    parser.add_argument("-m", "--modules-packages", action="store_true",
+                        help=("Only check the diff of modules and packages."))
+    parser.add_argument("-v", "--verbose", action="store_true",
+                        help=("Shows mismatch info."))
+    parser.add_argument("-vv", "--very-verbose", action="store_true",
+                        help=("Shows extra output on failures."))
+    parser.add_argument("-vvv", "--very-very-verbose", action="store_true",
+                        help=("Shows all output info."))
+
     args = parser.parse_args()
 
     start_time = datetime.datetime.now()
@@ -217,13 +269,19 @@ def main():
         if args.cpu:
             target_boards = _supported_boards_from_cpu(args.cpu, full_env,
                                                        test_dir)
+        elif args.boards[0] == "all":
+            target_boards = _supported_boards(boards, full_env, test_dir, True)
         else:
-            target_boards = _supported_boards(boards, full_env, test_dir)
+            target_boards = _supported_boards(boards, full_env, test_dir,
+                                              False)
         for board in target_boards:
             if args.dry_run:
                 print(f"{app: <30} {board: <30}")
+            elif args.modules_packages:
+                _modules_packages(app, board, args.jobs, full_env, riot_dir,
+                                  args)
             else:
-                _build(app, board, args.jobs, full_env, riot_dir)
+                _build(app, board, args.jobs, full_env, riot_dir, args)
     elapse_time = datetime.datetime.now() - start_time
     _end(elapse_time.total_seconds(), args.jobs)
 
