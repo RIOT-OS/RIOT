@@ -6,6 +6,10 @@ extern "C"
 {
 #endif
 
+    void init_isr(void);
+
+    void vblank_irq_enable(void);
+
 #ifdef __cplusplus
 }
 #endif

@@ -10,6 +10,7 @@
 
 #ifndef PERIPH_CPU_H
 #define PERIPH_CPU_H
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C"

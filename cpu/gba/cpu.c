@@ -5,6 +5,7 @@
  */
 
 #include <stdint.h>
+#include "gba_irq.h"
 #include "cpu.h"
 #include "kernel_init.h"
 
@@ -23,6 +24,9 @@ void arm_reset(void)
 void cpu_init(void)
 {
     extern void board_init(void);
+
+    init_isr();
+    vblank_irq_enable();
 
     /* board specific setup of i/o pins */
     board_init();
