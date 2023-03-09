@@ -32,6 +32,16 @@ extern "C" {
 #endif
 
 /**
+ * @brief Number of IN EPs required for the MSC interface
+ */
+#define USBUS_MSC_EP_IN_REQUIRED_NUMOF   1
+
+/**
+ * @brief Number of Out EPs required for the MSC interface
+ */
+#define USBUS_MSC_EP_OUT_REQUIRED_NUMOF  1
+
+/**
  * @brief USBUS MSC Number of exported MTD device through USB
  */
 #ifndef USBUS_MSC_EXPORTED_NUMOF
