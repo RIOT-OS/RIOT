@@ -459,6 +459,13 @@ typedef struct {
 /** @} */
 
 /**
+ * @name    USB device definitions
+ * @{
+ */
+#define USBDEV_NUM_ENDPOINTS    4   /**< Number of USB OTG FS endpoints including EP0 */
+/** @} */
+
+/**
  * @brief   Enable the given peripheral clock
  *
  * @param[in] bus       bus the peripheral is connected to
