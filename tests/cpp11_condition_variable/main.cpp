@@ -22,6 +22,8 @@
 #include <cstdio>
 #include <system_error>
 
+#include "time_units.h"
+#include "ztimer64.h"
 #include "riot/mutex.hpp"
 #include "riot/chrono.hpp"
 #include "riot/thread.hpp"
@@ -95,13 +97,13 @@ int main() {
     constexpr unsigned timeout = 1;
     mutex m;
     condition_variable cv;
-    timex_t before, after;
+    uint64_t before, after;
     unique_lock<mutex> lk(m);
-    xtimer_now_timex(&before);
+    before = ztimer64_now(ZTIMER64_USEC);
     cv.wait_for(lk, chrono::seconds(timeout));
-    xtimer_now_timex(&after);
-    auto diff = timex_sub(after, before);
-    expect(diff.seconds >= timeout);
+    after = ztimer64_now(ZTIMER64_USEC);
+    auto diff = after - before;
+    expect(diff >= timeout * US_PER_SEC);
   }
   puts("Done\n");
 
@@ -111,14 +113,14 @@ int main() {
     constexpr unsigned timeout = 1;
     mutex m;
     condition_variable cv;
-    timex_t before, after;
+    uint64_t before, after;
     unique_lock<mutex> lk(m);
-    xtimer_now_timex(&before);
+    before = ztimer64_now(ZTIMER64_USEC);
     auto time = riot::now() += chrono::seconds(timeout);
     cv.wait_until(lk, time);
-    xtimer_now_timex(&after);
-    auto diff = timex_sub(after, before);
-    expect(diff.seconds >= timeout);
+    after = ztimer64_now(ZTIMER64_USEC);
+    auto diff = after - before;
+    expect(diff >= timeout * US_PER_SEC);
   }
   puts("Done\n");
 
