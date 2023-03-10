@@ -26,7 +26,7 @@ void cpu_init(void)
     extern void board_init(void);
 
     init_isr();
-    vblank_irq_enable();
+    // vblank_irq_enable();
 
     /* board specific setup of i/o pins */
     board_init();

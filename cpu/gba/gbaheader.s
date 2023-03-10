@@ -58,14 +58,4 @@
     .hword  0x0000
 
 _end_gbaheader:
-    // Disable REG_IME by setting lowest bit to zero (using lowest bit of REG_IME)
-    //mov     r0, #0x4000000
-    //str     r0, [r0, #0x208]
-    //mov r0, #0x80
-    //msr CPSR_c, r0
     b _startup
-
-    //adr     r0, .Lthumb_start + 1
-    //bx      r0
-
-//.Lthumb_start:

@@ -83,8 +83,7 @@ static void drawChar(unsigned char c, int x, int y, unsigned short fgColour, uns
 
 void stdio_init(void)
 {
-    //*videoctl_base = 0x0403; // Mode 3 + BG 3
-    GBA_DISPCNT = GBA_DISPCNT_BGMODE_3 | GBA_DISPCNT_SDBG_2; // 0x0403;
+    GBA_DISPCNT = GBA_DISPCNT_BGMODE_3 | GBA_DISPCNT_SDBG_2;
     clearScreen();
 }
 
@@ -109,10 +108,19 @@ ssize_t stdio_write(const void *buffer, size_t len)
 {
     static unsigned short row = 0;
     static unsigned short cursor = 0;
-    unsigned short color = WHITE;
-    drawPixel(0, 0, BLUE);
+
     for (size_t i = 0; i < len; i++)
     {
+        if (cursor >= (240 / FONT_WIDTH))
+        {
+            cursor = 0;
+            row++;
+        }
+        if (row >= (160 / FONT_HEIGHT))
+        {
+            clearScreen();
+            row = 0;
+        }
         char c = ((char *)buffer)[i];
         if (c == '\n')
         {
@@ -120,32 +128,9 @@ ssize_t stdio_write(const void *buffer, size_t len)
             cursor = 0;
             continue;
         }
-        switch (c)
-        {
-        case 0x01:
-            color = RED;
-            continue;
-        case 0x02:
-            color = GREEN;
-            continue;
-        case 0x03:
-            color = BLUE;
-            continue;
-        default:
-            break;
-        }
-        drawChar(c, cursor * FONT_WIDTH, row * FONT_HEIGHT, color, BLACK);
+
+        drawChar(c, cursor * FONT_WIDTH, row * FONT_HEIGHT, WHITE, BLACK);
         cursor++;
-        if (cursor >= (240 / FONT_WIDTH))
-        {
-            cursor = 0;
-            row++;
-        }
-        if (row >= 160 / FONT_HEIGHT)
-        {
-            clearScreen();
-            row = 0;
-        }
     }
     return len;
 }

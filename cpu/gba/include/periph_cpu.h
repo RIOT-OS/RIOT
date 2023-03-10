@@ -34,6 +34,8 @@ extern "C"
  */
 #define MEM16(ADDR) ((uint16_t(*))(ADDR))
 
+#define GBA_IRQ_BIOS_ACK REG16(0x03FFFFF8)
+
 #define GBA_DISPCNT REG16(0x4000000)
 /* Bitmap, 240x160, 15-bit RGB */
 #define GBA_DISPCNT_BGMODE_3 0x0003
@@ -44,16 +46,23 @@ extern "C"
 
 #define GBA_KEYPAD REG16(0x4000130)
 #define GBA_KEYPAD_IRQCNTL REG16(0x4000132)
-#define GBA_KEY_A 1 << 0
-#define GBA_KEY_B 1 << 1
-#define GBA_KEY_Select 1 << 2
-#define GBA_KEY_Start 1 << 3
-#define GBA_KEY_Right 1 << 4
-#define GBA_KEY_Left 1 << 5
-#define GBA_KEY_Up 1 << 6
-#define GBA_KEY_Down 1 << 7
-#define GBA_KEY_R 1 << 8
-#define GBA_KEY_L 1 << 9
+#define GBA_KEY_A 0x0001
+#define GBA_KEY_B 0x0002
+#define GBA_KEY_SELECT 0x0004
+#define GBA_KEY_START 0x0008
+#define GBA_KEY_RIGHT 0x0010
+#define GBA_KEY_LEFT 0x0020
+#define GBA_KEY_UP 0x0040
+#define GBA_KEY_DOWN 0x0080
+#define GBA_KEY_R 0x0100
+#define GBA_KEY_L 0x0200
+#define GBA_KEY_ALL 0x03FF
+#define GBA_KEY_NC0 0x0400
+#define GBA_KEY_NC1 0x0800
+#define GBA_KEY_NC2 0x1000
+#define GBA_KEY_NC3 0x2000
+#define GBA_KEY_IE 0x4000
+#define GBA_KEY_IC_AND 0x8000
 
 /* Interrupt Enable */
 #define GBA_IE REG16(0x4000200)
