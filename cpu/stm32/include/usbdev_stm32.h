@@ -41,42 +41,22 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "periph_cpu.h"
-#include "periph/usbdev.h"
 
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-/* Detect the IP version based on the available register define */
-#if defined(USB_OTG_GCCFG_NOVBUSSENS)
-#define STM32_USB_OTG_CID_1x        /**< USB OTG FS version 0x00001200 */
-#elif defined(USB_OTG_GCCFG_VBDEN)
-#define STM32_USB_OTG_CID_2x        /**< USB OTG FS version 0x00002000 */
-#elif defined(USB)
-#define STM32_USB_FS_CID_1x         /**< USB FS version 0x00001200 */
-#else
-#error Unknown USB peripheral version
 #endif
 
 /**
  * @brief Number of endpoints available with the OTG FS peripheral
  *        including the control endpoint
  */
-#ifdef STM32_USB_OTG_CID_1x
-#define DWC2_USB_OTG_FS_NUM_EP (4) /**< OTG FS with 4 endpoints */
-#elif defined(STM32_USB_OTG_CID_2x)
-#define DWC2_USB_OTG_FS_NUM_EP (6) /**< OTG FS with 6 endpoints */
-#endif
+#define DWC2_USB_OTG_FS_NUM_EP  STM32_USB_OTG_FS_NUM_EP
 
 /**
  * @brief Number of endpoints available with the OTG HS peripheral
  *        including the control endpoint
  */
-#ifdef STM32_USB_OTG_CID_1x
-#define DWC2_USB_OTG_HS_NUM_EP (6) /**< OTG HS with 6 endpoints */
-#elif defined(STM32_USB_OTG_CID_2x)
-#define DWC2_USB_OTG_HS_NUM_EP (9) /**< OTG HS with 9 endpoints */
-#endif
+#define DWC2_USB_OTG_HS_NUM_EP  STM32_USB_OTG_HS_NUM_EP
 
 /**
  * @brief USB OTG FS FIFO reception buffer space in 32-bit words
@@ -143,6 +123,9 @@ extern "C" {
 #define STM32_USB_OTG_HS_USE_DMA        (1)
 #endif
 #endif
+
+/* periph/usbdev.h is included after the definitions above by intention */
+#include "periph/usbdev.h"
 
 /**
  * @brief stm32 USB Device FS only peripheral device context
