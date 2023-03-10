@@ -59,7 +59,7 @@
 #include "timex.h"
 /* Macros for frames to be read */
 
-#define ACC_FRAMES	10 /* 10 Frames are available every 100ms @ 100Hz */ //Datasheet says you can take measurementes at 1600 Hz
+#define ACC_FRAMES	1 /* 10 Frames are available every 100ms @ 100Hz */ //Datasheet says you can take measurementes at 1600 Hz
 /* 10 frames containing a 1 byte header, 6 bytes of accelerometer,
  * 6 bytes of gyroscope and 8 bytes of magnetometer data. This results in
  * 21 bytes per frame. Additional 40 bytes in case sensor time readout is enabled */
@@ -495,7 +495,7 @@ static int gatt_svr_chr_access_rw_demo(
 }
 
 static int auxi2 = 0;
-bool connected = FALSE; 
+bool connected = 0; 
 
 static void _hr_update(event_t *e)
 {
@@ -606,7 +606,7 @@ void log_readings(void)
         printf("Acc_x: %f ", ((float)readings_buffer[i].X_axis)/ AC);
         printf("Acc_y: %f ", ((float)readings_buffer[i].Y_axis)/ AC);
         printf("Acc_z: %f ", ((float)readings_buffer[i].Z_axis)/ AC);
-        printf("Acc_timeStamp: %f ", ((float)readings_buffer[i].timestamp));
+        printf("Acc_timeStamp: %d ", (readings_buffer[i].timestamp));
         printf("\n %c", 13);
    // }
     //#else
@@ -709,14 +709,14 @@ void init_bmiSensor(void)
 static void _start_updating(void)
 {
     event_timeout_set(&_update_timeout_evt, UPDATE_INTERVAL);
-    connected= TRUE;
+    connected= 1;
     puts("[NOTIFY_ENABLED] heart rate service");
 }
 
 static void _stop_updating(void)
 {
     //event_timeout_clear(&_update_timeout_evt);
-    connected = FALSE;
+    connected = 0;
     puts("[NOTIFY_DISABLED] heart rate service");
 }
 
