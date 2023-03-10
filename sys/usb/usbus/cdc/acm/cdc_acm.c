@@ -231,18 +231,21 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
     usbus_endpoint_t *ep = usbus_add_endpoint(usbus, &cdcacm->iface_ctrl,
                                               USB_EP_TYPE_INTERRUPT,
                                               USB_EP_DIR_IN, 8);
+    assert(ep);
     ep->interval = 255; /* Max interval */
     usbus_enable_endpoint(ep);
     ep = usbus_add_endpoint(usbus, &cdcacm->iface_data,
                             USB_EP_TYPE_BULK, USB_EP_DIR_IN,
                             CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE);
     ep->interval = 0; /* Interval is not used with bulk endpoints */
+    assert(ep);
     usbus_enable_endpoint(ep);
     /* Store the endpoint reference to activate it
      * when DTE present is signalled by the host */
     ep = usbus_add_endpoint(usbus, &cdcacm->iface_data,
                             USB_EP_TYPE_BULK, USB_EP_DIR_OUT,
                             CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE);
+    assert(ep);
     ep->interval = 0; /* Interval is not used with bulk endpoints */
     usbus_enable_endpoint(ep);
 
