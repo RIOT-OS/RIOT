@@ -152,7 +152,7 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
     /* Add string descriptor to the interface */
     dfu->iface.descr = &dfu->slot0_str;
 
-#ifdef MODULE_RIOTBOOT_USB_DFU
+#if defined (MODULE_RIOTBOOT_USB_DFU) && NUM_SLOTS == 2
     /* Create needed string descriptor for the alternate settings */
     usbus_add_string_descriptor(usbus, &dfu->slot1_str, USB_DFU_MODE_SLOT1_NAME);
 
