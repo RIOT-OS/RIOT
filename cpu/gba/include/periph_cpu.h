@@ -34,6 +34,7 @@ extern "C"
  */
 #define MEM16(ADDR) ((uint16_t(*))(ADDR))
 
+#define GBA_IRQ_ISR 0x03FFFFFC
 #define GBA_IRQ_BIOS_ACK REG16(0x03FFFFF8)
 
 #define GBA_DISPCNT REG16(0x4000000)

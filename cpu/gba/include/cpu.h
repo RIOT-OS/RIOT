@@ -22,11 +22,6 @@ extern "C"
     extern uintptr_t __stack_start; /**< end of user stack memory space */
 
     /**
-     * @brief install lpc23xx irq
-     */
-    bool install_irq(int IntNumber, void (*HandlerAddr)(void), int Priority);
-
-    /**
      * @brief   Returns the current content of the link register (lr)
      */
     static inline uintptr_t cpu_get_caller_pc(void)

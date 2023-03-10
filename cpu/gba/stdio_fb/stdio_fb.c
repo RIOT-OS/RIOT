@@ -22,64 +22,11 @@
 
 #include "stdio_base.h"
 #include "periph_cpu.h"
+#include "graphics.h"
 #include <string.h>
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
-
-static const unsigned char systemFont[] =
-    {
-#include "font_terminal.h"
-};
-
-#define BLUE 0x7C00
-#define RED 0x001F
-#define GREEN 0x03E0
-#define BLACK 0x0000
-#define WHITE 0xFFFF
-
-// unsigned short *videoctl_base = GBA_DISPCNT;
-// unsigned short *framebuffer = (unsigned short *)FRAMEBUFFER;
-
-void clearScreen(void)
-{
-    memset(GBA_VRAM, 0x00, 240 * 160 * 2);
-}
-
-void drawPixel(unsigned short x, unsigned short y, unsigned short color)
-{
-    GBA_VRAM[x + y * 240] = color;
-}
-
-static void drawChar(unsigned char c, int x, int y, unsigned short fgColour, unsigned short bgColour)
-{
-    unsigned char mask;
-    const unsigned char *font = systemFont + (c * FONT_HEIGHT);
-    unsigned short colourToDraw;
-
-    for (int h = 0; h < FONT_HEIGHT; h++)
-    {
-        mask = 0x01;
-
-        // This loop draws up to 1 byte (8 bit) per line; so 8 pixels at most
-        for (int w = 0; w < FONT_WIDTH; w++)
-        {
-            if ((*font) & mask)
-            {
-                colourToDraw = fgColour;
-            }
-            else
-            {
-                colourToDraw = bgColour;
-            }
-
-            drawPixel(x + w, y + h, colourToDraw);
-
-            mask <<= 1;
-        }
-        font++;
-    }
-}
 
 void stdio_init(void)
 {
@@ -89,18 +36,8 @@ void stdio_init(void)
 
 ssize_t stdio_read(void *buffer, size_t count)
 {
-    static int first_run = 1;
-#define HELP "help\n"
     (void)buffer;
     (void)count;
-    if (first_run)
-    {
-        first_run = 0;
-        memcpy(buffer, HELP, sizeof(HELP));
-        return sizeof(HELP);
-    }
-    while (1)
-        ;
     return 0;
 }
 

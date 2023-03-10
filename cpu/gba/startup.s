@@ -48,6 +48,32 @@
 .arm
 .section .init
 
+swi_addr:       .word   ctx_switch          /* defined in arm7_common/common.s */
+
+setup_swi:
+              ldr r0, =0x02002040
+              adr r1, swi_switch
+              ldm r1, {r1 - r3}
+              stm r0, {r1 - r3}
+              bx lr
+
+swi_switch:
+              .word 0xe59ff000 // ldr pc, [pc]
+              .word 0
+              .word swi_handler
+
+swi_handler:
+              /* un-do the garbage the bios did */
+              /* https://github.com/camthesaxman/gba_bios/blob/master/asm/bios.s#L153 */
+              pop	{r2, lr}
+              eor	r11, r11, #0x0c
+              msr	cpsr, r11
+              pop {r11}
+              msr	spsr, r11
+              pop	{r11,r12,lr}
+              ldr pc, swi_addr
+
+
 .global _startup
 .func   _startup
 
@@ -58,6 +84,11 @@ _startup:
 reset_handler:
 
 .section .init0
+                ldr r0, =0x4000000
+                mov r1, #0
+                strh r1, [r0]
+                bl setup_swi
+
                 /* Setup a stack for each mode - note that this only sets up a usable stack
                 for User mode.   Also each mode is setup with interrupts initially disabled. */
                 ldr   r0, = __stack_end

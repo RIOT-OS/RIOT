@@ -4,8 +4,6 @@
 
 #define NUM_CB 3
 
-extern IsrFn isrColor;
-
 typedef struct
 {
     uint16_t mask;
@@ -53,7 +51,7 @@ void init_isr(void)
     GBA_IRF = 0xFFFF;
 
     // set an isr
-    (*(IsrFn * (*))(0x03FFFFFC)) = gba_isr; // isrColor;
+    (*(IsrFn * (*))(GBA_IRQ_ISR)) = gba_isr; // isrColor;
 
     irq_enable();
 }

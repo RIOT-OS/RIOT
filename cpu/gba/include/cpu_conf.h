@@ -124,8 +124,8 @@ extern "C"
 /** @} */
 
 /**
- * @brief   The CPU has 4 blocks of SRAM at different addresses.
- *          (primary RAM, USB RAM, Ethernet RAM & Backup RAM)
+ * @brief   The CPU has 2 blocks of SRAM at different addresses.
+ *          (primary RAM, EWRAM)
  */
 #define NUM_HEAPS (1)
 
