@@ -18,6 +18,7 @@ NO_AUTO_SRC = 1
 # Default CRYPTO source files                                 #
 #-------------------------------------------------------------#
 SRC +=  error.c \
+        kdf.c \
         hash.c \
         logging.c \
         wc_encrypt.c \

@@ -1,0 +1,26 @@
+From 9b8de27eeee659dcb7c5355418527f3946bd060b Mon Sep 17 00:00:00 2001
+From: Florian Lentz <flolen@uni-bremen.de>
+Date: Wed, 18 Jan 2023 20:19:47 +0100
+Subject: [PATCH] Fix missing include necessary to use gettimeofday() on
+ RIOT-OS
+
+---
+ src/tls13.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/tls13.c b/src/tls13.c
+index 42eb7ffce..af90c217f 100644
+--- a/src/tls13.c
++++ b/src/tls13.c
+@@ -103,7 +103,7 @@
+     #include <errno.h>
+ #endif
+ 
+-#if defined(__MACH__) || defined(__FreeBSD__)
++#if defined(__MACH__) || defined(__FreeBSD__) || defined(WOLFSSL_RIOT_OS)
+ #include <sys/time.h>
+ #endif /* __MACH__ || __FreeBSD__ */
+ 
+-- 
+2.34.1
+

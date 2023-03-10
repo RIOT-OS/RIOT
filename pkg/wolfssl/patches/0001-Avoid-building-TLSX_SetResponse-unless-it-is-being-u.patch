@@ -1,0 +1,67 @@
+From 08a3e2cb6ed10f2210f5dbb8d47b36bf34a84bc3 Mon Sep 17 00:00:00 2001
+From: Kareem <kareem@wolfssl.com>
+Date: Tue, 28 Feb 2023 14:37:45 -0700
+Subject: [PATCH] Avoid building TLSX_SetResponse unless it is being used. 
+ Initialize PIC32 UPDPTR register in all cases.
+
+---
+ src/tls.c                                | 8 +++++++-
+ wolfcrypt/src/port/pic32/pic32mz-crypt.c | 4 ++++
+ 2 files changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/src/tls.c b/src/tls.c
+index 5265a9a67..d5a9f7f56 100644
+--- a/src/tls.c
++++ b/src/tls.c
+@@ -1412,7 +1412,13 @@ int TLSX_HandleUnsupportedExtension(WOLFSSL* ssl)
+ 
+ #endif
+ 
+-#if !defined(NO_WOLFSSL_SERVER) || defined(WOLFSSL_TLS13)
++#if defined(WOLFSSL_TLS13) || (!defined(NO_WOLFSSL_SERVER) \
++    && (defined(WOLFSSL_SRTP) || defined(HAVE_SESSION_TICKET) \
++    || defined(HAVE_SECURE_RENEGOTIATION) || defined(HAVE_SERVER_RENEGOTIATION_INFO) \
++    || defined(HAVE_SUPPORTED_CURVES) || defined(HAVE_CERTIFICATE_STATUS_REQUEST_V2) \
++    || defined(HAVE_CERTIFICATE_STATUS_REQUEST) || defined(HAVE_TRUNCATED_HMAC) \
++    || defined(HAVE_MAX_FRAGMENT) || defined(HAVE_TRUSTED_CA) || defined(HAVE_SNI) \
++    || defined(HAVE_ALPN)))
+ /** Mark an extension to be sent back to the client. */
+ static void TLSX_SetResponse(WOLFSSL* ssl, TLSX_Type type)
+ {
+diff --git a/wolfcrypt/src/port/pic32/pic32mz-crypt.c b/wolfcrypt/src/port/pic32/pic32mz-crypt.c
+index bd70fb517..32cf02ed0 100644
+--- a/wolfcrypt/src/port/pic32/pic32mz-crypt.c
++++ b/wolfcrypt/src/port/pic32/pic32mz-crypt.c
+@@ -89,11 +89,13 @@ static int Pic32Crypto(const byte* pIn, int inLen, word32* pOut, int outLen,
+     bufferDescriptor *bd_p;
+     byte *in_p;
+     byte *out_p;
++    unsigned int *updptrVal_p;
+     word32* dst;
+     word32 padRemain;
+     int timeout = 0xFFFFFF;
+     word32* in = (word32*)pIn;
+     word32* out = pOut;
++    word32 updptrVal = 0;
+     int isDynamic = 0;
+ 
+     /* check args */
+@@ -125,6 +127,7 @@ static int Pic32Crypto(const byte* pIn, int inLen, word32* pOut, int outLen,
+     bd_p = KVA0_TO_KVA1(&bd);
+     out_p= KVA0_TO_KVA1(out);
+     in_p = KVA0_TO_KVA1(in);
++    updptrVal_p = KVA0_TO_KVA1(&updptrVal);
+ 
+     /* Sync cache if in physical memory (not flash) */
+     if (PIC32MZ_IF_RAM(in_p)) {
+@@ -193,6 +196,7 @@ static int Pic32Crypto(const byte* pIn, int inLen, word32* pOut, int outLen,
+         if (in != out)
+             XMEMSET(out_p, 0, outLen); /* clear output buffer */
+         bd_p->DSTADDR = (unsigned int)KVA_TO_PA(out);
++        bd_p->UPDPTR = (unsigned int)KVA_TO_PA(updptrVal_p);
+     }
+     else {
+         /* hashing */
+-- 
+2.39.2
+

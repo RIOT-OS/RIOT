@@ -15,7 +15,7 @@ BOARD = os.environ.get("BOARD", "native")
 TEST_TIMEOUT = 600 if BOARD != 'native' else DEFAULT_TIMEOUT
 # ECDSA 256 takes +30s on samr21-xpro
 # ECDSA 256 takes +40s on nrf51dk
-BENCH_TIMEOUT = 40 if BOARD != 'native' else DEFAULT_TIMEOUT
+BENCH_TIMEOUT = 40 if BOARD != 'native' else 20
 
 
 def _wait_for_test(child):
