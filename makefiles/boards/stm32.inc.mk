@@ -18,17 +18,6 @@ OPENOCD_DEBUG_ADAPTER ?= stlink
 
 JLINK_DEVICE ?= $(CPU_MODEL)
 
-ifeq (dfu-util,$(PROGRAMMER))
-  # optionally, use dfu-util to flash via usb
-  # note: needs a bootloader flashed before, config below is compatible
-  # with blackmagic_dfu, see https://github.com/blacksphere/blackmagic/
-  # To stop bootloader from loading an existing firmware, pull down
-  # (ground) GPIO B1.
-  ifeq (,$(DFU_USB_ID))
-    $(error DFU_USB_ID is not set)
-  endif
-endif
-
 ifeq (stm32flash,$(PROGRAMMER))
   ROM_OFFSET ?= 0x0
   FLASHER = stm32flash
