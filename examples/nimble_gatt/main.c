@@ -75,6 +75,7 @@ static uint16_t _conn_handle;
 static uint16_t _hrs_val_handle;
 
 void make_data_package(void);
+
 uint16_t contador = 15;
 char myarray[16*15];
 
@@ -240,7 +241,7 @@ static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
             .uuid = (ble_uuid_t *)&latest_mesurement_uuid.u,
             .access_cb = send_latest_measurements,
             .val_handle = &_hrs_val_handle,
-            .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_NOTIFY,
+            .flags = BLE_GATT_CHR_F_NOTIFY,
          },
          {
              0, /* No more characteristics in this service */
@@ -259,13 +260,14 @@ static int send_latest_measurements(
     (void)attr_handle;
     (void)arg;
 
-    make_data_package();
+    //make_data_package();
     
     int rc = os_mbuf_append(ctxt->om, myarray, sizeof(myarray));
 
     puts("new service working");
 
-
+    //event_timeout_clear(&_update_timeout_evt);
+    //_hr_update(&_update_evt);
 
     return rc;
 
@@ -432,7 +434,20 @@ static int gatt_svr_chr_access_rw_demo(
 
             float auxf;
             int auxi;
-            uint16_t contador = 15;
+
+            //do_read();
+            for(int i=contador*conta_requisicoes; i < contador*(1+conta_requisicoes); i++){
+                printf("Posicao: %d", i);
+                auxf= (readings_buffer[i].X_axis / AC);
+                memcpy(str_answer + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+                auxf= (readings_buffer[i].Y_axis / AC); 
+                memcpy(str_answer + (3*i+1)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+                auxf= (readings_buffer[i].Z_axis / AC);
+                memcpy(str_answer + (3*i+2)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+                auxi= (readings_buffer[i].timestamp);
+                memcpy(str_answer + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
+                //str_answer[16*i]='\0';
+            }
 
             if((conta_requisicoes >= MAX_READINGS/contador) && /* */
                 conta_requisicoes*contador < (int)rlen )
@@ -445,20 +460,6 @@ static int gatt_svr_chr_access_rw_demo(
             }
 
             printf("reqs = %d %c", conta_requisicoes, 13);
-
-            
-            //do_read();
-            for(int i=contador*conta_requisicoes; i < contador*(1+conta_requisicoes); i++){
-                auxf= (readings_buffer[i].X_axis / AC);
-                memcpy(str_answer + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-                auxf= (readings_buffer[i].Y_axis / AC); 
-                memcpy(str_answer + (3*i+1)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-                auxf= (readings_buffer[i].Z_axis / AC);
-                memcpy(str_answer + (3*i+2)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-                auxi= (readings_buffer[i].timestamp);
-                memcpy(str_answer + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
-                //str_answer[16*i]='\0';
-            }
             //auxi=0;
             //if(auxi==0)
             //printf("Honesty check 0!!\n"); //Prevents compiler optimization from ignoring pointless auxi=0 instruction
@@ -475,10 +476,23 @@ static int gatt_svr_chr_access_rw_demo(
             //printf("Timestamp: %f\n", auxf);
             return rc;
         }
+        else if (ctxt->op == BLE_GATT_ACCESS_OP_READ_CHR && strcmp(rm_demo_write_data, "ri") == 0)
+        {
+            conta_requisicoes = 0;
+            snprintf(str_answer, STR_ANSWER_BUFFER_SIZE,
+                     "Ringbuffer index Reset");
+            puts(str_answer);
+
+            rc = os_mbuf_append(ctxt->om, &str_answer, strlen(str_answer));
+
+            puts("");
+
+            return rc;
+        }
         else
         {
             snprintf(str_answer, STR_ANSWER_BUFFER_SIZE,
-                     "Nope");
+                     "No data available");
             puts(str_answer);
 
             rc = os_mbuf_append(ctxt->om, &str_answer, strlen(str_answer));
@@ -549,9 +563,9 @@ int main(void)
     event_queue_init(&_eq);
     _update_evt.handler = _hr_update;
     event_timeout_ztimer_init(&_update_timeout_evt, ZTIMER_MSEC, &_eq, &_update_evt);
-
-    init_and_run_BLE();
     
+    init_and_run_BLE();
+    event_timeout_set(&_update_timeout_evt, UPDATE_INTERVAL);
     //int cont=0;
     // while (rslt == 0)
     // {
@@ -708,7 +722,7 @@ void init_bmiSensor(void)
 
 static void _start_updating(void)
 {
-    event_timeout_set(&_update_timeout_evt, UPDATE_INTERVAL);
+    //event_timeout_set(&_update_timeout_evt, UPDATE_INTERVAL);
     connected= 1;
     puts("[NOTIFY_ENABLED] heart rate service");
 }
