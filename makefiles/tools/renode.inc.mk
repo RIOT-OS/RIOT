@@ -27,6 +27,11 @@ endif
 RENODE_LOG_LEVEL ?= 2  # Warning level
 RENODE_CONFIG_FLAGS += -e "logLevel $(RENODE_LOG_LEVEL)"
 
+# Configure renode telnet port to allow sending command to the monitor while
+# the emulator is running (used to send reset command)
+RENODE_TELNET_PORT ?= 1234
+RENODE_CONFIG_FLAGS += -P $(RENODE_TELNET_PORT)
+
 # Renode GUI
 RENODE_SHOW_GUI ?= 0
 ifneq (1,$(RENODE_SHOW_GUI))
@@ -61,6 +66,9 @@ DEBUGSERVER_FLAGS ?= $(RENODE_DEBUG_FLAGS)
 
 DEBUGGER_FLAGS ?= $(BOARD) $(APPDIR) $(DEBUG_ELFFILE) $(GDB_REMOTE) $(EMULATOR_TMP_DIR) "-ex \"monitor start\""
 DEBUGGER ?= $(RIOTTOOLS)/emulator/debug.sh
+
+RESET ?= bash
+RESET_FLAGS ?= -c "{ sleep 0.2;echo machine RequestReset; } | telnet localhost $(RENODE_TELNET_PORT)" || true
 
 # No flasher available with renode emulator
 FLASHER ?=
