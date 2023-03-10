@@ -45,7 +45,9 @@ static int _get(usbdev_t *usbdev, usbopt_t opt, void *value, size_t max_len);
 static int _set(usbdev_t *usbdev, usbopt_t opt, const void *value, size_t value_len);
 static usbdev_ep_t *_new_ep(usbdev_t *dev, usb_ep_type_t type, usb_ep_dir_t dir, size_t len);
 static void _esr(usbdev_t *usbdev);
+static void _ep0_stall(usbdev_t *usbdev);
 static void _ep_init(usbdev_ep_t *ep);
+static void _ep_stall(usbdev_ep_t *ep, bool enable);
 static int _ep_get(usbdev_ep_t *ep, usbopt_ep_t opt, void *value, size_t max_len);
 static int _ep_set(usbdev_ep_t *ep, usbopt_ep_t opt, const void *value, size_t value_len);
 static int _ep_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len);
@@ -57,7 +59,9 @@ static const usbdev_driver_t _driver = {
     .get = _get,
     .set = _set,
     .esr = _esr,
+    .ep0_stall = _ep0_stall,
     .ep_init = _ep_init,
+    .ep_stall = _ep_stall,
     .ep_get = _ep_get,
     .ep_set = _ep_set,
     .ep_esr = _ep_esr,
@@ -177,6 +181,8 @@ static void _ep_disable(usbdev_ep_t *ep)
 
 static void _ep_set_stall(usbdev_ep_t *ep, usbopt_enable_t enable)
 {
+    assert(ep->num != 0);
+
     /* TODO: validate size */
     nrfusb_t *usbdev = (nrfusb_t *)ep->dev;
     uint32_t val = (ep->num & USBD_EPSTALL_EP_Msk) |
@@ -184,6 +190,12 @@ static void _ep_set_stall(usbdev_ep_t *ep, usbopt_enable_t enable)
                    (enable ? USBD_EPSTALL_STALL_Msk : 0);
 
     usbdev->device->EPSTALL = val;
+}
+
+static void _ep_stall(usbdev_ep_t *ep, bool enable)
+{
+    /* quick wrapper */
+    _ep_set_stall(ep, (usbopt_enable_t)enable);
 }
 
 static usbopt_enable_t _ep_get_stall(usbdev_ep_t *ep)
@@ -388,6 +400,13 @@ static void _ep_disable_irq(usbdev_ep_t *ep)
             usbdev->device->INTENCLR = USBD_INTENCLR_EP0SETUP_Msk;
         }
     }
+}
+
+static void _ep0_stall(usbdev_t *dev)
+{
+    nrfusb_t *usbdev = (nrfusb_t*)dev;
+    /* Stalls both OUT and IN */
+    usbdev->device->TASKS_EP0STALL = 1;
 }
 
 static void _ep_init(usbdev_ep_t *ep)

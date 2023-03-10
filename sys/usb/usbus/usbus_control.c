@@ -277,10 +277,8 @@ static void _recv_setup(usbus_t *usbus, usbus_control_handler_t *handler)
         }
     }
     if (res < 0) {
-        /* Signal stall to indicate unsupported (USB 2.0 spec 9.6.2 */
-        static const usbopt_enable_t enable = USBOPT_ENABLE;
-        usbdev_ep_set(handler->in, USBOPT_EP_STALL, &enable,
-                      sizeof(usbopt_enable_t));
+        /* Signal stall to indicate unsupported (USB 2.0 spec 9.6.2) */
+        usbdev_ep0_stall(usbus->dev);
         handler->control_request_state = USBUS_CONTROL_REQUEST_STATE_READY;
     }
     else if (res) {

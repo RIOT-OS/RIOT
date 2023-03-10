@@ -665,6 +665,18 @@ static void _ep_set_stall(usbdev_ep_t *ep, usbopt_enable_t enable)
     EP_REG(ep->num) = reg;
 }
 
+static void _usbdev_ep0_stall(usbdev_t *usbdev)
+{
+    (void)usbdev;
+    _ep_set_stall(&_ep_in[0], true);
+    _ep_set_stall(&_ep_out[0], true);
+}
+
+static void _usbdev_ep_stall(usbdev_ep_t *ep, bool enable)
+{
+    _ep_set_stall(ep, enable);
+}
+
 static int _usbdev_ep_set(usbdev_ep_t *ep, usbopt_ep_t opt,
                           const void *value, size_t value_len)
 {
@@ -773,7 +785,9 @@ const usbdev_driver_t driver = {
     .get = _usbdev_get,
     .set = _usbdev_set,
     .esr = _usbdev_esr,
+    .ep0_stall = _usbdev_ep0_stall,
     .ep_init = _usbdev_ep_init,
+    .ep_stall = _usbdev_ep_stall,
     .ep_get = _usbdev_ep_get,
     .ep_set = _usbdev_ep_set,
     .ep_esr = _usbdev_ep_esr,
