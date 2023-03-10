@@ -160,6 +160,22 @@ extern "C" {
 #endif
 
 /**
+ * @brief   CoAP server work buf size
+ *          Used both for RX and TX, needs to hold payload block + header
+ */
+#ifndef CONFIG_NANOCOAP_SERVER_BUF_SIZE
+#define CONFIG_NANOCOAP_SERVER_BUF_SIZE         ((1 << (CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT + 3)) \
+                                                 + CONFIG_NANOCOAP_URI_MAX + 16)
+#endif
+
+/**
+ * @brief   CoAP server thread stack size
+ */
+#ifndef CONFIG_NANOCOAP_SERVER_STACK_SIZE
+#define CONFIG_NANOCOAP_SERVER_STACK_SIZE       THREAD_STACKSIZE_DEFAULT
+#endif
+
+/**
  * @brief   NanoCoAP socket types
  */
 typedef enum {
@@ -219,6 +235,18 @@ static inline uint16_t nanocoap_sock_next_msg_id(nanocoap_sock_t *sock)
  * @returns     -1 on error
  */
 int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize);
+
+/**
+ * @brief   Create and start the nanoCoAP server thread
+ *
+ * To automatically start the nanoCoAP server on startup, select the
+ * `nanocoap_server_auto_init` module.
+ *
+ * @param[in] local UDP endpoint to bind to
+ *
+ * @return pid of the server thread
+ */
+kernel_pid_t nanocoap_server_start(const sock_udp_ep_t *local);
 
 /**
  * @brief   Create a CoAP client socket
