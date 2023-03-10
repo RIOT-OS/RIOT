@@ -65,7 +65,7 @@
  * 21 bytes per frame. Additional 40 bytes in case sensor time readout is enabled */
 #define FIFO_SIZE	250
 
-#define UPDATE_INTERVAL         (100U)
+#define UPDATE_INTERVAL         (1000U)
 
 static event_queue_t _eq;
 static event_t _update_evt;
@@ -495,6 +495,7 @@ static int gatt_svr_chr_access_rw_demo(
 }
 
 static int auxi2 = 0;
+bool connected = FALSE; 
 
 static void _hr_update(event_t *e)
 {
@@ -520,13 +521,15 @@ static void _hr_update(event_t *e)
         memcpy(myarray2 + (3*i+2)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
         auxi= (readings_buffer[i].timestamp);
         memcpy(myarray2 + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
-
-    /* send data notification to GATT client */
-    om = ble_hs_mbuf_from_flat(myarray2, sizeof(myarray2));
-    assert(om != NULL);
-    int res = ble_gattc_notify_custom(_conn_handle, _hrs_val_handle, om);
-    assert(res == 0);
-    (void)res;
+    
+    if(connected){
+        /* send data notification to GATT client */
+        om = ble_hs_mbuf_from_flat(myarray2, sizeof(myarray2));
+        assert(om != NULL);
+        int res = ble_gattc_notify_custom(_conn_handle, _hrs_val_handle, om);
+        assert(res == 0);
+        (void)res;
+    }
 
     auxi = myarray2[12] + (myarray2[13] <<8) + (myarray2[14] <<16) + (myarray2[15] <<24); //VERY SENSIBLE BIT SHIFT OPERATION
     printf("[NOTIFY] Latest measurement: %d \n %c", auxi - auxi2, 13);
@@ -706,12 +709,14 @@ void init_bmiSensor(void)
 static void _start_updating(void)
 {
     event_timeout_set(&_update_timeout_evt, UPDATE_INTERVAL);
+    connected= TRUE;
     puts("[NOTIFY_ENABLED] heart rate service");
 }
 
 static void _stop_updating(void)
 {
-    event_timeout_clear(&_update_timeout_evt);
+    //event_timeout_clear(&_update_timeout_evt);
+    connected = FALSE;
     puts("[NOTIFY_DISABLED] heart rate service");
 }
 

@@ -17,7 +17,7 @@ USEMODULE += nimble_svc_gatt
 
 # Use automated advertising
 USEMODULE += nimble_autoadv
-CFLAGS += -DNIMBLE_AUTOADV_DEVICE_NAME='"NimBLE GATT Example"'
+CFLAGS += -DNIMBLE_AUTOADV_DEVICE_NAME='"BELKA 7985"'
 CFLAGS += -DNIMBLE_AUTOADV_START_MANUALLY=1
 
 SENSORS += accelerometer
