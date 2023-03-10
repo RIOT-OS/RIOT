@@ -436,17 +436,16 @@ static int gatt_svr_chr_access_rw_demo(
             int auxi;
 
             //do_read();
-            for(int i=contador*conta_requisicoes; i < contador*(1+conta_requisicoes); i++){
-                printf("Posicao: %d", i);
+            for(int i=contador*conta_requisicoes, j=0; i < contador*(1+conta_requisicoes) && j< contador; i++, j++){
+                printf("Posicao: %d \n", i);
                 auxf= (readings_buffer[i].X_axis / AC);
-                memcpy(str_answer + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+                memcpy(str_answer + ( 3*j )*sizeof(float) + j*sizeof(int), &auxf, sizeof(float));
                 auxf= (readings_buffer[i].Y_axis / AC); 
-                memcpy(str_answer + (3*i+1)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+                memcpy(str_answer + (3*j+1)*sizeof(float) + j*sizeof(int), &auxf, sizeof(float));
                 auxf= (readings_buffer[i].Z_axis / AC);
-                memcpy(str_answer + (3*i+2)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+                memcpy(str_answer + (3*j+2)*sizeof(float) + j*sizeof(int), &auxf, sizeof(float));
                 auxi= (readings_buffer[i].timestamp);
-                memcpy(str_answer + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
-                //str_answer[16*i]='\0';
+                memcpy(str_answer + (3*j+3)*sizeof(float) + j*sizeof(int), &auxi, sizeof(int));
             }
 
             if((conta_requisicoes >= MAX_READINGS/contador) && /* */
@@ -456,10 +455,11 @@ static int gatt_svr_chr_access_rw_demo(
             }
             else
             {
-                conta_requisicoes++;
+                conta_requisicoes+=1;
+                printf("Posicao: %d \n", conta_requisicoes);
             }
 
-            printf("reqs = %d %c", conta_requisicoes, 13);
+            printf("reqs = %d \n", conta_requisicoes);
             //auxi=0;
             //if(auxi==0)
             //printf("Honesty check 0!!\n"); //Prevents compiler optimization from ignoring pointless auxi=0 instruction
