@@ -40,6 +40,7 @@
 #endif
 
 #ifdef MODULE_PERIPH_GPIO
+#include "board.h"
 #include "periph/gpio.h"
 #endif
 
