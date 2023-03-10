@@ -339,9 +339,11 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
     /* Create required endpoints */
     msc->ep_in = usbus_add_endpoint(usbus, &msc->iface, USB_EP_TYPE_BULK,
                                     USB_EP_DIR_IN, CONFIG_USBUS_EP0_SIZE);
+    assert(msc->ep_in);
     msc->ep_in->interval = 0;
     msc->ep_out = usbus_add_endpoint(usbus, &msc->iface, USB_EP_TYPE_BULK,
                                      USB_EP_DIR_OUT, CONFIG_USBUS_EP0_SIZE);
+    assert(msc->ep_out);
     msc->ep_out->interval = 0;
 
     /* Add interfaces to the stack */
