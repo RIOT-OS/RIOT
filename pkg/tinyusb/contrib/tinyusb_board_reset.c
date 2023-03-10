@@ -8,6 +8,8 @@
 
 #if MODULE_TINYUSB_DEVICE && MODULE_TINYUSB_CLASS_CDC && MODULE_USB_BOARD_RESET
 
+#define USB_H_USER_IS_RIOT_INTERNAL
+
 #include "usb_board_reset_internal.h"
 #include "class/cdc/cdc.h"
 
