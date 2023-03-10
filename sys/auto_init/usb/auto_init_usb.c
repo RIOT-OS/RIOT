@@ -27,6 +27,7 @@
 #include <assert.h>
 
 #include "usb/usbus.h"
+#include "usb/usbus/control.h"
 
 #ifdef MODULE_USBUS_CDC_ECM
 #include "usb/usbus/cdc/ecm.h"
@@ -39,10 +40,51 @@ usbus_cdcecm_device_t cdcecm;
 #include "usb/usbus/dfu.h"
 static usbus_dfu_device_t dfu;
 #endif
+#ifdef MODULE_USBUS_HID
+#include "usb/usbus/hid.h"
+#endif
 #ifdef MODULE_USBUS_MSC
 #include "usb/usbus/msc.h"
 static usbus_msc_device_t msc;
 #endif
+
+#ifndef MODULE_USBUS_CDC_ACM
+#define USBUS_CDC_ACM_EP_IN_REQUIRED_NUMOF  0
+#define USBUS_CDC_ACM_EP_OUT_REQUIRED_NUMOF 0
+#endif
+
+#ifndef MODULE_USBUS_CDC_ECM
+#define USBUS_CDC_ECM_EP_IN_REQUIRED_NUMOF  0
+#define USBUS_CDC_ECM_EP_OUT_REQUIRED_NUMOF 0
+#endif
+
+#ifndef MODULE_USBUS_HID
+#define USBUS_HID_EP_IN_REQUIRED_NUMOF      0
+#define USBUS_HID_EP_OUT_REQUIRED_NUMOF     0
+#endif
+
+#ifndef MODULE_USBUS_MSC
+#define USBUS_MSC_EP_IN_REQUIRED_NUMOF      0
+#define USBUS_MSC_EP_OUT_REQUIRED_NUMOF     0
+#endif
+
+#define USBUS_EP_IN_REQUIRED_NUMOF  (USBUS_CONTROL_EP_IN_REQUIRED_NUMOF + \
+                                     USBUS_CDC_ACM_EP_IN_REQUIRED_NUMOF + \
+                                     USBUS_CDC_ECM_EP_IN_REQUIRED_NUMOF + \
+                                     USBUS_HID_EP_IN_REQUIRED_NUMOF + \
+                                     USBUS_MSC_EP_IN_REQUIRED_NUMOF)
+
+#define USBUS_EP_OUT_REQUIRED_NUMOF (USBUS_CONTROL_EP_OUT_REQUIRED_NUMOF + \
+                                     USBUS_CDC_ACM_EP_OUT_REQUIRED_NUMOF + \
+                                     USBUS_CDC_ECM_EP_OUT_REQUIRED_NUMOF + \
+                                     USBUS_HID_EP_OUT_REQUIRED_NUMOF + \
+                                     USBUS_MSC_EP_OUT_REQUIRED_NUMOF)
+
+static_assert(USBUS_EP_IN_REQUIRED_NUMOF <= USBDEV_NUM_ENDPOINTS,
+              "Number of required IN endpoints exceeded");
+
+static_assert(USBUS_EP_OUT_REQUIRED_NUMOF <= USBDEV_NUM_ENDPOINTS,
+              "Number of required OUT endpoints exceeded");
 
 static char _stack[USBUS_STACKSIZE];
 static usbus_t usbus;
