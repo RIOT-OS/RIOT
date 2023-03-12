@@ -451,7 +451,7 @@ static void _set_address(dwc2_usb_otg_fshs_t *usbdev, uint8_t address)
 static usbdev_ep_t *_get_ep(dwc2_usb_otg_fshs_t *usbdev, unsigned num,
                             usb_ep_dir_t dir)
 {
-    if (num >= DWC2_USB_OTG_FS_NUM_EP) {
+    if (num >= _max_endpoints(usbdev->config)) {
         return NULL;
     }
     return dir == USB_EP_DIR_IN ? &usbdev->in[num] : &usbdev->out[num].ep;
@@ -532,7 +532,7 @@ static usbdev_ep_t *_usbdev_new_ep(usbdev_t *dev, usb_ep_type_t type,
     }
     else {
         /* Find the first unassigned ep with matching direction */
-        for (unsigned idx = 1; idx < DWC2_USB_OTG_FS_NUM_EP && !ep; idx++) {
+        for (unsigned idx = 1; idx < _max_endpoints(usbdev->config) && !ep; idx++) {
             usbdev_ep_t *candidate_ep = _get_ep(usbdev, idx, dir);
             if (candidate_ep->type == USB_EP_TYPE_NONE) {
                 ep = candidate_ep;
