@@ -74,7 +74,7 @@ static event_timeout_t _update_timeout_evt;
 static uint16_t _conn_handle;
 static uint16_t _hrs_val_handle;
 
-void make_data_package(void);
+void make_data_package(uint16_t index);
 
 uint16_t contador = 15;
 char myarray[16*15];
@@ -273,21 +273,50 @@ static int send_latest_measurements(
 
 }
 
-void make_data_package(void)
+void make_data_package(uint16_t index)
+{
+    int auxi;
+    float auxf;
+
+        auxf= (readings_buffer[index].X_axis / AC);
+        memcpy(myarray, &auxf, sizeof(float));
+        auxf= (readings_buffer[index].Y_axis / AC); 
+        memcpy(myarray + sizeof(float) , &auxf, sizeof(float));
+        auxf= (readings_buffer[index].Z_axis / AC);
+        memcpy(myarray + (2)*sizeof(float), &auxf, sizeof(float));
+        auxi= (readings_buffer[index].timestamp);
+        memcpy(myarray + (+3)*sizeof(float), &auxi, sizeof(int));
+    }
+
+
+void make_dump_package(int initial_index)
 {
     int auxi;
     float auxf;
 
     for(int i=0; i < contador; i++)
     {
-        auxf= (readings_buffer[i].X_axis / AC);
-        memcpy(myarray + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-        auxf= (readings_buffer[i].Y_axis / AC); 
-        memcpy(myarray + (3*i+1)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-        auxf= (readings_buffer[i].Z_axis / AC);
-        memcpy(myarray + (3*i+2)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-        auxi= (readings_buffer[i].timestamp);
-        memcpy(myarray + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
+        if (i+initial_index <= MAX_READINGS -1)
+        {
+            auxf= (readings_buffer[i+initial_index].X_axis / AC);
+            memcpy(myarray + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+            auxf= (readings_buffer[i+initial_index].Y_axis / AC); 
+            memcpy(myarray + (3*i+1)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+            auxf= (readings_buffer[i+initial_index].Z_axis / AC);
+            memcpy(myarray + (3*i+2)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+            auxi= (readings_buffer[i+initial_index].timestamp);
+            memcpy(myarray + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
+        }
+        else{
+            auxf= (readings_buffer[i].X_axis / AC);
+            memcpy(myarray + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+            auxf= (readings_buffer[i].Y_axis / AC); 
+            memcpy(myarray + (3*i+1)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+            auxf= (readings_buffer[i].Z_axis / AC);
+            memcpy(myarray + (3*i+2)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+            auxi= (readings_buffer[i].timestamp);
+            memcpy(myarray + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
+        }
     }
 }
 
@@ -415,38 +444,7 @@ static int gatt_svr_chr_access_rw_demo(
         if (ctxt->op == BLE_GATT_ACCESS_OP_READ_CHR && strcmp(rm_demo_write_data, "oi") == 0)
         {
 
-            //snprintf(str_answer, STR_ANSWER_BUFFER_SIZE,
-              //       "Hello World!"); // A crude way to display a command recognition
-           // puts(str_answer);
-            
-            //do_read();
-///
-            //char bufferk[10]; 
-            //printf("passou por aqui1\n %c", 13);
-            //snprintf(str_answer, STR_ANSWER_BUFFER_SIZE, "%c", (char)(accel_data[1].x / AC));
-            //printf("passou por aqui2\n %c", 13);
-
-            //printf("%d \n %c", 13, lenki);
-            
-            //snprintf(str_answer, STR_ANSWER_BUFFER_SIZE,
-            //         bufferk); // A crude way to display a command recognition
-            //puts(str_answer);
-
-            float auxf;
-            int auxi;
-
-            //do_read();
-            for(int i=contador*conta_requisicoes, j=0; i < contador*(1+conta_requisicoes) && j< contador; i++, j++){
-                printf("Posicao: %d \n", i);
-                auxf= (readings_buffer[i].X_axis / AC);
-                memcpy(str_answer + ( 3*j )*sizeof(float) + j*sizeof(int), &auxf, sizeof(float));
-                auxf= (readings_buffer[i].Y_axis / AC); 
-                memcpy(str_answer + (3*j+1)*sizeof(float) + j*sizeof(int), &auxf, sizeof(float));
-                auxf= (readings_buffer[i].Z_axis / AC);
-                memcpy(str_answer + (3*j+2)*sizeof(float) + j*sizeof(int), &auxf, sizeof(float));
-                auxi= (readings_buffer[i].timestamp);
-                memcpy(str_answer + (3*j+3)*sizeof(float) + j*sizeof(int), &auxi, sizeof(int));
-            }
+            make_dump_package(contador*conta_requisicoes);
 
             if((conta_requisicoes >= MAX_READINGS/contador) && /* */
                 conta_requisicoes*contador < (int)rlen )
@@ -459,21 +457,10 @@ static int gatt_svr_chr_access_rw_demo(
                 printf("Posicao: %d \n", conta_requisicoes);
             }
 
-            printf("reqs = %d \n", conta_requisicoes);
-            //auxi=0;
-            //if(auxi==0)
-            //printf("Honesty check 0!!\n"); //Prevents compiler optimization from ignoring pointless auxi=0 instruction
+            printf("reqs = %d \n", conta_requisicoes);           
 
-            //rc = os_mbuf_append(ctxt->om, &rm_demo_write_data, strlen(rm_demo_write_data));
             rc = os_mbuf_append(ctxt->om, &str_answer, contador*(3*sizeof(float)+sizeof(int)));
             
-            //printf("Sent: %s\n %c", str_answer, 13); //This might never look pretty
-
-            //printf("SIze: %d\n %c", strlen(str_answer), 13); //TODO: find something that really sends the adequate size of what is sent
-            /*strlen will not work with this array, since it has the posssibility of multiple terminators '\0'
-             nor will sizeof work, since it only returns the array's full size sizeof(char)*lenght */
-            //auxi = str_answer[12] + (str_answer[13] <<8) + (str_answer[14] <<16) + (str_answer[15] <<24); //VERY SENSIBLE BIT SHIFT OPERATION
-            //printf("Timestamp: %f\n", auxf);
             return rc;
         }
         else if (ctxt->op == BLE_GATT_ACCESS_OP_READ_CHR && strcmp(rm_demo_write_data, "ri") == 0)
@@ -523,18 +510,7 @@ static void _hr_update(event_t *e)
     log_readings();
 
     int auxi;
-
-    float auxf;
-
-    int i=0;
-        auxf= (readings_buffer[i].X_axis / AC);
-        memcpy(myarray2 + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-        auxf= (readings_buffer[i].Y_axis / AC); 
-        memcpy(myarray2 + (3*i+1)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-        auxf= (readings_buffer[i].Z_axis / AC);
-        memcpy(myarray2 + (3*i+2)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-        auxi= (readings_buffer[i].timestamp);
-        memcpy(myarray2 + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
+    make_data_package((uint16_t)0);   
     
     if(connected){
         /* send data notification to GATT client */
@@ -566,17 +542,7 @@ int main(void)
     
     init_and_run_BLE();
     event_timeout_set(&_update_timeout_evt, UPDATE_INTERVAL);
-    //int cont=0;
-    // while (rslt == 0)
-    // {
-    //     /* Wait for 100ms for the FIFO to fill */
-    //     user_delay(10);
-    //     acquire_ACC_Values();
-        
-    //     //printf("teste\n");
-    //     read_and_show_Acc_values();
-    //     //cont++;
-    // }
+
 
     /* run an event loop for handling the heart rate update events */
     event_loop(&_eq);
@@ -622,16 +588,6 @@ void log_readings(void)
         printf("Acc_z: %f ", ((float)readings_buffer[i].Z_axis)/ AC);
         printf("Acc_timeStamp: %d ", (readings_buffer[i].timestamp));
         printf("\n %c", 13);
-   // }
-    //#else
-    /*for (size_t i = 0; i < ACC_FRAMES; i++) {
-        printf("[Acc_readings] readings_buffer[%d]: ", i);
-        printf("Acc_x: %f ", ((float)readings_buffer[i].X_axis)/ AC);
-        printf("Acc_y: %f ", ((float)readings_buffer[i].Y_axis)/ AC);
-        printf("Acc_z: %f ", ((float)readings_buffer[i].Z_axis)/ AC);
-        printf("\n %c", 13);
-    }*/
-    //#endif
 }
 void read_and_show_Acc_values(void)
 {
