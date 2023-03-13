@@ -267,7 +267,12 @@ static inline void irq_handler(tim_t tim)
 {
     uint32_t top = dev(tim)->ARR;
     uint32_t status = dev(tim)->SR & dev(tim)->DIER;
-    dev(tim)->SR = 0;
+
+    /* clear interrupts which we are about to service */
+    /* Note, the flags in the SR register can be cleared by software, but
+     * setting them has no effect on the register. Only the hardware can set
+     * them. */
+    dev(tim)->SR = ~status;
 
     for (unsigned int i = 0; status; i++) {
         uint32_t msk = TIM_SR_CC1IF << i;
