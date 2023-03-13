@@ -14,14 +14,16 @@ extern crate rust_riotmodules;
 
 riot_main!(main);
 
-fn main() {
+fn main(tokens: riot_wrappers::thread::StartToken) -> ! {
     extern "C" {
         fn do_vfs_init();
     }
 
     unsafe { do_vfs_init() };
 
-    let handler = coap_message_demos::full_application_tree(None)
+    let mainlog = coap_message_demos::log::Log::start_once();
+
+    let handler = coap_message_demos::full_application_tree(Some(mainlog))
         .below(&["ps"], riot_coap_handler_demos::ps::ps_tree())
         .below(&["vfs"], riot_coap_handler_demos::vfs::vfs("/const"))
         .with_wkc()
@@ -34,8 +36,12 @@ fn main() {
         greg.register(&mut listener);
 
         println!("CoAP server ready; waiting for interfaces to settle before reporting addresses...");
+        // This goes into the /log resource
+        log::info!("CoAP server is ready.");
 
-        let sectimer = ztimer::Clock::sec();
+        // Packing the clock for a single sleep doesn't save measurable runtime; this would be more
+        // relevant if sleep were repeated.
+        let sectimer = tokens.in_thread().promote(ztimer::Clock::sec());
         sectimer.sleep_ticks(2);
 
         for netif in gnrc::Netif::all() {
