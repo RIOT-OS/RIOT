@@ -58,6 +58,14 @@ static candev_mcp2515_t mcp2515_dev;
 static isrpipe_t rxbuf;
 static uint8_t rx_ringbuf[RX_RINGBUFFER_SIZE];
 
+#define CAN_RX_FILTER_FORMAT_EXT    0x1
+#define CAN_RX_FILTER_FORMAT_STD    0x0
+#define CAN_RX_FILTER_MASK_EXT      0x1FFFFFFF
+#define CAN_RX_FILTER_MASK_STD      0x7FF
+#define CAN_RX_FILTER_ID_T1         0x001
+#define CAN_RX_FILTER_ID_T2         0x0C11FFFF
+#define CAN_RX_FILTER_ID_T3         0x003
+#define CAN_RX_FILTER_ID_T4         0x004
 static candev_t *candev = NULL;
 
 static int _send(int argc, char **argv)
@@ -224,26 +232,31 @@ if (IS_ACTIVE(CONFIG_USE_LOOPBACK_MODE)) {
     if (IS_ACTIVE(MCP2515_RECV_FILTER_EN)) {
         /* CAN filters examples */
         struct can_filter filter[4];
-        filter[0].can_mask = 0x7FF;
-        filter[0].can_id = 0x001;
+        filter[0].can_mask = CAN_RX_FILTER_MASK_STD | (CAN_RX_FILTER_FORMAT_STD << 31);
+        filter[0].can_id = CAN_RX_FILTER_ID_T1 | (CAN_RX_FILTER_FORMAT_STD << 31);
 #if defined(MODULE_MCP2515)
         filter[0].target_mailbox = 0;   /* messages with CAN ID 0x001 will be received in mailbox 0 */
 #endif
-        filter[1].can_mask = 0x7FF;
-        filter[1].can_id = 0x002;
+
+        filter[1].can_mask = CAN_RX_FILTER_MASK_EXT | (CAN_RX_FILTER_FORMAT_EXT << 31);
+        filter[1].can_id = CAN_RX_FILTER_ID_T2 | (CAN_RX_FILTER_FORMAT_EXT << 31);
 #if defined(MODULE_MCP2515)
-        filter[1].target_mailbox = 1;   /* messages with CAN ID 0x002 will be received in mailbox 1 */
+        filter[1].target_mailbox = 1;   /* messages with CAN ID 0x0C11FFFF
+                                            will be received in mailbox 1 */
 #endif
-        filter[2].can_mask = 0x7FF;
-        filter[2].can_id = 0x003;
+
+        filter[2].can_mask = CAN_RX_FILTER_MASK_STD | (CAN_RX_FILTER_FORMAT_STD << 31);
+        filter[2].can_id = CAN_RX_FILTER_ID_T3 | (CAN_RX_FILTER_FORMAT_STD << 31);
 #if defined(MODULE_MCP2515)
         filter[2].target_mailbox = 0;   /* messages with CAN ID 0x003 will be received in mailbox 0 */
 #endif
-        filter[3].can_mask = 0x7FF;
-        filter[3].can_id = 0x004;
+
+        filter[3].can_mask = CAN_RX_FILTER_MASK_STD | (CAN_RX_FILTER_FORMAT_STD << 31);
+        filter[3].can_id = CAN_RX_FILTER_ID_T4 | (CAN_RX_FILTER_FORMAT_STD << 31);
 #if defined(MODULE_MCP2515)
         filter[3].target_mailbox = 0;   /* this filter won't be applied. Reason is no space found in the first mailbox as it supports only two filters */
 #endif
+
         for (uint8_t i = 0; i < 4; i++) {
             candev->driver->set_filter(candev, &filter[i]);
         }

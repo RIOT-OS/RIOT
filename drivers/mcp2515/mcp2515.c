@@ -396,9 +396,11 @@ int mcp2515_set_filter(candev_mcp2515_t *dev, int filter_id, uint32_t filter)
     uint8_t reg;
 
     if ((filter & CAN_EFF_FLAG) == CAN_EFF_FLAG) {
+        DEBUG_PUTS("mcp2515 set filter: extended CAN filter");
         _fill_extended_id(filter, buf);
     }
     else {
+        DEBUG_PUTS("mcp2515 set filter: standard CAN filter");
         _fill_standard_id(filter, buf);
     }
     if (filter_id < 3) {
@@ -415,9 +417,11 @@ int mcp2515_set_mask(candev_mcp2515_t *dev, int mailbox, uint32_t mask)
     uint8_t buf[4];
 
     if ((mask & CAN_EFF_FLAG) == CAN_EFF_FLAG) {
+        DEBUG_PUTS("mcp2515 set mask: extended CAN mask");
         _fill_extended_id(mask, buf);
     }
     else {
+        DEBUG_PUTS("mcp2515 set mask: standard CAN mask");
         _fill_standard_id(mask, buf);
     }
     return mcp2515_spi_write(dev, MCP2515_RXM0SIDH + (mailbox << 2), buf, 4);

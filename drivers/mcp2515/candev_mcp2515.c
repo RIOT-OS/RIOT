@@ -444,13 +444,6 @@ static int _set_filter(candev_t *dev, const struct can_filter *filter)
         return -1;
     }
 
-    if ((f.can_id & CAN_EFF_FLAG) == CAN_EFF_FLAG) {
-        f.can_mask &= CAN_EFF_MASK;
-    }
-    else {
-        f.can_mask &= CAN_SFF_MASK;
-    }
-
     /* mask unused */
     if (dev_mcp->masks[f.target_mailbox] == 0) {
         if (mutex_trylock(&_mcp_mutex)) {
