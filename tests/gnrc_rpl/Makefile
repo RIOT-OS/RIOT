@@ -4,10 +4,13 @@ USEMODULE += auto_init_gnrc_netif
 USEMODULE += auto_init_gnrc_rpl
 USEMODULE += gnrc_ipv6_router_default
 USEMODULE += gnrc_icmpv6_echo
+USEMODULE += gnrc_netif_bus
 USEMODULE += gnrc_rpl
 
 USEMODULE += shell
 USEMODULE += shell_cmds_default
+
+DISABLE_MODULE += test_utils_print_stack_usage
 
 ifeq (native, $(BOARD))
   USEMODULE += socket_zep

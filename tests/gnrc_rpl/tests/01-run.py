@@ -90,13 +90,14 @@ def test_linear_topology(factory, zep_dispatch):
     D = nodes[3]
 
     # add prefix to root node
-    A.cmd("nib prefix add 5 2001:db8::/32")
-    A.cmd("ifconfig 5 add 2001:db8::1/32")
+    A.cmd("nib prefix add 5 2001:db8::/64")
+    A.cmd("ifconfig 5 add 2001:db8::1/64")
     A.cmd("rpl root 0 2001:db8::1")
     root_addr = global_addr(A.ifconfig_list())[1]
 
     # wait for the creation of the DODAG
-    time.sleep(10)
+    D.riotctrl.term.expect("uplink ready")
+    time.sleep(5)
 
     # ping root node from last node
     parser = GNRCICMPv6EchoParser()
@@ -137,13 +138,14 @@ def test_alternative_route(factory, zep_dispatch):
     D = nodes[3]
 
     # add prefix to root node
-    A.cmd("nib prefix add 5 2001:db8::/32")
-    A.cmd("ifconfig 5 add 2001:db8::1/32")
+    A.cmd("nib prefix add 5 2001:db8::/64")
+    A.cmd("ifconfig 5 add 2001:db8::1/64")
     A.cmd("rpl root 0 2001:db8::1")
     root_addr = global_addr(A.ifconfig_list())[1]
 
     # wait for the creation of the DODAG
-    time.sleep(10)
+    D.riotctrl.term.expect("uplink ready")
+    time.sleep(5)
 
     # ping root node from last node
     parser = GNRCICMPv6EchoParser()
