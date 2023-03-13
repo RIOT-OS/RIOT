@@ -113,7 +113,7 @@ static void ack_timer_cb(void *arg)
     sx126x_write_buffer(dev, 0x80, ack, IEEE802154_ACK_FRAME_LEN-2);
     sx126x_set_lora_payload_length(dev, IEEE802154_ACK_FRAME_LEN-2);
     _set_state(dev, STATE_TX);
-    dev->ack_filter = true;
+    dev->pending = true;
 }
 
 void sx126x_setup(sx126x_t *dev, const sx126x_params_t *params, uint8_t index)
@@ -126,6 +126,7 @@ void sx126x_setup(sx126x_t *dev, const sx126x_params_t *params, uint8_t index)
     dev->ack_timer.arg = dev;
     dev->ack_timer.callback = ack_timer_cb;
     dev->ack_filter = false;
+    dev->pending = false;
 
 }
 
@@ -258,13 +259,13 @@ void sx126x_hal_task_handler(ieee802154_dev_t *hal)
     if (sx126x_is_stm32wl(dev)) {
 
     if (irq_mask & SX126X_IRQ_TX_DONE) {
-        if(dev->ack_filter == false){
+        if(dev->pending == false){
         DEBUG("[sx126x] netdev: SX126X_IRQ_TX_DONE\n");
         ztimer_remove(ZTIMER_USEC, &dev->ack_timer);
         hal->cb(hal, IEEE802154_RADIO_CONFIRM_TX_DONE);
         }
         else {
-            dev->ack_filter = false;
+            dev->pending = false;
             DEBUG("[sx126x] TX ACK done.\n");
             ztimer_remove(ZTIMER_USEC, &dev->ack_timer);
             hal->cb(hal, IEEE802154_RADIO_INDICATION_RX_DONE);
@@ -387,7 +388,7 @@ static int _request_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
     (void)ctx;
     switch (op) {
         case IEEE802154_HAL_OP_TRANSMIT:
-        dev->ack_filter = false;
+        dev->pending = false;
         ieee802154_radio_cca(hal);
         _set_state(dev, STATE_TX);
 
