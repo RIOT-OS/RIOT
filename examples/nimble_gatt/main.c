@@ -74,8 +74,6 @@ static event_timeout_t _update_timeout_evt;
 static uint16_t _conn_handle;
 static uint16_t _hrs_val_handle;
 
-void make_data_package(uint16_t index);
-
 uint16_t contador = 15;
 char myarray[16*15];
 
@@ -119,6 +117,9 @@ void do_read(void);
 void log_readings(void);
 void read_and_show_Acc_values(void);
 void acquire_ACC_Values(void);
+static void _hr_update(event_t *e);
+void make_data_package(uint16_t index);
+void make_dump_package(int initial_index);
 
 int dev = I2C_DEV(0);
 
@@ -252,95 +253,6 @@ static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
     },
 };
 
-static int send_latest_measurements(
-    uint16_t conn_handle, uint16_t attr_handle,
-    struct ble_gatt_access_ctxt *ctxt, void *arg)
-{
-    (void)conn_handle;
-    (void)attr_handle;
-    (void)arg;
-
-    //make_data_package();
-    
-    int rc = os_mbuf_append(ctxt->om, myarray, sizeof(myarray));
-
-    puts("new service working");
-
-    //event_timeout_clear(&_update_timeout_evt);
-    //_hr_update(&_update_evt);
-
-    return rc;
-
-}
-
-void make_data_package(uint16_t index)
-{
-    int auxi;
-    float auxf;
-
-        auxf= (readings_buffer[index].X_axis / AC);
-        memcpy(myarray, &auxf, sizeof(float));
-        auxf= (readings_buffer[index].Y_axis / AC); 
-        memcpy(myarray + sizeof(float) , &auxf, sizeof(float));
-        auxf= (readings_buffer[index].Z_axis / AC);
-        memcpy(myarray + (2)*sizeof(float), &auxf, sizeof(float));
-        auxi= (readings_buffer[index].timestamp);
-        memcpy(myarray + (+3)*sizeof(float), &auxi, sizeof(int));
-    }
-
-
-void make_dump_package(int initial_index)
-{
-    int auxi;
-    float auxf;
-
-    for(int i=0; i < contador; i++)
-    {
-        if (i+initial_index <= MAX_READINGS -1)
-        {
-            auxf= (readings_buffer[i+initial_index].X_axis / AC);
-            memcpy(myarray + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-            auxf= (readings_buffer[i+initial_index].Y_axis / AC); 
-            memcpy(myarray + (3*i+1)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-            auxf= (readings_buffer[i+initial_index].Z_axis / AC);
-            memcpy(myarray + (3*i+2)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-            auxi= (readings_buffer[i+initial_index].timestamp);
-            memcpy(myarray + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
-        }
-        else{
-            auxf= (readings_buffer[i].X_axis / AC);
-            memcpy(myarray + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-            auxf= (readings_buffer[i].Y_axis / AC); 
-            memcpy(myarray + (3*i+1)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-            auxf= (readings_buffer[i].Z_axis / AC);
-            memcpy(myarray + (3*i+2)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-            auxi= (readings_buffer[i].timestamp);
-            memcpy(myarray + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
-        }
-    }
-}
-
-static int gatt_svr_chr_access_device_info_manufacturer(
-    uint16_t conn_handle, uint16_t attr_handle,
-    struct ble_gatt_access_ctxt *ctxt, void *arg)
-{
-    puts("service 'device info: manufacturer' callback triggered");
-
-    (void)conn_handle;
-    (void)attr_handle;
-    (void)arg;
-
-    snprintf(str_answer, STR_ANSWER_BUFFER_SIZE,
-             "This is RIOT! (Version: %s)\n %c", RIOT_VERSION, 13); /*THIS %c = 13 IS JUST A MANUAL CARRIGE RETURN, NOT ALL TERMINALS DO IT AUTOMATICALLY*/
-    puts(str_answer);
-
-    int rc = os_mbuf_append(ctxt->om, str_answer, strlen(str_answer));
-
-    puts("");
-
-    return rc;
-}
-
 static int gatt_svr_chr_access_device_info_model(
     uint16_t conn_handle, uint16_t attr_handle,
     struct ble_gatt_access_ctxt *ctxt, void *arg)
@@ -446,7 +358,7 @@ static int gatt_svr_chr_access_rw_demo(
 
             make_dump_package(contador*conta_requisicoes);
 
-            if((conta_requisicoes >= MAX_READINGS/contador) && /* */
+            if((conta_requisicoes >= MAX_READINGS/contador) &&
                 conta_requisicoes*contador < (int)rlen )
             {
                 conta_requisicoes=0;
@@ -497,36 +409,6 @@ static int gatt_svr_chr_access_rw_demo(
 
 static int auxi2 = 0;
 bool connected = 0; 
-
-static void _hr_update(event_t *e)
-{
-    (void)e;
-    struct os_mbuf *om;
-    char myarray2[16];
-
-    /* from here, we code the event */
-    acquire_ACC_Values();
-    do_read();
-    log_readings();
-
-    int auxi;
-    make_data_package((uint16_t)0);   
-    
-    if(connected){
-        /* send data notification to GATT client */
-        om = ble_hs_mbuf_from_flat(myarray2, sizeof(myarray2));
-        assert(om != NULL);
-        int res = ble_gattc_notify_custom(_conn_handle, _hrs_val_handle, om);
-        assert(res == 0);
-        (void)res;
-    }
-
-    auxi = myarray2[12] + (myarray2[13] <<8) + (myarray2[14] <<16) + (myarray2[15] <<24); //VERY SENSIBLE BIT SHIFT OPERATION
-    printf("[NOTIFY] Latest measurement: %d \n %c", auxi - auxi2, 13);
-    auxi2 = auxi;
-    /* schedule next update event */
-    event_timeout_set(&_update_timeout_evt, UPDATE_INTERVAL);
-}
 
 int main(void)
 {
@@ -786,4 +668,121 @@ void acquire_ACC_Values(void){
         printf("Error extracting accel data - %d\n %c", rslt, 13);
         return;
     }
+}
+
+static void _hr_update(event_t *e)
+{
+    (void)e;
+    struct os_mbuf *om;
+    char myarray2[16];
+
+    /* from here, we code the event */
+    acquire_ACC_Values();
+    do_read();
+
+    int auxi;
+    make_data_package((uint16_t)0);   
+    
+    if(connected){
+        /* send data notification to GATT client */
+        om = ble_hs_mbuf_from_flat(myarray2, sizeof(myarray2));
+        assert(om != NULL);
+        int res = ble_gattc_notify_custom(_conn_handle, _hrs_val_handle, om);
+        assert(res == 0);
+        (void)res;
+    }
+
+    auxi = myarray2[12] + (myarray2[13] <<8) + (myarray2[14] <<16) + (myarray2[15] <<24); //VERY SENSIBLE BIT SHIFT OPERATION
+    printf("[NOTIFY] Latest measurement: %d \n %c", auxi - auxi2, 13);
+    auxi2 = auxi;
+    /* schedule next update event */
+    event_timeout_set(&_update_timeout_evt, UPDATE_INTERVAL);
+}
+
+void make_data_package(uint16_t index)
+{
+    int auxi;
+    float auxf;
+
+        auxf= (readings_buffer[index].X_axis / AC);
+        memcpy(myarray, &auxf, sizeof(float));
+        auxf= (readings_buffer[index].Y_axis / AC); 
+        memcpy(myarray + sizeof(float) , &auxf, sizeof(float));
+        auxf= (readings_buffer[index].Z_axis / AC);
+        memcpy(myarray + (2)*sizeof(float), &auxf, sizeof(float));
+        auxi= (readings_buffer[index].timestamp);
+        memcpy(myarray + (+3)*sizeof(float), &auxi, sizeof(int));
+    }
+
+static int gatt_svr_chr_access_device_info_manufacturer(
+    uint16_t conn_handle, uint16_t attr_handle,
+    struct ble_gatt_access_ctxt *ctxt, void *arg)
+{
+    puts("service 'device info: manufacturer' callback triggered");
+
+    (void)conn_handle;
+    (void)attr_handle;
+    (void)arg;
+
+    snprintf(str_answer, STR_ANSWER_BUFFER_SIZE,
+             "This is RIOT! (Version: %s)\n %c", RIOT_VERSION, 13); /*THIS %c = 13 IS JUST A MANUAL CARRIGE RETURN, NOT ALL TERMINALS DO IT AUTOMATICALLY*/
+    puts(str_answer);
+
+    int rc = os_mbuf_append(ctxt->om, str_answer, strlen(str_answer));
+
+    puts("");
+
+    return rc;
+}
+
+void make_dump_package(int initial_index)
+{
+    int auxi;
+    float auxf;
+
+    for(int i=0; i < contador; i++)
+    {
+        if (i+initial_index <= MAX_READINGS -1)
+        {
+            auxf= (readings_buffer[i+initial_index].X_axis / AC);
+            memcpy(myarray + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+            auxf= (readings_buffer[i+initial_index].Y_axis / AC); 
+            memcpy(myarray + (3*i+1)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+            auxf= (readings_buffer[i+initial_index].Z_axis / AC);
+            memcpy(myarray + (3*i+2)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+            auxi= (readings_buffer[i+initial_index].timestamp);
+            memcpy(myarray + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
+        }
+        else{
+            auxf= (readings_buffer[i].X_axis / AC);
+            memcpy(myarray + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+            auxf= (readings_buffer[i].Y_axis / AC); 
+            memcpy(myarray + (3*i+1)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+            auxf= (readings_buffer[i].Z_axis / AC);
+            memcpy(myarray + (3*i+2)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+            auxi= (readings_buffer[i].timestamp);
+            memcpy(myarray + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
+        }
+    }
+}
+
+static int send_latest_measurements(
+    uint16_t conn_handle, uint16_t attr_handle,
+    struct ble_gatt_access_ctxt *ctxt, void *arg)
+{
+    (void)conn_handle;
+    (void)attr_handle;
+    (void)arg;
+
+    //make_data_package();
+    
+    int rc = os_mbuf_append(ctxt->om, myarray, sizeof(myarray));
+
+    puts("new service working");
+
+    //event_timeout_clear(&_update_timeout_evt);
+    //_hr_update(&_update_evt);
+
+    return rc;
+
 }
