@@ -584,14 +584,12 @@ static inline void _enable_ep_stall_in(UsbDeviceEndpoint *ep_reg)
 
 static inline void _disable_ep_stall_out(UsbDeviceEndpoint *ep_reg)
 {
-    ep_reg->EPSTATUSCLR.reg = USB_DEVICE_EPSTATUSCLR_STALLRQ0 |
-                              USB_DEVICE_EPSTATUSCLR_DTGLOUT;
+    ep_reg->EPSTATUSCLR.reg = USB_DEVICE_EPSTATUSCLR_STALLRQ0;
 }
 
 static inline void _disable_ep_stall_in(UsbDeviceEndpoint *ep_reg)
 {
-    ep_reg->EPSTATUSCLR.reg = USB_DEVICE_EPSTATUSCLR_STALLRQ1 |
-                              USB_DEVICE_EPSTATUSCLR_DTGLIN;
+    ep_reg->EPSTATUSCLR.reg = USB_DEVICE_EPSTATUSCLR_STALLRQ1;
 }
 
 static void _usbdev_ep0_stall(usbdev_t *usbdev)
