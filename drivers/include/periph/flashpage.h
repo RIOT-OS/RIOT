@@ -237,28 +237,6 @@ unsigned flashpage_page(const void *addr);
 void flashpage_erase(unsigned page);
 
 /**
- * @brief Get number of first free flashpage
- * @deprecated Use @ref FLASH_WRITABLE_INIT instead, which is usable in modules
- *             as well as applications. The function will be removed after
- *             the 2022.04 release.
- *
- * If riotboot is used in two slot mode, this number will change across
- * firmware updates as the firmware slots alternate.
- */
-unsigned flashpage_first_free(void);
-
-/**
- * @brief Get number of last free flashpage
- * @deprecated Use @ref FLASH_WRITABLE_INIT instead, which is usable in modules
- *             as well as applications. The function will be removed after
- *             the 2022.04 release.
- *
- * If riotboot is used in two slot mode, this number will change across
- * firmware updates as the firmware slots alternate.
- */
-unsigned flashpage_last_free(void);
-
-/**
  * @brief   Write the given page with the given data
  *
  * @param[in] page      page to write

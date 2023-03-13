@@ -26,13 +26,6 @@
 #include "irq.h"
 #include "periph/flashpage.h"
 
-/**
- * @brief   Memory markers, defined in the linker script
- * @{
- */
-extern uint32_t _end_fw;
-extern uint32_t _erom;
-
 static inline int _unlock(void)
 {
     int state;
@@ -103,16 +96,4 @@ void flashpage_write(void *target_addr, const void *data, size_t len)
 
     /* lock flash and re-enable interrupts */
     _lock(state);
-}
-
-unsigned flashpage_first_free(void)
-{
-    return flashpage_page(&_end_fw) + 1;
-}
-
-/* MSP430 cpu's last page holds the interrupt vector, so flashpage_last_free
-   is the one before last */
-unsigned flashpage_last_free(void)
-{
-    return flashpage_page(&_erom) - 1;
 }
