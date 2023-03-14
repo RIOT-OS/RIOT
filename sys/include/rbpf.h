@@ -36,7 +36,7 @@
  * static uint8_t _bpf_stack[RBPF_STACK_SIZE];
  * rbpf_application_t rbpf = { 0 };
  * rbpf_application_setup(&rbpf, _bpf_stack, (const rbpf_application_t*)&test_app, sizeof(test_app));
- * uint64_t exec_result;
+ * int64_t exec_result;
  * int result = rbpf_application_run_ctx(&rbpf, NULL, 0, &exec_result);
  * ```
  *
