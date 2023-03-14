@@ -9,7 +9,7 @@
  */
 
 /**
- * @defgroup    sys_rBPF rBPF small virtual machine
+ * @defgroup    sys_rbpf rBPF small virtual machine
  * @ingroup     sys
  * @brief       Small eBPF style virtual machine implementation for RIOT
  * @experimental
@@ -112,7 +112,8 @@
  *
  * @{
  *
- * @file Interface definitions for rBPF virtual machines
+ * @file
+ * @brief Interface definitions for rBPF virtual machines
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
@@ -131,12 +132,12 @@ extern "C" {
 /**
  * @brief Stack size inside the virtual machine, fixed size per specification
  */
-#define RBPF_STACK_SIZE  512
+#define RBPF_STACK_SIZE  (512)
 
 /**
  * @brief Magic number for the header
  */
-#define RBPF_MAGIC_NO 0x72425046
+#define RBPF_MAGIC_NO (0x72425046)
 
 /**
  * @brief Header for rBPF applications
@@ -205,10 +206,12 @@ struct rbpf_mem_region {
 
 /**
  * @name Internal rBPF struct flags
+ * @{
  */
 #define RBPF_FLAG_SETUP_DONE        0x01    /**< Initial setup of vm done */
 #define RBPF_FLAG_PREFLIGHT_DONE    0x02    /**< Pre-flight checks executed at least once */
 #define RBPF_CONFIG_NO_RETURN       0x0100  /**< Script doesn't need to have a return */
+/** @} */
 
 /**
  * @brief rBPF application
@@ -411,3 +414,5 @@ void rbpf_store_init(void);
 }
 #endif
 #endif /* RBPF_H*/
+
+/** @} */
