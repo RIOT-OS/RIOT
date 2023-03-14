@@ -579,6 +579,7 @@ PSEUDOMODULES += vfs_auto_mount
 PSEUDOMODULES += vfs_default
 
 PSEUDOMODULES += wakaama_objects_%
+PSEUDOMODULES += wifi_scan_list
 PSEUDOMODULES += wifi_enterprise
 PSEUDOMODULES += xtimer_on_ztimer
 PSEUDOMODULES += xtimer_no_ztimer_default
