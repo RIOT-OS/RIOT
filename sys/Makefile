@@ -101,6 +101,9 @@ endif
 ifneq (,$(filter l2filter,$(USEMODULE)))
   DIRS += net/link_layer/l2filter
 endif
+ifneq (,$(filter l2scan_list,$(USEMODULE)))
+  DIRS += net/link_layer/l2scan_list
+endif
 ifneq (,$(filter l2util,$(USEMODULE)))
   DIRS += net/link_layer/l2util
 endif
