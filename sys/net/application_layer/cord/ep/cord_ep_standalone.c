@@ -23,7 +23,7 @@
 #include "log.h"
 #include "assert.h"
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "net/cord/ep.h"
 #include "net/cord/config.h"
 #include "net/cord/ep_standalone.h"
@@ -38,11 +38,11 @@
 
 #define UPDATE_TIMEOUT      (0xe537)
 
-#define TIMEOUT_US          ((uint64_t)(CONFIG_CORD_UPDATE_INTERVAL * US_PER_SEC))
+#define TIMEOUT_MS          (CONFIG_CORD_UPDATE_INTERVAL * MS_PER_SEC)
 
 static char _stack[STACKSIZE];
 
-static xtimer_t _timer;
+static ztimer_t _timer;
 static kernel_pid_t _runner_pid;
 static msg_t _msg;
 
@@ -50,7 +50,7 @@ static cord_ep_standalone_cb_t _cb = NULL;
 
 static void _set_timer(void)
 {
-    xtimer_set_msg64(&_timer, TIMEOUT_US, &_msg, _runner_pid);
+    ztimer_set_msg(ZTIMER_MSEC, &_timer, TIMEOUT_MS, &_msg, _runner_pid);
 }
 
 static void _notify(cord_ep_standalone_event_t event)
@@ -94,7 +94,7 @@ void cord_ep_standalone_run(void)
 void cord_ep_standalone_signal(bool connected)
 {
     /* clear timer in any case */
-    xtimer_remove(&_timer);
+    ztimer_remove(ZTIMER_MSEC, &_timer);
     /* reset the update timer in case a connection was established or updated */
     if (connected) {
         _set_timer();

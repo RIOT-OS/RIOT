@@ -810,7 +810,7 @@ endif
 
 ifneq (,$(filter cord_ep_standalone,$(USEMODULE)))
   USEMODULE += cord_ep
-  USEMODULE += xtimer
+  USEMODULE += ztimer_msec
 endif
 
 ifneq (,$(filter cord_lc,$(USEMODULE)))
