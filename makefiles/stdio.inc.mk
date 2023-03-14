@@ -4,6 +4,7 @@ STDIO_MODULES = \
   stdio_ethos \
   stdio_native \
   stdio_nimble \
+  stdio_fb \
   stdio_null \
   stdio_rtt \
   stdio_semihosting \
