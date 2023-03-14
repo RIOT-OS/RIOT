@@ -18,9 +18,9 @@
 
 static bool _rbpf_check_call(uint32_t num)
 {
-    switch(num) {
-        default:
-            return rbpf_get_external_call(num) ? true : false;
+    switch (num) {
+    default:
+        return rbpf_get_external_call(num) ? true : false;
     }
 }
 
@@ -29,6 +29,7 @@ int rbpf_application_verify_preflight(rbpf_application_t *rbpf)
 {
     const bpf_instruction_t *application = rbpf_application_text(rbpf);
     size_t length = rbpf_application_text_len(rbpf);
+
     if (rbpf->flags & RBPF_FLAG_PREFLIGHT_DONE) {
         return RBPF_OK;
     }
@@ -39,7 +40,7 @@ int rbpf_application_verify_preflight(rbpf_application_t *rbpf)
 
 
     for (const bpf_instruction_t *i = application;
-            i < (bpf_instruction_t*)((uint8_t*)application + length); i++) {
+         i < (bpf_instruction_t *)((uint8_t *)application + length); i++) {
         /* Check if register values are valid */
         if (i->dst >= 11 || i->src >= 11) {
             return RBPF_ILLEGAL_REGISTER;
@@ -56,7 +57,7 @@ int rbpf_application_verify_preflight(rbpf_application_t *rbpf)
             intptr_t target = (intptr_t)(i + i->offset);
             /* Check if the jump target is within bounds. The address is
              * incremented after the jump by the regular PC increase */
-            if ((target >= (intptr_t)((uint8_t*)application + length))
+            if ((target >= (intptr_t)((uint8_t *)application + length))
                 || (target < (intptr_t)application)) {
                 return RBPF_ILLEGAL_JUMP;
             }
@@ -69,10 +70,11 @@ int rbpf_application_verify_preflight(rbpf_application_t *rbpf)
         }
     }
 
-    size_t num_instructions = length/sizeof(bpf_instruction_t);
+    size_t num_instructions = length / sizeof(bpf_instruction_t);
 
     /* Check if the last instruction is a return instruction */
-    if (application[num_instructions - 1].opcode != 0x95 && !(rbpf->flags & RBPF_CONFIG_NO_RETURN)) {
+    if (application[num_instructions - 1].opcode != 0x95 &&
+        !(rbpf->flags & RBPF_CONFIG_NO_RETURN)) {
         return RBPF_NO_RETURN;
     }
     rbpf->flags |= RBPF_FLAG_PREFLIGHT_DONE;

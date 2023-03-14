@@ -137,29 +137,29 @@ extern "C" {
 
 
 #define BPF_INSTRUCTION_JMP_ALWAYS  (0x05)
-#define BPF_INSTRUCTION_JMP_EQ_IMM	(0x15)
-#define BPF_INSTRUCTION_JMP_GT_IMM	(0x25)
-#define BPF_INSTRUCTION_JMP_GE_IMM	(0x35)
-#define BPF_INSTRUCTION_JMP_SET_IMM	(0x45)
-#define BPF_INSTRUCTION_JMP_NE_IMM	(0x55)
-#define BPF_INSTRUCTION_JMP_SGT_IMM	(0x65)
-#define BPF_INSTRUCTION_JMP_SGE_IMM	(0x75)
-#define BPF_INSTRUCTION_JMP_LT_IMM	(0xa5)
-#define BPF_INSTRUCTION_JMP_LE_IMM	(0xb5)
-#define BPF_INSTRUCTION_JMP_SLT_IMM	(0xc5)
-#define BPF_INSTRUCTION_JMP_SLE_IMM	(0xd5)
+#define BPF_INSTRUCTION_JMP_EQ_IMM  (0x15)
+#define BPF_INSTRUCTION_JMP_GT_IMM  (0x25)
+#define BPF_INSTRUCTION_JMP_GE_IMM  (0x35)
+#define BPF_INSTRUCTION_JMP_SET_IMM (0x45)
+#define BPF_INSTRUCTION_JMP_NE_IMM  (0x55)
+#define BPF_INSTRUCTION_JMP_SGT_IMM (0x65)
+#define BPF_INSTRUCTION_JMP_SGE_IMM (0x75)
+#define BPF_INSTRUCTION_JMP_LT_IMM  (0xa5)
+#define BPF_INSTRUCTION_JMP_LE_IMM  (0xb5)
+#define BPF_INSTRUCTION_JMP_SLT_IMM (0xc5)
+#define BPF_INSTRUCTION_JMP_SLE_IMM (0xd5)
 
-#define BPF_INSTRUCTION_JMP_EQ_REG	(0x1d)
-#define BPF_INSTRUCTION_JMP_GT_REG	(0x2d)
-#define BPF_INSTRUCTION_JMP_GE_REG	(0x3d)
-#define BPF_INSTRUCTION_JMP_SET_REG	(0x4d)
-#define BPF_INSTRUCTION_JMP_NE_REG	(0x5d)
-#define BPF_INSTRUCTION_JMP_SGT_REG	(0x6d)
-#define BPF_INSTRUCTION_JMP_SGE_REG	(0x7d)
-#define BPF_INSTRUCTION_JMP_LT_REG	(0xad)
-#define BPF_INSTRUCTION_JMP_LE_REG	(0xbd)
-#define BPF_INSTRUCTION_JMP_SLT_REG	(0xcd)
-#define BPF_INSTRUCTION_JMP_SLE_REG	(0xdd)
+#define BPF_INSTRUCTION_JMP_EQ_REG  (0x1d)
+#define BPF_INSTRUCTION_JMP_GT_REG  (0x2d)
+#define BPF_INSTRUCTION_JMP_GE_REG  (0x3d)
+#define BPF_INSTRUCTION_JMP_SET_REG (0x4d)
+#define BPF_INSTRUCTION_JMP_NE_REG  (0x5d)
+#define BPF_INSTRUCTION_JMP_SGT_REG (0x6d)
+#define BPF_INSTRUCTION_JMP_SGE_REG (0x7d)
+#define BPF_INSTRUCTION_JMP_LT_REG  (0xad)
+#define BPF_INSTRUCTION_JMP_LE_REG  (0xbd)
+#define BPF_INSTRUCTION_JMP_SLT_REG (0xcd)
+#define BPF_INSTRUCTION_JMP_SLE_REG (0xdd)
 
 #define BPF_INSTRUCTION_MEM_LDDW    (0x18)
 #define BPF_INSTRUCTION_MEM_LDDWD   (0xB8)
@@ -190,8 +190,8 @@ extern "C" {
  */
 typedef struct __attribute__((packed)) {
     uint8_t opcode;
-    unsigned dst:4;
-    unsigned src:4;
+    unsigned dst : 4;
+    unsigned src : 4;
     int16_t offset;
     int32_t immediate;
 } bpf_instruction_t;
@@ -201,4 +201,3 @@ typedef struct __attribute__((packed)) {
 #endif
 #endif /* BPF_INSTRUCTION_H */
 /** @} */
-

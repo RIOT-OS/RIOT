@@ -164,16 +164,17 @@ typedef struct __attribute__((packed)) {
  * @brief rBPF Virtual Machine exit codes
  */
 enum {
-    RBPF_OK                     = 0,  /**< Successful execution */
-    RBPF_ILLEGAL_INSTRUCTION    = -1, /**< Failed on instruction parsing */
-    RBPF_ILLEGAL_MEM            = -2, /**< Illegal memory load */
-    RBPF_ILLEGAL_JUMP           = -3, /**< Jump offset not allowed */
-    RBPF_ILLEGAL_CALL           = -4, /**< Illegal call instruction, called function not known */
-    RBPF_ILLEGAL_LEN            = -5, /**< Invalid length of application */
-    RBPF_ILLEGAL_REGISTER       = -6, /**< Instruction register argument invalid */
-    RBPF_NO_RETURN              = -7, /**< No valid return found in the application code */
-    RBPF_OUT_OF_BRANCHES        = -8, /**< Number of branches taken is more than allowed */
-    RBPF_ILLEGAL_DIV            = -9, /**< Divide by zero error in instructions */
+    RBPF_CONTINUE               = 1,    /**< Next instruction, never returned to user */
+    RBPF_OK                     = 0,    /**< Successful execution */
+    RBPF_ILLEGAL_INSTRUCTION    = -1,   /**< Failed on instruction parsing */
+    RBPF_ILLEGAL_MEM            = -2,   /**< Illegal memory load */
+    RBPF_ILLEGAL_JUMP           = -3,   /**< Jump offset not allowed */
+    RBPF_ILLEGAL_CALL           = -4,   /**< Illegal call instruction, called function not known */
+    RBPF_ILLEGAL_LEN            = -5,   /**< Invalid length of application */
+    RBPF_ILLEGAL_REGISTER       = -6,   /**< Instruction register argument invalid */
+    RBPF_NO_RETURN              = -7,   /**< No valid return found in the application code */
+    RBPF_OUT_OF_BRANCHES        = -8,   /**< Number of branches taken is more than allowed */
+    RBPF_ILLEGAL_DIV            = -9,   /**< Divide by zero error in instructions */
 };
 
 /**
@@ -185,8 +186,8 @@ typedef struct rbpf_mem_region rbpf_mem_region_t;
  * @name Memory permission flags
  * @{
  */
-#define RBPF_MEM_REGION_READ     0x01 /**< Memory region has reads allowed */
-#define RBPF_MEM_REGION_WRITE    0x02 /**< Memory region has writes allowed */
+#define RBPF_MEM_REGION_READ     0x01   /**< Memory region has reads allowed */
+#define RBPF_MEM_REGION_WRITE    0x02   /**< Memory region has writes allowed */
 /** @} */
 
 
@@ -196,10 +197,10 @@ typedef struct rbpf_mem_region rbpf_mem_region_t;
  * Defines the permissions on memory regions. Default permission is reject.
  */
 struct rbpf_mem_region {
-    rbpf_mem_region_t *next; /**< Linked list ptr */
-    const uint8_t *start;    /**< Start address */
-    size_t len;              /**< Length of the region in bytes */
-    uint8_t flags;            /**< Permission flags */
+    rbpf_mem_region_t *next;    /**< Linked list ptr */
+    const uint8_t *start;       /**< Start address */
+    size_t len;                 /**< Length of the region in bytes */
+    uint8_t flags;              /**< Permission flags */
 };
 
 /**
@@ -213,15 +214,15 @@ struct rbpf_mem_region {
  * @brief rBPF application
  */
 typedef struct {
-    rbpf_mem_region_t stack_region;  /**< Memory permission region for the stack */
-    rbpf_mem_region_t rodata_region; /**< Memory permissions for the application read-only data */
-    rbpf_mem_region_t data_region;   /**< Memory permissions for the application data region */
-    rbpf_mem_region_t arg_region;    /**< Memory region for the caller-supplied arguments */
-    const void *application;         /**< Application header */
-    size_t application_len;          /**< Application length */
-    uint8_t *stack;                  /**< VM stack, must be  and aligned */
-    uint16_t flags;                  /**< State flags for the virtual machine */
-    uint32_t branches_remaining;    /**< Number of allowed branch instructions remaining */
+    rbpf_mem_region_t stack_region;     /**< Memory permission region for the stack */
+    rbpf_mem_region_t rodata_region;    /**< Memory permissions for the application read-only data */
+    rbpf_mem_region_t data_region;      /**< Memory permissions for the application data region */
+    rbpf_mem_region_t arg_region;       /**< Memory region for the caller-supplied arguments */
+    const void *application;            /**< Application header */
+    size_t application_len;             /**< Application length */
+    uint8_t *stack;                     /**< VM stack, must be  and aligned */
+    uint16_t flags;                     /**< State flags for the virtual machine */
+    uint32_t branches_remaining;        /**< Number of allowed branch instructions remaining */
 } rbpf_application_t;
 
 /**
@@ -241,7 +242,7 @@ typedef uint32_t (*rbpf_call_t)(rbpf_application_t *rbpf, uint64_t *regs);
  * @param application_len   Size of the whole application (including header) in bytes
  */
 void rbpf_application_setup(rbpf_application_t *rbpf, uint8_t *stack,
-        const rbpf_application_t *application, size_t application_len);
+                            const rbpf_application_t *application, size_t application_len);
 
 /**
  * @brief Manually run the pre-flight checks for an application
@@ -276,7 +277,8 @@ int rbpf_application_run_ctx(rbpf_application_t *rbpf, void *ctx, size_t ctx_siz
  * @param   len     Length of the region
  * @param   flags   Permission flags
  */
-static inline void rbpf_memory_region_init(rbpf_mem_region_t *region, void *start, size_t len, uint8_t flags)
+static inline void rbpf_memory_region_init(rbpf_mem_region_t *region, void *start, size_t len,
+                                           uint8_t flags)
 {
     region->start = start;
     region->len = len;

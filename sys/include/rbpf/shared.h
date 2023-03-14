@@ -27,10 +27,10 @@ extern "C" {
  * @param name  Name of the pointer
  */
 #define __bpf_shared_ptr(type, name)    \
-union {                 \
-    type name;          \
-    uint64_t :64;          \
-} __attribute__((aligned(8)))
+    union {                 \
+        type name;          \
+        uint64_t : 64;          \
+    } __attribute__((aligned(8)))
 
 
 #ifdef __cplusplus

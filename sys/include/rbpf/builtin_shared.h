@@ -16,10 +16,10 @@ extern "C" {
 
 enum {
     /* Key/value store functions */
-    BPF_FUNC_BPF_STORE_LOCAL = 0x10,
-    BPF_FUNC_BPF_STORE_GLOBAL = 0x11,
-    BPF_FUNC_BPF_FETCH_LOCAL = 0x12,
-    BPF_FUNC_BPF_FETCH_GLOBAL = 0x13,
+    BPF_FUNC_BPF_STORE_LOCAL    = 0x10,
+    BPF_FUNC_BPF_STORE_GLOBAL   = 0x11,
+    BPF_FUNC_BPF_FETCH_LOCAL    = 0x12,
+    BPF_FUNC_BPF_FETCH_GLOBAL   = 0x13,
 };
 
 #ifdef __cplusplus
