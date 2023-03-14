@@ -37,4 +37,3 @@ void fill_instruction(const bpf_instruction_t *instr, test_application_t *test_a
 #endif
 #endif /* TEST_UTIL_H */
 /** @} */
-

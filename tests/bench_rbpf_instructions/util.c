@@ -44,4 +44,3 @@ void fill_instruction(const bpf_instruction_t *instr, test_application_t *test_a
     };
     memcpy(&test_app->text[NUM_INSTRUCTIONS], &return_instr, sizeof(bpf_instruction_t));
 }
-
