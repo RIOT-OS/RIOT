@@ -49,8 +49,7 @@ static scan_list_node_t *_scan_list_get_insert(l2scan_list_t *list,
             lowest = result; /* override lowest element */
         }
     }
-    list_node_t l = { .next = list->head };
-    list_remove(&l, &lowest->node);
+    list_remove(&list->head, &lowest->node);
     return lowest;
 }
 
@@ -58,7 +57,7 @@ void l2scan_list_empty(l2scan_list_t *list,
                        list_node_t *nodes, unsigned nodes_numof,
                        size_t node_size)
 {
-    list->head = NULL;
+    list->head.next = NULL;
     memset(nodes, 0, nodes_numof * node_size);
 }
 
@@ -71,20 +70,25 @@ void l2scan_list_insert(l2scan_list_t *list,
                                                      nodes_numof, node_size);
     *insert = (scan_list_node_t) { .node = { .next = NULL }, };
     memcpy(&insert->result, result, node_size - sizeof(list_node_t));
+    const scan_list_node_t *next;
+    list_node_t *before = &list->head;
+    while ((next = (scan_list_node_t *)before->next) &&
+           next->result.strength > result->strength) {
+        before = before->next;
+    }
+    list_add(before, &insert->node);
+}
 
-    if (!list->head) {
-        list->head = &insert->node;
+unsigned l2scan_list_to_array(const l2scan_list_t *list,
+                              void *nodes_array, unsigned nodes_numof,
+                              size_t node_size)
+{
+    list_node_t *node = list->head.next;
+    uint8_t *buf = nodes_array;
+    size_t size = node_size - sizeof(*node);
+    unsigned i;
+    for (i = 0; i < nodes_numof && node; i++, buf += size, node = node->next) {
+        memcpy(buf, &node[1], size);
     }
-    else if (((scan_list_node_t *)list->head)->result.strength < result->strength) {
-        insert->node.next = list->head;
-        list->head = &insert->node;
-    }
-    else {
-        scan_list_node_t *next, *before = (scan_list_node_t *)list->head;
-        while ((next = (scan_list_node_t *)before->node.next) &&
-               next->result.strength > result->strength) {
-            before = (scan_list_node_t *)before->node.next;
-        }
-        list_add(&before->node, &insert->node);
-    }
+    return i;
 }

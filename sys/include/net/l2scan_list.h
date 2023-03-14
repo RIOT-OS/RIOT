@@ -35,7 +35,7 @@ extern "C" {
  * @brief   Type of a Link Layer scan list
  */
 typedef struct l2scan_list {
-    list_node_t *head;          /**< Pointer to the list head node */
+    list_node_t head;          /**< List head, where head->next is the first element */
     /* items */
 } l2scan_list_t;
 
@@ -64,6 +64,20 @@ void l2scan_list_insert(l2scan_list_t *list,
                         list_node_t *nodes, unsigned nodes_numof,
                         size_t node_size,
                         const netopt_scan_result_t *result);
+
+/**
+ * @brief   Copy the content of a L2 scan list to an array to get rid of the list overhead
+ *
+ * @param[in]       list            Pointer to list
+ * @param[out]      nodes_array     Buffer of nodes to store the result
+ * @param[in]       nodes_numof     Maximum number of nodes that can be copied
+ * @param[in]       node_size       Size of one node element in the array
+ *
+ * @return  Number of copied nodes
+ */
+unsigned l2scan_list_to_array(const l2scan_list_t *list,
+                              void *nodes_array, unsigned nodes_numof,
+                              size_t node_size);
 
 #ifdef __cplusplus
 }
