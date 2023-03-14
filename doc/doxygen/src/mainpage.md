@@ -33,8 +33,8 @@ Contribute to RIOT                                        {#contribute-to-riot}
 RIOT is developed by an open community that anyone is welcome to join:
  - Download and contribute your code on
    [GitHub](https://github.com/RIOT-OS/RIOT). You can read about how to
-   contribute [in our GitHub
-   Wiki](https://github.com/RIOT-OS/RIOT/wiki/Contributing-to-RIOT).
+   contribute [in our contributing
+   document](https://github.com/RIOT-OS/RIOT/blob/master/CONTRIBUTING.md).
  - Sign-up to our [forum](https://forum.riot-os.org/) to ask for help using RIOT
    or writing an application for RIOT, discuss kernel and network stack
    development as well as hardware support, or to show-case your latest project.
