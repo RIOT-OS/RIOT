@@ -142,49 +142,13 @@ static rbpf_call_t _rbpf_get_call(uint32_t num)
         DST = *(const SIZE *)(uintptr_t)(SRC + (*instr)->offset);   \
         break;
 
-
-/* This generates values for the jumptable array. It combines the same opcode
- * name as used in the code generation macros and the numeric opcode value to
- * create a jumptable entry. Entries are generated for 64 and 32 bit types */
-/* And this macro generates a register and immediate type jumptable entry based
- * on the above macros */
-static int _rbpf_instruction(rbpf_application_t *rbpf,
-                             const bpf_instruction_t **instr,
-                             uint64_t regmap[11]);
-
-
-int rbpf_engine_run(rbpf_application_t *rbpf, const void *ctx, int64_t *result)
-{
-    int res = RBPF_OK;
-
-    rbpf->branches_remaining = RBPF_BRANCHES_ALLOWED;
-    uint64_t regmap[11] = { 0 };
-
-    regmap[1] = (uint64_t)(uintptr_t)ctx;
-    regmap[10] = (uint64_t)(uintptr_t)(rbpf->stack + RBPF_STACK_SIZE);
-
-    const bpf_instruction_t *instr = (const bpf_instruction_t *)rbpf_application_text(rbpf);
-
-    res = rbpf_application_verify_preflight(rbpf);
-    if (res < 0) {
-        return res;
-    }
-
-    do {
-        res = _rbpf_instruction(rbpf, &instr, regmap);
-        instr++;
-    } while (res > 0);
-    *result = regmap[0];
-    return res;
-}
-
 static inline int _rbpf_over_max_jumps(const rbpf_application_t *rbpf)
 {
     return !(rbpf->flags & RBPF_CONFIG_NO_RETURN) && rbpf->branches_remaining == 0;
 }
 
-/* Must be inlined to make the tail call optimization work */
-static inline int _rbpf_jump(rbpf_application_t *rbpf, const bpf_instruction_t **instr)
+/* Asking the compiler to really inline this call is the easiest way to speed up the VM */
+static inline int __attribute__((always_inline)) _rbpf_jump(rbpf_application_t *rbpf, const bpf_instruction_t **instr)
 {
     *instr += (*instr)->offset;
     rbpf->branches_remaining--;
@@ -194,7 +158,8 @@ static inline int _rbpf_jump(rbpf_application_t *rbpf, const bpf_instruction_t *
     return RBPF_CONTINUE;
 }
 
-static inline int _rbpf_instruction(rbpf_application_t *rbpf,
+/* Asking the compiler to really inline this call is the easiest way to speed up the VM */
+static inline int __attribute__((always_inline)) _rbpf_instruction(rbpf_application_t *rbpf,
                                     const bpf_instruction_t **instr, uint64_t regmap[11])
 {
     switch ((*instr)->opcode) {
@@ -373,3 +338,29 @@ static inline int _rbpf_instruction(rbpf_application_t *rbpf,
     }
     return RBPF_CONTINUE;
 }
+
+int rbpf_engine_run(rbpf_application_t *rbpf, const void *ctx, int64_t *result)
+{
+    int res = RBPF_OK;
+
+    rbpf->branches_remaining = RBPF_BRANCHES_ALLOWED;
+    uint64_t regmap[11] = { 0 };
+
+    regmap[1] = (uint64_t)(uintptr_t)ctx;
+    regmap[10] = (uint64_t)(uintptr_t)(rbpf->stack + RBPF_STACK_SIZE);
+
+    const bpf_instruction_t *instr = (const bpf_instruction_t *)rbpf_application_text(rbpf);
+
+    res = rbpf_application_verify_preflight(rbpf);
+    if (res < 0) {
+        return res;
+    }
+
+    do {
+        res = _rbpf_instruction(rbpf, &instr, regmap);
+        instr++;
+    } while (res > 0);
+    *result = regmap[0];
+    return res;
+}
+
