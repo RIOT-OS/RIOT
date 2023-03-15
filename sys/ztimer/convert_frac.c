@@ -101,7 +101,7 @@ void ztimer_convert_frac_init(ztimer_convert_frac_t *self,
         .super.super = { .ops = &ztimer_convert_frac_ops, },
         .super.lower = lower,
         .super.lower_entry =
-        { .callback = (void (*)(void *))ztimer_handler, .arg = &self->super, },
+        { .callback = (void (*)(void *)) ztimer_handler, .arg = &self->super, },
     };
 
     ztimer_convert_frac_compute_scale(self, freq_self, freq_lower);

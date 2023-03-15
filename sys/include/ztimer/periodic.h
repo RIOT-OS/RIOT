@@ -89,12 +89,12 @@ typedef bool (*ztimer_periodic_callback_t)(void *);
  * @brief   ztimer periodic structure
  */
 typedef struct {
-    ztimer_t timer;             /**< timer object used for this timer   */
-    ztimer_clock_t *clock;      /**< clock for this timer               */
-    uint32_t interval;          /**< interval of this timer             */
-    ztimer_now_t last;          /**< last trigger time                  */
-    ztimer_periodic_callback_t callback;   /**< called on each trigger             */
-    void *arg;                  /**< argument for callback              */
+    ztimer_t timer;                         /**< timer object used for this timer   */
+    ztimer_clock_t *clock;                  /**< clock for this timer               */
+    uint32_t interval;                      /**< interval of this timer             */
+    ztimer_now_t last;                      /**< last trigger time                  */
+    ztimer_periodic_callback_t callback;    /**< called on each trigger             */
+    void *arg;                              /**< argument for callback              */
 } ztimer_periodic_t;
 
 /**

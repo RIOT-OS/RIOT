@@ -430,7 +430,7 @@ bool ztimer_acquire(ztimer_clock_t *clock);
 #else
 static inline bool ztimer_acquire(ztimer_clock_t *clock)
 {
-    (void) clock;
+    (void)clock;
     return false;
 }
 #endif
@@ -450,7 +450,7 @@ bool ztimer_release(ztimer_clock_t *clock);
 #else
 static inline bool ztimer_release(ztimer_clock_t *clock)
 {
-    (void) clock;
+    (void)clock;
     return false;
 }
 #endif

@@ -56,7 +56,7 @@ void ztimer_convert_init(ztimer_convert_t *ztimer_convert,
     ztimer_convert_t tmp = {
         .lower = lower,
         .lower_entry = {
-            .callback = (void (*)(void *))ztimer_handler,
+            .callback = (void (*)(void *)) ztimer_handler,
             .arg = ztimer_convert,
         },
         .super.max_value = max_value,
