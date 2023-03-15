@@ -74,8 +74,9 @@ static event_timeout_t _update_timeout_evt;
 static uint16_t _conn_handle;
 static uint16_t _hrs_val_handle;
 
-uint16_t contador = 15;
-char myarray[16*15];
+uint16_t contador = 9; //é necessário para o IOS
+char myarray[9*15]; //15 mensagens de 9 bytes cada, aqui agora precisa ser 9 pois o IOS menor que 10 não aceita mais que 158 bytes por envio
+char myarray2[16];
 
 /* Variable declarations */
 
@@ -120,6 +121,11 @@ void acquire_ACC_Values(void);
 static void _hr_update(event_t *e);
 void make_data_package(uint16_t index);
 void make_dump_package(int initial_index);
+
+uint16_t ring_buffer_current_index = 0;
+uint16_t get_ring_index(void);
+void add_ring_index(void);
+
 
 int dev = I2C_DEV(0);
 
@@ -446,16 +452,16 @@ void right_shift_readings_buffer(void)
 
 void do_read(void)
 {
-    //#ifdef PULGA_USE_RINGBUFFER
-       right_shift_readings_buffer();
-    //#endif
-    for (size_t i = 0; i < ACC_FRAMES; i++)
+    uint16_t aux = get_ring_index(); //supondo que o index nunca vai ser um valor proibido
+    uint16_t i, j;
+    for (i = aux, j = 0; i < (aux + ACC_FRAMES) && j < ACC_FRAMES; i++, j++)
     {
-        readings_buffer[i].X_axis = accel_data[i].x;
-        readings_buffer[i].Y_axis = accel_data[i].y;
-        readings_buffer[i].Z_axis = accel_data[i].z;
+        readings_buffer[i].X_axis = accel_data[j].x;
+        readings_buffer[i].Y_axis = accel_data[j].y;
+        readings_buffer[i].Z_axis = accel_data[j].z;
         readings_buffer[i].timestamp = (int)(xtimer_now_usec()/1000); 
     }
+    add_ring_index(); //função para incrementar o scan no ring buffer
 }
 
 void log_readings(void)
@@ -674,14 +680,14 @@ static void _hr_update(event_t *e)
 {
     (void)e;
     struct os_mbuf *om;
-    char myarray2[16];
 
     /* from here, we code the event */
     acquire_ACC_Values();
-    do_read();
+    do_read(); //aqui na do_read iremos adicionar os dados no final do ring buffer
 
-    int auxi;
-    make_data_package((uint16_t)0);   
+    int auxi, auxi3;
+    auxi3 = get_ring_index();
+    make_data_package(auxi3);   
     
     if(connected){
         /* send data notification to GATT client */
@@ -705,13 +711,13 @@ void make_data_package(uint16_t index)
     float auxf;
 
         auxf= (readings_buffer[index].X_axis / AC);
-        memcpy(myarray, &auxf, sizeof(float));
+        memcpy(myarray2, &auxf, sizeof(float));
         auxf= (readings_buffer[index].Y_axis / AC); 
-        memcpy(myarray + sizeof(float) , &auxf, sizeof(float));
+        memcpy(myarray2 + sizeof(float) , &auxf, sizeof(float));
         auxf= (readings_buffer[index].Z_axis / AC);
-        memcpy(myarray + (2)*sizeof(float), &auxf, sizeof(float));
+        memcpy(myarray2 + (2)*sizeof(float), &auxf, sizeof(float));
         auxi= (readings_buffer[index].timestamp);
-        memcpy(myarray + (+3)*sizeof(float), &auxi, sizeof(int));
+        memcpy(myarray2 + (+3)*sizeof(float), &auxi, sizeof(int));
     }
 
 static int gatt_svr_chr_access_device_info_manufacturer(
@@ -731,7 +737,6 @@ static int gatt_svr_chr_access_device_info_manufacturer(
     int rc = os_mbuf_append(ctxt->om, str_answer, strlen(str_answer));
 
     puts("");
-
     return rc;
 }
 
@@ -784,5 +789,14 @@ static int send_latest_measurements(
     //_hr_update(&_update_evt);
 
     return rc;
+}
 
+uint16_t get_ring_index(void)
+{
+    return ring_buffer_current_index;
+}
+
+void add_ring_index(void)
+{
+    ring_buffer_current_index = rlen < MAX_READINGS ? (9*15)*rlen++ : 0;
 }
