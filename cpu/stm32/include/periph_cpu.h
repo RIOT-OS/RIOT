@@ -131,20 +131,24 @@ typedef struct {
  * @brief Number of endpoints available with the OTG FS peripheral
  *        including the control endpoint
  */
-#ifdef STM32_USB_OTG_CID_1x
-#define STM32_USB_OTG_FS_NUM_EP (4)    /**< OTG FS with 4 endpoints */
+#if defined(USB_OTG_FS_MAX_IN_ENDPOINTS)
+#define STM32_USB_OTG_FS_NUM_EP     (USB_OTG_FS_MAX_IN_ENDPOINTS)
+#elif defined(STM32_USB_OTG_CID_1x)
+#define STM32_USB_OTG_FS_NUM_EP     (4)    /**< OTG FS with 4 endpoints */
 #elif defined(STM32_USB_OTG_CID_2x)
-#define STM32_USB_OTG_FS_NUM_EP (6)    /**< OTG FS with 6 endpoints */
+#define STM32_USB_OTG_FS_NUM_EP     (6)    /**< OTG FS with 6 endpoints */
 #endif
 
 /**
  * @brief Number of endpoints available with the OTG HS peripheral
  *        including the control endpoint
  */
-#ifdef STM32_USB_OTG_CID_1x
-#define STM32_USB_OTG_HS_NUM_EP (6)     /**< OTG HS with 6 endpoints */
+#if defined(USB_OTG_HS_MAX_IN_ENDPOINTS)
+#define STM32_USB_OTG_HS_NUM_EP     (USB_OTG_HS_MAX_IN_ENDPOINTS)
+#elif defined(STM32_USB_OTG_CID_1x)
+#define STM32_USB_OTG_HS_NUM_EP     (6)     /**< OTG HS with 6 endpoints */
 #elif defined(STM32_USB_OTG_CID_2x)
-#define STM32_USB_OTG_HS_NUM_EP (9)     /**< OTG HS with 9 endpoints */
+#define STM32_USB_OTG_HS_NUM_EP     (9)     /**< OTG HS with 9 endpoints */
 #endif
 
 /**
