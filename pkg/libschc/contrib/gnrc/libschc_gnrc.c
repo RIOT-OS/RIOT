@@ -152,9 +152,6 @@ static void end_tx(schc_fragmentation_t *conn) {
 static void end_rx(schc_fragmentation_t *conn) {
     DEBUG("schc: end_rx callback for device %" PRIu32 "\n", conn->device_id);
 
-    schc_bitarray_t rcv_buf;
-    conn->bit_arr = &rcv_buf;
-
     /* what is the length of the complete packet? */
     uint16_t compressed_packetlen = get_mbuf_len(conn);
     gnrc_pktsnip_t *schc = gnrc_pktbuf_add(NULL, NULL, MAX_PACKET_LENGTH, GNRC_NETTYPE_SCHC);
@@ -165,8 +162,9 @@ static void end_rx(schc_fragmentation_t *conn) {
     }
     memset(schc->data, 0, schc->size);
     mbuf_copy(conn, schc->data);       /* copy to a local buffer */
-    rcv_buf.ptr = schc->data;
+    schc_bitarray_t rcv_buf = SCHC_DEFAULT_BIT_ARRAY(sizeof(schc->size), schc->data);
 
+    conn->bit_arr = &rcv_buf;
     gnrc_pktsnip_t *ip6 = gnrc_pktbuf_add(NULL, NULL, MAX_PACKET_LENGTH, GNRC_NETTYPE_IPV6);
     if (!ip6) {
         DEBUG("schc: unable to allocated decompressed packet\n");
@@ -490,8 +488,7 @@ static void _send(gnrc_pktsnip_t *pkt)
     }
     schc_conn.device_id = device_id;        /* the device id of the connection */
     memset(message_buffer, 0, sizeof(message_buffer));
-    schc_bitbuff.ptr = (uint8_t*) (message_buffer);     /* deep copy */
-    schc_bitbuff.len = 0;
+    schc_bitbuff = (schc_bitarray_t){ .ptr = (uint8_t *)message_buffer, .len = 0 };
 
     if (ENABLE_DEBUG && IS_USED(MODULE_OD)) {
         DEBUG("schc: compressing packet\n");
