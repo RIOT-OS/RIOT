@@ -77,6 +77,7 @@
 #ifndef PERIPH_QDEC_H
 #define PERIPH_QDEC_H
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <limits.h>
 
@@ -120,21 +121,45 @@ typedef enum {
 #endif
 
 /**
- * @brief   Signature of event callback functions triggered from interrupts
+ * @brief   Signature of rollover callback functions triggered from interrupts
  *
  * @param[in] arg       optional context for the callback
  */
-typedef void (*qdec_cb_t)(void *arg);
+typedef void (*qdec_rollover_cb_t)(void *arg);
 
 /**
- * @brief   Default interrupt context entry holding callback and argument
+ * @brief   Signature of alarm callback functions triggered from interrupts
+ *
+ * An alarm is determined to be a oneshot or repeating alarm based on the return
+ * value of it's callback. Oneshoots should return false. They will not be
+ * called again, until re-set. Repeating alarms should return true. They will
+ * be called everytime the alarm fires. A reapeating alarm may switch to a
+ * oneshot at any time by changing it's returned value.
+ *
+ * @param[in] arg       optional context for the callback
+ * @return              true if the alarm should be left enabled
  */
-#ifndef HAVE_TIMER_ISR_CTX_T
+typedef bool (*qdec_alarm_cb_t)(void *arg);
+
+#ifndef HAVE_QDEC_ISR_CTX_T
+
+/**
+ * @brief   Default rollover interrupt context entry
+ */
 typedef struct {
-    qdec_cb_t cb;           /**< callback executed from qdec interrupt */
-    void *arg;              /**< optional argument given to that callback */
-} qdec_isr_ctx_t;
-#endif
+    qdec_rollover_cb_t cb;      /**< callback executed from qdec interrupt */
+    void *arg;                  /**< optional argument given to that callback */
+} qdec_rollover_isr_ctx_t;
+
+/**
+ * @brief   Default alarm interrupt context entry
+ */
+typedef struct {
+    qdec_alarm_cb_t cb;         /**< callback executed from qdec interrupt */
+    void *arg;                  /**< optional argument given to that callback */
+} qdec_alarm_isr_ctx_t;
+
+#endif /* HAVE_QDEC_ISR_CTX_T */
 
 /**
  * @brief   Initialize a QDEC device
@@ -157,7 +182,7 @@ typedef struct {
  * @return                  error code on error
  * @return                  0 on success
  */
-int32_t qdec_init(qdec_t dev, qdec_mode_t mode, qdec_cb_t cb, void *arg);
+int32_t qdec_init(qdec_t dev, qdec_mode_t mode, qdec_rollover_cb_t cb, void *arg);
 
 /**
  * @brief Read the current value of the given qdec device
@@ -176,6 +201,35 @@ int32_t qdec_read(qdec_t dev);
  * @return                  the qdecs current value
  */
 int32_t qdec_read_and_reset(qdec_t dev);
+
+/**
+ * @brief Set an alarm on a qdec device
+ *
+ * An alarm may be set on a qdec to get called back when the qdec's value
+ * reaches a position of interest. Some qdecs may support multiple alarms. The
+ * position is defined as a positive or negative number of steps from the
+ * device's current position.
+ *
+ * @param[in] dev           the qdec to set the alarm on
+ * @param[in] alarm         the qdec's alarm to use
+ * @param[in] offset        offset from qdec's current position to set the alarm
+ * @param[in] cb            callback to call when alarm fires
+ * @param[in] arg           argument to pass to callback
+ *
+ * @return                  TODO
+ */
+int qdec_alarm_set(qdec_t dev, unsigned alarm, int32_t offset,
+                    qdec_alarm_cb_t cb, void* arg);
+
+/**
+ * @brief Clear (cancel) an alarm on a qdec device
+ *
+ * @param[in] dev           the qdec to clear the alarm on
+ * @param[in] alarm         the qdec's alarm to clear
+ *
+ * @return                  TODO
+ */
+int qdec_alarm_clear(qdec_t dev, unsigned alarm);
 
 /**
  * @brief Start the given qdec timer
