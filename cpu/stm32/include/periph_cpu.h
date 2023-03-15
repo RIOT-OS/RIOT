@@ -113,6 +113,57 @@ typedef struct {
 #define HAVE_PTP_TIMER_SET_ABSOLUTE 1   /**< Native implementation available */
 /** @} */
 
+#if !DOXYGEN    /* hide implementation details */
+/**
+ * @name    USB device definitions
+ * @{
+ */
+/* Detect the IP version based on the available register define */
+#if defined(USB_OTG_GCCFG_NOVBUSSENS)
+#define STM32_USB_OTG_CID_1x        /**< USB OTG FS version 0x00001200 */
+#elif defined(USB_OTG_GCCFG_VBDEN)
+#define STM32_USB_OTG_CID_2x        /**< USB OTG FS version 0x00002000 */
+#elif defined(USB)
+#define STM32_USB_FS_CID_1x         /**< USB FS version 0x00001200 */
+#endif
+
+/**
+ * @brief Number of endpoints available with the OTG FS peripheral
+ *        including the control endpoint
+ */
+#ifdef STM32_USB_OTG_CID_1x
+#define STM32_USB_OTG_FS_NUM_EP (4)    /**< OTG FS with 4 endpoints */
+#elif defined(STM32_USB_OTG_CID_2x)
+#define STM32_USB_OTG_FS_NUM_EP (6)    /**< OTG FS with 6 endpoints */
+#endif
+
+/**
+ * @brief Number of endpoints available with the OTG HS peripheral
+ *        including the control endpoint
+ */
+#ifdef STM32_USB_OTG_CID_1x
+#define STM32_USB_OTG_HS_NUM_EP (6)     /**< OTG HS with 6 endpoints */
+#elif defined(STM32_USB_OTG_CID_2x)
+#define STM32_USB_OTG_HS_NUM_EP (9)     /**< OTG HS with 9 endpoints */
+#endif
+
+/**
+ * @brief Number of IN/OUT endpoints including EP0 as used by USBUS
+ *
+ * @note Since only a single number of EPs can be defined for USBUS that is
+ *       valid for all devices, the smallest number of EPs must be used for
+ *       multiple USB devices.
+ */
+#if defined(STM32_USB_OTG_FS_NUM_EP)
+#define USBDEV_NUM_ENDPOINTS            STM32_USB_OTG_FS_NUM_EP
+#elif defined(STM32_USB_OTG_HS_NUM_EP)
+#define USBDEV_NUM_ENDPOINTS            STM32_USB_OTG_HS_NUM_EP
+#else
+#define USBDEV_NUM_ENDPOINTS            8
+#endif
+
+#endif /* !DOXYGEN */
+
 #ifdef __cplusplus
 }
 #endif

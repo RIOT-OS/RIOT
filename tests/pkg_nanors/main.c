@@ -36,10 +36,14 @@ int main(void)
     static uint8_t data[(DATA_SHARDS + RECOVERY_SHARDS) * SHARD_SIZE];
     /* copy of data for comparison */
     static uint8_t data_cmp[DATA_SHARDS * SHARD_SIZE];
+    /* nanors work buffer */
+    static uint8_t rs_buf[reed_solomon_bufsize(DATA_SHARDS, RECOVERY_SHARDS)];
+
     /* pointer to shards */
-    static uint8_t *shards[DATA_SHARDS + RECOVERY_SHARDS];
+    uint8_t *shards[DATA_SHARDS + RECOVERY_SHARDS];
     /* map of missing shards */
-    static uint8_t marks[DATA_SHARDS + RECOVERY_SHARDS];
+    uint8_t marks[DATA_SHARDS + RECOVERY_SHARDS];
+    memset(marks, 0, sizeof(marks));
 
     /* generate random data */
     random_bytes(data, sizeof(data_cmp));
@@ -51,8 +55,7 @@ int main(void)
     }
 
     puts("START");
-    reed_solomon_init();
-    rs_t *rs = reed_solomon_new(DATA_SHARDS, RECOVERY_SHARDS);
+    rs_t *rs = reed_solomon_new_static(rs_buf, sizeof(rs_buf), DATA_SHARDS, RECOVERY_SHARDS);
     if (!rs) {
         puts("failed to init codec");
         return -1;
@@ -79,7 +82,6 @@ int main(void)
     } else {
         puts("done.");
     }
-    reed_solomon_release(rs);
 
     if (memcmp(data, data_cmp, sizeof(data_cmp))) {
         puts("FAILED");

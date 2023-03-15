@@ -84,6 +84,16 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   Number of IN EPs required for the HID interface
+ */
+#define USBUS_HID_EP_IN_REQUIRED_NUMOF   1
+
+/**
+ * @brief   Number of Out EPs required for the HID interface
+ */
+#define USBUS_HID_EP_OUT_REQUIRED_NUMOF  1
+
+/**
  * @brief USB HID descriptor struct
  *
  * @see USB HID 1.11 spec section 6.2.1

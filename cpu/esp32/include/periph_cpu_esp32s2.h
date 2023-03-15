@@ -270,6 +270,11 @@ extern "C" {
  * @brief   Buffers have to be word aligned for DMA
  */
 #define USBDEV_CPU_DMA_ALIGNMENT        (4)
+
+/**
+ * @brief Number of USB IN and OUT endpoints available
+ */
+#define USBDEV_NUM_ENDPOINTS            DWC2_USB_OTG_FS_NUM_EP
 /** @} */
 
 

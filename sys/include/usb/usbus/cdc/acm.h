@@ -90,6 +90,16 @@ extern "C" {
 #define USBUS_CDC_ACM_INT_EP_SIZE      (8)
 
 /**
+ * @brief Number of IN EPs required for the CDC ACM interface
+ */
+#define USBUS_CDC_ACM_EP_IN_REQUIRED_NUMOF   2
+
+/**
+ * @brief Number of Out EPs required for the CDC ACM interface
+ */
+#define USBUS_CDC_ACM_EP_OUT_REQUIRED_NUMOF  1
+
+/**
  * @brief CDC ACM line state as reported by the host computer
  */
 typedef enum {

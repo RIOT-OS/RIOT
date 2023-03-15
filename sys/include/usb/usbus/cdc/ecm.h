@@ -88,6 +88,16 @@ extern "C" {
 #define USBUS_ETHERNET_FRAME_BUF   MATH_ALIGN(ETHERNET_FRAME_LEN, USBUS_CDCECM_EP_DATA_SIZE)
 
 /**
+ * @brief Number of IN EPs required for the CDC ECM interface
+ */
+#define USBUS_CDC_ECM_EP_IN_REQUIRED_NUMOF   2
+
+/**
+ * @brief Number of Out EPs required for the CDC ECM interface
+ */
+#define USBUS_CDC_ECM_EP_OUT_REQUIRED_NUMOF  1
+
+/**
  * @brief notification state, used to track which information must be send to
  * the host
  */
