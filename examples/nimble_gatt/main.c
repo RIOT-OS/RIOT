@@ -66,6 +66,8 @@
 #define FIFO_SIZE	250
 
 #define UPDATE_INTERVAL         (1000U)
+#define TAMANHO_MEDIDA          (3*sizeof(float)+sizeof(int))
+#define CONTADOR                9 //QUANTIDADE DE MEDIDAS DO DUMP
 
 static event_queue_t _eq;
 static event_t _update_evt;
@@ -74,9 +76,8 @@ static event_timeout_t _update_timeout_evt;
 static uint16_t _conn_handle;
 static uint16_t _hrs_val_handle;
 
-uint16_t contador = 9; //é necessário para o IOS
-char myarray[9*15]; //15 mensagens de 9 bytes cada, aqui agora precisa ser 9 pois o IOS menor que 10 não aceita mais que 158 bytes por envio
-char myarray2[16];
+char myarray[CONTADOR*TAMANHO_MEDIDA]; //9 mensagens de 16 bytes cada, aqui agora precisa ser 9 pois o IOS menor que 10 não aceita mais que 158 bytes por envio
+char myarray2[TAMANHO_MEDIDA];
 
 /* Variable declarations */
 
@@ -104,7 +105,7 @@ typedef struct
     int  timestamp;
 } leitura;
 
-uint16_t conta_requisicoes=0;
+uint16_t conta_requisicoes=MAX_READINGS-;
  
 #define MAX_READINGS 4096
 leitura readings_buffer[MAX_READINGS];
@@ -362,10 +363,10 @@ static int gatt_svr_chr_access_rw_demo(
         if (ctxt->op == BLE_GATT_ACCESS_OP_READ_CHR && strcmp(rm_demo_write_data, "oi") == 0)
         {
 
-            make_dump_package(contador*conta_requisicoes);
+            make_dump_package(CONTADOR*conta_requisicoes);
 
-            if((conta_requisicoes >= MAX_READINGS/contador) &&
-                conta_requisicoes*contador < (int)rlen )
+            if((conta_requisicoes >= MAX_READINGS/CONTADOR) &&
+                conta_requisicoes*CONTADOR < (int)rlen )
             {
                 conta_requisicoes=0;
             }
@@ -375,9 +376,9 @@ static int gatt_svr_chr_access_rw_demo(
                 printf("Posicao: %d \n", conta_requisicoes);
             }
 
-            printf("reqs = %d \n", conta_requisicoes);           
+            printf("Requisicao = %d \n", (int)get_ring_index());           
 
-            rc = os_mbuf_append(ctxt->om, &str_answer, contador*(3*sizeof(float)+sizeof(int)));
+            rc = os_mbuf_append(ctxt->om, &str_answer, CONTADOR*(3*sizeof(float)+sizeof(int)));
             
             return rc;
         }
@@ -745,9 +746,9 @@ void make_dump_package(int initial_index)
     int auxi;
     float auxf;
 
-    for(int i=0; i < contador; i++)
+    for(int i=-1; i >= -CONTADOR; i--)
     {
-        if (i+initial_index <= MAX_READINGS -1)
+        if (i+initial_index >= 0)    
         {
             auxf= (readings_buffer[i+initial_index].X_axis / AC);
             memcpy(myarray + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
@@ -759,13 +760,13 @@ void make_dump_package(int initial_index)
             memcpy(myarray + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
         }
         else{
-            auxf= (readings_buffer[i].X_axis / AC);
+            auxf= (readings_buffer[MAX_READINGS+i].X_axis / AC);
             memcpy(myarray + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-            auxf= (readings_buffer[i].Y_axis / AC); 
+            auxf= (readings_buffer[MAX_READINGS+i].Y_axis / AC); 
             memcpy(myarray + (3*i+1)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-            auxf= (readings_buffer[i].Z_axis / AC);
+            auxf= (readings_buffer[MAX_READINGS+i].Z_axis / AC);
             memcpy(myarray + (3*i+2)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-            auxi= (readings_buffer[i].timestamp);
+            auxi= (readings_buffer[MAX_READINGS+i].timestamp);
             memcpy(myarray + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
         }
     }
@@ -798,5 +799,5 @@ uint16_t get_ring_index(void)
 
 void add_ring_index(void)
 {
-    ring_buffer_current_index = rlen < MAX_READINGS ? (9*15)*rlen++ : 0;
+    ring_buffer_current_index = rlen < MAX_READINGS ? (9*16)*rlen++ : 0;
 }
