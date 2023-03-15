@@ -211,7 +211,15 @@ static size_t _max_endpoints(const dwc2_usb_otg_fshs_config_t *config)
 
 static bool _uses_dma(const dwc2_usb_otg_fshs_config_t *config)
 {
-#if defined(DWC2_USB_OTG_HS_ENABLED) && STM32_USB_OTG_HS_USE_DMA
+/* DMA mode is disabled for now due to several problems:
+ * - The STALL bit of the OUT control endpoint does not seem to be cleared
+ *   automatically on the next SETUP received. At least the USB OTG HS core
+ *   does not generate an interrupt on the next SETUP received. This happens,
+ *   for example, when CDC ACM is used and the host sends the SET_LINE_CODING
+ *   request. In this case the enumeration of further interfaces, for example
+ *   CDC ECM is stopped.
+ * - The Enumeration fails for CDC ECM interface which uses URB support. */
+#if 0 /* defined(DWC2_USB_OTG_HS_ENABLED) && STM32_USB_OTG_HS_USE_DMA */
     return config->type == DWC2_USB_OTG_HS;
 #else
     (void)config;
