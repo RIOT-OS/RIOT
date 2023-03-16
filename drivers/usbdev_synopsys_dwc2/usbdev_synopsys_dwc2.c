@@ -596,6 +596,8 @@ static void _sleep_periph(const dwc2_usb_otg_fshs_config_t *conf)
     /* switch USB core clock source either to LFXO or LFRCO */
     CMU_ClockSelectSet(cmuClock_USB, CLOCK_LFA);
     pm_unblock(EFM32_PM_MODE_EM2);
+#elif defined(MCU_ESP32)
+    pm_unblock(ESP_PM_LIGHT_SLEEP);
 #endif
 }
 
@@ -613,6 +615,8 @@ static void _wake_periph(const dwc2_usb_otg_fshs_config_t *conf)
 #else
 #error "EFM32 family not yet supported"
 #endif
+#elif defined(MCU_ESP32)
+    pm_block(ESP_PM_LIGHT_SLEEP);
 #endif
     *_pcgcctl_reg(conf) &= ~USB_OTG_PCGCCTL_STOPCLK;
     _flush_rx_fifo(conf);
@@ -691,6 +695,9 @@ static void _usbdev_init(usbdev_t *dev)
     _enable_gpio(conf);
 
 #elif defined(MCU_ESP32)
+
+    pm_block(ESP_PM_DEEP_SLEEP);
+    pm_block(ESP_PM_LIGHT_SLEEP);
 
     usb_phy_handle_t phy_hdl;               /* only needed temporarily */
 

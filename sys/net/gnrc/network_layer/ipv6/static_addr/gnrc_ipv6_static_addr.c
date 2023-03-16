@@ -84,7 +84,7 @@ static void _config_downstream(gnrc_netif_t *downstream)
 
     DEBUG("gnrc_ipv6_static_addr: interface %u selected as downstream\n", downstream->pid);
 
-    if (CONFIG_GNRC_IPV6_STATIC_PREFIX == NULL) {
+    if (static_prefix == NULL) {
         return;
     }
 
@@ -113,25 +113,34 @@ static void _config_downstream(gnrc_netif_t *downstream)
 
 void auto_init_gnrc_ipv6_static_addr(void)
 {
-    gnrc_netif_t *netif = NULL;
     gnrc_netif_t *upstream = NULL;
     gnrc_netif_t *downstream = NULL;
 
-    if (IS_ACTIVE(CONFIG_GNRC_IPV6_STATIC_ADDR_UPSTREAM)) {
-        upstream = gnrc_netif_get_by_pid(CONFIG_GNRC_IPV6_STATIC_ADDR_UPSTREAM);
-    }
+    if (gnrc_netif_highlander() || gnrc_netif_numof() == 1) {
+        upstream = gnrc_netif_iter(NULL);
 
-    if (IS_ACTIVE(CONFIG_GNRC_IPV6_STATIC_ADDR_DOWNSTREAM)) {
-        downstream = gnrc_netif_get_by_pid(CONFIG_GNRC_IPV6_STATIC_ADDR_DOWNSTREAM);
-    }
+        if (IS_ACTIVE(CONFIG_GNRC_IPV6_STATIC_ADDR_UPSTREAM)) {
+            assert(upstream->pid == CONFIG_GNRC_IPV6_STATIC_ADDR_UPSTREAM);
+        }
+    } else {
 
-    while ((netif = gnrc_netif_iter(netif))) {
-        bool is_wired = gnrc_netapi_get(netif->pid, NETOPT_IS_WIRED, 0, NULL, 0) == 1;
+        if (IS_ACTIVE(CONFIG_GNRC_IPV6_STATIC_ADDR_UPSTREAM)) {
+            upstream = gnrc_netif_get_by_pid(CONFIG_GNRC_IPV6_STATIC_ADDR_UPSTREAM);
+        }
 
-        if (!upstream && is_wired) {
-            upstream = netif;
-        } else if (!downstream && !is_wired) {
-            downstream = netif;
+        if (IS_ACTIVE(CONFIG_GNRC_IPV6_STATIC_ADDR_DOWNSTREAM)) {
+            downstream = gnrc_netif_get_by_pid(CONFIG_GNRC_IPV6_STATIC_ADDR_DOWNSTREAM);
+        }
+
+        gnrc_netif_t *netif = NULL;
+        while ((netif = gnrc_netif_iter(netif))) {
+            bool is_wired = gnrc_netapi_get(netif->pid, NETOPT_IS_WIRED, 0, NULL, 0) == 1;
+
+            if (!upstream && is_wired) {
+                upstream = netif;
+            } else if (!downstream && !is_wired) {
+                downstream = netif;
+            }
         }
     }
 

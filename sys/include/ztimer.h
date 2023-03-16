@@ -487,7 +487,7 @@ unsigned ztimer_is_set(const ztimer_clock_t *clock, const ztimer_t *timer);
 /**
  * @brief   Remove a timer from a clock
  *
- * This will place @p timer in the timer targets queue for @p clock.
+ * This will remove @p timer from the timer targets queue for @p clock.
  *
  * This function does nothing if @p timer is not found in the timer queue of
  * @p clock.
