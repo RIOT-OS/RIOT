@@ -130,6 +130,9 @@ typedef struct {
     usbdev_ep_t *in;                            /**< In endpoints */
     dwc2_usb_otg_fshs_out_ep_t *out;            /**< Out endpoints */
     bool suspend;                               /**< Suspend status */
+#ifdef DWC2_USB_OTG_HS_ENABLED
+    uint8_t *ep0_out_buf;  /**< Points to the buffer of EP0 OUT handler */
+#endif
 } dwc2_usb_otg_fshs_t;
 
 /* List of instantiated USB peripherals */
@@ -219,7 +222,7 @@ static bool _uses_dma(const dwc2_usb_otg_fshs_config_t *config)
  *   request. In this case the enumeration of further interfaces, for example
  *   CDC ECM is stopped.
  * - The Enumeration fails for CDC ECM interface which uses URB support. */
-#if 0 /* defined(DWC2_USB_OTG_HS_ENABLED) && STM32_USB_OTG_HS_USE_DMA */
+#ifdef DWC2_USB_OTG_HS_ENABLED
     return config->type == DWC2_USB_OTG_HS;
 #else
     (void)config;
@@ -975,7 +978,7 @@ static void _usbdev_init(usbdev_t *dev)
         /* Unmask the transfer complete interrupts
          * Only needed when using DMA, otherwise the RX FIFO not empty
          * interrupt is used */
-        _device_regs(conf)->DOEPMSK |= USB_OTG_DOEPMSK_XFRCM;
+        _device_regs(conf)->DOEPMSK |= USB_OTG_DOEPMSK_XFRCM | USB_OTG_DOEPMSK_STUPM;
         _device_regs(conf)->DIEPMSK |= USB_OTG_DIEPMSK_XFRCM;
     }
 
@@ -1165,6 +1168,22 @@ static void _usbdev_ep0_stall(usbdev_t *usbdev)
     /* Stall both directions, cleared automatically on SETUP received */
     _in_regs(conf, 0)->DIEPCTL |= USB_OTG_DIEPCTL_STALL;
     _out_regs(conf, 0)->DOEPCTL |= USB_OTG_DOEPCTL_STALL;
+
+#ifdef DWC2_USB_OTG_HS_ENABLED
+    if (_uses_dma(conf) && st_usbdev->ep0_out_buf) {
+        /* The STALL condition is automatically cleared by the hardware as
+         * specified in the API documentation. However, in DMA mode the
+         * reception of the next SETUP must be prepared by setting the SETUP
+         * packet counter (STUPCNT) and enabling the OUT endpoint. Otherwise
+         * the USB OTG HS core will not generate an interrupt and the USB stack
+         * cannot respond correctly to the next SETUP received. In addition,
+         * the DMA address must be reset to the buffer address of the EP0
+         * OUT handler. */
+        _out_regs(conf, 0)->DOEPDMA = (uint32_t)(intptr_t)(st_usbdev->ep0_out_buf);
+        _out_regs(conf, 0)->DOEPTSIZ |= 1 << USB_OTG_DOEPTSIZ_STUPCNT_Pos;
+        _out_regs(conf, 0)->DOEPCTL |= USB_OTG_DOEPCTL_EPENA;
+    }
+#endif
 }
 
 static void _ep_set_stall(usbdev_ep_t *ep, bool enable)
@@ -1306,6 +1325,13 @@ static int _usbdev_ep_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
 
         if (_uses_dma(conf)) {
             _out_regs(conf, ep->num)->DOEPDMA = (uint32_t)(intptr_t)buf;
+            /* store the buffer address of the EP0 OUT handler to use it in
+             * _usbdev_ep0_stall */
+#ifdef DWC2_USB_OTG_HS_ENABLED
+            if (ep->num == 0) {
+                usbdev->ep0_out_buf = buf;
+            }
+#endif
         }
         else {
             container_of(ep, dwc2_usb_otg_fshs_out_ep_t, ep)->out_buf = buf;
@@ -1354,11 +1380,6 @@ static void _read_packet(dwc2_usb_otg_fshs_out_ep_t *st_ep)
      * complete status */
     if (pkt_status == DWC2_PKTSTS_DATA_UPDT ||
         pkt_status == DWC2_PKTSTS_SETUP_UPDT) {
-#if defined(MCU_EFM32)
-        /* TODO For some reason a short delay is required here on EFM32. It has
-         * to be investigated further. A delay of 1 msec is inserted for now. */
-        ztimer_sleep(ZTIMER_MSEC, 1);
-#endif
         _copy_rxfifo(usbdev, st_ep->out_buf, len);
 #if !defined(STM32_USB_OTG_CID_1x)
         /* CID 2x doesn't signal SETUP_COMP on non-zero length packets, signal
@@ -1409,6 +1430,15 @@ static void _usbdev_ep_esr(usbdev_ep_t *ep)
              !_uses_dma(conf)) {
             _read_packet(container_of(ep, dwc2_usb_otg_fshs_out_ep_t, ep));
         }
+#ifdef DWC2_USB_OTG_HS_ENABLED
+        else if (_out_regs(conf, ep->num)->DOEPINT & USB_OTG_DOEPINT_STUP) {
+            _out_regs(conf, ep->num)->DOEPINT = USB_OTG_DOEPINT_STUP;
+            _out_regs(conf, ep->num)->DOEPINT = USB_OTG_DOEPINT_XFRC;
+            if (_uses_dma(conf)) {
+                usbdev->usbdev.epcb(ep, USBDEV_EVENT_TR_COMPLETE);
+            }
+        }
+#endif
         /* Transfer complete seems only reliable when used with DMA */
         else if (_out_regs(conf, ep->num)->DOEPINT & USB_OTG_DOEPINT_XFRC) {
             _out_regs(conf, ep->num)->DOEPINT = USB_OTG_DOEPINT_XFRC;
