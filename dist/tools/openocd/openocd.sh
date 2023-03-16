@@ -154,6 +154,14 @@ if [ "${OPENOCD_RESET_USE_CONNECT_ASSERT_SRST}" = "1" ]; then
   OPENOCD_EXTRA_RESET_INIT+="-c 'reset_config connect_assert_srst'"
 fi
 
+${OPENOCD_ADAPTER_USB_LOCATION:=}
+# Choose USB-Port to use openocd on (via ENV-Var $OPENOCD_USB_LOCATION). Useful, when more than 1 device attached.
+    if [[ ! -z ${OPENOCD_USB_LOCATION} ]] ; then
+        ${OPENOCD_ADAPTER_USB_LOCATION:="-c 'adapter usb location ${OPENOCD_USB_LOCATION}'"}
+        # adapter usb location [<bus>-<port>[.<port>]...]
+        # Page 37 in Manual: https://openocd.org/doc/pdf/openocd.pdf
+    fi
+
 #
 # a couple of tests for certain configuration options
 #
@@ -241,6 +249,7 @@ _flash_list_raw() {
             ${OPENOCD_ADAPTER_INIT} \
             -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_RESET_INIT} \
+            ${OPENOCD_ADAPTER_USB_LOCATION} \
             -c 'init' \
             -c 'targets' \
             ${OPENOCD_CMD_RESET_HALT} \
@@ -253,6 +262,7 @@ _flash_list_raw() {
     echo "WARN: Falling back to using the openocd configuration value." >&2
     sh -c "${OPENOCD} \
             ${OPENOCD_ADAPTER_INIT} \
+            ${OPENOCD_ADAPTER_USB_LOCATION} \
             -f '${OPENOCD_CONFIG}' \
             -c 'flash list' \
             -c 'shutdown'" 2>&1
@@ -310,6 +320,7 @@ do_flashr() {
             -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_INIT} \
             ${OPENOCD_EXTRA_RESET_INIT} \
+            ${OPENOCD_ADAPTER_USB_LOCATION} \
             -c 'tcl_port 0' \
             -c 'telnet_port 0' \
             -c 'gdb_port 0' \
@@ -357,12 +368,14 @@ do_flash() {
         echo "Flashing with IMAGE_OFFSET: ${IMAGE_OFFSET}"
     fi
 
+    
     # flash device
     sh -c "${OPENOCD} \
             ${OPENOCD_ADAPTER_INIT} \
             -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_INIT} \
             ${OPENOCD_EXTRA_RESET_INIT} \
+            ${OPENOCD_ADAPTER_USB_LOCATION} \
             -c 'tcl_port 0' \
             -c 'telnet_port 0' \
             -c 'gdb_port 0' \
@@ -374,8 +387,8 @@ do_flash() {
             ${OPENOCD_PRE_VERIFY_CMDS} \
             ${OPENOCD_VERIFY} \
             -c 'reset run' \
-            -c 'shutdown'" &&
-    echo 'Done flashing'
+            -c 'shutdown'" #&&
+    #echo 'Done flashing'
 }
 
 do_debug() {
@@ -396,10 +409,12 @@ do_debug() {
     # don't trap on Ctrl+C, because GDB keeps running
     trap '' INT
     # start OpenOCD as GDB server
+
     ${SETSID} sh -c "${OPENOCD} \
             ${OPENOCD_ADAPTER_INIT} \
             -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_INIT} \
+            ${OPENOCD_ADAPTER_USB_LOCATION} \
             -c 'tcl_port ${TCL_PORT}' \
             -c 'telnet_port ${TELNET_PORT}' \
             -c 'gdb_port ${GDB_PORT}' \
@@ -428,6 +443,7 @@ do_debugserver() {
             ${OPENOCD_ADAPTER_INIT} \
             -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_INIT} \
+            ${OPENOCD_ADAPTER_USB_LOCATION} \
             -c 'tcl_port ${TCL_PORT}' \
             -c 'telnet_port ${TELNET_PORT}' \
             -c 'gdb_port ${GDB_PORT}' \
@@ -443,6 +459,7 @@ do_reset() {
     sh -c "${OPENOCD} \
             ${OPENOCD_ADAPTER_INIT} \
             -f '${OPENOCD_CONFIG}' \
+            ${OPENOCD_ADAPTER_USB_LOCATION} \
             ${OPENOCD_EXTRA_INIT} \
             ${OPENOCD_EXTRA_RESET_INIT} \
             -c 'tcl_port 0' \
