@@ -154,14 +154,17 @@ typedef struct {
 /**
  * @brief Number of IN/OUT endpoints including EP0 as used by USBUS
  *
- * @note Since only a single number of EPs can be defined for USBUS that is
- *       valid for all devices, the smallest number of EPs must be used for
- *       multiple USB devices.
+ * @note USBUS allows only one definition of the number of available EPs, which
+ *       is then used for all devices. To be able to use all EPs for devices
+ *       with more EPs, the largest possible number of available EPs for
+ *       several USB devices is defined here. The driver has to ensure that the
+ *       number of allocated EPs does not exceed the number of available EPs if
+ *       a device has less EPs.
  */
-#if defined(STM32_USB_OTG_FS_NUM_EP)
-#define USBDEV_NUM_ENDPOINTS            STM32_USB_OTG_FS_NUM_EP
-#elif defined(STM32_USB_OTG_HS_NUM_EP)
+#if defined(MODULE_PERIPH_USBDEV_HS) && defined(STM32_USB_OTG_HS_NUM_EP)
 #define USBDEV_NUM_ENDPOINTS            STM32_USB_OTG_HS_NUM_EP
+#elif defined(STM32_USB_OTG_FS_NUM_EP)
+#define USBDEV_NUM_ENDPOINTS            STM32_USB_OTG_FS_NUM_EP
 #else
 #define USBDEV_NUM_ENDPOINTS            8
 #endif
