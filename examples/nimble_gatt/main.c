@@ -76,8 +76,8 @@ static event_timeout_t _update_timeout_evt;
 static uint16_t _conn_handle;
 static uint16_t _hrs_val_handle;
 
-char myarray[CONTADOR*TAMANHO_MEDIDA]; //9 mensagens de 16 bytes cada, aqui agora precisa ser 9 pois o IOS menor que 10 não aceita mais que 158 bytes por envio
-char myarray2[TAMANHO_MEDIDA];
+char dump_array[CONTADOR*TAMANHO_MEDIDA]; //9 mensagens de 16 bytes cada, aqui agora precisa ser 9 pois o IOS menor que 10 não aceita mais que 158 bytes por envio
+char solo_measurement[TAMANHO_MEDIDA];
 
 /* Variable declarations */
 
@@ -89,13 +89,13 @@ struct bmi160_sensor_data accel_data[ACC_FRAMES];
 
 int8_t rslt;
 
-typedef struct
-{
-    int16_t accelerometerX;
-    int16_t accelerometerY;
-    int16_t accelerometerZ;
-    uint16_t dummy;
-} reading_t;
+// typedef struct
+// {
+//     int16_t accelerometerX;
+//     int16_t accelerometerY;
+//     int16_t accelerometerZ;
+//     uint16_t dummy;
+// } reading_t;
 
 typedef struct
 {
@@ -105,15 +105,16 @@ typedef struct
     int  timestamp;
 } leitura;
 
-uint16_t conta_requisicoes=MAX_READINGS-;
- 
 #define MAX_READINGS 4096
+
 leitura readings_buffer[MAX_READINGS];
 size_t rlen = 0;
 
+uint16_t dump_index=0;
+
 void init_bmiSensor(void);
 void init_and_run_BLE(void);
-reading_t get_reading(void);
+//reading_t get_reading(void);
 void right_shift_readings_buffer(void);
 void do_read(void);
 void log_readings(void);
@@ -123,7 +124,7 @@ static void _hr_update(event_t *e);
 void make_data_package(uint16_t index);
 void make_dump_package(int initial_index);
 
-uint16_t ring_buffer_current_index = 0;
+uint16_t latest_measurement = 0; //Ring buffer index
 uint16_t get_ring_index(void);
 void add_ring_index(void);
 
@@ -181,7 +182,7 @@ static const ble_uuid128_t latest_mesurement_uuid
                 0x4d, 0xd5, 0x40, 0x3f, 0x11, 0xdd, 0xcc);
 
                 
-static char rm_demo_write_data[64] = "Get it done!";
+static char rm_demo_write_data[64] = "This is the command characteristic";
 
 static int gatt_svr_chr_access_device_info_manufacturer(
     uint16_t conn_handle, uint16_t attr_handle,
@@ -363,30 +364,29 @@ static int gatt_svr_chr_access_rw_demo(
         if (ctxt->op == BLE_GATT_ACCESS_OP_READ_CHR && strcmp(rm_demo_write_data, "oi") == 0)
         {
 
-            make_dump_package(CONTADOR*conta_requisicoes);
+            make_dump_package(dump_index);
 
-            if((conta_requisicoes >= MAX_READINGS/CONTADOR) &&
-                conta_requisicoes*CONTADOR < (int)rlen )
+            if (dump_index < 0)
             {
-                conta_requisicoes=0;
+                dump_index=get_ring_index();
             }
             else
             {
-                conta_requisicoes+=1;
-                printf("Posicao: %d \n", conta_requisicoes);
+                dump_index-=CONTADOR;
+                printf("Posicao Inicial: %d \n", dump_index);
             }
 
-            printf("Requisicao = %d \n", (int)get_ring_index());           
+            printf("Posicao Final = %d \n", (int)get_ring_index());           
 
-            rc = os_mbuf_append(ctxt->om, &str_answer, CONTADOR*(3*sizeof(float)+sizeof(int)));
+            rc = os_mbuf_append(ctxt->om, &str_answer, CONTADOR*TAMANHO_MEDIDA);
             
             return rc;
         }
         else if (ctxt->op == BLE_GATT_ACCESS_OP_READ_CHR && strcmp(rm_demo_write_data, "ri") == 0)
         {
-            conta_requisicoes = 0;
+            dump_index=get_ring_index();
             snprintf(str_answer, STR_ANSWER_BUFFER_SIZE,
-                     "Ringbuffer index Reset");
+                     "Ringbuffer index Reset to latest measurement");
             puts(str_answer);
 
             rc = os_mbuf_append(ctxt->om, &str_answer, strlen(str_answer));
@@ -453,7 +453,7 @@ void right_shift_readings_buffer(void)
 
 void do_read(void)
 {
-    uint16_t aux = get_ring_index(); //supondo que o index nunca vai ser um valor proibido
+    uint16_t aux = get_ring_index(); //supoes-se que o index nunca vai ser um valor proibido nunca <0 e nem >= MAX READINGS
     uint16_t i, j;
     for (i = aux, j = 0; i < (aux + ACC_FRAMES) && j < ACC_FRAMES; i++, j++)
     {
@@ -461,20 +461,17 @@ void do_read(void)
         readings_buffer[i].Y_axis = accel_data[j].y;
         readings_buffer[i].Z_axis = accel_data[j].z;
         readings_buffer[i].timestamp = (int)(xtimer_now_usec()/1000); 
+        add_ring_index(); //incrementa-se o indice do ring buffer a cada medida
     }
-    add_ring_index(); //função para incrementar o scan no ring buffer
 }
 
 void log_readings(void)
 {
-    //#ifdef PULGA_USE_RINGBUFFER
-    //for (size_t i = 0; i < rlen; i++)
-   // {
-    int i= 0;
+    int i= get_ring_index();
         printf("[Acc_readings] readings_buffer[%d]: ", i);
-        printf("Acc_x: %f ", ((float)readings_buffer[i].X_axis)/ AC);
-        printf("Acc_y: %f ", ((float)readings_buffer[i].Y_axis)/ AC);
-        printf("Acc_z: %f ", ((float)readings_buffer[i].Z_axis)/ AC);
+        printf("Acc_x: %2.6f ", ((float)readings_buffer[i].X_axis)/ AC);
+        printf("Acc_y: %2.6f ", ((float)readings_buffer[i].Y_axis)/ AC);
+        printf("Acc_z: %2.6f ", ((float)readings_buffer[i].Z_axis)/ AC);
         printf("Acc_timeStamp: %d ", (readings_buffer[i].timestamp));
         printf("\n %c", 13);
 }
@@ -569,14 +566,14 @@ static void _start_updating(void)
 {
     //event_timeout_set(&_update_timeout_evt, UPDATE_INTERVAL);
     connected= 1;
-    puts("[NOTIFY_ENABLED] heart rate service");
+    printf("[NOTIFY_ENABLED] Streaming ON\n%c", 13);
 }
 
 static void _stop_updating(void)
 {
     //event_timeout_clear(&_update_timeout_evt);
     connected = 0;
-    puts("[NOTIFY_DISABLED] heart rate service");
+    printf("[NOTIFY_DISABLED] Streaming OFF\n%c", 13);
 }
 
 static int gap_event_cb(struct ble_gap_event *event, void *arg)
@@ -615,7 +612,7 @@ static int gap_event_cb(struct ble_gap_event *event, void *arg)
 
 void init_and_run_BLE(void)
 {
-    puts("NimBLE GATT Server Example");
+    printf("NimBLE GATT Pulga for BELKA \n%c",13);
 
     int rc = 0;
     (void)rc;
@@ -684,23 +681,27 @@ static void _hr_update(event_t *e)
 
     /* from here, we code the event */
     acquire_ACC_Values();
-    do_read(); //aqui na do_read iremos adicionar os dados no final do ring buffer
+    do_read(); //aqui iremos adicionar os dados no final do ring buffer e incrementalo
 
     int auxi, auxi3;
     auxi3 = get_ring_index();
-    make_data_package(auxi3);   
+    if (auxi3 > 0)
+        make_data_package(auxi3 -1); //do read já incrementa o ring buffer
+    else
+        make_data_package(0);
     
     if(connected){
         /* send data notification to GATT client */
-        om = ble_hs_mbuf_from_flat(myarray2, sizeof(myarray2));
+        om = ble_hs_mbuf_from_flat(solo_measurement, sizeof(solo_measurement));
         assert(om != NULL);
         int res = ble_gattc_notify_custom(_conn_handle, _hrs_val_handle, om);
         assert(res == 0);
         (void)res;
     }
 
-    auxi = myarray2[12] + (myarray2[13] <<8) + (myarray2[14] <<16) + (myarray2[15] <<24); //VERY SENSIBLE BIT SHIFT OPERATION
-    printf("[NOTIFY] Latest measurement: %d \n %c", auxi - auxi2, 13);
+    auxi = solo_measurement[12] + (solo_measurement[13] <<8) + (solo_measurement[14] <<16) + (solo_measurement[15] <<24); //VERY SENSIBLE BIT SHIFT OPERATION
+    printf("[NOTIFY] Latest measurement interval: %d \n %c", auxi - auxi2, 13);
+    printf("[NOTIFY] Ringbuffer Index: %d \n %c", auxi3, 13);
     auxi2 = auxi;
     /* schedule next update event */
     event_timeout_set(&_update_timeout_evt, UPDATE_INTERVAL);
@@ -712,13 +713,13 @@ void make_data_package(uint16_t index)
     float auxf;
 
         auxf= (readings_buffer[index].X_axis / AC);
-        memcpy(myarray2, &auxf, sizeof(float));
+        memcpy(solo_measurement, &auxf, sizeof(float));
         auxf= (readings_buffer[index].Y_axis / AC); 
-        memcpy(myarray2 + sizeof(float) , &auxf, sizeof(float));
+        memcpy(solo_measurement + sizeof(float) , &auxf, sizeof(float));
         auxf= (readings_buffer[index].Z_axis / AC);
-        memcpy(myarray2 + (2)*sizeof(float), &auxf, sizeof(float));
+        memcpy(solo_measurement + (2)*sizeof(float), &auxf, sizeof(float));
         auxi= (readings_buffer[index].timestamp);
-        memcpy(myarray2 + (+3)*sizeof(float), &auxi, sizeof(int));
+        memcpy(solo_measurement + (3)*sizeof(float), &auxi, sizeof(int));
     }
 
 static int gatt_svr_chr_access_device_info_manufacturer(
@@ -746,28 +747,28 @@ void make_dump_package(int initial_index)
     int auxi;
     float auxf;
 
-    for(int i=-1; i >= -CONTADOR; i--)
+    for(int i=0; i < CONTADOR; i++)
     {
         if (i+initial_index >= 0)    
         {
-            auxf= (readings_buffer[i+initial_index].X_axis / AC);
-            memcpy(myarray + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-            auxf= (readings_buffer[i+initial_index].Y_axis / AC); 
-            memcpy(myarray + (3*i+1)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-            auxf= (readings_buffer[i+initial_index].Z_axis / AC);
-            memcpy(myarray + (3*i+2)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-            auxi= (readings_buffer[i+initial_index].timestamp);
-            memcpy(myarray + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
+            auxf= (readings_buffer[-i+initial_index].X_axis / AC);
+            memcpy(dump_array + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+            auxf= (readings_buffer[-i+initial_index].Y_axis / AC); 
+            memcpy(dump_array + (3*i+1)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+            auxf= (readings_buffer[-i+initial_index].Z_axis / AC);
+            memcpy(dump_array + (3*i+2)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+            auxi= (readings_buffer[-i+initial_index].timestamp);
+            memcpy(dump_array + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
         }
         else{
-            auxf= (readings_buffer[MAX_READINGS+i].X_axis / AC);
-            memcpy(myarray + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-            auxf= (readings_buffer[MAX_READINGS+i].Y_axis / AC); 
-            memcpy(myarray + (3*i+1)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-            auxf= (readings_buffer[MAX_READINGS+i].Z_axis / AC);
-            memcpy(myarray + (3*i+2)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-            auxi= (readings_buffer[MAX_READINGS+i].timestamp);
-            memcpy(myarray + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
+            auxf= (readings_buffer[MAX_READINGS-i].X_axis / AC);
+            memcpy(dump_array + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+            auxf= (readings_buffer[MAX_READINGS-i].Y_axis / AC); 
+            memcpy(dump_array + (3*i+1)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+            auxf= (readings_buffer[MAX_READINGS-i].Z_axis / AC);
+            memcpy(dump_array + (3*i+2)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+            auxi= (readings_buffer[MAX_READINGS-i].timestamp);
+            memcpy(dump_array + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
         }
     }
 }
@@ -780,24 +781,19 @@ static int send_latest_measurements(
     (void)attr_handle;
     (void)arg;
 
-    //make_data_package();
-    
-    int rc = os_mbuf_append(ctxt->om, myarray, sizeof(myarray));
+    int rc = os_mbuf_append(ctxt->om, solo_measurement, sizeof(solo_measurement));
 
     puts("new service working");
-
-    //event_timeout_clear(&_update_timeout_evt);
-    //_hr_update(&_update_evt);
 
     return rc;
 }
 
 uint16_t get_ring_index(void)
 {
-    return ring_buffer_current_index;
+    return latest_measurement;
 }
 
 void add_ring_index(void)
 {
-    ring_buffer_current_index = rlen < MAX_READINGS ? (9*16)*rlen++ : 0;
+    latest_measurement = rlen < MAX_READINGS ? rlen++ : 0;
 }
