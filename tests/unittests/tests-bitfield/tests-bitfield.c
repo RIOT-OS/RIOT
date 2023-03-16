@@ -299,6 +299,16 @@ static void test_bf_set_all(void)
     TEST_ASSERT_EQUAL_INT(0, field[4]);
 }
 
+static void test_bf_clear_all(void)
+{
+    uint8_t field[5];
+
+    memset(field, 0xFF, sizeof(field));
+    bf_clear_all(field, 5);
+    TEST_ASSERT_EQUAL_INT(0x7, field[0]);
+    TEST_ASSERT_EQUAL_INT(0xFF, field[1]);
+}
+
 static void test_bf_popcnt(void)
 {
     uint8_t field[5];
@@ -334,6 +344,7 @@ Test *tests_bitfield_tests(void) {
         new_TestFixture(test_bf_find_first_set),
         new_TestFixture(test_bf_find_first_unset),
         new_TestFixture(test_bf_set_all),
+        new_TestFixture(test_bf_clear_all),
         new_TestFixture(test_bf_popcnt),
     };
 
