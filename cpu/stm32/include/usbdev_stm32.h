@@ -111,19 +111,6 @@ extern "C" {
  */
 #define DWC2_USB_OTG_HS_TOTAL_FIFO_SIZE USB_OTG_HS_TOTAL_FIFO_SIZE
 
-/**
- * @brief Use the built-in DMA controller of the HS peripheral when possible
- */
-#ifndef STM32_USB_OTG_HS_USE_DMA
-#ifdef STM32_USB_OTG_CID_1x
-/* FIXME: It should be possible to use DMA with the 1.x version of the  *
- * peripheral, but somehow it doesn't work.                             */
-#define STM32_USB_OTG_HS_USE_DMA        (0)
-#else
-#define STM32_USB_OTG_HS_USE_DMA        (1)
-#endif
-#endif
-
 /* periph/usbdev.h is included after the definitions above by intention */
 #include "periph/usbdev.h"
 
