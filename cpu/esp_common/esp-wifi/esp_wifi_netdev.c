@@ -383,41 +383,99 @@ esp_err_t _esp_wifi_rx_cb(void *buffer, uint16_t len, void *eb)
 }
 
 #ifndef MODULE_ESP_WIFI_AP
-#define REASON_BEACON_TIMEOUT      (200)
-#define REASON_HANDSHAKE_TIMEOUT   (204)
-#define INDEX_BEACON_TIMEOUT       (REASON_BEACON_TIMEOUT - 24)
+static const char *_esp_wifi_disc_reasons[] = {
+    "INVALID",                                  /* 0 */
+    "UNSPECIFIED",                              /* 1 */
+    "AUTH_EXPIRE",                              /* 2 */
+    "AUTH_LEAVE",                               /* 3 */
+    "ASSOC_EXPIRE",                             /* 4 */
+    "ASSOC_TOOMANY",                            /* 5 */
+    "NOT_AUTHED",                               /* 6 */
+    "NOT_ASSOCED",                              /* 7 */
+    "ASSOC_LEAVE",                              /* 8 */
+    "ASSOC_NOT_AUTHED",                         /* 9 */
+    "DISASSOC_PWRCAP_BAD",                      /* 10 */
+    "DISASSOC_SUPCHAN_BAD",                     /* 11 */
+    "BSS_TRANSITION_DISASSOC",                  /* 12 */
+    "IE_INVALID",                               /* 13 */
+    "MIC_FAILURE",                              /* 14 */
+    "4WAY_HANDSHAKE_TIMEOUT",                   /* 15 */
+    "GROUP_KEY_UPDATE_TIMEOUT",                 /* 16 */
+    "IE_IN_4WAY_DIFFERS",                       /* 17 */
+    "GROUP_CIPHER_INVALID",                     /* 18 */
+    "PAIRWISE_CIPHER_INVALID",                  /* 19 */
+    "AKMP_INVALID",                             /* 20 */
+    "UNSUPP_RSN_IE_VERSION",                    /* 21 */
+    "INVALID_RSN_IE_CAP",                       /* 22 */
+    "802_1X_AUTH_FAILED",                       /* 23 */
+    "CIPHER_SUITE_REJECTED",                    /* 24 */
+    "TDLS_PEER_UNREACHABLE",                    /* 25 */
+    "TDLS_UNSPECIFIED",                         /* 26 */
+    "SSP_REQUESTED_DISASSOC",                   /* 27 */
+    "NO_SSP_ROAMING_AGREEMENT",                 /* 28 */
+    "BAD_CIPHER_OR_AKM",                        /* 29 */
+    "NOT_AUTHORIZED_THIS_LOCATION",             /* 30 */
+    "SERVICE_CHANGE_PERCLUDES_TS",              /* 31 */
+    "UNSPECIFIED_QOS",                          /* 32 */
+    "NOT_ENOUGH_BANDWIDTH",                     /* 33 */
+    "MISSING_ACKS",                             /* 34 */
+    "EXCEEDED_TXOP",                            /* 35 */
+    "STA_LEAVING",                              /* 36 */
+    "END_BA",                                   /* 37 */
+    "UNKNOWN_BA",                               /* 38 */
+    "TIMEOUT",                                  /* 39 */
 
-static const char *_esp_wifi_disc_reasons [] = {
-    "INVALID",                     /* 0 */
-    "UNSPECIFIED",                 /* 1 */
-    "AUTH_EXPIRE",                 /* 2 */
-    "AUTH_LEAVE",                  /* 3 */
-    "ASSOC_EXPIRE",                /* 4 */
-    "ASSOC_TOOMANY",               /* 5 */
-    "NOT_AUTHED",                  /* 6 */
-    "NOT_ASSOCED",                 /* 7 */
-    "ASSOC_LEAVE",                 /* 8 */
-    "ASSOC_NOT_AUTHED",            /* 9 */
-    "DISASSOC_PWRCAP_BAD",         /* 10 (11h) */
-    "DISASSOC_SUPCHAN_BAD",        /* 11 (11h) */
-    "IE_INVALID",                  /* 13 (11i) */
-    "MIC_FAILURE",                 /* 14 (11i) */
-    "4WAY_HANDSHAKE_TIMEOUT",      /* 15 (11i) */
-    "GROUP_KEY_UPDATE_TIMEOUT",    /* 16 (11i) */
-    "IE_IN_4WAY_DIFFERS",          /* 17 (11i) */
-    "GROUP_CIPHER_INVALID",        /* 18 (11i) */
-    "PAIRWISE_CIPHER_INVALID",     /* 19 (11i) */
-    "AKMP_INVALID",                /* 20 (11i) */
-    "UNSUPP_RSN_IE_VERSION",       /* 21 (11i) */
-    "INVALID_RSN_IE_CAP",          /* 22 (11i) */
-    "802_1X_AUTH_FAILED",          /* 23 (11i) */
-    "CIPHER_SUITE_REJECTED",       /* 24 (11i) */
-    "BEACON_TIMEOUT",              /* 200 */
-    "NO_AP_FOUND",                 /* 201 */
-    "AUTH_FAIL",                   /* 202 */
-    "ASSOC_FAIL",                  /* 203 */
-    "HANDSHAKE_TIMEOUT"            /* 204 */
+    "PEER_INITIATED",                           /* 46 */
+    "AP_INITIATED",                             /* 47 */
+    "INVALID_FT_ACTION_FRAME_COUNT",            /* 48 */
+    "INVALID_PMKID",                            /* 49 */
+    "INVALID_MDE",                              /* 50 */
+    "INVALID_FTE",                              /* 51 */
+
+    "TRANSMISSION_LINK_ESTABLISH_FAILED",       /* 67 */
+    "ALTERATIVE_CHANNEL_OCCUPIED",              /* 68 */
+
+    "BEACON_TIMEOUT",                           /* 200 */
+    "NO_AP_FOUND",                              /* 201 */
+    "AUTH_FAIL",                                /* 202 */
+    "ASSOC_FAIL",                               /* 203 */
+    "HANDSHAKE_TIMEOUT",                        /* 204 */
+    "CONNECTION_FAIL",                          /* 205 */
+    "AP_TSF_RESET",                             /* 206 */
+    "ROAMING",                                  /* 207 */
+    "WIFI_REASON_ASSOC_COMEBACK_TIME_TOO_LONG"  /* 208 */
 };
+
+typedef struct _esp_wifi_valid_disc_reason_codes {
+    uint8_t from;
+    uint8_t to;
+} _esp_wifi_valid_disc_reason_codes_t;
+
+static const _esp_wifi_valid_disc_reason_codes_t _esp_wifi_valid_disc_reasons[] = {
+    /* From, To */
+    { 0, 39 },
+    { 46, 51 },
+    { 67, 68 },
+    { 200, 208 },
+};
+
+static const char *_esp_wifi_get_disc_reason(uint8_t code)
+{
+    uint8_t offset = 0;
+    uint8_t valid_reasons_len = ARRAY_SIZE(_esp_wifi_valid_disc_reasons);
+    for (uint8_t i = 0; i < valid_reasons_len; i++) {
+        if ((_esp_wifi_valid_disc_reasons[i].from <= code) &&
+            (_esp_wifi_valid_disc_reasons[i].to >= code))
+        {
+            return _esp_wifi_disc_reasons[code - offset];
+        }
+        else if (i < (valid_reasons_len - 1)) {
+            offset += (_esp_wifi_valid_disc_reasons[i + 1].from - 1) -
+                      _esp_wifi_valid_disc_reasons[i].to;
+        }
+    }
+    return "UNKNOWN";
+}
 #endif /* MODULE_ESP_WIFI_AP */
 
 /* indicator whether the WiFi interface is started */
@@ -437,7 +495,6 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
     esp_err_t result;
 
     uint8_t reason;
-    const char* reason_str = "UNKNOWN";
 #endif /* MODULE_ESP_WIFI_AP */
 
     switch (event->event_id) {
@@ -513,15 +570,9 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
 
         case SYSTEM_EVENT_STA_DISCONNECTED:
             reason = event->event_info.disconnected.reason;
-            if (reason < REASON_BEACON_TIMEOUT) {
-                reason_str = _esp_wifi_disc_reasons[reason];
-            }
-            else if (reason <= REASON_HANDSHAKE_TIMEOUT) {
-                reason_str = _esp_wifi_disc_reasons[reason - INDEX_BEACON_TIMEOUT];
-            }
             ESP_WIFI_LOG_INFO("WiFi disconnected from ssid %s, reason %d (%s)",
                               event->event_info.disconnected.ssid,
-                              event->event_info.disconnected.reason, reason_str);
+                              reason, _esp_wifi_get_disc_reason(reason));
 
             /* unregister RX callback function */
             esp_wifi_internal_reg_rxcb(ESP_IF_WIFI_STA, NULL);
