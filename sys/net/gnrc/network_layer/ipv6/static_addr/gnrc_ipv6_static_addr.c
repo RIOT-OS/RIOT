@@ -84,7 +84,7 @@ static void _config_downstream(gnrc_netif_t *downstream)
 
     DEBUG("gnrc_ipv6_static_addr: interface %u selected as downstream\n", downstream->pid);
 
-    if (CONFIG_GNRC_IPV6_STATIC_PREFIX == NULL) {
+    if (static_prefix == NULL) {
         return;
     }
 
