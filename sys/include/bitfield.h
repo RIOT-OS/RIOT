@@ -365,10 +365,7 @@ static inline void bf_set_all_atomic(uint8_t field[], size_t size)
  * @param[in]     field The bitfield
  * @param[in]     size  The number of bits in the bitfield
  */
-static inline void bf_clear_all(uint8_t field[], size_t size)
-{
-    memset(field, 0, (size + 7) / 8);
-}
+void bf_clear_all(uint8_t field[], size_t size);
 
 /**
  * @brief  Atomically clear all bits in the bitfield to 0
