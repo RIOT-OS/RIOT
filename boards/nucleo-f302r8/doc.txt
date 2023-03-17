@@ -14,6 +14,9 @@ microcontroller with 16KiB of RAM and 64KiB of Flash.
 
 ![nucleo image](http://www.open-electronics.org/wp-content/uploads/2015/08/Figura2-500x467.png)
 
+## Pinout
+
+@image html pinouts/nucleo-f302r8.svg "Pinout for the nucleo-f302r8" width=50%
 
 ### MCU
 | MCU        | STM32F302R8           |

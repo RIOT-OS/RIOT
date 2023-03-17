@@ -12,6 +12,9 @@ Cortex-M3 STM32L152RE microcontroller with 80KiB of RAM and 512KiB of Flash.
 
 ![Nucleo64 L152RE](http://www.open-electronics.org/wp-content/uploads/2015/08/Figura2-500x467.png)
 
+## Pinout
+
+@image html pinouts/nucleo-l152re.svg "Pinout for the nucleo-l152re" width=50%
 
 ### MCU
 | MCU        | STM32L152RE       |

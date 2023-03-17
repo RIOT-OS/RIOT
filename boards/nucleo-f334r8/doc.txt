@@ -13,6 +13,9 @@ STM32F334R8 microcontroller with 12KiB of RAM and 64KiB or Flash.
 ![Nucleo64 F334R8](http://www.open-electronics.org/wp-content/uploads/2015/08/Figura2-500x467.png)
 ![nucleo-f334 pinout](https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/nucleo-f334_pinout.png)
 
+## Pinout
+
+@image html pinouts/nucleo-f334r8.svg "Pinout for the nucleo-f334r8" width=50%
 
 ### MCU
 | MCU        | STM32F334R8       |
