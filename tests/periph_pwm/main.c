@@ -42,7 +42,7 @@
 #define OSC_STEPS       (256U)
 #define PWR_SLEEP       (1U)
 
-static uint32_t initiated;
+static uint32_t initialized;
 
 static unsigned _get_dev(const char *dev_str)
 {
@@ -94,11 +94,11 @@ static int _init(int argc, char** argv)
                                  (uint16_t)atoi(argv[4]));
     if (pwm_freq != 0) {
         printf("The pwm frequency is set to %" PRIu32 "\n", pwm_freq);
-        initiated |= (1 << dev);
+        initialized |= (1 << dev);
         return 0;
     }
 
-    puts("Error: device is not initiated");
+    puts("Error: device is not initialized");
     return 1;
 }
 
@@ -117,8 +117,8 @@ static int _set(int argc, char**argv)
         return 1;
     }
 
-    if ((initiated & (1 << dev)) == 0) {
-        puts("Error: pwm is not initiated.\n");
+    if ((initialized & (1 << dev)) == 0) {
+        puts("Error: pwm is not initialized.\n");
         puts("Execute init function first.\n");
         return 1;
     }
@@ -245,7 +245,7 @@ static const shell_command_t shell_commands[] = {
 int main(void)
 {
     puts("PWM peripheral driver test\n");
-    initiated = 0;
+    initialized = 0;
 
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
