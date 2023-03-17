@@ -19,6 +19,7 @@
 #include "inttypes.h"
 #include "random.h"
 #include "trickle.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -53,14 +54,8 @@ void trickle_interval(trickle_t *trickle)
     /* old_interval == trickle->I / 2 */
     trickle->t = random_uint32_range(old_interval, trickle->I);
 
-#if IS_USED(MODULE_ZTIMER_MSEC)
     ztimer_set_msg(ZTIMER_MSEC, &trickle->msg_timer, (trickle->t + diff),
                    &trickle->msg, trickle->pid);
-#else
-    uint64_t msg_time = (trickle->t + diff) * US_PER_MS;
-    xtimer_set_msg64(&trickle->msg_timer, msg_time, &trickle->msg,
-                     trickle->pid);
-#endif
 }
 
 void trickle_reset_timer(trickle_t *trickle)
@@ -93,11 +88,7 @@ void trickle_start(kernel_pid_t pid, trickle_t *trickle, uint16_t msg_type,
 
 void trickle_stop(trickle_t *trickle)
 {
-#if IS_USED(MODULE_ZTIMER_MSEC)
     ztimer_remove(ZTIMER_MSEC, &trickle->msg_timer);
-#else
-    xtimer_remove(&trickle->msg_timer);
-#endif
 }
 
 void trickle_increment_counter(trickle_t *trickle)

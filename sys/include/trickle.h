@@ -33,11 +33,7 @@
 #endif
 
 #include "thread.h"
-#if IS_USED(MODULE_ZTIMER_MSEC)
 #include "ztimer.h"
-#else
-#include "xtimer.h"
-#endif
 
 /**
  * @brief Trickle callback function with arguments
@@ -63,13 +59,8 @@ typedef struct {
     trickle_callback_t callback;    /**< callback function and parameter that
                                          trickle calls after each interval */
     msg_t msg;                      /**< the msg_t to use for intervals */
-#if IS_USED(MODULE_ZTIMER_MSEC)
     ztimer_t msg_timer;             /**< timer to send a msg_t to the target
                                          thread for a new interval */
-#else
-    xtimer_t msg_timer;             /**< xtimer to send a msg_t to the target
-                                         thread for a new interval */
-#endif
 } trickle_t;
 
 /**
