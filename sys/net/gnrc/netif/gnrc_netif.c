@@ -1372,6 +1372,15 @@ static void _netif_bus_detach(gnrc_netif_t *netif, msg_bus_entry_t *sub)
     msg_bus_detach(bus, sub);
 }
 
+static void _netif_bus_msg_global(gnrc_netif_t *netif, msg_t* m, bool *has_global)
+{
+    msg_bus_t* bus = gnrc_netif_get_bus(netif, GNRC_NETIF_BUS_IPV6);
+    if (msg_is_from_bus(bus, m) && ipv6_addr_is_global(m->content.ptr)) {
+        DEBUG_PUTS("gnrc_netif: got global address");
+        *has_global = true;
+    }
+}
+
 bool gnrc_netif_ipv6_wait_for_global_address(gnrc_netif_t *netif,
                                              uint32_t timeout_ms)
 {
@@ -1385,7 +1394,7 @@ bool gnrc_netif_ipv6_wait_for_global_address(gnrc_netif_t *netif,
     msg_bus_entry_t subs[netif_numof];
     bool has_global = false;
 
-    if (netif) {
+    if (netif != NULL) {
         if (_has_global_addr(netif)) {
             return true;
         }
@@ -1406,17 +1415,27 @@ bool gnrc_netif_ipv6_wait_for_global_address(gnrc_netif_t *netif,
 
     /* wait for global address */
     msg_t m;
+    ztimer_now_t t_stop = ztimer_now(ZTIMER_MSEC) + timeout_ms;
     while (!has_global) {
+        /* stop if timeout reached */
+        if (ztimer_now(ZTIMER_MSEC) > t_stop) {
+            DEBUG_PUTS("gnrc_netif: timeout reached");
+            break;
+        }
+        /* waiting for any message */
         if (ztimer_msg_receive_timeout(ZTIMER_MSEC, &m, timeout_ms) < 0) {
             DEBUG_PUTS("gnrc_netif: timeout waiting for prefix");
             break;
         }
 
-        if (ipv6_addr_is_link_local(m.content.ptr)) {
-            DEBUG_PUTS("gnrc_netif: got link-local address");
+        if (netif != NULL) {
+            _netif_bus_msg_global(netif, &m, &has_global);
         } else {
-            DEBUG_PUTS("gnrc_netif: got global address");
-            has_global = true;
+            /* scan all interfaces */
+            gnrc_netif_t *_netif = NULL;
+            while ((_netif = gnrc_netif_iter(_netif))) {
+                _netif_bus_msg_global(_netif, &m, &has_global);
+            }
         }
     }
 
@@ -1738,7 +1757,7 @@ static void _send_queued_pkt(gnrc_netif_t *netif)
 }
 
 static void _tx_done(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
-                     gnrc_pktsnip_t *tx_sync , int res, bool push_back)
+                     gnrc_pktsnip_t *tx_sync, int res, bool push_back)
 {
     (void)push_back; /* only used with IS_USED(MODULE_GNRC_NETIF_PKTQ) */
 
