@@ -8,6 +8,10 @@
 The Nucleo-L053R8 is a board from ST's Nucleo family supporting a ARM
 Cortex-M0+ STM32L053R8 microcontroller with 8KiB of RAM and 32KiB of Flash.
 
+## Pinout
+
+@image html pinouts/nucleo-l053r8.svg "Pinout for the nucleo-l053r8" width=50%
+
 ## Flashing the Board Using ST-LINK Removable Media
 
 On-board ST-LINK programmer provides via composite USB device removable media.
