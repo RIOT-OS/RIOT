@@ -40,30 +40,44 @@
 #define EXTI_NUMOF          (16U)
 #define EXTI_MASK           (0xFFFF)
 
-#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
-    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
-    defined(CPU_FAM_STM32WL)
-#  define EXTI_REG_RTSR     (EXTI->RTSR1)
-#  define EXTI_REG_FTSR     (EXTI->FTSR1)
-#  define EXTI_REG_SWIER    (EXTI->SWIER1)
-#  define EXTI_REG_IMR      (EXTI->IMR1)
-#  if !defined(CPU_FAM_STM32G0) && !defined(CPU_FAM_STM32L5) && \
-      !defined(CPU_FAM_STM32U5) && !defined(CPU_FAM_STM32MP1)
-#    define EXTI_REG_PR       (EXTI->PR1)
-#  endif
-#elif defined(CPU_FAM_STM32MP1)
-#  define EXTI_REG_RTSR     (EXTI->RTSR1)
-#  define EXTI_REG_FTSR     (EXTI->FTSR1)
-#  define EXTI_REG_PR       (EXTI->PR1)
-#  define EXTI_REG_SWIER    (EXTI->SWIER1)
-#  define EXTI_REG_IMR      (EXTI_C2->IMR1)
-#else
-#  define EXTI_REG_RTSR     (EXTI->RTSR)
-#  define EXTI_REG_FTSR     (EXTI->FTSR)
-#  define EXTI_REG_PR       (EXTI->PR)
-#  define EXTI_REG_SWIER    (EXTI->SWIER)
-#  define EXTI_REG_IMR      (EXTI->IMR)
+#if defined(EXTI_SWIER_SWI0) || defined(EXTI_SWIER_SWIER0)
+#define EXTI_REG_SWIER      (EXTI->SWIER)
+#endif
+
+#if defined(EXTI_SWIER1_SWI0) || defined(EXTI_SWIER1_SWIER0)
+#define EXTI_REG_SWIER      (EXTI->SWIER1)
+#endif
+
+#if defined(EXTI_RTSR_RT0) || defined(EXTI_RTSR_TR0)
+#define EXTI_REG_RTSR       (EXTI->RTSR)
+#endif
+
+#if defined(EXTI_RTSR1_RT0) || defined(EXTI_RTSR1_TR0)
+#define EXTI_REG_RTSR       (EXTI->RTSR1)
+#endif
+
+#if defined(EXTI_FTSR_FT0) || defined(EXTI_FTSR_TR0)
+#define EXTI_REG_FTSR       (EXTI->FTSR)
+#endif
+
+#if defined(EXTI_FTSR1_FT0) || defined (EXTI_FTSR1_TR0)
+#define EXTI_REG_FTSR       (EXTI->FTSR1)
+#endif
+
+#ifdef EXTI_PR_PR0
+#define EXTI_REG_PR         (EXTI->PR)
+#endif
+
+#ifdef EXTI_PR1_PIF0
+#define EXTI_REG_PR         (EXTI->PR1)
+#endif
+
+#if defined(EXTI_C2_BASE)
+#  define EXTI_REG_IMR        (EXTI_C2->IMR1)
+#elif defined(EXTI_IMR_IM0)
+#  define EXTI_REG_IMR        (EXTI->IMR)
+#elif defined(EXTI_IMR1_IM0)
+#  define EXTI_REG_IMR        (EXTI->IMR1)
 #endif
 
 void gpio_ll_irq_mask(gpio_port_t port, uint8_t pin)

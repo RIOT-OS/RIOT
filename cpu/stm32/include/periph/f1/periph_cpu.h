@@ -19,6 +19,8 @@
 #ifndef PERIPH_F1_PERIPH_CPU_H
 #define PERIPH_F1_PERIPH_CPU_H
 
+#include "cpu_conf.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -62,6 +64,48 @@ extern "C" {
  * @brief   Available number of ADC devices
  */
 #define ADC_DEVS            (2U)
+
+/**
+ * @name    GPIO Definitions Missing in Vendor Files
+ * @{
+ */
+/**
+ * @brief   Possible values of the MODE0 field in the GPIO CRL register
+ *
+ * The MODE1 to MODE7 fields have the same values. Don't forget to shift the
+ * constants to the field position for MODE1 to MODE7 by 4 times n bits, where
+ * n is the pin number.
+ *
+ * In addition the MODE8 to MODE15 fields in the CRH register have the same
+ * layout and semantics as the MODE0 to MODE 7 fields in the CRL register.
+ */
+enum {
+    GPIO_CRL_MODE0_INPUT            = (0x0 << GPIO_CRL_MODE0_Pos),
+    GPIO_CRL_MODE0_OUTPUT_10MHZ     = (0x1 << GPIO_CRL_MODE0_Pos),
+    GPIO_CRL_MODE0_OUTPUT_2MHZ      = (0x2 << GPIO_CRL_MODE0_Pos),
+    GPIO_CRL_MODE0_OUTPUT_50MHZ     = (0x3 << GPIO_CRL_MODE0_Pos),
+};
+
+/**
+ * @brief   Possible values of the CNF0 field in the GPIO CRL register
+ *
+ * The CNF1 to CNF7 fields have the same values. Don't forget to shift the
+ * constants to the field position for CNF1 to CNF7 by 4 times n bits, where
+ * n is the pin number.
+ *
+ * In addition the CNF8 to CNF15 fields in the CRH register have the same
+ * layout and semantics as the CNF0 to CNF 7 fields in the CRL register.
+ */
+enum {
+    GPIO_CRL_CNF0_INPUT_ANALOG      = (0x0 << GPIO_CRL_CNF0_Pos),
+    GPIO_CRL_CNF0_INPUT_FLOATING    = (0x1 << GPIO_CRL_CNF0_Pos),
+    GPIO_CRL_CNF0_INPUT_PULL        = (0x2 << GPIO_CRL_CNF0_Pos),
+    GPIO_CRL_CNF0_OUTPUT_PUSH_PULL  = (0x0 << GPIO_CRL_CNF0_Pos),
+    GPIO_CRL_CNF0_OUTPUT_OPEN_DRAIN = (0x1 << GPIO_CRL_CNF0_Pos),
+    GPIO_CRL_CNF0_AF_PUSH_PULL      = (0x2 << GPIO_CRL_CNF0_Pos),
+    GPIO_CRL_CNF0_AF_OPEN_DRAIN     = (0x3 << GPIO_CRL_CNF0_Pos),
+};
+/** @} */
 
 #ifdef __cplusplus
 }

@@ -71,7 +71,14 @@ static inline void gpio_ll_set(gpio_port_t port, uword_t mask)
 static inline void gpio_ll_clear(gpio_port_t port, uword_t mask)
 {
     GPIO_TypeDef *p = (GPIO_TypeDef *)port;
+    /* The STM32F4 vendor header files do include defines for accessing the
+     * BRR register, but do not have a BRR register.
+     * See https://github.com/STMicroelectronics/cmsis_device_f4/pull/7 */
+#if defined(GPIO_BRR_BR0) && !defined(CPU_FAM_STM32F4)
+    p->BRR = mask;
+#else
     p->BSRR = mask << 16;
+#endif
 }
 
 static inline void gpio_ll_toggle(gpio_port_t port, uword_t mask)
