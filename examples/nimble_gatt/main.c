@@ -105,12 +105,12 @@ typedef struct
     int  timestamp;
 } leitura;
 
-#define MAX_READINGS 4096
+#define MAX_READINGS 11000
 
 leitura readings_buffer[MAX_READINGS];
 size_t rlen = 0;
 
-uint16_t dump_index=0;
+int dump_index=0;
 
 void init_bmiSensor(void);
 void init_and_run_BLE(void);
@@ -309,8 +309,8 @@ static int gatt_svr_chr_access_rw_demo(
 
         case BLE_GATT_ACCESS_OP_READ_CHR:
             puts("read from characteristic");
-            printf("current value of rm_demo_write_data: '%s'\n %c",
-                   rm_demo_write_data, 13);
+            printf("current value of rm_demo_write_data: '%s'\n \r",
+                   rm_demo_write_data);
 
             /* send given data to the client */
             rc = os_mbuf_append(ctxt->om, &rm_demo_write_data,
@@ -321,8 +321,8 @@ static int gatt_svr_chr_access_rw_demo(
         case BLE_GATT_ACCESS_OP_WRITE_CHR:
             puts("write to characteristic");
 
-            printf("old value of rm_demo_write_data: '%s'\n %c",
-                   rm_demo_write_data, 13);
+            printf("old value of rm_demo_write_data: '%s'\n \r",
+                   rm_demo_write_data);
 
             uint16_t om_len;
             om_len = OS_MBUF_PKTLEN(ctxt->om);
@@ -333,8 +333,8 @@ static int gatt_svr_chr_access_rw_demo(
             /* we need to null-terminate the received string */
             rm_demo_write_data[om_len] = '\0';
 
-            printf("new value of rm_demo_write_data: '%s'\n %c",
-                   rm_demo_write_data, 13);
+            printf("new value of rm_demo_write_data: '%s'\n \r",
+                   rm_demo_write_data);
 
             break;
 
@@ -366,19 +366,19 @@ static int gatt_svr_chr_access_rw_demo(
 
             make_dump_package(dump_index);
 
-            if (dump_index < 0)
+            if (dump_index <= 0)
             {
-                dump_index=get_ring_index();
+                dump_index+=MAX_READINGS-1;
             }
             else
             {
+                printf("Posicao Inicial: %d   \n \r", dump_index);
                 dump_index-=CONTADOR;
-                printf("Posicao Inicial: %d \n", dump_index);
             }
 
-            printf("Posicao Final = %d \n", (int)get_ring_index());           
+            printf("Posicao Final = %d \n \r", dump_index);           
 
-            rc = os_mbuf_append(ctxt->om, &str_answer, CONTADOR*TAMANHO_MEDIDA);
+            rc = os_mbuf_append(ctxt->om, &dump_array, CONTADOR*TAMANHO_MEDIDA);
             
             return rc;
         }
@@ -439,18 +439,6 @@ int main(void)
     return 0;
 }
 
-void right_shift_readings_buffer(void)
-{
-    size_t max = rlen < MAX_READINGS ? rlen++ : MAX_READINGS - 1;
-    for (size_t i = max; i > 0; i--)
-    {
-        readings_buffer[i].X_axis = readings_buffer[i - 1].X_axis;
-        readings_buffer[i].Y_axis = readings_buffer[i - 1].Y_axis;
-        readings_buffer[i].Z_axis = readings_buffer[i - 1].Z_axis;
-        readings_buffer[i].timestamp = readings_buffer[i - 1].timestamp;
-    }
-}
-
 void do_read(void)
 {
     uint16_t aux = get_ring_index(); //supoes-se que o index nunca vai ser um valor proibido nunca <0 e nem >= MAX READINGS
@@ -473,7 +461,7 @@ void log_readings(void)
         printf("Acc_y: %2.6f ", ((float)readings_buffer[i].Y_axis)/ AC);
         printf("Acc_z: %2.6f ", ((float)readings_buffer[i].Z_axis)/ AC);
         printf("Acc_timeStamp: %d ", (readings_buffer[i].timestamp));
-        printf("\n %c", 13);
+        printf("\n \r");
 }
 void read_and_show_Acc_values(void)
 {
@@ -500,16 +488,16 @@ void init_bmiSensor(void)
     rslt = bmi160_init(&bmi);
     if (rslt == BMI160_OK)
     {
-        printf("Success initializing BMI160 - Chip ID 0x%X\n", bmi.chip_id);
+        printf("Success initializing BMI160 - Chip ID 0x%X\n \r", bmi.chip_id);
     }
     else if (rslt == BMI160_E_DEV_NOT_FOUND)
     {
-        printf("Error initializing BMI160: device not found\n");
+        printf("Error initializing BMI160: device not found\n \r");
         return;
     }
     else
     {
-        printf("Error initializing BMI160 - %d\n", rslt);
+        printf("Error initializing BMI160 - %d\n \r", rslt);
         return;
     }
 
@@ -535,7 +523,7 @@ void init_bmiSensor(void)
     rslt = bmi160_set_sens_conf(&bmi);
     if (rslt != BMI160_OK)
     {
-        printf("Error configuring BMI160 - %d\n", rslt);
+        printf("Error configuring BMI160 - %d\n \r", rslt);
         return;
     }
 
@@ -547,7 +535,7 @@ void init_bmiSensor(void)
     rslt = bmi160_set_fifo_config(BMI160_FIFO_CONFIG_1_MASK, BMI160_DISABLE, &bmi);
     if (rslt != BMI160_OK)
     {
-        printf("Error clearing fifo - %d\n", rslt);
+        printf("Error clearing fifo - %d\n \r", rslt);
         return;
     }
 
@@ -555,7 +543,7 @@ void init_bmiSensor(void)
     rslt = bmi160_set_fifo_config(fifo_config, BMI160_ENABLE, &bmi);
     if (rslt != BMI160_OK)
     {
-        printf("Error enabling fifo - %d\n", rslt);
+        printf("Error enabling fifo - %d\n \r", rslt);
         return;
     }
     /* Check rslt for any error codes */
@@ -566,14 +554,14 @@ static void _start_updating(void)
 {
     //event_timeout_set(&_update_timeout_evt, UPDATE_INTERVAL);
     connected= 1;
-    printf("[NOTIFY_ENABLED] Streaming ON\n%c", 13);
+    printf("[NOTIFY_ENABLED] Streaming ON\n\r");
 }
 
 static void _stop_updating(void)
 {
     //event_timeout_clear(&_update_timeout_evt);
     connected = 0;
-    printf("[NOTIFY_DISABLED] Streaming OFF\n%c", 13);
+    printf("[NOTIFY_DISABLED] Streaming OFF\n\r");
 }
 
 static int gap_event_cb(struct ble_gap_event *event, void *arg)
@@ -612,7 +600,7 @@ static int gap_event_cb(struct ble_gap_event *event, void *arg)
 
 void init_and_run_BLE(void)
 {
-    printf("NimBLE GATT Pulga for BELKA \n%c",13);
+    printf("NimBLE GATT Pulga for BELKA \n\r");
 
     int rc = 0;
     (void)rc;
@@ -659,7 +647,7 @@ void acquire_ACC_Values(void){
     rslt = bmi160_get_fifo_data(&bmi);
     if (rslt != BMI160_OK)
     {
-        printf("Error getting fifo data - %d\n %c", rslt, 13);
+        printf("Error getting fifo data - %d\n \r", rslt);
         return;
     }
     i2c_release(dev);
@@ -669,7 +657,7 @@ void acquire_ACC_Values(void){
     rslt = bmi160_extract_accel(accel_data, &acc_inst, &bmi);
     if (rslt != BMI160_OK)
     {
-        printf("Error extracting accel data - %d\n %c", rslt, 13);
+        printf("Error extracting accel data - %d\n \r", rslt);
         return;
     }
 }
@@ -700,8 +688,8 @@ static void _hr_update(event_t *e)
     }
 
     auxi = solo_measurement[12] + (solo_measurement[13] <<8) + (solo_measurement[14] <<16) + (solo_measurement[15] <<24); //VERY SENSIBLE BIT SHIFT OPERATION
-    printf("[NOTIFY] Latest measurement interval: %d \n %c", auxi - auxi2, 13);
-    printf("[NOTIFY] Ringbuffer Index: %d \n %c", auxi3, 13);
+    printf("[NOTIFY] Latest measurement interval: %d \n \r", auxi - auxi2);
+    printf("[NOTIFY] Ringbuffer Index: %d \n \r", auxi3);
     auxi2 = auxi;
     /* schedule next update event */
     event_timeout_set(&_update_timeout_evt, UPDATE_INTERVAL);
@@ -733,7 +721,7 @@ static int gatt_svr_chr_access_device_info_manufacturer(
     (void)arg;
 
     snprintf(str_answer, STR_ANSWER_BUFFER_SIZE,
-             "This is RIOT! (Version: %s)\n %c", RIOT_VERSION, 13); /*THIS %c = 13 IS JUST A MANUAL CARRIGE RETURN, NOT ALL TERMINALS DO IT AUTOMATICALLY*/
+             "This is RIOT! (Version: %s)\n \r", RIOT_VERSION); 
     puts(str_answer);
 
     int rc = os_mbuf_append(ctxt->om, str_answer, strlen(str_answer));
@@ -749,7 +737,7 @@ void make_dump_package(int initial_index)
 
     for(int i=0; i < CONTADOR; i++)
     {
-        if (i+initial_index >= 0)    
+        if ((initial_index - i) >= 0)    
         {
             auxf= (readings_buffer[-i+initial_index].X_axis / AC);
             memcpy(dump_array + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
@@ -761,13 +749,13 @@ void make_dump_package(int initial_index)
             memcpy(dump_array + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
         }
         else{
-            auxf= (readings_buffer[MAX_READINGS-i].X_axis / AC);
+            auxf= (readings_buffer[MAX_READINGS-i-1].X_axis / AC);
             memcpy(dump_array + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-            auxf= (readings_buffer[MAX_READINGS-i].Y_axis / AC); 
+            auxf= (readings_buffer[MAX_READINGS-i-1].Y_axis / AC); 
             memcpy(dump_array + (3*i+1)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-            auxf= (readings_buffer[MAX_READINGS-i].Z_axis / AC);
+            auxf= (readings_buffer[MAX_READINGS-i-1].Z_axis / AC);
             memcpy(dump_array + (3*i+2)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-            auxi= (readings_buffer[MAX_READINGS-i].timestamp);
+            auxi= (readings_buffer[MAX_READINGS-i-1].timestamp);
             memcpy(dump_array + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
         }
     }
@@ -795,5 +783,24 @@ uint16_t get_ring_index(void)
 
 void add_ring_index(void)
 {
-    latest_measurement = rlen < MAX_READINGS ? rlen++ : 0;
+    //latest_measurement = rlen < MAX_READINGS ? rlen++ : 0;
+    if(rlen < MAX_READINGS-1)
+    {
+        rlen++;
+        latest_measurement = rlen;
+    }
+    else if(rlen == MAX_READINGS-1)
+    {
+        latest_measurement = 0;
+        rlen++;
+    }
+    else if (latest_measurement == MAX_READINGS -1)
+    {
+        latest_measurement = 0;
+    }
+    else 
+    {
+        latest_measurement++;
+    }
+
 }
