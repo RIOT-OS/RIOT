@@ -33,7 +33,7 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
     /* check if device is valid */
     if (dev >= PWM_NUMOF) {
-        return -1;
+        return 0;
     }
 
     /* enable clocks */
@@ -46,7 +46,7 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
                                                            freq_timer);
 
     if (prescaler > timerPrescale1024) {
-        return -2;
+        return 0;
     }
 
     /* reset and initialize peripheral */

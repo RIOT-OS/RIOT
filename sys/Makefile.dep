@@ -225,12 +225,7 @@ endif
 
 ifneq (,$(filter trickle,$(USEMODULE)))
   USEMODULE += random
-  ifeq (,$(filter ztimer_msec,$(USEMODULE)))
-    USEMODULE += xtimer
-    ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
-      USEMODULE += ztimer_msec
-    endif
-  endif
+  USEMODULE += ztimer_msec
 endif
 
 ifneq (,$(filter eui_provider,$(USEMODULE)))
