@@ -108,8 +108,7 @@ see section \ref esp32_mcu_esp32 "ESP32 SoC Series".
 ### Board Configuration {#esp32s3_devkit_board_configuration}
 
 ESP32-S3-DevKit boards have no special hardware on board with the exception
-of a single pin RGB-LED that uses a special bit-oriented protocol to
-control the RGB-LED by 24-bit RGB values which is not supported yet.
+of a single pin RGB-LED.
 
 All GPIOs are simply broken out for flexibility. Therefore, the board
 configuration is the most flexible one which provides:
@@ -158,6 +157,7 @@ PWM_DEV(0)      | GPIO14, GPIO17, GPIO18, GPIO21 | - | \ref esp32_pwm_channels "
 PWM_DEV(1)      | GPIO15, GPIO16 | if module `esp_rtc_timer_32k` is not used | \ref esp32_pwm_channels "PWM Channels"
 I2C_DEV(0) SCL  | GPIO9  | | \ref esp32_i2c_interfaces "I2C Interfaces"
 I2C_DEV(0) SDA  | GPIO8  | | \ref esp32_i2c_interfaces "I2C Interfaces"
+RGB-LED         | GPIO48 | supported by driver module `ws281x` | |
 SPI_DEV(0) CLK  | GPIO12 | SPI2_HOST (FSPI) is used | \ref esp32_spi_interfaces "SPI Interfaces"
 SPI_DEV(0) MISO | GPIO13 | SPI2_HOST (FSPI) is used | \ref esp32_spi_interfaces "SPI Interfaces"
 SPI_DEV(0) MOSI | GPIO11 | SPI2_HOST (FSPI) is used | \ref esp32_spi_interfaces "SPI Interfaces"
