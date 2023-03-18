@@ -80,6 +80,8 @@ void cord_ep_standalone_reg_cb(cord_ep_standalone_cb_t cb);
  */
 void cord_ep_standalone_signal(bool connected);
 
+int cord_ep_standalone_register(const sock_udp_ep_t *remote, const char *regif);
+void cord_ep_standalone_dump_status(void);
 #ifdef __cplusplus
 }
 #endif

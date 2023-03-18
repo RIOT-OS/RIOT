@@ -24,6 +24,8 @@
 #include "assert.h"
 #include "thread.h"
 #include "ztimer.h"
+#include "net/sock/util.h"
+#include "net/gcoap.h"
 #include "net/cord/ep.h"
 #include "net/cord/config.h"
 #include "net/cord/ep_standalone.h"
@@ -42,46 +44,37 @@
 
 static char _stack[STACKSIZE];
 
-static ztimer_t _timer;
-static kernel_pid_t _runner_pid;
-static msg_t _msg;
-
 static cord_ep_standalone_cb_t _cb = NULL;
+static cord_ep_ctx_t _cord;
 
-static void _set_timer(void)
-{
-    ztimer_set_msg(ZTIMER_MSEC, &_timer, TIMEOUT_MS, &_msg, _runner_pid);
-}
-
+#if 0
 static void _notify(cord_ep_standalone_event_t event)
 {
     if (_cb) {
         _cb(event);
     }
 }
+#endif
 
 static void *_reg_runner(void *arg)
 {
     (void)arg;
-    msg_t in;
-
-    /* prepare context and message */
-    _runner_pid = thread_getpid();
-    _msg.type = UPDATE_TIMEOUT;
-
-    while (1) {
-        msg_receive(&in);
-        if (in.type == UPDATE_TIMEOUT) {
-            if (cord_ep_update() == CORD_EP_OK) {
-                _set_timer();
-                _notify(CORD_EP_UPDATED);
-            }
-            else {
-                _notify(CORD_EP_DEREGISTERED);
-            }
+    sock_udp_ep_t remote;
+    sock_udp_name2ep(&remote, CORD_EP_STANDALONE_ADDRESS);
+    if (remote.port == 0) {
+        if (IS_USED(MODULE_GCOAP_DTLS)) {
+            remote.port = CONFIG_GCOAPS_PORT;
+        }
+        else {
+            remote.port = CONFIG_GCOAP_PORT;
         }
     }
+    event_queue_t queue;
+    event_queue_init(&queue);
 
+    cord_ep_init(&_cord, &queue, &remote, NULL);
+
+    event_loop(&queue);
     return NULL;    /* should never be reached */
 }
 
@@ -93,15 +86,8 @@ void cord_ep_standalone_run(void)
 
 void cord_ep_standalone_signal(bool connected)
 {
-    /* clear timer in any case */
-    ztimer_remove(ZTIMER_MSEC, &_timer);
-    /* reset the update timer in case a connection was established or updated */
-    if (connected) {
-        _set_timer();
-        _notify(CORD_EP_REGISTERED);
-    } else {
-        _notify(CORD_EP_DEREGISTERED);
-    }
+     (void)connected;
+     return;
 }
 
 void cord_ep_standalone_reg_cb(cord_ep_standalone_cb_t cb)
@@ -111,4 +97,14 @@ void cord_ep_standalone_reg_cb(cord_ep_standalone_cb_t cb)
      *       value of `_cb` to prevent concurrency issues... */
     assert(cb);
     _cb = cb;
+}
+
+int cord_ep_standalone_register(const sock_udp_ep_t *remote, const char *regif)
+{
+    return cord_ep_register(&_cord, remote, regif);
+}
+
+void cord_ep_standalone_dump_status(void)
+{
+    cord_ep_dump_status(&_cord);
 }
