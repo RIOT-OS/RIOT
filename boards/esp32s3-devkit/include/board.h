@@ -75,11 +75,15 @@
  * @name    LED (on-board) configuration
  *
  * ESP32-S3-DevKit boards have a SK68XXMINI-HS smart RGB-LED connected to
- * GPIO48 on-board. This RGB-LEDs uses a special bit-oriented protocol to
- * control the RGB-LED by 24-bit RGB values. Therefore, it can't be used as
- * default LED definition for RIOT.
+ * GPIO48 on-board. The WS281x driver module `ws281x` can be used to control it.
  * @{
  */
+#ifndef WS281X_PARAM_PIN
+#define WS281X_PARAM_PIN    (GPIO48)  /**< GPIO pin connected to the data pin */
+#endif
+#ifndef WS281X_PARAM_NUMOF
+#define WS281X_PARAM_NUMOF  (1U)      /**< Number of LEDs chained */
+#endif
 /** @} */
 
 /* include common board definitions as last step */

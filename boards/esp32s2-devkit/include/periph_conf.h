@@ -69,7 +69,7 @@ extern "C" {
  *
  * @note As long as the GPIOs listed in DAC_GPIOS are not initialized as DAC
  * channels with the `dac_init` function, they can be used for other
- * purposes.
+ * purposes. GPIO18 is also used for the RGB-LED.
  */
 #ifndef DAC_GPIOS
 #define DAC_GPIOS   { GPIO17, GPIO18 }
