@@ -201,11 +201,22 @@ _split_banks() {
     #   ...
     #   {name nrf51 base 0 size 0 bus_width 1 chip_width 1} {name nrf51 base 268439552 size 0 bus_width 1 chip_width 1}
     #   ...
+    #   or for newer openocd versions (v0.12.0 or higher)
+    #   ...
+    #   {name nrf51.flash driver nrf51 base 0 size 0 bus_width 1 chip_width 1 target nrf51.cpu} {name nrf51.uicr ...}
+    #   ...
     #
     # Output:
+    #   ...
     #   name nrf51 base 0 size 0 bus_width 1 chip_width 1
     #   name nrf51 base 268439552 size 0 bus_width 1 chip_width 1
-
+    #   ...
+    #   or for newer openocd versions (v0.12.0 or higher)
+    #   ...
+    #   name nrf51.flash driver nrf51 base 0 size 0 bus_width 1 chip_width 1 target nrf51.cpu
+    #   name nrf51.uicr driver nrf51 base 268439552 size 0 bus_width 1 chip_width 1 target nrf51.cpu
+    #   ...
+    #
     # The following command needs specific osx handling (non gnu):
     # * Same commands for a pattern should be on different lines
     # * Cannot use '\n' in the replacement string
@@ -220,11 +231,14 @@ _split_banks() {
 }
 
 _flash_list_raw() {
-    # Openocd output for 'flash list' is
+    # Openocd output for 'flash list' is either
     # ....
     # {name nrf51 base 0 size 0 bus_width 1 chip_width 1} {name nrf51 base 268439552 size 0 bus_width 1 chip_width 1}
     # ....
-    #
+    # or for newer openocd versions (v0.12.0 or higher)
+    # ...
+    # {name nrf51.flash driver nrf51 base 0 size 0 bus_width 1 chip_width 1 target nrf51.cpu} {name nrf51.uicr ...}
+    # ...
     # Before printing the flash list, try to init and probe the board
     # to get the actual address.
     # Some openocd configuration put an address of 0 and rely on probing to
@@ -264,17 +278,26 @@ _flash_list() {
     # name nrf51 base 0 size 0 bus_width 1 chip_width 1
     # name nrf51 base 268439552 size 0 bus_width 1 chip_width 1
     # ....
+    # or for newer openocd versions (v0.12.0 or higher)
+    # ....
+    # name nrf51.flash driver nrf51 base 0 size 0 bus_width 1 chip_width 1 target nrf51.cpu
+    # name nrf51.uicr driver nrf51 base 268439552 size 0 bus_width 1 chip_width 1 target nrf51.cpu
+    # ....
     _flash_list_raw | _split_banks
 }
 
 # Print flash address for 'bank_num' num defaults to 1
 # _flash_address  [bank_num:1]
 _flash_address() {
-    bank_num=${1:-1}
-
-    # extract 'base' value and print as hexadecimal
-    # name nrf51 base 268439552 size 0 bus_width 1 chip_width 1
-    _flash_list | awk "NR==${bank_num}"'{printf "0x%08x\n", $4}'
+    # extract the line from '_flash_list' output for bank with number 'bank_num'
+    bank=$(_flash_list | awk "NR==${1:-1}")
+    # determine the column of base address, a line can have following formats
+    #     name nrf51 base 268439552 size 0 bus_width 1 chip_width 1
+    # or for newer openocd versions (v0.12.0 or higher)
+    #     name nrf51.flash driver nrf51 base 0 size 0 bus_width 1 chip_width 1 target nrf51.cpu
+    base_addr_idx=$(echo ${bank} | awk '{ for (i=1; i <= NF; i++) if ($i == "base") print i + 1 }')
+    # extract the base address in hexadecimal format
+    printf 0x"%08x" $(echo ${bank} | cut -d " " -f${base_addr_idx})
 }
 
 do_flashr() {
