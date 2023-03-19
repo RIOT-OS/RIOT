@@ -22,7 +22,7 @@ INCLUDE riscv_vars.ld
 
 MEMORY
 {
-  flash (rxai!w) : ORIGIN = _rom_start_addr, LENGTH = _rom_length
+  flash (rxai!w) : ORIGIN = _rom_start_addr + _rom_offset, LENGTH = _fw_rom_length
   ram   (wxa!ri) : ORIGIN = _ram_start_addr, LENGTH = _ram_length
   itim  (wxa!ri) : ORIGIN = _itim_start_addr, LENGTH = _itim_length
 }
