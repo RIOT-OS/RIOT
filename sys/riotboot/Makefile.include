@@ -18,7 +18,7 @@ SLOT1_LEN := $(SLOT1_LEN)
 # slot 0. The values might be overridden to add more or less offset
 # if needed.
 SLOT0_OFFSET ?= $(RIOTBOOT_LEN)
-SLOT1_OFFSET ?= $(shell echo $$(($(SLOT0_OFFSET) + $(SLOT0_LEN))))
+SLOT1_OFFSET ?= $(shell printf "0x%x" $$(($(SLOT0_OFFSET) + $(SLOT0_LEN))))
 
 CFLAGS += -DSLOT0_LEN=$(SLOT0_LEN)
 CFLAGS += -DSLOT0_OFFSET=$(SLOT0_OFFSET)
