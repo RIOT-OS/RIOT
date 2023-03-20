@@ -41,6 +41,10 @@
 #define RCU_CFG0_SCS_HXTAL   (1 << RCU_CFG0_SCS_Pos)
 #define RCU_CFG0_SCS_PLL     (2 << RCU_CFG0_SCS_Pos)
 
+#define RCU_CFG0_SCSS_IRC8   (0 << RCU_CFG0_SCSS_Pos)
+#define RCU_CFG0_SCSS_HXTAL  (1 << RCU_CFG0_SCSS_Pos)
+#define RCU_CFG0_SCSS_PLL    (2 << RCU_CFG0_SCSS_Pos)
+
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
@@ -115,8 +119,7 @@ void gd32vf103_clock_init(void)
      * configure the AHB and APB clock dividers as configure by the board */
     RCU->CFG0 = (RCU_CFG0_SCS_IRC8 | CLOCK_AHB_DIV_CONF |
                  CLOCK_APB1_DIV_CONF | CLOCK_APB2_DIV_CONF);
-    while ((RCU->CFG0 & RCU_CFG0_SCSS_Msk) !=
-           (RCU_CFG0_SCS_IRC8 << RCU_CFG0_SCSS_Pos)) {}
+    while ((RCU->CFG0 & RCU_CFG0_SCSS_Msk) != RCU_CFG0_SCSS_IRC8) {}
 
     /* disable all active clocks except IRC8 -> resets the clk configuration */
     RCU->CTL &= (RCU_CTL_IRC8MCALIB_Msk | RCU_CTL_IRC8MADJ_Msk);
@@ -147,8 +150,7 @@ void gd32vf103_clock_init(void)
 
     RCU->AHBEN &= ~RCU_AHBEN_FMCSPEN_Msk;
 
-    while ((RCU->CFG0 & RCU_CFG0_SCSS_Msk) !=
-           (RCU_CFG0_SCS_PLL << RCU_CFG0_SCSS_Pos)) {}
+    while ((RCU->CFG0 & RCU_CFG0_SCSS_Msk) != RCU_CFG0_SCSS_PLL) {}
 
     if (IS_ACTIVE(CONFIG_BOARD_HAS_HXTAL)) {
         /* disable IRCM8 clock if HXTAL is used */
