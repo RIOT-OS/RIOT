@@ -27,7 +27,6 @@
 #include "mutex.h"
 #include "periph/gpio_ll.h"
 #include "periph/gpio_ll_irq.h"
-#include "test_utils/expect.h"
 #include "timex.h"
 #include "ztimer.h"
 
@@ -54,6 +53,19 @@ static void puts_optional(const char *str)
 #define printf_optional(...) printf(__VA_ARGS__)
 #endif
 
+/* a custom expect that keeps the CPU alive makes debugging easier with
+ * stdio that requires RIOT to remain alive, e.g. USB CDC ACM */
+static void expect_impl(int val, unsigned line)
+{
+    if (!val) {
+        printf("expect failed at line %u\n", line);
+        fflush(stdout);
+        while(1) {}
+    }
+}
+
+#define expect(x) expect_impl((int)(x), __LINE__)
+
 static void print_cabling(unsigned port1, unsigned pin1,
                           unsigned port2, unsigned pin2)
 {
@@ -66,7 +78,8 @@ static void print_details(void)
 {
     puts_optional("Test / Hardware Details:\n"
                   "========================\n"
-                  "Cabling:");
+                  "Cabling:\n"
+                  "(INPUT -- OUTPUT)");
     print_cabling(PORT_IN, PIN_IN_0, PORT_OUT, PIN_OUT_0);
     print_cabling(PORT_IN, PIN_IN_1, PORT_OUT, PIN_OUT_1);
     printf("Number of pull resistor values supported: %u\n", GPIO_PULL_NUMOF);
