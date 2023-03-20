@@ -41,43 +41,87 @@
 #define EXTI_MASK           (0xFFFF)
 
 #if defined(EXTI_SWIER_SWI0) || defined(EXTI_SWIER_SWIER0)
-#define EXTI_REG_SWIER      (EXTI->SWIER)
+#  define EXTI_REG_SWIER        (EXTI->SWIER)
 #endif
 
 #if defined(EXTI_SWIER1_SWI0) || defined(EXTI_SWIER1_SWIER0)
-#define EXTI_REG_SWIER      (EXTI->SWIER1)
+#  define EXTI_REG_SWIER        (EXTI->SWIER1)
 #endif
 
 #if defined(EXTI_RTSR_RT0) || defined(EXTI_RTSR_TR0)
-#define EXTI_REG_RTSR       (EXTI->RTSR)
+#  define EXTI_REG_RTSR         (EXTI->RTSR)
 #endif
 
 #if defined(EXTI_RTSR1_RT0) || defined(EXTI_RTSR1_TR0)
-#define EXTI_REG_RTSR       (EXTI->RTSR1)
+#  define EXTI_REG_RTSR         (EXTI->RTSR1)
 #endif
 
 #if defined(EXTI_FTSR_FT0) || defined(EXTI_FTSR_TR0)
-#define EXTI_REG_FTSR       (EXTI->FTSR)
+#  define EXTI_REG_FTSR         (EXTI->FTSR)
 #endif
 
 #if defined(EXTI_FTSR1_FT0) || defined (EXTI_FTSR1_TR0)
-#define EXTI_REG_FTSR       (EXTI->FTSR1)
+#  define EXTI_REG_FTSR         (EXTI->FTSR1)
 #endif
 
-#ifdef EXTI_PR_PR0
-#define EXTI_REG_PR         (EXTI->PR)
-#endif
-
-#ifdef EXTI_PR1_PIF0
-#define EXTI_REG_PR         (EXTI->PR1)
+#if defined(EXTI_PR_PR0)
+#  define EXTI_REG_PR           (EXTI->PR)
+#elif defined(EXTI_PR1_PIF0)
+#  define EXTI_REG_PR           (EXTI->PR1)
+#else
+#  define EXTI_REG_FPR          (EXTI->FPR1)
+#  define EXTI_REG_RPR          (EXTI->RPR1)
 #endif
 
 #if defined(EXTI_C2_BASE)
-#  define EXTI_REG_IMR        (EXTI_C2->IMR1)
+#  define EXTI_REG_IMR          (EXTI_C2->IMR1)
 #elif defined(EXTI_IMR_IM0)
-#  define EXTI_REG_IMR        (EXTI->IMR)
+#  define EXTI_REG_IMR          (EXTI->IMR)
 #elif defined(EXTI_IMR1_IM0)
-#  define EXTI_REG_IMR        (EXTI->IMR1)
+#  define EXTI_REG_IMR          (EXTI->IMR1)
+#endif
+
+#ifdef RCC_APB2ENR_SYSCFGCOMPEN
+#  define SYSFG_CLOCK           APB2
+#  define SYSFG_ENABLE_MASK     RCC_APB2ENR_SYSCFGCOMPEN
+#endif
+
+#ifdef  RCC_APBENR2_SYSCFGEN
+#  define SYSFG_ENABLE_MASK     RCC_APBENR2_SYSCFGEN
+#  ifdef APB12
+#    define SYSFG_CLOCK         APB12
+#  else
+#    define SYSFG_CLOCK         APB2
+#  endif
+#endif
+
+#ifdef RCC_APB3ENR_SYSCFGEN
+#  define SYSFG_CLOCK           APB3
+#  define SYSFG_ENABLE_MASK     RCC_APB3ENR_SYSCFGEN
+#endif
+
+#ifdef EXTI_EXTICR1_EXTI0
+#  define EXTICR_REG(num)       (EXTI->EXTICR[(num) >> 2])
+#endif
+
+#ifdef SYSCFG_EXTICR1_EXTI0
+#  define EXTICR_REG(num)       (SYSCFG->EXTICR[(num) >> 2])
+#endif
+
+#ifdef AFIO_EXTICR1_EXTI0
+#  define EXTICR_REG(num)       (AFIO->EXTICR[(num) >> 2])
+#endif
+
+#ifdef SYSCFG_EXTICR1_EXTI1_Pos
+#  define EXTICR_FIELD_SIZE     SYSCFG_EXTICR1_EXTI1_Pos
+#endif
+
+#ifdef EXTI_EXTICR1_EXTI1_Pos
+#  define EXTICR_FIELD_SIZE     EXTI_EXTICR1_EXTI1_Pos
+#endif
+
+#ifdef AFIO_EXTICR1_EXTI1_Pos
+#  define EXTICR_FIELD_SIZE     AFIO_EXTICR1_EXTI1_Pos
 #endif
 
 void gpio_ll_irq_mask(gpio_port_t port, uint8_t pin)
@@ -102,6 +146,8 @@ static uint16_t level_triggered;
 
 static IRQn_Type get_irqn(uint8_t pin)
 {
+    /* TODO: Come up with a way that this doesn't need updates whenever a new
+     * MCU family gets added */
 #if defined(CPU_FAM_STM32L5) ||  defined(CPU_FAM_STM32U5)
     return EXTI0_IRQn + pin;
 #elif defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || \
@@ -155,48 +201,29 @@ static IRQn_Type get_irqn(uint8_t pin)
 
 static void clear_pending_irqs(uint8_t pin)
 {
-#if defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32L5) || \
-    defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32MP1)
-    /* clear any pending requests */
-    EXTI->RPR1 = (1 << pin);
-    EXTI->FPR1 = (1 << pin);
+#ifdef EXTI_REG_PR
+    /* same IRQ flag no matter if falling or rising edge detected */
+    EXTI_REG_PR = (1U << pin);
 #else
-    /* clear any pending requests */
-    EXTI_REG_PR = (1 << pin);
+    /* distinct IRQ flags for falling and rising edge, clearing both */
+    EXTI_REG_FPR = (1U << pin);
+    EXTI_REG_RPR = (1U << pin);
 #endif
 }
 
 static void set_exti_port(uint8_t exti_num, uint8_t port_num)
 {
-#if defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32L5) || \
-    defined(CPU_FAM_STM32U5)
-    /* enable specific pin as exti sources */
-    EXTI->EXTICR[exti_num >> 2] &= ~(0xf << ((exti_num & 0x03) * 8));
-    EXTI->EXTICR[exti_num >> 2] |= (port_num << ((exti_num & 0x03) * 8));
-#elif defined(CPU_FAM_STM32MP1)
-    /* enable specific pin as exti sources */
-    EXTI->EXTICR[exti_num >> 2] &= ~(0xf << ((exti_num & 0x03) * 4));
-    EXTI->EXTICR[exti_num >> 2] |= (port_num << ((exti_num & 0x03) * 4));
-#else
-    /* enable specific pin as exti sources */
-    SYSCFG->EXTICR[exti_num >> 2] &= ~(0xf << ((exti_num & 0x03) * 4));
-    SYSCFG->EXTICR[exti_num >> 2] |= (port_num << ((exti_num & 0x03) * 4));
-#endif
+    uint32_t tmp = EXTICR_REG(exti_num);
+    tmp &= ~(0xf << ((exti_num & 0x03) * EXTICR_FIELD_SIZE));
+    tmp |= (port_num << ((exti_num & 0x03) * EXTICR_FIELD_SIZE));
+    EXTICR_REG(exti_num) = tmp;
 }
 
 static uint8_t get_exti_port(uint8_t exti_num)
 {
-#if defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32L5) || \
-    defined(CPU_FAM_STM32U5)
-    /* enable specific pin as exti sources */
-    return 0xf & (EXTI->EXTICR[exti_num >> 2] >> ((exti_num & 0x03) * 8));
-#elif defined(CPU_FAM_STM32MP1)
-    /* enable specific pin as exti sources */
-    return 0xf & (EXTI->EXTICR[exti_num >> 2] >> ((exti_num & 0x03) * 4));
-#else
-    /* enable specific pin as exti sources */
-    return 0xf & (SYSCFG->EXTICR[exti_num >> 2] >> ((exti_num & 0x03) * 4));
-#endif
+    uint32_t reg = EXTICR_REG(exti_num);
+    reg >>= (exti_num & 0x03) * EXTICR_FIELD_SIZE;
+    return reg & 0xf;
 }
 
 int gpio_ll_irq(gpio_port_t port, uint8_t pin, gpio_irq_trig_t trig, gpio_ll_cb_t cb, void *arg)
@@ -209,17 +236,8 @@ int gpio_ll_irq(gpio_port_t port, uint8_t pin, gpio_irq_trig_t trig, gpio_ll_cb_
     isr_ctx[pin].arg = arg;
 
     /* enable clock of the SYSCFG module for EXTI configuration */
-#if !defined(CPU_FAM_STM32WB) && !defined(CPU_FAM_STM32MP1) && \
-    !defined(CPU_FAM_STM32WL)
-#ifdef CPU_FAM_STM32F0
-    periph_clk_en(APB2, RCC_APB2ENR_SYSCFGCOMPEN);
-#elif defined(CPU_FAM_STM32G0)
-    periph_clk_en(APB12, RCC_APBENR2_SYSCFGEN);
-#elif defined(CPU_FAM_STM32U5)
-    periph_clk_en(APB3, RCC_APB3ENR_SYSCFGEN);
-#else
-    periph_clk_en(APB2, RCC_APB2ENR_SYSCFGEN);
-#endif
+#ifdef SYSFG_CLOCK
+    periph_clk_en(SYSFG_CLOCK, SYSFG_ENABLE_MASK);
 #endif
 
     /* enable global pin interrupt */
@@ -262,30 +280,35 @@ int gpio_ll_irq(gpio_port_t port, uint8_t pin, gpio_irq_trig_t trig, gpio_ll_cb_
     return 0;
 }
 
-void isr_exti(void)
+static uint32_t get_and_clear_pending_irqs(void)
 {
-#if defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32L5) || \
-    defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32MP1)
-    /* get all interrupts handled by this ISR */
-    uint32_t pending_rising_isr = (EXTI->RPR1 & EXTI_MASK);
-    uint32_t pending_falling_isr = (EXTI->FPR1 & EXTI_MASK);
+#ifdef EXTI_REG_PR
+    /* only one pending IRQ flag register for both falling and rising flanks */
+    uint32_t pending_isr = (EXTI_REG_PR & EXTI_MASK);
+
+    /* clear by writing a 1 */
+    EXTI_REG_PR = pending_isr;
+    return pending_isr;
+#else
+    /* distinct registers for pending IRQ flags depending on rising or falling
+     * flank */
+    uint32_t pending_rising_isr = (EXTI_REG_RPR & EXTI_MASK);
+    uint32_t pending_falling_isr = (EXTI_REG_FPR & EXTI_MASK);
 
     /* clear by writing a 1 */
     EXTI->RPR1 = pending_rising_isr;
     EXTI->FPR1 = pending_falling_isr;
 
-    /* only generate interrupts against lines which have their IMR set */
-    uint32_t pending_isr = (pending_rising_isr | pending_falling_isr) & EXTI_REG_IMR;
-#else
-    /* read all pending interrupts wired to isr_exti */
-    uint32_t pending_isr = (EXTI_REG_PR & EXTI_MASK);
+    return pending_rising_isr | pending_falling_isr;
+#endif
+}
 
-    /* clear by writing a 1 */
-    EXTI_REG_PR = pending_isr;
+void isr_exti(void)
+{
+    uint32_t pending_isr = get_and_clear_pending_irqs();
 
     /* only generate soft interrupts against lines which have their IMR set */
     pending_isr &= EXTI_REG_IMR;
-#endif
 
     /* iterate over all set bits */
     uint8_t pin = 0;
