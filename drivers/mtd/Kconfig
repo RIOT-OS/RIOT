@@ -7,52 +7,52 @@
 
 config HAVE_MTD_AT24CXXX
     bool
-    imply MODULE_MTD_AT24CXXX if MODULE_MTD
+    select MODULE_MTD_AT24CXXX if MODULE_MTD
     help
         Indicates that a at24cxxx EEPROM MTD is present
 
 config HAVE_MTD_AT25XXX
     bool
-    imply MODULE_MTD_AT25XXX if MODULE_MTD
+    select MODULE_MTD_AT25XXX if MODULE_MTD
     help
         Indicates that a at25xxx SPI-EEPROM MTD is present
 
 config HAVE_MTD_NATIVE
     bool
-    imply MODULE_MTD_NATIVE if MODULE_MTD
+    select MODULE_MTD_NATIVE if MODULE_MTD
     help
         Indicates that a native MTD is present.
 
 config HAVE_MTD_SDCARD_DEFAULT
     bool
-    imply MODULE_MTD_SDCARD if MODULE_MTD
-    imply MODULE_MTD_SDCARD_DEFAULT if MODULE_MTD
-    imply MODULE_SDCARD_SPI if MODULE_MTD
+    select MODULE_MTD_SDCARD if MODULE_MTD
+    select MODULE_MTD_SDCARD_DEFAULT if MODULE_MTD
+    select MODULE_SDCARD_SPI if MODULE_MTD
     select HAS_SDCARD_SPI
     help
         Indicates that a sdcard MTD is present with generic configuration
 
 config HAVE_MTD_SDCARD
     bool
-    imply MODULE_MTD_SDCARD if MODULE_MTD
+    select MODULE_MTD_SDCARD if MODULE_MTD
     help
         Indicates that a sdcard MTD is present
 
 config HAVE_MTD_SPI_NOR
     bool
-    imply MODULE_MTD_SPI_NOR if MODULE_MTD
+    select MODULE_MTD_SPI_NOR if MODULE_MTD
     help
         Indicates that a spi-nor MTD is present
 
 config HAVE_SAM0_SDHC
     bool
-    imply MODULE_SAM0_SDHC if MODULE_MTD
+    select MODULE_SAM0_SDHC if MODULE_MTD
     help
         Indicates that a SAM0 SD Host Controller MTD is present
 
 config HAVE_MTD_SPI_MCI
     bool
-    imply MODULE_MTD_MCI if MODULE_MTD
+    select MODULE_MTD_MCI if MODULE_MTD
     help
         Indicates that a Multimedia Card Interface (MCI) MTD is present
 
