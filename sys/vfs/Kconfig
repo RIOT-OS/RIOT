@@ -5,7 +5,7 @@
 # directory for more details.
 #
 
-config MODULE_VFS
+menuconfig MODULE_VFS
     bool "Virtual File System (VFS)"
     depends on TEST_KCONFIG
     select MODULE_POSIX_HEADERS
@@ -13,7 +13,7 @@ config MODULE_VFS
 config MODULE_VFS_DEFAULT
     bool "Use default (board specific) file systems and mount points"
     depends on MODULE_VFS
-    imply MODULE_VFS_AUTO_MOUNT
+    select MODULE_VFS_AUTO_MOUNT
 
 config MODULE_VFS_AUTO_MOUNT
     bool "Automatically mount configured file systems"

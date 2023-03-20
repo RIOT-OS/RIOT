@@ -20,5 +20,6 @@ config BOARD_WASPMOTE_PRO
 
     select HAVE_MTD_SDCARD_DEFAULT
     select MODULE_FATFS_VFS if MODULE_VFS_DEFAULT
+    select MODULE_MTD if MODULE_VFS_DEFAULT
 
 source "$(RIOTKCONFIG)/Kconfig.ztimer_only"

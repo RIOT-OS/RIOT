@@ -18,6 +18,9 @@ config BOARD_COMMON_WEACT_F4X1CX
     select HAS_PERIPH_USBDEV
     select HAS_HIGHLEVEL_STDIO
 
+    select MODULE_LITTLEFS2 if MODULE_VFS_DEFAULT
+    select MODULE_MTD if MODULE_VFS_DEFAULT
+
     # Clock configuration
     select BOARD_HAS_HSE
     select BOARD_HAS_LSE

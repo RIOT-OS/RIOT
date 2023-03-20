@@ -27,4 +27,11 @@ config BOARD_NATIVE
     select HAS_MOTOR_DRIVER
     select HAVE_SDL
 
+    # This will always select littlefs2 but we would prefer to use something
+    # that is already selected if possible...
+    # Restructuring is needed in order to make that happen without circular
+    # dependencies.
+    select MODULE_LITTLEFS2 if MODULE_VFS_DEFAULT
+    select MODULE_MTD if MODULE_VFS_DEFAULT
+
 rsource "drivers/Kconfig"

@@ -18,5 +18,7 @@ config BOARD_IOTLAB_M3
     select HAVE_LPS331AP
     select HAVE_ISL29020
     select MODULE_BOARDS_COMMON_IOTLAB if TEST_KCONFIG
+    select MODULE_LITTLEFS2 if MODULE_VFS_DEFAULT
+    select MODULE_MTD if MODULE_VFS_DEFAULT
 
 source "$(RIOTBOARD)/common/iotlab/Kconfig"
