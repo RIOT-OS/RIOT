@@ -125,6 +125,9 @@ void gd32vf103_clock_init(void)
     RCU->CTL &= (RCU_CTL_IRC8MCALIB_Msk | RCU_CTL_IRC8MADJ_Msk);
     RCU->CTL |= RCU_CTL_IRC8MEN_Msk;
 
+    /* reset PLL multiplier, required when configured before, e.g. in riotboot */
+    RCU->CFG0 &= ~(RCU_CFG0_PLLMF_3_0_Msk | RCU_CFG0_PLLMF_4_Msk);
+
     if (IS_ACTIVE(CONFIG_BOARD_HAS_HXTAL)) {
         /* if the board has an HXTAL, HXTAL is used as PLL input and PREDEV0 is set */
         cpu_reg_enable_bits(&RCU->CTL, RCU_CTL_HXTALEN_Msk);
