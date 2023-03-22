@@ -487,7 +487,7 @@ static inline void gpio_reset_all_config(uint8_t pin)
  */
 static inline void periph_reset(uint32_t components)
 {
-    io_reg_atomic_set(&RESETS->RESET.reg, components);
+    io_reg_atomic_set(&RESETS->RESET, components);
 }
 
 /**
@@ -498,8 +498,8 @@ static inline void periph_reset(uint32_t components)
  */
 static inline void periph_reset_done(uint32_t components)
 {
-    io_reg_atomic_clear(&RESETS->RESET.reg, components);
-    while ((~RESETS->RESET_DONE.reg) & components) { }
+    io_reg_atomic_clear(&RESETS->RESET, components);
+    while ((~RESETS->RESET_DONE) & components) { }
 }
 
 /**
