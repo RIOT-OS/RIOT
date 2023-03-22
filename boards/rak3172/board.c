@@ -37,6 +37,7 @@ void board_init(void)
         gpio_init(SX126X_LED_PIN, GPIO_OUT);
     }
     gpio_init(LED_STATUS, GPIO_OUT);
+    gpio_init(LED_USB_LINK, GPIO_OUT);
     gpio_set(LED_STATUS);
 }
 
