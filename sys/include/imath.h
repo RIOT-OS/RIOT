@@ -117,6 +117,25 @@ static inline unsigned sqrti(unsigned x)
     return y0;
 }
 
+/**
+ * @brief Returns the value of x to the power of y
+ *
+ * @param x base
+ * @param y exponent
+ *
+ * @return x^y
+ */
+static inline uint32_t powi(unsigned x, unsigned y)
+{
+    uint32_t res = 1;
+
+    while (y--) {
+        res *= x;
+    }
+
+    return res;
+}
+
 #ifdef __cplusplus
 }
 #endif
