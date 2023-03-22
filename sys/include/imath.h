@@ -27,12 +27,12 @@
 extern "C" {
 #endif
 
-#define ISIN_PERIOD      0x8000 /**< Period of the isin() function */
-#define ISIN_MAX         0x1000 /**< Max value of the isin() function */
-#define ISIN_MIN        -0x1000 /**< Min value of the isin() function */
+#define SINI_PERIOD      0x8000 /**< Period of the fast_sini() function */
+#define SINI_MAX         0x1000 /**< Max value of the fast_sini() function */
+#define SINI_MIN        -0x1000 /**< Min value of the fast_sini() function */
 
 /**
- * @brief       Internal isin/icos helper function
+ * @brief       Internal fast_sini/fast_cosi helper function
  * @internal
  *
  * @param[in] x Input parameter
@@ -66,7 +66,7 @@ int32_t _ihelp(int32_t x)
  * @param x     angle (with 2^15 units/circle)
  * @return      sine value (-2^12 ≤ y ≤ 2^12)
  */
-static inline int32_t isin(int32_t x)
+static inline int32_t fast_sini(int32_t x)
 {
     static const int32_t qN = 13;
 
@@ -83,14 +83,38 @@ static inline int32_t isin(int32_t x)
  * @param x     angle (with 2^15 units/circle)
  * @return      sine value (-2^12 ≤ y ≤ 2^12)
  */
-static inline int32_t icos(int32_t x)
+static inline int32_t fast_cosi(int32_t x)
 {
     static const int32_t qN = 13;
 
-    int32_t c = (x + (ISIN_PERIOD >> 2)) << (30 - qN);
+    int32_t c = (x + (SINI_PERIOD >> 2)) << (30 - qN);
     int32_t y = _ihelp(x);
 
     return c >= 0 ? y :-y;
+}
+
+/**
+ * @brief Square root of an integer
+ *
+ * @param x unsigned integer value
+ * @return  square root of @p x
+ */
+static inline unsigned sqrti(unsigned x)
+{
+    if (x <= 1) {
+        return x;
+    }
+
+    /* initial estimate */
+    unsigned y0 = x >> 1;
+    unsigned y1 = (y0 + x / y0) >> 1;
+
+    while (y1 < y0) {
+        y0 = y1;
+        y1 = (y0 + x / y0) >> 1;
+    }
+
+    return y0;
 }
 
 #ifdef __cplusplus
