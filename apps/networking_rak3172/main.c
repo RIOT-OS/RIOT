@@ -145,14 +145,16 @@ void* tcp_handler(void *arg){
             if(strncmp((char*)tcp_buf, "test", 4) == 0)
             {
                 uint32_t i = 0;
-                    while(i < 50)
+                    while(i < 5000)
                         {
                             sprintf(text, "Гречиха посевная *гудок*, а я гречиха посевная = %ld\n", i);
                         if (sock_tcp_write(sock, text, strlen(text)) < 0) {
                             puts("Error sending\n");
+                            goto exit_tcp;
                         }
+                            
                         i++;
-                        ztimer_sleep(ZTIMER_MSEC, 1000);
+                        ztimer_sleep(ZTIMER_MSEC, 100);
                         }
             }
             else if(strncmp((char*)tcp_buf, "led_on", 6) == 0){
@@ -176,6 +178,7 @@ void* tcp_handler(void *arg){
             sock_tcp_write(sock, "> ", 2);
                     }
     }
+    exit_tcp:
             sock_tcp_disconnect(sock);
         }
     }

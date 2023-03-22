@@ -131,7 +131,6 @@ static void sx126x_init_default_config(sx126x_t *dev)
     dev->mod_params.cr = (sx126x_lora_cr_t)(LORA_CR_4_5);
     dev->mod_params.ldro = _compute_ldro(dev);
     sx126x_set_lora_mod_params(dev, &dev->mod_params);
-
     dev->pkt_params.pld_len_in_bytes = 0;
     dev->pkt_params.crc_is_on = !IS_ACTIVE(CONFIG_LORA_PAYLOAD_CRC_OFF_DEFAULT);
     dev->pkt_params.header_type = (
@@ -142,6 +141,8 @@ static void sx126x_init_default_config(sx126x_t *dev)
         IS_ACTIVE(CONFIG_LORA_IQ_INVERTED_DEFAULT) ? true : false
         );
     sx126x_set_lora_pkt_params(dev, &dev->pkt_params);
+    uint8_t bufdata = 0x97;
+    sx126x_write_register(dev, 0x08AC, &bufdata, 1);
 }
 
 #if IS_ACTIVE(SX126X_SPI)
