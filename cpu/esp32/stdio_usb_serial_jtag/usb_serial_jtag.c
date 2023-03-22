@@ -116,11 +116,16 @@ void stdio_init(void)
     /* clear all interrupt flags */
     usb_serial_jtag_ll_clr_intsts_mask(USB_SERIAL_JTAG_LL_INTR_MASK);
 
-    /* route all UART interrupt sources to same the CPU interrupt */
+    /* route USB Serial/JTAG interrupt source to CPU interrupt */
     intr_matrix_set(PRO_CPU_NUM, ETS_USB_SERIAL_JTAG_INTR_SOURCE, CPU_INUM_SERIAL_JTAG);
 
-    /* we have to enable therefore the CPU interrupt here */
+    /* enable the CPU interrupt */
     intr_cntrl_ll_set_int_handler(CPU_INUM_SERIAL_JTAG, _serial_intr_handler, NULL);
     intr_cntrl_ll_enable_interrupts(BIT(CPU_INUM_SERIAL_JTAG));
+
+#ifdef SOC_CPU_HAS_FLEXIBLE_INTC
+    /* set interrupt level */
+    intr_cntrl_ll_set_int_level(CPU_INUM_SERIAL_JTAG, 1);
+#endif
 }
 /**@}*/
