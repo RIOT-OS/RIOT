@@ -19,6 +19,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "shell.h"
 #include "msg.h"
@@ -29,13 +30,16 @@
 #include "net/sock/tcp.h"
 #include "periph/i2c.h"
 #define MAIN_QUEUE_SIZE     (8)
+#define SOCK_QUEUE_LEN  (1U)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
 char udp_stack[THREAD_STACKSIZE_DEFAULT];
 char tcp_stack[THREAD_STACKSIZE_DEFAULT];
 char i2c_stack[THREAD_STACKSIZE_DEFAULT];
 kernel_pid_t main_thread, udp_thread, tcp_thread, i2c_thread;
-
+ 
+sock_tcp_t sock_queue[SOCK_QUEUE_LEN];
+volatile be_uint16_t vbat, light;
 void* udp_handler(void *arg);
 void* tcp_handler(void *arg);
 void* i2c_handler(void *arg);
@@ -79,33 +83,21 @@ void* udp_handler(void *arg){
     while (1) {
         sock_udp_ep_t remote;
         ssize_t res;
-        if ((res = sock_udp_recv(&sock, udp_buf, sizeof(udp_buf), SOCK_NO_TIMEOUT,
-                                 &remote)) >= 0) {
-            printf("%s\n", udp_buf);
-            if(strncmp((char*)udp_buf, "test", 5) == 0)
-            {
-                uint8_t i = 0;
-                    while(i<50)
-                        {
-                            char text[127];
-                            sprintf(text, "Гречиха посевная *гудок*, а я гречиха посевная = %d\n", i);
-                        if (sock_udp_send(&sock, text, strlen(text), &remote) < 0) {
-                            puts("Error sending reply");
-                        }
-                        i++;
-                        ztimer_sleep(ZTIMER_MSEC, 1000);
-                        }
-            }
-
+        if ((res = sock_udp_recv(&sock, udp_buf, sizeof(udp_buf), 1000,
+                                 &remote)) == -ETIMEDOUT) {
+                char text[127];
+                sprintf(text, "Датчики на LoRa LabKit:\n Датчик освещения = %d\n Напряжение батареи = %d mV\n", light.u16, vbat.u16);
+                if (sock_udp_send(&sock, text, strlen(text), &remote) < 0) {
+                    puts("Error sending reply");
+                }
+                ztimer_sleep(ZTIMER_MSEC, 10000);
+                }   
         }
-    }
     return NULL;
 }
 
-#define SOCK_QUEUE_LEN  (1U)
- 
-sock_tcp_t sock_queue[SOCK_QUEUE_LEN];
-be_uint16_t vbat;
+
+
 void* tcp_handler(void *arg){
     (void)arg;
      sock_tcp_ep_t local = SOCK_IPV6_EP_ANY;
@@ -128,8 +120,10 @@ void* tcp_handler(void *arg){
             int read_res = 0;
  
             puts("Reading data");
-            sock_tcp_write(sock, "> ", 2);
+            sock_tcp_write(sock, "\n> ", 2);
             while (read_res >= 0) {
+                for(uint8_t t = 0; t< sizeof(tcp_buf);t++)
+                    tcp_buf[t] = 0;
                 read_res = sock_tcp_read(sock, &tcp_buf, sizeof(tcp_buf),
                                          SOCK_NO_TIMEOUT);
                 if (read_res <= 0) {
@@ -142,40 +136,78 @@ void* tcp_handler(void *arg){
                         printf("%c", tcp_buf[i]);
                     }
                     puts("\"");
-            if(strncmp((char*)tcp_buf, "test", 4) == 0)
-            {
-                uint32_t i = 0;
-                    while(i < 5000)
+            if(strncmp((char*)tcp_buf, "test", 4) == 0){
+                uint16_t c = 0;
+                uint16_t i = 0;
+                uint8_t s = 0;
+                uint8_t current_char = 5;
+                while(current_char < 124)
+                {
+                    if(tcp_buf[current_char] == '-')
                         {
-                            sprintf(text, "Гречиха посевная *гудок*, а я гречиха посевная = %ld\n", i);
-                        if (sock_tcp_write(sock, text, strlen(text)) < 0) {
-                            puts("Error sending\n");
-                            goto exit_tcp;
+                            switch (tcp_buf[current_char+1]){
+                                case 'c':
+                                    c = atoi((char*)(tcp_buf + current_char+3));
+                                    break;
+                                case 's':
+                                    s = atoi((char*)(tcp_buf + current_char+3));
+                                    break;
+                                case 'i':
+                                    i = atoi((char*)(tcp_buf + current_char+3));
+                                    break;
+
+                            }
                         }
+                        current_char++;
+                }
+                if(c == 0)
+                    {
+                        c = 50;
+                    }
+                if(i == 0)
+                    {
+                        i = 100;
+                    }
+                    uint32_t packet_count = 0;
+                    while(packet_count < c)
+                        {
+                            sprintf(text, " 私は日本語のがくせいです = %ld\n", packet_count);
+                            if(s >= strlen(text) || s == 0)
+                                {
+                                    if (sock_tcp_write(sock, text, strlen(text)) < 0) {
+                                    puts("Error sending\n");
+                                    goto exit_tcp;
+                                }
+                                }
+                                else 
+                                if (sock_tcp_write(sock, text, s) < 0) {
+                                    puts("Error sending\n");
+                                    goto exit_tcp;
+                            }
                             
-                        i++;
-                        ztimer_sleep(ZTIMER_MSEC, 100);
+                        packet_count++;
+                        ztimer_sleep(ZTIMER_MSEC, i);
                         }
             }
             else if(strncmp((char*)tcp_buf, "led_on", 6) == 0){
                 gpio_set(LED_USB_LINK);
-                sprintf(text, "Светодиод включен\n");
+                sprintf(text, " Светодиод включен\n");
                 sock_tcp_write(sock, text, strlen(text));
             }
             else if(strncmp((char*)tcp_buf, "led_off", 7) == 0){
                 gpio_clear(LED_USB_LINK);
-                sprintf(text, "Светодиод выключен\n");
+                sprintf(text, " Светодиод выключен\n");
                 sock_tcp_write(sock, text, strlen(text));
             }
-            else if(strncmp((char*)tcp_buf, "vbat", 4) == 0){
-                sprintf(text, "Напряжение батареи %d mv\n", vbat.u16);
+            else if(strncmp((char*)tcp_buf, "sensors", 4) == 0){
+                sprintf(text, "Датчики на LoRa LabKit:\n Датчик освещения = %d\n Напряжение батареи = %d mV\n", light.u16, vbat.u16);
                 sock_tcp_write(sock, text, strlen(text));
             }
             else if(strncmp((char*)tcp_buf, "help", 4) == 0){
-                sprintf(text, "Доступные команды:\n\nhelp\nled_on\nled_off\ntest\nvbat\n\n");
+                sprintf(text, "Доступные команды:\n\nhelp\nled_on\nled_off\ntest\nsensors\n");
                 sock_tcp_write(sock, text, strlen(text));
             }
-            sock_tcp_write(sock, "> ", 2);
+            sock_tcp_write(sock, "\n> ", 2);
                     }
     }
     exit_tcp:
@@ -189,15 +221,22 @@ void* i2c_handler(void *arg){
     (void)arg;
     int dev = 0;
     i2c_init(dev);
-    i2c_acquire(dev);
     while(1){
+        i2c_acquire(dev);
         vbat.u16 = 0;
         le_uint16_t reg_value;
+        le_uint16_t light_value;
         i2c_read_regs(0, 0x40, 0x02, &reg_value.u16, 2, 0);
         vbat = byteorder_ltobs(reg_value);
         vbat.u16 = (vbat.u16>>3)*4;
-        i2c_release(0);
-        ztimer_sleep(ZTIMER_MSEC, 10000);
+        i2c_write_byte(0,0x23, 0b00100000, 0);
+        ztimer_sleep(ZTIMER_MSEC, 180);
+        i2c_read_bytes(0, 0x23, &light_value.u16,2, 0);
+        i2c_write_byte(0,0x23, 0b00000001, 0);
+        light = byteorder_ltobs(light_value);
+        light.u16 = (light.u16>>3)*4;
+        i2c_release(dev);
+        ztimer_sleep(ZTIMER_MSEC, 1000);
     }
     return NULL;
 }

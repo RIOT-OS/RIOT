@@ -18,7 +18,8 @@
         "initializer_list": "c",
         "ranges": "c",
         "utility": "c",
-        "i2c.h": "c"
+        "i2c.h": "c",
+        "shell.h": "c"
     },
     "[shellscript][c][cpp]": {
         "editor.tabSize": 4,
