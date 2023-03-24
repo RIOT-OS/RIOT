@@ -131,33 +131,40 @@ typedef struct {
  * @brief Number of endpoints available with the OTG FS peripheral
  *        including the control endpoint
  */
-#ifdef STM32_USB_OTG_CID_1x
-#define STM32_USB_OTG_FS_NUM_EP (4)    /**< OTG FS with 4 endpoints */
+#if defined(USB_OTG_FS_MAX_IN_ENDPOINTS)
+#define STM32_USB_OTG_FS_NUM_EP     (USB_OTG_FS_MAX_IN_ENDPOINTS)
+#elif defined(STM32_USB_OTG_CID_1x)
+#define STM32_USB_OTG_FS_NUM_EP     (4)    /**< OTG FS with 4 endpoints */
 #elif defined(STM32_USB_OTG_CID_2x)
-#define STM32_USB_OTG_FS_NUM_EP (6)    /**< OTG FS with 6 endpoints */
+#define STM32_USB_OTG_FS_NUM_EP     (6)    /**< OTG FS with 6 endpoints */
 #endif
 
 /**
  * @brief Number of endpoints available with the OTG HS peripheral
  *        including the control endpoint
  */
-#ifdef STM32_USB_OTG_CID_1x
-#define STM32_USB_OTG_HS_NUM_EP (6)     /**< OTG HS with 6 endpoints */
+#if defined(USB_OTG_HS_MAX_IN_ENDPOINTS)
+#define STM32_USB_OTG_HS_NUM_EP     (USB_OTG_HS_MAX_IN_ENDPOINTS)
+#elif defined(STM32_USB_OTG_CID_1x)
+#define STM32_USB_OTG_HS_NUM_EP     (6)     /**< OTG HS with 6 endpoints */
 #elif defined(STM32_USB_OTG_CID_2x)
-#define STM32_USB_OTG_HS_NUM_EP (9)     /**< OTG HS with 9 endpoints */
+#define STM32_USB_OTG_HS_NUM_EP     (9)     /**< OTG HS with 9 endpoints */
 #endif
 
 /**
  * @brief Number of IN/OUT endpoints including EP0 as used by USBUS
  *
- * @note Since only a single number of EPs can be defined for USBUS that is
- *       valid for all devices, the smallest number of EPs must be used for
- *       multiple USB devices.
+ * @note USBUS allows only one definition of the number of available EPs, which
+ *       is then used for all devices. To be able to use all EPs for devices
+ *       with more EPs, the largest possible number of available EPs for
+ *       several USB devices is defined here. The driver has to ensure that the
+ *       number of allocated EPs does not exceed the number of available EPs if
+ *       a device has less EPs.
  */
-#if defined(STM32_USB_OTG_FS_NUM_EP)
-#define USBDEV_NUM_ENDPOINTS            STM32_USB_OTG_FS_NUM_EP
-#elif defined(STM32_USB_OTG_HS_NUM_EP)
+#if defined(MODULE_PERIPH_USBDEV_HS) && defined(STM32_USB_OTG_HS_NUM_EP)
 #define USBDEV_NUM_ENDPOINTS            STM32_USB_OTG_HS_NUM_EP
+#elif defined(STM32_USB_OTG_FS_NUM_EP)
+#define USBDEV_NUM_ENDPOINTS            STM32_USB_OTG_FS_NUM_EP
 #else
 #define USBDEV_NUM_ENDPOINTS            8
 #endif

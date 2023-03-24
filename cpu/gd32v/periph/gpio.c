@@ -165,7 +165,7 @@ int gpio_read(gpio_t pin)
     GPIO_Type *port = _port(pin);
     unsigned pin_num = _pin_num(pin);
 
-    if (_pin_is_output(port, pin)) {
+    if (_pin_is_output(port, pin_num)) {
         /* pin is output */
         return (port->OCTL & (1 << pin_num));
     }

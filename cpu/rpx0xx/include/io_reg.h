@@ -121,7 +121,7 @@ static inline void io_reg_atomic_clear(volatile uint32_t *reg, uint32_t mask)
  *
  * Example use:
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
- * io_reg_write_dont_corrupt(&CLOCKS->CLK_SYS_CTRL.reg, source << CLOCKS_CLK_SYS_CTRL_SRC_Pos,
+ * io_reg_write_dont_corrupt(&CLOCKS->CLK_SYS_CTRL, source << CLOCKS_CLK_SYS_CTRL_SRC_Pos,
  *                           CLOCKS_CLK_SYS_CTRL_SRC_Msk);
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */

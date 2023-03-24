@@ -1,3 +1,7 @@
+ifneq (,$(filter periph_usbdev,$(USEMODULE)))
+  USEMODULE += periph_usbdev_hs
+endif
+
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
   USEMODULE += l3gxxxx

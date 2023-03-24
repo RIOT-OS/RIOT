@@ -34,15 +34,15 @@ void xosc_start(uint32_t f_ref)
 {
     assert(f_ref == MHZ(12));
     uint32_t delay = _xosc_conf_sartup_delay(f_ref, 1);
-    io_reg_write_dont_corrupt(&XOSC->STARTUP.reg, delay << XOSC_STARTUP_DELAY_Pos,
+    io_reg_write_dont_corrupt(&XOSC->STARTUP, delay << XOSC_STARTUP_DELAY_Pos,
                               XOSC_STARTUP_DELAY_Msk);
-    io_reg_write_dont_corrupt(&XOSC->CTRL.reg, XOSC_CTRL_ENABLE_ENABLE << XOSC_CTRL_ENABLE_Pos,
+    io_reg_write_dont_corrupt(&XOSC->CTRL, XOSC_CTRL_ENABLE_ENABLE << XOSC_CTRL_ENABLE_Pos,
                               XOSC_CTRL_ENABLE_Msk);
-    while (!XOSC->STATUS.bit.STABLE) { }
+    while (!(XOSC->STATUS & XOSC_STATUS_STABLE_Msk)) { }
 }
 
 void xosc_stop(void)
 {
-    io_reg_write_dont_corrupt(&XOSC->CTRL.reg, XOSC_CTRL_ENABLE_DISABLE << XOSC_CTRL_ENABLE_Pos,
+    io_reg_write_dont_corrupt(&XOSC->CTRL, XOSC_CTRL_ENABLE_DISABLE << XOSC_CTRL_ENABLE_Pos,
                               XOSC_CTRL_ENABLE_Msk);
 }

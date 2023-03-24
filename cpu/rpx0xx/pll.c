@@ -44,22 +44,22 @@ static void _pll_start(PLL_SYS_Type *pll, uint8_t ref_div,
     assert(post_div_2 <= PLL_POSTDIV_MAX);
 
     /* program reference clock divider */
-    io_reg_write_dont_corrupt(&pll->CS.reg, ref_div << PLL_SYS_CS_REFDIV_Pos,
+    io_reg_write_dont_corrupt(&pll->CS, ref_div << PLL_SYS_CS_REFDIV_Pos,
                               PLL_SYS_CS_REFDIV_Msk);
     /* program feedback divider */
-    io_reg_write_dont_corrupt(&pll->FBDIV_INT.reg,
+    io_reg_write_dont_corrupt(&pll->FBDIV_INT,
                               vco_feedback_scale << PLL_SYS_FBDIV_INT_FBDIV_INT_Pos,
                               PLL_SYS_FBDIV_INT_FBDIV_INT_Msk);
     /* turn on the main power */
-    io_reg_atomic_clear(&pll->PWR.reg, (1U << PLL_SYS_PWR_VCOPD_Pos)
+    io_reg_atomic_clear(&pll->PWR, (1U << PLL_SYS_PWR_VCOPD_Pos)
                                      | (1U << PLL_SYS_PWR_DSMPD_Pos)
                                      | (1U << PLL_SYS_PWR_PD_Pos));
     /* wait for VCO to lock (i.e. keep its output stable) */
-    while (!pll->CS.bit.LOCK) { }
+    while (!(pll->CS & PLL_SYS_CS_LOCK_Msk)) { }
     /* set up post divisors and turn them on */
-    pll->PRIM.reg = (post_div_1 << PLL_SYS_PRIM_POSTDIV1_Pos)
+    pll->PRIM = (post_div_1 << PLL_SYS_PRIM_POSTDIV1_Pos)
                   | (post_div_2 << PLL_SYS_PRIM_POSTDIV2_Pos);
-    io_reg_atomic_clear(&pll->PWR.reg, 1U << PLL_SYS_PWR_POSTDIVPD_Pos);
+    io_reg_atomic_clear(&pll->PWR, 1U << PLL_SYS_PWR_POSTDIVPD_Pos);
 }
 
 /**
@@ -72,7 +72,7 @@ static void _pll_stop(PLL_SYS_Type *pll)
                  | (1U << PLL_SYS_PWR_POSTDIVPD_Pos)
                  | (1U << PLL_SYS_PWR_DSMPD_Pos)
                  | (1U << PLL_SYS_PWR_PD_Pos);
-    io_reg_atomic_set(&pll->PWR.reg, reg);
+    io_reg_atomic_set(&pll->PWR, reg);
 }
 
 void pll_start_sys(uint8_t ref_div,
