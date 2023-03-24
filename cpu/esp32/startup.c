@@ -322,7 +322,7 @@ static NORETURN void IRAM system_init (void)
     LOG_STARTUP("Starting RIOT kernel on PRO cpu\n");
     esp_rom_uart_tx_wait_idle(CONFIG_ESP_CONSOLE_UART_NUM);
 #else
-    puts("");
+    ets_printf("\n");
 #endif
     kernel_init();
     UNREACHABLE();
