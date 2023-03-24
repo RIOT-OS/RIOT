@@ -67,9 +67,9 @@ by pins.
 | ADC_LINE(5)      | PB1     | ADC01_IN9      | TFT RST        | N/A if TFT is used             |
 | ADC_LINE(6)      | PA6     | ADC01_IN6      |                | N/A if TFT is used             |
 | ADC_LINE(7)      | PA7     | ADC01_IN7      |                | N/A if TFT is used             |
-| ADC_LINE(8)      | PA8     | ADC01_IN4      |                | N/A if TFT is used             |
-| ADC_LINE(9)      | PA9     | ADC01_IN5      |                | N/A if TFT is used             |
-| BTN0             | PA0     | BOOT0          | BOOT           |                                |
+| ADC_LINE(8)      | PA4     | ADC01_IN4      |                | N/A if TFT is used             |
+| ADC_LINE(9)      | PA5     | ADC01_IN5      |                | N/A if TFT is used             |
+| BTN0             | PA8     | BOOT0          | BOOT           |                                |
 | DAC_LINE(0)      | PA4     | DAC0           |                | N/A if TFT is used             |
 | DAC_LINE(1)      | PA5     | DAC1           |                | N/A if TFT is used             |
 | GPIO_PIN(1, 2)   | PB2     |                | TFT CS         |                                |
@@ -105,7 +105,7 @@ by pins.
 | PA5  | TFT SCL        | SPI_DEV(1) SCLK | ADC_LINE(9)*    | DAC_LINE(1)*    |
 | PA6  |                | SPI_DEV(1) MISO | ADC_LINE(6)*    |                 |
 | PA7  | TFT SDA        | SPI_DEV(1) MOSI | ADC_LINE(7)*    |                 |
-| PA8  |                |                 |                 |                 |
+| PA8  | BOOT           |                 |                 | BTN0            |
 | PA9  |                | UART_DEV(0) TX  |                 |                 |
 | PA10 |                | UART_DEV(0) RX  |                 |                 |
 | PA11 | USB D-         |                 |                 |                 |

@@ -27,6 +27,15 @@ extern "C" {
 #endif
 
 /**
+ * @name    Button pin definitions
+ * @{
+ */
+#define BTN0_PIN            GPIO_PIN(PORT_A, 8)
+#define BTN0_MODE           GPIO_IN
+#define BTN0_INT_FLANK      GPIO_RISING
+/** @} */
+
+/**
  * @name    LED (on-board) configuration
  * @{
  */
