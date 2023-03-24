@@ -1,0 +1,24 @@
+[package]
+name = "riot-module-stdio-coap"
+version = "0.1.0"
+edition = "2021"
+
+authors = ["Christian Amsüss <chrysn@fsfe.org>"]
+license = "LGPL-2.1-only"
+
+# Shipped with RIOT-OS; this has no external API that would make
+# sense to consume in any context than from within RIOT
+publish = false
+
+[dependencies]
+coap-scroll-ring-server = "0.1"
+riot-wrappers = { version = "^0.8", features = [ "with_coap_handler" ] } # esp. the git version: fixes mutex bug
+riot-sys = "0.7"
+scroll-ring = "0.1.1"
+static_cell = "1"
+# for stdin
+coap-handler = "0.1"
+coap-message = "0.2"
+coap-numbers = "0.2"
+ringbuf = { version = "0.3.2", default-features = false }
+coap-handler-implementations = { git = "https://gitlab.com/chrysn/coap-handler-implementations", features = [ "leaky_names" ] }

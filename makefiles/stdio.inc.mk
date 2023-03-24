@@ -1,6 +1,7 @@
 STDIO_MODULES = \
   slipdev_stdio \
   stdio_cdc_acm \
+  stdio_coap \
   stdio_ethos \
   stdio_native \
   stdio_nimble \
@@ -23,6 +24,23 @@ ifneq (,$(filter stdio_cdc_acm,$(USEMODULE)))
   USEMODULE += usbus_cdc_acm
   USEMODULE += isrpipe
   USEMODULE += stdio_available
+endif
+
+ifneq (,$(filter stdio_coap,$(USEMODULE)))
+  # FIXME: Does this obsolete the stdio_coap Makefile.{dep,include}?
+  USEMODULE += rust_riotmodules
+  PSEUDOMODULES += stdio_coap
+
+  # FIXME: Whose responsibility is it to include these?
+
+  # either
+  USEMODULE += netdev_default
+  #USEMODULE += usbus_cdc_ecm
+
+  USEMODULE += gnrc_sock_udp
+  USEMODULE += gcoap
+  USEMODULE += gnrc_ipv6_default
+  USEMODULE += auto_init_gnrc_netif
 endif
 
 ifneq (,$(filter stdio_tinyusb_cdc_acm,$(USEMODULE)))

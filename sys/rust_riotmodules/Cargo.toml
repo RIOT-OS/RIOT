@@ -12,3 +12,4 @@ publish = false
 
 riot-module-lsm303agr = { path = "../../drivers/lsm303agr", optional = true }
 riot-module-shell-democommands = { path = "../../sys/shell/democommands", optional = true }
+riot-module-stdio-coap = { path = "../../sys/stdio_coap", optional = true }
