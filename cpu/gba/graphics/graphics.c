@@ -2,6 +2,43 @@
 #include "graphics.h"
 #include <string.h>
 
+void setTiledMode(void)
+{
+    GBA_DISPCNT = GBA_DISPCNT_BGMODE_0 | GBA_DISPCNT_SDBG_0;
+}
+
+void setBG0Control(void)
+{
+    GBA_BG0CNT = 0    |       /* priority, 0 is highest, 3 is lowest */
+            (0 << 2)  |       /* the char block the image data is stored in */
+            (0 << 6)  |       /* the mosaic flag */
+            (1 << 7)  |       /* color mode, 0 is 16 colors, 1 is 256 colors */
+            (16 << 8) |       /* the screen block the tile data is stored in */
+            (1 << 13) |       /* wrapping flag */
+            (0 << 14);        /* bg size, 0 is 256x256 */
+}
+
+void setupBackgroundPalette(const unsigned short *palette, unsigned int size)
+{
+    for (unsigned int i = 0; i < size; i++)
+        GBA_VRAM_PALETTE[i] = palette[i];
+}
+
+void setupCharacterBlock(unsigned int block, const unsigned char *characters, unsigned int size)
+{
+    volatile unsigned char* addr = ((volatile unsigned char*  )GBA_VRAM + (block * 0x4000));
+    for (unsigned int i = 0; i < size; i ++) {
+        addr[i] = characters[i];
+    }
+}
+
+void setupMapBlock(unsigned int block, const unsigned short *map, unsigned int size)
+{
+    volatile unsigned short* addr = GBA_VRAM + (block * 0x400);
+    for (unsigned int i = 0; i < size; i++)
+        addr[i] = map[i];
+}
+
 void setBitmapMode(void)
 {
     GBA_DISPCNT = GBA_DISPCNT_BGMODE_3 | GBA_DISPCNT_SDBG_2;

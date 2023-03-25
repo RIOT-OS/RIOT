@@ -36,7 +36,7 @@ static inline __attribute__((always_inline)) void thread_yield_higher(void)
         sched_context_switch_request = 1;
     }
     else {
-        __asm__("svc 0\n");
+        __asm__("svc 0xd40000\n");
     }
 }
 

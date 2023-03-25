@@ -19,18 +19,19 @@ extern "C"
 {
 #endif
 
-    extern uintptr_t __stack_start; /**< end of user stack memory space */
+extern uintptr_t __stack_start;     /**< end of user stack memory space */
 
-    /**
-     * @brief   Returns the current content of the link register (lr)
-     */
-    static inline uintptr_t cpu_get_caller_pc(void)
-    {
-        register uintptr_t lr_ptr;
-        __asm__ __volatile__("mov %0, lr"
-                             : "=r"(lr_ptr));
-        return lr_ptr;
-    }
+/**
+ * @brief   Returns the current content of the link register (lr)
+ */
+static inline uintptr_t cpu_get_caller_pc(void)
+{
+    register uintptr_t lr_ptr;
+
+    __asm__ __volatile__ ("mov %0, lr"
+                          : "=r" (lr_ptr));
+    return lr_ptr;
+}
 
 #ifdef __cplusplus
 }

@@ -12,9 +12,12 @@ SECTIONS
         KEEP(*(.gbaheader))
         . = ALIGN(4);
         KEEP(*(.init))
+        . = ALIGN(4);
         KEEP(*(.init0))                 /* Start here after reset.  */
+        . = ALIGN(4);
         *(.text .text.* .gnu.linkonce.t.*)
         *(.glue_7t) *(.glue_7)
+        . = ALIGN(4);
         *(.rodata .rodata* .gnu.linkonce.r.*)
         *(.ARM.extab* .gnu.linkonce.armextab.*)
 

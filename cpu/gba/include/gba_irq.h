@@ -6,7 +6,7 @@ extern "C"
 {
 #endif
 
-    typedef void IsrFn(void);
+typedef void IsrFn(void);
 
 #define GBA_IRQ_VBLANK 0x0001
 #define GBA_IRQ_HBLANK 0x0002
@@ -23,13 +23,13 @@ extern "C"
 #define GBA_IRQ_KEYPAD 0x1000
 #define GBA_IRQ_EXTERN 0x2000
 
-    void init_isr(void);
+void init_isr(void);
 
-    void gba_isr(void);
+void gba_isr(void);
 
-    int gba_irq_register_cb(IsrFn *cb, uint16_t mask);
+int gba_irq_register_cb(IsrFn *cb, uint16_t mask);
 
-    void gba_irq_unregister_cb(int id);
+void gba_irq_unregister_cb(int id);
 
 #ifdef __cplusplus
 }

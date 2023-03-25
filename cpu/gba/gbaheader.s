@@ -6,7 +6,7 @@
 ===============================================================================
 */
 .section .gbaheader
-    b _end_gbaheader
+    b _startup
     // Logo data [156]
     .byte   0x24, 0xFF, 0xAE, 0x51, 0x69, 0x9A, 0xA2, 0x21
     .byte   0x3D, 0x84, 0x82, 0x0A, 0x84, 0xE4, 0x09, 0xAD
@@ -57,5 +57,5 @@
     // Zero hword [2]
     .hword  0x0000
 
-_end_gbaheader:
-    b _startup
+    // Multiboot
+    .zero 10

@@ -46,21 +46,17 @@ ssize_t stdio_write(const void *buffer, size_t len)
     static unsigned short row = 0;
     static unsigned short cursor = 0;
 
-    for (size_t i = 0; i < len; i++)
-    {
-        if (cursor >= (240 / FONT_WIDTH))
-        {
+    for (size_t i = 0; i < len; i++) {
+        if (cursor >= (240 / FONT_WIDTH)) {
             cursor = 0;
             row++;
         }
-        if (row >= (160 / FONT_HEIGHT))
-        {
+        if (row >= (160 / FONT_HEIGHT)) {
             clearScreen();
             row = 0;
         }
         char c = ((char *)buffer)[i];
-        if (c == '\n')
-        {
+        if (c == '\n') {
             row++;
             cursor = 0;
             continue;

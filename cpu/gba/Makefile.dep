@@ -1,5 +1,6 @@
 USEMODULE += arm7_common
 USEMODULE += graphics
+USEMODULE += dma
 
 ifeq (,$(filter stdio_%,$(USEMODULE)))
   USEMODULE += stdio_fb

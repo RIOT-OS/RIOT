@@ -24,7 +24,7 @@ extern "C"
  * @file
  * @brief       ARM7TDMI CPU configuration
  *
- * @author      Bennet Blischke
+ * @author
  */
 
 /**
@@ -36,8 +36,8 @@ extern "C"
 /** @} */
 
 /**
-￼ * @brief   This arch uses the inlined irq API.
-￼ */
+   ￼ * @brief   This arch uses the inlined irq API.
+   ￼ */
 #define IRQ_API_INLINED (1)
 
 /**
@@ -129,7 +129,7 @@ extern "C"
  */
 #define NUM_HEAPS (1)
 
-    /** @} */
+/** @} */
 
 #ifdef __cplusplus
 }
