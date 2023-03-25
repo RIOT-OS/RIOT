@@ -70,18 +70,23 @@ void ws281x_write_buffer(ws281x_t *dev, const void *buf, size_t size)
                 on_wait = zero_on;
                 off_wait = zero_off;
             }
+            data <<= 1;
+            while (cpu_hal_get_cycle_count() < current_wait) { }
+            /* end of LOW phase and start of HIGH phase */
             start = cpu_hal_get_cycle_count();
             gpio_set(dev->params.pin);
             current_wait = start + on_wait;
             while (cpu_hal_get_cycle_count() < current_wait) { }
-            gpio_clear(dev->params.pin);
+            /* end of HIGH phase and start of HIGH phase */
             start = cpu_hal_get_cycle_count();
+            gpio_clear(dev->params.pin);
             current_wait = start + off_wait;
-            while (cpu_hal_get_cycle_count() < current_wait) { }
-            data <<= 1;
         }
         pos++;
     }
+    /* final LOW phase */
+    current_wait = cpu_hal_get_cycle_count();
+    /* end of final LOW phase */
 }
 
 int ws281x_init(ws281x_t *dev, const ws281x_params_t *params)
