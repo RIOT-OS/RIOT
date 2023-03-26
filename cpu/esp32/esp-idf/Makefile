@@ -40,6 +40,10 @@ ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
   DIRS += nvs_flash
 endif
 
+ifneq (,$(filter esp_idf_rmt,$(USEMODULE)))
+  DIRS += rmt
+endif
+
 ifneq (,$(filter esp_idf_spi_flash,$(USEMODULE)))
   DIRS += spi_flash
 endif
