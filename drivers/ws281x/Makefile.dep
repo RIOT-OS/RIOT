@@ -15,3 +15,16 @@ endif
 ifneq (,$(filter ws281x_atmega,$(USEMODULE)))
   FEATURES_REQUIRED += cpu_core_atmega
 endif
+
+ifneq (,$(filter ws281x_esp32%,$(USEMODULE)))
+  FEATURES_REQUIRED += arch_esp32
+  ifneq (,$(filter ws281x_esp32_sw,$(USEMODULE)))
+    USEMODULE += ws281x_esp32
+  else
+    # use ESP32x RMT hardware implementation by default
+    FEATURES_REQUIRED += esp_rmt
+    USEMODULE += esp_idf_rmt
+    USEMODULE += ws281x_esp32
+    USEMODULE += ws281x_esp32_hw
+  endif
+endif
