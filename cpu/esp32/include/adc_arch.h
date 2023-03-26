@@ -34,9 +34,8 @@ extern "C" {
 #include "periph/adc.h"
 #include "periph/gpio.h"
 
+#include "driver/adc.h"
 #include "hal/adc_types.h"
-
-#include "esp_idf_api/adc.h"
 
 /**
  * @brief  Attenuations that can be set for ADC lines
@@ -112,9 +111,9 @@ int adc_line_vref_to_gpio(adc_t line, gpio_t gpio);
  * @return  0 on success
  * @return  -1 on invalid ADC line
  */
-static inline int adc_vref_to_gpio25 (void)
+static inline int adc_vref_to_gpio25(void)
 {
-    return esp_idf_adc_vref_to_gpio(ADC_UNIT_2, GPIO25);
+    return adc_vref_to_gpio(ADC_UNIT_2, GPIO25);
 }
 #endif
 
