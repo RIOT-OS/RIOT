@@ -26,6 +26,7 @@
  */
 #include "periph/timer.h"
 
+#include "driver/periph_ctrl.h"
 #include "esp/common_macros.h"
 #include "hal/interrupt_controller_types.h"
 #include "hal/interrupt_controller_ll.h"
@@ -39,8 +40,6 @@
 #include "xtensa/hal.h"
 #include "xtensa/xtensa_api.h"
 #endif
-
-#include "esp_idf_api/periph_ctrl.h"
 
 #include "esp_common.h"
 #include "irq_arch.h"
@@ -244,7 +243,7 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     intr_cntrl_ll_enable_interrupts(BIT(CPU_INUM_TIMER));
 
     /* enable TMG module */
-    esp_idf_periph_module_enable(_timers_desc[dev].module);
+    periph_module_enable(_timers_desc[dev].module);
 
     /* hardware timer configuration */
     timer_hal_init(&_timers[dev].hw, _timers_desc[dev].group, _timers_desc[dev].index);

@@ -59,6 +59,7 @@
 
 #else /* defined(MCU_ESP8266) */
 
+#include "driver/periph_ctrl.h"
 #include "esp_rom_gpio.h"
 #include "esp_rom_uart.h"
 #include "hal/interrupt_controller_types.h"
@@ -72,8 +73,6 @@
 #include "soc/uart_pins.h"
 #include "soc/uart_reg.h"
 #include "soc/uart_struct.h"
-
-#include "esp_idf_api/periph_ctrl.h"
 
 #undef  UART_CLK_FREQ
 #define UART_CLK_FREQ   rtc_clk_apb_freq_get() /* APB_CLK is used */
@@ -232,7 +231,7 @@ void uart_poweron(uart_t uart)
     assert(uart < UART_NUMOF);
 
 #ifndef MCU_ESP8266
-    esp_idf_periph_module_enable(_uarts[uart].mod);
+    periph_module_enable(_uarts[uart].mod);
 #endif
     _uart_config(uart);
 }
@@ -242,7 +241,7 @@ void uart_poweroff(uart_t uart)
     assert(uart < UART_NUMOF);
 
 #ifndef MCU_ESP8266
-    esp_idf_periph_module_disable(_uarts[uart].mod);
+    periph_module_disable(_uarts[uart].mod);
 #endif
 }
 
