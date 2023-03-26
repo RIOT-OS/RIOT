@@ -36,6 +36,7 @@ extern "C" {
  *
  * @{
  */
+#define CPU_INUM_RMT             1  /**< Level interrupt with low priority 1 */
 #define CPU_INUM_GPIO            2  /**< Level interrupt with low priority 1 */
 #define CPU_INUM_CAN             3  /**< Level interrupt with low priority 1 */
 #define CPU_INUM_UART            4  /**< Level interrupt with low priority 1 */
