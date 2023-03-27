@@ -339,7 +339,7 @@ static inline int __attribute__((always_inline)) _rbpf_instruction(rbpf_applicat
     return RBPF_CONTINUE;
 }
 
-int rbpf_engine_run(rbpf_application_t *rbpf, const void *ctx, int64_t *result)
+int rbpf_engine_run(rbpf_application_t *rbpf, size_t func_idx, const void *ctx, int64_t *result)
 {
     int res = RBPF_OK;
 
@@ -349,7 +349,7 @@ int rbpf_engine_run(rbpf_application_t *rbpf, const void *ctx, int64_t *result)
     regmap[1] = (uint64_t)(uintptr_t)ctx;
     regmap[10] = (uint64_t)(uintptr_t)(rbpf->stack + RBPF_STACK_SIZE);
 
-    const bpf_instruction_t *instr = (const bpf_instruction_t *)rbpf_application_text(rbpf);
+    const bpf_instruction_t *instr = rbpf_application_text_at_function(rbpf, func_idx);
 
     res = rbpf_application_verify_preflight(rbpf);
     if (res < 0) {

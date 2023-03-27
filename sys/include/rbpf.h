@@ -124,6 +124,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include "rbpf/instruction.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -159,7 +160,7 @@ typedef struct __attribute__((packed)) {
     uint16_t name_offset;       /**< Offset in the rodata for the name */
     uint16_t flags;             /**< Flags for this function */
     uint16_t location_offset;   /**< Location in the text section where the function starts */
-} rbpf_function_t;
+} rbpf_symbol_header_t;
 
 /**
  * @brief rBPF Virtual Machine exit codes
@@ -176,6 +177,7 @@ enum {
     RBPF_NO_RETURN              = -7,   /**< No valid return found in the application code */
     RBPF_OUT_OF_BRANCHES        = -8,   /**< Number of branches taken is more than allowed */
     RBPF_ILLEGAL_DIV            = -9,   /**< Divide by zero error in instructions */
+    RBPF_UNKNOWN_FUNCTION       = -10,  /**< Function not found inside the rbpf application */
 };
 
 /**
@@ -246,7 +248,6 @@ typedef uint32_t (*rbpf_call_t)(rbpf_application_t *rbpf, uint64_t *regs);
  */
 void rbpf_application_setup(rbpf_application_t *rbpf, uint8_t *stack,
                             const rbpf_application_t *application, size_t application_len);
-
 /**
  * @brief Manually run the pre-flight checks for an application
  *
@@ -269,6 +270,9 @@ int rbpf_application_verify_preflight(rbpf_application_t *rbpf);
  * @returns execution result of the virtual machine, negative on error
  */
 int rbpf_application_run_ctx(rbpf_application_t *rbpf, void *ctx, size_t ctx_size, int64_t *result);
+
+int rbpf_application_run_ctx_idx_function(rbpf_application_t *rbpf, size_t func_idx, void *ctx, size_t ctx_size, int64_t *result);
+int rbpf_application_run_ctx_name_function(rbpf_application_t *rbpf, const char *function, void *ctx, size_t ctx_size, int64_t *result);
 
 /**
  * @brief Initialize a memory region
@@ -334,7 +338,7 @@ static inline void *rbpf_application_rodata(const rbpf_application_t *rbpf)
 {
     const rbpf_header_t *header = rbpf_header(rbpf);
 
-    return (uint8_t *)header + sizeof(rbpf_application_t) + header->data_len;
+    return (uint8_t *)header + sizeof(rbpf_header_t) + header->data_len;
 }
 
 /**
@@ -407,6 +411,20 @@ static inline size_t rbpf_application_text_len(const rbpf_application_t *rbpf)
     return header->text_len;
 }
 
+static inline const rbpf_symbol_header_t *rbpf_symbol_table(const rbpf_application_t *rbpf)
+{
+    return (const rbpf_symbol_header_t*)((const uint8_t*)rbpf_application_text(rbpf) + rbpf_application_text_len(rbpf));
+}
+
+static inline size_t rbpf_application_num_functions(const rbpf_application_t *rbpf)
+{
+    const rbpf_header_t *header = rbpf_header(rbpf);
+    return header->functions;
+}
+
+ssize_t rbpf_application_get_function_name(const rbpf_application_t *rbpf, size_t idx, char *name, size_t name_len);
+ssize_t rbpf_application_function_by_name(const rbpf_application_t *rbpf, const char *name);
+const bpf_instruction_t *rbpf_application_text_at_function(const rbpf_application_t *rbpf, size_t func_idx);
 /* to be implemented by platform specifc code. */
 void rbpf_store_init(void);
 
