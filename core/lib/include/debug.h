@@ -71,6 +71,10 @@ extern "C" {
 #define ENABLE_DEBUG 0
 #endif
 
+#if !defined(ENABLE_DEBUG_VERBOSE) || defined(DOXYGEN)
+#define ENABLE_DEBUG_VERBOSE 0
+#endif
+
 /**
  * @def DEBUG_FUNC
  *
@@ -97,12 +101,27 @@ extern "C" {
 #define DEBUG(...) do { if (ENABLE_DEBUG) { DEBUG_PRINT(__VA_ARGS__); } } while (0)
 
 /**
+ * @def DEBUG_VERBOSE
+ *
+ * @brief Print debug information to stdout if and only if `ENABLE_DEBUG_VERBOSE` is `1`
+ */
+#define DEBUG_VERBOSE(...) do { if (ENABLE_DEBUG_VERBOSE) { DEBUG_PRINT(__VA_ARGS__); } } while (0)
+
+/**
  * @def DEBUG_PUTS
  *
  * @brief Print debug information to stdout using puts(), so no stack size
  *        restrictions do apply.
  */
 #define DEBUG_PUTS(str) do { if (ENABLE_DEBUG) { puts(str); } } while (0)
+
+/**
+ * @def DEBUG_PUTS_VERBOSE
+ *
+ * @brief Print debug information to stdout using puts(), so no stack size
+ *        restrictions do apply.
+ */
+#define DEBUG_PUTS_VERBOSE(str) do { if (ENABLE_DEBUG_VERBOSE) { puts(str); } } while (0)
 /** @} */
 
 /**
