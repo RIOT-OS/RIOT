@@ -24,8 +24,8 @@
 #include "irq.h"
 #include "sched.h"
 #include "thread.h"
-#include "timex.h"
-#include "xtimer.h"
+#include "time_units.h"
+#include "ztimer64.h"
 #include "priority_queue.h"
 
 #include "riot/condition_variable.hpp"
@@ -99,18 +99,19 @@ void condition_variable::wait(unique_lock<mutex>& lock) noexcept {
 
 cv_status condition_variable::wait_until(unique_lock<mutex>& lock,
                                          const time_point& timeout_time) {
-  xtimer_t timer;
-  // todo: use function to wait for absolute timepoint once available
-  timex_t before;
-  xtimer_now_timex(&before);
-  auto diff = timex_sub(timeout_time.native_handle(), before);
-  xtimer_set_wakeup(&timer, timex_uint64(diff), thread_getpid());
+  ztimer64_t timer;
+  uint64_t total_timeout_time_us = timeout_time.microseconds();
+  total_timeout_time_us += timeout_time.seconds() * US_PER_SEC;
+
+  ztimer64_set_wakeup_at(ZTIMER64_USEC, &timer, total_timeout_time_us,
+                         thread_getpid());
   wait(lock);
-  timex_t after;
-  xtimer_now_timex(&after);
-  xtimer_remove(&timer);
-  auto cmp = timex_cmp(after, timeout_time.native_handle());
-  return cmp < 1 ? cv_status::no_timeout : cv_status::timeout;
+  if (ztimer64_now(ZTIMER64_USEC) >= total_timeout_time_us) {
+    ztimer64_remove(ZTIMER64_USEC, &timer);
+    return cv_status::timeout;
+  }
+  ztimer64_remove(ZTIMER64_USEC, &timer);
+  return cv_status::no_timeout;
 }
 
 } // namespace riot

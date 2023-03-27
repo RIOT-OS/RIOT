@@ -22,6 +22,8 @@
 #include <cstdio>
 #include <system_error>
 
+#include "timex.h"
+#include "ztimer64.h"
 #include "riot/mutex.hpp"
 #include "riot/chrono.hpp"
 #include "riot/thread.hpp"
@@ -123,9 +125,9 @@ int main() {
   puts("Testing sleep_for ...");
   {
     timex_t before, after;
-    xtimer_now_timex(&before);
+    before = timex_from_uint64(ztimer64_now(ZTIMER64_USEC));
     this_thread::sleep_for(chrono::seconds(1));
-    xtimer_now_timex(&after);
+    after = timex_from_uint64(ztimer64_now(ZTIMER64_USEC));
     auto diff = timex_sub(after, before);
     expect(diff.seconds >= 1);
   }
@@ -136,9 +138,9 @@ int main() {
   puts("Testing sleep_until ...");
   {
     timex_t before, after;
-    xtimer_now_timex(&before);
+    before = timex_from_uint64(ztimer64_now(ZTIMER64_USEC));
     this_thread::sleep_until(riot::now() += chrono::seconds(1));
-    xtimer_now_timex(&after);
+    after = timex_from_uint64(ztimer64_now(ZTIMER64_USEC));
     auto diff = timex_sub(after, before);
     expect(diff.seconds >= 1);
   }

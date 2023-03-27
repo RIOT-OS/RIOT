@@ -7,7 +7,6 @@ ifneq (,$(filter nucleo-f303k8 nucleo-f334r8,$(BOARD)))
 endif
 
 USEMODULE += cpp11-compat
-USEMODULE += xtimer
-USEMODULE += timex
+USEMODULE += ztimer64_usec
 
 include $(RIOTBASE)/Makefile.include
