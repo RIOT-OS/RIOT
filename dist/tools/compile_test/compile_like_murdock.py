@@ -269,7 +269,7 @@ def main():
         if args.cpu:
             target_boards = _supported_boards_from_cpu(args.cpu, full_env,
                                                        test_dir)
-        elif args.boards[0] == "all":
+        elif args.boards and args.boards[0] == "all":
             target_boards = _supported_boards(boards, full_env, test_dir, True)
         else:
             target_boards = _supported_boards(boards, full_env, test_dir,

@@ -36,3 +36,5 @@ jobs:
       run: cd dist/pythonlibs/riotctrl_shell && tox
     - name: Test kconfig script
       run: cd dist/tools/kconfiglib/tests && ./test.sh
+    - name: Test compile_like_murdock script
+      run: cd dist/tools/compile_test/tests && ./test.sh
