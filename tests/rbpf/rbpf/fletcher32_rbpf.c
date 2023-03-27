@@ -52,3 +52,9 @@ uint32_t fletcher32(fletcher32_ctx_t *ctx)
     sum2 = (sum2 & 0xffff) + (sum2 >> 16);
     return (sum2 << 16) | sum1;
 }
+
+int second_function(void *ctx)
+{
+    (void)ctx;
+    return 5;
+}

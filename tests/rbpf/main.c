@@ -22,6 +22,7 @@
 #include <stdalign.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 #include "rbpf.h"
 #include "rbpf/shared.h"
 #include "embUnit.h"
@@ -44,7 +45,31 @@ typedef struct {
     uint32_t words;
 } fletcher32_ctx_t;
 
-static void tests_bpf_run1(void)
+static void tests_rbpf_header(void)
+{
+    rbpf_application_t rbpf;
+    rbpf_application_setup(&rbpf, _rbpf_stack,
+        (void*)fletcher32_rbpf_bin, sizeof(fletcher32_rbpf_bin));
+
+    size_t num_functions = rbpf_application_num_functions(&rbpf);
+    TEST_ASSERT_EQUAL_INT(2, num_functions);
+
+    char name_buffer[32];
+    ssize_t name_len = rbpf_application_get_function_name(&rbpf, 0, name_buffer, sizeof(name_buffer));
+
+    static const char fletcher32_name[] = "fletcher32";
+
+    TEST_ASSERT_EQUAL_INT(strlen(fletcher32_name), name_len);
+    TEST_ASSERT(strcmp(fletcher32_name, name_buffer) == 0);
+
+    static const char other_function_name[] = "second_function";
+    name_len = rbpf_application_get_function_name(&rbpf, 1, name_buffer, sizeof(name_buffer));
+
+    TEST_ASSERT_EQUAL_INT(strlen(other_function_name), name_len);
+    TEST_ASSERT(strcmp(other_function_name, name_buffer) == 0);
+}
+
+static void tests_rbpf_run1(void)
 {
     fletcher32_ctx_t ctx = {
         .data = (const uint16_t*)(uintptr_t)wrap_around_data,
@@ -59,19 +84,31 @@ static void tests_bpf_run1(void)
                    (void*)wrap_around_data, sizeof(wrap_around_data), RBPF_MEM_REGION_READ);
     rbpf_add_region(&rbpf, &region);
     int64_t result = 0;
-    int res = 0;
-    for (unsigned i = 0; i < 1000; i++) {
-        res = rbpf_application_run_ctx(&rbpf, &ctx, sizeof(ctx), &result);
-    }
+    int res = rbpf_application_run_ctx(&rbpf, &ctx, sizeof(ctx), &result);
 
     TEST_ASSERT_EQUAL_INT(0, res);
     TEST_ASSERT_EQUAL_INT(0x5bac8c3d, (uint32_t)result);
 }
 
+static void tests_rbpf_run2(void)
+{
+    rbpf_application_t rbpf;
+    rbpf_application_setup(&rbpf, _rbpf_stack,
+        (void*)fletcher32_rbpf_bin, sizeof(fletcher32_rbpf_bin));
+
+    int64_t result = 0;
+    int res = rbpf_application_run_ctx_name_function(&rbpf, "second_function", NULL, 0, &result);
+
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(5, result);
+}
+
 Test *tests_bpf(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
-        new_TestFixture(tests_bpf_run1),
+        new_TestFixture(tests_rbpf_header),
+        new_TestFixture(tests_rbpf_run1),
+        new_TestFixture(tests_rbpf_run2),
     };
 
     EMB_UNIT_TESTCALLER(bpf_tests, NULL, NULL, fixtures);
