@@ -590,17 +590,13 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
     /* start TX */
     ETH->DMATPDR = 0;
     /* await completion */
-    if (IS_ACTIVE(ENABLE_DEBUG_VERBOSE)) {
-        DEBUG("[stm32_eth] Started to send %u B via DMA\n", bytes_to_send);
-    }
+    DEBUG_VERBOSE("[stm32_eth] Started to send %u B via DMA\n", bytes_to_send);
     mutex_lock(&stm32_eth_tx_completed);
     if (IS_USED(MODULE_STM32_ETH_TRACING)) {
         gpio_ll_clear(GPIO_PORT(STM32_ETH_TRACING_TX_PORT_NUM),
                       (1U << STM32_ETH_TRACING_TX_PIN_NUM));
     }
-    if (IS_ACTIVE(ENABLE_DEBUG_VERBOSE)) {
-        DEBUG("[stm32_eth] TX completed\n");
-    }
+    DEBUG_VERBOSE("[stm32_eth] TX completed\n");
 
     /* Error check */
     int error = 0;
