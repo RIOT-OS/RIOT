@@ -272,7 +272,7 @@ extern void suit_init_conditions(void);
 AUTO_INIT(suit_init_conditions,
           AUTO_INIT_PRIO_MOD_SUIT);
 #endif
-#if IS_USED(MODULE_MBEDTLS)
+#if IS_USED(MODULE_AUTO_INIT_MBEDTLS)
 extern void auto_init_mbedtls(void);
 AUTO_INIT(auto_init_mbedtls,
           AUTO_INIT_PRIO_MOD_MBEDTLS);

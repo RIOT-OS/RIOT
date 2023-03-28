@@ -1,3 +1,5 @@
+DEFAULT_MODULE += auto_init_mbedtls
+
 ifneq (,$(filter mbedtls_%,$(USEMODULE)))
   USEMODULE += mbedtls_contrib
 endif

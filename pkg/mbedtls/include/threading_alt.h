@@ -35,6 +35,11 @@ typedef struct {
     mutex_t riot_mutex; /**< RIOT mutex structure */
 } mbedtls_threading_mutex_t;
 
+/**
+ * @brief   Initialize alternative threading API of RIOT
+ */
+void threading_mbedtls_riot_init(void);
+
 #endif /* MBEDTLS_THREADING_ALT */
 
 #ifdef __cplusplus

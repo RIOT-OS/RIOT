@@ -35,6 +35,11 @@ ifneq (,$(filter mbedtls_self_test,$(USEMODULE)))
   CFLAGS += -DCONFIG_MBEDTLS_SELF_TEST=1
 endif
 
+NO_PSEUDOMODULES += auto_init_mbedtls
+ifneq (,$(filter auto_init_mbedtls,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/mbedtls/init
+endif
+
 ifneq (,$(filter mbedtls_crypto,$(USEMODULE)))
   include $(RIOTPKG)/mbedtls/contrib/crypto/Makefile.include
 endif
