@@ -1,5 +1,8 @@
 # common definitions for all ESP-IDF modules
 
+# indicate that ESP-IDF code is compiled
+CFLAGS += -DESP_IDF_CODE
+
 # shortcuts used by ESP-IDF
 CFLAGS += -Dasm=__asm
 CFLAGS += -Dtypeof=__typeof__

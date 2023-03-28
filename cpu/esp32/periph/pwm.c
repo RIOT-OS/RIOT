@@ -28,13 +28,12 @@
 #include "periph/pwm.h"
 #include "periph/gpio.h"
 
+#include "driver/periph_ctrl.h"
 #include "esp_common.h"
 #include "esp_rom_gpio.h"
 #include "hal/ledc_hal.h"
 #include "soc/ledc_struct.h"
 #include "soc/rtc.h"
-
-#include "esp_idf_api/periph_ctrl.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -253,7 +252,7 @@ void pwm_poweron(pwm_t pwm)
     DEBUG("%s pwm=%u\n", __func__, pwm);
 
     /* enable and init the module and select the right clock source */
-    esp_idf_periph_module_enable(_CFG.module);
+    periph_module_enable(_CFG.module);
     ledc_hal_init(&_DEV.hw, _CFG.group);
     ledc_hal_set_slow_clk_sel(&_DEV.hw, LEDC_SLOW_CLK_APB);
     ledc_hal_set_clock_source(&_DEV.hw, _CFG.timer, LEDC_APB_CLK);
@@ -317,7 +316,7 @@ void pwm_poweroff(pwm_t pwm)
 
     /* if all devices of the same hardware module are disable, it is powered off */
     if (i == PWM_NUMOF) {
-        esp_idf_periph_module_disable(_CFG.module);
+        periph_module_disable(_CFG.module);
     }
 }
 

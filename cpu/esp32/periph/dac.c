@@ -23,8 +23,8 @@
 #include "periph/dac.h"
 
 #include "esp_common.h"
+#include "driver/dac_common.h"
 #include "soc/dac_periph.h"
-#include "esp_idf_api/dac.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -61,22 +61,21 @@ void dac_set(dac_t line, uint16_t value)
 {
     assert(line < DAC_NUMOF);
     assert(_dac_channels[line] != DAC_CHANNEL_MAX);
-    esp_idf_dac_output_voltage(_dac_channels[line],
-                               value >> (16 - SOC_DAC_RESOLUTION));
+    dac_output_voltage(_dac_channels[line], value >> (16 - SOC_DAC_RESOLUTION));
 }
 
 void dac_poweroff(dac_t line)
 {
     assert(line < DAC_NUMOF);
     assert(_dac_channels[line] != DAC_CHANNEL_MAX);
-    esp_idf_dac_output_disable(_dac_channels[line]);
+    dac_output_disable(_dac_channels[line]);
 }
 
 void dac_poweron(dac_t line)
 {
     assert(line < DAC_NUMOF);
     assert(_dac_channels[line] != DAC_CHANNEL_MAX);
-    esp_idf_dac_output_enable(_dac_channels[line]);
+    dac_output_enable(_dac_channels[line]);
 }
 
 static bool _dac_conf_check(void)

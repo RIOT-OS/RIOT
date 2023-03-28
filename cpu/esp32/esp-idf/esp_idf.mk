@@ -1,6 +1,6 @@
 # common definitions for all ESP-IDF modules
 
-# additional include pathes required by als ESP-IDF module
+# additional include pathes required by ESP-IDF module
 INCLUDES += -I$(ESP32_SDK_DIR)/components/bootloader_support/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/bootloader_support/include_bootloader
 INCLUDES += -I$(ESP32_SDK_DIR)/components/driver/$(CPU_FAM)/include

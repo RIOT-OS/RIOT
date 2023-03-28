@@ -61,7 +61,7 @@ static unsigned ticks_from_us(uint64_t duration, uint64_t freq)
  * timer chan n+1 ------------+
  *
  * Channel 0 is set to the period of one PWM control cycle and due to flag
- * `TIM_FLAG_RESET_ON_MATCH` will end the period and stat the new period. As
+ * `TIM_FLAG_RESET_ON_MATCH` will end the period and start the new period. As
  * a result, n+1 channels are needed to control n servos.
  */
 static void timer_cb(void *arg, int chan)

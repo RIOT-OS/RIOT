@@ -38,13 +38,13 @@
 #include "periph/spi.h"
 #include "syscalls.h"
 
+#include "driver/periph_ctrl.h"
 #include "esp_attr.h"
 #include "esp_rom_gpio.h"
 #include "hal/spi_hal.h"
 #include "hal/spi_types.h"
 #include "soc/rtc.h"
 
-#include "esp_idf_api/periph_ctrl.h"
 #include "esp_idf_api/gpio.h"
 
 #undef MHZ
@@ -117,7 +117,7 @@ void IRAM_ATTR spi_init(spi_t bus)
     }
 
     /* enable (power on) the according SPI module */
-    esp_idf_periph_module_enable(_spi[bus].periph->module);
+    periph_module_enable(_spi[bus].periph->module);
 
     /* initialize SPI peripheral */
     spi_ll_master_init(_spi[bus].periph->hw);
