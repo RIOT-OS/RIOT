@@ -1,3 +1,5 @@
+DEFAULT_MODULE += auto_init_security
+
 ifneq (,$(filter mbedtls_entropy,$(USEMODULE)))
   USEMODULE += mbedtls_contrib
   USEMODULE += hashes
