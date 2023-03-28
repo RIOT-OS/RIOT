@@ -41,9 +41,13 @@ int rbpf_application_run_ctx_idx_function(rbpf_application_t *rbpf, size_t func_
     return rbpf_engine_run(rbpf, func_idx, ctx, result);
 }
 
-void rbpf_application_setup(rbpf_application_t *rbpf, uint8_t *stack,
-                            const rbpf_application_t *application, size_t application_len)
+int rbpf_application_setup(rbpf_application_t *rbpf, uint8_t *stack,
+                            const uint8_t *application, size_t application_len)
 {
+    int res = rbpf_verify_application_structure(application, application_len);
+    if (res < 0) {
+        return res;
+    }
     rbpf->stack = stack;
     rbpf->application = application;
     rbpf->application_len = application_len;
@@ -65,6 +69,7 @@ void rbpf_application_setup(rbpf_application_t *rbpf, uint8_t *stack,
     rbpf->rodata_region.next = &rbpf->arg_region;
 
     rbpf->flags |= RBPF_FLAG_SETUP_DONE;
+    return 0;
 }
 
 void rbpf_add_region(rbpf_application_t *rbpf, rbpf_mem_region_t *region)
