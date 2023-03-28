@@ -138,7 +138,7 @@ extern "C" {
 /**
  * @brief Magic number for the header
  */
-#define RBPF_MAGIC_NO (0x72425046)
+#define RBPF_MAGIC_NO (0x46504272)
 
 /**
  * @brief Header for rBPF applications
@@ -146,7 +146,7 @@ extern "C" {
 typedef struct __attribute__((packed)) {
     uint32_t magic;         /**< Magic number */
     uint32_t version;       /**< Version of the application */
-    uint32_t flags;         /**< Flags for this application */
+    uint64_t flags;         /**< Flags for this application */
     uint32_t data_len;      /**< Length of the data section */
     uint32_t rodata_len;    /**< Length of the rodata section */
     uint32_t text_len;      /**< Length of the text section */
@@ -178,6 +178,9 @@ enum {
     RBPF_OUT_OF_BRANCHES        = -8,   /**< Number of branches taken is more than allowed */
     RBPF_ILLEGAL_DIV            = -9,   /**< Divide by zero error in instructions */
     RBPF_UNKNOWN_FUNCTION       = -10,  /**< Function not found inside the rbpf application */
+    RBPF_MAGIC_NOT_FOUND        = -11,  /**< No magic number found in the application */
+    RBPF_TEXT_ALIGN_MISMATCH    = -12,  /**< Text is not aligned to 8 byte boundaries */
+    RBPF_STRUCTURE_LENGTH_MISMATCH = -13,  /**< Application length doesn't match sum of header parts */
 };
 
 /**
@@ -245,9 +248,23 @@ typedef uint32_t (*rbpf_call_t)(rbpf_application_t *rbpf, uint64_t *regs);
  * @param stack             Stack space to use for this application, must be 512 bytes
  * @param application       Application to load
  * @param application_len   Size of the whole application (including header) in bytes
+ *
+ * @return 0 on success
+ * @return negative on error
  */
-void rbpf_application_setup(rbpf_application_t *rbpf, uint8_t *stack,
-                            const rbpf_application_t *application, size_t application_len);
+int rbpf_application_setup(rbpf_application_t *rbpf, uint8_t *stack,
+                            const uint8_t *application, size_t application_len);
+/**
+ * @brief Verify the structure of an rBPF application
+ *
+ * @param   application         Buffer containing an rBPF application
+ * @param   application_len     Size in bytes of the rBPF application
+ *
+ * @return  0 on success
+ * @return  negative on error
+ */
+int rbpf_verify_application_structure(const uint8_t *application, size_t application_len);
+
 /**
  * @brief Manually run the pre-flight checks for an application
  *
