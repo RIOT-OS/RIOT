@@ -7,14 +7,14 @@
  */
 
 /**
- * @ingroup     boards_common_esp32s3
+ * @ingroup     boards_common_esp32x
  * @{
  *
  * @file
- * @brief       Common declarations and functions for all ESP32-S3 boards.
+ * @brief       Common declarations and functions for all ESP32x boards.
  *
  * This file contains default declarations and functions that are valid
- * for all ESP32-S3 boards.
+ * for all ESP32x boards.
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */

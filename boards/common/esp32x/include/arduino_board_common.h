@@ -1,5 +1,5 @@
 /*
- * Copyright (C)  2022 Gunar Schorcht
+ * Copyright (C)  2023 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     boards_common_esp32s3
+ * @ingroup     boards_common_esp32x
  * @{
  *
  * @file
- * @brief       Common board definitions for the Arduino API
+ * @brief       Definitions for the Arduino API that are common for all ESP32x boards
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
