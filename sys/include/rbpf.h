@@ -411,20 +411,69 @@ static inline size_t rbpf_application_text_len(const rbpf_application_t *rbpf)
     return header->text_len;
 }
 
+/**
+ * @brief Get the start of the symbol headers from the rBPF application
+ *
+ * @param   rBPF    The rBPF application
+ *
+ * @return  A pointer to the first symbol header
+ */
 static inline const rbpf_symbol_header_t *rbpf_symbol_table(const rbpf_application_t *rbpf)
 {
     return (const rbpf_symbol_header_t*)((const uint8_t*)rbpf_application_text(rbpf) + rbpf_application_text_len(rbpf));
 }
 
+/**
+ * @brief Get the number of functions available in the rBPF application
+ *
+ * @param   rBPF    The rBPF application
+ *
+ * @return  The number of function exposed
+ */
 static inline size_t rbpf_application_num_functions(const rbpf_application_t *rbpf)
 {
     const rbpf_header_t *header = rbpf_header(rbpf);
     return header->functions;
 }
 
+/**
+ * @brief Copy a specific function name from a header of the rBPF application
+ *
+ * @param   rBPF        The rBPF application
+ * @param   idx         The index of the function to copy from
+ * @param   name        Buffer to write the function into
+ * @param   name_len    Size in bytes of the provided buffer
+ *
+ * @return  Number of bytes written into the buffer
+ * @return  Negative on error
+ */
 ssize_t rbpf_application_get_function_name(const rbpf_application_t *rbpf, size_t idx, char *name, size_t name_len);
+
+/**
+ * @brief Get the index of a function by name
+ *
+ * Looks up the available functions in the rBPF application and returns the
+ * function index matching the provided name
+ *
+ * @param   rBPF        The rBPF application
+ * @param   name        Function name to look up the index for
+ *
+ * @return  The index of the function
+ * @return  negative if no function matching the index was found
+ */
 ssize_t rbpf_application_function_by_name(const rbpf_application_t *rbpf, const char *name);
+
+/**
+ * @brief Get the first instruction of the function from the rBPF application
+ *
+ * @param   rBPF        The rBPF application
+ * @param   func_idx    The function index
+ *
+ * @return  The first instruction of the function with matching index
+ * @return  NULL on error
+ */
 const bpf_instruction_t *rbpf_application_text_at_function(const rbpf_application_t *rbpf, size_t func_idx);
+
 /* to be implemented by platform specifc code. */
 void rbpf_store_init(void);
 
