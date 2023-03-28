@@ -7,7 +7,7 @@ import itertools
 
 MAGIC = int.from_bytes(b"rBPF", "little")
 
-HEADER_STRUCT = struct.Struct("<IIIIIII")
+HEADER_STRUCT = struct.Struct("<IIQIIII")
 HEADER = namedtuple(
     "Header", "magic version flags data_len rodata_len text_len functions_len"
 )
