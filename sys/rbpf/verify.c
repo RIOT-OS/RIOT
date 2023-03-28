@@ -24,6 +24,31 @@ static bool _rbpf_check_call(uint32_t num)
     }
 }
 
+int rbpf_verify_application_structure(const uint8_t *application, size_t application_len)
+{
+    const rbpf_header_t *header = (const rbpf_header_t*)application;
+    if (header->magic != RBPF_MAGIC_NO) {
+        return RBPF_MAGIC_NOT_FOUND;
+    }
+
+    size_t pre_text_section_len = sizeof(rbpf_header_t) +
+            header->data_len +
+            header->rodata_len;
+
+    if ((pre_text_section_len % 8) != 0) {
+        return RBPF_TEXT_ALIGN_MISMATCH;
+    }
+
+    size_t calculated_len = pre_text_section_len +
+        header->text_len +
+        header->functions * sizeof(rbpf_symbol_header_t);
+
+    if (calculated_len != application_len) {
+        return RBPF_STRUCTURE_LENGTH_MISMATCH;
+    }
+
+    return 0;
+}
 
 int rbpf_application_verify_preflight(rbpf_application_t *rbpf)
 {
