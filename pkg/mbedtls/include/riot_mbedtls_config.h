@@ -41,6 +41,10 @@
 extern "C" {
 #endif
 
+/**
+ * @name    ECP supprted curves
+ * @{
+ */
 /* Short Weierstrass curves (supporting ECP, ECDH, ECDSA) */
 #define MBEDTLS_ECP_DP_SECP192R1_ENABLED
 #define MBEDTLS_ECP_DP_SECP224R1_ENABLED
@@ -56,6 +60,7 @@ extern "C" {
 /* Montgomery curves (supporting ECP) */
 #define MBEDTLS_ECP_DP_CURVE25519_ENABLED
 #define MBEDTLS_ECP_DP_CURVE448_ENABLED
+/** @} */
 
 /**
  * @cond
