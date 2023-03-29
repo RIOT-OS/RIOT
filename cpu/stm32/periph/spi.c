@@ -356,31 +356,34 @@ static void _transfer_no_dma(spi_t bus, const void *out, void *in, size_t len)
     /* transfer data, use shortpath if only sending data */
     if (!inbuf) {
         for (size_t i = 0; i < len; i++) {
-            while (!(dev(bus)->SR & SPI_SR_TXE));
+            while (!(dev(bus)->SR & SPI_SR_TXE)) {}
             *DR = outbuf[i];
-        }
-        /* wait until everything is finished and empty the receive buffer */
-        while (!(dev(bus)->SR & SPI_SR_TXE)) {}
-        while (dev(bus)->SR & SPI_SR_BSY) {}
-        while (dev(bus)->SR & SPI_SR_RXNE) {
-            dev(bus)->DR;       /* we might just read 2 bytes at once here */
         }
     }
     else if (!outbuf) {
         for (size_t i = 0; i < len; i++) {
-            while (!(dev(bus)->SR & SPI_SR_TXE));
+            while (!(dev(bus)->SR & SPI_SR_TXE)) { /* busy wait */ }
             *DR = 0;
-            while (!(dev(bus)->SR & SPI_SR_RXNE));
+            while (!(dev(bus)->SR & SPI_SR_RXNE)) { /* busy wait */ }
             inbuf[i] = *DR;
         }
     }
     else {
         for (size_t i = 0; i < len; i++) {
-            while (!(dev(bus)->SR & SPI_SR_TXE));
+            while (!(dev(bus)->SR & SPI_SR_TXE)) { /* busy wait */ }
             *DR = outbuf[i];
-            while (!(dev(bus)->SR & SPI_SR_RXNE));
+            while (!(dev(bus)->SR & SPI_SR_RXNE)) { /* busy wait */ }
             inbuf[i] = *DR;
         }
+    }
+
+    /* wait until everything is finished and empty the receive buffer */
+    while (!(dev(bus)->SR & SPI_SR_TXE)) {}
+    while (dev(bus)->SR & SPI_SR_BSY) {}
+    while (dev(bus)->SR & SPI_SR_RXNE) {
+        /* make sure to "read" any data, so the RXNE is indeed clear.
+         * Otherwise we risk reading stale data in the next transfer */
+        (void)*DR;
     }
 
     _wait_for_end(bus);
@@ -404,7 +407,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
     }
     else {
 #endif
-    _transfer_no_dma(bus, out, in, len);
+        _transfer_no_dma(bus, out, in, len);
 #ifdef MODULE_PERIPH_DMA
     }
 #endif
