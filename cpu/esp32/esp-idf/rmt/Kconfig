@@ -1,0 +1,16 @@
+# Copyright (c) 2022 Gunar Schorcht
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_ESP_IDF_RMT
+    bool
+    depends on TEST_KCONFIG
+    depends on MODULE_ESP_IDF && HAS_ESP_RMT
+
+    default y if MODULE_WS281X_ESP32 && MODULE_WS281X_ESP32_HW
+
+    help
+        ESP-IDF code for peripheral GPIO.

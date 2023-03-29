@@ -252,6 +252,40 @@ static const pwm_config_t pwm_config[] =
 /** @} */
 
 /**
+ * @name    RMT configuration
+ * @{
+ */
+
+/**
+ * @brief   RMT channel configuration
+ *
+ * For the moment, the only RMT channel configuration used is for the WS2812
+ * driver. To override this default configuration by a board definition, add
+ * ```
+ * #define HAVE_RMT_CHANNEL_CONFIG
+ * ```
+ * before including this file and define an according `rmt_channel_config`
+ * after including this file.
+ */
+#ifndef HAVE_RMT_CHANNEL_CONFIG
+static const rmt_channel_config_t rmt_channel_config[] = {
+#ifdef WS281X_PARAM_PIN
+    { 0, WS281X_PARAM_PIN },
+#else
+    /* default for boards that don't define WS281X_PARAM_PIN */
+    { 0, GPIO0 },
+#endif
+};
+#endif
+
+/**
+ * @brief   Number of RMT channels
+ */
+#define RMT_CH_NUMOF    ARRAY_SIZE(rmt_channel_config)
+
+/** @} */
+
+/**
  * @name   SPI configuration
  * @{
  */

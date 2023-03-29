@@ -12,6 +12,8 @@ USEMODULE += xtimer
 # is clocked at 14.7456 MHz :-/
 BOARD_BLACKLIST := waspmote-pro
 
+EXTERNAL_BOARD_DIRS += $(RIOTBASE)/tests/external_board_dirs/esp-ci-boards
+
 include $(RIOTBASE)/Makefile.include
 
 ifneq (, $(PIN))

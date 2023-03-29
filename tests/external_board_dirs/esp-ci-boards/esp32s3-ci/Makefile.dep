@@ -27,4 +27,8 @@ ifneq (,$(filter netdev_default,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter ws281x,$(USEMODULE)))
+  USEMODULE += ws281x_esp32_sw
+endif
+
 include $(RIOTBOARD)/esp32s3-devkit/Makefile.dep

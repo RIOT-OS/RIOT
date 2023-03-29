@@ -86,6 +86,7 @@ static const struct intr_handle_data_t _irq_data_table[] = {
 #if defined(ETS_USB_SERIAL_JTAG_INTR_SOURCE)
     { ETS_USB_SERIAL_JTAG_INTR_SOURCE, CPU_INUM_SERIAL_JTAG, 1 },
 #endif
+    { ETS_RMT_INTR_SOURCE, CPU_INUM_RMT, 1 },
 };
 
 #define IRQ_DATA_TABLE_SIZE        ARRAY_SIZE(_irq_data_table)

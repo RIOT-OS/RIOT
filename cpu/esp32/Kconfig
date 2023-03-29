@@ -39,6 +39,11 @@ config HAS_ESP_HW_COUNTER
         Indicates that the used ESP32x SoC supports HW counters that can be
         used as timers.
 
+config HAS_ESP_RMT
+    bool
+    help
+        Indicates that the ESP32x SoC has a RMT peripheral.
+
 config HAS_ESP_RTC_TIMER_32K
     bool
     help

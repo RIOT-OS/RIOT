@@ -26,6 +26,25 @@ config MODULE_WS281X_ESP32
     bool
     depends on HAS_ARCH_ESP32
 
+config MODULE_WS281X_ESP32_HW
+    bool "WS2812/SK6812 RGB LED uses ESP32x RMT"
+    depends on MODULE_WS281X_ESP32 && HAS_ESP_RMT
+    default y
+    help
+        The driver can use on ESP32x SoCs either the Remote Control (RMT)
+        peripheral or a bit-banging software implementation to generate the
+        RGB LED signal. Using the RMT peripheral requires more ROM and RAM but
+        does not use the CPU to generate the RGB LED signal. Disable this
+        option if saving ROM and RAM is required.
+
+config MODULE_WS281X_ESP32_SW
+    bool
+    depends on MODULE_WS281X_ESP32
+    default y if !MODULE_WS281X_ESP32_HW
+    help
+        Use the bit-banging software implementation to generate the RGB LED
+        signal.
+
 config HAVE_WS281X
     bool
     help

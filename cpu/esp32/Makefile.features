@@ -16,6 +16,7 @@ endif
 include $(RIOTCPU)/esp_common/Makefile.features
 
 FEATURES_PROVIDED += arch_esp32
+FEATURES_PROVIDED += esp_rmt
 FEATURES_PROVIDED += esp_wifi_enterprise
 FEATURES_PROVIDED += periph_flashpage
 FEATURES_PROVIDED += periph_flashpage_in_address_space

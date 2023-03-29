@@ -21,6 +21,7 @@
 extern "C" {
 #endif
 
+#define RINGBUF_TYPE_NOSPLIT    0
 #define RINGBUF_TYPE_BYTEBUF    2
 
 typedef unsigned RingbufferType_t;

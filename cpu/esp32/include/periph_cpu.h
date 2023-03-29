@@ -549,6 +549,40 @@ typedef struct {
 /** @} */
 
 /**
+ * @name    RMT configuration
+ *
+ * ESP32x SoCs have a Remote Control Peripheral (RMT) that can be used to
+ * generate digital waveforms, such as NEC remote control signals or
+ * WS2812B RGB LED signals. Each RMT peripheral has either 4 or 8 channels.
+ * Some ESP32x SoCs support configuring the clock sources used for each channel
+ * separately, while other ESP32x SoCs can only use a single clock source for
+ * all channels.
+ *
+ * @{
+ */
+
+/**
+ * @brief   RMT channel configuration
+ *
+ * Each RMT channel is mapped to a GPIO. The configured mappings are used
+ * by the drivers that use the RMT peripheral to determine the RMT channel
+ * for a given GPIO.
+ */
+typedef struct {
+    uint8_t channel;    /**< channel index */
+    gpio_t gpio;        /**< GPIO used as RMT channel */
+} rmt_channel_config_t;
+
+/**
+ * @brief   Maximum number of RMT channels
+ *
+ * The number of configured channels must be less or equal.
+ */
+#define RMT_CH_NUMOF_MAX    (SOC_RMT_CHANNELS_PER_GROUP)
+
+/** @} */
+
+/**
  * @name    RNG configuration
  * @{
  */
