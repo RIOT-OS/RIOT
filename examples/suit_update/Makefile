@@ -13,12 +13,9 @@ RIOTBASE ?= $(CURDIR)/../..
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 
-# uncomment this to compile in support for a possibly available radio
-#USEMODULE += netdev_default
-
 USEMODULE += auto_init_gnrc_netif
 # Specify the mandatory networking modules for IPv6 and UDP
-USEMODULE += gnrc_ipv6_router_default
+USEMODULE += gnrc_ipv6_default
 USEMODULE += sock_udp
 # Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo
@@ -87,6 +84,8 @@ ifeq (1,$(USE_ETHOS))
   IFACE ?= riot0
   TERMPROG = $(RIOTTOOLS)/ethos/ethos
   TERMFLAGS = $(IFACE) $(PORT)
+else
+  USEMODULE += netdev_default
 endif
 
 # Ensure both slot bin files are always generated and linked to avoid compiling

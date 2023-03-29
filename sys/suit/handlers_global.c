@@ -44,7 +44,7 @@ static int _version_handler(suit_manifest_t *manifest, int key,
     if (nanocbor_get_int32(it, &version) >= 0) {
         if (version == SUIT_VERSION) {
             manifest->validated |= SUIT_VALIDATED_VERSION;
-            LOG_INFO("suit: validated manifest version\n)");
+            LOG_INFO("suit: validated manifest version\n");
             return SUIT_OK;
         }
     }
@@ -71,11 +71,11 @@ static int _seq_no_handler(suit_manifest_t *manifest, int key,
              seq_nr, stored_seq_no);
 
     if (seq_nr <= stored_seq_no) {
-        LOG_ERROR("seq_nr <= running image\n)");
+        LOG_ERROR("seq_nr <= running image\n");
         return SUIT_ERR_SEQUENCE_NUMBER;
     }
 
-    LOG_INFO("suit: validated sequence number\n)");
+    LOG_INFO("suit: validated sequence number\n");
     manifest->seq_number = seq_nr;
     manifest->validated |= SUIT_VALIDATED_SEQ_NR;
     return SUIT_OK;
