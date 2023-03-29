@@ -1,0 +1,119 @@
+# Copyright (c) 2023 ML!PA Consulting Gmbh
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+menu "mbed TLS X509"
+    depends on USEMODULE_MBEDTLS_X509
+
+config MBEDTLS_ASN1_PARSE
+    bool "Enable the generic ASN1 parser"
+
+config MBEDTLS_ASN1_WRITE
+    bool "Enable the generic ASN1 writer"
+
+config MBEDTLS_OID
+    bool "Enable the OID database"
+
+config MBEDTLS_PEM_PARSE
+    bool "Enable PEM decoding / parsing"
+    select MBEDTLS_BASE64
+
+config MBEDTLS_PEM_WRITE
+    bool "Enable PEM encoding / writing"
+    select MBEDTLS_BASE64
+
+config MBEDTLS_PK
+    bool "Enable the generic public (asymetric) key layer"
+
+if MBEDTLS_PK
+
+choice
+    bool "Enable the generic public (asymetric) key parser"
+    default MBEDTLS_PK_ECP
+
+config MBEDTLS_PK_RSA
+    bool "RSA"
+    select MBEDTLS_RSA
+
+config MBEDTLS_PK_ECP
+    bool "ECP"
+    select MBEDTLS_ECP
+
+endchoice
+
+endif # MBEDTLS_PK
+
+config MBEDTLS_PK_PARSE
+    bool "Enable the generic public (asymetric) key parser"
+    select MBEDTLS_PK
+
+config MBEDTLS_PK_WRITE
+    bool "Enable the generic public (asymetric) key writer"
+    select MBEDTLS_PK
+
+config MBEDTLS_PKCS5
+    bool "Enable PKCS#5 functions"
+    select MBEDTLS_MD
+
+config MBEDTLS_PKCS11
+    bool "Enable wrapper for PKCS#11 smartcard support via the pkcs11-helper library"
+    select MBEDTLS_PK
+    help
+        Adds algorithms for parsing PKCS#8 encrypted private keys
+
+config MBEDTLS_PKCS12
+    bool "Enable PKCS#12 PBE functions."
+    select MBEDTLS_ASN1_PARSE
+    select MBEDTLS_CIPHER
+    select MBEDTLC_MD
+
+config MBEDTLS_X509_USE
+    bool "Enable X.509 core for using certificates"
+    select MBEDTLS_ASN1_PARSE
+    select MBEDTLS_BIGNUM
+    select MBEDTLS_OID
+    select MBEDTLS_PK_PARSE
+    help
+        This module is required for the X.509 parsing modules.
+
+config MBEDTLS_X509_CRT_PARSE
+    bool "Enable X.509 certificate parsing"
+    select MBEDTLS_X509_USE
+    help
+        This module is required for X.509 certificate parsing.
+
+config MBEDTLS_X509_CRL_PARSE
+    bool "Enable X.509 CRL parsing"
+    select MBEDTLS_X509_USE
+    help
+        This module is required for X.509 CRL parsing.
+
+config MBEDTLS_X509_CSR_PARSE
+    bool "Enable X.509 Certificate Signing Request (CSR) parsing"
+    select MBEDTLS_X509_USE
+    help
+        This module is used for reading X.509 certificate request
+
+config MBEDTLS_X509_CREATE
+    bool "Enable X.509 core for creating certificates"
+    select MBEDTLS_BIGNUM
+    select MBEDTLS_OID
+    select MBEDTLS_PK_WRITE
+    help
+        This module is the basis for creating X.509 certificates and CSRs.
+
+config MBEDTLS_X509_CRT_WRITE
+    bool "Enable creating X.509 certificates"
+    select MBEDTLS_X509_CREATE
+    help
+        This module is required for X.509 certificate creation.
+
+config MBEDTLS_X509_CSR_WRITE
+    bool "Enable creating X.509 Certificate Signing Requests (CSR)"
+    select MBEDTLS_X509_CREATE
+    help
+        This module is required for X.509 certificate request writing.
+
+endmenu # mbed TLS X509

@@ -9,54 +9,12 @@ menu "mbed TLS"
 
 config MBEDTLS_SELF_TEST
     bool "Enable the checkup functions (*_self_test)"
-    default y
 
-config MBEDTLS_ENTROPY_C
-    bool "Enable the platform-specific entropy code."
-    default y
-    depends on MBEDTLS_SHA256_C # || MBEDTLS_SHA512_C
-    help
-        This module provides a generic entropy pool.
-
-config MBEDTLS_SHA256_C
-    bool "Enable the SHA-224 and SHA-256 cryptographic hash algorithms"
-    default y
-    help
-        This module adds support for SHA-224 and SHA-256.
-        This module is required for the SSL/TLS 1.2 PRF
-        function.
-
-config MBEDTLS_SHA256_ALT
-    bool "Enable to let mbed TLS use an alternate SHA2xx core implementation"
-    default y
-    help
-        In case you enable MBEDTLS_SHA256_ALT, mbed TLS
-        will no longer provide the "struct
-        mbedtls_sha256_context" definition and omit the
-        base function declarations and implementations.
-        "sha256_alt.h" will be included from "sha256.h"
-        to include the new function definitions.
-
-config MBEDTLS_THREADING_C
-    bool "Enable this layer to allow use of mutexes within mbed TLS"
-    default y
-    help
-        Enable the threading abstraction layer. If you do intend to
-        use contexts between threads, you will need to enable this
-        layer to prevent race condition. See also the mbed TLS
-        Knowledge Base article about threading: https://tls.mbed.org/
-        kb/development/thread-safety-and-multi-threading
-        This allows different threading implementations
-        (self-implemented or  provided). In RIOT, we enable this
-        layer by default and utilize MBEDTLS_THREADING_ALT with RIOT
-        mutexes.
-
-config MBEDTLS_THREADING_ALT
-    bool "Provide your own alternate threading implementation"
-    default y if MBEDTLS_THREADING_C
-    help
-        This to allows your own alternate threading implementation.
-
+rsource "contrib/crypto/Kconfig"
 rsource "contrib/entropy/Kconfig"
+rsource "contrib/random/Kconfig"
+rsource "contrib/ssl/Kconfig"
+rsource "contrib/threading/Kconfig"
+rsource "contrib/x509/Kconfig"
 
 endmenu # mbed TLS

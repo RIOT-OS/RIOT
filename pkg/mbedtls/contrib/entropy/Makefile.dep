@@ -1,0 +1,12 @@
+ifneq (,$(filter mbedtls_entropy,$(USEMODULE)))
+  ifeq (,$(filter mbedtls_sha512 mbedtls_sha256,$(USEMODULE)))
+    $(info "mbedtls_entropy: using default SHA256")
+    USEMODULE += mbedtls_sha256
+  endif
+  # not a strict requirement but our entropy module provides that
+  USEMODULE += mbedtls_entropy_hardware_alt
+  # we do not have somesting like /dev/urandom
+  USEMODULE += mbedtls_no_platform_entropy
+  # since we are using SHA256
+  USEMODULE += mbedtls_entropy_force_sha256
+endif

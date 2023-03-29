@@ -1,0 +1,26 @@
+# Copyright (c) 2023 ML!PA Consulting Gmbh
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+menu "mbed TLS random"
+    depends on USEMODULE_MBEDTLS_RANDOM
+
+config MBEDTLS_CTR_DRBG
+    bool "Enable the CTR_DRBG AES-based random generator"
+    select MBEDTLS_AES
+
+    help
+        The CTR_DRBG generator uses AES-256 by default.
+        To use AES-128 instead, enable MBEDTLS_CTR_DRBG_USE_128_BIT_KEY above.
+        To achieve a 256-bit security strength with CTR_DRBG,
+        you must use AES-256 and use sufficient entropy.
+        See ctr_drbg.h for more details.
+        This module provides the CTR_DRBG AES random number generator.
+
+config MBEDTLS_HMAC_DRBG
+    bool "Enable the HMAC_DRBG random generator"
+    select MBEDTLS_MD
+
+endmenu # mbed TLS random
