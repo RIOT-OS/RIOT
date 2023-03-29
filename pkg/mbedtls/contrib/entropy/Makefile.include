@@ -1,0 +1,15 @@
+ifneq (,$(filter mbedtls_entropy,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_ENTROPY=1
+endif
+
+ifneq (,$(filter mbedtls_entropy_hardware_alt,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_ENTROPY_HARDWARE_ALT=1
+endif
+
+ifneq (,$(filter mbedtls_no_platform_entropy,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_NO_PLATFORM_ENTROPY=1
+endif
+
+ifneq (,$(filter mbedtls_entropy_force_sha256,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_ENTROPY_FORCE_SHA256=1
+endif

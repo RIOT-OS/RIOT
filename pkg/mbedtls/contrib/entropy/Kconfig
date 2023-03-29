@@ -5,11 +5,18 @@
 # directory for more details.
 
 menuconfig KCONFIG_USEMODULE_MBEDTLS_ENTROPY
-    bool "Configure mbed TLS mbedtls entropy"
+    bool "Configure mbed TLS entropy modules"
     help
         Configure mbed TLS mbedtls entropy using Kconfig.
 
 if KCONFIG_USEMODULE_MBEDTLS_ENTROPY
+
+config MBEDTLS_ENTROPY
+    bool "Enable the platform-specific entropy code."
+    default y
+    depends on MBEDTLS_SHA256 || MBEDTLS_SHA512
+    help
+        This module provides a generic entropy pool.
 
 config MBEDTLS_ENTROPY_HARDWARE_ALT
     bool "Let mbed TLS use your own implementation of a hardware entropy collector"
@@ -32,7 +39,7 @@ config MBEDTLS_NO_PLATFORM_ENTROPY
 config MBEDTLS_ENTROPY_FORCE_SHA256
     bool "Force the entropy accumulator to use a SHA-256."
     default y
-    depends on MBEDTLS_SHA256_C
+    select MBEDTLS_SHA256
     help
         Force the entropy accumulator to use a SHA-256
         accumulator instead of the default SHA-512 based

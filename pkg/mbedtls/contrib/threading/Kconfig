@@ -1,0 +1,34 @@
+# Copyright (c) 2023 ML!PA Consulting Gmbh
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+menuconfig KCONFIG_USEMODULE_MBEDTLS_THREADING
+    bool "Configure mbed TLS threaing modules"
+    help
+        Configure mbed TLS threading module using Kconfig.
+
+if KCONFIG_USEMODULE_MBEDTLS_THREADING
+
+config MBEDTLS_THREADING
+    bool "Enable this layer to allow use of mutexes within mbed TLS"
+    default y
+    help
+        Enable the threading abstraction layer. If you do intend to
+        use contexts between threads, you will need to enable this
+        layer to prevent race condition. See also the mbed TLS
+        Knowledge Base article about threading: https://tls.mbed.org/
+        kb/development/thread-safety-and-multi-threading
+        This allows different threading implementations
+        (self-implemented or  provided). In RIOT, we enable this
+        layer by default and utilize MBEDTLS_THREADING_ALT with RIOT
+        mutexes.
+
+config MBEDTLS_THREADING_ALT
+    bool "Provide your own alternate threading implementation"
+    default y if MBEDTLS_THREADING
+    help
+        This to allows your own alternate threading implementation.
+
+endif # KCONFIG_USEMODULE_MBEDTLS_THREADING

@@ -1,0 +1,74 @@
+# Mirror mbedtls X509 options as in mbedtls_config.h
+# Please keep the order
+
+ifneq (,$(filter mbedtls_asn1_parse,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_ASN1_PARSE=1
+endif
+
+ifneq (,$(filter mbedtls_asn1_write,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_ASN1_WRITE=1
+endif
+
+ifneq (,$(filter mbedtls_oid,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_OID=1
+endif
+
+ifneq (,$(filter mbedtls_pem_parse,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_PEM_PARSE=1
+endif
+
+ifneq (,$(filter mbedtls_pem_write,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_PEM_WRITE=1
+endif
+
+ifneq (,$(filter mbedtls_pk,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_PK=1
+endif
+
+ifneq (,$(filter mbedtls_pk_parse,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_PK_PARSE=1
+endif
+
+ifneq (,$(filter mbedtls_pk_write,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_PK_WRITE=1
+endif
+
+ifneq (,$(filter mbedtls_pkcs5,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_PKCS5=1
+endif
+
+ifneq (,$(filter mbedtls_pkcs11,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_PKCS11=1
+endif
+
+ifneq (,$(filter mbedtls_pkcs12,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_PKCS12=1
+endif
+
+ifneq (,$(filter mbedtls_x509_use,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_X509_USE=1
+endif
+
+ifneq (,$(filter mbedtls_x509_crt_parse,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_X509_CRT_PARSE=1
+endif
+
+ifneq (,$(filter mbedtls_x509_crl_parse,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_X509_CRL_PARSE=1
+endif
+
+ifneq (,$(filter mbedtls_x509_csr_parse,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_X509_CSR_PARSE=1
+endif
+
+ifneq (,$(filter mbedtls_x509_create,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_X509_CREATE=1
+endif
+
+ifneq (,$(filter mbedtls_x509_crt_write,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_X509_CRT_WRITE=1
+endif
+
+ifneq (,$(filter mbedtls_x509_csr_write,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_X509_CSR_WRITE=1
+endif
