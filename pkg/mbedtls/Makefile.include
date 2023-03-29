@@ -26,6 +26,11 @@ ifneq (,$(filter entropy_source_adc_noise,$(USEMODULE)))
   endif
 endif
 
+NO_PSEUDOMODULES += mbedtls_random
+ifneq (,$(filter mbedtls_random,$(USEMODULE)))
+  DIRS += $(RIOTPKG)/mbedtls/contrib/random
+endif
+
 ifneq (,$(filter mbedtls_self_test,$(USEMODULE)))
   CFLAGS += -DCONFIG_MBEDTLS_SELF_TEST=1
 endif
