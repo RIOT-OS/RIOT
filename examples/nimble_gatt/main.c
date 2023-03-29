@@ -66,8 +66,8 @@
 #define FIFO_SIZE	250
 
 #define UPDATE_INTERVAL         (1000U)
-#define TAMANHO_MEDIDA          (3*sizeof(float)+sizeof(int))
-#define CONTADOR                9 //QUANTIDADE DE MEDIDAS DO DUMP
+#define TAMANHO_MEDIDA          (3*sizeof(int16_t)+sizeof(int))
+#define CONTADOR                15 //QUANTIDADE DE MEDIDAS DO DUMP
 
 static event_queue_t _eq;
 static event_t _update_evt;
@@ -76,7 +76,7 @@ static event_timeout_t _update_timeout_evt;
 static uint16_t _conn_handle;
 static uint16_t _hrs_val_handle;
 
-char dump_array[CONTADOR*TAMANHO_MEDIDA]; //9 mensagens de 16 bytes cada, aqui agora precisa ser 9 pois o IOS menor que 10 não aceita mais que 158 bytes por envio
+char dump_array[CONTADOR*TAMANHO_MEDIDA]; //15 mensagens de 10 bytes cada, pois o IOS menor que 10 não aceita mais que 158 bytes por envio via bluetooth
 char solo_measurement[TAMANHO_MEDIDA];
 
 /* Variable declarations */
@@ -687,7 +687,7 @@ static void _hr_update(event_t *e)
         (void)res;
     }
 
-    auxi = solo_measurement[12] + (solo_measurement[13] <<8) + (solo_measurement[14] <<16) + (solo_measurement[15] <<24); //VERY SENSIBLE BIT SHIFT OPERATION
+    auxi = solo_measurement[TAMANHO_MEDIDA -4] + (solo_measurement[TAMANHO_MEDIDA -3] <<8) + (solo_measurement[TAMANHO_MEDIDA -2] <<16) + (solo_measurement[TAMANHO_MEDIDA-1] <<24); //VERY SENSIBLE BIT SHIFT OPERATION
     printf("[NOTIFY] Latest measurement interval: %d \n \r", auxi - auxi2);
     printf("[NOTIFY] Ringbuffer Index: %d \n \r", auxi3);
     auxi2 = auxi;
@@ -698,16 +698,16 @@ static void _hr_update(event_t *e)
 void make_data_package(uint16_t index)
 {
     int auxi;
-    float auxf;
+    int16_t auxf;
 
-        auxf= (readings_buffer[index].X_axis / AC);
-        memcpy(solo_measurement, &auxf, sizeof(float));
-        auxf= (readings_buffer[index].Y_axis / AC); 
-        memcpy(solo_measurement + sizeof(float) , &auxf, sizeof(float));
-        auxf= (readings_buffer[index].Z_axis / AC);
-        memcpy(solo_measurement + (2)*sizeof(float), &auxf, sizeof(float));
+        auxf= (readings_buffer[index].X_axis);
+        memcpy(solo_measurement, &auxf, sizeof(int16_t));
+        auxf= (readings_buffer[index].Y_axis); 
+        memcpy(solo_measurement + sizeof(int16_t) , &auxf, sizeof(int16_t));
+        auxf= (readings_buffer[index].Z_axis);
+        memcpy(solo_measurement + (2)*sizeof(int16_t), &auxf, sizeof(int16_t));
         auxi= (readings_buffer[index].timestamp);
-        memcpy(solo_measurement + (3)*sizeof(float), &auxi, sizeof(int));
+        memcpy(solo_measurement + (3)*sizeof(int16_t), &auxi, sizeof(int));
     }
 
 static int gatt_svr_chr_access_device_info_manufacturer(
@@ -733,30 +733,30 @@ static int gatt_svr_chr_access_device_info_manufacturer(
 void make_dump_package(int initial_index)
 {
     int auxi;
-    float auxf;
+    int16_t auxf; 
 
     for(int i=0; i < CONTADOR; i++)
     {
         if ((initial_index - i) >= 0)    
         {
-            auxf= (readings_buffer[-i+initial_index].X_axis / AC);
-            memcpy(dump_array + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-            auxf= (readings_buffer[-i+initial_index].Y_axis / AC); 
-            memcpy(dump_array + (3*i+1)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-            auxf= (readings_buffer[-i+initial_index].Z_axis / AC);
-            memcpy(dump_array + (3*i+2)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+            auxf= (readings_buffer[-i+initial_index].X_axis);
+            memcpy(dump_array + ( 3*i )*sizeof(int16_t) + i*sizeof(int), &auxf, sizeof(int16_t));
+            auxf= (readings_buffer[-i+initial_index].Y_axis); 
+            memcpy(dump_array + (3*i+1)*sizeof(int16_t) + i*sizeof(int), &auxf, sizeof(int16_t));
+            auxf= (readings_buffer[-i+initial_index].Z_axis);
+            memcpy(dump_array + (3*i+2)*sizeof(int16_t) + i*sizeof(int), &auxf, sizeof(int16_t));
             auxi= (readings_buffer[-i+initial_index].timestamp);
-            memcpy(dump_array + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
+            memcpy(dump_array + (3*i+3)*sizeof(int16_t) + i*sizeof(int), &auxi, sizeof(int));
         }
         else{
-            auxf= (readings_buffer[MAX_READINGS-i-1].X_axis / AC);
-            memcpy(dump_array + ( 3*i )*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-            auxf= (readings_buffer[MAX_READINGS-i-1].Y_axis / AC); 
-            memcpy(dump_array + (3*i+1)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
-            auxf= (readings_buffer[MAX_READINGS-i-1].Z_axis / AC);
-            memcpy(dump_array + (3*i+2)*sizeof(float) + i*sizeof(int), &auxf, sizeof(float));
+            auxf= (readings_buffer[MAX_READINGS-i-1].X_axis);
+            memcpy(dump_array + ( 3*i )*sizeof(int16_t) + i*sizeof(int), &auxf, sizeof(int16_t));
+            auxf= (readings_buffer[MAX_READINGS-i-1].Y_axis); 
+            memcpy(dump_array + (3*i+1)*sizeof(int16_t) + i*sizeof(int), &auxf, sizeof(int16_t));
+            auxf= (readings_buffer[MAX_READINGS-i-1].Z_axis);
+            memcpy(dump_array + (3*i+2)*sizeof(int16_t) + i*sizeof(int), &auxf, sizeof(int16_t));
             auxi= (readings_buffer[MAX_READINGS-i-1].timestamp);
-            memcpy(dump_array + (3*i+3)*sizeof(float) + i*sizeof(int), &auxi, sizeof(int));
+            memcpy(dump_array + (3*i+3)*sizeof(int16_t) + i*sizeof(int), &auxi, sizeof(int));
         }
     }
 }
