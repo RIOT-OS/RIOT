@@ -28,6 +28,9 @@
 #if IS_USED(MODULE_MBEDTLS_ENTROPY)
 #include "entropy_mbedtls_riot.h"
 #endif
+#if IS_USED(MODULE_MBEDTLS_RANDOM)
+#include "random_mbedtls_riot.h"
+#endif
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -39,5 +42,8 @@ void auto_init_mbedtls(void)
 #endif
 #if IS_USED(MODULE_MBEDTLS_ENTROPY)
     entropy_mbedtls_riot_init();
+#endif
+#if IS_USED(MODULE_MBEDTLS_RANDOM)
+    random_mbedtls_riot_init();
 #endif
 }

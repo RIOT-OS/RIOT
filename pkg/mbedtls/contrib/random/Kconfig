@@ -11,6 +11,11 @@ menuconfig KCONFIG_USEMODULE_MBEDTLS_RANDOM
 
 if KCONFIG_USEMODULE_MBEDTLS_RANDOM
 
+config MBEDTLS_RANDOM
+    bool "Enable RIOT mbed TLS random API"
+    help
+        This module provides seeded RNGs and allocates internal context.
+
 config MBEDTLS_CTR_DRBG
     bool "Enable the CTR_DRBG AES-based random generator"
     select MBEDTLS_AES
