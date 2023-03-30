@@ -1,0 +1,10 @@
+ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
+  USEMODULE += stdio_usb_serial_jtag
+endif
+
+ifeq (,$(filter esp32c3_wemos_mini_v%,$(USEMODULE)))
+  # use Wemos ESP32-C3 min version V2.1.0 by default
+  USEMODULE += esp32c3_wemos_mini_v2_1_0
+endif
+
+include $(RIOTBOARD)/common/esp32c3/Makefile.dep
