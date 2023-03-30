@@ -1,1 +1,1 @@
-../driver_netdev_common/main.c
+../netdev_common/main.c
