@@ -336,6 +336,12 @@ static void _handle_reset(usbus_t *usbus, usbus_handler_t *handler)
 {
     usbus_cdcecm_device_t *cdcecm = (usbus_cdcecm_device_t *)handler;
 
+    /* Set the max packet size advertised to the host to something compatible with the enumerated
+     * size */
+    size_t maxpacketsize = usbus_max_bulk_endpoint_size(usbus);
+    cdcecm->ep_in->maxpacketsize = maxpacketsize;
+    cdcecm->ep_out->maxpacketsize = maxpacketsize;
+
     DEBUG("CDC ECM: Reset\n");
     _handle_in_complete(usbus, handler);
     cdcecm->notif = USBUS_CDCECM_NOTIF_NONE;

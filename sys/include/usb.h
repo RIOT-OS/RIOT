@@ -239,6 +239,26 @@ typedef enum {
     USB_EP_DIR_IN,  /**< Host in, device out */
 } usb_ep_dir_t;
 
+/**
+ * @brief Maximum transfer size for interrupt endpoints at full speed
+ */
+#define USB_ENDPOINT_INTERRUPT_FS_MAX_SIZE  (64)
+
+/**
+ * @brief Maximum transfer size for interrupt endpoints at high speed
+ */
+#define USB_ENDPOINT_INTERRUPT_HS_MAX_SIZE  (1024)
+
+/**
+ * @brief Maximum transfer size for bulk endpoints at full speed
+ */
+#define USB_ENDPOINT_BULK_FS_MAX_SIZE  (64)
+
+/**
+ * @brief Maximum transfer size for bulk endpoints at high speed
+ */
+#define USB_ENDPOINT_BULK_HS_MAX_SIZE  (512)
+
 #ifdef __cplusplus
 }
 #endif

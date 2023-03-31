@@ -162,6 +162,50 @@ usbus_endpoint_t *usbus_interface_find_endpoint(usbus_interface_t *interface,
     return NULL;
 }
 
+size_t usbus_max_bulk_endpoint_size(usbus_t *usbus)
+{
+    usb_speed_t speed;
+    int res = usbdev_get(usbus->dev, USBOPT_ENUMERATED_SPEED, &speed,
+                               sizeof(speed));
+    if (res == -ENOTSUP) {
+        res = usbdev_get(usbus->dev, USBOPT_MAX_SPEED, &speed,
+                               sizeof(speed));
+    }
+
+    if (res < 0) {
+        return 0; /* Misbehaving usbdev device not implementing any speed indication */
+    }
+
+    switch (speed) {
+        case USB_SPEED_HIGH:
+            return USB_ENDPOINT_BULK_HS_MAX_SIZE;
+        default:
+            return USB_ENDPOINT_BULK_FS_MAX_SIZE;
+    }
+}
+
+size_t usbus_max_interrupt_endpoint_size(usbus_t *usbus)
+{
+    usb_speed_t speed;
+    int res = usbdev_get(usbus->dev, USBOPT_ENUMERATED_SPEED, &speed,
+                               sizeof(speed));
+    if (res == -ENOTSUP) {
+        res = usbdev_get(usbus->dev, USBOPT_MAX_SPEED, &speed,
+                               sizeof(speed));
+    }
+
+    if (res < 0) {
+        assert(false); /* Misbehaving usbdev device not implementing mandatory USBOPTS */
+    }
+
+    switch (speed) {
+        case USB_SPEED_HIGH:
+            return USB_ENDPOINT_INTERRUPT_HS_MAX_SIZE;
+        default:
+            return USB_ENDPOINT_INTERRUPT_FS_MAX_SIZE;
+    }
+}
+
 usbus_endpoint_t *usbus_add_endpoint(usbus_t *usbus, usbus_interface_t *iface,
                                      usb_ep_type_t type, usb_ep_dir_t dir,
                                      size_t len)
