@@ -590,6 +590,22 @@ void usbus_register_event_handler(usbus_t *usbus, usbus_handler_t *handler);
 void usbus_init(usbus_t *usbus, usbdev_t *usbdev);
 
 /**
+ * @brief Get the maximum supported bulk endpoint transfer size based on the enumeration speed
+ *
+ * Should only be called after enumeration has finished by the peripheral. Calling this in response
+ * to the @ref USBUS_EVENT_USB_RESET is valid
+ */
+size_t usbus_max_bulk_endpoint_size(usbus_t *usbus);
+
+/**
+ * @brief Get the maximum supported interrupt endpoint transfer size based on the enumeration speed
+ *
+ * Should only be called after enumeration has finished by the peripheral. Calling this in response
+ * to the @ref USBUS_EVENT_USB_RESET is valid
+ */
+size_t usbus_max_interrupt_endpoint_size(usbus_t *usbus);
+
+/**
  * @brief Create and start the USBUS thread
  *
  * @param[in] stack     The stack for the USBUS thread.
