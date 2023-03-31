@@ -1021,10 +1021,36 @@ static void _usbdev_init(usbdev_t *dev)
 #endif
 }
 
+static usb_speed_t _get_max_speed(const usbdev_t *dev)
+{
+    dwc2_usb_otg_fshs_t *usbdev = (dwc2_usb_otg_fshs_t *)dev;
+    const dwc2_usb_otg_fshs_config_t *conf = usbdev->config;
+    if (IS_USED(DWC2_USB_OTG_HS_ENABLED) && (conf->type == DWC2_USB_OTG_HS)) {
+        return USB_SPEED_HIGH;
+    }
+    return USB_SPEED_FULL;
+}
+
+static usb_speed_t _get_enumeration_speed(const usbdev_t *dev)
+{
+    dwc2_usb_otg_fshs_t *usbdev = (dwc2_usb_otg_fshs_t *)dev;
+    const dwc2_usb_otg_fshs_config_t *conf = usbdev->config;
+    unsigned speed = (_device_regs(conf)->DSTS & USB_OTG_DSTS_ENUMSPD_Msk) >>
+                     USB_OTG_DSTS_ENUMSPD_Pos;
+    switch (speed) {
+        case 0x00:
+            return USB_SPEED_HIGH;
+        case 0x03:
+            return USB_SPEED_FULL;
+        default:
+            assert(false); /* reserved values by peripheral */
+    }
+    return USB_SPEED_FULL; /* Should not be reached */
+}
+
 static int _usbdev_get(usbdev_t *dev, usbopt_t opt,
                        void *value, size_t max_len)
 {
-    (void)dev;
     (void)max_len;
     int res = -ENOTSUP;
     switch (opt) {
@@ -1035,7 +1061,12 @@ static int _usbdev_get(usbdev_t *dev, usbopt_t opt,
             break;
         case USBOPT_MAX_SPEED:
             assert(max_len == sizeof(usb_speed_t));
-            *(usb_speed_t *)value = USB_SPEED_FULL;
+            *(usb_speed_t *)value = _get_max_speed(dev);
+            res = sizeof(usb_speed_t);
+            break;
+        case USBOPT_ENUMERATED_SPEED:
+            assert(max_len == sizeof(usb_speed_t));
+            *(usb_speed_t *)value = _get_enumeration_speed(dev);
             res = sizeof(usb_speed_t);
             break;
         default:
