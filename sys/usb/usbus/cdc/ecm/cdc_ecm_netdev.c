@@ -71,7 +71,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     /* load packet data into FIFO */
     size_t iol_offset = 0;
     size_t usb_offset = 0;
-    size_t usb_remain = cdcecm->ep_in->ep->len;
+    size_t usb_remain = cdcecm->ep_in->maxpacketsize;
     DEBUG("CDC_ECM_netdev: cur iol: %d\n", iolist->iol_len);
     while (len) {
         mutex_lock(&cdcecm->out_lock);
