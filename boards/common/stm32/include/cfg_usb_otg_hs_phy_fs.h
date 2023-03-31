@@ -36,7 +36,7 @@ extern "C" {
 #define DWC2_USB_OTG_HS_ENABLED
 
 /**
- * @brief Common USB OTG HS configuration with on-chip FS PHY
+ * @brief Common USB OTG FS configuration
  */
 static const dwc2_usb_otg_fshs_config_t dwc2_usb_otg_fshs_config[] = {
     {
