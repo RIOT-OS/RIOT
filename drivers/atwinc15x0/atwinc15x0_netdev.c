@@ -768,7 +768,15 @@ static int _atwinc15x0_set(netdev_t *netdev, netopt_t opt, const void *val,
             assert(max_len <= sizeof(netopt_state_t));
             return _set_state(dev, *((const netopt_state_t *)val));
         case NETOPT_L2_GROUP:
-            if (m2m_wifi_enable_mac_mcast((void *)val, 1)) {
+            /* sometimes m2m_wifi_enable_mac_mcast() fails with M2M_ERR_MEM_ALLOC */
+            m2m_wifi_enable_mac_mcast((void *)val, 0);
+            /* sometimes it fails with M2M_ERR_BUS_FAIL */
+            int tries = 5;
+            do {
+                ret = m2m_wifi_enable_mac_mcast((void *)val, 1);
+                DEBUG_PUTS("busy loop setting L2 multicast address on atwinc15x0");
+            } while (--tries && ret == M2M_ERR_BUS_FAIL);
+            if (ret) {
                 return -EINVAL;
             } else {
                 return max_len;
