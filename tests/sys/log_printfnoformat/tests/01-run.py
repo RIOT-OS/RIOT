@@ -7,12 +7,16 @@
 # directory for more details.
 
 import sys
+import os
 from testrunner import run
 
 
 def testfunc(child):
-    for _ in range(4):
+    for _ in range(5):
         child.expect_exact('Logging value %d and string %s')
+
+    if os.environ.get('BOARD', 'native') == 'native':
+        child.expect_exact('native: exiting')
 
 
 if __name__ == "__main__":

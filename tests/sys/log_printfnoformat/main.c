@@ -24,10 +24,11 @@ int main(void)
     const char *string = "test";
     const char *format = "Logging value %d and string %s";
 
-    LOG_ERROR(format, value, string);
-    LOG_WARNING(format, value, string);
-    LOG_INFO(format, value, string);
     LOG_DEBUG(format, value, string);
+    LOG_INFO(format, value, string);
+    LOG_WARNING(format, value, string);
+    LOG_ERROR(format, value, string);
+    LOG_WTF(format, value, string);
 
     return 0;
 }
