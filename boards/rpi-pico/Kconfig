@@ -14,5 +14,6 @@ config BOARD_RPI_PICO
     select CPU_MODEL_RP2040
     select HAS_PERIPH_ADC
     select HAS_PERIPH_UART
+    select HAS_PERIPH_SPI
 
     select HAVE_SAUL_GPIO
