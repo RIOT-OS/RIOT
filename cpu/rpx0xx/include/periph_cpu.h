@@ -731,6 +731,39 @@ void rosc_stop(void);
 
 /** @} */
 
+/**
+ * @brief   Override SPI clock speed values
+ * @{
+ */
+#define HAVE_SPI_CLK_T
+enum {
+    SPI_CLK_100KHZ = KHZ(100), /**< drive the SPI bus with 100KHz */
+    SPI_CLK_400KHZ = KHZ(400), /**< drive the SPI bus with 400KHz */
+    SPI_CLK_1MHZ   = MHZ(1),   /**< drive the SPI bus with 1MHz */
+    SPI_CLK_5MHZ   = MHZ(5),   /**< drive the SPI bus with 5MHz */
+    SPI_CLK_10MHZ  = MHZ(10),  /**< drive the SPI bus with 10MHz */
+};
+
+/**
+ * @brief   SPI clock type
+ */
+typedef uint32_t spi_clk_t;
+/** @} */
+
+/**
+ * @brief   Configuration details for an SPI interface needed by the RPX0XX peripheral
+ */
+typedef struct {
+    SPI0_Type *dev;     /**< Base address of the I/O registers of the device */
+    gpio_t miso_pin;    /**< GPIO pin to use for MISO */
+    gpio_t mosi_pin;    /**< GPIO pin to use for MOSI */
+    gpio_t clk_pin;     /**< GPIO pin to use for CLK */
+} spi_conf_t;
+
+#define PERIPH_SPI_NEEDS_TRANSFER_REG
+#define PERIPH_SPI_NEEDS_TRANSFER_REGS
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTE
+
 #ifdef __cplusplus
 }
 #endif
