@@ -27,9 +27,13 @@
  * CONFIG_USE_HARDWARE_MTD is defined (add CFLAGS=-DCONFIG_USE_HARDWARE_MTD to
  * the command line to enable it */
 #if defined(MTD_0) && IS_ACTIVE(CONFIG_USE_HARDWARE_MTD)
-#define USE_MTD_0
+
 #define _dev (MTD_0)
+
 #else
+
+#include "mtd_emulated.h"
+
 /* Test mock object implementing a simple RAM-based mtd */
 #ifndef SECTOR_COUNT
 #define SECTOR_COUNT 16
@@ -41,84 +45,10 @@
 #define PAGE_SIZE 64
 #endif
 
-static uint8_t dummy_memory[PAGE_PER_SECTOR * PAGE_SIZE * SECTOR_COUNT];
+MTD_EMULATED_DEV(0, SECTOR_COUNT, PAGE_PER_SECTOR, PAGE_SIZE);
 
-static int _init(mtd_dev_t *dev)
-{
-    (void)dev;
+#define _dev (&mtd_emulated_dev0.base)
 
-    return 0;
-}
-
-static int _read(mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size)
-{
-    (void)dev;
-
-    if (addr + size > sizeof(dummy_memory)) {
-        return -EOVERFLOW;
-    }
-    memcpy(buff, dummy_memory + addr, size);
-
-    return 0;
-}
-
-static int _write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size)
-{
-    (void)dev;
-
-    if (addr + size > sizeof(dummy_memory)) {
-        return -EOVERFLOW;
-    }
-    if (size > PAGE_SIZE) {
-        return -EOVERFLOW;
-    }
-    memcpy(dummy_memory + addr, buff, size);
-
-    return 0;
-}
-
-static int _erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)
-{
-    (void)dev;
-
-    if (size % (PAGE_PER_SECTOR * PAGE_SIZE) != 0) {
-        return -EOVERFLOW;
-    }
-    if (addr % (PAGE_PER_SECTOR * PAGE_SIZE) != 0) {
-        return -EOVERFLOW;
-    }
-    if (addr + size > sizeof(dummy_memory)) {
-        return -EOVERFLOW;
-    }
-    memset(dummy_memory + addr, 0xff, size);
-
-    return 0;
-}
-
-static int _power(mtd_dev_t *dev, enum mtd_power_state power)
-{
-    (void)dev;
-    (void)power;
-    return 0;
-}
-
-static const mtd_desc_t driver = {
-    .init = _init,
-    .read = _read,
-    .write = _write,
-    .erase = _erase,
-    .power = _power,
-};
-
-static mtd_dev_t dev = {
-    .driver = &driver,
-    .sector_count = SECTOR_COUNT,
-    .pages_per_sector = PAGE_PER_SECTOR,
-    .page_size = PAGE_SIZE,
-    .write_size = 1,
-};
-
-static mtd_dev_t *_dev = (mtd_dev_t*) &dev;
 #endif /* MTD_0 */
 
 static littlefs_desc_t littlefs_desc;
@@ -414,10 +344,6 @@ static void tests_littlefs_statvfs(void)
 
 Test *tests_littlefs(void)
 {
-#ifndef USE_MTD_0
-    memset(dummy_memory, 0xff, sizeof(dummy_memory));
-#endif
-
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(tests_littlefs_format),
         new_TestFixture(tests_littlefs_mount_umount),
