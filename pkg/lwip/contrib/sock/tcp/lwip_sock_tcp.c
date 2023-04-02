@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Freie Universität Berlin
+ * Copyright (C) 2021 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,6 +11,7 @@
  *
  * @file
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
+ * @author  Hendrik van Essen <hendrik.ve@fu-berlin.de>
  */
 
 #include <assert.h>
@@ -290,12 +291,16 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock,
     return res;
 }
 
-ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
-                      uint32_t timeout)
+ssize_t _tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
+                  uint32_t timeout, bool peek)
 {
     struct pbuf *buf;
     ssize_t recvd = 0;
     ssize_t res = 0;
+
+    if (!IS_USED(MODULE_SOCK_PEEK)) {
+        peek = false;
+    }
 
     assert((sock != NULL) && (data != NULL) && (max_len > 0));
 
@@ -304,6 +309,7 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
     if (sock->base.conn == NULL) {
         return -ENOTCONN;
     }
+
     if (timeout == 0) {
         if (!mutex_trylock(&sock->mutex)) {
             return -EAGAIN;
@@ -320,13 +326,14 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
     else
 #endif
 
-    if ((timeout == 0) && !mbox_avail(&sock->base.conn->recvmbox.mbox)) {
+    if ((timeout == 0) && !mbox_avail(&sock->base.conn->recvmbox.mbox) && !peek) {
         mutex_unlock(&sock->mutex);
         return -EAGAIN;
     }
 
-    while (recv_left > 0) {
+    do {
         uint16_t copylen, buf_len;
+
         if (sock->last_buf != NULL) {
             buf = sock->last_buf;
         }
@@ -361,6 +368,7 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
             }
             sock->last_buf = buf;
         }
+
         buf_len = buf->tot_len - sock->last_offset;
         copylen = (buf_len > recv_left) ? (uint16_t)recv_left : buf_len;
         pbuf_copy_partial(buf, (uint8_t*)data + recvd, copylen, sock->last_offset);
@@ -371,24 +379,26 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
             res = recvd;   /* in case recvd == 0 */
         }
 
-        /* post-process buf */
-        if (buf_len > copylen) {
-            /* there is still data in the buffer */
-            sock->last_buf = buf;
-            sock->last_offset += copylen;
-        }
-        else {
-            sock->last_buf = NULL;
-            sock->last_offset = 0;
-            pbuf_free(buf);
-            /* Exit the loop only when there's no more data available in the
-             * connection. This allows to copy more data in a single read if
-             * available. */
-            if (!mbox_avail(&sock->base.conn->recvmbox.mbox)) {
-                break;
+        if (!peek) {
+            /* post-process buf */
+            if (buf_len > copylen) {
+                /* there is still data in the buffer */
+                sock->last_buf = buf;
+                sock->last_offset += copylen;
+            }
+            else {
+                sock->last_buf = NULL;
+                sock->last_offset = 0;
+                pbuf_free(buf);
+                /* Exit the loop only when there's no more data available in the
+                 * connection. This allows to copy more data in a single read if
+                 * available. */
+                if (!mbox_avail(&sock->base.conn->recvmbox.mbox)) {
+                    break;
+                }
             }
         }
-    }
+    } while (recv_left > 0 && !peek);
 
     if (recvd > 0) {
         res = recvd;   /* we received data so return it */
@@ -399,9 +409,25 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
     netconn_set_recvtimeout(sock->base.conn, 0);
 #endif
     netconn_set_nonblocking(sock->base.conn, false);
+
     mutex_unlock(&sock->mutex);
+
     return res;
 }
+
+ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
+                      uint32_t timeout)
+{
+    return _tcp_read(sock, data, max_len, timeout, false);
+}
+
+#if IS_USED(MODULE_SOCK_PEEK)
+ssize_t sock_tcp_peek(sock_tcp_t *sock, void *data, size_t max_len,
+                      uint32_t timeout)
+{
+    return _tcp_read(sock, data, max_len, timeout, true);
+}
+#endif
 
 ssize_t sock_tcp_write(sock_tcp_t *sock, const void *data, size_t len)
 {

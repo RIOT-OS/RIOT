@@ -269,6 +269,24 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
                       const uint32_t user_timeout_duration_ms);
 
 /**
+ * @brief Peek at data from the peer.
+ *
+ * This is identical to @ref gnrc_tcp_recv in all except that it only peeks at
+ * the data -- that is, it does not advance the read position, and later calls
+ * to either this or @ref gnrc_tcp_recv will return the same bytes (just maybe
+ * more, when data has been received inbetween) until @ref gnrc_tcp_recv is
+ * called.
+ *
+ * Beware that reading data this way does not free up buffer space: Unlike a
+ * call to @ref gnrc_tcp_recv, which can receive more than the TCP buffer size,
+ * calling this with a @p max_len exceeding the TCP buffer size and a @p
+ * user_timeout_duration_ms of @ref GNRC_TCP_NO_TIMEOUT will just block
+ * indefinitely.
+ */
+ssize_t gnrc_tcp_peek(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
+                      const uint32_t user_timeout_duration_ms);
+
+/**
  * @brief Close a TCP connection.
  *
  * @pre gnrc_tcp_tcb_init() must have been successfully called.

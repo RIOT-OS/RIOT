@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Freie Universität Berlin
+ * Copyright (C) 2021 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,6 +11,7 @@
  *
  * @file
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
+ * @author  Hendrik van Essen <hendrik.ve@fu-berlin.de>
  */
 
 #include <assert.h>
@@ -43,11 +44,20 @@ int sock_ip_create(sock_ip_t *sock, const sock_ip_ep_t *local,
     if ((res = lwip_sock_create(&tmp, (struct _sock_tl_ep *)local,
                                 (struct _sock_tl_ep *)remote, proto, flags,
                                 NETCONN_RAW)) == 0) {
+        mutex_init(&(sock->mutex));
+        mutex_lock(&(sock->mutex));
         sock->base.conn = tmp;
+
+        if (IS_USED(MODULE_SOCK_PEEK)) {
+            sock->last_buf = NULL;
+            sock->peek_buf_avail = false;
+        }
+
 #if IS_ACTIVE(SOCK_HAS_ASYNC)
         sock->base.async_cb.gen = NULL;
         netconn_set_callback_arg(sock->base.conn, &sock->base);
 #endif
+        mutex_unlock(&(sock->mutex));
     }
 
     return res;
@@ -189,15 +199,31 @@ ssize_t sock_ip_recv_aux(sock_ip_t *sock, void *data, size_t max_len,
     ssize_t res, ret = 0;
     bool nobufs = false;
 
+    bool peek = false;
+    if ((aux != NULL) && IS_USED(MODULE_SOCK_PEEK)) {
+        peek = aux->flags & SOCK_AUX_PEEK;
+    }
+
     assert((sock != NULL) && (data != NULL) && (max_len > 0));
-    while ((res = sock_ip_recv_buf_aux(sock, &pkt, (void **)&ctx, timeout,
-                                       remote, aux)) > 0) {
+    while ((res = sock_ip_recv_buf_aux(sock, &pkt, (void**)&ctx, timeout, remote,
+                                       aux)) > 0) {
         if (ctx->p->tot_len > (ssize_t)max_len) {
+            /* copy everything that fits in to the buffer and return -ENOBUFS
+             * (quite similar to the MSG_TRUNC flag) */
+            memcpy(ptr, pkt, max_len);
+            ret = max_len;
             nobufs = true;
+
+            if (peek && IS_USED(MODULE_SOCK_PEEK)) {
+                res = max_len;
+                nobufs = false;
+            }
+
             /* progress context to last element */
             while (netbuf_next(ctx) == 0) {}
             continue;
         }
+
         memcpy(ptr, pkt, res);
         ptr += res;
         ret += res;
@@ -210,40 +236,94 @@ ssize_t sock_ip_recv_buf_aux(sock_ip_t *sock, void **data, void **ctx,
                              uint32_t timeout, sock_ip_ep_t *remote,
                              sock_ip_aux_rx_t *aux)
 {
-    (void)aux;
     struct netbuf *buf;
     int res;
 
     assert((sock != NULL) && (data != NULL) && (ctx != NULL));
-    buf = *ctx;
+
+    bool peek = false;
+    sock_ip_ep_t *local = NULL;
+
+    if (aux != NULL) {
+
+        if (IS_USED(MODULE_SOCK_PEEK)) {
+            peek = aux->flags & SOCK_AUX_PEEK;
+        }
+
+#if IS_USED(MODULE_SOCK_AUX_LOCAL)
+        local = &aux->local;
+        aux->flags &= ~(SOCK_AUX_GET_LOCAL);
+#endif
+    }
+
+    buf = sock->last_buf;
+
+    if (timeout == 0) {
+        if (!mutex_trylock(&sock->mutex)) {
+            return -EAGAIN;
+        }
+    }
+    else {
+        mutex_lock(&sock->mutex);
+    }
 
     if (buf != NULL) {
-        if (netbuf_next(buf) == -1) {
-            *data = NULL;
-            netbuf_delete(buf);
-            *ctx = NULL;
-            return 0;
+        if (netbuf_next(buf) == -1) { /* check for next part in chain */
+            /* this is the last part of the chain (and maybe also the first) */
+
+            if (sock->peek_buf_avail && IS_USED(MODULE_SOCK_PEEK)) { /* first element in the chain */
+                /* return data from buffer fetched from sock */
+                sock->peek_buf_avail = false;
+
+                res = _parse_iphdr(buf, data, ctx, remote, local);
+
+                mutex_unlock(&sock->mutex);
+
+                return res;
+            }
+            else {
+                if (peek && IS_USED(MODULE_SOCK_PEEK)) {
+                    /* reset to the original starting point for later use and finish */
+                    netbuf_first(buf);
+                    sock->peek_buf_avail = true;
+
+                    mutex_unlock(&sock->mutex);
+
+                    return 0;
+                }
+                else {
+                    /* delete netbuf and finish */
+                    netbuf_delete(buf);
+                    sock->last_buf = NULL;
+                    *data = NULL;
+                    *ctx = NULL;
+
+                    mutex_unlock(&sock->mutex);
+
+                    return 0;
+                }
+            }
         }
         else {
+            /* next part in chain now available */
             *data = buf->ptr->payload;
-            return buf->ptr->len;
+            res = buf->ptr->len;
+
+            mutex_unlock(&sock->mutex);
+
+            return res;
         }
     }
 
     if ((res = lwip_sock_recv(sock->base.conn, timeout, &buf)) < 0) {
+        mutex_unlock(&sock->mutex);
         return res;
     }
 
-    sock_ip_ep_t *local = NULL;
-
-#if IS_USED(MODULE_SOCK_AUX_LOCAL)
-    if (aux != NULL) {
-        local = &aux->local;
-        aux->flags &= ~(SOCK_AUX_GET_LOCAL);
-    }
-#endif
-
+    sock->last_buf = buf;
     res = _parse_iphdr(buf, data, ctx, remote, local);
+
+    mutex_unlock(&sock->mutex);
 
     return res;
 }

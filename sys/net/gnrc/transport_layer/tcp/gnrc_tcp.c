@@ -795,12 +795,14 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
     return ret;
 }
 
-ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
-                      const uint32_t timeout_duration_ms)
+static ssize_t _gnrc_tcp_recv_or_peek(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
+                      const uint32_t timeout_duration_ms, bool peek)
 {
     TCP_DEBUG_ENTER;
     assert(tcb != NULL);
     assert(data != NULL);
+
+    _gnrc_tcp_fsm_event_t recv_or_peek = peek ? FSM_EVENT_CALL_PEEK : FSM_EVENT_CALL_RECV;
 
     msg_t msg;
     msg_t msg_queue[TCP_MSG_QUEUE_SIZE];
@@ -832,7 +834,7 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
     /* If FIN was received (CLOSE_WAIT), no further data can be received. */
     /* Copy received data into given buffer and return number of bytes. Can be zero. */
     if (state == FSM_STATE_CLOSE_WAIT) {
-        ret = _gnrc_tcp_fsm(tcb, FSM_EVENT_CALL_RECV, NULL, data, max_len);
+        ret = _gnrc_tcp_fsm(tcb, recv_or_peek, NULL, data, max_len);
         mutex_unlock(&(tcb->function_lock));
         TCP_DEBUG_LEAVE;
         return ret;
@@ -840,7 +842,7 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
 
     /* If this call is non-blocking (timeout_duration_ms == 0): Try to read data and return */
     if (timeout_duration_ms == 0) {
-        ret = _gnrc_tcp_fsm(tcb, FSM_EVENT_CALL_RECV, NULL, data, max_len);
+        ret = _gnrc_tcp_fsm(tcb, recv_or_peek, NULL, data, max_len);
         if (ret == 0) {
             TCP_DEBUG_ERROR("-EAGAIN: Not data available, try later again.");
             ret = -EAGAIN;
@@ -872,7 +874,7 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
         }
 
         /* Try to read available data */
-        ret = _gnrc_tcp_fsm(tcb, FSM_EVENT_CALL_RECV, NULL, data, max_len);
+        ret = _gnrc_tcp_fsm(tcb, recv_or_peek, NULL, data, max_len);
 
         /* If FIN was received (CLOSE_WAIT), no further data can be received. Leave event loop */
         if (state == FSM_STATE_CLOSE_WAIT) {
@@ -915,6 +917,19 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
     TCP_DEBUG_LEAVE;
     return ret;
 }
+
+ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
+                      const uint32_t timeout_duration_ms)
+{
+    return _gnrc_tcp_recv_or_peek(tcb, data, max_len, timeout_duration_ms, false);
+}
+
+ssize_t gnrc_tcp_peek(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
+                      const uint32_t timeout_duration_ms)
+{
+    return _gnrc_tcp_recv_or_peek(tcb, data, max_len, timeout_duration_ms, true);
+}
+
 
 void gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
 {

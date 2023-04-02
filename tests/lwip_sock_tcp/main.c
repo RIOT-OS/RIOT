@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Freie Universität Berlin
+ * Copyright (C) 2021 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,9 +11,10 @@
  * @{
  *
  * @file
- * @brief       Test for UDP socks
+ * @brief       Test for TCP socks
  *
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
+ * @author      Hendrik van Essen <hendrik.ve@fu-berlin.de>
  * @}
  */
 
@@ -484,6 +485,44 @@ static void test_tcp_read4__success_non_blocking(void)
     expect(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
 }
 
+#if IS_USED(MODULE_SOCK_PEEK)
+static void test_tcp_peek4__success(void)
+{
+    static const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
+                                          .family = AF_INET,
+                                          .port = _TEST_PORT_REMOTE,
+                                          .netif = SOCK_ADDR_ANY_NETIF };
+    msg_t msg = { .type = _SERVER_MSG_START };
+    static const struct iovec exp_data = { .iov_base = "Hello!",
+            .iov_len = sizeof("Hello!") };
+
+    _server_addr.family = AF_INET;
+    _server_addr.port = _TEST_PORT_REMOTE;
+    _server_addr.netif = SOCK_ADDR_ANY_NETIF;
+
+    msg_send(&msg, _server);        /* start server on _TEST_PORT_LOCAL */
+    msg.type = _SERVER_MSG_ACCEPT;
+    msg_send(&msg, _server);        /* let server accept */
+
+    expect(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
+    msg.type = _SERVER_MSG_WRITE;
+    msg.content.ptr = (void *)&exp_data;
+    msg_send(&msg, _server);        /* write expected data at server */
+
+    for (ssize_t i = 1; i <= (ssize_t)exp_data.iov_len; i++) {
+        expect(i == sock_tcp_peek(&_sock, _test_buffer, i, 0));
+    }
+
+    expect(((ssize_t)exp_data.iov_len) == sock_tcp_read(&_sock, _test_buffer,
+                                                        sizeof(_test_buffer),
+                                                        SOCK_NO_TIMEOUT));
+
+    expect(-EAGAIN == sock_tcp_read(&_sock, _test_buffer, sizeof(_test_buffer), 0));
+
+    expect(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
+}
+#endif /* IS_USED(MODULE_SOCK_PEEK) */
+
 /* ENOTCONN not applicable since lwIP always tries to send */
 
 static void test_tcp_write4__ENOTCONN(void)
@@ -832,6 +871,7 @@ static void test_tcp_read6__ETIMEDOUT(void)
                                        sizeof(_test_buffer), _TEST_TIMEOUT));
     printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT);
 }
+
 static void test_tcp_read6__success(void)
 {
     static const sock_tcp_ep_t remote = { .addr = { .ipv6 = _TEST_ADDR6_REMOTE },
@@ -915,6 +955,44 @@ static void test_tcp_read6__success_non_blocking(void)
                                                         0));
     expect(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
 }
+
+#if IS_USED(MODULE_SOCK_PEEK)
+static void test_tcp_peek6__success(void)
+{
+    static const sock_tcp_ep_t remote = { .addr = { .ipv6 = _TEST_ADDR6_REMOTE },
+                                          .family = AF_INET6,
+                                          .port = _TEST_PORT_REMOTE,
+                                          .netif = SOCK_ADDR_ANY_NETIF };
+    msg_t msg = { .type = _SERVER_MSG_START };
+    static const struct iovec exp_data = { .iov_base = "Hello!",
+            .iov_len = sizeof("Hello!") };
+
+    _server_addr.family = AF_INET6;
+    _server_addr.port = _TEST_PORT_REMOTE;
+    _server_addr.netif = SOCK_ADDR_ANY_NETIF;
+
+    msg_send(&msg, _server);        /* start server on _TEST_PORT_LOCAL */
+    msg.type = _SERVER_MSG_ACCEPT;
+    msg_send(&msg, _server);        /* let server accept */
+
+    expect(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
+    msg.type = _SERVER_MSG_WRITE;
+    msg.content.ptr = (void *)&exp_data;
+    msg_send(&msg, _server);        /* write expected data at server */
+
+    for (ssize_t i = 1; i <= (ssize_t)exp_data.iov_len; i++) {
+        expect(i == sock_tcp_peek(&_sock, _test_buffer, i, 0));
+    }
+
+    expect(((ssize_t)exp_data.iov_len) == sock_tcp_read(&_sock, _test_buffer,
+                                                        sizeof(_test_buffer),
+                                                        SOCK_NO_TIMEOUT));
+
+    expect(-EAGAIN == sock_tcp_read(&_sock, _test_buffer, sizeof(_test_buffer), 0));
+
+    expect(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
+}
+#endif /* IS_USED(MODULE_SOCK_PEEK) */
 
 /* ENOTCONN not applicable since lwIP always tries to send */
 
@@ -1012,6 +1090,9 @@ int main(void)
     CALL(test_tcp_read4__success());
     CALL(test_tcp_read4__success_with_timeout());
     CALL(test_tcp_read4__success_non_blocking());
+#if IS_USED(MODULE_SOCK_PEEK)
+    CALL(test_tcp_peek4__success());
+#endif
     /* ECONNABORTED can't be tested in this setup */
     /* ENOTCONN not applicable since lwIP always tries to send */
     CALL(test_tcp_write4__ENOTCONN());
@@ -1055,6 +1136,9 @@ int main(void)
     CALL(test_tcp_read6__success());
     CALL(test_tcp_read6__success_with_timeout());
     CALL(test_tcp_read6__success_non_blocking());
+#if IS_USED(MODULE_SOCK_PEEK)
+    CALL(test_tcp_peek6__success());
+#endif
     /* ECONNABORTED can't be tested in this setup */
     /* ENOTCONN not applicable since lwIP always tries to send */
     CALL(test_tcp_write6__ENOTCONN());

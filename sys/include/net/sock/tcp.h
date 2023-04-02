@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Alexander Aring <aar@pengutronix.de>
+ * Copyright (C) 2021 Alexander Aring <aar@pengutronix.de>
  *                    Freie Universität Berlin
  *                    HAW Hamburg
  *                    Kaspar Schleiser <kaspar@schleiser.de>
@@ -295,6 +295,7 @@
  * @author  Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ * @author  Hendrik van Essen <hendrik.ve@fu-berlin.de>
  */
 #ifndef NET_SOCK_TCP_H
 #define NET_SOCK_TCP_H
@@ -303,6 +304,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <sys/types.h>
+
+#include "kernel_defines.h"
 
 /* net/sock/async/types.h included by net/sock.h needs to re-typedef the
  * `sock_tcp_t` and `sock_tcp_queue_t` to prevent cyclic includes */
@@ -518,6 +521,40 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock,
  */
 ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
                       uint32_t timeout);
+
+#if IS_USED(MODULE_SOCK_PEEK) || defined(DOXYGEN)
+/**
+ * @brief   Peeks data from an established TCP stream
+ *
+ * @note    Currently only available for lwIP!
+ *
+ * @pre `(sock != NULL) && (data != NULL) && (max_len > 0)`
+ *
+ * @param[in] sock      A TCP sock object.
+ * @param[out] data     Pointer where the read data should be stored.
+ * @param[in] max_len   Maximum space available at @p data.
+ * @param[in] timeout   Timeout for receive in microseconds.
+ *                      If 0 and when not peeking and no data is available, the
+ *                      function returns immediately.
+ *                      May be @ref SOCK_NO_TIMEOUT for no timeout (wait until
+ *                      data is available).
+ *
+ * @note    Function may block.
+ * @note    This function is only available when using lwIP at the moment.
+ *
+ * @return  The number of bytes read on success.
+ * @return  0, if no read data is available, but everything is in order.
+ * @return  -EAGAIN, if @p timeout is `0` and no data is available.
+ * @return  -ECONNABORTED, if the connection is aborted while waiting for the
+ *          next data.
+ * @return  -ECONNRESET, if the connection was forcibly closed by remote end
+ *          point of @p sock.
+ * @return  -ENOTCONN, when @p sock is not connected to a remote end point.
+ * @return  -ETIMEDOUT, if @p timeout expired.
+ */
+ssize_t sock_tcp_peek(sock_tcp_t *sock, void *data, size_t max_len,
+                      uint32_t timeout);
+#endif /* IS_USED(MODULE_SOCK_PEEK) || defined(DOXYGEN) */
 
 /**
  * @brief   Writes data to an established TCP stream

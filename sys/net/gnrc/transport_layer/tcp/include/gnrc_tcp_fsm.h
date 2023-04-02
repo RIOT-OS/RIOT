@@ -53,6 +53,7 @@ typedef enum {
     FSM_EVENT_CALL_OPEN,          /* User function call: open */
     FSM_EVENT_CALL_SEND,          /* User function call: send */
     FSM_EVENT_CALL_RECV,          /* User function call: recv */
+    FSM_EVENT_CALL_PEEK,          /* User function call: peek (a no-op in the FSM, see _fsm_call_recv docs) */
     FSM_EVENT_CALL_CLOSE,         /* User function call: close */
     FSM_EVENT_CALL_ABORT,         /* User function call: abort */
     FSM_EVENT_RCVD_PKT,           /* Packet received from peer */

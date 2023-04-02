@@ -133,6 +133,21 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len, uint32_t tim
     return gnrc_tcp_recv(sock, data, max_len, timeout);
 }
 
+ssize_t sock_tcp_peek(sock_tcp_t *sock, void *data, size_t max_len, uint32_t timeout)
+{
+    /* Asserts defined by API. */
+    assert(sock != NULL);
+    assert(data != NULL);
+
+    /* Map SOCK_NO_TIMEOUT to GNRC_TCP_NO_TIMEOUT */
+    if (timeout == SOCK_NO_TIMEOUT) {
+        timeout = GNRC_TCP_NO_TIMEOUT;
+    }
+
+    /* Forward call to gnrc_tcp_recv: All error codes share the same semantics */
+    return gnrc_tcp_peek(sock, data, max_len, timeout);
+}
+
 ssize_t sock_tcp_write(sock_tcp_t *sock, const void *data, size_t len)
 {
     /* Asserts defined by API. */

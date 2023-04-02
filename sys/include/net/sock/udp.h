@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Alexander Aring <aar@pengutronix.de>
+ * Copyright (C) 2021 Alexander Aring <aar@pengutronix.de>
  *                    Freie Universität Berlin
  *                    HAW Hamburg
  *                    Kaspar Schleiser <kaspar@schleiser.de>
@@ -264,6 +264,7 @@
  * @author  Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ * @author  Hendrik van Essen <hendrik.ve@fu-berlin.de>
  */
 #ifndef NET_SOCK_UDP_H
 #define NET_SOCK_UDP_H
@@ -273,6 +274,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <sys/types.h>
+
+#include "kernel_defines.h"
 
 /* net/sock/async/types.h included by net/sock.h needs to re-typedef the
  * `sock_ip_t` to prevent cyclic includes */
@@ -526,6 +529,50 @@ static inline ssize_t sock_udp_recv(sock_udp_t *sock,
     return sock_udp_recv_aux(sock, data, max_len, timeout, remote, NULL);
 }
 
+#if IS_USED(MODULE_SOCK_PEEK) || defined(DOXYGEN)
+/**
+ * @brief   Peeks bytes from a UDP message from a remote end point. If no data
+ *          is available then an attempt is made to receive new data first.
+ *
+ * @note    Currently only available for lwIP!
+ *
+ * @pre `(sock != NULL) && (data != NULL) && (max_len > 0)`
+ *
+ * @param[in] sock      A UDP sock object.
+ * @param[out] data     Pointer where the read data should be stored.
+ * @param[in] max_len   Maximum space available at @p data.
+ * @param[in] timeout   Timeout for receive in microseconds.
+ *                      If 0 and no data is available, the function returns
+ *                      immediately.
+ *                      May be @ref SOCK_NO_TIMEOUT for no timeout (wait until
+ *                      data is available).
+ * @param[out] remote   Remote end point of the received data.
+ *                      May be `NULL`, if it is not required by the application.
+ *
+ * @note    Function blocks if no packet is currently waiting.
+ * @note    This function is only available when using lwIP at the moment.
+ *
+ * @return  The number of bytes read on success.
+ * @return  0, if no read data is available, but everything is in order.
+ * @return  -EADDRNOTAVAIL, if local of @p sock is not given.
+ * @return  -EAGAIN, if @p timeout is `0` and no data is available.
+ * @return  -EINVAL, if @p remote is invalid or @p sock is not properly
+ *          initialized (or closed while sock_udp_recv() blocks).
+ * @return  -ENOMEM, if no memory was available to receive @p data.
+ * @return  -EPROTO, if source address of received packet did not equal
+ *          the remote of @p sock.
+ * @return  -ETIMEDOUT, if @p timeout expired.
+ */
+static inline ssize_t sock_udp_peek(sock_udp_t *sock,
+                                    void *data, size_t max_len,
+                                    uint32_t timeout, sock_udp_ep_t *remote)
+{
+    sock_udp_aux_rx_t flags = { .flags = SOCK_AUX_PEEK };
+
+    return sock_udp_recv_aux(sock, data, max_len, timeout, remote, &flags);
+}
+#endif /* IS_USED(MODULE_SOCK_PEEK) || defined(DOXYGEN) */
+
 /**
  * @brief   Provides stack-internal buffer space containing a UDP message from
  *          a remote end point
@@ -623,6 +670,63 @@ static inline ssize_t sock_udp_recv_buf(sock_udp_t *sock,
 {
     return sock_udp_recv_buf_aux(sock, data, buf_ctx, timeout, remote, NULL);
 }
+
+#if IS_USED(MODULE_SOCK_PEEK) || defined(DOXYGEN)
+/**
+ * @brief   Provides stack-internal buffer space containing a UDP message from
+ *          a remote end point
+ *
+ * @note    Currently only available for lwIP!
+ *
+ * @pre `(sock != NULL) && (data != NULL) && (buf_ctx != NULL)`
+ *
+ * @param[in] sock      A UDP sock object.
+ * @param[out] data     Pointer to a stack-internal buffer space containing the
+ *                      received data.
+ * @param[in,out] buf_ctx  Stack-internal buffer context. If it points to a
+ *                      `NULL` pointer, the stack returns a new buffer space
+ *                      for a new packet. If it does not point to a `NULL`
+ *                      pointer, an existing context is assumed to get a next
+ *                      segment in a buffer.
+ * @param[in] timeout   Timeout for receive in microseconds.
+ *                      If 0 and no data is available, the function returns
+ *                      immediately.
+ *                      May be @ref SOCK_NO_TIMEOUT for no timeout (wait until
+ *                      data is available).
+ * @param[out] remote   Remote end point of the received data.
+ *                      May be `NULL`, if it is not required by the application.
+ *
+ * @experimental    This function is quite new, not implemented for all stacks
+ *                  yet, and may be subject to sudden API changes. Do not use in
+ *                  production if this is unacceptable.
+ *
+ * @note    Function blocks if no packet is currently waiting.
+ * @note    This function is only available when using lwIP at the moment.
+ *
+ * @return  The number of bytes read on success. May not be the complete
+ *          payload. Continue calling with the returned `buf_ctx` to get more
+ *          buffers until result is 0 or an error.
+ * @return  0, if no read data is available, but everything is in order.
+ *          When not peeking and if @p buf_ctx was provided, it was released.
+ * @return  -EADDRNOTAVAIL, if local of @p sock is not given.
+ * @return  -EAGAIN, if @p timeout is `0` and no data is available.
+ * @return  -EINVAL, if @p remote is invalid or @p sock is not properly
+ *          initialized (or closed while sock_udp_recv() blocks).
+ * @return  -ENOMEM, if no memory was available to receive @p data.
+ * @return  -EPROTO, if source address of received packet did not equal
+ *          the remote of @p sock.
+ * @return  -ETIMEDOUT, if @p timeout expired.
+ */
+static inline ssize_t sock_udp_peek_buf(sock_udp_t *sock,
+                                        void **data, void **buf_ctx,
+                                        uint32_t timeout,
+                                        sock_udp_ep_t *remote)
+{
+    sock_udp_aux_rx_t flags = { .flags = SOCK_AUX_PEEK };
+
+    return sock_udp_recv_buf_aux(sock, data, buf_ctx, timeout, remote, &flags);
+}
+#endif /* IS_USED(MODULE_SOCK_PEEK) || defined(DOXYGEN) */
 
 /**
  * @brief   Sends a UDP message to remote end point with non-continous payload

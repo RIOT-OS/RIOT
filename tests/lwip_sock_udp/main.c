@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Freie Universität Berlin
+ * Copyright (C) 2021 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +14,7 @@
  * @brief       Test for UDP socks
  *
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
+ * @author      Hendrik van Essen <hendrik.ve@fu-berlin.de>
  * @}
  */
 
@@ -445,6 +446,35 @@ static void test_sock_udp_recv_buf4__success(void)
     expect(ctx == NULL);
     expect(_check_net());
 }
+
+#if IS_USED(MODULE_SOCK_PEEK)
+static void test_sock_udp_peek4__success(void)
+{
+    static const sock_udp_ep_t local = { .family = AF_INET,
+                                         .port = _TEST_PORT_LOCAL };
+    static const sock_udp_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
+                                          .family = AF_INET,
+                                          .port = _TEST_PORT_REMOTE };
+
+    expect(0 == sock_udp_create(&_sock, &local, &remote, SOCK_FLAGS_REUSE_EP));
+    expect(_inject_4packet(_TEST_ADDR4_REMOTE, _TEST_ADDR4_LOCAL, _TEST_PORT_REMOTE,
+                           _TEST_PORT_LOCAL, "ABCD", sizeof("ABCD"),
+                           _TEST_NETIF));
+
+    for (ssize_t i = 1; i <= (ssize_t)sizeof("ABCD"); i++) {
+        expect(i == sock_udp_peek(&_sock, _test_buffer, i, SOCK_NO_TIMEOUT, NULL));
+    }
+
+    expect(sizeof("ABCD") == sock_udp_recv(&_sock, _test_buffer,
+                                           sizeof(_test_buffer),
+                                           SOCK_NO_TIMEOUT, NULL));
+
+    expect(-EAGAIN == sock_udp_recv(&_sock, _test_buffer, sizeof(_test_buffer),
+                                    0, NULL));
+
+    expect(_check_net());
+}
+#endif /* IS_USED(MODULE_SOCK_PEEK) */
 
 static void test_sock_udp_send4__EAFNOSUPPORT(void)
 {
@@ -1142,6 +1172,37 @@ static void test_sock_udp_recv_buf6__success(void)
     expect(_check_net());
 }
 
+#if IS_USED(MODULE_SOCK_PEEK)
+static void test_sock_udp_peek6__success(void)
+{
+    static const ipv6_addr_t src_addr = { .u8 = _TEST_ADDR6_REMOTE };
+    static const ipv6_addr_t dst_addr = { .u8 = _TEST_ADDR6_LOCAL };
+    static const sock_udp_ep_t local = { .family = AF_INET6,
+                                         .port = _TEST_PORT_LOCAL };
+    static const sock_udp_ep_t remote = { .addr = { .ipv6 = _TEST_ADDR6_REMOTE },
+                                          .family = AF_INET6,
+                                          .port = _TEST_PORT_REMOTE };
+
+    expect(0 == sock_udp_create(&_sock, &local, &remote, SOCK_FLAGS_REUSE_EP));
+    expect(_inject_6packet(&src_addr, &dst_addr, _TEST_PORT_REMOTE,
+                           _TEST_PORT_LOCAL, "ABCD", sizeof("ABCD"),
+                           _TEST_NETIF));
+
+    for (ssize_t i = 1; i <= (ssize_t)sizeof("ABCD"); i++) {
+        expect(i == sock_udp_peek(&_sock, _test_buffer, i, SOCK_NO_TIMEOUT, NULL));
+    }
+
+    expect(sizeof("ABCD") == sock_udp_recv(&_sock, _test_buffer,
+                                           sizeof(_test_buffer),
+                                           SOCK_NO_TIMEOUT, NULL));
+
+    expect(-EAGAIN == sock_udp_recv(&_sock, _test_buffer, sizeof(_test_buffer),
+                                    0, NULL));
+
+    expect(_check_net());
+}
+#endif /* IS_USED(MODULE_SOCK_PEEK) */
+
 static void test_sock_udp_send6__EAFNOSUPPORT(void)
 {
     static const sock_udp_ep_t remote = { .addr = { .ipv6 = _TEST_ADDR6_REMOTE },
@@ -1503,6 +1564,9 @@ int main(void)
     CALL(test_sock_udp_recv4__non_blocking());
     CALL(test_sock_udp_recv4__aux());
     CALL(test_sock_udp_recv_buf4__success());
+#if IS_USED(MODULE_SOCK_PEEK)
+    CALL(test_sock_udp_peek4__success());
+#endif
     _prepare_send_checks();
     CALL(test_sock_udp_send4__EAFNOSUPPORT());
     CALL(test_sock_udp_send4__EINVAL_addr());
@@ -1552,6 +1616,9 @@ int main(void)
     CALL(test_sock_udp_recv6__non_blocking());
     CALL(test_sock_udp_recv6__aux());
     CALL(test_sock_udp_recv_buf6__success());
+#if IS_USED(MODULE_SOCK_PEEK)
+    CALL(test_sock_udp_peek6__success());
+#endif
     _prepare_send_checks();
     CALL(test_sock_udp_send6__EAFNOSUPPORT());
     CALL(test_sock_udp_send6__EINVAL_addr());

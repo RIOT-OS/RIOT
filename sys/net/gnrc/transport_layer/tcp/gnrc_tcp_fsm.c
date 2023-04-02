@@ -377,6 +377,35 @@ static int _fsm_call_recv(gnrc_tcp_tcb_t *tcb, void *buf, size_t len)
 }
 
 /**
+ * @brief FSM handling function for peeking at received data.
+ *
+ * @param[in,out] tcb   TCB holding the connection information.
+ * @param[in,out] buf   Buffer to store received data into.
+ * @param[in]     len   Maximum number of bytes to receive.
+ *
+ * @returns   Number of successfully peeked bytes.
+ *
+ * This does not actually cause transitions, so it's an outlyer in the FSM
+ * events -- but still uses the transition mechansims to be protected from
+ * concurrent changes.
+ */
+static int _fsm_call_peek(gnrc_tcp_tcb_t *tcb, void *buf, size_t len)
+{
+    TCP_DEBUG_ENTER;
+
+    if (ringbuffer_empty(&tcb->rcv_buf)) {
+        TCP_DEBUG_LEAVE;
+        return 0;
+    }
+
+    /* Read data into 'buf' up to 'len' bytes from receive buffer */
+    size_t rcvd = ringbuffer_peek(&(tcb->rcv_buf), buf, len);
+
+    TCP_DEBUG_LEAVE;
+    return rcvd;
+}
+
+/**
  * @brief FSM handling function for starting connection teardown sequence.
  *
  * @param[in,out] tcb   TCB holding the connection information.
@@ -948,6 +977,9 @@ static int _fsm_unprotected(gnrc_tcp_tcb_t *tcb, _gnrc_tcp_fsm_event_t event,
             break;
         case FSM_EVENT_CALL_RECV :
             ret = _fsm_call_recv(tcb, buf, len);
+            break;
+        case FSM_EVENT_CALL_PEEK :
+            ret = _fsm_call_peek(tcb, buf, len);
             break;
         case FSM_EVENT_CALL_CLOSE :
             ret = _fsm_call_close(tcb);

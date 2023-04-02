@@ -1,6 +1,6 @@
 include ../Makefile.tests_common
 
-LWIP_IPV4 ?= 0
+LWIP_IPV4 ?= 1
 LWIP_IPV6 ?= 1
 
 ifneq (0, $(LWIP_IPV4))
@@ -21,6 +21,7 @@ USEMODULE += netdev_eth
 USEMODULE += netdev_test
 USEMODULE += ps
 USEMODULE += sock_tcp
+USEMODULE += sock_peek
 
 DISABLE_MODULE += auto_init_lwip
 
