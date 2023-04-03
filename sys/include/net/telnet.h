@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_telnet_stdio    STDIO over telnet
+ * @defgroup    net_telnet_stdio    stdio_telnet: STDIO over telnet
  * @ingroup     sys_stdio
  * @brief       Standard input/output via telnet
  *
@@ -27,7 +27,7 @@
  */
 
 /**
- * @defgroup    net_telnet basic Telnet server implementation
+ * @defgroup    net_telnet telnet: basic Telnet server implementation
  * @ingroup     net_ipv6
  * @brief       Telnet server functions
  * @{

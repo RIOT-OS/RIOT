@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_ecc ECC
+ * @defgroup    sys_ecc ecc: ECC
  * @ingroup     sys
  *
  * @brief       A collection of error correction code (ECC) algorithms.

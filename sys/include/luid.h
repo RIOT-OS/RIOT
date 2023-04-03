@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_luid Locally Unique ID Generator
+ * @defgroup    sys_luid luid: Locally Unique ID Generator
  * @ingroup     sys
  * @brief       Generate system wide (locally) unique IDs
  *

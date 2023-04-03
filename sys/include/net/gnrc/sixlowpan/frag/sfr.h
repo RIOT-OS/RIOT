@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_sixlowpan_frag_sfr  6LoWPAN selective fragment recovery
+ * @defgroup    net_gnrc_sixlowpan_frag_sfr  gnrc_sixlowpan_frag_sfr: 6LoWPAN selective fragment recovery
  * @ingroup     net_gnrc_sixlowpan
  * @brief       6LoWPAN selective fragment recovery implementation for GNRC
  *

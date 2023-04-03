@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_sixlowpan    6LoWPAN
+ * @defgroup    net_gnrc_sixlowpan    gnrc_sixlowpan: 6LoWPAN
  * @ingroup     net_gnrc
  * @brief       GNRC's 6LoWPAN implementation
  *

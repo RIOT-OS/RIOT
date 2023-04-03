@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_icmpv6  ICMPv6
+ * @defgroup    net_gnrc_icmpv6  gnrc_icmpv6: ICMPv6
  * @ingroup     net_gnrc_ipv6
  * @brief       GNRC's implementation of ICMPv6
  *

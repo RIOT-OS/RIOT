@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_icmpv6  ICMPV6
+ * @defgroup    net_icmpv6  icmpv6: ICMPV6
  * @ingroup     net_ipv6
  * @brief       Provides types related to ICMPv6
  * @see         <a href="https://tools.ietf.org/html/rfc4443">

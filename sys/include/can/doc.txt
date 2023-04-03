@@ -1,5 +1,5 @@
 /**
- * @defgroup sys_can CAN (Controller Area Network)
+ * @defgroup sys_can can: CAN (Controller Area Network)
  * @ingroup net
  * @brief RIOT CAN stack
  *

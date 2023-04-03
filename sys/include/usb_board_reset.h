@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_usb_board_reset Board reset via USB CDC ACM
+ * @defgroup    sys_usb_board_reset usb_board_reset: Board reset via USB CDC ACM
  * @ingroup     sys
  * @brief       Trigger a board reset via USB CDC ACM
  *

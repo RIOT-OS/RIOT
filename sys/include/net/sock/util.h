@@ -8,10 +8,8 @@
  */
 
 /**
- * @defgroup    net_sock_util   sock utility functions
+ * @defgroup    net_sock_util sock_util: sock utilities
  * @ingroup     net_sock
- *
- * @brief       sock utility function
  *
  * @{
  *

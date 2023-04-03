@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_eui64   IEEE EUI-64 identifier
+ * @defgroup    net_eui64   eui64: IEEE EUI-64 identifier
  * @ingroup     net
  * @brief       Type definition of the IEEE EUI-64 identifier
  * @see         <a href="https://web.archive.org/web/20170730083229/http://standards.ieee.org:80/develop/regauth/tut/eui64.pdf">

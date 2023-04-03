@@ -6,7 +6,7 @@
  * directory for more details.
  */
 /**
- * @defgroup    sys_suit_transport_vfs SUIT secure firmware OTA VFS transport
+ * @defgroup    sys_suit_transport_vfs suit_transport_vfs: SUIT secure firmware OTA VFS transport
  * @ingroup     sys_suit
  * @brief       SUIT firmware VFS transport
  *

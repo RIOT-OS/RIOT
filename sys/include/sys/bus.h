@@ -8,7 +8,7 @@
 
 /**
  * @ingroup     sys
- * @defgroup    sys_bus System Buses for common events
+ * @defgroup    sys_bus bus: System Buses for common events
  * @{
  *
  * @file

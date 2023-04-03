@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_ipv6_ext IPv6 extension headers.
+ * @defgroup    net_gnrc_ipv6_ext gnrc_ipv6_ext: IPv6 extension headers.
  * @ingroup     net_gnrc_ipv6
  * @brief       Implementation of IPv6 extension headers
  * @see [RFC 8200, section 4](https://tools.ietf.org/html/rfc8200#section-4)

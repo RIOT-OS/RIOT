@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_stdio_semihosting STDIO over Semihosting
+ * @defgroup    sys_stdio_semihosting stdio_semihosting: STDIO over Semihosting
  * @ingroup     sys_stdio
  *
  * @brief       Standard input/output backend using ARM Semihosting

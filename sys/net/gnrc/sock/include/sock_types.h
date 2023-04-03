@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_sock   GNRC-specific implementation of the sock API
+ * @defgroup    net_gnrc_sock   gnrc_sock: GNRC-specific implementation of the sock API
  * @ingroup     net_gnrc
  * @brief       Provides an implementation of the @ref net_sock by the
  *              @ref net_gnrc

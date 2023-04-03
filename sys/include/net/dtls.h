@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_dtls DTLS
+ * @defgroup    net_dtls dtls: DTLS
  * @ingroup     net
  * @brief       DTLS support in RIOT
  * @see         <a href="https://tools.ietf.org/html/rfc6347">

@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup  sys_ztimer_convert_shift conversion using shifts
+ * @defgroup  sys_ztimer_convert_shift ztimer_convert_shift: conversion using shifts
  * @ingroup   sys_ztimer_convert
  * @brief     Translates between clock tick rates
  *

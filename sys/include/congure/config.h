@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_congure_config  CongURE compile time configuration
+ * @defgroup    sys_congure_conf  CongURE compile time configuration
  * @ingroup     sys_congure
  * @ingroup     config
  * @brief   Configuration for congestion control using @ref sys_congure

@@ -6,7 +6,7 @@
  * directory for more details.
  */
 /**
- * @defgroup    sys_suit_storage_vfs  riotboot vfs storage backend
+ * @defgroup    sys_suit_storage_vfs  suit_storage_vfs: riotboot vfs storage backend
  * @ingroup     sys_suit_storage
  * @brief       SUIT riotboot firmware storage backend
  *

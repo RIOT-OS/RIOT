@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_mineplex 5x5 Font 'Mineplex'
+ * @defgroup    sys_mineplex mineplex: 5x5 Font 'Mineplex'
  * @ingroup     sys
  * @brief       The Mineplex font for containing 5x5 pixel ASCII characters
  * @{

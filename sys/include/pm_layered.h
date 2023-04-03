@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_pm_layered Layered PM Infrastructure
+ * @defgroup    sys_pm_layered pm_layered: Layered PM Infrastructure
  * @ingroup     sys
  * @{
  *

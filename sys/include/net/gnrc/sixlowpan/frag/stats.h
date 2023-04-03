@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_sixlowpan_frag_stats Fragmentation and reassembly statistics
+ * @defgroup    net_gnrc_sixlowpan_frag_stats gnrc_sixlowpan_frag_stats: Fragmentation and reassembly statistics
  * @ingroup     net_gnrc_sixlowpan_frag
  * @brief       Counter for certain 6LoWPAN fragmentation and reassembly events.
  * @{

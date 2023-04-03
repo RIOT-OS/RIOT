@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_mqttsn MQTT-SN Defines
+ * @defgroup    net_mqttsn mqttsn: MQTT-SN Defines
  * @ingroup     net
  * @brief       Shared definitions for MQTT-SN
  *

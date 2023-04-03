@@ -8,7 +8,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_lwmac LWMAC
+ * @defgroup    net_gnrc_lwmac gnrc_lwmac: LWMAC
  * @ingroup     net_gnrc
  * @brief       A Lightweight duty-cycling 802.15.4 MAC protocol
  *

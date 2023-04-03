@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_fatfs  FatFs integration
+ * @defgroup    sys_fatfs  fatfs: FatFs integration
  * @ingroup     sys_fs
  * @{
  *

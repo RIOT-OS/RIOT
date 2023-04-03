@@ -11,7 +11,7 @@
  */
 
 /**
- * @defgroup    net_sock_dtls    DTLS sock API
+ * @defgroup net_sock_dtls sock_dtls: DTLS sock module
  * @ingroup     net_sock net_dtls
  * @brief       Sock submodule for DTLS
  *

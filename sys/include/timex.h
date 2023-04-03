@@ -8,7 +8,7 @@
  */
 
 /**
- * @defgroup    sys_timex Timex
+ * @defgroup    sys_timex timex: Timex
  * @brief       Timestamp representation, computation, and conversion
  * @ingroup     sys
  *

@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_tcp TCP
+ * @defgroup    net_tcp tcp: TCP
  * @ingroup     net
  * @brief       Provides TCP header and helper functions
  *

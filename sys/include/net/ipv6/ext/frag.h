@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_ipv6_ext_frag   IPv6 fragmentation extension
+ * @defgroup    net_ipv6_ext_frag   ipv6_ext_frag: IPv6 fragmentation extension
  * @ingroup     net_ipv6_ext
  * @brief       Definitions for IPv6 fragmentation extension
  * @see         [RFC 8200, section 4.5](https://tools.ietf.org/html/rfc8200#section-4.5)

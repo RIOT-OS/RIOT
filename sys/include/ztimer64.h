@@ -10,7 +10,7 @@
 
 /**
  * @ingroup     sys_ztimer
- * @defgroup    sys_ztimer64 ztimer 64bit version
+ * @defgroup    sys_ztimer64 ztimer64: ztimer 64bit version
  * @brief       ztimer 64bit version
  *
  * # Introduction

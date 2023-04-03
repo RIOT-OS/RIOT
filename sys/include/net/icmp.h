@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_icmp  ICMPV4
+ * @defgroup    net_icmp  icmp: ICMPV4
  * @ingroup     net_ipv4
  * @brief       Provides types related to ICMPv4
  * @see         <a href="https://tools.ietf.org/html/rfc792">

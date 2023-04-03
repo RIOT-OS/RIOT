@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_atomic_utils    Utility functions for atomic access
+ * @defgroup    sys_atomic_utils atomic_utils: Utility functions for atomic access
  * @ingroup     sys
  *
  * This modules adds some utility functions to perform atomic accesses.

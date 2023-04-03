@@ -8,7 +8,7 @@
  */
 
 /**
- * @defgroup    net_csma_sender  CSMA/CA helper
+ * @defgroup    net_csma_sender  csma_sender: CSMA/CA helper
  * @ingroup     net
  * @brief       This interface allows code from layer 2 (MAC) or higher
  *              to send packets with CSMA/CA, whatever the abilities and/or

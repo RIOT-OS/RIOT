@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_sixlowpan_nd 6LoWPAN neighbor discovery
+ * @defgroup    net_gnrc_sixlowpan_nd gnrc_sixlowpan_nd: 6LoWPAN neighbor discovery
  * @ingroup     net_gnrc_sixlowpan
  * @brief       Neighbor Discovery Optimization for 6LoWPAN
  * @see         <a href="https://tools.ietf.org/html/rfc6775">

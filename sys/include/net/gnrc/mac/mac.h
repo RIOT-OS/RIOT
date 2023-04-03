@@ -8,7 +8,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_mac Common MAC module
+ * @defgroup    net_gnrc_mac gnrc_mac: Common MAC module
  * @ingroup     net_gnrc
  * @brief       A MAC module for providing common MAC parameters and helper functions.
  *

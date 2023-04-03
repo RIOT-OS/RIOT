@@ -1159,7 +1159,7 @@ warning: Member CAN_ISOTP_DEFAULT_RECV_BS (macro definition) of group sys_can_is
 warning: Member CAN_ISOTP_DEFAULT_RECV_STMIN (macro definition) of group sys_can_isotp is not documented.
 warning: Member CAN_ISOTP_DEFAULT_RECV_WFTMAX (macro definition) of group sys_can_isotp is not documented.
 warning: Member CAN_STM32_NB_FILTER (macro definition) of file candev_stm32.h is not documented.
-warning: Member _CASTASGN(a, b) (macro definition) of group sys_ut is not documented.
+warning: Member _CASTASGN(a, b) (macro definition) of group sys_utlist is not documented.
 warning: Member CC1200_CSN_GPIO (macro definition) of file board.h is not documented.
 warning: Member CC1200_GPD0_GPIO (macro definition) of file board.h is not documented.
 warning: Member CC1200_GPD2_GPIO (macro definition) of file board.h is not documented.
@@ -1383,8 +1383,8 @@ warning: Member CCS811_REG_SW_RESET (macro definition) of file ccs811_regs.h is 
 warning: Member CCS811_REG_THRESHOLDS (macro definition) of file ccs811_regs.h is not documented.
 warning: Member CCS811_SAUL_INFO (macro definition) of file ccs811_params.h is not documented.
 warning: Member CDEFAULT (macro definition) of file ColorTextColors.h is not documented.
-warning: Member CDL_SORT2(list, cmp, prev, next) (macro definition) of group sys_ut is not documented.
-warning: Member CDL_SORT(list, cmp) (macro definition) of group sys_ut is not documented.
+warning: Member CDL_SORT2(list, cmp, prev, next) (macro definition) of group sys_utlist is not documented.
+warning: Member CDL_SORT(list, cmp) (macro definition) of group sys_utlist is not documented.
 warning: Member CGREEN (macro definition) of file ColorTextColors.h is not documented.
 warning: Member CHARGING_ACTIVE (macro definition) of file board.h is not documented.
 warning: Member CIPHER_ERR_DEC_FAILED (macro definition) of file ciphers.h is not documented.
@@ -1901,8 +1901,8 @@ warning: Member DISP_SELECT_PIN (macro definition) of file board.h is not docume
 warning: Member DISP_SPI (macro definition) of file board.h is not documented.
 warning: Member _div_mulhi64(const uint64_t a, const uint64_t b) (function) of file div.h is not documented.
 warning: Member djb2_hash(const uint8_t *buf, size_t len) (function) of file hashes.h is not documented.
-warning: Member DL_SORT2(list, cmp, prev, next) (macro definition) of group sys_ut is not documented.
-warning: Member DL_SORT(list, cmp) (macro definition) of group sys_ut is not documented.
+warning: Member DL_SORT2(list, cmp, prev, next) (macro definition) of group sys_utlist is not documented.
+warning: Member DL_SORT(list, cmp) (macro definition) of group sys_utlist is not documented.
 warning: Member DMA_0_ISR (macro definition) of file periph_conf_common.h is not documented.
 warning: Member DMA_0_ISR (macro definition) of file periph_conf.h is not documented.
 warning: Member DMA_1_ISR (macro definition) of file periph_conf_common.h is not documented.
@@ -3216,7 +3216,7 @@ warning: Member LCD_DET (macro definition) of file board.h is not documented.
 warning: Member LCD_RESET (macro definition) of file board.h is not documented.
 warning: Member LCD_RS (macro definition) of file board.h is not documented.
 warning: Member LCD_RST (macro definition) of file board.h is not documented.
-warning: Member LDECLTYPE(x) (macro definition) of group sys_ut is not documented.
+warning: Member LDECLTYPE(x) (macro definition) of group sys_utlist is not documented.
 warning: Member LED0_ACTIVE (macro definition) of file board.h is not documented.
 warning: Member LED0_BIT (macro definition) of file board.h is not documented.
 warning: Member LED0B_PIN (macro definition) of file board.h is not documented.
@@ -3413,12 +3413,12 @@ warning: Member LIS3MDL_TEMP_OUT_H_REG (macro definition) of file lis3mdl-intern
 warning: Member LIS3MDL_TEMP_OUT_L_REG (macro definition) of file lis3mdl-internal.h is not documented.
 warning: Member LITTLEFS2_VFS_FILE_BUFFER_SIZE (macro definition) of group sys_vfs is not documented.
 warning: Member LITTLEFS_VFS_FILE_BUFFER_SIZE (macro definition) of group sys_vfs is not documented.
-warning: Member LL_APPEND2_VS2008(head, add, next) (macro definition) of group sys_ut is not documented.
-warning: Member LL_APPEND_VS2008(head, add) (macro definition) of group sys_ut is not documented.
-warning: Member LL_DELETE2_VS2008(head, del, next) (macro definition) of group sys_ut is not documented.
-warning: Member LL_DELETE_VS2008(head, del) (macro definition) of group sys_ut is not documented.
-warning: Member LL_SORT2(list, cmp, next) (macro definition) of group sys_ut is not documented.
-warning: Member LL_SORT(list, cmp) (macro definition) of group sys_ut is not documented.
+warning: Member LL_APPEND2_VS2008(head, add, next) (macro definition) of group sys_utlist is not documented.
+warning: Member LL_APPEND_VS2008(head, add) (macro definition) of group sys_utlist is not documented.
+warning: Member LL_DELETE2_VS2008(head, del, next) (macro definition) of group sys_utlist is not documented.
+warning: Member LL_DELETE_VS2008(head, del) (macro definition) of group sys_utlist is not documented.
+warning: Member LL_SORT2(list, cmp, next) (macro definition) of group sys_utlist is not documented.
+warning: Member LL_SORT(list, cmp) (macro definition) of group sys_utlist is not documented.
 warning: Member LOCK_TCPIP_CORE() (macro definition) of file sys_arch.h is not documented.
 warning: Member LOCK_TCPIP_CORE() (macro definition) of group pkg_lwip_sys is not documented.
 warning: Member LOG_CRITICAL(...) (macro definition) of file log.h is not documented.
@@ -5443,8 +5443,8 @@ warning: Member NETSTATS_ALL (macro definition) of group net_netstats is not doc
 warning: Member NETSTATS_IPV6 (macro definition) of group net_netstats is not documented.
 warning: Member NETSTATS_LAYER2 (macro definition) of group net_netstats is not documented.
 warning: Member NETSTATS_RPL (macro definition) of group net_netstats is not documented.
-warning: Member _NEXTASGN(elt, list, to, next) (macro definition) of group sys_ut is not documented.
-warning: Member _NEXT(elt, list, next) (macro definition) of group sys_ut is not documented.
+warning: Member _NEXTASGN(elt, list, to, next) (macro definition) of group sys_utlist is not documented.
+warning: Member _NEXT(elt, list, next) (macro definition) of group sys_utlist is not documented.
 warning: Member NIMBLE_AUTOADV_ADV_DURATION_MS (macro definition) of file nimble_autoadv_params.h is not documented.
 warning: Member NIMBLE_AUTOADV_ADV_ITVL_MS (macro definition) of file nimble_autoadv_params.h is not documented.
 warning: Member NIMBLE_AUTOADV_CHANNEL_MAP (macro definition) of file nimble_autoadv_params.h is not documented.
@@ -5748,7 +5748,7 @@ warning: Member PORT_TsSlotDuration (macro definition) of file board_info.h is n
 warning: Member PORT_US_PER_TICK (macro definition) of file board_info.h is not documented.
 warning: Member POWER_PRESENCE (macro definition) of file board.h is not documented.
 warning: Member PPP_SUPPORT (macro definition) of group pkg_lwip_opts is not documented.
-warning: Member _PREVASGN(elt, list, to, prev) (macro definition) of group sys_ut is not documented.
+warning: Member _PREVASGN(elt, list, to, prev) (macro definition) of group sys_utlist is not documented.
 warning: Member PRIM_RX (macro definition) of file nrf24l01p_settings.h is not documented.
 warning: Member PROVIDES_PM_LAYERED_OFF (macro definition) of file periph_cpu.h is not documented.
 warning: Member PROVIDES_PM_OFF (macro definition) of file periph_cpu.h is not documented.
@@ -6155,7 +6155,7 @@ warning: Member RR_CLASS_LENGTH (macro definition) of group net_dns is not docum
 warning: Member RR_RDLENGTH_LENGTH (macro definition) of group net_dns is not documented.
 warning: Member RR_TTL_LENGTH (macro definition) of group net_dns is not documented.
 warning: Member RR_TYPE_LENGTH (macro definition) of group net_dns is not documented.
-warning: Member _RS(list) (macro definition) of group sys_ut is not documented.
+warning: Member _RS(list) (macro definition) of group sys_utlist is not documented.
 warning: Member RST_RTC (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member RTC_DEV (macro definition) of file cfg_rtc_default.h is not documented.
 warning: Member RTC_LOAD_CAP_BITS (macro definition) of file periph_conf.h is not documented.
@@ -6804,7 +6804,7 @@ warning: Member STMPE811_PARAMS (macro definition) of file stmpe811_params.h is 
 warning: Member STMPE811_PARAM_XMAX (macro definition) of file stmpe811_params.h is not documented.
 warning: Member STMPE811_PARAM_YMAX (macro definition) of file stmpe811_params.h is not documented.
 warning: Member suit_parameter_t (enumeration) of group sys_suit is not documented.
-warning: Member _SV(elt, list) (macro definition) of group sys_ut is not documented.
+warning: Member _SV(elt, list) (macro definition) of group sys_utlist is not documented.
 warning: Member SX126X_PARAM_BUSY (macro definition) of file sx126x_params.h is not documented.
 warning: Member SX126X_PARAM_DIO1 (macro definition) of file sx126x_params.h is not documented.
 warning: Member SX126X_PARAM_REGULATOR (macro definition) of file sx126x_params.h is not documented.

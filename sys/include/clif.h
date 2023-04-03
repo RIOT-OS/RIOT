@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_clif CoRE Link Format
+ * @defgroup    sys_clif clif: CoRE Link Format
  * @ingroup     sys_serialization
  * @brief       Simple encoding and decoding of CoRE Link Format (RFC 6690)
  *              strings

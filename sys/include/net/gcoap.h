@@ -8,7 +8,7 @@
  */
 
 /**
- * @defgroup    net_gcoap  Gcoap
+ * @defgroup    net_gcoap  gcoap: Gcoap
  * @ingroup     net
  * @brief       High-level interface to CoAP messaging
  *

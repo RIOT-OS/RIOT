@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_sixlowpan_iphc   IPv6 header compression (IPHC)
+ * @defgroup    net_gnrc_sixlowpan_iphc   gnrc_sixlowpan_iphc: IPv6 header compression (IPHC)
  * @ingroup     net_gnrc_sixlowpan
  * @brief       IPv6 header compression for 6LoWPAN.
  * @{

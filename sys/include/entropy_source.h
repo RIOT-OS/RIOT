@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup   sys_entropy_source_common Entropy Source Common
+ * @defgroup   sys_entropy_source_common entropy_source_common: Entropy Source Common
  * @ingroup    sys_entropy_source
  * @brief      Common definitions and functions for entropy sources
  *
@@ -76,7 +76,7 @@ typedef struct {
 #define ENTROPY_SOURCE_HMIN_SCALE_BACK(x)    ((float)x / (1UL << 16))
 
 /**
- * @defgroup   sys_entropy_source_config Entropy Source compile configurations
+ * @defgroup   sys_entropy_source_conf entropy_source_config: Entropy Source compile configurations
  * @ingroup    config
  * @{
  */

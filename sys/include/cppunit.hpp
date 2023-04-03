@@ -7,7 +7,7 @@
  */
 /**
  * @ingroup     sys
- * @defgroup    unittests_cpp   C++ Unittests
+ * @defgroup    sys_cppunit   C++ Unittest framework
  * @brief       RIOT unit tests for C++
  * @details     The C++ unit test framework syntax is loosely based on
  *              GoogleTest, but offers far less functionality.

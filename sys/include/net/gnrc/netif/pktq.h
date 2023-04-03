@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_netif_pktq Send queue for @ref net_gnrc_netif
+ * @defgroup    net_gnrc_netif_pktq gnrc_netif_pktq: Send queue for @ref net_gnrc_netif
  * @ingroup     net_gnrc_netif
  * @brief
  * @{

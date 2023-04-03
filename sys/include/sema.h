@@ -8,7 +8,7 @@
  */
 
 /**
- * @defgroup    sys_sema Semaphores
+ * @defgroup    sys_sema sema: Semaphores
  * @ingroup     sys
  * @brief       Lightweight semaphore implementation
  * @{

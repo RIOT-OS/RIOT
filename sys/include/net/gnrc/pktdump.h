@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_pktdump Dump Network Packets
+ * @defgroup    net_gnrc_pktdump gnrc_pktdump: Dump Network Packets
  * @ingroup     net_gnrc
  * @brief       Dump network packets to STDOUT for debugging
  *

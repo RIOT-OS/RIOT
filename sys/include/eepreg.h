@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_eepreg EEPROM registration
+ * @defgroup    sys_eepreg eepreg: EEPROM registration
  * @ingroup     sys
  * @brief       eepreg provides a facility to easily manage the locations of
  *              data stored in EEPROM via a meta-data registry.

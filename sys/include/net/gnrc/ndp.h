@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_ndp   IPv6 neighbor discovery (v2)
+ * @defgroup    net_gnrc_ndp   gnrc_ndp: IPv6 neighbor discovery (v2)
  * @ingroup     net_gnrc_ipv6
  * @brief       Provides build and send functions for neighbor discovery packets
  * @{

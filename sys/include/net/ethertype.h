@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_ethertype Ether types
+ * @defgroup    net_ethertype ethertype: Ether types
  * @ingroup     net
  * @brief       Ether types
  * @see         <a href="http://www.iana.org/assignments/ieee-802-numbers/ieee-802-numbers.xhtml#ieee-802-numbers-1">
@@ -39,7 +39,7 @@ extern "C" {
 #define ETHERTYPE_6LOENC        (0xa0ed)    /**< 6LoWPAN encapsulation */
 
 /**
- * @defgroup    net_ethertype_custom_config Custom ethertype
+ * @defgroup    net_ethertype_custom_conf Custom ethertype
  * @ingroup     config
  * @brief       Custom ethertype definition
  * @warning     Do not use a IANA assigned number

@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_ipv6_nib_abr   Authoritative border router list
+ * @defgroup    net_gnrc_ipv6_nib_abr   gnrc_ipv6_nib_abr: Authoritative border router list
  * @ingroup     net_gnrc_ipv6_nib
  * @brief       Authoritative border router list component of neighbor
  *              information base

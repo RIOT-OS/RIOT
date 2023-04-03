@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_stdio_udp   STDIO over UDP
+ * @defgroup    sys_stdio_udp   stdio_udp: STDIO over UDP
  * @ingroup     sys_stdio
  * @brief       STDIO over UDP implementation
  *

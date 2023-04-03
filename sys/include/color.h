@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_color Color
+ * @defgroup    sys_color color: Color
  * @ingroup     sys
  * @brief       The color sys module supports handling RGB and HSV color
  * @{

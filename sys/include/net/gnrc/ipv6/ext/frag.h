@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_ipv6_ext_frag Support for IPv6 fragmentation extension
+ * @defgroup    net_gnrc_ipv6_ext_frag gnrc_ipv6_ext_frag: Support for IPv6 fragmentation extension
  * @ingroup     net_gnrc_ipv6_ext
  * @brief       GNRC implementation of IPv6 fragmentation extension
  * @{

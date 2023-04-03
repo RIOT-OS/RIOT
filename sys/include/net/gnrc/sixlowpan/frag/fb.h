@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup net_gnrc_sixlowpan_frag_fb 6LoWPAN fragmentation buffer
+ * @defgroup net_gnrc_sixlowpan_frag_fb gnrc_sixlowpan_frag_fb: 6LoWPAN fragmentation buffer
  * @ingroup  net_gnrc_sixlowpan_frag
  * @brief   Buffer for asynchronous 6LoWPAN fragmentation
  * @{

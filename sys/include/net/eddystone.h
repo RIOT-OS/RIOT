@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_eddystone Eddystone
+ * @defgroup    net_eddystone eddystone: Eddystone
  * @ingroup     net
  * @brief       General values defined by the BLE Eddystone beacon format
  *

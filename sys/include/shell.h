@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_shell Shell
+ * @defgroup    sys_shell shell: Shell
  * @ingroup     sys
  * @brief       Simple shell interpreter
  *
@@ -35,7 +35,7 @@ extern "C" {
 #endif
 
 /**
- * @defgroup sys_shell_config Shell compile time configurations
+ * @defgroup sys_shell_conf Shell compile time configurations
  * @ingroup config
  * @{
  */

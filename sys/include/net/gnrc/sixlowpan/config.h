@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_sixlowpan_config GNRC 6LoWPAN compile configurations
+ * @defgroup    net_gnrc_sixlowpan_conf GNRC 6LoWPAN compile configurations
  * @ingroup     net_gnrc_sixlowpan
  * @ingroup     net_gnrc_conf
  * @brief

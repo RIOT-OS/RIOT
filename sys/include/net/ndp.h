@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_ndp IPv6 neighbor discovery
+ * @defgroup    net_ndp ndp: IPv6 neighbor discovery
  * @ingroup     net_ipv6
  * @brief       Provides IPv6 neighbor discovery message types
  * @{

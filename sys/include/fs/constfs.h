@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup  sys_fs_constfs ConstFS static file system
+ * @defgroup  sys_fs_constfs fs_constfs: ConstFS static file system
  * @ingroup   sys_fs
  * @brief     Constant file system resident in arrays
  *

@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    fido2_ctap_mem FIDO2 CTAP flash
- * @ingroup     fido2_ctap
+ * @defgroup    sys_fido2_ctap_mem FIDO2 CTAP flash
+ * @ingroup     sys_fido2_ctap
  * @brief       FIDO2 CTAP flash memory helper
  *
  * @{

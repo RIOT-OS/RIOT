@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_dns_cache   DNS cache
+ * @defgroup    net_dns_cache   dns_cache: DNS cache
  * @ingroup     net_dns
  *
  * @brief       DNS cache

@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_senml_phydat SenML Phydat
+ * @defgroup    sys_senml_phydat senml_phydat: SenML Phydat
  * @ingroup     sys_senml
  * @brief       Functionality for converting from @ref sys_phydat to @ref sys_senml
  *

@@ -9,7 +9,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_rpl  RPL
+ * @defgroup    net_gnrc_rpl  gnrc_rpl: RPL
  * @ingroup     net_gnrc
  * @brief       RPL implementation for GNRC
  *

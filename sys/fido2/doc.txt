@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    fido2 FIDO2 - Fast Identity Online 2
+ * @defgroup    sys_fido2 fido2: FIDO2 - Fast Identity Online 2
  * @ingroup     sys
  * @brief       Description of the FIDO2 CTAP implementation in RIOT
  * @author      Nils Ollrogge <nils.ollrogge@fu-berlin.de>
