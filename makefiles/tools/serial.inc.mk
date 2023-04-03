@@ -53,7 +53,13 @@ else ifeq ($(RIOT_TERMINAL),picocom)
   TERMPROG  ?= picocom
   TERMFLAGS ?= --nolock --imap lfcrlf --baud "$(BAUD)" "$(PORT)"
 else ifeq ($(RIOT_TERMINAL),miniterm)
-  TERMPROG  ?= miniterm.py
+  # Check if miniterm.py is available in the path, if not use just miniterm
+  # since new versions will only have miniterm and not miniterm.py
+  ifeq (,$(shell command -v miniterm.py 2>/dev/null))
+    TERMPROG ?= miniterm
+  else
+    TERMPROG ?= miniterm.py
+  endif
   # The RIOT shell will still transmit back a CRLF, but at least with --eol LF
   # we avoid sending two lines on every "enter".
   TERMFLAGS ?= --eol LF "$(PORT)" "$(BAUD)" $(MINITERMFLAGS)
