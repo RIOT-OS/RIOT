@@ -16,21 +16,21 @@
  * This package only works with Semtech SX1272 and SX1276 radio devices. Thus,
  * in order to use it properly, the application `Makefile` must import the
  * corresponding device driver:
- * ```
+ * ```mk
  *     USEMODULE += sx1272  # for a SX1272 radio device
  *     USEMODULE += sx1276  # for a SX1276 radio device
  * ```
  *
  * In order to use this package in an application, add the following in
  * the application `Makefile`:
- * ```
+ * ```mk
  *     USEPKG += semtech-loramac
  * ```
  *
  * Since the LoRa radio depends on regional parameters regarding the access
  * to the physical support, the region where the device is used needs to be
  * set at compile time. Example for EU868:
- * ```
+ * ```mk
  *     LORA_REGION = EU868
  * ```
  *
