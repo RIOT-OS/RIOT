@@ -34,6 +34,10 @@ ifneq (,$(filter gnrc_gomach,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
+	USEMODULE += event_timeout
+endif
+
+ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
   USEMODULE += ztimer_msec
   USEMODULE += random
   USEMODULE += hashes

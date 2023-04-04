@@ -24,15 +24,11 @@
 
 #include "net/lorawan/hdr.h"
 
-#include "random.h"
-
 #define ENABLE_DEBUG      0
 #include "debug.h"
 
 #define _16_UPPER_BITMASK 0xFFFF0000
 #define _16_LOWER_BITMASK 0xFFFF
-
-static void _end_of_tx(gnrc_lorawan_t *mac, int type, int status);
 
 static int gnrc_lorawan_mic_is_valid(uint8_t *buf, size_t len, uint8_t *key,
                                      uint32_t fcnt_up, bool optneg)
@@ -169,13 +165,11 @@ void gnrc_lorawan_mcps_process_downlink(gnrc_lorawan_t *mac, uint8_t *psdu,
     if (!gnrc_lorawan_mic_is_valid(psdu, size, mac->ctx.snwksintkey,
                                    mac->mcps.fcnt, gnrc_lorawan_optneg_is_set(mac))) {
         DEBUG("gnrc_lorawan: invalid MIC\n");
-        gnrc_lorawan_event_no_rx(mac);
         return;
     }
 
     if (gnrc_lorawan_parse_dl(mac, psdu, size, &_pkt) < 0) {
         DEBUG("gnrc_lorawan: couldn't parse packet\n");
-        gnrc_lorawan_event_no_rx(mac);
         return;
     }
 
@@ -211,12 +205,6 @@ void gnrc_lorawan_mcps_process_downlink(gnrc_lorawan_t *mac, uint8_t *psdu,
         gnrc_lorawan_set_last_fcnt_down(mac, _pkt.fcnt_down);
     }
 
-    if (mac->mcps.waiting_for_ack && !_pkt.ack) {
-        DEBUG("gnrc_lorawan: expected ACK packet\n");
-        gnrc_lorawan_event_no_rx(mac);
-        return;
-    }
-
     if (_pkt.ack_req) {
         mac->mcps.ack_requested = true;
     }
@@ -243,9 +231,10 @@ void gnrc_lorawan_mcps_process_downlink(gnrc_lorawan_t *mac, uint8_t *psdu,
         gnrc_lorawan_process_fopts(mac, fopts->iol_base, fopts->iol_len);
     }
 
-    _end_of_tx(mac, MCPS_CONFIRMED, GNRC_LORAWAN_REQ_STATUS_SUCCESS);
-
-    if (_pkt.frame_pending) {
+    /* In class C we do not need to request an uplink for frame pending,
+     * as the server can send a downlink at any time */
+    if ((_pkt.frame_pending && !IS_ACTIVE(CONFIG_GNRC_LORAWAN_CLASS_C))
+        || _pkt.ack_req) {
         mlme_indication_t mlme_indication;
         mlme_indication.type = MLME_SCHEDULE_UPLINK;
         gnrc_lorawan_mlme_indication(mac, &mlme_indication);
@@ -257,6 +246,11 @@ void gnrc_lorawan_mcps_process_downlink(gnrc_lorawan_t *mac, uint8_t *psdu,
         mcps_indication.data.pkt = &_pkt.enc_payload;
         mcps_indication.data.port = _pkt.port;
         gnrc_lorawan_mcps_indication(mac, &mcps_indication);
+    }
+
+    if (_pkt.ack) {
+        /* The state machine will catch this in the WAIT_FOR_ACK event */
+        mac->mcps.waiting_for_ack = false;
     }
 }
 
@@ -338,125 +332,6 @@ size_t gnrc_lorawan_build_uplink(gnrc_lorawan_t *mac, iolist_t *payload,
     return buf.index;
 }
 
-static void _end_of_tx(gnrc_lorawan_t *mac, int type, int status)
-{
-    mlme_confirm_t mlme_confirm;
-    mcps_confirm_t mcps_confirm;
-
-    mac->mcps.waiting_for_ack = false;
-
-    mac->mcps.fcnt++;
-
-    gnrc_lorawan_mac_release(mac);
-
-    if (mac->mlme.pending_mlme_opts & GNRC_LORAWAN_MLME_OPTS_LINK_CHECK_REQ) {
-        mlme_confirm.type = MLME_LINK_CHECK;
-        mlme_confirm.status = -ETIMEDOUT;
-        mac->mlme.pending_mlme_opts &= ~GNRC_LORAWAN_MLME_OPTS_LINK_CHECK_REQ;
-        gnrc_lorawan_mlme_confirm(mac, &mlme_confirm);
-    }
-
-    mcps_confirm.type = type;
-    mcps_confirm.status = status;
-    mcps_confirm.msdu = mac->mcps.msdu;
-    mac->mcps.msdu = NULL;
-    gnrc_lorawan_mcps_confirm(mac, &mcps_confirm);
-}
-
-static void _transmit_pkt(gnrc_lorawan_t *mac)
-{
-    size_t mhdr_size = sizeof(lorawan_hdr_t) + 1 +
-                       lorawan_hdr_get_frame_opts_len((void *)mac->mcps.mhdr_mic);
-
-    iolist_t header =
-    { .iol_base = mac->mcps.mhdr_mic, .iol_len = mhdr_size,
-      .iol_next = mac->mcps.msdu };
-    iolist_t footer =
-    { .iol_base = mac->mcps.mhdr_mic + header.iol_len, .iol_len = MIC_SIZE,
-      .iol_next = NULL };
-    iolist_t *last_snip = mac->mcps.msdu;
-
-    while (last_snip->iol_next != NULL) {
-        last_snip = last_snip->iol_next;
-    }
-
-    mac->last_chan_idx = gnrc_lorawan_pick_channel(mac);
-
-    uint16_t conf_fcnt = 0;
-
-    if (IS_USED(MODULE_GNRC_LORAWAN_1_1)) {
-        /**
-         * If the ACK bit of the uplink frame is set, meaning this frame is
-         * acknowledging a downlink “confirmed” frame, then ConfFCnt is the frame
-         * counter value modulo 2^16 of the “confirmed” downlink frame that is being
-         * acknowledged. In all other cases ConfFCnt = 0x0000
-         */
-        lorawan_hdr_t *lw_hdr = (lorawan_hdr_t *)header.iol_base;
-        if (lorawan_hdr_get_ack(lw_hdr)) {
-            conf_fcnt = gnrc_lorawan_get_last_fcnt_down(mac);
-        }
-    }
-
-    gnrc_lorawan_calculate_mic_uplink(&header, conf_fcnt, mac, footer.iol_base);
-
-    last_snip->iol_next = &footer;
-    gnrc_lorawan_send_pkt(mac, &header, mac->last_dr,
-                          mac->channel[mac->last_chan_idx]);
-
-    /* cppcheck-suppress redundantAssignment
-     * (reason: cppcheck bug. The pointer is temporally modified to add a footer.
-     *          The `gnrc_lorawan_send_pkt` function uses this hack to append
-     *          the MIC independently of `gnrc_pktsnip_t` structures) */
-    last_snip->iol_next = NULL;
-}
-
-void gnrc_lorawan_event_retrans_timeout(gnrc_lorawan_t *mac)
-{
-    _transmit_pkt(mac);
-}
-
-static void _handle_retransmissions(gnrc_lorawan_t *mac)
-{
-    /* Check if retransmission should be handled.
-     *
-     * If there was a confirmed uplink, follow the standard retransmission
-     * procedure.
-     * If it was an unconfirmed uplink, perform retransmissions only if
-     * there's redundancy > 0 */
-    if (mac->mcps.nb_trials-- == 0) {
-        if (mac->mcps.waiting_for_ack) {
-            /* If we are here, the node ran out of confirmed uplink retransmissions.
-             * This means, the transmission was not successful. */
-            _end_of_tx(mac, MCPS_CONFIRMED, -ETIMEDOUT);
-        }
-        else {
-            /* In this case, we finished sending one or more unconfirmed
-             * (depending on the redundancy) */
-            _end_of_tx(mac, MCPS_UNCONFIRMED, GNRC_LORAWAN_REQ_STATUS_SUCCESS);
-        }
-    }
-    else {
-        /* Schedule a retransmission */
-        gnrc_lorawan_set_timer(mac, 1000000 + random_uint32_range(0, 2000000));
-    }
-}
-
-void gnrc_lorawan_event_no_rx(gnrc_lorawan_t *mac)
-{
-    mlme_confirm_t mlme_confirm;
-
-    if (mac->mlme.activation == MLME_ACTIVATION_NONE) {
-        /* This was a Join Request */
-        mlme_confirm.type = MLME_JOIN;
-        mlme_confirm.status = -ETIMEDOUT;
-        gnrc_lorawan_mac_release(mac);
-        gnrc_lorawan_mlme_confirm(mac, &mlme_confirm);
-        return;
-    }
-
-    _handle_retransmissions(mac);
-}
-
 void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
                                const mcps_request_t *mcps_request,
                                mcps_confirm_t *mcps_confirm)
@@ -466,10 +341,10 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
     if (mac->mlme.activation == MLME_ACTIVATION_NONE) {
         DEBUG("gnrc_lorawan_mcps: LoRaWAN not activated\n");
         mcps_confirm->status = -ENOTCONN;
-        goto out;
+        return;
     }
 
-    if (!gnrc_lorawan_mac_acquire(mac)) {
+    if (gnrc_lorawan_is_busy(mac)) {
         mcps_confirm->status = -EBUSY;
         return;
     }
@@ -477,12 +352,12 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
     if (mcps_request->data.port < LORAMAC_PORT_MIN ||
         mcps_request->data.port > LORAMAC_PORT_MAX) {
         mcps_confirm->status = -EBADMSG;
-        goto out;
+        return;
     }
 
     if (!gnrc_lorawan_validate_dr(mcps_request->data.dr)) {
         mcps_confirm->status = -EINVAL;
-        goto out;
+        return;
     }
 
     uint8_t fopts_length = gnrc_lorawan_build_options(mac, NULL);
@@ -494,7 +369,7 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
     if (mac_payload_size >
         gnrc_lorawan_region_mac_payload_max(mcps_request->data.dr)) {
         mcps_confirm->status = -EMSGSIZE;
-        goto out;
+        return;
     }
 
     int waiting_for_ack = mcps_request->type == MCPS_CONFIRMED;
@@ -509,13 +384,8 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
 
     mac->mcps.msdu = pkt;
     mac->last_dr = mcps_request->data.dr;
-    _transmit_pkt(mac);
     mcps_confirm->status = GNRC_LORAWAN_REQ_STATUS_DEFERRED;
-out:
-
-    if (mcps_confirm->status != GNRC_LORAWAN_REQ_STATUS_DEFERRED) {
-        gnrc_lorawan_mac_release(mac);
-    }
+    gnrc_lorawan_dispatch_event(mac, &mac->mac_fsm, GNRC_LORAWAN_EV_REQUEST_TX);
 }
 
 /** @} */
