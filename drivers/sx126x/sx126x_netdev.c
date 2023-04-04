@@ -182,6 +182,8 @@ static void _isr(netdev_t *netdev)
     }
     else if (irq_mask & SX126X_IRQ_HEADER_ERROR) {
         DEBUG("[sx126x] netdev: SX126X_IRQ_HEADER_ERROR\n");
+        /* Report it to the upper layer as CRC error */
+        netdev->event_callback(netdev, NETDEV_EVENT_CRC_ERROR);
     }
     else if (irq_mask & SX126X_IRQ_CRC_ERROR) {
         DEBUG("[sx126x] netdev: SX126X_IRQ_CRC_ERROR\n");
