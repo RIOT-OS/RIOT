@@ -22,6 +22,32 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "board.h"
+
+#if defined(MODULE_MTD_EMULATED)
+
+#include "mtd_emulated.h"
+
+/* The following parameters are only suitable for testing the basic functions
+ * of USB MSC. To create a partition with a FAT file system, at least 64 sectors
+ * have to be used. */
+
+#ifndef SECTOR_COUNT
+#define SECTOR_COUNT        64
+#endif
+
+#ifndef PAGES_PER_SECTOR
+#define PAGES_PER_SECTOR    4
+#endif
+
+#ifndef PAGE_SIZE
+#define PAGE_SIZE           128
+#endif
+
+MTD_EMULATED_DEV(0, SECTOR_COUNT, PAGES_PER_SECTOR, PAGE_SIZE);
+
+#endif /* MODULE_MTD_EMULATED */
+
 #include "mtd_default.h"
 #include "shell.h"
 #include "usb/usbus.h"

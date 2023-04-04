@@ -39,6 +39,19 @@ by attaching it to the host with the command:
 At this point, the USBUS stack will export the selected MTD devices.
 Devices should appears under /dev/sdX entries.
 
+If the board does not provide a MTD device, a MTD device can be emulated in RAM
+for testing using module `mtd_emulated`:
+```
+USEMODULE=mtd_emulated BOARD=... make ...
+```
+The emulated MTD device has by default 64 sectors with 4 pages of 128 bytes
+each, the minimum size to be able to create a partition with FAT file system.
+These default parameters can be overridden e.g. by `SECTOR_COUNT`,
+`PAGES_PER_SECTOR` and `PAGE_SIZE`:
+```
+CFLAGS='-DSECTOR_COUNT=128' USEMODULE=mtd_emulated BOARD=... make ...
+```
+
 **Notes:** Depending on the MTD device and the USB speed, this operation can take some times.
 
 USB operation can be stopped at any time using:
