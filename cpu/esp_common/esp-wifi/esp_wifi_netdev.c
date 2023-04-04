@@ -501,13 +501,13 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
 #ifdef MODULE_ESP_WIFI_AP
         case SYSTEM_EVENT_AP_START:
             _esp_wifi_started = 1;
-            esp_wifi_internal_reg_rxcb(ESP_IF_WIFI_AP, _esp_wifi_rx_cb);
+            esp_wifi_internal_reg_rxcb(WIFI_IF_AP, _esp_wifi_rx_cb);
             ESP_WIFI_DEBUG("WiFi started");
             break;
 
         case SYSTEM_EVENT_AP_STOP:
             _esp_wifi_started = 0;
-            esp_wifi_internal_reg_rxcb(ESP_IF_WIFI_AP, NULL);
+            esp_wifi_internal_reg_rxcb(WIFI_IF_AP, NULL);
             ESP_WIFI_DEBUG("WiFi stopped");
             break;
 
@@ -560,7 +560,7 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
             esp_now_set_channel(_esp_wifi_channel);
 #endif
             /* register RX callback function */
-            esp_wifi_internal_reg_rxcb(ESP_IF_WIFI_STA, _esp_wifi_rx_cb);
+            esp_wifi_internal_reg_rxcb(WIFI_IF_STA, _esp_wifi_rx_cb);
 
             _esp_wifi_dev.connected = true;
             _esp_wifi_dev.event_conn++;
@@ -575,7 +575,7 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
                               reason, _esp_wifi_get_disc_reason(reason));
 
             /* unregister RX callback function */
-            esp_wifi_internal_reg_rxcb(ESP_IF_WIFI_STA, NULL);
+            esp_wifi_internal_reg_rxcb(WIFI_IF_STA, NULL);
 
             _esp_wifi_dev.connected = false;
             _esp_wifi_dev.event_disc++;
@@ -661,10 +661,10 @@ static int _esp_wifi_send(netdev_t *netdev, const iolist_t *iolist)
     critical_exit();
 
 #ifdef MODULE_ESP_WIFI_AP
-    if (esp_wifi_internal_tx(ESP_IF_WIFI_AP, dev->tx_buf, dev->tx_len) == ESP_OK) {
+    if (esp_wifi_internal_tx(WIFI_IF_AP, dev->tx_buf, dev->tx_len) == ESP_OK) {
 #else /* MODULE_ESP_WIFI_AP */
     /* send the the packet to the peer(s) mac address */
-    if (esp_wifi_internal_tx(ESP_IF_WIFI_STA, dev->tx_buf, dev->tx_len) == ESP_OK) {
+    if (esp_wifi_internal_tx(WIFI_IF_STA, dev->tx_buf, dev->tx_len) == ESP_OK) {
 #endif
 #ifndef MCU_ESP8266
         /* for ESP8266 it is done in _esp_wifi_tx_cb */
@@ -758,9 +758,9 @@ static int _esp_wifi_get(netdev_t *netdev, netopt_t opt, void *val, size_t max_l
         case NETOPT_ADDRESS:
             assert(max_len >= ETHERNET_ADDR_LEN);
 #ifdef MODULE_ESP_WIFI_AP
-            esp_wifi_get_mac(ESP_MAC_WIFI_SOFTAP, (uint8_t *)val);
+            esp_wifi_get_mac(WIFI_IF_AP, (uint8_t *)val);
 #else /* MODULE_ESP_WIFI_AP */
-            esp_wifi_get_mac(ESP_MAC_WIFI_STA, (uint8_t *)val);
+            esp_wifi_get_mac(WIFI_IF_STA, (uint8_t *)val);
 #endif /* MODULE_ESP_WIFI_AP */
             return ETHERNET_ADDR_LEN;
         case NETOPT_LINK:
@@ -789,9 +789,9 @@ static int _esp_wifi_set(netdev_t *netdev, netopt_t opt, const void *val, size_t
         case NETOPT_ADDRESS:
             assert(max_len == ETHERNET_ADDR_LEN);
 #ifdef MODULE_ESP_WIFI_AP
-            esp_wifi_set_mac(ESP_MAC_WIFI_SOFTAP, (uint8_t *)val);
+            esp_wifi_set_mac(WIFI_IF_AP, (uint8_t *)val);
 #else /* MODULE_ESP_WIFI_AP */
-            esp_wifi_set_mac(ESP_MAC_WIFI_STA, (uint8_t *)val);
+            esp_wifi_set_mac(WIFI_IF_STA, (uint8_t *)val);
 #endif /* MODULE_ESP_WIFI_AP */
             return ETHERNET_ADDR_LEN;
         default:
@@ -972,13 +972,13 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
 #if defined(MCU_ESP8266) || defined(MODULE_ESP_WIFI_AP)
 #if IS_ACTIVE(ESP_WIFI_SSID_DYNAMIC)
     uint8_t mac[ETHERNET_ADDR_LEN];
-    esp_wifi_get_mac(ESP_MAC_WIFI_SOFTAP, mac);
+    esp_wifi_get_mac(WIFI_IF_AP, mac);
     sprintf((char*)wifi_config_ap.ap.ssid, "%s_%02x%02x%02x%02x%02x%02x",
             WIFI_SSID, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     wifi_config_ap.ap.ssid_len = strlen((char*)wifi_config_ap.ap.ssid);
 #endif /* IS_ACTIVE(ESP_WIFI_SSID_DYNAMIC) */
     /* set the SoftAP configuration */
-    result = esp_wifi_set_config(ESP_IF_WIFI_AP, &wifi_config_ap);
+    result = esp_wifi_set_config(WIFI_IF_AP, &wifi_config_ap);
     if (result != ESP_OK) {
         ESP_WIFI_LOG_ERROR("esp_wifi_set_config softap failed with return value %d", result);
         return;
@@ -989,7 +989,7 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
 
 #ifndef MODULE_ESP_WIFI_AP
     /* set the Station configuration */
-    result = esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config_sta);
+    result = esp_wifi_set_config(WIFI_IF_STA, &wifi_config_sta);
     if (result != ESP_OK) {
         ESP_WIFI_LOG_ERROR("esp_wifi_set_config station failed with return value %d", result);
         return;
