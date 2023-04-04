@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
 Command line utility to check if only a subset of board / application combinations
 need to be build in the CI
