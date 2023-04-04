@@ -164,6 +164,10 @@ INCLUDES = \
 # CONFIG_ESPTOOLPY_FLASHFREQ_* and CONFIG_FLASHMODE_*
 CFLAGS = -include '$(RIOTBUILD_CONFIG_HEADER_C)' \
 
+# TODO: required to be able to compile with GCC 12.1, remove them after upgrade to ESP-IDF 5.1
+CFLAGS += -Wno-error=format=
+CFLAGS += -Wno-format
+
 ifneq (,$(filter riscv32%,$(TARGET_ARCH)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/riscv/include
   CFLAGS += -DCONFIG_IDF_TARGET_ARCH_RISCV
