@@ -34,6 +34,14 @@ CFLAGS += -Wno-enum-compare
 # those are false positives.
 CFLAGS += -Wno-cast-align
 
+# TODO: required to be able to compile with GCC 12.1, remove them after upgrade to ESP-IDF 5.1
+CFLAGS += -Wno-attributes
+CFLAGS += -Wno-enum-conversion
+CFLAGS += -Wno-error=format=
+CFLAGS += -Wno-format
+CFLAGS += -Wno-use-after-free
+CFLAGS += -Wno-incompatible-pointer-types
+
 # additional CFLAGS required for RISC-V architecture
 ifneq (,$(filter riscv32%,$(TARGET_ARCH)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/riscv/include
