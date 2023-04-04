@@ -485,6 +485,7 @@ The shell script `$RIOTBASE/dist/tools/esptools/install.sh` is used to
 install Espressif's precompiled versions of the following tools:
 
 - ESP32 vendor toolchain (for ESP32, ESP32-S2, ESP32-S3 and ESP32-C3)
+- GDB for ESP32x SoCs based on Xtensa or RISC-V
 - OpenOCD for ESP32 (for ESP32, ESP32-S2, ESP32-S3 and ESP32-C3)
 - QEMU for ESP32 (only for ESP32)
 
@@ -494,8 +495,10 @@ script takes an argument that specifies which tools to download and install:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $ dist/tools/esptools/install.sh
 
-install.sh <tool>
-tool = all | esp32 | esp32c3 | esp32s2 | esp32s3 | openocd | qemu
+Usage: install.sh <tool>
+       install.sh gdb <platform>
+<tool> = all | esp32 | esp32c3 | esp32s2 | esp32s3 | gdb | openocd | qemu
+<platform> = xtensa | riscv
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Thus, either all tools or only certain tools can be installed.
@@ -522,7 +525,9 @@ paths of the installed tools using again the environment variable
 $ . dist/tools/esptools/export.sh
 
 Usage: export.sh <tool>
-tool = all | esp32 | esp32c3 | esp32s2 | esp32s3 | openocd | qemu
+       export.sh gdb <platform>
+<tool> = all | esp32 | esp32c3 | esp32s2 | esp32s3 | gdb | openocd | qemu
+<platform> = xtensa | riscv
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 All the tools required for building a RIOT application for ESP32x SoCs should then
