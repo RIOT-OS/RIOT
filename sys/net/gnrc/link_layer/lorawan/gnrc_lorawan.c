@@ -525,7 +525,9 @@ static gnrc_lorawan_fsm_status_t _state_mac_state_tx(gnrc_lorawan_t *mac, gnrc_l
 
 static void _process_rx_done(gnrc_lorawan_t *mac)
 {
-    _sleep_radio(mac);
+    if (!IS_ACTIVE(CONFIG_GNRC_LORAWAN_CLASS_C)) {
+        _sleep_radio(mac);
+    }
     uint8_t *psdu = mac->psdu->iol_base;
     uint8_t size = mac->psdu->iol_len;
     uint8_t mtype = (*(psdu) & MTYPE_MASK) >> 5;
@@ -558,6 +560,7 @@ static gnrc_lorawan_fsm_status_t _state_rx_window(gnrc_lorawan_t *mac, gnrc_lora
                                      true);
             }
             else {
+                assert(!IS_ACTIVE(CONFIG_GNRC_LORAWAN_CLASS_C));
                 _configure_rx_window(mac, CONFIG_LORAMAC_DEFAULT_RX2_FREQ,
                                  mac->dl_settings &
                                  GNRC_LORAWAN_DL_RX2_DR_MASK,
@@ -571,8 +574,10 @@ static gnrc_lorawan_fsm_status_t _state_rx_window(gnrc_lorawan_t *mac, gnrc_lora
             mac->rx_state = GNRC_LORAWAN_RXW_2;
             return GNRC_LORAWAN_FSM_HANDLED;
         case GNRC_LORAWAN_EV_RX_TO:
-            if (mac->rx_state == GNRC_LORAWAN_RXW_2) {
+            if (IS_ACTIVE(CONFIG_GNRC_LORAWAN_CLASS_C)
+                || mac->rx_state == GNRC_LORAWAN_RXW_2) {
                 /* In class A the device will go to Idle at the end of RX2 */
+                /* In class C the device goes as soon as possible to Idle */
                 return _state_transition(&mac->phy_fsm, _state_idle);
             }
             else if (mac->rx_state == GNRC_LORAWAN_RXW_1) {
@@ -580,11 +585,14 @@ static gnrc_lorawan_fsm_status_t _state_rx_window(gnrc_lorawan_t *mac, gnrc_lora
                 uint16_t now = ztimer_now(ZTIMER_MSEC);
                 uint16_t delta = (uint16_t) (now - mac->rxw_ts);
                 assert(delta <= MS_PER_SEC);
-                event_timeout_set(&mac->evt, MS_PER_SEC - delta);
+                if (!IS_ACTIVE(CONFIG_GNRC_LORAWAN_CLASS_C)) {
+                    event_timeout_set(&mac->evt, MS_PER_SEC - delta);
+                }
                 return _state_transition(&mac->phy_fsm, _state_wait_rx_window);
             }
             break;
         case GNRC_LORAWAN_EV_TO:
+            assert(!IS_ACTIVE(CONFIG_GNRC_LORAWAN_CLASS_C));
             /* This occurs when the packet is longer than the RX window duration.
              * We set a maximum timeout in case the device does not trigger RX_DONE
              */
@@ -624,12 +632,24 @@ static gnrc_lorawan_fsm_status_t _state_wait_rx_window(gnrc_lorawan_t *mac, gnrc
                 event_timeout_set(&mac->evt, rx_1 * MS_PER_SEC);
             }
 
-            _sleep_radio(mac);
+            if (IS_ACTIVE(CONFIG_GNRC_LORAWAN_CLASS_C) && mac->mlme.activation != MLME_ACTIVATION_NONE) {
+                /* Open RX Window */
+                _configure_rx_window(mac, CONFIG_LORAMAC_DEFAULT_RX2_FREQ,
+                                 mac->dl_settings &
+                                 GNRC_LORAWAN_DL_RX2_DR_MASK, false);
+                netopt_state_t state = NETOPT_STATE_RX;
+                dev->driver->set(dev, NETOPT_STATE, &state, sizeof(state));
+            }
+            else {
+                _sleep_radio(mac);
+            }
             return GNRC_LORAWAN_FSM_HANDLED;
 
         case GNRC_LORAWAN_EV_RX_ERROR:
+            assert(IS_ACTIVE(CONFIG_GNRC_LORAWAN_CLASS_C));
             return GNRC_LORAWAN_FSM_IGNORED;
         case GNRC_LORAWAN_EV_RX_DONE:
+            assert(IS_ACTIVE(CONFIG_GNRC_LORAWAN_CLASS_C));
             _process_rx_done(mac);
             return GNRC_LORAWAN_FSM_HANDLED;
             break;
@@ -678,7 +698,16 @@ static gnrc_lorawan_fsm_status_t _state_tx(gnrc_lorawan_t *mac, gnrc_lorawan_eve
 static void _set_idle(gnrc_lorawan_t *mac)
 {
     netdev_t *dev = gnrc_lorawan_get_netdev(mac);
-    _sleep_radio(mac);
+    if (IS_ACTIVE(CONFIG_GNRC_LORAWAN_CLASS_C) && mac->mlme.activation != MLME_ACTIVATION_NONE) {
+        _configure_rx_window(mac, CONFIG_LORAMAC_DEFAULT_RX2_FREQ,
+                         mac->dl_settings &
+                         GNRC_LORAWAN_DL_RX2_DR_MASK, false);
+        netopt_state_t state = NETOPT_STATE_RX;
+        dev->driver->set(dev, NETOPT_STATE, &state, sizeof(state));
+    }
+    else {
+        _sleep_radio(mac);
+    }
 }
 
 static gnrc_lorawan_fsm_status_t _state_idle(gnrc_lorawan_t *mac, gnrc_lorawan_event_t ev)
@@ -695,9 +724,11 @@ static gnrc_lorawan_fsm_status_t _state_idle(gnrc_lorawan_t *mac, gnrc_lorawan_e
         }
         break;
         case GNRC_LORAWAN_EV_RX_ERROR:
+            assert(IS_ACTIVE(CONFIG_GNRC_LORAWAN_CLASS_C));
             _set_idle(mac);
             return GNRC_LORAWAN_FSM_HANDLED;
         case GNRC_LORAWAN_EV_RX_DONE:
+            assert(IS_ACTIVE(CONFIG_GNRC_LORAWAN_CLASS_C));
             _process_rx_done(mac);
             _set_idle(mac);
             return GNRC_LORAWAN_FSM_HANDLED;
