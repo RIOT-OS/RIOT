@@ -38,6 +38,7 @@ RingbufHandle_t xRingbufferCreate(size_t xBufferSize, RingbufferType_t xBufferTy
         return NULL;
     }
     handle->item_size = 0;
+    handle->buf = NULL;
     ringbuffer_init((ringbuffer_t *)handle, handle->buf, xBufferSize);
 
     return handle;
