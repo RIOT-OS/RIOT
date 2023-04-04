@@ -85,6 +85,9 @@ ifndef CONFIG_KCONFIG_USEMODULE_LORAWAN
 
   # Set region
   CFLAGS += -DCONFIG_LORAMAC_REGION_EU_868
+
+  # Uncomment to enable class C
+  # CFLAGS += -DCONFIG_GNRC_LORAWAN_CLASS_C
 endif
 
 # We can reduce the size of the packet buffer for LoRaWAN, since there's no IP
