@@ -104,6 +104,7 @@ config MODULE_ESP_COMMON
     select MODULE_PERIPH
     select MODULE_ESP_IDF
     select MODULE_CORE_THREAD_FLAGS if MODULE_ZTIMER_MSEC
+    select MODULE_LITTLEFS2 if MODULE_VFS_DEFAULT
     help
       Common code module for ESP SoCs.
 

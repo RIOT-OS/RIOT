@@ -22,3 +22,6 @@ config BOARD_MSBA2
     select HAVE_LTC4150
     select HAVE_SHT11
     select HAVE_MTD_SPI_MCI
+
+    select MODULE_FATFS_VFS if MODULE_VFS_DEFAULT
+    select MODULE_MTD if MODULE_VFS_DEFAULT

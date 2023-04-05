@@ -27,6 +27,7 @@ config BOARD_SIPEED_LONGAN_NANO
 
     select HAVE_MTD_SDCARD_DEFAULT
     select MODULE_FATFS_VFS if MODULE_VFS_DEFAULT
+    select MODULE_MTD if MODULE_VFS_DEFAULT
     select PACKAGE_TINYUSB if TEST_KCONFIG
 
 menu "Sipeed Longan Nano Board Configuration"
