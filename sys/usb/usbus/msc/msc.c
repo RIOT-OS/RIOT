@@ -384,7 +384,6 @@ static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
         }
         /* Return the number of MTD devices available on the board */
         usbus_control_slicer_put_bytes(usbus, &data, sizeof(data));
-        usbus_control_slicer_ready(usbus);
         break;
     case USB_MSC_SETUP_REQ_BOMSR:
         DEBUG_PUTS("[msc]: TODO: implement reset setup request");
