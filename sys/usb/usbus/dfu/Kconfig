@@ -9,10 +9,14 @@ menuconfig KCONFIG_USEMODULE_USBUS_DFU
     bool "Configure USBUS DFU"
     depends on USEMODULE_USBUS_DFU
     depends on KCONFIG_USEMODULE_USBUS
+
+menuconfig MODULE_USBUS_DFU
+    bool "Configure USBUS DFU"
+    depends on MODULE_USBUS
     help
         Configure the USBUS DFU module via Kconfig.
 
-if KCONFIG_USEMODULE_USBUS_DFU
+if KCONFIG_USEMODULE_USBUS_DFU || MODULE_USBUS_DFU
 
 config USB_DFU_DETACH_TIMEOUT_MS
     int
@@ -33,4 +37,4 @@ config RIOTBOOT_MAGIC_ADDR
     int "DFU magic address"
     depends on CUSTOM_RIOTBOOT_MAGIC_ADDR
 
-endif # KCONFIG_USEMODULE_USBUS_DFU
+endif # KCONFIG_USEMODULE_USBUS_DFU || MODULE_USBUS_DFU
