@@ -49,12 +49,6 @@ config MODULE_STDIO_ETHOS
     select MODULE_ETHOS_STDIO
     select USE_STDOUT_BUFFERED
 
-config MODULE_STDIO_USB_SERIAL_JTAG
-    bool "STDIO via ESP32 Debug USB Serial/JTAG interface"
-    depends on TEST_KCONFIG
-    depends on CPU_FAM_ESP32C3 || CPU_FAM_ESP32S3
-    select MODULE_TSRB
-
 endchoice
 
 config MODULE_STDIN
