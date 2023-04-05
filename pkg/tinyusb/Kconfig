@@ -15,6 +15,20 @@ config HAS_TINYUSB_HOST
     help
         Indicates that the hardware supports tinyUSB host stack
 
+config REQUIRES_TINYUSB_DEVICE
+    bool
+    help
+        Indicates that the application requires tinyUSB stack
+
+config ERROR_TINYUSB_DEVICE
+    bool
+    default y if REQUIRES_TINYUSB_DEVICE && !MODULE_TINYUSB_DEVICE
+    help
+        The USB implmentation is required to be tinyUSB but cannot be set
+
+choice USB_IMPLEMENTATION
+    default PACKAGE_TINYUSB if REQUIRES_TINYUSB_DEVICE
+
 menuconfig PACKAGE_TINYUSB
     bool "TinyUSB stack package"
     depends on TEST_KCONFIG
@@ -117,6 +131,7 @@ config MODULE_TINYUSB_HW
 config MODULE_TINYUSB_DEVICE
     bool "Device Stack"
     depends on HAS_TINYUSB_DEVICE
+    select MODULE_TINYUSB_CLASS_CDC if REQUIRES_USB_STDIO
     default y
     help
         Select to enable tinyUSB device stack
@@ -241,5 +256,7 @@ config MODULE_RIOTBOOT_TINYUSB_DFU
 
 endif # MODULE_TINYUSB_DEVICE
 endif # PACKAGE_TINYUSB
+
+endchoice
 
 rsource "cdc_acm_stdio/Kconfig"
