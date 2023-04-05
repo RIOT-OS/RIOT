@@ -207,6 +207,13 @@ CFLAGS += -D_CONST=const
 # TODO no relaxation yet
 ifneq (,$(filter riscv%,$(TARGET_ARCH)))
   CFLAGS += -mno-relax -march=rv32imc -mabi=ilp32 -DRISCV_NO_RELAX
+  GCC_NEW_RISCV_ISA ?= $(shell echo "typedef int dont_be_pedantic;" | \
+                               $(TARGET_ARCH)-gcc -march=rv32imac -mabi=ilp32 \
+                                                  -misa-spec=2.2 -E - > /dev/null 2>&1 && \
+                               echo 1 || echo 0)
+  ifeq (1,$(GCC_NEW_RISCV_ISA))
+    CFLAGS += -misa-spec=2.2
+  endif
 endif
 
 ifneq (,$(filter xtensa%,$(TARGET_ARCH)))
@@ -242,6 +249,12 @@ else
 endif
 
 LINKFLAGS += -nostdlib -lgcc -Wl,-gc-sections
+
+# all ESP32x SoCs have to load executable code into IRAM
+# warning 'LOAD segment with RWX permissions' has to be disabled therefore
+ifeq (1,$(GCC_NEW_RISCV_ISA))
+  LINKFLAGS += -Wl,--no-warn-rwx-segments
+endif
 
 # Libraries needed when using esp_wifi_any pseudomodule
 ifneq (,$(filter esp_wifi_any,$(USEMODULE)))

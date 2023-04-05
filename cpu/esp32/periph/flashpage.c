@@ -76,8 +76,8 @@ void IRAM_ATTR esp_flashpage_init(void)
                                  p_addr, 64, p_numof, 0);
     Cache_Resume_ICache(autoload);
 
-    DEBUG("%s DCache MMU set paddr=%08x vaddr=%08x size=%d n=%u\n", __func__,
-           p_addr, (uint32_t)&_fp_mem_start, CONFIG_ESP_FLASHPAGE_CAPACITY,
+    DEBUG("%s DCache MMU set paddr=%08"PRIx32" vaddr=%08"PRIx32" size=%d n=%"PRIu32"\n",
+           __func__, p_addr, (uint32_t)&_fp_mem_start, CONFIG_ESP_FLASHPAGE_CAPACITY,
            p_numof);
 
     if (res != ESP_OK) {
