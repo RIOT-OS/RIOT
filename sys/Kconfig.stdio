@@ -8,6 +8,15 @@
 menu "Standard Input/Output (STDIO)"
     depends on TEST_KCONFIG
 
+config FORCE_USB_STDIO
+    bool "Force a USB based STDIO"
+    depends on HAS_PERIPH_USBDEV || HAS_TINYUSB_DEVICE
+    select KCONFIG_USB
+    select REQUIRES_USB_STDIO
+    help
+        To prevent a circular dependency, can force the USB modules to that
+        STDIO will select some sort of USB based STDIO backend.
+
 choice STDIO_IMPLEMENTATION
     bool "STDIO implementation"
     default MODULE_STDIO_NATIVE if CPU_ARCH_NATIVE
@@ -84,5 +93,10 @@ config USE_STDOUT_BUFFERED
     bool
     help
         Select this to prefer buffered standard output if provided by the implementation.
+
+config REQUIRES_USB_STDIO
+    bool
+    help
+        Indicates that the STDIO requires some USB implementation to be enabled.
 
 endmenu # Standard Input/Output (STDIO)
