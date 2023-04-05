@@ -16,7 +16,7 @@
  * @{
  *
  * @file
- * @brief       IRQ implementation of the GPIO Low-Level API for STM32 (except F1)
+ * @brief       IRQ implementation of the GPIO Low-Level API for STM32
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
