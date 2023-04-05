@@ -149,9 +149,25 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, const gpio_conf_t *conf)
     }
 
     /* if output pin, try to set drive strength */
+    gpio_drive_cap_t strength;
+    switch (conf->drive_strength) {
+    case GPIO_DRIVE_WEAKEST:
+        strength = GPIO_DRIVE_CAP_0;
+        break;
+    case GPIO_DRIVE_WEAK:
+        strength = GPIO_DRIVE_CAP_1;
+        break;
+    case GPIO_DRIVE_STRONG:
+        strength = GPIO_DRIVE_CAP_2;
+        break;
+    case GPIO_DRIVE_STRONGEST:
+        strength = GPIO_DRIVE_CAP_3;
+        break;
+    default:
+        strength = GPIO_DRIVE_CAP_DEFAULT;
+    }
     if ((cfg.pin_bit_mask & SOC_GPIO_VALID_OUTPUT_GPIO_MASK) &&
-        (esp_idf_gpio_set_drive_capability(gpio,
-                                           conf->drive_strength) != ESP_OK)) {
+        (esp_idf_gpio_set_drive_capability(gpio, strength) != ESP_OK)) {
         return -ENOTSUP;
     }
 
