@@ -1,5 +1,7 @@
 include ../Makefile.tests_common
 
-USEMODULE += at24c256
+AT24CXXX_DEV ?= at24c256
+
+USEMODULE += $(AT24CXXX_DEV)
 
 include $(RIOTBASE)/Makefile.include
