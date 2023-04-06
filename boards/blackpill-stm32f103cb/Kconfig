@@ -17,6 +17,9 @@ config BOARD_BLACKPILL_STM32F103CB
 
     select HAS_HIGHLEVEL_STDIO
 
+config FORCE_USB_STDIO
+    default y
+
 # HACK: This is added due to the make resolution
 # make will select timer backend, probably due to the USBUS
 # and kconfig cannot select if something is already selected like make
