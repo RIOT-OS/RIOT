@@ -1333,8 +1333,9 @@ static int _usbdev_ep_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
         _in_regs(conf, ep->num)->DIEPTSIZ = dieptsiz;
 
         /* Intentionally enabling this before the FIFO is filled, unmasking the
-        * interrupts after the FIFO is filled doesn't always trigger the ISR */
-        /* TX FIFO empty interrupt is only used in non-dma mode */
+         * interrupts after the FIFO is filled doesn't always trigger the ISR */
+        /* TX FIFO empty interrupt is used for EP0..EPn in non-DMA mode and
+         * for EP0 for DMA mode */
         _device_regs(conf)->DAINTMSK |= 1 << ep->num;
         _device_regs(conf)->DIEPEMPMSK |= 1 << ep->num;
 
@@ -1447,18 +1448,22 @@ static void _usbdev_ep_esr(usbdev_ep_t *ep)
     if (ep->dir == USB_EP_DIR_IN) {
         uint32_t status = _in_regs(conf, ep->num)->DIEPINT;
 
-        /* XFRC interrupt is used for all endpoints when DMA is enabled */
-        if (status & USB_OTG_DIEPINT_XFRC && _uses_dma(conf)) {
+        /* XFRC interrupt is used for EP1..EPn in DMA mode but
+         * cleared in any case */
+        if (status & USB_OTG_DIEPINT_XFRC) {
             _in_regs(conf, ep->num)->DIEPINT = USB_OTG_DIEPINT_XFRC;
-            if (ep->num != 0) {
+            if (_uses_dma(conf) && (ep->num != 0)) {
                 usbdev->usbdev.epcb(ep, USBDEV_EVENT_TR_COMPLETE);
             }
         }
         else
-        /* TXFE empty interrupt is only used with DMA disabled */
+        /* TXFE interrupt is used for all EPs in non-DMA mode but only for EP0
+         * in DMA mode. It is disabled in any case. */
         if (status & USB_OTG_DIEPINT_TXFE) {
             _device_regs(conf)->DIEPEMPMSK &= ~(1 << ep->num);
-            usbdev->usbdev.epcb(ep, USBDEV_EVENT_TR_COMPLETE);
+            if (!_uses_dma(conf) || (ep->num == 0)) {
+                usbdev->usbdev.epcb(ep, USBDEV_EVENT_TR_COMPLETE);
+            }
         }
     }
     else {
