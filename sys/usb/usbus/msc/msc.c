@@ -31,8 +31,8 @@
 
 #include "mtd.h"
 
-static unsigned char _ep_out_buf[CONFIG_USBUS_EP0_SIZE];
-static unsigned char _ep_in_buf[CONFIG_USBUS_EP0_SIZE];
+static usbdev_ep_buf_t _ep_out_buf[USBUS_MSC_EP_DATA_SIZE];
+static usbdev_ep_buf_t _ep_in_buf[USBUS_MSC_EP_DATA_SIZE];
 
 /* Internal handler definitions */
 static void _event_handler(usbus_t *usbus, usbus_handler_t *handler,
@@ -120,7 +120,7 @@ static void _write_xfer(usbus_msc_device_t *msc)
         if (msc->state == DATA_TRANSFER_OUT) {
             msc->state = GEN_CSW;
             /* Data was processed, ready next transfer */
-            usbdev_ep_xmit(msc->ep_out->ep, msc->out_buf, CONFIG_USBUS_EP0_SIZE);
+            usbdev_ep_xmit(msc->ep_out->ep, msc->out_buf, USBUS_MSC_EP_DATA_SIZE);
             return;
         }
     }
@@ -243,11 +243,24 @@ int usbus_msc_add_lun(usbus_t *usbus, mtd_dev_t *dev)
                 /* If new registered MTD device need more memory than the
                    previous, realloc a new buffer */
                 if (block_size > msc->buffer_size) {
-                    msc->buffer = realloc(msc->buffer, block_size);
+                    if (IS_USED(MODULE_ESP32_SDK)) {
+                        /* ESP32x does not support posix_memalign */
+                        msc->buffer = realloc(msc->buffer, block_size);
+                    }
+                    else {
+                        free(msc->buffer);
+                        msc->buffer = aligned_alloc(USBDEV_CPU_DMA_ALIGNMENT, block_size);
+                    }
                 }
             } else {
                 /* No buffer allocated yet, so allocate one */
-                msc->buffer = malloc(block_size);
+                if (IS_USED(MODULE_ESP32_SDK)) {
+                    /* ESP32x does not support posix_memalign */
+                    msc->buffer = malloc(block_size);
+                }
+                else {
+                    msc->buffer = aligned_alloc(USBDEV_CPU_DMA_ALIGNMENT, block_size);
+                }
             }
 
             if (!msc->buffer) {
@@ -338,11 +351,11 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
 
     /* Create required endpoints */
     msc->ep_in = usbus_add_endpoint(usbus, &msc->iface, USB_EP_TYPE_BULK,
-                                    USB_EP_DIR_IN, CONFIG_USBUS_EP0_SIZE);
+                                    USB_EP_DIR_IN, USBUS_MSC_EP_DATA_SIZE);
     assert(msc->ep_in);
     msc->ep_in->interval = 0;
     msc->ep_out = usbus_add_endpoint(usbus, &msc->iface, USB_EP_TYPE_BULK,
-                                     USB_EP_DIR_OUT, CONFIG_USBUS_EP0_SIZE);
+                                     USB_EP_DIR_OUT, USBUS_MSC_EP_DATA_SIZE);
     assert(msc->ep_out);
     msc->ep_out->interval = 0;
 
@@ -382,7 +395,7 @@ static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
         /* Return the number of MTD devices available on the board */
         usbus_control_slicer_put_bytes(usbus, &data, sizeof(data));
         /* Prepare to receive first bytes from Host */
-        usbdev_ep_xmit(msc->ep_out->ep, msc->out_buf, CONFIG_USBUS_EP0_SIZE);
+        usbdev_ep_xmit(msc->ep_out->ep, msc->out_buf, USBUS_MSC_EP_DATA_SIZE);
         break;
     case USB_MSC_SETUP_REQ_BOMSR:
         DEBUG_PUTS("[msc]: TODO: implement reset setup request");
@@ -421,10 +434,11 @@ static void _transfer_handler(usbus_t *usbus, usbus_handler_t *handler,
             if (msc->state == DATA_TRANSFER_OUT) {
                 /* If the next pkt is supposed to be a WRITE10 transfer,
                    directly redirect content to appropriate buffer */
-                usbdev_ep_xmit(msc->ep_out->ep, &msc->buffer[msc->block_offset], 64);
+                usbdev_ep_xmit(msc->ep_out->ep, &msc->buffer[msc->block_offset],
+                               USBUS_MSC_EP_DATA_SIZE);
             }
             else {
-                usbdev_ep_xmit(ep, msc->out_buf, CONFIG_USBUS_EP0_SIZE);
+                usbdev_ep_xmit(ep, msc->out_buf, USBUS_MSC_EP_DATA_SIZE);
             }
         }
     }
