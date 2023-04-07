@@ -80,7 +80,7 @@
 #error "STM32 line is not supported"
 #endif
 
-/* UUSB IP local base address for the endpoints buffers in PMA SRAM */
+/* USB IP local base address for the endpoints buffers in PMA SRAM */
 #define _PMA_BUF_BASE_OFFSET    (_ENDPOINT_NUMOF * 8)
 
 /* List of instantiated USB peripherals */
@@ -400,16 +400,19 @@ static usbdev_ep_t *_get_ep(stm32_usbdev_fs_t *usbdev, unsigned num,
     return dir == USB_EP_DIR_IN ? &usbdev->in[num] : &usbdev->out[num];
 }
 
-static bool _ep_check(usbdev_ep_t* ep)
+static bool _ep_check(stm32_usbdev_fs_t *usbdev, unsigned idx,
+                      usb_ep_dir_t dir, usb_ep_type_t type)
 {
-    /* Check if endpoint already configured */
-    if (ep->dir == USB_EP_DIR_IN) {
-        if ((EP_REG(ep->num) & USB_EPTX_STAT) == USB_EP_TX_DIS) {
+    usbdev_ep_t* ep_in = &usbdev->in[idx];
+    usbdev_ep_t* ep_out = &usbdev->out[idx];
+
+    if (dir == USB_EP_DIR_IN) {
+        if (ep_out->type == type || ep_out->type == USB_EP_TYPE_NONE) {
             return true;
         }
     }
     else {
-        if ((EP_REG(ep->num) & USB_EPRX_STAT) == USB_EP_RX_DIS) {
+        if (ep_in->type == type || ep_in->type == USB_EP_TYPE_NONE) {
             return true;
         }
     }
@@ -471,10 +474,12 @@ static usbdev_ep_t *_usbdev_new_ep(usbdev_t *dev, usb_ep_type_t type,
         for (unsigned idx = 1; idx < _ENDPOINT_NUMOF && !new_ep; idx++) {
             usbdev_ep_t *ep = _get_ep(usbdev, idx, dir);
             /* Check if endpoint is available */
-            bool avail = _ep_check(ep);
-            if (ep->type == USB_EP_TYPE_NONE && avail) {
-                new_ep = ep;
-                new_ep->num = idx;
+            if (ep->type == USB_EP_TYPE_NONE) {
+                bool avail = _ep_check(usbdev, idx, dir, type);
+                if (avail) {
+                    new_ep = ep;
+                    new_ep->num = idx;
+                }
             }
         }
     }
