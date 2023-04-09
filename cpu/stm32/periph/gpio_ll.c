@@ -16,7 +16,7 @@
  * @{
  *
  * @file
- * @brief       GPIO Low-level API implementation for the STM32 GPIO peripheral (except F1)
+ * @brief       GPIO Low-level API implementation for the STM32 GPIO peripheral
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
@@ -69,7 +69,6 @@
 #  define GPIO_BUS      APB2
 #  define GPIOAEN       RCC_APB2ENR_IOPAEN
 #endif
-
 
 static void _init_clock(gpio_port_t port)
 {
