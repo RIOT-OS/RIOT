@@ -80,7 +80,7 @@
 #error "STM32 line is not supported"
 #endif
 
-/* UUSB IP local base address for the endpoints buffers in PMA SRAM */
+/* USB IP local base address for the endpoints buffers in PMA SRAM */
 #define _PMA_BUF_BASE_OFFSET    (_ENDPOINT_NUMOF * 8)
 
 /* List of instantiated USB peripherals */
@@ -131,6 +131,10 @@ typedef struct {
 #else
 #error "_PMA_ACCESS_SCHEME is not defined"
 #endif
+
+/* Bit mask containing all toggleable bits in a EP_REG(x) register */
+#define _EP_REG_TOGGLE_ONLY_BITS_MASK (USB_EP_DTOG_TX | USB_EP_DTOG_RX | \
+                                       USB_EPTX_STAT  | USB_EPRX_STAT  )
 
 #define EP_DESC ((ep_buf_desc_t*)USB1_PMAADDR)
 #define EP_REG(x) (*((volatile uint32_t*) (((uintptr_t)(USB)) + (4*x))))
@@ -313,8 +317,9 @@ void USBDEV_ISR(void) {
         unsigned epnum = irq_status & 0x000F;
         usbdev_ep_t *ep = (irq_status & USB_ISTR_DIR) ? &_ep_out[epnum] : &_ep_in[epnum];
         /* get type and add endpoint address */
-        uint16_t reg = _type_to_reg(ep->type) | ep->num;
-
+        uint16_t reg = (_type_to_reg(ep->type) | ep->num);
+        /* Avoid toggling by mistake these bits */
+        CLRBIT(reg, (_EP_REG_TOGGLE_ONLY_BITS_MASK));
         if (irq_status & USB_ISTR_DIR) {
             /* Clear RX CTR by writing 0, avoid clear TX CTR so leave it to one */
             EP_REG(epnum) = reg | USB_EP_CTR_TX;
@@ -400,16 +405,19 @@ static usbdev_ep_t *_get_ep(stm32_usbdev_fs_t *usbdev, unsigned num,
     return dir == USB_EP_DIR_IN ? &usbdev->in[num] : &usbdev->out[num];
 }
 
-static bool _ep_check(usbdev_ep_t* ep)
+static bool _ep_check(stm32_usbdev_fs_t *usbdev, unsigned idx,
+                      usb_ep_dir_t dir, usb_ep_type_t type)
 {
-    /* Check if endpoint already configured */
-    if (ep->dir == USB_EP_DIR_IN) {
-        if ((EP_REG(ep->num) & USB_EPTX_STAT) == USB_EP_TX_DIS) {
+    usbdev_ep_t* ep_in = &usbdev->in[idx];
+    usbdev_ep_t* ep_out = &usbdev->out[idx];
+
+    if (dir == USB_EP_DIR_IN) {
+        if (ep_out->type == type || ep_out->type == USB_EP_TYPE_NONE) {
             return true;
         }
     }
     else {
-        if ((EP_REG(ep->num) & USB_EPRX_STAT) == USB_EP_RX_DIS) {
+        if (ep_in->type == type || ep_in->type == USB_EP_TYPE_NONE) {
             return true;
         }
     }
@@ -419,8 +427,10 @@ static bool _ep_check(usbdev_ep_t* ep)
 static void _ep_enable(usbdev_ep_t *ep)
 {
     uint16_t reg = EP_REG(ep->num);
-    /* Avoid modification of the following registers */
+    /* Avoid modification of the following bits in the register as writing
+       1 has no effect on these bits */
     SETBIT(reg, USB_EP_CTR_RX | USB_EP_CTR_TX);
+    CLRBIT(reg, USB_EP_DTOG_RX | USB_EP_DTOG_TX);
     if (ep->dir == USB_EP_DIR_OUT) {
         _set_ep_out_status(&reg, USB_EP_RX_NAK);
         /* Avoid toggling the other direction */
@@ -438,7 +448,8 @@ static void _ep_enable(usbdev_ep_t *ep)
 static void _ep_disable(usbdev_ep_t *ep)
 {
     uint16_t reg = EP_REG(ep->num);
-    /* Avoid modification of the following registers */
+    /* Avoid modification of the following bits in the register as writing
+       1 has no effect on these bits */
     SETBIT(reg, USB_EP_CTR_RX | USB_EP_CTR_TX);
 
     if (ep->dir == USB_EP_DIR_OUT) {
@@ -471,10 +482,12 @@ static usbdev_ep_t *_usbdev_new_ep(usbdev_t *dev, usb_ep_type_t type,
         for (unsigned idx = 1; idx < _ENDPOINT_NUMOF && !new_ep; idx++) {
             usbdev_ep_t *ep = _get_ep(usbdev, idx, dir);
             /* Check if endpoint is available */
-            bool avail = _ep_check(ep);
-            if (ep->type == USB_EP_TYPE_NONE && avail) {
-                new_ep = ep;
-                new_ep->num = idx;
+            if (ep->type == USB_EP_TYPE_NONE) {
+                bool avail = _ep_check(usbdev, idx, dir, type);
+                if (avail) {
+                    new_ep = ep;
+                    new_ep->num = idx;
+                }
             }
         }
     }
@@ -575,16 +588,17 @@ static void _usbdev_esr(usbdev_t *dev)
 
 static void _usbdev_ep_init(usbdev_ep_t *ep)
 {
+    uint16_t reg = EP_REG(ep->num);
     /* Set endpoint type */
-    uint16_t reg  = _type_to_reg(ep->type);
-    /* Keep previous state if already set */
-    reg |= EP_REG(ep->num) & (USB_EPTX_STAT | USB_EPRX_STAT);
-    _set_ep_out_status(&reg, USB_EP_RX_VALID);
+    reg &= ~(USB_EP_TYPE_MASK);
+    reg |= _type_to_reg(ep->type);
+    /* Keep the state ouf the other endpoint direction if already sets */
+    CLRBIT(reg, _EP_REG_TOGGLE_ONLY_BITS_MASK);
     /* Assign EP address */
     reg |= (ep->num & 0x000F);
     /* Ensure interrupts are cleared */
-    reg |= USB_EP_CTR_RX | USB_EP_CTR_TX;
-
+    reg &= ~(USB_EP_CTR_RX | USB_EP_CTR_TX);
+    /* Write the configuration to the register */
     EP_REG(ep->num) = reg;
     if (ep->dir == USB_EP_DIR_IN) {
         EP_DESC[ep->num].addr_tx = _ep_in_buf[ep->num];
@@ -648,7 +662,8 @@ static int _usbdev_ep_get(usbdev_ep_t *ep, usbopt_ep_t opt,
 static void _ep_set_stall(usbdev_ep_t *ep, usbopt_enable_t enable)
 {
     uint16_t reg = EP_REG(ep->num);
-    /* Avoid modification of the following registers */
+    /* Avoid modification of the following bits in the register as writing
+       1 has no effect on these bits */
     SETBIT(reg, USB_EP_CTR_RX | USB_EP_CTR_TX);
 
     if (ep->dir == USB_EP_DIR_IN) {
@@ -737,11 +752,12 @@ static int _usbdev_ep_xmit(usbdev_ep_t *ep, uint8_t* buf, size_t len)
 {
     unsigned irq = irq_disable();
     uint16_t reg = EP_REG(ep->num);
-    /* Avoid modification of the following registers */
+    /* Avoid modification of the following bits in the register as writing
+       1 has no effect on these bits */
     SETBIT(reg, USB_EP_CTR_RX | USB_EP_CTR_TX);
     if (ep->dir == USB_EP_DIR_OUT) {
         _set_ep_out_status(&reg, USB_EP_RX_VALID);
-        _set_ep_in_status(&reg, USB_EP_TX_NAK);
+        CLRBIT(reg, USB_EPTX_STAT);
         if (len == 0) {
             len = ep->len;
         }
@@ -756,8 +772,7 @@ static int _usbdev_ep_xmit(usbdev_ep_t *ep, uint8_t* buf, size_t len)
         _app_pbuf[ep->num] = buf;
     } else {
         _set_ep_in_status(&reg, USB_EP_TX_VALID);
-        _set_ep_out_status(&reg, USB_EP_RX_VALID);
-
+        CLRBIT(reg, USB_EPRX_STAT);
         /* Transfer IN buffer content to USB PMA SRAM */
         uint16_t* pma_ptr = (uint16_t *)(USB1_PMAADDR +
                                          (EP_DESC[ep->num].addr_tx * _PMA_ACCESS_STEP_SIZE));
