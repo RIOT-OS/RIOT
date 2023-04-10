@@ -476,6 +476,9 @@ void dma_start(dma_t dma)
 {
     STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
 
+    /* Ensure mutex is always locked when starting stream */
+    mutex_trylock(&dma_ctx[dma].sync_lock);
+
     stream->CONTROL_REG |= DMA_EN;
 }
 
