@@ -69,6 +69,7 @@ typedef enum {
     DMA_MEM_TO_MEM = 2,        /**< Memory to memory */
 } dma_mode_t;
 
+typedef void (*dma_callback_t)(dma_t dma, void *arg);
 /**
  * @brief   DMA channel/trigger configuration for DMA peripherals without
  *          channel/trigger filtering such as the stm32f1 and stm32f3.
@@ -193,6 +194,17 @@ void dma_wait(dma_t dma);
  */
 int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *dst, size_t len,
                   dma_mode_t mode, uint8_t flags);
+
+/**
+ * @brief Set a callback to be called for every completed transfer
+ *
+ * Callback is deconfigured upon a @ref dma_release of the stream
+ *
+ * @param[in]  dma      logical DMA stream
+ * @param[in]  callback function to call after transfers
+ * @param[in]  arg      argument to pass along with the function
+ */
+void dma_set_callback(dma_t dma, dma_callback_t callback, void *arg);
 
 /**
  * @brief   Low level initial DMA stream configuration

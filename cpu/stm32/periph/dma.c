@@ -97,6 +97,11 @@ struct dma_ctx {
 
 static struct dma_ctx dma_ctx[DMA_NUMOF];
 
+#ifdef MODULE_PERIPH_DMA_CALLBACK
+static dma_callback_t callbacks[DMA_NUMOF];
+static void *args[DMA_NUMOF];
+#endif
+
 /**
  * @brief   Get DMA base register
  *
@@ -358,6 +363,10 @@ void dma_release(dma_t dma)
     /* unblock STOP mode */
     pm_unblock(STM32_PM_STOP);
 #endif
+#ifdef MODULE_PERIPH_DMA_CALLBACK
+    callbacks[dma] = NULL;
+    args[dma] = NULL;
+#endif
     mutex_unlock(&dma_ctx[dma].conf_lock);
 }
 
@@ -415,6 +424,14 @@ void dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem)
     stream->NDTR_REG = len;
     dma_ctx[dma].len = len;
 }
+
+#ifdef MODULE_PERIPH_DMA_CALLBACK
+void dma_set_callback(dma_t dma, dma_callback_t callback, void *arg)
+{
+    callbacks[dma] = callback;
+    args[dma] = arg;
+}
+#endif
 
 int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *dst, size_t len,
                   dma_mode_t mode, uint8_t flags)
@@ -535,6 +552,11 @@ void dma_isr_handler(dma_t dma)
     dma_clear_all_flags(dma);
 
     mutex_unlock(&dma_ctx[dma].sync_lock);
+#ifdef MODULE_PERIPH_DMA_CALLBACK
+    if (callbacks[dma]) {
+        callbacks[dma](dma, args[dma]);
+    }
+#endif
 
     cortexm_isr_end();
 }
