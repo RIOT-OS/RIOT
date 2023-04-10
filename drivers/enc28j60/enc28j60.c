@@ -249,9 +249,6 @@ static void mac_set(enc28j60_t *dev, uint8_t *mac)
 
 static void on_int(void *arg)
 {
-    /* disable global interrupt enable bit to avoid losing interrupts */
-    cmd_bfc((enc28j60_t *)arg, REG_EIE, -1, EIE_INTIE);
-
     netdev_trigger_event_isr(arg);
 }
 
@@ -453,6 +450,8 @@ static int nd_init(netdev_t *netdev)
 static void nd_isr(netdev_t *netdev)
 {
     enc28j60_t *dev = (enc28j60_t *)netdev;
+    /* disable global interrupt enable bit to avoid losing interrupts */
+    cmd_bfc(dev, REG_EIE, -1, EIE_INTIE);
     uint8_t eir = cmd_rcr(dev, REG_EIR, -1);
 
     while (eir != 0) {
