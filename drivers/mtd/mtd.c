@@ -28,6 +28,10 @@
 
 #include "bitarithm.h"
 #include "mtd.h"
+#include "xfa.h"
+
+/* Automatic MTD handling */
+XFA_INIT_CONST(mtd_dev_t *, mtd_dev_xfa);
 
 static bool out_of_bounds(mtd_dev_t *mtd, uint32_t page, uint32_t offset, uint32_t len)
 {
