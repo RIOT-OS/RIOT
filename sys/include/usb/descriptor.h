@@ -59,6 +59,15 @@ extern "C" {
 /** @} */
 
 /**
+ * @name USB standard feature selectors
+ * @{
+ */
+#define USB_FEATURE_ENDPOINT_HALT           0x00    /**< Endpoint halt        */
+#define USB_FEATURE_DEVICE_REMOTE_WAKEUP    0x01    /**< Device remote wakeup */
+#define USB_FEATURE_TEST_MODE               0x02    /**< Test mode feature    */
+/** @} */
+
+/**
  * @name USB configuration attributes
  * @anchor USB_CONF_ATTR
  * @{

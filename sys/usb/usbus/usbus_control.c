@@ -105,11 +105,37 @@ static usbus_string_t *_get_descriptor(usbus_t *usbus, uint16_t idx)
 
 static int _req_status(usbus_t *usbus)
 {
-    uint8_t status[2];
-
-    memset(status, 0, sizeof(status));
-    usbus_control_slicer_put_bytes(usbus, status, sizeof(status));
+    /* Signal self powered */
+    uint16_t status = (CONFIG_USB_SELF_POWERED) ? 1 : 0;
+    usbus_control_slicer_put_bytes(usbus, (uint8_t*)&status, sizeof(status));
     return sizeof(status);
+}
+
+static int _req_iface_status(usbus_t *usbus)
+{
+    uint16_t status = 0; /* always zero */
+    usbus_control_slicer_put_bytes(usbus, (uint8_t*)&status, sizeof(status));
+    return sizeof(status);
+}
+
+static int _req_endpoint_status(usbus_t *usbus, usbus_endpoint_t *ep)
+{
+    uint16_t status = ep->halted ? 1 : 0;
+    usbus_control_slicer_put_bytes(usbus, (uint8_t*)&status, sizeof(status));
+    return sizeof(status);
+}
+
+static int _req_endpoint_feature(usbus_endpoint_t *ep, uint16_t feature, bool enable)
+{
+    switch (feature) {
+        case USB_FEATURE_ENDPOINT_HALT:
+            enable ? usbus_endpoint_halt(ep) : usbus_endpoint_clear_halt(ep);
+            break;
+        default:
+            DEBUG("usbus: unknown endpoint feature request: %u\n", feature);
+            return -1;
+    }
+    return 1;
 }
 
 static int _req_str(usbus_t *usbus, uint16_t idx)
@@ -238,6 +264,11 @@ static int _recv_interface_setup(usbus_t *usbus, usb_setup_t *pkt)
         (usbus_control_handler_t *)usbus->control;
     uint16_t destination = pkt->index & 0x0f;
 
+    /* Globally handle the iface get status request */
+    if (pkt->request == USB_SETUP_REQ_GET_STATUS) {
+        return _req_iface_status(usbus);
+    }
+
     /* Find interface handler */
     for (usbus_interface_t *iface = usbus->iface; iface; iface = iface->next) {
         if (destination == iface->idx &&
@@ -249,6 +280,26 @@ static int _recv_interface_setup(usbus_t *usbus, usb_setup_t *pkt)
         }
     }
     return -1;
+}
+
+static int _recv_endpoint_setup(usbus_t *usbus, usb_setup_t *pkt)
+{
+    uint8_t destination = pkt->index & 0x0f;
+    bool in = pkt->index & (1 << 7); /* Bit seven is 1 for IN, 0 for OUT */
+    usbus_endpoint_t *ep = in ? &usbus->ep_in[destination] :
+                                &usbus->ep_out[destination];
+
+    switch (pkt->request) {
+        case USB_SETUP_REQ_GET_STATUS:
+            return _req_endpoint_status(usbus, ep);
+        case USB_SETUP_REQ_SET_FEATURE:
+            return _req_endpoint_feature(ep, pkt->value, true);
+        case USB_SETUP_REQ_CLEAR_FEATURE:
+            return _req_endpoint_feature(ep, pkt->value, false);
+        default:
+            DEBUG("usbus: Unknown endpoint request %u\n", pkt->request);
+            return -1;
+    }
 }
 
 static void _recv_setup(usbus_t *usbus, usbus_control_handler_t *handler)
@@ -271,6 +322,9 @@ static void _recv_setup(usbus_t *usbus, usbus_control_handler_t *handler)
                 break;
             case USB_SETUP_REQUEST_RECIPIENT_INTERFACE:
                 res = _recv_interface_setup(usbus, pkt);
+                break;
+            case USB_SETUP_REQUEST_RECIPIENT_ENDPOINT:
+                res = _recv_endpoint_setup(usbus, pkt);
                 break;
             default:
                 DEBUG("usbus_control: Unhandled setup request\n");
