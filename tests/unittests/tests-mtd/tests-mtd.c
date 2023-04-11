@@ -29,6 +29,9 @@
 #ifdef MTD_0
 #define dev (MTD_0)
 #else
+
+#include "mtd_emulated.h"
+
 /* Test mock object implementing a simple RAM-based mtd */
 #ifndef SECTOR_COUNT
 #define SECTOR_COUNT 4
@@ -39,89 +42,10 @@
 #ifndef PAGE_SIZE
 #define PAGE_SIZE 128
 #endif
-#ifndef WRITE_SIZE
-#define WRITE_SIZE 1
-#endif
 
-static uint8_t dummy_memory[PAGE_PER_SECTOR * PAGE_SIZE * SECTOR_COUNT];
+MTD_EMULATED_DEV(0, SECTOR_COUNT, PAGE_PER_SECTOR, PAGE_SIZE);
 
-static int _init(mtd_dev_t *dev)
-{
-    (void)dev;
-
-    memset(dummy_memory, 0xff, sizeof(dummy_memory));
-    return 0;
-}
-
-static int _read(mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size)
-{
-    (void)dev;
-
-    if (addr + size > sizeof(dummy_memory)) {
-        return -EOVERFLOW;
-    }
-    memcpy(buff, dummy_memory + addr, size);
-
-    return 0;
-}
-
-static int _write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size)
-{
-    (void)dev;
-
-    if (addr + size > sizeof(dummy_memory)) {
-        return -EOVERFLOW;
-    }
-    if (((addr % PAGE_SIZE) + size) > PAGE_SIZE) {
-        return -EOVERFLOW;
-    }
-    memcpy(dummy_memory + addr, buff, size);
-
-    return 0;
-}
-
-static int _erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)
-{
-    (void)dev;
-
-    if (size % (PAGE_PER_SECTOR * PAGE_SIZE) != 0) {
-        return -EOVERFLOW;
-    }
-    if (addr % (PAGE_PER_SECTOR * PAGE_SIZE) != 0) {
-        return -EOVERFLOW;
-    }
-    if (addr + size > sizeof(dummy_memory)) {
-        return -EOVERFLOW;
-    }
-    memset(dummy_memory + addr, 0xff, size);
-
-    return 0;
-}
-
-static int _power(mtd_dev_t *dev, enum mtd_power_state power)
-{
-    (void)dev;
-    (void)power;
-    return 0;
-}
-
-static const mtd_desc_t driver = {
-    .init = _init,
-    .read = _read,
-    .write = _write,
-    .erase = _erase,
-    .power = _power,
-};
-
-static mtd_dev_t _dev = {
-    .driver = &driver,
-    .sector_count = SECTOR_COUNT,
-    .pages_per_sector = PAGE_PER_SECTOR,
-    .page_size = PAGE_SIZE,
-    .write_size = WRITE_SIZE,
-};
-
-static mtd_dev_t *dev = (mtd_dev_t*) &_dev;
+#define dev (&mtd_emulated_dev0.base)
 
 #endif /* MTD_0 */
 
