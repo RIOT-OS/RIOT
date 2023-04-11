@@ -217,11 +217,31 @@ void dma_set_callback(dma_t dma, dma_callback_t callback, void *arg);
  * @param[in]   chan        DMA channel (on stm32f2/4/7, CxS or unused on others)
  * @param[in]   periph_addr Peripheral register address
  * @param[in]   mode        DMA direction mode
+ * @param[in]   mwidth      DMA transfer memory width (one of DMA_DATA_WIDTH_*)
+ * @param[in]   pwidth      DMA transfer peripheral width (one of DMA_DATA_WIDTH_*)
+ * @param[in]   inc_periph  Increment peripheral address after read/write
+ */
+void dma_setup_full(dma_t dma, int chan, void *periph_addr, dma_mode_t mode,
+               uint8_t mwidth, uint8_t pwidth, bool inc_periph);
+/**
+ * @brief   Low level initial DMA stream configuration
+ *
+ * This function is supposed to be used together with @ref dma_prepare. This
+ * function sets up the one-time configuration of a stream and @ref dma_prepare
+ * configures the per-transfer registers.
+ *
+ * @param[in]   dma         Logical DMA stream
+ * @param[in]   chan        DMA channel (on stm32f2/4/7, CxS or unused on others)
+ * @param[in]   periph_addr Peripheral register address
+ * @param[in]   mode        DMA direction mode
  * @param[in]   width       DMA transfer width (one of DMA_DATA_WIDTH_*)
  * @param[in]   inc_periph  Increment peripheral address after read/write
  */
-void dma_setup(dma_t dma, int chan, void *periph_addr, dma_mode_t mode,
-               uint8_t width, bool inc_periph);
+static inline void dma_setup(dma_t dma, int chan, void *periph_addr, dma_mode_t mode,
+               uint8_t width, bool inc_periph)
+{
+    dma_setup_full(dma, chan, periph_addr, mode, width, width, inc_periph);
+}
 
 /**
  * @brief   Low level DMA transfer configuration
