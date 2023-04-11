@@ -366,6 +366,7 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
     usbus_enable_endpoint(msc->ep_out);
 
     usbus_handler_set_flag(handler, USBUS_HANDLER_FLAG_RESET);
+    usbus_handler_set_flag(handler, USBUS_HANDLER_FLAG_ACTIVE);
 
     /* Auto-configure all MTD devices */
     if (CONFIG_USBUS_MSC_AUTO_MTD) {
@@ -394,8 +395,6 @@ static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
         }
         /* Return the number of MTD devices available on the board */
         usbus_control_slicer_put_bytes(usbus, &data, sizeof(data));
-        /* Prepare to receive first bytes from Host */
-        usbdev_ep_xmit(msc->ep_out->ep, msc->out_buf, USBUS_MSC_EP_DATA_SIZE);
         break;
     case USB_MSC_SETUP_REQ_BOMSR:
         DEBUG_PUTS("[msc]: TODO: implement reset setup request");
@@ -466,12 +465,19 @@ static void _event_handler(usbus_t *usbus, usbus_handler_t *handler,
                            usbus_event_usb_t event)
 {
     (void)usbus;
-    (void)handler;
+
+    usbus_msc_device_t *msc = (usbus_msc_device_t *)handler;
+
     switch (event) {
     case USBUS_EVENT_USB_RESET:
         DEBUG_PUTS("[msc]: host reset event");
         break;
-
+    case USBUS_EVENT_USB_ACTIVE:
+        DEBUG_PUTS("[msc]: endpoints activated");
+        msc->state=WAITING;
+        /* Prepare to receive first bytes from Host */
+        usbdev_ep_xmit(msc->ep_out->ep, msc->out_buf, USBUS_MSC_EP_DATA_SIZE);
+        break;
     default:
         DEBUG("[msc]: Unhandled event :0x%x\n", event);
         break;
