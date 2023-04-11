@@ -79,4 +79,8 @@ ifneq (,$(filter periph_vbat,$(USEMODULE)))
   FEATURES_REQUIRED += periph_adc
 endif
 
+ifneq (,$(filter periph_i2s,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_dma periph_dma_callback
+endif
+
 include $(RIOTCPU)/cortexm_common/Makefile.dep

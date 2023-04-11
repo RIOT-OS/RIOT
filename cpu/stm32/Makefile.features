@@ -86,6 +86,10 @@ ifneq (,$(filter $(CPU_FAM),f2 f4 f7 g4 l1 l4 mp1))
   FEATURES_PROVIDED += cortexm_mpu
 endif
 
+ifneq (,$(filter $(CPU_FAM),f2 f4 f7))
+  FEATURES_PROVIDED += periph_i2s
+endif
+
 # only some stm32f3 have an MPU, stm32l052t8 provides an MPU but support is
 # broken for cortex-m0+
 STM32_WITH_MPU += stm32f303re stm32f303vc stm32f303ze
