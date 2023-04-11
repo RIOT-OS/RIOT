@@ -540,7 +540,7 @@ static inline uint8_t _wait_for_r1(sdcard_spi_t *card, uint32_t retry_us)
 
 void _select_card_spi(sdcard_spi_t *card)
 {
-    spi_acquire(card->params.spi_dev, SPI_CS_UNDEF,
+    spi_acquire(card->params.spi_dev, card->params.cs,
                 SD_CARD_SPI_MODE, card->spi_clk);
     gpio_clear(card->params.cs);
 }
