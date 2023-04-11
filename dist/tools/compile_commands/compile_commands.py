@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
 Command line utility to generate compile_commands.json for RIOT applications
 """

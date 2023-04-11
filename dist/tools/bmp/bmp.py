@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 # Copyright (C) 2019 Otto-von-Guericke-Universität Magdeburg
 #
