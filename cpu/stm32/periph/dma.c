@@ -434,6 +434,27 @@ void dma_set_callback(dma_t dma, dma_callback_t callback, void *arg)
 }
 #endif
 
+#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
+void dma_double_buffer_enable(dma_t dma)
+{
+    STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
+    stream->CONTROL_REG |= DMA_SxCR_DBM;
+}
+
+bool dma_double_buffer_set_other(dma_t dma, void *mem)
+{
+    STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
+    uint32_t current_target = stream->CONTROL_REG & DMA_SxCR_CT;
+    if (current_target) {
+        stream->M0AR = (uint32_t)mem;
+    }
+    else {
+        stream->M1AR = (uint32_t)mem;
+    }
+    return 0;
+}
+#endif
+
 int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *dst, size_t len,
                   dma_mode_t mode, uint8_t flags)
 {
@@ -549,6 +570,12 @@ void dma_stop(dma_t dma)
 void dma_wait(dma_t dma)
 {
     mutex_lock(&dma_ctx[dma].sync_lock);
+}
+
+size_t dma_items_remaining(dma_t dma)
+{
+    STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
+    return stream->NDTR_REG;
 }
 
 void dma_isr_handler(dma_t dma)

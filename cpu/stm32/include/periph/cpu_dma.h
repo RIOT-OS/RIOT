@@ -243,6 +243,8 @@ static inline void dma_setup(dma_t dma, int chan, void *periph_addr, dma_mode_t 
     dma_setup_full(dma, chan, periph_addr, mode, width, width, inc_periph);
 }
 
+void dma_double_buffer_enable(dma_t dma);
+bool dma_double_buffer_set_other(dma_t dma, void *mem);
 /**
  * @brief   Low level DMA transfer configuration
  *
@@ -252,6 +254,15 @@ static inline void dma_setup(dma_t dma, int chan, void *periph_addr, dma_mode_t 
  * @param[in]   inc_mem     Increment the memory address (by the transfer width) after read/write
  */
 void dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem);
+
+/**
+ * @brief   Get the number of items remaining in the transfer
+ *
+ * @param[in]   dma         Logical DMA stream
+ *
+ * @returns The number of data items remaining
+ */
+size_t dma_items_remaining(dma_t dma);
 
 #endif /* MODULE_PERIPH_DMA */
 
