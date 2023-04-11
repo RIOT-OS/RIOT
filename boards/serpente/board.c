@@ -53,5 +53,5 @@ static mtd_spi_nor_t serpente_nor_dev = {
     .params = &_serpente_nor_params,
 };
 
-mtd_dev_t *mtd0 = (mtd_dev_t *)&serpente_nor_dev;
+MTD_XFA_ADD(serpente_nor_dev, 0);
 #endif /* MODULE_MTD */
