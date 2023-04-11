@@ -65,6 +65,10 @@ static void _activate_endpoints(usbus_t *usbus)
                       ep->ep->dir == USB_EP_DIR_OUT ? "out" : "in");
             }
         }
+        if (iface->handler->flags & USBUS_HANDLER_FLAG_ACTIVE) {
+            iface->handler->driver->event_handler(usbus, iface->handler,
+                                                  USBUS_EVENT_USB_ACTIVE);
+        }
         for (usbus_interface_alt_t *alt = iface->alts; alt; alt = alt->next) {
             for (usbus_endpoint_t *ep = alt->ep; ep; ep = ep->next) {
                 if (ep->active) {
@@ -75,6 +79,10 @@ static void _activate_endpoints(usbus_t *usbus)
                           ep->ep->num,
                           ep->ep->dir == USB_EP_DIR_OUT ? "out" : "in");
                 }
+            }
+            if (iface->handler->flags & USBUS_HANDLER_FLAG_ACTIVE) {
+                iface->handler->driver->event_handler(usbus, iface->handler,
+                                                      USBUS_EVENT_USB_ACTIVE);
             }
         }
     }
