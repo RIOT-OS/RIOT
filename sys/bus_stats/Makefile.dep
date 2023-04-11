@@ -1,0 +1,12 @@
+# include parent module in case only child modules are used
+USEMODULE += bus_stats
+
+USEMODULE += ztimer_usec
+
+ifneq (,$(filter bus_stats_spi,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_spi
+endif
+
+ifneq (,$(filter bus_stats_i2c,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif

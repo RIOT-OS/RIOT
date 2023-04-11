@@ -2,6 +2,10 @@ ifneq (,$(filter bhp,$(USEMODULE)))
   include $(RIOTBASE)/sys/bhp/Makefile.include
 endif
 
+ifneq (,$(filter bus_stats,$(USEMODULE)))
+  include $(RIOTBASE)/sys/bus_stats/Makefile.include
+endif
+
 ifneq (,$(filter gnrc_sixlowpan_frag_rb,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/gnrc/network_layer/sixlowpan/frag
 endif

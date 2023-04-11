@@ -25,6 +25,9 @@ ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
   ifneq (,$(filter benchmark_udp,$(USEMODULE)))
     USEMODULE += shell_cmd_benchmark_udp
   endif
+  ifneq (,$(filter bus_stats,$(USEMODULE)))
+    USEMODULE += shell_cmd_bus_stats
+  endif
   ifneq (,$(filter ccn-lite-utils,$(USEMODULE)))
     USEMODULE += shell_cmd_ccn-lite-utils
   endif
@@ -146,6 +149,9 @@ ifneq (,$(filter shell_cmd_at30tse75x,$(USEMODULE)))
 endif
 ifneq (,$(filter shell_cmd_benchmark_udp,$(USEMODULE)))
   USEMODULE += benchmark_udp
+endif
+ifneq (,$(filter shell_cmd_bus_stats,$(USEMODULE)))
+  USEMODULE += bus_stats
 endif
 ifneq (,$(filter shell_cmd_ccn-lite-utils,$(USEMODULE)))
   USEMODULE += ccn-lite-utils
