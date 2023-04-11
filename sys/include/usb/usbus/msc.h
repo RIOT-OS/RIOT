@@ -51,17 +51,6 @@ extern "C" {
 #define USBUS_MSC_EP_OUT_REQUIRED_NUMOF  1
 
 /**
- * @brief USBUS MSC Number of exported MTD device through USB
- */
-#ifndef USBUS_MSC_EXPORTED_NUMOF
-#ifdef MTD_NUMOF
-#define USBUS_MSC_EXPORTED_NUMOF MTD_NUMOF
-#else
-#define USBUS_MSC_EXPORTED_NUMOF 0
-#endif
-#endif /* USBUS_MSC_EXPORTED_NUMOF */
-
-/**
  * @brief USBUS MSC internal state machine enum
  */
 typedef enum {
@@ -102,8 +91,7 @@ typedef struct usbus_msc_device {
     uint16_t block_nb;               /**< Number of block to transfer for READ and
                                           WRITE operations */
     uint16_t block_offset;           /**< Internal offset for endpoint size chunk transfer */
-    usbus_msc_lun_t lun_dev[USBUS_MSC_EXPORTED_NUMOF];    /**< Array holding exported logical
-                                                             unit descriptor */
+    usbus_msc_lun_t *lun_dev;        /**< Array holding exported logical unit descriptor */
 } usbus_msc_device_t;
 
 /**
