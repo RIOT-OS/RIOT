@@ -33,7 +33,7 @@
  * * A **sector** is the device's erase unit. Calls to @ref mtd_erase need to
  *   work in alignment with this number (commonly somewhere around 1kiB).
  *
- *   (Note that this corresponse to the term "page" as used in the flashpage
+ *   (Note that this corresponds to the term "page" as used in the flashpage
  *   API, and the term "eraseblock" in Linux's MTD).
  *
  * * A **page** is the largest a device can write in one transfer.
@@ -108,7 +108,7 @@ typedef struct mtd_desc mtd_desc_t;
 typedef struct {
     const mtd_desc_t *driver;  /**< MTD driver */
     uint32_t sector_count;     /**< Number of sector in the MTD */
-    uint32_t pages_per_sector; /**< Number of pages by sector in the MTD */
+    uint32_t pages_per_sector; /**< Number of pages per sector in the MTD */
     uint32_t page_size;        /**< Size of the pages in the MTD */
     uint32_t write_size;       /**< Minimum size and alignment of writes to the device */
 #if defined(MODULE_MTD_WRITE_PAGE) || DOXYGEN
@@ -324,8 +324,8 @@ int mtd_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t count);
  * @param[in]  offset   offset from the start of the page (in bytes)
  * @param[in]  size     the number of bytes to read
  *
- * @return 0 on success
- * @return < 0 if an error occurred
+ * @return number of bytes read on success
+ * @return < 0 value on error
  * @return -ENODEV if @p mtd is not a valid device
  * @return -ENOTSUP if operation is not supported on @p mtd
  * @return -EOVERFLOW if @p addr or @p count are not valid, i.e. outside memory
@@ -373,8 +373,8 @@ int mtd_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t count);
  * @param[in]  offset   byte offset from the start of the page
  * @param[in]  size     the number of bytes to write
  *
- * @return 0 on success
- * @return < 0 if an error occurred
+ * @return number of bytes written on success
+ * @return < 0 value on error
  * @return -ENODEV if @p mtd is not a valid device
  * @return -ENOTSUP if operation is not supported on @p mtd
  * @return -EOVERFLOW if @p addr or @p count are not valid, i.e. outside memory,
@@ -403,8 +403,8 @@ int mtd_write_page_raw(mtd_dev_t *mtd, const void *src, uint32_t page,
  * @param[in]  offset   byte offset from the start of the page
  * @param[in]  size     the number of bytes to write
  *
- * @return 0 on success
- * @return < 0 if an error occurred
+ * @return number of bytes written on success
+ * @return < 0 value on error
  * @return -ENODEV if @p mtd is not a valid device
  * @return -ENOTSUP if operation is not supported on @p mtd
  * @return -EOVERFLOW if @p addr or @p count are not valid, i.e. outside memory,

@@ -18,27 +18,51 @@
 #define MTD_DEFAULT_H
 
 #include "board.h"
+#include "modules.h"
 #include "mtd.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#if defined(MODULE_MTD_SDCARD_DEFAULT)
+#include "mtd_sdcard.h"
+#endif
+
+#if defined(MODULE_MTD_EMULATED)
+#include "mtd_emulated.h"
+#endif
+
+#if !defined(MTD_NUMOF) && !DOXYGEN
+
+#if defined(MTD_3)
+#define MTD_BOARD_NUMOF     4
+#elif defined(MTD_2)
+#define MTD_BOARD_NUMOF     3
+#elif defined(MTD_1)
+#define MTD_BOARD_NUMOF     2
+#elif defined(MTD_0)
+#define MTD_BOARD_NUMOF     1
+#else
+#define MTD_BOARD_NUMOF     0
+#endif
+
+#define MTD_SDCARD_NUMOF    IS_USED(MODULE_MTD_SDCARD_DEFAULT)
+#define MTD_EMULATED_NUMOF  IS_USED(MODULE_MTD_EMULATED)
+
 /**
  * @brief   Number of MTD devices
  */
-#ifndef MTD_NUMOF
-#if defined(MTD_3)
-#define MTD_NUMOF 4
-#elif defined(MTD_2)
-#define MTD_NUMOF 3
-#elif defined(MTD_1)
-#define MTD_NUMOF 2
-#elif defined(MTD_0)
-#define MTD_NUMOF 1
-#else
-#define MTD_NUMOF 0
+#define MTD_NUMOF           (MTD_BOARD_NUMOF + MTD_SDCARD_NUMOF + MTD_EMULATED_NUMOF)
+
+#endif /*  !defined(MTD_NUMOF) && !DOXYGEN */
+
+#if defined(MODULE_MTD_SDCARD_DEFAULT)
+extern mtd_sdcard_t mtd_sdcard_dev0;
 #endif
+
+#if defined(MODULE_MTD_EMULATED)
+extern mtd_emulated_t mtd_emulated_dev0;
 #endif
 
 /**
@@ -52,20 +76,25 @@ extern "C" {
 static inline mtd_dev_t *mtd_default_get_dev(unsigned idx)
 {
     switch (idx) {
-#ifdef MTD_0
+#if MTD_BOARD_NUMOF > 0
     case 0: return MTD_0;
 #endif
-#ifdef MTD_1
+#if MTD_BOARD_NUMOF > 1
     case 1: return MTD_1;
 #endif
-#ifdef MTD_2
+#if MTD_BOARD_NUMOF > 2
     case 2: return MTD_2;
 #endif
-#ifdef MTD_3
+#if MTD_BOARD_NUMOF > 3
     case 3: return MTD_3;
 #endif
+#if MTD_SDCARD_NUMOF > 0
+    case MTD_BOARD_NUMOF: return (mtd_dev_t *)&mtd_sdcard_dev0;
+#endif
+#if MTD_EMULATED_NUMOF > 0
+    case MTD_BOARD_NUMOF + MTD_SDCARD_NUMOF: return (mtd_dev_t *)&mtd_emulated_dev0;
+#endif
     }
-
     return NULL;
 }
 
