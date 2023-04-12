@@ -7,12 +7,19 @@
 # directory for more details.
 
 import sys
-from testrunner import run
+
+import pexpect
+
+from testrunner import run, run_check_unittests
 
 
 def testfunc(child):
-    child.expect([r"OK \([0-9]+ tests\)",
-                  r"error: unable to initialize RTC \[I2C initialization error\]"])
+    res = child.expect([
+        r"error: unable to initialize RTC \[I2C initialization error\]",
+        pexpect.TIMEOUT,
+    ])
+    if res == 1:
+        run_check_unittests()
 
 
 if __name__ == "__main__":

@@ -1,7 +1,8 @@
 # name of your application
 include ../Makefile.tests_common
 
-CFLAGS += -DOUTPUT=TEXT
+# set embunit output to test
+OUTPUT = TEXT
 
 # Add unittest framework
 USEMODULE += embunit

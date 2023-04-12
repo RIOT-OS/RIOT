@@ -4,7 +4,7 @@ include ../Makefile.tests_common
 
 export TAP ?= tap0
 
-CFLAGS += -DOUTPUT=TEXT
+OUTPUT = TEXT
 
 # use Ethernet as link-layer protocol
 ifeq (native,$(BOARD))
