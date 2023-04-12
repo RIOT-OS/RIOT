@@ -1,0 +1,4 @@
+CPU = esp32
+
+# additional features provided by all boards is at least one UART
+FEATURES_PROVIDED += periph_uart

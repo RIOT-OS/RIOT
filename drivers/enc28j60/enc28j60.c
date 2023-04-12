@@ -249,9 +249,6 @@ static void mac_set(enc28j60_t *dev, uint8_t *mac)
 
 static void on_int(void *arg)
 {
-    /* disable global interrupt enable bit to avoid losing interrupts */
-    cmd_bfc((enc28j60_t *)arg, REG_EIE, -1, EIE_INTIE);
-
     netdev_trigger_event_isr(arg);
 }
 
@@ -450,13 +447,38 @@ static int nd_init(netdev_t *netdev)
     return 0;
 }
 
+/**
+ * PKTIF does not reliably report the status of pending packets.
+ * Checking EPKTCNT is the suggested workaround.
+ * Returns the number of pending packets.
+ */
+static int rx_interrupt(netdev_t *netdev)
+{
+    enc28j60_t *dev = (enc28j60_t *)netdev;
+    int pkg_cnt = cmd_rcr(dev, REG_B1_EPKTCNT, 1);
+    int ret = pkg_cnt;
+    while (pkg_cnt-- > 0) {
+        DEBUG("[enc28j60] isr: packet received\n");
+        netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
+    }
+    return ret;
+}
+
 static void nd_isr(netdev_t *netdev)
 {
     enc28j60_t *dev = (enc28j60_t *)netdev;
-    uint8_t eir = cmd_rcr(dev, REG_EIR, -1);
 
-    while (eir != 0) {
+    /* disable global interrupt enable bit to avoid losing interrupts */
+    cmd_bfc(dev, REG_EIE, -1, EIE_INTIE);
+
+    uint8_t eir;
+    int loop;
+    do {
+        loop = 0;
+        eir = cmd_rcr(dev, REG_EIR, -1);
+
         if (eir & EIR_LINKIF) {
+            loop++;
             /* clear link state interrupt flag */
             cmd_r_phy(dev, REG_PHY_PHIR);
             /* go and tell the new link layer state to upper layers */
@@ -469,27 +491,27 @@ static void nd_isr(netdev_t *netdev)
                 netdev->event_callback(netdev, NETDEV_EVENT_LINK_DOWN);
             }
         }
-        if (eir & EIR_PKTIF) {
-            do {
-                DEBUG("[enc28j60] isr: packet received\n");
-                netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
-            } while (cmd_rcr(dev, REG_B1_EPKTCNT, 1) > 0);
+        if (rx_interrupt(netdev)) {
+            loop++;
         }
         if (eir & EIR_RXERIF) {
+            loop++;
             DEBUG("[enc28j60] isr: incoming packet dropped - RX buffer full\n");
             cmd_bfc(dev, REG_EIR, -1, EIR_RXERIF);
         }
         if (eir & EIR_TXIF) {
+            loop++;
             DEBUG("[enc28j60] isr: packet transmitted\n");
             netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
             cmd_bfc(dev, REG_EIR, -1, EIR_TXIF);
         }
         if (eir & EIR_TXERIF) {
+            loop++;
             DEBUG("[enc28j60] isr: error during transmission - pkt dropped\n");
             cmd_bfc(dev, REG_EIR, -1, EIR_TXERIF);
         }
-        eir = cmd_rcr(dev, REG_EIR, -1);
-    }
+    } while (loop);
+
     /* enable global interrupt enable bit again */
     cmd_bfs(dev, REG_EIE, -1, EIE_INTIE);
 }

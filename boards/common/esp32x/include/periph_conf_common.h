@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Gunar Schorcht
+ * Copyright (C) 2023 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,13 +7,13 @@
  */
 
 /**
- * @ingroup     boards_common_esp32s3
- * @brief       Common peripheral configurations for ESP32-S3 boards
+ * @ingroup     boards_common_esp32x
+ * @brief       Peripheral configurations that are common for all ESP32x boards
  *
  * This file contains the peripheral configurations that are valid for all
- * ESP32-S3 boards.
+ * ESP32x boards.
  *
- * For detailed information about the peripheral configuration for ESP32-S3
+ * For detailed information about the peripheral configuration for ESP32x
  * boards, see section \ref esp32_peripherals "Common Peripherals".
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
@@ -23,6 +23,18 @@
 
 #ifndef PERIPH_CONF_COMMON_H
 #define PERIPH_CONF_COMMON_H
+
+#if defined(CPU_FAM_ESP32)
+#include "periph_conf_common_esp32.h"
+#elif defined(CPU_FAM_ESP32C3)
+#include "periph_conf_common_esp32c3.h"
+#elif defined(CPU_FAM_ESP32S2)
+#include "periph_conf_common_esp32s2.h"
+#elif defined(CPU_FAM_ESP32S3)
+#include "periph_conf_common_esp32s3.h"
+#else
+#error "ESP32x SoC family not supported"
+#endif
 
 /* include periph_cpu.h to make it visible in any case */
 #include "periph_cpu.h"
@@ -105,16 +117,18 @@ static const gpio_t dac_channels[] = DAC_GPIOS;
 /** Define SCL pullup enabled by default */
 #define I2C0_SCL_PULLUP true
 #endif
+
 #if defined(I2C0_SDA) && !defined(I2C0_SDA_PULLUP)
 /** Define SDA pullup enabled by default */
 #define I2C0_SDA_PULLUP true
 #endif
 
-#if defined(I2C1_SCL) && !defined(I2C1_SCL_PULLUP)
+#if (SOC_I2C_NUM > 1) && defined(I2C1_SCL) && !defined(I2C1_SCL_PULLUP)
 /** Define SCL pullup enabled by default */
 #define I2C1_SCL_PULLUP true
 #endif
-#if defined(I2C1_SDA) && !defined(I2C1_SDA_PULLUP)
+
+#if (SOC_I2C_NUM > 1) && defined(I2C1_SDA) && !defined(I2C1_SDA_PULLUP)
 /** Define SDA pullup enabled by default */
 #define I2C1_SDA_PULLUP true
 #endif
@@ -133,7 +147,7 @@ static const i2c_conf_t i2c_config[] = {
         .sda_pullup = I2C0_SCL_PULLUP,
     },
 #endif
-#if defined(I2C1_SCL) && defined(I2C1_SDA) && defined(I2C1_SPEED)
+#if (SOC_I2C_NUM > 1) && defined(I2C1_SCL) && defined(I2C1_SDA) && defined(I2C1_SPEED)
     {
         .module = PERIPH_I2C1_MODULE,
         .speed = I2C1_SPEED,
@@ -295,7 +309,7 @@ static const rmt_channel_config_t rmt_channel_config[] = {
  * @brief   Static array with configuration for declared SPI devices
  */
 static const spi_conf_t spi_config[] = {
-#ifdef SPI0_CTRL
+#if defined(SPI0_CTRL)
     {
         .ctrl = SPI0_CTRL,
         .sck = SPI0_SCK,
@@ -304,7 +318,7 @@ static const spi_conf_t spi_config[] = {
         .cs = SPI0_CS0,
     },
 #endif
-#ifdef SPI1_CTRL
+#if defined(SPI1_CTRL) && (SOC_SPI_PERIPH_NUM > 2)
     {
         .ctrl = SPI1_CTRL,
         .sck = SPI1_SCK,
@@ -331,13 +345,6 @@ static const spi_conf_t spi_config[] = {
  * @{
  */
 
-#ifndef UART0_TXD
-#define UART0_TXD   (GPIO43)  /**< TxD of UART_DEV(0) used on all ESP32-S3 boards */
-#endif
-#ifndef UART0_RXD
-#define UART0_RXD   (GPIO44)  /**< RxD of UART_DEV(0) used on all ESP32-S3 boards */
-#endif
-
 /**
  * @brief   Static array with configuration for declared UART devices
  */
@@ -346,13 +353,13 @@ static const uart_conf_t uart_config[] = {
         .txd = UART0_TXD,
         .rxd = UART0_RXD,
     },
-#if defined(UART1_TXD) && defined(UART1_RXD)
+#if (SOC_UART_NUM > 1) && defined(UART1_TXD) && defined(UART1_RXD)
     {
         .txd = UART1_TXD,
         .rxd = UART1_RXD,
     },
 #endif
-#if defined(UART2_TXD) && defined(UART2_RXD)
+#if (SOC_UART_NUM > 2) && defined(UART2_TXD) && defined(UART2_RXD)
     {
         .txd = UART2_TXD,
         .rxd = UART2_RXD,
@@ -371,9 +378,9 @@ static const uart_conf_t uart_config[] = {
 #define UART_NUMOF  ARRAY_SIZE(uart_config)
 /** @} */
 
+#ifdef SOC_USB_OTG_SUPPORTED
 /**
  * @name   USB device configuration
- *
  * @{
  */
 
@@ -396,6 +403,7 @@ static const dwc2_usb_otg_fshs_config_t dwc2_usb_otg_fshs_config[] = {
 #define USBDEV_NUMOF    ARRAY_SIZE(dwc2_usb_otg_fshs_config)
 
 /** @} */
+#endif /* SOC_USB_OTG_SUPPORTED */
 
 #ifdef __cplusplus
 } /* end extern "C" */

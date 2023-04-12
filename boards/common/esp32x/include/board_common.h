@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Gunar Schorcht
+ * Copyright (C) 2018 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,13 +7,12 @@
  */
 
 /**
- * @ingroup     boards_common_esp32c3
- * @brief       Common board definitions for ESP32-C3 boards.
+ * @ingroup     boards_common
+ * @brief       Board definitions that are common for all ESP32x boards.
  *
- * This file contains board configurations that are valid for all
- * ESP32-C3 boards.
+ * This file contains board configurations that are valid for all ESP32.
  *
- * For detailed information about the configuration of ESP32-C3 boards, see
+ * For detailed information about the configuration of ESP32 boards, see
  * section \ref esp32_peripherals "Common Peripherals".
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
