@@ -36,7 +36,7 @@
 
 /* Test mock object implementing a simple RAM-based mtd */
 #ifndef SECTOR_COUNT
-#define SECTOR_COUNT 16
+#define SECTOR_COUNT 12
 #endif
 #ifndef PAGE_PER_SECTOR
 #define PAGE_PER_SECTOR 4
