@@ -511,13 +511,13 @@ void init_bmiSensor(void)
     bmi.accel_cfg.power = BMI160_ACCEL_NORMAL_MODE;
 
     /* Select the Output data rate, range of Gyroscope sensor */
-    bmi.gyro_cfg.odr = BMI160_GYRO_ODR_3200HZ;
-    bmi.gyro_cfg.range = BMI160_GYRO_RANGE_2000_DPS;
+    //bmi.gyro_cfg.odr = BMI160_GYRO_ODR_3200HZ;
+    //bmi.gyro_cfg.range = BMI160_GYRO_RANGE_2000_DPS;
     // bmi.gyro_cfg.range = BMI160_GYRO_RANGE_250_DPS;
-    bmi.gyro_cfg.bw = BMI160_GYRO_BW_NORMAL_MODE;
+    //bmi.gyro_cfg.bw = BMI160_GYRO_BW_NORMAL_MODE;
 
     /* Select the power mode of Gyroscope sensor */
-    bmi.gyro_cfg.power = BMI160_GYRO_NORMAL_MODE;
+    bmi.gyro_cfg.power = BMI160_GYRO_SUSPEND_MODE;
 
     /* Set the sensor configuration */
     rslt = bmi160_set_sens_conf(&bmi);
