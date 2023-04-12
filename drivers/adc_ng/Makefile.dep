@@ -1,0 +1,2 @@
+USEMODULE += auto_init
+FEATURES_OPTIONAL += periph_adc_ng
