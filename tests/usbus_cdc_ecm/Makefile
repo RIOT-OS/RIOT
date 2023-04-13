@@ -12,6 +12,7 @@ USEMODULE += ps
 # Boards that don't have enough endpoints to use CDC ACM together with CDC ECM
 ifeq (,$(filter stdio_%,$(filter-out stdio_cdc_acm,$(USEMODULE))))
   BOARD_BLACKLIST += \
+    seeedstudio-gd32 \
     stm32f4discovery \
     weact-f401cc \
     weact-f401ce \
