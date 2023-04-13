@@ -47,7 +47,8 @@ static void _at86rf2xx_set_key(ieee802154_sec_dev_t *dev,
                                const uint8_t *key, uint8_t key_size)
 {
     (void)key_size;
-    at86rf2xx_aes_key_write_encrypt((at86rf2xx_t *)dev->ctx, key);
+    ieee802154_dev_t *hal = dev->ctx;
+    at86rf2xx_aes_key_write_encrypt(hal->priv, key);
 }
 
 /**
@@ -65,7 +66,8 @@ static void _at86rf2xx_cbc(const ieee802154_sec_dev_t *dev,
                            const uint8_t *plain,
                            uint8_t nblocks)
 {
-    at86rf2xx_aes_cbc_encrypt((at86rf2xx_t *)dev->ctx,
+    ieee802154_dev_t *hal = dev->ctx;
+    at86rf2xx_aes_cbc_encrypt(hal->priv,
                               (aes_block_t *)cipher,
                               NULL,
                               iv,
@@ -86,7 +88,8 @@ static void _at86rf2xx_ecb(const ieee802154_sec_dev_t *dev,
                            const uint8_t *plain,
                            uint8_t nblocks)
 {
-    at86rf2xx_aes_ecb_encrypt((at86rf2xx_t *)dev->ctx,
+    ieee802154_dev_t *hal = dev->ctx;
+    at86rf2xx_aes_ecb_encrypt(hal->priv,
                               (aes_block_t *)cipher,
                               NULL,
                               (aes_block_t *)plain,
