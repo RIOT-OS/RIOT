@@ -46,7 +46,6 @@ extern void auto_init_event_thread(void);
 #include "at86rf2xx_params.h"
 #include "event/thread.h"
 #define AT86RF2XX_NUM   ARRAY_SIZE(at86rf2xx_params)
-extern void auto_init_event_thread(void);
 static at86rf2xx_bhp_ev_t at86rf2xx_bhp[AT86RF2XX_NUM];
 #endif
 
