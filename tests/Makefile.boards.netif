@@ -17,6 +17,7 @@ BOARD_PROVIDES_NETIF := \
     iotlab-a8-m3 \
     iotlab-m3 \
     lobaro-lorabox \
+    lora-e5-dev \
     lsn50 \
     microbit \
     microbit-v2 \
