@@ -14,6 +14,7 @@ menuconfig MODULE_SX126X
     depends on HAS_PERIPH_GPIO
     depends on HAS_PERIPH_GPIO_IRQ
     select MODULE_IOLIST
+    select MODULE_LORA
     select MODULE_NETDEV_LEGACY_API
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_GPIO_IRQ
