@@ -141,7 +141,6 @@ int main(void)
     ieee802154_dev_t hal = {0};
     at86rf2xx_t dev = {0};
 
-
     bool success = true;
     int res = at86rf2xx_init(&dev, &at86rf2xx_params[0], &hal, _irq_cb, NULL);
     if (res < 0) {
