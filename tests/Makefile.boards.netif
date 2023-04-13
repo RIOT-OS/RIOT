@@ -35,6 +35,7 @@ BOARD_PROVIDES_NETIF := \
     nucleo-f429zi \
     nucleo-f439zi \
     nucleo-f767zi \
+    nucleo-wl55jc \
     openlabs-kw41z-mini \
     openlabs-kw41z-mini-256kib \
     openmote-b \
