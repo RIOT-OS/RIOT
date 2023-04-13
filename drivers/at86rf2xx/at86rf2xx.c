@@ -85,6 +85,11 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     /* set default channel, page and TX power */
     at86rf2xx_configure_phy(dev, AT86RF2XX_DEFAULT_CHANNEL, AT86RF2XX_DEFAULT_PAGE, AT86RF2XX_DEFAULT_TXPOWER);
 
+    /* Record the default channel page in the device descriptor */
+#if AT86RF2XX_HAVE_SUBGHZ
+    dev->page = AT86RF2XX_DEFAULT_PAGE;
+#endif
+
     /* set default options */
 
     if (!IS_ACTIVE(AT86RF2XX_BASIC_MODE)) {
