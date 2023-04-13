@@ -39,7 +39,6 @@
 #include "net/gnrc/nettype.h"
 #include "net/ieee802154/radio.h"
 #include "event.h"
-#include "net/ieee802154_security.h"
 
 /* we need no peripherals for memory mapped radios */
 #if !defined(MODULE_AT86RFA1) && !defined(MODULE_AT86RFR2)
