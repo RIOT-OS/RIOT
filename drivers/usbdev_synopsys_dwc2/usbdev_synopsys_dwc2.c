@@ -80,14 +80,13 @@
 #endif
 
 /* Mask for the set of interrupts used */
-#define DWC2_FSHS_USB_GINT_MASK    \
-    (USB_OTG_GINTMSK_USBSUSPM | \
-     USB_OTG_GINTMSK_WUIM     | \
-     USB_OTG_GINTMSK_ENUMDNEM | \
-     USB_OTG_GINTMSK_USBRST   | \
-     USB_OTG_GINTMSK_OTGINT   | \
-     USB_OTG_GINTMSK_IEPINT   | \
-     USB_OTG_GINTMSK_OEPINT)
+#define DWC2_FSHS_USB_GINT_MASK    (USB_OTG_GINTMSK_USBSUSPM | \
+                                    USB_OTG_GINTMSK_WUIM     | \
+                                    USB_OTG_GINTMSK_ENUMDNEM | \
+                                    USB_OTG_GINTMSK_USBRST   | \
+                                    USB_OTG_GINTMSK_OTGINT   | \
+                                    USB_OTG_GINTMSK_IEPINT   | \
+                                    USB_OTG_GINTMSK_OEPINT)
 
 #define DWC2_PKTSTS_GONAK          0x01    /**< Rx fifo global out nak */
 #define DWC2_PKTSTS_DATA_UPDT      0x02    /**< Rx fifo data update    */
@@ -220,16 +219,8 @@ static size_t _max_endpoints(const dwc2_usb_otg_fshs_config_t *config)
 #endif
 }
 
-static bool _uses_dma(const dwc2_usb_otg_fshs_config_t *config)
+static inline bool _uses_dma(const dwc2_usb_otg_fshs_config_t *config)
 {
-/* DMA mode is disabled for now due to several problems:
- * - The STALL bit of the OUT control endpoint does not seem to be cleared
- *   automatically on the next SETUP received. At least the USB OTG HS core
- *   does not generate an interrupt on the next SETUP received. This happens,
- *   for example, when CDC ACM is used and the host sends the SET_LINE_CODING
- *   request. In this case the enumeration of further interfaces, for example
- *   CDC ECM is stopped.
- * - The Enumeration fails for CDC ECM interface which uses URB support. */
 #ifdef DWC2_USB_OTG_HS_ENABLED
     return config->type == DWC2_USB_OTG_HS;
 #else
@@ -1023,6 +1014,8 @@ static void _usbdev_init(usbdev_t *dev)
     /* Disable the global NAK for both directions */
     _disable_global_nak(conf);
 
+    uint32_t gint_mask = DWC2_FSHS_USB_GINT_MASK;
+
     if (_uses_dma(conf)) {
         _global_regs(usbdev->config)->GAHBCFG |=
             /* Configure DMA */
@@ -1036,9 +1029,8 @@ static void _usbdev_init(usbdev_t *dev)
         _device_regs(conf)->DOEPMSK |= USB_OTG_DOEPMSK_XFRCM | USB_OTG_DOEPMSK_STUPM;
         _device_regs(conf)->DIEPMSK |= USB_OTG_DIEPMSK_XFRCM;
     }
-
-    uint32_t gint_mask = DWC2_FSHS_USB_GINT_MASK;
-    if (!_uses_dma(conf)) {
+    else {
+        /* Use RXFLVL (RX FIFO Level) interrupt for IN EPs in non-DMA mode */
         gint_mask |= USB_OTG_GINTMSK_RXFLVLM;
     }
 
@@ -1047,8 +1039,8 @@ static void _usbdev_init(usbdev_t *dev)
     _global_regs(conf)->GINTMSK |= gint_mask;
 
     DEBUG("usbdev: USB peripheral currently in %s mode\n",
-          (_global_regs(
-               conf)->GINTSTS & USB_OTG_GINTSTS_CMOD) ? "host" : "device");
+          (_global_regs(conf)->GINTSTS & USB_OTG_GINTSTS_CMOD) ? "host"
+                                                               : "device");
 
     /* Enable interrupts and configure the TX level to interrupt on empty */
     _global_regs(conf)->GAHBCFG |= USB_OTG_GAHBCFG_GINT |
@@ -1574,21 +1566,21 @@ void _isr_common(dwc2_usb_otg_fshs_t *usbdev)
 
     uint32_t status = _global_regs(conf)->GINTSTS;
 
+    _global_regs(conf)->GAHBCFG &= ~USB_OTG_GAHBCFG_GINT;
+
     if (status) {
         if ((status & USB_OTG_GINTSTS_RXFLVL) && !_uses_dma(conf)) {
             unsigned epnum = _global_regs(conf)->GRXSTSR &
                              USB_OTG_GRXSTSP_EPNUM_Msk;
             usbdev->usbdev.epcb(&usbdev->out[epnum].ep, USBDEV_EVENT_ESR);
         }
-        else if (_global_regs(conf)->GINTSTS &
-                 (USB_OTG_GINTSTS_OEPINT | USB_OTG_GINTSTS_IEPINT)) {
+        else if (status & (USB_OTG_GINTSTS_OEPINT | USB_OTG_GINTSTS_IEPINT)) {
             _isr_ep(usbdev);
         }
         else {
             /* Global interrupt */
             usbdev->usbdev.cb(&usbdev->usbdev, USBDEV_EVENT_ESR);
         }
-        _global_regs(conf)->GAHBCFG &= ~USB_OTG_GAHBCFG_GINT;
     }
 
 #ifdef MODULE_CORTEXM_COMMON
