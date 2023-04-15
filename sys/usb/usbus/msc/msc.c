@@ -354,9 +354,6 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
 
     usbus_handler_set_flag(handler, USBUS_HANDLER_FLAG_RESET);
 
-    /* Prepare to receive first bytes from Host */
-    usbdev_ep_xmit(msc->ep_out->ep, msc->out_buf, CONFIG_USBUS_EP0_SIZE);
-
     /* Auto-configure all MTD devices */
     if (CONFIG_USBUS_MSC_AUTO_MTD) {
         for (int i = 0; i < USBUS_MSC_EXPORTED_NUMOF; i++) {
@@ -384,7 +381,8 @@ static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
         }
         /* Return the number of MTD devices available on the board */
         usbus_control_slicer_put_bytes(usbus, &data, sizeof(data));
-        usbus_control_slicer_ready(usbus);
+        /* Prepare to receive first bytes from Host */
+        usbdev_ep_xmit(msc->ep_out->ep, msc->out_buf, CONFIG_USBUS_EP0_SIZE);
         break;
     case USB_MSC_SETUP_REQ_BOMSR:
         DEBUG_PUTS("[msc]: TODO: implement reset setup request");
