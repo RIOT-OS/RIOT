@@ -80,7 +80,7 @@
 #include <stddef.h>
 
 #include "assert.h"
-#include "periph_cpu.h"
+#include "periph_conf.h"
 #include "usb.h"
 #include "usb/usbopt.h"
 
@@ -124,6 +124,20 @@ typedef struct usbdev_ep usbdev_ep_t;
  * array of uint8_t (assuming the requirement is alignment).
  */
 #define usbdev_ep_buf_t USBDEV_CPU_DMA_REQUIREMENTS uint8_t
+
+/**
+ * @brief USBDEV specific requirement for setting the device address
+ *
+ * The address in the USB device can be set either directly after the SETUP
+ * stage on receipt of the `SET ADDRESS Request` or after the associated status
+ * stage. When the USB device address has to be set depends on the hardware.
+ * If `USBDEV_CPU_SET_ADDR_AFTER_STATUS` has the value 1 (default), the address
+ * is only set in the USB device after the status stage. Overwrite it with 0
+ * in `periph_cpu.h` to set the address already directly after the SETUP stage.
+ */
+#ifndef USBDEV_CPU_SET_ADDR_AFTER_STATUS
+#define USBDEV_CPU_SET_ADDR_AFTER_STATUS    1
+#endif
 
 /**
  * @brief Number of USB IN and OUT endpoints allocated
