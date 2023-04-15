@@ -1442,13 +1442,14 @@ static void _copy_rxfifo(dwc2_usb_otg_fshs_t *usbdev, uint8_t *buf, size_t len)
     }
 }
 
-static void _read_packet(dwc2_usb_otg_fshs_out_ep_t *st_ep)
+static void _read_packet(dwc2_usb_otg_fshs_t *usbdev)
 {
-    dwc2_usb_otg_fshs_t *usbdev = (dwc2_usb_otg_fshs_t *)st_ep->ep.dev;
     const dwc2_usb_otg_fshs_config_t *conf = usbdev->config;
     /* Pop status from the receive fifo status register */
     uint32_t status = _global_regs(conf)->GRXSTSP;
 
+    unsigned epnum = (status & USB_OTG_GRXSTSP_EPNUM_Msk) >>
+                     USB_OTG_GRXSTSP_EPNUM_Pos;
     /* Packet status code */
     unsigned pkt_status = (status & USB_OTG_GRXSTSP_PKTSTS_Msk) >>
                           USB_OTG_GRXSTSP_PKTSTS_Pos;
@@ -1469,7 +1470,7 @@ static void _read_packet(dwc2_usb_otg_fshs_out_ep_t *st_ep)
 
     if (len && !_uses_dma(conf)) {
         /* in DMA mode, received data are directly written into memory */
-        _copy_rxfifo(usbdev, st_ep->out_buf, len);
+        _copy_rxfifo(usbdev, usbdev->out[epnum].out_buf, len);
     }
 }
 
@@ -1497,13 +1498,6 @@ static void _usbdev_ep_esr(usbdev_ep_t *ep)
         }
     }
     else {
-        /* RX FIFO not empty and the endpoint matches the function argument */
-        if ((_global_regs(conf)->GINTSTS & USB_OTG_GINTSTS_RXFLVL) &&
-            (_global_regs(conf)->GRXSTSR & USB_OTG_GRXSTSP_EPNUM_Msk) == ep->num &&
-             !_uses_dma(conf)) {
-            _read_packet(container_of(ep, dwc2_usb_otg_fshs_out_ep_t, ep));
-        }
-
         uint32_t status = _out_regs(conf, ep->num)->DOEPINT;
 
         if (status & USB_OTG_DOEPINT_STUP) {
@@ -1556,10 +1550,12 @@ void _isr_common(dwc2_usb_otg_fshs_t *usbdev)
     _global_regs(conf)->GAHBCFG &= ~USB_OTG_GAHBCFG_GINT;
 
     if (status) {
-        if ((status & USB_OTG_GINTSTS_RXFLVL) && !_uses_dma(conf)) {
-            unsigned epnum = _global_regs(conf)->GRXSTSR &
-                             USB_OTG_GRXSTSP_EPNUM_Msk;
-            usbdev->usbdev.epcb(&usbdev->out[epnum].ep, USBDEV_EVENT_ESR);
+        if (status & USB_OTG_GINTSTS_RXFLVL) {
+            /* The RXFLVL interrupt is only enabled in non-DMA mode. It is only
+             * used to read out the RX FIFO and set the SETUP stage flasg and
+             * can therefore be handled directly in the ISR. */
+            _read_packet(usbdev);
+            _global_regs(conf)->GAHBCFG |= USB_OTG_GAHBCFG_GINT;
         }
         else if (status & (USB_OTG_GINTSTS_OEPINT | USB_OTG_GINTSTS_IEPINT)) {
             _isr_ep(usbdev);
