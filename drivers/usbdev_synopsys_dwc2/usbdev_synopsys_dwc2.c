@@ -129,6 +129,7 @@ typedef struct {
     usbdev_ep_t *in;                            /**< In endpoints */
     dwc2_usb_otg_fshs_out_ep_t *out;            /**< Out endpoints */
     bool suspend;                               /**< Suspend status */
+    bool setup_stage;      /**< Indicates that EP0 is in SETUP stage */
 #ifdef DWC2_USB_OTG_HS_ENABLED
     uint8_t *ep0_out_buf;  /**< Points to the buffer of EP0 OUT handler */
 #endif
@@ -1022,18 +1023,15 @@ static void _usbdev_init(usbdev_t *dev)
             USB_OTG_GAHBCFG_DMAEN |
             /* DMA configured as 8 x 32bit accesses */
             (0x05 << USB_OTG_GAHBCFG_HBSTLEN_Pos);
-
-        /* Unmask the transfer complete interrupts
-         * Only needed when using DMA, otherwise the RX FIFO not empty
-         * interrupt is used */
-        _device_regs(conf)->DOEPMSK |= USB_OTG_DOEPMSK_XFRCM | USB_OTG_DOEPMSK_STUPM;
     }
     else {
         /* Use RXFLVL (RX FIFO Level) interrupt for IN EPs in non-DMA mode */
         gint_mask |= USB_OTG_GINTMSK_RXFLVLM;
     }
 
+    /* Unmask XFRC (Transfer Completed) interrupt for IN and OUT EPs */
     _device_regs(conf)->DIEPMSK |= USB_OTG_DIEPMSK_XFRCM;
+    _device_regs(conf)->DOEPMSK |= USB_OTG_DOEPMSK_XFRCM | USB_OTG_DOEPMSK_STUPM;
 
     /* Clear the interrupt flags and unmask those interrupts */
     _global_regs(conf)->GINTSTS |= gint_mask;
@@ -1174,6 +1172,7 @@ static void _usbdev_esr(usbdev_t *dev)
         }
 
         /* Reset all the things! */
+        usbdev->setup_stage = false;
         _flush_rx_fifo(conf);
         _flush_tx_fifo(conf, 0x10);
         _reset_eps(usbdev);
@@ -1456,24 +1455,21 @@ static void _read_packet(dwc2_usb_otg_fshs_out_ep_t *st_ep)
     size_t len = (status & USB_OTG_GRXSTSP_BCNT_Msk) >>
                  USB_OTG_GRXSTSP_BCNT_Pos;
 
-    /* Packet is copied on the update status and copied on the transfer
-     * complete status */
-    if (pkt_status == DWC2_PKTSTS_DATA_UPDT ||
-        pkt_status == DWC2_PKTSTS_SETUP_UPDT) {
-        _copy_rxfifo(usbdev, st_ep->out_buf, len);
-#if !defined(STM32_USB_OTG_CID_1x)
-        /* CID 2x doesn't signal SETUP_COMP on non-zero length packets, signal
-         * the TR_COMPLETE event immediately */
-        if (st_ep->ep.num == 0 && len) {
-            usbdev->usbdev.epcb(&st_ep->ep, USBDEV_EVENT_TR_COMPLETE);
-        }
-#endif  /* STM32_USB_OTG_CID_2x */
+    /* RXFLVL is only used in non-DMA mode to copy the packet from the FIFO
+     * and to set the flag to indicate the SETUP stage. */
+
+    if (pkt_status == DWC2_PKTSTS_SETUP_UPDT) {
+        /* Some versions of the USB OTG core, e.g. the GD32V USB OTG core,
+         * may generate an additional XFRC (Transfer Completed) interrupt in
+         * the SETUP stage before the STUP (SETUP phase done) interrupt. To
+         * prevent this additional interrupt from being processed accidentally,
+         * we must indicate that the SETUP stage has been started. */
+         usbdev->setup_stage = true;
     }
-    /* On zero length frames, only the COMP status is signalled and the UPDT
-     * status is skipped */
-    else if (pkt_status == DWC2_PKTSTS_XFER_COMP ||
-             pkt_status == DWC2_PKTSTS_SETUP_COMP) {
-        usbdev->usbdev.epcb(&st_ep->ep, USBDEV_EVENT_TR_COMPLETE);
+
+    if (len && !_uses_dma(conf)) {
+        /* in DMA mode, received data are directly written into memory */
+        _copy_rxfifo(usbdev, st_ep->out_buf, len);
     }
 }
 
@@ -1507,19 +1503,23 @@ static void _usbdev_ep_esr(usbdev_ep_t *ep)
              !_uses_dma(conf)) {
             _read_packet(container_of(ep, dwc2_usb_otg_fshs_out_ep_t, ep));
         }
-#ifdef DWC2_USB_OTG_HS_ENABLED
-        else if (_out_regs(conf, ep->num)->DOEPINT & USB_OTG_DOEPINT_STUP) {
+
+        uint32_t status = _out_regs(conf, ep->num)->DOEPINT;
+
+        if (status & USB_OTG_DOEPINT_STUP) {
             _out_regs(conf, ep->num)->DOEPINT = USB_OTG_DOEPINT_STUP;
-            _out_regs(conf, ep->num)->DOEPINT = USB_OTG_DOEPINT_XFRC;
-            if (_uses_dma(conf)) {
-                usbdev->usbdev.epcb(ep, USBDEV_EVENT_TR_COMPLETE);
-            }
+            /* Indicate that the SETUP stage has been finished */
+            usbdev->setup_stage = false;
+            usbdev->usbdev.epcb(ep, USBDEV_EVENT_TR_COMPLETE);
         }
-#endif
-        /* Transfer complete seems only reliable when used with DMA */
-        else if (_out_regs(conf, ep->num)->DOEPINT & USB_OTG_DOEPINT_XFRC) {
+        else if (status & USB_OTG_DOEPINT_XFRC) {
             _out_regs(conf, ep->num)->DOEPINT = USB_OTG_DOEPINT_XFRC;
-            if (_uses_dma(conf)) {
+            /* Some versions of the USB OTG core, e.g. the GD32V USB OTG core,
+             * may generate an additional XFRC (Transfer Complete) interrupt in
+             * the SETUP stage before the STUP (SETUP phase done) interrupt is
+             * triggered. USBDEV_EVENT_TR_COMPLETE must not be generated
+             * for EP0 in this case. */
+            if (!usbdev->setup_stage || (ep->num != 0)) {
                 usbdev->usbdev.epcb(ep, USBDEV_EVENT_TR_COMPLETE);
             }
         }
