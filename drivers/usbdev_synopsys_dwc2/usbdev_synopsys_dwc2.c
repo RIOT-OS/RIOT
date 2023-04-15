@@ -1041,9 +1041,8 @@ static void _usbdev_init(usbdev_t *dev)
           (_global_regs(conf)->GINTSTS & USB_OTG_GINTSTS_CMOD) ? "host"
                                                                : "device");
 
-    /* Enable interrupts and configure the TX level to interrupt on empty */
-    _global_regs(conf)->GAHBCFG |= USB_OTG_GAHBCFG_GINT |
-                                   USB_OTG_GAHBCFG_TXFELVL;
+    /* Enable interrupts */
+    _global_regs(conf)->GAHBCFG |= USB_OTG_GAHBCFG_GINT;
 
 #if defined(MCU_STM32)
     /* Unmask the interrupt in the NVIC */
@@ -1377,7 +1376,6 @@ static int _usbdev_ep_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
         /* Intentionally enabling this before the FIFO is filled, unmasking the
          * interrupts after the FIFO is filled doesn't always trigger the ISR */
         _device_regs(conf)->DAINTMSK |= 1 << ep->num;
-        _device_regs(conf)->DIEPEMPMSK |= 1 << ep->num;
 
         _in_regs(conf, ep->num)->DIEPCTL |= USB_OTG_DIEPCTL_CNAK |
                                             USB_OTG_DIEPCTL_EPENA;
@@ -1492,9 +1490,6 @@ static void _usbdev_ep_esr(usbdev_ep_t *ep)
         if (status & USB_OTG_DIEPINT_XFRC) {
             _in_regs(conf, ep->num)->DIEPINT = USB_OTG_DIEPINT_XFRC;
             usbdev->usbdev.epcb(ep, USBDEV_EVENT_TR_COMPLETE);
-        }
-        else if (status & USB_OTG_DIEPINT_TXFE) {
-            _device_regs(conf)->DIEPEMPMSK &= ~(1 << ep->num);
         }
     }
     else {
