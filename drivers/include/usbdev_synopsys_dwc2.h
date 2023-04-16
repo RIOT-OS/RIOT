@@ -28,6 +28,14 @@ extern "C" {
 #endif
 
 /**
+ * @brief USB OTG peripheral requirement for setting the device address
+ *
+ * The address in the USB device has to be directly after the SETUP
+ * stage on receipt of the `SET ADDRESS Request`.
+ */
+#define USBDEV_CPU_SET_ADDR_AFTER_STATUS    0
+
+/**
  * @brief USB OTG peripheral type.
  *
  * High speed peripheral is assumed to have DMA support available.

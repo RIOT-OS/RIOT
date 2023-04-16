@@ -241,6 +241,10 @@ static int _recv_dev_setup(usbus_t *usbus, usb_setup_t *pkt)
             case USB_SETUP_REQ_SET_ADDRESS:
                 DEBUG("usbus_control: Setting address\n");
                 usbus->addr = (uint8_t)pkt->value;
+                if (!USBDEV_CPU_SET_ADDR_AFTER_STATUS) {
+                    usbdev_set(usbus->dev, USBOPT_ADDRESS, &usbus->addr,
+                               sizeof(usbus->addr));
+                }
                 res = 1;
                 break;
             case USB_SETUP_REQ_SET_CONFIGURATION:
@@ -401,8 +405,10 @@ static int _handle_tr_complete(usbus_t *usbus,
         case USBUS_CONTROL_REQUEST_STATE_INACK:
             if (ep->dir == USB_EP_DIR_IN) {
                 if (usbus->addr && usbus->state == USBUS_STATE_RESET) {
-                    usbdev_set(usbus->dev, USBOPT_ADDRESS, &usbus->addr,
-                               sizeof(usbus->addr));
+                    if (USBDEV_CPU_SET_ADDR_AFTER_STATUS) {
+                        usbdev_set(usbus->dev, USBOPT_ADDRESS, &usbus->addr,
+                                   sizeof(usbus->addr));
+                    }
                     /* Address configured */
                     usbus->state = USBUS_STATE_ADDR;
                 }
