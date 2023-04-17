@@ -32,7 +32,7 @@
 #include "periph_cpu.h"
 #include "clk_conf.h"
 #include "cfg_i2c1_pb8_pb9.h"
-#include "cfg_timer_tim5.h"
+#include "cfg_timer_tim5_and_tim2.h"
 #include "cfg_usb_otg_fs.h"
 #include "mii.h"
 
