@@ -172,9 +172,9 @@ inline thread_id get_id() noexcept { return thread_id{thread_getpid()}; }
 inline void yield() noexcept { thread_yield(); }
 /**
  * @brief Puts the current thread to sleep.
- * @param[in] ns    Duration to sleep in nanoseconds.
+ * @param[in] us    Duration to sleep in microseconds.
  */
-void sleep_for(const std::chrono::nanoseconds& ns);
+void sleep_for(const std::chrono::microseconds& us);
 /**
  * @brief Puts the current thread to sleep.
  * @param[in] sleep_duration    The duration to sleep.
@@ -182,18 +182,22 @@ void sleep_for(const std::chrono::nanoseconds& ns);
 template <class Rep, class Period>
 void sleep_for(const std::chrono::duration<Rep, Period>& sleep_duration) {
   using namespace std::chrono;
-  if (sleep_duration > std::chrono::duration<Rep, Period>::zero()) {
-    constexpr std::chrono::duration<long double> max = nanoseconds::max();
-    nanoseconds ns;
+  if (sleep_duration > sleep_duration.zero()) {
+    constexpr duration<long double> max = microseconds::max();
+    microseconds us;
     if (sleep_duration < max) {
-      ns = duration_cast<nanoseconds>(sleep_duration);
-      if (ns < sleep_duration) {
-        ++ns;
+      us = duration_cast<microseconds>(sleep_duration);
+      if (us.count() == 0) {
+        // wait at least 1
+        us = microseconds(1);
+      }
+      if (us < sleep_duration) {
+        ++us;
       }
     } else {
-      ns = nanoseconds::max();
+      us = microseconds::max();
     }
-    sleep_for(ns);
+    sleep_for(us);
   }
 }
 /**
