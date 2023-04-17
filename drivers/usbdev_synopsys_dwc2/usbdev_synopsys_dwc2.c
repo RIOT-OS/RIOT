@@ -1338,7 +1338,14 @@ static int _usbdev_ep_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
         _device_regs(conf)->DAINTMSK |= 1 << ep->num;
         _device_regs(conf)->DIEPEMPMSK |= 1 << ep->num;
 
+        uint32_t eonum = 0;
+        if (ep->type == USB_EP_TYPE_ISOCHRONOUS) {
+            bool odd_frame = _device_regs(conf)->DSTS &  (1 << 8);
+            eonum = !odd_frame ? USB_OTG_DIEPCTL_SD0PID_SEVNFRM : USB_OTG_DIEPCTL_SODDFRM;
+        }
+
         _in_regs(conf, ep->num)->DIEPCTL |= USB_OTG_DIEPCTL_CNAK |
+                                            eonum |
                                             USB_OTG_DIEPCTL_EPENA;
 
         if (len > 0 && !_uses_dma(conf)) {
@@ -1355,10 +1362,16 @@ static int _usbdev_ep_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
         }
     }
     else {
+
         /* Abort when the endpoint is not active, prevents hangs,
          * could be an assert in the future maybe */
         if (!(_out_regs(conf, ep->num)->DOEPCTL & USB_OTG_DOEPCTL_USBAEP)) {
             return -1;
+        }
+        uint32_t eonum = 0;
+        if (ep->type == USB_EP_TYPE_ISOCHRONOUS) {
+            bool odd_frame = _device_regs(conf)->DSTS &  (1 << 8);
+            eonum = odd_frame ? USB_OTG_DOEPCTL_SD0PID_SEVNFRM : USB_OTG_DOEPCTL_SODDFRM;
         }
 
         if (_uses_dma(conf)) {
@@ -1382,6 +1395,7 @@ static int _usbdev_ep_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
         _out_regs(conf, ep->num)->DOEPTSIZ = doeptsiz;
         _out_regs(conf, ep->num)->DOEPCTL |= USB_OTG_DOEPCTL_CNAK |
                                              USB_OTG_DOEPCTL_EPENA |
+                                             eonum |
                                              _type_to_reg(ep->type);
     }
 
