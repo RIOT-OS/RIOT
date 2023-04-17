@@ -559,7 +559,7 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
     case NETOPT_LORAWAN_SNWKSINTKEY:
     case NETOPT_LORAWAN_NWKSENCKEY:
         assert(opt->data_len == LORAMAC_FNWKSINTKEY_LEN);
-        _memcpy_reversed(netif->lorawan.fnwksintkey, opt->data,
+        memcpy(netif->lorawan.fnwksintkey, opt->data,
                          LORAMAC_FNWKSINTKEY_LEN);
         break;
 #endif
