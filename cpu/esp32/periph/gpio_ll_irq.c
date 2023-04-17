@@ -75,7 +75,27 @@ int gpio_ll_irq(gpio_port_t port, uint8_t pin, gpio_irq_trig_t trig,
     gpio_isr_service_installed = true;
 
     /* set the interrupt type for the pin */
-    if (esp_idf_gpio_set_intr_type(gpio, trig) != ESP_OK) {
+    gpio_int_type_t type;
+    switch (trig) {
+    case GPIO_TRIGGER_EDGE_FALLING:
+        type = GPIO_INTR_NEGEDGE;
+        break;
+    case GPIO_TRIGGER_EDGE_RISING:
+        type = GPIO_INTR_POSEDGE;
+        break;
+    case GPIO_TRIGGER_EDGE_BOTH:
+        type = GPIO_INTR_ANYEDGE;
+        break;
+    case GPIO_TRIGGER_LEVEL_HIGH:
+        type = GPIO_INTR_HIGH_LEVEL;
+        break;
+    case GPIO_TRIGGER_LEVEL_LOW:
+        type = GPIO_INTR_LOW_LEVEL;
+        break;
+    default:
+        type = GPIO_INTR_DISABLE;
+    }
+    if (esp_idf_gpio_set_intr_type(gpio, type) != ESP_OK) {
         return -1;
     }
 

@@ -382,8 +382,9 @@ void system_wdt_init(void)
     wdt_hal_write_protect_enable(&rwdt);
 
 #if defined(CPU_FAM_ESP32)
-    DEBUG("%s TIMERG0 wdtconfig0=%08x wdtconfig1=%08x wdtconfig2=%08x "
-          "wdtconfig3=%08x wdtconfig4=%08x regclk=%08x\n", __func__,
+    DEBUG("%s TIMERG0 wdtconfig0=%08"PRIx32" wdtconfig1=%08"PRIx32
+          " wdtconfig2=%08"PRIx32" wdtconfig3=%08"PRIx32
+          " wdtconfig4=%08"PRIx32" regclk=%08"PRIx32"\n", __func__,
           TIMERG0.wdt_config0.val, TIMERG0.wdt_config1.val,
           TIMERG0.wdt_config2, TIMERG0.wdt_config3,
           TIMERG0.wdt_config4, TIMERG0.clk.val);

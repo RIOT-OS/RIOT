@@ -164,6 +164,10 @@ INCLUDES = \
 # CONFIG_ESPTOOLPY_FLASHFREQ_* and CONFIG_FLASHMODE_*
 CFLAGS = -include '$(RIOTBUILD_CONFIG_HEADER_C)' \
 
+# TODO: required to be able to compile with GCC 12.1, remove them after upgrade to ESP-IDF 5.1
+CFLAGS += -Wno-error=format=
+CFLAGS += -Wno-format
+
 ifneq (,$(filter riscv32%,$(TARGET_ARCH)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/riscv/include
   CFLAGS += -DCONFIG_IDF_TARGET_ARCH_RISCV
@@ -171,6 +175,13 @@ ifneq (,$(filter riscv32%,$(TARGET_ARCH)))
   CFLAGS += -Wno-error=format=
   CFLAGS += -nostartfiles
   CFLAGS += -Wno-format
+  GCC_NEW_RISCV_ISA ?= $(shell echo "typedef int dont_be_pedantic;" | \
+                               $(TARGET_ARCH)-gcc -march=rv32imac -mabi=ilp32 \
+                                                  -misa-spec=2.2 -E - > /dev/null 2>&1 && \
+                               echo 1 || echo 0)
+  ifeq (1,$(GCC_NEW_RISCV_ISA))
+    CFLAGS += -misa-spec=2.2
+  endif
 endif
 
 ifneq (,$(filter xtensa%,$(TARGET_ARCH)))

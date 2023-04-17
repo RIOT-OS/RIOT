@@ -135,13 +135,8 @@ static void _rtc_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
     RTCCNTL.slp_timer0 = rtc_alarm & 0xffffffff;
     RTCCNTL.slp_timer1.slp_val_hi = rtc_alarm >> 32;
 
-#if __xtensa__
-    DEBUG("%s %08x%08x \n", __func__,
-          RTCCNTL.slp_timer1.slp_val_hi, RTCCNTL.slp_timer0);
-#else
     DEBUG("%s %08x%08x \n", __func__,
           (unsigned)RTCCNTL.slp_timer1.slp_val_hi, (unsigned)RTCCNTL.slp_timer0);
-#endif
 
     /* enable RTC timer alarm */
     RTCCNTL.slp_timer1.main_timer_alarm_en = 1;

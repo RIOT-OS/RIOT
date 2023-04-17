@@ -1,0 +1,25 @@
+From 19f7ed9aaab8be94571779fc8b738d3479e0aa23 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Tue, 4 Apr 2023 09:55:00 +0200
+Subject: [PATCH 28/29] hal: cast esp interrupt type to riscv interrupt type
+
+---
+ components/hal/esp32c3/include/hal/interrupt_controller_ll.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/components/hal/esp32c3/include/hal/interrupt_controller_ll.h b/components/hal/esp32c3/include/hal/interrupt_controller_ll.h
+index 70afe314cfe..3c3ef3b953e 100644
+--- a/components/hal/esp32c3/include/hal/interrupt_controller_ll.h
++++ b/components/hal/esp32c3/include/hal/interrupt_controller_ll.h
+@@ -124,7 +124,7 @@ static inline void intr_cntrl_ll_set_int_level(int intr, int level)
+  */
+ static inline void intr_cntrl_ll_set_int_type(int intr, int_type_t type)
+ {
+-    esprv_intc_int_set_type(BIT(intr), type);
++    esprv_intc_int_set_type(BIT(intr), (enum intr_type)type);
+ }
+ 
+ #ifdef __cplusplus
+-- 
+2.34.1
+

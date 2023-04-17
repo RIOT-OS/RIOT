@@ -275,7 +275,7 @@ void IRAM_ATTR thread_yield_higher(void)
 #if defined(ENABLE_DEBUG) && defined(DEVELHELP)
     thread_t *active_thread = thread_get_active();
     if (active_thread) {
-        DEBUG("%u old task %u %s %u\n", system_get_time(),
+        DEBUG("%"PRIu32" old task %u %s %u\n", system_get_time(),
                active_thread->pid, active_thread->name,
                active_thread->sp - active_thread-> stack_start);
     }
@@ -302,7 +302,7 @@ void IRAM_ATTR thread_yield_higher(void)
 #if defined(ENABLE_DEBUG) && defined(DEVELHELP)
     active_thread = thread_get_active();
     if (active_thread) {
-        DEBUG("%u new task %u %s %u\n", system_get_time(),
+        DEBUG("%"PRIu32" new task %u %s %u\n", system_get_time(),
                active_thread->pid, active_thread->name,
                active_thread->sp - active_thread-> stack_start);
     }
