@@ -148,8 +148,6 @@ extern mode_t (*real_umask)(mode_t cmask);
 extern ssize_t (*real_writev)(int fildes, const struct iovec *iov, int iovcnt);
 extern ssize_t (*real_send)(int sockfd, const void *buf, size_t len, int flags);
 
-extern int (*real_clock_gettime)(clockid_t clk_id, struct timespec *tp);
-
 /**
  * data structures
  */

@@ -106,11 +106,6 @@ mode_t (*real_umask)(mode_t cmask);
 ssize_t (*real_writev)(int fildes, const struct iovec *iov, int iovcnt);
 ssize_t (*real_send)(int sockfd, const void *buf, size_t len, int flags);
 
-#ifdef __MACH__
-#else
-int (*real_clock_gettime)(clockid_t clk_id, struct timespec *tp);
-#endif
-
 void _native_syscall_enter(void)
 {
     _native_in_syscall++;
@@ -553,8 +548,4 @@ void _native_init_syscalls(void)
     *(void **)(&real_ftell) = dlsym(RTLD_NEXT, "ftell");
     *(void **)(&real_fputc) = dlsym(RTLD_NEXT, "fputc");
     *(void **)(&real_fgetc) = dlsym(RTLD_NEXT, "fgetc");
-#ifdef __MACH__
-#else
-    *(void **)(&real_clock_gettime) = dlsym(RTLD_NEXT, "clock_gettime");
-#endif
 }

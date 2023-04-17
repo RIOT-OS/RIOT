@@ -204,7 +204,7 @@ unsigned int timer_read(tim_t dev)
 
     _native_syscall_enter();
 
-    if (real_clock_gettime(CLOCK_MONOTONIC, &t) == -1) {
+    if (clock_gettime(CLOCK_MONOTONIC, &t) == -1) {
         err(EXIT_FAILURE, "timer_read: clock_gettime");
     }
 
