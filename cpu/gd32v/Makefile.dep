@@ -11,4 +11,8 @@ ifneq (,$(filter periph_i2c,$(USEMODULE)))
   USEMODULE += ztimer_usec
 endif
 
+ifneq (,$(filter periph_usbdev,$(USEMODULE)))
+  USEMODULE += usbdev_synopsys_dwc2
+endif
+
 include $(RIOTCPU)/riscv_common/Makefile.dep

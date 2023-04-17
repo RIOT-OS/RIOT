@@ -22,12 +22,15 @@ config BOARD_SIPEED_LONGAN_NANO
     select HAS_PERIPH_SPI
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
+    select HAS_PERIPH_USBDEV
     select HAS_TINYUSB_DEVICE
     select HAVE_SAUL_GPIO
 
     select HAVE_MTD_SDCARD_DEFAULT
     select MODULE_FATFS_VFS if MODULE_VFS_DEFAULT
-    select PACKAGE_TINYUSB if TEST_KCONFIG
+    select MODULE_USBUS if TEST_KCONFIG && !PACKAGE_TINYUSB
+    select MODULE_USBUS_CDC_ACM if MODULE_USBUS
+    select MODULE_USB_BOARD_RESET if MODULE_USBUS_CDC_ACM || MODULE_TINYUSB_CLASS_CDC
 
 menu "Sipeed Longan Nano Board Configuration"
 
@@ -39,6 +42,7 @@ menu "Sipeed Longan Nano Board Configuration"
 endmenu
 
 choice STDIO_IMPLEMENTATION
+    default MODULE_STDIO_CDC_ACM if MODULE_USBUS
     default MODULE_STDIO_TINYUSB_CDC_ACM if PACKAGE_TINYUSB
 endchoice
 

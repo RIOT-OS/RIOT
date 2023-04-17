@@ -70,7 +70,7 @@
 #endif
 
 /**
- * @brief   Total size of the FIFO
+ * @brief   Total size of the FIFO in bytes
  */
 #define DWC2_USB_OTG_FS_TOTAL_FIFO_SIZE (1280)
 
