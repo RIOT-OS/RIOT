@@ -9,7 +9,7 @@ RIOTBASE ?= $(CURDIR)/../..
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
-USEMODULE += netdev_default
+USEMODULE += netif_dev_default
 
 # use GNRC by default
 LWIP ?= 0

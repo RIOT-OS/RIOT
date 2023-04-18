@@ -16,7 +16,7 @@ USEMODULE += xtimer
 ifneq (,$(filter native,$(BOARD)))
   # Has to be provided here and not in Makefile.dep, so TERMFLAGS are properly
   # configured
-  USEMODULE += netdev_default
+  USEMODULE += netif_dev_default
   IFACE ?= tapbr0
 else
   IFACE ?= tap0

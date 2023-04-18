@@ -7,7 +7,7 @@ USEMODULE += shell_cmds_default
 USEMODULE += ps
 
 # Include GNRC and RPL
-USEMODULE += netdev_default
+USEMODULE += netif_dev_default
 USEMODULE += auto_init_gnrc_netif
 
 # Setup CCN-lite

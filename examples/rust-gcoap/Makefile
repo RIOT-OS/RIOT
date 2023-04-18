@@ -9,7 +9,7 @@ RIOTBASE ?= $(CURDIR)/../..
 
 # Basic networking, and gcoap
 USEMODULE += gcoap
-USEMODULE += netdev_default
+USEMODULE += netif_dev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_default
 USEMODULE += gnrc_icmpv6_echo

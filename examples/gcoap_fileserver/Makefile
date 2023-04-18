@@ -28,7 +28,7 @@ USEMODULE += gcoap_fileserver_put
 # select network modules
 USEMODULE += gnrc_ipv6_default
 USEMODULE += auto_init_gnrc_netif
-USEMODULE += netdev_default
+USEMODULE += netif_dev_default
 USEMODULE += gnrc_icmpv6_echo
 
 # enable default file system mount points

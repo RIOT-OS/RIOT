@@ -9,7 +9,7 @@ RIOTBASE ?= ../../
 
 # Include board's default network devices and auto-initialization of GNRC
 # interfaces
-USEMODULE += netdev_default
+USEMODULE += netif_dev_default
 USEMODULE += auto_init_gnrc_netif
 
 # Add support for GNRC LoRaWAN

@@ -10,7 +10,7 @@ RIOTBASE ?= $(CURDIR)/../..
 # Define modules that are used
 USEMODULE += fmt
 USEMODULE += gnrc
-USEMODULE += netdev_default
+USEMODULE += netif_dev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += shell
 USEMODULE += shell_cmds_default

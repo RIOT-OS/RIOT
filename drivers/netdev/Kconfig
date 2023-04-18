@@ -9,6 +9,7 @@ if TEST_KCONFIG
 
 config MODULE_NETDEV_DEFAULT
     bool "Enable default network devices on the platform"
+    select MODULE_NETIF_DEV_DEFAULT
     help
         Say y to enable the drivers for the default network devices present on
         your platform.

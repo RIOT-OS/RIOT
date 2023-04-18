@@ -36,7 +36,7 @@ endif
 USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += ps
-USEMODULE += netdev_default
+USEMODULE += netif_dev_default
 USEPKG += paho-mqtt
 
 # paho-mqtt depends on TCP support, choose which stacks you want

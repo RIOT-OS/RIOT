@@ -8,7 +8,7 @@ USEMODULE += dhcpv6_client_mud_url
 USEMODULE += gnrc_dhcpv6_client
 USEMODULE += gnrc_ipv6_default
 USEMODULE += auto_init_dhcpv6_client
-USEMODULE += netdev_default
+USEMODULE += netif_dev_default
 USEMODULE += gnrc_pktdump
 USEMODULE += ps
 USEMODULE += shell
@@ -18,7 +18,7 @@ USEMODULE += shell_cmds_default
 ifeq (native,$(BOARD))
   # Has to be provided here and not in Makefile.dep, so TERMFLAGS are properly
   # configured
-  USEMODULE += netdev_default
+  USEMODULE += netif_dev_default
   IFACE ?= tapbr0
 else
   IFACE ?= tap0

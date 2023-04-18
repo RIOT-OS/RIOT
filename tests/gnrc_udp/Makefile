@@ -1,6 +1,6 @@
 include ../Makefile.tests_common
 
-USEMODULE += netdev_default
+USEMODULE += netif_dev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_router_default
 USEMODULE += gnrc_ipv6_ext_frag

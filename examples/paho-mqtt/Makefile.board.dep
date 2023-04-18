@@ -5,5 +5,5 @@ ifneq (,$(filter arch_esp,$(FEATURES_USED)))
 endif
 
 ifeq ($(BOARD),native)
-  USEMODULE += netdev_default
+  USEMODULE += netif_dev_default
 endif

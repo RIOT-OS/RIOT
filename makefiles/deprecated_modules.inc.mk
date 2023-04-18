@@ -8,6 +8,7 @@ DEPRECATED_MODULES += gnrc_udp_cmd # use shell_cmd_gnrc_udp instead
 DEPRECATED_MODULES += heap_cmd # use shell_cmd_heap instead
 DEPRECATED_MODULES += i2c_scan # use shell_cmd_i2c_scan instead
 DEPRECATED_MODULES += md5sum # use shell_cmd_md5sum instead
+DEPRECATED_MODULES += netdev_default # use netif_dev_default instead
 DEPRECATED_MODULES += nice # use shell_cmd_nice instead
 DEPRECATED_MODULES += random_cmd # use shell_cmd_random instead
 DEPRECATED_MODULES += sema_deprecated

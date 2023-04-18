@@ -9,7 +9,7 @@ RIOTBASE ?= $(CURDIR)/../..
 
 # Define modules that are used
 USEMODULE += gnrc
-USEMODULE += netdev_default
+USEMODULE += netif_dev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += xtimer
 USEMODULE += ztimer64_xtimer_compat
