@@ -3,6 +3,10 @@ ifneq (,$(filter shell_cmd_%,$(USEMODULE)))
   USEMODULE += shell_cmds
 endif
 
+ifneq (,$(filter shell_cmds,$(USEMODULE)))
+  USEMODULE += shell
+endif
+
 ifneq (,$(filter shell_commands,$(USEMODULE)))
   # shell_commands has been renamed to shell_cmds_default, but let's keep this
   # for backward compatibility
