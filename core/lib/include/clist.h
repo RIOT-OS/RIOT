@@ -19,23 +19,23 @@
  *
  * Its operations are:
  *
- * operation            | runtime | description
- * ---------------------|---------|---------------
- * clist_lpush()        | O(1)    | insert as head (leftmost node)
- * clist_lpeek()        | O(1)    | get the head without removing it
- * clist_lpop()         | O(1)    | remove and return head (leftmost node)
- * clist_rpush()        | O(1)    | append as tail (rightmost node)
- * clist_rpeek()        | O(1)    | get the tail without removing it
- * clist_rpop()         | O(n)    | remove and return tail (rightmost node)
- * clist_lpoprpush()    | O(1)    | move first element to the end of the list
- * clist_find()         | O(n)    | find and return node
- * clist_find_before()  | O(n)    | find node return node pointing to node
- * clist_remove()       | O(n)    | remove and return node
- * clist_sort()         | O(NlogN)| sort list (stable)
- * clist_count()        | O(n)    | count the number of elements in a list
- * clist_is_empty()     | O(1)    | returns true if the list contains no elements
- * clist_exactly_one()  | O(1)    | returns true if the list contains one element
- * clist_more_than_one()| O(1)    | returns true if the list contains more than one element
+ * operation            | runtime                                                   | description
+ * ---------------------|-----------------------------------------------------------|-----------------------------------------------------------
+ * clist_lpush()        | \f(\mathcal{O}\left(1\right)\f)                           | insert as head (leftmost node)
+ * clist_lpeek()        | \f(\mathcal{O}\left(1\right)\f)                           | get the head without removing it
+ * clist_lpop()         | \f(\mathcal{O}\left(1\right)\f)                           | remove and return head (leftmost node)
+ * clist_rpush()        | \f(\mathcal{O}\left(1\right)\f)                           | append as tail (rightmost node)
+ * clist_rpeek()        | \f(\mathcal{O}\left(1\right)\f)                           | get the tail without removing it
+ * clist_rpop()         | \f(\mathcal{O}\left(n\right)\f)                           | remove and return tail (rightmost node)
+ * clist_lpoprpush()    | \f(\mathcal{O}\left(1\right)\f)                           | move first element to the end of the list
+ * clist_find()         | \f(\mathcal{O}\left(n\right)\f)                           | find and return node
+ * clist_find_before()  | \f(\mathcal{O}\left(n\right)\f)                           | find node return node pointing to node
+ * clist_remove()       | \f(\mathcal{O}\left(n\right)\f)                           | remove and return node
+ * clist_sort()         | \f(\mathcal{O}\left(n \times \log\left(n\right)\right)\f) | sort list (stable)
+ * clist_count()        | \f(\mathcal{O}\left(n\right)\f)                           | count the number of elements in a list
+ * clist_is_empty()     | \f(\mathcal{O}\left(1\right)\f)                           | returns true if the list contains no elements
+ * clist_exactly_one()  | \f(\mathcal{O}\left(1\right)\f)                           | returns true if the list contains one element
+ * clist_more_than_one()| \f(\mathcal{O}\left(1\right)\f)                           | returns true if the list contains more than one element
  *
  * clist can be used as a traditional list, a queue (FIFO) and a stack (LIFO) using
  * fast O(1) operations.
@@ -109,7 +109,7 @@ typedef list_node_t clist_node_t;
 /**
  * @brief Checks if *list is empty
  *
- * @note Complexity: O(1)
+ * @note Complexity: \f(\mathcal{O}\left(1\right)\f)
  *
  * @param[in]   list        Pointer to clist
  *
@@ -123,7 +123,7 @@ static inline bool clist_is_empty(const clist_node_t *list)
 /**
  * @brief Appends *new_node* at the end of *list
  *
- * @note Complexity: O(1)
+ * @note Complexity: \f(\mathcal{O}\left(1\right)\f)
  *
  * @param[in,out]   list        Pointer to clist
  * @param[in,out]   new_node    Node which gets inserted.
@@ -144,7 +144,7 @@ static inline void clist_rpush(clist_node_t *list, clist_node_t *new_node)
 /**
  * @brief Inserts *new_node* at the beginning of *list
  *
- * @note Complexity: O(1)
+ * @note Complexity: \f(\mathcal{O}\left(1\right)\f)
  *
  * @param[in,out]   list        Pointer to clist
  * @param[in,out]   new_node    Node which gets inserted.
@@ -165,7 +165,7 @@ static inline void clist_lpush(clist_node_t *list, clist_node_t *new_node)
 /**
  * @brief Removes and returns first element from list
  *
- * @note Complexity: O(1)
+ * @note Complexity: \f(\mathcal{O}\left(1\right)\f)
  *
  * @param[in,out]   list        Pointer to the *list* to remove first element
  *                              from.
@@ -196,7 +196,7 @@ static inline clist_node_t *clist_lpop(clist_node_t *list)
  *
  * [ A, B, C ] becomes [ B, C, A ]
  *
- * @note Complexity: O(1)
+ * @note Complexity: \f(\mathcal{O}\left(1\right)\f)
  *
  * @param[in,out]   list        The list to work upon.
  */
@@ -210,7 +210,7 @@ static inline void clist_lpoprpush(clist_node_t *list)
 /**
  * @brief Returns first element in list
  *
- * @note: Complexity: O(1)
+ * @note: Complexity: \f(\mathcal{O}\left(1\right)\f)
  *
  * @param[in]   list        The list to work upon.
  * @returns     first (leftmost) list element, or NULL if list is empty
@@ -226,7 +226,7 @@ static inline clist_node_t *clist_lpeek(const clist_node_t *list)
 /**
  * @brief Returns last element in list
  *
- * @note: Complexity: O(1)
+ * @note: Complexity: \f(\mathcal{O}\left(1\right)\f)
  *
  * @param[in]   list        The list to work upon.
  * @returns     last (rightmost) list element, or NULL if list is empty
@@ -239,7 +239,7 @@ static inline clist_node_t *clist_rpeek(const clist_node_t *list)
 /**
  * @brief Removes and returns last element from list
  *
- * @note Complexity: O(n) with n being the number of elements in the list.
+ * @note Complexity: \f(\mathcal{O}\left(n\right)\f) with n being the number of elements in the list.
  *
  * @param[in,out]   list        Pointer to the *list* to remove last element
  *                              from.
@@ -261,7 +261,7 @@ static inline clist_node_t *clist_rpop(clist_node_t *list)
 /**
  * @brief Finds node and returns its predecessor
  *
- * @note Complexity: O(n)
+ * @note Complexity: \f(\mathcal{O}\left(n\right)\f)
  *
  * @param[in]       list    pointer to clist
  * @param[in,out]   node    Node to look for
@@ -291,7 +291,7 @@ static inline clist_node_t *clist_find_before(const clist_node_t *list,
 /**
  * @brief Finds and returns node
  *
- * @note Complexity: O(n)
+ * @note Complexity: \f(\mathcal{O}\left(n\right)\f)
  *
  * @param[in]       list    pointer to clist
  * @param[in,out]   node    Node to look for
@@ -316,7 +316,7 @@ static inline clist_node_t *clist_find(const clist_node_t *list,
 /**
  * @brief Finds and removes node
  *
- * @note Complexity: O(n)
+ * @note Complexity: \f(\mathcal{O}\left(n\right)\f)
  *
  * @param[in]       list    pointer to clist
  * @param[in,out]   node    Node to remove for
@@ -471,7 +471,7 @@ static inline size_t clist_count(clist_node_t *list)
 /**
  * @brief   Tells if a list has exactly one element
  *
- * @note    Complexity: O(1)
+ * @note    Complexity: \f(\mathcal{O}\left(1\right)\f)
  *
  * @param[in]   list    Pointer to the clist
  *
@@ -485,7 +485,7 @@ static inline bool clist_exactly_one(clist_node_t *list)
 /**
  * @brief   Tells if a list has more than one element
  *
- * @note    Complexity: O(1)
+ * @note    Complexity: \f(\mathcal{O}\left(1\right)\f)
  *
  * @param[in]   list    Pointer to the clist
  *
