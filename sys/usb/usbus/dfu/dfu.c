@@ -228,13 +228,14 @@ static int _dfu_class_control_req(usbus_t *usbus, usbus_dfu_device_t *dfu, usb_s
 
             if (dfu->dfu_state == USB_DFU_STATE_DFU_DL_SYNC) {
                 dfu->dfu_state = USB_DFU_STATE_DFU_DL_IDLE;
-                DEBUG("GET STATUS GO TO IDLE\n");
             }
             else if (dfu->dfu_state == USB_DFU_STATE_DFU_MANIFEST_SYNC) {
                 /* Scheduled reboot, so we can answer back dfu-util before rebooting */
                 dfu->dfu_state = USB_DFU_STATE_DFU_DL_IDLE;
 #ifdef MODULE_RIOTBOOT_USB_DFU
                 ztimer_set(ZTIMER_SEC, &scheduled_reboot, 1);
+                /* Set specific flag to forward TRANSFER_COMPLETE event to this interface */
+                usbus_handler_set_flag(&dfu->handler_ctrl, USBUS_HANDLER_FLAG_TR_EP0_FWD);
 #endif
             }
             memset(&buf, 0, sizeof(buf));
@@ -243,7 +244,6 @@ static int _dfu_class_control_req(usbus_t *usbus, usbus_dfu_device_t *dfu, usb_s
             buf.state = dfu->dfu_state;
             /* Send answer to host */
             usbus_control_slicer_put_bytes(usbus, (uint8_t*)&buf, sizeof(buf));
-            DEBUG("send answer\n");
             break;
         }
         case DFU_CLR_STATUS:
@@ -294,10 +294,17 @@ static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
 static void _transfer_handler(usbus_t *usbus, usbus_handler_t *handler,
                              usbdev_ep_t *ep, usbus_event_transfer_t event)
 {
-    (void)event;
-    (void)usbus;
     (void)handler;
-    (void)ep;
+    usbus_control_handler_t *ep0_handler = (usbus_control_handler_t *)usbus->control;
+
+    /* Ensure we did transmit the status packet before rebooting to application */
+    if (ep->dir == USB_EP_DIR_OUT && event == USBUS_EVENT_TRANSFER_COMPLETE) {
+
+        /* Wait to receive OUTACK event on EP0 before rebooting */
+        if (ep0_handler->control_request_state == USBUS_CONTROL_REQUEST_STATE_READY) {
+            pm_reboot();
+        }
+    }
 }
 
 static void _event_handler(usbus_t *usbus, usbus_handler_t *handler,
