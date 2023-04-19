@@ -2,7 +2,6 @@ include ../Makefile.tests_common
 
 USEMODULE += dfplayer
 USEMODULE += event_thread
-USEMODULE += shell
 USEMODULE += shell_cmds_default
 
 include $(RIOTBASE)/Makefile.include

@@ -12,7 +12,6 @@ endif
 
 USEMODULE += ztimer_usec
 USEMODULE += ztimer_sec
-USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += schedstatistics
 

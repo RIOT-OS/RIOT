@@ -1,7 +1,6 @@
 export APPLICATION = can_trx
 include ../Makefile.tests_common
 
-USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += ps
 

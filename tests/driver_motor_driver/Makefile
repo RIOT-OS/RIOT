@@ -3,7 +3,6 @@ BOARD ?= native
 include ../Makefile.tests_common
 
 USEMODULE += motor_driver
-USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += xtimer
 

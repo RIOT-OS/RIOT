@@ -3,7 +3,6 @@ include ../Makefile.tests_common
 USEMODULE += congure_reno
 USEMODULE += congure_test
 USEMODULE += fmt
-USEMODULE += shell
 USEMODULE += shell_cmds_default
 
 INCLUDES += -I$(CURDIR)

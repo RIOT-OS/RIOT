@@ -10,7 +10,6 @@ CFLAGS += -DTHREAD_STACKSIZE_MAIN=\($(MAIN_THREAD_SIZE)\)
 USEMODULE += fmt
 USEMODULE += random
 USEMODULE += shell_cmd_random
-USEMODULE += shell
 USEMODULE += xtimer
 
 FEATURES_OPTIONAL += periph_hwrng

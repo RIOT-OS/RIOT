@@ -22,7 +22,6 @@ else
 endif
 
 # Add also the shell, some shell commands
-USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += ps
 USEMODULE += netstats_l2
