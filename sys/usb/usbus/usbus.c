@@ -556,13 +556,6 @@ static void _event_ep_cb(usbdev_ep_t *ep, usbdev_event_t event)
                 case USBDEV_EVENT_TR_COMPLETE:
                     _usbus_transfer_complete(usbus, ep, handler);
                     break;
-                case USBDEV_EVENT_TR_FAIL:
-                    if (usbus_handler_isset_flag(handler,
-                                                 USBUS_HANDLER_FLAG_TR_FAIL)) {
-                        handler->driver->transfer_handler(usbus, handler, ep,
-                                                          USBUS_EVENT_TRANSFER_FAIL);
-                    }
-                    break;
                 case USBDEV_EVENT_TR_STALL:
                     if (usbus_handler_isset_flag(handler,
                                                  USBUS_HANDLER_FLAG_TR_STALL)) {

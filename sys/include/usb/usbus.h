@@ -131,15 +131,6 @@ extern "C" {
 #define USBUS_HANDLER_FLAG_SOF      (0x0002)    /**< Report SOF events */
 #define USBUS_HANDLER_FLAG_SUSPEND  (0x0004)    /**< Report suspend events */
 #define USBUS_HANDLER_FLAG_RESUME   (0x0008)    /**< Report resume from suspend */
-
-/**
- * @brief Report transfer fail
- *
- * @deprecated This event is deprecated as only a limited number of low level
- *             devices report this and it doesn't offer value for upper layer
- *             code. This flag will be removed after the 2022.07 release
- */
-#define USBUS_HANDLER_FLAG_TR_FAIL  (0x0010)
 #define USBUS_HANDLER_FLAG_TR_STALL (0x0020)    /**< Report transfer stall complete */
 /** @} */
 
