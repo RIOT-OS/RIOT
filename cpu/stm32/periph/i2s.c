@@ -59,8 +59,11 @@ static inline i2s_runtime_state_t *state(i2s_t dev)
 static bool _enable_clock(i2s_t dev)
 {
     bool previous_state = state(dev)->clock_state;
-    pm_block(STM32_PM_STOP);
-    periph_clk_en(i2s_config[dev].apbbus, i2s_config[dev].rccmask);
+    if (!previous_state) {
+        pm_block(STM32_PM_STOP);
+        periph_clk_en(i2s_config[dev].apbbus, i2s_config[dev].rccmask);
+        state(dev)->clock_state = true;
+    }
     return previous_state;
 }
 
@@ -151,7 +154,7 @@ static uint8_t _datlen2bits(uint32_t reg)
 
 static i2s_direction_t _reg2dir(uint32_t cfgr)
 {
-    return (cfgr & SPI_I2SCFGR_I2SCFG_0) ? I2S_DIRECTION_TRANSMIT : I2S_DIRECTION_RECEIVE;
+    return (cfgr & SPI_I2SCFGR_I2SCFG_0) ? I2S_DIRECTION_RECEIVE : I2S_DIRECTION_TRANSMIT;
 }
 
 static i2s_mode_t _reg2mode(uint32_t cfgr)
@@ -190,7 +193,7 @@ static uint32_t _get_clock_config(i2s_t dev, uint8_t frame_length)
         return input_clock / (256 * divisor);
     }
     else {
-        return input_clock / (2 * frame_length * divisor);
+        return input_clock / (frame_length * divisor);
     }
 }
 
@@ -236,6 +239,7 @@ int i2s_configure(i2s_t dev, const i2s_config_t *config)
         periph(dev)->CR2 = SPI_CR2_TXDMAEN;
     }
 
+    state(dev)->transaction_bytes = config->transaction_bytes - (config->transaction_bytes % (frame_length / 8));
     state(dev)->bytes_per_frame = i2s_bytes_per_frame(frame_length, config->channels);
 
     _restore_clock(dev, clk);
@@ -269,6 +273,15 @@ uint32_t i2s_get_frame_clock(i2s_t dev)
     return frame_clock;
 }
 
+uint8_t i2s_get_word_size(i2s_t dev)
+{
+    bool clk = _enable_clock(dev);
+    uint32_t cfgr = periph(dev)->I2SCFGR;
+    uint8_t data_length = _datlen2bits(cfgr);
+    _restore_clock(dev, clk);
+    return data_length;
+}
+
 void _start_transaction(i2s_t dev)
 {
     i2s_transaction_t *transaction = container_of(clist_lpop(&state(dev)->transactions), i2s_transaction_t, node);
@@ -280,8 +293,10 @@ void _start_transaction(i2s_t dev)
 void _append_transaction(i2s_t dev)
 {
     i2s_transaction_t *transaction = container_of(clist_lpop(&state(dev)->transactions), i2s_transaction_t, node);
+    assert(transaction && transaction->buf);
     state(dev)->current_transaction = transaction;
     transaction = container_of(clist_lpeek(&state(dev)->transactions), i2s_transaction_t, node);
+    assert(transaction && transaction->buf);
     dma_double_buffer_set_other(i2s_config[dev].dma, transaction->buf);
 }
 
@@ -317,18 +332,28 @@ int i2s_start(i2s_t dev)
     i2s_transaction_t *transaction = container_of(clist_lpeek(&state(dev)->transactions), i2s_transaction_t, node);
     dma_double_buffer_set_other(i2s_config[dev].dma, transaction->buf);
 
-    periph(dev)->I2SCFGR |= SPI_I2SCFGR_I2SE;
     _config_gpio(dev, mode, dir);
+
+    periph(dev)->I2SCFGR |= SPI_I2SCFGR_I2SE;
 
     return I2S_OK;
 }
 
-void i2s_stop(i2s_t dev)
+int i2s_drain(i2s_t dev)
+{
+    (void)dev;
+    return 0;
+}
+
+int i2s_stop(i2s_t dev)
 {
     dma_stop(i2s_config[dev].dma);
     dma_release(i2s_config[dev].dma);
     periph(dev)->I2SCFGR &= ~SPI_I2SCFGR_I2SE;
     _restore_clock(dev, false);
+    state(dev)->current_transaction = NULL;
+    state(dev)->transactions.next = NULL;
+    return 0;
 }
 
 void i2s_add_transaction(i2s_t dev, i2s_transaction_t *transaction)
@@ -342,21 +367,25 @@ static void _dma_transfer_callback(dma_t dma, void *arg)
 {
     (void)dma;
     i2s_t dev = (i2s_t)(intptr_t)arg;
+    dev = I2S_DEV(0);
     clist_node_t *transactions = &(state(dev)->transactions);
     i2s_transaction_t *previous = state(dev)->current_transaction;
     /* pop the previous transaction */
     state(dev)->frames_transmitted += state(dev)->transaction_bytes / state(dev)->bytes_per_frame;
+
+    if (state(dev)->transaction_callback) {
+        state(dev)->transaction_callback(dev, previous, state(dev)->arg);
+    }
+
     if (!clist_is_empty(transactions)) {
         _append_transaction(dev);
     }
     else {
+        assert(false);
         i2s_stop(dev);
         if (state(dev)->event_callback) {
             state(dev)->event_callback(dev, I2S_STATE_ERROR, I2S_EVENT_ERR_TX_UDR, state(dev)->arg);
         }
-    }
-    if (state(dev)->transaction_callback) {
-        state(dev)->transaction_callback(dev, previous, state(dev)->arg);
     }
 }
 
@@ -374,14 +403,16 @@ size_t i2s_frames_transmitted(i2s_t dev)
 size_t i2s_write_transaction_buffer(i2s_t dev, const void *source, size_t bytes, i2s_transaction_t *transaction, size_t offset)
 {
     assert(transaction && transaction->buf);
+    bool clk = _enable_clock(dev);
     size_t word_size = periph(dev)->I2SCFGR & SPI_I2SCFGR_CHLEN ? 32 : 16;
+    _restore_clock(dev, clk);
     size_t transaction_bytes = state(dev)->transaction_bytes;
     size_t bytes_to_copy = MIN(bytes, transaction_bytes - offset);
     if (word_size == 32) {
         /* swap half words */
         for (size_t i = 0; i < bytes_to_copy/4; i++) {
             uint32_t val = unaligned_get_u32((uint8_t*)source + (4 * i));
-            uint32_t *target = ((uint32_t*)(void*)transaction->buf) + i; /* Should be aligned already */
+            uint32_t *target = ((uint32_t*)(void*)transaction->buf) + i + (offset/4); /* Should be aligned already */
             *target = (val << 16) | (val >> 16);
         }
     }
