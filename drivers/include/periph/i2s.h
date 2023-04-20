@@ -115,15 +115,15 @@
  * ```
  * 32                          0
  * +------+--------------------+
- * | SIGN | L0                 |
- * +------+--------------------+
- * | SIGN | R0                 |
- * +------+--------------------+
- * | SIGN | ...                |
- * +------+--------------------+
- * | SIGN | LN                 |
- * +------+--------------------+
- * | SIGN | RN                 |
+ * | L0                 | 0x00 |
+ * +--------------------+------+
+ * | R0                 | 0x00 |
+ * +--------------------+------+
+ * | ...                | 0x00 |
+ * +--------------------+------+
+ * | LN                 | 0x00 |
+ * +--------------------+------+
+ * | RN                 | 0x00 |
  * +------+--------------------+
  * ```
  *
@@ -172,6 +172,9 @@
 
 #ifndef PERIPH_I2S_H
 #define PERIPH_I2S_H
+
+#include <stddef.h>
+#include <stdint.h>
 
 #include "periph_cpu.h"
 #include "periph_conf.h"
@@ -230,13 +233,14 @@ typedef unsigned int i2s_t;
  * I2S function result values
  */
 enum {
-    I2S_OK = 0,         /**< No error */
-    I2S_NODEV = -1,     /**< I2S device doesn't exist */
-    I2S_NOCONF = -2,    /**< I2S device is not configured */
-    I2S_NOWIDTH = -3,   /**< The requested bit width is not available */
-    I2S_NOCHANNEL = -4, /**< Requested number of channels is not available */
-    I2S_NODIR = -5,     /**< Requested direction is not available on the device */
-    I2S_NODATA = -6,    /**< No transactions supplied before starting */
+    I2S_OK = 0,          /**< No error */
+    I2S_NODEV = -1,      /**< I2S device doesn't exist */
+    I2S_NOCONF = -2,     /**< I2S device is not configured */
+    I2S_NOWIDTH = -3,    /**< The requested bit width is not available */
+    I2S_NOCHANNEL = -4,  /**< Requested number of channels is not available */
+    I2S_NODIR = -5,      /**< Requested direction is not available on the device */
+    I2S_NODATA = -6,     /**< No transactions supplied before starting */
+    I2S_NOTRUNNING = -7, /**< No transactions supplied before starting */
 };
 
 /**
@@ -362,7 +366,14 @@ int i2s_get_configuration(i2s_t dev, i2s_config_t *config);
  */
 uint32_t i2s_get_frame_clock(i2s_t dev);
 
-uint32_t i2s_get_word_size(i2s_t dev);
+/**
+ * @brief Get the current word size of the I2S device
+ *
+ * @param   dev         I2S device
+ *
+ * @return              The word size in bits
+ */
+uint8_t i2s_get_word_size(i2s_t dev);
 
 /**
  * @brief Start the I2S stream.
@@ -384,14 +395,14 @@ int i2s_start(i2s_t dev);
  *
  * @param   dev     I2S device to drain the transmission queue for
  */
-void i2s_drain(i2s_t dev);
+int i2s_drain(i2s_t dev);
 
 /**
  * @brief   Stop the I2S stream immediately without processing the remaining queued transactions.
  *
  * @param   dev     I2S device to stop
  */
-void i2s_stop(i2s_t dev);
+int i2s_stop(i2s_t dev);
 
 /**
  * @brief Add a data transaction to the device
@@ -446,7 +457,7 @@ size_t i2s_read_transaction_buffer(i2s_t dev, void *dest, size_t bytes, i2s_tran
  */
 static inline size_t i2s_bytes_per_frame(uint8_t word_size, uint8_t channels)
 {
-    return (channels * word_size / 8);
+    return ((channels * word_size) / 8);
 }
 /**
  * @brief Calculate the number of frames in a byte buffer
