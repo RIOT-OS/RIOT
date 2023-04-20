@@ -45,6 +45,10 @@ typedef struct {
     gpio_t bclk_pin;        /**< Bit clock pin */
     gpio_t wclk_pin;        /**< Word/LR clock pin */
     gpio_t mclk_pin;        /**< Master clock pin */
+    gpio_af_t data_af;      /**< Data In/Out pin alternative function */
+    gpio_af_t bclk_af;      /**< Bit clock pin alternative function */
+    gpio_af_t wclk_af;      /**< Word/LR clock pin alternative function */
+    gpio_af_t mclk_af;      /**< Master clock pin alternative function */
     uint32_t rccmask;       /**< bit in the RCC peripheral enable register */
     uint8_t apbbus;         /**< APBx bus the device is connected to */
     uint32_t input_clock;   /**< Peripheral input clock frequency */
