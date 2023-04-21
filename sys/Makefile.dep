@@ -403,9 +403,6 @@ endif
 
 ifneq (,$(filter entropy_source_%,$(USEMODULE)))
   USEMODULE += entropy_source
-  ifneq (,$(filter entropy_source_adc_noise,$(USEMODULE)))
-    FEATURES_REQUIRED += periph_adc
-  endif
 endif
 
 ifneq (,$(filter puf_sram,$(USEMODULE)))
