@@ -213,12 +213,12 @@ ifneq (,$(filter l2util,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
-ifneq (,$(filter od,$(USEMODULE)))
-  USEMODULE += fmt
-endif
-
 ifneq (,$(filter od_string,$(USEMODULE)))
   USEMODULE += od
+endif
+
+ifneq (,$(filter od,$(USEMODULE)))
+  USEMODULE += fmt
 endif
 
 ifneq (,$(filter netutils,$(USEMODULE)))
