@@ -590,10 +590,6 @@ ifneq (,$(filter nanocoap_%,$(USEMODULE)))
   USEMODULE += nanocoap
 endif
 
-ifneq (,$(filter benchmark,$(USEMODULE)))
-  USEMODULE += ztimer_usec
-endif
-
 ifneq (,$(filter skald_%,$(USEMODULE)))
   USEMODULE += skald
 endif
