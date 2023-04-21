@@ -378,10 +378,6 @@ ifneq (,$(filter pthread,$(USEMODULE)))
   endif
 endif
 
-ifneq (,$(filter saul_reg,$(USEMODULE)))
-  USEMODULE += saul
-endif
-
 ifneq (,$(filter saul_default,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_saul
   DEFAULT_MODULE += saul_init_devs
