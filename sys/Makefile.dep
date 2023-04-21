@@ -405,12 +405,6 @@ ifneq (,$(filter entropy_source_%,$(USEMODULE)))
   USEMODULE += entropy_source
 endif
 
-ifneq (,$(filter puf_sram,$(USEMODULE)))
-  USEMODULE += hashes
-  USEMODULE += random
-  FEATURES_REQUIRED += puf_sram
-endif
-
 ifneq (,$(filter random,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_random
   USEMODULE += prng
