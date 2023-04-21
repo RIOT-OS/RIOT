@@ -670,10 +670,6 @@ ifneq (,$(filter usbus_dfu,$(USEMODULE)))
   USEMODULE += riotboot_slot
 endif
 
-ifneq (,$(filter ut_process,$(USEMODULE)))
-  USEMODULE += fmt
-endif
-
 ifneq (,$(filter usbus_msc,$(USEMODULE)))
   USEMODULE += usbus
   USEMODULE += mtd
