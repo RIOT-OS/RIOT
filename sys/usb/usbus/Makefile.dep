@@ -1,0 +1,35 @@
+DEFAULT_MODULE += auto_init_usbus
+USEMODULE += core_thread_flags
+USEMODULE += event
+USEMODULE += luid
+USEMODULE += fmt
+
+ifeq (,$(filter usbdev_mock,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_usbdev
+endif
+
+ifneq (,$(filter usbus_cdc_acm,$(USEMODULE)))
+  USEMODULE += tsrb
+endif
+
+ifneq (,$(filter usbus_cdc_ecm,$(USEMODULE)))
+  USEMODULE += iolist
+  USEMODULE += fmt
+  USEMODULE += usbus_urb
+  USEMODULE += netdev_eth
+  USEMODULE += luid
+endif
+
+ifneq (,$(filter usbus_hid,$(USEMODULE)))
+  USEMODULE += isrpipe_read_timeout
+endif
+
+ifneq (,$(filter usbus_dfu,$(USEMODULE)))
+  FEATURES_REQUIRED += riotboot
+  USEMODULE += riotboot_slot
+endif
+
+ifneq (,$(filter usbus_msc,$(USEMODULE)))
+  USEMODULE += mtd
+  USEMODULE += mtd_write_page
+endif
