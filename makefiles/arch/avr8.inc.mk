@@ -41,10 +41,3 @@ endif
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-overflow
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-truncation
 OPTIONAL_CFLAGS_BLACKLIST += -gz
-
-ifeq ($(TOOLCHAIN),gnu)
-  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105523
-  ifneq ($(findstring 12.,$(shell $(TARGET_ARCH)-gcc --version 2>/dev/null)),)
-    CFLAGS += --param=min-pagesize=0
-  endif
-endif
