@@ -185,11 +185,6 @@ ifneq (,$(filter netdev_tap,$(USEMODULE)))
   USEMODULE += iolist
 endif
 
-ifneq (,$(filter trickle,$(USEMODULE)))
-  USEMODULE += random
-  USEMODULE += ztimer_msec
-endif
-
 ifneq (,$(filter eui_provider,$(USEMODULE)))
   USEMODULE += luid
 endif
