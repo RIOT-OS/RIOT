@@ -360,12 +360,6 @@ ifneq (,$(filter log_%,$(USEMODULE)))
   USEMODULE += log
 endif
 
-ifneq (,$(filter log_color,$(USEMODULE)))
-  # log_color fails to compile with -Wformat-nonliteral but this is required
-  # for the wrapped stdio that pushes the format string into progmem
-  FEATURES_BLACKLIST += arch_avr8
-endif
-
 ifneq (,$(filter cpp11-compat,$(USEMODULE)))
   USEMODULE += cpp_new_delete
   USEMODULE += ztimer64_usec
