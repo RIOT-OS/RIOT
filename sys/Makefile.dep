@@ -100,10 +100,6 @@ ifneq (,$(filter shell_lock,$(USEMODULE)))
   USEMODULE += ztimer_msec
 endif
 
-ifneq (,$(filter ssp,$(USEMODULE)))
-  FEATURES_REQUIRED += ssp
-endif
-
 ifneq (,$(filter base64url,$(USEMODULE)))
   USEMODULE += base64
 endif
