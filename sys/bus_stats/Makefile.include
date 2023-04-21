@@ -1,0 +1,12 @@
+# use the wrapper functions for bus accesses
+
+ifneq (,$(filter bus_stats_spi,$(USEMODULE)))
+  LINKFLAGS += -Wl,-wrap=spi_acquire -Wl,-wrap=spi_release
+  LINKFLAGS += -Wl,-wrap=spi_transfer_bytes -Wl,-wrap=spi_transfer_byte
+endif
+
+ifneq (,$(filter bus_stats_i2c,$(USEMODULE)))
+  LINKFLAGS += -Wl,-wrap=i2c_acquire -Wl,-wrap=i2c_release
+  LINKFLAGS += -Wl,-wrap=i2c_read_byte -Wl,-wrap=i2c_write_byte
+  LINKFLAGS += -Wl,-wrap=i2c_read_bytes -Wl,-wrap=i2c_write_bytes
+endif

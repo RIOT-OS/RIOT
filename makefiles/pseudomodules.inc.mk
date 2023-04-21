@@ -33,6 +33,8 @@ PSEUDOMODULES += base64url
 ## be advertised in any other capacity, e.g. through @ref sys_auto_init_saul).
 PSEUDOMODULES += board_software_reset
 
+PSEUDOMODULES += bus_stats_i2c
+PSEUDOMODULES += bus_stats_spi
 PSEUDOMODULES += can_mbox
 PSEUDOMODULES += can_pm
 PSEUDOMODULES += can_raw
@@ -445,6 +447,7 @@ PSEUDOMODULES += sha256sum
 PSEUDOMODULES += shell_cmd_app_metadata
 PSEUDOMODULES += shell_cmd_at30tse75x
 PSEUDOMODULES += shell_cmd_benchmark_udp
+PSEUDOMODULES += shell_cmd_bus_stats
 PSEUDOMODULES += shell_cmd_ccn-lite-utils
 PSEUDOMODULES += shell_cmd_conn_can
 PSEUDOMODULES += shell_cmd_cord_ep

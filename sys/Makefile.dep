@@ -186,6 +186,11 @@ ifneq (,$(filter gnrc% %gnrc,$(USEMODULE)))
   include $(RIOTBASE)/sys/net/gnrc/Makefile.dep
 endif
 
+# include bus_stats dependencies
+ifneq (,$(filter bus_stats%,$(USEMODULE)))
+  include $(RIOTBASE)/sys/bus_stats/Makefile.dep
+endif
+
 ifneq (,$(filter sntp,$(USEMODULE)))
   USEMODULE += sock_udp
   USEMODULE += xtimer
