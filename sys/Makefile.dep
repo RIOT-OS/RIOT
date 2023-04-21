@@ -385,8 +385,8 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_reg
 endif
 
-ifneq (,$(filter senml%,$(USEMODULE)))
-  include $(RIOTBASE)/sys/senml/Makefile.dep
+ifneq (,$(filter senml_%,$(USEMODULE)))
+  USEMODULE += senml
 endif
 
 ifneq (,$(filter phydat,$(USEMODULE)))
