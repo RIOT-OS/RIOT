@@ -335,14 +335,6 @@ ifneq (,$(filter posix_inet,$(USEMODULE)))
   USEMODULE += posix_headers
 endif
 
-ifneq (,$(filter sema_inv,$(USEMODULE)))
-  USEMODULE += atomic_utils
-endif
-
-ifneq (,$(filter sema,$(USEMODULE)))
-  USEMODULE += ztimer
-endif
-
 ifneq (,$(filter sema_deprecated,$(USEMODULE)))
   USEMODULE += sema
   USEMODULE += ztimer64
