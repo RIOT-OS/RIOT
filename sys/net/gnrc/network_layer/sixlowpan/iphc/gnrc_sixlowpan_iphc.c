@@ -734,6 +734,14 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
     gnrc_sixlowpan_frag_vrb_t *vrbe = NULL;
 #endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_VRB */
 
+    if (sixlo->size < 2U) {
+        DEBUG("6lo iphc: IPHC header truncated\n");
+        if (rbuf != NULL) {
+            gnrc_sixlowpan_frag_rb_remove(rbuf);
+        }
+        gnrc_pktbuf_release(sixlo);
+        return;
+    }
     if (rbuf != NULL) {
         ipv6 = rbuf->pkt;
         assert(ipv6 != NULL);
