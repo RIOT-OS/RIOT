@@ -715,10 +715,6 @@ ifneq (,$(filter ztimer64%,$(USEMODULE)))
   include $(RIOTBASE)/sys/ztimer64/Makefile.dep
 endif
 
-ifneq (,$(filter evtimer,$(USEMODULE)))
-  USEMODULE += ztimer_msec
-endif
-
 # handle xtimer's deps. Needs to be done *after* ztimer
 ifneq (,$(filter xtimer,$(USEMODULE)))
   include $(RIOTBASE)/sys/xtimer/Makefile.dep
