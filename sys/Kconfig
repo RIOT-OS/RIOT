@@ -72,6 +72,7 @@ choice LOG
     #modules log_color and log_printfnoformat describe their options
 endchoice
 
+rsource "coding/Kconfig"
 rsource "log_color/Kconfig"
 rsource "log_printfnoformat/Kconfig"
 rsource "luid/Kconfig"
