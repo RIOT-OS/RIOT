@@ -128,7 +128,7 @@ config MODULE_SHELL_CMD_GNRC_NETIF_LORA
     depends on MODULE_SHELL_CMD_GNRC_NETIF
 
 config MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN
-    bool "LoRa integration to the GNRC network interface command (ifconfig)"
+    bool "LoRaWAN integration to the GNRC network interface command (ifconfig)"
     default y if MODULE_SHELL_CMD_GNRC_NETIF && MODULE_GNRC_NETIF_LORAWAN
     depends on MODULE_GNRC_NETIF
     depends on MODULE_GNRC_NETIF_LORAWAN
