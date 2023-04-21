@@ -309,10 +309,6 @@ endif
 # Include all stdio_% dependencies after all USEMODULE += stdio_%
 include $(RIOTBASE)/makefiles/stdio.inc.mk
 
-ifneq (,$(filter isrpipe,$(USEMODULE)))
-  USEMODULE += tsrb
-endif
-
 ifneq (,$(filter isrpipe_read_timeout,$(USEMODULE)))
   USEMODULE += isrpipe
   USEMODULE += ztimer_usec
