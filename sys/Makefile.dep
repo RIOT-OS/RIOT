@@ -394,25 +394,11 @@ ifneq (,$(filter evtimer_mbox,$(USEMODULE)))
   USEMODULE += core_mbox
 endif
 
-ifneq (,$(filter can,$(USEMODULE)))
-  USEMODULE += can_raw
-  ifneq (,$(filter can_mbox,$(USEMODULE)))
-    USEMODULE += core_mbox
-  endif
-  USEMODULE += memarray
-endif
-
-ifneq (,$(filter can_isotp,$(USEMODULE)))
-  USEMODULE += ztimer
-  USEMODULE += ztimer_usec
-  USEMODULE += gnrc_pktbuf
+ifneq (,$(filter can_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter conn_can,$(USEMODULE)))
   USEMODULE += can
-  USEMODULE += can_mbox
-  USEMODULE += ztimer
-  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter entropy_source_%,$(USEMODULE)))
