@@ -349,10 +349,6 @@ ifneq (,$(filter shell_cmds,$(USEMODULE)))
   USEMODULE += shell
 endif
 
-ifneq (,$(filter shell,$(USEMODULE)))
-  include $(RIOTBASE)/sys/shell/Makefile.dep
-endif
-
 # Include all stdio_% dependencies after all USEMODULE += stdio_%
 include $(RIOTBASE)/makefiles/stdio.inc.mk
 
