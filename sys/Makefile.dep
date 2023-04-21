@@ -757,8 +757,4 @@ ifneq (,$(filter auto_init%,$(USEMODULE)))
   USEMODULE += preprocessor_successor
 endif
 
-ifneq (,$(filter uri_parser,$(USEMODULE)))
-  USEMODULE += fmt
-endif
-
 include $(RIOTBASE)/sys/test_utils/Makefile.dep
