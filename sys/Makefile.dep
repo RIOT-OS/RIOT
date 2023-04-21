@@ -346,10 +346,6 @@ ifneq (,$(filter telnet,$(USEMODULE)))
   USEMODULE += sock_tcp
 endif
 
-ifneq (,$(filter luid,$(USEMODULE)))
-  FEATURES_OPTIONAL += periph_cpuid
-endif
-
 ifneq (,$(filter fib,$(USEMODULE)))
   USEMODULE += universal_address
   USEMODULE += xtimer
@@ -684,10 +680,6 @@ ifneq (,$(filter gcoap_dns,$(USEMODULE)))
   USEMODULE += ipv6_addr
   USEMODULE += uri_parser
   USEMODULE += sock_util
-endif
-
-ifneq (,$(filter luid,$(USEMODULE)))
-  FEATURES_OPTIONAL += periph_cpuid
 endif
 
 ifneq (,$(filter nanocoap_dtls,$(USEMODULE)))
