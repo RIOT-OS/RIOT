@@ -378,11 +378,6 @@ ifneq (,$(filter pthread,$(USEMODULE)))
   endif
 endif
 
-ifneq (,$(filter schedstatistics,$(USEMODULE)))
-  USEMODULE += ztimer_usec
-  USEMODULE += sched_cb
-endif
-
 ifneq (,$(filter sched_round_robin,$(USEMODULE)))
 # this depends on either ztimer_usec or ztimer_msec if neither is used
 # prior to this msec is preferred
