@@ -378,15 +378,6 @@ ifneq (,$(filter pthread,$(USEMODULE)))
   endif
 endif
 
-ifneq (,$(filter sched_round_robin,$(USEMODULE)))
-# this depends on either ztimer_usec or ztimer_msec if neither is used
-# prior to this msec is preferred
-  ifeq (,$(filter ztimer_usec,$(USEMODULE))$(filter ztimer_msec,$(USEMODULE)))
-    USEMODULE += ztimer_msec
-  endif
-  USEMODULE += sched_runq_callback
-endif
-
 ifneq (,$(filter saul_reg,$(USEMODULE)))
   USEMODULE += saul
 endif
