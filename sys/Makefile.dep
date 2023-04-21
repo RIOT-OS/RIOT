@@ -96,11 +96,6 @@ ifneq (,$(filter ieee802154_security,$(USEMODULE)))
   USEMODULE += cipher_modes
 endif
 
-ifneq (,$(filter trace,$(USEMODULE)))
-  USEMODULE += ztimer
-  USEMODULE += ztimer_usec
-endif
-
 ifneq (,$(filter shell_lock,$(USEMODULE)))
   USEMODULE += ztimer_msec
 endif
