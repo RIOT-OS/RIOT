@@ -131,6 +131,7 @@ extern "C" {
 #define USBUS_HANDLER_FLAG_SOF      (0x0002)    /**< Report SOF events */
 #define USBUS_HANDLER_FLAG_SUSPEND  (0x0004)    /**< Report suspend events */
 #define USBUS_HANDLER_FLAG_RESUME   (0x0008)    /**< Report resume from suspend */
+#define USBUS_HANDLER_FLAG_ACTIVE   (0x0040)    /**< Report EPs activated event*/
 
 /**
  * @brief Report transfer fail
@@ -176,6 +177,7 @@ typedef enum {
     USBUS_EVENT_USB_SOF,        /**< USB start of frame received    */
     USBUS_EVENT_USB_SUSPEND,    /**< USB suspend condition detected */
     USBUS_EVENT_USB_RESUME,     /**< USB resume condition detected  */
+    USBUS_EVENT_USB_ACTIVE,     /**< USB configuration set and EPs activated */
 } usbus_event_usb_t;
 
 /**
