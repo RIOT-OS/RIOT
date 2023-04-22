@@ -1,7 +1,6 @@
 include ../Makefile.tests_common
 
 USEMODULE += stdio_semihosting
-USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += ps
 

@@ -13,7 +13,6 @@ USEMODULE += sock_udp
 USEMODULE += netstats_ipv6
 USEMODULE += netstats_l2
 USEMODULE += ps
-USEMODULE += shell
 USEMODULE += shell_cmds_default
 
 USEMODULE += sock_aux_local

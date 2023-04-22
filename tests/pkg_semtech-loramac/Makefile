@@ -20,7 +20,6 @@ ifeq (,$(filter $(BOARD),$(BOARD_WITHOUT_LORAMAC_RX)))
 endif
 
 USEMODULE += auto_init_loramac
-USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += fmt
 

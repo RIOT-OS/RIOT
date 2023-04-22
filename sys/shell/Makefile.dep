@@ -1,13 +1,4 @@
-ifneq (,$(filter shell_cmd_%,$(USEMODULE)))
-  # each and every command is a submodule of shell_cmds
-  USEMODULE += shell_cmds
-endif
-
-ifneq (,$(filter shell_commands,$(USEMODULE)))
-  # shell_commands has been renamed to shell_cmds_default, but let's keep this
-  # for backward compatibility
-  USEMODULE += shell_cmds_default
-endif
+USEMODULE += stdin
 
 ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
   USEMODULE += shell_cmd_sys

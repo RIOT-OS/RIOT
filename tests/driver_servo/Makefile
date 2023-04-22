@@ -1,7 +1,6 @@
 include ../Makefile.tests_common
 
 USEMODULE += servo
-USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += saul_default
 

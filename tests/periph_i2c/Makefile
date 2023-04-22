@@ -4,7 +4,6 @@ include ../Makefile.tests_common
 FEATURES_REQUIRED = periph_i2c
 FEATURES_OPTIONAL = periph_i2c_reconfigure
 
-USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += shell_cmd_i2c_scan
 USEMODULE += xtimer

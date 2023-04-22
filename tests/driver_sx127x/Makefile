@@ -3,7 +3,6 @@ BOARD ?= b-l072z-lrwan1
 include ../Makefile.tests_common
 
 USEMODULE += od
-USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += ps
 

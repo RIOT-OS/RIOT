@@ -7,7 +7,6 @@ FEATURES_OPTIONAL += periph_gpio_irq
 FEATURES_OPTIONAL += periph_gpio_fast_read
 FEATURES_OPTIONAL += periph_gpio_tamper_wake
 
-USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += benchmark
 

@@ -79,7 +79,6 @@ endif
 ## Test application Modules
 USEMODULE += ps
 USEMODULE += od_string
-USEMODULE += shell
 USEMODULE += shell_cmds_default
 
 # ztimer is used instead of xtimer because it's a dependency of some

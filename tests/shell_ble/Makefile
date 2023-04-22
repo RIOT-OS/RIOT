@@ -3,7 +3,6 @@ BOARD ?= nrf52dk
 include ../Makefile.tests_common
 
 USEMODULE += app_metadata
-USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += ps
 

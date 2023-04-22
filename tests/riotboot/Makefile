@@ -6,7 +6,6 @@ FEATURES_REQUIRED += riotboot
 
 # Include modules to test the bootloader
 USEMODULE += riotboot_slot
-USEMODULE += shell
 # Add shell_cmds_default to use the shell version of `test_utils_interactive_sync`
 USEMODULE += shell_cmds_default
 

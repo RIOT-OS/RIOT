@@ -2,7 +2,6 @@ BOARD ?= nrf52dk
 include ../Makefile.tests_common
 
 # include shell support
-USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += ps
 

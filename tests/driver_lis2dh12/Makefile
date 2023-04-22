@@ -6,7 +6,6 @@ DRIVER ?= lis2dh12_spi
 USEMODULE += fmt
 USEMODULE += ztimer
 USEMODULE += ztimer_msec
-USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += $(DRIVER)
 

@@ -2,7 +2,6 @@ DEVELHELP=0
 include ../Makefile.tests_common
 
 USEMODULE += app_metadata
-USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += ps
 

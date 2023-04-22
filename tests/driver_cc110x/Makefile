@@ -5,7 +5,6 @@ DEVICE ?= cc1100 # The MSB-A2 uses the CC1100. New boards use CC1101
 
 # This test will rely on a human interacting with the shell, so we better add
 # the shell and some commands
-USEMODULE += shell
 USEMODULE += shell_cmds_default
 # Add the device driver
 USEMODULE += $(DEVICE)

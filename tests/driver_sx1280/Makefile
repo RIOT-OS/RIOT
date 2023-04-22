@@ -5,7 +5,6 @@ include ../Makefile.tests_common
 # required modules
 USEMODULE += sx1280
 
-USEMODULE += shell
 USEMODULE += shell_cmds_default
 
 USEMODULE += iolist

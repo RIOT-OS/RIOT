@@ -4,7 +4,6 @@ include ../Makefile.tests_common
 LORA_DRIVER ?= sx1261
 USEMODULE += $(LORA_DRIVER)
 
-USEMODULE += shell
 USEMODULE += shell_cmds_default
 
 include $(RIOTBASE)/Makefile.include

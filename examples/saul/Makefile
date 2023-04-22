@@ -10,7 +10,6 @@ RIOTBASE ?= $(CURDIR)/../..
 # we want to use SAUL:
 USEMODULE += saul_default
 # include the shell:
-USEMODULE += shell
 USEMODULE += shell_cmds_default
 # additional modules for debugging:
 USEMODULE += ps

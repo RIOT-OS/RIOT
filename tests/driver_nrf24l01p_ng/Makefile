@@ -2,7 +2,6 @@ DEBUG ?= 0
 
 include ../Makefile.tests_common
 
-USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += ps
 USEMODULE += gnrc

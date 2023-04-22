@@ -33,7 +33,6 @@ ifneq (,$(DEFAULT_MQTT_PWD))
   CFLAGS += -DDEFAULT_MQTT_PWD=\"$(DEFAULT_MQTT_PWD)\"
 endif
 
-USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += ps
 USEMODULE += netdev_default
