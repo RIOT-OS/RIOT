@@ -1,1 +1,2 @@
 INCLUDES += -I$(PKGDIRBASE)/qcbor/inc
+INCLUDES += -I$(PKGDIRBASE)/qcbor/inc/qcbor
