@@ -1,0 +1,5 @@
+
+ifneq (,$(filter mbedtls_threading,$(USEMODULE)))
+  # we provide alternative implementation in threading_alt.c
+  USEMODULE += mbedtls_threading_alt
+endif

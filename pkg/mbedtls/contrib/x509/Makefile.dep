@@ -1,0 +1,72 @@
+# Resolve X509 requirements according to the documentation in mbedtls_config.h.
+# Please keep the order.
+
+ifneq (,$(filter mbedtls_pem_parse,$(USEMODULE)))
+  USEMODULE += mbedtls_base64
+endif
+
+ifneq (,$(filter mbedtls_pem_write,$(USEMODULE)))
+  USEMODULE += mbedtls_base64
+endif
+
+ifneq (,$(filter mbedtls_pk,$(USEMODULE)))
+  ifeq (,$(filter mbedtls_rsa mbedtls_ecp,$(USEMODULE)))
+    $(info "mbedtls_pk: using default ECP")
+    USEMODULE += mbedtls_ecp
+  endif
+endif
+
+ifneq (,$(filter mbedtls_pk_parse,$(USEMODULE)))
+  USEMODULE += mbedtls_pk
+endif
+
+ifneq (,$(filter mbedtls_pk_write,$(USEMODULE)))
+  USEMODULE += mbedtls_pk
+endif
+
+ifneq (,$(filter mbedtls_pkcs5,$(USEMODULE)))
+  USEMODULE += mbedtls_md
+endif
+
+ifneq (,$(filter mbedtls_pkcs11,$(USEMODULE)))
+  USEMODULE += mbedtls_pk
+endif
+
+ifneq (,$(filter mbedtls_pkcs12,$(USEMODULE)))
+  USEMODULE += mbedtls_asn1_parse
+  USEMODULE += mbedtls_cipher
+  USEMODULE += mbedtls_md
+endif
+
+ifneq (,$(filter mbedtls_x509_use,$(USEMODULE)))
+  USEMODULE += mbedtls_asn1_parse
+  USEMODULE += mbedtls_bignum
+  USEMODULE += mbedtls_oid
+  USEMODULE += mbedtls_pk_parse
+endif
+
+ifneq (,$(filter mbedtls_x509_crt_parse,$(USEMODULE)))
+  USEMODULE += mbedtls_x509_use
+endif
+
+ifneq (,$(filter mbedtls_x509_crl_parse,$(USEMODULE)))
+  USEMODULE += mbedtls_x509_use
+endif
+
+ifneq (,$(filter mbedtls_x509_csr_parse,$(USEMODULE)))
+  USEMODULE += mbedtls_x509_use
+endif
+
+ifneq (,$(filter mbedtls_x509_create,$(USEMODULE)))
+  USEMODULE += mbedtls_bignum
+  USEMODULE += mbedtls_oid
+  USEMODULE += mbedtls_pk_write
+endif
+
+ifneq (,$(filter mbedtls_x509_crt_write,$(USEMODULE)))
+  USEMODULE += mbedtls_x509_create
+endif
+
+ifneq (,$(filter mbedtls_x509_csr_write,$(USEMODULE)))
+  USMEODULE += mbedtls_x509_create
+endif

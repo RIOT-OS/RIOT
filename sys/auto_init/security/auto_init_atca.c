@@ -16,9 +16,12 @@
  * @}
  */
 
+#include "modules.h"
 #include "log.h"
+#if IS_USED(MODULE_CRYPTOAUTHLIB)
 #include "atca.h"
 #include "atca_params.h"
+#endif
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -27,10 +30,12 @@
 
 void auto_init_atca(void)
 {
+#if IS_USED(MODULE_CRYPTOAUTHLIB)
     for (unsigned i = 0; i < ATCA_NUMOF; i++) {
         if (atcab_init((ATCAIfaceCfg *)&atca_params[i]) != ATCA_SUCCESS) {
             LOG_ERROR("[auto_init_atca] error initializing cryptoauth device #%u\n", i);
             continue;
         }
     }
+#endif
 }

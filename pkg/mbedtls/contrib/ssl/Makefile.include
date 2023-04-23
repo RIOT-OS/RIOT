@@ -1,0 +1,119 @@
+# Mirror mbedtls SSL options as in mbedtls_config.h
+# Please keep the order
+
+ifneq (,$(filter mbedtls_key_exchand_psk_enabled,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_KEY_EXCHANGE_PSK_ENABLED=1
+endif
+
+ifneq (,$(filter mbedtls_key_exchange_dhe_psk_enabled,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_KEY_EXCHANGE_DHE_PSK_ENABLED=1
+endif
+
+ifneq (,$(filter mbedtls_key_exchange_ecdhe_psk_enabled,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_KEY_EXCHANGE_ECDHE_PSK_ENABLED=1
+endif
+
+ifneq (,$(filter mbedtls_key_exchange_rsa_psk_enabled,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_KEY_EXCHANGE_RSA_PSK_ENABLED=1
+endif
+
+ifneq (,$(filter mbedtls_key_exchange_rsa_enabled,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_KEY_EXCHANGE_RSA_ENABLED=1
+endif
+
+ifneq (,$(filter mbedtls_key_exchange_dhe_rsa_enabled,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_KEY_EXCHANGE_DHE_RSA_ENABLED=1
+endif
+
+ifneq (,$(filter mbedtls_key_exchange_ecdhe_rsa_enabled,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_KEY_EXCHANGE_ECDHE_RSA_ENABLED=1
+endif
+
+ifneq (,$(filter mbedtls_key_exchange_ecdhe_ecdsa_enabled,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED=1
+endif
+
+ifneq (,$(filter mbedtls_key_exchange_ecdh_ecdsa_enabled,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_KEY_EXCHANGE_ECDH_ECDSA_ENABLED=1
+endif
+
+ifneq (,$(filter mbedtls_key_exchange_ecdh_rsa_enabled,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_KEY_EXCHANGE_ECDH_RSA_ENABLED=1
+endif
+
+ifneq (,$(filter mbedtls_key_exchange_ecjpake_enabled,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED=1
+endif
+
+ifneq (,$(filter mbedtls_ssl_dtls_connection_id,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_SSL_DTLS_CONNECTION_ID=1
+endif
+
+ifneq (,$(filter mbedtls_ssl_encrypt_then_mac,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_SSL_ENCRYPT_THEN_MAC=1
+endif
+
+ifneq (,$(filter mbedtls_ssl_extend_master_secret,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBETDLS_SSL_EXTEND_MASTER_SECRET=1
+endif
+
+ifneq (,$(filter mbedtls_ssl_proto_tls1,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_SSL_TLS1=1
+endif
+
+ifneq (,$(filter mbedtls_ssl_proto_tls1_1,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_SSL_TLS1_1=1
+endif
+
+ifneq (,$(filter mbedtls_ssl_proto_tls1_2,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_SSL_TLS1_2=1
+endif
+
+ifneq (,$(filter mbedtls_ssl_proto_dtls,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_SSL_PROTO_DTLS=1
+endif
+
+ifneq (,$(filter mbedtls_ssl_dtls_anti_replay,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_SSL_DTLS_ANTI_REPLAY=1
+endif
+
+ifneq (,$(filter mbedtls_ssl_dtls_hello_verify,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_SSL_DTLS_HELLO_VERIFY=1
+endif
+
+ifneq (,$(filter mbedtls_ssl_dtls_srtp,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_SSL_DTLS_SRTP=1
+endif
+
+ifneq (,$(filter mbedtls_ssl_dtls_client_port_reuse,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_SSL_DTLS_CLIENT_PORT_REUSE=1
+endif
+
+ifneq (,$(filter mbedtls_ssl_dtls_badmac_limit,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_SSL_DTLS_BADMAC_LIMIT=1
+endif
+
+ifneq (,$(filter mbedtls_ssl_server_name_indication,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_SSL_SERVER_NAME_INDICATION=1
+endif
+
+ifneq (,$(filter mbedtls_ssl_truncated_hmac,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_SSL_TRUNCATED_HMAC=1
+endif
+
+ifneq (,$(filter mbedtls_ssl_ticket,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_SSL_TICKET=1
+endif
+
+ifneq (,$(filter mbedtls_ssl_cli,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_SSL_CLI=1
+endif
+
+ifneq (,$(filter mbedtls_ssl_srv,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_SSL_SRV=1
+endif
+
+ifneq (,$(filter mbedtls_ssl_tls,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_SSL_TLS=1
+endif
+

@@ -5,14 +5,15 @@ INCLUDES += -I$(RIOTPKG)/mbedtls/include
 
 CFLAGS += -DMBEDTLS_CONFIG_FILE='<riot_mbedtls_config.h>'
 
-# these PSEUDOMODULES can be used to enable/disable an entropy source
-PSEUDOMODULES += mbedtls_entropy_source_hwrng
-PSEUDOMODULES += mbedtls_entropy_source_adc
+# PSEUDOMODULES can be used to enable/disable mbedtls library modules
+PSEUDOMODULES += mbedtls_%
 
+NO_PSEUDOMODULES += mbedtls_contrib
 ifneq (,$(filter mbedtls_contrib,$(USEMODULE)))
   DIRS += $(RIOTPKG)/mbedtls/contrib
 endif
 
+NO_PSEUDOMODULES += mbedtls_entropy
 ifneq (,$(filter mbedtls_entropy,$(USEMODULE)))
   DIRS += $(RIOTPKG)/mbedtls/contrib/entropy
 endif
@@ -24,3 +25,19 @@ ifneq (,$(filter entropy_source_adc_noise,$(USEMODULE)))
     CFLAGS += -DCONFIG_ENTROPY_SOURCE_ADC_HEALTH_TEST=1
   endif
 endif
+
+NO_PSEUDOMODULES += mbedtls_random
+ifneq (,$(filter mbedtls_random,$(USEMODULE)))
+  DIRS += $(RIOTPKG)/mbedtls/contrib/random
+endif
+
+ifneq (,$(filter mbedtls_self_test,$(USEMODULE)))
+  CFLAGS += -DCONFIG_MBEDTLS_SELF_TEST=1
+endif
+
+include $(RIOTPKG)/mbedtls/contrib/crypto/Makefile.include
+include $(RIOTPKG)/mbedtls/contrib/entropy/Makefile.include
+include $(RIOTPKG)/mbedtls/contrib/random/Makefile.include
+include $(RIOTPKG)/mbedtls/contrib/ssl/Makefile.include
+include $(RIOTPKG)/mbedtls/contrib/threading/Makefile.include
+include $(RIOTPKG)/mbedtls/contrib/x509/Makefile.include
