@@ -19,7 +19,6 @@
 #include <stddef.h> /* for NULL */
 #include <sys/types.h> /* for off_t etc */
 #include <sys/stat.h> /* for struct stat */
-#include <sys/statvfs.h> /* for struct statvfs */
 #include <fcntl.h> /* for O_ACCMODE, ..., fcntl */
 #include <unistd.h> /* for STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO */
 

@@ -611,7 +611,6 @@ ifneq (,$(filter vfs_util,$(USEMODULE)))
 endif
 
 ifneq (,$(filter vfs,$(USEMODULE)))
-  USEMODULE += posix_headers
   ifeq (native, $(BOARD))
     USEMODULE += native_vfs
   endif

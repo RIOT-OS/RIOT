@@ -8,7 +8,6 @@
 config MODULE_VFS
     bool "Virtual File System (VFS)"
     depends on TEST_KCONFIG
-    select MODULE_POSIX_HEADERS
 
 config MODULE_VFS_DEFAULT
     bool "Use default (board specific) file systems and mount points"
