@@ -20,7 +20,7 @@
 #include <errno.h>
 #include <stdio.h>
 
-#define ENABLE_DEBUG 1
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #include "net/ieee802154/radio.h"
@@ -484,7 +484,7 @@ static int _len(ieee802154_dev_t *hal){
     sx126x_t *dev = hal->priv;
     sx126x_rx_buffer_status_t rx_buffer_status;
     sx126x_get_rx_buffer_status(dev, &rx_buffer_status);
-    return rx_buffer_status.pld_len_in_bytes;
+    return rx_buffer_status.pld_len_in_bytes-2;
 }
 
 static int _read(ieee802154_dev_t *hal, void *buf, size_t max_size, ieee802154_rx_info_t *info)
