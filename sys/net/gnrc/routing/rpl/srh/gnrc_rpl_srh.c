@@ -74,6 +74,13 @@ int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh, void **err_ptr)
     uint8_t current_pos, pref_elided, addr_len, compri_addr_len;
     const uint8_t new_seg_left = rh->seg_left - 1;
 
+    if ((rh->len * 8) < (GNRC_RPL_SRH_PADDING(rh->pad_resv) +
+                         (16 - GNRC_RPL_SRH_COMPRE(rh->compr)))) {
+        DEBUG("RPL SRH: inconsistent header received\n");
+        *err_ptr = &rh->len;
+        return GNRC_IPV6_EXT_RH_ERROR;
+    }
+
     assert(rh->seg_left > 0);
     num_addr = (((rh->len * 8) - GNRC_RPL_SRH_PADDING(rh->pad_resv) -
                  (16 - GNRC_RPL_SRH_COMPRE(rh->compr))) /

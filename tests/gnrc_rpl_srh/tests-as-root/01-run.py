@@ -167,7 +167,7 @@ def test_wrong_type(child, iface, hw_dst, ll_dst, ll_src):
     pktbuf_empty(child)
 
 
-def test_seg_left_gt_len_addresses(child, iface, hw_dst, ll_dst, ll_src):
+def test_inconsistent_header(child, iface, hw_dst, ll_dst, ll_src):
     # send routing header with no (0) addresses but segleft set to a value
     # larger than 0
     p = srp1(Ether(dst=hw_dst) / IPv6(dst=ll_dst, src=ll_src) /
@@ -176,7 +176,7 @@ def test_seg_left_gt_len_addresses(child, iface, hw_dst, ll_dst, ll_src):
     assert(p is not None)
     assert(ICMPv6ParamProblem in p)
     assert(p[ICMPv6ParamProblem].code == 0)     # erroneous header field encountered
-    assert(p[ICMPv6ParamProblem].ptr == 43)     # segleft field
+    assert(p[ICMPv6ParamProblem].ptr == 41)     # len field
     pktbuf_empty(child)
 
 
@@ -348,7 +348,7 @@ def testfunc(child):
                 raise e
 
     run(test_wrong_type)
-    run(test_seg_left_gt_len_addresses)
+    run(test_inconsistent_header)
     run(test_multicast_dst)
     run(test_multicast_addr)
     run(test_multiple_addrs_of_mine_uncomp)

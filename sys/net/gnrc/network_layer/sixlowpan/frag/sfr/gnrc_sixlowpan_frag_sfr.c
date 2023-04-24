@@ -309,6 +309,10 @@ static int _forward_rfrag(gnrc_pktsnip_t *pkt, _generic_rb_entry_t *entry,
 /* ====== PUBLIC FUNCTION DEFINITIONS ====== */
 void gnrc_sixlowpan_frag_sfr_init(void)
 {
+    /* initialize _arq_timer if not yet done */
+    if (_arq_timer.callback == NULL) {
+        evtimer_init_msg(&_arq_timer);
+    }
     if (gnrc_sixlowpan_frag_sfr_congure_snd_has_inter_frame_gap()) {
         for (unsigned i = 0; i < FRAME_QUEUE_POOL_SIZE; i++) {
             clist_rpush(&_frame_queue_free, &_frame_queue_pool[i].super);
@@ -397,10 +401,6 @@ void gnrc_sixlowpan_frag_sfr_send(gnrc_pktsnip_t *pkt, void *ctx,
           _frag_seq(frag_desc), _frag_size(frag_desc),
           frag_desc->offset);
     if (_frag_ack_req(frag_desc)) {
-        /* initialize _arq_timer if not yet done */
-        if (_arq_timer.callback == NULL) {
-            evtimer_init_msg(&_arq_timer);
-        }
         _sched_arq_timeout(fbuf, fbuf->sfr.arq_timeout);
     }
 
