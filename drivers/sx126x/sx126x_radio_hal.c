@@ -20,14 +20,14 @@
 #include <errno.h>
 #include <stdio.h>
 
-#define ENABLE_DEBUG 0
+#define ENABLE_DEBUG 1
 #include "debug.h"
 
 #include "net/ieee802154/radio.h"
 #include "event/callback.h"
 #include "event/thread.h"
 #include "ztimer.h"
-
+#include "checksum/ucrc16.h"
 #include "kernel_defines.h"
 #include "event.h"
 
@@ -102,6 +102,7 @@ static void ack_timer_cb(void *arg)
 {
     sx126x_t *dev = arg;
     (void)dev;
+    uint16_t chksum = 0;
     _set_state(dev, STATE_IDLE);
     ztimer_remove(ZTIMER_USEC, &dev->ack_timer);
     uint8_t ack[3] = {
@@ -111,7 +112,10 @@ static void ack_timer_cb(void *arg)
     };
     sx126x_set_buffer_base_address(dev, 0x80, 0x00);
     sx126x_write_buffer(dev, 0x80, ack, IEEE802154_ACK_FRAME_LEN-2);
-    sx126x_set_lora_payload_length(dev, IEEE802154_ACK_FRAME_LEN-2);
+    chksum = ucrc16_calc_le(ack, IEEE802154_ACK_FRAME_LEN-2,
+                                UCRC16_CCITT_POLY_LE, chksum);
+    sx126x_write_buffer(dev, 0x80 + IEEE802154_ACK_FRAME_LEN-2 , (uint8_t*)&chksum, sizeof(chksum));
+    sx126x_set_lora_payload_length(dev, IEEE802154_ACK_FRAME_LEN);
     _set_state(dev, STATE_TX);
     dev->pending = true;
 }
@@ -366,6 +370,7 @@ static int _write(ieee802154_dev_t *hal, const iolist_t *iolist){
     sx126x_t *dev = hal->priv;
     (void)dev;
     size_t pos = 0;
+    uint16_t chksum = 0;
     /* Full buffer used for Tx */
     sx126x_set_buffer_base_address(dev, 0x80, 0x00);
     /* Write payload buffer */
@@ -374,11 +379,18 @@ static int _write(ieee802154_dev_t *hal, const iolist_t *iolist){
             sx126x_write_buffer(dev, pos + 0x80, iol->iol_base, iol->iol_len);
             DEBUG("[sx126x] netdev: send: wrote data to payload buffer.\n");
             pos += iol->iol_len;
+            chksum = ucrc16_calc_le(iol->iol_base, iol->iol_len,
+                                UCRC16_CCITT_POLY_LE, chksum);
         }
-    }
 
+    }
+    chksum = byteorder_htols(chksum).u16;
+         /* Include CRC */
+    sx126x_write_buffer(dev, pos + 0x80, (uint8_t*) &chksum, sizeof(chksum));
+    pos += 2;
     sx126x_set_lora_payload_length(dev, pos);
     DEBUG("[sx126x] writing (size: %d).\n", (pos));
+    DEBUG("chksum = %d \n", chksum);
     return 0;
 }
 
@@ -480,6 +492,8 @@ static int _read(ieee802154_dev_t *hal, void *buf, size_t max_size, ieee802154_r
     (void)hal;
     (void)buf;
     (void)info;
+    uint16_t chksum = 0;
+    uint16_t exp_chksum;
 
     sx126x_t* dev = hal->priv;
         /* Getting information about last received packet */
@@ -488,27 +502,45 @@ static int _read(ieee802154_dev_t *hal, void *buf, size_t max_size, ieee802154_r
     sx126x_pkt_status_lora_t pkt_status;
     sx126x_get_rx_buffer_status(dev, &rx_buffer_status);
     sx126x_get_lora_pkt_status(dev, &pkt_status);
+
     if (info) {
         info->lqi = pkt_status.snr_pkt_in_db;
         info->rssi = pkt_status.rssi_pkt_in_dbm;
     }
 
       /* Put PSDU to the output buffer */
-    
+
     if (buf == NULL) {
-        return rx_buffer_status.pld_len_in_bytes;
+        return rx_buffer_status.pld_len_in_bytes-2;
     }
 
-    if (rx_buffer_status.pld_len_in_bytes > max_size) {
+    if (rx_buffer_status.pld_len_in_bytes > max_size + 2) {
         return -ENOBUFS;
     }
 
-    if (rx_buffer_status.pld_len_in_bytes < 3) {
+    if (rx_buffer_status.pld_len_in_bytes < 5) {
         return -EBADMSG;
     }
-    sx126x_read_buffer(dev, rx_buffer_status.buffer_start_pointer, (uint8_t*)buf, rx_buffer_status.pld_len_in_bytes);
-    DEBUG("[sx126x] first 3 bytes of received packet: %d %d %d\n", *(uint8_t*)buf, *((uint8_t*)buf+1), *((uint8_t*)buf+2));
-    return rx_buffer_status.pld_len_in_bytes;
+
+    sx126x_read_buffer(dev, rx_buffer_status.buffer_start_pointer, (uint8_t*)buf, rx_buffer_status.pld_len_in_bytes-2);
+    sx126x_read_buffer(dev, rx_buffer_status.buffer_start_pointer + rx_buffer_status.pld_len_in_bytes-2, (uint8_t*)&exp_chksum, sizeof(exp_chksum));
+
+    chksum = ucrc16_calc_le(buf, rx_buffer_status.pld_len_in_bytes-2,
+                        UCRC16_CCITT_POLY_LE, chksum);
+    chksum = byteorder_htols(chksum).u16;
+    
+    DEBUG("Packet:\n");
+    for(uint8_t i = 0; i < rx_buffer_status.pld_len_in_bytes-2;i++)
+        {
+            DEBUG("%c ", (uint8_t)*(uint8_t*)(buf+i));
+        }
+    DEBUG("\n");
+    DEBUG("chksum = %d \n", chksum);
+    DEBUG("exp_chksum = %d \n", exp_chksum);
+    if (chksum != exp_chksum) {
+        return -EBADMSG;
+    }
+    return rx_buffer_status.pld_len_in_bytes-2;
 }
 
 static int _set_cca_threshold(ieee802154_dev_t *hal, int8_t threshold)
@@ -540,7 +572,7 @@ static int _off(ieee802154_dev_t *hal)
 {
     (void)hal;
     sx126x_t *dev = hal->priv;
-    sx126x_set_sleep(dev, SX126X_SLEEP_CFG_COLD_START);
+    sx126x_set_sleep(dev, SX126X_SLEEP_CFG_WARM_START);
     return 0;
 }
 
