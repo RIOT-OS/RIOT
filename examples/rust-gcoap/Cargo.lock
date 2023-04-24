@@ -156,21 +156,6 @@ dependencies = [
 
 [[package]]
 name = "coap-handler-implementations"
-version = "0.3.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a88fc2ff9ee38c4ff71d2ab2154afb842fa7c81e4e924753c74d89aed1b56bb6"
-dependencies = [
- "coap-handler",
- "coap-message",
- "coap-numbers",
- "crc 1.8.1",
- "serde",
- "serde_cbor",
- "windowed-infinity",
-]
-
-[[package]]
-name = "coap-handler-implementations"
 version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4f96e53455f4b1eadadadf53bef28d799dc295414bb2c8b8f86b3d45cc71f154"
@@ -199,7 +184,7 @@ version = "0.3.0"
 source = "git+https://gitlab.com/chrysn/coap-message-demos/#eb1b6ce4c72269b68e6be8ca758d3379d1e59258"
 dependencies = [
  "coap-handler",
- "coap-handler-implementations 0.4.2",
+ "coap-handler-implementations",
  "coap-message",
  "coap-numbers",
  "heapless",
@@ -544,7 +529,7 @@ version = "0.1.0"
 source = "git+https://gitlab.com/etonomy/riot-module-examples/#5aa33e8e8f7912049e09a5b1379131038d70641f"
 dependencies = [
  "coap-handler",
- "coap-handler-implementations 0.4.2",
+ "coap-handler-implementations",
  "coap-message",
  "coap-numbers",
  "embedded-graphics",
@@ -600,7 +585,7 @@ dependencies = [
 name = "rust-gcoap"
 version = "0.1.0"
 dependencies = [
- "coap-handler-implementations 0.3.6",
+ "coap-handler-implementations",
  "coap-message-demos",
  "riot-coap-handler-demos",
  "riot-wrappers",
