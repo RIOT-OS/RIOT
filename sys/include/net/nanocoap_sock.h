@@ -22,16 +22,22 @@
  *
  * ## Server Operation ##
  *
- * See the nanocoap_server example, which is built on the nanocoap_server()
- * function. A server must define an array of coap_resource_t resources for
- * which it responds. See the declarations of `coap_resources` and
- * `coap_resources_numof`. The array contents must be ordered by the resource
- * path, specifically the ASCII encoding of the path characters (digit and
- * capital precede lower case). Also see _Server path matching_ in the base
- * [nanocoap](group__net__nanocoap.html) documentation.
+ * See the nanocoap_server example, which is built on the `nanocoap_server()`
+ * function. A server must define CoAP resources for which it responds.
+ *
+ * Each @ref coap_resource_t is added to the XFA with NANOCOAP_RESOURCE(name)
+ * followed by the declaration of the CoAP resource, e.g.:
+ *
+ * ```C
+ * NANOCOAP_RESOURCE(board) {
+ *   .path = "/board", .methods = COAP_GET, .handler = _board_handler,
+ * };
+ * ```
  *
  * nanocoap itself provides the COAP_WELL_KNOWN_CORE_DEFAULT_HANDLER entry for
  * `/.well-known/core`.
+ *
+ * To use the CoAP resource XFA, enable the `nanocoap_resources` module.
  *
  * ### Handler functions ###
  *
@@ -154,6 +160,22 @@ extern "C" {
 #endif
 
 /**
+ * @brief   CoAP server work buf size
+ *          Used both for RX and TX, needs to hold payload block + header
+ */
+#ifndef CONFIG_NANOCOAP_SERVER_BUF_SIZE
+#define CONFIG_NANOCOAP_SERVER_BUF_SIZE         ((1 << (CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT + 3)) \
+                                                 + CONFIG_NANOCOAP_URI_MAX + 16)
+#endif
+
+/**
+ * @brief   CoAP server thread stack size
+ */
+#ifndef CONFIG_NANOCOAP_SERVER_STACK_SIZE
+#define CONFIG_NANOCOAP_SERVER_STACK_SIZE       THREAD_STACKSIZE_DEFAULT
+#endif
+
+/**
  * @brief   NanoCoAP socket types
  */
 typedef enum {
@@ -213,6 +235,18 @@ static inline uint16_t nanocoap_sock_next_msg_id(nanocoap_sock_t *sock)
  * @returns     -1 on error
  */
 int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize);
+
+/**
+ * @brief   Create and start the nanoCoAP server thread
+ *
+ * To automatically start the nanoCoAP server on startup, select the
+ * `nanocoap_server_auto_init` module.
+ *
+ * @param[in] local UDP endpoint to bind to
+ *
+ * @return pid of the server thread
+ */
+kernel_pid_t nanocoap_server_start(const sock_udp_ep_t *local);
 
 /**
  * @brief   Create a CoAP client socket

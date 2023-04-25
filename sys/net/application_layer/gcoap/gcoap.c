@@ -1390,6 +1390,17 @@ kernel_pid_t gcoap_init(void)
         gcoap_forward_proxy_init();
     }
 
+#ifdef MODULE_NANOCOAP_RESOURCES
+    /* add CoAP resources from XFA */
+    XFA_USE_CONST(coap_resource_t, coap_resources_xfa);
+    static gcoap_listener_t _xfa_listener = {
+        .resources = coap_resources_xfa,
+    };
+    _xfa_listener.resources_len = XFA_LEN(coap_resource_t, coap_resources_xfa),
+
+    gcoap_register_listener(&_xfa_listener);
+#endif
+
     return _pid;
 }
 

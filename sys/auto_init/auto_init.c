@@ -160,6 +160,10 @@ extern void gcoap_init(void);
 AUTO_INIT(gcoap_init,
           AUTO_INIT_PRIO_MOD_GCOAP);
 #endif
+#if IS_USED(MODULE_NANOCOAP_SERVER_AUTO_INIT)
+extern void auto_init_nanocoap_server(void);
+AUTO_INIT(auto_init_nanocoap_server, AUTO_INIT_PRIO_MOD_NANOCOAP);
+#endif
 #if IS_USED(MODULE_DEVFS)
 extern void auto_init_devfs(void);
 AUTO_INIT(auto_init_devfs,

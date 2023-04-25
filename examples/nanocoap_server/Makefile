@@ -18,6 +18,7 @@ USEMODULE += sock_udp
 USEMODULE += gnrc_icmpv6_echo
 
 USEMODULE += nanocoap_sock
+USEMODULE += nanocoap_resources
 
 USEMODULE += xtimer
 
@@ -40,6 +41,23 @@ ifneq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
   $(info Using low-memory configuration for microcoap_server.)
   ## low-memory tuning values
   USEMODULE += prng_minstd
+endif
+
+# Enable fileserver for boards with plenty of memory
+HIGH_MEMORY_BOARDS := native same54-xpro mcb2388
+
+ifneq (,$(filter $(BOARD),$(HIGH_MEMORY_BOARDS)))
+  USEMODULE += gcoap_fileserver
+  USEMODULE += vfs_default
+
+  # we don't want to run GCoAP
+  CFLAGS += -DCONFIG_GCOAP_NO_AUTO_INIT=1
+  CFLAGS += -DCONFIG_NANOCOAP_SERVER_WELL_KNOWN_CORE=1
+
+  # always enable auto-format for native
+  ifeq ($(BOARD),native)
+    USEMODULE += vfs_auto_format
+  endif
 endif
 
 # Change this to 0 show compiler invocation lines by default:

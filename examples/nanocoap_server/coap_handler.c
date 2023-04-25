@@ -166,14 +166,38 @@ ssize_t _sha256_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, coap_request_
     return pkt_pos - (uint8_t*)pkt->hdr;
 }
 
-/* must be sorted by path (ASCII order) */
-const coap_resource_t coap_resources[] = {
-    COAP_WELL_KNOWN_CORE_DEFAULT_HANDLER,
-    { "/echo/", COAP_GET | COAP_MATCH_SUBTREE, _echo_handler, NULL },
-    { "/riot/board", COAP_GET, _riot_board_handler, NULL },
-    { "/riot/value", COAP_GET | COAP_PUT | COAP_POST, _riot_value_handler, NULL },
-    { "/riot/ver", COAP_GET, _riot_block2_handler, NULL },
-    { "/sha256", COAP_POST, _sha256_handler, NULL },
+NANOCOAP_RESOURCE(echo) {
+    .path = "/echo/", .methods = COAP_GET | COAP_MATCH_SUBTREE, .handler = _echo_handler
+};
+NANOCOAP_RESOURCE(board) {
+    .path = "/riot/board", .methods = COAP_GET, .handler = _riot_board_handler
+};
+NANOCOAP_RESOURCE(value) {
+    .path = "/riot/value", .methods = COAP_GET | COAP_PUT | COAP_POST, .handler = _riot_value_handler
+};
+NANOCOAP_RESOURCE(ver) {
+    .path = "/riot/ver", .methods = COAP_GET, .handler = _riot_block2_handler
+};
+NANOCOAP_RESOURCE(sha256) {
+    .path = "/sha256", .methods = COAP_POST, .handler = _sha256_handler
 };
 
-const unsigned coap_resources_numof = ARRAY_SIZE(coap_resources);
+/* we can also include the fileserver module */
+#ifdef MODULE_GCOAP_FILESERVER
+#include "net/gcoap/fileserver.h"
+#include "vfs_default.h"
+
+NANOCOAP_RESOURCE(fileserver) {
+    .path = "/vfs",
+    .methods = COAP_GET
+#if IS_USED(MODULE_GCOAP_FILESERVER_PUT)
+      | COAP_PUT
+#endif
+#if IS_USED(MODULE_GCOAP_FILESERVER_DELETE)
+      | COAP_DELETE
+#endif
+      | COAP_MATCH_SUBTREE,
+    .handler = gcoap_fileserver_handler,
+    .context = VFS_DEFAULT_DATA
+};
+#endif
