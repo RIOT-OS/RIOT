@@ -1,0 +1,5 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+endif
+
+USEMODULE += stdio_rtt 

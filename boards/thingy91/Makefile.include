@@ -1,0 +1,7 @@
+# write here the flasher tool and stdio configurations
+INCLUDES += -I$(RIOTBOARD)/thingy91/include
+
+TERMPROG = $(RIOTOOLS)/jlink/jlink.sh
+TERMFLAGS = term-rtt
+
+RIOT_TERMINAL ?= jlink 

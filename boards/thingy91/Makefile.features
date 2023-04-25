@@ -1,0 +1,7 @@
+CPU = nrf9160
+CPU_MODEL = nrf9160
+
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += highlevel_stdio
+FEATURES_PROVIDED += periph_timer
+
