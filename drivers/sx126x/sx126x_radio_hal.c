@@ -78,7 +78,7 @@ void _sx126x_handler(void* arg)
 #if IS_USED(MODULE_SX126X_STM32WL)
 
 event_callback_t sx126x_ev_callback;
-
+#if IS_USED(MODULE_IEEE802154)
 void isr_subghz_radio(void)
 {
     /* Disable NVIC to avoid ISR conflict in CPU. */
@@ -87,6 +87,7 @@ void isr_subghz_radio(void)
     event_post(EVENT_PRIO_MEDIUM, (event_t*)&sx126x_ev_callback);
     cortexm_isr_end();
 }
+#endif
 #endif 
 
 void sx126x_hal_setup(sx126x_t *dev, ieee802154_dev_t *hal)
@@ -173,17 +174,11 @@ static int _set_state(sx126x_t *dev, sx126x_state_t state)
     switch (state) {
     case STATE_IDLE:
         DEBUG("[sx126x] netdev: set STATE_STANDBY\n");
-#ifdef SX126X_LED_PIN
-        gpio_clear(SX126X_LED_PIN);
-#endif
         sx126x_set_standby(dev, SX126X_CHIP_MODE_STBY_XOSC);
         break;
 
     case STATE_RX:
         DEBUG("[sx126x] netdev: set STATE_RX\n");
-#ifdef SX126X_LED_PIN
-        gpio_clear(SX126X_LED_PIN);
-#endif
 #if IS_USED(MODULE_SX126X_RF_SWITCH)
         /* Refer Section 4.2 RF Switch in Application Note (AN5406) */
         if (dev->params->set_rf_mode) {
@@ -202,9 +197,6 @@ static int _set_state(sx126x_t *dev, sx126x_state_t state)
 
     case STATE_TX:
         DEBUG("[sx126x] netdev: set STATE_TX\n");
-#ifdef SX126X_LED_PIN
-        gpio_set(SX126X_LED_PIN);
-#endif
 #if IS_USED(MODULE_SX126X_RF_SWITCH)
         if (dev->params->set_rf_mode) {
             dev->params->set_rf_mode(dev, dev->params->tx_pa_mode);
@@ -278,10 +270,10 @@ void sx126x_hal_task_handler(ieee802154_dev_t *hal)
     else if (irq_mask & SX126X_IRQ_RX_DONE) {
         DEBUG("[sx126x] netdev: SX126X_IRQ_RX_DONE\n");
     
-    uint8_t rxbuf[127];
+    uint8_t rxbuf[130];
     sx126x_rx_buffer_status_t rx_buffer_status;
     sx126x_get_rx_buffer_status(dev, &rx_buffer_status);
-    dev->size = rx_buffer_status.pld_len_in_bytes;
+    dev->size = rx_buffer_status.pld_len_in_bytes-2;
  
     sx126x_read_buffer(dev, rx_buffer_status.buffer_start_pointer, (uint8_t*)rxbuf, dev->size);
         bool l2filter_passed = _l2filter(hal, rxbuf);
@@ -493,7 +485,7 @@ static int _read(ieee802154_dev_t *hal, void *buf, size_t max_size, ieee802154_r
     (void)buf;
     (void)info;
     uint16_t chksum = 0;
-    uint16_t exp_chksum;
+    uint16_t exp_chksum = 0;
 
     sx126x_t* dev = hal->priv;
         /* Getting information about last received packet */
@@ -505,9 +497,15 @@ static int _read(ieee802154_dev_t *hal, void *buf, size_t max_size, ieee802154_r
 
     if (info) {
         info->lqi = pkt_status.snr_pkt_in_db;
-        info->rssi = pkt_status.rssi_pkt_in_dbm;
+           if(pkt_status.rssi_pkt_in_dbm >= 0)
+            {
+                info->rssi = (- IEEE802154_RADIO_RSSI_OFFSET) + pkt_status.rssi_pkt_in_dbm ;
+            }
+        else 
+            {
+                info->rssi = -IEEE802154_RADIO_RSSI_OFFSET - (255-(uint8_t)pkt_status.rssi_pkt_in_dbm);
+            }
     }
-
       /* Put PSDU to the output buffer */
 
     if (buf == NULL) {
@@ -528,13 +526,7 @@ static int _read(ieee802154_dev_t *hal, void *buf, size_t max_size, ieee802154_r
     chksum = ucrc16_calc_le(buf, rx_buffer_status.pld_len_in_bytes-2,
                         UCRC16_CCITT_POLY_LE, chksum);
     chksum = byteorder_htols(chksum).u16;
-    
-    DEBUG("Packet:\n");
-    for(uint8_t i = 0; i < rx_buffer_status.pld_len_in_bytes-2;i++)
-        {
-            DEBUG("%c ", (uint8_t)*(uint8_t*)(buf+i));
-        }
-    DEBUG("\n");
+
     DEBUG("chksum = %d \n", chksum);
     DEBUG("exp_chksum = %d \n", exp_chksum);
     if (chksum != exp_chksum) {

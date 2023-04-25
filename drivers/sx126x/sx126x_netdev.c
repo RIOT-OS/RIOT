@@ -27,21 +27,29 @@
 #include "net/netdev/lora.h"
 #include "net/lora.h"
 
-#include "event.h"
-#include "event/callback.h"
-
 #include "sx126x.h"
 #include "sx126x_netdev.h"
 #include "sx126x_internal.h"
 
-#define ENABLE_DEBUG 0
+#define ENABLE_DEBUG 1
 #include "debug.h"
 
 const uint8_t llcc68_max_sf = LORA_SF11;
 const uint8_t sx126x_max_sf = LORA_SF12;
 
-extern void _sx126x_handler(void* arg);
-extern event_callback_t sx126x_ev_callback;
+#if IS_USED(MODULE_SX126X_STM32WL)
+static netdev_t *_dev;
+#if !(IS_USED(MODULE_IEEE802154))
+void isr_subghz_radio(void)
+{
+    /* Disable NVIC to avoid ISR conflict in CPU. */
+    NVIC_DisableIRQ(SUBGHZ_Radio_IRQn);
+    NVIC_ClearPendingIRQ(SUBGHZ_Radio_IRQn);
+    netdev_trigger_event_isr(_dev);
+    cortexm_isr_end();
+}
+#endif
+#endif
 
 static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
@@ -119,11 +127,13 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 static int _init(netdev_t *netdev)
 {
     sx126x_t *dev = container_of(netdev, sx126x_t, netdev);
+
     if (sx126x_is_stm32wl(dev)) {
 #if IS_USED(MODULE_SX126X_STM32WL)
-        event_callback_init(&sx126x_ev_callback, (void*)_sx126x_handler, (void*)netdev);
+        _dev = netdev;
 #endif
     }
+
     /* Launch initialization of driver and device */
     DEBUG("[sx126x] netdev: initializing driver...\n");
     if (sx126x_init(dev) != 0) {
@@ -132,6 +142,7 @@ static int _init(netdev_t *netdev)
     }
 
     DEBUG("[sx126x] netdev: initialization successful\n");
+
     /* signal link UP */
     netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
 
@@ -301,9 +312,7 @@ static int _set_state(sx126x_t *dev, netopt_state_t state)
     switch (state) {
     case NETOPT_STATE_STANDBY:
         DEBUG("[sx126x] netdev: set NETOPT_STATE_STANDBY state\n");
-#ifdef SX126X_LED_PIN
-        gpio_clear(SX126X_LED_PIN);
-#endif
+
         sx126x_set_standby(dev, SX126X_CHIP_MODE_STBY_XOSC);
         break;
 
@@ -315,9 +324,6 @@ static int _set_state(sx126x_t *dev, netopt_state_t state)
         if (dev->params->set_rf_mode) {
             dev->params->set_rf_mode(dev, SX126X_RF_MODE_RX);
         }
-#endif
-#ifdef SX126X_LED_PIN
-        gpio_clear(SX126X_LED_PIN);
 #endif
         sx126x_cfg_rx_boosted(dev, true);
         int _timeout = (sx126x_symbol_to_msec(dev, dev->rx_timeout));
@@ -331,9 +337,7 @@ static int _set_state(sx126x_t *dev, netopt_state_t state)
 
     case NETOPT_STATE_TX:
         DEBUG("[sx126x] netdev: set NETOPT_STATE_TX state\n");
-#ifdef SX126X_LED_PIN
-        gpio_set(SX126X_LED_PIN);
-#endif
+
 #if IS_USED(MODULE_SX126X_RF_SWITCH)
         if (dev->params->set_rf_mode) {
             dev->params->set_rf_mode(dev, dev->params->tx_pa_mode);
