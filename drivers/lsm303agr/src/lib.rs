@@ -93,7 +93,7 @@ impl registration::Drivable for &SaulLSM {
         let data = device.accel_data()
             .map_err(|_| registration::Error)?;
         // Data is in the +-2g range by default, which doesn't overflow even the i16 SAUL uses
-        Ok(Phydat::new(&[data.x as _, data.y as _, data.z as _], Some(saul::Unit::G), -3))
+        Ok(Phydat::new(&[data.x as _, data.y as _, data.z as _], Some(saul::Unit::GForce), -3))
     }
 }
 
