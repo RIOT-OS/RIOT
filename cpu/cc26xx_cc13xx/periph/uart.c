@@ -64,7 +64,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     int cts_pin = uart_config[uart].cts_pin;
 #endif
 
-    if (uart == 0) {
+    if ((UART_NUMOF == 1) || (uart == 0)) {
         /* UART0 requires serial domain to be enabled */
         if (!power_is_domain_enabled(POWER_DOMAIN_SERIAL)) {
             power_enable_domain(POWER_DOMAIN_SERIAL);
