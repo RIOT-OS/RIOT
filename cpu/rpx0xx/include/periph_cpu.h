@@ -636,7 +636,7 @@ void pll_start_sys(uint8_t ref_div,
                    uint8_t post_div_1, uint8_t post_div_2);
 
 /**
- * @brief   Start the PLL for the system clock
+ * @brief   Start the PLL for the USB clock
  *          output[MHz] = f_ref / @p ref_div * @p vco_feedback_scale / @p post_div_1 / @p post_div_2
  *
  * @note    Usual setting should be (12 MHz, 1, 40, 5, 2) to get a 48 MHz USB clock signal
