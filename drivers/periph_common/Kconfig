@@ -90,6 +90,11 @@ config MODULE_PERIPH_INIT_HWRNG
 
 rsource "Kconfig.i2c"
 
+config MODULE_PERIPH_I2S
+    bool "I2S peripheral driver"
+    depends on HAS_PERIPH_I2S
+    select MODULE_PERIPH_COMMON
+
 config MODULE_PERIPH_PWM
     bool "PWM peripheral driver"
     depends on HAS_PERIPH_PWM
