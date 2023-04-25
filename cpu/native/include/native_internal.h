@@ -59,7 +59,9 @@
 #include <time.h>
 #include <sys/time.h>
 #include <sys/stat.h>
+#include <sys/statvfs.h>
 #include <sys/uio.h>
+#include <dirent.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -90,6 +92,10 @@ void _native_init_syscalls(void);
  */
 extern ssize_t (*real_read)(int fd, void *buf, size_t count);
 extern ssize_t (*real_write)(int fd, const void *buf, size_t count);
+extern off_t (*real_lseek)(int fd, off_t offset, int whence);
+extern off_t (*real_fstat)(int fd, struct stat *statbuf);
+extern int (*real_statvfs)(const char *restrict path, struct statvfs *restrict buf);
+extern int (*real_fsync)(int fd);
 extern size_t (*real_fread)(void *ptr, size_t size, size_t nmemb, FILE *stream);
 extern void (*real_clearerr)(FILE *stream);
 extern __attribute__((noreturn)) void (*real_exit)(int status);
@@ -124,6 +130,11 @@ extern int (*real_gettimeofday)(struct timeval *t, ...);
 extern int (*real_ioctl)(int fildes, int request, ...);
 extern int (*real_listen)(int socket, int backlog);
 extern int (*real_open)(const char *path, int oflag, ...);
+extern int (*real_mkdir)(const char *pathname, mode_t mode);
+extern int (*real_rmdir)(const char *pathname);
+extern DIR *(*real_opendir)(const char *name);
+extern struct dirent *(*real_readdir)(DIR *dirp);
+extern int (*real_closedir)(DIR *dirp);
 extern int (*real_pause)(void);
 extern int (*real_pipe)(int[2]);
 /* The ... is a hack to save includes: */
@@ -136,6 +147,7 @@ extern int (*real_setsockopt)(int socket, ...);
 extern int (*real_socket)(int domain, int type, int protocol);
 extern int (*real_printf)(const char *format, ...);
 extern int (*real_unlink)(const char *);
+extern int (*real_rename)(const char *, const char *);
 extern long int (*real_random)(void);
 extern const char* (*real_gai_strerror)(int errcode);
 extern FILE* (*real_fopen)(const char *path, const char *mode);

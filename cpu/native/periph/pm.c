@@ -71,6 +71,10 @@ void pm_off(void)
 #ifdef MODULE_PERIPH_GPIO_LINUX
     gpio_linux_teardown();
 #endif
+#ifdef MODULE_VFS_DEFAULT
+    extern void auto_unmount_vfs(void);
+    auto_unmount_vfs();
+#endif
     real_exit(EXIT_SUCCESS);
 }
 
@@ -84,6 +88,10 @@ void pm_reboot(void)
 #endif
 #ifdef MODULE_PERIPH_GPIO_LINUX
     gpio_linux_teardown();
+#endif
+#ifdef MODULE_VFS_DEFAULT
+    extern void auto_unmount_vfs(void);
+    auto_unmount_vfs();
 #endif
 
     if (real_execve(_native_argv[0], _native_argv, NULL) == -1) {

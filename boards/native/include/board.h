@@ -97,6 +97,15 @@ void _native_LED_RED_TOGGLE(void);
 extern mtd_dev_t *mtd0;
 #endif
 
+/**
+ * @name    Host FS access configuration
+ * @{
+ */
+#ifndef FS_NATIVE_DIR
+#define FS_NATIVE_DIR           "native"  /**< Folder on the host fs exported to RIOT */
+#endif
+/** @} */
+
 #if defined(MODULE_SPIFFS) || DOXYGEN
 /**
  * @name    SPIFFS default configuration
