@@ -86,6 +86,8 @@ typedef uint_fast8_t adc_t;
 #define ADC_LINE(x)          (x)
 #endif
 
+#if !defined(MODULE_ADC_NG_COMPAT) || defined(DOXYGEN)
+
 /**
  * @brief   Possible ADC resolution settings
  */
@@ -127,6 +129,74 @@ int adc_init(adc_t line);
  * @return                  -1 if resolution is not applicable
  */
 int32_t adc_sample(adc_t line, adc_res_t res);
+
+#else /* MODULE_ADC_NG_COMPAT */
+
+#include "adc_ng.h"
+
+/**
+ * @brief   Possible ADC resolution settings
+ */
+typedef enum {
+    ADC_RES_1BIT = 1,       /**< ADC resolution: 1 bit */
+    ADC_RES_2BIT,           /**< ADC resolution: 2 bit */
+    ADC_RES_3BIT,           /**< ADC resolution: 3 bit */
+    ADC_RES_4BIT,           /**< ADC resolution: 4 bit */
+    ADC_RES_5BIT,           /**< ADC resolution: 5 bit */
+    ADC_RES_6BIT,           /**< ADC resolution: 6 bit */
+    ADC_RES_7BIT,           /**< ADC resolution: 7 bit */
+    ADC_RES_8BIT,           /**< ADC resolution: 8 bit */
+    ADC_RES_9BIT,           /**< ADC resolution: 9 bit */
+    ADC_RES_10BIT,          /**< ADC resolution: 10 bit */
+    ADC_RES_11BIT,          /**< ADC resolution: 11 bit */
+    ADC_RES_12BIT,          /**< ADC resolution: 12 bit */
+    ADC_RES_13BIT,          /**< ADC resolution: 13 bit */
+    ADC_RES_14BIT,          /**< ADC resolution: 14 bit */
+    ADC_RES_15BIT,          /**< ADC resolution: 15 bit */
+    ADC_RES_16BIT,          /**< ADC resolution: 16 bit */
+    ADC_RES_17BIT,          /**< ADC resolution: 17 bit */
+    ADC_RES_18BIT,          /**< ADC resolution: 18 bit */
+    ADC_RES_19BIT,          /**< ADC resolution: 19 bit */
+    ADC_RES_20BIT,          /**< ADC resolution: 20 bit */
+    ADC_RES_21BIT,          /**< ADC resolution: 21 bit */
+    ADC_RES_22BIT,          /**< ADC resolution: 22 bit */
+    ADC_RES_23BIT,          /**< ADC resolution: 23 bit */
+    ADC_RES_24BIT,          /**< ADC resolution: 24 bit */
+    ADC_RES_25BIT,          /**< ADC resolution: 25 bit */
+    ADC_RES_26BIT,          /**< ADC resolution: 26 bit */
+    ADC_RES_27BIT,          /**< ADC resolution: 27 bit */
+    ADC_RES_28BIT,          /**< ADC resolution: 28 bit */
+    ADC_RES_29BIT,          /**< ADC resolution: 29 bit */
+    ADC_RES_30BIT,          /**< ADC resolution: 30 bit */
+    ADC_RES_31BIT,          /**< ADC resolution: 31 bit */
+    ADC_RES_32BIT,          /**< ADC resolution: 32 bit */
+} adc_res_t;
+
+static inline int adc_init(adc_t line)
+{
+    (void)line;
+    return 0;
+}
+
+static inline int32_t adc_sample(adc_t line, adc_res_t res)
+{
+    int16_t ref = ADC_NG_MAX_REF;
+    int32_t result;
+
+    if (adc_ng_init(0, (uint8_t)line, (uint8_t)res, &ref)) {
+        return -1;
+    }
+    if (adc_ng_single(0, &result)) {
+        adc_ng_off(0);
+        return -1;
+    }
+
+    adc_ng_off(0);
+
+    return result;
+}
+
+#endif /* MODULE_ADC_NG_COMPAT */
 
 #ifdef __cplusplus
 }
