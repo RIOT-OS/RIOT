@@ -177,4 +177,9 @@ ssize_t write(int fd, const void *src, size_t count)
 #endif
 }
 
+void perror(const char *s)
+{
+    printf("%s: %s\n", s, strerror(errno));
+}
+
 /** @} */
