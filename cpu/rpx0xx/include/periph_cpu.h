@@ -613,6 +613,13 @@ void clock_gpout2_configure(uint32_t f_in, uint32_t f_out, CLOCKS_CLK_GPOUT2_CTR
  */
 void clock_gpout3_configure(uint32_t f_in, uint32_t f_out, CLOCKS_CLK_GPOUT3_CTRL_AUXSRC_Enum aux);
 
+/**
+ * @brief   Configure the ADC clock to run from a dedicated auxiliary
+ *          clock source
+ *
+ * @param   aux     Auxiliary clock source
+ */
+void clock_adc_configure(CLOCKS_CLK_ADC_CTRL_AUXSRC_Enum aux);
 /** @} */
 
 /**

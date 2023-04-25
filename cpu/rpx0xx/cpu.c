@@ -41,6 +41,7 @@ static void _cpu_reset(void)
         |   RESETS_RESET_pll_usb_Msk
         |   RESETS_RESET_pll_sys_Msk
         |   RESETS_RESET_pads_qspi_Msk
+        |   RESETS_RESET_pads_bank0_Msk
         |   RESETS_RESET_io_qspi_Msk);
     periph_reset(rst);
     /* Assert that reset has completed except for those components which
@@ -77,6 +78,13 @@ static void _cpu_reset(void)
         /* check clk_ref with logic analyzer */
         clock_gpout0_configure(CLOCK_XOSC, CLOCK_XOSC,
                                CLOCKS_CLK_GPOUT0_CTRL_AUXSRC_clk_ref);
+    }
+
+    /* Configure USB PLL to deliver 48MHz needed by ADC */
+    if (IS_USED(MODULE_PERIPH_ADC)) {
+        pll_start_usb(PLL_USB_REF_DIV, PLL_USB_VCO_FEEDBACK_SCALE,
+                      PLL_USB_POSTDIV1, PLL_USB_POSTDIV2);
+        clock_adc_configure(CLOCKS_CLK_ADC_CTRL_AUXSRC_clksrc_pll_usb);
     }
 }
 
