@@ -65,6 +65,7 @@
 #include "periph/cpu_gpio.h"
 #include "periph/cpu_gpio_ll.h"
 #include "periph/cpu_i2c.h"
+#include "periph/cpu_i2s.h"
 #include "periph/cpu_ltdc.h"
 #include "periph/cpu_pm.h"
 #include "periph/cpu_pwm.h"

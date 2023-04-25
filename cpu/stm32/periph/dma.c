@@ -97,6 +97,11 @@ struct dma_ctx {
 
 static struct dma_ctx dma_ctx[DMA_NUMOF];
 
+#ifdef MODULE_PERIPH_DMA_CALLBACK
+static dma_callback_t callbacks[DMA_NUMOF];
+static void *args[DMA_NUMOF];
+#endif
+
 /**
  * @brief   Get DMA base register
  *
@@ -358,19 +363,24 @@ void dma_release(dma_t dma)
     /* unblock STOP mode */
     pm_unblock(STM32_PM_STOP);
 #endif
+#ifdef MODULE_PERIPH_DMA_CALLBACK
+    callbacks[dma] = NULL;
+    args[dma] = NULL;
+#endif
     mutex_unlock(&dma_ctx[dma].conf_lock);
 }
 
-void dma_setup(dma_t dma, int chan, void *periph_addr, dma_mode_t mode,
-               uint8_t width, bool inc_periph)
+void dma_setup_full(dma_t dma, int chan, void *periph_addr, dma_mode_t mode,
+               uint8_t mwidth, uint8_t pwidth, bool inc_periph)
 {
     STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
 
 #if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
     /* Set channel, data width, inc and mode */
     uint32_t cr_settings = (chan & 0xF) << DMA_SxCR_CHSEL_Pos |
-                           (width << DMA_SxCR_MSIZE_Pos) |
-                           (width << DMA_SxCR_PSIZE_Pos) |
+                           (mwidth << DMA_SxCR_MSIZE_Pos) |
+                           (pwidth << DMA_SxCR_PSIZE_Pos) |
+                           (DMA_SxCR_CIRC) |
                            (inc_periph << DMA_SxCR_PINC_Pos) |
                            (mode & 3) << DMA_SxCR_DIR_Pos |
                            DMA_SxCR_TCIE |
@@ -385,8 +395,8 @@ void dma_setup(dma_t dma, int chan, void *periph_addr, dma_mode_t mode,
 #else
     (void)chan;
 #endif
-    uint32_t ctr_reg = (width << DMA_CCR_MSIZE_Pos) |
-                       (width << DMA_CCR_PSIZE_Pos) |
+    uint32_t ctr_reg = (mwidth << DMA_CCR_MSIZE_Pos) |
+                       (pwidth << DMA_CCR_PSIZE_Pos) |
                        (inc_periph << DMA_CCR_PINC_Pos) |
                        (mode & 1) << DMA_CCR_DIR_Pos |
                        ((mode & 2) >> 1) << DMA_CCR_MEM2MEM_Pos |
@@ -415,6 +425,35 @@ void dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem)
     stream->NDTR_REG = len;
     dma_ctx[dma].len = len;
 }
+
+#ifdef MODULE_PERIPH_DMA_CALLBACK
+void dma_set_callback(dma_t dma, dma_callback_t callback, void *arg)
+{
+    callbacks[dma] = callback;
+    args[dma] = arg;
+}
+#endif
+
+#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
+void dma_double_buffer_enable(dma_t dma)
+{
+    STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
+    stream->CONTROL_REG |= DMA_SxCR_DBM;
+}
+
+bool dma_double_buffer_set_other(dma_t dma, void *mem)
+{
+    STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
+    uint32_t current_target = stream->CONTROL_REG & DMA_SxCR_CT;
+    if (current_target) {
+        stream->M0AR = (uint32_t)mem;
+    }
+    else {
+        stream->M1AR = (uint32_t)mem;
+    }
+    return 0;
+}
+#endif
 
 int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *dst, size_t len,
                   dma_mode_t mode, uint8_t flags)
@@ -458,6 +497,9 @@ int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *
 void dma_start(dma_t dma)
 {
     STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
+
+    /* Ensure mutex is always locked when starting stream */
+    mutex_trylock(&dma_ctx[dma].sync_lock);
 
     stream->CONTROL_REG |= DMA_EN;
 }
@@ -530,11 +572,22 @@ void dma_wait(dma_t dma)
     mutex_lock(&dma_ctx[dma].sync_lock);
 }
 
+size_t dma_items_remaining(dma_t dma)
+{
+    STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
+    return stream->NDTR_REG;
+}
+
 void dma_isr_handler(dma_t dma)
 {
     dma_clear_all_flags(dma);
 
     mutex_unlock(&dma_ctx[dma].sync_lock);
+#ifdef MODULE_PERIPH_DMA_CALLBACK
+    if (callbacks[dma]) {
+        callbacks[dma](dma, args[dma]);
+    }
+#endif
 
     cortexm_isr_end();
 }

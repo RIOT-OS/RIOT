@@ -42,6 +42,7 @@ static const dma_conf_t dma_config[] = {
     { .stream = 10 },   /* DMA2 Stream 2 - SPI1_RX */
     { .stream = 4 },    /* DMA1 Stream 4 - SPI2_TX */
     { .stream = 3 },    /* DMA1 Stream 3 - SPI2_RX */
+    { .stream = 5 },    /* DMA1 Stream 5 - SPI3_TX (for I2S) */
 };
 
 #define DMA_0_ISR           isr_dma2_stream3
@@ -251,6 +252,35 @@ static const i2c_conf_t i2c_config[] = {
 #define I2C_0_ISR           isr_i2c1_ev
 
 #define I2C_NUMOF           ARRAY_SIZE(i2c_config)
+/** @} */
+
+/**
+ * @name I2S configuration
+ * @{
+ */
+static const i2s_conf_t i2s_config[] = {
+    {
+        .dev      = SPI3,
+        .data_pin = GPIO_PIN(PORT_C, 12),
+        .bclk_pin = GPIO_PIN(PORT_C, 10),
+        .wclk_pin = GPIO_PIN(PORT_A, 4),
+        .mclk_pin = GPIO_PIN(PORT_C, 7),
+        .data_af  = GPIO_AF6,
+        .bclk_af  = GPIO_AF6,
+        .wclk_af  = GPIO_AF6,
+        .mclk_af  = GPIO_AF6,
+        .rccmask  = RCC_APB1ENR_SPI3EN,
+        .apbbus   = APB1,
+        .dma      = 4,
+        .dma_chan = 0,
+        .irqn       = SPI3_IRQn,
+    },
+};
+
+#define I2S_0_ISR          (isr_spi3)
+
+#define I2S_NUMOF          ARRAY_SIZE(i2s_config)
+
 /** @} */
 
 #ifdef __cplusplus

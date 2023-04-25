@@ -69,6 +69,7 @@ typedef enum {
     DMA_MEM_TO_MEM = 2,        /**< Memory to memory */
 } dma_mode_t;
 
+typedef void (*dma_callback_t)(dma_t dma, void *arg);
 /**
  * @brief   DMA channel/trigger configuration for DMA peripherals without
  *          channel/trigger filtering such as the stm32f1 and stm32f3.
@@ -195,6 +196,34 @@ int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *
                   dma_mode_t mode, uint8_t flags);
 
 /**
+ * @brief Set a callback to be called for every completed transfer
+ *
+ * Callback is deconfigured upon a @ref dma_release of the stream
+ *
+ * @param[in]  dma      logical DMA stream
+ * @param[in]  callback function to call after transfers
+ * @param[in]  arg      argument to pass along with the function
+ */
+void dma_set_callback(dma_t dma, dma_callback_t callback, void *arg);
+
+/**
+ * @brief   Low level initial DMA stream configuration
+ *
+ * This function is supposed to be used together with @ref dma_prepare. This
+ * function sets up the one-time configuration of a stream and @ref dma_prepare
+ * configures the per-transfer registers.
+ *
+ * @param[in]   dma         Logical DMA stream
+ * @param[in]   chan        DMA channel (on stm32f2/4/7, CxS or unused on others)
+ * @param[in]   periph_addr Peripheral register address
+ * @param[in]   mode        DMA direction mode
+ * @param[in]   mwidth      DMA transfer memory width (one of DMA_DATA_WIDTH_*)
+ * @param[in]   pwidth      DMA transfer peripheral width (one of DMA_DATA_WIDTH_*)
+ * @param[in]   inc_periph  Increment peripheral address after read/write
+ */
+void dma_setup_full(dma_t dma, int chan, void *periph_addr, dma_mode_t mode,
+               uint8_t mwidth, uint8_t pwidth, bool inc_periph);
+/**
  * @brief   Low level initial DMA stream configuration
  *
  * This function is supposed to be used together with @ref dma_prepare. This
@@ -208,9 +237,14 @@ int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *
  * @param[in]   width       DMA transfer width (one of DMA_DATA_WIDTH_*)
  * @param[in]   inc_periph  Increment peripheral address after read/write
  */
-void dma_setup(dma_t dma, int chan, void *periph_addr, dma_mode_t mode,
-               uint8_t width, bool inc_periph);
+static inline void dma_setup(dma_t dma, int chan, void *periph_addr, dma_mode_t mode,
+               uint8_t width, bool inc_periph)
+{
+    dma_setup_full(dma, chan, periph_addr, mode, width, width, inc_periph);
+}
 
+void dma_double_buffer_enable(dma_t dma);
+bool dma_double_buffer_set_other(dma_t dma, void *mem);
 /**
  * @brief   Low level DMA transfer configuration
  *
@@ -220,6 +254,15 @@ void dma_setup(dma_t dma, int chan, void *periph_addr, dma_mode_t mode,
  * @param[in]   inc_mem     Increment the memory address (by the transfer width) after read/write
  */
 void dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem);
+
+/**
+ * @brief   Get the number of items remaining in the transfer
+ *
+ * @param[in]   dma         Logical DMA stream
+ *
+ * @returns The number of data items remaining
+ */
+size_t dma_items_remaining(dma_t dma);
 
 #endif /* MODULE_PERIPH_DMA */
 

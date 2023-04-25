@@ -6,6 +6,7 @@ ifneq (mp1,$(CPU_FAM))
 endif
 FEATURES_PROVIDED += cpu_stm32$(CPU_FAM)
 FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += periph_dma_callback
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
 FEATURES_PROVIDED += periph_timer_periodic
 FEATURES_PROVIDED += periph_rtt_overflow
@@ -83,6 +84,10 @@ endif
 
 ifneq (,$(filter $(CPU_FAM),f2 f4 f7 g4 l1 l4 mp1))
   FEATURES_PROVIDED += cortexm_mpu
+endif
+
+ifneq (,$(filter $(CPU_FAM),f2 f4 f7))
+  FEATURES_PROVIDED += periph_i2s
 endif
 
 # only some stm32f3 have an MPU, stm32l052t8 provides an MPU but support is
