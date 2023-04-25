@@ -391,6 +391,14 @@ typedef struct {
 /** @} */
 
 /**
+ * @brief   ADC channel configuration data
+ */
+typedef struct {
+    gpio_t pin;             /**< Pin connected to the channel */
+    uint8_t chan;           /**< CPU ADC channel connected to the pin */
+} adc_conf_t;
+
+/**
  * @brief   Configuration details for an UART interface needed by the RPX0XX peripheral
  */
 typedef struct {
