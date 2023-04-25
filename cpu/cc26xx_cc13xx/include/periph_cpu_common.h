@@ -143,6 +143,18 @@ typedef struct {
     uint8_t     chn;    /**< number of channels [1,2] */
 } timer_conf_t;
 
+/**
+ * @brief   Maximum number of channels
+ *
+ * @note    32 bit timers only support one channel instead of two. But knowing
+ *          the worst case is useful e.g. for static allocation. Users are
+ *          expected to either do proper error handling with `timer_set()` and
+ *          `timer_set_absolute()`, or at least verify with
+ *          @ref timer_query_channel_numof what the actual number of channels
+ *          of a timer is.
+ */
+#define TIMER_CHANNEL_NUMOF 2
+
 #define PERIPH_I2C_NEED_READ_REG
 #define PERIPH_I2C_NEED_READ_REGS
 #define PERIPH_I2C_NEED_WRITE_REG
