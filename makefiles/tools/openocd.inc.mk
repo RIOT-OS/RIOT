@@ -40,7 +40,8 @@ endif
 
 ifneq (,$(OPENOCD_CMD_RESET_HALT))
   # Export OPENOCD_CMD_RESET_HALT only to the flash targets
-  $(call target-export-variables,flash%,OPENOCD_CMD_RESET_HALT)
+  $(call target-export-variables,flash,OPENOCD_CMD_RESET_HALT)
+  $(call target-export-variables,flash-only,OPENOCD_CMD_RESET_HALT)
 endif
 
 OPENOCD_DEBUG_TARGETS = debug debugr debug-server
