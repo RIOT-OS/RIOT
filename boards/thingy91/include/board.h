@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Freie Universität Berlin
+ * Copyright (C) 2023 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,9 +11,9 @@
  * @{
  *
  * @file
- * @brief       Board specific configuration for the Nordic Thingy:52 board
+ * @brief       Board specific configuration for the Nordic Thingy:91 board
  *
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Thanh-Viet Nguyen  <topologicrose@protonmail.com>
  */
 
 #ifndef BOARD_H
@@ -56,8 +56,6 @@ extern "C" {
  * @name    Power switch pins definitions
  * @{
  */
-//#define SPK_PWR_CTRL_PIN    GPIO_PIN(0, 29) /**< Speaker power switch */
-//#define VDD_PWR_CTRL_PIN    GPIO_PIN(0, 30) /**< VDD power switch */
 /** @} */
 
 /**

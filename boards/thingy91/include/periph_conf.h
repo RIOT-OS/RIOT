@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_thingy52
+ * @ingroup     boards_thingy91
  * @{
  *
  * @file
