@@ -29,7 +29,7 @@ reset button as well as 15 configurable external pins.
 - [nRF52840 web page](https://www.nordicsemi.com/?sc_itemid=%7BCDCCA013-FE4C-4655-B20C-1557AB6568C9%7D)
 - [documentation and hardware description](https://infocenter.nordicsemi.com/topic/ug_nrf52840_dongle/UG/nrf52840_Dongle/intro.html?cp=3_0_5)
 
-### <a name=nrf52840dongle_flash> Flash the board </a>
+### Flash the board {#nrf52840dongle_flash}
 
 The board is flashed using its on-board boot loader; the proprietary
 [nrfutil](https://www.nordicsemi.com/Products/Development-tools/nRF-Util) program needs to
