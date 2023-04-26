@@ -39,6 +39,9 @@ config MODULE_CORE_MSG_BUS
     help
         Messaging Bus API for inter process message broadcast.
 
+config MODULE_CORE_MUTEX_DEBUG
+    bool "Aid debugging deadlocks by printing on whom mutex_lock() is waiting"
+
 config MODULE_CORE_MUTEX_PRIORITY_INHERITANCE
     bool "Use priority inheritance to mitigate priority inversion for mutexes"
 

@@ -36,6 +36,28 @@ affect more than one module.
 ## Network devices
 ### IEEE 802.15.4
 
+ - José I. Álamos (@jia200x)
+
+### NRF802154
+
+ - José I. Álamos (@jia200x)
+
+### CC2538
+
+ - José I. Álamos (@jia200x)
+
+### KW2XRF
+
+ - José I. Álamos (@jia200x)
+
+### MRF24J40
+
+ - José I. Álamos (@jia200x)
+
+### AT86RF2XX
+
+ - José I. Álamos (@jia200x)
+
 #### AT86RF215
 
  - Benjamin Valentin (@benpicco)
@@ -43,6 +65,8 @@ affect more than one module.
 ### BLE
 
 ### LoRa
+
+ - José I. Álamos (@jia200x)
 
 ### CC110X
 
@@ -101,6 +125,10 @@ affect more than one module.
 
  - Benjamin Valentin (@benpicco)
 
+#### Netif
+
+ - José I. Álamos (@jia200x)
+
 #### UDP
 
 - Martine S. Lenders (@miri64)
@@ -109,18 +137,26 @@ affect more than one module.
 
 ### OpenThread
 
+ - José I. Álamos (@jia200x)
+
 ### LWIP
 
 - Martine S. Lenders (@miri64)
 
 ### OpenWSN
 
+ - José I. Álamos (@jia200x)
+
 ## Physical/Link Layer
 ### LoRaWAN
+
+ - José I. Álamos (@jia200x)
 
 ### BLE (nimble)
 
 ### IEEE 802.15.4
+
+ - José I. Álamos (@jia200x)
 
 ## Interfaces
 ### Sock
@@ -129,7 +165,11 @@ affect more than one module.
 
 ### Netif
 
+ - José I. Álamos (@jia200x)
+
 ### Netdev
+
+ - José I. Álamos (@jia200x)
 
 ## Application protocols
 ### CoAP

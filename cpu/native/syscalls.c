@@ -105,6 +105,16 @@ int (*real_fgetc)(FILE *stream);
 mode_t (*real_umask)(mode_t cmask);
 ssize_t (*real_writev)(int fildes, const struct iovec *iov, int iovcnt);
 ssize_t (*real_send)(int sockfd, const void *buf, size_t len, int flags);
+off_t (*real_lseek)(int fd, off_t offset, int whence);
+off_t (*real_fstat)(int fd, struct stat *statbuf);
+int (*real_fsync)(int fd);
+int (*real_mkdir)(const char *pathname, mode_t mode);
+int (*real_rmdir)(const char *pathname);
+DIR *(*real_opendir)(const char *name);
+struct dirent *(*real_readdir)(DIR *dirp);
+int (*real_closedir)(DIR *dirp);
+int (*real_rename)(const char *, const char *);
+int (*real_statvfs)(const char *restrict path, struct statvfs *restrict buf);
 
 void _native_syscall_enter(void)
 {
@@ -339,8 +349,9 @@ char *make_message(const char *format, va_list argp)
             free(message);
             return NULL;
         }
-        if (n < size)
+        if (n < size) {
             return message;
+        }
         size = n + 1;
         if ((temp = realloc(message, size)) == NULL) {
             free(message);
@@ -548,4 +559,14 @@ void _native_init_syscalls(void)
     *(void **)(&real_ftell) = dlsym(RTLD_NEXT, "ftell");
     *(void **)(&real_fputc) = dlsym(RTLD_NEXT, "fputc");
     *(void **)(&real_fgetc) = dlsym(RTLD_NEXT, "fgetc");
+    *(void **)(&real_mkdir) = dlsym(RTLD_NEXT, "mkdir");
+    *(void **)(&real_rmdir) = dlsym(RTLD_NEXT, "rmdir");
+    *(void **)(&real_lseek) = dlsym(RTLD_NEXT, "lseek");
+    *(void **)(&real_fstat) = dlsym(RTLD_NEXT, "fstat");
+    *(void **)(&real_fsync) = dlsym(RTLD_NEXT, "fsync");
+    *(void **)(&real_rename) = dlsym(RTLD_NEXT, "rename");
+    *(void **)(&real_opendir) = dlsym(RTLD_NEXT, "opendir");
+    *(void **)(&real_readdir) = dlsym(RTLD_NEXT, "readdir");
+    *(void **)(&real_closedir) = dlsym(RTLD_NEXT, "closedir");
+    *(void **)(&real_statvfs) = dlsym(RTLD_NEXT, "statvfs");
 }

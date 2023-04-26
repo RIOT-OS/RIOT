@@ -97,6 +97,25 @@
  *       `MUTEX_LOCK`.
  *     - The scheduler is run, so that if the unblocked waiting thread can
  *       run now, in case it has a higher priority than the running thread.
+ *
+ * Debugging deadlocks
+ * -------------------
+ *
+ * The module `core_mutex_debug` can be used to print on whom `mutex_lock()`
+ * is waiting. This information includes the thread ID of the owner and the
+ * program counter (PC) from where `mutex_lock()` was called. Note that the
+ * information is only valid if:
+ *
+ * - The mutex was locked by a thread, and not e.g. by `MUTEX_INIT_LOCKED`
+ * - The function `cpu_get_caller_pc()` is implemented for the target
+ *   architecture. (The thread ID will remain valid, though.)
+ * - The caller PC is briefly 0 when the current owner passes over ownership
+ *   to the next thread, but that thread didn't get CPU time yet to write its
+ *   PC into the data structure. Even worse, on architectures where an aligned
+ *   function-pointer-sized write is not atomic, the value may briefly be
+ *   bogus. Chances are close to zero this ever hits and since this only
+ *   effects debug output, the ostrich algorithm was chosen here.
+ *
  * @{
  *
  * @file
@@ -112,6 +131,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "architecture.h"
 #include "kernel_defines.h"
 #include "list.h"
 #include "thread.h"
@@ -130,7 +150,8 @@ typedef struct {
      * @internal
      */
     list_node_t queue;
-#if defined(DOXYGEN) || defined(MODULE_CORE_MUTEX_PRIORITY_INHERITANCE)
+#if defined(DOXYGEN) || defined(MODULE_CORE_MUTEX_PRIORITY_INHERITANCE) \
+    || defined(MODULE_CORE_MUTEX_DEBUG)
     /**
      * @brief   The current owner of the mutex or `NULL`
      * @note    Only available if module core_mutex_priority_inheritance
@@ -141,6 +162,18 @@ typedef struct {
      * this will have the value of `NULL`.
      */
     kernel_pid_t owner;
+#endif
+#if defined(DOXYGEN) || defined(MODULE_CORE_MUTEX_DEBUG)
+    /**
+     * @brief   Program counter of the call to @ref mutex_lock that most
+     *          recently acquired this mutex
+     *
+     * This is used when the module `core_mutex_debug` is used to debug
+     * deadlocks and is non-existing otherwise
+     */
+    uinttxtptr_t owner_calling_pc;
+#endif
+#if defined(DOXYGEN) || defined(MODULE_CORE_MUTEX_PRIORITY_INHERITANCE)
     /**
      * @brief   Original priority of the owner
      * @note    Only available if module core_mutex_priority_inheritance

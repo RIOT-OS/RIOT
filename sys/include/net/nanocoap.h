@@ -90,6 +90,7 @@
 #include "bitfield.h"
 #include "byteorder.h"
 #include "iolist.h"
+#include "macros/utils.h"
 #include "net/coap.h"
 #else
 #include "coap.h"
@@ -100,6 +101,10 @@
 #include "net/sock/udp.h"
 #else
 typedef void sock_udp_ep_t;
+#endif
+
+#if defined(MODULE_NANOCOAP_RESOURCES)
+#include "xfa.h"
 #endif
 
 #ifdef __cplusplus
@@ -402,15 +407,29 @@ typedef struct {
     uint8_t *opt;                   /**< Pointer to the placed option       */
 } coap_block_slicer_t;
 
+#if defined(MODULE_NANOCOAP_RESOURCES) || DOXYGEN
+/**
+ * @brief   CoAP XFA resource entry
+ *
+ * @param name  internal name of the resource entry, must be unique
+ */
+#define NANOCOAP_RESOURCE(name) \
+    XFA_CONST(coap_resources_xfa, 0) coap_resource_t CONCAT(coap_resource_, name) =
+#else
 /**
  * @brief   Global CoAP resource list
+ * @deprecated Use @ref NANOCOAP_RESOURCE instead.
+ *             The function will be removed after the 2024.01 release.
  */
 extern const coap_resource_t coap_resources[];
 
 /**
  * @brief   Number of entries in global CoAP resource list
+ * @deprecated Use @ref NANOCOAP_RESOURCE instead.
+ *             The function will be removed after the 2024.01 release.
  */
 extern const unsigned coap_resources_numof;
+#endif
 
 /**
  * @name    Functions -- Header Read/Write
@@ -2047,6 +2066,13 @@ extern ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, \
                                                     uint8_t *buf, size_t len,
                                                     coap_request_ctx_t *context);
 /**@}*/
+
+/**
+ * @brief   Respond to `/.well-known/core` to list all resources on the server
+ */
+#ifndef CONFIG_NANOCOAP_SERVER_WELL_KNOWN_CORE
+#define CONFIG_NANOCOAP_SERVER_WELL_KNOWN_CORE !IS_USED(MODULE_GCOAP)
+#endif
 
 /**
  * @brief   Checks if a CoAP resource path matches a given URI

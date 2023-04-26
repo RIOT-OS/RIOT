@@ -175,6 +175,12 @@ extern "C" {
 #endif
 #ifndef AUTO_INIT_PRIO_MOD_GCOAP
 /**
+ * @brief   nanoCoAP server priority
+ */
+#define AUTO_INIT_PRIO_MOD_NANOCOAP                     1235
+#endif
+#ifndef AUTO_INIT_PRIO_MOD_GCOAP
+/**
  * @brief   GCoAP priority
  */
 #define AUTO_INIT_PRIO_MOD_GCOAP                        1240
