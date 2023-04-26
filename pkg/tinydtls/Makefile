@@ -5,7 +5,10 @@ PKG_LICENSE=EPL-1.0,EDL-1.0
 
 include $(RIOTBASE)/pkg/pkg.mk
 
-CFLAGS += -Wno-implicit-fallthrough
+# tinyDTLS custom logging functions pass non-literals to printf(), so disable them
+ifneq (,$(filter arch_avr8,$(FEATURES_USED)))
+  CFLAGS += -DNDEBUG
+endif
 
 all:
 	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR) -f $(PKG_SOURCE_DIR)/Makefile.riot

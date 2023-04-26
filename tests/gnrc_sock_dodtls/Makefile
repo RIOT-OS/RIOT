@@ -4,9 +4,6 @@ RIOTBASE ?= $(CURDIR)/../..
 
 export TAP ?= tap0
 
-# TinyDTLS only has support for 32-bit architectures ATM
-FEATURES_REQUIRED += arch_32bit
-
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += ipv4_addr
 USEMODULE += ipv6_addr
