@@ -177,3 +177,17 @@ void clock_gpout3_configure(uint32_t f_in, uint32_t f_out, CLOCKS_CLK_GPOUT3_CTR
     io_reg_atomic_set(&PADS_BANK0->GPIO25, 1U << PADS_BANK0_GPIO25_IE_Pos);
     gpio_set_function_select(25, FUNCTION_SELECT_CLOCK);
 }
+
+void clock_adc_configure(CLOCKS_CLK_ADC_CTRL_AUXSRC_Enum aux)
+{
+    /* Stop the clock generator */
+    io_reg_atomic_clear(&CLOCKS->CLK_ADC_CTRL,
+                        (1u << CLOCKS_CLK_ADC_CTRL_ENABLE_Pos));
+    /* Selects the new auxiliary clock source */
+    io_reg_write_dont_corrupt(&CLOCKS->CLK_ADC_CTRL,
+                              aux << CLOCKS_CLK_ADC_CTRL_AUXSRC_Pos,
+                              CLOCKS_CLK_ADC_CTRL_AUXSRC_Msk);
+    /* Restart the clock generator */
+    io_reg_atomic_set(&CLOCKS->CLK_ADC_CTRL,
+                      (1u << CLOCKS_CLK_ADC_CTRL_ENABLE_Pos));
+}
