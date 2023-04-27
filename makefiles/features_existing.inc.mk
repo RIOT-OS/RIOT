@@ -48,6 +48,7 @@ FEATURES_EXISTING := \
     cortexm_mpu \
     cortexm_svc \
     cpp \
+    cpu_arm7tdmi_gba \
     cpu_atmega1281 \
     cpu_atmega1284p \
     cpu_atmega128rfa1 \

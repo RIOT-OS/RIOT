@@ -1,0 +1,3 @@
+MCPU := arm7tdmi
+
+include $(RIOTCPU)/arm7_common/Makefile.include
