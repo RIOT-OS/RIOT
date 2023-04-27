@@ -58,16 +58,6 @@ void gpio_init_ports(void);
 #endif
 
 /**
- * @brief   Returns the current content of the link register (lr)
- */
-static inline uintptr_t cpu_get_caller_pc(void)
-{
-    register uintptr_t lr_ptr;
-    __asm__ __volatile__("mov %0, lr" : "=r"(lr_ptr));
-    return lr_ptr;
-}
-
-/**
  * @brief   Returns true if the CPU woke from Deep Sleep
  */
 static inline bool cpu_woke_from_backup(void) {
