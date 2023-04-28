@@ -931,7 +931,7 @@ static int _is_available(l3gxxxx_t *dev)
         case L3GXXXX_CHIP_ID_L3GD20:   dev->sensor = L3GD20;
                                        break;
 #endif
-#if IS_USED(MODULE_L3G4200D) || IS_USED(MODULE_I3G4250D) || IS_USED(MODULE_A3G4250D)
+#if IS_USED(MODULE_L3G4200D_NG) || IS_USED(MODULE_I3G4250D) || IS_USED(MODULE_A3G4250D)
         case L3GXXXX_CHIP_ID_X3G42XXD: dev->sensor = X3G42XXD;
                                        break;
 #endif
