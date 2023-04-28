@@ -391,6 +391,14 @@ typedef struct {
 /** @} */
 
 /**
+ * @brief   ADC channel configuration data
+ */
+typedef struct {
+    gpio_t pin;             /**< Pin connected to the channel */
+    uint8_t chan;           /**< CPU ADC channel connected to the pin */
+} adc_conf_t;
+
+/**
  * @brief   Configuration details for an UART interface needed by the RPX0XX peripheral
  */
 typedef struct {
@@ -613,6 +621,13 @@ void clock_gpout2_configure(uint32_t f_in, uint32_t f_out, CLOCKS_CLK_GPOUT2_CTR
  */
 void clock_gpout3_configure(uint32_t f_in, uint32_t f_out, CLOCKS_CLK_GPOUT3_CTRL_AUXSRC_Enum aux);
 
+/**
+ * @brief   Configure the ADC clock to run from a dedicated auxiliary
+ *          clock source
+ *
+ * @param   aux     Auxiliary clock source
+ */
+void clock_adc_configure(CLOCKS_CLK_ADC_CTRL_AUXSRC_Enum aux);
 /** @} */
 
 /**
@@ -636,7 +651,7 @@ void pll_start_sys(uint8_t ref_div,
                    uint8_t post_div_1, uint8_t post_div_2);
 
 /**
- * @brief   Start the PLL for the system clock
+ * @brief   Start the PLL for the USB clock
  *          output[MHz] = f_ref / @p ref_div * @p vco_feedback_scale / @p post_div_1 / @p post_div_2
  *
  * @note    Usual setting should be (12 MHz, 1, 40, 5, 2) to get a 48 MHz USB clock signal

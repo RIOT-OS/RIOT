@@ -21,6 +21,7 @@
 #ifndef COMPILER_HINTS_H
 #define COMPILER_HINTS_H
 
+#include <assert.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -89,7 +90,7 @@ extern "C" {
  *            Use this if the compiler cannot tell that e.g.
  *            an assembler instruction causes a longjmp, or a write causes a reboot.
  */
-#if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ >= 5)
+#if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ >= 5) || defined(__clang__)
 #define UNREACHABLE() __builtin_unreachable()
 #else
 #define UNREACHABLE() do { /* nothing */ } while (1)
@@ -163,6 +164,22 @@ extern "C" {
  * @return result of @p x
  */
 #define unlikely(x)     __builtin_expect((uintptr_t)(x), 0)
+
+/**
+ * @brief   Behaves like an `assert()`, but tells the compiler that @p cond can
+ *          never be false.
+ *          This allows the compiler to optimize the code accordingly even when
+ *          `NDEBUG` is set / with `DEVELHELP=0`.
+ *
+ *          @p cond being false will result in undefined behavior.
+ *
+ * @param[in] cond  Condition that is guaranteed to be true
+ */
+#ifdef NDEBUG
+#define assume(cond)    ((cond) ? (void)0 : UNREACHABLE())
+#else
+#define assume(cond)    assert(cond)
+#endif
 
 #ifdef __cplusplus
 }

@@ -78,6 +78,21 @@ static const timer_conf_t timer_config[] = {
 
 #define TIMER_NUMOF     ARRAY_SIZE(timer_config)
 
+/**
+ * @name   ADC configuration
+ *
+ * The configuration consists simply of a list of channels that should be used
+ * @{
+ */
+static const adc_conf_t adc_config[] = {
+                                        { .pin = GPIO_PIN(0, 26), .chan = 0},
+                                        { .pin = GPIO_PIN(0, 27), .chan = 1},
+                                        { .pin = GPIO_PIN(0, 28), .chan = 2},
+                                        };
+
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
