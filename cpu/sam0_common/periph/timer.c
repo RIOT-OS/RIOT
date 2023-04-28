@@ -43,6 +43,22 @@ static timer_isr_ctx_t config[TIMER_NUMOF];
 
 static uint32_t _oneshot;
 
+/* Number of right-shifts to perform on the input frequency to get the output
+ * frequency the prescaler will divide it down to */
+static const uint8_t _prescaler_shifts[] = {
+    [TC_CTRLA_PRESCALER_DIV1_Val] = 0,
+    [TC_CTRLA_PRESCALER_DIV2_Val] = 1,
+    [TC_CTRLA_PRESCALER_DIV4_Val] = 2,
+    [TC_CTRLA_PRESCALER_DIV8_Val] = 3,
+    [TC_CTRLA_PRESCALER_DIV16_Val] = 4,
+    [TC_CTRLA_PRESCALER_DIV64_Val] = 6,
+    [TC_CTRLA_PRESCALER_DIV256_Val] = 8,
+    [TC_CTRLA_PRESCALER_DIV1024_Val] = 10,
+};
+
+static_assert(ARRAY_SIZE(_prescaler_shifts) == (TC_CTRLA_PRESCALER_DIV1024_Val + 1),
+              "_prescaler_shifts needs an update for the selected MCU");
+
 static inline void set_oneshot(tim_t tim, int chan)
 {
     _oneshot |= (1 << chan) << (TIMER_CHANNEL_NUMOF * tim);
@@ -94,20 +110,13 @@ static inline void _irq_enable(tim_t tim)
 
 static uint8_t _get_prescaler(uint32_t freq_out, uint32_t freq_in)
 {
-    uint8_t scale = 0;
-    while (freq_in > freq_out) {
-        freq_in >>= 1;
-
-        /* after DIV16 the prescaler gets more coarse */
-        if (++scale > TC_CTRLA_PRESCALER_DIV16_Val) {
-            freq_in >>= 1;
+    for (uint8_t scale = 0; scale < ARRAY_SIZE(_prescaler_shifts); scale++) {
+        if ((freq_in >> _prescaler_shifts[scale]) == freq_out) {
+            return scale;
         }
     }
 
-    /* fail if output frequency can't be derived from input frequency */
-    assert(freq_in == freq_out);
-
-    return scale;
+    return UINT8_MAX;
 }
 
 /* TOP value is CC0 */
@@ -128,6 +137,23 @@ static inline void _set_nfrq(tim_t tim)
 #else
     dev(tim)->CTRLA.bit.WAVEGEN = TC_CTRLA_WAVEGEN_NFRQ_Val;
 #endif
+}
+
+uword_t timer_query_freqs_numof(tim_t dev)
+{
+    assert(dev < TIMER_NUMOF);
+    (void)dev;
+    return ARRAY_SIZE(_prescaler_shifts);
+}
+
+uint32_t timer_query_freqs(tim_t dev, uword_t index)
+{
+    assert(dev < TIMER_NUMOF);
+    const tc32_conf_t *cfg = &timer_config[dev];
+    if (index >= ARRAY_SIZE(_prescaler_shifts)) {
+        return 0;
+    }
+    return sam0_gclk_freq(cfg->gclk_src) >> _prescaler_shifts[index];
 }
 
 /**
