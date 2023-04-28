@@ -92,7 +92,6 @@ static void _get_rtc_mem(void)
         }
     }
 
-
     puts("RTC mem OK");
 }
 #else
@@ -105,17 +104,17 @@ int main(void)
     puts("\nRIOT RTT low-level driver test");
 
     puts("RTT configuration:");
-    printf("RTT_MAX_VALUE: 0x%08x\n", (unsigned)RTT_MAX_VALUE);
-    printf("RTT_FREQUENCY: %u\n\n", (unsigned)RTT_FREQUENCY);
+    printf("RTT_MAX_VALUE: 0x%08" PRIx32 "\n", (uint32_t)RTT_MAX_VALUE);
+    printf("RTT_FREQUENCY: %" PRIu32 "\n\n", (uint32_t)RTT_FREQUENCY);
 
-    puts("Testing the tick conversion");
-    for (unsigned i = 0; i < ARRAY_SIZE(_ticktest); i++) {
+    puts("Testing the tick conversion (with rounding if RTT_FREQUENCY is not power of 2)");
+    for (uint16_t i = 0; i < ARRAY_SIZE(_ticktest); i++) {
         uint32_t sec = RTT_TICKS_TO_SEC(_ticktest[i]);
         uint32_t ticks = RTT_SEC_TO_TICKS(sec);
         printf("Trying to convert %" PRIu32 " to seconds and back\n",
                _ticktest[i]);
-        /* account for rounding errors... */
-        if ((ticks != 0) && (ticks != _ticktest[i])) {
+        /* RTT_FREQUENCY is not always power of 2 so compare with rounded result */
+        if ((ticks != 0) && (ticks != _ticktest[i] / RTT_FREQUENCY * RTT_FREQUENCY)) {
             puts("error: TICK conversion not working as expected\n");
             return 1;
         }
