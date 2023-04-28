@@ -416,6 +416,78 @@ void dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem)
     dma_ctx[dma].len = len;
 }
 
+void dma_setup_ext(dma_t dma, dma_burst_t pburst, dma_burst_t mburst,
+                   bool fifo, dma_fifo_thresh_t thresh, bool pfctrl)
+{
+#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
+    STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
+
+    /* configuraition can be done only if DMA stream is disabled */
+    assert((stream->CR & DMA_EN) == 0);
+
+    /* FIFO configuration if enabled */
+    if (fifo) {
+        uint8_t width = (stream->CR & DMA_SxCR_MSIZE_Msk) >> DMA_SxCR_MSIZE_Pos;
+
+        /* check valid combinations of MSIZE, MBURST and FIFO threshold level */
+        switch (width) {
+        case DMA_DATA_WIDTH_BYTE:
+            switch (thresh) {
+            case DMA_FIFO_FULL_1_4:
+                /* fall through */
+            case DMA_FIFO_FULL_3_4:
+                assert(mburst == DMA_BURST_INCR4);
+                break;
+            case DMA_FIFO_FULL_1_2:
+                assert((mburst == DMA_BURST_INCR4) || (mburst == DMA_BURST_INCR8));
+                break;
+            case DMA_FIFO_FULL: /* all mburst values are valid */
+                break;
+            }
+            break;
+
+        case DMA_DATA_WIDTH_HALF_WORD:
+            switch (thresh) {
+            case DMA_FIFO_FULL_1_2:
+                assert(mburst == DMA_BURST_INCR4);
+                break;
+            case DMA_FIFO_FULL:
+                assert((mburst == DMA_BURST_INCR4) || (mburst == DMA_BURST_INCR8));
+                break;
+            default:
+                assert(false);  /* all other combinations are invalid) */
+                break;
+            }
+            break;
+
+        case DMA_DATA_WIDTH_WORD:
+            assert((thresh == DMA_FIFO_FULL) && (mburst == DMA_BURST_INCR4));
+            break;
+        }
+
+        stream->FCR = (fifo << DMA_SxFCR_DMDIS_Pos) |
+                      (thresh << DMA_SxFCR_FTH_Pos);
+    }
+    else {
+        stream->FCR = 0;
+    }
+
+    stream->CR &= ~(DMA_SxCR_PFCTRL | DMA_SxCR_MBURST | DMA_SxCR_PBURST);
+    stream->CR |= pfctrl ? DMA_SxCR_PFCTRL : 0;
+    stream->CR |= (mburst << DMA_SxCR_MBURST_Pos);
+    stream->CR |= (pburst << DMA_SxCR_PBURST_Pos);
+
+#else
+    (void)dma;
+    (void)pburst;
+    (void)pburst;
+    (void)mburst;
+    (void)fifo;
+    (void)thresh;
+    (void)pfctrl;
+#endif
+}
+
 int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *dst, size_t len,
                   dma_mode_t mode, uint8_t flags)
 {
