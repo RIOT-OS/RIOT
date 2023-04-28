@@ -45,6 +45,30 @@ static inline NRF_TIMER_Type *dev(tim_t tim)
     return timer_config[tim].dev;
 }
 
+uword_t timer_query_freqs_numof(tim_t dev)
+{
+    assert(dev < TIMER_NUMOF);
+    (void)dev;
+    return 10;
+}
+
+uword_t timer_query_channel_numof(tim_t dev)
+{
+    assert(dev < TIMER_NUMOF);
+    return timer_config[dev].channels;
+}
+
+uint32_t timer_query_freqs(tim_t dev, uword_t index)
+{
+    assert(dev < TIMER_NUMOF);
+    (void)dev;
+    if (index >= 10) {
+        return 0;
+    }
+
+    return F_TIMER >> index;
+}
+
 int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
 {
     /* make sure the given timer is valid */
@@ -75,7 +99,7 @@ int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
             dev(tim)->PRESCALER = i;
             break;
         }
-        cando /= 2;
+        cando >>= 1;
     }
     if (i == 10) {
         return -1;

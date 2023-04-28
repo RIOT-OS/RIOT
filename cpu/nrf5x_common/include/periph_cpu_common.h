@@ -257,6 +257,16 @@ typedef struct {
  */
 #define PERIPH_TIMER_PROVIDES_SET   1
 
+/**
+ * @brief   Maximum number of channels
+ *
+ * @note    NRF_TIMER1 and NRF_TIMER2 only have 4 hardware channels (and 3 of
+ *          of them are available to the application, as one has to be used
+ *          to implement timer_read()). Use @ref timer_query_channel_numof to
+ *          check the actual number of supported channels for a given timer.
+ */
+#define TIMER_CHANNEL_NUMOF 5
+
 #ifndef DOXYGEN
 /**
  * @brief   Override SPI mode values
