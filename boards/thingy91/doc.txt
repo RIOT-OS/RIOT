@@ -15,7 +15,6 @@
  * Used extra software: https://eclipse-embed-cdt.github.io/debug/jlink/install/ 
  * 
  * Some notes about how to flash the board
- * BOARD=thingy91 QUIET=0 make flash term
  * BOARD=thingy91 make flash term
  */
 
