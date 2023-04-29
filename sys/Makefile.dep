@@ -702,4 +702,10 @@ ifneq (,$(filter configuration configuration_%,$(USEMODULE)))
   include $(RIOTBASE)/sys/configuration/Makefile.dep
 endif
 
+ifneq (,$(filter wifi_configuration,$(USEMODULE)))
+  USEMODULE += wifi
+  USEMODULE += configuration
+  USEMODULE += fmt
+endif
+
 include $(RIOTBASE)/sys/test_utils/Makefile.dep

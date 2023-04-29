@@ -227,6 +227,9 @@ endif
 ifneq (,$(filter usbus usbus_%,$(USEMODULE)))
     DIRS += usb/usbus
 endif
+ifneq (,$(filter wifi wifi_%,$(USEMODULE)))
+  DIRS += net/link_layer/wifi
+endif
 ifneq (,$(filter ztimer_core,$(USEMODULE)))
     DIRS += ztimer
 endif
