@@ -581,6 +581,7 @@ PSEUDOMODULES += vfs_auto_mount
 PSEUDOMODULES += vfs_default
 
 PSEUDOMODULES += wakaama_objects_%
+PSEUDOMODULES += wifi_manager
 PSEUDOMODULES += wifi_configuration
 PSEUDOMODULES += wifi_scan_list
 PSEUDOMODULES += wifi_enterprise

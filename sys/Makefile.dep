@@ -709,4 +709,10 @@ ifneq (,$(filter wifi_configuration,$(USEMODULE)))
   USEPKG += nanocbor
 endif
 
+ifneq (,$(filter wifi_manager,$(USEMODULE)))
+  USEMODULE += wifi
+  USEMODULE += wifi_scan_list
+  USEMODULE += ztimer_sec
+endif
+
 include $(RIOTBASE)/sys/test_utils/Makefile.dep
