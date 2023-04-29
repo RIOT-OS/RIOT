@@ -26,6 +26,7 @@
 #include "mutex.h"
 #include "net/wifi_scan_list.h"
 #include "net/netdev/wifi.h"
+#include "net/wifi_manager.h"
 #include "net/netopt.h"
 #include "net/wifi.h"
 #include "sched.h"
@@ -118,6 +119,14 @@ static void _wifi_disconnect_cb(void *netif, const wifi_disconnect_result_t *res
     mutex_unlock(&_sync);
 }
 
+#if IS_USED(MODULE_WIFI_MANAGER)
+static wifi_manager_listener_t _manager_listener = {
+    .on_scan = (wifi_manager_on_scan_cb)_wifi_scan_cb,
+    .on_connect = (wifi_manager_connect_cb)_wifi_connect_cb,
+    .on_disconnect = (wifi_manager_disconnect_cb)_wifi_disconnect_cb,
+};
+#endif
+
 static int _iw_probe(netif_t *iface)
 {
     long ret;
@@ -142,9 +151,16 @@ static int _iw_probe(netif_t *iface)
 static int _iw_disconnect(netif_t *iface)
 {
     long ret;
-    wifi_disconnect_request_t request = WIFI_DISCONNECT_REQUEST_INITIALIZER(NULL);
-    if ((ret = netif_set_opt(iface, NETOPT_DISCONNECT, 0, &request, sizeof(request))) < 0) {
-        return ret;
+    if (IS_USED(MODULE_WIFI_MANAGER)) {
+        if ((ret = wifi_manager_disconnect(netif_get_id(iface))) < 0) {
+            return ret;
+        }
+    }
+    else {
+        wifi_disconnect_request_t request = WIFI_DISCONNECT_REQUEST_INITIALIZER(NULL);
+        if ((ret = netif_set_opt(iface, NETOPT_DISCONNECT, 0, &request, sizeof(request))) < 0) {
+            return ret;
+        }
     }
     return 0;
 }
@@ -160,9 +176,17 @@ static int _iw_connect(netif_t *iface, wifi_connect_request_t *request)
     long ret;
     /* this should not block! */
     mutex_lock(&_sync);
-    if ((ret = netif_set_opt(iface, NETOPT_CONNECT, 0, request, sizeof(*request))) < 0) {
-        mutex_unlock(&_sync);
-        return ret;
+    if (IS_USED(MODULE_WIFI_MANAGER)) {
+        if ((ret = wifi_manager_connect(netif_get_id(iface), request->ssid, request->cred, request->base.channel)) < 0) {
+            mutex_unlock(&_sync);
+            return ret;
+        }
+    }
+    else {
+        if ((ret = netif_set_opt(iface, NETOPT_CONNECT, 0, request, sizeof(*request))) < 0) {
+            mutex_unlock(&_sync);
+            return ret;
+        }
     }
     /* callback unlocks mutex */
     ztimer_mutex_lock_timeout(ZTIMER_SEC, &_sync, SC_IW_AP_CONNECT_TIMEOUT_SEC_MAX);
@@ -289,9 +313,17 @@ static int _iw_scan(netif_t *iface, wifi_scan_request_t *request)
     int ret;
     /* this should not block! */
     mutex_lock(&_sync);
-    if ((ret = netif_set_opt(iface, NETOPT_SCAN, 0, request, sizeof(*request))) < 0) {
-        mutex_unlock(&_sync);
-        return ret;
+    if (IS_USED(MODULE_WIFI_MANAGER)) {
+        if ((ret = wifi_manager_scan(netif_get_id(iface))) < 0) {
+            mutex_unlock(&_sync);
+            return ret;
+        }
+    }
+    else {
+        if ((ret = netif_set_opt(iface, NETOPT_SCAN, 0, request, sizeof(*request))) < 0) {
+            mutex_unlock(&_sync);
+            return ret;
+        }
     }
     /* callback unlocks mutex */
     ztimer_mutex_lock_timeout(ZTIMER_SEC, &_sync, SC_IW_AP_SCAN_TIMEOUT_SEC_MAX);
@@ -361,6 +393,9 @@ int _iw_cmd(int argc, char **argv)
     if (argc < 3) {
         goto exit_help;
     }
+#if IS_USED(MODULE_WIFI_MANAGER)
+    wifi_manager_register_listener(&_manager_listener);
+#endif
     int ret = -EINVAL;
     netif_t *iface = netif_get_by_name(argv[1]);
     if (!iface) {
@@ -397,6 +432,9 @@ int _iw_cmd(int argc, char **argv)
         goto exit_help;
     }
 
+#if IS_USED(MODULE_WIFI_MANAGER)
+    wifi_manager_deregister_listener(&_manager_listener);
+#endif
     printf("%s: ok\n", argv[0]);
     return EXIT_SUCCESS;
 
@@ -405,6 +443,9 @@ exit_help:
     return EXIT_FAILURE;
 
 exit_failure:
+#if IS_USED(MODULE_WIFI_MANAGER)
+    wifi_manager_deregister_listener(&_manager_listener);
+#endif
     _iw_error(argv[0], ret);
     return EXIT_FAILURE;
 
