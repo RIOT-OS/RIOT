@@ -49,6 +49,34 @@ extern struct fal_flash_dev mtd_flash0;
     &mtd_flash0,                                                     \
 }
 
+#if !defined(FAL_MTD)
+/**
+ * @brief   Default MTD to use for flashdb
+ */
+#define FAL_MTD                                     MTD_0
+#endif
+
+#if !defined(FAL_PART_LABEL)
+/**
+ * @brief   Default FAL partition to use for flashdb
+ */
+#define FAL_PART_LABEL                              FAL_PART0_LABEL
+#endif
+
+#if !defined(FAL_PART0_LABEL)
+/**
+ * @brief   Have at least the label of partition 0 defined
+ */
+#define FAL_PART0_LABEL                             "part0"
+#endif
+
+#if !defined(FAL_PART0_LENGTH)
+/**
+ * @brief   Have at least the length of partition 0 defined
+ */
+#define FAL_PART0_LENGTH                            (2 * 4096u)
+#endif
+
 /**
  * @brief Partition 0
  */
@@ -83,7 +111,7 @@ extern struct fal_flash_dev mtd_flash0;
  * @brief Partition 3
  */
 #ifdef FAL_PART3_LABEL
-#define FAL_ROW_PART3   { FAL_PART_MAGIC_WORD, FAL_PART2_LABEL, "fal_mtd",
+#define FAL_ROW_PART3   { FAL_PART_MAGIC_WORD, FAL_PART3_LABEL, "fal_mtd",
                           FAL_PART2_LENGTH, FAL_PART3_LENGTH, 0 },
 #else
 #define FAL_ROW_PART3
