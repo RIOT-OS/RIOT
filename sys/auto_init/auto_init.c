@@ -335,6 +335,11 @@ extern void auto_init_gnrc_ipv6_static_addr(void);
 AUTO_INIT(auto_init_gnrc_ipv6_static_addr,
           AUTO_INIT_PRIO_MOD_GNRC_IPV6_STATIC_ADDR);
 #endif
+#if IS_USED(MODULE_WIFI_MANAGER)
+extern void auto_init_wifi_manager(void);
+AUTO_INIT(auto_init_wifi_manager,
+          AUTO_INIT_PRIO_MOD_WIFI_MANAGER);
+#endif
 
 void auto_init(void)
 {

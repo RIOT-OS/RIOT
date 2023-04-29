@@ -1,0 +1,21 @@
+# Copyright (c) 2023 ML!PA Consulting GmbH
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_WIFI_CONFIGURATION
+    bool "WiFi Configuration"
+    depends on MODULE_WIFI
+    help
+        This module provides a configuration for the WiFi module.
+
+if MODULE_WIFI_CONFIGURATION
+
+config WIFI_CONF_STORED_AP_NUMOF
+    int "Nomer of WiFi access points that can be stored"
+    default 2
+
+endif # MODULE_WIFI_CONFIGURATION
+

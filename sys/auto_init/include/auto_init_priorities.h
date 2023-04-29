@@ -395,6 +395,12 @@ extern "C" {
  */
 #define AUTO_INIT_PRIO_MOD_GNRC_IPV6_STATIC_ADDR        1560
 #endif
+#ifndef AUTO_INIT_PRIO_MOD_WIFI_MANAGER
+/**
+ * @brief   WiFi manager priority
+ */
+#define AUTO_INIT_PRIO_MOD_WIFI_MANAGER                 1570
+#endif
 
 #ifdef __cplusplus
 }
