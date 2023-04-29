@@ -216,3 +216,7 @@ endif
 ifneq (,$(filter event,$(USEMODULE)))
   include $(RIOTBASE)/sys/event/Makefile.include
 endif
+
+ifneq (,$(filter configuration configuration_%,$(USEMODULE)))
+  include $(RIOTBASE)/sys/configuration/Makefile.include
+endif

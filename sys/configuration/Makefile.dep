@@ -1,0 +1,24 @@
+DEFAULT_MODULE += auto_init_configuration
+
+USEMODULE += fmt
+
+ifneq (,$(filter configuration_backend_%,$(USEMODULE)))
+  USEMODULE += configuration_backend
+endif
+
+ifneq (,$(filter configuration_backend_riotconf,$(USEMODULE)))
+  USEMODULE += riotconf
+endif
+
+ifneq (,$(filter configuration_backend_flashdb%,$(USEMODULE)))
+  # this backend needs strings
+  USEMODULE += configuration_strings
+  USEMODULE += configuration_backend_flashdb
+  USEMODULE += flashdb_kvdb
+  ifneq (,$(filter configuration_backend_flashdb_vfs,$(USEMODULE)))
+    USEMODULE += flashdb_vfs
+    USEMODULE += vfs_default
+  else ifneq (,$(filter configuration_backend_flashdb_mtd,$(USEMODULE)))
+    USEMODULE += flashdb_mtd
+  endif
+endif
