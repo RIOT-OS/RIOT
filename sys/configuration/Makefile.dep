@@ -1,0 +1,15 @@
+DEFAULT_MODULE += auto_init_configuration
+DEFAULT_MODULE += auto_init_configuration_backend_flashdb
+
+USEMODULE += fmt
+
+ifneq (,$(filter configuration_backend_flashdb%,$(USEMODULE)))
+  USEMODULE += configuration_backend_flashdb
+  USEMODULE += flashdb_kvdb
+  ifneq (,$(filter configuration_backend_flashdb_vfs,$(USEMODULE)))
+    USEMODULE += flashdb_vfs
+    USEMODULE += vfs_default
+  else ifneq (,$(filter configuration_backend_flashdb_mtd,$(USEMODULE)))
+    USEMODULE += flashdb_mtd
+  endif
+endif

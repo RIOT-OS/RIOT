@@ -197,6 +197,12 @@ extern "C" {
  */
 #define AUTO_INIT_PRIO_MOD_VFS                          1260
 #endif
+#ifndef AUTO_INIT_PRIO_MOD_CONFIGURATION
+/**
+ * @brief   Configuration priority
+ */
+#define AUTO_INIT_PRIO_MOD_CONFIGURATION                1265
+#endif
 #ifndef AUTO_INIT_PRIO_MOD_GNRC_IPV6_NIB
 /**
  * @brief   GNRC IPv6 NIB priority

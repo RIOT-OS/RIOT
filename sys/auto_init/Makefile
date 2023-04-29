@@ -10,6 +10,10 @@ ifneq (,$(filter auto_init_can,$(USEMODULE)))
   DIRS += can
 endif
 
+ifneq (,$(filter auto_init_configuration,$(USEMODULE)))
+  DIRS += configuration
+endif
+
 ifneq (,$(filter auto_init_loramac,$(USEMODULE)))
   DIRS += loramac
 endif
