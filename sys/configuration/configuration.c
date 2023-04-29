@@ -118,7 +118,7 @@ static int _configuration_find_handler(const conf_handler_node_t **next_handler,
         do {
             if ((handler = _configuration_subnode_next(*next_handler, next))) {
                 if ((*next_handler)->ops &&
-                    container_of(*next_handler, conf_handler_t, node)->handles_array &&
+                    container_of(*next_handler, conf_handler_t, node)->conf_flags.handles_array &&
                     off < 0) {
                     /* for an array there must be an index before a new handler, like
                        if config was an array /config/next is invalid */
@@ -129,7 +129,7 @@ static int _configuration_find_handler(const conf_handler_node_t **next_handler,
             else if ((next = _configuration_key_array_index(next, &index))) {
                 *key = next;
                 if (!(*next_handler)->ops ||
-                    !container_of(*next_handler, conf_handler_t, node)->handles_array ||
+                    !container_of(*next_handler, conf_handler_t, node)->conf_flags.handles_array ||
                     off >= 0) {
                     /* if ther is an index, it must be an array */
                     /* do not allow multidimensional array, like config/0/1 */
@@ -218,7 +218,7 @@ static conf_handler_node_t *_configuration_handler_iterator_next(conf_iterator_t
 
 static int _configuration_append_index(conf_key_buf_t *key, const conf_handler_node_t *next)
 {
-    assert(container_of(next, conf_handler_t, node)->handles_array);
+    assert(container_of(next, conf_handler_t, node)->conf_flags.handles_array);
     char *slash = &key->buf[strlen(key->buf) - 1];
     if (*slash != '/') {
         strcat(slash, "/");
@@ -244,7 +244,8 @@ static conf_handler_node_t *_configuration_path_iterator_next(conf_iterator_t *i
     if (iter->sp > 0) {
         const conf_handler_node_t *next = iter->stack[--iter->sp];
         if (next != iter->root) {
-            if (next->ops && container_of(next, conf_handler_t, node)->handles_array) {
+            if (next->ops && container_of(next, conf_handler_t, node)->conf_flags.handles_array
+                          && container_of(next, conf_handler_t, node)->conf_flags.export_as_a_whole == 0) {
                 if (_configuration_append_index(key, next) > 0) {
                     assert(iter->sp < ARRAY_SIZE(iter->stack));
                     iter->stack[iter->sp++] = next;

@@ -260,6 +260,47 @@ typedef int (*conf_data_verify_handler) (const struct conf_handler *handler,
 typedef int (*conf_data_apply_handler) (const struct conf_handler *handler,
                                         conf_key_buf_t *key);
 
+
+/**
+ * @brief   Handler prototype to encode the internal representation of a configuration item
+ *          from a struct representation to for example CBOR.
+ *
+ * This is called by the default export handler before exporting.
+ * If needed, an internal buffer must be known to the implementation of this function.
+ * Another use case of this function could be to disguise confidential data which are not
+ * supposed to be exported to a certain backend.
+ *
+ * @param[in]           handler     Reference to the handler
+ * @param[in]           key         Configuration key which belongs to the configuration handler
+ * @param[in, out]      enc_data    in: pointer to data to be encoded; out: pointer to encoded data to be exported
+ * @param[out]          enc_size    in: size of data to be encoded; out: size of encoded data
+ *
+ * @return  0 on success
+ */
+typedef int (*conf_data_encode_handler) (const struct conf_handler *handler,
+                                         conf_key_buf_t *key,
+                                         const void **enc_data, size_t *enc_size);
+/**
+ * @brief   Handler prototype to decode the internal representation of a configuration item
+ *          for example from CBOR to a struct representation.
+ *
+ * This is called by the default import handler after importing.
+ * If needed, an internal buffer must be known to the implementation of this function.
+ *
+ * @param[in]           handler     Reference to the handler
+ * @param[in]           key         Configuration key which belongs to the configuration handler
+ * @param[in, out]      dec_data    When this is a pointer to NULL, this will return the decoding buffer
+                                    and the size of it in @p dec_size
+                                    in: pointer to data to be decoded; out: pointer to decoded data
+ * @param[in, out]      dec_size    Size of decoding buffer or in: size of data to be decoded;
+                                    out: size of decoded data
+ *
+ * @return  0 on success
+ */
+typedef int (*conf_data_decode_handler) (const struct conf_handler *handler,
+                                         conf_key_buf_t *key,
+                                         void **dec_data, size_t *dec_size);
+
 /**
  * @brief   Configuration handler operations
  */
@@ -277,6 +318,8 @@ typedef struct conf_handler_ops {
 typedef struct conf_handler_data_ops {
     conf_data_verify_handler verify;        /**< Verify the currently set configuration */
     conf_data_apply_handler apply;          /**< Apply the currently set configuration */
+    conf_data_encode_handler encode;        /**< Encode the currently set configuration */
+    conf_data_decode_handler decode;        /**< Decode the currently set configuration */
 } conf_handler_data_ops_t;
 
 /**
@@ -302,6 +345,15 @@ typedef struct conf_handler_node {
 }
 
 /**
+ * @brief   Configuration of handler behavior
+ */
+typedef struct {
+    uint32_t handles_array      :1;     /**< True if the handler handles an array of items */
+    uint32_t export_as_a_whole  :1;     /**< If the handler handles an array, this specifies whether the array
+                                             should be exported a whole or item by item with an index in the key */
+} conf_handler_flags_t;
+
+/**
  * @brief   A node with handler operations in the configuration tree
  */
 typedef struct conf_handler {
@@ -310,8 +362,8 @@ typedef struct conf_handler {
     const struct conf_backend *src_backend; /**< Backend to store the configuration item */
     const struct conf_backend *dst_backend; /**< Backend to store the configuration item TODO */
     void *data;                             /**< Pointer to the configuration item data location */
-    unsigned size;                          /**< Configuration item size in bytes */
-    bool handles_array;                     /**< True if the handler handles an array of items */
+    uint32_t size;                          /**< Configuration item size in bytes */
+    conf_handler_flags_t conf_flags;        /**< Configuration of handler behavior */
 } conf_handler_t;
 
 /**
@@ -320,7 +372,7 @@ typedef struct conf_handler {
  */
 typedef struct conf_array_handler {
     conf_handler_t handler;             /**< Configuration handler */
-    unsigned array_size;                /**< Number of items in the array */
+    uint32_t array_size;                /**< Number of items in the array */
 } conf_array_handler_t;
 
 /**
@@ -349,10 +401,13 @@ typedef struct conf_array_handler {
  * @param   path        Configuration path segment
  * @param   operations  Pointer to handler operations
  * @param   size        Size of a single item in the array
- * @param   numof       Number of items in the array
  * @param   location    Location of the configuration data
+ * @param   numof       Number of items in the array
+ * @param   is_a_whole  If true, the array is exported as a whole,
+ *                      otherwise each item is exported with an index in the kex
  */
-#define CONF_ARRAY_HANDLER_INITIALIZER(path, operations, data_operations, item_size, numof, location)   \
+#define CONF_ARRAY_HANDLER_INITIALIZER(path, operations, data_operations, item_size, location,          \
+                                       numof, is_a_whole)                                               \
 {                                                                                                       \
     .handler = {                                                                                        \
         .node = {                                                                                       \
@@ -363,7 +418,10 @@ typedef struct conf_array_handler {
         .data = location,                                                                               \
         .size = item_size,                                                                              \
         .mutex = MUTEX_INIT,                                                                            \
-        .handles_array = true,                                                                          \
+        .conf_flags = {                                                                                 \
+            .handles_array = 1u,                                                                        \
+            .export_as_a_whole = (uint32_t)!!(is_a_whole),                                              \
+        },                                                                                              \
     },                                                                                                  \
     .array_size = numof,                                                                                \
 }
