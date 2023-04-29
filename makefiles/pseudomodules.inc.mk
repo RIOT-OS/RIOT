@@ -585,6 +585,7 @@ PSEUDOMODULES += test_utils_main_exit_cb
 # All auto_init modules are pseudomodules
 PSEUDOMODULES += auto_init_%
 NO_PSEUDOMODULES += auto_init_can
+NO_PSEUDOMODULES += auto_init_configuration
 NO_PSEUDOMODULES += auto_init_loramac
 NO_PSEUDOMODULES += auto_init_multimedia
 NO_PSEUDOMODULES += auto_init_security
