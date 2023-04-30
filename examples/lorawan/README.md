@@ -39,7 +39,7 @@ Use the `BOARD`, `DRIVER` and `LORA_REGION` make variables to adapt the applicat
 to your hardware setup and region of use:
 
 - `BOARD` can be one of the nucleo-64 boards
-- `DRIVER` can be either `sx1276` or `sx1272`
+- `DRIVER` can be either `sx1261`, `sx1262`, `sx1268`, `sx1276` or `sx1272`
 - `LORA_REGION` can be `EU868`, `US915`, etc (see LoRaWAN regional parameters for
   details).
 
