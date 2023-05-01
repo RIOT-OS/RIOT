@@ -165,7 +165,7 @@ void ztimer_mock_init(ztimer_mock_t *self, unsigned width)
     self->running = 1;
 #endif
 
-    DEBUG("zmock_init: %p width=%u mask=0x%08" PRIx32 " runnnig=%u\n", (void *)self, width,
+    DEBUG("zmock_init: %p width=%u mask=0x%08" PRIx32 " running=%u\n", (void *)self, width,
           self->mask, self->running);
     if (max_value < UINT32_MAX) {
         self->super.ops->set(&self->super, self->super.max_value >> 1);
