@@ -186,7 +186,7 @@ typedef struct {
  * @brief   Device descriptor for sdcard_spi
  */
 typedef struct {
-    sdcard_spi_params_t params;     /**< parameters for pin and spi config */
+    const sdcard_spi_params_t *params;    /**< parameters for pin and spi config */
     spi_clk_t spi_clk;              /**< active SPI clock speed */
     bool use_block_addr;            /**< true if block addressing (vs. byte addressing) is used */
     bool init_done;                 /**< set to true once the init procedure completed successfully */
