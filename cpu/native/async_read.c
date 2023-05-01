@@ -1,5 +1,5 @@
 /**
- * Multiple asynchronus read on file descriptors
+ * Multiple asynchronous read on file descriptors
  *
  * Copyright (C) 2015 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>,
  *                    Martine Lenders <mlenders@inf.fu-berlin.de>

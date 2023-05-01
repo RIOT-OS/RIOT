@@ -316,7 +316,7 @@ void cc110x_isr(netdev_t *netdev)
     gpio_irq_enable(dev->params.gdo0);
     gpio_irq_enable(dev->params.gdo2);
     cc110x_release(dev);
-    /* Pass event to uper layer, if needed */
+    /* Pass event to upper layer, if needed */
     if (post_isr_event != NETDEV_NO_EVENT) {
         dev->netdev.event_callback(&dev->netdev, post_isr_event);
     }

@@ -362,7 +362,7 @@ int _i2c_read_cmd(i2c_t dev, uint8_t *data)
     switch (_i2c_dev[dev].state) {
     case I2C_RXB_NOT_EMPTY_BT_COMPLETE:
     case I2C_RXB_NOT_EMPTY:
-        /* RBNE is cleared by reding STAT0 followed by reading the data register */
+        /* RBNE is cleared by reading STAT0 followed by reading the data register */
         i2c->STAT0;
         *data = i2c->DATA;
         return 0;
