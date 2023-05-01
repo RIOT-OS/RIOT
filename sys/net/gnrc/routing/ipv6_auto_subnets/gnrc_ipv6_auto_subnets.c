@@ -121,7 +121,7 @@
 #endif
 
 /**
- * @brief How long to wait for other routers annoucements before resending
+ * @brief How long to wait for other routers announcements before resending
  *        or creating subnets when the retry counter is exhausted
  */
 #ifndef CONFIG_GNRC_IPV6_AUTO_SUBNETS_TIMEOUT_MS

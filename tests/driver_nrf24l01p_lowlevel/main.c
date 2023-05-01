@@ -229,7 +229,7 @@ int cmd_send(int argc, char **argv)
     }
     /* trigger transmitting */
     nrf24l01p_transmit(&nrf24l01p_0);
-    /* wait while data is pysically transmitted  */
+    /* wait while data is physically transmitted  */
     ztimer_sleep(ZTIMER_USEC, DELAY_DATA_ON_AIR);
     /* get status of the transceiver */
     status = nrf24l01p_get_status(&nrf24l01p_0);

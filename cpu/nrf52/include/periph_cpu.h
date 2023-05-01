@@ -246,7 +246,7 @@ typedef struct {
 typedef void (*spi_twi_irq_cb_t)(void *arg);
 
 /**
- * @brief Reqister a SPI IRQ handler for a shared I2C/SPI irq vector
+ * @brief Register a SPI IRQ handler for a shared I2C/SPI irq vector
  *
  * @param   bus bus to register the IRQ handler on
  * @param   cb  callback to call on IRQ
@@ -256,7 +256,7 @@ void spi_twi_irq_register_spi(NRF_SPIM_Type *bus,
                               spi_twi_irq_cb_t cb, void *arg);
 
 /**
- * @brief Reqister a I2C IRQ handler for a shared I2C/SPI irq vector
+ * @brief Register a I2C IRQ handler for a shared I2C/SPI irq vector
  *
  * @param   bus bus to register the IRQ handler on
  * @param   cb  callback to call on IRQ
