@@ -73,18 +73,15 @@ void dac_set(dac_t line, uint16_t value)
 {
     assert(line < DAC_NUMOF);
 
-    /* scale set value to 12-bit */
-    value = (value >> 4);
-
-#ifdef DAC_DHR12R2_DACC2DHR
+#ifdef DAC_DHR12L2_DACC2DHR
     if (dac_config[line].chan & 0x01) {
-        dev(line)->DHR12R2 = value;
+        dev(line)->DHR12L2 = value;
     }
     else {
-        dev(line)->DHR12R1 = value;
+        dev(line)->DHR12L1 = value;
     }
 #else
-    dev(line)->DHR12R1 = value;
+    dev(line)->DHR12L1 = value;
 #endif
 }
 
