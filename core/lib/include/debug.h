@@ -60,6 +60,27 @@ extern "C" {
 #endif
 
 /**
+ * @def DEBUG_BREAKPOINT
+ *
+ * @brief Set a debug breakpoint
+ *
+ * When `DEVELHELP` is enabled, this traps the CPU and allows to debug the
+ * program with e.g. `gdb`.
+ * Without `DEVELHELP` this turns into a no-op.
+ *
+ * @warning     If no Debugger is attached, the CPU might get stuck here
+ *              and consume a lot of power until reset.
+ *
+ * @param val   Breakpoint context for debugger, usually ignored.
+ */
+#ifdef DEVELHELP
+#include "architecture.h"
+#define DEBUG_BREAKPOINT(val)   ARCHITECTURE_BREAKPOINT(val)
+#else
+#define DEBUG_BREAKPOINT(val)   (void)0
+#endif
+
+/**
  * @name Debugging defines
  * @{
  */

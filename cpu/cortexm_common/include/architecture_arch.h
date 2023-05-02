@@ -26,7 +26,8 @@ extern "C" {
 
 /* Doc is provided centrally in architecture.h, hide this from Doxygen */
 #ifndef DOXYGEN
-#define ARCHITECTURE_WORD_BITS      (32U)
+#define ARCHITECTURE_WORD_BITS          (32U)
+#define ARCHITECTURE_BREAKPOINT(value)  __BKPT(value)
 #endif /* DOXYGEN */
 
 #ifdef __cplusplus
