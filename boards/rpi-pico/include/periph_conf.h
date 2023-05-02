@@ -48,6 +48,23 @@ static const uart_conf_t uart_config[] = {
 
 #define UART_NUMOF      ARRAY_SIZE(uart_config)
 
+static const spi_conf_t spi_config[] = {
+    {
+        .dev = SPI0,
+        .miso_pin = GPIO_PIN(0, 4),
+        .mosi_pin = GPIO_PIN(0, 3),
+        .clk_pin = GPIO_PIN(0, 2)
+    },
+    {
+        .dev = SPI1,
+        .miso_pin = GPIO_PIN(0, 12),
+        .mosi_pin = GPIO_PIN(0, 11),
+        .clk_pin = GPIO_PIN(0, 10)
+    }
+};
+
+#define SPI_NUMOF      ARRAY_SIZE(spi_config)
+
 static const timer_channel_conf_t timer0_channel_config[] = {
     {
         .irqn = TIMER_IRQ_0_IRQn
