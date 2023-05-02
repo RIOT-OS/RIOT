@@ -31,6 +31,8 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+
+#include "modules.h"
 #include "timex.h"
 #ifdef MODULE_CORE_MSG
 #include "msg.h"
