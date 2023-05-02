@@ -8,6 +8,8 @@
 
 #include <limits.h>
 
+#include "container.h"
+
 #include "embUnit.h"
 
 #include "mbox.h"

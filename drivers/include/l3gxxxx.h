@@ -976,7 +976,7 @@ extern "C"
 #include "l3gxxxx_regs.h"
 
 #if !IS_USED(MODULE_L3GD20H) && !IS_USED(MODULE_L3GD20) \
-                             && !IS_USED(MODULE_L3G4200_NG) \
+                             && !IS_USED(MODULE_L3G4200D_NG) \
                              && !IS_USED(MODULE_A3G4250D) \
                              && !IS_USED(MODULE_I3G4250D)
 #error Please select your sensor variant by using the respective pseudomodule.

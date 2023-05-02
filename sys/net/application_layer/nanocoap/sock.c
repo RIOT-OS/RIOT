@@ -369,9 +369,12 @@ static int _get_put_cb(void *arg, coap_pkt_t *pkt)
 
 ssize_t nanocoap_sock_get(nanocoap_sock_t *sock, const char *path, void *buf, size_t len)
 {
-    uint8_t *pktpos = buf;
+    /* buffer for CoAP header */
+    uint8_t buffer[CONFIG_NANOCOAP_BLOCK_HEADER_MAX];
+    uint8_t *pktpos = buffer;
+
     coap_pkt_t pkt = {
-        .hdr = buf,
+        .hdr = (void *)pktpos,
     };
 
     struct iovec ctx = {
