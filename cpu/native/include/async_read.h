@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Multiple asynchronus read on file descriptors
+ * @brief       Multiple asynchronous read on file descriptors
  *
  * @author      Takuo Yonezawa <Yonezawa-T2@mail.dnp.co.jp>
  */
@@ -33,7 +33,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   asynchronus read callback type
+ * @brief   asynchronous read callback type
  */
 typedef void (*native_async_read_callback_t)(int fd, void *arg);
 
@@ -48,14 +48,14 @@ typedef struct {
 } async_read_t;
 
 /**
- * @brief   initialize asynchronus read system
+ * @brief   initialize asynchronous read system
  *
  * This registers SIGIO signal handler.
  */
 void native_async_read_setup(void);
 
 /**
- * @brief   shutdown asynchronus read system
+ * @brief   shutdown asynchronous read system
  *
  * This deregisters SIGIO signal handler.
  */

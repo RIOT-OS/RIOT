@@ -281,7 +281,7 @@ uint8_t nrf24l01p_ng_get_crc(const nrf24l01p_ng_t *dev,
  *
  * @retval 0                Success
  * @retval -EINVAL          Bad Tx power configuration value
- * @retval -EAGAIN          Current state does not permit changin Tx power
+ * @retval -EAGAIN          Current state does not permit changing Tx power
  */
 int nrf24l01p_ng_set_tx_power(nrf24l01p_ng_t *dev,
                               nrf24l01p_ng_tx_power_t power);
@@ -333,7 +333,7 @@ uint8_t nrf24l01p_ng_get_channel(const nrf24l01p_ng_t *dev);
  *
  * @retval 0                Success
  * @retval -EINVAL          Bad address length
- * @return -EAGAIN          Current state does not permit changin Rx address
+ * @return -EAGAIN          Current state does not permit changing Rx address
  */
 int nrf24l01p_ng_set_rx_address(nrf24l01p_ng_t *dev, const uint8_t *addr,
                                 nrf24l01p_ng_pipe_t pipe);

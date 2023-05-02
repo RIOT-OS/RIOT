@@ -67,7 +67,7 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 | RTT        | &mdash; | RTCC            |                                   | 1 Hz interval. Either RTT or RTC (see below)             |
 | RTC        | &mdash; | RTCC            |                                   | 1 Hz interval. Either RTC or RTT (see below)             |
 | SPI        | 0       | USART0          | MOSI: PE10, MISO: PE11, CLK: PE12 |                                                          |
-| Timer      | 0       | TIMER0 + TIMER1 |                                   | TIMER0 is used as prescaler (must be adjecent)           |
+| Timer      | 0       | TIMER0 + TIMER1 |                                   | TIMER0 is used as prescaler (must be adjacent)           |
 | UART       | 0       | USART1          | RX: PA0, TX: PF2                  | Default STDIO output                                     |
 |            | 1       | LEUART0         | RX: PD5, TX: PD4                  | Baud rate limited (see below)                            |
 

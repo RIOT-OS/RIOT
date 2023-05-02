@@ -11,7 +11,7 @@
  *
  * @{
  * @file
- * @brief       Internal address, registers, constatns for the BQ2429x family
+ * @brief       Internal address, registers, constants for the BQ2429x family
  *              power ICs.
  *
  * @author      Jean Pierre Dudey <jeandudey@hotmail.com>

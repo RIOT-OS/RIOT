@@ -17,6 +17,9 @@ dout
 # ALS (Ambient Light Sensing) => ALSO
 als
 
+# CAF (Comp. A Enable Output Filter (MSP430) or Copy All Frames (SAM0) or C++ Actor Framework) => CALF
+caf
+
 # Technik (From "Beuth Hochschule für Technik Berlin") => Technique
 technik
 
@@ -150,3 +153,6 @@ donot
 
 # Didi (Ayman El Didi) => Did
 didi
+
+# loath => loathe (both correct, one is an adjective, the other a verb)
+loath
