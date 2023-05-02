@@ -40,9 +40,10 @@ use the `set`/`get` commands in test application shell.
 
 ## Building the application
 
-The default parameters for the Semtech SX1272/SX1276 radios works as-is with
+The default parameters for the Semtech SX1261/SX1262/SX1272/SX1276 radios works as-is with
 STM32 Nucleo-64 boards and MBED LoRa shields
-([SX1276](https://os.mbed.com/components/SX1276MB1xAS/) or
+([SX1261/SX1262](https://os.mbed.com/components/SX126xMB2xAS/),
+[SX1276](https://os.mbed.com/components/SX1276MB1xAS/) or
 [SX1272](https://os.mbed.com/components/SX1272MB2xAS/)). You can also use the
 ST [b-l072z-lrwan1](http://www.st.com/en/evaluation-tools/b-l072z-lrwan1.html)
 board.
