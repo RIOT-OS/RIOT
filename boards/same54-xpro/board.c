@@ -67,9 +67,19 @@ static mtd_at24cxxx_t at24mac_dev = {
         .driver = &mtd_at24cxxx_driver,
     },
     .at24cxxx_eeprom = &at24cxxx_dev,
-    .params = at24cxxx_params,
+    .params = &at24cxxx_params[0],
 };
 mtd_dev_t *mtd1 = (mtd_dev_t *)&at24mac_dev;
+
+static at24cxxx_t at24c256_dev;
+static mtd_at24cxxx_t at24c256_mtd_dev = {
+    .base = {
+        .driver = &mtd_at24cxxx_driver,
+    },
+    .at24cxxx_eeprom = &at24c256_dev,
+    .params = &at24cxxx_params[1],
+};
+mtd_dev_t *mtd3 = (mtd_dev_t *)&at24c256_mtd_dev;
 #endif /* MODULE_MTD_AT24CXXX */
 
 #ifdef MODULE_SAM0_SDHC

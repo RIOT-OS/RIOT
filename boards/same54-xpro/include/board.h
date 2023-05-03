@@ -35,7 +35,25 @@ extern "C" {
 #define AT24MAC_PARAM_I2C_ADDR  (0x5E)
 #define AT24MAC_PARAM_TYPE      AT24MAC4XX
 #define AT24CXXX_PARAM_I2C      I2C_DEV(1)
-#define AT24CXXX_PARAM_ADDR     (0x56)
+#define AT24CXXX_PARAM_ADDR     (0x50)
+
+#define AT24CXXX_PARAMS                             \
+{                                                   \
+    .i2c = AT24MAC_PARAM_I2C_DEV,                   \
+    .pin_wp = AT24CXXX_PARAM_PIN_WP,                \
+    .eeprom_size = AT24MAC_EEPROM_SIZE,             \
+    .dev_addr = AT24MAC_PARAM_I2C_ADDR,             \
+    .page_size = AT24MAC_PAGE_SIZE,                 \
+    .max_polls = AT24MAC_MAX_POLLS                  \
+},                                                  \
+{                                                   \
+    .i2c = AT24CXXX_PARAM_I2C,                      \
+    .pin_wp = AT24CXXX_PARAM_PIN_WP,                \
+    .eeprom_size = AT24C256_EEPROM_SIZE,            \
+    .dev_addr = AT24CXXX_PARAM_ADDR,                \
+    .page_size = AT24C256_PAGE_SIZE,                \
+    .max_polls = AT24C256_MAX_POLLS                 \
+}
 /** @} */
 
 /**
@@ -71,11 +89,12 @@ extern "C" {
  * @name MTD configuration
  * @{
  */
-extern mtd_dev_t *mtd0, *mtd1, *mtd2;
+extern mtd_dev_t *mtd0, *mtd1, *mtd2, *mtd3;
 #define MTD_0       mtd0
 #define MTD_1       mtd1
 #define MTD_2       mtd2
-#define MTD_NUMOF   3
+#define MTD_3       mtd3
+#define MTD_NUMOF   4
 /** @} */
 
 /**
