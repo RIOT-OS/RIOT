@@ -48,6 +48,11 @@ typedef enum {
      */
     SYS_BUS_POWER_EVENT_LOW_VOLTAGE,
 
+    /**
+     * @brief MCU power mode changed
+     */
+    SYS_BUS_POWER_EVENT_PM_CHANGED,
+
     /* add more if needed, but not more than 32 */
 } sys_bus_power_event_t;
 
