@@ -145,6 +145,11 @@ typedef uint32_t spi_cs_t;
 #define PERIPH_TIMER_PROVIDES_SET
 
 /**
+ * @brief   Only a single channel supported by the driver/hardware
+ */
+#define TIMER_CHANNEL_NUMOF             1
+
+/**
  * @name    Kinetis power mode configuration
  * @{
  */
