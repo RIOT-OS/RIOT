@@ -28,7 +28,7 @@
 #include "shell.h"
 
 #ifdef MODULE_PM_LAYERED
-#include "pm_layered.h"
+#include "pm_layered_sys_bus.h"
 
 #endif /* MODULE_PM_LAYERED */
 
