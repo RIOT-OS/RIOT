@@ -39,7 +39,9 @@
 
 static int _msg_receive(msg_t *m, int block);
 static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block,
-                     unsigned state);
+                     unsigned state, kernel_pid_t sender_pid);
+static int _msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid,
+                             kernel_pid_t sender_pid);
 
 static int queue_msg(thread_t *target, const msg_t *m)
 {
@@ -69,7 +71,7 @@ int msg_send(msg_t *m, kernel_pid_t target_pid)
     if (thread_getpid() == target_pid) {
         return msg_send_to_self(m);
     }
-    return _msg_send(m, target_pid, true, irq_disable());
+    return _msg_send(m, target_pid, true, irq_disable(), thread_getpid());
 }
 
 int msg_try_send(msg_t *m, kernel_pid_t target_pid)
@@ -80,11 +82,11 @@ int msg_try_send(msg_t *m, kernel_pid_t target_pid)
     if (thread_getpid() == target_pid) {
         return msg_send_to_self(m);
     }
-    return _msg_send(m, target_pid, false, irq_disable());
+    return _msg_send(m, target_pid, false, irq_disable(), thread_getpid());
 }
 
 static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block,
-                     unsigned state)
+                     unsigned state, kernel_pid_t sender_pid)
 {
 #ifdef DEVELHELP
     if (!pid_is_valid(target_pid)) {
@@ -94,7 +96,7 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block,
 
     thread_t *target = thread_get_unchecked(target_pid);
 
-    m->sender_pid = thread_getpid();
+    m->sender_pid = sender_pid;
 
     if (target == NULL) {
         DEBUG("msg_send(): target thread %d does not exist\n", target_pid);
@@ -271,7 +273,39 @@ int msg_send_bus(msg_t *m, msg_bus_t *bus)
     return count;
 }
 
-int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid)
+int msg_send_receive_bus(msg_t *m, msg_bus_t *bus)
+{
+    assert(!irq_is_in());
+    const uint32_t event_mask = (1UL << (m->type & 0x1F));
+    int count = 0;
+
+    m->sender_pid = thread_getpid() | MSB_BUS_PID_FLAG;
+
+    unsigned state = irq_disable();
+
+    for (list_node_t *e = bus->subs.next; e; e = e->next) {
+        msg_bus_entry_t *subscriber = container_of(e, msg_bus_entry_t, next);
+
+        if ((subscriber->event_mask & event_mask) == 0) {
+            continue;
+        }
+        msg_t reply;
+        if (_msg_send_receive(m, &reply, subscriber->pid, m->sender_pid) > 0) {
+            ++count;
+        }
+    }
+
+    irq_restore(state);
+
+    if (sched_context_switch_request) {
+        thread_yield_higher();
+    }
+
+    return count;
+}
+
+static int _msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid,
+                             kernel_pid_t sender_pid)
 {
     assert(thread_getpid() != target_pid);
     unsigned state = irq_disable();
@@ -284,7 +318,12 @@ int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid)
      * overwritten if the target is not in RECEIVE_BLOCKED */
     *reply = *m;
     /* msg_send blocks until reply received */
-    return _msg_send(reply, target_pid, true, state);
+    return _msg_send(reply, target_pid, true, state, sender_pid);
+}
+
+int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid)
+{
+    return _msg_send_receive(m, reply, target_pid, thread_getpid());
 }
 
 int msg_reply(msg_t *m, msg_t *reply)

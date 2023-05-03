@@ -235,6 +235,24 @@ static inline void msg_bus_unsubscribe(msg_bus_entry_t *entry, uint8_t type)
 int msg_send_bus(msg_t *m, msg_bus_t *bus);
 
 /**
+ * @brief Post a pre-assembled message to a bus and wait for a confirmation reply.
+ *
+ * This function sends a message to all threads listening on the bus which are
+ * listening for messages with the message type of @p m and waits for a reply.
+ *
+ * It behaves identical to @ref msg_bus_post_ack, but sends a pre-defined message.
+ *
+ * @note The message is expected to have the event ID encoded in the lower
+ *       5 bits and the bus ID encoded in the upper 11 bits of the message type.
+ *
+ * @param[in] m             The message to post the bus
+ * @param[in] bus           The message bus to post the message on
+ *
+ * @return                  The number of threads the message was sent to.
+ */
+int msg_send_receive_bus(msg_t *m, msg_bus_t *bus);
+
+/**
  * @brief Post a message to a bus.
  *
  * This function sends a message to all threads listening on the bus which are
@@ -258,6 +276,32 @@ static inline int msg_bus_post(msg_bus_t *bus, uint8_t type, const void *arg)
     };
 
     return msg_send_bus(&m, bus);
+}
+
+/**
+ * @brief Post a message to a bus and wait for a confirmation of receipt for every subscriber.
+ *
+ * This function sends a message to all threads listening on the bus which are
+ * listening for messages of @p type and blocks until a confirmation is received.
+ *
+ * It is *not* safe to call this function from interrupt context.
+ *
+ * @param[in] bus           The message bus to post this on
+ * @param[in] type          The event type (range: 0…31)
+ * @param[in] arg           Optional event parameter
+ *
+ * @return                  The number of threads the event was posted to.
+ */
+static inline int msg_bus_post_ack(msg_bus_t *bus, uint8_t type, const void *arg)
+{
+    assert(type < 32);
+
+    msg_t m = {
+        .type = type | ((bus->id) << 5),
+        .content.ptr = (void *)arg,
+    };
+
+    return msg_send_receive_bus(&m, bus);
 }
 
 #ifdef __cplusplus
