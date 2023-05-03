@@ -9,3 +9,8 @@ config MODULE_PM_LAYERED
     bool "Platform-independent Power Management"
     depends on MODULE_PERIPH_PM
     depends on TEST_KCONFIG
+
+config MODULE_PM_LAYERED_SYS_BUS
+    bool "Platform-independent Power Management with system bus message notifications"
+    depends on MODULE_PM_LAYERED
+    depends on TEST_KCONFIG

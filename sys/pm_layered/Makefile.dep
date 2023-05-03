@@ -1,0 +1,7 @@
+ifneq (,$(filter pm_layered_%,$(USEMODULE)))
+  USEMODULE += pm_layered
+endif
+
+ifneq (,$(filter pm_layered_sys_bus,$(USEMODULE)))
+  USEMODULE += sys_bus_power
+endif

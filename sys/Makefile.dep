@@ -1041,6 +1041,10 @@ ifneq (,$(filter fido2_ctap,$(USEMODULE)))
   USEMODULE += fido2
 endif
 
+ifneq (,$(filter pm_layered pm_layered_%,$(USEMODULE)))
+  include $(RIOTBASE)/sys/pm_layered/Makefile.dep
+endif
+
 ifneq (,$(filter rust_riotmodules,$(USEMODULE)))
   include $(RIOTBASE)/sys/rust_riotmodules/Makefile.dep
 endif
