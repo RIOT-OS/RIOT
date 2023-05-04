@@ -85,6 +85,9 @@ test-with-config/check-config:
 		done; \
 		${COLOR_ECHO} -n "${COLOR_RESET}"
 
+
+RIOT_TEST_HASH_DIR ?= $(BINDIR)
+
 # this target only makes sense if an ELFFILE is actually created, thus guard by
 # RIOTNOLINK="".
 ifeq (,$(RIOTNOLINK))
@@ -92,10 +95,10 @@ ifeq (,$(RIOTNOLINK))
     $(error HASHFILE is empty for $(BOARD))
   endif
 test-input-hash: $(TESTS) $(TESTS_WITH_CONFIG) $(TESTS_AS_ROOT) $(HASHFILE) $(TEST_EXTRA_FILES)
-	sha1sum $^ > $(BINDIR)/test-input-hash.sha1
+	sha1sum $^ > $(RIOT_TEST_HASH_DIR)/test-input-hash.sha1
 else
 # .SECONDARY creates the bin folder, we depend on it to avoid writing to it
 # prior to it being created when concurrent building is used
 test-input-hash: .SECONDARY
-	$(file >$(BINDIR)/test-input-hash.sha1,no binary generated due to RIOTNOLINK=1)
+	$(file >$(RIOT_TEST_HASH_DIR)/test-input-hash.sha1,no binary generated due to RIOTNOLINK=1)
 endif
