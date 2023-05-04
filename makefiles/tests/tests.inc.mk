@@ -102,3 +102,26 @@ else
 test-input-hash: .SECONDARY
 	$(file >$(RIOT_TEST_HASH_DIR)/test-input-hash.sha1,no binary generated due to RIOTNOLINK=1)
 endif
+
+# Helper function to compare two strings
+define compare_strings
+$(and $(filter $1,$2),$(filter $2,$1))
+endef
+
+# Target to test only if the input hash has changed
+.PHONY: test-input-hash-changed
+test-input-hash-changed:
+	@if [ ! -f "$(RIOT_TEST_HASH_DIR)/test-input-hash.sha1" ]; then \
+		echo "Old hash file doesn't exist. Generating hash and running tests..."; \
+		mkdir -p $(RIOT_TEST_HASH_DIR); \
+		$(MAKE) test-input-hash; \
+	else \
+		OLD_HASH=$$(cat $(RIOT_TEST_HASH_DIR)/test-input-hash.sha1); \
+		$(MAKE) test-input-hash; \
+		NEW_HASH=$$(cat $(RIOT_TEST_HASH_DIR)/test-input-hash.sha1); \
+		if [ "$${OLD_HASH}" != "$${NEW_HASH}" ]; then \
+			echo "Hashes do not match."; \
+		else \
+			echo "Hashes match."; \
+		fi; \
+	fi
