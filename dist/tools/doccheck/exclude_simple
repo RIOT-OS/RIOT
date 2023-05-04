@@ -2305,7 +2305,6 @@ warning: Member FCFG1_DAC_BIAS_CNF_LPM_BIAS_BACKUP_EN (macro definition) of file
 warning: Member FCFG1_DAC_BIAS_CNF_LPM_BIAS_WIDTH_TRIM_m (macro definition) of file cc26x2_cc13x2_fcfg.h is not documented.
 warning: Member FCFG1_DAC_BIAS_CNF_LPM_BIAS_WIDTH_TRIM_s (macro definition) of file cc26x2_cc13x2_fcfg.h is not documented.
 warning: Member FCFG1_DAC_BIAS_CNF_LPM_TRIM_IOUT_s (macro definition) of file cc26x2_cc13x2_fcfg.h is not documented.
-warning: Member F_CPU (macro definition) of file board.h is not documented.
 warning: Member FEATURE_EN_ACK_PAY (macro definition) of file nrf24l01p_settings.h is not documented.
 warning: Member FEATURE_EN_DPL (macro definition) of file nrf24l01p_settings.h is not documented.
 warning: Member FEATURE_EN_DYN_ACK (macro definition) of file nrf24l01p_settings.h is not documented.
@@ -2362,7 +2361,6 @@ warning: Member FRAME_5_PAUSE (macro definition) of file enc28j60_regs.h is not 
 warning: Member FRAME_5_RCV_CTRL (macro definition) of file enc28j60_regs.h is not documented.
 warning: Member FRAME_5_UKWN_OPCODE (macro definition) of file enc28j60_regs.h is not documented.
 warning: Member FRAME_5_VLAN (macro definition) of file enc28j60_regs.h is not documented.
-warning: Member F_RC_OSCILLATOR (macro definition) of file board.h is not documented.
 warning: Member FRDM_NOR_SPI_CLK (macro definition) of file board.h is not documented.
 warning: Member FRDM_NOR_SPI_DEV (macro definition) of file board.h is not documented.
 warning: Member FSK_BT_10 (macro definition) of file at86rf215_registers.h is not documented.
@@ -5348,8 +5346,6 @@ warning: Member MRF24J40_WAKECON_IMMWAKE (macro definition) of file mrf24j40_reg
 warning: Member MRF24J40_WAKECON_REGWAKE (macro definition) of file mrf24j40_registers.h is not documented.
 warning: Member MRF24J40_WAKEUP_DELAY (macro definition) of file mrf24j40_registers.h is not documented.
 warning: Member MRF25J40_BBREG2_CCAMODE1 (macro definition) of file mrf24j40_registers.h is not documented.
-warning: Member MSP430_HAS_DCOR (macro definition) of file board.h is not documented.
-warning: Member MSP430_HAS_EXTERNAL_CRYSTAL (macro definition) of file board.h is not documented.
 warning: Member MTD_0 (macro definition) of file board.h is not documented.
 warning: Member mtd0 (variable) of file board.h is not documented.
 warning: Member MTD_1 (macro definition) of file board.h is not documented.

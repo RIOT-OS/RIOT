@@ -7,8 +7,9 @@
  * directory for more details.
  */
 
-#include "cpu.h"
 #include "board.h"
+#include "cpu.h"
+#include "periph_conf.h"
 
 void uart_init(void);
 

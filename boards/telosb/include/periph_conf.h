@@ -29,10 +29,14 @@ extern "C" {
  * @name    Clock configuration
  * @{
  */
-/** @todo   Move all clock configuration code here from the board.h */
-#define CLOCK_CORECLOCK     (2457600U)
+#define CLOCK_CORECLOCK             (2457600U)
+#define MSP430_INITIAL_CPU_SPEED    2457600uL
+#define F_CPU                       MSP430_INITIAL_CPU_SPEED
+#define F_RC_OSCILLATOR             32768
+#define MSP430_HAS_DCOR             0
+#define MSP430_HAS_EXTERNAL_CRYSTAL 1
 
-#define CLOCK_CMCLK         CLOCK_CORECLOCK     /* no divider programmed */
+#define CLOCK_CMCLK                 CLOCK_CORECLOCK     /* no divider programmed */
 /** @} */
 
 /**
