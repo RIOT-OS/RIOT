@@ -44,6 +44,7 @@ usage: compile_and_test_for_board.py [-h] [--applications APPLICATIONS]
                                      [--test-targets TEST_TARGETS]
                                      [--test-available-targets TEST_AVAILABLE_TARGETS]
                                      [--report-xml] [--jobs JOBS]
+                                     [--only-if-changed]
                                      riot_directory board [result_directory]
 
 positional arguments:
@@ -84,6 +85,9 @@ optional arguments:
                         (default: False)
   --jobs JOBS, -j JOBS  Parallel building (0 means not limit, like '--jobs')
                         (default: None)
+  --only-if-changed, -c
+                        Only test if the application has changed since last
+                        test (default: False)
 ```
 """  # noqa
 
@@ -225,6 +229,7 @@ def is_in_directory(path, directory):
     return path.startswith(directory)
 
 
+# pylint: disable=too-many-instance-attributes
 class RIOTApplication:
     """RIOT Application representation.
 
@@ -245,6 +250,7 @@ class RIOTApplication:
     )
     FLASH_TARGETS = ("flash-only",)
     TEST_TARGETS = ("test",)
+    TEST_INPUT_HASH = ("test-input-hash-changed",)
     TEST_AVAILABLE_TARGETS = ("test/available",)
 
     # pylint: disable=too-many-arguments
@@ -252,6 +258,7 @@ class RIOTApplication:
         self.board = board
         self.riotdir = riotdir
         self.appdir = appdir
+        self.hashdir = os.path.abspath(os.path.join(resultdir, "hashes", appdir))
         self.resultdir = os.path.join(resultdir, appdir)
         if junit:
             if not junit_xml:
@@ -368,8 +375,11 @@ class RIOTApplication:
         incremental=False,
         jobs=False,
         with_test_only=False,
+        only_if_changed=False,
     ):
         # pylint:disable=too-many-arguments
+        # pylint:disable=too-many-nested-blocks
+        # pylint:disable=too-many-branches
         """Compile and execute test if available.
 
         Checks for board supported/enough memory, compiles.
@@ -422,8 +432,28 @@ class RIOTApplication:
         if clean_after:
             self.clean_intermediates()
 
+        # pylint: disable=too-many-nested-blocks
         if runtest:
             if has_test:
+                if only_if_changed:
+                    try:
+                        out = self.make(
+                            self.TEST_INPUT_HASH,
+                            env={"RIOT_TEST_HASH_DIR": self.hashdir},
+                        )
+                        hash_match = "hashes match" in out.lower()
+                        self.logger.info("Hashes match: %r", hash_match)
+                        if hash_match:
+                            self._skip(
+                                "bins_unchanged",
+                                f"{self.appdir} matched test input hashes.",
+                            )
+                            if clean_after:
+                                self.clean()
+                            self.logger.info("Success")
+                            return
+                    except subprocess.CalledProcessError as err:
+                        self._make_handle_error(self.TEST_INPUT_HASH[0], err)
                 setuptasks = collections.OrderedDict([("flash", self.FLASH_TARGETS)])
                 self.make_with_outfile(
                     "test", self.TEST_TARGETS, save_output=True, setuptasks=setuptasks
@@ -732,13 +762,20 @@ PARSER.add_argument(
     default=False,
     help="Output results to report.xml in the " "result_directory",
 )
-
 PARSER.add_argument(
     "--jobs",
     "-j",
     type=int,
     default=None,
     help="Parallel building (0 means not limit, like '--jobs')",
+)
+# Arg that allows hashes of tests to be saved locally in a hashes folder
+# and used to skip tests if new hashes match.
+PARSER.add_argument(
+    "--only-if-changed",
+    "-c",
+    action="store_true",
+    help="Only test if the application has changed since last test",
 )
 
 
@@ -798,6 +835,7 @@ def main(args):
             incremental=args.incremental,
             jobs=args.jobs,
             with_test_only=args.with_test_only,
+            only_if_changed=args.only_if_changed,
         )
         for app in applications
     ]
