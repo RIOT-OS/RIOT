@@ -6,4 +6,5 @@ USEMODULE += netstats_neighbor_rssi
 USEMODULE += netstats_neighbor_lqi
 USEMODULE += netstats_neighbor_tx_time
 
-include ../driver_netdev_common/Makefile.netdev.mk
+include ../Makefile.tests_common
+include ../netdev_common/Makefile.netdev.mk
