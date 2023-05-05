@@ -33,6 +33,8 @@ scd30_t scd30_dev;
 scd30_params_t params = SCD30_PARAMS;
 scd30_measurement_t result;
 
+#define TEST_ITERATIONS 10
+
 int main(void)
 {
     printf("SCD30 Test:\n");
