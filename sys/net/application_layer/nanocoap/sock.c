@@ -548,22 +548,6 @@ ssize_t nanocoap_request(coap_pkt_t *pkt, const sock_udp_ep_t *local,
     return res;
 }
 
-ssize_t nanocoap_get(const sock_udp_ep_t *remote, const char *path, void *buf, size_t len)
-{
-    int res;
-    nanocoap_sock_t sock;
-
-    res = nanocoap_sock_connect(&sock, NULL, remote);
-    if (res) {
-        return res;
-    }
-
-    res = nanocoap_sock_get(&sock, path, buf, len);
-    nanocoap_sock_close(&sock);
-
-    return res;
-}
-
 static int _block_cb(void *arg, coap_pkt_t *pkt)
 {
     _block_ctx_t *ctx = arg;
