@@ -165,12 +165,12 @@ u8g2_SetI2CAddress(&u8g2, SSD1306_I2C_ADDR);
 u8g2_InitDisplay(&u8g2);
 u8g2_SetPowerSave(&u8g2, 0);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The `tests/pkg_u8g2` test application is a good example of how to use the
+The `tests/pkg/u8g2` test application is a good example of how to use the
 `pkg/u8g2` package. It can be compiled for the board with the following command:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 TEST_OUTPUT=4 TEST_I2C=0 TEST_ADDR=0x3c TEST_PIN_RESET=GPIO16 \
 TEST_DISPLAY=u8g2_Setup_ssd1306_i2c_128x64_noname_f \
-BOARD=esp32-heltec-lora32-v2 make -C tests/pkg_u8g2/ flash
+BOARD=esp32-heltec-lora32-v2 make -C tests/pkg/u8g2/ flash
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 [Back to table of contents](#esp32_heltec_lora32_v2_toc)

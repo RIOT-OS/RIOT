@@ -130,8 +130,8 @@ tests/driver_u*
 tests/driver_v*
 tests/external_board_dirs
 tests/periph_*
-tests/pkg_elk
-tests/pkg_uzlib
+tests/pkg/elk
+tests/pkg/uzlib
 tests/prng_*
 tests/trace
 tests/xtimer_*

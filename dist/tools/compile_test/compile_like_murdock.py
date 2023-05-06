@@ -50,7 +50,7 @@ _RATIOS = [
 
 DEFAULT_APPS = [
     "examples/hello-world",
-    "tests/pkg_tinyusb_cdc_msc",
+    "tests/pkg/tinyusb_cdc_msc",
     "tests/mtd_mapper",
     "tests/shell",
     "tests/saul"

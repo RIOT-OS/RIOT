@@ -16,7 +16,7 @@ variables `USB_VID` and `USB_PID` in the makefile or at the command line,
 for example
 
 ```
-USB_VID=1234 USB_PID=5678 BOARD=... make -C tests/pkg_tinyusb_cdc_msc
+USB_VID=1234 USB_PID=5678 BOARD=... make -C tests/pkg/tinyusb_cdc_msc
 ```
 
 ## Usage

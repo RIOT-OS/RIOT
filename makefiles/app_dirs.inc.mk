@@ -15,6 +15,7 @@ APPLICATION_DIRS :=                   \
     examples                          \
     tests                             \
     tests/drivers                     \
+    tests/pkg                         \
     #
 
 APPLICATION_DIRS := $(addprefix $(RIOTBASE)/,$(APPLICATION_DIRS))

@@ -23,7 +23,7 @@ LVGL_TASK_THREAD_PRIO cannot be configured via Kconfig.
 Example of command line for changing the max activity period to 5s:
 
 ```
-CFLAGS=-DCONFIG_LVGL_ACTIVITY_PERIOD=5000 make -C tests/pkg_lvgl
+CFLAGS=-DCONFIG_LVGL_ACTIVITY_PERIOD=5000 make -C tests/pkg/lvgl
 ```
 
 ### SDL Usage
