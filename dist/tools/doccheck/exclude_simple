@@ -1415,7 +1415,6 @@ warning: Member CLOCK_APB1 (macro definition) of file cfg_clock_default.h is not
 warning: Member CLOCK_APB2 (macro definition) of file cfg_clock_default.h is not documented.
 warning: Member CLOCK_BUSCLOCK (macro definition) of file periph_conf_common.h is not documented.
 warning: Member CLOCK_BUSCLOCK (macro definition) of file periph_conf.h is not documented.
-warning: Member CLOCK_CMCLK (macro definition) of file periph_conf.h is not documented.
 warning: Member clock_config (variable) of file periph_conf_common.h is not documented.
 warning: Member clock_config (variable) of file periph_conf.h is not documented.
 warning: Member CLOCK_CORECLOCK (macro definition) of file board.h is not documented.

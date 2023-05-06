@@ -21,23 +21,27 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+#include "macros/units.h"
+#include "periph_cpu.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/**
- * @name    Clock configuration
- * @{
- */
-#define CLOCK_CORECLOCK             (2457600U)
-#define MSP430_INITIAL_CPU_SPEED    2457600uL
-#define F_CPU                       MSP430_INITIAL_CPU_SPEED
-#define F_RC_OSCILLATOR             32768
-#define MSP430_HAS_DCOR             0
-#define MSP430_HAS_EXTERNAL_CRYSTAL 1
+#define CLOCK_CORECLOCK             msp430_fxyz_dco_freq
 
-#define CLOCK_CMCLK                 CLOCK_CORECLOCK     /* no divider programmed */
-/** @} */
+/**
+ * @brief   Clock configuration
+ */
+static const msp430_fxyz_clock_params_t clock_params = {
+    .target_dco_frequency = 2457600U,
+    .lfxt1_frequency = 32768,
+    .main_clock_source = MAIN_CLOCK_SOURCE_DCOCLK,
+    .submain_clock_source = SUBMAIN_CLOCK_SOURCE_DCOCLK,
+    .main_clock_divier = MAIN_CLOCK_DIVIDE_BY_1,
+    .submain_clock_divier = SUBMAIN_CLOCK_DIVIDE_BY_1,
+    .auxiliary_clock_divier = AUXILIARY_CLOCK_DIVIDE_BY_1,
+};
 
 /**
  * @name    Timer configuration
