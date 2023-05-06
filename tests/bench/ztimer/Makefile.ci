@@ -2,6 +2,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     bluepill-stm32f030c8 \
     im880b \
     nucleo-l011k4 \
+    olimex-msp430-h1611 \
     olimexino-stm32 \
     samd10-xmini \
     slstk3400a \
