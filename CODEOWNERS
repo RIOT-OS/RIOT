@@ -142,8 +142,8 @@
 
 /tests/                                     @smlng @leandrolanzieri @aabadie @MichelRottleuthner @fjmolinas
 /tests/candev/                              @wosym
-/tests/driver_bq2429x/                      @jeandudey
-/tests/driver_dht/                          @wosym
+/tests/drivers/bq2429x/                     @jeandudey
+/tests/drivers/dht/                         @wosym
 /tests/gnrc*                                @miri64
 /tests/lwip*                                @miri64
 /tests/pkg/libschc/                         @miri64

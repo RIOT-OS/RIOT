@@ -13,5 +13,5 @@ The test application demonstrates the use of the CCS811 using
 - default configuration parameters, that is, the measurement mode
   `CCS811_MODE_1S` with one measurement per second.
 
-Please refer `$(RIOTBASE)/tests/driver_ccs811_full` to learn how
+Please refer `$(RIOTBASE)/tests/drivers/ccs811_full` to learn how
 to use the CCS811 with interrupts.

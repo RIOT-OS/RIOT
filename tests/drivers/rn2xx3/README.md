@@ -28,7 +28,7 @@ Use the `DRIVER` variable to select the right driver module between `rn2483`
 and `rn2903` depending on your region.
 Example in EU:
 ```
-    make DRIVER=rn2483 BOARD=arduino-zero -C tests/driver_rn2xx3 flash term
+    make DRIVER=rn2483 BOARD=arduino-zero -C tests/drivers/rn2xx3 flash term
 ```
 
 # Usage

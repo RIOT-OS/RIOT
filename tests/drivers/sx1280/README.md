@@ -12,7 +12,7 @@ the configuration to your needs by copying an adapted version of
 ## Build and Flash
 
 ```shell
-cd tests/driver_sx1280
+cd tests/drivers/sx1280
 make flash term
 ```
 

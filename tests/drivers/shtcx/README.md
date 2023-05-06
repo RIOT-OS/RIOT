@@ -7,4 +7,4 @@ Default driver is "shtc1". To use the SHTC3 driver, set the "DRIVER" when buildi
     DRIVER=shtc3 make BOARD=<your board>
 
 #Usage
-Just build it using the `make BOARD=??? flash` command in the `tests/driver_shtcx` folder. Temperature and humidity values should be printed in the terminal every 2s
+Just build it using the `make BOARD=??? flash` command in the `tests/drivers/shtcx` folder. Temperature and humidity values should be printed in the terminal every 2s

@@ -11,7 +11,7 @@ The used sensor must be specified by setting the variable DRIVER to
 `l3gd20h`, `l3gd20`, `l3g4200d_ng`, `i3g4250d` or `a3g4250d` which enables
 the corresponding pseudomodule:
 ```
-DRIVER=l3gd20h BOARD=... make -C tests/driver_l3gxxxx
+DRIVER=l3gd20h BOARD=... make -C tests/drivers/l3gxxxx
 ```
 If the DRIVER variable is not set, `l3gd20h` is used.
 
@@ -32,7 +32,7 @@ of the sensor and polls the data periodically every 200 ms. If the SPI
 interface of the sensor should be used, the module `l3gxxxx_spi` has to
 be used:
 ```
-DRIVER=l3gd20h USEMODULE=l3gxxxx_spi BOARD=... make -C tests/driver_l3gxxxx
+DRIVER=l3gd20h USEMODULE=l3gxxxx_spi BOARD=... make -C tests/drivers/l3gxxxx
 ```
 
 The application is configurable by using different pseudomodules to test
@@ -47,7 +47,7 @@ most of the functionalities of the L3Gxxxx driver.
 
     ```
     DRIVER=l3gd20h USEMODULE=l3gxxxx_irq_drdy \
-    CFLAGS='-DL3GXXXX_INT2_PIN=GPIO_PIN\(0,5\) BOARD=... make -C tests/driver_l3gxxxx
+    CFLAGS='-DL3GXXXX_INT2_PIN=GPIO_PIN\(0,5\) BOARD=... make -C tests/drivers/l3gxxxx
     ```
 
 - Module `l3gxxxx_irq_event`:
@@ -59,7 +59,7 @@ most of the functionalities of the L3Gxxxx driver.
 
     ```
     DRIVER=l3gd20h USEMODULE=l3gxxxx_irq_event \
-    CFLAGS='-DL3GXXXX_INT1_PIN=GPIO_PIN\(0,6\) BOARD=... make -C tests/driver_l3gxxxx
+    CFLAGS='-DL3GXXXX_INT1_PIN=GPIO_PIN\(0,6\) BOARD=... make -C tests/drivers/l3gxxxx
     ```
 
 - Module `l3gxxxx_fifo`:

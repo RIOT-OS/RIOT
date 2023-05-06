@@ -24,7 +24,7 @@ configuration parameter `HMC5883L_PARAM_INT_PIN` if necessary, for example:
 
 ```
 USEMODULE=hmc5883l_int CFLAGS='-DHMC5883L_PARAM_INT_PIN=GPIO_PIN\(0,12\)' \
-make flash -C tests/driver_hmc5883l BOARD=...
+make flash -C tests/drivers/hmc5883l BOARD=...
 ```
 
 The heading angle is calculated for a magnetic declination in radians defined

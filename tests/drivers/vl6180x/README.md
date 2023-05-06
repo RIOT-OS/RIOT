@@ -17,7 +17,7 @@ Module Name        | Functionality used
 
 To compile and execute the test application, use command:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-make BOARD=... -C tests/driver_vl6180x flash term
+make BOARD=... -C tests/drivers/vl6180x flash term
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default, the `vl6180x_rng` and `vl6180x_als` modules are enabled.
@@ -33,7 +33,7 @@ for example:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 CFLAGS="-DVL6180X_PARAM_INT_PIN=\(GPIO_PIN\(0,5\)\)" \
 USEMODULE=vl6180x_irq \
-make BOARD=... -C tests/driver_vl6180x flash term
+make BOARD=... -C tests/drivers/vl6180x flash term
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If the module `vl6180x_config` is used additionally, the event interrupt
@@ -41,7 +41,7 @@ is configured and used for range measurements:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 CFLAGS="-DVL6180X_PARAM_INT_PIN=\(GPIO_PIN\(0,5\)\)" \
 USEMODULE='vl6180x_irq vl6180x_config'\
-make BOARD=... -C tests/driver_vl6180x flash term
+make BOARD=... -C tests/drivers/vl6180x flash term
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To test the power-down and power-up functionality, the `vl6180x_shutdown`
@@ -51,5 +51,5 @@ of the sensor has to be defined by configuration parameter
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 CFLAGS="-VL6180X_PARAM_SHUTDOWN_PIN=\(GPIO_PIN\(0,6\)\)" \
 USEMODULE=vl6180x_shutdown \
-make BOARD=... -C tests/driver_vl6180x flash term
+make BOARD=... -C tests/drivers/vl6180x flash term
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
