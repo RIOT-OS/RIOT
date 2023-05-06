@@ -16,7 +16,7 @@ set RTT_MIN_OFFSET to the value found out with this test + 1tick.
 
 ## Usage
 
-Run `BOARD=<board> make -C tests/periph_rtt_min/ flash test` the value will
+Run `BOARD=<board> make -C tests/periph/rtt_min/ flash test` the value will
 be printed as:
 
 ```

@@ -1,7 +1,7 @@
 # Arduino peripheral GPIO Test
 
 This test is designed for testing the Arduino to RIOT pin mapping
-on boards with Arduino support.  It is much like tests/periph_gpio
+on boards with Arduino support.  It is much like tests/periph/gpio
 but for Arduino pin numbers.
 
 In this test, pins are specified by integer pin numbers.

@@ -77,7 +77,7 @@ SERCOM non-secure mode. To do so, a fuse bit must be set in User ROW
 flash memory. Such action can be done with the following EDBG command:
 'edbg -t saml11 -F w0,194,1'
 or pass it as argument when calling make:
-EDBG_ARGS="-F w0,194,1" BOARD=saml11-xpro make flash term -C tests/periph_uart
+EDBG_ARGS="-F w0,194,1" BOARD=saml11-xpro make flash term -C tests/periph/uart
 
 ## Supported Toolchains
 

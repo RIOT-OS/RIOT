@@ -77,12 +77,12 @@ jobs:
       COMPILE_AND_TEST_FOR_BOARD: ./dist/tools/compile_and_test_for_board/compile_and_test_for_board.py
       COMPILE_AND_TEST_ARGS: --with-test-only --jobs=2 --report-xml
       # Exclude applications that are expected to fail or cannot run on iotlab
-      # - tests/periph_timer_short_relative_set is expected to fail
+      # - tests/periph/timer_short_relative_set is expected to fail
       # - tests/riotboot requires the riotboot feature and provides a test
       #   but flashing at a specific offset is not (yet) supported on IoT-LAB
       #   so it will always fail because of that limitation
-      APPLICATIONS_EXCLUDE: tests/periph_timer_short_relative_set tests/riotboot
-      # Increase tolerance error with `tests/periph_timer_periodic` because
+      APPLICATIONS_EXCLUDE: tests/periph/timer_short_relative_set tests/riotboot
+      # Increase tolerance error with `tests/periph/timer_periodic` because
       # of timing issues with the test script when running in the github
       # actions environment
       TEST_PERIPH_TIMER_PERIODIC_PRECISION: 0.30

@@ -20,5 +20,5 @@ LEN - The length to read or write.</br>
 FLAG - Flags set for the I2C, more information is available in driver/include/periph/i2c.h
 
 _note: Automated tests can be found in the
-[RobotFW-tests](https://github.com/RIOT-OS/RobotFW-tests/tree/master/tests/periph_i2c)
+[RobotFW-tests](https://github.com/RIOT-OS/RobotFW-tests/tree/master/tests/periph/i2c)
 repository_

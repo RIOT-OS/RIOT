@@ -129,7 +129,7 @@ tests/driver_t*
 tests/driver_u*
 tests/driver_v*
 tests/external_board_dirs
-tests/periph_*
+tests/periph/*
 tests/pkg/elk
 tests/pkg/uzlib
 tests/prng_*
