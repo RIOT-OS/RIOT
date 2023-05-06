@@ -15,7 +15,7 @@ Usage
 
 Simply flash and run the application on the board of your choice using:
 
-    make BOARD=<board of your choice> -C tests/pkg_flatbuffers flash term
+    make BOARD=<board of your choice> -C tests/pkg/flatbuffers flash term
 
 Expected result
 ---------------

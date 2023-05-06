@@ -322,7 +322,7 @@
  - The provided test application provides a UDP client and server. If the UDP
  server is able to receive packets, the mechanism is considered to work correctly.
  You should also be able to ping the device from your host. See
- `tests/pkg_openwsn/README.md` for more details.
+ `tests/pkg/openwsn/README.md` for more details.
 
  - To speed up synchronization and make sniffing easier you can disable channel
  hopping by setting (`CFLAGS=-DIEEE802154E_SINGLE_CHANNEL=26`).
@@ -343,7 +343,7 @@
  the IoT-LAB testbed.
 
  - To test Openserial on a given platform the target `make openv-serial` can
- be used on a BOARD flashed with `tests/pkg_openwsn` (`USEMODULE=openwsn_serial`)
+ be used on a BOARD flashed with `tests/pkg/openwsn` (`USEMODULE=openwsn_serial`)
  must be included as well. The following output should appear:
 
     ```

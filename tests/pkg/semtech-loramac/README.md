@@ -51,7 +51,7 @@ board.
 Depending on the type of radio device, set the `LORA_DRIVER` variable accordingly:
 For example:
 
-    LORA_DRIVER=sx1272 make BOARD=nucleo-f411re -C tests/pkg_semtech-loramac flash term
+    LORA_DRIVER=sx1272 make BOARD=nucleo-f411re -C tests/pkg/semtech-loramac flash term
 
 will build the application for a nucleo-f411re with an SX1272 based mbed LoRa shield.
 
@@ -60,7 +60,7 @@ The SX1276 is the default value.
 The other parameter that has to be set at build time is the geographic region:
 `EU868`, `US915`, etc. See LoRaWAN regional parameters for more information.
 
-    LORA_REGION=US915 LORA_DRIVER=sx1272 make BOARD=nucleo-f411re -C tests/pkg_semtech-loramac flash term
+    LORA_REGION=US915 LORA_DRIVER=sx1272 make BOARD=nucleo-f411re -C tests/pkg/semtech-loramac flash term
 
 will build the application for a nucleo-f411re with an SX1272 based mbed LoRa shield
 for US915 region.
@@ -247,17 +247,17 @@ for ABP. The test assumes that both devices have the same Application EUI.
 
 1. flash device with appropriate keys and test
 
-    $ DEVEUI_OTA=<...> DEVEUI_ABP=<...> APPEUI=<...> APPKEY=<...> DEVADDR=<...> NWKSKEY=<...> APPSKEY=<...> RX2_DR=<...> make BOARD=b-l072z-lrwan1 -C tests/pkg_semtech-loramac test
+    $ DEVEUI_OTA=<...> DEVEUI_ABP=<...> APPEUI=<...> APPKEY=<...> DEVADDR=<...> NWKSKEY=<...> APPSKEY=<...> RX2_DR=<...> make BOARD=b-l072z-lrwan1 -C tests/pkg/semtech-loramac test
 
 #### With iotlab
 
 1. setup the iotlab experiment:
 
-    $ make -C tests/pkg_semtech-loramac iotlab-exp
+    $ make -C tests/pkg/semtech-loramac iotlab-exp
 
 2. flash device with the appropriate keys and test
 
-    $ DEVEUI=<...> APPEUI=<...> APPKEY=<...> DEVADDR=<...> NWKSKEY=<...> APPSKEY=<...> RX2_DR=<...> IOTLAB_NODE=auto make -C tests/pkg_semtech-loramac flash test
+    $ DEVEUI=<...> APPEUI=<...> APPKEY=<...> DEVADDR=<...> NWKSKEY=<...> APPSKEY=<...> RX2_DR=<...> IOTLAB_NODE=auto make -C tests/pkg/semtech-loramac flash test
 
 3. stop the iotlab experiment:
 

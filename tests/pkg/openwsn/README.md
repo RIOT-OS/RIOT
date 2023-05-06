@@ -140,22 +140,22 @@ to be specified for every node,  `IOTLAB_NODE=m3-%.saclay.iot-lab.info`
 2. flash the root node
 
         $ IOTLAB_NODE=${ROOT_IOTLAB_NODE} USEMODULE=openwsn_serial \
-          BOARD=iotlab-m3 make -C tests/pkg_openwsn flash
+          BOARD=iotlab-m3 make -C tests/pkg/openwsn flash
 
 3. open a shell to the leaf nodes so in two shell windows, do (one in each):
-        $ BOARD=iotlab-m3 make -C tests/pkg_openwsn all -j4
-        $ BOARD=iotlab-m3 IOTLAB_NODE=${LEAF_IOTLAB_NODE0} make -C tests/pkg_openwsn flash-only
-        $ BOARD=iotlab-m3 IOTLAB_NODE=${LEAF_IOTLAB_NODE1} make -C tests/pkg_openwsn flash-only
+        $ BOARD=iotlab-m3 make -C tests/pkg/openwsn all -j4
+        $ BOARD=iotlab-m3 IOTLAB_NODE=${LEAF_IOTLAB_NODE0} make -C tests/pkg/openwsn flash-only
+        $ BOARD=iotlab-m3 IOTLAB_NODE=${LEAF_IOTLAB_NODE1} make -C tests/pkg/openwsn flash-only
 
 4. open a shell to the leaf nodes
    so in two shell windows, do (one in each):
 
-        $ BOARD=iotlab-m3 IOTLAB_NODE=${LEAF_IOTLAB_NODE0} make -C tests/pkg_openwsn term
-        $ BOARD=iotlab-m3 IOTLAB_NODE=${LEAF_IOTLAB_NODE1} make -C tests/pkg_openwsn term
+        $ BOARD=iotlab-m3 IOTLAB_NODE=${LEAF_IOTLAB_NODE0} make -C tests/pkg/openwsn term
+        $ BOARD=iotlab-m3 IOTLAB_NODE=${LEAF_IOTLAB_NODE1} make -C tests/pkg/openwsn term
 
 5. in a third shell, launch openvisualizer:
 
-        $ BOARD=iotlab-m3 IOTLAB_NODE=${ROOT_IOTLAB_NODE} make -C tests/pkg_openwsn openv-termroot
+        $ BOARD=iotlab-m3 IOTLAB_NODE=${ROOT_IOTLAB_NODE} make -C tests/pkg/openwsn openv-termroot
 
 ### Network Setup
 
@@ -280,11 +280,11 @@ follows:
 
 on iotlab:
     $ IOTLAB_NODE=${ROOT_IOTLAB_NODE}  BOARD=iotlab-m3 \
-        make -C tests/pkg_openwsn openv-termtun
+        make -C tests/pkg/openwsn openv-termtun
 
 on local boards:
     $ PORT=<USB-serial-port, e.g., /dev/ttyUSB0>  BOARD=samr21-xpro \
-        make -C tests/pkg_openwsn openv-termtun
+        make -C tests/pkg/openwsn openv-termtun
 
 Once DAOs are received you can ping nodes in the network from your host:
 

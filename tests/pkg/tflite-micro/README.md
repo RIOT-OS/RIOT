@@ -18,7 +18,7 @@ To get started with TensorFlow Lite on microcontrollers, please refer to
 
 Simply run the application on the board of your choice using:
 
-    make BOARD=<board of your choice> -C tests/pkg_tensorflow-lite flash term
+    make BOARD=<board of your choice> -C tests/pkg/tensorflow-lite flash term
 
 Set `EXAMPLE=hello_world` from the command line to try the upstream hello_world
 example.

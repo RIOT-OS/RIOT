@@ -18,7 +18,7 @@ The program will loop forever. In every loop it:
 This is an example, with the Arduino Mega2560 board and the Decagon CTD-10
 sensor:
 
-    $ BOARD=arduino-mega2560 make -C tests/pkg_arduino_sdi_12 all flash term
+    $ BOARD=arduino-mega2560 make -C tests/pkg/arduino_sdi_12 all flash term
     [...]
     2021-09-28 12:14:57,492 # main(): This is RIOT! (Version: 2021.10-devel-776-gc7af21-sdi12)
     2021-09-28 12:14:57,496 # Testing the Arduino-SDI-12 package

@@ -77,6 +77,6 @@ Here are the steps required to train a new model and update the C++ files in the
 
 4. Generate the C++ model files that will be included later in the RIOT build:
     ```
-    cd $RIOTBASE/tests/pkg_utensor
+    cd $RIOTBASE/tests/pkg/utensor
     utensor-cli convert /tmp/utensor-mnist-demo/mnist_model/deep_mlp.pb --target utensor --output-nodes=y_pred
     ```

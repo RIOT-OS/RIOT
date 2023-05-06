@@ -20,14 +20,14 @@ The test application use the protocol defined by the CLASS variable, which
 defaults to the RNDIS protocol (`tinyusb_class_net_rndis`). This can be
 changed by setting this variable in the make command line, for example:
 ```
-CLASS=tinyusb_class_net_cdc_ecm BOARD=... make -C tests/pkg_tinyusb_netdev flash
+CLASS=tinyusb_class_net_cdc_ecm BOARD=... make -C tests/pkg/tinyusb_netdev flash
 ```
 The CDC ECM protocol (`tinyusb_class_net_cdc_ecm`) and the RNDIS protocol
 (`tinyusb_class_net_rndis`) can be used simultaneously to support all operating
 systems, for example :
 ```
 CLASS='tinyusb_class_net_rndis tinyusb_class_net_cdc_ecm' \
-BOARD=... make -C tests/pkg_tinyusb_netdev flash
+BOARD=... make -C tests/pkg/tinyusb_netdev flash
 ```
 In this case, the CDC ECM protocol is the default protocol and the RNDIS
 protocol the alternative protocol defined as second device configuration.

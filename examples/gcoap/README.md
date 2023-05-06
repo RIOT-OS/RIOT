@@ -88,7 +88,7 @@ implementations:
   [nanocoap library](https://github.com/kaspar030/sock/tree/master/nanocoap)
   implementation
 
-* [Microcoap](../../tests/pkg_microcoap): another lightweight CoAP server based
+* [Microcoap](../../tests/pkg/microcoap): another lightweight CoAP server based
   on the [microcoap library](https://github.com/1248/microcoap) implementation
 
 

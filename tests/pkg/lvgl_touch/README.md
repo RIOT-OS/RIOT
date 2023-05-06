@@ -9,7 +9,7 @@ The application works without modification on the stm32f429i-disc1 board. To
 build, flash and run the application for this board, just use:
 
 ```
-make BOARD=stm32f429i-disc1 -C tests/pkg_lvgl_touch flash
+make BOARD=stm32f429i-disc1 -C tests/pkg/lvgl_touch flash
 ```
 
 ### Expected result

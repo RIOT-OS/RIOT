@@ -256,8 +256,8 @@ sudo dist/tools/tapsetup/tapsetup -c 2
 - bootstrap the `BOARD`s and specify the tap interface to use for each
 
 ```
-PORT=tap0 make -C tests/pkg_edhoc_c all term
-PORT=tap1 make -C tests/pkg_edhoc_c all term
+PORT=tap0 make -C tests/pkg/edhoc_c all term
+PORT=tap1 make -C tests/pkg/edhoc_c all term
 ```
 
 #### physical `BOARD`s
@@ -268,7 +268,7 @@ through which they will be able to communicate.
 - bootstrap the `BOARD`s
 
 ```
-make -C tests/pkg_edhoc_c flash term
+make -C tests/pkg/edhoc_c flash term
 ```
 
 ### Perform the handshake
@@ -414,5 +414,5 @@ OSCORE salt:
 As long as a BOARD with a netdev interface is used is as simple as:
 
 ```
-$ make -C tests/pkg_edhoc_c flash test-with-config
+$ make -C tests/pkg/edhoc_c flash test-with-config
 ```

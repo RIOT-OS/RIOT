@@ -127,7 +127,7 @@
  *
  * to make the device to be a composite keyboard/mouse device.
  *
- * Please refer `$RIOTBASE/tests/pkg_tinyusb_cdc_msc` and the
+ * Please refer `$RIOTBASE/tests/pkg/tinyusb_cdc_msc` and the
  * [tinyUSB documentation](https://docs.tinyusb.org/en/latest/reference/getting_started.html)
  * for details.
  */
