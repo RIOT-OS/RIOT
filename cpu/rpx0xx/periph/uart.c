@@ -89,7 +89,7 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t uart_parity
      * transferred with a single 32 bit write (updating both parity and number of data bits at the
      * same time), the configuration change of the parity bits will not take place until after the
      * next char send out. If the configuration is updated in multiple bus accesses, it will apply
-     * directly to the next char. So: Double check e.g. with tests/periph_uart_mode after touching
+     * directly to the next char. So: Double check e.g. with tests/periph/uart_mode after touching
      * the initialization code here */
     dev->UARTLCR_H = (uint32_t)data_bits << UART0_UARTLCR_H_WLEN_Pos;
 

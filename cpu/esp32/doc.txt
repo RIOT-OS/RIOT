@@ -1387,7 +1387,7 @@ interrupt or if the RxD signal of UART0 goes HIGH at least 4 times
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 CFLAGS='-DESP_PM_WUP_PINS=GPIO25 -DESP_PM_WUP_LEVEL=ESP_PM_WUP_PINS_ALL_LOW \
         -DESP_PM_WUP_UART0=6 -DESP_PM_GPIO_HOLD' \
-make BOARD=esp32-wroom-32 -C tests/periph_pm
+make BOARD=esp32-wroom-32 -C tests/periph/pm
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 [Back to table of contents](#esp32_toc)

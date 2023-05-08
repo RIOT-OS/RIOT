@@ -80,9 +80,9 @@ jobs:
       #    DOCKER_ENVIRONMENT_CMDLINE=\'-e CFLAGS=-D<flag>\'
       COMPILE_AND_TEST_VARS: ''
       APPLICATIONS: ''
-      # Exclude 'tests/periph_timer_short_relative_set' since its expected
+      # Exclude 'tests/periph/timer_short_relative_set' since its expected
       # to fail on most BOARDs
-      APPLICATIONS_EXCLUDE: 'tests/periph_timer_short_relative_set'
+      APPLICATIONS_EXCLUDE: 'tests/periph/timer_short_relative_set'
     steps:
       - name: Checkout RIOT
         uses: actions/checkout@main
