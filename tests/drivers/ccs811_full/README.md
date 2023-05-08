@@ -24,5 +24,5 @@ overridden according to the hardware configuration by defining
 ```
 or via the `CFLAGS` variable in the make command.
 ```
-CFLAGS="-DCCS811_PARAM_INT_PIN=GPIO_PIN\(0,7\)" make -C tests/driver_ccs811_full BOARD=...
+CFLAGS="-DCCS811_PARAM_INT_PIN=GPIO_PIN\(0,7\)" make -C tests/drivers/ccs811_full BOARD=...
 ```

@@ -7,7 +7,7 @@ This is the test application for the STMPE811 touchscreen controller.
 The application works out of the box on a STM32F429I-DISC1 board:
 
 ```
-make -C tests/driver_stmpe811 flash term
+make -C tests/drivers/stmpe811 flash term
 ```
 
 ## Expected output

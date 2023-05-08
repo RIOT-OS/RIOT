@@ -14,7 +14,7 @@ expander modules. Please check the default configuration parameters in
 if necessary. Alternatively, a modified version of this file could be
 placed in the directory of this test application to override it.
 ```
-USEMODULE=pcf8575 make -C tests/driver_pcf857x BOARD=...
+USEMODULE=pcf8575 make -C tests/drivers/pcf857x BOARD=...
 ```
 **Please note:** When no pseudomodule is given, `pcf8575` is used by default.
 
@@ -24,7 +24,7 @@ low-active open-drain interrupt signal has to be enabled. Add module
 parameter `PCF857X_PARAM_INT_PIN`, e.g.
 ```
 CFLAGS="-DPCF857X_PARAM_INT_PIN=\(GPIO_PIN\(0,6\)\)" \
-USEMODULE="pcf8575 pcf857x_irq" make -C tests/driver_pcf857x BOARD=...
+USEMODULE="pcf8575 pcf857x_irq" make -C tests/drivers/pcf857x BOARD=...
 ```
 **Please note:** Since interrupts are handled in the context of a separate
 event thread, enabling interrupts requires more RAM.
@@ -56,7 +56,7 @@ is defined by the macro `PCF857X_PORT_0`, which is 16 by default. This value
 can be overridden during compilation, e.g.:
 ```
 CFLAGS="-DPCF857X_PORT_0=8" \
-USEMODULE=pcf8575 make -C tests/driver_pcf857x BOARD=...
+USEMODULE=pcf8575 make -C tests/drivers/pcf857x BOARD=...
 ```
 Using the port number defined by `PCF857X_PORT_0` and the following port
 numbers, you can apply the command to the PCF857X expander ports. For

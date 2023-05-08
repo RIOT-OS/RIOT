@@ -8,7 +8,7 @@ SPI and GPIO commands, which abstract the driver-functions from the used board.
 
 ## Predefined pin mapping
 
-Please compare the `tests/driver_nrf24l01p_lowlevel/Makefile` for predefined
+Please compare the `tests/drivers/nrf24l01p_lowlevel/Makefile` for predefined
 pin-mappings on different boards. (In addition, you also need to connect to 3V
 and GND)
 

@@ -14,5 +14,5 @@ second:
 The user can specify the number of iterations by setting the variable
 `TEST_ITERATIONS` (default value is 10) from commandline as follows:
 ```
-make BOARD=... TEST_ITERATIONS=... -C tests/driver_scd30
+make BOARD=... TEST_ITERATIONS=... -C tests/drivers/scd30
 ```

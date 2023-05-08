@@ -910,7 +910,7 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * DRIVER=l3gd20h USEMODULE='l3gxxxx_irq_data` \
  * CLFAGS='-DL3GXXXX_INT2_PIN=GPIO_PIN\(0, 5\)' \
- * BOARD=... make -C tests/driver_l3gxxxx
+ * BOARD=... make -C tests/drivers/l3gxxxx
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * The default configuration of the sensor is defined in file
@@ -947,7 +947,7 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * DRIVER=l3gd20h USEMODULE='l3gxxxx_low_odr l3gxxxx_irq_data` \
  * CLFAGS='-DCONFIG_L3GXXXX_ODR=L3GXXXX_ODR_12 -DL3GXXXX_INT2_PIN=GPIO_PIN\(0,5\)' \
- * BOARD=... make -C tests/driver_l3gxxxx
+ * BOARD=... make -C tests/drivers/l3gxxxx
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>

@@ -24,7 +24,7 @@
  *
  * ## Usage
  *
- * Examine `tests/driver_isr29125` for an exemplary application using
+ * Examine `tests/drivers/isr29125` for an exemplary application using
  * this driver.
  *
  * ## Caveats

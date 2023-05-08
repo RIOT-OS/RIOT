@@ -113,21 +113,21 @@ z1
 : ${TEST_KCONFIG_ENFORCE_APP_GROUPS:="
 tests/cb_mux*
 tests/congure_*
-tests/driver_b*
-tests/driver_f*
-tests/driver_g*
-tests/driver_h*
-tests/driver_i*
-tests/driver_j*
-tests/driver_l*
-tests/driver_o*
-tests/driver_p*
-tests/driver_q*
-tests/driver_r*
-tests/driver_s*
-tests/driver_t*
-tests/driver_u*
-tests/driver_v*
+tests/drivers/b*
+tests/drivers/f*
+tests/drivers/g*
+tests/drivers/h*
+tests/drivers/i*
+tests/drivers/j*
+tests/drivers/l*
+tests/drivers/o*
+tests/drivers/p*
+tests/drivers/q*
+tests/drivers/r*
+tests/drivers/s*
+tests/drivers/t*
+tests/drivers/u*
+tests/drivers/v*
 tests/external_board_dirs
 tests/periph_*
 tests/pkg/elk
@@ -159,7 +159,7 @@ tests/saul
 tests/mtd_mapper
 "}
 
-: ${TEST_WITH_CONFIG_SUPPORTED:="examples/suit_update tests/driver_at86rf2xx_aes"}
+: ${TEST_WITH_CONFIG_SUPPORTED:="examples/suit_update tests/drivers/at86rf2xx_aes"}
 
 export RIOT_CI_BUILD=1
 export CC_NOCOLOR=1

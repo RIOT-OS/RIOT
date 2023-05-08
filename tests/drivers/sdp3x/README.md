@@ -11,7 +11,7 @@ of following values first in continuous mode and then triggered mode every secon
 The user can specify the number of iterations by setting the variable `TEST_ITERATIONS`
 (default value is 10) from commandline as follows:
 ```
-make BOARD=... TEST_ITERATIONS=... -C tests/driver_sdp3x
+make BOARD=... TEST_ITERATIONS=... -C tests/drivers/sdp3x
 ```
 
 ##Features

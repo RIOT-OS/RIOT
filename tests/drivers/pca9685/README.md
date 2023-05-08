@@ -16,7 +16,7 @@ which is under following copyright:
 
 To use the test application, compile it with
 ```
-     make -C tests/driver_pca9685 BOARD=...
+     make -C tests/drivers/pca9685 BOARD=...
 ```
 Please check the default configuration parameters in
 `$(RIOTBASE)/drivers/pca9685/include/pca9685_params.h` and adopt them
@@ -26,5 +26,5 @@ If the active LOW output enable pin /OE is used, the GPIO has to be defined
 as parameter, e.g.
 ```
      CFLAGS="-DPCA9685_PARAM_INT_PIN=\(GPIO\(0,6\)\)" \
-     make -C tests/driver_pca9685 BOARD=...
+     make -C tests/drivers/pca9685 BOARD=...
 ```

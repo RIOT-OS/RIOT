@@ -21,7 +21,7 @@ conversions. By default fixed-point arithmetic is used. To use floating-point
 arithmetic, the `bme680_fp` module has to be enabled. This can be done in the
 test application by setting the environment variable `ENABLE_FP`:
 ```
-ENABLE_FP=1 make BOARD=... -C tests/driver_bme680
+ENABLE_FP=1 make BOARD=... -C tests/drivers/bme680
 ```
 
 ## Interface
@@ -35,11 +35,11 @@ Which implementation is used for the test application is defined by the
 `DRIVER` environment variable. By default `bme680_i2c` is used. To use
 `bme680_spi`, the `DRIVER` variable could be set at the make command line:
 ```
-DRIVER=bme680_spi make BOARD=... -C tests/driver_bme680
+DRIVER=bme680_spi make BOARD=... -C tests/drivers/bme680
 ```
 
 It is also possible to use I2C as well SPI simultaneously in the test
 application:
 ```
-DRIVER=bme680_spi bme680_i2c' make BOARD=... -C tests/driver_bme680
+DRIVER=bme680_spi bme680_i2c' make BOARD=... -C tests/drivers/bme680
 ```

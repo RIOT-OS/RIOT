@@ -18,4 +18,4 @@ sys/test_utils/result_output/*/.*\h
 sys/test_utils/include/result_output.h
 sys/ztimer/.*\.c
 sys/include/ztimer.*\.h
-tests/driver_sx127x/.*\.c
+tests/drivers/sx127x/.*\.c

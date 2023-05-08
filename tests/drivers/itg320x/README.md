@@ -25,5 +25,5 @@ defined by #ITG320X_PARAM_INT_PIN, for example:
 
 ```
 USEMODULE=itg320x_int CFLAGS="-DITG320X_PARAM_INT_PIN=\(GPIO_PIN\(0,3\)\)" \
-make flash -C tests/driver_itg320x BOARD=...
+make flash -C tests/drivers/itg320x BOARD=...
 ```

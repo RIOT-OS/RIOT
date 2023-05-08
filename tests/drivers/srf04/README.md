@@ -1,4 +1,4 @@
-tests/driver_srf04
+tests/drivers/srf04
 ================
 This example shows the usage of an srf04 module.
 The application uses a timer and two gpio pins.
