@@ -8,7 +8,7 @@
 
 /**
  * @ingroup     pkg_lvgl
- * @brief       LittlevGL configuration macros
+ * @brief       LVGL configuration macros
  * @{
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>

@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Definitions specific to RIOT for the LittlevGL engine
+ * @brief       Definitions specific to RIOT for the LVGL engine
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */

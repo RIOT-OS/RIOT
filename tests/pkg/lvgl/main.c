@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       LittlevGL example application
+ * @brief       LVGL example application
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  *
