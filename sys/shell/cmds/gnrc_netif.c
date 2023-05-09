@@ -215,11 +215,11 @@ static void _set_usage(char *cmd_name)
          "       * \"pan\" - alias for \"nid\"\n"
          "       * \"pan_id\" - alias for \"nid\"\n"
          "       * \"phy_busy\" - set busy mode on-off\n"
-#if IS_USED(MODULE_LORA)
+#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORA)
          "       * \"bw\" - alias for channel bandwidth\n"
          "       * \"sf\" - alias for spreading factor\n"
          "       * \"cr\" - alias for coding rate\n"
-#endif
+#endif  /* MODULE_SHELL_CMD_GNRC_NETIF_LORA */
 #if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN)
          "       * \"appkey\" - sets Application key\n"
          "       * \"appskey\" - sets Application session key\n"
@@ -393,7 +393,7 @@ static void _print_netopt(netopt_t opt)
         printf("encryption key");
         break;
 
-#if IS_USED(MODULE_LORA)
+#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORA)
     case NETOPT_BANDWIDTH:
         printf("bandwidth");
         break;
@@ -405,7 +405,7 @@ static void _print_netopt(netopt_t opt)
     case NETOPT_CODING_RATE:
         printf("coding rate");
         break;
-#endif /* MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN */
+#endif /* MODULE_SHELL_CMD_GNRC_NETIF_LORA */
 #ifdef MODULE_NETDEV_IEEE802154_MULTIMODE
 
     case NETOPT_IEEE802154_PHY:
@@ -506,7 +506,7 @@ static const char *_netopt_state_str[] = {
     [NETOPT_STATE_STANDBY] = "STANDBY"
 };
 
-#if IS_USED(MODULE_LORA)
+#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORA)
 static const char *_netopt_bandwidth_str[] = {
     [LORA_BW_125_KHZ] = "125",
     [LORA_BW_250_KHZ] = "250",
@@ -519,7 +519,7 @@ static const char *_netopt_coding_rate_str[] = {
     [LORA_CR_4_7] = "4/7",
     [LORA_CR_4_8] = "4/8"
 };
-#endif
+#endif  /* MODULE_SHELL_CMD_GNRC_NETIF_LORA */
 
 #ifdef MODULE_NETDEV_IEEE802154
 static const char *_netopt_ieee802154_phy_str[] = {
@@ -678,7 +678,7 @@ static void _netif_list(netif_t *iface)
     if (res >= 0) {
         printf(" RSSI: %d ", i16);
     }
-#if IS_USED(MODULE_LORA)
+#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORA)
     res = netif_get_opt(iface, NETOPT_BANDWIDTH, 0, &u8, sizeof(u8));
     if (res >= 0) {
         printf(" BW: %skHz ", _netopt_bandwidth_str[u8]);
@@ -691,7 +691,7 @@ static void _netif_list(netif_t *iface)
     if (res >= 0) {
         printf(" CR: %s ", _netopt_coding_rate_str[u8]);
     }
-#endif /* MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN */
+#endif /* MODULE_SHELL_CMD_GNRC_NETIF_LORA */
 #ifdef MODULE_NETDEV_IEEE802154
     res = netif_get_opt(iface, NETOPT_IEEE802154_PHY, 0, &u8, sizeof(u8));
     if (res >= 0) {
@@ -1001,7 +1001,7 @@ static int _netif_set_u32(netif_t *iface, netopt_t opt, uint32_t context,
     return 0;
 }
 
-#if IS_USED(MODULE_LORA)
+#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORA)
 static int _netif_set_bandwidth(netif_t *iface, char *value)
 {
     uint8_t bw;
@@ -1062,7 +1062,7 @@ static int _netif_set_coding_rate(netif_t *iface, char *value)
 
     return 0;
 }
-#endif /* MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN */
+#endif  /* MODULE_SHELL_CMD_GNRC_NETIF_LORA */
 
 #ifdef MODULE_NETDEV_IEEE802154_MR_FSK
 static int _netif_set_fsk_fec(netif_t *iface, char *value)
@@ -1506,7 +1506,7 @@ static int _netif_set(char *cmd_name, netif_t *iface, char *key, char *value)
     else if ((strcmp("frequency", key) == 0) || (strcmp("freq", key) == 0)) {
         return _netif_set_u32(iface, NETOPT_CHANNEL_FREQUENCY, 0, value);
     }
-#if IS_USED(MODULE_LORA)
+#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORA)
     else if ((strcmp("bandwidth", key) == 0) || (strcmp("bw", key) == 0)) {
         return _netif_set_bandwidth(iface, value);
     }
@@ -1516,7 +1516,7 @@ static int _netif_set(char *cmd_name, netif_t *iface, char *key, char *value)
     else if ((strcmp("coding_rate", key) == 0) || (strcmp("cr", key) == 0)) {
         return _netif_set_coding_rate(iface, value);
     }
-#endif
+#endif  /* MODULE_SHELL_CMD_GNRC_NETIF_LORA */
 #if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN)
 #if IS_USED(MODULE_GNRC_LORAWAN_1_1)
     else if (strcmp("joineui", key) == 0) {
