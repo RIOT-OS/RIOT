@@ -344,7 +344,7 @@ static int _print_reply(gnrc_pktsnip_t *pkt, int corrupted, uint32_t triptime, v
     }
     /* check response for corruption */
     else if (corrupted >= 0) {
-        printf(" corrupted at offset %u", corrupted);
+        printf(" corrupted at offset %u", (unsigned)corrupted);
     }
     if (rssi != GNRC_NETIF_HDR_NO_RSSI) {
         printf(" rssi=%"PRId16" dBm", rssi);
