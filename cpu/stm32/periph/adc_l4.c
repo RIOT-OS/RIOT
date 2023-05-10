@@ -76,6 +76,9 @@
  */
 static mutex_t locks[ADC_DEVS];
 
+/* count the periph_clk_en calls to know when to disable the clock in done() */
+static uint8_t _clk_en_ctr = 0;
+
 static inline ADC_TypeDef *dev(adc_t line)
 {
     return (ADC_TypeDef *)(ADC1_BASE + (adc_config[line].dev << 8));
@@ -85,16 +88,16 @@ static inline void prep(adc_t line)
 {
     mutex_lock(&locks[adc_config[line].dev]);
     periph_clk_en(ADC_PERIPH_CLK, ADC_CLK_EN_MASK);
+    _clk_en_ctr++;
 }
 
 static inline void done(adc_t line)
 {
-/* on STM32L476RG (TODO: maybe true for other L4's? - haven't checked yet)
-   all adc devices are controlled by this one bit.
-   So don't disable the clock as other devices may still use it */
-#if !defined(CPU_MODEL_STM32L476RG)
-    periph_clk_dis(ADC_PERIPH_CLK, ADC_CLK_EN_MASK);
-#endif
+    /* All ADC devices are controlled by this one bit.
+     * So don't disable the clock if other devices may still use it */
+    if (_clk_en_ctr && --_clk_en_ctr == 0) {
+        periph_clk_dis(ADC_PERIPH_CLK, ADC_CLK_EN_MASK);
+    }
     mutex_unlock(&locks[adc_config[line].dev]);
 }
 
