@@ -1,1 +1,1 @@
-../shell/main.c
+../sys/shell/main.c
