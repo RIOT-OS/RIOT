@@ -18,6 +18,7 @@ APPLICATION_DIRS :=                   \
     tests/drivers                     \
     tests/periph                      \
     tests/pkg                         \
+    tests/sys                         \
     #
 
 APPLICATION_DIRS := $(addprefix $(RIOTBASE)/,$(APPLICATION_DIRS))
