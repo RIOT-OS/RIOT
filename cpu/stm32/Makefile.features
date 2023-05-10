@@ -82,6 +82,13 @@ ifneq (,$(filter $(CPU_FAM),f2 f4 f7 g4 l0 l4 l5 u5 wb))
   endif
 endif
 
+ifneq (,$(filter $(CPU_FAM),f2 f4 f7 l4))
+  FEATURES_PROVIDED += periph_sdmmc_auto_clk
+  FEATURES_PROVIDED += periph_sdmmc_clk
+  FEATURES_PROVIDED += periph_sdmmc_hs
+  FEATURES_PROVIDED += periph_sdmmc_mmc
+endif
+
 ifneq (,$(filter $(CPU_FAM),f2 f4 f7 g4 l1 l4 mp1))
   FEATURES_PROVIDED += cortexm_mpu
 endif

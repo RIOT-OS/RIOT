@@ -70,6 +70,7 @@
 #include "periph/cpu_pm.h"
 #include "periph/cpu_pwm.h"
 #include "periph/cpu_qdec.h"
+#include "periph/cpu_sdmmc.h"
 #include "periph/cpu_spi.h"
 #include "periph/cpu_timer.h"
 #include "periph/cpu_uart.h"
