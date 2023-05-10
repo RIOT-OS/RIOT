@@ -212,16 +212,6 @@ typedef enum {
 #define GPIO_DRIVE_20   GPIO_DRIVE_STRONG       /**< 20 mA (default) */
 #define GPIO_DRIVE_30   GPIO_DRIVE_STRONGEST    /**< 30 mA */
 
-#define HAVE_GPIO_IRQ_TRIG_T
-typedef enum {
-    GPIO_TRIGGER_NONE = 0,
-    GPIO_TRIGGER_EDGE_RISING = 1,
-    GPIO_TRIGGER_EDGE_FALLING = 2,
-    GPIO_TRIGGER_EDGE_BOTH = 3,
-    GPIO_TRIGGER_LEVEL_LOW = 4,
-    GPIO_TRIGGER_LEVEL_HIGH = 5
-} gpio_irq_trig_t;
-
 /* END: GPIO LL overwrites */
 
 #endif /* ndef DOXYGEN */

@@ -229,8 +229,8 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
                       (mode == GPIO_OD_PU) ||
                       (mode == GPIO_IN_OD_PU)) ? GPIO_PULLUP_ENABLE
                                                : GPIO_PULLUP_DISABLE;
-    cfg.pull_down_en = (mode == GPIO_IN_PD) ? GPIO_PULLUP_ENABLE
-                                            : GPIO_PULLUP_DISABLE;
+    cfg.pull_down_en = (mode == GPIO_IN_PD) ? GPIO_PULLDOWN_ENABLE
+                                            : GPIO_PULLDOWN_DISABLE;
     cfg.intr_type = GPIO_INTR_DISABLE;
 
 #ifdef ESP_PM_WUP_PINS

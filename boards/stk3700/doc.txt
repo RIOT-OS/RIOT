@@ -71,7 +71,7 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 | RTC        | &mdash; | RTC             |                                | Either RTC or RTT (see below)                            |
 | SPI        | 0       | USART1          | MOSI: PD0, MISO: PD1, CLK: PD2 |                                                          |
 |            | 1       | USART2          | MOSI: NC, MISO: PC3, CLK: PC4  |                                                          |
-| Timer      | 0       | TIMER0 + TIMER1 |                                | TIMER0 is used as prescaler (must be adjecent)           |
+| Timer      | 0       | TIMER0 + TIMER1 |                                | TIMER0 is used as prescaler (must be adjacent)           |
 |            | 1       | LETIMER0        |                                |                                                          |
 | UART       | 0       | UART0           | RX: PE1, TX: PE0               | STDIO output                                             |
 |            | 1       | LEUART0         | RX: PD5, TX: PD4               | Baud rate limited (see below)                            |

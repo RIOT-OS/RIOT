@@ -201,7 +201,7 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *va
             uint16_t chan = *((uint16_t *)value);
             /* real validity needs to be checked by device, since sub-GHz and
              * 2.4 GHz band radios have different legal values. Here we only
-             * check that it fits in an 8-bit variabl*/
+             * check that it fits in an 8-bit variable */
             assert(chan <= UINT8_MAX);
             dev->chan = chan;
             res = sizeof(uint16_t);
