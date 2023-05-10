@@ -26,7 +26,7 @@
 #include "flash_utils.h"
 #include "senml/phydat.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifndef PRIi64
