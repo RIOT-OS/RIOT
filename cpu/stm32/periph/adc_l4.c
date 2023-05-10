@@ -124,6 +124,16 @@ int adc_init(adc_t line)
         return -1;
     }
 
+#if VREFBUF_ENABLE && defined(VREFBUF_CSR_ENVR)
+    /* enable VREFBUF if needed and available (for example if the board doesn't
+     * have an external reference voltage connected to V_REF+), wait until
+     * it is ready */
+    RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+    VREFBUF->CSR &= ~VREFBUF_CSR_HIZ;
+    VREFBUF->CSR |= VREFBUF_CSR_ENVR;
+    while (!(VREFBUF->CSR & VREFBUF_CSR_VRR)) { }
+#endif
+
     /* lock device and enable its peripheral clock */
     prep(line);
 
