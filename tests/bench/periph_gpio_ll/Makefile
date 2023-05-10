@@ -13,7 +13,7 @@ PORT_OUT ?= 0
 PIN_OUT_0 ?= 0
 PIN_OUT_1 ?= 1
 
-include ../Makefile.tests_common
+include ../Makefile.bench_common
 
 FEATURES_REQUIRED += periph_gpio_ll
 FEATURES_REQUIRED += periph_gpio

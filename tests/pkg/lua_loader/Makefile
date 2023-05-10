@@ -1,4 +1,4 @@
-include ../Makefile.tests_common
+include ../Makefile.pkg_common
 
 USEPKG += lua
 

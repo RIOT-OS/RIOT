@@ -1,4 +1,4 @@
-include ../Makefile.tests_common
+include ../Makefile.bench_common
 
 USEMODULE += xtimer
 

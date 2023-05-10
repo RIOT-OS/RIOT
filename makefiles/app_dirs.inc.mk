@@ -14,6 +14,7 @@ APPLICATION_DIRS :=                   \
     bootloaders                       \
     examples                          \
     tests                             \
+    tests/bench                       \
     tests/drivers                     \
     tests/periph                      \
     tests/pkg                         \
