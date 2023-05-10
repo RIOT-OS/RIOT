@@ -186,8 +186,9 @@ void gpio_init_analog(gpio_t pin)
 #else
     periph_clk_en(AHB1, (RCC_AHB1ENR_GPIOAEN << _port_num(pin)));
 #endif
-    /* set to analog mode */
+    /* set to analog mode, PUPD has to be 0b00 */
     _port(pin)->MODER |= (0x3 << (2 * _pin_num(pin)));
+    _port(pin)->PUPDR &= ~(0x3 << (2 * _pin_num(pin)));
 }
 
 void gpio_irq_enable(gpio_t pin)
