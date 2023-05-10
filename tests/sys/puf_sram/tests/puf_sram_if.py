@@ -14,7 +14,7 @@ class PufSram:
 
     def __init__(self, port, baud):
         self.__dev = serial.Serial(port, baud, timeout=10)
-        if(self.__dev.isOpen() is False):
+        if self.__dev.isOpen() is False:
             self.__dev.open()
 
     def repower(self, shutdown_time):
@@ -26,15 +26,15 @@ class PufSram:
         data = None
         start = False
         str = 'no_exit'
-        while (str != ''):
+        while str != '':
             str = self.__dev.readline()
-            if (b'Start: ' in str):
+            if b'Start: ' in str:
                 start = True
-            if ((b'Success: ' in str) and (start is True)):
-                if (b'[' in str) and (b']' in str):
-                    data_str = str[str.find(b"[")+1:str.find(b"]")]
+            if b'Success: ' in str and start is True:
+                if b'[' in str and b']' in str:
+                    data_str = str[str.find(b"[") + 1:str.find(b"]")]
                     data = int(data_str, 0)
-            if ((b'End: ' in str) and (data is not None)):
+            if b'End: ' in str and data is not None:
                 return data
         return None
 
@@ -43,16 +43,16 @@ class PufSram:
         for i in range(0, n):
             self.repower(off_time)
             data.append(self.read_data())
-            if (allow_print):
+            if allow_print:
                 print('Iteration %i/%i' % (i, n))
                 print(data[-1])
         return data
 
     def connect(self, dev):
-        if (dev.isOpen()):
+        if dev.isOpen():
             dev.close()
         self.__dev = self
-        if(self.__dev.isOpen() is False):
+        if self.__dev.isOpen() is False:
             self.__dev.open()
 
     def disconnect(self):

@@ -19,7 +19,7 @@ def testfunc(child):
             sleeps.append([sleep, child_num])
     for _, child_num in sorted(sleeps):
         child.expect(r'Done (\d+)\r\n')
-        assert(child_num == int(child.match.group(1)))
+        assert child_num == int(child.match.group(1))
     child.expect('SUCCESS')
 
 

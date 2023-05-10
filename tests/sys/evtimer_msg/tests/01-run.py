@@ -6,7 +6,6 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-from __future__ import print_function
 import sys
 from testrunner import run
 
@@ -23,7 +22,7 @@ def testfunc(child):
         # check if output is correct
         expected = int(child.match.group(2))
         actual = int(child.match.group(1))
-        assert(actual in range(expected - ACCEPTED_ERROR, expected + ACCEPTED_ERROR + 1))
+        assert actual in range(expected - ACCEPTED_ERROR, expected + ACCEPTED_ERROR + 1)
         print(".", end="", flush=True)
     print("")
     print("All tests successful")
