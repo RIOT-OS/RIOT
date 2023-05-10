@@ -93,7 +93,7 @@ static esp_err_t IRAM_ATTR _eth_input_callback(esp_eth_handle_t hdl,
                                                uint8_t *buffer, uint32_t len,
                                                void *priv)
 {
-    DEBUG("%s: buf=%p len=%d priv=%p\n", __func__, buffer, len, priv);
+    DEBUG("%s: buf=%p len=%"PRIu32" priv=%p\n", __func__, buffer, len, priv);
 
     assert(buffer != NULL);
     assert(len <= ETHERNET_MAX_LEN);
@@ -145,7 +145,7 @@ static void _esp_eth_event_handler(void *arg, esp_event_base_t event_base,
             }
             break;
         default:
-            DEBUG("%s: event=%d\n", __func__, event_id);
+            DEBUG("%s: event=%"PRIi32"\n", __func__, event_id);
             break;
     }
 }
