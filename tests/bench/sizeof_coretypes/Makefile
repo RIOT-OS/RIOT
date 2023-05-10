@@ -1,4 +1,4 @@
-include ../Makefile.tests_common
+include ../Makefile.bench_common
 
 # Modules that will have an impact on the size of the TCB (thread_t):
 #
