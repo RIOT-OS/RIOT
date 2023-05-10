@@ -181,7 +181,7 @@ int adc_init(adc_t line)
         /* configure calibration for single ended input */
         dev(line)->ADC_CR_REG &= ~(ADC_CR_ADCALDIF);
 
-        /* ´start automatic calibration and wait for it to complete */
+        /* start automatic calibration and wait for it to complete */
         dev(line)->ADC_CR_REG |= ADC_CR_ADCAL;
         while (dev(line)->ADC_CR_REG  & ADC_CR_ADCAL) {}
 
@@ -192,8 +192,8 @@ int adc_init(adc_t line)
         dev(line)->ADC_CR_REG |= (ADC_CR_ADEN);
         while ((dev(line)->ADC_ISR_REG & ADC_ISR_ADRDY) == 0) {}
 
-        /* set sequence length to 1 conversion */
-        dev(line)->SQR1 |= (0 & ADC_SQR1_L);
+        /* set sequence length to 1 conversion, set ADC_SQR1_L to 0 */
+        dev(line)->SQR1 &= ~ADC_SQR1_L_Msk;
     }
 
     /* configure sampling time for the given channel */
@@ -236,7 +236,8 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     dev(line)->CFGR |= res;
 
     /* specify channel for regular conversion */
-    dev(line)->SQR1 = (adc_config[line].chan << ADC_SQR1_SQ1_Pos);
+    dev(line)->SQR1 &= ~ADC_SQR1_SQ1_Msk;
+    dev(line)->SQR1 |= (adc_config[line].chan << ADC_SQR1_SQ1_Pos);
 
     /* start conversion and wait for it to complete */
     dev(line)->ADC_CR_REG |= ADC_CR_ADSTART;
