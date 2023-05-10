@@ -1,6 +1,6 @@
 BOARD_WHITELIST = native
 
-include ../Makefile.tests_common
+include ../Makefile.build_system_common
 include $(RIOTBASE)/Makefile.include
 
 

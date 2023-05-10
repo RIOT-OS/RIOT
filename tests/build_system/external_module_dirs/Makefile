@@ -1,4 +1,4 @@
-include ../Makefile.tests_common
+include ../Makefile.build_system_common
 USEMODULE += random
 
 USEMODULE += external_module

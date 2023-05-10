@@ -1,5 +1,5 @@
 BOARD ?= samr21-xpro
-include ../Makefile.tests_common
+include ../Makefile.build_system_common
 
 
 # Normally all boards using `cortexm_common/ldscripts/cortexm.ld` linkerscript

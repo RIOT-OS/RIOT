@@ -1,4 +1,4 @@
-include ../Makefile.tests_common
+include ../Makefile.build_system_common
 
 USEMODULE += external_module_1
 USEMODULE += external_module_2

@@ -1,5 +1,5 @@
 APPLICATION = external_board
-RIOTBASE ?= $(CURDIR)/../../
+RIOTBASE ?= $(CURDIR)/../../../
 
 # Only support this board
 # No need for a `WHITELIST` as there is only one board in `external_boards`.

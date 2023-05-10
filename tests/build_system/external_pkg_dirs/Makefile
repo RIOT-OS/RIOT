@@ -1,4 +1,4 @@
-include ../Makefile.tests_common
+include ../Makefile.build_system_common
 
 EXTERNAL_PKG_DIRS += external_pkgs
 USEPKG += external_pkg

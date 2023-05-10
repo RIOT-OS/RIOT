@@ -1,5 +1,5 @@
 BOARD ?= stm32f4discovery
-include ../Makefile.tests_common
+include ../Makefile.build_system_common
 
 # The stm32f4discovery is the only board that provides known conflicting features,
 # so using this compile test on other boards will not provide the expected warning.
