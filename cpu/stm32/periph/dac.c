@@ -109,8 +109,14 @@ void dac_poweron(dac_t line)
     while (!(VREFBUF->CSR & VREFBUF_CSR_VRR)) { }
 #endif
 
+#ifdef DAC_MCR_MODE1
+    /* Normal mode with Buffer enabled and connected to external pin and on-chip
+     * peripherals */
+    dev(line)->MCR |= (DAC_MCR_MODE1_0 << (16 * (dac_config[line].chan & 0x01)));
+#endif
+
     /* enable corresponding DAC channel */
-    dev(line)->CR |= (1 << (16 * (dac_config[line].chan & 0x01)));
+    dev(line)->CR |= (DAC_CR_EN1 << (16 * (dac_config[line].chan & 0x01)));
 }
 
 void dac_poweroff(dac_t line)
@@ -118,7 +124,7 @@ void dac_poweroff(dac_t line)
     assert(line < DAC_NUMOF);
 
     /* disable corresponding channel */
-    dev(line)->CR &= ~(1 << (16 * (dac_config[line].chan & 0x01)));
+    dev(line)->CR &= ~(DAC_CR_EN1 << (16 * (dac_config[line].chan & 0x01)));
 
     /* disable the DAC's clock in case no channel is active anymore */
     if (!(dev(line)->CR & EN_MASK)) {
