@@ -154,8 +154,10 @@ int adc_init(adc_t line)
     if (adc_config[line].pin != GPIO_UNDEF) {
         gpio_init_analog(adc_config[line].pin);
     }
-#if defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L475VG)
-    /* On STM32L475xx/476xx/486xx devices, before any conversion of an input channel coming
+#if defined(CPU_LINE_STM32L486xx) || defined(CPU_LINE_STM32L485xx) || \
+    defined(CPU_LINE_STM32L476xx) || defined(CPU_LINE_STM32L475xx) || \
+    defined(CPU_LINE_STM32L471xx)
+    /* On STM32L47xx/48xx devices, before any conversion of an input channel coming
        from GPIO pads, it is necessary to configure the corresponding GPIOx_ASCR register in
        the GPIO, in addition to the I/O configuration in analog mode. */
     _port(adc_config[line].pin)->ASCR |= (1 << _pin_num(adc_config[line].pin));
