@@ -40,33 +40,29 @@
 #endif
 
 /**
- * @brief map CPU specific register/value names
+ * @brief map CPU specific register/value names valid for all STM32L4 MCUs
  */
-#if defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L4R5ZI) || \
-    defined(CPU_MODEL_STM32L496ZG)
 #define ADC_CR_REG      CR
 #define ADC_ISR_REG     ISR
 #define ADC_PERIPH_CLK  AHB2
-/* on stm32-l476rg all ADC clocks are are enabled by this bit
+/* on STM32L4xx MCUs all ADC clocks are are enabled by this bit
    further clock config is possible over CKMODE[1:0] bits in ADC_CCR reg */
 #define ADC_CLK_EN_MASK   (RCC_AHB2ENR_ADCEN)
 /* referring to Datasheet Section 6.3.18 (ADC characteristics) the minimum
    achievable sampling rate is 4.21 Msps (12 Bit resolution on slow channel)
    we use that worst case for configuring the sampling time to be sure it
    works on all channels.
-   TCONV = Sampling time + 12.5 ADC clock cycles.
+   TCONV = Sampling time + 12.5 ADC clock cycles (RM section 18.4.12)
    At 80MHz this means we need to set SMP to 001 (6.5 ADC clock cycles) to
-   stay within specs. (80000000/(6.5+12.5)) = 4210526   */
+   stay within specs. (80000000/(6.5+12.5)) = 4210526 */
 #define ADC_SMP_MIN_VAL      (0x1)
 
-/* The sampling time can be specified for each channel over SMPR1 and SMPR2.
-   This specifies the first channel that goes to SMPR2 instead of SMPR1. */
+/* The sampling time width is 3 bit */
 #define ADC_SMP_BIT_WIDTH    (3)
 
 /* The sampling time can be specified for each channel over SMPR1 and SMPR2.
    This specifies the first channel that goes to SMPR2 instead of SMPR1. */
 #define ADC_SMPR2_FIRST_CHAN (10)
-#endif
 
 /**
  * @brief   Default VBAT undefined value
