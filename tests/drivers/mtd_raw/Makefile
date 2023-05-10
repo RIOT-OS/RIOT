@@ -1,4 +1,4 @@
-include ../Makefile.tests_common
+include ../Makefile.drivers_common
 
 USEMODULE += shell
 USEMODULE += shell_cmds_default

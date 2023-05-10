@@ -1,5 +1,5 @@
 BOARD ?= stm32f4discovery
-include ../Makefile.tests_common
+include ../Makefile.drivers_common
 
 # Only build on a subset of boards (one per arch supported and
 # with enough features provided)

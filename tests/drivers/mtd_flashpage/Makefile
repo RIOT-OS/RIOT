@@ -1,4 +1,4 @@
-include ../Makefile.tests_common
+include ../Makefile.drivers_common
 
 USEMODULE += mtd_flashpage
 USEMODULE += mtd_write_page

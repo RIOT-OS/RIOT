@@ -1,6 +1,6 @@
 BOARD ?= nucleo-f767zi
 
-include ../Makefile.tests_common
+include ../Makefile.drivers_common
 
 USEMODULE += mtd_at24cxxx
 USEMODULE += embunit

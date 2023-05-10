@@ -1,4 +1,4 @@
-include ../Makefile.tests_common
+include ../Makefile.drivers_common
 
 USEMODULE += mtd_at25xxx
 USEMODULE += embunit
