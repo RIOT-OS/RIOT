@@ -231,6 +231,11 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
         vbat_enable();
     }
+#ifdef VREFINT_ADC
+    if (line == VREFINT_ADC) {
+        ADC->CCR |= ADC_CCR_VREFEN;
+    }
+#endif
 
     /* first clear resolution */
     dev(line)->CFGR &= ~(ADC_CFGR_RES);
@@ -253,6 +258,11 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
         vbat_disable();
     }
+#ifdef VREFINT_ADC
+    if (line == VREFINT_ADC) {
+        ADC->CCR &= ~ADC_CCR_VREFEN;
+    }
+#endif
 
     /* free the device again */
     done(line);
