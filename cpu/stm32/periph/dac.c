@@ -99,6 +99,16 @@ void dac_poweron(dac_t line)
     periph_clk_en(APB1, RCC_BIT);
 #endif
 
+#if VREFBUF_ENABLE && defined(VREFBUF_CSR_ENVR)
+    /* enable VREFBUF if needed and available (for example if the board doesn't
+     * have an external reference voltage connected to V_REF+), wait until
+     * it is ready */
+    RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+    VREFBUF->CSR &= ~VREFBUF_CSR_HIZ;
+    VREFBUF->CSR |= VREFBUF_CSR_ENVR;
+    while (!(VREFBUF->CSR & VREFBUF_CSR_VRR)) { }
+#endif
+
     /* enable corresponding DAC channel */
     dev(line)->CR |= (1 << (16 * (dac_config[line].chan & 0x01)));
 }
