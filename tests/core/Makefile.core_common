@@ -1,0 +1,2 @@
+RIOTBASE ?= $(CURDIR)/../../..
+include $(CURDIR)/../../Makefile.tests_common
