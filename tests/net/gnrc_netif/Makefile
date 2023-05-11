@@ -11,6 +11,9 @@ USEMODULE += netdev_ieee802154
 USEMODULE += netdev_test
 USEMODULE += od
 
+# uncomment the line to have and see timestamp in the netif header
+#USEMODULE += gnrc_netif_timestamp
+
 # deactivate automatically emitted packets from IPv6 neighbor discovery
 CFLAGS += -DCONFIG_GNRC_IPV6_NIB_ARSM=0
 CFLAGS += -DCONFIG_GNRC_IPV6_NIB_SLAAC=0
