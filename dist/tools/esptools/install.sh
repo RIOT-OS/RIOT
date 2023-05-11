@@ -73,7 +73,7 @@ esac
 download()
 {
     if [ "${URL_GET}" = "curl" ]; then
-        curl -L "$1" -o "$2"
+        curl -L "$1" --retry 10 -o "$2"
     elif [ "${URL_GET}" = "wget" ]; then
         wget "$1" -O "$2"
     else
