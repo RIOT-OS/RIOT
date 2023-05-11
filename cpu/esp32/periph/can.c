@@ -104,7 +104,7 @@ static void _esp_can_power_down(can_t *dev);
 static int  _esp_can_set_mode(can_t *dev, canopt_state_t state);
 static void _esp_can_init_pins(void);
 static void _esp_can_deinit_pins(void);
-static void IRAM_ATTR _esp_can_intr_handler(void *arg);
+static void _esp_can_intr_handler(void *arg);
 
 /** ESP32 CAN low level device driver data */
 static const candev_driver_t _esp_can_driver = {
@@ -925,7 +925,7 @@ void can_init(can_t *dev, const can_conf_t *conf)
     can_device_calc_bittiming(ESP_CAN_CLOCK, &timing_const, &dev->candev.bittiming);
 
     /* initialize other members */
-    dev->state = CAN_STATE_SLEEPING;
+    dev->state = CANOPT_STATE_SLEEP;
     dev->tx_frame = NULL;
     dev->rx_frames_wptr = 0;
     dev->rx_frames_rptr = 0;
