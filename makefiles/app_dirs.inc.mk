@@ -15,6 +15,7 @@ APPLICATION_DIRS :=                   \
     examples                          \
     tests                             \
     tests/bench                       \
+    tests/build_system                \
     tests/core                        \
     tests/drivers                     \
     tests/periph                      \

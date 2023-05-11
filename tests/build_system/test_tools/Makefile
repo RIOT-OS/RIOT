@@ -1,5 +1,5 @@
 DEVELHELP = 0
-include ../Makefile.tests_common
+include ../Makefile.build_system_common
 
 USEMODULE += shell
 

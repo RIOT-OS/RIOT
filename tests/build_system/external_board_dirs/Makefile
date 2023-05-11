@@ -1,4 +1,4 @@
-include ../Makefile.tests_common
+include ../Makefile.build_system_common
 
 # Require arch_native feature so this is not compiled for other boards in
 # $(RIOTBOARD)/
