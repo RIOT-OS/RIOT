@@ -28,7 +28,7 @@
 #include "net/netdev_test.h"
 #include "test_utils/expect.h"
 #include "thread.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define TEST_DST        { 0x5a, 0x9d, 0x93, 0x86, 0x22, 0x08, 0x65, 0x79 }
 #define TEST_SRC        { 0x2a, 0xab, 0xdc, 0x15, 0x54, 0x01, 0x64, 0x79 }
@@ -212,7 +212,7 @@ static void test_recv__vrb_full(void)
     /* Fill up VRB */
     for (unsigned i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_SIZE; i++) {
         base.tag++;
-        base.arrival = xtimer_now_usec();
+        base.arrival = ztimer_now(ZTIMER_MSEC);
         TEST_ASSERT_NOT_NULL(gnrc_sixlowpan_frag_vrb_add(&base, _mock_netif,
                                                          _test_dst,
                                                          sizeof(_test_dst)));

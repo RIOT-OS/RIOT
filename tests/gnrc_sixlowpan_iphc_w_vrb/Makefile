@@ -8,6 +8,7 @@ USEMODULE += gnrc_sixlowpan_frag_vrb
 USEMODULE += netdev_ieee802154
 USEMODULE += netdev_test
 USEMODULE += od
+USEMODULE += ztimer_msec
 
 # we don't need all this packet buffer space so reduce it a little
 CFLAGS += -DTEST_SUITES

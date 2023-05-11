@@ -26,7 +26,6 @@
 #include "evtimer_msg.h"
 #include "modules.h"
 #include "msg.h"
-#include "xtimer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -52,7 +51,7 @@ typedef struct gnrc_sixlowpan_frag_sfr_fb {
      * @brief   Acknowledgment request timeout event
      */
     evtimer_msg_event_t arq_timeout_event;
-    uint32_t arq_timeout;       /**< Time in microseconds the sender should
+    uint32_t arq_timeout;       /**< Time in milliseconds the sender should
                                  *   wait for an RFRAG Acknowledgment */
     uint8_t cur_seq;            /**< Sequence number for next fragment */
     uint8_t frags_sent;         /**< Number of fragments sent */

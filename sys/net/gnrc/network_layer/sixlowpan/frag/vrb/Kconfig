@@ -19,8 +19,8 @@ config GNRC_SIXLOWPAN_FRAG_VRB_SIZE
         Has a direct influence on the number of available
         gnrc_sixlowpan_frag_rb_int_t entries.
 
-config GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US
-    int "Timeout for a virtual reassembly buffer entry in microseconds"
-    default 3000000
+config GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_MS
+    int "Timeout for a virtual reassembly buffer entry in milliseconds"
+    default 3000
 
 endif # KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_VRB

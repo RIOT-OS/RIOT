@@ -20,7 +20,7 @@
 
 #include "net/gnrc/sixlowpan/frag/fb.h"
 #include "net/gnrc/sixlowpan/frag/vrb.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "tests-gnrc_sixlowpan_frag_vrb.h"
 
@@ -161,7 +161,7 @@ static void test_vrb_gc(void)
     gnrc_sixlowpan_frag_rb_base_t base = _base;
     gnrc_sixlowpan_frag_vrb_t *res;
 
-    base.arrival = xtimer_now_usec() - CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US - 1000;
+    base.arrival = ztimer_now(ZTIMER_MSEC) - CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_MS - 1;
     TEST_ASSERT_NOT_NULL((res = gnrc_sixlowpan_frag_vrb_add(&base,
                                                             &_dummy_netif,
                                                             _out_dst,

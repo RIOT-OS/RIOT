@@ -29,6 +29,7 @@
 #include "net/gnrc/sixlowpan/iphc.h"
 #include "net/gnrc/netif.h"
 #include "net/sixlowpan.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -397,6 +398,13 @@ static void *_event_loop(void *args)
 
     /* preinitialize ACK */
     reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
+
+#if IS_ACTIVE(MODULE_GNRC_SIXLOWPAN_CTX) || \
+    IS_ACTIVE(MODULE_GNRC_SIXLOWPAN_FRAG_RB) || \
+    IS_ACTIVE(MODULE_GNRC_SIXLOWPAN_FRAG_SFR)
+    /* acquire ztimer clock for packet time stamping */
+    ztimer_acquire(ZTIMER_MSEC);
+#endif
 
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_SFR
     gnrc_sixlowpan_frag_sfr_init();

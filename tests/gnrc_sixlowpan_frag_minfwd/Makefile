@@ -8,6 +8,7 @@ USEMODULE += gnrc_netif
 USEMODULE += embunit
 USEMODULE += netdev_ieee802154
 USEMODULE += netdev_test
+USEMODULE += ztimer_msec
 
 CFLAGS += -DTEST_SUITES
 

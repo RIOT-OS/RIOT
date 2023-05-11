@@ -16,9 +16,9 @@ config GNRC_SIXLOWPAN_FRAG_RBUF_SIZE
     int "Size of the reassembly buffer"
     default 4
 
-config GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US
-    int "Timeout for reassembly buffer entries in microseconds"
-    default 3000000
+config GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_MS
+    int "Timeout for reassembly buffer entries in milliseconds"
+    default 3000
 
 config GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE
     bool "Do not override oldest datagram when reassembly buffer is full"
@@ -26,11 +26,11 @@ config GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE
         When not set, it will cause the reassembly buffer to override the oldest
         entry when a fragment for a new datagram is received. When set, only the
         oldest entry that is older than @ref
-        CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US will be overwritten (they
+        CONFIGMGNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_MS will be overwritten (they
         will still timeout normally if reassembly buffer is not full).
 
-config GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER
-    int "Deletion timer for reassembly buffer entries in microseconds"
+config GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER_MS
+    int "Deletion timer for reassembly buffer entries in milliseconds"
     default 0
     help
         Time to pass between completion of a datagram and the deletion

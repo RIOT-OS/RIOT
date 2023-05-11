@@ -19,7 +19,7 @@
 #include "net/gnrc/ipv6/nib.h"
 #endif  /* MODULE_GNRC_IPV6_NIB */
 #include "net/gnrc/netif.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "net/gnrc/sixlowpan/frag/fb.h"
 #ifdef  MODULE_GNRC_SIXLOWPAN_FRAG_STATS
@@ -211,11 +211,11 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_reverse(
 
 void gnrc_sixlowpan_frag_vrb_gc(void)
 {
-    uint32_t now_usec = xtimer_now_usec();
+    uint32_t now_msec = ztimer_now(ZTIMER_MSEC);
 
     for (unsigned i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_SIZE; i++) {
         if (!gnrc_sixlowpan_frag_vrb_entry_empty(&_vrb[i]) &&
-            (now_usec - _vrb[i].super.arrival) > CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US) {
+            (now_msec - _vrb[i].super.arrival) > CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_MS) {
             DEBUG("6lo vrb: entry (%s, ",
                   gnrc_netif_addr_to_str(_vrb[i].super.src,
                                          _vrb[i].super.src_len,
