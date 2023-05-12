@@ -1,4 +1,4 @@
-include ../Makefile.sys_common
+include ../Makefile.drivers_common
 
 USEMODULE += shell
 USEMODULE += can
