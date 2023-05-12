@@ -1,1 +1,1 @@
-../../netdev_common/main.c
+../../net/netdev_common/main.c

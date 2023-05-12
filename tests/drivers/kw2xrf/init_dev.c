@@ -1,1 +1,1 @@
-../../ieee802154_hal/init_devs.c
+../../net/ieee802154_hal/init_devs.c

@@ -5,4 +5,4 @@ USEMODULE = atwinc15x0
 FEATURES_BLACKLIST += arch_msp430 cpu_core_atxmega
 
 include ../Makefile.drivers_common
-include ../../netdev_common/Makefile.netdev.mk
+include ../../net/netdev_common/Makefile.netdev.mk
