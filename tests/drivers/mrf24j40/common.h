@@ -1,1 +1,1 @@
-../../ieee802154_hal/common.h
+../../net/ieee802154_hal/common.h
