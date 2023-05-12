@@ -6,6 +6,7 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
+import os
 import subprocess
 import time
 
@@ -16,6 +17,8 @@ from riotctrl.ctrl import RIOTCtrlBoardFactory
 from riotctrl_ctrl import native
 from riotctrl_shell.netif import IfconfigListParser
 
+RIOTBASE = os.getenv("RIOTBASE", os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../")))
+ZEP_DISPATCH_PATH = os.path.join(RIOTBASE, "dist/tools/zep_dispatch/bin/zep_dispatch")
 PARSERS = {
     "ping6": GNRCICMPv6EchoParser(),
     "ifconfig": IfconfigListParser(),
@@ -120,8 +123,7 @@ def test_linear_topology(factory, zep_dispatch):
 
 
 def run_test(func, factory):
-    with Popen(['../../dist/tools/zep_dispatch/bin/zep_dispatch',
-                '-t', '-', '127.0.0.1', '17754'], stdin=subprocess.PIPE) as zep_dispatch:
+    with Popen([ZEP_DISPATCH_PATH, '-t', '-', '127.0.0.1', '17754'], stdin=subprocess.PIPE) as zep_dispatch:
         try:
             func(factory, zep_dispatch)
         finally:
