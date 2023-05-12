@@ -81,8 +81,14 @@ extern struct fal_flash_dev mtd_flash0;
  * @brief Partition 0
  */
 #ifdef FAL_PART0_LABEL
+#ifndef FAL_PART0_OFFSET
+/**
+ * @brief Offset of partition 0
+ */
+#define FAL_PART0_OFFSET    0
+#endif
 #define FAL_ROW_PART0   { FAL_PART_MAGIC_WORD, FAL_PART0_LABEL, "fal_mtd", \
-                          0, FAL_PART0_LENGTH, 0 },
+                          FAL_PART0_OFFSET, FAL_PART0_LENGTH, 0 },
 #else
 #define FAL_ROW_PART0
 #endif
@@ -91,8 +97,14 @@ extern struct fal_flash_dev mtd_flash0;
  * @brief Partition 1
  */
 #ifdef FAL_PART1_LABEL
+#ifndef FAL_PART1_OFFSET
+/**
+ * @brief Offset of partition 1
+ */
+#define FAL_PART1_OFFSET    (FAL_PART0_OFFSET + FAL_PART0_LENGTH)
+#endif
 #define FAL_ROW_PART1   { FAL_PART_MAGIC_WORD, FAL_PART1_LABEL, "fal_mtd", \
-                          FAL_PART0_LENGTH, FAL_PART1_LENGTH, 0 },
+                          FAL_PART1_OFFSET, FAL_PART1_LENGTH, 0 },
 #else
 #define FAL_ROW_PART1
 #endif
@@ -101,8 +113,14 @@ extern struct fal_flash_dev mtd_flash0;
  * @brief Partition 2
  */
 #ifdef FAL_PART2_LABEL
+#ifndef FAL_PART2_OFFSET
+/**
+ * @brief Offset of partition 2
+ */
+#define FAL_PART2_OFFSET    (FAL_PART1_OFFSET + FAL_PART1_LENGTH)
+#endif
 #define FAL_ROW_PART2   { FAL_PART_MAGIC_WORD, FAL_PART2_LABEL, "fal_mtd",
-                          FAL_PART1_LENGTH, FAL_PART2_LENGTH, 0 },
+                          FAL_PART2_OFFSET, FAL_PART2_LENGTH, 0 },
 #else
 #define FAL_ROW_PART2
 #endif
@@ -111,8 +129,14 @@ extern struct fal_flash_dev mtd_flash0;
  * @brief Partition 3
  */
 #ifdef FAL_PART3_LABEL
+#ifndef FAL_PART3_OFFSET
+/**
+ * @brief Offset of partition 3
+ */
+#define FAL_PART3_OFFSET    (FAL_PART2_OFFSET + FAL_PART2_LENGTH)
+#endif
 #define FAL_ROW_PART3   { FAL_PART_MAGIC_WORD, FAL_PART3_LABEL, "fal_mtd",
-                          FAL_PART2_LENGTH, FAL_PART3_LENGTH, 0 },
+                          FAL_PART3_OFFSET, FAL_PART3_LENGTH, 0 },
 #else
 #define FAL_ROW_PART3
 #endif
