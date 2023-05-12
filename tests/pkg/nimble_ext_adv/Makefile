@@ -1,5 +1,5 @@
 BOARD ?= nrf52840dk
-include ../Makefile.tests_common
+include ../Makefile.pkg_common
 
 # we want shell support
 USEMODULE += shell

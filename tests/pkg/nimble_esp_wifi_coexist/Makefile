@@ -1,4 +1,4 @@
-include ../Makefile.tests_common
+include ../Makefile.pkg_common
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= esp32-wroom-32

@@ -1,5 +1,5 @@
 BOARD ?= nrf52dk
-include ../Makefile.tests_common
+include ../Makefile.pkg_common
 
 # include shell support
 USEMODULE += shell_cmds_default
