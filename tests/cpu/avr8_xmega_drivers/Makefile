@@ -1,6 +1,6 @@
 BOARD ?= atxmega-a1u-xpro
 
-include ../Makefile.tests_common
+include ../Makefile.cpu_common
 
 # list of ATxmega boards
 BOARD_WHITELIST = \

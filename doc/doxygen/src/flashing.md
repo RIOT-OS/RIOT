@@ -196,8 +196,8 @@ JTAG. Also JTAG requires more signal lines to be connected compared to SWD and
 some internal programmers only have the SWD signal lines connected, so that
 JTAG will not be possible.
 
-`stm32flash` Configuration                  {#flashing-configuration-stm32flash}
---------------------------
+stm32flash Configuration                  {#flashing-configuration-stm32flash}
+------------------------
 
 It is possible to automatically boot the STM32 board into the in-ROM bootloader
 that `stm32flash` communicates with for flashing by connecting the RST pin to

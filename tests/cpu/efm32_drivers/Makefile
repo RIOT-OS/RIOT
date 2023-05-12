@@ -1,5 +1,5 @@
 BOARD ?= sltb001a
-include ../Makefile.tests_common
+include ../Makefile.cpu_common
 
 FEATURES_REQUIRED += efm32_coretemp
 

@@ -1,5 +1,5 @@
 BOARD ?= sltb001a
-include ../Makefile.tests_common
+include ../Makefile.cpu_common
 
 BOARD_WHITELIST := ikea-tradfri \
                    slstk3401a \
