@@ -19,6 +19,7 @@ APPLICATION_DIRS :=                   \
     tests/core                        \
     tests/cpu                         \
     tests/drivers                     \
+    tests/net                         \
     tests/periph                      \
     tests/pkg                         \
     tests/sys                         \
