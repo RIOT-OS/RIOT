@@ -1,5 +1,5 @@
 INCLUDES += -I$(APPDIR)
-BOARD ?= nrf52dk
+BOARD ?= nrf52840dk
 
 include ../Makefile.drivers_common
 
