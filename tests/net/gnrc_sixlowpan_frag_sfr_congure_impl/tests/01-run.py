@@ -8,6 +8,7 @@
 # directory for more details.
 
 import contextlib
+import os
 import subprocess
 import sys
 import time
@@ -19,6 +20,8 @@ from riotctrl.ctrl import RIOTCtrlBoardFactory
 from riotctrl_ctrl import native
 from riotctrl_shell.netif import IfconfigListParser
 
+RIOTBASE = os.getenv("RIOTBASE", os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../")))
+ZEP_DISPATCH_PATH = os.path.join(RIOTBASE, "dist/tools/zep_dispatch/bin/zep_dispatch")
 PARSERS = {
     "ping6": GNRCICMPv6EchoParser(),
     "ifconfig": IfconfigListParser(),
@@ -135,7 +138,7 @@ def test_fragmentation(factory, zep_dispatch):
 def run_zep_dispatch():
     zep_dispatch = Popen(
         [
-            '../../dist/tools/zep_dispatch/bin/zep_dispatch',
+            ZEP_DISPATCH_PATH,
             '-t',
             '-',
             '127.0.0.1',
