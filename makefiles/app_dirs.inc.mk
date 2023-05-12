@@ -17,6 +17,7 @@ APPLICATION_DIRS :=                   \
     tests/bench                       \
     tests/build_system                \
     tests/core                        \
+    tests/cpu                         \
     tests/drivers                     \
     tests/periph                      \
     tests/pkg                         \
