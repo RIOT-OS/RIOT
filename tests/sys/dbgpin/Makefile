@@ -1,6 +1,6 @@
 BOARD ?= nucleo-f767zi
 
-include ../Makefile.tests_common
+include ../Makefile.sys_common
 
 USEMODULE += dbgpin
 USEMODULE += xtimer

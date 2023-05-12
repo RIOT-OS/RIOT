@@ -1,4 +1,4 @@
-include ../Makefile.tests_common
+include ../Makefile.sys_common
 
 USEMODULE += shell
 USEMODULE += shell_cmd_heap
