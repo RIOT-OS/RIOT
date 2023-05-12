@@ -1,4 +1,4 @@
-include ../Makefile.tests_common
+include ../Makefile.pkg_common
 
 LWIP_IPV4 ?= 0
 LWIP_IPV6 ?= 1
