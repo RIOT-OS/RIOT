@@ -1,5 +1,5 @@
 BOARD ?= nucleo-f411re
-include ../Makefile.tests_common
+include ../Makefile.cpu_common
 
 FEATURES_REQUIRED = bootloader_stm32
 

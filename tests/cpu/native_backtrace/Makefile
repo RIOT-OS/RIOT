@@ -1,4 +1,4 @@
-include ../Makefile.tests_common
+include ../Makefile.cpu_common
 
 USEMODULE += backtrace
 
