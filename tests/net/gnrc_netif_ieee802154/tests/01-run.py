@@ -23,7 +23,7 @@ def testfunc(child):
         dst = int(child.match.group(1).replace(':', ''), base=16)
 
         # first send valid packet to check if communication is set up correctly
-        # generated with udp send <link-local> 61616 0 in tests/gnrc_udp
+        # generated with udp send <link-local> 61616 0 in tests/net/gnrc_udp
         payload = b"\x7e\x33\xf3\x00"
         payload = (
             Dot15d4FCS(fcf_srcaddrmode=2, fcf_panidcompress=True,
