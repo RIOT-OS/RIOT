@@ -21,8 +21,8 @@
  * This module can be used by manually adding it to the command line when
  * building, e.g.,
  *
- *     USEMODULE+=dummy_thread make -C tests/rmutex
- *     make -C tests/rmutex test
+ *     USEMODULE+=dummy_thread make -C tests/core/rmutex
+ *     make -C tests/core/rmutex test
  *
  * Note how the output of the test changes compared to a build without
  * dummy_thread.
