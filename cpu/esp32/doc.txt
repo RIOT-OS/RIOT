@@ -576,11 +576,11 @@ command, for example:
 - RIOT Docker build image installation
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   $ BUILD_IN_DOCKER=1 DOCKER="sudo docker" \
-    make flash BOARD=esp32-wroom-32 -C tests/shell [Compile Options]
+    make flash BOARD=esp32-wroom-32 -C tests/sys/shell/ [Compile Options]
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 - Local toolchain installation
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  $ make flash BOARD=esp32-wroom-32 -C tests/shell [Compile Options]
+  $ make flash BOARD=esp32-wroom-32 -C tests/sys/shell/ [Compile Options]
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The `BOARD` variable in the example specifies the generic ESP32 board that uses
@@ -2051,12 +2051,12 @@ installed.
 To use QEMU for ESP32, an application has to be built with `esp_qemu` module
 enabled, for example with local toolchain installation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-$ USEMODULE=esp_qemu make flash BOARD=esp32-wroom-32 -C tests/shell
+$ USEMODULE=esp_qemu make flash BOARD=esp32-wroom-32 -C tests/sys/shell/
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 or with RIOT Docker build image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $ BUILD_IN_DOCKER=1 DOCKER="sudo docker" \
-  USEMODULE=esp_qemu make flash BOARD=esp32-wroom-32 -C tests/shell
+  USEMODULE=esp_qemu make flash BOARD=esp32-wroom-32 -C tests/sys/shell/
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Instead of flashing the image to the target hardware, a binary image named
@@ -2070,7 +2070,7 @@ QEMU for ESP32 can then be started with command:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $ qemu-system-xtensa \
     -s -machine esp32 \
-    -drive file=tests/shell/bin/esp32-wroom-32/qemu_flash_image.bin,if=mtd,format=raw \
+    -drive file=tests/sys/shell//bin/esp32-wroom-32/qemu_flash_image.bin,if=mtd,format=raw \
     -serial tcp::5555,server,nowait
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2099,12 +2099,12 @@ start_test           starts a test
 
 To debug the application in QEMU for ESP32, another terminal is required:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-$ xtensa-esp32-elf-gdb tests/shell/bin/esp32-wroom-32/tests_shell.elf
+$ xtensa-esp32-elf-gdb tests/sys/shell//bin/esp32-wroom-32/tests_shell.elf
 
 GNU gdb (crosstool-NG crosstool-ng-1.22.0-80-g6c4433a5) 7.10
 Copyright (C) 2015 Free Software Foundation, Inc.
 ...
-Reading symbols from tests/shell/bin/esp32-wroom-32/tests_shell.elf...done.
+Reading symbols from tests/sys/shell//bin/esp32-wroom-32/tests_shell.elf...done.
 (gdb) target remote :1234
 
 Remote debugging using :1234
@@ -2117,10 +2117,10 @@ QEMU for ESP32 can also be used in RIOT Docker build image. For that purpose
 QEMU has to be started in the Docker container.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $ sudo docker run --rm -i -t -u $UID -v $(pwd):/data/riotbuild riot/riotbuild
-riotbuild@container-id:~$ USEMODULE=esp_qemu make flash BOARD=esp32-wroom-32 -C tests/shell
+riotbuild@container-id:~$ USEMODULE=esp_qemu make flash BOARD=esp32-wroom-32 -C tests/sys/shell/
 riotbuild@container-id:~$ qemu-system-xtensa \
     -s -machine esp32 \
-    -drive file=tests/shell/bin/esp32-wroom-32/qemu_flash_image.bin,if=mtd,format=raw \
+    -drive file=tests/sys/shell//bin/esp32-wroom-32/qemu_flash_image.bin,if=mtd,format=raw \
     -serial tcp::5555,server,nowait
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2144,12 +2144,12 @@ test_shell.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $ sudo docker docker exec -it <container-id> bash
-riotbuild@container-id:~$ xtensa-esp32-elf-gdb tests/shell/bin/esp32-wroom-32/tests_shell.elf
+riotbuild@container-id:~$ xtensa-esp32-elf-gdb tests/sys/shell//bin/esp32-wroom-32/tests_shell.elf
 
 GNU gdb (crosstool-NG crosstool-ng-1.22.0-80-g6c4433a5) 7.10
 Copyright (C) 2015 Free Software Foundation, Inc.
 ...
-Reading symbols from tests/shell/bin/esp32-wroom-32/tests_shell.elf...done.
+Reading symbols from tests/sys/shell//bin/esp32-wroom-32/tests_shell.elf...done.
 (gdb) target remote :1234
 
 Remote debugging using :1234

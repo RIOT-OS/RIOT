@@ -52,7 +52,7 @@ DEFAULT_APPS = [
     "examples/hello-world",
     "tests/pkg/tinyusb_cdc_msc",
     "tests/mtd_mapper",
-    "tests/shell",
+    "tests/sys/shell/",
     "tests/saul"
 ]
 
