@@ -128,7 +128,7 @@ tests/drivers/s*
 tests/drivers/t*
 tests/drivers/u*
 tests/drivers/v*
-tests/external_board_dirs
+tests/build_system/external_board_dirs
 tests/periph/*
 tests/pkg/elk
 tests/pkg/uzlib
