@@ -195,7 +195,7 @@
  * @note Module `saul_gpio` has to be added to the
  * project to enable SAUL capabilities of the PCF857X driver, e.g.:
  *
- *      USEMODULE="pcf8575 saul_gpio" make -C tests/saul BOARD=...
+ *      USEMODULE="pcf8575 saul_gpio" make -C tests/drivers/saul BOARD=...
  *
  * ## Using Multiple Devices
  *
