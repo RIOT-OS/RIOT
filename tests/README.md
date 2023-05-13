@@ -1,9 +1,43 @@
 # Running and creating tests                        {#running-and-creating-tests}
 
 There are a number of tests included in RIOT. They are located in the
-[tests folder](https://github.com/RIOT-OS/RIOT/tree/master/tests). These tests
+[tests directory](https://github.com/RIOT-OS/RIOT/tree/master/tests). These tests
 allow basic functionality to be verified as well as provide an example of
 usage.
+
+# Directory Structure
+
+The [tests directory](https://github.com/RIOT-OS/RIOT/tree/master/tests) in RIOT
+is further divided into a number of subdirectories.
+
+- [*bench*](https://github.com/RIOT-OS/RIOT/tree/master/tests/bench): Benchmark
+  tests, these provide numbers on how RIOT performs on the used hardware.
+- [*build_system*](https://github.com/RIOT-OS/RIOT/tree/master/tests/build_system): Tests
+  the RIOT build system functionality, such as blob, external board/module/package dirs,
+  and kconfig.
+- [*core*](https://github.com/RIOT-OS/RIOT/tree/master/tests/core): Tests the
+  RIOT core functionality such as threading and IPC.
+- [*cpu*](https://github.com/RIOT-OS/RIOT/tree/master/tests/cpu): Tests
+  RIOT cpu specific features such as efm32, stm32, native and AVR.
+- [*drivers*](https://github.com/RIOT-OS/RIOT/tree/master/tests/drivers): Tests
+  individual drivers. The tests for sensors print the measured values to the
+  console, others demonstrate the functionality of the driver and attached
+  hardware.
+- [*net*](https://github.com/RIOT-OS/RIOT/tree/master/tests/net): Tests the
+  networking features provided in RIOT, such as CoAP, emcute, GNRC, IEEE 802.15.4
+  and sntp.
+- [*periph*](https://github.com/RIOT-OS/RIOT/tree/master/tests/periph): Tests the
+  low level peripherals in RIOT, such as interacting with SPI and I2C
+  peripherals.
+- [*pkg*](https://github.com/RIOT-OS/RIOT/tree/master/tests/pkg): Tests the
+  external packages available in RIOT, such as lvgl, lwip, nanocbor, and tinyusb.
+- [*sys*](https://github.com/RIOT-OS/RIOT/tree/master/tests/sys): Collection
+  of tests for the utilities in
+  [*sys*](https://github.com/RIOT-OS/RIOT/tree/master/sys) directory of RIOT.
+- [*unittests*](https://github.com/RIOT-OS/RIOT/tree/master/tests/unittests):
+  Collection of very simple test applications that test simple modules and do
+  not rely on extra hardware. Can be flashed and run as single application to
+  test all unit tests at once.
 
 # Running automated tests
 
