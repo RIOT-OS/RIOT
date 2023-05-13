@@ -27,7 +27,7 @@ Warning:
     available endpoints is not sufficient for this. To use this application you
     have to use `stdio_uart` or any other `stdio_*` module, for example:
 
-    USEMODULE=stdio_uart BOARD=$(BOARD) make -C tests/usbus_cdc_ecm
+    USEMODULE=stdio_uart BOARD=$(BOARD) make -C tests/sys/usbus_cdc_ecm
 
 endef
 
