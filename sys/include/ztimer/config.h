@@ -155,7 +155,7 @@ extern "C" {
  *          introduced by turning on the underlying peripheral.
  *
  * @note    This value can be measured with the
- *          `tests/ztimer_ondemand_benchmark` tool.
+ *          `tests/sys/ztimer_ondemand_benchmark` tool.
  *
  *          This value should be configured in the board.h.
  */
