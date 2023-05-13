@@ -86,7 +86,7 @@ applied. Note that if any dependency issue occurs, warnings will be generated
 ## Application configuration with Kconfig                 {#app-config-kconfig}
 To expose application-specific configuration options a `Kconfig` file can
 be placed in the application's folder. For an example of this you can check
-the [tests/kconfig](https://github.com/RIOT-OS/RIOT/tree/master/tests/kconfig)
+the [tests/build_system/kconfig](https://github.com/RIOT-OS/RIOT/tree/master/tests/build_system/kconfig)
 application.
 
 ## Configuration via environment variables                {#env-config-kconfig}
