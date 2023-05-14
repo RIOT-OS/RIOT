@@ -30,7 +30,7 @@
  * even before kernel initialization.
  * Memory properties are hardware specific and can depend on environmental conditions.
  * Thus, they should be evaluated for each individual deployment. A basic
- * testing tool is provided in /RIOT/tests/puf_sram.
+ * testing tool is provided in /RIOT/tests/sys/puf_sram.
  *
  * # Soft-reset detection
  *

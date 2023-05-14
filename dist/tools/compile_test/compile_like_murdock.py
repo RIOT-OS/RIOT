@@ -28,7 +28,7 @@ The following use cases are:
     `./compile_like_murdock.py -c stm32`
 
     I changed a driver the DHT driver
-    `./compile_like_murdock.py -a tests/drivers/dht tests/saul`
+    `./compile_like_murdock.py -a tests/drivers/dht tests/drivers/saul`
 
     I changed a nucleo-f103rb board...
     `./compile_like_murdock.py -a all -b nucleo-f103rb`
@@ -50,10 +50,10 @@ _RATIOS = [
 
 DEFAULT_APPS = [
     "examples/hello-world",
+    "tests/drivers/mtd_mapper",
+    "tests/drivers/saul",
     "tests/pkg/tinyusb_cdc_msc",
-    "tests/mtd_mapper",
-    "tests/shell",
-    "tests/saul"
+    "tests/sys/shell/",
 ]
 
 DEFAULT_BOARDS = [

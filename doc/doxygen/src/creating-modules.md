@@ -82,7 +82,7 @@ External modules can optionally define the following files:
             module `foo` must be located in `<PATH_IN_EXTERNAL_MODULE_DIRS>/foo`.
 
 An example can be found in
-[`tests/external_module_dirs`](https://github.com/RIOT-OS/RIOT/tree/master/tests/external_module_dirs)
+[`tests/build_system/external_module_dirs`](https://github.com/RIOT-OS/RIOT/tree/master/tests/build_system/external_module_dirs)
 
 Pseudomodules                                                  {#pseudomodules}
 =============

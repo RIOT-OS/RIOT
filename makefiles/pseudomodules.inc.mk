@@ -590,7 +590,7 @@ PSEUDOMODULES += ztimer64_%
 ## a configurable @ref CONFIG_ZTIMER_AUTO_ADJUST_SETTLE value can be set for this.
 ##
 ## Alternatively CONFIG_ZTIMER_USEC_ADJUST_% values can be set in the BOARDs
-## configuration header board.h. These can be found out by running tests/ztimer_overhead
+## configuration header board.h. These can be found out by running tests/sys/ztimer_overhead
 PSEUDOMODULES += ztimer_auto_adjust
 
 # core_lib is not a submodule

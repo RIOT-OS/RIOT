@@ -111,8 +111,8 @@ z1
 "}
 
 : ${TEST_KCONFIG_ENFORCE_APP_GROUPS:="
-tests/cb_mux*
-tests/congure_*
+examples/hello-world
+tests/build_system/external_board_dirs
 tests/drivers/b*
 tests/drivers/f*
 tests/drivers/g*
@@ -128,16 +128,16 @@ tests/drivers/s*
 tests/drivers/t*
 tests/drivers/u*
 tests/drivers/v*
-tests/external_board_dirs
+tests/net/ieee802154_hal
 tests/periph/*
 tests/pkg/elk
 tests/pkg/uzlib
-tests/prng_*
-tests/trace
-tests/xtimer_*
-tests/ztimer_*
-examples/hello-world
-tests/ieee802154_hal
+tests/sys/cb_mux*
+tests/sys/congure_*
+tests/sys/prng_*
+tests/sys/trace
+tests/sys/xtimer_*
+tests/sys/ztimer_*
 "}
 
 # This list prevents boards from being tested by the TEST_KCONFIG_TEST_ALLOWLIST
@@ -155,8 +155,8 @@ tests/ieee802154_hal
 # the kconfig implementations.
 : ${TEST_KCONFIG_TEST_ALLOWLIST:="
 examples/hello-world
-tests/saul
-tests/mtd_mapper
+tests/drivers/saul
+tests/drivers/mtd_mapper
 "}
 
 : ${TEST_WITH_CONFIG_SUPPORTED:="examples/suit_update tests/drivers/at86rf2xx_aes"}

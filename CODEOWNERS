@@ -141,16 +141,16 @@
 /sys/ztimer/                                @kaspar030 @bergzand
 
 /tests/                                     @smlng @leandrolanzieri @aabadie @MichelRottleuthner @fjmolinas
-/tests/candev/                              @wosym
+/tests/drivers/candev/                      @wosym
 /tests/drivers/bq2429x/                     @jeandudey
 /tests/drivers/dht/                         @wosym
-/tests/gnrc*                                @miri64
-/tests/lwip*                                @miri64
+/tests/net/gnrc*                            @miri64
+/tests/pkg/lwip*                            @miri64
 /tests/pkg/libschc/                         @miri64
-/tests/slip/                                @miri64
+/tests/net/slip/                            @miri64
 /tests/unittests                            @miri64
 /tests/*/tests/*.py                         @miri64
-/tests/cpu_efm32_features/                  @basilfx
+/tests/cpu/efm32_features/                  @basilfx
 
 # KConfig maintainers will be notified about all KConfig changes
 Kconfig                                     @leandrolanzieri @jia200x @MrKevinWeiss

@@ -2,7 +2,7 @@ Test description
 ==========
 The testsuite tests the GNRC TCP integration into the SOCK TCP interface.
 The tests offer only basic verification of the SOCK TCP interface since GNRC TCP aims
-follow the SOCK TCP interface as close as possible, detailed tests are under tests/gnrc_tcp
+follow the SOCK TCP interface as close as possible, detailed tests are under tests/net/gnrc_tcp
 
 Setup
 ==========

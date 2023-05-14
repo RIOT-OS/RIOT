@@ -41,7 +41,7 @@ TEST_INTERACTIVE_DELAY = int(os.environ.get('TEST_INTERACTIVE_DELAY') or 1)
 TESTRUNNER_RESET_AFTER_TERM = int(os.environ.get('TESTRUNNER_RESET_AFTER_TERM')
                                   or 0)
 
-# When running e.g. tests/shell_ble we don't want to reset the board, because
+# When running e.g. tests/sys/shell/_ble we don't want to reset the board, because
 # then ble-serial would terminate and the created virtual serial port would get
 # lost. By default the board is reset before the test starts.
 TESTRUNNER_RESET_BOARD_ON_STARTUP = \
