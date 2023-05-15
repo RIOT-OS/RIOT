@@ -20,7 +20,7 @@ entire platforms, e.g. Atmel SAM R21 Xplained Pro, Zolertia Z1, STM32 Discovery
 Boards etc. (see the list of
 [supported hardware](https://github.com/RIOT-OS/RIOT/wiki/RIOT-Platforms).
 Across all supported hardware (32-bit, 16-bit, and 8-bit platforms). RIOT
-provides a consistent API and enables ANSI C and C++ application programming,
+provides a consistent API and enables C and C++ application programming,
 with  multithreading, IPC, system timers, mutexes etc.
 
 A good high-level overview can be found in the article
