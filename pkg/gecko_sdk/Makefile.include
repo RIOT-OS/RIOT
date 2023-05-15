@@ -12,3 +12,8 @@ ifneq (,$(filter gecko_sdk_librail_pa,$(USEMODULE)))
   INCLUDES += -I$(PKGDIRBASE)/gecko_sdk/dist/radio/rail_lib/plugin/pa-conversions
   INCLUDES += -I$(PKGDIRBASE)/gecko_sdk/dist/radio/rail_lib/plugin/pa-conversions/$(EFM32_LIBRAIL_PA_HEADER_NAME)/config
 endif
+
+ifeq ($(CPU_CORE),cortex-m33)
+  # Disable -Wcast-align globally on cortex-m33 for this package
+  CFLAGS += -Wno-cast-align
+endif

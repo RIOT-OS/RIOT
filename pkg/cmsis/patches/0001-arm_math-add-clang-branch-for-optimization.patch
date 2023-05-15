@@ -1,0 +1,29 @@
+From 232e7ea0398c5e6a5f903abbeeda6c675d7b826d Mon Sep 17 00:00:00 2001
+From: Alexandre Abadie <alexandre.abadie@inria.fr>
+Date: Fri, 6 May 2022 20:30:52 +0200
+Subject: [PATCH 1/1] arm_math: add clang branch for optimization
+
+---
+ CMSIS/DSP/Include/arm_math_types.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/CMSIS/DSP/Include/arm_math_types.h b/CMSIS/DSP/Include/arm_math_types.h
+index c615e66..e2090c2 100755
+--- a/CMSIS/DSP/Include/arm_math_types.h
++++ b/CMSIS/DSP/Include/arm_math_types.h
+@@ -46,6 +46,12 @@ extern "C"
+   #pragma GCC diagnostic ignored "-Wconversion"
+   #pragma GCC diagnostic ignored "-Wunused-parameter"
+ 
++#elif defined(__clang__)
++  #define LOW_OPTIMIZATION_ENTER __attribute__(( optnone ))
++  #define LOW_OPTIMIZATION_EXIT
++  #define IAR_ONLY_LOW_OPTIMIZATION_ENTER
++  #define IAR_ONLY_LOW_OPTIMIZATION_EXIT
++
+ #elif defined ( __ICCARM__ )
+ 
+ #elif defined ( __TI_ARM__ )
+-- 
+2.34.1
+

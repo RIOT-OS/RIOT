@@ -1,4 +1,0 @@
-INCLUDES += -I$(PKGDIRBASE)/cmsis-dsp/CMSIS/DSP/Include
-
-# cmsis-dsp module is not a concrete module, so declare it as a pseudomodule
-PSEUDOMODULES += cmsis-dsp

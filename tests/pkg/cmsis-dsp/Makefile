@@ -1,15 +1,18 @@
 BOARD ?= samr21-xpro
 include ../Makefile.pkg_common
 
-USEPKG += cmsis-dsp
+USEPKG += cmsis
+USEMODULE += cmsis-dsp
 
 BOARD_WHITELIST := \
   airfy-beacon \
   arduino-due \
+  b-u585i-iot02a \
   cc2538dk \
   f4vi1 \
   iotlab-m3 \
   mbed_lpc1768 \
+  microbit-v2 \
   msbiot \
   mulle \
   nucleo-f091rc \
@@ -19,6 +22,7 @@ BOARD_WHITELIST := \
   nucleo-f334r8 \
   nucleo-f401re \
   nucleo-l152re \
+  nucleo-l476rg \
   openmote-cc2538 \
   pba-d-01-kw2x \
   samd21-xpro \

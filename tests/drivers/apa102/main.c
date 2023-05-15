@@ -31,7 +31,7 @@
 /**
  * @brief   Switch to the next LED every 10ms
  */
-#define STEP        (200 * US_PER_MS)
+#define STEP_MS     (200 * US_PER_MS)
 
 /**
  * @brief   Interval for dimming colors
@@ -132,7 +132,7 @@ int main(void)
             step *= -1;
         }
 
-        xtimer_periodic_wakeup(&now, STEP);
+        xtimer_periodic_wakeup(&now, STEP_MS);
     }
 
     return 0;

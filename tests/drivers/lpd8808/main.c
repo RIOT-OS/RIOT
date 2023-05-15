@@ -31,7 +31,7 @@
 /**
  * @brief   Switch to the next LED every 10ms
  */
-#define STEP        (10 * 1000U)
+#define STEP_MS     (10 * 1000U)
 
 /**
  * @brief   Allocate the device descriptor
@@ -77,7 +77,7 @@ int main(void)
             step *= -1;
         }
 
-        xtimer_periodic_wakeup(&now, STEP);
+        xtimer_periodic_wakeup(&now, STEP_MS);
     }
 
     return 0;
