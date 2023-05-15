@@ -58,7 +58,10 @@ for app in ${APPLICATIONS}; do
     # as this is exactly what we want here
     # shellcheck disable=SC2086
     if ! make BOARD="${BOARD}" ${LOCAL_MAKE_ARGS} -C "${RIOTBASE}/${application}" > "$TMPFILE" 2>&1; then
-        if grep -e overflowed -e "not within region" "$TMPFILE" > /dev/null; then
+        if grep -e overflowed \
+                -e "not within region" \
+                -e "wraps around address space" \
+                "$TMPFILE" > /dev/null; then
             printf "${CBIG}%s${CRESET}\n" "too big"
             make -f "$(dirname "$0")"/Makefile.for_sh DIR="${RIOTBASE}/${application}" BOARD="${BOARD}" Makefile.ci > /dev/null
         elif grep -e "not whitelisted" \
