@@ -65,8 +65,8 @@
  *
  * Follow the instructions in the section _Write Options and Payload_ below.
  *
- * To send the message and await the response, see nanocoap_request() as well
- * as nanocoap_get(), which additionally copies the response payload to a user
+ * To send the message and await the response, see nanocoap_sock_request() as well
+ * as nanocoap_sock_get(), which additionally copies the response payload to a user
  * supplied buffer. Finally, read the response as described above in the server
  * _Handler functions_ section for reading a request.
  *
@@ -564,23 +564,6 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
  */
 ssize_t nanocoap_request(coap_pkt_t *pkt, const sock_udp_ep_t *local,
                          const sock_udp_ep_t *remote, size_t len);
-
-/**
- * @brief   Simple synchronous CoAP (confirmable) get
- *
- * @deprecated  Will be removed after the 2023.04 release.
- *              Please use @ref nanocoap_sock_get instead.
- *
- * @param[in]   remote  remote UDP endpoint
- * @param[in]   path    remote path
- * @param[out]  buf     buffer to write response to
- * @param[in]   len     length of @p buffer
- *
- * @returns     length of response payload on success
- * @returns     <0 on error
- */
-ssize_t nanocoap_get(const sock_udp_ep_t *remote, const char *path,
-                     void *buf, size_t len);
 
 /**
  * @brief   Initialize block request context by URL and connect a socket
