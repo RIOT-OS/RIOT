@@ -254,6 +254,6 @@ menu "LVGL RIOT configuration"
 
 endmenu
 
-osource "$(RIOTBASE)/build/pkg/lvgl/Kconfig"
+osource "$(PKGDIRBASE)/lvgl/Kconfig"
 
 endif

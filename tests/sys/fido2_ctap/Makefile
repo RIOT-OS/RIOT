@@ -23,7 +23,7 @@ USB_PID ?= $(USB_PID_TESTING)
 # compiled natively (x86-64). Therefore we need to clear the flags set by e.g.
 # BOARD = nrf52840dk
 fido2-test:
-	env -i PATH=$(PATH) $(MAKE) -C $(RIOTBASE)/build/pkg/fido2_tests
+	env -i PATH=$(PATH) $(MAKE) -C $(PKGDIRBASE)/fido2_tests
 
 # FIDO2 user presence tests.
 #
@@ -33,6 +33,6 @@ fido2-test:
 # compiled natively (x86-64). Therefore we need to clear the flags set by e.g.
 # BOARD = nrf52840dk
 fido2-test-up:
-	env -i PATH=$(PATH) $(MAKE) -C $(RIOTBASE)/build/pkg/fido2_tests up-tests
+	env -i PATH=$(PATH) $(MAKE) -C $(PKGDIRBASE)/fido2_tests up-tests
 
 include $(RIOTBASE)/Makefile.include
