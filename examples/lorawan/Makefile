@@ -45,6 +45,9 @@ USEMODULE += auto_init_loramac
 USEMODULE += $(DRIVER)
 USEMODULE += fmt
 FEATURES_OPTIONAL += periph_rtc
+# Needed to fix the backend o ztimer so the RTC is free
+USEMODULE += ztimer_msec
+USEMODULE += ztimer_periph_timer
 
 # Uncomment the following line to enable Loramac stack state persistence on EEPROM.
 # Make sure the EEPROM is erased before enabling this and when flashing a board

@@ -87,7 +87,7 @@ endif
 
 ifneq (,$(filter ztimer_msec ztimer_sec,$(USEMODULE)))
   USEMODULE += ztimer
-  ifeq (,$(filter ztimer_no_periph_rtt,$(USEMODULE)))
+  ifeq (,$(filter ztimer_no_periph_rtt ztimer_periph_timer,$(USEMODULE)))
     FEATURES_OPTIONAL += periph_rtt
     # HACK: periph_rtt will get used only in the next iteration but an updated
     # state for FEATURES_USED is needed here so include `features_check.inc.mk`
