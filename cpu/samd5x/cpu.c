@@ -254,7 +254,11 @@ void sam0_gclk_enable(uint8_t id)
         } else if (USE_XOSC) {
             gclk_connect(SAM0_GCLK_PERIPH, GCLK_SOURCE_ACTIVE_XOSC, 0);
         }
-
+        break;
+    case SAM0_GCLK_200MHZ:
+        fdpll_init_nolock(1, MHZ(200), OSCCTRL_DPLLCTRLA_ONDEMAND);
+        gclk_connect(SAM0_GCLK_200MHZ, GCLK_SOURCE_DPLL1, 0);
+        fdpll_lock(1);
         break;
     }
 }
@@ -277,6 +281,8 @@ uint32_t sam0_gclk_freq(uint8_t id)
             assert(0);
             return 0;
         }
+    case SAM0_GCLK_200MHZ:
+        return MHZ(200);
     default:
         return 0;
     }
