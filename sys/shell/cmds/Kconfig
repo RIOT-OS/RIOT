@@ -308,6 +308,11 @@ config MODULE_SHELL_CMD_SYS
     default y if MODULE_SHELL_CMDS_DEFAULT
     depends on MODULE_SHELL_CMDS
 
+config MODULE_SHELL_CMD_CORECLK
+    bool "Shell command printing the CPU frequency"
+    default n
+    depends on MODULE_SHELL_CMDS
+
 config MODULE_SHELL_CMD_VFS
     bool "Commands for the VFS module (ls, vfs)"
     default y if MODULE_SHELL_CMDS_DEFAULT
