@@ -104,6 +104,8 @@ COMPILE_FLAGS := -Wall \
 %.wat: %.wasm Makefile
 	wasm2wat -o $@ $<
 
+hello.wasm:
+
 ifeq ($(COPY_HELLO),YES)
 hello.wasm: hello_prebuild.wasm
 	@echo "!! NO wasm-ld(-VERSION) found  !!"
