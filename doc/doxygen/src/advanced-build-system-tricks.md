@@ -86,3 +86,10 @@ This will compile and link the application for every board available and record
 the result in the Makefile.ci. This requires the toolchain for every target to
 be available. The target supports using docker via the `BUILD_IN_DOCKER=1`
 variable.
+
+Out of Tree Cache Directory                            {#out-of-tree-cache-dir}
+===========================
+
+By exporting the `BUILD_DIR` environment variable, a custom build / clone cache
+directory can be created. This can be particularly useful when working with
+multiple git work trees or clones of the RIOT repository.

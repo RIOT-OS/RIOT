@@ -23,7 +23,7 @@
  * packages is fetched in a global location in:
  *
  * ~~~~~~~~ {.mk}
- * $(RIOTBASE)/build/pkg/$(PKG_NAME)
+ * $(PKGDIRBASE)/$(PKG_NAME)
  * ~~~~~~~~
  *
  * When out-of-source build is not possible (for example because the package
