@@ -34,14 +34,6 @@
 #define USE_VREG_BUCK   (0)
 #endif
 
-/*
- * An external inductor needs to be present on the board,
- * so the feature can only be enabled by the board configuration.
- */
-#ifndef USE_VREG_BUCK
-#define USE_VREG_BUCK   (0)
-#endif
-
 #if CLOCK_CORECLOCK == 0
 #error Please select CLOCK_CORECLOCK
 #endif
