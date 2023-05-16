@@ -30,6 +30,8 @@
 
 #if AT86RF2XX_IS_PERIPH
 #include <string.h>
+#include "irq.h"
+#include "time_units.h"
 #endif
 #include "at86rf2xx_registers.h"
 
@@ -292,6 +294,46 @@ static inline uint8_t at86rf2xx_get_irq_flags(at86rf2xx_t *dev)
 #endif
 
 }
+
+#if AT86RF2XX_IS_PERIPH
+/*
+ * Read a 32 bit register as described in section 10.3 of the datasheet: A read
+ * of the least significant byte causes the current value to be atomically
+ * captured in a temporary 32 bit registers. The remaining reads will access this
+ * register instead. Only a single 32 bit temporary register is used to provide
+ * means to atomically access them. Thus, interrupts must be disabled during the
+ * read sequence in order to prevent other threads (or ISRs) from updating the
+ * temporary 32 bit register before the reading sequence has completed.
+ */
+static inline uint32_t reg32_read(volatile uint8_t *reg_ll)
+{
+    le_uint32_t reg;
+    unsigned state = irq_disable();
+    reg.u8[0] =  reg_ll[0];
+    reg.u8[1] =  reg_ll[1];
+    reg.u8[2] =  reg_ll[2];
+    reg.u8[3] =  reg_ll[3];
+    irq_restore(state);
+    return reg.u32;
+}
+
+/**
+ * @brief Get the timestamp of the packet in symbol counter ticks
+ *
+ * @param[in] dev   pointer to the device descriptor
+ *
+ * @return the symbol counter value
+ */
+static inline uint32_t at86rf2xx_get_sc(const at86rf2xx_t *dev)
+{
+    (void) dev;
+    return reg32_read(&SCCNTLL);
+}
+
+/* Symbol counter frequency is 62500Hz. One symbol counter tick is 16us = 16000 ns*/
+#define SC_TO_NS (16000LU)
+
+#endif
 
 #ifdef __cplusplus
 }

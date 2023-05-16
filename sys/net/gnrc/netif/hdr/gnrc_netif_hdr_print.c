@@ -36,10 +36,14 @@ void gnrc_netif_hdr_print(gnrc_netif_hdr_t *hdr)
         if (hdr->flags & GNRC_NETIF_HDR_FLAGS_BROADCAST) {
             printf("BROADCAST ");
         }
-
         if (hdr->flags & GNRC_NETIF_HDR_FLAGS_MULTICAST) {
             printf("MULTICAST ");
         }
+#if IS_USED(MODULE_GNRC_NETIF_TIMESTAMP)
+        if (hdr->flags & GNRC_NETIF_HDR_FLAGS_TIMESTAMP) {
+            printf("TIMESTAMP ");
+        }
+#endif
         puts("");
     }
     else {
