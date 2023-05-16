@@ -21,19 +21,27 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+#include "macros/units.h"
+#include "periph_cpu.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/**
- * @name    Clock configuration
- * @{
- */
-/** @todo   Move all clock configuration code here from the board.h */
-#define CLOCK_CORECLOCK     (8000000U)
+#define CLOCK_CORECLOCK     MHZ(8)
 
-#define CLOCK_CMCLK         CLOCK_CORECLOCK     /* no divider programmed */
-/** @} */
+/**
+ * @brief   Clock configuration
+ */
+static const msp430_fxyz_clock_params_t clock_params = {
+    .xt2_frequency = CLOCK_CORECLOCK,
+    .lfxt1_frequency = 32768,
+    .main_clock_source = MAIN_CLOCK_SOURCE_XT2CLK,
+    .submain_clock_source = SUBMAIN_CLOCK_SOURCE_XT2CLK,
+    .main_clock_divier = MAIN_CLOCK_DIVIDE_BY_1,
+    .submain_clock_divier = SUBMAIN_CLOCK_DIVIDE_BY_1,
+    .auxiliary_clock_divier = AUXILIARY_CLOCK_DIVIDE_BY_1,
+};
 
 /**
  * @name    Timer configuration

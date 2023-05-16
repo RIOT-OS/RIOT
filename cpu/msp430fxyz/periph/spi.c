@@ -77,7 +77,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     mutex_lock(&spi_lock);
 
     /* calculate baudrate */
-    uint32_t br = CLOCK_CMCLK / clk;
+    uint32_t br = msp430_fxyz_submain_clock_freq() / clk;
     /* make sure the is not smaller then 2 */
     if (br < 2) {
         br = 2;

@@ -10,9 +10,9 @@ BOARD_INSUFFICIENT_MEMORY := \
     b-l072z-lrwan1 \
     blackpill-stm32f103c8 \
     blackpill-stm32f103cb \
+    bluepill-stm32f030c8 \
     bluepill-stm32f103c8 \
     bluepill-stm32f103cb \
-    bluepill-stm32f030c8 \
     calliope-mini \
     cc1312-launchpad \
     cc1350-launchpad \
@@ -71,6 +71,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-l433rc \
     nucleo-wl55jc \
     nz32-sc151 \
+    olimex-msp430-h1611 \
     olimexino-stm32 \
     opencm904 \
     openlabs-kw41z-mini-256kib \
@@ -85,8 +86,8 @@ BOARD_INSUFFICIENT_MEMORY := \
     samr30-xpro \
     samr34-xpro \
     seeedstudio-gd32 \
-    sipeed-longan-nano \
     sensebox_samd21 \
+    sipeed-longan-nano \
     slstk3400a \
     slstk3401a \
     sltb001a \

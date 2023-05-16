@@ -27,15 +27,21 @@
 extern "C" {
 #endif
 
-/**
- * @name    Clock configuration
- * @{
- */
-/** @todo   Move all clock configuration code here from the board.h */
 #define CLOCK_CORECLOCK     (7372800U)
 
-#define CLOCK_CMCLK         CLOCK_CORECLOCK     /* no divider programmed */
-/** @} */
+/**
+ * @brief   Clock configuration
+ */
+static const msp430_fxyz_clock_params_t clock_params = {
+    .xt2_frequency = CLOCK_CORECLOCK,
+    .lfxt1_frequency = 32768,
+    .main_clock_source = MAIN_CLOCK_SOURCE_XT2CLK,
+    .submain_clock_source = SUBMAIN_CLOCK_SOURCE_XT2CLK,
+    .main_clock_divier = MAIN_CLOCK_DIVIDE_BY_1,
+    .submain_clock_divier = SUBMAIN_CLOCK_DIVIDE_BY_1,
+    .auxiliary_clock_divier = AUXILIARY_CLOCK_DIVIDE_BY_1,
+    .has_r_osc = true,
+};
 
 /**
  * @name    Timer configuration

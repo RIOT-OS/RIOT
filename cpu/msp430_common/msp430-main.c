@@ -45,6 +45,7 @@
 #include "cpu.h"
 #include "irq.h"
 #include "periph/init.h"
+#include "periph_cpu.h"
 
 /*---------------------------------------------------------------------------*/
 static void
@@ -108,6 +109,7 @@ void msp430_cpu_init(void)
 {
     irq_disable();
     init_ports();
+    clock_init();
     irq_enable();
 }
 /*---------------------------------------------------------------------------*/

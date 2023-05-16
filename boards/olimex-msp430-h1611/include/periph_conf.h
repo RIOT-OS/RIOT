@@ -8,11 +8,11 @@
  */
 
 /**
- * @ingroup     boards_telosb
+ * @ingroup     boards_olimex_msp430_h1611
  * @{
  *
  * @file
- * @brief       TelosB peripheral configuration
+ * @brief       Olimex-MSP430-H1611 peripheral configuration
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
@@ -21,20 +21,20 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
-#include "macros/units.h"
 #include "periph_cpu.h"
+#include "macros/units.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define CLOCK_CORECLOCK             msp430_fxyz_dco_freq
+#define CLOCK_CORECLOCK     msp430_fxyz_dco_freq
 
 /**
  * @brief   Clock configuration
  */
 static const msp430_fxyz_clock_params_t clock_params = {
-    .target_dco_frequency = 2457600U,
+    .target_dco_frequency = MHZ(8),
     .lfxt1_frequency = 32768,
     .main_clock_source = MAIN_CLOCK_SOURCE_DCOCLK,
     .submain_clock_source = SUBMAIN_CLOCK_SOURCE_DCOCLK,

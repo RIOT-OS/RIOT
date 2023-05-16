@@ -72,7 +72,7 @@ static int init_base(uart_t uart, uint32_t baudrate)
     dev->TCTL = (USART_TCTL_TXEPT | USART_TCTL_SSEL_SMCLK);
     dev->RCTL = 0x00;
     /* baudrate configuration */
-    uint16_t br = (uint16_t)(CLOCK_CMCLK / baudrate);
+    uint16_t br = (uint16_t)(msp430_fxyz_submain_clock_freq() / baudrate);
     dev->BR0 = (uint8_t)br;
     dev->BR1 = (uint8_t)(br >> 8);
     /* TODO: calculate value for modulation register */
@@ -165,7 +165,7 @@ static int init_base(uart_t uart, uint32_t baudrate)
     dev->ACTL0 = 0;
     dev->ASTAT = 0;
     /* configure baudrate */
-    uint32_t base = ((CLOCK_CMCLK << 7)  / baudrate);
+    uint32_t base = ((msp430_fxyz_submain_clock_freq() << 7)  / baudrate);
     uint16_t br = (uint16_t)(base >> 7);
     uint8_t brs = (((base & 0x3f) * 8) >> 7);
     dev->ABR0 = (uint8_t)br;
