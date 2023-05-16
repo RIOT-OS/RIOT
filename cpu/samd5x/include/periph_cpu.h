@@ -47,7 +47,7 @@ extern "C" {
 /**
  * @brief   DPLL frequency must not exceed 200 MHz
  */
-#define SAM0_DPLL_FREQ_MAX_HZ   MHZ(20)
+#define SAM0_DPLL_FREQ_MAX_HZ   MHZ(200)
 
 /**
  * @name    Power mode configuration
