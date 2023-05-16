@@ -183,37 +183,43 @@ static void dfll_init(void)
     while (!OSCCTRL->STATUS.bit.DFLLRDY) {}
 }
 
-static void fdpll0_init(uint32_t f_cpu)
+static void fdpll_init_nolock(uint8_t idx, uint32_t f_cpu, uint8_t flags)
 {
+    /* Trigger assertion if not using FDPLL0 or FDPLL1 */
+    assert(idx == 0 || idx == 1);
+
     if (!USE_DPLL) {
-        OSCCTRL->Dpll[0].DPLLCTRLA.reg = 0;
+        OSCCTRL->Dpll[idx].DPLLCTRLA.reg = 0;
         return;
     }
 
-    /* We source the DPLL from 32kHz GCLK1 */
-    const uint32_t LDR = ((f_cpu << 5) / 32768);
+    /* Source the DPLL from 32kHz GCLK1 ( equivalent to ((f_cpu << 5) / 32768) ) */
+    const uint32_t LDR = (f_cpu >> 10);
 
     /* disable the DPLL before changing the configuration */
-    OSCCTRL->Dpll[0].DPLLCTRLA.bit.ENABLE = 0;
-    while (OSCCTRL->Dpll[0].DPLLSYNCBUSY.reg) {}
+    OSCCTRL->Dpll[idx].DPLLCTRLA.bit.ENABLE = 0;
+    while (OSCCTRL->Dpll[idx].DPLLSYNCBUSY.reg) {}
 
     /* set DPLL clock source */
-    GCLK->PCHCTRL[OSCCTRL_GCLK_ID_FDPLL0].reg = GCLK_PCHCTRL_GEN(1) | GCLK_PCHCTRL_CHEN;
-    while (!(GCLK->PCHCTRL[OSCCTRL_GCLK_ID_FDPLL0].reg & GCLK_PCHCTRL_CHEN)) {}
+    GCLK->PCHCTRL[OSCCTRL_GCLK_ID_FDPLL0 + idx].reg = GCLK_PCHCTRL_GEN(1) | GCLK_PCHCTRL_CHEN;
+    while (!(GCLK->PCHCTRL[OSCCTRL_GCLK_ID_FDPLL0 + idx].reg & GCLK_PCHCTRL_CHEN)) {}
 
-    OSCCTRL->Dpll[0].DPLLRATIO.reg = OSCCTRL_DPLLRATIO_LDRFRAC(LDR & 0x1F)
-                                   | OSCCTRL_DPLLRATIO_LDR((LDR >> 5) - 1);
+    OSCCTRL->Dpll[idx].DPLLRATIO.reg = OSCCTRL_DPLLRATIO_LDRFRAC(LDR & 0x1F)
+                                     | OSCCTRL_DPLLRATIO_LDR((LDR >> 5) - 1);
 
     /* Without LBYPASS, startup takes very long, see errata section 2.13. */
-    OSCCTRL->Dpll[0].DPLLCTRLB.reg = OSCCTRL_DPLLCTRLB_REFCLK_GCLK
-                                   | OSCCTRL_DPLLCTRLB_WUF
-                                   | OSCCTRL_DPLLCTRLB_LBYPASS;
+    OSCCTRL->Dpll[idx].DPLLCTRLB.reg = OSCCTRL_DPLLCTRLB_REFCLK_GCLK
+                                     | OSCCTRL_DPLLCTRLB_WUF
+                                     | OSCCTRL_DPLLCTRLB_LBYPASS;
 
-    OSCCTRL->Dpll[0].DPLLCTRLA.reg = OSCCTRL_DPLLCTRLA_ENABLE;
+    OSCCTRL->Dpll[idx].DPLLCTRLA.reg = OSCCTRL_DPLLCTRLA_ENABLE | flags;
 
-    while (OSCCTRL->Dpll[0].DPLLSYNCBUSY.reg) {}
-    while (!(OSCCTRL->Dpll[0].DPLLSTATUS.bit.CLKRDY &&
-             OSCCTRL->Dpll[0].DPLLSTATUS.bit.LOCK)) {}
+    while (OSCCTRL->Dpll[idx].DPLLSYNCBUSY.reg) {}
+}
+
+static void fdpll_lock(uint8_t idx) {
+    while (!(OSCCTRL->Dpll[idx].DPLLSTATUS.bit.CLKRDY &&
+             OSCCTRL->Dpll[idx].DPLLSTATUS.bit.LOCK)) {}
 }
 
 static void gclk_connect(uint8_t id, uint8_t src, uint32_t flags) {
@@ -346,12 +352,13 @@ void cpu_init(void)
 
     xosc_init(0);
     xosc_init(1);
-    fdpll0_init(CLOCK_CORECLOCK * DPLL_DIV);
 
     /* select the source of the main clock */
     if (USE_DPLL) {
+        fdpll_init_nolock(0, CLOCK_CORECLOCK * DPLL_DIV, OSCCTRL_DPLLCTRLA_ONDEMAND);
         gclk_connect(SAM0_GCLK_MAIN, GCLK_SOURCE_DPLL0,
                      GCLK_GENCTRL_DIV(DPLL_DIV));
+        fdpll_lock(0);
     } else if (USE_DFLL) {
         gclk_connect(SAM0_GCLK_MAIN, GCLK_SOURCE_DFLL,
                      GCLK_GENCTRL_DIV(SAM0_DFLL_FREQ_HZ / CLOCK_CORECLOCK));
