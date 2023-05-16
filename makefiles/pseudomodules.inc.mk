@@ -448,6 +448,7 @@ PSEUDOMODULES += shell_cmd_benchmark_udp
 PSEUDOMODULES += shell_cmd_ccn-lite-utils
 PSEUDOMODULES += shell_cmd_conn_can
 PSEUDOMODULES += shell_cmd_cord_ep
+PSEUDOMODULES += shell_cmd_coreclk
 PSEUDOMODULES += shell_cmd_cryptoauthlib
 PSEUDOMODULES += shell_cmd_dfplayer
 PSEUDOMODULES += shell_cmd_fib
