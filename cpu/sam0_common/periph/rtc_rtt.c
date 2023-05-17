@@ -26,8 +26,10 @@
  * @}
  */
 
+#include <errno.h>
 #include <stdint.h>
 #include <string.h>
+
 #include "pm_layered.h"
 #include "periph/rtc.h"
 #include "periph/rtt.h"
@@ -611,7 +613,7 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 
     if ((time->tm_year < reference_year) ||
         (time->tm_year > (reference_year + 63))) {
-        return -2;
+        return -EINVAL;
     }
 
     /* make sure that preceding changes have been applied */

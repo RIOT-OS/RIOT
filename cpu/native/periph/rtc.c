@@ -22,13 +22,14 @@
  * @}
  */
 
-#include <time.h>
+#include <err.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <err.h>
+#include <time.h>
 
-#include "periph/rtc.h"
 #include "cpu.h"
+#include "periph/rtc.h"
 #include "timex.h"
 #include "ztimer.h"
 
@@ -206,11 +207,11 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 {
     if (!_native_rtc_initialized) {
         warnx("rtc_set_alarm: not initialized");
-        return -1;
+        return -EIO;
     }
     if (!_native_rtc_powered) {
         warnx("rtc_set_alarm: not powered on");
-        return -1;
+        return -EIO;
     }
 
     struct tm now;
