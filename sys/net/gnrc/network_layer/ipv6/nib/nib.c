@@ -1715,6 +1715,22 @@ static uint32_t _handle_rio(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                              netif->pid, route_ltime);
     }
 
+    if (IS_ACTIVE(CONFIG_GNRC_NETIF_IPV6_BR_AUTO_6CTX) && gnrc_netif_is_6lbr(netif)) {
+        /* configure compression context */
+        int cid = gnrc_sixlowpan_ctx_update_6ctx(&rio->prefix, rio->prefix_len, route_ltime);
+        if (cid >= 0) {
+            DEBUG("gnrc_netif: add compression context for prefix %s/%u\n",
+                   ipv6_addr_to_str(addr_str, &rio->prefix, sizeof(addr_str)),
+                   rio->prefix_len);
+
+            /* add new context to ABRs */
+            _nib_abr_entry_t *abr = NULL;
+            while ((abr = _nib_abr_iter(abr))) {
+                bf_set(abr->ctxs, cid);
+            }
+        }
+    }
+
     return route_ltime;
 }
 /** @} */
