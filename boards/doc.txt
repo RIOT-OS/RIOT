@@ -17,6 +17,68 @@
  * device drivers should go into this module.
  *
 
+Board Selection Guide {#board-selection-guide}
+=====================
+
+There is no single best board to buy for use with RIOT, as hardware design
+involves many trade-offs. The challenge is to clearly assess the use case and
+collect the requirements and to find the best match for those.
+
+With this in mind, it is still possible to give some hints and recommendations:
+
+1. During Development:
+    - An integrated programmer/debugger is immensely useful. At the very least
+      a standard JTAG/SWD connector for quick and fool-proof connection is
+      required
+    - If possible, pick an MCU with *more* RAM and flash than your target board.
+      This allows to spend the excess in memory for debug features such as
+      utility modules, verbose assert messages, etc. during development
+    - Standard connectors such as Arduino Headers, or Grove, STEMMA, STEMMA QT,
+      QUIIC connectors etc. make hardware prototyping easier
+2. Final Product:
+    - An integrated programmer/debugger is a waste of resources (money, power,
+      space, ...)
+    - ...
+
+Popular Boards
+--------------
+
+| Board                                 | Use Case              | Performance   | Integrated Debugger   | Integrated Networking             | Native USB    | Arduino Headers       | Other Connectors          | Integrated Sensors/...                                | Breadboard Friendly   | Costs     | Remarks                       |
+|:------------------------------------- |:--------------------- |:------------- |:--------------------- |:--------------------------------- |:------------- |:--------------------- |:------------------------- |:----------------------------------------------------- |:--------------------- |:--------- |:----------------------------- |
+| @ref boards_arduino-due               | Education             | `++`          | ✔                     | ✗                                 | ✔             | `+++` (Uno, Mega, ISP)| ✗                         | `-` (1 LED)                                           | `+`                   | `o`       | Better buy the nrf52840dk     |
+| @ref boards_arduino-mega2560          | You have them anyway  | `--`          | ✗                     | ✗                                 | ✗             | `+++` (Uno, Mega, ISP)| ✗                         | `-` (1 LED)                                           | `+`                   | `--`      | Better buy the nrf52840dk     |
+| @ref boards_arduino-uno               | You have them anyway  | `---`         | ✗                     | ✗                                 | ✗             | `++` (Uno, ISP)       | ✗                         | `-` (1 LED)                                           | `+`                   | `--`      | You like pain, don't you?     |
+| @ref boards_common_nucleo32           | Development           | `-/o/+/++`    | ✔                     | ✗                                 | ✗             | `o` (Nano)            | Custom                    | `o` (1 button, 1 LED)                                 | `+`                   | `++`      | Good bang for the buck        |
+| @ref boards_common_nucleo64           | Development           | `o/+/++`      | ✔                     | ✗                                 | ✗             | `+` (Uno)             | ST Morpho Headers         | `o` (1 button, 1 LED)                                 | `+`                   | `++`      | Good bang for the buck        |
+| @ref boards_common_nucleo144          | Development           | `+/++/+++`    | ✔                     | (✔) (some have Ethernet)          | ✔             | `++` (Uno, Mega)      | ST Morpho Headers         | `+` (1 button, 3 LEDs)                                | `+`                   | `++`      | Good bang for the buck        |
+| @ref boards_esp32_esp-ethernet-kit    | Development           | `+++`         | ✔                     | ✔ (WiFi, BLE, Ethernet, custom)   | ✗             | ✗                     | Custom                    | `-` (1 button)                                        | `+`                   | `o`       | Requires proprietary software |
+| @ref boards_esp32_wroom-32            | Prototyping           | `+++`         | ✗                     | ✔ (WiFi, BLE, custom)             | ✗             | ✗                     | Custom                    | `-` (1 button)                                        | `+++`                 | `+++`     | Requires proprietary software |
+| @ref boards_microbit_v2               | Education             | `++`          | ✔                     | ✔ (802.15.4, BLE, custom)         | ✗             | ✗                     | micro:bit edge connector  | `+++` (6 buttons, LED matrix, mic, speaker, IMO)      | `--`                  | `++`      | Good education board          |
+| @ref boards_nrf52840dk                | Development           | `++`          | ✔                     | ✔ (802.15.4, BLE, custom)         | ✔             | `+++`(Uno, Mega)      | Custom                    | `+` (4 buttons, 4 LEDs)                               | `+`                   | `+`       | Excellent border router       |
+| @ref boards_nrf52840dongle            | Prototyping           | `++`          | ✗                     | ✔ (802.15.4, BLE, custom)         | ✔             | ✗                     | Custom                    |  o  (1 button, 4 LEDs)                                | `++`                  | `++`      | Good wireless dev board       |
+| @ref boards_nucleo-wl55jc             | Development           | `++`          | ✔                     | ✔ (LoRa)                          | ✗             | `+` (Uno)             | ST Morpho Headers         | `+` (3 buttons, 3 LEDs)                               | `+`                   | `++`      | Good bang for the buck        |
+| @ref boards_pinetime                  | Gadget                | `++`          | ✗                     | ✔ (BLE)                           | ✗             | ✗                     | ✗                         | `+++` (LCD, button, touch screen, IMU, flash, ...)    | `---`                 | `+++`     | Buy two: One with SWD access  |
+| @ref boards_samr21-xpro               | Development           | `+`           | ✔                     | ✔ (802.15.4)                      | ✔             | ✗                     | XPRO Expansion Header     | `o` (1 button, 1 LED)                                 | `+`                   | `--`      | Quite expensive               |
+| @ref boards_samr34-xpro               | Development           | `++`          | ✔                     | ✔ (LoRa)                          | ✔             | ✗                     | XPRO Expansion Header     | `o` (1 button, 2 LEDs)                                | `+`                   | `---`     | Got a spare kidney to sell?   |
+| @ref boards_weact-f411ce              | Prototyping           | `++`          | ✗                     | ✗                                 | ✔             | ✗                     | Custom                    | `+` (1 button, 1 LED, SPI flash)                      | `+++`                 | `+++`     | Excellent bang for the buck   |
+
+@note       Only boards with mature RIOT support and decent documentation qualify for above list
+@details    This list was last updated in May 2023
+
+
+<!-- Add when doc is fixed
+| @ref boards_b-l072z-lrwan1            | Development           | `+`           | ✔                     | ✔ (LoRa)                          | ✗             | `++` (Uno, Mega)      | ST Morpho Headers         | `+` (1 button, 4 LEDs)                                | `+`                   | `++`      | Good bang for the buck        |
+-->
+
+### Notes on Arduino Compatibility
+
+- Perfect (`+++`) only if it is fully compatible with both Arduino Uno and Arduino Mega Shields (including SPI via ISP connector)
+- Good (`++`) if it is fully compatible with Arduino Uno shields (including SPI via ISP connector)
+- Good (`++`) if it is partially compatible with both Arduino Uno and Arduino Mega Shields (no SPI via ISP connector)
+- Decent (`+`) if it is partially compatible with Arduino Uno Shields (no SPI via ISP connector)
+- Decent (`+`) if it is fully compatible with Arduino Nano Shields (including SPI via ISP connector)
+- OK (`o`) if it is partially compatible with Arduino Nano Shields
+
 Guide to board pinouts {#pinout_guide}
 =====================================
 
