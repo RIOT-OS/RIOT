@@ -1324,7 +1324,7 @@ int gnrc_netif_ipv6_add_prefix(gnrc_netif_t *netif,
 
         if (IS_ACTIVE(CONFIG_GNRC_NETIF_IPV6_BR_AUTO_6CTX)) {
             /* configure compression context */
-            if (gnrc_sixlowpan_ctx_update_6ctx(pfx, pfx_len, valid)) {
+            if (gnrc_sixlowpan_ctx_update_6ctx(pfx, pfx_len, valid) >= 0) {
                 DEBUG("gnrc_netif: add compression context for prefix %s/%u\n",
                        ipv6_addr_to_str(addr_str, pfx, sizeof(addr_str)), pfx_len);
             }

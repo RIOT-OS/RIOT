@@ -151,15 +151,15 @@ static inline bool gnrc_sixlowpan_ctx_match(const gnrc_sixlowpan_ctx_t *ctx,
  * @param[in] prefix_len Length of the IPv6 prefix
  * @param[in] valid      Lifetime of the prefix in seconds
  *
- * @return    true if a new compression context was created or an existing context
+ * @return    ID of the compression context if a new one was created or an existing one
  *                 was updated.
- *            false if no new context could be added
+ *            -1 if no new context could be added
  */
-static inline bool gnrc_sixlowpan_ctx_update_6ctx(const ipv6_addr_t *prefix, uint8_t prefix_len,
+static inline int gnrc_sixlowpan_ctx_update_6ctx(const ipv6_addr_t *prefix, uint8_t prefix_len,
                                                   uint32_t valid)
 {
     if (!IS_USED(MODULE_GNRC_SIXLOWPAN_CTX)) {
-        return false;
+        return -1;
     }
 
     gnrc_sixlowpan_ctx_t *ctx = gnrc_sixlowpan_ctx_lookup_addr(prefix);
@@ -180,13 +180,13 @@ static inline bool gnrc_sixlowpan_ctx_update_6ctx(const ipv6_addr_t *prefix, uin
             cid++;
         }
     }
-    if (cid < GNRC_SIXLOWPAN_CTX_SIZE) {
-        return gnrc_sixlowpan_ctx_update(cid, (ipv6_addr_t *)prefix, prefix_len,
-                                         valid / (60 * MS_PER_SEC),
-                                         true);
+    if (cid < GNRC_SIXLOWPAN_CTX_SIZE &&
+        gnrc_sixlowpan_ctx_update(cid, (ipv6_addr_t *)prefix, prefix_len,
+                                  valid / (60 * MS_PER_SEC), true)) {
+        return cid;
     }
 
-    return false;
+    return -1;
 }
 
 #ifdef TEST_SUITES
