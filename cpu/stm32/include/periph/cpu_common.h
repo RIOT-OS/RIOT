@@ -119,7 +119,7 @@ typedef enum {
  *
  * @return              bus clock frequency in Hz
  */
-uint32_t periph_apb_clk(uint8_t bus);
+uint32_t periph_apb_clk(bus_t bus);
 
 /**
  * @brief   Get the actual timer clock frequency
@@ -128,7 +128,7 @@ uint32_t periph_apb_clk(uint8_t bus);
  *
  * @return              timer clock frequency in Hz
  */
-uint32_t periph_timer_clk(uint8_t bus);
+uint32_t periph_timer_clk(bus_t bus);
 
 /**
  * @brief   Enable the given peripheral clock
