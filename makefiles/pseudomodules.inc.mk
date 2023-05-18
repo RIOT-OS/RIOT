@@ -36,7 +36,6 @@ PSEUDOMODULES += board_software_reset
 PSEUDOMODULES += can_mbox
 PSEUDOMODULES += can_pm
 PSEUDOMODULES += can_raw
-PSEUDOMODULES += ccn-lite-utils
 PSEUDOMODULES += cc2538_rf_obs_sig
 PSEUDOMODULES += conn_can_isotp_multi
 PSEUDOMODULES += cord_ep_standalone
@@ -153,12 +152,6 @@ PSEUDOMODULES += gnrc_netif_dedup
 
 ## @addtogroup 	net_gnrc_nettype
 ## @{
-
-## @defgroup 	net_gnrc_nettype_ccn        gnrc_nettype_ccn
-## @{
-## Enables @ref GNRC_NETTYPE_CCN and @ref GNRC_NETTYPE_CCN_CHUNK
-PSEUDOMODULES += gnrc_nettype_ccn
-## @}
 
 ## @defgroup 	net_gnrc_nettype_gomac      gnrc_nettype_gomac
 ## @{
@@ -445,7 +438,6 @@ PSEUDOMODULES += sha256sum
 PSEUDOMODULES += shell_cmd_app_metadata
 PSEUDOMODULES += shell_cmd_at30tse75x
 PSEUDOMODULES += shell_cmd_benchmark_udp
-PSEUDOMODULES += shell_cmd_ccn-lite-utils
 PSEUDOMODULES += shell_cmd_conn_can
 PSEUDOMODULES += shell_cmd_cord_ep
 PSEUDOMODULES += shell_cmd_coreclk
