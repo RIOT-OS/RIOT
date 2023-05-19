@@ -29,6 +29,7 @@
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netif.h"
+#include "time_units.h"
 
 #ifdef __cplusplus
 extern "C" {

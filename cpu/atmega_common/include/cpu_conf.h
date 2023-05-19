@@ -31,7 +31,9 @@
 extern "C" {
 #endif
 
+#ifndef THREAD_EXTRA_STACKSIZE_PRINTF
 #define THREAD_EXTRA_STACKSIZE_PRINTF    (128)
+#endif
 
 /**
  * @name           Kernel configuration
