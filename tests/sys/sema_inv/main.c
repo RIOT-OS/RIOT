@@ -21,7 +21,7 @@
 #include <stdio.h>
 
 #include "sema_inv.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 char t1_stack[THREAD_STACKSIZE_SMALL];
 char t2_stack[THREAD_STACKSIZE_SMALL];
@@ -38,7 +38,7 @@ static void *thread_count(void *arg)
 
     printf("THREAD %u start\n", ctx->id);
 
-    xtimer_msleep(5);
+    ztimer_sleep(ZTIMER_MSEC, 5);
 
     if (sema_inv_post(ctx->sync)) {
         printf("THREAD %u woke main thread\n", ctx->id);
@@ -53,7 +53,7 @@ static void *thread_bit(void *arg)
 
     printf("THREAD %u start\n", ctx->id);
 
-    xtimer_msleep(5);
+    ztimer_sleep(ZTIMER_MSEC, 5);
 
     if (sema_inv_post_mask(ctx->sync, 1 << ctx->id)) {
         printf("THREAD %u woke main thread\n", ctx->id);
@@ -86,7 +86,7 @@ static void test_counter_mode(void)
     puts("thread synced");
 
     /* wait for all threads to terminate, we are going to re-use the stack */
-    xtimer_msleep(50);
+    ztimer_sleep(ZTIMER_MSEC, 50);
 }
 
 static void test_mask_mode(void)
@@ -113,7 +113,7 @@ static void test_mask_mode(void)
     puts("thread synced");
 
     /* wait for all threads to terminate, we are going to re-use the stack */
-    xtimer_msleep(50);
+    ztimer_sleep(ZTIMER_MSEC, 50);
 }
 
 int main(void)
