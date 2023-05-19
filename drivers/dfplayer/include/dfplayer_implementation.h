@@ -240,16 +240,16 @@ static inline int dfplayer_source_set_contains(dfplayer_source_set_t set,
     return (set & (0x01 << src)) ? 1 : 0;
 }
 
-static inline void dfplayer_source_set_add(dfplayer_source_set_t set,
+static inline void dfplayer_source_set_add(dfplayer_source_set_t *set,
                                            dfplayer_source_t src)
 {
-    set |= 0x01 << src;
+    *set |= 0x01 << src;
 }
 
-static inline void dfplayer_source_set_rm(dfplayer_source_set_t set,
+static inline void dfplayer_source_set_rm(dfplayer_source_set_t *set,
                                           dfplayer_source_t src)
 {
-    set &= ~((dfplayer_source_set_t)(0x01 << src));
+    *set &= ~((dfplayer_source_set_t)(0x01 << src));
 }
 #endif /* !DOXYGEN */
 
