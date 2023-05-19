@@ -141,7 +141,7 @@ int pcf857x_init(pcf857x_t *dev, const pcf857x_params_t *params)
 
     _release(dev);
 
-    return PCF857X_OK;
+    return res;
 }
 
 int pcf857x_gpio_init(pcf857x_t *dev, gpio_t pin, gpio_mode_t mode)
