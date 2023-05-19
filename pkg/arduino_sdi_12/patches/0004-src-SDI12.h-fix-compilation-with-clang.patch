@@ -1,0 +1,26 @@
+From a2ec151b2d0094357b5b08cd541cd9deff4e97a6 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Fri, 19 May 2023 23:08:12 +0200
+Subject: [PATCH] src/SDI12.h: fix compilation with clang
+
+Fix `-Winconsistent-missing-override` warning.
+---
+ src/SDI12.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/SDI12.h b/src/SDI12.h
+index 6709771..a97bf7b 100644
+--- a/src/SDI12.h
++++ b/src/SDI12.h
+@@ -898,7 +898,7 @@ class SDI12 : public Stream {
+    * instance, but is *NOT* intenteded to be used for SDI-12 objects.  Instead, use the
+    * SDI12::sendCommand() or SDI12::sendResponse() functions.
+    */
+-  virtual size_t write(uint8_t byte);
++  virtual size_t write(uint8_t byte) override;
+ 
+   /**
+    * @brief Send a command out on the data line, acting as a datalogger (master)
+-- 
+2.40.1
+
