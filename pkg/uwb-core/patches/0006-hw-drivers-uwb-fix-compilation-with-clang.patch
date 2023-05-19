@@ -1,0 +1,88 @@
+From 72372f5bd25f4718369eb79ac8b0344846dded53 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Fri, 19 May 2023 22:05:27 +0200
+Subject: [PATCH] hw/drivers/uwb: fix compilation with clang
+
+clang doesn't like initializer lists without designators that are
+shorter then the number of fields, as it assumes one of the fields
+was by accident forgotten to be initialized with a non-zero value.
+Hence, only initialize one field by name and let the rest be implicitly
+zero-initialized.
+
+Secondly, clang wants all `struct`s and `union`s within a packed
+`struct` or `union` to explicitly also be packed. IMO those should
+be implicitly packed anyway. But if so, this doesn't make a difference
+and makes clang happy, so let's add them.
+---
+ hw/drivers/uwb/include/uwb/uwb_ftypes.h |  4 ++--
+ lib/uwb_rng/src/uwb_rng.c               | 24 ++++++++++++------------
+ 2 files changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/hw/drivers/uwb/include/uwb/uwb_ftypes.h b/hw/drivers/uwb/include/uwb/uwb_ftypes.h
+index 5920f14..4a4259e 100644
+--- a/hw/drivers/uwb/include/uwb/uwb_ftypes.h
++++ b/hw/drivers/uwb/include/uwb/uwb_ftypes.h
+@@ -159,7 +159,7 @@ typedef union{
+         union {
+             uint64_t long_address;  //!< Device ID TODOs::depreciated nomenclature
+             uint64_t euid;          //!< extended unique identifier
+-        };
++        }__attribute__((__packed__,aligned(1)));
+     }__attribute__((__packed__,aligned(1)));
+     uint8_t array[sizeof(struct _ieee_blink_frame_t)]; //!< Array of size blink frame
+ }ieee_blink_frame_t;
+@@ -173,7 +173,7 @@ typedef union {
+         union {
+             uint64_t address;       //!< Device ID TODOs::depreciated nomenclature
+             uint64_t euid;          //!< extended unique identifier
+-        };
++        }__attribute__((__packed__,aligned(1)));
+         uint8_t encoding;           //!< 0x43 to indicate no extended ID
+         uint8_t EXT_header ;        //!< 0x02 to indicate tag is listening for a response immediately
+     }__attribute__((__packed__,aligned(1)));
+diff --git a/lib/uwb_rng/src/uwb_rng.c b/lib/uwb_rng/src/uwb_rng.c
+index 3218f61..4caa02d 100644
+--- a/lib/uwb_rng/src/uwb_rng.c
++++ b/lib/uwb_rng/src/uwb_rng.c
+@@ -134,26 +134,26 @@ static struct uwb_rng_config g_config = {
+ static twr_frame_t g_twr_frames[][4] = {
+ #if MYNEWT_VAL(UWB_DEVICE_0)
+     {
+-        [0] = {.fctrl = 0, 0},
+-        [1] = {.fctrl = 0, 0},
+-        [2] = {.fctrl = 0, 0},
+-        [3] = {.fctrl = 0, 0},
++        [0] = {.fctrl = 0},
++        [1] = {.fctrl = 0},
++        [2] = {.fctrl = 0},
++        [3] = {.fctrl = 0},
+     },
+ #endif
+ #if MYNEWT_VAL(UWB_DEVICE_1)
+     {
+-        [0] = {.fctrl = 0, 0},
+-        [1] = {.fctrl = 0, 0},
+-        [2] = {.fctrl = 0, 0},
+-        [3] = {.fctrl = 0, 0},
++        [0] = {.fctrl = 0},
++        [1] = {.fctrl = 0},
++        [2] = {.fctrl = 0},
++        [3] = {.fctrl = 0},
+     },
+ #endif
+ #if MYNEWT_VAL(UWB_DEVICE_2)
+     {
+-        [0] = {.fctrl = 0, 0},
+-        [1] = {.fctrl = 0, 0},
+-        [2] = {.fctrl = 0, 0},
+-        [3] = {.fctrl = 0, 0},
++        [0] = {.fctrl = 0},
++        [1] = {.fctrl = 0},
++        [2] = {.fctrl = 0},
++        [3] = {.fctrl = 0},
+     },
+ #endif
+ };
+-- 
+2.40.1
+
