@@ -87,6 +87,13 @@ CFLAGS += -Wno-atomic-alignment
 # unsupported warning flags:
 CFLAGS += -Wno-unknown-warning-option
 
+# Designated initializers make the code much more readable and are part
+# of the C standard since C99. C++ with C++20 finally caught up.
+# Until we switch to that C++ version, let's disable the annoying
+# warning rather than reducing the code quality for the sake of
+# strict C++ compatibility of our headers.
+CXXEXFLAGS += -Wno-c99-designator
+
 OPTIONAL_CFLAGS_BLACKLIST += -fno-delete-null-pointer-checks
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-overflow
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-truncation
