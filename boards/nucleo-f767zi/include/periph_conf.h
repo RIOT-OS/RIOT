@@ -208,6 +208,7 @@ static const adc_conf_t adc_config[] = {
 };
 
 #define VBAT_ADC            ADC_LINE(6) /**< VBAT ADC line */
+#define ADC_CLK_MAX         MHZ(36)     /**< Use a faster than default ADC clock */
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
