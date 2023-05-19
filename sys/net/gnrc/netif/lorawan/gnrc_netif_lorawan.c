@@ -506,10 +506,6 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
         }
         netif->lorawan.datarate = *((uint8_t *)opt->data);
         break;
-    case NETOPT_LORAWAN_TX_PORT:
-        assert(opt->data_len == sizeof(uint8_t));
-        netif->lorawan.port = *((uint8_t *)opt->data);
-        break;
     case NETOPT_ACK_REQ:
         assert(opt->data_len == sizeof(netopt_enable_t));
         netif->lorawan.ack_req = *((netopt_enable_t *)opt->data);
