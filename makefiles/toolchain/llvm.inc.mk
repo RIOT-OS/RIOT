@@ -36,14 +36,14 @@ SIZE        = $(LLVMPREFIX)size
 include $(RIOTMAKE)/tools/gdb.inc.mk
 
 # Include directories from gcc
-#   $1: language <c|cpp>
+#   $1: language <c|c++>
 #
 #   `realpath` is used instead of `abspath` to support Mingw32 which has issues
 #   with windows formatted gcc directories
 #
 # CFLAGS_CPU is used to get the correct multilib include header.
 gcc_include_dirs = $(realpath \
-    $(shell $(PREFIX)gcc $(CFLAGS_CPU) -v -x $1 -E /dev/null 2>&1 | \
+    $(shell $(PREFIX)g++ $(CFLAGS_CPU) -v -x $1 -E /dev/null 2>&1 | \
         sed \
         -e '1,/\#include <...> search starts here:/d' \
         -e '/End of search list./,$$d' \
