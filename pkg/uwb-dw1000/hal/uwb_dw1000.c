@@ -153,8 +153,8 @@ void uwb_dw1000_update_config_from_otp(dw1000_dev_instance_t *dev)
             ((_dw1000_otp_read(dev,
                                OTP_CH5_PG_DELAY_ADDRESS) & OTP_CH5_PG_DELAY_MASK) >>
              OTP_CH5_PG_DELAY_SHIFT);
-        LOG_DEBUG("uwb-dw1000: pg-delay addr=(%" PRIx16 "),val=(%" PRIx16 ")\n",
-                  OTP_CH5_PG_DELAY_ADDRESS, pg_delay);
+        LOG_DEBUG("uwb-dw1000: pg-delay addr=(%x),val=(%x)\n",
+                  (unsigned)OTP_CH5_PG_DELAY_ADDRESS, (unsigned)pg_delay);
         dev->uwb_dev.config.txrf.PGdly = pg_delay;
     }
 }
