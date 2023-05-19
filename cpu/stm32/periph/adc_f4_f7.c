@@ -29,7 +29,9 @@
 /**
  * @brief   Maximum allowed ADC clock speed
  */
-#define MAX_ADC_SPEED           MHZ(12)
+#ifndef ADC_CLK_MAX
+#define ADC_CLK_MAX             MHZ(12)
+#endif
 
 /**
  * @brief   Maximum sampling time for each channel (480 cycles)
@@ -95,7 +97,7 @@ int adc_init(adc_t line)
     dev(line)->CR2 = ADC_CR2_ADON;
     /* set clock prescaler to get the maximal possible ADC clock value */
     for (clk_div = 2; clk_div < 8; clk_div += 2) {
-        if ((periph_apb_clk(APB2) / clk_div) <= MAX_ADC_SPEED) {
+        if ((periph_apb_clk(APB2) / clk_div) <= ADC_CLK_MAX) {
             break;
         }
     }
