@@ -7,8 +7,10 @@ USEMODULE += shell_cmds_default
 USEMODULE += shell_lock
 USEMODULE += shell_lock_auto_locking
 
+ifneq (1,$(TEST_KCONFIG))
 CFLAGS += -DCONFIG_SHELL_LOCK_PASSWORD=\"password\"
 CFLAGS += -DCONFIG_SHELL_LOCK_AUTO_LOCK_TIMEOUT_MS=7000
+endif
 
 # This config defaults to 1 on native, such that pm_off() would be called as soon as
 # shell_run_once is terminated in shell_run_forever. We do not want this behavior for this test.
