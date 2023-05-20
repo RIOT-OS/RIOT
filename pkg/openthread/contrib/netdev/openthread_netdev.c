@@ -77,6 +77,12 @@ static void _event_cb(netdev_t *dev, netdev_event_t event) {
     }
 }
 
+static void *_error_msg_and_return_null(const char *fn, otError err)
+{
+    printf("Call to %s() failed with error code %d\n", fn, (int)err);
+    return NULL;
+}
+
 static void *_openthread_event_loop(void *arg)
 {
     _dev = arg;
@@ -98,12 +104,25 @@ static void *_openthread_event_loop(void *arg)
     /* Init default parameters */
     otPanId panid = OPENTHREAD_PANID;
     uint8_t channel = OPENTHREAD_CHANNEL;
-    otLinkSetPanId(sInstance, panid);
-    otLinkSetChannel(sInstance, channel);
+    otError err;
+    err = otLinkSetPanId(sInstance, panid);
+    if (err != OT_ERROR_NONE) {
+        return _error_msg_and_return_null("otLinkSetPanId", err);
+    }
+    err = otLinkSetChannel(sInstance, channel);
+    if (err != OT_ERROR_NONE) {
+        return _error_msg_and_return_null("otLinkSetChannel", err);
+    }
     /* Bring up the IPv6 interface  */
-    otIp6SetEnabled(sInstance, true);
+    err = otIp6SetEnabled(sInstance, true);
+    if (err != OT_ERROR_NONE) {
+        return _error_msg_and_return_null("otIp6SetEnabled", err);
+    }
     /* Start Thread protocol operation */
-    otThreadSetEnabled(sInstance, true);
+    err = otThreadSetEnabled(sInstance, true);
+    if (err != OT_ERROR_NONE) {
+        return _error_msg_and_return_null("otThreadSetEnabled", err);
+    }
 #else
     /* enable OpenThread UART */
     otPlatUartEnable();

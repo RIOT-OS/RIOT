@@ -109,10 +109,11 @@ typedef struct {
  */
 typedef struct {
     event_t ev;                             /**< Event associated to the OpenThread job */
-    int status;                             /**< Status of the job */
+    otError retval;                         /**< Return value of the job */
     const char *command;                    /**< A pointer to the job name string. */
     void *arg;                              /**< arg for the job **/
     void *answer;                           /**< answer from the job **/
+    mutex_t mutex;                          /**< used to for synchronization with the event thread */
 } ot_job_t;
 
 /**
