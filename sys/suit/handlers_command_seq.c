@@ -322,6 +322,7 @@ static int _start_storage(suit_manifest_t *manifest, suit_component_t *comp)
     return suit_storage_start(comp->storage_backend, manifest, img_size);
 }
 
+__attribute__((unused))
 static inline void _print_download_progress(suit_manifest_t *manifest,
                                             size_t offset, size_t len,
                                             size_t image_size)
