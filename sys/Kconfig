@@ -75,6 +75,7 @@ endchoice
 
 rsource "coding/Kconfig"
 rsource "ecc/Kconfig"
+rsource "evtimer/Kconfig"
 rsource "log_color/Kconfig"
 rsource "log_printfnoformat/Kconfig"
 rsource "luid/Kconfig"
