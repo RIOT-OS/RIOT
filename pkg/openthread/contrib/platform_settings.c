@@ -35,7 +35,7 @@ otError otPlatSettingsBeginChange(otInstance *aInstance)
 
 otError otPlatSettingsCommitChange(otInstance *aInstance)
 {
-    DEBUG("openthread: otPlatSettingsCommitChange\n");
+    DEBUG_PUTS("openthread: otPlatSettingsCommitChange");
     (void)aInstance;
     return OT_ERROR_NONE;
 }
@@ -53,7 +53,7 @@ otError otPlatSettingsGet(otInstance *aInstance, uint16_t aKey, int aIndex, uint
     (void)aIndex;
     (void)aValue;
 
-    DEBUG("openthread: otPlatSettingsGet\n");
+    DEBUG_PUTS("openthread: otPlatSettingsGet");
     *aValueLength = 0;
     return OT_ERROR_NOT_IMPLEMENTED;
 }

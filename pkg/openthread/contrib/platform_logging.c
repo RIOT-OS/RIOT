@@ -30,8 +30,8 @@
 __attribute__((__format__ (__printf__, 3, 4)))
 void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat, ...)
 {
-    (void) aLogLevel;
-    (void) aLogRegion;
+    (void)aLogLevel;
+    (void)aLogRegion;
     va_list args;
     va_start(args, aFormat);
     vfprintf(stderr, aFormat, args);

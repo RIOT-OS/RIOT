@@ -59,21 +59,21 @@ otInstance* openthread_get_instance(void)
 
 static void _event_cb(netdev_t *dev, netdev_event_t event) {
     switch (event) {
-        case NETDEV_EVENT_ISR:
-            event_post(&ev_queue, &ev_isr);
-            break;
-        case NETDEV_EVENT_RX_COMPLETE:
-            DEBUG("openthread_netdev: Reception of a packet\n");
-            recv_pkt(sInstance, dev);
-            break;
-        case NETDEV_EVENT_TX_COMPLETE:
-        case NETDEV_EVENT_TX_NOACK:
-        case NETDEV_EVENT_TX_MEDIUM_BUSY:
-            DEBUG("openthread_netdev: Transmission of a packet\n");
-            send_pkt(sInstance, dev, event);
-            break;
-        default:
-            break;
+    case NETDEV_EVENT_ISR:
+        event_post(&ev_queue, &ev_isr);
+        break;
+    case NETDEV_EVENT_RX_COMPLETE:
+        DEBUG("openthread_netdev: Reception of a packet\n");
+        recv_pkt(sInstance, dev);
+        break;
+    case NETDEV_EVENT_TX_COMPLETE:
+    case NETDEV_EVENT_TX_NOACK:
+    case NETDEV_EVENT_TX_MEDIUM_BUSY:
+        DEBUG("openthread_netdev: Transmission of a packet\n");
+        send_pkt(sInstance, dev, event);
+        break;
+    default:
+        break;
     }
 }
 
@@ -124,8 +124,8 @@ static void *_openthread_event_loop(void *arg)
 int openthread_netdev_init(char *stack, int stacksize, char priority,
                            const char *name, netdev_t *netdev) {
     if (thread_create(stack, stacksize,
-                         priority, THREAD_CREATE_STACKTEST,
-                         _openthread_event_loop, netdev, name) < 0) {
+                      priority, THREAD_CREATE_STACKTEST,
+                      _openthread_event_loop, netdev, name) < 0) {
         return -EINVAL;
     }
 

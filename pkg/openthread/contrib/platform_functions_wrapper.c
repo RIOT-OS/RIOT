@@ -31,27 +31,27 @@
 
 typedef uint8_t OT_COMMAND;
 
-OT_COMMAND ot_channel(otInstance* ot_instance, void* arg, void* answer);
-OT_COMMAND ot_eui64(otInstance* ot_instance, void* arg, void* answer);
-OT_COMMAND ot_extaddr(otInstance* ot_instance, void* arg, void* answer);
-OT_COMMAND ot_ipaddr(otInstance* ot_instance, void* arg, void* answer);
-OT_COMMAND ot_masterkey(otInstance* ot_instance, void* arg, void* answer);
-OT_COMMAND ot_networkname(otInstance* ot_instance, void* arg, void* answer);
-OT_COMMAND ot_mode(otInstance* ot_instance, void* arg, void* answer);
-OT_COMMAND ot_panid(otInstance* ot_instance, void* arg, void* answer);
-OT_COMMAND ot_parent(otInstance* ot_instance, void* arg, void* answer);
-OT_COMMAND ot_state(otInstance* ot_instance, void* arg, void* answer);
-OT_COMMAND ot_thread(otInstance* ot_instance, void* arg, void* answer);
+static OT_COMMAND ot_channel(otInstance *ot_instance, void *arg, void *answer);
+static OT_COMMAND ot_eui64(otInstance *ot_instance, void *arg, void *answer);
+static OT_COMMAND ot_extaddr(otInstance *ot_instance, void *arg, void *answer);
+static OT_COMMAND ot_ipaddr(otInstance *ot_instance, void *arg, void *answer);
+static OT_COMMAND ot_masterkey(otInstance *ot_instance, void *arg, void *answer);
+static OT_COMMAND ot_networkname(otInstance *ot_instance, void *arg, void *answer);
+static OT_COMMAND ot_mode(otInstance *ot_instance, void *arg, void *answer);
+static OT_COMMAND ot_panid(otInstance *ot_instance, void *arg, void *answer);
+static OT_COMMAND ot_parent(otInstance *ot_instance, void *arg, void *answer);
+static OT_COMMAND ot_state(otInstance *ot_instance, void *arg, void *answer);
+static OT_COMMAND ot_thread(otInstance *ot_instance, void *arg, void *answer);
 
 /**
  * @brief   Struct containing an OpenThread job command
  */
 typedef struct {
     const char *name;                                   /**< A pointer to the job name string. */
-    OT_COMMAND (*function)(otInstance*, void*, void*);  /**< function to be called */
+    OT_COMMAND (*function)(otInstance *, void *, void *);  /**< function to be called */
 } ot_command_t;
 
-const ot_command_t otCommands[] =
+static const ot_command_t otCommands[] =
 {
     /* channel: arg NULL: get channel in answer | arg not NULL: set channel */
     { "channel", &ot_channel },
@@ -77,8 +77,8 @@ const ot_command_t otCommands[] =
     { "thread", &ot_thread },
 };
 
-void _exec_cmd(event_t *event) {
-    ot_job_t *job = (ot_job_t*) event;
+static void _exec_cmd(event_t *event) {
+    ot_job_t *job = container_of(event, ot_job_t, ev);
 
     uint8_t res = 0xFF;
     /* Check running thread */
@@ -89,15 +89,17 @@ void _exec_cmd(event_t *event) {
         }
     }
     if (res == 0xFF) {
-        DEBUG("Wrong ot_COMMAND name\n");
+        DEBUG_PUTS("Wrong ot_COMMAND name");
         res = 1;
     }
     job->status = res;
 }
 
-uint8_t ot_call_command(char* command, void *arg, void* answer)
+uint8_t ot_call_command(char *command, void *arg, void *answer)
 {
-    ot_job_t job = {.ev.handler = _exec_cmd};
+    ot_job_t job = {
+        .ev.handler = _exec_cmd,
+    };
 
     job.command = command;
     job.arg = arg;
@@ -107,149 +109,161 @@ uint8_t ot_call_command(char* command, void *arg, void* answer)
     return job.status;
 }
 
-void output_bytes(const char* name, const uint8_t *aBytes, uint8_t aLength)
+static void output_bytes(const char *name, const uint8_t *aBytes, uint8_t aLength)
 {
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         DEBUG("%s: ", name);
         for (int i = 0; i < aLength; i++) {
             DEBUG("%02x", aBytes[i]);
         }
-        DEBUG("\n");
+        DEBUG_PUTS("");
     }
 }
 
-OT_COMMAND ot_channel(otInstance* ot_instance, void* arg, void* answer) {
+static OT_COMMAND ot_channel(otInstance *ot_instance, void *arg, void *answer) {
     if (answer != NULL) {
         *((uint8_t *) answer) = otLinkGetChannel(ot_instance);
-        DEBUG("Channel: %04x\n", *((uint8_t *) answer));
-    } else if (arg != NULL) {
-        uint8_t channel = *((uint8_t *) arg);
+        DEBUG("Channel: %04x\n", *((uint8_t *)answer));
+    }
+    else if (arg != NULL) {
+        uint8_t channel = *((uint8_t *)arg);
         otLinkSetChannel(ot_instance, channel);
-    } else {
-        DEBUG("ERROR: wrong argument\n");
+    }
+    else {
+        DEBUG_PUTS("ERROR: wrong argument");
     }
     return 0;
 }
 
-OT_COMMAND ot_eui64(otInstance* ot_instance, void* arg, void* answer) {
+static OT_COMMAND ot_eui64(otInstance *ot_instance, void *arg, void *answer) {
     (void)arg;
 
     if (answer != NULL) {
         otExtAddress address;
         otLinkGetFactoryAssignedIeeeEui64(ot_instance, &address);
         output_bytes("eui64", address.m8, OT_EXT_ADDRESS_SIZE);
-        *((otExtAddress *) answer) = address;
-    } else {
-        DEBUG("ERROR: wrong argument\n");
+        *((otExtAddress *)answer) = address;
+    }
+    else {
+        DEBUG_PUTS("ERROR: wrong argument");
     }
     return 0;
 }
 
-OT_COMMAND ot_extaddr(otInstance* ot_instance, void* arg, void* answer) {
+static OT_COMMAND ot_extaddr(otInstance *ot_instance, void *arg, void *answer) {
     (void)arg;
 
     if (answer != NULL) {
         answer = (void*)otLinkGetExtendedAddress(ot_instance);
         output_bytes("extaddr", (const uint8_t *)answer, OT_EXT_ADDRESS_SIZE);
-    } else {
-        DEBUG("ERROR: wrong argument\n");
+    }
+    else {
+        DEBUG_PUTS("ERROR: wrong argument");
     }
     return 0;
 }
 
-OT_COMMAND ot_ipaddr(otInstance* ot_instance, void* arg, void* answer) {
+static OT_COMMAND ot_ipaddr(otInstance *ot_instance, void *arg, void *answer) {
     uint8_t cnt = 0;
     for (const otNetifAddress *addr = otIp6GetUnicastAddresses(ot_instance); addr; addr = addr->mNext) {
-        if (arg != NULL && answer != NULL && cnt == *((uint8_t *) arg)) {
-            *((otNetifAddress *) answer) = *addr;
+        if (arg != NULL && answer != NULL && cnt == *((uint8_t *)arg)) {
+            *((otNetifAddress *)answer) = *addr;
             return 0;
         }
         cnt++;
     }
     if (answer != NULL) {
-        *((uint8_t *) answer) = cnt;
-    } else {
-        DEBUG("ERROR: wrong argument\n");
+        *((uint8_t *)answer) = cnt;
+    }
+    else {
+        DEBUG_PUTS("ERROR: wrong argument");
     }
     return 0;
 }
 
-OT_COMMAND ot_masterkey(otInstance* ot_instance, void* arg, void* answer) {
+static OT_COMMAND ot_masterkey(otInstance *ot_instance, void *arg, void *answer) {
     if (answer != NULL) {
         const otMasterKey* masterkey = otThreadGetMasterKey(ot_instance);
         *((otMasterKey *) answer) = *masterkey;
         output_bytes("masterkey", (const uint8_t *)answer, OT_MASTER_KEY_SIZE);
-    } else if (arg != NULL) {
-        otThreadSetMasterKey(ot_instance, (otMasterKey*)arg);
-    } else {
-        DEBUG("ERROR: wrong argument\n");
+    }
+    else if (arg != NULL) {
+        otThreadSetMasterKey(ot_instance, (otMasterKey *)arg);
+    }
+    else {
+        DEBUG_PUTS("ERROR: wrong argument");
     }
     return 0;
 }
 
-OT_COMMAND ot_mode(otInstance* ot_instance, void* arg, void* answer) {
+static OT_COMMAND ot_mode(otInstance *ot_instance, void *arg, void *answer) {
     (void)answer;
 
     if (arg != NULL) {
         otLinkModeConfig link_mode;
         memset(&link_mode, 0, sizeof(otLinkModeConfig));
         char mode[6];
-        memcpy(mode, (char*)arg, 5);
+        memcpy(mode, (char *)arg, 5);
         mode[5] = '\0';
         for (char *arg = &mode[0]; *arg != '\0'; arg++) {
             switch (*arg) {
-                case 'r':
-                    link_mode.mRxOnWhenIdle = 1;
-                    break;
-                case 's':
-                    link_mode.mSecureDataRequests = 1;
-                    break;
-                case 'd':
-                    link_mode.mDeviceType = 1;
-                    break;
-                case 'n':
-                    link_mode.mNetworkData = 1;
-                    break;
+            case 'r':
+                link_mode.mRxOnWhenIdle = 1;
+                break;
+            case 's':
+                link_mode.mSecureDataRequests = 1;
+                break;
+            case 'd':
+                link_mode.mDeviceType = 1;
+                break;
+            case 'n':
+                link_mode.mNetworkData = 1;
+                break;
             }
         }
         otThreadSetLinkMode(ot_instance, link_mode);
-        DEBUG("OT mode changed to %s\n", (char*)arg);
-    } else {
-        DEBUG("ERROR: wrong argument\n");
+        DEBUG("OT mode changed to %s\n", (char *)arg);
+    }
+    else {
+        DEBUG_PUTS("ERROR: wrong argument");
     }
     return 0;
 }
 
-OT_COMMAND ot_networkname(otInstance* ot_instance, void* arg, void* answer) {
+static OT_COMMAND ot_networkname(otInstance *ot_instance, void *arg, void *answer) {
     if (answer != NULL) {
-        const char* networkName = otThreadGetNetworkName(ot_instance);
+        const char *networkName = otThreadGetNetworkName(ot_instance);
         strcpy((char*) answer, networkName);
         DEBUG("networkname: %.*s\n", OT_NETWORK_NAME_MAX_SIZE, networkName);
-    } else if (arg != NULL) {
-        otThreadSetNetworkName(ot_instance, (char*) arg);
-    } else {
-        DEBUG("ERROR: wrong argument\n");
+    }
+    else if (arg != NULL) {
+        otThreadSetNetworkName(ot_instance, (char *)arg);
+    }
+    else {
+        DEBUG_PUTS("ERROR: wrong argument\n");
     }
     return 0;
 }
 
-OT_COMMAND ot_panid(otInstance* ot_instance, void* arg, void* answer) {
+static OT_COMMAND ot_panid(otInstance *ot_instance, void *arg, void *answer) {
     if (answer != NULL) {
         *((uint16_t *) answer) = otLinkGetPanId(ot_instance);
         DEBUG("PanID: %04x\n", *((uint16_t *) answer));
-    } else if (arg != NULL) {
+    }
+    else if (arg != NULL) {
         /* Thread operation needs to be stopped before setting panid */
         otThreadSetEnabled(ot_instance, false);
-        uint16_t panid = *((uint16_t *) arg);
+        uint16_t panid = *((uint16_t *)arg);
         otLinkSetPanId(ot_instance, panid);
         otThreadSetEnabled(ot_instance, true);
-    } else {
-        DEBUG("ERROR: wrong argument\n");
+    }
+    else {
+        DEBUG_PUTS("ERROR: wrong argument");
     }
     return 0;
 }
 
-OT_COMMAND ot_parent(otInstance* ot_instance, void* arg, void* answer) {
+static OT_COMMAND ot_parent(otInstance *ot_instance, void *arg, void *answer) {
     (void)arg;
 
     if (answer != NULL) {
@@ -257,14 +271,15 @@ OT_COMMAND ot_parent(otInstance* ot_instance, void* arg, void* answer) {
         otThreadGetParentInfo(ot_instance, &parentInfo);
         output_bytes("parent", (const uint8_t *)parentInfo.mExtAddress.m8, sizeof(parentInfo.mExtAddress));
         DEBUG("Rloc: %x\n", parentInfo.mRloc16);
-        *((otRouterInfo *) answer) = parentInfo;
-    } else {
-        DEBUG("ERROR: wrong argument\n");
+        *((otRouterInfo *)answer) = parentInfo;
+    }
+    else {
+        DEBUG_PUTS("ERROR: wrong argument");
     }
     return 0;
 }
 
-OT_COMMAND ot_state(otInstance* ot_instance, void* arg, void* answer) {
+static OT_COMMAND ot_state(otInstance *ot_instance, void *arg, void *answer) {
     (void)arg;
 
     if (answer != NULL) {
@@ -272,46 +287,50 @@ OT_COMMAND ot_state(otInstance* ot_instance, void* arg, void* answer) {
         *((otDeviceRole *) answer) = state;
         DEBUG("state: ");
         switch (state) {
-            case OT_DEVICE_ROLE_DISABLED:
-                puts("disabled");
-                break;
-            case OT_DEVICE_ROLE_DETACHED:
-                puts("detached");
-                break;
-            case OT_DEVICE_ROLE_CHILD:
-                puts("child");
-                break;
-            case OT_DEVICE_ROLE_ROUTER:
-                puts("router");
-                break;
-            case OT_DEVICE_ROLE_LEADER:
-                puts("leader");
-                break;
-            default:
-                puts("invalid state");
-                break;
+        case OT_DEVICE_ROLE_DISABLED:
+            puts("disabled");
+            break;
+        case OT_DEVICE_ROLE_DETACHED:
+            puts("detached");
+            break;
+        case OT_DEVICE_ROLE_CHILD:
+            puts("child");
+            break;
+        case OT_DEVICE_ROLE_ROUTER:
+            puts("router");
+            break;
+        case OT_DEVICE_ROLE_LEADER:
+            puts("leader");
+            break;
+        default:
+            puts("invalid state");
+            break;
         }
-    } else {
-        DEBUG("ERROR: wrong argument\n");
+    }
+    else {
+        DEBUG_PUTS("ERROR: wrong argument");
     }
     return 0;
 }
 
-OT_COMMAND ot_thread(otInstance* ot_instance, void* arg, void* answer) {
+static OT_COMMAND ot_thread(otInstance *ot_instance, void *arg, void *answer) {
     (void)answer;
 
     if (arg != NULL) {
         if (strcmp((char*)arg, "start") == 0) {
             otThreadSetEnabled(ot_instance, true);
-            DEBUG("Thread start\n");
-        } else if (strcmp((char*)arg, "stop") == 0) {
-            otThreadSetEnabled(ot_instance, false);
-            DEBUG("Thread stop\n");
-        } else {
-            DEBUG("ERROR: thread available args: start/stop\n");
+            DEBUG_PUTS("Thread start");
         }
-    } else {
-        DEBUG("ERROR: wrong argument\n");
+        else if (strcmp(arg, "stop") == 0) {
+            otThreadSetEnabled(ot_instance, false);
+            DEBUG_PUTS("Thread stop");
+        }
+        else {
+            DEBUG_PUTS("ERROR: thread available args: start/stop");
+        }
+    }
+    else {
+        DEBUG_PUTS("ERROR: wrong argument");
     }
     return 0;
 }

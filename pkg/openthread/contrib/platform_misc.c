@@ -26,7 +26,7 @@
 
 static void _ev_tasklets_handler(event_t *event)
 {
-    (void) event;
+    (void)event;
     otInstance *instance = openthread_get_instance();
     while (otTaskletsArePending(instance)) {
         otTaskletsProcess(instance);
@@ -39,7 +39,7 @@ static event_t ev_tasklet = {
 
 /* OpenThread will call this when switching state from empty tasklet to non-empty tasklet. */
 void otTaskletsSignalPending(otInstance *aInstance) {
-    (void) aInstance;
+    (void)aInstance;
     event_post(openthread_get_evq(), &ev_tasklet);
 }
 

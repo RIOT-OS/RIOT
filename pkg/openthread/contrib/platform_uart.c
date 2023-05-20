@@ -37,9 +37,9 @@ static uint16_t frameLength = 0;
 
 static void _ev_serial_handler(event_t *event)
 {
-    (void) event;
+    (void)event;
     /* Tell OpenThread about the reception of a CLI command */
-    otPlatUartReceived((uint8_t*)gSerialMessage[0].buf, gSerialMessage[0].length);
+    otPlatUartReceived((uint8_t *)gSerialMessage[0].buf, gSerialMessage[0].length);
     gSerialMessage[0].serial_buffer_status = OPENTHREAD_SERIAL_BUFFER_STATUS_FREE;
 }
 
@@ -54,22 +54,22 @@ static void uart_handler(void* arg, char c) {
         memset(&gSerialMessage[0], 0, sizeof(serial_msg_t));
     }
     switch (c) {
-        case '\r':
-        case '\n':
-            if (frameLength > 0) {
-                gSerialMessage[0].buf[frameLength] = c;
-                frameLength++;
-                gSerialMessage[0].length = frameLength;
-                event_post(openthread_get_evq(), &ev_serial);
-                frameLength = 0;
-            }
-            break;
-        default:
-            if (frameLength < OPENTHREAD_SERIAL_BUFFER_SIZE) {
-                gSerialMessage[0].buf[frameLength] = c;
-                frameLength++;
-            }
-            break;
+    case '\r':
+    case '\n':
+        if (frameLength > 0) {
+            gSerialMessage[0].buf[frameLength] = c;
+            frameLength++;
+            gSerialMessage[0].length = frameLength;
+            event_post(openthread_get_evq(), &ev_serial);
+            frameLength = 0;
+        }
+        break;
+    default:
+        if (frameLength < OPENTHREAD_SERIAL_BUFFER_SIZE) {
+            gSerialMessage[0].buf[frameLength] = c;
+            frameLength++;
+        }
+        break;
     }
 }
 
