@@ -1,6 +1,6 @@
 PKG_NAME=flatbuffers
 PKG_URL=https://github.com/google/flatbuffers
-PKG_VERSION=9e7e8cbe9f675123dd41b7c62868acad39188cae
+PKG_VERSION=72b56fd0810c9a6cd38ea1c8f40feaa1bb4916b1
 PKG_LICENSE=Apache2.0
 
 # manually set some RIOT env vars, so this Makefile can be called stand-alone
