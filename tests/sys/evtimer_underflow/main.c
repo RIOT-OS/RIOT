@@ -23,7 +23,7 @@
 #include "evtimer_msg.h"
 #include "thread.h"
 #include "msg.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define WORKER_MSG_QUEUE_SIZE   (8)
 
@@ -61,7 +61,7 @@ void *worker_thread(void *arg)
 
 void sleep_msec(uint16_t t)
 {
-    xtimer_msleep(t);
+    ztimer_sleep(ZTIMER_MSEC, t);
 }
 
 int main(void)

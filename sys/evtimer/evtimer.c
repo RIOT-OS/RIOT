@@ -93,19 +93,9 @@ static void _del_event_from_list(evtimer_t *evtimer, evtimer_event_t *event)
 static void _set_timer(evtimer_t *evtimer)
 {
     evtimer_event_t *next_event = evtimer->events;
-
-#if IS_USED(MODULE_EVTIMER_ON_ZTIMER)
     evtimer->base = ztimer_set(ZTIMER_MSEC, &evtimer->timer, next_event->offset);
     DEBUG("evtimer: now=%" PRIu32 " ms setting ztimer to %" PRIu32 " ms\n",
           evtimer->base, next_event->offset);
-#else
-    uint64_t offset_us = (uint64_t)next_event->offset * US_PER_MS;
-
-    DEBUG("evtimer: now=%" PRIu32 " us setting xtimer to %" PRIu32 ":%" PRIu32 " us\n",
-          xtimer_now_usec(), (uint32_t)(offset_us >> 32), (uint32_t)(offset_us));
-
-    xtimer_set64(&evtimer->timer, offset_us);
-#endif
 }
 
 static void _update_timer(evtimer_t *evtimer)
@@ -114,15 +104,10 @@ static void _update_timer(evtimer_t *evtimer)
         _set_timer(evtimer);
     }
     else {
-#if IS_USED(MODULE_EVTIMER_ON_ZTIMER)
         ztimer_remove(ZTIMER_MSEC, &evtimer->timer);
-#else
-        xtimer_remove(&evtimer->timer);
-#endif
     }
 }
 
-#if IS_USED(MODULE_EVTIMER_ON_ZTIMER)
 static void _update_head_offset(evtimer_t *evtimer)
 {
     if (evtimer->events) {
@@ -137,23 +122,6 @@ static void _update_head_offset(evtimer_t *evtimer)
         evtimer->base = now;
     }
 }
-#else /* IS_USED(MODULE_EVTIMER_ON_ZTIMER) */
-static uint32_t _get_offset(xtimer_t *timer)
-{
-    uint64_t left = xtimer_left_usec(timer);
-    /* add half of 125 so integer division rounds to nearest */
-    return div_u64_by_125((left >> 3) + 62);
-}
-
-static void _update_head_offset(evtimer_t *evtimer)
-{
-    if (evtimer->events) {
-        evtimer_event_t *event = evtimer->events;
-        event->offset = _get_offset(&evtimer->timer);
-        DEBUG("evtimer: _update_head_offset(): new head offset %" PRIu32 "\n", event->offset);
-    }
-}
-#endif /* !IS_USED(MODULE_EVTIMER_ON_ZTIMER) */
 
 void evtimer_add(evtimer_t *evtimer, evtimer_event_t *event)
 {

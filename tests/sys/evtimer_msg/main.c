@@ -23,7 +23,7 @@
 #include "evtimer_msg.h"
 #include "thread.h"
 #include "msg.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 static char worker_stack[THREAD_STACKSIZE_MAIN];
 static evtimer_t evtimer;
@@ -111,7 +111,7 @@ int main(void)
            NEVENTS);
 
     /* The last offset is the largest, wait for it and a tiny bit more */
-    xtimer_msleep((offsets[3] + 10));
+    ztimer_sleep(ZTIMER_MSEC, (offsets[3] + 10));
     puts("By now all msgs should have been received");
     puts("If yes, the tests were successful");
 }

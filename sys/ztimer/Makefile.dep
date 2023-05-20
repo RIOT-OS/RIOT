@@ -11,13 +11,6 @@ ifneq (,$(filter ztimer,$(USEMODULE)))
   DEFAULT_MODULE += ztimer_init
 endif
 
-# unless ztimer_xtimer_compat is used, make xtimer use ztimer_usec as backend.
-ifneq (,$(filter ztimer,$(USEMODULE)))
-  ifneq (,$(filter evtimer,$(USEMODULE)))
-    USEMODULE += evtimer_on_ztimer
-  endif
-endif
-
 ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
   USEMODULE += ztimer_usec
 endif
@@ -25,11 +18,6 @@ endif
 ifneq (,$(filter ztimer64_xtimer_compat,$(USEMODULE)))
   USEMODULE += ztimer64_usec
   USEMODULE += ztimer_xtimer_compat
-endif
-
-# make evtimer use ztimer_msec as low level timer
-ifneq (,$(filter evtimer_on_ztimer,$(USEMODULE)))
-  USEMODULE += ztimer_msec
 endif
 
 ifneq (,$(filter ztimer_%,$(USEMODULE)))
