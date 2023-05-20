@@ -90,16 +90,6 @@ config MODULE_PERIPH_INIT_HWRNG
 
 rsource "Kconfig.i2c"
 
-config MODULE_PERIPH_PWM
-    bool "PWM peripheral driver"
-    depends on HAS_PERIPH_PWM
-    select MODULE_PERIPH_COMMON
-
-config MODULE_PERIPH_INIT_PWM
-    bool "Auto initialize PWM peripheral"
-    default y if MODULE_PERIPH_INIT
-    depends on MODULE_PERIPH_PWM
-
 config MODULE_PERIPH_PM
     bool "Power Management (PM) peripheral driver"
     default y
@@ -110,6 +100,16 @@ config MODULE_PERIPH_INIT_PM
     bool "Auto initialize Power Management (PM) peripheral"
     default y if MODULE_PERIPH_INIT
     depends on MODULE_PERIPH_PM
+
+config MODULE_PERIPH_PWM
+    bool "PWM peripheral driver"
+    depends on HAS_PERIPH_PWM
+    select MODULE_PERIPH_COMMON
+
+config MODULE_PERIPH_INIT_PWM
+    bool "Auto initialize PWM peripheral"
+    default y if MODULE_PERIPH_INIT
+    depends on MODULE_PERIPH_PWM
 
 config MODULE_PERIPH_QDEC
     bool "Quadrature Decoder (QDEC) peripheral driver"
@@ -155,6 +155,7 @@ config MODULE_PERIPH_INIT_TEMPERATURE
     default y if MODULE_PERIPH_INIT
     depends on MODULE_PERIPH_TEMPERATURE
 
+rsource "Kconfig.timer"
 rsource "Kconfig.uart"
 rsource "Kconfig.usbdev"
 
@@ -166,6 +167,5 @@ config HAVE_SHARED_PERIPH_RTT_PERIPH_RTC
         The periph_rtc module or the periph_rtt module share hardware, thus,
         only one can be selected.
 
-rsource "Kconfig.timer"
 rsource "Kconfig.vbat"
 rsource "Kconfig.wdt"
