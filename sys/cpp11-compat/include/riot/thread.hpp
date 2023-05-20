@@ -345,7 +345,7 @@ thread::thread(F&& f, Args&&... args) : m_data{new thread_data} {
   using func_and_args = tuple
     <thread_data*, typename decay<F>::type, typename decay<Args>::type...>;
   unique_ptr<func_and_args> p(
-    new func_and_args(m_data.get(), forward<F>(f), forward<Args>(args)...));
+    new func_and_args(m_data.get(), std::forward<F>(f), std::forward<Args>(args)...));
   m_handle = thread_create(
     m_data->stack.data(), m_data->stack.size(), THREAD_PRIORITY_MAIN - 1, 0,
     &thread_proxy<func_and_args>, p.get(), "riot_cpp_thread");
