@@ -61,13 +61,6 @@ PSEUDOMODULES += dns_msg
 PSEUDOMODULES += ecc_%
 PSEUDOMODULES += ethos_stdio
 PSEUDOMODULES += event_%
-## @defgroup sys_event_thread_lowest event_thread_lowest
-## @ingroup sys_event
-## @{
-## @deprecated  Use module `event_thread` instead (see @ref event/thread.h);
-##              Will be removed after 2021.10 release.
-PSEUDOMODULES += event_thread_lowest
-## @}
 PSEUDOMODULES += event_timeout
 PSEUDOMODULES += event_timeout_ztimer
 PSEUDOMODULES += evtimer_mbox

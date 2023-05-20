@@ -1,6 +1,5 @@
 # Add deprecated modules here
 # Keep this list ALPHABETICALLY SORTED!!!!111elven
-DEPRECATED_MODULES += event_thread_lowest
 DEPRECATED_MODULES += gnrc_netdev_default
 DEPRECATED_MODULES += gnrc_netif_cmd_lora # use shell_cmd_gnrc_netif_lorawan instead
 DEPRECATED_MODULES += gnrc_pktbuf_cmd # use shell_cmd_gnrc_pktbuf instead
