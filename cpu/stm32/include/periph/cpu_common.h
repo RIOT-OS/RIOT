@@ -119,7 +119,7 @@ typedef enum {
  *
  * @return              bus clock frequency in Hz
  */
-uint32_t periph_apb_clk(uint8_t bus);
+uint32_t periph_apb_clk(bus_t bus);
 
 /**
  * @brief   Get the actual timer clock frequency
@@ -128,7 +128,7 @@ uint32_t periph_apb_clk(uint8_t bus);
  *
  * @return              timer clock frequency in Hz
  */
-uint32_t periph_timer_clk(uint8_t bus);
+uint32_t periph_timer_clk(bus_t bus);
 
 /**
  * @brief   Enable the given peripheral clock
@@ -144,7 +144,7 @@ void periph_clk_en(bus_t bus, uint32_t mask);
  * @param[in] bus       bus the peripheral is connected to
  * @param[in] mask      bit in the RCC enable register
  */
-void periph_lpclk_dis(bus_t bus, uint32_t mask);
+void periph_clk_dis(bus_t bus, uint32_t mask);
 
 /**
  * @brief   Enable the given peripheral clock in low power mode
@@ -160,7 +160,7 @@ void periph_lpclk_en(bus_t bus, uint32_t mask);
  * @param[in] bus       bus the peripheral is connected to
  * @param[in] mask      bit in the RCC enable register
  */
-void periph_clk_dis(bus_t bus, uint32_t mask);
+void periph_lpclk_dis(bus_t bus, uint32_t mask);
 
 #ifdef __cplusplus
 }

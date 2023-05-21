@@ -58,7 +58,7 @@ static const uint8_t apbmul[] = {
 #endif
 };
 
-uint32_t periph_apb_clk(uint8_t bus)
+uint32_t periph_apb_clk(bus_t bus)
 {
 #ifdef CLOCK_APB2
     if (bus == APB2) {
@@ -70,7 +70,7 @@ uint32_t periph_apb_clk(uint8_t bus)
     return CLOCK_APB1;
 }
 
-uint32_t periph_timer_clk(uint8_t bus)
+uint32_t periph_timer_clk(bus_t bus)
 {
     return periph_apb_clk(bus) * apbmul[bus];
 }
