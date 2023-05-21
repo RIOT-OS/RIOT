@@ -10,3 +10,6 @@ IWASM_INCLUDES += ${IWASM_ROOT}/include \
 INCLUDES += $(addprefix -I,${IWASM_INCLUDES})
 
 ARCHIVES += $(BINDIR)/libwamr.a
+
+# clang stumbles upon the asm syntax, likely it ignores -mthumb
+TOOLCHAINS_BLACKLIST += llvm
