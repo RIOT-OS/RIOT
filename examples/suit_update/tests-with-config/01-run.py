@@ -94,6 +94,8 @@ def wait_for_update(child):
 
 def get_ipv6_addr(child):
     child.expect_exact(">")
+    # give the stack some time to make the address non-tentataive
+    time.sleep(2)
     child.sendline("ifconfig")
     if USE_ETHOS == 0:
         # Get device global address
