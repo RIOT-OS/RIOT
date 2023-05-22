@@ -31,6 +31,9 @@ USE_ETHOS = int(os.getenv("USE_ETHOS", "1"))
 IFACE = os.getenv("IFACE", "tapbr0")
 TMPDIR = tempfile.TemporaryDirectory()
 
+TRIGGER_RECEIVED_MSG = "suit_worker: started."
+REBOOTING_MSG = "suit_worker: rebooting..."
+
 
 def get_iface_addr(iface):
     out = subprocess.check_output(["ip", "a", "s", "dev", iface]).decode()
@@ -178,7 +181,7 @@ def running_slot(child):
 def _test_invalid_version(child, client, app_ver):
     publish(TMPDIR.name, COAP_HOST, app_ver)
     notify(COAP_HOST, client, app_ver)
-    child.expect_exact("suit_coap: trigger received")
+    child.expect_exact(TRIGGER_RECEIVED_MSG)
     child.expect_exact("suit: verifying manifest signature")
     child.expect_exact("seq_nr <= running image")
 
@@ -186,7 +189,7 @@ def _test_invalid_version(child, client, app_ver):
 def _test_invalid_signature(child, client, app_ver):
     publish(TMPDIR.name, COAP_HOST, app_ver + 1, "invalid_keys")
     notify(COAP_HOST, client, app_ver + 1)
-    child.expect_exact("suit_coap: trigger received")
+    child.expect_exact(TRIGGER_RECEIVED_MSG)
     child.expect_exact("suit: verifying manifest signature")
     child.expect_exact("Unable to validate signature")
 
@@ -196,7 +199,7 @@ def _test_successful_update(child, client, app_ver):
         # Trigger update process, verify it validates manifest correctly
         publish(TMPDIR.name, COAP_HOST, version)
         notify(COAP_HOST, client, version)
-        child.expect_exact("suit_coap: trigger received")
+        child.expect_exact(TRIGGER_RECEIVED_MSG)
         child.expect_exact("suit: verifying manifest signature")
         child.expect(
             r"SUIT policy check OK.\r\n",
@@ -211,7 +214,7 @@ def _test_successful_update(child, client, app_ver):
 
         # Wait for reboot on non-native BOARDs
         if BOARD != "native":
-            child.expect_exact("suit_coap: rebooting...")
+            child.expect_exact(REBOOTING_MSG)
             # Verify client is reachable and get address
             client = get_reachable_addr(child)
         assert seq_no(child) == version
