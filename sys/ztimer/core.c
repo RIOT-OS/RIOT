@@ -57,7 +57,7 @@ static bool _ztimer_acquire(ztimer_clock_t *clock)
     unsigned state = irq_disable();
 
     DEBUG("ztimer_acquire(): %p: %" PRIu16 " user(s)\n",
-          (void *)clock, clock->users + 1);
+          (void *)clock, (uint16_t)(clock->users + 1));
 
     if (clock->users++ == 0) {
         if (clock->ops->start) {
@@ -93,7 +93,7 @@ bool ztimer_release(ztimer_clock_t *clock)
     assert(clock->users > 0);
 
     DEBUG("ztimer_release(): %p: %" PRIu16 " user(s)\n",
-          (void *)clock, clock->users - 1);
+          (void *)clock, (uint16_t)(clock->users - 1));
 
     if (--clock->users == 0) {
         /* make sure the timer isn't armed before turning off */
