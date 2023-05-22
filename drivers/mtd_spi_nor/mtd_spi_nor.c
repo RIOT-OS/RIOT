@@ -458,6 +458,7 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
                 retries++;
             } while (res < 0 && retries < MTD_POWER_UP_WAIT_FOR_ID);
             if (res < 0) {
+                mtd_spi_release(dev);
                 return -EIO;
             }
             /* enable 32 bit address mode */
@@ -501,9 +502,9 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
     _init_pins(dev);
 
     /* power up the MTD device*/
-    DEBUG("mtd_spi_nor_init: power up MTD device");
+    DEBUG_PUTS("mtd_spi_nor_init: power up MTD device");
     if (mtd_spi_nor_power(mtd, MTD_POWER_UP)) {
-        DEBUG("mtd_spi_nor_init: failed to power up MTD device");
+        DEBUG_PUTS("mtd_spi_nor_init: failed to power up MTD device");
         return -EIO;
     }
 
