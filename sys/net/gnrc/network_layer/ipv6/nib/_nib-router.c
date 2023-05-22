@@ -172,62 +172,66 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
         ext_opts = rdnsso;
     }
 #endif  /* CONFIG_GNRC_IPV6_NIB_DNS */
+    if (gnrc_netif_is_6ln(netif)) {
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
-    uint16_t ltime_min;
-    gnrc_pktsnip_t *abro;
+        uint16_t ltime_min;
+        gnrc_pktsnip_t *abro;
 
 #ifdef MODULE_GNRC_SIXLOWPAN_CTX
-    for (int i = 0; i < GNRC_SIXLOWPAN_CTX_SIZE; i++) {
-        gnrc_sixlowpan_ctx_t *ctx;
-        if (bf_isset(abr->ctxs, i) &&
-            ((ctx = gnrc_sixlowpan_ctx_lookup_id(i)) != NULL)) {
-            gnrc_pktsnip_t *sixco = gnrc_sixlowpan_nd_opt_6ctx_build(
-                                            ctx->prefix_len, ctx->flags_id,
-                                            ctx->ltime, &ctx->prefix, ext_opts);
-            if (sixco == NULL) {
-                DEBUG("nib: No space left in packet buffer. Not adding 6LO\n");
-                return NULL;
+        for (int i = 0; i < GNRC_SIXLOWPAN_CTX_SIZE; i++) {
+            gnrc_sixlowpan_ctx_t *ctx;
+            if (bf_isset(abr->ctxs, i) &&
+                ((ctx = gnrc_sixlowpan_ctx_lookup_id(i)) != NULL)) {
+                gnrc_pktsnip_t *sixco = gnrc_sixlowpan_nd_opt_6ctx_build(
+                                                ctx->prefix_len, ctx->flags_id,
+                                                ctx->ltime, &ctx->prefix, ext_opts);
+                if (sixco == NULL) {
+                    DEBUG("nib: No space left in packet buffer. Not adding 6LO\n");
+                    return NULL;
+                }
+                ext_opts = sixco;
             }
-            ext_opts = sixco;
         }
-    }
 #endif  /* MODULE_GNRC_SIXLOWPAN_CTX */
-    while ((pfx = _nib_abr_iter_pfx(abr, pfx))) {
-        if (_nib_onl_get_if(pfx->next_hop) == id) {
-            if ((ext_opts = _offl_to_pio(pfx, ext_opts)) == NULL) {
-                return NULL;
+        while ((pfx = _nib_abr_iter_pfx(abr, pfx))) {
+            if (_nib_onl_get_if(pfx->next_hop) == id) {
+                if ((ext_opts = _offl_to_pio(pfx, ext_opts)) == NULL) {
+                    return NULL;
+                }
             }
         }
-    }
-    if (gnrc_netif_is_6lbr(netif)) {
-        ltime_min = 0U;
+        if (gnrc_netif_is_6lbr(netif)) {
+            ltime_min = 0U;
 
-        /* update valid time */
-        abr->valid_until_ms = evtimer_now_msec() + (
-            SIXLOWPAN_ND_OPT_ABR_LTIME_DEFAULT * MS_PER_SEC * SEC_PER_MIN
-        );
+            /* update valid time */
+            abr->valid_until_ms = evtimer_now_msec() + (
+                SIXLOWPAN_ND_OPT_ABR_LTIME_DEFAULT * MS_PER_SEC * SEC_PER_MIN
+            );
+        }
+        else {
+            ltime_min = _nib_abr_entry_valid_offset(abr);
+        }
+        (void)ltime_min;    /* gnrc_sixlowpan_nd_opt_abr_build might evaluate to NOP */
+        abro = gnrc_sixlowpan_nd_opt_abr_build(abr->version, ltime_min, &abr->addr,
+                                            ext_opts);
+        if (abro == NULL) {
+            DEBUG("nib: No space left in packet buffer. Not adding ABRO\n");
+            return NULL;
+        }
+        ext_opts = abro;
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
     }
     else {
-        ltime_min = _nib_abr_entry_valid_offset(abr);
-    }
-    (void)ltime_min;    /* gnrc_sixlowpan_nd_opt_abr_build might evaluate to NOP */
-    abro = gnrc_sixlowpan_nd_opt_abr_build(abr->version, ltime_min, &abr->addr,
-                                           ext_opts);
-    if (abro == NULL) {
-        DEBUG("nib: No space left in packet buffer. Not adding ABRO\n");
-        return NULL;
-    }
-    ext_opts = abro;
-#else   /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
-    (void)abr;
-    while ((pfx = _nib_offl_iter(pfx))) {
-        if ((pfx->mode & _PL) && (_nib_onl_get_if(pfx->next_hop) == id)) {
-            if ((ext_opts = _offl_to_pio(pfx, ext_opts)) == NULL) {
-                return NULL;
+        (void)abr;
+        while ((pfx = _nib_offl_iter(pfx))) {
+            if ((pfx->mode & _PL) && (_nib_onl_get_if(pfx->next_hop) == id)) {
+                if ((ext_opts = _offl_to_pio(pfx, ext_opts)) == NULL) {
+                    return NULL;
+                }
             }
         }
     }
-#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
+
     return ext_opts;
 }
 
