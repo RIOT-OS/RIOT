@@ -109,10 +109,8 @@ static void free_memory(struct node *head)
     printf("Free count: %"PRIu32"\n", freed);
 }
 
-int main(void)
+static void check_calloc_returns_null_on_overflow(void)
 {
-    uint32_t allocations = 0;
-
     /* modern compilers warn about nonsense calls to calloc, but this is exactly what we want to
      * test */
 #pragma GCC diagnostic push
@@ -121,8 +119,24 @@ int main(void)
 #endif
     /* test if an overflow is correctly detected by calloc(): the size below overflows by 1 byte */
     /* cppcheck-suppress leakReturnValNotUsed; (should return NULL, so nothing to free anyway) */
-    expect(NULL == calloc(SIZE_MAX / 16 + 1, 16));
+    size_t nmemb = SIZE_MAX / 16 + 1;
+    size_t size = 16;
+    void *p = calloc(nmemb, size);
+
+    /* When clang detects that the memory allocated is not actually used, it
+     * will optimize out the call to `calloc()` and just assume that the
+     * allocation succeeded. It then optimized out the test `NULL == p` and
+     * assumes it to always be false. We just print the address to prevent
+     * that from happening */
+    printf("calloc(%zu, %zu) = %p\n", nmemb, size, p);
+    expect(NULL == p);
 #pragma GCC diagnostic pop
+}
+
+int main(void)
+{
+    uint32_t allocations = 0;
+    check_calloc_returns_null_on_overflow();
 
     printf("CHUNK_SIZE: %"PRIu32"\n", (uint32_t)CHUNK_SIZE);
     printf("NUMBER_OF_TESTS: %d\n", NUMBER_OF_TESTS);
