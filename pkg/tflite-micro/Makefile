@@ -40,5 +40,13 @@ all: $(TFLITE_MODULES_USED)
 
 .PHONY: tflite-%
 
-tflite-%:
+.PHONY: $(PKG_SOURCE_DIR)/tensorflow/lite/schema/schema_generated.h
+
+$(PKG_SOURCE_DIR)/tensorflow/lite/schema/schema_generated.h: $(PKG_SOURCE_DIR)/tensorflow/lite/schema/schema.fbs $(FLATC)
+	$(FLATC) --cpp -o "$(dir $@)" "$<"
+
+tflite-%: $(PKG_SOURCE_DIR)/tensorflow/lite/schema/schema_generated.h
 	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/$(DIR_$@) -f $(CURDIR)/$@.mk
+
+$(FLATC):
+	$(Q)make -C "$(dir $@)"
