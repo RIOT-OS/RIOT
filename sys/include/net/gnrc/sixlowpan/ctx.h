@@ -165,6 +165,12 @@ static inline bool gnrc_sixlowpan_ctx_update_6ctx(const ipv6_addr_t *prefix, uin
     gnrc_sixlowpan_ctx_t *ctx = gnrc_sixlowpan_ctx_lookup_addr(prefix);
     uint8_t cid = 0;
 
+    /* IPHC does not support prefixes shorter than 64 bit
+     * see https://datatracker.ietf.org/doc/html/rfc6282#page-9 */
+    if (prefix_len < 64) {
+        prefix_len = 64;
+    }
+
     if (!gnrc_sixlowpan_ctx_match(ctx, prefix, prefix_len)) {
         /* While the context is a prefix match, the defined prefix within the
          * context does not match => use new context */
