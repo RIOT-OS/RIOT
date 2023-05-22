@@ -458,6 +458,7 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
                 retries++;
             } while (res < 0 && retries < MTD_POWER_UP_WAIT_FOR_ID);
             if (res < 0) {
+                mtd_spi_release(dev);
                 return -EIO;
             }
             /* enable 32 bit address mode */
