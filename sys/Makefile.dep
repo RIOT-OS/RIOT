@@ -362,7 +362,7 @@ endif
 
 ifneq (,$(filter isrpipe_read_timeout,$(USEMODULE)))
   USEMODULE += isrpipe
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter md5sum sha1sum sha256sum,$(USEMODULE)))
