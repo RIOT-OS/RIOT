@@ -210,7 +210,6 @@ def _test_successful_update(child, client, app_ver):
             pass
         # Check successful install
         child.expect_exact("Install correct payload")
-        child.expect_exact("Install correct payload")
 
         # Wait for reboot on non-native BOARDs
         if BOARD != "native":
