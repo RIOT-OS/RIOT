@@ -1,5 +1,5 @@
 /* ============================================================================ */
-/* Copyright (c) 2020, Texas Instruments Incorporated                           */
+/* Copyright (c) 2021, Texas Instruments Incorporated                           */
 /*  All rights reserved.                                                        */
 /*                                                                              */
 /*  Redistribution and use in source and binary forms, with or without          */
@@ -31,7 +31,7 @@
 /* ============================================================================ */
 
 /* This file supports MSP430F2617 devices. */
-/* Version: 1.210 */
+/* Version: 1.212 */
 
 /************************************************************
 * STANDARD BITS
