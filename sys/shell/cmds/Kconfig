@@ -273,7 +273,7 @@ config MODULE_SHELL_CMD_SEMTECH-LORAMAC
     bool "Command to control the Semtech LoRaMAC stack"
     default y if MODULE_SHELL_CMDS_DEFAULT
     depends on MODULE_SHELL_CMDS
-    depends on MODULE_SEMTECH-LORAMAC
+    depends on PACKAGE_SEMTECH-LORAMAC
 
 config MODULE_SHELL_CMD_SHA1SUM
     bool "Command to compute the SHA1 sum of a file"
