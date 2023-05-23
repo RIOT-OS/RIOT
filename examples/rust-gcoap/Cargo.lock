@@ -157,8 +157,7 @@ dependencies = [
 [[package]]
 name = "coap-handler-implementations"
 version = "0.4.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4f96e53455f4b1eadadadf53bef28d799dc295414bb2c8b8f86b3d45cc71f154"
+source = "git+https://gitlab.com/chrysn/coap-handler-implementations#de9d434c05c5a36056b99e4a52715bf001dee2d4"
 dependencies = [
  "ciborium-io",
  "coap-handler",
@@ -546,7 +545,6 @@ dependencies = [
 [[package]]
 name = "riot-sys"
 version = "0.7.9"
-source = "git+https://github.com/RIOT-OS/rust-riot-sys#b4bd4bde7520d0ffd79b89c2c5454f74de29dc39"
 dependencies = [
  "bindgen",
  "c2rust-asm-casts",
@@ -561,7 +559,6 @@ dependencies = [
 [[package]]
 name = "riot-wrappers"
 version = "0.8.1"
-source = "git+https://github.com/RIOT-OS/rust-riot-wrappers#fbc6cfe86f8b256427f15f18b4c945483ff2bcfc"
 dependencies = [
  "bare-metal",
  "coap-handler",
@@ -585,9 +582,15 @@ dependencies = [
 name = "rust-gcoap"
 version = "0.1.0"
 dependencies = [
+ "coap-handler",
  "coap-handler-implementations",
+ "coap-message",
  "coap-message-demos",
+ "coap-numbers",
+ "crc 3.0.1",
+ "minicbor",
  "riot-coap-handler-demos",
+ "riot-sys",
  "riot-wrappers",
  "rust_riotmodules",
 ]
