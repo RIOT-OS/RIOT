@@ -28,6 +28,16 @@
 extern "C" {
 #endif
 
+/**
+ * @brief   Silences the warning when an unsigned value is compared to 0
+ *
+ * This can be deleted when I2C is properly implemented.
+ */
+static inline unsigned _periph_numof_is_unsigned_0(void)
+{
+    return 0;
+}
+
 static const uart_conf_t uart_config[] = {
     {
         .dev = UART0,
@@ -108,6 +118,62 @@ static const adc_conf_t adc_config[] = {
                                         };
 
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
+/** @} */
+
+/**
+ * @name    I2C configuration
+ * @{
+ */
+/**
+ *  @brief  Number of I2C interfaces
+ */
+#define I2C_NUMOF       _periph_numof_is_unsigned_0()
+/** @} */
+
+/**
+ * @name    PIO configuration
+ * @{
+ */
+/**
+ * @brief   Array of PIO configurations
+ */
+static const pio_conf_t pio_config[] = {
+    {
+        .dev = PIO0,
+        .irqn0 = PIO0_IRQ_0_IRQn,
+        .irqn1 = PIO0_IRQ_1_IRQn
+    },
+    {
+        .dev = PIO1,
+        .irqn0 = PIO1_IRQ_0_IRQn,
+        .irqn1 = PIO1_IRQ_1_IRQn
+    }
+};
+
+#define PIO_0_ISR0      isr_pio00   /**< ISR name of PIO 0 IRQ 0 */
+#define PIO_0_ISR1      isr_pio01   /**< ISR name of PIO 0 IRQ 1 */
+#define PIO_1_ISR0      isr_pio10   /**< ISR name of PIO 1 IRQ 0 */
+#define PIO_1_ISR1      isr_pio11   /**< ISR name of PIO 1 IRQ 1 */
+
+#define PIO_NUMOF       ARRAY_SIZE(pio_config)  /**< Number of PIOs */
+
+#if defined(PIO_I2C_CONFIG) || defined(DOXYGEN)
+/**
+ * @brief   PIO I2C configuration
+ *
+ * PIO_I2C_CONFIG should be defined during the build process to fit
+ * the users pin selection.
+ */
+static const pio_i2c_conf_t pio_i2c_config[] = {
+    PIO_I2C_CONFIG
+};
+/**
+ * @brief   Number of PIO I2C configurations
+ */
+#define PIO_I2C_NUMOF   ARRAY_SIZE(pio_i2c_config)
+#else
+#define pio_i2c_config  ((pio_i2c_conf_t *)NULL)
+#endif
 /** @} */
 
 #ifdef __cplusplus

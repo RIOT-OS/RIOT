@@ -11,10 +11,12 @@ config CPU_FAM_RPX0XX
     select HAS_CPU_RPX0XX
     select HAS_PERIPH_GPIO
     select HAS_PERIPH_GPIO_IRQ
+    select HAS_PERIPH_PIO
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_TIMER_PERIODIC
     select HAS_PERIPH_UART_MODECFG
     select HAS_PERIPH_UART_RECONFIGURE
+    select HAS_PIO_I2C
 
 config CPU_FAM
     default "RPX0XX" if CPU_FAM_RPX0XX

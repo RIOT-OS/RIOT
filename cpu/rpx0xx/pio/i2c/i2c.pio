@@ -1,0 +1,121 @@
+;
+; Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
+;
+; SPDX-License-Identifier: BSD-3-Clause
+;
+
+.program i2c
+.side_set 1 opt pindirs
+
+; TX Encoding:
+; | 15:10 | 9     | 8:1  | 0   |
+; | Instr | Final | Data | NAK |
+;
+; If Instr has a value n > 0, then this FIFO word has no
+; data payload, and the next n + 1 words will be executed as instructions.
+; Otherwise, shift out the 8 data bits, followed by the ACK bit.
+;
+; The Instr mechanism allows stop/start/repstart sequences to be programmed
+; by the processor, and then carried out by the state machine at defined points
+; in the datastream.
+;
+; The "Final" field should be set for the final byte in a transfer.
+; This tells the state machine to ignore a NAK: if this field is not
+; set, then any NAK will cause the state machine to halt and interrupt.
+;
+; Autopull should be enabled, with a threshold of 16.
+; Autopush should be enabled, with a threshold of 8.
+; The TX FIFO should be accessed with halfword writes, to ensure
+; the data is immediately available in the OSR.
+;
+; Pin mapping:
+; - Input pin 0 is SDA, 1 is SCL (if clock stretching used)
+; - Jump pin is SDA
+; - Side-set pin 0 is SCL
+; - Set pin 0 is SDA
+; - OUT pin 0 is SDA
+; - SCL must be SDA + 1 (for wait mapping)
+;
+; The OE outputs should be inverted in the system IO controls!
+; (It's possible for the inversion to be done in this program,
+; but costs 2 instructions: 1 for inversion, and one to cope
+; with the side effect of the MOV on TX shift counter.)
+
+do_nack:
+    jmp y-- entry_point        ; Continue if NAK was expected
+    irq wait 0 rel             ; Otherwise stop, ask for help
+
+do_byte:
+    set x, 7                   ; Loop 8 times
+bitloop:
+    out pindirs, 1         [7] ; Serialise write data (all-ones if reading)
+    nop             side 1 [2] ; SCL rising edge
+    wait 1 pin, 1          [4] ; Allow clock to be stretched
+    in pins, 1             [7] ; Sample read data in middle of SCL pulse
+    jmp x-- bitloop side 0 [7] ; SCL falling edge
+
+    ; Handle ACK pulse
+    out pindirs, 1         [7] ; On reads, we provide the ACK.
+    nop             side 1 [7] ; SCL rising edge
+    wait 1 pin, 1          [7] ; Allow clock to be stretched
+    jmp pin do_nack side 0 [2] ; Test SDA for ACK/NAK, fall through if ACK
+
+public entry_point:
+.wrap_target
+    out x, 6                   ; Unpack Instr count
+    out y, 1                   ; Unpack the NAK ignore bit
+    jmp !x do_byte             ; Instr == 0, this is a data record.
+    out null, 32               ; Instr > 0, remainder of this OSR is invalid
+do_exec:
+    out exec, 16               ; Execute one instruction per FIFO word
+    jmp x-- do_exec            ; Repeat n + 1 times
+.wrap
+
+% c-sdk {
+
+#include "hardware/clocks.h"
+#include "hardware/gpio.h"
+
+
+static inline void i2c_program_init(PIO pio, uint sm, uint offset, uint pin_sda, uint pin_scl) {
+    assert(pin_scl == pin_sda + 1);
+    pio_sm_config c = i2c_program_get_default_config(offset);
+
+    // IO mapping
+    sm_config_set_out_pins(&c, pin_sda, 1);
+    sm_config_set_set_pins(&c, pin_sda, 1);
+    sm_config_set_in_pins(&c, pin_sda);
+    sm_config_set_sideset_pins(&c, pin_scl);
+    sm_config_set_jmp_pin(&c, pin_sda);
+
+    sm_config_set_out_shift(&c, false, true, 16);
+    sm_config_set_in_shift(&c, false, true, 8);
+
+    float div = (float)clock_get_hz(clk_sys) / (32 * 100000);
+    sm_config_set_clkdiv(&c, div);
+
+    // Try to avoid glitching the bus while connecting the IOs. Get things set
+    // up so that pin is driven down when PIO asserts OE low, and pulled up
+    // otherwise.
+    gpio_pull_up(pin_scl);
+    gpio_pull_up(pin_sda);
+    uint32_t both_pins = (1u << pin_sda) | (1u << pin_scl);
+    pio_sm_set_pins_with_mask(pio, sm, both_pins, both_pins);
+    pio_sm_set_pindirs_with_mask(pio, sm, both_pins, both_pins);
+    pio_gpio_init(pio, pin_sda);
+    gpio_set_oeover(pin_sda, GPIO_OVERRIDE_INVERT);
+    pio_gpio_init(pio, pin_scl);
+    gpio_set_oeover(pin_scl, GPIO_OVERRIDE_INVERT);
+    pio_sm_set_pins_with_mask(pio, sm, 0, both_pins);
+
+    // Clear IRQ flag before starting
+    hw_clear_bits(&pio->inte0, 1u << sm);
+    hw_clear_bits(&pio->inte1, 1u << sm);
+    pio->irq = 1u << sm;
+
+    // Configure and start SM
+    pio_sm_init(pio, sm, offset + i2c_offset_entry_point, &c);
+    pio_sm_set_enabled(pio, sm, true);
+}
+
+%}

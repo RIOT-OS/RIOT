@@ -607,6 +607,9 @@ PSEUDOMODULES += stm32_periph_%
 PSEUDOMODULES += periph_%
 NO_PSEUDOMODULES += periph_common
 
+# Modules to automatically start PIO programs
+PSEUDOMODULES += pio_autostart_%
+
 # Submodules provided by Skald
 PSEUDOMODULES += skald_ibeacon
 PSEUDOMODULES += skald_eddystone
