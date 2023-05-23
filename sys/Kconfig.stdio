@@ -29,6 +29,12 @@ config MODULE_STDIO_RTT
     select MODULE_ZTIMER
     select MODULE_ZTIMER_MSEC
 
+config MODULE_STDIO_SEMIHOSTING
+    bool "ARM and RISC-V Semihosting"
+    depends on HAS_ARCH_ARM || HAS_ARCH_RISCV
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_MSEC
+
 config MODULE_SLIPDEV_STDIO
     bool "SLIP network device"
     depends on MODULE_SLIPDEV
