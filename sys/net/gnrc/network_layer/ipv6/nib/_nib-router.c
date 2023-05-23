@@ -267,7 +267,7 @@ static gnrc_pktsnip_t *_build_final_ext_opts(gnrc_netif_t *netif)
             gnrc_pktsnip_t *snip  = gnrc_ndp_opt_ri_build(&entry->pfx,
                                                           entry->pfx_len,
                                                           valid_ltime,
-                                                          NDP_OPT_RI_FLAGS_PRF_NONE,
+                                                          NDP_OPT_RI_FLAGS_PRF_ZERO,
                                                           ext_opts);
             if (snip != NULL) {
                 ext_opts = snip;
