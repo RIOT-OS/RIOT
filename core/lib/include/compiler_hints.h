@@ -181,6 +181,19 @@ extern "C" {
 #define assume(cond)    assert(cond)
 #endif
 
+/**
+ * @brief   Wrapper function to silence "comparison is always false due to limited
+ *          range of data type" type of warning when the warning is caused by a
+ *          preprocessor configuration value that may be zero.
+ *
+ * @param[in]   n   Variable that may be zero
+ * @return      The same variable @p n
+ */
+static inline unsigned may_be_zero(unsigned n)
+{
+    return n;
+}
+
 #ifdef __cplusplus
 }
 #endif

@@ -144,6 +144,78 @@ static inline uint16_t _nib_abr_entry_valid_offset(const _nib_abr_entry_t *abr)
 }
 #endif
 
+/* check if a different prefix already includes the prefix of the entry */
+static bool _has_better_match(const _nib_offl_entry_t *entry)
+{
+    _nib_offl_entry_t *candidate = NULL;
+
+    while ((candidate = _nib_offl_iter(candidate))) {
+
+        if (candidate == entry) {
+            continue;
+        }
+
+        if (!(entry->mode & (_PL | _FT))) {
+            continue;
+        }
+
+        if (candidate->pfx_len >= entry->pfx_len) {
+            continue;
+        }
+
+        if (ipv6_addr_match_prefix(&entry->pfx, &candidate->pfx) == candidate->pfx_len) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+static gnrc_pktsnip_t *_add_rio(gnrc_netif_t *netif, gnrc_pktsnip_t *ext_opts, bool offl)
+{
+    _nib_offl_entry_t *entry = NULL;
+    uint32_t now = evtimer_now_msec();
+
+    while ((entry = _nib_offl_iter(entry))) {
+
+        unsigned id = netif->pid;
+        if (_nib_onl_get_if(entry->next_hop) == id) {
+            continue;
+        }
+
+        if (entry->pfx_len == 0) {
+            continue;
+        }
+
+        if (offl && _has_better_match(entry)) {
+            continue;
+        }
+
+        bool local_pfx = (entry->mode & _PL) && (entry->flags & _PFX_ON_LINK);
+        bool routed_pfx = (entry->mode & _FT);
+
+        if (local_pfx || (offl && routed_pfx)) {
+
+            DEBUG("nib: adding downstream subnet to RA\n");
+            uint32_t valid_ltime = (entry->valid_until == UINT32_MAX) ? UINT32_MAX :
+                                   ((entry->valid_until - now) / MS_PER_SEC);
+            gnrc_pktsnip_t *snip  = gnrc_ndp_opt_ri_build(&entry->pfx,
+                                                          entry->pfx_len,
+                                                          valid_ltime,
+                                                          NDP_OPT_RI_FLAGS_PRF_ZERO,
+                                                          ext_opts);
+            if (snip != NULL) {
+                ext_opts = snip;
+            } else {
+                DEBUG_PUTS("nib: can't add RIO to RA - out of memory");
+                break;
+            }
+        }
+    }
+
+    return ext_opts;
+}
+
 static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
                                        _nib_abr_entry_t *abr)
 {
@@ -232,6 +304,12 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
         }
     }
 
+    /* advertise route to off-link subnets */
+    if (CONFIG_GNRC_IPV6_NIB_ADD_RIO_IN_RA) {
+        DEBUG("nib: add RIO to RA on interface %u\n", netif->pid);
+        ext_opts = _add_rio(netif, ext_opts, true);
+    }
+
     return ext_opts;
 }
 
@@ -243,39 +321,10 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
 static gnrc_pktsnip_t *_build_final_ext_opts(gnrc_netif_t *netif)
 {
     gnrc_pktsnip_t *ext_opts = NULL;
-    _nib_offl_entry_t *entry = NULL;
 
-    if (!IS_USED(MODULE_GNRC_IPV6_NIB_RIO) ||
-        !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ADD_RIO_IN_LAST_RA)) {
-        return NULL;
-    }
-
-    DEBUG("nib: sending final RA on interface %u\n", netif->pid);
-
-    uint32_t now = evtimer_now_msec();
-    while ((entry = _nib_offl_iter(entry))) {
-
-        unsigned id = netif->pid;
-        if (_nib_onl_get_if(entry->next_hop) == id) {
-            continue;
-        }
-
-        if ((entry->mode & _PL) && (entry->flags & _PFX_ON_LINK)) {
-            DEBUG("nib: adding downstream subnet to RA\n");
-            uint32_t valid_ltime = (entry->valid_until == UINT32_MAX) ? UINT32_MAX :
-                                   ((entry->valid_until - now) / MS_PER_SEC);
-            gnrc_pktsnip_t *snip  = gnrc_ndp_opt_ri_build(&entry->pfx,
-                                                          entry->pfx_len,
-                                                          valid_ltime,
-                                                          NDP_OPT_RI_FLAGS_PRF_ZERO,
-                                                          ext_opts);
-            if (snip != NULL) {
-                ext_opts = snip;
-            } else {
-                DEBUG_PUTS("nib: can't add RIO to RA - out of memory");
-                break;
-            }
-        }
+    if (CONFIG_GNRC_IPV6_NIB_ADD_RIO_IN_LAST_RA) {
+        DEBUG("nib: add RIO to final RA on interface %u\n", netif->pid);
+        ext_opts = _add_rio(netif, ext_opts, false);
     }
 
     return ext_opts;

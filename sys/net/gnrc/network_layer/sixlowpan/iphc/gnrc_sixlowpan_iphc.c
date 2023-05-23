@@ -113,6 +113,8 @@
 #define NHC_IPV6_EXT_EID_MOB        (0x04 << 1)
 #define NHC_IPV6_EXT_EID_IPV6       (0x07 << 1)
 
+#define SIXLOWPAN_IPHC_PREFIX_LEN   (64)    /**< minimum prefix length for IPHC */
+
 /* currently only used with forwarding output, remove guard if more debug info
  * is added */
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_VRB
@@ -1090,6 +1092,11 @@ static size_t _iphc_ipv6_encode(gnrc_pktsnip_t *pkt,
         if (src_ctx && !(src_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_COMP)) {
             src_ctx = NULL;
         }
+        /* prefix bits not covered by context information must be zero */
+        if (src_ctx &&
+            ipv6_addr_match_prefix(&src_ctx->prefix, &ipv6_hdr->src) < SIXLOWPAN_IPHC_PREFIX_LEN) {
+            src_ctx = NULL;
+        }
     }
 
     if (!ipv6_addr_is_multicast(&ipv6_hdr->dst)) {
@@ -1097,6 +1104,11 @@ static size_t _iphc_ipv6_encode(gnrc_pktsnip_t *pkt,
         /* do not use destination context for compression if */
         /* GNRC_SIXLOWPAN_CTX_FLAGS_COMP is not set */
         if (dst_ctx && !(dst_ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_COMP)) {
+            dst_ctx = NULL;
+        }
+        /* prefix bits not covered by context information must be zero */
+        if (dst_ctx &&
+            ipv6_addr_match_prefix(&dst_ctx->prefix, &ipv6_hdr->dst) < SIXLOWPAN_IPHC_PREFIX_LEN) {
             dst_ctx = NULL;
         }
     }
