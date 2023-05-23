@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2021 ML!PA Consulting GmbH
  *
@@ -332,7 +333,7 @@ static bool _remove_old_prefix(gnrc_netif_t *netif,
 
     /* invalidate old prefix in RIO */
     tmp = gnrc_ndp_opt_ri_build(&old_pfx, old_pfx_len, 0,
-                                NDP_OPT_RI_FLAGS_PRF_NONE, *ext_opts);
+                                NDP_OPT_RI_FLAGS_PRF_ZERO, *ext_opts);
     if (tmp) {
         *ext_opts = tmp;
     }
