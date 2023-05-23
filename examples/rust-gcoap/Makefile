@@ -9,12 +9,16 @@ RIOTBASE ?= $(CURDIR)/../..
 
 # Basic networking, and gcoap
 USEMODULE += gcoap
-USEMODULE += netdev_default
+USEMODULE += usbus_cdc_ecm
+#USEMODULE += netdev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_default
 USEMODULE += gnrc_icmpv6_echo
 
 FEATURES_REQUIRED += riotboot
+USEMODULE += usbus_dfu
+BOARD ?= particle-xenon
+PROGRAMMER = dfu-util
 
 USEMODULE += suit_storage_flashwrite
 USEMODULE += suit_transport_coap
