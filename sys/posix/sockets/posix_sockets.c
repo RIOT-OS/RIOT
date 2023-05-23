@@ -232,6 +232,7 @@ static int _ep_to_sockaddr(const struct _sock_tl_ep *ep,
             in6_addr->sin6_family = AF_INET6;
             memcpy(&in6_addr->sin6_addr, &ep->addr.ipv6, sizeof(ep->addr.ipv6));
             in6_addr->sin6_port = htons(ep->port);
+            in6_addr->sin6_scope_id = ep->netif;
             return sizeof(struct sockaddr_in6);
         }
 #endif
