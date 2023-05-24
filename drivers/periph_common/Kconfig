@@ -90,6 +90,16 @@ config MODULE_PERIPH_INIT_HWRNG
 
 rsource "Kconfig.i2c"
 
+config MODULE_PERIPH_PIO
+    bool "Programmable IO (PIO) peripheral driver"
+    depends on HAS_PERIPH_PIO
+    select MODULE_PERIPH_COMMON
+
+config MODULE_PERIPH_INIT_PIO
+    bool "Auto initialize programmable IO (PIO) peripheral driver"
+    default y if MODULE_PERIPH_INIT
+    depends on MODULE_PERIPH_PIO
+
 config MODULE_PERIPH_PM
     bool "Power Management (PM) peripheral driver"
     default y
