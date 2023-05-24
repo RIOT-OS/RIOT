@@ -217,6 +217,31 @@ now, `STM32FLASH_RESET_INVERT` is by default `1`. This may change if it
 becomes evident that non-inverted TTL adapters are in fact more common than
 inverted adapters.
 
+MSPDEBUG Configuration                         {#flashing-configuration-mspdebug}
+----------------------
+
+All options can be passed as environment variables or as make arguments.
+All options except for `DEBUGSERVER_PORT` apply to both debugging and flashing
+alike.
+
+`MSPDEBUG_PROGRAMMER` is used to set the hardware programmer/debugger to use
+for programming and debugging. See `mspdebug --help` or `man mspdebug` for a
+list of programmers.
+
+`MSPDEBUG_PROTOCOL` is used to specify the debugger protocol. It is typically
+set by the board used. Only JTAG and Spi-Bi-Wire are supported.
+
+`MSPDEBUG_TTY` is used to connect via TTY interface instead of directly via
+USB to the debugger. Usually, this is not required.
+
+`DEBUG_ADAPTER_ID` is used to select the debugger/programmer by its serial. If
+not set, `mspdebug` will select the first device with matching vendor and
+product ID. Unless multiple debuggers of the same type are connected, this
+options is typically not needed.
+
+`DEBUGSERVER_PORT` is used to specify the TCP port to listen for GDB to
+connect to. It defaults to 2000.
+
 Handling Multiple Boards With UDEV-Rules                {#multiple-boards-udev}
 ========================================
 
