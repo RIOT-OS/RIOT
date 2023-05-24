@@ -496,6 +496,13 @@ static void _handler_ep0_transfer(usbus_t *usbus, usbus_handler_t *handler,
     switch (event) {
         case USBUS_EVENT_TRANSFER_COMPLETE:
             _handle_tr_complete(usbus, ep0_handler, ep);
+            /* Forward to every handler, EP0 transfer event, except the first
+             * handler as this is the current handler used for this event */
+            for (usbus_handler_t *hdl = handler->next; hdl; hdl = hdl->next) {
+                if(usbus_handler_isset_flag(hdl, USBUS_HANDLER_FLAG_TR_EP0_FWD)) {
+                    hdl->driver->transfer_handler(usbus, hdl, ep, USBUS_EVENT_TRANSFER_COMPLETE);
+                }
+            }
             break;
         default:
             break;

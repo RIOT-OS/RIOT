@@ -132,6 +132,7 @@ extern "C" {
 #define USBUS_HANDLER_FLAG_SUSPEND  (0x0004)    /**< Report suspend events */
 #define USBUS_HANDLER_FLAG_RESUME   (0x0008)    /**< Report resume from suspend */
 #define USBUS_HANDLER_FLAG_TR_STALL (0x0020)    /**< Report transfer stall complete */
+#define USBUS_HANDLER_FLAG_TR_EP0_FWD   (0x0100)    /**< Forward transfer complete */
 /** @} */
 
 /**

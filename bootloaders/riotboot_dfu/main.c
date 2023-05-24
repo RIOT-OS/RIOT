@@ -26,9 +26,8 @@
 #include "panic.h"
 #include "riotboot/slot.h"
 #include "riotboot/usb_dfu.h"
-#include "ztimer.h"
-
 #include "riotboot/bootloader_selection.h"
+#include "ztimer.h"
 
 #ifdef BTN_BOOTLOADER_PIN
 #include "periph/gpio.h"
@@ -74,9 +73,9 @@ void kernel_init(void)
         }
     }
 
-    /* Init ztimer before starting DFU mode */
-    ztimer_init();
-
+    if (IS_USED(MODULE_ZTIMER)) {
+        ztimer_init();
+    }
     /* Flash the unused slot if magic word is set */
     riotboot_usb_dfu_init(0);
 
