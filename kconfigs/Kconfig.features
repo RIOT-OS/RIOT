@@ -191,9 +191,9 @@ config HAS_PERIPH_GPIO_IRQ
 config HAS_PERIPH_GPIO_FAST_READ
     bool
     help
-	Indicates that the GPIO peripheral supports a mode in which pin read
-	operations are faster, usually with a tradeoff against a different
-	property.
+        Indicates that the GPIO peripheral supports a mode in which pin read
+        operations are faster, usually with a tradeoff against a different
+        property.
 
 config HAS_PERIPH_GPIO_TAMPER_WAKE
     bool
