@@ -38,7 +38,6 @@
 #include "net/netif.h"
 #include "test_utils/expect.h"
 #include "utlist.h"
-#include "xtimer.h"
 
 #define ETHERNET_STACKSIZE          (THREAD_STACKSIZE_MAIN)
 #define IEEE802154_STACKSIZE        (THREAD_STACKSIZE_MAIN)
