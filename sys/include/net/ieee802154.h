@@ -126,6 +126,13 @@ extern "C" {
 #define IEEE802154_MR_OFDM_SYMBOL_TIME_US   (120)
 
 /**
+ * @brief Symbol time for IEEE 802.15.4 MR-FSK in µs
+ *
+ * symbol time is always 20 µs for MR-FSK (table 0, pg. 7)
+ */
+#define IEEE802154_MR_FSK_SYMBOL_TIME_US    (20)
+
+/**
  * @brief value of measured power when RSSI is zero.
  *
  * This value is defined in the IEEE 802.15.4 standard
@@ -190,11 +197,23 @@ typedef enum {
 /**
  * @brief   802.15.4 forward error correction schemes
  */
-enum {
+typedef enum {
     IEEE802154_FEC_NONE,            /**< no forward error correction */
     IEEE802154_FEC_NRNSC,           /**< non-recursive and non-systematic code */
     IEEE802154_FEC_RSC              /**< recursive and systematic code */
-};
+} ieee802154_mr_fsk_fec_t;
+
+/**
+ * @brief   802.15.4 MR-FSK symbol rates
+ */
+typedef enum {
+    IEEE802154_MR_FSK_SRATE_50K,    /**< 50k Symbols/s  */
+    IEEE802154_MR_FSK_SRATE_100K,   /**< 100k Symbols/s */
+    IEEE802154_MR_FSK_SRATE_150K,   /**< 150k Symbols/s */
+    IEEE802154_MR_FSK_SRATE_200K,   /**< 200k Symbols/s */
+    IEEE802154_MR_FSK_SRATE_300K,   /**< 300k Symbols/s */
+    IEEE802154_MR_FSK_SRATE_400K,   /**< 400k Symbols/s */
+} ieee802154_mr_fsk_srate_t;
 
 /**
  * @brief   802.15.4 MR-OQPSK chip rates
@@ -205,6 +224,32 @@ typedef enum {
     IEEE802154_MR_OQPSK_CHIPS_1000, /**< 1000 kChip/s */
     IEEE802154_MR_OQPSK_CHIPS_2000, /**< 2000 kChip/s */
 } ieee802154_mr_oqpsk_chips_t;
+
+/**
+ * @brief Get the minimum preamble length for a given symbol rate
+ *
+ * From IEEE 802.15.4g Table 6-64
+ *
+ * @param[in] srate     symbol rate
+ * @return    preamble length in bytes
+ */
+static inline uint8_t ieee802154_mr_fsk_plen(ieee802154_mr_fsk_srate_t srate)
+{
+    switch (srate) {
+    case IEEE802154_MR_FSK_SRATE_50K:
+        return 2;
+    case IEEE802154_MR_FSK_SRATE_100K:
+        return 3;
+    case IEEE802154_MR_FSK_SRATE_150K:
+    case IEEE802154_MR_FSK_SRATE_200K:
+    case IEEE802154_MR_FSK_SRATE_300K:
+        return 8;
+    case IEEE802154_MR_FSK_SRATE_400K:
+        return 10;
+    }
+
+    return 0;
+}
 
 /**
  * @brief   Special address definitions
@@ -300,6 +345,34 @@ extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
  */
 #ifndef CONFIG_IEEE802154_MR_OFDM_DEFAULT_SCHEME
 #define CONFIG_IEEE802154_MR_OFDM_DEFAULT_SCHEME    (2U)
+#endif
+
+/**
+ * @brief IEEE802.15.4 MR-FSK default symbol rate
+ */
+#ifndef CONFIG_IEEE802154_MR_FSK_DEFAULT_SRATE
+#define CONFIG_IEEE802154_MR_FSK_DEFAULT_SRATE      IEEE802154_MR_FSK_SRATE_200K
+#endif
+
+/**
+ * @brief IEEE802.15.4 MR-FSK default modulation index, fraction of 64
+ */
+#ifndef CONFIG_IEEE802154_MR_FSK_DEFAULT_MOD_IDX
+#define CONFIG_IEEE802154_MR_FSK_DEFAULT_MOD_IDX    (64U)
+#endif
+
+/**
+ * @brief IEEE802.15.4 MR-FSK default modulation order
+ */
+#ifndef CONFIG_IEEE802154_MR_FSK_DEFAULT_MOD_ORD
+#define CONFIG_IEEE802154_MR_FSK_DEFAULT_MOD_ORD    (2U)
+#endif
+
+/**
+ * @brief IEEE802.15.4 MR-FSK default error correction mode
+ */
+#ifndef CONFIG_IEEE802154_MR_FSK_DEFAULT_FEC
+#define CONFIG_IEEE802154_MR_FSK_DEFAULT_FEC        IEEE802154_FEC_NONE
 #endif
 
 /**
