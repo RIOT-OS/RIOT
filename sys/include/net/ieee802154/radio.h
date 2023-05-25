@@ -478,6 +478,17 @@ typedef struct {
 } ieee802154_mr_odmf_conf_t;
 
 /**
+ * @brief extension for IEEE 802.15.4g MR-FSK PHY
+ */
+typedef struct {
+    ieee802154_phy_conf_t super;        /**< common settings */
+    ieee802154_mr_fsk_srate_t srate;    /**< symbol rate */
+    uint8_t mod_ord;                    /**< modulation order, 2 or 4 */
+    uint8_t mod_idx;                    /**< modulation index */
+    ieee802154_mr_fsk_fec_t fec;        /**< forward error correction */
+} ieee802154_mr_fsk_conf_t;
+
+/**
  * @brief IEEE 802.15.4 radio operations
  */
 typedef enum {

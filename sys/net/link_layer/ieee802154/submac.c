@@ -553,6 +553,45 @@ static inline uint16_t _mr_ofdm_ack_timeout_us(const ieee802154_mr_odmf_conf_t *
          + _mr_ofdm_frame_duration(conf->option, conf->scheme, IEEE802154_ACK_FRAME_LEN);
 }
 
+/*
+ * MR-FSK timing calculations
+ *
+ * The standard unfortunately does not list the formula, instead it has to be pieced together
+ * from scattered information and tables in the IEEE 802.15.4 document - may contain errors.
+ */
+
+static inline uint16_t _mr_fsk_csma_backoff_period_us(const ieee802154_mr_fsk_conf_t *conf)
+{
+    (void)conf;
+
+    return IEEE802154_CCA_DURATION_IN_SYMBOLS * IEEE802154_MR_FSK_SYMBOL_TIME_US
+         + IEEE802154G_ATURNAROUNDTIME_US;
+}
+
+static inline uint16_t _mr_fsk_ack_timeout_us(const ieee802154_mr_fsk_conf_t *conf)
+{
+    uint8_t ack_len = IEEE802154_ACK_FRAME_LEN;
+    uint8_t fsk_pl = ieee802154_mr_fsk_plen(conf->srate);
+
+    /* PHR uses same data rate as PSDU */
+    ack_len += 2;
+
+    /* 4-FSK doubles data rate */
+    if (conf->mod_ord == 4) {
+        ack_len /= 2;
+    }
+
+    /* forward error correction halves data rate */
+    if (conf->fec) {
+        ack_len *= 2;
+    }
+
+    return _mr_fsk_csma_backoff_period_us(conf)
+         + IEEE802154G_ATURNAROUNDTIME_US
+         /* long Preamble + SFD; SFD=2 */
+         + ((fsk_pl * 8 + 2) + ack_len) * 8 * IEEE802154_MR_FSK_SYMBOL_TIME_US;
+}
+
 static int ieee802154_submac_config_phy(ieee802154_submac_t *submac,
                                         const ieee802154_phy_conf_t *conf)
 {
@@ -571,6 +610,12 @@ static int ieee802154_submac_config_phy(ieee802154_submac_t *submac,
     case IEEE802154_PHY_MR_OFDM:
         submac->ack_timeout_us = _mr_ofdm_ack_timeout_us((void *)conf);
         submac->csma_backoff_us = _mr_ofdm_csma_backoff_period_us((void *)conf);
+        break;
+#endif
+#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+    case IEEE802154_PHY_MR_FSK:
+        submac->ack_timeout_us = _mr_fsk_ack_timeout_us((void *)conf);
+        submac->csma_backoff_us = _mr_fsk_csma_backoff_period_us((void *)conf);
         break;
 #endif
     case IEEE802154_PHY_NO_OP:
@@ -659,6 +704,9 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
 #ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
         ieee802154_mr_odmf_conf_t mr_ofdm;
 #endif
+#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+        ieee802154_mr_fsk_conf_t mr_fsk;
+#endif
     } conf;
 
 #ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
@@ -671,6 +719,14 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     if (submac->phy_mode == IEEE802154_PHY_MR_OFDM) {
         conf.mr_ofdm.option = CONFIG_IEEE802154_MR_OFDM_DEFAULT_OPTION;
         conf.mr_ofdm.scheme = CONFIG_IEEE802154_MR_OFDM_DEFAULT_SCHEME;
+    }
+#endif
+#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+    if (submac->phy_mode == IEEE802154_PHY_MR_FSK) {
+        conf.mr_fsk.srate = CONFIG_IEEE802154_MR_FSK_DEFAULT_SRATE;
+        conf.mr_fsk.mod_ord = CONFIG_IEEE802154_MR_FSK_DEFAULT_MOD_ORD;
+        conf.mr_fsk.mod_idx = CONFIG_IEEE802154_MR_FSK_DEFAULT_MOD_IDX;
+        conf.mr_fsk.fec = CONFIG_IEEE802154_MR_FSK_DEFAULT_FEC;
     }
 #endif
 
