@@ -227,7 +227,7 @@ static ieee802154_fsm_state_t _fsm_state_prepare(ieee802154_submac_t *submac,
         if (!_does_handle_csma(dev)) {
             /* delay for an adequate random backoff period */
             uint32_t bp = (random_uint32() & submac->backoff_mask) *
-                          CSMA_SENDER_BACKOFF_PERIOD_UNIT_US;
+                          submac->csma_backoff_us;
 
             ztimer_sleep(ZTIMER_USEC, bp);
             /* Prepare for next iteration */
@@ -282,7 +282,7 @@ static ieee802154_fsm_state_t _fsm_state_tx_process_tx_done(ieee802154_submac_t 
             assert (res >= 0);
 
             /* Handle ACK reception */
-            ieee802154_submac_ack_timer_set(submac, ACK_TIMEOUT_US);
+            ieee802154_submac_ack_timer_set(submac, submac->ack_timeout_us);
             return IEEE802154_FSM_STATE_WAIT_FOR_ACK;
         }
         break;
@@ -431,6 +431,21 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
     return 0;
 }
 
+static int ieee802154_submac_config_phy(ieee802154_submac_t *submac,
+                                        const ieee802154_phy_conf_t *conf)
+{
+    switch (conf->phy_mode) {
+    case IEEE802154_PHY_OQPSK:
+        submac->ack_timeout_us = ACK_TIMEOUT_US;
+        submac->csma_backoff_us = CSMA_SENDER_BACKOFF_PERIOD_UNIT_US;
+        break;
+    default:
+        return -EINVAL;
+    }
+
+    return ieee802154_radio_config_phy(&submac->dev, conf);
+}
+
 int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *short_addr,
                            const eui64_t *ext_addr)
 {
@@ -505,7 +520,7 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
       .page = submac->channel_page,
       .pow = submac->tx_pow };
 
-    ieee802154_radio_config_phy(dev, &conf);
+    ieee802154_submac_config_phy(submac, &conf);
     ieee802154_radio_set_cca_threshold(dev,
                                        CONFIG_IEEE802154_CCA_THRESH_DEFAULT);
     assert(res >= 0);
@@ -539,7 +554,7 @@ int ieee802154_set_phy_conf(ieee802154_submac_t *submac, uint16_t channel_num,
         }
     }
 
-    res = ieee802154_radio_config_phy(dev, &conf);
+    res = ieee802154_submac_config_phy(submac, &conf);
 
     if (res >= 0) {
         submac->channel_num = channel_num;
