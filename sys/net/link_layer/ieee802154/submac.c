@@ -282,7 +282,7 @@ static ieee802154_fsm_state_t _fsm_state_tx_process_tx_done(ieee802154_submac_t 
             assert (res >= 0);
 
             /* Handle ACK reception */
-            ieee802154_submac_ack_timer_set(submac, submac->ack_timeout_us);
+            ieee802154_submac_ack_timer_set(submac);
             return IEEE802154_FSM_STATE_WAIT_FOR_ACK;
         }
         break;

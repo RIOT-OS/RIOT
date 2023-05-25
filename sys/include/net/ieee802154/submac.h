@@ -503,10 +503,8 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
  * @note This function should be implemented by the user of the SubMAC.
  *
  * @param[in] submac pointer to the SubMAC descriptor
- * @param[in] us microseconds until the ACK timeout timer is fired
  */
-extern void ieee802154_submac_ack_timer_set(ieee802154_submac_t *submac,
-                                            uint16_t us);
+extern void ieee802154_submac_ack_timer_set(ieee802154_submac_t *submac);
 
 /**
  * @brief Cancel the ACK timeout timer

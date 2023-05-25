@@ -128,10 +128,9 @@ static void _ev_ack_timeout_handler(event_t *event)
     mutex_unlock(&lock);
 }
 
-void ieee802154_submac_ack_timer_set(ieee802154_submac_t *submac, uint16_t us)
+void ieee802154_submac_ack_timer_set(ieee802154_submac_t *submac)
 {
-    (void)submac;
-    ztimer_set(ZTIMER_USEC, &ack_timer, us);
+    ztimer_set(ZTIMER_USEC, &ack_timer, submac->ack_timeout_us);
 }
 
 void ieee802154_submac_ack_timer_cancel(ieee802154_submac_t *submac)
