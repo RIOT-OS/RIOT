@@ -334,6 +334,8 @@ ctap_status_code_t fido2_ctap_handle_request(ctap_req_t *req, ctap_resp_t *resp)
         break;
     }
 
+    DEBUG("Resp status %d \n", resp->status);
+
     return resp->status;
 }
 
@@ -422,7 +424,11 @@ static uint32_t get_id(void)
 
 static int _reset(void)
 {
-    fido2_ctap_mem_erase_flash();
+    int ret = fido2_ctap_mem_erase_flash();
+
+    if (ret != CTAP2_OK) {
+        return ret;
+    }
 
     _state.initialized_marker = CTAP_INITIALIZED_MARKER;
     _state.rem_pin_att = CTAP_PIN_MAX_ATTS;

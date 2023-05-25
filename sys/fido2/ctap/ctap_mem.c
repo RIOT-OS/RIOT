@@ -28,16 +28,21 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+#ifdef BOARD_NATIVE
+#include "mtd_default.h"
+char *_backing_memory = NULL;
+static mtd_dev_t *_mtd_dev = NULL;
+#else
 /**
  * @brief Reserve flash memory to store CTAP data
  */
 FLASH_WRITABLE_INIT(_backing_memory, CONFIG_FIDO2_CTAP_NUM_FLASHPAGES);
-
 /**
  * @brief   MTD device descriptor initialized with flash-page driver
  */
 static mtd_flashpage_t _mtd_flash_dev = MTD_FLASHPAGE_INIT_VAL(CTAP_FLASH_PAGES_PER_SECTOR);
 static mtd_dev_t *_mtd_dev = &_mtd_flash_dev.base;
+#endif
 
 /**
  * @brief   Check if flash region is erased
@@ -54,13 +59,12 @@ static unsigned _amount_flashpages_rk(void);
  */
 static ctap_status_code_t _flash_write(const void *buf, uint32_t addr, size_t len);
 
-/**
- * @brief Get start address of reserved flash memory region
- */
-static unsigned _flash_start(void);
-
 ctap_status_code_t fido2_ctap_mem_init(void)
 {
+#ifdef BOARD_NATIVE
+    _mtd_dev = mtd_default_get_dev(0);
+#endif
+
     int ret = mtd_init(_mtd_dev);
 
     if (ret < 0) {
@@ -78,7 +82,6 @@ static unsigned _amount_flashpages_rk(void)
 ctap_status_code_t fido2_ctap_mem_read(void *buf, uint32_t page, uint32_t offset, uint32_t len)
 {
     assert(buf);
-
     int ret;
 
     ret = mtd_read_page(_mtd_dev, buf, page, offset, len);
@@ -119,6 +122,9 @@ static ctap_status_code_t _flash_write(const void *buf, uint32_t addr, size_t le
 
 static bool _flash_is_erased(uint32_t addr, size_t len)
 {
+#ifdef BOARD_NATIVE
+    return true;
+#else
     for (size_t i = 0; i < len; i++) {
         if (*(uint32_t *)(addr + i) != FLASHPAGE_ERASE_STATE) {
             return false;
@@ -126,23 +132,22 @@ static bool _flash_is_erased(uint32_t addr, size_t len)
     }
 
     return true;
+#endif
 }
 
-static unsigned _flash_start(void)
+static uint32_t _flash_start_addr(void)
 {
-    return flashpage_page((void *)_backing_memory);
+    return (uint32_t)_backing_memory;
 }
 
 ctap_status_code_t fido2_ctap_mem_erase_flash(void)
 {
-    unsigned start = _flash_start();
-    unsigned end = start + CONFIG_FIDO2_CTAP_NUM_FLASHPAGES;
+    unsigned addr = _flash_start_addr();
+    unsigned sector_size = _mtd_dev->pages_per_sector * _mtd_dev->page_size;
 
-    for (unsigned page = start; page < end; page++) {
-        flashpage_erase(page);
-    }
+    int ret = mtd_erase(_mtd_dev, addr, sector_size * CONFIG_FIDO2_CTAP_NUM_FLASHPAGES);
 
-    return CTAP2_OK;
+    return ret == 0 ? CTAP2_OK : CTAP1_ERR_OTHER;
 }
 
 /**
@@ -151,7 +156,7 @@ ctap_status_code_t fido2_ctap_mem_erase_flash(void)
  */
 ctap_status_code_t fido2_ctap_mem_read_state_from_flash(ctap_state_t *state)
 {
-    uint32_t addr = (uint32_t)flashpage_addr(_flash_start());
+    uint32_t addr = _flash_start_addr();
 
     int ret = mtd_read(_mtd_dev, state, addr, sizeof(ctap_state_t));
 
@@ -168,7 +173,7 @@ ctap_status_code_t fido2_ctap_mem_read_state_from_flash(ctap_state_t *state)
 ctap_status_code_t fido2_ctap_mem_write_rk_to_flash(ctap_resident_key_t *rk)
 {
     int ret;
-    uint32_t addr = (uint32_t)flashpage_addr(_flash_start() + CTAP_FLASH_RK_OFF);
+    uint32_t addr = _flash_start_addr() + FLASHPAGE_SIZE;
     uint16_t amt_stored = fido2_ctap_get_state()->rk_amount_stored;
     ctap_resident_key_t tmp = { 0 };
     bool equal = false;
@@ -209,22 +214,21 @@ ctap_status_code_t fido2_ctap_mem_write_rk_to_flash(ctap_resident_key_t *rk)
 
 ctap_status_code_t fido2_ctap_mem_write_state_to_flash(ctap_state_t *state)
 {
-    uint32_t addr = (uint32_t)flashpage_addr(_flash_start());
-
-    return _flash_write(state, addr, CTAP_FLASH_STATE_SZ);
+    return _flash_write(state, _flash_start_addr(), CTAP_FLASH_STATE_SZ);
 }
 
-ctap_status_code_t fido2_ctap_mem_read_rk_from_flash(ctap_resident_key_t *key, uint8_t *rp_id_hash, uint32_t *addr)
+ctap_status_code_t fido2_ctap_mem_read_rk_from_flash(ctap_resident_key_t *key, uint8_t *rp_id_hash,
+                                                     uint32_t *addr)
 {
     uint16_t end;
     uint16_t amt_stored = fido2_ctap_get_state()->rk_amount_stored;
 
     if (*addr == 0x0) {
         end = amt_stored;
-        *addr = (uint32_t)flashpage_addr(_flash_start() + CTAP_FLASH_RK_OFF);
+        *addr = _flash_start_addr() + FLASHPAGE_SIZE;
     }
     else {
-        uint32_t start_addr = (uint32_t)flashpage_addr(_flash_start() + CTAP_FLASH_RK_OFF);
+        uint32_t start_addr = _flash_start_addr() + FLASHPAGE_SIZE;
         uint16_t rks_read = (*addr - start_addr) / CTAP_FLASH_RK_SZ;
 
         if (rks_read > amt_stored) {
