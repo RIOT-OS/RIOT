@@ -25,8 +25,9 @@
 #include <stdlib.h>
 
 #include "byteorder.h"
-#include "net/eui64.h"
 #include "modules.h"
+#include "net/eui64.h"
+#include "time_units.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -189,6 +190,16 @@ enum {
 };
 
 /**
+ * @brief   802.15.4 MR-OQPSK chip rates
+ */
+typedef enum {
+    IEEE802154_MR_OQPSK_CHIPS_100,  /**< 100 kChip/s  */
+    IEEE802154_MR_OQPSK_CHIPS_200,  /**< 200 kChip/s  */
+    IEEE802154_MR_OQPSK_CHIPS_1000, /**< 1000 kChip/s */
+    IEEE802154_MR_OQPSK_CHIPS_2000, /**< 2000 kChip/s */
+} ieee802154_mr_oqpsk_chips_t;
+
+/**
  * @brief   Special address definitions
  * @{
  */
@@ -254,6 +265,20 @@ extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
  */
 #ifndef CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE
 #define CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE      (2U)
+#endif
+
+/**
+ * @brief IEEE802.15.4 MR-OQPSK default chip rate
+ */
+#ifndef CONFIG_IEEE802154_MR_OQPSK_DEFAULT_CHIPS
+#define CONFIG_IEEE802154_MR_OQPSK_DEFAULT_CHIPS    IEEE802154_MR_OQPSK_CHIPS_1000
+#endif
+
+/**
+ * @brief IEEE802.15.4 MR-OQPSK default rate mode
+ */
+#ifndef CONFIG_IEEE802154_MR_OQPSK_DEFAULT_RATE
+#define CONFIG_IEEE802154_MR_OQPSK_DEFAULT_RATE     (2U)
 #endif
 
 /**

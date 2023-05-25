@@ -460,6 +460,15 @@ typedef struct {
 } ieee802154_phy_conf_t;
 
 /**
+ * @brief extension for IEEE 802.15.4g MR-OQPSK PHY
+ */
+typedef struct {
+    ieee802154_phy_conf_t super;        /**< common settings */
+    ieee802154_mr_oqpsk_chips_t chips;  /**< chip rate       */
+    uint8_t rate_mode;                  /**< rate mode       */
+} ieee802154_mr_oqpks_conf_t;
+
+/**
  * @brief IEEE 802.15.4 radio operations
  */
 typedef enum {
