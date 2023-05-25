@@ -312,9 +312,7 @@ static inline ieee802154_phy_mode_t ieee802154_get_phy_mode(
  * @brief Set IEEE 802.15.4 PHY configuration (channel, TX power)
  *
  * @param[in] submac pointer to the SubMAC descriptor
- * @param[in] channel_num channel number
- * @param[in] channel_page channel page
- * @param[in] tx_pow transmission power (in dBm)
+ * @param[in] conf   pointer to the PHY configuration
  *
  * @return 0 on success
  * @return -ENOTSUP if the PHY settings are not supported
@@ -323,8 +321,7 @@ static inline ieee802154_phy_mode_t ieee802154_get_phy_mode(
  *         @ref ieee802154_submac_cb_t::tx_done
  * @return negative errno on error
  */
-int ieee802154_set_phy_conf(ieee802154_submac_t *submac, uint16_t channel_num,
-                            uint8_t channel_page, int8_t tx_pow);
+int ieee802154_set_phy_conf(ieee802154_submac_t *submac, const ieee802154_phy_conf_t *conf);
 
 /**
  * @brief Set IEEE 802.15.4 channel number
@@ -344,8 +341,14 @@ int ieee802154_set_phy_conf(ieee802154_submac_t *submac, uint16_t channel_num,
 static inline int ieee802154_set_channel_number(ieee802154_submac_t *submac,
                                                 uint16_t channel_num)
 {
-    return ieee802154_set_phy_conf(submac, channel_num, submac->channel_page,
-                                   submac->tx_pow);
+    const ieee802154_phy_conf_t conf = {
+        .phy_mode = IEEE802154_PHY_NO_OP,
+        .channel = channel_num,
+        .page = submac->channel_page,
+        .pow = submac->tx_pow,
+    };
+
+    return ieee802154_set_phy_conf(submac, &conf);
 }
 
 /**
@@ -366,8 +369,14 @@ static inline int ieee802154_set_channel_number(ieee802154_submac_t *submac,
 static inline int ieee802154_set_channel_page(ieee802154_submac_t *submac,
                                               uint16_t channel_page)
 {
-    return ieee802154_set_phy_conf(submac, submac->channel_num, channel_page,
-                                   submac->tx_pow);
+    const ieee802154_phy_conf_t conf = {
+        .phy_mode = IEEE802154_PHY_NO_OP,
+        .channel = submac->channel_num,
+        .page = channel_page,
+        .pow = submac->tx_pow,
+    };
+
+    return ieee802154_set_phy_conf(submac, &conf);
 }
 
 /**
@@ -388,8 +397,14 @@ static inline int ieee802154_set_channel_page(ieee802154_submac_t *submac,
 static inline int ieee802154_set_tx_power(ieee802154_submac_t *submac,
                                           int8_t tx_pow)
 {
-    return ieee802154_set_phy_conf(submac, submac->channel_num,
-                                   submac->channel_page, tx_pow);
+    const ieee802154_phy_conf_t conf = {
+        .phy_mode = IEEE802154_PHY_NO_OP,
+        .channel = submac->channel_num,
+        .page = submac->channel_page,
+        .pow = tx_pow,
+    };
+
+    return ieee802154_set_phy_conf(submac, &conf);
 }
 
 /**

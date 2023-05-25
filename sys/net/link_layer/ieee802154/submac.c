@@ -498,7 +498,7 @@ static inline uint8_t _mr_oqpsk_ack_psdu_duration_syms(uint8_t chips, uint8_t mo
     return (Npsdu + Ns/2) / Ns + (Npsdu + 8 * Ns) / (16 * Ns);
 }
 
-static uint16_t _mr_oqpsk_ack_timeout_us(const ieee802154_mr_oqpks_conf_t *conf)
+static inline uint16_t _mr_oqpsk_ack_timeout_us(const ieee802154_mr_oqpks_conf_t *conf)
 {
     /* see 802.15.4g-2012, p. 30 */
     uint16_t symbols = _mr_oqpsk_cca_duration_syms(conf->chips)
@@ -510,7 +510,7 @@ static uint16_t _mr_oqpsk_ack_timeout_us(const ieee802154_mr_oqpks_conf_t *conf)
          + IEEE802154G_ATURNAROUNDTIME_US;
 }
 
-static uint16_t _mr_oqpsk_csma_backoff_period_us(const ieee802154_mr_oqpks_conf_t *conf)
+static inline uint16_t _mr_oqpsk_csma_backoff_period_us(const ieee802154_mr_oqpks_conf_t *conf)
 {
     return _mr_oqpsk_cca_duration_syms(conf->chips) * _mr_oqpsk_symbol_duration_us(conf->chips)
          + IEEE802154G_ATURNAROUNDTIME_US;
@@ -524,9 +524,14 @@ static int ieee802154_submac_config_phy(ieee802154_submac_t *submac,
         submac->ack_timeout_us = ACK_TIMEOUT_US;
         submac->csma_backoff_us = CSMA_SENDER_BACKOFF_PERIOD_UNIT_US;
         break;
+#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
     case IEEE802154_PHY_MR_OQPSK:
         submac->ack_timeout_us = _mr_oqpsk_ack_timeout_us((void *)conf);
         submac->csma_backoff_us = _mr_oqpsk_csma_backoff_period_us((void *)conf);
+        break;
+#endif
+    case IEEE802154_PHY_NO_OP:
+    case IEEE802154_PHY_DISABLED:
         break;
     default:
         return -EINVAL;
@@ -603,13 +608,26 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     ieee802154_radio_config_addr_filter(dev, IEEE802154_AF_PANID, &submac->panid);
 
     /* Configure PHY settings (mode, channel, TX power) */
-    ieee802154_phy_conf_t conf =
-    { .phy_mode = submac->phy_mode,
-      .channel = submac->channel_num,
-      .page = submac->channel_page,
-      .pow = submac->tx_pow };
+    union {
+        ieee802154_phy_conf_t super;
+#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+        ieee802154_mr_oqpks_conf_t mr_oqpsk;
+#endif
+    } conf;
 
-    ieee802154_submac_config_phy(submac, &conf);
+#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+    if (submac->phy_mode == IEEE802154_PHY_MR_OQPSK) {
+        conf.mr_oqpsk.chips = CONFIG_IEEE802154_MR_OQPSK_DEFAULT_CHIPS;
+        conf.mr_oqpsk.rate_mode = CONFIG_IEEE802154_MR_OQPSK_DEFAULT_RATE;
+    }
+#endif
+
+    conf.super.phy_mode = submac->phy_mode;
+    conf.super.channel = submac->channel_num;
+    conf.super.page = submac->channel_page;
+    conf.super.pow = submac->tx_pow;
+
+    ieee802154_submac_config_phy(submac, &conf.super);
     ieee802154_radio_set_cca_threshold(dev,
                                        CONFIG_IEEE802154_CCA_THRESH_DEFAULT);
     assert(res >= 0);
@@ -619,15 +637,9 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     return res;
 }
 
-int ieee802154_set_phy_conf(ieee802154_submac_t *submac, uint16_t channel_num,
-                            uint8_t channel_page, int8_t tx_pow)
+int ieee802154_set_phy_conf(ieee802154_submac_t *submac, const ieee802154_phy_conf_t *conf)
 {
     ieee802154_dev_t *dev = &submac->dev;
-    const ieee802154_phy_conf_t conf =
-    { .phy_mode = submac->phy_mode,
-      .channel = channel_num,
-      .page = channel_page,
-      .pow = tx_pow };
     int res;
     ieee802154_fsm_state_t current_state = submac->fsm_state;
 
@@ -643,12 +655,15 @@ int ieee802154_set_phy_conf(ieee802154_submac_t *submac, uint16_t channel_num,
         }
     }
 
-    res = ieee802154_submac_config_phy(submac, &conf);
+    res = ieee802154_submac_config_phy(submac, conf);
 
     if (res >= 0) {
-        submac->channel_num = channel_num;
-        submac->channel_page = channel_page;
-        submac->tx_pow = tx_pow;
+        submac->channel_num = conf->channel;
+        submac->channel_page = conf->page;
+        submac->tx_pow = conf->pow;
+        if (conf->phy_mode != IEEE802154_PHY_NO_OP) {
+            submac->phy_mode = conf->phy_mode;
+        }
     }
     while (ieee802154_radio_confirm_set_idle(dev) == -EAGAIN) {}
 
