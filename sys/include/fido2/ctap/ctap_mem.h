@@ -156,7 +156,7 @@ ctap_status_code_t fido2_ctap_mem_write_state_to_flash(ctap_state_t *state);
  * @return @ref ctap_status_code_t
  */
 ctap_status_code_t fido2_ctap_mem_read_rk_from_flash(ctap_resident_key_t *key, uint8_t *rp_id_hash,
-                                      uint32_t *addr);
+                                                     uint32_t *addr);
 
 /**
  * @brief Write resident credential to flash
