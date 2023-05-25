@@ -722,11 +722,7 @@ _BASELIBS_VALUE_BEFORE_USAGE := $(BASELIBS)
 ARCHIVES_GROUP = $(if $(ARCHIVES),$(LINKFLAGPREFIX)--start-group $(ARCHIVES) -lm $(LINKFLAGPREFIX)--end-group, -lm)
 
 $(ELFFILE): FORCE
-ifeq ($(BUILDOSXNATIVE),1)
-  _LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $$(find $(BASELIBS:%.module=$(BINDIR)/%/) -name "*.o" 2> /dev/null | sort) $(ARCHIVES_GROUP) $(LINKFLAGS) $(LINKFLAGPREFIX)-no_pie
-else
   _LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $$(find $(BASELIBS:%.module=$(BINDIR)/%/) -name "*.o" 2> /dev/null | sort) $(ARCHIVES_GROUP) $(LINKFLAGS) $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map
-endif # BUILDOSXNATIVE
 
 COMPILE_COMMANDS_PATH ?= $(RIOTBASE)/compile_commands.json
 COMPILE_COMMANDS_FLAGS ?= --clangd
