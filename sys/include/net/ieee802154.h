@@ -121,6 +121,11 @@ extern "C" {
 #define IEEE802154_ACK_TIMEOUT_SYMS     (54)
 
 /**
+ * @brief Symbol time for IEEE 802.15.4 MR-OFDM in µs
+ */
+#define IEEE802154_MR_OFDM_SYMBOL_TIME_US   (120)
+
+/**
  * @brief value of measured power when RSSI is zero.
  *
  * This value is defined in the IEEE 802.15.4 standard
@@ -281,6 +286,20 @@ extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
  */
 #ifndef CONFIG_IEEE802154_MR_OQPSK_DEFAULT_RATE
 #define CONFIG_IEEE802154_MR_OQPSK_DEFAULT_RATE     (2U)
+#endif
+
+/**
+ * @brief IEEE802.15.4 MR-OFDM default modulation option
+ */
+#ifndef CONFIG_IEEE802154_MR_OFDM_DEFAULT_OPTION
+#define CONFIG_IEEE802154_MR_OFDM_DEFAULT_OPTION    (2U)
+#endif
+
+/**
+ * @brief IEEE802.15.4 MR-OFDM default Modulation & Coding Scheme
+ */
+#ifndef CONFIG_IEEE802154_MR_OFDM_DEFAULT_SCHEME
+#define CONFIG_IEEE802154_MR_OFDM_DEFAULT_SCHEME    (2U)
 #endif
 
 /**

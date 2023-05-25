@@ -469,6 +469,15 @@ typedef struct {
 } ieee802154_mr_oqpks_conf_t;
 
 /**
+ * @brief extension for IEEE 802.15.4g MR-ODFM PHY
+ */
+typedef struct {
+    ieee802154_phy_conf_t super;        /**< common settings */
+    uint8_t option;                     /**< OFDM Option */
+    uint8_t scheme;                     /**< Modulation & Coding Scheme */
+} ieee802154_mr_odmf_conf_t;
+
+/**
  * @brief IEEE 802.15.4 radio operations
  */
 typedef enum {
