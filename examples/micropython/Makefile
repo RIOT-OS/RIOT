@@ -34,4 +34,7 @@ TESTRUNNER_RESET_AFTER_TERM ?= 1
 # failing on native with floating point exception (#15870)
 TEST_ON_CI_BLACKLIST = native
 
+# avoid running Kconfig by default
+SHOULD_RUN_KCONFIG ?=
+
 include $(RIOTBASE)/Makefile.include
