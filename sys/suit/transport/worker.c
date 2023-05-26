@@ -35,6 +35,8 @@
 #include "periph/pm.h"
 #include "ztimer.h"
 
+#include "suit/transport/worker.h"
+
 #ifdef MODULE_SUIT_TRANSPORT_COAP
 #include "net/nanocoap_sock.h"
 #include "suit/transport/coap.h"
