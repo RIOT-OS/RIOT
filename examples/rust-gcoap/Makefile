@@ -9,10 +9,19 @@ RIOTBASE ?= $(CURDIR)/../..
 
 # Basic networking, and gcoap
 USEMODULE += gcoap
-USEMODULE += netdev_default
+USEMODULE += usbus_cdc_ecm
+#USEMODULE += netdev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_default
 USEMODULE += gnrc_icmpv6_echo
+
+FEATURES_REQUIRED += riotboot
+USEMODULE += usbus_dfu
+BOARD ?= particle-xenon
+PROGRAMMER = dfu-util
+
+USEMODULE += suit_storage_flashwrite
+USEMODULE += suit_transport_coap
 
 USEMODULE += ztimer
 USEMODULE += ztimer_usec
@@ -33,7 +42,8 @@ QUIET ?= 1
 # Add 3k extra stack: The Rust examples take more of it than gcoap expects,
 # presumably because the example use the standard library's sting formatting
 # instead of one of the more optimized formatters.
-CFLAGS += -DGCOAP_STACK_SIZE='(THREAD_STACKSIZE_DEFAULT+DEBUG_EXTRA_STACKSIZE+sizeof(coap_pkt_t)+1024)'
+CFLAGS += -DGCOAP_STACK_SIZE='(THREAD_STACKSIZE_DEFAULT+DEBUG_EXTRA_STACKSIZE+sizeof(coap_pkt_t)+20000)'
+CFLAGS += -DTHREAD_STACKSIZE_MAIN='(THREAD_STACKSIZE_DEFAULT+8000)'
 
 # The name of crate (as per Cargo.toml package name, but with '-' replaced with '_')
 APPLICATION_RUST_MODULE = rust_gcoap
