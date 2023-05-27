@@ -46,21 +46,33 @@ enum {
     DHT_OK      =  0,       /**< all good */
     DHT_NOCSUM  = -1,       /**< checksum error */
     DHT_TIMEOUT = -2,       /**< communication timed out */
+    DHT_NODEV   = -3        /**< device type not defined */
 };
 
 /**
  * @brief   Data type for storing DHT sensor readings
  */
 typedef struct {
-    uint16_t humidity;      /**< relative percent */
+    uint16_t humidity;      /**< relative humidity in deci-percent */
     uint16_t temperature;   /**< temperature in deci-Celsius */
 } dht_data_t;
+
+/**
+ * @brief   Device type of the DHT device
+ */
+typedef enum {
+    DHT11,                  /**< DHT11 device identifier */
+    DHT22,                  /**< DHT22 device identifier */
+    DHT21 = DHT22,          /**< DHT21 device identifier */
+    AM2301 = DHT22,         /**< AM2301 device identifier */
+} dht_type_t;
 
 /**
  * @brief   Configuration parameters for DHT devices
  */
 typedef struct {
     gpio_t pin;             /**< GPIO pin of the device's data pin */
+    dht_type_t type;        /**< type of the DHT device */
     gpio_mode_t in_mode;    /**< input pin configuration, with or without pull
                              *   resistor */
 } dht_params_t;
