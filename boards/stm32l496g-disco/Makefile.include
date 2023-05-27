@@ -1,0 +1,18 @@
+# we use shared STM32 configuration snippets
+INCLUDES += -I$(RIOTBOARD)/common/stm32/include
+
+# this board uses openocd with st-link
+PROGRAMMER ?= openocd
+# this board has an on-board ST-link adapter
+OPENOCD_DEBUG_ADAPTER ?= stlink
+
+# openocd programmer is supported
+PROGRAMMERS_SUPPORTED += openocd
+
+# Configure riotboot bootloader and slot lengths
+# 8KB are currently enough, set it to 16KB if USB-DFU or tinyUSB DFU is used
+ifneq (,$(filter usbus_dfu tinyusb_dfu,$(USEMODULE)))
+  RIOTBOOT_LEN ?= 0x4000
+else
+  RIOTBOOT_LEN ?= 0x2000
+endif

@@ -1,0 +1,19 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+endif
+
+ifneq (,$(filter stdio_uart,$(USEMODULE)))
+  USEMODULE += periph_uart
+endif
+
+ifneq (,$(filter touch_dev,$(USEMODULE)))
+  USEMODULE += ft5x06
+endif
+
+ifneq (,$(filter periph_uart,$(USEMODULE)))
+  USEMODULE += periph_lpuart
+  ifeq (,$(filter periph_spi_stmod_plus,$(USEMODULE)))
+    # if STMod+ is not used with SPI (default), the UART interface uses HW FC
+    USEMODULE += periph_uart_hw_fc
+  endif
+endif
