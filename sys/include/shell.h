@@ -50,7 +50,7 @@ extern "C" {
  * Instead terminate RIOT, which is also the behavior a user would
  * expect from a CLI application.
  */
-#  if defined(CPU_NATIVE)
+#  if defined(CPU_NATIVE) && !IS_ACTIVE(MODULE_SHELL_LOCK)
 #    define CONFIG_SHELL_SHUTDOWN_ON_EXIT 1
 #  else
 #    define CONFIG_SHELL_SHUTDOWN_ON_EXIT 0

@@ -501,6 +501,9 @@ void shell_run_once(const shell_command_t *shell_commands,
         switch (res) {
 
             case EOF:
+                if (IS_USED(MODULE_SHELL_LOCK)) {
+                    shell_lock_do_lock();
+                }
                 return;
 
             case -ENOBUFS:
