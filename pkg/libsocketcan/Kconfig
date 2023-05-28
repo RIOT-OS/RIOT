@@ -7,4 +7,5 @@
 
 config PACKAGE_LIBSOCKETCAN
     bool "libsocketcan2 32bit for native Linux builds"
+    depends on TEST_KCONFIG
     depends on BOARD_NATIVE
