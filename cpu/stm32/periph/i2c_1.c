@@ -74,7 +74,7 @@ static uint32_t hsi_state;
 static inline void _i2c_init(I2C_TypeDef *i2c, uint32_t timing);
 static int _write(I2C_TypeDef *i2c, uint16_t addr, const void *data,
                   size_t length, uint8_t flags, uint32_t cr2_flags);
-static int _start(I2C_TypeDef *i2c, uint32_t cr2, uint8_t flags);
+static int _i2c_start(I2C_TypeDef *i2c, uint32_t cr2, uint8_t flags);
 static int _stop(I2C_TypeDef *i2c);
 static int _wait_isr_set(I2C_TypeDef *i2c, uint32_t mask, uint8_t flags);
 static inline int _wait_for_bus(I2C_TypeDef *i2c);
@@ -227,7 +227,7 @@ int i2c_read_bytes(i2c_t dev, uint16_t address, void *data,
     }
     DEBUG("[i2c] read_bytes: Starting\n");
     /* RELOAD is needed because we don't know the full frame */
-    int ret = _start(i2c, (address << 1) | (length << I2C_CR2_NBYTES_Pos) |
+    int ret = _i2c_start(i2c, (address << 1) | (length << I2C_CR2_NBYTES_Pos) |
                      I2C_CR2_RELOAD | I2C_FLAG_READ, flags);
     if (ret < 0) {
         return ret;
@@ -280,7 +280,7 @@ static int _write(I2C_TypeDef *i2c, uint16_t addr, const void *data,
     if ((i2c->ISR & I2C_ISR_TC) && (flags & I2C_NOSTART)) {
         return -EOPNOTSUPP;
     }
-    int ret = _start(i2c, (addr << 1) | (length << I2C_CR2_NBYTES_Pos) |
+    int ret = _i2c_start(i2c, (addr << 1) | (length << I2C_CR2_NBYTES_Pos) |
                      cr2_flags, flags);
     if (ret < 0) {
         return ret;
@@ -320,7 +320,7 @@ static int _write(I2C_TypeDef *i2c, uint16_t addr, const void *data,
     return _wait_for_bus(i2c);
 }
 
-static int _start(I2C_TypeDef *i2c, uint32_t cr2, uint8_t flags)
+static int _i2c_start(I2C_TypeDef *i2c, uint32_t cr2, uint8_t flags)
 {
     assert(i2c != NULL);
     assert((i2c->ISR & I2C_ISR_BUSY) || !(flags & I2C_NOSTART));

@@ -42,7 +42,7 @@
  * - functions require an additional parameter, the pointer to the MCP47xx
  *   device of type #mcp47xx_t.
  *
- * Please refer the test application in `tests/driver_mcp47xx` for an example
+ * Please refer the test application in `tests/drivers/mcp47xx` for an example
  * on how to use the driver.
  *
  * ## SAUL Capabilities

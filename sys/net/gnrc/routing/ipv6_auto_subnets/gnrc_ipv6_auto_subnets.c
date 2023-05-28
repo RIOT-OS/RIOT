@@ -89,6 +89,7 @@
  * @author  Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
+#include "compiler_hints.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/netif/hdr.h"
@@ -121,7 +122,7 @@
 #endif
 
 /**
- * @brief How long to wait for other routers annoucements before resending
+ * @brief How long to wait for other routers announcements before resending
  *        or creating subnets when the retry counter is exhausted
  */
 #ifndef CONFIG_GNRC_IPV6_AUTO_SUBNETS_TIMEOUT_MS
@@ -139,6 +140,14 @@
  */
 #ifndef CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_FIX_LEN
 #define CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_FIX_LEN (0)
+#endif
+
+/**
+ * @brief   Minimal length of a new prefix.
+ *          e.g. Linux will only accept /64 prefixes for SLAAC
+ */
+#ifndef CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_MIN_LEN
+#define CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_MIN_LEN (0)
 #endif
 
 /**
@@ -332,7 +341,7 @@ static bool _remove_old_prefix(gnrc_netif_t *netif,
 
     /* invalidate old prefix in RIO */
     tmp = gnrc_ndp_opt_ri_build(&old_pfx, old_pfx_len, 0,
-                                NDP_OPT_RI_FLAGS_PRF_NONE, *ext_opts);
+                                NDP_OPT_RI_FLAGS_PRF_ZERO, *ext_opts);
     if (tmp) {
         *ext_opts = tmp;
     }
@@ -367,6 +376,10 @@ static void _configure_subnets(uint8_t subnets, uint8_t start_idx, gnrc_netif_t 
     if (new_prefix_len > 64) {
         DEBUG("auto_subnets: can't split /%u into %u subnets\n", prefix_len, subnets);
         return;
+    }
+
+    if (new_prefix_len < may_be_zero(CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_MIN_LEN)) {
+        new_prefix_len = CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_MIN_LEN;
     }
 
     while ((downstream = gnrc_netif_iter(downstream))) {

@@ -30,7 +30,7 @@ static int _nib_route(int argc, char **argv);
 static int _nib_abr(int argc, char **argv);
 #endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 
-/* TODO: updated tests/gnrc_dhcpv6_client to no longer abuse this shell command
+/* TODO: updated tests/net/gnrc_dhcpv6_client to no longer abuse this shell command
  * and add static qualifier */
 int _gnrc_ipv6_nib(int argc, char **argv)
 {

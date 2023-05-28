@@ -23,7 +23,7 @@
  * packages is fetched in a global location in:
  *
  * ~~~~~~~~ {.mk}
- * $(RIOTBASE)/build/pkg/$(PKG_NAME)
+ * $(PKGDIRBASE)/$(PKG_NAME)
  * ~~~~~~~~
  *
  * When out-of-source build is not possible (for example because the package
@@ -96,7 +96,7 @@
  * `foo`must be located in `<PATH_IN_EXTERNAL_PKG_DIRS>/foo`.
  *
  * An example can be found in
- * [`tests/external_pkg_dirs`](https://github.com/RIOT-OS/RIOT/tree/master/tests/external_pkg_dirs)
+ * [`tests/build_system/external_pkg_dirs`](https://github.com/RIOT-OS/RIOT/tree/master/tests/build_system/external_pkg_dirs)
  *
  * RIOT welcomes new and useful packages. If you'd like to share your work,
  * consider [contributing](https://github.com/RIOT-OS/RIOT/tree/master/CONTRIBUTING.md).

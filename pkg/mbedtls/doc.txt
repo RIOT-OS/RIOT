@@ -93,7 +93,7 @@
  *
  * # Testing
  * Many Mbed TLS implementations provide self tests within the boundaries of
- * a module and the [test folder](../../tests/pkg_mbedtls) acts as a place to execute
+ * a module and the [test folder](../../tests/pkg/mbedtls) acts as a place to execute
  * these tests in RIOT context. It is noteworthy, that built-in Mbed TLS entropy source tests
  * only execute on the source that is implemented in `mbedtls_hardware_poll`.
  * The additional sources that were added using `mbedtls_entropy_add_source` are ignored in the test.

@@ -33,6 +33,19 @@
 extern "C" {
 #endif
 
+/**
+ * @brief   Set a breakpoint
+ * @warning         If no Debugger is attached, the CPU might get stuck here
+ *                  and consume a lot of power until reset.
+ * @param[in] value Context value for debugger, usually ignored.
+ */
+#ifndef ARCHITECTURE_BREAKPOINT
+/* If no breakpoint instruction is defined, busy wait for debugger
+ * to attach and break to ease backtrace
+ */
+#define ARCHITECTURE_BREAKPOINT(value)  do {} while (1)
+#endif
+
 /* Provide doxygen doc centrally, instead of in every architecture_arch.h */
 #ifdef DOXYGEN
 /**

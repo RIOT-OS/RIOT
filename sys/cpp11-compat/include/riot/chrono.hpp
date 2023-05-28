@@ -34,10 +34,6 @@
 
 namespace riot {
 
-namespace {
-constexpr uint32_t microsecs_in_sec = 1000000;
-} // namespace anaonymous
-
 /**
  * @brief A time point for timed wait, as clocks from the standard are not
  *        available on RIOT.
@@ -94,9 +90,9 @@ class time_point {
  private:
   timex_t m_handle;
   void inline adjust_overhead() {
-    auto secs = m_handle.microseconds / microsecs_in_sec;
+    auto secs = m_handle.microseconds / US_PER_SEC;
     m_handle.seconds += secs;
-    m_handle.microseconds -= (secs * microsecs_in_sec);
+    m_handle.microseconds -= (secs * US_PER_SEC);
   }
 };
 

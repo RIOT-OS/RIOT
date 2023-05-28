@@ -40,7 +40,7 @@ peripherals, different energy modes and short wake-up times.
 | HWCRYPTO   | &mdash; | &mdash;         |                             | AES128/AES256, SHA1, SHA256                         |
 | RTT        | &mdash; | RTCC            |                             | 1 Hz interval. Either RTT or RTC (see below)        |
 | RTC        | &mdash; | RTCC            |                             | 1 Hz interval. Either RTC or RTT (see below)        |
-| Timer      | 0       | TIMER0 + TIMER1 |                             | TIMER0 is used as prescaler (must be adjecent)      |
+| Timer      | 0       | TIMER0 + TIMER1 |                             | TIMER0 is used as prescaler (must be adjacent)      |
 |            | 1       | LETIMER0        |                             |                                                     |
 | UART       | 0       | USART0          | RX: PA1, TX: PA0            | Default STDIO output                                |
 

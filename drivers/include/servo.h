@@ -26,7 +26,7 @@
  * depending on the selected implementation, @ref servo_pwm_params or
  * @ref servo_timer_params to match your hardware configuration.
  *
- * The test application in `tests/driver_servo` can serve as starting point for
+ * The test application in `tests/drivers/servo` can serve as starting point for
  * users.
  *
  * @{

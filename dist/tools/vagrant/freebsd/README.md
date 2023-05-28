@@ -31,8 +31,8 @@ See the general vagrant [README.md](../README.md) for more commands.
 Once logged in to the VM you can run compile and run tests e.g.
 
 ```sh
-make -C tests/shell all -j
-make -C tests/shell test
+make -C tests/sys/shell/ all -j
+make -C tests/sys/shell/ test
 ```
 
 Even applications requiring network interface access should be able to work:

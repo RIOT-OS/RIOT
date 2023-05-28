@@ -24,6 +24,7 @@
 #include "vendor/RP2040.h"
 #include "io_reg.h"
 #include "macros/units.h"
+#include "periph/pio.h" /* pio_t */
 
 #ifdef __cplusplus
 extern "C" {
@@ -432,6 +433,25 @@ typedef struct {
 } timer_conf_t;
 
 /**
+ * @brief   PIO configuration type
+ */
+typedef struct {
+    PIO0_Type *dev;                 /**< PIO device */
+    IRQn_Type irqn0;                /**< PIO IRQ0 interrupt number */
+    IRQn_Type irqn1;                /**< PIO IRQ1 interrupt number */
+} pio_conf_t;
+
+/**
+ * @brief   PIO I2C configuration type
+ */
+typedef struct {
+    pio_t pio;                      /**< PIO number of the PIO to run this configuration */
+    gpio_t sda;                     /**< Pin to use as SDA pin */
+    gpio_t scl;                     /**< Pin to use as SCL pin */
+    unsigned irq;                   /**< PIO IRQ line to use */
+} pio_i2c_conf_t;
+
+/**
  * @brief   Get the PAD control register for the given GPIO pin as word
  *
  * Note: Only perform 32-bit writes to I/O registers.
@@ -730,6 +750,39 @@ void rosc_start(void);
 void rosc_stop(void);
 
 /** @} */
+
+/**
+ * @brief   Override SPI clock speed values
+ * @{
+ */
+#define HAVE_SPI_CLK_T
+enum {
+    SPI_CLK_100KHZ = KHZ(100), /**< drive the SPI bus with 100KHz */
+    SPI_CLK_400KHZ = KHZ(400), /**< drive the SPI bus with 400KHz */
+    SPI_CLK_1MHZ   = MHZ(1),   /**< drive the SPI bus with 1MHz */
+    SPI_CLK_5MHZ   = MHZ(5),   /**< drive the SPI bus with 5MHz */
+    SPI_CLK_10MHZ  = MHZ(10),  /**< drive the SPI bus with 10MHz */
+};
+
+/**
+ * @brief   SPI clock type
+ */
+typedef uint32_t spi_clk_t;
+/** @} */
+
+/**
+ * @brief   Configuration details for an SPI interface needed by the RPX0XX peripheral
+ */
+typedef struct {
+    SPI0_Type *dev;     /**< Base address of the I/O registers of the device */
+    gpio_t miso_pin;    /**< GPIO pin to use for MISO */
+    gpio_t mosi_pin;    /**< GPIO pin to use for MOSI */
+    gpio_t clk_pin;     /**< GPIO pin to use for CLK */
+} spi_conf_t;
+
+#define PERIPH_SPI_NEEDS_TRANSFER_REG
+#define PERIPH_SPI_NEEDS_TRANSFER_REGS
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTE
 
 #ifdef __cplusplus
 }

@@ -265,19 +265,12 @@ static int _config_phy(ieee802154_dev_t *hal, const ieee802154_phy_conf_t *conf)
 static int _set_csma_params(ieee802154_dev_t *hal, const ieee802154_csma_be_t *bd, int8_t retries)
 {
     mrf24j40_t *dev = hal->priv;
-    uint8_t tmp;
 
     if (bd->min > MRF24J40_MAX_MINBE) {
         return -EINVAL;
     }
 
-    tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXMCR) & ~MRF24J40_TXMCR_MACMINBE;
-    if (retries >= 0) {
-        tmp |= bd->min << MRF24J40_TXMCR_MACMINBE_SHIFT;
-    }
-
     /* This radio ignores max_be */
-
     mrf24j40_set_csma_max_retries(dev, retries);
     return 0;
 }

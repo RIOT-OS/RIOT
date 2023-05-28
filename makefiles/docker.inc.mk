@@ -47,8 +47,8 @@ export DOCKER_ENV_VARS += \
   CXXUWFLAGS \
   $(DOCKER_RIOT_CONFIG_VARIABLES) \
   ELFFILE \
-  HEXFILE \
   FLASHFILE \
+  HEXFILE \
   IOTLAB_NODE \
   LINK \
   LINKFLAGPREFIX \
@@ -57,20 +57,20 @@ export DOCKER_ENV_VARS += \
   OBJCOPY \
   OFLAGS \
   PARTICLE_MONOFIRMWARE \
-  PREFIX \
-  QUIET \
-  WERROR \
   PICOLIBC \
+  PREFIX \
   PROGRAMMER \
+  QUIET \
   RIOT_CI_BUILD \
   RIOT_VERSION \
   RIOT_VERSION_CODE \
   SCANBUILD_ARGS \
   SCANBUILD_OUTPUTDIR \
   SIZE \
-  TOOLCHAIN \
   TEST_KCONFIG \
+  TOOLCHAIN \
   UNDEF \
+  WERROR \
   #
 
 # List of all exported environment variables that shall be passed on to the

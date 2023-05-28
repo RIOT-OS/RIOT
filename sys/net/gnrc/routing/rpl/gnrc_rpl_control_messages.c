@@ -1231,7 +1231,7 @@ void gnrc_rpl_recv_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack, kernel_pid_t iface, ipv6
 #endif
 
     if (!IS_ACTIVE(CONFIG_GNRC_RPL_WITHOUT_VALIDATION)) {
-        if (!gnrc_rpl_validation_DAO_ACK(dao_ack, len, dst)) {
+        if (!dst || !gnrc_rpl_validation_DAO_ACK(dao_ack, len, dst)) {
             return;
         }
     }

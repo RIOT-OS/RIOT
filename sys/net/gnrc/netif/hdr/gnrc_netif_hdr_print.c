@@ -24,6 +24,11 @@ void gnrc_netif_hdr_print(gnrc_netif_hdr_t *hdr)
 
     printf("if_pid: %u  ", (unsigned) hdr->if_pid);
     printf("rssi: %d  ", (signed) hdr->rssi);
+#if IS_USED(MODULE_GNRC_NETIF_TIMESTAMP)
+    /* Only last 32 bits are printed due to printf from avg-libc doesn't support 64-bit values */
+    printf(" timestamp: %" PRIu32 ".%09" PRIu32 " ", (uint32_t)(hdr->timestamp / NS_PER_SEC),
+                                                     (uint32_t)(hdr->timestamp % NS_PER_SEC));
+#endif
     printf("lqi: %u\n", (unsigned) hdr->lqi);
     printf("flags: ");
 
@@ -31,10 +36,14 @@ void gnrc_netif_hdr_print(gnrc_netif_hdr_t *hdr)
         if (hdr->flags & GNRC_NETIF_HDR_FLAGS_BROADCAST) {
             printf("BROADCAST ");
         }
-
         if (hdr->flags & GNRC_NETIF_HDR_FLAGS_MULTICAST) {
             printf("MULTICAST ");
         }
+#if IS_USED(MODULE_GNRC_NETIF_TIMESTAMP)
+        if (hdr->flags & GNRC_NETIF_HDR_FLAGS_TIMESTAMP) {
+            printf("TIMESTAMP ");
+        }
+#endif
         puts("");
     }
     else {

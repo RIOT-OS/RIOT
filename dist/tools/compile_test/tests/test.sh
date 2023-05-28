@@ -38,7 +38,7 @@ function call_with_defaults {
 function call_with_specific_board_app {
     ${COMPILE_TEST_DIR}/compile_like_murdock.py \
     --boards native \
-    --apps tests/shell \
+    --apps tests/sys/shell/ \
     --dry-run
 }
 

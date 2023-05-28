@@ -25,21 +25,26 @@ ifneq (,$(filter $(CPU_FAM),f2 f4 f7))
   # flash, to get evenly sized and distributed slots.
   SLOT0_LEN ?= $(shell printf "0x%x" $$((($(ROM_LEN:%K=%*1024)-2*$(RIOTBOOT_LEN)) / $(NUM_SLOTS))))
   SLOT1_LEN ?= $(SLOT0_LEN)
-else ifeq (stm32l4,$(CPU_FAM))
+else ifeq (l4,$(CPU_FAM))
   # "The Vector table must be naturally aligned to a power of two whose alignment
   # value is greater than or equal to number of Exceptions supported x 4"
-  # CPU_IRQ_NUMOFF for stm32l4 boards is < 91+16 so (107*4 bytes = 428 bytes ~= 0x200)
+  # CPU_IRQ_NUMOFF for stm32l4 boards is < 95+16 so (111*4 bytes = 444 bytes ~= 0x200)
   # RIOTBOOT_HDR_LEN can be set to 0x200
   RIOTBOOT_HDR_LEN ?= 0x200
-else ifeq (stm32wb,$(CPU_FAM))
+else ifeq (wb,$(CPU_FAM))
   # "The Vector table must be naturally aligned to a power of two whose alignment
   # value is greater than or equal to number of Exceptions supported x 4"
-  # CPU_IRQ_NUMOFF for stm32l4 boards is < 91+16 so (107*4 bytes = 428 bytes ~= 0x200)
+  # CPU_IRQ_NUMOFF for stm32wb boards is < 63+16 so (79*4 bytes = 316 bytes ~= 0x200)
   # RIOTBOOT_HDR_LEN can be set to 0x200
   RIOTBOOT_HDR_LEN ?= 0x200
 
   # Slot size is determined by "((total_flash_size - RIOTBOOT_LEN) / 2)".
   # If RIOTBOOT_LEN uses an odd number of flashpages, the remainder of the
   # flash cannot be divided by two slots while staying FLASHPAGE_SIZE aligned.
-  RIOTBOOT_LEN ?= 0x2000
+  # 8KB are currently enough, set it to 16KB if USB-DFU or tinyUSB DFU is used
+  ifneq (,$(filter usbus_dfu tinyusb_dfu,$(USEMODULE)))
+    RIOTBOOT_LEN ?= 0x4000
+  else
+    RIOTBOOT_LEN ?= 0x2000
+  endif
 endif

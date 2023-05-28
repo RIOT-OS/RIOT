@@ -90,6 +90,15 @@ static void _handle_rdnss_timeout(sock_udp_ep_t *dns_server);
 #endif
 /** @} */
 
+static inline bool _should_search_rtr(const gnrc_netif_t *netif)
+{
+    /* 6LBR interface does not send RS.
+       A non-advertising router sends RS or a 6LN that is advertising or not
+       has to refetch router information */
+    return !gnrc_netif_is_6lbr(netif) &&
+           (!gnrc_netif_is_rtr_adv(netif) || gnrc_netif_is_6ln(netif));
+}
+
 void gnrc_ipv6_nib_init(void)
 {
     evtimer_event_t *tmp;
@@ -137,8 +146,7 @@ void gnrc_ipv6_nib_iface_up(gnrc_netif_t *netif)
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
     netif->ipv6.na_sent = 0;
     _auto_configure_addr(netif, &ipv6_addr_link_local_prefix, 64U);
-    if (!(gnrc_netif_is_rtr_adv(netif)) ||
-        (gnrc_netif_is_6ln(netif) && !gnrc_netif_is_6lbr(netif))) {
+    if (_should_search_rtr(netif)) {
         uint32_t next_rs_time = random_uint32_range(0, NDP_MAX_RS_MS_DELAY);
 
         _evtimer_add(netif, GNRC_IPV6_NIB_SEARCH_RTR, &netif->ipv6.search_rtr,
@@ -160,8 +168,7 @@ void gnrc_ipv6_nib_iface_down(gnrc_netif_t *netif, bool send_final_ra)
     gnrc_netif_acquire(netif);
 
     _deinit_iface_arsm(netif);
-    if (!(gnrc_netif_is_rtr_adv(netif)) ||
-        (gnrc_netif_is_6ln(netif) && !gnrc_netif_is_6lbr(netif))) {
+    if (_should_search_rtr(netif)) {
         _evtimer_del(&netif->ipv6.search_rtr);
     }
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
@@ -482,8 +489,10 @@ void gnrc_ipv6_nib_change_rtr_adv_iface(gnrc_netif_t *netif, bool enable)
         netif->flags &= ~GNRC_NETIF_FLAGS_IPV6_RTR_ADV;
         /* send final router advertisements */
         _handle_snd_mc_ra(netif);
-        _evtimer_add(netif, GNRC_IPV6_NIB_SEARCH_RTR, &netif->ipv6.search_rtr,
-                     next_rs_time);
+        if (!gnrc_netif_is_6lbr(netif)) {
+            _evtimer_add(netif, GNRC_IPV6_NIB_SEARCH_RTR,
+                         &netif->ipv6.search_rtr, next_rs_time);
+        }
     }
     gnrc_netif_release(netif);
 }
@@ -858,7 +867,9 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
 
     /* stop sending router solicitations
      * see https://tools.ietf.org/html/rfc4861#section-6.3.7 */
-    evtimer_del(&_nib_evtimer, &netif->ipv6.search_rtr.event);
+    if (!gnrc_netif_is_6lbr(netif)) {
+        evtimer_del(&_nib_evtimer, &netif->ipv6.search_rtr.event);
+    }
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     if (gnrc_netif_is_6ln(netif) && !gnrc_netif_is_6lbr(netif)) {
         if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)) {
@@ -1461,7 +1472,7 @@ void _handle_search_rtr(gnrc_netif_t *netif)
 {
 #if !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_NO_RTR_SOL)
     gnrc_netif_acquire(netif);
-    if (!(gnrc_netif_is_rtr_adv(netif)) || gnrc_netif_is_6ln(netif)) {
+    if (_should_search_rtr(netif)) {
         uint32_t next_rs = _evtimer_lookup(netif, GNRC_IPV6_NIB_SEARCH_RTR);
         uint32_t interval = _get_next_rs_interval(netif);
 

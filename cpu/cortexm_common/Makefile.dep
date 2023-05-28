@@ -26,3 +26,6 @@ endif
 
 # Make calls to malloc and friends thread-safe
 USEMODULE += malloc_thread_safe
+
+# CMSIS headers are fetched using a package
+USEPKG += cmsis

@@ -369,9 +369,12 @@ static int _get_put_cb(void *arg, coap_pkt_t *pkt)
 
 ssize_t nanocoap_sock_get(nanocoap_sock_t *sock, const char *path, void *buf, size_t len)
 {
-    uint8_t *pktpos = buf;
+    /* buffer for CoAP header */
+    uint8_t buffer[CONFIG_NANOCOAP_BLOCK_HEADER_MAX];
+    uint8_t *pktpos = buffer;
+
     coap_pkt_t pkt = {
-        .hdr = buf,
+        .hdr = (void *)pktpos,
     };
 
     struct iovec ctx = {
@@ -540,22 +543,6 @@ ssize_t nanocoap_request(coap_pkt_t *pkt, const sock_udp_ep_t *local,
     }
 
     res = nanocoap_sock_request(&sock, pkt, len);
-    nanocoap_sock_close(&sock);
-
-    return res;
-}
-
-ssize_t nanocoap_get(const sock_udp_ep_t *remote, const char *path, void *buf, size_t len)
-{
-    int res;
-    nanocoap_sock_t sock;
-
-    res = nanocoap_sock_connect(&sock, NULL, remote);
-    if (res) {
-        return res;
-    }
-
-    res = nanocoap_sock_get(&sock, path, buf, len);
     nanocoap_sock_close(&sock);
 
     return res;

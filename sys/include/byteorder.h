@@ -23,10 +23,6 @@
 #include <stdint.h>
 #include "unaligned.h"
 
-#if defined(__MACH__)
-#   include "clang_compat.h"
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif

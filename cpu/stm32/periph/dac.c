@@ -33,8 +33,10 @@
 #endif
 
 /* get RCC bit */
-#ifdef RCC_APB1ENR_DAC1EN
+#if defined(RCC_APB1ENR_DAC1EN)
 #define RCC_BIT             (RCC_APB1ENR_DAC1EN)
+#elif defined(RCC_APB1ENR1_DAC1EN)
+#define RCC_BIT             (RCC_APB1ENR1_DAC1EN)
 #else
 #define RCC_BIT             (RCC_APB1ENR_DACEN)
 #endif
@@ -73,18 +75,15 @@ void dac_set(dac_t line, uint16_t value)
 {
     assert(line < DAC_NUMOF);
 
-    /* scale set value to 12-bit */
-    value = (value >> 4);
-
-#ifdef DAC_DHR12R2_DACC2DHR
+#ifdef DAC_DHR12L2_DACC2DHR
     if (dac_config[line].chan & 0x01) {
-        dev(line)->DHR12R2 = value;
+        dev(line)->DHR12L2 = value;
     }
     else {
-        dev(line)->DHR12R1 = value;
+        dev(line)->DHR12L1 = value;
     }
 #else
-    dev(line)->DHR12R1 = value;
+    dev(line)->DHR12L1 = value;
 #endif
 }
 
@@ -100,8 +99,24 @@ void dac_poweron(dac_t line)
     periph_clk_en(APB1, RCC_BIT);
 #endif
 
+#if VREFBUF_ENABLE && defined(VREFBUF_CSR_ENVR)
+    /* enable VREFBUF if needed and available (for example if the board doesn't
+     * have an external reference voltage connected to V_REF+), wait until
+     * it is ready */
+    RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+    VREFBUF->CSR &= ~VREFBUF_CSR_HIZ;
+    VREFBUF->CSR |= VREFBUF_CSR_ENVR;
+    while (!(VREFBUF->CSR & VREFBUF_CSR_VRR)) { }
+#endif
+
+#ifdef DAC_MCR_MODE1
+    /* Normal mode with Buffer enabled and connected to external pin and on-chip
+     * peripherals */
+    dev(line)->MCR |= (DAC_MCR_MODE1_0 << (16 * (dac_config[line].chan & 0x01)));
+#endif
+
     /* enable corresponding DAC channel */
-    dev(line)->CR |= (1 << (16 * (dac_config[line].chan & 0x01)));
+    dev(line)->CR |= (DAC_CR_EN1 << (16 * (dac_config[line].chan & 0x01)));
 }
 
 void dac_poweroff(dac_t line)
@@ -109,7 +124,7 @@ void dac_poweroff(dac_t line)
     assert(line < DAC_NUMOF);
 
     /* disable corresponding channel */
-    dev(line)->CR &= ~(1 << (16 * (dac_config[line].chan & 0x01)));
+    dev(line)->CR &= ~(DAC_CR_EN1 << (16 * (dac_config[line].chan & 0x01)));
 
     /* disable the DAC's clock in case no channel is active anymore */
     if (!(dev(line)->CR & EN_MASK)) {

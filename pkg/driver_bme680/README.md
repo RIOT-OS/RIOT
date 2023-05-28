@@ -24,12 +24,12 @@ which BME680 sensor is defined in the `bme680_params` parameters. The
 respective implementation is enabled by the modules `bme680_i2c` and
 `bme680_spi`. Both I2C and SPI can be used in one application.
 ```
-USEMODULE='bme680_spi bme680_i2c' make BOARD=... -C tests/driver_bme680
+USEMODULE='bme680_spi bme680_i2c' make BOARD=... -C tests/drivers/bme680
 ```
 
 In order to use floating point, you can enable module `bme680_fp` variable:
 ```
-USEMODULE='bme680_fp bme680_i2c' make BOARD=... -C tests/driver_bme680
+USEMODULE='bme680_fp bme680_i2c' make BOARD=... -C tests/drivers/bme680
 ```
 
 The following callbacks add support for the included drivers via I2C and SPI

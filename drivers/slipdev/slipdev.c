@@ -78,8 +78,8 @@ check_end:
 
 static void _poweron(slipdev_t *dev)
 {
-    if ((dev->state != SLIPDEV_STATE_STANDBY) ||
-        (dev->state != SLIPDEV_STATE_SLEEP)) {
+    if ((dev->state != SLIPDEV_STATE_STANDBY) &&
+            (dev->state != SLIPDEV_STATE_SLEEP)) {
         return;
     }
 

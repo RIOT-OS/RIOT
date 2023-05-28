@@ -26,6 +26,7 @@
 /* prevent cascading include error to xtimer if it is not compiled in or not
  * supported by board */
 #if IS_USED(MODULE_EVTIMER)
+#include "timex.h"
 #include "evtimer.h"
 #endif
 #include "net/ipv6/addr.h"

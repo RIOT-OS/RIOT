@@ -144,6 +144,78 @@ static inline uint16_t _nib_abr_entry_valid_offset(const _nib_abr_entry_t *abr)
 }
 #endif
 
+/* check if a different prefix already includes the prefix of the entry */
+static bool _has_better_match(const _nib_offl_entry_t *entry)
+{
+    _nib_offl_entry_t *candidate = NULL;
+
+    while ((candidate = _nib_offl_iter(candidate))) {
+
+        if (candidate == entry) {
+            continue;
+        }
+
+        if (!(entry->mode & (_PL | _FT))) {
+            continue;
+        }
+
+        if (candidate->pfx_len >= entry->pfx_len) {
+            continue;
+        }
+
+        if (ipv6_addr_match_prefix(&entry->pfx, &candidate->pfx) == candidate->pfx_len) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+static gnrc_pktsnip_t *_add_rio(gnrc_netif_t *netif, gnrc_pktsnip_t *ext_opts, bool offl)
+{
+    _nib_offl_entry_t *entry = NULL;
+    uint32_t now = evtimer_now_msec();
+
+    while ((entry = _nib_offl_iter(entry))) {
+
+        unsigned id = netif->pid;
+        if (_nib_onl_get_if(entry->next_hop) == id) {
+            continue;
+        }
+
+        if (entry->pfx_len == 0) {
+            continue;
+        }
+
+        if (offl && _has_better_match(entry)) {
+            continue;
+        }
+
+        bool local_pfx = (entry->mode & _PL) && (entry->flags & _PFX_ON_LINK);
+        bool routed_pfx = (entry->mode & _FT);
+
+        if (local_pfx || (offl && routed_pfx)) {
+
+            DEBUG("nib: adding downstream subnet to RA\n");
+            uint32_t valid_ltime = (entry->valid_until == UINT32_MAX) ? UINT32_MAX :
+                                   ((entry->valid_until - now) / MS_PER_SEC);
+            gnrc_pktsnip_t *snip  = gnrc_ndp_opt_ri_build(&entry->pfx,
+                                                          entry->pfx_len,
+                                                          valid_ltime,
+                                                          NDP_OPT_RI_FLAGS_PRF_ZERO,
+                                                          ext_opts);
+            if (snip != NULL) {
+                ext_opts = snip;
+            } else {
+                DEBUG_PUTS("nib: can't add RIO to RA - out of memory");
+                break;
+            }
+        }
+    }
+
+    return ext_opts;
+}
+
 static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
                                        _nib_abr_entry_t *abr)
 {
@@ -172,62 +244,72 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
         ext_opts = rdnsso;
     }
 #endif  /* CONFIG_GNRC_IPV6_NIB_DNS */
+    if (gnrc_netif_is_6ln(netif)) {
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
-    uint16_t ltime_min;
-    gnrc_pktsnip_t *abro;
+        uint16_t ltime_min;
+        gnrc_pktsnip_t *abro;
 
 #ifdef MODULE_GNRC_SIXLOWPAN_CTX
-    for (int i = 0; i < GNRC_SIXLOWPAN_CTX_SIZE; i++) {
-        gnrc_sixlowpan_ctx_t *ctx;
-        if (bf_isset(abr->ctxs, i) &&
-            ((ctx = gnrc_sixlowpan_ctx_lookup_id(i)) != NULL)) {
-            gnrc_pktsnip_t *sixco = gnrc_sixlowpan_nd_opt_6ctx_build(
-                                            ctx->prefix_len, ctx->flags_id,
-                                            ctx->ltime, &ctx->prefix, ext_opts);
-            if (sixco == NULL) {
-                DEBUG("nib: No space left in packet buffer. Not adding 6LO\n");
-                return NULL;
+        for (int i = 0; i < GNRC_SIXLOWPAN_CTX_SIZE; i++) {
+            gnrc_sixlowpan_ctx_t *ctx;
+            if (bf_isset(abr->ctxs, i) &&
+                ((ctx = gnrc_sixlowpan_ctx_lookup_id(i)) != NULL)) {
+                gnrc_pktsnip_t *sixco = gnrc_sixlowpan_nd_opt_6ctx_build(
+                                                ctx->prefix_len, ctx->flags_id,
+                                                ctx->ltime, &ctx->prefix, ext_opts);
+                if (sixco == NULL) {
+                    DEBUG("nib: No space left in packet buffer. Not adding 6LO\n");
+                    return NULL;
+                }
+                ext_opts = sixco;
             }
-            ext_opts = sixco;
         }
-    }
 #endif  /* MODULE_GNRC_SIXLOWPAN_CTX */
-    while ((pfx = _nib_abr_iter_pfx(abr, pfx))) {
-        if (_nib_onl_get_if(pfx->next_hop) == id) {
-            if ((ext_opts = _offl_to_pio(pfx, ext_opts)) == NULL) {
-                return NULL;
+        while ((pfx = _nib_abr_iter_pfx(abr, pfx))) {
+            if (_nib_onl_get_if(pfx->next_hop) == id) {
+                if ((ext_opts = _offl_to_pio(pfx, ext_opts)) == NULL) {
+                    return NULL;
+                }
             }
         }
-    }
-    if (gnrc_netif_is_6lbr(netif)) {
-        ltime_min = 0U;
+        if (gnrc_netif_is_6lbr(netif)) {
+            ltime_min = 0U;
 
-        /* update valid time */
-        abr->valid_until_ms = evtimer_now_msec() + (
-            SIXLOWPAN_ND_OPT_ABR_LTIME_DEFAULT * MS_PER_SEC * SEC_PER_MIN
-        );
+            /* update valid time */
+            abr->valid_until_ms = evtimer_now_msec() + (
+                SIXLOWPAN_ND_OPT_ABR_LTIME_DEFAULT * MS_PER_SEC * SEC_PER_MIN
+            );
+        }
+        else {
+            ltime_min = _nib_abr_entry_valid_offset(abr);
+        }
+        (void)ltime_min;    /* gnrc_sixlowpan_nd_opt_abr_build might evaluate to NOP */
+        abro = gnrc_sixlowpan_nd_opt_abr_build(abr->version, ltime_min, &abr->addr,
+                                            ext_opts);
+        if (abro == NULL) {
+            DEBUG("nib: No space left in packet buffer. Not adding ABRO\n");
+            return NULL;
+        }
+        ext_opts = abro;
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
     }
     else {
-        ltime_min = _nib_abr_entry_valid_offset(abr);
-    }
-    (void)ltime_min;    /* gnrc_sixlowpan_nd_opt_abr_build might evaluate to NOP */
-    abro = gnrc_sixlowpan_nd_opt_abr_build(abr->version, ltime_min, &abr->addr,
-                                           ext_opts);
-    if (abro == NULL) {
-        DEBUG("nib: No space left in packet buffer. Not adding ABRO\n");
-        return NULL;
-    }
-    ext_opts = abro;
-#else   /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
-    (void)abr;
-    while ((pfx = _nib_offl_iter(pfx))) {
-        if ((pfx->mode & _PL) && (_nib_onl_get_if(pfx->next_hop) == id)) {
-            if ((ext_opts = _offl_to_pio(pfx, ext_opts)) == NULL) {
-                return NULL;
+        (void)abr;
+        while ((pfx = _nib_offl_iter(pfx))) {
+            if ((pfx->mode & _PL) && (_nib_onl_get_if(pfx->next_hop) == id)) {
+                if ((ext_opts = _offl_to_pio(pfx, ext_opts)) == NULL) {
+                    return NULL;
+                }
             }
         }
     }
-#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
+
+    /* advertise route to off-link subnets */
+    if (CONFIG_GNRC_IPV6_NIB_ADD_RIO_IN_RA) {
+        DEBUG("nib: add RIO to RA on interface %u\n", netif->pid);
+        ext_opts = _add_rio(netif, ext_opts, true);
+    }
+
     return ext_opts;
 }
 
@@ -239,39 +321,10 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
 static gnrc_pktsnip_t *_build_final_ext_opts(gnrc_netif_t *netif)
 {
     gnrc_pktsnip_t *ext_opts = NULL;
-    _nib_offl_entry_t *entry = NULL;
 
-    if (!IS_USED(MODULE_GNRC_IPV6_NIB_RIO) ||
-        !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ADD_RIO_IN_LAST_RA)) {
-        return NULL;
-    }
-
-    DEBUG("nib: sending final RA on interface %u\n", netif->pid);
-
-    uint32_t now = evtimer_now_msec();
-    while ((entry = _nib_offl_iter(entry))) {
-
-        unsigned id = netif->pid;
-        if (_nib_onl_get_if(entry->next_hop) == id) {
-            continue;
-        }
-
-        if ((entry->mode & _PL) && (entry->flags & _PFX_ON_LINK)) {
-            DEBUG("nib: adding downstream subnet to RA\n");
-            uint32_t valid_ltime = (entry->valid_until == UINT32_MAX) ? UINT32_MAX :
-                                   ((entry->valid_until - now) / MS_PER_SEC);
-            gnrc_pktsnip_t *snip  = gnrc_ndp_opt_ri_build(&entry->pfx,
-                                                          entry->pfx_len,
-                                                          valid_ltime,
-                                                          NDP_OPT_RI_FLAGS_PRF_NONE,
-                                                          ext_opts);
-            if (snip != NULL) {
-                ext_opts = snip;
-            } else {
-                DEBUG_PUTS("nib: can't add RIO to RA - out of memory");
-                break;
-            }
-        }
+    if (CONFIG_GNRC_IPV6_NIB_ADD_RIO_IN_LAST_RA) {
+        DEBUG("nib: add RIO to final RA on interface %u\n", netif->pid);
+        ext_opts = _add_rio(netif, ext_opts, false);
     }
 
     return ext_opts;

@@ -29,7 +29,7 @@
  *
  * ## Usage
  *
- * See `tests/driver_adt7310` for an example application using this driver.
+ * See `tests/drivers/adt7310` for an example application using this driver.
  *
  * ## Caveats
  *

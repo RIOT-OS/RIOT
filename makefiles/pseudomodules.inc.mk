@@ -61,17 +61,9 @@ PSEUDOMODULES += dns_msg
 PSEUDOMODULES += ecc_%
 PSEUDOMODULES += ethos_stdio
 PSEUDOMODULES += event_%
-## @defgroup sys_event_thread_lowest event_thread_lowest
-## @ingroup sys_event
-## @{
-## @deprecated  Use module `event_thread` instead (see @ref event/thread.h);
-##              Will be removed after 2021.10 release.
-PSEUDOMODULES += event_thread_lowest
-## @}
 PSEUDOMODULES += event_timeout
 PSEUDOMODULES += event_timeout_ztimer
 PSEUDOMODULES += evtimer_mbox
-PSEUDOMODULES += evtimer_on_ztimer
 PSEUDOMODULES += fatfs_vfs_format
 PSEUDOMODULES += fmt_%
 PSEUDOMODULES += gcoap_forward_proxy
@@ -448,6 +440,7 @@ PSEUDOMODULES += shell_cmd_benchmark_udp
 PSEUDOMODULES += shell_cmd_ccn-lite-utils
 PSEUDOMODULES += shell_cmd_conn_can
 PSEUDOMODULES += shell_cmd_cord_ep
+PSEUDOMODULES += shell_cmd_coreclk
 PSEUDOMODULES += shell_cmd_cryptoauthlib
 PSEUDOMODULES += shell_cmd_dfplayer
 PSEUDOMODULES += shell_cmd_fib
@@ -457,6 +450,7 @@ PSEUDOMODULES += shell_cmd_gnrc_ipv6_frag_stats
 PSEUDOMODULES += shell_cmd_gnrc_ipv6_nib
 PSEUDOMODULES += shell_cmd_gnrc_ipv6_whitelist
 PSEUDOMODULES += shell_cmd_gnrc_netif
+PSEUDOMODULES += shell_cmd_gnrc_netif_lora
 PSEUDOMODULES += shell_cmd_gnrc_netif_lorawan
 PSEUDOMODULES += shell_cmd_gnrc_pktbuf
 PSEUDOMODULES += shell_cmd_gnrc_rpl
@@ -589,7 +583,7 @@ PSEUDOMODULES += ztimer64_%
 ## a configurable @ref CONFIG_ZTIMER_AUTO_ADJUST_SETTLE value can be set for this.
 ##
 ## Alternatively CONFIG_ZTIMER_USEC_ADJUST_% values can be set in the BOARDs
-## configuration header board.h. These can be found out by running tests/ztimer_overhead
+## configuration header board.h. These can be found out by running tests/sys/ztimer_overhead
 PSEUDOMODULES += ztimer_auto_adjust
 
 # core_lib is not a submodule
@@ -611,6 +605,9 @@ PSEUDOMODULES += stm32_periph_%
 # declare periph submodules as pseudomodules, but exclude periph_common
 PSEUDOMODULES += periph_%
 NO_PSEUDOMODULES += periph_common
+
+# Modules to automatically start PIO programs
+PSEUDOMODULES += pio_autostart_%
 
 # Submodules provided by Skald
 PSEUDOMODULES += skald_ibeacon

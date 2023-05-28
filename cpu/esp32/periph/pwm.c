@@ -323,7 +323,7 @@ void pwm_poweroff(pwm_t pwm)
 void pwm_print_config(void)
 {
     for (unsigned pwm = 0; pwm < PWM_NUMOF; pwm++) {
-        printf("\tPWM_DEV(%d)\tchannels=[ ", pwm);
+        printf("\tPWM_DEV(%u)\tchannels=[ ", pwm);
         for (int i = 0; i < _CFG.ch_numof; i++) {
             printf("%d ", _CFG.gpios[i]);
         }

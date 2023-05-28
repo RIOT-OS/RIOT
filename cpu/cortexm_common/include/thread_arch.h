@@ -20,6 +20,8 @@
 #ifndef THREAD_ARCH_H
 #define THREAD_ARCH_H
 
+#include "cpu_conf.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

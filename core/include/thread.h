@@ -122,7 +122,6 @@
 #include "clist.h"
 #include "cib.h"
 #include "msg.h"
-#include "cpu_conf.h"
 #include "sched.h"
 #include "thread_config.h"
 
@@ -206,9 +205,6 @@ struct _thread {
 /* enable TLS only when Picolibc is compiled with TLS enabled */
 #ifdef PICOLIBC_TLS
     void *tls;                      /**< thread local storage ptr */
-#endif
-#ifdef HAVE_THREAD_ARCH_T
-    thread_arch_t arch;             /**< architecture dependent part    */
 #endif
 };
 

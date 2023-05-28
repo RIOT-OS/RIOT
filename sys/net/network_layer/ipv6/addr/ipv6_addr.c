@@ -20,6 +20,7 @@
 #include <stdio.h>
 
 #include "fmt.h"
+#include "bitarithm.h"
 #include "kernel_defines.h"
 #include "net/ipv6/addr.h"
 
@@ -52,25 +53,15 @@ uint8_t ipv6_addr_match_prefix(const ipv6_addr_t *a, const ipv6_addr_t *b)
     }
 
     for (int i = 0; i < 16; i++) {
-        /* if bytes are equal add 8 */
-        if (a->u8[i] == b->u8[i]) {
-            prefix_len += 8;
+        uint8_t xor = a->u8[i] ^ b->u8[i];
+        if (xor) {
+            /* if bytes aren't equal count matching leading bits */
+            prefix_len += bitarithm_clzb(xor);
+            break;
         }
         else {
-            uint8_t xor = (a->u8[i] ^ b->u8[i]);
-
-            /* while bits from byte equal add 1 */
-            for (int j = 0; j < 8; j++) {
-                if ((xor & 0x80) == 0) {
-                    prefix_len++;
-                    xor = xor << 1;
-                }
-                else {
-                    break;
-                }
-            }
-
-            break;
+            /* if bytes are equal add 8 */
+            prefix_len += 8;
         }
     }
 

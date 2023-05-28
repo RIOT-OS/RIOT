@@ -8,18 +8,5 @@ ifeq ($(PROGRAMMER),adafruit-nrfutil)
   # The preinstalled bootloader must also be taken into account so
   # ROM_OFFSET skips the space taken by such bootloader.
   ROM_OFFSET = 0x26000
-
-  ifneq (,$(filter reset flash flash-only, $(MAKECMDGOALS)))
-    # Add 2 seconds delay before opening terminal: this is required when opening
-    # the terminal right after flashing. In this case, the stdio over USB needs
-    # some time after reset before being ready.
-    TERM_DELAY = 2
-    TERMDEPS += term-delay
-  endif
+  include $(RIOTMAKE)/tools/usb_board_reset.mk
 endif
-
-term-delay:
-	sleep $(TERM_DELAY)
-
-TESTRUNNER_CONNECT_DELAY ?= $(TERM_DELAY)
-$(call target-export-variables,test,TESTRUNNER_CONNECT_DELAY)

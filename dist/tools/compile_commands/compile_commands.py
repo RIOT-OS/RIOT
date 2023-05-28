@@ -335,6 +335,8 @@ if __name__ == '__main__':
             # it's called -mlong-calls in LLVM, but we don't need it for clangd
             # as we do not generate code anyway
             '-mlongcalls',
+            # GCC specific diagnostics: Tell GCC address space starts at 0
+            '--param=min-pagesize=0',
         ]
         _args.filter_out.extend(flags)
     generate_compile_commands(_args)

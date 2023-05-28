@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       LittlevGL glue code
+ * @brief       LVGL glue code
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @}

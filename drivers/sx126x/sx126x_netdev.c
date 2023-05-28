@@ -401,7 +401,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
         const uint8_t max_sf = sx126x_is_llcc68(dev)
                                ? llcc68_max_sf
                                : sx126x_max_sf;
-        if ((sf < LORA_SF6) || (sf > max_sf)) {
+        if ((sf < LORA_SF5) || (sf > max_sf)) {
             res = -EINVAL;
             break;
         }

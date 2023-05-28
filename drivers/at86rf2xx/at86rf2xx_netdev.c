@@ -319,8 +319,23 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         at86rf2xx_fb_stop(dev);
 #endif
         radio_info->rssi = RSSI_BASE_VAL + ed;
-        DEBUG("[at86rf2xx] LQI:%d high is good, RSSI:%d high is either good or"
+        DEBUG("[at86rf2xx] LQI:%d high is good, RSSI:%d high is either good or "
               "too much interference.\n", radio_info->lqi, radio_info->rssi);
+#if AT86RF2XX_IS_PERIPH && IS_USED(MODULE_NETDEV_IEEE802154_RX_TIMESTAMP)
+        /* AT86RF2XX_IS_PERIPH means the MCU is ATmegaRFR2 that has symbol counter */
+        {
+            uint32_t rx_sc;
+            rx_sc = at86rf2xx_get_sc(dev);
+
+            /* convert counter value to ns */
+            uint64_t res = SC_TO_NS * (uint64_t)rx_sc;
+            netdev_ieee802154_rx_info_set_timestamp(radio_info, res);
+            DEBUG("[at86rf2xx] CS: %" PRIu32 " timestamp: %" PRIu32 ".%09" PRIu32 " ",
+                    rx_sc, (uint32_t)(radio_info->timestamp / NS_PER_SEC),
+                           (uint32_t)(radio_info->timestamp % NS_PER_SEC));
+        }
+#endif
+
     }
     else {
         at86rf2xx_fb_stop(dev);

@@ -22,7 +22,7 @@
  * For example, in the command line:
  *
  * ```
- * CFLAGS="-DQCBOR_DISABLE_INDEFINITE_LENGTH_STRINGS" BOARD=samr21-xpro make -C tests/pkg_qcbor
+ * CFLAGS="-DQCBOR_DISABLE_INDEFINITE_LENGTH_STRINGS" BOARD=samr21-xpro make -C tests/pkg/qcbor
  * ```
  *
  */

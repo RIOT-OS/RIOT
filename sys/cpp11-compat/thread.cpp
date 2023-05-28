@@ -44,7 +44,7 @@ void thread::join() {
       m_data->joining_thread = thread_getpid();
       thread_sleep();
     }
-    m_handle = thread_uninitialized;
+    m_handle = KERNEL_PID_UNDEF;
   } else {
     throw system_error(make_error_code(errc::invalid_argument),
                        "Can not join an unjoinable thread.");
@@ -54,7 +54,7 @@ void thread::join() {
 
 void thread::detach() {
   if (joinable()) {
-    m_handle = thread_uninitialized;
+    m_handle = KERNEL_PID_UNDEF;
   } else {
     throw system_error(make_error_code(errc::invalid_argument),
                        "Can not detach an unjoinable thread.");

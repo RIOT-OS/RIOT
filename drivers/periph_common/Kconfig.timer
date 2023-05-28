@@ -7,7 +7,7 @@
 if TEST_KCONFIG
 
 menuconfig MODULE_PERIPH_TIMER
-    bool "Configure timer peripheral driver"
+    bool "Timer peripheral driver"
     depends on HAS_PERIPH_TIMER
     select MODULE_PERIPH_COMMON
 

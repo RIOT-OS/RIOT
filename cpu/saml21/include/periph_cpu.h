@@ -140,7 +140,7 @@ static const gpio_t sam0_adc_pins[1][20] = {
 #define RTT_CLOCK_FREQUENCY (32768U)                      /* in Hz */
 #define RTT_MIN_FREQUENCY   (RTT_CLOCK_FREQUENCY / 512U)  /* in Hz */
 #define RTT_MAX_FREQUENCY   (RTT_CLOCK_FREQUENCY)         /* in Hz */
-/* determined by tests/ztimer_underflow */
+/* determined by tests/sys/ztimer_underflow */
 #define RTT_MIN_OFFSET      (8U)
 /** @} */
 

@@ -342,7 +342,7 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * USEMODULE='vl6180x_rng vl6180x_als vl6180x_irq` \
  * CLFAGS='-DVL6180X_PARAM_INT_PIN=GPIO_PIN\(0,5\)' \
- * BOARD=... make -C tests/driver_vl6180x
+ * BOARD=... make -C tests/drivers/vl6180x
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  *  The default configuration of the sensor is defined in file
@@ -370,7 +370,7 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * USEMODULE='vl6180x_rng vl6180x_als` \
  * CLFAGS='-DCONFIG_VL6180X_MEAS_PERIOD=50 -DCONFIG_VL6180X_RNG_MAX_TIME=60' \
- * BOARD=... make -C tests/driver_vl6180x
+ * BOARD=... make -C tests/drivers/vl6180x
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * ## Configuration at runtime

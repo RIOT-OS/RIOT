@@ -998,14 +998,7 @@ ifneq (,$(filter ztimer64%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter evtimer,$(USEMODULE)))
-  ifneq (,$(filter evtimer_on_ztimer,$(USEMODULE)))
-    USEMODULE += ztimer_msec
-  else
-    USEMODULE += xtimer
-    ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
-      USEMODULE += evtimer_on_ztimer
-    endif
-  endif
+  USEMODULE += ztimer_msec
 endif
 
 # handle xtimer's deps. Needs to be done *after* ztimer

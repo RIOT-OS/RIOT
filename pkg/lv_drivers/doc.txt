@@ -1,8 +1,8 @@
 /**
-@defgroup pkg_lv_drivers LittlevGL Drivers
+@defgroup pkg_lv_drivers LVGL Drivers
 @ingroup  pkg
 @brief    Display controller and touchpad driver to can be directly used with
-          LittlevGL.
+          LVGL.
 
 @note     This package needs the 32bit version of SDL2
 

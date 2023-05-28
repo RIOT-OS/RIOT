@@ -43,7 +43,7 @@ struct uart_ctx {
     void* rx_cb_arg;    /**< RX callback arg     */
     uint32_t bit_time;  /**< timer ticks per bit */
     uint16_t byte_tx;   /**< current TX byte     */
-    uint16_t byte_rx;   /**< curretn RX byte     */
+    uint16_t byte_rx;   /**< current RX byte     */
     uint8_t bits_tx;    /**< TX bit pos          */
     uint8_t state_rx;   /**< RX state            */
 #ifdef MODULE_SOFT_UART_MODECFG

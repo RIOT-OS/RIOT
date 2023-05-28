@@ -68,9 +68,23 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
     /* configure the used pins */
     unsigned i = 0;
+    uint32_t ccer = 0;
+
     while ((i < TIMER_CHANNEL_NUMOF) && (pwm_config[pwm].chan[i].pin != GPIO_UNDEF)) {
         gpio_init(pwm_config[pwm].chan[i].pin, GPIO_OUT);
         gpio_init_af(pwm_config[pwm].chan[i].pin, pwm_config[pwm].af);
+        if (pwm_config[pwm].chan[i].cc_chan < 4) {
+            /* OCx output channel used */
+            ccer |= TIM_CCER_CC1E << ((pwm_config[pwm].chan[i].cc_chan) << 2);
+        }
+        else {
+#ifdef TIM_CCER_CC1NE
+            /* OCxN complementary output channel used */
+            ccer |= TIM_CCER_CC1NE << ((pwm_config[pwm].chan[i].cc_chan & 0x03) << 2);
+#else
+            assert(false);
+#endif
+        }
         i++;
     }
 
@@ -102,8 +116,7 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 #ifdef TIM_BDTR_MOE
     dev(pwm)->BDTR = TIM_BDTR_MOE;
 #endif
-    dev(pwm)->CCER = (TIM_CCER_CC1E | TIM_CCER_CC2E |
-                      TIM_CCER_CC3E | TIM_CCER_CC4E);
+    dev(pwm)->CCER = ccer;
     dev(pwm)->CR1 |= TIM_CR1_CEN;
 
     /* return the actual used PWM frequency */
@@ -138,7 +151,7 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
     }
 
     /* set new value */
-    TIM_CHAN(pwm, pwm_config[pwm].chan[channel].cc_chan) = value;
+    TIM_CHAN(pwm, (pwm_config[pwm].chan[channel].cc_chan & 0x3)) = value;
 }
 
 void pwm_poweron(pwm_t pwm)

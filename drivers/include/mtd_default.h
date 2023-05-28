@@ -57,6 +57,31 @@ extern "C" {
 
 #endif /*  !defined(MTD_NUMOF) && !DOXYGEN */
 
+#if !DOXYGEN
+
+/**
+ * @brief   Declare `mtd*` according to the number of MTD devices
+ */
+#if MTD_NUMOF > 0
+extern mtd_dev_t *mtd0;
+#endif
+#if MTD_NUMOF > 1
+extern mtd_dev_t *mtd1;
+#endif
+#if MTD_NUMOF > 2
+extern mtd_dev_t *mtd2;
+#endif
+#if MTD_NUMOF > 3
+extern mtd_dev_t *mtd3;
+#endif
+#if MTD_NUMOF > 4
+extern mtd_dev_t *mtd4;
+#endif
+#if MTD_NUMOF > 5
+extern mtd_dev_t *mtd5;
+#endif
+#endif /* !DOXYGEN */
+
 #if defined(MODULE_MTD_SDCARD_DEFAULT)
 extern mtd_sdcard_t mtd_sdcard_dev0;
 #endif

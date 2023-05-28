@@ -163,9 +163,9 @@ static void _scsi_read_format_capacities(usbus_handler_t *handler, uint8_t lun)
     pkt->type = SCSI_READ_FMT_CAPA_TYPE_FORMATTED;
 
     /* Manage endianness, bytes 11..9 -> LSB..MSB */
-    pkt->blk_len[0] = (block_size >> 16) && 0xFF;
-    pkt->blk_len[1] = (block_size >> 8) && 0xFF;
-    pkt->blk_len[2] = block_size && 0xFF;
+    pkt->blk_len[0] = (block_size >> 16) & 0xFF;
+    pkt->blk_len[1] = (block_size >> 8) & 0xFF;
+    pkt->blk_len[2] = block_size & 0xFF;
 
     /* copy into ep buffer */
     usbdev_ep_xmit(msc->ep_in->ep, (uint8_t *)pkt, sizeof(msc_read_fmt_capa_pkt_t));

@@ -180,11 +180,11 @@ PROGRAMMER ?= openocd
 
 When using high level timers, i.e. `ztimer` there is an overhead in calling
 for @ref ztimer_sleep and @ref ztimer_set functions. This offset can be
-compensated for. It can be measured by running `tests/ztimer_overhead`
+compensated for. It can be measured by running `tests/sys/ztimer_overhead`
 on your board, i.e:
 
 ```shell
-$ BOARD=my-new-board make -C tests/ztimer_overhead
+$ BOARD=my-new-board make -C tests/sys/ztimer_overhead
 main(): This is RIOT!
 ZTIMER_USEC auto_adjust params:
     ZTIMER_USEC->adjust_set = xx
@@ -379,7 +379,7 @@ In this case some special considerations must be taken with the makefiles:
   `include $(RIOTBOARD)/foo-parent/Makefile.*include*`
 
 An example can be found in
-[`tests/external_board_native`](https://github.com/RIOT-OS/RIOT/tree/master/tests/external_board_native)
+[`tests/build_system/external_board_native`](https://github.com/RIOT-OS/RIOT/tree/master/tests/build_system/external_board_native)
 
 # Tools                                                          {#boards-tools}
 

@@ -121,7 +121,7 @@ microcontroller is rather straightforward. You need to:
 - Provide the variables `ROM_START_ADDR` and `ROM_LEN` as well as
 `RAM_LEN` and `RAM_START_ADDR`.
 - Adapt the linker scripts for your cpu to pass the test
-[tests/cortexm_common_ldscript](../../tests/cortexm_common_ldscript). This test
+[tests/cpu/cortexm_common_ldscript](../../tests/cpu/cortexm_common_ldscript). This test
 ensures that the linker script supports building firmware's with a rom offset
 and specific sized firmware's.
 - Make the startup code `board_init()`, `cpu_init` idempotent, i.e. whether you

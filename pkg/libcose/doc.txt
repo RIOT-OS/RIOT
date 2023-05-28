@@ -19,7 +19,7 @@
  * The use of the library itself [is described in the libcose
  * documentation](https://bergzand.github.io/libcose/), and some example code
  * can be found in
- * [`tests/pkg_libcose/`](https://github.com/RIOT-OS/RIOT/tree/master/tests/pkg_libcose).
+ * [`tests/pkg/libcose/`](https://github.com/RIOT-OS/RIOT/tree/master/tests/pkg/libcose).
  *
  * Backends
  * --------

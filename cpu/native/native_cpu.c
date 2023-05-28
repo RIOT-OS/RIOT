@@ -99,6 +99,11 @@ int thread_isr_stack_usage(void)
     return -1;
 }
 
+void native_breakpoint(void)
+{
+    raise(SIGTRAP);
+}
+
 static inline void *align_stack(uintptr_t start, int *stacksize)
 {
     const size_t alignment = sizeof(uintptr_t);

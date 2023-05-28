@@ -68,7 +68,7 @@ endif
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-EXTERNAL_BOARD_DIRS += $(RIOTBASE)/tests/external_board_dirs/esp-ci-boards
+EXTERNAL_BOARD_DIRS += $(RIOTBASE)/tests/build_system/external_board_dirs/esp-ci-boards
 
 include $(RIOTBASE)/Makefile.include
 

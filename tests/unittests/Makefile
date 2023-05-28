@@ -3,12 +3,14 @@ include ../Makefile.tests_common
 
 USEMODULE += embunit
 
-ifeq (, $(filter tests-%, $(MAKECMDGOALS)))
-  # the $(dir) Makefile function leaves a trailing slash after the directory
-  # name, therefore we use patsubst instead.
-  UNIT_TESTS := $(patsubst %/Makefile,%,$(wildcard tests-*/Makefile))
-else
-  UNIT_TESTS := $(filter tests-%, $(MAKECMDGOALS))
+ifeq (, $(UNIT_TESTS))
+  ifeq (, $(filter tests-%, $(MAKECMDGOALS)))
+    # the $(dir) Makefile function leaves a trailing slash after the directory
+    # name, therefore we use patsubst instead.
+    UNIT_TESTS := $(patsubst %/Makefile,%,$(wildcard tests-*/Makefile))
+  else
+    UNIT_TESTS := $(filter tests-%, $(MAKECMDGOALS))
+  endif
 endif
 
 DISABLE_MODULE += auto_init auto_init_%

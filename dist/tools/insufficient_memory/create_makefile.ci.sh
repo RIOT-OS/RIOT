@@ -53,7 +53,10 @@ for BOARD in $(EXTERNAL_BOARD_DIRS="" make  --no-print-directory info-boards-sup
     # as this is exactly what we want here
     # shellcheck disable=SC2086
     if ! make BOARD="${BOARD}" ${LOCAL_MAKE_ARGS} clean all -C "${APP_DIR}" > "$TMPFILE" 2>&1; then
-        if grep -e overflowed -e "not within region" "$TMPFILE" > /dev/null; then
+        if grep -e overflowed \
+                -e "not within region" \
+                -e "wraps around address space" \
+                "$TMPFILE" > /dev/null; then
             printf "${CBIG}%s${CRESET}\n" "too big"
             BOARDS="${BOARDS} ${BOARD}"
         elif grep -e "not whitelisted" \

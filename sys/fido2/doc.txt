@@ -197,7 +197,7 @@
  *
  * Testing is done with the help of the fido2-tests package based on the [solokeys fido2-tests](https://github.com/solokeys/fido2-tests).
  *
- * For for more information about testing the FIDO2 CTAP implementation refer to the README of the test application (`/tests/sys_fido2_ctap`).
+ * For for more information about testing the FIDO2 CTAP implementation refer to the README of the test application (`/tests/sys/fido2_ctap`).
  *
  * **Todo**
  *
