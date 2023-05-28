@@ -1,0 +1,75 @@
+# Copyright (c) 2023 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menu "CAN (Controller Area Network) bus"
+    depends on TEST_KCONFIG
+
+config MODULE_CAN
+    bool "CAN (Controller Area Network) bus"
+    depends on TEST_KCONFIG
+
+    select MODULE_CORE_MBOX if MODULE_CAN_MBOX
+    select MODULE_MEMARRAY
+
+if MODULE_CAN
+
+config MODULE_CAN_MBOX
+    bool "CAN mbox"
+
+config MODULE_CAN_PM
+    bool "CAN pm"
+
+endif  # MODULE_CAN
+
+config MODULE_CAN_ISOTP
+    bool "CAN isotp"
+    depends on TEST_KCONFIG
+
+    select MODULE_GNRC_PKTBUF
+    select MODULE_ZTIMER
+    select ZTIMER_USEC
+
+config MODULE_CONN_CAN
+    bool "CAN conn API"
+    depends on TEST_KCONFIG
+
+    select MODULE_CAN
+    select MODULE_CAN_MBOX
+    select MODULE_GNRC_PKTBUF
+    select MODULE_ZTIMER
+    select ZTIMER_USEC
+
+if MODULE_CONN_CAN
+
+config MODULE_CONN_CAN_ISOTP_MULTI
+    bool "CAN conn API isotp multi"
+
+endif  # MODULE_CONN_CAN
+
+if MODULE_CONN_CAN || MODULE_CAN_ISOTP
+
+# TODO: the following should be removed once the Kconfig GNRC dependency modelling
+# is done
+config MODULE_GNRC_PKTBUF
+    bool "GNRC Packet Buffer module"
+    select USEMODULE_GNRC
+    select MODULE_AUTO_INIT_GNRC_PKTBUF
+    select MODULE_GNRC_PKT
+    select MODULE_GNRC_PKTBUF_STATIC
+
+config MODULE_AUTO_INIT_GNRC_PKTBUF
+    bool "GNRC Packet auto init"
+
+config MODULE_GNRC_PKT
+    bool "GNRC Packet"
+
+config MODULE_GNRC_PKTBUF_STATIC
+    bool "GNRC Packet Buffer static module"
+
+endif # MODULE_CONN_CAN || MODULE_CAN_ISOTP
+
+endmenu
