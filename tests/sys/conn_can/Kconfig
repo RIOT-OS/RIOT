@@ -1,0 +1,23 @@
+config APPLICATION
+    bool
+    default y
+    depends on TEST_KCONFIG
+    depends on HAS_PERIPH_CAN
+    depends on HAS_PERIPH_GPIO_IRQ
+    select MODULE_PERIPH_CAN
+    select MODULE_PERIPH_GPIO_IRQ
+
+choice CAN_TRX_TO_BUILD
+    bool "CAN TRX transceiver selection"
+    default CAN_TRX_TJA1042
+    depends on TEST_KCONFIG
+
+config CAN_TRX_TJA1042
+    bool "tja1042 transceiver"
+    select MODULE_TJA1042
+
+config CAN_TRX_NCV7356
+    bool "ncv7356 transceiver"
+    select MODULE_NCV7356
+
+endchoice
