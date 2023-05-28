@@ -17,6 +17,9 @@ USEMODULE += shell_cmds_default
 USEMODULE += ps
 USEMODULE += ztimer64_usec
 
+# Enable to get access to gnrc_pktbuf_stats in gnrc_pktbuf shell command
+DEVELHELP ?= 1
+
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
