@@ -506,7 +506,6 @@ void gnrc_sixlowpan_frag_sfr_arq_timeout(gnrc_sixlowpan_frag_fb_t *fbuf)
     int error_no = ETIMEDOUT;   /* assume time out for fbuf->pkt */
 
     DEBUG("6lo sfr: ARQ timeout for datagram %u\n", fbuf->tag);
-    fbuf->sfr.arq_timeout_event.msg.content.ptr = NULL;
     if (IS_ACTIVE(CONFIG_GNRC_SIXLOWPAN_SFR_MOCK_ARQ_TIMER)) {
         /* mock-up to emulate time having passed beyond (1us) the ARQ timeout */
         now -= (fbuf->sfr.arq_timeout * US_PER_MS) + 1;
@@ -681,7 +680,6 @@ static void _clean_slate_datagram(gnrc_sixlowpan_frag_fb_t *fbuf)
     /* remove potentially scheduled timers for this datagram */
     evtimer_del((evtimer_t *)(&_arq_timer),
                 &fbuf->sfr.arq_timeout_event.event);
-    fbuf->sfr.arq_timeout_event.event.next = NULL;
     if (gnrc_sixlowpan_frag_sfr_congure_snd_has_inter_frame_gap()) {
         for (clist_node_t *node = clist_lpop(&_frame_queue);
              node != NULL; node = clist_lpop(&_frame_queue)) {
@@ -1708,13 +1706,26 @@ static void _sched_next_frame(gnrc_sixlowpan_frag_fb_t *fbuf)
     }
 }
 
+static inline bool _arq_scheduled(gnrc_sixlowpan_frag_fb_t *fbuf)
+{
+    evtimer_event_t *ptr = _arq_timer.events;
+    evtimer_event_t *event = &fbuf->sfr.arq_timeout_event.event;
+    while (ptr) {
+        if (ptr == event) {
+            return true;
+        }
+        ptr = ptr->next;
+    }
+    return false;
+}
+
 static void _sched_arq_timeout(gnrc_sixlowpan_frag_fb_t *fbuf, uint32_t offset)
 {
     if (IS_ACTIVE(CONFIG_GNRC_SIXLOWPAN_SFR_MOCK_ARQ_TIMER)) {
         /* mock does not need to be scheduled */
         return;
     }
-    if (fbuf->sfr.arq_timeout_event.msg.content.ptr != NULL) {
+    if (_arq_scheduled(fbuf)) {
         DEBUG("6lo sfr: ARQ timeout for datagram %u already scheduled\n",
               (uint8_t)fbuf->tag);
         return;
@@ -1804,7 +1815,6 @@ static void _handle_ack(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
             DEBUG("6lo sfr: cancelling ARQ timeout\n");
             evtimer_del((evtimer_t *)(&_arq_timer),
                         &fbuf->sfr.arq_timeout_event.event);
-            fbuf->sfr.arq_timeout_event.msg.content.ptr = NULL;
             if ((unaligned_get_u32(hdr->bitmap) == _null_bitmap.u32)) {
                 /* ACK indicates the reassembling endpoint canceled reassembly
                  */
