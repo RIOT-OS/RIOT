@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 TUÚ Braunschweig Institut für Betriebssysteme und Rechnerverbund
+ * Copyright (C) 2023 TU Braunschweig Institut für Betriebssysteme und Rechnerverbund
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,7 +16,7 @@
  *
  * @file
  *
- * @author      Daniel Prigoshij <d.prigoshij@tu-braunschweig.de>
+ * @author      Daniel Prigoshij <prigoshi@ibr.cs.tu-bs.de>
  */
 
 #ifndef SEN5X_H
@@ -74,15 +74,21 @@ typedef struct {
  *
  * @param[inout] dev        Device descriptor of the driver
  * @param[in]    params     Initialization parameters
+ * 
+ * @return 0 on success
+ * @return < 0 on error
  */
-void sen5x_init(sen5x_t *dev, const sen5x_params_t *params);
+int sen5x_init(sen5x_t *dev, const sen5x_params_t *params);
 
 /**
  * @brief   Execute a reset on the given device
  *
  * @param[inout] dev        Device descriptor of the driver
+ * 
+ * @return 0 on success
+ * @return < 0 on error
  */
-void sen5x_reset(const sen5x_t *dev);
+int sen5x_reset(const sen5x_t *dev);
 
 /**
  * @brief   Starts a continuous measurement

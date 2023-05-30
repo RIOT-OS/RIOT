@@ -34,6 +34,7 @@
 
 #include "sensirion_config.h"
 #include "sen5x_params.h"
+#include "sen5x_constants.h"
 #include "xtimer.h"
 #include "periph/i2c.h"
 

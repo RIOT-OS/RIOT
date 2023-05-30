@@ -40,17 +40,17 @@
 void sensirion_i2c_hal_init(void) {
 
     // initialize the bus
-    i2c_init(I2C_DEVICE);
+    i2c_init(SEN5X_PARAM_I2C_DEV);
 
     // first, acquire the shared bus again
-    i2c_acquire(I2C_DEVICE);
+    i2c_acquire(SEN5X_PARAM_I2C_DEV);
 }
 
 /**
  * Release all resources initialized by sensirion_i2c_hal_init().
  */
 void sensirion_i2c_hal_free(void) {
-    i2c_release(I2C_DEVICE);
+    i2c_release(SEN5X_PARAM_I2C_DEV);
 }
 
 /**
@@ -64,7 +64,7 @@ void sensirion_i2c_hal_free(void) {
  * @returns 0 on success, error code otherwise
  */
 int8_t sensirion_i2c_hal_read(uint8_t address, uint8_t* data, uint16_t count) {
-    return i2c_read_bytes(I2C_DEVICE, address, data, count, 0);
+    return i2c_read_bytes(SEN5X_PARAM_I2C_DEV, address, data, count, 0);
 }
 
 /**
@@ -79,7 +79,7 @@ int8_t sensirion_i2c_hal_read(uint8_t address, uint8_t* data, uint16_t count) {
  * @returns 0 on success, error code otherwise
  */
 int8_t sensirion_i2c_hal_write(uint8_t address, const uint8_t* data, uint16_t count) {
-    return i2c_write_bytes(I2C_DEVICE, address, data, count, 0);
+    return i2c_write_bytes(SEN5X_PARAM_I2C_DEV, address, data, count, 0);
 }
 
 /**

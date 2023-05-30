@@ -11,9 +11,9 @@
  *
  * @{
  * @file
- * @brief       Default configuration
+ * @brief       Default configuration for SEN50/54/55
  *
- * @author      Daniel Prigoshij <d.prigoshij@tu-braunschweig.de>
+ * @author      Daniel Prigoshij <prigoshi@ibr.cs.tu-bs.de>
  */
 
 #ifndef SEN5X_PARAMS_H
@@ -21,6 +21,7 @@
 
 #include "board.h"
 #include "sen5x.h"
+#include "saul_reg.h"
 #include "sen5x_constants.h"
 #include "periph/i2c.h"
 
@@ -36,13 +37,15 @@ extern "C" {
 #define SEN5X_PARAM_I2C_DEV         I2C_DEV(0)
 #endif
 #ifndef SEN5X_PARAM_ADDR
-#define SEN5X_PARAM_ADDR            SEN5X_I2C_ADDRESS
+#define SEN5X_PARAM_ADDR            SEN5X_ADRESS_I2C
 #endif
-
 
 #ifndef SEN5X_PARAMS
 #define SEN5X_PARAMS                { .i2c_dev = SEN5X_PARAM_I2C_DEV, \
                                       .i2c_addr = SEN5X_PARAM_ADDR }
+#endif
+#ifndef SEN5X_SAUL_INFO
+#define SEN5X_SAUL_INFO             { .name = "sen5x" }
 #endif
 /**@}*/
 
