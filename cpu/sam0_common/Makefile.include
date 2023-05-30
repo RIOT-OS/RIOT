@@ -27,7 +27,9 @@ CFLAGS += -DDONT_USE_PREDEFINED_CORE_HANDLERS
 CFLAGS += -DDONT_USE_PREDEFINED_PERIPHERALS_HANDLERS
 
 # For Cortex-M cpu we use the common cortexm.ld linker script
-LINKER_SCRIPT ?= cortexm.ld
+ifeq (,$(USE_LDMEMORY))
+  LINKER_SCRIPT ?= cortexm.ld
+endif
 
 INCLUDES += -I$(RIOTCPU)/sam0_common/include
 

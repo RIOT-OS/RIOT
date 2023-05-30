@@ -10,6 +10,8 @@ RAM_START_ADDR ?= 0x20070000
 ROM_LEN ?= 0x80000
 RAM_LEN ?= 0x18000
 
-LINKER_SCRIPT ?= cortexm.ld
+ifeq (,$(USE_LDMEMORY))
+  LINKER_SCRIPT ?= cortexm.ld
+endif
 
 INCLUDES += -I$(RIOTCPU)/sam_common/include
