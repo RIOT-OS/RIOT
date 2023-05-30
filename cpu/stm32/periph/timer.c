@@ -36,6 +36,21 @@ static inline TIM_TypeDef *dev(tim_t tim)
     return timer_config[tim].dev;
 }
 
+/**
+ * @brief   Get the number of channels of the timer device
+ */
+static unsigned channel_numof(tim_t tim)
+{
+    if (timer_config[tim].channel_numof) {
+        return timer_config[tim].channel_numof;
+    }
+
+    /* backwards compatibility with older periph_conf.h files when all STM32
+     * had exactly 4 channels */
+    return TIMER_CHANNEL_NUMOF;
+}
+
+
 #ifdef MODULE_PERIPH_TIMER_PERIODIC
 
 /**
@@ -121,7 +136,7 @@ int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
 
 int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 {
-    if (channel >= (int)TIMER_CHANNEL_NUMOF) {
+    if ((unsigned)channel >= channel_numof(tim)) {
         return -1;
     }
 
@@ -150,7 +165,7 @@ int timer_set(tim_t tim, int channel, unsigned int timeout)
 {
     unsigned value = (dev(tim)->CNT + timeout) & timer_config[tim].max;
 
-    if (channel >= (int)TIMER_CHANNEL_NUMOF) {
+    if ((unsigned)channel >= channel_numof(tim)) {
         return -1;
     }
 
@@ -188,7 +203,7 @@ int timer_set(tim_t tim, int channel, unsigned int timeout)
 #ifdef MODULE_PERIPH_TIMER_PERIODIC
 int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags)
 {
-    if (channel >= (int)TIMER_CHANNEL_NUMOF) {
+    if ((unsigned)channel >= channel_numof(tim)) {
         return -1;
     }
 
@@ -227,7 +242,7 @@ int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags
 
 int timer_clear(tim_t tim, int channel)
 {
-    if (channel >= (int)TIMER_CHANNEL_NUMOF) {
+    if ((unsigned)channel >= channel_numof(tim)) {
         return -1;
     }
 

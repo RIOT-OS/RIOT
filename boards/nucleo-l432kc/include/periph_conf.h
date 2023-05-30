@@ -30,7 +30,7 @@
 #include "clk_conf.h"
 #include "cfg_i2c1_pb6_pb7.h"
 #include "cfg_rtt_default.h"
-#include "cfg_timer_tim2.h"
+#include "cfg_timer_tim2_tim15_tim16.h"
 
 #ifdef __cplusplus
 extern "C" {

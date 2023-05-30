@@ -159,7 +159,7 @@ static void _init_desc_buf(void)
     GMAC->TBQB.reg = (uint32_t) tx_desc;
 }
 
-int sam0_read_phy(uint8_t phy, uint8_t addr)
+unsigned sam0_read_phy(uint8_t phy, uint8_t addr)
 {
     GMAC->MAN.reg = GMAC_MAN_REGA(addr) | GMAC_MAN_PHYA(phy)
                   | GMAC_MAN_CLTTO      | GMAC_MAN_WTN(0x2)
@@ -353,9 +353,6 @@ int sam0_eth_init(void)
     memset(rx_desc, 0, sizeof(rx_desc));
     memset(tx_desc, 0, sizeof(tx_desc));
 
-    /* Enable PHY */
-    gpio_set(sam_gmac_config[0].rst_pin);
-
     /* Initialize buffers descriptor */
     _init_desc_buf();
     /* Disable RX and TX */
@@ -373,9 +370,9 @@ int sam0_eth_init(void)
 
     /* Set TxBase-100-FD by default */
     /* TODO: implement auto negotiation */
-    GMAC->NCFGR.reg |= (GMAC_NCFGR_SPD | GMAC_NCFGR_FD | GMAC_NCFGR_MTIHEN |
-                        GMAC_NCFGR_RXCOEN | GMAC_NCFGR_MAXFS | GMAC_NCFGR_CAF |
-                        GMAC_NCFGR_LFERD | GMAC_NCFGR_RFCS | GMAC_NCFGR_CLK(3));
+    GMAC->NCFGR.reg = GMAC_NCFGR_SPD | GMAC_NCFGR_FD | GMAC_NCFGR_MTIHEN
+                    | GMAC_NCFGR_RXCOEN | GMAC_NCFGR_MAXFS | GMAC_NCFGR_CAF
+                    | GMAC_NCFGR_LFERD | GMAC_NCFGR_RFCS | GMAC_NCFGR_CLK(3);
 
     /* Enable all multicast addresses */
     GMAC->HRB.reg = 0xffffffff;
