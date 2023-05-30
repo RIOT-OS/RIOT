@@ -27,6 +27,7 @@ FEATURES_PROVIDED += periph_gpio_ll_irq_level_triggered_high
 FEATURES_PROVIDED += periph_gpio_ll_irq_level_triggered_low
 FEATURES_PROVIDED += periph_spi_reconfigure
 FEATURES_PROVIDED += puf_sram
+FEATURES_PROVIDED += periph_rtc_from_rtt_rtc
 
 ifeq (xtensa,$(CPU_ARCH))
   FEATURES_PROVIDED += esp_hw_counter
