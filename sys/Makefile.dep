@@ -1031,7 +1031,6 @@ ifneq (,$(filter fido2_ctap_%,$(USEMODULE)))
   USEMODULE += fido2_ctap_transport
   USEMODULE += fido2_ctap
   ifneq (,$(filter fido2_ctap_transport_hid,$(USEMODULE)))
-      USEMODULE += ztimer64_msec
       USEMODULE += usbus_hid
       DISABLE_MODULE += auto_init_usbus
   endif
@@ -1055,6 +1054,7 @@ ifneq (,$(filter fido2_ctap,$(USEMODULE)))
   USEMODULE += crypto_aes_256
   USEMODULE += hashes
   USEMODULE += fido2
+  USEMODULE += fmt
 endif
 
 ifneq (,$(filter rust_riotmodules,$(USEMODULE)))

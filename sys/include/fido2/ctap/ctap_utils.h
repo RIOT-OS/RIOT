@@ -38,18 +38,18 @@ void fido2_ctap_utils_led_animation(void);
 /**
  * @brief Initialize button to be used for user presence test
  *
- * @return @ref ctap_status_codes_t
+ * @return @ref ctap_status_code_t
  */
-int fido2_ctap_utils_init_gpio_pin(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank);
+ctap_status_code_t fido2_ctap_utils_init_gpio_pin(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank);
 
 /**
  * @brief Test user presence
  *
  * Successful if user clicks button in less than @ref CTAP_UP_TIMEOUT
  *
- * @return @ref ctap_status_codes_t
+ * @return @ref ctap_status_code_t
  */
-int fido2_ctap_utils_user_presence_test(void);
+ctap_status_code_t fido2_ctap_utils_user_presence_test(void);
 
 /**
  * @brief Compare fido2 credentials based on id to find more recent one
