@@ -89,6 +89,7 @@ riotboot/bootloader/%: $$(if $$(filter riotboot/bootloader/clean,$$@),,$$(BUILDD
 		EXTERNAL_BOARD_DIRS="$(EXTERNAL_BOARD_DIRS)" BOARD=$(BOARD)\
 		DEBUG_ADAPTER_ID=$(DEBUG_ADAPTER_ID) \
 		IOTLAB_NODE=$(IOTLAB_NODE) \
+		USE_LDMEMORY=$(USE_LDMEMORY) \
 		PROGRAMMER=$(PROGRAMMER) PROGRAMMER_QUIET=$(PROGRAMMER_QUIET) \
 			$(MAKE) --no-print-directory -C $(RIOTBOOT_DIR) $*
 
