@@ -461,6 +461,19 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
                 else if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) &&
                          sixlowpan_sfr_rfrag_is(pkt->data)) {
                     entry.super->datagram_size--;
+                    /* Check, if fragment is still small enough to fit datagram size.
+                     * `offset` is 0, as this is the first fragment so it does not have to be added
+                     * here. */
+                    if (frag_size > entry.super->datagram_size) {
+                        DEBUG_PUTS(
+                           "6lo rfrag: fragment too big for resulting datagram, "
+                           "discarding datagram\n"
+                        );
+                        gnrc_pktbuf_release(entry.rbuf->pkt);
+                        gnrc_pktbuf_release(pkt);
+                        gnrc_sixlowpan_frag_rb_remove(entry.rbuf);
+                        return RBUF_ADD_ERROR;
+                    }
                 }
             }
         }
