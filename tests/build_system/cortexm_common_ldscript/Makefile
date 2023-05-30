@@ -34,7 +34,12 @@ include $(RIOTBASE)/Makefile.include
 # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 COMPILE_TESTS  = test-elffile-overflow test-elffile-fw_rom_length
-COMPILE_TESTS += tests-offsets tests-fw_rom_len tests-rom-overflow
+COMPILE_TESTS += tests-offsets tests-fw_rom_len
+
+# this test currently doesn't work when using ld-memory .ld file generation
+ifeq (,$(USE_LDMEMORY))
+  COMPILE_TESTS += tests-rom-overflow
+endif
 
 # The tests should only be executed in build environment
 ifneq ($(BUILD_IN_DOCKER),1)
