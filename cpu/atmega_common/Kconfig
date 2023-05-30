@@ -53,5 +53,10 @@ config MODULE_ATMEGA_COMMON
     help
         ATmega common code.
 
+config HAVE_CONFLICT_WITH_RTC_RTT
+    bool
+    depends on MODULE_ATMEGA_COMMON
+    default y
+
 rsource "periph/Kconfig"
 source "$(RIOTCPU)/avr8_common/Kconfig"

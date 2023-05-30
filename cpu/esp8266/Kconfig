@@ -27,6 +27,11 @@ config CPU_FAM_ESP8266
     select MODULE_RTT_RTC if HAS_PERIPH_RTT && MODULE_PERIPH_RTC
     select MODULE_ZTIMER_NO_PERIPH_RTT if MODULE_ESP_WIFI_ANY
 
+config PERIPH_RTC_FROM_RTT_RTC
+    bool
+    default y
+    depends on CPU_FAM_ESP8266
+
 ## CPU Models
 config CPU_MODEL_ESP8266EX
     bool

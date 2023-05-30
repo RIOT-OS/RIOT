@@ -33,6 +33,10 @@ config CPU_COMMON_SAM0
 
 if CPU_COMMON_SAM0
 
+config HAVE_CONFLICT_WITH_RTC_RTT
+    bool
+    default y
+
 rsource "periph/Kconfig"
 
 endif # CPU_COMMON_SAM0
