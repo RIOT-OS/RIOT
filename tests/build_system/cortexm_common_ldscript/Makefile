@@ -48,6 +48,11 @@ compile-tests: $(COMPILE_TESTS)
 # iotlab-m3 defines ROM_LEN as 512K which is not handled by bash math operations
 ROM_LEN_BYTES = $(shell printf "0x%x\n" $$(($(ROM_LEN:%K=%*1024))))
 
+ifneq (,$(USE_LDMEMORY))
+  FW_ROM_LEN_SYMBOL = _rom_length
+else
+  FW_ROM_LEN_SYMBOL = _fw_rom_len
+endif
 
 # test-elffile-overflow depends on $(BINFILE) to prevent:
 # * ROM_LEN to be passed to $(ELFFILE) generation
@@ -68,7 +73,7 @@ test-elffile-fw_rom_length: $(ELFFILE)
 	$(Q)echo -n "Test rom offset subtracted from rom length in elffile: "
 	$(Q)\
 	if test -n "$(ROM_OFFSET)"; then \
-	  TEST_FW_LEN=$$($(PREFIX)readelf --symbols $^ 2>/dev/null | awk '/_fw_rom_length/{printf "0x%s\n", $$2}'); \
+	  TEST_FW_LEN=$$($(PREFIX)readelf --symbols $^ 2>/dev/null | awk '/$(FW_ROM_LEN_SYMBOL)/{printf "0x%s\n", $$2}'); \
 	  EXPECT_FW_LEN=$$(printf "0x%08x" $$(( $(ROM_LEN_BYTES) - $(ROM_OFFSET) ))); \
 	  if test $${TEST_FW_LEN} != $${EXPECT_FW_LEN}; then \
 	    echo "[ERROR] Rom offset not taken into account for firmware length $${TEST_FW_LEN} != $${EXPECT_FW_LEN}" >&2; \
@@ -127,7 +132,7 @@ tests-fw_rom_len: test-fw_len_half_rom
 test-fw_len_half_rom: $(BINDIR)/$(APPLICATION)_fw_len_half_rom.elf
 	$(Q)echo -n "Test compilation with half ROM length: "
 	$(Q)\
-	TEST_FW_LEN=$$($(PREFIX)readelf --symbols $^ 2>/dev/null | awk '/_fw_rom_length/{printf "0x%s\n", $$2}'); \
+	TEST_FW_LEN=$$($(PREFIX)readelf --symbols $^ 2>/dev/null | awk '/$(FW_ROM_LEN_SYMBOL)/{printf "0x%s\n", $$2}'); \
 	EXPECT_FW_LEN=$$(printf "0x%08x" $$(( $(ROM_LEN_BYTES) / 2 ))); \
 	if test $${TEST_FW_LEN} != $${EXPECT_FW_LEN}; then \
 	  echo "[ERROR] Linker firmware length not used $${TEST_FW_LEN} != $${EXPECT_FW_LEN}" >&2; \
