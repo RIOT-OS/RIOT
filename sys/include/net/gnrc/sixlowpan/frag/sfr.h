@@ -12,8 +12,9 @@
  * @brief       6LoWPAN selective fragment recovery implementation for GNRC
  *
  * 6LoWPAN selective fragment recovery is an alternative fragmentation
- * specification to [classic 6LoWPAN fragmentation](@ref
- * net_gnrc_sixlowpan_frag). It can be run in parallel to classic fragmentation,
+ * specification to
+ * [classic 6LoWPAN fragmentation](@ref net_gnrc_sixlowpan_frag).
+ * It can be run in parallel to classic fragmentation,
  * but is incompatible with its message formats.
  *
  * How nodes can exchange that they are able to communicate using selective
@@ -22,6 +23,7 @@
  * that network can communicate using selective fragment recovery.
  *
  * @see         [RFC 8931](https://tools.ietf.org/html/rfc8931)
+ * @experimental
  * @{
  *
  * @file
