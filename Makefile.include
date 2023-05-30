@@ -721,8 +721,19 @@ _BASELIBS_VALUE_BEFORE_USAGE := $(BASELIBS)
 # Only use --start-group when archives are defined
 ARCHIVES_GROUP = $(if $(ARCHIVES),$(LINKFLAGPREFIX)--start-group $(ARCHIVES) -lm $(LINKFLAGPREFIX)--end-group, -lm)
 
+LDMEMORY_RUN = mkdir -p $$(dirname $@) && \
+	ld-memory \
+	--section ram:$(RAM_START_ADDR):$(RAM_LEN) \
+	--section rom:$(ROM_START_ADDR):$(or $(FW_ROM_LEN), $(ROM_LEN)):$(ROM_OFFSET) \
+	--section bkup_ram:$(BACKUP_RAM_START):$(BACKUP_RAM_LEN) \
+	--include cortexm_base.ld \
+	>
+
 $(ELFFILE): FORCE
-  _LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $$(find $(BASELIBS:%.module=$(BINDIR)/%/) -name "*.o" 2> /dev/null | sort) $(ARCHIVES_GROUP) $(LINKFLAGS) $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map
+  _LINK = $(if $(USE_LDMEMORY),$(LDMEMORY_RUN) $@.ld &&) \
+          $(if $(CPPMIX),$(LINKXX),$(LINK)) $$(find $(BASELIBS:%.module=$(BINDIR)/%/) -name "*.o" 2> /dev/null | sort) \
+            $(if $(USE_LDMEMORY),-T$@.ld) \
+            $(ARCHIVES_GROUP) $(LINKFLAGS) $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map
 
 COMPILE_COMMANDS_PATH ?= $(RIOTBASE)/compile_commands.json
 COMPILE_COMMANDS_FLAGS ?= --clangd
