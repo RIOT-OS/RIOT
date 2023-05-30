@@ -23,6 +23,7 @@
  * that network can communicate using selective fragment recovery.
  *
  * @see         [RFC 8931](https://tools.ietf.org/html/rfc8931)
+ * @experimental
  * @{
  *
  * @file
