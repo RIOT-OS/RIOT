@@ -1,10 +1,13 @@
 /*
- * Copyright (C) 2023 TUÚ Braunschweig Institut für Betriebssysteme und Rechnerverbund
+ * Copyright (C) 2023 TU Braunschweig Institut für Betriebssysteme und Rechnerverbund
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+
+#ifndef SEN5X_H
+#define SEN5X_H
 
 /**
  * @defgroup    drivers_sen5x Sensirion Embedded I2C SEN5x Driver
@@ -16,7 +19,7 @@
  *
  * @file
  *
- * @author      Daniel Prigoshij <d.prigoshij@tu-braunschweig.de>
+ * @author      Daniel Prigoshij <prigoshi@ibr.cs.tu-bs.de>
  */
 
 #ifndef SEN5X_H
@@ -38,20 +41,34 @@ extern "C" {
  * @brief   Wrapper for measured values
  */
 typedef struct {
-    uint16_t mass_concentration_pm1p0;      /**< raw value is scaled with factor 10: PM1.0 [µg/m³] = value / 10 */
-    uint16_t mass_concentration_pm2p5;      /**< raw value is scaled with factor 10: PM2.5 [µg/m³] = value / 10 */
-    uint16_t mass_concentration_pm4p0;      /**< raw value is scaled with factor 10: PM4.0 [µg/m³] = value / 10 */
-    uint16_t mass_concentration_pm10p0;     /**< raw value is scaled with factor 10: PM10.0 [µg/m³] = value / 10 */
-    uint16_t number_concentration_pm0p5;    /**< raw value is scaled with factor 10: PM0.5 [#/cm³] = value / 10 */
-    uint16_t number_concentration_pm1p0;    /**< raw value is scaled with factor 10: PM1.0 [#/cm³] = value / 10 */
-    uint16_t number_concentration_pm2p5;    /**< raw value is scaled with factor 10: PM2.5 [#/cm³] = value / 10 */
-    uint16_t number_concentration_pm4p0;    /**< raw value is scaled with factor 10: PM4.0 [#/cm³] = value / 10 */
-    uint16_t number_concentration_pm10p0;   /**< raw value is scaled with factor 10: PM10.0 [#/cm³] = value / 10 */
-    uint16_t typical_particle_size;         /**< raw value is scaled with factor 1000: Size [µm] = value / 1000*/
-    int16_t ambient_humidity;               /**< raw value is scaled with factor 100: RH [%] = value / 100 */
-    int16_t ambient_temperature;            /**< raw value is scaled with factor 200: T [°C] = value / 200 */
-    int16_t voc_index;                      /**< raw value is scaled with factor 10: VOC Index = value / 10 */
-    int16_t nox_index;                      /**< raw value is scaled with factor 10: NOx Index = value / 10 */
+    uint16_t mass_concentration_pm1p0;      /**< raw value is scaled with factor 10:
+                                                 PM1.0 [µg/m³] = value / 10 */
+    uint16_t mass_concentration_pm2p5;      /**< raw value is scaled with factor 10:
+                                                 PM2.5 [µg/m³] = value / 10 */
+    uint16_t mass_concentration_pm4p0;      /**< raw value is scaled with factor 10:
+                                                 PM4.0 [µg/m³] = value / 10 */
+    uint16_t mass_concentration_pm10p0;     /**< raw value is scaled with factor 10:
+                                                 PM10.0 [µg/m³] = value / 10 */
+    uint16_t number_concentration_pm0p5;    /**< raw value is scaled with factor 10:
+                                                 PM0.5 [#/cm³] = value / 10 */
+    uint16_t number_concentration_pm1p0;    /**< raw value is scaled with factor 10:
+                                                 PM1.0 [#/cm³] = value / 10 */
+    uint16_t number_concentration_pm2p5;    /**< raw value is scaled with factor 10:
+                                                 PM2.5 [#/cm³] = value / 10 */
+    uint16_t number_concentration_pm4p0;    /**< raw value is scaled with factor 10:
+                                                 PM4.0 [#/cm³] = value / 10 */
+    uint16_t number_concentration_pm10p0;   /**< raw value is scaled with factor 10:
+                                                 PM10.0 [#/cm³] = value / 10 */
+    uint16_t typical_particle_size;         /**< raw value is scaled with factor 1000:
+                                                 Size [µm] = value / 1000*/
+    int16_t ambient_humidity;               /**< raw value is scaled with factor 100:
+                                                 RH [%] = value / 100 */
+    int16_t ambient_temperature;            /**< raw value is scaled with factor 200:
+                                                 T [°C] = value / 200 */
+    int16_t voc_index;                      /**< raw value is scaled with factor 10:
+                                                 VOC Index = value / 10 */
+    int16_t nox_index;                      /**< raw value is scaled with factor 10:
+                                                 NOx Index = value / 10 */
 } sen5x_measurement_t;
 
 /**
@@ -74,15 +91,21 @@ typedef struct {
  *
  * @param[inout] dev        Device descriptor of the driver
  * @param[in]    params     Initialization parameters
+ *
+ * @return 0 on success
+ * @return < 0 on error
  */
-void sen5x_init(sen5x_t *dev, const sen5x_params_t *params);
+int sen5x_init(sen5x_t *dev, const sen5x_params_t *params);
 
 /**
  * @brief   Execute a reset on the given device
  *
  * @param[inout] dev        Device descriptor of the driver
+ *
+ * @return 0 on success
+ * @return < 0 on error
  */
-void sen5x_reset(const sen5x_t *dev);
+int sen5x_reset(const sen5x_t *dev);
 
 /**
  * @brief   Starts a continuous measurement
@@ -92,7 +115,8 @@ void sen5x_reset(const sen5x_t *dev);
 void sen5x_wake(const sen5x_t *dev);
 
 /**
- * @brief   Starts a continuous measurement without PM. Only humidity, temperature, VOC and NOx are measured.
+ * @brief   Starts a continuous measurement without PM. Only humidity,
+ *          temperature, VOC and NOx are measured.
  *
  * @param[inout] dev        Device descriptor of the driver
  */
@@ -116,7 +140,7 @@ void sen5x_clean_fan(const sen5x_t *dev);
  * @brief   Sets the fan to maximum speed, to clean it within 10 seconds
  *
  * @param[inout] dev        Device descriptor of the driver
- * 
+ *
  * @return 0 if no new measurements are available
  * @return 1 if new measuremtns are ready to be read
  */
@@ -146,7 +170,8 @@ void sen5x_read_pm_values(const sen5x_t *dev, sen5x_measurement_t *values);
  * @param[in]    slope          Normalized temperature offset slope
  * @param[in]    time_constant  Time constant in seconds
  */
-void sen5x_set_temperature_offset(const sen5x_t *dev, int16_t temp_offset, int16_t slope, uint16_t time_constant);
+void sen5x_set_temperature_offset(const sen5x_t *dev,
+    int16_t temp_offset, int16_t slope, uint16_t time_constant);
 
 /**
  * @brief   Set a custom temperature offset to the ambient temperature
@@ -159,7 +184,8 @@ void sen5x_set_temperature_offset(const sen5x_t *dev, int16_t temp_offset, int16
 void sen5x_get_temperature_offset(const sen5x_t *dev, int16_t *temp_offset, int16_t *slope, uint16_t *time_constant);
 
 /**
- * @brief   Set the parameter for a warm start on the device, to improve initial accuracy of the ambient temperature output
+ * @brief   Set the parameter for a warm start on the device, to improve initial
+ *          accuracy of the ambient temperature output
  *
  * @param[inout] dev            Device descriptor of the driver
  * @param[in]    warm_start     Warm start behavior as a value in the range from
@@ -168,7 +194,7 @@ void sen5x_get_temperature_offset(const sen5x_t *dev, int16_t *temp_offset, int1
 void sen5x_set_warm_start(const sen5x_t *dev, uint16_t warm_start);
 
 /**
- * @brief   Get the warm start paramater
+ * @brief   Get the warm start parameter
  *
  * @param[inout] dev            Device descriptor of the driver
  * @param[out]   warm_start     Warm start behavior as a value in the range from
@@ -181,13 +207,14 @@ void sen5x_get_warm_start(const sen5x_t *dev, uint16_t *warm_start);
  *
  * @param[inout] dev                            Device descriptor of the driver
  * @param[in]    index_offset                   VOC index representing typical (average) conditions
- * @param[in]    learning_time_offset_hours     Time constant to estimate the VOC algorithm offset from the
- *                                              history in hours
- * @param[in]    learning_time_gain_hours       Time constant to estimate the VOC algorithm gain from the history
- *                                              in hours
+ * @param[in]    learning_time_offset_hours     Time constant to estimate the VOC
+ *                                              algorithm offset from the history in hours
+ * @param[in]    learning_time_gain_hours       Time constant to estimate the VOC
+ *                                              algorithm gain from the history in hours
  * @param[in]    gating_max_duration_minutes    Maximum duration of gating in minutes
  * @param[in]    std_initial                    Initial estimate for standard deviation
- * @param[in]    gain_factor                    Gain factor to amplify or to attenuate the VOC index output
+ * @param[in]    gain_factor                    Gain factor to amplify or to attenuate
+ *                                              the VOC index output
  */
 void sen5x_set_voc_algorithm_tuning(
     const sen5x_t *dev, int16_t index_offset, int16_t learning_time_offset_hours,
@@ -195,17 +222,19 @@ void sen5x_set_voc_algorithm_tuning(
     int16_t std_initial, int16_t gain_factor);
 
 /**
- * @brief   Get the VOC Algortihm tuning parameters
+ * @brief   Get the VOC Algorithm tuning parameters
  *
- * @param[inout] dev                             Device descriptor of the driver
- * @param[out]    index_offset                   VOC index representing typical (average) conditions
- * @param[out]    learning_time_offset_hours     Time constant to estimate the VOC algorithm offset from the
- *                                               history in hours
- * @param[out]    learning_time_gain_hours       Time constant to estimate the VOC algorithm gain from the history
- *                                               in hours
+ * @param[inout]  dev                            Device descriptor of the driver
+ * @param[out]    index_offset                   VOC index representing typical
+ *                                               (average) conditions
+ * @param[out]    learning_time_offset_hours     Time constant to estimate the VOC
+ *                                               algorithm offset from the history in hours
+ * @param[out]    learning_time_gain_hours       Time constant to estimate the VOC
+ *                                               algorithm gain from the history in hours
  * @param[out]    gating_max_duration_minutes    Maximum duration of gating in minutes
  * @param[out]    std_initial                    Initial estimate for standard deviation
- * @param[out]    gain_factor                    Gain factor to amplify or to attenuate the VOC index output
+ * @param[out]    gain_factor                    Gain factor to amplify or to attenuate
+ *                                               the VOC index output
  */
 void sen5x_get_voc_algorithm_tuning(
     const sen5x_t *dev, int16_t *index_offset, int16_t *learning_time_offset_hours,
@@ -217,15 +246,18 @@ void sen5x_get_voc_algorithm_tuning(
  *
  * @param[inout] dev                            Device descriptor of the driver
  * @param[in]    index_offset                   NOx index representing typical (average) conditions
- * @param[in]    learning_time_offset_hours     Time constant to estimate the NOx algorithm offset from the
- *                                              history in hours
- * @param[in]    learning_time_gain_hours       The time constant to estimate the NOx algorithm gain from the
- *                                              history has no impact for NOx. This parameter is still in place for
- *                                              consistency reasons with the VOC tuning parameters command.
+ * @param[in]    learning_time_offset_hours     Time constant to estimate the NOx algorithm offset
+ *                                              from the history in hours
+ * @param[in]    learning_time_gain_hours       The time constant to estimate the
+ *                                              NOx algorithm gain from the history has no
+ *                                              impact for NOx. This parameter is still in place
+ *                                              for consistency reasons with the VOC tuning
+ *                                              parameters command.
  *                                              This parameter must always be set to 12 hours
  * @param[in]    gating_max_duration_minutes    Maximum duration of gating in minutes
  * @param[in]    std_initial                    Initial estimate for standard deviation
- * @param[in]    gain_factor                    Gain factor to amplify or to attenuate the NOx index output
+ * @param[in]    gain_factor                    Gain factor to amplify or to attenuate
+ *                                              the NOx index output
  */
 void sen5x_set_nox_algorithm_tuning(
     const sen5x_t *dev, int16_t index_offset, int16_t learning_time_offset_hours,
@@ -233,19 +265,22 @@ void sen5x_set_nox_algorithm_tuning(
     int16_t std_initial, int16_t gain_factor);
 
 /**
- * @brief   Get the NOx Algortihm tuning parameters
- * 
+ * @brief   Get the NOx Algorithm tuning parameters
+ *
  * @param[inout]  dev                            Device descriptor of the driver
- * @param[out]    index_offset                   NOx index representing typical (average) conditions
- * @param[out]    learning_time_offset_hours     Time constant to estimate the NOx algorithm offset from the
- *                                               history in hours
- * @param[out]    learning_time_gain_hours       The time constant to estimate the NOx algorithm gain from the
- *                                               history has no impact for NOx. This parameter is still in place for
- *                                               consistency reasons with the VOC tuning parameters command.
+ * @param[out]    index_offset                   NOx index representing typical(average) conditions
+ * @param[out]    learning_time_offset_hours     Time constant to estimate the NOx algorithm
+ *                                               offset from the history in hours
+ * @param[out]    learning_time_gain_hours       The time constant to estimate the
+ *                                               NOx algorithm gain from the history has no
+ *                                               impact for NOx. This parameter is still in place
+ *                                               for consistency reasons with the VOC tuning
+ *                                               parameters command.
  *                                               This parameter must always be set to 12 hours
  * @param[out]    gating_max_duration_minutes    Maximum duration of gating in minutes
  * @param[out]    std_initial                    Initial estimate for standard deviation
- * @param[out]    gain_factor                    Gain factor to amplify or to attenuate the NOx index output
+ * @param[out]    gain_factor                    Gain factor to amplify or to attenuate
+ *                                               the NOx index output
  */
 void sen5x_get_nox_algorithm_tuning(
     const sen5x_t *dev, int16_t *index_offset, int16_t *learning_time_offset_hours,
@@ -256,7 +291,7 @@ void sen5x_get_nox_algorithm_tuning(
  * @brief   Set the mode for the RH/T acceleration algorithm
  *
  * @param[inout] dev        Device descriptor of the driver
- * @param[in]    mode       RH/T accelaration mode:
+ * @param[in]    mode       RH/T acceleration mode:
  *                              = 0: Low Acceleration
  *                              = 1: High Acceleration
  *                              = 2: Medium Acceleration
@@ -267,7 +302,7 @@ void sen5x_set_rht_acceleration(const sen5x_t *dev, uint16_t mode);
  * @brief   Get the mode for the RH/T acceleration algorithm
  *
  * @param[inout] dev        Device descriptor of the driver
- * @param[out]   mode       RH/T accelaration mode:
+ * @param[out]   mode       RH/T acceleration mode:
  *                              = 0: Low Acceleration
  *                              = 1: High Acceleration
  *                              = 2: Medium Acceleration

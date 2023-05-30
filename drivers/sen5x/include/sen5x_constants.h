@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+#ifndef SEN5X_CONSTANTS_H
+#define SEN5X_CONSTANTS_H
+
 /**
  * @ingroup     drivers_sen5x
  * @{
@@ -13,7 +16,7 @@
  * @file
  * @brief       Internal addresses, registers and constants
  *
- * @author      Daniel Prigoshij <d.prigoshij@tu-braunschweig.de>
+ * @author      Daniel Prigoshij <prigoshi@ibr.cs.tu-bs.de>
  */
 
 #ifndef SEN5X_CONSTANTS_H
@@ -25,8 +28,8 @@ extern "C" {
 
 /* define here the addresses, register and constants of the driver */
 
-#ifndef SEN5X_I2C_ADDRESS
-#define SEN5X_I2C_ADDRESS            (0x69)
+#ifndef SEN5X_ADRESS_I2C
+#define SEN5X_ADRESS_I2C            (0x69)
 #endif
 
 #ifdef __cplusplus

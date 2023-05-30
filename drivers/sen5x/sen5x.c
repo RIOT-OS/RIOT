@@ -13,7 +13,7 @@
  * @file
  * @brief       Device driver implementation for the Sensirion Embedded I2C SEN5x Driver
  *
- * @author      Daniel Prigoshij <d.prigoshij@tu-braunschweig.de>
+ * @author      Daniel Prigoshij <prigoshi@ibr.cs.tu-bs.de>
  *
  * @}
  */
@@ -24,7 +24,7 @@
 #include "sensirion_i2c_hal.h"
 #include "sen5x_i2c.h"
 
-void sen5x_init(sen5x_t *dev, const sen5x_params_t *params)
+int sen5x_init(sen5x_t *dev, const sen5x_params_t *params)
 {
     /* check parameters */
     assert(dev && params);
@@ -32,17 +32,18 @@ void sen5x_init(sen5x_t *dev, const sen5x_params_t *params)
     dev->params = *params;
 
     i2c_init(dev->params.i2c_dev);
-    sen5x_reset(dev);
+    return sen5x_reset(dev);
 }
 
-void sen5x_reset(const sen5x_t *dev)
+int sen5x_reset(const sen5x_t *dev)
 {
     assert(dev);
     i2c_acquire(dev->params.i2c_dev);
 
-    sen5x_device_reset();
+    int result = sen5x_device_reset();
 
     i2c_release(dev->params.i2c_dev);
+    return result;
 }
 
 void sen5x_wake(const sen5x_t *dev)
@@ -87,7 +88,7 @@ bool sen5x_data_ready_flag(const sen5x_t *dev)
     return status;
 }
 
-void sen5x_read_values(sen5x_t *dev ,sen5x_measurement_t *values) 
+void sen5x_read_values(const sen5x_t *dev ,sen5x_measurement_t *values)
 {
     assert(dev && values);
     i2c_acquire(dev->params.i2c_dev);
