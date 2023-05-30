@@ -29,10 +29,21 @@ static void test_libc_strscpy(void)
     TEST_ASSERT_EQUAL_INT(strscpy(buffer, "empty", 0), -E2BIG);
 }
 
+static void test_libc_memchk(void)
+{
+    char buffer[32];
+    memset(buffer, 0xff, sizeof(buffer));
+    TEST_ASSERT_NULL(memchk(buffer, 0xff, sizeof(buffer)));
+
+    buffer[5] = 5;
+    TEST_ASSERT(memchk(buffer, 0xff, sizeof(buffer)) == &buffer[5]);
+}
+
 Test *tests_libc_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_libc_strscpy),
+        new_TestFixture(test_libc_memchk),
     };
 
     EMB_UNIT_TESTCALLER(libc_tests, NULL, NULL, fixtures);
