@@ -91,6 +91,18 @@ static inline void explicit_bzero(void *dest, size_t n_bytes)
  */
 ssize_t strscpy(char *dest, const char *src, size_t count);
 
+/**
+ * @brief   Check if the entire buffer is filled with the same byte.
+ *
+ * @param[in]   data    The buffer to probe
+ * @param[in]   c       The byte to check of
+ * @param[in]   len     Size of the buffer
+ *
+ * @return NULL if the entire buffer is filled with @p c
+ * @return pointer to the first non-matching byte
+ */
+const void *memchk(const void *data, uint8_t c, size_t len);
+
 #ifdef __cplusplus
 }
 #endif
