@@ -1074,11 +1074,17 @@ static size_t _iphc_ipv6_encode(gnrc_pktsnip_t *pkt,
                                 uint8_t *iphc_hdr)
 {
     gnrc_sixlowpan_ctx_t *src_ctx = NULL, *dst_ctx = NULL;
-    ipv6_hdr_t *ipv6_hdr = pkt->next->data;
+    ipv6_hdr_t *ipv6_hdr;
     bool addr_comp = false;
     uint16_t inline_pos = SIXLOWPAN_IPHC_HDR_LEN;
 
     assert(iface != NULL);
+
+    if (pkt->next == NULL) {
+        DEBUG("6lo iphc: packet missing header\n");
+        return 0;
+    }
+    ipv6_hdr = pkt->next->data;
 
     /* set initial dispatch value*/
     iphc_hdr[IPHC1_IDX] = SIXLOWPAN_IPHC1_DISP;
@@ -1742,6 +1748,14 @@ void gnrc_sixlowpan_iphc_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
         gnrc_sixlowpan_multiplex_by_size(tmp, orig_datagram_size, netif, page);
     }
     else {
+        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_MINFWD)) {
+            gnrc_sixlowpan_frag_fb_t *fb = ctx;
+
+            if (fb->pkt == pkt) {
+                /* free provided fragmentation buffer */
+                fb->pkt = NULL;
+            }
+        }
         gnrc_pktbuf_release(pkt);
     }
 }
