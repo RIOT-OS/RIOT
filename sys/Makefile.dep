@@ -502,7 +502,6 @@ ifneq (,$(filter evtimer_mbox,$(USEMODULE)))
 endif
 
 ifneq (,$(filter can,$(USEMODULE)))
-  USEMODULE += can_raw
   ifneq (,$(filter can_mbox,$(USEMODULE)))
     USEMODULE += core_mbox
   endif
