@@ -5,6 +5,7 @@ include ../Makefile.sys_common
 
 USEMODULE += fido2_ctap_transport_hid
 USEMODULE += usbus
+USEMODULE += ztimer_sec
 USEPKG += fido2_tests
 
 USB_VID ?= $(USB_VID_TESTING)
