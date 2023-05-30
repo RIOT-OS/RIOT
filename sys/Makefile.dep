@@ -223,6 +223,11 @@ ifneq (,$(filter netdev_tap,$(USEMODULE)))
   USEMODULE += iolist
 endif
 
+ifneq (,$(filter netdev_test_ieee802154,$(USEMODULE)))
+  USEMODULE += netdev_ieee802154
+  USEMODULE += netdev_test
+endif
+
 ifneq (,$(filter trickle,$(USEMODULE)))
   USEMODULE += random
   USEMODULE += ztimer_msec
