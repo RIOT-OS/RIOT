@@ -1,0 +1,31 @@
+From bd441c5d8983a7a0c32ccf206e172d87c5b3ae22 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@posteo.net>
+Date: Wed, 31 May 2023 22:08:19 +0200
+Subject: [PATCH] sx1280_driver: use integer arithmetic
+
+Drop the floating point computation in favor of the commented out
+integer only arithmetic.
+---
+ sx1280_driver/src/sx1280.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/sx1280_driver/src/sx1280.c b/sx1280_driver/src/sx1280.c
+index 0b69d55..7d7386a 100644
+--- a/sx1280_driver/src/sx1280.c
++++ b/sx1280_driver/src/sx1280.c
+@@ -573,11 +573,8 @@ sx1280_status_t sx1280_get_and_clear_irq_status( const void* context, sx1280_irq
+ sx1280_status_t sx1280_set_rf_freq( const void* context, const uint32_t freq_in_hz )
+ {
+     uint8_t  buf[SX1280_SIZE_SET_RFFREQUENCY] = { 0 };
+-    uint32_t freq                             = freq_in_hz * INV_FREQ_STEP;
+ 
+-    // Alternate 64-bit integer calculation instead of floating point:
+-    // uint32_t freq = ((uint64_t)freq_in_hz << XTAL_FREQ_STEP_DIV_POWER) /
+-    // XTAL_FREQ;
++    uint32_t freq = ((uint64_t)freq_in_hz << XTAL_FREQ_STEP_DIV_POWER) / XTAL_FREQ;
+ 
+     buf[0] = SX1280_SET_RFFREQUENCY;
+ 
+-- 
+2.40.1
+
