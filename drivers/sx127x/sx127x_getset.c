@@ -29,6 +29,9 @@
 #include "ztimer.h"
 
 #include "net/lora.h"
+#include "macros/units.h"
+#include "macros/math.h"
+#include "time_units.h"
 
 #include "sx127x.h"
 #include "sx127x_registers.h"
@@ -117,9 +120,10 @@ void sx127x_set_syncword(sx127x_t *dev, uint8_t syncword)
 
 uint32_t sx127x_get_channel(const sx127x_t *dev)
 {
-    return (((uint32_t)sx127x_reg_read(dev, SX127X_REG_FRFMSB) << 16) |
-            (sx127x_reg_read(dev, SX127X_REG_FRFMID) << 8) |
-            (sx127x_reg_read(dev, SX127X_REG_FRFLSB))) * LORA_FREQUENCY_RESOLUTION_DEFAULT;
+    uint32_t raw = ((uint32_t)sx127x_reg_read(dev, SX127X_REG_FRFMSB) << 16)
+                 | ((uint32_t)sx127x_reg_read(dev, SX127X_REG_FRFMID) << 8)
+                 | ((uint32_t)sx127x_reg_read(dev, SX127X_REG_FRFLSB));
+    return (uint64_t)raw * LORA_FREQUENCY_RESOLUTION_NANOHERTZ_DEFAULT / 1000000000U;
 }
 
 void sx127x_set_channel(sx127x_t *dev, uint32_t channel)
@@ -129,7 +133,7 @@ void sx127x_set_channel(sx127x_t *dev, uint32_t channel)
     /* Save current operating mode */
     dev->settings.channel = channel;
 
-    channel = (uint32_t)((double)channel / (double)LORA_FREQUENCY_RESOLUTION_DEFAULT);
+    channel = (uint64_t)channel * 1000000000U / LORA_FREQUENCY_RESOLUTION_NANOHERTZ_DEFAULT;
 
     /* Write frequency settings into chip */
     sx127x_reg_write(dev, SX127X_REG_FRFMSB, (uint8_t)((channel >> 16) & 0xFF));
@@ -139,62 +143,51 @@ void sx127x_set_channel(sx127x_t *dev, uint32_t channel)
 
 uint32_t sx127x_get_time_on_air(const sx127x_t *dev, uint8_t pkt_len)
 {
-    uint32_t air_time = 0;
-
     switch (dev->settings.modem) {
+    default:
     case SX127X_MODEM_FSK:
         /* todo */
-        break;
+        return 0;
     case SX127X_MODEM_LORA:
     {
-        double bw = 0.0;
-
         /* Note: When using LoRa modem only bandwidths 125, 250 and 500 kHz are supported. */
-        switch (dev->settings.lora.bandwidth) {
-        case LORA_BW_125_KHZ:
-            bw = 125e3;
-            break;
-        case LORA_BW_250_KHZ:
-            bw = 250e3;
-            break;
-        case LORA_BW_500_KHZ:
-            bw = 500e3;
-            break;
-        default:
-            DEBUG("Invalid bandwidth: %d\n", dev->settings.lora.bandwidth);
-            break;
+        if ((unsigned)dev->settings.lora.bandwidth > LORA_BW_500_KHZ) {
+            DEBUG("Invalid bandwidth: %u\n", (unsigned)dev->settings.lora.bandwidth);
+            return 0;
         }
+        uint32_t bw = KHZ(125) << dev->settings.lora.bandwidth;
 
-        /* Symbol rate : time for one symbol [secs] */
-        double rs = bw / (1 << dev->settings.lora.datarate);
-        double ts = 1 / rs;
+        /* Symbol rate : time for one symbol [nanosecs] */
+        uint32_t rs = bw >> dev->settings.lora.datarate;
+        uint64_t ts = 1000000000LLU / rs;
 
-        /* time of preamble */
-        double t_preamble = (dev->settings.lora.preamble_len + 4.25) * ts;
+        /* time of preamble ((preamble_len + 4.25) * ts) */
+        uint64_t t_preamble = (dev->settings.lora.preamble_len + 4) * ts
+                            + (ts >> 2);
 
         /* Symbol length of payload and time */
-        double tmp =
-            ceil(
-                (8 * pkt_len - 4 * dev->settings.lora.datarate + 28
-                 + 16 * (dev->settings.lora.flags & SX127X_ENABLE_CRC_FLAG)
-                 - (!(dev->settings.lora.flags & SX127X_ENABLE_FIXED_HEADER_LENGTH_FLAG) ? 20 : 0))
-                / (double)(4 * dev->settings.lora.datarate
-                           - (((dev->settings.lora.flags & SX127X_LOW_DATARATE_OPTIMIZE_FLAG)
-                               > 0) ? 2 : 0)))
-            * (dev->settings.lora.coderate + 4);
-        double n_payload = 8 + ((tmp > 0) ? tmp : 0);
-        double t_payload = n_payload * ts;
+        uint32_t tmp = 8 * pkt_len - 4 * dev->settings.lora.datarate + 28;
+        tmp += 16 * (dev->settings.lora.flags & SX127X_ENABLE_CRC_FLAG);
+        if (!(dev->settings.lora.flags & SX127X_ENABLE_FIXED_HEADER_LENGTH_FLAG)) {
+            tmp -= 20;
+        }
+
+        if (dev->settings.lora.flags & SX127X_LOW_DATARATE_OPTIMIZE_FLAG) {
+            tmp /= 4 * dev->settings.lora.datarate - 2;
+        }
+        else {
+            tmp /= 4 * dev->settings.lora.datarate;
+        }
+        uint32_t n_payload = 8 + tmp;
+        uint64_t t_payload = n_payload * ts;
 
         /* Time on air */
-        double t_on_air = t_preamble + t_payload;
+        uint64_t t_on_air_ns = t_preamble + t_payload;
 
-        /* return milli seconds */
-        air_time = floor(t_on_air * 1e3 + 0.999);
+        return DIV_ROUND(t_on_air_ns, NS_PER_MS);
     }
     break;
     }
-
-    return air_time;
 }
 
 void sx127x_set_sleep(sx127x_t *dev)
