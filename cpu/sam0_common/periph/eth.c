@@ -124,11 +124,17 @@ void sam0_eth_poweron(void)
 {
     _enable_clock();
     sam0_clear_rx_buffers();
+
+    /* enable PHY */
+    gpio_set(sam_gmac_config[0].rst_pin);
     _is_sleeping = false;
 }
 
 void sam0_eth_poweroff(void)
 {
+    /* disable PHY */
+    gpio_clear(sam_gmac_config[0].rst_pin);
+
     _is_sleeping = true;
     _disable_clock();
 }
