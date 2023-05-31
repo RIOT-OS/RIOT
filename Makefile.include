@@ -726,7 +726,8 @@ LDMEMORY_RUN = mkdir -p $$(dirname $@) && \
 	--section ram:$(RAM_START_ADDR):$(RAM_LEN) \
 	--section rom:$(ROM_START_ADDR):$(or $(FW_ROM_LEN), $(ROM_LEN)):$(ROM_OFFSET) \
 	--section bkup_ram:$(BACKUP_RAM_START):$(BACKUP_RAM_LEN) \
-	--include cortexm_base.ld \
+	$(addprefix --section ,$(LDMEMORY_SECTIONS)) \
+	$(addprefix --include ,$(LDMEMORY_INCLUDES)) \
 	>
 
 $(ELFFILE): FORCE

@@ -30,6 +30,8 @@ ASFLAGS += $(CFLAGS_CPU)
 LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts -L$(RIOTCPU)/cortexm_common/ldscripts
 ifeq (,$(USE_LDMEMORY))
   LINKER_SCRIPT ?= $(CPU_MODEL).ld
+else
+  LDMEMORY_INCLUDES += cortexm_base.ld
 endif
 
 LINKFLAGS += $(if $(LINKER_SCRIPT), -T$(LINKER_SCRIPT))
