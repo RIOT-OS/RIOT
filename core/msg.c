@@ -452,7 +452,10 @@ static unsigned _msg_avail(thread_t *thread)
 
 unsigned msg_avail_thread(kernel_pid_t pid)
 {
-    return _msg_avail(thread_get(pid));
+    thread_t *thread = thread_get(pid);
+    assert(thread);
+
+    return _msg_avail(thread);
 }
 
 unsigned msg_avail(void)
@@ -467,6 +470,8 @@ unsigned msg_queue_capacity(kernel_pid_t pid)
 
     thread_t *thread = thread_get(pid);
     int queue_cap = 0;
+
+    assert(thread);
 
     if (thread_has_msg_queue(thread)) {
         queue_cap = cib_size(&(thread->msg_queue));
