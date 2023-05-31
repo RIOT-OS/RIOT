@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 TUBA Freiberg
+ * Copyright (C) 2023 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,18 +11,18 @@
  * @{
  *
  * @file
- * @brief    high level ztimer test application
+ * @brief    Simple dependency check for ztimer backend
  *
- * @author   Karl Fessel <karl.fessel@ovgu.de>
+ * @author   Kevin Weiss <kevin.weiss@haw-hamburg.de>
  *
  *
  * @}
  */
 
-#include "ztimer.h"
+#include <stdio.h>
 
 int main(void)
 {
-    printf("SUCCESS!\n");
+    puts("SUCCESS!\n");
     return 0;
 }
