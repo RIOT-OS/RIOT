@@ -1,3 +1,5 @@
+GOOD_REASON_FOR_USING_FLOATS := "Correct use of floats is tested here"
+
 include ../Makefile.core_common
 
 USEMODULE += printf_float

@@ -1,3 +1,5 @@
+GOOD_REASON_FOR_USING_FLOATS := "FPU used to compare fixmath operations against"
+
 include ../Makefile.pkg_common
 
 USEMODULE += libfixmath-unittests
