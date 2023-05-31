@@ -4,7 +4,8 @@ ifeq (,$(USE_LDMEMORY))
   # For stm32 cpu's we use the generic stm32.ld linker script
   LINKER_SCRIPT ?= stm32.ld
 else
-  LDMEMORY_INCLUDES += stm32_heap4.ld
+  LDMEMORY_INCLUDES += stm32_sram4_heap.ld
+
   LDMEMORY_SECTIONS += ccmram:0x10000000:$(CCMRAM_LEN)
   LDMEMORY_SECTIONS += sram4:0x28000000:$(SRAM4_LEN)
 endif
