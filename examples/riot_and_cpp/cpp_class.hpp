@@ -49,9 +49,9 @@ public:
     void say_hello(int n);
 
     /**
-     * @brief overloaded public function with float parameter
+     * @brief overloaded public function with a c string parameter
      */
-    void say_hello(float f);
+    void say_hello(const char *s);
 private:
     /**
      * @brief private function

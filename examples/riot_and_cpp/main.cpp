@@ -56,7 +56,7 @@ int main()
     printf("\n-= Test overloading functions =-\n");
     cpp_obj.say_hello();
     cpp_obj.say_hello(42);
-    cpp_obj.say_hello(3.141592f);
+    cpp_obj.say_hello("foobar");
 
     printf("\n-= Test namespace =-\n");
     printf("typing std::vector is obsolete when 'using namespace std;'\n");
