@@ -54,6 +54,10 @@ ifneq (,$(filter coding,$(USEMODULE)))
   USEMODULE += bitfield
 endif
 
+ifneq (,$(filter color,$(USEMODULE)))
+  GOOD_REASON_FOR_USING_FLOATS := "HSV color computation is conventionally done using floats"
+endif
+
 ifneq (,$(filter congure_%,$(USEMODULE)))
   USEMODULE += congure
 endif
