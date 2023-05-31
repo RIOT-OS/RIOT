@@ -94,5 +94,6 @@ rsource "Kconfig.esp32"
 rsource "Kconfig.esp32c3"
 rsource "Kconfig.esp32s3"
 rsource "Kconfig.esp32s2"
+rsource "stdio_usb_serial_jtag/Kconfig"
 
 source "$(RIOTCPU)/esp_common/Kconfig"

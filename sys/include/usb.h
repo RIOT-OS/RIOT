@@ -53,7 +53,15 @@ extern "C" {
 #error Please configure your vendor and product IDs. For development, you may \
     set USB_VID=${USB_VID_TESTING} USB_PID=${USB_PID_TESTING}.
 #endif
+#else
+#if CONFIG_USB_VID == INTERNAL_PERIPHERAL_VID && \
+    CONFIG_USB_PID == INTERNAL_PERIPHERAL_PID
+#error Please configure your vendor and product IDs differently than the \
+    INTERNAL_PERIPHERAL_* settings. For development, you may set \
+    USB_VID=${USB_VID_TESTING} \
+    USB_PID=${USB_PID_TESTING}.
 #endif
+#endif /* !(defined(CONFIG_USB_VID) && defined(CONFIG_USB_PID)) */
 
 /**
  * @brief USB peripheral device vendor ID

@@ -1,6 +1,6 @@
 PKG_NAME=kconfiglib
-PKG_URL=https://github.com/ulfalizer/Kconfiglib
-PKG_VERSION=061e71f7d78cb057762d88de088055361863deff
+PKG_URL=https://github.com/RIOT-OS/Kconfiglib
+PKG_VERSION=110688d78edba9fa7eb09cbe001c62fbbee86abf
 PKG_LICENSE=ISC
 
 include $(RIOTBASE)/pkg/pkg.mk

@@ -11,3 +11,6 @@ config MODULE_BOARDS_COMMON_SAMDX1-ARDUINO-BOOTLOADER
     depends on TEST_KCONFIG
     help
        Common code of samdx1 boards with an arduino bootloader
+
+config FORCE_USB_STDIO
+    default y
