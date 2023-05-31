@@ -27,13 +27,5 @@ MEMORY
     sram4   : ORIGIN = 0x28000000, LENGTH = sram4_length
 }
 
-SECTIONS
-{
-    .heap2 ALIGN(4) (NOLOAD) :
-    {
-        _sheap2 = . ;
-        _eheap2 = ORIGIN(sram4) + LENGTH(sram4);
-    } > sram4
-}
-
+INCLUDE stm32_sram4_heap.ld
 INCLUDE cortexm.ld
