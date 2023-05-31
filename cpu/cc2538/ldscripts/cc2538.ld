@@ -30,15 +30,7 @@ MEMORY
     ram (w!rx)  : ORIGIN = _ram_start_addr, LENGTH = _ram_length
 }
 
-/* MCU Specific Section Definitions */
-SECTIONS
-{
-    .flashcca :
-    {
-        KEEP(*(.flashcca))
-    } > cca
-}
-
+INCLUDE cc2538_keep_cca.ld
 INCLUDE cortexm_base.ld
 
 /* @} */

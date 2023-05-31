@@ -32,7 +32,13 @@ FLASHSIZE := $(shell echo $$(( $(call _rom_len_k,$(ROM_LEN)) * $(KB))) )
 CFLAGS += -DCC2538_FLASHSIZE=$(FLASHSIZE)U
 
 # Use common ld script
-LINKER_SCRIPT ?= cc2538.ld
+ifeq (,$(USE_LDMEMORY))
+  LINKER_SCRIPT ?= cc2538.ld
+endif
+
+# ld-memory settings
+LDMEMORY_SECTIONS += cca:0x0027ffd4:44:
+LDMEMORY_INCLUDES += cc2538_keep_cca.ld
 
 # The entry point `cortex_vector_base` is defined in the cca field.
 # If the cca field is updated when flashing a slot then the entry
