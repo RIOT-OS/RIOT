@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <math.h>
 
+#include "container.h"
 #include "phydat.h"
 
 /**
@@ -18,17 +19,21 @@
 static int16_t month_to_yday[] = { 0,      31, -306, -275, -245, -214,
                                    -184, -153, -122,  -92,  -61,  -31 };
 
+static const uint16_t tenmap[] = { 1, 10, 100, 1000 };
+
 static inline int16_t phydat_unscale(int16_t value, int16_t scale)
 {
-    if (scale > 0) {
-        return value * pow(10, scale);
+    if (((unsigned)scale >= ARRAY_SIZE(tenmap))
+            || ((unsigned)(-scale) >= ARRAY_SIZE(tenmap))) {
+        /* no sensible date or time can be encoded with this scale */
+        return 0;
     }
 
-    if (scale < 0) {
-        return value / pow(10, -scale);
+    if (scale >= 0) {
+        return value * tenmap[scale];
     }
 
-    return value;
+    return value / tenmap[-scale];
 }
 
 int64_t phydat_date_time_to_unix(phydat_t *date, phydat_t *time, int32_t offset_seconds)

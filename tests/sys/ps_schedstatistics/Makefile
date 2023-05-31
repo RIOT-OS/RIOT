@@ -4,7 +4,6 @@ USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += ps
 USEMODULE += schedstatistics
-USEMODULE += printf_float
 USEMODULE += ztimer_usec
 USEMODULE += ztimer_sec
 

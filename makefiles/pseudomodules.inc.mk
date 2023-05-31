@@ -356,6 +356,12 @@ PSEUDOMODULES += nimble_phy_2mbit
 PSEUDOMODULES += nimble_rpble_ext
 PSEUDOMODULES += nimble_statconn_ext
 PSEUDOMODULES += nimble_autoadv_shell
+## @defgroup pseudomodule_nosoftfpu Prevent linking of soft FPU functions
+## @ingroup sys
+## @{
+## With `USEMODULE += nosoftfpu`
+PSEUDOMODULES += nosoftfpu
+## @}
 PSEUDOMODULES += nrfx
 PSEUDOMODULES += newlib
 PSEUDOMODULES += newlib_gnu_source

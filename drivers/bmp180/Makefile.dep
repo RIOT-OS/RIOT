@@ -1,3 +1,7 @@
 FEATURES_REQUIRED += periph_i2c
 USEMODULE += ztimer
 USEMODULE += ztimer_msec
+
+# conversion of pressure readings to altitude is not driver specific and should
+# work fine with every accurate enough pressure sensor
+GOOD_REASON_FOR_USING_FLOATS := "TODO: Move out altitude computation from drive and reconsider use of float"

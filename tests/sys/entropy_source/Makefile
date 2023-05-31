@@ -1,3 +1,5 @@
+GOOD_REASON_FOR_USING_FLOATS := "TODO: Convert to integer arithmetic"
+
 DEVELHELP ?= 0
 include ../Makefile.sys_common
 

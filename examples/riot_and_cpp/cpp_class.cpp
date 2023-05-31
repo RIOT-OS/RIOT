@@ -44,9 +44,9 @@ void cpp_class::say_hello(int n)
     printf("Hello![int: %d]\n", n);
 }
 
-void cpp_class::say_hello(float f)
+void cpp_class::say_hello(const char *s)
 {
-    printf("Hello![float: %f]\n", f);
+    printf("Hello![float: %s]\n", s);
 }
 
 void cpp_class::greet(void)

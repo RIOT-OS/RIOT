@@ -13,3 +13,5 @@ USEMODULE += ztimer_msec
 # The build fails on MSP430 because the toolchain doesn't provide
 # EXIT_SUCCESS/EXIT_FAILURE macros
 FEATURES_BLACKLIST += arch_msp430
+
+GOOD_REASON_FOR_USING_FLOATS := "We cannot easily fix external code's use of float"

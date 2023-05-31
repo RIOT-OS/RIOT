@@ -2,6 +2,7 @@
 
 # uncomment and change this to limit builds, e.g.,
 #export BOARDS="samr21-xpro native"
+export BOARDS="esp32-mh-et-live-minikit arduino-mega2560 bluepill-stm32f103cb"
 # and / or
 #export APPS="examples/hello-world tests/unittests"
 

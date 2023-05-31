@@ -90,6 +90,73 @@ ifneq (,$(filter newlib,$(USEMODULE)))
   include $(RIOTMAKE)/libc/newlib.mk
 endif
 
+ifneq (,$(filter nosoftfpu,$(USEMODULE)))
+  LINKFLAGS += -Wl,-wrap=__adddf3
+  LINKFLAGS += -Wl,-wrap=__addsf3
+  LINKFLAGS += -Wl,-wrap=__aeabi_d2f
+  LINKFLAGS += -Wl,-wrap=__aeabi_dadd
+  LINKFLAGS += -Wl,-wrap=__aeabi_dcmpeq
+  LINKFLAGS += -Wl,-wrap=__aeabi_dcmpge
+  LINKFLAGS += -Wl,-wrap=__aeabi_dcmpgt
+  LINKFLAGS += -Wl,-wrap=__aeabi_dcmple
+  LINKFLAGS += -Wl,-wrap=__aeabi_dcmplt
+  LINKFLAGS += -Wl,-wrap=__aeabi_ddiv
+  LINKFLAGS += -Wl,-wrap=__aeabi_dmul
+  LINKFLAGS += -Wl,-wrap=__aeabi_drsub
+  LINKFLAGS += -Wl,-wrap=__aeabi_dsub
+  LINKFLAGS += -Wl,-wrap=__aeabi_f2d
+  LINKFLAGS += -Wl,-wrap=__aeabi_fadd
+  LINKFLAGS += -Wl,-wrap=__aeabi_fcmpeq
+  LINKFLAGS += -Wl,-wrap=__aeabi_fcmpge
+  LINKFLAGS += -Wl,-wrap=__aeabi_fcmpgt
+  LINKFLAGS += -Wl,-wrap=__aeabi_fcmple
+  LINKFLAGS += -Wl,-wrap=__aeabi_fcmplt
+  LINKFLAGS += -Wl,-wrap=__aeabi_fdiv
+  LINKFLAGS += -Wl,-wrap=__aeabi_fmul
+  LINKFLAGS += -Wl,-wrap=__aeabi_frsub
+  LINKFLAGS += -Wl,-wrap=__aeabi_fsub
+  LINKFLAGS += -Wl,-wrap=__cmpdf2
+  LINKFLAGS += -Wl,-wrap=__cmpsf2
+  LINKFLAGS += -Wl,-wrap=__divdf3
+  LINKFLAGS += -Wl,-wrap=__divsf3
+  LINKFLAGS += -Wl,-wrap=__extendsfdf2
+  LINKFLAGS += -Wl,-wrap=__fixdfdi
+  LINKFLAGS += -Wl,-wrap=__fixdfsi
+  LINKFLAGS += -Wl,-wrap=__fixdfti
+  LINKFLAGS += -Wl,-wrap=__fixsfdi
+  LINKFLAGS += -Wl,-wrap=__fixsfsi
+  LINKFLAGS += -Wl,-wrap=__fixsfti
+  LINKFLAGS += -Wl,-wrap=__fixunsdfdi
+  LINKFLAGS += -Wl,-wrap=__fixunsdfsi
+  LINKFLAGS += -Wl,-wrap=__fixunsdfti
+  LINKFLAGS += -Wl,-wrap=__fixunssfdi
+  LINKFLAGS += -Wl,-wrap=__fixunssfsi
+  LINKFLAGS += -Wl,-wrap=__fixunssfti
+  LINKFLAGS += -Wl,-wrap=__floatdidf
+  LINKFLAGS += -Wl,-wrap=__floatdisf
+  LINKFLAGS += -Wl,-wrap=__floatsidf
+  LINKFLAGS += -Wl,-wrap=__floatsisf
+  LINKFLAGS += -Wl,-wrap=__floattidf
+  LINKFLAGS += -Wl,-wrap=__floattisf
+  LINKFLAGS += -Wl,-wrap=__floatundidf
+  LINKFLAGS += -Wl,-wrap=__floatundisf
+  LINKFLAGS += -Wl,-wrap=__floatunsidf
+  LINKFLAGS += -Wl,-wrap=__floatunsisf
+  LINKFLAGS += -Wl,-wrap=__floatuntidf
+  LINKFLAGS += -Wl,-wrap=__floatuntisf
+  LINKFLAGS += -Wl,-wrap=__muldf3
+  LINKFLAGS += -Wl,-wrap=__mulsf3
+  LINKFLAGS += -Wl,-wrap=__negdf2
+  LINKFLAGS += -Wl,-wrap=__negsf2
+  LINKFLAGS += -Wl,-wrap=__powidf2
+  LINKFLAGS += -Wl,-wrap=__powisf2
+  LINKFLAGS += -Wl,-wrap=__subdf3
+  LINKFLAGS += -Wl,-wrap=__subsf3
+  LINKFLAGS += -Wl,-wrap=__truncdfsf2
+  LINKFLAGS += -Wl,-wrap=__unorddf2
+  LINKFLAGS += -Wl,-wrap=__unordsf2
+endif
+
 ifneq (,$(filter picolibc,$(USEMODULE)))
   include $(RIOTMAKE)/libc/picolibc.mk
 endif

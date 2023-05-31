@@ -1,3 +1,5 @@
+GOOD_REASON_FOR_USING_FLOATS := "FPU's occasionally have other stack alignment requirements than the CPU, so test this"
+
 include ../Makefile.core_common
 
 USEMODULE += printf_float

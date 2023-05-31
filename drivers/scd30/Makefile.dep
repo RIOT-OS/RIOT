@@ -1,3 +1,5 @@
 FEATURES_REQUIRED += periph_i2c
 USEMODULE += checksum
 USEMODULE += xtimer
+
+GOOD_REASON_FOR_USING_FLOATS := "TODO: Convert to integer arithmetic"

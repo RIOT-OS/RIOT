@@ -103,3 +103,5 @@ ifneq (,$(filter esp_freertos_common,$(USEMODULE)))
     USEMODULE += core_thread_flags
   endif
 endif
+
+GOOD_REASON_FOR_USING_FLOATS := "Espressif's newlib and SDK make use of floats

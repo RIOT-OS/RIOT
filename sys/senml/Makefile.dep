@@ -14,3 +14,5 @@ ifneq (,$(filter senml_phydat,$(USEMODULE)))
   USEMODULE += senml
   USEMODULE += phydat
 endif
+
+GOOD_REASON_FOR_USING_FLOATS := "SenML has float data types"

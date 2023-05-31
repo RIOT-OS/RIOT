@@ -39,7 +39,7 @@ int isl29020_init(isl29020_t *dev, const isl29020_params_t *params)
     uint8_t tmp;
 
     /* initialize device descriptor */
-    dev->lux_fac = (float)((1 << (10 + (2 * DEV_RANGE))) - 1) / 0xffff;
+    dev->lux_fac = (1UL << (10 + (2 * DEV_RANGE))) - 1;
 
     /* acquire exclusive access to the bus */
     i2c_acquire(DEV_I2C);
@@ -73,7 +73,7 @@ int isl29020_read(const isl29020_t *dev)
     res = (high << 8) | low;
     DEBUG("ISL29020: Raw value: %i - high: %i, low: %i\n", res, high, low);
     /* calculate and return the actual lux value */
-    return (int)(dev->lux_fac * res);
+    return (dev->lux_fac * res) / 0xffff;
 }
 
 int isl29020_enable(const isl29020_t *dev)

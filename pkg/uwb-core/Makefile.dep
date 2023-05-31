@@ -37,3 +37,5 @@ FEATURES_BLACKLIST += arch_avr8
 # libraries these introduce additional compilation issues that have not
 # been addressed in this port
 FEATURES_BLACKLIST += arch_native
+
+GOOD_REASON_FOR_USING_FLOATS := "We cannot easily fix external code's use of float"

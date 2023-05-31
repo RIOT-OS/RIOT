@@ -81,7 +81,7 @@ typedef struct {
  */
 typedef struct {
     isl29020_params_t params;   /**< device initialization parameters */
-    float lux_fac;              /**< factor to calculate actual lux value */
+    uint32_t lux_fac;           /**< factor to calculate actual lux value */
 } isl29020_t;
 
 /**

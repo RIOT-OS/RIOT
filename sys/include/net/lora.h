@@ -35,9 +35,9 @@ extern "C" {
  * @ingroup  config
  * @{
  */
-/** @brief Frequency resolution in Hz */
-#ifndef LORA_FREQUENCY_RESOLUTION_DEFAULT
-#define LORA_FREQUENCY_RESOLUTION_DEFAULT      (61.03515625)
+/** @brief Frequency resolution in nano Hz */
+#ifndef LORA_FREQUENCY_RESOLUTION_NANOHERTZ_DEFAULT
+#define LORA_FREQUENCY_RESOLUTION_NANOHERTZ_DEFAULT      61035156250
 #endif
 
 /** @brief Preamble length, same for Tx and Rx

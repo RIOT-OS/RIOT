@@ -1,3 +1,5 @@
+GOOD_REASON_FOR_USING_FLOATS := "summing up the channel energy requires a dynamic number format"
+
 # Set the name of your application:
 APPLICATION = spectrum-scanner
 

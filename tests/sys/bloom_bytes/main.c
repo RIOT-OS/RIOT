@@ -22,13 +22,13 @@
 #include <string.h>
 #include <inttypes.h>
 
-#include "xtimer.h"
-#include "fmt.h"
-
-#include "hashes.h"
-#include "bloom.h"
-#include "random.h"
 #include "bitfield.h"
+#include "bloom.h"
+#include "fmt.h"
+#include "hashes.h"
+#include "macros/math.h"
+#include "random.h"
+#include "xtimer.h"
 
 #define BLOOM_BITS (1UL << 12)
 #define BLOOM_HASHF (8)
@@ -107,14 +107,12 @@ int main(void)
     printf("\n");
     printf("%d elements probably in the filter.\n", in);
     printf("%d elements not in the filter.\n", not_in);
-    double false_positive_rate = (double) in / (double) lenA;
+    int32_t false_positive_rate = DIV_ROUND(in * 1000U, lenA);
+    char strbuf[20];
+    strbuf[fmt_s32_dfp(strbuf, false_positive_rate, -3)] = '\0';
     /* Use 'fmt/print_float' to work on all platforms (atmega)
      * Stdout should be flushed before to prevent garbled output. */
-#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
-    fflush(stdout);
-#endif
-    print_float(false_positive_rate, 6);
-    puts(" false positive rate.");
+    printf("%s false positive rate.\n", strbuf);
 
     bloom_del(&bloom);
     printf("\nAll done!\n");
