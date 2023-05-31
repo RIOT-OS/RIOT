@@ -282,7 +282,11 @@ static void _usbus_transfer_urb_submit(usbus_endpoint_t *usbus_ep,
 void usbus_urb_submit(usbus_t *usbus, usbus_endpoint_t *endpoint, usbus_urb_t *urb)
 {
     (void)usbus;
-    assert(!(clist_find(&endpoint->urb_list, &urb->list)));
+
+    if (clist_find(&endpoint->urb_list, &urb->list)) {
+        return;
+    }
+
     if (endpoint->ep->dir == USB_EP_DIR_IN &&
             ((urb->len % endpoint->maxpacketsize) == 0) &&
             usbus_urb_isset_flag(urb, USBUS_URB_FLAG_AUTO_ZLP)) {
