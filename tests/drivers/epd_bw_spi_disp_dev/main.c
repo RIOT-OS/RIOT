@@ -53,7 +53,7 @@ int main(void)
         .x1 = 0,
         .x2 = riot_200_width - 1,
         .y1 = 0,
-        .y2 = riot_200_width - 1.
+        .y2 = riot_200_width - 1,
     };
 
     dev->driver = &epd_bw_spi_disp_dev_driver;
@@ -70,7 +70,7 @@ int main(void)
                     .x1 = x,
                     .x2 = x + riot_32_width - 1,
                     .y1 = y,
-                    .y2 = y + riot_32_height - 1.
+                    .y2 = y + riot_32_height - 1,
                 };
 
                 disp_dev_map(dev, &small_area, (void *)riot_logo_32);
