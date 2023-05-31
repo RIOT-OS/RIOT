@@ -30,6 +30,7 @@ MEMORY
     ram      (w!rx) : ORIGIN = _ram_start_addr,               LENGTH = _ram_length
 }
 
+INCLUDE bkup_ram.ld
 INCLUDE cc26xx_cc13xx_sections.ld
 INCLUDE cortexm_base.ld
 

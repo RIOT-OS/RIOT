@@ -1,6 +1,19 @@
 VARIANT = $(shell echo $(CPU_VARIANT) | tr 'a-z-' 'A-Z_')
 CFLAGS += -DCPU_VARIANT_$(VARIANT)
 
-LINKER_SCRIPT ?= $(RIOTCPU)/cc26xx_cc13xx/ldscripts/cc26xx_cc13xx.ld
+LINKFLAGS += -L$(RIOTCPU)/cc26xx_cc13xx/ldscripts
+
+ifeq (,$(USE_LDMEMORY))
+  LINKER_SCRIPT ?= cc26xx_cc13xx.ld
+else
+# CCFG starts at the end of ROM
+  LDMEMORY_SECTIONS += ccfg:${ROM_LEN}-88:88
+
+# GPRAM is only available when cache is disabled. When GPRAM is enabled it
+# is used as a backup RAM at the expense of slower CPU execution time
+  LDMEMORY_SECTIONS += gpram:0x11000000:8K
+
+  LDMEMORY_INCLUDES += cc26xx_cc13xx_sections.ld
+endif
 
 INCLUDES += -I${RIOTCPU}/cc26xx_cc13xx/include
