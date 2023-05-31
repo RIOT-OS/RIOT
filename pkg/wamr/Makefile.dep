@@ -7,3 +7,5 @@ USEMODULE += ztimer_usec
 FEATURES_REQUIRED_ANY += arch_native|arch_esp32|arch_riscv|cortexm_svc
 #arch_arm|arch_esp need modified
 #  build/pkg/wamr/core/iwasm/common/arch/invokeNative_<arch>.s
+
+GOOD_REASON_FOR_USING_FLOATS := "WASM ISA provides an FPU"

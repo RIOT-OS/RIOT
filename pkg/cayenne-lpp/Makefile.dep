@@ -1,3 +1,1 @@
-FEATURES_REQUIRED += arch_32bit
-
 GOOD_REASON_FOR_USING_FLOATS := "We cannot easily fix external code's use of float"

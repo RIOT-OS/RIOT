@@ -3,3 +3,5 @@ USEMODULE += printf_float
 
 # Blacklist AVR8 since printing float is not well supported on these platforms
 FEATURES_BLACKLIST += arch_avr8
+
+GOOD_REASON_FOR_USING_FLOATS := "JavaScript has float support --> a JS engine has to support that"
