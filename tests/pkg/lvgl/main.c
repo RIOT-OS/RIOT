@@ -92,7 +92,7 @@ void sysmon_create(void)
 
     /* Create a chart with two data lines */
     chart = lv_chart_create(cont);
-    lv_obj_set_size(chart, hres / 2.5, vres / 2);
+    lv_obj_set_size(chart, hres * 10L / 25, vres / 2);
     lv_obj_set_pos(chart, LV_DPI_DEF / 10, LV_DPI_DEF / 10);
     lv_chart_set_point_count(chart, CHART_POINT_NUM);
     lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, 0, 100);
