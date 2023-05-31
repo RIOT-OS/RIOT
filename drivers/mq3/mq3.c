@@ -21,8 +21,9 @@
 #include "mq3.h"
 
 #define PRECISION           ADC_RES_10BIT
-#define MIN                 (100U)              /* TODO: calibrate to useful value */
-#define FACTOR              (2.33f)             /* TODO: calibrate to useful value */
+#define MIN                 (100)               /* TODO: calibrate to useful value */
+#define FACTOR              (233)               /* TODO: calibrate to useful value */
+#define DIVISOR             (100)
 
 int mq3_init(mq3_t *dev, adc_t adc_line)
 {
@@ -30,14 +31,14 @@ int mq3_init(mq3_t *dev, adc_t adc_line)
     return adc_init(dev->adc_line);
 }
 
-int mq3_read_raw(const mq3_t *dev)
+int16_t mq3_read_raw(const mq3_t *dev)
 {
     return adc_sample(dev->adc_line, PRECISION);
 }
 
-int mq3_read(const mq3_t *dev)
+int16_t mq3_read(const mq3_t *dev)
 {
-    float res = mq3_read_raw(dev);
+    int32_t res = mq3_read_raw(dev);
     res = (res > MIN) ? res - MIN : 0;
-    return (int)(res * FACTOR);
+    return res * FACTOR / DIVISOR;
 }
