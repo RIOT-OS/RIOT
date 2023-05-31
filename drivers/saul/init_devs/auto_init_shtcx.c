@@ -54,7 +54,7 @@
 
  void auto_init_shtcx(void)
  {
-     assert(SHTCX_NUM == SHTCX_INFO_NUM);
+     assert(2 * SHTCX_NUM == SHTCX_INFO_NUM);
 
      for (unsigned i = 0; i < SHTCX_NUM; i++) {
          LOG_DEBUG("[auto_init_saul] initializing shtcx #%u\n", i);
@@ -70,7 +70,7 @@
 
          /* Humidity */
          saul_entries[(i * 2)+1].dev = &(shtcx_devs[i]);
-         saul_entries[(i * 2)+1].name = shtcx_saul_info[i].name;
+         saul_entries[(i * 2)+1].name = shtcx_saul_info[(i * 2)+1].name;
          saul_entries[(i * 2)+1].driver = &shtcx_relative_humidity_saul_driver;
 
          saul_reg_add(&(saul_entries[(i * 2)]));
