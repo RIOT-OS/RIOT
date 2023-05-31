@@ -1,7 +1,13 @@
 CFLAGS += -DCPU_FAM_STM32$(call uppercase_and_underscore,$(CPU_FAM))
 
-# For stm32 cpu's we use the generic stm32.ld linker script
-LINKER_SCRIPT ?= stm32.ld
+ifeq (,$(USE_LDMEMORY))
+  # For stm32 cpu's we use the generic stm32.ld linker script
+  LINKER_SCRIPT ?= stm32.ld
+else
+  LDMEMORY_INCLUDES += stm32_heap4.ld
+  LDMEMORY_SECTIONS += ccmram:0x10000000:$(CCMRAM_LEN)
+  LDMEMORY_SECTIONS += sram4:0x28000000:$(SRAM4_LEN)
+endif
 
 # Include riotboot specific variables
 include $(RIOTCPU)/stm32/stm32_riotboot.mk
@@ -58,11 +64,13 @@ info-stm32:
 	@$(COLOR_ECHO) "\tRAM size:\t$(RAM_LEN_K)KiB"
 
 
-ifneq (,$(CCMRAM_LEN))
-  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ccmram_length=$(CCMRAM_LEN)
-endif
-ifneq (,$(SRAM4_LEN))
-  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_sram4_length=$(SRAM4_LEN)
+ifeq (,$(USE_LDMEMORY))
+  ifneq (,$(CCMRAM_LEN))
+    LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ccmram_length=$(CCMRAM_LEN)
+  endif
+  ifneq (,$(SRAM4_LEN))
+    LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_sram4_length=$(SRAM4_LEN)
+  endif
 endif
 
 VECTORS_O ?= $(BINDIR)/stm32_vectors/$(CPU_LINE).o
