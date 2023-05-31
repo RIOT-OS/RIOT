@@ -741,7 +741,7 @@ ifeq ($(BUILD_IN_DOCKER),1)
 link: ..in-docker-container
 else
 ifeq (,$(RIOTNOLINK))
-link: ..compiler-check ..build-message $(BUILD_FILES) print-size ..module-check
+link: ..compiler-check ..build-message $(BUILD_FILES) print-size ..softfpucheck ..module-check
 else
 link: ..compiler-check ..build-message $(BASELIBS) $(ARCHIVES) ..module-check
 endif # RIOTNOLINK
@@ -754,6 +754,15 @@ $(ELFFILE): $(BASELIBS) $(ARCHIVES) $(LD_SCRIPTS)
 ..module-check: $(BASELIBS)
 	@[ -z "$(strip $(NON_GENERATED_MODULES))" ] || \
 	($(COLOR_ECHO) "$(COLOR_RED)Error - using unknown modules: $(COLOR_RESET)$(NON_GENERATED_MODULES)" && false)
+
+..softfpucheck: $(ELFFILE)
+ifeq (,$(GOOD_REASON_FOR_USING_FLOATS))
+  ifeq ($(RIOT_CI_BUILD),1)
+	$(Q)$(RIOTTOOLS)/softfpucheck/check.sh $(MAPFILE) --fail
+  else
+	$(Q)$(RIOTTOOLS)/softfpucheck/check.sh $(MAPFILE)
+  endif
+endif
 
 $(APPLICATION_MODULE).module: pkg-build $(BUILDDEPS)
 	$(Q)DIRS="$(DIRS)" APPLICATION_BLOBS="$(BLOBS)" \
