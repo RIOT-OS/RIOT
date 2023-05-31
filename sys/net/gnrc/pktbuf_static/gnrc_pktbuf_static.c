@@ -30,6 +30,7 @@
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/nettype.h"
 #include "net/gnrc/pkt.h"
+#include "string_utils.h"
 
 #include "pktbuf_internal.h"
 #include "pktbuf_static.h"
@@ -60,18 +61,6 @@ static uint16_t max_byte_count = 0;
 static gnrc_pktsnip_t *_create_snip(gnrc_pktsnip_t *next, const void *data, size_t size,
                                     gnrc_nettype_t type);
 static void *_pktbuf_alloc(size_t size);
-
-static const void *mem_is_set(const void *data, uint8_t c, size_t len)
-{
-    const uint8_t *end = (uint8_t *)data + len;
-    for (const uint8_t *d = data; d != end; ++d) {
-        if (c != *d) {
-            return d;
-        }
-    }
-
-    return NULL;
-}
 
 static inline void _set_pktsnip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *next,
                                 void *data, size_t size, gnrc_nettype_t type)
@@ -440,7 +429,7 @@ static void *_pktbuf_alloc(size_t size)
 
     const void *mismatch;
     if (CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE &&
-        (mismatch = mem_is_set(ptr + 1, CANARY, size - sizeof(_unused_t)))) {
+        (mismatch = memchk(ptr + 1, CANARY, size - sizeof(_unused_t)))) {
         printf("[%p] mismatch at offset %"PRIuPTR"/%u (ignoring %u initial bytes that were repurposed)\n",
                (void *)ptr, (uintptr_t)mismatch - (uintptr_t)ptr, (unsigned)size, (unsigned)sizeof(_unused_t));
 #ifdef MODULE_OD

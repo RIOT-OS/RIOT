@@ -77,7 +77,9 @@ static inline void gpio_ll_clear(gpio_port_t port, uword_t mask)
 #if defined(GPIO_BRR_BR0) && !defined(CPU_FAM_STM32F4)
     p->BRR = mask;
 #else
-    p->BSRR = mask << 16;
+    /* The first half-word sets GPIOs, the second half-world clears GPIOs */
+    volatile uint16_t *brr = (volatile uint16_t *)&(p->BSRR);
+    brr[1] = (uint16_t)mask;
 #endif
 }
 

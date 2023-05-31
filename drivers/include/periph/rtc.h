@@ -113,9 +113,14 @@ int rtc_get_time_ms(struct tm *time, uint16_t *ms);
  * @param[in] cb            Callback executed when alarm is hit.
  * @param[in] arg           Argument passed to callback when alarm is hit.
  *
- * @return  0 for success
- * @return -2 invalid `time` parameter
- * @return -1 other errors
+ * @note    The driver must be prepared to work with denormalized time values
+ *          (e.g. seconds > 60). The driver may normalize the value, or just
+ *          keep it denormalized. In either case, the timeout should occur at
+ *          the equivalent normalized time.
+ *
+ * @retval  0           success
+ * @return  -EINVAL     @p time was invalid (e.g. in the past, out of range)
+ * @return  <0          other error (negative errno code to indicate cause)
  */
 int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg);
 
