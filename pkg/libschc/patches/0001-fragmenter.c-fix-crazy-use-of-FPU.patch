@@ -1,0 +1,25 @@
+From b9a52e1ee44fc0212aff25404de392526581b8a8 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@posteo.net>
+Date: Wed, 31 May 2023 22:19:23 +0200
+Subject: [PATCH] fragmenter.c: fix crazy use of FPU
+
+---
+ fragmenter.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fragmenter.c b/fragmenter.c
+index 8454906..19c43a8 100755
+--- a/fragmenter.c
++++ b/fragmenter.c
+@@ -1914,7 +1914,7 @@ static void tx_fragment_send(schc_fragmentation_t *tx_conn) {
+ 	if (has_no_more_fragments(tx_conn)) {
+ 		DEBUG_PRINTF("schc_fragment(): all-1 window\n");
+ 		fcn = tx_conn->fcn;
+-		tx_conn->fcn = (pow(2, tx_conn->fragmentation_rule->FCN_SIZE) - 1); // all 1-window
++		tx_conn->fcn = (1UL << tx_conn->fragmentation_rule->FCN_SIZE) - 1; // all 1-window
+ 		if (send_fragment(tx_conn)) { // only continue when packet was transmitted
+ 			tx_conn->TX_STATE = WAIT_BITMAP;
+ 			set_local_bitmap(tx_conn); // set bitmap according to fcn
+-- 
+2.40.1
+
