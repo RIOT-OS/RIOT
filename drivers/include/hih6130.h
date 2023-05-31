@@ -49,18 +49,18 @@ typedef struct {
 void hih6130_init(hih6130_t *dev, i2c_t i2c, uint8_t address);
 
 /**
- * @brief   Read humidity and temperature from sensor and convert to floating-point
+ * @brief   Read humidity and temperature
  *
- * @param[in]  dev                       Sensor device descriptor
- * @param[out] relative_humidity_percent Measured relative humidity in percent
- * @param[out] temperature_celsius       Measured temperature in degrees Celsius
+ * @param[in]  dev                          Sensor device descriptor
+ * @param[out] humidity_milli_percent       Relative humidity in E-03 %
+ * @param[out] temperature_milli_celsius    Temperature in m°C
  *
- * @return 0 on success
- * @return -1 on error
- * @return 1 if data is stale
+ * @retval  0       success
+ * @retval  -1      error
+ * @retval 1        data is stale
  */
-int hih6130_get_humidity_temperature_float(const hih6130_t *dev,
-    float *relative_humidity_percent, float *temperature_celsius);
+int hih6130_get_humidity_temperature(const hih6130_t *dev,
+        int32_t *humidity_milli_percent, int32_t *temperature_milli_celsius);
 
 #ifdef __cplusplus
 }

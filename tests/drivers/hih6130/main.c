@@ -25,50 +25,49 @@
 #error "TEST_HIH6130_ADDR not defined"
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-#include "xtimer.h"
+#include "fmt.h"
 #include "hih6130.h"
+#include "ztimer.h"
 
-#define SLEEP_USEC  (100 * 1000U)
+#define SLEEP_MSEC  100
 
 int main(void)
 {
     hih6130_t dev;
 
-    puts("HIH6130 sensor driver test application\n");
+    print_str("HIH6130 sensor driver test application\n");
 
-    printf("Initializing HIH6130 sensor at I2C_%i, address 0x%02x... ",
-        TEST_HIH6130_I2C, TEST_HIH6130_ADDR);
+    print_str("Initializing HIH6130 sensor at I2C_");
+    print_u32_dec(TEST_HIH6130_I2C);
+    print_str(", address 0x");
+    print_u32_hex(TEST_HIH6130_ADDR);
+    print_str("...\n");
     hih6130_init(&dev, TEST_HIH6130_I2C, TEST_HIH6130_ADDR);
-    puts("[OK]");
+    print_str("[OK]\n");
 
     while (1) {
-        float hum = 0.f;
-        float temp = 0.f;
+        int32_t hum, temp;
         int status;
-        float integral = 0.f;
-        float fractional;
 
-        xtimer_usleep(SLEEP_USEC);
+        ztimer_sleep(ZTIMER_MSEC, SLEEP_MSEC);
 
-        status = hih6130_get_humidity_temperature_float(&dev, &hum, &temp);
+        status = hih6130_get_humidity_temperature(&dev, &hum, &temp);
         if (status < 0) {
-            printf("Communication error: %d\n", status);
+            print_str("Communication error: ");
+            print_s32_dec(status);
+            print_str("\n");
             continue;
-        } else if (status == 1) {
-            puts("Stale values");
         }
-        /* Several platforms usually build with nano.specs, (without float printf) */
-        /* Split value into two integer parts for printing. */
-        fractional = modff(hum, &integral);
-        printf("humidity: %4d.%04u %%",
-            (int)integral, (unsigned int)abs((int)(fractional * 10000.f)));
-        fractional = modff(temp, &integral);
-        printf("  temperature: %4d.%04u C\n",
-            (int)integral, (unsigned int)abs((int)(fractional * 10000.f)));
+        else if (status == 1) {
+            print_str("Stale values\n");
+        }
+
+        print_str("humidity: ");
+        char buf[20];
+        print(buf, fmt_s32_dfp(buf, hum, -3));
+        print_str(" %, temperature: ");
+        print(buf, fmt_s32_dfp(buf, temp, -3));
+        print_str(" °C\n");
     }
 
     return 0;
