@@ -102,7 +102,7 @@ void sysmon_create(void)
 
     /* Set the data series to zero */
     uint16_t i;
-    for(i = 0; i < CHART_POINT_NUM; i++) {
+    for (i = 0; i < CHART_POINT_NUM; i++) {
         lv_chart_set_next_value(chart, cpu_ser, 0);
         lv_chart_set_next_value(chart, mem_ser, 0);
     }
