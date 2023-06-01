@@ -367,6 +367,7 @@ bool sdhc_send_cmd(sdhc_state_t *state, uint32_t cmd, uint32_t arg)
     if (_wait_for_event(state)) {
         SDHC_DEV->SRR.reg = SDHC_SRR_SWRSTCMD;  /* reset command */
         while (SDHC_DEV->SRR.bit.SWRSTCMD) {}
+        state->need_init = true;
         return false;
     }
 
