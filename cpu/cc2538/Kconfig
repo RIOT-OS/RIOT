@@ -39,7 +39,7 @@ config HAS_CPU_CC2538
     help
         Indicates that a 'cc2538' cpu is being used.
 
-config PERIPH_RTC_FROM_RTT_RTC
+config HAS_PERIPH_RTC_FROM_RTT_RTC
     bool
     default y
     depends on CPU_FAM_CC2538
