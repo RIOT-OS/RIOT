@@ -10,34 +10,28 @@ menuconfig PACKAGE_OPENTHREAD
     depends on TEST_KCONFIG
 
     depends on HAS_CPP
-    select MODULE_CPP11-COMPAT
+    select MODULE_CPP
     select MODULE_EVENT
     select MODULE_NETDEV
     select MODULE_OPENTHREAD_CONTRIB
     select MODULE_OPENTHREAD_CONTRIB_NETDEV
     select MODULE_L2UTIL
-    select MODULE_TIMEX
     select MODULE_ZTIMER
-    select MODULE_ZTIMER64
     select MODULE_ZTIMER_MSEC
 
 if PACKAGE_OPENTHREAD
 
 config MODULE_OPENTHREAD-FTD
     bool "Openthread Full Thread Device"
-    depends on TEST_KCONFIG
 
 config MODULE_OPENTHREAD-MTD
     bool "Openthread Minimal Thread Device"
-    depends on TEST_KCONFIG
 
 config MODULE_OPENTHREAD-CLI-FTD
     bool "Openthread Full Thread Device CLI"
-    depends on TEST_KCONFIG
 
 config MODULE_OPENTHREAD-CLI-MTD
     bool "Openthread Minimal Thread Device CLI"
-    depends on TEST_KCONFIG
 
 config MODULE_OPENTHREAD_CONTRIB
     bool
