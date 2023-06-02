@@ -378,7 +378,8 @@ int sam0_eth_init(void)
     /* TODO: implement auto negotiation */
     GMAC->NCFGR.reg = GMAC_NCFGR_SPD | GMAC_NCFGR_FD | GMAC_NCFGR_MTIHEN
                     | GMAC_NCFGR_RXCOEN | GMAC_NCFGR_MAXFS | GMAC_NCFGR_CAF
-                    | GMAC_NCFGR_LFERD | GMAC_NCFGR_RFCS | GMAC_NCFGR_CLK(3);
+                    | GMAC_NCFGR_LFERD | GMAC_NCFGR_RFCS | GMAC_NCFGR_CLK(3)
+                    | GMAC_NCFGR_DBW(1);
 
     /* Enable all multicast addresses */
     GMAC->HRB.reg = 0xffffffff;
