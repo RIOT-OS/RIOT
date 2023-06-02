@@ -73,6 +73,4 @@ USEMODULE += ps
 CXXEXFLAGS += -fno-rtti
 USEMODULE += cpp11-compat
 
-SHOULD_RUN_KCONFIG ?=
-
 include $(RIOTBASE)/Makefile.include
