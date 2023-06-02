@@ -3,5 +3,7 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
 endif
 
 ifneq (,$(filter ztimer_msec ztimer_sec,$(USEMODULE)))
-  USEMODULE += ztimer_periph_lptimer
+  ifeq (,$(filter ztimer_periph_timer,$(USEMODULE)))
+    USEMODULE += ztimer_periph_lptimer
+  endif
 endif

@@ -45,6 +45,9 @@ USEMODULE += auto_init_loramac
 USEMODULE += $(DRIVER)
 USEMODULE += fmt
 FEATURES_OPTIONAL += periph_rtc
+# Needed to fix the backend o ztimer so the RTC is free
+USEMODULE += ztimer_msec
+USEMODULE += ztimer_periph_timer
 
 # Uncomment the following line to enable Loramac stack state persistence on EEPROM.
 # Make sure the EEPROM is erased before enabling this and when flashing a board
@@ -79,6 +82,10 @@ endif
 ifneq (,$(filter test,$(MAKECMDGOALS)))
   DEFAULT_MODULE += test_utils_interactive_sync
 endif
+
+# This application provides a 'Kconfig' file and we want to explicitly disable
+# Kconfig by default by setting this variable to empty
+SHOULD_RUN_KCONFIG ?=
 
 include $(RIOTBASE)/Makefile.include
 
