@@ -120,6 +120,13 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Bits in the MII Auto-Negotiation Expansion Register
+ * @{
+ */
+#define MII_LPA_HAS_AN      BIT0    /**< Partner can auto-negotiate */
+/** @} */
+
+/**
  * @brief   Check if an Ethernet PHY supports 100 Mbps at full duplex
  *
  * @param[in]   bmsr    Value of the MII basic mode status register
