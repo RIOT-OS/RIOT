@@ -92,7 +92,7 @@ void sysmon_create(void)
 
     /* Create a chart with two data lines */
     chart = lv_chart_create(cont);
-    lv_obj_set_size(chart, hres / 2.5, vres / 2);
+    lv_obj_set_size(chart, hres * 10L / 25, vres / 2);
     lv_obj_set_pos(chart, LV_DPI_DEF / 10, LV_DPI_DEF / 10);
     lv_chart_set_point_count(chart, CHART_POINT_NUM);
     lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, 0, 100);
@@ -102,7 +102,7 @@ void sysmon_create(void)
 
     /* Set the data series to zero */
     uint16_t i;
-    for(i = 0; i < CHART_POINT_NUM; i++) {
+    for (i = 0; i < CHART_POINT_NUM; i++) {
         lv_chart_set_next_value(chart, cpu_ser, 0);
         lv_chart_set_next_value(chart, mem_ser, 0);
     }
