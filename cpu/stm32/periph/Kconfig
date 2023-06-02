@@ -48,9 +48,13 @@ config MODULE_PERIPH_CAN
     depends on HAS_PERIPH_GPIO
     depends on HAS_PERIPH_GPIO_IRQ
     select MODULE_PERIPH_GPIO_IRQ
-    select MODULE_PERIPH_I2C
     help
         STM32 CAN peripheral controller.
+
+config MODULE_PERIPH_INIT_CAN
+    bool "Auto initialize CAN peripheral"
+    default y if MODULE_PERIPH_INIT
+    depends on MODULE_PERIPH_CAN
 
 config MODULE_PERIPH_ADC
     bool "ADC peripheral driver"

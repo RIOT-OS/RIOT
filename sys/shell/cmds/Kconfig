@@ -141,6 +141,7 @@ config MODULE_SHELL_CMD_GNRC_PKTBUF
     default y if MODULE_SHELL_CMDS_DEFAULT
     depends on MODULE_SHELL_CMDS
     depends on MODULE_GNRC_PKTBUF
+    select MODULE_OD if MODULE_GNRC_PKTBUF_STATIC
 
 config MODULE_SHELL_CMD_GNRC_RPL
     bool "Command to configure GNRC's RPL implementation"

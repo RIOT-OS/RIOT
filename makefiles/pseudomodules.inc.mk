@@ -35,7 +35,6 @@ PSEUDOMODULES += board_software_reset
 
 PSEUDOMODULES += can_mbox
 PSEUDOMODULES += can_pm
-PSEUDOMODULES += can_raw
 PSEUDOMODULES += ccn-lite-utils
 PSEUDOMODULES += cc2538_rf_obs_sig
 PSEUDOMODULES += conn_can_isotp_multi

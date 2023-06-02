@@ -19,7 +19,8 @@ USEMODULE += bluetil_addr
 USEMODULE += nimble_rpble
 NIMBLE_MAX_CONN = 3
 
-DEVELHELP = 0
+# Enable to get access to gnrc_pktbuf_stats in gnrc_pktbuf shell command
+DEVELHELP ?= 1
 
 TEST_ON_CI_WHITELIST += nrf52dk
 
