@@ -20,6 +20,7 @@
 #include <string.h>
 
 #include "iolist.h"
+#include "mii.h"
 #include "net/gnrc/netif/ethernet.h"
 #include "net/gnrc.h"
 #include "net/ethernet.h"
@@ -48,6 +49,14 @@ extern void sam0_clear_rx_buffers(void);
 /* SAM0 CPUs only have one GMAC IP, so it is safe to
 statically defines one in this file */
 static sam0_eth_netdev_t _sam0_eth_dev;
+
+unsigned sam0_read_phy(uint8_t phy, uint8_t addr);
+void sam0_write_phy(uint8_t phy, uint8_t addr, uint16_t data);
+
+static inline bool _get_link_status(void)
+{
+    return sam0_read_phy(0, MII_BMSR) & MII_BMSR_LINK;
+}
 
 static int _sam0_eth_init(netdev_t *netdev)
 {
@@ -105,6 +114,11 @@ static int _sam0_eth_get(netdev_t *netdev, netopt_t opt, void *val, size_t max_l
             assert(max_len >= ETHERNET_ADDR_LEN);
             sam0_eth_get_mac((char *)val);
             res = ETHERNET_ADDR_LEN;
+            break;
+        case NETOPT_LINK:
+            assert(max_len == sizeof(netopt_enable_t));
+            *(netopt_enable_t *)val = _get_link_status();
+            res = sizeof(netopt_enable_t);
             break;
         default:
             res = netdev_eth_get(netdev, opt, val, max_len);
