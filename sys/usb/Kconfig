@@ -64,8 +64,8 @@ config USB_PID
     hex "Product ID"
     depends on CUSTOM_USB_VID_PID
     range 0x0000 0xFFFF
-    # default 0x7002 if MODULE_RIOTBOOT_DFU
-    default 0x7001
+    # default 0x7D02 if MODULE_RIOTBOOT_DFU
+    default 0x7D01
     help
         You must provide your own PID.
 
