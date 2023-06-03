@@ -30,7 +30,13 @@
 #include "periph_conf.h"
 #include "periph_cpu.h"
 
+#ifdef RSEL3
+#define RSEL_MASK (RSEL0 | RSEL1 | RSEL2 | RSEL3)
+#define HAS_RSEL3 1
+#else
 #define RSEL_MASK (RSEL0 | RSEL1 | RSEL2)
+#define HAS_RSEL3 0
+#endif
 
 uint32_t msp430_fxyz_dco_freq;
 
@@ -188,7 +194,13 @@ static void calibrate_dco(void)
     uint8_t bcsctl1 = BCSCTL1 & ~(RSEL_MASK);
     uint8_t rselx = 0;
 
-    for (uint8_t iter = 0x04; iter != 0; iter >>= 1) {
+    /*
+     * Note: For MSP430F2xx (HAS_RSEL3 == 1) the bit in RSEL3 is actually
+     * ignored if an external resistor is used for the DCO. Still, setting
+     * it won't hurt */
+    const uint8_t rsel_max_bit = (HAS_RSEL3) ? BIT3 : BIT2;
+
+    for (uint8_t iter = rsel_max_bit; iter != 0; iter >>= 1) {
         BCSCTL1 = bcsctl1 | rselx | iter;
 
         /* busy wait for timer to capture */
