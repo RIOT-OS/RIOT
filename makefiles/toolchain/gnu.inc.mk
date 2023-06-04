@@ -36,6 +36,6 @@ include $(RIOTMAKE)/tools/gdb.inc.mk
 # Data address spaces starts at zero for all supported architectures. This fixes
 # compilation at least on MSP430 and AVR.
 # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105523
-ifeq ($(GCC_VERSION),12)
+ifneq (,$(filter $(GCC_VERSION),12 13))
   CFLAGS += --param=min-pagesize=0
 endif
