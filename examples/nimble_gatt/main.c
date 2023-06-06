@@ -361,7 +361,7 @@ static int gatt_svr_chr_access_rw_demo(
 
         puts("access to characteristic 'rw demo (read-only)'");
 
-        if (ctxt->op == BLE_GATT_ACCESS_OP_READ_CHR && strcmp(rm_demo_write_data, "oi") == 0)
+        if (ctxt->op == BLE_GATT_ACCESS_OP_READ_CHR && strcmp(rm_demo_write_data, "ola") == 0)
         {
 
             make_dump_package(dump_index);
@@ -708,7 +708,7 @@ void make_data_package(uint16_t index)
         memcpy(solo_measurement + (2)*sizeof(int16_t), &auxf, sizeof(int16_t));
         auxi= (readings_buffer[index].timestamp);
         memcpy(solo_measurement + (3)*sizeof(int16_t), &auxi, sizeof(int));
-    }
+}
 
 static int gatt_svr_chr_access_device_info_manufacturer(
     uint16_t conn_handle, uint16_t attr_handle,

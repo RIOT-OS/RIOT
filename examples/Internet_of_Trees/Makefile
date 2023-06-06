@@ -1,14 +1,17 @@
 # name of your application
-APPLICATION = nimble_gatt
+APPLICATION = nimble_heart_rate_sensor
 
 # If no BOARD is found in the environment, use this default:
-BOARD ?= pulga
-
-# default serial port
-PORT ?= /dev/ttyUSB0
+BOARD ?= nrf52dk
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
+
+DRIVER ?= bme280_i2c
+USEMODULE += $(DRIVER)
+
+# Some RIOT modules needed for this example
+USEMODULE += event_timeout_ztimer
 
 # Include NimBLE
 USEPKG += nimble
@@ -17,34 +20,8 @@ USEMODULE += nimble_svc_gatt
 
 # Use automated advertising
 USEMODULE += nimble_autoadv
-CFLAGS += -DNIMBLE_AUTOADV_DEVICE_NAME='"BELKA 6157"'
+CFLAGS += -DNIMBLE_AUTOADV_DEVICE_NAME='"Internet of Trees"'
 CFLAGS += -DNIMBLE_AUTOADV_START_MANUALLY=1
-
-SENSORS += accelerometer
-
-#BMI160 MODULE
-ifeq (pulga,$(BOARD))
-FEATURES_REQUIRED += periph_i2c
-#USEMODULE += i2c
-endif
-
-# Modules to include:
-USEMODULE += shell_commands
-#USEMODULE += shell_cmds
-USEMODULE += ps
-USEMODULE += printf_float
-USEMODULE += ztimer
-USEMODULE += ztimer_msec
-
-USEMODULE += event_timeout_ztimer
-
-USEMODULE += xtimer
-
-ifneq (,$(filter accelerometer,$(SENSORS)))
-CFLAGS += -DPULGA_ENABLE_ACCELEROMETER=1
-endif
-
-CFLAGS += -DPULGA_USE_RINGBUFFER=1
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the

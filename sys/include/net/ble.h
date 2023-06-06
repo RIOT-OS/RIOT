@@ -97,6 +97,7 @@ extern "C" {
 #define BLE_GATT_SVC_HRS                    (0x180d)    /**< heart rate service */
 #define BLE_GATT_SVC_BAS                    (0x180f)    /**< battery service */
 #define BLE_GATT_SVC_IPSS                   (0x1820)    /**< IP protocol support */
+#define BLE_GATT_SVC_ESS                    (0x181a)    /**< environmental sensing service */
 /* XXX: custom services not defined by the BT SIG (random values) */
 #define BLE_GATT_SVC_NDNSS                  (0x7e5e)    /**< NDN support service */
 /* add more on demand */
