@@ -320,6 +320,15 @@ PSEUDOMODULES += mpu_stack_guard
 PSEUDOMODULES += mpu_noexec_ram
 ## @}
 
+## @defgroup pseudomodule_pmp_noexec_ram pmp_noexec_ram
+## @{
+## @brief Mark RAM as non-executable using the PMP
+##
+## Mark the RAM non executable.
+## This is a protection mechanism which makes exploitation of buffer overflows significantly harder.
+PSEUDOMODULES += pmp_noexec_ram
+## @}
+
 ## @defgroup pseudomodule_md5sum md5sum
 ## @ingroup sys_shell_commands
 ## @{

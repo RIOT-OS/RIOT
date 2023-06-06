@@ -33,6 +33,10 @@ ifneq (,$(filter mpu_noexec_ram,$(USEMODULE)))
   FEATURES_REQUIRED += cortexm_mpu
 endif
 
+ifneq (,$(filter pmp_noexec_ram,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_pmp
+endif
+
 ifneq (,$(filter lwip_%,$(USEMODULE)))
   USEPKG += lwip
 endif

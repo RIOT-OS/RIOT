@@ -288,6 +288,11 @@ config HAS_PERIPH_PLIC
     help
         Indicates that a RISC-V Platform-local Interrupt Controller (PLIC) peripheral is present.
 
+config HAS_PERIPH_PMP
+    bool
+    help
+        Indicates that a RISC-V physical memory protection (PMP) peripheral is present.
+
 config HAS_PERIPH_PM
     bool
     help
