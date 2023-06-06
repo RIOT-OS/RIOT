@@ -2,7 +2,7 @@
 APPLICATION = nimble_heart_rate_sensor
 
 # If no BOARD is found in the environment, use this default:
-BOARD ?= nrf52dk
+BOARD ?= pulga
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
@@ -22,6 +22,9 @@ USEMODULE += nimble_svc_gatt
 USEMODULE += nimble_autoadv
 CFLAGS += -DNIMBLE_AUTOADV_DEVICE_NAME='"Internet of Trees"'
 CFLAGS += -DNIMBLE_AUTOADV_START_MANUALLY=1
+
+# printar float
+USEMODULE += printf_float
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the

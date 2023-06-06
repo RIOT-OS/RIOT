@@ -62,6 +62,8 @@ static event_queue_t _eq;
 static event_t _update_evt;
 static event_timeout_t _update_timeout_evt;
 
+static bmx280_t dev;
+
 static uint16_t _conn_handle;
 static uint16_t _hrs_val_handle;
 
@@ -76,8 +78,26 @@ static int _devinfo_handler(uint16_t conn_handle, uint16_t attr_handle,
 static int _bas_handler(uint16_t conn_handle, uint16_t attr_handle,
                         struct ble_gatt_access_ctxt *ctxt, void *arg);
 
+static int send_latest_measurements(
+    uint16_t conn_handle, uint16_t attr_handle,
+    struct ble_gatt_access_ctxt *ctxt, void *arg)
+{
+    (void)conn_handle;
+    (void)attr_handle;
+    (void)arg;
+
+    int rc = os_mbuf_append(ctxt->om, sensor_measurements, sizeof(sensor_measurements));
+
+    return rc;
+}
+
 static void _start_updating(void);
 static void _stop_updating(void);
+
+/* UUID = ccdd113f-40d5-4d68-86ac-a728dd82f4ab */
+static const ble_uuid128_t latest_mesurement_uuid
+        = BLE_UUID128_INIT(0xab, 0xf4, 0x82, 0xdd, 0x28, 0xa7, 0xac, 0x86, 0x68,
+                0x4d, 0xd5, 0x40, 0x3f, 0x11, 0xdd, 0xcc);
 
 /* GATT service definitions */
 static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
@@ -85,18 +105,29 @@ static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
         /* Heart Rate Service */
         .type = BLE_GATT_SVC_TYPE_PRIMARY,
         .uuid = BLE_UUID16_DECLARE(BLE_GATT_SVC_ESS),
-        .characteristics = (struct ble_gatt_chr_def[]) { {
-            .uuid = BLE_UUID16_DECLARE(BLE_GATT_CHAR_HEART_RATE_MEASURE),
-            .access_cb = _hrs_handler,
-            .val_handle = &_hrs_val_handle,
-            .flags = BLE_GATT_CHR_F_NOTIFY,
-        }, {
-            .uuid = BLE_UUID16_DECLARE(BLE_GATT_CHAR_BODY_SENSE_LOC),
-            .access_cb = _hrs_handler,
-            .flags = BLE_GATT_CHR_F_READ,
-        }, {
-            0, /* no more characteristics in this service */
-        }, }
+        .characteristics = (struct ble_gatt_chr_def[]) { 
+            {
+                .uuid = BLE_UUID16_DECLARE(BLE_GATT_CHAR_HEART_RATE_MEASURE),
+                .access_cb = _hrs_handler,
+                .val_handle = &_hrs_val_handle,
+                .flags = BLE_GATT_CHR_F_NOTIFY,
+            }, 
+            {
+                .uuid = BLE_UUID16_DECLARE(BLE_GATT_CHAR_BODY_SENSE_LOC),
+                .access_cb = _hrs_handler,
+                .flags = BLE_GATT_CHR_F_READ,
+            },
+            {
+            /* Characteristic: Read only latest measurement */
+                .uuid = (ble_uuid_t *)&latest_mesurement_uuid.u,
+                .access_cb = send_latest_measurements,
+                .val_handle = &_hrs_val_handle,
+                .flags = BLE_GATT_CHR_F_NOTIFY,
+            },  
+            {
+                0, /* no more characteristics in this service */
+            }, 
+        }
     },
     {
         /* Device Information Service */
@@ -263,6 +294,9 @@ static void _hr_update(event_t *e)
     (void)e;
     struct os_mbuf *om;
 
+    uint32_t pressure = bmx280_read_pressure(&dev);
+    memcpy(sensor_measurements, &pressure, sizeof(uint32_t));
+
     /* send heart rate data notification to GATT client */
     om = ble_hs_mbuf_from_flat(sensor_measurements, sizeof(sensor_measurements));
     assert(om != NULL);
@@ -272,6 +306,8 @@ static void _hr_update(event_t *e)
 
     /* schedule next update event */
     event_timeout_set(&_update_timeout_evt, UPDATE_INTERVAL);
+
+    printf("   Pressure [Pa]: %" PRIu32 "\n", pressure);
 }
 
 void make_data_package(bmx280_t* dev)
@@ -280,25 +316,11 @@ void make_data_package(bmx280_t* dev)
     memcpy(sensor_measurements, &pressure, sizeof(uint32_t));
 }
 
-// static int send_latest_measurements(
-//     uint16_t conn_handle, uint16_t attr_handle,
-//     struct ble_gatt_access_ctxt *ctxt, void *arg)
-// {
-//     (void)conn_handle;
-//     (void)attr_handle;
-//     (void)arg;
-
-//     int rc = os_mbuf_append(ctxt->om, sensor_measurements, sizeof(sensor_measurements));
-
-//     return rc;
-// }
 
 
 int main(void)
 {
     puts("NimBLE Heart Rate Sensor Example");
-
-    bmx280_t dev;
 
     switch (bmx280_init(&dev, &bmx280_params[0])) {
         case BMX280_ERR_BUS:
@@ -343,8 +365,8 @@ int main(void)
     nimble_autoadv_set_ble_gap_adv_params(&advp);
 
     /* configure and set the advertising data */
-    uint16_t hrs_uuid = BLE_GATT_SVC_HRS;
-    nimble_autoadv_add_field(BLE_GAP_AD_UUID16_INCOMP, &hrs_uuid, sizeof(hrs_uuid));
+    //uint16_t hrs_uuid = BLE_GATT_SVC_ESS;
+    nimble_autoadv_add_field(BLE_GAP_AD_UUID16_INCOMP, &latest_mesurement_uuid, sizeof(latest_mesurement_uuid));
 
     nimble_auto_adv_set_gap_cb(&gap_event_cb, NULL);
 
