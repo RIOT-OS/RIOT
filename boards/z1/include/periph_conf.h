@@ -28,16 +28,16 @@
 extern "C" {
 #endif
 
-#define CLOCK_CORECLOCK     MHZ(8)
+#define CLOCK_CORECLOCK     msp430_fxyz_dco_freq
 
 /**
  * @brief   Clock configuration
  */
 static const msp430_fxyz_clock_params_t clock_params = {
-    .xt2_frequency = CLOCK_CORECLOCK,
+    .target_dco_frequency = MHZ(8),
     .lfxt1_frequency = 32768,
-    .main_clock_source = MAIN_CLOCK_SOURCE_XT2CLK,
-    .submain_clock_source = SUBMAIN_CLOCK_SOURCE_XT2CLK,
+    .main_clock_source = MAIN_CLOCK_SOURCE_DCOCLK,
+    .submain_clock_source = SUBMAIN_CLOCK_SOURCE_DCOCLK,
     .main_clock_divier = MAIN_CLOCK_DIVIDE_BY_1,
     .submain_clock_divier = SUBMAIN_CLOCK_DIVIDE_BY_1,
     .auxiliary_clock_divier = AUXILIARY_CLOCK_DIVIDE_BY_1,
