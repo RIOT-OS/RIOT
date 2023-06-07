@@ -281,19 +281,27 @@ int coap_opt_get_uint(coap_pkt_t *pkt, uint16_t opt_num, uint32_t *target)
     return -ENOENT;
 }
 
-uint8_t *coap_iterate_option(coap_pkt_t *pkt, uint8_t **optpos,
-                             int *opt_len, int first)
+uint8_t *coap_iterate_option(coap_pkt_t *pkt, unsigned optnum,
+                             uint8_t **opt_pos, int *opt_len)
 {
     uint8_t *data_start;
 
+    bool first = false;
+    if (*opt_pos == NULL) {
+        *opt_pos = coap_find_option(pkt, optnum);
+        first = true;
+        if (*opt_pos == NULL) {
+            return NULL;
+        }
+    }
+
     uint16_t delta = 0;
-    data_start = _parse_option(pkt, *optpos, &delta, opt_len);
+    data_start = _parse_option(pkt, *opt_pos, &delta, opt_len);
     if (data_start && (first || !delta)) {
-        *optpos = data_start + *opt_len;
+        *opt_pos = data_start + *opt_len;
         return data_start;
     }
     else {
-        *optpos = NULL;
         return NULL;
     }
 }
@@ -359,31 +367,35 @@ ssize_t coap_opt_get_string(coap_pkt_t *pkt, uint16_t optnum,
 {
     assert(pkt && target && (max_len > 1));
 
-    uint8_t *opt_pos = coap_find_option(pkt, optnum);
-    if (!opt_pos) {
+    uint8_t *opt_pos = NULL;
+    int opt_len;
+    unsigned left = max_len;
+
+    while (1) {
+        uint8_t *part_start = coap_iterate_option(pkt, optnum, &opt_pos, &opt_len);
+
+        if (part_start == NULL) {
+            /* if option was not found still return separator */
+            if (opt_pos == NULL) {
+                *target++ = (uint8_t)separator;
+                --left;
+            }
+            break;
+        }
+
+        /* separator and terminating \0 have to fit */
+        if (left < (unsigned)(opt_len + 2)) {
+            return -ENOSPC;
+        }
+
         *target++ = (uint8_t)separator;
-        *target = '\0';
-        return 2;
+        memcpy(target, part_start, opt_len);
+        target += opt_len;
+        left -= opt_len + 1;
     }
 
-    unsigned left = max_len - 1;
-    uint8_t *part_start = NULL;
-    do {
-        int opt_len;
-        part_start = coap_iterate_option(pkt, &opt_pos, &opt_len,
-                                         (part_start == NULL));
-        if (part_start) {
-            if (left < (unsigned)(opt_len + 1)) {
-                return -ENOSPC;
-            }
-            *target++ = (uint8_t)separator;
-            memcpy(target, part_start, opt_len);
-            target += opt_len;
-            left -= (opt_len + 1);
-        }
-    } while (opt_pos);
-
     *target = '\0';
+    left--;
 
     return (int)(max_len - left);
 }
