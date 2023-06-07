@@ -657,6 +657,21 @@ static inline void coap_hdr_set_type(coap_hdr_t *hdr, unsigned type)
 uint8_t *coap_find_option(coap_pkt_t *pkt, unsigned opt_num);
 
 /**
+ * @brief   Get pointer to an option field, can be called in a loop
+ *          if there are multiple options with the same number
+ *
+ * @param[in]   pkt     packet to work on
+ * @param[in]   opt_num the option number to search for
+ * @param[out]  opt_pos opaque, must be set to `NULL` on first call
+ * @param[out]  opt_len size of the current option data
+ *
+ * @returns     pointer to the option data
+ *              NULL if option number was not found
+ */
+uint8_t *coap_iterate_option(coap_pkt_t *pkt, unsigned opt_num,
+                             uint8_t **opt_pos, int *opt_len);
+
+/**
  * @brief   Get content type from packet
  *
  * @param[in]   pkt     packet to work on
