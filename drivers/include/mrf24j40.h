@@ -14,6 +14,13 @@
  * This module contains drivers for radio devices in Microchip MRF24J40 series.
  * The driver is aimed to work with all devices of this series.
  *
+ * @warning     This driver doesn't handle the wake pin. As of now, it is
+ *              required that the wake pin is high prior to the initialization
+ *              (e.g. by connecting it to VCC in the board design).
+ * @note        A PR extending @ref mrf24j40_params_t to contain the wake pin
+ *              and adding appropriate handling of the wake pin to the driver
+ *              logic would be a welcome addition.
+ *
  * Default TX power is 0dBm.
  *
  * TX power mapping:
