@@ -66,9 +66,9 @@ among the less expensive options.
 @warning    A jumper in `P_OUT` is mutually exclusive to a jumper in `P_IN`.
             Never connect both at the same time.
 
-@note       While the JTAG connector has no markings, you can easily spot pin 1
-            on to bottom of the board by the square pad; all other JTAG pins
-            have a circular pad.
+@note       Pin 1 on the JTAG connector has a small white triangle next to it
+            and square pad, compared to the round pad used by all other JTAG
+            pins.
 
 Once the jumper is correctly placed in either `P_IN` or in `P_OUT` and the
 JTAG cable is connected just run
