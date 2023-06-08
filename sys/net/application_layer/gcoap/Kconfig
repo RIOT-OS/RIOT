@@ -5,10 +5,10 @@
 # directory for more details.
 #
 menuconfig KCONFIG_USEMODULE_GCOAP
-    bool "Configure Gcoap"
+    bool "Configure GCoAP"
     depends on USEMODULE_GCOAP
     help
-        Configure Gcoap module using Kconfig. If not set default values and
+        Configure GCoAP module using Kconfig. If not set default values and
         CFLAGS will be used.
 
 if KCONFIG_USEMODULE_GCOAP
@@ -17,7 +17,7 @@ menuconfig KCONFIG_USEMODULE_GCOAP_FORWARD_PROXY
     bool "Configure forward proxy"
     depends on USEMODULE_GCOAP_FORWARD_PROXY
     help
-        Configure forward proxy of Gcoap using Kconfig.
+        Configure forward proxy of GCoAP using Kconfig.
 
 if KCONFIG_USEMODULE_GCOAP_FORWARD_PROXY
 config GCOAP_FORWARD_PROXY_EMPTY_ACK_MS
@@ -29,7 +29,7 @@ menuconfig KCONFIG_USEMODULE_GCOAP_DNS
     bool "Configure DNS-over-CoAPS implementation in GCoAP"
     depends on USEMODULE_GCOAP_DNS
     help
-        Configure DNS-over-CoAPS submodule of Gcoap using Kconfig. If not set
+        Configure DNS-over-CoAPS submodule of GCoAP using Kconfig. If not set
         default values and CFLAGS will be used.
 
 if KCONFIG_USEMODULE_GCOAP_DNS
