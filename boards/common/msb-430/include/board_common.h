@@ -29,11 +29,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Address of the info memory
- */
-#define INFOMEM     (0x1000)
-
-/**
  * @name    Xtimer configuration
  * @{
  */
