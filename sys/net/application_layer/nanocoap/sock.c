@@ -13,7 +13,7 @@
  * @{
  *
  * @file
- * @brief       Nanocoap sock helpers
+ * @brief       nanoCoAP sock helpers
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>

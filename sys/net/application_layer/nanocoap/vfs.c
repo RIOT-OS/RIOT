@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Nanocoap VFS helpers
+ * @brief       nanoCoAP VFS helpers
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  *

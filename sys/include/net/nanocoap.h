@@ -10,7 +10,7 @@
  */
 
 /**
- * @defgroup    net_nanocoap Nanocoap small CoAP library
+ * @defgroup    net_nanocoap nanoCoAP small CoAP library
  * @ingroup     net
  * @brief       CoAP library optimized for minimal resource usage
  *
@@ -112,7 +112,7 @@ extern "C" {
 #endif
 
 /**
- * @name    Nanocoap specific CoAP method flags used in coap_handlers array
+ * @name    nanoCoAP specific CoAP method flags used in coap_handlers array
  * @anchor  nanocoap_method_flags
  * @{
  */
@@ -130,12 +130,12 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Nanocoap-specific value to indicate no format specified
+ * @brief   nanoCoAP-specific value to indicate no format specified
  */
 #define COAP_FORMAT_NONE        (UINT16_MAX)
 
 /**
- * @defgroup net_nanocoap_conf    Nanocoap compile configurations
+ * @defgroup net_nanocoap_conf    nanoCoAP compile configurations
  * @ingroup  net_nanocoap
  * @ingroup  config
  * @{

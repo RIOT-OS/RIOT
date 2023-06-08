@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_nanocoap_cache Nanocoap-Cache implementation
+ * @defgroup    net_nanocoap_cache nanoCoAP-Cache implementation
  * @ingroup     net_nanocoap
  * @brief       A cache implementation for nanocoap response messages
  *

@@ -9,7 +9,7 @@
  */
 
 /**
- * @defgroup    net_nanosock Nanocoap Sock
+ * @defgroup    net_nanosock nanoCoAP Sock
  * @ingroup     net
  * @brief       Synchronous sock based messaging with nanocoap
  *
