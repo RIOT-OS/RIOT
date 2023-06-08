@@ -8,7 +8,7 @@
  */
 
 /**
- * @defgroup    net_gcoap  Gcoap
+ * @defgroup    net_gcoap  GCoAP
  * @ingroup     net
  * @brief       High-level interface to CoAP messaging
  *
@@ -341,15 +341,15 @@
  *
  * ## DTLS as transport security ##
  *
- * Gcoap allows to use DTLS for transport security by using the @ref net_sock_dtls
- * "DTLS sock API". Using the module gcoap_dtls enables the support. Gcoap
+ * GCoAP allows to use DTLS for transport security by using the @ref net_sock_dtls
+ * "DTLS sock API". Using the module gcoap_dtls enables the support. GCoAP
  * listens for requests on CONFIG_GCOAPS_PORT, 5684 by default when DTLS is enabled.
  *
  * Credentials have to been configured before use. See @ref net_credman "Credman"
  * and @ref net_sock_dtls_creds "DTLS sock credentials API" for credential managing.
  * Access to the DTLS socket is provided by gcoap_get_sock_dtls().
  *
- * Gcoap includes a DTLS session management component that stores active sessions.
+ * GCoAP includes a DTLS session management component that stores active sessions.
  * By default, it tries to have CONFIG_GCOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS
  * session slots available to keep the server responsive. If not enough sessions
  * are available the server destroys the session that has not been used for the
@@ -413,7 +413,7 @@ extern "C" {
 #endif
 
 /**
- * @defgroup net_gcoap_conf    Gcoap compile configurations
+ * @defgroup net_gcoap_conf    GCoAP compile configurations
  * @ingroup  net_gcoap
  * @ingroup  config
  * @{

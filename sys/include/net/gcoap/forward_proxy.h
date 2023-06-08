@@ -7,9 +7,9 @@
  */
 
 /**
- * @defgroup    net_gcoap_forward_proxy    Gcoap Forward Proxy
+ * @defgroup    net_gcoap_forward_proxy    GCoAP Forward Proxy
  * @ingroup     net_gcoap
- * @brief       Forward proxy implementation for Gcoap
+ * @brief       Forward proxy implementation for GCoAP
  * @note Does not support CoAPS yet.
  * @see <a href="https://tools.ietf.org/html/rfc7252#section-5.7.2">
  *          RFC 7252
@@ -18,7 +18,7 @@
  * @{
  *
  * @file
- * @brief       Definitions for the Gcoap forward proxy
+ * @brief       Definitions for the GCoAP forward proxy
  *
  * @author      Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */

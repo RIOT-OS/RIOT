@@ -13,7 +13,7 @@
  * @{
  *
  * @file
- * @brief       Nanocoap implementation
+ * @brief       nanoCoAP implementation
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
