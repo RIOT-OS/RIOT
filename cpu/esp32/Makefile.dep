@@ -189,3 +189,7 @@ endif
 ifneq (,$(filter usbus_cdc_acm tinyusb_class_cdc,$(USEMODULE)))
   USEMODULE += usb_board_reset
 endif
+
+ifneq (,$(filter delay_us_spinning,$(USEMODULE)))
+  USEMODULE += ztimer_usec
+endif

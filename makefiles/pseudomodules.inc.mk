@@ -564,6 +564,7 @@ PSEUDOMODULES += vfs_auto_mount
 ## backends.
 PSEUDOMODULES += vfs_default
 
+PSEUDOMODULES += wait_us_spinning
 PSEUDOMODULES += wakaama_objects_%
 PSEUDOMODULES += wifi_enterprise
 PSEUDOMODULES += xtimer_on_ztimer
