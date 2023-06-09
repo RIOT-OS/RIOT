@@ -57,7 +57,7 @@
 #ifndef __msp430x16x
 #define __msp430x16x
 
-#define __MSP430_HEADER_VERSION__ 1210
+#define __MSP430_HEADER_VERSION__ 1212
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,5 +1,5 @@
 /* ============================================================================ */
-/* Copyright (c) 2020, Texas Instruments Incorporated                           */
+/* Copyright (c) 2021, Texas Instruments Incorporated                           */
 /*  All rights reserved.                                                        */
 /*                                                                              */
 /*  Redistribution and use in source and binary forms, with or without          */
@@ -31,7 +31,7 @@
 /* ============================================================================ */
 
 /* This file supports MSP430F2617 devices. */
-/* Version: 1.210 */
+/* Version: 1.212 */
 /* Default linker script, for normal executables */
 
 OUTPUT_ARCH(msp430)
@@ -172,10 +172,10 @@ SECTIONS
        directory crtbegin.o is in.  */
     KEEP (*crtbegin*.o(.ctors))
 
-    /* We don't want to include the .ctor section from from the
-       crtend.o file until after the sorted ctors.  The .ctor section
-       from the crtend file contains the end of ctors marker and it
-       must be last */
+    /* We don't want to include the .ctor section from the crtend.o
+       file until after the sorted ctors.  The .ctor section from
+       the crtend file contains the end of ctors marker and it must
+       be last */
     KEEP (*(EXCLUDE_FILE (*crtend*.o ) .ctors))
     KEEP (*(SORT(.ctors.*)))
     KEEP (*(.ctors))

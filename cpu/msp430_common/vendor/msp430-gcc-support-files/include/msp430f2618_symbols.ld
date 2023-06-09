@@ -30,7 +30,7 @@
 /*  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                          */
 /* ============================================================================ */
 
-/* This file supports MSP430F2617 devices. */
+/* This file supports MSP430F2618 devices. */
 /* Version: 1.212 */
 
 /************************************************************

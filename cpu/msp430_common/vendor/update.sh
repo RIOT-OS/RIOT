@@ -5,7 +5,7 @@
 
 set -e
 
-URL="https://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/9_2_0_0/export/msp430-gcc-support-files-1.210.zip"
+URL="https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-LlCjWuAbzH/9.3.1.2/msp430-gcc-support-files-1.212.zip"
 rm -Rf msp430-gcc-support-files
 
 _CPUS="$(git -C ../../.. grep -o '^CPU_MODEL.=.*430.*$' | cut -d' ' -f 3 | sort -u)"
@@ -17,3 +17,5 @@ unzip $(basename $URL)
     rm $(ls | grep -v -E '(msp430\.h|in430\.h|legacy\.h|iomacros\.h|devices.csv)' | \
             grep -v -F "${_CPUS}" )
 )
+
+find msp430-gcc-support-files -type f -exec dos2unix "{}" \;
