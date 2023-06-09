@@ -1,0 +1,4 @@
+# Delay loop won't work on native
+ifeq (native,$(BOARD))
+  USEMODULE += ztimer_msec ztimer_usec
+endif
