@@ -1,12 +1,14 @@
 FLASHER ?= $(RIOTTOOLS)/openocd/openocd.sh
 DEBUGGER ?= $(RIOTTOOLS)/openocd/openocd.sh
 DEBUGSERVER ?= $(RIOTTOOLS)/openocd/openocd.sh
+DEBUGCLIENT ?= $(RIOTTOOLS)/openocd/openocd.sh
 RESET ?= $(RIOTTOOLS)/openocd/openocd.sh
 
 FLASHFILE ?= $(ELFFILE)
 FFLAGS ?= flash $(FLASHFILE)
 DEBUGGER_FLAGS ?= debug $(DEBUG_ELFFILE)
 DEBUGSERVER_FLAGS ?= debug-server
+DEBUGCLIENT_FLAGS ?= debug-client $(DEBUG_ELFFILE)
 RESET_FLAGS ?= reset
 
 ifneq (,$(OPENOCD_DEBUG_ADAPTER))
@@ -44,7 +46,7 @@ ifneq (,$(OPENOCD_CMD_RESET_HALT))
   $(call target-export-variables,flash-only,OPENOCD_CMD_RESET_HALT)
 endif
 
-OPENOCD_DEBUG_TARGETS = debug debugr debug-server
+OPENOCD_DEBUG_TARGETS = debug debugr debug-server debug-client
 
 ifneq (,$(OPENOCD_DBG_EXTRA_CMD))
   # Export OPENOCD_DBG_EXTRA_CMD only to the flash/flash-only target

@@ -50,6 +50,11 @@
 #               TELNET_PORT:    port opened for telnet connections
 #               DBG:            debugger client command, default: 'gdb -q'
 #               TUI:            if TUI!=null, the -tui option will be used
+# debug-client: debug-client <elffile>
+#               connects to a running debug-server
+#               GDB_PORT:       port opened for GDB connections
+#               DBG:            debugger client command, default: 'gdb -q'
+#               TUI:            if TUI!=null, the -tui option will be used
 #
 # debugr:       debug <elfile>
 #               debug given file on the target but flash it first directly
@@ -344,6 +349,21 @@ do_flash() {
     echo 'Done flashing'
 }
 
+do_debugclient() {
+    ELFFILE=$1
+    test_elffile
+    # Export to be able to access these from the sh -c command lines, may be
+    # useful when using a frontend for GDB
+    export ELFFILE
+    export GDB
+    export GDB_PORT
+    export DBG_FLAGS
+    export DBG_DEFAULT_FLAGS
+    export DBG_EXTRA_FLAGS
+    # Start the debugger and connect to the GDB server
+    sh -c "${DBG} ${DBG_FLAGS} ${ELFFILE}"
+}
+
 do_debug() {
     ELFFILE=$1
     test_config
@@ -375,16 +395,7 @@ do_debug() {
             ${OPENOCD_DBG_START_CMD} \
             -l /dev/null & \
             echo \$! > $OCD_PIDFILE" &
-    # Export to be able to access these from the sh -c command lines, may be
-    # useful when using a frontend for GDB
-    export ELFFILE
-    export GDB
-    export GDB_PORT
-    export DBG_FLAGS
-    export DBG_DEFAULT_FLAGS
-    export DBG_EXTRA_FLAGS
-    # Start the debugger and connect to the GDB server
-    sh -c "${DBG} ${DBG_FLAGS} ${ELFFILE}"
+    do_debugclient ${ELFFILE}
 }
 
 do_debugserver() {
@@ -484,6 +495,10 @@ case "${ACTION}" in
   debug)
     echo "### Starting Debugging ###"
     do_debug "$@"
+    ;;
+  debug-client)
+    echo "### Attaching to GDB Server ###"
+    do_debugclient "$@"
     ;;
   debug-server)
     echo "### Starting GDB Server ###"
