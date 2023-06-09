@@ -209,3 +209,19 @@ int ztimer_rmutex_lock_timeout(ztimer_clock_t *clock, rmutex_t *rmutex,
     }
     return -ECANCELED;
 }
+
+void ztimer_sleep_scale_up(ztimer_clock_t *clock, uint32_t time, uint32_t scale)
+{
+    const uint32_t max_sleep = UINT32_MAX / scale;
+
+    /* acquiring the clock while sleeping multiple times can increase accuracy
+     * a bit and avoids needless power-down/power-up cycles */
+    ztimer_acquire(clock);
+    while (time > max_sleep) {
+        ztimer_sleep(clock, max_sleep * scale);
+        time -= max_sleep;
+    }
+
+    ztimer_sleep(clock, time * scale);
+    ztimer_release(clock);
+}
