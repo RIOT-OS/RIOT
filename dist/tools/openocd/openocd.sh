@@ -20,6 +20,7 @@
 #                      `OPENOCD="~/openocd/src/openocd -s ~/openocd/tcl"`.
 # OPENOCD_CONFIG:      OpenOCD configuration file name,
 #                      default: "${BOARDSDIR}/${BOARD}/dist/openocd.cfg"
+# OPENOCD_SERVER_ADDRESS: OpenOCD server bind address, default: "localhost"
 #
 # The script supports the following actions:
 #
@@ -97,6 +98,8 @@
 : ${OPENOCD_ADAPTER_INIT:=}
 # If set to 1 'reset_config' will use 'connect_assert_srst' before 'flash' or 'reset.
 : ${OPENOCD_RESET_USE_CONNECT_ASSERT_SRST:=}
+# Default bind address for OpenOCD
+: ${OPENOCD_SERVER_ADDRESS:=localhost}
 # The setsid command is needed so that Ctrl+C in GDB doesn't kill OpenOCD
 : ${SETSID:=setsid}
 # GDB command, usually a separate command for each platform (e.g. arm-none-eabi-gdb)
@@ -104,7 +107,7 @@
 # Debugger client command, can be used to wrap GDB in a front-end
 : ${DBG:=${GDB}}
 # Default debugger flags,
-: ${DBG_DEFAULT_FLAGS:=-q -ex \"tar ext :$(( GDB_PORT + GDB_PORT_CORE_OFFSET ))\"}
+: ${DBG_DEFAULT_FLAGS:=-q -ex \"tar ext ${OPENOCD_SERVER_ADDRESS}:$(( GDB_PORT + GDB_PORT_CORE_OFFSET ))\"}
 # Extra debugger flags, added by the user
 : ${DBG_EXTRA_FLAGS:=}
 # Debugger flags, will be passed to sh -c, remember to escape any quotation signs.
@@ -137,7 +140,7 @@
 
 # default terminal frontend
 _OPENOCD_TERMPROG=${RIOTTOOLS}/pyterm/pyterm
-_OPENOCD_TERMFLAGS="-ts ${RTT_PORT} ${PYTERMFLAGS}"
+_OPENOCD_TERMFLAGS="-ts ${OPENOCD_SERVER_ADDRESS}:${RTT_PORT} ${PYTERMFLAGS}"
 
 #
 # Examples of alternative debugger configurations
@@ -371,6 +374,7 @@ do_debug() {
             ${OPENOCD_ADAPTER_INIT} \
             -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_INIT} \
+            -c 'bindto ${OPENOCD_SERVER_ADDRESS}' \
             -c 'tcl_port ${TCL_PORT}' \
             -c 'telnet_port ${TELNET_PORT}' \
             -c 'gdb_port ${GDB_PORT}' \
@@ -399,6 +403,7 @@ do_debugserver() {
             ${OPENOCD_ADAPTER_INIT} \
             -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_INIT} \
+            -c 'bindto ${OPENOCD_SERVER_ADDRESS}' \
             -c 'tcl_port ${TCL_PORT}' \
             -c 'telnet_port ${TELNET_PORT}' \
             -c 'gdb_port ${GDB_PORT}' \
@@ -448,6 +453,7 @@ do_term() {
             ${OPENOCD_ADAPTER_INIT} \
             -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_INIT} \
+            -c 'bindto ${OPENOCD_SERVER_ADDRESS}' \
             -c 'tcl_port 0' \
             -c 'telnet_port 0' \
             -c 'gdb_port 0' \
