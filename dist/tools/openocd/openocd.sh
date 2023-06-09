@@ -73,6 +73,9 @@
 #
 # term-rtt:     opens a serial terminal using RTT (Real-Time Transfer)
 #
+#               <options>
+#               RTT_PORT:       port opened for RTT connection
+#
 # @author       Hauke Peteresen <hauke.petersen@fu-berlin.de>
 # @author       Joakim Nohlgård <joakim.nohlgard@eistec.se>
 
@@ -84,6 +87,8 @@
 : ${TELNET_PORT:=4444}
 # Default TCL port, set to 0 to disable
 : ${TCL_PORT:=6333}
+# Default RTT port
+: ${RTT_PORT:=9999}
 # Default OpenOCD command
 : ${OPENOCD:=openocd}
 # Extra board initialization commands to pass to OpenOCD
@@ -132,7 +137,7 @@
 
 # default terminal frontend
 _OPENOCD_TERMPROG=${RIOTTOOLS}/pyterm/pyterm
-_OPENOCD_TERMFLAGS="-ts 9999 ${PYTERMFLAGS}"
+_OPENOCD_TERMFLAGS="-ts ${RTT_PORT} ${PYTERMFLAGS}"
 
 #
 # Examples of alternative debugger configurations
@@ -449,7 +454,7 @@ do_term() {
             -c init \
             -c 'rtt setup '${RAM_START_ADDR}' '${RAM_LEN}' \"SEGGER RTT\"' \
             -c 'rtt start' \
-            -c 'rtt server start 9999 0' \
+            -c 'rtt server start '${RTT_PORT}' 0' \
             >/dev/null & \
             echo  \$! > $OPENOCD_PIDFILE" &
     sleep 1
