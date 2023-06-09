@@ -65,6 +65,8 @@
 : ${IMAGE_OFFSET:=0}
 # Allow overwriting the reset commands.
 : ${JLINK_RESET_FILE:=${RIOTTOOLS}/jlink/reset.seg}
+# The setsid command is needed so that Ctrl+C in GDB doesn't kill OpenOCD
+: ${SETSID:=setsid}
 
 # default GDB port
 _GDB_PORT=3333
@@ -239,7 +241,7 @@ do_debug() {
     test_tui
     test_dbg
     # start the J-Link GDB server
-    sh -c "${JLINK_SERVER} ${JLINK_SERIAL_SERVER} \
+    ${SETSID} sh -c "${JLINK_SERVER} ${JLINK_SERIAL_SERVER} \
                            -nogui \
                            -silent \
                            -device '${JLINK_DEVICE}' \
