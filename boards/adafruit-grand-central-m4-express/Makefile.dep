@@ -1,0 +1,19 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+endif
+
+# default to using fatfs on SD card
+ifneq (,$(filter vfs_default,$(USEMODULE)))
+  USEPKG += littlefs2
+  USEMODULE += fatfs_vfs
+  USEMODULE += mtd
+endif
+
+ifneq (,$(filter mtd,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_spi_on_qspi
+  USEMODULE += mtd_spi_nor
+  USEMODULE += mtd_sdcard_default
+endif
+
+# setup the samd21 arduino bootloader related dependencies
+include $(RIOTBOARD)/common/samdx1-arduino-bootloader/Makefile.dep
