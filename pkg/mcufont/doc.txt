@@ -1,0 +1,22 @@
+/**
+ * @defgroup pkg_mcufont   MCUFont
+ * @ingroup  pkg
+ * @brief    MCUFont is a font compression, decompression and rendering library
+ *           for use with microcontroller systems.
+ *
+ * # Introduction
+ *
+ * MCUFont is a stand-alone font compression, decompression and rendering
+ * library for use with microcontroller systems. On microcontrollers only
+ * decompression and rendering is supported, the compression part is written in
+ * C++ and is not supposed to be run on constrained devices.
+ *
+ * MCUFont supports high quality rendering of supplied fonts with kerning and
+ * anti-aliasing support. It does not support font scaling.
+ *
+ * # License
+ *
+ * Licensed under MIT.
+ *
+ * @see      https://github.com/mcufont/mcufont
+ */
