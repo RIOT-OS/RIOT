@@ -96,6 +96,7 @@ endif
 
 ifneq (,$(filter stdio_udp,$(USEMODULE)))
   USEMODULE += sock_udp
+  USEMODULE += sock_async
 endif
 
 # enable stdout buffering for modules that benefit from sending out buffers in larger chunks
