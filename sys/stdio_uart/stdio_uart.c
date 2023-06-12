@@ -31,51 +31,33 @@
 #include <string.h>
 
 #include "board.h"
-#include "isrpipe.h"
 #include "kernel_defines.h"
 #include "periph/uart.h"
+#include "stdio_base.h"
 #include "stdio_uart.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
-
-static uint8_t _rx_buf_mem[STDIO_UART_RX_BUFSIZE];
-isrpipe_t stdio_uart_isrpipe = ISRPIPE_INIT(_rx_buf_mem);
 
 static void _isrpipe_write_one_wrapper(void *arg, uint8_t value)
 {
     isrpipe_write_one(arg, value);
 }
 
-void stdio_init(void)
+static void _init(void)
 {
     uart_rx_cb_t cb = NULL;
     void *arg = NULL;
 
     if (IS_USED(MODULE_STDIO_UART_RX)) {
         cb = _isrpipe_write_one_wrapper;
-        arg = &stdio_uart_isrpipe;
+        arg = &stdin_isrpipe;
     }
 
     uart_init(STDIO_UART_DEV, STDIO_UART_BAUDRATE, cb, arg);
 }
 
-#if IS_USED(MODULE_STDIO_AVAILABLE)
-int stdio_available(void)
-{
-    return tsrb_avail(&stdio_uart_isrpipe.tsrb);
-}
-#endif
-
-ssize_t stdio_read(void* buffer, size_t count)
-{
-    if (IS_USED(MODULE_STDIO_UART_RX)) {
-        return (ssize_t)isrpipe_read(&stdio_uart_isrpipe, buffer, count);
-    }
-    return -ENOTSUP;
-}
-
-ssize_t stdio_write(const void *buffer, size_t len)
+static ssize_t _write(const void *buffer, size_t len)
 {
     ssize_t result = len;
     if (IS_USED(MODULE_STDIO_UART_ONLCR)) {
@@ -101,3 +83,10 @@ ssize_t stdio_write(const void *buffer, size_t len)
     }
     return result;
 }
+
+static void _detach(void)
+{
+    uart_poweroff(STDIO_UART_DEV);
+}
+
+STDIO_PROVIDER(STDIO_UART, _init, _detach, _write)
