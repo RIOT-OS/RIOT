@@ -8,6 +8,9 @@
 
 #ifndef UNITTESTS_CONSTANTS_H
 #define UNITTESTS_CONSTANTS_H
+#include <limits.h>
+#include <stdint.h>
+
 #include "embUnit/embUnit.h"
 
 #ifdef __cplusplus
@@ -55,7 +58,7 @@ extern "C" {
 #define TEST_UINT64 (13500266397057512199LLU)
 #endif
 
-#if defined(CPU_CC430) || defined(CPU_MSP430FXYZ) || defined(CPU_ATMEGA2560)
+#if INT_MAX == INT16_MAX
 #define TEST_INT TEST_INT16
 #else
 #define TEST_INT TEST_INT32
