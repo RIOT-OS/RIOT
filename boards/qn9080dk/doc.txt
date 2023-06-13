@@ -77,15 +77,26 @@ Guide.
 
 The MMA8652 sensor has I2C address 0x1d.
 
-
 ### Flashing the Board
 
 The integrated programmer by default comes with an "LPC-LINK2" firmware that
 provides a CMSIS DAP compatible interface. The programmer can be flashed with
 a Segger J-Link firmware via DFU, see the [LPCSCrypt User Guide][LPCScrypt] for
-details. It seems that the J-Link firmware is indeed a bit more reliable, so
-if you run into issues during debugging and/or flashing, switching to the
-J-Link firmware is an option.
+details. It seems that the "LPC-LINK2" firmware the board is shipped with is
+unreliable. Updating that as also described in the
+[LPCSCrypt User Guide][LPCScrypt] or  switching to the J-Link firmware is
+recommended.
+
+@warning    The update software is quite flaky. Do not connect other USB
+            device providing a serial (e.g. CDC ACM) to not confuse it. You may
+            need to adapt the shell script to grep for the correct vid/pid pair
+            using hex values prefixed with `0x` when using a `dfu-util` in a
+            more recent version than the script expects.
+
+@note       The Windows version of the software is at least equally frustrating.
+            So you may was well use the Linux variant and fix the
+            shell script as needed rather than spinning up a Windows VM in the
+            hope to safe pain in the ass.
 
 [LPCScrypt]: https://web.archive.org/web/20220225151231/https://www.nxp.com/docs/en/user-guide/LPCScrypt_User_Guide.pdf
 
@@ -97,8 +108,10 @@ In the application directory, run:
 make BOARD=qn9080dk flash
 ```
 
-OpenOCD support for the QN908x flash is experimental and available as pending
-[patch](https://review.openocd.org/c/openocd/+/5584).
+OpenOCD support for the QN908x flash is as of June 2023 not yet part of any
+release, but has been merged upstream. It is expected to be included first in
+the 0.13 release of OpenOCD. Until then, compiling a version from the current
+git source is the needed.
 
 #### Using the Internal Programmer with J-Link Firmware
 
