@@ -368,6 +368,7 @@ PSEUDOMODULES += newlib_nano
 PSEUDOMODULES += nice
 ## @}
 PSEUDOMODULES += nrf24l01p_ng_diagnostics
+PSEUDOMODULES += opendsme
 PSEUDOMODULES += openthread
 PSEUDOMODULES += picolibc
 PSEUDOMODULES += picolibc_stdout_buffered
@@ -468,6 +469,7 @@ PSEUDOMODULES += shell_cmd_netstats_neighbor
 PSEUDOMODULES += shell_cmd_nice
 PSEUDOMODULES += shell_cmd_nimble_netif
 PSEUDOMODULES += shell_cmd_nimble_statconn
+PSEUDOMODULES += shell_cmd_opendsme
 PSEUDOMODULES += shell_cmd_openwsn
 PSEUDOMODULES += shell_cmd_pm
 PSEUDOMODULES += shell_cmd_ps

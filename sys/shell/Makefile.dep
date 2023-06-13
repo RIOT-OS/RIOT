@@ -99,6 +99,9 @@ ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
   ifneq (,$(filter nimble_statconn,$(USEMODULE)))
     USEMODULE += shell_cmd_nimble_statconn
   endif
+  ifneq (,$(filter opendsme,$(USEPKG)))
+    USEMODULE += shell_cmd_opendsme
+  endif
   ifneq (,$(filter openwsn,$(USEPKG)))
     USEMODULE += shell_cmd_openwsn
   endif
