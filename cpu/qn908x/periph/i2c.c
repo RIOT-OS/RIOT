@@ -32,6 +32,7 @@
 #include "periph/i2c.h"
 
 #include "vendor/drivers/fsl_clock.h"
+#include "vendor/drivers/fsl_iocon.h"
 
 #include "gpio_mux.h"
 #include "flexcomm.h"
@@ -40,6 +41,22 @@
 #include "debug.h"
 
 static mutex_t locks[I2C_NUMOF];
+
+/**
+ * @name Definitions for MSTSTATE bits in I2C Status register STAT
+ * @{
+ */
+/* Controller Idle State Code */
+#define I2C_STAT_MSTSTATE_IDLE      (0)
+/* Controller Receive Ready State Code */
+#define I2C_STAT_MSTSTATE_RXREADY   (1)
+/* Controller Transmit Ready State Code */
+#define I2C_STAT_MSTSTATE_TXREADY   (2)
+/* Controller NACK by peripheral on address State Code */
+#define I2C_STAT_MSTSTATE_NACKADR   (3)
+/* Controller NACK by peripheral on data State Code */
+#define I2C_STAT_MSTSTATE_NACKDAT   (4)
+/** @} */
 
 /**
  * @brief Limit value I2C CLKDIV register.
@@ -99,14 +116,39 @@ static void _i2c_init_pins(i2c_t dev)
      */
     static const uint32_t func5_mask =
         (1 << 2) | (1 << 3) | (1 << 4) | (1 << 5) | (1 << 20) | (1 << 21);
-    /* TODO: Have a way to configure IOCON_MODE_PULLUP and IOCON_DRIVE_HIGH
-     * from the board. */
-    gpio_init_mux(conf->pin_sda,
-                  ((1u << GPIO_T_PIN(conf->pin_sda)) & func5_mask) ? 5 : 4);
-    gpio_init_mux(conf->pin_scl,
-                  ((1u << GPIO_T_PIN(conf->pin_scl)) & func5_mask) ? 5 : 4);
+
+    uint32_t sda_mode = IOCON_FUNC4;
+    if ((1u << GPIO_T_PIN(conf->pin_sda)) & func5_mask) {
+        sda_mode = IOCON_FUNC5;
+    }
+
+    uint32_t scl_mode = IOCON_FUNC4;
+    if ((1u << GPIO_T_PIN(conf->pin_scl)) & func5_mask) {
+        sda_mode = IOCON_FUNC5;
+    }
+
+    /* Using the internal pull up will make sure the I2C bus is also working
+     * when no external pull up is present. It can waste power by when both
+     * external and internal pull up are present. If a real world example
+     * shows up where disabling the internal pull up is helpful, we can extend
+     * i2c_conf_t to make it configurable */
+    scl_mode |= IOCON_MODE_PULLUP;
+
+    gpio_init_mux(conf->pin_sda, sda_mode);
+    gpio_init_mux(conf->pin_scl, scl_mode);
 
     mutex_unlock(&locks[dev]);
+}
+
+static void _enable(I2C_Type *const i2c_dev)
+{
+    i2c_dev->CFG = I2C_CFG_MSTEN_MASK;
+    while ((i2c_dev->STAT & I2C_STAT_MSTPENDING_MASK) == 0) {
+        /* I2C peripheral not yet available, spin more ... */
+    }
+
+    /* I2C peripheral is online, check state is indeed idle  */
+    assert((i2c_dev->STAT & I2C_STAT_MSTSTATE_MASK) == I2C_STAT_MSTSTATE_IDLE);
 }
 
 void i2c_init(i2c_t dev)
@@ -126,7 +168,7 @@ void i2c_init(i2c_t dev)
     }
 
     /* Enable controller mode, no timeout, no monitor, no clock stretching. */
-    i2c_dev->CFG = I2C_CFG_MSTEN_MASK;
+    _enable(i2c_dev);
     _i2c_controller_set_speed(i2c_dev, conf->speed);
     locks[dev] = (mutex_t)MUTEX_INIT_LOCKED;
 
@@ -192,18 +234,6 @@ static uint32_t _i2c_stop(I2C_Type *i2c_dev)
     return status;
 }
 
-/* Definitions for MSTSTATE bits in I2C Status register STAT */
-
-/* Controller Idle State Code */
-#define I2C_STAT_MSTSTATE_IDLE (0)
-/* Controller Receive Ready State Code */
-#define I2C_STAT_MSTSTATE_RXREADY (1)
-/* Controller Transmit Ready State Code */
-#define I2C_STAT_MSTSTATE_TXREADY (2)
-/* Controller NACK by peripheral on address State Code */
-#define I2C_STAT_MSTSTATE_NACKADR (3)
-/* Controller NACK by peripheral on data State Code */
-#define I2C_STAT_MSTSTATE_NACKDAT (4)
 
 static int _i2c_transfer_blocking(i2c_t dev, uint32_t addr_dir, uint8_t *data,
                                   size_t len, uint8_t flags)
