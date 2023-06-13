@@ -110,6 +110,8 @@ export HEXFILE               # The 'intel hex' stripped result of the compilatio
 # DEBUGGER_FLAGS             # The parameters to supply to DEBUGGER.
 # DEBUGSERVER                # The command to call on "make debug-server", usually a script starting the GDB server.
 # DEBUGSERVER_FLAGS          # The parameters to supply to DEBUGSERVER.
+# DEBUGCLIENT                # The command to call on "make debug-client", usually a script starting the GDB client.
+# DEBUGCLIENT_FLAGS          # The parameters to supply to DEBUGCLIENT.
 # DEVELHELP                  # Set to 1 to spend ROM, RAM and CPU time for help during development (e.g. enable asserts())
 # RESET                      # The command to call on "make reset", this command resets/reboots the target.
 # RESET_FLAGS                # The parameters to supply to RESET.
