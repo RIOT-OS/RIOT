@@ -14,7 +14,11 @@ affect more than one module.
 
 ## MSP430
 
+- Marian Buschsieweke (@maribu)
+
 ## ARM7
+
+- Marian Buschsieweke (@maribu)
 
 ## ARM Cortex-M
 
@@ -24,6 +28,8 @@ affect more than one module.
  - Dylan Laduranty (@dylad)
 
 ## Atmel AVR (Atmega)
+
+- Marian Buschsieweke (@maribu)
 
 ## Native
 
@@ -70,9 +76,13 @@ affect more than one module.
 
 ### CC110X
 
+- Marian Buschsieweke (@maribu)
+
 ### ESP-NOW
 
 ## Peripherals
+
+- Marian Buschsieweke (@maribu)
 
 ## Other drivers
 
@@ -108,6 +118,8 @@ affect more than one module.
   - Kaspar Schleiser (@kaspar030)
 
 ## C++ support
+
+- Marian Buschsieweke (@maribu)
 
 ## Crypto
 
