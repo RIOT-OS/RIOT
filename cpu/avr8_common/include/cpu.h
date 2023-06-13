@@ -3,6 +3,7 @@
  *               2014 Freie Universität Berlin, Hinnerk van Bruinehsen
  *               2018 RWTH Aachen, Josua Arndt <jarndt@ias.rwth-aachen.de>
  *               2021 Gerson Fernando Budke <nandojve@gmail.com>
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -26,6 +27,7 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  * @author      Gerson Fernando Budke <nandojve@gmail.com>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  */
 
@@ -38,7 +40,9 @@
 #include <avr/interrupt.h>
 #include "architecture.h"
 #include "cpu_conf.h"
+#if !defined (CPU_ATMEGA8)
 #include "cpu_clock.h"
+#endif
 #include "sched.h"
 #include "thread.h"
 

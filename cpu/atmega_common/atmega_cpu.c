@@ -3,6 +3,7 @@
  *               2017 RWTH Aachen, Josua Arndt
  *               2018 Matthew Blue
  *               2021 Gerson Fernando Budke
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -22,6 +23,7 @@
  * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
  * @author      Francisco Acosta <francisco.acosta@inria.fr>
  * @author      Gerson Fernando Budke <nandojve@gmail.com>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -58,17 +60,19 @@ void avr8_reset_cause(void)
             DEBUG("Watchdog reset!\n");
         }
     }
-#if !defined (CPU_ATMEGA328P)
+#if !defined (CPU_ATMEGA328P) && !defined (CPU_ATMEGA8)
     if (mcusr_mirror & (1 << JTRF)) {
         DEBUG("JTAG reset!\n");
     }
 #endif
 }
 
+#if !defined (CPU_ATMEGA8)
 void __attribute__((weak)) avr8_clk_init(void)
 {
     atmega_set_prescaler(CPU_ATMEGA_CLK_SCALE_INIT);
 }
+#endif
 
 /* This is a vector which is aliased to __vector_default,
  * the vector executed when an ISR fires with no accompanying

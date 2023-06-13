@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2015 HAW Hamburg
  *               2016 INRIA
-
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -22,6 +22,7 @@
  * @author      Robert Hartung <hartung@ibr.cs.tu-bs.de>
  * @author      Torben Petersen <petersen@ibr.cs.tu-bs.de>
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -313,20 +314,30 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     cli();
 
     /* enable interrupt number int_num */
+#ifndef CPU_ATMEGA8
     EIFR |= (1 << int_num);
     EIMSK |= (1 << int_num);
+#else /* atmega8 */
+    GIFR |= (1 << (INTF0 + int_num));
+    GICR |= (1 << (INT0 + int_num));
+#endif
 
     /* apply flank to interrupt number int_num */
-    #if defined(EICRB)
+#if defined(EICRB)
     if (int_num >= 4) {
         EICRB &= ~(0x3 << ((int_num % 4) * 2));
         EICRB |= (flank << ((int_num % 4) * 2));
     }
     else
-    #endif
+#endif
     {
+#ifndef CPU_ATMEGA8
         EICRA &= ~(0x3 << (int_num * 2));
         EICRA |= (flank << (int_num * 2));
+#else /* atmega8 */
+        MCUCR &= ~(0x3 << (int_num * 2));
+        MCUCR |= (flank << (int_num * 2));
+#endif
     }
 
     /* set callback */
@@ -341,13 +352,22 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 
 void gpio_irq_enable(gpio_t pin)
 {
+#ifndef CPU_ATMEGA8
     EIFR |= (1 << _int_num(pin));
     EIMSK |= (1 << _int_num(pin));
+#else /* atmega8 */
+    GIFR |= (1 << (INTF0 + _int_num(pin)));
+    GICR |= (1 << (INTF0 + _int_num(pin)));
+#endif
 }
 
 void gpio_irq_disable(gpio_t pin)
 {
+#ifndef CPU_ATMEGA8
     EIMSK &= ~(1 << _int_num(pin));
+#else /* atmega8 */
+    GICR &= ~(1 << (INTF0 + _int_num(pin)));
+#endif
 }
 
 static inline void irq_handler(uint8_t int_num)

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 Hamburg University of Applied Sciences, Dimitri Nahm
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,6 +19,7 @@
  *
  * @author      Dimitri Nahm <dimitri.nahm@haw-hamburg.de>
  * @author      Laurent Navet <laurent.navet@gmail.com>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -47,7 +49,9 @@
 static int _start(uint8_t address, uint8_t rw_flag);
 static int _write(const uint8_t *data, int length);
 static void _stop(void);
+#ifndef CPU_ATMEGA8
 static void i2c_poweron(i2c_t dev);
+#endif
 
 static mutex_t locks[I2C_NUMOF];
 
@@ -119,8 +123,10 @@ void i2c_init(i2c_t dev)
     /* set pull-up on SCL and SDA */
     I2C_PORT_REG |= (I2C_PIN_MASK);
 
+#ifndef CPU_ATMEGA8
     /* enable I2C clock */
     i2c_poweron(dev);
+#endif
 
     /* disable device */
     TWCR &= ~(1 << TWEN);
@@ -234,12 +240,14 @@ void i2c_release(i2c_t dev)
     mutex_unlock(&locks[dev]);
 }
 
+#ifndef CPU_ATMEGA8
 static void i2c_poweron(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
     (void) dev;
     power_twi_enable();
 }
+#endif
 
 static int _start(uint8_t address, uint8_t rw_flag)
 {

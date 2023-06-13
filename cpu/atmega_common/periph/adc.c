@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2016 Laurent Navet <laurent.navet@gmail.com>
  *               2017 HAW Hamburg, Dimitri Nahm
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -17,6 +18,7 @@
  * @author      Laurent Navet <laurent.navet@gmail.com>
  * @author      Dimitri Nahm <dimitri.nahm@haw-hamburg.de>
  * @author      Sebastian Meiling <s@mlng.net>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  * @}
  */
 
@@ -52,6 +54,7 @@ int adc_init(adc_t line)
 
     _prep();
 
+#if !defined(CPU_ATMEGA8)
     /* Disable corresponding Digital input */
     if (line < 8) {
         DIDR0 |= (1 << line);
@@ -61,9 +64,10 @@ int adc_init(adc_t line)
         DIDR2 |= (1 << (line - 8));
     }
 #endif
+#endif /* !CPU_ATMEGA8 */
 
     /* Set ADC-pin as input */
-#if defined(CPU_ATMEGA328P)
+#if defined(CPU_ATMEGA328P) || defined(CPU_ATMEGA8)
     DDRC &= ~(1 << line);
     PORTC &= ~(1 << line);
 #elif defined(CPU_ATMEGA1284P)
@@ -110,7 +114,8 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     _prep();
 
     /* set conversion channel */
-#if defined(CPU_ATMEGA328P) || defined(CPU_ATMEGA1281) || defined(CPU_ATMEGA1284P) || defined(CPU_ATMEGA32U4)
+#if defined(CPU_ATMEGA328P) || defined(CPU_ATMEGA1281) || \
+    defined(CPU_ATMEGA1284P) || defined(CPU_ATMEGA32U4) || defined(CPU_ATMEGA8)
     ADMUX &= 0xf0;
     ADMUX |= line;
 #elif defined(CPU_ATMEGA2560) || defined(CPU_ATMEGA128RFA1) || defined(CPU_ATMEGA256RFR2)

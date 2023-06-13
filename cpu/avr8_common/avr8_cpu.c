@@ -3,6 +3,7 @@
  *               2017 RWTH Aachen, Josua Arndt
  *               2018 Matthew Blue
  *               2021 Gerson Fernando Budke
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -22,6 +23,7 @@
  * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
  * @author      Francisco Acosta <francisco.acosta@inria.fr>
  * @author      Gerson Fernando Budke <nandojve@gmail.com>
+ * @author      Hugues Larrive <hugues.larrive@gmail.com>
  *
  * @}
  */
@@ -31,7 +33,9 @@
 #include <avr/pgmspace.h>
 
 #include "cpu.h"
+#if !defined (CPU_ATMEGA8)
 #include "cpu_clock.h"
+#endif
 #include "board.h"
 #include "irq.h"
 #include "periph/init.h"
@@ -99,7 +103,9 @@ void cpu_init(void)
     wdt_reset();   /* should not be nececessary as done in bootloader */
     wdt_disable(); /* but when used without bootloader this is needed */
 
+#ifndef CPU_ATMEGA8
     avr8_clk_init();
+#endif
 
     /* Initialize stdio before periph_init() to allow use of DEBUG() there */
 #ifdef MODULE_AVR_LIBC_EXTRA

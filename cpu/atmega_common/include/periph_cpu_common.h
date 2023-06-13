@@ -2,6 +2,7 @@
  * Copyright (C) 2015 HAW Hamburg
  *               2016 Freie Universität Berlin
  *               2016 INRIA
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,6 +19,7 @@
  * @author          René Herthel <rene-herthel@outlook.de>
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Francisco Acosta <francisco.acosta@inria.fr>
+ * @author          Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef PERIPH_CPU_COMMON_H
@@ -61,7 +63,11 @@ typedef uint8_t gpio_t;
  *
  * Must be identical to the address of `PINA` provided by avr/io.h
  */
+#ifdef CPU_ATMEGA8
+#define ATMEGA_GPIO_BASE_A      (0x39)
+#else
 #define ATMEGA_GPIO_BASE_A      (0x20)
+#endif
 /**
  * @brief   Base of the GPIO port G register as memory address
  *
@@ -137,7 +143,11 @@ typedef struct {
 static inline atmega_gpio_port_t *atmega_gpio_port(uint8_t port_num)
 {
     static const uintptr_t base_addr = (uintptr_t)ATMEGA_GPIO_BASE_A;
+#ifdef CPU_ATMEGA8
+    uintptr_t res = base_addr - port_num * sizeof(atmega_gpio_port_t);
+#else
     uintptr_t res = base_addr + port_num * sizeof(atmega_gpio_port_t);
+#endif
     /* GPIO ports up to (including) G are mapped in the I/O address space,
      * port H and higher (if present) are mapped in a different contiguous
      * region afterwards (e.g. 0x100 for ATmega2560). */
