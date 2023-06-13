@@ -341,7 +341,7 @@ static int cmd_test_last(int argc, char **argv)
             fill = 'a';
         }
     }
-#if defined(CPU_CC430) || defined(CPU_MSP430FXYZ)
+#ifdef __MSP430__
     printf("The last page holds the ISR vector, so test page %u\n", last_free);
 #endif
     if (flashpage_write_and_verify(last_free, page_mem) != FLASHPAGE_OK) {
@@ -427,7 +427,7 @@ static int cmd_test_last_raw(int argc, char **argv)
 
     /* try to align */
     memcpy(raw_buf, "test12344321tset", 16);
-#if defined(CPU_CC430) || defined(CPU_MSP430FXYZ)
+#ifdef __MSP430__
     printf("The last page holds the ISR vector, so test page %u\n", last_free);
 #endif
 
