@@ -27,12 +27,12 @@
 extern "C" {
 #endif
 
-#define CLOCK_CORECLOCK     msp430_fxyz_dco_freq
+#define CLOCK_CORECLOCK     msp430_dco_freq
 
 /**
  * @brief   Clock configuration
  */
-static const msp430_fxyz_clock_params_t clock_params = {
+static const msp430_clock_params_t clock_params = {
     .target_dco_frequency = MHZ(16),
     .lfxt1_frequency = 32768,
     .main_clock_source = MAIN_CLOCK_SOURCE_DCOCLK,
@@ -59,7 +59,6 @@ static const msp430_fxyz_clock_params_t clock_params = {
  */
 #define UART_NUMOF          (1U)
 
-#define UART_USE_USCI
 #define UART_BASE           (USCI_0)
 #define UART_IE             (SFR->IE2)
 #define UART_IF             (SFR->IFG2)
@@ -80,7 +79,6 @@ static const msp430_fxyz_clock_params_t clock_params = {
 #define SPI_NUMOF           (1U)
 
 /* SPI configuration */
-#define SPI_USE_USCI
 #define SPI_BASE            (USCI_0_B_SPI)
 #define SPI_IE              (SFR->IE2)
 #define SPI_IF              (SFR->IFG2)

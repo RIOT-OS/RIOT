@@ -2,7 +2,7 @@
 TARGET_ARCH_MSP430 ?= msp430-elf
 TARGET_ARCH ?= $(TARGET_ARCH_MSP430)
 
-MSP430_SUPPORT_FILES ?= $(RIOTCPU)/msp430_common/vendor/msp430-gcc-support-files
+MSP430_SUPPORT_FILES ?= $(RIOTCPU)/msp430/vendor/msp430-gcc-support-files
 
 # define build specific options
 CFLAGS_CPU   = -mmcu=$(CPU_MODEL) -isystem $(MSP430_SUPPORT_FILES)/include
@@ -19,14 +19,14 @@ NEEDS_NEW_LINKER_SCRIPT := $(call version_is_greater_or_equal,$(BINUTILS_VERSION
 LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT)
 LINKFLAGS += -Wl,--gc-sections
 LINKFLAGS += -Wl,-L$(MSP430_SUPPORT_FILES)/include
-LINKFLAGS += -Wl,-L$(RIOTCPU)/msp430_common/ldscripts
+LINKFLAGS += -Wl,-L$(RIOTCPU)/msp430/ldscripts
 
 ifeq (1,$(NEEDS_NEW_LINKER_SCRIPT))
   LINKFLAGS += -T riot-$(CPU_MODEL).ld
 else
   LINKFLAGS += -T $(MSP430_SUPPORT_FILES)/include/$(CPU_MODEL).ld
-  LINKFLAGS += -T $(RIOTCPU)/msp430_common/ldscripts/msp430_common.ld
-  LINKFLAGS += $(RIOTCPU)/msp430_common/ldscripts/xfa.ld
+  LINKFLAGS += -T $(RIOTCPU)/msp430/ldscripts/msp430_common.ld
+  LINKFLAGS += $(RIOTCPU)/msp430/ldscripts/xfa.ld
 endif
 
 OPTIONAL_CFLAGS_BLACKLIST += -fdiagnostics-color

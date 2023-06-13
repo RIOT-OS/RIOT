@@ -32,7 +32,7 @@ extern "C" {
 /**
  * @brief   Clock configuration
  */
-static const msp430_fxyz_clock_params_t clock_params = {
+static const msp430_clock_params_t clock_params = {
     .xt2_frequency = CLOCK_CORECLOCK,
     .lfxt1_frequency = 32768,
     .main_clock_source = MAIN_CLOCK_SOURCE_XT2CLK,

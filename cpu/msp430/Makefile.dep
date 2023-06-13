@@ -1,0 +1,9 @@
+USEMODULE += newlib
+USEMODULE += periph
+
+ifneq (,$(filter newlib,$(USEMODULE)))
+  DEFAULT_MODULE += newlib_nano
+endif
+
+# Make calls to malloc and friends thread-safe
+USEMODULE += malloc_thread_safe
