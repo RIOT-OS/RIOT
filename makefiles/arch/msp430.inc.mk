@@ -26,6 +26,7 @@ ifeq (1,$(NEEDS_NEW_LINKER_SCRIPT))
 else
   LINKFLAGS += -T $(MSP430_SUPPORT_FILES)/include/$(CPU_MODEL).ld
   LINKFLAGS += -T $(RIOTCPU)/msp430/ldscripts/msp430_common.ld
+  LINKFLAGS += -T $(RIOTCPU)/msp430/ldscripts/$(CPU_FAM).ld
   LINKFLAGS += $(RIOTCPU)/msp430/ldscripts/xfa.ld
 endif
 

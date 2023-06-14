@@ -34,12 +34,17 @@ extern "C" {
 #define HAVE_SPI_MODE_T     /**< MSP430 F2xx/G2xx has a custom spi_mode_t */
 /**
  * @brief   Support SPI modes
+ *
+ * | Field  | Name                  |   Description                                         |
+ * |:------ |:--------------------- |:----------------------------------------------------- |
+ * | UCCKPH | Clock phase select    | 0 = capture on second edge, 1 = capture on first      |
+ * | UCCKPL | Clock polarity select | 0 = clock is idle-low, 1 = clock is high idle-high    |
  */
 typedef enum {
-    SPI_MODE_0 = (USCI_SPI_CTL0_CKPH),                      /**< CPOL=0, CPHA=0 */
-    SPI_MODE_1 = 0,                                         /**< CPOL=0, CPHA=1 */
-    SPI_MODE_2 = (USCI_SPI_CTL0_CKPL | USCI_SPI_CTL0_CKPH), /**< CPOL=1, CPHA=0 */
-    SPI_MODE_3 = (USCI_SPI_CTL0_CKPL)                       /**< CPOL=1, CPHA=1 */
+    SPI_MODE_0 = (UCCKPH),              /**< CPOL=0, CPHA=0 */
+    SPI_MODE_1 = 0,                     /**< CPOL=0, CPHA=1 */
+    SPI_MODE_2 = (UCCKPL | UCCKPH),     /**< CPOL=1, CPHA=0 */
+    SPI_MODE_3 = (UCCKPL)               /**< CPOL=1, CPHA=1 */
 } spi_mode_t;
 /** @} */
 

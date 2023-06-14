@@ -53,10 +53,13 @@ typedef uint16_t gpio_t;
 #define SPI_HWCS(x)         (SPI_CS_UNDEF)
 
 /**
- * @brief   Override flank selection values
+ * @name    Override flank selection values
  * @{
  */
-#define HAVE_GPIO_FLANK_T
+#define HAVE_GPIO_FLANK_T       /**< MSP430 has a custom gpio_flank_t */
+/**
+ * @brief   Enumeration of supported GPIO flanks
+ */
 typedef enum {
     GPIO_FALLING = 0xff,        /**< emit interrupt on falling flank */
     GPIO_RISING  = 0x00,        /**< emit interrupt on rising flank */

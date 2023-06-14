@@ -30,8 +30,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /**
- * @brief   USART (UART, SPI and I2C) registers
+ * @brief   USART (UART, SPI and I2C) Registers
  */
 typedef struct {
     REG8    CTL;        /**< USART control */
@@ -45,63 +46,63 @@ typedef struct {
 } msp_usart_t;
 
 /**
- * @name    USART control register bitmap
- * @{
+ * @brief   USART Special Function Registers (SFR)
+ *
+ * Despite being part of the USART peripheral, the SFR registers location is
+ * completely different. Even more confusing, the IE register of USART 1
+ * follows the IE register of USART 0. Hence, the SFR register map of the two
+ * USART peripherals will overlap (with the IE register of the second USART
+ * being located at the first padding of the first USART). The padding bytes
+ * are intentionally declared as `const` to aid in preventing accidentally
+ * overwriting registers of the other USART's SFR registers.
  */
-#define USART_CTL_SWRST             (0x01)
-#define USART_CTL_MM                (0x02)
-#define USART_CTL_SYNC              (0x04)
-#define USART_CTL_LISTEN            (0x08)
-#define USART_CTL_CHAR              (0x10)
-#define USART_CTL_SPB               (0x20)
-#define USART_CTL_PEV               (0x40)
-#define USART_CTL_PENA              (0x80)
-/** @} */
+typedef struct {
+    REG8    IE;         /**< USART Interrupt Enable Register */
+    const uint8_t _pad1;/**< Padding */
+    REG8    IFG;        /**< USART Interrupt Flag Register */
+    const uint8_t _pad2;/**< Padding */
+    REG8    ME;         /**< Module Enable Register */
+} msp_usart_sfr_t;
 
 /**
- * @name    USART transmit control register bitmap
+ * @name    USART clock selection
+ *
+ * The vendor header files expose clock configurations selection field as one
+ * bitmask per bit. This is pretty hard to read in the code, so we provide
+ * alias with better names.
+ *
  * @{
  */
-#define USART_TCTL_TXEPT            (0x01)
-#define USART_TCTL_STC              (0x02)
-#define USART_TCTL_TXWAKE           (0x04)
-#define USART_TCTL_URXSE            (0x08)
-#define USART_TCTL_SSEL_MASK        (0x30)
-#define USART_TCTL_SSEL_UCLKI       (0x00)
-#define USART_TCTL_SSEL_ACLK        (0x10)
-#define USART_TCTL_SSEL_SMCLK       (0x20)
-#define USART_TCTL_CKPL             (0x40)
-#define USART_TCTL_CKPH             (0x80)
-/** @} */
-
-/**
- * @name    USART receive control register bitmap
- * @{
- */
-#define USART_RCTL_RXERR            (0x01)
-#define USART_RCTL_RXWAKE           (0x02)
-#define USART_RCTL_URXWIE           (0x04)
-#define USART_RCTL_URXEIE           (0x08)
-#define USART_RCTL_BRK              (0x10)
-#define USART_RCTL_OE               (0x20)
-#define USART_RCTL_PE               (0x40)
-#define USART_RCTL_FE               (0x80)
-/** @} */
-
-/**
- * @name    Base register address definitions
- * @{
- */
-#define USART_0_BASE            ((uint16_t)0x0070)
-#define USART_1_BASE            ((uint16_t)0x0078)
+#define UXTCTL_SSEL_UCLKI   0               /**< Clock USART using UCLKI clock */
+#define UXTCTL_SSEL_ACLK    SSEL0           /**< Clock USART using auxiliary clock */
+#define UXTCTL_SSEL_SMCLK   SSEL1           /**< Clock USART using sub-system master clock */
+#define UXTCTL_SSEL_MASK    (SSEL0 | SSEL1) /**< Mask to retrieve SSEL field */
 /** @} */
 
 /**
  * @name    Typing of base register objects
  * @{
  */
-#define USART_0                 ((msp_usart_t *)USART_0_BASE)
-#define USART_1                 ((msp_usart_t *)USART_1_BASE)
+/**
+ * @brief   USART 0 SFR register map
+ */
+extern msp_usart_sfr_t USART_0_SFR;
+/**
+ * @brief   USART 1 SFR register map
+ */
+extern msp_usart_sfr_t USART_1_SFR;
+/**
+ * @brief   USART 0 register map
+ *
+ * @details The address is provided by the linker script
+ */
+extern msp_usart_t USART_0;
+/**
+ * @brief   USART 1 register map
+ *
+ * @details The address is provided by the linker script
+ */
+extern msp_usart_t USART_1;
 /** @} */
 
 #ifdef __cplusplus

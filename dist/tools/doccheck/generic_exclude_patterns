@@ -43,9 +43,6 @@ warning: Member LED[0-9]_PIN_NUM \(macro definition\) of
 warning: Member LED[0-9]_PORT \(macro definition\) of
 warning: Member LED[0-9]_PORT_NUM \(macro definition\) of
 warning: Member LED[0-9]_TOGGLE \(macro definition\) of
-warning: Member MSP430_HAS_DCOR \(macro definition\) of
-warning: Member MSP430_HAS_EXTERNAL_CRYSTAL \(macro definition\) of
-warning: Member MSP430_INITIAL_CPU_SPEED \(macro definition\) of
 warning: Member PIR_PARAM_ACTIVE_HIGH \(macro definition\) of
 warning: Member PIR_PARAM_GPIO \(macro definition\) of
 warning: Member PIR_SAUL_INFO \(macro definition\) of

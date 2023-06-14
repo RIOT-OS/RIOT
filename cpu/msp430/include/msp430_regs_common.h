@@ -40,39 +40,74 @@ extern "C" {
 #define REG16               volatile uint16_t
 
 /**
- * @brief   Special function registers
+ * @name    Timer SSEL Values
+ *
+ * @details When using the macros in the vendor header files such as TASSEL_0
+ *          the actually used clock is non-obvious. Hence, provide aliases
+ *          with obvious names.
+ * @{
  */
-typedef struct {
-    REG8    IE1;        /**< interrupt enable 1 */
-    REG8    IE2;        /**< interrupt enable 2 */
-    REG8    IFG1;       /**< interrupt flag 1 */
-    REG8    IFG2;       /**< interrupt flag 2 */
-    REG8    ME1;        /**< module enable 1 */
-    REG8    ME2;        /**< module enable 2 */
-} msp_sfr_t;
+#define TXSSEL_TXCLK    TASSEL_0    /**< External TxCLK as clock source */
+#define TXSSEL_ACLK     TASSEL_1    /**< Auxiliary clock as clock source */
+#define TXSSEL_SMCLK    TASSEL_2    /**< Sub-system master clock as clock source */
+#define TXSSEL_INCLK    TASSEL_3    /**< External INCLK as clock source */
+/** @} */
 
 /**
- * @brief   Digital I/O Port w/o interrupt functionality (P3-P6)
+ * @name    Timer Input Divider Values
+ *
+ * @details The vendor header macros are again non-obvious in their naming, so
+ *          provide better alies names.
+ * @{
+ */
+#define TXID_DIV_1      ID_0        /**< Input Divider: Divide by 1 */
+#define TXID_DIV_2      ID_1        /**< Input Divider: Divide by 2 */
+#define TXID_DIV_4      ID_2        /**< Input Divider: Divide by 4 */
+#define TXID_DIV_8      ID_3        /**< Input Divider: Divide by 4 */
+/** @} */
+
+/**
+ * @name    Timer Mode Control Values
+ *
+ * @details The vendor header macros are again non-obvious in their naming, so
+ *          provide better alies names.
+ * @{
+ */
+#define TXMC_STOP       MC_0        /**< Stop Mode */
+#define TXMC_UP         MC_1        /**< Up to CCR0 Mode*/
+#define TXMC_CONT       MC_2        /**< Continuous Mode */
+#define TXMC_UP_DOWN    MC_3        /**< Up/Down Mode */
+#define TXMC_MASK       MC_3        /**< Bitmask to retrieve MC field */
+/** @} */
+
+/**
+ * @brief   Common MSP GPIO Port Registers
  */
 typedef struct {
     REG8    IN;         /**< input data */
     REG8    OD;         /**< output data */
     REG8    DIR;        /**< pin direction */
-    REG8    SEL;        /**< alternative function select */
 } msp_port_t;
 
 /**
- * @brief   Digital I/O Port with interrupt functionality (P1 & P2)
+ * @brief   GPIO Port 1/2 (with interrupt functionality)
  */
 typedef struct {
-    REG8    IN;         /**< input data */
-    REG8    OD;         /**< output data */
-    REG8    DIR;        /**< pin direction */
+    msp_port_t base;    /**< common GPIO port registers */
     REG8    IFG;        /**< interrupt flag */
     REG8    IES;        /**< interrupt edge select */
     REG8    IE;         /**< interrupt enable */
     REG8    SEL;        /**< alternative function select */
-} msp_port_isr_t;
+} msp_port_p1_p2_t;
+
+/**
+ * @brief   GPIO Port 3..6 (without interrupt functionality)
+ */
+typedef struct {
+    msp_port_t base;    /**< common GPIO port registers */
+    REG8    SEL;        /**< alternative function select */
+} msp_port_p3_p6_t;
+
 
 /**
  * @brief   Timer interrupt status registers
@@ -94,140 +129,51 @@ typedef struct {
 } msp_timer_t;
 
 /**
- * @name    SFR interrupt enable 1 register bitmap
+ * @name    MSP430 Common Peripheral Register Maps
+ *
+ * @details The addresses will be provided by the linker script using the
+ *          vendor files.
  * @{
  */
-#define SFR_IE1_OFIE                (0x02)
-#define SFR_IE1_URXIE0              (0x40)
-#define SFR_IE1_UTXIE0              (0x80)
-/** @} */
+/**
+ * @brief   Register map of GPIO PORT 1
+ */
+extern msp_port_p1_p2_t PORT_1;
+/**
+ * @brief   Register map of GPIO PORT 2
+ */
+extern msp_port_p1_p2_t PORT_2;
+/**
+ * @brief   Register map of GPIO PORT 3
+ */
+extern msp_port_p3_p6_t PORT_3;
+/**
+ * @brief   Register map of GPIO PORT 4
+ */
+extern msp_port_p3_p6_t PORT_4;
+/**
+ * @brief   Register map of GPIO PORT 5
+ */
+extern msp_port_p3_p6_t PORT_5;
+/**
+ * @brief   Register map of GPIO PORT 6
+ */
+extern msp_port_p3_p6_t PORT_6;
 
 /**
- * @name    SFR interrupt enable 2 register bitmap
- * @{
+ * @brief   Register map of the timer interrupt control registers
  */
-#define SFR_IE2_UCA0RXIE            (0x01)
-#define SFR_IE2_UCA0TXIE            (0x02)
-#define SFR_IE2_URXIE2              (0x10)
-#define SFR_IE2_UTXIE2              (0x20)
-/** @} */
+extern msp_timer_ivec_t TIMER_IVEC;
 
 /**
- * @name    SFR interrupt flag 1 register bitmap
- * @{
+ * @brief   Register map of the timer A control registers
  */
-#define SFR_IFG1_OFIFG              (0x02)
-#define SFR_IFG1_URXIFG0            (0x40)
-#define SFR_IFG1_UTXIFG0            (0x80)
-/** @} */
+extern msp_timer_t TIMER_A;
 
 /**
- * @name    SFR interrupt flag 2 register bitmap
- * @{
+ * @brief   Register map of the timer B control registers
  */
-#define SFR_IFG2_UCA0RXIFG          (0x01)
-#define SFR_IFG2_UCA0TXIFG          (0x02)
-#define SFR_IFG2_URXIFG1            (0x10)
-#define SFR_IFG2_UTXIFG1            (0x20)
-/** @} */
-
-/**
- * @name    SFR module enable register 1
- * @{
- */
-#define SFR_ME1_USPIE0              (0x40)
-/** @} */
-
-/**
- * @name    SFR module enable register 2
- * @{
- */
-#define SFR_ME2_USPIE1              (0x10)
-/** @} */
-
-/**
- * @name    Timer Control register bitmap
- * @{
- */
-#define TIMER_CTL_IFG                 (0x0001)
-#define TIMER_CTL_IE                  (0x0002)
-#define TIMER_CTL_CLR                 (0x0004)
-#define TIMER_CTL_MC_MASK             (0x0030)
-#define TIMER_CTL_MC_STOP             (0x0000)
-#define TIMER_CTL_MC_UP               (0x0010)
-#define TIMER_CTL_MC_CONT             (0x0020)
-#define TIMER_CTL_MC_UPDOWN           (0x0030)
-#define TIMER_CTL_ID_MASK             (0x00c0)
-#define TIMER_CTL_ID_DIV1             (0x0000)
-#define TIMER_CTL_ID_DIV2             (0x0040)
-#define TIMER_CTL_ID_DIV4             (0x0080)
-#define TIMER_CTL_ID_DIV8             (0x00c0)
-#define TIMER_CTL_TASSEL_MASK         (0x0300)
-#define TIMER_CTL_TASSEL_TCLK         (0x0000)
-#define TIMER_CTL_TASSEL_ACLK         (0x0100)
-#define TIMER_CTL_TASSEL_SMCLK        (0x0200)
-#define TIMER_CTL_TASSEL_INV_TCLK     (0x0300)
-/** @} */
-
-/**
- * @name    Timer Channel Control register bitmap
- * @{
- */
-#define TIMER_CCTL_CCIFG              (0x0001)
-#define TIMER_CCTL_COV                (0x0002)
-#define TIMER_CCTL_OUT                (0x0004)
-#define TIMER_CCTL_CCI                (0x0008)
-#define TIMER_CCTL_CCIE               (0x0010)
-#define TIMER_CCTL_OUTMOD_MASK        (0x00e0)
-#define TIMER_CCTL_OUTMOD_OUTVAL      (0x0000)
-#define TIMER_CCTL_OUTMOD_SET         (0x0020)
-#define TIMER_CCTL_OUTMOD_TOG_RESET   (0x0040)
-#define TIMER_CCTL_OUTMOD_SET_RESET   (0x0060)
-#define TIMER_CCTL_OUTMOD_TOGGLE      (0x0080)
-#define TIMER_CCTL_OUTMOD_RESET       (0x00a0)
-#define TIMER_CCTL_OUTMOD_TOG_SET     (0x00c0)
-#define TIMER_CCTL_OUTMOD_RESET_SET   (0x00e0)
-#define TIMER_CCTL_CAP                (0x0100)
-#define TIMER_CCTL_CLLD_MASK          (0x0600)
-#define TIMER_CCTL_SCS                (0x0800)
-#define TIMER_CCTL_CCIS_MASK          (0x3000)
-#define TIMER_CCTL_CM_MASK            (0xc000)
-/** @} */
-
-/**
- * @name    Base register address definitions
- * @{
- */
-#define SFR_BASE                ((uint16_t)0x0000)
-#define PORT_1_BASE             ((uint16_t)0x0020)
-#define PORT_2_BASE             ((uint16_t)0x0028)
-#define PORT_3_BASE             ((uint16_t)0x0018)
-#define PORT_4_BASE             ((uint16_t)0x001c)
-#define PORT_5_BASE             ((uint16_t)0x0030)
-#define PORT_6_BASE             ((uint16_t)0x0034)
-#define CLK_BASE                ((uint16_t)0x0053)
-#define TIMER_IVEC_BASE         ((uint16_t)0x011e)
-#define TIMER_A_BASE            ((uint16_t)0x0160)
-#define TIMER_B_BASE            ((uint16_t)0x0180)
-#define WD_BASE                 ((uint16_t)0x0120)
-/** @} */
-
-/**
- * @name    Typing of base register objects
- * @{
- */
-#define SFR                     ((msp_sfr_t *)SFR_BASE)
-#define PORT_1                  ((msp_port_t *)PORT_1_BASE)
-#define PORT_2                  ((msp_port_t *)PORT_2_BASE)
-#define PORT_3                  ((msp_port_t *)PORT_3_BASE)
-#define PORT_4                  ((msp_port_t *)PORT_4_BASE)
-#define PORT_5                  ((msp_port_t *)PORT_5_BASE)
-#define PORT_6                  ((msp_port_t *)PORT_6_BASE)
-#define CLK                     ((msp_clk_t *)CLK_BASE)
-#define TIMER_IVEC              ((msp_timer_ivec_t *)TIMER_IVEC_BASE)
-#define TIMER_A                 ((msp_timer_t *)TIMER_A_BASE)
-#define TIMER_B                 ((msp_timer_t *)TIMER_B_BASE)
-#define WD                      ((msp_wd_t *)WD_BASE)
+extern msp_timer_t TIMER_B;
 /** @} */
 
 #ifdef __cplusplus

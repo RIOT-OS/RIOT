@@ -45,10 +45,10 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     ctx_rx_cb = rx_cb;
     ctx_isr_arg = arg;
     /* reset interrupt flags and enable RX interrupt */
-    UART_IE &= ~(UART_IE_TX_BIT);
-    UART_IF &= ~(UART_IE_RX_BIT);
-    UART_IF |=  (UART_IE_TX_BIT);
-    UART_IE |=  (UART_IE_RX_BIT);
+    UART_SFR->IE &= ~(UART_IE_TX_BIT);
+    UART_SFR->IFG &= ~(UART_IE_RX_BIT);
+    UART_SFR->IFG |=  (UART_IE_TX_BIT);
+    UART_SFR->IE |=  (UART_IE_RX_BIT);
     return UART_OK;
 }
 
@@ -63,10 +63,10 @@ static int init_base(uart_t uart, uint32_t baudrate)
 
     /* power off and reset device */
     uart_poweroff(uart);
-    dev->CTL = USART_CTL_SWRST;
+    dev->CTL = SWRST;
     /* configure to 8N1 and using the SMCLK*/
-    dev->CTL |= USART_CTL_CHAR;
-    dev->TCTL = (USART_TCTL_TXEPT | USART_TCTL_SSEL_SMCLK);
+    dev->CTL |= CHAR;
+    dev->TCTL = (TXEPT | UXTCTL_SSEL_SMCLK);
     dev->RCTL = 0x00;
     /* baudrate configuration */
     uint16_t br = (uint16_t)(msp430_submain_clock_freq() / baudrate);
@@ -76,14 +76,15 @@ static int init_base(uart_t uart, uint32_t baudrate)
     dev->MCTL = 0;
     /* configure pins -> TODO: move into GPIO driver (once implemented) */
     UART_PORT->SEL |= (UART_RX_PIN | UART_TX_PIN);
-    UART_PORT->OD |= UART_RX_PIN;
-    UART_PORT->OD &= ~(UART_TX_PIN);
-    UART_PORT->DIR |= UART_TX_PIN;
-    UART_PORT->DIR &= ~(UART_RX_PIN);
+    msp_port_t *port = &UART_PORT->base;
+    port->OD |= UART_RX_PIN;
+    port->OD &= ~(UART_TX_PIN);
+    port->DIR |= UART_TX_PIN;
+    port->DIR &= ~(UART_RX_PIN);
     /* enable receiver and transmitter */
     uart_poweron(uart);
     /* and finally release the software reset bit */
-    dev->CTL &= ~(USART_CTL_SWRST);
+    dev->CTL &= ~(SWRST);
     return UART_OK;
 }
 
@@ -93,7 +94,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     msp_usart_t *dev = UART_BASE;
 
     for (size_t i = 0; i < len; i++) {
-        while (!(dev->TCTL & USART_TCTL_TXEPT)) {}
+        while (!(dev->TCTL & TXEPT)) {}
         dev->TXBUF = data[i];
     }
 }
@@ -101,13 +102,13 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 void uart_poweron(uart_t uart)
 {
     (void)uart;
-    UART_ME |= UART_ME_BITS;
+    UART_SFR->ME |= UART_ME_BITS;
 }
 
 void uart_poweroff(uart_t uart)
 {
     (void)uart;
-    UART_ME &= ~(UART_ME_BITS);
+    UART_SFR->ME &= ~(UART_ME_BITS);
 }
 
 ISR(UART_RX_ISR, isr_uart_0_rx)

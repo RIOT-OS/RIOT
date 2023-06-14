@@ -19,8 +19,9 @@
  * @}
  */
 
-#include "cpu.h"
 #include "bitarithm.h"
+#include "container.h"
+#include "cpu.h"
 #include "periph/gpio.h"
 
 /**
@@ -36,20 +37,20 @@
 static msp_port_t *_port(gpio_t pin)
 {
     switch (pin >> 8) {
-        case 1:
-            return PORT_1;
-        case 2:
-            return PORT_2;
-        case 3:
-            return PORT_3;
-        case 4:
-            return PORT_4;
-        case 5:
-            return PORT_5;
-        case 6:
-            return PORT_6;
-        default:
-            return NULL;
+    case 1:
+        return &PORT_1.base;
+    case 2:
+        return &PORT_2.base;
+    case 3:
+        return &PORT_3.base;
+    case 4:
+        return &PORT_4.base;
+    case 5:
+        return &PORT_5.base;
+    case 6:
+        return &PORT_6.base;
+    default:
+        return NULL;
     }
 }
 
@@ -58,12 +59,15 @@ static inline uint8_t _pin(gpio_t pin)
     return (uint8_t)(pin & 0xff);
 }
 
-static inline msp_port_isr_t *_isr_port(gpio_t pin)
+static inline msp_port_p1_p2_t *_isr_port(gpio_t pin)
 {
-    msp_port_t *p = _port(pin);
-    if ((p == PORT_1) || (p == PORT_2)) {
-        return (msp_port_isr_t *)p;
+    /* checking for (pin >> 8) <= 2 requires 6 byte of .text more than
+     * checking the resulting address */
+    msp_port_p1_p2_t *port = container_of(_port(pin), msp_port_p1_p2_t, base);
+    if ((port == &PORT_1) || (port == &PORT_2)) {
+        return port;
     }
+
     return NULL;
 }
 
@@ -90,12 +94,12 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 void gpio_periph_mode(gpio_t pin, bool enable)
 {
     REG8 *sel;
-    msp_port_isr_t *isrport = _isr_port(pin);
+    msp_port_p1_p2_t *isrport = _isr_port(pin);
     if (isrport) {
         sel = &(isrport->SEL);
     }
     else {
-        msp_port_t *port = _port(pin);
+        msp_port_p3_p6_t *port = container_of(_port(pin), msp_port_p3_p6_t, base);
         if (port) {
             sel = &(port->SEL);
         }
@@ -156,13 +160,13 @@ static gpio_isr_ctx_t isr_ctx[ISR_NUMOF];
 static int _ctx(gpio_t pin)
 {
     int i = bitarithm_lsb(_pin(pin));
-    return (_port(pin) == PORT_1) ? i : (i + 8);
+    return (_port(pin) == &PORT_1.base) ? i : (i + 8);
 }
 
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                     gpio_cb_t cb, void *arg)
 {
-    msp_port_isr_t *port = _isr_port(pin);
+    msp_port_p1_p2_t *port = _isr_port(pin);
 
     /* check if port, pull resistor and flank configuration are valid */
     if ((port == NULL) || (flank == GPIO_BOTH)) {
@@ -189,7 +193,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 
 void gpio_irq_enable(gpio_t pin)
 {
-    msp_port_isr_t *port = _isr_port(pin);
+    msp_port_p1_p2_t *port = _isr_port(pin);
     if (port) {
         port->IE |= _pin(pin);
     }
@@ -197,13 +201,13 @@ void gpio_irq_enable(gpio_t pin)
 
 void gpio_irq_disable(gpio_t pin)
 {
-    msp_port_isr_t *port = _isr_port(pin);
+    msp_port_p1_p2_t *port = _isr_port(pin);
     if (port) {
         port->IE &= ~(_pin(pin));
     }
 }
 
-static inline void isr_handler(msp_port_isr_t *port, int ctx)
+static inline void isr_handler(msp_port_p1_p2_t *port, int ctx)
 {
     for (unsigned i = 0; i < PINS_PER_PORT; i++) {
         if ((port->IE & (1 << i)) && (port->IFG & (1 << i))) {
@@ -216,14 +220,14 @@ static inline void isr_handler(msp_port_isr_t *port, int ctx)
 ISR(PORT1_VECTOR, isr_port1)
 {
     __enter_isr();
-    isr_handler((msp_port_isr_t *)PORT_1, 0);
+    isr_handler(&PORT_1, 0);
     __exit_isr();
 }
 
 ISR(PORT2_VECTOR, isr_port2)
 {
     __enter_isr();
-    isr_handler((msp_port_isr_t *)PORT_2, 8);
+    isr_handler(&PORT_2, 8);
     __exit_isr();
 }
 #endif /* MODULE_PERIPH_GPIO_IRQ */

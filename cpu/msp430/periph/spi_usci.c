@@ -39,8 +39,8 @@ void spi_init(spi_t bus)
     assert((unsigned)bus < SPI_NUMOF);
 
     /* reset SPI device */
-    SPI_BASE->CTL1 = USCI_SPI_CTL1_SWRST;
-    SPI_BASE->CTL1 |= (USCI_SPI_CTL1_SSEL_SMCLK);
+    SPI_BASE->CTL1 = UCSWRST;
+    SPI_BASE->CTL1 |= UCSSEL_SMCLK;
 
     /* trigger the pin configuration */
     spi_init_pins(bus);
@@ -76,17 +76,16 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
     /* configure bus mode */
     /* configure mode */
-    SPI_BASE->CTL0 = (USCI_SPI_CTL0_UCSYNC | USCI_SPI_CTL0_MST|
-                     USCI_SPI_CTL0_MODE_0 | USCI_SPI_CTL0_MSB | mode);
+    SPI_BASE->CTL0 = (UCSYNC | UCMST | UCMODE_0 | UCMSB | mode);
     /* release from software reset */
-    SPI_BASE->CTL1 &= ~(USCI_SPI_CTL1_SWRST);
+    SPI_BASE->CTL1 &= ~(UCSWRST);
 }
 
 void spi_release(spi_t bus)
 {
     (void)bus;
     /* put SPI device back in reset state */
-    SPI_BASE->CTL1 |= (USCI_SPI_CTL1_SWRST);
+    SPI_BASE->CTL1 |= UCSWRST;
 
     /* release the bus */
     mutex_unlock(&spi_lock);
@@ -113,7 +112,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
             SPI_BASE->TXBUF = out_buf[i];
         }
         /* finally we need to wait, until all transfers are complete */
-        while (SPI_BASE->STAT & USCI_SPI_STAT_UCBUSY) {}
+        while (SPI_BASE->STAT & UCBUSY) {}
         SPI_BASE->RXBUF;
     }
     else if (!out_buf) {

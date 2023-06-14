@@ -39,12 +39,12 @@ void spi_init(spi_t bus)
     assert((unsigned)bus < SPI_NUMOF);
 
     /* put SPI device in reset state */
-    SPI_BASE->CTL = USART_CTL_SWRST;
-    SPI_BASE->CTL |= (USART_CTL_CHAR | USART_CTL_SYNC | USART_CTL_MM);
+    SPI_BASE->CTL = SWRST;
+    SPI_BASE->CTL |= (CHAR | SYNC | MM);
     SPI_BASE->RCTL = 0;
     SPI_BASE->MCTL = 0;
     /* enable SPI mode */
-    SPI_ME |= SPI_ME_BIT;
+    SPI_SFR->ME |= SPI_ME_BIT;
 
     /* trigger the pin configuration */
     spi_init_pins(bus);
@@ -80,16 +80,16 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
     /* configure bus mode */
     /* configure mode */
-    SPI_BASE->TCTL = (USART_TCTL_SSEL_SMCLK | USART_TCTL_STC | mode);
+    SPI_BASE->TCTL = (UXTCTL_SSEL_SMCLK | STC | mode);
     /* release from software reset */
-    SPI_BASE->CTL &= ~(USART_CTL_SWRST);
+    SPI_BASE->CTL &= ~(SWRST);
 }
 
 void spi_release(spi_t bus)
 {
     (void)bus;
     /* put SPI device back in reset state */
-    SPI_BASE->CTL |= (USART_CTL_SWRST);
+    SPI_BASE->CTL |= SWRST;
 
     /* release the bus */
     mutex_unlock(&spi_lock);
@@ -112,25 +112,25 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
     /* if we only send out data, we do this the fast way... */
     if (!in_buf) {
         for (size_t i = 0; i < len; i++) {
-            while (!(SPI_IF & SPI_IE_TX_BIT)) {}
+            while (!(SPI_SFR->IFG & SPI_IE_TX_BIT)) {}
             SPI_BASE->TXBUF = out_buf[i];
         }
         /* finally we need to wait, until all transfers are complete */
-        while (!(SPI_IF & SPI_IE_TX_BIT) || !(SPI_IF & SPI_IE_RX_BIT)) {}
+        while (!(SPI_SFR->IFG & SPI_IE_TX_BIT) || !(SPI_SFR->IFG & SPI_IE_RX_BIT)) {}
         SPI_BASE->RXBUF;
     }
     else if (!out_buf) {
         for (size_t i = 0; i < len; i++) {
             SPI_BASE->TXBUF = 0;
-            while (!(SPI_IF & SPI_IE_RX_BIT)) {}
+            while (!(SPI_SFR->IFG & SPI_IE_RX_BIT)) {}
             in_buf[i] = (char)SPI_BASE->RXBUF;
         }
     }
     else {
         for (size_t i = 0; i < len; i++) {
-            while (!(SPI_IF & SPI_IE_TX_BIT)) {}
+            while (!(SPI_SFR->IFG & SPI_IE_TX_BIT)) {}
             SPI_BASE->TXBUF = out_buf[i];
-            while (!(SPI_IF & SPI_IE_RX_BIT)) {}
+            while (!(SPI_SFR->IFG & SPI_IE_RX_BIT)) {}
             in_buf[i] = (char)SPI_BASE->RXBUF;
         }
     }

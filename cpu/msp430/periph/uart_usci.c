@@ -58,28 +58,28 @@ static int init_base(uart_t uart, uint32_t baudrate)
     }
 
     /* get the default UART for now -> TODO: enable for multiple devices */
-    msp_usci_t *dev = UART_BASE;
+    msp_usci_a_t *dev = UART_BASE;
 
     /* put device in reset mode while configuration is going on */
-    dev->ACTL1 = USCI_ACTL1_SWRST;
+    dev->CTL1 = UCSWRST;
     /* configure to UART, using SMCLK in 8N1 mode */
-    dev->ACTL1 |= USCI_ACTL1_SSEL_SMCLK;
-    dev->ACTL0 = 0;
-    dev->ASTAT = 0;
+    dev->CTL1 |= UCSSEL_SMCLK;
+    dev->CTL0 = 0;
+    dev->STAT = 0;
     /* configure baudrate */
     uint32_t base = ((msp430_submain_clock_freq() << 7)  / baudrate);
     uint16_t br = (uint16_t)(base >> 7);
     uint8_t brs = (((base & 0x3f) * 8) >> 7);
-    dev->ABR0 = (uint8_t)br;
-    dev->ABR1 = (uint8_t)(br >> 8);
-    dev->AMCTL = (brs << USCI_AMCTL_BRS_SHIFT);
+    dev->BR0 = (uint8_t)br;
+    dev->BR1 = (uint8_t)(br >> 8);
+    dev->MCTL = (brs << UCBRS_POS);
     /* pin configuration -> TODO: move to GPIO driver once implemented */
     UART_RX_PORT->SEL |= UART_RX_PIN;
     UART_TX_PORT->SEL |= UART_TX_PIN;
-    UART_RX_PORT->DIR &= ~(UART_RX_PIN);
-    UART_TX_PORT->DIR |= UART_TX_PIN;
+    UART_RX_PORT->base.DIR &= ~(UART_RX_PIN);
+    UART_TX_PORT->base.DIR |= UART_TX_PIN;
     /* releasing the software reset bit starts the UART */
-    dev->ACTL1 &= ~(USCI_ACTL1_SWRST);
+    dev->CTL1 &= ~(UCSWRST);
     return 0;
 }
 
@@ -89,7 +89,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 
     for (size_t i = 0; i < len; i++) {
         while (!(UART_IF & UART_IE_TX_BIT)) {}
-        UART_BASE->ATXBUF = data[i];
+        UART_BASE->TXBUF = data[i];
     }
 }
 
@@ -109,10 +109,10 @@ ISR(UART_RX_ISR, isr_uart_0_rx)
 {
     __enter_isr();
 
-    uint8_t stat = UART_BASE->ASTAT;
-    uint8_t data = (uint8_t)UART_BASE->ARXBUF;
+    uint8_t stat = UART_BASE->STAT;
+    uint8_t data = (uint8_t)UART_BASE->RXBUF;
 
-    if (stat & (USCI_ASTAT_FE | USCI_ASTAT_OE | USCI_ASTAT_PE | USCI_ASTAT_BRK)) {
+    if (stat & (UCFE | UCOE | UCPE | UCBRK)) {
         /* some error which we do not handle, just do a pseudo read to reset the
          * status register */
         (void)data;

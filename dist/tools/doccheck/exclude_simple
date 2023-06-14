@@ -1401,12 +1401,10 @@ warning: Member CLK1 (macro definition) of file periph_conf.h is not documented.
 warning: Member CLK40 (macro definition) of file periph_conf.h is not documented.
 warning: Member CLK50 (macro definition) of file periph_conf.h is not documented.
 warning: Member CLK80 (macro definition) of file periph_conf.h is not documented.
-warning: Member CLK_BASE (macro definition) of file msp430_regs.h is not documented.
 warning: Member clk_div_config[] (variable) of file periph_conf.h is not documented.
 warning: Member CLK_DIV_NUMOF (macro definition) of file periph_conf.h is not documented.
 warning: Member CLKLOADCTL_LOADDONE (macro definition) of file cc26x0_cc13x0_prcm.h is not documented.
 warning: Member CLKLOADCTL_LOADDONE (macro definition) of file cc26x2_cc13x2_prcm.h is not documented.
-warning: Member CLK (macro definition) of file msp430_regs.h is not documented.
 warning: Member clk_mux_config[] (variable) of file periph_conf.h is not documented.
 warning: Member CLK_MUX_NUMOF (macro definition) of file periph_conf.h is not documented.
 warning: Member CLOCK_8MHZ (macro definition) of file periph_conf.h is not documented.
@@ -2565,7 +2563,6 @@ warning: Member GPIO_PIN(x, y) (macro definition) of file periph_cpu_common.h is
 warning: Member GPIO_PIN(x, y) (macro definition) of file periph_cpu.h is not documented.
 warning: Member gpio_t (typedef) of file periph_cpu_common.h is not documented.
 warning: Member gpio_t (typedef) of file periph_cpu.h is not documented.
-warning: Member gpio_t (typedef) of group cpu_msp430fxyz is not documented.
 warning: Member GPRS_PIN (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member GPRS_PW (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member GPS_ENABLE_MASK (macro definition) of file board.h is not documented.
@@ -5627,13 +5624,10 @@ warning: Member PERIPH_INIT_LED0 (macro definition) of group boards_common_nucle
 warning: Member PERIPH_SPI_NEEDS_INIT_CS (macro definition) of file periph_cpu.h is not documented.
 warning: Member PERIPH_SPI_NEEDS_TRANSFER_BYTE (macro definition) of file periph_cpu_common.h is not documented.
 warning: Member PERIPH_SPI_NEEDS_TRANSFER_BYTE (macro definition) of file periph_cpu.h is not documented.
-warning: Member PERIPH_SPI_NEEDS_TRANSFER_BYTE (macro definition) of group cpu_msp430fxyz is not documented.
 warning: Member PERIPH_SPI_NEEDS_TRANSFER_REG (macro definition) of file periph_cpu_common.h is not documented.
 warning: Member PERIPH_SPI_NEEDS_TRANSFER_REG (macro definition) of file periph_cpu.h is not documented.
-warning: Member PERIPH_SPI_NEEDS_TRANSFER_REG (macro definition) of group cpu_msp430fxyz is not documented.
 warning: Member PERIPH_SPI_NEEDS_TRANSFER_REGS (macro definition) of file periph_cpu_common.h is not documented.
 warning: Member PERIPH_SPI_NEEDS_TRANSFER_REGS (macro definition) of file periph_cpu.h is not documented.
-warning: Member PERIPH_SPI_NEEDS_TRANSFER_REGS (macro definition) of group cpu_msp430fxyz is not documented.
 warning: Member PHCON1_PDPXMD (macro definition) of file enc28j60_regs.h is not documented.
 warning: Member PHCON1_PLOOPBK (macro definition) of file enc28j60_regs.h is not documented.
 warning: Member PHCON1_PPWRSV (macro definition) of file enc28j60_regs.h is not documented.
@@ -5711,18 +5705,6 @@ warning: Member PN532_FW_FEATURES(fwver) (macro definition) of group drivers_pn5
 warning: Member PN532_FW_REVISION(fwver) (macro definition) of group drivers_pn532 is not documented.
 warning: Member PN532_FW_VERSION(fwver) (macro definition) of group drivers_pn532 is not documented.
 warning: Member PN532_IC_VERSION(fwver) (macro definition) of group drivers_pn532 is not documented.
-warning: Member PORT_1_BASE (macro definition) of file msp430_regs.h is not documented.
-warning: Member PORT_1 (macro definition) of file msp430_regs.h is not documented.
-warning: Member PORT_2_BASE (macro definition) of file msp430_regs.h is not documented.
-warning: Member PORT_2 (macro definition) of file msp430_regs.h is not documented.
-warning: Member PORT_3_BASE (macro definition) of file msp430_regs.h is not documented.
-warning: Member PORT_3 (macro definition) of file msp430_regs.h is not documented.
-warning: Member PORT_4_BASE (macro definition) of file msp430_regs.h is not documented.
-warning: Member PORT_4 (macro definition) of file msp430_regs.h is not documented.
-warning: Member PORT_5_BASE (macro definition) of file msp430_regs.h is not documented.
-warning: Member PORT_5 (macro definition) of file msp430_regs.h is not documented.
-warning: Member PORT_6_BASE (macro definition) of file msp430_regs.h is not documented.
-warning: Member PORT_6 (macro definition) of file msp430_regs.h is not documented.
 warning: Member PORT_delayRx (macro definition) of file board_info.h is not documented.
 warning: Member PORT_delayTx (macro definition) of file board_info.h is not documented.
 warning: Member PORT_delayTx (macro definition) of file openwsn_defs.h is not documented.
@@ -6397,16 +6379,6 @@ warning: Member SET_MUX_SOCKET1 (macro definition) of file board.h is not docume
 warning: Member SET_MUX_USB_MODULE (macro definition) of file board.h is not documented.
 warning: Member setsockopt(int socket, int level, int option_name, const void *option_value, socklen_t option_len) (function) of group posix_sockets is not documented.
 warning: Member setup_fpu(void) (function) of group cpu_lm4f120 is not documented.
-warning: Member SFR_IE1_URXIE0 (macro definition) of file msp430_regs.h is not documented.
-warning: Member SFR_IE1_UTXIE0 (macro definition) of file msp430_regs.h is not documented.
-warning: Member SFR_IE2_UCA0TXIE (macro definition) of file msp430_regs.h is not documented.
-warning: Member SFR_IE2_URXIE2 (macro definition) of file msp430_regs.h is not documented.
-warning: Member SFR_IE2_UTXIE2 (macro definition) of file msp430_regs.h is not documented.
-warning: Member SFR_IFG1_URXIFG0 (macro definition) of file msp430_regs.h is not documented.
-warning: Member SFR_IFG1_UTXIFG0 (macro definition) of file msp430_regs.h is not documented.
-warning: Member SFR_IFG2_UCA0TXIFG (macro definition) of file msp430_regs.h is not documented.
-warning: Member SFR_IFG2_URXIFG1 (macro definition) of file msp430_regs.h is not documented.
-warning: Member SFR_IFG2_UTXIFG1 (macro definition) of file msp430_regs.h is not documented.
 warning: Member SGP30_PARAM_I2C_DEV (macro definition) of file sgp30_params.h is not documented.
 warning: Member SGP30_PARAMS (macro definition) of file sgp30_params.h is not documented.
 warning: Member SGP30_SAUL_INFO (macro definition) of file sgp30_params.h is not documented.
@@ -6732,6 +6704,7 @@ warning: Member SOFT_UART_PARAM_TIMER_TX (macro definition) of file soft_uart_pa
 warning: Member SOFT_UART_PARAM_TX (macro definition) of file soft_uart_params.h is not documented.
 warning: Member SPEAKER_PIN (macro definition) of file board.h is not documented.
 warning: Member SPI_BASE (macro definition) of file periph_conf.h is not documented.
+warning: Member SPI_SFR (macro definition) of file periph_conf.h is not documented.
 warning: Member spi_clk_config[] (variable) of file periph_conf_common.h is not documented.
 warning: Member spi_clk_config[] (variable) of file periph_conf.h is not documented.
 warning: Member spi_clk_t (enumeration) of file periph_cpu.h is not documented.
@@ -8072,29 +8045,7 @@ warning: Member TIMER_2_ISR (macro definition) of file periph_conf.h is not docu
 warning: Member TIMER_2 (macro definition) of file default_timer_config.h is not documented.
 warning: Member TIMER_2_MASK (macro definition) of file default_timer_config.h is not documented.
 warning: Member TIMER_3_ISR (macro definition) of file cfg_timer_default.h is not documented.
-warning: Member TIMER_A_BASE (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_A (macro definition) of file msp430_regs.h is not documented.
 warning: Member TIMER_BASE (macro definition) of file periph_conf.h is not documented.
-warning: Member TIMER_B_BASE (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_B (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CCTL_CAP (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CCTL_CCIE (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CCTL_CCI (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CCTL_CCIS_MASK (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CCTL_CLLD_MASK (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CCTL_CM_MASK (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CCTL_COV (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CCTL_OUT (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CCTL_OUTMOD_MASK (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CCTL_OUTMOD_OUTVAL (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CCTL_OUTMOD_RESET (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CCTL_OUTMOD_RESET_SET (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CCTL_OUTMOD_SET (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CCTL_OUTMOD_SET_RESET (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CCTL_OUTMOD_TOGGLE (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CCTL_OUTMOD_TOG_RESET (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CCTL_OUTMOD_TOG_SET (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CCTL_SCS (macro definition) of file msp430_regs.h is not documented.
 warning: Member TIMER_CHAN (macro definition) of file periph_conf.h is not documented.
 warning: Member TIMER_CHANNEL_NUMOF (macro definition) of file default_timer_config.h is not documented.
 warning: Member TIMER_CHANNEL_NUMOF (macro definition) of file periph_cpu.h is not documented.
@@ -8105,30 +8056,11 @@ warning: Member timer_config[] (variable) of file cfg_timer_tim2.h is not docume
 warning: Member timer_config[] (variable) of file cfg_timer_tim5.h is not documented.
 warning: Member timer_config[] (variable) of file periph_conf_common.h is not documented.
 warning: Member timer_config[] (variable) of file periph_conf.h is not documented.
-warning: Member TIMER_CTL_CLR (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CTL_ID_DIV1 (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CTL_ID_DIV2 (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CTL_ID_DIV4 (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CTL_ID_DIV8 (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CTL_ID_MASK (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CTL_IE (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CTL_MC_CONT (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CTL_MC_MASK (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CTL_MC_STOP (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CTL_MC_UPDOWN (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CTL_MC_UP (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CTL_TASSEL_ACLK (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CTL_TASSEL_INV_TCLK (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CTL_TASSEL_MASK (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CTL_TASSEL_SMCLK (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_CTL_TASSEL_TCLK (macro definition) of file msp430_regs.h is not documented.
 warning: Member timer_div_t (enumeration) of file periph_cpu_common.h is not documented.
 warning: Member TIMER_IRQ_PRIO (macro definition) of file cfg_timer_default.h is not documented.
 warning: Member TIMER_IRQ_PRIO (macro definition) of file periph_conf.h is not documented.
 warning: Member TIMER_ISR_CC0 (macro definition) of file periph_conf.h is not documented.
 warning: Member TIMER_ISR_CCX (macro definition) of file periph_conf.h is not documented.
-warning: Member TIMER_IVEC_BASE (macro definition) of file msp430_regs.h is not documented.
-warning: Member TIMER_IVEC (macro definition) of file msp430_regs.h is not documented.
 warning: Member TIMER_MAX_VALUE (macro definition) of file periph_cpu.h is not documented.
 warning: Member TIMER_NUMOF (macro definition) of file cfg_timer_012.h is not documented.
 warning: Member TIMER_NUMOF (macro definition) of file cfg_timer_01.h is not documented.
@@ -8281,6 +8213,7 @@ warning: Member UART_4_ISR (macro definition) of file periph_conf.h is not docum
 warning: Member UART_6_DMA_ISR (macro definition) of file periph_conf.h is not documented.
 warning: Member UART_6_ISR (macro definition) of file periph_conf.h is not documented.
 warning: Member UART_BASE (macro definition) of file periph_conf.h is not documented.
+warning: Member UART_SFR (macro definition) of file periph_conf.h is not documented.
 warning: Member UARTCLKGDS_CLK_EN_UART0 (macro definition) of file cc26x0_cc13x0_prcm.h is not documented.
 warning: Member UARTCLKGDS_CLK_EN_UART0 (macro definition) of file cc26x2_cc13x2_prcm.h is not documented.
 warning: Member UARTCLKGDS_CLK_EN_UART1 (macro definition) of file cc26x2_cc13x2_prcm.h is not documented.
@@ -8382,33 +8315,6 @@ warning: Member UNLOCK_TCPIP_CORE() (macro definition) of file sys_arch.h is not
 warning: Member UNLOCK_TCPIP_CORE() (macro definition) of group pkg_lwip_sys is not documented.
 warning: Member UPDATE_CCA (macro definition) of file board.h is not documented.
 warning: Member UPDATE_CCA (macro definition) of group boards_common_remote is not documented.
-warning: Member USART_0_BASE (macro definition) of file msp430_regs.h is not documented.
-warning: Member USART_0 (macro definition) of file msp430_regs.h is not documented.
-warning: Member USART_1_BASE (macro definition) of file msp430_regs.h is not documented.
-warning: Member USART_1 (macro definition) of file msp430_regs.h is not documented.
-warning: Member USART_CTL_CHAR (macro definition) of file msp430_regs.h is not documented.
-warning: Member USART_CTL_LISTEN (macro definition) of file msp430_regs.h is not documented.
-warning: Member USART_CTL_MM (macro definition) of file msp430_regs.h is not documented.
-warning: Member USART_CTL_PENA (macro definition) of file msp430_regs.h is not documented.
-warning: Member USART_CTL_PEV (macro definition) of file msp430_regs.h is not documented.
-warning: Member USART_CTL_SPB (macro definition) of file msp430_regs.h is not documented.
-warning: Member USART_CTL_SYNC (macro definition) of file msp430_regs.h is not documented.
-warning: Member USART_RCTL_BRK (macro definition) of file msp430_regs.h is not documented.
-warning: Member USART_RCTL_FE (macro definition) of file msp430_regs.h is not documented.
-warning: Member USART_RCTL_OE (macro definition) of file msp430_regs.h is not documented.
-warning: Member USART_RCTL_PE (macro definition) of file msp430_regs.h is not documented.
-warning: Member USART_RCTL_RXWAKE (macro definition) of file msp430_regs.h is not documented.
-warning: Member USART_RCTL_URXEIE (macro definition) of file msp430_regs.h is not documented.
-warning: Member USART_RCTL_URXWIE (macro definition) of file msp430_regs.h is not documented.
-warning: Member USART_TCTL_CKPH (macro definition) of file msp430_regs.h is not documented.
-warning: Member USART_TCTL_CKPL (macro definition) of file msp430_regs.h is not documented.
-warning: Member USART_TCTL_SSEL_ACLK (macro definition) of file msp430_regs.h is not documented.
-warning: Member USART_TCTL_SSEL_MASK (macro definition) of file msp430_regs.h is not documented.
-warning: Member USART_TCTL_SSEL_SMCLK (macro definition) of file msp430_regs.h is not documented.
-warning: Member USART_TCTL_SSEL_UCLKI (macro definition) of file msp430_regs.h is not documented.
-warning: Member USART_TCTL_STC (macro definition) of file msp430_regs.h is not documented.
-warning: Member USART_TCTL_TXWAKE (macro definition) of file msp430_regs.h is not documented.
-warning: Member USART_TCTL_URXSE (macro definition) of file msp430_regs.h is not documented.
 warning: Member USB_APP_MODE_SLOT_NAME (macro definition) of file usb_dfu.h is not documented.
 warning: Member usbdev_mock_ep_state_t (enumeration) of group drivers_usbdev_mock is not documented.
 warning: Member USB_DFU_DETACH_TIMEOUT_MS (macro definition) of group usb_dfu is not documented.
@@ -8431,65 +8337,6 @@ warning: Member USB_HID_SUBCLASS_BOOT (macro definition) of group usb_hid is not
 warning: Member USB_HID_SUBCLASS_NONE (macro definition) of group usb_hid is not documented.
 warning: Member USB_XBEE_RX (macro definition) of file waspmote_pinmap.h is not documented.
 warning: Member USB_XBEE_TX (macro definition) of file waspmote_pinmap.h is not documented.
-warning: Member USCI_0_A_BASE (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_0_A_SPI (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_0_BASE (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_0_B_BASE (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_0_B_SPI (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_0 (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_1_A_BASE (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_1_A (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_1_BASE (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_1_B_BASE (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_1_B (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_1 (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ACTL0_7BIT (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ACTL0_MODE_ABMM (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ACTL0_MODE_ILMM (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ACTL0_MODE_MASK (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ACTL0_MODE_UART_ABR (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ACTL0_MODE_UART (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ACTL0_MSB (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ACTL0_PAR (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ACTL0_PEN (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ACTL0_SPB (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ACTL1_BRKIE (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ACTL1_DORM (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ACTL1_RXEIE (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ACTL1_SSEL_ACLK (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ACTL1_SSEL_MASK (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ACTL1_SSEL_SMCLK (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ACTL1_SSEL_UCLK (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ACTL1_TXADDR (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ACTL1_TXBRK (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_AMCTL_BRF_MASK (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_AMCTL_BRF_SHIFT (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_AMCTL_BRS_MASK (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_AMCTL_BRS_SHIFT (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ASTAT_ADDR (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ASTAT_BRK (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ASTAT_FE (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ASTAT_IDLE (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ASTAT_LISTEN (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ASTAT_OE (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ASTAT_PE (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_ASTAT_RXERR (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_SPI_CTL0_7BIT (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_SPI_CTL0_CKPH (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_SPI_CTL0_CKPL (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_SPI_CTL0_MODE_0 (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_SPI_CTL0_MODE_1 (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_SPI_CTL0_MODE_2 (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_SPI_CTL0_MODE_3 (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_SPI_CTL0_MSB (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_SPI_CTL0_MST (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_SPI_CTL1_SSEL_ACLK (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_SPI_CTL1_SSEL_MASK (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_SPI_CTL1_SSEL_NA (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_SPI_CTL1_SSEL_SMCLK (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_SPI_STAT_UCFE (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_SPI_STAT_UCLISTEN (macro definition) of file msp430_regs.h is not documented.
-warning: Member USCI_SPI_STAT_UCOE (macro definition) of file msp430_regs.h is not documented.
 warning: Member UUID_VERSION_MASK (macro definition) of group sys_uuid is not documented.
 warning: Member VCC33 (macro definition) of file board.h is not documented.
 warning: Member VCNL40X0_AMBIENT_MASK_PARA_AUTO_OFFSET (macro definition) of file vcnl40x0_internals.h is not documented.
@@ -8593,8 +8440,6 @@ warning: Member W5100_PARAM_EVT (macro definition) of group boards_common_arduin
 warning: Member W5100_PARAM_EVT (macro definition) of group boards_common_arduino_due is not documented.
 warning: Member W5100_PARAMS (macro definition) of file w5100_params.h is not documented.
 warning: Member Watchdog_IRQn (macro definition) of file cpu_conf.h is not documented.
-warning: Member WD_BASE (macro definition) of file msp430_regs.h is not documented.
-warning: Member WD (macro definition) of file msp430_regs.h is not documented.
 warning: Member WDT_CLOCK_HZ (macro definition) of file periph_cpu.h is not documented.
 warning: Member WDT_HAS_INIT (macro definition) of file periph_cpu.h is not documented.
 warning: Member WDT_HAS_STOP (macro definition) of file periph_cpu.h is not documented.
