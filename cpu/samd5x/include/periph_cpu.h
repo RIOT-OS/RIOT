@@ -54,6 +54,16 @@ extern "C" {
  * @{
  */
 #define PM_NUM_MODES            (4)     /**< Backup, Hibernate, Standby, Idle */
+
+/**
+ * @brief   Power modes
+ */
+enum {
+    SAM0_PM_BACKUP = 0,
+    SAM0_PM_HIBERNATE = 1,
+    SAM0_PM_STANDBY = 2,
+    SAM0_PM_IDLE = 3,
+};
 /** @} */
 
 /**
