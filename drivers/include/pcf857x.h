@@ -272,15 +272,21 @@ extern "C"
  * of 0 to 7.
  * @{
  */
+#ifndef PCF8575_BASE_ADDR
 #define PCF8575_BASE_ADDR   (0x20)  /**< PCF8575 I2C slave base address.
                                          Addresses are then in range from
                                          0x20 to 0x27 */
+#endif
+#ifndef PCF8574_BASE_ADDR
 #define PCF8574_BASE_ADDR   (0x20)  /**< PCF8574 I2C slave base address.
                                          Addresses are then in range from
                                          0x20 to 0x27 */
+#endif
+#ifndef PCF8574A_BASE_ADDR
 #define PCF8574A_BASE_ADDR  (0x38)  /**< PCF8574A I2C slave base address.
                                          Addresses are then in range from
                                          0x38 to 0x3f */
+#endif
 /** @} */
 
 /**
