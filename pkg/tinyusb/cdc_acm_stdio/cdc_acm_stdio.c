@@ -24,30 +24,12 @@
 
 #include <stdio.h>
 #include <sys/types.h>
+#include "stdio_base.h"
 
 #include "tusb.h"
 #include "tinyusb.h"
 
-static mutex_t data_lock = MUTEX_INIT_LOCKED;
-
-void stdio_init(void)
-{
-}
-
-#if IS_USED(MODULE_STDIO_AVAILABLE)
-int stdio_available(void)
-{
-    return tud_cdc_available();
-}
-#endif
-
-ssize_t stdio_read(void* buffer, size_t len)
-{
-    mutex_lock(&data_lock);
-    return tud_cdc_read(buffer, len);
-}
-
-ssize_t stdio_write(const void* buffer, size_t len)
+static ssize_t _write(const void* buffer, size_t len)
 {
     const char *start = buffer;
 
@@ -66,5 +48,9 @@ void tud_cdc_rx_cb(uint8_t itf)
 {
     (void)itf;
 
-    mutex_unlock(&data_lock);
+    uint8_t buffer[64];
+    unsigned res = tud_cdc_read(buffer, sizeof(buffer));
+    isrpipe_write(&stdin_isrpipe, buffer, res);
 }
+
+STDIO_PROVIDER(STDIO_TINYUSB_CDC_ACM, NULL, NULL, _write)
