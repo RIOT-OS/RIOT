@@ -19,5 +19,6 @@ ifneq (,$(filter sam0_eth,$(USEMODULE)))
   USEMODULE += netdev_legacy_api
   USEMODULE += netopt
   FEATURES_REQUIRED += periph_eth
+  FEATURES_REQUIRED += periph_gpio_irq
 endif
 include $(RIOTCPU)/cortexm_common/Makefile.dep

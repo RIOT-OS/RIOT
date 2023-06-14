@@ -52,6 +52,7 @@ extern "C" {
 #define MII_LPA             (0x05U) /**< Link Parter Abilities */
 #define MII_EXPANSION       (0x06U) /**< Auto-Negotiation Expansion */
 #define MII_ESTATUS         (0x0fU) /**< Extended Status Register */
+#define MII_IRQ             (0x1bU) /**< Interrupt Control/Status */
 /** @} */
 
 /**
@@ -117,6 +118,35 @@ extern "C" {
 #define MII_LPA_10_H        BIT5    /**< Partner can 10BASE-T, half duplex */
 #define MII_LPA_100         (BIT7 | BIT8)   /**< Partner can 100BASE-T */
 #define MII_LPA_10          (BIT5 | BIT6)   /**< Partner can 10BASE-T */
+/** @} */
+
+/**
+ * @name    Bits in the MII Auto-Negotiation Expansion Register
+ * @{
+ */
+#define MII_LPA_HAS_AN      BIT0    /**< Partner can auto-negotiate */
+/** @} */
+
+/**
+ * @name    Bits in the MII Interrupt Control/Status Register
+ * @{
+ */
+#define MII_IRQ_LINK_UP     BIT0    /**< Link-up occurred */
+#define MII_IRQ_RMT_FAULT   BIT1    /**< Remote fault occurred */
+#define MII_IRQ_LINK_DOWN   BIT2    /**< Link-down occurred */
+#define MII_IRQ_LPA_ACK     BIT3    /**< Link partner acknowledge occurred */
+#define MII_IRQ_PD_FAULT    BIT4    /**< Parallel detect fault occurred */
+#define MII_IRQ_PAGE_RX     BIT5    /**< Page receive occurred */
+#define MII_IRQ_RX_ERROR    BIT6    /**< Receive error occurred */
+#define MII_IRQ_JABBER      BIT7    /**< Jabber occurred */
+#define MII_IRQ_EN_LINK_UP     BIT8    /**< Enable Link-up occurred IRQ */
+#define MII_IRQ_EN_RMT_FAULT   BIT9    /**< Enable Remote fault occurred IRQ */
+#define MII_IRQ_EN_LINK_DOWN   BIT10   /**< Enable Link-down occurred IRQ */
+#define MII_IRQ_EN_LPA_ACK     BIT11    /**< Enable Link partner acknowledge occurred IRQ */
+#define MII_IRQ_EN_PD_FAULT    BIT12    /**< Enable Parallel detect fault occurred IRQ */
+#define MII_IRQ_EN_PAGE_RX     BIT13    /**< Enable Page receive occurred IRQ */
+#define MII_IRQ_EN_RX_ERROR    BIT14    /**< Enable Receive error occurred IRQ */
+#define MII_IRQ_EN_JABBER      BIT15    /**< Enable Jabber occurred IRQ */
 /** @} */
 
 /**
