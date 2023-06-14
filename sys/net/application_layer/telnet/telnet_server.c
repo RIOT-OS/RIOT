@@ -21,6 +21,7 @@
 #include <fcntl.h>
 #include "net/sock/tcp.h"
 #include "net/telnet.h"
+#include "stdio_base.h"
 #include "pipe.h"
 
 #define ENABLE_DEBUG 0
@@ -106,16 +107,21 @@ static void _connected(void)
     telnet_cb_pre_connected(client);
 
     connected = true;
-    mutex_unlock(&connected_mutex);
+    if (!IS_USED(MODULE_STDIO_TELNET)) {
+        mutex_unlock(&connected_mutex);
+    }
 
     telnet_cb_connected(client);
 }
 
 static void _disconnect(void)
 {
-    mutex_trylock(&connected_mutex);
+    if (!IS_USED(MODULE_STDIO_TELNET)) {
+        mutex_trylock(&connected_mutex);
+    }
     connected = false;
 
+    DEBUG("telnet disconnect\n");
     telnet_cb_disconneced();
 }
 
@@ -252,7 +258,12 @@ static void *telnet_thread(void *arg)
                     continue;
                 }
 write:
-                pipe_write(&_stdin_pipe, &c, 1);
+                if (IS_USED(MODULE_STDIO_TELNET)) {
+                    isrpipe_write_one(&stdin_isrpipe, c);
+                }
+                else {
+                    pipe_write(&_stdin_pipe, &c, 1);
+                }
             }
         }
 disco:
@@ -276,6 +287,7 @@ int telnet_server_write(const void* buffer, size_t len)
     return -ENOTCONN;
 }
 
+#ifndef MODULE_STDIO_TELNET
 int telnet_server_read(void* buffer, size_t count)
 {
     /* block until a connection is established */
@@ -286,6 +298,7 @@ int telnet_server_read(void* buffer, size_t count)
     }
     return res;
 }
+#endif
 
 void telnet_server_disconnect(void)
 {
@@ -304,9 +317,11 @@ int telnet_server_start(void)
         return res;
     }
 
-    /* init RX ringbuffer */
-    ringbuffer_init(&_stdin_ringbuffer, _stdin_pipe_buf, sizeof(_stdin_pipe_buf));
-    pipe_init(&_stdin_pipe, &_stdin_ringbuffer, NULL);
+    if (!IS_USED(MODULE_STDIO_TELNET)) {
+        /* init RX ringbuffer */
+        ringbuffer_init(&_stdin_ringbuffer, _stdin_pipe_buf, sizeof(_stdin_pipe_buf));
+        pipe_init(&_stdin_pipe, &_stdin_ringbuffer, NULL);
+    }
 
     /* initiate telnet server */
     thread_create(telnet_stack, sizeof(telnet_stack),
