@@ -1,0 +1,31 @@
+DEFAULT_MODULE += auto_init_random
+USEMODULE += prng
+
+ifneq (,$(filter prng_fortuna,$(USEMODULE)))
+  USEMODULE += fortuna
+  USEMODULE += hashes
+  USEMODULE += crypto
+  ifneq (,$(filter fortuna_reseed,$(USEMODULE)))
+      USEMODULE += atomic_utils
+      USEMODULE += xtimer
+  endif
+endif
+
+ifneq (,$(filter prng_tinymt32,$(USEMODULE)))
+  USEMODULE += tinymt32
+endif
+
+ifneq (,$(filter prng_sha%prng,$(USEMODULE)))
+  USEMODULE += prng_shaxprng
+  USEMODULE += hashes
+endif
+
+ifneq (,$(filter prng_hwrng,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_hwrng
+endif
+
+ifeq (,$(filter puf_sram,$(USEMODULE)))
+  FEATURES_OPTIONAL += periph_hwrng
+endif
+
+USEMODULE += luid

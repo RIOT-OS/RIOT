@@ -1,5 +1,4 @@
 ifneq (,$(filter senml_saul,$(USEMODULE)))
-  USEMODULE += senml
   USEMODULE += senml_cbor
   USEMODULE += senml_phydat
   USEMODULE += saul_reg
@@ -7,10 +6,8 @@ endif
 
 ifneq (,$(filter senml_cbor,$(USEMODULE)))
   USEPKG += nanocbor
-  USEMODULE += senml
 endif
 
 ifneq (,$(filter senml_phydat,$(USEMODULE)))
-  USEMODULE += senml
   USEMODULE += phydat
 endif

@@ -1,0 +1,14 @@
+USEMODULE += core_thread_flags
+
+ifneq (,$(filter event_thread_%,$(USEMODULE)))
+  USEMODULE += event_thread
+endif
+
+ifneq (,$(filter event_timeout_ztimer,$(USEMODULE)))
+  USEMODULE += ztimer
+endif
+
+ifneq (,$(filter event_timeout,$(USEMODULE)))
+  USEMODULE += event_timeout_ztimer
+  USEMODULE += ztimer_usec
+endif

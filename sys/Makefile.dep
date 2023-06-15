@@ -1,24 +1,3 @@
-ifneq (,$(filter arduino,$(USEMODULE)))
-  FEATURES_OPTIONAL += periph_adc
-  FEATURES_OPTIONAL += periph_i2c
-  FEATURES_OPTIONAL += periph_spi
-  FEATURES_REQUIRED += arduino
-  FEATURES_REQUIRED += cpp
-  FEATURES_REQUIRED += periph_gpio
-  FEATURES_REQUIRED += periph_uart
-  USEMODULE += arduino_sketches
-  USEMODULE += fmt
-  USEMODULE += ztimer_usec
-  USEMODULE += ztimer_msec
-  ifneq (,$(filter stdio_cdc_acm,$(USEMODULE)))
-    USEMODULE += arduino_serial_stdio
-  endif
-endif
-
-ifneq (,$(filter arduino_pwm,$(FEATURES_USED)))
-  FEATURES_REQUIRED += periph_pwm
-endif
-
 # cannot be moved to GNRC's Makefile.dep, as module name neither starts or ends with gnrc
 ifneq (,$(filter auto_init_gnrc_netif,$(USEMODULE)))
   USEMODULE += gnrc_netif_init_devs
@@ -50,32 +29,8 @@ ifneq (,$(filter auto_init_sock_dns,$(USEMODULE)))
   endif
 endif
 
-ifneq (,$(filter coding,$(USEMODULE)))
-  USEMODULE += bitfield
-endif
-
 ifneq (,$(filter congure_%,$(USEMODULE)))
   USEMODULE += congure
-endif
-
-ifneq (,$(filter congure_abe,$(USEMODULE)))
-  USEMODULE += congure_reno_methods
-endif
-
-ifneq (,$(filter congure_quic,$(USEMODULE)))
-  USEMODULE += ztimer_msec
-endif
-
-ifneq (,$(filter congure_test,$(USEMODULE)))
-  USEMODULE += fmt
-endif
-
-ifneq (,$(filter congure_reno,$(USEMODULE)))
-  USEMODULE += congure_reno_methods
-endif
-
-ifneq (,$(filter congure_reno_methods,$(USEMODULE)))
-  USEMODULE += seq
 endif
 
 ifneq (,$(filter crc16_fast,$(USEMODULE)))
@@ -88,10 +43,6 @@ endif
 
 ifneq (,$(filter debug_irq_disable,$(USEMODULE)))
   USEMODULE += fmt
-endif
-
-ifneq (,$(filter eepreg,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_eeprom
 endif
 
 ifneq (,$(filter fmt_table,$(USEMODULE)))
@@ -125,17 +76,8 @@ ifneq (,$(filter ieee802154_security,$(USEMODULE)))
   USEMODULE += cipher_modes
 endif
 
-ifneq (,$(filter trace,$(USEMODULE)))
-  USEMODULE += ztimer
-  USEMODULE += ztimer_usec
-endif
-
 ifneq (,$(filter shell_lock,$(USEMODULE)))
   USEMODULE += ztimer_msec
-endif
-
-ifneq (,$(filter ssp,$(USEMODULE)))
-  FEATURES_REQUIRED += ssp
 endif
 
 ifneq (,$(filter base64url,$(USEMODULE)))
@@ -223,11 +165,6 @@ ifneq (,$(filter netdev_tap,$(USEMODULE)))
   USEMODULE += iolist
 endif
 
-ifneq (,$(filter trickle,$(USEMODULE)))
-  USEMODULE += random
-  USEMODULE += ztimer_msec
-endif
-
 ifneq (,$(filter eui_provider,$(USEMODULE)))
   USEMODULE += luid
 endif
@@ -256,12 +193,12 @@ ifneq (,$(filter l2util,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
-ifneq (,$(filter od,$(USEMODULE)))
-  USEMODULE += fmt
-endif
-
 ifneq (,$(filter od_string,$(USEMODULE)))
   USEMODULE += od
+endif
+
+ifneq (,$(filter od,$(USEMODULE)))
+  USEMODULE += fmt
 endif
 
 ifneq (,$(filter netutils,$(USEMODULE)))
@@ -349,16 +286,8 @@ ifneq (,$(filter shell_cmds,$(USEMODULE)))
   USEMODULE += shell
 endif
 
-ifneq (,$(filter shell,$(USEMODULE)))
-  include $(RIOTBASE)/sys/shell/Makefile.dep
-endif
-
 # Include all stdio_% dependencies after all USEMODULE += stdio_%
 include $(RIOTBASE)/makefiles/stdio.inc.mk
-
-ifneq (,$(filter isrpipe,$(USEMODULE)))
-  USEMODULE += tsrb
-endif
 
 ifneq (,$(filter isrpipe_read_timeout,$(USEMODULE)))
   USEMODULE += isrpipe
@@ -386,14 +315,6 @@ ifneq (,$(filter posix_inet,$(USEMODULE)))
   USEMODULE += posix_headers
 endif
 
-ifneq (,$(filter sema_inv,$(USEMODULE)))
-  USEMODULE += atomic_utils
-endif
-
-ifneq (,$(filter sema,$(USEMODULE)))
-  USEMODULE += ztimer
-endif
-
 ifneq (,$(filter sema_deprecated,$(USEMODULE)))
   USEMODULE += sema
   USEMODULE += ztimer64
@@ -403,10 +324,6 @@ endif
 ifneq (,$(filter telnet,$(USEMODULE)))
   USEMODULE += pipe
   USEMODULE += sock_tcp
-endif
-
-ifneq (,$(filter luid,$(USEMODULE)))
-  FEATURES_OPTIONAL += periph_cpuid
 endif
 
 ifneq (,$(filter fib,$(USEMODULE)))
@@ -421,24 +338,6 @@ endif
 # if any log_* is used, also use LOG pseudomodule
 ifneq (,$(filter log_%,$(USEMODULE)))
   USEMODULE += log
-endif
-
-ifneq (,$(filter log_color,$(USEMODULE)))
-  # log_color fails to compile with -Wformat-nonliteral but this is required
-  # for the wrapped stdio that pushes the format string into progmem
-  FEATURES_BLACKLIST += arch_avr8
-endif
-
-ifneq (,$(filter cpp11-compat,$(USEMODULE)))
-  USEMODULE += cpp_new_delete
-  USEMODULE += ztimer64_usec
-  USEMODULE += timex
-  FEATURES_REQUIRED += cpp
-  FEATURES_REQUIRED += libstdcpp
-  ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
-    # requires 64bit for syscalls
-    USEMODULE += ztimer64_xtimer_compat
-  endif
 endif
 
 ifneq (,$(filter netstats_%, $(USEMODULE)))
@@ -459,24 +358,6 @@ ifneq (,$(filter pthread,$(USEMODULE)))
   endif
 endif
 
-ifneq (,$(filter schedstatistics,$(USEMODULE)))
-  USEMODULE += ztimer_usec
-  USEMODULE += sched_cb
-endif
-
-ifneq (,$(filter sched_round_robin,$(USEMODULE)))
-# this depends on either ztimer_usec or ztimer_msec if neither is used
-# prior to this msec is preferred
-  ifeq (,$(filter ztimer_usec,$(USEMODULE))$(filter ztimer_msec,$(USEMODULE)))
-    USEMODULE += ztimer_msec
-  endif
-  USEMODULE += sched_runq_callback
-endif
-
-ifneq (,$(filter saul_reg,$(USEMODULE)))
-  USEMODULE += saul
-endif
-
 ifneq (,$(filter saul_default,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_saul
   DEFAULT_MODULE += saul_init_devs
@@ -484,16 +365,8 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_reg
 endif
 
-ifneq (,$(filter senml%,$(USEMODULE)))
-  include $(RIOTBASE)/sys/senml/Makefile.dep
-endif
-
-ifneq (,$(filter phydat,$(USEMODULE)))
-  USEMODULE += fmt
-endif
-
-ifneq (,$(filter pm_layered,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_pm
+ifneq (,$(filter senml_%,$(USEMODULE)))
+  USEMODULE += senml
 endif
 
 ifneq (,$(filter evtimer_mbox,$(USEMODULE)))
@@ -501,72 +374,15 @@ ifneq (,$(filter evtimer_mbox,$(USEMODULE)))
   USEMODULE += core_mbox
 endif
 
-ifneq (,$(filter can,$(USEMODULE)))
-  USEMODULE += can_raw
-  ifneq (,$(filter can_mbox,$(USEMODULE)))
-    USEMODULE += core_mbox
-  endif
-  USEMODULE += memarray
-endif
-
-ifneq (,$(filter can_isotp,$(USEMODULE)))
-  USEMODULE += ztimer
-  USEMODULE += ztimer_usec
-  USEMODULE += gnrc_pktbuf
+ifneq (,$(filter can_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter conn_can,$(USEMODULE)))
   USEMODULE += can
-  USEMODULE += can_mbox
-  USEMODULE += ztimer
-  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter entropy_source_%,$(USEMODULE)))
   USEMODULE += entropy_source
-  ifneq (,$(filter entropy_source_adc_noise,$(USEMODULE)))
-    FEATURES_REQUIRED += periph_adc
-  endif
-endif
-
-ifneq (,$(filter puf_sram,$(USEMODULE)))
-  USEMODULE += hashes
-  USEMODULE += random
-  FEATURES_REQUIRED += puf_sram
-endif
-
-ifneq (,$(filter random,$(USEMODULE)))
-  DEFAULT_MODULE += auto_init_random
-  USEMODULE += prng
-
-  ifneq (,$(filter prng_fortuna,$(USEMODULE)))
-    USEMODULE += fortuna
-    USEMODULE += hashes
-    USEMODULE += crypto
-    ifneq (,$(filter fortuna_reseed,$(USEMODULE)))
-        USEMODULE += atomic_utils
-        USEMODULE += xtimer
-    endif
-  endif
-
-  ifneq (,$(filter prng_tinymt32,$(USEMODULE)))
-    USEMODULE += tinymt32
-  endif
-
-  ifneq (,$(filter prng_sha%prng,$(USEMODULE)))
-    USEMODULE += prng_shaxprng
-    USEMODULE += hashes
-  endif
-
-  ifneq (,$(filter prng_hwrng,$(USEMODULE)))
-    FEATURES_REQUIRED += periph_hwrng
-  endif
-
-  ifeq (,$(filter puf_sram,$(USEMODULE)))
-    FEATURES_OPTIONAL += periph_hwrng
-  endif
-
-  USEMODULE += luid
 endif
 
 ifneq (,$(filter hashes,$(USEMODULE)))
@@ -603,18 +419,6 @@ endif
 
 ifneq (,$(filter vfs_default,$(USEMODULE)))
   USEMODULE += vfs
-  DEFAULT_MODULE += vfs_auto_mount
-endif
-
-ifneq (,$(filter vfs_util,$(USEMODULE)))
-  USEMODULE += vfs
-endif
-
-ifneq (,$(filter vfs,$(USEMODULE)))
-  USEMODULE += posix_headers
-  ifeq (native, $(BOARD))
-    USEMODULE += native_vfs
-  endif
 endif
 
 ifneq (,$(filter sock_async_event,$(USEMODULE)))
@@ -660,23 +464,6 @@ endif
 
 ifneq (,$(filter event_%,$(USEMODULE)))
   USEMODULE += event
-endif
-
-ifneq (,$(filter event_thread_%,$(USEMODULE)))
-  USEMODULE += event_thread
-endif
-
-ifneq (,$(filter event_timeout_ztimer,$(USEMODULE)))
-  USEMODULE += ztimer
-endif
-
-ifneq (,$(filter event_timeout,$(USEMODULE)))
-  USEMODULE += event_timeout_ztimer
-  USEMODULE += ztimer_usec
-endif
-
-ifneq (,$(filter event,$(USEMODULE)))
-  USEMODULE += core_thread_flags
 endif
 
 ifneq (,$(filter l2filter_%,$(USEMODULE)))
@@ -745,10 +532,6 @@ ifneq (,$(filter gcoap_dns,$(USEMODULE)))
   USEMODULE += sock_util
 endif
 
-ifneq (,$(filter luid,$(USEMODULE)))
-  FEATURES_OPTIONAL += periph_cpuid
-endif
-
 ifneq (,$(filter nanocoap_dtls,$(USEMODULE)))
   USEMODULE += sock_dtls
   USEPKG += tinydtls
@@ -785,10 +568,6 @@ endif
 
 ifneq (,$(filter nanocoap_%,$(USEMODULE)))
   USEMODULE += nanocoap
-endif
-
-ifneq (,$(filter benchmark,$(USEMODULE)))
-  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter skald_%,$(USEMODULE)))
@@ -835,94 +614,15 @@ ifneq (,$(filter cord_lc,$(USEMODULE)))
   USEMODULE += clif
 endif
 
-ifneq (,$(filter usbus,$(USEMODULE)))
-  DEFAULT_MODULE += auto_init_usbus
-  USEMODULE += core_thread_flags
-  USEMODULE += event
-  USEMODULE += luid
-  USEMODULE += fmt
-  ifeq (,$(filter usbdev_mock,$(USEMODULE)))
-    FEATURES_REQUIRED += periph_usbdev
-  endif
-endif
-
-ifneq (,$(filter usbus_cdc_acm,$(USEMODULE)))
-  USEMODULE += tsrb
+ifneq (,$(filter usbus%,$(USEMODULE)))
   USEMODULE += usbus
+  # usbus is not directly in a subdirectory of sys, so we have to include the
+  # Makefile.dep manually
+  include $(RIOTBASE)/sys/usb/usbus/Makefile.dep
 endif
 
-ifneq (,$(filter usbus_cdc_ecm,$(USEMODULE)))
-  USEMODULE += iolist
-  USEMODULE += fmt
-  USEMODULE += usbus
-  USEMODULE += usbus_urb
-  USEMODULE += netdev_eth
-  USEMODULE += luid
-endif
-
-ifneq (,$(filter usbus_hid,$(USEMODULE)))
-  USEMODULE += isrpipe_read_timeout
-  USEMODULE += usbus
-endif
-
-ifneq (,$(filter usbus_dfu,$(USEMODULE)))
-  FEATURES_REQUIRED += riotboot
-  USEMODULE += usbus
-  USEMODULE += riotboot_slot
-endif
-
-ifneq (,$(filter ut_process,$(USEMODULE)))
-  USEMODULE += fmt
-endif
-
-ifneq (,$(filter usbus_msc,$(USEMODULE)))
-  USEMODULE += usbus
-  USEMODULE += mtd
-  USEMODULE += mtd_write_page
-endif
-
-ifneq (,$(filter uuid,$(USEMODULE)))
-  USEMODULE += hashes
-  USEMODULE += random
-  USEMODULE += fmt
-endif
-
-ifneq (,$(filter riotboot_flashwrite, $(USEMODULE)))
-  USEMODULE += riotboot_slot
-  FEATURES_REQUIRED += periph_flashpage
-endif
-
-ifneq (,$(filter riotboot_slot, $(USEMODULE)))
-  USEMODULE += riotboot_hdr
-endif
-
-ifneq (,$(filter riotboot_serial, $(USEMODULE)))
-  FEATURES_REQUIRED += periph_flashpage
-  FEATURES_REQUIRED += periph_uart
-  USEMODULE += riotboot_reset
-  USEMODULE += checksum
-endif
-
-ifneq (,$(filter riotboot_reset, $(USEMODULE)))
+ifneq (,$(filter riotboot_%, $(USEMODULE)))
   USEMODULE += riotboot
-  USEMODULE += usb_board_reset
-endif
-
-ifneq (,$(filter riotboot_hdr, $(USEMODULE)))
-  USEMODULE += checksum
-  USEMODULE += riotboot
-endif
-
-ifneq (,$(filter riotboot_usb_dfu, $(USEMODULE)))
-  USEMODULE += usbus_dfu
-  USEMODULE += riotboot_flashwrite
-  USEMODULE += ztimer_sec
-  FEATURES_REQUIRED += no_idle_thread
-  FEATURES_REQUIRED += periph_pm
-endif
-
-ifneq (,$(filter riotboot_tinyusb_dfu, $(USEMODULE)))
-  USEPKG += tinyusb
 endif
 
 ifneq (,$(filter irq_handler,$(USEMODULE)))
@@ -936,47 +636,6 @@ endif
 
 ifneq (,$(filter credman_load, $(USEMODULE)))
   USEPKG += tiny-asn1
-endif
-
-ifneq (,$(filter suit,$(USEMODULE)))
-  USEPKG += nanocbor
-  USEPKG += libcose
-  USEMODULE += uuid
-
-  ifeq (,$(filter libcose_crypt_%,$(USEMODULE)))
-    USEMODULE += libcose_crypt_c25519
-  endif
-endif
-
-ifneq (,$(filter suit_transport_%, $(USEMODULE)))
-  USEMODULE += suit_transport
-  USEMODULE += suit_transport_worker
-endif
-
-ifneq (,$(filter suit_transport_coap, $(USEMODULE)))
-  USEMODULE += nanocoap_sock
-  USEMODULE += ztimer_msec
-  USEMODULE += sock_util
-endif
-
-ifneq (,$(filter suit_transport_vfs, $(USEMODULE)))
-  USEMODULE += vfs_util
-endif
-
-ifneq (,$(filter suit_storage_%, $(USEMODULE)))
-  USEMODULE += suit_storage
-endif
-
-ifneq (,$(filter suit_storage_flashwrite, $(USEMODULE)))
-  FEATURES_REQUIRED += riotboot
-  USEMODULE += riotboot_slot
-  USEMODULE += riotboot_flashwrite
-  USEMODULE += riotboot_flashwrite_verify_sha256
-endif
-
-ifneq (,$(filter suit_storage_vfs,$(USEMODULE)))
-  USEMODULE += vfs
-  USEMODULE += mtd
 endif
 
 ifneq (,$(filter suit_%,$(USEMODULE)))
@@ -995,10 +654,6 @@ endif
 # include ztimer64 dependencies
 ifneq (,$(filter ztimer64%,$(USEMODULE)))
   include $(RIOTBASE)/sys/ztimer64/Makefile.dep
-endif
-
-ifneq (,$(filter evtimer,$(USEMODULE)))
-  USEMODULE += ztimer_msec
 endif
 
 # handle xtimer's deps. Needs to be done *after* ztimer
@@ -1027,33 +682,7 @@ ifneq (,$(filter dbgpin,$(USEMODULE)))
   FEATURES_REQUIRED += dbgpin
 endif
 
-ifneq (,$(filter fido2_ctap_%,$(USEMODULE)))
-  USEMODULE += fido2_ctap_transport
-  USEMODULE += fido2_ctap
-  ifneq (,$(filter fido2_ctap_transport_hid,$(USEMODULE)))
-      USEMODULE += ztimer64_msec
-      USEMODULE += usbus_hid
-      DISABLE_MODULE += auto_init_usbus
-  endif
-endif
-
-ifneq (,$(filter fido2_ctap,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_flashpage
-  FEATURES_REQUIRED += periph_flashpage_in_address_space
-  FEATURES_REQUIRED += periph_gpio_irq
-
-  USEPKG += tiny-asn1
-  USEPKG += tinycbor
-  USEPKG += micro-ecc
-
-  USEMODULE += mtd_flashpage
-  USEMODULE += mtd_write_page
-  USEMODULE += ztimer_msec
-  USEMODULE += event
-  USEMODULE += event_timeout_ztimer
-  USEMODULE += cipher_modes
-  USEMODULE += crypto_aes_256
-  USEMODULE += hashes
+ifneq (,$(filter fido2_ctap%,$(USEMODULE)))
   USEMODULE += fido2
 endif
 
@@ -1063,10 +692,6 @@ endif
 
 ifneq (,$(filter auto_init%,$(USEMODULE)))
   USEMODULE += preprocessor_successor
-endif
-
-ifneq (,$(filter uri_parser,$(USEMODULE)))
-  USEMODULE += fmt
 endif
 
 include $(RIOTBASE)/sys/test_utils/Makefile.dep
