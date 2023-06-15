@@ -409,6 +409,17 @@ do_debug() {
 
 do_debugserver() {
     test_config
+    # temporary file that saves OpenOCD pid
+    OCD_PIDFILE=$(mktemp -t "openocd_pid.XXXXXXXXXX")
+    # will be called by trap
+    cleanup() {
+        OCD_PID="$(cat $OCD_PIDFILE)"
+        kill ${OCD_PID}
+        rm -f "$OCD_PIDFILE"
+        exit 0
+    }
+    # cleanup after script terminates
+    trap "cleanup ${OCD_PIDFILE}" EXIT
     # start OpenOCD as GDB server
     sh -c "${OPENOCD} \
             ${OPENOCD_ADAPTER_INIT} \
@@ -421,7 +432,13 @@ do_debugserver() {
             -c 'init' \
             ${OPENOCD_DBG_EXTRA_CMD} \
             -c 'targets' \
-            -c 'halt'"
+            -c 'halt' & \
+            echo \$! > $OCD_PIDFILE ; \
+            wait \$(cat $OCD_PIDFILE)" &
+
+    while read -r line; do
+        echo "Exit with Ctrl+D"
+    done
 }
 
 do_reset() {
