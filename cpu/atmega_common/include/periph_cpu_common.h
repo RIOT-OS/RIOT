@@ -64,7 +64,11 @@ typedef uint8_t gpio_t;
  * Must be identical to the address of `PINA` provided by avr/io.h
  */
 #ifdef CPU_ATMEGA8
-#define ATMEGA_GPIO_BASE_A      (0x39)
+#define GPIO_PORT_DESCENDENT
+#endif
+
+#ifdef GPIO_PORT_DESCENDENT
+#define ATMEGA_GPIO_BASE_A     (0x39)
 #else
 #define ATMEGA_GPIO_BASE_A      (0x20)
 #endif
@@ -143,7 +147,7 @@ typedef struct {
 static inline atmega_gpio_port_t *atmega_gpio_port(uint8_t port_num)
 {
     static const uintptr_t base_addr = (uintptr_t)ATMEGA_GPIO_BASE_A;
-#ifdef CPU_ATMEGA8
+#ifdef GPIO_PORT_DESCENDENT
     uintptr_t res = base_addr - port_num * sizeof(atmega_gpio_port_t);
 #else
     uintptr_t res = base_addr + port_num * sizeof(atmega_gpio_port_t);

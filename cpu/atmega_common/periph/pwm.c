@@ -37,10 +37,10 @@
 #define COMA1 7
 
 static struct {
-#ifndef CPU_ATMEGA8
+#if (defined(TCCR0A) && defined(TTCR0B)) || (defined(TCCR2A) && defined(TCCR2B))
     uint8_t CRA;
     uint8_t CRB;
-#else
+#elif defined(TCCR2)
     uint8_t CR;
 #endif
     uint8_t res;
@@ -66,7 +66,7 @@ static inline uint8_t get_prescaler(pwm_t dev, uint32_t *scale)
     return pre;
 }
 
-#ifndef CPU_ATMEGA8
+#if (defined(TCCR0A) && defined(TTCR0B)) || (defined(TCCR2A) && defined(TCCR2B))
 static inline void compute_cra_and_crb(pwm_t dev, uint8_t pre)
 {
     uint8_t cra = (1 << WGM1) | (1 << WGM0);
@@ -90,19 +90,19 @@ static inline void compute_cra_and_crb(pwm_t dev, uint8_t pre)
 
 static inline void apply_config(pwm_t dev)
 {
-#ifndef CPU_ATMEGA8
+#if (defined(TCCR0A) && defined(TTCR0B)) || (defined(TCCR2A) && defined(TCCR2B))
     pwm_conf[dev].dev->CRA = state[dev].CRA;
     pwm_conf[dev].dev->CRB = state[dev].CRB;
-#else
+#elif defined(TCCR2)
     pwm_conf[dev].dev->CR = state[dev].CR;
 #endif
 
     if (pwm_conf[dev].pin_ch[0] == GPIO_UNDEF) {
         /* If channel 0 is not used, variable resolutions can be used for
          * channel 1 */
-#ifndef CPU_ATMEGA8
+#if (defined(OCR0A) && defined(OCR0B)) || (defined(OCR2A) && defined(OCR2B))
         pwm_conf[dev].dev->OCR[0] = state[dev].res;
-#else
+#elif defined(OCR2)
         pwm_conf[dev].dev->OCR = state[dev].res;
 #endif
     }
@@ -117,17 +117,17 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     assert(!(res != 256 && pwm_conf[dev].pin_ch[0] != GPIO_UNDEF));
 
     /* disable PWM */
-#ifndef CPU_ATMEGA8
+#if (defined(TCCR0A) && defined(TTCR0B)) || (defined(TCCR2A) && defined(TCCR2B))
     pwm_conf[dev].dev->CRA = 0x00;
     pwm_conf[dev].dev->CRB = 0x00;
     pwm_conf[dev].dev->OCR[0] = 0;
     pwm_conf[dev].dev->OCR[1] = 0;
-#else
+#elif defined(TCCR2)
     pwm_conf[dev].dev->CR = 0x00;
     pwm_conf[dev].dev->OCR = 0;
 #endif
 
-#ifndef CPU_ATMEGA8
+#ifdef PRR
     /* disable power reduction */
     if (dev) {
         power_timer2_enable();
@@ -144,9 +144,9 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
     /* Compute configuration and store it in the state. (The state is needed
      * for later calls to pwm_poweron().)*/
-#ifndef CPU_ATMEGA8
+#if (defined(TCCR0A) && defined(TTCR0B)) || (defined(TCCR2A) && defined(TCCR2B))
     compute_cra_and_crb(dev, pre);
-#else
+#elif defined(TCCR2)
     uint8_t cr = (1 << WGM21) | (1 << WGM20) | (1 << COM21) | pre;
     state[dev].CR = cr;
 #endif
@@ -183,21 +183,21 @@ uint8_t pwm_channels(pwm_t dev)
 
 void pwm_set(pwm_t dev, uint8_t ch, uint16_t value)
 {
-#ifdef CPU_ATMEGA8
+#ifdef OCR2
     (void)ch;
 #endif
     assert(dev < PWM_NUMOF && ch <= 1 && pwm_conf[dev].pin_ch[ch] != GPIO_UNDEF);
     if (value > state[dev].res) {
-#ifndef CPU_ATMEGA8
+#if (defined(OCR0A) && defined(OCR0B)) || (defined(OCR2A) && defined(OCR2B))
         pwm_conf[dev].dev->OCR[ch] = state[dev].res;
-#else
+#elif defined(OCR2)
         pwm_conf[dev].dev->OCR = state[dev].res;
 #endif
     }
     else {
-#ifndef CPU_ATMEGA8
+#if (defined(OCR0A) && defined(OCR0B)) || (defined(OCR2A) && defined(OCR2B))
         pwm_conf[dev].dev->OCR[ch] = value;
-#else
+#elif defined(OCR2)
         pwm_conf[dev].dev->OCR = value;
 #endif
     }
@@ -206,7 +206,7 @@ void pwm_set(pwm_t dev, uint8_t ch, uint16_t value)
 void pwm_poweron(pwm_t dev)
 {
     assert(dev < PWM_NUMOF);
-#ifndef CPU_ATMEGA8
+#ifdef PRR
     /* disable power reduction */
     if (dev) {
         power_timer2_enable();
@@ -222,7 +222,7 @@ void pwm_poweron(pwm_t dev)
 void pwm_poweroff(pwm_t dev)
 {
     assert(dev < PWM_NUMOF);
-#ifndef CPU_ATMEGA8
+#if (defined(TCCR0A) && defined(TTCR0B)) || (defined(TCCR2A) && defined(TCCR2B))
     pwm_conf[dev].dev->CRA = 0x00;
     pwm_conf[dev].dev->CRB = 0x00;
     /* disable timers to lower power consumption */
@@ -232,7 +232,7 @@ void pwm_poweroff(pwm_t dev)
     else {
         power_timer0_disable();
     }
-#else
+#elif defined(TCCR2)
     pwm_conf[dev].dev->CR = 0x00;
 #endif
 

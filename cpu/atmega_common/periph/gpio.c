@@ -314,10 +314,10 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     cli();
 
     /* enable interrupt number int_num */
-#ifndef CPU_ATMEGA8
+#if defined(EIFR) && defined(EIMSK)
     EIFR |= (1 << int_num);
     EIMSK |= (1 << int_num);
-#else /* atmega8 */
+#elif defined(GIFR) && defined(GICR)
     GIFR |= (1 << (INTF0 + int_num));
     GICR |= (1 << (INT0 + int_num));
 #endif
@@ -331,10 +331,10 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     else
 #endif
     {
-#ifndef CPU_ATMEGA8
+#if defined(EICRA)
         EICRA &= ~(0x3 << (int_num * 2));
         EICRA |= (flank << (int_num * 2));
-#else /* atmega8 */
+#elif defined(MCUCR)
         MCUCR &= ~(0x3 << (int_num * 2));
         MCUCR |= (flank << (int_num * 2));
 #endif
@@ -352,10 +352,10 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 
 void gpio_irq_enable(gpio_t pin)
 {
-#ifndef CPU_ATMEGA8
+#if defined(EIFR) && defined(EIMSK)
     EIFR |= (1 << _int_num(pin));
     EIMSK |= (1 << _int_num(pin));
-#else /* atmega8 */
+#elif defined(GIFR) && defined(GICR)
     GIFR |= (1 << (INTF0 + _int_num(pin)));
     GICR |= (1 << (INTF0 + _int_num(pin)));
 #endif
@@ -363,9 +363,9 @@ void gpio_irq_enable(gpio_t pin)
 
 void gpio_irq_disable(gpio_t pin)
 {
-#ifndef CPU_ATMEGA8
+#if defined(EIMSK)
     EIMSK &= ~(1 << _int_num(pin));
-#else /* atmega8 */
+#elif defined(GICR)
     GICR &= ~(1 << (INTF0 + _int_num(pin)));
 #endif
 }

@@ -49,7 +49,7 @@
 static int _start(uint8_t address, uint8_t rw_flag);
 static int _write(const uint8_t *data, int length);
 static void _stop(void);
-#ifndef CPU_ATMEGA8
+#ifdef PRR
 static void i2c_poweron(i2c_t dev);
 #endif
 
@@ -123,7 +123,7 @@ void i2c_init(i2c_t dev)
     /* set pull-up on SCL and SDA */
     I2C_PORT_REG |= (I2C_PIN_MASK);
 
-#ifndef CPU_ATMEGA8
+#ifdef PRR
     /* enable I2C clock */
     i2c_poweron(dev);
 #endif
@@ -240,7 +240,7 @@ void i2c_release(i2c_t dev)
     mutex_unlock(&locks[dev]);
 }
 
-#ifndef CPU_ATMEGA8
+#ifdef PRR
 static void i2c_poweron(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);

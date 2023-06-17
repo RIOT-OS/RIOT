@@ -67,20 +67,18 @@ typedef struct {
 /**
  * @brief   8-bit timer register map
  */
-#ifndef TCCR2
 typedef struct {
+#if ((defined(TCCR0A) && defined(TTCR0B)) || (defined(TCCR2A) && defined(TCCR2B)))
     REG8    CRA;            /**< control A */
     REG8    CRB;            /**< control B */
     REG8    CNT;            /**< counter */
     REG8    OCR[2];         /**< output compare */
-} mini_timer_t;
-#else /* atmega8 */
-typedef struct {
+#elif defined(TCCR2)
     REG8    OCR;            /**< output compare */
     REG8    CNT;            /**< counter */
     REG8    CR;             /**< control */
-} mini_timer_t;
 #endif
+} mini_timer_t;
 
 /**
  * @brief   UART register map

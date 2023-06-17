@@ -67,12 +67,12 @@ void avr8_reset_cause(void)
 #endif
 }
 
-#if !defined (CPU_ATMEGA8)
 void __attribute__((weak)) avr8_clk_init(void)
 {
+#if defined(CLKPR)
     atmega_set_prescaler(CPU_ATMEGA_CLK_SCALE_INIT);
-}
 #endif
+}
 
 /* This is a vector which is aliased to __vector_default,
  * the vector executed when an ISR fires with no accompanying

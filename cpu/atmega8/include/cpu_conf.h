@@ -2,6 +2,7 @@
  * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
  *               2017 RWTH Aachen, Josua Arndt
  *               2018 Matthew Blue
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -20,6 +21,7 @@
  * @author          Josua Arndt <jarndt@ias.rwth-aachen.de>
  * @author          Steffen Robertz <steffen.robertz@rwth-aachen.de>
  * @author          Matthew Blue <matthew.blue.neuro@gmail.com>
+ * @author          Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef CPU_CONF_H
@@ -32,7 +34,7 @@ extern "C" {
 #endif
 
 #ifndef THREAD_EXTRA_STACKSIZE_PRINTF
-#define THREAD_EXTRA_STACKSIZE_PRINTF    (128)
+#define THREAD_EXTRA_STACKSIZE_PRINTF    (32)
 #endif
 
 /**
@@ -44,7 +46,7 @@ extern "C" {
  * @{
  */
 #ifndef THREAD_STACKSIZE_DEFAULT
-#define THREAD_STACKSIZE_DEFAULT   (512)
+#define THREAD_STACKSIZE_DEFAULT   (128)
 #endif
 
 /* keep THREAD_STACKSIZE_IDLE > THREAD_EXTRA_STACKSIZE_PRINTF
@@ -59,7 +61,7 @@ extern "C" {
  */
 #define THREAD_STACKSIZE_IDLE      (192)
 #else
-#define THREAD_STACKSIZE_IDLE      (128)
+#define THREAD_STACKSIZE_IDLE      (96)
 #endif
 #endif
 /** @} */
