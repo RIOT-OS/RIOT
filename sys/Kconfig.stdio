@@ -34,6 +34,7 @@ config MODULE_STDIO_SEMIHOSTING
     depends on HAS_ARCH_ARM || HAS_ARCH_RISCV
     select MODULE_ZTIMER
     select MODULE_ZTIMER_MSEC
+    select USE_STDOUT_BUFFERED
 
 config MODULE_SLIPDEV_STDIO
     bool "SLIP network device"
