@@ -26,6 +26,9 @@
 #include "irq.h"
 #include "periph/timer.h"
 
+#define ENABLE_DEBUG    1
+#include "debug.h"
+
 #define F_TIMER             (16000000U)     /* the timer is clocked at 16MHz */
 
 typedef struct {
@@ -113,6 +116,9 @@ int timer_set_absolute(tim_t tim, int chan, unsigned int value)
 
     /* enable IRQ */
     dev(tim)->INTENSET = (TIMER_INTENSET_COMPARE0_Msk << chan);
+
+    DEBUG("[timer] set at %u (in %u)\n",
+          value, value - timer_read(tim));
 
     return 0;
 }

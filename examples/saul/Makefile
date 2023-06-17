@@ -13,6 +13,7 @@ USEMODULE += saul_default
 USEMODULE += shell_cmds_default
 # additional modules for debugging:
 USEMODULE += ps
+USEMODULE += dht
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
@@ -23,3 +24,14 @@ DEVELHELP ?= 1
 QUIET ?= 1
 
 include $(RIOTBASE)/Makefile.include
+
+ifeq (nucleo-f767zi,$(BOARD))
+  CFLAGS += '-DDHT_PARAM_PIN=GPIO_PIN(PORT_G, 0)'
+  $(info "DHT data pin on pin PG0")
+endif
+
+ifeq (nrf52840dk,$(BOARD))
+  CFLAGS += '-DDHT_PARAM_PIN=GPIO_PIN(0, 31)'
+  $(info "DHT data pin on pin P0.31")
+endif
+CFLAGS += '-DISR_STACKSIZE=THREAD_STACKSIZE_MAIN'

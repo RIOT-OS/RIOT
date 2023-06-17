@@ -20,8 +20,13 @@
  * @}
  */
 
+#include <stdint.h>
+
 #include "cpu.h"
 #include "periph/timer.h"
+
+#define ENABLE_DEBUG    1
+#include "debug.h"
 
 /**
  * @brief   Interrupt context for each configured timer
@@ -196,6 +201,9 @@ int timer_set(tim_t tim, int channel, unsigned int timeout)
     }
 
     irq_restore(irqstate);
+
+    DEBUG("[timer] set at %u (in %u)\n",
+          value, (unsigned)((uint16_t)value - (uint16_t)(dev(tim)->CNT)));
 
     return 0;
 }
