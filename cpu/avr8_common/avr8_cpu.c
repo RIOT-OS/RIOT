@@ -31,6 +31,7 @@
 #include <avr/io.h>
 #include <avr/wdt.h>
 #include <avr/pgmspace.h>
+#include <avr/sleep.h>
 
 #include "cpu.h"
 #if !defined (CPU_ATMEGA8)
@@ -106,6 +107,9 @@ void cpu_init(void)
 #ifndef CPU_ATMEGA8
     avr8_clk_init();
 #endif
+
+    /* Set default sleep mode for LPM or threadless idle */
+    set_sleep_mode(SLEEP_MODE_IDLE);
 
     /* Initialize stdio before periph_init() to allow use of DEBUG() there */
 #ifdef MODULE_AVR_LIBC_EXTRA
