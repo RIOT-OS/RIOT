@@ -72,6 +72,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-wl55jc \
     nz32-sc151 \
     olimex-msp430-h1611 \
+    olimex-msp430-h2618 \
     olimexino-stm32 \
     opencm904 \
     openlabs-kw41z-mini-256kib \

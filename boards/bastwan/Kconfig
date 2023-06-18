@@ -24,3 +24,6 @@ config BOARD_BASTWAN
 
     select HAVE_SAUL_GPIO
     select HAVE_SX1276
+
+config FORCE_USB_STDIO
+    default y

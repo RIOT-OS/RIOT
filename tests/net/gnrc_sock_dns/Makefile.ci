@@ -21,6 +21,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-l031k6 \
     nucleo-l053r8 \
     olimex-msp430-h1611 \
+    olimex-msp430-h2618 \
     samd10-xmini \
     slstk3400a \
     stk3200 \

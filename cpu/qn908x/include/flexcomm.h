@@ -57,7 +57,7 @@ int flexcomm_init(FLEXCOMM_Type *dev, flexcom_pselid_t mode);
  * For example, the flexcomm block number of FLEXCOMM2, the pointer to the
  * FLEXCOMM_Type block is 2. If an invalid address is passed returns -1.
  */
-int flexcomm_instance_from_addr(FLEXCOMM_Type *dev);
+int flexcomm_instance_from_addr(const FLEXCOMM_Type *dev);
 
 #ifdef __cplusplus
 }

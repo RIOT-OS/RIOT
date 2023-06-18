@@ -27,6 +27,8 @@
 
 #include "vendor/drivers/fsl_clock.h"
 
+#define ENABLE_DEBUG 0
+
 #include "debug.h"
 
 int flexcomm_init(FLEXCOMM_Type *dev, flexcom_pselid_t mode)
@@ -59,7 +61,7 @@ int flexcomm_init(FLEXCOMM_Type *dev, flexcom_pselid_t mode)
     return flexcomm_num;
 }
 
-int flexcomm_instance_from_addr(FLEXCOMM_Type *dev)
+int flexcomm_instance_from_addr(const FLEXCOMM_Type *dev)
 {
     static const FLEXCOMM_Type *flexcomm_addrs[] = FLEXCOMM_BASE_PTRS;
 

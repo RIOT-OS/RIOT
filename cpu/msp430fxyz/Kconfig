@@ -24,6 +24,10 @@ config CPU_MODEL_MSP430F2617
     bool
     select CPU_FAM_MSP430F
 
+config CPU_MODEL_MSP430F2618
+    bool
+    select CPU_FAM_MSP430F
+
 ## Definition of specific features
 config HAS_CPU_MSP430FXYZ
     bool
@@ -38,6 +42,7 @@ config CPU_MODEL
     default "msp430f1611" if CPU_MODEL_MSP430F1611
     default "msp430f1612" if CPU_MODEL_MSP430F1612
     default "msp430f2617" if CPU_MODEL_MSP430F2617
+    default "msp430f2618" if CPU_MODEL_MSP430F2618
 
 config CPU
     default "msp430fxyz" if CPU_FAM_MSP430F

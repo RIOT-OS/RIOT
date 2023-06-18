@@ -1,0 +1,3 @@
+# log_color fails to compile with -Wformat-nonliteral but this is required
+# for the wrapped stdio that pushes the format string into progmem
+FEATURES_BLACKLIST += arch_avr8

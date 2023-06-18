@@ -20,6 +20,7 @@
 #                      `OPENOCD="~/openocd/src/openocd -s ~/openocd/tcl"`.
 # OPENOCD_CONFIG:      OpenOCD configuration file name,
 #                      default: "${BOARDSDIR}/${BOARD}/dist/openocd.cfg"
+# OPENOCD_SERVER_ADDRESS: OpenOCD server bind address, default: "localhost"
 #
 # The script supports the following actions:
 #
@@ -50,6 +51,11 @@
 #               TELNET_PORT:    port opened for telnet connections
 #               DBG:            debugger client command, default: 'gdb -q'
 #               TUI:            if TUI!=null, the -tui option will be used
+# debug-client: debug-client <elffile>
+#               connects to a running debug-server
+#               GDB_PORT:       port opened for GDB connections
+#               DBG:            debugger client command, default: 'gdb -q'
+#               TUI:            if TUI!=null, the -tui option will be used
 #
 # debugr:       debug <elfile>
 #               debug given file on the target but flash it first directly
@@ -73,6 +79,9 @@
 #
 # term-rtt:     opens a serial terminal using RTT (Real-Time Transfer)
 #
+#               <options>
+#               RTT_PORT:       port opened for RTT connection
+#
 # @author       Hauke Peteresen <hauke.petersen@fu-berlin.de>
 # @author       Joakim Nohlgård <joakim.nohlgard@eistec.se>
 
@@ -84,6 +93,8 @@
 : ${TELNET_PORT:=4444}
 # Default TCL port, set to 0 to disable
 : ${TCL_PORT:=6333}
+# Default RTT port
+: ${RTT_PORT:=9999}
 # Default OpenOCD command
 : ${OPENOCD:=openocd}
 # Extra board initialization commands to pass to OpenOCD
@@ -92,6 +103,8 @@
 : ${OPENOCD_ADAPTER_INIT:=}
 # If set to 1 'reset_config' will use 'connect_assert_srst' before 'flash' or 'reset.
 : ${OPENOCD_RESET_USE_CONNECT_ASSERT_SRST:=}
+# Default bind address for OpenOCD
+: ${OPENOCD_SERVER_ADDRESS:=localhost}
 # The setsid command is needed so that Ctrl+C in GDB doesn't kill OpenOCD
 : ${SETSID:=setsid}
 # GDB command, usually a separate command for each platform (e.g. arm-none-eabi-gdb)
@@ -99,7 +112,7 @@
 # Debugger client command, can be used to wrap GDB in a front-end
 : ${DBG:=${GDB}}
 # Default debugger flags,
-: ${DBG_DEFAULT_FLAGS:=-q -ex \"tar ext :$(( GDB_PORT + GDB_PORT_CORE_OFFSET ))\"}
+: ${DBG_DEFAULT_FLAGS:=-q -ex \"tar ext ${OPENOCD_SERVER_ADDRESS}:$(( GDB_PORT + GDB_PORT_CORE_OFFSET ))\"}
 # Extra debugger flags, added by the user
 : ${DBG_EXTRA_FLAGS:=}
 # Debugger flags, will be passed to sh -c, remember to escape any quotation signs.
@@ -132,7 +145,7 @@
 
 # default terminal frontend
 _OPENOCD_TERMPROG=${RIOTTOOLS}/pyterm/pyterm
-_OPENOCD_TERMFLAGS="-ts 9999 ${PYTERMFLAGS}"
+_OPENOCD_TERMFLAGS="-ts ${OPENOCD_SERVER_ADDRESS}:${RTT_PORT} ${PYTERMFLAGS}"
 
 #
 # Examples of alternative debugger configurations
@@ -344,6 +357,21 @@ do_flash() {
     echo 'Done flashing'
 }
 
+do_debugclient() {
+    ELFFILE=$1
+    test_elffile
+    # Export to be able to access these from the sh -c command lines, may be
+    # useful when using a frontend for GDB
+    export ELFFILE
+    export GDB
+    export GDB_PORT
+    export DBG_FLAGS
+    export DBG_DEFAULT_FLAGS
+    export DBG_EXTRA_FLAGS
+    # Start the debugger and connect to the GDB server
+    sh -c "${DBG} ${DBG_FLAGS} ${ELFFILE}"
+}
+
 do_debug() {
     ELFFILE=$1
     test_config
@@ -366,6 +394,7 @@ do_debug() {
             ${OPENOCD_ADAPTER_INIT} \
             -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_INIT} \
+            -c 'bindto ${OPENOCD_SERVER_ADDRESS}' \
             -c 'tcl_port ${TCL_PORT}' \
             -c 'telnet_port ${TELNET_PORT}' \
             -c 'gdb_port ${GDB_PORT}' \
@@ -375,16 +404,7 @@ do_debug() {
             ${OPENOCD_DBG_START_CMD} \
             -l /dev/null & \
             echo \$! > $OCD_PIDFILE" &
-    # Export to be able to access these from the sh -c command lines, may be
-    # useful when using a frontend for GDB
-    export ELFFILE
-    export GDB
-    export GDB_PORT
-    export DBG_FLAGS
-    export DBG_DEFAULT_FLAGS
-    export DBG_EXTRA_FLAGS
-    # Start the debugger and connect to the GDB server
-    sh -c "${DBG} ${DBG_FLAGS} ${ELFFILE}"
+    do_debugclient ${ELFFILE}
 }
 
 do_debugserver() {
@@ -394,6 +414,7 @@ do_debugserver() {
             ${OPENOCD_ADAPTER_INIT} \
             -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_INIT} \
+            -c 'bindto ${OPENOCD_SERVER_ADDRESS}' \
             -c 'tcl_port ${TCL_PORT}' \
             -c 'telnet_port ${TELNET_PORT}' \
             -c 'gdb_port ${GDB_PORT}' \
@@ -443,13 +464,14 @@ do_term() {
             ${OPENOCD_ADAPTER_INIT} \
             -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_INIT} \
+            -c 'bindto ${OPENOCD_SERVER_ADDRESS}' \
             -c 'tcl_port 0' \
             -c 'telnet_port 0' \
             -c 'gdb_port 0' \
             -c init \
             -c 'rtt setup '${RAM_START_ADDR}' '${RAM_LEN}' \"SEGGER RTT\"' \
             -c 'rtt start' \
-            -c 'rtt server start 9999 0' \
+            -c 'rtt server start '${RTT_PORT}' 0' \
             >/dev/null & \
             echo  \$! > $OPENOCD_PIDFILE" &
     sleep 1
@@ -484,6 +506,10 @@ case "${ACTION}" in
   debug)
     echo "### Starting Debugging ###"
     do_debug "$@"
+    ;;
+  debug-client)
+    echo "### Attaching to GDB Server ###"
+    do_debugclient "$@"
     ;;
   debug-server)
     echo "### Starting GDB Server ###"

@@ -34,4 +34,7 @@ config MODULE_BOARDS_COMMON_WEACT-F4X1CX
     help
        Common code of weact based boards
 
+config FORCE_USB_STDIO
+    default y
+
 source "$(RIOTBOARD)/common/stm32/Kconfig"

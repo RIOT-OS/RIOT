@@ -1,0 +1,40 @@
+FEATURES_REQUIRED += cpp
+
+# Contrib code of openDSME
+USEMODULE += opendsme_riot_contrib
+
+# Internal openDSME modules
+USEMODULE += opendsme_dsmelayer
+USEMODULE += opendsme_acklayer
+USEMODULE += opendsme_associationmanager
+USEMODULE += opendsme_beaconmanager
+USEMODULE += opendsme_caplayer
+USEMODULE += opendsme_gtsmanager
+USEMODULE += opendsme_messagedispatcher
+USEMODULE += opendsme_messages
+USEMODULE += opendsme_datastructures
+USEMODULE += opendsme_mcps_sap
+USEMODULE += opendsme_mlme_sap
+USEMODULE += opendsme_pib
+
+# openDSME adaption layer modules
+USEMODULE += opendsme_adaption_layer
+USEMODULE += opendsme_adaption_layer_scheduling
+
+# required RIOT modules
+USEMODULE += luid
+USEMODULE += gnrc
+USEMODULE += gnrc_netif
+USEMODULE += ieee802154
+USEMODULE += ztimer_usec
+
+USEMODULE += cpp11-compat
+CXXEXFLAGS += -Wno-unused-parameter -Wno-pedantic -Wno-missing-field-initializers -Wno-unused-but-set-variable -Wno-maybe-uninitialized -Wno-unused-variable -Wno-reorder -Wno-address -Wno-sign-compare -Wno-unused-function
+FEATURES_REQUIRED += cpp # basic C++ support
+FEATURES_REQUIRED += libstdcpp # libstdc++ support (for #include <cstdio>)
+
+
+# Disable Auto-ACK (not supported by openDSME)
+CFLAGS += -DCONFIG_IEEE802154_AUTO_ACK_DISABLE=1
+
+USEMODULE += random

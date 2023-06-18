@@ -21,3 +21,6 @@ config BOARD_YARM
     select HAS_PERIPH_UART
     select HAS_PERIPH_USBDEV
     select HAS_RIOTBOOT
+
+config FORCE_USB_STDIO
+    default y

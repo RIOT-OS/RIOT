@@ -69,7 +69,7 @@ uint16_t calc_rank(gnrc_rpl_dodag_t *dodag, uint16_t base_rank)
         add = CONFIG_GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE;
     }
 
-    if ((base_rank + add) < base_rank) {
+    if ((uint16_t)(base_rank + add) < base_rank) {
         return GNRC_RPL_INFINITE_RANK;
     }
 

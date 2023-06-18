@@ -1,6 +1,42 @@
+Build 1.212 (GCC)
+=================
+07/19/2021
+
+New device support:
+------------------
+- None
+
+New features / changes:
+-----------------------
+- None
+
+Bug fixes:
+----------
+- Fix missing lowtext section for GCC linker files
+
+Build 1.211 (GCC)
+=================
+11/16/2020
+
+New device support:
+------------------
+- None
+
+New features / changes:
+-----------------------
+- Aligned GCC linker command file template for MSP430FR and other MSP430 devices
+  to allow for easier diffs
+
+Bug fixes:
+----------
+- Fixed faulty PORT register definition and references for several FR2xx, FR5xx
+  and FR6xx devices
+- Fixed typo in MSP430G2 family device header files
+
+
 Build 1.210 (GCC)
 =================
-05/14/2020
+05/05/2020
 
 New device support:
 ------------------

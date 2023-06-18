@@ -10,7 +10,7 @@
  */
 
 /**
- * @defgroup    net_nanocoap Nanocoap small CoAP library
+ * @defgroup    net_nanocoap nanoCoAP small CoAP library
  * @ingroup     net
  * @brief       CoAP library optimized for minimal resource usage
  *
@@ -112,7 +112,7 @@ extern "C" {
 #endif
 
 /**
- * @name    Nanocoap specific CoAP method flags used in coap_handlers array
+ * @name    nanoCoAP specific CoAP method flags used in coap_handlers array
  * @anchor  nanocoap_method_flags
  * @{
  */
@@ -130,12 +130,12 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Nanocoap-specific value to indicate no format specified
+ * @brief   nanoCoAP-specific value to indicate no format specified
  */
 #define COAP_FORMAT_NONE        (UINT16_MAX)
 
 /**
- * @defgroup net_nanocoap_conf    Nanocoap compile configurations
+ * @defgroup net_nanocoap_conf    nanoCoAP compile configurations
  * @ingroup  net_nanocoap
  * @ingroup  config
  * @{
@@ -655,6 +655,21 @@ static inline void coap_hdr_set_type(coap_hdr_t *hdr, unsigned type)
  *              NULL if option number was not found
  */
 uint8_t *coap_find_option(coap_pkt_t *pkt, unsigned opt_num);
+
+/**
+ * @brief   Get pointer to an option field, can be called in a loop
+ *          if there are multiple options with the same number
+ *
+ * @param[in]   pkt     packet to work on
+ * @param[in]   opt_num the option number to search for
+ * @param[out]  opt_pos opaque, must be set to `NULL` on first call
+ * @param[out]  opt_len size of the current option data
+ *
+ * @returns     pointer to the option data
+ *              NULL if option number was not found
+ */
+uint8_t *coap_iterate_option(coap_pkt_t *pkt, unsigned opt_num,
+                             uint8_t **opt_pos, int *opt_len);
 
 /**
  * @brief   Get content type from packet

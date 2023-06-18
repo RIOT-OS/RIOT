@@ -21,11 +21,15 @@ config BOARD_COMMON_PARTICLE_MESH
     select HAVE_SAUL_PWM
 
     select MODULE_BOARDS_COMMON_PARTICLE_MESH if TEST_KCONFIG
+    select MODULE_USB_BOARD_RESET if KCONFIG_USB && TEST_KCONFIG
 
 config MODULE_BOARDS_COMMON_PARTICLE_MESH
     bool
     depends on TEST_KCONFIG
     help
        Common code for particle-mesh boards
+
+config FORCE_USB_STDIO
+    default y
 
 source "$(RIOTBOARD)/common/nrf52/Kconfig"

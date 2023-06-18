@@ -68,7 +68,8 @@ extern "C" {
  * that the USB peripheral is ready for use.
  */
 #ifndef CONFIG_USBUS_AUTO_ATTACH
-#if !IS_ACTIVE(KCONFIG_MODULE_USBUS)
+/* Check for Kconfig usage */
+#if !IS_ACTIVE(CONFIG_MODULE_USBUS)
 #define CONFIG_USBUS_AUTO_ATTACH            1
 #endif
 #endif

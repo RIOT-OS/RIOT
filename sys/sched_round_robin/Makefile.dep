@@ -1,0 +1,7 @@
+# this depends on either ztimer_usec or ztimer_msec if neither is used
+# prior to this msec is preferred
+ifeq (,$(filter ztimer_usec,$(USEMODULE))$(filter ztimer_msec,$(USEMODULE)))
+  USEMODULE += ztimer_msec
+endif
+
+USEMODULE += sched_runq_callback

@@ -93,14 +93,14 @@ static inline int hih6130_get_humidity_temperature_raw(const hih6130_t *dev, uin
 
     /* data is in big-endian format, with status bits in the first byte. */
     switch (buf[0] & HIH6130_STATUS_MASK) {
-        case HIH6130_STATUS_OK:
-            status = 0;
-            break;
-        case HIH6130_STATUS_STALE_DATA:
-            status = 1;
-            break;
-        default:
-            return -2;
+    case HIH6130_STATUS_OK:
+        status = 0;
+        break;
+    case HIH6130_STATUS_STALE_DATA:
+        status = 1;
+        break;
+    default:
+        return -2;
     }
 
     *humidity_raw    = ((buf[0] << 8) | buf[1]) & HIH6130_HUMIDITY_MASK;
@@ -109,8 +109,8 @@ static inline int hih6130_get_humidity_temperature_raw(const hih6130_t *dev, uin
     return status;
 }
 
-int hih6130_get_humidity_temperature_float(const hih6130_t *dev,
-    float *relative_humidity_percent, float *temperature_celsius)
+int hih6130_get_humidity_temperature(const hih6130_t *dev,
+        int32_t *humidity_milli_percent, int32_t *temperature_milli_celsius)
 {
     uint16_t hum_raw, temp_raw;
     int status;
@@ -127,11 +127,12 @@ int hih6130_get_humidity_temperature_float(const hih6130_t *dev,
         return -1;
     }
 
-    if (relative_humidity_percent != NULL) {
-        *relative_humidity_percent = hum_raw * (100.f / 16383.f);
+    if (humidity_milli_percent != NULL) {
+        *humidity_milli_percent= (int32_t)hum_raw * 100000 / 16383;
     }
-    if (temperature_celsius != NULL) {
-        *temperature_celsius = temp_raw * (165.f / 16383.f) - 40.f;
+
+    if (temperature_milli_celsius != NULL) {
+        *temperature_milli_celsius = (int32_t)temp_raw * 165000 / 16383 - 40000;
     }
 
     return status;

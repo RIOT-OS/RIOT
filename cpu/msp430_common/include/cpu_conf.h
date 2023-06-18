@@ -42,6 +42,9 @@ extern "C" {
 #elif defined (CPU_MODEL_MSP430F2617)
 #define CPU_FLASH_BASE      (0x3200)    /* first sector is only 256 byte, skip it*/
 #define FLASHPAGE_NUMOF     (103U)      /* we can currently only access 51.5K */
+#elif defined (CPU_MODEL_MSP430F2618)
+#define CPU_FLASH_BASE      (0x3200)    /* first sector is only 256 byte, skip it*/
+#define FLASHPAGE_NUMOF     (103U)      /* we can currently only access 51.5K */
 #elif defined (CPU_MODEL_CC430F6137)
 #define CPU_FLASH_BASE      (0x8000)
 #define FLASHPAGE_NUMOF     (64U)        /* 32K */

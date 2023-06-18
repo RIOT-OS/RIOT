@@ -8,9 +8,20 @@
 menu "Standard Input/Output (STDIO)"
     depends on TEST_KCONFIG
 
+config FORCE_USB_STDIO
+    bool "Force a USB based STDIO"
+    depends on HAS_PERIPH_USBDEV || HAS_TINYUSB_DEVICE
+    select KCONFIG_USB
+    select REQUIRES_USB_STDIO
+    help
+        To prevent a circular dependency, can force the USB modules to that
+        STDIO will select some sort of USB based STDIO backend.
+
 choice STDIO_IMPLEMENTATION
     bool "STDIO implementation"
     default MODULE_STDIO_NATIVE if CPU_ARCH_NATIVE
+    default MODULE_STDIO_CDC_ACM if MODULE_USBUS && REQUIRES_USB_STDIO
+    default MODULE_STDIO_TINYUSB_CDC_ACM if MODULE_TINYUSB_DEVICE && REQUIRES_USB_STDIO
     default MODULE_STDIO_UART
 
 config MODULE_STDIO_RTT
@@ -49,12 +60,6 @@ config MODULE_STDIO_ETHOS
     select MODULE_ETHOS_STDIO
     select USE_STDOUT_BUFFERED
 
-config MODULE_STDIO_USB_SERIAL_JTAG
-    bool "STDIO via ESP32 Debug USB Serial/JTAG interface"
-    depends on TEST_KCONFIG
-    depends on CPU_FAM_ESP32C3 || CPU_FAM_ESP32S3
-    select MODULE_TSRB
-
 endchoice
 
 config MODULE_STDIN
@@ -90,5 +95,10 @@ config USE_STDOUT_BUFFERED
     bool
     help
         Select this to prefer buffered standard output if provided by the implementation.
+
+config REQUIRES_USB_STDIO
+    bool
+    help
+        Indicates that the STDIO requires some USB implementation to be enabled.
 
 endmenu # Standard Input/Output (STDIO)

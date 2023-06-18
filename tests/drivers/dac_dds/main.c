@@ -31,6 +31,7 @@
 #include "mutex.h"
 #include "dac_dds.h"
 #include "dac_dds_params.h"
+#include "imath.h"
 #include "shell.h"
 
 #include "blob/hello.raw.h"
@@ -58,38 +59,6 @@
 static bool res_16b = 0;
 static unsigned sample_rate = 8000;
 
-#define ISIN_PERIOD     (0x7FFF)
-#define ISIN_MAX        (0x1000)
-
-/**
- * @brief A sine approximation via a fourth-order cosine approx.
- *        source: https://www.coranac.com/2009/07/sines/
- *
- * @param x     angle (with 2^15 units/circle)
- * @return      sine value (Q12)
- */
-static int32_t isin(int32_t x)
-{
-    int32_t c, y;
-    static const int32_t qN = 13,
-                         qA = 12,
-                          B = 19900,
-                          C = 3516;
-
-    c = x << (30 - qN);         /* Semi-circle info into carry. */
-    x -= 1 << qN;               /* sine -> cosine calc          */
-
-    x = x << (31 - qN);         /* Mask with PI                 */
-    x = x >> (31 - qN);         /* Note: SIGNED shift! (to qN)  */
-    x = x * x >> (2 * qN - 14); /* x=x^2 To Q14                 */
-
-    y = B - (x * C >> 14);      /* B - x^2*C                    */
-    y = (1 << qA)               /* A - x^2*(B-x^2*C)            */
-      - (x * y >> 16);
-
-    return c >= 0 ? y : -y;
-}
-
 /* simple function to fill buffer with samples
  *
  * It is up to the caller to ensure that len is always at least period.
@@ -115,11 +84,11 @@ static void _fill_saw_samples_16(uint8_t *buf, size_t len, uint16_t period)
 static void _fill_sine_samples_8(uint8_t *buf, size_t len, uint16_t period)
 {
     uint16_t x = 0;
-    unsigned step = ISIN_PERIOD / period;
+    unsigned step = SINI_PERIOD / period;
 
     for (uint16_t i = 0; i < period; ++i) {
         x += step;
-        buf[i] = (isin(x) + 4096) >> 6;
+        buf[i] = (fast_sini(x) - SINI_MIN) >> 6;
     }
 
     for (uint16_t i = period; i < len; i += period) {
@@ -130,14 +99,14 @@ static void _fill_sine_samples_8(uint8_t *buf, size_t len, uint16_t period)
 static void _fill_sine_samples_16(uint8_t *buf, size_t len, uint16_t period)
 {
     uint16_t x = 0;
-    unsigned step = ISIN_PERIOD / period;
+    unsigned step = SINI_PERIOD / period;
 
     period *= 2;
 
     for (uint16_t i = 0; i < period; ++i) {
         x += step;
 
-        uint16_t y = (isin(x) + 4096) << 2;
+        uint16_t y = (fast_sini(x) - SINI_MIN) << 2;
         buf[i]   = y;
         buf[++i] = y >> 8;
     }

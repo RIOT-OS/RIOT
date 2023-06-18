@@ -1,0 +1,35 @@
+ifneq (,$(filter riotboot_flashwrite, $(USEMODULE)))
+  USEMODULE += riotboot_slot
+  FEATURES_REQUIRED += periph_flashpage
+endif
+
+ifneq (,$(filter riotboot_slot, $(USEMODULE)))
+  USEMODULE += riotboot_hdr
+endif
+
+ifneq (,$(filter riotboot_serial, $(USEMODULE)))
+  FEATURES_REQUIRED += periph_flashpage
+  FEATURES_REQUIRED += periph_uart
+  USEMODULE += riotboot_reset
+  USEMODULE += checksum
+endif
+
+ifneq (,$(filter riotboot_reset, $(USEMODULE)))
+  USEMODULE += usb_board_reset
+endif
+
+ifneq (,$(filter riotboot_hdr, $(USEMODULE)))
+  USEMODULE += checksum
+endif
+
+ifneq (,$(filter riotboot_usb_dfu, $(USEMODULE)))
+  USEMODULE += usbus_dfu
+  USEMODULE += riotboot_flashwrite
+  USEMODULE += ztimer_sec
+  FEATURES_REQUIRED += no_idle_thread
+  FEATURES_REQUIRED += periph_pm
+endif
+
+ifneq (,$(filter riotboot_tinyusb_dfu, $(USEMODULE)))
+  USEPKG += tinyusb
+endif

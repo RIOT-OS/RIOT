@@ -1,0 +1,4 @@
+INCLUDES += -I$(PKGDIRBASE)/opendsme
+INCLUDES += -I$(RIOTBASE)/pkg/opendsme/include
+
+DIRS += $(RIOTBASE)/pkg/opendsme/contrib

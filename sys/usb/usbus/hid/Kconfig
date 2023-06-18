@@ -7,7 +7,6 @@
 
 menuconfig MODULE_USBUS_HID
     bool "USB HID support"
-    depends on TEST_KCONFIG
     depends on MODULE_USBUS
     select MODULE_ISRPIPE_READ_TIMEOUT
 

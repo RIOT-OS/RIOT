@@ -24,6 +24,10 @@
 #include "include/init_devs.h"
 #include "net/netdev/ieee802154_submac.h"
 
+#if IS_USED(MODULE_OPENDSME)
+#include "opendsme/opendsme.h"
+#endif
+
 /**
  * @brief   Define stack parameters for the MAC layer thread
  * @{
@@ -31,6 +35,7 @@
 #ifndef NRF802154_MAC_STACKSIZE
 #define NRF802154_MAC_STACKSIZE     (IEEE802154_STACKSIZE_DEFAULT)
 #endif
+
 #ifndef NRF802154_MAC_PRIO
 #define NRF802154_MAC_PRIO          (GNRC_NETIF_PRIO)
 #endif
@@ -46,13 +51,24 @@ void auto_init_nrf802154(void)
     LOG_DEBUG("[auto_init_netif] initializing nrf802154\n");
 
     netdev_register(&nrf802154_netdev.dev.netdev, NETDEV_NRF802154, 0);
-    netdev_ieee802154_submac_init(&nrf802154_netdev);
-    nrf802154_hal_setup(&nrf802154_netdev.submac.dev);
 
     nrf802154_init();
-    gnrc_netif_ieee802154_create(&_netif, _stack,
+#if IS_USED(MODULE_OPENDSME)
+        nrf802154_hal_setup(&nrf802154_netdev.submac.dev);
+        /* NOTE: This casts a Radio HAL descriptor to a netdev and should be
+         * addressed as soon as the GNRC<->netdev dependency is removed.
+         */
+        gnrc_netif_opendsme_create(&_netif, _stack,
+                                 NRF802154_MAC_STACKSIZE,
+                                 NRF802154_MAC_PRIO, "nrf802154",
+                                 (netdev_t*) &nrf802154_netdev.submac.dev);
+#else
+        netdev_ieee802154_submac_init(&nrf802154_netdev);
+        nrf802154_hal_setup(&nrf802154_netdev.submac.dev);
+        gnrc_netif_ieee802154_create(&_netif, _stack,
                                  NRF802154_MAC_STACKSIZE,
                                  NRF802154_MAC_PRIO, "nrf802154",
                                  &nrf802154_netdev.dev.netdev);
+#endif
 }
 /** @} */

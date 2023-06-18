@@ -107,13 +107,17 @@ int main(void)
     printf("\n");
     printf("%d elements probably in the filter.\n", in);
     printf("%d elements not in the filter.\n", not_in);
-    double false_positive_rate = (double) in / (double) lenA;
+    unsigned false_positive_rate = (1000UL * in) /  lenA;
     /* Use 'fmt/print_float' to work on all platforms (atmega)
      * Stdout should be flushed before to prevent garbled output. */
 #if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
     fflush(stdout);
 #endif
-    print_float(false_positive_rate, 6);
+
+    char buf[8];
+    int res = fmt_s32_dfp(buf, false_positive_rate, -3);
+
+    print(buf, res);
     puts(" false positive rate.");
 
     bloom_del(&bloom);

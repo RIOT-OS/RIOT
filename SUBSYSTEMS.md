@@ -14,7 +14,11 @@ affect more than one module.
 
 ## MSP430
 
+- Marian Buschsieweke (@maribu)
+
 ## ARM7
+
+- Marian Buschsieweke (@maribu)
 
 ## ARM Cortex-M
 
@@ -24,6 +28,8 @@ affect more than one module.
  - Dylan Laduranty (@dylad)
 
 ## Atmel AVR (Atmega)
+
+- Marian Buschsieweke (@maribu)
 
 ## Native
 
@@ -70,17 +76,25 @@ affect more than one module.
 
 ### CC110X
 
+- Marian Buschsieweke (@maribu)
+
 ### ESP-NOW
 
 ## Peripherals
+
+- Marian Buschsieweke (@maribu)
 
 ## Other drivers
 
 # Kernel (core)
 
+  - Kaspar Schleiser (@kaspar030)
+
 # System libraries
 
 ## High-level timer API (xtimer, ztimer)
+
+  - Kaspar Schleiser (@kaspar030)
 
 ## Power Management
 
@@ -101,8 +115,11 @@ affect more than one module.
 ## RUST support
 
   - Christian Amsüss (@chrysn)
+  - Kaspar Schleiser (@kaspar030)
 
 ## C++ support
+
+- Marian Buschsieweke (@maribu)
 
 ## Crypto
 
@@ -192,6 +209,10 @@ affect more than one module.
 
 # Build System
 
+  - Kaspar Schleiser (@kaspar030)
+
 # Documentation
 
 # Testing/CI
+
+  - Kaspar Schleiser (@kaspar030)
