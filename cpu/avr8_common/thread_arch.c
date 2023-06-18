@@ -26,6 +26,7 @@
  */
 
 #include <stdio.h>
+#include <avr/sleep.h>
 
 #include "thread.h"
 #include "sched.h"
@@ -426,4 +427,22 @@ __attribute__((always_inline)) static inline void avr8_context_restore(void)
         "pop  __tmp_reg__                        \n\t"
         "out  __SREG__, __tmp_reg__              \n\t"
         "pop  __tmp_reg__                        \n\t");
+}
+
+void sched_arch_idle(void)
+{
+#ifdef MODULE_PM_LAYERED
+    void pm_set_lowest(void);
+    pm_set_lowest();
+#else
+    unsigned irq_state = irq_disable();
+    sleep_enable();
+#ifdef sleep_bod_disable
+    sleep_bod_disable();
+#endif
+    sei();
+    sleep_cpu();
+    sleep_disable();
+    irq_restore(irq_state);
+#endif
 }

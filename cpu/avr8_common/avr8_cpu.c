@@ -29,6 +29,7 @@
 #include <avr/io.h>
 #include <avr/wdt.h>
 #include <avr/pgmspace.h>
+#include <avr/sleep.h>
 
 #include "cpu.h"
 #include "cpu_clock.h"
@@ -100,6 +101,9 @@ void cpu_init(void)
     wdt_disable(); /* but when used without bootloader this is needed */
 
     avr8_clk_init();
+
+    /* Set default sleep mode for LPM or threadless idle */
+    set_sleep_mode(SLEEP_MODE_IDLE);
 
     /* Initialize stdio before periph_init() to allow use of DEBUG() there */
 #ifdef MODULE_AVR_LIBC_EXTRA
