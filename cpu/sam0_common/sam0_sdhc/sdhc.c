@@ -50,6 +50,7 @@
 #include <stdio.h>
 #include "periph_cpu.h"
 #include "periph/pm.h"
+#include "macros/math.h"
 #include "vendor/sd_mmc_protocol.h"
 #include "sdhc.h"
 #include "time_units.h"
@@ -432,46 +433,23 @@ static void _set_speed(sdhc_state_t *state, uint32_t fsdhc)
 {
     (void)state;
 
-    uint32_t div;
-
     if (SDHC_DEV->CCR.bit.SDCLKEN) {
         /* wait for command/data to go inactive */
         while (SDHC_DEV->PSR.reg & (SDHC_PSR_CMDINHC | SDHC_PSR_CMDINHD)) {}
         /* disable the clock */
-        SDHC_DEV->CCR.reg &= ~SDHC_CCR_SDCLKEN;
+        SDHC_DEV->CCR.reg = 0;
     }
 
-    /* since both examples use divided clock rather than programmable - just use divided here */
-    SDHC_DEV->CCR.reg &= ~SDHC_CCR_CLKGSEL;     /* divided clock */
+    uint32_t div = DIV_ROUND_UP(sam0_gclk_freq(SDHC_CLOCK), fsdhc) - 1;
 
-    /* According to the data sheet the divided clock is given by
-     *
-     *        Fsdclk = Fsdhc_core/(2 * div)
-     *
-     * Hovewer, this seems to be wrong since the SD CLK is always exactly the half.
-     * So it seems that the clock is given by
-     *
-     *        Fsdclk = Fsdhc_core/(4 * div)
-     */
-    if (SDHC_CLOCK == SAM0_GCLK_100MHZ) {
-        /* if the FDPLL1 with 100 MHz is used, we can use 25 MHz/50 MHz clocks */
-        div = (sam0_gclk_freq(SDHC_CLOCK) / fsdhc) / 4;
-    }
-    else {
-        div = (sam0_gclk_freq(SDHC_CLOCK) / fsdhc) / 2;
-
-        /* high speed div must not be 0 */
-        if (SDHC_DEV->HC1R.bit.HSEN && (div == 0)) {
-            div = 1;
-        }
-    }
+    DEBUG("sdhc: switch to %lu Hz (div %lu) -> %lu Hz\n",
+          fsdhc, div, sam0_gclk_freq(SDHC_CLOCK) / (div + 1));
 
     /* write the 10 bit clock divider */
-    SDHC_DEV->CCR.reg &= ~(SDHC_CCR_USDCLKFSEL_Msk | SDHC_CCR_SDCLKFSEL_Msk);
-    SDHC_DEV->CCR.reg |= SDHC_CCR_SDCLKFSEL(div) | SDHC_CCR_USDCLKFSEL(div >> 8);
-    SDHC_DEV->CCR.reg |= SDHC_CCR_INTCLKEN;  /* enable internal clock       */
+    SDHC_DEV->CCR.reg = SDHC_CCR_SDCLKFSEL(div) | SDHC_CCR_USDCLKFSEL(div >> 8)
+                      | SDHC_CCR_CLKGSEL | SDHC_CCR_INTCLKEN;
     while (!SDHC_DEV->CCR.bit.INTCLKS) {}    /* wait for clock to be stable */
-    SDHC_DEV->CCR.reg |= SDHC_CCR_SDCLKEN;   /* enable clock to card        */
+    SDHC_DEV->CCR.bit.SDCLKEN = 1;           /* enable clock to card        */
 }
 
 /**
