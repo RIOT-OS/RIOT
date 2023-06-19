@@ -7,7 +7,7 @@
 
 if MODULE_PICOLIBC
 
-config PICOLIBC_STDOUT_BUFFERED
+config MODULE_PICOLIBC_STDOUT_BUFFERED
     bool "Buffered standard output"
     default USE_STDOUT_BUFFERED
     help

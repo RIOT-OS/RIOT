@@ -14,6 +14,6 @@ ifneq (,$(filter periph_uart,$(USEMODULE)))
   USEMODULE += periph_lpuart
   ifeq (,$(filter periph_spi_stmod_plus,$(USEMODULE)))
     # if STMod+ is not used with SPI (default), the UART interface uses HW FC
-    USEMODULE += periph_uart_hw_fc
+    FEATURES_REQUIRED += periph_uart_hw_fc
   endif
 endif

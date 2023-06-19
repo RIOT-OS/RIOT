@@ -1,5 +1,5 @@
 ifneq (,$(filter periph_uart,$(USEMODULE)))
-  USEMODULE += periph_uart_hw_fc
+  FEATURES_REQUIRED += periph_uart_hw_fc
 endif
 
 ifneq (,$(filter saul_default,$(USEMODULE)))

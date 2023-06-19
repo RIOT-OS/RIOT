@@ -61,5 +61,7 @@ config MODULE_STDIO_CDC_ACM
     depends on MODULE_USBUS_CDC_ACM && !MODULE_TINYUSB_DEVICE
     select MODULE_ISRPIPE
     select MODULE_STDIO_AVAILABLE
+    select USE_STDOUT_BUFFERED
+
 
 endchoice
