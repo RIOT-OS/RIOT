@@ -114,6 +114,13 @@ static bool _card_detect(sdhc_state_t *state)
     return state->dev->PSR.bit.CARDINS;
 }
 
+static inline void _clock_sdcard(sdhc_state_t *state, bool on)
+{
+    (void)state;
+
+    SDHC_DEV->CCR.bit.SDCLKEN = on;
+}
+
 static bool _check_mask(uint32_t val, uint32_t mask)
 {
     return (val & mask) == mask;
@@ -259,6 +266,7 @@ int sdhc_init(sdhc_state_t *state)
 {
     bool f8;
     uint32_t response;
+    int res = 0;
 
     /* set the initial clock slow, single bit and normal speed */
     state->type = CARD_TYPE_SD;
@@ -290,14 +298,16 @@ int sdhc_init(sdhc_state_t *state)
     for (int i = 0; i < 2; i++) { /* we do this step twice before failing */
         if (!sdhc_send_cmd(state, SDMMC_MCI_CMD0_GO_IDLE_STATE, 0)) {
             if (i == 1) {
-                return -EIO;
+                res = -EIO;
+                goto out;
             }
         }
         /* Test for SD version 2 */
         if (!sdhc_send_cmd(state, SD_CMD8_SEND_IF_COND, SD_CMD8_PATTERN | SD_CMD8_HIGH_VOLTAGE)) {
             if (i == 1) {
                 /* bad card */
-                return -EIO;
+                res = -EIO;
+                goto out;
             }
         }
         else {
@@ -314,40 +324,49 @@ int sdhc_init(sdhc_state_t *state)
         }
     }
     if (!sdio_test_type(state)) {
-        return -EIO;
+        res = -EIO;
+        goto out;
     }
     if (state->type & CARD_TYPE_SDIO) {
-        return -ENOTSUP;
+        res = -ENOTSUP;
+        goto out;
     }
     /* Try to get the SD card's operating condition */
     if (!_test_voltage(state, f8)) {
         state->type = CARD_TYPE_UNKNOWN;
-        return -EIO;
+        res = -EIO;
+        goto out;
     }
     /* SD MEMORY, Put the Card in Identify Mode
      * Note: The CID is not used in this stack */
     if (!sdhc_send_cmd(state, SDMMC_CMD2_ALL_SEND_CID, 0)) {
-        return -EIO;
+        res = -EIO;
+        goto out;
     }
     /* Ask the card to publish a new relative address (RCA).*/
     if (!sdhc_send_cmd(state, SD_CMD3_SEND_RELATIVE_ADDR, 0)) {
-        return -EIO;
+        res = -EIO;
+        goto out;
     }
     state->rca = (uint16_t)(SDHC_DEV->RR[0].reg >> 16);
     /* SD MEMORY, Get the Card-Specific Data */
     if (!_test_capacity(state)) {
-        return -EIO;
+        res = -EIO;
+        goto out;
     }
     /* Put it into Transfer Mode */
     if (!sdhc_send_cmd(state, SDMMC_CMD7_SELECT_CARD_CMD, (uint32_t)state->rca << 16)) {
-        return -EIO;
+        res = -EIO;
+        goto out;
     }
     /* SD MEMORY, Read the SCR to get card version */
     if (!_test_version(state)) {
-        return -EIO;
+        res = -EIO;
+        goto out;
     }
     if (!_test_bus_width(state)) {
-        return -EIO;
+        res = -EIO;
+        goto out;
     }
 
     /* update the host controller to the detected changes in bus_width and clock */
@@ -356,7 +375,8 @@ int sdhc_init(sdhc_state_t *state)
     /* if it is high speed capable, (well it is) */
     if (IS_USED(SDHC_ENABLE_HS) && SDHC_DEV->CA0R.bit.HSSUP) {
         if (!_test_high_speed(state)) {
-            return -EIO;
+            res = -EIO;
+            goto out;
         }
     }
 
@@ -364,11 +384,15 @@ int sdhc_init(sdhc_state_t *state)
     _set_hc(state);
 
     if (!sdhc_send_cmd(state, SDMMC_CMD16_SET_BLOCKLEN, SD_MMC_BLOCK_SIZE)) {
-        return -EIO;
+        res = -EIO;
+        goto out;
     }
 
     state->need_init = false;
-    return 0;
+
+out:
+    _clock_sdcard(state, 0);
+    return res;
 }
 
 bool sdhc_send_cmd(sdhc_state_t *state, uint32_t cmd, uint32_t arg)
@@ -767,6 +791,7 @@ int sdhc_read_blocks(sdhc_state_t *state, uint32_t address, void *dst, uint16_t 
     }
 
     mutex_lock(&state->lock);
+    _clock_sdcard(state, 1);
 
     if (state->need_init) {
         res = sdhc_init(state);
@@ -824,6 +849,7 @@ int sdhc_read_blocks(sdhc_state_t *state, uint32_t address, void *dst, uint16_t 
     }
 
 out:
+    _clock_sdcard(state, 0);
     mutex_unlock(&state->lock);
     return res;
 }
@@ -848,6 +874,7 @@ int sdhc_write_blocks(sdhc_state_t *state, uint32_t address, const void *src,
     }
 
     mutex_lock(&state->lock);
+    _clock_sdcard(state, 1);
 
     if (state->need_init) {
         res = sdhc_init(state);
@@ -908,6 +935,8 @@ int sdhc_write_blocks(sdhc_state_t *state, uint32_t address, const void *src,
     }
 
 out:
+    _wait_not_busy(state);
+    _clock_sdcard(state, 0);
     mutex_unlock(&state->lock);
     return res;
 }
@@ -922,6 +951,7 @@ int sdhc_erase_blocks(sdhc_state_t *state, uint32_t start, uint16_t num_blocks)
     }
 
     mutex_lock(&state->lock);
+    _clock_sdcard(state, 1);
 
     if (state->need_init) {
         res = sdhc_init(state);
@@ -951,6 +981,8 @@ int sdhc_erase_blocks(sdhc_state_t *state, uint32_t start, uint16_t num_blocks)
     }
 
 out:
+    _wait_not_busy(state);
+    _clock_sdcard(state, 0);
     mutex_unlock(&state->lock);
     return res;
 }
