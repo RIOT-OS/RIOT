@@ -157,7 +157,7 @@ Test *tests_senml(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
 /* Don't run this test on CPUs with unpredictable rounding */
-#if !defined(__AVR__) && !defined(CPU_MSP430FXYZ)
+#if !defined(__AVR__) && !defined(__MSP430__)
         new_TestFixture(test_phydat_to_senml_float),
 #endif
         new_TestFixture(test_phydat_to_senml_decimal),
