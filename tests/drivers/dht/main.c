@@ -23,11 +23,10 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
-#include "timex.h"
-#include "fmt.h"
 #include "dht.h"
 #include "dht_params.h"
+#include "time_units.h"
+#include "ztimer.h"
 
 #define DELAY           (2 * US_PER_SEC)
 
@@ -50,6 +49,8 @@ int main(void)
 
     /* periodically read temp and humidity values */
     while (1) {
+        ztimer_sleep(ZTIMER_USEC, DELAY);
+
         if (dht_read(&dev, &temp, &hum) != DHT_OK) {
             puts("Error reading values");
             continue;
@@ -57,8 +58,6 @@ int main(void)
 
         printf("DHT values - temp: %d.%d°C - relative humidity: %d.%d%%\n",
                temp/10, temp%10, hum/10, hum%10);
-
-        xtimer_usleep(DELAY);
     }
 
     return 0;

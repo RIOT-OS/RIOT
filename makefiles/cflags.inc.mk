@@ -119,3 +119,7 @@ CFLAGS += $(filter-out $(OPTIONAL_CFLAGS_BLACKLIST),$(OPTIONAL_CFLAGS))
 # accept good C practises within `extern "C" { ... }` while enforcing good C++
 # practises elsewhere. But in absence of this, we disable the warning for now.
 CXXEXFLAGS += -Wno-missing-field-initializers
+
+# Reformat the RAM region for usage within code and expose them
+CFLAGS += -DCPU_RAM_BASE=$(RAM_START_ADDR)
+CFLAGS += -DCPU_RAM_SIZE=$(shell printf "0x%x" $$(($(RAM_LEN:%K=%*1024))))

@@ -10,7 +10,7 @@ config MODULE_DHT
     depends on HAS_PERIPH_GPIO
     depends on TEST_KCONFIG
     select MODULE_PERIPH_GPIO
-    select MODULE_XTIMER
+    select ZTIMER_USEC
 
 config HAVE_DHT
     bool
