@@ -40,9 +40,7 @@
 #include <avr/interrupt.h>
 #include "architecture.h"
 #include "cpu_conf.h"
-#if !defined (CPU_ATMEGA8)
 #include "cpu_clock.h"
-#endif
 #include "sched.h"
 #include "thread.h"
 

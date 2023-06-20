@@ -34,9 +34,7 @@
 #include <avr/sleep.h>
 
 #include "cpu.h"
-#if !defined (CPU_ATMEGA8)
 #include "cpu_clock.h"
-#endif
 #include "board.h"
 #include "irq.h"
 #include "periph/init.h"
@@ -104,9 +102,7 @@ void cpu_init(void)
     wdt_reset();   /* should not be nececessary as done in bootloader */
     wdt_disable(); /* but when used without bootloader this is needed */
 
-#ifndef CPU_ATMEGA8
     avr8_clk_init();
-#endif
 
     /* Set default sleep mode for LPM or threadless idle */
     set_sleep_mode(SLEEP_MODE_IDLE);

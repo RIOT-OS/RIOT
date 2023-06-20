@@ -59,7 +59,7 @@ void init8_ovr(void) __attribute__((section(".init8")));
 
 __attribute__((used, naked)) void init7_ovr(void)
 {
-#ifdef CPU_ATMEGA8
+#if (ROM_LEN <= 0x2000)
     __asm__ ("rjmp reset_handler");
 #else
     __asm__ ("call reset_handler");
@@ -68,7 +68,7 @@ __attribute__((used, naked)) void init7_ovr(void)
 
 __attribute__((used, naked)) void init8_ovr(void)
 {
-#ifdef CPU_ATMEGA8
+#if (ROM_LEN <= 0x2000)
     __asm__ ("rjmp exit");
 #else
     __asm__ ("jmp exit");
