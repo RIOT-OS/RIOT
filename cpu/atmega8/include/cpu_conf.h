@@ -34,7 +34,7 @@ extern "C" {
 #endif
 
 #ifndef THREAD_EXTRA_STACKSIZE_PRINTF
-#define THREAD_EXTRA_STACKSIZE_PRINTF    (32)
+#define THREAD_EXTRA_STACKSIZE_PRINTF    (64)
 #endif
 
 /**
