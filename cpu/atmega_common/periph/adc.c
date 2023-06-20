@@ -72,22 +72,21 @@ int adc_init(adc_t line)
      * and it only have PORTC6 and PORTC7 */
     DDRC &= ~(1 << line);
     PORTC &= ~(1 << line);
-#elif defined(PORTA) && !defined(DIDR2)
-    /* 1284p do not have DIDR2 */
+#elif defined(PORTA) && !defined(DIDR2) /* 1284p do not have DIDR2 */
     DDRA &= ~(1 << line);
     PORTA &= ~(1 << line);
-#elif defined(PORTF)
+#elif defined(PORTF) /* 2560 and 1281 */
     if (line < 8) {
         DDRF  &= ~(1 << line);
         PORTF &= ~(1 << line);
     }
-#if defined(PORTK)
+#if     defined(PORTK) /* 2560 */
     else {
         DDRK  &= ~(1 << (line - 8));
         PORTK &= ~(1 << (line - 8));
     }
-#elif defined(PORTF0) && !defined(PORTF2) && !defined(PORTF3)
-    /* 32u4 do not have PORTF2 and PORTF3 */
+#elif   defined(PORTF0) && !defined(PORTF2) && !defined(PORTF3)
+        /* 32u4 do not have PORTF2 and PORTF3 */
     else if (line == 8) {
         DDRD  &= ~(1 << PORTD4);
         PORTD &= ~(1 << PORTD4);
@@ -131,9 +130,10 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     /* set conversion channel */
 #if defined(ADMUX)
 #if !defined(MUX5)
+    /* atmega8 ; 328p ; 1281 ; 1284p ; 32u4 */
     ADMUX &= 0xf0;
     ADMUX |= line;
-#else
+#else /* 2560 ; 128rfa1 ; 256rfr2 */
     if (line < 8) {
         ADCSRB &= ~(1 << MUX5);
         ADMUX &= 0xf0;
