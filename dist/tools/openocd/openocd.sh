@@ -208,7 +208,42 @@ _is_binfile() {
         [[ -z "${firmware_type}" ]] && _has_bin_extension "${firmware}"; }
 }
 
-_flash_list() {
+# Split bank info on different lines without the '{}'
+_split_banks() {
+    # Input:
+    #   ...
+    #   {name nrf51 base 0 size 0 bus_width 1 chip_width 1} {name nrf51 base 268439552 size 0 bus_width 1 chip_width 1}
+    #   ...
+    #   or for newer openocd versions (v0.12.0 or higher)
+    #   ...
+    #   {name nrf51.flash driver nrf51 base 0 size 0 bus_width 1 chip_width 1 target nrf51.cpu} {name nrf51.uicr ...}
+    #   ...
+    #
+    # Output:
+    #   ...
+    #   name nrf51 base 0 size 0 bus_width 1 chip_width 1
+    #   name nrf51 base 268439552 size 0 bus_width 1 chip_width 1
+    #   ...
+    #   or for newer openocd versions (v0.12.0 or higher)
+    #   ...
+    #   name nrf51.flash driver nrf51 base 0 size 0 bus_width 1 chip_width 1 target nrf51.cpu
+    #   name nrf51.uicr driver nrf51 base 268439552 size 0 bus_width 1 chip_width 1 target nrf51.cpu
+    #   ...
+    #
+    # The following command needs specific osx handling (non gnu):
+    # * Same commands for a pattern should be on different lines
+    # * Cannot use '\n' in the replacement string
+    local sed_escaped_newline=\\$'\n'
+
+    sed -n '
+    /^{.*}$/ {
+        s/\} /\}'"${sed_escaped_newline}"'/g
+        s/[{}]//g
+        p
+    }'
+}
+
+_flash_list_raw() {
     # Openocd output for 'flash list' is either
     # ....
     # {name nrf51 base 0 size 0 bus_width 1 chip_width 1} {name nrf51 base 268439552 size 0 bus_width 1 chip_width 1}
@@ -250,10 +285,32 @@ _flash_list() {
             -c 'shutdown'" 2>&1
 }
 
-# Print flash address for 'bank_num' num defaults to 0
-# _flash_address  [bank_num:0]
+# Outputs bank info on different lines without the '{}'
+_flash_list() {
+    # ....
+    # name nrf51 base 0 size 0 bus_width 1 chip_width 1
+    # name nrf51 base 268439552 size 0 bus_width 1 chip_width 1
+    # ....
+    # or for newer openocd versions (v0.12.0 or higher)
+    # ....
+    # name nrf51.flash driver nrf51 base 0 size 0 bus_width 1 chip_width 1 target nrf51.cpu
+    # name nrf51.uicr driver nrf51 base 268439552 size 0 bus_width 1 chip_width 1 target nrf51.cpu
+    # ....
+    _flash_list_raw | _split_banks
+}
+
+# Print flash address for 'bank_num' num defaults to 1
+# _flash_address  [bank_num:1]
 _flash_address() {
-    _flash_list | "${RIOTTOOLS}/openocd/openocd_flashinfo.py" --idx "${1:-0}"
+    # extract the line from '_flash_list' output for bank with number 'bank_num'
+    bank=$(_flash_list | awk "NR==${1:-1}")
+    # determine the column of base address, a line can have following formats
+    #     name nrf51 base 268439552 size 0 bus_width 1 chip_width 1
+    # or for newer openocd versions (v0.12.0 or higher)
+    #     name nrf51.flash driver nrf51 base 0 size 0 bus_width 1 chip_width 1 target nrf51.cpu
+    base_addr_idx=$(echo ${bank} | awk '{ for (i=1; i <= NF; i++) if ($i == "base") print i + 1 }')
+    # extract the base address in hexadecimal format
+    printf 0x"%08x" $(echo ${bank} | cut -d " " -f${base_addr_idx})
 }
 
 do_flashr() {
@@ -273,7 +330,7 @@ do_flashr() {
     # This allows flashing normal binary files without env configuration
     if _is_binfile "${IMAGE_FILE}" "${IMAGE_TYPE}"; then
         # hardwritten to use the first bank
-        FLASH_ADDR=$(_flash_address 0)
+        FLASH_ADDR=$(_flash_address 1)
         echo "Binfile detected, adding ROM base address: ${FLASH_ADDR}"
         IMAGE_TYPE=bin
         IMAGE_OFFSET=$(printf "0x%08x\n" "$((${IMAGE_OFFSET} + ${FLASH_ADDR}))")
@@ -322,7 +379,7 @@ do_flash() {
     # This allows flashing normal binary files without env configuration
     if _is_binfile "${IMAGE_FILE}" "${IMAGE_TYPE}"; then
         # hardwritten to use the first bank
-        FLASH_ADDR=$(_flash_address 0)
+        FLASH_ADDR=$(_flash_address 1)
         echo "Binfile detected, adding ROM base address: ${FLASH_ADDR}"
         IMAGE_TYPE=bin
         IMAGE_OFFSET=$(printf "0x%08x\n" "$((${IMAGE_OFFSET} + ${FLASH_ADDR}))")
