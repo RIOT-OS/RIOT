@@ -67,24 +67,39 @@ int adc_init(adc_t line)
 #endif
 
     /* Set ADC-pin as input */
-#if defined(CPU_ATMEGA328P) || defined(CPU_ATMEGA8)
+#if !defined(PORTA) && defined(PC0)
+    /* 328p and 8 do not have PORTA, on 32u4 pins are named differently
+     * and it only have PORTC6 and PORTC7 */
     DDRC &= ~(1 << line);
     PORTC &= ~(1 << line);
-#elif defined(CPU_ATMEGA1284P)
+#elif defined(PORTA) && !defined(DIDR2)
+    /* 1284p do not have DIDR2 */
     DDRA &= ~(1 << line);
     PORTA &= ~(1 << line);
-#elif defined(CPU_ATMEGA2560) || defined(CPU_ATMEGA1281)
+#elif defined(PORTF)
     if (line < 8) {
         DDRF  &= ~(1 << line);
         PORTF &= ~(1 << line);
     }
-#if defined(CPU_ATMEGA2560)
+#if defined(PORTK)
     else {
-        DDRK  &= ~(1 << (line-8));
-        PORTK &= ~(1 << (line-8));
+        DDRK  &= ~(1 << (line - 8));
+        PORTK &= ~(1 << (line - 8));
     }
-#endif /* CPU_ATMEGA2560 */
-#endif /* CPU_ATMEGA328P */
+#elif defined(PORTF0) && !defined(PORTF2) && !defined(PORTF3)
+    /* 32u4 do not have PORTF2 and PORTF3 */
+    else if (line == 8) {
+        DDRD  &= ~(1 << PORTD4);
+        PORTD &= ~(1 << PORTD4);
+    else if (line < 11) {
+        DDRD  &= ~(1 << (line - 3));
+        PORTD &= ~(1 << (line - 3));
+    else {
+        DDRB  &= ~(1 << (line - 7));
+        PORTB &= ~(1 << (line - 7));
+    }
+#endif /* PORTK */
+#endif /* PORTF */
 
     /* set clock prescaler to get the maximal possible ADC clock value */
     for (uint32_t clk_div = 1; clk_div < 8; ++clk_div) {

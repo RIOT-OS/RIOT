@@ -49,9 +49,7 @@
 static int _start(uint8_t address, uint8_t rw_flag);
 static int _write(const uint8_t *data, int length);
 static void _stop(void);
-#ifdef PRR
 static void i2c_poweron(i2c_t dev);
-#endif
 
 static mutex_t locks[I2C_NUMOF];
 
@@ -123,10 +121,8 @@ void i2c_init(i2c_t dev)
     /* set pull-up on SCL and SDA */
     I2C_PORT_REG |= (I2C_PIN_MASK);
 
-#ifdef PRR
     /* enable I2C clock */
     i2c_poweron(dev);
-#endif
 
     /* disable device */
     TWCR &= ~(1 << TWEN);
@@ -240,14 +236,14 @@ void i2c_release(i2c_t dev)
     mutex_unlock(&locks[dev]);
 }
 
-#ifdef PRR
 static void i2c_poweron(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
     (void) dev;
+#ifdef PRTWI
     power_twi_enable();
-}
 #endif
+}
 
 static int _start(uint8_t address, uint8_t rw_flag)
 {

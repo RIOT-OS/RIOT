@@ -85,19 +85,20 @@ static uart_isr_ctx_t isr_ctx[UART_NUMOF];
 
 static void _update_brr(uart_t uart, uint16_t brr, bool double_speed)
 {
-#ifndef CPU_ATMEGA8
+#if defined(UCSR0A) || defined(UCSR1A)
     dev[uart]->BRR = brr;
-#else /* on atmega8 BRRH is shared with CSRC */
+#elif defined(UCSRA) /* atmega8 */
+    /* on atmega8 BRRH is shared with CSRC */
     dev[uart]->CSRC = (brr >> 8);
     dev[uart]->BRRL = (uint8_t)(brr & 0x00ff);
 #endif
     if (double_speed) {
-#if defined(CPU_ATMEGA8)
+#if defined(U2X) /* atmega8 */
         dev[uart]->CSRA |= (1 << U2X);
-#elif defined(CPU_ATMEGA32U4)
-        dev[uart]->CSRA |= (1 << U2X1);
-#else
+#elif defined(U2X0)
         dev[uart]->CSRA |= (1 << U2X0);
+#elif defined(U2X1) /* atmega32u4 */
+        dev[uart]->CSRA |= (1 << U2X1);
 #endif
     }
 }
@@ -138,40 +139,40 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     isr_ctx[uart].arg = arg;
 
     /* disable and reset UART */
-#ifdef CPU_ATMEGA32U4
+#ifdef UCSR1D /* 32u4 */
     dev[uart]->CSRD = 0;
 #endif
     dev[uart]->CSRB = 0;
     dev[uart]->CSRA = 0;
 
     /* configure UART to 8N1 mode */
-#if defined(CPU_ATMEGA8)
+#if defined(UCSZ0) && defined(UCSZ1) /* atmega8 */
     dev[uart]->CSRC = (1 << UCSZ0) | (1 << UCSZ1);
-#elif defined(CPU_ATMEGA32U4)
-    dev[uart]->CSRC = (1 << UCSZ10) | (1 << UCSZ11);
-#else
+#elif defined(UCSZ00) && defined(UCSZ01)
     dev[uart]->CSRC = (1 << UCSZ00) | (1 << UCSZ01);
+#elif defined(UCSZ10) && defined(UCSZ11) /* 32u4 */
+    dev[uart]->CSRC = (1 << UCSZ10) | (1 << UCSZ11);
 #endif
     /* set clock divider */
     _set_brr(uart, baudrate);
 
     /* enable RX and TX and their respective interrupt */
     if (rx_cb) {
-#if defined(CPU_ATMEGA8)
+#if defined(RXCIE) /* atmega8 */
         dev[uart]->CSRB = ((1 << RXCIE) | (1 << TXCIE) | (1 << RXEN) | (1 << TXEN));
-#elif defined(CPU_ATMEGA32U4)
-        dev[uart]->CSRB = ((1 << RXCIE1) | (1 << TXCIE1) | (1 << RXEN1) | (1 << TXEN1));
-#else
+#elif defined(RXCIE0)
         dev[uart]->CSRB = ((1 << RXCIE0) | (1 << TXCIE0) | (1 << RXEN0) | (1 << TXEN0));
+#elif defined(RXCIE1) /* 32u4 */
+        dev[uart]->CSRB = ((1 << RXCIE1) | (1 << TXCIE1) | (1 << RXEN1) | (1 << TXEN1));
 #endif
     }
     else {
-#if defined(CPU_ATMEGA8)
+#if defined(TXEN) /* atmega8 */
         dev[uart]->CSRB = ((1 << TXEN) | (1 << TXCIE));
-#elif defined(CPU_ATMEGA32U4)
-        dev[uart]->CSRB = ((1 << TXEN1) | (1 << TXCIE1));
-#else
+#elif defined(TXEN0)
         dev[uart]->CSRB = ((1 << TXEN0) | (1 << TXCIE0));
+#elif defined(TXEN1) /* 32u4 */
+        dev[uart]->CSRB = ((1 << TXEN1) | (1 << TXCIE1));
 #endif
     }
 
@@ -181,12 +182,12 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     for (size_t i = 0; i < len; i++) {
-#if defined(CPU_ATMEGA8)
+#if defined(UDRE) /* atmega8 */
         while (!(dev[uart]->CSRA & (1 << UDRE))) {};
-#elif defined(CPU_ATMEGA32U4)
-        while (!(dev[uart]->CSRA & (1 << UDRE1))) {};
-#else
+#elif defined(UDRE0)
         while (!(dev[uart]->CSRA & (1 << UDRE0))) {}
+#elif defined(UDRE1) /* 32u4 */
+        while (!(dev[uart]->CSRA & (1 << UDRE1))) {};
 #endif
         /* start of TX won't finish until no data in UDRn and transmit shift
            register is empty */

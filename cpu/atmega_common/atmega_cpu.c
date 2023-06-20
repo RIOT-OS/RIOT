@@ -60,7 +60,7 @@ void avr8_reset_cause(void)
             DEBUG("Watchdog reset!\n");
         }
     }
-#if !defined (CPU_ATMEGA328P) && !defined (CPU_ATMEGA8)
+#if defined(JTRF)
     if (mcusr_mirror & (1 << JTRF)) {
         DEBUG("JTAG reset!\n");
     }
@@ -89,7 +89,7 @@ ISR(BADISR_vect)
 {
     avr8_reset_cause();
 
-#if defined (CPU_ATMEGA256RFR2)
+#if defined(CPU_ATMEGA256RFR2)
     printf("IRQ_STATUS %#02x\nIRQ_STATUS1 %#02x\n",
             (unsigned int)IRQ_STATUS, (unsigned int)IRQ_STATUS1);
 
@@ -105,7 +105,7 @@ ISR(BADISR_vect)
     core_panic(PANIC_GENERAL_ERROR, "BADISR");
 }
 
-#if defined(CPU_ATMEGA128RFA1) || defined (CPU_ATMEGA256RFR2)
+#if defined(BAT_LOW_vect)
 ISR(BAT_LOW_vect, ISR_BLOCK)
 {
     avr8_enter_isr();

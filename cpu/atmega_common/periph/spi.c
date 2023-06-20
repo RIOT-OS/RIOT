@@ -45,7 +45,7 @@ static mutex_t lock = MUTEX_INIT;
 void spi_init(spi_t bus)
 {
     assert(bus == 0);
-#ifndef CPU_ATMEGA8
+#ifdef PRSPI
     /* power off the SPI peripheral */
     power_spi_disable();
 #endif
@@ -57,13 +57,13 @@ void spi_init_pins(spi_t bus)
 {
     (void)bus;
     /* set SPI pins as output */
-#if defined (CPU_ATMEGA2560) || defined (CPU_ATMEGA1281)
+#if defined(CPU_ATMEGA2560) || defined(CPU_ATMEGA1281)
     DDRB |= ((1 << DDB2) | (1 << DDB1) | (1 << DDB0));
 #endif
-#if defined (CPU_ATMEGA328P) || defined (CPU_ATMEGA8)
+#if defined(CPU_ATMEGA328P) || defined(CPU_ATMEGA8)
     DDRB |= ((1 << DDB2) | (1 << DDB3) | (1 << DDB5));
 #endif
-#if defined (CPU_ATMEGA1284P)
+#if defined(CPU_ATMEGA1284P)
     DDRB |= ((1 << DDB4) | (1 << DDB5) | (1 << DDB7));
 #endif
 #if defined(CPU_ATMEGA128RFA1) || defined(CPU_ATMEGA256RFR2)
@@ -90,7 +90,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
     /* lock the bus and power on the SPI peripheral */
     mutex_lock(&lock);
-#ifndef CPU_ATMEGA8
+#ifdef PRSPI
     power_spi_enable();
 #endif
 
@@ -108,7 +108,7 @@ void spi_release(spi_t bus)
     (void)bus;
     /* power off and release the bus */
     SPCR &= ~(1 << SPE);
-#ifndef CPU_ATMEGA8
+#ifdef PRSPI
     power_spi_disable();
 #endif
     mutex_unlock(&lock);

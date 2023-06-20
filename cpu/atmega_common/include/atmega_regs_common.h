@@ -84,18 +84,18 @@ typedef struct {
  * @brief   UART register map
  */
 typedef struct {
-#ifndef CPU_ATMEGA8
+#if defined(UCSR0A) || defined(UCSR1A)
     REG8    CSRA;               /**< control and status register A */
     REG8    CSRB;               /**< control and status register B */
     REG8    CSRC;               /**< control and status register C */
-#ifdef CPU_ATMEGA32U4
+#ifdef UCSR1D /* 32u4 */
     REG8    CSRD;               /**< control and status register D */
 #else
     REG8    reserved;           /**< reserved */
 #endif
     REG16   BRR;                /**< baud rate register */
     REG8    DR;                 /**< data register */
-#else /* atmega8 */
+#elif defined(UCSRA) /* atmega8 */
     REG8    BRRL;               /**< baud rate register low byte */
     REG8    CSRB;               /**< control and status register B */
     REG8    CSRA;               /**< control and status register A */

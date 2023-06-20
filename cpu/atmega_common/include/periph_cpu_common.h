@@ -63,15 +63,27 @@ typedef uint8_t gpio_t;
  *
  * Must be identical to the address of `PINA` provided by avr/io.h
  */
-#ifdef CPU_ATMEGA8
+#if (defined(OCF1A) && defined(OCF1B) && (OCF1A > OCF1B)) \
+    || (defined(PUD) && (PUD != 4)) || (defined(INT0) && (INT0 == 6))
+    /* match with 65 devices against 61 for (PORTB == _SFR_IO8(0x18)) which
+     * did not work here anyway */
 #define GPIO_PORT_DESCENDENT
 #endif
 
 #ifdef GPIO_PORT_DESCENDENT
-#define ATMEGA_GPIO_BASE_A     (0x39)
+#ifdef      _AVR_ATTINY1634_H_INCLUDED
+/*          the only one that requires particular treatment! */
+#define     ATMEGA_GPIO_BASE_A  (0x2F)
 #else
-#define ATMEGA_GPIO_BASE_A      (0x20)
-#endif
+/*          oll other port descendent, including :
+             - _AVR_IO8534_ (only have port A but with 0x18 address) ;
+             - _AVR_IOAT94K_H_ (only have ports D and E) ;
+             - _AVR_IOTN28_H_ (only have ports A and D). */
+#define     ATMEGA_GPIO_BASE_A  (0x39)
+#endif /*   _AVR_ATTINY1634_H_INCLUDED */
+#else /* !GPIO_PORT_DESCENDENT */
+#define     ATMEGA_GPIO_BASE_A  (0x20)
+#endif /* GPIO_PORT_DESCENDENT */
 /**
  * @brief   Base of the GPIO port G register as memory address
  *

@@ -136,7 +136,7 @@ int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
     /* stop and reset timer */
     ctx[tim].dev->CRA = 0;
     ctx[tim].dev->CRB = 0;
-#ifndef CPU_ATMEGA8
+#ifdef TCCR1C
     ctx[tim].dev->CRC = 0;
 #endif
     ctx[tim].dev->CNT = 0;
@@ -162,12 +162,12 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
     unsigned state = irq_disable();
 
     ctx[tim].dev->OCR[channel] = (uint16_t)value;
-#ifndef CPU_ATMEGA8
+#if defined(OCF1A) && defined(OCF1B) && (OCF1A < OCF1B)
     /* clear spurious IRQs, if any */
-    *ctx[tim].flag = (1 << (channel + OCF1A));
+    *ctx[tim].flag = (1 << (OCF1A + channel));
     /* unmask IRQ */
-    *ctx[tim].mask |= (1 << (channel + OCIE1A));
-#else /* atmega8 */
+    *ctx[tim].mask |= (1 << (OCIE1A + channel));
+#elif defined(OCF1A) && defined(OCF1B) && (OCF1A > OCF1B)
     /* clear spurious IRQs, if any */
     *ctx[tim].flag = (1 << (OCF1A - channel));
     /* unmask IRQ */
@@ -190,12 +190,12 @@ int timer_set(tim_t tim, int channel, unsigned int timeout)
     unsigned absolute = ctx[tim].dev->CNT + timeout;
 
     ctx[tim].dev->OCR[channel] = absolute;
-#ifndef CPU_ATMEGA8
+#if defined(OCF1A) && defined(OCF1B) && (OCF1A < OCF1B)
     /* clear spurious IRQs, if any */
-    *ctx[tim].flag = (1 << (channel + OCF1A));
+    *ctx[tim].flag = (1 << (OCF1A + channel));
     /* unmask IRQ */
-    *ctx[tim].mask |= (1 << (channel + OCIE1A));
-#else /* atmega8 */
+    *ctx[tim].mask |= (1 << (OCIE1A + channel));
+#elif defined(OCF1A) && defined(OCF1B) && (OCF1A > OCF1B)
     /* clear spurious IRQs, if any */
     *ctx[tim].flag = (1 << (OCF1A - channel));
     /* unmask IRQ */
@@ -207,9 +207,9 @@ int timer_set(tim_t tim, int channel, unsigned int timeout)
         /* Timer already expired. Trigger the interrupt now and loop until it
          * is triggered.
          */
-#ifndef CPU_ATMEGA8
+#if defined(OCF1A) && defined(OCF1B) && (OCF1A < OCF1B)
         while (!(*ctx[tim].flag & (1 << (OCF1A + channel)))) {
-#else
+#elif defined(OCF1A) && defined(OCF1B) && (OCF1A > OCF1B)
         while (!(*ctx[tim].flag & (1 << (OCF1A - channel)))) {
 #endif
             ctx[tim].dev->OCR[channel] = ctx[tim].dev->CNT;
@@ -237,12 +237,12 @@ int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags
 
     ctx[tim].dev->OCR[channel] = (uint16_t)value;
 
-#ifndef CPU_ATMEGA8
+#if defined(OCF1A) && defined(OCF1B) && (OCF1A < OCF1B)
     /* clear spurious IRQs, if any */
-    *ctx[tim].flag = (1 << (channel + OCF1A));
+    *ctx[tim].flag = (1 << (OCF1A + channel));
     /* unmask IRQ */
-    *ctx[tim].mask |= (1 << (channel + OCIE1A));
-#else /* atmega8 */
+    *ctx[tim].mask |= (1 << (OCIE1A + channel));
+#elif defined(OCF1A) && defined(OCF1B) && (OCF1A > OCF1B)
     /* clear spurious IRQs, if any */
     *ctx[tim].flag = (1 << (OCF1A - channel));
     /* unmask IRQ */
@@ -282,9 +282,9 @@ int timer_clear(tim_t tim, int channel)
         return -1;
     }
 
-#ifndef CPU_ATMEGA8
-    *ctx[tim].mask &= ~(1 << (channel + OCIE1A));
-#else
+#if defined(OCIE1A) && defined(OCIE1B) && (OCIE1A < OCIE1B)
+    *ctx[tim].mask &= ~(1 << (OCIE1A + channel));
+#elif defined(OCIE1A) && defined(OCIE1B) && (OCIE1A > OCIE1B)
     *ctx[tim].mask &= ~(1 << (OCIE1A - channel));
 #endif
 
@@ -326,11 +326,7 @@ static inline void _isr(tim_t tim, int chan)
     avr8_enter_isr();
 
     if (is_oneshot(tim, chan)) {
-#ifndef CPU_ATMEGA8
-        *ctx[tim].mask &= ~(1 << (chan + OCIE1A));
-#else
-        *ctx[tim].mask &= ~(1 << (OCIE1A - chan));
-#endif
+        timer_clear(tim, chan);
     }
     ctx[tim].cb(ctx[tim].arg, chan);
 

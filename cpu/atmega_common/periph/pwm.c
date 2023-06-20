@@ -127,7 +127,7 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     pwm_conf[dev].dev->OCR = 0;
 #endif
 
-#ifdef PRR
+#if defined(PRT2) || defined(PRTIM2) || defined(PRT0) || defined(PRTIM0)
     /* disable power reduction */
     if (dev) {
         power_timer2_enable();
@@ -206,7 +206,7 @@ void pwm_set(pwm_t dev, uint8_t ch, uint16_t value)
 void pwm_poweron(pwm_t dev)
 {
     assert(dev < PWM_NUMOF);
-#ifdef PRR
+#if defined(PRT2) || defined(PRTIM2) || defined(PRT0) || defined(PRTIM0)
     /* disable power reduction */
     if (dev) {
         power_timer2_enable();
