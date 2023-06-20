@@ -103,12 +103,6 @@ static bool _init_transfer(sdhc_state_t *state, uint32_t cmd, uint32_t arg, uint
                           uint16_t num_blocks);
 static bool sdio_test_type(sdhc_state_t *state);
 
-/** SD/MMC transfer rate unit codes (10K) list */
-static const uint32_t transfer_units[] = { 10, 100, 1000, 10000, 0, 0, 0, 0 };
-/** SD transfer multiplier factor codes (1/10) list */
-static const uint8_t transfer_multiplier[16] =
-{ 0, 10, 12, 13, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 70, 80 };
-
 static bool _card_detect(sdhc_state_t *state)
 {
     return state->dev->PSR.bit.CARDINS;
@@ -369,6 +363,9 @@ int sdhc_init(sdhc_state_t *state)
         goto out;
     }
 
+    /* all SD Cards should support this clock at that point */
+    state->clock = SDHC_FAST_CLOCK_HZ;
+
     /* update the host controller to the detected changes in bus_width and clock */
     _set_hc(state);
 
@@ -567,7 +564,6 @@ static bool _test_capacity(sdhc_state_t *state)
 {
     alignas(uint32_t)
     uint8_t csd[CSD_REG_BSIZE];
-    uint32_t transfer_speed;
 
     if (!sdhc_send_cmd(state, SDMMC_MCI_CMD9_SEND_CSD, (uint32_t)state->rca << 16)) {
         return false;
@@ -576,9 +572,7 @@ static bool _test_capacity(sdhc_state_t *state)
         uint32_t *csd32 = (void *)csd;
         csd32[i] = __builtin_bswap32(SDHC_DEV->RR[3 - i].reg);
     }
-    transfer_speed = CSD_TRAN_SPEED(&csd[1]);
-    state->clock = transfer_units[transfer_speed & 0x7] *
-                   transfer_multiplier[(transfer_speed >> 3) & 0xF] * 1000;
+
     /*
      * Card Capacity.
      * ----------------------------------------------------
