@@ -1,0 +1,7 @@
+RAM_LEN = 1K
+ROM_LEN = 8K
+
+LINKER_SCRIPT ?= avr4.ld
+
+# CPU depends on the atmega common module, so include it
+include $(RIOTCPU)/atmega_common/Makefile.include
