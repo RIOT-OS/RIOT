@@ -36,9 +36,11 @@ int mac_cmd(int argc, char **argv)
         gnrc_netif_t *netif = NULL;
         netif = gnrc_netif_iter(netif);
 
-        msg_t msg;
-        msg.type = GNRC_MAC_TYPE_GET_DUTYCYCLE;
-        msg_send(&msg, netif->pid);
+        if (netif) {
+            msg_t msg;
+            msg.type = GNRC_MAC_TYPE_GET_DUTYCYCLE;
+            msg_send(&msg, netif->pid);
+        }
 #else
         puts("MAC: radio duty-cycle unavailable.");
 #endif

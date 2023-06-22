@@ -1424,6 +1424,10 @@ static void _handle_snd_na(gnrc_pktsnip_t *pkt)
 static void _handle_pfx_timeout(_nib_offl_entry_t *pfx)
 {
     gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(pfx->next_hop));
+    if (netif == NULL) {
+        return;
+    }
+
     uint32_t now = evtimer_now_msec();
 
     gnrc_netif_acquire(netif);
