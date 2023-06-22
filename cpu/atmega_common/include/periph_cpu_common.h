@@ -2,6 +2,7 @@
  * Copyright (C) 2015 HAW Hamburg
  *               2016 Freie Universität Berlin
  *               2016 INRIA
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,6 +19,7 @@
  * @author          René Herthel <rene-herthel@outlook.de>
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Francisco Acosta <francisco.acosta@inria.fr>
+ * @author          Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef PERIPH_CPU_COMMON_H
@@ -61,7 +63,27 @@ typedef uint8_t gpio_t;
  *
  * Must be identical to the address of `PINA` provided by avr/io.h
  */
-#define ATMEGA_GPIO_BASE_A      (0x20)
+#if (defined(OCF1A) && defined(OCF1B) && (OCF1A > OCF1B)) \
+    || (defined(PUD) && (PUD != 4)) || (defined(INT0) && (INT0 == 6))
+    /* match with 65 devices against 61 for (PORTB == _SFR_IO8(0x18)) which
+     * did not work here anyway */
+#define GPIO_PORT_DESCENDENT
+#endif
+
+#ifdef GPIO_PORT_DESCENDENT
+#ifdef      _AVR_ATTINY1634_H_INCLUDED
+/*          the only one that requires particular treatment! */
+#define     ATMEGA_GPIO_BASE_A  (0x2F)
+#else
+/*          all other port descendent, including :
+             - _AVR_IO8534_ (only have port A but with 0x1B address) ;
+             - _AVR_IOAT94K_H_ (only have ports D and E) ;
+             - _AVR_IOTN28_H_ (only have ports A and D). */
+#define     ATMEGA_GPIO_BASE_A  (0x39)
+#endif /*   _AVR_ATTINY1634_H_INCLUDED */
+#else /* !GPIO_PORT_DESCENDENT */
+#define     ATMEGA_GPIO_BASE_A  (0x20)
+#endif /* GPIO_PORT_DESCENDENT */
 /**
  * @brief   Base of the GPIO port G register as memory address
  *
@@ -137,7 +159,11 @@ typedef struct {
 static inline atmega_gpio_port_t *atmega_gpio_port(uint8_t port_num)
 {
     static const uintptr_t base_addr = (uintptr_t)ATMEGA_GPIO_BASE_A;
+#ifdef GPIO_PORT_DESCENDENT
+    uintptr_t res = base_addr - port_num * sizeof(atmega_gpio_port_t);
+#else
     uintptr_t res = base_addr + port_num * sizeof(atmega_gpio_port_t);
+#endif
     /* GPIO ports up to (including) G are mapped in the I/O address space,
      * port H and higher (if present) are mapped in a different contiguous
      * region afterwards (e.g. 0x100 for ATmega2560). */

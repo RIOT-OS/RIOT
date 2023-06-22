@@ -63,11 +63,15 @@ enum {
 static inline void atmega_set_prescaler(uint8_t clk_scale)
 {
     /* Enable clock change */
+#ifdef CLKPR
     /* Must be assignment to set all other bits to zero, see datasheet */
     CLKPR = (1 << CLKPCE);
 
     /* Write clock within 4 cycles */
     CLKPR = clk_scale;
+#else
+    (void) clk_scale;
+#endif
 }
 
 #ifdef __cplusplus
