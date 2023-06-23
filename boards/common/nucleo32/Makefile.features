@@ -1,2 +1,4 @@
 # Various common features of Nucleo boards
-FEATURES_PROVIDED += arduino
+FEATURES_PROVIDED += arduino_analog
+FEATURES_PROVIDED += arduino_pins
+FEATURES_PROVIDED += arduino_shield_nano

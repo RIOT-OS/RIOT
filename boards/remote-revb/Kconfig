@@ -11,7 +11,8 @@ config BOARD_REMOTE_REVB
     bool
     default y
     select BOARD_COMMON_REMOTE
-    select HAS_ARDUINO
+    select HAS_ARDUINO_ANALOG
+    select HAS_ARDUINO_PINS
     select HAVE_SAUL_ADC
     select HAVE_SAUL_GPIO
 

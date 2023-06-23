@@ -1,2 +1,5 @@
 # Various common features of Nucleo-144 boards
-FEATURES_PROVIDED += arduino
+FEATURES_PROVIDED += arduino_analog
+FEATURES_PROVIDED += arduino_pins
+FEATURES_PROVIDED += arduino_shield_mega
+FEATURES_PROVIDED += arduino_shield_uno
