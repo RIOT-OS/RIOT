@@ -51,6 +51,7 @@ static size_t _fit(const gnrc_pktsnip_t *orig_pkt)
 
     if (netif_hdr) {
         gnrc_netif_t *netif = gnrc_netif_hdr_get_netif(netif_hdr->data);
+        assert(netif != NULL);
 
         pkt_len -= netif_hdr->size;
         DEBUG("gnrc_icmpv6_error: fitting to MTU of iface %u (%u)\n",

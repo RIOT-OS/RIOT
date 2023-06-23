@@ -548,6 +548,11 @@ static size_t _iphc_nhc_ipv6_decode(gnrc_pktsnip_t *sixlo, size_t offset,
             uint16_t payload_len;
             size_t tmp;
 
+            if (netif == NULL) {
+                DEBUG("6lo iphc: unable to find NETIF snip\n");
+                return 0;
+            }
+
             offset++;   /* move over NHC header */
             /* realloc size for uncompressed snip, if too small */
             if (ipv6->size < (*uncomp_hdr_len + sizeof(ipv6_hdr_t))) {
