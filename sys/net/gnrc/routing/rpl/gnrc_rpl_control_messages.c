@@ -1096,7 +1096,7 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
 
     gnrc_rpl_send(pkt, dodag->iface, NULL, destination, &dodag->dodag_id);
 
-    GNRC_RPL_COUNTER_INCREMENT(dodag->dao_seq);
+    dodag->dao_seq = GNRC_RPL_COUNTER_INCREMENT(dodag->dao_seq);
 }
 
 void gnrc_rpl_send_DAO_ACK(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint8_t seq)
