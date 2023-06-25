@@ -21,8 +21,18 @@
 
 #include "board.h"
 
+#ifdef MODULE_SHIELD_W5100
+#include "arduino_iomap.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#ifdef MODULE_SHIELD_W5100
+#define W5100_PARAM_SPI         ARDUINO_SPI_ISP
+#define W5100_PARAM_CS          ARDUINO_PIN_10
+#define W5100_PARAM_EVT         ARDUINO_PIN_2
 #endif
 
 /**
