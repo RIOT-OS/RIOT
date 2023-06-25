@@ -28,6 +28,37 @@ else
   $(error Unkwnown ESP32x SoC variant (family))
 endif
 
+# RAM configuration
+ifeq (esp32,$(CPU_FAM))
+  ifneq (,$(filter esp_idf_ble,$(USEMODULE)))
+    # If BT is used, the first 0xdb5c bytes (ca. 55 kbytes) of RAM are shared
+    # with the BT controller. Usable RAM region the starts at 0x3FFBDB5C.
+    # We reduce the usable size by 55 kByte.
+    RAM_LEN = 120K
+    RAM_START_ADDR = 0x3FFBE000
+  else
+    RAM_LEN = 176K
+    RAM_START_ADDR = 0x3FFB0000
+  endif
+else ifeq (esp32s2,$(CPU_FAM))
+  # The ESP32-S2 configuration in RIOT uses a data cache size and an
+  # instruction cache size of 8 kByte each. This means that the usable RAM
+  # starts at 0x3FFB0000 + 0x4000 and the size is reduced by 0x4000
+  RAM_LEN = 176K
+  RAM_START_ADDR = 0x3FFB4000
+else ifeq (esp32s3,$(CPU_FAM))
+  RAM_LEN = 264K
+  RAM_START_ADDR = 0x3FC88000
+else ifeq (esp32c3,$(CPU_FAM))
+  # Note: The address space is shared between the data and the instruction bus.
+  # Therefore, a part at the beginning of the RAM is not usable since it is
+  # used as instruction cache via the instruction bus.
+  RAM_LEN = 320K
+  RAM_START_ADDR = 0x3FC88000
+else
+  $(error Unkwnown ESP32x SoC variant (family))
+endif
+
 ifneq (,$(filter periph_flashpage,$(USEMODULE)))
   ifneq (,$(CONFIG_ESP_FLASHPAGE_CAPACITY_64K))
     FLASHFILE_POS = 0x20000
