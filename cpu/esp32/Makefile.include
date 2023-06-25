@@ -54,7 +54,7 @@ else ifeq (esp32c3,$(CPU_FAM))
   # Therefore, a part at the beginning of the RAM is not usable since it is
   # used as instruction cache via the instruction bus.
   RAM_LEN = 320K
-  RAM_START_ADDR = 0x3FC88000
+  RAM_START_ADDR = 0x3FC80000
 else
   $(error Unkwnown ESP32x SoC variant (family))
 endif
