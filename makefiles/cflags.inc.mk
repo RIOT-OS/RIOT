@@ -121,5 +121,9 @@ CFLAGS += $(filter-out $(OPTIONAL_CFLAGS_BLACKLIST),$(OPTIONAL_CFLAGS))
 CXXEXFLAGS += -Wno-missing-field-initializers
 
 # Reformat the RAM region for usage within code and expose them
-CFLAGS += -DCPU_RAM_BASE=$(RAM_START_ADDR)
-CFLAGS += -DCPU_RAM_SIZE=$(shell printf "0x%x" $$(($(RAM_LEN:%K=%*1024))))
+ifneq (,$(RAM_START_ADDR))
+  CFLAGS += -DCPU_RAM_BASE=$(RAM_START_ADDR)
+endif
+ifneq (,$(RAM_LEN))
+  CFLAGS += -DCPU_RAM_SIZE=$(shell printf "0x%x" $$(($(RAM_LEN:%K=%*1024))))
+endif
