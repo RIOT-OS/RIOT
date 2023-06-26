@@ -1,3 +1,4 @@
 CPU = atmega328p
 
+FEATURES_PROVIDED += arduino_shield_uno
 include $(RIOTBOARD)/common/arduino-atmega/Makefile.features

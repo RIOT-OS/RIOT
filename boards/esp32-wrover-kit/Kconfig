@@ -12,7 +12,7 @@ config BOARD_ESP32_WROVER_KIT
     default y
     select BOARD_COMMON_ESP32
     select CPU_MODEL_ESP32_WROVER
-    select HAS_ARDUINO
+    select HAS_ARDUINO_PINS
     select HAS_ESP_RTC_TIMER_32K
     select HAS_ESP_JTAG
     select HAS_PERIPH_ADC

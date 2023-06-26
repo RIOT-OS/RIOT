@@ -7,7 +7,9 @@
 
 config BOARD_COMMON_NUCLEO32
     bool
-    select HAS_ARDUINO
+    select HAS_ARDUINO_ANALOG
+    select HAS_ARDUINO_PINS
+    select HAS_ARDUINO_SHIELD_NANO
 
     # Clock configuration
     select BOARD_HAS_LSE if (CPU_FAM_L0 || CPU_FAM_L4) && !BOARD_NUCLEO_L011K4

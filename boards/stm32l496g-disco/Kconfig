@@ -30,7 +30,8 @@ config BOARD_STM32L496G_DISCO
     select HAS_PERIPH_USBDEV
 
     # Put other features for this board (in alphabetical order)
-    select HAS_ARDUINO
+    select HAS_ARDUINO_ANALOG
+    select HAS_ARDUINO_PINS
     select HAS_RIOTBOOT
     select HAS_TINYUSB_DEVICE
 

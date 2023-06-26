@@ -1,3 +1,4 @@
 CPU = atmega32u4
 
+FEATURES_PROVIDED += arduino_shield_uno
 include $(RIOTBOARD)/common/arduino-atmega/Makefile.features

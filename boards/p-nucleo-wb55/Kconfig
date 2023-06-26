@@ -25,7 +25,9 @@ config BOARD_P_NUCLEO_WB55
     select MODULE_PERIPH_LPUART if MODULE_STDIO_UART && HAS_PERIPH_LPUART
 
     # Put other features for this board (in alphabetical order)
-    select HAS_ARDUINO
+    select HAS_ARDUINO_ANALOG
+    select HAS_ARDUINO_PINS
+    select HAS_ARDUINO_SHIELD_UNO
     select HAS_RIOTBOOT
     select HAS_TINYUSB_DEVICE
 

@@ -11,7 +11,8 @@ config BOARD_ADAFRUIT_GRAND_CENTRAL_M4_EXPRESS
     bool
     default y
     select CPU_MODEL_SAMD51P20A
-    select HAS_ARDUINO
+    select HAS_ARDUINO_ANALOG
+    select HAS_ARDUINO_PINS
     select HAS_HIGHLEVEL_STDIO
     select HAS_PERIPH_ADC
     select HAS_PERIPH_DAC

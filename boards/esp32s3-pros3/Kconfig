@@ -13,7 +13,7 @@ config BOARD_ESP32S3_PROS3
     default y
     select BOARD_COMMON_ESP32S3
     select CPU_MODEL_ESP32S3
-    select HAS_ARDUINO
+    select HAS_ARDUINO_PINS
     select HAS_ESP_JTAG
     select HAS_ESP_SPI_RAM
     select HAS_HIGHLEVEL_STDIO

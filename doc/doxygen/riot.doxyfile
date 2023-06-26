@@ -775,6 +775,7 @@ INPUT                  = ../../doc.txt \
                          src/debugging-aids.md \
                          src/emulators.md \
                          src/release-cycle.md \
+                         src/io-mapping-and-shields.md \
                          src/changelog.md \
                          ../../LOSTANDFOUND.md \
                          ../../makefiles/pseudomodules.inc.mk \

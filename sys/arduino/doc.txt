@@ -89,55 +89,19 @@
  *
  * @section sec_boardsupport Add Arduino support to a board
  *
- * @note As prerequisite, the board must have support for C++.
+ * @note    As prerequisite, the board must have support for C++. Support for
+ *          the standard C++ lib (feature `libstdcpp`) is not required.
  *
- * To add Arduino support to a board, it has to provide the following:
+ * As a minimum requirement, the features `arduino_pins` is a hard dependency.
+ * See @ref iomaps-mapping-gpio what a board needs to provide this.
  *
- * In `RIOT/board/BOARD/include/arduino_board.h`:
- * - a mapping of GPIO pins to Arduino pin numbers named `arduino_pinmap`, e.g.
- * @code{c}
- *  static const gpio_t arduino_pinmap[] = {
- *      GPIO_PIN(PORT_D, 12),
- *      GPIO_PIN(PORT_D, 13),
- *      GPIO_PIN(PORT_D, 14),
- *      GPIO_PIN(PORT_D, 15),
- *      GPIO_PIN(PORT_A, 12),
- *      GPIO_PIN(PORT_A, 15),
- *      GPIO_PIN(PORT_B, 1),
- *      GPIO_PIN(PORT_B, 2),
- *      ...
- *  };
- * @endcode
+ * Additional mappings for analog pins (see @ref iomaps-mapping-adc) and PWM
+ * pins (see @ref iomaps-mapping-pwm) is required to be able to use
+ * `analogRead()` and `analogWrite()`.
  *
- * - a mapping of ADC lines to Arduino analogs pins named `arduino_analog_map`, e.g.
- * @code{c}
- *  static const adc_t arduino_analog_map[] = {
- *      ADC_LINE(3),
- *      ADC_LINE(2),
- *      ADC_LINE(1),
- *      ...
- *  };
- * @endcode
- *
- * - a define `ARDUINO_LED` that is mapped to an Arduino pin number connected to
- *   any on-board LED, or to pin 0 in case no LED is defined:
- * @code{c}
- *  #define ARDUINO_LED         (2)
- * @endcode
- *   This links to the third entry in the `arduino_pinmap` array.
- *
- * - a define `ARDUINO_UART_DEV` that defines the UART to use as the Arduino
- *   primary serial port (default UART_DEV(0)):
- * @code{c}
- *  #define ARDUINO_UART_DEV         (UART_DEV(3))
- * @endcode
- *
- * In addition, you have to add the 'arduino' feature to the board. For this,
- * just add `FEATURES_PROVIDED += arduino` to the 'other features' section in
- * your board's `Makefile.features'.
- *
- * That's it, your board can now run Ardunio sketches.
- *
+ * See also @ref iomaps on how a board can provide more I/O mappings and even
+ * declare electrical and mechanical compatibility with common Arduino form
+ * factors.
  *
  * @section sec_todo Open issues
  *

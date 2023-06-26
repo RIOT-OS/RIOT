@@ -315,14 +315,14 @@ CPU family or vendor, it should be placed in the correspondent Kconfig file
 the Kconfig file of that module.
 
 #### Example
-The feature `arduino` is placed in `/kconfigs/Kconfig.features` and modelled
+The feature `arduino_pins` is placed in `/kconfigs/Kconfig.features` and modelled
 like:
 
 ```Kconfig
-config HAS_ARDUINO
+config HAS_ARDUINO_PINS
     bool
     help
-        Indicates that Arduino pins compatibility is supported.
+        Indicates that Arduino digital pins mappings are provided.
 ```
 
 ### CPUs
