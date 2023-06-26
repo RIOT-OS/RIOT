@@ -188,7 +188,7 @@ extern "C" {
 #define CONFIG_BTDM_CTRL_PCM_POLAR_EFF                  0
 #define CONFIG_BTDM_CTRL_PINNED_TO_CORE_0               1
 #define CONFIG_BTDM_CTRL_PINNED_TO_CORE                 0
-#define CONFIG_BTDM_RESERVE_DRAM                        0xdb5c
+#define CONFIG_BTDM_RESERVE_DRAM                        0xe000 /* at least 0xdb5c, we use 56 kB */
 #define CONFIG_BTDM_SCAN_DUPL_CACHE_SIZE                200
 #define CONFIG_BTDM_SCAN_DUPL_TYPE_DEVICE               1
 #define CONFIG_BTDM_SCAN_DUPL_TYPE                      0
