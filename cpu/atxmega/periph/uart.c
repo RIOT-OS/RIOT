@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Gerson Fernando Budke <nandojve@gmail.com>
+ * Copyright (C) 2021-2023 Gerson Fernando Budke <nandojve@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -310,7 +310,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         /* start of TX won't finish until no data in DATAn and transmit shift
            register is empty */
         uint8_t irq_state = irq_disable();
-        avr8_state |= AVR8_STATE_FLAG_UART_TX(uart);
+        avr8_uart_tx_set_pending(uart);
         irq_restore(irq_state);
 
         dev(uart)->DATA = data[i];
@@ -344,7 +344,7 @@ static inline void _tx_isr_handler(int num)
 
     /* entire frame in the Transmit Shift Register has been shifted out and
        there are no new data currently present in the transmit buffer */
-    avr8_state &= ~AVR8_STATE_FLAG_UART_TX(num);
+    avr8_uart_tx_clear_pending(num);
 
     avr8_exit_isr();
 }

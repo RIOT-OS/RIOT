@@ -2,6 +2,7 @@
  * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
  *               2017 Thomas Perrot <thomas.perrot@tupi.fr>
  *               2023 Hugues Larrive
+ *               2023 Gerson Fernando Budke
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -20,6 +21,7 @@
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author      Thomas Perrot <thomas.perrot@tupi.fr>
  * @author      Hugues Larrive <hugues.larrive@pm.me>
+ * @author      Gerson Fernando Budke <nandojve@gmail.com>
  *
  *
  * Support static BAUD rate calculation using STDIO_UART_BAUDRATE.
@@ -192,8 +194,9 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         /* start of TX won't finish until no data in UDRn and transmit shift
            register is empty */
         unsigned long state = irq_disable();
-        avr8_state |= AVR8_STATE_FLAG_UART_TX(uart);
+        avr8_uart_tx_set_pending(uart);
         irq_restore(state);
+
         dev[uart]->DR = data[i];
     }
 }
@@ -225,7 +228,7 @@ static inline void _tx_isr_handler(int num)
 
     /* entire frame in the Transmit Shift Register has been shifted out and
        there are no new data currently present in the transmit buffer */
-    avr8_state &= ~AVR8_STATE_FLAG_UART_TX(num);
+    avr8_uart_tx_clear_pending(num);
 
     avr8_exit_isr();
 }
