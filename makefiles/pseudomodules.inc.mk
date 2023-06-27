@@ -33,6 +33,8 @@ PSEUDOMODULES += base64url
 ## be advertised in any other capacity, e.g. through @ref sys_auto_init_saul).
 PSEUDOMODULES += board_software_reset
 
+PSEUDOMODULES += arduino_pwm
+PSEUDOMODULES += arduino_serial_stdio
 PSEUDOMODULES += can_mbox
 PSEUDOMODULES += can_pm
 PSEUDOMODULES += can_raw
