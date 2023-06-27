@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Peripheral configuration for the Thingy:52
+ * @brief       Peripheral configuration for the Thingy:91
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
