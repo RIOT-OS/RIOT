@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
  *               2017 Thomas Perrot <thomas.perrot@tupi.fr>
  *               2018 RWTH Aachen, Josua Arndt <jarndt@ias.rwth-aachen.de>
- *               2021 Gerson Fernando Budke <nandojve@gmail.com>
+ *               2021-2023 Gerson Fernando Budke <nandojve@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -273,12 +273,13 @@ void thread_yield_higher(void)
 
 void avr8_exit_isr(void)
 {
-    avr8_state &= ~AVR8_STATE_FLAG_ISR;
+    --avr8_state_irq_count;
 
     /* Force access to avr8_state to take place */
     __asm__ volatile ("" : : : "memory");
 
-    if (sched_context_switch_request) {
+    /* schedule should switch context when returning from a non nested interrupt */
+    if (sched_context_switch_request && avr8_state_irq_count == 0) {
         avr8_context_save();
         sched_run();
         avr8_context_restore();

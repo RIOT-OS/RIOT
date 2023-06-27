@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
  *               2018 RWTH Aachen, Josua Arndt <jarndt@ias.rwth-aachen.de>
  *               2020 Otto-von-Guericke-Universität Magdeburg
- *               2021 Gerson Fernando Budke
+ *               2021-2023 Gerson Fernando Budke
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -100,8 +100,11 @@ __attribute__((always_inline)) static inline void irq_restore(unsigned int _stat
  */
 __attribute__((always_inline)) static inline bool irq_is_in(void)
 {
-    uint8_t state = avr8_get_state();
-    return (state & AVR8_STATE_FLAG_ISR);
+    bool is_in = avr8_state_irq_count > 0;
+
+    __asm__ volatile ("" : : : "memory");
+
+    return is_in;
 }
 
 /**

@@ -72,6 +72,39 @@ extern uint8_t avr8_state_uart_sram;            /**< UART state variable. */
 #endif
 /** @} */
 
+/**
+ * @name    Internal flag which defines if IRQ state is stored on SRAM
+ * @{
+ */
+#ifdef GPIOR1
+#define AVR8_STATE_IRQ_USE_SRAM 0 /**< IRQ state using GPIOR registers. */
+#else
+#define AVR8_STATE_IRQ_USE_SRAM 1 /**< IRQ state using GPIOR registers. */
+#endif
+/** @} */
+
+/**
+ * @name    Global variable containing the current state of the MCU
+ * @{
+ *
+ * @note    This variable is updated from IRQ context; access to it should
+ *          be wrapped into @ref irq_disable and @ref irq_restore should be
+ *          used.
+ *
+ * Contents:
+ *
+ * | Label  | Description                                                   |
+ * |:-------|:--------------------------------------------------------------|
+ * | IRQ    | This variable is incremented when in IRQ context              |
+ */
+#if (AVR8_STATE_IRQ_USE_SRAM)
+extern uint8_t avr8_state_irq_count_sram;               /**< IRQ state variable. */
+#define avr8_state_irq_count avr8_state_irq_count_sram  /**< Definition for SRAM. */
+#else
+#define avr8_state_irq_count GPIOR1                     /**< Definition for GPIOR1. */
+#endif
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

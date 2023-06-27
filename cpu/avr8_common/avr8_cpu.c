@@ -68,7 +68,9 @@
 */
 uint8_t mcusr_mirror __attribute__((section(".noinit")));
 uint8_t soft_rst __attribute__((section(".noinit")));
-uint8_t avr8_state = 0;
+#if (AVR8_STATE_IRQ_USE_SRAM)
+uint8_t avr8_state_irq_count_sram = 0;
+#endif
 #if (AVR8_STATE_UART_USE_SRAM)
 uint8_t avr8_state_uart_sram = 0;
 #endif
@@ -123,6 +125,7 @@ void cpu_init(void)
 
     /* Set global resources initial state */
     avr8_state_uart = 0;
+    avr8_state_irq_count = 0;
 
     irq_enable();
 }

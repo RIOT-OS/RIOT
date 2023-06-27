@@ -59,61 +59,6 @@ extern "C"
 /** @} */
 
 /**
- * @name    Flags for the current state of the ATmega MCU
- * @{
- */
-#define AVR8_STATE_FLAG_ISR           (0x80U) /**< In ISR */
-/** @} */
-
-/**
- * @brief   Global variable containing the current state of the MCU
- *
- * @note    This variable is updated from IRQ context; access to it should
- *          be wrapped into @ref irq_disable and @ref irq_restore or
- *          @ref avr8_get_state should be used.
- *
- * Contents:
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *   7   6   5   4   3   2   1   0
- * +---+---+---+---+---+---+---+---+
- * |IRQ|        RESERVED           |
- * +---+---+---+---+---+---+---+---+
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *
- * | Label  | Description                                                   |
- * |:-------|:--------------------------------------------------------------|
- * | IRQ    | This bit is set when in IRQ context                           |
- */
-extern uint8_t avr8_state;
-
-/**
- * @brief   Atomically read the state (@ref avr8_state)
- *
- * This function guarantees that the read is not optimized out, not reordered
- * and done atomically. This does not mean that by the time return value is
- * processed that it still reflects the value currently stored in
- * @ref avr8_state.
- *
- * Using ASM rather than C11 atomics has less overhead, as not every access to
- * the state has to be performed atomically: Those done from ISR will not be
- * interrupted (no support for nested interrupts) and barriers at the begin and
- * end of the ISRs make sure the access takes place before IRQ context is left.
- */
-static inline uint8_t avr8_get_state(void)
-{
-    uint8_t state;
-    __asm__ volatile(
-        "lds   %[state], avr8_state       \n\t"
-        : [state]   "=r" (state)
-        :
-        : "memory"
-
-    );
-
-    return state;
-}
-
-/**
  * @brief   Run this code on entering interrupt routines
  */
 static inline void avr8_enter_isr(void)
@@ -122,7 +67,7 @@ static inline void avr8_enter_isr(void)
      * supported as of now. The flag will be unset before the IRQ context is
      * left, so no need to use memory barriers or atomics here
      */
-    avr8_state |= AVR8_STATE_FLAG_ISR;
+    ++avr8_state_irq_count;
 }
 
 /**
