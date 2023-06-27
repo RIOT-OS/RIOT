@@ -12,8 +12,10 @@ config BOARD_WAVESHARE_NRF52840_EVAL_KIT
     default y
     select BOARD_COMMON_NRF52
     select CPU_MODEL_NRF52840XXAA
-    select HAS_ARDUINO
+    select HAS_ARDUINO_ANALOG
+    select HAS_ARDUINO_PINS
     select HAS_ARDUINO_PWM
+    select HAS_ARDUINO_SHIELD_UNO
     select HAS_PERIPH_I2C
     select HAS_PERIPH_PWM
     select HAS_PERIPH_SPI

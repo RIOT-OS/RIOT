@@ -10,4 +10,4 @@ FEATURES_PROVIDED += periph_i2c
 FEATURES_PROVIDED += periph_pwm
 FEATURES_PROVIDED += periph_spi
 
-FEATURES_PROVIDED += arduino
+FEATURES_PROVIDED += arduino_pins

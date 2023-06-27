@@ -13,7 +13,7 @@ config BOARD_ESP32C3_WEMOS_MINI
     default y
     select BOARD_COMMON_ESP32C3
     select CPU_MODEL_ESP32C3_FH4
-    # select HAS_ARDUINO
+    select HAS_ARDUINO_PINS
     select HAS_ESP_JTAG
     select HAS_PERIPH_ADC
     select HAS_PERIPH_I2C

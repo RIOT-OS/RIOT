@@ -23,7 +23,7 @@ config BOARD_NUCLEO_WL55JC
     select HAS_PERIPH_UART
 
     # Put other features for this board (in alphabetical order)
-    select HAS_ARDUINO
+    select HAS_ARDUINO_PINS
     select HAS_PERIPH_GPIO_IRQ
     select HAS_RIOTBOOT
     select HAVE_SX126X_STM32WL

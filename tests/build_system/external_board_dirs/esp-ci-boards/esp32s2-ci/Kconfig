@@ -13,7 +13,7 @@ config BOARD_ESP32S2_CI
     default y
     select BOARD_COMMON_ESP32S2
     select CPU_MODEL_ESP32S2_MINI_1X_N4R2
-    select HAS_ARDUINO
+    select HAS_ARDUINO_PINS
     select HAS_ESP_JTAG
     select HAS_ESP_RTC_TIMER_32K
     select HAS_PERIPH_ADC

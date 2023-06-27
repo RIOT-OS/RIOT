@@ -21,7 +21,7 @@
 
 /* For MSP430 cpu's the last page holds the interrupt vector, although the api
    should not limit erasing that page, we don't want to break when testing */
-#if defined(CPU_CC430) || defined(CPU_MSP430FXYZ)
+#ifdef __MSP430__
 #define LAST_AVAILABLE_PAGE    (FLASHPAGE_NUMOF - 2)
 #else
 #define LAST_AVAILABLE_PAGE    (FLASHPAGE_NUMOF - 1)

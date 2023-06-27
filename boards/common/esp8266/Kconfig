@@ -6,7 +6,7 @@
 
 config BOARD_COMMON_ESP8266
     bool
-    select HAS_ARDUINO
+    select HAS_ARDUINO_PINS
     select HAS_PERIPH_ADC
     select HAS_PERIPH_I2C
     select HAS_PERIPH_PWM

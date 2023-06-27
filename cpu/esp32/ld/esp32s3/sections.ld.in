@@ -637,3 +637,15 @@ ASSERT(((_iram_end - ORIGIN(iram0_0_seg)) <= LENGTH(iram0_0_seg)),
 
 ASSERT(((_heap_start - ORIGIN(dram0_0_seg)) <= LENGTH(dram0_0_seg)),
           "DRAM segment data does not fit.")
+
+. = ORIGIN(dram0_0_seg);
+_cpu_ram_start = ABSOLUTE(.);
+. = ORIGIN(dram0_0_seg) + LENGTH(dram0_0_seg);
+_cpu_ram_end = ABSOLUTE(.);
+
+/* ensure that RAM_START_ADDR and RAM_LEN as defined in RIOT's makefile
+ * match the parameters used in linker script */
+ASSERT((ORIGIN(dram0_0_seg) == CPU_RAM_BASE),
+       "RAM_START_ADDR does not match DRAM start address")
+ASSERT((LENGTH(dram0_0_seg) == CPU_RAM_SIZE),
+       "RAM_LEN does not match DRAM size")

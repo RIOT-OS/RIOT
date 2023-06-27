@@ -6,7 +6,8 @@
 
 config BOARD_COMMON_SILABS
     bool
-    select HAS_ARDUINO
+    select HAS_ARDUINO_ANALOG
+    select HAS_ARDUINO_PINS
     select HAS_EFM32_CORETEMP
     select HAS_RIOTBOOT
 

@@ -18,21 +18,22 @@
  * @}
  */
 
-extern "C" {
+#include "arduino_board.h"
 #include "assert.h"
-#include "ztimer.h"
-#include "periph/gpio.h"
 #include "periph/adc.h"
+#include "periph/gpio.h"
 #include "periph/pwm.h"
-}
+#include "ztimer.h"
 
 #include "arduino.hpp"
 
-#define ANALOG_PIN_NUMOF     (ARRAY_SIZE(arduino_analog_map))
-
 void pinMode(int pin, int mode)
 {
-    assert(gpio_is_valid(arduino_pinmap[pin]));
+    if ((pin > ARDUINO_PIN_LAST) || (pin < 0) ||
+            !gpio_is_valid(arduino_pinmap[pin])) {
+        assert(0);
+        return;
+    }
     gpio_mode_t m = GPIO_OUT;
 
     if (mode == INPUT) {
@@ -82,7 +83,7 @@ unsigned long millis()
     return ztimer_now(ZTIMER_MSEC);
 }
 
-#if MODULE_PERIPH_ADC
+#if IS_USED(MODULE_PERIPH_ADC) && defined(ARDUINO_ANALOG_PIN_LAST)
 int analogRead(int arduino_pin)
 {
     /*
@@ -91,13 +92,16 @@ int analogRead(int arduino_pin)
     * 1: Successfully initialized
     */
     static uint16_t adc_line_state;
+#if ARDUINO_ANALOG_PIN_LAST > 15
+#  error "Implementation currently not compatible with more than 16 analog pins"
+#endif
     int adc_value;
 
     /* Check if the ADC line is valid */
-    assert((arduino_pin >= 0) && (arduino_pin < (int)ANALOG_PIN_NUMOF));
+    assert((arduino_pin >= 0) && (arduino_pin <= (int)ARDUINO_ANALOG_PIN_LAST));
 
     /* Initialization of given ADC channel */
-    if (!(adc_line_state & (1 << arduino_pin))) {
+    if (!(adc_line_state & (1UL << arduino_pin))) {
         if (adc_init(arduino_analog_map[arduino_pin]) != 0) {
             return -1;
         }

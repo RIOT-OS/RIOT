@@ -30,7 +30,8 @@ config BOARD_STM32L496G_DISCO
     select HAS_PERIPH_USBDEV
 
     # Put other features for this board (in alphabetical order)
-    select HAS_ARDUINO
+    select HAS_ARDUINO_ANALOG
+    select HAS_ARDUINO_PINS
     select HAS_RIOTBOOT
     select HAS_TINYUSB_DEVICE
 
@@ -41,7 +42,7 @@ config BOARD_STM32L496G_DISCO
     select HAVE_FT5X06
 
     select MODULE_PERIPH_LPUART if MODULE_PERIPH_UART
-    select MODULE_PERIPH_UART_HW_FC if MODULE_PERIPH_UART && !MODULE_PERIPH_SPI_STMOD
+    select MODULE_PERIPH_UART_HW_FC if MODULE_PERIPH_UART && !MODULE_PERIPH_SPI_STMOD && HAS_PERIPH_UART_HW_FC
 
 source "$(RIOTBOARD)/common/stm32/Kconfig"
 

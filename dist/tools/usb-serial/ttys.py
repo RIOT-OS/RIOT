@@ -186,7 +186,7 @@ def print_results(args, ttys):
         line = ""
         for fmt in args.format:
             item = tty[fmt]
-            if item.rfind(args.format_sep) >= 0:
+            if item is not None and item.rfind(args.format_sep) >= 0:
                 # item contains separator --> quote it
                 # using json.dumps to also escape quotation chars and other
                 # unsafe stuff

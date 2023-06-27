@@ -163,11 +163,6 @@ ifneq (,$(filter prng,$(USEMODULE)))
   include $(RIOTBASE)/sys/random/Makefile.include
 endif
 
-ifneq (,$(filter tinyusb_dfu usbus_dfu riotboot_reset,$(USEMODULE)))
-  CFLAGS += -DCPU_RAM_BASE=$(RAM_START_ADDR)
-  CFLAGS += -DCPU_RAM_SIZE=$(shell printf "0x%x" $$(($(RAM_LEN:%K=%*1024))))
-endif
-
 ifneq (,$(filter test_utils_netdev_eth_minimal,$(USEMODULE)))
   CFLAGS += -DCONFIG_NETDEV_REGISTER_SIGNAL
 endif

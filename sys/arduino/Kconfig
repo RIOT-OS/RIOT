@@ -13,7 +13,7 @@ menuconfig MODULE_ARDUINO
     imply MODULE_PERIPH_ADC
     imply MODULE_PERIPH_I2C
     imply MODULE_PERIPH_SPI
-    depends on HAS_ARDUINO
+    depends on HAS_ARDUINO_PINS
     depends on HAS_PERIPH_GPIO
     depends on HAS_PERIPH_UART
     depends on HAS_CPP

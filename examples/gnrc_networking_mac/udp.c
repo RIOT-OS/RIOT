@@ -91,7 +91,11 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
         /* add netif header, if interface was given */
         if (netif != NULL) {
             gnrc_pktsnip_t *netif_hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
-
+            if (netif_hdr == NULL) {
+                puts("Error: unable to allocate netif header");
+                gnrc_pktbuf_release(ip);
+                return;
+            }
             gnrc_netif_hdr_set_netif(netif_hdr->data, netif);
             ip = gnrc_pkt_prepend(ip, netif_hdr);
         }

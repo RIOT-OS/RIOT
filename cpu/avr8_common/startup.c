@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
  *               2021 Gerson Fernando Budke
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,6 +19,7 @@
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
  * @author      Gerson Fernando Budke <nandojve@gmail.com>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  * @}
  */
 
@@ -48,7 +50,7 @@ extern void __libc_init_array(void);
  * avr-libc normally uses the .init9 section for a call to main. This call
  * seems to be not replaceable without hacking inside the library. We
  * circumvent the call to main by using section .init7 to call the function
- * reset_handler which therefore is the real entry point and  section .init8
+ * reset_handler which therefore is the real entry point and section .init8
  * which should never be reached but just in case jumps to exit.
  * This way there should be no way to call main directly.
  */
@@ -57,12 +59,20 @@ void init8_ovr(void) __attribute__((section(".init8")));
 
 __attribute__((used, naked)) void init7_ovr(void)
 {
+#if (FLASHEND <= 0x1FFF)
+    __asm__ ("rjmp reset_handler");
+#else
     __asm__ ("call reset_handler");
+#endif
 }
 
 __attribute__((used, naked)) void init8_ovr(void)
 {
+#if (FLASHEND <= 0x1FFF)
+    __asm__ ("rjmp exit");
+#else
     __asm__ ("jmp exit");
+#endif
 }
 
 /**

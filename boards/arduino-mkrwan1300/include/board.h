@@ -31,11 +31,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   The on-board LED is connected to pin 6 on this board
- */
-#define ARDUINO_LED         (6U)
-
-/**
  * @name    LED pin definitions and handlers
  * @{
  */

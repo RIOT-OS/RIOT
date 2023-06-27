@@ -1,3 +1,6 @@
-FEATURES_REQUIRED += periph_uart_hw_fc
+
+ifneq (,$(filter periph_uart,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_uart_hw_fc
+endif
 
 include $(RIOTBOARD)/common/nrf51/Makefile.dep
