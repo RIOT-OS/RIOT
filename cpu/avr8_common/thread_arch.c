@@ -264,7 +264,6 @@ void thread_yield_higher(void)
         avr8_context_save();
         sched_run();
         avr8_context_restore();
-        __asm__ volatile ("ret");
     }
     else {
         sched_context_switch_request = 1;
