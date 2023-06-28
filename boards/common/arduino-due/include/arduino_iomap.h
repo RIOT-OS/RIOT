@@ -56,7 +56,7 @@ extern "C" {
 /**
  * @brief   The only configured I2C
  */
-#define ARDUINO_I2C0            I2C_DEV(0)
+#define ARDUINO_I2C_UNO         I2C_DEV(0)
 /** @} */
 
 /**

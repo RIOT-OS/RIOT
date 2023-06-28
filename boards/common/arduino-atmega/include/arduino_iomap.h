@@ -63,7 +63,11 @@ extern "C" {
 /**
  * @brief   The only hardware I2C on ATmegas
  */
-#define ARDUINO_I2C0            I2C_DEV(0)
+#ifndef BOARD_ARDUINO_NANO
+#define ARDUINO_I2C_UNO         I2C_DEV(0)
+#else
+#define ARDUINO_I2C_NANO        I2C_DEV(0)
+#endif
 /** @} */
 
 /**
