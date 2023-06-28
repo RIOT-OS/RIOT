@@ -209,6 +209,54 @@ I2C_DEV(0) | SDA    | GPIO8  | `#I2C0_SDA`   | -
 The ESP32-S3 LEDC module has 1 channel group with 8 channels. Each of
 these channels can be clocked by one of the 4 timers.
 
+## SDMMC Interfaces {#esp32_sdmmc_interfaces_esp32s3}
+
+The ESP32-S3 variant uses the GPIO matrix (i.e. `SOC_SDMMC_USE_GPIO_MATRIX`
+is defined in the SoC Capabilities file) to route the SDMMC signals to
+arbitrary pins. The GPIOs used for the SDMMC signals are therefore
+configurable and have to be defined in the board-specific configuration in
+array @ref sdmmc_config in addition to the used slot.
+
+The width of the data bus used is determined by the GPIOs defined for the
+DAT lines. To use a 1-bit data bus, only DAT0 (@ref sdmmc_conf_t::dat0)
+must be defined. All other GPIOs for the DAT lines must be set undefined
+(@ref GPIO_UNDEF). For a 4-bit data bus, the GPIOs for pins DAT1 to DAT3
+(@ref sdmmc_conf_t::dat1 ... @ref sdmmc_conf_t::dat3) must also be defined.
+An 8-bit data bus width requires the definition of DAT4 to DAT7
+(@ref sdmmc_conf_t::dat4 ... @ref sdmmc_conf_t::dat7) and the enabling
+of the `periph_sdmmc_8bit` module.
+
+The following example shows a configuration with 4-bit or 8-bit data
+bus width dependent on whether the `periph_sdmmc_8bit` module is enabled.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+static const sdmmc_conf_t sdmmc_config[] = {
+    {
+        .slot = SDMMC_SLOT_0,
+        .cd = GPIO16,
+        .wp = GPIO_UNDEF,
+        .clk = GPIO14,
+        .cmd = GPIO15,
+        .dat0 = GPIO2,
+        .dat1 = GPIO4,
+        .dat2 = GPIO12,
+        .dat3 = GPIO13,
+#if IS_USED(MODULE_PERIPH_SMMC_8BIT)
+        .dat4 = GPIO33,
+        .dat5 = GPIO33,
+        .dat6 = GPIO33,
+        .dat7 = GPIO33,
+#endif
+    },
+};
+
+#define SDMMC_NUMOF 1
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If the board supports a Card Detect pin or a Write Protect pin, the
+corresponding GPIOs have to be defined in @ref sdmmc_conf_t::cd and
+@ref sdmmc_conf_t::wp. Otherwise they have to be set to undefined
+(@ref GPIO_UNDEF).
+
 ## SPI Interfaces {#esp32_spi_interfaces_esp32s3}
 
 ESP32-S3 has four SPI controllers where SPI0 and SPI1 share the same bus

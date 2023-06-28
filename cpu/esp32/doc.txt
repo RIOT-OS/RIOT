@@ -55,13 +55,14 @@ This document describes the RIOT implementation for supported variants
     3. [DAC Channels](#esp32_dac_channels)
     4. [I2C Interfaces](#esp32_i2c_interfaces)
     5. [PWM Channels](#esp32_pwm_channels)
-    6. [SPI Interfaces](#esp32_spi_interfaces)
-    7. [Timers](#esp32_timers)
-    8. [RTT Implementation](#esp32_rtt_counter)
-    9. [UART Interfaces](#esp32_uart_interfaces)
-    10. [CAN Interfaces](#esp32_can_interfaces)
-    11. [Power Management](#esp32_power_management)
-    12. [Other Peripherals](#esp32_other_peripherals)
+    6. [SDMMC Interfaces](#esp32_sdmmc_interfaces)
+    8. [SPI Interfaces](#esp32_spi_interfaces)
+    9. [Timers](#esp32_timers)
+    10. [RTT Implementation](#esp32_rtt_counter)
+    12. [UART Interfaces](#esp32_uart_interfaces)
+    13. [CAN Interfaces](#esp32_can_interfaces)
+    14. [Power Management](#esp32_power_management)
+    15. [Other Peripherals](#esp32_other_peripherals)
 7. [Special On-board Peripherals](#esp32_special_on_board_peripherals)
     1. [SPI RAM Modules](#esp32_spi_ram)
     2. [SPIFFS Device](#esp32_spiffs_device)
@@ -212,13 +213,14 @@ The key features of ESP32 are:
 | Flash             | 512 KiB ... 16 MiB                                                | yes |
 | Frequency         | 240 MHz, 160 MHz, 80 MHz                                          | yes |
 | Power Consumption | 68 mA @ 240 MHz <br> 44 mA @ 160 MHz (34 mA @ 160 MHz single core) <br> 31 mA @ 80 MHz (25 mA @ 80 MHz single core) <br> 800 uA in light sleep mode <br> 10 uA in deep sleep mode | yes <br> yes <br> yes <br> yes <br> yes |
-| Timers            | 4 x 64 bit                                                        | yes |
-| ADCs              | 2 x SAR-ADC with up to 18 x 12 bit channels total                 | yes |
-| DACs              | 2 x DAC with 8 bit                                                | yes |
-| GPIOs             | 34 (6 are only inputs, 18 are RTC GPIOs)                          | yes |
-| I2Cs              | 2                                                                 | yes |
-| SPIs              | 4                                                                 | yes (2) |
-| UARTs             | 3                                                                 | yes |
+| Timer             | 4 x 64 bit                                                        | yes |
+| ADC               | 2 x SAR-ADC with up to 18 x 12 bit channels total                 | yes |
+| DAC               | 2 x DAC with 8 bit                                                | yes |
+| GPIO              | 34 (6 are only inputs, 18 are RTC GPIOs)                          | yes |
+| I2C               | 2                                                                 | yes |
+| SDMMC             | 2                                                                 | yes |
+| SPI               | 4                                                                 | yes (2) |
+| UART              | 3                                                                 | yes |
 | WiFi              | IEEE 802.11 b/g/n built in                                        | yes |
 | Bluetooth         | v4.2 BR/EDR and BLE                                               | yes |
 | Ethernet          | MAC interface with dedicated DMA and IEEE 1588 support            | yes |
@@ -248,13 +250,13 @@ The key features of ESP32-C3 are:
 | Flash             | 8 MiB                                                             | yes |
 | Frequency         | 160 MHz, 80 MHz                                                   | yes |
 | Power Consumption | 20 mA @ 240 MHz <br> 15 mA @ 80 MHz <br> 130 uA in light sleep mode <br> 5 uA in deep sleep mode | yes <br> yes <br> yes <br> yes |
-| Timers            | 2 x 54 bit                                                        | yes |
-| ADCs              | 2 x SAR-ADC with up to 6 x 12 bit channels total                  | yes |
-| DACs              | -                                                                 | -   |
-| GPIOs             | 22                                                                | yes |
-| I2Cs              | 1                                                                 | yes |
-| SPIs              | 3                                                                 | yes (1) |
-| UARTs             | 2                                                                 | yes |
+| Timer             | 2 x 54 bit                                                        | yes |
+| ADC               | 2 x SAR-ADC with up to 6 x 12 bit channels total                  | yes |
+| DAC               | -                                                                 | -   |
+| GPIO              | 22                                                                | yes |
+| I2C               | 1                                                                 | yes |
+| SPI               | 3                                                                 | yes (1) |
+| UART              | 2                                                                 | yes |
 | WiFi              | IEEE 802.11 b/g/n built in                                        | yes |
 | Bluetooth         | Bluetooth 5 (LE)                                                  | yes |
 | Ethernet          | -                                                                 | -   |
@@ -284,13 +286,13 @@ The key features of ESP32-S2 are:
 | Flash             | 512 KiB ... 32 MiB Dual/Quad/Octal SPI (external or internal)     | yes |
 | Frequency         | 240 MHz, 160 MHz, 80 MHz                                          | yes |
 | Power Consumption | 66 mA @ 240 MHz <br> 50 mA @ 160 MHz (40 mA @ 160 MHz single core) <br> 33 mA @ 80 MHz (28 mA @ 80 MHz single core) <br> 19 mA @ 40 MHz (16 mA @ 40 MHz single core) <br>240 uA in light sleep mode <br> 8 uA in deep sleep mode | yes <br> yes <br> yes <br> yes <br> yes <br> yes |
-| Timers            | 4 x 54 bit                                                        | yes |
-| ADCs              | 2 x SAR-ADC with up to 20 x 13 bit channels total                 | yes |
-| DACs              | 2 x DAC with 8 bit                                                | -   |
-| GPIOs             | 43 (22 are RTC GPIOs)                                             | yes |
-| I2Cs              | 2                                                                 | yes |
-| SPIs              | 4                                                                 | yes (2) |
-| UARTs             | 2                                                                 | yes |
+| Timer             | 4 x 54 bit                                                        | yes |
+| ADC               | 2 x SAR-ADC with up to 20 x 13 bit channels total                 | yes |
+| DAC               | 2 x DAC with 8 bit                                                | -   |
+| GPIO              | 43 (22 are RTC GPIOs)                                             | yes |
+| I2C               | 2                                                                 | yes |
+| SPI               | 4                                                                 | yes (2) |
+| UART              | 2                                                                 | yes |
 | WiFi              | IEEE 802.11 b/g/n built in                                        | yes |
 | Bluetooth         | -                                                                 | -   |
 | Ethernet          | -                                                                 | -   |
@@ -320,13 +322,14 @@ The key features of ESP32-S3 are:
 | Flash             | 512 KiB ... 32 MiB Dual/Quad/Octal SPI (external or internal)     | yes |
 | Frequency         | 240 MHz, 160 MHz, 80 MHz                                          | yes |
 | Power Consumption | 66 mA @ 240 MHz <br> 50 mA @ 160 MHz (40 mA @ 160 MHz single core) <br> 33 mA @ 80 MHz (28 mA @ 80 MHz single core) <br> 19 mA @ 40 MHz (16 mA @ 40 MHz single core) <br>240 uA in light sleep mode <br> 8 uA in deep sleep mode | yes <br> yes <br> yes <br> yes <br> yes <br> yes |
-| Timers            | 4 x 54 bit                                                        | yes |
-| ADCs              | 2 x SAR-ADC with up to 20 x 12 bit channels total                 | yes |
-| DACs              | -                                                                 | -   |
-| GPIOs             | 45 (22 are RTC GPIOs)                                             | yes |
-| I2Cs              | 2                                                                 | yes |
-| SPIs              | 4                                                                 | yes (2) |
-| UARTs             | 3                                                                 | yes |
+| Timer             | 4 x 54 bit                                                        | yes |
+| ADC               | 2 x SAR-ADC with up to 20 x 12 bit channels total                 | yes |
+| DAC               | -                                                                 | -   |
+| GPIO              | 45 (22 are RTC GPIOs)                                             | yes |
+| I2C               | 2                                                                 | yes |
+| SDMMC             | 2                                                                 | yes |
+| SPI               | 4                                                                 | yes (2) |
+| UART              | 3                                                                 | yes |
 | WiFi              | IEEE 802.11 b/g/n built in                                        | yes |
 | Bluetooth         | Bluetooth 5 (LE)                                                  | yes |
 | Ethernet          | -                                                                 | -   |
@@ -1011,6 +1014,62 @@ definition of `PWM0_GPIOS`, `PWM1_GPIOS`, `PWM2_GPIOS` and `PWM3_GPIOS`.
   the #pwm_init function, they can be used other purposes.
 
 [Back to table of contents](#esp32_toc)
+
+## SDMMC Interfaces {#esp32_sdmmc_interfaces}
+
+ESP32 and ESP32-S3 variants integrate a SD/MMC host controller which supports
+two slots for
+
+- SD Memory Cards,
+- SDIO Cards and
+- MMC/eMMCs.
+
+The SD/MMC host controller on the ESP32 variant
+
+- supports 1-bit, 4-bit and 8-bit data bus width for slot 0 (@ref SDMMC_SLOT_0),
+- supports 1-bit and 4-bit data bus width for slot 1 (@ref SDMMC_SLOT_1),
+- uses direct I/O for SD/MMC signals so that the GPIOs used for the slots are
+  therefore fixed.
+
+The SD/MMC host controller on the ESP32-S3 variant
+- supports 1-, 4- and 8-bit data bus width for both slots
+- uses the GPIO matrix to connect the SD/MMC signals to the GPIOs so that
+  all pins are configurable.
+
+@note Since the GPIOs are fixed on the ESP32 variant and the same GPIOs are
+used for slot 0 and the flash, slot 0 cannot be used on ESP32 variant.
+
+The board-specific configuration is realized by defining the array
+@ref sdmmc_config
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+static const sdmmc_conf_t sdmmc_config[] = {
+    {
+        .slot = SDMMC_SLOT_1,
+        .cd = GPIO_UNDEF,
+        .wp = GPIO_UNDEF,
+        ...
+    },
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+and the macro `SDMMC_NUMOF`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+#define SDMMC_NUMOF 1
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+where the value of @ref SDMMC_NUMOF must correspond to the number of elements
+in @ref sdmmc_config.
+
+While for the ESP32 variant it is sufficient to define the data bus width, used
+GPIOs have to be defined in the configuration for the ESP32-S3 variant instead.
+For details of ESP32x variant specific configuration, see:
+
+- \ref esp32_sdmmc_interfaces_esp32 "ESP32"
+- \ref esp32_sdmmc_interfaces_esp32s3 "ESP32-S3"
+
+If the board supports a Card Detect pin or a Write Protect pin, the
+corresponding GPIOs have to be defined in @ref sdmmc_conf_t::cd and
+@ref sdmmc_conf_t::wp. Otherwise they have to be set to undefined
+(@ref GPIO_UNDEF).
 
 ## SPI Interfaces {#esp32_spi_interfaces}
 
