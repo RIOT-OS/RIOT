@@ -2,6 +2,7 @@
  * Copyright (C) 2015 HAW Hamburg
  *               2016 INRIA
  *               2022 Otto-von-Guericke-Universität Magdeburg
+ *               2023 Gerson Fernando Budke
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -22,6 +23,7 @@
  * @author      Robert Hartung <hartung@ibr.cs.tu-bs.de>
  * @author      Torben Petersen <petersen@ibr.cs.tu-bs.de>
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author      Gerson Fernando Budke <nandojve@gmail.com>
  *
  * @}
  */
@@ -117,63 +119,37 @@ int gpio_ll_irq(gpio_port_t port, uint8_t pin, gpio_irq_trig_t trig,
 
 static void isr_exti(uint8_t exti)
 {
-    avr8_enter_isr();
     isr_ctx[exti].cb(isr_ctx[exti].arg);
-    avr8_exit_isr();
 }
 
 #ifdef INT0_vect
-ISR(INT0_vect, ISR_BLOCK)
-{
-    isr_exti(0);
-}
+AVR8_ISR(INT0_vect, isr_exti, 0);
 #endif
 
 #ifdef INT1_vect
-ISR(INT1_vect, ISR_BLOCK)
-{
-    isr_exti(1);
-}
+AVR8_ISR(INT1_vect, isr_exti, 1);
 #endif
 
 #ifdef INT2_vect
-ISR(INT2_vect, ISR_BLOCK)
-{
-    isr_exti(2);
-}
+AVR8_ISR(INT2_vect, isr_exti, 2);
 #endif
 
 #ifdef INT3_vect
-ISR(INT3_vect, ISR_BLOCK)
-{
-    isr_exti(3);
-}
+AVR8_ISR(INT3_vect, isr_exti, 3);
 #endif
 
 #ifdef INT4_vect
-ISR(INT4_vect, ISR_BLOCK)
-{
-    isr_exti(4);
-}
+AVR8_ISR(INT4_vect, isr_exti, 4);
 #endif
 
 #ifdef INT5_vect
-ISR(INT5_vect, ISR_BLOCK)
-{
-    isr_exti(5);
-}
+AVR8_ISR(INT5_vect, isr_exti, 5);
 #endif
 
 #ifdef INT6_vect
-ISR(INT6_vect, ISR_BLOCK)
-{
-    isr_exti(6);
-}
+AVR8_ISR(INT6_vect, isr_exti, 6);
 #endif
 
 #ifdef INT7_vect
-ISR(INT7_vect, ISR_BLOCK)
-{
-    isr_exti(7);
-}
+AVR8_ISR(INT7_vect, isr_exti, 7);
 #endif

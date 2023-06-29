@@ -2,6 +2,8 @@
  * Copyright (C) 2015 HAW Hamburg
  *               2016 INRIA
  *               2023 Hugues Larrive
+ *               2023 Gerson Fernando Budke
+
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -23,6 +25,7 @@
  * @author      Torben Petersen <petersen@ibr.cs.tu-bs.de>
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  * @author      Hugues Larrive <hugues.larrive@pm.me>
+ * @author      Gerson Fernando Budke <nandojve@gmail.com>
  *
  * @}
  */
@@ -32,6 +35,7 @@
 #include <avr/interrupt.h>
 
 #include "cpu.h"
+#include "irq.h"
 #include "board.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
@@ -368,16 +372,13 @@ void gpio_irq_disable(gpio_t pin)
 
 static inline void irq_handler(uint8_t int_num)
 {
-    avr8_enter_isr();
     config[int_num].cb(config[int_num].arg);
-    avr8_exit_isr();
 }
 
 #ifdef ENABLE_PCINT
 /* inline function that is used by the PCINT ISR */
 static inline void pcint_handler(uint8_t bank, uint8_t enabled_pcints)
 {
-    avr8_enter_isr();
     /* Find right item */
     uint8_t idx = 0;
 
@@ -406,89 +407,50 @@ static inline void pcint_handler(uint8_t bank, uint8_t enabled_pcints)
         enabled_pcints = enabled_pcints >> 1;
         idx++;
     }
-
-    avr8_exit_isr();
 }
 #ifdef MODULE_ATMEGA_PCINT0
-ISR(PCINT0_vect, ISR_BLOCK)
-{
-    pcint_handler(PCINT0_IDX, PCMSK0);
-}
+AVR8_ISR(PCINT0_vect, pcint_handler, PCINT0_IDX, PCMSK0);
 #endif /* MODULE_ATMEGA_PCINT0 */
 
 #ifdef MODULE_ATMEGA_PCINT1
-ISR(PCINT1_vect, ISR_BLOCK)
-{
-    pcint_handler(PCINT1_IDX, PCMSK1);
-}
+AVR8_ISR(PCINT1_vect, pcint_handler, PCINT1_IDX, PCMSK1);
 #endif  /* MODULE_ATMEGA_PCINT1 */
 
 #ifdef MODULE_ATMEGA_PCINT2
-ISR(PCINT2_vect, ISR_BLOCK)
-{
-    pcint_handler(PCINT2_IDX, PCMSK2);
-}
+AVR8_ISR(PCINT2_vect, pcint_handler, PCINT2_IDX, PCMSK2);
 #endif  /* MODULE_ATMEGA_PCINT2 */
 
 #ifdef MODULE_ATMEGA_PCINT3
-ISR(PCINT3_vect, ISR_BLOCK)
-{
-    pcint_handler(PCINT3_IDX, PCMSK3);
-}
+AVR8_ISR(PCINT3_vect, pcint_handler, PCINT3_IDX, PCMSK3);
 #endif  /* MODULE_ATMEGA_PCINT3 */
 
 #endif  /* ENABLE_PCINT */
 
-ISR(INT0_vect, ISR_BLOCK)
-{
-    irq_handler(0); /**< predefined interrupt pin */
-}
-
-ISR(INT1_vect, ISR_BLOCK)
-{
-    irq_handler(1); /**< predefined interrupt pin */
-}
+AVR8_ISR(INT0_vect, irq_handler, 0); /**< predefined interrupt pin */
+AVR8_ISR(INT1_vect, irq_handler, 1); /**< predefined interrupt pin */
 
 #if defined(INT2_vect)
-ISR(INT2_vect, ISR_BLOCK)
-{
-    irq_handler(2); /**< predefined interrupt pin */
-}
+AVR8_ISR(INT2_vect, irq_handler, 2); /**< predefined interrupt pin */
 #endif
 
 #if defined(INT3_vect)
-ISR(INT3_vect, ISR_BLOCK)
-{
-    irq_handler(3); /**< predefined interrupt pin */
-}
+AVR8_ISR(INT3_vect, irq_handler, 3); /**< predefined interrupt pin */
 #endif
 
 #if defined(INT4_vect)
-ISR(INT4_vect, ISR_BLOCK)
-{
-    irq_handler(4); /**< predefined interrupt pin */
-}
+AVR8_ISR(INT4_vect, irq_handler, 4); /**< predefined interrupt pin */
 #endif
 
 #if defined(INT5_vect)
-ISR(INT5_vect, ISR_BLOCK)
-{
-    irq_handler(5); /**< predefined interrupt pin */
-}
+AVR8_ISR(INT5_vect, irq_handler, 5); /**< predefined interrupt pin */
 #endif
 
 #if defined(INT6_vect)
-ISR(INT6_vect, ISR_BLOCK)
-{
-    irq_handler(6); /**< predefined interrupt pin */
-}
+AVR8_ISR(INT6_vect, irq_handler, 6); /**< predefined interrupt pin */
 #endif
 
 #if defined(INT7_vect)
-ISR(INT7_vect, ISR_BLOCK)
-{
-    irq_handler(7); /**< predefined interrupt pin */
-}
+AVR8_ISR(INT7_vect, irq_handler, 7); /**< predefined interrupt pin */
 #endif
 
 #endif /* MODULE_PERIPH_GPIO_IRQ */
