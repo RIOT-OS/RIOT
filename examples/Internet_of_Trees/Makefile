@@ -9,6 +9,10 @@ RIOTBASE ?= $(CURDIR)/../..
 
 DRIVER ?= bme280_i2c
 USEMODULE += $(DRIVER)
+FEATURES_REQUIRED += periph_i2c
+USEMODULE += checksum
+USEMODULE += xtimer
+
 
 # Some RIOT modules needed for this example
 USEMODULE += event_timeout_ztimer

@@ -296,6 +296,10 @@ static void _hr_update(event_t *e)
 
     uint32_t pressure = bmx280_read_pressure(&dev);
     memcpy(sensor_measurements, &pressure, sizeof(uint32_t));
+    uint32_t temperature = bmx280_read_temperature(&dev);
+    memcpy(sensor_measurements + sizeof(uint32_t), &temperature, sizeof(uint32_t));
+    uint32_t humidity = bme280_read_humidity(&dev);
+    memcpy(sensor_measurements +2*sizeof(uint32_t), &humidity, sizeof(uint32_t));
 
     /* send heart rate data notification to GATT client */
     om = ble_hs_mbuf_from_flat(sensor_measurements, sizeof(sensor_measurements));
@@ -307,7 +311,9 @@ static void _hr_update(event_t *e)
     /* schedule next update event */
     event_timeout_set(&_update_timeout_evt, UPDATE_INTERVAL);
 
-    printf("   Pressure [Pa]: %" PRIu32 "\n", pressure);
+    printf("   Pressure    [Pa]:      %" PRIu32 "\n", pressure);
+    printf("   Temperature [°C]:      %" PRIu32 "\n", temperature);
+    printf("   Pressure    [Percent]: %" PRIu32 "\n", humidity);
 }
 
 void make_data_package(bmx280_t* dev)
@@ -316,12 +322,74 @@ void make_data_package(bmx280_t* dev)
     memcpy(sensor_measurements, &pressure, sizeof(uint32_t));
 }
 
+#include <stdio.h>
+#include "periph/gpio.h"
+#include "xtimer.h"
+#include "scd30.h"
+#include "scd30_params.h"
+#include "scd30_internal.h"
 
+#define MEASUREMENT_INTERVAL_SECS (2)
+
+scd30_t scd30_dev;
+scd30_params_t params = SCD30_PARAMS;
+scd30_measurement_t result;
+
+#define TEST_ITERATIONS 10
 
 int main(void)
 {
-    puts("NimBLE Heart Rate Sensor Example");
+    printf("SCD30 Test:\n");
+    int i = 0;
 
+    scd30_init(&scd30_dev, &params);
+    uint16_t pressure_compensation = SCD30_DEF_PRESSURE;
+    uint16_t value = 0;
+    uint16_t interval = MEASUREMENT_INTERVAL_SECS;
+
+    scd30_set_param(&scd30_dev, SCD30_INTERVAL, MEASUREMENT_INTERVAL_SECS);
+    scd30_set_param(&scd30_dev, SCD30_START, pressure_compensation);
+
+    scd30_get_param(&scd30_dev, SCD30_INTERVAL, &value);
+    printf("[test][dev-%d] Interval: %u s\n", i, value);
+    scd30_get_param(&scd30_dev, SCD30_T_OFFSET, &value);
+    printf("[test][dev-%d] Temperature Offset: %u.%02u C\n", i, value / 100u,
+           value % 100u);
+    scd30_get_param(&scd30_dev, SCD30_A_OFFSET, &value);
+    printf("[test][dev-%d] Altitude Compensation: %u m\n", i, value);
+    scd30_get_param(&scd30_dev, SCD30_ASC, &value);
+    printf("[test][dev-%d] ASC: %u\n", i, value);
+    scd30_get_param(&scd30_dev, SCD30_FRC, &value);
+    printf("[test][dev-%d] FRC: %u ppm\n", i, value);
+    puts("NimBLE Heart Rate Sensor Example");
+    
+    while (i < TEST_ITERATIONS) {
+        xtimer_sleep(1);
+        scd30_read_triggered(&scd30_dev, &result);
+        printf(
+            "[scd30_test-%d] Triggered measurements co2: %.02fppm,"
+            " temp: %.02f°C, hum: %.02f%%. \n", i, result.co2_concentration,
+            result.temperature, result.relative_humidity);
+        i++;
+    }
+
+    i = 0;
+    scd30_start_periodic_measurement(&scd30_dev, &interval,
+                                     &pressure_compensation);
+
+    while (i < TEST_ITERATIONS) {
+        xtimer_sleep(MEASUREMENT_INTERVAL_SECS);
+        scd30_read_periodic(&scd30_dev, &result);
+        printf(
+            "[scd30_test-%d] Continuous measurements co2: %.02fppm,"
+            " temp: %.02f°C, hum: %.02f%%. \n", i, result.co2_concentration,
+            result.temperature, result.relative_humidity);
+        i++;
+    }
+
+    scd30_stop_measurements(&scd30_dev);
+
+    printf("Nimble GATT application\n\r");
     switch (bmx280_init(&dev, &bmx280_params[0])) {
         case BMX280_ERR_BUS:
             puts("[Error] Something went wrong when using the I2C bus");
