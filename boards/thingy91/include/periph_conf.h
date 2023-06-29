@@ -13,7 +13,7 @@
  * @file
  * @brief       Peripheral configuration for the Thingy:91
  *
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Thanh-Viet Nguyen <topologicrose@protonmail.com>
  *
  */
 
@@ -21,11 +21,10 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
-//#include "cfg_clock_32_1.h"
-//#include "cfg_rtt_default.h"
-//#include "cfg_timer_default.h"
-#include "board.h"
-#include "periph/gpio.h"
+#include "cfg_clock_32_1.h"
+#include "cfg_rtt_default.h"
+#include "cfg_timer_default.h"
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,11 +34,22 @@ extern "C" {
  * @name    UART configuration
  * @{
  */
-#define UART_NUMOF          (1U)
-#define UART_PIN_RX         GPIO_PIN(0, 2)
-#define UART_PIN_TX         GPIO_PIN(0, 3)
-/** @} */
+static const uart_conf_t uart_config[] = {
+    {
+        .dev        = NRF_UARTE0_S,
+        .rx_pin     = GPIO_PIN(0, 2),
+        .tx_pin     = GPIO_PIN(0, 3),
+#ifdef MODULE_PERIPH_UART_HW_FC
+        .rts_pin    = GPIO_UNDEF,
+        .cts_pin    = GPIO_UNDEF,
+#endif
+        .irqn       = UARTE0_SPIM0_SPIS0_TWIM0_TWIS0_IRQn,
+    },
+};
 
+#define UART_0_ISR          (isr_uarte0_spim0_spis0_twim0_twis0) /**< UART0_IRQ */
+
+#define UART_NUMOF          ARRAY_SIZE(uart_config) /**< UART confgiguration NUMOF */
 /**
  * @name   Timer configuration
  * @{

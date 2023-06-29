@@ -20,7 +20,7 @@
 #define BOARD_H
 
 #include "cpu.h"
-#include "periph/gpio.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -32,24 +32,25 @@ extern "C" {
  *
  * @{
  */
-#define CLOCK_HFCLK         (32U)           /**< set to  0: internal RC oscillator
-                                             *        32: 32MHz crystal */
-#define CLOCK_LFCLK         (3)             /**< set to  0: internal RC oscillator
-                                             *         3: High Accuracy oscillator */
+#define CLOCK_HFCLK         (32U)           /**< set to  0: internal RC oscillator 32: 32MHz crystal */
+                                                
+#define CLOCK_LFCLK         (3)             /**< set to  0: internal RC oscillator 3: High Accuracy oscillator */
 /** @} */
 
 /**
  * @name    Button pin configuration
  * @{
  */
+
 #define BTN0_PIN            GPIO_PIN(0, 26)
+#define LED0_PIN            GPIO_PIN(0, 29) /**< red */
+#define LED1_PIN            GPIO_PIN(0, 30) /**<  green */
+#define LED2_PIN            GPIO_PIN(0, 31) /**<  blue */ 
 #define BTN0_MODE           GPIO_IN_PU
 #define LED0_ON             (PORTB |=  LED0_MASK)
 #define LED0_OFF            (PORTB &= ~LED0_MASK)
 #define LED0_TOGGLE         (PORTB ^=  LED0_MASK)
-#define LED0_PIN        GPIO_PIN(0, 29) /**< red */
-#define LED1_PIN        GPIO_PIN(0, 30) /**<  green */
-#define LED2_PIN        GPIO_PIN(0, 31) /**<  blue */   
+  
 /** @} */
 
 /**
@@ -63,15 +64,6 @@ extern "C" {
  * @{
  */
 //#define LIS2DH12_PARAM_I2C  I2C_DEV(1)
-
-/** @} */
-
-/**
- * @name    LPS22HB device address
- * @{
- */
-//#define LPSXXX_PARAM_ADDR   (0x5c)
-/** @} */
 
 #ifdef __cplusplus
 }
