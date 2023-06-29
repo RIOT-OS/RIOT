@@ -31,7 +31,9 @@ __NORETURN void _assert_failure(const char *file, unsigned line)
     printf("failed assertion. Backtrace:\n");
     backtrace_print();
 #endif
+#ifdef DEBUG_ASSERT_BREAKPOINT
     DEBUG_BREAKPOINT(1);
+#endif
     core_panic(PANIC_ASSERT_FAIL, "FAILED ASSERTION.");
 }
 
@@ -41,7 +43,9 @@ __NORETURN void _assert_panic(void)
 #if IS_USED(MODULE_BACKTRACE)
     backtrace_print();
 #endif
+#ifdef DEBUG_ASSERT_BREAKPOINT
     DEBUG_BREAKPOINT(1);
+#endif
     core_panic(PANIC_ASSERT_FAIL, "FAILED ASSERTION.");
 }
 

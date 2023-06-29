@@ -19,6 +19,3 @@ endif
 
 # include the Arduino headers
 INCLUDES += -I$(RIOTBASE)/sys/arduino/include
-
-PSEUDOMODULES += arduino_pwm
-PSEUDOMODULES += arduino_serial_stdio

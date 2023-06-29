@@ -33,6 +33,8 @@ PSEUDOMODULES += base64url
 ## be advertised in any other capacity, e.g. through @ref sys_auto_init_saul).
 PSEUDOMODULES += board_software_reset
 
+PSEUDOMODULES += arduino_pwm
+PSEUDOMODULES += arduino_serial_stdio
 PSEUDOMODULES += can_mbox
 PSEUDOMODULES += can_pm
 PSEUDOMODULES += can_raw
@@ -318,6 +320,15 @@ PSEUDOMODULES += mpu_stack_guard
 ## Mark the RAM non executable.
 ## This is a protection mechanism which makes exploitation of buffer overflows significantly harder.
 PSEUDOMODULES += mpu_noexec_ram
+## @}
+
+## @defgroup pseudomodule_pmp_noexec_ram pmp_noexec_ram
+## @{
+## @brief Mark RAM as non-executable using the PMP
+##
+## Mark the RAM non executable.
+## This is a protection mechanism which makes exploitation of buffer overflows significantly harder.
+PSEUDOMODULES += pmp_noexec_ram
 ## @}
 
 ## @defgroup pseudomodule_md5sum md5sum

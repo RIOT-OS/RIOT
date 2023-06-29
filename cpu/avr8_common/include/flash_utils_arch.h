@@ -41,7 +41,7 @@ extern "C" {
 #define flash_strcpy strcpy_P
 #define flash_strncpy strncpy_P
 #define flash_printf printf_P
-/* avrlibc seemingly forgot to provide fprintf(), but vfprintf() is there */
+/* avrlibc seemingly forgot to provide vprintf_P(), but vfprintf_P() is there */
 #define flash_vprintf(fmt, arglist) vfprintf_P(stdout, fmt, arglist)
 #define flash_fprintf fprintf_P
 #define flash_vfprintf vfprintf_P

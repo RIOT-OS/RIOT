@@ -44,6 +44,20 @@ extern "C" {
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 #define DEBUG_ASSERT_VERBOSE
+
+/**
+ * @brief   Activate breakpoints for @ref assert() when defined
+ *
+ * Without this macro defined the @ref assert() macro will just print some
+ * information about the failed assertion, see @ref assert and
+ * @ref DEBUG_ASSERT_VERBOSE.
+ * If @ref DEBUG_ASSERT_BREAKPOINT is defined, the execution will stop on a
+ * failed assertion instead of producing the output. If the architecture
+ * defines the macro @ref DEBUG_BREAKPOINT, a breakpoint is inserted and the
+ * execution is stopped directly in the debugger. Otherwise the execution stops
+ * in an endless while loop.
+ */
+#define DEBUG_ASSERT_BREAKPOINT
 #else
 /* we should not include custom headers in standard headers */
 #define _likely(x)      __builtin_expect((uintptr_t)(x), 1)
@@ -111,6 +125,12 @@ __NORETURN void _assert_failure(const char *file, unsigned line);
  *
  * If the `backtrace` module is enabled (and implemented for architecture in use)
  * a backtrace will be printed in addition to the location of the failed assertion.
+ *
+ * If @ref DEBUG_ASSERT_BREAKPOINT is defined, the execution will stop on a
+ * failed assertion instead of producing the above output. If the architecture
+ * defines the macro @ref DEBUG_BREAKPOINT, a breakpoint is inserted and the
+ * execution is stopped directly in the debugger. Otherwise the execution stops
+ * in an endless while loop.
  *
  * @see http://pubs.opengroup.org/onlinepubs/9699919799/functions/assert.html
  */

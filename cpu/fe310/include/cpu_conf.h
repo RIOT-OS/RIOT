@@ -36,6 +36,12 @@ extern "C" {
  */
 #define PLIC_BASE_ADDR      (PLIC_CTRL_ADDR)
 
+/**
+ * @brief Number of available PMP regions
+ * Note, the upper 8 regions are hardwired to zero!
+ */
+#define NUM_PMP_ENTRIES 16
+
 #ifdef __cplusplus
 }
 #endif
