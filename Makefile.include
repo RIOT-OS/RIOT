@@ -624,7 +624,7 @@ include $(RIOTMAKE)/modules.inc.mk
 
 
 .PHONY: all link clean flash flash-only termdeps term doc debug debug-server reset objdump help info-modules
-.PHONY: print-size elffile binfile hexfile flashfile cosy
+.PHONY: print-size elffile lstfile binfile hexfile flashfile cosy
 .PHONY: ..in-docker-container
 
 # Targets that depend on FORCE will always be rebuilt. Contrary to a .PHONY
@@ -658,6 +658,7 @@ HEXFILE ?= $(ELFFILE:.elf=.hex)
 BINFILE ?= $(ELFFILE:.elf=.bin)
 HASHFILE ?= $(BINFILE)
 MAPFILE ?= $(ELFFILE:.elf=.map)
+LSTFILE ?= $(ELFFILE:.elf=.lst)
 
 ifneq (,$(filter suit,$(USEMODULE)))
   include $(RIOTMAKE)/suit.base.inc.mk
@@ -680,6 +681,7 @@ DEBUG_ELFFILE ?= $(ELFFILE)
 elffile: $(ELFFILE)
 hexfile: $(HEXFILE)
 binfile: $(BINFILE)
+lstfile: $(LSTFILE)
 # FLASHFILE is the file used by the flasher
 # Usually set to $(ELFFILE), $(HEXFILE) or $(BINFILE) in the board/flasher
 # or application specific files
@@ -690,6 +692,15 @@ ifeq (,$(FLASHFILE))
 endif
 
 BUILD_FILES += $(ELFFILE) $(BINFILE) $(FLASHFILE) $(HASHFILE)
+
+# when not in CI, aid developers in debugging the firmware with a full memory
+# layout and disassembly provided by the lst file:
+ifneq ($(RIOT_CI_BUILD),1)
+  # as of now, the xtensa tools cannot create lst files
+  ifeq (,$(findstring xtensa,$(PREFIX)))
+    BUILD_FILES += $(LSTFILE)
+  endif
+endif
 
 # variables used to compile and link c++
 ifneq (,$(filter cpp,$(USEMODULE)))
@@ -778,6 +789,11 @@ $(BUILD_DIR)/CACHEDIR.TAG:
 
 %.bin: %.elf
 	$(Q)$(OBJCOPY) $(OFLAGS) -Obinary $< $@
+
+%.lst: %.elf
+	$(Q)$(OBJDUMP) --disassemble-all --file-headers --file-offsets \
+  --section-headers --line-numbers --private-headers --source --wide \
+  --disassemble-zeroes $< > $@
 
 endif # BUILD_IN_DOCKER
 
