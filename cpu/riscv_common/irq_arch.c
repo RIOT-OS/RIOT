@@ -134,6 +134,14 @@ static void handle_trap(uword_t mcause)
             write_csr(mepc, return_pc + 4);
             break;
         }
+#ifdef MODULE_PERIPH_PMP
+        case CAUSE_FAULT_FETCH:
+            core_panic(PANIC_MEM_MANAGE, "MEM MANAGE HANDLER (fetch)");
+        case CAUSE_FAULT_LOAD:
+            core_panic(PANIC_MEM_MANAGE, "MEM MANAGE HANDLER (load)");
+        case CAUSE_FAULT_STORE:
+            core_panic(PANIC_MEM_MANAGE, "MEM MANAGE HANDLER (store)");
+#endif
         default:
 #ifdef DEVELHELP
             printf("Unhandled trap:\n");

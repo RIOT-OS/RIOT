@@ -32,4 +32,10 @@ config MODULE_PERIPH_PLIC
     help
         Platform-Level interrupt controller driver.
 
+config MODULE_PERIPH_PMP
+    bool
+    depends on HAS_PERIPH_PMP
+    help
+        Physical memory protection driver.
+
 endif # MODULE_RISCV_COMMON_PERIPH
