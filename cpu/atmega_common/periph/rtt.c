@@ -197,15 +197,15 @@ static inline void _timer_init(void)
 static inline uint8_t _rtt_div(uint16_t freq)
 {
     switch (freq) {
-    case 32768: return 0x1;
-    case  4096: return 0x2;
-    case  1024: return 0x3;
-    case   512: return 0x4;
-    case   256: return 0x5;
-    case   128: return 0x6;
-    case    32: return 0x7;
-    default   : assert(0);
-                return 0;
+        case 32768: return 0x1;
+        case 4096:  return 0x2;
+        case 1024:  return 0x3;
+        case 512:   return 0x4;
+        case 256:   return 0x5;
+        case 128:   return 0x6;
+        case 32:    return 0x7;
+        default:    assert(0);
+                    return 0;
     }
 }
 
