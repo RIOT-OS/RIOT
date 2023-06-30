@@ -53,23 +53,19 @@ static gpio_isr_ctx_t config[GPIO_EXT_INT_NUMOF];
 
 /* Check which pcints should be enabled */
 #if defined(MODULE_ATMEGA_PCINT0) && !defined(ATMEGA_PCINT_MAP_PCINT0)
-#error \
-    Either mapping for pin change interrupt bank 0 is missing or not supported by the MCU
+#  error "Either mapping for pin change interrupt bank 0 is missing or not supported by the MCU"
 #endif
 
 #if defined(MODULE_ATMEGA_PCINT1) && !defined(ATMEGA_PCINT_MAP_PCINT1)
-#error \
-    Either mapping for pin change interrupt bank 1 is missing or not supported by the MCU
+#  error "Either mapping for pin change interrupt bank 1 is missing or not supported by the MCU"
 #endif
 
 #if defined(MODULE_ATMEGA_PCINT2) && !defined(ATMEGA_PCINT_MAP_PCINT2)
-#error \
-    Either mapping for pin change interrupt bank 2 is missing or not supported by the MCU
+#  error "Either mapping for pin change interrupt bank 2 is missing or not supported by the MCU"
 #endif
 
 #if defined(MODULE_ATMEGA_PCINT3) && !defined(ATMEGA_PCINT_MAP_PCINT3)
-#error \
-    Either mapping for pin change interrupt bank 3 is missing or not supported by the MCU
+#  error "Either mapping for pin change interrupt bank 3 is missing or not supported by the MCU"
 #endif
 
 /**
