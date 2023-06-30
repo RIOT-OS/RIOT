@@ -142,7 +142,6 @@ static const ieee802154_radio_cipher_ops_t _at86rf2xx_cipher_ops = {
 #endif /* IS_USED(MODULE_AT86RF2XX_AES_SPI) && \
           IS_USED(MODULE_IEEE802154_SECURITY) */
 
-
 /* SOC has radio interrupts, store reference to netdev */
 static netdev_t *at86rfmega_dev;
 static void _irq_handler(void *arg)
@@ -178,7 +177,8 @@ static int _init(netdev_t *netdev)
     at86rf2xx_set_addr_short(dev, (network_uint16_t *)dev->netdev.short_addr);
 
     /* `netdev_ieee802154_reset` does not set the default channel. */
-    netdev_ieee802154_set(&dev->netdev, NETOPT_CHANNEL, &at86rf2xx_chan_default, sizeof(at86rf2xx_chan_default));
+    netdev_ieee802154_set(&dev->netdev, NETOPT_CHANNEL,
+                          &at86rf2xx_chan_default, sizeof(at86rf2xx_chan_default));
 
     if (!IS_ACTIVE(AT86RF2XX_BASIC_MODE)) {
         static const netopt_enable_t ack_req =
@@ -563,7 +563,8 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             if (!IS_ACTIVE(AT86RF2XX_BASIC_MODE)) {
                 assert(max_len >= sizeof(netopt_enable_t));
                 uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__CSMA_SEED_1);
-                *((netopt_enable_t *)val) = (tmp & AT86RF2XX_CSMA_SEED_1__AACK_DIS_ACK) ? false : true;
+                *((netopt_enable_t *)val) = (tmp & AT86RF2XX_CSMA_SEED_1__AACK_DIS_ACK)
+                                          ? false : true;
                 res = sizeof(netopt_enable_t);
             }
             break;
@@ -958,7 +959,6 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params, uint8_t
     /* set device address */
     netdev_ieee802154_setup(&dev->netdev);
 }
-
 
 #if AT86RF2XX_IS_PERIPH
 
