@@ -13,7 +13,7 @@ CFLAGS_OPT  ?= -Os
 CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
 ASFLAGS += $(CFLAGS_CPU) --defsym $(CPU_MODEL)=1 $(CFLAGS_DBG)
 
-BINUTILS_VERSION := $(shell $(PREFIX)ld --version | grep -Eo '[0-9]\.[0-9]+')
+BINUTILS_VERSION := $(shell $(PREFIX)ld --version | grep -Eo '[0-9]\.[0-9]+$$')
 NEEDS_NEW_LINKER_SCRIPT := $(call version_is_greater_or_equal,$(BINUTILS_VERSION),2.40)
 
 LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT)
