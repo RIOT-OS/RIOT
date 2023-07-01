@@ -32,7 +32,7 @@ extern "C" {
 #endif
 
 #ifndef THREAD_EXTRA_STACKSIZE_PRINTF
-#define THREAD_EXTRA_STACKSIZE_PRINTF    (128)
+#define THREAD_EXTRA_STACKSIZE_PRINTF    (132)
 #endif
 
 /**
