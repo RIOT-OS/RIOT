@@ -204,6 +204,11 @@ ifneq (,$(filter stmpe811_%,$(USEMODULE)))
   USEMODULE += stmpe811
 endif
 
+ifneq (,$(filter soft_spi_as_periph_spi,$(USEMODULE)))
+  USEMODULE += soft_spi
+  FEAUTRES_PROVIDED += periph_spi
+endif
+
 ifneq (,$(filter sx126%,$(USEMODULE)))
   USEMODULE += sx126x
 endif

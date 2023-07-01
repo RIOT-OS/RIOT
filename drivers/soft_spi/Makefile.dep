@@ -1,2 +1,6 @@
 FEATURES_REQUIRED += periph_gpio
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
+
+ifneq (,$(filter periph_init,$(USEMODULE)))
+  USEMODULE += periph_init_soft_spi
+endif

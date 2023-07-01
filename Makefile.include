@@ -448,6 +448,9 @@ else
   # always select CPU core features
   FEATURES_REQUIRED += $(filter cpu_core_%,$(FEATURES_PROVIDED))
 
+  # add features provided by modules
+  include $(RIOTMAKE)/features_provided_by_modules.inc.mk
+
   # check if required features are provided and update $(FEATURES_USED)
   include $(RIOTMAKE)/features_check.inc.mk
 

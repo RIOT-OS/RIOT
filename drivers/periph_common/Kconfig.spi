@@ -10,7 +10,7 @@ menuconfig MODULE_PERIPH_SPI
     depends on HAS_PERIPH_SPI
     select MODULE_PERIPH_COMMON
 
-if MODULE_PERIPH_SPI
+if MODULE_PERIPH_SPI && !MODULE_SOFT_SPI_AS_PERIPH_SPI
 
 config MODULE_PERIPH_INIT_SPI
     bool "Auto initialize SPI peripheral"

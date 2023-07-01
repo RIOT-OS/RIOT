@@ -25,6 +25,8 @@
 #include "cpu.h"
 #include "periph/spi.h"
 
+#if defined(SPI_NUMOF) && !defined(MODULE_SOFT_SPI_AS_PERIPH_SPI)
+
 #ifdef PERIPH_SPI_NEEDS_INIT_CS
 int spi_init_cs(spi_t bus, spi_cs_t cs)
 {
@@ -66,4 +68,6 @@ void spi_transfer_regs(spi_t bus, spi_cs_t cs,
     spi_transfer_bytes(bus, cs, true, &reg, NULL, 1);
     spi_transfer_bytes(bus, cs, false, out, in, len);
 }
+#endif
+
 #endif

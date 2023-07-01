@@ -7,6 +7,10 @@
 PERIPH_FEATURES := $(filter periph_%,$(FEATURES_USED))
 # all periph features correspond to a periph submodule
 # FEATURES_USED is defined in Makefile.features
+ifneq (,$(filter soft_spi_as_periph_spi,$(USEMODULE)))
+  # don't use periph_spi module if a soft_spi is used to provide it
+  PERIPH_FEATURES := $(filter-out periph_spi,$(PERIPH_FEATURES))
+endif
 USEMODULE += $(PERIPH_FEATURES)
 
 # Add all USED periph_% init modules unless they are blacklisted
