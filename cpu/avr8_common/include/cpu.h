@@ -230,18 +230,18 @@ static inline uinttxtptr_t __attribute__((always_inline)) cpu_get_caller_pc(void
 {
         uinttxtptr_t addr;
     __asm__ volatile(
-        "ldi %D[dest], 0"                   "\n\t"
+        "ldi %D[dest], 0                   \n\t"
 #if __AVR_3_BYTE_PC__
-        "pop %C[dest] "      "\n\t"
+        "pop %C[dest]                      \n\t"
 #else
-        "ldi %C[dest], 0"                   "\n\t"
+        "ldi %C[dest], 0                   \n\t"
 #endif
-        "pop %B[dest]"                      "\n\t"
-        "pop %A[dest]"                      "\n\t"
-        "push %A[dest]"                     "\n\t"
-        "push %B[dest]"                     "\n\t"
+        "pop %B[dest]                      \n\t"
+        "pop %A[dest]                      \n\t"
+        "push %A[dest]                     \n\t"
+        "push %B[dest]                     \n\t"
 #if __AVR_3_BYTE_PC__
-        "push %C[dest] "      "\n\t"
+        "push %C[dest]                     \n\t"
 #endif
         : [dest]    "=r"(addr)
         : /* no inputs */
