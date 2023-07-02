@@ -1,5 +1,5 @@
 # Copyright (c) 2020 HAW Hamburg
-# Copyright (c) 2021 Gerson Fernando Budke
+# Copyright (c) 2021-2023 Gerson Fernando Budke
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
@@ -21,7 +21,9 @@ config BOARD_ATMEGA328P_XPLAINED_MINI
     select HAS_PERIPH_SPI
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
-    # Various other features (if any)
+
+    select HAVE_SAUL_GPIO
     select MODULE_BOARDS_COMMON_ATMEGA if TEST_KCONFIG
+    select MODULE_ATMEGA_PCINT0 if TEST_KCONFIG
 
 source "$(RIOTBOARD)/common/atmega/Kconfig"
