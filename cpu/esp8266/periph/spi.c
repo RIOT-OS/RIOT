@@ -47,14 +47,13 @@
 
 #define SPI_BLOCK_SIZE  64  /* number of bytes per SPI transfer */
 
-/* baud_rate = 80MHz / (spi_clkdiv_pre + 1) / (spi_clkcnt_N + 1) */
-#if CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ == 2
-#define SPI_CLK_SRC_FREQ    2000000
-#elif CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ == 40
-#define SPI_CLK_SRC_FREQ    40000000
-#else
+/* The ESP8266 can operate at 160 MHz, but contrary to what the
+ * spi_clk_equ_sysclk bit name in the SPI_CLOCK register might suggest,
+ * the SPI clock source frequency is always 80 MHz. */
 #define SPI_CLK_SRC_FREQ    80000000
-#endif
+/* baud_rate = 80MHz / (spi_clkdiv_pre + 1) / (spi_clkcnt_N + 1)
+ * 80 MHz / 8192 / 2 = 4882 Hz which is very low so we will use a
+ * constant spi_clkcnt_N of 1. */
 #define CONST_SPI_CLKCNT_N  1
 
 /** structure which describes all properties of one SPI bus */
@@ -244,10 +243,15 @@ spi_clk_t IRAM_ATTR spi_get_clk(spi_t bus, uint32_t freq)
      * spi_clk_equ_sysclk   In the master mode:
      *                                  1: spi_clk is equal to 80MHz,
      *                                  0: spi_clk is divided from 80 MHz clock.
-     * spi_clkdiv_pre 0..8191 (13 bit)
-     * spi_clkcnt_N 1..63 (6 bit)
-     * baud_rate = 80MHz / (spi_clkdiv_pre + 1) / (spi_clkcnt_N + 1)
-     * 80 MHz / 8192 / 2 = 4882 Hz so we can use a constant spi_clkcnt_N of 1.
+     * spi_clkdiv_pre 0..8191 (13 bit):
+     *      In the master mode, it is pre-divider of spi_clk.
+     * spi_clkcnt_N 1..63 (6 bit):
+     *      In the master mode, it is the divider of spi_clk.
+     *      So spi_clk = 80 MHz / (spi_clkdiv_pre + 1) / (spi_clkcnt_N + 1).
+     * spi_clkcnt_H (6 bits):
+     *      In the master mode, it must be floor((spi_clkcnt_N + 1) / 2 - 1).
+     * spi_clkcnt_L (6 bits):
+     *      In the master mode, it must be equal to spi_clkcnt_N.
      */
 
     uint32_t source_clock = SPI_CLK_SRC_FREQ / (CONST_SPI_CLKCNT_N + 1);
@@ -281,11 +285,11 @@ int32_t IRAM_ATTR spi_get_freq(spi_t bus, spi_clk_t clk)
         return SPI_CLK_SRC_FREQ;
     }
     else {
-        /* baud_rate = sysclk / (spi_clkdiv_pre + 1) / (spi_clkcnt_N + 1) */
+        /* spi_clk = sysclk / (spi_clkdiv_pre + 1) / (spi_clkcnt_N + 1) */
         uint32_t sysclk = SPI_CLK_SRC_FREQ;
         uint32_t clkdiv_pre = spi_regs.clock.clkdiv_pre;
         uint32_t clkcnt_n = spi_regs.clock.clkcnt_n;
-        return (sysclk / (clkdiv_pre + 1) / (clkcnt_n + 1));
+        return (DIV_ROUND(sysclk / (clkcnt_n + 1), (clkdiv_pre + 1)));
     }
 }
 
