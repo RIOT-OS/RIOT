@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2019 Otto-von-Guericke-Universität Magdeburg
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,6 +14,7 @@
  * @brief   Board specific configuration for all NRF24L01+ (NG) devices
  *
  * @author  Fabian Hüßler <fabian.huessler@ovgu.de>
+ * @author  Hugues Larrive <hugues.larrive@pm.me>
  */
 #ifndef NRF24L01P_NG_PARAMS_H
 #define NRF24L01P_NG_PARAMS_H
@@ -21,6 +23,7 @@
 #include "periph/gpio.h"
 #include "periph/spi.h"
 #include "kernel_defines.h"
+#include "macros/units.h"
 #include "nrf24l01p_ng_constants.h"
 #include "nrf24l01p_ng.h"
 
@@ -39,7 +42,7 @@ extern "C" {
 /**
  * @brief   SPI clock speed
  */
-#define NRF24L01P_NG_PARAM_SPI_CLK          SPI_CLK_5MHZ
+#define NRF24L01P_NG_PARAM_SPI_CLK          MHZ(8)
 #endif
 
 #ifndef NRF24L01P_NG_PARAM_CS
@@ -115,7 +118,7 @@ extern "C" {
  */
 #define NRF24L01P_NG_PARAMS    {                                               \
         .spi = NRF24L01P_NG_PARAM_SPI,                                         \
-        .spi_clk = NRF24L01P_NG_PARAM_SPI_CLK,                                 \
+        .spi_freq = NRF24L01P_NG_PARAM_SPI_CLK,                                \
         .pin_cs = NRF24L01P_NG_PARAM_CS,                                       \
         .pin_ce = NRF24L01P_NG_PARAM_CE,                                       \
         .pin_irq = NRF24L01P_NG_PARAM_IRQ,                                     \

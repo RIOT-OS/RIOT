@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2019 Otto-von-Guericke-Universität Magdeburg
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,9 +15,10 @@
  *
  * @{
  * @file
- * @brief   Public interface for NRF24L01+ (NG) devices
+ * @brief       Public interface for NRF24L01+ (NG) devices
  *
- * @author  Fabian Hüßler <fabian.huessler@ovgu.de>
+ * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 #ifndef NRF24L01P_NG_H
 #define NRF24L01P_NG_H
@@ -129,7 +131,8 @@ typedef struct __attribute__((packed)) {
  */
 typedef struct {
     spi_t spi;                      /**< SPI bus */
-    spi_clk_t spi_clk;              /**< SPI clock speed */
+    spi_clk_t spi_clk;              /**< SPI clock configuration computed during init */
+    uint32_t spi_freq;              /**< SPI clock speed to use */
     gpio_t pin_cs;                  /**< SPI chip select gpio pin */
     gpio_t pin_ce;                  /**< NRF24L01+ chip enable gpio pin */
     gpio_t pin_irq;                 /**< NRF24L01+ IRQ gpio pin */

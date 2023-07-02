@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2019 Otto-von-Guericke-Universität Magdeburg
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -10,9 +11,10 @@
  * @{
  *
  * @file
- * @brief   Implementation of the public NRF24L01+ (NG) device interface
+ * @brief       Implementation of the public NRF24L01+ (NG) device interface
  *
- * @author Fabian Hüßler <fabian.huessler@ovgu.de>
+ * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  * @}
  */
 
@@ -46,6 +48,7 @@ int nrf24l01p_ng_setup(nrf24l01p_ng_t *dev,
     dev->state = NRF24L01P_NG_STATE_UNDEFINED;
     dev->idle_state = NRF24L01P_NG_STATE_RX_MODE;
     dev->params = *params;
+    dev->params.spi_clk = spi_get_clk(dev->params.spi, dev->params.spi_freq);
     dev->netdev.driver = &nrf24l01p_ng_driver;
     netdev_register(&dev->netdev, NETDEV_NRF24L01P_NG, index);
     return 0;
