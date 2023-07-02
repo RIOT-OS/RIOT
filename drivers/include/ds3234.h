@@ -1,5 +1,6 @@
 /*
- * Copyright 2018 SKF AB
+ * Copyright (C) 2018 SKF AB
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -19,6 +20,7 @@
  * @brief       DS3234 device driver
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef DS3234_H
@@ -36,7 +38,7 @@ extern "C" {
  */
 typedef struct {
     spi_t spi;              /**< SPI bus the sensor is connected to */
-    spi_clk_t clk;          /**< SPI bus clock speed */
+    uint32_t freq;          /**< SPI bus clock speed to use */
     gpio_t cs;              /**< CS pin GPIO handle */
 } ds3234_params_t;
 

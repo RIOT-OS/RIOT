@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 SKF AB
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Default configuration for DS3234 devices
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef DS3234_PARAMS_H
@@ -21,6 +23,7 @@
 
 #include "board.h"
 #include "ds3234.h"
+#include "macros/units.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,14 +40,14 @@ extern "C" {
 #define DS3234_PARAM_CS                 (GPIO_PIN(0, 0))
 #endif
 #ifndef DS3234_PARAM_CLK
-#define DS3234_PARAM_CLK                (SPI_CLK_1MHZ)
+#define DS3234_PARAM_CLK                MHZ(4)
 #endif
 #ifndef DS3234_PARAMS
 #define DS3234_PARAMS \
     { \
         .spi = DS3234_PARAM_SPI, \
         .cs = DS3234_PARAM_CS, \
-        .clk = DS3234_PARAM_CLK, \
+        .freq = DS3234_PARAM_CLK, \
     }
 #endif
 /**@}*/
