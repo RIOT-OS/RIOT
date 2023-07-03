@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2022 Inria
  * Copyright (C) 2020-2022 Université Grenoble Alpes
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,6 +19,7 @@
  *
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @author      Aymeric Brochier <aymeric.brochier@univ-grenoble-alpes.fr>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  */
 
@@ -59,7 +61,7 @@ typedef struct sx1280 sx1280_t;
 typedef struct {
     spi_t spi;                          /**< SPI device */
     spi_mode_t spi_mode;                /**< SPI mode */
-    spi_clk_t spi_clk;                  /**< SPI clk */
+    uint32_t spi_clk;                   /**< SPI clk */
     gpio_t nss_pin;                     /**< SPI NSS pin */
     gpio_t reset_pin;                   /**< Reset pin */
     gpio_t busy_pin;                    /**< Busy pin */
