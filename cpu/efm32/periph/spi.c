@@ -101,9 +101,6 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
     clkdiv = (ref_freq - 1) / (2 * freq);
     clkdiv = clkdiv << 8;
 
-    /* Verify that resulting clock divider is within limits. */
-    EFM_ASSERT(!(clkdiv & ~_USART_CLKDIV_MASK));
-
     /* =================================================================
      *
      * The manual say that `the clock division factor have a 15-bit
@@ -112,7 +109,7 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
      */
 
     /* br = fHFPERCLK/(2 x (1 + USARTn_CLKDIV / 256)) */
-    return (spi_clk_t){ .clk = DIV_ROUND_UP(ref_freq, (2 * (1 + (clkdiv >> 8)))) };
+    return (spi_clk_t){ .clk = DIV_ROUND_UP(ref_freq, (2 * (1 + clkdiv / 256))) };
 }
 
 int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
