@@ -83,7 +83,7 @@ configuration can be overridden by
 
 These abbreviations are used in subsequent tables:
 
-*SDC* = SD-Card interface is used (module **sdcard_spi** is enabled)\n
+*SDC* = SD-Card interface is used (module **periph_sdmmc** is enabled)\n
 *CAM* = Camera is plugged in/used
 
 <center>
@@ -95,12 +95,18 @@ These abbreviations are used in subsequent tables:
 | `ADC_LINE(2)`         | `GPIO36`  | `GPIO36`  | -         | -         | `CAMERA_D4`                   | \ref esp32_adc_channels       |
 | `ADC_LINE(3)`         | `GPIO39`  | `GPIO39`  | -         | -         | `CAMERA_D5`                   | \ref esp32_adc_channels       |
 | `PWM_DEV(0):0 / LED0` | `GPIO0`   | `GPIO0`   | -         | -         | `LED_RED` / `CAMERA_RESET`    | \ref esp32_pwm_channels       |
-| `PWM_DEV(0):2 / LED2` | `GPIO4`   | `GPIO4`   | -         | -         | `LED_BLUE` / `CAMERA_D0`      | \ref esp32_pwm_channels       |
+| `PWM_DEV(0):1 / LED2` | `GPIO4`   | `GPIO4`   | -         | -         | `LED_BLUE` / `CAMERA_D0`      | \ref esp32_pwm_channels       |
 | `LED1`                | `GPIO2`   | `GPIO2`   | `GPIO2`   | `GPIO2`   | `LED_GREEN`                   |                               |
 | `I2C_DEV(0):SCL`      | `GPIO27`  | `GPIO27`  | `GPIO27`  | `GPIO27`  | `CAMERA_SIO_C`                | \ref esp32_i2c_interfaces     |
-| `I2C_DEV(0):SDA`      | `GPIO26`  | `GPIO26`  | `GPIO26`  | `GPIO27`  | `CAMERA_SIO_D`                | \ref esp32_i2c_interfaces     |
+| `I2C_DEV(0):SDA`      | `GPIO26`  | `GPIO26`  | `GPIO26`  | `GPIO26`  | `CAMERA_SIO_D`                | \ref esp32_i2c_interfaces     |
 | `UART_DEV(0):TX`      | `GPIO1`   | `GPIO1`   | `GPIO1`   | `GPIO1`   |                               | \ref esp32_uart_interfaces    |
 | `UART_DEV(0):RX`      | `GPIO3`   | `GPIO3`   | `GPIO3`   | `GPIO3`   |                               | \ref esp32_uart_interfaces    |
+| `SDMMC_DEV(0):CLK`    | `GPIO14`  | `GPIO14`  | -         | -         | SD-Card                       | \ref esp32_sdmmc_interfaces   |
+| `SDMMC_DEV(0):CMD`    | `GPIO15`  | `GPIO`    | -         | -         | SD-Card                       | \ref esp32_sdmmc_interfaces   |
+| `SDMMC_DEV(0):DAT0`   | `GPIO2`   | `GPIO2`   | -         | -         | SD-Card                       | \ref esp32_sdmmc_interfaces   |
+| `SDMMC_DEV(0):DAT1`   | `GPIO4`   | `GPIO4`   | -         | -         | SD-Card                       | \ref esp32_sdmmc_interfaces   |
+| `SDMMC_DEV(0):DAT2`   | `GPIO12`  | `GPIO`    | -         | -         | SD-Card                       | \ref esp32_sdmmc_interfaces   |
+| `SDMMC_DEV(0):DAT3`   | `GPIO13`  | `GPIO`    | -         | -         | SD-Card                       | \ref esp32_sdmmc_interfaces   |
 | `SPI_DEV(0):SCK`      | `GPIO14`  | `GPIO14`  | `GPIO14`  | `GPIO14`  | HSPI: SD-Card / Peripherals   | \ref esp32_spi_interfaces     |
 | `SPI_DEV(0):MOSI`     | `GPIO15`  | `GPIO15`  | `GPIO15`  | `GPIO15`  | HSPI: SD-Card / Peripherals   | \ref esp32_spi_interfaces     |
 | `SPI_DEV(0):CS0`      | `GPIO13`  | `GPIO13`  | `GPIO13`  | `GPIO13`  | HSPI: SD-Card CS              | \ref esp32_spi_interfaces     |
@@ -133,17 +139,18 @@ These abbreviations are used in subsequent tables:
 
 </center>
 
-Following table shows the default board configuration sorted by GPIOs.
+Following table shows the default board configuration sorted by GPIOs depending
+on used hardware.
 
 <center>
 
-| Pin    | None                   | SDC                 | CAM                 | SDC+CAM                    | Remarks |
+| Pin    | None                   | SDC 4-bit           | CAM                 | SDC 1-bit + CAM            | Remarks |
 |:-------|:-----------------------|:--------------------|:--------------------|:---------------------------|:-----|
 | GPIO0  | PWM_DEV(0):0 / LED0    | PWM_DEV(0):0 / LED0 | CAMERA_RESET        | CAMERA_RESET               | |
 | GPIO1  | UART_DEV(0):TX         | UART_DEV(0):TX      | UART_DEV(0):TX      | UART_DEV(0):TX             | |
-| GPIO2  | SPI_DEV(0):MISO / LED1 | SPI_DEV(0):MISO     | SPI_DEV(0):MISO     | SPI_DEV(0):MISO            | HSPI |
+| GPIO2  | SPI_DEV(0):MISO / LED1 | SDMMC_DEV(0):DAT0   | SPI_DEV(0):MISO     | SDMMC_DEV(0):DAT0          | HSPI |
 | GPIO3  | UART_DEV(0):RX         | UART_DEV(0):RX      | UART_DEV(0):RX      | UART_DEV(0):RX             | |
-| GPIO4  | PWM_DEV(0):1 / LED2    | PWM_DEV(0):1 / LED2 | CAMERA_D0           | CAMERA_D0                  | |
+| GPIO4  | PWM_DEV(0):1 / LED2    | SDMMC_DEV(0):DAT1   | CAMERA_D0           | CAMERA_D0                  | |
 | GPIO5  | LCD LED                | LCD_LED             | CAMERA_D1           | CAMERA_D1                  | |
 | GPIO6  | Flash CLK              | Flash CLK           | Flash CLK           | Flash CLK                  | |
 | GPIO7  | Flash SD0              | Flash SD0           | Flash SD0           | Flash SD0                  | |
@@ -151,10 +158,10 @@ Following table shows the default board configuration sorted by GPIOs.
 | GPIO9  |                        |                     |                     |                            | |
 | GPIO10 |                        |                     |                     |                            | |
 | GPIO11 | Flash CMD              | Flash CMD           | Flash CMD           | Flash CMD                  | |
-| GPIO12 |                        |                     |                     |                            | |
-| GPIO13 | SPI_DEV(0):CS0         | SPI_DEV(0):CS0      | SPI_DEV(0):CS0      | SPI_DEV(0):CS0             | HSPI / SD-Card CS |
-| GPIO14 | SPI_DEV(0):SCK         | SPI_DEV(0):SCK      | SPI_DEV(0):SCK      | SPI_DEV(0):SCK             | HSPI |
-| GPIO15 | SPI_DEV(0):MOSI        | SPI_DEV(0):MOSI     | SPI_DEV(0):MOSI     | SPI_DEV(0):MOSI            | HSPI |
+| GPIO12 |                        | SDMMC_DEV(0):DAT2   |                     |                            | |
+| GPIO13 | SPI_DEV(0):CS0         | SDMMC_DEV(0):DAT3   | SPI_DEV(0):CS0      |                            | HSPI / SPI SD-Card CS |
+| GPIO14 | SPI_DEV(0):SCK         | SDMMC_DEV(0):CLK    | SPI_DEV(0):SCK      |                            | HSPI |
+| GPIO15 | SPI_DEV(0):MOSI        | SDMMC_DEV(0):CMD    | SPI_DEV(0):MOSI     |                            | HSPI |
 | GPIO16 | N/A                    | N/A                 | N/A                 | N/A                        | see below |
 | GPIO17 | N/A                    | N/A                 | N/A                 | N/A                        | see below |
 | GPIO18 | LCD_RESET              | LCD_RESET           | LCD_RESET           | CAMERA_D2                  | |
