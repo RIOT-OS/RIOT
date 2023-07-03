@@ -21,7 +21,7 @@
 #include "cpu_conf_common.h"
 #include "periph_cpu_common.h"
 
-#ifdef MODULE_PMP_NOEXEC_RAM
+#if defined(MODULE_PMP_NOEXEC_RAM) || defined(MODULE_PMP_STACK_GUARD)
 #include "pmp.h"
 #endif
 
@@ -49,13 +49,18 @@ void riscv_init(void)
 {
     riscv_fpu_init();
     riscv_irq_init();
-#ifdef MODULE_PMP_NOEXEC_RAM
+#if defined(MODULE_PMP_NOEXEC_RAM) || defined(MODULE_PMP_STACK_GUARD)
     /* This marks the (main) RAM region as non
      * executable. Using PMP entry 0.
      */
-    write_pmpaddr(0, make_napot(CPU_RAM_BASE, CPU_RAM_SIZE));
+    write_pmpaddr(7, make_napot(CPU_RAM_BASE, CPU_RAM_SIZE));
 
     /* Lock & select NAPOT, only allow write and read */
-    set_pmpcfg(0, PMP_L | PMP_NAPOT | PMP_W | PMP_R);
+    set_pmpcfg(7, PMP_L | PMP_NAPOT | PMP_W | PMP_R);
+#endif
+#ifdef MODULE_PMP_STACK_GUARD
+    /* Make sure that none-locked rules also apply to M-Mode */
+    clear_csr(mstatus, MSTATUS_MPP);
+    set_csr(mstatus, MSTATUS_MPRV);
 #endif
 }

@@ -23,6 +23,10 @@
 #include "periph/init.h"
 #include "periph_conf.h"
 
+#if defined(MODULE_PMP_STACK_GUARD)
+#include "pmp.h"
+#endif
+
 #include "vendor/riscv_csr.h"
 
 #include "stdio_uart.h"
@@ -103,6 +107,17 @@ void cpu_init(void)
        case the CPU core clock can be configured to be so fast that the SPI
        flash frequency needs to be adjusted accordingly. */
     flash_init();
+#endif
+
+#ifdef MODULE_PMP_STACK_GUARD
+    /* FLASH ROM */
+    write_pmpaddr(0, make_napot(0x20000000, 0x20000000));
+    set_pmpcfg(0, PMP_L | PMP_NAPOT | PMP_X | PMP_W | PMP_R);
+
+    /* allow R/W for On-Chip Peripherals */
+    write_pmpaddr(1, 0x02000000);
+    write_pmpaddr(2, 0x20000000);
+    set_pmpcfg(2, PMP_L | PMP_TOR | PMP_W | PMP_R);
 #endif
 
     /* Common RISC-V initialization */
