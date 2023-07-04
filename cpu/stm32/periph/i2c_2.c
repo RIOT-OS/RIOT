@@ -120,7 +120,7 @@ static void _init_pins(i2c_t dev)
         /* The remapping periph clock must first be enabled */
         RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
         /* Then the remap can occur */
-        AFIO->MAPR |= AFIO_MAPR_I2C1_REMAP;
+        afio_mapr_write(afio_mapr_read() | AFIO_MAPR_I2C1_REMAP);
     }
     gpio_init_af(i2c_config[dev].scl_pin, GPIO_AF_OUT_OD);
     gpio_init_af(i2c_config[dev].sda_pin, GPIO_AF_OUT_OD);
