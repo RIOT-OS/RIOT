@@ -70,6 +70,18 @@ extern "C" {
 #define GPIO_UNDEF          (UINT8_MAX)
 
 /**
+ * @brief   Wrapper around GPIOTE ISR
+ *
+ * @note    nRF53 has two GPIOTE instances available on Application Core
+ *          but we always use the first one.
+ */
+#ifdef NRF_GPIOTE0_S
+#define ISR_GPIOTE isr_gpiote0
+#else
+#define ISR_GPIOTE isr_gpiote
+#endif
+
+/**
  * @brief   Generate GPIO mode bitfields
  *
  * We use 4 bit to encode the pin mode:
@@ -209,7 +221,7 @@ typedef struct {
  * @brief   Override SPI mode values
  * @{
  */
-#ifndef CPU_FAM_NRF9160
+#if !defined(CPU_FAM_NRF9160) && !defined(CPU_FAM_NRF53)
 #define HAVE_SPI_MODE_T
 typedef enum {
     SPI_MODE_0 = 0,                                             /**< CPOL=0, CPHA=0 */

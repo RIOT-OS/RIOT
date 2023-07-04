@@ -1,0 +1,8 @@
+ROM_LEN ?= 0x100000
+RAM_LEN ?= 0x80000
+
+PROGRAMMER ?= jlink
+JLINK_DEVICE = NRF5340_XXAA_APP
+
+include $(RIOTCPU)/nrf5x_common/Makefile.include
+include $(RIOTMAKE)/arch/cortexm.inc.mk

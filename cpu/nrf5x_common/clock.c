@@ -31,7 +31,7 @@
 #error "Clock init: CLOCK_LFCLK is not defined by your board!"
 #endif
 
-/* Add compatibility wrapper defines for nRF9160 */
+/* Add compatibility wrapper defines for nRF families with Cortex-M33 core */
 #ifdef NRF_CLOCK_S
 #define NRF_CLOCK NRF_CLOCK_S
 #endif
