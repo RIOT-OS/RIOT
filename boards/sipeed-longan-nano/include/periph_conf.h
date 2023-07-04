@@ -65,7 +65,7 @@ static const adc_conf_t adc_config[] = {
     /* This conflicts with TFT pins if connected. */
     { .pin = GPIO_PIN(PORT_B, 0), .dev = 0, .chan = 8 },
     { .pin = GPIO_PIN(PORT_B, 1), .dev = 0, .chan = 9 },
-    /* This conflicts with the SPI0 controller which is used is TFT is connected */
+    /* This conflicts with the SPI0 controller which is used if TFT is connected */
     { .pin = GPIO_PIN(PORT_A, 6), .dev = 0, .chan = 6 },
     { .pin = GPIO_PIN(PORT_A, 7), .dev = 0, .chan = 7 },
 #if !defined(MODULE_PERIPH_DAC)
@@ -86,8 +86,8 @@ static const dac_conf_t dac_config[] = {
 #if !CONFIG_SIPEED_LONGAN_NANO_WITH_TFT
     { .pin = GPIO_PIN(PORT_A, 4), .chan = 0 },
     { .pin = GPIO_PIN(PORT_A, 5), .chan = 1 },
-};
 #endif /* !CONFIG_SIPEED_LONGAN_NANO_WITH_TFT */
+};
 
 #define DAC_NUMOF           ARRAY_SIZE(dac_config)
 /** @} */

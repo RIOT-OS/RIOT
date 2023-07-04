@@ -77,10 +77,12 @@ extern "C" {
 #define ST7735_PARAM_CS           GPIO_PIN(PORT_B, 2)   /**< Chip Select pin */
 #define ST7735_PARAM_DCX          GPIO_PIN(PORT_B, 0)   /**< DCX pin */
 #define ST7735_PARAM_RST          GPIO_PIN(PORT_B, 1)   /**< Reset pin */
-#define ST7735_PARAM_RGB          1                     /**< RGB mode enable */
-#define ST7735_PARAM_INVERTED     0                     /**< Inverted mode enable */
+#define ST7735_PARAM_RGB          0                     /**< RGB mode enable */
+#define ST7735_PARAM_INVERTED     1                     /**< Inverted mode enable */
 #define ST7735_PARAM_NUM_LINES    160U                  /**< Number of lines */
 #define ST7735_PARAM_RGB_CHANNELS 80U                   /**< Number of columns */
+#define ST7735_PARAM_ROTATION     ST7735_ROTATION_HORZ  /**< Rotation mode */
+#define ST7735_PARAM_OFFSET_Y     25                    /**< Vertical offset */
 #endif
 
 #ifdef __cplusplus
