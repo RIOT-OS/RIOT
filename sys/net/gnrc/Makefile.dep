@@ -10,6 +10,10 @@ ifneq (,$(filter sock_async,$(USEMODULE)))
   USEMODULE += gnrc_sock_async
 endif
 
+ifneq (,$(filter sock_peek,$(USEMODULE)))
+  $(error GNRC does not support sock_peek)
+endif
+
 ifneq (,$(filter gnrc_mac,$(USEMODULE)))
   USEMODULE += gnrc_priority_pktqueue
   USEMODULE += csma_sender
