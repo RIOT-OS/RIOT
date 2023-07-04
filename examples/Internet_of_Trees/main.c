@@ -29,7 +29,6 @@
 #include "nimble_riot.h"
 #include "nimble_autoadv.h"
 #include "net/bluetil/ad.h"
-#include "timex.h"
 
 #include "host/ble_hs.h"
 #include "host/ble_gatt.h"
@@ -39,31 +38,19 @@
 #include "bmx280.h"
 #include "bmx280_params.h"
 
-#include <stdio.h>
 #include "periph/gpio.h"
 #include "xtimer.h"
 #include "scd30.h"
 #include "scd30_params.h"
 #include "scd30_internal.h"
 
-#define HRS_FLAGS_DEFAULT       (0x01)      /* 16-bit BPM value */
-#define SENSOR_LOCATION         (0x02)      /* wrist sensor */
-#define UPDATE_INTERVAL         (250U)
-#define BPM_MIN                 (80U)
-#define BPM_MAX                 (210U)
-#define BPM_STEP                (2)
-#define BAT_LEVEL               (42U)
+#define UPDATE_INTERVAL         (250U) /* tempo do update do BLE */
 
 static const char *_manufacturer_name = "Unfit Byte Inc.";
 static const char *_model_number = "2A";
 static const char *_serial_number = "a8b302c7f3-29183-x8";
 static const char *_fw_ver = "13.7.12";
 static const char *_hw_ver = "V3B";
-
-// static struct __attribute__((packed)) {
-//     uint8_t flags;
-//     uint16_t bpm;
-// } _hr_data = { HRS_FLAGS_DEFAULT, 10 };
 
 static event_queue_t _eq;
 static event_t _update_evt;
@@ -81,14 +68,9 @@ static uint16_t _hrs_val_handle;
 
 char sensor_measurements[100];
 
-static int _hrs_handler(uint16_t conn_handle, uint16_t attr_handle,
-                        struct ble_gatt_access_ctxt *ctxt, void *arg);
 
 static int _devinfo_handler(uint16_t conn_handle, uint16_t attr_handle,
                             struct ble_gatt_access_ctxt *ctxt, void *arg);
-
-static int _bas_handler(uint16_t conn_handle, uint16_t attr_handle,
-                        struct ble_gatt_access_ctxt *ctxt, void *arg);
 
 static int send_latest_measurements(
     uint16_t conn_handle, uint16_t attr_handle,
@@ -114,21 +96,10 @@ static const ble_uuid128_t latest_mesurement_uuid
 /* GATT service definitions */
 static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
     {
-        /* Heart Rate Service */
+        /* Environmental Service Sensing */
         .type = BLE_GATT_SVC_TYPE_PRIMARY,
         .uuid = BLE_UUID16_DECLARE(BLE_GATT_SVC_ESS),
         .characteristics = (struct ble_gatt_chr_def[]) { 
-            // {
-            //     .uuid = BLE_UUID16_DECLARE(BLE_GATT_CHAR_HEART_RATE_MEASURE),
-            //     .access_cb = _hrs_handler,
-            //     .val_handle = &_hrs_val_handle,
-            //     .flags = BLE_GATT_CHR_F_NOTIFY,
-            // }, 
-            {
-                .uuid = BLE_UUID16_DECLARE(BLE_GATT_CHAR_BODY_SENSE_LOC),
-                .access_cb = _hrs_handler,
-                .flags = BLE_GATT_CHR_F_READ,
-            },
             {
             /* Characteristic: Read only latest measurement */
                 .uuid = (ble_uuid_t *)&latest_mesurement_uuid.u,
@@ -170,39 +141,9 @@ static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
         }, }
     },
     {
-        /* Battery Level Service */
-        .type = BLE_GATT_SVC_TYPE_PRIMARY,
-        .uuid = BLE_UUID16_DECLARE(BLE_GATT_SVC_BAS),
-        .characteristics = (struct ble_gatt_chr_def[]) { {
-            .uuid = BLE_UUID16_DECLARE(BLE_GATT_CHAR_BATTERY_LEVEL),
-            .access_cb = _bas_handler,
-            .flags = BLE_GATT_CHR_F_READ,
-        }, {
-            0, /* no more characteristics in this service */
-        }, }
-    },
-    {
         0, /* no more services */
     },
 };
-
-static int _hrs_handler(uint16_t conn_handle, uint16_t attr_handle,
-                        struct ble_gatt_access_ctxt *ctxt, void *arg)
-{
-    (void)conn_handle;
-    (void)attr_handle;
-    (void)arg;
-
-    if (ble_uuid_u16(ctxt->chr->uuid) != BLE_GATT_CHAR_BODY_SENSE_LOC) {
-        return BLE_ATT_ERR_UNLIKELY;
-    }
-
-    puts("[READ] heart rate service: body sensor location value");
-
-    uint8_t loc = SENSOR_LOCATION;
-    int res = os_mbuf_append(ctxt->om, &loc, sizeof(loc));
-    return (res == 0) ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
-}
 
 static int _devinfo_handler(uint16_t conn_handle, uint16_t attr_handle,
                             struct ble_gatt_access_ctxt *ctxt, void *arg)
@@ -241,19 +182,6 @@ static int _devinfo_handler(uint16_t conn_handle, uint16_t attr_handle,
     return (res == 0) ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
 }
 
-static int _bas_handler(uint16_t conn_handle, uint16_t attr_handle,
-                        struct ble_gatt_access_ctxt *ctxt, void *arg)
-{
-    (void)conn_handle;
-    (void)attr_handle;
-    (void)arg;
-
-    puts("[READ] battery level service: battery level value");
-
-    uint8_t level = BAT_LEVEL;  /* this battery will never drain :-) */
-    int res = os_mbuf_append(ctxt->om, &level, sizeof(level));
-    return (res == 0) ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
-}
 
 static int gap_event_cb(struct ble_gap_event *event, void *arg)
 {
@@ -292,13 +220,13 @@ static int gap_event_cb(struct ble_gap_event *event, void *arg)
 static void _start_updating(void)
 {
     event_timeout_set(&_update_timeout_evt, UPDATE_INTERVAL);
-    puts("[NOTIFY_ENABLED] heart rate service");
+    puts("[NOTIFY_ENABLED] environmental sensing service");
 }
 
 static void _stop_updating(void)
 {
     event_timeout_clear(&_update_timeout_evt);
-    puts("[NOTIFY_DISABLED] heart rate service");
+    puts("[NOTIFY_DISABLED] environmental sensing service");
 }
 
 static void _hr_update(event_t *e)
@@ -331,13 +259,6 @@ static void _hr_update(event_t *e)
     event_timeout_set(&_update_timeout_evt, UPDATE_INTERVAL);
 
 }
-
-void make_data_package(bmx280_t* dev)
-{
-    uint32_t pressure = bmx280_read_pressure(dev);
-    memcpy(sensor_measurements, &pressure, sizeof(uint32_t));
-}
-
 
 #define MEASUREMENT_INTERVAL_SECS (2)
 #define TEST_ITERATIONS 3
@@ -405,8 +326,6 @@ int main(void)
             result.temperature, result.relative_humidity);
         i++;
     }
-
-    //scd30_stop_measurements(&scd30_dev);
 
     printf("Nimble GATT application\n\r");
 
