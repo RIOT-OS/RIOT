@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 Inria
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -20,6 +21,7 @@
  * @brief       Device driver for Microchip ATA8520E transceiver (Sigfox)
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef ATA8520E_H
@@ -121,7 +123,9 @@ typedef enum {
  */
 typedef struct {
     spi_t spi;                              /**< SPI device */
-    spi_clk_t spi_clk;                      /**< SPI clock speed */
+    spi_clk_t spi_clk;                      /**< SPI clock configuration
+                                             *   computed during init */
+    uint32_t spi_freq;                      /**< SPI clock speed to use */
     gpio_t cs_pin;                          /**< Chip select pin */
     gpio_t int_pin;                         /**< IRQ pin */
     gpio_t power_pin;                       /**< Power pin */
