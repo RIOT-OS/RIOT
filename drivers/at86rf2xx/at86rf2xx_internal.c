@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2013 Alaeddine Weslati <alaeddine.weslati@inria.fr>
  * Copyright (C) 2015 Freie Universität Berlin
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,6 +19,7 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  * @}
  */
 
@@ -188,6 +190,9 @@ void at86rf2xx_get_random(at86rf2xx_t *dev, uint8_t *data, size_t len)
 #if !AT86RF2XX_IS_PERIPH
 void at86rf2xx_spi_init(at86rf2xx_t *dev, void (*irq_handler)(void *arg))
 {
+    /* compute clk configuration */
+    dev->params.spi_clk = spi_get_clk(dev->params.spi, dev->params.spi_freq);
+
     /* initialize GPIOs */
     spi_init_cs(dev->params.spi, dev->params.cs_pin);
     gpio_init(dev->params.sleep_pin, GPIO_OUT);

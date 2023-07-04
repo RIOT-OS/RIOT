@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
  *               2015 Hauke Petersen <hauke.petersen@fu-berlin.de>
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef AT86RF2XX_PARAMS_H
@@ -22,6 +24,7 @@
 
 #include "at86rf2xx.h"
 #include "board.h"
+#include "macros/units.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,7 +45,7 @@ extern "C" {
 /**
  * @brief   Clock to drive the SPI bus when speaking with the AT86RF2xx
  */
-#define AT86RF2XX_PARAM_SPI_CLK     (SPI_CLK_5MHZ)
+#define AT86RF2XX_PARAM_SPI_CLK     MHZ(7.5)
 #endif
 
 #ifndef AT86RF2XX_PARAM_CS
@@ -78,7 +81,7 @@ extern "C" {
  * @brief   Parameters to initialize the AT86RF2xx driver with
  */
 #define AT86RF2XX_PARAMS            { .spi = AT86RF2XX_PARAM_SPI,         \
-                                      .spi_clk = AT86RF2XX_PARAM_SPI_CLK, \
+                                      .spi_freq = AT86RF2XX_PARAM_SPI_CLK,\
                                       .cs_pin = AT86RF2XX_PARAM_CS,       \
                                       .int_pin = AT86RF2XX_PARAM_INT,     \
                                       .sleep_pin = AT86RF2XX_PARAM_SLEEP, \
