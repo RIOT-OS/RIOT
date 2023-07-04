@@ -1,0 +1,35 @@
+# Copyright (c) 2020 Freie Universität Berlin
+#               2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_FAM_MSP430_F2XX_G2XX
+    bool
+    select CPU_MSP430
+    select HAS_CPU_MSP430_F2XX_G2XX
+
+## CPU Models
+config CPU_MODEL_MSP430F2617
+    bool
+    select CPU_FAM_MSP430_F2XX_G2XX
+
+config CPU_MODEL_MSP430F2618
+    bool
+    select CPU_FAM_MSP430_F2XX_G2XX
+
+## Definition of specific features
+config HAS_CPU_MSP430_F2XX_G2XX
+    bool
+    help
+        Indicates that an 'MSP430 F2xx/G2xx' CPU is being used.
+
+## Common CPU symbols
+config CPU_FAM
+    default "msp430_f2xx_g2xx" if HAS_CPU_MSP430_F2XX_G2XX
+
+config CPU_MODEL
+    default "msp430f2617" if CPU_MODEL_MSP430F2617
+    default "msp430f2618" if CPU_MODEL_MSP430F2618

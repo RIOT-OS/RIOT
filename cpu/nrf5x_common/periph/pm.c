@@ -30,7 +30,7 @@
 /* TODO: implement proper pm_off for nRF9160 */
 void pm_off(void)
 {
-#ifndef CPU_FAM_NRF9160
+#if (!defined(CPU_FAM_NRF9160) && !defined(CPU_FAM_NRF53))
 #ifdef CPU_FAM_NRF51
     NRF_POWER->RAMON = 0;
 #else

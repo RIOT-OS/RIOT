@@ -28,12 +28,12 @@
 extern "C" {
 #endif
 
-#define CLOCK_CORECLOCK     msp430_fxyz_dco_freq
+#define CLOCK_CORECLOCK     msp430_dco_freq
 
 /**
  * @brief   Clock configuration
  */
-static const msp430_fxyz_clock_params_t clock_params = {
+static const msp430_clock_params_t clock_params = {
     .target_dco_frequency = MHZ(8),
     .lfxt1_frequency = 32768,
     .main_clock_source = MAIN_CLOCK_SOURCE_DCOCLK,
@@ -48,7 +48,7 @@ static const msp430_fxyz_clock_params_t clock_params = {
  * @{
  */
 #define TIMER_NUMOF         (1U)
-#define TIMER_BASE          (TIMER_A)
+#define TIMER_BASE          (&TIMER_A)
 #define TIMER_CHAN          (3)
 #define TIMER_ISR_CC0       (TIMERA0_VECTOR)
 #define TIMER_ISR_CCX       (TIMERA1_VECTOR)
@@ -60,15 +60,14 @@ static const msp430_fxyz_clock_params_t clock_params = {
  */
 #define UART_NUMOF          (1U)
 
-#define UART_USE_USCI
-#define UART_BASE           (USCI_0)
-#define UART_IE             (SFR->IE2)
-#define UART_IF             (SFR->IFG2)
+#define UART_BASE           (&USCI_A0)
+#define UART_IE             (IE2)
+#define UART_IF             (IFG2)
 #define UART_IE_RX_BIT      (1 << 0)
 #define UART_IE_TX_BIT      (1 << 1)
-#define UART_RX_PORT        ((msp_port_t *)PORT_3)
+#define UART_RX_PORT        (&PORT_3)
 #define UART_RX_PIN         (1 << 5)
-#define UART_TX_PORT        ((msp_port_t *)PORT_3)
+#define UART_TX_PORT        (&PORT_3)
 #define UART_TX_PIN         (1 << 4)
 #define UART_RX_ISR         (USCIAB0RX_VECTOR)
 #define UART_TX_ISR         (USCIAB0TX_VECTOR)
@@ -81,10 +80,9 @@ static const msp430_fxyz_clock_params_t clock_params = {
 #define SPI_NUMOF           (1U)
 
 /* SPI configuration */
-#define SPI_USE_USCI
-#define SPI_BASE            (USCI_0_B_SPI)
-#define SPI_IE              (SFR->IE2)
-#define SPI_IF              (SFR->IFG2)
+#define SPI_BASE            (&USCI_B0)
+#define SPI_IE              (IE2)
+#define SPI_IF              (IFG2)
 #define SPI_IE_RX_BIT       (1 << 2)
 #define SPI_IE_TX_BIT       (1 << 3)
 #define SPI_PIN_MISO        GPIO_PIN(P3, 2)

@@ -835,8 +835,8 @@ EXCLUDE_SYMLINKS       = NO
 
 EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/atmega_common/include/sys/*.h \
-                         */cpu/msp430_common/include/stdatomic.h \
-                         */cpu/msp430_common/include/sys/*.h \
+                         */cpu/msp430/include/stdatomic.h \
+                         */cpu/msp430/include/sys/*.h \
                          */cpu/native/osx-libc-extra \
                          */cpu/x86/include/* \
                          */drivers/kw2xrf/include/overwrites.h \

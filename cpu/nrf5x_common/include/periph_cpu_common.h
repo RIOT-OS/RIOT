@@ -70,6 +70,18 @@ extern "C" {
 #define GPIO_UNDEF          (UINT8_MAX)
 
 /**
+ * @brief   Wrapper around GPIOTE ISR
+ *
+ * @note    nRF53 has two GPIOTE instances available on Application Core
+ *          but we always use the first one.
+ */
+#ifdef NRF_GPIOTE0_S
+#define ISR_GPIOTE isr_gpiote0
+#else
+#define ISR_GPIOTE isr_gpiote
+#endif
+
+/**
  * @brief   Generate GPIO mode bitfields
  *
  * We use 4 bit to encode the pin mode:
@@ -209,7 +221,7 @@ typedef struct {
  * @brief   Override SPI mode values
  * @{
  */
-#ifndef CPU_FAM_NRF9160
+#if !defined(CPU_FAM_NRF9160) && !defined(CPU_FAM_NRF53)
 #define HAVE_SPI_MODE_T
 typedef enum {
     SPI_MODE_0 = 0,                                             /**< CPOL=0, CPHA=0 */
@@ -264,6 +276,31 @@ typedef struct {
  * @return          0xff if no channel is found
  */
 uint8_t gpio_int_get_exti(gpio_t pin);
+
+#if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
+/**
+ * @brief   Structure for UART configuration data
+ */
+typedef struct {
+    NRF_UARTE_Type *dev;    /**< UART with EasyDMA device base
+                             * register address */
+    gpio_t rx_pin;          /**< RX pin */
+    gpio_t tx_pin;          /**< TX pin */
+#ifdef MODULE_PERIPH_UART_HW_FC
+    gpio_t rts_pin;         /**< RTS pin */
+    gpio_t cts_pin;         /**< CTS pin */
+#endif
+    uint8_t irqn;           /**< IRQ channel */
+} uart_conf_t;
+
+/**
+ * @brief   Size of the UART TX buffer for non-blocking mode.
+ */
+#ifndef UART_TXBUF_SIZE
+#define UART_TXBUF_SIZE    (64)
+#endif
+
+#endif /* ndef CPU_MODEL_NRF52832XXAA && ndef CPU_FAM_NRF51 */
 
 #ifdef __cplusplus
 }

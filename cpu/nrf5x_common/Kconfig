@@ -5,6 +5,7 @@
 # directory for more details.
 
 config CPU_COMMON_NRF5X
+depends on !CPU_FAM_NRF53
     bool
     select HAS_BLE_NIMBLE
     select HAS_PERIPH_CPUID
