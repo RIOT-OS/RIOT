@@ -36,28 +36,6 @@ extern "C" {
  */
 #define PERIPH_CLOCK        MHZ(16)
 
-/**
- * @brief   Structure for UART configuration data
- */
-typedef struct {
-    NRF_UARTE_Type *dev;    /**< UART with EasyDMA device base
-                             * register address */
-    gpio_t rx_pin;          /**< RX pin */
-    gpio_t tx_pin;          /**< TX pin */
-#ifdef MODULE_PERIPH_UART_HW_FC
-    gpio_t rts_pin;         /**< RTS pin */
-    gpio_t cts_pin;         /**< CTS pin */
-#endif
-    uint8_t irqn;           /**< IRQ channel */
-} uart_conf_t;
-
-/**
- * @brief   Size of the UART TX buffer for non-blocking mode.
- */
-#ifndef UART_TXBUF_SIZE
-#define UART_TXBUF_SIZE    (64)
-#endif
-
 #ifndef DOXYGEN
 /**
  * @brief Wrapper to fix differences between nRF9160 and

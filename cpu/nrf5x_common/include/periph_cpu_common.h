@@ -277,6 +277,31 @@ typedef struct {
  */
 uint8_t gpio_int_get_exti(gpio_t pin);
 
+#if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
+/**
+ * @brief   Structure for UART configuration data
+ */
+typedef struct {
+    NRF_UARTE_Type *dev;    /**< UART with EasyDMA device base
+                             * register address */
+    gpio_t rx_pin;          /**< RX pin */
+    gpio_t tx_pin;          /**< TX pin */
+#ifdef MODULE_PERIPH_UART_HW_FC
+    gpio_t rts_pin;         /**< RTS pin */
+    gpio_t cts_pin;         /**< CTS pin */
+#endif
+    uint8_t irqn;           /**< IRQ channel */
+} uart_conf_t;
+
+/**
+ * @brief   Size of the UART TX buffer for non-blocking mode.
+ */
+#ifndef UART_TXBUF_SIZE
+#define UART_TXBUF_SIZE    (64)
+#endif
+
+#endif /* ndef CPU_MODEL_NRF52832XXAA && ndef CPU_FAM_NRF51 */
+
 #ifdef __cplusplus
 }
 #endif
