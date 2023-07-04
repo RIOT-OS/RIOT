@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2019 2019 ML!PA Consulting GmbH
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -18,6 +19,7 @@
  * @brief       Interface definition for AT86RF215 based drivers
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef AT86RF215_H
@@ -329,7 +331,8 @@ typedef enum {
  */
 typedef struct at86rf215_params {
     spi_t spi;              /**< SPI bus the device is connected to */
-    spi_clk_t spi_clk;      /**< SPI clock speed to use */
+    spi_clk_t spi_clk;      /**< SPI clock configuration computed during setup */
+    uint32_t spi_freq;      /**< SPI clock speed to use */
     spi_cs_t cs_pin;        /**< GPIO pin connected to chip select */
     gpio_t int_pin;         /**< GPIO pin connected to the interrupt pin */
     gpio_t reset_pin;       /**< GPIO pin connected to the reset pin */
