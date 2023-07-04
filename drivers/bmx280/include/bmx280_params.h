@@ -52,7 +52,7 @@ extern "C" {
 #define BMX280_PARAM_I2C_DEV        I2C_DEV(0)
 #endif
 #ifndef BMX280_PARAM_I2C_ADDR
-#define BMX280_PARAM_I2C_ADDR       (0x77)
+#define BMX280_PARAM_I2C_ADDR       (0x76)
 #endif
 #endif
 

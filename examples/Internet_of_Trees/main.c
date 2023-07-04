@@ -39,6 +39,13 @@
 #include "bmx280.h"
 #include "bmx280_params.h"
 
+#include <stdio.h>
+#include "periph/gpio.h"
+#include "xtimer.h"
+#include "scd30.h"
+#include "scd30_params.h"
+#include "scd30_internal.h"
+
 #define HRS_FLAGS_DEFAULT       (0x01)      /* 16-bit BPM value */
 #define SENSOR_LOCATION         (0x02)      /* wrist sensor */
 #define UPDATE_INTERVAL         (250U)
@@ -64,8 +71,13 @@ static event_timeout_t _update_timeout_evt;
 
 static bmx280_t dev;
 
+scd30_t scd30_dev;
+scd30_params_t params = SCD30_PARAMS;
+scd30_measurement_t result;
+
 static uint16_t _conn_handle;
 static uint16_t _hrs_val_handle;
+//static uint16_t _sensor_handle;
 
 char sensor_measurements[100];
 
@@ -106,12 +118,12 @@ static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
         .type = BLE_GATT_SVC_TYPE_PRIMARY,
         .uuid = BLE_UUID16_DECLARE(BLE_GATT_SVC_ESS),
         .characteristics = (struct ble_gatt_chr_def[]) { 
-            {
-                .uuid = BLE_UUID16_DECLARE(BLE_GATT_CHAR_HEART_RATE_MEASURE),
-                .access_cb = _hrs_handler,
-                .val_handle = &_hrs_val_handle,
-                .flags = BLE_GATT_CHR_F_NOTIFY,
-            }, 
+            // {
+            //     .uuid = BLE_UUID16_DECLARE(BLE_GATT_CHAR_HEART_RATE_MEASURE),
+            //     .access_cb = _hrs_handler,
+            //     .val_handle = &_hrs_val_handle,
+            //     .flags = BLE_GATT_CHR_F_NOTIFY,
+            // }, 
             {
                 .uuid = BLE_UUID16_DECLARE(BLE_GATT_CHAR_BODY_SENSE_LOC),
                 .access_cb = _hrs_handler,
@@ -294,12 +306,14 @@ static void _hr_update(event_t *e)
     (void)e;
     struct os_mbuf *om;
 
+    scd30_read_triggered(&scd30_dev, &result);
+    memcpy(sensor_measurements,&result.co2_concentration,sizeof(float));
     uint32_t pressure = bmx280_read_pressure(&dev);
-    memcpy(sensor_measurements, &pressure, sizeof(uint32_t));
-    uint32_t temperature = bmx280_read_temperature(&dev);
-    memcpy(sensor_measurements + sizeof(uint32_t), &temperature, sizeof(uint32_t));
-    uint32_t humidity = bme280_read_humidity(&dev);
-    memcpy(sensor_measurements +2*sizeof(uint32_t), &humidity, sizeof(uint32_t));
+    memcpy(sensor_measurements + sizeof(float), &pressure, sizeof(uint32_t));                                                   
+    int16_t temperature = bmx280_read_temperature(&dev);
+    memcpy(sensor_measurements + sizeof(float) + sizeof(uint32_t), &temperature, sizeof(int16_t));
+    int humidity = bme280_read_humidity(&dev);
+    memcpy(sensor_measurements + sizeof(float) + sizeof(uint32_t) + sizeof(int16_t), &humidity, sizeof(int));
 
     /* send heart rate data notification to GATT client */
     om = ble_hs_mbuf_from_flat(sensor_measurements, sizeof(sensor_measurements));
@@ -308,12 +322,14 @@ static void _hr_update(event_t *e)
     assert(res == 0);
     (void)res;
 
+    printf("CO2 Concentration [ppm]: %f\n",result.co2_concentration);
+    printf("   Pressure    [Pa]:      %" PRIu32 "\n\n", pressure);
+    printf("   Temperature [°C]:      %" PRIi16 "\n", temperature);
+    printf("   Humidity    [Percent]: %d\n", humidity);
+
     /* schedule next update event */
     event_timeout_set(&_update_timeout_evt, UPDATE_INTERVAL);
 
-    printf("   Pressure    [Pa]:      %" PRIu32 "\n", pressure);
-    printf("   Temperature [°C]:      %" PRIu32 "\n", temperature);
-    printf("   Pressure    [Percent]: %" PRIu32 "\n", humidity);
 }
 
 void make_data_package(bmx280_t* dev)
@@ -322,23 +338,26 @@ void make_data_package(bmx280_t* dev)
     memcpy(sensor_measurements, &pressure, sizeof(uint32_t));
 }
 
-#include <stdio.h>
-#include "periph/gpio.h"
-#include "xtimer.h"
-#include "scd30.h"
-#include "scd30_params.h"
-#include "scd30_internal.h"
 
 #define MEASUREMENT_INTERVAL_SECS (2)
-
-scd30_t scd30_dev;
-scd30_params_t params = SCD30_PARAMS;
-scd30_measurement_t result;
-
-#define TEST_ITERATIONS 10
+#define TEST_ITERATIONS 3
 
 int main(void)
 {
+
+    switch (bmx280_init(&dev, &bmx280_params[0])) {
+        case BMX280_ERR_BUS:
+            puts("[Error] Something went wrong when using the I2C bus");
+            return 1;
+        case BMX280_ERR_NODEV:
+            puts("[Error] Unable to communicate with any BMX280 device");
+            return 1;
+        default:
+            /* all good -> do nothing */
+            printf("BME280 initialized\n");
+            break;
+    }
+
     printf("SCD30 Test:\n");
     int i = 0;
 
@@ -387,20 +406,9 @@ int main(void)
         i++;
     }
 
-    scd30_stop_measurements(&scd30_dev);
+    //scd30_stop_measurements(&scd30_dev);
 
     printf("Nimble GATT application\n\r");
-    switch (bmx280_init(&dev, &bmx280_params[0])) {
-        case BMX280_ERR_BUS:
-            puts("[Error] Something went wrong when using the I2C bus");
-            return 1;
-        case BMX280_ERR_NODEV:
-            puts("[Error] Unable to communicate with any BMX280 device");
-            return 1;
-        default:
-            /* all good -> do nothing */
-            break;
-    }
 
     int res = 0;
     (void)res;
