@@ -66,13 +66,15 @@ static const spi_conf_t spi_config[] = {
 static const timer_conf_t timer_config[] = {
     {
         .dev      = NRF_TIMER0_S,
-        .channels = 3,
+        /* using last channel for timer_read(), so only 5 of 6 channels available */
+        .channels = 5,
         .bitmode  = TIMER_BITMODE_BITMODE_32Bit,
         .irqn     = TIMER0_IRQn
     },
     {
         .dev      = NRF_TIMER1_S,
-        .channels = 3,
+        /* using last channel for timer_read(), so only 5 of 6 channels available */
+        .channels = 5,
         .bitmode  = TIMER_BITMODE_BITMODE_08Bit,
         .irqn     = TIMER1_IRQn
     },
