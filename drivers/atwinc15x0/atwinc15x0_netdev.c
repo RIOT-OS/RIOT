@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2020 Gunar Schorcht
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Netdev driver for the ATWINC15x0 WiFi module
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -601,6 +603,8 @@ void atwinc15x0_setup(atwinc15x0_t *dev, const atwinc15x0_params_t *params, uint
     atwinc15x0 = dev;
     atwinc15x0->netdev.driver = &atwinc15x0_netdev_driver;
     atwinc15x0->params = *params;
+    atwinc15x0->params.spi_clk = spi_get_clk(atwinc15x0->params.spi,
+                                             atwinc15x0->params.spi_freq);
 
     netdev_register(&dev->netdev, NETDEV_ATWINC15X0, idx);
 }

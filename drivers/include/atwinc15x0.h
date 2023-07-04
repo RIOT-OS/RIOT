@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2020 Gunar Schorcht
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  * @brief       Public interface for ATWINC15x0 netdev driver
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef ATWINC15X0_H
@@ -46,7 +48,8 @@ extern "C" {
  */
 typedef struct {
     spi_t spi;              /**< SPI device */
-    spi_clk_t spi_clk;      /**< SPI clock speed used */
+    spi_clk_t spi_clk;      /**< SPI clock configuration computed during setup */
+    uint32_t spi_freq;      /**< SPI clock speed to use */
     gpio_t ssn_pin;         /**< SPI SS pin (slave select LOW active) */
     gpio_t reset_pin;       /**< RESET_N pin (LOW active) */
     gpio_t irq_pin;         /**< IRQN pin (LOW active) */
