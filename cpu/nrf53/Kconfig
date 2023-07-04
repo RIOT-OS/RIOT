@@ -9,6 +9,7 @@
 config CPU_FAM_NRF53
     bool
     select HAS_CPU_NRF53
+    select HAS_PERIPH_CPUID
     select HAS_PERIPH_GPIO
     select HAS_PERIPH_GPIO_IRQ
     select HAS_PERIPH_TIMER_PERIODIC
