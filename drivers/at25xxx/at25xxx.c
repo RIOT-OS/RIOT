@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2019 ML!PA Consulting GmbH
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,6 +17,7 @@
  *              CAT25xxx & BR25Sxxx.
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  * @}
  */
 
@@ -242,6 +244,7 @@ int at25xxx_clear(const at25xxx_t *dev, uint32_t pos, size_t len)
 int at25xxx_init(at25xxx_t *dev, const at25xxx_params_t *params)
 {
     dev->params = *params;
+    dev->params.spi_clk = spi_get_clk(dev->params.spi, dev->params.spi_freq);
     spi_init_cs(dev->params.spi, dev->params.cs_pin);
 
     if (gpio_is_valid(dev->params.wp_pin)) {
