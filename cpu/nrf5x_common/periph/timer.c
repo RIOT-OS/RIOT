@@ -82,9 +82,9 @@ int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
     }
 
     /* reset compare state */
-    dev(tim)->EVENTS_COMPARE[0] = 0;
-    dev(tim)->EVENTS_COMPARE[1] = 0;
-    dev(tim)->EVENTS_COMPARE[2] = 0;
+    for (unsigned i = 0; i < timer_config[tim].channels; i++) {
+        dev(tim)->EVENTS_COMPARE[i] = 0;
+    }
 
     /* enable interrupts */
     NVIC_EnableIRQ(timer_config[tim].irqn);
