@@ -8,3 +8,7 @@ endif
 
 # Make calls to malloc and friends thread-safe
 USEMODULE += malloc_thread_safe
+
+ifneq (,$(filter delay_us_spinning,$(USEMODULE)))
+  USEMODULE += ztimer_usec
+endif

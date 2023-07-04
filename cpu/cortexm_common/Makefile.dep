@@ -29,3 +29,7 @@ USEMODULE += malloc_thread_safe
 
 # CMSIS headers are fetched using a package
 USEPKG += cmsis
+
+ifneq (,$(filter delay_us_spinning,$(USEMODULE)))
+  USEMODULE += ztimer_usec
+endif

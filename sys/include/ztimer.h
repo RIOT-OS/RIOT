@@ -839,6 +839,17 @@ static inline void ztimer_init_extend(ztimer_clock_t *clock)
 }
 #endif /* MODULE_ZTIMER_EXTEND */
 
+/**
+ * @brief   Internal function to sleep on a higher frequency clock for a
+ *          duration specified as lower frequency ticks without overflowing
+ * @internal
+ * @param[in,out]   clock       Higher frequency clock to sleep on
+ * @param[in]       time        Time to sleep in lower frequency clock ticks
+ * @param[in]       scale       Each tick in @p time corresponds to @p scale
+ *                              ticks of @p clock
+ */
+void ztimer_sleep_scale_up(ztimer_clock_t *clock, uint32_t time, uint32_t scale);
+
 /* default ztimer virtual devices */
 /**
  * @brief   Default ztimer microsecond clock
