@@ -36,6 +36,12 @@ static const i2c_conf_t i2c_config[] = {
         .scl = GPIO_PIN(0, 15),
         .sda = GPIO_PIN(0, 13),
         .speed = I2C_SPEED_NORMAL
+    },
+    {
+        .dev = NRF_TWIM0,
+        .scl = GPIO_PIN(0, 11),
+        .sda = GPIO_PIN(0, 29),
+        .speed = I2C_SPEED_NORMAL
     }
 };
 #define I2C_NUMOF           ARRAY_SIZE(i2c_config)

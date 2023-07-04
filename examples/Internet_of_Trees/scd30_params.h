@@ -42,7 +42,7 @@ extern "C" {
  * @{
  */
 #ifndef SCD30_PARAM_I2C_DEV
-#define SCD30_PARAM_I2C_DEV          I2C_DEV(0)
+#define SCD30_PARAM_I2C_DEV          I2C_DEV(1)
 #endif
 #ifndef SCD30_PARAM_I2C_ADDR
 #define SCD30_PARAM_I2C_ADDR         SCD30_I2C_ADDR
