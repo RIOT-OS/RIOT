@@ -466,6 +466,7 @@ struct usbus {
     usbus_state_t state;                            /**< Current state                         */
     usbus_state_t pstate;                           /**< state to recover to from suspend      */
     uint8_t addr;                                   /**< Address of the USB peripheral         */
+    bool wakeup_enabled;                            /**< Remote wakeup device feature status   */
 #ifndef CONFIG_USB_SERIAL_STR
     /**
      * @brief Hex representation of the device serial number
