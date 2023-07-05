@@ -110,6 +110,22 @@ static const pwm_conf_t pwm_config[] = {
 #define PWM_NUMOF           ARRAY_SIZE(pwm_config)
 /** @} */
 
+/**
+ * @name    SPI configuration
+ * @{
+ */
+static const spi_conf_t spi_config[] = {
+    {
+        .dev  = NRF_SPIM1_S,
+        .sclk = GPIO_PIN(0, 17),
+        .mosi = GPIO_PIN(0, 13),
+        .miso = GPIO_PIN(0, 14),
+    }
+};
+
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
