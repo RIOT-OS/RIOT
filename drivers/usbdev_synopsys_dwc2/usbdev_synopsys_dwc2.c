@@ -750,6 +750,11 @@ static void _usbdev_init(usbdev_t *dev)
     PWR->CR2 |= PWR_CR2_USV;
 #endif /* PWR_CR2_USV */
 
+#if defined(PWR_SVMCR_USV)
+    /* on U5: Validate USB Supply */
+    PWR->SVMCR |= PWR_SVMCR_USV;
+#endif /* PWR_SVMCR_USV */
+
     /* Enable the clock to the peripheral */
     periph_clk_en(conf->ahb, conf->rcc_mask);
 
