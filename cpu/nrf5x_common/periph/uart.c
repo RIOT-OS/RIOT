@@ -37,11 +37,8 @@
 #include "periph/gpio.h"
 
 #if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
-#define UART_INVALID    (uart >= UART_NUMOF)
-#define REG_BAUDRATE    dev(uart)->BAUDRATE
-#define REG_CONFIG      dev(uart)->CONFIG
-#define PSEL_RXD        dev(uart)->PSEL.RXD
-#define PSEL_TXD        dev(uart)->PSEL.TXD
+#define PSEL_RXD        PSEL.RXD
+#define PSEL_TXD        PSEL.TXD
 #define UART_IRQN       uart_config[uart].irqn
 #define UART_PIN_RX     uart_config[uart].rx_pin
 #define UART_PIN_TX     uart_config[uart].tx_pin
@@ -88,11 +85,8 @@ static inline NRF_UARTE_Type *dev(uart_t uart)
 
 #else /* nrf51 and nrf52832 etc */
 
-#define UART_INVALID    (uart != 0)
-#define REG_BAUDRATE    NRF_UART0->BAUDRATE
-#define REG_CONFIG      NRF_UART0->CONFIG
-#define PSEL_RXD        NRF_UART0->PSELRXD
-#define PSEL_TXD        NRF_UART0->PSELTXD
+#define PSEL_RXD        PSELRXD
+#define PSEL_TXD        PSELTXD
 #define UART_0_ISR      isr_uart0
 #define ISR_CTX         isr_ctx
 
@@ -101,11 +95,49 @@ static inline NRF_UARTE_Type *dev(uart_t uart)
  */
 static uart_isr_ctx_t isr_ctx;
 
+
+static inline NRF_UART_Type *dev(uart_t uart)
+{
+    (void)uart;
+    return NRF_UART0;
+}
 #endif  /* !CPU_MODEL_NRF52832XXAA && !CPU_FAM_NRF51 */
+
+static inline void set_power(uart_t uart, bool value)
+{
+#if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
+    const uint32_t enable_mask  = UARTE_ENABLE_ENABLE_Enabled;
+    const uint32_t disable_mask = UARTE_ENABLE_ENABLE_Disabled;
+#else
+    const uint32_t enable_mask  = UART_ENABLE_ENABLE_Enabled;
+    const uint32_t disable_mask = UART_ENABLE_ENABLE_Disabled;
+#endif
+
+    if (value) {
+        dev(uart)->ENABLE = enable_mask;
+    }
+    else {
+        dev(uart)->ENABLE = disable_mask;
+    }
+#ifdef CPU_FAM_NRF51
+    dev(uart)->POWER = value;
+#endif
+}
+
+static inline bool get_power(uart_t uart)
+{
+#if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
+    const uint32_t disable_mask = UARTE_ENABLE_ENABLE_Disabled;
+#else
+    const uint32_t disable_mask = UART_ENABLE_ENABLE_Disabled;
+#endif
+    return dev(uart)->ENABLE != disable_mask;
+}
+
 
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
-    if (UART_INVALID) {
+    if (uart >= UART_NUMOF) {
         return UART_NODEV;
     }
 
@@ -113,23 +145,18 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     ISR_CTX.rx_cb = rx_cb;
     ISR_CTX.arg = arg;
 
-#ifdef CPU_FAM_NRF51
-   /* power on the UART device */
-    NRF_UART0->POWER = 1;
-#endif
-
     /* reset configuration registers */
-    REG_CONFIG = 0;
+    dev(uart)->CONFIG = 0;
 
     /* configure RX pin */
     if (rx_cb) {
         gpio_init(UART_PIN_RX, GPIO_IN);
-        PSEL_RXD = UART_PIN_RX;
+        dev(uart)->PSEL_RXD = UART_PIN_RX;
     }
 
     /* configure TX pin */
     gpio_init(UART_PIN_TX, GPIO_OUT);
-    PSEL_TXD = UART_PIN_TX;
+    dev(uart)->PSEL_TXD = UART_PIN_TX;
 
 #if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
     /* enable HW-flow control if defined */
@@ -141,7 +168,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
             /* configure RTS and CTS pins to use */
             dev(uart)->PSEL.RTS = UART_PIN_RTS;
             dev(uart)->PSEL.CTS = UART_PIN_CTS;
-            REG_CONFIG |= UART_CONFIG_HWFC_Msk; /* enable HW flow control */
+            dev(uart)-> CONFIG |= UART_CONFIG_HWFC_Msk; /* enable HW flow control */
         }
 #else
         dev(uart)->PSEL.RTS = 0xffffffff;   /* pin disconnected */
@@ -154,9 +181,9 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         gpio_init(UART_PIN_RTS, GPIO_OUT);
         gpio_init(UART_PIN_CTS, GPIO_IN);
         /* configure RTS and CTS pins to use */
-        NRF_UART0->PSELRTS = UART_PIN_RTS;
-        NRF_UART0->PSELCTS = UART_PIN_CTS;
-        REG_CONFIG |= UART_CONFIG_HWFC_Msk;     /* enable HW flow control */
+        dev(uart)->PSELRTS = UART_PIN_RTS;
+        dev(uart)->PSELCTS = UART_PIN_CTS;
+        dev(uart)->CONFIG |= UART_CONFIG_HWFC_Msk;     /* enable HW flow control */
     }
 #else
         NRF_UART0->PSELRTS = 0xffffffff;        /* pin disconnected */
@@ -167,63 +194,59 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     /* select baudrate */
     switch (baudrate) {
         case 1200:
-            REG_BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud1200;
+            dev(uart)->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud1200;
             break;
         case 2400:
-            REG_BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud2400;
+            dev(uart)->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud2400;
             break;
         case 4800:
-            REG_BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud4800;
+            dev(uart)->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud4800;
             break;
         case 9600:
-            REG_BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud9600;
+            dev(uart)->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud9600;
             break;
         case 14400:
-            REG_BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud14400;
+            dev(uart)->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud14400;
             break;
         case 19200:
-            REG_BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud19200;
+            dev(uart)->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud19200;
             break;
         case 28800:
-            REG_BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud28800;
+            dev(uart)->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud28800;
             break;
         case 38400:
-            REG_BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud38400;
+            dev(uart)->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud38400;
             break;
         case 57600:
-            REG_BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud57600;
+            dev(uart)->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud57600;
             break;
         case 76800:
-            REG_BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud76800;
+            dev(uart)->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud76800;
             break;
         case 115200:
-            REG_BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud115200;
+            dev(uart)->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud115200;
             break;
         case 230400:
-            REG_BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud230400;
+            dev(uart)->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud230400;
             break;
         case 250000:
-            REG_BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud250000;
+            dev(uart)->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud250000;
             break;
         case 460800:
-            REG_BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud460800;
+            dev(uart)->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud460800;
             break;
         case 921600:
-            REG_BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud921600;
+            dev(uart)->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud921600;
             break;
         case 1000000:
-            REG_BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud1M;
+            dev(uart)->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud1M;
             break;
         default:
             return UART_NOBAUD;
     }
 
     /* enable the UART device */
-#if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
-    dev(uart)->ENABLE = UARTE_ENABLE_ENABLE_Enabled;
-#else
-    NRF_UART0->ENABLE = UART_ENABLE_ENABLE_Enabled;
-#endif
+    set_power(uart, true);
 
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
     /* set up the TX buffer */
@@ -276,6 +299,10 @@ static void _write_buf(uart_t uart, const uint8_t *data, size_t len)
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     assert(uart < UART_NUMOF);
+    if (!get_power(uart)) {
+        /* Device is powered down. Writing anyway would deadlock */
+        return;
+    }
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
     for (size_t i = 0; i < len; i++) {
         /* in IRQ or interrupts disabled */
@@ -337,6 +364,11 @@ void uart_poweron(uart_t uart)
     assert(uart < UART_NUMOF);
 
     if (isr_ctx[uart].rx_cb) {
+#if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
+        dev(uart)->ENABLE = UARTE_ENABLE_ENABLE_Enabled;
+#else
+        NRF_UART0->ENABLE = UART_ENABLE_ENABLE_Enabled;
+#endif
         dev(uart)->TASKS_STARTRX = 1;
     }
 }
@@ -346,6 +378,11 @@ void uart_poweroff(uart_t uart)
     assert(uart < UART_NUMOF);
 
     dev(uart)->TASKS_STOPRX = 1;
+#if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
+    dev(uart)->ENABLE = UARTE_ENABLE_ENABLE_Disabled;
+#else
+    NRF_UART0->ENABLE = UART_ENABLE_ENABLE_Disabled;
+#endif
 }
 
 int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
@@ -445,7 +482,8 @@ void uart_poweron(uart_t uart)
     (void)uart;
 
     if (isr_ctx.rx_cb) {
-        NRF_UART0->TASKS_STARTRX = 1;
+        dev(uart)->TASKS_STARTRX = 1;
+        set_power(uart, true);
     }
 }
 
@@ -453,7 +491,8 @@ void uart_poweroff(uart_t uart)
 {
     (void)uart;
 
-    NRF_UART0->TASKS_STOPRX = 1;
+    dev(uart)->TASKS_STOPRX = 1;
+    set_power(uart, false);
 }
 
 int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
