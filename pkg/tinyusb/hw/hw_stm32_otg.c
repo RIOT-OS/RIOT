@@ -55,6 +55,9 @@ static int tinyusb_hw_init_dev(const dwc2_usb_otg_fshs_config_t *conf)
 #ifdef USB_OTG_GCCFG_NOVBUSSENS
     /* set No Vbus Sensing */
     global_regs->GCCFG |= USB_OTG_GCCFG_NOVBUSSENS;
+#elif USB_OTG_GCCFG_VBDEN
+    /* clear Vbus Detect Enable */
+    global_regs->GCCFG &= ~USB_OTG_GCCFG_VBDEN;
 #endif
 
 #ifdef DWC2_USB_OTG_HS_ENABLED
