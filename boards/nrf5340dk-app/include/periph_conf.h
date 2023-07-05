@@ -70,8 +70,6 @@ static const uart_conf_t uart_config[] = {
     },
 };
 
-#define UART_0_ISR          (isr_serial0) /**< SERIAL0_IRQn */
-
 #define UART_NUMOF          ARRAY_SIZE(uart_config) /**< UART configuration NUMOF */
 /** @} */
 

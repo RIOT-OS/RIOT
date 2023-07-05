@@ -21,6 +21,7 @@ config CPU_FAM_NRF9160
     select HAS_PERIPH_SPI_GPIO_MODE
     select HAS_PERIPH_WDT
     select HAS_PERIPH_WDT_CB
+    select MODULE_NRF_SHARED_SERIAL_IRQ
 
 ## CPU Models
 config CPU_MODEL_NRF9160

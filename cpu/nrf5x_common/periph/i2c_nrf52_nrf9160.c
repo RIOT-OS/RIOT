@@ -134,7 +134,7 @@ void i2c_init(i2c_t dev)
     /* configure shared periphal speed */
     _setup_shared_peripheral(dev);
 
-    spi_twi_irq_register_i2c(bus(dev), i2c_isr_handler, (void *)(uintptr_t)dev);
+    shared_irq_register_i2c(bus(dev), i2c_isr_handler, (void *)(uintptr_t)dev);
 
     /* We expect that the device was being acquired before
      * the i2c_init_master() function is called, so it should be enabled when

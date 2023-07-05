@@ -1,4 +1,5 @@
 USEMODULE += nrf53_vectors
+USEMODULE += nrf_shared_serial_irq
 
 include $(RIOTCPU)/nrf5x_common/Makefile.dep
 include $(RIOTCPU)/cortexm_common/Makefile.dep
