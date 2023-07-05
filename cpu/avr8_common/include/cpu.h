@@ -119,57 +119,54 @@ static inline void avr8_isr_prolog(void)
      * around `avr8_state_irq_count`.
      */
     __asm__ volatile (
-#if defined(CPU_ATXMEGA)
-        "cli                               \n\t"
-#endif
     /* Register pair r24/25 are used to update `avr8_state_irq_count` content.
      * This registers are used to test conditions related to context switch in
      * ISR at @ref avr8_isr_epilog.
      */
-        "push   r24                        \n\t"
-        "push   r25                        \n\t"
+        "push r30                                \n\t"
+        "in   r30, __SREG__                      \n\t"
+        "push r30                                \n\t"
+        "push r31                                \n\t"
+#if defined(CPU_ATXMEGA)
+        "cli                                     \n\t"
+#endif
 #if (AVR8_STATE_IRQ_USE_SRAM)
-        "lds    r24, %[state]              \n\t"
-        "subi   r24, 0xFF                  \n\t"
-        "sts    %[state], r24              \n\t"
+        "lds    r30, %[state]                    \n\t"
+        "subi   r30, 0xFF                        \n\t"
+        "sts    %[state], r30                    \n\t"
 #else
-        "in     r24, %[state]              \n\t"
-        "subi   r24, 0xFF                  \n\t"
-        "out    %[state], r24              \n\t"
+        "in     r30, %[state]                    \n\t"
+        "subi   r30, 0xFF                        \n\t"
+        "out    %[state], r30                    \n\t"
 #endif
 #if defined(CPU_ATXMEGA)
-        "sei                               \n\t"
-#endif
-        "push   __zero_reg__               \n\t"
-        "push   __tmp_reg__                \n\t"
-        "in     __tmp_reg__, __SREG__      \n\t"
-        "push   __tmp_reg__                \n\t"
-        "eor    __zero_reg__, __zero_reg__ \n\t"
-#if __AVR_HAVE_RAMPD__
-        "in     __tmp_reg__, __RAMPD__     \n\t"
-        "push   __tmp_reg__                \n\t"
-        "out    __RAMPD__, __zero_reg__    \n\t"
-#endif
-#if __AVR_HAVE_RAMPX__
-        "in     __tmp_reg__, __RAMPX__     \n\t"
-        "push   __tmp_reg__                \n\t"
-        "out    __RAMPX__, __zero_reg__    \n\t"
+        "sei                                     \n\t"
 #endif
 #if __AVR_HAVE_RAMPZ__
-        "in     __tmp_reg__, __RAMPZ__     \n\t"
-        "push   __tmp_reg__                \n\t"
-        "out    __RAMPZ__, __zero_reg__    \n\t"
+        "in   r30, __RAMPZ__                     \n\t"
+        "push r30                                \n\t"
 #endif
-        "push   r18                        \n\t"
-        "push   r19                        \n\t"
-        "push   r20                        \n\t"
-        "push   r21                        \n\t"
-        "push   r22                        \n\t"
-        "push   r23                        \n\t"
-        "push   r26                        \n\t"
-        "push   r27                        \n\t"
-        "push   r30                        \n\t"
-        "push   r31                        \n\t"
+#if __AVR_HAVE_RAMPX__
+        "in   r30, __RAMPX__                     \n\t"
+        "push r30                                \n\t"
+#endif
+#if __AVR_HAVE_RAMPD__
+        "in   r30, __RAMPD__                     \n\t"
+        "push r30                                \n\t"
+#endif
+        "push r0                                 \n\t"
+        "push r1                                 \n\t"
+        "clr  r1                                 \n\t"
+        "push r18                                \n\t"
+        "push r19                                \n\t"
+        "push r20                                \n\t"
+        "push r21                                \n\t"
+        "push r22                                \n\t"
+        "push r23                                \n\t"
+        "push r24                                \n\t"
+        "push r25                                \n\t"
+        "push r26                                \n\t"
+        "push r27                                \n\t"
         : /* no output */
 #if (AVR8_STATE_IRQ_USE_SRAM)
         : [state] "" (avr8_state_irq_count)
