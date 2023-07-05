@@ -745,8 +745,8 @@ static void _usbdev_init(usbdev_t *dev)
     pm_block(STM32_PM_STOP);
     pm_block(STM32_PM_STANDBY);
 
-#if defined(PWR_CR2_USV) /* on L4 */
-    /* Validate USB Supply */
+#if defined(PWR_CR2_USV)
+    /*  on L4: Validate USB Supply */
     PWR->CR2 |= PWR_CR2_USV;
 #endif /* PWR_CR2_USV */
 
@@ -1004,10 +1004,10 @@ static void _usbdev_init(usbdev_t *dev)
 
     /* Disable Vbus detection and force the pull-up on, GCCFG is STM32 specific */
 #if defined(STM32_USB_OTG_CID_1x)
-    /* Enable no Vbus sensing */
+    /* set No Vbus Sensing */
     _global_regs(usbdev->config)->GCCFG |= USB_OTG_GCCFG_NOVBUSSENS;
 #elif defined(STM32_USB_OTG_CID_2x)
-    /* Enable no Vbus Detect enable  and enable 'Power Down Disable */
+    /* clear Vbus Detect Enable */
     _global_regs(usbdev->config)->GCCFG |= USB_OTG_GCCFG_VBDEN;
     /* Force Vbus Detect values and ID detect values to device mode */
     _global_regs(usbdev->config)->GOTGCTL |= USB_OTG_GOTGCTL_VBVALOVAL |
