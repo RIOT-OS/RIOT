@@ -1008,7 +1008,7 @@ static void _usbdev_init(usbdev_t *dev)
     _global_regs(usbdev->config)->GCCFG |= USB_OTG_GCCFG_NOVBUSSENS;
 #elif defined(STM32_USB_OTG_CID_2x)
     /* clear Vbus Detect Enable */
-    _global_regs(usbdev->config)->GCCFG |= USB_OTG_GCCFG_VBDEN;
+    _global_regs(usbdev->config)->GCCFG &= ~USB_OTG_GCCFG_VBDEN;
     /* Force Vbus Detect values and ID detect values to device mode */
     _global_regs(usbdev->config)->GOTGCTL |= USB_OTG_GOTGCTL_VBVALOVAL |
                                              USB_OTG_GOTGCTL_VBVALOEN |
