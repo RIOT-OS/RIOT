@@ -693,15 +693,6 @@ endif
 
 BUILD_FILES += $(ELFFILE) $(BINFILE) $(FLASHFILE) $(HASHFILE)
 
-# when not in CI, aid developers in debugging the firmware with a full memory
-# layout and disassembly provided by the lst file:
-ifneq ($(RIOT_CI_BUILD),1)
-  # as of now, the xtensa tools cannot create lst files
-  ifeq (,$(findstring xtensa,$(PREFIX)))
-    BUILD_FILES += $(LSTFILE)
-  endif
-endif
-
 # variables used to compile and link c++
 ifneq (,$(filter cpp,$(USEMODULE)))
   CPPMIX ?= 1
