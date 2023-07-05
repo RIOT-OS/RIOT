@@ -3,6 +3,7 @@
  *               2016 INRIA
  *               2022 Otto-von-Guericke-Universität Magdeburg
  *               2023 Gerson Fernando Budke
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -24,6 +25,7 @@
  * @author      Torben Petersen <petersen@ibr.cs.tu-bs.de>
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  * @author      Gerson Fernando Budke <nandojve@gmail.com>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -49,32 +51,54 @@ static struct isr_ctx isr_ctx[GPIO_EXT_INT_NUMOF];
 
 static void clear_pending_irqs(uint8_t exti)
 {
+#if defined(EIFR)
     EIFR |= 1 << exti;
+#elif defined(GIFR)
+    GIFR |= 1 << (INTF0 + exti);
+#else
+#  error "No support for AVR with neither EIFR nor GIFR"
+#endif
 }
 
 void gpio_ll_irq_mask(gpio_port_t port, uint8_t pin)
 {
     uint8_t exti = atmega_pin2exti(GPIO_PORT_NUM(port), pin);
+#if defined(EIMSK)
     EIMSK &= ~(1 << exti);
+#elif defined(GICR)
+    GICR &= ~(1 << (INT0 + exti));
+#endif
 }
 
 void gpio_ll_irq_unmask(gpio_port_t port, uint8_t pin)
 {
     uint8_t exti = atmega_pin2exti(GPIO_PORT_NUM(port), pin);
+#if defined(EIMSK)
     EIMSK |= 1 << exti;
+#elif defined(GICR)
+    GICR |= 1 << (INT0 + exti);
+#endif
 }
 
 void gpio_ll_irq_unmask_and_clear(gpio_port_t port, uint8_t pin)
 {
     uint8_t exti = atmega_pin2exti(GPIO_PORT_NUM(port), pin);
     clear_pending_irqs(exti);
+#if defined(EIMSK)
     EIMSK |= 1 << exti;
+#elif defined(GICR)
+    GICR |= 1 << (INT0 + exti);
+#endif
 }
 
 static void set_trigger(uint8_t exti, gpio_irq_trig_t trig)
 {
     exti <<= 1;
+#if defined(EICRA)
     volatile uint8_t *eicr = &EICRA;
+#elif defined(MCUCR)
+    volatile uint8_t *eicr = &MCUCR;
+#endif
 
 #ifdef EICRB
     if (exti >= 8) {
@@ -110,7 +134,11 @@ int gpio_ll_irq(gpio_port_t port, uint8_t pin, gpio_irq_trig_t trig,
     /* setup IRQ */
     set_trigger(exti, trig);
     clear_pending_irqs(exti);
+#if defined(EIMSK)
     EIMSK |= 1 << exti;
+#elif defined(GICR)
+    GICR |= 1 << (INT0 + exti);
+#endif
 
     irq_restore(irq_state);
 
