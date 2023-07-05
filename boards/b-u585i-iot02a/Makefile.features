@@ -5,5 +5,7 @@ CPU_MODEL = stm32u585ai
 FEATURES_PROVIDED += periph_i2c
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
+FEATURES_PROVIDED += periph_usbdev
 
 # Put other features for this board (in alphabetical order)
+FEATURES_PROVIDED += tinyusb_device
