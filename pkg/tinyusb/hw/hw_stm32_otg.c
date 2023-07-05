@@ -32,8 +32,8 @@ static int tinyusb_hw_init_dev(const dwc2_usb_otg_fshs_config_t *conf)
     pm_block(STM32_PM_STOP);
     pm_block(STM32_PM_STANDBY);
 
-#if defined(PWR_CR2_USV) /* on L4 */
-    /* Validate USB Supply */
+#if defined(PWR_CR2_USV)
+    /* on L4: Validate USB Supply */
     PWR->CR2 |= PWR_CR2_USV;
 #endif /* PWR_CR2_USV */
 
@@ -53,7 +53,7 @@ static int tinyusb_hw_init_dev(const dwc2_usb_otg_fshs_config_t *conf)
                 (USB_OTG_GlobalTypeDef *)(conf->periph + USB_OTG_GLOBAL_BASE);
 
 #ifdef USB_OTG_GCCFG_NOVBUSSENS
-    /* Enable no Vbus Detect enable and enable `Power Down Disable` */
+    /* set No Vbus Sensing */
     global_regs->GCCFG |= USB_OTG_GCCFG_NOVBUSSENS;
 #endif
 
