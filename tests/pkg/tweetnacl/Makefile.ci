@@ -6,6 +6,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega256rfr2-xpro \
     atmega328p \
     atmega328p-xplained-mini \
+    atmega8 \
     nucleo-f031k6 \
     nucleo-f042k6 \
     nucleo-l011k4 \
