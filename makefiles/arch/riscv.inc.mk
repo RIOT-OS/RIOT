@@ -35,9 +35,14 @@ TARGET_ARCH_RISCV ?= \
     $(subst -gcc,,\
       $(notdir \
         $(word 1,\
-          $(foreach triple,$(_TRIPLES_TO_TEST),$(shell which $(triple)-gcc 2> /dev/null))))))
+          $(shell which $(addsuffix -gcc,$(_TRIPLES_TO_TEST)) 2> /dev/null)))))
 
 TARGET_ARCH ?= $(TARGET_ARCH_RISCV)
+
+# Convert to a simply expanded variable here, as a recursively expended
+# variable would result in detecting the toolchain each and every time again the
+# toolchain is referenced.
+TARGET_ARCH := $(TARGET_ARCH)
 
 ifeq (,$(TARGET_ARCH))
   $(error No RISC-V toolchain detected. Make sure a RISC-V toolchain is installed.)
