@@ -61,6 +61,13 @@ static_assert((CLOCK_CORECLOCK == MHZ(128)) || CLOCK_CORECLOCK == MHZ(64));
     /* For now, disable the unused network core */
     NRF_RESET_S->NETWORK.FORCEOFF = 1;
 
+#if defined(MODULE_PERIPH_RTT) && (CLOCK_LFCLK==CLOCK_LFCLKSRC_SRC_LFXO)
+    /* Enable P0.00 and P0.01 as XL1/XL2 if LXFO is selected */
+    NRF_P0_S->PIN_CNF[0] &= ~GPIO_PIN_CNF_MCUSEL_Msk;
+    NRF_P0_S->PIN_CNF[0] |= GPIO_PIN_CNF_MCUSEL_Peripheral << GPIO_PIN_CNF_MCUSEL_Pos;
+    NRF_P0_S->PIN_CNF[1] &= ~GPIO_PIN_CNF_MCUSEL_Msk;
+    NRF_P0_S->PIN_CNF[1] |= GPIO_PIN_CNF_MCUSEL_Peripheral << GPIO_PIN_CNF_MCUSEL_Pos;
+#endif
     /* call cortexm default initialization */
     cortexm_init();
 
