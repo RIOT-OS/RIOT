@@ -21,21 +21,15 @@
  *
  * @author      Daniel Prigoshij <prigoshi@ibr.cs.tu-bs.de>
  */
-
-#ifndef SEN5X_H
-#define SEN5X_H
-
-/* Add header includes here */
+#include <stdbool.h>
+#include <stdint.h>
 
 #include "periph/i2c.h"
-#include <stdint.h>
 #include "saul.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/* Declare the API of the driver */
 
 /**
  * @brief   Wrapper for measured values
@@ -170,8 +164,8 @@ void sen5x_read_pm_values(const sen5x_t *dev, sen5x_measurement_t *values);
  * @param[in]    slope          Normalized temperature offset slope
  * @param[in]    time_constant  Time constant in seconds
  */
-void sen5x_set_temperature_offset(const sen5x_t *dev,
-    int16_t temp_offset, int16_t slope, uint16_t time_constant);
+void sen5x_set_temperature_offset(const sen5x_t *dev,int16_t temp_offset,
+                                    int16_t slope, uint16_t time_constant);
 
 /**
  * @brief   Set a custom temperature offset to the ambient temperature
@@ -181,7 +175,8 @@ void sen5x_set_temperature_offset(const sen5x_t *dev,
  * @param[out]    slope          Normalized temperature offset slope
  * @param[out]    time_constant  Time constant in seconds
  */
-void sen5x_get_temperature_offset(const sen5x_t *dev, int16_t *temp_offset, int16_t *slope, uint16_t *time_constant);
+void sen5x_get_temperature_offset(const sen5x_t *dev, int16_t *temp_offset,
+                                    int16_t *slope, uint16_t *time_constant);
 
 /**
  * @brief   Set the parameter for a warm start on the device, to improve initial
@@ -331,5 +326,5 @@ void sen5x_get_voc_state(const sen5x_t *dev, uint8_t *state, uint8_t state_size)
 }
 #endif
 
-#endif /* SEN5X_H */
 /** @} */
+#endif /* SEN5X_H */

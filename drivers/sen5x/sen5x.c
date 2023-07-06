@@ -78,11 +78,11 @@ void sen5x_clean_fan(const sen5x_t *dev)
 
 bool sen5x_data_ready_flag(const sen5x_t *dev)
 {
-    assert(dev && status);
+    assert(dev);
     i2c_acquire(dev->params.i2c_dev);
 
-    bool* status;
-    sen5x_read_data_ready(&status);
+    bool* status = NULL;
+    sen5x_read_data_ready(status);
 
     i2c_release(dev->params.i2c_dev);
     return status;
@@ -117,7 +117,8 @@ void sen5x_read_pm_values(const sen5x_t *dev, sen5x_measurement_t *values)
     i2c_release(dev->params.i2c_dev);
 }
 
-void sen5x_set_temperature_offset(const sen5x_t *dev, int16_t temp_offset, int16_t slope, uint16_t time_constant)
+void sen5x_set_temperature_offset(const sen5x_t *dev, int16_t temp_offset,
+                                    int16_t slope, uint16_t time_constant)
 {
     assert(dev);
     i2c_acquire(dev->params.i2c_dev);
@@ -127,7 +128,8 @@ void sen5x_set_temperature_offset(const sen5x_t *dev, int16_t temp_offset, int16
     i2c_release(dev->params.i2c_dev);
 }
 
-void sen5x_get_temperature_offset(const sen5x_t *dev, int16_t *temp_offset, int16_t *slope, uint16_t *time_constant)
+void sen5x_get_temperature_offset(const sen5x_t *dev, int16_t *temp_offset,
+                                    int16_t *slope, uint16_t *time_constant)
 {
     assert(dev && temp_offset && slope && time_constant);
     i2c_acquire(dev->params.i2c_dev);

@@ -19,16 +19,14 @@
  * @author      Daniel Prigoshij <prigoshi@ibr.cs.tu-bs.de>
  */
 
-#ifndef SEN5X_CONSTANTS_H
-#define SEN5X_CONSTANTS_H
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* define here the addresses, register and constants of the driver */
-
 #ifndef SEN5X_ADRESS_I2C
+/**
+ * @brief     SEN5x I2C address
+ */
 #define SEN5X_ADRESS_I2C            (0x69)
 #endif
 
@@ -36,5 +34,5 @@ extern "C" {
 }
 #endif
 
-#endif /* SEN5X_CONSTANTS_H */
 /** @} */
+#endif /* SEN5X_CONSTANTS_H */
