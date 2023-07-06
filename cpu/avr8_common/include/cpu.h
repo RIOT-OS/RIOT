@@ -48,6 +48,8 @@ extern "C"
 {
 #endif
 
+extern uint8_t avr8_isr_stack[];
+
 /**
  * @name    BOD monitoring when CPU is on sleep
  * @{
@@ -105,6 +107,13 @@ static inline int avr8_is_uart_tx_pending(void)
     return avr8_state_uart;
 }
 
+/*
+ * The AVR-8 uses a shared stack only for process interrupts and switch context.
+ */
+#ifndef ISR_STACKSIZE
+#define ISR_STACKSIZE                   (512)
+#endif
+
 /**
  * @brief Enter ISR routine
  *
@@ -131,13 +140,13 @@ static inline void avr8_isr_prolog(void)
         "cli                                     \n\t"
 #endif
 #if (AVR8_STATE_IRQ_USE_SRAM)
-        "lds    r30, %[state]                    \n\t"
-        "subi   r30, 0xFF                        \n\t"
-        "sts    %[state], r30                    \n\t"
+        "lds  r31, %[state]                      \n\t"
+        "subi r31, 0xFF                          \n\t"
+        "sts  %[state], r31                      \n\t"
 #else
-        "in     r30, %[state]                    \n\t"
-        "subi   r30, 0xFF                        \n\t"
-        "out    %[state], r30                    \n\t"
+        "in   r31, %[state]                      \n\t"
+        "subi r31, 0xFF                          \n\t"
+        "out  %[state], r31                      \n\t"
 #endif
 #if defined(CPU_ATXMEGA)
         "sei                                     \n\t"
@@ -167,12 +176,35 @@ static inline void avr8_isr_prolog(void)
         "push r25                                \n\t"
         "push r26                                \n\t"
         "push r27                                \n\t"
+    /*
+     * Load irq_stack
+     */
+#if defined(CPU_ATXMEGA)
+        "cli                                     \n\t"
+#endif
+        "cpi  r31, 1                             \n\t"
+        "brne skip_save_if_nested_isr_%=         \n\t"
+        "ldi  r30, lo8(%[irq_stack])             \n\t"
+        "ldi  r31, hi8(%[irq_stack])             \n\t"
+        "in   r24, __SP_L__                      \n\t"
+        "st   z, r24                             \n\t"
+        "in   r24, __SP_H__                      \n\t"
+        "st   -z, r24                            \n\t"
+        "subi r30, 1                             \n\t"
+        "sbci r31, 0                             \n\t"
+        "out  __SP_L__, r30                      \n\t"
+        "out  __SP_H__, r31                      \n\t"
+        "skip_save_if_nested_isr_%=:             \n\t"
+#if defined(CPU_ATXMEGA)
+        "sei                                     \n\t"
+#endif
         : /* no output */
 #if (AVR8_STATE_IRQ_USE_SRAM)
-        : [state] "" (avr8_state_irq_count)
+        : [state] "" (avr8_state_irq_count),
 #else
-        : [state] "I" (_SFR_IO_ADDR(avr8_state_irq_count))
+        : [state] "I" (_SFR_IO_ADDR(avr8_state_irq_count)),
 #endif
+          [irq_stack] "" (avr8_isr_stack + ISR_STACKSIZE - 1)
         : "memory"
     );
 }

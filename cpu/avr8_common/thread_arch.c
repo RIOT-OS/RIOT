@@ -325,24 +325,33 @@ void avr8_isr_epilog(void)
      * Note:
      * - ATmega may be affected when IRQ is re-enabled on ISR body by the user.
      */
-        "cli                               \n\t"
+        "cli                                     \n\t"
 #if AVR8_STATE_IRQ_USE_SRAM
-        "lds    r30, %[state]              \n\t"
-        "subi   r30, 0x01                  \n\t"
-        "sts    %[state], r30              \n\t"
+        "lds  %[isr_sts], %[state]               \n\t"
+        "subi %[isr_sts], 0x01                   \n\t"
+        "sts  %[state], %[isr_sts]               \n\t"
 #else
-        "in     r30, %[state]              \n\t"
-        "subi   r30, 0x01                  \n\t"
-        "out    %[state], r30              \n\t"
+        "in   %[isr_sts], %[state]               \n\t"
+        "subi %[isr_sts], 0x01                   \n\t"
+        "out  %[state], %[isr_sts]               \n\t"
 #endif
-        "mov    %[isr_sts], r30            \n\t"
+    /**
+     * Restore thread stack
+     */
+        "cpse %[isr_sts], r1                     \n\t"
+        "rjmp skip_restore_if_nested_isr         \n\t"
+        "pop  r31                                \n\t"
+        "pop  r30                                \n\t"
+        "out  __SP_L__, r30                      \n\t"
+        "out  __SP_H__, r31                      \n\t"
+        "skip_restore_if_nested_isr:             \n\t"
         : [isr_sts] "=r" (isr_sts)
 #if (AVR8_STATE_IRQ_USE_SRAM)
         : [state] "" (avr8_state_irq_count)
 #else
         : [state] "I" (_SFR_IO_ADDR(avr8_state_irq_count))
 #endif
-        : "memory"
+        : "r30", "r31", "memory"
     );
 
     /* Branch Tests - critical section.
@@ -385,9 +394,9 @@ void avr8_isr_epilog(void)
      */
     __asm__ volatile (
 #if defined(CPU_ATXMEGA)
-        "sei                               \n\t"
+        "sei                                     \n\t"
 #endif
-        "reti                              \n\t"
+        "reti                                    \n\t"
         : : : "memory"
     );
 }
