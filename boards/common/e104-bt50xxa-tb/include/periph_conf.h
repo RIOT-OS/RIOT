@@ -34,7 +34,12 @@ extern "C" {
  * @{
  */
 #define CLOCK_HFCLK         (1)             /* external crystal */
-#define CLOCK_LFCLK         (0)             /* internal RC oscillator */
+
+/* LFCLK Source clock selection:*/
+/* - CLOCK_LFCLKSRC_SRC_RC: internal RC oscillator
+ * - CLOCK_LFCLKSRC_SRC_Xtal: 32.768 kHz crystal
+ * - CLOCK_LFCLKSRC_SRC_Synth: derived from HFCLK */
+#define CLOCK_LFCLK         (CLOCK_LFCLKSRC_SRC_RC) /**< LFCLK Source */
 /** @} */
 
 /**

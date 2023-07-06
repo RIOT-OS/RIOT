@@ -745,10 +745,15 @@ static void _usbdev_init(usbdev_t *dev)
     pm_block(STM32_PM_STOP);
     pm_block(STM32_PM_STANDBY);
 
-#if defined(PWR_CR2_USV) /* on L4 */
-    /* Validate USB Supply */
+#if defined(PWR_CR2_USV)
+    /*  on L4: Validate USB Supply */
     PWR->CR2 |= PWR_CR2_USV;
 #endif /* PWR_CR2_USV */
+
+#if defined(PWR_SVMCR_USV)
+    /* on U5: Validate USB Supply */
+    PWR->SVMCR |= PWR_SVMCR_USV;
+#endif /* PWR_SVMCR_USV */
 
     /* Enable the clock to the peripheral */
     periph_clk_en(conf->ahb, conf->rcc_mask);
@@ -1004,11 +1009,11 @@ static void _usbdev_init(usbdev_t *dev)
 
     /* Disable Vbus detection and force the pull-up on, GCCFG is STM32 specific */
 #if defined(STM32_USB_OTG_CID_1x)
-    /* Enable no Vbus sensing */
+    /* set No Vbus Sensing */
     _global_regs(usbdev->config)->GCCFG |= USB_OTG_GCCFG_NOVBUSSENS;
 #elif defined(STM32_USB_OTG_CID_2x)
-    /* Enable no Vbus Detect enable  and enable 'Power Down Disable */
-    _global_regs(usbdev->config)->GCCFG |= USB_OTG_GCCFG_VBDEN;
+    /* clear Vbus Detect Enable */
+    _global_regs(usbdev->config)->GCCFG &= ~USB_OTG_GCCFG_VBDEN;
     /* Force Vbus Detect values and ID detect values to device mode */
     _global_regs(usbdev->config)->GOTGCTL |= USB_OTG_GOTGCTL_VBVALOVAL |
                                              USB_OTG_GOTGCTL_VBVALOEN |

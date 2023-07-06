@@ -31,7 +31,7 @@ extern "C" {
 #define CLOCK_CORECLOCK     MHZ(128)
 
 /**
- * @name    HF Clock configuration
+ * @name    Clock configuration
  *
  *
  * @{
@@ -40,7 +40,12 @@ extern "C" {
  /* CLOCK_HFCLKSRC_SRC_HFXO to use external 32MHz crystal
   *   CLOCK_HFCLKSRC_SRC_HFINT to use internal crystal */
 #define CLOCK_HFCLK         (CLOCK_HFCLKSRC_SRC_HFXO) /**< HFCLK Source selection */
-#define CLOCK_LFCLK         (3) /**< LFCLK Source selection */
+
+/* LFCLK Source clock selection:*/
+/* - CLOCK_LFCLKSRC_SRC_LFRC: 32.768 kHz RC oscillator
+ * - CLOCK_LFCLKSRC_SRC_LFXO: 32.768 kHz crystal oscillator
+ * - CLOCK_LFCLKSRC_SRC_LFSYNT: 32.768 kHz synthesized from HFCLK*/
+#define CLOCK_LFCLK         (CLOCK_LFCLKSRC_SRC_LFXO) /**< LFCLK Source */
 /** @} */
 
 /**

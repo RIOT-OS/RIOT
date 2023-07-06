@@ -76,6 +76,8 @@ $(call target-export-variables,$(VECTORS_O),CPU_LINE)
 # Add this define to skip the inclusion of the system_stm32xxxx.h header files
 # which are only used for STM32 system includes and not of interest for RIOT.
 CFLAGS += -D__SYSTEM_STM32$(call uppercase,$(CPU_FAM))XX_H
+# C0, G0, H7, L5 and U5 use SYSTEM_STM32..XX_H instead
+CFLAGS += -DSYSTEM_STM32$(call uppercase,$(CPU_FAM))XX_H
 
 ifneq (,$(filter STM32F030x4 STM32MP157Cxx,$(CPU_LINE)))
   STM32CMSIS_INCLUDE_DIR = $(RIOTCPU)/stm32/include/vendor/cmsis/$(CPU_FAM)/Include
