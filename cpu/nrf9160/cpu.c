@@ -26,6 +26,14 @@
 #include "stdio_base.h"
 
 /**
+ * @brief    LFCLK Clock selection configuration guard
+*/
+#if ((CLOCK_LFCLK != CLOCK_LFCLKSRC_SRC_LFRC) && \
+     (CLOCK_LFCLK != CLOCK_LFCLKSRC_SRC_LFXO))
+#error "LFCLK init: CLOCK_LFCLK has invalid value"
+#endif
+
+/**
  * @brief   Initialize the CPU, set IRQ priorities
  */
 void cpu_init(void)
