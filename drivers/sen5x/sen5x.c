@@ -78,17 +78,17 @@ void sen5x_clean_fan(const sen5x_t *dev)
 
 bool sen5x_data_ready_flag(const sen5x_t *dev)
 {
-    assert(dev && status);
+    assert(dev);
     i2c_acquire(dev->params.i2c_dev);
 
-    bool* status;
-    sen5x_read_data_ready(&status);
+    bool* status = NULL;
+    sen5x_read_data_ready(status);
 
     i2c_release(dev->params.i2c_dev);
     return status;
 }
 
-void sen5x_read_values(sen5x_t *dev ,sen5x_measurement_t *values) 
+void sen5x_read_values(const sen5x_t *dev ,sen5x_measurement_t *values) 
 {
     assert(dev && values);
     i2c_acquire(dev->params.i2c_dev);

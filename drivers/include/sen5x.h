@@ -6,6 +6,9 @@
  * directory for more details.
  */
 
+ #ifndef SEN5X_H
+ #define SEN5X_H
+
 /**
  * @defgroup    drivers_sen5x Sensirion Embedded I2C SEN5x Driver
  * @ingroup     drivers_sensors
@@ -19,11 +22,6 @@
  * @author      Daniel Prigoshij <prigoshi@ibr.cs.tu-bs.de>
  */
 
-#ifndef SEN5X_H
-#define SEN5X_H
-
-/* Add header includes here */
-
 #include "periph/i2c.h"
 #include <stdint.h>
 #include "saul.h"
@@ -31,8 +29,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/* Declare the API of the driver */
 
 /**
  * @brief   Wrapper for measured values
@@ -302,5 +298,5 @@ void sen5x_get_voc_state(const sen5x_t *dev, uint8_t *state, uint8_t state_size)
 }
 #endif
 
-#endif /* SEN5X_H */
 /** @} */
+#endif /* SEN5X_H */
