@@ -105,8 +105,8 @@ static usbus_string_t *_get_descriptor(usbus_t *usbus, uint16_t idx)
 
 static int _req_status(usbus_t *usbus)
 {
-    /* Signal self powered */
-    uint16_t status = (CONFIG_USB_SELF_POWERED) ? 1 : 0;
+    /* Signal self powered and remote wakeup status */
+    uint16_t status = (CONFIG_USB_SELF_POWERED) ? 1 : 0 | usbus->wakeup_enabled << 1;
     usbus_control_slicer_put_bytes(usbus, (uint8_t*)&status, sizeof(status));
     return sizeof(status);
 }
@@ -219,6 +219,24 @@ static int _req_descriptor(usbus_t *usbus, usb_setup_t *pkt)
     }
 }
 
+static int _req_dev_feature(usbus_t *usbus, uint16_t feature, bool enable)
+{
+    int res = -1;
+
+    switch (feature) {
+        case USB_FEATURE_DEVICE_REMOTE_WAKEUP:
+            if (CONFIG_USB_REM_WAKEUP) {
+                usbus->wakeup_enabled = enable;
+                res = 1;
+            }
+            break;
+        default:
+            DEBUG("usbus: unknown device feature request: %u\n", feature);
+            break;
+    }
+    return res;
+}
+
 static int _recv_dev_setup(usbus_t *usbus, usb_setup_t *pkt)
 {
     int res = -1;
@@ -253,6 +271,12 @@ static int _recv_dev_setup(usbus_t *usbus, usb_setup_t *pkt)
                 usbus->state = USBUS_STATE_CONFIGURED;
                 _activate_endpoints(usbus);
                 res = 1;
+                break;
+            case USB_SETUP_REQ_SET_FEATURE:
+                res = _req_dev_feature(usbus, pkt->value, true);
+                break;
+            case USB_SETUP_REQ_CLEAR_FEATURE:
+                res = _req_dev_feature(usbus, pkt->value, false);
                 break;
             default:
                 DEBUG("usbus: Unknown write request %u\n", pkt->request);
@@ -480,6 +504,7 @@ static void _handler_ep0_event(usbus_t *usbus, usbus_handler_t *handler,
     switch (event) {
         case USBUS_EVENT_USB_RESET:
             DEBUG("usbus_control: Reset event triggered\n");
+            usbus->wakeup_enabled = false;
             ep0_handler->control_request_state = USBUS_CONTROL_REQUEST_STATE_READY;
             _usbus_config_ep0(ep0_handler);
             break;
