@@ -7,6 +7,14 @@ ifneq (,$(filter periph_i2c,$(USEMODULE)))
   endif
 endif
 
+# Select the specific implementation for `periph_pwm`
+# nRF51 has its own PWM driver variant in its periph driver folder
+ifneq (,$(filter periph_pwm,$(USEMODULE)))
+  ifneq (,$(filter $(CPU_FAM),nrf52 nrf53 nrf9160))
+    SRC += pwm_nrfxx.c
+  endif
+endif
+
 # Select the specific implementation for `periph_spi`
 ifneq (,$(filter periph_spi,$(USEMODULE)))
   ifneq (,$(filter $(CPU_FAM),nrf52 nrf9160))
