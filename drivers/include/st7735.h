@@ -28,6 +28,10 @@
  * when strictly necessary. This option will slow down the driver as it
  * certainly can't use DMA anymore, every short has to be converted before
  * transfer.
+ *
+ * @note The driver can also be used for the ST7789 which is compatible with
+ *       the ST7735 but supports higher resolutions. Just enable the module
+ *       `st7789` instead of `st7735` if your board uses the ST7789.
  */
 
 
