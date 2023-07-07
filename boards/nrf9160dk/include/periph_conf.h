@@ -116,7 +116,7 @@ static const uart_conf_t uart_config[] = {
 #define UART_0_ISR          (isr_uarte0_spim0_spis0_twim0_twis0) /**< UART0_IRQ */
 #define UART_1_ISR          (isr_uarte1_spim1_spis1_twim1_twis1) /**< UART1_IRQ */
 
-#define UART_NUMOF          ARRAY_SIZE(uart_config) /**< UART confgiguration NUMOF */
+#define UART_NUMOF          ARRAY_SIZE(uart_config) /**< UART configuration NUMOF */
 /** @} */
 
 /**
@@ -135,6 +135,25 @@ static const uart_conf_t uart_config[] = {
 #ifndef RTT_FREQUENCY
 #define RTT_FREQUENCY       (1024U)              /**< in Hz */
 #endif
+/** @} */
+
+/**
+ * @name   PWM configuration
+ * @{
+ */
+static const pwm_conf_t pwm_config[] = {
+    {
+        .dev = NRF_PWM0_S,
+        .pin = {
+                    LED0_PIN,
+                    LED1_PIN,
+                    LED2_PIN,
+                    LED3_PIN
+               }
+    },
+};
+
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
 /** @} */
 
 #ifdef __cplusplus
