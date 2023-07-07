@@ -1035,13 +1035,13 @@ static void test_nanocoap__add_get_proxy_uri(void)
  */
 static void test_nanocoap__token_length_over_limit(void)
 {
-    /* RFC7252 states that TKL must be within 0-8:
-     * "Lengths 9-15 are reserved, MUST NOT be sent,
-     * and MUST be processed as a message format error."
+    /* RFC8974 states that TKL must not be 15:
+     * 15: Reserved. This value MUST NOT be sent and MUST be processed
+     * as a message-format error.
      */
     uint16_t msgid = 0xABCD;
     uint8_t buf_invalid[] = {
-        0x49, 0x01, 0xAB, 0xCD,
+        0x4F, 0x01, 0xAB, 0xCD,
         0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99
     };
     uint8_t buf_valid[] = {
@@ -1059,9 +1059,62 @@ static void test_nanocoap__token_length_over_limit(void)
     TEST_ASSERT_EQUAL_INT(8, coap_get_token_len(&pkt));
     TEST_ASSERT_EQUAL_INT(0, pkt.payload_len);
 
-    /* Invalid packet (TKL = 9) */
+    /* Invalid packet (TKL = 15) */
     res = coap_parse(&pkt, buf_invalid, sizeof(buf_invalid));
     TEST_ASSERT_EQUAL_INT(-EBADMSG, res);
+}
+
+/*
+ * Verifies that coap_parse() recognizes 8 bit extended token length
+ */
+static void test_nanocoap__token_length_ext_16(void)
+{
+    const char *token = "0123456789ABCDEF";
+
+    uint8_t buf[32];
+    coap_hdr_t *hdr = (void *)buf;
+
+    TEST_ASSERT_EQUAL_INT(21, coap_build_hdr(hdr, COAP_TYPE_CON,
+                                             (void *)token, strlen(token),
+                                             COAP_CODE_204, 23));
+    coap_pkt_t pkt;
+    int res = coap_parse(&pkt, buf, 21);
+
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(204, coap_get_code(&pkt));
+    TEST_ASSERT_EQUAL_INT(23, coap_get_id(&pkt));
+    TEST_ASSERT_EQUAL_INT(strlen(token), coap_get_token_len(&pkt));
+    TEST_ASSERT_EQUAL_INT(0, memcmp(coap_get_token(&pkt), token, strlen(token)));
+    TEST_ASSERT_EQUAL_INT(0, pkt.payload_len);
+    TEST_ASSERT_EQUAL_INT(13, hdr->ver_t_tkl & 0xf);
+}
+
+/*
+ * Verifies that coap_parse() recognizes 16 bit extended token length
+ */
+static void test_nanocoap__token_length_ext_269(void)
+{
+    const char *token = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr,"
+                        "sed diam nonumy eirmod tempor invidunt ut labore et dolore"
+                        "magna aliquyam erat, sed diam voluptua. At vero eos et accusam"
+                        "et justo duo dolores et ea rebum. Stet clita kasd gubergren,"
+                        "no sea takimata sanctus est Lore.";
+    uint8_t buf[280];
+    coap_hdr_t *hdr = (void *)buf;
+
+    TEST_ASSERT_EQUAL_INT(275, coap_build_hdr(hdr, COAP_TYPE_CON,
+                                             (void *)token, strlen(token),
+                                             COAP_CODE_204, 23));
+    coap_pkt_t pkt;
+    int res = coap_parse(&pkt, buf, 275);
+
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(204, coap_get_code(&pkt));
+    TEST_ASSERT_EQUAL_INT(23, coap_get_id(&pkt));
+    TEST_ASSERT_EQUAL_INT(strlen(token), coap_get_token_len(&pkt));
+    TEST_ASSERT_EQUAL_INT(0, memcmp(coap_get_token(&pkt), token, strlen(token)));
+    TEST_ASSERT_EQUAL_INT(0, pkt.payload_len);
+    TEST_ASSERT_EQUAL_INT(14, hdr->ver_t_tkl & 0xf);
 }
 
 Test *tests_nanocoap_tests(void)
@@ -1100,6 +1153,8 @@ Test *tests_nanocoap_tests(void)
         new_TestFixture(test_nanocoap__add_path_unterminated_string),
         new_TestFixture(test_nanocoap__add_get_proxy_uri),
         new_TestFixture(test_nanocoap__token_length_over_limit),
+        new_TestFixture(test_nanocoap__token_length_ext_16),
+        new_TestFixture(test_nanocoap__token_length_ext_269),
     };
 
     EMB_UNIT_TESTCALLER(nanocoap_tests, NULL, NULL, fixtures);
