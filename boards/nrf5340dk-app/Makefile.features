@@ -5,3 +5,4 @@ CPU = nrf53
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
 FEATURES_PROVIDED += periph_uart_hw_fc
+FEATURES_PROVIDED += periph_usbdev
