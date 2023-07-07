@@ -129,16 +129,16 @@ though it **can vary** from board to board.
 
 Device                  | Signal | Pin    | Symbol      | Remarks
 :-----------------------|:------:|:-------|:-----------:|:---------------------------
-`SPI_HOST0`/`SPI_HOST1` | SPICS0 | GPIO14 | - | reserved for flash and PSRAM
-`SPI_HOST0`/`SPI_HOST1` | SPICLK | GPIO15 | - | reserved for flash and PSRAM
-`SPI_HOST0`/`SPI_HOST1` | SPID   | GPIO16 | - | reserved for flash and PSRAM
-`SPI_HOST0`/`SPI_HOST1` | SPIQ   | GPIO17 | - | reserved for flash and PSRAM
-`SPI_HOST0`/`SPI_HOST1` | SPIHD  | GPIO12 | - | reserved for flash and PSRAM (only in `qio` or `qout` mode)
-`SPI_HOST0`/`SPI_HOST1` | SPIWP  | GPIO13 | - | reserved for flash and PSRAM (only in `qio` or `qout` mode)
-`SPI_HOST2` (`FSPI`)    | SCK    | GPIO6  |`#SPI0_SCK`  | can be used
-`SPI_HOST2` (`FSPI`)    | MOSI   | GPIO7  |`#SPI0_MOSI` | can be used
-`SPI_HOST2` (`FSPI`)    | MISO   | GPIO2  |`#SPI0_MISO` | can be used
-`SPI_HOST2` (`FSPI`)    | CS0    | GPIO10 |`#SPI0_CS0`  | can be used
+`SPI0_HOST`/`SPI1_HOST` | SPICS0 | GPIO14 | - | reserved for flash and PSRAM
+`SPI0_HOST`/`SPI1_HOST` | SPICLK | GPIO15 | - | reserved for flash and PSRAM
+`SPI0_HOST`/`SPI1_HOST` | SPID   | GPIO16 | - | reserved for flash and PSRAM
+`SPI0_HOST`/`SPI1_HOST` | SPIQ   | GPIO17 | - | reserved for flash and PSRAM
+`SPI0_HOST`/`SPI1_HOST` | SPIHD  | GPIO12 | - | reserved for flash and PSRAM (only in `qio` or `qout` mode)
+`SPI0_HOST`/`SPI1_HOST` | SPIWP  | GPIO13 | - | reserved for flash and PSRAM (only in `qio` or `qout` mode)
+`SPI2_HOST` (`FSPI`)    | SCK    | GPIO6  |`#SPI0_SCK`  | can be used
+`SPI2_HOST` (`FSPI`)    | MOSI   | GPIO7  |`#SPI0_MOSI` | can be used
+`SPI2_HOST` (`FSPI`)    | MISO   | GPIO2  |`#SPI0_MISO` | can be used
+`SPI2_HOST` (`FSPI`)    | CS0    | GPIO10 |`#SPI0_CS0`  | can be used
 
 </center><br>
 
