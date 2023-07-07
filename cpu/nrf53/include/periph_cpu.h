@@ -26,6 +26,15 @@
 extern "C" {
 #endif
 
+/**
+ * @brief    Peripheral clocks speed
+ */
+#define PERIPH_CLOCK_1MHZ   MHZ(1)          /**<  1MHz peripheral clock */
+#define PERIPH_CLOCK_16MHZ  MHZ(16)         /**< 16MHz peripheral clock */
+#define PERIPH_CLOCK_32MHZ  MHZ(32)         /**< 32MHz peripheral clock */
+#define PERIPH_CLOCK_64MHZ  MHZ(64)         /**< 64MHz peripheral clock */
+#define PERIPH_CLOCK        PERIPH_CLOCK_16MHZ /**< For driver compatibility */
+
 #ifndef DOXYGEN
 /**
  * @brief Wrapper to fix differences between nRF families vendor files
