@@ -22,6 +22,16 @@ config HAVE_ST7735
     help
       Indicates that an ST7735 display is present.
 
+config MODULE_ST7789
+    bool "ST7789 display driver"
+    select MODULE_ST7735
+
+config HAVE_ST7789
+    bool
+    select MODULE_ST7789 if MODULE_DISP_DEV
+    help
+      Indicates that an ST7789 display is present.
+
 menuconfig KCONFIG_USEMODULE_ST7735
     bool "Configure ST7735 driver"
     depends on USEMODULE_ST7735
