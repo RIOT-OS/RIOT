@@ -93,6 +93,25 @@ static const uart_conf_t uart_config[] = {
 #endif
 /** @} */
 
+/**
+ * @name   PWM configuration
+ * @{
+ */
+static const pwm_conf_t pwm_config[] = {
+    {
+        .dev = NRF_PWM0_S,
+        .pin = {
+                    LED0_PIN,
+                    LED1_PIN,
+                    LED2_PIN,
+                    LED3_PIN
+               }
+    },
+};
+
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
