@@ -147,7 +147,7 @@ extern "C" {
 #define SPI0_SCK    GPIO36  /**< FSPICLK used as signal `OLED_CLK` */
 #endif
 #ifndef SPI0_MISO
-#define SPI0_MISO   GPIO37  /**< FSPIQ used as Display signal `OLED_MISO` */
+#define SPI0_MISO   GPIO9   /**< FSPIHD dummy (not broken out), GPIO37 is used as DCX */
 #endif
 #ifndef SPI0_MOSI
 #define SPI0_MOSI   GPIO35  /**< FSPID used as Display signal `OLED_MOSI` */

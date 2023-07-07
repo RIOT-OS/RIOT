@@ -66,7 +66,12 @@ static uint8_t _st7735_calc_vml(int16_t vcoml)
 
 static int _init(lcd_t *dev, const lcd_params_t *params)
 {
-    assert(params->lines <= 162);
+    if (IS_USED(MODULE_ST7789)) {
+        assert(params->lines <= 320);
+    }
+    else {
+        assert(params->lines <= 162);
+    }
     dev->params = params;
     uint8_t command_params[4] = { 0 };
 

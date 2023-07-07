@@ -38,6 +38,11 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+/* Compatibility wrapper for nRF53 */
+#ifdef NRF_USBD_S
+#define NRF_USBD NRF_USBD_S
+#endif
+
 static nrfusb_t _usbdevs[NRF_USB_NUM_PERIPH];
 
 static void _init(usbdev_t *usbdev);
