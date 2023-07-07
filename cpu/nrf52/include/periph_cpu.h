@@ -280,16 +280,6 @@ void nrf5x_spi_acquire(NRF_SPIM_Type *bus, spi_twi_irq_cb_t cb, void *arg);
  */
 void nrf5x_spi_release(NRF_SPIM_Type *bus);
 
-/**
- * @brief USBDEV buffers must be word aligned because of DMA restrictions
- */
-#define USBDEV_CPU_DMA_ALIGNMENT       (4)
-
-/**
- * @brief USBDEV buffer instantiation requirement
- */
-#define USBDEV_CPU_DMA_REQUIREMENTS    __attribute__((aligned(USBDEV_CPU_DMA_ALIGNMENT)))
-
 #ifdef __cplusplus
 }
 #endif

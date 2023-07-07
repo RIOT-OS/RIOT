@@ -302,6 +302,16 @@ typedef struct {
 
 #endif /* ndef CPU_MODEL_NRF52832XXAA && ndef CPU_FAM_NRF51 */
 
+/**
+ * @brief USBDEV buffers must be word aligned because of DMA restrictions
+ */
+#define USBDEV_CPU_DMA_ALIGNMENT       (4)
+
+/**
+ * @brief USBDEV buffer instantiation requirement
+ */
+#define USBDEV_CPU_DMA_REQUIREMENTS    __attribute__((aligned(USBDEV_CPU_DMA_ALIGNMENT)))
+
 #ifdef __cplusplus
 }
 #endif
