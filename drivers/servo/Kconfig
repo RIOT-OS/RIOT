@@ -26,6 +26,7 @@ config MODULE_SERVO_PWM
     # PWM prescaler on nRF5x MCUs cannot generate a 50 Hz signal
     depends on !HAS_CPU_NRF51
     depends on !HAS_CPU_NRF52
+    depends on !HAS_CPU_NRF53
     depends on !HAS_CPU_NRF9160
     select MODULE_PERIPH_PWM
     select SERVO_DRIVER_BACKEND
