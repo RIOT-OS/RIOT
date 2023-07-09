@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 OTA keys S.A.
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,6 +17,7 @@
  * @author      Toon Stegen <toon.stegen@altran.com>
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Wouter Symons <wosym@airsantelmo.com>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  * @}
  */
 
@@ -107,6 +109,7 @@ void candev_mcp2515_init(candev_mcp2515_t *dev,
     }
 
     dev->conf = conf;
+    dev->spi_clk = spi_get_clk(conf->spi, conf->spi_freq);
 }
 
 static void _mcp2515_irq_handler(void *arg)
