@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 Koen Zandberg <koen@bergzand.net>
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Default configuration for ili9341
  *
  * @author      Koen Zandberg <koen@bergzand.net>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef ILI9341_PARAMS_H
@@ -21,6 +23,7 @@
 
 #include "board.h"
 #include "lcd.h"
+#include "macros/units.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,7 +38,7 @@ extern "C" {
 #define ILI9341_PARAM_SPI          SPI_DEV(0)
 #endif
 #ifndef ILI9341_PARAM_SPI_CLK
-#define ILI9341_PARAM_SPI_CLK      SPI_CLK_5MHZ
+#define ILI9341_PARAM_SPI_CLK      MHZ(10) /* 1 / 100ns (min serial clock cycle) */
 #endif
 #ifndef ILI9341_PARAM_CS
 #define ILI9341_PARAM_CS           GPIO_PIN(2, 2)
@@ -76,7 +79,7 @@ extern "C" {
  */
 #ifndef ILI9341_PARAMS
 #define ILI9341_PARAMS              { .spi = ILI9341_PARAM_SPI, \
-                                      .spi_clk = ILI9341_PARAM_SPI_CLK, \
+                                      .spi_freq = ILI9341_PARAM_SPI_CLK, \
                                       .spi_mode = ILI9341_PARAM_SPI_MODE, \
                                       .cs_pin = ILI9341_PARAM_CS, \
                                       .dcx_pin = ILI9341_PARAM_DCX, \
