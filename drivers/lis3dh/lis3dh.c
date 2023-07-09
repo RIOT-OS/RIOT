@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2015 Eistec AB
  *               2016 Freie Universität Berlin
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,6 +17,7 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #include <stddef.h>
@@ -30,7 +32,8 @@
 
 #define DEV_SPI        (dev->params.spi)
 #define DEV_CS         (dev->params.cs)
-#define DEV_CLK        (dev->params.clk)
+#define DEV_CLK        (dev->spi_clk)
+#define DEV_FREQ       (dev->params.freq)
 #define DEV_SCALE      (dev->params.scale)
 
 static inline int lis3dh_write_bits(const lis3dh_t *dev, const uint8_t reg,
@@ -43,6 +46,7 @@ static int lis3dh_read_regs(const lis3dh_t *dev, const uint8_t reg,
 int lis3dh_init(lis3dh_t *dev, const lis3dh_params_t *params)
 {
     dev->params = *params;
+    DEV_CLK = spi_get_clk(DEV_SPI, DEV_FREQ);
 
     uint8_t test;
 
