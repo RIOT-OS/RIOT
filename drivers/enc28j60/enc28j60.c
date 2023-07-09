@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Freie Universität Berlin
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Implementation of ENC28J60 driver interfaces
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -38,6 +40,7 @@
 #define CS_PIN          (dev->p.cs_pin)
 #define INT_PIN         (dev->p.int_pin)
 #define RST_PIN         (dev->p.rst_pin)
+#define SPI_CLK         (dev->p.spi_clk)
 /**
  * @brief   Amount of time to hold the reset pin low on reset
  */
@@ -48,14 +51,6 @@
  *          initialization
  */
 #define STARTUP_TIMEOUT             (1000)
-
-/**
- * @brief   Set SPI speed fixed to 10MHz
- *
- * The SPI speed is set to a fixed value, as it must be > 8MHz (see the devices
- * errata sheet).
- */
-#define SPI_CLK                     SPI_CLK_10MHZ
 
 /**
  * @brief   The devices built-in buffer size
@@ -565,6 +560,14 @@ void enc28j60_setup(enc28j60_t *dev, const enc28j60_params_t *params, uint8_t in
 {
     dev->netdev.driver = &netdev_driver_enc28j60;
     dev->p = *params;
+
+    /* compute the SPI clk configuration */
+    SPI_CLK = spi_get_clk(SPI_BUS, dev->p.spi_freq);
+    /* When the SPI clock from the host microcontroller is run at frequencies of
+     * less than 8 MHz, reading or writing to the MAC registers may be
+     * unreliable. (See errata sheet) */
+    assert(spi_get_freq(SPI_BUS, SPI_CLK) >= (int32_t)MHZ(8));
+
     mutex_init(&dev->lock);
     dev->tx_time = 0;
 
