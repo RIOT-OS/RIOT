@@ -2,6 +2,7 @@
  * Copyright (C) 2016 Kees Bakker, SODAQ
  *               2017 Inria
  *               2018 Freie Universität Berlin
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,6 +19,7 @@
  * @author      Kees Bakker <kees@sodaq.com>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef BMX280_PARAMS_H
@@ -25,6 +27,7 @@
 
 #include "board.h"
 #include "bmx280.h"
+#include "macros/units.h"
 #include "saul_reg.h"
 
 #ifdef __cplusplus
@@ -41,7 +44,7 @@ extern "C" {
 #define BMX280_PARAM_SPI            SPI_DEV(0)
 #endif
 #ifndef BMX280_PARAM_CLK
-#define BMX280_PARAM_CLK            SPI_CLK_5MHZ
+#define BMX280_PARAM_CLK            MHZ(10)
 #endif
 #ifndef BMX280_PARAM_CS
 #define BMX280_PARAM_CS             GPIO_PIN(0, 0)
@@ -70,7 +73,7 @@ extern "C" {
 #define BMX280_PARAMS                       \
     {                                       \
         .spi = BMX280_PARAM_SPI,            \
-        .clk = BMX280_PARAM_CLK,            \
+        .freq = BMX280_PARAM_CLK,           \
         .cs  = BMX280_PARAM_CS,             \
         BMX280_PARAM_MISC                   \
     }

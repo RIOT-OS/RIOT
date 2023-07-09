@@ -2,6 +2,7 @@
  * Copyright (C) 2016 Kees Bakker, SODAQ
  *               2017 Inria
  *               2018 Freie Universität Berlin
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -17,6 +18,7 @@
  *
  * @author      Kees Bakker <kees@sodaq.com>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -238,6 +240,8 @@ int bmx280_init(bmx280_t *dev, const bmx280_params_t *params)
         DEBUG("[bmx280] error: unable to configure chip the select pin\n");
         return BMX280_ERR_BUS;
     }
+    /* compute the SPI clk configuration */
+    dev->params.clk = spi_get_clk(dev->params.spi, dev->params.freq);
 #endif
 
     /* acquire bus bus, this also tests the bus parameters in SPI mode */
