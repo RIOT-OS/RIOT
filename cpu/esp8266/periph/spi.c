@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2022 Gunar Schorcht
- *               2021-2023 Hugues Larrive
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -278,7 +278,9 @@ spi_clk_t IRAM_ATTR spi_get_clk(spi_t bus, uint32_t freq)
 int32_t IRAM_ATTR spi_get_freq(spi_t bus, spi_clk_t clk)
 {
     (void)bus;
-    if (clk.err) { return -EINVAL; }
+    if (clk.err) {
+        return -EINVAL;
+    }
     spi_dev_t spi_regs;
     spi_regs.clock.val = clk.clk;
     if (spi_regs.clock.clk_equ_sysclk) {

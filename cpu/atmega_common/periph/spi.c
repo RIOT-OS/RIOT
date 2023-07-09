@@ -132,7 +132,9 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
 int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
 {
     (void)bus;
-    if (clk.err) { return -EINVAL; }
+    if (clk.err) {
+        return -EINVAL;
+    }
     uint8_t shift = (~clk.spi2x & 1) | (clk.spr << 1);
     return shift > 5 ?
         CLOCK_CORECLOCK >> shift : (CLOCK_CORECLOCK / 2) >> shift;
@@ -144,7 +146,9 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     (void)cs;
 
     assert(bus == SPI_DEV(0));
-    if (clk.err) { return; }
+    if (clk.err) {
+        return;
+    }
 
     /* lock the bus and power on the SPI peripheral */
     mutex_lock(&lock);

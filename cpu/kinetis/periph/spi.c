@@ -3,7 +3,7 @@
  *               2014 PHYTEC Messtechnik GmbH
  *               2015 Eistec AB
  *               2016 Freie Universität Berlin
- *               2021-2023 Hugues Larrive
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -287,7 +287,9 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
 int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
 {
     (void)bus;
-    if (clk.err) { return -EINVAL; }
+    if (clk.err) {
+        return -EINVAL;
+    }
 
     static const int br_scalers[16] = {
         2,     4,     6,     8,    16,    32,    64,   128,

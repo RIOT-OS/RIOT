@@ -257,7 +257,9 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
 int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
 {
     (void)bus;
-    if (clk.err) { return -EINVAL; }
+    if (clk.err) {
+        return -EINVAL;
+    }
     return CLOCK_PERIPH / (clk.cpsdvsr * clk.scr);
 }
 

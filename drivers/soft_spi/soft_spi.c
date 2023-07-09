@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2017 Hamburg University of Applied Sciences
- *               2021-2023 Hugues Larrive
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level

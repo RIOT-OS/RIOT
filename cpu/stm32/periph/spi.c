@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Hamburg University of Applied Sciences
  *               2014-2017 Freie Universität Berlin
  *               2016-2017 OTA keys S.A.
- *               2021-2023 Hugues Larrive
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -201,7 +201,9 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
 
 int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
 {
-    if (clk.err) { return -EINVAL; }
+    if (clk.err) {
+        return -EINVAL;
+    }
     return periph_apb_clk(spi_config[bus].apbbus)
             / (1 << ((clk.clk >> BR_SHIFT) + 1));
 }

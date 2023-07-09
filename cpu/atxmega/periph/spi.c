@@ -127,20 +127,20 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
 {
     (void)bus;
     /* bound divider to 128 */
-    if(freq < DIV_ROUND_UP(CLOCK_CORECLOCK, 128)) {
+    if (freq < DIV_ROUND_UP(CLOCK_CORECLOCK, 128)) {
         return (spi_clk_t){ .err = -EDOM };
     }
 
     uint8_t shift = _clk_shift(freq);
-    return (spi_clk_t){
-        .clk = ((~shift & 1) << 7) | (shift >> 1)
-    };
+    return (spi_clk_t){ .clk = ((~shift & 1) << 7) | (shift >> 1) };
 }
 
 int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
 {
     (void)bus;
-    if (clk.err) { return -EINVAL; }
+    if (clk.err) {
+        return -EINVAL;
+    }
     uint8_t shift = ((~clk.clk & 0x80) >> 7) | (clk.clk << 1);
     return shift > 5 ?
         CLOCK_CORECLOCK >> shift : (CLOCK_CORECLOCK / 2) >> shift;
@@ -151,7 +151,9 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     (void)cs;
 
     assert(bus < SPI_NUMOF);
-    if (clk.err) { return; }
+    if (clk.err) {
+        return;
+    }
 
     DEBUG("acquire\n");
 

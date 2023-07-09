@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2022 Gunar Schorcht
- *               2021-2023 Hugues Larrive
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -305,7 +305,9 @@ spi_clk_t IRAM_ATTR spi_get_clk(spi_t bus, uint32_t freq)
 int32_t IRAM_ATTR spi_get_freq(spi_t bus, spi_clk_t clk)
 {
     (void)bus;
-    if (clk.err) { return -EINVAL; }
+    if (clk.err) {
+        return -EINVAL;
+    }
     uint32_t apb_clk = rtc_clk_apb_freq_get();
     uint16_t spi_clkdiv_pre = (clk.clk >> 18) & 0x1fff;
     uint8_t spi_clkcnt_N = (clk.clk >> 12) & 0x3f;

@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2015 Loci Controls Inc.
  *               2016 Freie Universität Berlin
- *               2021-2023 Hugues Larrive
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -129,7 +129,9 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
 int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
 {
     (void)bus;
-    if (clk.err) { return -EINVAL; }
+    if (clk.err) {
+        return -EINVAL;
+    }
     return CLOCK_CORECLOCK / (clk.cpsr * ((clk.scr >> SSI_CR0_SCR_S) + 1));
 }
 
@@ -138,7 +140,9 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     (void)cs;
 
     assert((unsigned)bus < SPI_NUMOF);
-    if (clk.err) { return; }
+    if (clk.err) {
+        return;
+    }
 
     DEBUG("%s: bus=%u\n", __FUNCTION__, bus);
     /* lock the bus */

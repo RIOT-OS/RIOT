@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2019 Frank Hessel <frank@fhessel.de>
- *               2021-2023 Hugues Larrive
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level

@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2015 Rakendra Thapa <rakendrathapa@gmail.com>
  *               2017 Marc Poulhiès <dkm@kataplop.net>
- *               2021-2023 Hugues Larrive
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
