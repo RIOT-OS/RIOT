@@ -16,18 +16,18 @@ config MODULE_ST7735
     select MODULE_ZTIMER
     select MODULE_ZTIMER_MSEC
 
-config HAVE_ST7735
-    bool
-    select MODULE_ST7735 if MODULE_DISP_DEV
-    help
-      Indicates that an ST7735 display is present.
-
 config MODULE_ST7789
     bool
     depends on HAVE_ST7789
     default y if MODULE_ST7735
     help
         ST7789 display driver
+
+config HAVE_ST7735
+    bool
+    select MODULE_ST7735 if MODULE_DISP_DEV
+    help
+      Indicates that an ST7735 display is present.
 
 config HAVE_ST7789
     bool
