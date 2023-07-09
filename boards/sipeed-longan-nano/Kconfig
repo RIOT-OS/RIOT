@@ -38,6 +38,7 @@ menu "Sipeed Longan Nano Board Configuration"
 
     config SIPEED_LONGAN_NANO_WITH_TFT
         bool "Board with TFT display"
+        default y
         select HAVE_ST7735
         help
             Indicates that a Sipeed Longan Nano board with TFT display is used.
