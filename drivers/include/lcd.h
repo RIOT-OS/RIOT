@@ -138,6 +138,52 @@ struct lcd_driver {
 };
 
 /**
+ * @brief   Low Level to acquire the device
+ *
+ * @param[out]  dev     device descriptor
+ */
+void lcd_ll_acquire(const lcd_t *dev);
+
+/**
+ * @brief   Low Level function to release the device
+ *
+ * @param[out]  dev     device descriptor
+ */
+void lcd_ll_release(const lcd_t *dev);
+
+/**
+ * @brief   Low level function to write a command
+ *
+ * @pre The device must have already been acquired with @ref lcd_ll_acquire
+ *      before this function can be called.
+ *
+ * @param[in]   dev     device descriptor
+ * @param[in]   cmd     command code
+ * @param[in]   data    command data to the device
+ * @param[in]   len     length of the command data
+ */
+void lcd_ll_write_cmd(const lcd_t *dev, uint8_t cmd, const uint8_t *data,
+                      size_t len);
+
+/**
+ * @brief   Low level function for read command command
+ *
+ * @note Very often the SPI MISO signal of the serial interface or the RDX
+ *       signal of the MCU 8080 parallel interface are not connected to the
+ *       display. In this case the read command does not provide valid data.
+ *
+ * @pre The device must have already been acquired with @ref lcd_ll_acquire
+ *      before this function can be called.
+ * @pre len > 0
+ *
+ * @param[in]   dev     device descriptor
+ * @param[in]   cmd     command
+ * @param[out]  data    data from the device
+ * @param[in]   len     length of the returned data
+ */
+void lcd_ll_read_cmd(const lcd_t *dev, uint8_t cmd, uint8_t *data, size_t len);
+
+/**
  * @brief   Setup an lcd display device
  *
  * @param[out]  dev     device descriptor
