@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 Freie Universität Berlin
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Default configuration for the CC2420 driver
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef CC2420_PARAMS_H
@@ -21,6 +23,7 @@
 
 #include "board.h"
 #include "cc2420.h"
+#include "macros/units.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,7 +37,7 @@ extern "C" {
 #define CC2420_PARAM_SPI        (SPI_DEV(0))
 #endif
 #ifndef CC2420_PARAM_SPI_CLK
-#define CC2420_PARAM_SPI_CLK    (SPI_CLK_5MHZ)
+#define CC2420_PARAM_SPI_CLK    MHZ(10)
 #endif
 #ifndef CC2420_PARAM_CS
 #define CC2420_PARAM_CS         (GPIO_PIN(0, 0))
@@ -60,7 +63,7 @@ extern "C" {
 
 #ifndef CC2420_PARAMS
 #define CC2420_PARAMS           { .spi        = CC2420_PARAM_SPI,     \
-                                  .spi_clk    = CC2420_PARAM_SPI_CLK, \
+                                  .spi_freq   = CC2420_PARAM_SPI_CLK, \
                                   .pin_cs     = CC2420_PARAM_CS,      \
                                   .pin_fifo   = CC2420_PARAM_FIFO,    \
                                   .pin_fifop  = CC2420_PARAM_FIFOP,   \

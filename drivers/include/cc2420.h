@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Freie Universität Berlin
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -16,6 +17,7 @@
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef CC2420_H
@@ -73,7 +75,8 @@ enum {
  */
 typedef struct cc2420_params {
     spi_t spi;              /**< SPI bus the device is connected to */
-    spi_clk_t spi_clk;      /**< SPI speed to use */
+    spi_clk_t spi_clk;      /**< SPI clock configuration computed during setup */
+    uint32_t spi_freq;      /**< SPI clock speed to use */
     gpio_t pin_cs;          /**< pin connected to chip select */
     gpio_t pin_fifo;        /**< pin connected to the FIFO interrupt pin */
     gpio_t pin_fifop;       /**< pin connected to the FIFOP interrupt pin */
