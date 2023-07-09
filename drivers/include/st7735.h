@@ -83,7 +83,7 @@ extern "C" {
 #endif
 
 /**
- * @name    ILI9341 display rotation modes
+ * @name    ST7735 display rotation modes
  * @{
  */
 #define ST7735_ROTATION_VERT            0                   /**< Vertical mode */
