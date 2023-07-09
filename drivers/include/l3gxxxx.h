@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 Gunar Schorcht
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -951,6 +952,7 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @{
  * @file
@@ -1407,7 +1409,7 @@ typedef struct {
  */
 typedef struct {
     spi_t     dev;                  /**< SPI device used */
-    spi_clk_t clk;                  /**< SPI clock speed */
+    uint32_t freq;                  /**< SPI clock speed */
     gpio_t    cs;                   /**< SPI chip Select pin */
 } l3gxxxx_spi_params_t;
 #endif
@@ -1463,6 +1465,9 @@ typedef struct {
  */
 typedef struct {
     l3gxxxx_params_t params;      /**< Device initialization parameters */
+#if IS_USED(MODULE_L3GXXXX_SPI) || DOXYGEN
+    spi_clk_t spi_clk;            /**< SPI clock configuration computed during init */
+#endif
     l3gxxxx_int_types_t int_type; /**< Type of the last interrupt triggered */
     mutex_t int_lock;             /**< Used to lock the calling thread while
                                        waiting for an interrupt */
