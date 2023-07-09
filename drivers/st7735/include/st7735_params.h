@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2018 Koen Zandberg <koen@bergzand.net>
  *               2021 Francisco Molina
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,6 +17,7 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef ST7735_PARAMS_H
@@ -23,6 +25,7 @@
 
 #include "board.h"
 #include "lcd.h"
+#include "macros/units.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,8 +39,8 @@ extern "C" {
 #ifndef ST7735_PARAM_SPI
 #define ST7735_PARAM_SPI          SPI_DEV(0)        /**< SPI device */
 #endif
-#ifndef ST7735_PARAM_SPI_CLK
-#define ST7735_PARAM_SPI_CLK      SPI_CLK_5MHZ      /**< SPI clock frequency */
+#ifndef ST7735_PARAM_SPI_CLK      /* 1 / 66 ns (min serial clock cycle) */
+#define ST7735_PARAM_SPI_CLK      MHZ(15)           /**< SPI clock frequency */
 #endif
 #ifndef ST7735_PARAM_CS
 #define ST7735_PARAM_CS           GPIO_PIN(2, 2)    /**< Chip Select pin */
@@ -78,7 +81,7 @@ extern "C" {
  */
 #ifndef ST7735_PARAMS
 #define ST7735_PARAMS              {  .spi = ST7735_PARAM_SPI, \
-                                      .spi_clk = ST7735_PARAM_SPI_CLK, \
+                                      .spi_freq = ST7735_PARAM_SPI_CLK, \
                                       .spi_mode = ST7735_PARAM_SPI_MODE, \
                                       .cs_pin = ST7735_PARAM_CS, \
                                       .dcx_pin = ST7735_PARAM_DCX, \
