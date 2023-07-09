@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 Phytec Messtechnik GmbH
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,6 +19,7 @@
  * @author      Johann Fischer <j.fischer@phytec.de>
  * @author      Jonas Remmert <j.remmert@phytec.de>
  * @author      Sebastian Meiling <s@mlng.net>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef KW2XRF_H
@@ -105,7 +107,7 @@ extern "C" {
  */
 typedef struct kw2xrf_params {
     spi_t spi;                          /**< SPI bus the device is connected to */
-    spi_clk_t spi_clk;                  /**< SPI clock speed to use */
+    uint32_t spi_freq;                  /**< SPI clock speed to use */
     gpio_t cs_pin;                      /**< GPIO pin connected to chip select */
     gpio_t int_pin;                     /**< GPIO pin connected to the interrupt pin */
     gpio_t rst_pin;                     /**< GPIO pin connected to RST_B */
@@ -123,6 +125,7 @@ typedef struct {
      */
     thread_t *thread;                   /**< Network driver thread, for providing feedback from IRQ handler */
     const kw2xrf_params_t *params;      /**< parameters for initialization */
+    spi_clk_t spi_clk;                  /**< SPI clock configuration computed during init */
     uint8_t buf[KW2XRF_MAX_PKT_LENGTH]; /**< Buffer for incoming or outgoing packets */
     uint8_t state;                      /**< current state of the radio */
     uint8_t tx_frame_len;               /**< length of the current TX frame */

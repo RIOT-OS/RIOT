@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 Hamburg University of Applied Sciences
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Default configuration for the KW2XRF driver
  *
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef KW2XRF_PARAMS_H
@@ -21,6 +23,7 @@
 
 #include "board.h"
 #include "kw2xrf.h"
+#include "macros/units.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,7 +37,7 @@ extern "C" {
 #define KW2XRF_PARAM_SPI         (SPI_DEV(0))
 #endif
 #ifndef KW2XRF_PARAM_SPI_CLK
-#define KW2XRF_PARAM_SPI_CLK     (SPI_CLK_10MHZ)
+#define KW2XRF_PARAM_SPI_CLK     MHZ(9)
 #endif
 #ifndef KW2XRF_PARAM_CS
 #define KW2XRF_PARAM_CS          (GPIO_PIN(0, 0))
@@ -51,7 +54,7 @@ extern "C" {
 
 #ifndef KW2XRF_PARAMS
 #define KW2XRF_PARAMS            { .spi = KW2XRF_PARAM_SPI,         \
-                                   .spi_clk = KW2XRF_PARAM_SPI_CLK, \
+                                   .spi_freq = KW2XRF_PARAM_SPI_CLK, \
                                    .cs_pin = KW2XRF_PARAM_CS,       \
                                    .int_pin = KW2XRF_PARAM_INT, \
                                    .rst_pin = KW2XRF_PARAM_RESET }

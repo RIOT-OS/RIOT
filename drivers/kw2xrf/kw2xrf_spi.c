@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 PHYTEC Messtechnik GmbH
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -15,6 +16,7 @@
  * @author      Johann Fischer <j.fischer@phytec.de>
  * @author      Jonas Remmert <j.remmert@phytec.de>
  * @author      Sebastian Meiling <s@mlng.net>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  * @}
  */
 
@@ -31,7 +33,7 @@
 #include "debug.h"
 
 #define SPIDEV              (dev->params->spi)
-#define SPICLK              (dev->params->spi_clk)
+#define SPICLK              (dev->spi_clk)
 #define CSPIN               (dev->params->cs_pin)
 #define SPIMODE             (SPI_MODE_0)
 
@@ -80,8 +82,8 @@ int kw2xrf_spi_init(kw2xrf_t *dev)
         spi_release(SPIDEV);
     }
 
-    DEBUG("[kw2xrf_spi] SPI_DEV(%u) initialized: mode: %u, clk: %u, cs_pin: %u\n",
-          (unsigned)SPIDEV, (unsigned)SPIMODE, (unsigned)SPICLK, (unsigned)CSPIN);
+    DEBUG("[kw2xrf_spi] SPI_DEV(%u) initialized: mode: %u, clk.err: %i, cs_pin: %u\n",
+          (unsigned)SPIDEV, (unsigned)SPIMODE, SPICLK.err, (unsigned)CSPIN);
     return 0;
 }
 
