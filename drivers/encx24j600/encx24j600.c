@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2015 Ell-i open source co-operative
  *                    Kaspar Schleiser <kaspar@schleiser.de>
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  * @brief       Internal functions for the ENCX24J600 driver
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -35,7 +37,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#define SPI_CLK                 SPI_CLK_1MHZ
+#define SPI_CLK                 (dev->spi_clk)
 #define SPI_MODE                SPI_MODE_0
 
 #define ENCX24J600_INIT_DELAY   (100000U)
@@ -85,6 +87,7 @@ void encx24j600_setup(encx24j600_t *dev, const encx24j600_params_t *params, uint
 {
     dev->netdev.driver = &netdev_driver_encx24j600;
     dev->spi = params->spi;
+    dev->spi_clk = spi_get_clk(params->spi, params->spi_freq);
     dev->cs = params->cs_pin;
     dev->int_pin = params->int_pin;
     dev->rx_next_ptr = RX_BUFFER_START;
