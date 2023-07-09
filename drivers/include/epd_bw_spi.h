@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2019 Silke Hofstra
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -27,6 +28,7 @@
  * @brief       Generic black/white e-paper/e-ink display SPI driver.
  *
  * @author      Silke Hofstra <silke@slxh.eu>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef EPD_BW_SPI_H
@@ -84,7 +86,8 @@ typedef struct {
  */
 typedef struct {
     spi_t spi;                              /**< SPI device that the display is connected to */
-    spi_clk_t spi_clk;                      /**< SPI clock speed to use */
+    spi_clk_t spi_clk;                      /**< SPI clock configuration computed during init */
+    uint32_t spi_freq;                      /**< SPI clock speed to use */
     gpio_t cs_pin;                          /**< pin connected to the CHIP SELECT line */
     gpio_t dc_pin;                          /**< pin connected to the DC line */
     gpio_t rst_pin;                         /**< pin connected to the reset line (optional) */

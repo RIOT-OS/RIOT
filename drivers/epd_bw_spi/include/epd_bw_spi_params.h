@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2019 Silke Hofstra
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Default configuration for epd_bw_spi
  *
  * @author      Silke Hofstra <silke@slxh.eu>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef EPD_BW_SPI_PARAMS_H
@@ -21,6 +23,7 @@
 
 #include "board.h"
 #include "epd_bw_spi.h"
+#include "macros/units.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -109,7 +112,7 @@ static const uint8_t epd_bw_spi_il3829_lut_default_part[] = {
 /**
  * @brief SPI device clock speed.
  */
-#define EPD_BW_SPI_PARAM_SPI_CLK    (SPI_CLK_5MHZ)
+#define EPD_BW_SPI_PARAM_SPI_CLK    MHZ(4) /* 1 / 250ns min clock cycle time */
 #endif
 
 /**
@@ -175,7 +178,7 @@ static const uint8_t epd_bw_spi_il3829_lut_default_part[] = {
  * @brief Parameters to initialize the display with.
  */
 #define EPD_BW_SPI_PARAMS           { .spi = EPD_BW_SPI_PARAM_SPI, \
-                                      .spi_clk = EPD_BW_SPI_PARAM_SPI_CLK, \
+                                      .spi_freq = EPD_BW_SPI_PARAM_SPI_CLK, \
                                       .cs_pin = EPD_BW_SPI_PARAM_CS, \
                                       .dc_pin = EPD_BW_SPI_PARAM_DC, \
                                       .rst_pin = EPD_BW_SPI_PARAM_RST, \

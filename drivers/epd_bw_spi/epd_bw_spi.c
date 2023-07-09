@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2022 Silke Hofstra
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Device driver implementation for the epd_bw_spi display controller
  *
  * @author      Silke Hofstra <silke@slxh.eu>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  * @}
  */
 #include <string.h>
@@ -104,6 +106,9 @@ int epd_bw_spi_init(epd_bw_spi_t *dev, const epd_bw_spi_params_t *params)
         DEBUG("[epd_bw_spi] init: error initializing the CS pin [%i]\n", res);
         return res;
     }
+
+    /* compute the SPI clk configuration */
+    dev->params.spi_clk = spi_get_clk(dev->params.spi, dev->params.spi_freq);
 
     return 0;
 }
