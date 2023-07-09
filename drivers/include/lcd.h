@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2018 Koen Zandberg
  *               2021 Francisco Molina
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -19,6 +20,7 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * The LCD is a generic display driver for small RGB displays. The driver
  * implemented here operates over SPI to communicate with the device.
@@ -72,20 +74,21 @@ extern "C" {
  * @brief   Device initialization parameters
  */
 typedef  struct {
-    spi_t spi;                  /**< SPI device that the display is connected to */
-    spi_clk_t spi_clk;          /**< SPI clock speed to use */
-    spi_mode_t spi_mode;        /**< SPI mode */
-    gpio_t cs_pin;              /**< pin connected to the CHIP SELECT line */
-    gpio_t dcx_pin;             /**< pin connected to the DC line */
-    gpio_t rst_pin;             /**< pin connected to the reset line */
-    bool rgb;                   /**< True when display is connected in RGB mode
-                                 *  False when display is connected in BGR mode */
-    bool inverted;              /**< Display works in inverted color mode */
-    uint16_t lines;             /**< Number of lines, from 16 to 320 in 8 line steps */
-    uint16_t rgb_channels;      /**< Display rgb channels */
-    uint8_t rotation;           /**< Display rotation mode */
-    uint8_t offset_x;           /**< LCD offset to apply on x axis. */
-    uint8_t offset_y;           /**< LCD offset to apply on y axis. */
+    spi_t spi;              /**< SPI device that the display is connected to */
+    uint32_t spi_freq;      /**< SPI clock speed to use */
+    spi_mode_t spi_mode;    /**< SPI mode */
+    gpio_t cs_pin;          /**< pin connected to the CHIP SELECT line */
+    gpio_t dcx_pin;         /**< pin connected to the DC line */
+    gpio_t rst_pin;         /**< pin connected to the reset line */
+    bool rgb;               /**< True when display is connected in RGB mode
+                             *   False when display is connected in BGR mode */
+    bool inverted;          /**< Display works in inverted color mode */
+    uint16_t lines;         /**< Number of lines,
+                             *   from 16 to 320 in 8 line steps */
+    uint16_t rgb_channels;  /**< Display rgb channels */
+    uint8_t rotation;       /**< Display rotation mode */
+    uint8_t offset_x;       /**< LCD offset to apply on x axis. */
+    uint8_t offset_y;       /**< LCD offset to apply on y axis. */
 } lcd_params_t;
 
 /**
@@ -100,10 +103,12 @@ typedef struct lcd_driver lcd_driver_t;
  */
 typedef struct {
 #ifdef MODULE_DISP_DEV
-    disp_dev_t *dev;                /**< Pointer to the generic display device */
+    disp_dev_t *dev;            /**< Pointer to the generic display device */
 #endif
-    const lcd_driver_t *driver;     /**< LCD driver */
-    const lcd_params_t *params;     /**< Device initialization parameters */
+    const lcd_driver_t *driver; /**< LCD driver */
+    const lcd_params_t *params; /**< Device initialization parameters */
+    spi_clk_t spi_clk;          /**< SPI clock configuration
+                                 *   computed during init */
 } lcd_t;
 
 /**
