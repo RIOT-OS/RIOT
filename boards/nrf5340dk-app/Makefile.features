@@ -2,6 +2,7 @@ CPU_MODEL = nrf5340_app
 CPU = nrf53
 
 # Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_pwm
 FEATURES_PROVIDED += periph_rtt
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart

@@ -180,6 +180,14 @@ ifneq (,$(filter servo_%,$(USEMODULE)))
   USEMODULE += servo
 endif
 
+ifneq (,$(filter shield_w5100,$(USEMODULE)))
+  FEATURES_REQUIRED += arduino_pins
+  FEATURES_REQUIRED += arduino_shield_isp
+  FEATURES_REQUIRED += arduino_shield_uno
+  FEATURES_REQUIRED += arduino_spi
+  USEMODULE += w5100
+endif
+
 ifneq (,$(filter sht1%,$(USEMODULE)))
   USEMODULE += sht1x
 endif
