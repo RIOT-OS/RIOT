@@ -126,6 +126,11 @@ struct lcd_driver {
     /**
      * @brief   Set area LCD work area
      *
+     * This function pointer can be NULL if the controller specific driver
+     * does not require anything special. In this case the default
+     * implementation is used which sets the column addresses and the row
+     * addresses of the area including the coordinates of the opposite corner.
+     *
      * @param[in] dev  Pointer to the selected driver
      * @param[in] x1   x coordinate of the first corner
      * @param[in] x2   x coordinate of the opposite corner

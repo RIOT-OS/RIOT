@@ -82,11 +82,39 @@ static void _lcd_cmd_start(const lcd_t *dev, uint8_t cmd, bool cont)
     gpio_set(dev->params->dcx_pin);
 }
 
+static void _lcd_set_area_default(const lcd_t *dev, uint16_t x1, uint16_t x2,
+                                  uint16_t y1, uint16_t y2)
+{
+    be_uint16_t params[2];
+
+    x1 += dev->params->offset_x;
+    x2 += dev->params->offset_x;
+    y1 += dev->params->offset_y;
+    y2 += dev->params->offset_y;
+
+    /* Function is called by a high level function of the LCD driver where
+     * the device is already acquired. So we don't must acquire it here.
+     * Therefore the low level write command function is called. */
+
+    params[0] = byteorder_htons(x1);
+    params[1] = byteorder_htons(x2);
+    lcd_ll_write_cmd(dev, LCD_CMD_CASET, (uint8_t *)params,
+                     sizeof(params));
+    params[0] = byteorder_htons(y1);
+    params[1] = byteorder_htons(y2);
+    lcd_ll_write_cmd(dev, LCD_CMD_PASET, (uint8_t *)params,
+                     sizeof(params));
+}
+
 static void _lcd_set_area(const lcd_t *dev, uint16_t x1, uint16_t x2,
                           uint16_t y1, uint16_t y2)
 {
-    assert(dev->driver->set_area);
-    dev->driver->set_area(dev, x1, x2, y1, y2);
+    if (dev->driver->set_area) {
+        dev->driver->set_area(dev, x1, x2, y1, y2);
+    }
+    else {
+        _lcd_set_area_default(dev, x1, x2, y1, y2);
+    }
 }
 
 void lcd_ll_acquire(const lcd_t *dev)

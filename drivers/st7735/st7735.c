@@ -173,31 +173,7 @@ static int _init(lcd_t *dev, const lcd_params_t *params)
     return 0;
 }
 
-static void _set_area(const lcd_t *dev, uint16_t x1, uint16_t x2,
-                      uint16_t y1, uint16_t y2)
-{
-    be_uint16_t params[2];
-
-    x1 += dev->params->offset_x;
-    x2 += dev->params->offset_x;
-    y1 += dev->params->offset_y;
-    y2 += dev->params->offset_y;
-
-    params[0] = byteorder_htons(x1);
-    params[1] = byteorder_htons(x2);
-
-    /* Function is called by a high level function of the LCD driver where
-     * the device is already acquired. So we don't must acquire it here.
-     * Therefore the low level write command function is called. */
-    lcd_ll_write_cmd(dev, LCD_CMD_CASET, (uint8_t *)params,
-                     sizeof(params));
-    params[0] = byteorder_htons(y1);
-    params[1] = byteorder_htons(y2);
-    lcd_ll_write_cmd(dev, LCD_CMD_PASET, (uint8_t *)params,
-                     sizeof(params));
-}
-
 const lcd_driver_t lcd_st7735_driver = {
     .init = _init,
-    .set_area = _set_area,
+    .set_area = NULL, /* default implementation is used */
 };
