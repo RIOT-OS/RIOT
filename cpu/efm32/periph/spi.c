@@ -108,8 +108,8 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
      * part was used in the gecko SDK.
      */
 
-    /* br = fHFPERCLK/(2 x (1 + USARTn_CLKDIV / 256)) */
-    return (spi_clk_t){ .clk = DIV_ROUND_UP(ref_freq, (2 * (1 + clkdiv / 256))) };
+    /* baudrate = fHFPERCLK/(2 x (1 + USARTn_CLKDIV / 256)) */
+    return (spi_clk_t){ .baudrate = DIV_ROUND_UP(ref_freq, (2 * (1 + clkdiv / 256))) };
 }
 
 int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
@@ -118,7 +118,7 @@ int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
     if (clk.err) {
         return -EINVAL;
     }
-    return clk.clk;
+    return clk.baudrate;
 }
 
 #define GET_PIN(x) (x & 0xf)
@@ -129,7 +129,9 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)cs;
     assert((unsigned)bus < SPI_NUMOF);
-    if (clk.err) { return; }
+    if (clk.err) {
+        return;
+    }
 
     mutex_lock(&spi_lock[bus]);
 
@@ -141,7 +143,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
     USART_InitSync_TypeDef init = USART_INITSYNC_DEFAULT;
 
-    init.baudrate = (uint32_t)clk.clk;
+    init.baudrate = clk.baudrate;
     init.clockMode = (USART_ClockMode_TypeDef)mode;
     init.msbf = true;
 

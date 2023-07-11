@@ -101,11 +101,11 @@ void spi_init_pins(spi_t bus)
 
 spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
 {
-    (void)bus;
-
     /* CLOCK_CORECLOCK / (1 << 0..3) / 2..254 and even */
 
-    uint32_t pclksel, cpsr, source_clock = CLOCK_CORECLOCK / 2;
+    lpc23xx_spi_t *dev = get_dev(bus);
+    uint32_t pclksel_pclk_ssp, pclk_ssp, cpsdvsr;
+    uint32_t source_clock = CLOCK_CORECLOCK / 2;
 
     /* bound divider to 2032 */
     if (freq >= DIV_ROUND_UP(source_clock, 2032)) {
@@ -115,28 +115,51 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
     /* result must be at most the requested frequency */
     freq = CLOCK_CORECLOCK / DIV_ROUND_UP(CLOCK_CORECLOCK, freq);
 
-    lpc23xx_pclk_scale(CLOCK_CORECLOCK, freq, &pclksel, &cpsr);
+    lpc23xx_pclk_scale(CLOCK_CORECLOCK, freq, &pclk_ssp, &cpsdvsr);
 
-    return (spi_clk_t){ .pclksel = pclksel, .cpsr = cpsr };
+    switch ((uint32_t)dev) {
+    case SSP0_BASE_ADDR:
+        pclksel_pclk_ssp = pclk_ssp << 10;
+        break;
+    case SSP1_BASE_ADDR:
+        pclksel_pclk_ssp = pclk_ssp << 20;
+        break;
+    default:
+        return (spi_clk_t){ .err = -ENODEV };
+    }
+    return (spi_clk_t){
+        .pclksel_pclk_ssp = pclksel_pclk_ssp,
+        .cpsr_cpsdvsr = cpsdvsr
+    };
 }
 
 int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
 {
-    (void)bus;
     if (clk.err) {
         return -EINVAL;
     }
 
-    uint32_t pclkdiv;
+    lpc23xx_spi_t *dev = get_dev(bus);
+    uint32_t pclk_ssp, pclkdiv;
 
-    switch (clk.pclksel) {
+    switch ((uint32_t)dev) {
+    case SSP0_BASE_ADDR:
+        pclk_ssp = clk.pclksel_pclk_ssp >> 10;
+        break;
+    case SSP1_BASE_ADDR:
+        pclk_ssp = clk.pclksel_pclk_ssp >> 20;
+        break;
+    default:
+        return -ENODEV;
+    }
+    switch (pclk_ssp) {
         case 0: pclkdiv = 4; break;
         case 1: pclkdiv = 1; break;
         case 2: pclkdiv = 2; break;
         case 3: pclkdiv = 8; break;
         default: pclkdiv = 4; break;
     }
-    return CLOCK_CORECLOCK / pclkdiv / clk.cpsr;
+    return CLOCK_CORECLOCK / pclkdiv / clk.cpsr_cpsdvsr;
 }
 
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
@@ -144,7 +167,9 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     (void)cs; (void)mode;
     assert((unsigned)bus < SPI_NUMOF);
     assert(mode == SPI_MODE_0);
-    if (clk.err) { return; }
+    if (clk.err) {
+        return;
+    }
 
     lpc23xx_spi_t *dev = get_dev(bus);
 
@@ -161,14 +186,14 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     switch ((uint32_t)dev) {
     case SSP0_BASE_ADDR:
         PCLKSEL1 &= ~(BIT10 | BIT11);   /* CCLK to PCLK divider*/
-        PCLKSEL1 |= clk.pclksel << 10;
+        PCLKSEL1 |= clk.pclksel_pclk_ssp;
         break;
     case SSP1_BASE_ADDR:
         PCLKSEL0 &= ~(BIT20 | BIT21);   /* CCLK to PCLK divider*/
-        PCLKSEL0 |= clk.pclksel << 20;
+        PCLKSEL0 |= clk.pclksel_pclk_ssp;
         break;
     }
-    dev->CPSR = clk.cpsr;
+    dev->CPSR = clk.cpsr_cpsdvsr;
 
     /* enable the bus */
     dev->CR1 |= BIT1;

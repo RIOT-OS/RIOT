@@ -124,8 +124,8 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
 
     uint8_t shift = _clk_shift(freq);
     return (spi_clk_t){
-        .spi2x = ~shift & 1,
-        .spr = shift >> 1
+        .spsr_spi2x = ~shift & 1,
+        .spcr_spr = shift >> 1
     };
 }
 
@@ -135,7 +135,7 @@ int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
     if (clk.err) {
         return -EINVAL;
     }
-    uint8_t shift = (~clk.spi2x & 1) | (clk.spr << 1);
+    uint8_t shift = (~clk.spsr_spi2x & 1) | (clk.spcr_spr << 1);
     return shift > 5 ?
         CLOCK_CORECLOCK >> shift : (CLOCK_CORECLOCK / 2) >> shift;
 }
@@ -157,8 +157,8 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 #endif
 
     /* configure as master, with given mode and clock */
-    SPSR = clk.spi2x;
-    SPCR = (1 << SPE | 1 << MSTR | mode | clk.spr);
+    SPSR = clk.spsr_spi2x;
+    SPCR = (1 << SPE | 1 << MSTR | mode | clk.spcr_spr);
 
     /* clear interrupt flag by reading SPSR and data register by reading SPDR */
     (void)SPSR;

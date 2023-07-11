@@ -98,12 +98,13 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
      */
 
     uint32_t source_clock = coreclk() / 2;
+    uint32_t div = DIV_ROUND_UP(source_clock, freq) - 1;
 
-    /* bound divider to 4096 */
-    if (freq < DIV_ROUND_UP(source_clock, 4096)) {
+    /* bound divider to 12 bits */
+    if (div & ~0xfff) {
         return (spi_clk_t){ .err = -EDOM };
     }
-    return (spi_clk_t){ .clk = DIV_ROUND_UP(source_clock, freq) - 1 };
+    return (spi_clk_t){ .sckdiv = div };
 }
 
 int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
@@ -112,18 +113,20 @@ int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
     if (clk.err) {
         return -EINVAL;
     }
-    return coreclk() / (2 * (clk.clk + 1));
+    return coreclk() / (2 * (clk.sckdiv + 1));
 }
 
 void spi_acquire(spi_t dev, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)cs;
     assert(dev < SPI_NUMOF);
-    if (clk.err) { return; }
+    if (clk.err) {
+        return;
+    }
 
     mutex_lock(&lock);
 
-    _REG32(spi_config[dev].addr, SPI_REG_SCKDIV) = clk.clk;
+    _REG32(spi_config[dev].addr, SPI_REG_SCKDIV) = clk.sckdiv;
     _REG32(spi_config[dev].addr, SPI_REG_SCKMODE) = mode;
 }
 

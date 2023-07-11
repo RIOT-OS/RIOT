@@ -219,7 +219,7 @@ static void _qspi_acquire(spi_mode_t mode, spi_clk_t clk)
     _mode &= 0x3;
 
     QSPI->CTRLA.bit.ENABLE = 1;
-    QSPI->BAUD.reg = QSPI_BAUD_BAUD(clk.clk) | _mode;
+    QSPI->BAUD.reg = QSPI_BAUD_BAUD(clk.baud) | _mode;
 #else
     (void)mode; (void)clk;
 #endif
@@ -302,11 +302,11 @@ static void _spi_acquire(spi_t bus, spi_mode_t mode, spi_clk_t clk)
                          | (mode << SERCOM_SPI_CTRLA_CPHA_Pos);
 
     /* first configuration or reconfiguration after altered device usage */
-    if (dev(bus)->BAUD.reg != clk.clk || dev(bus)->CTRLA.reg != ctrla) {
+    if (dev(bus)->BAUD.reg != clk.baud || dev(bus)->CTRLA.reg != ctrla) {
         /* disable the device */
         _disable(dev(bus));
 
-        dev(bus)->BAUD.reg = clk.clk;
+        dev(bus)->BAUD.reg = clk.baud;
         dev(bus)->CTRLA.reg = ctrla;
         /* no synchronization needed here, the enable synchronization below
          * acts as a write-synchronization for both registers */
@@ -429,7 +429,7 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
     if (baud > 255) {
         return (spi_clk_t){ .err = -EDOM };
     }
-    return (spi_clk_t){ .clk = baud };
+    return (spi_clk_t){ .baud = baud };
 }
 
 int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
@@ -440,10 +440,10 @@ int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
     if (_is_qspi(bus)) {
         /* SCK = MCK / (BAUD + 1)
          * but assume SCK = MCK / BAUD as in _qspi_baud() */
-        return CLOCK_CORECLOCK / clk.clk;
+        return CLOCK_CORECLOCK / clk.baud;
     } else {
         /* fbaud = fref / 2 / (BAUD + 1) */
-        return sam0_gclk_freq(spi_config[bus].gclk_src) / 2 / ++clk.clk;
+        return sam0_gclk_freq(spi_config[bus].gclk_src) / 2 / ++clk.baud;
     }
 }
 
@@ -451,7 +451,9 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)cs;
     assert((unsigned)bus < SPI_NUMOF);
-    if (clk.err) { return; }
+    if (clk.err) {
+        return;
+    }
 
     /* get exclusive access to the device */
     mutex_lock(&locks[bus]);

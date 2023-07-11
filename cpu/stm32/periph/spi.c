@@ -196,7 +196,7 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
     if (br > BR_MAX) {
         return (spi_clk_t){ .err = -EDOM };
     }
-    return (spi_clk_t){ .clk = (br << BR_SHIFT) };
+    return (spi_clk_t){ .cr1_br = (br << BR_SHIFT) };
 }
 
 int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
@@ -205,13 +205,15 @@ int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
         return -EINVAL;
     }
     return periph_apb_clk(spi_config[bus].apbbus)
-            / (1 << ((clk.clk >> BR_SHIFT) + 1));
+            / (1 << ((clk.cr1_br >> BR_SHIFT) + 1));
 }
 
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     assert((unsigned)bus < SPI_NUMOF);
-    if (clk.err) { return; }
+    if (clk.err) {
+        return;
+    }
 
     /* lock bus */
     mutex_lock(&locks[bus]);
@@ -222,7 +224,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     /* enable SPI device clock */
     periph_clk_en(spi_config[bus].apbbus, spi_config[bus].rccmask);
     /* enable device */
-    uint16_t cr1_settings = (clk.clk | mode | SPI_CR1_MSTR);
+    uint16_t cr1_settings = (clk.cr1_br | mode | SPI_CR1_MSTR);
     /* Settings to add to CR2 in addition to SPI_CR2_SETTINGS */
     uint16_t cr2_extra_settings = 0;
     if (cs != SPI_HWCS_MASK) {

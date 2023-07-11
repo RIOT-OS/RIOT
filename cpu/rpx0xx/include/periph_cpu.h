@@ -761,8 +761,8 @@ void rosc_stop(void);
 #define HAVE_SPI_CLK_T
 typedef struct {
     int err;
-    uint8_t cpsdvsr;
-    uint8_t scr;
+    uint8_t spcpsr_cpsdvsr;
+    uint8_t sspcr0_scr;
 } spi_clk_t;
 /** @} */
 #endif /* ndef DOXYGEN */

@@ -101,28 +101,28 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
 {
     (void)bus;
 
-    /* SPI bus frequency =  CLOCK_CORECLOCK / (CPSR * (SCR + 1)), with
-     * CPSR = 2..254 and even,
-     *  SCR = 0..255 */
+    /* SPI bus frequency =  CLOCK_CORECLOCK / (CPSDVR * (SCR + 1)), with
+     * CPSDVR = 2..254 and even,
+     * SCR = 0..255 */
 
     /* bound divider to 65024 (254 * (255 + 1)) */
     if (freq < DIV_ROUND_UP(CLOCK_CORECLOCK, 65024)) {
         return (spi_clk_t){ .err = -EDOM };
     }
 
-    uint8_t cpsr = 2, scr = 0;
+    uint8_t cpsdvsr = 2, scr = 0;
     uint32_t divider = DIV_ROUND_UP(CLOCK_CORECLOCK, freq);
     if (divider % 2) {
         divider++;
     }
-    while (divider / cpsr > 256) {
-        cpsr += 2;
+    while (divider / cpsdvsr > 256) {
+        cpsdvsr += 2;
     }
-    scr = divider / cpsr - 1;
+    scr = divider / cpsdvsr - 1;
 
     return (spi_clk_t){
-        .cpsr = cpsr,
-        .scr = (scr << SSI_CR0_SCR_S)
+        .cpsr_cpsdvsr = cpsdvsr,
+        .cr0_scr = (scr << SSI_CR0_SCR_S)
     };
 }
 
@@ -132,7 +132,7 @@ int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
     if (clk.err) {
         return -EINVAL;
     }
-    return CLOCK_CORECLOCK / (clk.cpsr * ((clk.scr >> SSI_CR0_SCR_S) + 1));
+    return CLOCK_CORECLOCK / (clk.cpsr_cpsdvsr * ((clk.cr0_scr >> SSI_CR0_SCR_S) + 1));
 }
 
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
@@ -151,8 +151,8 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     poweron(bus);
     /* configure SCR clock field, data-width and mode */
     dev(bus)->CR0 = 0;
-    dev(bus)->CPSR = clk.cpsr;
-    dev(bus)->CR0 = clk.scr | mode | SSI_CR0_DSS(8);
+    dev(bus)->CPSR = clk.cpsr_cpsdvsr;
+    dev(bus)->CR0 = clk.cr0_scr | mode | SSI_CR0_DSS(8);
     /* enable SSI device */
     dev(bus)->CR1 = SSI_CR1_SSE;
 }

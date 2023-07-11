@@ -272,7 +272,7 @@ spi_clk_t IRAM_ATTR spi_get_clk(spi_t bus, uint32_t freq)
         spi_regs.clock.clkdiv_pre = DIV_ROUND_UP(source_clock, freq) - 1;
     }
 
-    return (spi_clk_t){ .clk = spi_regs.clock.val };
+    return (spi_clk_t){ .spi_clock = spi_regs.clock.val };
 }
 
 int32_t IRAM_ATTR spi_get_freq(spi_t bus, spi_clk_t clk)
@@ -282,7 +282,7 @@ int32_t IRAM_ATTR spi_get_freq(spi_t bus, spi_clk_t clk)
         return -EINVAL;
     }
     spi_dev_t spi_regs;
-    spi_regs.clock.val = clk.clk;
+    spi_regs.clock.val = clk.spi_clock;
     if (spi_regs.clock.clk_equ_sysclk) {
         return SPI_CLK_SRC_FREQ;
     }
@@ -297,10 +297,12 @@ int32_t IRAM_ATTR spi_get_freq(spi_t bus, spi_clk_t clk)
 
 void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
-    DEBUG("%s bus=%u cs=%u mode=%u clk=%x\n", __func__, bus, cs, mode, clk.clk);
+    DEBUG("%s bus=%u cs=%u mode=%u spi_clock=%x\n", __func__, bus, cs, mode, clk.spi_clock);
 
     assert(bus < SPI_NUMOF);
-    if (clk.err) { return; }
+    if (clk.err) {
+        return;
+    }
 
     /* call initialization of the SPI interface if it is not initialized yet */
     if (!_spi[bus].initialized) {
@@ -333,10 +335,10 @@ void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t cl
     _spi[bus].regs->ctrl2.mosi_delay_num = 0;
 
     /* set SPI clock configuration */
-    if (!(clk.clk & 0x80000000)) {
+    if (!(clk.spi_clock & 0x80000000)) {
         IOMUX.CONF &= ~IOMUX_CONF_SPI1_CLOCK_EQU_SYS_CLOCK;
     }
-    _spi[bus].regs->clock.val = (uint32_t)clk.clk;
+    _spi[bus].regs->clock.val = clk.spi_clock;
 
     DEBUG("%s bus %d: SPI_CLOCK_REG=%08x\n",
           __func__, bus, _spi[bus].regs->clock.val);

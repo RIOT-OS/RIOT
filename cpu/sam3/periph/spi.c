@@ -76,7 +76,9 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
     if (freq < DIV_ROUND_UP(CLOCK_CORECLOCK, 255)) {
         return (spi_clk_t){ .err = -EDOM };
     }
-    return (spi_clk_t){ .clk = DIV_ROUND_UP(CLOCK_CORECLOCK, freq) };
+    return (spi_clk_t){
+        .spi_csr_scbr = SPI_CSR_SCBR(DIV_ROUND_UP(CLOCK_CORECLOCK, freq))
+    };
 }
 
 int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
@@ -85,21 +87,23 @@ int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
     if (clk.err) {
         return -EINVAL;
     }
-    return CLOCK_CORECLOCK / clk.clk;
+    return CLOCK_CORECLOCK / clk.spi_csr_scbr;
 }
 
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)cs;
     assert((unsigned)bus < SPI_NUMOF);
-    if (clk.err) { return; }
+    if (clk.err) {
+        return;
+    }
 
     /* lock bus */
     mutex_lock(&locks[bus]);
     /* enable SPI device clock */
     PMC->PMC_PCER0 |= (1 << spi_config[bus].id);
     /* set mode and speed */
-    dev(bus)->SPI_CSR[0] = (SPI_CSR_SCBR(clk.clk) | mode);
+    dev(bus)->SPI_CSR[0] = (clk.spi_csr_scbr | mode);
     dev(bus)->SPI_MR = (SPI_MR_MSTR | SPI_MR_MODFDIS);
     dev(bus)->SPI_CR = SPI_CR_SPIEN;
 }

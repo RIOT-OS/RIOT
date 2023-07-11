@@ -132,7 +132,8 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
     }
 
     uint8_t shift = _clk_shift(freq);
-    return (spi_clk_t){ .clk = ((~shift & 1) << 7) | (shift >> 1) };
+    return (spi_clk_t)
+        { .ctrl_clk2x_prescaler = ((~shift & 1) << 7) | (shift >> 1) };
 }
 
 int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
@@ -141,7 +142,8 @@ int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
     if (clk.err) {
         return -EINVAL;
     }
-    uint8_t shift = ((~clk.clk & 0x80) >> 7) | (clk.clk << 1);
+    uint8_t shift = ((~clk.ctrl_clk2x_prescaler & 0x80) >> 7)
+                    | (clk.ctrl_clk2x_prescaler << 1);
     return shift > 5 ?
         CLOCK_CORECLOCK >> shift : (CLOCK_CORECLOCK / 2) >> shift;
 }
@@ -164,7 +166,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     dev(bus)->CTRL = SPI_ENABLE_bm
                    | SPI_MASTER_bm
                    | (mode << SPI_MODE_gp)
-                   | clk.clk;
+                   | clk.ctrl_clk2x_prescaler;
 
     (void)dev(bus)->STATUS;
     (void)dev(bus)->DATA;

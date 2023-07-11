@@ -299,7 +299,7 @@ spi_clk_t IRAM_ATTR spi_get_clk(spi_t bus, uint32_t freq)
           "reg=%08"PRIx32"\n",
           __func__, bus, freq, _freq, clk_reg);
 
-    return (spi_clk_t){ .clk = clk_reg };
+    return (spi_clk_t){ .reg_psc_bits = clk_reg };
 }
 
 int32_t IRAM_ATTR spi_get_freq(spi_t bus, spi_clk_t clk)
@@ -309,17 +309,20 @@ int32_t IRAM_ATTR spi_get_freq(spi_t bus, spi_clk_t clk)
         return -EINVAL;
     }
     uint32_t apb_clk = rtc_clk_apb_freq_get();
-    uint16_t spi_clkdiv_pre = (clk.clk >> 18) & 0x1fff;
-    uint8_t spi_clkcnt_N = (clk.clk >> 12) & 0x3f;
+    uint16_t spi_clkdiv_pre = (clk.reg_psc_bits >> 18) & 0x1fff;
+    uint8_t spi_clkcnt_N = (clk.reg_psc_bits >> 12) & 0x3f;
     return (apb_clk / (spi_clkdiv_pre + 1) / (spi_clkcnt_N +1));
 }
 
 void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
-    DEBUG("%s bus=%u cs=%u mode=%u clk=%"PRIu32"\n", __func__, bus, cs, mode, clk.clk);
+    DEBUG("%s bus=%u cs=%u mode=%u clk=%"PRIu32"\n",
+            __func__, bus, cs, mode, clk.reg_psc_bits);
 
     assert(bus < SPI_NUMOF);
-    if (clk.err) { return; }
+    if (clk.err) {
+        return;
+    }
 
     /* if parameter cs is GPIO_UNDEF, the default CS pin is used */
     cs = (cs == GPIO_UNDEF) ? spi_config[bus].cs : cs;
@@ -352,7 +355,7 @@ void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t cl
     spi_ll_set_mosi_delay(_spi[bus].periph->hw, 0, 0);
 
     /* set SPI clock */
-    spi_ll_master_set_clock_by_reg(_spi[bus].periph->hw, &clk.clk);
+    spi_ll_master_set_clock_by_reg(_spi[bus].periph->hw, &clk.reg_psc_bits);
 
 #if defined(CPU_FAM_ESP32C3) || defined(CPU_FAM_ESP32S3)
     /*

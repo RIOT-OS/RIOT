@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015-2017 Freie Universität Berlin
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef PERIPH_CPU_H
@@ -475,6 +477,17 @@ typedef enum {
     SPI_MODE_2 = usartClockMode2,
     SPI_MODE_3 = usartClockMode3
 } spi_mode_t;
+/** @} */
+
+/**
+ * @brief   Override SPI clock configuration
+ * @{
+ */
+#define HAVE_SPI_CLK_T
+typedef struct {
+    uint32_t baudrate;
+    int err;
+} spi_clk_t;
 /** @} */
 #endif /* ndef DOXYGEN */
 

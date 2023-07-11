@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2022 Gunar Schorcht
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Peripheral configuration that is common for all ESP32x SoCs
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef PERIPH_CPU_H

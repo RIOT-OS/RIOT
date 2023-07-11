@@ -95,7 +95,7 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
     scr = divider / cpsdvsr - 1;
 
     return (spi_clk_t){
-        .clk = DIV_ROUND_UP(sys_ctl_clock, (cpsdvsr * (1 + scr)))
+        .bit_rate = DIV_ROUND_UP(sys_ctl_clock, (cpsdvsr * (1 + scr)))
     };
 }
 
@@ -105,14 +105,16 @@ int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
     if (clk.err) {
         return -EINVAL;
     }
-    return clk.clk;
+    return clk.bit_rate;
 }
 
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)cs;
     assert((unsigned)bus < SPI_NUMOF);
-    if (clk.err) { return; }
+    if (clk.err) {
+        return;
+    }
 
     /* lock bus */
     mutex_lock(&locks[bus]);
@@ -124,7 +126,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     ROM_SSIConfigSetExpClk(spi_confs[bus].ssi_base, ROM_SysCtlClockGet(),
                            mode,
                            SSI_MODE_MASTER,
-                           clk.clk,
+                           clk.bit_rate,
                            8);
 
     ROM_SSIEnable(spi_confs[bus].ssi_base);

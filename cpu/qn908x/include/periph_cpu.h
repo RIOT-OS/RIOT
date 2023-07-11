@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2020 iosabi
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief           CPU specific definitions for internal peripheral handling
  *
  * @author          iosabi <iosabi@protonmail.com>
+ * @author          Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef PERIPH_CPU_H
@@ -450,6 +452,17 @@ typedef struct {
     gpio_t clk_pin;                  /**< CLK pin */
     gpio_t cs_pin[SPI_HWCS_NUMOF];   /**< pins used for HW cs lines */
 } spi_conf_t;
+
+/**
+ * @brief   Override SPI clock configuration
+ * @{
+ */
+#define HAVE_SPI_CLK_T
+typedef struct {
+    uint32_t div_divval;
+    int err;
+} spi_clk_t;
+/** @} */
 
 #endif /* ifndef DOXYGEN */
 

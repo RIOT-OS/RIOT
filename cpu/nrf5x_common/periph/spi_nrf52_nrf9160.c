@@ -28,6 +28,7 @@
 
 #include <assert.h>
 
+#include "bitarithm.h"
 #include "cpu.h"
 #include "mutex.h"
 #include "periph/spi.h"
@@ -187,25 +188,13 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
 {
     (void)bus;
 
-    if (freq >= MHZ(8)) {
-        return (spi_clk_t){ .clk = SPIM_FREQUENCY_FREQUENCY_M8 };
+    uint8_t shift;
+    for (shift = 0; MHZ(8) >> shift > freq; shift++) {
+        if (shift > 6) {
+            return (spi_clk_t){ .err = -EDOM };
+        }
     }
-    else if (freq >= MHZ(4)) {
-        return (spi_clk_t){ .clk = SPIM_FREQUENCY_FREQUENCY_M4 };
-    }
-    else if (freq >= MHZ(2)) {
-        return (spi_clk_t){ .clk = SPIM_FREQUENCY_FREQUENCY_M2 };
-    }
-    else if (freq >= MHZ(1)) {
-        return (spi_clk_t){ .clk = SPIM_FREQUENCY_FREQUENCY_M1 };
-    }
-    else if (freq >= 500000) {
-        return (spi_clk_t){ .clk = SPIM_FREQUENCY_FREQUENCY_K500 };
-    }
-    else if (freq >= 250000) {
-        return (spi_clk_t){ .clk = SPIM_FREQUENCY_FREQUENCY_K250 };
-    }
-    return (spi_clk_t){ .err = -EDOM };
+    return (spi_clk_t){ .frequency = BIT31 >> shift };
 }
 
 int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
@@ -214,24 +203,16 @@ int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
     if (clk.err) {
         return -EINVAL;
     }
-
-    switch (clk.clk) {
-        case SPIM_FREQUENCY_FREQUENCY_K125: return 125000;
-        case SPIM_FREQUENCY_FREQUENCY_K250: return 250000;
-        case SPIM_FREQUENCY_FREQUENCY_K500: return 500000;
-        case SPIM_FREQUENCY_FREQUENCY_M1: return MHZ(1);
-        case SPIM_FREQUENCY_FREQUENCY_M2: return MHZ(2);
-        case SPIM_FREQUENCY_FREQUENCY_M4: return MHZ(4);
-        case SPIM_FREQUENCY_FREQUENCY_M8: return MHZ(8);
-        default: return -EINVAL;
-    }
+    return MHZ(8) >> (31 - bitarithm_msb(clk.frequency));
 }
 
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)cs;
     assert((unsigned)bus < SPI_NUMOF);
-    if (clk.err) { return; }
+    if (clk.err) {
+        return;
+    }
 
     if (IS_USED(MODULE_PERIPH_SPI_RECONFIGURE)) {
         mutex_lock(&locks[bus]);
@@ -242,7 +223,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
     /* configure bus */
     dev(bus)->CONFIG = mode;
-    dev(bus)->FREQUENCY = clk.clk;
+    dev(bus)->FREQUENCY = clk.frequency;
     /* enable the bus */
     dev(bus)->ENABLE = SPIM_ENABLE_ENABLE_Enabled;
 }

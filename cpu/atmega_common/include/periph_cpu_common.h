@@ -285,9 +285,9 @@ typedef enum {
  */
 #define HAVE_SPI_CLK_T
 typedef struct {
+    uint8_t spsr_spi2x;
+    uint8_t spcr_spr;
     int err;
-    uint8_t spi2x;
-    uint8_t spr;
 } spi_clk_t;
 /** @} */
 #endif /* ifndef DOXYGEN */

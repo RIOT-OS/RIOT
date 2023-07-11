@@ -277,7 +277,7 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
     }
 
     return (spi_clk_t){
-        .clk =  SPI_CTAR_PBR(pbr) | SPI_CTAR_BR(br) |
+        .ctar = SPI_CTAR_PBR(pbr) | SPI_CTAR_BR(br) |
                 SPI_CTAR_PCSSCK(pdt) | SPI_CTAR_CSSCK(dt) |
                 SPI_CTAR_PASC(pdt) | SPI_CTAR_ASC(dt) |
                 SPI_CTAR_PDT(pdt) | SPI_CTAR_DT(dt)
@@ -297,8 +297,8 @@ int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
     };
     static const int br_prescalers[4] = {2, 3, 5, 7};
 
-    int pbr = br_prescalers[clk.clk >> 16 & 0x3];
-    int br = br_scalers[clk.clk & 0xf];
+    int pbr = br_prescalers[clk.ctar >> 16 & 0x3];
+    int br = br_scalers[clk.ctar & 0xf];
 
     return CLOCK_BUSCLOCK / (pbr * br);
 }
@@ -307,7 +307,9 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)cs;
     assert((unsigned)bus < SPI_NUMOF);
-    if (clk.err) { return; }
+    if (clk.err) {
+        return;
+    }
 
     /* lock and power on the bus */
     mutex_lock(&locks[bus]);
@@ -317,7 +319,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     dev(bus)->MCR &= ~(SPI_MCR_HALT_MASK | SPI_MCR_MDIS_MASK);
 
     /* configure clock and mode */
-    dev(bus)->CTAR[0] = (mode | SPI_CTAR_FMSZ(7) | clk.clk);
+    dev(bus)->CTAR[0] = (mode | SPI_CTAR_FMSZ(7) | clk.ctar);
 }
 
 void spi_release(spi_t bus)

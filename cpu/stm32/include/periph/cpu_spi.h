@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2016 Freie Universität Berlin
  *               2017 OTA keys S.A.
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,6 +17,7 @@
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Vincent Dupont <vincent@otakeys.com>
+ * @author          Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef PERIPH_CPU_SPI_H
@@ -60,6 +62,17 @@ extern "C" {
  */
 #define HAVE_SPI_CS_T
 typedef uint32_t spi_cs_t;
+/** @} */
+
+/**
+ * @brief   Override SPI clock configuration
+ * @{
+ */
+#define HAVE_SPI_CLK_T
+typedef struct {
+    uint32_t cr1_br;
+    int err;
+} spi_clk_t;
 /** @} */
 #endif
 

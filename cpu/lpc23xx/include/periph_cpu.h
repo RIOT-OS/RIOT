@@ -153,9 +153,9 @@ typedef struct {
  */
 #define HAVE_SPI_CLK_T
 typedef struct {
+    uint32_t pclksel_pclk_ssp;
+    uint32_t cpsr_cpsdvsr;
     int err;
-    uint32_t pclksel;
-    uint32_t cpsr;
 } spi_clk_t;
 #endif /* ifndef DOXYGEN */
 

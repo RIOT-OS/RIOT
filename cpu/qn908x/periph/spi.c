@@ -183,7 +183,7 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
 
     /* The value stored in DIV is always (divider - 1), meaning that a value of
      * 0 divides by 1. */
-    return (spi_clk_t){ .clk = (uint16_t)(divider - 1) };
+    return (spi_clk_t){ .div_divval = (uint16_t)(divider - 1) };
 }
 
 int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
@@ -192,14 +192,16 @@ int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
     if (clk.err) {
         return -EINVAL;
     }
-    return CLOCK_GetFreq(kCLOCK_BusClk) / (clk.clk + 1);
+    return CLOCK_GetFreq(kCLOCK_BusClk) / (clk.div_divval + 1);
 }
 
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     assert((unsigned)bus < SPI_NUMOF);
     assert((mode & ~(SPI_CFG_CPHA_MASK | SPI_CFG_CPOL_MASK)) == 0);
-    if (clk.err) { return; }
+    if (clk.err) {
+        return;
+    }
 
     const spi_conf_t *const conf = &spi_config[bus];
 
@@ -207,7 +209,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
     /* Set SPI clock speed. This silently chooses the closest frequency, no
      * matter how far it is from the requested one. */
-    conf->dev->DIV = clk.clk;
+    conf->dev->DIV = clk.div_divval;
 
     DEBUG("[spi] acquire: mode CPHA=%d CPOL=%d, cs=0x%" PRIx32 "\n",
           !!(mode & SPI_CFG_CPHA_MASK), !!(mode & SPI_CFG_CPOL_MASK),

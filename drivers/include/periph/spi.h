@@ -132,15 +132,22 @@ typedef gpio_t spi_cs_t;
 #endif
 
 /**
- * @brief   Structure representing the return value of @ref spi_get_clk function
+ * @brief   Opaque type that contains an SPI clock configuration
  *
- * This structure encapsulates the return code and the SPI clock configuration.
+ * This should contains precomputed register bitmask(s) ready to be applied by
+ * @ref spi_acquire and implementation should overwrite it if needed, e.g two
+ * registers are impacted or register size not matching uword_t.
+ *
+ * The driver for each device on the bus can save this value at init time
+ * for later use if spi_get_clk generates too much overhead.
+ *
+ * Use @ref spi_get_clk to obtain this value.
+ * Use @ref spi_get_freq to obtain the obtained actual frequency.
  */
 #ifndef HAVE_SPI_CLK_T
 typedef struct {
-    int err;        /**< Error code indicating the success or failure of the
-                     *   operation */
-    uword_t clk;    /**< SPI clock configuration */
+    uword_t reg_psc_bits;
+    int err;
 } spi_clk_t;
 #endif
 
@@ -381,7 +388,6 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq);
  * @retval  > 0         The exact frequency in Hertz matching the clock
  *                      configuration.
  * @retval  -EINVAL     spi_get_clk() failed to get a valid clock configuration
- *                      so .errno was set in clk data structure.
  *
  * @note    In most cases `spi_get_freq(spi_get_clk(x)) != x` will be true,
  *          since `spi_get_clk()` will return only the closest match, which will

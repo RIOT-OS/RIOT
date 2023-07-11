@@ -168,6 +168,17 @@ typedef enum {
     SPI_MODE_3 = SSI_FRF_MOTO_MODE_0,       /**< CPOL=1, CPHA=1 */
 } spi_mode_t;
 /** @} */
+
+/**
+ * @brief   Override SPI clock configuration
+ * @{
+ */
+#define HAVE_SPI_CLK_T
+typedef struct {
+    uint32_t bit_rate;
+    int err;
+} spi_clk_t;
+/** @} */
 #endif /* ndef DOXYGEN */
 
 #ifdef __cplusplus
