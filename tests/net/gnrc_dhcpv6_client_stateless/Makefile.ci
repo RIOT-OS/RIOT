@@ -8,6 +8,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega1284p \
     atmega328p \
     atmega328p-xplained-mini \
+    atmega8 \
     atxmega-a3bu-xplained \
     b-l072z-lrwan1 \
     bluepill-stm32f030c8 \

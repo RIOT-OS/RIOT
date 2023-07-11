@@ -6,4 +6,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega328p \
     atmega328p-xplained-mini \
     atmega32u4 \
+    atmega8 \
     #

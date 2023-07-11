@@ -1,5 +1,6 @@
 BOARD_INSUFFICIENT_MEMORY := \
     atmega256rfr2-xpro \
+    atmega8 \
     hifive1 \
     hifive1b \
     i-nucleo-lrwan1 \

@@ -14,8 +14,8 @@ config CPU_COMMON_ATMEGA
     bool
     select HAS_CPU_CORE_ATMEGA
     select HAS_ATMEGA_PCINT0
-    select HAS_DBGPIN
-    select HAS_PERIPH_CPUID
+    select HAS_DBGPIN if !CPU_FAM_ATMEGA8
+    select HAS_PERIPH_CPUID if !CPU_FAM_ATMEGA8
     select HAS_PERIPH_EEPROM
     select HAS_PERIPH_GPIO
     select HAS_PERIPH_GPIO_IRQ
