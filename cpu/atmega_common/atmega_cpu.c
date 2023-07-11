@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
  *               2017 RWTH Aachen, Josua Arndt
  *               2018 Matthew Blue
- *               2021 Gerson Fernando Budke
+ *               2021-2023 Gerson Fernando Budke
  *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -30,6 +30,7 @@
 
 #include "board.h"
 #include "cpu.h"
+#include "irq_arch.h"
 #include "panic.h"
 
 #define ENABLE_DEBUG 0
@@ -85,7 +86,7 @@ void __attribute__((weak)) avr8_clk_init(void)
  * EIFR – External Interrupt Flag Register
  * PCIFR – Pin Change Interrupt Flag Register
  */
-ISR(BADISR_vect)
+ISR(BADISR_vect, ISR_NAKED)
 {
     avr8_reset_cause();
 
@@ -109,10 +110,5 @@ ISR(BADISR_vect)
 }
 
 #if defined(BAT_LOW_vect)
-ISR(BAT_LOW_vect, ISR_BLOCK)
-{
-    avr8_enter_isr();
-    DEBUG("BAT_LOW\n");
-    avr8_exit_isr();
-}
+AVR8_ISR(BAT_LOW_vect, DEBUG, "BAT_LOW\n");
 #endif

@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
  *               2023 Hugues Larrive
+ *               2023 Gerson Fernando Budke
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,6 +19,7 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author      Hugues Larrive <hugues.larrive@pm.me>
+ * @author      Gerson Fernando Budke <nandojve@gmail.com>
  *
  * @}
  */
@@ -323,8 +325,6 @@ static inline void _isr(tim_t tim, int chan)
     DEBUG_TIMER_PORT |= (1 << DEBUG_TIMER_PIN);
 #endif
 
-    avr8_enter_isr();
-
     if (is_oneshot(tim, chan)) {
         timer_clear(tim, chan);
     }
@@ -333,79 +333,33 @@ static inline void _isr(tim_t tim, int chan)
 #if defined(DEBUG_TIMER_PORT)
     DEBUG_TIMER_PORT &= ~(1 << DEBUG_TIMER_PIN);
 #endif
-
-    avr8_exit_isr();
 }
 #endif
 
 #ifdef TIMER_0
-ISR(TIMER_0_ISRA, ISR_BLOCK)
-{
-    _isr(0, 0);
-}
-
-ISR(TIMER_0_ISRB, ISR_BLOCK)
-{
-    _isr(0, 1);
-}
-
+AVR8_ISR(TIMER_0_ISRA, _isr, 0, 0);
+AVR8_ISR(TIMER_0_ISRB, _isr, 0, 1);
 #ifdef TIMER_0_ISRC
-ISR(TIMER_0_ISRC, ISR_BLOCK)
-{
-    _isr(0, 2);
-}
+AVR8_ISR(TIMER_0_ISRC, _isr, 0, 2);
 #endif  /* TIMER_0_ISRC */
 #endif  /* TIMER_0 */
 
 #ifdef TIMER_1
-ISR(TIMER_1_ISRA, ISR_BLOCK)
-{
-    _isr(1, 0);
-}
-
-ISR(TIMER_1_ISRB, ISR_BLOCK)
-{
-    _isr(1, 1);
-}
-
+AVR8_ISR(TIMER_1_ISRA, _isr, 1, 0);
+AVR8_ISR(TIMER_1_ISRB, _isr, 1, 1);
 #ifdef TIMER_1_ISRC
-ISR(TIMER_1_ISRC, ISR_BLOCK)
-{
-    _isr(1, 2);
-}
-#endif  /* TIMER_1_ISRC */
+AVR8_ISR(TIMER_1_ISRC, _isr, 1, 2);
+#endif  /* TIMER_0_ISRC */
 #endif  /* TIMER_1 */
 
 #ifdef TIMER_2
-ISR(TIMER_2_ISRA, ISR_BLOCK)
-{
-    _isr(2, 0);
-}
-
-ISR(TIMER_2_ISRB, ISR_BLOCK)
-{
-    _isr(2, 1);
-}
-
-ISR(TIMER_2_ISRC, ISR_BLOCK)
-{
-    _isr(2, 2);
-}
+AVR8_ISR(TIMER_2_ISRA, _isr, 2, 0);
+AVR8_ISR(TIMER_2_ISRB, _isr, 2, 1);
+AVR8_ISR(TIMER_2_ISRC, _isr, 2, 2);
 #endif /* TIMER_2 */
 
 #ifdef TIMER_3
-ISR(TIMER_3_ISRA, ISR_BLOCK)
-{
-    _isr(2, 0);
-}
-
-ISR(TIMER_3_ISRB, ISR_BLOCK)
-{
-    _isr(2, 1);
-}
-
-ISR(TIMER_3_ISRC, ISR_BLOCK)
-{
-    _isr(2, 2);
-}
+AVR8_ISR(TIMER_3_ISRA, _isr, 3, 0);
+AVR8_ISR(TIMER_3_ISRB, _isr, 3, 1);
+AVR8_ISR(TIMER_3_ISRC, _isr, 3, 2);
 #endif /* TIMER_3 */

@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2018 Kaspar Schleiser <kaspar@schleiser.de>
  *               2015 Freie Universität Berlin
+ *               2023 Gerson Fernando Budke
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -20,6 +21,7 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
+ * @author      Gerson Fernando Budke <nandojve@gmail.com>
  *
  * @}
  */
@@ -140,7 +142,6 @@ static const ieee802154_radio_cipher_ops_t _at86rf2xx_cipher_ops = {
 #endif /* IS_USED(MODULE_AT86RF2XX_AES_SPI) && \
           IS_USED(MODULE_IEEE802154_SECURITY) */
 
-
 /* SOC has radio interrupts, store reference to netdev */
 static netdev_t *at86rfmega_dev;
 static void _irq_handler(void *arg)
@@ -176,7 +177,8 @@ static int _init(netdev_t *netdev)
     at86rf2xx_set_addr_short(dev, (network_uint16_t *)dev->netdev.short_addr);
 
     /* `netdev_ieee802154_reset` does not set the default channel. */
-    netdev_ieee802154_set(&dev->netdev, NETOPT_CHANNEL, &at86rf2xx_chan_default, sizeof(at86rf2xx_chan_default));
+    netdev_ieee802154_set(&dev->netdev, NETOPT_CHANNEL,
+                          &at86rf2xx_chan_default, sizeof(at86rf2xx_chan_default));
 
     if (!IS_ACTIVE(AT86RF2XX_BASIC_MODE)) {
         static const netopt_enable_t ack_req =
@@ -561,7 +563,8 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             if (!IS_ACTIVE(AT86RF2XX_BASIC_MODE)) {
                 assert(max_len >= sizeof(netopt_enable_t));
                 uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__CSMA_SEED_1);
-                *((netopt_enable_t *)val) = (tmp & AT86RF2XX_CSMA_SEED_1__AACK_DIS_ACK) ? false : true;
+                *((netopt_enable_t *)val) = (tmp & AT86RF2XX_CSMA_SEED_1__AACK_DIS_ACK)
+                                          ? false : true;
                 res = sizeof(netopt_enable_t);
             }
             break;
@@ -957,7 +960,6 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params, uint8_t
     netdev_ieee802154_setup(&dev->netdev);
 }
 
-
 #if AT86RF2XX_IS_PERIPH
 
 /**
@@ -989,18 +991,15 @@ ISR(TRX24_TX_START_vect){
  *
  * Manual p. 40
  */
-ISR(TRX24_PLL_LOCK_vect, ISR_BLOCK)
+static inline void txr24_pll_lock_handler(void)
 {
-    avr8_enter_isr();
-
     DEBUG("TRX24_PLL_LOCK\n");
     netdev_ieee802154_t *netdev_ieee802154 = container_of(at86rfmega_dev,
                           netdev_ieee802154_t, netdev);
     at86rf2xx_t *dev = container_of(netdev_ieee802154, at86rf2xx_t, netdev);
     dev->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__PLL_LOCK;
-
-    avr8_exit_isr();
 }
+AVR8_ISR(TRX24_PLL_LOCK_vect, txr24_pll_lock_handler);
 
 /**
  * @brief  Transceiver PLL Unlock
@@ -1009,18 +1008,15 @@ ISR(TRX24_PLL_LOCK_vect, ISR_BLOCK)
  *
  * Manual p. 89
  */
-ISR(TRX24_PLL_UNLOCK_vect, ISR_BLOCK)
+static inline void txr24_pll_unlock_handler(void)
 {
-    avr8_enter_isr();
-
     DEBUG("TRX24_PLL_UNLOCK\n");
     netdev_ieee802154_t *netdev_ieee802154 = container_of(at86rfmega_dev,
                           netdev_ieee802154_t, netdev);
     at86rf2xx_t *dev = container_of(netdev_ieee802154, at86rf2xx_t, netdev);
     dev->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__PLL_UNLOCK;
-
-    avr8_exit_isr();
 }
+AVR8_ISR(TRX24_PLL_UNLOCK_vect, txr24_pll_unlock_handler);
 
 /**
  * @brief ISR for transceiver's receive start interrupt
@@ -1030,10 +1026,8 @@ ISR(TRX24_PLL_UNLOCK_vect, ISR_BLOCK)
  *
  * Flow Diagram Manual p. 52 / 63
  */
-ISR(TRX24_RX_START_vect, ISR_BLOCK)
+static inline void txr24_rx_start_handler(void)
 {
-    avr8_enter_isr();
-
     uint8_t status = *AT86RF2XX_REG__TRX_STATE & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
     DEBUG("TRX24_RX_START 0x%x\n", status);
 
@@ -1043,9 +1037,8 @@ ISR(TRX24_RX_START_vect, ISR_BLOCK)
     dev->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__RX_START;
     /* Call upper layer to process valid PHR */
     netdev_trigger_event_isr(at86rfmega_dev);
-
-    avr8_exit_isr();
 }
+AVR8_ISR(TRX24_RX_START_vect, txr24_rx_start_handler);
 
 /**
  * @brief ISR for transceiver's receive end interrupt
@@ -1055,10 +1048,8 @@ ISR(TRX24_RX_START_vect, ISR_BLOCK)
  *
  * Flow Diagram Manual p. 52 / 63
  */
-ISR(TRX24_RX_END_vect, ISR_BLOCK)
+static inline void txr24_rx_end_handler(void)
 {
-    avr8_enter_isr();
-
     uint8_t status = *AT86RF2XX_REG__TRX_STATE & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
     DEBUG("TRX24_RX_END 0x%x\n", status);
 
@@ -1068,9 +1059,8 @@ ISR(TRX24_RX_END_vect, ISR_BLOCK)
     dev->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__RX_END;
     /* Call upper layer to process received data */
     netdev_trigger_event_isr(at86rfmega_dev);
-
-    avr8_exit_isr();
 }
+AVR8_ISR(TRX24_RX_END_vect, txr24_rx_end_handler);
 
 /**
  * @brief  Transceiver CCAED Measurement finished
@@ -1079,18 +1069,15 @@ ISR(TRX24_RX_END_vect, ISR_BLOCK)
  *
  * Manual p. 74 and p. 76
  */
-ISR(TRX24_CCA_ED_DONE_vect, ISR_BLOCK)
+static inline void txr24_cca_ed_done_handler(void)
 {
-    avr8_enter_isr();
-
     DEBUG("TRX24_CCA_ED_DONE\n");
     netdev_ieee802154_t *netdev_ieee802154 = container_of(at86rfmega_dev,
                           netdev_ieee802154_t, netdev);
     at86rf2xx_t *dev = container_of(netdev_ieee802154, at86rf2xx_t, netdev);
     dev->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__CCA_ED_DONE;
-
-    avr8_exit_isr();
 }
+AVR8_ISR(TRX24_CCA_ED_DONE_vect, txr24_cca_ed_done_handler);
 
 /**
  * @brief  Transceiver Frame Address Match, indicates incoming frame
@@ -1100,18 +1087,15 @@ ISR(TRX24_CCA_ED_DONE_vect, ISR_BLOCK)
  *
  * Flow Diagram Manual p. 52 / 63
  */
-ISR(TRX24_XAH_AMI_vect, ISR_BLOCK)
+static inline void txr24_xah_ami_handler(void)
 {
-    avr8_enter_isr();
-
     DEBUG("TRX24_XAH_AMI\n");
     netdev_ieee802154_t *netdev_ieee802154 = container_of(at86rfmega_dev,
                           netdev_ieee802154_t, netdev);
     at86rf2xx_t *dev = container_of(netdev_ieee802154, at86rf2xx_t, netdev);
     dev->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__AMI;
-
-    avr8_exit_isr();
 }
+AVR8_ISR(TRX24_XAH_AMI_vect, txr24_xah_ami_handler);
 
 /**
  * @brief ISR for transceiver's transmit end interrupt
@@ -1120,10 +1104,8 @@ ISR(TRX24_XAH_AMI_vect, ISR_BLOCK)
  *
  * Flow Diagram Manual p. 52 / 63
  */
-ISR(TRX24_TX_END_vect, ISR_BLOCK)
+static inline void txr24_tx_end_handler(void)
 {
-    avr8_enter_isr();
-
     netdev_ieee802154_t *netdev_ieee802154 = container_of(at86rfmega_dev,
                           netdev_ieee802154_t, netdev);
     at86rf2xx_t *dev = container_of(netdev_ieee802154, at86rf2xx_t, netdev);
@@ -1138,9 +1120,8 @@ ISR(TRX24_TX_END_vect, ISR_BLOCK)
         /* Call upper layer to process if data was send successful */
         netdev_trigger_event_isr(at86rfmega_dev);
     }
-
-    avr8_exit_isr();
 }
+AVR8_ISR(TRX24_TX_END_vect, txr24_tx_end_handler);
 
 /**
  * @brief ISR for transceiver's wakeup finished interrupt
@@ -1150,10 +1131,8 @@ ISR(TRX24_TX_END_vect, ISR_BLOCK)
  *
  * Manual p. 40
  */
-ISR(TRX24_AWAKE_vect, ISR_BLOCK)
+static inline void txr24_awake_handler(void)
 {
-    avr8_enter_isr();
-
     DEBUG("TRX24_AWAKE\n");
 
     netdev_ieee802154_t *netdev_ieee802154 = container_of(at86rfmega_dev,
@@ -1162,8 +1141,7 @@ ISR(TRX24_AWAKE_vect, ISR_BLOCK)
     dev->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__AWAKE;
     /* Call upper layer to process transceiver wakeup finished */
     netdev_trigger_event_isr(at86rfmega_dev);
-
-    avr8_exit_isr();
 }
+AVR8_ISR(TRX24_AWAKE_vect, txr24_awake_handler);
 
 #endif /* AT86RF2XX_IS_PERIPH */
