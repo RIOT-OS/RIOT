@@ -37,7 +37,7 @@ extern "C" {
 #define LCD_CMD_RDDIDIF         0x04    /**< Read display ID */
 #define LCD_CMD_SPLIN           0x10    /**< Enter sleep mode */
 #define LCD_CMD_SLPOUT          0x11    /**< Sleep out */
-#define LCD_CMD_NORON           0x11    /**< Normal display mode on */
+#define LCD_CMD_NORON           0x13    /**< Normal display mode on */
 #define LCD_CMD_DINVOFF         0x20    /**< Display inversion off */
 #define LCD_CMD_DINVON          0x21    /**< Display inversion on */
 
