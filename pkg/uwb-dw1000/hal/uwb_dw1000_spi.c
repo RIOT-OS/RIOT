@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2020 Inria
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,13 +15,15 @@
  * @brief       SPI abstraction layer implementation
  *
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  * @}
  */
 
 #include "hal/hal_spi.h"
+#include "macros/units.h"
 #include "periph/spi.h"
 
-static uint32_t spi_clk[SPI_NUMOF] = { SPI_CLK_1MHZ };
+static spi_clk_t spi_clk[SPI_NUMOF] = { spi_get_clk(0, MHZ(1)) };
 static uint32_t spi_mode[SPI_NUMOF] = { SPI_MODE_0 };
 
 int hal_spi_set_txrx_cb(int spi_num, hal_spi_txrx_cb txrx_cb, void *arg)
@@ -41,7 +44,7 @@ int hal_spi_init(int spi_num, void *cfg, uint8_t spi_type)
 
 int hal_spi_config(int spi_num, struct hal_spi_settings *settings)
 {
-    spi_clk[spi_num] = settings->baudrate;
+    spi_clk[spi_num] = spi_get_clk(spi_num, settings->baudrate);
     spi_mode[spi_num] = settings->data_mode;
     return 0;
 }

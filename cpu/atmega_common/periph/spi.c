@@ -29,18 +29,50 @@
 #include <assert.h>
 
 #include "cpu.h"
+#include "macros/math.h"
+#include "macros/units.h"
 #include "mutex.h"
 #include "periph/spi.h"
 
-/**
- * @brief   Extract BR0, BR1 and SPI2X bits from speed value
- * @{
- */
-#define CLK_MASK            (0x3)
-#define S2X_SHIFT           (2)
-/** @} */
+#define ENABLE_DEBUG        0
+#include "debug.h"
 
 static mutex_t lock = MUTEX_INIT;
+
+/**
+ * @brief   Helper function to compute a right shift value corresponding
+ *          to dividers
+ * @{
+ */
+static uint8_t _clk_shift(uint32_t freq)
+{
+    /* Atmega datasheets give the following table:
+     * SPI2X    SPR1    SPR0    SCK Frequency
+     * 0        0       0       Fosc/4
+     * 0        0       1       Fosc/16
+     * 0        1       0       Fosc/64
+     * 0        1       1       Fosc/128
+     * 1        0       0       Fosc/2
+     * 1        0       1       Fosc/8
+     * 1        1       0       Fosc/32
+     * 1        1       1       Fosc/64
+     * We can easily sort it by dividers by inverting the SPI2X bit and
+     * taking it as LSB:
+     * Divider  SPR1    SPR0    ~SPI2X  shift
+     * 2        0       0       0       0
+     * 4        0       0       1       1
+     * 8        0       1       0       2
+     * 16       0       1       1       3
+     * 32       1       0       0       4
+     * 64       1       0       1       5
+     * 64       1       1       0       6
+     * 128      1       1       1       7 */
+    uint8_t shift;
+    for (shift = 0; freq << shift < CLOCK_CORECLOCK / 2;
+         shift = ++shift > 5 ? shift + 1 : shift) {}
+    return shift;
+}
+/** @} */
 
 void spi_init(spi_t bus)
 {
@@ -82,11 +114,41 @@ void spi_init_pins(spi_t bus)
 #endif
 }
 
+spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
+{
+    (void)bus;
+    /* bound divider to 128 */
+    if(freq < DIV_ROUND_UP(CLOCK_CORECLOCK, 128)) {
+        return (spi_clk_t){ .err = -EDOM };
+    }
+
+    uint8_t shift = _clk_shift(freq);
+    return (spi_clk_t){
+        .spsr_spi2x = ~shift & 1,
+        .spcr_spr = shift >> 1
+    };
+}
+
+int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
+{
+    (void)bus;
+    if (clk.err) {
+        return -EINVAL;
+    }
+    uint8_t shift = (~clk.spsr_spi2x & 1) | (clk.spcr_spr << 1);
+    return shift > 5 ?
+        CLOCK_CORECLOCK >> shift : (CLOCK_CORECLOCK / 2) >> shift;
+}
+
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)bus;
     (void)cs;
+
     assert(bus == SPI_DEV(0));
+    if (clk.err) {
+        return;
+    }
 
     /* lock the bus and power on the SPI peripheral */
     mutex_lock(&lock);
@@ -95,8 +157,8 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 #endif
 
     /* configure as master, with given mode and clock */
-    SPSR = (clk >> S2X_SHIFT);
-    SPCR = ((1 << SPE) | (1 << MSTR) | mode | (clk & CLK_MASK));
+    SPSR = clk.spsr_spi2x;
+    SPCR = (1 << SPE | 1 << MSTR | mode | clk.spcr_spr);
 
     /* clear interrupt flag by reading SPSR and data register by reading SPDR */
     (void)SPSR;

@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2016 Freie Universität Berlin
  *               2017 OTA keys S.A.
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,6 +17,7 @@
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Vincent Dupont <vincent@otakeys.com>
+ * @author          Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef PERIPH_CPU_SPI_H
@@ -61,6 +63,17 @@ extern "C" {
 #define HAVE_SPI_CS_T
 typedef uint32_t spi_cs_t;
 /** @} */
+
+/**
+ * @brief   Override SPI clock configuration
+ * @{
+ */
+#define HAVE_SPI_CLK_T
+typedef struct {
+    uint32_t cr1_br;
+    int err;
+} spi_clk_t;
+/** @} */
 #endif
 
 /**
@@ -73,25 +86,6 @@ typedef uint32_t spi_cs_t;
 #define PERIPH_SPI_NEEDS_TRANSFER_REG
 /** Use transfer regs function from periph common */
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS
-/** @} */
-
-/**
- * @brief   Override SPI clock speed values
- * @{
- */
-#define HAVE_SPI_CLK_T
-enum {
-    SPI_CLK_100KHZ = KHZ(100), /**< drive the SPI bus with 100KHz */
-    SPI_CLK_400KHZ = KHZ(400), /**< drive the SPI bus with 400KHz */
-    SPI_CLK_1MHZ   = MHZ(1),   /**< drive the SPI bus with 1MHz */
-    SPI_CLK_5MHZ   = MHZ(5),   /**< drive the SPI bus with 5MHz */
-    SPI_CLK_10MHZ  = MHZ(10),  /**< drive the SPI bus with 10MHz */
-};
-
-/**
- * @brief   SPI clock type
- */
-typedef uint32_t spi_clk_t;
 /** @} */
 
 /**

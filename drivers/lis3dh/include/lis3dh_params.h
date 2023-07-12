@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 Freie Universität Berlin
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Default configuration for LIS3DH devices
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef LIS3DH_PARAMS_H
@@ -21,6 +23,7 @@
 
 #include "board.h"
 #include "lis3dh.h"
+#include "macros/units.h"
 #include "saul_reg.h"
 
 #ifdef __cplusplus
@@ -38,7 +41,7 @@ extern "C" {
 #define LIS3DH_PARAM_CS             (GPIO_PIN(0, 0))
 #endif
 #ifndef LIS3DH_PARAM_CLK
-#define LIS3DH_PARAM_CLK            (SPI_CLK_5MHZ)
+#define LIS3DH_PARAM_CLK            MHZ(10)
 #endif
 #ifndef LIS3DH_PARAM_INT1
 #define LIS3DH_PARAM_INT1           (GPIO_PIN(0, 1))
@@ -56,7 +59,7 @@ extern "C" {
 #ifndef LIS3DH_PARAMS
 #define LIS3DH_PARAMS               { .spi   = LIS3DH_PARAM_SPI,   \
                                       .cs    = LIS3DH_PARAM_CS,    \
-                                      .clk   = LIS3DH_PARAM_CLK,   \
+                                      .freq  = LIS3DH_PARAM_CLK,   \
                                       .int1  = LIS3DH_PARAM_INT1,  \
                                       .int2  = LIS3DH_PARAM_INT2,  \
                                       .scale = LIS3DH_PARAM_SCALE, \

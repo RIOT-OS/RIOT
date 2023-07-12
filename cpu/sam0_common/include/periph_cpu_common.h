@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 Freie Universität Berlin
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,6 +17,7 @@
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Dylan Laduranty <dylan.laduranty@mesotic.com>
+ * @author          Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef PERIPH_CPU_COMMON_H
@@ -369,26 +371,23 @@ typedef enum {
 /** @} */
 
 /**
- * @brief   Override SPI clock speed values
- * @{
- */
-#define HAVE_SPI_CLK_T
-typedef enum {
-    SPI_CLK_100KHZ =   100000U, /**< drive the SPI bus with 100KHz */
-    SPI_CLK_400KHZ =   400000U, /**< drive the SPI bus with 400KHz */
-    SPI_CLK_1MHZ   =  1000000U, /**< drive the SPI bus with 1MHz */
-    SPI_CLK_5MHZ   =  5000000U, /**< drive the SPI bus with 5MHz */
-    SPI_CLK_10MHZ  = 10000000U  /**< drive the SPI bus with 10MHz */
-} spi_clk_t;
-/** @} */
-
-/**
  * @brief   SPI pin getters
  * @{
  */
 #define spi_pin_mosi(dev) spi_config[dev].mosi_pin
 #define spi_pin_miso(dev) spi_config[dev].miso_pin
 #define spi_pin_clk(dev)  spi_config[dev].clk_pin
+/** @} */
+
+/**
+ * @brief   Override SPI clock configuration
+ * @{
+ */
+#define HAVE_SPI_CLK_T
+typedef struct {
+    uint32_t baud;
+    int err;
+} spi_clk_t;
 /** @} */
 
 #endif /* ndef DOXYGEN */

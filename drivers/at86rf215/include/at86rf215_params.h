@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2019 ML!PA Consulting GmbH
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Default configuration for the AT86RF215 driver
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef AT86RF215_PARAMS_H
@@ -21,6 +23,7 @@
 
 #include "at86rf215.h"
 #include "board.h"
+#include "macros/units.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,7 +38,7 @@ extern "C" {
 #define AT86RF215_PARAM_SPI         (SPI_DEV(0))
 #endif
 #ifndef AT86RF215_PARAM_SPI_CLK
-#define AT86RF215_PARAM_SPI_CLK     (SPI_CLK_5MHZ)
+#define AT86RF215_PARAM_SPI_CLK     MHZ(25)
 #endif
 #ifndef AT86RF215_PARAM_CS
 #define AT86RF215_PARAM_CS          (GPIO_PIN(1, 28))
@@ -49,7 +52,7 @@ extern "C" {
 
 #ifndef AT86RF215_PARAMS
 #define AT86RF215_PARAMS            { .spi = AT86RF215_PARAM_SPI,         \
-                                      .spi_clk = AT86RF215_PARAM_SPI_CLK, \
+                                      .spi_freq = AT86RF215_PARAM_SPI_CLK,\
                                       .cs_pin = AT86RF215_PARAM_CS,       \
                                       .int_pin = AT86RF215_PARAM_INT,     \
                                       .reset_pin = AT86RF215_PARAM_RESET }

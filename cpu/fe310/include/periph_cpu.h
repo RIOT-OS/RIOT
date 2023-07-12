@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 Ken Rabold
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -14,6 +15,7 @@
  * @brief           CPU specific definitions for internal peripheral handling
  *
  * @author          Ken Rabold
+ * @author          Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef PERIPH_CPU_H
@@ -89,6 +91,19 @@ typedef struct {
     gpio_t miso;            /**< MISO pin */
     gpio_t sclk;            /**< SCLK pin */
 } spi_conf_t;
+
+#ifndef DOXYGEN
+/**
+ * @brief   Override SPI clock configuration
+ * @{
+ */
+#define HAVE_SPI_CLK_T
+typedef struct {
+    uint32_t sckdiv;
+    int err;
+} spi_clk_t;
+/** @} */
+#endif /* ifndef DOXYGEN */
 
 /**
  * @brief   Prevent shared timer functions from being used

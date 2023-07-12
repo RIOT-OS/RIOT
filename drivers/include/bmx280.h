@@ -2,6 +2,7 @@
  * Copyright (C) 2016 Kees Bakker, SODAQ
  *               2017 Inria
  *               2018 Freie Universität Berlin
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -68,6 +69,7 @@
  * @author      Kees Bakker <kees@sodaq.com>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef BMX280_H
@@ -184,7 +186,9 @@ typedef struct {
 #ifdef BMX280_USE_SPI
     /* SPI configuration */
     spi_t spi;                          /**< SPI bus */
-    spi_clk_t clk;                      /**< clock speed for the SPI bus */
+    spi_clk_t clk;                      /**< SPI clock configuration
+                                         *   computed during init */
+    uint32_t freq;                      /**< SPI clock speed to use */
     gpio_t cs;                          /**< chip select pin */
 #else
     /* I2C details */

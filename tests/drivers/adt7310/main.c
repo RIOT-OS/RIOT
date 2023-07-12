@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Eistec AB
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Test application for the ADT7310 accelerometer driver
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -26,6 +28,7 @@
 #include "xtimer.h"
 #include "periph/spi.h"
 #include "adt7310.h"
+#include "macros/units.h"
 
 /* Check for definition of hardware settings */
 #ifndef TEST_ADT7310_SPI
@@ -36,7 +39,12 @@
 #endif
 
 #define SPI_CONF    (SPI_CONF_SECOND_FALLING)
-#define SPI_CLK     (SPI_CLK_10MHZ)
+/* https://www.analog.com/media/en/technical-documentation/data-sheets/ADT7310.pdf
+ * SPI TIMING SPECIFICATIONS:
+ * 100 ns min SCLK high pulse width
+ * 100 ns min SCLK low pulse width
+ * so SCLK min period = 200ns so 5 MHz max spi clk */
+#define SPI_CLK     MHZ(5)
 
 #define SLEEP_CONT  (100 * 1000U)
 #define SLEEP_1SPS  (1000 * 1000U)
@@ -87,11 +95,12 @@ int test_adt7310_sample_print(adt7310_t *dev)
 int main(void)
 {
     adt7310_t dev;
+    spi_clk_t spi_clk = spi_get_clk(TEST_ADT7310_SPI, SPI_CLK);
 
     puts("ADT7310 temperature driver test application\n");
 
     puts("Initializing ADT7310 sensor... ");
-    if (adt7310_init(&dev, TEST_ADT7310_SPI, SPI_CLK, TEST_ADT7310_CS) == 0) {
+    if (adt7310_init(&dev, TEST_ADT7310_SPI, spi_clk, TEST_ADT7310_CS) == 0) {
         puts("[OK]");
     }
     else {

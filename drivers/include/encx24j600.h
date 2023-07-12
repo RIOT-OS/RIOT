@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -16,6 +17,7 @@
  * @brief       Interface definition for the ENCX24J600 driver
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef ENCX24J600_H
@@ -39,6 +41,7 @@ typedef struct {
     spi_t spi;              /**< SPI device the enc is connected to*/
     gpio_t cs;              /**< SPI chip select pin */
     gpio_t int_pin;         /**< SPI interrupt pin */
+    spi_clk_t spi_clk;      /**< SPI clock configuration computed during setup */
     uint16_t rx_next_ptr;   /**< ptr to next packet within devices memory */
 } encx24j600_t;
 
@@ -49,6 +52,7 @@ typedef struct {
     spi_t spi;              /**< SPI line */
     gpio_t cs_pin;          /**< chip select pin */
     gpio_t int_pin;         /**< interrupt pin */
+    uint32_t spi_freq;      /**< SPI clock speed to use */
 } encx24j600_params_t;
 
 /**

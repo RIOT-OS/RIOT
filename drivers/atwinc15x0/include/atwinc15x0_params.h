@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2020 Gunar Schorcht
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,12 +15,14 @@
  * @brief       Default configuration for the ATWINC15x0 WiFi netdev driver
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef ATWINC15X0_PARAMS_H
 #define ATWINC15X0_PARAMS_H
 
 #include "board.h"
+#include "macros/units.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,7 +52,7 @@ extern "C" {
 #endif
 
 #ifndef ATWINC15X0_PARAM_SPI_CLK
-#define ATWINC15X0_PARAM_SPI_CLK        SPI_CLK_10MHZ
+#define ATWINC15X0_PARAM_SPI_CLK        MHZ(48)
 #endif
 
 #ifndef ATWINC15X0_PARAM_SSN_PIN
@@ -75,7 +78,7 @@ extern "C" {
 #ifndef ATWINC15X0_PARAMS
 #define ATWINC15X0_PARAMS   {                                               \
                               .spi         = ATWINC15X0_PARAM_SPI,          \
-                              .spi_clk     = ATWINC15X0_PARAM_SPI_CLK,      \
+                              .spi_freq    = ATWINC15X0_PARAM_SPI_CLK,      \
                               .ssn_pin     = ATWINC15X0_PARAM_SSN_PIN,      \
                               .reset_pin   = ATWINC15X0_PARAM_RESET_PIN,    \
                               .irq_pin     = ATWINC15X0_PARAM_IRQ_PIN,      \

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 OTA keys S.A.
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -20,6 +21,7 @@
  * @author      Toon Stegen <toon.stegen@altran.com>
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Wouter Symons <wosym@airsantelmo.com>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef CANDEV_MCP2515_H
@@ -91,7 +93,7 @@ typedef struct candev_mcp2515 candev_mcp2515_t;
 typedef struct candev_mcp2515_conf {
     spi_t spi;                  /**< SPI bus */
     spi_mode_t spi_mode;        /**< SPI mode */
-    spi_clk_t spi_clk;          /**< SPI clock speed */
+    uint32_t spi_freq;          /**< SPI clock speed to use */
     gpio_t cs_pin;              /**< Slave select pin */
     gpio_t rst_pin;             /**< Reset pin */
     gpio_t int_pin;             /**< Interrupt pin */
@@ -106,6 +108,8 @@ struct candev_mcp2515 {
     candev_t candev;
     /** driver configuration */
     const candev_mcp2515_conf_t *conf;
+    /** SPI clock configuration computed during init */
+    spi_clk_t spi_clk;
     /** tx mailboxes local copy */
     const struct can_frame *tx_mailbox[MCP2515_TX_MAILBOXES];
     /** rx mailboxes local copy */

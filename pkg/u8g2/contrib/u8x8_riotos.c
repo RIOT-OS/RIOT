@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016-2018 Bas Stottelaar <basstottelaar@gmail.com>
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       U8g2 driver for interacting with RIOT-OS peripherals
  *
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -34,24 +36,17 @@
 #endif
 
 #ifdef MODULE_PERIPH_SPI
-static spi_clk_t u8x8_pulse_width_to_spi_speed(uint32_t pulse_width)
+static spi_clk_t spi_clk_cache(spi_t bus, uint32_t period_ns)
 {
-    const uint32_t cycle_time = 2 * pulse_width;
+    static uint32_t period_ns_cache;
+    static spi_clk_t clk_cache;
 
-    if (cycle_time < 100) {
-        return SPI_CLK_10MHZ;
-    }
-    else if (cycle_time < 200) {
-        return SPI_CLK_5MHZ;
-    }
-    else if (cycle_time < 1000) {
-        return SPI_CLK_1MHZ;
-    }
-    else if (cycle_time < 2500) {
-        return SPI_CLK_400KHZ;
+    if (period_ns != period_ns_cache) {
+        period_ns_cache = period_ns;
+        clk_cache = spi_get_clk(bus, MHZ(1000) / period_ns);
     }
 
-    return SPI_CLK_100KHZ;
+    return clk_cache;
 }
 
 static spi_mode_t u8x8_spi_mode_to_spi_conf(uint32_t spi_mode)
@@ -151,7 +146,7 @@ uint8_t u8x8_byte_hw_spi_riotos(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, void
         case U8X8_MSG_BYTE_START_TRANSFER:
             spi_acquire(dev, GPIO_UNDEF,
                         u8x8_spi_mode_to_spi_conf(u8g2->display_info->spi_mode),
-                        u8x8_pulse_width_to_spi_speed(u8g2->display_info->sck_pulse_width_ns));
+                        spi_clk_cache(dev, u8g2->display_info->sck_pulse_width_ns));
 
             u8x8_gpio_SetCS(u8g2, u8g2->display_info->chip_enable_level);
             u8g2->gpio_and_delay_cb(u8g2, U8X8_MSG_DELAY_NANO, u8g2->display_info->post_chip_enable_wait_ns, NULL);

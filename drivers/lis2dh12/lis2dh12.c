@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 Freie Universität Berlin
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -16,11 +17,13 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Jan Mohr <jan.mohr@ml-pa.com>
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  * @}
  */
 
 #include "assert.h"
 #include "byteorder.h"
+#include "macros/units.h"
 #include "mutex.h"
 #include "timex.h"
 #include "ztimer.h"
@@ -36,7 +39,7 @@
 #ifdef MODULE_LIS2DH12_SPI
 
 /* SPI bus speed and mode */
-#define BUS_CLK             SPI_CLK_5MHZ
+#define BUS_CLK             MHZ(10)
 #define BUS_MODE            SPI_MODE_0
 #define BUS_OK              SPI_OK
 /* shortcuts for SPI bus parameters */
@@ -47,10 +50,18 @@
 /* flag to enable address auto incrementation on read or write */
 #define FLAG_AINC           (0x40)
 
+/* SPI clock configuration cache */
+static spi_clk_t bus_clk;
+
 static int _init_bus(const lis2dh12_t *dev)
 {
-    /* for SPI, we only need to initialize the chip select pin */
+    /* initialize the chip select pin */
     if (spi_init_cs(BUS, BUS_CS) != SPI_OK) {
+        return LIS2DH12_NOBUS;
+    }
+    /* cache the spi_clk_t value corresponding to BUS_CLK */
+    bus_clk = spi_get_clk(BUS, BUS_CLK);
+    if (bus_clk.err) {
         return LIS2DH12_NOBUS;
     }
     return LIS2DH12_OK;
@@ -58,7 +69,7 @@ static int _init_bus(const lis2dh12_t *dev)
 
 static int _acquire(const lis2dh12_t *dev)
 {
-    spi_acquire(BUS, BUS_CS, BUS_MODE, BUS_CLK);
+    spi_acquire(BUS, BUS_CS, BUS_MODE, bus_clk);
     return BUS_OK;
 }
 

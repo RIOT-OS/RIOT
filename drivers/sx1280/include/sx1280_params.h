@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2022 Inria
  * Copyright (C) 2020-2022 Université Grenoble Alpes
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  *
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @author      Aymeric Brochier <aymeric.brochier@univ-grenoble-alpes.fr>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  */
 
@@ -22,6 +24,7 @@
 #define SX1280_PARAMS_H
 
 #include "board.h"
+#include "macros/units.h"
 #include "sx1280.h"
 #include "sx1280_constants.h"
 
@@ -59,7 +62,7 @@ extern "C" {
 #endif
 
 #ifndef SX1280_PARAM_SPI_CLK
-#define SX1280_PARAM_SPI_CLK                SPI_CLK_5MHZ    /**< default SPI speed */
+#define SX1280_PARAM_SPI_CLK                MHZ(18)         /**< default SPI speed */
 #endif
 
 #ifndef SX1280_PARAM_SPI_MODE

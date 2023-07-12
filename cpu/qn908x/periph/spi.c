@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2020 iosabi
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -16,6 +17,7 @@
  * @brief       Low-level SPI driver implementation
  *
  * @author      iosabi <iosabi@protonmail.com>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -23,6 +25,7 @@
 #include <assert.h>
 
 #include "bitarithm.h"
+#include "macros/math.h"
 #include "mutex.h"
 
 #include "cpu.h"
@@ -75,30 +78,6 @@ static const uint32_t _spi_func5_mask_fc2 =
     (1u << 3) | /* FC2_SSEL0 */
     (1u << 4) | /* FC2_COPI */
     (1u << 5);  /* FC2_CIPO */
-
-/**
- * @brief Set the clock divided for the target frequency.
- */
-static void _spi_controller_set_speed(SPI_Type *spi_bus, uint32_t speed_hz)
-{
-    /* The SPI clock source is based on the FLEXCOMM clock with a simple
-     * frequency divider between /1 and /65536. */
-    const uint32_t bus_freq = CLOCK_GetFreq(kCLOCK_BusClk);
-    uint32_t divider = (bus_freq + speed_hz / 2) / speed_hz;
-
-    if (divider == 0) {
-        divider = 1;
-    }
-    else if (divider > (1u << 16)) {
-        divider = 1u << 16;
-    }
-    DEBUG("[spi] clock requested: %" PRIu32 " Hz, actual: %" PRIu32
-          " Hz, divider: /%" PRIu32 "\n", speed_hz, bus_freq / divider,
-          divider);
-    /* The value stored in DIV is always (divider - 1), meaning that a value of
-     * 0 divides by 1. */
-    spi_bus->DIV = divider - 1;
-}
 
 void spi_init(spi_t bus)
 {
@@ -188,17 +167,49 @@ void spi_deinit_pins(spi_t bus)
 }
 #endif /* MODULE_PERIPH_SPI_RECONFIGURE */
 
+spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
+{
+    (void)bus;
+    /* The SPI clock source is based on the FLEXCOMM clock with a simple
+     * frequency divider between /1 and /65536. */
+    const uint32_t bus_freq = CLOCK_GetFreq(kCLOCK_BusClk);
+
+    /* bound divider to 65536 */
+    if (freq < DIV_ROUND_UP(bus_freq, 65536)) {
+        return (spi_clk_t){ .err = -EDOM };
+    }
+
+    uint32_t divider = DIV_ROUND_UP(bus_freq, freq);
+
+    /* The value stored in DIV is always (divider - 1), meaning that a value of
+     * 0 divides by 1. */
+    return (spi_clk_t){ .div_divval = (uint16_t)(divider - 1) };
+}
+
+int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
+{
+    (void)bus;
+    if (clk.err) {
+        return -EINVAL;
+    }
+    return CLOCK_GetFreq(kCLOCK_BusClk) / (clk.div_divval + 1);
+}
+
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     assert((unsigned)bus < SPI_NUMOF);
     assert((mode & ~(SPI_CFG_CPHA_MASK | SPI_CFG_CPOL_MASK)) == 0);
+    if (clk.err) {
+        return;
+    }
+
     const spi_conf_t *const conf = &spi_config[bus];
 
     mutex_lock(&locks[bus]);
 
     /* Set SPI clock speed. This silently chooses the closest frequency, no
      * matter how far it is from the requested one. */
-    _spi_controller_set_speed(conf->dev, clk);
+    conf->dev->DIV = clk.div_divval;
 
     DEBUG("[spi] acquire: mode CPHA=%d CPOL=%d, cs=0x%" PRIx32 "\n",
           !!(mode & SPI_CFG_CPHA_MASK), !!(mode & SPI_CFG_CPOL_MASK),

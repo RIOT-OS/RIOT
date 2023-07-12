@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 Hamburg University of Applied Sciences
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -23,6 +24,7 @@
  * @brief       Software SPI port descriptor definition
  *
  * @author      Markus Blechschmidt <Markus.Blechschmidt@haw-hamburg.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef SOFT_SPI_H
@@ -75,6 +77,13 @@ typedef unsigned int soft_spi_t;
 typedef gpio_t soft_spi_cs_t;
 
 /**
+ * @brief   Opaque type that contains a SPI clock configuration
+ *
+ * Use @ref soft_spi_get_clk to obtain this value.
+ */
+typedef uword_t soft_spi_clk_t;
+
+/**
  * @brief   Status codes used by the SPI driver interface
  */
 enum {
@@ -114,12 +123,17 @@ typedef enum {
  * The actual speed of the bus varies between CPUs and depends on the speed
  * of the processing. The values of the enum entries represent the approximate
  * delay between two clock edges.
+ *
+ * @deprecated  Use numeric values instead
  */
-typedef enum {
-    SOFT_SPI_CLK_100KHZ = 5,     /**< drive the SPI bus with less than 100kHz */
-    SOFT_SPI_CLK_1MHZ   = 1,     /**< drive the SPI bus with less than 1MHz */
-    SOFT_SPI_CLK_DEFAULT = 0,    /**< drive the SPI bus with maximum speed possible */
-} soft_spi_clk_t;
+enum {
+    SOFT_SPI_CLK_100KHZ = KHZ(100), /**< drive the SPI bus with less
+                                     *   than 100kHz */
+    SOFT_SPI_CLK_1MHZ = MHZ(1),     /**< drive the SPI bus with less
+                                     *   than 400kHz */
+    SOFT_SPI_CLK_DEFAULT = (MHZ(500) + 1), /**< drive the SPI bus with
+                                            *   maximum speed possible */
+};
 
 /**
  * @brief Software SPI port descriptor
@@ -173,6 +187,31 @@ void soft_spi_init_pins(soft_spi_t bus);
  * @return              SOFT_SPI_NOCS on invalid CS pin/line
  */
 int soft_spi_init_cs(soft_spi_t bus, soft_spi_cs_t cs);
+
+/**
+ * @brief   Get the @ref soft_spi_clk_t value that best matches the given frequency in Hertz
+ *
+ * @param[in]   bus     SPI device to get a clock configuration for
+ * @param[in]   freq    Get the clock configuration best matching this frequency in Hertz
+ *
+ * @return  The opaque clock configuration that is as close to but not higher than the frequency
+ *          given in @p freq
+ */
+soft_spi_clk_t soft_spi_get_clk(soft_spi_t bus, uint32_t freq);
+
+/**
+ * @brief   Get the actual frequency Hertz corresponding to the given clock config
+ *
+ * @param[in]   bus     SPI device which the clock configuration was made for
+ * @param[in]   clk     The clock configuration to get the corresponding frequency from
+ *
+ * @return  The exact frequency in Hertz matching the clock configuration
+ *
+ * @note    In most cases `soft_spi_get_freq(soft_spi_get_clk(x)) != x` will be true,
+ *          since `soft_spi_get_clk()` will return only the closest match, which will
+ *          rarely be an exact match.
+ */
+uint32_t soft_spi_get_freq(soft_spi_t bus, soft_spi_clk_t clk);
 
 /**
  * @brief   Start a new SPI transaction

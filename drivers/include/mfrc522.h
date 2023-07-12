@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2021 Freie Universität Berlin
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -32,6 +33,7 @@
  * @{
  *
  * @author   Hendrik van Essen <hendrik.ve@fu-berlin.de>
+ * @author   Hugues Larrive <hugues.larrive@pm.me>
  * @file
  */
 
@@ -69,7 +71,7 @@ extern "C"
  */
 typedef struct {
     spi_t spi_dev;      /**< SPI bus the controller is connected to */
-    spi_clk_t spi_clk;  /**< SPI clock speed */
+    uint32_t spi_freq;  /**< SPI clock speed to use */
     gpio_t sck_pin;     /**< SCK pin */
     gpio_t miso_pin;    /**< MISO pin */
     gpio_t mosi_pin;    /**< MOSI pin */
@@ -82,6 +84,7 @@ typedef struct {
  */
 typedef struct {
     mfrc522_params_t params;  /**< Device initialization parameters */
+    spi_clk_t spi_clk;        /**< SPI clock configuration computed during init */
 } mfrc522_t;
 
 /**

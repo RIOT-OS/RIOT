@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 Eistec AB
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,6 +17,7 @@
  *              Integrated Crystal and SRAM, from Maxim
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  * @}
  */
 
@@ -31,6 +33,19 @@
 #define DS3234_CMD_READ         (0x00)
 #define DS3234_CMD_WRITE        (0x80)
 
+static inline spi_clk_t spi_clk_cache(spi_t bus, uint32_t freq)
+{
+    static uint32_t freq_cache;
+    static spi_clk_t clk_cache;
+
+    if (freq != freq_cache) {
+        freq_cache = freq;
+        clk_cache = spi_get_clk(bus, freq);
+    }
+
+    return clk_cache;
+}
+
 /**
  * @brief Read one or more registers from the sensor
  *
@@ -43,7 +58,7 @@ static void ds3234_read_reg(const ds3234_params_t *dev, uint8_t addr, size_t len
 {
     uint8_t command = DS3234_CMD_READ | addr;
     /* Acquire exclusive access to the bus. */
-    spi_acquire(dev->spi, dev->cs, SPI_MODE_3, dev->clk);
+    spi_acquire(dev->spi, dev->cs, SPI_MODE_3, spi_clk_cache(dev->spi, dev->freq));
     /* Perform the transaction */
     spi_transfer_regs(dev->spi, dev->cs, command, NULL, buf, len);
     /* Release the bus for other threads. */
@@ -62,7 +77,7 @@ static void ds3234_write_reg(const ds3234_params_t *dev, uint8_t addr, size_t le
 {
     uint8_t command = DS3234_CMD_WRITE | addr;
     /* Acquire exclusive access to the bus. */
-    spi_acquire(dev->spi, dev->cs, SPI_MODE_3, dev->clk);
+    spi_acquire(dev->spi, dev->cs, SPI_MODE_3, spi_clk_cache(dev->spi, dev->freq));
     /* Perform the transaction */
     spi_transfer_regs(dev->spi, dev->cs, command, buf, NULL, len);
     /* Release the bus for other threads. */
@@ -77,6 +92,12 @@ int ds3234_pps_init(const ds3234_params_t *dev)
         return DS3234_NO_SPI;
     }
     DEBUG("ds3234: init on SPI_DEV(%u)\n", dev->spi);
+
+    /* compute the spi clk configuration */
+    spi_clk_t clk = spi_clk_cache(dev->spi, dev->freq);
+    if (clk.err < 0) {
+        return DS3234_NO_SPI;
+    }
 
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         for (int k = 0; k <= 0x19; ++k) {

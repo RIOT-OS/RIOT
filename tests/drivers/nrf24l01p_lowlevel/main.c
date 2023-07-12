@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Hamburg University of Applied Sciences
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -14,6 +15,7 @@
  * @brief       Test application for nrf24l01p lowlevel functions
  *
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -258,7 +260,7 @@ int cmd_print_regs(int argc, char **argv)
 
     printf("################## Print Registers ###################\n");
 
-    spi_acquire(SPI_PORT, CS_PIN, SPI_MODE_0, SPI_CLK_400KHZ);
+    spi_acquire(SPI_PORT, CS_PIN, SPI_MODE_0, spi_get_clk(SPI_PORT, KHZ(400)));
 
     puts("REG_CONFIG: ");
     print_register(REG_CONFIG, 1);

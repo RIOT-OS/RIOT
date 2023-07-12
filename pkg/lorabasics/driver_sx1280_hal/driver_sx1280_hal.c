@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2022 Inria
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,6 +19,7 @@
  * @author      Didier Donsez <didier.donsez@univ-grenoble-alpes.fr>
  * @author      Olivier Alphand <olivier.alphand@univ-grenoble-alpes.fr>
  * @author      Aymeric Brochier <aymeric.brochier@univ-grenoble-alpes.fr>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -34,6 +36,19 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+
+static inline spi_clk_t spi_clk_cache(spi_t bus, uint32_t freq)
+{
+    static uint32_t freq_cache;
+    static spi_clk_t clk_cache;
+
+    if (freq != freq_cache) {
+        freq_cache = freq;
+        clk_cache = spi_get_clk(bus, freq);
+    }
+
+    return clk_cache;
+}
 
 /**
  * @brief Wait until radio busy pin is reset to 0
@@ -55,7 +70,8 @@ sx1280_hal_status_t sx1280_hal_write(const void *context, const uint8_t *command
 
     DEBUG("[sx1280_hal_write]: command_length=%d data_length=%d\n", command_length, data_length);
 
-    spi_acquire(dev->params->spi, SPI_CS_UNDEF, dev->params->spi_mode, dev->params->spi_clk);
+    spi_acquire(dev->params->spi, SPI_CS_UNDEF, dev->params->spi_mode,
+                spi_clk_cache(dev->params->spi, dev->params->spi_clk));
     spi_transfer_bytes(dev->params->spi, dev->params->nss_pin, data_length != 0,
                        command, NULL, command_length);
     if (data_length) {
@@ -80,7 +96,8 @@ sx1280_hal_status_t sx1280_hal_read(const void *context, const uint8_t *command,
 
     sx1280_hal_wakeup(context);
 
-    spi_acquire(dev->params->spi, SPI_CS_UNDEF, dev->params->spi_mode, dev->params->spi_clk);
+    spi_acquire(dev->params->spi, SPI_CS_UNDEF, dev->params->spi_mode,
+                spi_clk_cache(dev->params->spi, dev->params->spi_clk));
     spi_transfer_bytes(dev->params->spi, dev->params->nss_pin, true, \
                        command, NULL, command_length);
     spi_transfer_bytes(dev->params->spi, dev->params->nss_pin, false, \

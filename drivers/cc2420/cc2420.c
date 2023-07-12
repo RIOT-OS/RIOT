@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2015-2016 Freie Universität Berlin
  *               2016 Inria
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,6 +17,7 @@
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -34,6 +36,9 @@
 void cc2420_setup(cc2420_t * dev, const cc2420_params_t *params, uint8_t index)
 {
     netdev_t *netdev = &dev->netdev.netdev;
+
+    /* compute the SPI clk configuration */
+    dev->params.spi_clk = spi_get_clk(dev->params.spi, dev->params.spi_freq);
 
     /* set pointer to the devices netdev functions */
     netdev->driver = &cc2420_driver;

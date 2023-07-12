@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 Gunar Schorcht
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -10,6 +11,7 @@
  * @ingroup     drivers_l3gxxxx
  * @brief       Default configuration for ST L3Gxxxx 3-axis gyroscope sensor family
  * @author      Gunar Schorcht <gunar@schorcht.net>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  * @file
  * @{
  */
@@ -19,6 +21,7 @@
 
 #include "board.h"
 #include "l3gxxxx.h"
+#include "macros/units.h"
 #include "saul_reg.h"
 
 #ifdef __cplusplus
@@ -59,7 +62,7 @@ extern "C" {
 
 #ifndef L3GXXXX_SPI_CLK
 /** Default SPI clock frequency, if the SPI interface is used */
-#define L3GXXXX_SPI_CLK     (SPI_CLK_1MHZ)
+#define L3GXXXX_SPI_CLK     MHZ(10)
 #endif
 
 #ifndef L3GXXXX_SPI_CS
@@ -71,7 +74,7 @@ extern "C" {
 /** Default SPI interface parameter set */
 #define L3GXXXX_SPI_IF_PARAMS   .if_params.type = L3GXXXX_SPI, \
                                 .if_params.spi.dev = L3GXXXX_SPI_DEV, \
-                                .if_params.spi.clk = L3GXXXX_SPI_CLK, \
+                                .if_params.spi.freq = L3GXXXX_SPI_CLK, \
                                 .if_params.spi.cs = L3GXXXX_SPI_CS,
 #endif
 

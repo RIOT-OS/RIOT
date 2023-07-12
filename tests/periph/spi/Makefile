@@ -1,7 +1,7 @@
 BOARD ?= samr21-xpro
 include ../Makefile.periph_common
 
-LOW_MEMORY_BOARDS := samd10-xmini
+LOW_MEMORY_BOARDS := samd10-xmini atmega1284p
 
 FEATURES_REQUIRED += periph_spi
 FEATURES_OPTIONAL += periph_spi_on_qspi

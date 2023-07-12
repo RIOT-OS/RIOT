@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 Otto-von-Guericke-Universität Magdeburg
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       cc110x board specific configuration
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef CC110X_PARAMS_H
@@ -21,6 +23,7 @@
 
 #include "board.h"
 #include "cc110x_settings.h"
+#include "macros/units.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,7 +52,7 @@ extern "C" {
 #endif
 
 #ifndef CC110X_PARAM_SPI_CLOCK
-#define CC110X_PARAM_SPI_CLOCK      SPI_CLK_5MHZ    /**< SPI clock frequency to use */
+#define CC110X_PARAM_SPI_CLOCK      KHZ(6500)       /**< SPI clock frequency to use */
 #endif
 
 #ifndef CC110X_PARAM_PATABLE
@@ -100,7 +103,7 @@ extern "C" {
  */
 #define CC110X_PARAMS               { \
         .spi      = CC110X_PARAM_SPI,  \
-        .spi_clk  = CC110X_PARAM_SPI_CLOCK, \
+        .spi_freq = CC110X_PARAM_SPI_CLOCK, \
         .cs       = CC110X_PARAM_CS,   \
         .gdo0     = CC110X_PARAM_GDO0, \
         .gdo2     = CC110X_PARAM_GDO2, \

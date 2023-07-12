@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 Inria
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Default initialization parameters for the ATA8520E device
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef ATA8520E_PARAMS_H
@@ -21,6 +23,7 @@
 
 #include "board.h"
 #include "ata8520e.h"
+#include "macros/units.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,7 +37,7 @@ extern "C" {
 #define ATA8520E_PARAM_SPI         SPI_DEV(0)
 #endif
 #ifndef ATA8520E_PARAM_SPI_CLK
-#define ATA8520E_PARAM_SPI_CLK     (SPI_CLK_100KHZ)
+#define ATA8520E_PARAM_SPI_CLK     KHZ(125)
 #endif
 #ifndef ATA8520E_PARAM_CS_PIN
 #define ATA8520E_PARAM_CS_PIN      GPIO_PIN(0, 0)
@@ -51,7 +54,7 @@ extern "C" {
 
 #ifndef ATA8520E_PARAMS
 #define ATA8520E_PARAMS            { .spi = ATA8520E_PARAM_SPI,             \
-                                     .spi_clk = ATA8520E_PARAM_SPI_CLK,     \
+                                     .spi_freq = ATA8520E_PARAM_SPI_CLK,    \
                                      .cs_pin = ATA8520E_PARAM_CS_PIN,       \
                                      .int_pin = ATA8520E_PARAM_INT_PIN,     \
                                      .power_pin = ATA8520E_PARAM_POWER_PIN, \

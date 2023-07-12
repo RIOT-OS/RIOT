@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2019 ML!PA Consulting GmbH
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -17,6 +18,7 @@
  * @brief       Driver for the AT25xxx series of EEPROMs
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  * @}
  */
 
@@ -38,7 +40,8 @@ extern "C" {
  */
 typedef struct {
     spi_t spi;              /**< SPI bus the device is connected to */
-    spi_clk_t spi_clk;      /**< SPI clock speed to use */
+    spi_clk_t spi_clk;      /**< SPI clock configuration computed during init */
+    uint32_t spi_freq;      /**< SPI clock speed to use */
     spi_cs_t cs_pin;        /**< GPIO pin connected to chip select */
     gpio_t wp_pin;          /**< GPIO pin connected to the write-protect pin */
     gpio_t hold_pin;        /**< GPIO pin connected to the hold pin */

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2022 HAW Hamburg
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Default configuration for the ENCX24J600 Ethernet driver
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef ENCX24J600_PARAMS_H
@@ -39,11 +41,15 @@ extern "C" {
 #ifndef ENCX24J600_PARAM_INT
 #define ENCX24J600_PARAM_INT      (GPIO_PIN(0, 1))
 #endif
+#ifndef ENCX24J600_PARAM_SPI_CLK
+#define ENCX24J600_PARAM_SPI_CLK  MHZ(14)
+#endif
 
 #ifndef ENCX24J600_PARAMS
 #define ENCX24J600_PARAMS         { .spi = ENCX24J600_PARAM_SPI,     \
                                     .cs_pin = ENCX24J600_PARAM_CS,   \
-                                    .int_pin = ENCX24J600_PARAM_INT }
+                                    .int_pin = ENCX24J600_PARAM_INT, \
+                                    .spi_freq = ENCX24J600_PARAM_SPI_CLK }
 #endif
 /** @} */
 

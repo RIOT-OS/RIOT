@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 Otto-von-Guericke-Universität Magdeburg
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Implementation for the "public" API of the CC1100/CC1101 driver
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  * @}
  */
 
@@ -38,6 +40,7 @@ int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params, uint8_t index)
     memset((char *)dev + sizeof(netdev_t), 0x00,
            sizeof(cc110x_t) - sizeof(netdev_t));
     dev->params = *params;
+    dev->params.spi_clk = spi_get_clk(dev->params.spi, dev->params.spi_freq);
     dev->netdev.driver = &cc110x_driver;
     dev->state = CC110X_STATE_OFF;
     netdev_register(&dev->netdev, NETDEV_CC110X, index);

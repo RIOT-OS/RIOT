@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2021 Freie Universität Berlin
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -10,6 +11,7 @@
  * @ingroup drivers_mfrc522
  * @brief   Device driver for the MFRC522 controller
  * @author  Hendrik van Essen <hendrik.ve@fu-berlin.de>
+ * @author  Hugues Larrive <hugues.larrive@pm.me>
  * @file
  * @{
  */
@@ -52,7 +54,7 @@ static void _device_write_n(mfrc522_t *dev, mfrc522_pcd_register_t reg,
 {
     assert(dev);
 
-    spi_acquire(dev->params.spi_dev, dev->params.cs_pin, SPI_MODE_0, dev->params.spi_clk);
+    spi_acquire(dev->params.spi_dev, dev->params.cs_pin, SPI_MODE_0, dev->spi_clk);
 
     /* LSB always 0 and address needs to be shifted left by one. (Datasheet 8.1.2.3) */
     reg = reg << 1;
@@ -110,7 +112,7 @@ static void _device_read_n(mfrc522_t *dev, mfrc522_pcd_register_t reg,
     /* last read operation is done outside the loop */
     count -= 1;
 
-    spi_acquire(dev->params.spi_dev, dev->params.cs_pin, SPI_MODE_0, dev->params.spi_clk);
+    spi_acquire(dev->params.spi_dev, dev->params.cs_pin, SPI_MODE_0, dev->spi_clk);
 
     /* LSB always 0 and address needs to be shifted left by one. (Datasheet 8.1.2.3) */
     reg = reg << 1;
@@ -289,6 +291,9 @@ int mfrc522_pcd_init(mfrc522_t *dev, const mfrc522_params_t *params)
     assert(params);
 
     dev->params = *params;
+
+    /* compute the SPI clk configuration */
+    dev->spi_clk = spi_get_clk(dev->params.spi_dev, dev->params.spi_freq);
 
     /* Initialize SPI bus */
     int rc = spi_init_cs(dev->params.spi_dev, dev->params.cs_pin);

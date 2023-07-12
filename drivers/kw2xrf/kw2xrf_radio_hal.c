@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2020 HAW Hamburg
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  * @brief       IEEE 802.15.4 Radio HAL implementation for the KW2x RF driver
  *
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -120,7 +122,7 @@ static void _set_sequence(kw2xrf_t *kw_dev, kw2xrf_physeq_t seq)
 void _kw2xrf_read_dregs_from_sts1(kw2xrf_t *dev, uint8_t *buf, uint8_t length)
 {
     spi_acquire(dev->params->spi, dev->params->cs_pin, SPI_MODE_0,
-                dev->params->spi_clk);
+                dev->spi_clk);
     uint8_t cmd = (MKW2XDM_IRQSTS2 | MKW2XDRF_REG_READ);
     spi_transfer_bytes(dev->params->spi, dev->params->cs_pin, true, &cmd, buf, 1);
     if (length > 1) {
@@ -293,6 +295,9 @@ void kw2xrf_radio_hal_irq_handler(void *arg)
 int kw2xrf_init(kw2xrf_t *dev, const kw2xrf_params_t *params, ieee802154_dev_t *hal,
                      gpio_cb_t cb, void *ctx)
 {
+    /* compute the SPI clk configuration */
+    dev->spi_clk = spi_get_clk(params->spi, params->spi_freq);
+
     /* initialize device descriptor */
     dev->params = params;
     dev->idle_state = XCVSEQ_RECEIVE;
@@ -356,7 +361,7 @@ static int _write(ieee802154_dev_t *dev, const iolist_t *iolist)
 
     /* transfer packet data to radio buffer */
     spi_acquire(kw_dev->params->spi, kw_dev->params->cs_pin, SPI_MODE_0,
-                kw_dev->params->spi_clk);
+                kw_dev->spi_clk);
     spi_transfer_byte(kw_dev->params->spi, kw_dev->params->cs_pin, true,
                       MKW2XDRF_BUF_WRITE);
     spi_transfer_byte(kw_dev->params->spi, kw_dev->params->cs_pin, true, len);

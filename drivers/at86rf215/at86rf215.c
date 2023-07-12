@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2019 ML!PA Consulting GmbH
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Implementation of public functions for AT86RF215 driver
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  * @}
  */
 
@@ -35,6 +37,7 @@ static void _setup_interface(at86rf215_t *dev, const at86rf215_params_t *params,
 
     netdev->driver = &at86rf215_driver;
     dev->params = *params;
+    dev->params.spi_clk = spi_get_clk(dev->params.spi, dev->params.spi_freq);
     dev->state = AT86RF215_STATE_OFF;
 
     netdev_register(netdev, NETDEV_AT86RF215, index);

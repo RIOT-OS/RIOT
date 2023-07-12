@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Freie Universität Berlin
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -17,6 +18,7 @@
  * @anchor      drivers_enc28j60
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef ENC28J60_H
@@ -41,6 +43,9 @@ typedef struct {
     gpio_t cs_pin;          /**< beer in the evening, */
     gpio_t int_pin;         /**< I will be most certainly */
     gpio_t rst_pin;         /**< drunk in the morning?! */
+    spi_clk_t spi_clk;      /**< SPI clock configuration computed during setup */
+    uint32_t spi_freq;      /**< SPI clock speed to use, must be > 8MHz (see the
+                             *   devices errata sheet). */
 } enc28j60_params_t;
 
 /**

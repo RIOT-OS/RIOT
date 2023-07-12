@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 OTA keys S.A.
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Wouter Symons <wosym@airsantelmo.com>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef MCP2515_PARAMS_H
@@ -26,6 +28,7 @@ extern "C" {
 
 #include "can/device.h"
 #include "candev_mcp2515.h"
+#include "macros/units.h"
 
 #include "board.h"
 
@@ -34,31 +37,31 @@ extern "C" {
  * @{
  */
 #ifndef MCP2515_PARAM_SPI
-#define MCP2515_PARAM_SPI SPI_DEV(0)
+#define MCP2515_PARAM_SPI       SPI_DEV(0)
 #endif
 
 #ifndef MCP2515_PARAM_SPI_MODE
-#define MCP2515_PARAM_SPI_MODE SPI_MODE_0
+#define MCP2515_PARAM_SPI_MODE  SPI_MODE_0
 #endif
 
 #ifndef MCP2515_PARAM_SPI_CLK
-#define MCP2515_PARAM_SPI_CLK SPI_CLK_10MHZ
+#define MCP2515_PARAM_SPI_CLK   MHZ(10)
 #endif
 
 #ifndef MCP2515_PARAM_CS
-#define MCP2515_PARAM_CS GPIO_PIN(1, 9)
+#define MCP2515_PARAM_CS        GPIO_PIN(1, 9)
 #endif
 
 #ifndef MCP2515_PARAM_RST
-#define MCP2515_PARAM_RST GPIO_UNDEF
+#define MCP2515_PARAM_RST       GPIO_UNDEF
 #endif
 
 #ifndef MCP2515_PARAM_INT
-#define MCP2515_PARAM_INT GPIO_PIN(1, 8)
+#define MCP2515_PARAM_INT       GPIO_PIN(1, 8)
 #endif
 
 #ifndef MCP2515_PARAM_CLK
-#define MCP2515_PARAM_CLK (8000000ul)       /**< External clock frequency */
+#define MCP2515_PARAM_CLK       MHZ(8) /**< External clock frequency */
 
 #endif
 
@@ -66,7 +69,7 @@ extern "C" {
 { \
     .spi = MCP2515_PARAM_SPI, \
     .spi_mode = MCP2515_PARAM_SPI_MODE, \
-    .spi_clk =MCP2515_PARAM_SPI_CLK, \
+    .spi_freq = MCP2515_PARAM_SPI_CLK, \
     .cs_pin = MCP2515_PARAM_CS, \
     .rst_pin = MCP2515_PARAM_RST, \
     .int_pin = MCP2515_PARAM_INT, \

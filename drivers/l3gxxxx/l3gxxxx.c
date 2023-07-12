@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 Gunar Schorcht
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -10,6 +11,7 @@
  * @ingroup     drivers_l3gxxxx
  * @brief       Device Driver for ST L3Gxxxx 3-axis gyroscope family
  * @author      Gunar Schorcht <gunar@schorcht.net>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  * @file
  * @{
  */
@@ -59,7 +61,8 @@
 #if IS_USED(MODULE_L3GXXXX_SPI)
 #define _SPI_DEV    (dev->params.if_params.spi.dev)
 #define _SPI_CS     (dev->params.if_params.spi.cs)
-#define _SPI_CLK    (dev->params.if_params.spi.clk)
+#define _SPI_CLK    (dev->spi_clk)
+#define _SPI_FREQ   (dev->params.if_params.spi.freq)
 #define _IS_DEV_SPI (dev->params.if_params.type == L3GXXXX_SPI)
 #endif
 
@@ -103,6 +106,9 @@ int l3gxxxx_init(l3gxxxx_t *dev, const l3gxxxx_params_t *params)
 
     /* init sensor data structure */
     dev->params = *params;
+#if IS_USED(MODULE_L3GXXXX_SPI)
+    _SPI_CLK = spi_get_clk(_SPI_DEV, _SPI_FREQ);
+#endif
     mutex_init(&dev->int_lock);
 
 #if IS_USED(MODULE_L3GXXXX_SPI)

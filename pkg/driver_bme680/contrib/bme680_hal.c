@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2019 Mesotic SAS
  *               2020 Gunar Schorcht
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -17,6 +18,7 @@
  *
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  * @author      Gunar Schorcht <gunar@schorcht.net>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #include <assert.h>
@@ -26,6 +28,7 @@
 #include "bme680.h"
 #include "bme680_hal.h"
 #include "irq.h"
+#include "macros/units.h"
 
 #ifdef MODULE_PERIPH_I2C
 #include "periph/i2c.h"
@@ -37,7 +40,7 @@
 #include "ztimer.h"
 
 #ifndef BME680_SPI_SPEED
-#define BME680_SPI_SPEED    (SPI_CLK_1MHZ)
+#define BME680_SPI_SPEED    MHZ(10)
 #endif /* BME680_SPI_SPEED */
 
 #ifndef BME680_SPI_MODE
@@ -80,6 +83,19 @@ int8_t bme680_i2c_write_hal(uint8_t dev_id, uint8_t reg_addr,
 #endif /* MODULE_PERIPH_I2C */
 
 #ifdef MODULE_PERIPH_SPI
+static inline spi_clk_t spi_clk_cache(spi_t bus, uint32_t freq)
+{
+    static uint32_t freq_cache;
+    static spi_clk_t clk_cache;
+
+    if (freq != freq_cache) {
+        freq_cache = freq;
+        clk_cache = spi_get_clk(bus, freq);
+    }
+
+    return clk_cache;
+}
+
 int8_t bme680_spi_read_hal(uint8_t dev_id, uint8_t reg_addr,
                            uint8_t *data, uint16_t len)
 {
@@ -89,7 +105,7 @@ int8_t bme680_spi_read_hal(uint8_t dev_id, uint8_t reg_addr,
     unsigned int cpsr = irq_disable();
 
     gpio_clear(intf->nss_pin);
-    spi_acquire(intf->dev, SPI_CS_UNDEF, BME680_SPI_MODE, BME680_SPI_SPEED);
+    spi_acquire(intf->dev, SPI_CS_UNDEF, BME680_SPI_MODE, spi_clk_cache(intf->dev, BME680_SPI_SPEED));
     spi_transfer_regs(intf->dev, SPI_CS_UNDEF, reg_addr, NULL, data, len);
     gpio_set(intf->nss_pin);
 
@@ -107,7 +123,7 @@ int8_t bme680_spi_write_hal(uint8_t dev_id, uint8_t reg_addr,
     unsigned int cpsr = irq_disable();
 
     gpio_clear(intf->nss_pin);
-    spi_acquire(intf->dev, SPI_CS_UNDEF, BME680_SPI_MODE, BME680_SPI_SPEED);
+    spi_acquire(intf->dev, SPI_CS_UNDEF, BME680_SPI_MODE, spi_clk_cache(intf->dev, BME680_SPI_SPEED));
     spi_transfer_regs(intf->dev, SPI_CS_UNDEF, reg_addr, data, NULL, len);
     gpio_set(intf->nss_pin);
 

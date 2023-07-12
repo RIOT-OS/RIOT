@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 Koen Zandberg
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Device driver implementation for the ili9341 display controller
  *
  * @author      Koen Zandberg <koen@bergzand.net>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -85,7 +87,7 @@ static int _init(lcd_t *dev, const lcd_params_t *params)
 
     /* Acquire once at release at the end */
     spi_acquire(dev->params->spi, dev->params->cs_pin, dev->params->spi_mode,
-                dev->params->spi_clk);
+                dev->spi_clk);
 
     /* Soft Reset */
     _write_cmd(dev, LCD_CMD_SWRESET, NULL, 0);

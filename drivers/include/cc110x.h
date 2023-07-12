@@ -3,6 +3,7 @@
  *               2014 Freie Universität Berlin
  *               2015 Kaspar Schleiser <kaspar@schleiser.de>
  *               2018,2019 Otto-von-Guericke-Universität Magdeburg
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -189,6 +190,7 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef CC110X_H
@@ -460,7 +462,9 @@ typedef struct {
     const cc110x_config_t *config;
     const cc110x_chanmap_t *channels;   /**< Pointer to the default channel map */
     spi_t spi;                          /**< SPI bus connected to the device */
-    spi_clk_t spi_clk;                  /**< SPI clock to use (max 6.5 MHz) */
+    spi_clk_t spi_clk;                  /**< SPI clock configuration computed
+                                         *   during setup */
+    uint32_t spi_freq;                  /**< SPI clock to use (max 6.5 MHz) */
     spi_cs_t cs;                        /**< GPIO pin connected to chip select */
     gpio_t gdo0;                        /**< GPIO pin connected to GDO0 */
     gpio_t gdo2;                        /**< GPIO pin connected to GDO2 */

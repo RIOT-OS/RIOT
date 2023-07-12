@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 Inria
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -14,6 +15,7 @@
  * @brief       Device driver for Microchip ATA8520E transceiver
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -242,6 +244,7 @@ int ata8520e_init(ata8520e_t *dev, const ata8520e_params_t *params)
 {
     /* write config params to device descriptor */
     dev->params = *params;
+    dev->params.spi_clk = spi_get_clk(dev->params.spi, dev->params.spi_freq);
 
     /* Initialize pins*/
     if (gpio_init_int(INTPIN, GPIO_IN_PD,

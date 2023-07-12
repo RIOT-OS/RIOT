@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Eistec AB
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -20,6 +21,7 @@
  *
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef LIS3DH_H
@@ -727,7 +729,7 @@ extern "C" {
  */
 typedef struct {
     spi_t spi;              /**< SPI device the sensor is connected to */
-    spi_clk_t clk;          /**< designated clock speed of the SPI bus */
+    uint32_t freq;          /**< designated clock speed of the SPI bus */
     gpio_t cs;              /**< Chip select pin */
     gpio_t int1;            /**< INT1 pin */
     gpio_t int2;            /**< INT2 (DRDY) pin */
@@ -740,6 +742,7 @@ typedef struct {
  */
 typedef struct {
     lis3dh_params_t params; /**< Device initialization parameters */
+    spi_clk_t spi_clk;      /**< clock configuration computed during init */
     uint16_t scale;         /**< Internal sensor scale */
 } lis3dh_t;
 

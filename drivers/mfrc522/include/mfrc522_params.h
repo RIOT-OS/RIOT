@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2021 Freie Universität Berlin
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,6 +14,7 @@
  * @{
  *
  * @author  Hendrik van Essen <hendrik.ve@fu-berlin.de>
+ * @author  Hugues Larrive <hugues.larrive@pm.me>
  * @file
  */
 #ifndef MFRC522_PARAMS_H
@@ -20,6 +22,7 @@
 
 #include <stdbool.h>
 
+#include "macros/units.h"
 #include "periph/spi.h"
 
 #include "mfrc522_regs.h"
@@ -37,7 +40,7 @@ extern "C"
 #define MFRC522_PARAM_SPI_DEV   SPI_DEV(0)       /**< Default SPI device */
 #endif
 #ifndef MFRC522_PARAM_SPI_CLK
-#define MFRC522_PARAM_SPI_CLK   SPI_CLK_5MHZ     /**< Default SPI speed */
+#define MFRC522_PARAM_SPI_CLK   MHZ(10)          /**< Default SPI speed */
 #endif
 #ifndef MFRC522_PARAM_SCK_PIN
 #define MFRC522_PARAM_SCK_PIN   GPIO_PIN(0, 18)  /**< Default SCK pin */
@@ -59,7 +62,7 @@ extern "C"
 #define MFRC522_PARAMS                      \
     {                                       \
         .spi_dev  = MFRC522_PARAM_SPI_DEV,  \
-        .spi_clk  = MFRC522_PARAM_SPI_CLK,  \
+        .spi_freq = MFRC522_PARAM_SPI_CLK,  \
         .sck_pin  = MFRC522_PARAM_SCK_PIN,  \
         .miso_pin = MFRC522_PARAM_MISO_PIN, \
         .mosi_pin = MFRC522_PARAM_MOSI_PIN, \
