@@ -184,12 +184,9 @@ int lcd_init(lcd_t *dev, const lcd_params_t *params)
     }
     ztimer_sleep(ZTIMER_MSEC, 120);
 
-    if (dev->driver->init) {
-        return dev->driver->init(dev, params);
-    }
-    else {
-        return -ENOTSUP;
-    }
+    /* controller-specific init function has to be defined */
+    assert(dev->driver->init);
+    return dev->driver->init(dev, params);
 }
 
 void lcd_write_cmd(const lcd_t *dev, uint8_t cmd, const uint8_t *data,
