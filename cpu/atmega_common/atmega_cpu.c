@@ -32,6 +32,7 @@
 #include "cpu.h"
 #include "irq_arch.h"
 #include "panic.h"
+#include "sys/bus.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -110,5 +111,15 @@ ISR(BADISR_vect, ISR_NAKED)
 }
 
 #if defined(BAT_LOW_vect)
-AVR8_ISR(BAT_LOW_vect, DEBUG, "BAT_LOW\n");
+static inline void bat_low_handler(void)
+{
+    DEBUG("BAT_LOW\n");
+
+#if MODULE_SYS_BUS_POWER
+    msg_bus_t *bus = sys_bus_get(SYS_BUS_POWER);
+    msg_bus_post(bus, SYS_BUS_POWER_EVENT_LOW_VOLTAGE, NULL);
+#endif
+}
+
+AVR8_ISR(BAT_LOW_vect, bat_low_handler);
 #endif
