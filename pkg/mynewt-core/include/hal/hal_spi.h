@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2020 Inria
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       SPI abstraction layer RIOT adaption
  *
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  * @}
  */
 
@@ -47,8 +49,8 @@ typedef void (*hal_spi_txrx_cb)(void *arg, int len);
 struct hal_spi_settings {
     /** Data mode of SPI driver, defined by HAL_SPI_MODEn */
     spi_mode_t         data_mode;
-    /** Baudrate in kHz */
-    spi_clk_t          baudrate;
+    /** Baudrate in MHz */
+    uint32_t           baudrate;
 };
 
 /**
