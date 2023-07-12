@@ -192,11 +192,11 @@ int cmd_init(int argc, char **argv)
     clk = atoi(argv[3]);
 #endif
     switch (clk) {
-        case 0: spiconf.clk = spi_get_clk(SPI_DEV(dev), SPI_CLK_100KHZ); break;
-        case 1: spiconf.clk = spi_get_clk(SPI_DEV(dev), SPI_CLK_400KHZ); break;
-        case 2: spiconf.clk = spi_get_clk(SPI_DEV(dev), SPI_CLK_1MHZ);   break;
-        case 3: spiconf.clk = spi_get_clk(SPI_DEV(dev), SPI_CLK_5MHZ);   break;
-        case 4: spiconf.clk = spi_get_clk(SPI_DEV(dev), SPI_CLK_10MHZ);  break;
+        case 0: spiconf.clk = SPI_CLK_100KHZ; break;
+        case 1: spiconf.clk = SPI_CLK_400KHZ; break;
+        case 2: spiconf.clk = SPI_CLK_1MHZ;   break;
+        case 3: spiconf.clk = SPI_CLK_5MHZ;   break;
+        case 4: spiconf.clk = SPI_CLK_10MHZ;  break;
         default:
             spiconf.clk = spi_get_clk(SPI_DEV(dev), clk);
     }

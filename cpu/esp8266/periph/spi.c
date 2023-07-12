@@ -145,7 +145,7 @@ static void IRAM_ATTR _spi_init_internal(spi_t bus)
     _spi[bus].regs->ctrl.fastrd_mode = 0;
 
     /* acquire and release to set default parameters */
-    spi_acquire(bus, GPIO_UNDEF, SPI_MODE_0, spi_get_clk(bus, SPI_CLK_1MHZ));
+    spi_acquire(bus, GPIO_UNDEF, SPI_MODE_0, spi_get_clk(bus, MHZ(1)));
     spi_release(bus);
 }
 

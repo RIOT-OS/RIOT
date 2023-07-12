@@ -128,7 +128,7 @@ void IRAM_ATTR spi_init(spi_t bus)
     spi_ll_set_tx_lsbfirst(_spi[bus].periph->hw, false);
 
     /* acquire and release to set default parameters */
-    spi_acquire(bus, GPIO_UNDEF, SPI_MODE_0, spi_get_clk(bus, SPI_CLK_100KHZ));
+    spi_acquire(bus, GPIO_UNDEF, SPI_MODE_0, spi_get_clk(bus, KHZ(100)));
     spi_release(bus);
 
     return;

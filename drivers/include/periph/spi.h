@@ -197,16 +197,19 @@ typedef enum {
  * CPU clock and available prescaler values on certain platforms may not make
  * the exact values possible.
  *
- * @deprecated  Use numeric values instead
+ * @deprecated  Use @ref spi_get_clk instead
  * @{
  */
-enum {
-    SPI_CLK_100KHZ  = KHZ(100), /**< drive the SPI bus with 100KHz */
-    SPI_CLK_400KHZ  = KHZ(400), /**< drive the SPI bus with 400KHz */
-    SPI_CLK_1MHZ    = MHZ(1),   /**< drive the SPI bus with 1MHz */
-    SPI_CLK_5MHZ    = MHZ(5),   /**< drive the SPI bus with 5MHz */
-    SPI_CLK_10MHZ   = MHZ(10),  /**< drive the SPI bus with 10MHz */
-};
+/** drive the SPI bus with 100KHz */
+#define SPI_CLK_100KHZ      spi_get_clk(SPI_DEV(0), KHZ(100))
+/** drive the SPI bus with 400KHz */
+#define SPI_CLK_400KHZ      spi_get_clk(SPI_DEV(0), KHZ(400))
+/** drive the SPI bus with 1MHz */
+#define SPI_CLK_1MHZ        spi_get_clk(SPI_DEV(0), MHZ(1))
+/** drive the SPI bus with 5MHz */
+#define SPI_CLK_5MHZ        spi_get_clk(SPI_DEV(0), MHZ(5))
+/** drive the SPI bus with 10MHz */
+#define SPI_CLK_10MHZ       spi_get_clk(SPI_DEV(0), MHZ(10))
 /** @} */
 
 /**
