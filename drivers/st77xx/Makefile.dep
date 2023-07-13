@@ -1,0 +1,12 @@
+FEATURES_REQUIRED += periph_spi
+FEATURES_REQUIRED += periph_gpio
+
+USEMODULE += lcd
+USEMODULE += lcd_multi_cntrl
+USEMODULE += ztimer
+USEMODULE += ztimer_msec
+
+ifeq (,$(filter st7789 st7796,$(USEMODULE)))
+  # enable st7735 as default if no other module is enabled
+  USEMODULE += st7735
+endif

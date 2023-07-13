@@ -9,11 +9,11 @@
  */
 
 /**
- * @ingroup     drivers_st7735
+ * @ingroup     drivers_st77xx
  * @{
  *
  * @file
- * @brief       Device driver implementation for the st7735 display controller
+ * @brief       Device driver implementation for the ST77xx display controller
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
@@ -33,8 +33,8 @@
 #include "periph/spi.h"
 #endif
 
-#include "st7735.h"
-#include "st7735_internal.h"
+#include "st77xx.h"
+#include "st77xx_internal.h"
 #include "lcd.h"
 #include "lcd_internal.h"
 
@@ -43,11 +43,20 @@
 
 static int _init(lcd_t *dev, const lcd_params_t *params)
 {
-    if (IS_USED(MODULE_ST7789)) {
+    if (params->cntrl == ST77XX_CNTRL_ST7735) {
+        assert(params->lines <= 162);
+        assert(params->rgb_channels <= 132);
+    }
+    if (params->cntrl == ST77XX_CNTRL_ST7789) {
         assert(params->lines <= 320);
+        assert(params->rgb_channels <= 240);
+    }
+    if (params->cntrl == ST77XX_CNTRL_ST7796) {
+        assert(params->lines <= 480);
+        assert(params->rgb_channels <= 320);
     }
     else {
-        assert(params->lines <= 162);
+        assert(0);
     }
 
     uint8_t command_params[4] = { 0 };
@@ -114,7 +123,7 @@ static int _init(lcd_t *dev, const lcd_params_t *params)
     return 0;
 }
 
-const lcd_driver_t lcd_st7735_driver = {
+const lcd_driver_t lcd_st77xx_driver = {
     .init = _init,
     .set_area = NULL, /* default implementation is used */
 };
