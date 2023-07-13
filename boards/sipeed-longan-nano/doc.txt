@@ -4,11 +4,12 @@
 @brief      Support for the Sipeed Longan Nano board
 @author     Gunar Schorcht <gunar@schorcht.net>
 
+\section sipeed_longan_nano Sipeed Longan Nano
+
 ## Overview
 
-The [Sipeed Longan Nano](https://longan.sipeed.com/en) is a
-development board for the GigaDevice GD32VF103CBT6 MCU with the following
-on-board components:
+The [Sipeed Longan Nano](https://longan.sipeed.com/en) is a development board
+for the GigaDevice GD32VF103CBT6 MCU with the following on-board components:
 
 - GD32VF103CBT6 RISC-V MCU @108MHz
 - USB Type C
@@ -98,10 +99,10 @@ by pins.
 
 \n
 @note To use the TFT display of a Sipeed Longan Nano board, if available, the
-macro `CONFIG_SIPEED_LONGAN_NANO_WITH_TFT=1` has to be defined, for
-example using the `CFLAGS` variable in the make command:
+module `sipeed_longan_nano_tft` has to be enabled, for
+example using the `USEMODULE` variable in the make command:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-BOARD=sipeed-longan-nano CFLAGS='-DCONFIG_SIPEED_LONGAN_NANO_WITH_TFT=1' make ...
+BOARD=sipeed-longan-nano USEMODULE=sipeed_longan_nano_tft make ...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 | Pin  | Board Function | RIOT Function 1 | RIOT Function 2 | RIOT Function 3 |
@@ -188,10 +189,16 @@ PROGRAMMER=openocd OPENOCD_DEBUG_ADAPTER=jlink BOARD=sipeed-longan-nano make -C 
 ## Using the TFT Display
 
 To use the TFT display of a Sipeed Longan Nano board, if available, the
-macro `CONFIG_SIPEED_LONGAN_NANO_WITH_TFT=1` has to be defined, for
+`sipeed_longan_nano_tft` module has to be enabled, for
 example using the `CFLAGS` variable in the make command:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-BOARD=sipeed-longan-nano CFLAGS='-DCONFIG_SIPEED_LONGAN_NANO_WITH_TFT=1' make -C tests/drivers/st7735 flash
+BOARD=sipeed-longan-nano USEMODULE=sipeed_longan_nano_tft make -C tests/drivers/st7735 flash
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Alternatively, the `sipeed-longan-nano-tft` board definition can be used,
+which simply enables the `sipeed_longan_nano_tft` module:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+BOARD=sipeed-longan-nano-tft make -C tests/drivers/st7735 flash
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Accessing STDIO

@@ -34,15 +34,4 @@ config BOARD_SIPEED_LONGAN_NANO
 config FORCE_USB_STDIO
     default y
 
-menu "Sipeed Longan Nano Board Configuration"
-
-    config SIPEED_LONGAN_NANO_WITH_TFT
-        bool "Board with TFT display"
-        default y if MODULE_DISP_DEV
-        select HAVE_ST7735
-        help
-            Indicates that a Sipeed Longan Nano board with TFT display is used.
-
-endmenu
-
 source "$(RIOTBOARD)/common/gd32v/Kconfig"
