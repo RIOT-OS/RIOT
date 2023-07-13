@@ -41,6 +41,10 @@ void auto_init_screen(void)
             extern void auto_init_st7789(void);
             auto_init_st7789();
         }
+        if (IS_USED(MODULE_ST7796)) {
+            extern void auto_init_st7796(void);
+            auto_init_st7796();
+        }
     }
 
     if (IS_USED(MODULE_TOUCH_DEV)) {
