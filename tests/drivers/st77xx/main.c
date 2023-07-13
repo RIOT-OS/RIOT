@@ -28,13 +28,13 @@
 
 #include "riot_logo.h"
 
-#include "st7735.h"
-#include "st7735_params.h"
+#include "st77xx.h"
+#include "st77xx_params.h"
 
 int main(void)
 {
     lcd_t dev;
-    dev.driver = &lcd_st7735_driver;
+    dev.driver = &lcd_st77xx_driver;
 
     puts("lcd TFT display test application");
 
@@ -46,7 +46,7 @@ int main(void)
     BACKLIGHT_ON;
 #endif
 
-    if (lcd_init(&dev, &st7735_params[0]) == 0) {
+    if (lcd_init(&dev, &st77xx_params[0]) == 0) {
         puts("[OK]");
     }
     else {
