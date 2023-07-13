@@ -51,6 +51,9 @@ extern "C" {
 #define LCD_CMD_MADCTL          0x36    /**< Memory data access control */
 #define LCD_CMD_IDMOFF          0x38    /**< Idle Mode OFF */
 #define LCD_CMD_IDMON           0x39    /**< Idle Mode ON */
+#define LCD_CMD_TEOFF           0x34    /**< Tearing Effect Line Off */
+#define LCD_CMD_TEON            0x35    /**< Tearing Effect Line On */
+#define LCD_CMD_COLMOD          0x3A    /**< Interface Pixel Format Set */
 #define LCD_CMD_PIXSET          0x3A    /**< COLMOD: Pixel Format Set */
 #define LCD_CMD_WRDISBV         0x51    /**< Write Display Brightness */
 #define LCD_CMD_WRCTRLD         0x53    /**< Write Control Display */
