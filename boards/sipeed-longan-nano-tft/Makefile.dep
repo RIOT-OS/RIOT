@@ -1,0 +1,3 @@
+USEMODULE += sipeed_longan_nano_tft
+
+include $(RIOTBOARD)/sipeed-longan-nano/Makefile.dep
