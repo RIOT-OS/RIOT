@@ -178,7 +178,7 @@ void spi_init_pins(spi_t bus)
 
     /* select pins for the SPI device */
     _setup_workaround_for_ftpan_58(bus);
-    spi_twi_irq_register_spi(dev(bus), spi_isr_handler, (void *)(uintptr_t)bus);
+    shared_irq_register_spi(dev(bus), spi_isr_handler, (void *)(uintptr_t)bus);
 }
 
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)

@@ -31,6 +31,15 @@ extern "C" {
 #ifdef NRF_FICR_S
 #define NRF_FICR NRF_FICR_S
 #endif
+
+/**
+ * @brief   Enable the workaround for the SPI single byte transmit errata (No.
+ * 58 on the nrf52832)
+ */
+#ifdef CPU_MODEL_NRF52832XXAA
+#define ERRATA_SPI_SINGLE_BYTE_WORKAROUND (1)
+#endif
+
 /**
  * @name    Power management configuration
  * @{
@@ -136,6 +145,38 @@ typedef enum {
 } gpio_pull_t;
 #endif /* END: GPIO LL overwrites */
 
+#if !defined(DOXYGEN) && (defined(CPU_NRF53) || defined(CPU_NRF9160))
+/**
+ * @brief Wrapper to fix differences between nRF families vendor files
+  */
+#define UART_BAUDRATE_BAUDRATE_Baud1200 UARTE_BAUDRATE_BAUDRATE_Baud1200
+#define UART_BAUDRATE_BAUDRATE_Baud2400 UARTE_BAUDRATE_BAUDRATE_Baud2400
+#define UART_BAUDRATE_BAUDRATE_Baud4800 UARTE_BAUDRATE_BAUDRATE_Baud4800
+#define UART_BAUDRATE_BAUDRATE_Baud9600 UARTE_BAUDRATE_BAUDRATE_Baud9600
+#define UART_BAUDRATE_BAUDRATE_Baud14400 UARTE_BAUDRATE_BAUDRATE_Baud14400
+#define UART_BAUDRATE_BAUDRATE_Baud19200 UARTE_BAUDRATE_BAUDRATE_Baud19200
+#define UART_BAUDRATE_BAUDRATE_Baud28800 UARTE_BAUDRATE_BAUDRATE_Baud28800
+#define UART_BAUDRATE_BAUDRATE_Baud31250 UARTE_BAUDRATE_BAUDRATE_Baud31250
+#define UART_BAUDRATE_BAUDRATE_Baud38400 UARTE_BAUDRATE_BAUDRATE_Baud38400
+#define UART_BAUDRATE_BAUDRATE_Baud56000 UARTE_BAUDRATE_BAUDRATE_Baud56000
+#define UART_BAUDRATE_BAUDRATE_Baud57600 UARTE_BAUDRATE_BAUDRATE_Baud57600
+#define UART_BAUDRATE_BAUDRATE_Baud76800 UARTE_BAUDRATE_BAUDRATE_Baud76800
+#define UART_BAUDRATE_BAUDRATE_Baud115200 UARTE_BAUDRATE_BAUDRATE_Baud115200
+#define UART_BAUDRATE_BAUDRATE_Baud230400 UARTE_BAUDRATE_BAUDRATE_Baud230400
+#define UART_BAUDRATE_BAUDRATE_Baud250000 UARTE_BAUDRATE_BAUDRATE_Baud250000
+#define UART_BAUDRATE_BAUDRATE_Baud460800 UARTE_BAUDRATE_BAUDRATE_Baud460800
+#define UART_BAUDRATE_BAUDRATE_Baud921600 UARTE_BAUDRATE_BAUDRATE_Baud921600
+#define UART_BAUDRATE_BAUDRATE_Baud1M UARTE_BAUDRATE_BAUDRATE_Baud1M
+
+#define SPI_FREQUENCY_FREQUENCY_K125 SPIM_FREQUENCY_FREQUENCY_K125
+#define SPI_FREQUENCY_FREQUENCY_K500 SPIM_FREQUENCY_FREQUENCY_K500
+#define SPI_FREQUENCY_FREQUENCY_M1 SPIM_FREQUENCY_FREQUENCY_M1
+#define SPI_FREQUENCY_FREQUENCY_M4 SPIM_FREQUENCY_FREQUENCY_M4
+#define SPI_FREQUENCY_FREQUENCY_M8 SPIM_FREQUENCY_FREQUENCY_M8
+#define SPI_CONFIG_CPHA_Msk SPIM_CONFIG_CPHA_Msk
+#define SPI_CONFIG_CPOL_Msk SPIM_CONFIG_CPOL_Msk
+#endif
+
 /**
  * @brief   No support for HW chip select...
  */
@@ -221,7 +262,6 @@ typedef struct {
  * @brief   Override SPI mode values
  * @{
  */
-#if !defined(CPU_FAM_NRF9160) && !defined(CPU_FAM_NRF53)
 #define HAVE_SPI_MODE_T
 typedef enum {
     SPI_MODE_0 = 0,                                             /**< CPOL=0, CPHA=0 */
@@ -244,7 +284,6 @@ typedef enum {
     SPI_CLK_10MHZ  = SPI_FREQUENCY_FREQUENCY_M8     /**< 10MHz */
 } spi_clk_t;
 /** @} */
-#endif /* ndef CPU_FAM_NRF9160 */
 #endif /* ndef DOXYGEN */
 
 /**
@@ -360,6 +399,159 @@ typedef struct {
 } pwm_conf_t;
 #endif
 #endif /* ndef CPU_FAM_NRF51 */
+#ifndef CPU_NRF51
+
+/**
+ * @brief   Redefine some peripheral names to unify them across nRF families
+ */
+#define SPI_SCKSEL          (dev(bus)->PSEL.SCK)    /**< Macro for SPI clk */
+#define SPI_MOSISEL         (dev(bus)->PSEL.MOSI)   /**< Macro for SPI mosi */
+#define SPI_MISOSEL         (dev(bus)->PSEL.MISO)   /**< Macro for SPI miso */
+#ifdef CPU_MODEL_NRF52832XXAA
+#define UART_IRQN           (UARTE0_UART0_IRQn)
+#endif
+
+/**
+ * @brief  SPI configuration values
+ */
+typedef struct {
+    NRF_SPIM_Type *dev; /**< SPI device used */
+    gpio_t sclk;        /**< CLK pin */
+    gpio_t mosi;        /**< MOSI pin */
+    gpio_t miso;        /**< MISO pin */
+#if ERRATA_SPI_SINGLE_BYTE_WORKAROUND
+    uint8_t ppi;        /**< PPI channel */
+#endif
+} spi_conf_t;
+
+/**
+ * @brief Common UART/SPI/I2C interrupt callback
+ *
+ * @param   arg     Opaque context pointer
+ */
+typedef void (*shared_irq_cb_t)(void *arg);
+
+/**
+ * @brief Register a SPI IRQ handler for a shared UART/I2C/SPI irq vector
+ *
+ * @param   bus bus to register the IRQ handler on
+ * @param   cb  callback to call on IRQ
+ * @param   arg Argument to pass to the handler
+ */
+void shared_irq_register_spi(NRF_SPIM_Type *bus,
+                              shared_irq_cb_t cb, void *arg);
+
+/**
+ * @brief Register an I2C IRQ handler for a shared UART/I2C/SPI irq vector
+ *
+ * @param   bus bus to register the IRQ handler on
+ * @param   cb  callback to call on IRQ
+ * @param   arg Argument to pass to the handler
+ */
+void shared_irq_register_i2c(NRF_TWIM_Type *bus,
+                              shared_irq_cb_t cb, void *arg);
+
+/**
+ * @brief Register an UART IRQ handler for a shared UART/I2C/SPI irq vector
+ *
+ * @param   bus bus to register the IRQ handler on
+ * @param   cb  callback to call on IRQ
+ * @param   arg Argument to pass to the handler
+ */
+void shared_irq_register_uart(NRF_UARTE_Type *bus,
+                              shared_irq_cb_t cb, void *arg);
+
+/**
+ * @brief   Acquire the shared I2C/SPI peripheral in I2C mode
+ *
+ * @param   bus bus to acquire exclusive access on
+ * @param   cb  ISR handler to call on IRQ
+ * @param   arg ISR handler argument
+ */
+void nrf5x_i2c_acquire(NRF_TWIM_Type *bus, shared_irq_cb_t cb, void *arg);
+
+/**
+ * @brief   Release the shared I2C/SPI peripheral in I2C mode
+ *
+ * @param   bus bus to release exclusive access on
+ */
+void nrf5x_i2c_release(NRF_TWIM_Type *bus);
+
+/**
+ * @brief   Acquire the shared I2C/SPI peripheral in SPI mode
+ *
+ * @param   bus bus to release exclusive access on
+ * @param   cb  ISR handler to call on IRQ
+ * @param   arg ISR handler argument
+ */
+void nrf5x_spi_acquire(NRF_SPIM_Type *bus, shared_irq_cb_t cb, void *arg);
+
+/**
+ * @brief   Acquire the shared I2C/SPI peripheral in SPI mode
+ *
+ * @param   bus bus to release exclusive access on
+ */
+void nrf5x_spi_release(NRF_SPIM_Type *bus);
+
+/**
+ * @brief   Size of the UART TX buffer for non-blocking mode.
+ */
+#ifndef UART_TXBUF_SIZE
+#define UART_TXBUF_SIZE    (64)
+#endif
+
+/**
+ * @brief   SPI temporary buffer size for storing const data in RAM before
+ *          initiating DMA transfer
+ */
+#ifndef CONFIG_SPI_MBUF_SIZE
+#define CONFIG_SPI_MBUF_SIZE    64
+#endif
+
+#ifndef DOXYGEN
+/**
+ * @brief   Override I2C speed settings
+ * @{
+ */
+#define HAVE_I2C_SPEED_T
+typedef enum {
+    I2C_SPEED_LOW       = 0xff,                         /**< not supported */
+    I2C_SPEED_NORMAL    = TWIM_FREQUENCY_FREQUENCY_K100,    /**< 100kbit/s */
+    I2C_SPEED_FAST      = TWIM_FREQUENCY_FREQUENCY_K400,    /**< 400kbit/s */
+    I2C_SPEED_FAST_PLUS = 0xfe,                         /**< not supported */
+    I2C_SPEED_HIGH      = 0xfd,                         /**< not supported */
+} i2c_speed_t;
+/** @} */
+#endif /* ndef DOXYGEN */
+
+/**
+ * @brief   I2C (TWI) configuration options
+ * @{
+ */
+typedef struct {
+    NRF_TWIM_Type *dev;         /**< TWIM hardware device */
+    gpio_t scl;                 /**< SCL pin */
+    gpio_t sda;                 /**< SDA pin */
+    i2c_speed_t speed;          /**< Bus speed */
+} i2c_conf_t;
+/** @} */
+
+/**
+ * @name   Use shared I2C functions
+ * @{
+ */
+#define PERIPH_I2C_NEED_READ_REG
+#define PERIPH_I2C_NEED_WRITE_REG
+/** @} */
+
+/**
+ * @name    Define macros for sda and scl pin to be able to reinitialize them
+ * @{
+ */
+#define i2c_pin_sda(dev) i2c_config[dev].sda    /**< Macro for getting SDA pin */
+#define i2c_pin_scl(dev) i2c_config[dev].scl    /**< Macro for getting SCL pin */
+/** @} */
+#endif /* ndef CPU_NRF51 */
 
 #ifdef __cplusplus
 }

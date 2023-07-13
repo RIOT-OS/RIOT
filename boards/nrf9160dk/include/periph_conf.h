@@ -113,9 +113,6 @@ static const uart_conf_t uart_config[] = {
     },
 };
 
-#define UART_0_ISR          (isr_uarte0_spim0_spis0_twim0_twis0) /**< UART0_IRQ */
-#define UART_1_ISR          (isr_uarte1_spim1_spis1_twim1_twis1) /**< UART1_IRQ */
-
 #define UART_NUMOF          ARRAY_SIZE(uart_config) /**< UART configuration NUMOF */
 /** @} */
 

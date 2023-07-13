@@ -19,6 +19,7 @@ config CPU_FAM_NRF53
     select HAS_PERIPH_UART_MODECFG
     select HAS_PERIPH_WDT
     select HAS_PERIPH_WDT_CB
+    select MODULE_NRF_SHARED_SERIAL_IRQ
 
 ## CPU Models
 config CPU_MODEL_NRF5340_APP

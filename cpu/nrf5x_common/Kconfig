@@ -53,6 +53,11 @@ config HAS_VDD_LC_FILTER_REG1
         Indicates that a board is equipped with an external LC filter circuit
         attached to the CPUs voltage regulator stage 1.
 
+config MODULE_NRF_SHARED_SERIAL_IRQ
+    bool
+    depends on CPU_FAM_NRF53 || CPU_FAM_NRF9160
+    help
+        Indicates that the MCU used shared IRQ for UART/I2C/SPI.
 
 config MODULE_CPU_COMMON
     bool

@@ -76,6 +76,11 @@ static tsrb_t uart_tx_rb[UART_NUMOF];
 static uint8_t uart_tx_rb_buf[UART_NUMOF][UART_TXBUF_SIZE];
 #endif
 
+/**
+ * @brief Shared IRQ Callback for UART on nRF53/nRF9160
+*/
+void uart_isr_handler(void *arg);
+
 static inline NRF_UARTE_Type *dev(uart_t uart)
 {
     return uart_config[uart].dev;
@@ -239,7 +244,11 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     }
 
     if (rx_cb || IS_USED(MODULE_PERIPH_UART_NONBLOCKING)) {
+#if  defined(CPU_NRF53) || defined(CPU_NRF9160)
+        shared_irq_register_uart(dev(uart), uart_isr_handler, (void *)(uintptr_t)uart);
+#else
         NVIC_EnableIRQ(UART_IRQN);
+#endif
     }
     return UART_OK;
 }
@@ -489,6 +498,14 @@ static inline void irq_handler(uart_t uart)
 
 #endif  /* !CPU_MODEL_NRF52832XXAA && !CPU_FAM_NRF51 */
 
+#if defined(CPU_NRF53) || defined(CPU_NRF9160)
+void uart_isr_handler(void *arg)
+{
+    uart_t uart = (uart_t)(uintptr_t)arg;
+
+    irq_handler(uart);
+}
+#else
 #ifdef UART_0_ISR
 void UART_0_ISR(void)
 {
@@ -502,3 +519,4 @@ void UART_1_ISR(void)
     irq_handler(UART_DEV(1));
 }
 #endif
+#endif /* def CPU_NRF53 || CPU_NRF9160 */

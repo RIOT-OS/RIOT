@@ -33,4 +33,14 @@ config MODULE_VDD_LC_FILTER_REG1
     help
         Use the LC filter attached to the CPUs voltage regulator
 
+config MODULE_PERIPH_UART_NONBLOCKING
+    depends on HAS_PERIPH_UART_NONBLOCKING
+    depends on MODULE_PERIPH_UART
+    select MODULE_TSRB
+
+config MODULE_PERIPH_SPI
+    depends on HAS_PERIPH_SPI
+    select MODULE_PERIPH_GPIO_IRQ if CPU_MODEL_NRF52832XXAA && HAS_PERIPH_GPIO_IRQ
+    select MODULE_PERIPH_SPI_GPIO_MODE if MODULE_PERIPH_SPI && HAS_PERIPH_SPI_GPIO_MODE
+
 endif # TEST_KCONFIG

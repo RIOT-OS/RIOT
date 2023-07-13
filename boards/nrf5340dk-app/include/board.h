@@ -20,6 +20,7 @@
 #define BOARD_H
 
 #include "cpu.h"
+#include "mtd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -93,6 +94,19 @@ extern "C" {
 #define BTN2_MODE           GPIO_IN_PU       /**< BTN2 default mode */
 #define BTN3_PIN            GPIO_PIN(0, 9)   /**< BTN3 pin definition */
 #define BTN3_MODE           GPIO_IN_PU       /**< BTN3 default mode */
+/** @} */
+
+/**
+ * @name MTD configuration
+ * @{
+ */
+extern mtd_dev_t *mtd0;
+#define MTD_0       mtd0
+#define MTD_NUMOF   1
+
+#define BOARD_QSPI_PIN_CS       GPIO_PIN(0, 18)     /**< SPI Flash Chip Select */
+#define BOARD_QSPI_PIN_WP       GPIO_PIN(0, 15)     /**< SPI Flash Write Protect */
+#define BOARD_QSPI_PIN_HOLD     GPIO_PIN(0, 16)     /**< SPI Flash Hold pin */
 /** @} */
 
 #ifdef __cplusplus
