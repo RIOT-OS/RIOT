@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2020 Koen Zandberg <koen@bergzand.net>
  *               2023 Gunar Schorcht <gunar@schorcht.net>
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -16,6 +17,7 @@
  *
  * @author          Koen Zandberg <koen@bergzand.net>
  * @author          Gunar Schorcht <gunar@schorcht.net>
+ * @author          Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef PERIPH_CPU_H
@@ -322,25 +324,6 @@ typedef uint32_t spi_cs_t;
 /** @} */
 
 /**
- * @brief   Override SPI clock speed values
- * @{
- */
-#define HAVE_SPI_CLK_T
-enum {
-    SPI_CLK_100KHZ = KHZ(100), /**< drive the SPI bus with 100KHz */
-    SPI_CLK_400KHZ = KHZ(400), /**< drive the SPI bus with 400KHz */
-    SPI_CLK_1MHZ   = MHZ(1),   /**< drive the SPI bus with 1MHz */
-    SPI_CLK_5MHZ   = MHZ(5),   /**< drive the SPI bus with 5MHz */
-    SPI_CLK_10MHZ  = MHZ(10),  /**< drive the SPI bus with 10MHz */
-};
-
-/**
- * @brief   SPI clock type
- */
-typedef uint32_t spi_clk_t;
-/** @} */
-
-/**
  * @brief   Structure for SPI configuration data
  */
 typedef struct {
@@ -358,6 +341,19 @@ typedef struct {
     uint8_t rx_dma_chan;    /**< DMA channel used for RX */
 #endif
 } spi_conf_t;
+
+#ifndef DOXYGEN
+/**
+ * @brief   Override SPI clock configuration
+ * @{
+ */
+#define HAVE_SPI_CLK_T
+typedef struct {
+    uint32_t ctl0_psc;
+    int err;
+} spi_clk_t;
+/** @} */
+#endif /* ifndef DOXYGEN */
 
 /**
  * @name    Use the shared I2C functions

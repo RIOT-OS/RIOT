@@ -1,7 +1,8 @@
 /*
  * Copyright (C) 2014-2016 Freie Universität Berlin
- * Copyright (C) 2020 Inria
- * Copyright (C) 2020 Koen Zandberg <koen@bergzand.net>
+ *               2020 Inria
+ *               2020 Koen Zandberg <koen@bergzand.net>
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -20,12 +21,14 @@
  * @author      Frank Holtz <frank-riot2015@holtznet.de>
  * @author      Jan Wagner <mail@jwagner.eu>
  * @author      Koen Zandberg <koen@bergzand.net>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
 
 #include <assert.h>
 
+#include "bitarithm.h"
 #include "cpu.h"
 #include "mutex.h"
 #include "periph/spi.h"
@@ -181,10 +184,35 @@ void spi_init_pins(spi_t bus)
     spi_twi_irq_register_spi(dev(bus), spi_isr_handler, (void *)(uintptr_t)bus);
 }
 
+spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
+{
+    (void)bus;
+
+    uint8_t shift;
+    for (shift = 0; MHZ(8) >> shift > freq; shift++) {
+        if (shift > 6) {
+            return (spi_clk_t){ .err = -EDOM };
+        }
+    }
+    return (spi_clk_t){ .frequency = BIT31 >> shift };
+}
+
+int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
+{
+    (void)bus;
+    if (clk.err) {
+        return -EINVAL;
+    }
+    return MHZ(8) >> (31 - bitarithm_msb(clk.frequency));
+}
+
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)cs;
     assert((unsigned)bus < SPI_NUMOF);
+    if (clk.err) {
+        return;
+    }
 
     if (IS_USED(MODULE_PERIPH_SPI_RECONFIGURE)) {
         mutex_lock(&locks[bus]);
@@ -195,7 +223,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
     /* configure bus */
     dev(bus)->CONFIG = mode;
-    dev(bus)->FREQUENCY = clk;
+    dev(bus)->FREQUENCY = clk.frequency;
     /* enable the bus */
     dev(bus)->ENABLE = SPIM_ENABLE_ENABLE_Enabled;
 }

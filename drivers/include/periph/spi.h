@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014-2016 Freie Universität Berlin
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -61,6 +62,7 @@
  * @brief       Low-level SPI peripheral driver interface definition
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef PERIPH_SPI_H
@@ -72,9 +74,11 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "periph_cpu.h"
-#include "periph_conf.h"
+#include "architecture.h"
+#include "macros/units.h"
 #include "periph/gpio.h"
+#include "periph_conf.h"
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -128,6 +132,26 @@ typedef gpio_t spi_cs_t;
 #endif
 
 /**
+ * @brief   Opaque type that contains an SPI clock configuration
+ *
+ * This should contains precomputed register bitmask(s) ready to be applied by
+ * @ref spi_acquire and implementation should overwrite it if needed, e.g two
+ * registers are impacted or register size not matching uword_t.
+ *
+ * The driver for each device on the bus can save this value at init time
+ * for later use if spi_get_clk generates too much overhead.
+ *
+ * Use @ref spi_get_clk to obtain this value.
+ * Use @ref spi_get_freq to obtain the obtained actual frequency.
+ */
+#ifndef HAVE_SPI_CLK_T
+typedef struct {
+    uword_t reg_psc_bits;
+    int err;
+} spi_clk_t;
+#endif
+
+/**
  * @brief       Status codes used by the SPI driver interface
  *
  * @deprecated  Use negative errno codes instead. The enum is still provided
@@ -172,16 +196,21 @@ typedef enum {
  * The actual speed of the bus can vary to some extend, as the combination of
  * CPU clock and available prescaler values on certain platforms may not make
  * the exact values possible.
+ *
+ * @deprecated  Use @ref spi_get_clk instead
+ * @{
  */
-#ifndef HAVE_SPI_CLK_T
-typedef enum {
-    SPI_CLK_100KHZ = 0,     /**< drive the SPI bus with 100KHz */
-    SPI_CLK_400KHZ,         /**< drive the SPI bus with 400KHz */
-    SPI_CLK_1MHZ,           /**< drive the SPI bus with 1MHz */
-    SPI_CLK_5MHZ,           /**< drive the SPI bus with 5MHz */
-    SPI_CLK_10MHZ           /**< drive the SPI bus with 10MHz */
-} spi_clk_t;
-#endif
+/** drive the SPI bus with 100KHz */
+#define SPI_CLK_100KHZ      spi_get_clk(SPI_DEV(0), KHZ(100))
+/** drive the SPI bus with 400KHz */
+#define SPI_CLK_400KHZ      spi_get_clk(SPI_DEV(0), KHZ(400))
+/** drive the SPI bus with 1MHz */
+#define SPI_CLK_1MHZ        spi_get_clk(SPI_DEV(0), MHZ(1))
+/** drive the SPI bus with 5MHz */
+#define SPI_CLK_5MHZ        spi_get_clk(SPI_DEV(0), MHZ(5))
+/** drive the SPI bus with 10MHz */
+#define SPI_CLK_10MHZ       spi_get_clk(SPI_DEV(0), MHZ(10))
+/** @} */
 
 /**
  * @brief   Basic initialization of the given SPI bus
@@ -334,21 +363,60 @@ int spi_init_with_gpio_mode(spi_t bus, const spi_gpio_mode_t* mode);
 #endif
 
 /**
+ * @brief   Get the @ref spi_clk_t value that best matches the given frequency
+ *          in Hertz
+ *
+ * @param[in]   bus     SPI device to get a clock configuration for
+ * @param[in]   freq    The desired frequency in Hertz
+ *
+ * @return  The SPI clock configuration that is as close to, but not higher than
+ *          the specified frequency. If the requested frequency is too low
+ *          (below the lower limit), it returns an spi_clk_t structure with
+ *          errno set to -EDOM indicating an invalid argument. If the requested
+ *          frequency is too high (above the upper limit), it returns the
+ *          closest clock configuration available that is within the valid
+ *          range.
+ */
+spi_clk_t spi_get_clk(spi_t bus, uint32_t freq);
+
+/**
+ * @brief   Get the actual frequency Hertz corresponding to the given
+ *          clock config
+ *
+ * @param[in]   bus     SPI device which the clock configuration was
+ *                      made for
+ * @param[in]   clk     The clock configuration to get the corresponding
+ *                      frequency from
+ *
+ * @retval  > 0         The exact frequency in Hertz matching the clock
+ *                      configuration.
+ * @retval  -EINVAL     spi_get_clk() failed to get a valid clock configuration
+ *
+ * @note    In most cases `spi_get_freq(spi_get_clk(x)) != x` will be true,
+ *          since `spi_get_clk()` will return only the closest match, which will
+ *          rarely be an exact match.
+ */
+int32_t spi_get_freq(spi_t bus, spi_clk_t clk);
+
+/**
  * @brief   Start a new SPI transaction
  *
  * Starting a new SPI transaction will get exclusive access to the SPI bus
  * and configure it according to the given values. If another SPI transaction
  * is active when this function is called, this function will block until the
- * other transaction is complete (spi_relase was called).
+ * other transaction is complete (@ref spi_release was called).
  *
  * @param[in]   bus     SPI device to access
  * @param[in]   cs      chip select pin/line to use, set to SPI_CS_UNDEF if chip
  *                      select should not be handled by the SPI driver
  * @param[in]   mode    mode to use for the new transaction
- * @param[in]   clk     bus clock speed to use for the transaction
+ * @param[in]   clk     opaque clock configuration obtain from @ref spi_get_clk
  *
  * @pre     All parameters are valid and supported, otherwise an assertion blows
  *          up (if assertions are enabled).
+ *
+ * @post    Exclusive access to the SPI bus is guaranteed until @ref spi_release
+ *          is called.
  */
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk);
 

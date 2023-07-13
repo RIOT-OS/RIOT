@@ -3,6 +3,7 @@
  *               2014-2017 Freie Universität Berlin
  *               2016-2017 OTA keys S.A.
  *               2023 Gunar Schorcht <gunar@schorcht.net>
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -25,6 +26,7 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Gunar Schorcht <gunar@schorcht.net>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -54,48 +56,10 @@
  */
 static mutex_t locks[SPI_NUMOF];
 
-/**
- * @brief   Clock configuration cache
- */
-static uint32_t clocks[SPI_NUMOF];
-
-/**
- * @brief   Clock divider cache
- */
-static uint8_t dividers[SPI_NUMOF];
 
 static inline SPI_Type *dev(spi_t bus)
 {
     return spi_config[bus].dev;
-}
-
-/**
- * @brief Multiplier for clock divider calculations
- *
- * Makes the divider calculation fixed point
- */
-#define SPI_APB_CLOCK_SHIFT          (4U)
-#define SPI_APB_CLOCK_MULT           (1U << SPI_APB_CLOCK_SHIFT)
-
-static uint8_t _get_clkdiv(const spi_conf_t *conf, uint32_t clock)
-{
-    uint32_t bus_clock = periph_apb_clk(conf->apbbus);
-    /* Shift bus_clock with SPI_APB_CLOCK_SHIFT to create a fixed point int */
-    uint32_t div = (bus_clock << SPI_APB_CLOCK_SHIFT) / (2 * clock);
-    DEBUG("[spi] clock: divider: %"PRIu32"\n", div);
-    /* Test if the divider is 2 or smaller, keeping the fixed point in mind */
-    if (div <= SPI_APB_CLOCK_MULT) {
-        return 0;
-    }
-    /* determine MSB and compensate back for the fixed point int shift */
-    uint8_t rounded_div = bitarithm_msb(div) - SPI_APB_CLOCK_SHIFT;
-    /* Determine if rounded_div is not a power of 2 */
-    if ((div & (div - 1)) != 0) {
-        /* increment by 1 to ensure that the clock speed at most the
-         * requested clock speed */
-        rounded_div++;
-    }
-    return rounded_div > BR_MAX ? BR_MAX : rounded_div;
 }
 
 void spi_init(spi_t bus)
@@ -179,9 +143,36 @@ int spi_init_with_gpio_mode(spi_t bus, const spi_gpio_mode_t* mode)
 }
 #endif
 
+spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
+{
+    /* freq = f_pclk / (1 << (BR + 1))
+     * BR = 0..7 */
+    uint8_t br = 0;
+    while (periph_apb_clk(spi_config[bus].apbbus) / (1 << (br + 1)) > freq) {
+        br++;
+    }
+    /* bound divider to 256 */
+    if (br > BR_MAX) {
+        return (spi_clk_t){ .err = -EDOM };
+    }
+    return (spi_clk_t){ .ctl0_psc = (br << BR_SHIFT) };
+}
+
+int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
+{
+    if (clk.err) {
+        return -EINVAL;
+    }
+    return periph_apb_clk(spi_config[bus].apbbus)
+            / (1 << ((clk.ctl0_psc >> BR_SHIFT) + 1));
+}
+
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     assert((unsigned)bus < SPI_NUMOF);
+    if (clk.err) {
+        return;
+    }
 
     /* lock bus */
     mutex_lock(&locks[bus]);
@@ -192,19 +183,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     /* enable SPI device clock */
     periph_clk_en(spi_config[bus].apbbus, spi_config[bus].rcumask);
     /* enable device */
-    if (clk != clocks[bus]) {
-        dividers[bus] = _get_clkdiv(&spi_config[bus], clk);
-        clocks[bus] = clk;
-    }
-    uint8_t br = dividers[bus];
-
-    DEBUG("[spi] acquire: requested clock: %"PRIu32", resulting clock: %"PRIu32
-          " BR divider: %u\n",
-          clk,
-          periph_apb_clk(spi_config[bus].apbbus)/(1 << (br + 1)),
-          br);
-
-    uint16_t ctl0_settings = ((br << BR_SHIFT) | mode | SPI0_CTL0_MSTMOD_Msk);
+    uint16_t ctl0_settings = clk.ctl0_psc | mode | SPI0_CTL0_MSTMOD_Msk;
     /* Settings to add to CTL1 in addition to SPI_CTL1_SETTINGS */
     uint16_t ctl1_extra_settings = 0;
     if (cs != SPI_HWCS_MASK) {

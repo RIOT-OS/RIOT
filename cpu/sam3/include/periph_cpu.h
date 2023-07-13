@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2015 Freie Universität Berlin
  *               2015 Hamburg University of Applied Sciences
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,6 +17,7 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Tobias Fredersdorf <tobias.fredersdorf@haw-hamburg.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  */
 
@@ -161,16 +163,13 @@ typedef enum {
 /** @} */
 
 /**
- * @brief   Override default SPI clock values
+ * @brief   Override SPI clock configuration
  * @{
  */
 #define HAVE_SPI_CLK_T
-typedef enum {
-    SPI_CLK_100KHZ = (100000),                      /**< 100KHz */
-    SPI_CLK_400KHZ = (400000),                      /**< 400KHz */
-    SPI_CLK_1MHZ   = (1000000),                     /**< 1MHz */
-    SPI_CLK_5MHZ   = (5000000),                     /**< 5MHz */
-    SPI_CLK_10MHZ  = (10000000)                     /**< 10MHz */
+typedef struct {
+    uint32_t spi_csr_scbr;
+    int err;
 } spi_clk_t;
 /** @} */
 #endif /* ndef DOXYGEN */
