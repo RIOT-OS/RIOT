@@ -147,21 +147,21 @@
  * This configuration cannot be changed.
  * @{
  */
-#if MODULE_ST7735
+#if MODULE_ST77XX
 #define LCD_DC              GPIO4   /**< LCD DC signal */
 #define LCD_CS              GPIO5   /**< LCD EN signal */
 #define LCD_RST             GPIO8   /**< LCD RST signal */
 #define LCD_BACKLIGHT       GPIO9   /**< LCD BL signal */
 
-#define ST7735_PARAM_SPI            SPI_DEV(0)
-#define ST7735_PARAM_CS             LCD_CS
-#define ST7735_PARAM_DCX            LCD_DC
-#define ST7735_PARAM_RST            LCD_RST
-#define ST7735_PARAM_NUM_LINES      240
-#define ST7735_PARAM_RGB_CHANNELS   240
-#define ST7735_PARAM_ROTATION       LCD_MADCTL_MV | LCD_MADCTL_MX | LCD_MADCTL_MY
-#define ST7735_PARAM_INVERTED       1
-#define ST7735_PARAM_RGB            1
+#define ST77XX_PARAM_CNTRL          ST77XX_CNTRL_ST7789
+#define ST77XX_PARAM_CS             LCD_CS
+#define ST77XX_PARAM_DCX            LCD_DC
+#define ST77XX_PARAM_RST            LCD_RST
+#define ST77XX_PARAM_NUM_LINES      240
+#define ST77XX_PARAM_RGB_CHANNELS   240
+#define ST77XX_PARAM_ROTATION       ST77XX_ROTATION_VERT
+#define ST77XX_PARAM_INVERTED       1
+#define ST77XX_PARAM_RGB            1
 
 #define BACKLIGHT_ON                gpio_set(LCD_BACKLIGHT)
 #define BACKLIGHT_OFF               gpio_clear(LCD_BACKLIGHT)
