@@ -12,7 +12,7 @@
  *
  * @{
  * @file
- * @brief       Default configuration for st7735
+ * @brief       Default configuration for ST7735 display controller
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>

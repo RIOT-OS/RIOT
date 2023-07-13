@@ -9,10 +9,10 @@
  */
 
 /**
- * @defgroup    drivers_st7735 ST7735 display driver
+ * @defgroup    drivers_st7796 ST7796 display driver
  * @ingroup     drivers_display
  *
- * @brief       Driver for the ST7735 display controller
+ * @brief       Driver for the ST7796 display controller
  *
  * @{
  *
@@ -22,7 +22,7 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @author      Gunar Schorcht <gunar@schorcht.net>
  *
- * The ST7735 is a generic display driver for small RGB displays. The driver
+ * The ST7796 is a generic display driver for small RGB displays. The driver
  * implemented here operates over SPI to communicate with the device.
  *
  * The device requires colors to be send in big endian RGB-565 format. The
@@ -33,8 +33,8 @@
  */
 
 
-#ifndef ST7735_H
-#define ST7735_H
+#ifndef ST7796_H
+#define ST7796_H
 
 #include "lcd.h"
 
@@ -47,33 +47,33 @@ extern "C" {
 #endif
 
 /**
- * @name    ST7735 display rotation modes
+ * @name    ST7796 display rotation modes
  * @{
  */
-#define ST7735_ROTATION_VERT            0                   /**< Vertical mode */
-#define ST7735_ROTATION_VERT_FLIP       LCD_MADCTL_MX | \
+#define ST7796_ROTATION_VERT            0                   /**< Vertical mode */
+#define ST7796_ROTATION_VERT_FLIP       LCD_MADCTL_MX | \
                                         LCD_MADCTL_MY       /**< Flipped vertical */
-#define ST7735_ROTATION_HORZ            LCD_MADCTL_MV | \
+#define ST7796_ROTATION_HORZ            LCD_MADCTL_MV | \
                                         LCD_MADCTL_MX       /**< Horizontal mode */
-#define ST7735_ROTATION_HORZ_FLIP       LCD_MADCTL_MV | \
+#define ST7796_ROTATION_HORZ_FLIP       LCD_MADCTL_MV | \
                                         LCD_MADCTL_MY       /**< Horizontal flipped */
 /** @} */
 
 /**
- * @brief   Device descriptor for a st7735
+ * @brief   Device descriptor for a st7796
  *
  */
 typedef struct {
     lcd_t dev;                    /**< Pointer to the common lcd device */
-} st7735_t;
+} st7796_t;
 
 /**
  * @brief   LCD device operations table
  */
-extern const lcd_driver_t lcd_st7735_driver;
+extern const lcd_driver_t lcd_st7796_driver;
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* ST7735_H */
+#endif /* ST7796_H */
 /** @} */

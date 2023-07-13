@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Device driver implementation for the st7735 display controller
+ * @brief       Device driver implementation for the ST7735 display controller
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  *
@@ -26,19 +26,6 @@ extern "C" {
 #endif
 
 #include "lcd_internal.h"
-
-/**
- * @name LCD ST7735 commands
- *
- * LCD commands extension available for st7735 LCD controllers
- * @{
- */
-#define LCD_CMD_INVCTR          0xb4    /**< Display Inversion Control */
-#define LCD_CMD_PWCTRL3         0xc2    /**< Power control 3 */
-#define LCD_CMD_PWCTRL4         0xc3    /**< Power control 4 */
-#define LCD_CMD_PWCTRL5         0xc4    /**< Power control 5 */
-#define LCD_CMD_PWCTRL6         0xfc    /**< Power control 6 */
-/** @} */
 
 #ifdef __cplusplus
 }
