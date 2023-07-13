@@ -13,4 +13,72 @@ config MODULE_ST7735
     help
         ST7735 display controller is used
 
+if MODULE_ST7735
+
+menuconfig ST7735_CUSTOM_CONFIG
+    bool "ST7735 Custom Configuration"
+    help
+        Enable if customized configuration of voltages are needed. Otherwise
+        reset default values are used.
+
+if ST7735_CUSTOM_CONFIG
+
+config ST7735_AVDD
+    int "AVDD voltage (in millivolts)"
+    default 4900
+    range 4500 5100
+    help
+        Configure the AVDD voltage for analog circuits in millivolts.
+        Valid values must be in the range of 4500 (4.5V) to 5100 (5.1V)
+        in steps of 100.
+
+config ST7735_GVDD
+    int "GVDD voltage (in millivolts)"
+    default 4600
+    range 3150 4700
+    help
+        Configure the GVDD voltage, the gamma reference positive voltage.
+        Valid values must be in the range of 3150 (3.15V) to 4700 (4.7V)
+        in steps of 50.
+
+config ST7735_GVCL
+    int "GVCL voltage (in millivolts)"
+    default -4600
+    range -4700 -3150
+    help
+        Configure the GVCL voltage, the gamma reference negative voltage.
+        Valid values must be in the range of -4700 (-4.7V) to -3150 (-3.15V)
+        in steps of 50.
+
+config ST7735_VCOM
+    int "VCOM voltage (in millivolts)"
+    default -775
+    range -2000 -425
+    help
+        Configure the VCOM voltage. VCOM needs to be adjusted to match the
+        capacitance and performance specifications of the TFT panel to
+        maximize contrast and minimize flickering.
+        Valid values must be in the range of -2000 (-2.0V) to -425 (-0.425V)
+        in steps of 25.
+
+config ST7735_VGH
+    int "VGH voltage (in millivolts)"
+    default 14700
+    range 10000 15000
+    help
+        Configure the high voltage for gate drivers in millivolts.
+        Valid values must be in the range of 10000 (10V) to 15000 (15V) and
+        in the range of (2 * AVDD + 2.1V) and (3 * AVDD + 2.4 V).
+
+config ST7735_VGL
+    int "VGL voltage (in millivolts)"
+    default -10000
+    range -13000 -7500
+    help
+        Configure the low voltage for gate drivers in millivolts.
+        Valid values must be in the range of -13000 (-13V) to -7500 (-7.5V)
+        in steps of 2500.
+
+endif # ST7735_CUSTOM_CONFIG
+endif # MODULE_ST7735
 endif # MODULE_ST77XX
