@@ -22,8 +22,18 @@
  * @ref lcd_params_t::cntrl or as macro @ref ST77XX_PARAM_CNTRL if the
  * default parameter set @ref ST77XX_PARAMS is used.
  *
- * The driver uses the SPI serial interface to communicate with the display
- * controller.
+ * The driver communicates with the device either via an
+ *
+ * - SPI serial interface (if module `lcd_spi` enabled) or an
+ * - MCU 8080 8-/16-bit parallel interface (if module `lcd_parallel` or
+ *   module `lcd_parallel_16` is enabled).
+ *
+ * Usually the device driver is used either for a single display with SPI serial
+ * interface or for a display with parallel MCU 8080 8-/16-bit parallel
+ * interface. However, the device driver can also be used simultaneously for
+ * multiple displays with different interfaces if several of the `lcd_spi`,
+ * `lcd_parallel` and `lcd_parallel_16bit` modules are enabled at the same time.
+ * In this case, please refer to the notes in @ref lcd_params_t.
  *
  * The device requires colors to be send in big endian RGB-565 format. The
  * @ref CONFIG_LCD_LE_MODE compile time option can switch this, but only use this
