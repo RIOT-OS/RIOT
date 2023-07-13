@@ -13,6 +13,11 @@ config MODULE_LCD
     select MODULE_PERIPH_SPI
     select MODULE_PERIPH_GPIO
 
+config MODULE_LCD_MULTI_CNTRL
+    bool
+    help
+        The controller-specific driver supports multiple controller variants.
+
 menuconfig KCONFIG_USEMODULE_LCD
     bool "Configure LCD driver"
     depends on USEMODULE_LCD

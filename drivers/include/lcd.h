@@ -30,7 +30,6 @@
  * transfer.
  */
 
-
 #ifndef LCD_H
 #define LCD_H
 
@@ -86,6 +85,11 @@ typedef  struct {
     uint8_t rotation;           /**< Display rotation mode */
     uint8_t offset_x;           /**< LCD offset to apply on x axis. */
     uint8_t offset_y;           /**< LCD offset to apply on y axis. */
+#if MODULE_LCD_MULTI_CNTRL || DOXYGEN
+    uint8_t cntrl;              /**< controller variant used, if the controller-
+                                     specific driver supports multiple
+                                     controller variants */
+#endif
 } lcd_params_t;
 
 /**
