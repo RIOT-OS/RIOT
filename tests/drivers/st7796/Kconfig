@@ -1,0 +1,15 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config NO_RIOT_IMAGE
+    bool
+    prompt "Avoid showing the RIOT logo on the test" if !HAS_ARCH_AVR8
+    # the logo does not usually fit in AVR8
+    default y if HAS_ARCH_AVR8
+    help
+        Say y to avoid loading the RIOT logo on the test application. Useful for architectures
+        storing it in a limited RAM.
