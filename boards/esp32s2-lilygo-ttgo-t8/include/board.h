@@ -87,20 +87,20 @@
  * OLED display uses SPI_DEV(0) on this board.
  * @{
  */
-#if defined(MODULE_ST7735)
-#define ST7735_PARAM_SPI            SPI_DEV(0)      /**< SPI device */
-#define ST7735_PARAM_SPI_CLK        SPI_CLK_10MHZ   /**< SPI clock frequency */
-#define ST7735_PARAM_SPI_MODE       SPI_MODE_0      /**< SPI mode */
-#define ST7735_PARAM_CS             GPIO34          /**< Chip Select pin */
-#define ST7735_PARAM_DCX            GPIO37          /**< DCX pin */
-#define ST7735_PARAM_RST            GPIO38          /**< Reset pin */
-#define ST7735_PARAM_RGB            1               /**< RGB mode enable */
-#define ST7735_PARAM_INVERTED       1               /**< Inverted mode enable */
-#define ST7735_PARAM_NUM_LINES      240U            /**< Number of lines */
-#define ST7735_PARAM_RGB_CHANNELS   135U            /**< Number of columns */
-#define ST7735_PARAM_ROTATION       LCD_MADCTL_MY   /**< Rotation */
-#define ST7735_PARAM_OFFSET_X       40              /**< X offset */
-#define ST7735_PARAM_OFFSET_Y       52              /**< Y offset */
+#if defined(MODULE_ST7789)
+#define ST7789_PARAM_SPI            SPI_DEV(0)      /**< SPI device */
+#define ST7789_PARAM_SPI_CLK        SPI_CLK_10MHZ   /**< SPI clock frequency */
+#define ST7789_PARAM_SPI_MODE       SPI_MODE_0      /**< SPI mode */
+#define ST7789_PARAM_CS             GPIO34          /**< Chip Select pin */
+#define ST7789_PARAM_DCX            GPIO37          /**< DCX pin */
+#define ST7789_PARAM_RST            GPIO38          /**< Reset pin */
+#define ST7789_PARAM_RGB            1               /**< RGB mode enable */
+#define ST7789_PARAM_INVERTED       1               /**< Inverted mode enable */
+#define ST7789_PARAM_NUM_LINES      240U            /**< Number of lines */
+#define ST7789_PARAM_RGB_CHANNELS   135U            /**< Number of columns */
+#define ST7789_PARAM_ROTATION       ST7789_ROTATION_HORZ   /**< Rotation */
+#define ST7789_PARAM_OFFSET_X       40              /**< X offset */
+#define ST7789_PARAM_OFFSET_Y       52              /**< Y offset */
 #endif
 /** @} */
 
