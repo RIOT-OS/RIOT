@@ -31,6 +31,65 @@
 extern "C" {
 #endif
 
+#if !DOXYGEN    /* hide from documentation */
+/**
+ * @name    Mapping of former ST7735 configuration parameters for backward compatibility
+ *
+ * If a board definition already used the ST7735 driver, `ST7735_*` macros were
+ * used in the board definitions to define the default configuration parameter
+ * set. For backward compatibility these symbols are mapped to the `ST77XX_*`
+ * macros if they are defined.
+ *
+ * @{
+ */
+#ifdef ST7735_PARAM_SPI
+#define ST77XX_PARAM_SPI            ST7735_PARAM_SPI
+#endif
+#ifdef ST7735_PARAM_SPI_CLK
+#define ST77XX_PARAM_SPI_CLK        ST7735_PARAM_SPI_CLK
+#endif
+#ifdef ST7735_PARAM_CS
+#define ST77XX_PARAM_CS             ST7735_PARAM_CS
+#endif
+#ifdef ST7735_PARAM_DCX
+#define ST77XX_PARAM_DCX            ST7735_PARAM_DCX
+#endif
+#ifdef ST7735_PARAM_RST
+#define ST77XX_PARAM_RST            ST7735_PARAM_RST
+#endif
+#ifdef ST7735_PARAM_SPI_MODE
+#define ST77XX_PARAM_SPI_MODE       ST7735_PARAM_SPI_MODE
+#endif
+#ifdef ST7735_PARAM_RGB
+#define ST77XX_PARAM_RGB            ST7735_PARAM_RGB
+#endif
+#ifdef ST7735_PARAM_INVERTED
+#define ST77XX_PARAM_INVERTED       ST7735_PARAM_INVERTED
+#endif
+#ifdef ST7735_PARAM_NUM_LINES
+#define ST77XX_PARAM_NUM_LINES      ST7735_PARAM_NUM_LINES
+#endif
+#ifdef ST7735_PARAM_RGB_CHANNELS
+#define ST77XX_PARAM_RGB_CHANNELS   ST7735_PARAM_RGB_CHANNELS
+#endif
+#ifdef ST7735_PARAM_ROTATION
+#define ST77XX_PARAM_ROTATION       ST7735_PARAM_ROTATION
+#endif
+#ifdef ST7735_PARAM_OFFSET_X
+#define ST77XX_PARAM_OFFSET_X       ST7735_PARAM_OFFSET_X
+#endif
+#ifdef ST7735_PARAM_OFFSET_Y
+#define ST77XX_PARAM_OFFSET_Y       ST7735_PARAM_OFFSET_Y
+#endif
+#ifdef ST7735_PARAMS
+#define ST77XX_PARAMS               ST7735_PARAMS
+#endif
+#ifdef ST7735_PARAM_SCREEN_IDS
+#define ST77XX_PARAM_SCREEN_IDS     ST7735_PARAM_SCREEN_IDS
+#endif
+
+#endif /* !DOXYGEN */
+
 /**
  * @name    Set default configuration parameters for the ST77xx
  * @{
