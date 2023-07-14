@@ -2,10 +2,4 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
 endif
 
-# used for software reset
-ifneq (,$(filter board_software_reset,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_gpio_irq
-  FEATURES_REQUIRED += periph_pm
-endif
-
 include $(RIOTBOARD)/common/nrf52/Makefile.dep
