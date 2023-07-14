@@ -6,8 +6,9 @@
 
 exit_code=1
 
+SCRIPTDIR="$(cd "$(dirname "$0")" || exit 1; pwd)"
 for serial in "$@"; do
-    if ./ttys.py --format path --serial "$serial"; then
+    if "$SCRIPTDIR"/ttys.py --format path --serial "$serial"; then
         exit_code=0
     fi
 done
