@@ -306,6 +306,16 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
         aux->flags &= ~SOCK_AUX_GET_RSSI;
     }
 #endif
+#if IS_USED(MODULE_SOCK_AUX_TTL)
+    if ((aux != NULL) && (aux->flags & SOCK_AUX_GET_TTL)) {
+        gnrc_pktsnip_t *ip = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
+        if (ip) {
+            ipv6_hdr_t *ip_hdr = ip->data;
+            aux->ttl = ip_hdr->hl;
+            aux->flags &= ~SOCK_AUX_GET_TTL;
+        }
+    }
+#endif
     *data = pkt->data;
     *buf_ctx = pkt;
     res = (int)pkt->size;
