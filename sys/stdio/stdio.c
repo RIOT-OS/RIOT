@@ -78,3 +78,10 @@ int stdio_available(void)
     return tsrb_avail(&stdin_isrpipe.tsrb);
 }
 #endif
+
+void stdio_clear_stdin(void)
+{
+    if (IS_USED(MODULE_STDIN)) {
+        tsrb_clear(&stdin_isrpipe.tsrb);
+    }
+}
