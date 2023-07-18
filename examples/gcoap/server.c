@@ -60,11 +60,17 @@ static ssize_t _encode_link(const coap_resource_t *resource, char *buf,
                             size_t maxlen, coap_link_encoder_ctx_t *context);
 static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx);
 static ssize_t _riot_board_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx);
+#if IS_USED(MODULE_GCOAP_DTLS)
+static ssize_t _creds_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx);
+#endif
 
 /* CoAP resources. Must be sorted by path (ASCII order). */
 static const coap_resource_t _resources[] = {
     { "/cli/stats", COAP_GET | COAP_PUT, _stats_handler, NULL },
     { "/riot/board", COAP_GET, _riot_board_handler, NULL },
+#if IS_USED(MODULE_GCOAP_DTLS)
+    { "/show/credentials", COAP_IGNORE, _creds_handler, NULL},
+#endif
 };
 
 static const char *_link_params[] = {
@@ -159,6 +165,41 @@ static ssize_t _riot_board_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, co
         return gcoap_response(pdu, buf, len, COAP_CODE_INTERNAL_SERVER_ERROR);
     }
 }
+
+#if IS_USED(MODULE_GCOAP_DTLS)
+static ssize_t _creds_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx)
+{
+#ifdef CONFIG_DTLS_PSK
+    sock_dtls_t *gcoap_sock_dtls = gcoap_get_sock_dtls();
+    const sock_udp_ep_t *remote_ep = coap_request_ctx_get_remote_udp(ctx);
+    credman_tag_t client_tag = 0;
+    credman_type_t cred_type = 0;
+    credman_credential_t credential = {0};
+    sock_dtls_session_t dtls_session = {0};
+    sock_dtls_session_set_udp_ep(&dtls_session, remote_ep);
+    if (dsm_get_session_credential_info(gcoap_sock_dtls, &dtls_session,
+                                        &cred_type, &client_tag)) {
+        puts("gcoap_cli: could not retrieve credential information");
+        return gcoap_response(pdu, buf, len, COAP_CODE_INTERNAL_SERVER_ERROR);
+    }
+    if (credman_get(&credential, client_tag, cred_type) != CREDMAN_OK) {
+        puts("gcoap_cli: could not retrieve credman credential");
+        return gcoap_response(pdu, buf, len, COAP_CODE_INTERNAL_SERVER_ERROR);
+    }
+
+    puts("Credentials used for this connection:");
+    printf("Credman tag: %d\n", client_tag);
+    printf("Credential type: %d\n", cred_type);
+    printf("Credential ID: %s\n", (char*)credential.params.psk.id.s);
+    printf("Credential key: %s\n", (char*)credential.params.psk.key.s);
+
+    return gcoap_response(pdu, buf, len, COAP_CODE_CREATED);
+#else
+    puts("gcoap_cli: Retrieving credentials is currently only implemented for PSK");
+    return gcoap_response(pdu, buf, len, COAP_CODE_INTERNAL_SERVER_ERROR);
+#endif /* CONFIG_DTLS_PSK */
+}
+#endif /* IS_USED(MODULE_GCOAP_DTLS) */
 
 void notify_observers(void)
 {
