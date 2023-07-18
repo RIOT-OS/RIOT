@@ -761,7 +761,7 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
   struct {
     __I uint8_t  MB:1;             /*!< bit:      0  Master on Bus                      */
     __I uint8_t  SB:1;             /*!< bit:      1  Slave on Bus                       */
-    __I uint8_t  :6;               /*!< bit:  2.. 7  Reserved                           */
+    uint8_t  :6;                   /*!< bit:  2.. 7  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   uint8_t reg;                 /*!< Type      used for register access              */
 } SERCOM_I2CM_INTFLAG_Type;
@@ -783,7 +783,7 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint8_t  PREC:1;           /*!< bit:      0  Stop Received                      */
     __I uint8_t  AMATCH:1;         /*!< bit:      1  Address Match                      */
     __I uint8_t  DRDY:1;           /*!< bit:      2  Data Ready                         */
-    __I uint8_t  :5;               /*!< bit:  3.. 7  Reserved                           */
+    uint8_t  :5;                   /*!< bit:  3.. 7  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   uint8_t reg;                 /*!< Type      used for register access              */
 } SERCOM_I2CS_INTFLAG_Type;
@@ -807,7 +807,7 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint8_t  DRE:1;            /*!< bit:      0  Data Register Empty                */
     __I uint8_t  TXC:1;            /*!< bit:      1  Transmit Complete                  */
     __I uint8_t  RXC:1;            /*!< bit:      2  Receive Complete                   */
-    __I uint8_t  :5;               /*!< bit:  3.. 7  Reserved                           */
+    uint8_t  :5;                   /*!< bit:  3.. 7  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   uint8_t reg;                 /*!< Type      used for register access              */
 } SERCOM_SPI_INTFLAG_Type;
@@ -832,7 +832,7 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint8_t  TXC:1;            /*!< bit:      1  Transmit Complete                  */
     __I uint8_t  RXC:1;            /*!< bit:      2  Receive Complete                   */
     __I uint8_t  RXS:1;            /*!< bit:      3  Receive Start Interrupt            */
-    __I uint8_t  :4;               /*!< bit:  4.. 7  Reserved                           */
+    uint8_t  :4;                   /*!< bit:  4.. 7  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   uint8_t reg;                 /*!< Type      used for register access              */
 } SERCOM_USART_INTFLAG_Type;

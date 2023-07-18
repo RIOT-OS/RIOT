@@ -8,6 +8,8 @@ include $(RIOTBASE)/pkg/pkg.mk
 TDIR = $(RIOTPKG)/$(PKG_NAME)
 PDIR = $(PKG_SOURCE_DIR)
 
+CFLAGS += -Wno-unused-but-set-variable
+
 # NimBLE is not optimized for building with all (extra) warnings enabled. So for
 # now, we disable a number of selected compiler warnings when building NimBLE.
 CFLAGS += -Wno-extra -Wno-cast-align
@@ -19,8 +21,10 @@ ifeq (llvm,$(TOOLCHAIN))
 # Workaround, until https://github.com/apache/mynewt-nimble/pull/566 is merged
 # upstream and the NimBLE version in RIOT is updated.
   CFLAGS += -Wno-sometimes-uninitialized
-else
-  CFLAGS += -Wno-unused-but-set-variable
+  CFLAGS += -Wno-parentheses-equality
+# Backward compatibility with older versions of LLVM (when it doesn't know
+# about the -Wno-foo, it won't throw any -Wfoo related warnings anyway)
+  CFLAGS += -Wno-unknown-warning-option
 endif
 
 IGNORE := nimble_autoconn_% nimble_phy_% nimble_%_ext nimble_autoadv%

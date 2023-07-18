@@ -285,6 +285,10 @@ static const uint8_t _test_send_frag3[] = {
         0x00, 0xbb, /* offset: 187 */
         0x6c, 0x28, 0x16, 0x59, 0xcc, 0x06
     };
+
+/* compiler bug in clang: _loc_l2 is passed via _vrbe_base to external
+ * functions and may be used, but clang considers it to be unused */
+__attribute__((used))
 static const uint8_t _loc_l2[] = LOC_L2;
 static const ipv6_addr_t _rem_ll = { .u8 = REM_LL };
 static const ipv6_addr_t _rem_gb = { .u8 = REM_GB };

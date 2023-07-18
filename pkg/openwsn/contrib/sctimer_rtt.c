@@ -23,6 +23,7 @@
  *
  * @}
  */
+#include <stdint.h>
 #include <stdatomic.h>
 
 #include "sctimer.h"

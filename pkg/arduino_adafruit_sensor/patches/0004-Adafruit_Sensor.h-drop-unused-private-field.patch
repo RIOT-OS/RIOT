@@ -1,0 +1,27 @@
+From 0a165527f2ef58b593ecd95a0ebfc014312d32f7 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Fri, 19 May 2023 23:11:05 +0200
+Subject: [PATCH] Adafruit_Sensor.h: drop unused private field
+
+This fixes compilation with clang.
+---
+ Adafruit_Sensor.h | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/Adafruit_Sensor.h b/Adafruit_Sensor.h
+index 92e35c2..9681391 100755
+--- a/Adafruit_Sensor.h
++++ b/Adafruit_Sensor.h
+@@ -183,9 +183,6 @@ public:
+   virtual void getSensor(sensor_t *) = 0;
+ 
+   void printSensorDetails(void);
+-
+-private:
+-  bool _autoRange;
+ };
+ 
+ #endif
+-- 
+2.40.1
+

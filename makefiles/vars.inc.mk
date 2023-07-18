@@ -22,6 +22,9 @@ export INCLUDES              # The extra include paths, set by the various Makef
 export CXXINCLUDES           # The extra include paths for c++, set by the various Makefile.include files.
 export NATIVEINCLUDES        # The native include paths, set by the various native Makefile.include files.
 
+export GCC_C_INCLUDES        # system include dirs implicitly used by GCC's c compiler, only defined with TOOLCHAIN=llvm
+export GCC_CXX_INCLUDES      # system include dirs implicitly used by GCC's c++ compiler, only defined with TOOLCHAIN=llvm
+
 export USEMODULE             # Sys Module dependencies of the application. Set in the application's Makefile.
 export BIN_USEMODULE         # Modules specific to bindist (see bindist.ink.mk). Set in the application's Makefile.
 export USEPKG                # Pkg dependencies (third party modules) of the application. Set in the application's Makefile.
@@ -60,6 +63,7 @@ export FEATURES_USED         # List of features used
 export TOOLCHAIN             # Base build toolchain, i.e. GNU or LLVM
 
 export TARGET_ARCH           # The target platform name, in GCC triple notation, e.g. "arm-none-eabi", "i686-elf", "avr"
+export TARGET_ARCH_LLVM      # The target platform name, in LLVM triple notation, e.g. "arm-none-eabi"
 export PREFIX                # The prefix of the toolchain commands, usually "$(TARGET_ARCH)-", e.g. "arm-none-eabi-" or "msp430-".
 export CC                    # The C compiler to use.
 export CXX                   # The CXX compiler to use.

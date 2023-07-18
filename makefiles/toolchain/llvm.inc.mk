@@ -36,14 +36,14 @@ SIZE        = $(LLVMPREFIX)size
 include $(RIOTMAKE)/tools/gdb.inc.mk
 
 # Include directories from gcc
-#   $1: language <c|cpp>
+#   $1: language <c|c++>
 #
 #   `realpath` is used instead of `abspath` to support Mingw32 which has issues
 #   with windows formatted gcc directories
 #
 # CFLAGS_CPU is used to get the correct multilib include header.
 gcc_include_dirs = $(realpath \
-    $(shell $(PREFIX)gcc $(CFLAGS_CPU) -v -x $1 -E /dev/null 2>&1 | \
+    $(shell $(PREFIX)g++ $(CFLAGS_CPU) -v -x $1 -E /dev/null 2>&1 | \
         sed \
         -e '1,/\#include <...> search starts here:/d' \
         -e '/End of search list./,$$d' \
@@ -87,6 +87,15 @@ CFLAGS += -Wno-atomic-alignment
 # unsupported warning flags:
 CFLAGS += -Wno-unknown-warning-option
 
+# Designated initializers make the code much more readable and are part
+# of the C standard since C99. C++ with C++20 finally caught up.
+# Until we switch to that C++ version, let's disable the annoying
+# warning rather than reducing the code quality for the sake of
+# strict C++ compatibility of our headers.
+CXXEXFLAGS += -Wno-c99-designator
+
 OPTIONAL_CFLAGS_BLACKLIST += -fno-delete-null-pointer-checks
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-overflow
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-truncation
+
+LLVM_VERSION := $(shell command -v $(CC) > /dev/null && $(CC) -dumpversion | cut -d . -f 1)

@@ -178,7 +178,7 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint8_t  UNDERRUN:1;       /*!< bit:      0  Underrun                           */
     __I uint8_t  EMPTY:1;          /*!< bit:      1  Data Buffer Empty                  */
     __I uint8_t  SYNCRDY:1;        /*!< bit:      2  Synchronization Ready              */
-    __I uint8_t  :5;               /*!< bit:  3.. 7  Reserved                           */
+    uint8_t  :5;                   /*!< bit:  3.. 7  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   uint8_t reg;                 /*!< Type      used for register access              */
 } DAC_INTFLAG_Type;

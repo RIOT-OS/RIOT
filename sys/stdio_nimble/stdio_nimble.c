@@ -85,23 +85,17 @@ static struct ble_gap_event_listener _gap_event_listener;
 static char _debug_printf_buf[DEBUG_PRINTF_BUFSIZE];
 #endif /* IS_USED(MODULE_STDIO_NIMBLE_DEBUG) */
 
-static int _debug_printf(const char *format, ...)
-{
 #if IS_USED(MODULE_STDIO_NIMBLE_DEBUG)
-    unsigned state = irq_disable();
-    va_list va;
-    va_start(va, format);
-    int rc = vsnprintf(_debug_printf_buf, DEBUG_PRINTF_BUFSIZE, format, va);
-    va_end(va);
-    uart_write(STDIO_UART_DEV, (const uint8_t *)_debug_printf_buf, rc);
-    irq_restore(state);
-
-    return rc;
+#define _debug_printf(...) \
+    do { \
+        unsigned state = irq_disable(); \
+        int rc = snprintf(_debug_printf_buf, DEBUG_PRINTF_BUFSIZE, __VA_ARGS__); \
+        uart_write(STDIO_UART_DEV, (const uint8_t *)_debug_printf_buf, rc); \
+        irq_restore(state); \
+    } while(0)
 #else
-    (void)format;
-    return 0;
+#define _debug_printf(...) (void)0
 #endif
-}
 
 /**
  * @brief UUID for stdio service (value: e6d54866-0292-4779-b8f8-c52bbec91e71)

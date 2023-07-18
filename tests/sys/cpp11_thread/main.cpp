@@ -173,7 +173,7 @@ int main() {
     thread t1([] {
       // nop
     });
-    thread t2(move(t1));
+    thread t2(std::move(t1));
     expect(t1.joinable() == 0);
     expect(t2.joinable() == 1);
     t2.join();

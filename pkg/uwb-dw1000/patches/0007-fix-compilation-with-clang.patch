@@ -1,0 +1,41 @@
+From 27650dfe8d7258a55e50b3c52fe8039e0f383275 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Fri, 19 May 2023 22:48:17 +0200
+Subject: [PATCH] fix compilation with clang
+
+clang wants `struct`s and `union`s within a packed `struct`/`union` to
+be explicitly also marked as packed. So let's do that.
+---
+ hw/drivers/uwb/uwb_dw1000/include/dw1000/dw1000_dev.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/hw/drivers/uwb/uwb_dw1000/include/dw1000/dw1000_dev.h b/hw/drivers/uwb/uwb_dw1000/include/dw1000/dw1000_dev.h
+index e149054..753ef66 100644
+--- a/hw/drivers/uwb/uwb_dw1000/include/dw1000/dw1000_dev.h
++++ b/hw/drivers/uwb/uwb_dw1000/include/dw1000/dw1000_dev.h
+@@ -79,18 +79,18 @@ typedef struct _dw1000_dev_rxdiag_t{
+         struct _rx_time {
+             uint32_t    fp_idx:16;          //!< First path index (10.6 bits fixed point integer)
+             uint32_t    fp_amp:16;          //!< Amplitude at floor(index FP) + 1
+-        };
++        }__attribute__((packed, aligned(1)));
+         uint32_t rx_time;
+-    };
++    }__attribute__((packed, aligned(1)));
+     union {
+         struct _rx_fqual {
+             uint64_t    rx_std:16;          //!<  Standard deviation of noise
+             uint64_t    fp_amp2:16;         //!<  Amplitude at floor(index FP) + 2
+             uint64_t    fp_amp3:16;         //!<  Amplitude at floor(index FP) + 3
+             uint64_t    cir_pwr:16;         //!<  Channel Impulse Response max growth CIR
+-        };
++        }__attribute__((packed, aligned(1)));
+         uint64_t rx_fqual;
+-    };
++    }__attribute__((packed, aligned(1)));
+     uint16_t    pacc_cnt;                   //!<  Count of preamble symbols accumulated
+ } __attribute__((packed, aligned(1))) dw1000_dev_rxdiag_t;
+ 
+-- 
+2.40.1
+

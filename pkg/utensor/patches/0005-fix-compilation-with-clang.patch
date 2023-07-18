@@ -1,0 +1,57 @@
+From b9bd370199116066e0b9e56386e8f447e7c5dcfe Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Sat, 20 May 2023 22:41:46 +0200
+Subject: [PATCH] fix compilation with clang++
+
+---
+ src/uTensor/core/uTensorBase.cpp        | 4 ++--
+ src/uTensor/ops/MathOps.hpp             | 6 +++---
+ src/uTensor/util/quantization_utils.hpp | 2 +-
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/src/uTensor/core/uTensorBase.cpp b/src/uTensor/core/uTensorBase.cpp
+index ed25ac9..d76da53 100644
+--- a/src/uTensor/core/uTensorBase.cpp
++++ b/src/uTensor/core/uTensorBase.cpp
+@@ -14,6 +14,6 @@ void Operator::setOutputs(S_TList &_outputs) {
+ }
+ 
+ void Operator::empty(void) {
+-  inputs.empty();
+-  outputs.empty();
++  (void)inputs.empty();
++  (void)outputs.empty();
+ }
+diff --git a/src/uTensor/ops/MathOps.hpp b/src/uTensor/ops/MathOps.hpp
+index 4fae883..4f436e7 100644
+--- a/src/uTensor/ops/MathOps.hpp
++++ b/src/uTensor/ops/MathOps.hpp
+@@ -125,9 +125,9 @@ void Add(Tensor* input, Tensor* input2, Tensor** out) {
+ //reduce_shape actual output shape without the reduce dim
+ //out_shape intermediate shape with reduce dim in the last orders
+ inline void reduceShapeHelper(TensorShape input, TensorShape dim, TensorShape &reduce_shape, TensorShape &out_shape, std::vector<uint8_t> &perm, size_t &reduce_size) {
+-  reduce_shape.empty();
+-  out_shape.empty();
+-  perm.empty();
++  (void)reduce_shape.empty();
++  (void)out_shape.empty();
++  (void)perm.empty();
+ 
+   for(auto i = 0; i < (int) input.size(); i++) {
+     if(std::find(dim.begin(), dim.end(), i) == dim.end()) {
+diff --git a/src/uTensor/util/quantization_utils.hpp b/src/uTensor/util/quantization_utils.hpp
+index 06e0eee..addc475 100644
+--- a/src/uTensor/util/quantization_utils.hpp
++++ b/src/uTensor/util/quantization_utils.hpp
+@@ -184,7 +184,7 @@ void QuantizationRangeForMultiplication(float min_a, float max_a, float min_b,
+   *min_c = c_float_for_one_quant_level * c_lowest;  // NT: this resulting in
+                                                     // taking only the necessary
+                                                     // quantize range
+-  *max_c = c_float_for_one_quant_level * c_highest;
++  *max_c = c_float_for_one_quant_level * (float)c_highest;
+ }
+ 
+ #endif  // UTENSOR_QUANT_UTILS
+-- 
+2.40.1
+

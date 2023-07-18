@@ -188,7 +188,7 @@ static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
     case USB_HID_REQUEST_GET_PROTOCOL:
         break;
     case USB_HID_REQUEST_SET_REPORT:
-        if ((state == USBUS_CONTROL_REQUEST_STATE_OUTDATA)) {
+        if (state == USBUS_CONTROL_REQUEST_STATE_OUTDATA) {
             size_t size = 0;
             uint8_t *data = usbus_control_get_out_data(usbus, &size);
             if (size > 0) {

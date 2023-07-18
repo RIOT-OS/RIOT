@@ -377,15 +377,15 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
   struct {
     __I uint8_t  OVF:1;            /*!< bit:      0  OVF Interrupt Flag                 */
     __I uint8_t  ERR:1;            /*!< bit:      1  ERR Interrupt Flag                 */
-    __I uint8_t  :2;               /*!< bit:  2.. 3  Reserved                           */
+    uint8_t  :2;                   /*!< bit:  2.. 3  Reserved                           */
     __I uint8_t  MC0:1;            /*!< bit:      4  MC Interrupt Flag 0                */
     __I uint8_t  MC1:1;            /*!< bit:      5  MC Interrupt Flag 1                */
-    __I uint8_t  :2;               /*!< bit:  6.. 7  Reserved                           */
+    uint8_t  :2;                   /*!< bit:  6.. 7  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   struct {
-    __I uint8_t  :4;               /*!< bit:  0.. 3  Reserved                           */
+    uint8_t  :4;                   /*!< bit:  0.. 3  Reserved                           */
     __I uint8_t  MC:2;             /*!< bit:  4.. 5  MC Interrupt Flag x                */
-    __I uint8_t  :2;               /*!< bit:  6.. 7  Reserved                           */
+    uint8_t  :2;                   /*!< bit:  6.. 7  Reserved                           */
   } vec;                       /*!< Structure used for vec  access                  */
   uint8_t reg;                 /*!< Type      used for register access              */
 } TC_INTFLAG_Type;

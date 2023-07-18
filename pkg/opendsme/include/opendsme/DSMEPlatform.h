@@ -308,7 +308,7 @@ public:
     /**
      * @brief callback to offload the start of CFP
      */
-    void scheduleStartOfCFP();
+    void scheduleStartOfCFP() override;
 
     /**
      * @brief Get the minimum LQI. Beacons with LQI lower than this will not be
@@ -321,12 +321,12 @@ public:
     /**
      * @brief turn on transceiver
      */
-    void turnTransceiverOn();
+    void turnTransceiverOn() override;
 
     /**
      * @brief turn off transceiver
      */
-    void turnTransceiverOff();
+    void turnTransceiverOff() override;
 
     /**
      * @brief get extended address

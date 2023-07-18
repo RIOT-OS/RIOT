@@ -75,6 +75,3 @@ endif
 ifndef CONFIG_KCONFIG_USEMODULE_IEEE802154
   CFLAGS += -DCONFIG_IEEE802154_AUTO_ACK_DISABLE
 endif
-
-# LLVM ARM shows issues with missing definitions for stdatomic
-TOOLCHAINS_BLACKLIST += llvm

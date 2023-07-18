@@ -38,8 +38,7 @@ esac
 
 # temporarily disabling llvm builds until https://github.com/RIOT-OS/RIOT/pull/15595
 # is in
-#: ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
-: ${TEST_BOARDS_LLVM_COMPILE:=""}
+: ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
 
 : ${TEST_KCONFIG_BOARDS_AVAILABLE:="
 adafruit-itsybitsy-m4

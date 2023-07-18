@@ -397,6 +397,7 @@ void backup_ram_init(void)
 #define BACKUP_RAM_MAGIC    {'R', 'I', 'O', 'T'}
 #endif
 
+__attribute__((unused))
 static inline bool _backup_battery_connected(void) {
 #if IS_USED(MODULE_PERIPH_VBAT)
     vbat_init(); /* early use of VBAT requires init() */

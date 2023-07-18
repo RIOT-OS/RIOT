@@ -168,7 +168,7 @@ typedef union {
 typedef union { // __I to avoid read-modify-write on write-to-clear register
   struct {
     __I uint8_t  BRK:1;            /*!< bit:      0  Break                              */
-    __I uint8_t  :7;               /*!< bit:  1.. 7  Reserved                           */
+    uint8_t  :7;                   /*!< bit:  1.. 7  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   uint8_t reg;                 /*!< Type      used for register access              */
 } TAL_INTFLAG_Type;

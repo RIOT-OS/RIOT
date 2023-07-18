@@ -1,0 +1,33 @@
+From 6ca9271090ed24fcd4e6e27a5751ade1020ad275 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Fri, 19 May 2023 23:34:12 +0200
+Subject: [PATCH] fragmenter.c: drop unused variable
+
+---
+ fragmenter.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/fragmenter.c b/fragmenter.c
+index 8454906..dd8694a 100755
+--- a/fragmenter.c
++++ b/fragmenter.c
+@@ -73,7 +73,7 @@ static uint16_t get_max_fcn_value(schc_fragmentation_t* conn) {
+  *
+  */
+ static void mbuf_print(schc_mbuf_t *head) {
+-	uint8_t i = 0; uint8_t j;
++	uint8_t j;
+ 	schc_mbuf_t *curr = head;
+ 	while (curr != NULL) {
+ 		DEBUG_PRINTF("%d: %p\n", curr->frag_cnt, curr->ptr);
+@@ -83,7 +83,6 @@ static void mbuf_print(schc_mbuf_t *head) {
+ 		}
+ 		DEBUG_PRINTF("\n");
+ 		curr = curr->next;
+-		i++;
+ 	}
+ }
+ 
+-- 
+2.40.1
+
