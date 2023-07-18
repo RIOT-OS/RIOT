@@ -309,26 +309,26 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
   struct {
     __I uint16_t RXRDY0:1;         /*!< bit:      0  Receive Ready 0                    */
     __I uint16_t RXRDY1:1;         /*!< bit:      1  Receive Ready 1                    */
-    __I uint16_t :2;               /*!< bit:  2.. 3  Reserved                           */
+    uint16_t :2;                   /*!< bit:  2.. 3  Reserved                           */
     __I uint16_t RXOR0:1;          /*!< bit:      4  Receive Overrun 0                  */
     __I uint16_t RXOR1:1;          /*!< bit:      5  Receive Overrun 1                  */
-    __I uint16_t :2;               /*!< bit:  6.. 7  Reserved                           */
+    uint16_t :2;                   /*!< bit:  6.. 7  Reserved                           */
     __I uint16_t TXRDY0:1;         /*!< bit:      8  Transmit Ready 0                   */
     __I uint16_t TXRDY1:1;         /*!< bit:      9  Transmit Ready 1                   */
-    __I uint16_t :2;               /*!< bit: 10..11  Reserved                           */
+    uint16_t :2;                   /*!< bit: 10..11  Reserved                           */
     __I uint16_t TXUR0:1;          /*!< bit:     12  Transmit Underrun 0                */
     __I uint16_t TXUR1:1;          /*!< bit:     13  Transmit Underrun 1                */
-    __I uint16_t :2;               /*!< bit: 14..15  Reserved                           */
+    uint16_t :2;                   /*!< bit: 14..15  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   struct {
     __I uint16_t RXRDY:2;          /*!< bit:  0.. 1  Receive Ready x                    */
-    __I uint16_t :2;               /*!< bit:  2.. 3  Reserved                           */
+    uint16_t :2;                   /*!< bit:  2.. 3  Reserved                           */
     __I uint16_t RXOR:2;           /*!< bit:  4.. 5  Receive Overrun x                  */
-    __I uint16_t :2;               /*!< bit:  6.. 7  Reserved                           */
+    uint16_t :2;                   /*!< bit:  6.. 7  Reserved                           */
     __I uint16_t TXRDY:2;          /*!< bit:  8.. 9  Transmit Ready x                   */
-    __I uint16_t :2;               /*!< bit: 10..11  Reserved                           */
+    uint16_t :2;                   /*!< bit: 10..11  Reserved                           */
     __I uint16_t TXUR:2;           /*!< bit: 12..13  Transmit Underrun x                */
-    __I uint16_t :2;               /*!< bit: 14..15  Reserved                           */
+    uint16_t :2;                   /*!< bit: 14..15  Reserved                           */
   } vec;                       /*!< Structure used for vec  access                  */
   uint16_t reg;                /*!< Type      used for register access              */
 } I2S_INTFLAG_Type;

@@ -36,6 +36,14 @@ all `source` folders are removed.
 Be aware that if you want to make changes to any file in this tree that the
 changes will be lost when a new ASF release is going to be used.
 
+### C++ compatibility (with LLVM)
+
+Many of the header files where generated with an outdated version of SVDConv
+that adds the `__I` qualifier to anonymous bit fields, which `clang++` won't
+compile. Run the script `fix_cxx_compat.sh` in this directory whenever you
+add or update vendor header filers until Microchips starts using a fixed version
+of SVDConv.
+
 ### sam0.h
 
 A SAM based CPU should include `sam0.h` in this directory, which will
