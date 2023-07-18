@@ -24,6 +24,7 @@
 #include "net/sock/dtls.h"
 #include "net/credman.h"
 #include "ztimer.h"
+#include "net/dsm.h"
 
 #if SOCK_HAS_ASYNC
 #include "net/sock/async.h"
@@ -276,6 +277,14 @@ static int _get_psk_info(struct dtls_context_t *ctx, const session_t *session,
                         DEBUG("sock_dtls: found\n");
                         c = credential.params.psk.key.s;
                         c_len = credential.params.psk.key.len;
+
+                        sock_dtls_session_t dtls_session = {0};
+                        sock_dtls_session_set_udp_ep(&dtls_session, &ep);
+                        dsm_store(sock, &dtls_session, SESSION_STATE_SOCK_INIT, false);
+                        if (dsm_set_session_credential_info(sock, &dtls_session,
+                                                            CREDMAN_TYPE_PSK, sock->tags[i]) < 0) {
+                            DEBUG("sock_dtls: dsm could not set credential info\n");
+                        }
                         break;
                     }
                 }

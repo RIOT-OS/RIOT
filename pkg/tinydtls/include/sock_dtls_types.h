@@ -88,6 +88,8 @@ struct sock_dtls {
  */
 struct sock_dtls_session {
     session_t       dtls_session;    /**< TinyDTLS session */
+    credman_tag_t   tag;             /**< Credman tag used for this session*/
+    credman_type_t  type;            /**< Credman type used for this session*/
 };
 
 #ifdef __cplusplus

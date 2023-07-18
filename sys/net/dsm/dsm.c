@@ -61,7 +61,7 @@ dsm_state_t dsm_store(sock_dtls_t *sock, sock_dtls_session_t *session,
     }
 
     prev_state = session_slot->state;
-    if (session_slot->state != SESSION_STATE_ESTABLISHED) {
+    if (new_state > session_slot->state) {
         session_slot->state = new_state;
     }
 
@@ -149,6 +149,38 @@ ssize_t dsm_get_least_recently_used_session(sock_dtls_t *sock, sock_dtls_session
     }
     mutex_unlock(&_lock);
     return res;
+}
+
+int dsm_set_session_credential_info(sock_dtls_t *sock, sock_dtls_session_t *session,
+                                    credman_type_t type, credman_tag_t tag)
+{
+    dsm_session_t *session_slot = NULL;
+
+    if (_find_session(sock, session, &session_slot) != 1) {
+        DEBUG("dsm: No session to set the credential information was found\n");
+        return -1;
+    }
+    session_slot->session.type = type;
+    session_slot->session.tag = tag;
+    return 1;
+}
+
+int dsm_get_session_credential_info(sock_dtls_t *sock, sock_dtls_session_t *session,
+                                    credman_type_t *type, credman_tag_t *tag)
+{
+    dsm_session_t *session_slot = NULL;
+
+    if (_find_session(sock, session, &session_slot) != 1) {
+        DEBUG("dsm: No session to get the credential information from was found\n");
+        return -1;
+    }
+    if (session_slot->session.type == 0 || session_slot->session.tag == 0) {
+        DEBUG("dsm: The credential information for this session was not set\n");
+        return -2;
+    }
+    *type = session_slot->session.type;
+    *tag = session_slot->session.tag;
+    return 0;
 }
 
 /* Search for existing session or empty slot for new one

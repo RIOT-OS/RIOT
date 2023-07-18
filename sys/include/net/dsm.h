@@ -52,6 +52,7 @@ extern "C" {
 typedef enum {
     NO_SPACE = -1,
     SESSION_STATE_NONE = 0,
+    SESSION_STATE_SOCK_INIT,
     SESSION_STATE_HANDSHAKE,
     SESSION_STATE_ESTABLISHED
 } dsm_state_t;
@@ -116,6 +117,35 @@ uint8_t dsm_get_num_available_slots(void);
  * @return   -1, when no session is stored
  */
 ssize_t dsm_get_least_recently_used_session(sock_dtls_t *sock, sock_dtls_session_t *session);
+
+/**
+ * @brief Sets the credential tag and type for the given session
+ * 
+ * @param[in]   sock        @ref sock_dtls_t, which the session is created on
+ * @param[in]   session     Session to set the credentials for
+ * @param[in]   type        Credential type for the session
+ * @param[in]   tag         Credential tag for the session
+ * 
+ * @return  1, on success
+ * @return  -1, when no corresponding session was found
+ */
+int dsm_set_session_credential_info(sock_dtls_t *sock, sock_dtls_session_t *session,
+                                    credman_type_t type ,credman_tag_t tag);
+
+/**
+ * @brief Gets the credential tag and type for the given session
+ * 
+ * @param[in]   sock        @ref sock_dtls_t, which the session is created on
+ * @param[in]   session     Session to get the credentials from
+ * @param[out]  type        Credential type for the session
+ * @param[out]  tag         Credential tag for the session
+ * 
+ * @return  1, on success
+ * @return  -1, when no corresponding session was found
+ * @return  -2, when the credentials for this session where not set before
+ */
+int dsm_get_session_credential_info(sock_dtls_t *sock, sock_dtls_session_t *session,
+                                    credman_type_t *type, credman_tag_t *tag);
 
 #ifdef __cplusplus
 }
