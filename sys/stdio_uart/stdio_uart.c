@@ -67,6 +67,13 @@ int stdio_available(void)
 }
 #endif
 
+#if IS_USED(MODULE_STDIO_FLUSH_RX)
+void stdio_flush_rx(void)
+{
+    tsrb_clear(&stdio_uart_isrpipe.tsrb);
+}
+#endif
+
 ssize_t stdio_read(void* buffer, size_t count)
 {
     if (IS_USED(MODULE_STDIO_UART_RX)) {
