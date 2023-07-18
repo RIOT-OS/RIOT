@@ -451,7 +451,7 @@ static void test_sock_udp_recv__aux(void)
     static const inject_aux_t inject_aux = { .timestamp = 1337, .rssi = -11 };
     sock_udp_ep_t result;
     sock_udp_aux_rx_t aux = {
-        .flags = SOCK_AUX_GET_LOCAL | SOCK_AUX_GET_TIMESTAMP | SOCK_AUX_GET_RSSI
+        .flags = SOCK_AUX_GET_LOCAL | SOCK_AUX_GET_TIMESTAMP | SOCK_AUX_GET_RSSI | SOCK_AUX_GET_TTL
     };
 
     expect(0 == sock_udp_create(&_sock, &local, NULL, SOCK_FLAGS_REUSE_EP));
@@ -483,6 +483,12 @@ static void test_sock_udp_recv__aux(void)
     expect(inject_aux.rssi == aux.rssi);
 #else
     expect(aux.flags & SOCK_AUX_GET_RSSI);
+#endif
+#if IS_USED(MODULE_SOCK_AUX_TTL)
+    expect(!(aux.flags & SOCK_AUX_GET_TTL));
+    expect(64 == aux.ttl);
+#else
+    expect(aux.flags & SOCK_AUX_GET_TTL);
 #endif
     expect(_check_net());
 }
