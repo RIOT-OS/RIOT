@@ -23,6 +23,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+//#include <time.h>
 
 #include "assert.h"
 #include "event/timeout.h"
@@ -37,6 +38,17 @@
 
 #include "bmx280.h"
 #include "bmx280_params.h"
+
+#include "msg.h"
+#include "thread.h"
+#include "fmt.h"
+
+#include "net/loramac.h"
+#include "semtech_loramac.h"
+
+#include "sx127x.h"
+#include "sx127x_netdev.h"
+#include "sx127x_params.h"
 
 #include "periph/gpio.h"
 #include "xtimer.h"
@@ -263,6 +275,89 @@ static void _hr_update(event_t *e)
 #define MEASUREMENT_INTERVAL_SECS (2)
 #define TEST_ITERATIONS 3
 
+/* Messages are sent every 20s to respect the duty cycle on each channel */
+#define PERIOD_S            (20U)
+
+#define SENDER_PRIO         (THREAD_PRIORITY_MAIN - 1)
+static kernel_pid_t sender_pid;
+static char sender_stack[THREAD_STACKSIZE_MAIN / 2];
+
+semtech_loramac_t loramac;
+static sx127x_t sx127x;
+
+static ztimer_t timer;
+
+static bmx280_t dev;
+
+//static const char *message = "123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_";
+char message[100];
+
+static uint8_t deveui[LORAMAC_DEVEUI_LEN];
+static uint8_t appeui[LORAMAC_APPEUI_LEN];
+
+static uint8_t appskey[LORAMAC_APPSKEY_LEN];
+static uint8_t nwkskey[LORAMAC_NWKSKEY_LEN];
+static uint8_t devaddr[LORAMAC_DEVADDR_LEN];
+
+static void _alarm_cb(void *arg)
+{
+    (void) arg;
+    msg_t msg;
+    msg_send(&msg, sender_pid);
+}
+
+static void _prepare_next_alarm(void)
+{
+    timer.callback = _alarm_cb;
+    ztimer_set(ZTIMER_MSEC, &timer, PERIOD_S * MS_PER_SEC);
+}
+
+static void _send_message(void)
+{
+    //printf(">>> Sending: '%s'\n", message);
+    uint32_t pressure = bmx280_read_pressure(&dev);
+    memcpy(message, &pressure, sizeof(uint32_t));                                                   
+    int16_t temperature = bmx280_read_temperature(&dev);
+    memcpy(message + sizeof(uint32_t), &temperature, sizeof(int16_t));
+    int humidity = bme280_read_humidity(&dev);
+    memcpy(message + sizeof(uint32_t) + sizeof(int16_t), &humidity, sizeof(int));
+
+    /* Try to send the message */
+    uint8_t ret = semtech_loramac_send(&loramac,
+                                       (uint8_t *)message, strlen(message));
+    if (ret != SEMTECH_LORAMAC_TX_DONE)  {
+        printf("Cannot send message '%s', ret code: %d\n\n", message, ret);
+        return;
+    }
+
+    printf("   Pressure    [Pa]:      %" PRIu32 "\n\r", pressure);
+    printf("   Temperature [°C]:      %" PRIi16 "\n\r", temperature);
+    printf("   Humidity    [Percent]: %d\n\r", humidity);
+
+}
+
+static void *sender(void *arg)
+{
+    (void)arg;
+
+    msg_t msg;
+    msg_t msg_queue[8];
+    msg_init_queue(msg_queue, 8);
+
+    while (1) {
+        msg_receive(&msg);
+
+        /* Trigger the message send */
+        _send_message();
+
+        /* Schedule the next wake-up alarm */
+        _prepare_next_alarm();
+    }
+
+    /* this should never be reached */
+    return NULL;
+}
+
 int main(void)
 {
 
@@ -278,6 +373,59 @@ int main(void)
             printf("BME280 initialized\n");
             break;
     }
+
+    puts("LoRaWAN Class A low-power application");
+    puts("=====================================");
+
+    /* Convert identifiers and application key */
+    fmt_hex_bytes(deveui, CONFIG_LORAMAC_DEV_EUI_DEFAULT);
+    fmt_hex_bytes(appeui, CONFIG_LORAMAC_APP_EUI_DEFAULT);
+
+    fmt_hex_bytes(devaddr, CONFIG_LORAMAC_DEV_ADDR_DEFAULT);
+    fmt_hex_bytes(nwkskey, CONFIG_LORAMAC_NWK_SKEY_DEFAULT);
+    fmt_hex_bytes(appskey, CONFIG_LORAMAC_APP_SKEY_DEFAULT);
+
+    /* Initialize the radio driver */
+    sx127x_setup(&sx127x, &sx127x_params[0], 0);
+    loramac.netdev = &sx127x.netdev;
+    loramac.netdev->driver = &sx127x_driver;
+
+    /* Initialize the loramac stack */
+    semtech_loramac_init(&loramac);
+    semtech_loramac_set_deveui(&loramac, deveui);
+    semtech_loramac_set_appeui(&loramac, appeui);
+    semtech_loramac_set_devaddr(&loramac, devaddr);
+    semtech_loramac_set_appskey(&loramac, appskey);
+    semtech_loramac_set_nwkskey(&loramac, nwkskey);
+
+    /* Set a channels mask that makes it use only the first 8 channels */
+    uint16_t channel_mask[LORAMAC_CHANNELS_MASK_LEN] = { 0 };
+    channel_mask[0] = 0x00FF;
+    semtech_loramac_set_channels_mask(&loramac, channel_mask);
+
+    /* Use a fast datarate */
+    semtech_loramac_set_dr(&loramac, LORAMAC_DR_5);
+
+    /* Start the ABP procedure */
+    puts("Starting join procedure");
+    if (semtech_loramac_join(&loramac, LORAMAC_JOIN_ABP) != SEMTECH_LORAMAC_JOIN_SUCCEEDED) {
+        puts("Join procedure failed");
+        return 1;
+    }
+    puts("Join procedure succeeded");
+
+    /* start the sender thread */
+    sender_pid = thread_create(sender_stack, sizeof(sender_stack),
+                               SENDER_PRIO, 0, sender, NULL, "sender");
+
+    /* trigger the first send */
+    msg_t msg;
+    msg_send(&msg, sender_pid);
+
+    //char line_buf[SHELL_DEFAULT_BUFSIZE]; shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+    printf("Vou entrar em loop infinito\n\r");
+    while(1){};
+    printf("Vou sair do loop infinito\n\r");
 
     printf("SCD30 Test:\n");
     int i = 0;
