@@ -120,26 +120,26 @@ ssize_t dsm_get_least_recently_used_session(sock_dtls_t *sock, sock_dtls_session
 
 /**
  * @brief Sets the credential tag and type for the given session
- * 
+ *
  * @param[in]   sock        @ref sock_dtls_t, which the session is created on
  * @param[in]   session     Session to set the credentials for
  * @param[in]   type        Credential type for the session
  * @param[in]   tag         Credential tag for the session
- * 
+ *
  * @return  1, on success
  * @return  -1, when no corresponding session was found
  */
 int dsm_set_session_credential_info(sock_dtls_t *sock, sock_dtls_session_t *session,
-                                    credman_type_t type ,credman_tag_t tag);
+                                    credman_type_t type, credman_tag_t tag);
 
 /**
  * @brief Gets the credential tag and type for the given session
- * 
+ *
  * @param[in]   sock        @ref sock_dtls_t, which the session is created on
  * @param[in]   session     Session to get the credentials from
  * @param[out]  type        Credential type for the session
  * @param[out]  tag         Credential tag for the session
- * 
+ *
  * @return  1, on success
  * @return  -1, when no corresponding session was found
  * @return  -2, when the credentials for this session where not set before
