@@ -1,4 +1,3 @@
-FEATURES_REQUIRED += arduino
 FEATURES_REQUIRED += cpp
 
 USEMODULE += arduino
