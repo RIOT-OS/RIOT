@@ -117,6 +117,11 @@ void periph_init(void)
     ptp_init();
 #endif
 
+#if defined(MODULE_PERIPH_INIT_FMC)
+    extern void fmc_init(void);
+    fmc_init();
+#endif
+
 #if defined(MODULE_PERIPH_INIT_VBAT)
     vbat_init();
 #endif
