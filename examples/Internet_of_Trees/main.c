@@ -314,25 +314,44 @@ static void _prepare_next_alarm(void)
 
 static void _send_message(void)
 {
-    //printf(">>> Sending: '%s'\n", message);
-    uint32_t pressure = bmx280_read_pressure(&dev);
-    memcpy(message, &pressure, sizeof(uint32_t));                                                   
+
     int16_t temperature = bmx280_read_temperature(&dev);
-    memcpy(message + sizeof(uint32_t), &temperature, sizeof(int16_t));
+    uint32_t pressure = bmx280_read_pressure(&dev);
     int humidity = bme280_read_humidity(&dev);
-    memcpy(message + sizeof(uint32_t) + sizeof(int16_t), &humidity, sizeof(int));
+    //char destination[3]; // 2 bytes para o int16_t + 1 byte para o caractere nulo
+
+    // Alocar memória para o array de caracteres (char*) e +1 para o caractere nulo \0
+    char* char_array = (char*)malloc(50* sizeof(char));
+
+    // Copiar o valor do int16_t para o char_array
+    snprintf(char_array, 51, "%d;%lu;%d", temperature, pressure, humidity);
+    
+    // Utilize essa etapa se o valor for negativo para manter o sinal (-) no início do char_array
+    if (temperature < 0) {
+        memmove(char_array + 1, char_array, 6);
+        char_array[0] = '-';
+    }
+
+    // Vetor de destino (char*)
+    char* destination = (char*)malloc(50 * sizeof(char));
+
+    // Copiar o char_array para o destination usando strcpy (ou strncpy)
+    strcpy(destination, char_array);
 
     /* Try to send the message */
     uint8_t ret = semtech_loramac_send(&loramac,
-                                       (uint8_t *)message, strlen(message));
+                                       (uint8_t *)destination, strlen(destination));
     if (ret != SEMTECH_LORAMAC_TX_DONE)  {
         printf("Cannot send message '%s', ret code: %d\n\n", message, ret);
         return;
     }
 
-    printf("   Pressure    [Pa]:      %" PRIu32 "\n\r", pressure);
-    printf("   Temperature [°C]:      %" PRIi16 "\n\r", temperature);
-    printf("   Humidity    [Percent]: %d\n\r", humidity);
+    free(char_array);
+    free(destination);
+
+    //printf("   Pressure    [Pa]:      %" PRIu32 "\n\r", pressure);
+    //printf("   Temperature [°C]:      %" PRIi16 "\n\r", temperature);
+    //printf("   Humidity    [Percent]: %d\n\r", humidity);
 
 }
 
