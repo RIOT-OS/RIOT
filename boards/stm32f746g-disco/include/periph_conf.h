@@ -321,6 +321,115 @@ static const dwc2_usb_otg_fshs_config_t dwc2_usb_otg_fshs_config[] = {
 /** @} */
 #endif /* defined(MODULE_PERIPH_USBDEV_HS_ULPI) || DOXYGEN */
 
+/**
+ * @name    FMC configuration
+ * @{
+ */
+/**
+ * @brief   FMC controller configuration
+ */
+static const fmc_conf_t fmc_config = {
+    .bus = AHB3,
+    .rcc_mask = RCC_AHB3ENR_FMCEN,
+#if MODULE_PERIPH_FMC_SDRAM
+    .ba0_pin = { .pin = GPIO_PIN(PORT_G, 4), .af = GPIO_AF12, },     /* FMC_BA0 signal */
+    .ba1_pin = { .pin = GPIO_PIN(PORT_G, 5), .af = GPIO_AF12, },     /* FMC_BA1 signal */
+    .sdclk_pin = { .pin = GPIO_PIN(PORT_G, 8), .af = GPIO_AF12, },   /* FMC_SDCLK signal */
+    .sdnwe_pin = { .pin = GPIO_PIN(PORT_H, 5), .af = GPIO_AF12, },   /* FMC_SDNWE signal */
+    .sdnras_pin = { .pin = GPIO_PIN(PORT_F, 11), .af = GPIO_AF12, }, /* FMC_SDNRAS signal */
+    .sdncas_pin = { .pin = GPIO_PIN(PORT_G, 15), .af = GPIO_AF12, }, /* FMC_SDNCAS signal */
+    .sdcke0_pin = { .pin = GPIO_PIN(PORT_C, 3), .af = GPIO_AF12, },  /* FMC_SDCKE0 signal */
+    .sdne0_pin = { .pin = GPIO_PIN(PORT_H, 3), .af = GPIO_AF12, },   /* FMC_SDNE0 signal */
+    .addr = {
+        { .pin = GPIO_PIN(PORT_F, 0), .af = GPIO_AF12, },  /* FMC_A0 signal */
+        { .pin = GPIO_PIN(PORT_F, 1), .af = GPIO_AF12, },  /* FMC_A1 signal */
+        { .pin = GPIO_PIN(PORT_F, 2), .af = GPIO_AF12, },  /* FMC_A2 signal */
+        { .pin = GPIO_PIN(PORT_F, 3), .af = GPIO_AF12, },  /* FMC_A3 signal */
+        { .pin = GPIO_PIN(PORT_F, 4), .af = GPIO_AF12, },  /* FMC_A4 signal */
+        { .pin = GPIO_PIN(PORT_F, 5), .af = GPIO_AF12, },  /* FMC_A5 signal */
+        { .pin = GPIO_PIN(PORT_F, 12), .af = GPIO_AF12, }, /* FMC_A6 signal */
+        { .pin = GPIO_PIN(PORT_F, 13), .af = GPIO_AF12, }, /* FMC_A7 signal */
+        { .pin = GPIO_PIN(PORT_F, 14), .af = GPIO_AF12, }, /* FMC_A8 signal */
+        { .pin = GPIO_PIN(PORT_F, 15), .af = GPIO_AF12, }, /* FMC_A9 signal */
+        { .pin = GPIO_PIN(PORT_G, 0), .af = GPIO_AF12, },  /* FMC_A10 signal */
+        { .pin = GPIO_PIN(PORT_G, 1), .af = GPIO_AF12, },  /* FMC_A11 signal */
+    },
+#endif
+    .data = {
+        { .pin = GPIO_PIN(PORT_D, 14), .af = GPIO_AF12, }, /* FMC_D0 signal */
+        { .pin = GPIO_PIN(PORT_D, 15), .af = GPIO_AF12, }, /* FMC_D1 signal */
+        { .pin = GPIO_PIN(PORT_D, 0), .af = GPIO_AF12, },  /* FMC_D2 signal */
+        { .pin = GPIO_PIN(PORT_D, 1), .af = GPIO_AF12, },  /* FMC_D3 signal */
+        { .pin = GPIO_PIN(PORT_E, 7), .af = GPIO_AF12, },  /* FMC_D4 signal */
+        { .pin = GPIO_PIN(PORT_E, 8), .af = GPIO_AF12, },  /* FMC_D5 signal */
+        { .pin = GPIO_PIN(PORT_E, 9), .af = GPIO_AF12, },  /* FMC_D6 signal */
+        { .pin = GPIO_PIN(PORT_E, 10), .af = GPIO_AF12, }, /* FMC_D7 signal */
+#if MODULE_PERIPH_FMC_16BIT
+        { .pin = GPIO_PIN(PORT_E, 11), .af = GPIO_AF12, }, /* FMC_D8 signal */
+        { .pin = GPIO_PIN(PORT_E, 12), .af = GPIO_AF12, }, /* FMC_D9 signal */
+        { .pin = GPIO_PIN(PORT_E, 13), .af = GPIO_AF12, }, /* FMC_D10 signal */
+        { .pin = GPIO_PIN(PORT_E, 14), .af = GPIO_AF12, }, /* FMC_D11 signal */
+        { .pin = GPIO_PIN(PORT_E, 15), .af = GPIO_AF12, }, /* FMC_D12 signal */
+        { .pin = GPIO_PIN(PORT_D, 8), .af = GPIO_AF12, },  /* FMC_D13 signal */
+        { .pin = GPIO_PIN(PORT_D, 9), .af = GPIO_AF12, },  /* FMC_D14 signal */
+        { .pin = GPIO_PIN(PORT_D, 10), .af = GPIO_AF12, }, /* FMC_D15 signal */
+#endif
+    },
+    .nbl0_pin = { .pin = GPIO_PIN(PORT_E, 0), .af = GPIO_AF12, },    /* FMC_NBL0 signal (LB) */
+    .nbl1_pin = { .pin = GPIO_PIN(PORT_E, 1), .af = GPIO_AF12, },    /* FMC_NBL1 signal (UB) */
+};
+
+/**
+ * @brief   FMC Bank configuration
+ *
+ * The board has a SDRAM IS42S32400F-6BL with 128 MBit on-board.
+ * It is organized in 4 banks of 1M x 32 bits each and connected to bank 5
+ * at address 0xc0000000.
+ *
+ * @note Since only D0 to D15 are connected and D16 to D31 are unused, 4 banks
+ *       with only 1M x 16 bits and thus half the capacity (8 MByte) can be
+ *       used.
+ */
+static const fmc_bank_conf_t fmc_bank_config[] = {
+    /* bank 5 is used for SDRAM */
+    {
+        .bank = FMC_BANK_5,
+        .mem_type = FMC_SDRAM,
+        .data_width = FMC_BUS_WIDTH_16BIT,
+        .address = 0xc0000000,               /* Bank 6 is mapped to 0xd0000000 */
+        .size = MiB(8),                      /* Size in MByte, 4M x 16 Bit */
+        .sdram = {
+            .clk_period = 2,                 /* SDCLK = 2 x HCLK */
+            .row_bits = 12,                  /* A11..A0 used for row address */
+            .col_bits = 8,                   /* A7..A0 used for column address */
+            .cas_latency = 2,                /* CAS latency is 2 clock cycles */
+            .read_delay = 0,                 /* No read delay after CAS */
+            .burst_read = true,              /* Burst read mode enabled */
+            .burst_write = false,            /* Burst write mode disabled */
+            .burst_len = FMC_BURST_LENGTH_1, /* Burst length is 1 */
+            .burst_interleaved = false,      /* Burst mode interleaved */
+            .write_protect = false,          /* No write protection */
+            .four_banks = true,              /* SDRAM has four internal banks */
+            .timing = {                      /* SDRAM Timing parameters */
+                .row_to_col_delay = 2,       /* Row to column delay (2 clock cycles) */
+                .row_precharge = 2,          /* Row precharge delay (2 clock cycles) */
+                .recovery_delay = 2,         /* Recovery delay is (2 clock cycles) */
+                .row_cylce = 7,              /* Row cycle delay is (7 clock cycles) */
+                .self_refresh = 4,           /* Self refresh time is (4 clock cycles) */
+                .exit_self_refresh = 7,      /* Exit self-refresh delay (7 clock cycles) */
+                .load_mode_register = 2,     /* Load Mode Register to Activate delay */
+                .refresh_period = 16,        /* Refresh period in ms */
+            },
+        },
+    },
+};
+
+/**
+ * @brief   Number of configured FMC banks
+ */
+#define FMC_BANK_NUMOF  ARRAY_SIZE(fmc_bank_config)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

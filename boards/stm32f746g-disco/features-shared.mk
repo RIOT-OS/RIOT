@@ -1,6 +1,9 @@
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_dma
 FEATURES_PROVIDED += periph_eth
+FEATURES_PROVIDED += periph_fmc
+FEATURES_PROVIDED += periph_fmc_16bit
+FEATURES_PROVIDED += periph_fmc_sdram
 FEATURES_PROVIDED += periph_i2c
 FEATURES_PROVIDED += periph_ltdc
 FEATURES_PROVIDED += periph_rtc
