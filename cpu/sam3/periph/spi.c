@@ -72,7 +72,7 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
     /* SPCK Baudrate = MCK / SCBR
      * SCBR = 1..255 */
 
-    /* bound dividerto 255 */
+    /* bound divider to 255 */
     if (freq < DIV_ROUND_UP(CLOCK_CORECLOCK, 255)) {
         return (spi_clk_t){ .err = -EDOM };
     }

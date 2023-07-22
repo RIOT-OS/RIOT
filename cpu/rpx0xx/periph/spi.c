@@ -209,7 +209,7 @@ static inline void _check_best_clk_result(uint16_t target_dvsr,
 spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
 {
     (void)bus;
-    /* bound dividerto 65024 (254 * 256) */
+    /* bound divider to 65024 (254 * 256) */
     if (freq < DIV_ROUND_UP(CLOCK_PERIPH, 65024)) {
         return (spi_clk_t){ .err = -EDOM };
     }
