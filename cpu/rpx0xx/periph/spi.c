@@ -249,7 +249,7 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
           best_cpsdvsr, best_scr, resulting_clk_hz);
 
     return (spi_clk_t){
-        .spcpsr_cpsdvsr = best_cpsdvsr << SPI0_SSPCPSR_CPSDVSR_Pos,
+        .sspcpsr_cpsdvsr = best_cpsdvsr << SPI0_SSPCPSR_CPSDVSR_Pos,
         .sspcr0_scr = best_scr << SPI0_SSPCR0_SCR_Pos
     };
 }
@@ -260,15 +260,15 @@ int32_t spi_get_freq(spi_t bus, spi_clk_t clk)
     if (clk.err) {
         return -EINVAL;
     }
-    return CLOCK_PERIPH / ((clk.spcpsr_cpsdvsr >> SPI0_SSPCPSR_CPSDVSR_Pos)
+    return CLOCK_PERIPH / ((clk.sspcpsr_cpsdvsr >> SPI0_SSPCPSR_CPSDVSR_Pos)
                             * (clk.sspcr0_scr >> SPI0_SSPCR0_SCR_Pos));
 }
 
 void spi_acquire(spi_t spi, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     DEBUG("[rpx0xx] Call spi_acquire(spi=%" PRIuFAST8 ", cs=%" PRIu32
-          ", mode=%" PRIu16 ", clk.cpsdvsr=%" PRIu8 ", clk.scr=%" PRIu8 ")\n",
-          spi, cs, mode, clk.spcpsr_cpsdvsr, clk.sspcr0_scr);
+          ", mode=%" PRIu16 ", clk.sspcpsr_cpsdvsr=%" PRIu8 ", clk.sspcr0_scr=%"
+          PRIu8 ")\n", spi, cs, mode, clk.sspcpsr_cpsdvsr, clk.sspcr0_scr);
 
     (void)cs;
     assert((unsigned)spi < SPI_NUMOF);
@@ -311,7 +311,7 @@ void spi_acquire(spi_t spi, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
     /* set clock speed */
     io_reg_write_dont_corrupt(&dev->SSPCPSR,
-                              clk.spcpsr_cpsdvsr,
+                              clk.sspcpsr_cpsdvsr,
                               SPI0_SSPCPSR_CPSDVSR_Msk);
     io_reg_write_dont_corrupt(&dev->SSPCR0,
                               clk.sspcr0_scr,
