@@ -276,7 +276,7 @@ spi_clk_t IRAM_ATTR spi_get_clk(spi_t bus, uint32_t freq)
     uint32_t clk_reg;
 
     /* Section 7.4 GP­SPI Clock Control:
-     * f_spi = f_apb / ((spi_clkcnt_n + 1) * (cpi__clkdiv_pre + 1))
+     * f_spi = f_apb / ((spi_clkcnt_n + 1) * (spi_clkdiv_pre + 1))
      * spi_clkdiv_pre 0..8191 (13 bit)
      * spi_clkcnt_N 1..63 (6 bit)
      */
@@ -299,7 +299,7 @@ spi_clk_t IRAM_ATTR spi_get_clk(spi_t bus, uint32_t freq)
           "reg=%08"PRIx32"\n",
           __func__, bus, freq, _freq, clk_reg);
 
-    return (spi_clk_t){ .reg_psc_bits = clk_reg };
+    return (spi_clk_t){ .spi_clock = clk_reg };
 }
 
 int32_t IRAM_ATTR spi_get_freq(spi_t bus, spi_clk_t clk)
@@ -309,15 +309,15 @@ int32_t IRAM_ATTR spi_get_freq(spi_t bus, spi_clk_t clk)
         return -EINVAL;
     }
     uint32_t apb_clk = rtc_clk_apb_freq_get();
-    uint16_t spi_clkdiv_pre = (clk.reg_psc_bits >> 18) & 0x1fff;
-    uint8_t spi_clkcnt_N = (clk.reg_psc_bits >> 12) & 0x3f;
+    uint16_t spi_clkdiv_pre = (clk.spi_clock >> 18) & 0x1fff;
+    uint8_t spi_clkcnt_N = (clk.spi_clock >> 12) & 0x3f;
     return (apb_clk / (spi_clkdiv_pre + 1) / (spi_clkcnt_N +1));
 }
 
 void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
-    DEBUG("%s bus=%u cs=%u mode=%u clk=%"PRIu32"\n",
-            __func__, bus, cs, mode, clk.reg_psc_bits);
+    DEBUG("%s bus=%u cs=%u mode=%u clk.spi_clock=0x%"PRIx32"\n",
+            __func__, bus, cs, mode, clk.spi_clock);
 
     assert(bus < SPI_NUMOF);
     if (clk.err) {
@@ -355,7 +355,7 @@ void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t cl
     spi_ll_set_mosi_delay(_spi[bus].periph->hw, 0, 0);
 
     /* set SPI clock */
-    spi_ll_master_set_clock_by_reg(_spi[bus].periph->hw, &clk.reg_psc_bits);
+    spi_ll_master_set_clock_by_reg(_spi[bus].periph->hw, &clk.spi_clock);
 
 #if defined(CPU_FAM_ESP32C3) || defined(CPU_FAM_ESP32S3)
     /*

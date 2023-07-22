@@ -691,6 +691,16 @@ typedef struct {
 #define spi_pin_clk(dev)  spi_config[dev].sck
 /** @} */
 
+/**
+ * @brief   Override SPI clock configuration
+ * @{
+ */
+#define HAVE_SPI_CLK_T
+typedef struct {
+    uint32_t spi_clock;
+    int err;
+} spi_clk_t;
+/** @} */
 #endif /* !DOXYGEN */
 
 /**
@@ -845,7 +855,8 @@ typedef struct {
  * @name   USB device configuration
  * @{
  *
- * ESP32x SoCs integrate depending on the specific ESP32x SoC variant (family) an USB OTG FS controller based on the Synopsys DWC2 IP core.
+ * ESP32x SoCs integrate depending on the specific ESP32x SoC variant (family)
+ * an USB OTG FS controller based on the Synopsys DWC2 IP core.
  */
 #include "usbdev_synopsys_dwc2.h"
 
