@@ -36,7 +36,7 @@ The main features of this board are:
 | Capacitive Touch Screen | - | FT3267 used as driver IC (not supported yet) |
 | Stereo microphones      | - | |
 | SAI audio codec         | - | |
-| External PSRAM          | - | Connected to FMC peripheral (not supported yet) |
+| External PSRAM          | x | Connected to FMC peripheral |
 | External Quad-SPI Flash | - | QSPI peripheral is not yet supported |
 | SD Card Interface       | - | |
 
