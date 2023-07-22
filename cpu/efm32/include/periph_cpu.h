@@ -64,7 +64,6 @@ typedef struct {
     CMU_ClkDiv_TypeDef div;  /**< Divisor */
 } clk_div_t;
 
-
 /**
  * @brief   Length of CPU ID in octets.
  */

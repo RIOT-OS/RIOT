@@ -316,9 +316,12 @@ typedef gpio_t adc_conf_t;
  * @{
  */
 #define SOC_ADC_ADCCON3_EREF_INT      (0 << SOC_ADC_ADCCON3_EREF_S)    /**< Internal reference */
-#define SOC_ADC_ADCCON3_EREF_EXT      (1 << SOC_ADC_ADCCON3_EREF_S)    /**< External reference on AIN7 pin */
+#define SOC_ADC_ADCCON3_EREF_EXT      (1 << SOC_ADC_ADCCON3_EREF_S)    /**< External reference
+                                                                        *   on AIN7 pin */
 #define SOC_ADC_ADCCON3_EREF_AVDD5    (2 << SOC_ADC_ADCCON3_EREF_S)    /**< AVDD5 pin */
-#define SOC_ADC_ADCCON3_EREF_DIFF     (3 << SOC_ADC_ADCCON3_EREF_S)    /**< External reference on AIN6-AIN7 differential input */
+#define SOC_ADC_ADCCON3_EREF_DIFF     (3 << SOC_ADC_ADCCON3_EREF_S)    /**< External reference
+                                                                        *   on AIN6-AIN7
+                                                                        *   differential input */
 /** @} */
 
 /**

@@ -118,7 +118,7 @@ spi_clk_t spi_get_clk(spi_t bus, uint32_t freq)
 {
     (void)bus;
     /* bound divider to 128 */
-    if(freq < DIV_ROUND_UP(CLOCK_CORECLOCK, 128)) {
+    if (freq < DIV_ROUND_UP(CLOCK_CORECLOCK, 128)) {
         return (spi_clk_t){ .err = -EDOM };
     }
 
