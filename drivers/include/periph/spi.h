@@ -136,18 +136,25 @@ typedef gpio_t spi_cs_t;
  *
  * This should contains precomputed register bitmask(s) ready to be applied by
  * @ref spi_acquire and implementation should overwrite it if needed, e.g two
- * registers are impacted or register size not matching uword_t.
+ * registers are impacted or register size not matching uword_t or even for a
+ * member name that better matches the register/bit definitions.
  *
- * The driver for each device on the bus can save this value at init time
- * for later use if spi_get_clk generates too much overhead.
+ * The driver for each device on the bus can save this value at init time for
+ * later use if spi_get_clk generates too much overhead.
+ *
+ * Using this type for the return value of the spi_get_clk function rather than
+ * for a pointer argument ensures backward compatibility by replacing the enum
+ * with simple macros. Since registers are always unsigned and the prescaler
+ * value is the register value + 1 on some architectures to prevent division by
+ * 0, a separate member has been added for the errno code.
  *
  * Use @ref spi_get_clk to obtain this value.
  * Use @ref spi_get_freq to obtain the obtained actual frequency.
  */
 #ifndef HAVE_SPI_CLK_T
 typedef struct {
-    uword_t reg_psc_bits;
-    int err;
+    uword_t reg_psc_bits;   /**< default register prescaler bits */
+    int err;                /**< separate member for errno code */
 } spi_clk_t;
 #endif
 
@@ -372,9 +379,9 @@ int spi_init_with_gpio_mode(spi_t bus, const spi_gpio_mode_t* mode);
  * @return  The SPI clock configuration that is as close to, but not higher than
  *          the specified frequency. If the requested frequency is too low
  *          (below the lower limit), it returns an spi_clk_t structure with
- *          errno set to -EDOM indicating an invalid argument. If the requested
- *          frequency is too high (above the upper limit), it returns the
- *          closest clock configuration available that is within the valid
+ *          err set to -EDOM indicating an out of domain argument. If the
+ *          requested frequency is too high (above the upper limit), it returns
+ *          the closest clock configuration available that is within the valid
  *          range.
  */
 spi_clk_t spi_get_clk(spi_t bus, uint32_t freq);
