@@ -51,6 +51,15 @@ extern "C" {
 /** @} */
 
 /**
+ * @name APA102 / DotStar configuration
+ * @{
+ */
+#define APA102_PARAM_LED_NUMOF      (1)
+#define APA102_PARAM_DATA_PIN       GPIO_PIN(0, 8)
+#define APA102_PARAM_CLK_PIN        GPIO_PIN(1, 9)
+/** @} */
+
+/**
  * @name    Button pin configuration
  * @{
  */
