@@ -70,9 +70,9 @@ int main(void)
     }
 
     area.x1 = ((max_width - RIOT_LOGO_WIDTH) >> 1);
-    area.x2 = ((max_width + RIOT_LOGO_WIDTH) >> 1);
+    area.x2 = ((max_width + RIOT_LOGO_WIDTH) >> 1) - 1;
     area.y1 = ((max_height - RIOT_LOGO_HEIGHT) >> 1);
-    area.y2 = ((max_height + RIOT_LOGO_HEIGHT) >> 1);
+    area.y2 = ((max_height + RIOT_LOGO_HEIGHT) >> 1) - 1;
     disp_dev_map(disp_dev->dev, &area, (const uint16_t *)picture);
 
     puts("SUCCESS");
