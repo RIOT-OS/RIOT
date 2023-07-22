@@ -156,3 +156,9 @@ didi
 
 # loath => loathe (both correct, one is an adjective, the other a verb)
 loath
+
+# NOE (Negative Output Enable) ==> NOT, NO, NODE, NOTE, KNOW, NOW
+noe
+
+# NWE (Negative Write Enable) ==> NEW
+nwe
