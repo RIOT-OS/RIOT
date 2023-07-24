@@ -208,6 +208,9 @@ int sdhc_init(sdhc_state_t *state)
     bool f8;
     uint32_t response;
 
+    /* set power control bits to 0 to power off the SD card */
+    SDHC_DEV->PCR.reg = 0;
+
     /* set the initial clock slow, single bit and normal speed */
     state->type = CARD_TYPE_SD;
     state->version = CARD_VER_UNKNOWN;
@@ -319,7 +322,7 @@ int sdhc_init(sdhc_state_t *state)
 
 bool sdhc_send_cmd(sdhc_state_t *state, uint32_t cmd, uint32_t arg)
 {
-    uint32_t timeout = 0xFFFFFFFF;
+    uint32_t timeout = 0x1FFFFF;
     uint32_t command;
     uint32_t eis;
 
@@ -364,6 +367,7 @@ bool sdhc_send_cmd(sdhc_state_t *state, uint32_t cmd, uint32_t arg)
     if (_wait_for_event(state)) {
         SDHC_DEV->SRR.reg = SDHC_SRR_SWRSTCMD;  /* reset command */
         while (SDHC_DEV->SRR.bit.SWRSTCMD) {}
+        state->need_init = true;
         return false;
     }
 
@@ -372,6 +376,7 @@ bool sdhc_send_cmd(sdhc_state_t *state, uint32_t cmd, uint32_t arg)
             if (--timeout == 0) {
                 SDHC_DEV->SRR.reg = SDHC_SRR_SWRSTCMD; /* reset command */
                 while (SDHC_DEV->SRR.bit.SWRSTCMD) {}
+                state->need_init = true;
                 return false;
             }
         } while (!(SDHC_DEV->PSR.reg & SDHC_PSR_DATLL(1))); /* DAT[0] is busy bit */
