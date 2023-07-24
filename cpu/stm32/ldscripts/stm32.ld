@@ -18,8 +18,8 @@
  * @}
  */
 
-ccmram_length = DEFINED( ccmram_len ) ? ccmram_len : 0x0 ;
-sram4_length = DEFINED( sram4_length ) ? sram4_length : 0x0 ;
+ccmram_length = DEFINED( _ccmram_len ) ? _ccmram_len : 0x0 ;
+sram4_length = DEFINED( _sram4_length ) ? _sram4_length : 0x0 ;
 
 MEMORY
 {
@@ -31,7 +31,7 @@ SECTIONS
 {
     .heap2 ALIGN(4) (NOLOAD) :
     {
-        _sheap2 = . ;
+        _sheap2 = ORIGIN(sram4);
         _eheap2 = ORIGIN(sram4) + LENGTH(sram4);
     } > sram4
 }
