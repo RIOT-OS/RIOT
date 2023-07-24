@@ -13,13 +13,6 @@
  *
  * @brief       Driver for the LCD display
  *
- * @{
- *
- * @file
- *
- * @author      Koen Zandberg <koen@bergzand.net>
- * @author      Francisco Molina <francois-xavier.molina@inria.fr>
- *
  * The LCD is a generic display driver for small RGB displays. The driver
  * implemented here operates over SPI to communicate with the device.
  *
@@ -28,6 +21,14 @@
  * when strictly necessary. This option will slow down the driver as it
  * certainly can't use DMA anymore, every short has to be converted before
  * transfer.
+ *
+ * @{
+ *
+ * @file
+ *
+ * @author      Koen Zandberg <koen@bergzand.net>
+ * @author      Francisco Molina <francois-xavier.molina@inria.fr>
+ *
  */
 
 #ifndef LCD_H
