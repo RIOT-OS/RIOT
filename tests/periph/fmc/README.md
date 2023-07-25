@@ -13,7 +13,7 @@ The bank to be used is defined by environment variable `FMC_BANK`. For example,
 if the board configures two banks with RAM, the second bank can be tested by
 specifying the `FMC_BANK` variable as follows:
 ```
-FMC_BANK=1 BOARD=... make -j8 -C tests/drivers/stm32_fmc flash test
+FMC_BANK=1 BOARD=... make -j8 -C tests/periph/fmc flash test
 ```
 
 Expected Output on Success

@@ -54,14 +54,12 @@ int main(void)
            data8, data16, data32);
     puts("------------------------------------------------------------------------");
 
-    for (unsigned i = 0; i < 256; i++)
-    {
+    for (unsigned i = 0; i < 256; i++) {
         data8[i] = i;
     }
     od_hex_dump_ext(data8, 256, 16, fmc_bank_config[FMC_BANK].address);
 
-    for (unsigned i = 0; i < 256; i++)
-    {
+    for (unsigned i = 0; i < 256; i++) {
         if (data8[i] != i) {
             printf("memory content did not match @%p\n", &data8[i]);
             return 1;
@@ -69,14 +67,12 @@ int main(void)
     }
     puts("------------------------------------------------------------------------");
 
-    for (unsigned i = 0; i < 128; i++)
-    {
+    for (unsigned i = 0; i < 128; i++) {
         data16[i] = ((128 + i) << 8) + i;
     }
     od_hex_dump_ext(data16, 256, 16, fmc_bank_config[FMC_BANK].address + 256);
 
-    for (unsigned i = 0; i < 128; i++)
-    {
+    for (unsigned i = 0; i < 128; i++) {
         if (data16[i] != ((128 + i) << 8) + i) {
             printf("memory content did not match @%p\n", &data16[i]);
             return 1;
@@ -84,15 +80,13 @@ int main(void)
     }
     puts("------------------------------------------------------------------------");
 
-    for (unsigned i = 0; i < 64; i++)
-    {
+    for (unsigned i = 0; i < 64; i++) {
         data32[i] = ((192 + i) << 24) + ((128 + i) << 16) + ((64 + i) << 8) + i;
     }
     od_hex_dump_ext(data32, 256, 16, (fmc_bank_config[FMC_BANK].address) +
                                      (fmc_bank_config[FMC_BANK].size) - 256);
 
-    for (unsigned i = 0; i < 64; i++)
-    {
+    for (unsigned i = 0; i < 64; i++) {
         if (data32[i] != ((192 + i) << 24) + ((128 + i) << 16) + ((64 + i) << 8) + i) {
             printf("memory content did not match @%p\n", &data32[i]);
             return 1;
