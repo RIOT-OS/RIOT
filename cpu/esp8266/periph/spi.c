@@ -256,6 +256,7 @@ spi_clk_t IRAM_ATTR spi_get_clk(spi_t bus, uint32_t freq)
 
     uint32_t source_clock = SPI_CLK_SRC_FREQ / (CONST_SPI_CLKCNT_N + 1);
     spi_dev_t spi_regs;
+    bool enable_miso_delay_mode = 0;
 
     /* bound divider to 8192 */
     if (freq < DIV_ROUND_UP(source_clock, 8192)) {
@@ -263,6 +264,10 @@ spi_clk_t IRAM_ATTR spi_get_clk(spi_t bus, uint32_t freq)
     }
 
     if (freq >= SPI_CLK_SRC_FREQ) {
+        /* When the SPI_CLK_EQU_SYSCLK bit in register SPI_CLOCK_REG is set
+         * to 1, and the other bits are set to 0, SPI output clock
+         * frequency is f apb. */
+        spi_regs.clock.val = 0;
         spi_regs.clock.clk_equ_sysclk = 1;
     }
     else {
@@ -270,9 +275,19 @@ spi_clk_t IRAM_ATTR spi_get_clk(spi_t bus, uint32_t freq)
         spi_regs.clock.clkcnt_h = (CONST_SPI_CLKCNT_N + 1) / 2 - 1;
         spi_regs.clock.clkcnt_n = CONST_SPI_CLKCNT_N;
         spi_regs.clock.clkdiv_pre = DIV_ROUND_UP(source_clock, freq) - 1;
+        /* If GP-SPI output clock frequency is not higher than clk apb /4,
+         * register SPI_MISO_DELAY_MODE can be set to the corresponding value
+         * in Table 7-3 when configuring the clock polarity.
+         * see ESP32 Technical Reference, Section 7.4.2 */
+        if(spi_regs.clock.clkdiv_pre > 0) {
+            enable_miso_delay_mode = 1;
+        }
     }
 
-    return (spi_clk_t){ .spi_clock = spi_regs.clock.val };
+    return (spi_clk_t){
+        .spi_clock = spi_regs.clock.val,
+        .enable_miso_delay_mode = enable_miso_delay_mode
+    };
 }
 
 int32_t IRAM_ATTR spi_get_freq(spi_t bus, spi_clk_t clk)
@@ -297,7 +312,8 @@ int32_t IRAM_ATTR spi_get_freq(spi_t bus, spi_clk_t clk)
 
 void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
-    DEBUG("%s bus=%u cs=%u mode=%u spi_clock=%x\n", __func__, bus, cs, mode, clk.spi_clock);
+    DEBUG("%s bus=%u cs=%u mode=%u spi_clock=%x enable_miso_delay_mode=%u\n",
+          __func__, bus, cs, mode, clk.spi_clock, clk.enable_miso_delay_mode);
 
     assert(bus < SPI_NUMOF);
     if (clk.err) {
@@ -329,13 +345,21 @@ void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t cl
      */
     _spi[bus].regs->pin.ck_idle_edge = (mode == SPI_MODE_2 || mode == SPI_MODE_3);
     _spi[bus].regs->user.ck_out_edge = (mode == SPI_MODE_1 || mode == SPI_MODE_2);
-    _spi[bus].regs->ctrl2.miso_delay_mode = (mode == SPI_MODE_0 || mode == SPI_MODE_3) ? 2 : 1;
+    if (clk.enable_miso_delay_mode) {
+        _spi[bus].regs->ctrl2.miso_delay_mode = (mode == SPI_MODE_0 || mode == SPI_MODE_3) ? 2 : 1;
+    }
+    else {
+        _spi[bus].regs->ctrl2.miso_delay_mode = 0;
+    }
     _spi[bus].regs->ctrl2.miso_delay_num = 0;
     _spi[bus].regs->ctrl2.mosi_delay_mode = 0;
     _spi[bus].regs->ctrl2.mosi_delay_num = 0;
 
     /* set SPI clock configuration */
-    if (!(clk.spi_clock & 0x80000000)) {
+    if (clk.spi_clock & SPI_CLK_EQU_SYSCLK) {
+        IOMUX.CONF |= IOMUX_CONF_SPI1_CLOCK_EQU_SYS_CLOCK;
+    }
+    else {
         IOMUX.CONF &= ~IOMUX_CONF_SPI1_CLOCK_EQU_SYS_CLOCK;
     }
     _spi[bus].regs->clock.val = clk.spi_clock;

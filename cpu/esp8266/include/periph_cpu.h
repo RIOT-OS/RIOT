@@ -23,6 +23,7 @@
 
 #include <stdint.h>
 #include <limits.h>
+#include <stdbool.h>
 
 #include "eagle_soc.h"
 #include "cpu_conf.h"
@@ -290,6 +291,7 @@ typedef struct {
 #define HAVE_SPI_CLK_T
 typedef struct {
     uint32_t spi_clock;
+    bool enable_miso_delay_mode;
     int err;
 } spi_clk_t;
 /** @} */
