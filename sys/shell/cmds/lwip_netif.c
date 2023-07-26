@@ -29,6 +29,12 @@
 #include "net/netopt.h"
 #include "shell.h"
 
+#include "arch/sys_arch.h"
+#include <arpa/inet.h>
+//#include "net/ipv4/addr.h"
+
+#include "net/netif.h"
+
 #ifdef MODULE_LWIP_IPV6
 static void _netif_list_ipv6(struct netif *netif, int addr_index, uint8_t state)
 {
@@ -116,6 +122,19 @@ static void _usage_add4(char *cmd)
  printf("usage: %s add4 <interface> <IPv4>/<prefix> gw <IPv4>\n", cmd);
 }
 
+static void _lwip_prefix_to_subnet(int prefix, ip4_addr_t *subnet)
+{
+ uint32_t value = 0;
+ uint32_t tmp = 0x80000000;
+
+ for(int i = 0; i < prefix; i++)
+    {
+     value += tmp;
+     tmp = tmp >> 1;
+    }
+ subnet->addr = htonl(value);
+}
+
 static int _lwip_netif_add4(int argc, char **argv)
 {
  if(argc != 4 && argc != 6)
@@ -125,6 +144,68 @@ static int _lwip_netif_add4(int argc, char **argv)
      return 1;
     }
 
+ struct netif *iface;
+
+ sys_lock_tcpip_core();
+ iface = netif_find(argv[2]);
+
+ if(iface == NULL)
+    {
+     printf("error: invalid interface name (names are case sensitive)\n");
+     sys_unlock_tcpip_core();
+     return 1;
+    }
+
+ char *ip_ptr, *prefix_ptr = NULL;
+
+ ip_ptr = argv[3];
+
+ while((*ip_ptr) != 0)
+    {
+     if((*ip_ptr) == '/')
+       {
+        *ip_ptr = 0;
+        prefix_ptr = ip_ptr + 1;
+       }
+
+     ip_ptr++;
+    }
+
+ ip_ptr = argv[3];
+
+ if(prefix_ptr == NULL)
+    {
+     printf("error: ivalid IPv4 prefix notation\n");
+     _usage_add4(argv[0]);
+     sys_unlock_tcpip_core();
+     return 1;
+    }
+
+ ip4_addr_t ip, subnet;
+
+ subnet.addr = 0x00ffffff;
+
+ if(inet_pton(AF_INET, ip_ptr, &ip.addr) != 1)
+    {
+     printf("error:invalid IPv4 address\n");
+     sys_unlock_tcpip_core();
+     return 1;
+    }
+
+ int prefix = atoi(prefix_ptr);
+
+ if( prefix < 0 || prefix > 32)
+    {
+     printf("error:invalid prefix, should be in range <0, 32>\n");
+     sys_unlock_tcpip_core();
+     return 1;
+    }
+
+ _lwip_prefix_to_subnet(prefix, &subnet);
+
+ netif_set_addr(iface, &ip, &subnet, NULL);
+
+ sys_unlock_tcpip_core();
  return 0;
 }
 #endif
@@ -145,6 +226,99 @@ static int _lwip_netif_add6(int argc, char **argv)
 }
 #endif
 
+static void _set_usage(char *cmd)
+{
+ printf("usage: %s <if_id> set <key> <value>\n", cmd);
+ printf("      Sets hardware specific values\n");
+ printf("      <key> may be one of the following\n");
+#ifdef MODULE_LWIP_IPV4
+ printf("       * \"ip4\" - sets IPv4 address\n");
+ printf("       * \"mask\" - sets IPv4 mask (in decimal dotted format)\n");
+ printf("       * \"gw\" - sets IPv4 gateway address\n");
+#endif
+}
+
+static void _print_iface_name(netif_t *iface)
+{
+    char name[CONFIG_NETIF_NAMELENMAX];
+
+    netif_get_name(iface, name);
+    printf("%s", name);
+}
+
+static void _print_netopt(netopt_t opt)
+{
+    switch (opt) {
+#ifdef MODULE_LWIP_IPV4
+    case NETOPT_IPV4_ADDR:
+        printf("ip4");
+        break;
+
+    case NETOPT_IPV4_MASK:
+        printf("mask");
+        break;
+
+    case NETOPT_IPV4_GW:
+        printf("gw");
+        break;
+#endif
+    default:
+        break;
+    }
+}
+
+#ifdef MODULE_LWIP_IPV4
+static int _lwip_netif_set_u32_from_ip4(netif_t *iface, netopt_t opt,
+            uint32_t context, char *ip)
+{
+ uint32_t u32_val;
+
+ if (inet_pton(AF_INET, ip, &u32_val) != 1) {
+        printf("error:invalid IPv4 address\n");
+        return 1;
+       }
+
+ sys_lock_tcpip_core();
+ if (netif_set_opt(iface, opt, context, &u32_val, sizeof(u32_val)) < 0) {
+     printf("error: unable to set ");
+     _print_netopt(opt);
+     printf("\n");
+     sys_unlock_tcpip_core();
+     return 1;
+    }
+ sys_unlock_tcpip_core();
+
+ printf("success: set ");
+ _print_netopt(opt);
+ printf(" on interface ");
+ _print_iface_name(iface);
+ printf(" to ");
+ printf("%s\n", ip);
+
+ return 0;
+}
+#endif
+
+static int _lwip_netif_set(char *cmd, netif_t *iface, char *key, char *value)
+{
+ (void)cmd;
+ (void)iface;
+ (void)key;
+ (void)value;
+
+#ifdef MODULE_LWIP_IPV4
+ if (strcmp("ip4", key) == 0) {
+    return _lwip_netif_set_u32_from_ip4(iface, NETOPT_IPV4_ADDR, 0, value);
+ }
+ if (strcmp("mask", key) == 0) {
+    return _lwip_netif_set_u32_from_ip4(iface, NETOPT_IPV4_MASK, 0, value);
+ }
+#endif
+ else
+     _set_usage(cmd);
+ return 1;
+}
+
 static void _lwip_netif_help(char *cmd)
 {
  printf("usage: %s\n", cmd);
@@ -155,6 +329,7 @@ static void _lwip_netif_help(char *cmd)
 #ifdef MODULE_LWIP_IPV6
  _usage_add6(cmd);
 #endif
+ _set_usage(cmd);
 }
 
 static int _lwip_netif_config(int argc, char **argv)
@@ -177,22 +352,38 @@ static int _lwip_netif_config(int argc, char **argv)
         return 0;
     }
     else {
-     if(strcmp("help", argv[1]) == 0)
+     if (strcmp("help", argv[1]) == 0)
         {
          _lwip_netif_help(argv[0]);
         }
 #ifdef MODULE_LWIP_IPV4
-     else if(strcmp("add4", argv[1]) == 0)
+     else if (strcmp("add4", argv[1]) == 0)
         {
          _lwip_netif_add4(argc, argv);
         }
 #endif
 #ifdef MODULE_LWIP_IPV6
-     else if(strcmp("add6", argv[1]) == 0)
+     else if (strcmp("add6", argv[1]) == 0)
         {
          _lwip_netif_add6(argc, argv);
         }
 #endif
+     else if (argc >= 2 && strcmp("set", argv[2]) == 0)
+        {
+         if (argc == 5)
+            {
+             netif_t *iface;
+             iface = netif_get_by_name(argv[1]);
+             if (!iface) {
+                printf("error: invalid interface given\n");
+                return 1; 
+               }
+            
+             _lwip_netif_set(argv[0], iface, argv[3], argv[4]);
+            }
+         else
+            _set_usage(argv[0]);
+        }
      else
         printf("error: invalid subcommand - use help\n");
     }
