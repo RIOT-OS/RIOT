@@ -43,7 +43,7 @@ void bench_mem_write(uint32_t addr, uint32_t len)
 
 int main(void)
 {
-    printf("HCLK freq %lu MHz\n", CLOCK_AHB/MHZ(1));
+    printf("FMC HCLK freq %lu MHz\n", CLOCK_AHB/MHZ(1));
 
     uint8_t *data8  = (uint8_t *)(fmc_bank_config[FMC_BANK].address);
     uint16_t *data16 = (uint16_t *)((fmc_bank_config[FMC_BANK].address) + 256);
@@ -61,7 +61,7 @@ int main(void)
 
     for (unsigned i = 0; i < 256; i++) {
         if (data8[i] != i) {
-            printf("memory content did not match @%p\n", &data8[i]);
+            printf("ERROR: memory content did not match @%p\n", &data8[i]);
             return 1;
         }
     }
@@ -74,7 +74,7 @@ int main(void)
 
     for (unsigned i = 0; i < 128; i++) {
         if (data16[i] != ((128 + i) << 8) + i) {
-            printf("memory content did not match @%p\n", &data16[i]);
+            printf("ERROR: memory content did not match @%p\n", &data16[i]);
             return 1;
         }
     }
@@ -88,31 +88,39 @@ int main(void)
 
     for (unsigned i = 0; i < 64; i++) {
         if (data32[i] != ((192 + i) << 24) + ((128 + i) << 16) + ((64 + i) << 8) + i) {
-            printf("memory content did not match @%p\n", &data32[i]);
+            printf("ERROR: memory content did not match @%p\n", &data32[i]);
             return 1;
         }
     }
     puts("------------------------------------------------------------------------");
 
-    printf("fill complete memory of %lu kByte (. represents 16 kByte)\n",
+
+    printf("fill complete memory of %lu kByte, a . represents a 16 kByte block\n",
            fmc_bank_config[FMC_BANK].size >> 10);
-    for (uint32_t i = 0; i < fmc_bank_config[FMC_BANK].size; i++) {
-        data8[i] = (i % 256);
-        if ((i % KiB(16)) == 0) {
+
+    data32 = (uint32_t *)(fmc_bank_config[FMC_BANK].address);
+
+    for (uint32_t i = 0; i < (fmc_bank_config[FMC_BANK].size >> 2); i++) {
+        *data32 = (uint32_t)data32;
+        data32++;
+        if (((i << 2) % KiB(16)) == 0) {
             printf(".");
         }
     }
     puts("\nready");
-    puts("------------------------------------------------------------------------");
+    puts("check memory content, a + represents one 16 kByte block of matching data");
 
-    puts("check memory content (+ represents 16 kByte of matching data)");
-    for (uint32_t i = 0; i < fmc_bank_config[FMC_BANK].size; i++) {
-        if (data8[i] != (i % 256)) {
-            printf("memory content did not match @%08"PRIx32"\n",
-                   fmc_bank_config[FMC_BANK].address + i);
+    data32 = (uint32_t *)(fmc_bank_config[FMC_BANK].address);
+
+    for (uint32_t i = 0; i < (fmc_bank_config[FMC_BANK].size >> 2); i++) {
+        if (*data32 != (uint32_t)data32) {
+            printf("ERROR: memory content did not match @%p, "
+                   "should be %p but was 0x%08"PRIx32"\n",
+                   data32, data32, *data32);
             return 1;
         }
-        if ((i % KiB(16)) == 0) {
+        data32++;
+        if (((i << 2) % KiB(16)) == 0) {
             printf("+");
         }
     }
@@ -145,8 +153,11 @@ int main(void)
     puts("print first and last memory block after benchmark, should be 0xaa\n");
     od_hex_dump_ext(data8, 256, 16, fmc_bank_config[FMC_BANK].address);
     puts("");
-    od_hex_dump_ext(data32, 256, 16, (fmc_bank_config[FMC_BANK].address) +
-                                     (fmc_bank_config[FMC_BANK].size) - 256);
+
+    data8 = (uint8_t *)((fmc_bank_config[FMC_BANK].address) +
+                        (fmc_bank_config[FMC_BANK].size) - 256);
+    od_hex_dump_ext(data8, 256, 16, (fmc_bank_config[FMC_BANK].address) +
+                                    (fmc_bank_config[FMC_BANK].size) - 256);
     puts("------------------------------------------------------------------------");
 
     puts("\n[SUCCESS]\n");
