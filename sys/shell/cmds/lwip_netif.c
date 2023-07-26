@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2021 Google LLC
+ *               2023 Krzysztof Cabaj <kcabaj@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -12,8 +13,10 @@
  *
  * @file
  * @brief       Shell command for printing lwIP network interface status
+ *              and configuration of IPv4 address
  *
  * @author      Erik Ekman <eekman@google.com>
+ *              Krzysztof Cabaj <kcabaj@gmail.com>
  *
  * @}
  */
@@ -105,6 +108,55 @@ static void _netif_list(struct netif *netif)
 #endif
 }
 
+
+#ifdef MODULE_LWIP_IPV4
+static void _usage_add4(char *cmd)
+{
+ printf("usage: %s add4 <interface> <IPv4>/<prefix>\n", cmd);
+ printf("usage: %s add4 <interface> <IPv4>/<prefix> gw <IPv4>\n", cmd);
+}
+
+static int _lwip_netif_add4(int argc, char **argv)
+{
+ if(argc != 4 && argc != 6)
+    {
+     printf("error: invalid number of parameters\n");
+     _usage_add4(argv[0]);
+     return 1;
+    }
+
+ return 0;
+}
+#endif
+
+#ifdef MODULE_LWIP_IPV6
+static void _usage_add6(char *cmd)
+{
+ printf("usage: %s add6 - currently not implemented\n", cmd);
+}
+
+static int _lwip_netif_add6(int argc, char **argv)
+{
+ (void)argc;
+ (void)argv;
+ printf("error: currently not implemented\n");
+
+ return 0;
+}
+#endif
+
+static void _lwip_netif_help(char *cmd)
+{
+ printf("usage: %s\n", cmd);
+ printf("usage: %s help\n", cmd);
+#ifdef MODULE_LWIP_IPV4
+ _usage_add4(cmd);
+#endif
+#ifdef MODULE_LWIP_IPV6
+ _usage_add6(cmd);
+#endif
+}
+
 static int _lwip_netif_config(int argc, char **argv)
 {
     if (argc < 2) {
@@ -124,7 +176,26 @@ static int _lwip_netif_config(int argc, char **argv)
         }
         return 0;
     }
-    printf("%s takes no arguments.\n", argv[0]);
+    else {
+     if(strcmp("help", argv[1]) == 0)
+        {
+         _lwip_netif_help(argv[0]);
+        }
+#ifdef MODULE_LWIP_IPV4
+     else if(strcmp("add4", argv[1]) == 0)
+        {
+         _lwip_netif_add4(argc, argv);
+        }
+#endif
+#ifdef MODULE_LWIP_IPV6
+     else if(strcmp("add6", argv[1]) == 0)
+        {
+         _lwip_netif_add6(argc, argv);
+        }
+#endif
+     else
+        printf("error: invalid subcommand - use help\n");
+    }
     return 1;
 }
 
