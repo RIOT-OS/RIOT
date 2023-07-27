@@ -15,6 +15,9 @@ config BOARD_STM32F429I_DISC1
 
     # Put defined MCU peripherals here (in alphabetical order)
     select HAS_PERIPH_DMA
+    select HAS_PERIPH_FMC
+    select HAS_PERIPH_FMC_SDRAM
+    select HAS_PERIPH_FMC_16BIT
     select HAS_PERIPH_I2C
     select HAS_PERIPH_SPI
     select HAS_PERIPH_TIMER

@@ -13,3 +13,8 @@ PROGRAMMERS_SUPPORTED += openocd
 # The board can become un-flashable after some execution or after being plugged,
 # use connect_assert_srst to always be able to flash or reset the board.
 OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
+
+# Since only 18 of the 19 address lines are connected, only 512 kByte of the
+# 1 MByte PSRAM can be used.
+FMC_RAM_ADDR=0x60000000
+FMC_RAM_LEN=512K

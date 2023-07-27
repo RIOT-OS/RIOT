@@ -57,12 +57,22 @@ info-stm32:
 	@$(COLOR_ECHO) "\tROM size:\t$(ROM_LEN) ($(FLASHSIZE) Bytes)"
 	@$(COLOR_ECHO) "\tRAM size:\t$(RAM_LEN_K)KiB"
 
-
 ifneq (,$(CCMRAM_LEN))
   LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ccmram_length=$(CCMRAM_LEN)
 endif
 ifneq (,$(SRAM4_LEN))
   LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_sram4_length=$(SRAM4_LEN)
+endif
+
+# if the board uses a FMC RAM, all 4 heaps have to be used even if
+# some of them are not available
+ifneq (,$(filter periph_fmc_sdram periph_fmc_nor_sram,$(USEMODULE)))
+  ifneq (,$(FMC_RAM_LEN))
+    LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_fmc_ram_addr=$(FMC_RAM_ADDR)
+    LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_fmc_ram_len=$(FMC_RAM_LEN)
+    CFLAGS += -DCPU_HAS_FMC_RAM=1
+    CFLAGS += -DNUM_HEAPS=4
+  endif
 endif
 
 VECTORS_O ?= $(BINDIR)/stm32_vectors/$(CPU_LINE).o

@@ -1,0 +1,6 @@
+config APPLICATION
+    bool
+    default y
+    imply MODULE_PERIPH_FMC_NOR_SRAM
+    imply MODULE_PERIPH_FMC_SDRAM
+    depends on TEST_KCONFIG

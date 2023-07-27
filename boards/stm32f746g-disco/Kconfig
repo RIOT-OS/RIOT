@@ -15,6 +15,9 @@ config BOARD_STM32F746G_DISCO
     # Put defined MCU peripherals here (in alphabetical order)
     select HAS_PERIPH_DMA
     select HAS_PERIPH_ETH
+    select HAS_PERIPH_FMC
+    select HAS_PERIPH_FMC_SDRAM
+    select HAS_PERIPH_FMC_16BIT
     select HAS_PERIPH_I2C
     select HAS_PERIPH_LTDC
     select HAS_PERIPH_RTC

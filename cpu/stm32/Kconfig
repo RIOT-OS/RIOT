@@ -74,6 +74,8 @@ config RDP2
     bool "RDP2"
 endchoice
 
+rsource "periph/Kconfig.fmc"
+
 if TEST_KCONFIG
 
 rsource "periph/Kconfig"

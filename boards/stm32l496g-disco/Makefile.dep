@@ -10,6 +10,10 @@ ifneq (,$(filter touch_dev,$(USEMODULE)))
   USEMODULE += ft5x06
 endif
 
+ifneq (,$(filter periph_fmc,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_fmc_16bit
+endif
+
 ifneq (,$(filter periph_uart,$(USEMODULE)))
   USEMODULE += periph_lpuart
   ifeq (,$(filter periph_spi_stmod_plus,$(USEMODULE)))
