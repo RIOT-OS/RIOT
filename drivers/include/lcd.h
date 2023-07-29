@@ -114,8 +114,7 @@ typedef struct {
 /**
  * @brief   LCD driver interface
  *
- * This define the functions to access a LCD.
- *
+ * This defines the functions to access a LCD.
  */
 struct lcd_driver {
     /**
@@ -129,7 +128,7 @@ struct lcd_driver {
     int (*init)(lcd_t *dev, const lcd_params_t *params);
 
     /**
-     * @brief   Set area LCD work area
+     * @brief   Set the LCD work area
      *
      * This function pointer can be NULL if the controller specific driver
      * does not require anything special. In this case the default
@@ -148,21 +147,32 @@ struct lcd_driver {
 };
 
 /**
- * @brief   Low Level to acquire the device
+ * @name    Low-level LCD API
+ *
+ * Low-level functions are used to acquire a device, write commands with data
+ * to the device, or read data from the device and release it when it is no
+ * longer needed. They are usually called by the high-level functions such
+ * as @ref lcd_init, @ref lcd_fill, @ref lcd_pixmap, etc., but can also be
+ * used by the application to implement low-level operations if needed.
+ *
+ * @{
+ */
+/**
+ * @brief   Low-level function to acquire the device
  *
  * @param[out]  dev     device descriptor
  */
 void lcd_ll_acquire(const lcd_t *dev);
 
 /**
- * @brief   Low Level function to release the device
+ * @brief   Low-level function to release the device
  *
  * @param[out]  dev     device descriptor
  */
 void lcd_ll_release(const lcd_t *dev);
 
 /**
- * @brief   Low level function to write a command
+ * @brief   Low-level function to write a command
  *
  * @pre The device must have already been acquired with @ref lcd_ll_acquire
  *      before this function can be called.
@@ -176,7 +186,7 @@ void lcd_ll_write_cmd(const lcd_t *dev, uint8_t cmd, const uint8_t *data,
                       size_t len);
 
 /**
- * @brief   Low level function for read command command
+ * @brief   Low-level function for read command
  *
  * @note Very often the SPI MISO signal of the serial interface or the RDX
  *       signal of the MCU 8080 parallel interface are not connected to the
@@ -192,11 +202,20 @@ void lcd_ll_write_cmd(const lcd_t *dev, uint8_t cmd, const uint8_t *data,
  * @param[in]   len     length of the returned data
  */
 void lcd_ll_read_cmd(const lcd_t *dev, uint8_t cmd, uint8_t *data, size_t len);
+/** @} */
 
 /**
- * @brief   Setup an lcd display device
+ * @name    High-level LCD API
  *
- * @param[out]  dev     device descriptor
+ * The functions of the high-level LCD API are used by the application. They
+ * use the low-level LCD API to implement more complex operations.
+ *
+ * @{
+ */
+/**
+ * @brief   Setup an LCD display device
+ *
+ * @param[in]   dev     device descriptor
  * @param[in]   params  parameters for device initialization
  */
 int lcd_init(lcd_t *dev, const lcd_params_t *params);
@@ -273,6 +292,7 @@ void lcd_invert_on(const lcd_t *dev);
  * @param[in]   dev     device descriptor
  */
 void lcd_invert_off(const lcd_t *dev);
+/** @} */
 
 #ifdef __cplusplus
 }
