@@ -162,6 +162,31 @@ extern "C" {
 #define ST77XX_PARAM_IF_PAR
 #endif
 
+#if MODULE_LCD_PARALLEL_16BIT || DOXYGEN
+/** Additional default interface params if MCU 8080 16-bit parallel interface is enabled */
+#define ST77XX_PARAM_IF_PAR_16BIT   .d8_pin = ST77XX_PARAM_D8, \
+                                    .d9_pin = ST77XX_PARAM_D9, \
+                                    .d10_pin = ST77XX_PARAM_D10, \
+                                    .d11_pin = ST77XX_PARAM_D11, \
+                                    .d12_pin = ST77XX_PARAM_D12, \
+                                    .d13_pin = ST77XX_PARAM_D13, \
+                                    .d14_pin = ST77XX_PARAM_D14, \
+                                    .d15_pin = ST77XX_PARAM_D15,
+#else
+#define ST77XX_PARAM_IF_PAR_16BIT
+#endif
+
+#if MODULE_LCD_PARALLEL_16BIT || DOXYGEN
+/** Interface mode is MCU 8080 16-bit parallel */
+#define ST77XX_PARAM_IF_MODE        .mode = LCD_IF_PARALLEL_16BIT,
+#elif MODULE_LCD_PARALLEL
+/** Interface mode is MCU 8080 8-bit parallel */
+#define ST77XX_PARAM_IF_MODE        .mode = LCD_IF_PARALLEL_8BIT,
+#else
+/** Interface mode parameter is not defined */
+#define ST77XX_PARAM_IF_MODE
+#endif
+
 /**
  * @brief   Default params
  *
@@ -174,9 +199,11 @@ extern "C" {
  *       for displays with MCU 8080 8-/16-bit parallel interfaces.
  */
 #ifndef ST77XX_PARAMS
-#define ST77XX_PARAMS              {  .cntrl = ST77XX_PARAM_CNTRL, \
+#define ST77XX_PARAMS              {  ST77XX_PARAM_IF_MODE \
                                       ST77XX_PARAM_IF_SPI \
                                       ST77XX_PARAM_IF_PAR \
+                                      ST77XX_PARAM_IF_PAR_16BIT \
+                                      .cntrl = ST77XX_PARAM_CNTRL, \
                                       .cs_pin = ST77XX_PARAM_CS, \
                                       .dcx_pin = ST77XX_PARAM_DCX, \
                                       .rst_pin = ST77XX_PARAM_RST, \
