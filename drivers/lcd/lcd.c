@@ -369,8 +369,7 @@ static void lcd_ll_set_area_default(lcd_t *dev, uint16_t x1, uint16_t x2,
                      sizeof(params));
 }
 
-static void lcd_ll_set_area(lcd_t *dev, uint16_t x1, uint16_t x2,
-                            uint16_t y1, uint16_t y2)
+void lcd_ll_set_area(lcd_t *dev, uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2)
 {
     if (dev->driver->set_area) {
         dev->driver->set_area(dev, x1, x2, y1, y2);

@@ -279,6 +279,18 @@ void lcd_ll_write_cmd(lcd_t *dev, uint8_t cmd, const uint8_t *data,
  * @param[in]   len     length of the returned data
  */
 void lcd_ll_read_cmd(lcd_t *dev, uint8_t cmd, uint8_t *data, size_t len);
+
+/**
+ * @brief   Set the LCD work area
+ *
+ * @param[in] dev  Pointer to the selected driver
+ * @param[in] x1   x coordinate of the first corner
+ * @param[in] x2   x coordinate of the opposite corner
+ * @param[in] y1   y coordinate of the first corner
+ * @param[in] y2   y coordinate of the opposite corner
+ *
+ */
+void lcd_ll_set_area(lcd_t *dev, uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2);
 /** @} */
 
 /**
