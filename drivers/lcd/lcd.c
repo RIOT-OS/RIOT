@@ -35,7 +35,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-static inline void _lcd_write_byte(const lcd_t *dev, bool cont, uint8_t data)
+static inline void lcd_ll_write_byte(const lcd_t *dev, bool cont, uint8_t data)
 {
     if (dev->params->spi != SPI_UNDEF) {
         /* SPI serial interface is used */
@@ -46,8 +46,8 @@ static inline void _lcd_write_byte(const lcd_t *dev, bool cont, uint8_t data)
     }
 }
 
-static inline void _lcd_write_bytes(const lcd_t *dev, bool cont,
-                                    const void *data, size_t len)
+static inline void lcd_ll_write_bytes(const lcd_t *dev, bool cont,
+                                      const void *data, size_t len)
 {
     if (dev->params->spi != SPI_UNDEF) {
         /* SPI serial interface is used */
@@ -59,8 +59,8 @@ static inline void _lcd_write_bytes(const lcd_t *dev, bool cont,
     }
 }
 
-static inline void _lcd_read_bytes(const lcd_t *dev, bool cont,
-                                   void *data, size_t len)
+static inline void lcd_ll_read_bytes(const lcd_t *dev, bool cont,
+                                     void *data, size_t len)
 {
     if (dev->params->spi != SPI_UNDEF) {
         /* SPI serial interface is used */
@@ -75,15 +75,15 @@ static inline void _lcd_read_bytes(const lcd_t *dev, bool cont,
     }
 }
 
-static void _lcd_cmd_start(const lcd_t *dev, uint8_t cmd, bool cont)
+static void lcd_ll_cmd_start(const lcd_t *dev, uint8_t cmd, bool cont)
 {
     gpio_clear(dev->params->dcx_pin);
-    _lcd_write_byte(dev, cont, cmd);
+    lcd_ll_write_byte(dev, cont, cmd);
     gpio_set(dev->params->dcx_pin);
 }
 
-static void _lcd_set_area_default(const lcd_t *dev, uint16_t x1, uint16_t x2,
-                                  uint16_t y1, uint16_t y2)
+static void lcd_ll_set_area_default(const lcd_t *dev, uint16_t x1, uint16_t x2,
+                                    uint16_t y1, uint16_t y2)
 {
     be_uint16_t params[2];
 
@@ -106,14 +106,14 @@ static void _lcd_set_area_default(const lcd_t *dev, uint16_t x1, uint16_t x2,
                      sizeof(params));
 }
 
-static void _lcd_set_area(const lcd_t *dev, uint16_t x1, uint16_t x2,
-                          uint16_t y1, uint16_t y2)
+static void lcd_ll_set_area(const lcd_t *dev, uint16_t x1, uint16_t x2,
+                            uint16_t y1, uint16_t y2)
 {
     if (dev->driver->set_area) {
         dev->driver->set_area(dev, x1, x2, y1, y2);
     }
     else {
-        _lcd_set_area_default(dev, x1, x2, y1, y2);
+        lcd_ll_set_area_default(dev, x1, x2, y1, y2);
     }
 }
 
@@ -143,17 +143,17 @@ void lcd_ll_release(const lcd_t *dev)
 void lcd_ll_write_cmd(const lcd_t *dev, uint8_t cmd, const uint8_t *data,
                       size_t len)
 {
-    _lcd_cmd_start(dev, cmd, len ? true : false);
+    lcd_ll_cmd_start(dev, cmd, len ? true : false);
     if (len) {
-        _lcd_write_bytes(dev, false, data, len);
+        lcd_ll_write_bytes(dev, false, data, len);
     }
 }
 
 void lcd_ll_read_cmd(const lcd_t *dev, uint8_t cmd, uint8_t *data, size_t len)
 {
     assert(len);
-    _lcd_cmd_start(dev, cmd, len ? true : false);
-    _lcd_read_bytes(dev, false, data, len);
+    lcd_ll_cmd_start(dev, cmd, len ? true : false);
+    lcd_ll_read_bytes(dev, false, data, len);
 }
 
 int lcd_init(lcd_t *dev, const lcd_params_t *params)
@@ -219,18 +219,18 @@ void lcd_fill(const lcd_t *dev, uint16_t x1, uint16_t x2, uint16_t y1,
     /* Send fill area to the display */
     lcd_ll_acquire(dev);
 
-    _lcd_set_area(dev, x1, x2, y1, y2);
+    lcd_ll_set_area(dev, x1, x2, y1, y2);
     /* Memory access command */
-    _lcd_cmd_start(dev, LCD_CMD_RAMWR, true);
+    lcd_ll_cmd_start(dev, LCD_CMD_RAMWR, true);
 
     if (IS_ACTIVE(CONFIG_LCD_LE_MODE)) {
         color = htons(color);
     }
 
     for (int i = 0; i < (num_pix - 1); i++) {
-        _lcd_write_bytes(dev, true, (uint8_t *)&color, sizeof(color));
+        lcd_ll_write_bytes(dev, true, (uint8_t *)&color, sizeof(color));
     }
-    _lcd_write_bytes(dev, false, (uint8_t *)&color, sizeof(color));
+    lcd_ll_write_bytes(dev, false, (uint8_t *)&color, sizeof(color));
     lcd_ll_release(dev);
 }
 
@@ -246,21 +246,21 @@ void lcd_pixmap(const lcd_t *dev, uint16_t x1, uint16_t x2,
     lcd_ll_acquire(dev);
 
     /* Send fill area to the display */
-    _lcd_set_area(dev, x1, x2, y1, y2);
+    lcd_ll_set_area(dev, x1, x2, y1, y2);
 
     /* Memory access command */
-    _lcd_cmd_start(dev, LCD_CMD_RAMWR, true);
+    lcd_ll_cmd_start(dev, LCD_CMD_RAMWR, true);
 
     if (IS_ACTIVE(CONFIG_LCD_LE_MODE)) {
         for (size_t i = 0; i < num_pix - 1; i++) {
             uint16_t ncolor = htons(*(color + i));
-            _lcd_write_bytes(dev, true, &ncolor, sizeof(uint16_t));
+            lcd_ll_write_bytes(dev, true, &ncolor, sizeof(uint16_t));
         }
         uint16_t ncolor = htons(*(color + num_pix - 1));
-        _lcd_write_bytes(dev, false, &ncolor, sizeof(uint16_t));
+        lcd_ll_write_bytes(dev, false, &ncolor, sizeof(uint16_t));
     }
     else {
-        _lcd_write_bytes(dev, false, (const uint8_t *)color, num_pix * 2);
+        lcd_ll_write_bytes(dev, false, (const uint8_t *)color, num_pix * 2);
     }
 
     lcd_ll_release(dev);
