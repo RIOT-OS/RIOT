@@ -96,6 +96,31 @@ extern "C" {
 #define ILI9341_PARAM_IF_PAR
 #endif
 
+#if MODULE_LCD_PARALLEL_16BIT || DOXYGEN
+/** Additional default interface params if MCU 8080 16-bit parallel interface is enabled */
+#define ILI9341_PARAM_IF_PAR_16BIT  .d8_pin = ILI9341_PARAM_D8, \
+                                    .d9_pin = ILI9341_PARAM_D9, \
+                                    .d10_pin = ILI9341_PARAM_D10, \
+                                    .d11_pin = ILI9341_PARAM_D11, \
+                                    .d12_pin = ILI9341_PARAM_D12, \
+                                    .d13_pin = ILI9341_PARAM_D13, \
+                                    .d14_pin = ILI9341_PARAM_D14, \
+                                    .d15_pin = ILI9341_PARAM_D15,
+#else
+#define ILI9341_PARAM_IF_PAR_16BIT
+#endif
+
+#if MODULE_LCD_PARALLEL_16BIT || DOXYGEN
+/** Interface mode is MCU 8080 16-bit parallel */
+#define ILI9341_PARAM_IF_MODE       .mode = LCD_IF_PARALLEL_16BIT,
+#elif MODULE_LCD_PARALLEL
+/** Interface mode is MCU 8080 8-bit parallel */
+#define ILI9341_PARAM_IF_MODE       .mode = LCD_IF_PARALLEL_8BIT,
+#else
+/** Interface mode parameter is not defined */
+#define ILI9341_PARAM_IF_MODE
+#endif
+
 /**
  * @brief   Default params
  *
@@ -108,8 +133,10 @@ extern "C" {
  *       for displays with MCU 8080 8-/16-bit parallel interfaces.
  */
 #ifndef ILI9341_PARAMS
-#define ILI9341_PARAMS              { ILI9341_PARAM_IF_SPI \
+#define ILI9341_PARAMS              { ILI9341_PARAM_IF_MODE \
+                                      ILI9341_PARAM_IF_SPI \
                                       ILI9341_PARAM_IF_PAR \
+                                      ILI9341_PARAM_IF_PAR_16BIT \
                                       .cs_pin = ILI9341_PARAM_CS, \
                                       .dcx_pin = ILI9341_PARAM_DCX, \
                                       .rst_pin = ILI9341_PARAM_RST, \
