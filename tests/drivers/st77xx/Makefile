@@ -23,6 +23,7 @@ endif
 DRIVER ?= st7735
 
 USEMODULE += $(DRIVER)
+USEMODULE += benchmark
 USEMODULE += ztimer
 USEMODULE += ztimer_msec
 
