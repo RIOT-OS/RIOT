@@ -29,6 +29,7 @@ endif
 
 ifneq (,$(filter st7796,$(USEMODULE)))
   USEMODULE += lcd_parallel
+  USEMODULE += lcd_parallel_ll_mcu
 endif
 
 ifneq (,$(filter touch_dev,$(USEMODULE)))
