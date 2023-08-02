@@ -27,6 +27,7 @@
 #include "periph_cpu.h"
 #include "clk_conf.h"
 #include "cfg_timer_tim5.h"
+#include "cfg_usb_otg_fs_u5.h"
 
 #ifdef __cplusplus
 extern "C" {

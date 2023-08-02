@@ -1,0 +1,49 @@
+# Copyright (c) 2023 Mesotic SAS
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+# For now, define all features here
+# We will rely on nrf5x_common later when we support more peripherals
+config CPU_FAM_NRF53
+    bool
+    select HAS_CPU_NRF53
+    select HAS_PERIPH_CPUID
+    select HAS_PERIPH_FLASHPAGE
+    select HAS_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
+    select HAS_PERIPH_FLASHPAGE_PAGEWISE
+    select HAS_PERIPH_GPIO
+    select HAS_PERIPH_GPIO_IRQ
+    select HAS_PERIPH_TIMER_PERIODIC
+    select HAS_PERIPH_UART_MODECFG
+    select HAS_PERIPH_WDT
+    select HAS_PERIPH_WDT_CB
+    select MODULE_NRF_SHARED_SERIAL_IRQ
+
+## CPU Models
+config CPU_MODEL_NRF5340_APP
+    bool
+    select CPU_CORE_CORTEX_M33
+    select CPU_FAM_NRF53
+
+## CPU common symbols
+config CPU_FAM
+    default "nrf53" if CPU_FAM_NRF53
+
+config CPU_MODEL
+    default "nrf5340_app" if CPU_MODEL_NRF5340_APP
+
+
+config CPU
+    default "nrf53" if CPU_FAM_NRF53
+
+## Definition of specific features
+config HAS_CPU_NRF53
+    bool
+    help
+        Indicates that the current cpu is 'nrf53'.
+
+rsource "vectors/Kconfig"
+
+source "$(RIOTCPU)/nrf5x_common/Kconfig"

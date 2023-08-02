@@ -32,10 +32,15 @@ static int tinyusb_hw_init_dev(const dwc2_usb_otg_fshs_config_t *conf)
     pm_block(STM32_PM_STOP);
     pm_block(STM32_PM_STANDBY);
 
-#if defined(PWR_CR2_USV) /* on L4 */
-    /* Validate USB Supply */
+#if defined(PWR_CR2_USV)
+    /* on L4: Validate USB Supply */
     PWR->CR2 |= PWR_CR2_USV;
 #endif /* PWR_CR2_USV */
+
+#if defined(PWR_SVMCR_USV)
+    /* on U5: Validate USB Supply */
+    PWR->SVMCR |= PWR_SVMCR_USV;
+#endif /* PWR_SVMCR_USV */
 
     /* Enable the clock to the peripheral */
     periph_clk_en(conf->ahb, conf->rcc_mask);
@@ -53,8 +58,11 @@ static int tinyusb_hw_init_dev(const dwc2_usb_otg_fshs_config_t *conf)
                 (USB_OTG_GlobalTypeDef *)(conf->periph + USB_OTG_GLOBAL_BASE);
 
 #ifdef USB_OTG_GCCFG_NOVBUSSENS
-    /* Enable no Vbus Detect enable and enable `Power Down Disable` */
+    /* set No Vbus Sensing */
     global_regs->GCCFG |= USB_OTG_GCCFG_NOVBUSSENS;
+#elif USB_OTG_GCCFG_VBDEN
+    /* clear Vbus Detect Enable */
+    global_regs->GCCFG &= ~USB_OTG_GCCFG_VBDEN;
 #endif
 
 #ifdef DWC2_USB_OTG_HS_ENABLED

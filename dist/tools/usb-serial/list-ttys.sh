@@ -3,4 +3,5 @@
 # Public License v2.1. See the file LICENSE in the top level directory for more
 # details.
 
-./ttys.py --format path
+SCRIPTDIR="$(cd "$(dirname "$0")" || exit 1; pwd)"
+"$SCRIPTDIR"/ttys.py --format path

@@ -1,0 +1,26 @@
+From 4e85c6f199f6b7c844eac06d72e91d2df6be2bf9 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Sat, 20 May 2023 21:15:35 +0200
+Subject: [PATCH] src/core/lv_obj.c: fix compilation with clang
+
+Drop an used variable.
+---
+ src/core/lv_obj.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/src/core/lv_obj.c b/src/core/lv_obj.c
+index 8890fcb..179f2bd 100644
+--- a/src/core/lv_obj.c
++++ b/src/core/lv_obj.c
+@@ -341,8 +341,6 @@ void lv_obj_allocate_spec_attr(lv_obj_t * obj)
+     LV_ASSERT_OBJ(obj, MY_CLASS);
+ 
+     if(obj->spec_attr == NULL) {
+-        static uint32_t x = 0;
+-        x++;
+         obj->spec_attr = lv_mem_alloc(sizeof(_lv_obj_spec_attr_t));
+         LV_ASSERT_MALLOC(obj->spec_attr);
+         if(obj->spec_attr == NULL) return;
+-- 
+2.40.1
+

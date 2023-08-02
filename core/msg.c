@@ -322,6 +322,9 @@ int msg_reply_int(msg_t *m, msg_t *reply)
 {
     thread_t *target = thread_get_unchecked(m->sender_pid);
 
+    /* msg_reply_int() can only be used to reply to existing threads */
+    assert(target != NULL);
+
     if (target->status != STATUS_REPLY_BLOCKED) {
         DEBUG("msg_reply_int(): %" PRIkernel_pid ": Target \"%" PRIkernel_pid
               "\" not waiting for reply.", thread_getpid(),
@@ -466,6 +469,9 @@ unsigned msg_queue_capacity(kernel_pid_t pid)
           pid);
 
     thread_t *thread = thread_get(pid);
+
+    assert(thread != NULL);
+
     int queue_cap = 0;
 
     if (thread_has_msg_queue(thread)) {

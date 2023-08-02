@@ -1,0 +1,23 @@
+From d34508c6d249ad0055c915ae96906f80eb4e47e5 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Mon, 22 May 2023 09:51:43 +0200
+Subject: [PATCH] src/vcdiff_codetable.c: add missing end of line
+
+---
+ src/vcdiff_codetable.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/vcdiff_codetable.c b/src/vcdiff_codetable.c
+index cb1d9c8..c39705c 100644
+--- a/src/vcdiff_codetable.c
++++ b/src/vcdiff_codetable.c
+@@ -49,4 +49,4 @@ void vcdiff_codetable_decode(uint8_t * inst0, size_t * size0, uint8_t * mode0,
+ 		*size1 = 1;
+ 		*mode0 = col;
+ 	}
+-}
+\ No newline at end of file
++}
+-- 
+2.40.1
+

@@ -7,6 +7,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega1284p \
     atmega328p \
     atmega328p-xplained-mini \
+    atmega8 \
     atxmega-a3bu-xplained \
     derfmega128 \
     mega-xplained \

@@ -505,6 +505,7 @@ PSEUDOMODULES += shell_commands
 ## @}
 PSEUDOMODULES += shell_hooks
 PSEUDOMODULES += shell_lock_auto_locking
+PSEUDOMODULES += shield_w5100
 PSEUDOMODULES += slipdev_stdio
 PSEUDOMODULES += slipdev_l2addr
 PSEUDOMODULES += sock
@@ -512,6 +513,7 @@ PSEUDOMODULES += sock_async
 PSEUDOMODULES += sock_aux_local
 PSEUDOMODULES += sock_aux_rssi
 PSEUDOMODULES += sock_aux_timestamp
+PSEUDOMODULES += sock_aux_ttl
 PSEUDOMODULES += sock_dtls
 PSEUDOMODULES += sock_ip
 PSEUDOMODULES += sock_tcp

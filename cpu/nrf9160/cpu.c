@@ -26,6 +26,14 @@
 #include "stdio_base.h"
 
 /**
+ * @brief    LFCLK Clock selection configuration guard
+*/
+#if ((CLOCK_LFCLK != CLOCK_LFCLKSRC_SRC_LFRC) && \
+     (CLOCK_LFCLK != CLOCK_LFCLKSRC_SRC_LFXO))
+#error "LFCLK init: CLOCK_LFCLK has invalid value"
+#endif
+
+/**
  * @brief   Initialize the CPU, set IRQ priorities
  */
 void cpu_init(void)
@@ -40,9 +48,6 @@ void cpu_init(void)
 
     /* call cortexm default initialization */
     cortexm_init();
-
-    /* enable wake up on events for __WFE CPU sleep */
-    SCB->SCR |= SCB_SCR_SEVONPEND_Msk;
 
     /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
     early_init();

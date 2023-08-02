@@ -51,25 +51,25 @@ static void _handle_rx_offload(event_t *ev);
 static void _start_of_cfp_handler(event_t *ev);
 
 /* Event used for ACK Timeout */
-static event_t acktimer_ev = {0, _acktimer_ev_handler};
+static event_t acktimer_ev = {{}, _acktimer_ev_handler};
 
 /* Event used for CCA Done */
-static event_t cca_ev = {0, _cca_ev_handler};
+static event_t cca_ev = {{}, _cca_ev_handler};
 
 /* Event used for timer events */
-static event_t timer_event = {0, _timer_ev_handler};
+static event_t timer_event = {{}, _timer_ev_handler};
 
 /* Event used for TX Done */
-static event_t tx_done_event = {0, _tx_done_handler};
+static event_t tx_done_event = {{}, _tx_done_handler};
 
 /* Event used for RX Done */
-static event_t rx_done_event = {0, _rx_done_handler};
+static event_t rx_done_event = {{}, _rx_done_handler};
 
 /* Event used for offloading the receive procedure */
-static event_t rx_offload_ev = {0, _handle_rx_offload};
+static event_t rx_offload_ev = {{}, _handle_rx_offload};
 
 /* Event used for offloading the start of a CFP */
-static event_t start_of_cfp_ev = {0, _start_of_cfp_handler};
+static event_t start_of_cfp_ev = {{}, _start_of_cfp_handler};
 
 void _handle_rx_offload(event_t *ev)
 {

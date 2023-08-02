@@ -215,7 +215,7 @@ if CPU_FAM_ESP32S3
 
 config MODULE_ESP_SPI_OCT
     bool
-    default y
+    default y if MODULE_ESP_SPI_RAM
     depends on HAS_ESP_SPI_OCT
     help
         Octal SPI is used for SPI RAM.

@@ -214,7 +214,7 @@ int dht_init(dht_t *dev, const dht_params_t *params)
     }
     else {
         DEBUG("\n[dht] dht_init: power-up duration: %" PRIi16 " ms\n",
-                (int16_t)(POWER_WAIT_TIMEOUT / US_PER_MS) - timeout);
+                (int16_t)(POWER_WAIT_TIMEOUT / US_PER_MS - timeout));
     }
     /* The previous test does not ensure the sensor presence in case an
      * external pull-up resistor is used. */
@@ -226,7 +226,7 @@ int dht_init(dht_t *dev, const dht_params_t *params)
     }
     else {
         DEBUG("\n[dht] dht_init: presence check duration: %" PRIi16 " ms\n",
-                (int16_t)(POWER_WAIT_TIMEOUT / US_PER_MS) - timeout);
+                (int16_t)(POWER_WAIT_TIMEOUT / US_PER_MS - timeout));
     }
 
     DEBUG_PUTS("[dht] dht_init: success");

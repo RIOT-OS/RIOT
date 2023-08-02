@@ -2,7 +2,7 @@
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
  *               2014 Freie Universität Berlin, Hinnerk van Bruinehsen
  *               2018 RWTH Aachen, Josua Arndt <jarndt@ias.rwth-aachen.de>
- *               2021 Gerson Fernando Budke <nandojve@gmail.com>
+ *               2021-2023 Gerson Fernando Budke <nandojve@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -41,6 +41,7 @@
 #include "cpu_clock.h"
 #include "sched.h"
 #include "thread.h"
+#include "states_internal.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -58,76 +59,6 @@ extern "C"
 /** @} */
 
 /**
- * @name    Flags for the current state of the ATmega MCU
- * @{
- */
-#define AVR8_STATE_FLAG_ISR           (0x80U) /**< In ISR */
-#define AVR8_STATE_FLAG_UART0_TX      (0x01U) /**< TX pending for UART 0 */
-#define AVR8_STATE_FLAG_UART1_TX      (0x02U) /**< TX pending for UART 1 */
-#define AVR8_STATE_FLAG_UART2_TX      (0x04U) /**< TX pending for UART 2 */
-#define AVR8_STATE_FLAG_UART3_TX      (0x08U) /**< TX pending for UART 3 */
-#define AVR8_STATE_FLAG_UART4_TX      (0x10U) /**< TX pending for UART 4 */
-#define AVR8_STATE_FLAG_UART5_TX      (0x20U) /**< TX pending for UART 5 */
-#define AVR8_STATE_FLAG_UART6_TX      (0x40U) /**< TX pending for UART 6 */
-#define AVR8_STATE_FLAG_UART_TX(x)    (0x01U << x) /**< TX pending for UART x */
-/** @} */
-
-/**
- * @brief   Global variable containing the current state of the MCU
- *
- * @note    This variable is updated from IRQ context; access to it should
- *          be wrapped into @ref irq_disable and @ref irq_restore or
- *          @ref avr8_get_state should be used.
- *
- * Contents:
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *   7   6   5   4   3   2   1   0
- * +---+---+---+---+---+---+---+---+
- * |IRQ|TX6|TX5|TX4|TX3|TX2|TX1|TX0|
- * +---+---+---+---+---+---+---+---+
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *
- * | Label  | Description                                                   |
- * |:-------|:--------------------------------------------------------------|
- * | IRQ    | This bit is set when in IRQ context                           |
- * | TX6    | This bit is set when on UART6 TX is pending                   |
- * | TX5    | This bit is set when on UART5 TX is pending                   |
- * | TX4    | This bit is set when on UART4 TX is pending                   |
- * | TX3    | This bit is set when on UART3 TX is pending                   |
- * | TX2    | This bit is set when on UART2 TX is pending                   |
- * | TX1    | This bit is set when on UART1 TX is pending                   |
- * | TX0    | This bit is set when on UART0 TX is pending                   |
- */
-extern uint8_t avr8_state;
-
-/**
- * @brief   Atomically read the state (@ref avr8_state)
- *
- * This function guarantees that the read is not optimized out, not reordered
- * and done atomically. This does not mean that by the time return value is
- * processed that it still reflects the value currently stored in
- * @ref avr8_state.
- *
- * Using ASM rather than C11 atomics has less overhead, as not every access to
- * the state has to be performed atomically: Those done from ISR will not be
- * interrupted (no support for nested interrupts) and barriers at the begin and
- * end of the ISRs make sure the access takes place before IRQ context is left.
- */
-static inline uint8_t avr8_get_state(void)
-{
-    uint8_t state;
-    __asm__ volatile(
-        "lds   %[state], avr8_state       \n\t"
-        : [state]   "=r" (state)
-        :
-        : "memory"
-
-    );
-
-    return state;
-}
-
-/**
  * @brief   Run this code on entering interrupt routines
  */
 static inline void avr8_enter_isr(void)
@@ -136,7 +67,34 @@ static inline void avr8_enter_isr(void)
      * supported as of now. The flag will be unset before the IRQ context is
      * left, so no need to use memory barriers or atomics here
      */
-    avr8_state |= AVR8_STATE_FLAG_ISR;
+    ++avr8_state_irq_count;
+}
+
+/**
+ * @brief        Compute UART TX channel
+ *
+ * @param uart   The UART number
+ */
+#define AVR8_STATE_FLAG_UART_TX(uart)    (0x01U << uart)
+
+/**
+ * @brief        Set UART TX channel as pending
+ *
+ * @param uart   The UART number
+ */
+static inline void avr8_uart_tx_set_pending(unsigned uart)
+{
+    avr8_state_uart |= AVR8_STATE_FLAG_UART_TX(uart);
+}
+
+/**
+ * @brief        Clear UART TX channel pending state
+ *
+ * @param uart   The UART number
+ */
+static inline void avr8_uart_tx_clear_pending(unsigned uart)
+{
+    avr8_state_uart &= ~AVR8_STATE_FLAG_UART_TX(uart);
 }
 
 /**
@@ -147,14 +105,7 @@ static inline void avr8_enter_isr(void)
  */
 static inline int avr8_is_uart_tx_pending(void)
 {
-    uint8_t state = avr8_get_state();
-    return (state & (AVR8_STATE_FLAG_UART0_TX
-                  |  AVR8_STATE_FLAG_UART1_TX
-                  |  AVR8_STATE_FLAG_UART2_TX
-                  |  AVR8_STATE_FLAG_UART3_TX
-                  |  AVR8_STATE_FLAG_UART4_TX
-                  |  AVR8_STATE_FLAG_UART5_TX
-                  |  AVR8_STATE_FLAG_UART6_TX));
+    return avr8_state_uart;
 }
 
 /**

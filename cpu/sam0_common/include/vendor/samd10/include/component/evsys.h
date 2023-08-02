@@ -340,20 +340,20 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint32_t OVR3:1;           /*!< bit:      3  Channel 3 Overrun                  */
     __I uint32_t OVR4:1;           /*!< bit:      4  Channel 4 Overrun                  */
     __I uint32_t OVR5:1;           /*!< bit:      5  Channel 5 Overrun                  */
-    __I uint32_t :2;               /*!< bit:  6.. 7  Reserved                           */
+    uint32_t :2;                   /*!< bit:  6.. 7  Reserved                           */
     __I uint32_t EVD0:1;           /*!< bit:      8  Channel 0 Event Detection          */
     __I uint32_t EVD1:1;           /*!< bit:      9  Channel 1 Event Detection          */
     __I uint32_t EVD2:1;           /*!< bit:     10  Channel 2 Event Detection          */
     __I uint32_t EVD3:1;           /*!< bit:     11  Channel 3 Event Detection          */
     __I uint32_t EVD4:1;           /*!< bit:     12  Channel 4 Event Detection          */
     __I uint32_t EVD5:1;           /*!< bit:     13  Channel 5 Event Detection          */
-    __I uint32_t :18;              /*!< bit: 14..31  Reserved                           */
+    uint32_t :18;                  /*!< bit: 14..31  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   struct {
     __I uint32_t OVR:6;            /*!< bit:  0.. 5  Channel x Overrun                  */
-    __I uint32_t :2;               /*!< bit:  6.. 7  Reserved                           */
+    uint32_t :2;                   /*!< bit:  6.. 7  Reserved                           */
     __I uint32_t EVD:6;            /*!< bit:  8..13  Channel x Event Detection          */
-    __I uint32_t :18;              /*!< bit: 14..31  Reserved                           */
+    uint32_t :18;                  /*!< bit: 14..31  Reserved                           */
   } vec;                       /*!< Structure used for vec  access                  */
   uint32_t reg;                /*!< Type      used for register access              */
 } EVSYS_INTFLAG_Type;

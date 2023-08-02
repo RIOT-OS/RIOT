@@ -59,6 +59,16 @@ struct isr_ctx {
 };
 static struct isr_ctx isr_ctx[GPIOTE_CHAN_NUMOF];
 
+static uint8_t get_portsel(uint32_t conf)
+{
+#ifdef GPIOTE_CONFIG_PORT_Msk
+    return (conf & GPIOTE_CONFIG_PORT_Msk) >> GPIOTE_CONFIG_PORT_Pos;
+#else
+    (void)conf;
+    return 0;
+#endif
+}
+
 /**
  * @brief   get the GPIOTE channel used to monitor the given pin
  *
@@ -74,14 +84,8 @@ static unsigned get_channel_of_pin(uint8_t port_num, uint8_t pin)
         uint32_t mode = (conf & GPIOTE_CONFIG_MODE_Msk) >> GPIOTE_CONFIG_MODE_Pos;
         if (mode == GPIOTE_CONFIG_MODE_Event) {
             uint8_t pinsel = (conf & GPIOTE_CONFIG_PSEL_Msk) >> GPIOTE_CONFIG_PSEL_Pos;
-#ifdef GPIOTE_CONFIG_PORT_Msk
-            uint8_t portsel = (conf & GPIOTE_CONFIG_PORT_Msk) >> GPIOTE_CONFIG_PORT_Pos;
-#endif
-            if ((pinsel == pin)
-#ifdef GPIOTE_CONFIG_PORT_Msk
-                && (portsel == port_num)
-#endif
-                ) {
+            uint8_t portsel = get_portsel(conf);
+            if ((pinsel == pin) && (portsel == port_num)) {
                 return i;
             }
         }

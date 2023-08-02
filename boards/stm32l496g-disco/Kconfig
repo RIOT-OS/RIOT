@@ -17,6 +17,9 @@ config BOARD_STM32L496G_DISCO
     select HAS_PERIPH_ADC
     select HAS_PERIPH_DAC
     select HAS_PERIPH_DMA
+    select HAS_PERIPH_FMC
+    select HAS_PERIPH_FMC_NOR_SRAM
+    select HAS_PERIPH_FMC_16BIT
     select HAS_PERIPH_I2C
     select HAS_PERIPH_LPUART
     select HAS_PERIPH_RTC

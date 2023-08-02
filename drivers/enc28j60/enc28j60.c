@@ -431,8 +431,6 @@ static int nd_init(netdev_t *netdev)
     cmd_w_phy(dev, REG_PHY_PHIE, PHIE_PLNKIE | PHIE_PGEIE);
 
     /* Finishing touches */
-    /* enable hardware flow control */
-    cmd_wcr(dev, REG_B3_EFLOCON, 3, EFLOCON_FULDPXS | EFLOCON_FCEN1);
     /* enable auto-inc of read and write pointers for the RBM/WBM commands */
     cmd_bfs(dev, REG_ECON2, -1, ECON2_AUTOINC);
     /* enable receive, link and tx interrupts */

@@ -159,35 +159,35 @@ though it **can vary** from board to board.
 
 Device                  |Signal| Pin    | Symbol      | Remarks
 :-----------------------|:----:|:-------|:-----------:|:---------------------------
-`SPI_HOST0`/`SPI_HOST1` | SCK  | GPIO6  |- | reserved for flash and PSRAM
-`SPI_HOST0`/`SPI_HOST1` | CMD  | GPIO11 |- | reserved for flash and PSRAM
-`SPI_HOST0`/`SPI_HOST1` | SD0  | GPIO7  |- | reserved for flash and PSRAM
-`SPI_HOST0`/`SPI_HOST1` | SD1  | GPIO8  |- | reserved for flash and PSRAM
-`SPI_HOST0`/`SPI_HOST1` | SD2  | GPIO9  |- | reserved for flash and PSRAM (only in `qio` or `qout` mode)
-`SPI_HOST0`/`SPI_HOST1` | SD3  | GPIO10 |- | reserved for flash and PSRAM (only in `qio` or `qout` mode)
-`SPI_HOST2` (`HSPI`)    | SCK  | GPIO14 |`#SPI1_SCK`  | can be used
-`SPI_HOST2` (`HSPI`)    | MISO | GPIO12 |`#SPI1_MISO` | can be used
-`SPI_HOST2` (`HSPI`)    | MOSI | GPIO13 |`#SPI1_MOSI` | can be used
-`SPI_HOST2` (`HSPI`)    | CS0  | GPIO15 |`#SPI1_CS0`  | can be used
-`SPI_HOST3` (`VSPI`)    | SCK  | GPIO18 |`#SPI0_SCK`  | can be used
-`SPI_HOST3` (`VSPI`)    | MISO | GPIO19 |`#SPI0_MISO` | can be used
-`SPI_HOST3` (`VSPI`)    | MOSI | GPIO23 |`#SPI0_MOSI` | can be used
-`SPI_HOST3` (`VSPI`)    | CS0  | GPIO5  |`#SPI0_CS0`  | can be used
+`SPI0_HOST`/`SPI1_HOST` | SCK  | GPIO6  |- | reserved for flash and PSRAM
+`SPI0_HOST`/`SPI1_HOST` | CMD  | GPIO11 |- | reserved for flash and PSRAM
+`SPI0_HOST`/`SPI1_HOST` | SD0  | GPIO7  |- | reserved for flash and PSRAM
+`SPI0_HOST`/`SPI1_HOST` | SD1  | GPIO8  |- | reserved for flash and PSRAM
+`SPI0_HOST`/`SPI1_HOST` | SD2  | GPIO9  |- | reserved for flash and PSRAM (only in `qio` or `qout` mode)
+`SPI0_HOST`/`SPI1_HOST` | SD3  | GPIO10 |- | reserved for flash and PSRAM (only in `qio` or `qout` mode)
+`SPI2_HOST` (`HSPI`)    | SCK  | GPIO14 |`#SPI1_SCK`  | can be used
+`SPI2_HOST` (`HSPI`)    | MISO | GPIO12 |`#SPI1_MISO` | can be used
+`SPI2_HOST` (`HSPI`)    | MOSI | GPIO13 |`#SPI1_MOSI` | can be used
+`SPI2_HOST` (`HSPI`)    | CS0  | GPIO15 |`#SPI1_CS0`  | can be used
+`SPI3_HOST` (`VSPI`)    | SCK  | GPIO18 |`#SPI0_SCK`  | can be used
+`SPI3_HOST` (`VSPI`)    | MISO | GPIO19 |`#SPI0_MISO` | can be used
+`SPI3_HOST` (`VSPI`)    | MOSI | GPIO23 |`#SPI0_MOSI` | can be used
+`SPI3_HOST` (`VSPI`)    | CS0  | GPIO5  |`#SPI0_CS0`  | can be used
 
 </center><br>
 
-Some boards use the `HSPI` (`SPI_HOST2`) as SD-Card interface (SDIO) in 4-bit SD mode.
+Some boards use the `HSPI` (`SPI2_HOST`) as SD-Card interface (SDIO) in 4-bit SD mode.
 
 <center>
 
 Device                | Pin    | SD 4-bit mode | SPI mode
 :---------------------|:------:|:-------------:|:----------:
-`SPI_HOST2` (`HSPI`)  | GPIO14 | CLK           | SCK
-`SPI_HOST2` (`HSPI`)  | GPIO15 | CMD           | CS0
-`SPI_HOST2` (`HSPI`)  | GPIO2  | DAT0          | MISO
-`SPI_HOST2` (`HSPI`)  | GPIO4  | DAT1          | -
-`SPI_HOST2` (`HSPI`)  | GPIO12 | DAT2          | -
-`SPI_HOST2` (`HSPI`)  | GPIO13 | DAT3          | MOSI
+`SPI2_HOST` (`HSPI`)  | GPIO14 | CLK           | SCK
+`SPI2_HOST` (`HSPI`)  | GPIO15 | CMD           | CS0
+`SPI2_HOST` (`HSPI`)  | GPIO2  | DAT0          | MISO
+`SPI2_HOST` (`HSPI`)  | GPIO4  | DAT1          | -
+`SPI2_HOST` (`HSPI`)  | GPIO12 | DAT2          | -
+`SPI2_HOST` (`HSPI`)  | GPIO13 | DAT3          | MOSI
 
 </center><br>
 

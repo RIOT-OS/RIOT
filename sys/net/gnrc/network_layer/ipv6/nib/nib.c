@@ -141,9 +141,7 @@ void gnrc_ipv6_nib_iface_up(gnrc_netif_t *netif)
     gnrc_netif_acquire(netif);
 
     _init_iface_arsm(netif);
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     netif->ipv6.rs_sent = 0;
-#endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
     netif->ipv6.na_sent = 0;
     _auto_configure_addr(netif, &ipv6_addr_link_local_prefix, 64U);
     if (_should_search_rtr(netif)) {

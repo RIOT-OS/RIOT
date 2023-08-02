@@ -996,7 +996,7 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint32_t TRG:1;            /*!< bit:      1  Retrigger                          */
     __I uint32_t CNT:1;            /*!< bit:      2  Counter                            */
     __I uint32_t ERR:1;            /*!< bit:      3  Error                              */
-    __I uint32_t :6;               /*!< bit:  4.. 9  Reserved                           */
+    uint32_t :6;                   /*!< bit:  4.. 9  Reserved                           */
     __I uint32_t UFS:1;            /*!< bit:     10  Non-Recoverable Update Fault       */
     __I uint32_t DFS:1;            /*!< bit:     11  Non-Recoverable Debug Fault        */
     __I uint32_t FAULTA:1;         /*!< bit:     12  Recoverable Fault A                */
@@ -1009,12 +1009,12 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint32_t MC3:1;            /*!< bit:     19  Match or Capture 3                 */
     __I uint32_t MC4:1;            /*!< bit:     20  Match or Capture 4                 */
     __I uint32_t MC5:1;            /*!< bit:     21  Match or Capture 5                 */
-    __I uint32_t :10;              /*!< bit: 22..31  Reserved                           */
+    uint32_t :10;                  /*!< bit: 22..31  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   struct {
-    __I uint32_t :16;              /*!< bit:  0..15  Reserved                           */
+    uint32_t :16;                  /*!< bit:  0..15  Reserved                           */
     __I uint32_t MC:6;             /*!< bit: 16..21  Match or Capture x                 */
-    __I uint32_t :10;              /*!< bit: 22..31  Reserved                           */
+    uint32_t :10;                  /*!< bit: 22..31  Reserved                           */
   } vec;                       /*!< Structure used for vec  access                  */
   uint32_t reg;                /*!< Type      used for register access              */
 } TCC_INTFLAG_Type;

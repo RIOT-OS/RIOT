@@ -232,6 +232,107 @@ static const spi_conf_t spi_config[] = {
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
+/**
+ * @name    FMC configuration
+ * @{
+ */
+
+/**
+ * @brief   FMC controller configuration
+ */
+static const fmc_conf_t fmc_config = {
+    .bus = AHB3,
+    .rcc_mask = RCC_AHB3ENR_FMCEN,
+#if MODULE_PERIPH_FMC_NOR_SRAM
+    .ne1_pin = { .pin = GPIO_PIN(PORT_D, 7), .af = GPIO_AF12, }, /* PSRAM_NE1 signal, subbank 1 */
+    .ne2_pin = { .pin = GPIO_PIN(PORT_G, 9), .af = GPIO_AF12, }, /* LCD_NE signal, subbank 2 */
+    .noe_pin = { .pin = GPIO_PIN(PORT_D, 4), .af = GPIO_AF12, }, /* LCD_PSRAM_NOE */
+    .nwe_pin = { .pin = GPIO_PIN(PORT_D, 5), .af = GPIO_AF12, }, /* LCD_PSRAM_NWE signal */
+    .addr = {
+        { .pin = GPIO_PIN(PORT_F, 0), .af = GPIO_AF12, },  /* PSRAM_A0 / LCD_RS signal */
+        { .pin = GPIO_PIN(PORT_F, 1), .af = GPIO_AF12, },  /* PSRAM_A1 signal */
+        { .pin = GPIO_PIN(PORT_F, 2), .af = GPIO_AF12, },  /* PSRAM_A2 signal */
+        { .pin = GPIO_PIN(PORT_F, 3), .af = GPIO_AF12, },  /* PSRAM_A3 signal */
+        { .pin = GPIO_PIN(PORT_F, 4), .af = GPIO_AF12, },  /* PSRAM_A4 signal */
+        { .pin = GPIO_PIN(PORT_F, 5), .af = GPIO_AF12, },  /* PSRAM_A5 signal */
+        { .pin = GPIO_PIN(PORT_F, 12), .af = GPIO_AF12, }, /* PSRAM_A6 signal */
+        { .pin = GPIO_PIN(PORT_F, 13), .af = GPIO_AF12, }, /* PSRAM_A7 signal */
+        { .pin = GPIO_PIN(PORT_F, 14), .af = GPIO_AF12, }, /* PSRAM_A8 signal */
+        { .pin = GPIO_PIN(PORT_F, 15), .af = GPIO_AF12, }, /* PSRAM_A9 signal */
+        { .pin = GPIO_PIN(PORT_G, 0), .af = GPIO_AF12, },  /* PSRAM_A10 signal */
+        { .pin = GPIO_PIN(PORT_G, 1), .af = GPIO_AF12, },  /* PSRAM_A11 signal */
+        { .pin = GPIO_PIN(PORT_G, 2), .af = GPIO_AF12, },  /* PSRAM_A12 signal */
+        { .pin = GPIO_PIN(PORT_G, 3), .af = GPIO_AF12, },  /* PSRAM_A13 signal */
+        { .pin = GPIO_PIN(PORT_G, 4), .af = GPIO_AF12, },  /* PSRAM_A14 signal */
+        { .pin = GPIO_PIN(PORT_G, 5), .af = GPIO_AF12, },  /* PSRAM_A15 signal */
+        { .pin = GPIO_PIN(PORT_D, 11), .af = GPIO_AF12, }, /* PSRAM_A16 signal */
+        { .pin = GPIO_PIN(PORT_D, 12), .af = GPIO_AF12, }, /* PSRAM_A17 signal */
+    },
+#endif
+    .data = {
+        { .pin = GPIO_PIN(PORT_D, 14), .af = GPIO_AF12, }, /* LCD_PSRAM_D0 signal */
+        { .pin = GPIO_PIN(PORT_D, 15), .af = GPIO_AF12, }, /* LCD_PSRAM_D1 signal */
+        { .pin = GPIO_PIN(PORT_D, 0), .af = GPIO_AF12, },  /* LCD_PSRAM_D2 signal */
+        { .pin = GPIO_PIN(PORT_D, 1), .af = GPIO_AF12, },  /* LCD_PSRAM_D3 signal */
+        { .pin = GPIO_PIN(PORT_E, 7), .af = GPIO_AF12, },  /* LCD_PSRAM_D4 signal */
+        { .pin = GPIO_PIN(PORT_E, 8), .af = GPIO_AF12, },  /* LCD_PSRAM_D5 signal */
+        { .pin = GPIO_PIN(PORT_E, 9), .af = GPIO_AF12, },  /* LCD_PSRAM_D6 signal */
+        { .pin = GPIO_PIN(PORT_E, 10), .af = GPIO_AF12, }, /* LCD_PSRAM_D7 signal */
+#if MODULE_PERIPH_FMC_16BIT
+        { .pin = GPIO_PIN(PORT_E, 11), .af = GPIO_AF12, }, /* LCD_PSRAM_D8 signal */
+        { .pin = GPIO_PIN(PORT_E, 12), .af = GPIO_AF12, }, /* LCD_PSRAM_D9 signal */
+        { .pin = GPIO_PIN(PORT_E, 13), .af = GPIO_AF12, }, /* LCD_PSRAM_D10 signal */
+        { .pin = GPIO_PIN(PORT_E, 14), .af = GPIO_AF12, }, /* LCD_PSRAM_D11 signal */
+        { .pin = GPIO_PIN(PORT_E, 15), .af = GPIO_AF12, }, /* LCD_PSRAM_D12 signal */
+        { .pin = GPIO_PIN(PORT_D, 8), .af = GPIO_AF12, },  /* LCD_PSRAM_D13 signal */
+        { .pin = GPIO_PIN(PORT_D, 9), .af = GPIO_AF12, },  /* LCD_PSRAM_D14 signal */
+        { .pin = GPIO_PIN(PORT_D, 10), .af = GPIO_AF12, }, /* LCD_PSRAM_D15 signal */
+#endif
+    },
+    .nbl0_pin = { .pin = GPIO_PIN(PORT_E, 0), .af = GPIO_AF12, }, /* PSRAM_NBL0 signal (LB) */
+    .nbl1_pin = { .pin = GPIO_PIN(PORT_E, 1), .af = GPIO_AF12, }, /* PSRAM_NBL1 signal (UB) */
+};
+
+/**
+ * @brief   FMC Bank configuration
+ *
+ * The board has a PSRAM IS66WV51216EBLL-55BLI with  MBit on-board.
+ * It is organized in 512K x 16 bits and connected to bank 1, subbank 1
+ * at address 0x60000000.
+ *
+ * @note A18 of the PSRAM is not used. Therefore, only 256K x 16 bits
+ *       (512 kByte) of the 1 MByte PSRAM can be used.
+ *
+ * The LCD display of the board is connected to bank 1, subbank2
+ * at address 0x64000000.
+ */
+static const fmc_bank_conf_t fmc_bank_config[] = {
+    /* bank 1, subbank 1 is used for PSRAM with asynchronuous
+     * access in Mode 1, i.e. write timings are not used */
+    {
+        .bank = FMC_BANK_1,
+        .mem_type = FMC_SRAM,
+        .data_width = FMC_BUS_WIDTH_16BIT,
+        .address = 0x60000000,  /* Bank 1, subbank 1 is mapped to 0x60000000 */
+        .size = KiB(512),       /* Size in byte, 256K x 16 bit */
+        .nor_sram = {
+            .sub_bank = 1,
+            .ext_mode = false,                      /* Mode 1 used, no separate w_timing */
+                                                    /* timings for IS66WV51216EBLL-55BLI
+                                                       @216 MHz AHB clock */
+            .r_timing = {  .addr_setup = 13,        /* t_AA = max 60 ns (13 HCLKs a 4.63 ns) */
+                           .data_setup = 6,         /* t_SD = min 25 ns (6 HCLKs a 4.63 ns) */
+                           .bus_turnaround = 3, },  /* 3 HCLKs a 4.63 ns */
+        },
+    },
+};
+
+/**
+ * @brief   Number of configured FMC banks
+ */
+#define FMC_BANK_NUMOF  ARRAY_SIZE(fmc_bank_config)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

@@ -98,7 +98,13 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
         return -EBADMSG;
     }
 
-    if (coap_get_token_len(pkt) > COAP_TOKEN_LENGTH_MAX) {
+    if (IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
+        if ((pkt->hdr->ver_t_tkl & 0xf) == 15) {
+            DEBUG("nanocoap: token length is reserved value 15,"
+                  "invalid for extended token length field.\n");
+            return -EBADMSG;
+        }
+    } else if (coap_get_token_len(pkt) > COAP_TOKEN_LENGTH_MAX) {
         DEBUG("nanocoap: token length invalid\n");
         return -EBADMSG;
     }
@@ -586,18 +592,39 @@ ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, uint8_t *token,
                        size_t token_len, unsigned code, uint16_t id)
 {
     assert(!(type & ~0x3));
-    assert(!(token_len & ~0x1f));
+
+    uint16_t tkl_ext;
+    uint8_t tkl_ext_len, tkl;
+
+    if (token_len > 268 && IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
+        tkl_ext_len = 2;
+        tkl_ext = htons(token_len - 269); /* 269 = 255 + 14 */
+        tkl = 14;
+    }
+    else if (token_len > 12 && IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
+        tkl_ext_len = 1;
+        tkl_ext = token_len - 13;
+        tkl = 13;
+    }
+    else {
+        tkl = token_len;
+        tkl_ext_len = 0;
+    }
 
     memset(hdr, 0, sizeof(coap_hdr_t));
-    hdr->ver_t_tkl = (COAP_V1 << 6) | (type << 4) | token_len;
+    hdr->ver_t_tkl = (COAP_V1 << 6) | (type << 4) | tkl;
     hdr->code = code;
     hdr->id = htons(id);
+
+    if (tkl_ext_len) {
+        memcpy(hdr + 1, &tkl_ext, tkl_ext_len);
+    }
 
     if (token_len) {
         memcpy(coap_hdr_data_ptr(hdr), token, token_len);
     }
 
-    return sizeof(coap_hdr_t) + token_len;
+    return sizeof(coap_hdr_t) + token_len + tkl_ext_len;
 }
 
 void coap_pkt_init(coap_pkt_t *pkt, uint8_t *buf, size_t len, size_t header_len)

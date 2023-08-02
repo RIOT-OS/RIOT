@@ -110,7 +110,7 @@ void __attribute__((weak)) avr8_clk_init(void)
  * create a catch-all for undefined but used ISRs for debugging
  * purposes.
  */
-ISR(BADISR_vect)
+ISR(BADISR_vect, ISR_NAKED)
 {
     avr8_reset_cause();
 

@@ -123,18 +123,6 @@ extern "C" {
 #endif
 /** @} */
 
-/**
- * @name    Configuration parameters for the W5100 driver
- * @{
- */
-#ifndef W5100_PARAM_CS
-#define W5100_PARAM_CS          (ARDUINO_PIN_10)
-#endif
-#ifndef W5100_PARAM_EVT
-#define W5100_PARAM_EVT         (ARDUINO_PIN_2)
-#endif
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif

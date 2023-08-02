@@ -117,6 +117,8 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
     case NETOPT_LINK:
         m_dsme.initialize(_pan_coord);
         m_dsme.start();
+        assert(*(netopt_enable_t *)opt->data == NETOPT_ENABLE);
+        res = sizeof(netopt_enable_t);
         break;
     case NETOPT_PAN_COORD:
         if (*((bool *)opt->data) == true) {

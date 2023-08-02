@@ -9,6 +9,7 @@ include $(RIOTBASE)/pkg/pkg.mk
 CFLAGS += -Wno-pedantic
 CFLAGS += -Wno-cast-align
 CFLAGS += -Wno-unused
+CFLAGS += -Wno-unused-parameter
 CFLAGS += -Wno-format
 
 .PHONY: flashdb_fal

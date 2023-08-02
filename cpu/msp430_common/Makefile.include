@@ -1,6 +1,0 @@
-INCLUDES += -I$(RIOTCPU)/msp430_common/include/
-
-CFLAGS += -DCPU_MODEL_$(call uppercase_and_underscore,$(CPU_MODEL))
-
-# include the msp430 common Makefile
-include $(RIOTMAKE)/arch/msp430.inc.mk

@@ -42,6 +42,18 @@
 #define NRF_WDT_HALT_MODE (WDT_CONFIG_HALT_Run)
 #endif
 
+/* Compatibility wrapper for nRF53/nRF9160 */
+#ifdef NRF_WDT0_S
+#define NRF_WDT NRF_WDT0_S
+#elif defined(NRF_WDT_S)
+#define NRF_WDT NRF_WDT_S
+#endif
+
+/* Wrapper around vendor files inconsistency */
+#ifdef WDT_RUNSTATUS_RUNSTATUSWDT_Running
+#define WDT_RUNSTATUS_RUNSTATUS_Running WDT_RUNSTATUS_RUNSTATUSWDT_Running
+#endif
+
 #ifdef MODULE_PERIPH_WDT_CB
 static wdt_cb_t wdt_cb;
 static void *wdt_arg;

@@ -14,6 +14,9 @@ config BOARD_STM32F723E_DISCO
     select CPU_MODEL_STM32F723IE
 
     # Put defined MCU peripherals here (in alphabetical order)
+    select HAS_PERIPH_FMC
+    select HAS_PERIPH_FMC_16BIT
+    select HAS_PERIPH_FMC_NOR_SRAM
     select HAS_PERIPH_I2C
     select HAS_PERIPH_RTC
     select HAS_PERIPH_RTT

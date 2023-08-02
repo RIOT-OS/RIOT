@@ -167,6 +167,8 @@ UART_DEV(0) RxD | GPIO44 | Console (configuration is fixed) | \ref esp32_uart_in
 </center>
 \n
 
+@note The RGB-LED is connected to GPIO38 on ESP32-S3-DevKitC-1 revision 1.1 boards.
+
 For detailed information about the peripheral configurations of ESP32-S3
 boards, see section \ref esp32_peripherals "Common Peripherals".
 

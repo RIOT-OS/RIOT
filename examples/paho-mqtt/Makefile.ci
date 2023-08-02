@@ -8,6 +8,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega1284p \
     atmega328p \
     atmega328p-xplained-mini \
+    atmega8 \
     atxmega-a3bu-xplained \
     blackpill-stm32f103c8 \
     blackpill-stm32f103cb \

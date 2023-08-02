@@ -43,6 +43,10 @@
 #define NRF_P0 NRF_P0_S
 #endif
 
+#ifdef NRF_P1_S
+#define NRF_P1 NRF_P1_S
+#endif
+
 #ifdef NRF_GPIOTE0_S
 #define NRF_GPIOTE NRF_GPIOTE0_S
 #define GPIOTE_IRQn GPIOTE0_IRQn
@@ -227,7 +231,7 @@ void gpio_irq_disable(gpio_t pin)
     }
 }
 
-void isr_gpiote(void)
+void ISR_GPIOTE(void)
 {
     for (unsigned int i = 0; i < _gpiote_next_index; ++i) {
         if (NRF_GPIOTE->EVENTS_IN[i] == 1) {

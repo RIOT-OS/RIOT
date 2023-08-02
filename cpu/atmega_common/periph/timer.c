@@ -1,5 +1,7 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
+ *               2023 Hugues Larrive
+ *               2023 Gerson Fernando Budke
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,6 +18,8 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
+ * @author      Gerson Fernando Budke <nandojve@gmail.com>
  *
  * @}
  */
@@ -134,7 +138,9 @@ int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
     /* stop and reset timer */
     ctx[tim].dev->CRA = 0;
     ctx[tim].dev->CRB = 0;
+#ifdef TCCR1C
     ctx[tim].dev->CRC = 0;
+#endif
     ctx[tim].dev->CNT = 0;
 
     /* save interrupt context and timer mode */
@@ -158,10 +164,17 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
     unsigned state = irq_disable();
 
     ctx[tim].dev->OCR[channel] = (uint16_t)value;
+#if defined(OCF1A) && defined(OCF1B) && (OCF1A < OCF1B)
     /* clear spurious IRQs, if any */
-    *ctx[tim].flag = (1 << (channel + OCF1A));
+    *ctx[tim].flag = (1 << (OCF1A + channel));
     /* unmask IRQ */
-    *ctx[tim].mask |= (1 << (channel + OCIE1A));
+    *ctx[tim].mask |= (1 << (OCIE1A + channel));
+#elif defined(OCF1A) && defined(OCF1B) && (OCF1A > OCF1B)
+    /* clear spurious IRQs, if any */
+    *ctx[tim].flag = (1 << (OCF1A - channel));
+    /* unmask IRQ */
+    *ctx[tim].mask |= (1 << (OCIE1A - channel));
+#endif
     set_oneshot(tim, channel);
 
     irq_restore(state);
@@ -179,17 +192,28 @@ int timer_set(tim_t tim, int channel, unsigned int timeout)
     unsigned absolute = ctx[tim].dev->CNT + timeout;
 
     ctx[tim].dev->OCR[channel] = absolute;
+#if defined(OCF1A) && defined(OCF1B) && (OCF1A < OCF1B)
     /* clear spurious IRQs, if any */
-    *ctx[tim].flag = (1 << (channel + OCF1A));
+    *ctx[tim].flag = (1 << (OCF1A + channel));
     /* unmask IRQ */
-    *ctx[tim].mask |= (1 << (channel + OCIE1A));
+    *ctx[tim].mask |= (1 << (OCIE1A + channel));
+#elif defined(OCF1A) && defined(OCF1B) && (OCF1A > OCF1B)
+    /* clear spurious IRQs, if any */
+    *ctx[tim].flag = (1 << (OCF1A - channel));
+    /* unmask IRQ */
+    *ctx[tim].mask |= (1 << (OCIE1A - channel));
+#endif
     set_oneshot(tim, channel);
 
     if ((absolute - ctx[tim].dev->CNT) > timeout) {
         /* Timer already expired. Trigger the interrupt now and loop until it
          * is triggered.
          */
+#if defined(OCF1A) && defined(OCF1B) && (OCF1A < OCF1B)
         while (!(*ctx[tim].flag & (1 << (OCF1A + channel)))) {
+#elif defined(OCF1A) && defined(OCF1B) && (OCF1A > OCF1B)
+        while (!(*ctx[tim].flag & (1 << (OCF1A - channel)))) {
+#endif
             ctx[tim].dev->OCR[channel] = ctx[tim].dev->CNT;
         }
     }
@@ -215,10 +239,17 @@ int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags
 
     ctx[tim].dev->OCR[channel] = (uint16_t)value;
 
+#if defined(OCF1A) && defined(OCF1B) && (OCF1A < OCF1B)
     /* clear spurious IRQs, if any */
-    *ctx[tim].flag = (1 << (channel + OCF1A));
+    *ctx[tim].flag = (1 << (OCF1A + channel));
     /* unmask IRQ */
-    *ctx[tim].mask |=  (1 << (channel + OCIE1A));
+    *ctx[tim].mask |= (1 << (OCIE1A + channel));
+#elif defined(OCF1A) && defined(OCF1B) && (OCF1A > OCF1B)
+    /* clear spurious IRQs, if any */
+    *ctx[tim].flag = (1 << (OCF1A - channel));
+    /* unmask IRQ */
+    *ctx[tim].mask |= (1 << (OCIE1A - channel));
+#endif
 
     clear_oneshot(tim, channel);
 
@@ -253,7 +284,11 @@ int timer_clear(tim_t tim, int channel)
         return -1;
     }
 
-    *ctx[tim].mask &= ~(1 << (channel + OCIE1A));
+#if defined(OCIE1A) && defined(OCIE1B) && (OCIE1A < OCIE1B)
+    *ctx[tim].mask &= ~(1 << (OCIE1A + channel));
+#elif defined(OCIE1A) && defined(OCIE1B) && (OCIE1A > OCIE1B)
+    *ctx[tim].mask &= ~(1 << (OCIE1A - channel));
+#endif
 
     return 0;
 }
@@ -290,89 +325,41 @@ static inline void _isr(tim_t tim, int chan)
     DEBUG_TIMER_PORT |= (1 << DEBUG_TIMER_PIN);
 #endif
 
-    avr8_enter_isr();
-
     if (is_oneshot(tim, chan)) {
-        *ctx[tim].mask &= ~(1 << (chan + OCIE1A));
+        timer_clear(tim, chan);
     }
     ctx[tim].cb(ctx[tim].arg, chan);
 
 #if defined(DEBUG_TIMER_PORT)
     DEBUG_TIMER_PORT &= ~(1 << DEBUG_TIMER_PIN);
 #endif
-
-    avr8_exit_isr();
 }
 #endif
 
 #ifdef TIMER_0
-ISR(TIMER_0_ISRA, ISR_BLOCK)
-{
-    _isr(0, 0);
-}
-
-ISR(TIMER_0_ISRB, ISR_BLOCK)
-{
-    _isr(0, 1);
-}
-
+AVR8_ISR(TIMER_0_ISRA, _isr, 0, 0);
+AVR8_ISR(TIMER_0_ISRB, _isr, 0, 1);
 #ifdef TIMER_0_ISRC
-ISR(TIMER_0_ISRC, ISR_BLOCK)
-{
-    _isr(0, 2);
-}
+AVR8_ISR(TIMER_0_ISRC, _isr, 0, 2);
 #endif  /* TIMER_0_ISRC */
 #endif  /* TIMER_0 */
 
 #ifdef TIMER_1
-ISR(TIMER_1_ISRA, ISR_BLOCK)
-{
-    _isr(1, 0);
-}
-
-ISR(TIMER_1_ISRB, ISR_BLOCK)
-{
-    _isr(1, 1);
-}
-
+AVR8_ISR(TIMER_1_ISRA, _isr, 1, 0);
+AVR8_ISR(TIMER_1_ISRB, _isr, 1, 1);
 #ifdef TIMER_1_ISRC
-ISR(TIMER_1_ISRC, ISR_BLOCK)
-{
-    _isr(1, 2);
-}
-#endif  /* TIMER_1_ISRC */
+AVR8_ISR(TIMER_1_ISRC, _isr, 1, 2);
+#endif  /* TIMER_0_ISRC */
 #endif  /* TIMER_1 */
 
 #ifdef TIMER_2
-ISR(TIMER_2_ISRA, ISR_BLOCK)
-{
-    _isr(2, 0);
-}
-
-ISR(TIMER_2_ISRB, ISR_BLOCK)
-{
-    _isr(2, 1);
-}
-
-ISR(TIMER_2_ISRC, ISR_BLOCK)
-{
-    _isr(2, 2);
-}
+AVR8_ISR(TIMER_2_ISRA, _isr, 2, 0);
+AVR8_ISR(TIMER_2_ISRB, _isr, 2, 1);
+AVR8_ISR(TIMER_2_ISRC, _isr, 2, 2);
 #endif /* TIMER_2 */
 
 #ifdef TIMER_3
-ISR(TIMER_3_ISRA, ISR_BLOCK)
-{
-    _isr(2, 0);
-}
-
-ISR(TIMER_3_ISRB, ISR_BLOCK)
-{
-    _isr(2, 1);
-}
-
-ISR(TIMER_3_ISRC, ISR_BLOCK)
-{
-    _isr(2, 2);
-}
+AVR8_ISR(TIMER_3_ISRA, _isr, 3, 0);
+AVR8_ISR(TIMER_3_ISRB, _isr, 3, 1);
+AVR8_ISR(TIMER_3_ISRC, _isr, 3, 2);
 #endif /* TIMER_3 */

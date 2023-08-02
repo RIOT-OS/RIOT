@@ -60,7 +60,7 @@
 #define NUM_HEAPS 1
 #endif
 
-#ifdef MODULE_MSP430_COMMON
+#ifdef __MSP430__
 /* the msp430 linker scripts define the end of all memory as __stack, which in
  * turn is used as the initial stack. RIOT also uses __stack as SP on isr
  * entry.  This logic makes __stack - ISR_STACKSIZE the heap end.
@@ -70,7 +70,7 @@ extern char __heap_start__;
 #define _sheap __heap_start__
 #define __eheap (char *)((uintptr_t)&__stack - ISR_STACKSIZE)
 
-#else /* MODULE_MSP430_COMMON */
+#else /* __MSP430__ */
 
 /**
  * @brief manage the heap

@@ -1,4 +1,5 @@
 USEMODULE += nrf9160_vectors
+USEMODULE += nrf_shared_serial_irq
 
 ifneq (,$(filter periph_spi,$(USEMODULE)))
   USEMODULE += periph_spi_gpio_mode

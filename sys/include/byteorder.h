@@ -397,15 +397,7 @@ static inline unsigned short __builtin_bswap16(unsigned short a)
 
 static inline uint16_t byteorder_swaps(uint16_t v)
 {
-#ifndef MODULE_MSP430_COMMON
     return __builtin_bswap16(v);
-#else
-    network_uint16_t result = { v };
-    uint8_t tmp = result.u8[0];
-    result.u8[0] = result.u8[1];
-    result.u8[1] = tmp;
-    return result.u16;
-#endif
 }
 
 static inline uint32_t byteorder_swapl(uint32_t v)

@@ -229,15 +229,15 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
   struct {
     __I uint8_t  COMP0:1;          /*!< bit:      0  Comparator 0                       */
     __I uint8_t  COMP1:1;          /*!< bit:      1  Comparator 1                       */
-    __I uint8_t  :2;               /*!< bit:  2.. 3  Reserved                           */
+    uint8_t  :2;                   /*!< bit:  2.. 3  Reserved                           */
     __I uint8_t  WIN0:1;           /*!< bit:      4  Window 0                           */
-    __I uint8_t  :3;               /*!< bit:  5.. 7  Reserved                           */
+    uint8_t  :3;                   /*!< bit:  5.. 7  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   struct {
     __I uint8_t  COMP:2;           /*!< bit:  0.. 1  Comparator x                       */
-    __I uint8_t  :2;               /*!< bit:  2.. 3  Reserved                           */
+    uint8_t  :2;                   /*!< bit:  2.. 3  Reserved                           */
     __I uint8_t  WIN:1;            /*!< bit:      4  Window x                           */
-    __I uint8_t  :3;               /*!< bit:  5.. 7  Reserved                           */
+    uint8_t  :3;                   /*!< bit:  5.. 7  Reserved                           */
   } vec;                       /*!< Structure used for vec  access                  */
   uint8_t reg;                 /*!< Type      used for register access              */
 } AC_INTFLAG_Type;

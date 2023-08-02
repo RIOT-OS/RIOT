@@ -1,0 +1,37 @@
+From 2e628f78bb4f0791728d0dc4e6f1bfc7cfd0d19c Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Sat, 20 May 2023 21:46:52 +0200
+Subject: [PATCH] csrc: drop dead code
+
+The variable y is declared and its value is computed, but never used.
+Hence, drop the variable and computation altogether.
+---
+ csrc/u8x8_d_s1d15e06.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/csrc/u8x8_d_s1d15e06.c b/csrc/u8x8_d_s1d15e06.c
+index a8f2b29..3ddc552 100644
+--- a/csrc/u8x8_d_s1d15e06.c
++++ b/csrc/u8x8_d_s1d15e06.c
+@@ -67,7 +67,7 @@ static const uint8_t u8x8_d_s1d15e06_flip1_seq[] = {
+ 
+ uint8_t u8x8_d_s1d15e06_common(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
+ {
+-  uint8_t x, y, c;
++  uint8_t x, c;
+   uint8_t *ptr;
+   switch(msg)
+   {
+@@ -80,9 +80,6 @@ uint8_t u8x8_d_s1d15e06_common(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void
+ 	  u8x8_cad_SendCmd(u8x8, 0xB1);	//Page Address - Row
+ 	  u8x8_cad_SendArg(u8x8, (((u8x8_tile_t *)arg_ptr)->y_pos));
+ 
+-      y = ((u8x8_tile_t *)arg_ptr)->y_pos;
+-      y += u8x8->x_offset;
+-
+       u8x8_cad_SendCmd(u8x8, 0x13);	/* col */
+       u8x8_cad_SendArg(u8x8, x);
+ 
+-- 
+2.40.1
+

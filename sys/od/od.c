@@ -28,7 +28,7 @@ void od_hex_dump_ext(const void *data, size_t data_len, uint8_t width, uint32_t 
         width = OD_WIDTH_DEFAULT;
     }
 #if MODULE_OD_STRING
-    uint8_t str_pos = 0;
+    size_t str_pos = 0;
 #endif
     for (unsigned int i = 0; i < data_len; i++) {
         print_str("  ");

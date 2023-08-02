@@ -42,8 +42,8 @@
 /**
  * @brief   Default button GPIO pin definition
  *
- * ESP32-S3-DevKit boards have a BOOT button connected to GPIO9, which can be
- * used as button during normal operation. Since the GPIO9 pin is pulled up,
+ * ESP32-S3-DevKit boards have a BOOT button connected to GPIO0, which can be
+ * used as button during normal operation. Since the GPIO0 pin is pulled up,
  * the button signal is inverted, i.e., pressing the button will give a
  * low signal.
  */
@@ -51,9 +51,6 @@
 
 /**
  * @brief   Default button GPIO mode definition
- *
- * Since the GPIO of the button is pulled up with an external resistor, the
- * mode for the GPIO pin has to be GPIO_IN.
  */
 #define BTN0_MODE       GPIO_IN_PU
 
@@ -74,8 +71,13 @@
 /**
  * @name    LED (on-board) configuration
  *
- * ESP32-S3-DevKit boards have a SK68XXMINI-HS smart RGB-LED connected to
- * GPIO48 on-board. The WS281x driver module `ws281x` can be used to control it.
+ * ESP32-S3-DevKit boards have a SK68XXMINI-HS smart RGB LED on-board connected
+ * to either
+ *
+ * - GPIO48 (ESP32-S3-DevKitC-1 revision 1.0 and all ESP32-S3-DevKitM-1 boards) or
+ * - GPIO38 (ESP32-S3-DevKitC-1 revision 1.1).
+ *
+ * The WS281x driver module `ws281x` can be used for control.
  * @{
  */
 #ifndef WS281X_PARAM_PIN

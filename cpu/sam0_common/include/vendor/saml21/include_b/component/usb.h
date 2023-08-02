@@ -613,7 +613,7 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint16_t RAMACER:1;        /*!< bit:      7  Ram Access                         */
     __I uint16_t LPMNYET:1;        /*!< bit:      8  Link Power Management Not Yet      */
     __I uint16_t LPMSUSP:1;        /*!< bit:      9  Link Power Management Suspend      */
-    __I uint16_t :6;               /*!< bit: 10..15  Reserved                           */
+    uint16_t :6;                   /*!< bit: 10..15  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   uint16_t reg;                /*!< Type      used for register access              */
 } USB_DEVICE_INTFLAG_Type;
@@ -648,7 +648,7 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 typedef union { // __I to avoid read-modify-write on write-to-clear register
   struct {
-    __I uint16_t :2;               /*!< bit:  0.. 1  Reserved                           */
+    uint16_t :2;                   /*!< bit:  0.. 1  Reserved                           */
     __I uint16_t HSOF:1;           /*!< bit:      2  Host Start Of Frame                */
     __I uint16_t RST:1;            /*!< bit:      3  Bus Reset                          */
     __I uint16_t WAKEUP:1;         /*!< bit:      4  Wake Up                            */
@@ -657,7 +657,7 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint16_t RAMACER:1;        /*!< bit:      7  Ram Access                         */
     __I uint16_t DCONN:1;          /*!< bit:      8  Device Connection                  */
     __I uint16_t DDISC:1;          /*!< bit:      9  Device Disconnection               */
-    __I uint16_t :6;               /*!< bit: 10..15  Reserved                           */
+    uint16_t :6;                   /*!< bit: 10..15  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   uint16_t reg;                /*!< Type      used for register access              */
 } USB_HOST_INTFLAG_Type;
@@ -1132,14 +1132,14 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint8_t  RXSTP:1;          /*!< bit:      4  Received Setup                     */
     __I uint8_t  STALL0:1;         /*!< bit:      5  Stall 0 In/out                     */
     __I uint8_t  STALL1:1;         /*!< bit:      6  Stall 1 In/out                     */
-    __I uint8_t  :1;               /*!< bit:      7  Reserved                           */
+    uint8_t  :1;                   /*!< bit:      7  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   struct {
     __I uint8_t  TRCPT:2;          /*!< bit:  0.. 1  Transfer Complete x                */
     __I uint8_t  TRFAIL:2;         /*!< bit:  2.. 3  Error Flow x                       */
-    __I uint8_t  :1;               /*!< bit:      4  Reserved                           */
+    uint8_t  :1;                   /*!< bit:      4  Reserved                           */
     __I uint8_t  STALL:2;          /*!< bit:  5.. 6  Stall x In/out                     */
-    __I uint8_t  :1;               /*!< bit:      7  Reserved                           */
+    uint8_t  :1;                   /*!< bit:      7  Reserved                           */
   } vec;                       /*!< Structure used for vec  access                  */
   uint8_t reg;                 /*!< Type      used for register access              */
 } USB_DEVICE_EPINTFLAG_Type;
@@ -1183,11 +1183,11 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint8_t  PERR:1;           /*!< bit:      3  Pipe Error Interrupt Flag          */
     __I uint8_t  TXSTP:1;          /*!< bit:      4  Transmit  Setup Interrupt Flag     */
     __I uint8_t  STALL:1;          /*!< bit:      5  Stall Interrupt Flag               */
-    __I uint8_t  :2;               /*!< bit:  6.. 7  Reserved                           */
+    uint8_t  :2;                   /*!< bit:  6.. 7  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   struct {
     __I uint8_t  TRCPT:2;          /*!< bit:  0.. 1  Transfer Complete x Interrupt Flag */
-    __I uint8_t  :6;               /*!< bit:  2.. 7  Reserved                           */
+    uint8_t  :6;                   /*!< bit:  2.. 7  Reserved                           */
   } vec;                       /*!< Structure used for vec  access                  */
   uint8_t reg;                 /*!< Type      used for register access              */
 } USB_HOST_PINTFLAG_Type;

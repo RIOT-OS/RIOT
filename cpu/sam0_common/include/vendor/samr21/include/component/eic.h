@@ -359,11 +359,11 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint32_t EXTINT13:1;       /*!< bit:     13  External Interrupt 13              */
     __I uint32_t EXTINT14:1;       /*!< bit:     14  External Interrupt 14              */
     __I uint32_t EXTINT15:1;       /*!< bit:     15  External Interrupt 15              */
-    __I uint32_t :16;              /*!< bit: 16..31  Reserved                           */
+    uint32_t :16;                  /*!< bit: 16..31  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   struct {
     __I uint32_t EXTINT:16;        /*!< bit:  0..15  External Interrupt x               */
-    __I uint32_t :16;              /*!< bit: 16..31  Reserved                           */
+    uint32_t :16;                  /*!< bit: 16..31  Reserved                           */
   } vec;                       /*!< Structure used for vec  access                  */
   uint32_t reg;                /*!< Type      used for register access              */
 } EIC_INTFLAG_Type;

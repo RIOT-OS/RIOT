@@ -1,0 +1,62 @@
+From 93b38d4855e2b6d5f3179d72da2f98f8df796804 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Fri, 19 May 2023 23:29:23 +0200
+Subject: [PATCH] src/portable/nordic/nrf5x: fix compilation with clang
+
+Previously code expecting atomic_flag as argument type was called with
+atomic_bool as type. This brings the functions called back in
+alignment with the types used.
+---
+ src/portable/nordic/nrf5x/dcd_nrf5x.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/portable/nordic/nrf5x/dcd_nrf5x.c b/src/portable/nordic/nrf5x/dcd_nrf5x.c
+index afc14b0..0316673 100644
+--- a/src/portable/nordic/nrf5x/dcd_nrf5x.c
++++ b/src/portable/nordic/nrf5x/dcd_nrf5x.c
+@@ -128,13 +128,13 @@ static void start_dma(volatile uint32_t* reg_startep)
+   // Therefore dma_pending is corrected right away
+   if ( (reg_startep == &NRF_USBD->TASKS_EP0STATUS) || (reg_startep == &NRF_USBD->TASKS_EP0RCVOUT) )
+   {
+-    atomic_flag_clear(&_dcd.dma_running);
++    atomic_store(&_dcd.dma_running, false);
+   }
+ }
+ 
+ static void edpt_dma_start(volatile uint32_t* reg_startep)
+ {
+-  if ( atomic_flag_test_and_set(&_dcd.dma_running) )
++  if ( atomic_exchange(&_dcd.dma_running, true) )
+   {
+     usbd_defer_func((osal_task_func_t) edpt_dma_start, (void*) (uintptr_t) reg_startep, true);
+   }else
+@@ -147,7 +147,7 @@ static void edpt_dma_start(volatile uint32_t* reg_startep)
+ static void edpt_dma_end(void)
+ {
+   TU_ASSERT(_dcd.dma_running, );
+-  atomic_flag_clear(&_dcd.dma_running);
++  atomic_store(&_dcd.dma_running, false);
+ }
+ 
+ // helper getting td
+@@ -171,7 +171,7 @@ static void xact_out_dma(uint8_t epnum)
+ 
+   // DMA can't be active during read of SIZE.EPOUT or SIZE.ISOOUT, so try to lock,
+   // If already running defer call regardless if it was called from ISR or task,
+-  if ( atomic_flag_test_and_set(&_dcd.dma_running) )
++  if ( atomic_exchange(&_dcd.dma_running, true) )
+   {
+     usbd_defer_func((osal_task_func_t)xact_out_dma_wrapper, (void *)(uint32_t)epnum, is_in_isr());
+     return;
+@@ -183,7 +183,7 @@ static void xact_out_dma(uint8_t epnum)
+     if (xact_len & USBD_SIZE_ISOOUT_ZERO_Msk)
+     {
+       xact_len = 0;
+-      atomic_flag_clear(&_dcd.dma_running);
++      atomic_store(&_dcd.dma_running, false);
+     }
+     else
+     {
+-- 
+2.40.1
+

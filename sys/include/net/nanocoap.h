@@ -92,6 +92,7 @@
 #include "iolist.h"
 #include "macros/utils.h"
 #include "net/coap.h"
+#include "modules.h"
 #else
 #include "coap.h"
 #include <arpa/inet.h>
@@ -513,14 +514,36 @@ static inline unsigned coap_get_id(const coap_pkt_t *pkt)
 /**
  * @brief   Get a message's token length [in byte]
  *
+ * If the `nanocoap_token_ext` module is enabled, this will include
+ * the extended token length.
+ *
  * @param[in]   pkt   CoAP packet
  *
  * @returns     length of token in the given message (0-8 byte)
  */
 static inline unsigned coap_get_token_len(const coap_pkt_t *pkt)
 {
-    return (pkt->hdr->ver_t_tkl & 0xf);
+    uint8_t tkl = pkt->hdr->ver_t_tkl & 0xf;
+
+    if (!IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
+        return tkl;
+    }
+
+    void *ext = pkt->hdr + 1;
+    switch (tkl) {
+    case 13:
+        return tkl + *(uint8_t *)ext;
+    case 14:
+        return tkl + 255 + byteorder_bebuftohs(ext);
+    case 15:
+        assert(0);
+        /* fall-through */
+    default:
+        return tkl;
+    }
 }
+
+static inline uint8_t *coap_hdr_data_ptr(const coap_hdr_t *hdr);
 
 /**
  * @brief   Get pointer to a message's token
@@ -531,7 +554,7 @@ static inline unsigned coap_get_token_len(const coap_pkt_t *pkt)
  */
 static inline void *coap_get_token(const coap_pkt_t *pkt)
 {
-    return (uint8_t*)pkt->hdr + sizeof(coap_hdr_t);
+    return coap_hdr_data_ptr(pkt->hdr);
 }
 
 /**
@@ -588,6 +611,35 @@ static inline unsigned coap_get_ver(const coap_pkt_t *pkt)
 }
 
 /**
+ * @brief   Get the size of the extended Token length field
+ *          (RFC 8974)
+ *
+ * @note    This requires the `nanocoap_token_ext` module to be enabled
+ *
+ * @param[in]   hdr   CoAP header
+ *
+ * @returns     number of bytes used for extended token length
+ */
+static inline uint8_t coap_hdr_tkl_ext_len(const coap_hdr_t *hdr)
+{
+    if (!IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
+        return 0;
+    }
+
+    switch (hdr->ver_t_tkl & 0xf) {
+    case 13:
+        return 1;
+    case 14:
+        return 2;
+    case 15:
+        assert(0);
+        /* fall-through */
+    default:
+        return 0;
+    }
+}
+
+/**
  * @brief   Get the start of data after the header
  *
  * @param[in]   hdr   Header of CoAP packet in contiguous memory
@@ -596,7 +648,7 @@ static inline unsigned coap_get_ver(const coap_pkt_t *pkt)
  */
 static inline uint8_t *coap_hdr_data_ptr(const coap_hdr_t *hdr)
 {
-    return ((uint8_t *)hdr) + sizeof(coap_hdr_t);
+    return ((uint8_t *)hdr) + sizeof(coap_hdr_t) + coap_hdr_tkl_ext_len(hdr);
 }
 
 /**

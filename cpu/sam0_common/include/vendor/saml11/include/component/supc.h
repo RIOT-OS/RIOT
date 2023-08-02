@@ -162,12 +162,12 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint32_t BOD12RDY:1;                /**< bit:      3  BOD12 Ready                              */
     __I uint32_t BOD12DET:1;                /**< bit:      4  BOD12 Detection                          */
     __I uint32_t B12SRDY:1;                 /**< bit:      5  BOD12 Synchronization Ready              */
-    __I uint32_t :2;                        /**< bit:   6..7  Reserved */
+    uint32_t :2;                            /**< bit:   6..7  Reserved */
     __I uint32_t VREGRDY:1;                 /**< bit:      8  Voltage Regulator Ready                  */
-    __I uint32_t :1;                        /**< bit:      9  Reserved */
+    uint32_t :1;                            /**< bit:      9  Reserved */
     __I uint32_t VCORERDY:1;                /**< bit:     10  VDDCORE Ready                            */
     __I uint32_t ULPVREFRDY:1;              /**< bit:     11  ULPVREF Voltage Reference Ready          */
-    __I uint32_t :20;                       /**< bit: 12..31  Reserved */
+    uint32_t :20;                           /**< bit: 12..31  Reserved */
   } bit;                                /**< Structure used for bit  access */
   uint32_t reg;                         /**< Type used for register access */
 } SUPC_INTFLAG_Type;

@@ -319,6 +319,21 @@ enum {
      * @ref sock_dtls_aux_tx_t::local.
      */
     SOCK_AUX_SET_LOCAL = (1LU << 3),
+    /**
+     * @brief   Flag to request the TTL value of received frame
+     *
+     * @note    Select module `sock_aux_ttl` and a compatible network stack to
+     *          use this
+     *
+     * Set this flag in the auxiliary data structure prior to the call of
+     * @ref sock_udp_recv_aux / @ref sock_ip_recv_aux / etc. to request the
+     * TTL value of a received frame. This flag will be cleared if the
+     * time to live was stored, otherwise it remains set.
+     *
+     * Depending on the family of the socket, the TTL value will be stored in
+     * @ref sock_udp_aux_rx_t::ttl or @ref sock_dtls_aux_rx_t::ttl.
+     */
+    SOCK_AUX_GET_TTL = (1LU << 4),
 };
 
 /**
