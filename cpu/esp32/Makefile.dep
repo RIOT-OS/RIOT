@@ -128,6 +128,12 @@ ifneq (,$(filter esp_idf_heap,$(USEMODULE)))
   USEPKG += tlsf
 endif
 
+ifneq (,$(filter lcd_parallel_ll_mcu,$(USEMODULE)))
+  USEMODULE += esp_lcd
+  USEMODULE += esp_idf_lcd
+  USEMODULE += esp_idf_heap
+endif
+
 ifneq (,$(filter mtd periph_flashpage,$(USEMODULE)))
   USEMODULE += esp_idf_spi_flash
 endif
