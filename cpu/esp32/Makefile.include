@@ -113,6 +113,7 @@ PSEUDOMODULES += esp_hw_counter
 PSEUDOMODULES += esp_idf_gpio_hal
 PSEUDOMODULES += esp_i2c_hw
 PSEUDOMODULES += esp_jtag
+PSEUDOMODULES += esp_lcd_gpio
 PSEUDOMODULES += esp_rtc_timer_32k
 PSEUDOMODULES += esp_spi_ram
 PSEUDOMODULES += esp_spi_oct
@@ -165,6 +166,10 @@ endif
 
 ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/include/soc/$(CPU_FAM)
+endif
+
+ifneq (,$(filter esp_idf_lcd,$(USEMODULE)))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_lcd/include
 endif
 
 ifneq (,$(filter esp_idf_spi_flash,$(USEMODULE)))

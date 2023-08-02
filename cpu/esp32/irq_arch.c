@@ -87,9 +87,18 @@ static const struct intr_handle_data_t _irq_data_table[] = {
     { ETS_USB_SERIAL_JTAG_INTR_SOURCE, CPU_INUM_SERIAL_JTAG, 1 },
 #endif
     { ETS_RMT_INTR_SOURCE, CPU_INUM_RMT, 1 },
+#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S2)
+    { ETS_I2S0_INTR_SOURCE, CPU_INUM_LCD, 1 },
+#elif defined(CPU_FAM_ESP32S3)
+    { ETS_LCD_CAM_INTR_SOURCE, CPU_INUM_LCD, 1 },
+#endif
 };
 
 #define IRQ_DATA_TABLE_SIZE        ARRAY_SIZE(_irq_data_table)
+
+#if defined(CPU_FAM_ESP32) && MODULE_ESP_LCD && MODULE_ESP_ETH
+#error "esp_eth and esp_lcd can't be used at the same time because of an interrupt conflict"
+#endif
 
 void esp_irq_init(void)
 {
@@ -170,6 +179,17 @@ esp_err_t esp_intr_alloc(int source, int flags, intr_handler_t handler,
     }
 
     return ESP_OK;
+}
+
+esp_err_t esp_intr_alloc_intrstatus(int source, int flags,
+                                    uint32_t reg, uint32_t mask,
+                                    intr_handler_t handler,
+                                    void *arg, intr_handle_t *ret_handle)
+{
+    /* TODO status register and status mask handling for shared interrupts */
+    (void)reg;
+    (void)mask;
+    return esp_intr_alloc(source, flags, handler, arg, ret_handle);
 }
 
 esp_err_t esp_intr_free(intr_handle_t handle)
