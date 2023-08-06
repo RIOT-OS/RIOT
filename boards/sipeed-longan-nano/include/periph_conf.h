@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Board specific definitions for the SeeedStudio GD32 RISC-V board
+ * @brief       Board specific definitions for the Sipeed Longan Nano board
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
@@ -33,8 +33,16 @@
 #define CONFIG_CLOCK_HXTAL      MHZ(8)      /**< HXTAL frequency */
 #endif
 
+#ifndef SPI_DEV_1_USED
 #if defined(BOARD_SIPEED_LONGAN_NANO_TFT)
-#define SPI_DEV_1_USED              /**< Enable SPI_DEV(1) if TFT is connected */
+#define SPI_DEV_1_USED          1   /**< Enable SPI_DEV(1) by default for the TFT version */
+#else
+#define SPI_DEV_1_USED          0   /**< Disable SPI_DEV(1) by default for the non-TFT version */
+#endif
+#endif
+
+#ifndef I2C_DEV_1_USED
+#define I2C_DEV_1_USED          1   /**< Enable I2C_DEV(1) by default */
 #endif
 
 #include "periph_cpu.h"
@@ -110,7 +118,7 @@ static const pwm_conf_t pwm_config[] = {
         .af       = GPIO_AF_OUT_PP,
         .bus      = APB1,
     },
-#if !defined(MODULE_PERIPH_CAN)
+#if !MODULE_PERIPH_CAN
     {
         .dev      = TIMER3,
         .rcu_mask = RCU_APB1EN_TIMER3EN_Msk,
