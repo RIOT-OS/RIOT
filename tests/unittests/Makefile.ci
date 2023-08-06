@@ -89,6 +89,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     seeedstudio-gd32 \
     sensebox_samd21 \
     sipeed-longan-nano \
+    sipeed-longan-nano-tft \
     slstk3400a \
     slstk3401a \
     sltb001a \
