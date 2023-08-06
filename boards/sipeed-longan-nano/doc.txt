@@ -66,15 +66,15 @@ by pins.
 | ADC_LINE(1)      | PA3     | ADC01_IN3      |                |                                |
 | ADC_LINE(2)      | -       | ADC01_IN16     |                | internal Temperature channel   |
 | ADC_LINE(3)      | -       | ADC01_IN17     |                | internal VFEF channel          |
-| ADC_LINE(4)      | PB0     | ADC01_IN8      | TFT RS         | N/A if TFT is used             |
-| ADC_LINE(5)      | PB1     | ADC01_IN9      | TFT RST        | N/A if TFT is used             |
-| ADC_LINE(6)      | PA6     | ADC01_IN6      |                | N/A if TFT is used             |
-| ADC_LINE(7)      | PA7     | ADC01_IN7      |                | N/A if TFT is used             |
-| ADC_LINE(8)      | PA4     | ADC01_IN4      |                | N/A if TFT is used             |
-| ADC_LINE(9)      | PA5     | ADC01_IN5      |                | N/A if TFT is used             |
+| ADC_LINE(4)*     | PA4     | ADC01_IN4      |                | N/A if DAC is used             |
+| ADC_LINE(5)*     | PB0     | ADC01_IN8      | TFT RS         | N/A if TFT is used             |
+| ADC_LINE(6)*     | PB1     | ADC01_IN9      | TFT RST        | N/A if TFT is used             |
+| ADC_LINE(7)*     | PA6     | ADC01_IN6      |                | N/A if TFT/SPI_DEV(1) is used  |
+| ADC_LINE(8)*     | PA7     | ADC01_IN7      |                | N/A if TFT/SPI_DEV(1) is used  |
+| ADC_LINE(9)*     | PA5     | ADC01_IN5      |                | N/A if TFT/SPI_DEV(1)/DAC used |
 | BTN0             | PA8     | BOOT0          | BOOT           |                                |
-| DAC_LINE(0)      | PA4     | DAC0           |                | N/A if TFT is used             |
-| DAC_LINE(1)      | PA5     | DAC1           |                | N/A if TFT is used             |
+| DAC_LINE(0)      | PA4     | DAC0           |                |                                |
+| DAC_LINE(1)*     | PA5     | DAC1           |                | N/A if TFT is used             |
 | GPIO_PIN(1, 2)   | PB2     |                | TFT CS         |                                |
 | I2C_DEV(0) SCL   | PB6     | I2C0 SCL       |                |                                |
 | I2C_DEV(0) SDA   | PB7     | I2C0 SDA       |                |                                |
@@ -85,18 +85,20 @@ by pins.
 | LED2             | PA2     |                | LED blue       |                                |
 | PWM_DEV(0) CH0   | PA1     |                | LED green      |                                |
 | PWM_DEV(0) CH1   | PA2     |                | LED blue       |                                |
-| PWM_DEV(1) CH0   | PB8     |                |                | N/A if CAN is used             |
-| PWM_DEV(1) CH1   | PB9     |                |                | N/A if CAN is used             |
+| PWM_DEV(1) CH0*  | PB8     |                |                | N/A if CAN is used             |
+| PWM_DEV(1) CH1*  | PB9     |                |                | N/A if CAN is used             |
 | SPI_DEV(0) CS    | PB12    | SPI1 CS        | SD CS          |                                |
 | SPI_DEV(0) SCLK  | PB13    | SPI1 SCLK      | SD SCK         |                                |
 | SPI_DEV(0) MISO  | PB14    | SPI1 MISO      | SD MISO        |                                |
 | SPI_DEV(0) MOSI  | PB15    | SPI1 MOSI      | SD MOSI        |                                |
-| SPI_DEV(1) CS    | PA4     | SPI0 CS        |                |                                |
+| SPI_DEV(1) CS    | PB5     | SPI0 CS        |                |                                |
 | SPI_DEV(1) SCLK  | PA5     | SPI0 SCLK      | TFT SCL        |                                |
 | SPI_DEV(1) MISO  | PA6     | SPI0 MISO      |                |                                |
 | SPI_DEV(1) MOSI  | PA7     | SPI0 MOSI      | TFT SDA        |                                |
 | UART_DEV(0) TX   | PA9     | USART0 TX      | UART TX        |                                |
 | UART_DEV(0) RX   | PA10    | USART0 RX      | UART RX        |                                |
+
+(*) The availability of these peripherals depend on the use of other peripherals.
 
 \n
 @note For the Sipeed Longan Nano board version with TFT display, the
@@ -111,10 +113,10 @@ BOARD=sipeed-longan-nano-tft make ...
 | PA1  | LED green      | PWM_DEV(0) CH0  |                 | LED0            |
 | PA2  | LED blue       | PWM_DEV(0) CH1  |                 | LED1            |
 | PA3  |                |                 | ADC_LINE(1)     |                 |
-| PA4  |                | SPI_DEV(1) CS   | ADC_LINE(8)*    | DAC_LINE(0)*    |
+| PA4  |                |                 | ADC_LINE(4)*    | DAC_LINE(0)     |
 | PA5  | TFT SCL        | SPI_DEV(1) SCLK | ADC_LINE(9)*    | DAC_LINE(1)*    |
-| PA6  |                | SPI_DEV(1) MISO | ADC_LINE(6)*    |                 |
-| PA7  | TFT SDA        | SPI_DEV(1) MOSI | ADC_LINE(7)*    |                 |
+| PA6  |                | SPI_DEV(1) MISO | ADC_LINE(7)*    |                 |
+| PA7  | TFT SDA        | SPI_DEV(1) MOSI | ADC_LINE(8)*    |                 |
 | PA8  | BOOT           |                 |                 | BTN0            |
 | PA9  |                | UART_DEV(0) TX  |                 |                 |
 | PA10 |                | UART_DEV(0) RX  |                 |                 |
@@ -123,12 +125,12 @@ BOARD=sipeed-longan-nano-tft make ...
 | PA13 | JTAG TMS       |                 |                 |                 |
 | PA14 | JTAG TCK       |                 |                 |                 |
 | PA15 | JTAG TDI       |                 |                 |                 |
-| PB0  | TFT RS         |                 | ADC_LINE(4)     |                 |
-| PB1  | TFT RST        |                 | ADC_LINE(5)     |                 |
+| PB0  | TFT RS         |                 | ADC_LINE(5)*    |                 |
+| PB1  | TFT RST        |                 | ADC_LINE(6)*    |                 |
 | PB2  | TFT CS         |                 |                 |                 |
 | PB3  | JTAG TDO       |                 |                 |                 |
 | PB4  | JTAG NRST      |                 |                 |                 |
-| PB5  |                |                 |                 |                 |
+| PB5  |                | SPI_DEV(1) CS   |                 |                 |
 | PB6  |                | I2C_DEV(0) SCL  |                 |                 |
 | PB7  |                | I2C_DEV(0) SDA  |                 |                 |
 | PB8  |                | PWM_DEV(1) CH0  |                 |                 |
@@ -139,7 +141,7 @@ BOARD=sipeed-longan-nano-tft make ...
 | PB13 | SD SCK         | SPI_DEV(0) SCLK |                 |                 |
 | PB14 | SD MISO        | SPI_DEV(0) MISO |                 |                 |
 | PB15 | SD MOSI        | SPI_DEV(0) MOSI |                 |                 |
-| PC13 | LED red        |                 |                 | LED3            |
+| PC13 | LED red        |                 |                 | LED2            |
 | PC14 | OSC32IN        |                 |                 |                 |
 | PC15 | OSC32OUT       |                 |                 |                 |
 | -    | Temperature    |                 | ADC_LINE(2)     |                 |
