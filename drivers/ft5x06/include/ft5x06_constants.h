@@ -34,7 +34,7 @@ extern "C" {
 /**
  * @brief Vendor ID for FT6X06 and FT6X36 models.
  */
-#define FT6XX6_VENDOR_ID                            (0xcd)
+#define FT6XX6_VENDOR_ID                            (0x11)
 
 /**
  * @brief Vendor ID for FT5606, FT5X16, FT5X06I, FT5336, FT3316, FT5436I, FT5336I, FT5X46 models.
