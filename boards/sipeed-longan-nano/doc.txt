@@ -1,8 +1,10 @@
 /**
-@defgroup   boards_sipeed_longan_nano Sipeed Longan Nano board
+@defgroup   boards_sipeed_longan_nano Sipeed Longan Nano
 @ingroup    boards
 @brief      Support for the Sipeed Longan Nano board
 @author     Gunar Schorcht <gunar@schorcht.net>
+
+\section sipeed_longan_nano Sipeed Longan Nano
 
 ## Overview
 
@@ -97,11 +99,10 @@ by pins.
 | UART_DEV(0) RX   | PA10    | USART0 RX      | UART RX        |                                |
 
 \n
-@note To use the TFT display of a Sipeed Longan Nano board, if available, the
-macro `CONFIG_SIPEED_LONGAN_NANO_WITH_TFT=1` has to be defined, for
-example using the `CFLAGS` variable in the make command:
+@note For the Sipeed Longan Nano board version with TFT display, the
+      `sipeed-longan-nano-tft` board definition has to be used.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-BOARD=sipeed-longan-nano CFLAGS='-DCONFIG_SIPEED_LONGAN_NANO_WITH_TFT=1' make ...
+BOARD=sipeed-longan-nano-tft make ...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 | Pin  | Board Function | RIOT Function 1 | RIOT Function 2 | RIOT Function 3 |
@@ -162,6 +163,12 @@ BOARD=sipeed-longan-nano make -C examples/hello-world flash
 
 After flashing you need to leave bootloader mode again by pressing the RESET button.
 
+@note For the Sipeed Longan Nano board version with TFT display, the
+      `sipeed-longan-nano-tft` board definition has to be used.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+BOARD=sipeed-longan-nano-tft make -C examples/hello-world flash
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 ### Using an external debug adapter
 
 The board can also be flashed via a JTAG interface with OpenOCD (at least [release version 0.12.0]
@@ -187,11 +194,10 @@ PROGRAMMER=openocd OPENOCD_DEBUG_ADAPTER=jlink BOARD=sipeed-longan-nano make -C 
 
 ## Using the TFT Display
 
-To use the TFT display of a Sipeed Longan Nano board, if available, the
-macro `CONFIG_SIPEED_LONGAN_NANO_WITH_TFT=1` has to be defined, for
-example using the `CFLAGS` variable in the make command:
+To use the display of the Sipeed Longan Nano board version with TFT display,
+the `sipeed_longan_nano_tft` board definition has to be used, for example:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-BOARD=sipeed-longan-nano CFLAGS='-DCONFIG_SIPEED_LONGAN_NANO_WITH_TFT=1' make -C tests/drivers/st7735 flash
+BOARD=sipeed-longan-nano-tft make -C tests/drivers/st7735 flash
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Accessing STDIO
