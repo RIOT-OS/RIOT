@@ -1,5 +1,6 @@
 # FlashDB is only supported by 32 bit architectures
 FEATURES_REQUIRED += arch_32bit
+CFLAGS += -DFDB_USING_NATIVE_ASSERT
 
 ifneq (,$(filter flashdb_tsdb,$(USEMODULE)))
   CFLAGS += -DFDB_USING_TSDB
