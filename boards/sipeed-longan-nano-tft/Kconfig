@@ -6,9 +6,9 @@
 #
 
 config BOARD
-    default "sipeed-longan-nano" if BOARD_SIPEED_LONGAN_NANO
+    default "sipeed-longan-nano-tft" if BOARD_SIPEED_LONGAN_NANO_TFT
 
-config BOARD_SIPEED_LONGAN_NANO
+config BOARD_SIPEED_LONGAN_NANO_TFT
     bool
     default y
     select CPU_MODEL_GD32VF103CBT6
@@ -28,6 +28,7 @@ config BOARD_SIPEED_LONGAN_NANO
 
     select HAVE_MTD_SDCARD_DEFAULT
     select HAVE_SAUL_GPIO
+    select HAVE_ST7735
 
     select MODULE_FATFS_VFS if MODULE_VFS_DEFAULT
     select MODULE_USB_BOARD_RESET if KCONFIG_USB && TEST_KCONFIG

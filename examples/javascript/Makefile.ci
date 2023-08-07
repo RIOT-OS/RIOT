@@ -48,6 +48,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     saml11-xpro \
     seeedstudio-gd32 \
     sipeed-longan-nano \
+    sipeed-longan-nano-tft \
     slstk3400a \
     spark-core \
     stk3200 \

@@ -119,16 +119,16 @@ void auto_init_gnrc_ipv6_static_addr(void)
     if (gnrc_netif_highlander() || gnrc_netif_numof() == 1) {
         upstream = gnrc_netif_iter(NULL);
 
-        if (IS_ACTIVE(CONFIG_GNRC_IPV6_STATIC_ADDR_UPSTREAM)) {
+        if (CONFIG_GNRC_IPV6_STATIC_ADDR_UPSTREAM) {
             assert(upstream->pid == CONFIG_GNRC_IPV6_STATIC_ADDR_UPSTREAM);
         }
     } else {
 
-        if (IS_ACTIVE(CONFIG_GNRC_IPV6_STATIC_ADDR_UPSTREAM)) {
+        if (CONFIG_GNRC_IPV6_STATIC_ADDR_UPSTREAM) {
             upstream = gnrc_netif_get_by_pid(CONFIG_GNRC_IPV6_STATIC_ADDR_UPSTREAM);
         }
 
-        if (IS_ACTIVE(CONFIG_GNRC_IPV6_STATIC_ADDR_DOWNSTREAM)) {
+        if (CONFIG_GNRC_IPV6_STATIC_ADDR_DOWNSTREAM) {
             downstream = gnrc_netif_get_by_pid(CONFIG_GNRC_IPV6_STATIC_ADDR_DOWNSTREAM);
         }
 

@@ -28,6 +28,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     saml11-xpro \
     seeedstudio-gd32 \
     sipeed-longan-nano \
+    sipeed-longan-nano-tft \
     stm32f7508-dk \
     waspmote-pro \
     zigduino \
