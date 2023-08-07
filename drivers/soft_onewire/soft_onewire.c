@@ -77,7 +77,7 @@ static bool _bus_sample(soft_onewire_t *dev)
 }
 
 /* schedule the next timer callback */
-static int _schedule(soft_onewire_t *dev, soft_onewire_timer_cb_t cb,
+static void _schedule(soft_onewire_t *dev, soft_onewire_timer_cb_t cb,
     unsigned usec)
 {
 #ifdef MODULE_SOFT_ONEWIRE_HWTIMER
@@ -92,15 +92,14 @@ static int _schedule(soft_onewire_t *dev, soft_onewire_timer_cb_t cb,
         _bus_release(dev);
 
         /* stop ongoing process, and indicate error to waiting thread */
-        mutex_unlock(&dev->sync);
         dev->buf_size = -EIO;
+        mutex_unlock(&dev->sync);
     }
 #else
     ztimer_t *timer = &dev->timer;
 
     timer->callback = (ztimer_callback_t)cb;
     ztimer_set(ZTIMER_USEC, timer, usec);
-    return 0;
 #endif
 }
 
