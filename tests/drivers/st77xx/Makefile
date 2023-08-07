@@ -8,6 +8,7 @@ ST7789_BOARDS = \
   #
 
 ST7796_BOARDS = \
+  esp32s3-wt32-sc01-plus \
   #
 
 ifneq (,$(filter $(ST7789_BOARDS),$(BOARD)))
