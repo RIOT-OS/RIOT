@@ -46,6 +46,6 @@ endif
 host-tools:
 	$(Q)env -u CC -u CFLAGS $(MAKE) -C $(RIOTTOOLS)
 
-TERMDEPS += host-tools
+TEST_DEPS += host-tools
 
 include $(RIOTBASE)/Makefile.include
