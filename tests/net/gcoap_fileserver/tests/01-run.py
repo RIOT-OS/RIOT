@@ -110,11 +110,6 @@ def test_linear_topology(factory, zep_dispatch):
     # upload the file to node B (only one node should write MEMORY.bin)
     A.cmd("ncput /const/song.txt coap://[" + global_addr(B.cmd("ifconfig 7"))[1] + "]/vfs/song2.txt", timeout=60)
 
-    # It seems like failures may occur due to the `ncput` command finishing but
-    # the data not being written to the file yet. Therefore, we wait a bit...
-    # This is just a guess though.
-    time.sleep(0.5)
-
     # make sure the content matches
     assert B.cmd("md5sum /nvm0/song.txt").split()[2] == B.cmd("md5sum /nvm0/song2.txt").split()[2]
 
