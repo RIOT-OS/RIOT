@@ -34,14 +34,17 @@
 #define ENABLE_DEBUG    0
 #include "debug.h"
 
-#define FT5X06_BUS              (dev->params.i2c)
-#define FT5X06_ADDR             (dev->params.addr)
+#define FT5X06_BUS              (dev->params->i2c)
+#define FT5X06_ADDR             (dev->params->addr)
 
 #define FT5X06_RESET_DELAY_MS   (200)
 
 int ft5x06_init(ft5x06_t *dev, const ft5x06_params_t *params, ft5x06_event_cb_t cb, void *arg)
 {
-    dev->params = *params;
+    assert(dev);
+    assert(params);
+
+    dev->params = params;
 
     /* Wait at least 200ms after power up before accessing registers */
     ztimer_sleep(ZTIMER_MSEC, FT5X06_RESET_DELAY_MS);
@@ -54,7 +57,7 @@ int ft5x06_init(ft5x06_t *dev, const ft5x06_params_t *params, ft5x06_event_cb_t 
         return -EPROTO;
     }
 
-    if (dev->params.type == FT5X06_TYPE_FT6X06 || dev->params.type == FT5X06_TYPE_FT6X36) {
+    if (dev->params->type == FT5X06_TYPE_FT6X06 || dev->params->type == FT5X06_TYPE_FT6X36) {
         if ((vendor_id != FT5X06_VENDOR_ID_2) && (vendor_id != FT5X06_VENDOR_ID_3)) {
             DEBUG("[ft5x06] init: invalid vendor ID: '0x%02x' (expected: 0x%02x or 0x%02x)\n",
                   vendor_id, FT5X06_VENDOR_ID_2, FT5X06_VENDOR_ID_3);
@@ -70,16 +73,16 @@ int ft5x06_init(ft5x06_t *dev, const ft5x06_params_t *params, ft5x06_event_cb_t 
     }
 
     /* Auto-calibrate if needed */
-    if (dev->params.type == FT5X06_TYPE_FT5606|| dev->params.type == FT5X06_TYPE_FT5X16 ||
-        dev->params.type == FT5X06_TYPE_FT5X06I) {
+    if (dev->params->type == FT5X06_TYPE_FT5606|| dev->params->type == FT5X06_TYPE_FT5X16 ||
+        dev->params->type == FT5X06_TYPE_FT5X06I) {
         DEBUG("[ft5x06] init: enable device auto-calibration\n");
         i2c_write_reg(FT5X06_BUS, FT5X06_ADDR, FT5X06_G_AUTO_CLB_MODE_REG, 0, 0);
     }
 
     /* Configure interrupt */
-    if (gpio_is_valid(dev->params.int_pin)) {
+    if (gpio_is_valid(dev->params->int_pin)) {
         DEBUG("[ft5x06] init: configuring touchscreen interrupt\n");
-        gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_RISING, cb, arg);
+        gpio_init_int(dev->params->int_pin, GPIO_IN, GPIO_RISING, cb, arg);
         i2c_write_reg(FT5X06_BUS, FT5X06_ADDR, FT5X06_G_MODE_REG, FT5X06_G_MODE_INTERRUPT_TRIGGER & 0x01, 0);
     }
 
@@ -98,6 +101,9 @@ static const uint8_t touch_reg_map[FT5X06_TOUCHES_COUNT_MAX] = {
 
 int ft5x06_read_touch_positions(const ft5x06_t *dev, ft5x06_touch_position_t *positions, size_t len)
 {
+    assert(dev);
+    assert(positions);
+
     i2c_acquire(FT5X06_BUS);
     for (uint8_t touch = 0; touch < len; touch++) {
         uint8_t regs[4];
@@ -116,6 +122,9 @@ int ft5x06_read_touch_positions(const ft5x06_t *dev, ft5x06_touch_position_t *po
 
 int ft5x06_read_touch_count(const ft5x06_t *dev, uint8_t *count)
 {
+    assert(dev);
+    assert(count);
+
     i2c_acquire(FT5X06_BUS);
     i2c_read_reg(FT5X06_BUS, FT5X06_ADDR, FT5X06_TD_STATUS_REG, count, 0);
     i2c_release(FT5X06_BUS);
@@ -130,6 +139,9 @@ int ft5x06_read_touch_count(const ft5x06_t *dev, uint8_t *count)
 
 int ft5x06_read_touch_gesture(const ft5x06_t *dev, ft5x06_touch_gesture_t *gesture)
 {
+    assert(dev);
+    assert(gesture);
+
     uint8_t gesture_id = 0;
     i2c_acquire(FT5X06_BUS);
     i2c_read_reg(FT5X06_BUS, FT5X06_ADDR, FT5X06_GESTURE_ID_REG, &gesture_id, 0);

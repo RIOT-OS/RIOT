@@ -101,9 +101,9 @@ typedef struct {
  */
 typedef struct {
 #ifdef MODULE_TOUCH_DEV
-    touch_dev_t *dev;       /**< Pointer to the generic touch device */
+    touch_dev_t *dev;               /**< Pointer to the generic touch device */
 #endif
-    ft5x06_params_t params; /**< Initialization parameters */
+    const ft5x06_params_t *params;  /**< Initialization parameters */
 } ft5x06_t;
 
 /**
