@@ -730,7 +730,7 @@ else
   _LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $$(find $(BASELIBS:%.module=$(BINDIR)/%/) -name "*.o" 2> /dev/null | sort) $(ARCHIVES_GROUP) $(LINKFLAGS) $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map
 endif # BUILDOSXNATIVE
 
-COMPILE_COMMANDS_PATH ?= $(RIOTBASE)/compile_commands.json
+COMPILE_COMMANDS_PATH ?= $(if $(findstring $(RIOTBASE),$(APPDIR)),$(RIOTBASE)/compile_commands.json, $(APPDIR)/compile_commands.json)
 COMPILE_COMMANDS_FLAGS ?= --clangd
 .PHONY: compile-commands
 compile-commands: $(BUILDDEPS)
