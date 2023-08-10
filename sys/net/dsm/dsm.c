@@ -31,6 +31,8 @@ typedef struct {
     sock_dtls_session_t session;
     dsm_state_t state;
     uint32_t last_used_sec;
+    credman_tag_t tag;
+    credman_type_t type;
 } dsm_session_t;
 
 static int _find_session(sock_dtls_t *sock, sock_dtls_session_t *to_find,
@@ -160,8 +162,8 @@ int dsm_set_session_credential_info(sock_dtls_t *sock, sock_dtls_session_t *sess
         DEBUG("dsm: No session to set the credential information was found\n");
         return -1;
     }
-    session_slot->session.type = type;
-    session_slot->session.tag = tag;
+    session_slot->type = type;
+    session_slot->tag = tag;
     return 1;
 }
 
@@ -174,12 +176,12 @@ int dsm_get_session_credential_info(sock_dtls_t *sock, sock_dtls_session_t *sess
         DEBUG("dsm: No session to get the credential information from was found\n");
         return -1;
     }
-    if (session_slot->session.type == 0 || session_slot->session.tag == 0) {
+    if (session_slot->type == 0 || session_slot->tag == 0) {
         DEBUG("dsm: The credential information for this session was not set\n");
         return -2;
     }
-    *type = session_slot->session.type;
-    *tag = session_slot->session.tag;
+    *type = session_slot->type;
+    *tag = session_slot->tag;
     return 0;
 }
 
