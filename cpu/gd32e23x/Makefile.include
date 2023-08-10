@@ -1,0 +1,16 @@
+CFLAGS += -DCPU_GD32E230C
+
+RAM_START_ADDR ?= 0x20000000
+RAM_LEN ?= 8K
+
+ROM_START_ADDR ?= 0x08000000
+ROM_LEN ?= 64K
+
+LINKER_SCRIPT ?= cortexm.ld
+
+INCLUDES += -I$(RIOTCPU)/gd32e23x/include/vendor/CMSIS/Include
+INCLUDES += -I$(RIOTCPU)/gd32e23x/include/vendor/GD32E23x_standard_peripheral/Include
+INCLUDES += -I$(RIOTCPU)/gd32e23x/include/vendor/Template
+INCLUDES += -I$(RIOTCPU)/gd32e23x/periph
+
+include $(RIOTMAKE)/arch/cortexm.inc.mk

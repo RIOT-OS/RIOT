@@ -1,0 +1,40 @@
+# Copyright (C) 2023 Bissell
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_GD32E23X
+    bool
+    select CPU_CORE_CORTEX_M23
+    select HAS_CPU_GD32E23X
+    select HAS_PERIPH_CPUID
+    select HAS_PERIPH_GPIO
+    select HAS_PERIPH_PWM
+    select HAS_PERIPH_TIMER
+
+
+
+config CPU_MODEL_GD32E230C
+    bool
+    select CPU_FAM_GD32E23X
+
+## Definition of specific features
+config HAS_CPU_GD32E23X
+    bool
+    help
+        Indicates that a 'gd32e23x' cpu is being used.
+
+config CPU_FAM
+    default "gd32e23x" if CPU_FAM_GD32E23X
+
+config CPU_MODEL
+    default "gd32e230c" if CPU_MODEL_GD32E230C
+
+config CPU
+    default "gd32e23x" if CPU_FAM_GD32E23X
+
+source "$(RIOTCPU)/cortexm_common/Kconfig"
+
+
