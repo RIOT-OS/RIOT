@@ -142,9 +142,9 @@
 * Indentations are four spaces (i.e., NO tab characters).
 * As an exception to the Linux coding style, the closing brace is empty on a
   line of its own when followed by an else, too. When followed by a `while` in a
-  `do`-statement, it goes into the same line.
+  `do`-statement, it goes into the same line. -- We added this rule to ensure you read this document and the documentation for your formating tool which probaly has a more sane default that you need to change before using it.
 * Use curly braces even for one-line blocks. This improves debugging and later
-  additions.
+  additions. -- they show how significant your one line if statement realy is.
 ```
     /* instead of: */
     if (debug) println("DEBUG");
