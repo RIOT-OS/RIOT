@@ -37,6 +37,7 @@ typedef struct {
 
 static int _find_session(sock_dtls_t *sock, sock_dtls_session_t *to_find,
                          dsm_session_t **session);
+static void _set_state(dsm_state_t new_state, dsm_session_t *session_slot);
 
 static mutex_t _lock;
 static dsm_session_t _sessions[CONFIG_DSM_PEER_MAX];
@@ -63,9 +64,7 @@ dsm_state_t dsm_store(sock_dtls_t *sock, sock_dtls_session_t *session,
     }
 
     prev_state = session_slot->state;
-    if (new_state > session_slot->state) {
-        session_slot->state = new_state;
-    }
+    _set_state(new_state, session_slot);
 
     /* no existing session found */
     if (res == 0) {
@@ -217,4 +216,33 @@ static int _find_session(sock_dtls_t *sock, sock_dtls_session_t *to_find,
         return 0;
     }
     return -1;
+}
+
+/*
+ * Checks if a state change is legal and changes it if that is the case.
+ * Otherwise the state will stay as it is.
+*/
+static void _set_state(dsm_state_t new_state, dsm_session_t *session_slot) {
+    bool change = false;
+    switch (session_slot->state) {
+        case SESSION_STATE_NONE:
+            change = true;
+            break;
+        case SESSION_STATE_SOCK_INIT:
+            change = ((new_state == SESSION_STATE_HANDSHAKE) ||
+                      (new_state == SESSION_STATE_ESTABLISHED));
+            break;
+        case SESSION_STATE_HANDSHAKE:
+            change = (new_state == SESSION_STATE_ESTABLISHED);
+            break;
+        case SESSION_STATE_ESTABLISHED:
+            /* Fall through */
+        default:
+            change = false;
+            break;
+    }
+
+    if (change) {
+        session_slot->state = new_state;
+    }
 }
