@@ -24,6 +24,7 @@
 #include <sys/uio.h>
 
 #include "iolist.h"
+#include "macros/utils.h"
 
 unsigned iolist_count(const iolist_t *iolist)
 {
@@ -79,4 +80,24 @@ ssize_t iolist_to_buffer(const iolist_t *iolist, void *buf, size_t len)
     }
 
     return (uintptr_t)dst - (uintptr_t)buf;
+}
+
+ssize_t iolist_from_buffer(iolist_t *iolist, const void *buf, size_t len)
+{
+    const uint8_t *src = buf;
+
+    while (iolist) {
+        size_t size = MIN(len, iolist->iol_len);
+        memcpy(iolist->iol_base, src, size);
+        src += size;
+        len -= size;
+        iolist = iolist->iol_next;
+    }
+
+    /* src bytes remaining - the buffer did not fit into the iolist */
+    if (len) {
+        return -ENOBUFS;
+    }
+
+    return (uintptr_t)src - (uintptr_t)buf;
 }
