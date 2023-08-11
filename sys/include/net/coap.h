@@ -177,6 +177,41 @@ extern "C" {
  * @{
  */
 #define COAP_FORMAT_TEXT                      (0)
+/**
+ * @brief   Content-Type `application/cose; cose-type="cose-encrypt0"`
+ * @see     [RFC 9052](https://datatracker.ietf.org/doc/html/rfc9052)
+ */
+#define COAP_FORMAT_COSE_ENCRYPT0            (16)
+/**
+ * @brief   Content-Type `application/cose; cose-type="cose-mac0"`
+ * @see     [RFC 9052](https://datatracker.ietf.org/doc/html/rfc9052)
+ */
+#define COAP_FORMAT_COSE_MAC0                (17)
+/**
+ * @brief   Content-Type `application/cose; cose-type="cose-sign1"`
+ * @see     [RFC 9052](https://datatracker.ietf.org/doc/html/rfc9052)
+ */
+#define COAP_FORMAT_COSE_SIGN1               (18)
+/**
+ * @brief   Content-Type `application/ace+cbor`
+ * @see     [RFC 9200](https://datatracker.ietf.org/doc/html/rfc9200)
+ */
+#define COAP_FORMAT_ACE_CBOR                 (19)
+/**
+ * @brief   Content-Type `image/gif`
+ * @see     https://www.w3.org/Graphics/GIF/spec-gif89a.txt
+ */
+#define COAP_FORMAT_IMAGE_GIF                (21)
+/**
+ * @brief   Content-Type `image/jpeg`
+ * @see     [ISO/IEC 10918-5](https://www.itu.int/rec/T-REC-T.871-201105-I/en)
+ */
+#define COAP_FORMAT_IMAGE_JPEG               (22)
+/**
+ * @brief   Content-Type `image/png`
+ * @see     [RFC 2083](https://datatracker.ietf.org/doc/html/rfc2083)
+ */
+#define COAP_FORMAT_IMAGE_PNG                (23)
 #define COAP_FORMAT_LINK                     (40)
 #define COAP_FORMAT_XML                      (41)
 #define COAP_FORMAT_OCTET                    (42)
@@ -185,14 +220,226 @@ extern "C" {
 #define COAP_FORMAT_JSON_PATCH_JSON          (51)
 #define COAP_FORMAT_MERGE_PATCH_JSON         (52)
 #define COAP_FORMAT_CBOR                     (60)
+/**
+ * @brief   Content-Type `application/cwt`
+ * @see     [RFC 8392](https://datatracker.ietf.org/doc/html/rfc8392)
+ */
+#define COAP_FORMAT_CWT                      (61)
+/**
+ * @brief   Content-Type `application/multipart-core`
+ * @see     [RFC 8710](https://datatracker.ietf.org/doc/html/rfc8710)
+ */
+#define COAP_FORMAT_MULTIPART_CORE           (62)
+/**
+ * @brief   Content-Type `application/cbor-seq`
+ * @see     [RFC 8742](https://datatracker.ietf.org/doc/html/rfc8742)
+ */
+#define COAP_FORMAT_CBOR_SEQ                 (63)
+/**
+ * @brief   Content-Type `application/cose; cose-type="cose-encrypt"`
+ * @see     [RFC 9052](https://datatracker.ietf.org/doc/html/rfc9052)
+ */
+#define COAP_FORMAT_COSE_ENCRYPT             (96)
+/**
+ * @brief   Content-Type `application/cose; cose-type="cose-mac"`
+ * @see     [RFC 9052](https://datatracker.ietf.org/doc/html/rfc9052)
+ */
+#define COAP_FORMAT_COSE_MAC                 (97)
+/**
+ * @brief   Content-Type `application/cose; cose-type="cose-sign"`
+ * @see     [RFC 9052](https://datatracker.ietf.org/doc/html/rfc9052)
+ */
+#define COAP_FORMAT_COSE_SIGN                (98)
+/**
+ * @brief   Content-Type `application/cose-key`
+ * @see     [RFC 9052](https://datatracker.ietf.org/doc/html/rfc9052)
+ */
+#define COAP_FORMAT_COSE_KEY                (101)
+/**
+ * @brief   Content-Type `application/cose-key-set`
+ * @see     [RFC 9052](https://datatracker.ietf.org/doc/html/rfc9052)
+ */
+#define COAP_FORMAT_COSE_KEY_SET            (102)
 #define COAP_FORMAT_SENML_JSON              (110)
 #define COAP_FORMAT_SENSML_JSON             (111)
 #define COAP_FORMAT_SENML_CBOR              (112)
 #define COAP_FORMAT_SENSML_CBOR             (113)
 #define COAP_FORMAT_SENML_EXI               (114)
 #define COAP_FORMAT_SENSML_EXI              (115)
+/**
+ * @brief   Content-Type `application/yang-data+cbor; id=sid`
+ * @see     [RFC 9254](https://datatracker.ietf.org/doc/html/rfc9254)
+ */
+#define COAP_FORMAT_YANG_DATA_CBOR_SID      (140)
+/**
+ * @brief   Content-Type `application/coap-group+json`
+ * @see     [RFC 7390](https://datatracker.ietf.org/doc/html/rfc7390)
+ */
+#define COAP_FORMAT_COAP_GROUP_JSON         (256)
+/**
+ * @brief   Content-Type `application/concise-problem-details+cbor`
+ * @see     [RFC 9290](https://datatracker.ietf.org/doc/html/rfc9290)
+ */
+#define COAP_FORMAT_PROBLEM_DETAILS_CBOR    (257)
+/**
+ * @brief   Content-Type `application/swid+cbor`
+ * @see     [RFC 9393](https://datatracker.ietf.org/doc/html/rfc9393)
+ */
+#define COAP_FORMAT_SWID_CBOR               (258)
+/**
+ * @brief   Content-Type `application/pkixcmp`
+ * @see     [draft-ietf-ace-cmpv2-coap-transport](https://datatracker.ietf.org/doc/draft-ietf-ace-cmpv2-coap-transport/)
+ * @see     [RFC 4210](https://datatracker.ietf.org/doc/html/rfc4210)
+ */
+#define COAP_FORMAT_PKIXCMP                 (259)
+/**
+ * @brief   Content-Type `application/dots+cbor`
+ * @see     [RFC 9132](https://datatracker.ietf.org/doc/html/rfc9132)
+ */
+#define COAP_FORMAT_DOTS_CBOR               (271)
+/**
+ * @brief   Content-Type `application/missing-blocks+cbor-seq`
+ * @see     [RFC 9177](https://datatracker.ietf.org/doc/html/rfc9177)
+ */
+#define COAP_FORMAT_MISSING_BLOCKS_CBOR_SEQ (272)
+/**
+ * @brief   Content-Type `application/pkcs7-mime; smime-type=server-generated-key`
+ * @see     [RFC 7030](https://datatracker.ietf.org/doc/html/rfc7030)
+ * @see     [RFC 8551](https://datatracker.ietf.org/doc/html/rfc8551)
+ * @see     [RFC 9148](https://datatracker.ietf.org/doc/html/rfc9148)
+ */
+#define COAP_FORMAT_PKCS7_MIME_SERVER_GEN   (280)
+/**
+ * @brief   Content-Type `application/pkcs7-mime; smime-type=certs-only`
+ * @see     [RFC 8551](https://datatracker.ietf.org/doc/html/rfc8551)
+ * @see     [RFC 9148](https://datatracker.ietf.org/doc/html/rfc9148)
+ */
+#define COAP_FORMAT_PKCS7_MIME_CERTS_ONLY   (281)
+/**
+ * @brief   Content-Type `application/pkcs8`
+ * @see     [RFC 5958](https://datatracker.ietf.org/doc/html/rfc5958)
+ * @see     [RFC 8551](https://datatracker.ietf.org/doc/html/rfc8551)
+ * @see     [RFC 9148](https://datatracker.ietf.org/doc/html/rfc9148)
+ */
+#define COAP_FORMAT_PKCS8                   (284)
+/**
+ * @brief   Content-Type `application/csrattrs`
+ * @see     [RFC 7030](https://datatracker.ietf.org/doc/html/rfc7030)
+ * @see     [RFC 9148](https://datatracker.ietf.org/doc/html/rfc9148)
+ */
+#define COAP_FORMAT_CSRATTRS                (285)
+/**
+ * @brief   Content-Type `application/pkcs10`
+ * @see     [RFC 5967](https://datatracker.ietf.org/doc/html/rfc5967)
+ * @see     [RFC 8551](https://datatracker.ietf.org/doc/html/rfc8551)
+ * @see     [RFC 9148](https://datatracker.ietf.org/doc/html/rfc9148)
+ */
+#define COAP_FORMAT_PKCS10                  (286)
+/**
+ * @brief   Content-Type `application/pkix-cert`
+ * @see     [RFC 2585](https://datatracker.ietf.org/doc/html/rfc2585)
+ * @see     [RFC 9148](https://datatracker.ietf.org/doc/html/rfc9148)
+ */
+#define COAP_FORMAT_PKIX_CERT               (287)
+/**
+ * @brief   Content-Type `application/aif+cbor`
+ * @see     [RFC 9237](https://datatracker.ietf.org/doc/html/rfc9237)
+ */
+#define COAP_FORMAT_AIF_CBOR                (290)
+/**
+ * @brief   Content-Type `application/aif+json`
+ * @see     [RFC 9237](https://datatracker.ietf.org/doc/html/rfc9237)
+ */
+#define COAP_FORMAT_AIF_JSON                (291)
 #define COAP_FORMAT_SENML_XML               (310)
 #define COAP_FORMAT_SENSML_XML              (311)
+/**
+ * @brief   Content-Type `application/senml-etch+json`
+ * @see     [RFC 8790](https://datatracker.ietf.org/doc/html/rfc8790)
+ */
+#define COAP_FORMAT_SNML_ETCH_JSON          (320)
+/**
+ * @brief   Content-Type `application/senml-etch+cbor`
+ * @see     [RFC 8790](https://datatracker.ietf.org/doc/html/rfc8790)
+ */
+#define COAP_FORMAT_SNML_ETCH_CBOR          (322)
+/**
+ * @brief   Content-Type `application/yang-data+cbor`
+ * @see     [RFC 9254](https://datatracker.ietf.org/doc/html/rfc9254)
+ */
+#define COAP_FORMAT_YAML_DATA_CBOR          (340)
+/**
+ * @brief   Content-Type `application/yang-data+cbor; id=name`
+ * @see     [RFC 9254](https://datatracker.ietf.org/doc/html/rfc9254)
+ */
+#define COAP_FORMAT_YAML_DATA_CBOR_ID_NAME  (341)
+/**
+ * @brief   Content-Type `application/td+json`
+ * @see     [Web of Things (WoT) Thing Description 1.1](https://www.w3.org/TR/wot-thing-description11/)
+ */
+#define COAP_FORMAT_TD_JSON                 (432)
+/**
+ * @brief   Content-Type `application/tm+json`
+ * @see     [Web of Things (WoT) Thing Description 1.1](https://www.w3.org/TR/wot-thing-description11/)
+ */
+#define COAP_FORMAT_TM_JSON                 (433)
+/**
+ * @brief   Content-Type `application/voucher-cose+cbor`
+ * @see     [draft-ietf-anima-constrained-voucher](https://datatracker.ietf.org/doc/draft-ietf-anima-constrained-voucher/)
+ * @note    Temporary registration until April 12, 2024.
+ */
+#define COAP_FORMAT_VOUCER_COSE_CBOR        (836)
+/**
+ * @brief   Content-Type `application/vnd.ocf+cbor`
+ */
+#define COAP_FORMAT_VND_OCF_CBOR          (10000)
+/**
+ * @brief   Content-Type `application/oscore`
+ * @see     [RFC 8613](https://datatracker.ietf.org/doc/html/rfc8613)
+ */
+#define COAP_FORMAT_OSCORE                (10001)
+/**
+ * @brief   Content-Type `application/javascript`
+ * @see     [RFC 4329](https://datatracker.ietf.org/doc/html/rfc4329)
+ */
+#define COAP_FORMAT_JAVASCRIPT            (10002)
+/**
+ * @brief   Content-Type `application/json` with Content Coding `deflate`
+ * @see     [RFC 8259](https://datatracker.ietf.org/doc/html/rfc8259)
+ * @see     [RFC 9110,  Section 8.4.1.2](https://datatracker.ietf.org/doc/html/rfc9110)
+ */
+#define COAP_FORMAT_JSON_DEFLATE          (11050)
+/**
+ * @brief   Content-Type `application/cbor` with Content Coding `deflate`
+ * @see     [RFC 8949](https://datatracker.ietf.org/doc/html/rfc8949)
+ * @see     [RFC 9110,  Section 8.4.1.2](https://datatracker.ietf.org/doc/html/rfc9110)
+ */
+#define COAP_FORMAT_CBOR_DEFLATE          (11060)
+/**
+ * @brief   Content-Type `application/vnd.oma.lwm2m+tlv`
+ * @see     [OMA-TS-LightweightM2M-V1_0](https://www.openmobilealliance.org/release/LightweightM2M/V1_0-20170208-A/OMA-TS-LightweightM2M-V1_0-20170208-A.pdf)
+ */
+#define COAP_FORMAT_VND_OMA_LWM2M_TLV     (11542)
+/**
+ * @brief   Content-Type `application/vnd.oma.lwm2m+json`
+ * @see     [OMA-TS-LightweightM2M-V1_0](https://www.openmobilealliance.org/release/LightweightM2M/V1_0-20170208-A/OMA-TS-LightweightM2M-V1_0-20170208-A.pdf)
+ */
+#define COAP_FORMAT_VND_OMA_LWM2M_JSON    (11543)
+/**
+ * @brief   Content-Type `application/vnd.oma.lwm2m+cbor`
+ * @see     [OMA-TS-LightweightM2M-V1_2](https://www.openmobilealliance.org/release/LightweightM2M/V1_2-20201110-A/HTML-Version/OMA-TS-LightweightM2M_Core-V1_2-20201110-A.html)
+ */
+#define COAP_FORMAT_VND_OMA_LWM2M_CBOR    (11544)
+/**
+ * @brief   Content-Type `text/css`
+ * @see     https://datatracker.ietf.org/doc/html/rfc2318
+ */
+#define COAP_FORMAT_TEXT_CSS              (20000)
+/**
+ * @brief   Content-Type `image/svg+xml`
+ * @see     [RFC 2318](https://www.w3.org/TR/SVG/mimereg.html)
+ */
+#define COAP_FORMAT_IMAGE_SVG_XML         (30000)
 #define COAP_FORMAT_DNS_MESSAGE           (65053)       /**< NON STANDARD! */
 /** @} */
 
