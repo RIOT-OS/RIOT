@@ -28,6 +28,7 @@
 #include "iec62056/obis.h"
 #include "fmt.h"
 #include "macros/utils.h"
+#include "rtc_utils.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
