@@ -27,8 +27,8 @@
 #include "fmt.h"
 #include "iec62056.h"
 #include "iec62056/obis.h"
+#include "macros/utils.h"
 
-#define MAX(a, b)   (a > b ? a : b)
 
 static const char *digitnsep(const char *str, size_t n)
 {

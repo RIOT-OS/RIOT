@@ -22,15 +22,16 @@
 #include <string.h>
 #include <time.h>
 #include <math.h>
+
+#include "checksum/ucrc16.h"
 #include "iec62056/21.h"
 #include "iec62056/obis.h"
 #include "fmt.h"
-#include "checksum/ucrc16.h"
+#include "macros/utils.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#define MIN(a, b)   (a > b ? b : a)
 
 static bool _is_whitespace(char c)
 {
@@ -385,7 +386,7 @@ int iec62056_21_dataset_parse_timestamp(const iec62056_21_dataset_t *dataset, st
     time->tm_sec = scn_u32_dec(dataset->value + 10, 2);
     time->tm_isdst = dataset->value[12] == 'S';
 
-    mktime(time); /* Normalize just in case */
+    rtc_tm_normalize(time); /* Normalize just in case */
 
     return 0;
 }
