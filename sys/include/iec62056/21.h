@@ -92,6 +92,17 @@ int iec62056_21_dataset_parse_register_to_decfrac(const iec62056_21_dataset_t *d
                                                   int64_t *mantissa, int64_t *scaling);
 
 /**
+ * @brief Parse the numerical part of a register value to a floating point.
+ *
+ * @param   dataset     The dataset to parse
+ * @param   value       Parsed value
+ *
+ * @returns negative when parsing failed, zero on success
+ */
+int iec62056_21_dataset_parse_register_to_float(const iec62056_21_dataset_t *dataset,
+                                                 float *value);
+
+/**
  * @brief Parse the numerical part of a register value to a floating point double.
  *
  * @param   dataset     The dataset to parse

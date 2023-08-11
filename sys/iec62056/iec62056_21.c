@@ -309,6 +309,20 @@ int iec62056_21_dataset_parse_register_to_decfrac(const iec62056_21_dataset_t *d
     return 0;
 }
 
+int iec62056_21_dataset_parse_register_to_float(const iec62056_21_dataset_t *dataset,
+                                                 float *value)
+{
+    int64_t mantissa = 0;
+    int64_t scaling = 0;
+    int res = iec62056_21_dataset_parse_register_to_decfrac(dataset, &mantissa, &scaling);
+    if (res < 0) {
+        return res;
+    }
+
+    *value = (float)mantissa * pow(10, scaling);
+    return 0;
+}
+
 int iec62056_21_dataset_parse_register_to_double(const iec62056_21_dataset_t *dataset,
                                                  double *value)
 {
