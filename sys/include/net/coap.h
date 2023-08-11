@@ -48,12 +48,46 @@ extern "C" {
 #define COAP_OPT_IF_NONE_MATCH  (5)
 #define COAP_OPT_OBSERVE        (6)
 #define COAP_OPT_LOCATION_PATH  (8)
+/**
+ * @brief OSCORE option
+ *
+ * Indicates that the CoAP message is an OSCORE message and that it contains a
+ * compressed COSE object.
+ *
+ * @see [RFC 8613](https://datatracker.ietf.org/doc/html/rfc8613)
+ */
+#define COAP_OPT_OSCORE         (9)
 #define COAP_OPT_URI_PATH       (11)
 #define COAP_OPT_CONTENT_FORMAT (12)
 #define COAP_OPT_MAX_AGE        (14)
 #define COAP_OPT_URI_QUERY      (15)
+/**
+ * @brief Hop-Limit option
+ *
+ * Used to prevent infinite loops when communicating over multiple proxies.
+ *
+ * @see [RFC 8768](https://datatracker.ietf.org/doc/html/rfc8768)
+ */
+#define COAP_OPT_HOP_LIMIT      (16)
 #define COAP_OPT_ACCEPT         (17)
+/**
+ * @brief Q-Block1 option
+ *
+ * Used for block-wise transfer supporting robust transmission in requests.
+ *
+ * @see [RFC 9177](https://datatracker.ietf.org/doc/html/rfc9177)
+ */
+#define COAP_OPT_Q_BLOCK1       (19)
 #define COAP_OPT_LOCATION_QUERY (20)
+/**
+ * @brief EDHOC option
+ *
+ * Used in a CoAP request to signal that the request payload conveys both an
+ * EDHOC message_3 and OSCORE protected data, combined together.
+ *
+ * @see [draft-ietf-core-oscore-edhoc-02](https://datatracker.ietf.org/doc/draft-ietf-core-oscore-edhoc/02/)
+ */
+#define COAP_OPT_EDHOC          (21)
 #define COAP_OPT_BLOCK2         (23)
 #define COAP_OPT_BLOCK1         (27)
 /**
@@ -67,6 +101,14 @@ extern "C" {
  * @see [RFC 8613](https://datatracker.ietf.org/doc/html/rfc8613)
  */
 #define COAP_OPT_SIZE2          (28)
+/**
+ * @brief Q-Block2 option
+ *
+ * Used for block-wise transfer supporting robust transmission in responses.
+ *
+ * @see [RFC 9177](https://datatracker.ietf.org/doc/html/rfc9177)
+ */
+#define COAP_OPT_Q_BLOCK2       (31)
 #define COAP_OPT_PROXY_URI      (35)
 #define COAP_OPT_PROXY_SCHEME   (39)
 /**
@@ -83,10 +125,28 @@ extern "C" {
  */
 #define COAP_OPT_SIZE1          (60)
 /**
+ * @brief Echo option
+ *
+ * Enables a CoAP server to verify the freshness of a request or to force a
+ * client to demonstrate reachability at its claimed network address.
+ *
+ * @see [RFC 9175](https://datatracker.ietf.org/doc/html/rfc9175)
+ */
+#define COAP_OPT_ECHO           (252)
+/**
  * @brief suppress CoAP response
  * @see [RFC 7968](https://datatracker.ietf.org/doc/html/rfc7967)
  */
 #define COAP_OPT_NO_RESPONSE    (258)
+/**
+ * @brief Request-Tag option
+ *
+ * Allows a CoAP server to match block-wise message fragments belonging to the
+ * same request.
+ *
+ * @see [RFC 9175](https://datatracker.ietf.org/doc/html/rfc9175)
+ */
+#define COAP_OPT_REQUEST_TAG    (292)
 /** @} */
 
 /**
