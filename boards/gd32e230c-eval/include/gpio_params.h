@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 /**
- * @brief    GPIO pin configuration
+ * @brief    LED/Button SAUL configuration
  */
 static const  saul_gpio_params_t saul_gpio_params[] =
 {
@@ -56,12 +56,12 @@ static const  saul_gpio_params_t saul_gpio_params[] =
         .flags = SAUL_GPIO_INIT_CLEAR,
     },
     {
-        .name = "Button Wakeup",
+        .name = "Button 0 - Wakeup",
         .pin  = BTN0_PIN,
         .mode = BTN0_MODE,
     },
     {
-        .name = "Button Tamper",
+        .name = "Button 1 - Tamper",
         .pin  = BTN1_PIN,
         .mode = BTN1_MODE,
     },

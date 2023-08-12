@@ -39,7 +39,7 @@ OF SUCH DAMAGE.
 #include "gd32e23x.h"
 
 /* CRC definitions */
-// #define CRC                            CRC_BASE                        /*!< CRC bsae address */
+#define CRC                            CRC_BASE                        /*!< CRC bsae address */
 
 /* registers definitions */
 #define CRC_DATA                       REG32((CRC) + 0x00000000U)      /*!< CRC data register */

@@ -39,8 +39,8 @@ OF SUCH DAMAGE.
 #include "gd32e23x.h"
 
 /* FMC and option byte definition */
-// #define FMC                     FMC_BASE                    /*!< FMC register base address */
-// #define OB                      OB_BASE                     /*!< option byte base address */
+#define FMC                     FMC_BASE                    /*!< FMC register base address */
+#define OB                      OB_BASE                     /*!< option byte base address */
 
 /* registers definitions */
 #define FMC_WS                  REG32((FMC) + 0x00U)        /*!< FMC wait state register */

@@ -39,7 +39,7 @@ OF SUCH DAMAGE.
 #include "gd32e23x.h"
 
 /* EXTI definitions */
-// #define EXTI                         EXTI_BASE
+#define EXTI                         EXTI_BASE
 
 /* registers definitions */
 #define EXTI_INTEN                  REG32(EXTI + 0x00000000U)       /*!< interrupt enable register */

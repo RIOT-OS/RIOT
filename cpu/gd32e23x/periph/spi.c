@@ -27,6 +27,7 @@
 #include "periph/gpio.h"
 #include "periph/spi.h"
 #include "pm_layered.h"
+#include "cpu_common.h"
 
 #define ENABLE_DEBUG        0
 #include "debug.h"
@@ -62,7 +63,7 @@ static uint32_t clocks[SPI_NUMOF];
  */
 static uint8_t dividers[SPI_NUMOF];
 
-static inline SPI0_Type *dev(spi_t bus)
+static inline SPI_Type *dev(spi_t bus)
 {
     return spi_config[bus].dev;
 }

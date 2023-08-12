@@ -23,7 +23,8 @@
 #include "mutex.h"
 #include "periph/adc.h"
 #include "periph/vbat.h"
-#include "gd32e23x_adc.h"
+#include "cpu_common.h"
+// #include "gd32e23x_adc.h"
 
 /**
  * @brief   Default VBAT undefined value

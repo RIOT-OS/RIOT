@@ -39,7 +39,7 @@ OF SUCH DAMAGE.
 #include "gd32e23x.h"
 
 /* DBG definitions */
-// #define DBG                      DBG_BASE
+#define DBG                      DBG_BASE
 
 /* registers definitions */
 #define DBG_ID                   REG32(DBG + 0x00U)      /*!< DBG_ID code register */

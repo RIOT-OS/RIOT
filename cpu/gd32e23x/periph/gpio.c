@@ -25,6 +25,20 @@
  * @brief   Extract information from mode parameter
  */
 #define MODE_MASK                       (0x0f)
+#define ODR_POS                         (4U)
+
+#ifdef MODULE_PERIPH_GPIO_IRQ
+/**
+ * @brief   Number of available external interrupt lines
+ */
+#define GPIO_ISR_CHAN_NUMOF             (16U)
+#define GPIO_ISR_CHAN_MASK              (0xFFFF)
+
+/**
+ * @brief   Allocate memory for one callback and argument per EXTI channel
+ */
+static gpio_isr_ctx_t exti_ctx[GPIO_ISR_CHAN_NUMOF];
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 /**
  * @brief   Extract the port base address from the given pin identifier
@@ -52,24 +66,19 @@ static inline int _pin_num(gpio_t pin)
 
 static inline void _port_enable_clock(gpio_t pin)
 {
-    //TODO APB1
-    // periph_clk_en(APB2, (RCU_APB2EN_PAEN_Msk << _port_num(pin)));
-    // periph_clk_en(AHB, (RCC_AHBENR_GPIOAEN << _port_num(pin)));
-    periph_clk_en(AHB, (RCU_AHBEN_PAEN_Msk << _port_num(pin)));
+    periph_clk_en(AHB, (RCU_AHBEN_PAEN_Msk << _port_num(pin)));  //GPIO are all on AHB2 which shares configuration with AHB
 }
 
-static inline void set_mode(GPIO_Type *port, int pin_num, unsigned mode)
-{
-    // uint32_t tmp = GPIO_OMODE(port);
-    uint32_t tmp = port->OMODE;
-    tmp &= ~(0x3 << (2 * pin_num));// is thei MODE_MASK  or GPIO_MODE_MASK ?
-    tmp |=  ((mode & 0x3) << (2 * pin_num));
-    // GPIO_OMODE(port) = tmp;
-    port->OMODE = tmp;
-}
+//static inline void set_mode(GPIO_Type *port, int pin_num, unsigned mode)
+//{
+//    uint32_t tmp = port->OMODE;
+//    tmp &= ~(0x3 << (2 * pin_num));// is this MODE_MASK  or GPIO_MODE_MASK ?
+//    tmp |=  ((mode & 0x3) << (2 * pin_num));
+//    port->OMODE = tmp;
+//}
 
 /**
- * @brief   Check if the given mode is some kind of input mdoe
+ * @brief   Check if the given mode is some kind of input mode
  * @param[in]   mode    Mode to check
  * @retval  1           @p mode is GPIO_IN, GPIO_IN_PD, or GPIO_IN_PU
  * @retval  0           @p mode is not an input mode
@@ -120,14 +129,15 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     //         cpu_reg_disable_bits(&port->OCTL, 1 << pin_num);
     //     }
     // }
+
     /* set pull resistor configuration */
-    GPIO_PUD(port) &= ~(0x3 << (2 * pin_num));
-    GPIO_PUD(port) |=  (((mode >> 2) & 0x3) << (2 * pin_num));
+    port->PUD &= ~(0x3 << (2 * pin_num));
+    port->PUD |=  (((mode >> 2) & 0x3) << (2 * pin_num));
     /* set output mode */
-    GPIO_OMODE(port) &= ~(1 << pin_num);
-    GPIO_OMODE(port) |=  (((mode >> 4) & 0x1) << pin_num);
+    port->OMODE &= ~(1 << pin_num);
+    port->OMODE |=  (((mode >> 4) & 0x1) << pin_num);
     /* set pin speed to maximum */
-    GPIO_OSPD(port) |= (3 << (2 * pin_num));
+    port->OSPD |= (3 << (2 * pin_num));
 
     return 0; /* all OK */
 }
@@ -160,7 +170,7 @@ int gpio_read(gpio_t pin)
     GPIO_Type *port = _port(pin);
     unsigned pin_num = _pin_num(pin);
 
-    if (_pin_is_output(port, pin)) {
+    if (_pin_is_output(port, pin_num)) {
         /* pin is output */
         return (port->OCTL & (1 << pin_num));
     }

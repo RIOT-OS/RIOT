@@ -1559,7 +1559,7 @@ typedef struct {                                /*!< GPIOA Structure            
             uint32_t            : 16;
     } TG_b;
   } ;
-} GPIOA_Type;                                   /*!< Size = 48 (0x30)                                                          */
+} GPIO_Type;                                   /*!< Size = 48 (0x30)                                                          */
 
 
 
@@ -4371,7 +4371,7 @@ typedef struct {                                /*!< SPI0 Structure             
             uint32_t            : 22;
     } I2SPSC_b;
   } ;
-} SPI0_Type;                                    /*!< Size = 36 (0x24)                                                          */
+} SPI_Type;                                     /*!< Size = 36 (0x24)                                                          */
 
 
 
@@ -4962,7 +4962,7 @@ typedef struct {                                /*!< TIMER0 Structure           
             uint32_t            : 30;
     } CFG_b;
   } ;
-} TIMER0_Type;                                  /*!< Size = 256 (0x100)                                                        */
+} TIMER_Type;                                  /*!< Size = 256 (0x100)                                                        */
 
 
 
@@ -6307,27 +6307,27 @@ typedef struct {                                /*!< WWDGT Structure            
   * @{
   */
 
-#define ADC_BASE                    0x40012400UL
-#define CMP_BASE                    0x4001001CUL
-#define CRC_BASE                    0x40023000UL
-#define DBGMCU_BASE                 0x40015800UL
-#define DMA_BASE                    0x40020000UL
-#define EXTI_BASE                   0x40010400UL
-#define FMC_BASE                    0x40022000UL
-#define FWDGT_BASE                  0x40003000UL
-#define GPIOA_BASE                  0x48000000UL
-#define GPIOB_BASE                  0x48000400UL
-#define GPIOC_BASE                  0x48000800UL
-#define GPIOF_BASE                  0x48001400UL
+// #define ADC_BASE                    0x40012400UL
+// #define CMP_BASE                    0x4001001CUL
+// #define CRC_BASE                    0x40023000UL
+// #define DBGMCU_BASE                 0x40015800UL
+// #define DMA_BASE                    0x40020000UL
+// #define EXTI_BASE                   0x40010400UL
+// #define FMC_BASE                    0x40022000UL
+// #define FWDGT_BASE                  0x40003000UL
+// #define GPIOA_BASE                  0x48000000UL
+// #define GPIOB_BASE                  0x48000400UL
+// #define GPIOC_BASE                  0x48000800UL
+// #define GPIOF_BASE                  0x48001400UL
 #define I2C0_BASE                   0x40005400UL
 #define I2C1_BASE                   0x40005800UL
 // #define NVIC_BASE                   0xE000E100UL
-#define PMU_BASE                    0x40007000UL
+// #define PMU_BASE                    0x40007000UL
 // #define RCU_BASE                    0x40021000UL
-#define RTC_BASE                    0x40002800UL
+// #define RTC_BASE                    0x40002800UL
 #define SPI0_BASE                   0x40013000UL
 #define SPI1_BASE                   0x40003800UL
-#define SYSCFG_BASE                 0x40010000UL
+// #define SYSCFG_BASE                 0x40010000UL
 #define TIMER0_BASE                 0x40012C00UL
 #define TIMER2_BASE                 0x40000400UL
 #define TIMER5_BASE                 0x40001000UL
@@ -6337,7 +6337,7 @@ typedef struct {                                /*!< WWDGT Structure            
 #define TIMER16_BASE                0x40014800UL
 #define USART0_BASE                 0x40013800UL
 #define USART1_BASE                 0x40004400UL
-#define WWDGT_BASE                  0x40002C00UL
+// #define WWDGT_BASE                  0x40002C00UL
 
 /** @} */ /* End of group Device_Peripheral_peripheralAddr */
 
@@ -6359,28 +6359,28 @@ typedef struct {                                /*!< WWDGT Structure            
 #define EXTI                        ((EXTI_Type*)              EXTI_BASE)
 #define FMC                         ((FMC_Type*)               FMC_BASE)
 #define FWDGT                       ((FWDGT_Type*)             FWDGT_BASE)
-// #define GPIOA                       ((GPIOA_Type*)             GPIOA_BASE)
-// #define GPIOB                       ((GPIOB_Type*)             GPIOB_BASE)
-// #define GPIOC                       ((GPIOC_Type*)             GPIOC_BASE)
-// #define GPIOF                       ((GPIOF_Type*)             GPIOF_BASE)
-#define I2C0                        ((I2C_Type*)              I2C0_BASE)
-#define I2C1                        ((I2C_Type*)              I2C1_BASE)
+#define GPIOA                       ((GPIO_Type*)              GPIOA_BASE)
+#define GPIOB                       ((GPIO_Type*)              GPIOB_BASE)
+#define GPIOC                       ((GPIO_Type*)              GPIOC_BASE)
+#define GPIOF                       ((GPIO_Type*)              GPIOF_BASE)
+#define I2C0                        ((I2C_Type*)               I2C0_BASE)
+#define I2C1                        ((I2C_Type*)               I2C1_BASE)
 // #define NVIC                        ((NVIC_Type*)              NVIC_BASE)
 #define PMU                         ((PMU_Type*)               PMU_BASE)
 #define RCU                         ((RCU_Type*)               RCU_BASE)
 #define RTC                         ((RTC_Type*)               RTC_BASE)
-#define SPI0                        ((SPI0_Type*)              SPI0_BASE)
-#define SPI1                        ((SPI1_Type*)              SPI1_BASE)
+#define SPI0                        ((SPI_Type*)               SPI0_BASE)
+#define SPI1                        ((SPI_Type*)               SPI1_BASE)
 #define SYSCFG                      ((SYSCFG_Type*)            SYSCFG_BASE)
-#define TIMER0                      ((TIMER0_Type*)            TIMER0_BASE)
-#define TIMER2                      ((TIMER2_Type*)            TIMER2_BASE)
-#define TIMER5                      ((TIMER5_Type*)            TIMER5_BASE)
-#define TIMER13                     ((TIMER13_Type*)           TIMER13_BASE)
-#define TIMER14                     ((TIMER14_Type*)           TIMER14_BASE)
-#define TIMER15                     ((TIMER15_Type*)           TIMER15_BASE)
-#define TIMER16                     ((TIMER15_Type*)           TIMER16_BASE)
-#define USART0                      ((USART_Type*)            USART0_BASE)
-#define USART1                      ((USART_Type*)            USART1_BASE)
+#define TIMER0                      ((TIMER_Type*)             TIMER0_BASE)
+#define TIMER2                      ((TIMER_Type*)             TIMER2_BASE)
+#define TIMER5                      ((TIMER_Type*)             TIMER5_BASE)
+#define TIMER13                     ((TIMER_Type*)             TIMER13_BASE)
+#define TIMER14                     ((TIMER_Type*)             TIMER14_BASE)
+#define TIMER15                     ((TIMER_Type*)             TIMER15_BASE)
+#define TIMER16                     ((TIMER_Type*)             TIMER16_BASE)
+#define USART0                      ((USART_Type*)             USART0_BASE)
+#define USART1                      ((USART_Type*)             USART1_BASE)
 #define WWDGT                       ((WWDGT_Type*)             WWDGT_BASE)
 
 /** @} */ /* End of group Device_Peripheral_declaration */

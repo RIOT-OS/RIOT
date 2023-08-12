@@ -34,7 +34,7 @@
 #include "periph/gpio.h"
 #include "periph_conf.h"
 #include "gd32e23x_periph.h"
-
+#include "cpu_common.h"
 
 #define ENABLE_DEBUG    0
 #include "debug.h"

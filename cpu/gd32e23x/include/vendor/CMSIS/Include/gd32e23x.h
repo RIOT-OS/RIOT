@@ -183,34 +183,33 @@ typedef enum {ERROR = 0, SUCCESS = !ERROR} ErrStatus;
 #define AHB1_BUS_BASE         ((uint32_t)0x40020000U)       /*!< ahb1 base address                */
 #define AHB2_BUS_BASE         ((uint32_t)0x48000000U)       /*!< ahb2 base address                */
 /* advanced peripheral bus 1 memory map */
-// #define TIMER_BASE            (APB1_BUS_BASE + 0x00000000U) /*!< TIMER base address               */
-// #define RTC_BASE              (APB1_BUS_BASE + 0x00002800U) /*!< RTC base address                 */
-// #define WWDGT_BASE            (APB1_BUS_BASE + 0x00002C00U) /*!< WWDGT base address               */
-// #define FWDGT_BASE            (APB1_BUS_BASE + 0x00003000U) /*!< FWDGT base address               */
-// #define SPI_BASE              (APB1_BUS_BASE + 0x00003800U) /*!< SPI base address                 */
-// #define USART_BASE            (APB1_BUS_BASE + 0x00004400U) /*!< USART base address               */
-// #define I2C_BASE              (APB1_BUS_BASE + 0x00005400U) /*!< I2C base address                 */
-// #define PMU_BASE              (APB1_BUS_BASE + 0x00007000U) /*!< PMU base address                 */
+#define TIMER_BASE            (APB1_BUS_BASE + 0x00000000U) /*!< TIMER base address               */
+#define RTC_BASE              (APB1_BUS_BASE + 0x00002800U) /*!< RTC base address                 */
+#define WWDGT_BASE            (APB1_BUS_BASE + 0x00002C00U) /*!< WWDGT base address               */
+#define FWDGT_BASE            (APB1_BUS_BASE + 0x00003000U) /*!< FWDGT base address               */
+#define SPI_BASE              (APB1_BUS_BASE + 0x00003800U) /*!< SPI base address                 */
+#define USART_BASE            (APB1_BUS_BASE + 0x00004400U) /*!< USART base address               */
+#define I2C_BASE              (APB1_BUS_BASE + 0x00005400U) /*!< I2C base address                 */
+#define PMU_BASE              (APB1_BUS_BASE + 0x00007000U) /*!< PMU base address                 */
 /* advanced peripheral bus 2 memory map */
-// #define SYSCFG_BASE           (APB2_BUS_BASE + 0x00000000U) /*!< SYSCFG base address              */
-// #define CMP_BASE              (APB2_BUS_BASE + 0x0000001CU) /*!< CMP base address                 */
-// #define EXTI_BASE             (APB2_BUS_BASE + 0x00000400U) /*!< EXTI base address                */
-// #define ADC_BASE              (APB2_BUS_BASE + 0x00002400U) /*!< ADC base address                 */
+#define SYSCFG_BASE           (APB2_BUS_BASE + 0x00000000U) /*!< SYSCFG base address              */
+#define CMP_BASE              (APB2_BUS_BASE + 0x0000001CU) /*!< CMP base address                 */
+#define EXTI_BASE             (APB2_BUS_BASE + 0x00000400U) /*!< EXTI base address                */
+#define ADC_BASE              (APB2_BUS_BASE + 0x00002400U) /*!< ADC base address                 */
 /* advanced high performance bus 1 memory map */
-// #define DMA_BASE              (AHB1_BUS_BASE + 0x00000000U) /*!< DMA base address                 */
-// #define DMA_CHANNEL_BASE      (DMA_BASE + 0x00000008U)      /*!< DMA channel base address         */
+#define DMA_BASE              (AHB1_BUS_BASE + 0x00000000U) /*!< DMA base address                 */
+#define DMA_CHANNEL_BASE      (DMA_BASE + 0x00000008U)      /*!< DMA channel base address         */
 #define RCU_BASE              (AHB1_BUS_BASE + 0x00001000U) /*!< RCU base address                 */
-// #define FMC_BASE              (AHB1_BUS_BASE + 0x00002000U) /*!< FMC base address                 */
-// #define CRC_BASE              (AHB1_BUS_BASE + 0x00003000U) /*!< CRC base address                 */
+#define FMC_BASE              (AHB1_BUS_BASE + 0x00002000U) /*!< FMC base address                 */
+#define CRC_BASE              (AHB1_BUS_BASE + 0x00003000U) /*!< CRC base address                 */
 /* advanced high performance bus 2 memory map */
-// #define GPIO_BASE             (AHB2_BUS_BASE + 0x00000000U) /*!< GPIO base address                */
+#define GPIOA_BASE            (AHB2_BUS_BASE + 0x00000000U) /*!< GPIO base address                */
+#define GPIOB_BASE            (APB2_BUS_BASE + 0x00000400U) /*!< GPIOB base address               */
+#define GPIOC_BASE            (APB2_BUS_BASE + 0x00000800U) /*!< GPIOC base address               */
+#define GPIOF_BASE            (APB2_BUS_BASE + 0x00001400U) /*!< GPIOE base address               */
 /* option byte and debug memory map */
 #define OB_BASE               ((uint32_t)0x1FFFF800U)       /*!< OB base address                  */
 #define DBG_BASE              ((uint32_t)0x40015800U)       /*!< DBG base address                 */
-
-// #include "gd32e23x_libopt.h"
-
-#define GPIO_Type GPIOA_Type
 
 #ifdef __cplusplus
 }

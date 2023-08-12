@@ -40,7 +40,7 @@ OF SUCH DAMAGE.
 #include "gd32e23x.h"
 
 /* CMP definitions */
-// #define CMP                                      CMP_BASE                       /*!< CMP base address */
+#define CMP                                      CMP_BASE                       /*!< CMP base address */
 
 /* registers definitions */
 #define CMP_CS                                   REG32((CMP) + 0x00U)           /*!< CMP control and status register */

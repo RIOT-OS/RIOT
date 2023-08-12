@@ -39,7 +39,7 @@ OF SUCH DAMAGE.
 #include "gd32e23x.h"
 
 /* DMA definitions */
-// #define DMA                               DMA_BASE              /*!< DMA base address */
+#define DMA                               DMA_BASE              /*!< DMA base address */
 
 /* registers definitions */
 #define DMA_INTF                          REG32(DMA_BASE + 0x00U)    /*!< DMA interrupt flag register */

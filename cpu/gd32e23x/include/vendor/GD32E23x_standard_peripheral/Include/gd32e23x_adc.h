@@ -39,7 +39,7 @@ OF SUCH DAMAGE.
 #include "gd32e23x.h"
 
 /* ADC definitions */
-// #define ADC                              ADC_BASE
+#define ADC                              ADC_BASE
 
 /* registers definitions */
 #define ADC_STAT                         REG32(ADC + 0x00U)               /*!< ADC status register */

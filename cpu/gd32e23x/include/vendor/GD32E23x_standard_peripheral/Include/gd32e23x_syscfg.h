@@ -39,7 +39,7 @@ OF SUCH DAMAGE.
 #include "gd32e23x.h"
 
 /* SYSCFG definitions */
-// #define SYSCFG                              SYSCFG_BASE
+#define SYSCFG                              SYSCFG_BASE
 
 /* registers definitions */
 #define SYSCFG_CFG0                         REG32(SYSCFG + 0x00U)               /*!< system configuration register 0 */

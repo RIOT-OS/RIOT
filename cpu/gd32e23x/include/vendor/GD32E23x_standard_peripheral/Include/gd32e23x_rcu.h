@@ -39,7 +39,7 @@ OF SUCH DAMAGE.
 #include "gd32e23x.h"
 
 /* RCU definitions */
-// #define RCU                         RCU_BASE
+#define RCU                         RCU_BASE
 
 /* registers definitions */
 #define RCU_CTL0                    REG32(RCU + 0x00000000U)        /*!< control register 0 */

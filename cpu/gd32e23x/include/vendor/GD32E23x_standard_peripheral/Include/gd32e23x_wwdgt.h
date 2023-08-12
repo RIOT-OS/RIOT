@@ -41,7 +41,7 @@ OF SUCH DAMAGE.
 #include "gd32e23x.h"
 
 /* WWDGT definitions */
-// #define WWDGT                       WWDGT_BASE
+#define WWDGT                       WWDGT_BASE
 
 /* registers definitions */
 #define WWDGT_CTL                   REG32((WWDGT) + 0x00000000U)                     /*!< WWDGT control register */

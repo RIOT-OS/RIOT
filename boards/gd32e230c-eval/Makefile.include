@@ -5,6 +5,9 @@
 #useful if cpu family header files have dependency on 230 vs 231 (they do)
 #CFLAGS += -D__GD32E230C__
 
+#PORT_LINUX ?= /dev/ttyACM0
+#PORT_LINUX ?= /dev/ttyUSB0
+
 #using JLink, do we have to enable the Virtual COM port using JLink configurator?
 
 #PROGRAMMER ?= openocd

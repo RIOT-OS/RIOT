@@ -39,8 +39,8 @@ OF SUCH DAMAGE.
 #include "gd32e23x.h"
 
 /* I2Cx(x=0,1) definitions */
-// #define I2C0                          I2C_BASE                          /*!< I2C0 base address */
-// #define I2C1                          (I2C_BASE + 0x00000400U)          /*!< I2C1 base address */
+#define I2C0                          I2C_BASE                          /*!< I2C0 base address */
+#define I2C1                          (I2C_BASE + 0x00000400U)          /*!< I2C1 base address */
 
 /* registers definitions */
 #define I2C_CTL0(i2cx)                REG32((i2cx) + 0x00000000U)       /*!< I2C control register 0 */

@@ -3,7 +3,7 @@
 // #include "assert.h"
 #include "periph/pwm.h"
 #include "periph/gpio.h"
-#include "gd32e23x_rcu.h"
+// #include "gd32e23x_rcu.h"
 
 // #define CCMR_MODE1          (TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC2M_1 | TIM_CCMR1_OC2M_2)
 // #define CCMR_MODE2          (TIM_CCMR1_OC1M_0 | TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC2M_0 | TIM_CCMR1_OC2M_1 | TIM_CCMR1_OC2M_2)

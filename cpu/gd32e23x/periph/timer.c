@@ -22,6 +22,7 @@
 #include "cpu.h"
 #include "periph/timer.h"
 // #include "gd32e23x_periph.h"  // TODO temporary?
+#include "cpu_common.h"
 
 /**
  * @brief   Interrupt context for each configured timer
@@ -31,7 +32,7 @@ static timer_isr_ctx_t isr_ctx[TIMER_NUMOF];
 /**
  * @brief   Get the timer device
  */
-static inline TIMER0_Type *dev(tim_t tim)  // not TIMER5?
+static inline TIMER_Type *dev(tim_t tim)
 {
     return timer_config[tim].dev;
 }

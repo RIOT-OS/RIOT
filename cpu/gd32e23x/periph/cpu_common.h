@@ -53,15 +53,6 @@ extern "C" {
 #define CLOCK_LSI           (40000U)
 
 /**
- * @brief   Available peripheral buses
- */
-typedef enum {
-    APB1,           /**< APB1 bus */
-    APB2,           /**< APB2 bus */
-    AHB,            /**< AHB bus */
-} bus_t;
-
-/**
  * @brief   Get the actual bus clock frequency for the APB buses
  *
  * @param[in] bus       target APBx bus

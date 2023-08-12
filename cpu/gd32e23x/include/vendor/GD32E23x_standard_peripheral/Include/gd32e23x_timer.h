@@ -39,13 +39,13 @@ OF SUCH DAMAGE.
 #include "gd32e23x.h"
 
 /* TIMERx(x=0,1,2,5,13..16) definitions */
-// #define TIMER0                           (TIMER_BASE + 0x00012C00U)
-// #define TIMER2                           (TIMER_BASE + 0x00000400U)
-// #define TIMER5                           (TIMER_BASE + 0x00001000U)
-// #define TIMER13                          (TIMER_BASE + 0x00002000U)
-// #define TIMER14                          (TIMER_BASE + 0x00014000U)
-// #define TIMER15                          (TIMER_BASE + 0x00014400U)
-// #define TIMER16                          (TIMER_BASE + 0x00014800U)
+#define TIMER0                           (TIMER_BASE + 0x00012C00U)
+#define TIMER2                           (TIMER_BASE + 0x00000400U)
+#define TIMER5                           (TIMER_BASE + 0x00001000U)
+#define TIMER13                          (TIMER_BASE + 0x00002000U)
+#define TIMER14                          (TIMER_BASE + 0x00014000U)
+#define TIMER15                          (TIMER_BASE + 0x00014400U)
+#define TIMER16                          (TIMER_BASE + 0x00014800U)
 
 /* registers definitions */
 #define TIMER_CTL0(timerx)               REG32((timerx) + 0x00U)           /*!< TIMER control register 0 */

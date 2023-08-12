@@ -41,7 +41,7 @@ OF SUCH DAMAGE.
 #include "gd32e23x.h"
 
 /* FWDGT definitions */
-// #define FWDGT                       FWDGT_BASE
+#define FWDGT                       FWDGT_BASE
 
 /* registers definitions */
 #define FWDGT_CTL                   REG32((FWDGT) + 0x00000000U)                     /*!< FWDGT control register */

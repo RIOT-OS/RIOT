@@ -43,12 +43,23 @@ extern "C" {
 #define CPU_HAS_BITBAND                 (1)
 // /** @} */
 
+// /**
+//  * @name cpu functions
+//  * @{
+//  */
+// extern void setup_fpu(void);
+// extern void cpu_clock_init(int);
+// /** @} */
+
 /**
- * @name cpu functions
+ * @name Flashpage settings
  * @{
  */
-// extern void cpu_clock_init(int);
-/** @} */
+// #define FLASHPAGE_SIZE                  (1024U)
+// #define FLASHPAGE_NUMOF                 (128U)
+// #define FLASHPAGE_WRITE_BLOCK_SIZE      (2U)
+// #define FLASHPAGE_WRITE_BLOCK_ALIGNMENT (4U)
+// #define CPU_FLASH_BASE                  0x08000000
 
 #ifdef __cplusplus
 }

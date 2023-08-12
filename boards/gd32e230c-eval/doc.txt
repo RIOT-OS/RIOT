@@ -1,11 +1,19 @@
 /**
+ * Copyright (C) 2023 BISSELL Homecare, Inc.
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
  * @defgroup    boards_gd32e230c-eval GD32E230C-EVAL
  * @ingroup     boards
  * @brief       Support for the GD32E230C-EVAL board.
  *
  * ### General information
  *
- * Reference GD32E2 MCU, Evaluation Board documentation here
+ * Reference GD32E23 MCU, Evaluation Board documentation here
  *          https://gd32mcu.com/en/download/8?kw=GD32E2
  * File GD32E23x_Demo_Suites_V1.1.1/GD32E230C_EVAL_Demo_Suites/Doc/
  *          GD32E230C-EVAL_User_Guide_Rev1.1.pdf
@@ -16,33 +24,35 @@
  *
  * From Table 2-1, page 6
  *
- * PA8          LED1
- * PA11         LED2
- * PA12         LED3
- * PA15         LED4
- *              KEY1-Reset
- * PA0          KEY2-Wakeup
- * PC13         KEY3-Tamper
- * PB4          IR_RX
- * PB9          IR_TX
- * PB6          I2C0_SCL
- * PB7          I2C0_SDA
- * PA4          I2S0_WS
- * PA5          I2S0_CK
- * PA7          I2S0_SD
- * PA6          I2S0_MCK
- * PA9          USART0_TX
- * PA10         USART0_RX
- * PB13         SPI1_SCK
- * PB14         SPI1_MISO
- * PB15         SPI1_MOSI
- * PB10         SPI1_IO2
- * PB11         SPI1_IO3
- * PB12         SPIFlash_CS
- * PB0          TFT_CS
- * PB1          TFT_RESET
- * ADC          PA2 ADC_IN2
- * COMPARATOR   PA1 COMP0_INP
+ * | Pin        |   Description     |
+ * |:-----------|:------------------|
+ * | PA8        |   LED1            |
+ * | PA11       |   LED2            |
+ * | PA12       |   LED3            |
+ * | PA15       |   LED4            |
+ * |            |   KEY1-Reset      |
+ * | PA0        |   KEY2-Wakeup     |
+ * | PC13       |   KEY3-Tamper     |
+ * | PB4        |   IR_RX           |
+ * | PB9        |   IR_TX           |
+ * | PB6        |   I2C0_SCL        |
+ * | PB7        |   I2C0_SDA        |
+ * | PA4        |   I2S0_WS         |
+ * | PA5        |   I2S0_CK         |
+ * | PA7        |   I2S0_SD         |
+ * | PA6        |   I2S0_MCK        |
+ * | PA9        |   USART0_TX       |
+ * | PA10       |   USART0_RX       |
+ * | PB13       |   SPI1_SCK        |
+ * | PB14       |   SPI1_MISO       |
+ * | PB15       |   SPI1_MOSI       |
+ * | PB10       |   SPI1_IO2        |
+ * | PB11       |   SPI1_IO3        |
+ * | PB12       |   SPIFlash_CS     |
+ * | PB0        |   TFT_CS          |
+ * | PB1        |   TFT_RESET       |
+ * | ADC        |   PA2 ADC_IN2     |
+ * | COMPARATOR |   PA1 COMP0_INP   |
  *
  * ### Flash the board
  *
@@ -50,11 +60,14 @@
  *
  * From Figure 4-15, page 12
  *
- * JP1-1        SWCLK
- * JP1-2        SWDAT
- * JP1-3        GND
- * JP1-4        +3V3
+ * | Pin    |   Description |
+ * |:-------|:--------------|
+ * | JP1-1  |   SWCLK       |
+ * | JP1-2  |   SWDAT       |
+ * | JP1-3  |   GND         |
+ * | JP1-4  |   +3V3        |
  *
  * Power is to be provided via the GD_Link USB mini header.
  *
  */
+ 

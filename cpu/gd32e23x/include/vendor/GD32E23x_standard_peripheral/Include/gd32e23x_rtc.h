@@ -39,7 +39,7 @@ OF SUCH DAMAGE.
 #include "gd32e23x.h"
 
 /* RTC definitions */
-// #define RTC                                RTC_BASE
+#define RTC                                RTC_BASE
 
 /* registers definitions */
 #define RTC_TIME                           REG32((RTC) + 0x00000000U)                  /*!< RTC time of day register */

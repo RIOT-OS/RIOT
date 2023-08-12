@@ -39,7 +39,7 @@ OF SUCH DAMAGE.
 #include "gd32e23x.h"
 
 /* PMU definitions */
-// #define PMU                           PMU_BASE                 /*!< PMU base address */
+#define PMU                           PMU_BASE                 /*!< PMU base address */
 
 /* registers definitions */
 #define PMU_CTL                       REG32((PMU) + 0x00U)     /*!< PMU control register */

@@ -17,8 +17,10 @@ config BOARD_GD32E230C_EVAL
     #select HAS_PERIPH_I2C
     #select HAS_PERIPH_PWM
     #select HAS_PERIPH_RTC
+    #select HAS_PERIPH_SPI
     #select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
     select HAVE_SAUL_GPIO
 
-    # Put other features for this board (in alphabetical order)
+#config FORCE_USB_STDIO
+    #default y

@@ -39,8 +39,8 @@ OF SUCH DAMAGE.
 #include "gd32e23x.h"
 
 /* SPIx(x=0,1) definitions */
-// #define SPI0                            (SPI_BASE + 0x0000F800U)
-// #define SPI1                            SPI_BASE
+#define SPI0                            (SPI_BASE + 0x0000F800U)
+#define SPI1                            SPI_BASE
 
 /* registers definitions */
 #define SPI_CTL0(spix)                  REG32((spix) + 0x00000000U)             /*!< SPI control register 0 */

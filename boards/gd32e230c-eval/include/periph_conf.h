@@ -21,14 +21,17 @@
 
 #include <stdint.h>
 
+#include "macros/units.h"
 // #include "cpu.h"
 #include "periph_cpu.h"
 // #include "saul/periph.h"
 // #include "board.h"
-#include "periph/gpio.h"
-#include "gd32e23x_periph.h"
+//#include "periph/gpio.h"
+// #include "periph/gpio.h"
+// #include "gd32e23x_periph.h"
 // #include "gd32e23x_rcu.h"
-#include "cpu_common.h"
+// #include "gd32e23x_gpio.h"
+// #include "cpu_common.h"
 #include "cpu_uart.h"
 
 #ifdef __cplusplus
@@ -52,10 +55,10 @@ static const uart_conf_t uart_config[] = {
         //how does it manage mutex combinations
         .dev        = USART0,
         .rcu_mask   = RCU_APB2EN_USART0EN_Msk,
-        .rx_pin     = GPIO_PIN(GPIOA, 3),
-        .rx_af      = GPIO_AF_1,
-        .tx_pin     = GPIO_PIN(GPIOA, 2),
-        .tx_af      = GPIO_AF_2,
+        .rx_pin     = GPIO_PIN(PORT_A, 3),
+        // .rx_af      = GPIO_AF_1,
+        .tx_pin     = GPIO_PIN(PORT_A, 2),
+        // .tx_af      = GPIO_AF_2,
         // .de_pin     = ,
         // .de_af      = ,
         // .cts_pin    = ,
@@ -71,10 +74,10 @@ static const uart_conf_t uart_config[] = {
     {
         .dev        = USART1,
         .rcu_mask   = RCU_APB1EN_USART1EN_Msk,
-        .rx_pin     = GPIO_PIN(GPIOA, 10),
-        .rx_af      = GPIO_AF_1,
-        .tx_pin     = GPIO_PIN(GPIOA, 9),
-        .tx_af      = GPIO_AF_1,
+        .rx_pin     = GPIO_PIN(PORT_A, 10),
+        // .rx_af      = GPIO_AF_1,
+        .tx_pin     = GPIO_PIN(PORT_A, 9),
+        // .tx_af      = GPIO_AF_1,
         // .de_pin     = ,
         // .de_af      = ,
         // .cts_pin    = ,
@@ -90,6 +93,9 @@ static const uart_conf_t uart_config[] = {
 
 #define UART_0_ISR          (isr_usart0)
 #define UART_1_ISR          (isr_usart1)
+
+#define UART_0_IRQN         USART0_IRQn
+#define UART_1_IRQN         USART1_IRQn
 
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 
@@ -109,7 +115,7 @@ static const uart_conf_t uart_config[] = {
  * @brief   Timer configuration
  */
 typedef struct {
-    TIMER0_Type *dev;       /**< timer device */
+    TIMER_Type *dev;       /**< timer device */
     uint32_t max;           /**< maximum value to count to (16/32 bit) */
     uint32_t rcu_mask;      /**< corresponding bit in the RCC register */
     uint8_t bus;            /**< APBx bus the timer is clock from */
@@ -122,15 +128,59 @@ typedef struct {
  */
 static const timer_conf_t timer_config[] = {
     {
-        .dev      = TIMER0,  //0 or 5?
+        .dev      = TIMER0,
         .max      = 0x0000ffff,
         .rcu_mask = RCU_APB2EN_TIMER0EN_Msk,
         .bus      = APB2,
-        .irqn     = TIMER0_CC_IRQn // TIMER5_CC_IRQn ?
-    }
+        // .irqn     = TIMER0_Channel_IRQn
+    },
+    {
+        .dev      = TIMER2,
+        .max      = 0x0000ffff,
+        .rcu_mask = RCU_APB1EN_TIMER2EN_Msk,
+        .bus      = APB2,
+    },
+    {
+        .dev      = TIMER5,
+        .max      = 0x0000ffff,
+        .rcu_mask = RCU_APB1EN_TIMER5EN_Msk,
+        .bus      = APB2,
+    },
+    {
+        .dev      = TIMER13,
+        .max      = 0x0000ffff,
+        .rcu_mask = RCU_APB1EN_TIMER13EN_Msk,
+        .bus      = APB2,
+    },
+    {
+        .dev      = TIMER14,
+        .max      = 0x0000ffff,
+        .rcu_mask = RCU_APB2EN_TIMER14EN_Msk,
+        .bus      = APB2,
+    },
+    {
+        .dev      = TIMER15,
+        .max      = 0x0000ffff,
+        .rcu_mask = RCU_APB2EN_TIMER15EN_Msk,
+        .bus      = APB2,
+    },
+    {
+        .dev      = TIMER16,
+        .max      = 0x0000ffff,
+        .rcu_mask = RCU_APB2EN_TIMER16EN_Msk,
+        .bus      = APB2,
+    },
 };
 
 #define TIMER_0_ISR         isr_tim1_cc
+
+#define TIMER_0_IRQN        TIMER0_Channel_IRQn
+#define TIMER_2_IRQN        TIMER2_IRQn
+#define TIMER_5_IRQN        TIMER5_IRQn
+#define TIMER_13_IRQN       TIMER13_IRQn
+#define TIMER_14_IRQN       TIMER14_IRQn
+#define TIMER_15_IRQN       TIMER15_IRQn
+#define TIMER_16_IRQN       TIMER16_IRQn
 
 #define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
@@ -153,7 +203,7 @@ typedef struct {
  */
 typedef struct
 {
-    TIMER0_Type *dev;               /**< Timer used */
+    TIMER_Type *dev;               /**< Timer used */
     uint32_t rcu_mask;              /**< bit in clock enable register */
     pwm_chan_t chan[TIMER_CHANNEL_NUMOF]; /**< channel mapping
                                            *   set to {GPIO_UNDEF, 0}
@@ -164,98 +214,81 @@ typedef struct
 
 static const pwm_conf_t pwm_config[] = {
     {
-        .dev      = (TIMER0_Type *) TIMER0,  // TODO for later pointers, the type is different b/c timer0 is "advanced"
+        .dev      = (TIMER_Type *) TIMER0,  // TODO for later pointers, the type is different b/c timer0 is "advanced"
         .rcu_mask = RCU_APB2EN_TIMER0EN_Msk,
-        .chan     = { { .pin = GPIO_PIN(GPIOA,  8), .cc_chan = 1 },
-                      { .pin = GPIO_PIN(GPIOA,  9), .cc_chan = 2 },
-                      { .pin = GPIO_PIN(GPIOA, 10), .cc_chan = 3 },
-                      { .pin = GPIO_PIN(GPIOA, 11), .cc_chan = 4 } },
-        .af       = GPIO_AF_2,
+        .chan     = {
+                        { .pin = GPIO_PIN(PORT_A,  8), .cc_chan = 1 },
+                        { .pin = GPIO_PIN(PORT_A,  9), .cc_chan = 2 },
+                        { .pin = GPIO_PIN(PORT_A, 10), .cc_chan = 3 },
+                        { .pin = GPIO_PIN(PORT_A, 11), .cc_chan = 4 },
+                    },
+        // .af       = GPIO_AF_2,
         .bus      = APB2
     },
     {
-        .dev      = (TIMER0_Type *) TIMER2,
+        .dev      = (TIMER_Type *) TIMER2,
         .rcu_mask = RCU_APB1EN_TIMER2EN_Msk,
-        .chan     = { { .pin = GPIO_PIN(GPIOA,  6), .cc_chan = 1 }, //B4
-                      { .pin = GPIO_PIN(GPIOA,  7), .cc_chan = 2 }, //B5
-                      { .pin = GPIO_PIN(GPIOB,  0), .cc_chan = 3 },
-                      { .pin = GPIO_PIN(GPIOB,  1), .cc_chan = 4 } },
-        .af       = GPIO_AF_1,
+        .chan     = {
+                        { .pin = GPIO_PIN(PORT_A,  6), .cc_chan = 1 }, //B4
+                        { .pin = GPIO_PIN(PORT_A,  7), .cc_chan = 2 }, //B5
+                        { .pin = GPIO_PIN(PORT_B,  0), .cc_chan = 3 },
+                        { .pin = GPIO_PIN(PORT_B,  1), .cc_chan = 4 },
+                    },
+        // .af       = GPIO_AF_1,
         .bus      = APB1
     },
     {
-        .dev      = (TIMER0_Type *) TIMER13,
+        .dev      = (TIMER_Type *) TIMER13,
         .rcu_mask = RCU_APB1EN_TIMER13EN_Msk,
-        .chan     = { { .pin = GPIO_PIN(GPIOB,  1), .cc_chan = 1 }, //AF4 = A4, A7
-                      { .pin = 0xffffffff,          .cc_chan = 0 },
-                      { .pin = 0xffffffff,          .cc_chan = 0 },
-                      { .pin = 0xffffffff,          .cc_chan = 0 } },
-        .af       = GPIO_AF_0,
+        .chan     = {
+                        { .pin = GPIO_PIN(PORT_B,  1), .cc_chan = 1 }, //AF4 = A4, A7
+                        { .pin = GPIO_UNDEF,          .cc_chan = 0 },
+                        { .pin = GPIO_UNDEF,          .cc_chan = 0 },
+                        { .pin = GPIO_UNDEF,          .cc_chan = 0 },
+                    },
+        // .af       = GPIO_AF_0,
         .bus      = APB1
     },
     {
-        .dev      = (TIMER0_Type *) TIMER14,
+        .dev      = (TIMER_Type *) TIMER14,
         .rcu_mask = RCU_APB2EN_TIMER14EN_Msk,
-        .chan     = { { .pin = GPIO_PIN(GPIOA,  2), .cc_chan = 1 }, //AF1 B14
-                      { .pin = GPIO_PIN(GPIOA,  3), .cc_chan = 2 }, //AF1 B15
-                      { .pin = 0xffffffff,          .cc_chan = 0 },
-                      { .pin = 0xffffffff,          .cc_chan = 0 } },
-        .af       = GPIO_AF_0,
+        .chan     = {
+                        { .pin = GPIO_PIN(PORT_A,  2), .cc_chan = 1 }, //AF1 B14
+                        { .pin = GPIO_PIN(PORT_A,  3), .cc_chan = 2 }, //AF1 B15
+                        { .pin = GPIO_UNDEF,          .cc_chan = 0 },
+                        { .pin = GPIO_UNDEF,          .cc_chan = 0 },
+                    },
+        // .af       = GPIO_AF_0,
         .bus      = APB2
     },
     {
-        .dev      = (TIMER0_Type *) TIMER15,
+        .dev      = (TIMER_Type *) TIMER15,
         .rcu_mask = RCU_APB2EN_TIMER15EN_Msk,
-        .chan     = { { .pin = GPIO_PIN(GPIOB,  8), .cc_chan = 1 },
-                      { .pin = 0xffffffff,          .cc_chan = 0 },
-                      { .pin = 0xffffffff,          .cc_chan = 0 },
-                      { .pin = 0xffffffff,          .cc_chan = 0 } },
-        .af       = GPIO_AF_2,
+        .chan     = {
+                        { .pin = GPIO_PIN(PORT_B,  8), .cc_chan = 1 },
+                        { .pin = GPIO_UNDEF,          .cc_chan = 0 },
+                        { .pin = GPIO_UNDEF,          .cc_chan = 0 },
+                        { .pin = GPIO_UNDEF,          .cc_chan = 0 },
+                    },
+        // .af       = GPIO_AF_2,
         .bus      = APB2
     },
     {
-        .dev      = (TIMER0_Type *) TIMER16,
+        .dev      = (TIMER_Type *) TIMER16,
         .rcu_mask = RCU_APB2EN_TIMER16EN_Msk,
-        .chan     = { { .pin = GPIO_PIN(GPIOB,  9), .cc_chan = 1 },
-                      { .pin = 0xffffffff,          .cc_chan = 0 },
-                      { .pin = 0xffffffff,          .cc_chan = 0 },
-                      { .pin = 0xffffffff,          .cc_chan = 0 } },
-        .af       = GPIO_AF_2,
+        .chan     = {
+                        { .pin = GPIO_PIN(PORT_B,  9), .cc_chan = 1 },
+                        { .pin = GPIO_UNDEF,          .cc_chan = 0 },
+                        { .pin = GPIO_UNDEF,          .cc_chan = 0 },
+                        { .pin = GPIO_UNDEF,          .cc_chan = 0 },
+                    },
+        // .af       = GPIO_AF_2,
         .bus      = APB2
     },
 };
 
 #define PWM_NUMOF           ARRAY_SIZE(pwm_config)
 /** @} */
-
-
-/**
- * @brief   Timer configuration
- */
-// typedef struct {
-//     TIMER0_Type *dev;       /**< timer device */
-//     uint32_t max;           /**< maximum value to count to (16/32 bit) */
-//     uint32_t rcu_mask;      /**< corresponding bit in the RCC register */
-//     uint8_t bus;            /**< APBx bus the timer is clock from */
-//     uint8_t irqn;           /**< global IRQ channel */
-// } i2c_conf_t;
-
-/**
- * @name   Timer configuration
- * @{
- */
-// static const i2c_conf_t i2c_config[] = {
-//     {
-//         .dev      = TIMER0,  //0 or 5?
-//         .max      = 0x0000ffff,
-//         .rcu_mask = RCU_APB2EN_TIMER0EN_Msk,
-//         .bus      = APB2,
-//         .irqn     = TIMER0_CC_IRQn // TIMER5_CC_IRQn ?
-//     }
-// };
-
-
-
 
 /**
  * @name    Use the shared I2C functions
@@ -356,10 +389,10 @@ static const i2c_conf_t i2c_config[] = {
     {
         .dev            = I2C0,
         .speed          = I2C_SPEED_NORMAL,
-        .scl_pin        = GPIO_PIN(GPIOB, 6),
-        .sda_pin        = GPIO_PIN(GPIOB, 7),
-        .scl_af         = GPIO_AF_1,
-        .sda_af         = GPIO_AF_1,
+        .scl_pin        = GPIO_PIN(PORT_B, 6),
+        .sda_pin        = GPIO_PIN(PORT_B, 7),
+        // .scl_af         = GPIO_AF_1,
+        // .sda_af         = GPIO_AF_1,
         .bus            = APB1,
         .rcu_mask       = RCU_APB1EN_I2C0EN_Msk,// RCU_APB1ENR_I2C1EN,
         // .rcu_sw_mask    = RCU_CFGR3_I2C1SW,
@@ -368,10 +401,10 @@ static const i2c_conf_t i2c_config[] = {
     {
         .dev            = I2C1,
         .speed          = I2C_SPEED_NORMAL,
-        .scl_pin        = GPIO_PIN(GPIOB, 8),
-        .sda_pin        = GPIO_PIN(GPIOB, 9),
-        .scl_af         = GPIO_AF_1,
-        .sda_af         = GPIO_AF_1,
+        .scl_pin        = GPIO_PIN(PORT_B, 8),
+        .sda_pin        = GPIO_PIN(PORT_B, 9),
+        // .scl_af         = GPIO_AF_1,
+        // .sda_af         = GPIO_AF_1,
         .bus            = APB1,
         .rcu_mask       = RCU_APB1EN_I2C1EN_Msk,
         // .rcu_sw_mask    = ,
@@ -452,7 +485,7 @@ typedef uint32_t spi_clk_t;
  * @brief   Structure for SPI configuration data
  */
 typedef struct {
-    SPI0_Type *dev;       /**< SPI device base register address */
+    SPI_Type *dev;          /**< SPI device base register address */
     gpio_t mosi_pin;        /**< MOSI pin */
     gpio_t miso_pin;        /**< MISO pin */
     gpio_t sclk_pin;        /**< SCLK pin */
@@ -479,14 +512,14 @@ typedef struct {
 static const spi_conf_t spi_config[] = {
     {
         .dev      = SPI0,
-        .mosi_pin = GPIO_PIN(GPIOA, 7),
-        .miso_pin = GPIO_PIN(GPIOA, 6),
-        .sclk_pin = GPIO_PIN(GPIOA, 5),
-        .cs_pin   = GPIO_PIN(GPIOB, 6),
-        .mosi_af  = GPIO_AF_1,
-        .miso_af  = GPIO_AF_1,
-        .sclk_af  = GPIO_AF_1,
-        .cs_af    = GPIO_AF_1,
+        .mosi_pin = GPIO_PIN(PORT_A, 7),
+        .miso_pin = GPIO_PIN(PORT_A, 6),
+        .sclk_pin = GPIO_PIN(PORT_A, 5),
+        .cs_pin   = GPIO_PIN(PORT_B, 6),
+        // .mosi_af  = GPIO_AF_1,
+        // .miso_af  = GPIO_AF_1,
+        // .sclk_af  = GPIO_AF_1,
+        // .cs_af    = GPIO_AF_1,
         .rcumask  = RCU_APB2EN_SPI0EN_Msk, //SPI0_CTL0_SPIEN_Msk
         .apbbus   = APB2,
 #ifdef MODULE_PERIPH_DMA
@@ -514,9 +547,12 @@ static const spi_conf_t spi_config[] = {
  * @name    Power modes
  * @{
  */
-#define GD32_PM_IDLE           (2U)  /**< Index of IDLE mode */
-#define GD32_PM_STOP           (1U)  /**< Index of STOP mode */
-#define GD32_PM_STANDBY        (0U)  /**< Index of STANDBY mode */
+enum {
+    //SLEEP == IDLE?
+    GD32_PM_STANDBY = 0,       /**< STANDBY mode,  */
+    GD32_PM_DEEPSLEEP = 1,     /**< DEEPSLEEP mode, croresponds to STOP mode of STM32 */
+    GD32_PM_IDLE = 2           /**< IDLE mode */
+};
 /** @} */
 
 #ifndef PM_EWUP_CONFIG
@@ -526,23 +562,6 @@ static const spi_conf_t spi_config[] = {
 #define PM_EWUP_CONFIG          (0U)
 #endif
 /** @} */
-
-/**
- * @brief   Check whether the backup domain voltage regulator is on
- */
-// bool pm_backup_regulator_is_on(void);
-
-/**
- * @brief   Enable the backup domain voltage regulator to retain backup
- *          register content during standby and VBAT mode
- */
-// void pm_backup_regulator_on(void);
-
-/**
- * @brief   Disable the backup domain voltage regulator
- */
-// void pm_backup_regulator_off(void);
-
 
 /**
  * @brief   ADC channel configuration data
@@ -573,20 +592,20 @@ typedef struct {
  * @name   ADC configuration
  * @{
  */
-static const adc_conf_t adc_config[] = {  //ADC lines?
-    { GPIO_PIN(GPIOA, 0), 0 },
-    { GPIO_PIN(GPIOA, 1), 1 },
-    { GPIO_PIN(GPIOA, 2), 2 },
-    { GPIO_PIN(GPIOA, 3), 3 },
-    { GPIO_PIN(GPIOA, 4), 4 },
-    { GPIO_PIN(GPIOA, 5), 5 },
-    { GPIO_PIN(GPIOA, 6), 6 },
-    { GPIO_PIN(GPIOA, 7), 7 },
-    { GPIO_PIN(GPIOB, 0), 8 },
-    { GPIO_PIN(GPIOB, 1), 9 },
-    // { GPIO_UNDEF, 16 },  //why isn't GPIO_PERIPH? defined?
-    // { GPIO_UNDEF, 17 },
-    // { GPIO_UNDEF, 18 }, /* VBAT */
+static const adc_conf_t adc_config[] = {
+    { .pin = GPIO_PIN(PORT_A, 0), .chan = 0 },
+    { .pin = GPIO_PIN(PORT_A, 1), .chan = 1 },
+    { .pin = GPIO_PIN(PORT_A, 2), .chan = 2 },
+    { .pin = GPIO_PIN(PORT_A, 3), .chan = 3 },
+    { .pin = GPIO_PIN(PORT_A, 4), .chan = 4 },
+    { .pin = GPIO_PIN(PORT_A, 5), .chan = 5 },
+    { .pin = GPIO_PIN(PORT_A, 6), .chan = 6 },
+    { .pin = GPIO_PIN(PORT_A, 7), .chan = 7 },
+    { .pin = GPIO_PIN(PORT_B, 0), .chan = 8 },
+    { .pin = GPIO_PIN(PORT_B, 1), .chan = 9 },
+    // { .pin = GPIO_UNDEF, .chan = 16 },
+    // { .pin = GPIO_UNDEF, .chan = 17 },
+    // { .pin = GPIO_UNDEF, .chan = 18 }, // VBAT VREF ?
 };
 
 #define VBAT_ADC            ADC_LINE(6) /**< VBAT ADC line */

@@ -39,8 +39,8 @@ OF SUCH DAMAGE.
 #include "gd32e23x.h"
 
 /* USARTx(x=0,1) definitions */
-// #define USART0                        (USART_BASE + 0x0000F400U)
-// #define USART1                        USART_BASE
+#define USART0                        (USART_BASE + 0x0000F400U)
+#define USART1                        USART_BASE
 
 /* registers definitions */
 #define USART_CTL0(usartx)            REG32((usartx) + 0x00000000U)        /*!< USART control register 0 */
