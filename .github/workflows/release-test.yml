@@ -123,7 +123,6 @@ jobs:
         sudo apt-get install lib32asan6
     - name: Run release tests
       timeout-minutes: 350
-      id: tests
       run: |
         RIOTBASE="$GITHUB_WORKSPACE/RIOT"
         TOX_ARGS=""
@@ -174,27 +173,6 @@ jobs:
         mkdir test-reports/
         junit2html ${REPORT_XML} ${REPORT_NAME}.html
         cp ${REPORT_XML} ${REPORT_NAME}.xml
-    - name: Generate result message
-      if: always()
-      id: generate_results
-      run: |
-        if [ "${{ steps.tests.conclusion }}" == "success" ]; then
-          nice_str="&#x2705; **PASSED**"
-        elif [ "${{ steps.tests.conclusion }}" == "failure" ]; then
-          nice_str="&#x274C; **FAILED**"
-        fi
-        echo "nice_str=${nice_str}" >> ${GITHUB_OUTPUT}
-    - name: Report to Matrix channel
-      if: ${{ always() && steps.generate_results.outputs.nice_str != '' }}
-      uses: fadenb/matrix-chat-message@v0.0.6
-      with:
-        homeserver: matrix.org
-        token: ${{ secrets.RIOT_CI_MATRIX_TOKEN }}
-        channel: '!UXNJuMzHTSAnwntbbN:utwente.io'
-        message: |
-          ${{ steps.generate_results.outputs.nice_str}}: Release tests
-          [${{ matrix.pytest_mark }}, ${{ matrix.sudo }}] on "*${{ github.event_name }}*":
-          ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
     - uses: actions/upload-artifact@v2
       if: always()
       with:
