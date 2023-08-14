@@ -383,8 +383,21 @@ int stmpe811_read_touch_position(stmpe811_t *dev, stmpe811_touch_position_t *pos
     /* Y value second correction */
     tmp_y /= 11;
 
+    /* maximum values in device coordinates */
+    uint16_t tmp_xmax;
+    uint16_t tmp_ymax;
+
+    if (dev->params.xyconv & STMPE811_SWAP_XY) {
+        tmp_xmax = dev->params.ymax;
+        tmp_ymax = dev->params.xmax;
+    }
+    else {
+        tmp_xmax = dev->params.xmax;
+        tmp_ymax = dev->params.ymax;
+    }
+
     /* clamp y position */
-    if (tmp_y > dev->params.ymax) {
+    if (tmp_y > tmp_ymax) {
         tmp_y = dev->prev_y;
     }
 
@@ -400,14 +413,30 @@ int stmpe811_read_touch_position(stmpe811_t *dev, stmpe811_touch_position_t *pos
     tmp_x /= 15;
 
     /* clamp x position */
-    if (tmp_x > dev->params.xmax) {
+    if (tmp_x > tmp_xmax) {
         tmp_x = dev->prev_x;
     }
 
     dev->prev_x = tmp_x;
     dev->prev_y = tmp_y;
-    position->x = tmp_x;
-    position->y = tmp_y;
+
+    /* conversion to screen coordinates */
+    if (dev->params.xyconv & STMPE811_SWAP_XY) {
+        position->x = tmp_y;
+        position->y = tmp_x;
+    }
+    else {
+        position->x = tmp_x;
+        position->y = tmp_y;
+    }
+    if (dev->params.xyconv & STMPE811_MIRROR_X) {
+        assert(position->x <= dev->params.xmax);
+        position->x = dev->params.xmax - position->x;
+    }
+    if (dev->params.xyconv & STMPE811_MIRROR_Y) {
+        assert(position->y <= dev->params.ymax);
+        position->y = dev->params.ymax - position->y;
+    }
 
     return 0;
 }
