@@ -29,6 +29,11 @@ extern "C" {
 #include <stdbool.h>
 
 /**
+ * @brief   Invalid touch value
+ */
+#define TOUCH_DEV_VALUE_INVALID         ((touch_t){ UINT16_MAX, UINT16_MAX })
+
+/**
  * @brief   Forward declaration for touch device struct
  */
 typedef struct touch_dev touch_dev_t;
