@@ -32,14 +32,19 @@ extern "C" {
 #define FT5X06_I2C_DEFAULT_ADDRESS                  (0x38)
 
 /**
- * @brief Vendor ID for FT6X06 and FT6X36 models.
- */
-#define FT6XX6_VENDOR_ID                            (0x11)
-
-/**
  * @brief Vendor ID for FT5606, FT5X16, FT5X06I, FT5336, FT3316, FT5436I, FT5336I, FT5X46 models.
  */
-#define FT5X06_VENDOR_ID                            (0x51)
+#define FT5X06_VENDOR_ID_1                          (0x51)
+
+/**
+ * @brief Vendor ID used for most FT6X06 and FT6X36 as well as FT3X67 models.
+ */
+#define FT5X06_VENDOR_ID_2                          (0x11)
+
+/**
+ * @brief Vendor ID used for some FT6X06 and FT6X36 models.
+ */
+#define FT5X06_VENDOR_ID_3                          (0xcd)
 
 /**
  * @brief Maximum touches count for FT6X06 and FT6X36 models.
@@ -81,9 +86,9 @@ extern "C" {
 #define FT5X06_TOUCH5_YH_REG                        (0x1D)
 #define FT5X06_TOUCH5_YL_REG                        (0x1E)
 #define FT5X06_G_AUTO_CLB_MODE_REG                  (0xA0)
-#define FT5X06_G_CIPHER_REG                         (0xA1)
-#define FT5X06_G_LIB_VERSION_H_REG                  (0xA2)
-#define FT5X06_G_LIB_VERSION_L_REG                  (0xA3)
+#define FT5X06_G_LIB_VERSION_H_REG                  (0xA1)
+#define FT5X06_G_LIB_VERSION_L_REG                  (0xA2)
+#define FT5X06_G_CIPHER_REG                         (0xA3)
 #define FT5X06_G_MODE_REG                           (0xA4)
 #define FT5X06_G_PMODE_REG                          (0xA5)
 #define FT5X06_G_FIRMID_REG                         (0xA6)
