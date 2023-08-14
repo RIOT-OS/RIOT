@@ -339,6 +339,14 @@ int stmpe811_read_touch_position(stmpe811_t *dev, stmpe811_touch_position_t *pos
     }
 #endif
 
+    /* Reset the FIFO, otherwise new touch data will be processed with a delay
+     * if the rate of calling this function to read the FIFO is slower than
+     * the rate at which the FIFO is filled. The reason for this is that with
+     * each call of this function only the oldest touch data is read
+     * value by value from the FIFO. Gestures, for example, can't be
+     * implemented with such a behavior. */
+    _reset_fifo(dev);
+
     /* Release device bus */
     _release(dev);
 
