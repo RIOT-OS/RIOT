@@ -8,6 +8,7 @@ menu "Packages"
 
 rsource "driver_sen5x/Kconfig"
 rsource "flashdb/Kconfig"
+rsource "libcoap/Kconfig"
 rsource "libfixmath/Kconfig"
 rsource "libschc/Kconfig"
 rsource "littlefs2/Kconfig"
