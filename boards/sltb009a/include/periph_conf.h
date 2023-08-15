@@ -81,6 +81,29 @@ static const adc_chan_conf_t adc_channel_config[] = {
 /** @} */
 
 /**
+ * @name    DAC configuration
+ * @{
+ */
+static const dac_conf_t dac_config[] = {
+    {
+        .dev = VDAC0,
+        .ref = vdacRefAvdd,
+        .cmu = cmuClock_VDAC0,
+    },
+};
+
+static const dac_chan_conf_t dac_channel_config[] = {
+    {
+        .dev = 0,
+        .index = 0,
+    },
+};
+
+#define DAC_DEV_NUMOF       ARRAY_SIZE(dac_config)
+#define DAC_NUMOF           ARRAY_SIZE(dac_channel_config)
+/** @} */
+
+/**
  * @name    I2C configuration
  * @{
  */
