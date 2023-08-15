@@ -3,7 +3,7 @@ USEMODULE += lua-contrib
 USEMODULE += printf_float
 
 # LUA is only supported by 32-bit architectures
-FEATURES_REQUIRED += arch_32bit
+FEATURES_REQUIRED_ANY += arch_32bit|arch_64bit
 
 # LUA is not supported on RISCV because of build issues with the toolchain
 # (undefined reference to _times, _unlink and _link functions in provided

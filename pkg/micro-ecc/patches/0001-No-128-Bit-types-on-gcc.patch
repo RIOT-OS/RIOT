@@ -1,0 +1,25 @@
+From ea5b0ba330ccf246317087e5eef4736c36b17158 Mon Sep 17 00:00:00 2001
+From: Leon Hielscher <Hielscher@fzi.de>
+Date: Mon, 8 Oct 2018 18:40:39 +0200
+Subject: [PATCH 4/4] No 128 Bit types on gcc.
+
+---
+ types.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/types.h b/types.h
+index 7cb1a28..0a0ff2d 100644
+--- a/types.h
++++ b/types.h
+@@ -51,7 +51,7 @@
+     #define uECC_WORD_SIZE 4
+ #endif
+ 
+-#if defined(__SIZEOF_INT128__) || ((__clang_major__ * 100 + __clang_minor__) >= 302)
++#if ((__clang_major__ * 100 + __clang_minor__) >= 302)
+     #define SUPPORTS_INT128 1
+ #else
+     #define SUPPORTS_INT128 0
+-- 
+2.7.4
+

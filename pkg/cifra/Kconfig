@@ -8,7 +8,7 @@
 config PACKAGE_CIFRA
     bool "Cifra cryptographic primitives"
     depends on TEST_KCONFIG
-    depends on HAS_ARCH_32BIT
+    depends on HAS_ARCH_32BIT || HAS_ARCH_64BIT
     help
         Cifra is a collection of cryptographic primitives targeted at
         embedded use.

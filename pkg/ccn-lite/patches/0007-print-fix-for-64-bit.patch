@@ -1,0 +1,25 @@
+From 5bdce82958a7fa1596f69ac4ed75948e8bfdb83b Mon Sep 17 00:00:00 2001
+From: Frederik Haxel <haxel@fzi.de>
+Date: Mon, 14 Aug 2023 14:53:59 +0200
+Subject: [PATCH] print fix for 64-bit native
+
+---
+ src/ccnl-riot/src/ccn-lite-riot.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/ccnl-riot/src/ccn-lite-riot.c b/src/ccnl-riot/src/ccn-lite-riot.c
+index fde0a44..0ddb488 100644
+--- a/src/ccnl-riot/src/ccn-lite-riot.c
++++ b/src/ccnl-riot/src/ccn-lite-riot.c
+@@ -278,7 +278,7 @@ int
+ ccnl_app_RX(struct ccnl_relay_s *ccnl, struct ccnl_content_s *c)
+ {
+     (void) ccnl;
+-    DEBUGMSG(DEBUG, "Received something of size %u for the application\n", c->pkt->contlen);
++    DEBUGMSG(DEBUG, "Received something of size %u for the application\n", (unsigned)c->pkt->contlen);
+ 
+     gnrc_pktsnip_t *pkt= gnrc_pktbuf_add(NULL, c->pkt->content,
+                                          c->pkt->contlen,
+-- 
+2.34.1
+

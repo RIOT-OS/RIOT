@@ -22,6 +22,11 @@ config HAS_ARCH_32BIT
     help
         Indicates that the CPU has a 32-bits architecture.
 
+config HAS_ARCH_64BIT
+    bool
+    help
+        Indicates that the CPU has a 64-bits architecture.
+
 config HAS_ARCH_ARM
     bool
     help
