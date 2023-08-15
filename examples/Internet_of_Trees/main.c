@@ -318,13 +318,14 @@ static void _send_message(void)
     int16_t temperature = bmx280_read_temperature(&dev);
     uint32_t pressure = bmx280_read_pressure(&dev);
     int humidity = bme280_read_humidity(&dev);
-    //char destination[3]; // 2 bytes para o int16_t + 1 byte para o caractere nulo
+    scd30_read_triggered(&scd30_dev, &result);
 
     // Alocar memória para o array de caracteres (char*) e +1 para o caractere nulo \0
     char* char_array = (char*)malloc(50* sizeof(char));
+    result.co2_concentration *= 100;
 
     // Copiar o valor do int16_t para o char_array
-    snprintf(char_array, 51, "%d;%lu;%d", temperature, pressure, humidity);
+    snprintf(char_array, 51, "%d;%lu;%d;%d", temperature, pressure, humidity,(int)(result.co2_concentration));
     
     // Utilize essa etapa se o valor for negativo para manter o sinal (-) no início do char_array
     if (temperature < 0) {
@@ -379,6 +380,56 @@ static void *sender(void *arg)
 
 int main(void)
 {
+
+    printf("SCD30 Test:\n");
+    int i = 0;
+
+    scd30_init(&scd30_dev, &params);
+    uint16_t pressure_compensation = SCD30_DEF_PRESSURE;
+    uint16_t value = 0;
+    uint16_t interval = MEASUREMENT_INTERVAL_SECS;
+
+    scd30_set_param(&scd30_dev, SCD30_INTERVAL, MEASUREMENT_INTERVAL_SECS);
+    scd30_set_param(&scd30_dev, SCD30_START, pressure_compensation);
+
+    scd30_get_param(&scd30_dev, SCD30_INTERVAL, &value);
+    printf("[test][dev-%d] Interval: %u s\n", i, value);
+    scd30_get_param(&scd30_dev, SCD30_T_OFFSET, &value);
+    printf("[test][dev-%d] Temperature Offset: %u.%02u C\n", i, value / 100u,
+           value % 100u);
+    scd30_get_param(&scd30_dev, SCD30_A_OFFSET, &value);
+    printf("[test][dev-%d] Altitude Compensation: %u m\n", i, value);
+    scd30_get_param(&scd30_dev, SCD30_ASC, &value);
+    printf("[test][dev-%d] ASC: %u\n", i, value);
+    scd30_get_param(&scd30_dev, SCD30_FRC, &value);
+    printf("[test][dev-%d] FRC: %u ppm\n", i, value);
+    puts("NimBLE Heart Rate Sensor Example");
+    
+    while (i < TEST_ITERATIONS) {
+        xtimer_sleep(1);
+        scd30_read_triggered(&scd30_dev, &result);
+        printf(
+            "[scd30_test-%d] Triggered measurements co2: %.02fppm,"
+            " temp: %.02f°C, hum: %.02f%%. \n", i, result.co2_concentration,
+            result.temperature, result.relative_humidity);
+        i++;
+    }
+
+    i = 0;
+    scd30_start_periodic_measurement(&scd30_dev, &interval,
+                                     &pressure_compensation);
+
+    while (i < TEST_ITERATIONS) {
+        xtimer_sleep(MEASUREMENT_INTERVAL_SECS);
+        scd30_read_periodic(&scd30_dev, &result);
+        printf(
+            "[scd30_test-%d] Continuous measurements co2: %.02fppm,"
+            " temp: %.02f°C, hum: %.02f%%. \n", i, result.co2_concentration,
+            result.temperature, result.relative_humidity);
+        i++;
+    }
+
+    printf("BME280 Test\n");
 
     switch (bmx280_init(&dev, &bmx280_params[0])) {
         case BMX280_ERR_BUS:
@@ -446,53 +497,53 @@ int main(void)
     while(1){};
     printf("Vou sair do loop infinito\n\r");
 
-    printf("SCD30 Test:\n");
-    int i = 0;
+    // printf("SCD30 Test:\n");
+    // int i = 0;
 
-    scd30_init(&scd30_dev, &params);
-    uint16_t pressure_compensation = SCD30_DEF_PRESSURE;
-    uint16_t value = 0;
-    uint16_t interval = MEASUREMENT_INTERVAL_SECS;
+    // scd30_init(&scd30_dev, &params);
+    // uint16_t pressure_compensation = SCD30_DEF_PRESSURE;
+    // uint16_t value = 0;
+    // uint16_t interval = MEASUREMENT_INTERVAL_SECS;
 
-    scd30_set_param(&scd30_dev, SCD30_INTERVAL, MEASUREMENT_INTERVAL_SECS);
-    scd30_set_param(&scd30_dev, SCD30_START, pressure_compensation);
+    // scd30_set_param(&scd30_dev, SCD30_INTERVAL, MEASUREMENT_INTERVAL_SECS);
+    // scd30_set_param(&scd30_dev, SCD30_START, pressure_compensation);
 
-    scd30_get_param(&scd30_dev, SCD30_INTERVAL, &value);
-    printf("[test][dev-%d] Interval: %u s\n", i, value);
-    scd30_get_param(&scd30_dev, SCD30_T_OFFSET, &value);
-    printf("[test][dev-%d] Temperature Offset: %u.%02u C\n", i, value / 100u,
-           value % 100u);
-    scd30_get_param(&scd30_dev, SCD30_A_OFFSET, &value);
-    printf("[test][dev-%d] Altitude Compensation: %u m\n", i, value);
-    scd30_get_param(&scd30_dev, SCD30_ASC, &value);
-    printf("[test][dev-%d] ASC: %u\n", i, value);
-    scd30_get_param(&scd30_dev, SCD30_FRC, &value);
-    printf("[test][dev-%d] FRC: %u ppm\n", i, value);
-    puts("NimBLE Heart Rate Sensor Example");
+    // scd30_get_param(&scd30_dev, SCD30_INTERVAL, &value);
+    // printf("[test][dev-%d] Interval: %u s\n", i, value);
+    // scd30_get_param(&scd30_dev, SCD30_T_OFFSET, &value);
+    // printf("[test][dev-%d] Temperature Offset: %u.%02u C\n", i, value / 100u,
+    //        value % 100u);
+    // scd30_get_param(&scd30_dev, SCD30_A_OFFSET, &value);
+    // printf("[test][dev-%d] Altitude Compensation: %u m\n", i, value);
+    // scd30_get_param(&scd30_dev, SCD30_ASC, &value);
+    // printf("[test][dev-%d] ASC: %u\n", i, value);
+    // scd30_get_param(&scd30_dev, SCD30_FRC, &value);
+    // printf("[test][dev-%d] FRC: %u ppm\n", i, value);
+    // puts("NimBLE Heart Rate Sensor Example");
     
-    while (i < TEST_ITERATIONS) {
-        xtimer_sleep(1);
-        scd30_read_triggered(&scd30_dev, &result);
-        printf(
-            "[scd30_test-%d] Triggered measurements co2: %.02fppm,"
-            " temp: %.02f°C, hum: %.02f%%. \n", i, result.co2_concentration,
-            result.temperature, result.relative_humidity);
-        i++;
-    }
+    // while (i < TEST_ITERATIONS) {
+    //     xtimer_sleep(1);
+    //     scd30_read_triggered(&scd30_dev, &result);
+    //     printf(
+    //         "[scd30_test-%d] Triggered measurements co2: %.02fppm,"
+    //         " temp: %.02f°C, hum: %.02f%%. \n", i, result.co2_concentration,
+    //         result.temperature, result.relative_humidity);
+    //     i++;
+    // }
 
-    i = 0;
-    scd30_start_periodic_measurement(&scd30_dev, &interval,
-                                     &pressure_compensation);
+    // i = 0;
+    // scd30_start_periodic_measurement(&scd30_dev, &interval,
+    //                                  &pressure_compensation);
 
-    while (i < TEST_ITERATIONS) {
-        xtimer_sleep(MEASUREMENT_INTERVAL_SECS);
-        scd30_read_periodic(&scd30_dev, &result);
-        printf(
-            "[scd30_test-%d] Continuous measurements co2: %.02fppm,"
-            " temp: %.02f°C, hum: %.02f%%. \n", i, result.co2_concentration,
-            result.temperature, result.relative_humidity);
-        i++;
-    }
+    // while (i < TEST_ITERATIONS) {
+    //     xtimer_sleep(MEASUREMENT_INTERVAL_SECS);
+    //     scd30_read_periodic(&scd30_dev, &result);
+    //     printf(
+    //         "[scd30_test-%d] Continuous measurements co2: %.02fppm,"
+    //         " temp: %.02f°C, hum: %.02f%%. \n", i, result.co2_concentration,
+    //         result.temperature, result.relative_humidity);
+    //     i++;
+    // }
 
     printf("Nimble GATT application\n\r");
 

@@ -14,7 +14,7 @@ USEMODULE += checksum
 USEMODULE += xtimer
 
 CFLAGS += -DBMX280_PARAM_I2C_DEV=I2C_DEV\(0\)
-CFLAGS += -DBMX280_PARAM_I2C_ADDR=0x77
+CFLAGS += -DBMX280_PARAM_I2C_ADDR=0x76
 
 
 # Some RIOT modules needed for this example
