@@ -44,7 +44,7 @@ static int _init(mtd_dev_t *dev)
     assert(dev->pages_per_sector * dev->page_size == FLASHPAGE_SIZE);
     assert(!(super->offset % dev->pages_per_sector));
 
-    assert((int)flashpage_addr(super->offset / dev->pages_per_sector) >= (int)CPU_FLASH_BASE);
+    assert((uintptr_t)flashpage_addr(super->offset / dev->pages_per_sector) >= CPU_FLASH_BASE);
     assert((uintptr_t)flashpage_addr(super->offset / dev->pages_per_sector)
            + dev->pages_per_sector * dev->page_size * dev->sector_count <= MTD_FLASHPAGE_END_ADDR);
     assert((uintptr_t)flashpage_addr(super->offset / dev->pages_per_sector)
