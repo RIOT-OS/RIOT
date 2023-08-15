@@ -1,0 +1,10 @@
+USEMODULE += posix_headers
+USEMODULE += posix_inet
+USEMODULE += sock_udp
+USEMODULE += sock_tcp
+USEMODULE += sock_aux_local
+USEMODULE += gnrc_sock_async
+
+ifneq (,$(filter libcoap,$(USEPKG)))
+  USEMODULE += libcoap
+endif
