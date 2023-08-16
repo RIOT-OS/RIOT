@@ -742,7 +742,6 @@ static int _esp_wifi_get(netdev_t *netdev, netopt_t opt, void *val, size_t max_l
     ESP_WIFI_DEBUG("%s %p %p %u", netopt2str(opt), netdev, val, max_len);
 
     assert(netdev != NULL);
-    assert(val != NULL);
 
 #ifndef MODULE_ESP_WIFI_AP
     esp_wifi_netdev_t* dev = container_of(netdev, esp_wifi_netdev_t, netdev);

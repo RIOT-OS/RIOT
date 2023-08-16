@@ -15,6 +15,7 @@ BOARD_BLACKLIST += \
                    ruuvitag \
                    seeedstudio-gd32 \
                    sipeed-longan-nano \
+                   sipeed-longan-nano-tft \
                    stm32f429i-disco \
                    stm32f4discovery \
                    thingy52 \

@@ -54,7 +54,7 @@ endif
 zep_dispatch:
 	$(Q)env -u CC -u CFLAGS $(MAKE) -C $(RIOTTOOLS) $@
 
-TERMDEPS += zep_dispatch
+TEST_DEPS += zep_dispatch
 
 include $(RIOTBASE)/Makefile.include
 

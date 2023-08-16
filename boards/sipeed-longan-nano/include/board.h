@@ -70,7 +70,7 @@ extern "C" {
 #define SDCARD_SPI_PARAM_MOSI        GPIO_PIN(PORT_B, 15)
 #endif
 
-#if defined(MODULE_ST7735) && defined(CONFIG_SIPEED_LONGAN_NANO_WITH_TFT)
+#if defined(MODULE_ST7735) && defined(BOARD_SIPEED_LONGAN_NANO_TFT)
 #define ST7735_PARAM_SPI          SPI_DEV(1)            /**< SPI device */
 #define ST7735_PARAM_SPI_CLK      SPI_CLK_5MHZ          /**< SPI clock frequency */
 #define ST7735_PARAM_SPI_MODE     SPI_MODE_0            /**< SPI mode */

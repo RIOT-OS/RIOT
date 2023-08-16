@@ -20,6 +20,7 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "timex.h"
 #include "ztimer.h"
@@ -51,6 +52,9 @@ int main(void)
 
             len = fmt_s16_dfp(str_hum, hum, -2);
             str_hum[len] = '\0';
+        } else {
+            strcpy(str_temp, "ERROR");
+            strcpy(str_hum, "ERROR");
         }
         /* print values to STDIO */
         printf("Temperature [°C]: %s\n", str_temp);
