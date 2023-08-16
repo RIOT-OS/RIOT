@@ -13,5 +13,4 @@ config BOARD_THINGY91
     select NRF9160
 
     # Put defined MCU peripherals here (in alphabetical order)
-    
     # Put other features for this board (in alphabetical order)
