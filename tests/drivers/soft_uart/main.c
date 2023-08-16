@@ -72,7 +72,7 @@ static int parse_dev(char *arg)
 
 static void rx_cb(void *arg, uint8_t data)
 {
-    uart_t dev = (soft_uart_t)arg;
+    uart_t dev = (soft_uart_t)(intptr_t)arg;
 
     ringbuffer_add_one(&(ctx[dev].rx_buf), data);
     if (data == '\n' || ringbuffer_full(&(ctx[dev].rx_buf))) {
@@ -139,7 +139,7 @@ static int cmd_init(int argc, char **argv)
     baud = strtol(argv[2], NULL, 0);
 
     /* initialize UART */
-    res = soft_uart_init(dev, baud, rx_cb, (void *)dev);
+    res = soft_uart_init(dev, baud, rx_cb, (void *)(intptr_t)dev);
     if (res == UART_NOBAUD) {
         printf("Error: Given baudrate (%u) not possible\n", (unsigned int)baud);
         return 1;
@@ -269,7 +269,7 @@ int main(void)
          "NOTE: all strings need to be '\\n' terminated!\n");
 
     puts("\nUART INFO:");
-    printf("Available devices:               %i\n", SOFT_UART_NUMOF);
+    printf("Available devices:               %u\n", (unsigned)SOFT_UART_NUMOF);
 
     /* initialize ringbuffers */
     for (unsigned i = 0; i < SOFT_UART_NUMOF; i++) {

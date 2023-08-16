@@ -76,7 +76,7 @@ static void _print_measurement(sds011_data_t *data)
 void measure_cb(sds011_data_t *data, void *ctx)
 {
     msg_t msg = { .content.value = (((uint32_t)data->pm_10) << 16 | data->pm_2_5) };
-    kernel_pid_t target_pid = (int)ctx;
+    kernel_pid_t target_pid = (intptr_t)ctx;
     msg_send(&msg, target_pid);
 }
 
@@ -194,7 +194,7 @@ int main(void)
         }
     }
 
-    sds011_register_callback(&dev, measure_cb, (void*)(int)thread_getpid());
+    sds011_register_callback(&dev, measure_cb, (void*)(intptr_t)thread_getpid());
 
     printf("switching to active reporting mode for %u measurements...\n",
             ACTIVE_REPORTING_TEST_CNT);

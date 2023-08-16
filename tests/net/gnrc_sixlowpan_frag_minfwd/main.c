@@ -624,10 +624,16 @@ static void test_minfwd_forward__ENOMEM__netif_hdr_build_fail(void)
     gnrc_pktsnip_t *pkt, *frag, *filled_space;
 
     vrbe->super.arrival = xtimer_now_usec();
+
+    /* offset: 2 * sizeof(gnrc_pktsnip_t) + movement due to mark */
+#if (__SIZEOF_POINTER__ == 8)
+        size_t offset = 155U;
+#else
+        size_t offset = 115U;
+#endif
     TEST_ASSERT_NOT_NULL((filled_space = gnrc_pktbuf_add(
             NULL, NULL,
-            /* 115U == 2 * sizeof(gnrc_pktsnip_t) + movement due to mark */
-            CONFIG_GNRC_PKTBUF_SIZE - sizeof(_test_nth_frag) - 115U,
+            CONFIG_GNRC_PKTBUF_SIZE - sizeof(_test_nth_frag) - offset,
             GNRC_NETTYPE_UNDEF
         )));
     TEST_ASSERT_NOT_NULL((pkt = gnrc_pktbuf_add(NULL, _test_nth_frag,
