@@ -90,6 +90,10 @@ typedef int16_t     sword_t;
 #define ARCHITECTURE_WORD_BYTES     (4U)
 typedef uint32_t    uword_t;
 typedef int32_t     sword_t;
+#elif (ARCHITECTURE_WORD_BITS == 64)
+#define ARCHITECTURE_WORD_BYTES     (8U)
+typedef uint64_t    uword_t;
+typedef int64_t     sword_t;
 #else
 #error  "Unsupported word size (check ARCHITECTURE_WORD_BITS in architecture_arch.h)"
 #endif
@@ -193,17 +197,20 @@ typedef uintptr_t   uinttxtptr_t;
 /**
  * @brief   Highest number an uword_t can hold
  */
-#define UWORD_MAX                   ((1ULL << ARCHITECTURE_WORD_BITS) - 1)
+#define UWORD_MAX                   ((1ULL << (ARCHITECTURE_WORD_BITS - 1)) - 1 \
+                                   + (1ULL << (ARCHITECTURE_WORD_BITS - 1)) )
 
 /**
  * @brief   Smallest number an sword_t can hold
  */
-#define SWORD_MIN                   (-(1LL << (ARCHITECTURE_WORD_BITS - 1)))
+#define SWORD_MIN                  (-((1LL << (ARCHITECTURE_WORD_BITS - 2)) - 1 \
+                                   + (1LL << (ARCHITECTURE_WORD_BITS - 2))) - 1)
 
 /**
  * @brief   Highest number an sword_t can hold
  */
-#define SWORD_MAX                   ((1LL << (ARCHITECTURE_WORD_BITS - 1)) - 1)
+#define SWORD_MAX                   ((1LL << (ARCHITECTURE_WORD_BITS - 2)) - 1 \
+                                   + (1LL << (ARCHITECTURE_WORD_BITS - 2)) )
 
 #ifdef __cplusplus
 }

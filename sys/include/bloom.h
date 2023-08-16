@@ -134,7 +134,7 @@ extern "C" {
 /**
  * @brief hash function to use in thee filter
  */
-typedef uint32_t (*hashfp_t)(const uint8_t *, int len);
+typedef uint32_t (*hashfp_t)(const uint8_t *, size_t len);
 
 /**
  * @brief bloom_t bloom filter object

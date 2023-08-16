@@ -111,7 +111,11 @@ extern "C" {
 #endif
 
 #if FF_USE_FASTSEEK
+  #if (__SIZEOF_POINTER__ == 8)
+#define _FATFS_FILE_SEEK_PTR            (8)
+  #else
 #define _FATFS_FILE_SEEK_PTR            (4)
+  #endif
 #else
 #define _FATFS_FILE_SEEK_PTR            (0)
 #endif
@@ -125,13 +129,22 @@ extern "C" {
 #endif
 
 #if FF_USE_LFN
+  #if (__SIZEOF_POINTER__ == 8)
+#define _FATFS_DIR_LFN                  (8)
+  #else
 #define _FATFS_DIR_LFN                  (4)
+  #endif
 #else
 #define _FATFS_DIR_LFN                  (0)
 #endif
 
+  #if (__SIZEOF_POINTER__ == 8)
+#define FATFS_VFS_DIR_BUFFER_SIZE       (64 + _FATFS_DIR_LFN + _FATFS_DIR_EXFAT)
+#define FATFS_VFS_FILE_BUFFER_SIZE      (57 + VFS_NAME_MAX + _FATFS_FILE_CACHE + _FATFS_FILE_SEEK_PTR + _FATFS_FILE_EXFAT)
+  #else
 #define FATFS_VFS_DIR_BUFFER_SIZE       (44 + _FATFS_DIR_LFN + _FATFS_DIR_EXFAT)
 #define FATFS_VFS_FILE_BUFFER_SIZE      (41 + VFS_NAME_MAX + _FATFS_FILE_CACHE + _FATFS_FILE_SEEK_PTR + _FATFS_FILE_EXFAT)
+  #endif
 #else
 #define FATFS_VFS_DIR_BUFFER_SIZE       (1)
 #define FATFS_VFS_FILE_BUFFER_SIZE      (1)
@@ -143,8 +156,13 @@ extern "C" {
  * @{
  */
 #ifdef MODULE_LITTLEFS
+  #if (__SIZEOF_POINTER__ == 8)
+#define LITTLEFS_VFS_DIR_BUFFER_SIZE    (48)
+#define LITTLEFS_VFS_FILE_BUFFER_SIZE   (72)
+  #else
 #define LITTLEFS_VFS_DIR_BUFFER_SIZE    (44)
 #define LITTLEFS_VFS_FILE_BUFFER_SIZE   (56)
+  #endif
 #else
 #define LITTLEFS_VFS_DIR_BUFFER_SIZE    (1)
 #define LITTLEFS_VFS_FILE_BUFFER_SIZE   (1)
@@ -156,8 +174,13 @@ extern "C" {
  * @{
  */
 #ifdef MODULE_LITTLEFS2
+  #if (__SIZEOF_POINTER__ == 8)
+#define LITTLEFS2_VFS_DIR_BUFFER_SIZE   (56)
+#define LITTLEFS2_VFS_FILE_BUFFER_SIZE  (104)
+  #else
 #define LITTLEFS2_VFS_DIR_BUFFER_SIZE   (52)
 #define LITTLEFS2_VFS_FILE_BUFFER_SIZE  (84)
+  #endif
 #else
 #define LITTLEFS2_VFS_DIR_BUFFER_SIZE   (1)
 #define LITTLEFS2_VFS_FILE_BUFFER_SIZE  (1)

@@ -521,7 +521,7 @@ static void _ztimer_print(const ztimer_clock_t *clock)
     uint32_t last_offset = 0;
 
     do {
-        printf("0x%08x:%" PRIu32 "(%" PRIu32 ")%s", (unsigned)entry,
+        printf("0x%08" PRIxPTR ":%" PRIu32 "(%" PRIu32 ")%s", (uintptr_t)entry,
                entry->offset, entry->offset +
                last_offset,
                entry->next ? "->" : (entry == clock->last ? "" : "!"));
