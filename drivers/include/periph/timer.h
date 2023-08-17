@@ -35,6 +35,7 @@
 
 #include <limits.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "architecture.h"
 #include "periph_cpu.h"
@@ -294,6 +295,39 @@ uword_t timer_query_channel_numof(tim_t dev);
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 uint32_t timer_query_freqs(tim_t dev, uword_t index);
+
+#if defined(DOXYGEN)
+/**
+ * @brief Check whether a compare channel has matched
+ *
+ * @return true once after the channel has matched.
+ *
+ * It is currently not defined whether this keeps returning true after a
+ * channel has been polled until that channel is set, or whether later calls
+ * return false.
+ *
+ * This is typically used in spin loops that wait for a timer's completion:
+ *
+ * ~~~
+ * while (!timer_poll_channel(tim, chan)) {};
+ * ~~~
+ *
+ * This function is only available on platforms that implement the
+ * `periph_timer_poll` peripheral in addition to `periph_timer`.
+ *
+ */
+/* As this function is polled, it needs to be inlined, so it is typically
+ * provided through timer_arch.h. If a platform ever does not need to go
+ * through static inline here, this declaration's condition can be extended to
+ * be `(defined(MODULE_PERIPH_TIMER_POLL) &&
+ * !defined(PERIPH_TIMER_PROVIDES_INLINE_POLL_CHANNEL) || defined(DOXYGEN)` or
+ * similar. */
+bool timer_poll_channel(tim_t dev, int channel);
+#endif
+
+#if defined(MODULE_PERIPH_TIMER_POLL)
+#include "timer_arch.h"
+#endif
 
 #ifdef __cplusplus
 }
