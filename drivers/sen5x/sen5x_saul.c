@@ -175,7 +175,6 @@ static int read_ambient_temperature(const void *dev, phydat_t *res) {
     return 1;
 }
 
-
 const saul_driver_t sen5x_mass_concentration_pm1p0_driver = {
     .read = read_mass_concentration_pm1p0,
     .write = saul_write_notsup,

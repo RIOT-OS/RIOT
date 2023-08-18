@@ -87,7 +87,7 @@ typedef struct {
  * @param[in]    params     Initialization parameters
  *
  * @return 0 on success
- * @return < 0 on error
+ * @return > 0 on error
  */
 int sen5x_init(sen5x_t *dev, const sen5x_params_t *params);
 
@@ -97,7 +97,7 @@ int sen5x_init(sen5x_t *dev, const sen5x_params_t *params);
  * @param[inout] dev        Device descriptor of the driver
  *
  * @return 0 on success
- * @return < 0 on error
+ * @return > 0 on error
  */
 int sen5x_reset(const sen5x_t *dev);
 
@@ -164,7 +164,7 @@ void sen5x_read_pm_values(const sen5x_t *dev, sen5x_measurement_t *values);
  * @param[in]    slope          Normalized temperature offset slope
  * @param[in]    time_constant  Time constant in seconds
  */
-void sen5x_set_temperature_offset(const sen5x_t *dev,int16_t temp_offset,
+void sen5x_set_temperature_offset(const sen5x_t *dev, int16_t temp_offset,
                                     int16_t slope, uint16_t time_constant);
 
 /**

@@ -1,0 +1,6 @@
+# this file enables modules defined in Kconfig. Do not use this file for
+# application configuration. This is only needed during migration.
+
+CONFIG_MODULE_SEN5X=y
+CONFIG_MODULE_PRINT_FLOAT=y
+CONFIG_MODULE_ZTIMER=y

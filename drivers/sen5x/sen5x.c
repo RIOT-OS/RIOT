@@ -88,7 +88,7 @@ bool sen5x_data_ready_flag(const sen5x_t *dev)
     return status;
 }
 
-void sen5x_read_values(const sen5x_t *dev ,sen5x_measurement_t *values)
+void sen5x_read_values(const sen5x_t *dev, sen5x_measurement_t *values)
 {
     assert(dev && values);
     i2c_acquire(dev->params.i2c_dev);

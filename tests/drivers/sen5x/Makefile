@@ -4,6 +4,7 @@ DRIVER ?= sen5x
 
 USEMODULE += $(DRIVER)
 USEMODULE += printf_float
-USEMODULE += xtimer
+USEMODULE += ztimer
+USEMODULE += ztimer_usec
 
 include $(RIOTBASE)/Makefile.include
