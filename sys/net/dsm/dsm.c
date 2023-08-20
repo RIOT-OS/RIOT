@@ -106,6 +106,13 @@ void dsm_remove(sock_dtls_t *sock, sock_dtls_session_t *session)
         }
 
         session_slot->state = SESSION_STATE_NONE;
+        session_slot->tag = CREDMAN_TAG_EMPTY;
+        session_slot->type = CREDMAN_TYPE_EMPTY;
+#ifdef CONFIG_DTLS_ECC
+        memset(session_slot->other_pub_x, 0, ARRAY_SIZE(session_slot->other_pub_x));
+        memset(session_slot->other_pub_y, 0, ARRAY_SIZE(session_slot->other_pub_y));
+        session_slot->key_size = 0;
+#endif
         _available_slots++;
         DEBUG("dsm: removed session\n");
     } else {
