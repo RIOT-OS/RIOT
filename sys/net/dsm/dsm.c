@@ -33,6 +33,11 @@ typedef struct {
     uint32_t last_used_sec;
     credman_tag_t tag;
     credman_type_t type;
+#ifdef CONFIG_DTLS_ECC
+    unsigned char other_pub_x[DTLS_EC_KEY_SIZE];
+    unsigned char other_pub_y[DTLS_EC_KEY_SIZE];
+    size_t key_size;
+#endif
 } dsm_session_t;
 
 static int _find_session(sock_dtls_t *sock, sock_dtls_session_t *to_find,
@@ -181,8 +186,47 @@ int dsm_get_session_credential_info(sock_dtls_t *sock, sock_dtls_session_t *sess
     }
     *type = session_slot->type;
     *tag = session_slot->tag;
-    return 0;
+    return 1;
 }
+
+#ifdef CONFIG_DTLS_ECC
+int dsm_set_other_public_key(sock_dtls_t *sock, sock_dtls_session_t *session,
+                             const unsigned char *other_pub_x,
+                             const unsigned char *other_pub_y, size_t key_size)
+{
+    assert(key_size <= DTLS_EC_KEY_SIZE);
+    dsm_session_t *session_slot = NULL;
+
+    if (_find_session(sock, session, &session_slot) != 1) {
+        DEBUG("dsm: No session to set the other public key was found\n");
+        return -1;
+    }
+    memcpy(session_slot->other_pub_x, other_pub_x, key_size);
+    memcpy(session_slot->other_pub_y, other_pub_y, key_size);
+    session_slot->key_size = key_size;
+    return 1;
+}
+
+int dsm_get_other_public_key(sock_dtls_t *sock, sock_dtls_session_t *session,
+                             const unsigned char **other_pub_x,
+                             const unsigned char **other_pub_y)
+{
+    dsm_session_t *session_slot = NULL;
+
+    if (_find_session(sock, session, &session_slot) != 1) {
+        DEBUG("dsm: No session to get the other public keys from was found\n");
+        return -1;
+    }
+    if (session_slot->key_size == 0) {
+        DEBUG("dsm: Other public key is not set\n");
+        return -2;
+    }
+
+    *other_pub_x = session_slot->other_pub_x;
+    *other_pub_y = session_slot->other_pub_y;
+    return session_slot->key_size;
+}
+#endif /* CONFIG_DTLS_ECC */
 
 /* Search for existing session or empty slot for new one
  * Returns 1, if existing session found

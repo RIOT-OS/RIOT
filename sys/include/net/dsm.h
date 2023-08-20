@@ -147,6 +147,40 @@ int dsm_set_session_credential_info(sock_dtls_t *sock, sock_dtls_session_t *sess
 int dsm_get_session_credential_info(sock_dtls_t *sock, sock_dtls_session_t *session,
                                     credman_type_t *type, credman_tag_t *tag);
 
+#ifdef CONFIG_DTLS_ECC
+/**
+ * @brief Set the public key of the other peer that is being communicated with
+ *
+ * @param[in] sock          @ref sock_dtls_t, which the session is created on
+ * @param[in] session       Session to set the public key for
+ * @param[in] other_pub_x   X part of the public key
+ * @param[in] other_pub_y   Y part of the public key
+ * @param[in] key_size      Size of each key part
+ *
+ * @return  1, on success
+ * @return  -1, when no corresponding session was found
+ */
+int dsm_set_other_public_key(sock_dtls_t *sock, sock_dtls_session_t *session,
+                             const unsigned char *other_pub_x,
+                             const unsigned char *other_pub_y, size_t key_size);
+
+/**
+ * @brief Gets the public key of the other peer that is being communicated with
+ *
+ * @param[in]  sock          @ref sock_dtls_t, which the session is created on
+ * @param[in]  session       Session to set the public key for
+ * @param[out] other_pub_x  X part of the public key
+ * @param[out] other_pub_y  Y part of the public key
+ *
+ * @return  size of a key part on success
+ * @return  -1, when no corresponding session was found
+ * @return  -2, when the other public key for this session was not set before
+ */
+int dsm_get_other_public_key(sock_dtls_t *sock, sock_dtls_session_t *session,
+                             const unsigned char **other_pub_x,
+                             const unsigned char **other_pub_y);
+#endif /* CONFIG_DTLS_ECC */
+
 #ifdef __cplusplus
 }
 #endif
