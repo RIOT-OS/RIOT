@@ -22,6 +22,7 @@
 
 #include "bsp/include/nm_bsp.h"
 #include "net/ethernet.h"
+#include "net/wifi.h"
 #include "net/netdev.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
@@ -42,6 +43,14 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Maximum number of supported entries in a scan result of
+ *          an ATWINC15x0 transceiver
+ */
+#ifndef CONFIG_ATWINC15X0_SCAN_LIST_NUMOF
+#define CONFIG_ATWINC15X0_SCAN_LIST_NUMOF   (3)
+#endif
+
+/**
  * @brief   ATWINC15x0 hardware and global parameters
  */
 typedef struct {
@@ -55,15 +64,31 @@ typedef struct {
 } atwinc15x0_params_t;
 
 /**
+ * @brief   ATWINC15x0 internal states
+ */
+typedef enum {
+    ATWINC15X0_STATE_SLEEP,                     /**< Sleep state */
+    ATWINC15X0_STATE_DISCONNECTING,             /**< Disconnect received when connected before */
+    ATWINC15X0_STATE_DISCONNECTED,              /**< Disconnect state */
+    ATWINC15X0_STATE_DISCONNECTED_SCANNING,     /**< Scanning state when disconnected */
+    ATWINC15X0_STATE_DISCONNECTED_CONNECTING,   /**< Connecting state where disconnected before */
+    ATWINC15X0_STATE_CONNECTED,                 /**< Connected state */
+    ATWINC15X0_STATE_CONNECTED_SCANNING,        /**< Scanning state when connected */
+    ATWINC15X0_STATE_CONNECTED_CONNECTING,      /**< Connecting state where disconnect
+                                                     event is not yet received */
+} atwinc15x0_state_t;
+
+/**
  * @brief   ATWINC15x0 device descriptor type
  */
 typedef struct atwinc15x0 {
     netdev_t netdev;            /**< Pulls in the netdev fields */
     atwinc15x0_params_t params; /**< Device initialization parameters */
-
-    bool connected;             /**< Indicates whether connected to an AP */
-    netopt_state_t state;       /**< Current interface state, only sleep or idle */
+    atwinc15x0_state_t state;   /**< Device state */
     char ap[ETHERNET_ADDR_LEN]; /**< BSSID of current AP */
+#if IS_USED(MODULE_ATWINC15X0_DYNAMIC_CONNECT) || defined(DOXYGEN)
+    char ssid[WIFI_SSID_LEN_MAX + 1]; /**< SSID of current AP */
+#endif
     uint8_t channel;            /**< Channel used for current AP */
     int8_t rssi;                /**< RSSI last measured by the WiFi module */
 

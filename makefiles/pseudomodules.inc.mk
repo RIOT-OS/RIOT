@@ -472,6 +472,7 @@ PSEUDOMODULES += shell_cmd_gnrc_sixlowpan_frag_stats
 PSEUDOMODULES += shell_cmd_gnrc_udp
 PSEUDOMODULES += shell_cmd_heap
 PSEUDOMODULES += shell_cmd_i2c_scan
+PSEUDOMODULES += shell_cmd_iw
 PSEUDOMODULES += shell_cmd_lwip_netif
 PSEUDOMODULES += shell_cmd_mci
 PSEUDOMODULES += shell_cmd_md5sum
@@ -580,6 +581,7 @@ PSEUDOMODULES += vfs_auto_mount
 PSEUDOMODULES += vfs_default
 
 PSEUDOMODULES += wakaama_objects_%
+PSEUDOMODULES += wifi_scan_list
 PSEUDOMODULES += wifi_enterprise
 PSEUDOMODULES += xtimer_on_ztimer
 PSEUDOMODULES += xtimer_no_ztimer_default
