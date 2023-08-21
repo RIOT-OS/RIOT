@@ -188,3 +188,7 @@ endif
 ifneq (,$(filter gcoap,$(USEMODULE)))
   include $(RIOTBASE)/sys/net/application_layer/gcoap/Makefile.include
 endif
+
+ifneq (,$(filter nanocoap,$(USEMODULE)))
+  include $(RIOTBASE)/sys/net/application_layer/nanocoap/Makefile.include
+endif
