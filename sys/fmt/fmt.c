@@ -489,26 +489,37 @@ uint32_t scn_u32_dec(const char *str, size_t n)
 uint32_t scn_u32_hex(const char *str, size_t n)
 {
     uint32_t res = 0;
+    const char *end = str + n;
 
-    while (n--) {
-        unsigned c = *str++;
-        unsigned d;
-        if (('0'<= c) && (c <= '9')){
-            d = c - (unsigned)'0';
+    while (str != end) {
+        unsigned char c = *str++ | 32; /* convert to lowercase */
+        unsigned char d;
+
+        switch (c >> 4) {
+        case 3:
+            /* characters '0' - '9' */
+            d = c & 0xf;
+            if (d < 10) {
+                break;
+            }
+            /* fall-through */
+        case 6:
+            /* characters 'a' - 'f' */
+            d = c - 'a';
+            if (d < 6) {
+                d += 10;
+                break;
+            }
+            /* fall-through */
+        default:
+            /* invalid character */
+            return res;
         }
-        else if (('A' <= c) && (c <= 'F')) {
-            d = c - (unsigned)'A' + 0xaU;
-        }
-        else if (('a' <= c) && (c <= 'f')) {
-            d = c - (unsigned)'a' + 0xaU;
-        }
-        else {
-            break;
-        }
+
         res <<= 4U;
         res |= d;
-
     }
+
     return res;
 }
 
