@@ -1,1 +1,3 @@
 # write here the flasher tool and stdio configurations
+
+include $(RIOTBOARD)/common/gd32v/Makefile.include
