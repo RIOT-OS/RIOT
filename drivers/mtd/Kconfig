@@ -38,6 +38,21 @@ config HAVE_MTD_SDCARD
     help
         Indicates that a sdcard MTD is present
 
+config HAVE_MTD_SDMMC_DEFAULT
+    bool
+    depends on HAS_PERIPH_SDMMC
+    imply MODULE_MTD_SDMMC if MODULE_MTD
+    imply MODULE_MTD_SDMMC_DEFAULT if MODULE_MTD
+    help
+        Indicates that a SD/MMC MTD is present with generic configuration
+
+config HAVE_MTD_SDMMC
+    bool
+    depends on HAS_PERIPH_SDMMC
+    imply MODULE_MTD_SDMMC if MODULE_MTD
+    help
+        Indicates that a SD/MMC MTD is present
+
 config HAVE_MTD_SPI_NOR
     bool
     imply MODULE_MTD_SPI_NOR if MODULE_MTD
@@ -46,13 +61,13 @@ config HAVE_MTD_SPI_NOR
 
 config HAVE_SAM0_SDHC
     bool
-    imply MODULE_SAM0_SDHC if MODULE_MTD
+    imply MODULE_SAM0_SDHC if MODULE_MTD && !MODULE_MTD_SDMMC
     help
         Indicates that a SAM0 SD Host Controller MTD is present
 
 config HAVE_MTD_SPI_MCI
     bool
-    imply MODULE_MTD_MCI if MODULE_MTD
+    imply MODULE_MTD_MCI if MODULE_MTD && !MODULE_MTD_SDMMC
     help
         Indicates that a Multimedia Card Interface (MCI) MTD is present
 
@@ -62,7 +77,7 @@ menuconfig MODULE_MTD
 
 if MODULE_MTD
 
-menu "MTD Interefaces"
+menu "MTD Interfaces"
 
 config MODULE_MTD_SPI_NOR
     bool "MTD interface for SPI NOR Flash"
@@ -95,22 +110,33 @@ config MODULE_MTD_MCI
     depends on CPU_FAM_LPC23XX
     select MODULE_MCI
 
+config MODULE_MTD_SDCARD
+    bool "MTD interface for SPI SD-Card"
+    depends on MODULE_SDCARD_SPI
+
 config MODULE_MTD_SDCARD_DEFAULT
     bool "Use Generic SD card configuration"
     depends on MODULE_MTD_SDCARD
     help
         Automatically create a MTD device and mount point for the SD card.
 
-config MODULE_MTD_SDCARD
-    bool "MTD interface for SPI SD-Card"
-    depends on MODULE_SDCARD_SPI
+config MODULE_MTD_SDMMC
+    bool "MTD interface for SD/MMC"
+    depends on HAS_PERIPH_SDMMC
+    select MODULE_PERIPH_SDMMC
+
+config MODULE_MTD_SDMMC_DEFAULT
+    bool "Use Generic SD/MMC card configuration"
+    depends on MODULE_MTD_SDMMC
+    help
+        Automatically create a MTD device and mount point for the SD/MMC card.
 
 config MODULE_MTD_EMULATED
     bool "MTD interface for MTD emulated in RAM"
 
 config MODULE_SAM0_SDHC
     bool "MTD interface for SAM0 SD Host Controller"
-    depends on CPU_COMMON_SAM0
+    depends on CPU_COMMON_SAM0 && HAVE_SAM0_SDHC && !MODULE_PERIPH_SDMMC
 
 endmenu # MTD Interfacs
 

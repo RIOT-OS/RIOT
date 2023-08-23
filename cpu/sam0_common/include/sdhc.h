@@ -95,6 +95,7 @@ typedef struct {
 /** This SD stack uses the maximum block size authorized (512 bytes) */
 #define SD_MMC_BLOCK_SIZE   512             /**< SD card block size */
 #define SDHC_SLOW_CLOCK_HZ  400000          /**< Clock frequency on init */
+#define SDHC_FAST_CLOCK_HZ  25000000        /**< Clock frequency after init */
 
 /**
  * @brief Initialize the SD host controller

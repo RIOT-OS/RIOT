@@ -50,6 +50,7 @@
 #include <stdio.h>
 #include "periph_cpu.h"
 #include "periph/pm.h"
+#include "macros/math.h"
 #include "vendor/sd_mmc_protocol.h"
 #include "sdhc.h"
 #include "time_units.h"
@@ -64,6 +65,10 @@
 
 #ifndef SDHC_CLOCK_SLOW
 #define SDHC_CLOCK_SLOW     SAM0_GCLK_TIMER
+#endif
+
+#ifndef SDHC_ENABLE_HS
+#define SDHC_ENABLE_HS      1
 #endif
 
 /**
@@ -98,15 +103,16 @@ static bool _init_transfer(sdhc_state_t *state, uint32_t cmd, uint32_t arg, uint
                           uint16_t num_blocks);
 static bool sdio_test_type(sdhc_state_t *state);
 
-/** SD/MMC transfer rate unit codes (10K) list */
-static const uint32_t transfer_units[] = { 10, 100, 1000, 10000, 0, 0, 0, 0 };
-/** SD transfer multiplier factor codes (1/10) list */
-static const uint8_t transfer_multiplier[16] =
-{ 0, 10, 12, 13, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 70, 80 };
-
 static bool _card_detect(sdhc_state_t *state)
 {
     return state->dev->PSR.bit.CARDINS;
+}
+
+static inline void _clock_sdcard(sdhc_state_t *state, bool on)
+{
+    (void)state;
+
+    SDHC_DEV->CCR.bit.SDCLKEN = on;
 }
 
 static bool _check_mask(uint32_t val, uint32_t mask)
@@ -126,26 +132,73 @@ static void _delay(unsigned us)
     }
 }
 
-static void _reset_all(sdhc_state_t *state)
+
+/**
+ * @brief   Reset the entire SDHC peripheral or a part of it
+ *
+ * @param   state   SDHC device context
+ * @param   type    Reset type
+ *                  [SDHC_SRR_SWRSTALL | SDHC_SRR_SWRSTCMD | SDHC_SRR_SWRSTDAT]
+ */
+static void _reset_sdhc(sdhc_state_t *state, uint8_t type)
 {
-    SDHC_DEV->SRR.reg = SDHC_SRR_SWRSTALL;
-    while (SDHC_DEV->SRR.bit.SWRSTALL) {}
-    state->need_init = true;
-    state->error = 0;
+    SDHC_DEV->SRR.reg = type;
+    while (SDHC_DEV->SRR.reg & type) {}
+
+    if (type == SDHC_SRR_SWRSTALL) {
+        /* trigger card_init */
+        state->need_init = true;
+        state->error = 0;
+    }
 }
 
-static uint32_t _wait_for_event(sdhc_state_t *state)
+/**
+ * @brief   Wait for a given event while checking for errors
+ *
+ * @param   state       SDHC device context
+ * @param   event       Event to wait for [SDHC_NISTR_*]
+ * @param   error_mask  Mask of errors to be checked [SDHC_EISTR_*]
+ * @param   reset       Reset type in case of errors
+ *                      [SDHC_SRR_SWRSTALL | SDHC_SRR_SWRSTCMD | SDHC_SRR_SWRSTDAT]
+ *
+ * @return true if event occurred or false on error
+ */
+static bool _wait_for_event(sdhc_state_t *state,
+                            uint16_t event, uint16_t error_mask,
+                            uint8_t reset)
 {
-    uint32_t res;
+    /* wait for the event given by event mask */
+    do {
+        /* check for any error in error mask */
+        if (SDHC_DEV->EISTR.reg & error_mask) {
+            state->error = SDHC_DEV->EISTR.reg;
+            SDHC_DEV->EISTR.reg = SDHC_EISTR_MASK;
+            if (IS_USED(ENABLE_DEBUG)) {
+                DEBUG("sdhc error: %x, ", state->error);
+                switch (reset) {
+                case SDHC_SRR_SWRSTCMD:
+                    DEBUG("reset CMD\n");
+                    break;
+                case SDHC_SRR_SWRSTDAT:
+                    DEBUG("reset DAT\n");
+                    break;
+                case SDHC_SRR_SWRSTALL:
+                    DEBUG("reset ALL\n");
+                    break;
+                default:
+                    assert(false);
+                    break;
+                }
+            }
+            _reset_sdhc(state, reset);
+            return false;
+        }
+    } while (!(SDHC_DEV->NISTR.reg & event));
 
-    /* SDHC runs off CPU clock - block IDLE so that the clock does not stop */
-    pm_block(3);
-    mutex_lock(&state->sync);
-    pm_unblock(3);
+    /* clear the event */
+    SDHC_DEV->NISTR.reg = event;
 
-    res = state->error;
-    state->error = 0;
-    return res;
+    return true;
 }
 
 static void _init_clocks(sdhc_state_t *state)
@@ -207,6 +260,7 @@ int sdhc_init(sdhc_state_t *state)
 {
     bool f8;
     uint32_t response;
+    int res = 0;
 
     /* set the initial clock slow, single bit and normal speed */
     state->type = CARD_TYPE_SD;
@@ -220,7 +274,9 @@ int sdhc_init(sdhc_state_t *state)
     state->sync = _init_locked;
 
     _init_clocks(state);
-    _reset_all(state);
+    _reset_sdhc(state, SDHC_SRR_SWRSTALL);
+
+    SDHC_DEV->NISIER.reg = NISTR_CARD_DETECT;
 
     SDHC_DEV->TCR.reg = 14;                     /* max timeout is 14 or about 1sec */
     SDHC_DEV->PCR.reg = SDHC_PCR_SDBPWR | SDHC_PCR_SDBVSEL_3V3;
@@ -236,14 +292,16 @@ int sdhc_init(sdhc_state_t *state)
     for (int i = 0; i < 2; i++) { /* we do this step twice before failing */
         if (!sdhc_send_cmd(state, SDMMC_MCI_CMD0_GO_IDLE_STATE, 0)) {
             if (i == 1) {
-                return -EIO;
+                res = -EIO;
+                goto out;
             }
         }
         /* Test for SD version 2 */
         if (!sdhc_send_cmd(state, SD_CMD8_SEND_IF_COND, SD_CMD8_PATTERN | SD_CMD8_HIGH_VOLTAGE)) {
             if (i == 1) {
                 /* bad card */
-                return -EIO;
+                res = -EIO;
+                goto out;
             }
         }
         else {
@@ -260,49 +318,62 @@ int sdhc_init(sdhc_state_t *state)
         }
     }
     if (!sdio_test_type(state)) {
-        return -EIO;
+        res = -EIO;
+        goto out;
     }
     if (state->type & CARD_TYPE_SDIO) {
-        return -ENOTSUP;
+        res = -ENOTSUP;
+        goto out;
     }
     /* Try to get the SD card's operating condition */
     if (!_test_voltage(state, f8)) {
         state->type = CARD_TYPE_UNKNOWN;
-        return -EIO;
+        res = -EIO;
+        goto out;
     }
     /* SD MEMORY, Put the Card in Identify Mode
      * Note: The CID is not used in this stack */
     if (!sdhc_send_cmd(state, SDMMC_CMD2_ALL_SEND_CID, 0)) {
-        return -EIO;
+        res = -EIO;
+        goto out;
     }
     /* Ask the card to publish a new relative address (RCA).*/
     if (!sdhc_send_cmd(state, SD_CMD3_SEND_RELATIVE_ADDR, 0)) {
-        return -EIO;
+        res = -EIO;
+        goto out;
     }
     state->rca = (uint16_t)(SDHC_DEV->RR[0].reg >> 16);
     /* SD MEMORY, Get the Card-Specific Data */
     if (!_test_capacity(state)) {
-        return -EIO;
+        res = -EIO;
+        goto out;
     }
     /* Put it into Transfer Mode */
     if (!sdhc_send_cmd(state, SDMMC_CMD7_SELECT_CARD_CMD, (uint32_t)state->rca << 16)) {
-        return -EIO;
+        res = -EIO;
+        goto out;
     }
     /* SD MEMORY, Read the SCR to get card version */
     if (!_test_version(state)) {
-        return -EIO;
+        res = -EIO;
+        goto out;
     }
     if (!_test_bus_width(state)) {
-        return -EIO;
+        res = -EIO;
+        goto out;
     }
+
+    /* all SD Cards should support this clock at that point */
+    state->clock = SDHC_FAST_CLOCK_HZ;
 
     /* update the host controller to the detected changes in bus_width and clock */
     _set_hc(state);
 
     /* if it is high speed capable, (well it is) */
-    if (SDHC_DEV->CA0R.bit.HSSUP) {
+    if (IS_USED(SDHC_ENABLE_HS) && SDHC_DEV->CA0R.bit.HSSUP) {
         if (!_test_high_speed(state)) {
-            return -EIO;
+            res = -EIO;
+            goto out;
         }
     }
 
@@ -310,11 +381,15 @@ int sdhc_init(sdhc_state_t *state)
     _set_hc(state);
 
     if (!sdhc_send_cmd(state, SDMMC_CMD16_SET_BLOCKLEN, SD_MMC_BLOCK_SIZE)) {
-        return -EIO;
+        res = -EIO;
+        goto out;
     }
 
     state->need_init = false;
-    return 0;
+
+out:
+    _clock_sdcard(state, 0);
+    return res;
 }
 
 bool sdhc_send_cmd(sdhc_state_t *state, uint32_t cmd, uint32_t arg)
@@ -355,15 +430,10 @@ bool sdhc_send_cmd(sdhc_state_t *state, uint32_t cmd, uint32_t arg)
         : SDHC_EISTR_CMDTEO | SDHC_EISTR_CMDEND | SDHC_EISTR_CMDIDX | SDHC_EISTR_DATTEO |
           SDHC_EISTR_DATEND | SDHC_EISTR_ADMA | SDHC_EISTR_CMDCRC | SDHC_EISTR_DATCRC;
 
-    SDHC_DEV->NISIER.reg = SDHC_NISTR_CMDC | NISTR_CARD_DETECT;
-    SDHC_DEV->EISIER.reg = eis;
-
     SDHC_DEV->ARG1R.reg = arg;    /* setup the argument register */
     SDHC_DEV->CR.reg = command;   /* send command */
 
-    if (_wait_for_event(state)) {
-        SDHC_DEV->SRR.reg = SDHC_SRR_SWRSTCMD;  /* reset command */
-        while (SDHC_DEV->SRR.bit.SWRSTCMD) {}
+    if (!_wait_for_event(state, SDHC_NISTR_CMDC, eis, SDHC_SRR_SWRSTCMD)) {
         return false;
     }
 
@@ -384,32 +454,23 @@ static void _set_speed(sdhc_state_t *state, uint32_t fsdhc)
 {
     (void)state;
 
-    uint32_t div;
-
     if (SDHC_DEV->CCR.bit.SDCLKEN) {
         /* wait for command/data to go inactive */
         while (SDHC_DEV->PSR.reg & (SDHC_PSR_CMDINHC | SDHC_PSR_CMDINHD)) {}
         /* disable the clock */
-        SDHC_DEV->CCR.reg &= ~SDHC_CCR_SDCLKEN;
+        SDHC_DEV->CCR.reg = 0;
     }
 
-    /* since both examples use divided clock rather than programmable - just use divided here */
-    SDHC_DEV->CCR.reg &= ~SDHC_CCR_CLKGSEL;     /* divided clock */
+    uint32_t div = DIV_ROUND_UP(sam0_gclk_freq(SDHC_CLOCK), fsdhc) - 1;
 
-    /* Fsdclk = Fsdhc_core/(2 * div) */
-    div = (sam0_gclk_freq(SDHC_CLOCK) / fsdhc) / 2;
-
-    /* high speed div must not be 0 */
-    if (SDHC_DEV->HC1R.bit.HSEN && (div == 0)) {
-        div = 1;
-    }
+    DEBUG("sdhc: switch to %lu Hz (div %lu) -> %lu Hz\n",
+          fsdhc, div, sam0_gclk_freq(SDHC_CLOCK) / (div + 1));
 
     /* write the 10 bit clock divider */
-    SDHC_DEV->CCR.reg &= ~(SDHC_CCR_USDCLKFSEL_Msk | SDHC_CCR_SDCLKFSEL_Msk);
-    SDHC_DEV->CCR.reg |= SDHC_CCR_SDCLKFSEL(div) | SDHC_CCR_USDCLKFSEL(div >> 8);
-    SDHC_DEV->CCR.reg |= SDHC_CCR_INTCLKEN;  /* enable internal clock       */
+    SDHC_DEV->CCR.reg = SDHC_CCR_SDCLKFSEL(div) | SDHC_CCR_USDCLKFSEL(div >> 8)
+                      | SDHC_CCR_CLKGSEL | SDHC_CCR_INTCLKEN;
     while (!SDHC_DEV->CCR.bit.INTCLKS) {}    /* wait for clock to be stable */
-    SDHC_DEV->CCR.reg |= SDHC_CCR_SDCLKEN;   /* enable clock to card        */
+    SDHC_DEV->CCR.bit.SDCLKEN = 1;           /* enable clock to card        */
 }
 
 /**
@@ -503,7 +564,6 @@ static bool _test_capacity(sdhc_state_t *state)
 {
     alignas(uint32_t)
     uint8_t csd[CSD_REG_BSIZE];
-    uint32_t transfer_speed;
 
     if (!sdhc_send_cmd(state, SDMMC_MCI_CMD9_SEND_CSD, (uint32_t)state->rca << 16)) {
         return false;
@@ -512,9 +572,7 @@ static bool _test_capacity(sdhc_state_t *state)
         uint32_t *csd32 = (void *)csd;
         csd32[i] = __builtin_bswap32(SDHC_DEV->RR[3 - i].reg);
     }
-    transfer_speed = CSD_TRAN_SPEED(&csd[1]);
-    state->clock = transfer_units[transfer_speed & 0x7] *
-                   transfer_multiplier[(transfer_speed >> 3) & 0xF] * 1000;
+
     /*
      * Card Capacity.
      * ----------------------------------------------------
@@ -569,8 +627,22 @@ static bool _test_version(sdhc_state_t *state)
         return false;
     }
 
+    /* wait until buffer read ready */
+    if (!_wait_for_event(state, SDHC_NISTR_BRDRDY,
+                         SDHC_EISTR_DATTEO | SDHC_EISTR_DATCRC | SDHC_EISTR_DATEND,
+                         SDHC_SRR_SWRSTALL)) {
+        return false;
+    }
+
     for (int words = 0; words < (SD_SCR_REG_BSIZE / 4); words++) {
         *p++ = SDHC_DEV->BDPR.reg;
+    }
+
+    /* wait until transfer is complete */
+    if (!_wait_for_event(state, SDHC_NISTR_TRFC,
+                         SDHC_EISTR_DATTEO | SDHC_EISTR_DATCRC | SDHC_EISTR_DATEND,
+                         SDHC_SRR_SWRSTALL)) {
+        return false;
     }
 
     /* Get SD Memory Card - Spec. Version */
@@ -606,17 +678,16 @@ static bool _init_transfer(sdhc_state_t *state, uint32_t cmd, uint32_t arg, uint
     uint32_t tmr;
     uint32_t command;
     uint32_t eis;
+    uint32_t timeout = 0xFFFFFFFF;
 
     /* wait if card is busy */
     while (SDHC_DEV->PSR.reg & (SDHC_PSR_CMDINHC | SDHC_PSR_CMDINHD)) {}
 
     if (cmd & MCI_CMD_WRITE) {
         tmr = SDHC_TMR_DTDSEL_WRITE;
-        SDHC_DEV->NISIER.reg = SDHC_NISTR_BWRRDY | NISTR_CARD_DETECT;
     }
     else {
         tmr = SDHC_TMR_DTDSEL_READ;
-        SDHC_DEV->NISIER.reg = SDHC_NISTR_BRDRDY | NISTR_CARD_DETECT;
     }
 
     if (cmd & MCI_CMD_SDIO_BYTE) {
@@ -672,15 +743,22 @@ static bool _init_transfer(sdhc_state_t *state, uint32_t cmd, uint32_t arg, uint
 
     DEBUG("sdhc: send cmd %lx\n", command);
 
-    SDHC_DEV->EISIER.reg = eis;
     SDHC_DEV->SSAR.reg = num_blocks;  /* Setup block size for Auto CMD23 */
     SDHC_DEV->ARG1R.reg = arg;        /* setup the argument register */
     SDHC_DEV->CR.reg = command;       /* send command */
 
-    if (_wait_for_event(state)) {
-        DEBUG("sdhc error: %x, reset all\n", state->error);
-        _reset_all(state);
+    if (!_wait_for_event(state, SDHC_NISTR_CMDC, eis, SDHC_SRR_SWRSTCMD)) {
         return false;
+    }
+
+    if (cmd & MCI_RESP_BUSY) {
+        do {
+            if (--timeout == 0) {
+                SDHC_DEV->SRR.reg = SDHC_SRR_SWRSTCMD; /* reset command */
+                while (SDHC_DEV->SRR.bit.SWRSTCMD) {}
+                return false;
+            }
+        } while (!(SDHC_DEV->PSR.reg & SDHC_PSR_DATLL(1))); /* DAT[0] is busy bit */
     }
 
     return true;
@@ -707,6 +785,7 @@ int sdhc_read_blocks(sdhc_state_t *state, uint32_t address, void *dst, uint16_t 
     }
 
     mutex_lock(&state->lock);
+    _clock_sdcard(state, 1);
 
     if (state->need_init) {
         res = sdhc_init(state);
@@ -741,13 +820,30 @@ int sdhc_read_blocks(sdhc_state_t *state, uint32_t address, void *dst, uint16_t 
         goto out;
     }
 
+    /* wait until buffer read ready */
+    if (!_wait_for_event(state, SDHC_NISTR_BRDRDY,
+                         SDHC_EISTR_DATTEO | SDHC_EISTR_DATCRC | SDHC_EISTR_DATEND,
+                         SDHC_SRR_SWRSTALL)) {
+        res = -EIO;
+        goto out;
+    }
+
     int num_words = (num_blocks * SD_MMC_BLOCK_SIZE) / 4;
     for (int words = 0; words < num_words; words++) {
         while (!SDHC_DEV->PSR.bit.BUFRDEN) {}
         *p++ = SDHC_DEV->BDPR.reg;
     }
 
+    /* wait until transfer is complete */
+    if (!_wait_for_event(state, SDHC_NISTR_TRFC,
+                         SDHC_EISTR_DATTEO | SDHC_EISTR_DATCRC | SDHC_EISTR_DATEND,
+                         SDHC_SRR_SWRSTALL)) {
+        res = -EIO;
+        goto out;
+    }
+
 out:
+    _clock_sdcard(state, 0);
     mutex_unlock(&state->lock);
     return res;
 }
@@ -772,6 +868,7 @@ int sdhc_write_blocks(sdhc_state_t *state, uint32_t address, const void *src,
     }
 
     mutex_lock(&state->lock);
+    _clock_sdcard(state, 1);
 
     if (state->need_init) {
         res = sdhc_init(state);
@@ -808,6 +905,14 @@ int sdhc_write_blocks(sdhc_state_t *state, uint32_t address, const void *src,
         goto out;
     }
 
+    /* wait until buffer write ready */
+    if (!_wait_for_event(state, SDHC_NISTR_BWRRDY,
+                         SDHC_EISTR_DATTEO | SDHC_EISTR_DATCRC | SDHC_EISTR_DATEND,
+                         SDHC_SRR_SWRSTALL)) {
+        res = -EIO;
+        goto out;
+    }
+
     /* Write data */
     int num_words = (num_blocks * SD_MMC_BLOCK_SIZE) / 4;
     for (int words = 0; words < num_words; words++) {
@@ -815,7 +920,17 @@ int sdhc_write_blocks(sdhc_state_t *state, uint32_t address, const void *src,
         SDHC_DEV->BDPR.reg = *p++;
     }
 
+    /* wait until transfer is complete */
+    if (!_wait_for_event(state, SDHC_NISTR_TRFC,
+                         SDHC_EISTR_DATTEO | SDHC_EISTR_DATCRC | SDHC_EISTR_DATEND,
+                         SDHC_SRR_SWRSTALL)) {
+        res = -EIO;
+        goto out;
+    }
+
 out:
+    _wait_not_busy(state);
+    _clock_sdcard(state, 0);
     mutex_unlock(&state->lock);
     return res;
 }
@@ -830,6 +945,7 @@ int sdhc_erase_blocks(sdhc_state_t *state, uint32_t start, uint16_t num_blocks)
     }
 
     mutex_lock(&state->lock);
+    _clock_sdcard(state, 1);
 
     if (state->need_init) {
         res = sdhc_init(state);
@@ -859,6 +975,8 @@ int sdhc_erase_blocks(sdhc_state_t *state, uint32_t start, uint16_t num_blocks)
     }
 
 out:
+    _wait_not_busy(state);
+    _clock_sdcard(state, 0);
     mutex_unlock(&state->lock);
     return res;
 }
@@ -966,8 +1084,22 @@ static bool _test_high_speed(sdhc_state_t *state)
             return false;
         }
 
+        /* wait until buffer read ready */
+        if (!_wait_for_event(state, SDHC_NISTR_BRDRDY,
+                             SDHC_EISTR_DATTEO | SDHC_EISTR_DATCRC | SDHC_EISTR_DATEND,
+                             SDHC_SRR_SWRSTALL)) {
+            return false;
+        }
+
         for (int words = 0; words < (SD_SW_STATUS_BSIZE / 4); words++) {
             *p++ = SDHC_DEV->BDPR.reg;
+        }
+
+        /* wait until transfer is complete */
+        if (!_wait_for_event(state, SDHC_NISTR_TRFC,
+                             SDHC_EISTR_DATTEO | SDHC_EISTR_DATCRC | SDHC_EISTR_DATEND,
+                             SDHC_SRR_SWRSTALL)) {
+            return false;
         }
 
         if (SDHC_DEV->RR[0].reg & CARD_STATUS_SWITCH_ERROR) {
@@ -1016,31 +1148,12 @@ static bool _test_bus_width(sdhc_state_t *state)
 
 static void _isr(sdhc_state_t *state)
 {
-    uint16_t events = (SDHC_DEV->NISIER.reg & ~NISTR_CARD_DETECT)
-                    | SDHC_NISTR_ERRINT;
-
-    if (SDHC_DEV->EISTR.reg) {
-        state->error = SDHC_DEV->EISTR.reg;
-    }
-
-    DEBUG("NISTR: %x\n", SDHC_DEV->NISTR.reg);
-    DEBUG("EISTR: %x\n", SDHC_DEV->EISTR.reg);
-    DEBUG("ACESR: %x\n", SDHC_DEV->ACESR.reg);
-
-    /* we got the awaited event */
-    if (SDHC_DEV->NISTR.reg & events) {
-        DEBUG_PUTS("unlock");
-        mutex_unlock(&state->sync);
-    }
-
     /* if card got inserted we need to re-init */
     if (SDHC_DEV->NISTR.reg & NISTR_CARD_DETECT) {
+        SDHC_DEV->NISTR.reg = NISTR_CARD_DETECT;
         DEBUG_PUTS("card presence changed");
         state->need_init = true;
     }
-
-    SDHC_DEV->EISTR.reg = SDHC_EISTR_MASK;
-    SDHC_DEV->NISTR.reg = SDHC_NISTR_MASK;
 
     cortexm_isr_end();
 }

@@ -1,0 +1,13 @@
+FEATURES_REQUIRED += periph_sdmmc
+FEATURES_OPTIONAL += periph_sdmmc_auto_clk
+FEATURES_OPTIONAL += periph_sdmmc_auto_cmd12
+FEATURES_OPTIONAL += periph_sdmmc_hs
+
+ifneq (,$(filter sdmmc_mmc,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_sdmmc_mmc
+endif
+
+ifeq (,$(filter ztimer_usec,$(USEMODULE)))
+  # enable ztimer_msec backend if ztimer_usec is not enabled
+  USEMODULE += ztimer_msec
+endif

@@ -54,17 +54,17 @@ int ft5x06_init(ft5x06_t *dev, const ft5x06_params_t *params, ft5x06_event_cb_t 
         return -EPROTO;
     }
 
-    uint8_t expected_id;
     if (dev->params.type == FT5X06_TYPE_FT6X06 || dev->params.type == FT5X06_TYPE_FT6X36) {
-        expected_id = FT6XX6_VENDOR_ID;
+        if ((vendor_id != FT5X06_VENDOR_ID_2) && (vendor_id != FT5X06_VENDOR_ID_3)) {
+            DEBUG("[ft5x06] init: invalid vendor ID: '0x%02x' (expected: 0x%02x or 0x%02x)\n",
+                  vendor_id, FT5X06_VENDOR_ID_2, FT5X06_VENDOR_ID_3);
+            i2c_release(FT5X06_BUS);
+            return -ENODEV;
+        }
     }
-    else {
-        expected_id = FT5X06_VENDOR_ID;
-    }
-
-    if (expected_id != vendor_id) {
+    else if (vendor_id != FT5X06_VENDOR_ID_1) {
         DEBUG("[ft5x06] init: invalid vendor ID: '0x%02x' (expected: 0x%02x)\n",
-                vendor_id, expected_id);
+                vendor_id, FT5X06_VENDOR_ID_1);
         i2c_release(FT5X06_BUS);
         return -ENODEV;
     }

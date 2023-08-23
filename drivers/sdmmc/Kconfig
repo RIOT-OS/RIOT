@@ -1,0 +1,22 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_SDMMC
+    bool "SDIO/SD/MMC interface"
+    depends on HAS_PERIPH_SDMMC
+    select MODULE_PERIPH_SDMMC
+    select MODULE_ZTIMER_MSEC if !ZTIMER_USEC
+
+if MODULE_SDMMC
+
+config MODULE_SDMMC_MMC
+    bool "MMC support"
+    depends on HAS_PERIPH_SDMMC_MMC
+    help
+        Say y to support MMCs/eMMCs.
+
+endif # MODULE_SDMMC

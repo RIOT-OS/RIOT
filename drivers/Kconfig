@@ -161,6 +161,7 @@ rsource "mtd_sdcard/Kconfig"
 rsource "nvram/Kconfig"
 rsource "nvram_spi/Kconfig"
 rsource "sdcard_spi/Kconfig"
+rsource "sdmmc/Kconfig"
 endmenu # Storage Device Drivers
 
 endmenu # Drivers
