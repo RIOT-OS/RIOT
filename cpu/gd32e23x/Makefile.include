@@ -11,4 +11,6 @@ LINKER_SCRIPT ?= cortexm.ld
 INCLUDES += -I$(RIOTCPU)/gd32e23x/include/vendor
 INCLUDES += -I$(RIOTCPU)/gd32e23x/periph
 
+# TODO which is needed?
+# include $(RIOTCPU)/cortexm_common/Makefile.include
 include $(RIOTMAKE)/arch/cortexm.inc.mk
