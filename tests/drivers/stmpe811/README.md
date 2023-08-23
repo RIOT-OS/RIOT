@@ -4,10 +4,20 @@ This is the test application for the STMPE811 touchscreen controller.
 
 ## Usage
 
-The application works out of the box on a STM32F429I-DISC1 board:
+The application works out of the box on a STM32F429I-DISC1 board using the
+interrupt mode by default:
 
 ```
 make -C tests/drivers/stmpe811 flash term
+```
+
+To use the polling mode, the environment variable `STMPE811_POLLING_MODE` must
+be set to 1. The polling period in milliseconds is defined by the environment
+variable `STMPE811_POLLING_PERIOD`. It is 50 ms by default. It can be changed
+by setting the environment variable `STMPE811_POLLING_PERIOD` in the make
+command, for example:
+```
+STMPE811_POLLING_MODE=1 STMPE811_POLLING_PERIOD=100 BOARD=... make -C tests/drivers/touch_dev flash term
 ```
 
 ## Expected output

@@ -282,7 +282,9 @@ int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t *params, stmpe811_eve
 
     if (gpio_is_valid(dev->params.int_pin)) {
         DEBUG("[stmpe811] init: configuring touchscreen interrupt\n");
-        gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_FALLING, cb, arg);
+        if (cb) {
+            gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_FALLING, cb, arg);
+        }
 
         /* Enable touchscreen interrupt */
         ret += _write_reg(dev, STMPE811_INT_EN, STMPE811_INT_EN_TOUCH_DET);
