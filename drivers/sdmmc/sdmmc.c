@@ -253,6 +253,9 @@ typedef struct __attribute__((packed)) {
     uint8_t reserved[32];           /**< reserved [255:0] */
 } sdmmc_sw_status_t;
 
+/* Definition of the XFA for the SDIO/SD/MMC device descriptor references */
+XFA_INIT_CONST(sdmmc_dev_t * const, sdmmc_devs);
+
 /* forward declaration of internal functions */
 static int _send_cmd(sdmmc_dev_t *dev, sdmmc_cmd_t cmd_idx, uint32_t arg,
                      sdmmc_resp_t resp_type, uint32_t *resp);
