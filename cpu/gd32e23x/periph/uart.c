@@ -23,7 +23,10 @@
 #include "cpu.h"
 // #include "clic.h"
 #include "gd32e23x_periph.h"
-#include "cpu_common.h"
+// #include "cpu_common.h"
+#ifdef MODULE_PM_LAYERED
+#include "pm_layered.h"
+#endif
 
 #define RXENABLE            (USART_CTL0_REN_Msk | USART_CTL0_RBNEIE_Msk)
 
@@ -51,21 +54,25 @@ static inline void uart_init_pins(uart_t uart, uart_rx_cb_t rx_cb)
     /* configure TX pin */
     gpio_init_af(uart_config[uart].tx_pin, GPIO_AF_OUT_PP);
     /* configure RX pin */
-      if (rx_cb) {
+    if (rx_cb) {
         gpio_init(uart_config[uart].rx_pin, GPIO_IN_PU);
     }
 }
 
 static inline void uart_enable_clock(uart_t uart)
 {
-    /* TODO: add pm blocker */
+    if (isr_ctx[uart].rx_cb) {
+        pm_block(GD32_PM_DEEPSLEEP);
+    }
     periph_clk_en(uart_config[uart].bus, uart_config[uart].rcu_mask);
 }
 
 static inline void uart_disable_clock(uart_t uart)
 {
     periph_clk_dis(uart_config[uart].bus, uart_config[uart].rcu_mask);
-    /* TODO remove pm blocker */
+    if (isr_ctx[uart].rx_cb) {
+        pm_unblock(GD32_PM_DEEPSLEEP);
+    }
 }
 
 static inline void uart_init_usart(uart_t uart, uint32_t baudrate)

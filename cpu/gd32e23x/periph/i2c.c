@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 BISSELL Homecare, Inc.
+ * Copyright (C) 2023 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,14 +7,14 @@
  */
 
 /**
- * @ingroup     cpu_gd32e23x
+ * @ingroup     cpu_gd32v
  * @ingroup     drivers_periph_i2c
  * @{
  *
  * @file
- * @brief       Low-level I2C driver implementation
+ * @brief       Low-level I2C driver implementation for GD32VF103
  *
- * @author      Jason Parker <jason.parker@bissell.com>
+ * @author      Gunar Schorcht <gunar@schorcht.net>
  *
  * @}
  */
@@ -24,140 +24,165 @@
 #include <errno.h>
 
 #include "cpu.h"
+#include "irq.h"
 #include "mutex.h"
-#include "byteorder.h"
+#ifdef MODULE_PM_LAYERED
+#include "pm_layered.h"
+#endif
 #include "panic.h"
-
-// #include "stmclk.h"
 
 #include "periph/i2c.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
-#include "gd32e23x_periph.h"
-#include "cpu_common.h"
+#include "ztimer.h"
 
-#define ENABLE_DEBUG    0
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
-#define TICK_TIMEOUT    (0xFFFF)
-#define MAX_BYTES_PER_FRAME (256)
+#define I2C_TIMEOUT_CYCLES      1000        /* clock cycles */
+#define I2C_IRQ_PRIO            (1)
 
-#define I2C_IRQ_PRIO    (1)
-#define I2C_FLAG_READ   (I2C_READ << I2C_CR2_RD_WRN_Pos)
-#define I2C_FLAG_WRITE  (0)
+#define I2C_ERROR_FLAGS_USED    (I2C0_STAT0_AERR_Msk | I2C0_STAT0_LOSTARB_Msk | \
+                                 I2C0_STAT0_BERR_Msk)
+#define I2C_ERROR_FLAGS_OTHER   (I2C0_STAT0_OUERR_Msk | I2C0_STAT0_PECERR_Msk | \
+                                 I2C0_STAT0_SMBTO_Msk | I2C0_STAT0_SMBALT_Msk)
+#define I2C_ERROR_FLAGS         (I2C_ERROR_FLAGS_USED | I2C_ERROR_FLAGS_OTHER)
 
-#define CLEAR_FLAG      (I2C_ICR_NACKCF | I2C_ICR_ARLOCF | I2C_ICR_BERRCF | I2C_ICR_ADDRCF)
-
-// #define I2C_CLOCK_SRC_REG       (RCU->CFGR3)
-
-// static uint32_t hsi_state;
+#define I2C_INT_EV_ERR_FLAGS    (I2C0_CTL1_EVIE_Msk | I2C0_CTL1_ERRIE_Msk)
+#define I2C_INT_ALL_FLAGS       (I2C0_CTL1_BUFIE_Msk | I2C_INT_EV_ERR_FLAGS)
 
 /* static function definitions */
-// static inline void _i2c_init(I2C_Type *i2c, uint32_t timing);
-// static int _write(I2C_Type *i2c, uint16_t addr, const void *data,
-//                   size_t length, uint8_t flags, uint32_t cr2_flags);
-// static int _start(I2C_Type *i2c, uint32_t cr2, uint8_t flags);
-// static int _stop(I2C_Type *i2c);
-// static int _wait_isr_set(I2C_Type *i2c, uint32_t mask, uint8_t flags);
-// static inline int _wait_for_bus(I2C_Type *i2c);
+static void _init(i2c_t dev);
+static void _init_pins(i2c_t dev);
+static void _init_clk(I2C_Type *i2c, uint32_t speed);
+static void _deinit_pins(i2c_t dev);
+static int  _wait_for_bus(i2c_t dev);
+static void _wait_for_irq(i2c_t dev);
+// static void _irq_handler(IRQn_Type irqn);
 
-/**
- * @brief Array holding one pre-initialized mutex for each I2C device
- */
-static mutex_t locks[I2C_NUMOF];
+typedef enum {
+    I2C_OK,
+    I2C_START_SENT,
+    I2C_ADDR_SENT,
+    I2C_ADDR10_SENT,
+    I2C_BT_COMPLETE,
+    I2C_TXB_EMPTY,
+    I2C_RXB_NOT_EMPTY,
+    I2C_RXB_NOT_EMPTY_BT_COMPLETE,
+    I2C_TIMEOUT,
+    I2C_ACK_ERR,
+    I2C_ARB_LOST,
+    I2C_BUS_ERROR,
+    I2C_OTHER_ERROR,
+} _i2c_state_t;
+
+typedef struct {
+    mutex_t dev_lock;
+    mutex_t irq_lock;
+    _i2c_state_t state;
+    void (*isr)(unsigned irqn);
+} _i2c_dev_t;
+
+_i2c_dev_t _i2c_dev[] = {
+    {
+        .dev_lock = MUTEX_INIT,
+        .irq_lock = MUTEX_INIT_LOCKED,
+        .state = I2C_OK,
+    },
+    {
+        .dev_lock = MUTEX_INIT,
+        .irq_lock = MUTEX_INIT_LOCKED,
+        .state = I2C_OK,
+    },
+};
 
 void i2c_init(i2c_t dev)
 {
-
-
     assert(dev < I2C_NUMOF);
 
-    DEBUG("[i2c] init: initializing device\n");
-    mutex_init(&locks[dev]);
+    assert(i2c_config[dev].dev != NULL);
 
-    // I2C_Type *i2c = i2c_config[dev].dev;
+    /* Configure pins in idle state as open drain outputs to keep the bus lines
+     * in HIGH state */
+    _deinit_pins(dev);
 
-    periph_clk_en(i2c_config[dev].bus, i2c_config[dev].rcu_mask);
+    periph_clk_en(APB1, i2c_config[dev].rcu_mask);
 
-    NVIC_SetPriority(i2c_config[dev].irqn, I2C_IRQ_PRIO);
-    NVIC_EnableIRQ(i2c_config[dev].irqn);
+    /* enable set event interrupt handler and enable the event interrupt */
+    // clic_set_handler(i2c_config[dev].irqn, _irq_handler);
+    // clic_enable_interrupt(i2c_config[dev].irqn, CPU_DEFAULT_IRQ_PRIO);
+    /* enable set error interrupt handler and enable the error interrupt */
+    // clic_set_handler(i2c_config[dev].irqn + 1, _irq_handler);
+    // clic_enable_interrupt(i2c_config[dev].irqn + 1, CPU_DEFAULT_IRQ_PRIO);
 
-    /* select I2C clock source */
-    // I2C_CLOCK_SRC_REG |= i2c_config[dev].u_sw_mask;
+    _init(dev);
 
-    /* reset I2C configuration -> defaults to ?? mode */
-    // dev(i2c)->CTL0 = 0;
-    // dev(i2c)->CTL1 = 0;
-    i2c_config[dev].dev->CTL0 = 0;
-    i2c_config[dev].dev->CTL1 = 0;
-
-    DEBUG("[i2c] init: configuring pins\n");
-    /* configure pins */
-    gpio_init(i2c_config[dev].scl_pin, GPIO_OD_PU);
-    gpio_init_af(i2c_config[dev].scl_pin, i2c_config[dev].scl_af);
-    gpio_init(i2c_config[dev].sda_pin, GPIO_OD_PU);
-    gpio_init_af(i2c_config[dev].sda_pin, i2c_config[dev].sda_af);
-
-    DEBUG("[i2c] init: configuring device\n");
-    /* set the timing register value from predefined values */
-    // uint32_t timing = 0;
-
-    /* These timing params assume a 48 MHz Clock */
-    // if (periph_apb_clk(i2c_config[dev].bus) ==  MHZ(48))
-    // {
-    //     i2c_timing_param_t tp = timing_params[i2c_config[dev].speed];
-    //     timing = (( (uint32_t)tp.presc << I2C_TIMINGR_PRESC_Pos) |
-    //                        ( (uint32_t)tp.scldel << I2C_TIMINGR_SCLDEL_Pos) |
-    //                        ( (uint32_t)tp.sdadel << I2C_TIMINGR_SDADEL_Pos) |
-    //                        ( (uint16_t)tp.sclh << I2C_TIMINGR_SCLH_Pos) |
-    //                          tp.scll);
-    // }
-    // else
-    // {
-    //     timing = i2c_config[dev].timing;
-    // }
-
-    // _i2c_init(i2c, timing);
+    _i2c_dev[dev].state = I2C_OK;
 }
 
-// static void _i2c_init(I2C_Type *i2c, uint32_t timing)
-// {
-//     assert(i2c != NULL);
+static void _init_pins(i2c_t dev)
+{
+    /* This is needed in case the remapped pins are used */
+    // if (i2c_config[dev].scl_pin == GPIO_PIN(PORT_B, 8) ||
+    //     i2c_config[dev].sda_pin == GPIO_PIN(PORT_B, 9)) {
+    //     /* The remapping periph clock must first be enabled */
+    //     RCU->APB2EN |= RCU_APB2EN_AFEN_Msk;
+    //     /* Then the remap can occur */
+    //     AFIO->PCF0 |= AFIO_PCF0_I2C0_REMAP_Msk;
+    // }
+    gpio_init_af(i2c_config[dev].scl_pin, GPIO_AF_OUT_OD);
+    gpio_init_af(i2c_config[dev].sda_pin, GPIO_AF_OUT_OD);
+}
 
-//     /* disable device */
-//     i2c->CR1 &= ~(I2C_CR1_PE);
+static void _init_clk(I2C_Type *i2c, uint32_t speed)
+{
+    /* disable device and set ACK bit */
+    i2c->CTL0 = I2C0_CTL0_ACKEN_Msk;
+    /* configure I2C clock */
+    i2c->CTL1 = (CLOCK_APB1 / MHZ(1)) | I2C0_CTL1_ERRIE_Msk;
+    i2c->CKCFG = CLOCK_APB1 / (2 * speed);
+    i2c->RT = (CLOCK_APB1 / 1000000) + 1;
+    /* Clear flags */
+    i2c->STAT0 &= ~I2C_ERROR_FLAGS;
+    /* enable device */
+    i2c->CTL0 |= I2C0_CTL0_I2CEN_Msk;
+}
 
-//     /* configure analog noise filter */
-//     i2c->CR1 |= I2C_CR1_ANFOFF;
+static void _init(i2c_t dev)
+{
+    I2C_Type *i2c = i2c_config[dev].dev;
 
-//     /* configure digital noise filter */
-//     i2c->CR1 |= I2C_CR1_DNF;
+    /* make peripheral soft reset */
+    i2c->CTL0 |= I2C0_CTL0_SRESET_Msk;
+    i2c->CTL0 &= ~I2C0_CTL0_SRESET_Msk;
 
-//     /* set timing registers */
-//     i2c->TIMINGR = timing;
+    /* configure I2C clock */
+    _init_clk(i2c, i2c_config[dev].speed);
+}
 
-//     /* configure clock stretching */
-//     i2c->CR1 &= ~(I2C_CR1_NOSTRETCH);
-
-//     /* Clear interrupt */
-//     i2c->ICR |= CLEAR_FLAG;
-
-//     /* enable device */
-//     i2c->CR1 |= I2C_CR1_PE;
-// }
+static void _deinit_pins(i2c_t dev)
+{
+    /* GD32V doesn't support GPIO_OD_PU mode, i.e. external pull-ups required */
+    gpio_init(i2c_config[dev].scl_pin, GPIO_OD);
+    gpio_init(i2c_config[dev].sda_pin, GPIO_OD);
+    gpio_set(i2c_config[dev].scl_pin);
+    gpio_set(i2c_config[dev].sda_pin);
+}
 
 void i2c_acquire(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
 
-    mutex_lock(&locks[dev]);
-    // hsi_state = (RCU->CR & RCU_CR_HSION);
-    // if (!hsi_state) {
-    //     /* the internal RC oscillator (HSI) must be enabled */
-    //     stmclk_enable_hsi();
-    // }
+    /* lock the device */
+    mutex_lock(&_i2c_dev[dev].dev_lock);
 
-    periph_clk_en(i2c_config[dev].bus, i2c_config[dev].rcu_mask);
+    /* block DEEP_SLEEP mode */
+    pm_block(GD32_PM_DEEPSLEEP);
+
+    periph_clk_en(APB1, i2c_config[dev].rcu_mask);
+
+    /* set the alternate function of the pins */
+    _init_pins(dev);
 
     /* enable device */
     i2c_config[dev].dev->CTL0 |= I2C0_CTL0_I2CEN_Msk;
@@ -168,320 +193,561 @@ void i2c_release(i2c_t dev)
     assert(dev < I2C_NUMOF);
 
     /* disable device */
-    i2c_config[dev].dev->CTL0 &= ~(I2C0_CTL0_I2CEN_Msk);
+    i2c_config[dev].dev->CTL0 &= ~I2C0_CTL0_I2CEN_Msk;
 
-    // _wait_for_bus(i2c_config[dev].dev);
+    _wait_for_bus(dev);
 
-    // periph_clk_dis(i2c_config[dev].bus, i2c_config[dev].rcu_mask);
-    // if (!hsi_state) {
-    //     stmclk_disable_hsi();
-    // }
+    /* Disabling the clock switches off the I2C controller, which results in
+     * LOW bus lines. To avoid that the used GPIOs then draw some milliamps
+     * of current via the pull-up resistors, the used GPIOs are set back to
+     * GPIO_OD mode and HIGH. */
+    _deinit_pins(dev);
 
-    mutex_unlock(&locks[dev]);
+    periph_clk_dis(APB1, i2c_config[dev].rcu_mask);
+
+    /* unblock DEEP_SLEEP mode */
+    pm_unblock(GD32_PM_DEEPSLEEP);
+
+    /* unlock the device */
+    mutex_unlock(&_i2c_dev[dev].dev_lock);
 }
 
-int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
-                   const void *data, size_t len, uint8_t flags)
+static int _i2c_start_cmd(i2c_t dev)
 {
-    (void) addr;
-    (void) len;
+    DEBUG("START cmd, dev=%d\n", dev);
+
+    I2C_Type *i2c = i2c_config[dev].dev;
+
+    /* clear error flags */
+    i2c->STAT0 &= ~I2C_ERROR_FLAGS;
+
+    /* send start condition and wait for interrupt */
+    i2c->CTL0 |= I2C0_CTL0_START_Msk;
+    _wait_for_irq(dev);
+
+    switch (_i2c_dev[dev].state) {
+    case I2C_START_SENT:
+        return 0;
+    case I2C_ARB_LOST:
+        return -EAGAIN;
+    case I2C_TIMEOUT:
+        return -ETIMEDOUT;
+    default:
+        /* on other errors */
+        return -EINVAL;
+    }
+}
+
+static int _i2c_stop_cmd(i2c_t dev)
+{
+    DEBUG("STOP cmd, dev=%d\n", dev);
+
+    I2C_Type *i2c = i2c_config[dev].dev;
+
+    /* clear error flags */
+    i2c->STAT0 &= ~I2C_ERROR_FLAGS;
+
+    /* send start condition */
+    i2c->CTL0 |= I2C0_CTL0_STOP_Msk;
+
+    return 0;
+}
+
+static int _i2c_stop_cmd_and_wait(i2c_t dev)
+{
+    _i2c_stop_cmd(dev);
+    return _wait_for_bus(dev);
+}
+
+static int _i2c_addr_cmd(i2c_t dev, uint8_t *addr, uint8_t size)
+{
+    if (size == 1) {
+        DEBUG("ADDR cmd, dev=%d, addr=%02x\n", dev, addr[0]);
+    }
+    else{
+        DEBUG("ADDR cmd, dev=%d, addr=%02x%02x\n", dev, addr[0], addr[1]);
+    }
+
+    I2C_Type *i2c = i2c_config[dev].dev;
+
+    /* clear error flags */
+    i2c->STAT0 &= ~I2C_ERROR_FLAGS;
+
+    /* read STAT0 followed by writing the first address byte to the
+     * DATA register to clear SBSEND and then wait for interrupt */
+    i2c->STAT0;
+    i2c->DATA = addr[0];
+    _wait_for_irq(dev);
+
+    if ((_i2c_dev[dev].state == I2C_ADDR10_SENT)) {
+        /* first byte is sent and indicates a 10 bit address */
+        assert(size == 2);
+        /* read STAT0 followed by writing the second byte of the 10-bit
+         * address to the DATA register to clear ADD10SEND and then wait for
+         * interrupt */
+        i2c->STAT0;
+        i2c->DATA = addr[1];
+        _wait_for_irq(dev);
+    }
+
+    switch (_i2c_dev[dev].state) {
+    case I2C_ADDR_SENT:
+        /* Since the ADDSEND flag is needed to control the ACK bit while
+         * receiving bytes, it is intentionally not cleared here, but must
+         * be explicitly cleared in `i2c_read_bytes` and `i2c_read_bytes */
+        return 0;
+    case I2C_ARB_LOST:
+        return -EAGAIN;
+    case I2C_TIMEOUT:
+        return -ETIMEDOUT;
+    case I2C_ACK_ERR:
+        return -ENXIO;
+    default:
+        /* on other errors */
+        return -EINVAL;
+    }
+}
+
+int _i2c_write_cmd(i2c_t dev, uint8_t data)
+{
+    DEBUG("WRITE cmd, dev=%d\n", dev);
+
+    I2C_Type *i2c = i2c_config[dev].dev;
+
+    /* clear error flags */
+    i2c->STAT0 &= ~I2C_ERROR_FLAGS;
+
+    /* send data byte and wait for BTC interrupt */
+    i2c->DATA = data;
+    _wait_for_irq(dev);
+
+    switch (_i2c_dev[dev].state) {
+    case I2C_BT_COMPLETE:
+        /* read STAT0 followed by reading DATA to clear the BTC flag */
+        i2c->STAT0;
+        i2c->DATA;
+       return 0;
+    case I2C_ARB_LOST:
+        return -EAGAIN;
+    case I2C_TIMEOUT:
+        return -ETIMEDOUT;
+    case I2C_ACK_ERR:
+        return -EIO;
+    default:
+        /* on other errors */
+        return -EINVAL;
+    }
+}
+
+int _i2c_read_cmd(i2c_t dev, uint8_t *data)
+{
+    DEBUG("READ cmd, dev=%d\n", dev);
+
+    I2C_Type *i2c = i2c_config[dev].dev;
+
+    /* clear error flags */
+    i2c->STAT0 &= ~I2C_ERROR_FLAGS;
+
+    if (i2c->STAT0 & (I2C0_STAT0_RBNE_Msk || I2C0_STAT0_BTC_Msk)) {
+        _i2c_dev[dev].state = I2C_RXB_NOT_EMPTY;
+    }
+    else {
+        /* buffer interrupts have to be enabled for read */
+        i2c_config[dev].dev->CTL1 |= I2C0_CTL1_BUFIE_Msk;
+
+        /* wait for interrupt */
+        _wait_for_irq(dev);
+    }
+
+    switch (_i2c_dev[dev].state) {
+    case I2C_RXB_NOT_EMPTY_BT_COMPLETE:
+    case I2C_RXB_NOT_EMPTY:
+        /* RBNE is cleared by reading STAT0 followed by reading the data register */
+        i2c->STAT0;
+        *data = i2c->DATA;
+        return 0;
+    case I2C_ARB_LOST:
+        return -EAGAIN;
+    case I2C_TIMEOUT:
+        return -ETIMEDOUT;
+    default:
+        /* on other errors */
+        return -EINVAL;
+    }
+}
+
+static int _i2c_wait_rbne_btc(i2c_t dev)
+{
+    DEBUG("WAIT RNBE+BTC cmd, dev=%d\n", dev);
+
+    I2C_Type *i2c = i2c_config[dev].dev;
+
+    /* clear error flags */
+    i2c->STAT0 &= ~I2C_ERROR_FLAGS;
+
+    _wait_for_irq(dev);
+
+    switch (_i2c_dev[dev].state) {
+    case I2C_RXB_NOT_EMPTY_BT_COMPLETE:
+        return 0;
+    case I2C_ARB_LOST:
+        return -EAGAIN;
+    case I2C_TIMEOUT:
+        return -ETIMEDOUT;
+    default:
+        /* on other errors */
+        return -EINVAL;
+    }
+}
+
+int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t length,
+                   uint8_t flags)
+{
     assert(dev < I2C_NUMOF);
-    if (flags & (I2C_NOSTOP | I2C_NOSTART)) {
+    assert(data);
+    assert(length);
+
+    DEBUG("i2c_read_bytes, dev=%d len=%d flags=%02x\n", dev, length, flags);
+
+    I2C_Type *i2c = i2c_config[dev].dev;
+
+    /* Repeated START of read operations is not supported. This is exactly the
+     * case if the previous transfer was a read operation (I2C_STAT1_TR == 0)
+     * and was not terminated by a STOP condition (I2C_STAT1_I2CBSY == 1) and
+     * the START condition is to be used (I2C_NOSTART == 0).
+     */
+    if (((i2c->STAT1 & (I2C0_STAT1_I2CBSY_Msk | I2C0_STAT1_TR_Msk)) == I2C0_STAT1_I2CBSY_Msk) &&
+        !(flags & I2C_NOSTART)) {
         return -EOPNOTSUPP;
     }
 
-    I2C_Type *i2c = i2c_config[dev].dev;
-    assert(i2c != NULL);
-    DEBUG("[i2c] write_regs: Starting\n");
-    /* As a higher level function we know the bus should be free */
-    // if (i2c->ISR & I2C_ISR_BUSY) {
-    //     return -EAGAIN;
-    // }
-    /* Handle endianness of register if 16 bit */
-    if (flags & I2C_REG16) {
-        reg = htons(reg); /* Make sure register is in big-endian on I2C bus */
+    int res;
+
+    _i2c_dev[dev].state = I2C_OK;
+
+    /* set the ACK bit */
+    i2c->CTL0 |= I2C0_CTL0_ACKEN_Msk;
+    /* clear the POAP bit to indicate that ACK bit controls the current byte */
+    i2c->CTL0 &= ~I2C0_CTL0_POAP_Msk;
+
+    if (!(flags & I2C_NOSTOP)) {
+        /* Since the I2C controller allows to receive up to two bytes before
+         * the application has to react, receiving a single byte, two bytes
+         * or more than two bytes needs a different handling for correct
+         * reception if the reception is not to be continued (I2C_NOSTOP
+         * is not set) */
+        if (length == 1) {
+            /* If a single byte is to be received clear the ACK bit before
+             * any byte is received and keep the POAP bit cleared to indicate
+             * that the ACK bit controls the ACK of the currecnt byte. */
+            i2c->CTL0 &= ~I2C0_CTL0_ACKEN_Msk;
+        }
+        else if (length == 2) {
+            /* If exactly 2 bytes are to be received, keep the ACK bit set but
+             * also set the POAP bit to indicate that the ACK bit controls the
+             * next byte that is received in shift register. The ACK bit is then
+             * cleared after the ADDSEND flag is cleared and thus the reception
+             * of first byte has already been started. Thus an ACK is generated
+             * for the first byte and a NACK for the second byte. */
+            i2c->CTL0 |= I2C0_CTL0_POAP_Msk;
+        }
+        /* In all other cases the ACK flag is kept set while the POAP flag
+         * is kept cleared, so that the ACK bit always controls the byte
+         * currently to be received in the shift register. To clear the ACK bit
+         * before the last byte is received in the shift register, reading of
+         * bytes from the DATA register is stopped when there are 3 bytes left
+         * to receive until the BTC flag is set. The BTC flag then indicates
+         * that the DATA register then contains the third last byte and the
+         * shift register the second last byte. The ACK flag is then cleared
+         * before reading of the bytes from the DATA register continues. */
     }
-    // /* First set ADDR and register with no stop */
-    // /* No RELOAD should be set so repeated start is valid */
-    // int ret = _write(i2c, addr, &reg, (flags & I2C_REG16) ? 2 : 1,
-    //                  flags | I2C_NOSTOP, I2C_CR2_RELOAD);
-    // if (ret < 0) {
-    //     return ret;
-    // }
-    // /* Then get the data from device */
-    // return _write(i2c, addr, data, len, I2C_NOSTART, 0);
 
-// #define I2C_DATA(i2cx)                REG32((i2cx) + 0x00000010U)       /*!< I2C transfer buffer register */
-// #define DATA_TRANS(regval)            (BITS(0,7) & ((uint32_t)(regval) << 0))
-//     I2C_DATA(i2c_periph) = DATA_TRANS(data);
+    /*  if I2C_NOSTART is not set, send START condition and ADDR */
+    if (!(flags & I2C_NOSTART)) {
+        res = _i2c_start_cmd(dev);
+        if (res != 0) {
+            _i2c_stop_cmd_and_wait(dev);
+            return res;
+        }
 
-    i2c_config[dev].dev->DATA = (0xFF & ((uint8_t*) data)[0]);
+        /* address handling */
+        if (flags & I2C_ADDR10) {
+            /* prepare 10 bit address bytes */
+            uint8_t addr10[2];
+            addr10[0] = 0xf0 | (addr & 0x0300) >> 7 | I2C_READ;
+            addr10[1] = addr & 0xff;
+            /* send ADDR without read flag */
+            res = _i2c_addr_cmd(dev, addr10, 2);
+        }
+        else {
+            /* send ADDR without read flag */
+            uint8_t addr7 = addr << 1 | I2C_READ;
+            res = _i2c_addr_cmd(dev, &addr7, 1);
+        }
+        if (res != 0) {
+            _i2c_stop_cmd_and_wait(dev);
+            return res;
+        }
+    }
 
-    return 0;
-}
+    /* read STAT0 followed by reading STAT1 to clear the ADDSEND flag */
+    i2c->STAT0;
+    i2c->STAT1;
 
-int i2c_read_bytes(i2c_t dev, uint16_t address, void *data,
-                   size_t length, uint8_t flags)
-{
-    (void) address;
-    assert(dev < I2C_NUMOF && length < MAX_BYTES_PER_FRAME);
-
-    I2C_Type *i2c = i2c_config[dev].dev;
-    assert(i2c != NULL);
-
-    /* If reload was set, cannot send a repeated start */
-    // if ((i2c->ISR & I2C_ISR_TCR) && !(flags & I2C_NOSTART)) {
-    //     return -EOPNOTSUPP;
-    // }
-    DEBUG("[i2c] read_bytes: Starting\n");
-    /* RELOAD is needed because we don't know the full frame */
-    // int ret = _start(i2c, (address << 1) | (length << I2C_CR2_NBYTES_Pos) |
-    //                  I2C_CR2_RELOAD | I2C_FLAG_READ, flags);
-    // if (ret < 0) {
-    //     return ret;
-    // }
+    /* read data */
+    uint8_t *buffer = (uint8_t*)data;
 
     for (size_t i = 0; i < length; i++) {
-        /* wait for transfer to finish */
-        DEBUG("[i2c] read_bytes: Waiting for DR to be full\n");
-        // ret = _wait_isr_set(i2c, I2C_ISR_RXNE, flags);
-        // if (ret < 0) {
-        //     return ret;
-        // }
-        /* read data from data register */
-        ((uint8_t*)data)[i]= i2c->DATA;
-        DEBUG("[i2c] read_bytes: DR full, read 0x%02X\n", ((uint8_t*)data)[i]);
+        if (!(flags & I2C_NOSTOP)) {
+            /* if the reception is not to be continued (I2C_NOSTOP is not set) */
+            if (i == 0 && (length == 2)) {
+                /* The shift register already receives the first byte after
+                 * the ADDSEND flag has been cleared. Since the POAP bit is
+                 * set in the case that exactly two bytes are to be received,
+                 * the change of the ACK bit during the reception of a byte
+                 * does not affect the generated ACK of the byte currently
+                 * received, but of the byte to be received next. Since the
+                 * ACK bit and the POAP bit were set in this case, an ACK
+                 * is generated for the first byte. Clearing the ACK bit here
+                 * then generates a NACK for the next (last) byte. */
+                i2c->CTL0 &= ~I2C0_CTL0_ACKEN_Msk;
+            }
+            else if (i == (length - 3)) {
+                /* To clear the ACK flag before the last byte is received
+                 * in the shift register, reading of bytes from the DATA
+                 * register is stopped when there are 3 bytes left to
+                 * receive until the BTC flag is set. The BTC flag is then
+                 * set when the third last received byte is in DATA register
+                 * and the second last byte is in shift register. */
+                res = _i2c_wait_rbne_btc(dev);
+                if (res != 0) {
+                    _i2c_stop_cmd_and_wait(dev);
+                    return res;
+                }
+                /* The ACK flag is then cleared before reading of the bytes
+                 * from the DATA register continues to generate an NACK
+                 * for the last byte. */
+                i2c->CTL0 &= ~I2C0_CTL0_ACKEN_Msk;
+            }
+        }
+        res = _i2c_read_cmd(dev, buffer + i);
+        if (res != 0) {
+            _i2c_stop_cmd_and_wait(dev);
+            return res;
+        }
     }
-    if (flags & I2C_NOSTOP) {
-        /* With NOSTOP, the TCR indicates that the next command is ready */
-        /* TCR is needed because RELOAD is set preventing a NACK on last byte */
-        // return _wait_isr_set(i2c, I2C_ISR_TCR, flags);
-    }
-    /* Wait until stop before other commands are sent */
-    // ret = _wait_isr_set(i2c, I2C_ISR_STOPF, flags);
-    // if (ret < 0) {
-    //     return ret;
-    // }
 
-    // return _wait_for_bus(i2c);
+    if (!(flags & I2C_NOSTOP)) {
+        /* If the transfer is not to be continued (I2C_NOSTOP is not set), set
+         * the STOP bit and wait a short time until the I2CBSY bit is cleared. */
+        return _i2c_stop_cmd_and_wait(dev);
+    }
+
     return 0;
 }
 
-/**
- * Cannot support continuous writes or frame splitting at this level.  If an
- * I2C_NOSTOP has been sent it must be followed by a repeated start or stop.
- */
-int i2c_write_bytes(i2c_t dev, uint16_t address, const void *data,
+int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data,
                     size_t length, uint8_t flags)
 {
-    (void) address;
-    (void) length;
-    (void) flags;
     assert(dev < I2C_NUMOF);
-    I2C_Type *i2c = i2c_config[dev].dev;
-    DEBUG("[i2c] write_bytes: Starting\n");
-    // return _write(i2c, address, data, length, flags, 0);
-    i2c->DATA = (0xFF & ((uint8_t*) data)[0]);
+    assert(data);
+    assert(length);
+
+    DEBUG("i2c_write_bytes, dev=%d len=%d flags=%02x\n", dev, length, flags);
+
+    int res;
+
+    _i2c_dev[dev].state = I2C_OK;
+
+    /*  if I2C_NOSTART is not set, send START condition and ADDR */
+    if (!(flags & I2C_NOSTART)) {
+        res = _i2c_start_cmd(dev);
+        if (res != 0) {
+            _i2c_stop_cmd_and_wait(dev);
+            return res;
+        }
+
+        /* address handling */
+        if (flags & I2C_ADDR10) {
+            /* prepare 10 bit address bytes */
+            uint8_t addr10[2];
+            addr10[0] = 0xf0 | (addr & 0x0300) >> 7;
+            addr10[1] = addr & 0xff;
+            /* send ADDR without read flag */
+            res = _i2c_addr_cmd(dev, addr10, 2);
+        }
+        else {
+            /* send ADDR without read flag */
+            uint8_t addr7 = addr << 1;
+            res = _i2c_addr_cmd(dev, &addr7, 1);
+        }
+        if (res != 0) {
+            _i2c_stop_cmd_and_wait(dev);
+            return res;
+        }
+    }
+
+    /* read STAT0 followed by reading STAT1 to clear the ADDSEND flag */
+    i2c_config[dev].dev->STAT0;
+    i2c_config[dev].dev->STAT1;
+
+    /* send data */
+    uint8_t *buffer = (uint8_t*)data;
+
+    for (size_t i = 0; i < length; i++) {
+        res = _i2c_write_cmd(dev, buffer[i]);
+        if (res != 0) {
+            _i2c_stop_cmd_and_wait(dev);
+            return res;
+        }
+    }
+
+    if (!(flags & I2C_NOSTOP)) {
+        /* If the transfer is not to be continued (I2C_NOSTOP is not set), set
+         * the STOP bit and wait a short time until the I2CBSY bit is cleared. */
+        return _i2c_stop_cmd_and_wait(dev);
+    }
+
     return 0;
 }
 
-// static int _write(I2C_Type *i2c, uint16_t addr, const void *data,
-//                     size_t length, uint8_t flags, uint32_t cr2_flags)
+void _i2c_transfer_timeout(void *arg)
+{
+    i2c_t dev = (i2c_t)(uintptr_t)arg;
+
+    /* set result to timeout */
+    _i2c_dev[dev].state = I2C_TIMEOUT;
+
+    /* wake up the thread that is waiting for the results */
+    mutex_unlock(&_i2c_dev[dev].irq_lock);
+}
+
+static void _wait_for_irq(i2c_t dev)
+{
+#if defined(MODULE_ZTIMER_USEC)
+    ztimer_t timer = { .callback = _i2c_transfer_timeout,
+                       .arg = (void *)dev };
+    uint32_t timeout = ((I2C_TIMEOUT_CYCLES * MHZ(1)) / i2c_config[dev].speed) + 1;
+    ztimer_set(ZTIMER_USEC, &timer, timeout);
+#elif defined(MODULE_ZTIMER_MSEC)
+    ztimer_t timer = { .callback = _i2c_transfer_timeout,
+                       .arg = (void *)dev };
+    uint32_t timeout = ((I2C_TIMEOUT_CYCLES * KHZ(1)) / i2c_config[dev].speed) + 1;
+    ztimer_set(ZTIMER_MSEC, &timer, timeout);
+#else
+#warning "I2C timeout handling requires to use ztimer_msec or ztimer_usec"
+#endif
+
+    /* enable only event and error interrupts, buffer interrupts are only used in read */
+    i2c_config[dev].dev->CTL1 |= I2C_INT_EV_ERR_FLAGS;
+
+    /* wait for buffer, event or error interrupt */
+    mutex_lock(&_i2c_dev[dev].irq_lock);
+
+#if defined(MODULE_ZTIMER_USEC)
+    ztimer_remove(ZTIMER_USEC, &timer);
+#elif defined(MODULE_ZTIMER_MSEC)
+    ztimer_remove(ZTIMER_MSEC, &timer);
+#endif
+
+    if (_i2c_dev[dev].state == I2C_TIMEOUT) {
+        DEBUG("error: timeout, dev=%d\n", dev);
+    }
+}
+
+#define TICK_TIMEOUT    0x00000fffUL
+
+static inline int _wait_for_bus(i2c_t dev)
+{
+    uint16_t tick = TICK_TIMEOUT;
+    /* short busy waiting for the bus becoming free (I2CBSY is cleared) */
+    while ((i2c_config[dev].dev->STAT1 & I2C0_STAT1_I2CBSY_Msk) && tick--) {}
+    if (!tick) {
+        DEBUG("error: timeout, dev=%d\n", dev);
+        return -ETIMEDOUT;
+    }
+    return 0;
+}
+
+// static void _irq_handler(IRQn_Type irqn)
 // {
-//     assert(i2c != NULL && length < MAX_BYTES_PER_FRAME);
+//     // static_assert(I2C0_ER_IRQn == I2C0_EV_IRQn + 1);
+//     // static_assert(I2C1_ER_IRQn == I2C1_EV_IRQn + 1);
 
-//     /* If reload was NOT set, must either stop or start */
-//     if ((i2c->ISR & I2C_ISR_TC) && (flags & I2C_NOSTART)) {
-//         return -EOPNOTSUPP;
-//     }
-//     int ret = _start(i2c, (addr << 1) | (length << I2C_CR2_NBYTES_Pos) |
-//                      cr2_flags, flags);
-//     if (ret < 0) {
-//         return ret;
-//     }
+//     i2c_t dev = ((irqn == i2c_config[0].irqn) ||
+//                  (irqn == (i2c_config[0].irqn + 1))) ? I2C_DEV(0) : I2C_DEV(1);
 
-//     for (size_t i = 0; i < length; i++) {
-//         DEBUG("[i2c] write_bytes: Waiting for TX reg to be free\n");
-//         ret = _wait_isr_set(i2c, I2C_ISR_TXIS, flags);
-//         if (ret < 0) {
-//             return ret;
-//         }
-//         DEBUG("[i2c] write_bytes: TX is free so send byte\n");
-//         /* write data to data register */
-//         i2c->TXDR = ((uint8_t*)data)[i];
-//     }
-
-//     if (flags & I2C_NOSTOP) {
-//         if (cr2_flags & I2C_CR2_RELOAD) {
-//             DEBUG("[i2c] write_bytes: Waiting for TCR\n");
-//             /* With NOSTOP, the TCR indicates that the next command is ready */
-//             /* TCR is needed because RELOAD allows loading more bytes */
-//             return _wait_isr_set(i2c, I2C_ISR_TCR, flags);
-//         }
-//         else {
-//             DEBUG("[i2c] write_bytes: Waiting for TC\n");
-//             /* With NOSTOP, the TC indicates that the next command is ready */
-//             /* TC is needed because no reload is set for repeated start */
-//             return _wait_isr_set(i2c, I2C_ISR_TC, flags);
-//         }
-//     }
-//     DEBUG("[i2c] write_bytes: Waiting for stop\n");
-//     /* Wait until stop before other commands are sent */
-//     ret = _wait_isr_set(i2c, I2C_ISR_STOPF, flags);
-//     if (ret < 0) {
-//         return ret;
-//     }
-//     return _wait_for_bus(i2c);
-// }
-
-// static int _start(I2C_Type *i2c, uint32_t cr2, uint8_t flags)
-// {
-//     assert(i2c != NULL);
-//     assert((i2c->ISR & I2C_ISR_BUSY) || !(flags & I2C_NOSTART));
-
-//     i2c->ICR |= CLEAR_FLAG;
-//     if (flags & I2C_ADDR10) {
-//         return -EOPNOTSUPP;
-//     }
-
-//     if (!(flags & I2C_NOSTART)) {
-//         DEBUG("[i2c] start: Generate start condition\n");
-//         /* Generate start condition */
-//         cr2 |= I2C_CR2_START;
-//     }
-//     if (!(flags & I2C_NOSTOP)) {
-//         cr2 |= I2C_CR2_AUTOEND;
-//         cr2 &= ~(I2C_CR2_RELOAD);
-//     }
-//     DEBUG("[i2c] start: Setting CR2=0x%08x\n", (unsigned int)cr2);
-//     i2c->CR2 = cr2;
-//     if (!(flags & I2C_NOSTART)) {
-//         uint16_t tick = TICK_TIMEOUT;
-//         while ((i2c->CR2 & I2C_CR2_START) && tick--) {
-//             if (!tick) {
-//                 /* Try to stop for state error recovery */
-//                 _stop(i2c);
-//                 return -ETIMEDOUT;
-//             }
-//         }
-//         DEBUG("[i2c] start: Start condition and address generated\n");
-//         /* Check if the device is there */
-//         if ((i2c->ISR & I2C_ISR_NACKF)) {
-//             i2c->ICR |= I2C_ICR_NACKCF;
-//             _stop(i2c);
-//             return -ENXIO;
-//         }
-//     }
-//     return 0;
-// }
-
-// static int _stop(I2C_Type *i2c)
-// {
-//     /* Send stop condition */
-//     DEBUG("[i2c] stop: Generate stop condition\n");
-//     i2c->CR2 |= I2C_CR2_STOP;
-
-//     /* Wait for the stop to complete */
-//     uint16_t tick = TICK_TIMEOUT;
-//     while ((i2c->CR2 & I2C_CR2_STOP) && tick--) {}
-//     if (!tick) {
-//         return -ETIMEDOUT;
-//     }
-//     DEBUG("[i2c] stop: Stop condition succeeded\n");
-//     if (_wait_for_bus(i2c) < 0) {
-//         return -ETIMEDOUT;
-//     }
-//     DEBUG("[i2c] stop: Bus is free\n");
-//     return 0;
-// }
-
-// static int _wait_isr_set(I2C_Type *i2c, uint32_t mask, uint8_t flags)
-// {
-//     uint16_t tick = TICK_TIMEOUT;
-//     while (tick--) {
-//         uint32_t isr = i2c->ISR;
-
-//         if (isr & I2C_ISR_NACKF) {
-//             DEBUG("[i2c] wait_isr_set: NACK received\n");
-
-//             /* Some devices have a valid data nack, if indicated don't stop */
-//             if (!(flags & I2C_NOSTOP)) {
-//                 _stop(i2c);
-//             }
-//             i2c->ICR |= CLEAR_FLAG;
-//             return -EIO;
-//         }
-//         if ((isr & I2C_ISR_ARLO) || (isr & I2C_ISR_BERR)) {
-//             DEBUG("[i2c] wait_isr_set: Arbitration lost or bus error\n");
-//             _stop(i2c);
-//             i2c->ICR |= CLEAR_FLAG;
-//             return -EAGAIN;
-//         }
-//         if (isr & mask) {
-//             DEBUG("[i2c] wait_isr_set: ISR 0x%08x set\n", (unsigned int)mask);
-//             return 0;
-//         }
-//     }
-//     /*
-//     * If timeout occurs this means a problem that must be handled on a higher
-//     * level.  A SWRST is recommended by the datasheet.
-//     */
-//     return -ETIMEDOUT;
-// }
-
-// static inline int _wait_for_bus(I2C_Type *i2c)
-// {
-//     uint16_t tick = TICK_TIMEOUT;
-//     while (tick-- && (i2c->ISR & I2C_ISR_BUSY)) {}
-//     if (!tick) {
-//         return -ETIMEDOUT;
-//     }
-//     return 0;
-// }
-
-// static inline void irq_handler(i2c_t dev)
-// {
 //     assert(dev < I2C_NUMOF);
 
 //     I2C_Type *i2c = i2c_config[dev].dev;
 
-//     unsigned state = i2c->ISR;
-//     DEBUG("\n\n### I2C ERROR OCCURRED ###\n");
-//     DEBUG("status: %08x\n", state);
-//     if (state & I2C_ISR_OVR) {
-//         DEBUG("OVR\n");
+//     assert(i2c != NULL);
+
+//     unsigned state = i2c->STAT0;
+
+//     /* disable buffer, event and error interrupts */
+//     i2c->CTL1 &= ~(I2C_INT_ALL_FLAGS);
+
+//     DEBUG("STAT0: %08x, dev=%d\n", state, dev);
+
+//     if (state & I2C_ERROR_FLAGS) {
+//         /* any error happened */
+//         if (state & I2C_ERROR_FLAGS_USED) {
+//             if (state & I2C0_STAT0_LOSTARB_Msk) {
+//                 DEBUG("error: arbitration lost, dev=%d\n", dev);
+//                 _i2c_dev[dev].state = I2C_ARB_LOST;
+//             }
+//             else if (state & I2C0_STAT0_AERR_Msk) {
+//                 DEBUG("error: ACK error, dev=%d\n", dev);
+//                 _i2c_dev[dev].state = I2C_ACK_ERR;
+//             }
+//             else if (state & I2C0_STAT0_BERR_Msk) {
+//                 DEBUG("error: bus error, dev=%d\n", dev);
+//                 _i2c_dev[dev].state = I2C_BUS_ERROR;
+//             }
+//         }
+//         if (state & I2C_ERROR_FLAGS_OTHER) {
+//             /* PEC calculation and SMBus are not used,
+//              * according errors are simply handled as other errors */
+//             DEBUG("error: other error, dev=%d\n", dev);
+//             _i2c_dev[dev].state = I2C_OTHER_ERROR;
+//         }
+//         /* clear interrupt flags for errors */
+//         i2c->CTL1 &= ~(I2C_ERROR_FLAGS);
 //     }
-//     if (state & I2C_ISR_NACKF) {
-//         DEBUG("AF\n");
+//     else if (state & I2C0_STAT0_SBSEND_Msk) {
+//         DEBUG("START sent, dev=%d\n", dev);
+//         _i2c_dev[dev].state = I2C_START_SENT;
 //     }
-//     if (state & I2C_ISR_ARLO) {
-//         DEBUG("ARLO\n");
+//     else if (state & I2C0_STAT0_ADDSEND_Msk) {
+//         DEBUG("ADDR sent, dev=%d\n", dev);
+//         _i2c_dev[dev].state = I2C_ADDR_SENT;
 //     }
-//     if (state & I2C_ISR_BERR) {
-//         DEBUG("BERR\n");
+//     else if (state & I2C0_STAT0_ADD10SEND_Msk) {
+//         DEBUG("ADDR10 first byte sent, dev=%d\n", dev);
+//         _i2c_dev[dev].state = I2C_ADDR10_SENT;
 //     }
-//     if (state & I2C_ISR_PECERR) {
-//         DEBUG("PECERR\n");
+//     else if (state & I2C0_STAT0_RBNE_Msk) {
+//         if (state & I2C0_STAT0_BTC_Msk) {
+//             DEBUG("RX buffer not empty + BT completed, dev=%d\n", dev);
+//             _i2c_dev[dev].state = I2C_RXB_NOT_EMPTY_BT_COMPLETE;
+//         }
+//         else {
+//             DEBUG("RX buffer not empty, dev=%d\n", dev);
+//             _i2c_dev[dev].state = I2C_RXB_NOT_EMPTY;
+//         }
 //     }
-//     if (state & I2C_ISR_TIMEOUT) {
-//         DEBUG("TIMEOUT\n");
+//     else if (state & I2C0_STAT0_BTC_Msk) {
+//         DEBUG("BT completed, dev=%d\n", dev);
+//         _i2c_dev[dev].state = I2C_BT_COMPLETE;
 //     }
-//     if (state & I2C_ISR_ALERT) {
-//         DEBUG("SMBALERT\n");
+//     else if (state & I2C0_STAT0_TBE_Msk) {
+//         DEBUG("TX buffer empty, dev=%d\n", dev);
+//         _i2c_dev[dev].state = I2C_TXB_EMPTY;
 //     }
-//     core_panic(PANIC_GENERAL_ERROR, "I2C FAULT");
+//     else {
+//         _i2c_dev[dev].state = I2C_OK;
+//     }
+
+//     mutex_unlock(&_i2c_dev[dev].irq_lock);
 // }
-
-#ifdef I2C_0_ISR
-void I2C_0_ISR(void)
-{
-    // irq_handler(I2C_DEV(0));
-}
-#endif /* I2C_0_ISR */
-
-#ifdef I2C_1_ISR
-void I2C_1_ISR(void)
-{
-    // irq_handler(I2C_DEV(1));
-}
-#endif /* I2C_1_ISR */

@@ -19,7 +19,7 @@
 #include "periph_cpu.h"
 #include "periph/gpio.h"
 #include "gd32e23x.h"
-#include "cpu_common.h"
+// #include "cpu_common.h"
 
 /**
  * @brief   Extract information from mode parameter

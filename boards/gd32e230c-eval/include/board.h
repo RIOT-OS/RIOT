@@ -19,11 +19,6 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-// #include "cpu.h"
-// #include "periph_conf.h"
-// #include "periph_cpu.h"
-// #include "gd32e23x_gpio.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

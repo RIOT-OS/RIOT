@@ -29,13 +29,13 @@ extern "C" {
  * @{
  */
 
-#ifndef CONFIG_CLOCK_PLL_PREDIV
-#define CONFIG_CLOCK_PLL_PREDIV         (1)
-#endif
+// #ifndef CONFIG_CLOCK_PLL_PREDIV
+// #define CONFIG_CLOCK_PLL_PREDIV         (1)
+// #endif
 
-#ifndef CONFIG_CLOCK_PLL_MUL
-#define CONFIG_CLOCK_PLL_MUL            (12)
-#endif
+// #ifndef CONFIG_CLOCK_PLL_MUL
+// #define CONFIG_CLOCK_PLL_MUL            (12)
+// #endif
 
 // #if IS_ACTIVE(CONFIG_USE_CLOCK_HSI)
 // #define CLOCK_CORECLOCK                 (CLOCK_HSI)
@@ -67,17 +67,17 @@ extern "C" {
 // #endif
 // #endif /* CONFIG_USE_CLOCK_PLL */
 
-#define CLOCK_AHB                       CLOCK_CORECLOCK
+// #define CLOCK_AHB                       CLOCK_CORECLOCK
 
-#ifndef CONFIG_CLOCK_APB1_DIV
-#define CONFIG_CLOCK_APB1_DIV           (1)
-#endif
-#define CLOCK_APB1                      (CLOCK_AHB / CONFIG_CLOCK_APB1_DIV)
+// #ifndef CONFIG_CLOCK_APB1_DIV
+// #define CONFIG_CLOCK_APB1_DIV           (1)
+// #endif
+// #define CLOCK_APB1                      (CLOCK_AHB / CONFIG_CLOCK_APB1_DIV)
 
-#ifndef CONFIG_CLOCK_APB2_DIV
-#define CONFIG_CLOCK_APB2_DIV           (1)
-#endif
-#define CLOCK_APB2                      (CLOCK_AHB / CONFIG_CLOCK_APB2_DIV)
+// #ifndef CONFIG_CLOCK_APB2_DIV
+// #define CONFIG_CLOCK_APB2_DIV           (1)
+// #endif
+// #define CLOCK_APB2                      (CLOCK_AHB / CONFIG_CLOCK_APB2_DIV)
 /** @} */
 
 #ifdef __cplusplus

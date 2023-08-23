@@ -20,151 +20,181 @@
  */
 
 #include "cpu.h"
+#include "macros/units.h"
 #include "mutex.h"
 #include "periph/adc.h"
-#include "periph/vbat.h"
-#include "cpu_common.h"
-// #include "gd32e23x_adc.h"
+#include "periph_conf.h"
 
 /**
- * @brief   Default VBAT undefined value
+ * @brief   Maximum allowed ADC clock speed
  */
-#ifndef VBAT_ADC
-#define VBAT_ADC    ADC_UNDEF
-#endif
+#define MAX_ADC_SPEED           MHZ(14)
 
 /**
- * @brief   Allocate lock for the ADC device
- *
- * All STM32F0 & STM32G0 CPUs we support so far only come with a single ADC device.
+ * @brief   Allocate locks for all three available ADC devices
  */
-static mutex_t lock = MUTEX_INIT;
+// static mutex_t locks[] = {
+// #if ADC_DEVS > 1
+//     MUTEX_INIT,
+// #endif
+//     MUTEX_INIT
+// };
 
-static inline void prep(void)
+static inline void prep(adc_t line, adc_res_t res)
 {
-    mutex_lock(&lock);
-#ifdef RCU_APB2EN_ADCEN_Msk
-    periph_clk_en(APB2, RCU_APB2EN_ADCEN_Msk);
-#endif
+    (void) res;
+    // mutex_lock(&locks[adc_config[line]]);
+    periph_clk_en(APB2, (RCU_APB2EN_ADCEN_Msk << 0));
+
+    /* enable the ADC module */
+    ADC->CTL1 |= ADC_CTL1_ADCON_Msk;
+
+// #define ADC_OVSAMPCTL_TOVS_Msk            (0x200UL)                 /*!< TOVS (Bitfield-Mask: 0x01)                            */
+// #define ADC_OVSAMPCTL_OVSS_Msk            (0x1e0UL)                 /*!< OVSS (Bitfield-Mask: 0x0f)                            */
+// #define ADC_OVSAMPCTL_OVSR_Msk            (0x1cUL)                  /*!< OVSR (Bitfield-Mask: 0x07)                            */
+// #define ADC_OVSAMPCTL_OVSEN_Msk           (0x1UL)                   /*!< OVSEN (Bitfield-Mask: 0x01)
+
+    /* configure the resolution */
+    // ADC->OVSAMPCTL &= ~ADC_OVSAMPCTL_DRES_Msk;
+    // switch (res) {
+    //     case ADC_RES_12BIT:
+    //         ADC->OVSAMPCTL |= 0 << ADC_OVSAMPCTL_DRES_Pos;
+    //         break;
+    //     case ADC_RES_10BIT:
+    //         ADC->OVSAMPCTL |= 1 << ADC_OVSAMPCTL_DRES_Pos;
+    //         break;
+    //     case ADC_RES_8BIT:
+    //         ADC->OVSAMPCTL |= 2 << ADC_OVSAMPCTL_DRES_Pos;
+    //         break;
+    //     case ADC_RES_6BIT:
+    //         ADC->OVSAMPCTL |= 3 << ADC_OVSAMPCTL_DRES_Pos;
+    //         break;
+    //     default:
+    //         break;
+    // }
+
+    /* check if this channel is an internal ADC channel, if so
+     * enable the internal temperature and Vref */
+    if (adc_config[line].chan == 16 || adc_config[line].chan == 17) {
+        ADC->CTL1 |= ADC_CTL1_TSVREN_Msk;
+    }
 }
 
 static inline void done(void)
 {
-#ifdef RCU_APB2EN_ADCEN_Msk
-    periph_clk_dis(APB2, RCU_APB2EN_ADCEN_Msk);
-#endif
-    mutex_unlock(&lock);
+    /* disable the internal temperature and Vref */
+    ADC->CTL1 &= ~ADC_CTL1_TSVREN_Msk;
+
+    /* disable the ADC module */
+    ADC->CTL1 &= ~ADC_CTL1_ADCON_Msk;
+
+    periph_clk_dis(APB2, (RCU_APB2EN_ADCEN_Msk << 0));
+    // mutex_unlock(&locks[adc_config[line]]);
 }
 
 int adc_init(adc_t line)
 {
-    /* make sure the given line is valid */
+    (void) line;
+    uint32_t clk_div = 2;
+
+    /* check if the line is valid */
     if (line >= ADC_NUMOF) {
         return -1;
     }
 
-    /* lock and power on the device */
-    prep();
+    /* lock and power-on the device */
+    prep(line, ADC_RES_12BIT);
+
     /* configure the pin */
     if (adc_config[line].pin != GPIO_UNDEF) {
         gpio_init_analog(adc_config[line].pin);
     }
-    /* reset configuration */
-    ADC->CTL0 = 0;
-    ADC->CTL1 = 0;
-    /* enable device */
-    ADC->CTL1 = ADC_CTL1_ADCON_Msk;
-    /* configure sampling time to save value */
-// // set sample rate only of selected channel not of base channel in each register
-//     ADC->SAMPT0 = ADC_SAMPLETIME_28POINT5;       /* 28.5 ADC clock cycles */
-//     ADC->SAMPT1 = ADC_SAMPLETIME_28POINT5;       /* 28.5 ADC clock cycles */
-    /* power off an release device for now */
-    done();
+    /* set clock prescaler to get the maximal possible ADC clock value */
+    for (clk_div = 2; clk_div < 8; clk_div += 2) {
+        if ((CLOCK_CORECLOCK / clk_div) <= MAX_ADC_SPEED) {
+            break;
+        }
+    }
+    RCU->CFG0 &= ~(RCU_CFG0_ADCPSC_Msk);
+    RCU->CFG0 |= ((clk_div / 2) - 1) << RCU_CFG0_ADCPSC_Pos;
 
+    /* resets the selected ADC calibration registers */
+    ADC->CTL1 |= ADC_CTL1_RSTCLB_Msk;
+    /* check the status of RSTCAL bit */
+    while (ADC->CTL1 & ADC_CTL1_RSTCLB_Msk) {}
+
+    /* enable the selected ADC calibration process */
+    ADC->CTL1 |= ADC_CTL1_CLB_Msk;
+    /* wait for the calibration to have finished */
+    while (ADC->CTL1 & ADC_CTL1_CLB_Msk) {}
+
+    /* set all channels to maximum (239.5) cycles for best accuracy */
+    ADC->SAMPT0 |= 0x00ffffff;
+    ADC->SAMPT1 |= 0x3fffffff;
+    /* we want to sample one channel */
+    ADC->RSQ0 = 1 << ADC_RSQ0_RL_Pos;
+    /* start sampling from software */
+    ADC->CTL1 |= ADC_CTL1_ETERC_Msk | ADC_CTL1_ETSRC_Msk;
+
+    /* check if the internal channels are configured to use ADC */
+    if (adc_config[line].chan == 16 || adc_config[line].chan == 17) {
+        assert (ADC == ADC);
+    }
+
+    /* free the device again */
+    done();
     return 0;
 }
 
-int32_t adc_sample(adc_t line,  adc_res_t res)
+int32_t adc_sample(adc_t line, adc_res_t res)
 {
     int sample;
 
-    /* check if resolution is applicable */
-    //see below ?
-    if ((res == ADC_RES_14BIT) || (res == ADC_RES_16BIT)) {
+    /* check if the linenel is valid */
+    if (line >= ADC_NUMOF) {
         return -1;
     }
 
+    /* check valid resolution */
+    // ADC->OVSAMPCTL &= ~ADC_OVSAMPCTL_DRES_Msk;
+    // switch (res) {
+    //     case ADC_RES_12BIT:
+    //     case ADC_RES_10BIT:
+    //     case ADC_RES_8BIT:
+    //     case ADC_RES_6BIT:
+    //         break;
+    //     default:
+    //         return -1;
+    // }
+
     /* lock and power on the ADC device  */
-    prep();
-    // 1. Make sure the DISRC, SM bits in the ADC_CTL0 register and CTN bit in the ADC_CTL1 register are reset;
-    /* set resolution and channel */
-    ADC->CTL0_b.DRES = (uint8_t) res;
-    ADC->CTL0_b.DISRC = 0;
-    ADC->CTL0_b.SM = 0;
-    ADC->CTL1_b.CTN = 0;
+    prep(line, res);
 
-    // 2. Configure RSQ0 with the analog channel number. (RSQ0 of ADC_RSQ2, not ADC_RSQ0)
-    ADC->RSQ2_b.RSQ0 = (1 << adc_config[line].chan);
+    /* set conversion channel */
+    ADC->RSQ2 = adc_config[line].chan;
+    /* start conversion and wait for results */
+    ADC->CTL1 |= ADC_CTL1_SWRCST_Msk;
+    while (!(ADC->STAT & ADC_STAT_EOC_Msk)) {}
+    /* finally read sample and reset the STRT bit in the status register */
+    sample = (int)ADC->RDATA;
 
-    // 3. Configure the ADC_SAMPT0 for ch 16, 17,  SAMPT1 for other channels 0-9    11 0x3 for 28.5 cycles.
-    switch(adc_config[line].chan){
-        case 0:
-            ADC->SAMPT1_b.SPT0 = 3;
+    /* the sample is 12 bit even if the resolution is less than 12 bit,
+     * scale down the 12 bit value to the requested resolution */
+    switch (res) {
+        case ADC_RES_10BIT:
+            sample = sample >> 2;
             break;
-        case 1:
-            ADC->SAMPT1_b.SPT1 = 3;
+        case ADC_RES_8BIT:
+            sample = sample >> 4;
             break;
-        case 2:
-            ADC->SAMPT1_b.SPT2 = 3;
+        case ADC_RES_6BIT:
+            sample = sample >> 6;
             break;
-        case 3:
-            ADC->SAMPT1_b.SPT3 = 3;
-            break;
-        case 4:
-            ADC->SAMPT1_b.SPT4 = 3;
-            break;
-        case 5:
-            ADC->SAMPT1_b.SPT5 = 3;
-            break;
-        case 6:
-            ADC->SAMPT1_b.SPT6 = 3;
-            break;
-        case 7:
-            ADC->SAMPT1_b.SPT7 = 3;
-            break;
-        case 8:
-            ADC->SAMPT1_b.SPT8 = 3;
-            break;
-        case 9:
-            ADC->SAMPT1_b.SPT9 = 3;
-            break;
-        case 16:
-            ADC->SAMPT0_b.SPT16 = 3;
-            break;
-        case 17:
-            ADC->SAMPT0_b.SPT17 = 3;
+        default:
             break;
     }
 
-    // 4. Configure the ETERC 0 and ETSRC bits 111 in the ADC_CTL1 register if in need.
-    ADC->CTL1_b.ETERC = 0;
-    ADC->CTL1_b.ETSRC = 7;
-
-    // 5. Set the SWRCST bit 1, or generate an external trigger for the routine sequence.
-    /* start conversion and wait for results */
-    ADC->CTL1_b.SWRCST = 1;
-    ADC->CTL1_b.ADCON = 1;
-
-    // 6. Wait for the ADC_STAT EOC flag to be set.
-    while (ADC->STAT_b.EOC == 0) {}
-
-    // 7. Read the converted data result from the ADC_RDATA register.
-    /* read result */
-    sample = (int)ADC->RDATA;
-
-    // 8. Clear the ADC_STAT EOC flag by writing 0.
-    /* unlock and power off device again */
-    ADC->STAT_b.EOC = 0;
+    /* power off and unlock device again */
     done();
 
     return sample;

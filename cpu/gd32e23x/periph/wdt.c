@@ -31,9 +31,6 @@
 #include "periph_cpu.h"
 #include "periph/wdt.h"
 
-// #include "gd32e23x_periph.h"
-// #include ""
-
 #define ENABLE_DEBUG 0
 #include "debug.h"
 

@@ -22,7 +22,7 @@
 #include "cpu.h"
 #include "periph/timer.h"
 // #include "gd32e23x_periph.h"  // TODO temporary?
-#include "cpu_common.h"
+// #include "cpu_common.h"
 
 /**
  * @brief   Interrupt context for each configured timer
@@ -47,7 +47,7 @@ static inline TIMER_Type *dev(tim_t tim)
 /**
  * @brief   Bitmap for compare channel disable after match
  */
-static uint8_t _oneshot[(TIMER_NUMOF+1)/2];
+static uint8_t _oneshot[(TIMER_NUMOF + 1) / 2];
 
 /**
  * @brief   Clear interrupt enable after the interrupt has fired

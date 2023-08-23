@@ -98,18 +98,18 @@ typedef enum {
 
 /* ==========================  Configuration of the ARM Cortex-M23 Processor and Core Peripherals  =========================== */
 #define __CM23_REV                 0x0000U      /*!< CM23 Core Revision                                                        */
-#define __NVIC_PRIO_BITS               4        /*!< Number of Bits used for Priority Levels                                   */
+#define __NVIC_PRIO_BITS               2        /*!< Number of Bits used for Priority Levels                                   */
 #define __Vendor_SysTickConfig         0        /*!< Set to 1 if different SysTick Config is used                              */
-#define __VTOR_PRESENT                 0        /*!< Set to 1 if CPU supports Vector Table Offset Register                     */
-#define __MPU_PRESENT                  1        /*!< MPU present                                                               */
-#define __FPU_PRESENT                  1        /*!< FPU present                                                               */
+#define __VTOR_PRESENT                 1        /*!< Set to 1 if CPU supports Vector Table Offset Register                     */
+#define __MPU_PRESENT                  0        /*!< MPU present                                                               */
+#define __FPU_PRESENT                  0        /*!< FPU present                                                               */
 #define __SAUREGION_PRESENT            0        /*!< SAU region present                                                        */
 
 
 /** @} */ /* End of group Configuration_of_CMSIS */
 
 #include "core_cm23.h"                          /*!< ARM Cortex-M23 processor and core peripherals                             */
-#include "system_gd32e23x.h"                    /*!< GD32E230 System                                                           */
+// #include "system_gd32e23x.h"                    /*!< GD32E230 System                                                           */
 
 #ifndef __IM                                    /*!< Fallback for older CMSIS versions                                         */
   #define __IM   __I
