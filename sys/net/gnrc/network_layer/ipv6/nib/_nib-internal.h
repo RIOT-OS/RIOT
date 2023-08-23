@@ -794,6 +794,8 @@ _nib_offl_entry_t *_nib_abr_iter_pfx(const _nib_abr_entry_t *abr,
  * @return  NULL, if @p last is the last ABR in the NIB.
  */
 _nib_abr_entry_t *_nib_abr_iter(const _nib_abr_entry_t *last);
+#else
+#define _nib_abr_iter(abr) NULL
 #endif
 
 /**
