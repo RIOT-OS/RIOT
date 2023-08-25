@@ -22,7 +22,6 @@
 #include "cpu.h"
 #include "periph/timer.h"
 // #include "gd32e23x_periph.h"  // TODO temporary?
-// #include "cpu_common.h"
 
 /**
  * @brief   Interrupt context for each configured timer

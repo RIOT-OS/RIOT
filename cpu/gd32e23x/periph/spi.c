@@ -27,7 +27,6 @@
 #include "periph/gpio.h"
 #include "periph/spi.h"
 #include "pm_layered.h"
-// #include "cpu_common.h"
 
 #define ENABLE_DEBUG        0
 #include "debug.h"

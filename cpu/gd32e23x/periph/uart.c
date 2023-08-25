@@ -23,7 +23,6 @@
 #include "cpu.h"
 // #include "clic.h"
 #include "gd32e23x_periph.h"
-// #include "cpu_common.h"
 #ifdef MODULE_PM_LAYERED
 #include "pm_layered.h"
 #endif
