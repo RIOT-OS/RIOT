@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Gunar Schorcht <gunar@schorcht.net>
+ * Copyright (C) 2023 BISSELL Homecare, Inc.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,13 +7,13 @@
  */
 
 /**
- * @ingroup     boards_common_gd32v
+ * @ingroup     boards_gd32e230c-eval
  * @{
  *
  * @file
- * @brief       Default I2C configuration for GD32VF103 boards
+ * @brief       Default I2C configuration for GD32E230 boards
  *
- * @author      Gunar Schorcht <gunar@schorcht.net>
+ * @author      Jason Parker <jason.parker@bissell.com>
  */
 
 #ifndef CFG_I2C_DEFAULT_H

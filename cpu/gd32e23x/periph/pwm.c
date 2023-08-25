@@ -1,8 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Freie Universität Berlin
- *               2015 Engineering-Spirit
- *               2016 OTA keys S.A.
- *               2023 Gunar Schorcht
+ * Copyright (C) 2023 BISSELL Homecare, Inc.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -10,18 +7,14 @@
  */
 
 /**
- * @ingroup     cpu_gd32v
+ * @ingroup     cpu_gd32e23x
  * @ingroup     drivers_periph_pwm
  * @{
  *
  * @file
- * @brief       Low-level PWM driver implementation
+ * @brief       Low-level PWM driver implementation for GD32E230
  *
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @author      Fabian Nack <nack@inf.fu-berlin.de>
- * @author      Nick v. IJzendoorn <nijzendoorn@engineering-spirit.nl>
- * @author      Aurelien Gonce <aurelien.gonce@altran.fr>
- * @author      Gunar Schorcht <gunar@schorcht.net>
+ * @author      Jason Parker <jason.parker@bissell.com>
  *
  * @}
  */

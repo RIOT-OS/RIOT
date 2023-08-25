@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Gunar Schorcht
+ * Copyright (C) 2023 BISSELL Homecare, Inc.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,14 +7,14 @@
  */
 
 /**
- * @ingroup     cpu_gd32v
+ * @ingroup     cpu_gd32e23x
  * @ingroup     drivers_periph_i2c
  * @{
  *
  * @file
- * @brief       Low-level I2C driver implementation for GD32VF103
+ * @brief       Low-level I2C driver implementation for GD32E230
  *
- * @author      Gunar Schorcht <gunar@schorcht.net>
+ * @author      Jason Parker <jason.parker@bissell.com>
  *
  * @}
  */

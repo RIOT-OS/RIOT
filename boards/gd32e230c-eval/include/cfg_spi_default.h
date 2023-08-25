@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2020 Koen Zandberg <koen@bergzand.net>
- *               2023 Gunar Schorcht <gunar@schorcht.net>
+ * Copyright (C) 2023 BISSELL Homecare, Inc.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,14 +7,13 @@
  */
 
 /**
- * @ingroup     boards_common_gd32v
+ * @ingroup     boards_gd32e230c-eval
  * @{
  *
  * @file
- * @brief       Common peripheral configuration for GD32VF103 boards
+ * @brief       Common peripheral configuration for GD32E230 boards
  *
- * @author      Koen Zandberg <koen@bergzand.net>
- * @author      Gunar Schorcht <gunar@schorcht.net>
+ * @author      Jason Parker <jason.parker@bissell.com>
  */
 
 #ifndef CFG_SPI_DEFAULT_H
