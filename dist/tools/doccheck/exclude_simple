@@ -2307,6 +2307,7 @@ warning: Member FT5X06_PARAMS (macro definition) of file ft5x06_params.h is not 
 warning: Member FT5X06_PARAM_TYPE (macro definition) of file ft5x06_params.h is not documented.
 warning: Member FT5X06_PARAM_XMAX (macro definition) of file ft5x06_params.h is not documented.
 warning: Member FT5X06_PARAM_YMAX (macro definition) of file ft5x06_params.h is not documented.
+warning: Member FT5X06_PARAM_XYCONV (macro definition) of file ft5x06_params.h is not documented.
 warning: Member FT5X06_TD_STATUS_MASK (macro definition) of file ft5x06_constants.h is not documented.
 warning: Member FT5X06_TD_STATUS_REG (macro definition) of file ft5x06_constants.h is not documented.
 warning: Member FT5X06_TOUCH1_XH_REG (macro definition) of file ft5x06_constants.h is not documented.

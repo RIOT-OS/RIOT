@@ -78,6 +78,26 @@ typedef enum {
 } ft5x06_type_t;
 
 /**
+ * @brief   Touch screen coordinate conversions
+ *
+ * Normally the coordinates of the touch device must be converted to the
+ * screen coordinates by swapping and/or mirroring. The flags defined by
+ * this enumeration can be ORed for a combined conversion. In this case,
+ * the swapping is performed before the mirroring.
+ *
+ * @note The maximum X and Y screen coordinates defined by
+ *       @ref ft5x06_params_t::xmax and @ref ft5x06_params_t::ymax
+ *       define the dimension of the touch device in screen coordinates,
+ *       i.e. after conversion.
+ */
+typedef enum {
+    FT5X06_NO_CONV  = 0x00, /**< No conversion */
+    FT5X06_MIRROR_X = 0x01, /**< Mirror X, applied after optional swapping */
+    FT5X06_MIRROR_Y = 0x02, /**< Mirror Y, applied after optional swapping */
+    FT5X06_SWAP_XY  = 0x04, /**< Swap XY, applied before optional mirroring */
+} ft5x06_touch_conv_t;
+
+/**
  * @brief   Signature of the touch event callback triggered from interrupt
  *
  * @param[in] arg           optional context for the callback
@@ -86,14 +106,20 @@ typedef void (*ft5x06_event_cb_t)(void *arg);
 
 /**
  * @brief   Device initialization parameters
+ *
+ * @note ft5x06_params_t::xmax and ft5x06_params_t::ymax define the
+ *       maximum X and Y values in screen coordinates after the optional
+ *       conversion defined by ft5x06_params_t::xmax.
  */
 typedef struct {
-    i2c_t i2c;              /**< I2C device which is used */
-    uint8_t addr;           /**< Device I2C address */
-    gpio_t int_pin;         /**< Touch screen interrupt pin */
-    uint16_t xmax;          /**< Touch screen max X position */
-    uint16_t ymax;          /**< Touch screen max Y position */
-    ft5x06_type_t type;     /**< Device type */
+    i2c_t i2c;                  /**< I2C device which is used */
+    uint8_t addr;               /**< Device I2C address */
+    gpio_t int_pin;             /**< Touch screen interrupt pin */
+    uint16_t xmax;              /**< Touch screen max X position */
+    uint16_t ymax;              /**< Touch screen max Y position */
+    ft5x06_touch_conv_t xyconv; /**< Touch screen coordinates conversion,
+                                     swapping is performed before mirroring */
+    ft5x06_type_t type;         /**< Device type */
 } ft5x06_params_t;
 
 /**

@@ -56,6 +56,7 @@ extern "C" {
 #define FT5X06_PARAM_INT_PIN            GPIO_PIN(PORT_I, 9)     /**< Interrupt pin */
 #define FT5X06_PARAM_XMAX               (240)                   /**< Max width */
 #define FT5X06_PARAM_YMAX               (240)                   /**< Max height */
+#define FT5X06_PARAM_XYCONV             FT5X06_NO_CONV          /**< No coordinate conversion */
 #define FT5X06_PARAM_TYPE               FT5X06_TYPE_FT6X06      /**< Device type */
 /** @} */
 

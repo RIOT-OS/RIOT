@@ -111,9 +111,30 @@ int ft5x06_read_touch_positions(const ft5x06_t *dev, ft5x06_touch_position_t *po
         i2c_read_regs(FT5X06_BUS, FT5X06_ADDR, touch_reg_map[touch], &regs, 4, 0);
         pos_x = (uint16_t)((regs[1] & FT5X06_TOUCH_POS_LSB_MASK) | (uint16_t)(regs[0] & FT5X06_TOUCH_POS_MSB_MASK) << 8);
         pos_y = (uint16_t)((regs[3] & FT5X06_TOUCH_POS_LSB_MASK) | (uint16_t)(regs[2] & FT5X06_TOUCH_POS_MSB_MASK) << 8);
-        /* X and Y positions are swapped compared to the display */
-        positions[touch].x = pos_y;
-        positions[touch].y = pos_x;
+
+        if (dev->params->xyconv & FT5X06_SWAP_XY) {
+            positions[touch].x = pos_y;
+            positions[touch].y = pos_x;
+        }
+        else {
+            positions[touch].x = pos_x;
+            positions[touch].y = pos_y;
+        }
+
+        if (dev->params->xyconv & FT5X06_MIRROR_X) {
+            /* X position is mirrored */
+            assert(positions[touch].x <= dev->params->xmax);
+            positions[touch].x = dev->params->xmax - positions[touch].x;
+        }
+
+        if (dev->params->xyconv & FT5X06_MIRROR_Y) {
+            /* Y position is mirrored */
+            assert(positions[touch].y <= dev->params->ymax);
+            positions[touch].y = dev->params->ymax - positions[touch].y;
+        }
+
+        DEBUG("[ft5x06] read position X=%u y=%u'\n",
+              positions[touch].x, positions[touch].y);
     }
     i2c_release(FT5X06_BUS);
 
