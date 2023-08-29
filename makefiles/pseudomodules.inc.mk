@@ -388,6 +388,11 @@ PSEUDOMODULES += posix_headers
 PSEUDOMODULES += printf_float
 PSEUDOMODULES += prng
 PSEUDOMODULES += prng_%
+PSEUDOMODULES += psa_riot_cipher_aes_common
+PSEUDOMODULES += psa_riot_cipher_aes_128_ecb
+PSEUDOMODULES += psa_riot_cipher_aes_128_cbc
+PSEUDOMODULES += psa_riot_cipher_aes_192_cbc
+PSEUDOMODULES += psa_riot_cipher_aes_256_cbc
 PSEUDOMODULES += fortuna_reseed
 ## @defgroup pseudomodule_random_cmd random_cmd
 ## @ingroup sys_shell_commands
