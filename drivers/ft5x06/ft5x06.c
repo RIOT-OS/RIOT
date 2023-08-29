@@ -80,11 +80,12 @@ int ft5x06_init(ft5x06_t *dev, const ft5x06_params_t *params, ft5x06_event_cb_t 
     }
 
     /* Configure interrupt */
-    if (gpio_is_valid(dev->params->int_pin)) {
+    if (gpio_is_valid(dev->params->int_pin) && cb) {
         DEBUG("[ft5x06] init: configuring touchscreen interrupt\n");
         gpio_init_int(dev->params->int_pin, GPIO_IN, GPIO_RISING, cb, arg);
-        i2c_write_reg(FT5X06_BUS, FT5X06_ADDR, FT5X06_G_MODE_REG, FT5X06_G_MODE_INTERRUPT_TRIGGER & 0x01, 0);
     }
+
+    i2c_write_reg(FT5X06_BUS, FT5X06_ADDR, FT5X06_G_MODE_REG, FT5X06_G_MODE_INTERRUPT_TRIGGER & 0x01, 0);
 
     i2c_release(FT5X06_BUS);
 
