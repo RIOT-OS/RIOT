@@ -163,6 +163,10 @@ ifneq (,$(filter prng,$(USEMODULE)))
   include $(RIOTBASE)/sys/random/Makefile.include
 endif
 
+ifneq (,$(filter psa_crypto,$(USEMODULE)))
+  include $(RIOTBASE)/sys/psa_crypto/Makefile.include
+endif
+
 ifneq (,$(filter test_utils_netdev_eth_minimal,$(USEMODULE)))
   CFLAGS += -DCONFIG_NETDEV_REGISTER_SIGNAL
 endif
