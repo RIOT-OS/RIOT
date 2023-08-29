@@ -107,7 +107,8 @@ static inline unsigned int cib_full(const cib_t *cib)
  *
  * @param[in,out] cib   corresponding *cib* to buffer.
  *                      Must not be NULL.
- * @return index of next item, -1 if the buffer is empty
+ * @return index of next item
+ * @retval -1 if the buffer is empty
  */
 static inline int cib_get(cib_t *__restrict cib)
 {
@@ -153,7 +154,8 @@ static inline int cib_get_unsafe(cib_t *cib)
  *
  * @param[in,out] cib   corresponding *cib* to buffer.
  *                      Must not be NULL.
- * @return index of item to put to, -1 if the buffer is full
+ * @return index of item to put to
+ * @retval -1 if the buffer is full
  */
 static inline int cib_put(cib_t *__restrict cib)
 {
