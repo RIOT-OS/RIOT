@@ -9,6 +9,7 @@ menuconfig PACKAGE_CRYPTOAUTHLIB
     bool "Microchip CryptoAuthentication Library package"
     depends on TEST_KCONFIG
     depends on !HAS_ARCH_EFM32
+    depends on HAS_PERIPH_I2C
     select MODULE_AUTO_INIT_SECURITY
     select MODULE_CRYPTOAUTHLIB_CONTRIB
 
@@ -19,6 +20,12 @@ config MODULE_CRYPTOAUTHLIB_CONTRIB
     select ZTIMER_USEC
     select MODULE_PERIPH_I2C
     select MODULE_PERIPH_I2C_RECONFIGURE if HAS_PERIPH_I2C_RECONFIGURE
+
+config MODULE_PSA_ATCA_DRIVER
+    bool
+    depends on PACKAGE_CRYPTOAUTHLIB
+    default y if MODULE_PSA_CRYPTO
+    select PSA_KEY_MANAGEMENT
 
 config MODULE_CRYPTOAUTHLIB_TEST
     bool "Module for cryptoauthlib tests"
@@ -56,4 +63,4 @@ config MODULE_CRYPTOAUTHLIB_TEST_API_CRYPTO
 config MODULE_CRYPTOAUTHLIB_TEST_VECTORS
     bool
 
-endif
+endif # PACKAGE_CRYPTOAUTHLIB
