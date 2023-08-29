@@ -333,6 +333,7 @@ typedef enum {
     NETDEV_ESP_WIFI,
     NETDEV_CDC_ECM,
     NETDEV_TINYUSB,
+    NETDEV_W5500,
     /* add more if needed */
 } netdev_type_t;
 /** @} */
@@ -360,11 +361,11 @@ typedef enum {
  * be used by upper layers to store reference information.
  */
 struct netdev {
-    const struct netdev_driver *driver;            /**< ptr to that driver's interface. */
-    netdev_event_cb_t event_callback;              /**< callback for device events */
-    void *context;                                 /**< ptr to network stack context */
+    const struct netdev_driver *driver;             /**< ptr to that driver's interface. */
+    netdev_event_cb_t event_callback;               /**< callback for device events */
+    void *context;                                  /**< ptr to network stack context */
 #ifdef MODULE_NETDEV_LAYER
-    netdev_t *lower;                               /**< ptr to the lower netdev layer */
+    netdev_t *lower;                                /**< ptr to the lower netdev layer */
 #endif
 #ifdef MODULE_L2FILTER
     l2filter_t filter[CONFIG_L2FILTER_LISTSIZE];   /**< link layer address filters */
@@ -401,12 +402,12 @@ void netdev_register_signal(struct netdev *dev, netdev_type_t type, uint8_t inde
 static inline void netdev_register(struct netdev *dev, netdev_type_t type, uint8_t index)
 {
 #ifdef MODULE_NETDEV_REGISTER
-    dev->type  = type;
+    dev->type = type;
     dev->index = index;
 #else
-    (void) dev;
-    (void) type;
-    (void) index;
+    (void)dev;
+    (void)type;
+    (void)index;
 #endif
 
     if (IS_ACTIVE(CONFIG_NETDEV_REGISTER_SIGNAL)) {
