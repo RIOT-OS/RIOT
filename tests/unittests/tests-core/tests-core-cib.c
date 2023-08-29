@@ -51,7 +51,6 @@ static void test_cib_get__overflow(void)
 
 static void test_cib_peek(void)
 {
-    cib_init(&cib, TEST_CIB_SIZE);
     TEST_ASSERT_EQUAL_INT(-1, cib_peek(&cib));
     TEST_ASSERT_EQUAL_INT(0, cib_put(&cib));
     TEST_ASSERT_EQUAL_INT(0, cib_peek(&cib));
