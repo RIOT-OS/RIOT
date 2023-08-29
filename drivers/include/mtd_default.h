@@ -55,6 +55,8 @@ extern "C" {
  */
 #define MTD_NUMOF           (MTD_BOARD_NUMOF + MTD_SDCARD_NUMOF + MTD_EMULATED_NUMOF)
 
+#else
+#define MTD_BOARD_NUMOF     MTD_NUMOF
 #endif /*  !defined(MTD_NUMOF) && !DOXYGEN */
 
 #if !DOXYGEN
