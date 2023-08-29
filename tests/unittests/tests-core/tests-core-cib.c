@@ -45,8 +45,8 @@ static void test_cib_get__overflow(void)
     cib.read_count = UINT_MAX;
     cib.write_count = UINT_MAX;
 
-    TEST_ASSERT_EQUAL_INT(3, cib_put(&cib));
-    TEST_ASSERT_EQUAL_INT(3, cib_get(&cib));
+    TEST_ASSERT_EQUAL_INT(TEST_CIB_SIZE-1, cib_put(&cib));
+    TEST_ASSERT_EQUAL_INT(TEST_CIB_SIZE-1, cib_get(&cib));
 }
 
 static void test_cib_peek(void)
@@ -69,8 +69,8 @@ static void test_cib_peek__overflow(void)
     cib.read_count = UINT_MAX;
     cib.write_count = UINT_MAX;
 
-    TEST_ASSERT_EQUAL_INT(3, cib_put(&cib));
-    TEST_ASSERT_EQUAL_INT(3, cib_peek(&cib));
+    TEST_ASSERT_EQUAL_INT(TEST_CIB_SIZE-1, cib_put(&cib));
+    TEST_ASSERT_EQUAL_INT(TEST_CIB_SIZE-1, cib_peek(&cib));
 }
 
 static void test_cib_avail(void)
