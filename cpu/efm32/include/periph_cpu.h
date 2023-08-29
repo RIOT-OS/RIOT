@@ -79,6 +79,7 @@ typedef struct {
  */
 typedef struct {
     DAC_TypeDef *dev;       /**< DAC device used */
+    DAC_Ref_TypeDef ref;    /**< DAC voltage reference */
     CMU_Clock_TypeDef cmu;  /**< the device CMU channel */
 } dac_conf_t;
 
@@ -88,7 +89,6 @@ typedef struct {
 typedef struct {
     uint8_t dev;            /**< device index */
     uint8_t index;          /**< channel index */
-    DAC_Ref_TypeDef ref;    /**< channel voltage reference */
 } dac_chan_conf_t;
 #endif
 

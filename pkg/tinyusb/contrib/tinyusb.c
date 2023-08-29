@@ -19,6 +19,7 @@
 
 #if IS_USED(MODULE_AUTO_INIT)
 #include "auto_init_utils.h"
+#include "auto_init_priorities.h"
 #endif
 
 #define ENABLE_DEBUG    0

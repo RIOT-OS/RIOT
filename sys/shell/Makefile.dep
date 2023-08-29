@@ -208,6 +208,9 @@ endif
 ifneq (,$(filter shell_cmd_i2c_scan,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
+ifneq (,$(filter shell_cmd_iw,$(USEMODULE)))
+  USEMODULE += ztimer_sec
+endif
 ifneq (,$(filter shell_cmd_lwip_netif,$(USEMODULE)))
   USEMODULE += lwip_netif
 endif

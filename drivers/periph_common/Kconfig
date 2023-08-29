@@ -153,6 +153,7 @@ config MODULE_PERIPH_INIT_RTT
     default y if MODULE_PERIPH_INIT
     depends on MODULE_PERIPH_RTT
 
+rsource "Kconfig.sdmmc"
 rsource "Kconfig.spi"
 
 config MODULE_PERIPH_TEMPERATURE

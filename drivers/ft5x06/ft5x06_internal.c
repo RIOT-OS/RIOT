@@ -20,7 +20,7 @@
 #include "ft5x06_internal.h"
 
 uint8_t ft5x06_get_touches_count_max(const ft5x06_t *dev) {
-    if (dev->params.type == FT5X06_TYPE_FT6X06 || dev->params.type == FT5X06_TYPE_FT6X36) {
+    if (dev->params->type == FT5X06_TYPE_FT6X06 || dev->params->type == FT5X06_TYPE_FT6X36) {
         return FT6XX6_TOUCHES_COUNT_MAX;
     }
     else {

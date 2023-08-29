@@ -25,6 +25,9 @@
 #ifndef NET_NETOPT_H
 #define NET_NETOPT_H
 
+#include <stdint.h>
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -784,6 +787,35 @@ typedef enum {
     NETOPT_RSSI,
 
     /**
+     * @brief   (@ref netopt_scan_request_t) Instruct the interface to do a network scan
+     *
+     * This netopt triggers an asynchronous network scan.
+     * The result is a list of reachable access points @ref l2scan_list_t.
+     * Notification happens by a callback @ref netopt_on_scan_result_t.
+     */
+    NETOPT_SCAN,
+
+    /**
+     * @brief   (@ref netopt_connect_request_t) Instructs the interface to connect to a network
+     *
+     * This netopt triggers an asynchronous connection attempt to a network.
+     * The result is a derivative of @ref netopt_connect_result_t or
+     * @ref netopt_disconnect_result_t. Notification happens through a callback
+     * @ref netopt_on_connect_result_t or @ref netopt_on_disconnect_result_t respectively.
+     */
+    NETOPT_CONNECT,
+
+    /**
+     * @brief   (@ref netopt_disconnect_request_t) Instructs the interface to disconnect
+     *          from a network
+     *
+     * This netopt triggers a disconnect procedure from a network.
+     * The result is a derivative of @ref netopt_disconnect_result_t.
+     * Notification happens through a callback @ref netopt_on_disconnect_result_t.
+     */
+    NETOPT_DISCONNECT,
+
+    /**
      * @brief (uint16_t) Set the battery monitor voltage (in mV).
      *
      * When set, a @ref SYS_BUS_POWER_EVENT_LOW_VOLTAGE event is generated
@@ -876,6 +908,157 @@ typedef enum {
     NETOPT_RF_TESTMODE_CTX_CW,      /**< carrier wave continuous tx mode */
     NETOPT_RF_TESTMODE_CTX_PRBS9,   /**< PRBS9 continuous tx mode */
 } netopt_rf_testmode_t;
+
+/**
+ * @brief   Netopt RF channel type
+ */
+typedef uint16_t netopt_channel_t;
+
+/**
+ * @brief   Netopt RSSI type
+ */
+typedef int16_t netopt_rssi_t;
+
+/**
+ * @brief   Request to scan all channels
+ */
+#define NETOPT_SCAN_REQ_ALL_CH      ((netopt_channel_t)(-1))
+
+/**
+ * @brief   Basic network scan result
+ */
+typedef struct netopt_scan_result {
+    netopt_channel_t channel;       /**< Scanned channel */
+    netopt_rssi_t strength;         /**< Received signal strength */
+} netopt_scan_result_t;
+
+/**
+ * @brief   Static initializer for a @ref netopt_scan_result_t
+ *
+ * @param   ch      Scanned channel
+ * @param   str     Received signal strength
+ */
+#define NETOPT_SCAN_RESULT_INITIALIZER(ch, str)         \
+    (netopt_scan_result_t) {                            \
+        .channel = ch,                                  \
+        .strength = str,                                \
+    }
+
+/**
+ * @brief   Forward declaration of a list of network scan results
+ *
+ * This prevents a recursive include.
+ */
+struct l2scan_list;
+
+/**
+ * @brief   Basic callback type on network scan @ref NETOPT_CONNECT
+ */
+typedef void (*netopt_on_scan_result_t) (void *netif, const struct l2scan_list *res);
+
+/**
+ * @brief   Basic network scan request
+ */
+typedef struct netopt_scan_request {
+    netopt_on_scan_result_t scan_cb;    /**< Scan result callback */
+    netopt_channel_t channel;           /**< Channel to scan */
+} netopt_scan_request_t;
+
+/**
+ * @brief   Static initializer for a @ref netopt_scan_request_t
+ *
+ * @param   ch      Channel to be scanned
+ * @param   cb      Scan result callback
+ */
+#define NETOPT_SCAN_REQUEST_INITIALIZER(ch, cb)         \
+    (netopt_scan_request_t) {                           \
+        .channel = ch,                                  \
+        .scan_cb = (netopt_on_scan_result_t)cb,         \
+    }
+
+/**
+ * @brief   Basic network connect result
+ */
+typedef struct netopt_connect_result {
+    netopt_channel_t channel;           /**< Connected channel */
+} netopt_connect_result_t;
+
+/**
+ * @brief   Static initializer for a @ref netopt_connect_result_t
+ *
+ * @param   ch      Connected channel
+ */
+#define NETOPT_CONNECT_RESULT_INITIALIZER(ch)               \
+    (netopt_connect_result_t) {                             \
+        .channel = ch,                                      \
+    }
+
+/**
+ * @brief   Basic disconnect result
+ */
+typedef struct netopt_disconnect_result {
+    netopt_channel_t channel;           /**< Channel of the disconnected AP */
+} netopt_disconnect_result_t;
+
+/**
+ * @brief   Static initializer for a @ref netopt_disconnect_result_t
+ *
+ * @param   ch      Channel of the disconnected AP
+ */
+#define NETOPT_DISCONNECT_RESULT_INITIALIZER(ch)        \
+    (netopt_disconnect_result_t) {                      \
+        .channel = ch,                                  \
+    }
+
+/**
+ * @brief   Basic callback type on network connection @ref NETOPT_CONNECT
+ */
+typedef void (*netopt_on_connect_result_t) (void *netif, const struct netopt_connect_result *res);
+
+/**
+ * @brief   Basic callback type on network disconnection @ref NETOPT_CONNECT
+ */
+typedef void (*netopt_on_disconnect_result_t) (void *netif, const struct netopt_disconnect_result *res);
+
+/**
+ * @brief   Basic network connect request
+ */
+typedef struct netopt_connect_request {
+    netopt_on_disconnect_result_t disconn_cb;   /**< On disconnect callback */
+    netopt_on_connect_result_t conn_cb;         /**< On connect callback */
+    netopt_channel_t channel;                   /**< Channel of the network to connect to */
+} netopt_connect_request_t;
+
+/**
+ * @brief   Static initializer for a @ref netopt_connect_request_t
+ *
+ * @param   ch      Channel of the network to connect to
+ * @param   ccb     On connect callback
+ * @param   dcb     On disconnect callback
+ */
+#define NETOPT_CONNECT_REQUEST_INITIALIZER(ch, ccb, dcb)    \
+    (netopt_connect_request_t) {                            \
+        .disconn_cb = (netopt_on_disconnect_result_t)dcb,   \
+        .conn_cb = (netopt_on_connect_result_t)ccb,         \
+        .channel = ch,                                      \
+    }
+
+/**
+ * @brief   Basic network disconnect request
+ */
+typedef struct netopt_disconnect_request {
+    netopt_on_disconnect_result_t disconn_cb;   /**< On disconnect callback */
+} netopt_disconnect_request_t;
+
+/**
+ * @brief   Static initializer for a @ref netopt_disconnect_request_t
+ *
+ * @param   dcb     On disconnect callback
+ */
+#define NETOPT_DISCONNECT_REQUEST_INITIALIZER(dcb)          \
+    (netopt_disconnect_request_t) {                         \
+        .disconn_cb = (netopt_on_disconnect_result_t)dcb,   \
+    }
 
 /**
  * @brief   Get a string ptr corresponding to opt, for debugging

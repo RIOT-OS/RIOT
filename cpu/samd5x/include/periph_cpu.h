@@ -65,7 +65,7 @@ enum {
     SAM0_GCLK_32KHZ,                    /**< 32 kHz clock             */
     SAM0_GCLK_TIMER,                    /**< 4-8 MHz clock for xTimer */
     SAM0_GCLK_PERIPH,                   /**< 12-48 MHz (DFLL) clock   */
-    SAM0_GCLK_200MHZ,                   /**< 200MHz FDPLL clock       */
+    SAM0_GCLK_100MHZ,                   /**< 100MHz FDPLL clock       */
 };
 /** @} */
 

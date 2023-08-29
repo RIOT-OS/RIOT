@@ -45,6 +45,7 @@ int8_t dac_init(dac_t line)
     /* reset and initialize peripheral */
     DAC_Init_TypeDef init = DAC_INIT_DEFAULT;
 
+    init.reference = dac_config[dev].ref;
     DAC_Reset(dac_config[dev].dev);
     DAC_Init(dac_config[dev].dev, &init);
 

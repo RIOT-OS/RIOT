@@ -176,6 +176,10 @@ config MODULE_SHELL_CMD_I2C_SCAN
     depends on MODULE_SHELL_CMDS
     depends on MODULE_PERIPH_I2C
 
+config MODULE_SHELL_CMD_IW
+    bool "Command to interact with WiFi interfaces"
+    depends on MODULE_ZTIMER_SEC
+
 config MODULE_SHELL_CMD_LWIP_NETIF
     bool "Command to manage lwIP network interfaces (ifconfig)"
     default y if MODULE_SHELL_CMDS_DEFAULT

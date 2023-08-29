@@ -694,4 +694,8 @@ ifneq (,$(filter auto_init%,$(USEMODULE)))
   USEMODULE += preprocessor_successor
 endif
 
+ifneq (,$(filter wifi_scan_list,$(USEMODULE)))
+  USEMODULE += l2scan_list
+endif
+
 include $(RIOTBASE)/sys/test_utils/Makefile.dep

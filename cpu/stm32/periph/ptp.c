@@ -33,14 +33,6 @@
 #define DEBUG_VERBOSE   0
 #include "debug.h"
 
-/* Workaround for typos in vendor files; drop when fixed upstream */
-#ifndef ETH_PTPTSCR_TSSSR
-#define ETH_PTPTSCR_TSSSR ETH_PTPTSSR_TSSSR
-#endif
-#ifndef ETH_PTPTSCR_TSSARFE
-#define ETH_PTPTSCR_TSSARFE ETH_PTPTSSR_TSSARFE
-#endif
-
 /* PTPSSIR is the number of nanoseconds to add onto the sub-second register
  * (the one counting the nanoseconds part of the timestamp with the
  * configuration we chose here). It is therefore the resolution of the clock
@@ -109,7 +101,7 @@ void ptp_init(void)
     ptp_clock_set(&initial_time);
     if (IS_USED(MODULE_PERIPH_ETH)) {
         /* enable timestamping of all received frames */
-        ETH->PTPTSCR |= ETH_PTPTSSR_TSSARFE;
+        ETH->PTPTSCR |= ETH_PTPTSCR_TSSARFE;
     }
     DEBUG("[periph_ptp] Initialized with PTPSAR = %" PRIu32 ", PTPSSIR = %" PRIu32 "\n",
           ptptsar, ptpssir);
