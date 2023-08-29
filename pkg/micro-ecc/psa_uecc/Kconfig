@@ -1,0 +1,19 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_PSA_UECC_P192
+    bool
+    depends on MODULE_PSA_CRYPTO
+    select MODULE_PSA_UECC
+
+config MODULE_PSA_UECC_P256
+    bool
+    depends on MODULE_PSA_CRYPTO
+    select MODULE_PSA_UECC
+
+config MODULE_PSA_UECC
+    bool
