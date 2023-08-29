@@ -1,4 +1,5 @@
 CPU_MODEL = nrf9160
+CPU = nrf9160
 
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_i2c
@@ -12,4 +13,4 @@ ifeq (1, $(TEST_KCONFIG))
   KCONFIG_BOARD_CONFIG += $(BOARDDIR)/thingy91.config
 endif
 
-include $(RIOTCPU)/nrf9160/Makefile.features
+#include $(RIOTCPU)/nrf9160/Makefile.features
