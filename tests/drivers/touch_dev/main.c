@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2020 Inria
+ *               2023 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Generic touch device test application
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Gunar Schorcht <gunar@schorcht.net>
  *
  * @}
  */
@@ -21,6 +23,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#include "mutex.h"
 #include "ztimer.h"
 
 #include "touch_dev.h"
@@ -30,11 +33,16 @@
 #include "test_utils/expect.h"
 #endif
 
+#ifndef TOUCH_DEV_POLLING_PERIOD
+#define TOUCH_DEV_POLLING_PERIOD     50
+#endif
+
+#if !IS_ACTIVE(TOUCH_DEV_POLLING_MODE)
 static void _touch_event_cb(void *arg)
 {
-    (void)arg;
-    printf("Event: ");
+    mutex_unlock(arg);
 }
+#endif
 
 int main(void)
 {
@@ -45,7 +53,11 @@ int main(void)
         return -1;
     }
 
-    touch_dev_set_touch_event_callback(touch_dev->dev, _touch_event_cb, NULL);
+#if !IS_ACTIVE(TOUCH_DEV_POLLING_MODE)
+    mutex_t lock = MUTEX_INIT_LOCKED;
+
+    touch_dev_set_touch_event_callback(touch_dev->dev, _touch_event_cb, &lock);
+#endif
 
 #if IS_USED(MODULE_STMPE811)
     uint16_t xmax = touch_dev_width(touch_dev->dev);
@@ -59,15 +71,21 @@ int main(void)
     uint8_t last_touches = touch_dev_touches(touch_dev->dev, NULL, 1);
 
     while (1) {
+#if IS_ACTIVE(TOUCH_DEV_POLLING_MODE)
+        ztimer_sleep(ZTIMER_MSEC, TOUCH_DEV_POLLING_PERIOD);
+#else
+        /* wait for event */
+        mutex_lock(&lock);
+#endif
         touch_t touches[1];
         uint8_t current_touches = touch_dev_touches(touch_dev->dev, touches, 1);
 
         if (current_touches != last_touches) {
             if (current_touches == 0) {
-                puts("released!");
+                puts("Event: released!");
             }
             if (current_touches > 0) {
-                puts("pressed!");
+                puts("Event: pressed!");
             }
             last_touches = current_touches;
         }
@@ -76,8 +94,6 @@ int main(void)
         if (current_touches == 1) {
             printf("X: %i, Y:%i\n", touches[0].x, touches[0].y);
         }
-
-        ztimer_sleep(ZTIMER_MSEC, 10);
     }
 
     return 0;
