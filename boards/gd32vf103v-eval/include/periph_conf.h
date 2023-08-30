@@ -95,7 +95,6 @@ static const pwm_conf_t pwm_config[] = {
 //        .af       = GPIO_AF_OUT_PP,
 //        .bus      = APB1,
     },
-#endif
 };
 
 #define PWM_NUMOF ARRAY_SIZE(pwm_config)
