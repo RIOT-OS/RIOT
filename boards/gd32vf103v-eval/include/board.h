@@ -37,7 +37,7 @@ extern "C" {
 #define LED0_MASK           (1 << LED0_BIT)
 #define LED0_ON             (GPIOC->BOP = LED0_MASK)
 #define LED0_OFF            (GPIOC->BC = LED0_MASK)
-#define LED0_TOGGLE         (GPIOC->TG = LED0_MASK)
+#define LED0_TOGGLE         (GPIOC->OCTL ^= LED0_MASK)
 
 #define LED1_BIT            2
 #define LED1_GPIO_PORT      PORT_C
@@ -45,7 +45,7 @@ extern "C" {
 #define LED1_MASK           (1 << LED1_BIT)
 #define LED1_ON             (GPIOC->BOP = LED1_MASK)
 #define LED1_OFF            (GPIOC->BC = LED1_MASK)
-#define LED1_TOGGLE         (GPIOC->TG = LED1_MASK)
+#define LED1_TOGGLE         (GPIOC->OCTL ^= LED1_MASK)
 
 #define LED2_BIT            0
 #define LED2_GPIO_PORT      PORT_E
@@ -53,7 +53,7 @@ extern "C" {
 #define LED2_MASK           (1 << LED2_BIT)
 #define LED2_ON             (GPIOE->BOP = LED2_MASK)
 #define LED2_OFF            (GPIOE->BC = LED2_MASK)
-#define LED2_TOGGLE         (GPIOE->TG = LED2_MASK)
+#define LED2_TOGGLE         (GPIOE->OCTL ^= LED2_MASK)
 
 #define LED3_BIT            1
 #define LED3_GPIO_PORT      PORT_E
@@ -61,7 +61,7 @@ extern "C" {
 #define LED3_MASK           (1 << LED3_BIT)
 #define LED3_ON             (GPIOE->BOP = LED3_MASK)
 #define LED3_OFF            (GPIOE->BC = LED3_MASK)
-#define LED3_TOGGLE         (GPIOE->TG = LED3_MASK)
+#define LED3_TOGGLE         (GPIOE->OCTL ^= LED3_MASK)
 
 /* A */
 #define BTN0_BIT            0
