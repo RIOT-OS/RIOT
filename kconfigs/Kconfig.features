@@ -134,6 +134,11 @@ config HAS_CPU_CHECK_ADDRESS
     help
         Indicates that address validity check is supported.
 
+config HAS_PERIPH_CRYPTOCELL_310
+    bool
+    help
+        Indicates that a cryptocell peripheral is present.
+
 config HAS_DBGPIN
     bool
     help
@@ -188,6 +193,11 @@ config HAS_PERIPH_CAN
     help
         Indicates that a CAN peripheral is present.
 
+config HAS_PERIPH_CIPHER_AES_128_CBC
+    bool
+    help
+        Indicates that there is AES 128 CBC hardware acceleration present
+
 config HAS_PERIPH_CORETIMER
     bool
     help
@@ -207,6 +217,16 @@ config HAS_PERIPH_DMA
     bool
     help
         Indicates that a DMA peripheral is present.
+
+config HAS_PERIPH_ECC_P192R1
+    bool
+    help
+        Indicates that there is ECC P192R1 hardware acceleration peripheral present.
+
+config HAS_PERIPH_ECC_P256R1
+    bool
+    help
+        Indicates that there is ECC P256R1 hardware acceleration peripheral present.
 
 config HAS_PERIPH_EEPROM
     bool
@@ -284,6 +304,36 @@ config HAS_PERIPH_GPIO_LL_IRQ_UNMASK
     help
         Indicates that the GPIO peripheral supports unmasking interrupts without
         clearing pending IRQs that came in while masked.
+
+config HAS_PERIPH_HASH_MD5
+    bool
+    help
+        Indicates that there is MD5 hardware acceleration present.
+
+config HAS_PERIPH_HASH_SHA_1
+    bool
+    help
+        Indicates that there is SHA-1 hardware acceleration present.
+
+config HAS_PERIPH_HASH_SHA_224
+    bool
+    help
+        Indicates that there is SHA-224 hardware acceleration present.
+
+config HAS_PERIPH_HASH_SHA_256
+    bool
+    help
+        Indicates that there is SHA-256 hardware acceleration present.
+
+config HAS_PERIPH_HASH_SHA_512
+    bool
+    help
+        Indicates that there is SHA-512 hardware acceleration present.
+
+config HAS_PERIPH_HMAC_SHA_256
+    bool
+    help
+        Indicates that there is HMAC SHA-256 hardware acceleration present.
 
 config HAS_PERIPH_HWRNG
     bool

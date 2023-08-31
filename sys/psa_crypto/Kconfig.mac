@@ -1,0 +1,37 @@
+# Copyright (c) 2022 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_PSA_MAC
+    bool "PSA Message Authenticated Ciphers"
+    select PSA_KEY_CONFIG
+    select MODULE_PSA_KEY_SLOT_MGMT
+
+if MODULE_PSA_MAC
+
+menuconfig MODULE_PSA_MAC_HMAC_SHA_256
+    bool "HMAC SHA-256"
+    select PSA_KEY_SIZE_256
+
+if MODULE_PSA_MAC_HMAC_SHA_256
+
+choice PSA_MAC_HMAC_SHA_256_BACKEND
+    bool "HMAC SHA256 Implementation"
+
+config MODULE_PSA_MAC_HMAC_SHA_256_BACKEND_PERIPH
+    bool "Hardware Accelerated"
+    depends on HAS_PERIPH_HMAC_SHA_256
+    select MODULE_PERIPH_HMAC_SHA_256
+
+config MODULE_PSA_MAC_HMAC_SHA_256_BACKEND_RIOT
+    bool "RIOT HMAC SHA-256"
+    select MODULE_PSA_RIOT_HASHES_HMAC_SHA256
+
+endchoice # PSA_MAC_HMAC_SHA_256_BACKEND
+
+endif # MODULE_PSA_MAC_HMAC_SHA_256
+
+endif # MODULE_PSA_MAC

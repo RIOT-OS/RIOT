@@ -1,0 +1,61 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_PSA_ASYMMETRIC
+    bool "PSA Asymmetric Crypto"
+    select PSA_KEY_CONFIG
+    select MODULE_PSA_KEY_SLOT_MGMT
+
+if MODULE_PSA_ASYMMETRIC
+
+menuconfig MODULE_PSA_ASYMMETRIC_ECC_P192R1
+    bool "ECC NIST-P192R1"
+    select PSA_KEY_SIZE_192
+
+if MODULE_PSA_ASYMMETRIC_ECC_P192R1
+
+choice PSA_ASYMMETRIC_ECC_P192R1_BACKEND
+    bool "ECC NIST-P192R1 Implementation"
+
+config MODULE_PSA_ASYMMETRIC_ECC_P192R1_BACKEND_PERIPH
+    bool "Hardware accelerated with peripheral"
+    depends on HAS_PERIPH_ECC_P192R1
+    select MODULE_PERIPH_ECC_P192R1
+
+config MODULE_PSA_ASYMMETRIC_ECC_P192R1_BACKEND_MICROECC
+    bool "Micro-ECC Package"
+    select PACKAGE_MICRO-ECC
+    select MODULE_PSA_UECC_P192
+
+endchoice
+
+endif # MODULE_PSA_ASYMMETRIC_ECC_P192R1
+
+menuconfig MODULE_PSA_ASYMMETRIC_ECC_P256R1
+    bool "ECC NIST-P256R1"
+    select PSA_KEY_SIZE_256
+
+if MODULE_PSA_ASYMMETRIC_ECC_P256R1
+
+choice PSA_ASYMMETRIC_ECC_P256R1_BACKEND
+    bool "ECC NIST-P256R1 Implementation"
+
+config MODULE_PSA_ASYMMETRIC_ECC_P256R1_BACKEND_PERIPH
+    bool "Hardware Accelerated"
+    depends on HAS_PERIPH_ECC_P256R1
+    select MODULE_PERIPH_ECC_P256R1
+
+config MODULE_PSA_ASYMMETRIC_ECC_P256R1_BACKEND_MICROECC
+    bool "Micro-ECC Package"
+    select PACKAGE_MICRO-ECC
+    select MODULE_PSA_UECC_P256
+
+endchoice
+
+endif # MODULE_PSA_ASYMMETRIC_ECC_P256R1
+
+endif # MODULE_PSA_ASYMMETRIC

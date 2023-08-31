@@ -10,6 +10,18 @@ ifneq (,$(filter nrf52811xxaa nrf52820xxaa nrf52833xxaa nrf52840xxaa,$(CPU_MODEL
   FEATURES_PROVIDED += radio_nrf802154
 endif
 
+# crypto features
+ifneq (,$(filter nrf52840xxaa,$(CPU_MODEL)))
+  FEATURES_PROVIDED += periph_hash_sha_1
+  FEATURES_PROVIDED += periph_hash_sha_224
+  FEATURES_PROVIDED += periph_hash_sha_256
+  FEATURES_PROVIDED += periph_hash_sha_512
+  FEATURES_PROVIDED += periph_hmac_sha_256
+  FEATURES_PROVIDED += periph_cipher_aes_128_cbc
+  FEATURES_PROVIDED += periph_ecc_p192r1
+  FEATURES_PROVIDED += periph_ecc_p256r1
+endif
+
 ifeq (,$(filter nrf52832%,$(CPU_MODEL)))
   FEATURES_PROVIDED += periph_uart_nonblocking
 endif
@@ -31,6 +43,10 @@ FEATURES_PROVIDED += periph_spi_gpio_mode
 FEATURES_PROVIDED += ble_phy_2mbit
 ifneq (,$(filter nrf52811% nrf52820% nrf52833% nrf52840%,$(CPU_MODEL)))
   FEATURES_PROVIDED += ble_phy_coded
+endif
+
+ifneq (,$(filter nrf52840%,$(CPU_MODEL)))
+  FEATURES_PROVIDED += periph_cryptocell_310
 endif
 
 FEATURES_PROVIDED += ble_adv_ext

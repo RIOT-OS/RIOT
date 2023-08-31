@@ -6,3 +6,10 @@ CFLAGS += -Wno-unused-variable
 
 # llvm fails to allocate registers for inline assembly :/
 TOOLCHAINS_BLACKLIST += llvm
+
+ifneq (,$(filter psa_uecc_%, $(USEMODULE)))
+  PSEUDOMODULES += psa_uecc_p192
+  PSEUDOMODULES += psa_uecc_p256
+  DIRS += $(RIOTPKG)/micro-ecc/psa_uecc
+  INCLUDES += -I$(RIOTBASE)/sys/psa_crypto/include
+endif
