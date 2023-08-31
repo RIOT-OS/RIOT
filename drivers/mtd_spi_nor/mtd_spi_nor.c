@@ -27,12 +27,14 @@
 
 #include "byteorder.h"
 #include "kernel_defines.h"
+#include "macros/math.h"
 #include "macros/utils.h"
 #include "mtd.h"
 #include "mtd_spi_nor.h"
+#include "time_units.h"
 #include "thread.h"
 
-#if IS_USED(MODULE_ZTIMER_USEC)
+#if IS_USED(MODULE_ZTIMER)
 #include "ztimer.h"
 #elif IS_USED(MODULE_XTIMER)
 #include "xtimer.h"
@@ -451,6 +453,9 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
             do {
 #if IS_USED(MODULE_ZTIMER_USEC)
                 ztimer_sleep(ZTIMER_USEC, dev->params->wait_chip_wake_up);
+#elif IS_USED(MODULE_ZTIMER_MSEC)
+                ztimer_sleep(ZTIMER_MSEC,
+                             DIV_ROUND_UP(dev->params->wait_chip_wake_up, US_PER_MS));
 #elif IS_USED(MODULE_XTIMER)
                 xtimer_usleep(dev->params->wait_chip_wake_up);
 #endif
