@@ -446,9 +446,13 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
     switch (power) {
         case MTD_POWER_UP:
             mtd_spi_cmd(dev, dev->params->opcode->wake);
-            /* No sense in trying multiple times if no xtimer to wait between
-               reads */
-            uint8_t retries = 0;
+
+            /* fall back to polling if no timer is used */
+            unsigned retries = MTD_POWER_UP_WAIT_FOR_ID;
+            if (!IS_USED(MODULE_ZTIMER) && !IS_USED(MODULE_XTIMER)) {
+                retries *= dev->params->wait_chip_wake_up * 1000;
+            }
+
             int res = 0;
             do {
 #if IS_USED(MODULE_ZTIMER_USEC)
@@ -460,8 +464,7 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
                 xtimer_usleep(dev->params->wait_chip_wake_up);
 #endif
                 res = mtd_spi_read_jedec_id(dev, &dev->jedec_id);
-                retries++;
-            } while (res < 0 && retries < MTD_POWER_UP_WAIT_FOR_ID);
+            } while (res < 0 && --retries);
             if (res < 0) {
                 mtd_spi_release(dev);
                 return -EIO;
