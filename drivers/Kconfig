@@ -32,6 +32,7 @@ rsource "ili9341/Kconfig"
 rsource "lcd/Kconfig"
 rsource "st7735/Kconfig"
 rsource "touch_dev/Kconfig"
+rsource "touch_dev_gestures/Kconfig"
 endmenu # Display Device Drivers
 
 menu "Miscellaneous Device Drivers"
