@@ -31,7 +31,7 @@ Current hardware support:
 | Capacitive touch screen | X | |
 | User microphones | - | |
 | External Quad-SPI Flash | - | |
-| External SDRAM | - | |
+| External SDRAM | X | |
 
 ## Flashing the device
 
