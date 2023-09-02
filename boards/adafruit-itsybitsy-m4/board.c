@@ -21,6 +21,9 @@
 #include "periph/gpio.h"
 #include "mtd_spi_nor.h"
 #include "timex.h"
+#ifdef MODULE_VFS_DEFAULT
+#include "vfs_default.h"
+#endif
 
 #ifdef MODULE_MTD
 /* GD25x16 */
@@ -52,6 +55,10 @@ static mtd_spi_nor_t samd51_nor_dev = {
 };
 
 mtd_dev_t *mtd0 = (mtd_dev_t *)&samd51_nor_dev;
+
+#ifdef MODULE_VFS_DEFAULT
+VFS_AUTO_MOUNT(littlefs2, VFS_MTD(samd51_nor_dev), VFS_DEFAULT_NVM(0), 0);
+#endif
 #endif /* MODULE_MTD */
 
 static inline void _toggle(unsigned n)

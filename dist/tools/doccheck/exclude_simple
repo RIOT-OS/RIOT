@@ -6669,6 +6669,7 @@ warning: Member STMPE811_PARAM_INT_PIN (macro definition) of file stmpe811_param
 warning: Member STMPE811_PARAMS (macro definition) of file stmpe811_params.h is not documented.
 warning: Member STMPE811_PARAM_XMAX (macro definition) of file stmpe811_params.h is not documented.
 warning: Member STMPE811_PARAM_YMAX (macro definition) of file stmpe811_params.h is not documented.
+warning: Member STMPE811_PARAM_XYCONV (macro definition) of file stmpe811_params.h is not documented.
 warning: Member suit_parameter_t (enumeration) of group sys_suit is not documented.
 warning: Member _SV(elt, list) (macro definition) of group sys_ut is not documented.
 warning: Member SX126X_PARAM_BUSY (macro definition) of file sx126x_params.h is not documented.
