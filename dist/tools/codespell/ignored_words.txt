@@ -162,3 +162,9 @@ noe
 
 # NWE (Negative Write Enable) ==> NEW
 nwe
+
+# rsource (used to include Kconfig files) ==> resource, source
+rsource
+
+# SHS (abbreviation for Secure Hash Standard) => SSH, NHS
+shs

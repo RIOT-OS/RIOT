@@ -1,0 +1,53 @@
+# Copyright (c) 2022 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_PSA_SECURE_ELEMENT
+    bool "PSA Secure Elements"
+    select MODULE_PSA_KEY_SLOT_MGMT
+    select MODULE_PSA_SE_MGMT
+
+if MODULE_PSA_SECURE_ELEMENT
+
+config MODULE_PSA_SECURE_ELEMENT_MULTIPLE
+    bool "Use multiple secure elements"
+
+config PSA_MAX_SE_COUNT
+    int
+    prompt "Maximum number of secure elements" if MODULE_PSA_SECURE_ELEMENT_MULTIPLE
+    range 2 255 if MODULE_PSA_SECURE_ELEMENT_MULTIPLE
+    range 1 255
+
+menuconfig MODULE_PSA_SECURE_ELEMENT_ATECCX08A
+    bool "Microchip ATECCX08A"
+    select PACKAGE_CRYPTOAUTHLIB
+    select MODULE_PSA_SECURE_ELEMENT_CONFIG
+    depends on HAS_PERIPH_I2C
+    help
+        When using Cryptoauthlib as a backend for elliptic curve operations,
+        please also choose the ECC symbol.
+
+config MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256
+    bool "Microchip ATECCX08A Elliptic Curve P256"
+    select PSA_KEY_SIZE_256
+    select MODULE_PSA_SECURE_ELEMENT_ASYMMETRIC
+    depends on MODULE_PSA_SECURE_ELEMENT_ATECCX08A
+
+config MODULE_PSA_SE_MGMT
+    bool
+
+config MODULE_PSA_SECURE_ELEMENT_ASYMMETRIC
+    bool
+    help
+        Indicates that an asymmetric operation is used with secure elements.
+
+config MODULE_PSA_SECURE_ELEMENT_CONFIG
+    bool
+    help
+        Indicates that this SE driver defines a configuration structure for
+        persistent driver data.
+
+endif # MODULE_PSA_SECURE_ELEMENT

@@ -1,0 +1,25 @@
+INCLUDES += -I$(PKGDIRBASE)/driver_cryptocell_310/include
+INCLUDES += -I$(RIOTPKG)/driver_cryptocell_310/include
+DIRS += $(RIOTPKG)/driver_cryptocell_310/contrib
+
+ARCHIVES += $(PKGDIRBASE)/driver_cryptocell_310/libnrf_cc310_0.9.13.a
+
+ifneq (,$(filter psa_cryptocell_310_%, $(USEMODULE)))
+  DIRS += $(RIOTPKG)/driver_cryptocell_310/psa_cryptocell_310
+  INCLUDES += -I$(RIOTBASE)/sys/psa_crypto/include
+endif
+
+CFLAGS += -Wno-cast-align
+
+PSEUDOMODULES += psa_cryptocell_310_aes_cbc
+PSEUDOMODULES += psa_cryptocell_310_aes_common
+PSEUDOMODULES += psa_cryptocell_310_ecc_common
+PSEUDOMODULES += psa_cryptocell_310_ecc_p192
+PSEUDOMODULES += psa_cryptocell_310_ecc_p256
+PSEUDOMODULES += psa_cryptocell_310_error_conversion
+PSEUDOMODULES += psa_cryptocell_310_hashes_common
+PSEUDOMODULES += psa_cryptocell_310_hashes_sha1
+PSEUDOMODULES += psa_cryptocell_310_hashes_sha224
+PSEUDOMODULES += psa_cryptocell_310_hashes_sha256
+PSEUDOMODULES += psa_cryptocell_310_hashes_sha512
+PSEUDOMODULES += psa_cryptocell_310_hmac

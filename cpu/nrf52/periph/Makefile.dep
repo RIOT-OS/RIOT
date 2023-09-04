@@ -1,0 +1,39 @@
+ifneq (,$(filter periph_ecc_p192r1,$(USEMODULE)))
+  USEPKG += driver_cryptocell_310
+  USEMODULE += psa_cryptocell_310_ecc_p192
+endif
+
+ifneq (,$(filter periph_ecc_p256r1,$(USEMODULE)))
+  USEPKG += driver_cryptocell_310
+  USEMODULE += psa_cryptocell_310_ecc_p256
+endif
+
+ifneq (,$(filter periph_hash_sha_1,$(USEMODULE)))
+  USEPKG += driver_cryptocell_310
+  USEMODULE += psa_cryptocell_310_hashes_sha1
+endif
+
+ifneq (,$(filter periph_hash_sha_224,$(USEMODULE)))
+  USEPKG += driver_cryptocell_310
+  USEMODULE += psa_cryptocell_310_hashes_sha224
+endif
+
+ifneq (,$(filter periph_hash_sha_256,$(USEMODULE)))
+  USEPKG += driver_cryptocell_310
+  USEMODULE += psa_cryptocell_310_hashes_sha256
+endif
+
+ifneq (,$(filter periph_hash_sha_512,$(USEMODULE)))
+  USEPKG += driver_cryptocell_310
+  USEMODULE += psa_cryptocell_310_hashes_sha512
+endif
+
+ifneq (,$(filter periph_cipher_aes_128_cbc,$(USEMODULE)))
+  USEPKG += driver_cryptocell_310
+  USEMODULE += psa_cryptocell_310_aes_cbc
+endif
+
+ifneq (,$(filter periph_hmac_sha_256,$(USEMODULE)))
+  USEPKG += driver_cryptocell_310
+  USEMODULE += psa_cryptocell_310_hmac
+endif

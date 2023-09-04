@@ -15,3 +15,5 @@ config PACKAGE_MICRO-ECC
         https://github.com/kmackay/micro-ecc and adds `hwrng_read` as
         the default RNG function if it is available on the target
         platform.
+
+rsource "psa_uecc/Kconfig"
