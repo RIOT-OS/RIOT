@@ -36,6 +36,10 @@ extern "C" {
  * configured peripheral drivers like SPI or I2C. This function SHOULD be called
  * early in the boot process, e.g. before the actual kernel initialization is
  * started.
+ *
+ * @note    This function is called by the boot up code. Application developers
+ *          do not need to care. Developers porting RIOT to a new MCU must make
+ *          sure that this function is called during boot up early on.
  */
 void periph_init(void);
 
