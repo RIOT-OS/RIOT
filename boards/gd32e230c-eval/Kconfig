@@ -12,7 +12,6 @@ config BOARD_GD32E230C_EVAL
     default y
     select CPU_MODEL_GD32E230C
 
-    # Put defined MCU peripherals here (in alphabetical order)
     select HAS_PERIPH_ADC
     select HAS_PERIPH_I2C
     select HAS_PERIPH_PWM

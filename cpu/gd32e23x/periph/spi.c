@@ -196,10 +196,10 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
     /* lock bus */
     mutex_lock(&locks[bus]);
-// #ifdef STM32_PM_STOP
-//     /* block STOP mode */
-//     pm_block(STM32_PM_STOP);
-// #endif
+#ifdef GD32_PM_STOP
+    /* block STOP mode */
+    pm_block(GD32_PM_STOP);
+#endif
     /* enable SPI device clock */
     periph_clk_en(spi_config[bus].apbbus, spi_config[bus].rcumask);
     /* enable device */

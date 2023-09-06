@@ -32,10 +32,6 @@
 // #include "vendor/GD32E23x_Firmware_Library/GD32E23x_standard_peripheral/Include/gd32e23x_usart.h"
 // #endif
 
-// #ifdef MODULE_PERIPH_CAN
-// #include "candev_stm32.h"
-// #endif
-
 // #include "periph/cpu_gpio.h"
 // #include "periph/cpu_timer.h"
 
@@ -193,7 +189,7 @@ typedef struct {
  * @brief   PWM configuration
  */
 typedef struct {
-    TIMER_Type *dev;               /**< Timer used */
+    TIMER_Type *dev;                /**< Timer used */
     uint32_t rcu_mask;              /**< bit in clock enable register */
     pwm_chan_t chan[TIMER_CHANNEL_NUMOF]; /**< channel mapping
                                            *   set to {GPIO_UNDEF, 0}
@@ -220,7 +216,7 @@ typedef struct {
 enum {
     //SLEEP == IDLE?
     GD32_PM_STANDBY = 0,       /**< STANDBY mode,  */
-    GD32_PM_DEEPSLEEP = 1,     /**< DEEPSLEEP mode, croresponds to STOP mode of STM32 */
+    GD32_PM_DEEPSLEEP = 1,     /**< DEEPSLEEP mode, corresponds to STOP mode of STM32 */
     GD32_PM_IDLE = 2           /**< IDLE mode */
 };
 /** @} */
@@ -453,7 +449,7 @@ typedef struct {
  * @brief UART hardware module types
  */
 typedef enum {
-    STM32_USART,
+    GD32_USART,
 } uart_type_t;
 
 /**
@@ -543,13 +539,11 @@ typedef struct {
  * @brief   Starting address of the ROM bootloader
  *          see application note AN2606
  */
-#define STM32_BOOTLOADER_ADDR
+#define GD32_BOOTLOADER_ADDR
 #endif
 
 /**
  * @brief   Length of the CPU_ID in octets
- *
- * This is the same for all members of the stm32 family
  */
 #define CPUID_LEN           (12U)
 
