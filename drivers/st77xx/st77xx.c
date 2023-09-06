@@ -9,11 +9,11 @@
  */
 
 /**
- * @ingroup     drivers_st7735
+ * @ingroup     drivers_st77xx
  * @{
  *
  * @file
- * @brief       Device driver implementation for the st7735 display controller
+ * @brief       Device driver implementation for the ST77xx display controller
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
@@ -33,38 +33,30 @@
 #include "periph/spi.h"
 #endif
 
-#include "st7735.h"
-#include "st7735_internal.h"
+#include "st77xx.h"
+#include "st77xx_internal.h"
 #include "lcd.h"
 #include "lcd_internal.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-/* datasheet page 178, table converted to equation.
- * gvdd in 1mv increments: 4850 = 4.85V */
-static uint8_t _st7735_calc_pwrctl1(uint16_t gvdd)
-{
-    return (gvdd - 2850) / 50;
-}
-
-static uint8_t _st7735_calc_vmh(uint16_t vcomh)
-{
-    return (vcomh - 2700) / 25;
-}
-
-static uint8_t _st7735_calc_vml(int16_t vcoml)
-{
-    return (vcoml + 2500) / 25;
-}
-
 static int _init(lcd_t *dev, const lcd_params_t *params)
 {
-    if (IS_USED(MODULE_ST7789)) {
+    if (params->cntrl == ST77XX_CNTRL_ST7735) {
+        assert(params->lines <= 162);
+        assert(params->rgb_channels <= 132);
+    }
+    if (params->cntrl == ST77XX_CNTRL_ST7789) {
         assert(params->lines <= 320);
+        assert(params->rgb_channels <= 240);
+    }
+    if (params->cntrl == ST77XX_CNTRL_ST7796) {
+        assert(params->lines <= 480);
+        assert(params->rgb_channels <= 320);
     }
     else {
-        assert(params->lines <= 162);
+        assert(0);
     }
 
     uint8_t command_params[4] = { 0 };
@@ -79,55 +71,13 @@ static int _init(lcd_t *dev, const lcd_params_t *params)
     /* Display off */
     lcd_ll_write_cmd(dev, LCD_CMD_DISPOFF, NULL, 0);
 
-    /* PWRCTL1 */
-    command_params[0] = _st7735_calc_pwrctl1(CONFIG_ST7735_GVDD);
-    lcd_ll_write_cmd(dev, LCD_CMD_PWCTRL1, command_params, 1);
-
-    /* PWCTR2 VGH = 14.7V, VGL = -7.35V */
-    command_params[0] = 0x01;
-    command_params[1] = 0x05;
-    lcd_ll_write_cmd(dev, LCD_CMD_PWCTRL2, command_params, 2);
-
-    /* PWCTR3 Opamp current small, Boost frequency */
-    command_params[0] = 0x02;
-    command_params[1] = 0x01;
-    command_params[2] = 0x02;
-    lcd_ll_write_cmd(dev, LCD_CMD_PWCTRL3, command_params, 3);
-
-    /* PWCTR6 */
-    command_params[0] = 0x02;
-    command_params[1] = 0x11;
-    command_params[2] = 0x15;
-    lcd_ll_write_cmd(dev, LCD_CMD_PWCTRL6, command_params, 3);
-
-    /* No display Inversion , Line inversion */
-    command_params[0] = 0x07;
-    lcd_ll_write_cmd(dev, LCD_CMD_INVCTR, command_params, 1);
-
-    /* VCOMCTL */
-    command_params[0] = _st7735_calc_vmh(CONFIG_ST7735_VCOMH);
-    command_params[1] = _st7735_calc_vml(CONFIG_ST7735_VCOML);
-    lcd_ll_write_cmd(dev, LCD_CMD_VMCTRL1, command_params, 2);
-
-    command_params[0] = 0x86;
-    lcd_ll_write_cmd(dev, LCD_CMD_VMCTRL2, command_params, 1);
+    /* TODO: instead of using a wrong initialization command sequence for power
+     * and frame control, default values after reset are used. */
 
     /* Memory access CTL */
     command_params[0] = dev->params->rotation;
     command_params[0] |= dev->params->rgb ? 0 : LCD_MADCTL_BGR;
     lcd_ll_write_cmd(dev, LCD_CMD_MADCTL, command_params, 1);
-
-    /* Frame control */
-    command_params[0] = 0x00;
-    command_params[1] = 0x18;
-    lcd_ll_write_cmd(dev, LCD_CMD_FRAMECTL1, command_params, 2);
-
-    /* Display function control */
-    command_params[0] = 0x08;
-    command_params[1] = 0x82;
-    /* number of lines, see datasheet p. 166 (DISCTRL::NL) */
-    command_params[2] = (params->lines >> 3) - 1;
-    lcd_ll_write_cmd(dev, LCD_CMD_DFUNC, command_params, 3);
 
     /* Pixel format */
     command_params[0] = 0x55; /* 16 bit mode */
@@ -139,16 +89,16 @@ static int _init(lcd_t *dev, const lcd_params_t *params)
     /* Gamma correction */
     {
         static const uint8_t gamma_pos[] = {
-            0x02, 0x1c, 0x07, 0x12, 0x37, 0x32, 0x29, 0x2d,
-            0x29, 0x25, 0x2B, 0x39, 0x00, 0x01, 0x03, 0x10
+            0xf0, 0x09, 0x0b, 0x06, 0x04, 0x15, 0x2f,
+            0x54, 0x42, 0x3c, 0x17, 0x14, 0x18, 0x1b,
         };
         lcd_ll_write_cmd(dev, LCD_CMD_PGAMCTRL, gamma_pos,
                          sizeof(gamma_pos));
     }
     {
         static const uint8_t gamma_neg[] = {
-            0x03, 0x1d, 0x07, 0x06, 0x2E, 0x2C, 0x29, 0x2D,
-            0x2E, 0x2E, 0x37, 0x3F, 0x00, 0x00, 0x02, 0x10
+            0xe0, 0x09, 0x0b, 0x06, 0x04, 0x03, 0x2b,
+            0x43, 0x42, 0x3b, 0x16, 0x14, 0x17, 0x1b
         };
         lcd_ll_write_cmd(dev, LCD_CMD_NGAMCTRL, gamma_neg,
                          sizeof(gamma_neg));
@@ -173,7 +123,7 @@ static int _init(lcd_t *dev, const lcd_params_t *params)
     return 0;
 }
 
-const lcd_driver_t lcd_st7735_driver = {
+const lcd_driver_t lcd_st77xx_driver = {
     .init = _init,
     .set_area = NULL, /* default implementation is used */
 };

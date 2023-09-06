@@ -1,0 +1,16 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+if MODULE_ST77XX
+
+config MODULE_ST7796
+    bool "ST7796 display"
+    default y if HAVE_ST7796
+    help
+        ST7796 display controller is used
+
+endif # MODULE_ST77XX

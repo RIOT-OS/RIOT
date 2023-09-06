@@ -1,0 +1,16 @@
+# Copyright (c) 2023 Gunar Schorcht
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+if MODULE_ST77XX
+
+config MODULE_ST7789
+    bool "ST7789 display"
+    default y if HAVE_ST7789
+    help
+        ST7789 display controller is used
+
+endif # MODULE_ST77XX
