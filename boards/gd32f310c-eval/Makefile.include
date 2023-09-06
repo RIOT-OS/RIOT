@@ -1,0 +1,32 @@
+#INCLUDES += -I$(RIOTBOARD)/gd32f310c-eval/include
+
+# write here the flasher tool and stdio configurations
+
+#useful if cpu family header files have dependency on 230 vs 231 (they do)
+#CFLAGS += -D__GD32F310C__
+
+#PORT_LINUX ?= /dev/ttyACM0
+#PORT_LINUX ?= /dev/ttyUSB0
+
+#using JLink, do we have to enable the Virtual COM port using JLink configurator?
+
+#PROGRAMMER ?= openocd
+#OPENOCD_DEBUG_ADAPTER ?= jlink
+#PROGRAMMERS_SUPPORTED += jlink openocd
+#OPENOCD_SKIP_VERIFY = yes
+
+# PROGRAMMER ?= jlink
+# PROGRAMMERS_SUPPORTED ?= jlink
+# JLINK_DEVICE ?= GD32F310C8
+# FLASH_ADDR ?= 0x8000000
+
+# configure the serial interface
+PORT_LINUX ?= /dev/ttyUSB0
+
+# configure the flasher
+PROGRAMMER ?= openocd
+OPENOCD_CONFIG ?= $(RIOTBOARD)/gd32f310c-eval/dist/openocd.cfg
+OPENOCD_DEBUG_ADAPTER ?= dap
+OPENOCD_FTDI_ADAPTER ?= openocd-usb
+OPENOCD_TRANSPORT = swd
+OPENOCD_RESET_USE_CONNECT_ASSERT_SRST = 1

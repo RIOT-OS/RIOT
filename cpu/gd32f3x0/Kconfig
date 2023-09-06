@@ -1,0 +1,40 @@
+# Copyright (C) 2023 BISSELL Homecare, Inc.
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_GD32F3X0
+    bool
+    select CPU_CORE_CORTEX_M4
+    select HAS_CPU_GD32F3X0
+    select HAS_PERIPH_CPUID
+    select HAS_PERIPH_GPIO
+    select HAS_PERIPH_PWM
+    select HAS_PERIPH_TIMER
+
+
+
+config CPU_MODEL_GD32F310C
+    bool
+    select CPU_FAM_GD32F3X0
+
+## Definition of specific features
+config HAS_CPU_GD32F3X0
+    bool
+    help
+        Indicates that a 'gd32f3x0' cpu is being used.
+
+config CPU_FAM
+    default "gd32f3x0" if CPU_FAM_GD32F3X0
+
+config CPU_MODEL
+    default "gd32f310c" if CPU_MODEL_GD32F310C
+
+config CPU
+    default "gd32f3x0" if CPU_FAM_GD32F3X0
+
+source "$(RIOTCPU)/cortexm_common/Kconfig"
+
+
