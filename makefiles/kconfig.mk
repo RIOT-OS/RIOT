@@ -193,7 +193,7 @@ EXTERNAL_MODULE_KCONFIGS ?= $(sort $(foreach dir,$(EXTERNAL_MODULE_DIRS),\
 # Build a Kconfig file that source all external modules configuration
 # files. Every EXTERNAL_MODULE_DIRS with a Kconfig file is written to
 # KCONFIG_EXTERNAL_MODULE_CONFIGS as 'osource dir/Kconfig'
-$(KCONFIG_EXTERNAL_MODULE_CONFIGS): FORCE | $(GENERATED_DIR)
+$(KCONFIG_EXTERNAL_MODULE_CONFIGS): pkg-prepare FORCE | $(GENERATED_DIR)
 	$(Q)\
 	if [ -n "$(EXTERNAL_MODULE_KCONFIGS)" ] ; then  \
 		printf "%s\n" $(EXTERNAL_MODULE_KCONFIGS) \
