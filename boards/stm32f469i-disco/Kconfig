@@ -10,6 +10,9 @@ config BOARD_STM32F469I_DISCO
     select HAS_PERIPH_ADC
     select HAS_PERIPH_DAC
     select HAS_PERIPH_DMA
+    select HAS_PERIPH_FMC
+    select HAS_PERIPH_FMC_SDRAM
+    select HAS_PERIPH_FMC_32BIT
     select HAS_PERIPH_I2C
     select HAS_PERIPH_PWM
     select HAS_PERIPH_RTC
