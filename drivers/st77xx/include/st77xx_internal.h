@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 Koen Zandberg
+ *               2023 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,9 +12,10 @@
  * @{
  *
  * @file
- * @brief       Device driver implementation for the ST77xx display controller
+ * @brief       Internal definitions that are common for all ST77xx controllers
  *
  * @author      Koen Zandberg <koen@bergzand.net>
+ * @author      Gunar Schorcht <gunar@schorcht.net>
  *
  * @}
  */

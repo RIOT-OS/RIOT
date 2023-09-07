@@ -29,12 +29,12 @@
 #include "kernel_defines.h"
 #include "ztimer.h"
 
-#if IS_USED(MODULE_LCD_SPI)
-#include "periph/spi.h"
-#endif
-
 #include "st77xx.h"
 #include "st77xx_internal.h"
+#include "st7735_internal.h"
+#include "st7789_internal.h"
+#include "st7796_internal.h"
+
 #include "lcd.h"
 #include "lcd_internal.h"
 
@@ -43,72 +43,59 @@
 
 static int _init(lcd_t *dev, const lcd_params_t *params)
 {
-    if (params->cntrl == ST77XX_CNTRL_ST7735) {
-        assert(params->lines <= 162);
-        assert(params->rgb_channels <= 132);
-    }
-    if (params->cntrl == ST77XX_CNTRL_ST7789) {
-        assert(params->lines <= 320);
-        assert(params->rgb_channels <= 240);
-    }
-    if (params->cntrl == ST77XX_CNTRL_ST7796) {
-        assert(params->lines <= 480);
-        assert(params->rgb_channels <= 320);
-    }
-    else {
-        assert(0);
-    }
-
-    uint8_t command_params[4] = { 0 };
+    uint8_t command_params[1] = { 0 };
 
     /* Acquire once and release at the end */
     lcd_ll_acquire(dev);
 
-    /* Soft Reset */
+    /* Soft Reset (requires 120 ms if in Sleep In mode), default display off */
     lcd_ll_write_cmd(dev, LCD_CMD_SWRESET, NULL, 0);
     ztimer_sleep(ZTIMER_MSEC, 120);
 
-    /* Display off */
-    lcd_ll_write_cmd(dev, LCD_CMD_DISPOFF, NULL, 0);
+    /* Sleep Out command to leave Sleep In state after reset, requires 120 ms */
+    lcd_ll_write_cmd(dev, LCD_CMD_SLPOUT, NULL, 0);
+    ztimer_sleep(ZTIMER_MSEC, 120);
 
-    /* TODO: instead of using a wrong initialization command sequence for power
-     * and frame control, default values after reset are used. */
+    /* COLMOD (3Ah): Interface Pixel Format */
+    command_params[0] = 0x55; /* 16 bit mode RGB & Control */
+    lcd_ll_write_cmd(dev, LCD_CMD_COLMOD, command_params, 1);
 
-    /* Memory access CTL */
+    /* controller specific initialization part called */
+    if (IS_USED(MODULE_ST7735) && (params->cntrl == ST77XX_CNTRL_ST7735)) {
+        DEBUG("ST7735 used ...\n");
+        st7735_init(dev, params);
+    }
+    else if (IS_USED(MODULE_ST7789) && (params->cntrl == ST77XX_CNTRL_ST7789)) {
+        DEBUG("ST7789 used ...\n");
+        st7789_init(dev, params);
+    }
+    else if (IS_USED(MODULE_ST7735) && (params->cntrl == ST77XX_CNTRL_ST7735)) {
+        DEBUG("ST7735 used ...\n");
+        st7735_init(dev, params);
+    }
+
+#if 0 /* no need to write reset defaults, just for documentation purpose */
+
+    /* GAMSET (26h): Gamma Set (== reset defaults) */
+    command_params[0] = 0x01;
+    lcd_ll_write_cmd(dev, LCD_CMD_GAMSET, command_params, 1);
+
+    /* TEON (35h): Tearing Effect Line ON (== reset defaults) */
+    command_params[0] = 0x00;   /* TEM=0 (only V-Blanking) */
+    lcd_ll_write_cmd(dev, LCD_CMD_VCOMS, command_params, 1);
+
+#endif /* no need to write reset defaults, just for documentation purpose */
+
+    /* MADCTL (36h): Memory Data Access Control */
     command_params[0] = dev->params->rotation;
     command_params[0] |= dev->params->rgb ? 0 : LCD_MADCTL_BGR;
     lcd_ll_write_cmd(dev, LCD_CMD_MADCTL, command_params, 1);
 
-    /* Pixel format */
-    command_params[0] = 0x55; /* 16 bit mode */
-    lcd_ll_write_cmd(dev, LCD_CMD_PIXSET, command_params, 1);
-
-    command_params[0] = 0x01;
-    lcd_ll_write_cmd(dev, LCD_CMD_GAMSET, command_params, 1);
-
-    /* Gamma correction */
-    {
-        static const uint8_t gamma_pos[] = {
-            0xf0, 0x09, 0x0b, 0x06, 0x04, 0x15, 0x2f,
-            0x54, 0x42, 0x3c, 0x17, 0x14, 0x18, 0x1b,
-        };
-        lcd_ll_write_cmd(dev, LCD_CMD_PGAMCTRL, gamma_pos,
-                         sizeof(gamma_pos));
-    }
-    {
-        static const uint8_t gamma_neg[] = {
-            0xe0, 0x09, 0x0b, 0x06, 0x04, 0x03, 0x2b,
-            0x43, 0x42, 0x3b, 0x16, 0x14, 0x17, 0x1b
-        };
-        lcd_ll_write_cmd(dev, LCD_CMD_NGAMCTRL, gamma_neg,
-                         sizeof(gamma_neg));
-    }
-
+    /* enable Inversion if configured, reset default is off */
     if (dev->params->inverted) {
+        /* INVON (21h): Display Inversion On */
         lcd_ll_write_cmd(dev, LCD_CMD_DINVON, NULL, 0);
     }
-    /* Sleep out (turn off sleep mode) */
-    lcd_ll_write_cmd(dev, LCD_CMD_SLPOUT, NULL, 0);
 
     /* Normal display mode on */
     lcd_ll_write_cmd(dev, LCD_CMD_NORON, NULL, 0);
