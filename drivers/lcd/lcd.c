@@ -372,6 +372,15 @@ int lcd_init(lcd_t *dev, const lcd_params_t *params)
     }
     ztimer_sleep(ZTIMER_MSEC, 120);
 
+#if IS_USED(MODULE_LCD_INIT_SEQUENCE)
+    if (dev->params->init_seq && dev->params->init_seq_len) {
+        lcd_write_cmd_sequence(dev,
+                               dev->params->init_seq,
+                               dev->params->init_seq_len);
+        return 0;
+    }
+#endif
+
     /* controller-specific init function has to be defined */
     assert(dev->driver->init);
     return dev->driver->init(dev, params);

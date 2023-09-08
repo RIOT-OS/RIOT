@@ -150,7 +150,7 @@ typedef  struct {
                                      False when display is connected in BGR mode */
     bool inverted;              /**< Display works in inverted color mode */
     uint16_t lines;             /**< Number of lines, from 16 to the number of
-                                     lines supported by the driver IC in 8 line
+                                     lines supported by the controller in 8 line
                                      steps */
     uint16_t rgb_channels;      /**< Display rgb channels */
     uint8_t rotation;           /**< Display rotation mode */
@@ -161,6 +161,13 @@ typedef  struct {
                                      specific driver supports multiple
                                      controller variants */
 #endif
+#if MODULE_LCD_INIT_SEQUENCE || DOXYGEN
+    const uint8_t *init_seq;    /**< Init command sequence that is executed if
+                                     not NULL in @ref lcd_init instead of the
+                                     controller-specific driver init function
+                                     @ref lcd_driver_t::init */
+    size_t init_seq_len;        /**< Init sequence length */
+#endif /* MODULE_LCD_INIT_SEQUENCE */
 } lcd_params_t;
 
 /**
@@ -303,6 +310,12 @@ void lcd_ll_set_area(lcd_t *dev, uint16_t x1, uint16_t x2, uint16_t y1, uint16_t
  */
 /**
  * @brief   Setup an LCD display device
+ *
+ * Initializes the controller interface and performs the initialization
+ * of the controller. For the latter either the controller-specific @ref
+ * lcd_driver_t::init function is called or the @ref lcd_params_t::init_seq
+ * is used if defined. For details about the format of the command sequence
+ * in @ref lcd_params_t::init_seq, see @ref lcd_write_cmd_sequence.
  *
  * @param[in]   dev     device descriptor
  * @param[in]   params  parameters for device initialization
