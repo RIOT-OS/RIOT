@@ -16,6 +16,12 @@ config MODULE_LCD_MULTI_CNTRL
     help
         The controller-specific driver supports multiple controller variants.
 
+config MODULE_LCD_INIT_SEQUENCE
+    bool "Enable initalization sequence"
+    help
+        Enable this option to be able to define an initialization command
+        sequence in the display parameter set in the map definition.
+
 config MODULE_LCD_SPI
     bool
     default y if !MODULE_LCD_PARALLEL && !MODULE_LCD_PARALLEL_16BIT
