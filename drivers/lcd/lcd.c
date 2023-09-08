@@ -385,7 +385,41 @@ void lcd_write_cmd(lcd_t *dev, uint8_t cmd, const uint8_t *data,
     lcd_ll_release(dev);
 }
 
-void lcd_read_cmd(lcd_t *dev, uint8_t cmd, uint8_t *data, size_t len)
+void lcd_write_cmd_sequence(const lcd_t *dev, const uint8_t *seq, size_t seq_len)
+{
+    assert(seq_len > 0);
+    assert(seq);
+
+    DEBUG("[%s] %p %u\n", __func__, (void *)seq, seq_len);
+
+    lcd_ll_acquire(dev);
+
+    size_t idx = 0;
+    while (idx < (seq_len - 1)) {
+        uint8_t cmd = seq[idx++];
+        uint8_t num = seq[idx++];
+
+        if (cmd == LCD_DELAY) {
+            /* in case of delay command, the number of parameters represents the
+             * delay in ms */
+            ztimer_sleep(ZTIMER_MSEC, num);
+            continue;
+        }
+
+        if ((idx + num) > seq_len) {
+            /* command sequence is inconsistent, number of remaining bytes does
+             * not match the specified number of parameters */
+            assert(false);
+        }
+
+        lcd_ll_write_cmd(dev, cmd, seq + idx, num);
+        idx += num;
+    }
+
+    lcd_ll_release(dev);
+}
+
+void lcd_read_cmd(const lcd_t *dev, uint8_t cmd, uint8_t *data, size_t len)
 {
     lcd_ll_acquire(dev);
     lcd_ll_read_cmd(dev, cmd, data, len);

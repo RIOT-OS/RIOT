@@ -357,6 +357,66 @@ void lcd_write_cmd(lcd_t *dev, uint8_t cmd, const uint8_t *data,
                    size_t len);
 
 /**
+ * @brief   Raw write command sequence
+ *
+ * The LCD driver allows to write a sequence of commands to the display
+ * controller defined as a sequence of CLP tuples (command, length, parameter).
+ * This can be useful, for example
+ * - to send an initialization sequence to a controller that is not supported
+ *   by a controller-specific driver (see also @ref lcd_params_t::init_seq
+ *   and @ref lcd_init) or
+ * - to write specific configuration parameters that are not covered by the
+ *   controller-specific driver.
+ *
+ * The format of a CLP tuple is:
+ * - one byte the command index
+ * - one byte the length of the following parameters, i.e. the number of bytes
+ * representing the parameters for the command. If the command has no
+ * parameters, the length is 0.
+ * - n bytes the parameters of the command.
+ *
+ * If @ref LCD_DELAY is used as the command index, the command is not sent
+ * to the display controller, but a delay is inserted, where the length
+ * in the CLP tuple then defines the delay in milliseconds.
+ *
+ * The following example shows the initialization sequence for a display
+ * with a ST7789:
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+ * static const uint8_t st7789_default_init[] =  {
+ *     LCD_CMD_SWRESET, 0,              // Soft Reset
+ *     LCD_DELAY, 120,                  // Soft Reset needs 120 ms if in Sleep In mode
+ *     LCD_CMD_SLPOUT, 0,               // Sleep Out leave Sleep In state after reset
+ *     LCD_DELAY, 120,                  // Sleep Out needs 120 ms
+ *     LCD_CMD_VCOMS, 1, 0x20,          // VCOM=0.9V
+ *     LCD_CMD_VRHS, 1, 0x0b,           // VRH=4.1V
+ *     LCD_CMD_VDVS, 1, 0x20,           // VDV=0V
+ *     LCD_CMD_VCMOFSET, 1, 0x20,       // VCOMFS=0V
+ *     LCD_CMD_PWCTRL1X, 2, 0xa4, 0xa1, // AVDD=6.8V, AVCL=4.8V, VDS=2.3
+ *     LCD_CMD_PGAMCTRL, 14,            // Positive Voltage Gamma Control
+ *         0xd0, 0x08, 0x11, 0x08, 0x0c, 0x15, 0x39,
+ *         0x33, 0x50, 0x36, 0x13, 0x14, 0x29, 0x2d,
+ *     LCD_CMD_NGAMCTRL, 14,            // Negative Voltage Gamma Control
+ *         0xd0, 0x08, 0x10, 0x08, 0x06, 0x06, 0x39,
+ *         0x44, 0x51, 0x0b, 0x16, 0x14, 0x2f, 0x32,
+ *     LCD_CMD_COLMOD, 1, 0x055,        // 16 bit mode RGB & Control interface pixel format
+ *     LCD_CMD_MADCTL, 1, LCD_MADCTL_MV | LCD_MADCTL_MX,
+ *     LCD_CMD_DINVON, 0,               // enable Inversion, reset default is off
+ *     LCD_CMD_SLPOUT, 0,               // Sleep out (turn off sleep mode)
+ *     LCD_CMD_NORON, 0,                // Normal display mode on
+ *     LCD_DELAY, 1,
+ *     LCD_CMD_DISPON, 0,               // Display on
+ * };
+ *
+ * lcd_write_cmd_sequence(&dev, st7789_default_init, sizeof(st7789_default_init));
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * @param[in]   dev     device descriptor
+ * @param[in]   seq     command sequence of CLP tuples as a sequence of bytes
+ * @param[in]   seq_len length of the command sequence
+ */
+void lcd_write_cmd_sequence(const lcd_t *dev, const uint8_t *seq, size_t seq_len);
+
+/**
  * @brief   Raw read command
  *
  * @note Very often the SPI MISO signal of the serial interface or the RDX
