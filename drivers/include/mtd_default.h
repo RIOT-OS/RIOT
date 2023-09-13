@@ -33,6 +33,10 @@ extern "C" {
 #include "mtd_emulated.h"
 #endif
 
+#if defined(MODULE_MTD_FLASHPAGE)
+#include "mtd_flashpage.h"
+#endif
+
 #if !defined(MTD_NUMOF) && !DOXYGEN
 
 #if defined(MTD_3)
