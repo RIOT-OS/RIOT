@@ -122,10 +122,15 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
     }
 
     /* register all_RPL_nodes multicast address */
-    gnrc_netif_ipv6_group_join_internal(gnrc_netif_get_by_pid(if_pid),
-                                        &ipv6_addr_all_rpl_nodes);
+    gnrc_netif_t *netif = gnrc_netif_get_by_pid(if_pid);
+    gnrc_netif_ipv6_group_join_internal(netif, &ipv6_addr_all_rpl_nodes);
 
+    /* send DODAG Information Solicitation */
     gnrc_rpl_send_DIS(NULL, (ipv6_addr_t *) &ipv6_addr_all_rpl_nodes, NULL, 0);
+
+    /* RPL enables routing, start advertising ourself as a router */
+    gnrc_ipv6_nib_change_rtr_adv_iface(netif, true);
+
     return gnrc_rpl_pid;
 }
 
