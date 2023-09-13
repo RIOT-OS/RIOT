@@ -150,6 +150,12 @@ int gnrc_icmpv6_echo_send(const gnrc_netif_t *netif, const ipv6_addr_t *addr,
     ipv6_hdr_t *ipv6;
     uint8_t *databuf;
 
+    /* max IPv6 payload 65535 minus 8 bytes of icmp header = 65527 */
+    if (len > (UINT16_MAX - sizeof(icmpv6_hdr_t))) {
+        DEBUG("error: wrong icmpv6 packet length\n");
+        return -EINVAL;
+    }
+
     pkt = gnrc_icmpv6_echo_build(ICMPV6_ECHO_REQ, id, seq, NULL, len);
     if (pkt == NULL) {
         DEBUG("error: packet buffer full\n");
