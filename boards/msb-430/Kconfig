@@ -20,4 +20,8 @@ config BOARD_MSB_430
 
     select HAVE_SHT11
 
+config ERROR_MODULES_CONFLICT
+    default "The msb-430 uses the same USART for UART and SPI" if MODULE_PERIPH_SPI && MODULE_PERIPH_UART
+    depends on BOARD_MSB_430
+
 source "$(RIOTBOARD)/common/msb-430/Kconfig"
