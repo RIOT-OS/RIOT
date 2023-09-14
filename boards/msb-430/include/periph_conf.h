@@ -80,8 +80,8 @@ static const msp430_clock_params_t clock_params = {
 #define SPI_NUMOF           (1U)
 
 /* SPI configuration */
-#define SPI_BASE            (&USART_0)
-#define SPI_SFR             (&USART_0_SFR)
+#define SPI_BASE            (&USART_1)
+#define SPI_SFR             (&USART_1_SFR)
 #define SPI_IE_RX_BIT       (1 << 6)
 #define SPI_IE_TX_BIT       (1 << 7)
 #define SPI_ME_BIT          (1 << 6)
