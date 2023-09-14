@@ -7,6 +7,10 @@ ifneq (,$(filter sdmmc_mmc,$(USEMODULE)))
   FEATURES_REQUIRED += periph_sdmmc_mmc
 endif
 
+ifneq (,$(filter sdmmc_sdhc,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_sdmmc_sdhc
+endif
+
 ifeq (,$(filter ztimer_usec,$(USEMODULE)))
   # enable ztimer_msec backend if ztimer_usec is not enabled
   USEMODULE += ztimer_msec

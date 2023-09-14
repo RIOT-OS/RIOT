@@ -514,6 +514,13 @@ config HAS_PERIPH_SDMMC_MMC
         Indicates that the SDIO/SD/MMC peripheral supports MMC/eMMCs. This
         feature shall be provided by the MCU.
 
+config HAS_PERIPH_SDMMC_SDHC
+    bool
+    help
+        Indicates that the SDIO/SD/MMC peripheral is compliant with the
+        SD Host Controller Specification. This feature shall
+        be provided by the MCU.
+
 config HAS_PERIPH_SPI
     bool
     help

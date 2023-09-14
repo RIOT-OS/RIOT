@@ -19,4 +19,13 @@ config MODULE_SDMMC_MMC
     help
         Say y to support MMCs/eMMCs.
 
+config MODULE_SDMMC_SDHC
+    bool
+    depends on HAS_PERIPH_SDMMC_SDHC
+    default y
+    help
+        SDHC driver is used as low-level SDIO/SD/MMC implementation for
+        peripherals that are compliant with SD Host Controller Simplified
+        Specification, Version 3.00.
+
 endif # MODULE_SDMMC

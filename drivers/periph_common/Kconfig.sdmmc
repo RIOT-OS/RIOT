@@ -73,4 +73,18 @@ config MODULE_PERIPH_INIT_SDMMC_AUTO_CMD12
     depends on MODULE_PERIPH_SDMMC_AUTO_CMD12
     default y if MODULE_PERIPH_INIT
 
+config MODULE_PERIPH_SDMMC_SDHC
+    bool
+    depends on HAS_PERIPH_SDMMC_SDHC
+    default y
+    help
+        If the SDIO/SD/MMC peripheral is compliant with the SD Host Controller
+        Specification, the low-level SD Host Controller (SDHC) peripheral
+        driver is used.
+
+config MODULE_PERIPH_INIT_SDMMC_SDHC
+    bool
+    depends on MODULE_PERIPH_SDMMC_SDHC
+    default y if MODULE_PERIPH_INIT
+
 endif # MODULE_PERIPH_SDMMC

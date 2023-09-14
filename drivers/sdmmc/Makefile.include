@@ -1,1 +1,2 @@
 PSEUDOMODULES += sdmmc_mmc
+PSEUDOMODULES += sdmmc_sdhc
