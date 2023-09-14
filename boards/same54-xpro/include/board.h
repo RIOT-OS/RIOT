@@ -76,6 +76,8 @@ extern mtd_dev_t *mtd0, *mtd1, *mtd2;
 #define MTD_1       mtd1
 #define MTD_2       mtd2
 #define MTD_NUMOF   3
+
+#define CONFIG_SDMMC_GENERIC_MTD_OFFSET     2   /**< mtd2 is used for SD Card */
 /** @} */
 
 /**
