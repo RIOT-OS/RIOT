@@ -42,6 +42,10 @@
 
 #endif /* ENABLE_DEBUG */
 
+#if !IS_USED(MODULE_PCF8574) && !IS_USED(MODULE_PCF8574A) && !IS_USED(MODULE_PCF8575)
+#error "Please provide a list of pcf857x variants used by the application (pcf8574, pcf8574a or pcf8575)"
+#endif
+
 #if IS_USED(MODULE_PCF857X_IRQ_LOW)
 #define PCF857X_EVENT_PRIO EVENT_PRIO_LOWEST
 #elif IS_USED(MODULE_PCF857X_IRQ_MEDIUM)
