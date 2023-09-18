@@ -92,6 +92,10 @@ ifneq (,$(filter esp_wifi,$(USEMODULE)))
   USEMODULE += netdev_eth
 endif
 
+ifneq (,$(filter esp_wifi_csi,$(USEMODULE)))
+  USEMODULE += esp_wifi
+endif
+
 ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
   USEMODULE += netdev_legacy_api
   USEMODULE += netopt
