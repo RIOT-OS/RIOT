@@ -409,9 +409,9 @@ void lcd_write_cmd_sequence(const lcd_t *dev, const uint8_t *seq, size_t seq_len
         uint8_t num = seq[idx++];
 
         if (cmd == LCD_DELAY) {
-            /* in case of delay command, the number of parameters represents the
-             * delay in ms */
-            ztimer_sleep(ZTIMER_MSEC, num);
+            /* in case of delay command, the number of parameters is 1 */
+            assert(1);
+            ztimer_sleep(ZTIMER_MSEC, seq[idx++]);
             continue;
         }
 

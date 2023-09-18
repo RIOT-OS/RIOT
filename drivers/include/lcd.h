@@ -389,17 +389,17 @@ void lcd_write_cmd(lcd_t *dev, uint8_t cmd, const uint8_t *data,
  * - n bytes the parameters of the command.
  *
  * If @ref LCD_DELAY is used as the command index, the command is not sent
- * to the display controller, but a delay is inserted, where the length
- * in the CLP tuple then defines the delay in milliseconds.
+ * to the display controller, but a delay is inserted, where the length in the
+ * CLP tuple must be 1 and the value then defines the delay in milliseconds.
  *
  * The following example shows the initialization sequence for a display
  * with a ST7789:
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
  * static const uint8_t st7789_default_init[] =  {
  *     LCD_CMD_SWRESET, 0,              // Soft Reset
- *     LCD_DELAY, 120,                  // Soft Reset needs 120 ms if in Sleep In mode
+ *     LCD_DELAY, 1, 120,               // Soft Reset needs 120 ms if in Sleep In mode
  *     LCD_CMD_SLPOUT, 0,               // Sleep Out leave Sleep In state after reset
- *     LCD_DELAY, 120,                  // Sleep Out needs 120 ms
+ *     LCD_DELAY, 1, 120,               // Sleep Out needs 120 ms
  *     LCD_CMD_VCOMS, 1, 0x20,          // VCOM=0.9V
  *     LCD_CMD_VRHS, 1, 0x0b,           // VRH=4.1V
  *     LCD_CMD_VDVS, 1, 0x20,           // VDV=0V
@@ -416,7 +416,7 @@ void lcd_write_cmd(lcd_t *dev, uint8_t cmd, const uint8_t *data,
  *     LCD_CMD_DINVON, 0,               // enable Inversion, reset default is off
  *     LCD_CMD_SLPOUT, 0,               // Sleep out (turn off sleep mode)
  *     LCD_CMD_NORON, 0,                // Normal display mode on
- *     LCD_DELAY, 1,
+ *     LCD_DELAY, 1, 1,
  *     LCD_CMD_DISPON, 0,               // Display on
  * };
  *
