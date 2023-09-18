@@ -706,6 +706,7 @@ ifneq (,$(filter wifi_configuration,$(USEMODULE)))
   USEMODULE += wifi
   USEMODULE += configuration
   USEMODULE += fmt
+  USEPKG += nanocbor
 endif
 
 include $(RIOTBASE)/sys/test_utils/Makefile.dep
