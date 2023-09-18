@@ -1,0 +1,6 @@
+# headers provided by the port
+#INCLUDES += -I$(RIOTPKG)/connectedhomeip/include
+
+# headers provided by the package
+INCLUDES += -I$(PKGDIRBASE)/connectedhomeip/src
+INCLUDES += -I$(PKGDIRBASE)/connectedhomeip/src/include
