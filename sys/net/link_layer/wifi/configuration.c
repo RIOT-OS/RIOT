@@ -425,14 +425,11 @@ static int _wifi_ap_conf_encode(const conf_handler_t *handler,
     memset(_wifi_ap_buf, 0, sizeof(_wifi_ap_buf));
 
     if (key->offset >= 0) {
-        assert(!(key->offset % sizeof(wifi_conf_ap_t)));
-        unsigned index = key->offset / sizeof(wifi_conf_ap_t);
-        if (index >= ARRAY_SIZE(_wifi_conf_ap_table)) {
+        if ((unsigned)key->offset >= ARRAY_SIZE(_wifi_conf_ap_table)) {
             return -EINVAL;
         }
         /* encode one */
-        assert((uint8_t *)handler->data + key->offset == (void *)&_wifi_conf_ap_table[index]);
-        if (_wifi_ap_conf_encode_one(&_wifi_conf_ap_table[index], &enc) < 0) {
+        if (_wifi_ap_conf_encode_one(&_wifi_conf_ap_table[key->offset], &enc) < 0) {
             return -ENOMEM;
         }
     }
@@ -465,14 +462,11 @@ static int _wifi_ap_conf_encode_ssid(const conf_handler_t *handler,
     assert(enc_data);
     assert(enc_size);
     assert(key->offset >= 0);
-    assert(!(key->offset % sizeof(wifi_conf_ap_t)));
 
-    unsigned index = key->offset / sizeof(wifi_conf_ap_t);
-    if (index >= ARRAY_SIZE(_wifi_conf_ap_table)) {
+    if ((unsigned)key->offset >= ARRAY_SIZE(_wifi_conf_ap_table)) {
         return -EINVAL;
     }
-    const wifi_conf_ap_t *ap = &_wifi_conf_ap_table[index];
-    assert((uint8_t *)handler->data + key->offset == (void *)&ap->ssid);
+    const wifi_conf_ap_t *ap = &_wifi_conf_ap_table[key->offset];
     nanocbor_encoder_t enc;
     nanocbor_encoder_init(&enc, _wifi_ap_buf, sizeof(_wifi_ap_buf));
     memset(_wifi_ap_buf, 0, sizeof(_wifi_ap_buf));
@@ -494,14 +488,11 @@ static int _wifi_ap_conf_encode_sec(const conf_handler_t *handler,
     assert(enc_data);
     assert(enc_size);
     assert(key->offset >= 0);
-    assert(!(key->offset % sizeof(wifi_conf_ap_t)));
 
-    unsigned index = key->offset / sizeof(wifi_conf_ap_t);
-    if (index >= ARRAY_SIZE(_wifi_conf_ap_table)) {
+    if ((unsigned)key->offset >= ARRAY_SIZE(_wifi_conf_ap_table)) {
         return -EINVAL;
     }
-    const wifi_conf_ap_t *ap = &_wifi_conf_ap_table[index];
-    assert((uint8_t *)handler->data + key->offset == (void *)&ap->sec);
+    const wifi_conf_ap_t *ap = &_wifi_conf_ap_table[key->offset];
     nanocbor_encoder_t enc;
     nanocbor_encoder_init(&enc, _wifi_ap_buf, sizeof(_wifi_ap_buf));
     memset(_wifi_ap_buf, 0, sizeof(_wifi_ap_buf));
@@ -584,10 +575,7 @@ static int _decode_sec(nanocbor_value_t *dec_parent,
         ap->sec.wpa_enterprise.pwd[len] = '\0';
         ap->sec.sec = WIFI_SECURITY_MODE_WPA2_ENTERPRISE;
     }
-    else if (idx == WIFI_SECURITY_MODE_OPEN) {
-        ap->sec.sec = WIFI_SECURITY_MODE_OPEN;
-    }
-    else {
+    else if (idx != WIFI_SECURITY_MODE_OPEN) {
         return -EINVAL;
     }
     nanocbor_leave_container(dec_parent, &dec);
@@ -640,7 +628,6 @@ static int _wifi_ap_conf_decode(const conf_handler_t *handler,
 
     nanocbor_value_t dec;
     nanocbor_decoder_init(&dec, *dec_data, *dec_size);
-    memset(&_ap_table[0], 0, sizeof(_ap_table[0]));
     if (key->offset >= 0) {
         /* decode one */
         if (_wifi_ap_conf_decode_one(&_ap_table[0], &dec) < 0) {
@@ -657,12 +644,14 @@ static int _wifi_ap_conf_decode(const conf_handler_t *handler,
         }
         unsigned num = 0;
         while (!nanocbor_at_end(&dec_array)) {
-            if (num >= ARRAY_SIZE(_ap_table)) {
-                nanocbor_skip(&dec_array);
-            }
-            if (_wifi_ap_conf_decode_one(&_ap_table[num], &dec_array)) {
+            wifi_conf_ap_t ap = { 0 };
+            if (_wifi_ap_conf_decode_one(&ap, &dec_array)) {
                 return -EINVAL;
             }
+            if (num < ARRAY_SIZE(_ap_table)) {
+                return -ENOMEM;
+            }
+            memcpy(&_ap_table[num], &ap, sizeof(ap));
         }
         nanocbor_leave_container(&dec, &dec_array);
 
@@ -683,7 +672,6 @@ static int _wifi_ap_conf_decode_ssid(const conf_handler_t *handler,
     assert(dec_data);
     assert(dec_size);
     assert(key->offset >= 0);
-    assert(!(key->offset % sizeof(wifi_conf_ap_t)));
 
     if (*dec_data == NULL) {
         *dec_data = _wifi_ap_buf;
@@ -693,12 +681,13 @@ static int _wifi_ap_conf_decode_ssid(const conf_handler_t *handler,
 
     nanocbor_value_t dec;
     nanocbor_decoder_init(&dec, *dec_data, *dec_size);
-    if (_decode_ssid(&dec, &_ap_table[0]) < 0) {
+    wifi_conf_ap_t *ap = &_ap_table[key->offset];
+    if (_decode_ssid(&dec, ap) < 0) {
         return -EINVAL;
     }
 
-    *dec_data = &_ap_table[0].ssid;
-    *dec_size = sizeof(_ap_table[0].ssid);
+    *dec_data = &_ap_table[key->offset].ssid;
+    *dec_size = sizeof(_ap_table[key->offset].ssid);
     return 0;
 }
 
@@ -720,12 +709,13 @@ static int _wifi_ap_conf_decode_sec(const conf_handler_t *handler,
 
     nanocbor_value_t dec;
     nanocbor_decoder_init(&dec, *dec_data, *dec_size);
-    if (_decode_sec(&dec, &_ap_table[0])) {
+    wifi_conf_ap_t *ap = &_ap_table[key->offset];
+    if (_decode_sec(&dec, ap)) {
         return -ENOMEM;
     }
 
-    *dec_data = &_ap_table[0].sec;
-    *dec_size = sizeof(_ap_table[0].sec);
+    *dec_data = &_ap_table[key->offset].sec;
+    *dec_size = sizeof(_ap_table[key->offset].sec);
     return 0;
 }
 
@@ -844,25 +834,17 @@ int wifi_configuration_ap_add(const wifi_conf_ap_t *ap, bool be_sync)
             size = sizeof(*ap);
             key_buf.buf[8] = '/';
             ret = configuration_set(&key_buf, ap, &size);
-            if (be_sync) {
-                ret = configuration_export(&key_buf);
-            }
             break;
         }
     }
-    if (ret == -ENOENT) {
-        if (new < 0) {
-            ret = -ENOBUFS;
-        }
-        else {
-            key_buf.buf[8] = '/';
-            int len = fmt_u32_dec(&key_buf.buf[9], new);
-            key_buf.buf[9 + len] = '\0';
-            size_t size = sizeof(*ap);
-            if (!(ret = configuration_set(&key_buf, ap, &size))) {
-                if (be_sync) {
-                    ret = configuration_export(&key_buf);
-                }
+    if (ret == -ENOENT && new >= 0) {
+        key_buf.buf[8] = '/';
+        int len = fmt_u32_dec(&key_buf.buf[9], new);
+        key_buf.buf[9 + len] = '\0';
+        size_t size = sizeof(*ap);
+        if (!(ret = configuration_set(&key_buf, ap, &size))) {
+            if (be_sync) {
+                ret = configuration_export(&key_buf);
             }
         }
     }
