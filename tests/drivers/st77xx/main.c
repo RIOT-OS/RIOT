@@ -41,9 +41,9 @@
 
 static const uint8_t st7735_default_init[] =  {
     LCD_CMD_SWRESET, 0,              /* Soft Reset */
-    LCD_DELAY, 120,                  /* Soft Reset needs 120 ms if in Sleep In mode */
+    LCD_DELAY, 1, 120,               /* Soft Reset needs 120 ms if in Sleep In mode */
     LCD_CMD_SLPOUT, 0,               /* Sleep Out leave Sleep In state after reset */
-    LCD_DELAY, 120,                  /* Sleep Out needs 120 ms */
+    LCD_DELAY, 1, 120,               /* Sleep Out needs 120 ms */
     LCD_CMD_PWCTRL1, 3,              /* Power Control 1 */
         0x82, 0x02, 0x84,            /* AVDD=4.9V, GVDD=4.6V, GVCL=-4.6V, AUTO mode */
     LCD_CMD_PWCTRL2, 1, 0xc5,        /* VGH=3*AVDD, VGL=-10V */
@@ -74,7 +74,7 @@ static const uint8_t st7735_default_init[] =  {
 #endif
     LCD_CMD_SLPOUT, 0,               /* Sleep out (turn off sleep mode) */
     LCD_CMD_NORON, 0,                /* Normal display mode on */
-    LCD_DELAY, 1,
+    LCD_DELAY, 1, 1,
     LCD_CMD_DISPON, 0,               /* Display on */
 };
 
@@ -87,9 +87,9 @@ size_t seq_len = ARRAY_SIZE(st7735_default_init);
 
 static const uint8_t st7789_default_init[] =  {
     LCD_CMD_SWRESET, 0,              /* Soft Reset */
-    LCD_DELAY, 120,                  /* Soft Reset needs 120 ms if in Sleep In mode */
+    LCD_DELAY, 1, 120,               /* Soft Reset needs 120 ms if in Sleep In mode */
     LCD_CMD_SLPOUT, 0,               /* Sleep Out leave Sleep In state after reset */
-    LCD_DELAY, 120,                  /* Sleep Out needs 120 ms */
+    LCD_DELAY, 1, 120,               /* Sleep Out needs 120 ms */
     LCD_CMD_VCOMS, 1, 0x20,          /* VCOM=0.9V */
     LCD_CMD_VRHS, 1, 0x0b,           /* VRH=4.1V */
     LCD_CMD_VDVS, 1, 0x20,           /* VDV=0V */
@@ -108,7 +108,7 @@ static const uint8_t st7789_default_init[] =  {
 #endif
     LCD_CMD_SLPOUT, 0,               /* Sleep out (turn off sleep mode) */
     LCD_CMD_NORON, 0,                /* Normal display mode on */
-    LCD_DELAY, 1,
+    LCD_DELAY, 1, 1,
     LCD_CMD_DISPON, 0,               /* Display on */
 };
 
