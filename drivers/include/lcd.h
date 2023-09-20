@@ -28,9 +28,6 @@
  * `lcd_parallel` and `lcd_parallel_16bit` modules are enabled at the same time.
  * In this case, please refer to the notes in @ref lcd_params_t.
  *
- * @warning MCU 8080 16-bit parallel interface (module `lcd_parallel_16bit`) is
- *          not supported yet.
- *
  * The device requires colors to be send in big endian RGB-565 format. The
  * @ref CONFIG_LCD_LE_MODE compile time option can switch this, but only use this
  * when strictly necessary. This option will slow down the driver as it
@@ -85,6 +82,21 @@ extern "C" {
 #define LCD_MADCTL_MH           0x04    /**< Horizontal refresh direction */
 /** @} */
 
+#if MODULE_LCD_PARALLEL || DOXYGEN
+/**
+ * @brief   Display interface modi
+ *
+ * This enumeration is only needed if the MCU 8080 8-/16-bit interfaces are
+ * enabled by `lcd_parallel` or `lcd_parallel_16bit`. Otherwise the serial
+ * SPI interface is implicitly assumed.
+ */
+typedef enum {
+    LCD_IF_SPI,             /**< SPI serial interface mode */
+    LCD_IF_PARALLEL_8BIT,   /**< MCU 8080 8-bit parallel interface mode */
+    LCD_IF_PARALLEL_16BIT,  /**< MCU 8080 16-bit parallel interface mode */
+} lcd_if_mode_t;
+#endif
+
 /**
  * @brief   Device initialization parameters
  *
@@ -106,6 +118,7 @@ typedef  struct {
     spi_mode_t spi_mode;        /**< SPI mode */
 #endif
 #if MODULE_LCD_PARALLEL || DOXYGEN
+    lcd_if_mode_t mode;         /**< LCD driver interface mode */
     /* Interface parameters used for MCU 8080 8-bit parallel interface */
     gpio_t wrx_pin;             /**< pin connected to the WRITE ENABLE line */
     gpio_t rdx_pin;             /**< pin connected to the READ ENABLE line */
@@ -169,6 +182,9 @@ typedef struct {
 #if MODULE_LCD_PARALLEL || DOXYGEN
     mutex_t lock;                   /**< Mutex used to lock the device in
                                          MCU 8080 parallel interface mode */
+#endif
+#if MODULE_LCD_PARALLEL_16BIT || DOXYGEN
+    bool word_access;               /**< indicates that a word access is active */
 #endif
 } lcd_t;
 

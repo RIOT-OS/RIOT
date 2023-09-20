@@ -35,7 +35,7 @@ extern "C" {
  */
 #define LCD_CMD_SWRESET         0x01    /**< Software reset */
 #define LCD_CMD_RDDIDIF         0x04    /**< Read display ID */
-#define LCD_CMD_SPLIN           0x10    /**< Enter sleep mode */
+#define LCD_CMD_SLPIN           0x10    /**< Enter sleep mode */
 #define LCD_CMD_SLPOUT          0x11    /**< Sleep out */
 #define LCD_CMD_NORON           0x13    /**< Normal display mode on */
 #define LCD_CMD_DINVOFF         0x20    /**< Display inversion off */
@@ -55,6 +55,8 @@ extern "C" {
 #define LCD_CMD_TEON            0x35    /**< Tearing Effect Line On */
 #define LCD_CMD_COLMOD          0x3A    /**< Interface Pixel Format Set */
 #define LCD_CMD_PIXSET          0x3A    /**< COLMOD: Pixel Format Set */
+#define LCD_CMD_RAMWRC          0x3c    /**< Memory Write Continue */
+#define LCD_CMD_RAMRDC          0x3e    /**< Memory Read Continue */
 #define LCD_CMD_WRDISBV         0x51    /**< Write Display Brightness */
 #define LCD_CMD_WRCTRLD         0x53    /**< Write Control Display */
 #define LCD_CMD_RDCTRLD         0x54    /**< Read Control Display */
