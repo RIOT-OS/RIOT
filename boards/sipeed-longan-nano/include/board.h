@@ -21,6 +21,7 @@
 #define BOARD_H
 
 #include "board_common.h"
+#include "mtd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -62,13 +63,24 @@ extern "C" {
 #define LED_BLUE_PIN        LED2_PIN    /**< LED2 is blue */
 /** @} */
 
-#if defined(MODULE_SDCARD_SPI)
+/**
+ * @name MTD configuration
+ * @{
+ */
+#define MTD_0 mtd0          /**< MTD device for SD Card */
+extern mtd_dev_t *mtd0;     /**< MTD device pointer for SD Card */
+/** @} */
+
+/**
+ * @name   SD-Card interface configuration
+ * @{
+ */
 #define SDCARD_SPI_PARAM_SPI         SPI_DEV(0)
 #define SDCARD_SPI_PARAM_CS          GPIO_PIN(PORT_B, 12)
 #define SDCARD_SPI_PARAM_CLK         GPIO_PIN(PORT_B, 13)
 #define SDCARD_SPI_PARAM_MISO        GPIO_PIN(PORT_B, 14)
 #define SDCARD_SPI_PARAM_MOSI        GPIO_PIN(PORT_B, 15)
-#endif
+/** @} */
 
 #if defined(MODULE_ST77XX) && defined(BOARD_SIPEED_LONGAN_NANO_TFT)
 #define ST77XX_PARAM_SPI          SPI_DEV(1)            /**< SPI device */

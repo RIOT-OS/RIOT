@@ -20,6 +20,7 @@
 #define BOARD_H
 
 #include "board_common.h"
+#include "mtd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -80,6 +81,14 @@ extern "C" {
 #define SDCARD_SPI_PARAM_CLK         GPIO_PIN(0, 17)
 #define SDCARD_SPI_PARAM_MOSI        GPIO_PIN(0, 24)
 #define SDCARD_SPI_PARAM_MISO        GPIO_PIN(0, 20)
+/** @} */
+
+/**
+ * @name MTD configuration
+ * @{
+ */
+#define MTD_0 mtd0          /**< MTD device for SD Card */
+extern mtd_dev_t *mtd0;     /**< MTD device pointer for SD Card */
 /** @} */
 
 #ifdef __cplusplus

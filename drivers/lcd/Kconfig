@@ -7,16 +7,56 @@
 
 config MODULE_LCD
     bool "LCD display driver"
-    depends on HAS_PERIPH_SPI
     depends on HAS_PERIPH_GPIO
     depends on TEST_KCONFIG
-    select MODULE_PERIPH_SPI
     select MODULE_PERIPH_GPIO
 
 config MODULE_LCD_MULTI_CNTRL
     bool
     help
         The controller-specific driver supports multiple controller variants.
+
+config MODULE_LCD_SPI
+    bool
+    default y if !MODULE_LCD_PARALLEL && !MODULE_LCD_PARALLEL_16BIT
+    default y if HAVE_LCD_SPI
+    depends on HAS_PERIPH_SPI
+    depends on MODULE_LCD
+    select MODULE_PERIPH_SPI
+    help
+        SPI serial interface is used
+
+config MODULE_LCD_PARALLEL
+    bool
+    default y if HAVE_LCD_PARALLEL || HAVE_LCD_PARALLEL_16BIT
+    depends on MODULE_LCD
+    help
+        MCU 8080 8-/16-bit parallel interface is used
+
+config MODULE_LCD_PARALLEL_16BIT
+    bool
+    default y if HAVE_LCD_PARALLEL_16BIT
+    depends on MODULE_LCD
+    help
+        MCU 8080 16-bit paralell interface is used
+
+config HAVE_LCD_SPI
+    bool
+    help
+        Indicates that a display with MCU 8080 8-/16-bit parallel interface
+        is present
+
+config HAVE_LCD_PARALLEL
+    bool
+    help
+        Indicates that a display with MCU 8080 8-/16-bit parallel interface
+        is present
+
+config HAVE_LCD_PARALLEL_16BIT
+    bool
+    help
+        Indicates that a display with MCU 8080 16-bit parallel interface
+        is present
 
 menuconfig KCONFIG_USEMODULE_LCD
     bool "Configure LCD driver"

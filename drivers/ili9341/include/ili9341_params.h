@@ -71,13 +71,45 @@ extern "C" {
 #define ILI9341_PARAM_OFFSET_Y          0               /**< Vertival offset */
 #endif
 
+#if MODULE_LCD_SPI || DOXYGEN
+/** Default interface params if SPI serial interface is enabled */
+#define ILI9341_PARAM_IF_SPI        .spi = ILI9341_PARAM_SPI, \
+                                    .spi_clk = ILI9341_PARAM_SPI_CLK, \
+                                    .spi_mode = ILI9341_PARAM_SPI_MODE,
+#else
+#define ILI9341_PARAM_IF_SPI
+#endif
+
+#if MODULE_LCD_PARALLEL || DOXYGEN
+/** Default interface params if MCU 8080 8-bit parallel interface is enabled */
+#define ILI9341_PARAM_IF_PAR        .d0_pin = ILI9341_PARAM_D0, \
+                                    .d1_pin = ILI9341_PARAM_D1, \
+                                    .d2_pin = ILI9341_PARAM_D2, \
+                                    .d3_pin = ILI9341_PARAM_D3, \
+                                    .d4_pin = ILI9341_PARAM_D4, \
+                                    .d5_pin = ILI9341_PARAM_D5, \
+                                    .d6_pin = ILI9341_PARAM_D6, \
+                                    .d7_pin = ILI9341_PARAM_D7, \
+                                    .wrx_pin = ILI9341_PARAM_WRX, \
+                                    .rdx_pin = ILI9341_PARAM_RDX,
+#else
+#define ILI9341_PARAM_IF_PAR
+#endif
+
 /**
  * @brief   Default params
+ *
+ * @note The default parameter set defined here can only be used if a single
+ *       ILI9341 display and only one interface mode is used. If multiple
+ *       ILI9341 displays are used or if multiple interface modes are enabled
+ *       by the modules `lcd_spi`, lcd_parallel and `lcd_parallel_16bit`, a user
+ *       defined parameter set @ref ILI9341_PARAMS has to be defined. In the
+ *       latter case @ref lcd_params_t::spi must then be set to @ref SPI_UNDEF
+ *       for displays with MCU 8080 8-/16-bit parallel interfaces.
  */
 #ifndef ILI9341_PARAMS
-#define ILI9341_PARAMS              { .spi = ILI9341_PARAM_SPI, \
-                                      .spi_clk = ILI9341_PARAM_SPI_CLK, \
-                                      .spi_mode = ILI9341_PARAM_SPI_MODE, \
+#define ILI9341_PARAMS              { ILI9341_PARAM_IF_SPI \
+                                      ILI9341_PARAM_IF_PAR \
                                       .cs_pin = ILI9341_PARAM_CS, \
                                       .dcx_pin = ILI9341_PARAM_DCX, \
                                       .rst_pin = ILI9341_PARAM_RST, \
@@ -123,7 +155,6 @@ static const uint8_t ili9341_screen_ids[] =
  * @brief   Define the number screens this display driver is attached to
  */
 #define ILI9341_SCREEN_NUMOF    ARRAY_SIZE(ili9341_screen_ids)
-
 
 #ifdef __cplusplus
 }
