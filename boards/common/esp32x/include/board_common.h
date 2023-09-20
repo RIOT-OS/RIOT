@@ -103,11 +103,15 @@ extern "C" {
 #define SPI_FLASH_DRIVE_START  0
 #endif
 
-/** Default MTD drive definition */
-#define MTD_0 mtd0
+#define MTD_0 mtd0          /**< Flash MTD device */
+extern mtd_dev_t *mtd0;     /**< Flash MTD device pointer */
 
-/** Pointer to the default MTD drive structure */
-extern mtd_dev_t *mtd0;
+#if MODULE_MTD_SDCARD_DEFAULT || DOXYGEN
+
+#define MTD_1 mtd1          /**< SD Card MTD device */
+extern mtd_dev_t *mtd1;     /**< SD Card MTD device pointer */
+
+#endif /* MODULE_MTD_SDCARD_DEFAULT || DOXYGEN */
 
 /**
  * @brief   MTD offset for SD Card interfaces
