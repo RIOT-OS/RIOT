@@ -69,9 +69,9 @@ static int _init(lcd_t *dev, const lcd_params_t *params)
         DEBUG("ST7789 used ...\n");
         st7789_init(dev, params);
     }
-    else if (IS_USED(MODULE_ST7735) && (params->cntrl == ST77XX_CNTRL_ST7735)) {
-        DEBUG("ST7735 used ...\n");
-        st7735_init(dev, params);
+    else if (IS_USED(MODULE_ST7796) && (params->cntrl == ST77XX_CNTRL_ST7796)) {
+        DEBUG("ST7796 used ...\n");
+        st7796_init(dev, params);
     }
 
 #if 0 /* no need to write reset defaults, just for documentation purpose */
