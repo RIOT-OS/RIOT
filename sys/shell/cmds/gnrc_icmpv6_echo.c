@@ -211,7 +211,7 @@ static int _configure(int argc, char **argv, _ping_data_t *data)
                         value = atoi(argv[i]);
 
                         if ((value < 0) || ((unsigned)value > (UINT16_MAX - sizeof(icmpv6_hdr_t)))) {
-                            printf("ICMPv6 datagram size should be in range 0-65527.\n");
+                            printf("ping size should be in range 0-65527.\n");
                             return -1;
                         }
                         data->datalen = value;
