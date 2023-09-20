@@ -172,6 +172,7 @@ static int _configure(int argc, char **argv, _ping_data_t *data)
 {
     char *cmdname = argv[0];
     int res = 1;
+    int value;
 
     /* parse command line arguments */
     for (int i = 1; i < argc; i++) {
@@ -207,7 +208,13 @@ static int _configure(int argc, char **argv, _ping_data_t *data)
                     /* intentionally falls through */
                 case 's':
                     if ((++i) < argc) {
-                        data->datalen = atoi(argv[i]);
+                        value = atoi(argv[i]);
+
+                        if ((value < 0) || ((unsigned)value > (UINT16_MAX - sizeof(icmpv6_hdr_t)))) {
+                            printf("ping size should be in range 0-65527.\n");
+                            return -1;
+                        }
+                        data->datalen = value;
                         continue;
                     }
                     /* intentionally falls through */
