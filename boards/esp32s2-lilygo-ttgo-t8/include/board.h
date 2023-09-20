@@ -99,7 +99,7 @@
 #define ST77XX_PARAM_INVERTED       1               /**< Inverted mode enable */
 #define ST77XX_PARAM_NUM_LINES      240U            /**< Number of lines */
 #define ST77XX_PARAM_RGB_CHANNELS   135U            /**< Number of columns */
-#define ST77XX_PARAM_ROTATION       ST77XX_ROTATION_HORZ   /**< Rotation */
+#define ST77XX_PARAM_ROTATION       ST77XX_ROTATION_270  /**< Rotation */
 #define ST77XX_PARAM_OFFSET_X       40              /**< X offset */
 #define ST77XX_PARAM_OFFSET_Y       52              /**< Y offset */
 #endif

@@ -81,7 +81,7 @@ extern "C" {
 #define ST77XX_PARAM_INVERTED     1                     /**< Inverted mode enable */
 #define ST77XX_PARAM_NUM_LINES    160U                  /**< Number of lines */
 #define ST77XX_PARAM_RGB_CHANNELS 80U                   /**< Number of columns */
-#define ST77XX_PARAM_ROTATION     ST77XX_ROTATION_HORZ  /**< Rotation mode */
+#define ST77XX_PARAM_ROTATION     ST77XX_ROTATION_270   /**< Rotation mode */
 #define ST77XX_PARAM_OFFSET_Y     25                    /**< Vertical offset */
 #endif
 
