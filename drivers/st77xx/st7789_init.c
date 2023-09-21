@@ -124,6 +124,7 @@ static inline uint8_t _st7789_calc_vrh(int16_t vrh)
 
 int st7789_init(lcd_t *dev, const lcd_params_t *params)
 {
+    (void)params;
     assert(params->lines <= 320);
     assert(params->rgb_channels <= 240);
 

@@ -142,6 +142,7 @@ static inline uint8_t _st7735_calc_vghl(uint16_t vgh, int16_t vgl, uint16_t avdd
 
 int st7735_init(lcd_t *dev, const lcd_params_t *params)
 {
+    (void)params;
     assert(params->lines <= 162);
     assert(params->rgb_channels <= 132);
 
