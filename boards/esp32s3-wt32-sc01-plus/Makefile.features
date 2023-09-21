@@ -1,0 +1,18 @@
+# actually the board uses a WT32-S3-WROVER-N16R2 module which in fact
+# is the same as the ESP32-S3-WROOM-1-N16R2
+CPU_MODEL = esp32s3_wroom_1x_n16r2
+
+# additional features provided by the board
+FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_spi
+FEATURES_PROVIDED += periph_uart
+FEATURES_PROVIDED += periph_usbdev
+
+# unique features provided by the board
+FEATURES_PROVIDED += esp_jtag
+FEATURES_PROVIDED += sdcard_spi
+FEATURES_PROVIDED += highlevel_stdio
+FEATURES_PROVIDED += tinyusb_device
+
+# common board and CPU features
+include $(RIOTBOARD)/common/esp32s3/Makefile.features
