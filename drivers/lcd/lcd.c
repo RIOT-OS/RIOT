@@ -40,10 +40,6 @@
 
 #if IS_USED(MODULE_LCD_PARALLEL)
 
-#if MODULE_LCD_PARALLEL_16BIT
-#error "MCU 8080 16-bit parallel interface is not supported yet"
-#endif
-
 static void lcd_ll_par_write_byte(lcd_t *dev, bool cont, uint8_t out)
 {
     if (gpio_is_valid(dev->params->cs_pin)) {
@@ -96,17 +92,76 @@ static uint8_t lcd_ll_par_read_byte(lcd_t *dev, bool cont)
     return in;
 }
 
-static void lcd_ll_par_read_bytes(lcd_t *dev, bool cont,
-                                  void *data, size_t len)
+#if IS_USED(MODULE_LCD_PARALLEL_16BIT)
+
+static void lcd_ll_par_write_word(lcd_t *dev, bool cont, uint16_t out)
 {
-    assert(len);
-
-    uint8_t *data_in = data;
-
-    for (size_t i = 0; i < len; i++) {
-        data_in[i] = lcd_ll_par_read_byte(dev, i == (len - 1) ? cont : true);
+    if (gpio_is_valid(dev->params->cs_pin)) {
+        gpio_clear(dev->params->cs_pin);
     }
+
+    gpio_clear(dev->params->wrx_pin);
+
+    gpio_write(dev->params->d0_pin, out & 0x0001);
+    gpio_write(dev->params->d1_pin, out & 0x0002);
+    gpio_write(dev->params->d2_pin, out & 0x0004);
+    gpio_write(dev->params->d3_pin, out & 0x0008);
+    gpio_write(dev->params->d4_pin, out & 0x0010);
+    gpio_write(dev->params->d5_pin, out & 0x0020);
+    gpio_write(dev->params->d6_pin, out & 0x0040);
+    gpio_write(dev->params->d7_pin, out & 0x0080);
+    gpio_write(dev->params->d8_pin, out & 0x0100);
+    gpio_write(dev->params->d9_pin, out & 0x0200);
+    gpio_write(dev->params->d10_pin, out & 0x0400);
+    gpio_write(dev->params->d11_pin, out & 0x0800);
+    gpio_write(dev->params->d12_pin, out & 0x1000);
+    gpio_write(dev->params->d13_pin, out & 0x2000);
+    gpio_write(dev->params->d14_pin, out & 0x4000);
+    gpio_write(dev->params->d15_pin, out & 0x8000);
+
+    gpio_set(dev->params->wrx_pin);
+
+    if (gpio_is_valid(dev->params->cs_pin) && !cont) {
+        gpio_set(dev->params->cs_pin);
+    };
 }
+
+static uint16_t lcd_ll_par_read_word(lcd_t *dev, bool cont)
+{
+    uint16_t in = 0;
+
+    if (gpio_is_valid(dev->params->cs_pin)) {
+        gpio_clear(dev->params->cs_pin);
+    }
+
+    gpio_clear(dev->params->rdx_pin);
+
+    in |= gpio_read(dev->params->d0_pin) ? 0x0001 : 0;
+    in |= gpio_read(dev->params->d1_pin) ? 0x0002 : 0;
+    in |= gpio_read(dev->params->d2_pin) ? 0x0004 : 0;
+    in |= gpio_read(dev->params->d3_pin) ? 0x0008 : 0;
+    in |= gpio_read(dev->params->d4_pin) ? 0x0010 : 0;
+    in |= gpio_read(dev->params->d5_pin) ? 0x0020 : 0;
+    in |= gpio_read(dev->params->d6_pin) ? 0x0040 : 0;
+    in |= gpio_read(dev->params->d7_pin) ? 0x0080 : 0;
+    in |= gpio_read(dev->params->d8_pin) ? 0x01000 : 0;
+    in |= gpio_read(dev->params->d9_pin) ? 0x02000 : 0;
+    in |= gpio_read(dev->params->d10_pin) ? 0x0400 : 0;
+    in |= gpio_read(dev->params->d11_pin) ? 0x0800 : 0;
+    in |= gpio_read(dev->params->d12_pin) ? 0x1000 : 0;
+    in |= gpio_read(dev->params->d13_pin) ? 0x2000 : 0;
+    in |= gpio_read(dev->params->d14_pin) ? 0x4000 : 0;
+    in |= gpio_read(dev->params->d15_pin) ? 0x8000 : 0;
+
+    gpio_set(dev->params->rdx_pin);
+
+    if (gpio_is_valid(dev->params->cs_pin) && !cont) {
+        gpio_set(dev->params->cs_pin);
+    };
+
+    return in;
+}
+#endif /* IS_USED(MODULE_LCD_PARALLEL_16BIT) */
 
 static void lcd_ll_par_write_bytes(lcd_t *dev, bool cont,
                                    const void *data, size_t len)
@@ -115,8 +170,46 @@ static void lcd_ll_par_write_bytes(lcd_t *dev, bool cont,
 
     const uint8_t *data_out = data;
 
+#if IS_USED(MODULE_LCD_PARALLEL_16BIT)
+    if (dev->word_access) {
+        /* len has to be a multiple of two for word access */
+        assert((len % 2) == 0);
+        for (size_t i = 0; i < len; i += 2) {
+            /* data[i] is the high byte and data[i+1] is the low byte in BE */
+            uint16_t out_word = (data_out[i] << 8) + data_out[i + 1];
+            lcd_ll_par_write_word(dev, i == (len - 2) ? cont : true, out_word);
+        }
+        return;
+    }
+#endif
+
     for (size_t i = 0; i < len; i++) {
         lcd_ll_par_write_byte(dev, i == (len - 1) ? cont : true, data_out[i]);
+    }
+}
+
+static void lcd_ll_par_read_bytes(lcd_t *dev, bool cont,
+                                  void *data, size_t len)
+{
+    assert(len);
+
+    uint8_t *data_in = data;
+
+#if IS_USED(MODULE_LCD_PARALLEL_16BIT)
+    if (dev->word_access) {
+        /* len has to be a multiple of two for word access */
+        assert((len % 2) == 0);
+        for (size_t i = 0; i < len; i += 2) {
+            uint16_t in_word = lcd_ll_par_read_word(dev, i == (len - 2) ? cont : true);
+            data_in[i] = in_word >> 8;       /* data[i] is the high byte in BE */
+            data_in[i + 1] = in_word & 0xff; /* data[i+1] is the low byte in BE */
+        }
+        return;
+    }
+#endif
+
+    for (size_t i = 0; i < len; i++) {
+        data_in[i] = lcd_ll_par_read_byte(dev, i == (len - 1) ? cont : true);
     }
 }
 
@@ -190,6 +283,18 @@ static inline void lcd_ll_read_bytes(lcd_t *dev, bool cont,
         gpio_init(dev->params->d5_pin, GPIO_IN);
         gpio_init(dev->params->d6_pin, GPIO_IN);
         gpio_init(dev->params->d7_pin, GPIO_IN);
+#if IS_USED(MODULE_LCD_PARALLEL_16BIT)
+        if (dev->params->mode == LCD_IF_PARALLEL_16BIT) {
+            gpio_init(dev->params->d8_pin, GPIO_IN);
+            gpio_init(dev->params->d9_pin, GPIO_IN);
+            gpio_init(dev->params->d10_pin, GPIO_IN);
+            gpio_init(dev->params->d11_pin, GPIO_IN);
+            gpio_init(dev->params->d12_pin, GPIO_IN);
+            gpio_init(dev->params->d13_pin, GPIO_IN);
+            gpio_init(dev->params->d14_pin, GPIO_IN);
+            gpio_init(dev->params->d15_pin, GPIO_IN);
+        }
+#endif /* IS_USED(MODULE_LCD_PARALLEL_16BIT) */
 
         /* Dummy read */
         lcd_ll_par_read_byte(dev, true);
@@ -204,6 +309,18 @@ static inline void lcd_ll_read_bytes(lcd_t *dev, bool cont,
         gpio_init(dev->params->d5_pin, GPIO_OUT);
         gpio_init(dev->params->d6_pin, GPIO_OUT);
         gpio_init(dev->params->d7_pin, GPIO_OUT);
+#if IS_USED(MODULE_LCD_PARALLEL_16BIT)
+        if (dev->params->mode == LCD_IF_PARALLEL_16BIT) {
+            gpio_init(dev->params->d8_pin, GPIO_OUT);
+            gpio_init(dev->params->d9_pin, GPIO_OUT);
+            gpio_init(dev->params->d10_pin, GPIO_OUT);
+            gpio_init(dev->params->d11_pin, GPIO_OUT);
+            gpio_init(dev->params->d12_pin, GPIO_OUT);
+            gpio_init(dev->params->d13_pin, GPIO_OUT);
+            gpio_init(dev->params->d14_pin, GPIO_OUT);
+            gpio_init(dev->params->d15_pin, GPIO_OUT);
+        }
+#endif /* IS_USED(MODULE_LCD_PARALLEL_16BIT) */
 #else
         assert(false);
 #endif
@@ -217,6 +334,15 @@ static void lcd_ll_cmd_start(lcd_t *dev, uint8_t cmd, bool cont)
     gpio_clear(dev->params->dcx_pin);
     lcd_ll_write_byte(dev, cont, cmd);
     gpio_set(dev->params->dcx_pin);
+
+#if IS_USED(MODULE_LCD_PARALLEL_16BIT)
+    /* only the RAMRD and RAMRDC commands use 16-bit data access */
+    if (((cmd == LCD_CMD_RAMWR) || (cmd == LCD_CMD_RAMWRC) ||
+         (cmd == LCD_CMD_RAMRD) || (cmd == LCD_CMD_RAMRDC)) &&
+        (dev->params->mode == LCD_IF_PARALLEL_16BIT)) {
+        dev->word_access = true;
+    }
+#endif
 }
 
 static void lcd_ll_set_area_default(lcd_t *dev, uint16_t x1, uint16_t x2,
@@ -277,6 +403,11 @@ void lcd_ll_acquire(lcd_t *dev)
 
 void lcd_ll_release(lcd_t *dev)
 {
+#if IS_USED(MODULE_LCD_PARALLEL_16BIT)
+    /* reset word to byte access */
+    dev->word_access = false;
+#endif
+
 #if IS_USED(MODULE_LCD_SPI)
     if (dev->params->spi != SPI_UNDEF) {
         /* SPI serial interface is used */
@@ -298,6 +429,14 @@ void lcd_ll_release(lcd_t *dev)
 void lcd_ll_write_cmd(lcd_t *dev, uint8_t cmd, const uint8_t *data,
                       size_t len)
 {
+    DEBUG("[%s] command 0x%02x (%u) ", __func__, cmd, len);
+    if (IS_USED(ENABLE_DEBUG) && len) {
+        for (uint8_t i = 0; i < len; i++) {
+             DEBUG("0x%02x ", data[i]);
+        }
+    }
+    DEBUG("\n");
+
     lcd_ll_cmd_start(dev, cmd, len ? true : false);
     if (len) {
         lcd_ll_write_bytes(dev, false, data, len);
@@ -307,8 +446,18 @@ void lcd_ll_write_cmd(lcd_t *dev, uint8_t cmd, const uint8_t *data,
 void lcd_ll_read_cmd(lcd_t *dev, uint8_t cmd, uint8_t *data, size_t len)
 {
     assert(len);
-    lcd_ll_cmd_start(dev, cmd, len ? true : false);
+
+    DEBUG("[%s] command 0x%02x (%u) ", __func__, cmd, len);
+
+    lcd_ll_cmd_start(dev, cmd, true);
     lcd_ll_read_bytes(dev, false, data, len);
+
+    if (IS_USED(ENABLE_DEBUG) && len) {
+        for (uint8_t i = 0; i < len; i++) {
+             DEBUG("0x%02x ", data[i]);
+        }
+    }
+    DEBUG("\n");
 }
 
 int lcd_init(lcd_t *dev, const lcd_params_t *params)
@@ -341,11 +490,6 @@ int lcd_init(lcd_t *dev, const lcd_params_t *params)
         gpio_init(dev->params->wrx_pin, GPIO_OUT);
         gpio_set(dev->params->wrx_pin);
 
-        if (gpio_is_valid(dev->params->wrx_pin)) {
-            gpio_init(dev->params->wrx_pin, GPIO_OUT);
-            gpio_set(dev->params->wrx_pin);
-        }
-
         if (gpio_is_valid(dev->params->rdx_pin)) {
             gpio_init(dev->params->rdx_pin, GPIO_OUT);
             gpio_set(dev->params->rdx_pin);
@@ -367,6 +511,27 @@ int lcd_init(lcd_t *dev, const lcd_params_t *params)
         gpio_init(dev->params->d5_pin, GPIO_OUT);
         gpio_init(dev->params->d6_pin, GPIO_OUT);
         gpio_init(dev->params->d7_pin, GPIO_OUT);
+#if IS_USED(MODULE_LCD_PARALLEL_16BIT)
+        if (dev->params->mode == LCD_IF_PARALLEL_16BIT) {
+            assert(gpio_is_valid(dev->params->d8_pin));
+            assert(gpio_is_valid(dev->params->d9_pin));
+            assert(gpio_is_valid(dev->params->d10_pin));
+            assert(gpio_is_valid(dev->params->d11_pin));
+            assert(gpio_is_valid(dev->params->d12_pin));
+            assert(gpio_is_valid(dev->params->d13_pin));
+            assert(gpio_is_valid(dev->params->d14_pin));
+            assert(gpio_is_valid(dev->params->d15_pin));
+            gpio_init(dev->params->d8_pin, GPIO_OUT);
+            gpio_init(dev->params->d9_pin, GPIO_OUT);
+            gpio_init(dev->params->d10_pin, GPIO_OUT);
+            gpio_init(dev->params->d11_pin, GPIO_OUT);
+            gpio_init(dev->params->d12_pin, GPIO_OUT);
+            gpio_init(dev->params->d13_pin, GPIO_OUT);
+            gpio_init(dev->params->d14_pin, GPIO_OUT);
+            gpio_init(dev->params->d15_pin, GPIO_OUT);
+        }
+        dev->word_access = false;
+#endif /* IS_USED(MODULE_LCD_PARALLEL_16BIT) */
 #else
         assert(false);
 #endif
