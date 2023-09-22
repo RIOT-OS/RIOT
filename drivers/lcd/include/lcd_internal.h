@@ -35,6 +35,7 @@ extern "C" {
  */
 #define LCD_CMD_SWRESET         0x01    /**< Software reset */
 #define LCD_CMD_RDDIDIF         0x04    /**< Read display ID */
+#define LCD_CMD_RDDST           0x09    /**< Read display status */
 #define LCD_CMD_SLPIN           0x10    /**< Enter sleep mode */
 #define LCD_CMD_SLPOUT          0x11    /**< Sleep out */
 #define LCD_CMD_NORON           0x13    /**< Normal display mode on */
