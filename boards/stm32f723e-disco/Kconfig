@@ -39,6 +39,7 @@ config BOARD_STM32F723E_DISCO
     select HAVE_FT5X06
     select HAVE_ST7789
     select HAVE_LCD_PARALLEL_16BIT if MODULE_ST7789
+    select HAVE_LCD_PARALLEL_LL_MCU if MODULE_ST7789
 
     select MODULE_PERIPH_UART_HW_FC if HAS_PERIPH_UART_HW_FC && MODULE_PERIPH_UART
     # Workaround due to stdout only working with stdin enabled
