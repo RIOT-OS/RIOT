@@ -55,7 +55,7 @@ extern "C" {
  * For the `LCD_*` pins the identifiers are used as given in the [schematic]
  * (https://www.st.com/resource/en/schematic_pack/mb1261-l496g-b06-schematic.pdf).
  *
- * The LCD display has to switched on explicitly by activating VDD_LCD using
+ * The LCD display has to be switched on explicitly by activating VDD_LCD using
  * the LOW active `LD_PWR_ON` signal.
  *
  * @note The `LCD_RESET` signal is provided by the MFX GPIO2 pin. Since the MFX
