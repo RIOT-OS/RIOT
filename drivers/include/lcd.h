@@ -256,8 +256,8 @@ void lcd_ll_release(lcd_t *dev);
  *
  * @param[in]   dev     device descriptor
  * @param[in]   cmd     command code
- * @param[in]   data    command data to the device
- * @param[in]   len     length of the command data
+ * @param[in]   data    command data to the device or NULL for commands without data
+ * @param[in]   len     length of the command data or 0 for commands without data
  */
 void lcd_ll_write_cmd(lcd_t *dev, uint8_t cmd, const uint8_t *data,
                       size_t len);
@@ -350,8 +350,8 @@ void lcd_pixmap(lcd_t *dev, uint16_t x1, uint16_t x2, uint16_t y1,
  *
  * @param[in]   dev     device descriptor
  * @param[in]   cmd     command code
- * @param[in]   data    command data to the device
- * @param[in]   len     length of the command data
+ * @param[in]   data    command data to the device or NULL for commands without data
+ * @param[in]   len     length of the command data or 0 for commands without data
  */
 void lcd_write_cmd(lcd_t *dev, uint8_t cmd, const uint8_t *data,
                    size_t len);
@@ -386,6 +386,109 @@ void lcd_invert_on(lcd_t *dev);
  */
 void lcd_invert_off(lcd_t *dev);
 /** @} */
+
+#if MODULE_LCD_PARALLEL || DOXYGEN
+/**
+ * @name    Low-level MCU 8080 8-/16-bit parallel interface
+ *
+ * The low-level MCU 8080 8-/16-bit parallel interface (low-level parallel
+ * interface for short) is used when the LCD device is connected via a parallel
+ * interface. Either the GPIO-driven low-level parallel interface provided by
+ * this LCD driver or a low-level parallel interface implemented by the MCU,
+ * such as the STM32 FMC peripheral, can be used. If the MCU provides its
+ * own implementation of the low-level parallel interface, it can be used
+ * by implementing the following low-level parallel interface driver functions,
+ * enabling the `lcd_parallel_ll_mcu` module and defining the
+ * @ref lcd_ll_par_driver variable of type @ref lcd_ll_par_driver_t.
+ *
+ * @{
+ */
+
+/**
+ * @brief   Low-level MCU 8080 8-/16-bit parallel interface driver
+ *
+ * If the MCU-driven low-level parallel interface is enabled by
+ * module `lcd_ll_parallel_mcu`, the implementation of the MCU low-level
+ * parallel interface has to define a variable @ref lcd_ll_par_driver of this
+ * type. All or a set of members have to point to the low-level parallel
+ * interface functions implemented by the MCU. For functions that are not
+ * implemented by the MCU, the members have to be set to the corresponding
+ * GPIO-driven low-level parallel interface functions provided by the LCD
+ * driver.
+ */
+typedef struct {
+    /**
+     * @brief   Initialize the MCU-driven low-level parallel interface
+     *
+     * @param[in]   dev     device descriptor
+     */
+    void (*init)(lcd_t *dev);
+
+    /**
+     * @brief   Set the data direction of the low-level parallel interface
+     *
+     * @param[in]   dev     device descriptor
+     * @param[in]   output  set to output mode if true and to input mode otherwise
+     */
+    void (*set_data_dir)(lcd_t *dev, bool output);
+
+    /**
+     * @brief   Write command using the MCU-driven low-level parallel interface
+     *
+     * @param[in]   dev     device descriptor
+     * @param[in]   cmd     command
+     * @param[in]   cont    operation is continued
+     */
+    void (*cmd_start)(lcd_t *dev, uint8_t cmd, bool cont);
+
+    /**
+     * @brief   Write a byte using the MCU-driven low-level parallel interface
+     *
+     * @param[in]   dev     device descriptor
+     * @param[in]   cont    operation is continued
+     * @param[in]   out     byte to be written
+     */
+    void (*write_byte)(lcd_t *dev, bool cont, uint8_t out);
+
+    /**
+     * @brief   Read a byte using the MCU-driven low-level parallel interface
+     *
+     * @param[in]   dev     device descriptor
+     * @param[in]   cont    operation is continued
+     *
+     * @return  byte read
+     */
+    uint8_t (*read_byte)(lcd_t *dev, bool cont);
+
+#if MODULE_LCD_PARALLEL_16BIT || DOXYGEN
+    /**
+     * @brief   Write a word using the MCU-driven low-level parallel interface
+     *
+     * @param[in]   dev     device descriptor
+     * @param[in]   cont    operation is continued
+     * @param[in]   out     word to be written
+     */
+    void (*write_word)(lcd_t *dev, bool cont, uint16_t out);
+
+    /**
+     * @brief   Read a word using the MCU-driven low-level parallel interface
+     *
+     * @param[in]   dev     device descriptor
+     * @param[in]   cont    operation is continued
+     *
+     * @return  word read
+     */
+    uint16_t (*read_word)(lcd_t *dev, bool cont);
+#endif
+} lcd_ll_par_driver_t;
+
+/**
+ * @brief   Low-level parallel interface driver instance
+ */
+extern const lcd_ll_par_driver_t lcd_ll_par_driver;
+
+/** @} */
+#endif
 
 #ifdef __cplusplus
 }

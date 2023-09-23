@@ -243,4 +243,20 @@ uint16_t lcd_ll_par_gpio_read_word(lcd_t *dev, bool cont)
 }
 #endif /* IS_USED(MODULE_LCD_PARALLEL_16BIT) */
 
+#if !IS_USED(MODULE_LCD_PARALLEL_LL_MCU)
+/* If MCU-driven low-level implementation is not used, the GPIO-driven
+ * implementation is used as driver. */
+const lcd_ll_par_driver_t lcd_ll_par_driver = {
+    .init = lcd_ll_par_gpio_init,
+    .set_data_dir = lcd_ll_par_gpio_set_data_dir,
+    .cmd_start = lcd_ll_par_gpio_cmd_start,
+    .write_byte = lcd_ll_par_gpio_write_byte,
+    .read_byte = lcd_ll_par_gpio_read_byte,
+#if IS_USED(MODULE_LCD_PARALLEL_16BIT)
+    .write_word = lcd_ll_par_gpio_write_word,
+    .read_word = lcd_ll_par_gpio_read_word,
+#endif
+};
+#endif
+
 #endif /* IS_USED(MODULE_LCD_PARALLEL) */

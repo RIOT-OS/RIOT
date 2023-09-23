@@ -26,6 +26,7 @@
 #include <string.h>
 #include "byteorder.h"
 #include "kernel_defines.h"
+#include "log.h"
 #include "ztimer.h"
 
 #if IS_USED(MODULE_LCD_SPI)
@@ -43,24 +44,24 @@
 
 static void lcd_ll_par_write_byte(lcd_t *dev, bool cont, uint8_t out)
 {
-    lcd_ll_par_gpio_write_byte(dev, cont, out);
+    lcd_ll_par_driver.write_byte(dev, cont, out);
 }
 
 static uint8_t lcd_ll_par_read_byte(lcd_t *dev, bool cont)
 {
-    return lcd_ll_par_gpio_read_byte(dev, cont);
+    return lcd_ll_par_driver.read_byte(dev, cont);
 }
 
 #if IS_USED(MODULE_LCD_PARALLEL_16BIT)
 
 static void lcd_ll_par_write_word(lcd_t *dev, bool cont, uint16_t out)
 {
-    lcd_ll_par_gpio_write_word(dev, cont, out);
+    lcd_ll_par_driver.write_word(dev, cont, out);
 }
 
 static uint16_t lcd_ll_par_read_word(lcd_t *dev, bool cont)
 {
-    return lcd_ll_par_gpio_read_word(dev, cont);
+    return lcd_ll_par_driver.read_word(dev, cont);
 }
 
 #endif /* IS_USED(MODULE_LCD_PARALLEL_16BIT) */
@@ -83,7 +84,7 @@ static void lcd_ll_par_write_bytes(lcd_t *dev, bool cont,
         }
         return;
     }
-#endif
+#endif /* IS_USED(MODULE_LCD_PARALLEL_16BIT) */
 
     for (size_t i = 0; i < len; i++) {
         lcd_ll_par_write_byte(dev, i == (len - 1) ? cont : true, data_out[i]);
@@ -108,7 +109,7 @@ static void lcd_ll_par_read_bytes(lcd_t *dev, bool cont,
         }
         return;
     }
-#endif
+#endif /* IS_USED(MODULE_LCD_PARALLEL_16BIT) */
 
     for (size_t i = 0; i < len; i++) {
         data_in[i] = lcd_ll_par_read_byte(dev, i == (len - 1) ? cont : true);
@@ -129,8 +130,6 @@ static inline void lcd_ll_write_byte(lcd_t *dev, bool cont, uint8_t data)
 #if IS_USED(MODULE_LCD_PARALLEL)
         /* MCU 8080 8-/16-bit parallel interface is used */
         lcd_ll_par_write_byte(dev, cont, data);
-#else
-        assert(false);
 #endif
 #if IS_USED(MODULE_LCD_SPI)
     }
@@ -151,8 +150,6 @@ static inline void lcd_ll_write_bytes(lcd_t *dev, bool cont,
 #if IS_USED(MODULE_LCD_PARALLEL)
         /* MCU 8080 8-/16-bit parallel interface is used */
         lcd_ll_par_write_bytes(dev, cont, data, len);
-#else
-        assert(false);
 #endif
 #if IS_USED(MODULE_LCD_SPI)
     }
@@ -172,21 +169,19 @@ static inline void lcd_ll_read_bytes(lcd_t *dev, bool cont,
                            dev->params->cs_pin, cont, NULL, data, len);
     }
     else {
-#endif
+#endif /* IS_USED(MODULE_LCD_SPI) */
 #if IS_USED(MODULE_LCD_PARALLEL)
         /* MCU 8080 8-/16-bit parallel interface is used */
 
         /* switch GPIO mode to input */
-        lcd_ll_par_gpio_set_data_dir(dev, false);
+        lcd_ll_par_driver.set_data_dir(dev, false);
 
         /* Dummy read */
         lcd_ll_par_read_byte(dev, true);
         lcd_ll_par_read_bytes(dev, cont, data, len);
 
         /* switch GPIO mode back to output */
-        lcd_ll_par_gpio_set_data_dir(dev, true);
-#else
-        assert(false);
+        lcd_ll_par_driver.set_data_dir(dev, true);
 #endif
 #if IS_USED(MODULE_LCD_SPI)
     }
@@ -197,7 +192,7 @@ static void lcd_ll_cmd_start(lcd_t *dev, uint8_t cmd, bool cont)
 {
 #if IS_USED(MODULE_LCD_PARALLEL)
     if (dev->params->mode != LCD_IF_SPI) {
-        lcd_ll_par_gpio_cmd_start(dev, cmd, cont);
+        lcd_ll_par_driver.cmd_start(dev, cmd, cont);
     }
     else {
 #endif
@@ -265,8 +260,6 @@ void lcd_ll_acquire(lcd_t *dev)
 #if IS_USED(MODULE_LCD_PARALLEL)
         /* MCU 8080 8-/16-bit parallel interface is used */
         mutex_lock(&dev->lock);
-#else
-        assert(false);
 #endif
 #if IS_USED(MODULE_LCD_SPI)
     }
@@ -290,8 +283,6 @@ void lcd_ll_release(lcd_t *dev)
 #if IS_USED(MODULE_LCD_PARALLEL)
         /* MCU 8080 8-/16-bit parallel interface is used */
         mutex_unlock(&dev->lock);
-#else
-        assert(false);
 #endif
 #if IS_USED(MODULE_LCD_SPI)
     }
@@ -336,11 +327,11 @@ int lcd_init(lcd_t *dev, const lcd_params_t *params)
 {
     dev->params = params;
 
-    assert(gpio_is_valid(dev->params->dcx_pin));
-    gpio_init(dev->params->dcx_pin, GPIO_OUT);
-
 #if IS_USED(MODULE_LCD_SPI)
     if (dev->params->spi != SPI_UNDEF) {
+        assert(gpio_is_valid(dev->params->dcx_pin));
+        gpio_init(dev->params->dcx_pin, GPIO_OUT);
+
         /* SPI serial interface is used */
         int res = spi_init_cs(dev->params->spi, dev->params->cs_pin);
 
@@ -350,12 +341,25 @@ int lcd_init(lcd_t *dev, const lcd_params_t *params)
         }
     }
     else {
-#endif
+#endif /* IS_USED(MODULE_LCD_SPI) */
+
 #if IS_USED(MODULE_LCD_PARALLEL)
-        lcd_ll_par_gpio_init(dev);
-#else
+        mutex_init(&dev->lock);
+#if IS_USED(MODULE_LCD_PARALLEL_16BIT)
+        dev->word_access = false;
+#endif /* IS_USED(MODULE_LCD_PARALLEL_16BIT) */
+
+        /* Low-level parallel interface initialization */
+        lcd_ll_par_driver.init(dev);
+        /* set output data direction */
+        lcd_ll_par_driver.set_data_dir(dev, true);
+
+#else /* IS_USED(MODULE_LCD_PARALLEL) */
+
+        LOG_ERROR("[lcd] either lcd_parallel or lcd_spi has to be enabled");
         assert(false);
 #endif
+
 #if IS_USED(MODULE_LCD_SPI)
     }
 #endif
@@ -367,10 +371,6 @@ int lcd_init(lcd_t *dev, const lcd_params_t *params)
         gpio_set(dev->params->rst_pin);
     }
     ztimer_sleep(ZTIMER_MSEC, 120);
-
-#if IS_USED(MODULE_LCD_PARALLEL)
-    mutex_init(&dev->lock);
-#endif
 
     /* controller-specific init function has to be defined */
     assert(dev->driver->init);
