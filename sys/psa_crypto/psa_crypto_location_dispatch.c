@@ -368,6 +368,21 @@ psa_status_t psa_location_dispatch_sign_hash(  const psa_key_attributes_t *attri
                                             signature_size, signature_length);
 }
 
+psa_status_t psa_location_dispatch_sign_message(const psa_key_attributes_t *attributes,
+                                               psa_algorithm_t alg,
+                                               const psa_key_slot_t *slot,
+                                               const uint8_t *input,
+                                               size_t input_length,
+                                               uint8_t *signature,
+                                               size_t signature_size,
+                                               size_t *signature_length)
+{
+    /* TODO: implement MODULE_PSA_SECURE_ELEMENT support */
+
+    return psa_algorithm_dispatch_sign_message(attributes, alg, slot, input, input_length, signature,
+                                            signature_size, signature_length);
+}
+
 psa_status_t psa_location_dispatch_verify_hash(const psa_key_attributes_t *attributes,
                                                psa_algorithm_t alg,
                                                const psa_key_slot_t *slot,
@@ -397,6 +412,20 @@ psa_status_t psa_location_dispatch_verify_hash(const psa_key_attributes_t *attri
 #endif /* CONFIG_PSA_SECURE_ELEMENT */
 
     return psa_algorithm_dispatch_verify_hash(attributes, alg, slot, hash, hash_length, signature,
+                                              signature_length);
+}
+
+psa_status_t psa_location_dispatch_verify_message(  const psa_key_attributes_t *attributes,
+                                                    psa_algorithm_t alg,
+                                                    const psa_key_slot_t *slot,
+                                                    const uint8_t *input,
+                                                    size_t input_length,
+                                                    const uint8_t *signature,
+                                                    size_t signature_length)
+{
+    /* TODO: implement MODULE_PSA_SECURE_ELEMENT support */
+
+    return psa_algorithm_dispatch_verify_message(attributes, alg, slot, input, input_length, signature,
                                               signature_length);
 }
 

@@ -228,6 +228,11 @@ config HAS_PERIPH_ECC_P256R1
     help
         Indicates that there is ECC P256R1 hardware acceleration peripheral present.
 
+config HAS_PERIPH_ECC_ED25519
+    bool
+    help
+        Indicates that there is ECC Edwards25519 hardware acceleration peripheral present.
+
 config HAS_PERIPH_EEPROM
     bool
     help

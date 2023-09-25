@@ -62,6 +62,25 @@ psa_status_t psa_ecc_p192r1_sign_hash(  const psa_key_attributes_t *attributes,
     return PSA_SUCCESS;
 }
 
+psa_status_t psa_ecc_p192r1_sign_message(  const psa_key_attributes_t *attributes,
+                                        psa_algorithm_t alg, const uint8_t *key_buffer,
+                                        size_t key_buffer_size, const uint8_t *input,
+                                        size_t input_length, uint8_t *signature,
+                                        size_t signature_size, size_t *signature_length)
+{
+    psa_status_t status;
+
+    uint8_t hash[PSA_HASH_LENGTH(PSA_ALG_GET_HASH(alg))];
+    size_t hash_length;
+
+    status = psa_hash_compute(PSA_ALG_GET_HASH(alg), input, input_length, hash, sizeof(hash), &hash_length);
+    if (status != PSA_SUCCESS) {
+        return status;
+    }
+
+    return psa_ecc_p192r1_sign_hash(attributes, alg, key_buffer, key_buffer_size, hash, hash_length, signature, signature_size, signature_length);
+}
+
 psa_status_t psa_ecc_p192r1_verify_hash(const psa_key_attributes_t *attributes,
                                         psa_algorithm_t alg, const uint8_t *key_buffer,
                                         size_t key_buffer_size, const uint8_t *hash,
@@ -81,4 +100,23 @@ psa_status_t psa_ecc_p192r1_verify_hash(const psa_key_attributes_t *attributes,
     (void)key_buffer_size;
     (void)signature_length;
     return PSA_SUCCESS;
+}
+
+psa_status_t psa_ecc_p192r1_verify_message(const psa_key_attributes_t *attributes,
+                                        psa_algorithm_t alg, const uint8_t *key_buffer,
+                                        size_t key_buffer_size, const uint8_t *input,
+                                        size_t input_length, const uint8_t *signature,
+                                        size_t signature_length)
+{
+    psa_status_t status;
+
+    uint8_t hash[PSA_HASH_LENGTH(PSA_ALG_GET_HASH(alg))];
+    size_t hash_length;
+
+    status = psa_hash_compute(PSA_ALG_GET_HASH(alg), input, input_length, hash, sizeof(hash), &hash_length);
+    if (status != PSA_SUCCESS) {
+        return status;
+    }
+
+    return psa_ecc_p192r1_verify_hash(attributes, alg, key_buffer, key_buffer_size, hash, hash_length, signature, signature_length);
 }

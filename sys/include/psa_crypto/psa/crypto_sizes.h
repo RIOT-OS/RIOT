@@ -59,6 +59,7 @@ extern "C" {
  */
 #ifndef CONFIG_PSA_MAX_KEY_SIZE
 #if (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1) || \
+     IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519) || \
      IS_USED(MODULE_PSA_CIPHER_AES_256_CBC) || \
      IS_USED(MODULE_PSA_MAC_HMAC_SHA_256) || \
      IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256))
@@ -838,16 +839,21 @@ extern "C" {
     /* implementation-defined value */
 
 /**
- * @brief   Check whether the key size is a valid ECC size.
+ * @brief   Check whether the key size is a valid ECC size for key type.
  *
+ * @param   type key type of of type @ref psa_key_type_t
  * @param   bits Key size of type @ref psa_key_bits_t
  */
-#define PSA_ECC_KEY_SIZE_IS_VALID(bits)     \
-    (bits == 128 || \
-     bits == 192 || \
-     bits == 224 || \
-     bits == 256 || \
-     bits == 384)
+#define PSA_ECC_KEY_SIZE_IS_VALID(type, bits) \
+    (PSA_KEY_TYPE_ECC_GET_FAMILY(type) == PSA_ECC_FAMILY_TWISTED_EDWARDS ?  \
+        (bits == 255) :                                                     \
+    (PSA_KEY_TYPE_ECC_GET_FAMILY(type) == PSA_ECC_FAMILY_SECP_R1 ?          \
+        (bits == 128 || \
+         bits == 192 || \
+         bits == 224 || \
+         bits == 256 || \
+         bits == 384) : \
+    0))
 
 /**
  * @brief   The maximum size of an asymmetric private key.
@@ -866,17 +872,44 @@ extern "C" {
 #define PSA_EXPORT_KEY_PAIR_MAX_SIZE /* implementation-defined value */
 
 /**
+ * @brief   Get curve size from ECC public key
+ *
+ * @details The representation of an ECC public key is dependent on the family:
+ *          - for twisted Edwards curves: 32B
+ *          - for Weierstrass curves:
+ *            - The byte 0x04;
+ *            - `x_P` as a `ceiling(m/8)`-byte string, big-endian;
+ *            - `y_P` as a `ceiling(m/8)`-byte string, big-endian;
+ *            - where m is the bit size associated with the curve.
+ *            - 1 byte + 2 * point size.
+ */
+#define PSA_ECC_KEY_GET_CURVE_FROM_PUBLIC_KEY(key_type, key_bits)                    \
+    (PSA_KEY_TYPE_ECC_GET_FAMILY(key_type) == PSA_ECC_FAMILY_TWISTED_EDWARDS ? 255 : \
+     ((size_t)((key_bits - 8) / 2)))
+
+/**
+ * @brief   Get curve size from ECC key (public or private)
+ */
+#define PSA_ECC_KEY_GET_CURVE(key_type, key_bits)                   \
+    (PSA_KEY_TYPE_IS_ECC_PUBLIC_KEY(key_type) ?                     \
+        PSA_ECC_KEY_GET_CURVE_FROM_PUBLIC_KEY(key_type, key_bits) : \
+     (size_t)key_bits)
+
+/**
  * @brief   Maximum size of the export encoding of an ECC public key.
  *
- * @details The representation of an ECC public key is:
- *          - The byte 0x04;
- *          - `x_P` as a `ceiling(m/8)`-byte string, big-endian;
- *          - `y_P` as a `ceiling(m/8)`-byte string, big-endian;
- *          - where m is the bit size associated with the curve.
- *          - 1 byte + 2 * point size.
+ * @details The representation of an ECC public key is dependent on the family:
+ *          - for twisted Edwards curves: 32B
+ *          - for Weierstrass curves:
+ *            - The byte 0x04;
+ *            - `x_P` as a `ceiling(m/8)`-byte string, big-endian;
+ *            - `y_P` as a `ceiling(m/8)`-byte string, big-endian;
+ *            - where m is the bit size associated with the curve.
+ *            - 1 byte + 2 * point size.
  */
-#define PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(key_bits)        \
-    ((size_t)(2 * PSA_BITS_TO_BYTES(key_bits) + 1))
+#define PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(key_type, key_bits)                  \
+    (PSA_KEY_TYPE_ECC_GET_FAMILY(key_type) == PSA_ECC_FAMILY_TWISTED_EDWARDS ? 32 : \
+     ((size_t)(2 * PSA_BITS_TO_BYTES(key_bits) + 1)))
 
 /**
  * @brief   Sufficient output buffer size for @ref psa_export_public_key().
@@ -919,7 +952,7 @@ extern "C" {
  *          @ref PSA_KEY_TYPE_PUBLIC_KEY_OF_KEY_PAIR(@p key_type), @p key_bits).
  */
 #define PSA_EXPORT_PUBLIC_KEY_OUTPUT_SIZE(key_type, key_bits)                           \
-    (PSA_KEY_TYPE_IS_ECC(key_type) ? PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(key_bits) : \
+    (PSA_KEY_TYPE_IS_ECC(key_type) ? PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(key_type, key_bits) : \
      0)
 
 /**
@@ -932,8 +965,13 @@ extern "C" {
  *
  *          See also @ref PSA_EXPORT_PUBLIC_KEY_OUTPUT_SIZE(@p key_type, @p key_bits).
  */
+#if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1) || IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P192R1)
 #define PSA_EXPORT_PUBLIC_KEY_MAX_SIZE \
-    (PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(PSA_MAX_PRIV_KEY_SIZE))
+    (PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(PSA_ECC_FAMILY_SECT_R1, PSA_MAX_PRIV_KEY_SIZE))
+#else
+#define PSA_EXPORT_PUBLIC_KEY_MAX_SIZE \
+    (PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(PSA_ECC_FAMILY_TWISTED_EDWARDS, PSA_MAX_PRIV_KEY_SIZE))
+#endif
 
 /**
  * @brief   The maximum size of an asymmetric private key buffer. If only a secure element driver is
@@ -993,7 +1031,7 @@ extern "C" {
  *          If the parameters are not valid, the return value is unspecified.
  */
 #define PSA_SIGN_OUTPUT_SIZE(key_type, key_bits, alg)        \
-    (PSA_KEY_TYPE_IS_ECC(key_type) ? PSA_ECDSA_SIGNATURE_SIZE(key_bits) : \
+    (PSA_KEY_TYPE_IS_ECC(key_type) ? PSA_ECDSA_SIGNATURE_SIZE(PSA_ECC_KEY_GET_CURVE(key_type, key_bits)) : \
      ((void)alg, 0))
 
 #ifdef __cplusplus

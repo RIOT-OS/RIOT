@@ -2816,18 +2816,6 @@ extern "C" {
     (PSA_KEY_TYPE_ECC_KEY_PAIR_BASE | (curve))
 
 /**
- * @brief   Extract group family of an elliptic curve key pair
- *
- * @param   type    A an ECC key pair type: a value of type @ref psa_key_type_t such that
- *          @ref PSA_KEY_TYPE_IS_ECC(@p type) is true.
- *
- * @return  The elliptic curve family id, if type is a supported elliptic curve key.
- *          Unspecified if type is not a supported elliptic curve key.
- */
-#define PSA_KEY_TYPE_ECC_GET_CURVE(type) \
-    (type & ~PSA_KEY_TYPE_ECC_KEY_PAIR_BASE)
-
-/**
  * @brief   Elliptic curve public key.
  *
  * @details The size of an elliptic curve public key is the same as the corresponding private key.

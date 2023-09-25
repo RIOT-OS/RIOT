@@ -46,11 +46,31 @@ psa_status_t psa_ecc_p256r1_sign_hash(  const psa_key_attributes_t *attributes,
                                         size_t *signature_length)
 {
     (void)key_buffer_size;
-    CRYS_ECPKI_HASH_OpMode_t hash_mode = MAP_PSA_HASH_TO_CRYS_HASH(PSA_ALG_GET_HASH(alg));
+    CRYS_ECPKI_HASH_OpMode_t hash_mode = MAP_PSA_HASH_TO_CRYS_HASH_AFTER(PSA_ALG_GET_HASH(alg));
     *signature_length = signature_size;
-    return cryptocell_310_common_ecc_sign_hash(key_buffer,
+    return cryptocell_310_common_ecc_sign(key_buffer,
                                        PSA_BITS_TO_BYTES(attributes->bits),
                                        hash, hash_length, signature,
+                                       signature_length, hash_mode,
+                                       CRYS_ECPKI_DomainID_secp256r1);
+}
+
+psa_status_t psa_ecc_p256r1_sign_message(const psa_key_attributes_t *attributes,
+                                        psa_algorithm_t alg,
+                                        const uint8_t *key_buffer,
+                                        size_t key_buffer_size,
+                                        const uint8_t *input,
+                                        size_t input_length,
+                                        uint8_t *signature,
+                                        size_t signature_size,
+                                        size_t *signature_length)
+{
+    (void)key_buffer_size;
+    CRYS_ECPKI_HASH_OpMode_t hash_mode = MAP_PSA_HASH_TO_CRYS_HASH_BEFORE(PSA_ALG_GET_HASH(alg));
+    *signature_length = signature_size;
+    return cryptocell_310_common_ecc_sign(key_buffer,
+                                       PSA_BITS_TO_BYTES(attributes->bits),
+                                       input, input_length, signature,
                                        signature_length, hash_mode,
                                        CRYS_ECPKI_DomainID_secp256r1);
 }
@@ -64,11 +84,29 @@ psa_status_t psa_ecc_p256r1_verify_hash(const psa_key_attributes_t *attributes,
                                         const uint8_t *signature,
                                         size_t signature_length)
 {
-    CRYS_ECPKI_HASH_OpMode_t hash_mode = MAP_PSA_HASH_TO_CRYS_HASH(PSA_ALG_GET_HASH(alg));
+    CRYS_ECPKI_HASH_OpMode_t hash_mode = MAP_PSA_HASH_TO_CRYS_HASH_AFTER(PSA_ALG_GET_HASH(alg));
 
     (void)attributes;
-    return cryptocell_310_common_ecc_verify_hash(key_buffer, key_buffer_size,
+    return cryptocell_310_common_ecc_verify(key_buffer, key_buffer_size,
                                          hash, hash_length, signature,
+                                         signature_length, hash_mode,
+                                         CRYS_ECPKI_DomainID_secp256r1);
+}
+
+psa_status_t psa_ecc_p256r1_verify_message(const psa_key_attributes_t *attributes,
+                                        psa_algorithm_t alg,
+                                        const uint8_t *key_buffer,
+                                        size_t key_buffer_size,
+                                        const uint8_t *input,
+                                        size_t input_length,
+                                        const uint8_t *signature,
+                                        size_t signature_length)
+{
+    CRYS_ECPKI_HASH_OpMode_t hash_mode = MAP_PSA_HASH_TO_CRYS_HASH_BEFORE(PSA_ALG_GET_HASH(alg));
+
+    (void)attributes;
+    return cryptocell_310_common_ecc_verify(key_buffer, key_buffer_size,
+                                         input, input_length, signature,
                                          signature_length, hash_mode,
                                          CRYS_ECPKI_DomainID_secp256r1);
 }
