@@ -37,4 +37,8 @@ choice STDIO_IMPLEMENTATION
     default MODULE_STDIO_USB_SERIAL_JTAG
 endchoice
 
+choice ESP32_I2C_IMPLEMENTATION
+     default MODULE_ESP_I2C_HW
+endchoice
+
 source "$(RIOTBOARD)/common/esp32s3/Kconfig"
