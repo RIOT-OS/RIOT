@@ -193,7 +193,7 @@ struct _thread {
                                          to this thread's message queue */
 #endif
 #if defined(DEVELHELP) || IS_ACTIVE(SCHED_TEST_STACK) \
-    || defined(MODULE_MPU_STACK_GUARD) || defined(MODULE_PMP_STACKGUARD) \
+    || defined(MODULE_MPU_STACK_GUARD) || defined(MODULE_PMP_STACK_GUARD) \
     || defined(DOXYGEN)
     char *stack_start;              /**< thread's stack start address   */
 #endif
@@ -556,7 +556,7 @@ const char *thread_state_to_string(thread_status_t state);
 static inline void *thread_get_stackstart(const thread_t *thread)
 {
 #if defined(DEVELHELP) || IS_ACTIVE(SCHED_TEST_STACK) \
-    || defined(MODULE_MPU_STACK_GUARD) || defined(MODULE_PMP_STACKGUARD)
+    || defined(MODULE_MPU_STACK_GUARD) || defined(MODULE_PMP_STACK_GUARD)
     return thread->stack_start;
 #else
     (void)thread;

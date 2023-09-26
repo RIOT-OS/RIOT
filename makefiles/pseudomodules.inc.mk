@@ -323,7 +323,7 @@ PSEUDOMODULES += mpu_noexec_ram
 ## @}
 
 ## @defgroup pseudomodule_pmp_stack_guard pmp_stack_guard
-## @brief MPU based stack guard
+## @brief PMP based stack guard
 ##
 ## When this module is active,
 ## the Physical Memory Protection Unit will be configured to detect stack overflows.
