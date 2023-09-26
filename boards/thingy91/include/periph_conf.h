@@ -51,6 +51,21 @@ static const uart_conf_t uart_config[] = {
 
 #define UART_NUMOF          ARRAY_SIZE(uart_config) /**< UART confgiguration NUMOF */
 /**
+ * @name    I2C configuration
+ * @{
+ */
+static const i2c_conf_t i2c_config[] = {
+    {
+        .dev = NRF_TWIM1,
+        .scl = GPIO_PIN(0, ???),
+        .sda = GPIO_PIN(0, ???),
+        .speed = I2C_SPEED_NORMAL
+    }
+};
+#define I2C_NUMOF           ARRAY_SIZE(i2c_config)
+/** @} */
+
+/**
  * @name   Timer configuration
  * @{
  */
