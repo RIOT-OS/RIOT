@@ -1,0 +1,19 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config PACKAGE_DRIVER_CRYPTOCELL_310
+    bool
+    depends on CPU_MODEL_NRF52840XXAA
+    depends on TEST_KCONFIG
+    depends on HAS_PERIPH_CRYPTOCELL_310
+    depends on MODULE_PERIPH_CRYPTOCELL_310
+    select MODULE_DRIVER_CRYPTOCELL_310_CONTRIB
+
+config MODULE_DRIVER_CRYPTOCELL_310_CONTRIB
+    bool
+
+rsource "psa_cryptocell_310/Kconfig"

@@ -24,6 +24,7 @@
 
 #include "periph/gpio.h"
 #include "periph/adc.h"
+#include "periph_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,7 +44,9 @@ extern "C" {
 /**
  * @brief   SPI_DEV(1) is connected to D11/D12/D13
  */
-#define ARDUINO_SPI_D11D12D13   SPI_DEV(1)
+#if !defined(ARDUINO_SPI_D11D12D13) && defined(SPI_NUMOF)
+#define ARDUINO_SPI_D11D12D13   SPI_DEV(0)
+#endif
 /** @} */
 
 /**

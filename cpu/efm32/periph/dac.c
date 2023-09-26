@@ -20,6 +20,7 @@
  */
 
 #include "cpu.h"
+#include "macros/units.h"
 
 #include "periph_conf.h"
 #include "periph/dac.h"
@@ -27,6 +28,23 @@
 #include "em_cmu.h"
 #if defined(DAC_COUNT) && DAC_COUNT > 0
 #include "em_dac.h"
+#elif defined(VDAC_COUNT) && VDAC_COUNT > 0
+#include "em_vdac.h"
+#endif
+
+/* DAC implementation can be used for VDAC by mapping the symbols */
+#if defined(VDAC_COUNT) && VDAC_COUNT > 0
+
+#define DAC_INIT_DEFAULT        VDAC_INIT_DEFAULT
+#define DAC_INITCHANNEL_DEFAULT VDAC_INITCHANNEL_DEFAULT
+
+#define DAC_Init_TypeDef        VDAC_Init_TypeDef
+#define DAC_InitChannel_TypeDef VDAC_InitChannel_TypeDef
+#define DAC_Reset               VDAC_Reset
+#define DAC_Init                VDAC_Init
+#define DAC_InitChannel         VDAC_InitChannel
+#define DAC_ChannelOutputSet    VDAC_ChannelOutputSet
+
 #endif
 
 int8_t dac_init(dac_t line)
@@ -45,7 +63,11 @@ int8_t dac_init(dac_t line)
     /* reset and initialize peripheral */
     DAC_Init_TypeDef init = DAC_INIT_DEFAULT;
 
+#if defined(VDAC_COUNT)
     init.reference = dac_config[dev].ref;
+    init.prescaler = VDAC_PrescaleCalc(MHZ(1000000), true, 0);
+#endif
+
     DAC_Reset(dac_config[dev].dev);
     DAC_Init(dac_config[dev].dev, &init);
 

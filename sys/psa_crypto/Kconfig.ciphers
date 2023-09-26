@@ -1,0 +1,92 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_PSA_CIPHER
+    bool "PSA Ciphers"
+    select PSA_KEY_CONFIG
+    select MODULE_PSA_KEY_SLOT_MGMT
+
+if MODULE_PSA_CIPHER
+
+menuconfig MODULE_PSA_CIPHER_AES_128_ECB
+    bool "AES-128 ECB"
+    select PSA_KEY_SIZE_128
+
+if MODULE_PSA_CIPHER_AES_128_ECB
+
+choice PSA_CIPHER_AES_128_ECB_BACKEND
+    bool "AES-128 Implementation"
+
+config MODULE_PSA_CIPHER_AES_128_ECB_BACKEND_RIOT
+    bool "RIOT cipher"
+    select MODULE_CRYPTO
+    select MODULE_PSA_RIOT_CIPHER_AES_ECB
+
+endchoice
+
+endif # MODULE_PSA_CIPHER_AES_128_ECB
+
+menuconfig MODULE_PSA_CIPHER_AES_128_CBC
+    bool "AES-128 CBC"
+    select PSA_KEY_SIZE_128
+
+if MODULE_PSA_CIPHER_AES_128_CBC
+
+choice PSA_CIPHER_AES_128_CBC_BACKEND
+    bool "AES-128 CBC Implementation"
+
+config MODULE_PSA_CIPHER_AES_128_CBC_BACKEND_PERIPH
+    bool "Hardware Accelerated"
+    depends on HAS_PERIPH_CIPHER_AES_128_CBC
+    select MODULE_PERIPH_CIPHER_AES_128_CBC
+
+config MODULE_PSA_CIPHER_AES_128_CBC_BACKEND_RIOT
+    bool "RIOT cipher"
+    select MODULE_CRYPTO
+    select MODULE_PSA_RIOT_CIPHER_AES_128_CBC
+
+endchoice
+
+endif # MODULE_PSA_CIPHER_AES_128_CBC
+
+menuconfig MODULE_PSA_CIPHER_AES_192_CBC
+    bool "AES-192 CBC"
+    select PSA_KEY_SIZE_192
+
+if MODULE_PSA_CIPHER_AES_192_CBC
+
+choice PSA_CIPHER_AES_192_CBC_BACKEND
+    bool "AES-192 Implementation"
+
+config MODULE_PSA_CIPHER_AES_192_CBC_BACKEND_RIOT
+    bool "RIOT cipher"
+    select MODULE_CRYPTO
+    select MODULE_PSA_RIOT_CIPHER_AES_CBC
+
+endchoice
+
+endif # MODULE_PSA_CIPHER_AES_192_CBC
+
+menuconfig MODULE_PSA_CIPHER_AES_256_CBC
+    bool "AES-256 CBC"
+    select PSA_KEY_SIZE_256
+
+if MODULE_PSA_CIPHER_AES_256_CBC
+
+choice CIPHER_AES_256_CBC_BACKEND
+    bool "AES-256 Implementation"
+
+config MODULE_PSA_CIPHER_AES_256_CBC_BACKEND_RIOT
+    bool "RIOT Cipher Module"
+    select MODULE_CRYPTO
+    select MODULE_PSA_RIOT_CIPHER_AES_CBC
+
+endchoice
+
+endif # MODULE_PSA_CIPHER_AES_256_CBC
+
+endif # MODULE_PSA_CIPHER

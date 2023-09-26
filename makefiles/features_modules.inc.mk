@@ -11,9 +11,13 @@ USEMODULE += $(PERIPH_FEATURES)
 
 # Add all USED periph_% init modules unless they are blacklisted
 PERIPH_IGNORE_MODULES := \
+  periph_cipher_aes_128_cbc \
   periph_clic \
   periph_common \
   periph_coretimer \
+  periph_cryptocell_310 \
+  periph_ecc_p192r1 \
+  periph_ecc_p256r1 \
   periph_eth \
   periph_eth_common \
   periph_flash \
@@ -25,6 +29,11 @@ PERIPH_IGNORE_MODULES := \
   periph_gpio_ll_irq_level_triggered_low \
   periph_gpio_ll_irq_unmask \
   periph_gpio_mux \
+  periph_hash_sha_1 \
+  periph_hash_sha_224 \
+  periph_hash_sha_256 \
+  periph_hash_sha_512 \
+  periph_hmac_sha_256 \
   periph_i2c_hw \
   periph_i2c_sw \
   periph_init% \

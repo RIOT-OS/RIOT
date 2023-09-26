@@ -1,0 +1,40 @@
+# Copyright (c) 2023 Gunar Schorcht
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_TOUCH_DEV_GESTURES
+    bool "Touch device gesture recognition"
+    depends on TEST_KCONFIG
+    select MODULE_TOUCH_DEV
+    select MODULE_ZTIMER_MSEC
+    help
+        Gesture recognition for touch devices that are accessed using the
+        generic touch device API.
+
+if MODULE_TOUCH_DEV_GESTURES
+
+config TOUCH_DEV_SWIPE_TRESH
+    int "Swipe threshold"
+    range 0 50
+    default 5
+    help
+        Minimum distance in one direction to recognize a swipe gesture.
+
+config TOUCH_DEV_PRESS_TIME_MS
+    int "Press time in milliseconds"
+    range 0 2000
+    default 600
+    help
+        Minimum touch time in milliseconds to detect a long press gesture.
+
+config TOUCH_DEV_DOUBLE_TIME_MS
+    int "Double tap maximum delay in milliseconds"
+    range 0 1000
+    default 400
+    help
+        Maximum time in milliseconds between two taps to detect a double tap.
+
+endif

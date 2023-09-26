@@ -133,6 +133,7 @@
 #include "byteorder.h"
 #include "macros/units.h"
 #include "periph_conf.h"
+#include "xfa.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -1387,14 +1388,61 @@ typedef struct sdmmc_dev {
 } sdmmc_dev_t;
 
 /**
- * @brief   Retrieve SDIO/SD/MMC device descriptor from the peripheral index
+ * @brief   SDIO/SD/MMC device descriptor references as read-only XFA
  *
- * The function converts the peripheral index to the corresponding SDIO/SD/MMC
- * device descriptor.
+ * The array contains the references to all SDIO/SD/MMC device descriptors.
+ * The i-th device in this array can then be accessed with `sdmmc_devs[i]`.
+ * The number of SDIO/SD/MMC device descriptor references defined in this array
+ * is `XFA_LEN(sdmmc_devs)`, see @ref SDMMC_NUMOF.
  *
- * @note This function has to be implemented by the low-level SDIO/SD/MMC
- *       peripheral driver to allow to convert a SDIO/SD/MMC peripheral index
- *       to the corresponding SDIO/SD/MMC device descriptor.
+ * @warning To ensure to have the references to all SDIO/SD/MMC device
+ *          descriptors in this array, the low-level SDIO/SD/MMC peripheral
+ *          drivers must define the references to their SDIO/SD/MMC
+ *          device descriptors as XFA members by using the macro
+ *          `XFA_CONST(sdmmc_devs, 0)` as shown in the example below.
+ *
+ * For example, if the low-level
+ * SDIO/SD/MMC peripheral driver defines an MCU-specific SDIO/SD/MMC
+ * device descriptor structure `_mcu_sdmmc_dev_t` and defines the device
+ * descriptors in an array `_mcu_sdmmc_dev`, it must define the references
+ * to them as members of the XFA `sdmmc_devs` as follows:
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+ * typedef struct {
+ *     sdmmc_dev_t sdmmc_dev;      // Inherited sdmmc_dev_t struct
+ *     const sdmmc_conf_t *config; // SDIO/SD/MMC peripheral config
+ *     ...
+ * } _mcu_sdmmc_dev_t;
+ *
+ * static _mcu_sdmmc_dev_t _mcu_sdmmc_devs[] = {
+ *     {
+ *         ...
+ *     },
+ *     {
+ *         ...
+ *     },
+ * };
+ *
+ * XFA_CONST(sdmmc_devs, 0) sdmmc_dev_t * const _sdmmc_1 = (sdmmc_dev_t * const)&_mcu_sdmmc_devs[0];
+ * XFA_CONST(sdmmc_devs, 0) sdmmc_dev_t * const _sdmmc_2 = (sdmmc_dev_t * const)&_mcu_sdmmc_devs[1];
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ */
+#if !DOXYGEN
+XFA_USE_CONST(sdmmc_dev_t * const, sdmmc_devs);
+#else
+sdmmc_dev_t sdmmc_devs[];
+#endif
+
+/**
+ * @brief   Number of SDIO/SD/MMC devices defined
+ */
+#define SDMMC_NUMOF   XFA_LEN(sdmmc_dev_t *, sdmmc_devs)
+
+/**
+ * @brief   Retrieve SDIO/SD/MMC device descriptor reference from device index
+ *
+ * The function converts the device index to the corresponding SDIO/SD/MMC
+ * device descriptor. See also @ref sdmmc_devs.
  *
  * @param[in]   num   SDIO/SD/MMC peripheral index
  *
@@ -1402,7 +1450,10 @@ typedef struct sdmmc_dev {
  * @retval  NULL if @p num is greater than the number of SDIO/SD/MMC device
  *          descriptors
  */
-sdmmc_dev_t *sdmmc_get_dev(unsigned num);
+static inline sdmmc_dev_t *sdmmc_get_dev(unsigned num)
+{
+    return (num < SDMMC_NUMOF) ? sdmmc_devs[num] : NULL;
+}
 
 /**
  * @brief   Basic initialization of the given SDIO/SD/MMC device
@@ -1569,7 +1620,7 @@ int sdmmc_send_acmd(sdmmc_dev_t *dev, sdmmc_cmd_t cmd_idx, uint32_t arg,
  *
  * @warning  If the low-level SDIO/SD/MMC peripheral driver defines its own
  *           @ref sdmmc_driver_t::card_init function, this function is used
- *           instead. \n
+ *           instead.\n
  *           However, the low-level SDIO/SD/MMC peripheral driver should
  *           define its own @ref sdmmc_driver_t::card_init function only in
  *           very special cases, e.g. when special hardware handling is

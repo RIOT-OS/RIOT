@@ -19,5 +19,13 @@ ifneq (,$(filter periph_spi,$(USEMODULE)))
   DISABLE_MODULE += periph_init_led0
 endif
 
+ifneq (,$(filter disp_dev,$(USEMODULE)))
+  USEMODULE += st7789
+endif
+
+ifneq (,$(filter st7789,$(USEMODULE)))
+  USEMODULE += lcd_parallel_16bit
+endif
+
 # TODO: remove the stdin dependency
 USEMODULE += stdin

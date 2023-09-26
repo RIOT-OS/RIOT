@@ -7,6 +7,11 @@ INCLUDES += -I$(PKG_SOURCE_DIR)/app
 INCLUDES += -I$(PKG_SOURCE_DIR)/lib/calib
 INCLUDES += -I$(RIOTPKG)/cryptoauthlib/include
 
+ifneq (,$(filter psa_crypto, $(USEMODULE)))
+  DIRS += $(RIOTPKG)/cryptoauthlib/psa_atca_driver
+  INCLUDES += -I$(RIOTBASE)/sys/psa_crypto/include
+endif
+
 DIRS += $(RIOTPKG)/cryptoauthlib/contrib
 ARCHIVES += $(BINDIR)/cryptoauthlib.a
 
@@ -20,4 +25,9 @@ ifneq (,$(filter cryptoauthlib_test,$(USEMODULE)))
   INCLUDES += -I$(PKG_TESTINCLDIR)/api_crypto
   INCLUDES += -I$(PKG_TESTINCLDIR)/vectors
   INCLUDES += -I$(PKG_SOURCE_DIR)/third_party/unity
+endif
+
+ifneq (,$(filter psa_crypto,$(USEMODULE)))
+  PSEUDOMODULES += psa_secure_element_ateccx08a
+  PSEUDOMODULES += psa_secure_element_ateccx08a_ecc_p256
 endif

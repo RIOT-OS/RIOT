@@ -686,6 +686,14 @@ ifneq (,$(filter fido2_ctap%,$(USEMODULE)))
   USEMODULE += fido2
 endif
 
+ifneq (,$(filter psa_crypto,$(USEMODULE)))
+  include $(RIOTBASE)/sys/psa_crypto/Makefile.dep
+endif
+
+ifneq (,$(filter psa_riot_cipher_aes_%,$(USEMODULE)))
+  USEMODULE += psa_riot_cipher_aes_common
+endif
+
 ifneq (,$(filter rust_riotmodules,$(USEMODULE)))
   include $(RIOTBASE)/sys/rust_riotmodules/Makefile.dep
 endif

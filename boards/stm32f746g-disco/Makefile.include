@@ -14,5 +14,6 @@ PROGRAMMERS_SUPPORTED += openocd
 # use connect_assert_srst to always be able to flash or reset the board.
 OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
 
+# heap configuration
 FMC_RAM_ADDR=0xc0000000
 FMC_RAM_LEN=8192K

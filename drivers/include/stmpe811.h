@@ -46,6 +46,26 @@ typedef enum {
 } stmpe811_touch_state_t;
 
 /**
+ * @brief   Touch screen coordinate conversions
+ *
+ * Normally the coordinates of the touch device must be converted to the
+ * screen coordinates by swapping and/or mirroring. The flags defined by
+ * this enumeration can be ORed for a combined conversion. In this case,
+ * the swapping is performed before the mirroring.
+ *
+ * @note The maximum X and Y screen coordinates defined by
+ *       @ref stmpe811_params_t::xmax and @ref stmpe811_params_t::ymax
+ *       define the dimension of the touch device in screen coordinates,
+ *       i.e. after conversion.
+ */
+typedef enum {
+    STMPE811_NO_CONV  = 0x00, /**< No conversion */
+    STMPE811_MIRROR_X = 0x01, /**< Mirror X, applied after optional swapping */
+    STMPE811_MIRROR_Y = 0x02, /**< Mirror Y, applied after optional swapping */
+    STMPE811_SWAP_XY  = 0x04, /**< Swap XY, applied before optional mirroring */
+} stmpe811_touch_conv_t;
+
+/**
  * @brief  Touch position structure
  */
 typedef struct {
@@ -62,6 +82,10 @@ typedef void (*stmpe811_event_cb_t)(void *arg);
 
 /**
  * @brief   Device initialization parameters
+ *
+ * @note stmpe811_params_t::xmax and stmpe811_params_t::ymax define the
+ *       maximum X and Y values in screen coordinates after the optional
+ *       conversion defined by stmpe811_params_t::xmax.
  */
 typedef struct {
 #if IS_USED(MODULE_STMPE811_SPI)
@@ -78,6 +102,8 @@ typedef struct {
     gpio_t int_pin;                    /**< Touch screen interrupt pin */
     uint16_t xmax;                     /**< Touch screen max X position */
     uint16_t ymax;                     /**< Touch screen max Y position */
+    stmpe811_touch_conv_t xyconv;      /**< Touch screen coordinates conversion,
+                                            swapping is applied before mirroring */
 } stmpe811_params_t;
 
 /**

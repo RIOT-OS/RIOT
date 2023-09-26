@@ -1,2 +1,14 @@
-FEATURES_REQUIRED += periph_spi
 FEATURES_REQUIRED += periph_gpio
+
+ifneq (,$(filter lcd_parallel_16bit,$(USEMODULE)))
+  USEMODULE += lcd_parallel
+endif
+
+ifeq (,$(filter lcd_parallel%,$(USEMODULE)))
+  # default to SPI serial interface if no MCU 8080 parallel interface is enabled
+  USEMODULE += lcd_spi
+endif
+
+ifneq (,$(filter lcd_spi,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_spi
+endif
