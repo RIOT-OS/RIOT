@@ -33,7 +33,7 @@ The main features of the board are:
 
 - ESP32-S3 SoC with 2.4 GHz WiFi 802.11b/g/n and Bluetooth5, BLE
 - 16 MByte Flash
-- 4 MByte SPI RAM
+- 8 MByte QSPI RAM
 - RGB LED WS2812B
 - Native USB and USB Serial JTAG
 - LiPo Battery Charging and PicoBlade connector
