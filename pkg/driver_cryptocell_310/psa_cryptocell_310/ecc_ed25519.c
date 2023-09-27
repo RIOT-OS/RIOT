@@ -21,6 +21,7 @@
 #include "crys_ec_edw_api.h"
 #include "psa_error.h"
 #include "cryptocell_310_util.h"
+#include "string_utils.h"
 
 #define ENABLE_DEBUG    0
 #include "debug.h"
@@ -49,13 +50,15 @@ psa_status_t psa_generate_ecc_ed25519_key_pair( uint8_t *priv_key_buffer,
     cryptocell_310_disable();
     if (ret != CRYS_OK) {
         DEBUG("CRYS_ECEDW_KeyPair failed with %s\n", cryptocell310_status_to_humanly_readable(ret));
-        return CRYS_to_psa_error(ret);
+        goto done;
     }
 
     memcpy(priv_key_buffer, secret_key, CRYS_ECEDW_ORD_SIZE_IN_BYTES);
     memcpy(pub_key_buffer, &secret_key[CRYS_ECEDW_ORD_SIZE_IN_BYTES], CRYS_ECEDW_MOD_SIZE_IN_BYTES);
 
-    return PSA_SUCCESS;
+done:
+    explicit_bzero(&secret_key, sizeof(secret_key));
+    return CRYS_to_psa_error(ret);
 }
 
 psa_status_t psa_ecc_ed25519_sign_message(const uint8_t *priv_key_buffer,
@@ -91,10 +94,12 @@ psa_status_t psa_ecc_ed25519_sign_message(const uint8_t *priv_key_buffer,
     cryptocell_310_disable();
     if (ret != CRYS_OK) {
         DEBUG("CRYS_ECEDW_Sign failed with %s\n", cryptocell310_status_to_humanly_readable(ret));
-        return CRYS_to_psa_error(ret);
+        goto done;
     }
 
-    return PSA_SUCCESS;
+done:
+    explicit_bzero(&secret_key, sizeof(secret_key));
+    return CRYS_to_psa_error(ret);
 
     (void)signature_size;
 }

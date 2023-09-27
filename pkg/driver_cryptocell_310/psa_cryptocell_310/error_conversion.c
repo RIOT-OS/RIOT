@@ -23,6 +23,8 @@
 psa_status_t CRYS_to_psa_error(CRYSError_t error)
 {
     switch (error) {
+    case CRYS_OK:
+        return PSA_SUCCESS;
     case CRYS_HASH_ILLEGAL_OPERATION_MODE_ERROR:
     case CRYS_HASH_IS_NOT_SUPPORTED:
         return PSA_ERROR_NOT_SUPPORTED;
