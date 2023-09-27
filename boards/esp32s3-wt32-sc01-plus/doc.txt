@@ -41,7 +41,7 @@ The ESP32-S3 WT32-SC01 Plus has following main features:
 | ESP32-S3 SoC                                | yes     |
 | 16 MB Flash                                 | yes     |
 | 2 MB QSPI RAM                               | yes     |
-| 3.5" LCD Display 480 x 320 with ST7796UI    | yes     |
+| 3.5\" LCD Display 480 x 320 with ST7796UI   | yes     |
 | Capacitive Touch Panel with FT6336U         | yes     |
 | SD Card SPI mode                            | yes     |
 | USB Type-C                                  | yes     |

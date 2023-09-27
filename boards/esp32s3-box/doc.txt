@@ -38,7 +38,7 @@ The ESP32-S3-Box has following main features:
 | ESP32-S3 SoC                                | yes     |
 | 16 MB Flash                                 | yes     |
 | 8 MB QSPI RAM                               | yes     |
-| 2.4" LCD Display 320 x 240 with ILI9342C    | yes     |
+| 2.4\" LCD Display 320 x 240 with ILI9342C   | yes     |
 | Capacitive Touch Panel                      | no      |
 | Dual Microphone ES7210                      | no      |
 | Speaker Codec ES8311                        | no      |
