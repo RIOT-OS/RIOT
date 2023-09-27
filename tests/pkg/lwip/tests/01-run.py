@@ -367,8 +367,7 @@ def test_tcp_large_send(board_group, application, ipv6=True, env=None):
             # Last line of the message should be on the third read call,
             # together with the rest of the third read.
             server.expect(u"00000050  %s" % data_line(len(data) - 16))
-            sock.close()
-            server.expect(u"TCP connection to \\[([0-9a-f:]+|[0-9\\.]+)\\]:[0-9]+ reset")
+        server.expect(u"TCP connection to \\[([0-9a-f:]+|[0-9\\.]+)\\]:[0-9]+ reset")
 
 
 def test_tcpv4_large_send(board_group, application, env=None):
