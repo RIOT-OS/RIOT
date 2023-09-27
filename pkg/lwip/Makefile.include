@@ -20,8 +20,13 @@ PSEUDOMODULES += lwip_sock_async
 #These flags enable calculating ICMP chksum in LWIP software.
 #Without these flags RIOT device respond with ICMP chsum equal to 0, and
 #cannot be successfully "pinged" from Windows hosts.
-CFLAGS +=-DCHECKSUM_GEN_ICMP=0
-CFLAGS +=-DLWIP_CHECKSUM_CTRL_PER_NETIF=1
+ifeq ($(BOARD),nucleo-f207zg)
+ CFLAGS +=-DCHECKSUM_GEN_ICMP=0
+endif
+
+ifeq ($(BOARD),nucleo-f429zi)
+ CFLAGS +=-DCHECKSUM_GEN_ICMP=0
+endif
 
 ifneq (,$(filter lwip_contrib,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/lwip/contrib
