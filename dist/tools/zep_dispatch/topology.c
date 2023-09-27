@@ -90,13 +90,18 @@ static bool _parse_line(char *line, list_node_t *nodes, list_node_t *edges)
         return true;
     }
 
-    char *a     = strtok(line, "\t ");
+    char *a     = strtok(line, "\n\t ");
     char *b     = strtok(NULL, "\n\t ");
     char *e_ab  = strtok(NULL, "\n\t ");
     char *e_ba  = strtok(NULL, "\n\t ");
 
-    if (a == NULL || b == NULL) {
+    if (a == NULL) {
         return false;
+    }
+
+    if (b == NULL) {
+        _find_or_create_node(nodes, a);
+        return true;
     }
 
     /* add node with a defined MAC address */
@@ -332,7 +337,9 @@ bool topology_add(topology_t *t, const uint8_t *mac, uint8_t mac_len,
         return false;
     }
 
-    printf("adding node %s\n", _fmt_addr(addr_str, sizeof(addr_str), mac, mac_len));
+    printf("adding node %s as %s\n",
+            _fmt_addr(addr_str, sizeof(addr_str), mac, mac_len),
+            (char *)empty->name);
 
     /* add new node to empty spot */
     memcpy(empty->mac, mac, sizeof(empty->mac));
