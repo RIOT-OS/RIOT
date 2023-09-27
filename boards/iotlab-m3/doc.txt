@@ -18,13 +18,11 @@
 
 ## Board HW overview
 
-![IoT-LAB M3 Layout]
-(https://www.iot-lab.info/wp-content/uploads/2013/10/m3opennode.png)
+![IoT-LAB M3 Layout](https://www.iot-lab.info/wp-content/uploads/2013/10/m3opennode.png)
 
 ### Board Architecture
 
-![IoT-LAB M3 Architecture]
-(https://github.com/iot-lab/iot-lab/wiki/Images/archiopenm3.png)
+![IoT-LAB M3 Architecture](https://github.com/iot-lab/iot-lab/wiki/Images/archiopenm3.png)
 
 ### [Board schematics](http://github.com/iot-lab/iot-lab/wiki/Docs/openm3-schematics.pdf)
 , wiring, pinouts, etc...

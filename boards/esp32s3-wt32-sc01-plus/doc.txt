@@ -31,8 +31,8 @@ is a smart panel development platform with the ESP32-S3 SoC.
 
 \image html https://raw.githubusercontent.com/sukesh-ak/ESP32-TUX/master/datasheet/WT32-SC01-Plus.png "ESP32-S3 WT32-SC01 Plus" width=400px
 
-It also available on the market as [Smart Panlee SC01 Plus]
-(http://en.smartpanle.com/product-item-15.html).
+It also available on the market as
+[Smart Panlee SC01 Plus](http://en.smartpanle.com/product-item-15.html).
 
 The ESP32-S3 WT32-SC01 Plus has following main features:
 <center>

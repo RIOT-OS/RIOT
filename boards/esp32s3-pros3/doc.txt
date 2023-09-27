@@ -128,8 +128,8 @@ The following figure shows the pinout as configured by board definition.
 
 @image html https://esp32s3.com/images/pins_pros3.jpg "ESP32 ProS3C-1 Pinout" width=900px
 
-The corresponding board schematic can be found [here]
-(https://github.com/UnexpectedMaker/esp32s3/raw/main/schematics/schematic-pros3.pdf)
+The corresponding board schematic can be found
+[here](https://github.com/UnexpectedMaker/esp32s3/raw/main/schematics/schematic-pros3.pdf)
 
 [Back to table of contents](#esp32s3_pros3_toc)
 
