@@ -510,6 +510,10 @@ if __name__ == "__main__":
             ]
         )
     test_cases.append(test_triple_send)
-    TestStrategy().execute([BoardGroup((Board("native", "tap0"),
-                            Board("native", "tap1")))],
-                           test_cases)
+    try:
+        TestStrategy().execute([BoardGroup((Board("native", "tap0"),
+                                Board("native", "tap1")))],
+                               test_cases)
+    except Exception as exc:
+        print(f"\033[31;1m{type(exc).__name__}: {exc}\033[0m", file=sys.stderr)
+        raise
