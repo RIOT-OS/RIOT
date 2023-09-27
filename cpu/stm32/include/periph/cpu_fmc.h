@@ -257,8 +257,7 @@ typedef struct {
  *
  * The GPIOs are defined depending on used memory type according to the
  * FMC pin definition in Table 12 of section 4 in the
- * [Datasheet for STM32F765xx, STM32F767xx, STM32F768Ax, STM32F769xx]
- * (https://www.st.com/resource/en/datasheet/stm32f767zi.pdf).
+ * [Datasheet for STM32F765xx, STM32F767xx, STM32F768Ax, STM32F769xx](https://www.st.com/resource/en/datasheet/stm32f767zi.pdf).
  * Which memory types are used is defined by the pseudomodules
  * `periph_fmc_nor_sram`, `periph_fmc_nand` and `periph_fmc_sdram`
  *
