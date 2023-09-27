@@ -1,7 +1,7 @@
 include ../Makefile.pkg_common
 
-LWIP_IPV4 ?= 0
-LWIP_IPV6 ?= 1
+export LWIP_IPV4 ?= 0
+export LWIP_IPV6 ?= 1
 
 ifneq (0, $(LWIP_IPV4))
   USEMODULE += ipv4_addr
