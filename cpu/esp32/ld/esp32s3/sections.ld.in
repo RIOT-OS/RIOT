@@ -213,6 +213,8 @@ SECTIONS
     *components/esp_hw_support/*/rtc_sleep.*(.literal .literal.* .text .text.*)
     *components/esp_hw_support/*/rtc_time.*(.literal .literal.* .text .text.*)
     *components/esp_hw_support/*/rtc_wdt.*(.literal .literal.* .text .text.*)
+    *components/esp_hw_support/*/spiram_psram.*(.literal .literal.* .text .text.*)
+    *components/esp_hw_support/*/opiram_psram.*(.literal .literal.* .text .text.*)
     *components/esp_ringbuf/*(.literal .literal.* .text .text.*)
     *components/esp_rom/esp_rom_spiflash.*(.literal .literal.* .text .text.*)
     *components/esp_system/esp_err.*(.literal .literal.* .text .text.*)
