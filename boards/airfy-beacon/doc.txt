@@ -11,13 +11,11 @@ usual micro-controller peripherals with a 2.4GHz radio that supports both
 Nordics proprietary ShockBurst as well as Bluetooth Low Energy (BLE).
 
 The board was available via
-[Indiegogo]
-(https://www.indiegogo.com/projects/airfy-beacon-make-your-smart-home-even-smarter).
+[Indiegogo](https://www.indiegogo.com/projects/airfy-beacon-make-your-smart-home-even-smarter).
 
 ## Hardware
 
-![airfy-beacon]
-(https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/airfy-beacon.jpg)
+![airfy-beacon](https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/airfy-beacon.jpg)
 
 | MCU                   | NRF51822QFAA                      |
 |:--------------------- |:--------------------------------- |
@@ -114,8 +112,7 @@ SWD data I/O:      SWDIO <-----------> SWDIO (CN3, pin4)
 
 The following image shows the wiring for an SWD flasher board:
 
-![airfy-beacon-flash-connect]
-(https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/airfy-beacon-flash-connect.jpg)
+![airfy-beacon-flash-connect](https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/airfy-beacon-flash-connect.jpg)
 
 ### Software
 Debugging and programming this module works well with

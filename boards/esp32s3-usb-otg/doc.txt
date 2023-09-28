@@ -73,7 +73,7 @@ The Espressif ESP32-S3-USB-OTG is a development board that uses the
 ESP32-S3-MINI-1 module. Most important features of the board are
 
 - Micro-SD Card interface
-- 1.3" Color LCD display with ST7789 display controller
+- 1.3\" Color LCD display with ST7789 display controller
 - USB-to-UART bridge
 - `USB_DEV` Type-A male port
 - `USB_HOST` Type-A female port

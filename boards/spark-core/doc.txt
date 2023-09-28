@@ -12,8 +12,7 @@ when you're ready to integrate the Core into your product, you can.
 
 ## Hardware
 
-![Spark-Core image]
-(https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/spark-core.jpg)
+![Spark-Core image](https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/spark-core.jpg)
 
 Link to [product website](http://docs.spark.io/hardware/).
 

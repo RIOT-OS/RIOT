@@ -63,7 +63,7 @@
 /**
  * @name    LCD display configuration
  *
- * ESP32-S3 WT32-SC01 Plus uses a 3.5" LCD 480 x 320 pixel display with
+ * ESP32-S3 WT32-SC01 Plus uses a 3.5\" LCD 480 x 320 pixel display with
  * an ST7796UI as driver chip and MCU8080 8-bit parallel interface.
  *
  * This configuration cannot be changed.
