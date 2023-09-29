@@ -908,6 +908,25 @@ typedef struct {
 #endif /* USB_INST_NUM */
 
 /**
+ * @brief SDIO/SDMMC buffer alignment for SDHC because of DMA/FIFO buffer restrictions
+ */
+#define SDMMC_CPU_DMA_ALIGNMENT     4
+
+/**
+ * @brief SDIO/SDMMC buffer instantiation requirement for SDHC
+ */
+#define SDMMC_CPU_DMA_REQUIREMENTS  __attribute__((aligned(SDMMC_CPU_DMA_ALIGNMENT)))
+
+/**
+ * @brief SDHC peripheral configuration
+ */
+typedef struct {
+    void *sdhc; /**< SDHC peripheral */
+    gpio_t cd;  /**< Card Detect pin (must be GPIO_UNDEF if not connected) */
+    gpio_t wp;  /**< Write Protect pin (must be GPIO_UNDEF if not connected) */
+} sdhc_conf_t;
+
+/**
  * @name    WDT upper and lower bound times in ms
  * @{
  */

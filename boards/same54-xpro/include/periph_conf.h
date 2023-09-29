@@ -369,6 +369,18 @@ static const adc_conf_chan_t adc_channels[] = {
  */
 #define SDHC_DEV            SDHC1       /**< The SDHC instance to use */
 #define SDHC_DEV_ISR        isr_sdhc1   /**< Interrupt service routing for SDHC1 */
+
+/** SDHC devices */
+static const sdhc_conf_t sdhc_config[] = {
+    {
+        .sdhc = SDHC1,
+        .cd = GPIO_PIN(PD, 20),
+        .wp = GPIO_UNDEF,
+    },
+};
+
+/** Number of configured SDHC devices */
+#define SDHC_CONFIG_NUMOF  1
 /** @} */
 
 /**

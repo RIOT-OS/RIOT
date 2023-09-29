@@ -37,7 +37,7 @@ The ESP32-S3-Box has following main features:
 |:--------------------------------------------|:-------:|
 | ESP32-S3 SoC                                | yes     |
 | 16 MB Flash                                 | yes     |
-| 8 MB QSPI RAM                               | yes     |
+| 8 MB Octal SPI RAM                          | yes     |
 | 2.4\" LCD Display 320 x 240 with ILI9342C   | yes     |
 | Capacitive Touch Panel                      | no      |
 | Dual Microphone ES7210                      | no      |
@@ -104,7 +104,7 @@ UART_DEV(0) RxD | GPIO44 | PMOD2 | \ref esp32_uart_interfaces "UART interfaces"
 The following figures show the pinouts as configured by default board
 definition.
 
-@image html https://raw.githubusercontent.com/espressif/esp-box/master/docs/_static/_get_started_static/hardware_pmod.png "ESP32-S3-BoxC-1 Pinout" width=900px
+@image html https://raw.githubusercontent.com/espressif/esp-box/master/docs/_static/previous_get_started_fig/hardware_pmod.png "ESP32-S3-BoxC-1 Pinout" width=900px
 
 The corresponding schematics can be found:
 

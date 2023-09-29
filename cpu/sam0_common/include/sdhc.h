@@ -11,6 +11,9 @@
  * @ingroup     cpu_sam0_common
  * @brief       SD card interface functions for sam0 class devices
  *
+ * @warning     This driver is deprecated. Use the `sdmmc` driver module
+ *              instead. You can refer to the `same54-xpro´ board as an example
+ *              on how to use it.
  * @{
  *
  * @file
