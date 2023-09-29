@@ -25,9 +25,12 @@
  * ```
  * #include "ztimer/periodic.h"
  *
- * static void callback(void *arg)
+ * static bool callback(void *arg)
  * {
  *    puts(arg);
+ *
+ *    // keep the timer running
+ *    return true;
  * }
  *
  *
