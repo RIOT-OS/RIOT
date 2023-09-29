@@ -9,7 +9,7 @@ config MODULE_SDMMC
     bool "SDIO/SD/MMC interface"
     depends on HAS_PERIPH_SDMMC
     select MODULE_PERIPH_SDMMC
-    select MODULE_ZTIMER_MSEC if !ZTIMER_USEC
+    select MODULE_ZTIMER_MSEC
 
 if MODULE_SDMMC
 
