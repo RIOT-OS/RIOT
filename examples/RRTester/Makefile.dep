@@ -1,0 +1,13 @@
+APPLICATION = RRTester
+BOARD ?= native
+USEMODULE += sched_round_robin
+
+
+RIOTBASE ?= $(CURDIR)/../../RIOT
+
+include $(RIOTBASE)/Makefile.base
+
+
+
+
+
