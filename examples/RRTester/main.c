@@ -1,9 +1,21 @@
-#include "thread.h"
+/*
+ * Copyright (C) 2014 Freie Universität Berlin
+ */
+
+/**
+ * @ingroup     examples
+ * @{
+ *
+ * @file
+ * @brief       RRTester application
+ *
+ */
 #include <stdio.h>
 #include <stdlib.h>
+#include "thread.h"
 
 // Dimensione dello stack di default per i thread
-#define THREAD_STACKSIZE_DEFAULT (512)
+#define THREAD_STACKSIZE_DEFAULT (8192)
 
 // Struttura per i parametri del thread
 typedef struct
@@ -85,7 +97,7 @@ int main(void)
         {"E", 2}};
 
     // Creazione e avvio dei thread
-    for (int i = 0; i < sizeof(thread_params) / sizeof(thread_params[0]); i++)
+    for (size_t i = 0; i < sizeof(thread_params) / sizeof(thread_params[0]); i++)
     {
         kernel_pid_t pid = init_thread(&thread_params[i]);
         if (pid < 0)

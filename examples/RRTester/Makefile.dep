@@ -1,13 +1,16 @@
+# name of your application
 APPLICATION = RRTester
+# board default
 BOARD ?= native
-USEMODULE += sched_round_robin
 
+#USEMODULE += sched_round_robin
+#USEMODULE += thread
+USEMODULE += ztimer_msec
+#USEMODULE += sched_runq_callback
 
-RIOTBASE ?= $(CURDIR)/../../RIOT
+# This has to be the absolute path to the RIOT base directory:
+RIOTBASE ?= $(CURDIR)/../..
 
-include $(RIOTBASE)/Makefile.base
-
-
-
+include $(RIOTBASE)/Makefile.include
 
 
