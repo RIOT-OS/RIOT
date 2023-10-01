@@ -1,0 +1,1161 @@
+From f0e7cf9633f2797cb7ed0e3dfd489258b7b1bf2e Mon Sep 17 00:00:00 2001
+From: Hafsa <101563334+hafsa-dreamyland@users.noreply.github.com>
+Date: Sat, 30 Sep 2023 21:45:30 +0000
+Subject: [PATCH 1/9] Progetto_RRTester
+
+---
+ examples/RRTester/Makefile            |   1 +
+ examples/RRTester/Makefile.dep        |  13 ++++
+ examples/RRTester/main.c              | 106 ++++++++++++++++++++++++++
+ examples/RRTester/sched_round_robin.c |  94 +++++++++++++++++++++++
+ 4 files changed, 214 insertions(+)
+ create mode 100644 examples/RRTester/Makefile
+ create mode 100644 examples/RRTester/Makefile.dep
+ create mode 100644 examples/RRTester/main.c
+ create mode 100644 examples/RRTester/sched_round_robin.c
+
+diff --git a/examples/RRTester/Makefile b/examples/RRTester/Makefile
+new file mode 100644
+index 0000000000..99a88ed402
+--- /dev/null
++++ b/examples/RRTester/Makefile
+@@ -0,0 +1 @@
++include Makefile.dep
+diff --git a/examples/RRTester/Makefile.dep b/examples/RRTester/Makefile.dep
+new file mode 100644
+index 0000000000..8ac2f23c44
+--- /dev/null
++++ b/examples/RRTester/Makefile.dep
+@@ -0,0 +1,13 @@
++APPLICATION = RRTester
++BOARD ?= native
++USEMODULE += sched_round_robin
++
++
++RIOTBASE ?= $(CURDIR)/../../RIOT
++
++include $(RIOTBASE)/Makefile.base
++
++
++
++
++
+diff --git a/examples/RRTester/main.c b/examples/RRTester/main.c
+new file mode 100644
+index 0000000000..b6ac07469f
+--- /dev/null
++++ b/examples/RRTester/main.c
+@@ -0,0 +1,106 @@
++#include "thread.h"
++#include <stdio.h>
++#include <stdlib.h>
++
++// Dimensione dello stack di default per i thread
++#define THREAD_STACKSIZE_DEFAULT (512)
++
++// Struttura per i parametri del thread
++typedef struct
++{
++    char name[2];     // Nome del thread
++    int service_time; // Tempo di servizio in secondi
++} thread_params_t;
++
++// Funzione eseguita dai thread
++void *thread_func(void *arg)
++{
++    thread_params_t *params = (thread_params_t *)arg;
++    int remaining_time = params->service_time;
++
++    // Loop fino a quando il tempo di servizio non è esaurito
++    while (remaining_time > 0)
++    {
++        printf("Thread %s: %d seconds remaining.\n", params->name, remaining_time);
++        remaining_time--;
++
++        // Sleep per 1 secondo
++        thread_sleep();
++    }
++
++    printf("Thread %s completed.\n", params->name);
++
++    // Termina il thread
++    return NULL;
++}
++
++// Funzione di inizializzazione del thread
++kernel_pid_t init_thread(thread_params_t *params)
++{
++    char *stack = malloc(THREAD_STACKSIZE_DEFAULT);
++    if (stack == NULL)
++    {
++        fprintf(stderr, "Error: Unable to allocate stack for Thread %s.\n", params->name);
++        return -1;
++    }
++
++    // Imposta la priorità del thread
++    uint8_t priority = 2; // Sostituisci con la priorità desiderata
++
++    // Crea e avvia il thread
++    kernel_pid_t pid = thread_create(stack,
++                                     THREAD_STACKSIZE_DEFAULT,
++                                     priority,
++                                     THREAD_CREATE_SLEEPING | THREAD_CREATE_STACKTEST,
++                                     thread_func,
++                                     params,
++                                     params->name);
++
++    // Verifica se la creazione del thread ha avuto successo
++    if (pid < 0)
++    {
++        fprintf(stderr, "Error: Unable to create Thread %s.\n", params->name);
++        free(stack);
++        return -1;
++    }
++
++    // Avvio del thread
++    thread_wakeup(pid);
++
++    printf("Created Thread %s with priority %d.\n", params->name, priority);
++
++    return pid;
++}
++
++int main(void)
++{
++    printf("RRTester Application\n");
++
++    // Definizione dei parametri per ciascun thread
++    thread_params_t thread_params[] = {
++        {"A", 3},
++        {"B", 6},
++        {"C", 4},
++        {"D", 5},
++        {"E", 2}};
++
++    // Creazione e avvio dei thread
++    for (int i = 0; i < sizeof(thread_params) / sizeof(thread_params[0]); i++)
++    {
++        kernel_pid_t pid = init_thread(&thread_params[i]);
++        if (pid < 0)
++        {
++            // Gestisci l'errore, ad esempio interrompendo la creazione di altri thread
++            break;
++        }
++    }
++
++    // Loop infinito per il thread principale
++    while (1)
++    {
++        printf("Main thread running.\n");
++        thread_sleep();
++    }
++
++    return 0;
++}
+diff --git a/examples/RRTester/sched_round_robin.c b/examples/RRTester/sched_round_robin.c
+new file mode 100644
+index 0000000000..4861e159a5
+--- /dev/null
++++ b/examples/RRTester/sched_round_robin.c
+@@ -0,0 +1,94 @@
++/*
++ * Copyright (C) 2021 TUBA Freiberg
++ *
++ * This file is subject to the terms and conditions of the GNU Lesser
++ * General Public License v2.1. See the file LICENSE in the top level
++ * directory for more details.
++ */
++/**
++ * @ingroup     sys
++ * @{
++ *
++ * @file
++ * @brief       Round Robin Scheduler implementation
++ *
++ * @author      Karl Fessel <karl.fessel@ovgu.de>
++ *
++ * @}
++ */
++
++#include "thread.h"
++#include "ztimer.h"
++#include <stdio.h>
++
++/* Costanti per la politica di scheduling a feedback */
++#define NUM_FEEDBACK_QUEUES 3
++#define FEEDBACK_QUANTUM_S 500 /* che corrisponde a 0.5 secondi*/  
++
++// Dichiarazioni di variabili 
++static int feedback_quantum_count = 0;
++static int feedback_queue_levels[NUM_FEEDBACK_QUEUES] = {0};
++
++/* Callback per la politica di scheduling a feedback */
++static void _sched_feedback_cb(void *d);
++/* Timer per la politica di scheduling a feedback */
++static ztimer_t _feedback_timer = { .callback = _sched_feedback_cb };
++
++/* Variabile per tracciare la coda corrente */
++static uint8_t _current_feedback_queue = 0;
++
++void sched_runq_callback(uint8_t prio);
++/* Funzione di callback per il timer di scheduling a feedback */
++void _sched_feedback_cb(void *d)
++{
++    (void)d;
++    
++    /* Logica per la politica di scheduling a feedback */
++    thread_t *active_thread = thread_get_active();
++
++    if (active_thread && active_thread->status == STATUS_RUNNING) {
++        if (++feedback_quantum_count >= FEEDBACK_QUANTUM_S / NUM_FEEDBACK_QUEUES) {
++            feedback_quantum_count = 0;
++            feedback_queue_levels[active_thread->priority]++;
++            active_thread->priority = feedback_queue_levels[active_thread->priority] % NUM_FEEDBACK_QUEUES;
++
++            // Stampa delle informazioni sulla console 
++            printf("Thread %s switched to queue %d\n", thread_getpid_of(active_thread), active_thread->priority);
++        }
++    }
++
++    // Chiamata alla funzione sched_runq_callback per eventuali ulteriori azioni
++    if (active_thread) {
++        uint8_t active_priority = active_thread->priority;
++        sched_runq_callback(active_priority);
++    }
++}
++
++/* Implementazione della Callback. Gestisce lo scambio di 
++contesto e stampaerà le informazioni sulla console.
++E' basata su una rotazione semplice delle code di feedback.*/
++static inline void _sched_feedback_remove(void)
++{
++    _current_feedback_queue = 0;
++    ztimer_remove(FEEDBACK_QUANTUM_S, &_feedback_timer);
++}
++
++static inline void _sched_feedback_set(uint8_t queue)
++{
++    if (queue >= NUM_FEEDBACK_QUEUES) {
++        return;
++    }
++    _current_feedback_queue = queue;
++    ztimer_set(FEEDBACK_QUANTUM_S, &_feedback_timer, ztimer_ticks_from_s(FEEDBACK_QUANTUM_S));
++}
++
++/* Funzioni di Set e Remove per il Timer*/
++void sched_feedback_init(void)
++{
++    // Inizializza _current_feedback_queue e verifica se applicabile alla priorità attiva
++    _current_feedback_queue = 0;
++    thread_t *active_thread = thread_get_active();
++    if (active_thread) {
++        sched_runq_callback(active_thread->priority);
++    }
++}
+-- 
+2.42.0
+
+
+From e96dcf9f5883e401dd8579d54c4b9c5a5f4cf2bd Mon Sep 17 00:00:00 2001
+From: Hafsa <101563334+hafsa-dreamyland@users.noreply.github.com>
+Date: Sat, 30 Sep 2023 21:57:20 +0000
+Subject: [PATCH 2/9] Progtto_RRTester
+
+---
+ examples/RRTester/0001-Progetto_RRTester.patch | Bin 0 -> 7602 bytes
+ examples/RRTester/RRTester.patch               | Bin 0 -> 7602 bytes
+ 2 files changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 examples/RRTester/0001-Progetto_RRTester.patch
+ create mode 100644 examples/RRTester/RRTester.patch
+
+diff --git a/examples/RRTester/0001-Progetto_RRTester.patch b/examples/RRTester/0001-Progetto_RRTester.patch
+new file mode 100644
+index 0000000000000000000000000000000000000000..73e1d6eb6c330ac19041c0f39754ce89f3c0859f
+GIT binary patch
+literal 7602
+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
+Xp&7G9P|}%-|9Y}owRWr4u&n<BYOfJr
+
+literal 0
+HcmV?d00001
+
+diff --git a/examples/RRTester/RRTester.patch b/examples/RRTester/RRTester.patch
+new file mode 100644
+index 0000000000000000000000000000000000000000..73e1d6eb6c330ac19041c0f39754ce89f3c0859f
+GIT binary patch
+literal 7602
+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
+Xp&7G9P|}%-|9Y}owRWr4u&n<BYOfJr
+
+literal 0
+HcmV?d00001
+
+-- 
+2.42.0
+
+
+From 3ba9c31add2072606460101971bc216e194ec08a Mon Sep 17 00:00:00 2001
+From: Hafsa <101563334+hafsa-dreamyland@users.noreply.github.com>
+Date: Sun, 1 Oct 2023 01:40:44 +0200
+Subject: [PATCH 3/9] README.md
+
+---
+ examples/RRTester/README.md | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+ create mode 100644 examples/RRTester/README.md
+
+diff --git a/examples/RRTester/README.md b/examples/RRTester/README.md
+new file mode 100644
+index 0000000000..03f91f555f
+--- /dev/null
++++ b/examples/RRTester/README.md
+@@ -0,0 +1,11 @@
++Development Project on RIOT OS  
++The goal of the project is twofold:  
++--> to modify the current scheduling policy to support a Feedback scheduling policy;  
++--> to test the scheduling policy by developing a simple application that spawns different threads;  
++
++To do that, modify the RIOT OS scheduler (for the “native” board) by introducing the Feedback scheduling policy, and implement a tester application (RRTester) 
++capable of testing the new scheduling policy.  
++
++More in detail, modify the OS fixed-priority scheduling policy and introduce a Feedback scheduling policy with 3 queues and quantum equals to 0.5 seconds.   
++In addition, the scheduling policy needs to print on the terminal all the context switches of the different threads.
++The application RRTester must be deployed as a RIOT application containing a main() function that that starts 5 new threads.  
+-- 
+2.42.0
+
+
+From fd07a55f3ed9f06914945a7c8332ead4c2b6f970 Mon Sep 17 00:00:00 2001
+From: Hafsa <101563334+hafsa-dreamyland@users.noreply.github.com>
+Date: Sun, 1 Oct 2023 01:42:32 +0200
+Subject: [PATCH 4/9] README.md
+
+---
+ README.md | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/README.md b/README.md
+index 14b1c4ee06..dd637e8c92 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,5 @@
++Personal Development Project on RIOT OS  (see branch feedback-scheduling)
++
+ [![Nightly CI status master][master-ci-badge]][master-ci-link]
+ [![GitHub release][release-badge]][release-link]
+ [![License][license-badge]][license-link]
+-- 
+2.42.0
+
+
+From 660ee3cf021ed208765dd4ba1afa7978d3bef6de Mon Sep 17 00:00:00 2001
+From: Hafsa <101563334+hafsa-dreamyland@users.noreply.github.com>
+Date: Sun, 1 Oct 2023 07:47:09 +0000
+Subject: [PATCH 5/9] Progetto_RRTester
+
+---
+ examples/RRTester/Makefile.dep        | 15 ++++++-----
+ examples/RRTester/main.c              | 18 +++++++++++---
+ examples/RRTester/sched_round_robin.c | 36 +++++++++++++++------------
+ 3 files changed, 44 insertions(+), 25 deletions(-)
+
+diff --git a/examples/RRTester/Makefile.dep b/examples/RRTester/Makefile.dep
+index 8ac2f23c44..2a00c765f9 100644
+--- a/examples/RRTester/Makefile.dep
++++ b/examples/RRTester/Makefile.dep
+@@ -1,13 +1,16 @@
++# name of your application
+ APPLICATION = RRTester
++# board default
+ BOARD ?= native
+-USEMODULE += sched_round_robin
+-
+-
+-RIOTBASE ?= $(CURDIR)/../../RIOT
+-
+-include $(RIOTBASE)/Makefile.base
+ 
++#USEMODULE += sched_round_robin
++#USEMODULE += thread
++USEMODULE += ztimer_msec
++#USEMODULE += sched_runq_callback
+ 
++# This has to be the absolute path to the RIOT base directory:
++RIOTBASE ?= $(CURDIR)/../..
+ 
++include $(RIOTBASE)/Makefile.include
+ 
+ 
+diff --git a/examples/RRTester/main.c b/examples/RRTester/main.c
+index b6ac07469f..5a49fcec75 100644
+--- a/examples/RRTester/main.c
++++ b/examples/RRTester/main.c
+@@ -1,9 +1,21 @@
+-#include "thread.h"
++/*
++ * Copyright (C) 2014 Freie Universität Berlin
++ */
++
++/**
++ * @ingroup     examples
++ * @{
++ *
++ * @file
++ * @brief       RRTester application
++ *
++ */
+ #include <stdio.h>
+ #include <stdlib.h>
++#include "thread.h"
+ 
+ // Dimensione dello stack di default per i thread
+-#define THREAD_STACKSIZE_DEFAULT (512)
++#define THREAD_STACKSIZE_DEFAULT (8192)
+ 
+ // Struttura per i parametri del thread
+ typedef struct
+@@ -85,7 +97,7 @@ int main(void)
+         {"E", 2}};
+ 
+     // Creazione e avvio dei thread
+-    for (int i = 0; i < sizeof(thread_params) / sizeof(thread_params[0]); i++)
++    for (size_t i = 0; i < sizeof(thread_params) / sizeof(thread_params[0]); i++)
+     {
+         kernel_pid_t pid = init_thread(&thread_params[i]);
+         if (pid < 0)
+diff --git a/examples/RRTester/sched_round_robin.c b/examples/RRTester/sched_round_robin.c
+index 4861e159a5..6afac6a93b 100644
+--- a/examples/RRTester/sched_round_robin.c
++++ b/examples/RRTester/sched_round_robin.c
+@@ -11,7 +11,7 @@
+  *
+  * @file
+  * @brief       Round Robin Scheduler implementation
+- *
++ *@brief        Updated to a Feedback-scheduling implementation
+  * @author      Karl Fessel <karl.fessel@ovgu.de>
+  *
+  * @}
+@@ -23,9 +23,9 @@
+ 
+ /* Costanti per la politica di scheduling a feedback */
+ #define NUM_FEEDBACK_QUEUES 3
+-#define FEEDBACK_QUANTUM_S 500 /* che corrisponde a 0.5 secondi*/  
++#define FEEDBACK_QUANTUM_S 500 /* che corrisponde a 0.5 secondi*/
+ 
+-// Dichiarazioni di variabili 
++// Dichiarazioni di variabili
+ static int feedback_quantum_count = 0;
+ static int feedback_queue_levels[NUM_FEEDBACK_QUEUES] = {0};
+ 
+@@ -42,53 +42,57 @@ void sched_runq_callback(uint8_t prio);
+ void _sched_feedback_cb(void *d)
+ {
+     (void)d;
+-    
++
+     /* Logica per la politica di scheduling a feedback */
+     thread_t *active_thread = thread_get_active();
+ 
+-    if (active_thread && active_thread->status == STATUS_RUNNING) {
+-        if (++feedback_quantum_count >= FEEDBACK_QUANTUM_S / NUM_FEEDBACK_QUEUES) {
++    if (active_thread && active_thread->status == STATUS_RUNNING)
++    {
++        if (++feedback_quantum_count >= FEEDBACK_QUANTUM_S / NUM_FEEDBACK_QUEUES)
++        {
+             feedback_quantum_count = 0;
+             feedback_queue_levels[active_thread->priority]++;
+             active_thread->priority = feedback_queue_levels[active_thread->priority] % NUM_FEEDBACK_QUEUES;
+ 
+-            // Stampa delle informazioni sulla console 
+-            printf("Thread %s switched to queue %d\n", thread_getpid_of(active_thread), active_thread->priority);
++            // Stampa delle informazioni sulla console
++            printf("Thread %d switched to queue %d\n", (int)thread_getpid_of(active_thread), active_thread->priority);
+         }
+     }
+ 
+     // Chiamata alla funzione sched_runq_callback per eventuali ulteriori azioni
+-    if (active_thread) {
++    if (active_thread)
++    {
+         uint8_t active_priority = active_thread->priority;
+         sched_runq_callback(active_priority);
+     }
+ }
+ 
+-/* Implementazione della Callback. Gestisce lo scambio di 
+-contesto e stampaerà le informazioni sulla console.
+-E' basata su una rotazione semplice delle code di feedback.*/
++/* Implementazione della Callback. Gestisce lo scambio di contesto e stamperà le informazioni sulla console.
++E' basata su una rotazione semplice delle code di feedback. */
+ static inline void _sched_feedback_remove(void)
+ {
+     _current_feedback_queue = 0;
+-    ztimer_remove(FEEDBACK_QUANTUM_S, &_feedback_timer);
++    ztimer_remove(NULL, &_feedback_timer);
+ }
+ 
++
+ static inline void _sched_feedback_set(uint8_t queue)
+ {
+     if (queue >= NUM_FEEDBACK_QUEUES) {
+         return;
+     }
+     _current_feedback_queue = queue;
+-    ztimer_set(FEEDBACK_QUANTUM_S, &_feedback_timer, ztimer_ticks_from_s(FEEDBACK_QUANTUM_S));
++    ztimer_set(NULL, &_feedback_timer, FEEDBACK_QUANTUM_S);
+ }
+ 
+-/* Funzioni di Set e Remove per il Timer*/
++/* Funzioni di Set e Remove per il Timer */
+ void sched_feedback_init(void)
+ {
+     // Inizializza _current_feedback_queue e verifica se applicabile alla priorità attiva
+     _current_feedback_queue = 0;
+     thread_t *active_thread = thread_get_active();
+-    if (active_thread) {
++    if (active_thread)
++    {
+         sched_runq_callback(active_thread->priority);
+     }
+ }
+-- 
+2.42.0
+
+
+From bc69df11bf7f45c2a5aaae766c5175d7bdabc813 Mon Sep 17 00:00:00 2001
+From: Hafsa <101563334+hafsa-dreamyland@users.noreply.github.com>
+Date: Sun, 1 Oct 2023 07:52:36 +0000
+Subject: [PATCH 6/9] Progetto_RRTester
+
+---
+ examples/RRTester/README.md | 12 +-----------
+ 1 file changed, 1 insertion(+), 11 deletions(-)
+
+diff --git a/examples/RRTester/README.md b/examples/RRTester/README.md
+index 03f91f555f..f984e699a4 100644
+--- a/examples/RRTester/README.md
++++ b/examples/RRTester/README.md
+@@ -1,11 +1 @@
+-Development Project on RIOT OS  
+-The goal of the project is twofold:  
+---> to modify the current scheduling policy to support a Feedback scheduling policy;  
+---> to test the scheduling policy by developing a simple application that spawns different threads;  
+-
+-To do that, modify the RIOT OS scheduler (for the “native” board) by introducing the Feedback scheduling policy, and implement a tester application (RRTester) 
+-capable of testing the new scheduling policy.  
+-
+-More in detail, modify the OS fixed-priority scheduling policy and introduce a Feedback scheduling policy with 3 queues and quantum equals to 0.5 seconds.   
+-In addition, the scheduling policy needs to print on the terminal all the context switches of the different threads.
+-The application RRTester must be deployed as a RIOT application containing a main() function that that starts 5 new threads.  
++Sadik, Hafsa, 5084409
+-- 
+2.42.0
+
+
+From 70efa63a3963322cc75417fd42d13c9a1fb9340f Mon Sep 17 00:00:00 2001
+From: Hafsa <101563334+hafsa-dreamyland@users.noreply.github.com>
+Date: Sun, 1 Oct 2023 08:00:42 +0000
+Subject: [PATCH 7/9] Rimosse patch obsolete
+
+---
+ examples/RRTester/0001-Progetto_RRTester.patch | Bin 7602 -> 0 bytes
+ examples/RRTester/RRTester.patch               | Bin 7602 -> 0 bytes
+ 2 files changed, 0 insertions(+), 0 deletions(-)
+ delete mode 100644 examples/RRTester/0001-Progetto_RRTester.patch
+ delete mode 100644 examples/RRTester/RRTester.patch
+
+diff --git a/examples/RRTester/0001-Progetto_RRTester.patch b/examples/RRTester/0001-Progetto_RRTester.patch
+deleted file mode 100644
+index 73e1d6eb6c330ac19041c0f39754ce89f3c0859f..0000000000000000000000000000000000000000
+GIT binary patch
+literal 0
+HcmV?d00001
+
+literal 7602
+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
+Xp&7G9P|}%-|9Y}owRWr4u&n<BYOfJr
+
+diff --git a/examples/RRTester/RRTester.patch b/examples/RRTester/RRTester.patch
+deleted file mode 100644
+index 73e1d6eb6c330ac19041c0f39754ce89f3c0859f..0000000000000000000000000000000000000000
+GIT binary patch
+literal 0
+HcmV?d00001
+
+literal 7602
+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
+Xp&7G9P|}%-|9Y}owRWr4u&n<BYOfJr
+
+-- 
+2.42.0
+
+
+From 7cb2258f4f4b3ff7ccce1c62b1480c479900a28d Mon Sep 17 00:00:00 2001
+From: Hafsa <101563334+hafsa-dreamyland@users.noreply.github.com>
+Date: Sun, 1 Oct 2023 08:03:11 +0000
+Subject: [PATCH 8/9] Progetto RRTester
+
+---
+ examples/RRTester/0001-Progetto_RRTester.patch | Bin 0 -> 7602 bytes
+ examples/RRTester/RRTester.patch               | Bin 0 -> 7602 bytes
+ 2 files changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 examples/RRTester/0001-Progetto_RRTester.patch
+ create mode 100644 examples/RRTester/RRTester.patch
+
+diff --git a/examples/RRTester/0001-Progetto_RRTester.patch b/examples/RRTester/0001-Progetto_RRTester.patch
+new file mode 100644
+index 0000000000000000000000000000000000000000..73e1d6eb6c330ac19041c0f39754ce89f3c0859f
+GIT binary patch
+literal 7602
+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
+Xp&7G9P|}%-|9Y}owRWr4u&n<BYOfJr
+
+literal 0
+HcmV?d00001
+
+diff --git a/examples/RRTester/RRTester.patch b/examples/RRTester/RRTester.patch
+new file mode 100644
+index 0000000000000000000000000000000000000000..73e1d6eb6c330ac19041c0f39754ce89f3c0859f
+GIT binary patch
+literal 7602
+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
+Xp&7G9P|}%-|9Y}owRWr4u&n<BYOfJr
+
+literal 0
+HcmV?d00001
+
+-- 
+2.42.0
+
+
+From f31d089c9d37689e56ea61f73311a7af14ee84e5 Mon Sep 17 00:00:00 2001
+From: Hafsa <101563334+hafsa-dreamyland@users.noreply.github.com>
+Date: Sun, 1 Oct 2023 08:05:24 +0000
+Subject: [PATCH 9/9] Progetto-RRTester
+
+---
+ examples/RRTester/0001-Progetto_RRTester.patch | Bin 7602 -> 0 bytes
+ examples/RRTester/Progetto_RRTester.patch      | Bin 0 -> 8221 bytes
+ examples/RRTester/RRTester.patch               | Bin 7602 -> 0 bytes
+ 3 files changed, 0 insertions(+), 0 deletions(-)
+ delete mode 100644 examples/RRTester/0001-Progetto_RRTester.patch
+ create mode 100644 examples/RRTester/Progetto_RRTester.patch
+ delete mode 100644 examples/RRTester/RRTester.patch
+
+diff --git a/examples/RRTester/0001-Progetto_RRTester.patch b/examples/RRTester/0001-Progetto_RRTester.patch
+deleted file mode 100644
+index 73e1d6eb6c330ac19041c0f39754ce89f3c0859f..0000000000000000000000000000000000000000
+GIT binary patch
+literal 0
+HcmV?d00001
+
+literal 7602
+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
+Xp&7G9P|}%-|9Y}owRWr4u&n<BYOfJr
+
+diff --git a/examples/RRTester/Progetto_RRTester.patch b/examples/RRTester/Progetto_RRTester.patch
+new file mode 100644
+index 0000000000000000000000000000000000000000..642f9c24a1f3a632e56ae670cc54ce68de4c11ca
+GIT binary patch
+literal 8221
+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
+
+literal 0
+HcmV?d00001
+
+diff --git a/examples/RRTester/RRTester.patch b/examples/RRTester/RRTester.patch
+deleted file mode 100644
+index 73e1d6eb6c330ac19041c0f39754ce89f3c0859f..0000000000000000000000000000000000000000
+GIT binary patch
+literal 0
+HcmV?d00001
+
+literal 7602
+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
+Xp&7G9P|}%-|9Y}owRWr4u&n<BYOfJr
+
+-- 
+2.42.0
+
