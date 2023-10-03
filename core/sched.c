@@ -40,7 +40,7 @@
 #include "pmp.h"
 #endif
 
-#define ENABLE_DEBUG 0
+#define ENABLE_DEBUG 1
 #include "debug.h"
 
 #ifdef PICOLIBC_TLS
@@ -224,8 +224,9 @@ thread_t *__attribute__((used)) sched_run(void)
 #endif
 
 #ifdef MODULE_PMP_STACK_GUARD
-        write_pmpaddr(3, (uintptr_t)next_thread->stack_start);
-        set_pmpcfg(3, PMP_NA4 | PMP_R);
+        DEBUG("sched_run 1: set PMP region %d to %x\n", PMP_REGION_STACK_GUARD, (uintptr_t)next_thread->stack_start);
+        write_pmpaddr(PMP_REGION_STACK_GUARD, (uintptr_t)next_thread->stack_start);
+        DEBUG("sched_run 2: set PMP region %d to %x\n", PMP_REGION_STACK_GUARD, (uintptr_t)next_thread->stack_start);
 #endif
         DEBUG("sched_run: done, changed sched_active_thread.\n");
     }

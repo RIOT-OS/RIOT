@@ -25,9 +25,25 @@
 #include <assert.h>
 #include <stdint.h>
 
+#include "cpu_conf.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @name Region definitions per use-case, depending on the priority and the 
+ * number of available regions on a given system
+ * @{
+ */
+#if NUM_PMP_ENTRIES < 4
+#error "You do not have enough PMP entries to run RIOT"
+#endif
+#define PMP_REGION_STACK_GUARD (NUM_PMP_ENTRIES - 4) /**< Used for the PMP_STACK_GUARD module */
+/* One region left free to account for silicon bugs in the hifive1b / fe310 */
+#define PMP_REGION_NOEXEC_RAM (NUM_PMP_ENTRIES - 2) /**< Used for the PMP_NOEXEC_RAM module */
+#define PMP_REGION_ALLOW_ALL (NUM_PMP_ENTRIES - 1) /**< Used as a catch-all fall back */
+/** @} */
 
 /**
  * @name    Bit masks for the PMP configuration register
@@ -58,6 +74,11 @@ static inline uint32_t make_napot(uint32_t addr, uint32_t size)
     assert(addr % size == 0);
     return addr | ((size - 1) >> 1);
 }
+
+/**
+ * @brief A NAPOT formatted address that encodes the entire 34-Bit address space
+ */
+#define PMP_NAPOT_ENTIRE_ADDRESS_SPACE UINT32_MAX
 
 /**
  * @brief   Writes a complete pmpcfg register
