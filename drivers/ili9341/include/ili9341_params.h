@@ -121,6 +121,20 @@ extern "C" {
 #define ILI9341_PARAM_IF_MODE
 #endif
 
+#if MODULE_LCD_INIT_SEQUENCE || DOXYGEN
+#ifndef ILI9341_PARAM_INIT_SEQ
+#define ILI9341_PARAM_INIT_SEQ      (NULL)  /**< Init sequence not used by default */
+#endif
+#ifndef ILI9341_PARAM_INIT_SEQ_LEN
+#define ILI9341_PARAM_INIT_SEQ_LEN  0       /**< Init sequence length is 0 by default */
+#endif
+/** Additional default parameters if init sequence is enabled */
+#define ILI9341_PARAMS_INIT         .init_seq = ILI9341_PARAM_INIT_SEQ, \
+                                    .init_seq_len = ILI9341_PARAM_INIT_SEQ_LEN,
+#else /* MODULE_LCD_INIT_SEQUENCE */
+#define ILI9341_PARAMS_INIT
+#endif /* MODULE_LCD_INIT_SEQUENCE */
+
 /**
  * @brief   Default params
  *
@@ -147,6 +161,7 @@ extern "C" {
                                       .rotation = ILI9341_PARAM_ROTATION, \
                                       .offset_x = ILI9341_PARAM_OFFSET_X, \
                                       .offset_y = ILI9341_PARAM_OFFSET_Y, \
+                                      ILI9341_PARAMS_INIT \
 }
 #endif
 /** @} */

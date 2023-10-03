@@ -551,6 +551,15 @@ int lcd_init(lcd_t *dev, const lcd_params_t *params)
     mutex_init(&dev->lock);
 #endif
 
+#if IS_USED(MODULE_LCD_INIT_SEQUENCE)
+    if (dev->params->init_seq && dev->params->init_seq_len) {
+        lcd_write_cmd_sequence(dev,
+                               dev->params->init_seq,
+                               dev->params->init_seq_len);
+        return 0;
+    }
+#endif
+
     /* controller-specific init function has to be defined */
     assert(dev->driver->init);
     return dev->driver->init(dev, params);
@@ -564,7 +573,41 @@ void lcd_write_cmd(lcd_t *dev, uint8_t cmd, const uint8_t *data,
     lcd_ll_release(dev);
 }
 
-void lcd_read_cmd(lcd_t *dev, uint8_t cmd, uint8_t *data, size_t len)
+void lcd_write_cmd_sequence(const lcd_t *dev, const uint8_t *seq, size_t seq_len)
+{
+    assert(seq_len > 0);
+    assert(seq);
+
+    DEBUG("[%s] %p %u\n", __func__, (void *)seq, seq_len);
+
+    lcd_ll_acquire(dev);
+
+    size_t idx = 0;
+    while (idx < (seq_len - 1)) {
+        uint8_t cmd = seq[idx++];
+        uint8_t num = seq[idx++];
+
+        if (cmd == LCD_DELAY) {
+            /* in case of delay command, the number of parameters is 1 */
+            assert(1);
+            ztimer_sleep(ZTIMER_MSEC, seq[idx++]);
+            continue;
+        }
+
+        if ((idx + num) > seq_len) {
+            /* command sequence is inconsistent, number of remaining bytes does
+             * not match the specified number of parameters */
+            assert(false);
+        }
+
+        lcd_ll_write_cmd(dev, cmd, seq + idx, num);
+        idx += num;
+    }
+
+    lcd_ll_release(dev);
+}
+
+void lcd_read_cmd(const lcd_t *dev, uint8_t cmd, uint8_t *data, size_t len)
 {
     lcd_ll_acquire(dev);
     lcd_ll_read_cmd(dev, cmd, data, len);

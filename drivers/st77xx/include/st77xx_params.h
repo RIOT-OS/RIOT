@@ -187,6 +187,20 @@ extern "C" {
 #define ST77XX_PARAM_IF_MODE
 #endif
 
+#if MODULE_LCD_INIT_SEQUENCE || DOXYGEN
+#ifndef ST77XX_PARAM_INIT_SEQ
+#define ST77XX_PARAM_INIT_SEQ       (NULL)  /**< Init sequence not used by default */
+#endif
+#ifndef ST77XX_PARAM_INIT_SEQ_LEN
+#define ST77XX_PARAM_INIT_SEQ_LEN   0       /**< Init sequence length is 0 by default */
+#endif
+/** Additional default parameters if init sequence is enabled */
+#define ST77XX_PARAMS_INIT          .init_seq = ST77XX_PARAM_INIT_SEQ, \
+                                    .init_seq_len = ST77XX_PARAM_INIT_SEQ_LEN,
+#else /* MODULE_LCD_INIT_SEQUENCE */
+#define ST77XX_PARAMS_INIT
+#endif /* MODULE_LCD_INIT_SEQUENCE */
+
 /**
  * @brief   Default params
  *
@@ -214,6 +228,7 @@ extern "C" {
                                       .rotation = ST77XX_PARAM_ROTATION, \
                                       .offset_x = ST77XX_PARAM_OFFSET_X, \
                                       .offset_y = ST77XX_PARAM_OFFSET_Y, \
+                                      ST77XX_PARAMS_INIT \
                                     }
 #endif /* ST77XX_PARAMS */
 /** @} */
