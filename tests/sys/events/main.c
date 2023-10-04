@@ -197,6 +197,7 @@ int main(void)
     before = xtimer_now_usec();
 #endif
     event_timeout_set(&event_timeout, (1 * US_PER_SEC));
+    expect(event_timeout_is_pending(&event_timeout));
 
     event_timeout_t event_timeout_canceled;
 
@@ -205,6 +206,7 @@ int main(void)
                        (event_t *)&noevent_callback);
     event_timeout_set(&event_timeout_canceled, 500 * US_PER_MS);
     event_timeout_clear(&event_timeout_canceled);
+    expect(!event_timeout_is_pending(&event_timeout_canceled));
 
     puts("launching event queue");
     event_loop(&queue);
