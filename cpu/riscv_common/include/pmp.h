@@ -13,8 +13,8 @@
  * @file
  * @brief           RISC-V PMP configuration options
  *
- * RISCV implementations using this peripheral must define the `NUM_PMP_ENTRIES`
- * `NUM_PMP_ENTRIES` must be 16 or 64.
+ * RISCV implementations using this peripheral must define the `PMP_REGION_COUNT`
+ * `PMP_REGION_COUNT` must be 16 or 64.
  *
  * @author          Bennet Blischke
  */
@@ -36,13 +36,13 @@ extern "C" {
  * number of available regions on a given system
  * @{
  */
-#if NUM_PMP_ENTRIES < 4
+#if PMP_REGION_COUNT < 4
 #error "You do not have enough PMP entries to run RIOT"
 #endif
-#define PMP_REGION_STACK_GUARD (NUM_PMP_ENTRIES - 4) /**< Used for the PMP_STACK_GUARD module */
+#define PMP_REGION_STACK_GUARD (PMP_REGION_COUNT - 4) /**< Used for the PMP_STACK_GUARD module */
 /* One region left free to account for silicon bugs in the hifive1b / fe310 */
-#define PMP_REGION_NOEXEC_RAM (NUM_PMP_ENTRIES - 2) /**< Used for the PMP_NOEXEC_RAM module */
-#define PMP_REGION_ALLOW_ALL (NUM_PMP_ENTRIES - 1) /**< Used as a catch-all fall back */
+#define PMP_REGION_NOEXEC_RAM (PMP_REGION_COUNT - 2) /**< Used for the PMP_NOEXEC_RAM module */
+#define PMP_REGION_ALLOW_ALL (PMP_REGION_COUNT - 1) /**< Used as a catch-all fall back */
 /** @} */
 
 /**
