@@ -23,10 +23,6 @@
 #include "periph/init.h"
 #include "periph_conf.h"
 
-#if defined(MODULE_PMP_STACK_GUARD)
-#include "pmp.h"
-#endif
-
 #include "vendor/riscv_csr.h"
 
 #include "stdio_uart.h"

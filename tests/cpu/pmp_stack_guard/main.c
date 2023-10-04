@@ -83,7 +83,7 @@ int main(void)
 {
     puts("\nPMP Stack Guard Test\n");
     puts("If the test fails, the canary value will change unexpectedly");
-    puts("after ~150 iterations. If the test succeeds, the MEM MANAGE HANDLER");
+    puts("after ~50 iterations. If the test succeeds, the MEM MANAGE HANDLER");
     puts("will trigger a RIOT kernel panic before the canary value changes.\n");
 #ifdef MODULE_PMP_STACK_GUARD
     puts("The pmp_stack_guard module is present. Expect the test to succeed.\n");
