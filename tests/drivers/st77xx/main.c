@@ -25,6 +25,7 @@
 #include "ztimer.h"
 #include "board.h"
 #include "lcd.h"
+#include "lcd_internal.h"
 
 #include "riot_logo.h"
 
@@ -53,6 +54,18 @@ int main(void)
         puts("[Failed]");
         return 1;
     }
+
+#if MODULE_LCD_PARALLEL
+    if (gpio_is_valid(st77xx_params[0].rdx_pin)) {
+        uint8_t data[4];
+
+        lcd_read_cmd(&dev, LCD_CMD_RDDIDIF, data, 3);
+        printf("lcd ID: %02x %02x %02x\n", data[0], data[1], data[2]);
+
+        lcd_read_cmd(&dev, LCD_CMD_RDDST, data, 4);
+        printf("lcd status: %02x %02x %02x %02x\n", data[0], data[1], data[2], data[3]);
+    }
+#endif
 
     puts("lcd TFT display filling map");
     lcd_fill(&dev, 0, dev.params->lines, 0, dev.params->rgb_channels, 0x0000);

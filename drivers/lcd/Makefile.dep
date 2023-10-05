@@ -1,6 +1,6 @@
 FEATURES_REQUIRED += periph_gpio
 
-ifneq (,$(filter lcd_parallel_16bit,$(USEMODULE)))
+ifneq (,$(filter lcd_parallel_%,$(USEMODULE)))
   USEMODULE += lcd_parallel
 endif
 
