@@ -161,6 +161,19 @@ typedef struct candev_driver {
      */
     int (*set_filter)(candev_t *dev, const struct can_filter *filter);
 
+#if defined(MODULE_CAN_FILTER_TYPE_SPECIFIC)
+    /**
+     * @brief   Set and configure a reception filter
+     *
+     * @param[in] dev           CAN device descriptor
+     * @param[in] filter_mode   The mode in which the filter will be applied
+     *
+     * @return              a positive filter number
+     * @return              <0 on error
+     */
+    int (*set_filter_type_spec)(candev_t *dev, const struct can_filter_mode *filter_mode);
+#endif
+
     /**
      * @brief  Remove a @p filter
      *
