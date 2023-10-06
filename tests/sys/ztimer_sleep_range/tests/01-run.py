@@ -11,13 +11,11 @@ import time
 from testrunner import run
 
 US_PER_SEC = 1000000
-INTERNAL_JITTER = 0.05
 
 class InvalidTimeout(Exception):
     pass
 
-def _test1(child):
-    child.expect_exact("######################### TEST1:")
+def testfunc(child):
     child.expect(r"Running test (\d+) times with (\d+) distinct sleep time ranges")
     RUNS = int(child.match.group(1))
     SLEEP_TIMES_NUMOF = int(child.match.group(2))
@@ -28,20 +26,14 @@ def _test1(child):
                 child.expect(r"Slept between (\d+) us and (\d+) us, actually slept (\d+) us")
                 min_sleep = int(child.match.group(1))
                 max_sleep = int(child.match.group(2))
-                allowed_error = max_sleep * INTERNAL_JITTER
                 actual_sleep = int(child.match.group(3))
                 
-                if not (min_sleep <= actual_sleep <= max_sleep + allowed_error):
+                if not (min_sleep <= actual_sleep <= max_sleep):
                     raise InvalidTimeout("Invalid sleep time %d us, expected between %d us and %d us" %
                                          (actual_sleep, min_sleep, max_sleep))
     except InvalidTimeout as e:
         print(e)
-
-def testfunc(child):
-    # _test1(child)
-    print("only test 2")
-
+        sys.exit(1)
 
 if __name__ == "__main__":
     sys.exit(run(testfunc))
-
