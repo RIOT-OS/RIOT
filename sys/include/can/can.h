@@ -176,53 +176,14 @@ struct can_filter_dual {
 #endif
 
 /**
- * @brief Controller Area Network filter type
- *
- * The different CAN controllers provide different CAN filter
- * types. These types are provided by the SAMD5x family (please check
- * chapter 39.9.5 and 39.9.6 of the SAMD5x/SAME5x family Datasheet).
- *
- * The current CAN filter types list is from the SAMD5x/SAME5x family.
- *
- * Can be extended by other filter types if provided
- */
-typedef enum {
-    CAN_FILTER_TYPE_RANGE = 0x00,   /**< Range filter from Filter 1 to Filter 2 (Filter 2 > Filter 1) */
-    CAN_FILTER_TYPE_DUAL,           /**< Dual ID Filter (Filter 2 or Filter 1) */
-    CAN_FILTER_TYPE_CLASSIC,        /**< Classic Filter: Filter ID and Mask */
-    CAN_FILTER_TYPE_EXT_RANGE       /**< For extended filters, Range filter from Filter 1 to Filter 2 (Filter 2 > Filter 1) */
-} can_filter_type_t;
-
-/**
- * @brief Controller Area Network filter configuration
- *
- * The different CAN controllers provide different CAN filter
- * configurations. These types are provided by the SAMD5x family (please check
- * chapter 39.9.5 and 39.9.6 of the SAMD5x/SAME5x family Datasheet).
- *
- * The current CAN filter configuration list is from the SAMD5x/SAME5x family.
- *
- * Can be extended by other filter configurations if provided
- */
-typedef enum {
-    CAN_FILTER_DISABLE = 0x00,      /**< Disable Filter element */
-    CAN_FILTER_RX_0,                /**< Store message in reception mailbox Rx_0 if filter matches */
-    CAN_FILTER_RX_1,                /**< Store message in reception mailbox Rx_1 if filter matches */
-    CAN_FILTER_RX_REJECT,           /**< Reject message if filter matches */
-    CAN_FILTER_RX_PRIO,             /**< Set priority if filter matches */
-    CAN_FILTER_RX_PRIO_0,           /**< Set priority and store message in reception mailbox Rx_0 if filter matches */
-    CAN_FILTER_RX_PRIO_1,           /**< Set priority and store message in reception mailbox Rx_1 if filter matches */
-    CAN_FILTER_RX_STRXBUF           /**< Store message in the RX buffer or as debug message */
-} can_filter_conf_t;
-
-/**
  * @brief Controller Area Network filter
  */
 struct can_filter {
     canid_t can_id;    /**< CAN ID */
     canid_t can_mask;  /**< Mask */
-    can_filter_conf_t can_filter_conf;      /**< CAN filter configuration */
-    can_filter_type_t can_filter_type;      /**< CAN filter type */
+#if defined(MODULE_MCP2515)
+    uint8_t target_mailbox; /**< The mailbox to apply the filter to */
+#endif
 };
 
 /**
