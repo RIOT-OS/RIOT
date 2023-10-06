@@ -47,6 +47,9 @@ static int _set(candev_t *candev, canopt_t opt, void *value, size_t value_len);
 static int _get(candev_t *candev, canopt_t opt, void *value, size_t max_len);
 static int _abort(candev_t *candev, const struct can_frame *frame);
 static int _set_filter(candev_t *dev, const struct can_filter *filter);
+#if defined(MODULE_CAN_FILTER_TYPE_SPECIFIC)
+static int _set_filter_type_spec(candev_t *dev, const struct can_filter_mode *filter_mode);
+#endif
 static int _remove_filter(candev_t *dev, const struct can_filter *filter);
 
 static void _irq_rx(candev_mcp2515_t *dev, int handle);
@@ -65,6 +68,9 @@ static const candev_driver_t candev_mcp2515_driver = {
     .set = _set,
     .abort = _abort,
     .set_filter = _set_filter,
+#if defined(MODULE_CAN_FILTER_TYPE_SPECIFIC)
+    .set_filter_type_spec = _set_filter_type_spec,
+#endif
     .remove_filter = _remove_filter,
 };
 
@@ -525,6 +531,134 @@ static int _set_filter(candev_t *dev, const struct can_filter *filter)
     /* Filter added */
     return 0;
 }
+
+#if defined(MODULE_CAN_FILTER_TYPE_SPECIFIC)
+static int _set_filter_type_spec(candev_t *dev, const struct can_filter_mode *filter_mode)
+{
+    DEBUG("inside _set_filter of MCP2515\n");
+    /* Filter type supported is classic mode (Mask and Identifier) */
+    assert(filter_mode->can_filter_type == CAN_FILTER_TYPE_CLASSIC);
+    /* Filter configuration applied to reception mailbox Rx_0 or Rx_1 */
+    assert(filter_mode->can_filter_conf == CAN_FILTER_RX_0 || filter_mode->can_filter_conf == CAN_FILTER_RX_1);
+
+    struct can_filter_classic *classic_filter = container_of(filter_mode, struct can_filter_classic, mode);
+
+    int res = -1;
+    enum mcp2515_mode mode;
+
+    candev_mcp2515_t *dev_mcp = container_of(dev, candev_mcp2515_t, candev);
+
+    if (mutex_trylock(&_mcp_mutex)) {
+        mode = mcp2515_get_mode(dev_mcp);
+        res = mcp2515_set_mode(dev_mcp, MODE_CONFIG);
+
+        mutex_unlock(&_mcp_mutex);
+    }
+    else {
+        DEBUG("setfilt_Failed to lock mutex\n");
+        return -1;
+    }
+
+    if (res != MODE_CONFIG) {
+        return -1;
+    }
+
+    if ((classic_filter->can_id & CAN_EFF_FLAG) == CAN_EFF_FLAG) {
+        classic_filter->can_mask &= CAN_EFF_MASK;
+    }
+    else {
+        classic_filter->can_mask &= CAN_SFF_MASK;
+    }
+
+    uint8_t rx_mailbox = 0;
+    switch (classic_filter->mode.can_filter_conf) {
+        case CAN_FILTER_RX_0:
+            DEBUG_PUTS("Filter to apply to reception mailbox Rx_0");
+            rx_mailbox = 0;
+            break;
+        case CAN_FILTER_RX_1:
+            DEBUG_PUTS("Filter to apply to reception mailbox Rx_1");
+            rx_mailbox = 1;
+            break;
+        default:
+            DEBUG_PUTS("Filter configuration not supported --> Filter won't be applied");
+            return -1;
+    }
+    /* mask unused */
+    if (dev_mcp->masks[rx_mailbox] == 0) {
+        if (mutex_trylock(&_mcp_mutex)) {
+            /* set mask */
+            mcp2515_set_mask(dev_mcp, rx_mailbox, classic_filter->can_mask);
+            /* set filter */
+            mcp2515_set_filter(dev_mcp, MCP2515_FILTERS_MB0 * rx_mailbox,
+                           classic_filter->can_id);
+            mutex_unlock(&_mcp_mutex);
+        }
+        else {
+           DEBUG("setfilt2_Failed to lock mutex\n");
+           return -1;
+        }
+
+        /* save filter */
+        dev_mcp->masks[rx_mailbox] = classic_filter->can_mask;
+        dev_mcp->filter_ids[rx_mailbox][0] = classic_filter->can_id;
+    }
+
+    /* mask existed and same mask */
+    else if (dev_mcp->masks[rx_mailbox] == classic_filter->can_mask) {
+        /* find an empty space if it exists */
+        int filter_pos = 1; /* first one is already filled */
+        /* stop at the end of mailbox or an empty space found */
+        while (filter_pos < _max_filters(rx_mailbox) &&
+               dev_mcp->filter_ids[rx_mailbox][filter_pos] != 0) {
+            filter_pos++;
+        }
+
+        /* an empty space is found */
+        if (filter_pos < _max_filters(rx_mailbox)) {
+            /* set filter on this memory space */
+            if (mutex_trylock(&_mcp_mutex)) {
+                mcp2515_set_filter(dev_mcp,
+                                   MCP2515_FILTERS_MB0 * rx_mailbox + filter_pos,
+                                   classic_filter->can_id);
+                mutex_unlock(&_mcp_mutex);
+            }
+            else {
+                DEBUG("setfilt3_Failed to lock mutex");
+                return -1;
+            }
+
+            /* save filter */
+            dev_mcp->filter_ids[rx_mailbox][filter_pos] = classic_filter->can_id;
+        }
+        /* No empty space is found */
+        else {
+            DEBUG_PUTS("no empty space found");
+            if (mutex_trylock(&_mcp_mutex)) {
+                mcp2515_set_mode(dev_mcp, mode);
+                mutex_unlock(&_mcp_mutex);
+            }
+            else {
+                DEBUG_PUTS("setfilt4_Failed to lock mutex");
+                return -1;
+            }
+            return -1;
+        }
+    }
+
+    if (mutex_trylock(&_mcp_mutex)) {
+        mcp2515_set_mode(dev_mcp, mode);
+        mutex_unlock(&_mcp_mutex);
+    }
+    else {
+        DEBUG("setfilt5_Failed to lock mutex");
+        return -1;
+    }
+
+    /* Filter added */
+    return 0;
+}
+#endif
 
 static int _remove_filter(candev_t *dev, const struct can_filter *filter)
 {
