@@ -1,5 +1,6 @@
 ifneq (,$(filter native,$(BOARD)))
   CAN_DRIVER ?= PERIPH_CAN
+  DISABLE_MODULE += can_filter_type_specific
 endif
 
 # define the CAN driver you want to use here
@@ -11,6 +12,8 @@ else ifeq ($(CAN_DRIVER), MCP2515)
   USEMODULE += mcp2515
   # Uncomment to enable MCP2515 reception filtering
   # CFLAGS += "-DMCP2515_RECV_FILTER_EN=1"
+  # Uncomment to apply type specific filters
+  # USEMODULE += can_filter_type_specific
 else ifeq ($(CAN_DRIVER), CAN_ALT)
   # other can modules can be defined here
 endif

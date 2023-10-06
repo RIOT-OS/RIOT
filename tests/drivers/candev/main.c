@@ -222,6 +222,7 @@ if (IS_ACTIVE(CONFIG_USE_LOOPBACK_MODE)) {
 }
 
     if (IS_ACTIVE(MCP2515_RECV_FILTER_EN)) {
+#if !defined(MODULE_CAN_FILTER_TYPE_SPECIFIC)
         /* CAN filters examples */
         struct can_filter filter[4];
         filter[0].can_mask = 0x7FF;
@@ -247,6 +248,26 @@ if (IS_ACTIVE(CONFIG_USE_LOOPBACK_MODE)) {
         for (uint8_t i = 0; i < 4; i++) {
             candev->driver->set_filter(candev, &filter[i]);
         }
+#else
+        struct can_filter_classic filter_classic_test_1 = {
+            .mode = {
+                CAN_FILTER_RX_0,
+                CAN_FILTER_TYPE_CLASSIC
+            },
+            .can_id = 0x111,
+            .can_mask = 0x7FF
+        };
+        candev->driver->set_filter_type_spec(candev, &filter_classic_test_1.mode);
+        struct can_filter_classic filter_classic_test_2 = {
+            .mode = {
+                CAN_FILTER_RX_1,
+                CAN_FILTER_TYPE_CLASSIC
+            },
+            .can_id = 0x222,
+            .can_mask = 0x7FF
+        };
+        candev->driver->set_filter_type_spec(candev, &filter_classic_test_2.mode);
+#endif
         /* All other messages won't be received */
     }
 
