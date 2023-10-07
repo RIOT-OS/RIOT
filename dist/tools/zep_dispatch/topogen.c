@@ -113,6 +113,12 @@ static void world_gen(struct world *w, unsigned num_nodes,
         node_generate(&w->nodes[i], w, random_range(range - var, range + var), i);
         node_name(&w->nodes[i], i);
     }
+
+    if (!w->grid) {
+        /* place first node at origin */
+        w->nodes[0].x = 0;
+        w->nodes[0].y = 0;
+    }
 }
 
 static unsigned _color(const struct node *n, unsigned base)
