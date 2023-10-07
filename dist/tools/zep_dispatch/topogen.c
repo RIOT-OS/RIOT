@@ -13,6 +13,10 @@
 #include <math.h>
 #include <unistd.h>
 
+#ifndef CONFIG_USE_NUMERIC_NAMES
+#define CONFIG_USE_NUMERIC_NAMES 1
+#endif
+
 struct node {
     char name[8];
     int x;
@@ -80,6 +84,11 @@ static double node_distance_weight(const struct node *a, const struct node *b)
 
 static void node_name(struct node *n, unsigned idx)
 {
+    if (CONFIG_USE_NUMERIC_NAMES) {
+        snprintf(n->name, sizeof(n->name), "n%03u", (uint16_t)idx + 1);
+        return;
+    }
+
     char *s = n->name;
     const char *end = s + sizeof(n->name) - 1;
 
