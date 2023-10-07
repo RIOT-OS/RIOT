@@ -192,6 +192,12 @@ static void _print_distance(struct node *nodes, unsigned num, bool recursive, bo
 {
     struct node *start = nodes;
 
+    if (recursive) {
+        for (unsigned i = 0; i < num; ++i) {
+            printf("%s\n", nodes[i].name);
+        }
+    }
+
     for (unsigned i = 1; i < num; ++i) {
         struct node *n = &nodes[i];
 
