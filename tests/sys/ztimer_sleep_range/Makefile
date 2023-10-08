@@ -3,6 +3,8 @@ include ../Makefile.sys_common
 
 USEMODULE += ztimer
 USEMODULE += ztimer_usec
+USEMODULE += posix_semaphore
+
 
 # This test randomly fails on `native` so disable it from CI
 TEST_ON_CI_BLACKLIST += native

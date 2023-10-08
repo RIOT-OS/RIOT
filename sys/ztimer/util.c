@@ -31,7 +31,6 @@
 #include "ztimer.h"
 
 static list_node_t rooms = {.next = NULL};
-static uint32_t num_rooms = 0;
 static mutex_t room_lock = MUTEX_INIT;
 
 static void _callback_unlock_mutex(void *arg)
@@ -47,7 +46,6 @@ static void _callback_sleep_range(void *arg)
     
     mutex_lock(&room_lock);
     list_remove(&rooms, &(args->room->node));
-    num_rooms--;
     mutex_unlock(&room_lock);
 
     ztimer_release(ZTIMER_USEC);
@@ -99,8 +97,10 @@ void ztimer_sleep_range(uint32_t min_time, uint32_t max_time)
 
         while (curr->next != NULL) {
             //ztimer_room_t* curr_room = (ztimer_room_t *)curr->next;
-            ztimer_room_t* curr_room = container_of((clist_node_t*)curr->next, ztimer_room_t, node);
-            if (!(relative_min > curr_room->end || relative_max < curr_room->begin)) {
+            ztimer_room_t* curr_room = container_of((clist_node_t*)curr->next, 
+                                                     ztimer_room_t, node);
+            if (!(relative_min > curr_room->end ||
+                  relative_max < curr_room->begin)) {
                 added_to_existing_room = true;
                 if (relative_min > curr_room->begin) {
                     curr_room->begin = relative_min;
@@ -156,7 +156,6 @@ void ztimer_sleep_range(uint32_t min_time, uint32_t max_time)
         callback_args.room = &new_room;
         _add_room_sorted(&new_room);
         mutex_lock(&room_lock);
-        num_rooms++;
         mutex_unlock(&room_lock);
         ztimer_now_t elapsed = ztimer_now(ZTIMER_USEC) - start;
         /* correct board / MCU specific overhead */

@@ -1,21 +1,16 @@
 DEVELHELP ?= 0
 include ../Makefile.sys_common
 
-USEMODULE += ztimer
-USEMODULE += ztimer_usec
-USEMODULE += posix_semaphore
-
-
-# This test randomly fails on `native` so disable it from CI
+# The test depends on how fast and often the host schedules the RIOT native
+# application. If the host is busy enough it won't schedule the process,
+# delaying the application, thus delaying the time measurement. This happens
+# often on ci with resulting offsets of +10ms
 TEST_ON_CI_BLACKLIST += native
 
-# Port and pin configuration for probing with oscilloscope
-# Port number should be found in port enum e.g in cpu/include/periph_cpu.h
-#FEATURES_REQUIRED += periph_gpio
-#CFLAGS += -DSLEEP_PIN=7
-#CFLAGS += -DSLEEP_PORT=PORT_F
+USEMODULE += fmt
+USEMODULE += ztimer_usec ztimer_msec
 
-# microbit qemu failing currently
+# microbit qemu lacks rtt
 TEST_ON_CI_BLACKLIST += microbit
 
 include $(RIOTBASE)/Makefile.include
