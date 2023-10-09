@@ -17,7 +17,7 @@ ifneq ($(RIOTBASE),)
 include $(RIOTBASE)/Makefile.base
 endif
 
-.PHONY: all clean distcleanq
+.PHONY: all clean distclean
 
 prepare: $(PKG_SOURCE_DIR)/
 
