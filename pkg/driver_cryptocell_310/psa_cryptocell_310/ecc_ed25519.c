@@ -54,7 +54,6 @@ psa_status_t psa_generate_ecc_ed25519_key_pair( uint8_t *priv_key_buffer,
     }
 
     memcpy(priv_key_buffer, secret_key, CRYS_ECEDW_ORD_SIZE_IN_BYTES);
-    memcpy(pub_key_buffer, &secret_key[CRYS_ECEDW_ORD_SIZE_IN_BYTES], CRYS_ECEDW_MOD_SIZE_IN_BYTES);
 
 done:
     explicit_bzero(&secret_key, sizeof(secret_key));
