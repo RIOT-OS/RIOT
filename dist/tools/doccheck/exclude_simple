@@ -4010,7 +4010,6 @@ warning: Member MAG3110_SYSMOD_ACTIVE (macro definition) of file mag3110_reg.h i
 warning: Member MAG3110_SYSMOD_ACTIVE_RAW (macro definition) of file mag3110_reg.h is not documented.
 warning: Member MAG3110_SYSMOD_STANDBY (macro definition) of file mag3110_reg.h is not documented.
 warning: Member MAIPGL_FD (macro definition) of file enc28j60_regs.h is not documented.
-warning: Member Maj(x, y, z) (macro definition) of group sys_hashes_sha2xx_common is not documented.
 warning: Member MASK_MAX_RT (macro definition) of file nrf24l01p_settings.h is not documented.
 warning: Member MASK_RX_DR (macro definition) of file nrf24l01p_settings.h is not documented.
 warning: Member MASK_TX_DS (macro definition) of file nrf24l01p_settings.h is not documented.
@@ -6025,7 +6024,6 @@ warning: Member rom_setup_set_aon_rtc_sub_sec_inc (macro definition) of file cc2
 warning: Member rom_setup_set_cache_mode_according_to_ccfg_setting (macro definition) of file cc26x2_cc13x2_setup.h is not documented.
 warning: Member rom_setup_step_vddr_trim_to (macro definition) of file cc26x2_cc13x2_setup.h is not documented.
 warning: Member rotating_hash(const uint8_t *buf, size_t len) (function) of file hashes.h is not documented.
-warning: Member ROTR(x, n) (macro definition) of group sys_hashes_sha2xx_common is not documented.
 warning: Member RR_CLASS_LENGTH (macro definition) of group net_dns is not documented.
 warning: Member RR_RDLENGTH_LENGTH (macro definition) of group net_dns is not documented.
 warning: Member RR_TTL_LENGTH (macro definition) of group net_dns is not documented.
@@ -6063,14 +6061,10 @@ warning: Member RUN_MIC_PIN (macro definition) of file board.h is not documented
 warning: Member RX_DR (macro definition) of file nrf24l01p_settings.h is not documented.
 warning: Member RX_P_NO (macro definition) of file nrf24l01p_settings.h is not documented.
 warning: Member s0_OFFSET (macro definition) of file context_frame.h is not documented.
-warning: Member s0(x) (macro definition) of group sys_hashes_sha2xx_common is not documented.
-warning: Member S0(x) (macro definition) of group sys_hashes_sha2xx_common is not documented.
 warning: Member s10_OFFSET (macro definition) of file context_frame.h is not documented.
 warning: Member s11_OFFSET (macro definition) of file context_frame.h is not documented.
 warning: Member S16_F (macro definition) of group pkg_lwip_sys is not documented.
 warning: Member s1_OFFSET (macro definition) of file context_frame.h is not documented.
-warning: Member s1(x) (macro definition) of group sys_hashes_sha2xx_common is not documented.
-warning: Member S1(x) (macro definition) of group sys_hashes_sha2xx_common is not documented.
 warning: Member s2_OFFSET (macro definition) of file context_frame.h is not documented.
 warning: Member S32_F (macro definition) of group pkg_lwip_sys is not documented.
 warning: Member s3_OFFSET (macro definition) of file context_frame.h is not documented.
@@ -6280,7 +6274,6 @@ warning: Member setup_fpu(void) (function) of group cpu_lm4f120 is not documente
 warning: Member SGP30_PARAM_I2C_DEV (macro definition) of file sgp30_params.h is not documented.
 warning: Member SGP30_PARAMS (macro definition) of file sgp30_params.h is not documented.
 warning: Member SGP30_SAUL_INFO (macro definition) of file sgp30_params.h is not documented.
-warning: Member SHR(x, n) (macro definition) of group sys_hashes_sha2xx_common is not documented.
 warning: Member SHT1X_PARAM_CLK (macro definition) of file board.h is not documented.
 warning: Member SHT1X_PARAM_DATA (macro definition) of file board.h is not documented.
 warning: Member SHT2X_PARAM_CRC_MODE (macro definition) of file sht2x_params.h is not documented.
