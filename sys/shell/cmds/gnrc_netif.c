@@ -776,11 +776,17 @@ static void _netif_list(netif_t *iface)
         }
     }
 #endif /* MODULE_NETDEV_IEEE802154 */
-    netopt_enable_t link;
-    res = netif_get_opt(iface, NETOPT_LINK, 0, &link, sizeof(netopt_enable_t));
+    netopt_enable_t enabled;
+    res = netif_get_opt(iface, NETOPT_LINK, 0, &enabled, sizeof(enabled));
     if (res >= 0) {
-        printf(" Link: %s ", (link == NETOPT_ENABLE) ? "up" : "down" );
+        printf(" Link: %s ", (enabled == NETOPT_ENABLE) ? "up" : "down" );
     }
+#if IS_USED(MODULE_LWIP_NETIF) /* only supported on lwIP for now */
+    res = netif_get_opt(iface, NETOPT_ACTIVE, 0, &enabled, sizeof(enabled));
+    if (res >= 0) {
+        printf(" State: %s ", (enabled == NETOPT_ENABLE) ? "up" : "down" );
+    }
+#endif /* MODULE_LWIP_NETIF */
     line_thresh = _newline(0U, line_thresh);
     res = netif_get_opt(iface, NETOPT_ADDRESS_LONG, 0, hwaddr, sizeof(hwaddr));
     if (res >= 0) {
@@ -806,9 +812,9 @@ static void _netif_list(netif_t *iface)
     }
     res = netif_get_opt(iface, NETOPT_CSMA_RETRIES, 0, &u8, sizeof(u8));
     if (res >= 0) {
-        netopt_enable_t enable = NETOPT_DISABLE;
-        res = netif_get_opt(iface, NETOPT_CSMA, 0, &enable, sizeof(enable));
-        if ((res >= 0) && (enable == NETOPT_ENABLE)) {
+        enabled = NETOPT_DISABLE;
+        res = netif_get_opt(iface, NETOPT_CSMA, 0, &enabled, sizeof(enabled));
+        if ((res >= 0) && (enabled == NETOPT_ENABLE)) {
             printf(" CSMA Retries: %u ", (unsigned)u8);
         }
         line_thresh++;
