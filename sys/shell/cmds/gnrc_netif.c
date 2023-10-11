@@ -1684,10 +1684,17 @@ static uint8_t _get_prefix_len(char *addr)
 
 static int _netif_link(netif_t *iface, netopt_enable_t en)
 {
+#if IS_USED(MODULE_LWIP_NETIF) /* lwIP sets netif state, not link state */
+    if (netif_set_opt(iface, NETOPT_ACTIVE, 0, &en, sizeof(en)) < 0) {
+        printf("error: unable to set state %s\n", en == NETOPT_ENABLE ? "up" : "down");
+        return 1;
+    }
+#else
     if (netif_set_opt(iface, NETOPT_LINK, 0, &en, sizeof(en)) < 0) {
         printf("error: unable to set link %s\n", en == NETOPT_ENABLE ? "up" : "down");
         return 1;
     }
+#endif
     return 0;
 }
 
