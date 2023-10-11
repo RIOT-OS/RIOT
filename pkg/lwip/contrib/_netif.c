@@ -42,6 +42,17 @@ int netif_get_opt(netif_t *iface, netopt_t opt, uint16_t context,
     struct netdev *dev = netif->state;
     int res = -ENOTSUP;
     switch (opt) {
+    case NETOPT_ACTIVE: {
+            assert(max_len >= sizeof(netopt_enable_t));
+            netopt_enable_t *tgt = value;
+            if (netif_is_up(netif)) {
+                *tgt = NETOPT_ENABLE;
+            } else {
+                *tgt = NETOPT_DISABLE;
+            }
+            res = 0;
+        }
+        break;
 #ifdef MODULE_LWIP_IPV6
     case NETOPT_IPV6_ADDR: {
             assert(max_len >= sizeof(ipv6_addr_t));
