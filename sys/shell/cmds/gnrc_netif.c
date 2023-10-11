@@ -33,7 +33,6 @@
 #include "net/loramac.h"
 #include "net/netif.h"
 #include "shell.h"
-#include "container.h"
 
 #ifdef MODULE_NETSTATS
 #include "net/netstats.h"
@@ -1793,67 +1792,6 @@ static int _netif_del(netif_t *iface, char *addr_str)
 }
 
 /* shell commands */
-#ifdef MODULE_GNRC_TXTSND
-static int _gnrc_netif_send(int argc, char **argv)
-{
-    netif_t *iface;
-    uint8_t addr[GNRC_NETIF_L2ADDR_MAXLEN];
-    size_t addr_len;
-    gnrc_pktsnip_t *pkt, *hdr;
-    gnrc_netif_hdr_t *nethdr;
-    uint8_t flags = 0x00;
-
-    if (argc < 4) {
-        printf("usage: %s <if> [<L2 addr>|bcast] <data>\n", argv[0]);
-        return 1;
-    }
-
-    iface = netif_get_by_name(argv[1]);
-    if (!iface) {
-        printf("error: invalid interface given\n");
-        return 1;
-    }
-
-    /* parse address */
-    addr_len = gnrc_netif_addr_from_str(argv[2], addr);
-
-    if (addr_len == 0) {
-        if (strcmp(argv[2], "bcast") == 0) {
-            flags |= GNRC_NETIF_HDR_FLAGS_BROADCAST;
-        }
-        else {
-            printf("error: invalid address given\n");
-            return 1;
-        }
-    }
-
-    /* put packet together */
-    pkt = gnrc_pktbuf_add(NULL, argv[3], strlen(argv[3]), GNRC_NETTYPE_UNDEF);
-    if (pkt == NULL) {
-        printf("error: packet buffer full\n");
-        return 1;
-    }
-    hdr = gnrc_netif_hdr_build(NULL, 0, addr, addr_len);
-    if (hdr == NULL) {
-        printf("error: packet buffer full\n");
-        gnrc_pktbuf_release(pkt);
-        return 1;
-    }
-    pkt = gnrc_pkt_prepend(pkt, hdr);
-    nethdr = (gnrc_netif_hdr_t *)hdr->data;
-    nethdr->flags = flags;
-    /* and send it */
-    if (gnrc_netif_send(container_of(iface, gnrc_netif_t, netif), pkt) < 1) {
-        printf("error: unable to send\n");
-        gnrc_pktbuf_release(pkt);
-        return 1;
-    }
-
-    return 0;
-}
-
-SHELL_COMMAND(txtsnd, "Sends a custom string as is over the link layer", _gnrc_netif_send);
-#endif
 
 /* TODO: updated tests/net/gnrc_dhcpv6_client to no longer abuse this shell command
  * and add static qualifier */
