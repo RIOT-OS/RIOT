@@ -18,6 +18,7 @@
 
 #include "fmt.h"
 #include "lwip/netif/compat.h"
+#include "lwip/netifapi.h"
 #include "net/netif.h"
 
 int netif_get_name(netif_t *iface, char *name)
@@ -85,13 +86,28 @@ int netif_get_opt(netif_t *iface, netopt_t opt, uint16_t context,
 int netif_set_opt(netif_t *iface, netopt_t opt, uint16_t context,
                   void *value, size_t value_len)
 {
-    (void)iface;
-    (void)opt;
     (void)context;
-    (void)value;
-    (void)value_len;
+    int res = -ENOTSUP;
+    lwip_netif_t *lwip_netif = (lwip_netif_t*) iface;
+    struct netif *netif = &lwip_netif->lwip_netif;
 
-    return -ENOTSUP;
+    switch (opt) {
+    case NETOPT_ACTIVE: {
+            assert(value_len >= sizeof(netopt_enable_t));
+            netopt_enable_t *state = value;
+            if (*state == NETOPT_ENABLE) {
+                netifapi_netif_set_up(netif);
+            } else {
+                netifapi_netif_set_down(netif);
+            }
+            res = 0;
+        }
+        break;
+    default:
+        break;
+    }
+
+    return res;
 }
 
 /** @} */
