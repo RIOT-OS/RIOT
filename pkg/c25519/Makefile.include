@@ -1,1 +1,7 @@
 INCLUDES += -I$(PKGDIRBASE)/c25519/src
+
+ifneq (,$(filter psa_c25519_%, $(USEMODULE)))
+  PSEUDOMODULES += psa_c25519_edsign
+  DIRS += $(RIOTPKG)/c25519/psa_c25519
+  INCLUDES += -I$(RIOTBASE)/sys/psa_crypto/include
+endif

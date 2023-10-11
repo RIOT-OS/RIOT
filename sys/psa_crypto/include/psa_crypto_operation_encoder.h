@@ -11,7 +11,7 @@
  * @{
  *
  * @file        psa_crypto_operation_encoder.h
- * @brief       Macros used to map PSA akgorithms, key types and key sizes to specific key types
+ * @brief       Macros used to map PSA algorithms, key types and key sizes to specific key types
  *              and operations to call the corresponding driver functions.
  *
  * @note        Currently this only supports a small number of operations. It should be expanded as
@@ -66,36 +66,36 @@ typedef enum {
     PSA_ECC_P384_R1,
     PSA_ECC_P521_R1,
     PSA_ECC_FRP,
-    PSA_ECMONT_255,
-    PSA_ECMONT_448
+    PSA_ECC_ED25519,
 } psa_asym_key_t;
 
 /**
- * @brief   Combine an ECC 192 key type with a given curve.
+ * @brief   Combine a SECP_R1 key type with a given key size (private or public key).
  *
- * @param   curve   Must be a curve of type @ref psa_ecc_family_t
+ * @param   bits    Key size of type @ref psa_key_bits_t
  *
  * @return  @ref psa_asym_key_t
- * @return  @ref PSA_INVALID_OPERATION  @c curve is not compatible with key size
+ * @return  @ref PSA_INVALID_OPERATION  @c bits is not compatible with SECP_R1 curves
  */
-#define GET_ECC_KEY_TYPE_192(curve) \
-    ((curve == PSA_ECC_FAMILY_SECP_R1) ? PSA_ECC_P192_R1 : \
+#define PSA_ENCODE_ECC_KEY_TYPE_SECPR1(bits) \
+    ((bits == 256) || (bits == 520) ? PSA_ECC_P256_R1 : \
+     (bits == 192) || (bits == 392) ? PSA_ECC_P192_R1 : \
      PSA_INVALID_OPERATION)
 
 /**
- * @brief   Combine an ECC 265 key type with a given curve.
+ * @brief   Combine a Twisted Edwards key type with a given key size (private or public key).
  *
- * @param   curve   Must be a curve of type @ref psa_ecc_family_t
+ * @param   bits    Key size of type @ref psa_key_bits_t
  *
  * @return  @ref psa_asym_key_t
- * @return  @ref PSA_INVALID_OPERATION  @c curve is not compatible with key size
+ * @return  @ref PSA_INVALID_OPERATION  @c bits is not compatible with Twisted Edwards curves
  */
-#define GET_ECC_KEY_TYPE_256(curve) \
-    ((curve == PSA_ECC_FAMILY_SECP_R1) ? PSA_ECC_P256_R1 : \
+#define PSA_ENCODE_ECC_KEY_TYPE_EDWARDS(bits) \
+    ((bits == 255) || (bits == 256) ? PSA_ECC_ED25519 : \
      PSA_INVALID_OPERATION)
 
 /**
- * @brief   Map an ECC 192 key to a given curve according to its type and size.
+ * @brief   Map an ECC key to a given curve according to its type and size.
  *
  * @param   bits    Key size of type @ref psa_key_bits_t
  * @param   curve   Must be a curve of type @ref psa_ecc_family_t
@@ -104,8 +104,8 @@ typedef enum {
  * @return  @ref PSA_INVALID_OPERATION  @c curve and @c bits are incompatible
  */
 #define PSA_ENCODE_ECC_KEY_TYPE(bits, curve) \
-    ((bits == 256) || (bits == 520) ? GET_ECC_KEY_TYPE_256(curve) : \
-     (bits == 192) || (bits == 392) ? GET_ECC_KEY_TYPE_192(curve) : \
+    ((curve == PSA_ECC_FAMILY_SECP_R1) ? PSA_ENCODE_ECC_KEY_TYPE_SECPR1(bits) : \
+     (curve == PSA_ECC_FAMILY_TWISTED_EDWARDS) ? PSA_ENCODE_ECC_KEY_TYPE_EDWARDS(bits) : \
      PSA_INVALID_OPERATION)
 
 /**

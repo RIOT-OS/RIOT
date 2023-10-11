@@ -16,6 +16,7 @@ PSEUDOMODULES += psa_cryptocell_310_aes_common
 PSEUDOMODULES += psa_cryptocell_310_ecc_common
 PSEUDOMODULES += psa_cryptocell_310_ecc_p192
 PSEUDOMODULES += psa_cryptocell_310_ecc_p256
+PSEUDOMODULES += psa_cryptocell_310_ecc_ed25519
 PSEUDOMODULES += psa_cryptocell_310_error_conversion
 PSEUDOMODULES += psa_cryptocell_310_hashes_common
 PSEUDOMODULES += psa_cryptocell_310_hashes_sha1

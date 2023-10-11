@@ -18,6 +18,7 @@ PERIPH_IGNORE_MODULES := \
   periph_cryptocell_310 \
   periph_ecc_p192r1 \
   periph_ecc_p256r1 \
+  periph_ecc_ed25519 \
   periph_eth \
   periph_eth_common \
   periph_flash \

@@ -38,12 +38,25 @@ extern "C" {
  *
  * @param   hash psa_algorithm_t
  */
-#define MAP_PSA_HASH_TO_CRYS_HASH(hash) \
+#define MAP_PSA_HASH_TO_CRYS_HASH_AFTER(hash) \
     ((hash == PSA_ALG_SHA_1) ? CRYS_ECPKI_AFTER_HASH_SHA1_mode : \
      (hash == PSA_ALG_SHA_224) ? CRYS_ECPKI_AFTER_HASH_SHA224_mode : \
      (hash == PSA_ALG_SHA_256) ? CRYS_ECPKI_AFTER_HASH_SHA256_mode : \
      (hash == PSA_ALG_SHA_384) ? CRYS_ECPKI_AFTER_HASH_SHA384_mode : \
      (hash == PSA_ALG_SHA_512) ? CRYS_ECPKI_AFTER_HASH_SHA512_mode : \
+     0)
+
+/**
+ * @brief   Map PSA hash encodings to CryptoCell specific hash encodings
+ *
+ * @param   hash psa_algorithm_t
+ */
+#define MAP_PSA_HASH_TO_CRYS_HASH_BEFORE(hash) \
+    ((hash == PSA_ALG_SHA_1) ? CRYS_ECPKI_HASH_SHA1_mode : \
+     (hash == PSA_ALG_SHA_224) ? CRYS_ECPKI_HASH_SHA224_mode : \
+     (hash == PSA_ALG_SHA_256) ? CRYS_ECPKI_HASH_SHA256_mode : \
+     (hash == PSA_ALG_SHA_384) ? CRYS_ECPKI_HASH_SHA384_mode : \
+     (hash == PSA_ALG_SHA_512) ? CRYS_ECPKI_HASH_SHA512_mode : \
      0)
 
 /**
@@ -63,34 +76,34 @@ psa_status_t cryptocell_310_common_ecc_generate_key_pair(uint8_t *priv_key_buffe
                                                  CRYS_ECPKI_DomainID_t domain);
 
 /**
- * @brief   Common ECC hash signature function
+ * @brief   Common ECC signature function
  *
  * @param   priv_key            Pointer to ECC private key
  * @param   priv_key_size       Size of private key
- * @param   hash                Hash of the message to sign
- * @param   hash_length         Length of the message hash
+ * @param   input               Input to sign (hash or original message depending on @c hash_mode )
+ * @param   input_length        Length of the input
  * @param   signature           Output buffer to write the generated signature
  * @param   signature_length    Pointer to store the actual length of the signature
  * @param   hash_mode           Mode used to hash the message of type @c CRYS_ECPKI_HASH_OpMode_t
  * @param   domain              ECC domain of type @c CRYS_ECPKI_DomainID_t
  * @return  psa_status_t
  */
-psa_status_t cryptocell_310_common_ecc_sign_hash(const uint8_t *priv_key,
+psa_status_t cryptocell_310_common_ecc_sign(const uint8_t *priv_key,
                                          uint32_t priv_key_size,
-                                         const uint8_t *hash,
-                                         size_t hash_length,
+                                         const uint8_t *input,
+                                         size_t input_length,
                                          uint8_t *signature,
                                          size_t *signature_length,
                                          CRYS_ECPKI_HASH_OpMode_t hash_mode,
                                          CRYS_ECPKI_DomainID_t domain);
 
 /**
- * @brief   Common ECC hash verification function
+ * @brief   Common ECC verification function
  *
  * @param   pub_key             Pointer to ECC public key
  * @param   pub_key_size        Size of public key
- * @param   hash                Hash of the message to sign
- * @param   hash_length         Length of the message hash
+ * @param   input               Input to verify (hash or original message depending on @c hash_mode )
+ * @param   input_length        Length of the input
  * @param   signature           Buffer containing the signature to be verified
  * @param   signature_length    Actual length of the signature
  * @param   hash_mode           Mode used to hash the message of type
@@ -98,10 +111,10 @@ psa_status_t cryptocell_310_common_ecc_sign_hash(const uint8_t *priv_key,
  * @param   domain              ECC domain of type @c CRYS_ECPKI_DomainID_t
  * @return  psa_status_t
  */
-psa_status_t cryptocell_310_common_ecc_verify_hash(const uint8_t *pub_key,
+psa_status_t cryptocell_310_common_ecc_verify(const uint8_t *pub_key,
                                            size_t pub_key_size,
-                                           const uint8_t *hash,
-                                           size_t hash_length,
+                                           const uint8_t *input,
+                                           size_t input_length,
                                            const uint8_t *signature,
                                            size_t signature_length,
                                            CRYS_ECPKI_HASH_OpMode_t hash_mode,

@@ -992,7 +992,7 @@ static psa_status_t psa_validate_key_for_key_generation(psa_key_type_t type, siz
     }
 #if IS_USED(MODULE_PSA_ASYMMETRIC) || IS_USED(MODULE_PSA_SECURE_ELEMENT_ASYMMETRIC)
     else if (PSA_KEY_TYPE_IS_ECC_KEY_PAIR(type)) {
-        return PSA_ECC_KEY_SIZE_IS_VALID(bits) ? PSA_SUCCESS : PSA_ERROR_INVALID_ARGUMENT;
+        return PSA_ECC_KEY_SIZE_IS_VALID(type, bits) ? PSA_SUCCESS : PSA_ERROR_INVALID_ARGUMENT;
     }
 #endif
     /* TODO: add validation for other key types */
@@ -1329,8 +1329,6 @@ psa_status_t psa_generate_key(const psa_key_attributes_t *attributes,
         if (status != PSA_SUCCESS) {
             return status;
         }
-
-        slot->key.data_len = PSA_MAX_KEY_DATA_SIZE;
     }
 
     status = psa_location_dispatch_generate_key(attributes, slot);
@@ -1804,7 +1802,7 @@ psa_status_t psa_sign_hash(psa_key_id_t key,
         return PSA_ERROR_NOT_SUPPORTED;
     }
 
-    if (hash_length != PSA_HASH_LENGTH(alg)) {
+    if (!PSA_ALG_IS_SIGN_HASH(alg) || hash_length != PSA_HASH_LENGTH(alg)) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
@@ -1814,7 +1812,7 @@ psa_status_t psa_sign_hash(psa_key_id_t key,
         return status;
     }
 
-    if (signature_size < PSA_SIGN_OUTPUT_SIZE(slot->attr.type, slot->attr.bits, alg)) {
+    if (signature_size < PSA_ECDSA_SIGNATURE_SIZE(PSA_ECC_KEY_GET_CURVE(slot->attr.type, slot->attr.bits))) {
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
@@ -1840,14 +1838,49 @@ psa_status_t psa_sign_message(psa_key_id_t key,
                               size_t signature_size,
                               size_t *signature_length)
 {
-    (void)key;
-    (void)alg;
-    (void)input;
-    (void)input_length;
-    (void)signature;
-    (void)signature_size;
-    (void)signature_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+    psa_status_t unlock_status = PSA_ERROR_CORRUPTION_DETECTED;
+    psa_key_slot_t *slot;
+
+    if (!lib_initialized) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!input || !signature || !signature_length) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (!PSA_ALG_IS_ECDSA(alg)) {
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
+
+    if (!PSA_ALG_IS_SIGN_MESSAGE(alg)) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    status = psa_get_and_lock_key_slot_with_policy(key, &slot, PSA_KEY_USAGE_SIGN_MESSAGE, alg);
+    if (status != PSA_SUCCESS) {
+        unlock_status = psa_unlock_key_slot(slot);
+        return status;
+    }
+
+    if (signature_size < PSA_ECDSA_SIGNATURE_SIZE(PSA_ECC_KEY_GET_CURVE(slot->attr.type, slot->attr.bits))) {
+        return PSA_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    if (!PSA_KEY_TYPE_IS_KEY_PAIR(slot->attr.type)) {
+        unlock_status = psa_unlock_key_slot(slot);
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    psa_key_attributes_t attributes = slot->attr;
+
+    status = psa_location_dispatch_sign_message(&attributes, alg, slot, input, input_length, signature,
+                                             signature_size, signature_length);
+
+    unlock_status = psa_unlock_key_slot(slot);
+    return ((status == PSA_SUCCESS) ? unlock_status : status);
 }
 
 psa_status_t psa_verify_hash(psa_key_id_t key,
@@ -1873,7 +1906,7 @@ psa_status_t psa_verify_hash(psa_key_id_t key,
         return PSA_ERROR_NOT_SUPPORTED;
     }
 
-    if (hash_length != PSA_HASH_LENGTH(alg)) {
+    if (!PSA_ALG_IS_SIGN_HASH(alg) || hash_length != PSA_HASH_LENGTH(alg)) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
@@ -1883,14 +1916,7 @@ psa_status_t psa_verify_hash(psa_key_id_t key,
         return status;
     }
 
-    /**
-     * An ECC public key has the size `curve_bytes * 2 + 1`.
-     * So to get the curve size to determine the required signature
-     * size, we need to revert that calculation.
-     */
-    uint16_t curve_size = PSA_BYTES_TO_BITS(PSA_BITS_TO_BYTES(slot->attr.bits / 2) - 1);
-
-    if (signature_length != PSA_ECDSA_SIGNATURE_SIZE(curve_size)) {
+    if (signature_length != PSA_ECDSA_SIGNATURE_SIZE(PSA_ECC_KEY_GET_CURVE(slot->attr.type, slot->attr.bits))) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
@@ -1921,11 +1947,52 @@ psa_status_t psa_verify_message(psa_key_id_t key,
                                 const uint8_t *signature,
                                 size_t signature_length)
 {
-    (void)key;
-    (void)alg;
-    (void)input;
-    (void)input_length;
-    (void)signature;
-    (void)signature_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+    psa_status_t unlock_status = PSA_ERROR_CORRUPTION_DETECTED;
+    psa_key_slot_t *slot;
+
+    if (!lib_initialized) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!input || !signature) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (!PSA_ALG_IS_ECDSA(alg)) {
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
+
+    if (!PSA_ALG_IS_SIGN_MESSAGE(alg)) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    status = psa_get_and_lock_key_slot_with_policy(key, &slot, PSA_KEY_USAGE_VERIFY_MESSAGE, alg);
+    if (status != PSA_SUCCESS) {
+        unlock_status = psa_unlock_key_slot(slot);
+        return status;
+    }
+
+    if (signature_length != PSA_ECDSA_SIGNATURE_SIZE(PSA_ECC_KEY_GET_CURVE(slot->attr.type, slot->attr.bits))) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    /**
+     * When key location is a secure element, this implementation only supports
+     * the use of public keys stored on the secure element, not key pairs in
+     * which the public key is stored locally.
+     */
+    if ((PSA_KEY_LIFETIME_GET_LOCATION(slot->attr.lifetime) != PSA_KEY_LOCATION_LOCAL_STORAGE) &&
+        PSA_KEY_TYPE_IS_ECC_KEY_PAIR(slot->attr.type)) {
+        unlock_status = psa_unlock_key_slot(slot);
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
+
+    psa_key_attributes_t attributes = slot->attr;
+
+    status = psa_location_dispatch_verify_message(&attributes, alg, slot, input, input_length, signature,
+                                               signature_length);
+
+    unlock_status = psa_unlock_key_slot(slot);
+    return ((status == PSA_SUCCESS) ? unlock_status : status);
 }

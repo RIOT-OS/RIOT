@@ -56,6 +56,30 @@ ifneq (,$(filter psa_asymmetric_ecc_p256r1_backend_periph,$(USEMODULE)))
   FEATURES_REQUIRED += periph_ecc_p256r1
 endif
 
+## ECC_ED25519 backend
+ifneq (,$(filter psa_asymmetric_ecc_ed25519,$(USEMODULE)))
+  ifeq (,$(filter psa_asymmetric_ecc_ed25519_custom_backend,$(USEMODULE)))
+    FEATURES_OPTIONAL += periph_ecc_ed25519
+    include $(RIOTMAKE)/features_check.inc.mk
+    # HACK: Due to kconfig migration, may cause problems
+    ifneq (,$(filter periph_ecc_ed25519,$(FEATURES_USED)))
+      USEMODULE += psa_asymmetric_ecc_ed25519_backend_periph
+    else
+      USEMODULE += psa_asymmetric_ecc_ed25519_backend_c25519
+    endif
+  endif
+endif
+
+ifneq (,$(filter psa_asymmetric_ecc_ed25519_backend_c25519,$(USEMODULE)))
+  USEPKG += c25519
+  USEMODULE += psa_c25519
+  USEMODULE += psa_c25519_edsign
+endif
+
+ifneq (,$(filter psa_asymmetric_ecc_ed25519_backend_periph,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_ecc_ed25519
+endif
+
 # Cipher
 ifneq (,$(filter psa_cipher,$(USEMODULE)))
   USEMODULE += psa_key_slot_mgmt

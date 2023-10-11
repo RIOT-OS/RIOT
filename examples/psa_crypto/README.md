@@ -4,10 +4,11 @@ This example application is supposed to show two things:
 2. How to configure the implementation with Kconfig dependency resolution vs. Make dependency resolution
 
 ## Basic usage of PSA Crypto
-There are three example operations:
+There are four example operations:
 - AES 128 CBC
 - HMAC SHA256
 - ECDSA with a P256 curve
+- EdDSA with the Ed25519 curve
 
 Each comes in its own sourcefile called `example_<operation>.c`. To see which functions to call to perform each operations, please read the code.
 

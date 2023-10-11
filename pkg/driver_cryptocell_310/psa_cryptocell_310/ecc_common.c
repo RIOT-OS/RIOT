@@ -21,6 +21,7 @@
 #include "psa_error.h"
 #include "psa_cryptocell_310_ecc_common.h"
 #include "cryptocell_310_util.h"
+#include "string_utils.h"
 
 #define ENABLE_DEBUG    0
 #include "debug.h"
@@ -67,13 +68,14 @@ psa_status_t cryptocell_310_common_ecc_generate_key_pair(uint8_t *priv_key_buffe
         return CRYS_to_psa_error(ret);
     }
 
+    explicit_bzero(&priv_key, sizeof(priv_key));
     return PSA_SUCCESS;
 }
 
-psa_status_t cryptocell_310_common_ecc_sign_hash(const uint8_t *priv_key,
+psa_status_t cryptocell_310_common_ecc_sign(const uint8_t *priv_key,
                                          uint32_t priv_key_size,
-                                         const uint8_t *hash,
-                                         size_t hash_length,
+                                         const uint8_t *input,
+                                         size_t input_length,
                                          uint8_t *signature,
                                          size_t *signature_length,
                                          CRYS_ECPKI_HASH_OpMode_t hash_mode,
@@ -89,26 +91,28 @@ psa_status_t cryptocell_310_common_ecc_sign_hash(const uint8_t *priv_key,
     ret = CRYS_ECPKI_BuildPrivKey(pDomain, priv_key, priv_key_size, &user_priv_key);
     if (ret != CRYS_OK) {
         DEBUG("CRYS_ECPKI_BuildPrivKey failed with %s\n", cryptocell310_status_to_humanly_readable(ret));
-        return CRYS_to_psa_error(ret);
+        goto done;
     }
 
     cryptocell_310_enable();
     ret = CRYS_ECDSA_Sign(rndState_ptr, rndGenerateVectFunc,
-                          &SignUserContext, &user_priv_key, hash_mode, (uint8_t *)hash, hash_length,
+                          &SignUserContext, &user_priv_key, hash_mode, (uint8_t *)input, input_length,
                           signature, (uint32_t *)signature_length);
     cryptocell_310_disable();
     if (ret != CRYS_OK) {
         DEBUG("CRYS_ECDSA_Sign failed with %s\n", cryptocell310_status_to_humanly_readable(ret));
-        return CRYS_to_psa_error(ret);
+        goto done;
     }
 
-    return PSA_SUCCESS;
+done:
+    explicit_bzero(&user_priv_key, sizeof(user_priv_key));
+    return CRYS_to_psa_error(ret);
 }
 
-psa_status_t cryptocell_310_common_ecc_verify_hash(const uint8_t *pub_key,
+psa_status_t cryptocell_310_common_ecc_verify(const uint8_t *pub_key,
                                            size_t pub_key_size,
-                                           const uint8_t *hash,
-                                           size_t hash_length,
+                                           const uint8_t *input,
+                                           size_t input_length,
                                            const uint8_t *signature,
                                            size_t signature_length,
                                            CRYS_ECPKI_HASH_OpMode_t hash_mode,
@@ -132,7 +136,7 @@ psa_status_t cryptocell_310_common_ecc_verify_hash(const uint8_t *pub_key,
 
     cryptocell_310_enable();
     ret =  CRYS_ECDSA_Verify(&VerifyUserContext, &user_pub_key, hash_mode, (uint8_t *)signature,
-                             signature_length, (uint8_t *)hash, hash_length);
+                             signature_length, (uint8_t *)input, input_length);
     cryptocell_310_disable();
 
     if (ret != CRYS_OK) {

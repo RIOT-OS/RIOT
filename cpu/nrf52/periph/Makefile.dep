@@ -8,6 +8,11 @@ ifneq (,$(filter periph_ecc_p256r1,$(USEMODULE)))
   USEMODULE += psa_cryptocell_310_ecc_p256
 endif
 
+ifneq (,$(filter periph_ecc_ed25519,$(USEMODULE)))
+  USEPKG += driver_cryptocell_310
+  USEMODULE += psa_cryptocell_310_ecc_ed25519
+endif
+
 ifneq (,$(filter periph_hash_sha_1,$(USEMODULE)))
   USEPKG += driver_cryptocell_310
   USEMODULE += psa_cryptocell_310_hashes_sha1

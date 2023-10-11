@@ -248,6 +248,12 @@
  * - psa_asymmetric_ecc_p256r1_custom_backend
  * - psa_asymmetric_ecc_p256r1_backend_microecc
  *
+ * #### Ed25519
+ * - psa_asymmetric_ecc_ed25519
+ * - psa_asymmetric_ecc_ed25519_backend_periph
+ * - psa_asymmetric_ecc_ed25519_custom_backend
+ * - psa_asymmetric_ecc_ed25519_backend_c25519
+ *
  * ### Ciphers
  * - Base: psa_cipher
  *
