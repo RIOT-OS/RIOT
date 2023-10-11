@@ -196,7 +196,7 @@ static void _link_usage(char *cmd_name)
 static void _set_usage(char *cmd_name)
 {
     printf("usage: %s <if_id> set <key> <value>\n", cmd_name);
-    printf("      Sets an hardware specific specific value\n"
+    printf("      Sets a hardware specific value\n"
          "      <key> may be one of the following\n"
          "       * \"addr\" - sets (short) address\n"
          "       * \"addr_long\" - sets long address\n"
