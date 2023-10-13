@@ -6,6 +6,8 @@ BOARD ?= native
 #USEMODULE += sched_round_robin
 #USEMODULE += thread
 USEMODULE += ztimer_msec
+USEMODULE += xtimer
+
 #USEMODULE += sched_runq_callback
 
 # This has to be the absolute path to the RIOT base directory:

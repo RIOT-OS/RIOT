@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "thread.h"
+#include "xtimer.h"
 
 // Dimensione dello stack di default per i thread
 #define THREAD_STACKSIZE_DEFAULT (8192)
@@ -37,7 +38,7 @@ void *thread_func(void *arg)
         remaining_time--;
 
         // Sleep per 1 secondo
-        thread_sleep();
+        xtimer_msleep(1000);
     }
 
     printf("Thread %s completed.\n", params->name);
@@ -47,7 +48,7 @@ void *thread_func(void *arg)
 }
 
 // Funzione di inizializzazione del thread
-kernel_pid_t init_thread(thread_params_t *params)
+kernel_pid_t init_thread(thread_params_t *params, size_t index)
 {
     char *stack = malloc(THREAD_STACKSIZE_DEFAULT);
     if (stack == NULL)
@@ -56,8 +57,12 @@ kernel_pid_t init_thread(thread_params_t *params)
         return -1;
     }
 
-    // Imposta la priorità del thread
-    uint8_t priority = 2; // Sostituisci con la priorità desiderata
+    // Imposta la priorità del thread sulla base della posizione nell'array
+    // Con questa modifica, ogni thread avrà una priorità diversa in base alla
+    // sua posizione nell'array 'thread_params'.
+    // Questo permette al modulo di scheduling a feedback di regolare dinamicamente
+    // la priorità dei thread durante l'esecuzione.
+    uint8_t priority = THREAD_PRIORITY_MAIN + index;
 
     // Crea e avvia il thread
     kernel_pid_t pid = thread_create(stack,
@@ -99,7 +104,7 @@ int main(void)
     // Creazione e avvio dei thread
     for (size_t i = 0; i < sizeof(thread_params) / sizeof(thread_params[0]); i++)
     {
-        kernel_pid_t pid = init_thread(&thread_params[i]);
+        kernel_pid_t pid = init_thread(&thread_params[i], i);
         if (pid < 0)
         {
             // Gestisci l'errore, ad esempio interrompendo la creazione di altri thread
