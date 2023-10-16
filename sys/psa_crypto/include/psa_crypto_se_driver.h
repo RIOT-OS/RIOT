@@ -756,7 +756,7 @@ typedef psa_status_t (*psa_drv_se_aead_encrypt_t)(psa_drv_se_context_t *drv_cont
                                                   size_t *p_ciphertext_length);
 
 /**
- * @brief   A function that peforms a secure element authenticated decryption operation
+ * @brief   A function that performs a secure element authenticated decryption operation
  *
  * @param   drv_context             The driver context structure.
  * @param   key_slot                Slot containing the key to use

@@ -55,7 +55,7 @@ See also the ARMmbed
 [instructions](https://developer.mbed.org/platforms/FRDM-K64F/#getting-started-
 with-mbed).
 
-## Updating the Booloader
+## Updating the Bootloader
 A update of CMSIS-DAP firmware is necessary to using the board with OpenOCD.
 A good step by step guide is available
 [here](https://developer.mbed.org/handbook/Firmware-FRDM-K64F).

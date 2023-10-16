@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include "timex.h"
 #include "ztimer.h"
+#include "benchmark.h"
 #include "board.h"
 #include "lcd.h"
 #include "lcd_internal.h"
@@ -92,14 +93,21 @@ int main(void)
     lcd_invert_off(&dev);
     puts("lcd TFT display normal");
 
-    puts("lcd TFT display clear screen");
-    lcd_fill(&dev, 0, dev.params->lines, 0, dev.params->rgb_channels, 0x0000);
+    puts("lcd TFT display clear screen with benchmarking");
+    BENCHMARK_FUNC("fill", 1,
+                   lcd_fill(&dev, 0, dev.params->lines, 0, dev.params->rgb_channels, 0x0000));
+
 #ifndef CONFIG_NO_RIOT_IMAGE
+    printf("Write pixmap of size %u x %u with benchmarking\n",
+           RIOT_LOGO_WIDTH, RIOT_LOGO_HEIGHT);
     /* Approximate middle of the display */
     uint8_t x1 = (dev.params->lines / 2) - (RIOT_LOGO_WIDTH / 2);
     uint8_t y1 = (dev.params->rgb_channels / 2) - (RIOT_LOGO_HEIGHT / 2);
-    lcd_pixmap(&dev, x1, x1 + RIOT_LOGO_WIDTH - 1, y1, y1 +  RIOT_LOGO_HEIGHT - 1,
-               (const uint16_t *)picture);
+    BENCHMARK_FUNC("fill", 1,
+                   lcd_pixmap(&dev,
+                              x1, x1 + RIOT_LOGO_WIDTH - 1,
+                              y1, y1 +  RIOT_LOGO_HEIGHT - 1,
+                              (const uint16_t *)picture));
 #endif
     while (1) {}
 

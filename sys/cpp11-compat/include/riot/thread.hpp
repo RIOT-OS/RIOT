@@ -317,7 +317,7 @@ void swap(thread& lhs, thread& rhs) noexcept;
 /** @cond INTERNAL */
 template <class Tuple>
 void* thread_proxy(void* vp) {
-  { // without this scope, the objects here are not cleaned up corrctly
+  { // without this scope, the objects here are not cleaned up correctly
     std::unique_ptr<Tuple> p(static_cast<Tuple*>(vp));
     auto tmp = std::get<0>(*p);
     std::unique_ptr<thread_data, thread_data_deleter> data{tmp};

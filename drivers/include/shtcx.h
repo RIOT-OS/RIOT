@@ -81,7 +81,7 @@ int8_t shtcx_init(shtcx_t* const dev, const shtcx_params_t* params);
 
 /**
  * @brief Reads all register values from the device.
- * @details The values as raw data will be saved into reveived.
+ * @details The values as raw data will be saved into received.
  *
  * @param[in] dev             The I2C device descriptor.
  * @param[in] rel_humidity    Humidity in centi %.

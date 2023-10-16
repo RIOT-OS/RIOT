@@ -26,7 +26,7 @@
  *  - This implementation of the ChaCha stream cipher is very stripped down.
  *  - It assumes a little-endian system.
  *  - It is implemented for little code and data size, but will likely be
- *    slower than the refenrence implementation. Optimized implementation will
+ *    slower than the reference implementation. Optimized implementation will
  *    out-perform the code even more.
  */
 

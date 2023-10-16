@@ -76,7 +76,7 @@ b <breakpoint>
 c
 ```
 For best debugging experience also change the `-Os` flag in
-`Makefile.inlcude`'s `CFLAGS` variable to `-O0`.
+`Makefile.include`'s `CFLAGS` variable to `-O0`.
 
 ## Details
 The M3 Open Node can reset, debug and program the STM32 on JTAG through the

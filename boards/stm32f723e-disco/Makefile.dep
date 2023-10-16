@@ -25,6 +25,8 @@ endif
 
 ifneq (,$(filter st7789,$(USEMODULE)))
   USEMODULE += lcd_parallel_16bit
+  USEMODULE += lcd_parallel_ll_mcu
+  FEATURES_REQUIRED += periph_fmc_nor_sram
 endif
 
 # TODO: remove the stdin dependency

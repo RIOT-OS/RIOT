@@ -395,7 +395,7 @@ void create_window(int *argc, char ***argv)
     gtk_widget_set_sensitive(reboot_button, TRUE);
     gtk_widget_show(reboot_button);
 
-    bootloader_button = gtk_button_new_with_label("Booloader");
+    bootloader_button = gtk_button_new_with_label("Bootloader");
     gtk_widget_show(bootloader_button);
 
     quit_button = gtk_button_new_with_label("Quit");

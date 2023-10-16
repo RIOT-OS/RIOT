@@ -310,7 +310,7 @@ unsigned int timer_read(tim_t tim)
         return 0;
     }
 
-    /* request syncronisation */
+    /* request synchronisation */
 #ifdef TC_CTRLBSET_CMD_READSYNC_Val
     dev(tim)->CTRLBSET.reg = TC_CTRLBSET_CMD_READSYNC;
      /* work around a possible hardware bug where it takes some

@@ -36,7 +36,7 @@
  *
  * 1. The high-level API that implements the SD Host Controller driver and
  *    allows
- *    - to inititialize and identify different types of cards,
+ *    - to initialize and identify different types of cards,
  *    - to access them either blockwise or bytewise,
  *    - to get information about the used card, and
  *    - to send single commands or application specific commands to the card.
@@ -676,7 +676,7 @@ typedef struct __attribute__((packed)) {
 /**
  * @brief   CSD register structure Version 2.0 and Version 3.0
  *
- * A combined format is used vor CSD Version 2.0 and 3.0 to reduce the code
+ * A combined format is used for CSD Version 2.0 and 3.0 to reduce the code
  * size. The only difference is the bit length of `C_SIZE`.
  *
  * @see Physical Layer Simplified Specification Version 9.00

@@ -257,7 +257,7 @@ Wrong:
   functionality.
 * Every function must be documented - including parameters and return value.
 
-An examplary doxygen documentation in a header file can look like this.
+An exemplary doxygen documentation in a header file can look like this.
 
 ```
 /*

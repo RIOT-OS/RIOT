@@ -65,6 +65,17 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Gives the configuration of n-th bank
+ *
+ * This macro gives a pointer to the n-th entry of type @ref fmc_bank_conf_t of
+ * the banks configured by the board in the @ref fmc_bank_config array. n is in
+ * the range 0 ... @ref FMC_BANK_NUMOF - 1.
+ */
+#ifndef FMC_BANK_CONFIG
+#define FMC_BANK_CONFIG(n)  (&fmc_bank_config[n])
+#endif
+
+/**
  * @brief   Number of data pins used
  *
  * The number of configured data pins depends on the memory with the maximum
