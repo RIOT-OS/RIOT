@@ -3,6 +3,9 @@ USEMODULE += stdin
 ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
   USEMODULE += shell_cmd_sys
 
+  ifneq (,$(filter netif,$(USEMODULE)))
+    USEMODULE += l2util
+  endif
   ifneq (,$(filter app_metadata,$(USEMODULE)))
     USEMODULE += shell_cmd_app_metadata
   endif
