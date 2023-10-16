@@ -395,7 +395,7 @@ static void _process_transaction(event_t *arg)
         _handle_init_packet(cid, bcnt, buf);
     }
     else {
-        /* readding deleted cid */
+        /* re-adding deleted cid */
         if (!_cid_exists(cid) && _add_cid(cid) == -1) {
             _send_error_response(cid, CTAP_HID_ERR_CHANNEL_BUSY);
         }

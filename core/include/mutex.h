@@ -392,7 +392,7 @@ void mutex_unlock_and_sleep(mutex_t *mutex);
  *          @ref mutex_lock_cancelable. (You can reinitialize the same memory
  *          to safely reuse it.)
  * @warning You ***MUST NOT*** call this function once the thread referred to by
- *          @p mc re-uses the mutex object referred to by @p mc (not counting
+ *          @p mc reuses the mutex object referred to by @p mc (not counting
  *          the call to @ref mutex_lock_cancelable @p mc was used in).
  * @note    It is safe to call this function from IRQ context, e.g. from a timer
  *          interrupt.

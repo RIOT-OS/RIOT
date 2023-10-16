@@ -745,7 +745,7 @@
  *
  * **cpu/myCPU/Makefile.features:**
  * @code
- * FEATURES_PROVIDED += periph_speedycrypt      // General feature for the acclerator
+ * FEATURES_PROVIDED += periph_speedycrypt      // General feature for the accelerator
  * FEATURES_PROVIDED += periph_hash_sha_256
  * FEATURES_PROVIDED += periph_ecc_p256r1
  * @endcode

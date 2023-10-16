@@ -6,7 +6,7 @@ ESP32x WiFi interface simultaneously.
 
 # Usage
 
-Comile and flash the application with command
+Compile and flash the application with command
 ```
 CFLAGS='-DWIFI_SSID=\"myssid\" -DWIFI_PASS=\"mypass\"'
 BOARD=esp32-wroom-32 make -C tests/nimble_esp_wifi_coexist flash term
