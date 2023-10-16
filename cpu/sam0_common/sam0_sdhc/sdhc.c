@@ -1038,7 +1038,7 @@ static bool sdio_test_type(sdhc_state_t *state)
 
     /*
      * Wait card ready
-     * Timeout 1s = 400KHz / ((6+4)*8) cylces = 5000 retry
+     * Timeout 1s = 400KHz / ((6+4)*8) cycles = 5000 retry
      * 6 = cmd byte size
      * 4(SPI) 6(MCI) = response byte size
      */

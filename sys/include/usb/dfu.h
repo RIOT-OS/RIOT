@@ -50,7 +50,7 @@ extern "C" {
 #define USB_DFU_CAN_DOWNLOAD            0x01    /**< DFU Download attribute */
 #define USB_DFU_CAN_UPLOAD              0x02    /**< DFU Upload attribute */
 #define USB_DFU_MANIFEST_TOLERANT       0x04    /**< DFU Manifest tolerant attribute */
-#define USB_DFU_WILL_DETACH             0x08    /**< DFU Detach capabability attribute */
+#define USB_DFU_WILL_DETACH             0x08    /**< DFU Detach capability attribute */
 /** @} */
 
 /**
