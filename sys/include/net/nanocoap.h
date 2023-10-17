@@ -1501,6 +1501,61 @@ static inline ssize_t coap_opt_add_uri_path_buffer(coap_pkt_t *pkt,
 }
 
 /**
+ * @brief   Adds an entity-tag (etag) value to the coap pkt.
+ *
+ * @param[in,out] pkt         Packet being built
+ * @param[in]     etag        Etag value of the packet
+ * @param[in]     len         Length of @p etag in bytes
+ *
+ * @return        number of bytes written to pkt buffer
+ * @return        -EINVAL if invalid etag size is used for @p len
+ * @return        -ENOSPC if no available options or pkt full
+ */
+static inline ssize_t coap_opt_add_etag(coap_pkt_t *pkt, const uint8_t *etag, size_t len)
+{
+    if (len == 0 || len > 8) {
+        return -EINVAL;
+    }
+    return coap_opt_add_opaque(pkt, COAP_OPT_ETAG, etag, len);
+}
+
+/**
+ * @brief   Adds an empty dummy entity-tag (etag) value to the coap pkt.
+ *
+ * This function adds an all-zero etag value to the packet as placeholder for later updating
+ *
+ * @param[in,out] pkt         Packet being built
+ * @param[in]     len         Length of etag space to reserve in bytes
+ *
+ * @return        number of bytes written to pkt buffer
+ * @return        -EINVAL if invalid etag size is used for @p len
+ * @return        -ENOSPC if no available options or pkt full
+ */
+static inline ssize_t coap_opt_add_etag_dummy(coap_pkt_t *pkt, size_t len)
+{
+    const uint8_t zeros[8] = { 0 };
+    return coap_opt_add_etag(pkt, zeros, len);
+}
+
+
+/**
+ * @brief   replaces an entity-tag (etag) value with a new one in a coap pkt.
+ *
+ * @note    The etag option must have been added first via @ref coap_opt_add_etag or
+ *          @ref coap_opt_add_etag_dummy
+ * @note    The @p len supplied to this call must match the length supplied to the call to add the
+ *          etag option
+ *
+ * @param[in,out] pkt         Packet being built
+ * @param[in]     etag        New etag value of the packet
+ * @param[in]     len         Length of etag space to reserve in bytes
+ *
+ * @return        number of bytes replaced in the packet
+ * @return        -ENOENT if no existing etag value is found
+ */
+ssize_t coap_opt_replace_etag(coap_pkt_t *pkt, const uint8_t *etag, size_t len);
+
+/**
  * @brief   Finalizes options as required and prepares for payload
  *
  * @post pkt.payload advanced to first available byte after options

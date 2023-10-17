@@ -1059,6 +1059,24 @@ ssize_t coap_opt_add_proxy_uri(coap_pkt_t *pkt, const char *uri)
     return _add_opt_pkt(pkt, COAP_OPT_PROXY_URI, (uint8_t *)uri, strlen(uri));
 }
 
+ssize_t coap_opt_replace_etag(coap_pkt_t *pkt, const uint8_t *etag, size_t len)
+{
+    coap_optpos_t optpos = { 0 };
+    uint8_t *val = NULL;
+    ssize_t res = coap_opt_get_next(pkt, &optpos, &val, true);
+    while (optpos.opt_num != COAP_OPT_ETAG) {
+        res = coap_opt_get_next(pkt, &optpos, &val, false);
+        if (res < 0) {
+            return res;
+        }
+    }
+    /* Supplied etag size and reserved etag space do not match */
+    assert(len == (size_t)res);
+
+    memcpy(val, etag, len);
+    return res;
+}
+
 ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags)
 {
     if (flags & COAP_OPT_FINISH_PAYLOAD) {
