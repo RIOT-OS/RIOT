@@ -204,7 +204,7 @@ static ssize_t _get_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     if (request->options.exists.etag &&
         !memcmp(&etag, &request->options.etag, sizeof(etag))) {
         gcoap_resp_init(pdu, buf, len, COAP_CODE_VALID);
-        coap_opt_add_opaque(pdu, COAP_OPT_ETAG, &etag, sizeof(etag));
+        coap_opt_add_etag(pdu, &etag, sizeof(etag));
         return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
     }
 
@@ -214,7 +214,7 @@ static ssize_t _get_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     }
 
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
-    coap_opt_add_opaque(pdu, COAP_OPT_ETAG, &etag, sizeof(etag));
+    coap_opt_add_etag(pdu, &etag, sizeof(etag));
     coap_block_slicer_t slicer;
     _calc_szx2(pdu,
                5 + 1 + 1 /* reserve BLOCK2 size + payload marker + more */,
@@ -366,7 +366,7 @@ static ssize_t _put_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 
         stat_etag(&stat, &etag); /* Etag after write */
         gcoap_resp_init(pdu, buf, len, create ? COAP_CODE_CREATED : COAP_CODE_CHANGED);
-        coap_opt_add_opaque(pdu, COAP_OPT_ETAG, &etag, sizeof(etag));
+        coap_opt_add_etag(pdu, &etag, sizeof(etag));
     }
     else {
         gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTINUE);
