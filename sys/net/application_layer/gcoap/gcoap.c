@@ -1474,7 +1474,7 @@ int gcoap_req_init_path_buffer(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     if (IS_USED(MODULE_NANOCOAP_CACHE)) {
         static const uint8_t tmp[COAP_ETAG_LENGTH_MAX] = { 0 };
         /* add slack to maybe add an ETag on stale cache hit later */
-        res = coap_opt_add_opaque(pdu, COAP_OPT_ETAG, tmp, sizeof(tmp));
+        res = coap_opt_add_etag(pdu, tmp, sizeof(tmp));
     }
     if ((res > 0) && (path != NULL) && (path_len > 0)) {
         res = coap_opt_add_uri_path_buffer(pdu, path, path_len);
