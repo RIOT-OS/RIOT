@@ -43,8 +43,7 @@ typedef struct {
  * http://en.wikipedia.org/w/index.php?title=Fletcher%27s_checksum&oldid=661273016#Optimizations
  *
  * @note the returned sum is never 0
- * @note pay attention to alignment issues since this operates on an input
- *       buffer containing 16 bit words, not bytes.
+ * @note pay attention to the @p words parameter buffer containing 16 bit words, not bytes.
  *
  * @param buf input buffer to hash
  * @param words length of buffer, in 16 bit words
