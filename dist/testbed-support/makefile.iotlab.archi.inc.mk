@@ -10,6 +10,7 @@ IOTLAB_ARCHI_microbit       = microbit:ble
 IOTLAB_ARCHI_nrf52dk        = nrf52dk:ble
 IOTLAB_ARCHI_nrf52840dk     = nrf52840dk:multi
 IOTLAB_ARCHI_nucleo-wl55jc  = nucleo-wl55jc:stm32wl
+IOTLAB_ARCHI_openmote-b     = openmoteb
 IOTLAB_ARCHI_samr21-xpro    = samr21:at86rf233
 IOTLAB_ARCHI_samr30-xpro    = samr30:at86rf212b
 IOTLAB_ARCHI_samr34-xpro    = samr34:sx1276
