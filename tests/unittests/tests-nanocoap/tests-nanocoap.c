@@ -1117,6 +1117,35 @@ static void test_nanocoap__token_length_ext_269(void)
     TEST_ASSERT_EQUAL_INT(14, hdr->ver_t_tkl & 0xf);
 }
 
+static void test_nanocoap__replace_etag(void)
+{
+    uint8_t buf[_BUF_SIZE];
+    coap_pkt_t pkt;
+    uint16_t msgid = 0xABCD;
+    uint8_t token[2] = {0xDA, 0xEC};
+    uint8_t etag[] = {0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88};
+
+    for (size_t etag_len = 1; etag_len <= 8; etag_len++) {
+
+        ssize_t len = coap_build_hdr((coap_hdr_t *)&buf[0], COAP_TYPE_NON,
+                       &token[0], 2, COAP_CLASS_SUCCESS, msgid);
+        coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
+        len = coap_opt_add_etag_dummy(&pkt, etag_len);
+        TEST_ASSERT_EQUAL_INT(len, 1 + etag_len);
+        coap_opt_add_format(&pkt, COAP_FORMAT_TEXT);
+        ssize_t plen = coap_opt_finish(&pkt, COAP_OPT_FINISH_NONE);
+        coap_opt_replace_etag(&pkt, etag, etag_len);
+
+        int res = coap_parse(&pkt, buf, plen);
+        TEST_ASSERT_EQUAL_INT(0, res);
+
+        uint8_t *encoded_etag;
+        len = coap_opt_get_opaque(&pkt, COAP_OPT_ETAG, &encoded_etag);
+        TEST_ASSERT_EQUAL_INT(etag_len, len);
+        TEST_ASSERT_EQUAL_INT(0, memcmp(encoded_etag, etag, len));
+    }
+}
+
 Test *tests_nanocoap_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -1155,6 +1184,7 @@ Test *tests_nanocoap_tests(void)
         new_TestFixture(test_nanocoap__token_length_over_limit),
         new_TestFixture(test_nanocoap__token_length_ext_16),
         new_TestFixture(test_nanocoap__token_length_ext_269),
+        new_TestFixture(test_nanocoap__replace_etag),
     };
 
     EMB_UNIT_TESTCALLER(nanocoap_tests, NULL, NULL, fixtures);
