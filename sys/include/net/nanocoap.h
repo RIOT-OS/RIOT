@@ -1511,7 +1511,7 @@ static inline ssize_t coap_opt_add_uri_path_buffer(coap_pkt_t *pkt,
  * @return        -EINVAL if invalid etag size is used for @p len
  * @return        -ENOSPC if no available options or pkt full
  */
-static inline ssize_t coap_opt_add_etag(coap_pkt_t *pkt, const uint8_t *etag, size_t len)
+static inline ssize_t coap_opt_add_etag(coap_pkt_t *pkt, const void *etag, size_t len)
 {
     if (len == 0 || len > 8) {
         return -EINVAL;
@@ -1537,7 +1537,6 @@ static inline ssize_t coap_opt_add_etag_dummy(coap_pkt_t *pkt, size_t len)
     return coap_opt_add_etag(pkt, zeros, len);
 }
 
-
 /**
  * @brief   replaces an entity-tag (etag) value with a new one in a coap pkt.
  *
@@ -1553,7 +1552,7 @@ static inline ssize_t coap_opt_add_etag_dummy(coap_pkt_t *pkt, size_t len)
  * @return        number of bytes replaced in the packet
  * @return        -ENOENT if no existing etag value is found
  */
-ssize_t coap_opt_replace_etag(coap_pkt_t *pkt, const uint8_t *etag, size_t len);
+ssize_t coap_opt_replace_etag(coap_pkt_t *pkt, const void *etag, size_t len);
 
 /**
  * @brief   Finalizes options as required and prepares for payload
