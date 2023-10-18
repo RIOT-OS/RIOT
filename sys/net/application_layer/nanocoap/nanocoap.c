@@ -1059,7 +1059,7 @@ ssize_t coap_opt_add_proxy_uri(coap_pkt_t *pkt, const char *uri)
     return _add_opt_pkt(pkt, COAP_OPT_PROXY_URI, (uint8_t *)uri, strlen(uri));
 }
 
-ssize_t coap_opt_replace_etag(coap_pkt_t *pkt, const uint8_t *etag, size_t len)
+ssize_t coap_opt_replace_etag(coap_pkt_t *pkt, const void *etag, size_t len)
 {
     coap_optpos_t optpos = { 0 };
     uint8_t *val = NULL;
