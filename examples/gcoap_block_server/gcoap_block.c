@@ -73,7 +73,7 @@ static ssize_t _riot_block2_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, c
     plen += coap_blockwise_put_char(&slicer, buf+plen, 'U');
     plen += coap_blockwise_put_char(&slicer, buf+plen, '.');
 
-    coap_block2_finish(&slicer);
+    coap_block2_finish(pdu, &slicer);
 
     return plen;
 }
