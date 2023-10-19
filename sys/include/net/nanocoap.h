@@ -1548,7 +1548,7 @@ static inline ssize_t coap_opt_add_etag_dummy(coap_pkt_t *pkt, size_t len)
  * @note    The @p len supplied to this call must be at most the length supplied to the call to add
  *          the etag option
  * @note    When used with blockwise transfers, note that this functions must be called *after*
- *          @ref coap_finish_block and related functions
+ *          @ref coap_block_finish and related functions
  *
  * @param[in,out] pkt         Packet being built
  * @param[in]     etag        New etag value of the packet
