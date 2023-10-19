@@ -11,10 +11,11 @@
  * @ingroup     net_nanocoap
  * @brief       Nanocbor helpers for CoAP block-wise
  *
- * This module wraps NanoCoAP and gcoap around the NanoCBOR stream-like interface to generate sliced
- * block-wise payloads automatically from nanocbor encoder serialization calls. The content is
- * serialized for every individual block-wise request. This module supports both block1 and block2
- * payloads and will automatically generate and update the etag option in the packet.
+ * This module wraps NanoCoAP and gcoap around the NanoCBOR stream-like interface to generate single
+ * packets and sliced block-wise payloads automatically from nanocbor encoder serialization calls.
+ * The content is serialized for every individual (block-wise) request. This module supports single
+ * packets (without block-wise option) and block1/block2 payloads and will automatically update the
+ * etag option in the packet if a dummy etag header has been placed.
  *
  * This module assumes that the serialized content does not change between successive
  * serializations. In case this happens it should be detected via the etag that can be included in
@@ -52,6 +53,11 @@
  * ```
  * This finishes the block-wise structure and writes the generated etag into the CoAP option.
  *
+ * If a simple payload is required without supporting block-wise, the slicer does not have to be
+ * initialized and a `NULL` pointer can be passed in the @ref coap_nanocbor_slicer_helper_init call.
+ * In this case only the available payload space will be used, possibly truncating the CBOR
+ * structure.
+ *
  * @{
  *
  * @file
@@ -85,8 +91,11 @@ extern "C" {
 typedef struct {
     coap_block_slicer_t *slicer;    /**< coap block-wise slicer struct */
     uint8_t *buf;                   /**< Buffer to slice into, usually the CoAP payload */
-    size_t sliced_length;           /**< Number of bytes written into the current slice */
-    size_t resp_len;                /**< Total length of the serialized response */
+    union {
+        size_t full_len;            /**< Total length of the serialized response */
+        size_t buf_len;             /**< Total available space in the payload buf */
+    }
+    size_t payload_len;           /**< Number of bytes written into the current slice */
     uint8_t fletcher_tmp;           /**< Temporary storage for half a fletcher32 words */
     fletcher32_ctx_t fletcher_ctx;  /**< Fletcher32 context for etag generation */
 } coap_nanocbor_slicer_helper_t;
@@ -114,7 +123,8 @@ void coap_nanocbor_encoder_blockwise_init(nanocbor_encoder_t *encoder,
 /**
  * @brief Finish the CoAP reply packet with the block2 option.
  *
- * Finishes the block2 option in the packet and writes the correct etag into the option if present
+ * Finishes the block2 option in the packet and writes the correct etag into the option if such
+ * option is already present in the packet.
  *
  * @param pdu       CoAP packet to finish
  * @param helper    CoAP NanoCBOR slicer helper
@@ -127,7 +137,8 @@ ssize_t coap_nanocbor_block2_finish(coap_pkt_t *pdu, coap_nanocbor_slicer_helper
 /**
  * @brief Finish the CoAP request packet with the block1 option.
  *
- * Finishes the block1 option in the packet and writes the correct etag into the option if present
+ * Finishes the block1 option in the packet and writes the correct etag into the option if such
+ * option is already present in the packet.
  *
  * @param pdu       CoAP packet to finish
  * @param helper    CoAP NanoCBOR slicer helper
@@ -137,6 +148,18 @@ ssize_t coap_nanocbor_block2_finish(coap_pkt_t *pdu, coap_nanocbor_slicer_helper
  */
 ssize_t coap_nanocbor_block1_finish(coap_pkt_t *pdu, coap_nanocbor_slicer_helper_t *helper);
 
+/**
+ * @brief Finish the CoAP request packet without any block option
+ *
+ * Writes the correct etag into the option if such option is already present in the packet
+ *
+ * @param pdu       CoAP packet to finish
+ * @param helper    CoAP NanoCBOR slicer helper
+ *
+ * @returns The full length of the CoAP packet
+ * @returns Negative on error
+ */
+ssize_t coap_nanocbor_finish(coap_pkt_t *pdu, coap_nanocbor_slicer_helper_t *helper);
 #ifdef __cplusplus
 }
 #endif
