@@ -199,20 +199,30 @@ int coap_match_path(const coap_resource_t *resource, uint8_t *uri)
     return res;
 }
 
-uint8_t *coap_find_option(coap_pkt_t *pkt, unsigned opt_num)
+static uint8_t *_get_option(const coap_pkt_t *pkt, unsigned opt_num, const coap_optpos_t **found_optpos)
 {
     const coap_optpos_t *optpos = pkt->options;
     unsigned opt_count = pkt->options_len;
 
     while (opt_count--) {
         if (optpos->opt_num == opt_num) {
-            unsigned idx = index_of(pkt->options, optpos);
-            bf_unset(pkt->opt_crit, idx);
+            *found_optpos = optpos;
             return (uint8_t*)pkt->hdr + optpos->offset;
         }
         optpos++;
     }
     return NULL;
+}
+
+uint8_t *coap_find_option(coap_pkt_t *pkt, unsigned opt_num)
+{
+    const coap_optpos_t *optpos = NULL;
+    uint8_t *optloc = _get_option(pkt, opt_num, &optpos);
+    if (optloc) {
+        unsigned idx = index_of(pkt->options, optpos);
+        bf_unset(pkt->opt_crit, idx);
+    }
+    return optloc;
 }
 
 /*
