@@ -185,12 +185,19 @@ void _handle_rereg_address(const ipv6_addr_t *addr)
 {
     gnrc_netif_t *netif = gnrc_netif_get_by_ipv6_addr(addr);
 
+    if (netif == NULL) {
+        DEBUG("nib: Couldn't re-register %s, address wasn't assigned to any "
+              "interface anymore.\n",
+              ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)));
+        return;
+    }
+
     gnrc_netif_acquire(netif);
     _nib_dr_entry_t *router = _nib_drl_get(NULL, netif->pid);
     const bool router_reachable = (router != NULL) &&
                                   _is_reachable(router->next_hop);
 
-    if (router_reachable && (netif != NULL)) {
+    if (router_reachable) {
         assert((unsigned)netif->pid == _nib_onl_get_if(router->next_hop));
         DEBUG("nib: Re-registering %s",
               ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)));
@@ -200,39 +207,36 @@ void _handle_rereg_address(const ipv6_addr_t *addr)
         _snd_ns(&router->next_hop->ipv6, netif, addr, &router->next_hop->ipv6);
     }
     else {
-        DEBUG("nib: Couldn't re-register %s, no current router found or address "
-              "wasn't assigned to any interface anymore.\n",
+        DEBUG("nib: Couldn't re-register %s, no current router found.\n",
               ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)));
     }
-    if (netif != NULL) {
-        int idx = gnrc_netif_ipv6_addr_idx(netif, addr);
 
-        if (idx < 0) {
-            DEBUG("nib: %s is not assigned to interface %d anymore.\n",
-                  ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
-                  netif->pid);
-        }
-        else if (router_reachable &&
-                 (_is_valid(netif, idx) || (_is_tentative(netif, idx) &&
-                 (gnrc_netif_ipv6_addr_dad_trans(netif, idx) <
-                 SIXLOWPAN_ND_REG_TRANSMIT_NUMOF)))) {
-            uint32_t retrans_time;
+    int idx = gnrc_netif_ipv6_addr_idx(netif, addr);
+    if (idx < 0) {
+        DEBUG("nib: %s is not assigned to interface %d anymore.\n",
+              ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
+              netif->pid);
+    }
+    else if (router_reachable &&
+             (_is_valid(netif, idx) || (_is_tentative(netif, idx) &&
+             (gnrc_netif_ipv6_addr_dad_trans(netif, idx) <
+             SIXLOWPAN_ND_REG_TRANSMIT_NUMOF)))) {
+        uint32_t retrans_time;
 
-            if (_is_valid(netif, idx)) {
-                retrans_time = SIXLOWPAN_ND_MAX_RS_SEC_INTERVAL * MS_PER_SEC;
-            }
-            else {
-                retrans_time = netif->ipv6.retrans_time;
-                /* increment encoded retransmission count */
-                netif->ipv6.addrs_flags[idx]++;
-            }
-            _evtimer_add(&netif->ipv6.addrs[idx], GNRC_IPV6_NIB_REREG_ADDRESS,
-                         &netif->ipv6.addrs_timers[idx], retrans_time);
+        if (_is_valid(netif, idx)) {
+            retrans_time = SIXLOWPAN_ND_MAX_RS_SEC_INTERVAL * MS_PER_SEC;
         }
         else {
-            netif->ipv6.rs_sent = 0;
-            _handle_search_rtr(netif);
+            retrans_time = netif->ipv6.retrans_time;
+            /* increment encoded retransmission count */
+            netif->ipv6.addrs_flags[idx]++;
         }
+        _evtimer_add(&netif->ipv6.addrs[idx], GNRC_IPV6_NIB_REREG_ADDRESS,
+                     &netif->ipv6.addrs_timers[idx], retrans_time);
+    }
+    else {
+        netif->ipv6.rs_sent = 0;
+        _handle_search_rtr(netif);
     }
     gnrc_netif_release(netif);
 }
