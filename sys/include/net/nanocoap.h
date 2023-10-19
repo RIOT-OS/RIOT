@@ -1513,7 +1513,7 @@ static inline ssize_t coap_opt_add_uri_path_buffer(coap_pkt_t *pkt,
  */
 static inline ssize_t coap_opt_add_etag(coap_pkt_t *pkt, const void *etag, size_t len)
 {
-    if (len == 0 || len > 8) {
+    if (len == 0 || len > COAP_ETAG_LENGTH_MAX) {
         return -EINVAL;
     }
     return coap_opt_add_opaque(pkt, COAP_OPT_ETAG, etag, len);
@@ -1533,7 +1533,7 @@ static inline ssize_t coap_opt_add_etag(coap_pkt_t *pkt, const void *etag, size_
  */
 static inline ssize_t coap_opt_add_etag_dummy(coap_pkt_t *pkt, size_t len)
 {
-    const uint8_t zeros[8] = { 0 };
+    const uint8_t zeros[COAP_ETAG_LENGTH_MAX] = { 0 };
     return coap_opt_add_etag(pkt, zeros, len);
 }
 
