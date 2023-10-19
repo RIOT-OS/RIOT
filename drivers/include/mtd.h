@@ -75,6 +75,8 @@
 
 #include <stdint.h>
 
+#include "xfa.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -115,6 +117,56 @@ typedef struct {
     void *work_area;           /**< sector-sized buffer (only present when @ref mtd_write_page is enabled) */
 #endif
 } mtd_dev_t;
+
+/**
+ * @brief   MTD device array as XFA
+ *
+ * The array contains the addresses of all MTD devices that are defined using
+ * the @ref MTD_XFA_ADD macro, for example:
+ * ```
+ * MTD_XFA_ADD(my_dev, 0);
+ * ```
+ * The MTD devices in this array can be used for automatic functions such as
+ * with the `mtd_default` module. The i-th device in this array can then be
+ * accessed with `mtd_dev_xfa[i]`. The number of MTDs defined in this array
+ * is `XFA_LEN(mtd_dev_xfa)`.
+ */
+#if !DOXYGEN
+XFA_USE_CONST(mtd_dev_t *, mtd_dev_xfa);
+#else
+mtd_dev_t * const mtd_dev_xfa[];
+#endif
+
+/**
+ * @brief   Define MTD device pointer variable `mtd<idx>`
+ *
+ * The macro defines the MTD device pointer variable `mtd<idx>`, sets it to
+ * the address of the MTD device specified by the @p dev parameter, and adds
+ * it to the XFA of MTD device pointers @ref mtd_dev_xfa. For example
+ * ```
+ * MTD_XFA_ADD(my_dev, 1);
+ * ```
+ * defines the variable `mtd1` pointing to the device `my_dev`.
+ *
+ * The parameter @p idx is used as priority of the MTD device pointer within
+ * the XFA. That means it determines the order of the MTD device pointers
+ * within @ref mtd_dev_xfa.
+ *
+ * @note Only if each MTD device is added with a unique priority and only if the
+ *       priorities start at 0 and are used in consecutive order, the parameter
+ *       @p idx corresponds to the position of the MTD device pointer within
+ *       the @ref mtd_dev_xfa XFA and `mtd_dev_xfa[i]` points to the i-th MTD
+ *       device.
+ *
+ * @param   dev     MTD device
+ * @param   idx     Priority of the MTD device pointer within the XFA
+ */
+#define MTD_XFA_ADD(dev, idx) XFA_CONST(mtd_dev_xfa, 0) mtd_dev_t *mtd ## idx = (mtd_dev_t *)&(dev)
+
+/**
+ * @brief   Number of MTDs defined in the MTD device array in XFA
+ */
+#define MTD_NUMOF   XFA_LEN(mtd_dev_t *, mtd_dev_xfa)
 
 /**
  * @brief   MTD driver can write any data to the storage without erasing it first.

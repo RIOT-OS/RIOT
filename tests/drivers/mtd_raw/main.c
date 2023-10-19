@@ -281,7 +281,7 @@ static int cmd_info(int argc, char **argv)
     if (argc < 2) {
         printf("mtd devices: %d\n", MTD_NUMOF);
 
-        for (int i = 0; i < MTD_NUMOF; ++i) {
+        for (unsigned i = 0; i < MTD_NUMOF; ++i) {
             printf(" -=[ MTD_%d ]=-\n", i);
             _print_info(mtd_default_get_dev(i));
         }
@@ -450,7 +450,7 @@ int main(void)
         puts("no MTD device present on the board.");
     }
 
-    for (int i = 0; i < MTD_NUMOF; ++i) {
+    for (unsigned i = 0; i < MTD_NUMOF; ++i) {
         printf("init MTD_%d… ", i);
 
         mtd_dev_t *dev = mtd_default_get_dev(i);

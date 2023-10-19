@@ -31,7 +31,7 @@
 #ifdef MODULE_MTD_MCI
 extern const mtd_desc_t mtd_mci_driver;
 static mtd_dev_t _mtd_mci = { .driver = &mtd_mci_driver };
-mtd_dev_t *mtd0 = &_mtd_mci;
+MTD_XFA_ADD(_mtd_mci, 0);
 #endif
 
 #ifdef MODULE_VFS_DEFAULT
