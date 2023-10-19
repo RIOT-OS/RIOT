@@ -25,5 +25,13 @@ ifneq (,$(filter psa_crypto,$(USEMODULE)))
 endif
 
 ifneq (,$(filter psa_secure_element_ateccx08a_ecc_p256, $(USEMODULE)))
-  USEMODULE += psa_secure_element_asymmetric
+  USEMODULE += psa_asymmetric
+endif
+
+ifneq (,$(filter psa_secure_element_ateccx08a_cipher_aes_128, $(USEMODULE)))
+  USEMODULE += psa_cipher
+endif
+
+ifneq (,$(filter psa_secure_element_ateccx08a_hmac_sha256, $(USEMODULE)))
+  USEMODULE += psa_mac
 endif

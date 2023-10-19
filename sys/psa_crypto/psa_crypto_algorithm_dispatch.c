@@ -21,12 +21,28 @@
 #include <stdio.h>
 #include "kernel_defines.h"
 #include "psa/crypto.h"
-#include "psa_mac.h"
-#include "psa_hashes.h"
-#include "psa_ecc.h"
-#include "psa_ciphers.h"
-#include "psa_crypto_operation_encoder.h"
 
+#if IS_USED(MODULE_PSA_MAC)
+#include "psa_mac.h"
+#endif
+
+#if IS_USED(MODULE_PSA_HASH)
+#include "psa_hashes.h"
+#endif
+
+#if IS_USED(MODULE_PSA_ASYMMETRIC)
+#include "psa_ecc.h"
+#endif
+
+#if IS_USED(MODULE_PSA_CIPHER)
+#include "psa_ciphers.h"
+#endif
+
+#if IS_USED(MODULE_PSA_KEY_MANAGEMENT)
+#include "psa_crypto_operation_encoder.h"
+#endif
+
+#if IS_USED(MODULE_PSA_HASH)
 psa_status_t psa_algorithm_dispatch_hash_setup(psa_hash_operation_t *operation,
                                                psa_algorithm_t alg)
 {
@@ -150,7 +166,9 @@ psa_status_t psa_algorithm_dispatch_hash_finish(psa_hash_operation_t *operation,
         return PSA_ERROR_NOT_SUPPORTED;
     }
 }
+#endif /* MODULE_PSA_HASH */
 
+#if IS_USED(MODULE_PSA_ASYMMETRIC)
 psa_status_t psa_algorithm_dispatch_sign_hash(  const psa_key_attributes_t *attributes,
                                                 psa_algorithm_t alg,
                                                 const psa_key_slot_t *slot,
@@ -353,7 +371,9 @@ psa_status_t psa_algorithm_dispatch_verify_message(const psa_key_attributes_t *a
         return PSA_ERROR_NOT_SUPPORTED;
     }
 }
+#endif /* MODULE_PSA_ASYMMETRIC */
 
+#if IS_USED(MODULE_PSA_KEY_MANAGEMENT)
 psa_status_t psa_algorithm_dispatch_generate_key(   const psa_key_attributes_t *attributes,
                                                     psa_key_slot_t *slot)
 {
@@ -407,7 +427,9 @@ psa_status_t psa_algorithm_dispatch_generate_key(   const psa_key_attributes_t *
 
     return psa_builtin_generate_key(attributes, key_data, *key_bytes, key_bytes);
 }
+#endif /* MODULE_PSA_KEY_MANAGEMENT */
 
+#if IS_USED(MODULE_PSA_CIPHER)
 psa_status_t psa_algorithm_dispatch_cipher_encrypt( const psa_key_attributes_t *attributes,
                                                     psa_algorithm_t alg,
                                                     const psa_key_slot_t *slot,
@@ -499,7 +521,9 @@ psa_status_t psa_algorithm_dispatch_cipher_decrypt( const psa_key_attributes_t *
         return PSA_ERROR_NOT_SUPPORTED;
     }
 }
+#endif /* MODULE_PSA_CIPHER */
 
+#if IS_USED(MODULE_PSA_MAC)
 psa_status_t psa_algorithm_dispatch_mac_compute(const psa_key_attributes_t *attributes,
                                                 psa_algorithm_t alg,
                                                 const psa_key_slot_t *slot,
@@ -538,3 +562,4 @@ psa_status_t psa_algorithm_dispatch_mac_compute(const psa_key_attributes_t *attr
     (void)mac_length;
     return PSA_SUCCESS;
 }
+#endif /* MODULE_PSA_MAC */

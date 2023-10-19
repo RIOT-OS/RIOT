@@ -7,7 +7,6 @@
 
 menuconfig MODULE_PSA_HASH
     bool "PSA Hashes"
-    select PSA_KEY_CONFIG
 
 if MODULE_PSA_HASH
 

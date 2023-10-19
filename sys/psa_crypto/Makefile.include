@@ -146,6 +146,9 @@ ifneq (,$(filter psa_hash_sha_512,$(USEMODULE)))
   endif
 endif
 
+## Key Management
+PSEUDOMODULES += psa_key_management
+
 ## MAC
 PSEUDOMODULES += psa_mac
 PSEUDOMODULES += psa_mac_hmac_sha_256
@@ -162,6 +165,5 @@ endif
 
 ## Secure Elements
 PSEUDOMODULES += psa_secure_element
-PSEUDOMODULES += psa_secure_element_asymmetric
 PSEUDOMODULES += psa_secure_element_config
 PSEUDOMODULES += psa_secure_element_multiple
