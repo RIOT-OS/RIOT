@@ -24,7 +24,7 @@
  *
  * 1. Initialize a regular packet with a block-wise option and all the other options required to be
  * included. Optionally include a dummy etag value of at least 4 bytes when the payload might change
- * between successive CoAP packets. Wrap up with a call to @ref coap_opt_finish:
+ * between successive CoAP packets. Wrap up with a call to @ref coap_opt_finish :
  *
  * ```
  * ssize_t plen = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
@@ -60,8 +60,8 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-#ifndef NANOCBOR_HELPER_H
-#define NANOCBOR_HELPER_H
+#ifndef NET_NANOCOAP_NANOCBOR_HELPER_H
+#define NET_NANOCOAP_NANOCBOR_HELPER_H
 
 #include <stdint.h>
 #include "net/coap.h"
@@ -96,7 +96,7 @@ typedef struct {
  * slicer
  *
  * @param helper    CoAP NanoCBOR slicer helper to initialize
- * @param buf       Payload buffer for the CoAP packet
+ * @param pdu       CoAP packet to initialize the helper for
  * @param slicer    Block wise slicer used with the CoAP packet
  */
 void coap_nanocbor_slicer_helper_init(coap_nanocbor_slicer_helper_t *helper, const coap_pkt_t *pdu,
@@ -139,6 +139,5 @@ ssize_t coap_nanocbor_block1_finish(coap_pkt_t *pdu, coap_nanocbor_slicer_helper
 #ifdef __cplusplus
 }
 #endif
-#endif /* NANOCBOR_HELPER_H */
+#endif /* NET_NANOCOAP_NANOCBOR_HELPER_H */
 /** @} */
-
