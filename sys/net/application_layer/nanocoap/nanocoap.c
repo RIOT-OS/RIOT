@@ -1071,20 +1071,35 @@ ssize_t coap_opt_add_proxy_uri(coap_pkt_t *pkt, const char *uri)
 
 ssize_t coap_opt_replace_etag(coap_pkt_t *pkt, const void *etag, size_t len)
 {
-    coap_optpos_t optpos = { 0 };
-    uint8_t *val = NULL;
-    ssize_t res = coap_opt_get_next(pkt, &optpos, &val, true);
-    while (optpos.opt_num != COAP_OPT_ETAG) {
-        res = coap_opt_get_next(pkt, &optpos, &val, false);
-        if (res < 0) {
-            return res;
-        }
+    const coap_optpos_t *optpos = NULL;
+    uint8_t *opt = _get_option(pkt, COAP_OPT_ETAG, &optpos);
+    if (!opt) {
+        /* No etag, nothing modified */
+        return 0;
     }
-    /* Supplied etag size and reserved etag space do not match */
-    assert(len == (size_t)res);
 
-    memcpy(val, etag, len);
-    return res;
+    uint16_t delta = 0;
+    int opt_len = 0;
+    uint8_t *value = _parse_option(pkt, opt, &delta, &opt_len);
+
+    /* Length supplied to the initial call must be at least as much as supplied to this call */
+    assert((size_t)opt_len >= len);
+
+    if ((size_t)opt_len > len) {
+        /* shift everything */
+        uint16_t lastonum = COAP_OPT_ETAG - delta;
+        size_t new_len = coap_put_option(opt, lastonum, COAP_OPT_ETAG, etag, len);
+
+        /* Memmove the rest of the packet */
+        uint8_t *rest_start = value + opt_len;
+        uint8_t *end_of_packet = pkt->payload + pkt->payload_len;
+
+        memmove(opt + new_len, rest_start, end_of_packet - rest_start);
+    }
+    else {
+        memcpy(value, etag, len);
+    }
+    return len - opt_len;
 }
 
 ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags)
