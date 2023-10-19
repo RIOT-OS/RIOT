@@ -1540,17 +1540,22 @@ static inline ssize_t coap_opt_add_etag_dummy(coap_pkt_t *pkt, size_t len)
 /**
  * @brief   replaces an entity-tag (etag) value with a new one in a coap pkt.
  *
+ *          When @p len is lower than the length supplied to the initial call, this shifts the data
+ *          in the packet buffer after the option.
+ *
  * @note    The etag option must have been added first via @ref coap_opt_add_etag or
  *          @ref coap_opt_add_etag_dummy
- * @note    The @p len supplied to this call must match the length supplied to the call to add the
- *          etag option
+ * @note    The @p len supplied to this call must be at most the length supplied to the call to add
+ *          the etag option
+ * @note    When used with blockwise transfers, note that this functions must be called *after*
+ *          @ref coap_finish_block and related functions
  *
  * @param[in,out] pkt         Packet being built
  * @param[in]     etag        New etag value of the packet
- * @param[in]     len         Length of etag space to reserve in bytes
+ * @param[in]     len         Length of the new etag
  *
- * @return        number of bytes replaced in the packet
- * @return        -ENOENT if no existing etag value is found
+ * @return        number of bytes removed in the packet
+ * @return        0 if no existing etag value is found
  */
 ssize_t coap_opt_replace_etag(coap_pkt_t *pkt, const void *etag, size_t len);
 
