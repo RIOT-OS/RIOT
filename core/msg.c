@@ -46,7 +46,8 @@ static int queue_msg(thread_t *target, const msg_t *m)
     int n = cib_put(&(target->msg_queue));
 
     if (n < 0) {
-        DEBUG("queue_msg(): message queue is full (or there is none)\n");
+        DEBUG("queue_msg(): message queue of thread %" PRIkernel_pid
+              " is full (or there is none)\n", target->pid);
         return 0;
     }
 
