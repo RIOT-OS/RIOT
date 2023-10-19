@@ -66,11 +66,32 @@ Test *tests_hashes_sha224_tests(void);
 Test *tests_hashes_sha256_tests(void);
 
 /**
- * @brief   Generates tests for hashes/sha2512.h
+ * @brief   Generates tests for hashes/sha384.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_hashes_sha384_tests(void);
+
+/**
+ * @brief   Generates tests for hashes/sha512.h
  *
  * @return  embUnit tests if successful, NULL if not.
  */
 Test *tests_hashes_sha512_tests(void);
+
+/**
+ * @brief   Generates tests for hashes/sha512_224.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_hashes_sha512_224_tests(void);
+
+/**
+ * @brief   Generates tests for hashes/sha512_256.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_hashes_sha512_256_tests(void);
 
 /**
  * @brief   Generates tests for hashes/sha256.h - hmac

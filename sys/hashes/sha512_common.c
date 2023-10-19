@@ -34,26 +34,25 @@
 #else /* !__BIG_ENDIAN__ */
 
 /*
- * Encode a length len/8 vector of (uint64_t) into a length len vector of
- * (unsigned char) in big-endian form.  Assumes len is a multiple of 8.
+ * Encode a length ceil(len/8) vector of (uint64_t) into a length len vector of
+ * (unsigned char) in big-endian form.
  */
 static void be64enc_vect(void *dst_, const void *src_, size_t len)
 {
-    /* Assert if len is not a multiple of 8 */
-    assert(!(len & 7));
-
+    size_t i;
     if ((uintptr_t)dst_ % sizeof(uint64_t) == 0 &&
         (uintptr_t)src_ % sizeof(uint64_t) == 0) {
         uint64_t *dst = dst_;
         const uint64_t *src = src_;
-        for (size_t i = 0; i < len / 8; i++) {
+        for (i = 0; i < len / 8; i++) {
             dst[i] = __builtin_bswap64(src[i]);
         }
+        i *= 8;
     }
     else {
         uint8_t *dst = dst_;
         const uint8_t *src = src_;
-        for (size_t i = 0; i < len; i += 8) {
+        for (i = 0; i < len-7; i += 8) {
             dst[i] = src[i + 7];
             dst[i + 1] = src[i + 6];
             dst[i + 2] = src[i + 5];
@@ -62,6 +61,14 @@ static void be64enc_vect(void *dst_, const void *src_, size_t len)
             dst[i + 5] = src[i + 2];
             dst[i + 6] = src[i + 1];
             dst[i + 7] = src[i];
+        }
+    }
+    /* copy len%8 remaining bytes */
+    if (i < len) {
+        uint8_t *dst = dst_;
+        const uint8_t *src = src_;
+        for (size_t j = 0; j < len-i; j++) {
+            dst[i + j] = src[i+7 - j];
         }
     }
 }
