@@ -1106,6 +1106,10 @@ ssize_t coap_opt_replace_etag(coap_pkt_t *pkt, const void *etag, size_t len)
 
         /* Move the rest of the packet to right after the newly written option */
         memmove(opt + new_len, rest_of_the_packet, end_of_the_packet - rest_of_the_packet);
+
+        /* Update the payload data */
+        pkt->payload += len_diff;
+        pkt->payload_len += len_diff;
     }
     else {
         memcpy(value, etag, len);
