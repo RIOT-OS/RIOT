@@ -46,8 +46,8 @@ cd Adafruit_nRF52_Bootloader
 git submodule update --init
 git -C lib/tinyusb submodule update --init hw/mcu/nordic/nrfx/
 pip3 install --user adafruit-nrfutil
-make BOARD=feather_nrf52840_express all
-make BOARD=feather_nrf52840_express flash
+make BOARD=feather-nrf52840 all
+make BOARD=feather-nrf52840 flash
 ~~~~~~~~~~~~~
 
 [nrfjprog]: https://www.nordicsemi.com/Products/Development-tools/nRF-Command-Line-Tools
