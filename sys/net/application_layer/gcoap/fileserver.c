@@ -85,7 +85,7 @@ static bool entry_is_dir(char *path, const char *name)
         return false;
     }
 
-    /* re-use path buffer, it is already COAPFILESERVER_PATH_MAX bytes long */
+    /* reuse path buffer, it is already COAPFILESERVER_PATH_MAX bytes long */
     path[path_len] = '/';
     path[path_len + 1] = 0;
     strncat(path, name, COAPFILESERVER_PATH_MAX - 1);

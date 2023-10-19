@@ -216,7 +216,7 @@ static int _msg_send_oneway(msg_t *m, kernel_pid_t target_pid)
 
         sched_set_status(target, STATUS_PENDING);
 
-        /* Interrupts are disabled here, we can set / re-use
+        /* Interrupts are disabled here, we can set / reuse
            sched_context_switch_request. */
         sched_context_switch_request = 1;
 
@@ -280,7 +280,7 @@ int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid)
     sched_set_status(me, STATUS_REPLY_BLOCKED);
     me->wait_data = reply;
 
-    /* we re-use (abuse) reply for sending, because wait_data might be
+    /* we reuse (abuse) reply for sending, because wait_data might be
      * overwritten if the target is not in RECEIVE_BLOCKED */
     *reply = *m;
     /* msg_send blocks until reply received */

@@ -168,3 +168,9 @@ rsource
 
 # SHS (abbreviation for Secure Hash Standard) => SSH, NHS
 shs
+
+# FRAM (abbreviation for ferroelectric random access memory, a non-volatile memory)
+fram
+
+# MIS (mask interrupt register)
+mis

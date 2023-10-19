@@ -71,7 +71,7 @@ typedef struct {
  *
  * @param[out] ctx             context handle to initialise
  * @param[in] rate             the desired rate of the sponge
- * @param[in] capacity         the desired capcity of the sponge
+ * @param[in] capacity         the desired capacity of the sponge
  * @param[in] delimitedSuffix  suffix to be appended to the message after the absorbation phase
  */
 void Keccak_init(keccak_state_t *ctx, unsigned int rate, unsigned int capacity,
