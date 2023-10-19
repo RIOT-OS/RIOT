@@ -72,14 +72,16 @@ static void _nanocbor_append(nanocbor_encoder_t *enc, void *ctx, const uint8_t *
     }
 }
 
-void coap_nanocbor_slicer_helper_init(coap_nanocbor_slicer_helper_t *helper, const coap_pkt_t *pkt, coap_block_slicer_t *slicer)
+void coap_nanocbor_slicer_helper_init(coap_nanocbor_slicer_helper_t *helper, const coap_pkt_t *pkt,
+                                      coap_block_slicer_t *slicer)
 {
     memset(helper, 0, sizeof(coap_nanocbor_slicer_helper_t));
     helper->slicer = slicer;
     helper->buf = pkt->payload;
 }
 
-void coap_nanocbor_encoder_blockwise_init(nanocbor_encoder_t *encoder, coap_nanocbor_slicer_helper_t *helper)
+void coap_nanocbor_encoder_blockwise_init(nanocbor_encoder_t *encoder,
+                                          coap_nanocbor_slicer_helper_t *helper)
 {
     nanocbor_encoder_stream_init(encoder, helper, _nanocbor_append, _nanocbor_fits);
 }

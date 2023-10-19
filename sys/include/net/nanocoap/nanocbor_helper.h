@@ -45,8 +45,8 @@
  * nanocbor_fmt_uint(&enc, 1);
  * ```
  *
- * 4. After encoding the full CBOR structure, wrap up the block-wise payload and return from the CoAP
- * handler:
+ * 4. After encoding the full CBOR structure, wrap up the block-wise payload and return from the
+ * CoAP handler:
  * ```
  * return plen + coap_nanocbor_block2_finish(pdu, &helper);
  * ```
@@ -136,6 +136,7 @@ ssize_t coap_nanocbor_block2_finish(coap_pkt_t *pdu, coap_nanocbor_slicer_helper
  * @returns Negative on error
  */
 ssize_t coap_nanocbor_block1_finish(coap_pkt_t *pdu, coap_nanocbor_slicer_helper_t *helper);
+
 #ifdef __cplusplus
 }
 #endif
