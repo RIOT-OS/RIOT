@@ -67,7 +67,8 @@ static ssize_t _riot_block2_handler_cbor(coap_pkt_t *pdu, coap_block_slicer_t *s
     return coap_nanocbor_block2_finish(pdu, &helper);
 }
 
-static ssize_t _riot_block2_handler_plain(coap_pkt_t *pdu, uint8_t *buf, size_t plen, coap_block_slicer_t *slicer)
+static ssize_t _riot_block2_handler_plain(coap_pkt_t *pdu, uint8_t *buf, size_t plen,
+                                          coap_block_slicer_t *slicer)
 {
     (void)pdu;
     /* Add actual content */
