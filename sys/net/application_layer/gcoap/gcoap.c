@@ -1180,7 +1180,7 @@ static void _cache_process(gcoap_request_memo_t *memo,
 #if IS_USED(MODULE_NANOCOAP_CACHE)
     nanocoap_cache_entry_t *ce;
     /* cache_key in memo is pre-processor guarded so we need to as well */
-    if ((ce = nanocoap_cache_process(memo->cache_key, coap_get_code(&req), pdu, pdu_len))) {
+    if ((ce = nanocoap_cache_process(memo->cache_key, coap_get_code_raw(&req), pdu, pdu_len))) {
         ce->truncated = (memo->state == GCOAP_MEMO_RESP_TRUNC);
     }
 #else
@@ -1288,7 +1288,7 @@ static bool _cache_lookup(gcoap_request_memo_t *memo,
         _update_memo_cache_key(memo, cache_key);
         /* cache hit, methods are equal, and cache entry is not stale */
         if (*ce &&
-            ((*ce)->request_method == coap_get_code(pdu)) &&
+            ((*ce)->request_method == coap_get_code_raw(pdu)) &&
             !nanocoap_cache_entry_is_stale(*ce, now)) {
             return true;
         }
