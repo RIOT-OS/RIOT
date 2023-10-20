@@ -1109,7 +1109,6 @@ ssize_t coap_opt_replace_etag(coap_pkt_t *pkt, const void *etag, size_t len)
 
         /* Update the payload data */
         pkt->payload += len_diff;
-        pkt->payload_len += len_diff;
     }
     else {
         memcpy(value, etag, len);
