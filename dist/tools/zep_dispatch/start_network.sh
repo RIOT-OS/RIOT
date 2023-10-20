@@ -62,7 +62,7 @@ start_radvd() {
 }
 
 start_zep_dispatch() {
-    ${ZEP_DISPATCH} :: "${ZEP_PORT_BASE}" > /dev/null &
+    ${ZEP_DISPATCH} ${ZEP_DISPATCH_FLAGS} :: "${ZEP_PORT_BASE}" > /dev/null &
     ZEP_DISPATCH_PID=$!
 }
 
@@ -93,6 +93,17 @@ if [ "$1" = "-z" ] || [ "$1" = "--use-zep-dispatch" ]; then
     shift 2
 else
     USE_ZEP_DISPATCH=0
+fi
+
+if [ "$1" = "-t" ] || [ "$1" = "--topology" ]; then
+    ZEP_DISPATCH_FLAGS+="-t $2 "
+    shift 2
+fi
+
+if [ "$1" = "-w" ] || [ "$1" = "--monitor" ]; then
+    modprobe mac802154_hwsim
+    ZEP_DISPATCH_FLAGS+="-w wpan0 "
+    shift 1
 fi
 
 ELFFILE=$1
