@@ -94,7 +94,7 @@ typedef struct {
     union {
         size_t full_len;            /**< Total length of the serialized response */
         size_t buf_len;             /**< Total available space in the payload buf */
-    }
+    };
     size_t payload_len;           /**< Number of bytes written into the current slice */
     uint8_t fletcher_tmp;           /**< Temporary storage for half a fletcher32 words */
     fletcher32_ctx_t fletcher_ctx;  /**< Fletcher32 context for etag generation */
@@ -117,8 +117,8 @@ void coap_nanocbor_slicer_helper_init(coap_nanocbor_slicer_helper_t *helper, con
  * @param encoder   NanoCBOR encoder context to initialize
  * @param helper    CoAP NanoCBOR slicer helper
  */
-void coap_nanocbor_encoder_blockwise_init(nanocbor_encoder_t *encoder,
-                                          coap_nanocbor_slicer_helper_t *helper);
+void coap_nanocbor_encoder_init(nanocbor_encoder_t *encoder,
+                                coap_nanocbor_slicer_helper_t *helper);
 
 /**
  * @brief Finish the CoAP reply packet with the block2 option.
