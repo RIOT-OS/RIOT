@@ -1094,6 +1094,8 @@ ssize_t coap_opt_replace_etag(coap_pkt_t *pkt, const void *etag, size_t len)
 
     /* Between -7 and 0, inclusive */
     ssize_t len_diff = len - opt_len;
+    /* Sanity checking for API abuse */
+    assert(pkt->payload + len_diff > opt);
 
     if (len_diff != 0) {
         /* shift everything */
