@@ -35,6 +35,7 @@ static bool _nanocbor_fits_block(nanocbor_encoder_t *enc, void *ctx, size_t len)
 
 static bool _nanocbor_fits_simple(nanocbor_encoder_t *enc, void *ctx, size_t len)
 {
+    (void)enc;
     const coap_nanocbor_slicer_helper_t *helper = ctx;
     return len + helper->payload_len <= helper->buf_len;
 }
@@ -80,6 +81,7 @@ static void _nanocbor_append_blockwise(nanocbor_encoder_t *enc, void *ctx, const
 
 static void _nanocbor_append_simple(nanocbor_encoder_t *enc, void *ctx, const uint8_t *buf, size_t len)
 {
+    (void)enc;
     coap_nanocbor_slicer_helper_t *helper = ctx;
     if (len == 0) {
         return;
@@ -90,7 +92,7 @@ static void _nanocbor_append_simple(nanocbor_encoder_t *enc, void *ctx, const ui
     /* This should have been checked before */
     assert(len + helper->payload_len <= helper->buf_len);
 
-    memcpy(buf + helper->payload_len, buf, len);
+    memcpy(helper->buf + helper->payload_len, buf, len);
     helper->payload_len += len;
 }
 
@@ -98,7 +100,12 @@ void coap_nanocbor_slicer_helper_init(coap_nanocbor_slicer_helper_t *helper, con
                                       coap_block_slicer_t *slicer)
 {
     memset(helper, 0, sizeof(coap_nanocbor_slicer_helper_t));
-    helper->slicer = slicer;
+    if (slicer) {
+        helper->slicer = slicer;
+    }
+    else {
+        helper->buf_len = pkt->payload_len;
+    }
     helper->buf = pkt->payload;
 }
 
@@ -106,7 +113,7 @@ void coap_nanocbor_encoder_init(nanocbor_encoder_t *encoder,
                                 coap_nanocbor_slicer_helper_t *helper)
 {
     if (helper->slicer) {
-        nanocbor_encoder_stream_init(encoder, helper, _nanocbor_append_block, _nanocbor_fits_block);
+        nanocbor_encoder_stream_init(encoder, helper, _nanocbor_append_blockwise, _nanocbor_fits_block);
     }
     else {
         nanocbor_encoder_stream_init(encoder, helper, _nanocbor_append_simple, _nanocbor_fits_simple);
@@ -126,7 +133,7 @@ static ssize_t _etag_finish(coap_pkt_t *pdu, coap_nanocbor_slicer_helper_t *help
     uint32_t etag = fletcher32_finish(&helper->fletcher_ctx);
     coap_opt_replace_etag(pdu, &etag, sizeof(etag));
     size_t header_options_len = pdu->payload - (uint8_t *)pdu->hdr;
-    return header_options_len + helper->payload_leng;
+    return header_options_len + helper->payload_len;
 }
 
 ssize_t coap_nanocbor_block2_finish(coap_pkt_t *pdu, coap_nanocbor_slicer_helper_t *helper)
