@@ -284,7 +284,7 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
             }
 
             state = STATE_RESPONSE_OK;
-            DEBUG("nanocoap: response code=%i\n", coap_get_code(pkt));
+            DEBUG("nanocoap: response code=%i\n", coap_get_code_decimal(pkt));
             switch (coap_get_type(pkt)) {
             case COAP_TYPE_RST:
                 /* TODO: handle different? */
