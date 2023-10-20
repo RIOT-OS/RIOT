@@ -89,7 +89,7 @@ static void test_gcoap__client_get_req(void)
     len = gcoap_request(&pdu, &buf[0], CONFIG_GCOAP_PDU_BUF_SIZE,
                                                 COAP_METHOD_GET, &path[0]);
 
-    TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code(&pdu));
+    TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code_decimal(&pdu));
     TEST_ASSERT_EQUAL_INT(CONFIG_GCOAP_TOKENLEN, coap_get_token_len(&pdu));
     TEST_ASSERT_EQUAL_INT(hdr_fixed_len + CONFIG_GCOAP_TOKENLEN,
                           coap_get_total_hdr_len(&pdu));
@@ -157,7 +157,7 @@ static void test_gcoap__client_put_req(void)
 
     coap_parse(&pdu, buf, len + 1);
 
-    TEST_ASSERT_EQUAL_INT(COAP_METHOD_PUT, coap_get_code(&pdu));
+    TEST_ASSERT_EQUAL_INT(COAP_METHOD_PUT, coap_get_code_decimal(&pdu));
     TEST_ASSERT_EQUAL_INT(1, pdu.payload_len);
     TEST_ASSERT_EQUAL_INT('1', (char)*pdu.payload);
 }
@@ -223,7 +223,7 @@ static void test_gcoap__client_ping(void)
                          NULL);
 
     TEST_ASSERT_EQUAL_INT(0, res);
-    TEST_ASSERT_EQUAL_INT(COAP_CODE_EMPTY, coap_get_code(&pdu));
+    TEST_ASSERT_EQUAL_INT(COAP_CODE_EMPTY, coap_get_code_decimal(&pdu));
     TEST_ASSERT_EQUAL_INT(COAP_TYPE_CON, coap_get_type(&pdu));
     TEST_ASSERT_EQUAL_INT(0, coap_get_token_len(&pdu));
 
@@ -261,7 +261,7 @@ static void test_gcoap__server_get_req(void)
     int res = _read_cli_stats_req(&pdu, &buf[0]);
 
     TEST_ASSERT_EQUAL_INT(0, res);
-    TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code(&pdu));
+    TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code_decimal(&pdu));
     TEST_ASSERT_EQUAL_INT(2, coap_get_token_len(&pdu));
     TEST_ASSERT_EQUAL_INT(4 + 2, coap_get_total_hdr_len(&pdu));
     TEST_ASSERT_EQUAL_INT(COAP_TYPE_NON, coap_get_type(&pdu));
@@ -333,7 +333,7 @@ static void test_gcoap__server_con_req(void)
     int res = _read_cli_stats_req_con(&pdu, &buf[0]);
 
     TEST_ASSERT_EQUAL_INT(0, res);
-    TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code(&pdu));
+    TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code_decimal(&pdu));
     TEST_ASSERT_EQUAL_INT(COAP_TYPE_CON, coap_get_type(&pdu));
 }
 

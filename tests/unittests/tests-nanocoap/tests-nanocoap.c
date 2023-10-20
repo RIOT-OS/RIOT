@@ -108,7 +108,7 @@ static void test_nanocoap__get_req(void)
 
     coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
 
-    TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code(&pkt));
+    TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code_decimal(&pkt));
     TEST_ASSERT_EQUAL_INT(2, coap_get_token_len(&pkt));
     TEST_ASSERT_EQUAL_INT(total_hdr_len, coap_get_total_hdr_len(&pkt));
     TEST_ASSERT_EQUAL_INT(COAP_TYPE_NON, coap_get_type(&pkt));
@@ -146,7 +146,7 @@ static void test_nanocoap__put_req(void)
 
     coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
 
-    TEST_ASSERT_EQUAL_INT(COAP_METHOD_PUT, coap_get_code(&pkt));
+    TEST_ASSERT_EQUAL_INT(COAP_METHOD_PUT, coap_get_code_decimal(&pkt));
     TEST_ASSERT_EQUAL_INT(122, pkt.payload_len);
 
     len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, &path[0], '/');
@@ -683,7 +683,7 @@ static void test_nanocoap__server_get_req(void)
     int res = _read_riot_value_req(&pkt, &buf[0]);
 
     TEST_ASSERT_EQUAL_INT(0, res);
-    TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code(&pkt));
+    TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code_decimal(&pkt));
     TEST_ASSERT_EQUAL_INT(2, coap_get_token_len(&pkt));
     TEST_ASSERT_EQUAL_INT(4 + 2, coap_get_total_hdr_len(&pkt));
     TEST_ASSERT_EQUAL_INT(COAP_TYPE_NON, coap_get_type(&pkt));
@@ -740,7 +740,7 @@ static void test_nanocoap__server_get_req_con(void)
     int res = _read_riot_value_req_con(&pkt, &buf[0]);
 
     TEST_ASSERT_EQUAL_INT(0, res);
-    TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code(&pkt));
+    TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code_decimal(&pkt));
     TEST_ASSERT_EQUAL_INT(COAP_TYPE_CON, coap_get_type(&pkt));
 }
 
@@ -1081,7 +1081,7 @@ static void test_nanocoap__token_length_ext_16(void)
     int res = coap_parse(&pkt, buf, 21);
 
     TEST_ASSERT_EQUAL_INT(0, res);
-    TEST_ASSERT_EQUAL_INT(204, coap_get_code(&pkt));
+    TEST_ASSERT_EQUAL_INT(204, coap_get_code_decimal(&pkt));
     TEST_ASSERT_EQUAL_INT(23, coap_get_id(&pkt));
     TEST_ASSERT_EQUAL_INT(strlen(token), coap_get_token_len(&pkt));
     TEST_ASSERT_EQUAL_INT(0, memcmp(coap_get_token(&pkt), token, strlen(token)));
@@ -1109,7 +1109,7 @@ static void test_nanocoap__token_length_ext_269(void)
     int res = coap_parse(&pkt, buf, 275);
 
     TEST_ASSERT_EQUAL_INT(0, res);
-    TEST_ASSERT_EQUAL_INT(204, coap_get_code(&pkt));
+    TEST_ASSERT_EQUAL_INT(204, coap_get_code_decimal(&pkt));
     TEST_ASSERT_EQUAL_INT(23, coap_get_id(&pkt));
     TEST_ASSERT_EQUAL_INT(strlen(token), coap_get_token_len(&pkt));
     TEST_ASSERT_EQUAL_INT(0, memcmp(coap_get_token(&pkt), token, strlen(token)));
