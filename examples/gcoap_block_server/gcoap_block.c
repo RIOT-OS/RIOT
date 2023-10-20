@@ -56,7 +56,7 @@ static ssize_t _riot_block2_handler_cbor(coap_pkt_t *pdu, coap_block_slicer_t *s
     coap_nanocbor_slicer_helper_init(&helper, pdu, slicer);
     nanocbor_encoder_t enc;
 
-    coap_nanocbor_encoder_blockwise_init(&enc, &helper);
+    coap_nanocbor_encoder_init(&enc, &helper);
 
     /* Add actual content */
     nanocbor_fmt_array(&enc, 3);
