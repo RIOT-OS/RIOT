@@ -56,6 +56,7 @@ typedef struct {
     ipv6_addr_t mask;   /**< bitmask for address */
     uint8_t prio;       /**< rule priority       */
     uint8_t flags;      /**< rule flags          */
+    uint8_t padding[2]; /**< padding for XFA     */
 } gnrc_ipv6_firewall_rule_t;
 
 /**
