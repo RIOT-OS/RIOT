@@ -113,6 +113,10 @@ const char *psa_status_to_humanly_readable(psa_status_t status)
 
 psa_status_t psa_crypto_init(void)
 {
+    if (lib_initialized) {
+        return PSA_SUCCESS;
+    }
+
     lib_initialized = 1;
 
 #if (IS_USED(MODULE_PSA_KEY_SLOT_MGMT))
