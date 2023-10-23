@@ -62,6 +62,10 @@ ifeq ($(QUIET),1)
   GIT_QUIET ?= --quiet
 endif
 
+ifeq (,$(NO_GIT_FILTERING))
+  GIT_FILTER ?= --filter=blob:none
+endif
+
 GITFLAGS ?= -c user.email=buildsystem@riot -c user.name="RIOT buildsystem"
 GITAMFLAGS ?= $(GIT_QUIET) --no-gpg-sign --ignore-whitespace --whitespace=nowarn
 
@@ -144,7 +148,7 @@ $(PKG_SOURCE_DIR)/.git: | $(PKG_CUSTOM_PREPARED)
 	$(Q)$(GIT_IN_PKG) remote add origin $(PKG_URL)
 	$(Q)$(GIT_IN_PKG) config extensions.partialClone origin
 	$(Q)$(GIT_IN_PKG) config advice.detachedHead false
-	$(Q)$(GIT_IN_PKG) fetch $(GIT_QUIET) --depth=1 -t --filter=blob:none origin $(PKG_VERSION)
+	$(Q)$(GIT_IN_PKG) fetch $(GIT_QUIET) --depth=1 -t $(GIT_FILTER) origin $(PKG_VERSION)
 	$(Q)$(GIT_IN_PKG) checkout $(GIT_QUIET) $(PKG_VERSION) 2>&1 | cat
 endif
 
