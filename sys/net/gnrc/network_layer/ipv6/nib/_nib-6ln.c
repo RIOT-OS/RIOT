@@ -196,7 +196,6 @@ void _handle_rereg_address(const ipv6_addr_t *addr)
     _nib_dr_entry_t *router = _nib_drl_get(NULL, netif->pid);
     const bool router_reachable = (router != NULL) &&
                                   _is_reachable(router->next_hop);
-
     if (router_reachable) {
         assert((unsigned)netif->pid == _nib_onl_get_if(router->next_hop));
         DEBUG("nib: Re-registering %s",
@@ -209,18 +208,16 @@ void _handle_rereg_address(const ipv6_addr_t *addr)
     else {
         DEBUG("nib: Couldn't re-register %s, no current router found.\n",
               ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)));
+        netif->ipv6.rs_sent = 0;
+        _handle_search_rtr(netif);
+        goto out;
     }
 
     int idx = gnrc_netif_ipv6_addr_idx(netif, addr);
-    if (idx < 0) {
-        DEBUG("nib: %s is not assigned to interface %d anymore.\n",
-              ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
-              netif->pid);
-    }
-    else if (router_reachable &&
-             (_is_valid(netif, idx) || (_is_tentative(netif, idx) &&
-             (gnrc_netif_ipv6_addr_dad_trans(netif, idx) <
-             SIXLOWPAN_ND_REG_TRANSMIT_NUMOF)))) {
+    assert(idx >= 0);
+
+    if (_is_valid(netif, idx) || (_is_tentative(netif, idx) &&
+        (gnrc_netif_ipv6_addr_dad_trans(netif, idx) < SIXLOWPAN_ND_REG_TRANSMIT_NUMOF))) {
         uint32_t retrans_time;
 
         if (_is_valid(netif, idx)) {
@@ -234,10 +231,7 @@ void _handle_rereg_address(const ipv6_addr_t *addr)
         _evtimer_add(&netif->ipv6.addrs[idx], GNRC_IPV6_NIB_REREG_ADDRESS,
                      &netif->ipv6.addrs_timers[idx], retrans_time);
     }
-    else {
-        netif->ipv6.rs_sent = 0;
-        _handle_search_rtr(netif);
-    }
+out:
     gnrc_netif_release(netif);
 }
 
