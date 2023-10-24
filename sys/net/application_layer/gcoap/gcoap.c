@@ -1331,8 +1331,21 @@ static ssize_t _cache_check(const uint8_t *buf, size_t len,
         if ((resp_etag_len > 0) && ((size_t)resp_etag_len <= COAP_ETAG_LENGTH_MAX)) {
             uint8_t *tmp_etag;
             ssize_t tmp_etag_len = coap_opt_get_opaque(&req, COAP_OPT_ETAG, &tmp_etag);
-
             if (tmp_etag_len >= resp_etag_len) {
+                /* peak length without padding */
+                size_t rem_len = (len - (tmp_etag + tmp_etag_len - buf));
+
+                if ((tmp_etag < buf) || (tmp_etag > (buf + len)) ||
+                    (rem_len > (len - ((tmp_etag + COAP_ETAG_LENGTH_MAX) - buf)))) {
+                    DEBUG("gcoap: invalid calculated padding length (%lu) for ETag injection "
+                          "during cache lookup.\n", (long unsigned)rem_len);
+                    /* something fishy happened in the request. Better don't return cache entry */
+                    *cache_hit = false;
+#if IS_USED(MODULE_NANOCOAP_CACHE)
+                    memset(memo->cache_key, 0, sizeof(memo->cache_key));
+#endif
+                    return -EINVAL;
+                }
                 memcpy(tmp_etag, resp_etag, resp_etag_len);
                 /* shorten ETag option if necessary */
                 if ((size_t)resp_etag_len < COAP_ETAG_LENGTH_MAX) {
@@ -1345,7 +1358,6 @@ static ssize_t _cache_check(const uint8_t *buf, size_t len,
                      * bitmask resp_etag_len */
                     *start |= (uint8_t)resp_etag_len;
                     /* remove padding */
-                    size_t rem_len = (len - (tmp_etag + COAP_ETAG_LENGTH_MAX - buf));
                     memmove(tmp_etag + resp_etag_len, tmp_etag + COAP_ETAG_LENGTH_MAX, rem_len);
                     len -= (COAP_ETAG_LENGTH_MAX - resp_etag_len);
                 }

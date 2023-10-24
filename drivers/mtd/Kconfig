@@ -43,6 +43,7 @@ config HAVE_MTD_SDMMC_DEFAULT
     depends on HAS_PERIPH_SDMMC
     imply MODULE_MTD_SDMMC if MODULE_MTD
     imply MODULE_MTD_SDMMC_DEFAULT if MODULE_MTD
+    imply MODULE_SDMMC if MODULE_MTD
     help
         Indicates that a SD/MMC MTD is present with generic configuration
 

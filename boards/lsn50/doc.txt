@@ -7,7 +7,7 @@
 
 This board is a waterproof board with a LoRa SX1276 radio.
 
-![LSN50](https://wiki.dragino.com/images/thumb/e/e9/Introdution.png/600px-Introdution.png)
+![LSN50](https://docs.zephyrproject.org/latest/_images/dragino_lsn50.jpg)
 
 Documentation of the board is available
 [here](https://wiki.dragino.com/index.php?title=Lora_Sensor_Node-LSN50).

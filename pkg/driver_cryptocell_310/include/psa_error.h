@@ -25,6 +25,7 @@ extern "C" {
 
 #include "psa/crypto.h"
 #include "crys_ecpki_error.h"
+#include "crys_ec_mont_edw_error.h"
 #include "crys_hash_error.h"
 #include "ssi_aes_error.h"
 

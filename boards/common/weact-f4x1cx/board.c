@@ -51,7 +51,7 @@ static mtd_spi_nor_t weact_nor_dev = {
     .params = &_weact_nor_params,
 };
 
-mtd_dev_t *mtd0 = (mtd_dev_t *)&weact_nor_dev;
+MTD_XFA_ADD(weact_nor_dev, 0);
 
 #ifdef MODULE_VFS_DEFAULT
 #include "vfs_default.h"

@@ -227,7 +227,7 @@ typedef struct gnrc_netreg_entry {
  * There is an exclusive counterpart to the lock, which is
  * internal to netreg (and used through functions such as @ref
  * gnrc_netreg_register and @ref gnrc_netreg_unregister). The current
- * implementation priorizes shared locks. This means that shared locks are
+ * implementation prioritizes shared locks. This means that shared locks are
  * generally acquired fast (they only block if an exclusive operation has
  * already started), but constant access through shared locks might starve
  * registration and deregistration.

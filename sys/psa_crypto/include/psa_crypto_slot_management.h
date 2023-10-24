@@ -80,7 +80,7 @@ typedef struct {
     /** Structure containing key data */
     struct key_data {
         uint8_t data[PSA_MAX_KEY_DATA_SIZE];    /**< Key data buffer */
-        size_t data_len;                           /**< Size of actual key data in bytes */
+        size_t data_len;                        /**< Size of actual key data in bytes */
     } key;                                      /**< Key data structure */
 } psa_key_slot_t;
 

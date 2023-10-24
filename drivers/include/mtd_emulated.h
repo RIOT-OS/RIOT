@@ -38,7 +38,10 @@ extern "C" {
  * creates the emulated MTD device `mtd_emulated_dev0` with 16 sectors, 4 pages
  * per sector and a page size of 64 bytes. The write size is always 1 byte.
  *
- * @param   n   index of the emulated MTD (results into symbol `mtd_emulated_devn`)
+ * @note The emulated devices are added to the XFA of MTD device pointers
+ *       @ref mtd_dev_xfa with priority 99 to place them at the end of the XFA.
+ *
+ * @param   n   index of the emulated MTD (results into symbol `mtd_emulated_dev<n>`)
  * @param   sc  sectors of the emulated MTD
  * @param   pps pages per sector of the emulated MTD
  * @param   ps  page size in bytes
@@ -57,7 +60,9 @@ extern "C" {
         .size = sc * pps * ps,                          \
         .memory = _mtd_emulated_memory ## n,            \
         .init_done = false,                             \
-    }                                                   \
+    };                                                  \
+                                                        \
+    XFA_CONST(mtd_dev_xfa, 99) mtd_dev_t CONCAT(*mtd_emulated, n) = (mtd_dev_t *)&mtd_emulated_dev ## n
 
 #if MODULE_VFS_AUTO_MOUNT || DOXYGEN
 /**
@@ -70,7 +75,7 @@ extern "C" {
  * automatically mounts the emulated MTD `mtd_emulated_dev0` with FAT file
  * system under mount point `/mtde0` with unique index 2.
  *
- * @param   n   index of the emulated MTD (symbol `mtd_emulated_devn`, mount point `/mtde0`)
+ * @param   n   index of the emulated MTD (symbol `mtd_emulated_dev<n>`, mount point `/mtde0`)
  * @param   m   unique overall index of VFS mount point
  * @param   fs  filesystem type used
  */

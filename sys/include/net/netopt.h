@@ -300,6 +300,16 @@ typedef enum {
     NETOPT_LINK,
 
     /**
+     * @brief (@ref netopt_enable_t) network interface status.
+     *
+     * This option is used check state or to enable/disable the interface,
+     * regardless of link status.
+     *
+     * @note On error this option should return a negative number.
+     */
+    NETOPT_ACTIVE,
+
+    /**
      * @brief   (@ref netopt_enable_t) CSMA/CA support
      *
      * If the device supports CSMA in hardware, this option enables it with

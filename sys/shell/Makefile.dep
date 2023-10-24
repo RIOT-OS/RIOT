@@ -3,6 +3,9 @@ USEMODULE += stdin
 ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
   USEMODULE += shell_cmd_sys
 
+  ifneq (,$(filter netif,$(USEMODULE)))
+    USEMODULE += l2util
+  endif
   ifneq (,$(filter app_metadata,$(USEMODULE)))
     USEMODULE += shell_cmd_app_metadata
   endif
@@ -50,6 +53,9 @@ ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
     ifneq (,$(filter lora,$(USEMODULE)))
       USEMODULE += shell_cmd_gnrc_netif_lora
     endif
+  endif
+  ifneq (,$(filter gnrc_txtsnd,$(USEMODULE)))
+    USEMODULE += shell_cmd_gnrc_txtsnd
   endif
   ifneq (,$(filter gnrc_netif_lorawan,$(USEMODULE)))
     USEMODULE += shell_cmd_gnrc_netif_lorawan

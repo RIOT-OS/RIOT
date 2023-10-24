@@ -211,7 +211,7 @@ def main():
         release_fullname = args.release_branch
         release_shortname = _branch_name_strip(args.release_branch)
     else:
-        status, branches = github_api.repos[ORG][REPO].branches.get()
+        status, branches = github_api.repos[ORG][REPO].branches.get(per_page=100)
         if status != 200:
             print(
                 f"Could not retrieve branches for {ORG}/{REPO}: "

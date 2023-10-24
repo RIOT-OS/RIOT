@@ -71,7 +71,6 @@ psa_status_t psa_cipher_cbc_aes_128_decrypt(const psa_key_attributes_t *attribut
                                             size_t *output_length)
 {
     DEBUG("RIOT AES 128 Cipher");
-    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
     psa_cipher_operation_t operation = psa_cipher_operation_init();
     size_t required_output_buf_size = PSA_CIPHER_DECRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_AES,
                                         PSA_ALG_CBC_NO_PADDING, input_length);

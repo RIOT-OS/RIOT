@@ -526,9 +526,9 @@ extern "C" {
  *          A wildcard signature algorithm policy, using @ref PSA_ALG_ANY_HASH, returns the same
  *          value as the signature algorithm parameterised with a valid hash algorithm.
  */
-#define PSA_ALG_IS_HASH_AND_SIGN(alg) \
-    (PSA_ALG_IS_RSA_PSS(alg) || PSA_ALG_IS_RSA_PKCS1V15_SIGN(alg) || \
-     PSA_ALG_IS_ECDSA(alg) || PSA_ALG_IS_HASH_EDDSA(alg))
+#define PSA_ALG_IS_HASH_AND_SIGN(alg)   \
+    (PSA_ALG_IS_SIGN_HASH(alg) &&       \
+     ((alg) & PSA_ALG_HASH_MASK) != 0)
 
 /**
  * @brief   Whether the specified algorithm is an HKDF algorithm.
@@ -746,7 +746,8 @@ extern "C" {
  *          0 if alg is not a signature algorithm
  */
 #define PSA_ALG_IS_SIGN_HASH(alg) \
-    PSA_ALG_IS_SIGN(alg)
+    (PSA_ALG_IS_RSA_PSS(alg) || PSA_ALG_IS_RSA_PKCS1V15_SIGN(alg) ||    \
+     PSA_ALG_IS_ECDSA(alg) || PSA_ALG_IS_HASH_EDDSA(alg))
 
 /**
  * @brief   Whether the specified algorithm is a signature algorithm that can be used with
@@ -760,8 +761,7 @@ extern "C" {
  *          0 if alg is not a signature algorithm.
  */
 #define PSA_ALG_IS_SIGN_MESSAGE(alg) \
-    (PSA_ALG_IS_SIGN(alg) && \
-     (alg) != PSA_ALG_ECDSA_ANY && (alg) != PSA_ALG_RSA_PKCS1V15_SIGN_RAW)
+     (PSA_ALG_IS_SIGN_HASH(alg) || (alg) == PSA_ALG_PURE_EDDSA)
 
 /**
  * @brief   Whether the specified algorithm is a stream cipher.
@@ -2814,18 +2814,6 @@ extern "C" {
  */
 #define PSA_KEY_TYPE_ECC_KEY_PAIR(curve)         \
     (PSA_KEY_TYPE_ECC_KEY_PAIR_BASE | (curve))
-
-/**
- * @brief   Extract group family of an elliptic curve key pair
- *
- * @param   type    A an ECC key pair type: a value of type @ref psa_key_type_t such that
- *          @ref PSA_KEY_TYPE_IS_ECC(@p type) is true.
- *
- * @return  The elliptic curve family id, if type is a supported elliptic curve key.
- *          Unspecified if type is not a supported elliptic curve key.
- */
-#define PSA_KEY_TYPE_ECC_GET_CURVE(type) \
-    (type & ~PSA_KEY_TYPE_ECC_KEY_PAIR_BASE)
 
 /**
  * @brief   Elliptic curve public key.

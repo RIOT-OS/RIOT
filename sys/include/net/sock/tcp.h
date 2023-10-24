@@ -322,7 +322,7 @@ typedef struct _sock_tl_ep sock_tcp_ep_t;   /**< An end point for a TCP sock obj
 /**
  * @brief   Type for a TCP sock object
  *
- * @note API implementors: `struct sock_tcp` needs to be defined by
+ * @note API implementers: `struct sock_tcp` needs to be defined by
  *       implementation-specific `sock_types.h`.
  */
 typedef struct sock_tcp sock_tcp_t;
@@ -330,7 +330,7 @@ typedef struct sock_tcp sock_tcp_t;
 /**
  * @brief   Type for a TCP listening queue
  *
- * @note API implementors: `struct sock_tcp_queue` needs to be defined by
+ * @note API implementers: `struct sock_tcp_queue` needs to be defined by
  *                          implementation-specific `sock_types.h`.
  */
 typedef struct sock_tcp_queue sock_tcp_queue_t;

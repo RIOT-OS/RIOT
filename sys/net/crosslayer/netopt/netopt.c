@@ -63,6 +63,7 @@ static const char *_netopt_strmap[] = {
     [NETOPT_MAC_NO_SLEEP]          = "NETOPT_MAC_NO_SLEEP",
     [NETOPT_IS_WIRED]              = "NETOPT_IS_WIRED",
     [NETOPT_LINK]                  = "NETOPT_LINK",
+    [NETOPT_ACTIVE]                = "NETOPT_ACTIVE",
     [NETOPT_DEVICE_TYPE]           = "NETOPT_DEVICE_TYPE",
     [NETOPT_CHANNEL_PAGE]          = "NETOPT_CHANNEL_PAGE",
     [NETOPT_CCA_THRESHOLD]         = "NETOPT_CCA_THRESHOLD",

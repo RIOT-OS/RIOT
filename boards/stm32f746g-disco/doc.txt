@@ -10,7 +10,7 @@ is an evaluation board supporting a ARM Cortex-M7 STM32F746NG microcontroller
 with 340KB of RAM and 1MB of ROM Flash.
 
 As main features, this board provides:
-- a 4"3 RGB 480×272 color LCD-TFT with capacitive touch screen,
+- a 4.3\" RGB 480×272 color LCD-TFT with capacitive touch screen,
 - an ethernet port
 - 2 user USB ports (FS and HS)
 - 2 user digital microphones

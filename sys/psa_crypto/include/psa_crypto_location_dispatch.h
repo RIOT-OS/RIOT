@@ -53,6 +53,29 @@ psa_status_t psa_location_dispatch_sign_hash(  const psa_key_attributes_t *attri
                                                size_t *signature_length);
 
 /**
+ * @brief   Dispatch call of a message signature function to a location specific backend.
+ *          See psa_sign_message()
+ *
+ * @param attributes
+ * @param alg
+ * @param slot
+ * @param input
+ * @param input_length
+ * @param signature
+ * @param signature_size
+ * @param signature_length
+ * @return psa_status_t
+ */
+psa_status_t psa_location_dispatch_sign_message(const psa_key_attributes_t *attributes,
+                                               psa_algorithm_t alg,
+                                               const psa_key_slot_t *slot,
+                                               const uint8_t *input,
+                                               size_t input_length,
+                                               uint8_t *signature,
+                                               size_t signature_size,
+                                               size_t *signature_length);
+
+/**
  * @brief   Dispatch call of a hash verification function to a location specific backend.
  *          See psa_verify_hash()
  *
@@ -70,6 +93,27 @@ psa_status_t psa_location_dispatch_verify_hash(  const psa_key_attributes_t *att
                                                  const psa_key_slot_t *slot,
                                                  const uint8_t *hash,
                                                  size_t hash_length,
+                                                 const uint8_t *signature,
+                                                 size_t signature_length);
+
+/**
+ * @brief   Dispatch call of a message verification function to a location specific backend.
+ *          See psa_verify_message()
+ *
+ * @param attributes
+ * @param alg
+ * @param slot
+ * @param input
+ * @param input_length
+ * @param signature
+ * @param signature_length
+ * @return psa_status_t
+ */
+psa_status_t psa_location_dispatch_verify_message(const psa_key_attributes_t *attributes,
+                                                 psa_algorithm_t alg,
+                                                 const psa_key_slot_t *slot,
+                                                 const uint8_t *input,
+                                                 size_t input_length,
                                                  const uint8_t *signature,
                                                  size_t signature_length);
 

@@ -569,8 +569,7 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
     for (unsigned i = 0; iolist; iolist = iolist->iol_next, i++) {
         dma_iter->control = iolist->iol_len;
         dma_iter->buffer_addr = iolist->iol_base;
-        uint32_t status = TX_DESC_STAT_IC | TX_DESC_STAT_TCH | TX_DESC_STAT_CIC
-                          | TX_DESC_STAT_OWN;
+        uint32_t status = TX_DESC_STAT_IC | TX_DESC_STAT_TCH | TX_DESC_STAT_OWN;
         if (!i) {
             /* fist chunk */
             status |= TX_DESC_STAT_FS;

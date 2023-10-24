@@ -130,8 +130,8 @@ expects data from the MCU with the same settings.
 ### Clock selection
 
 There are several clock sources that are available for the different
-peripherals. You are advised to read [AN0004.0]
-(https://www.silabs.com/documents/public/application-notes/an0004.0-efm32-cmu.pdf)
+peripherals. You are advised to read
+[AN0004.0](https://www.silabs.com/documents/public/application-notes/an0004.0-efm32-cmu.pdf)
 to get familiar with the different clocks.
 
 | Source | Internal | Speed      | Comments                           |
@@ -249,8 +249,8 @@ make emulate
 ## Supported Toolchains
 
 For using the Silicon Labs SLTB009A starter kit we strongly recommend
-the usage of the [GNU Tools for ARM Embedded Processors]
-(https://developer.arm.com/open-source/gnu-toolchain/gnu-rm)
+the usage of the
+[GNU Tools for ARM Embedded Processors](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm)
 toolchain.
 
 ## License information

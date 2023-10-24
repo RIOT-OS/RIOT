@@ -51,7 +51,7 @@ static mtd_spi_nor_t same54_nor_dev = {
     },
     .params = &_same54_nor_params,
 };
-mtd_dev_t *mtd0 = (mtd_dev_t *)&same54_nor_dev;
+MTD_XFA_ADD(same54_nor_dev, 0);
 
 #ifdef MODULE_VFS_DEFAULT
 VFS_AUTO_MOUNT(littlefs2, VFS_MTD(same54_nor_dev), VFS_DEFAULT_NVM(0), 0);
@@ -69,7 +69,8 @@ static mtd_at24cxxx_t at24mac_dev = {
     .at24cxxx_eeprom = &at24cxxx_dev,
     .params = at24cxxx_params,
 };
-mtd_dev_t *mtd1 = (mtd_dev_t *)&at24mac_dev;
+MTD_XFA_ADD(at24mac_dev, 1);
+
 #endif /* MODULE_MTD_AT24CXXX */
 
 #ifdef MODULE_SAM0_SDHC
@@ -84,7 +85,7 @@ static mtd_sam0_sdhc_t sdhc_dev = {
             .wp  = GPIO_PIN(PD, 21),
         },
     };
-mtd_dev_t *mtd2 = (mtd_dev_t *)&sdhc_dev;
+MTD_XFA_ADD(sdhc_dev, 2);
 
 #ifdef MODULE_VFS_DEFAULT
 /* default to FAT */

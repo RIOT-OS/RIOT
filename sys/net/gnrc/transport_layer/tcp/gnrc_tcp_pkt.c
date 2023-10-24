@@ -39,8 +39,8 @@
 /**
  * @brief Calculates the maximum of two unsigned numbers.
  *
- * @param[in] x   First comparrison value.
- * @param[in] y   Second comparrison value.
+ * @param[in] x   First comparison value.
+ * @param[in] y   Second comparison value.
  *
  * @returns   X if x is larger than y, if not y is returned.
  */

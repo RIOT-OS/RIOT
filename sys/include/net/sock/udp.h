@@ -295,7 +295,7 @@ typedef struct _sock_tl_ep sock_udp_ep_t;   /**< An end point for a UDP sock obj
 /**
  * @brief   Type for a UDP sock object
  *
- * @note    API implementors: `struct sock_udp` needs to be defined by
+ * @note    API implementers: `struct sock_udp` needs to be defined by
  *         implementation-specific `sock_types.h`.
  */
 typedef struct sock_udp sock_udp_t;

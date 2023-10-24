@@ -21,8 +21,7 @@
     1. [MCU](#esp32_wemos_lolin_d32_pro_mcu)
     2. [Board Configuration](#esp32_wemos_lolin_d32_pro_board_configuration)
     3. [Board Pinout](#esp32_wemos_lolin_d32_pro_pinout)
-    4. [Optional Hardware Configurations]
-       (#esp32_wemos_lolin_d32_pro_optional_hardware)
+    4. [Optional Hardware Configurations](#esp32_wemos_lolin_d32_pro_optional_hardware)
 3. [Flashing the Device](#esp32_wemos_lolin_d32_pro_flashing)
 
 ## Overview {#esp32_wemos_lolin_d32_pro_overview}
@@ -164,8 +163,8 @@ any purpose. However, if optional off-board hardware modules are used,
 these GPIOs may also be occupied, see section
 \ref esp32_wemos_lolin_d32_pro_board_configuration for more information.
 
-The corresponding board schematic can be found [here]
-(https://docs.wemos.cc/en/latest/_static/files/sch_d32_pro_v2.0.0.pdf).
+The corresponding board schematic can be found
+[here](https://docs.wemos.cc/en/latest/_static/files/sch_d32_pro_v2.0.0.pdf).
 
 \anchor esp32_wemos_lolin_d32_pro_pinout_img
 @image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/Wemos_LOLIN_D32_PRO_pinout.png" "Wemos LOLIN D32 PRO pinout"

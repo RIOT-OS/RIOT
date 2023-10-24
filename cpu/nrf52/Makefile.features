@@ -20,6 +20,7 @@ ifneq (,$(filter nrf52840xxaa,$(CPU_MODEL)))
   FEATURES_PROVIDED += periph_cipher_aes_128_cbc
   FEATURES_PROVIDED += periph_ecc_p192r1
   FEATURES_PROVIDED += periph_ecc_p256r1
+  FEATURES_PROVIDED += periph_ecc_ed25519
 endif
 
 ifeq (,$(filter nrf52832%,$(CPU_MODEL)))
