@@ -42,7 +42,7 @@ static void _event_process_urc(event_t *_event)
 
 static void _isrpipe_write_one_wrapper(void *_dev, uint8_t data)
 {
-    at_dev_t *dev = (at_dev_t *) _dev;
+    at_dev_t *dev = (at_dev_t *)_dev;
     isrpipe_write_one(&dev->isrpipe, data);
 #if defined(MODULE_AT_URC_ISR)
     if (data == AT_RECV_EOL_2[0] && !dev->awaiting_response) {
@@ -51,7 +51,8 @@ static void _isrpipe_write_one_wrapper(void *_dev, uint8_t data)
 #endif
 }
 
-int at_dev_init(at_dev_t *dev, uart_t uart, uint32_t baudrate, char *buf, size_t bufsize)
+int at_dev_init(at_dev_t *dev, uart_t uart, uint32_t baudrate, char *buf,
+                size_t bufsize)
 {
     dev->uart = uart;
 
@@ -62,8 +63,7 @@ int at_dev_init(at_dev_t *dev, uart_t uart, uint32_t baudrate, char *buf, size_t
 
     isrpipe_init(&dev->isrpipe, (uint8_t *)buf, bufsize);
 
-    return uart_init(uart, baudrate, _isrpipe_write_one_wrapper,
-                     dev);
+    return uart_init(uart, baudrate, _isrpipe_write_one_wrapper, dev);
 }
 
 int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout)
@@ -76,7 +76,8 @@ int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout)
 
     while (*bytes) {
         char c;
-        if ((res = isrpipe_read_timeout(&dev->isrpipe, (uint8_t *)&c, 1, timeout)) == 1) {
+        if ((res = isrpipe_read_timeout(&dev->isrpipe, (uint8_t *)&c, 1,
+                                        timeout)) == 1) {
             if (AT_PRINT_INCOMING) {
                 print(&c, 1);
             }
@@ -131,8 +132,8 @@ ssize_t at_recv_bytes(at_dev_t *dev, char *bytes, size_t len, uint32_t timeout)
     return (resp_pos - bytes);
 }
 
-int at_recv_bytes_until_string(at_dev_t *dev, const char *string,
-                               char *bytes, size_t *bytes_len, uint32_t timeout)
+int at_recv_bytes_until_string(at_dev_t *dev, const char *string, char *bytes,
+                               size_t *bytes_len, uint32_t timeout)
 {
     size_t len = 0;
     char *_string = (char *)string;
@@ -144,7 +145,8 @@ int at_recv_bytes_until_string(at_dev_t *dev, const char *string,
 
     while (*_string && len < *bytes_len) {
         char c;
-        if ((res = isrpipe_read_timeout(&dev->isrpipe, (uint8_t *)&c, 1, timeout)) == 1) {
+        if ((res = isrpipe_read_timeout(&dev->isrpipe, (uint8_t *)&c, 1,
+                                        timeout)) == 1) {
             if (AT_PRINT_INCOMING) {
                 print(&c, 1);
             }
@@ -179,7 +181,8 @@ int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout)
             return -1;
         }
 
-        if (at_expect_bytes(dev, CONFIG_AT_SEND_EOL AT_RECV_EOL_1 AT_RECV_EOL_2, timeout)) {
+        if (at_expect_bytes(dev, CONFIG_AT_SEND_EOL AT_RECV_EOL_1 AT_RECV_EOL_2,
+                            timeout)) {
             return -2;
         }
     }
@@ -206,8 +209,8 @@ void at_drain(at_dev_t *dev)
 #endif
 }
 
-ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command,
-                             char *resp_buf, size_t len, uint32_t timeout)
+ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command, char *resp_buf,
+                             size_t len, uint32_t timeout)
 {
     ssize_t res;
 
@@ -228,8 +231,9 @@ out:
     return res;
 }
 
-ssize_t at_send_cmd_get_resp_wait_ok(at_dev_t *dev, const char *command, const char *resp_prefix,
-                                     char *resp_buf, size_t len, uint32_t timeout)
+ssize_t at_send_cmd_get_resp_wait_ok(at_dev_t *dev, const char *command,
+                                     const char *resp_prefix, char *resp_buf,
+                                     size_t len, uint32_t timeout)
 {
     ssize_t res;
     ssize_t res_ok;
@@ -279,7 +283,8 @@ out:
 }
 
 ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command,
-                              char *resp_buf, size_t len, bool keep_eol, uint32_t timeout)
+                              char *resp_buf, size_t len, bool keep_eol,
+                              uint32_t timeout)
 {
     const char eol[] = AT_RECV_EOL_1 AT_RECV_EOL_2;
     assert(sizeof(eol) > 1);
@@ -312,13 +317,12 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command,
             bytes_left -= res;
             size_t len_ok = sizeof(CONFIG_AT_RECV_OK) - 1;
             size_t len_error = sizeof(CONFIG_AT_RECV_ERROR) - 1;
-            if (((size_t )res == (len_ok + keep_eol)) &&
-                (len_ok != 0) &&
+            if (((size_t)res == (len_ok + keep_eol)) && (len_ok != 0) &&
                 (strncmp(pos, CONFIG_AT_RECV_OK, len_ok) == 0)) {
                 res = len - bytes_left;
                 break;
             }
-            else if (((size_t )res == (len_error + keep_eol)) &&
+            else if (((size_t)res == (len_error + keep_eol)) &&
                      (len_error != 0) &&
                      (strncmp(pos, CONFIG_AT_RECV_ERROR, len_error) == 0)) {
                 return -1;
@@ -349,7 +353,8 @@ out:
     return res;
 }
 
-int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout)
+int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command,
+                            uint32_t timeout)
 {
     unsigned cmdlen = strlen(command);
 
@@ -362,7 +367,11 @@ int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout
         return -1;
     }
 
-    if (at_expect_bytes(dev, CONFIG_AT_SEND_EOL AT_RECV_EOL_2, timeout)) {
+    // if (at_expect_bytes(dev, CONFIG_AT_SEND_EOL AT_RECV_EOL_2, timeout)) {
+    //     return -2;
+    // }
+    // LARA L6 just gives the prompt, no new line before
+    if (at_expect_bytes(dev, CONFIG_AT_SEND_EOL, timeout)) {
         return -2;
     }
 
@@ -378,7 +387,8 @@ int at_send_cmd_wait_ok(at_dev_t *dev, const char *command, uint32_t timeout)
     int res;
     char resp_buf[64];
 
-    res = at_send_cmd_get_resp(dev, command, resp_buf, sizeof(resp_buf), timeout);
+    res = at_send_cmd_get_resp(dev, command, resp_buf, sizeof(resp_buf),
+                               timeout);
 
     if (res > 0) {
         ssize_t len_ok = sizeof(CONFIG_AT_RECV_OK) - 1;
@@ -393,7 +403,8 @@ int at_send_cmd_wait_ok(at_dev_t *dev, const char *command, uint32_t timeout)
     return res;
 }
 
-ssize_t at_readline(at_dev_t *dev, char *resp_buf, size_t len, bool keep_eol, uint32_t timeout)
+ssize_t at_readline(at_dev_t *dev, char *resp_buf, size_t len, bool keep_eol,
+                    uint32_t timeout)
 {
     const char eol[] = AT_RECV_EOL_1 AT_RECV_EOL_2;
     assert(sizeof(eol) > 1);
