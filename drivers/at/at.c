@@ -358,19 +358,27 @@ int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout
     uart_write(dev->uart, (const uint8_t *)command, cmdlen);
     uart_write(dev->uart, (const uint8_t *)CONFIG_AT_SEND_EOL, AT_SEND_EOL_LEN);
 
-    if (at_expect_bytes(dev, command, timeout)) {
-        return -1;
+    if (!IS_ACTIVE(CONFIG_AT_SEND_SKIP_ECHO)) {
+        if (at_expect_bytes(dev, command, timeout)) {
+            return -1;
+        }
+        if (at_expect_bytes(dev, CONFIG_AT_SEND_EOL, timeout)) {
+            return -2;
+        }
+    }
+    // some modems (e.g. U-Blox LARA L6) reply '>' with no leading EOL
+    for (unsigned i = 0; i < sizeof(AT_RECV_EOL_1 AT_RECV_EOL_2 ">") - 1; i++) {
+        char c;
+        if (isrpipe_read_timeout(&dev->isrpipe, (uint8_t *)&c, 1, timeout) !=
+            1) {
+            return -ETIMEDOUT;
+        }
+        if (c == '>') {
+            return 0;
+        }
     }
 
-    if (at_expect_bytes(dev, CONFIG_AT_SEND_EOL AT_RECV_EOL_2, timeout)) {
-        return -2;
-    }
-
-    if (at_expect_bytes(dev, ">", timeout)) {
-        return -3;
-    }
-
-    return 0;
+    return -3;
 }
 
 int at_send_cmd_wait_ok(at_dev_t *dev, const char *command, uint32_t timeout)
