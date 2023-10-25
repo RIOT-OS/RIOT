@@ -444,6 +444,11 @@ extern "C" {
  */
 #define COAP_FORMAT_TM_JSON                 (433)
 /**
+ * @brief   Content-Type `application/dns-message`
+ * @see     [draft-ietf-core-dns-over-coap](https://datatracker.ietf.org/doc/draft-ietf-core-dns-over-coap/)
+ */
+#define COAP_FORMAT_DNS_MESSAGE             (553)
+/**
  * @brief   Content-Type `application/voucher-cose+cbor`
  * @see     [draft-ietf-anima-constrained-voucher](https://datatracker.ietf.org/doc/draft-ietf-anima-constrained-voucher/)
  * @note    Temporary registration until April 12, 2024.
@@ -500,7 +505,6 @@ extern "C" {
  * @see     [RFC 2318](https://www.w3.org/TR/SVG/mimereg.html)
  */
 #define COAP_FORMAT_IMAGE_SVG_XML         (30000)
-#define COAP_FORMAT_DNS_MESSAGE           (65053)       /**< NON STANDARD! */
 /** @} */
 
 /**
