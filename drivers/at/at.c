@@ -371,13 +371,12 @@ int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command,
             return -2;
         }
     }
-    // Some devices (e.g. U-Blox LARA L6) issue '>' with no leading EOL
-    int res;
-    for (unsigned i = 0; i < sizeof(AT_RECV_EOL_1 AT_RECV_EOL_2) - 1 + 1; i++) {
+    // some modems (e.g. U-Blox LARA L6) reply '>' with no leading EOL
+    for (unsigned i = 0; i < sizeof(AT_RECV_EOL_1 AT_RECV_EOL_2 ">") - 1; i++) {
         char c;
-        res = isrpipe_read_timeout(&dev->isrpipe, (uint8_t *)&c, 1, timeout);
-        if (res != 1) {
-            return res;
+        if (isrpipe_read_timeout(&dev->isrpipe, (uint8_t *)&c, 1, timeout) !=
+            1) {
+            return -ETIMEDOUT;
         }
         if (c == '>') {
             return 0;
