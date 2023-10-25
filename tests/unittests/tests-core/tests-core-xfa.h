@@ -27,6 +27,10 @@ typedef struct {
     const char *text;
 } xfatest_t;
 
+typedef struct {
+    const char text[31];
+} xfatest_noalign_t;
+
 #ifdef __cplusplus
 }
 #endif

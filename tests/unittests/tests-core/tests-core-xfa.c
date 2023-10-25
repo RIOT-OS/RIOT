@@ -20,6 +20,9 @@ XFA_INIT_CONST(xfatest_t, xfatest_const);
 XFA_USE(xfatest_t, xfatest_use);
 XFA_USE_CONST(xfatest_t, xfatest_use_const);
 
+XFA_INIT_CONST(xfatest_noalign_t, xfatest_noalign_const);
+XFA_INIT_CONST(xfatest_noalign_t, xfatest_noalign_const_sameprio);
+
 /* Verifying that cross file array linking is correct by iterating over an external array */
 static void test_xfa_data(void)
 {
@@ -128,6 +131,24 @@ static void test_xfa_use_const_data(void)
     TEST_ASSERT_EQUAL_INT(n, found);
 }
 
+static void test_xfa_noalign_const(void)
+{
+    unsigned n = XFA_LEN(xfatest_noalign_t, xfatest_noalign_const);
+    TEST_ASSERT_EQUAL_INT(3, n);
+    TEST_ASSERT_EQUAL_STRING("noalign const 3", xfatest_noalign_const[0].text);
+    TEST_ASSERT_EQUAL_STRING("noalign const 2", xfatest_noalign_const[1].text);
+    TEST_ASSERT_EQUAL_STRING("noalign const 1", xfatest_noalign_const[2].text);
+}
+
+static void test_xfa_noalign_const_sameprio(void)
+{
+    unsigned n = XFA_LEN(xfatest_noalign_t, xfatest_noalign_const_sameprio);
+    TEST_ASSERT_EQUAL_INT(3, n);
+    TEST_ASSERT_EQUAL_STRING("noalign const sameprio 3", xfatest_noalign_const_sameprio[0].text);
+    TEST_ASSERT_EQUAL_STRING("noalign const sameprio 2", xfatest_noalign_const_sameprio[1].text);
+    TEST_ASSERT_EQUAL_STRING("noalign const sameprio 1", xfatest_noalign_const_sameprio[2].text);
+}
+
 Test *tests_core_xfa_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -135,6 +156,8 @@ Test *tests_core_xfa_tests(void)
         new_TestFixture(test_xfa_const_data),
         new_TestFixture(test_xfa_use_data),
         new_TestFixture(test_xfa_use_const_data),
+        new_TestFixture(test_xfa_noalign_const),
+        new_TestFixture(test_xfa_noalign_const_sameprio),
     };
 
     EMB_UNIT_TESTCALLER(core_xfa_tests, NULL, NULL,
