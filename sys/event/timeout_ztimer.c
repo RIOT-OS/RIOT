@@ -29,6 +29,9 @@ void event_timeout_init(event_timeout_t *event_timeout, event_queue_t *queue, ev
 void event_timeout_ztimer_init(event_timeout_t *event_timeout, ztimer_clock_t *clock,
                                event_queue_t *queue, event_t *event)
 {
+    if (event_timeout->clock) {
+        ztimer_remove(event_timeout->clock, &event_timeout->timer);
+    }
     event_timeout->clock = clock;
     event_timeout->timer.callback = _event_timeout_callback;
     event_timeout->timer.arg = event_timeout;
