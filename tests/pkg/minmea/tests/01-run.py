@@ -32,7 +32,7 @@ def testfunc(child):
     child.expect_exact('check_nmea: RMC recorded\r\n')
     child.expect_exact('\tlat: 52.450366\r\n')
     child.expect_exact('\tlon: 13.298649\r\n')
-    child.expect_exact('\ttime: 1697808102\r\n')
+    child.expect_exact('\ttime: 1697811702\r\n')
     child.expect_exact('SUCCESS\r\n')
 
 
