@@ -1,0 +1,4 @@
+PSEUDOMODULES += arduino_adafruit_lsm9ds0_i2c
+PSEUDOMODULES += arduino_adafruit_lsm9ds0_spi
+
+INCLUDES += -I$(PKGDIRBASE)/arduino_adafruit_lsm9ds0
