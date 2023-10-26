@@ -26,6 +26,7 @@
 #define XFA_H
 
 #include <inttypes.h>
+#include "architecture.h"
 #include "compiler_hints.h"
 
 /*
@@ -76,6 +77,7 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
     _XFA_CONST(name, 0_) type name [0] = {}; \
     _XFA_CONST(name, 9_) type name ## _end [0] = {}; \
     _Pragma("GCC diagnostic pop") \
+    _Static_assert(__alignof__(type) >= ARCHITECTURE_WORD_BYTES, #type " is not aligned properly"); \
     extern const unsigned __xfa_dummy
 
 /**
@@ -97,6 +99,7 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
     _Pragma("GCC diagnostic ignored \"-Wpedantic\"") \
     _XFA(name, 0_) type name [0] = {}; \
     _XFA(name, 9_) type name ## _end [0] = {}; \
+    _Static_assert(__alignof__(type) >= ARCHITECTURE_WORD_BYTES, #type " is not aligned properly"); \
     _Pragma("GCC diagnostic pop") \
     extern const unsigned __xfa_dummy
 
@@ -138,6 +141,9 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  *
  *     XFA(driver_params, 0) driver_params_t _onboard = { .pin=42 };
  *
+ *
+ * @warning The `driver_params_t` struct must be aligned with the word size
+ *
  * @param[in]   xfa_name    name of the xfa
  * @param[in]   prio        priority within the xfa
  */
@@ -151,6 +157,8 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  * Add this to the type in a variable definition, e.g.:
  *
  *     XFA(driver_params, 0) driver_params_t _onboard = { .pin=42 };
+ *
+ * @warning The `driver_params_t` struct must be aligned with the word size
  *
  * @param[in]   xfa_name    name of the xfa
  * @param[in]   prio        priority within the xfa

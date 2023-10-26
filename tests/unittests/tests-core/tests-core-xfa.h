@@ -18,6 +18,8 @@
 #ifndef TESTS_CORE_XFA_H
 #define TESTS_CORE_XFA_H
 
+#include "architecture.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -27,7 +29,7 @@ typedef struct {
     const char *text;
 } xfatest_t;
 
-typedef struct {
+typedef struct WORD_ALIGNED {
     const char text[31];
 } xfatest_noalign_t;
 
