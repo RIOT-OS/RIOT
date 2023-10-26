@@ -10,6 +10,9 @@ TARGET_ARCH ?= $(TARGET_ARCH_CORTEXM)
 CFLAGS_CPU   = -mcpu=$(MCPU) -mlittle-endian -mthumb $(CFLAGS_FPU)
 
 ifneq (llvm,$(TOOLCHAIN))
+  # enable LTO by default
+  LTO ?= 1
+
   # Clang (observed with v3.7) does not understand  -mno-thumb-interwork, only add if
   # not building with LLVM
   CFLAGS += -mno-thumb-interwork
