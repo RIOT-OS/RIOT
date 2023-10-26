@@ -3,4 +3,8 @@ ifeq (,$(UNIT_TESTS))
   FEATURES_REQUIRED += periph_rtt
 endif
 
+ifneq (,$(filter ztimer_%,$(USEMODULE)))
+  USEMODULE += ztimer_no_periph_rtt
+endif
+
 USEMODULE += rtc_utils

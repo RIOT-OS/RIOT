@@ -1,5 +1,4 @@
 USEMODULE += rtt_rtc
-USEMODULE += ztimer_no_periph_rtt
 
 CFLAGS += -DMOCK_RTT_FREQUENCY=32
 CFLAGS += -DMOCK_RTT_MAX_VALUE=0xFFFF
