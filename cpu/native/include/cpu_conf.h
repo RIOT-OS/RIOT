@@ -28,24 +28,24 @@ extern "C" {
  * @{
  */
 #ifndef THREAD_STACKSIZE_DEFAULT
-#define THREAD_STACKSIZE_DEFAULT            (8192)
+#define THREAD_STACKSIZE_DEFAULT            (4*1024)
 #endif
 #ifndef THREAD_STACKSIZE_IDLE
-#define THREAD_STACKSIZE_IDLE               (THREAD_STACKSIZE_DEFAULT)
+#define THREAD_STACKSIZE_IDLE               (2048)
 #endif
 #ifndef THREAD_EXTRA_STACKSIZE_PRINTF
-#define THREAD_EXTRA_STACKSIZE_PRINTF       (4096)
+#define THREAD_EXTRA_STACKSIZE_PRINTF       (512)
 #endif
 #ifndef THREAD_EXTRA_STACKSIZE_PRINTF_FLOAT
 #define THREAD_EXTRA_STACKSIZE_PRINTF_FLOAT (4096)
 #endif
 /* for core/include/thread.h */
 #ifndef THREAD_STACKSIZE_MINIMUM
-#define THREAD_STACKSIZE_MINIMUM            (THREAD_STACKSIZE_DEFAULT)
+#define THREAD_STACKSIZE_MINIMUM            (sizeof(thread_t))
 #endif
 /* native internal */
 #ifndef ISR_STACKSIZE
-#define ISR_STACKSIZE                       (THREAD_STACKSIZE_DEFAULT)
+#define ISR_STACKSIZE                       (512U)
 #endif
 /** @} */
 

@@ -119,6 +119,12 @@ extern "C" {
  */
 #define AUTO_INIT_PRIO_MOD_GNRC_SIXLOWPAN               1140
 #endif
+#ifndef AUTO_INIT_PRIO_MOD_GNRC_IPV6_IPSEC
+/**
+ * @brief   GNRC IPSEC priority
+ */
+#define AUTO_INIT_PRIO_MOD_GNRC_IPV6_IPSEC               1141
+#endif
 #ifndef AUTO_INIT_PRIO_MOD_GNRC_IPV6
 /**
  * @brief   GNRC IPv6 priority

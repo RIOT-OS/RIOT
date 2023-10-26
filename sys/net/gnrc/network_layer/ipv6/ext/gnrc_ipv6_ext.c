@@ -34,6 +34,8 @@
          * defined(MODULE_GNRC_IPV6_EXT_FRAG) */
 
 #include "net/gnrc/ipv6/ext.h"
+#include "net/gnrc/ipv6/ipsec/ipsec.h"
+#include "net/gnrc/ipv6/ipsec/esp.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -125,11 +127,20 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_process_all(gnrc_pktsnip_t *pkt,
 #endif  /* defined(MODULE_GNRC_SIXLOWPAN_IPHC_NHC) &&
          * defined(MODULE_GNRC_IPV6_EXT_FRAG) */
         switch (*protnum) {
+            case PROTNUM_IPV6_EXT_AH:
+            case PROTNUM_IPV6_EXT_ESP:
+#ifdef MODULE_GNRC_IPV6_IPSEC
+                if ((pkt = _demux(pkt, *protnum)) == NULL) {
+                    DEBUG("ipv6: Rx error in esp handling\n");
+                    return NULL;
+                }
+                *protnum = gnrc_nettype_to_protnum(pkt->type);
+                is_ext = false;
+                break;
+#endif /* MODULE_GNRC_IPV6_IPSEC */
             case PROTNUM_IPV6_EXT_DST:
             case PROTNUM_IPV6_EXT_RH:
             case PROTNUM_IPV6_EXT_FRAG:
-            case PROTNUM_IPV6_EXT_AH:
-            case PROTNUM_IPV6_EXT_ESP:
             case PROTNUM_IPV6_EXT_MOB: {
                 ipv6_ext_t *ext_hdr;
                 uint8_t nh;
@@ -243,10 +254,10 @@ static inline bool _has_valid_size(gnrc_pktsnip_t *pkt, uint8_t protnum)
         case PROTNUM_IPV6_EXT_DST:
         case PROTNUM_IPV6_EXT_FRAG:
         case PROTNUM_IPV6_EXT_AH:
-        case PROTNUM_IPV6_EXT_ESP:
         case PROTNUM_IPV6_EXT_MOB:
             return ((ext->len * IPV6_EXT_LEN_UNIT) + IPV6_EXT_LEN_UNIT) <= pkt->size;
 
+        case PROTNUM_IPV6_EXT_ESP:
         default:
             return true;
     }
@@ -319,6 +330,18 @@ static gnrc_pktsnip_t *_demux(gnrc_pktsnip_t *pkt, unsigned protnum)
             /* Intentionally falls through */
         case PROTNUM_IPV6_EXT_AH:
         case PROTNUM_IPV6_EXT_ESP:
+            if (protnum == PROTNUM_IPV6_EXT_ESP)
+            {
+#ifdef MODULE_GNRC_IPV6_IPSEC
+                pkt = esp_header_process(pkt, protnum);
+                if (pkt == NULL) {
+                    DEBUG("ipv6_ext: Rx esp header processing failed or pkt was consumed by ext handling\n");
+                    return NULL;
+                }
+                break;
+#endif /* MODULE_GNRC_IPV6_IPSEC */
+            }
+            /* Intentionally falls through */
         case PROTNUM_IPV6_EXT_MOB:
             DEBUG("ipv6_ext: skipping over unsupported extension header\n");
             if (_mark_extension_header(pkt) == NULL) {

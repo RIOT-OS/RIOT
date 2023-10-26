@@ -706,4 +706,14 @@ ifneq (,$(filter wifi_scan_list,$(USEMODULE)))
   USEMODULE += l2scan_list
 endif
 
+ifneq (,$(filter ike,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_ipsec
+  USEMODULE += od
+  USEMODULE += sock_aux_local
+  USEMODULE += sock_udp
+
+  USEPKG += wolfssl
+  USEMODULE += wolfcrypt_dh
+endif
+
 include $(RIOTBASE)/sys/test_utils/Makefile.dep

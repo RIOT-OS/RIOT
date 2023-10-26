@@ -124,7 +124,7 @@ extern "C" {
  * @brief   Default stack size to use for the IPv6 thread
  */
 #ifndef GNRC_IPV6_STACK_SIZE
-#define GNRC_IPV6_STACK_SIZE        (THREAD_STACKSIZE_DEFAULT)
+#define GNRC_IPV6_STACK_SIZE        2 * (THREAD_STACKSIZE_DEFAULT)
 #endif
 
 /**

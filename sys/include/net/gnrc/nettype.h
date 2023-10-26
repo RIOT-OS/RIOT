@@ -94,6 +94,9 @@ typedef enum {
 #if IS_USED(MODULE_GNRC_NETTYPE_IPV6_EXT) || defined(DOXYGEN)
     GNRC_NETTYPE_IPV6_EXT,      /**< Protocol is IPv6 extension header */
 #endif
+#if IS_USED(MODULE_GNRC_NETTYPE_IPV6_EXT_ESP) || defined(DOXYGEN)
+    GNRC_NETTYPE_IPV6_EXT_ESP,      /**< Protocol is ESP */
+#endif
 #if IS_USED(MODULE_GNRC_NETTYPE_ICMPV6) || defined(DOXYGEN)
     GNRC_NETTYPE_ICMPV6,        /**< Protocol is ICMPv6 */
 #endif
