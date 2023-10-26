@@ -21,6 +21,9 @@
 #include "net/ethernet/hdr.h"
 #include "net/gnrc.h"
 #include "net/gnrc/netif/ethernet.h"
+#ifdef MODULE_GNRC_SCHC_ETH
+#include "net/gnrc/schc.h"
+#endif
 #include "net/netdev/eth.h"
 #ifdef MODULE_GNRC_IPV6
 #include "net/ipv6/hdr.h"
@@ -35,11 +38,11 @@
 
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif);
-#ifdef MODULE_GNRC_SIXLOENC
+#if IS_USED(MODULE_GNRC_SIXLOENC) || IS_USED(MODULE_GNRC_SCHC_ETH)
 static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt);
-#else
+#else   /* IS_USED(MODULE_GNRC_SIXLOENC) || IS_USED(MODULE_GNRC_SCHC_ETH) */
 #define _set    gnrc_netif_set_from_netdev
-#endif /* MODULE_GNRC_SIXLOENC */
+#endif  /* IS_USED(MODULE_GNRC_SIXLOENC) || IS_USED(MODULE_GNRC_SCHC_ETH) */
 
 static char addr_str[ETHERNET_ADDR_LEN * 3];
 
@@ -266,10 +269,12 @@ safe_out:
     return NULL;
 }
 
-#ifdef MODULE_GNRC_SIXLOENC
+#if IS_USED(MODULE_GNRC_SIXLOENC) || IS_USED(MODULE_GNRC_SCHC_ETH)
 static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
 {
-    if (opt->opt == NETOPT_6LO) {
+    switch (opt->opt) {
+#if IS_USED(MODULE_GNRC_SIXLOENC)
+    case NETOPT_6LO:
         assert(opt->data_len == sizeof(netopt_enable_t));
         if (*((netopt_enable_t *)opt->data) == NETOPT_ENABLE) {
             netif->flags |= (GNRC_NETIF_FLAGS_6LO | GNRC_NETIF_FLAGS_6LO_HC |
@@ -280,8 +285,23 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
                               GNRC_NETIF_FLAGS_6LN);
         }
         return sizeof(netopt_enable_t);
+#endif
+#if IS_USED(MODULE_GNRC_SCHC_ETH)
+    case NETOPT_SCHC:
+        assert(opt->data_len == sizeof(netopt_enable_t));
+        if (*((netopt_enable_t *)opt->data) == NETOPT_ENABLE) {
+            netif->flags |= GNRC_NETIF_FLAGS_SCHC;
+            gnrc_schc_netif_init(netif);
+        }
+        else {
+            netif->flags &= ~GNRC_NETIF_FLAGS_SCHC;
+        }
+        return sizeof(netopt_enable_t);
+#endif
+    default:
+        break;
     }
     return gnrc_netif_set_from_netdev(netif, opt);
 }
-#endif /* MODULE_GNRC_SIXLOENC */
+#endif /* IS_USED(MODULE_GNRC_SIXLOENC) || IS_USED(MODULE_GNRC_SCHC_ETH) */
 /** @} */

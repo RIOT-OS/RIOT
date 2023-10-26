@@ -10,3 +10,7 @@ INCLUDES += -I$(PKGDIRBASE)/libschc
 
 PSEUDOMODULES += libschc_coap
 PSEUDOMODULES += libschc_udpv6
+
+ifneq (,$(filter libschc_gnrc,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/libschc/contrib/gnrc/
+endif

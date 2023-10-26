@@ -6,4 +6,8 @@ ifneq (,$(filter libschc,$(USEPKG)))
   USEMODULE += libschc_udpv6
 endif
 
+ifneq (,$(filter libschc_gnrc,$(USEMODULE)))
+  USEMODULE += gnrc_schc
+endif
+
 FEATURES_BLACKLIST += arch_8bit arch_16bit arch_esp8266

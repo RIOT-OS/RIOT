@@ -62,6 +62,7 @@ static const struct {
     netopt_t opt;
 } flag_cmds[] = {
     { "6lo", NETOPT_6LO },
+    { "schc", NETOPT_SCHC },
     { "ack_req", NETOPT_ACK_REQ },
     { "gts", NETOPT_GTS_TX },
     { "pan_coord", NETOPT_PAN_COORD },
@@ -879,7 +880,7 @@ static void _netif_list(netif_t *iface)
     }
     line_thresh = _netif_list_flag(iface, NETOPT_IPV6_FORWARDING, "RTR  ",
                                    line_thresh);
-#ifndef MODULE_GNRC_SIXLOWPAN_IPHC
+#if !IS_USED(MODULE_GNRC_SIXLOWPAN_IPHC) && !IS_USED(MODULE_GNRC_SCHC)
     line_thresh += _LINE_THRESHOLD + 1; /* enforce linebreak after this option */
 #endif
     line_thresh = _netif_list_flag(iface, NETOPT_IPV6_SND_RTR_ADV, "RTR_ADV  ",
@@ -888,9 +889,17 @@ static void _netif_list(netif_t *iface)
     line_thresh = _netif_list_flag(iface, NETOPT_6LO, "6LO  ", line_thresh);
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
+#if !IS_USED(MODULE_GNRC_SCHC)
     line_thresh += _LINE_THRESHOLD + 1; /* enforce linebreak after this option */
+#endif
     line_thresh = _netif_list_flag(iface, NETOPT_6LO_IPHC, "IPHC  ",
                                    line_thresh);
+#endif
+#ifdef MODULE_GNRC_SCHC
+#if !IS_USED(MODULE_GNRC_SIXLOWPAN_IPHC)
+    line_thresh += _LINE_THRESHOLD + 1; /* enforce linebreak after this option */
+#endif
+    line_thresh = _netif_list_flag(iface, NETOPT_SCHC, "SCHC  ", line_thresh);
 #endif
 #endif
     res = netif_get_opt(iface, NETOPT_SRC_LEN, 0, &u16, sizeof(u16));

@@ -293,6 +293,12 @@ int l2util_ndp_addr_len_from_l2ao(int dev_type,
                     return -EINVAL;
             }
 #endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE) */
+#if defined(MODULE_GNRC_NETIF_LORAWAN)
+        case NETDEV_TYPE_LORA:
+
+            (void)opt;
+            return 4U;
+#endif
 #if defined(MODULE_NRF24L01P_NG)
         case NETDEV_TYPE_NRF24L01P_NG:
             (void)opt;

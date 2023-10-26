@@ -1,0 +1,6 @@
+ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
+  KCONFIG_ADD_CONFIG += $(CURDIR)/lorawan.config
+  SHOULD_RUN_KCONFIG = 1
+  # include custom rules for SCHC over LoRaWAN
+  INCLUDES += -I$(CURDIR)/schc_lorawan/include
+endif

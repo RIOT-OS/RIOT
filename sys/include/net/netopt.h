@@ -562,6 +562,13 @@ typedef enum {
     NETOPT_6LO_IPHC,
 
     /**
+     * @brief   (@ref netopt_enable_t) SCHC support
+     *
+     * @see [RFC 8724](https://tools.ietf.org/html/rfc8724)
+     */
+    NETOPT_SCHC,
+
+    /**
      * @brief   (uint8_t) retry amount from missing ACKs of the last transmission
      *
      * This retrieves the number of retries needed for the last transmission.

@@ -196,6 +196,12 @@ PSEUDOMODULES += gnrc_nettype_lwmac
 PSEUDOMODULES += gnrc_nettype_ndn
 ## @}
 
+## @defgroup 	net_gnrc_nettype_schc  		gnrc_nettype_schc
+## Enables @ref GNRC_NETTYPE_SCHC
+## @{
+PSEUDOMODULES += gnrc_nettype_schc
+## @}
+
 ## @defgroup 	net_gnrc_nettype_sixlowpan  gnrc_nettype_sixlowpan
 ## Enables @ref GNRC_NETTYPE_SIXLOWPAN
 ## @{
@@ -264,6 +270,13 @@ PSEUDOMODULES += gnrc_sixlowpan_router_default
 ## @deprecated  Use module `shell_cmd_gnrc_udp` instead;
 ##              will be removed after 2023.07 release.
 PSEUDOMODULES += gnrc_udp_cmd
+## @}
+## @defgroup  net_gnrc_schc_eth  gnrc_schc_eth: Experimental SCHC-support for Ethernet
+## @ingroup   net_gnrc_schc
+##
+## Uses @ref ETHERTYPE_802EXP to encode SCHC packets in Ethernet frames.
+## @{
+PSEUDOMODULES += gnrc_schc_eth
 ## @}
 PSEUDOMODULES += gnrc_sock_async
 PSEUDOMODULES += gnrc_sock_check_reuse

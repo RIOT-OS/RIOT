@@ -14,6 +14,7 @@ if KCONFIG_USEMODULE_GNRC_PKTBUF_STATIC
 
 config GNRC_PKTBUF_SIZE
     int "Maximum size of the static packet buffer"
+    default 4096 if USEMODULE_GNRC_SCHC
     default 6144
     help
         Set the value to 0 to allow dynamic memory management to allocate

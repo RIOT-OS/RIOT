@@ -18,6 +18,8 @@
 #ifndef NET_GNRC_NETIF_LORAWAN_H
 #define NET_GNRC_NETIF_LORAWAN_H
 
+#include "net/eui64.h"
+
 #include "net/gnrc/lorawan.h"
 
 #include "ztimer.h"
@@ -176,6 +178,20 @@ static inline int gnrc_netif_lorawan_set_nwksenckey(gnrc_netif_lorawan_t *lw_net
 #endif
     return 0;
 }
+
+/**
+ * @brief   Generates the IPv6 IID according to RFC 9011
+ *
+ * @see [RFC 9011, section 5.3](https://www.rfc-editor.org/rfc/rfc9011.html#section-5.3)
+ *
+ * @param[in] netif A network interface
+ * @param[out] iid The IPv6 IID for @p netif
+ *
+ * @return  sizeof(eui64), on success.
+ * @return  -ENOTSUP, if no SCHC support is provided.
+ * @return  -ENOTCONN, if device is not joined.
+ */
+int gnrc_netif_lorawan_ipv6_iid(gnrc_netif_lorawan_t *netif, eui64_t *iid);
 
 #ifdef __cplusplus
 }
