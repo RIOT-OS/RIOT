@@ -56,11 +56,37 @@ fi
 # - LOGFILE to parse GitHub annotations into
 github_annotate_setup
 
+# include paths for sources in cpu and boards depend on the board being used.
+FILES=$(echo "$FILES" | grep -v -e '^\(cpu\|boards\)\/')
+
+: "${CFLAGS:="$(cat "${RIOTTOOLS}/cppcheck/defines_samr21-xpro.txt")"}"
+: "${INCLUDE_DIRS_BOARD:="${RIOTTOOLS}/cppcheck/include_dirs_samr21-xpro.txt"}"
+: "${PLATFORM:="${RIOTTOOLS}/cppcheck/platform_cortexm.xml"}"
+
+# add all folders named "include" located in core, in sys, or in drivers as
+# include paths
+INCLUDE_DIRS=$(mktemp /tmp/cppcheck_include_folders_XXXXXX.txt)
+find core drivers sys -name include -type d | sort > "${INCLUDE_DIRS}"
+
 # TODO: switch back to 8 jobs when/if cppcheck issue is resolved
-cppcheck --std=c99 --enable=style --force --error-exitcode=2 --quiet -j 1 \
-         --template "{file}:{line}: {severity} ({id}): {message}"         \
-         --inline-suppr ${DEFAULT_SUPPRESSIONS} ${CPPCHECK_OPTIONS} ${@}  \
-         ${FILES} 2>&1 | ${LOG} 1>&2
+cppcheck \
+    --std=c11 \
+    --enable=style \
+    --error-exitcode=2 \
+    --quiet \
+    --force \
+    -j 8 \
+    --template "{file}:{line}: {severity} ({id}): {message}" \
+    --inline-suppr ${DEFAULT_SUPPRESSIONS} \
+    ${CPPCHECK_OPTIONS} \
+    --platform="${PLATFORM}" \
+    --includes-file="${INCLUDE_DIRS_BOARD}" \
+    --includes-file="${INCLUDE_DIRS}" \
+    --max-configs=1 \
+    ${CFLAGS} \
+    ${FILES} 2>&1 | ${LOG} 1>&2
+
+rm -f "${INCLUDE_DIRS}"
 
 RESULT=${PIPESTATUS[0]}
 
