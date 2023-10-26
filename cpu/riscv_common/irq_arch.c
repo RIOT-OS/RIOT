@@ -160,7 +160,7 @@ static void handle_trap(uword_t mcause)
 /* Marking this as interrupt to ensure an mret at the end, provided by the
  * compiler. Aligned to 64-byte boundary as per RISC-V spec and required by some
  * of the supported platforms (gd32)*/
-__attribute((aligned(64)))
+__attribute((aligned(64), no_profile_instrument_function))
 static void __attribute__((interrupt)) trap_entry(void)
 {
     __asm__ volatile (

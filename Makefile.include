@@ -892,6 +892,10 @@ cleanterm: $(TERMDEPS)
 	$(call check_cmd,$(TERMPROG),Terminal program)
 	$(TERMPROG) $(TERMFLAGS) $(TERMTEE)
 
+coverage: export PYTERMFLAGS += --exit-on-match=^GCOV_COVERAGE_DUMP_END\$
+coverage: $(TERMDEPS)
+	${MAKE} cleanterm | "$(RIOTBASE)/./dist/tools/coverage/coverage.py" -i -
+
 list-ttys:
 	$(Q)$(RIOTTOOLS)/usb-serial/ttys.py
 

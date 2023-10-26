@@ -112,6 +112,7 @@ class SerCmd(cmd.Cmd):
                  log_dir_name=None, newline=None, formatter=None,
                  set_rts=None, set_dtr=None, serprompt=None,
                  repeat_command_on_empty_line=defaultrepeat_cmd_empty_line,
+                 line_regex=None,
                  reconnect=defaultreconnect):
         """Constructor.
 
@@ -145,6 +146,10 @@ class SerCmd(cmd.Cmd):
         self.reconnect = reconnect
         if formatter is not None:
             self.fmt_str = formatter
+        if line_regex is not None:
+            self.line_regex = re.compile(line_regex)
+        else:
+            self.line_regex = None
 
         if not self.host:
             self.host = defaulthostname
@@ -635,6 +640,7 @@ class SerCmd(cmd.Cmd):
         Args:
             line (str): input line from node.
         """
+
         # First check if line should be ignored
         ignored = False
         if (len(self.ignores)):
@@ -652,6 +658,10 @@ class SerCmd(cmd.Cmd):
         else:
             if not ignored:
                 self.process_line(line)
+
+        if self.line_regex and self.line_regex.match(line):
+            self.do_PYTERM_exit("")
+            os._exit(0)
 
     def serial_connect(self):
         self.ser = serial.Serial(port=self.port, dsrdtr=0, rtscts=0, exclusive=1)
@@ -891,6 +901,10 @@ if __name__ == "__main__":
                         action="store_false",
                         help="Do not try to reconnect when failing on "
                              "connection setup (Default)")
+    parser.add_argument("--exit-on-match",
+                        dest='line_regex',
+                        help="Exit after encoutering line which matches "
+                             "the given regex")
     parser.set_defaults(
         repeat_command_on_empty_line=defaultrepeat_cmd_empty_line,
         reconnect=defaultreconnect)
@@ -903,7 +917,7 @@ if __name__ == "__main__":
                      args.directory, args.config, args.host, args.run_name,
                      args.log_dir_name, args.newline, args.format,
                      args.set_rts, args.set_dtr, args.prompt,
-                     args.repeat_command_on_empty_line)
+                     args.repeat_command_on_empty_line, args.line_regex)
     myshell.prompt = ''
 
     try:

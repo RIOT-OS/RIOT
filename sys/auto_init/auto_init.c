@@ -344,6 +344,11 @@ extern void auto_init_gnrc_ipv6_static_addr(void);
 AUTO_INIT(auto_init_gnrc_ipv6_static_addr,
           AUTO_INIT_PRIO_MOD_GNRC_IPV6_STATIC_ADDR);
 #endif
+#if IS_USED(MODULE_COVERAGE)
+extern void auto_init_sys_coverage(void);
+AUTO_INIT(auto_init_sys_coverage,
+          AUTO_INIT_PRIO_MOD_sys_coverage);
+#endif
 
 void auto_init(void)
 {
