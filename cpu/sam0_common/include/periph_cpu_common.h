@@ -789,6 +789,31 @@ typedef struct {
 } adc_conf_chan_t;
 
 /**
+ * @brief   Define default ADC type identifier
+ */
+typedef uint_fast8_t adc_t;
+
+/**
+ * @brief Get positive ADC pin
+ *
+ * @param[in] line  the ADC line to query
+ *
+ * @return The pin used for the positive ADC component
+ *         `GPIO_UNDEF` if the ADC line is not mapped to a GPIO
+ */
+gpio_t adc_pin_pos(adc_t line);
+
+/**
+ * @brief Get negative ADC pin
+ *
+ * @param[in] line  the ADC line to query
+ *
+ * @return The pin used for the negative ADC component
+ *         `GPIO_UNDEF` if the ADC line is not mapped to a GPIO
+ */
+gpio_t adc_pin_neg(adc_t line);
+
+/**
  * @brief Compatibility define for muxpos struct member
  *        Unused on all platforms that have DIFFMODE in CTRLB
  */

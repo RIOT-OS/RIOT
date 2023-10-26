@@ -250,6 +250,44 @@ static int _adc_configure(Adc *dev, adc_res_t res)
     return 0;
 }
 
+gpio_t adc_pin_pos(adc_t line)
+{
+#ifdef ADC0
+    const uint8_t adc = adc_channels[line].dev == ADC1 ? 1 : 0;
+#else
+    const uint8_t adc = 0;
+#endif
+
+    uint8_t muxpos = (adc_channels[line].inputctrl & ADC_INPUTCTRL_MUXPOS_Msk)
+                   >> ADC_INPUTCTRL_MUXPOS_Pos;
+
+    if (muxpos < 0x18) {
+        assert(muxpos < ARRAY_SIZE(sam0_adc_pins[adc]));
+        return sam0_adc_pins[adc][muxpos];
+    } else {
+        return GPIO_UNDEF;
+    }
+}
+
+gpio_t adc_pin_neg(adc_t line)
+{
+#ifdef ADC0
+    const uint8_t adc = adc_channels[line].dev == ADC1 ? 1 : 0;
+#else
+    const uint8_t adc = 0;
+#endif
+
+    uint8_t muxneg = (adc_channels[line].inputctrl & ADC_INPUTCTRL_MUXNEG_Msk)
+                   >> ADC_INPUTCTRL_MUXNEG_Pos;
+
+    if (adc_channels[line].inputctrl & ADC_INPUTCTRL_DIFFMODE) {
+        assert(muxneg < ARRAY_SIZE(sam0_adc_pins[adc]));
+        return sam0_adc_pins[adc][muxneg];
+    } else {
+        return GPIO_UNDEF;
+    }
+}
+
 int adc_init(adc_t line)
 {
     if (line >= ADC_NUMOF) {
@@ -257,31 +295,19 @@ int adc_init(adc_t line)
         return -1;
     }
 
-#ifdef ADC0
-    const uint8_t adc = adc_channels[line].dev == ADC1 ? 1 : 0;
-#else
-    const uint8_t adc = 0;
-#endif
-
-    _prep();
-
-    uint8_t muxpos = (adc_channels[line].inputctrl & ADC_INPUTCTRL_MUXPOS_Msk)
-                   >> ADC_INPUTCTRL_MUXPOS_Pos;
-    uint8_t muxneg = (adc_channels[line].inputctrl & ADC_INPUTCTRL_MUXNEG_Msk)
-                   >> ADC_INPUTCTRL_MUXNEG_Pos;
+    gpio_t pin_pos = adc_pin_pos(line);
+    gpio_t pin_neg = adc_pin_neg(line);
 
     /* configure positive input pin */
-    if (muxpos < 0x18) {
-        assert(muxpos < ARRAY_SIZE(sam0_adc_pins[adc]));
-        gpio_init(sam0_adc_pins[adc][muxpos], GPIO_IN);
-        gpio_init_mux(sam0_adc_pins[adc][muxpos], GPIO_MUX_B);
+    if (gpio_is_valid(pin_pos)) {
+        gpio_init(pin_pos, GPIO_IN);
+        gpio_init_mux(pin_pos, GPIO_MUX_B);
     }
 
     /* configure negative input pin */
-    if (adc_channels[line].inputctrl & ADC_INPUTCTRL_DIFFMODE) {
-        assert(muxneg < ARRAY_SIZE(sam0_adc_pins[adc]));
-        gpio_init(sam0_adc_pins[adc][muxneg], GPIO_IN);
-        gpio_init_mux(sam0_adc_pins[adc][muxneg], GPIO_MUX_B);
+    if (gpio_is_valid(pin_neg)) {
+        gpio_init(pin_neg, GPIO_IN);
+        gpio_init_mux(pin_neg, GPIO_MUX_B);
     }
 
     _done();
