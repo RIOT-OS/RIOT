@@ -322,7 +322,14 @@ static void handle_input_line(const shell_command_t *command_list, char *line)
             shell_post_command_hook(res, argc, argv);
         }
         else {
-            handler(argc, argv);
+            int res = handler(argc, argv);
+            if (res < 0) {
+                if (IS_ACTIVE(DEVELHELP)) {
+                    puts(strerror(-res));
+                } else {
+                    printf("error: %d\n", res);
+                }
+            }
         }
     }
     else {
