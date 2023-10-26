@@ -166,6 +166,15 @@ static void test_ipv4_addr_from_str__success2(void)
     TEST_ASSERT(ipv4_addr_equal(&sock_dns_mock_example_com_addr_ipv4, &address));
 }
 
+static void test_ipv6_addr_from_str__success3(void)
+{
+    static const ipv4_addr_t a = IPV4_ADDR_LOOPBACK;
+    ipv4_addr_t address;
+
+    TEST_ASSERT_NOT_NULL(ipv4_addr_from_str(&address, "127.0.0.1"));
+    TEST_ASSERT(ipv4_addr_equal(&a, &address));
+}
+
 Test *tests_netutils_ipv4_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -176,6 +185,7 @@ Test *tests_netutils_ipv4_tests(void)
         new_TestFixture(test_ipv4_addr_from_str__address_NULL),
         new_TestFixture(test_ipv4_addr_from_str__success),
         new_TestFixture(test_ipv4_addr_from_str__success2),
+        new_TestFixture(test_ipv6_addr_from_str__success3),
     };
 
     EMB_UNIT_TESTCALLER(ipv4_addr_tests, NULL, NULL, fixtures);

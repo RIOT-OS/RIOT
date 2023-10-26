@@ -36,6 +36,11 @@ void ipv4_addr_print(const ipv4_addr_t *addr)
     }
 }
 
+const ipv4_addr_t ipv4_addr_none = IPV4_ADDR_NONE;
+const ipv4_addr_t ipv4_addr_loopback = IPV4_ADDR_LOOPBACK;
+const ipv4_addr_t ipv4_addr_any = IPV4_ADDR_ANY;
+const ipv4_addr_t ipv4_addr_broadcast = IPV4_ADDR_BROADCAST;
+
 /**
  * @}
  */
