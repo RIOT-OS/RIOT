@@ -17,10 +17,12 @@ DEVELHELP ?= 1
 # Include uwb-core, uwb-dw1000
 USEPKG += uwb-core
 USEPKG += uwb-dw1000
-# Use event threads instead of a custom event queue
+## Use event threads instead of a custom event queue
 USEMODULE += uwb-core_event_thread
 CFLAGS += -DEVENT_THREAD_MEDIUM_STACKSIZE=THREAD_STACKSIZE_DEFAULT
 
+# Include TWR helper modules
+USEMODULE += uwb-core_twr
 # Include all ranging algorithms
 USEMODULE += uwb-core_twr_ss
 USEMODULE += uwb-core_twr_ss_ack
@@ -34,11 +36,6 @@ USEMODULE += uwb-core_twr_ds_ext
 USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += ps
-USEMODULE += l2util
-USEMODULE += event_callback
-USEMODULE += event_timeout_ztimer
-USEMODULE += event_periodic
-USEMODULE += test_utils_result_output
 
 # Collision between defines of Silabs SDK and mynewt-core
 BOARD_BLACKLIST := xg23-pk6068a

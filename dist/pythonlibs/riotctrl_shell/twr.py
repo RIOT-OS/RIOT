@@ -8,9 +8,41 @@
 twr-aloha shell interactions
 """
 
+from dataclasses import dataclass
+import json
 import re
+from typing import Union
 
 from riotctrl.shell import ShellInteraction, ShellInteractionParser
+
+TWR_LISTEN_ON_CMD_OUTPUT = "[twr]: start listening"
+TWR_LISTEN_OFF_CMD_OUTPUT = "[twr]: stop listening"
+TWR_REQUEST_CMD_OUTPUT = "[twr]: start ranging"
+
+
+@dataclass
+class TwrData:
+    t: int
+    src: str
+    dst: str
+    d_cm: Union[int, float]
+
+    @staticmethod
+    def from_json_str(json_string: str):
+        json_dict = json.loads(json_string)
+        return TwrData(**json_dict)
+
+
+class TwrRequestParser(ShellInteractionParser):
+    def parse(self, cmd_output):
+        d_cm = []
+        for line in cmd_output.splitlines():
+            try:
+                twr_data = TwrData.from_json_str(line)
+            except json.decoder.JSONDecodeError:
+                continue
+            d_cm.append(twr_data.d_cm)
+        return d_cm
 
 
 class TwrIfconfigParser(ShellInteractionParser):
@@ -60,9 +92,11 @@ class TwrCmd(ShellInteraction):
             args=("lst", "on" if on else "off"), timeout=timeout, async_=async_
         )
 
-    def twr_req(self, addr="ff:ff", count=1, interval=1000, proto="ss", timeout=-1, async_=False):
+    def twr_request(
+        self, addr="ff:ff", count=1, itvl=1000, proto="ss", timeout=-1, async_=False
+    ):
         return self.twr_cmd(
-            args=("req", f"{addr}", f"-c {count}", f"-p {proto}", f"-i {interval}"),
+            args=("req", f"{addr}", f"-c {count}", f"-p {proto}", f"-i {itvl}"),
             timeout=timeout,
             async_=async_,
         )

@@ -24,6 +24,7 @@
 #if IS_USED(MODULE_UWB_CORE_EVENT_THREAD)
 #include "event/thread.h"
 #endif
+#include "uwb/uwb_ftypes.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,6 +50,21 @@ extern "C" {
 #ifndef UWB_CORE_STACKSIZE
 #define UWB_CORE_STACKSIZE              (THREAD_STACKSIZE_DEFAULT)
 #endif
+
+/**
+ * @brief TWR protocols
+ */
+typedef enum {
+    TWR_PROTOCOL_NONE   = 0,
+    TWR_PROTOCOL_SS     = UWB_DATA_CODE_SS_TWR,     /**< single sided twr */
+    TWR_PROTOCOL_SS_ACK = UWB_DATA_CODE_SS_TWR_ACK, /**< single sided twr with
+                                                         hw ACK as response */
+    TWR_PROTOCOL_SS_EXT = UWB_DATA_CODE_SS_TWR_EXT, /**< single sided twr with
+                                                         extended frames */
+    TWR_PROTOCOL_DS     = UWB_DATA_CODE_DS_TWR,     /**< double sided twr */
+    TWR_PROTOCOL_DS_ACK = UWB_DATA_CODE_DS_TWR_EXT, /**< double sided twr with
+                                                         extended frames */
+} twr_protocol_t;
 
 /**
  * @brief   Setup and run uwb-core thread

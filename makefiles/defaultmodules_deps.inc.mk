@@ -9,7 +9,6 @@ endif
 ifneq (,$(filter auto_init_ztimer,$(USEMODULE)))
   USEMODULE += ztimer_init
 endif
-
 ifneq (,$(filter ztimer_auto_adjust,$(USEMODULE)))
   USEMODULE += ztimer_overhead
 endif
@@ -26,4 +25,8 @@ ifneq (,$(filter xtimer,$(USEMODULE)))
   ifeq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
     USEMODULE += div
   endif
+endif
+
+ifneq (,$(filter auto_init_uwb-core,$(USEMODULE)))
+  USEMODULE += uwb-core_init
 endif
