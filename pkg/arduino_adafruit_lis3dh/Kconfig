@@ -1,0 +1,33 @@
+# Copyright (c) 2021 Gunar Schorcht
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config PACKAGE_ARDUINO_ADAFRUIT_LIS3DH
+    bool "Arduino Adafruit LIS3DH driver package"
+    depends on TEST_KCONFIG
+    select PACKAGE_ARDUINO_ADAFRUIT_SENSOR
+    help
+        Arduino driver package for the Adafruit Adafruit LIS3DH
+        Triple-Axis Accelerometer breakout with ST LIS3DH sensor
+
+choice MODULE_ARDUINO_LIS3DH
+    bool "Device Interface"
+    depends on PACKAGE_ARDUINO_ADAFRUIT_LIS3DH
+    help
+        The driver supports LIS3DH connected either via SPI or
+        I2C bus.
+
+    config MODULE_ARDUINO_ADAFRUIT_LIS3DH_I2C
+        bool "I2C"
+        depends on HAS_PERIPH_I2C
+        select MODULE_PERIPH_I2C
+
+    config MODULE_ARDUINO_ADAFRUIT_LIS3DH_SPI
+        bool "SPI"
+        depends on HAS_PERIPH_SPI
+        select MODULE_PERIPH_SPI
+
+endchoice

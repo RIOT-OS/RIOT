@@ -1,0 +1,4 @@
+PSEUDOMODULES += arduino_adafruit_lis3dh_i2c
+PSEUDOMODULES += arduino_adafruit_lis3dh_spi
+
+INCLUDES += -I$(PKGDIRBASE)/arduino_adafruit_lis3dh
