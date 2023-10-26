@@ -24,6 +24,8 @@
 #include <string.h>
 #include <sys/types.h>
 
+#include "architecture.h"
+#include "cpu.h"
 #include "mutex.h"
 #include "od.h"
 #include "utlist.h"
@@ -211,9 +213,18 @@ int gnrc_pktbuf_realloc_data(gnrc_pktsnip_t *pkt, size_t size)
 
 void gnrc_pktbuf_hold(gnrc_pktsnip_t *pkt, unsigned int num)
 {
+    uinttxtptr_t pc;
+    if (IS_USED(MODULE_GNRC_PKTBUF_TRACING)) {
+        pc = cpu_get_caller_pc();
+    }
     mutex_lock(&gnrc_pktbuf_mutex);
     while (pkt) {
         pkt->users += num;
+        if (IS_USED(MODULE_GNRC_PKTBUF_TRACING)) {
+            printf("[pkt] increased refcount of %p by %u to %u users @ 0x%"
+                    PRIxTXTPTR "\n",
+                   (void *)pkt, num, pkt->users, pc);
+        }
         pkt = pkt->next;
     }
     mutex_unlock(&gnrc_pktbuf_mutex);
@@ -376,6 +387,10 @@ static gnrc_pktsnip_t *_create_snip(gnrc_pktsnip_t *next, const void *data, size
         }
     }
     _set_pktsnip(pkt, next, _data, size, type);
+    if (IS_USED(MODULE_GNRC_PKTBUF_TRACING)) {
+        printf("[pkt] created %p\n", (void *)pkt);
+    }
+
     return pkt;
 }
 

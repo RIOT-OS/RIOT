@@ -476,7 +476,7 @@ ifneq (,$(filter gnrc,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_pktbuf, $(USEMODULE)))
-  ifeq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
+  ifeq (,$(filter gnrc_pktbuf_static gnrc_pktbuf_dynamic, $(USEMODULE)))
     USEMODULE += gnrc_pktbuf_static
   endif
   ifeq (shell_cmd_gnrc_pktbuf,$(filter gnrc_pktbuf_%, $(USEMODULE)))

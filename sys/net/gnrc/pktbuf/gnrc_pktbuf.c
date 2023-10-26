@@ -13,6 +13,10 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
+#include <stdio.h>
+
+#include "architecture.h"
+#include "cpu.h"
 #include "mutex.h"
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/tx_sync.h"
@@ -87,8 +91,20 @@ int gnrc_pktbuf_merge(gnrc_pktsnip_t *pkt)
 
 void gnrc_pktbuf_release_error(gnrc_pktsnip_t *pkt, uint32_t err)
 {
+    uinttxtptr_t pc;
+    if (IS_USED(MODULE_GNRC_PKTBUF_TRACING)) {
+        pc = cpu_get_caller_pc();
+    }
     mutex_lock(&gnrc_pktbuf_mutex);
     while (pkt) {
+        if (IS_USED(MODULE_GNRC_PKTBUF_TRACING)) {
+            if (!IS_WORD_ALIGNED(pkt)) {
+                printf("[pkt] releasing unaligned pkt %p @ 0x%" PRIxTXTPTR "\n",
+                       (void *)pkt, pc);
+            }
+            printf("[pkt] releasing %p with %u users @ 0x%" PRIxTXTPTR "\n",
+                   (void *)pkt, pkt->users, pc);
+        }
         gnrc_pktsnip_t *tmp;
         assert(gnrc_pktbuf_contains(pkt));
         assert(pkt->users > 0);

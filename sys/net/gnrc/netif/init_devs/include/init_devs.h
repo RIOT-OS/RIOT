@@ -28,14 +28,28 @@
 extern "C" {
 #endif
 
+#if MODULE_GNRC_PKTBUF_TRACING || DOXYGEN
 /**
+ * @brief   Additional stacksize needed for gnrc_pktbuf_tracing
+ *
+ * The actual value depends on the used modules. If
+ * @ref pseudomodule_gnrc_pktbuf_tracing_tracing is ***not*** used, it will
+ * be `0`
+ */
+#define GNRC_NETIF_STACKSIZE_EXTRA THREAD_EXTRA_STACKSIZE_PRINTF
+#else
+#define GNRC_NETIF_STACKSIZE_EXTRA 0
+#endif
+
+    /**
  * @brief   stack size of a netif thread
  *
  *          Message queue was previously allocated on the stack, reduce
  *          stack size by default msg queue size to keep the RAM use the same
  */
 #ifndef GNRC_NETIF_STACKSIZE_DEFAULT
-#define GNRC_NETIF_STACKSIZE_DEFAULT    (THREAD_STACKSIZE_DEFAULT - 128)
+#define GNRC_NETIF_STACKSIZE_DEFAULT    (THREAD_STACKSIZE_DEFAULT - 128 \
+                                         + GNRC_NETIF_STACKSIZE_EXTRA)
 #endif
 
 /**
