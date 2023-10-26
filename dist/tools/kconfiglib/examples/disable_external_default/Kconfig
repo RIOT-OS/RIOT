@@ -1,0 +1,21 @@
+config MODULE_FOO
+    bool "Foo"
+    depends on FOO_DEP
+
+module = FOO
+rsource "Kconfig.template.disable_default"
+
+config MODULE_DEFAULT_FOO
+    bool "Enable FOO by default"
+    select DEFAULT_FOO
+
+config MODULE_OTHER_DEFAULT_FOO
+    bool "Another module that enables FOO by default"
+    select DEFAULT_FOO
+
+config MODULE_DISABLE_FOO
+    bool "Disable FOO defaults"
+    select DISABLE_FOO
+
+config FOO_DEP
+    bool "Foo dependency"

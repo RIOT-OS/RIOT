@@ -503,14 +503,36 @@ reserved for the cases described below:
 | `CPU_CORE_` | Models a CPU core |
 | `CPU_FAM_` | Models a family of CPUs |
 | `CPU_MODEL_` | Models a particular model of CPU |
-| `HAS_` | Models a [feature](build-system-basics.html#features) |
+| `ERROR_` | Raises an error in the build system to indicate something is configured wrong |
+| `HAS_` | Models a hardware specific [feature](build-system-basics.html#features) |
+| `HAVE_` | Models a hardware specific feature not present in makefiles, will be unified in the future |
 | `KCONFIG_USEMODULE_` | Used during transition to enable configuration of a module via Kconfig |
 | `KCONFIG_USEPKG_` | Used during transition to enable configuration of a package via Kconfig |
-| `HAVE_` | Models a feature not present in makefiles, will be unified in the future |
+| `MODULE_` | Exports to `USEMODULE` if using kconfig dependency resolution |
+| `PACKAGE_` | Exports to `USEPKG` if using kconfig dependency resolution |
+| `REQUIRES_` | A hidden symbol indicating some requirements a certain feature that may be provided by multiple modules, most useful when selecting `choice` options |
 | `USEMODULE_` | Models a [RIOT module](creating-modules.html#creating-modules). Generated from `USEMODULE` variable |
 | `USEPKG_` | Models an [external package](group__pkg.html). Generated from `USEPKG` variable |
 
 ---
+
+## Kconfig design patterns  {#kconfig-design-patterns}
+
+Some common design patterns are documented in the
+`dist/tools/kconfiglib/examples` along with information on the when and how to
+use these patterns.
+
+## FAQs
+
+### What are choice overrides only allowed in applications, boards, and CPUs?
+
+Because order of inclusion matters in choice overrides.
+Boards/CPUs/applications have a simple structure without user selection
+and always get selected first, this is why it is can be done. In the
+rest of the modules, it may not be so apparent when something is getting
+selected. Applications will override board defaults, boards will
+override CPU defaults.
+
 # Appendixes                                              {#kconfig-appendixes}
 
 ## Appendix A: Check if a module or package is used       {#kconfig-appendix-a}

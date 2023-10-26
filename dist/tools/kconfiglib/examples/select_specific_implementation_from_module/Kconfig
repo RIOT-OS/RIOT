@@ -1,0 +1,90 @@
+config MODULE_BAR_0
+    bool "Module Bar 0"
+    select MODULE_FOO
+    select REQUIRES_FOO_0
+    help
+        This specifically brings in the 0 implementation of FOO.
+
+config MODULE_BAR_1
+    bool "Module Bar 1"
+    select MODULE_FOO
+    select REQUIRES_FOO_1
+    help
+        This specifically brings in the 1 implementation of FOO.
+
+config MODULE_BAR_1_2
+    bool "Module Bar 1 2"
+    select MODULE_FOO
+    select REQUIRES_FOO_1_2
+    help
+        This specifically brings in the 1 or 2 implementation of FOO.
+
+config BOARD_HAS_FOO_2
+    bool "Example of HAS_FOO_2"
+    select HAS_FOO_2
+
+menuconfig MODULE_FOO
+    bool "Module FOO"
+
+if MODULE_FOO
+
+config ERROR_FOO
+    bool
+    default y if !MODULE_FOO_0 && REQUIRES_FOO_0
+    default y if !MODULE_FOO_1 && REQUIRES_FOO_1
+    default y if !MODULE_FOO_2 && REQUIRES_FOO_2
+    default y if !PROVIDES_FOO && REQUIRES_FOO_1_2
+
+choice FOO_IMPLEMENTATION
+    bool
+    prompt "FOO Implementation"
+    default MODULE_FOO_0 if REQUIRES_FOO_0
+    default MODULE_FOO_1 if REQUIRES_FOO_1 || REQUIRES_FOO_1_2
+    default MODULE_FOO_2 if REQUIRES_FOO_2 || REQUIRES_FOO_1_2
+    default MODULE_FOO_0 if HAS_FOO_0
+    default MODULE_FOO_1 if HAS_FOO_1
+    default MODULE_FOO_2 if HAS_FOO_2
+
+config MODULE_FOO_0
+    bool "Implementation 0"
+
+config MODULE_FOO_1
+    bool "Implementation 1"
+    select PROVIDES_FOO
+
+config MODULE_FOO_2
+    bool "Implementation 2"
+    select PROVIDES_FOO
+
+endchoice # FOO_IMPLEMENTATION
+endif # MODULE_FOO
+
+# All REQUIRES_*, HAS_* and PROVIDES_* should be defined outside of the module
+# so anything can select it
+
+# If multiple implementations can provide a feature we can use PROVIDE instead
+# of a long list of A && B && ...
+config PROVIDE_FOO
+    bool
+
+config REQUIRES_FOO_0
+    bool
+
+config REQUIRES_FOO_1
+    bool
+
+config REQUIRES_FOO_2
+    bool
+
+config REQUIRES_FOO_1_2
+    bool
+
+config HAS_FOO_0
+    bool
+
+config HAS_FOO_1
+    bool
+
+config HAS_FOO_2
+    bool
+

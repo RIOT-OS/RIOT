@@ -1,0 +1,6 @@
+config DISABLE_$(module)
+    bool
+
+config DEFAULT_$(module)
+    bool
+    imply MODULE_$(module) if !DISABLE_$(module)
