@@ -141,12 +141,12 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  *
  *     XFA(driver_params, 0) driver_params_t _onboard = { .pin=42 };
  *
- *
- * @warning The `driver_params_t` struct must be aligned with the word size.
+ * @warning `driver_params_t` struct must be aligned at multiples of the word
+ *          size.
  *
  * @note    The `WORD_ALIGNED` macro from `#include "architecture.h" provides
  *          the appropriate attribute to ensure word-alignment. Just add this to
- *          the `typedef` statement.
+ *          the `typedef` statement if necessary.
  *
  * @param[in]   xfa_name    name of the xfa
  * @param[in]   prio        priority within the xfa
@@ -162,7 +162,12 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  *
  *     XFA(driver_params, 0) driver_params_t _onboard = { .pin=42 };
  *
- * @warning The `driver_params_t` struct must be aligned with the word size
+ * @warning `driver_params_t` struct must be aligned at multiples of the word
+ *          size.
+ *
+ * @note    The `WORD_ALIGNED` macro from `#include "architecture.h" provides
+ *          the appropriate attribute to ensure word-alignment. Just add this to
+ *          the `typedef` statement if necessary.
  *
  * @param[in]   xfa_name    name of the xfa
  * @param[in]   prio        priority within the xfa
