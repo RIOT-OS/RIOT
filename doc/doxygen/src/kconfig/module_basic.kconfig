@@ -1,0 +1,9 @@
+# Only use config when there are not other selectable dependencies
+# As soon as a selectable dependancy is added, change it to menuconfig
+config MODULE_MY_MODULE
+    bool "This is MY_MODULE"
+
+config HAVE_MY_MODULE
+    bool
+    help
+        Indicates that MY_MODULE is present.

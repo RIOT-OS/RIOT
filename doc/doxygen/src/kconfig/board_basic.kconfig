@@ -1,0 +1,13 @@
+config BOARD_MY_BOARD
+    bool
+    default y
+    select BOARD_COMMON_MY_COMMON_BOARD
+
+    select HAS_FOO
+    select HAS_BAR
+
+# Declare all the hardware that is wired to the board with HAVE_*
+    select HAVE_MY_DRIVER_MODULE
+
+# If additional modules will always be brought in for this board then it should
+# be done by the $(BOARD).config

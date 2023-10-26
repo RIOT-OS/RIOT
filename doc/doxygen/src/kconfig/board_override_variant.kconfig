@@ -1,0 +1,23 @@
+config BOARD_MY_BOARD
+    bool
+    default y
+    select BOARD_COMMON_MY_COMMON_BOARD
+
+    select HAS_FOO
+    select HAS_BAR
+
+# Declare that the board has hardware for MY_DRIVER
+    select HAVE_MY_DRIVER_MODULE_VARIANT_1
+# Maybe both variants are available, for example a sensor with both I2C and SPI
+# connected to the board
+    select HAVE_MY_DRIVER_MODULE_VARIANT_2
+
+# Override default priority to use <VARIANT_2>
+choice MY_DRIVER_MODULE_VARIANT
+# By default the VARIANT_1 would be selected but for this board we want to
+# select VARIANT_2 by default
+    default MODULE_DRIVER_MODULE_VARIANT_2 if HAVE_MY_DRIVER_MODULE_VARIANT_2
+    default MODULE_DRIVER_MODULE_VARIANT_1 if HAVE_MY_DRIVER_MODULE_VARIANT_1
+# Note that overriding choices DO NOT require duplication of dependancies
+# Nor do they require duplication of prompts, or helps
+endchoice

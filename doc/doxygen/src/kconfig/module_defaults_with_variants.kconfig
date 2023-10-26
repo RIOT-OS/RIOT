@@ -1,0 +1,59 @@
+menuconfig MODULE_MY_MODULE
+    bool
+    prompt "This is MY_MODULE" if !(MODULE_MY_DEFAULT && HAVE_MY_MODULE)
+    default y if (MODULE_MY_DEFAULT && HAVE_MY_MODULE)
+# Common depenencies should be in the module
+    depends on HAS_FOO
+    select MODULE_BAR
+
+if MODULE_MY_MODULE
+
+choice MY_MODULE_VARIANT
+    bool "Variants"
+    default MODULE_MY_MODULE_VARIANT_1 if HAVE_MY_MODULE_VARIANT_1
+    default MODULE_MY_MODULE_VARIANT_2 if HAVE_MY_MODULE_VARIANT_2
+
+    default MODULE_MY_MODULE_VARIANT_n if HAVE_MY_MODULE_VARIANT_n
+    help
+        Only one variant can be selected.
+
+config MODULE_MY_MODULE_VARIANT_1
+    bool "MY_MODULE with VARIANT_1"
+    depends on MODULE_VARIANT_SPECIFIC_DEPENDANCY
+
+config MODULE_MY_MODULE_VARIANT_2
+    bool "MY_MODULE with VARIANT_2"
+    select MODULE_VARIANT_SPECIFIC_SELECT
+
+config MODULE_MY_MODULE_VARIANT_n
+    bool "MY_MODULE with VARIANT_n"
+
+endchoice
+
+endif # MODULE_MY_MODULE
+
+# Since choices allow us to see when a module is selected by a default
+# we do not require any logic in the HAVE_*, and it is better to keep this
+# clean
+config HAVE_MY_MODULE
+    bool
+    help
+        Indicates that MY_MODULE is present.
+
+config HAVE_MY_MODULE_VARIANT_1
+    bool
+    select HAVE_MY_MODULE
+    help
+        Indicates that MY_MODULE is VARIANT_1.
+
+config HAVE_MY_MODULE_VARIANT_2
+    bool
+    select HAVE_MY_MODULE
+    help
+        Indicates that MY_MODULE is VARIANT_2.
+
+config HAVE_MY_MODULE_VARIANT_n
+    bool
+    select HAVE_MY_MODULE
+    help
+        Indicates that MY_MODULE is VARIANT_n.

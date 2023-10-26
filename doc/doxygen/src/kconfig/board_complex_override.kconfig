@@ -1,0 +1,16 @@
+config BOARD_MY_BOARD
+    bool
+    default y
+    select BOARD_COMMON_MY_COMMON_BOARD
+
+    select HAS_FOO
+    select HAS_BAR
+
+# Only override the modules like this of there are other modules that may
+# select this
+# Otherwise these modules should be selected in the $(BOARD).config
+config MODULE_MY_MODULE
+# All modules must be duplicated otherwise the dependencies may be weakened.
+    default y if MODULE_OTHER_MODULE_THAT_SELECTS_THIS_ONE
+    depends on MODULE_ALL_OTHER_DEPS
+# Only the dependencies need to be duplicated, the prompts and help do not

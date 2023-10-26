@@ -1,5 +1,7 @@
 # Kconfig in RIOT                                           {#kconfig-in-riot}
 
+[test](board_basic_kconfig.md)
+
 [TOC]
 
 The objective of using Kconfig in RIOT is to configure software modules at
@@ -511,6 +513,220 @@ reserved for the cases described below:
 | `USEPKG_` | Models an [external package](group__pkg.html). Generated from `USEPKG` variable |
 
 ---
+
+# Design Patterns                                    {#kconfig-design-patterns}
+
+Some design patterns have emerged which working on the dependency
+modelling in kconfig.
+
+- Generally, all boards should indicate the onboard devices with `HAD_*`
+or `HAVE_*`. Use of `HAVE` and `HAS` in is to describe the capabilities
+of a board (or CPU). When the boards features are described, this allows
+the dependency resolution to select appropriate modules, reducing
+selection complexity for the user.
+- The peripheral modelling in kconfig should be split to indicate each
+peripheral. This For example, `cpu/<example_cpu>/periph/kconfig.rtc` is
+where the rtc peripherals should be modelled. The
+`driver/periph_common/Kconfig.*` will source them if available.
+- For top level modules, `menuconfig` is usually better than `config` as
+it hints at the gui to display additional configurations in a submenu.
+rather than flattened. see [kconfig
+docs](https://www.kernel.org/doc/html/latest/kbuild/kconfig-language.html#kconfig-syntax)
+for more info.
+
+## Conditions
+
+The following will explain the different conditions that will effect the
+type of design pattern to use.
+
+### Defaults {None, Prefer, Force}
+
+A default type module is a module that can be used to automatically
+select a subset of other modules, allowing for easy configuration (but
+possibly bloat). These are good for getting code to run quickly, and for
+running examples and tests.
+
+Examples of modules that select defaults are:
+- `saul_default` - selects all available sensors or actuators.
+- `touch_dev` - selects any touchscreen drivers that the board provides.
+- `mtd` - selects any flash memory devices or persistent storage that
+  the board provides
+- `disp_dev` - Selects any LCD or display drivers that the board
+  provides.
+- `netdev_default` - Selects modules needed for network interfaces, if
+  any are available for the board.
+
+Some other possible defaults:
+- stdio* (stdio_cdc_acm, stdio_uart, stdio_native, stdio_ethos,
+  stdio_uart_rx, stdio_available, stdio_semihosting, stdio_null)
+- slipdev_stdio
+- eui_provider
+- sx126x_stm32wl
+- vfs
+
+For example, if a board contains a temperature sensor and `saul_default`
+is used, the temperature sensor driver should be selected.
+
+#### None
+
+No defaults are applicable, purly user selectable module.
+
+#### Prefer
+
+Where defaults should be selected but if dependencies are not met, it
+will not be selected and still work
+
+#### Force
+
+The defaults will select this module, an error will be thrown if the
+dependencies are not met.
+
+### Configurations {None, Variant}
+
+#### None
+
+This is the simplest form of a module, usually will only contain the
+specific module without additional configurations.
+
+#### Variant
+
+This is when a module uses only one variant, no more, no less. For
+example, a sensor that is connected either by I2C or by SPI.
+
+### Default Configuration Selection Override
+
+Some boards may want to change the default selections. This may be the
+libc variant, one may be smaller in size than the other. A board could
+choose that as it optimizes size but not speed for example. Note that
+this is only useful if there is one of many mutually exclusive variants
+that must be selected.
+
+## Examples
+
+### Basic driver module
+
+Some drivers are very simple, the only option is to manually enable the
+driver. However, in order to future-proof updates to the driver and
+allow the creation of tools that can accurately describe board
+capabitlities, it is recommended to include the `HAVE_*` in and
+configure all boards that contain the driver to select the `HAVE_*`.
+
+This is a generic example of [the module](module_basic.kconfig), and the
+[board](board_basic.kconfig)
+
+Other examples include:
+- None yet...
+
+
+### Driver module with forced defaults
+
+Though normally we want to keep logic involving modules out of `HAVE_*`,
+here we must select the module if the default module is selected. Since
+we select the module, it will show in `make menuconfig` but cannot be
+deselected unless the default module is deselected. There is an
+assumption that the `HAVE_*` will only be selected if all dependencies
+for the module are met. This simplfies the `HAVE_*` config, otherwise
+all dependencies would have to be remodelled for each `HAVE_*` selecting
+the module. If dependences are not met, and the default module is
+enabled by a `.config` file an error would be thrown. Using the `make
+menuconfig` with unmet dependencies would result in not being able to
+select the default module. Generally failing loudly is preferred.
+
+This is a generic example of [the
+module](module_forced_defaults.kconfig), and the
+[board](board_basic.kconfig)
+
+Other examples include:
+- ADS101X
+- BMX055
+- HTS221
+- LIS3DH
+- LTC4150
+
+### Driver module with preferred defaults
+
+As an alternative to forcing select with defaults a weaker pattern can
+be used. We must [hide the prompt to prevent the value from getting
+stuck](https://docs.zephyrproject.org/latest/guides/build/kconfig/tips.html#stuck-symbols-in-menuconfig-and-guiconfig).
+The issue is that `make menuconfig` will no longer show the value. This,
+we must put a comment indicating that the default module selected out
+desired module. If there are unmet dependencies when the default module
+is enabled, the module will silently not be selected. For this reason,
+we recommend against using this pattern, unless a silent lack of
+selection is necessary. The behaviour is similar to an `imply` without
+the issue of getting stuck or missing prompt.
+
+This is a generic example of [the
+module](module_preferred_defaults.kconfig), and the
+[board](board_basic.kconfig)
+
+Other examples include:
+- None yet...
+
+### Driver module with variants
+
+A drive may have multiple variants, for example, a temperature sensor
+with an I2C interface or SPI, depending on how it is wired, or maybe
+just different temperature range but use a common driver interface. In
+this case the `choice` can be used to select one, and only one, variant.
+Though multiple variants may be possible, such as having wiring via I2C
+or SPI, only one communication method can be used at any given time.
+Though having a name after the `choice` is not required, it is
+recommended for futureproofing and doesn't cost anything.
+
+This is a generic example of [the module](module_with_variants.kconfig),
+and the [board](board_variant.kconfig)
+
+Other examples include:
+- BMX280
+
+### Driver module defaults and variants
+
+Very close to the "Driver module with variants" and the "Driver module
+with preferred defaults " having a module with variants and defaults can
+actually be easier. Since there are choices, hiding the prompt WILL NOT
+result in the module being hidden from `make menuconfig`. This means a
+comment is not necessary, nor is selecting in the `HAVE_*`.
+
+This is a generic example of [the
+module](module_defaults_with_variants.kconfig), and the
+[board](board_variant.kconfig)
+
+Other examples include:
+- HM330X
+- LM75
+- LIS2DH12
+
+### Driver module defaults and optional variants
+
+This is a special case where variants exist that can be selected as a choice
+with defaults but the possiblilty to have an empty or generic variant is
+present.
+This may occur if params are defined for only one device but user params can
+have multiple devices or just want to override the variants present in kconfig.
+
+This is a generic example of [the
+module](module_defaults_with_optional_variants.kconfig), and the
+[board](board_variant.kconfig)
+
+Other examples include:
+- AT24CXXX
+
+### Boards with multiple variants requiring different default order
+
+If a board contains multiple possible variants, but can only select one,
+the module will have a default variant when being selected. If that
+order should be changed for a specific board, the choice can simply
+override default order of the module.
+
+
+This is a generic example of [the
+module](module_defaults_with_variants.kconfig), and the
+[board](board_override_variant.kconfig)
+
+Other examples include:
+- libc_implementation
+
 # Appendixes                                              {#kconfig-appendixes}
 
 ## Appendix A: Check if a module or package is used       {#kconfig-appendix-a}

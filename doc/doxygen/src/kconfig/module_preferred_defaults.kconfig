@@ -1,0 +1,13 @@
+menuconfig MODULE_MY_MODULE
+    bool
+    prompt "This is MY_MODULE" if !(MODULE_MY_DEFAULT && HAVE_MY_MODULE)
+    default y if (MODULE_MY_DEFAULT && HAVE_MY_MODULE)
+
+# comment required to show that this module is being selected by default
+comment "This is actually selected by MY_DEFAULT"
+    depends on (MODULE_MY_DEFAULT && HAVE_MY_MODULE)
+
+config HAVE_MY_MODULE
+    bool
+    help
+        Indicates that MY_MODULE is present.

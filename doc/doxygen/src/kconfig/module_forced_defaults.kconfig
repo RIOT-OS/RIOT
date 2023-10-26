@@ -1,0 +1,11 @@
+menuconfig MODULE_MY_MODULE
+    bool "This is MY_MODULE"
+
+config HAVE_MY_MODULE
+    bool
+# Though we do not like putting logic in the HAVE_* this is the easiest way to
+# get what we want
+# There is an assumption that depenencies will be met when using this.
+    select MODULE_MY_MODULE if MY_DEFAULT
+    help
+        Indicates that MY_MODULE is present.
