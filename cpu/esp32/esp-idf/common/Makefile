@@ -93,6 +93,7 @@ endif
 
 ifeq (esp32,$(CPU_FAM))
   ESP32_SDK_SRC += components/esp_timer/src/esp_timer_impl_frc_legacy.c
+  ESP32_SDK_SRC += components/spi_flash/esp32/spi_flash_rom_patch.c
 endif
 
 ifeq (esp32c3,$(CPU_FAM))

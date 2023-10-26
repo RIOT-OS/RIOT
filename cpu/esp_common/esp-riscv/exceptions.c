@@ -24,8 +24,11 @@
 #include "periph/pm.h"
 
 #include "esp_attr.h"
+#include "hal/cpu_ll.h"
 #include "riscv/rvruntime-frames.h"
+#include "rom/cache.h"
 #include "rom/ets_sys.h"
+#include "rom/spi_flash.h"
 
 static const char *exceptions[] = {
     "nil",
@@ -48,15 +51,48 @@ void init_exceptions (void)
 {
 }
 
+static void IRAM_ATTR exception_handler_entry(RvExcFrame *frame)
+{
+    /* save the pointer to the RISC-V exception frame */
+    _frame = frame;
+
+    /* Ensure that the exception handler is called only once. */
+    static uint8_t exception_handler_calls = 0;
+    if (++exception_handler_calls > 1) {
+        /* If the exception handler is called more than once, break to the
+         * debugger if attached or stop the execution. This normally indicates
+         * an exception while handling another exception, for example trying
+         * to use a function from IROM while the cache is disabled. */
+        if (cpu_ll_is_debugger_attached()) {
+            cpu_ll_break();
+        }
+        else {
+            while (1) { }
+        }
+    }
+
+    /* Before the literal strings in the IROM can be accessed by the exception
+     * handler, it has to be ensured that the IROM cache is enabled. However,
+     * before its activation it is necessary to wait until possible write
+     * operations to the SPI flash have been finished. */
+#if defined(CPU_FAM_ESP32C3) || defined(CPU_FAM_ESP32H2)
+    esp_rom_spiflash_wait_idle(&g_rom_flashchip);
+    Cache_Invalidate_ICache_All();
+    Cache_Resume_ICache(1);
+#else
+#error Platform implementation required
+#endif
+}
+
 void IRAM_ATTR xt_unhandled_exception(RvExcFrame *frame)
 {
-    _frame = frame;
+    exception_handler_entry(frame);
     core_panic(PANIC_GENERAL_ERROR, "Unhandled exception");
 }
 
 void IRAM_ATTR panicHandler(RvExcFrame *frame)
 {
-    _frame = frame;
+    exception_handler_entry(frame);
     core_panic(PANIC_GENERAL_ERROR, "Panic handler");
 }
 
@@ -70,6 +106,14 @@ void panic_arch(void)
                    _frame->mepc, exceptions[_frame->mcause]);
     }
 #if defined(DEVELHELP)
+    /* print heap statistics */
     heap_stats();
+    /* break in debugger if attached or busy wait until WDT resets the MCU */
+    if (cpu_ll_is_debugger_attached()) {
+        cpu_ll_break();
+    }
+    else {
+        while (1) { }
+    }
 #endif
 }
