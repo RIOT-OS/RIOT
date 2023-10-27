@@ -106,12 +106,6 @@ int _parse_nmea_msg(const char* nmea_msg)
         if (minmea_parse_rmc(&frame, nmea_msg) && frame.valid) {
             puts("check_nmea: RMC recorded");
 
-            /* parse timestamp */
-            struct tm tm;
-            time_t timestamp;
-            minmea_getdatetime(&tm, &frame.date, &frame.time);
-            timestamp = mktime(&tm);
-
             /* print values */
             print_str("\tlat: ");
             print_float(minmea_tocoord(&frame.latitude), 6);
@@ -119,7 +113,10 @@ int _parse_nmea_msg(const char* nmea_msg)
             print_str("\tlon: ");
             print_float(minmea_tocoord(&frame.longitude), 6);
             printf("\n");
-            printf("\ttime: %"PRIu32"\n", (uint32_t)timestamp);
+            /* NMEA RMC is providing UTC time */
+            printf("\tdate: %d.%d.%d\n", frame.date.day, frame.date.month, frame.date.year);
+            printf("\ttime: %dh %dm %ds, %dms\n", frame.time.hours, frame.time.minutes,
+                                            frame.time.seconds, frame.time.microseconds/1000);
         }
         else {
             puts("check_nmea: invalid RMC record");
