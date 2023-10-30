@@ -29,6 +29,11 @@ extern "C" {
 
 /* Declare the API of the module */
 
+/**
+ * Example function to say hello from the Matter module
+*/
+void matter_hello(void);
+
 #ifdef __cplusplus
 }
 #endif

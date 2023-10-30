@@ -22,3 +22,7 @@
 #include <stdio.h>
 
 /* Implementation of the module */
+
+void matter_hello(void) {
+    puts("Hello from Matter module!");
+}
