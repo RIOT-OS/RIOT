@@ -472,6 +472,10 @@ endif
 
 ifneq (,$(filter gcoap_fileserver,$(USEMODULE)))
   USEMODULE += gcoap
+  USEMODULE += nanocoap_fileserver
+endif
+
+ifneq (,$(filter nanocoap_fileserver,$(USEMODULE)))
   USEMODULE += checksum
   USEMODULE += vfs
 endif

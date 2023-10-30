@@ -24,7 +24,6 @@
 #include "kernel_defines.h"
 #include "checksum/fletcher32.h"
 #include "net/gcoap/fileserver.h"
-#include "net/gcoap.h"
 #include "vfs.h"
 #include "vfs_util.h"
 
@@ -111,6 +110,22 @@ static unsigned _count_char(const char *s, char c)
     return count;
 }
 
+static int _resp_init(coap_pkt_t *pdu, uint8_t *buf, size_t len, unsigned code)
+{
+    int header_len = coap_build_reply(pdu, code, buf, len, 0);
+
+    /* request contained no-response option or not enough space for response */
+    if (header_len <= 0) {
+        return -1;
+    }
+
+    pdu->options_len = 0;
+    pdu->payload     = buf + header_len;
+    pdu->payload_len = len - header_len;
+
+    return 0;
+}
+
 /** Build an ETag based on the given file's VFS stat. If the stat fails,
  * returns the error and leaves etag in any state; otherwise there's an etag
  * in the stattag's field */
@@ -146,7 +161,13 @@ static size_t gcoap_fileserver_error_handler(coap_pkt_t *pdu, uint8_t *buf, size
         DEBUG("gcoap_fileserver: Rejecting error %d (%s) as %d.%02d\n", err, strerror(err),
               code >> 5, code & 0x1f);
     }
-    return gcoap_response(pdu, buf, len, code);
+
+    if (_resp_init(pdu, buf, len, code)) {
+        return -1;
+    }
+    coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
+
+    return 0;
 }
 
 static void _calc_szx2(coap_pkt_t *pdu, size_t reserve, coap_block1_t *block2)
@@ -203,7 +224,7 @@ static ssize_t _get_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     }
     if (request->options.exists.etag &&
         !memcmp(&etag, &request->options.etag, sizeof(etag))) {
-        gcoap_resp_init(pdu, buf, len, COAP_CODE_VALID);
+        _resp_init(pdu, buf, len, COAP_CODE_VALID);
         coap_opt_add_opaque(pdu, COAP_OPT_ETAG, &etag, sizeof(etag));
         return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
     }
@@ -213,7 +234,7 @@ static ssize_t _get_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         return gcoap_fileserver_error_handler(pdu, buf, len, fd);
     }
 
-    gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
+    _resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     coap_opt_add_opaque(pdu, COAP_OPT_ETAG, &etag, sizeof(etag));
     coap_block_slicer_t slicer;
     _calc_szx2(pdu,
@@ -365,11 +386,11 @@ static ssize_t _put_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         _event_file(GCOAP_FILESERVER_PUT_FILE_END, request);
 
         stat_etag(&stat, &etag); /* Etag after write */
-        gcoap_resp_init(pdu, buf, len, create ? COAP_CODE_CREATED : COAP_CODE_CHANGED);
+        _resp_init(pdu, buf, len, create ? COAP_CODE_CREATED : COAP_CODE_CHANGED);
         coap_opt_add_opaque(pdu, COAP_OPT_ETAG, &etag, sizeof(etag));
     }
     else {
-        gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTINUE);
+        _resp_init(pdu, buf, len, COAP_CODE_CONTINUE);
         block1.more = true; /* resource is created atomically */
         coap_opt_add_block1_control(pdu, &block1);
     }
@@ -407,7 +428,7 @@ static ssize_t _delete_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     if ((ret = vfs_unlink(request->namebuf)) < 0) {
         return gcoap_fileserver_error_handler(pdu, buf, len, ret);
     }
-    gcoap_resp_init(pdu, buf, len, COAP_CODE_DELETED);
+    _resp_init(pdu, buf, len, COAP_CODE_DELETED);
     return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
 }
 #endif
@@ -450,7 +471,7 @@ static ssize_t _get_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     }
     DEBUG("gcoap_fileserver: Serving directory listing\n");
 
-    gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
+    _resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     coap_opt_add_format(pdu, COAP_FORMAT_LINK);
     _calc_szx2(pdu,
                5 + 1 /* reserve BLOCK2 size + payload marker */,
@@ -505,7 +526,7 @@ static ssize_t _put_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         if (request->options.exists.if_match && request->options.if_match_len) {
             return gcoap_fileserver_error_handler(pdu, buf, len, COAP_CODE_PRECONDITION_FAILED);
         }
-        gcoap_resp_init(pdu, buf, len, COAP_CODE_CHANGED);
+        _resp_init(pdu, buf, len, COAP_CODE_CHANGED);
     }
     else {
         if (request->options.exists.if_match) {
@@ -514,7 +535,7 @@ static ssize_t _put_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         if ((err = vfs_mkdir(request->namebuf, 0777)) < 0) {
             return gcoap_fileserver_error_handler(pdu, buf, len, err);
         }
-        gcoap_resp_init(pdu, buf, len, COAP_CODE_CREATED);
+        _resp_init(pdu, buf, len, COAP_CODE_CREATED);
     }
     return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
 }
@@ -540,7 +561,7 @@ static ssize_t _delete_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
             return gcoap_fileserver_error_handler(pdu, buf, len, err);
         }
     }
-    gcoap_resp_init(pdu, buf, len, COAP_CODE_DELETED);
+    _resp_init(pdu, buf, len, COAP_CODE_DELETED);
     return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
 }
 #endif
@@ -698,7 +719,11 @@ ssize_t gcoap_fileserver_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         ? gcoap_fileserver_directory_handler(pdu, buf, len, &request, root, resource)
         : gcoap_fileserver_file_handler(pdu, buf, len, &request);
 error:
-    return gcoap_response(pdu, buf, len, errorcode);
+    if (_resp_init(pdu, buf, len, errorcode)) {
+        return -1;
+    }
+    coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
+    return 0;
 }
 
 #ifdef MODULE_GCOAP_FILESERVER_CALLBACK
