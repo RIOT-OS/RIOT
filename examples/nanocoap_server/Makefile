@@ -47,12 +47,8 @@ endif
 HIGH_MEMORY_BOARDS := native same54-xpro mcb2388
 
 ifneq (,$(filter $(BOARD),$(HIGH_MEMORY_BOARDS)))
-  USEMODULE += gcoap_fileserver
+  USEMODULE += nanocoap_fileserver
   USEMODULE += vfs_default
-
-  # we don't want to run GCoAP
-  CFLAGS += -DCONFIG_GCOAP_NO_AUTO_INIT=1
-  CFLAGS += -DCONFIG_NANOCOAP_SERVER_WELL_KNOWN_CORE=1
 
   # always enable auto-format for native
   ifeq ($(BOARD),native)
