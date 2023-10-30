@@ -28,12 +28,13 @@
 
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif);
+int _get(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt);
 
 static const gnrc_netif_ops_t ieee802154_ops = {
     .init = gnrc_netif_default_init,
     .send = _send,
     .recv = _recv,
-    .get = gnrc_netif_get_from_netdev,
+    .get = _get,
     .set = gnrc_netif_set_from_netdev,
 };
 
@@ -42,6 +43,76 @@ int gnrc_netif_ieee802154_create(gnrc_netif_t *netif, char *stack, int stacksize
 {
     return gnrc_netif_create(netif, stack, stacksize, priority, name, dev,
                              &ieee802154_ops);
+}
+
+int gnrc_netif_hdr_to_ieee802154(uint8_t *mhr, const gnrc_netif_t *netif, const gnrc_netif_hdr_t *hdr)
+{
+    const uint8_t *src = NULL, *dst = NULL;
+    size_t src_len = 0, dst_len = 0;
+    le_uint16_t src_pan, dst_pan;
+    uint8_t *fcf = mhr;
+    fcf[0] = fcf[1] = 0;
+    netdev_ieee802154_t *dev = container_of(netif->dev, netdev_ieee802154_t, netdev);
+    if ((dev->flags & NETDEV_IEEE802154_SECURITY_EN)) {
+        fcf[0] |= IEEE802154_FCF_SECURITY_EN;
+    }
+    if (hdr->flags & GNRC_NETIF_HDR_FLAGS_MORE_DATA) {
+        fcf[0] |= IEEE802154_FCF_FRAME_PEND;
+    }
+    if (dev->flags & NETDEV_IEEE802154_ACK_REQ) {
+        fcf[0] |= IEEE802154_FCF_ACK_REQ;
+    }
+    fcf[0] |= IEEE802154_FCF_TYPE_DATA;
+    fcf[1] |= IEEE802154_FCF_VERS_V1;
+    if (dev->pan == IEEE802154_PANID_UNASSOCIATED) {
+        return -ENOTCONN;
+    }
+    /* As long as netif header has no field for destination network,
+       source and destination PAN are assumed to be equal */
+    src_pan = dst_pan = byteorder_htols(dev->pan);
+    if ((src_len = hdr->src_l2addr_len)) {
+        src = gnrc_netif_hdr_get_src_addr(hdr);
+    }
+    else {
+        /* if not PAN coordinator */
+        /* As long as only implicit keys and no peering are supported,
+           the sender needs to include long source address because the recipient
+           will need it to decrypt the frame. */
+        if ((fcf[0] & IEEE802154_FCF_SECURITY_EN) ||
+            (dev->flags & NETDEV_IEEE802154_SRC_MODE_LONG) ||
+            !memcmp(dev->short_addr, ieee802154_addr_unassigned, sizeof(dev->short_addr)) ||
+            !memcmp(dev->short_addr, ieee802154_addr_unassociated, sizeof(dev->short_addr))) {
+            src = dev->long_addr;
+            src_len = sizeof(dev->long_addr);
+        }
+        else {
+            src = dev->short_addr;
+            src_len = sizeof(dev->short_addr);
+        }
+    }
+    if ((dst_len = hdr->dst_l2addr_len)) {
+        dst = gnrc_netif_hdr_get_dst_addr(hdr);
+    }
+    else if (hdr->flags & (GNRC_NETIF_HDR_FLAGS_BROADCAST |
+                           GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
+        dst = ieee802154_addr_bcast;
+        dst_len = 2;
+        fcf[0] &= ~IEEE802154_FCF_ACK_REQ;
+    }
+    else {
+        /* dst is PAN coordinator */
+        return -ENOTSUP;
+    }
+    int res;
+    /* set addressing modes and PAN compression */
+    if ((res = ieee802154_set_frame_hdr(mhr,
+                                        src, src_len,
+                                        dst, dst_len,
+                                        src_pan, dst_pan,
+                                        mhr[0], 0)) < 0) {
+        return -EINVAL;
+    }
+    return res;
 }
 
 static gnrc_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
@@ -188,7 +259,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
                 netdev_ieee802154_t *netdev_ieee802154 = container_of(dev,
                                                                       netdev_ieee802154_t,
                                                                       netdev);
-                if (mhr[0] & NETDEV_IEEE802154_SECURITY_EN) {
+                if (mhr[0] & IEEE802154_FCF_SECURITY_EN) {
                     if (ieee802154_sec_decrypt_frame(&netdev_ieee802154->sec_ctx,
                                                      nread,
                                                      mhr, (uint8_t *)&mhr_len,
@@ -253,19 +324,13 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     netdev_t *dev = netif->dev;
     netdev_ieee802154_t *state = container_of(dev, netdev_ieee802154_t, netdev);
     gnrc_netif_hdr_t *netif_hdr;
-    const uint8_t *src, *dst = NULL;
     int res = 0;
-    size_t src_len, dst_len;
     uint8_t mhr_len;
 #if IS_USED(MODULE_IEEE802154_SECURITY)
     uint8_t mhr[IEEE802154_MAX_HDR_LEN + IEEE802154_SEC_MAX_AUX_HDR_LEN];
 #else
     uint8_t mhr[IEEE802154_MAX_HDR_LEN];
 #endif
-    uint8_t flags = (uint8_t)(state->flags & NETDEV_IEEE802154_SEND_MASK);
-    le_uint16_t dev_pan = byteorder_htols(state->pan);
-
-    flags |= IEEE802154_FCF_TYPE_DATA;
     if (pkt == NULL) {
         DEBUG("_send_ieee802154: pkt was NULL\n");
         return -EINVAL;
@@ -275,44 +340,12 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         return -EBADMSG;
     }
     netif_hdr = pkt->data;
-    if (netif_hdr->flags & GNRC_NETIF_HDR_FLAGS_MORE_DATA) {
-        /* Set frame pending field */
-        flags |= IEEE802154_FCF_FRAME_PEND;
-    }
-    /* prepare destination address */
-    if (netif_hdr->flags & /* If any of these flags is set assume broadcast */
-        (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
-        dst = ieee802154_addr_bcast;
-        dst_len = IEEE802154_ADDR_BCAST_LEN;
-    }
-    else {
-        dst = gnrc_netif_hdr_get_dst_addr(netif_hdr);
-        dst_len = netif_hdr->dst_l2addr_len;
-    }
-    if (flags & NETDEV_IEEE802154_SECURITY_EN) {
-        /* need to include long source address because the recipient
-           will need it to decrypt the frame */
-        src_len = IEEE802154_LONG_ADDRESS_LEN;
-        src = state->long_addr;
-    }
-    else {
-        src_len = netif_hdr->src_l2addr_len;
-        if (src_len > 0) {
-            src = gnrc_netif_hdr_get_src_addr(netif_hdr);
-        }
-        else {
-            src_len = netif->l2addr_len;
-            src = netif->l2addr;
-        }
-    }
-    /* fill MAC header, seq should be set by device */
-    if ((res = ieee802154_set_frame_hdr(mhr, src, src_len,
-                                        dst, dst_len, dev_pan,
-                                        dev_pan, flags, state->seq++)) == 0) {
+    if ((res = gnrc_netif_hdr_to_ieee802154(mhr, netif, netif_hdr)) < 0) {
         DEBUG("_send_ieee802154: Error preperaring frame\n");
         gnrc_pktbuf_release(pkt);
         return -EINVAL;
     }
+    mhr[2] = state->seq++;
     mhr_len = res;
 
     /* prepare iolist for netdev / mac layer */
@@ -352,7 +385,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         uint8_t mic[IEEE802154_SEC_MAX_MAC_SIZE];
         uint8_t mic_size = 0;
 
-        if (flags & NETDEV_IEEE802154_SECURITY_EN) {
+        if (mhr[0] & IEEE802154_FCF_SECURITY_EN) {
             res = ieee802154_sec_encrypt_frame(&state->sec_ctx,
                                                mhr, &mhr_len,
                                                pkt->next->data, pkt->next->size,
@@ -404,4 +437,51 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     }
     return res;
 }
+
+int _get(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
+{
+    int res = -ENOTSUP;
+
+    gnrc_netif_acquire(netif);
+    switch (opt->opt) {
+        case NETOPT_MAX_SDU_SIZE:
+            if (opt->data_len >= sizeof(iolist_t)) {
+                const iolist_t *in = opt->data;
+                const gnrc_netif_hdr_t *l2 = in->iol_base;
+                uint16_t sdu;
+                gnrc_netapi_opt_t opt_dev = {
+                    .data = &sdu,
+                    .data_len = sizeof(sdu),
+                    .opt = NETOPT_MAX_PDU_SIZE,
+                };
+                if (gnrc_netif_get_from_netdev(netif, &opt_dev) <= 0) {
+                    goto release;
+                }
+                uint8_t mhr[IEEE802154_MAX_HDR_LEN];
+                int hdr_len = gnrc_netif_hdr_to_ieee802154(mhr, netif, l2);
+                if (hdr_len < 0) {
+                    goto release;
+                }
+                /* The value obtained from NETOPT_MAX_PDU_SIZE is the smallest number of
+                   L2 payload bytes, resulting from the most possible header overhead.
+                   To get the actual possible payload size, we add the saving we gain,
+                   from the actual header size. */
+                sdu += (IEEE802154_MAX_HDR_LEN - hdr_len);
+#if IS_USED(MODULE_IEEE802154_SECURITY)
+                netdev_ieee802154_t *dev = container_of(netif->dev, netdev_ieee802154_t, netdev);
+                hdr_len = ieee802154_sec_get_aux_hdr_len(&dev->sec_ctx, mhr, hdr_len);
+                sdu += ((IEEE802154_SEC_MAX_AUX_HDR_LEN + IEEE802154_SEC_MAX_MAC_SIZE) - hdr_len);
+#endif
+                *((uint16_t *)opt->data) = sdu;
+                res = sizeof(uint16_t);
+            }
+            break;
+        default:
+            res = gnrc_netif_get_from_netdev(netif, opt);
+    }
+release:
+    gnrc_netif_release(netif);
+    return res;
+}
+
 /** @} */

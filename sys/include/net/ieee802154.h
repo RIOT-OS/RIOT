@@ -167,6 +167,11 @@ extern "C" {
 #define IEEE802154_CCA_DURATION_IN_SYMBOLS      (8)
 
 /**
+ * @brief   Unassociated PAN ID
+ */
+#define IEEE802154_PANID_UNASSOCIATED           (0xffff)
+
+/**
  * @brief   802.15.4 PHY modes
  */
 typedef enum {
@@ -198,6 +203,20 @@ enum {
 #define IEEE802154_ADDR_BCAST               { 0xff, 0xff }
 
 /**
+ * @brief   Static initializer for an unassigned short address
+ *
+ * If the short source address has this value, the extended source address must be preferred
+ */
+#define IEEE802154_ADDR_UNASSIGNED          { 0xff, 0xfe }
+
+/**
+ * @brief   Static initializer for the short address if unassociated to a PAN coordinator
+ *
+ * If the short source address has this value, the device is not associated to a PAN coordinator
+ */
+#define IEEE802154_ADDR_UNASSOCIATED        { 0xff, 0xff }
+
+/**
  * @brief   Length in byte of @ref IEEE802154_ADDR_BCAST
  */
 #define IEEE802154_ADDR_BCAST_LEN           (IEEE802154_SHORT_ADDRESS_LEN)
@@ -206,6 +225,16 @@ enum {
  * @brief   Broadcast address
  */
 extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
+
+/**
+ * @brief   Unassigned short address
+ */
+extern const uint8_t ieee802154_addr_unassigned[IEEE802154_SHORT_ADDRESS_LEN];
+
+/**
+ * @brief   Unassociated short address
+ */
+extern const uint8_t ieee802154_addr_unassociated[IEEE802154_SHORT_ADDRESS_LEN];
 /** @} */
 
 /**

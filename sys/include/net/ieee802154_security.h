@@ -386,7 +386,7 @@ void ieee802154_sec_init(ieee802154_sec_context_t *ctx);
  * @brief   Encrypt IEEE 802.15.4 frame according to @p ctx
  *
  * @param[in]       ctx                     IEEE 802.15.4 security context
- * @param[in]       header                  Pointer to frame header
+ * @param[in, out]  header                  Pointer to frame header
  * @param[in, out]  header_size             in: Header size; out: Size of header and auxiliary header
  * @param[in,out]   payload                 in: Plain payload; out: Encrypted payload
  * @param[in]       payload_size            Size of payload
@@ -400,7 +400,7 @@ void ieee802154_sec_init(ieee802154_sec_context_t *ctx);
  * @return          negative integer on error
  */
 int ieee802154_sec_encrypt_frame(ieee802154_sec_context_t *ctx,
-                                 const uint8_t *header, uint8_t *header_size,
+                                 uint8_t *header, uint8_t *header_size,
                                  uint8_t *payload, uint16_t payload_size,
                                  uint8_t *mic, uint8_t *mic_size,
                                  const uint8_t *src_address);
@@ -429,6 +429,18 @@ int ieee802154_sec_decrypt_frame(ieee802154_sec_context_t *ctx,
                                  uint8_t **payload, uint16_t *payload_size,
                                  uint8_t **mic, uint8_t *mic_size,
                                  const uint8_t *src_address);
+
+/**
+ * @brief   Get auxiliary security header size estimation
+ *
+ * @param[in]       ctx                     IEEE 802.15.4 security context
+ * @param[in]       header                  Pointer to IEEE 802.15.4 header
+ * @param[in]       header_size             Header size
+ *
+ * @return          Auxiliary security headeer size
+ */
+size_t ieee802154_sec_get_aux_hdr_len(ieee802154_sec_context_t *ctx,
+                                      const uint8_t *header, size_t header_size);
 
 /**
  * @brief Default descriptor that will fallback to default implementations

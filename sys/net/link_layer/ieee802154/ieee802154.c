@@ -20,6 +20,8 @@
 #include "net/ieee802154.h"
 
 const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN] = IEEE802154_ADDR_BCAST;
+const uint8_t ieee802154_addr_unassigned[IEEE802154_SHORT_ADDRESS_LEN] = IEEE802154_ADDR_UNASSIGNED;
+const uint8_t ieee802154_addr_unassociated[IEEE802154_SHORT_ADDRESS_LEN] = IEEE802154_ADDR_UNASSOCIATED;
 
 size_t ieee802154_set_frame_hdr(uint8_t *buf, const uint8_t *src, size_t src_len,
                                 const uint8_t *dst, size_t dst_len,

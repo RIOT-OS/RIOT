@@ -54,8 +54,9 @@ static inline uint8_t _max_frag_size(gnrc_netif_t *iface,
                : fbuf->hint.fragsz;
     }
 #endif /* MODULE_GNRC_SIXLOWPAN_FRAG_HINT */
-    (void)fbuf;
-    return iface->sixlo.max_frag_size;
+    (void)iface;
+    assert(fbuf->best_frag_size > 0);
+    return fbuf->best_frag_size;
 }
 
 static inline int _payload_diff(gnrc_sixlowpan_frag_fb_t *fbuf,
@@ -180,13 +181,14 @@ static uint16_t _send_nth_fragment(gnrc_netif_t *iface,
                                    size_t payload_len,
                                    gnrc_pktsnip_t **tx_sync)
 {
+    (void)iface;
     gnrc_pktsnip_t *frag, *pkt = fbuf->pkt;
     sixlowpan_frag_n_t *hdr;
     uint8_t *data;
     uint16_t local_offset = 0, offset_count = 0, offset = fbuf->offset;
     /* since dispatches aren't supposed to go into subsequent fragments, we need not account
      * for payload difference as for the first fragment */
-    uint16_t max_frag_size = _floor8(iface->sixlo.max_frag_size -
+    uint16_t max_frag_size = _floor8(fbuf->best_frag_size -
                                      sizeof(sixlowpan_frag_n_t));
 
     DEBUG("6lo frag: determined max_frag_size = %" PRIu16 "\n", max_frag_size);

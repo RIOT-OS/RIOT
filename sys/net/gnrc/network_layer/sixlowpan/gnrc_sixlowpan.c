@@ -102,6 +102,23 @@ void gnrc_sixlowpan_dispatch_send(gnrc_pktsnip_t *pkt, void *context,
     }
 }
 
+size_t gnrc_sixlowpan_get_l2_frag_size(const gnrc_netif_t *netif,
+                                       gnrc_pktsnip_t *pkt) {
+    /* worst case fragment size if NETOPT_MAX_SDU_SIZE is not supported */
+    size_t best_frag_size = netif->sixlo.max_frag_size;
+    union {
+        iolist_t in;
+        uint16_t out;
+    } value;
+    value.in.iol_base = pkt->data;
+    value.in.iol_len = pkt->size;
+    if (gnrc_netapi_get(netif->pid, NETOPT_MAX_SDU_SIZE, 0, &value.in, sizeof(value)) > 0) {
+        best_frag_size = value.out;
+        assert(netif->sixlo.max_frag_size <= best_frag_size);
+    }
+    return best_frag_size;
+}
+
 void gnrc_sixlowpan_multiplex_by_size(gnrc_pktsnip_t *pkt,
                                       size_t orig_datagram_size,
                                       gnrc_netif_t *netif,
@@ -110,17 +127,15 @@ void gnrc_sixlowpan_multiplex_by_size(gnrc_pktsnip_t *pkt,
     assert(pkt != NULL);
     assert(netif != NULL);
     size_t datagram_size = gnrc_pkt_len(pkt->next);
-    DEBUG("6lo: iface->sixlo.max_frag_size = %u for interface %i\n",
-          netif->sixlo.max_frag_size, netif->pid);
-    if ((netif->sixlo.max_frag_size == 0) ||
-        (datagram_size <= netif->sixlo.max_frag_size)) {
+    size_t best_frag_size = gnrc_sixlowpan_get_l2_frag_size(netif, pkt);
+    DEBUG("6lo: packet size = %zu, fragment size = %zu for interface %i\n",
+          datagram_size, best_frag_size, netif->pid);
+    if ((netif->sixlo.max_frag_size == 0) || (datagram_size <= best_frag_size)) {
         DEBUG("6lo: Dispatch for sending\n");
         gnrc_sixlowpan_dispatch_send(pkt, NULL, page);
     }
 #if defined(MODULE_GNRC_SIXLOWPAN_FRAG) || defined(MODULE_GNRC_SIXLOWPAN_FRAG_SFR)
     else if (orig_datagram_size <= SIXLOWPAN_FRAG_MAX_LEN) {
-        DEBUG("6lo: Send fragmented (%u > %u)\n",
-              (unsigned int)datagram_size, netif->sixlo.max_frag_size);
         gnrc_sixlowpan_frag_fb_t *fbuf;
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_SFR
         bool sfr = gnrc_sixlowpan_frag_sfr_netif(netif);
@@ -140,10 +155,10 @@ void gnrc_sixlowpan_multiplex_by_size(gnrc_pktsnip_t *pkt,
         fbuf->tag = gnrc_sixlowpan_frag_fb_next_tag();
         /* Sending the first fragment has an offset==0 */
         fbuf->offset = 0;
+        fbuf->best_frag_size = best_frag_size;
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_HINT
         fbuf->hint.fragsz = 0;
 #endif
-
         if (!sfr) {
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG
             gnrc_sixlowpan_frag_send(pkt, fbuf, page);
@@ -160,8 +175,7 @@ void gnrc_sixlowpan_multiplex_by_size(gnrc_pktsnip_t *pkt,
 #endif /* defined(MODULE_GNRC_SIXLOWPAN_FRAG) || defined(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) */
     else {
         (void)orig_datagram_size;
-        DEBUG("6lo: packet too big (%u > %u)\n",
-              (unsigned int)datagram_size, netif->sixlo.max_frag_size);
+        DEBUG("6lo: packet too big (%zu > %u)\n", datagram_size, best_frag_size);
         gnrc_pktbuf_release_error(pkt, EMSGSIZE);
     }
 }
@@ -327,6 +341,7 @@ static void _send(gnrc_pktsnip_t *pkt)
                 fbuf->datagram_size = datagram_size;
                 fbuf->tag = gnrc_sixlowpan_frag_fb_next_tag();
                 fbuf->offset = 0;
+                fbuf->best_frag_size = gnrc_sixlowpan_get_l2_frag_size(netif, pkt);
                 /* fbuf->hint only exists with the `gnrc_sixlowpan_frag_hint`
                  * module, so despite already specifying that this `if` block
                  * only works with `IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_HINT)`
