@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    net_gcoap_fileserver GCoAP file server
- * @ingroup     net_gcoap
+ * @defgroup    net_nanocoap_fileserver CoAP file server
+ * @ingroup     net_nanocoap
  * @brief       Library for serving files from the VFS to CoAP clients
  *
  * # About
@@ -41,9 +41,9 @@
  *
  * # Usage
  *
- * * ``USEMODULE += gcoap_fileserver``
+ * * ``USEMODULE += nanocoap_fileserver``
  *
- * * Enter a @ref gcoap_fileserver_handler handler into your CoAP server's
+ * * Enter a @ref nanocoap_fileserver_handler handler into your CoAP server's
  *   resource list like this:
  *
  *   ```
@@ -52,7 +52,7 @@
  *       {
  *          .path = "/files/sd",
  *          .methods = COAP_GET | COAP_MATCH_SUBTREE,
- *          .handler = gcoap_fileserver_handler,
+ *          .handler = nanocoap_fileserver_handler,
  *          .context = "/sd0"
  *       },
  *       ...
@@ -65,7 +65,7 @@
  *   The allowed methods dictate whether it's read-only (``COAP_GET``) or
  *   read-write (``COAP_GET | COAP_PUT | COAP_DELETE``).
  *   If you want to support ``PUT`` and `DELETE`, you need to enable the modules
- *   ``gcoap_fileserver_put`` and ``gcoap_fileserver_delete``.
+ *   ``nanocoap_fileserver_put`` and ``nanocoap_fileserver_delete``.
  *
  * @{
  *
@@ -75,8 +75,8 @@
  * @author      chrysn <chrysn@fsfe.org>
  */
 
-#ifndef NET_GCOAP_FILESERVER_H
-#define NET_GCOAP_FILESERVER_H
+#ifndef NET_NANOCOAP_FILESERVER_H
+#define NET_NANOCOAP_FILESERVER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -93,16 +93,16 @@ extern "C" {
 /**
  * @brief   GCoAP fileserver event types
  *
- * @note This requires the gcoap_fileserver_callback module.
+ * @note This requires the nanocoap_fileserver_callback module.
  */
 typedef enum {
-    GCOAP_FILESERVER_GET_FILE_START,     /**< file download started   */
-    GCOAP_FILESERVER_GET_FILE_END,       /**< file download finished  */
-    GCOAP_FILESERVER_PUT_FILE_START,     /**< file upload started     */
-    GCOAP_FILESERVER_PUT_FILE_END,       /**< file upload finished    */
-    GCOAP_FILESERVER_DELETE_FILE,        /**< file deletion requested
+    NANOCOAP_FILESERVER_GET_FILE_START, /**< file download started   */
+    NANOCOAP_FILESERVER_GET_FILE_END,   /**< file download finished  */
+    NANOCOAP_FILESERVER_PUT_FILE_START, /**< file upload started     */
+    NANOCOAP_FILESERVER_PUT_FILE_END,   /**< file upload finished    */
+    NANOCOAP_FILESERVER_DELETE_FILE,    /**< file deletion requested
                                          (called before file is deleted) */
-} gcoap_fileserver_event_t;
+} nanocoap_fileserver_event_t;
 
 /**
  * @brief   GCoAP fileserver event context
@@ -110,7 +110,7 @@ typedef enum {
 typedef struct {
     const char *path;               /**< VFS path of the affected file  */
     void *user_ctx;                 /**< Optional user supplied context */
-} gcoap_fileserver_event_ctx_t;
+} nanocoap_fileserver_event_ctx_t;
 
 /**
  * @brief   GCoAP fileserver event callback type
@@ -119,12 +119,12 @@ typedef struct {
  * @param[in] ctx       Event context information
  *
  */
-typedef void (*gcoap_fileserver_event_handler_t)(gcoap_fileserver_event_t event,
-                                                 gcoap_fileserver_event_ctx_t *ctx);
+typedef void (*nanocoap_fileserver_event_handler_t)(nanocoap_fileserver_event_t event,
+                                                    nanocoap_fileserver_event_ctx_t *ctx);
 
 /**
  * @brief   Register a consumer for GCoAP fileserver events
- *          Requires the `gcoap_fileserver_callback` module
+ *          Requires the `nanocoap_fileserver_callback` module
  *
  *          The Callback is called on each fileserver event and executed
  *          within the GCoAP thread.
@@ -133,13 +133,13 @@ typedef void (*gcoap_fileserver_event_handler_t)(gcoap_fileserver_event_t event,
  * @param[in]  arg  Custom callback function context
  *
  */
-void gcoap_fileserver_set_event_cb(gcoap_fileserver_event_handler_t cb, void *arg);
+void nanocoap_fileserver_set_event_cb(nanocoap_fileserver_event_handler_t cb, void *arg);
 
 /**
  * @brief File server handler
  *
  * Serve a directory from the VFS as a CoAP resource tree.
- * @see net_gcoap_fileserver
+ * @see net_nanocoap_fileserver
  *
  * @param[in] pdu   CoAP request package
  * @param[out] buf  Buffer for the response
@@ -149,12 +149,13 @@ void gcoap_fileserver_set_event_cb(gcoap_fileserver_event_handler_t cb, void *ar
  * @return size of the response on success
  *         negative error
  */
-ssize_t gcoap_fileserver_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx);
+ssize_t nanocoap_fileserver_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len,
+                                    coap_request_ctx_t *ctx);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* NET_GCOAP_FILESERVER_H */
+#endif /* NET_NANOCOAP_FILESERVER_H */
 
 /** @} */

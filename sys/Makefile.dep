@@ -480,13 +480,13 @@ ifneq (,$(filter nanocoap_fileserver,$(USEMODULE)))
   USEMODULE += vfs
 endif
 
-ifneq (,$(filter gcoap_fileserver_delete,$(USEMODULE)))
-  USEMODULE += gcoap_fileserver
+ifneq (,$(filter nanocoap_fileserver_delete,$(USEMODULE)))
+  USEMODULE += nanocoap_fileserver
   USEMODULE += vfs_util
 endif
 
-ifneq (,$(filter gcoap_fileserver_put,$(USEMODULE)))
-  USEMODULE += gcoap_fileserver
+ifneq (,$(filter nanocoap_fileserver_put,$(USEMODULE)))
+  USEMODULE += nanocoap_fileserver
 endif
 
 ifneq (,$(filter gcoap_forward_proxy,$(USEMODULE)))
