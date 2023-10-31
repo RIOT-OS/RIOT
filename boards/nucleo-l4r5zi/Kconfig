@@ -18,6 +18,7 @@ config BOARD_NUCLEO_L4R5ZI
     select HAS_PERIPH_ADC
     select HAS_PERIPH_I2C
     select HAS_PERIPH_LPUART
+    select HAS_PERIPH_PWM
     select HAS_PERIPH_RTC
     select HAS_PERIPH_RTT
     select HAS_PERIPH_SPI
