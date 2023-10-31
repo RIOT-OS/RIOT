@@ -333,18 +333,49 @@ static bool _is_ipv6_hdr(gnrc_pktsnip_t *hdr)
 #endif
 }
 
+/* find the last extension header, if present */
+static gnrc_pktsnip_t *_last_ext_hdr(gnrc_pktsnip_t *ipv6)
+{
+#ifdef MODULE_GNRC_IPV6_EXT_OPT
+    if (ipv6->next == NULL || ipv6->next->type != GNRC_NETTYPE_IPV6_EXT) {
+        return NULL;
+    }
+
+    while (ipv6->next && ipv6->next->type == GNRC_NETTYPE_IPV6_EXT) {
+        ipv6 = ipv6->next;
+    }
+
+    return ipv6;
+#else
+    (void)ipv6;
+    return NULL;
+#endif
+}
+
 static int _fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *ipv6)
 {
     int res;
     ipv6_hdr_t *hdr = ipv6->data;
-    gnrc_pktsnip_t *payload, *prev;
+    gnrc_pktsnip_t *payload, *prev, *ext;
 
     hdr->len = byteorder_htons(gnrc_pkt_len(ipv6->next));
     DEBUG("ipv6: set payload length to %u (network byteorder %04" PRIx16 ")\n",
           (unsigned)byteorder_ntohs(hdr->len), hdr->len.u16);
 
+    ext = _last_ext_hdr(ipv6);
+    if (ext) {
+        ipv6_ext_t *ext_hdr = ext->data;
+
+        if (ext_hdr->nh == PROTNUM_RESERVED) {
+            ext_hdr->nh = ext->next
+                        ? gnrc_nettype_to_protnum(ext->next->type)
+                        : PROTNUM_IPV6_NONXT;
+        }
+
+        DEBUG("ipv6: set next header to %u\n", ext_hdr->nh);
+    }
     /* check if e.g. extension header was not already marked */
-    if (hdr->nh == PROTNUM_RESERVED) {
+    else if (hdr->nh == PROTNUM_RESERVED) {
         if (ipv6->next == NULL) {
             hdr->nh = PROTNUM_IPV6_NONXT;
         }
@@ -356,9 +387,9 @@ static int _fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *ipv6)
                 hdr->nh = PROTNUM_IPV6_NONXT;
             }
         }
-    }
 
-    DEBUG("ipv6: set next header to %u\n", hdr->nh);
+        DEBUG("ipv6: set next header to %u\n", hdr->nh);
+    }
 
     if (hdr->hl == 0) {
         if (netif == NULL) {
