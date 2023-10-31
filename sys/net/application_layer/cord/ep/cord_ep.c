@@ -23,13 +23,13 @@
 
 #include "mutex.h"
 #include "assert.h"
-#include "thread_flags.h"
 
+#include "fmt.h"
+#include "luid.h"
 #include "clif.h"
 #include "net/gcoap.h"
 #include "net/ipv6/addr.h"
 #include "net/cord/ep.h"
-#include "net/cord/common.h"
 #include "net/cord/config.h"
 
 #ifdef MODULE_CORD_EP_STANDALONE
@@ -38,6 +38,70 @@
 
 #define ENABLE_DEBUG        0
 #include "debug.h"
+
+#ifdef CONFIG_CORD_EP
+#define cord_ep_name    CONFIG_CORD_EP
+#else
+#define PREFIX_LEN      (sizeof(CORD_EP_PREFIX))        /* contains \0 char */
+#define BUFSIZE         (PREFIX_LEN + CORD_EP_SUFFIX_LEN)
+static char cord_ep_name[BUFSIZE] = { 0 };
+#endif
+
+int _pkt_add_qstring(coap_pkt_t *pkt)
+{
+    /* extend the url with some query string options */
+    int res = coap_opt_add_uri_query(pkt, "ep", cord_ep_name);
+    if (res < 0) {
+        return res;
+    }
+
+    /* [optional] set the lifetime parameter */
+#if CONFIG_CORD_LT
+    char lt[11];
+    lt[fmt_u32_dec(lt, CONFIG_CORD_LT)] = '\0';
+    res = coap_opt_add_uri_query(pkt, "lt", lt);
+    if (res < 0) {
+        return res;
+    }
+#endif
+
+    /* [optional] set the domain parameter */
+#ifdef CORD_D
+    res = coap_opt_add_uri_query(pkt, "d", CORD_D);
+    if (res < 0) {
+        return res;
+    }
+#endif
+
+#ifdef CONFIG_CORD_EXTRAARGS
+    static const char *extra[] = { CONFIG_CORD_EXTRAARGS };
+    for (unsigned i = 0; i < ARRAY_SIZE(extra); ++i) {
+        res = coap_opt_add_uri_query(pkt, extra[i], NULL);
+        if (res < 0) {
+            return res;
+        }
+    }
+#endif
+
+    return 0;
+}
+
+void _init_epname(void)
+{
+#ifndef CONFIG_CORD_EP
+    if (cord_ep_name[0] == '\0') {
+        uint8_t luid[CORD_EP_SUFFIX_LEN / 2];
+
+        if (PREFIX_LEN > 1) {
+            memcpy(cord_ep_name, CORD_EP_PREFIX, (PREFIX_LEN - 1));
+        }
+
+        luid_get(luid, sizeof(luid));
+        fmt_bytes_hex(&cord_ep_name[PREFIX_LEN - 1], luid, sizeof(luid));
+        cord_ep_name[BUFSIZE - 1] = '\0';
+    }
+#endif
+}
 
 static void _post_state(cord_ep_ctx_t *cord, cord_state_t state)
 {
@@ -58,11 +122,6 @@ static void _post_refresh(cord_ep_ctx_t *cord, cord_state_t state)
     _post_retry(cord, state, CONFIG_CORD_LT);
 }
 
-static void _clear_rd_location(cord_ep_ctx_t *cord)
-{
-    memset(&cord->rd_loc, 0, CONFIG_CORD_URI_MAX);
-}
-
 static void _clear_regif(cord_ep_ctx_t *cord)
 {
     memset(&cord->rd_regif, 0, CONFIG_CORD_URI_MAX);
@@ -71,7 +130,7 @@ static void _clear_regif(cord_ep_ctx_t *cord)
 static int _set_rd_settings(cord_ep_ctx_t *cord, const sock_udp_ep_t *remote, const char *regif)
 {
     memcpy(&cord->rd_remote, remote, sizeof(cord->rd_remote));
-    if (regif) {
+    if (IS_ACTIVE(CORD_EP) && regif) {
         if (strlen(regif) < sizeof(cord->rd_regif)) {
             strcpy(cord->rd_regif, regif);
         }
@@ -79,12 +138,26 @@ static int _set_rd_settings(cord_ep_ctx_t *cord, const sock_udp_ep_t *remote, co
             return CORD_EP_OVERFLOW;
         }
     }
+    else {
+        memcpy(cord->rd_regif, "/.well-known/rd", sizeof("/.well-known/rd"));
+    }
     return CORD_EP_OK;
+}
+
+#ifdef MODULE_CORD_EP
+static void _clear_rd_location(cord_ep_ctx_t *cord)
+{
+    memset(&cord->rd_loc, 0, CONFIG_CORD_URI_MAX);
 }
 
 static void _on_delete(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
                        const sock_udp_ep_t *remote)
 {
+    cord_ep_ctx_t *cord = memo->context;
+    unsigned req_state = memo->state;
+    (void)remote;
+    (void)pdu;
+
     if (req_state == GCOAP_MEMO_RESP) {
         /* Either the registration was succesfully deleted, or there was no
          * registration in the first place */
@@ -197,6 +270,7 @@ static int _start_discovery(cord_ep_ctx_t *cord)
     }
     return 0;
 }
+#endif
 
 static void _on_register(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
                          const sock_udp_ep_t *remote)
@@ -207,6 +281,7 @@ static void _on_register(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
         /* use the remote used to respond with as new sock remote */
         memcpy(&cord->rd_remote, remote, sizeof(cord->rd_remote));
         if (pdu->hdr->code == COAP_CODE_CREATED) {
+#ifdef MODULE_CORD_EP
             /* read the location header and save the RD details on success */
             if (coap_get_location_path(pdu, (uint8_t *)cord->rd_loc,
                                        sizeof(cord->rd_loc)) > 0) {
@@ -214,11 +289,19 @@ static void _on_register(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
                 return;
             }
             /* if copy fails cascade through to retrying later again */
+#else
+            _post_refresh(cord, CORD_STATE_REGISTRY);
+#endif
         }
         else if (coap_get_code_class(pdu) == COAP_CLASS_CLIENT_FAILURE) {
             _clear_regif(cord);
             /* Retry discovery later */
-            _post_retry(cord, CORD_STATE_DISCOVERY, CONFIG_CORD_FAIL_RETRY_SEC);
+            if (!IS_ACTIVE(MODULE_CORD_EP)) {
+                _post_retry(cord, CORD_STATE_DISCOVERY, CONFIG_CORD_FAIL_RETRY_SEC);
+            }
+            else {
+                _post_retry(cord, CORD_STATE_REGISTRY, CONFIG_CORD_FAIL_RETRY_SEC);
+            }
             return;
         }
     }
@@ -242,23 +325,32 @@ static int  _start_registration(cord_ep_ctx_t *cord)
     }
     /* set hdr type and content format and write query string */
     coap_hdr_set_type(pkt.hdr, COAP_TYPE_CON);
-    coap_opt_add_uint(&pkt, COAP_OPT_CONTENT_FORMAT, COAP_FORMAT_LINK);
-    res = cord_common_add_qstring(&pkt);
+
+    if (IS_ACTIVE(MODULE_CORD_EP)) {
+        coap_opt_add_format(&pkt, COAP_FORMAT_LINK);
+    }
+
+    res = _pkt_add_qstring(&pkt);
     if (res < 0) {
         retval = CORD_EP_ERR;
         goto end;
     }
 
-    pkt_len = coap_opt_finish(&pkt, COAP_OPT_FINISH_PAYLOAD);
+    if (IS_ACTIVE(MODULE_CORD_EP)) {
+        pkt_len = coap_opt_finish(&pkt, COAP_OPT_FINISH_PAYLOAD);
 
-    /* add the resource description as payload */
-    res = gcoap_get_resource_list(pkt.payload, pkt.payload_len,
-                                  COAP_FORMAT_LINK, GCOAP_SOCKET_TYPE_UNDEF);
-    if (res < 0) {
-        retval = CORD_EP_ERR;
-        goto end;
+        /* add the resource description as payload */
+        res = gcoap_get_resource_list(pkt.payload, pkt.payload_len,
+                                      COAP_FORMAT_LINK, GCOAP_SOCKET_TYPE_UNDEF);
+        if (res < 0) {
+            retval = CORD_EP_ERR;
+            goto end;
+        }
+        pkt_len += res;
     }
-    pkt_len += res;
+    else {
+        pkt_len = coap_opt_finish(&pkt, COAP_OPT_FINISH_NONE);
+    }
 
     /* send out the request */
     res = gcoap_req_send(cord->buf, pkt_len, &cord->rd_remote, _on_register, cord);
@@ -280,7 +372,6 @@ int cord_ep_register(cord_ep_ctx_t *cord, const sock_udp_ep_t *remote, const cha
     mutex_lock(&cord->lock);
     cord_state_t state = cord->state;
     if (state == CORD_STATE_IDLE) {
-        /* TODO: dedup */
         /* start registration or discovery at remote */
         res = _set_rd_settings(cord, remote, regif);
         if (res == CORD_EP_OK) {
@@ -316,6 +407,12 @@ int cord_ep_remove(cord_ep_ctx_t *cord)
 {
     mutex_lock(&cord->lock);
     event_timeout_clear(&cord->retry_timer);
+    if (IS_ACTIVE(CORD_STATE_DELETE)) {
+        _post_state(cord, CORD_STATE_DELETE);
+    }
+    else {
+        _post_state(cord, CORD_STATE_IDLE);
+    }
     mutex_unlock(&cord->lock);
     return CORD_EP_OK;
 }
@@ -328,12 +425,15 @@ static void _on_state_update(event_t *event)
         case CORD_STATE_IDLE:
             /* Do nothing */
             break;
+#ifdef MODULE_CORD_EP
         case CORD_STATE_DISCOVERY:
             _start_discovery(cord);
             break;
+#endif
         case CORD_STATE_REGISTRY:
             _start_registration(cord);
             break;
+#ifdef MODULE_CORD_EP
         case CORD_STATE_WAIT_REFRESH:
         case CORD_STATE_WAIT_RETRY:
             /* Send refresh */
@@ -341,6 +441,8 @@ static void _on_state_update(event_t *event)
             break;
         case CORD_STATE_DELETE:
             _send_update_request_with_code(cord, COAP_METHOD_DELETE, _on_delete);
+            break;
+#endif
         default:
             DEBUG("[CORD] State: %d\n", cord->state);
             assert(false);
@@ -352,13 +454,15 @@ int cord_ep_init(cord_ep_ctx_t *cord, event_queue_t *queue, const sock_udp_ep_t 
 {
     assert(remote);
 
+    _init_epname();
+
     memset(cord, 0, sizeof(cord_ep_ctx_t));
     cord->queue = queue;
     cord->state_update.handler = _on_state_update;
     event_timeout_ztimer_init(&cord->retry_timer, ZTIMER_SEC, queue, &cord->state_update);
 
     int res = _set_rd_settings(cord, remote, regif);
-    if (remote && regif) {
+    if (remote && cord->rd_regif[0]) {
         _post_state(cord, CORD_STATE_REGISTRY);
     } else {
         _post_state(cord, CORD_STATE_DISCOVERY);
@@ -367,22 +471,36 @@ int cord_ep_init(cord_ep_ctx_t *cord, event_queue_t *queue, const sock_udp_ep_t 
     return res;
 }
 
+ssize_t cord_ep_get_ep(char *buf, size_t buf_len)
+{
+    size_t ep_len = strlen(cord_ep_name) + 1;
+    if (ep_len > buf_len) {
+        return CORD_EP_OVERFLOW;
+    }
+    memcpy(buf, cord_ep_name, ep_len);
+    return ep_len;
+}
+
 void cord_ep_dump_status(const cord_ep_ctx_t *cord)
 {
     puts("CoAP RD connection status:");
 
+#ifdef MODULE_CORD_EP
     if (cord->rd_loc[0] == 0) {
         puts("  --- not registered with any RD ---");
     }
     else {
+#endif
         /* get address string */
         char addr[IPV6_ADDR_MAX_STR_LEN];
         ipv6_addr_to_str(addr, (ipv6_addr_t *)&cord->rd_remote.addr, sizeof(addr));
 
         printf("RD address: coap://[%s]:%"PRIu16"\n", addr, cord->rd_remote.port);
-        printf("   ep name: %s\n", cord_common_get_ep());
+        printf("   ep name: %s\n", cord_ep_name);
         printf("  lifetime: %is\n", (int)CONFIG_CORD_LT);
         printf("    reg if: %s\n", cord->rd_regif);
+#ifdef MODULE_CORD_EP
         printf("  location: %s\n", cord->rd_loc);
     }
+#endif
 }

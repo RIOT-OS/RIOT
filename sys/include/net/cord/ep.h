@@ -44,7 +44,12 @@
 extern "C" {
 #endif
 
+#ifdef MODULE_CORD_EP
 #define CONFIG_CORD_EP_BUFSIZE             (128U)
+#else
+#define CONFIG_CORD_EP_BUFSIZE             (64U)
+#endif
+
 #define CONFIG_CORD_FAIL_RETRY_SEC          (5)
 #define CONFIG_CORD_URI_MAX         (CONFIG_NANOCOAP_URI_MAX)
 
@@ -69,6 +74,7 @@ typedef enum {
     CORD_STATE_REGISTERING,  /**< Waiting for registration reply */
     CORD_STATE_WAIT_REFRESH, /**< Waiting until refresh is required */
     CORD_STATE_REFRESHING,   /**< Waiting for refresh reply */
+    CORD_STATE_DELETE,    /**< Deleting registration */
     CORD_STATE_DELETING,    /**< Deleting registration */
     CORD_STATE_WAIT_RETRY,  /**< Failure happened, waiting to retry */
 } cord_state_t;
@@ -78,11 +84,12 @@ typedef enum {
  */
 typedef struct {
     mutex_t lock;
+#ifdef MODULE_CORD_EP
     char rd_loc[CONFIG_CORD_URI_MAX];
+#endif
     char rd_regif[CONFIG_CORD_URI_MAX];
     uint8_t buf[CONFIG_CORD_EP_BUFSIZE];
     sock_udp_ep_t rd_remote;
-    thread_t *waiter;
     event_t state_update;
     event_timeout_t retry_timer;
     event_queue_t *queue;
@@ -108,7 +115,7 @@ int cord_ep_discover_regif(cord_ep_ctx_t *cord, const sock_udp_ep_t *remote,
  * @brief   Initiate the node registration by sending an empty push
  *
  * - if registration fails (e.g. timeout), we are not associated with any RD
- *   anymore (even if we have been before we called cord_ep_register)
+ *   anymore (even if we have been before we called cord_endpoint_register)
  *
  * @note    In case a multicast address is given, the @p regif parameter MUST be
  *          NULL. The first RD responding to the request will be chosen and all
@@ -149,13 +156,6 @@ int cord_ep_update(cord_ep_ctx_t *cord);
 int cord_ep_remove(cord_ep_ctx_t *cord);
 
 /**
- * @brief   Dump the current RD connection status to STDIO (for debugging)
- *
- * @param   cord    Resource Directory context to use
- */
-void cord_ep_dump_status(const cord_ep_ctx_t *cord);
-
-/**
  * @brief   Start a resource directory registration
  *
  * @param   cord    Resource Directory context to use
@@ -166,6 +166,26 @@ void cord_ep_dump_status(const cord_ep_ctx_t *cord);
  * @return  CORD_EP_OK on success
  */
 int cord_ep_init(cord_ep_ctx_t *cord, event_queue_t *queue, const sock_udp_ep_t *remote, const char *regif);
+
+/**
+ * @brief   Copy the endpoint name into the provided buffer
+ *
+ * @param   cord    Resource Directory context to use
+ * @param   buf     Buffer to copy into
+ * @param   len     Length of the buffer
+ *
+ * @return  Negative on error
+ * @return  Number of bytes copied
+ */
+ssize_t cord_ep_get_ep(char *buf, size_t buf_len);
+
+/**
+ * @brief   Dump the current RD connection status to STDIO (for debugging)
+ *
+ * @param   cord    Resource Directory context to use
+ */
+void cord_ep_dump_status(const cord_ep_ctx_t *cord);
+
 #ifdef __cplusplus
 }
 #endif

@@ -1,4 +1,4 @@
-MODULE = cord_ep
+MODULE = cord_epsim
 
 SRC = cord_ep.c
 
