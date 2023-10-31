@@ -592,11 +592,11 @@ ifneq (,$(filter cord_lc,$(USEMODULE)))
   USEMODULE += gcoap
 endif
 
-ifneq (,$(filter cord_ep,$(USEMODULE)))
-  USEMODULE += cord_epsim
+ifneq (,$(filter cord_endpoint,$(USEMODULE)))
+  USEMODULE += cord_endpoint_simple
 endif
 
-ifneq (,$(filter cord_epsim,$(USEMODULE)))
+ifneq (,$(filter cord_endpoint_simple,$(USEMODULE)))
   USEMODULE += clif
   USEMODULE += gcoap
   USEMODULE += ztimer_sec

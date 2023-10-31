@@ -32,8 +32,8 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-#ifndef NET_CORD_EP_H
-#define NET_CORD_EP_H
+#ifndef NET_CORD_ENDPOINT_H
+#define NET_CORD_ENDPOINT_H
 
 #include "event.h"
 #include "event/timeout.h"
@@ -44,10 +44,10 @@
 extern "C" {
 #endif
 
-#ifdef MODULE_CORD_EP
-#define CONFIG_CORD_EP_BUFSIZE             (128U)
+#ifdef MODULE_CORD_ENDPOINT
+#define CONFIG_CORD_ENDPOINT_BUFSIZE             (128U)
 #else
-#define CONFIG_CORD_EP_BUFSIZE             (64U)
+#define CONFIG_CORD_ENDPOINT_BUFSIZE             (64U)
 #endif
 
 #define CONFIG_CORD_FAIL_RETRY_SEC          (5)
@@ -57,13 +57,13 @@ extern "C" {
  * @brief   Return values and error codes used by this module
  */
 enum {
-    CORD_EP_OK        =  0,     /**< everything went as expected */
-    CORD_EP_TIMEOUT   = -1,     /**< no response from the network */
-    CORD_EP_ERR       = -2,     /**< internal error or invalid reply */
-    CORD_EP_NORD      = -3,     /**< not connected to an RD, not to be confused with north */
-    CORD_EP_NO_RD     = -3,     /**< not connected to an RD */
-    CORD_EP_OVERFLOW  = -4,     /**< internal buffers can not handle input */
-    CORD_EP_BUSY      = -5,     /**< Resource directory is busy  */
+    CORD_ENDPOINT_OK        =  0,     /**< everything went as expected */
+    CORD_ENDPOINT_TIMEOUT   = -1,     /**< no response from the network */
+    CORD_ENDPOINT_ERR       = -2,     /**< internal error or invalid reply */
+    CORD_ENDPOINT_NORD      = -3,     /**< not connected to an RD, not to be confused with north */
+    CORD_ENDPOINT_NO_RD     = -3,     /**< not connected to an RD */
+    CORD_ENDPOINT_OVERFLOW  = -4,     /**< internal buffers can not handle input */
+    CORD_ENDPOINT_BUSY      = -5,     /**< Resource directory is busy  */
 };
 
 typedef enum {
@@ -84,17 +84,17 @@ typedef enum {
  */
 typedef struct {
     mutex_t lock;
-#ifdef MODULE_CORD_EP
+#ifdef MODULE_CORD_ENDPOINT
     char rd_loc[CONFIG_CORD_URI_MAX];
 #endif
     char rd_regif[CONFIG_CORD_URI_MAX];
-    uint8_t buf[CONFIG_CORD_EP_BUFSIZE];
+    uint8_t buf[CONFIG_CORD_ENDPOINT_BUFSIZE];
     sock_udp_ep_t rd_remote;
     event_t state_update;
     event_timeout_t retry_timer;
     event_queue_t *queue;
     cord_state_t state;
-} cord_ep_ctx_t;
+} cord_endpoint_t;
 
 /**
  * @brief   Discover the registration interface resource of a RD
@@ -103,12 +103,12 @@ typedef struct {
  * @param[out] regif    the registration interface is written to this buffer
  * @param[in] maxlen    size of @p regif
  *
- * @return  CORD_EP_OK on success
- * @return  CORD_EP_TIMEOUT if the discovery request times out
- * @return  CORD_EP_NORD if addressed endpoint is not a RD
- * @return  CORD_EP_ERR on any other internal error
+ * @return  CORD_ENDPOINT_OK on success
+ * @return  CORD_ENDPOINT_TIMEOUT if the discovery request times out
+ * @return  CORD_ENDPOINT_NORD if addressed endpoint is not a RD
+ * @return  CORD_ENDPOINT_ERR on any other internal error
  */
-int cord_ep_discover_regif(cord_ep_ctx_t *cord, const sock_udp_ep_t *remote,
+int cord_endpoint_discover_regif(cord_endpoint_t *cord, const sock_udp_ep_t *remote,
                            char *regif, size_t maxlen);
 
 /**
@@ -125,35 +125,35 @@ int cord_ep_discover_regif(cord_ep_ctx_t *cord, const sock_udp_ep_t *remote,
  * @param[in] regif     registration interface resource of the RD, it will be
  *                      discovered automatically when set to NULL
  *
- * @return  CORD_EP_OK on success
- * @return  CORD_EP_TIMEOUT on registration timeout
- * @return  CORD_EP_NORD if addressed endpoint is not a RD
- * @return  CORD_EP_OVERFLOW if @p regif does not fit into internal buffer
- * @return  CORD_EP_ERR on any other internal error
+ * @return  CORD_ENDPOINT_OK on success
+ * @return  CORD_ENDPOINT_TIMEOUT on registration timeout
+ * @return  CORD_ENDPOINT_NORD if addressed endpoint is not a RD
+ * @return  CORD_ENDPOINT_OVERFLOW if @p regif does not fit into internal buffer
+ * @return  CORD_ENDPOINT_ERR on any other internal error
  */
-int cord_ep_register(cord_ep_ctx_t *cord, const sock_udp_ep_t *remote, const char *regif);
+int cord_endpoint_register(cord_endpoint_t *cord, const sock_udp_ep_t *remote, const char *regif);
 
 /**
  * @brief   Force update our current entry at the RD
  *
  * @param   cord    Resource Directory context to use
  *
- * @return  CORD_EP_OK on success
- * @return  CORD_EP_TIMEOUT if the update request times out
- * @return  CORD_EP_ERR on any other internal error
+ * @return  CORD_ENDPOINT_OK on success
+ * @return  CORD_ENDPOINT_TIMEOUT if the update request times out
+ * @return  CORD_ENDPOINT_ERR on any other internal error
  */
-int cord_ep_update(cord_ep_ctx_t *cord);
+int cord_endpoint_update(cord_endpoint_t *cord);
 
 /**
  * @brief   Unregister from a given RD server
  *
  * @param   cord    Resource Directory context to use
  *
- * @return  CORD_EP_OK on success
- * @return  CORD_EP_TIMEOUT if the remove request times out
- * @return  CORD_EP_ERR on any other internal error
+ * @return  CORD_ENDPOINT_OK on success
+ * @return  CORD_ENDPOINT_TIMEOUT if the remove request times out
+ * @return  CORD_ENDPOINT_ERR on any other internal error
  */
-int cord_ep_remove(cord_ep_ctx_t *cord);
+int cord_endpoint_remove(cord_endpoint_t *cord);
 
 /**
  * @brief   Start a resource directory registration
@@ -163,9 +163,9 @@ int cord_ep_remove(cord_ep_ctx_t *cord);
  * @param   remote  Remote endpoint to register at
  * @param   regif   Endpoint to register at, can be NULL to use discovery
  *
- * @return  CORD_EP_OK on success
+ * @return  CORD_ENDPOINT_OK on success
  */
-int cord_ep_init(cord_ep_ctx_t *cord, event_queue_t *queue, const sock_udp_ep_t *remote, const char *regif);
+int cord_endpoint_init(cord_endpoint_t *cord, event_queue_t *queue, const sock_udp_ep_t *remote, const char *regif);
 
 /**
  * @brief   Copy the endpoint name into the provided buffer
@@ -177,18 +177,18 @@ int cord_ep_init(cord_ep_ctx_t *cord, event_queue_t *queue, const sock_udp_ep_t 
  * @return  Negative on error
  * @return  Number of bytes copied
  */
-ssize_t cord_ep_get_ep(char *buf, size_t buf_len);
+ssize_t cord_endpoint_get_ep(char *buf, size_t buf_len);
 
 /**
  * @brief   Dump the current RD connection status to STDIO (for debugging)
  *
  * @param   cord    Resource Directory context to use
  */
-void cord_ep_dump_status(const cord_ep_ctx_t *cord);
+void cord_endpoint_dump_status(const cord_endpoint_t *cord);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* NET_CORD_EP_H */
+#endif /* NET_CORD_ENDPOINT_H */
 /** @} */

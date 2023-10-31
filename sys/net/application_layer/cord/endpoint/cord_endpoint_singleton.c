@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     net_cord_ep_standalone
+ * @ingroup     net_cord_endpoint_singleton
  * @{
  *
  * @file
@@ -26,9 +26,9 @@
 #include "ztimer.h"
 #include "net/sock/util.h"
 #include "net/gcoap.h"
-#include "net/cord/ep.h"
+#include "net/cord/endpoint.h"
 #include "net/cord/config.h"
-#include "net/cord/ep_standalone.h"
+#include "net/cord/endpoint_singleton.h"
 
 #define ENABLE_DEBUG        0
 #include "debug.h"
@@ -44,11 +44,11 @@
 
 static char _stack[STACKSIZE];
 
-static cord_ep_standalone_cb_t _cb = NULL;
-static cord_ep_ctx_t _cord;
+static cord_endpoint_singleton_cb_t _cb = NULL;
+static cord_endpoint_t _cord;
 
 #if 0
-static void _notify(cord_ep_standalone_event_t event)
+static void _notify(cord_endpoint_singleton_event_t event)
 {
     if (_cb) {
         _cb(event);
@@ -60,7 +60,7 @@ static void *_reg_runner(void *arg)
 {
     (void)arg;
     sock_udp_ep_t remote;
-    sock_udp_name2ep(&remote, CORD_EP_STANDALONE_ADDRESS);
+    sock_udp_name2ep(&remote, CORD_ENDPOINT_STANDALONE_ADDRESS);
     if (remote.port == 0) {
         if (IS_USED(MODULE_GCOAP_DTLS)) {
             remote.port = CONFIG_GCOAPS_PORT;
@@ -72,25 +72,25 @@ static void *_reg_runner(void *arg)
     event_queue_t queue;
     event_queue_init(&queue);
 
-    cord_ep_init(&_cord, &queue, &remote, NULL);
+    cord_endpoint_init(&_cord, &queue, &remote, NULL);
 
     event_loop(&queue);
     return NULL;    /* should never be reached */
 }
 
-void cord_ep_standalone_run(void)
+void cord_endpoint_singleton_run(void)
 {
     thread_create(_stack, sizeof(_stack), PRIO, THREAD_CREATE_STACKTEST,
                   _reg_runner, NULL, TNAME);
 }
 
-void cord_ep_standalone_signal(bool connected)
+void cord_endpoint_singleton_signal(bool connected)
 {
      (void)connected;
      return;
 }
 
-void cord_ep_standalone_reg_cb(cord_ep_standalone_cb_t cb)
+void cord_endpoint_singleton_reg_cb(cord_endpoint_singleton_cb_t cb)
 {
     /* Note: we do not allow re-setting the callback (via passing cb := NULL),
      *       as this would mean additional complexity for synchronizing the
@@ -99,12 +99,12 @@ void cord_ep_standalone_reg_cb(cord_ep_standalone_cb_t cb)
     _cb = cb;
 }
 
-int cord_ep_standalone_register(const sock_udp_ep_t *remote, const char *regif)
+int cord_endpoint_singleton_register(const sock_udp_ep_t *remote, const char *regif)
 {
-    return cord_ep_register(&_cord, remote, regif);
+    return cord_endpoint_register(&_cord, remote, regif);
 }
 
-void cord_ep_standalone_dump_status(void)
+void cord_endpoint_singleton_dump_status(void)
 {
-    cord_ep_dump_status(&_cord);
+    cord_endpoint_dump_status(&_cord);
 }

@@ -29,28 +29,24 @@
 #include "clif.h"
 #include "net/gcoap.h"
 #include "net/ipv6/addr.h"
-#include "net/cord/ep.h"
+#include "net/cord/endpoint.h"
 #include "net/cord/config.h"
-
-#ifdef MODULE_CORD_EP_STANDALONE
-#include "net/cord/ep_standalone.h"
-#endif
 
 #define ENABLE_DEBUG        0
 #include "debug.h"
 
-#ifdef CONFIG_CORD_EP
-#define cord_ep_name    CONFIG_CORD_EP
+#ifdef CONFIG_CORD_ENDPOINT
+#define cord_endpoint_name    CONFIG_CORD_ENDPOINT
 #else
-#define PREFIX_LEN      (sizeof(CORD_EP_PREFIX))        /* contains \0 char */
-#define BUFSIZE         (PREFIX_LEN + CORD_EP_SUFFIX_LEN)
-static char cord_ep_name[BUFSIZE] = { 0 };
+#define PREFIX_LEN      (sizeof(CORD_ENDPOINT_PREFIX))        /* contains \0 char */
+#define BUFSIZE         (PREFIX_LEN + CORD_ENDPOINT_SUFFIX_LEN)
+static char cord_endpoint_name[BUFSIZE] = { 0 };
 #endif
 
 int _pkt_add_qstring(coap_pkt_t *pkt)
 {
     /* extend the url with some query string options */
-    int res = coap_opt_add_uri_query(pkt, "ep", cord_ep_name);
+    int res = coap_opt_add_uri_query(pkt, "ep", cord_endpoint_name);
     if (res < 0) {
         return res;
     }
@@ -88,64 +84,64 @@ int _pkt_add_qstring(coap_pkt_t *pkt)
 
 void _init_epname(void)
 {
-#ifndef CONFIG_CORD_EP
-    if (cord_ep_name[0] == '\0') {
-        uint8_t luid[CORD_EP_SUFFIX_LEN / 2];
+#ifndef CONFIG_CORD_ENDPOINT
+    if (cord_endpoint_name[0] == '\0') {
+        uint8_t luid[CORD_ENDPOINT_SUFFIX_LEN / 2];
 
         if (PREFIX_LEN > 1) {
-            memcpy(cord_ep_name, CORD_EP_PREFIX, (PREFIX_LEN - 1));
+            memcpy(cord_endpoint_name, CORD_ENDPOINT_PREFIX, (PREFIX_LEN - 1));
         }
 
         luid_get(luid, sizeof(luid));
-        fmt_bytes_hex(&cord_ep_name[PREFIX_LEN - 1], luid, sizeof(luid));
-        cord_ep_name[BUFSIZE - 1] = '\0';
+        fmt_bytes_hex(&cord_endpoint_name[PREFIX_LEN - 1], luid, sizeof(luid));
+        cord_endpoint_name[BUFSIZE - 1] = '\0';
     }
 #endif
 }
 
-static void _post_state(cord_ep_ctx_t *cord, cord_state_t state)
+static void _post_state(cord_endpoint_t *cord, cord_state_t state)
 {
     cord->state = state;
     /* submit event */
     event_post(cord->queue, &cord->state_update);
 }
 
-static void _post_retry(cord_ep_ctx_t *cord, cord_state_t state, uint32_t timeout)
+static void _post_retry(cord_endpoint_t *cord, cord_state_t state, uint32_t timeout)
 {
     cord->state = state;
     /* submit event */
     event_timeout_set(&cord->retry_timer, timeout);
 }
 
-static void _post_refresh(cord_ep_ctx_t *cord, cord_state_t state)
+static void _post_refresh(cord_endpoint_t *cord, cord_state_t state)
 {
     _post_retry(cord, state, CONFIG_CORD_LT);
 }
 
-static void _clear_regif(cord_ep_ctx_t *cord)
+static void _clear_regif(cord_endpoint_t *cord)
 {
     memset(&cord->rd_regif, 0, CONFIG_CORD_URI_MAX);
 }
 
-static int _set_rd_settings(cord_ep_ctx_t *cord, const sock_udp_ep_t *remote, const char *regif)
+static int _set_rd_settings(cord_endpoint_t *cord, const sock_udp_ep_t *remote, const char *regif)
 {
     memcpy(&cord->rd_remote, remote, sizeof(cord->rd_remote));
-    if (IS_ACTIVE(CORD_EP) && regif) {
+    if (IS_ACTIVE(CORD_ENDPOINT) && regif) {
         if (strlen(regif) < sizeof(cord->rd_regif)) {
             strcpy(cord->rd_regif, regif);
         }
         else {
-            return CORD_EP_OVERFLOW;
+            return CORD_ENDPOINT_OVERFLOW;
         }
     }
     else {
         memcpy(cord->rd_regif, "/.well-known/rd", sizeof("/.well-known/rd"));
     }
-    return CORD_EP_OK;
+    return CORD_ENDPOINT_OK;
 }
 
-#ifdef MODULE_CORD_EP
-static void _clear_rd_location(cord_ep_ctx_t *cord)
+#ifdef MODULE_CORD_ENDPOINT
+static void _clear_rd_location(cord_endpoint_t *cord)
 {
     memset(&cord->rd_loc, 0, CONFIG_CORD_URI_MAX);
 }
@@ -153,7 +149,7 @@ static void _clear_rd_location(cord_ep_ctx_t *cord)
 static void _on_delete(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
                        const sock_udp_ep_t *remote)
 {
-    cord_ep_ctx_t *cord = memo->context;
+    cord_endpoint_t *cord = memo->context;
     unsigned req_state = memo->state;
     (void)remote;
     (void)pdu;
@@ -172,7 +168,7 @@ static void _on_delete(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
 static void _on_update(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
                        const sock_udp_ep_t *remote)
 {
-    cord_ep_ctx_t *cord = memo->context;
+    cord_endpoint_t *cord = memo->context;
     unsigned req_state = memo->state;
     (void)remote;
 
@@ -191,18 +187,18 @@ static void _on_update(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
     _post_retry(cord, CORD_STATE_WAIT_RETRY, CONFIG_CORD_FAIL_RETRY_SEC);
 }
 
-static int _send_update_request_with_code(cord_ep_ctx_t *cord, unsigned code, gcoap_resp_handler_t handle)
+static int _send_update_request_with_code(cord_endpoint_t *cord, unsigned code, gcoap_resp_handler_t handle)
 {
     coap_pkt_t pkt;
 
     if (cord->rd_loc[0] == 0) {
-        return CORD_EP_NO_RD;
+        return CORD_ENDPOINT_NO_RD;
     }
 
     /* build CoAP request packet */
-    int res = gcoap_req_init(&pkt, cord->buf, CONFIG_CORD_EP_BUFSIZE, code, cord->rd_loc);
+    int res = gcoap_req_init(&pkt, cord->buf, CONFIG_CORD_ENDPOINT_BUFSIZE, code, cord->rd_loc);
     if (res < 0) {
-        return CORD_EP_ERR;
+        return CORD_ENDPOINT_ERR;
     }
     coap_hdr_set_type(pkt.hdr, COAP_TYPE_CON);
     ssize_t pkt_len = coap_opt_finish(&pkt, COAP_OPT_FINISH_NONE);
@@ -210,7 +206,7 @@ static int _send_update_request_with_code(cord_ep_ctx_t *cord, unsigned code, gc
     /* send request */
     ssize_t send_len = gcoap_req_send(cord->buf, pkt_len, &cord->rd_remote, handle, cord);
     if (send_len <= 0) {
-        return CORD_EP_ERR;
+        return CORD_ENDPOINT_ERR;
     }
     return 0;
 }
@@ -218,7 +214,7 @@ static int _send_update_request_with_code(cord_ep_ctx_t *cord, unsigned code, gc
 static void _on_discover(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
                          const sock_udp_ep_t *remote)
 {
-    cord_ep_ctx_t *cord = memo->context;
+    cord_endpoint_t *cord = memo->context;
     (void)remote;
 
     if (memo->state == GCOAP_MEMO_RESP) {
@@ -250,15 +246,15 @@ end:
     return;
 }
 
-static int _start_discovery(cord_ep_ctx_t *cord)
+static int _start_discovery(cord_endpoint_t *cord)
 {
     coap_pkt_t pkt;
     cord->state = CORD_STATE_DISCOVERING;
     /* do URI discovery for the registration interface */
-    int res = gcoap_req_init(&pkt, cord->buf, CONFIG_CORD_EP_BUFSIZE, COAP_METHOD_GET,
+    int res = gcoap_req_init(&pkt, cord->buf, CONFIG_CORD_ENDPOINT_BUFSIZE, COAP_METHOD_GET,
                              "/.well-known/core");
     if (res < 0) {
-        return CORD_EP_ERR;
+        return CORD_ENDPOINT_ERR;
     }
     coap_hdr_set_type(pkt.hdr, COAP_TYPE_CON);
     coap_opt_add_uri_query(&pkt, "rt", "core.rd");
@@ -266,7 +262,7 @@ static int _start_discovery(cord_ep_ctx_t *cord)
     res = gcoap_req_send(cord->buf, pkt_len, &cord->rd_remote, _on_discover, cord);
     if (res <= 0) {
         _post_retry(cord, CORD_STATE_DISCOVERY, CONFIG_CORD_FAIL_RETRY_SEC);
-        return CORD_EP_ERR;
+        return CORD_ENDPOINT_ERR;
     }
     return 0;
 }
@@ -275,13 +271,13 @@ static int _start_discovery(cord_ep_ctx_t *cord)
 static void _on_register(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
                          const sock_udp_ep_t *remote)
 {
-    cord_ep_ctx_t *cord = memo->context;
+    cord_endpoint_t *cord = memo->context;
 
     if (memo->state == GCOAP_MEMO_RESP) {
         /* use the remote used to respond with as new sock remote */
         memcpy(&cord->rd_remote, remote, sizeof(cord->rd_remote));
         if (pdu->hdr->code == COAP_CODE_CREATED) {
-#ifdef MODULE_CORD_EP
+#ifdef MODULE_CORD_ENDPOINT
             /* read the location header and save the RD details on success */
             if (coap_get_location_path(pdu, (uint8_t *)cord->rd_loc,
                                        sizeof(cord->rd_loc)) > 0) {
@@ -296,7 +292,7 @@ static void _on_register(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
         else if (coap_get_code_class(pdu) == COAP_CLASS_CLIENT_FAILURE) {
             _clear_regif(cord);
             /* Retry discovery later */
-            if (!IS_ACTIVE(MODULE_CORD_EP)) {
+            if (!IS_ACTIVE(MODULE_CORD_ENDPOINT)) {
                 _post_retry(cord, CORD_STATE_DISCOVERY, CONFIG_CORD_FAIL_RETRY_SEC);
             }
             else {
@@ -309,7 +305,7 @@ static void _on_register(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
     _post_retry(cord, CORD_STATE_REGISTRY, CONFIG_CORD_FAIL_RETRY_SEC);
 }
 
-static int  _start_registration(cord_ep_ctx_t *cord)
+static int  _start_registration(cord_endpoint_t *cord)
 {
     int res;
     cord->state = CORD_STATE_REGISTERING;
@@ -318,32 +314,32 @@ static int  _start_registration(cord_ep_ctx_t *cord)
     coap_pkt_t pkt;
 
     /* build and send CoAP POST request to the RD's registration interface */
-    res = gcoap_req_init(&pkt, cord->buf, CONFIG_CORD_EP_BUFSIZE, COAP_METHOD_POST, cord->rd_regif);
+    res = gcoap_req_init(&pkt, cord->buf, CONFIG_CORD_ENDPOINT_BUFSIZE, COAP_METHOD_POST, cord->rd_regif);
     if (res < 0) {
-        retval = CORD_EP_ERR;
+        retval = CORD_ENDPOINT_ERR;
         goto end;
     }
     /* set hdr type and content format and write query string */
     coap_hdr_set_type(pkt.hdr, COAP_TYPE_CON);
 
-    if (IS_ACTIVE(MODULE_CORD_EP)) {
+    if (IS_ACTIVE(MODULE_CORD_ENDPOINT)) {
         coap_opt_add_format(&pkt, COAP_FORMAT_LINK);
     }
 
     res = _pkt_add_qstring(&pkt);
     if (res < 0) {
-        retval = CORD_EP_ERR;
+        retval = CORD_ENDPOINT_ERR;
         goto end;
     }
 
-    if (IS_ACTIVE(MODULE_CORD_EP)) {
+    if (IS_ACTIVE(MODULE_CORD_ENDPOINT)) {
         pkt_len = coap_opt_finish(&pkt, COAP_OPT_FINISH_PAYLOAD);
 
         /* add the resource description as payload */
         res = gcoap_get_resource_list(pkt.payload, pkt.payload_len,
                                       COAP_FORMAT_LINK, GCOAP_SOCKET_TYPE_UNDEF);
         if (res < 0) {
-            retval = CORD_EP_ERR;
+            retval = CORD_ENDPOINT_ERR;
             goto end;
         }
         pkt_len += res;
@@ -358,23 +354,23 @@ static int  _start_registration(cord_ep_ctx_t *cord)
         /* wait for gcoap result */
         return 0;
     }
-    retval = CORD_EP_ERR;
+    retval = CORD_ENDPOINT_ERR;
 end:
     /* retry registration later on */
     _post_retry(cord, CORD_STATE_REGISTRY, CONFIG_CORD_FAIL_RETRY_SEC);
     return retval;
 }
 
-int cord_ep_register(cord_ep_ctx_t *cord, const sock_udp_ep_t *remote, const char *regif)
+int cord_endpoint_register(cord_endpoint_t *cord, const sock_udp_ep_t *remote, const char *regif)
 {
     assert(remote);
-    int res = CORD_EP_OK;
+    int res = CORD_ENDPOINT_OK;
     mutex_lock(&cord->lock);
     cord_state_t state = cord->state;
     if (state == CORD_STATE_IDLE) {
         /* start registration or discovery at remote */
         res = _set_rd_settings(cord, remote, regif);
-        if (res == CORD_EP_OK) {
+        if (res == CORD_ENDPOINT_OK) {
             if (regif) {
                 _post_state(cord, CORD_STATE_REGISTRY);
             }
@@ -384,26 +380,26 @@ int cord_ep_register(cord_ep_ctx_t *cord, const sock_udp_ep_t *remote, const cha
         }
     }
     else {
-        res = CORD_EP_BUSY;
+        res = CORD_ENDPOINT_BUSY;
     }
     mutex_unlock(&cord->lock);
     return res;
 }
 
-int cord_ep_update(cord_ep_ctx_t *cord)
+int cord_endpoint_update(cord_endpoint_t *cord)
 {
-    int res = CORD_EP_BUSY;
+    int res = CORD_ENDPOINT_BUSY;
     mutex_lock(&cord->lock);
     if (cord->state == CORD_STATE_WAIT_REFRESH) {
         event_timeout_clear(&cord->retry_timer);
         _post_state(cord, CORD_STATE_WAIT_REFRESH);
-        res = CORD_EP_OK;
+        res = CORD_ENDPOINT_OK;
     }
     mutex_unlock(&cord->lock);
     return res;
 }
 
-int cord_ep_remove(cord_ep_ctx_t *cord)
+int cord_endpoint_remove(cord_endpoint_t *cord)
 {
     mutex_lock(&cord->lock);
     event_timeout_clear(&cord->retry_timer);
@@ -414,18 +410,18 @@ int cord_ep_remove(cord_ep_ctx_t *cord)
         _post_state(cord, CORD_STATE_IDLE);
     }
     mutex_unlock(&cord->lock);
-    return CORD_EP_OK;
+    return CORD_ENDPOINT_OK;
 }
 
 static void _on_state_update(event_t *event)
 {
-    cord_ep_ctx_t *cord = container_of(event, cord_ep_ctx_t, state_update);
+    cord_endpoint_t *cord = container_of(event, cord_endpoint_t, state_update);
     mutex_lock(&cord->lock);
     switch (cord->state) {
         case CORD_STATE_IDLE:
             /* Do nothing */
             break;
-#ifdef MODULE_CORD_EP
+#ifdef MODULE_CORD_ENDPOINT
         case CORD_STATE_DISCOVERY:
             _start_discovery(cord);
             break;
@@ -433,7 +429,7 @@ static void _on_state_update(event_t *event)
         case CORD_STATE_REGISTRY:
             _start_registration(cord);
             break;
-#ifdef MODULE_CORD_EP
+#ifdef MODULE_CORD_ENDPOINT
         case CORD_STATE_WAIT_REFRESH:
         case CORD_STATE_WAIT_RETRY:
             /* Send refresh */
@@ -450,13 +446,13 @@ static void _on_state_update(event_t *event)
     mutex_unlock(&cord->lock);
 }
 
-int cord_ep_init(cord_ep_ctx_t *cord, event_queue_t *queue, const sock_udp_ep_t *remote, const char *regif)
+int cord_endpoint_init(cord_endpoint_t *cord, event_queue_t *queue, const sock_udp_ep_t *remote, const char *regif)
 {
     assert(remote);
 
     _init_epname();
 
-    memset(cord, 0, sizeof(cord_ep_ctx_t));
+    memset(cord, 0, sizeof(cord_endpoint_t));
     cord->queue = queue;
     cord->state_update.handler = _on_state_update;
     event_timeout_ztimer_init(&cord->retry_timer, ZTIMER_SEC, queue, &cord->state_update);
@@ -471,21 +467,21 @@ int cord_ep_init(cord_ep_ctx_t *cord, event_queue_t *queue, const sock_udp_ep_t 
     return res;
 }
 
-ssize_t cord_ep_get_ep(char *buf, size_t buf_len)
+ssize_t cord_endpoint_get_ep(char *buf, size_t buf_len)
 {
-    size_t ep_len = strlen(cord_ep_name) + 1;
+    size_t ep_len = strlen(cord_endpoint_name) + 1;
     if (ep_len > buf_len) {
-        return CORD_EP_OVERFLOW;
+        return CORD_ENDPOINT_OVERFLOW;
     }
-    memcpy(buf, cord_ep_name, ep_len);
+    memcpy(buf, cord_endpoint_name, ep_len);
     return ep_len;
 }
 
-void cord_ep_dump_status(const cord_ep_ctx_t *cord)
+void cord_endpoint_dump_status(const cord_endpoint_t *cord)
 {
     puts("CoAP RD connection status:");
 
-#ifdef MODULE_CORD_EP
+#ifdef MODULE_CORD_ENDPOINT
     if (cord->rd_loc[0] == 0) {
         puts("  --- not registered with any RD ---");
     }
@@ -496,10 +492,10 @@ void cord_ep_dump_status(const cord_ep_ctx_t *cord)
         ipv6_addr_to_str(addr, (ipv6_addr_t *)&cord->rd_remote.addr, sizeof(addr));
 
         printf("RD address: coap://[%s]:%"PRIu16"\n", addr, cord->rd_remote.port);
-        printf("   ep name: %s\n", cord_ep_name);
+        printf("   ep name: %s\n", cord_endpoint_name);
         printf("  lifetime: %is\n", (int)CONFIG_CORD_LT);
         printf("    reg if: %s\n", cord->rd_regif);
-#ifdef MODULE_CORD_EP
+#ifdef MODULE_CORD_ENDPOINT
         printf("  location: %s\n", cord->rd_loc);
     }
 #endif

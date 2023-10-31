@@ -7,9 +7,9 @@
  */
 
 /**
- * @defgroup    net_cord_ep_standalone CoRE RD Endpoint Standalone Extension
- * @ingroup     net_cord_ep
- * @brief       Run a CoRE Resource Directory endpoint standalone
+ * @defgroup    net_cord_endpoint_singleton CoRE RD Endpoint Standalone Extension
+ * @ingroup     net_cord_endpoint
+ * @brief       Run a CoRE Resource Directory endpoint singleton
  *
  * This sub-module enables a CoRE RD endpoint to manage is registration state
  * with a RD autonomously by periodically running the update procedure. This
@@ -18,36 +18,36 @@
  * @{
  *
  * @file
- * @brief       CoRE Resource Directory endpoint standalone extension
+ * @brief       CoRE Resource Directory endpoint singleton extension
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef NET_CORD_EP_STANDALONE_H
-#define NET_CORD_EP_STANDALONE_H
+#ifndef NET_CORD_ENDPOINT_SINGLETON_H
+#define NET_CORD_ENDPOINT_SINGLETON_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @brief   Possible types of events triggered by the cord_ep_standalone module
+ * @brief   Possible types of events triggered by the cord_endpoint_singleton module
  */
 typedef enum {
-    CORD_EP_REGISTERED,
-    CORD_EP_DEREGISTERED,
-    CORD_EP_UPDATED,
-} cord_ep_standalone_event_t;
+    CORD_ENDPOINT_REGISTERED,
+    CORD_ENDPOINT_DEREGISTERED,
+    CORD_ENDPOINT_UPDATED,
+} cord_endpoint_singleton_event_t;
 
 /**
  * @brief   Callback function signature for RD endpoint state synchronization
  *
  * The registered callback function is executed in the context of the dedicated
- * standalone RD endpoint's thread.
+ * singleton RD endpoint's thread.
  *
  * @param[in] event     type of event
  */
-typedef void(*cord_ep_standalone_cb_t)(cord_ep_standalone_event_t event);
+typedef void(*cord_endpoint_singleton_cb_t)(cord_endpoint_singleton_event_t event);
 
 /**
  * @brief   Spawn a new thread that takes care of sending periodic updates to an
@@ -56,7 +56,7 @@ typedef void(*cord_ep_standalone_cb_t)(cord_ep_standalone_event_t event);
  * @warning This function must only be called once (typically during system
  *          initialization)
  */
-void cord_ep_standalone_run(void);
+void cord_endpoint_singleton_run(void);
 
 /**
  * @brief   Register a callback to be notified about RD endpoint state changes
@@ -68,23 +68,23 @@ void cord_ep_standalone_run(void);
  *
  * @param[in] cb            callback to execute on RD endpoint state changes
  */
-void cord_ep_standalone_reg_cb(cord_ep_standalone_cb_t cb);
+void cord_endpoint_singleton_reg_cb(cord_endpoint_singleton_cb_t cb);
 
 /**
- * @brief   Signal the cord_ep thread about connection status change
+ * @brief   Signal the cord_endpoint thread about connection status change
  *
  * @note    This function should not be called by a user, but it is called from
- *          within the cord_ep implementation
+ *          within the cord_endpoint implementation
  *
  * @param[in] connected     set to true if we are connected to a RD
  */
-void cord_ep_standalone_signal(bool connected);
+void cord_endpoint_singleton_signal(bool connected);
 
-int cord_ep_standalone_register(const sock_udp_ep_t *remote, const char *regif);
-void cord_ep_standalone_dump_status(void);
+int cord_endpoint_singleton_register(const sock_udp_ep_t *remote, const char *regif);
+void cord_endpoint_singleton_dump_status(void);
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* NET_CORD_EP_STANDALONE_H */
+#endif /* NET_CORD_ENDPOINT_SINGLETON_H */
 /** @} */
