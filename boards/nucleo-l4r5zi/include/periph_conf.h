@@ -167,6 +167,50 @@ static const adc_conf_t adc_config[] = {
 
 /** @} */
 
+/**
+ * @name    PWM configuration
+ *
+ * To find appriopate device and channel find in the MCU datasheet table
+ * concerning "Alternate function AF0 to AF7" a text similar to TIM[X]_CH[Y
+],
+ * where:
+ * TIM[X] - is device,
+ * [Y] - describes used channel (indexed from 0), for example TIM2_CH1 is
+ * channel 0 in configuration structure (cc_chan - field),
+ * Port column in the table describes connected port.
+ *
+ * For Nucleo-L4R5ZI this information is in the datasheet, Table 16, page
+ * 117.
+ *
+ * @{
+ */
+static const pwm_conf_t pwm_config[] = {
+    {
+        .dev      = TIM2,
+        .rcc_mask = RCC_APB1ENR1_TIM2EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_A, 0) /* CN10 D32 */, .cc_chan  = 0},
+                      { .pin = GPIO_PIN(PORT_A, 1) /* CN10  A8 */, .cc_chan  = 1},
+                      { .pin = GPIO_PIN(PORT_A, 2) /* CN10 D26 */, .cc_chan  = 2},
+                      { .pin = GPIO_PIN(PORT_A, 3) /*  CN9  A0 */, .cc_chan  = 3} },
+        .af       = GPIO_AF1,
+        .bus      = APB1
+    },
+    {
+        .dev      = TIM3,
+        .rcc_mask = RCC_APB1ENR1_TIM3EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_B, 4) /*  CN7 D25 */, .cc_chan = 0},
+                      { .pin = GPIO_PIN(PORT_E, 4) /*  CN9 D57 */, .cc_chan = 1},
+                      { .pin = GPIO_PIN(PORT_B, 0) /* CN10 D33 */, .cc_chan = 2},
+                      { .pin = GPIO_PIN(PORT_B, 1) /* CN10  A6 */, .cc_chan = 3} },
+        .af       = GPIO_AF2,
+        .bus      = APB1
+    },
+};
+
+#define PWM_NUMOF              ARRAY_SIZE(pwm_config)
+
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

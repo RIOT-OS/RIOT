@@ -163,14 +163,20 @@ extern "C" {
  * @name    CoAP method codes used in header
  * @{
  */
-#define COAP_CLASS_REQ          (0)
-#define COAP_METHOD_GET         (1)
-#define COAP_METHOD_POST        (2)
-#define COAP_METHOD_PUT         (3)
-#define COAP_METHOD_DELETE      (4)
-#define COAP_METHOD_FETCH       (5)
-#define COAP_METHOD_PATCH       (6)
-#define COAP_METHOD_IPATCH      (7)
+#define COAP_CLASS_REQ          (0) /**< Code Class for Request */
+
+/**
+ * @brief   CoAP method codes used in request
+ */
+typedef enum {
+    COAP_METHOD_GET    = 1,         /**< GET request (no paylod) */
+    COAP_METHOD_POST   = 2,         /**< POST request (resource processes payload) */
+    COAP_METHOD_PUT    = 3,         /**< PUT request (update resource with payload) */
+    COAP_METHOD_DELETE = 4,         /**< DELETE request (no payload, remove resource)*/
+    COAP_METHOD_FETCH  = 5,         /**< FETCH request (RFC 8132) */
+    COAP_METHOD_PATCH  = 6,         /**< PATCH request (RFC 8132) */
+    COAP_METHOD_IPATCH = 7,         /**< iPATCH request (RFC 8132) */
+} coap_method_t;
 /** @} */
 
 /**

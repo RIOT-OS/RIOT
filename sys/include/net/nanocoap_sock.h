@@ -205,7 +205,7 @@ typedef struct {
     nanocoap_sock_t *sock;          /**< socket used for the request        */
     const char *path;               /**< path on the server                 */
     uint32_t blknum;                /**< current block number               */
-    uint8_t method;                 /**< request method (GET, POST, PUT)    */
+    coap_method_t method;           /**< request method (GET, POST, PUT)    */
     uint8_t blksize;                /**< CoAP blocksize exponent            */
 } coap_block_request_t;
 
@@ -580,7 +580,7 @@ ssize_t nanocoap_request(coap_pkt_t *pkt, const sock_udp_ep_t *local,
 static inline int nanocoap_block_request_connect_url(coap_block_request_t *ctx,
                                                      nanocoap_sock_t *sock,
                                                      const char *url,
-                                                     uint8_t method,
+                                                     coap_method_t method,
                                                      coap_blksize_t blksize)
 {
     ctx->sock = sock;
