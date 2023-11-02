@@ -251,7 +251,8 @@ if (IS_ACTIVE(CONFIG_USE_LOOPBACK_MODE)) {
 #else
         struct can_filter_classic filter_classic_test_1 = {
             .mode = {
-                CAN_FILTER_RX_0,
+                false,
+                MCP2515_RX_MAILBOX_0,
                 CAN_FILTER_TYPE_CLASSIC
             },
             .can_id = 0x111,
@@ -260,7 +261,8 @@ if (IS_ACTIVE(CONFIG_USE_LOOPBACK_MODE)) {
         candev->driver->set_filter_type_spec(candev, &filter_classic_test_1.mode);
         struct can_filter_classic filter_classic_test_2 = {
             .mode = {
-                CAN_FILTER_RX_1,
+                false,
+                MCP2515_RX_MAILBOX_1,
                 CAN_FILTER_TYPE_CLASSIC
             },
             .can_id = 0x222,
