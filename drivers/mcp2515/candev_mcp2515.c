@@ -34,7 +34,7 @@
 #include "sched.h"
 #include "ztimer.h"
 
-#define ENABLE_DEBUG 0
+#define ENABLE_DEBUG 1
 #include "debug.h"
 
 static mutex_t _mcp_mutex;
@@ -535,11 +535,11 @@ static int _set_filter(candev_t *dev, const struct can_filter *filter)
 #if defined(MODULE_CAN_FILTER_TYPE_SPECIFIC)
 static int _set_filter_type_spec(candev_t *dev, const struct can_filter_mode *filter_mode)
 {
-    DEBUG("inside _set_filter of MCP2515\n");
+    DEBUG("inside _set_filter_type_spec of MCP2515\n");
     /* Filter type supported is classic mode (Mask and Identifier) */
     assert(filter_mode->can_filter_type == CAN_FILTER_TYPE_CLASSIC);
-    /* Filter configuration applied to reception mailbox Rx_0 or Rx_1 */
-    assert(filter_mode->can_filter_conf == CAN_FILTER_RX_0 || filter_mode->can_filter_conf == CAN_FILTER_RX_1);
+    /* Filter applied to reception mailbox Rx_0 or Rx_1 */
+    assert(filter_mode->rx_mailbox == MCP2515_RX_MAILBOX_0 || filter_mode->rx_mailbox == MCP2515_RX_MAILBOX_1);
 
     struct can_filter_classic *classic_filter = container_of(filter_mode, struct can_filter_classic, mode);
 
@@ -571,12 +571,12 @@ static int _set_filter_type_spec(candev_t *dev, const struct can_filter_mode *fi
     }
 
     uint8_t rx_mailbox = 0;
-    switch (classic_filter->mode.can_filter_conf) {
-        case CAN_FILTER_RX_0:
+    switch (classic_filter->mode.rx_mailbox) {
+        case MCP2515_RX_MAILBOX_0:
             DEBUG_PUTS("Filter to apply to reception mailbox Rx_0");
             rx_mailbox = 0;
             break;
-        case CAN_FILTER_RX_1:
+        case MCP2515_RX_MAILBOX_1:
             DEBUG_PUTS("Filter to apply to reception mailbox Rx_1");
             rx_mailbox = 1;
             break;

@@ -80,6 +80,8 @@ extern "C" {
 #define MCP2515_FILTERS_MB0 2
 #define MCP2515_FILTERS_MB1 4
 #define MCP2515_FILTERS (MCP2515_FILTERS_MB0 + MCP2515_FILTERS_MB1)
+#define MCP2515_RX_MAILBOX_0 0
+#define MCP2515_RX_MAILBOX_1 1
 /** @} */
 
 /** MCP2515 candev descriptor */
