@@ -22,7 +22,7 @@
 #include <stdlib.h>
 
 #include "net/cord/config.h"
-#include "net/cord/ep.h"
+#include "net/cord/endpoint_singleton.h"
 #include "net/gnrc/netif.h"
 #include "net/nanocoap.h"
 #include "net/sock/util.h"
@@ -93,12 +93,11 @@ static int _cord_ep_handler(int argc, char **argv)
         }
 
         puts("Registering with RD now, this may take a short while...");
-        if (cord_ep_register(&remote, uri_result.path) != CORD_EP_OK) {
+        if (cord_endpoint_singleton_register(&remote, uri_result.path) != CORD_ENDPOINT_OK) {
             puts("failure: registration failed");
         }
         else {
-            puts("registration successful\n");
-            cord_ep_dump_status();
+            cord_endpoint_singleton_dump_status();
         }
     }
     else if ((argc > 1) && (strcmp(argv[1], "discover") == 0)) {
@@ -112,7 +111,7 @@ static int _cord_ep_handler(int argc, char **argv)
             printf("error: unable to parse address\n");
             return 1;
         }
-        if (cord_ep_discover_regif(&remote, regif, sizeof(regif)) == CORD_EP_OK) {
+        if (cord_endpoint_singleton_register(&remote, regif) == CORD_ENDPOINT_OK) {
             printf("the registration interface is '%s'\n", regif);
         }
         else {
@@ -120,14 +119,14 @@ static int _cord_ep_handler(int argc, char **argv)
         }
     }
     else if ((argc > 1) && (strcmp(argv[1], "update") == 0)) {
-        res = cord_ep_update();
-        if (res == CORD_EP_OK) {
+        res = cord_endpoint_singleton_update();
+        if (res == CORD_ENDPOINT_OK) {
             puts("RD update successful");
         }
-        else if (res == CORD_EP_NORD) {
+        else if (res == CORD_ENDPOINT_NORD) {
             puts("error: not associated with any RD");
         }
-        else if (res == CORD_EP_TIMEOUT) {
+        else if (res == CORD_ENDPOINT_TIMEOUT) {
             puts("error: unable to reach RD - dropped association");
         }
         else {
@@ -135,22 +134,10 @@ static int _cord_ep_handler(int argc, char **argv)
         }
     }
     else if ((argc > 1) && (strcmp(argv[1], "remove") == 0)) {
-        res = cord_ep_remove();
-        if (res == CORD_EP_OK) {
-            puts("node successfully removed from RD");
-        }
-        else if (res == CORD_EP_NORD) {
-            puts("error: not associated with any RD");
-        }
-        else if (res == CORD_EP_TIMEOUT) {
-            puts("error: unable to reach RD - remove association only locally");
-        }
-        else {
-            puts("error: unable to remove node from RD");
-        }
+        cord_endpoint_singleton_remove();
     }
     else if ((argc > 1) && (strcmp(argv[1], "info") == 0)) {
-        cord_ep_dump_status();
+        cord_endpoint_singleton_dump_status();
     }
     else {
         printf("usage: %s <register|discover|update|remove|info>\n",
