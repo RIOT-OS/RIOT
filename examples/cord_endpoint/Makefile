@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = cord_ep
+APPLICATION = cord_endpoint
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
@@ -12,7 +12,9 @@ USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_default
 USEMODULE += gnrc_icmpv6_echo
 
-USEMODULE += cord_ep_standalone
+USEMODULE += cord_endpoint_singleton
+USEMODULE += cord_endpoint
+USEMODULE += event_thread
 
 USEMODULE += shell
 USEMODULE += shell_cmds_default

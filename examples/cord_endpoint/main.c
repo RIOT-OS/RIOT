@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       CoRE Resource Directory endpoint (cord_ep) example
+ * @brief       CoRE Resource Directory endpoint (cord_endpoint) example
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
@@ -20,30 +20,41 @@
 
 #include <stdio.h>
 
+#include "event/thread.h"
 #include "fmt.h"
 #include "shell.h"
 #include "net/ipv6/addr.h"
 #include "net/gcoap.h"
-#include "net/cord/common.h"
-#include "net/cord/ep_standalone.h"
+#include "net/cord/endpoint.h"
+#include "net/cord/endpoint_singleton.h"
 
 #define MAIN_QUEUE_SIZE     (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
+/* TODO: define */
+//static char _ep_name[64];
 
 #define NODE_INFO  "SOME NODE INFORMATION"
 
-/* we will use a custom event handler for dumping cord_ep events */
-static void _on_ep_event(cord_ep_standalone_event_t event)
+/* we will use a custom event handler for dumping cord_endpoint events */
+static void _on_ep_event(event_t *ev)
 {
-    switch (event) {
-        case CORD_EP_REGISTERED:
-            puts("RD endpoint event: now registered with a RD");
+    (void)ev;
+    cord_state_t state = cord_endpoint_singleton_get_state();
+    switch (state) {
+        case CORD_STATE_IDLE:
+            puts("RD endpoint is idle");
             break;
-        case CORD_EP_DEREGISTERED:
-            puts("RD endpoint event: dropped client registration");
+        case CORD_STATE_DISCOVERY:
+            puts("RD endpoint is performing discovery");
             break;
-        case CORD_EP_UPDATED:
-            puts("RD endpoint event: successfully updated client registration");
+        case CORD_STATE_REGISTRY:
+            puts("RD endpoint is performing registration");
+            break;
+        case CORD_STATE_REFRESH:
+            puts("RD endpoint is registered");
+            cord_endpoint_singleton_dump_status();
+            break;
+        default:
             break;
     }
 }
@@ -98,11 +109,14 @@ int main(void)
     /* setup CoAP resources */
     gcoap_register_listener(&_listener);
 
-    /* register event callback with cord_ep_standalone */
-    cord_ep_standalone_reg_cb(_on_ep_event);
+    event_t ev = { .handler = _on_ep_event };
+    event_source_subscriber_t sub = EVENT_SOURCE_SUBSCRIBER_INIT(&ev, EVENT_PRIO_LOWEST);
+    cord_endpoint_singleton_event_source_attach(&sub);
 
+    char name[32];
+    cord_endpoint_get_name(name, sizeof(name));
     puts("Client information:");
-    printf("  ep: %s\n", cord_common_get_ep());
+    printf("  ep: %s\n", name);
     printf("  lt: %is\n", (int)CONFIG_CORD_LT);
 
     char line_buf[SHELL_DEFAULT_BUFSIZE];
