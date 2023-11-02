@@ -24,7 +24,10 @@
 extern psa_status_t example_cipher_aes_128(void);
 extern psa_status_t example_hmac_sha256(void);
 extern psa_status_t example_ecdsa_p256(void);
+
+#ifndef SECURE_ELEMENT
 extern psa_status_t example_eddsa(void);
+#endif
 
 #ifdef MULTIPLE_SE
 extern psa_status_t example_cipher_aes_128_sec_se(void);
@@ -61,12 +64,14 @@ int main(void)
         printf("ECDSA failed: %s\n", psa_status_to_humanly_readable(status));
     }
 
+#ifndef SECURE_ELEMENT
     start = ztimer_now(ZTIMER_USEC);
     status = example_eddsa();
     printf("EdDSA took %d us\n", (int)(ztimer_now(ZTIMER_USEC) - start));
     if (status != PSA_SUCCESS) {
         printf("EdDSA failed: %s\n", psa_status_to_humanly_readable(status));
     }
+#endif
 
 #ifdef MULTIPLE_SE
     puts("Running Examples with secondary SE:");

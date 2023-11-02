@@ -81,10 +81,13 @@ psa_status_t example_ecdsa_p256(void)
     }
 
 #ifdef SECURE_ELEMENT
+    /* Currently there is no support for message signature and verification on secure elements */
     psa_set_key_lifetime(&pubkey_attr, lifetime);
+    psa_set_key_usage_flags(&pubkey_attr, PSA_KEY_USAGE_VERIFY_HASH);
+#else
+    psa_set_key_usage_flags(&pubkey_attr, PSA_KEY_USAGE_VERIFY_MESSAGE);
 #endif
     psa_set_key_algorithm(&pubkey_attr, ECC_ALG);
-    psa_set_key_usage_flags(&pubkey_attr, PSA_KEY_USAGE_VERIFY_MESSAGE);
     psa_set_key_bits(&pubkey_attr, PSA_BYTES_TO_BITS(pubkey_length));
     psa_set_key_type(&pubkey_attr, PSA_KEY_TYPE_ECC_PUBLIC_KEY(PSA_ECC_FAMILY_SECP_R1));
 
@@ -98,6 +101,12 @@ psa_status_t example_ecdsa_p256(void)
     if (status != PSA_SUCCESS) {
         return status;
     }
+
+#ifdef SECURE_ELEMENT
+    /* Currently there is only support for hash signature and verification on secure elements,
+       so we can't verify the message, but only the hash */
+    return psa_verify_hash(pubkey_id, ECC_ALG, hash, sizeof(hash), signature, sig_length);
+#endif
 
     /* verify on original message with internal hashing operation */
     return psa_verify_message(pubkey_id, ECC_ALG, msg, sizeof(msg), signature, sig_length);
