@@ -604,6 +604,10 @@ ifneq (,$(filter cord_endpoint_simple,$(USEMODULE)))
   USEMODULE += luid
 endif
 
+ifneq (,$(filter cord_endpoint_singleton,$(USEMODULE)))
+  USEMODULE += event_thread
+endif
+
 ifneq (,$(filter usbus%,$(USEMODULE)))
   USEMODULE += usbus
   # usbus is not directly in a subdirectory of sys, so we have to include the

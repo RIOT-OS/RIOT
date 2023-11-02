@@ -22,8 +22,7 @@
 
 #include "log.h"
 #include "assert.h"
-#include "thread.h"
-#include "ztimer.h"
+#include "event/thread.h"
 #include "net/sock/util.h"
 #include "net/gcoap.h"
 #include "net/cord/endpoint.h"
@@ -42,23 +41,10 @@
 
 #define TIMEOUT_MS          (CONFIG_CORD_UPDATE_INTERVAL * MS_PER_SEC)
 
-static char _stack[STACKSIZE];
-
-static cord_endpoint_singleton_cb_t _cb = NULL;
 static cord_endpoint_t _cord;
 
-#if 0
-static void _notify(cord_endpoint_singleton_event_t event)
+void cord_endpoint_singleton_run(void)
 {
-    if (_cb) {
-        _cb(event);
-    }
-}
-#endif
-
-static void *_reg_runner(void *arg)
-{
-    (void)arg;
     sock_udp_ep_t remote;
     sock_udp_name2ep(&remote, CORD_ENDPOINT_STANDALONE_ADDRESS);
     if (remote.port == 0) {
@@ -69,34 +55,18 @@ static void *_reg_runner(void *arg)
             remote.port = CONFIG_GCOAP_PORT;
         }
     }
-    event_queue_t queue;
-    event_queue_init(&queue);
-
-    cord_endpoint_init(&_cord, &queue, &remote, NULL);
-
-    event_loop(&queue);
-    return NULL;    /* should never be reached */
+    cord_endpoint_init(&_cord, CONFIG_CORD_ENDPOINT_SINGLETON_EVENT_QUEUE,
+            &remote, NULL);
 }
 
-void cord_endpoint_singleton_run(void)
+int cord_endpoint_singleton_update(void)
 {
-    thread_create(_stack, sizeof(_stack), PRIO, THREAD_CREATE_STACKTEST,
-                  _reg_runner, NULL, TNAME);
+    return cord_endpoint_update(&_cord);
 }
 
-void cord_endpoint_singleton_signal(bool connected)
+void cord_endpoint_singleton_remove(void)
 {
-     (void)connected;
-     return;
-}
-
-void cord_endpoint_singleton_reg_cb(cord_endpoint_singleton_cb_t cb)
-{
-    /* Note: we do not allow re-setting the callback (via passing cb := NULL),
-     *       as this would mean additional complexity for synchronizing the
-     *       value of `_cb` to prevent concurrency issues... */
-    assert(cb);
-    _cb = cb;
+    cord_endpoint_remove(&_cord);
 }
 
 int cord_endpoint_singleton_register(const sock_udp_ep_t *remote, const char *regif)
@@ -107,4 +77,29 @@ int cord_endpoint_singleton_register(const sock_udp_ep_t *remote, const char *re
 void cord_endpoint_singleton_dump_status(void)
 {
     cord_endpoint_dump_status(&_cord);
+}
+
+cord_state_t cord_endpoint_singleton_get_state(void)
+{
+    return cord_endpoint_get_state(&_cord);
+}
+
+ssize_t cord_endpoint_singleton_get_location(char *buf, size_t buf_len)
+{
+    return cord_endpoint_get_location(&_cord, buf, buf_len);
+}
+
+ssize_t cord_endpoint_singleton_get_interface(char *buf, size_t buf_len)
+{
+    return cord_endpoint_get_interface(&_cord, buf, buf_len);
+}
+
+void cord_endpoint_singleton_event_source_attach(event_source_subscriber_t *subscriber)
+{
+    cord_endpoint_event_source_attach(&_cord, subscriber);
+}
+
+void cord_endpoint_singleton_event_source_detach(event_source_subscriber_t *subscriber)
+{
+    cord_endpoint_event_source_detach(&_cord, subscriber);
 }

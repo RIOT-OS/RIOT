@@ -9,11 +9,10 @@
 /**
  * @defgroup    net_cord_endpoint_singleton CoRE RD Endpoint Standalone Extension
  * @ingroup     net_cord_endpoint
- * @brief       Run a CoRE Resource Directory endpoint singleton
+ * @brief       Run a single CoRE Resource Directory endpoint registration
  *
- * This sub-module enables a CoRE RD endpoint to manage is registration state
- * with a RD autonomously by periodically running the update procedure. This
- * is implemented by running a dedicated thread.
+ * This sub-module instantiates a single CoRE RD endpoint and manages the
+ * registration with the RD
  *
  * @{
  *
@@ -26,32 +25,23 @@
 #ifndef NET_CORD_ENDPOINT_SINGLETON_H
 #define NET_CORD_ENDPOINT_SINGLETON_H
 
+#include "net/sock/udp.h"
+#include "event/source.h"
+#include "net/cord/endpoint.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @brief   Possible types of events triggered by the cord_endpoint_singleton module
+ * @brief Event thread queue used for the singleton instance
  */
-typedef enum {
-    CORD_ENDPOINT_REGISTERED,
-    CORD_ENDPOINT_DEREGISTERED,
-    CORD_ENDPOINT_UPDATED,
-} cord_endpoint_singleton_event_t;
+#ifndef CONFIG_CORD_ENDPOINT_SINGLETON_EVENT_QUEUE
+#define CONFIG_CORD_ENDPOINT_SINGLETON_EVENT_QUEUE    EVENT_PRIO_LOWEST
+#endif
 
 /**
- * @brief   Callback function signature for RD endpoint state synchronization
- *
- * The registered callback function is executed in the context of the dedicated
- * singleton RD endpoint's thread.
- *
- * @param[in] event     type of event
- */
-typedef void(*cord_endpoint_singleton_cb_t)(cord_endpoint_singleton_event_t event);
-
-/**
- * @brief   Spawn a new thread that takes care of sending periodic updates to an
- *          active RD entry
+ * @brief Run the endpoint with compiled-in settings in the event thread
  *
  * @warning This function must only be called once (typically during system
  *          initialization)
@@ -59,29 +49,90 @@ typedef void(*cord_endpoint_singleton_cb_t)(cord_endpoint_singleton_event_t even
 void cord_endpoint_singleton_run(void);
 
 /**
- * @brief   Register a callback to be notified about RD endpoint state changes
+ * @brief   Initiate the endpoint registration with a resource directory
  *
- * Only a single callback can be active at any point in time, so setting a new
- * callback will override the existing one.
+ * @note    In case a multicast address is given, the @p regif parameter MUST be
+ *          NULL. The first RD responding to the request will be chosen and all
+ *          replies from other RD servers are ignored.
  *
- * @pre                     @p cb != NULL
+ * @param[in] remote    remote endpoint of the target RD
+ * @param[in] regif     registration interface resource of the RD, it will be
+ *                      discovered automatically when set to NULL
  *
- * @param[in] cb            callback to execute on RD endpoint state changes
+ * @return  CORD_ENDPOINT_OK on success
+ * @return  CORD_ENDPOINT_OVERFLOW if @p regif does not fit into internal buffer
+ * @return  CORD_ENDPOINT_BUSY when the endpoint is not idle
  */
-void cord_endpoint_singleton_reg_cb(cord_endpoint_singleton_cb_t cb);
+int cord_endpoint_singleton_register(const sock_udp_ep_t *remote, const char *regif);
 
 /**
- * @brief   Signal the cord_endpoint thread about connection status change
+ * @brief   Force update our current entry at the RD
  *
- * @note    This function should not be called by a user, but it is called from
- *          within the cord_endpoint implementation
- *
- * @param[in] connected     set to true if we are connected to a RD
+ * @return  CORD_ENDPOINT_OK on success
+ * @return  CORD_ENDPOINT_BUSY if the update request can't be schedule now
  */
-void cord_endpoint_singleton_signal(bool connected);
+int cord_endpoint_singleton_update(void);
 
-int cord_endpoint_singleton_register(const sock_udp_ep_t *remote, const char *regif);
+/**
+ * @brief   Unregister from a given RD server
+ *
+ * When simple registration is used, this does not cancel the registration with
+ * the RD
+ */
+void cord_endpoint_singleton_remove(void);
+
+/**
+ * @brief   Dump the current RD connection status to STDIO (for debugging)
+ */
 void cord_endpoint_singleton_dump_status(void);
+
+/**
+ * @brief   Retrieve the current registration state of the endpoint
+ *
+ * @return  Current state of the RD endpoint
+ */
+cord_state_t cord_endpoint_singleton_get_state(void);
+
+/**
+ * @brief   Retrieve the current registration location as supplied by the RD
+ *          from the endpoint.
+ *
+ * @param   buf     Buffer to copy into
+ * @param   buf_len Length of the buffer
+ *
+ * @return  Number of bytes copied
+ * @return  CORD_ENDPOINT_OVERFLOW if the location does not fit in the provided
+ *          buffer
+ */
+ssize_t cord_endpoint_singleton_get_location(char *buf, size_t buf_len);
+
+/**
+ * @brief   Retrieve the current registration interface used with the RD from
+ *          the endpoint.
+ *
+ * @param   buf     Buffer to copy into
+ * @param   buf_len Length of the buffer
+ *
+ * @return  Number of bytes copied
+ * @return  CORD_ENDPOINT_OVERFLOW if the interface name does not fit in the
+ *          provided buffer
+ */
+ssize_t cord_endpoint_singleton_get_interface(char *buf, size_t buf_len);
+
+/**
+ * @brief   Attach an event subscriber to the endpoint state changes
+ *
+ * @param   subscriber  Subscriber to attach
+ */
+void cord_endpoint_singleton_event_source_attach(event_source_subscriber_t *subscriber);
+
+/**
+ * @brief   Detach an event subscriber from the endpoint state changes
+ *
+ * @param   subscriber  Subscriber to detach
+ */
+void cord_endpoint_singleton_event_source_detach(event_source_subscriber_t *subscriber);
+
 #ifdef __cplusplus
 }
 #endif
