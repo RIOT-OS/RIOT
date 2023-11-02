@@ -46,7 +46,7 @@ static cord_endpoint_t _cord;
 void cord_endpoint_singleton_run(void)
 {
     sock_udp_ep_t remote;
-    sock_udp_name2ep(&remote, CORD_ENDPOINT_STANDALONE_ADDRESS);
+    sock_udp_name2ep(&remote, CORD_ENDPOINT_SINGLETON_ADDRESS);
     if (remote.port == 0) {
         if (IS_USED(MODULE_GCOAP_DTLS)) {
             remote.port = CONFIG_GCOAPS_PORT;

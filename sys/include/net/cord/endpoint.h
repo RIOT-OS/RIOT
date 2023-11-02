@@ -7,21 +7,20 @@
  */
 
 /**
- * @defgroup    net_cord_ep CoRE RD Endpoint
+ * @defgroup    net_cord_endpoint CoRE RD Endpoint
  * @ingroup     net_cord
  * @brief       Library for using RIOT as CoRE Resource Directory endpoint
  *
  * This module implements a CoRE Resource Directory endpoint library, that
  * allows RIOT nodes to register themselves with resource directories.
  * It implements the standard endpoint functionality as defined in
- * draft-ietf-core-resource-directory-27.
- * @see https://datatracker.ietf.org/doc/html/rfc9176
+ * https://datatracker.ietf.org/doc/html/rfc9176
  *
  * # Design Decisions
- * - all operations provided by this module are fully synchronous, meaning that
- *   the functions will block until an operation is successful or will time out
- * - the implementation limits the endpoint to be registered with a single RD at
- *   any point in time
+ * - All operations are fully asynchronous and will not block. The module can be
+ *   fully run within one of the event threads.
+ * - While outside of the use cases of the rfc, the module allows for multiple
+ *   registrations at different RDs
  *
  * @{
  *
@@ -37,6 +36,7 @@
 
 #include "event.h"
 #include "event/timeout.h"
+#include "event/source.h"
 #include "net/sock/udp.h"
 #include "net/nanocoap.h"
 
@@ -44,14 +44,24 @@
 extern "C" {
 #endif
 
-#ifdef MODULE_CORD_ENDPOINT
+/**
+ * @brief Buffer size allocated for the CoAP packet
+ */
+#ifndef CONFIG_CORD_ENDPOINT_BUFSIZE
 #define CONFIG_CORD_ENDPOINT_BUFSIZE             (128U)
-#else
-#define CONFIG_CORD_ENDPOINT_BUFSIZE             (64U)
 #endif
 
-#define CONFIG_CORD_FAIL_RETRY_SEC          (5)
-#define CONFIG_CORD_URI_MAX         (CONFIG_NANOCOAP_URI_MAX)
+/**
+ * @brief Number of seconds after which a CoAP failure should be retried
+ */
+#ifndef CONFIG_CORD_FAIL_RETRY_SEC
+#define CONFIG_CORD_FAIL_RETRY_SEC              (60)
+#endif
+
+/**
+ * @brief Maximum URI size allocated
+ */
+#define CORD_URI_MAX         (CONFIG_NANOCOAP_URI_MAX)
 
 /**
  * @brief   Return values and error codes used by this module
@@ -66,70 +76,50 @@ enum {
     CORD_ENDPOINT_BUSY      = -5,     /**< Resource directory is busy  */
 };
 
+/**
+ * @brief CORD endpoint state machine states
+ */
 typedef enum {
-    CORD_STATE_IDLE = 0, /**< Idle, not active */
-    CORD_STATE_DISCOVERY, /**< Discovery of registration endpoint required */
-    CORD_STATE_DISCOVERING, /**< Waiting for discovery reply */
+    CORD_STATE_IDLE,        /**< Idle, not active */
+    CORD_STATE_DISCOVERY,   /**< Discovery of registration endpoint required */
     CORD_STATE_REGISTRY,    /**< Endpoint available, registration */
-    CORD_STATE_REGISTERING,  /**< Waiting for registration reply */
-    CORD_STATE_WAIT_REFRESH, /**< Waiting until refresh is required */
-    CORD_STATE_REFRESHING,   /**< Waiting for refresh reply */
-    CORD_STATE_DELETE,    /**< Deleting registration */
-    CORD_STATE_DELETING,    /**< Deleting registration */
-    CORD_STATE_WAIT_RETRY,  /**< Failure happened, waiting to retry */
+    CORD_STATE_REFRESH,     /**< Waiting until refresh is required */
+    CORD_STATE_DELETE,      /**< Deleting registration */
 } cord_state_t;
 
 /**
  * @brief Core Resource Directory endpoint interface context
  */
 typedef struct {
-    mutex_t lock;
+    mutex_t lock;                   /**< Synchronization mutex */
 #ifdef MODULE_CORD_ENDPOINT
-    char rd_loc[CONFIG_CORD_URI_MAX];
+    char rd_loc[CORD_URI_MAX];      /**< Location path received from the RD */
+    char rd_regif[CORD_URI_MAX];    /**< Registration interface discovered */
 #endif
-    char rd_regif[CONFIG_CORD_URI_MAX];
-    uint8_t buf[CONFIG_CORD_ENDPOINT_BUFSIZE];
-    sock_udp_ep_t rd_remote;
-    event_t state_update;
-    event_timeout_t retry_timer;
-    event_queue_t *queue;
-    cord_state_t state;
+    uint8_t buf[CONFIG_CORD_ENDPOINT_BUFSIZE]; /**< Buffer size for CoAP packets */
+    sock_udp_ep_t rd_remote;        /**< Remote sock endpoint */
+    event_t state_update;           /**< State update event */
+    event_timeout_t retry_timer;    /**< Retry timer event */
+    event_queue_t *queue;           /**< Queue used by this CORD endpoint */
+    event_source_t ev_source;       /**< Event system source */
+    cord_state_t state;             /**< Current state of the endpoint */
 } cord_endpoint_t;
 
 /**
- * @brief   Discover the registration interface resource of a RD
- *
- * @param[in] remote    remote endpoint of the target RD
- * @param[out] regif    the registration interface is written to this buffer
- * @param[in] maxlen    size of @p regif
- *
- * @return  CORD_ENDPOINT_OK on success
- * @return  CORD_ENDPOINT_TIMEOUT if the discovery request times out
- * @return  CORD_ENDPOINT_NORD if addressed endpoint is not a RD
- * @return  CORD_ENDPOINT_ERR on any other internal error
- */
-int cord_endpoint_discover_regif(cord_endpoint_t *cord, const sock_udp_ep_t *remote,
-                           char *regif, size_t maxlen);
-
-/**
- * @brief   Initiate the node registration by sending an empty push
- *
- * - if registration fails (e.g. timeout), we are not associated with any RD
- *   anymore (even if we have been before we called cord_endpoint_register)
+ * @brief   Initiate the endpoint registration with a resource directory
  *
  * @note    In case a multicast address is given, the @p regif parameter MUST be
  *          NULL. The first RD responding to the request will be chosen and all
  *          replies from other RD servers are ignored.
  *
- * @param[in] remote    remote endpoint of the target RD
- * @param[in] regif     registration interface resource of the RD, it will be
+ * @param   cord    Resource Directory context to use
+ * @param   remote    remote endpoint of the target RD
+ * @param   regif     registration interface resource of the RD, it will be
  *                      discovered automatically when set to NULL
  *
  * @return  CORD_ENDPOINT_OK on success
- * @return  CORD_ENDPOINT_TIMEOUT on registration timeout
- * @return  CORD_ENDPOINT_NORD if addressed endpoint is not a RD
  * @return  CORD_ENDPOINT_OVERFLOW if @p regif does not fit into internal buffer
- * @return  CORD_ENDPOINT_ERR on any other internal error
+ * @return  CORD_ENDPOINT_BUSY when the endpoint is not idle
  */
 int cord_endpoint_register(cord_endpoint_t *cord, const sock_udp_ep_t *remote, const char *regif);
 
@@ -139,45 +129,48 @@ int cord_endpoint_register(cord_endpoint_t *cord, const sock_udp_ep_t *remote, c
  * @param   cord    Resource Directory context to use
  *
  * @return  CORD_ENDPOINT_OK on success
- * @return  CORD_ENDPOINT_TIMEOUT if the update request times out
- * @return  CORD_ENDPOINT_ERR on any other internal error
+ * @return  CORD_ENDPOINT_BUSY if the update request can't be schedule now
  */
 int cord_endpoint_update(cord_endpoint_t *cord);
 
 /**
  * @brief   Unregister from a given RD server
  *
- * @param   cord    Resource Directory context to use
+ * When simple registration is used, this does not cancel the registration with
+ * the RD
  *
- * @return  CORD_ENDPOINT_OK on success
- * @return  CORD_ENDPOINT_TIMEOUT if the remove request times out
- * @return  CORD_ENDPOINT_ERR on any other internal error
+ * @param   cord    Resource Directory context to use
  */
-int cord_endpoint_remove(cord_endpoint_t *cord);
+void cord_endpoint_remove(cord_endpoint_t *cord);
 
 /**
- * @brief   Start a resource directory registration
+ * @brief   Start a resource directory endpoint and initiate with a resource
+ *          directory if supplied.
+ *
+ * @see also @ref cord_endpoint_register
  *
  * @param   cord    Resource Directory context to use
  * @param   queue   Event queue to use for synchronization
- * @param   remote  Remote endpoint to register at
+ * @param   remote  Remote endpoint to register at, can be NULL to only
+ *                  initialize
  * @param   regif   Endpoint to register at, can be NULL to use discovery
  *
  * @return  CORD_ENDPOINT_OK on success
+ * @return  CORD_ENDPOINT_OVERFLOW when the registration interface is too long
+ * to store
  */
 int cord_endpoint_init(cord_endpoint_t *cord, event_queue_t *queue, const sock_udp_ep_t *remote, const char *regif);
 
 /**
  * @brief   Copy the endpoint name into the provided buffer
  *
- * @param   cord    Resource Directory context to use
  * @param   buf     Buffer to copy into
- * @param   len     Length of the buffer
+ * @param   buf_len Length of the buffer
  *
  * @return  Negative on error
  * @return  Number of bytes copied
  */
-ssize_t cord_endpoint_get_ep(char *buf, size_t buf_len);
+ssize_t cord_endpoint_get_name(char *buf, size_t buf_len);
 
 /**
  * @brief   Dump the current RD connection status to STDIO (for debugging)
@@ -185,6 +178,65 @@ ssize_t cord_endpoint_get_ep(char *buf, size_t buf_len);
  * @param   cord    Resource Directory context to use
  */
 void cord_endpoint_dump_status(const cord_endpoint_t *cord);
+
+/**
+ * @brief   Retrieve the current registration state of the endpoint
+ *
+ * @param   cord Resource Directory context to use
+ *
+ * @return  Current state of the RD endpoint
+ */
+cord_state_t cord_endpoint_get_state(cord_endpoint_t *cord);
+
+/**
+ * @brief   Retrieve the current registration location as supplied by the RD
+ *          from the endpoint.
+ *
+ * @param   cord    Resource Directory context to use
+ * @param   buf     Buffer to copy into
+ * @param   buf_len Length of the buffer
+ *
+ * @return  Number of bytes copied
+ * @return  CORD_ENDPOINT_OVERFLOW if the location does not fit in the provided
+ *          buffer
+ */
+ssize_t cord_endpoint_get_location(cord_endpoint_t *cord, char *buf, size_t buf_len);
+
+/**
+ * @brief   Retrieve the current registration interface used with the RD from
+ *          the endpoint.
+ *
+ * @param   cord    Resource Directory context to use
+ * @param   buf     Buffer to copy into
+ * @param   buf_len Length of the buffer
+ *
+ * @return  Number of bytes copied
+ * @return  CORD_ENDPOINT_OVERFLOW if the interface name does not fit in the
+ *          provided buffer
+ */
+ssize_t cord_endpoint_get_interface(cord_endpoint_t *cord, char *buf, size_t buf_len);
+
+/**
+ * @brief   Attach an event subscriber to the endpoint state changes
+ *
+ * @param   cord        Resource Directory context to use
+ * @param   subscriber  Subscriber to attach
+ */
+static inline void cord_endpoint_event_source_attach(cord_endpoint_t *cord, event_source_subscriber_t *subscriber)
+{
+    event_source_attach(&cord->ev_source, subscriber);
+}
+
+/**
+ * @brief   Detach an event subscriber from the endpoint state changes
+ *
+ * @param   cord        Resource Directory context to use
+ * @param   subscriber  Subscriber to detach
+ */
+static inline void cord_endpoint_event_source_detach(cord_endpoint_t *cord, event_source_subscriber_t *subscriber)
+{
+    event_source_detach(&cord->ev_source, subscriber);
+}
 
 #ifdef __cplusplus
 }

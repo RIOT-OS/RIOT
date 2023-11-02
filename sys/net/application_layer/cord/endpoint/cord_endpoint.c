@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     net_cord_ep
+ * @ingroup     net_cord_endpoint
  * @{
  *
  * @file
@@ -41,6 +41,10 @@
 #define PREFIX_LEN      (sizeof(CORD_ENDPOINT_PREFIX))        /* contains \0 char */
 #define BUFSIZE         (PREFIX_LEN + CORD_ENDPOINT_SUFFIX_LEN)
 static char cord_endpoint_name[BUFSIZE] = { 0 };
+#endif
+
+#ifndef MODULE_CORD_ENDPOINT
+static const char wkrd[] = "/.well-known/rd";
 #endif
 
 int _pkt_add_qstring(coap_pkt_t *pkt)
@@ -102,31 +106,36 @@ void _init_epname(void)
 static void _post_state(cord_endpoint_t *cord, cord_state_t state)
 {
     cord->state = state;
+    /* Notify subscribers of state change */
+    event_source_trigger(&cord->ev_source);
     /* submit event */
     event_post(cord->queue, &cord->state_update);
 }
 
-static void _post_retry(cord_endpoint_t *cord, cord_state_t state, uint32_t timeout)
+static void _post_timeout(cord_endpoint_t *cord, cord_state_t state, uint32_t timeout)
 {
     cord->state = state;
     /* submit event */
     event_timeout_set(&cord->retry_timer, timeout);
+    /* Notify subscribers of state change */
+    event_source_trigger(&cord->ev_source);
+}
+
+static void _post_retry(cord_endpoint_t *cord, cord_state_t state)
+{
+    _post_timeout(cord, state, CONFIG_CORD_FAIL_RETRY_SEC);
 }
 
 static void _post_refresh(cord_endpoint_t *cord, cord_state_t state)
 {
-    _post_retry(cord, state, CONFIG_CORD_LT);
-}
-
-static void _clear_regif(cord_endpoint_t *cord)
-{
-    memset(&cord->rd_regif, 0, CONFIG_CORD_URI_MAX);
+    _post_timeout(cord, state, CONFIG_CORD_LT);
 }
 
 static int _set_rd_settings(cord_endpoint_t *cord, const sock_udp_ep_t *remote, const char *regif)
 {
     memcpy(&cord->rd_remote, remote, sizeof(cord->rd_remote));
-    if (IS_ACTIVE(CORD_ENDPOINT) && regif) {
+#ifdef MODULE_CORD_ENDPOINT
+    if (regif) {
         if (strlen(regif) < sizeof(cord->rd_regif)) {
             strcpy(cord->rd_regif, regif);
         }
@@ -134,16 +143,24 @@ static int _set_rd_settings(cord_endpoint_t *cord, const sock_udp_ep_t *remote, 
             return CORD_ENDPOINT_OVERFLOW;
         }
     }
-    else {
-        memcpy(cord->rd_regif, "/.well-known/rd", sizeof("/.well-known/rd"));
-    }
+#else
+    (void)regif;
+#endif
     return CORD_ENDPOINT_OK;
+}
+
+static void _clear_regif(cord_endpoint_t *cord)
+{
+    (void)cord;
+#ifdef MODULE_CORD_ENDPOINT
+    memset(cord->rd_regif, 0, CORD_URI_MAX);
+#endif
 }
 
 #ifdef MODULE_CORD_ENDPOINT
 static void _clear_rd_location(cord_endpoint_t *cord)
 {
-    memset(&cord->rd_loc, 0, CONFIG_CORD_URI_MAX);
+    memset(cord->rd_loc, 0, CORD_URI_MAX);
 }
 
 static void _on_delete(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
@@ -155,14 +172,14 @@ static void _on_delete(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
     (void)pdu;
 
     if (req_state == GCOAP_MEMO_RESP) {
-        /* Either the registration was succesfully deleted, or there was no
+        /* Either the registration was successfully deleted, or there was no
          * registration in the first place */
         _clear_rd_location(cord);
         _post_state(cord, CORD_STATE_IDLE);
         return;
     }
     /* Retry if the server is temporarily unavailable */
-    _post_retry(cord, CORD_STATE_DELETE, CONFIG_CORD_FAIL_RETRY_SEC);
+    _post_retry(cord, CORD_STATE_DELETE);
 }
 
 static void _on_update(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
@@ -174,7 +191,7 @@ static void _on_update(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
 
     if (req_state == GCOAP_MEMO_RESP) {
         if (pdu->hdr->code == COAP_CODE_CHANGED) {
-            _post_refresh(cord, CORD_STATE_WAIT_REFRESH);
+            _post_refresh(cord, CORD_STATE_REFRESH);
             return;
         }
         else if (coap_get_code_class(pdu) == COAP_CLASS_CLIENT_FAILURE) {
@@ -184,7 +201,7 @@ static void _on_update(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
             return;
         }
     }
-    _post_retry(cord, CORD_STATE_WAIT_RETRY, CONFIG_CORD_FAIL_RETRY_SEC);
+    _post_retry(cord, CORD_STATE_REFRESH);
 }
 
 static int _send_update_request_with_code(cord_endpoint_t *cord, unsigned code, gcoap_resp_handler_t handle)
@@ -242,14 +259,13 @@ static void _on_discover(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
     }
 end:
     /* retry later */
-    _post_retry(cord, CORD_STATE_DISCOVERY, CONFIG_CORD_FAIL_RETRY_SEC);
+    _post_retry(cord, CORD_STATE_DISCOVERY);
     return;
 }
 
 static int _start_discovery(cord_endpoint_t *cord)
 {
     coap_pkt_t pkt;
-    cord->state = CORD_STATE_DISCOVERING;
     /* do URI discovery for the registration interface */
     int res = gcoap_req_init(&pkt, cord->buf, CONFIG_CORD_ENDPOINT_BUFSIZE, COAP_METHOD_GET,
                              "/.well-known/core");
@@ -261,7 +277,7 @@ static int _start_discovery(cord_endpoint_t *cord)
     size_t pkt_len = coap_opt_finish(&pkt, COAP_OPT_FINISH_NONE);
     res = gcoap_req_send(cord->buf, pkt_len, &cord->rd_remote, _on_discover, cord);
     if (res <= 0) {
-        _post_retry(cord, CORD_STATE_DISCOVERY, CONFIG_CORD_FAIL_RETRY_SEC);
+        _post_retry(cord, CORD_STATE_DISCOVERY);
         return CORD_ENDPOINT_ERR;
     }
     return 0;
@@ -281,7 +297,7 @@ static void _on_register(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
             /* read the location header and save the RD details on success */
             if (coap_get_location_path(pdu, (uint8_t *)cord->rd_loc,
                                        sizeof(cord->rd_loc)) > 0) {
-                _post_refresh(cord, CORD_STATE_WAIT_REFRESH);
+                _post_refresh(cord, CORD_STATE_REFRESH);
                 return;
             }
             /* if copy fails cascade through to retrying later again */
@@ -290,31 +306,35 @@ static void _on_register(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
 #endif
         }
         else if (coap_get_code_class(pdu) == COAP_CLASS_CLIENT_FAILURE) {
-            _clear_regif(cord);
             /* Retry discovery later */
             if (!IS_ACTIVE(MODULE_CORD_ENDPOINT)) {
-                _post_retry(cord, CORD_STATE_DISCOVERY, CONFIG_CORD_FAIL_RETRY_SEC);
+                _clear_regif(cord);
+                _post_retry(cord, CORD_STATE_DISCOVERY);
             }
             else {
-                _post_retry(cord, CORD_STATE_REGISTRY, CONFIG_CORD_FAIL_RETRY_SEC);
+                _post_retry(cord, CORD_STATE_REGISTRY);
             }
             return;
         }
     }
     /* Retry registration after some time if other failure */
-    _post_retry(cord, CORD_STATE_REGISTRY, CONFIG_CORD_FAIL_RETRY_SEC);
+    _post_retry(cord, CORD_STATE_REGISTRY);
 }
 
 static int  _start_registration(cord_endpoint_t *cord)
 {
     int res;
-    cord->state = CORD_STATE_REGISTERING;
     ssize_t pkt_len;
     int retval;
     coap_pkt_t pkt;
 
     /* build and send CoAP POST request to the RD's registration interface */
-    res = gcoap_req_init(&pkt, cord->buf, CONFIG_CORD_ENDPOINT_BUFSIZE, COAP_METHOD_POST, cord->rd_regif);
+    res = gcoap_req_init(&pkt, cord->buf, CONFIG_CORD_ENDPOINT_BUFSIZE, COAP_METHOD_POST,
+#ifdef MODULE_CORD_ENDPOINT
+            cord->rd_regif);
+#else
+            wkrd);
+#endif
     if (res < 0) {
         retval = CORD_ENDPOINT_ERR;
         goto end;
@@ -357,7 +377,7 @@ static int  _start_registration(cord_endpoint_t *cord)
     retval = CORD_ENDPOINT_ERR;
 end:
     /* retry registration later on */
-    _post_retry(cord, CORD_STATE_REGISTRY, CONFIG_CORD_FAIL_RETRY_SEC);
+    _post_retry(cord, CORD_STATE_REGISTRY);
     return retval;
 }
 
@@ -390,27 +410,26 @@ int cord_endpoint_update(cord_endpoint_t *cord)
 {
     int res = CORD_ENDPOINT_BUSY;
     mutex_lock(&cord->lock);
-    if (cord->state == CORD_STATE_WAIT_REFRESH) {
+    if (cord->state == CORD_STATE_REFRESH) {
         event_timeout_clear(&cord->retry_timer);
-        _post_state(cord, CORD_STATE_WAIT_REFRESH);
+        _post_state(cord, CORD_STATE_REFRESH);
         res = CORD_ENDPOINT_OK;
     }
     mutex_unlock(&cord->lock);
     return res;
 }
 
-int cord_endpoint_remove(cord_endpoint_t *cord)
+void cord_endpoint_remove(cord_endpoint_t *cord)
 {
     mutex_lock(&cord->lock);
     event_timeout_clear(&cord->retry_timer);
-    if (IS_ACTIVE(CORD_STATE_DELETE)) {
+    if (IS_ACTIVE(MODULE_CORD_ENDPOINT)) {
         _post_state(cord, CORD_STATE_DELETE);
     }
     else {
         _post_state(cord, CORD_STATE_IDLE);
     }
     mutex_unlock(&cord->lock);
-    return CORD_ENDPOINT_OK;
 }
 
 static void _on_state_update(event_t *event)
@@ -430,8 +449,7 @@ static void _on_state_update(event_t *event)
             _start_registration(cord);
             break;
 #ifdef MODULE_CORD_ENDPOINT
-        case CORD_STATE_WAIT_REFRESH:
-        case CORD_STATE_WAIT_RETRY:
+        case CORD_STATE_REFRESH:
             /* Send refresh */
             _send_update_request_with_code(cord, COAP_METHOD_POST, _on_update);
             break;
@@ -448,8 +466,6 @@ static void _on_state_update(event_t *event)
 
 int cord_endpoint_init(cord_endpoint_t *cord, event_queue_t *queue, const sock_udp_ep_t *remote, const char *regif)
 {
-    assert(remote);
-
     _init_epname();
 
     memset(cord, 0, sizeof(cord_endpoint_t));
@@ -457,17 +473,28 @@ int cord_endpoint_init(cord_endpoint_t *cord, event_queue_t *queue, const sock_u
     cord->state_update.handler = _on_state_update;
     event_timeout_ztimer_init(&cord->retry_timer, ZTIMER_SEC, queue, &cord->state_update);
 
-    int res = _set_rd_settings(cord, remote, regif);
-    if (remote && cord->rd_regif[0]) {
-        _post_state(cord, CORD_STATE_REGISTRY);
-    } else {
-        _post_state(cord, CORD_STATE_DISCOVERY);
+    int res = CORD_ENDPOINT_OK;
+
+    if (!remote) {
+        _post_state(cord, CORD_STATE_IDLE);
+        return res;
     }
-    /* wait for registration signal */
+
+    res = _set_rd_settings(cord, remote, regif);
+    if (IS_ACTIVE(MODULE_CORD_ENDPOINT)) {
+        if (remote && regif) {
+            _post_state(cord, CORD_STATE_REGISTRY);
+        } else {
+            _post_state(cord, CORD_STATE_DISCOVERY);
+        }
+    }
+    else {
+        _post_state(cord, CORD_STATE_REGISTRY);
+    }
     return res;
 }
 
-ssize_t cord_endpoint_get_ep(char *buf, size_t buf_len)
+ssize_t cord_endpoint_get_name(char *buf, size_t buf_len)
 {
     size_t ep_len = strlen(cord_endpoint_name) + 1;
     if (ep_len > buf_len) {
@@ -475,6 +502,48 @@ ssize_t cord_endpoint_get_ep(char *buf, size_t buf_len)
     }
     memcpy(buf, cord_endpoint_name, ep_len);
     return ep_len;
+}
+
+static ssize_t _copy_cord_str(cord_endpoint_t *cord, const char *src, char *dest, size_t buf_len)
+{
+    mutex_lock(&cord->lock);
+    size_t src_len = strlen(src) + 1;
+    if (src_len > buf_len) {
+        return CORD_ENDPOINT_OVERFLOW;
+    }
+    memcpy(dest, src, src_len);
+    mutex_unlock(&cord->lock);
+    return src_len;
+}
+
+ssize_t cord_endpoint_get_location(cord_endpoint_t *cord, char *buf, size_t buf_len)
+{
+    return _copy_cord_str(cord,
+#ifdef MODULE_CORD_ENDPOINT
+            cord->rd_loc,
+#else
+            wkrd,
+#endif
+            buf, buf_len);
+}
+
+ssize_t cord_endpoint_get_interface(cord_endpoint_t *cord, char *buf, size_t buf_len)
+{
+    return _copy_cord_str(cord,
+#ifdef MODULE_CORD_ENDPOINT
+            cord->rd_regif,
+#else
+            wkrd,
+#endif
+            buf, buf_len);
+}
+
+cord_state_t cord_endpoint_get_state(cord_endpoint_t *cord)
+{
+    mutex_lock(&cord->lock);
+    cord_state_t state = cord->state;
+    mutex_unlock(&cord->lock);
+    return state;
 }
 
 void cord_endpoint_dump_status(const cord_endpoint_t *cord)
@@ -494,8 +563,8 @@ void cord_endpoint_dump_status(const cord_endpoint_t *cord)
         printf("RD address: coap://[%s]:%"PRIu16"\n", addr, cord->rd_remote.port);
         printf("   ep name: %s\n", cord_endpoint_name);
         printf("  lifetime: %is\n", (int)CONFIG_CORD_LT);
-        printf("    reg if: %s\n", cord->rd_regif);
 #ifdef MODULE_CORD_ENDPOINT
+        printf("    reg if: %s\n", cord->rd_regif);
         printf("  location: %s\n", cord->rd_loc);
     }
 #endif
