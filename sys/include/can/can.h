@@ -31,6 +31,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #if defined(__linux__)
 
@@ -115,32 +116,13 @@ typedef enum {
 } can_filter_type_t;
 
 /**
- * @brief Controller Area Network filter configuration
- *
- * The different CAN controllers provide different CAN filter
- * configurations. These types are provided by the SAMD5x family (please check
- * chapter 39.9.5 and 39.9.6 of the SAMD5x/SAME5x family Datasheet).
- *
- * The current CAN filter configuration list is from the SAMD5x/SAME5x family.
- *
- * Can be extended by other filter configurations if provided
- */
-typedef enum {
-    CAN_FILTER_DISABLE = 0x00,      /**< Disable Filter element */
-    CAN_FILTER_RX_0,                /**< Store message in reception mailbox Rx_0 if filter matches */
-    CAN_FILTER_RX_1,                /**< Store message in reception mailbox Rx_1 if filter matches */
-    CAN_FILTER_RX_REJECT,           /**< Reject message if filter matches */
-    CAN_FILTER_RX_PRIO,             /**< Set priority if filter matches */
-    CAN_FILTER_RX_PRIO_0,           /**< Set priority and store message in reception mailbox Rx_0 if filter matches */
-    CAN_FILTER_RX_PRIO_1,           /**< Set priority and store message in reception mailbox Rx_1 if filter matches */
-    CAN_FILTER_RX_STRXBUF           /**< Store message in the RX buffer or as debug message */
-} can_filter_conf_t;
-
-/**
  * @brief Controller Area Network filter mode
  */
 struct can_filter_mode {
-    can_filter_conf_t can_filter_conf;      /**< CAN filter configuration */
+    bool reject;                            /**< Defines whether to use the CAN filter as a whitelist or blacklist.
+                                                 Set to TRUE: Messages with matching filter will be REJECTED
+                                                 Set to FALSE: Messages with matching filter will be ACCEPTED */
+    uint8_t rx_mailbox;                     /**< The reception mailbox to which the CAN filter will be applied */
     can_filter_type_t can_filter_type;      /**< CAN filter type */
 };
 
