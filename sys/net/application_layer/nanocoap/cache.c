@@ -83,11 +83,10 @@ size_t nanocoap_cache_free_count(void)
     return clist_count(&_empty_list_head);
 }
 
-void nanocoap_cache_key_generate(const coap_pkt_t *req, uint8_t *cache_key)
+static void _cache_key_digest_opts(const coap_pkt_t *req, sha256_context_t *ctx,
+        bool include_etag,
+        bool include_blockwise)
 {
-    sha256_context_t ctx;
-    sha256_init(&ctx);
-
     coap_optpos_t opt = {0, 0};
     uint8_t *value;
 
@@ -96,7 +95,7 @@ void nanocoap_cache_key_generate(const coap_pkt_t *req, uint8_t *cache_key)
         if (optlen >= 0) {
             /* gCoAP forward proxy is ETag-aware, so skip ETag option,
              * see https://datatracker.ietf.org/doc/html/rfc7252#section-5.4.2 */
-            if (IS_USED(MODULE_GCOAP_FORWARD_PROXY) && (opt.opt_num == COAP_OPT_ETAG)) {
+            if ((!include_etag) && (opt.opt_num == COAP_OPT_ETAG)) {
                 continue;
             }
             /* skip NoCacheKey,
@@ -104,9 +103,42 @@ void nanocoap_cache_key_generate(const coap_pkt_t *req, uint8_t *cache_key)
             if ((opt.opt_num & 0x1E) == 0x1C) {
                 continue;
             }
-            sha256_update(&ctx, value, optlen);
+            /* Don't include blockwise (on request) so matching between
+             * blockwise parts is possible */
+            if ((!include_blockwise) && (
+                    (opt.opt_num == COAP_OPT_BLOCK2) ||
+                    (opt.opt_num == COAP_OPT_BLOCK1)
+                    )) {
+                continue;
+            }
+            sha256_update(ctx, &opt.opt_num, sizeof(opt.opt_num));
+            sha256_update(ctx, value, optlen);
         }
     }
+}
+
+void nanocoap_cache_key_options_generate(const coap_pkt_t *req, void *cache_key)
+{
+    sha256_context_t ctx;
+    sha256_init(&ctx);
+    _cache_key_digest_opts(req, &ctx, true, true);
+    sha256_final(&ctx, cache_key);
+}
+
+void nanocoap_cache_key_blockreq_options_generate(const coap_pkt_t *req, void *cache_key)
+{
+    sha256_context_t ctx;
+    sha256_init(&ctx);
+    _cache_key_digest_opts(req, &ctx, true, false);
+    sha256_final(&ctx, cache_key);
+}
+
+void nanocoap_cache_key_generate(const coap_pkt_t *req, uint8_t *cache_key)
+{
+    sha256_context_t ctx;
+    sha256_init(&ctx);
+
+    _cache_key_digest_opts(req, &ctx, !(IS_USED(MODULE_GCOAP_FORWARD_PROXY)), true);
     switch (req->hdr->code) {
         case COAP_METHOD_FETCH:
             sha256_update(&ctx, req->payload, req->payload_len);

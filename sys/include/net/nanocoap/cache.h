@@ -221,6 +221,26 @@ int nanocoap_cache_del(const nanocoap_cache_entry_t *ce);
 void nanocoap_cache_key_generate(const coap_pkt_t *req, uint8_t *cache_key);
 
 /**
+ * @brief   Generates a cache key based on only the options in @p req
+ *
+ * @param[in] req           The request to generate the cache key from
+ * @param[out] cache_key    The generated cache key of SHA256_DIGEST_LENGTH bytes
+ */
+void nanocoap_cache_key_options_generate(const coap_pkt_t *req, void *cache_key);
+
+/**
+ * @brief   Generates a cache key based on only the options in @p req without
+ * any of the blockwise options included in the key
+ *
+ * This function can be used to correlate individual requests that are part of a
+ * blockwise transfer with each other.
+ *
+ * @param[in] req           The request to generate the cache key from
+ * @param[out] cache_key    The generated cache key of SHA256_DIGEST_LENGTH bytes
+ */
+void nanocoap_cache_key_blockreq_options_generate(const coap_pkt_t *req, void *cache_key);
+
+/**
  * @brief   Compares two cache keys.
  *
  * @param[in] cache_key1    The first cache key in the comparison
