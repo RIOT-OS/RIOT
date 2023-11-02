@@ -4226,6 +4226,8 @@ warning: Member MCP2515_RXM1EID8 (macro definition) of file mcp2515_defines.h is
 warning: Member MCP2515_RXM1SIDH (macro definition) of file mcp2515_defines.h is not documented.
 warning: Member MCP2515_RXM1SIDL (macro definition) of file mcp2515_defines.h is not documented.
 warning: Member MCP2515_RX_MAILBOXES (macro definition) of group drivers_mcp2515 is not documented.
+warning: Member MCP2515_RX_MAILBOX_0 (macro definition) of group drivers_mcp2515 is not documented.
+warning: Member MCP2515_RX_MAILBOX_1 (macro definition) of group drivers_mcp2515 is not documented.
 warning: Member MCP2515_SPI_BITMOD (macro definition) of file mcp2515_defines.h is not documented.
 warning: Member MCP2515_SPI_LOAD_TXBUF (macro definition) of file mcp2515_defines.h is not documented.
 warning: Member MCP2515_SPI_READ (macro definition) of file mcp2515_defines.h is not documented.
