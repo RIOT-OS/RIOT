@@ -5,8 +5,11 @@ PKG_LICENSE=MIT
 
 include $(RIOTBASE)/pkg/pkg.mk
 
-all: $(CURDIR)/uf2conv.py
+all: $(CURDIR)/uf2conv.py $(CURDIR)/uf2families.json
 
 $(CURDIR)/uf2conv.py:
 	cp $(PKG_SOURCE_DIR)/utils/uf2conv.py .
 	chmod a+x uf2conv.py
+
+$(CURDIR)/uf2families.json:
+	cp $(PKG_SOURCE_DIR)/utils/uf2families.json .
