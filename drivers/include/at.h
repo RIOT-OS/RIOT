@@ -306,6 +306,18 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf
 int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout);
 
 /**
+ * @brief   Repeatedly calls at_expect_bytes() until a match or timeout occurs
+ *
+ * @param[in]   dev     device to operate on
+ * @param[in]   bytes   buffer containing bytes to expect (NULL-terminated)
+ * @param[in]   timeout timeout (in usec)
+ *
+ * @returns     0 on success
+ * @returns     <0 otherwise
+ */
+int at_wait_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout);
+
+/**
  * @brief   Receives bytes into @p bytes buffer until the string pattern
  * @p string is received or the buffer is full.
  *
@@ -370,6 +382,21 @@ int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout);
  * @returns     <0 on error
  */
 ssize_t at_readline(at_dev_t *dev, char *resp_buf, size_t len, bool keep_eol, uint32_t timeout);
+
+/**
+ * @brief   Read a line from device, skipping a possibly empty line.
+ *
+ * @param[in]   dev         device to operate on
+ * @param[in]   resp_buf    buffer to store line
+ * @param[in]   len         size of @p resp_buf
+ * @param[in]   keep_eol    true to keep the CR character in the response
+ * @param[in]   timeout     timeout (in usec)
+ *
+ * @returns     line length on success
+ * @returns     <0 on error
+ */
+ssize_t at_readline_skip_empty(at_dev_t *dev, char *resp_buf, size_t len,
+                               bool keep_eol, uint32_t timeout);
 
 /**
  * @brief   Drain device input buffer
