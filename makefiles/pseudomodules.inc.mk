@@ -530,6 +530,7 @@ PSEUDOMODULES += sock_aux_rssi
 PSEUDOMODULES += sock_aux_timestamp
 PSEUDOMODULES += sock_aux_ttl
 PSEUDOMODULES += sock_dtls
+PSEUDOMODULES += sock_dtls_verify_public_key
 PSEUDOMODULES += sock_ip
 PSEUDOMODULES += sock_tcp
 PSEUDOMODULES += sock_udp
