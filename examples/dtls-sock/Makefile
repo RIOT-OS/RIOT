@@ -20,6 +20,10 @@ USEPKG += tinydtls
 
 # Pull in sock APIs
 USEMODULE += sock_dtls
+# When using asymmetric cryptography, e.g. ecc,
+# this verifies the public key against a known set.
+# It does not affect symmetric crypto e.g. PSK.
+USEMODULE += sock_dtls_verify_public_key
 USEMODULE += sock_udp
 
 # extra utilities for endpoint printing

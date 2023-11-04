@@ -41,6 +41,7 @@
 #ifdef CONFIG_DTLS_ECC
 static const ecdsa_public_key_t other_pubkeys0[] = {
     { .x = ecdsa_pub_key0_x, .y = ecdsa_pub_key0_y },
+    { .x = ecdsa_pub_key1_x, .y = ecdsa_pub_key1_y },
 };
 
 static const credman_credential_t credential0 = {
