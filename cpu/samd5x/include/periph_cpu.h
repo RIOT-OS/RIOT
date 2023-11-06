@@ -199,6 +199,28 @@ static const gpio_t rtc_tamper_pins[RTC_NUM_OF_TAMPERS] = {
 };
 
 /**
+ * @brief   Pins that have peripheral function GCLK
+ */
+static const gpio_t gclk_io_pins[] = {
+    GPIO_PIN(PA, 10), GPIO_PIN(PA, 11), GPIO_PIN(PA, 14),
+    GPIO_PIN(PA, 15), GPIO_PIN(PA, 16), GPIO_PIN(PA, 17),
+    GPIO_PIN(PA, 27), GPIO_PIN(PA, 30), GPIO_PIN(PB, 10),
+    GPIO_PIN(PB, 11), GPIO_PIN(PB, 12), GPIO_PIN(PB, 13),
+    GPIO_PIN(PB, 14), GPIO_PIN(PB, 15), GPIO_PIN(PB, 16),
+    GPIO_PIN(PB, 17), GPIO_PIN(PB, 18), GPIO_PIN(PB, 19),
+    GPIO_PIN(PB, 20), GPIO_PIN(PB, 21), GPIO_PIN(PB, 22),
+    GPIO_PIN(PB, 23)
+};
+
+/**
+ * @brief   GCLK IDs of pins that have peripheral function GCLK - This maps
+ *          directly to gclk_io_pins.
+ */
+static const uint8_t gclk_io_ids[] = {
+    4, 5, 0, 1, 2, 3, 1, 0, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1
+};
+
+/**
  * @brief   NVM User Page Mapping - Dedicated Entries
  *          Config values will be applied at power-on.
  */
