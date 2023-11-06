@@ -70,13 +70,19 @@ enum {
  * @name   SAMD5x GCLK definitions
  * @{
  */
-enum {
-    SAM0_GCLK_MAIN = 0,                 /**< 120 MHz main clock       */
-    SAM0_GCLK_32KHZ,                    /**< 32 kHz clock             */
-    SAM0_GCLK_TIMER,                    /**< 4-8 MHz clock for xTimer */
-    SAM0_GCLK_PERIPH,                   /**< 12-48 MHz (DFLL) clock   */
-    SAM0_GCLK_100MHZ,                   /**< 100MHz FDPLL clock       */
-};
+#define SAM0_GCLK_MAIN 0                /**< 120 MHz main clock       */
+#ifndef SAM0_GCLK_32KHZ
+#define SAM0_GCLK_32KHZ 1               /**< 32 kHz clock             */
+#endif
+#ifndef SAM0_GCLK_TIMER
+#define SAM0_GCLK_TIMER 2               /**< 4-8 MHz clock for xTimer */
+#endif
+#ifndef SAM0_GCLK_PERIPH
+#define SAM0_GCLK_PERIPH 3              /**< 12-48 MHz (DFLL) clock   */
+#endif
+#ifndef SAM0_GCLK_100MHZ
+#define SAM0_GCLK_100MHZ 4              /**< 100MHz FDPLL clock       */
+#endif
 /** @} */
 
 /**
