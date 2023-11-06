@@ -265,11 +265,7 @@ ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command, char *resp_buf,
         goto out;
     }
 
-    res = at_readline(dev, resp_buf, len, false, timeout);
-    if (res == 0) {
-        /* skip possible empty line */
-        res = at_readline(dev, resp_buf, len, false, timeout);
-    }
+    res = at_readline_skip_empty(dev, resp_buf, len, false, timeout);
 
 out:
     return res;
@@ -293,11 +289,7 @@ ssize_t at_send_cmd_get_resp_wait_ok(at_dev_t *dev, const char *command,
     /* URCs may occur right after the command has been sent and before the
      * expected response */
     do {
-        res = at_readline(dev, resp_buf, len, false, timeout);
-        if (res == 0) {
-            /* skip possible empty line */
-            res = at_readline(dev, resp_buf, len, false, timeout);
-        }
+        res = at_readline_skip_empty(dev, resp_buf, len, false, timeout);
 
         /* Strip the expected prefix */
         if (res > 0 && resp_prefix && *resp_prefix) {
@@ -314,10 +306,10 @@ ssize_t at_send_cmd_get_resp_wait_ok(at_dev_t *dev, const char *command,
 
     /* wait for OK */
     if (res >= 0) {
-        res_ok = at_readline(dev, ok_buf, sizeof(ok_buf), false, timeout);
-        if (res_ok == 0) {
-            /* skip possible empty line */
-            res_ok = at_readline(dev, ok_buf, sizeof(ok_buf), false, timeout);
+        res_ok = at_readline_skip_empty(dev, ok_buf, sizeof(ok_buf), false,
+                                        timeout);
+        if (res_ok < 0) {
+            return -1;
         }
         ssize_t len_ok = sizeof(CONFIG_AT_RECV_OK) - 1;
         if ((len_ok != 0) && (strcmp(ok_buf, CONFIG_AT_RECV_OK) == 0)) {
@@ -450,6 +442,9 @@ int at_send_cmd_wait_ok(at_dev_t *dev, const char *command, uint32_t timeout)
             return -2;
         }
         // probably a sneaky URC
+#ifdef MODULE_AT_URC
+        clist_foreach(&dev->urc_list, _check_urc, resp_buf);
+#endif
         res = at_readline_skip_empty(dev, resp_buf, sizeof(resp_buf), false,
                                      timeout);
     }
