@@ -214,7 +214,6 @@ static int _mount(vfs_mount_t *mountp)
     }
 
     mp->os_locks = &_lwext4_os_lock;
-    mp->mounted = true;
 
     res = ext4_recover(fs->mp.name);
     if (res != EOK && res != ENOTSUP) {
@@ -228,6 +227,7 @@ static int _mount(vfs_mount_t *mountp)
         return -res;
     }
 
+    mp->mounted = true;
     ext4_cache_write_back(fs->mp.name, 1);
 
     return -res;
