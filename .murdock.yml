@@ -3,6 +3,8 @@ push:
     # these two enable potential bors support:
     - '^staging$'
     - '^trying$'
+    # github merge trains:
+    - '^gh-readonly-queue/'
 
 pr:
   enable_comments: true
