@@ -181,7 +181,7 @@ check_label() {
 # this function returns 0 when this is build is building one of the two bors
 # branches ("staging" or "trying", 1 otherwise.
 is_bors_build() {
-    test "${CI_BUILD_BRANCH}" = "staging" || test "${CI_BUILD_BRANCH}" = "trying"
+    [[ "${CI_BUILD_BRANCH}" == "gh-readonly-queue/"* ]]
 }
 
 # Set CI_BASE_COMMIT in case of a bors build.
