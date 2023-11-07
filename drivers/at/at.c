@@ -306,8 +306,7 @@ ssize_t at_send_cmd_get_resp_wait_ok(at_dev_t *dev, const char *command,
 
     /* wait for OK */
     if (res >= 0) {
-        res_ok = at_readline_skip_empty(dev, ok_buf, sizeof(ok_buf), false,
-                                        timeout);
+        res_ok = at_readline_skip_empty(dev, ok_buf, sizeof(ok_buf), false, timeout);
         if (res_ok < 0) {
             return -1;
         }
@@ -315,7 +314,7 @@ ssize_t at_send_cmd_get_resp_wait_ok(at_dev_t *dev, const char *command,
         if ((len_ok != 0) && (strcmp(ok_buf, CONFIG_AT_RECV_OK) == 0)) {
         }
         else {
-            /* Something else then OK */
+            /* Something else than OK */
             res = -1;
         }
     }
@@ -441,12 +440,11 @@ int at_send_cmd_wait_ok(at_dev_t *dev, const char *command, uint32_t timeout)
         else if (strncmp(resp_buf, "+CMS ERROR:", len_cme_cms) == 0) {
             return -2;
         }
-        // probably a sneaky URC
+        /* probably a sneaky URC */
 #ifdef MODULE_AT_URC
         clist_foreach(&dev->urc_list, _check_urc, resp_buf);
 #endif
-        res = at_readline_skip_empty(dev, resp_buf, sizeof(resp_buf), false,
-                                     timeout);
+        res = at_readline_skip_empty(dev, resp_buf, sizeof(resp_buf), false, timeout);
     }
 
     return res;
