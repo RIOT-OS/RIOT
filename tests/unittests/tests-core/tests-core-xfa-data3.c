@@ -38,4 +38,22 @@ XFA_CONST(xfatest_noalign_const_sameprio, 0) xfatest_noalign_t _xfatest_noalign_
 XFA_CONST(xfatest_noalign_const_sameprio, 0) xfatest_noalign_t _xfatest_noalign_const_sameprio_3 =
     { .text = "noalign const sameprio 3" };
 
+XFA_CONST(xfatest_noalign_33_const, 2) xfatest_noalign_33_t _xfatest_noalign_33_const_1 =
+    { .text = "noalign 33 const 1" };
+
+XFA_CONST(xfatest_noalign_33_const, 1) xfatest_noalign_33_t _xfatest_noalign_33_const_2 =
+    { .text = "noalign 33 const 2" };
+
+XFA_CONST(xfatest_noalign_33_const, 0) xfatest_noalign_33_t _xfatest_noalign_33_const_3 =
+    { .text = "noalign 33 const 3" };
+
+XFA_CONST(xfatest_noalign_33_const_sameprio, 0) xfatest_noalign_33_t _xfatest_noalign_33_const_sameprio_1 =
+    { .text = "noalign 33 const sameprio 1" };
+
+XFA_CONST(xfatest_noalign_33_const_sameprio, 0) xfatest_noalign_33_t _xfatest_noalign_33_const_sameprio_2 =
+    { .text = "noalign 33 const sameprio 2" };
+
+XFA_CONST(xfatest_noalign_33_const_sameprio, 0) xfatest_noalign_33_t _xfatest_noalign_33_const_sameprio_3 =
+    { .text = "noalign 33 const sameprio 3" };
+
 /** @} */

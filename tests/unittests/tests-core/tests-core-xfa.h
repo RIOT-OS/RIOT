@@ -33,6 +33,10 @@ typedef struct WORD_ALIGNED {
     const char text[31];
 } xfatest_noalign_t;
 
+typedef struct WORD_ALIGNED {
+    const char text[33];
+} xfatest_noalign_33_t;
+
 #ifdef __cplusplus
 }
 #endif
