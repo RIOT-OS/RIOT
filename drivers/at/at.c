@@ -67,6 +67,11 @@
 #define AT_EVENT_PRIO EVENT_PRIO_HIGHEST
 #endif
 
+
+#if defined(MODULE_AT_URC)
+static int _check_urc(clist_node_t *node, void *arg);
+#endif
+
 #if defined(MODULE_AT_URC_ISR)
 static void _event_process_urc(event_t *_event)
 {
