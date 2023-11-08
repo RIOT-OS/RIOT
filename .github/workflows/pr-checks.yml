@@ -7,15 +7,12 @@ on:
   pull_request:
 
 jobs:
+  static-tests:
+    uses: ./.github/workflows/static-test.yml
   ci-check-catchall:
     runs-on: ubuntu-latest
     needs:
-      - "python-tests"
-      - "tools-build-success"
-      - "check-labels"
       - "static-tests"
-      - "check-commits (commit-msg)"
-      - "check-commits (pr_check)"
     steps:
       - name: always succeed
         run: "true"

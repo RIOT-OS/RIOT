@@ -7,10 +7,11 @@ on:
   merge_group:
 
 jobs:
+  static-tests:
+    uses: ./.github/workflows/static-test.yml
   ci-check-catchall:
     runs-on: ubuntu-latest
     needs:
-      - "tools-build-success"
       - "static-tests"
     steps:
       - name: always succeed
