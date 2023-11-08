@@ -1,0 +1,17 @@
+#
+# this workflow defines a catch-all job that depends on all
+# checks a merge group needs to pass.
+#
+name: merge group checks
+on:
+  merge_group:
+
+jobs:
+  merge-group-checks:
+    runs-on: ubuntu-latest
+    needs:
+      - "tools-build-success"
+      - "static-tests"
+    steps:
+      - name: always succeed
+        run: "false"
