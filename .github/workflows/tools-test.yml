@@ -9,9 +9,11 @@ on:
   pull_request:
     branches:
       - '*'
+  merge_group:
 
 jobs:
   python-tests:
+    if: github.event_name != 'merge_group'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@main
