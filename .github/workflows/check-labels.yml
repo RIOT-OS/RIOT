@@ -4,8 +4,11 @@ on:
     types: [opened, reopened, labeled, unlabeled, synchronize]
   pull_request_review:
     types: [submitted, dismissed]
+  merge_group:
+
 jobs:
   check-labels:
+    if: github.event_name != 'merge_group'
     runs-on: ubuntu-latest
     steps:
     - uses: RIOT-OS/check-labels-action@v1.1.1
