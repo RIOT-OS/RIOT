@@ -178,19 +178,27 @@ check_label() {
     return $?
 }
 
-# this function returns 0 when this is build is building one of the two bors
-# branches ("staging" or "trying", 1 otherwise.
-is_bors_build() {
-    test "${CI_BUILD_BRANCH}" = "staging" || test "${CI_BUILD_BRANCH}" = "trying"
+# true if "$2" starts with "$1", false otherwise
+startswith() {
+  case "${2}" in
+    ${1}*) true ;;
+    *) false ;;
+  esac
 }
 
-# Set CI_BASE_COMMIT in case of a bors build.
-# This assumes that bors always adds a single merge commit (possibly itself
+# this function returns 0 when this is build is building one of the two merge
+# queue branches ("staging" or "trying", 1 otherwise.
+is_merge_queue_build() {
+    startswith "gh-readonly-queue/" "${CI_BUILD_BRANCH}"
+}
+
+# Set CI_BASE_COMMIT in case of a merge queue build.
+# This assumes that merge queue always adds a single merge commit (possibly itself
 # including multiple merges for PRs) on the base branch.
 # That git command outputs the hash of the second merge commit (the one before
 # the topmost merge), which should be the base branch HEAD.
 # (CI_BASE_COMMIT is used by `can_fast_ci_run.py` to only build changes.)
-if test -z "${CI_BASE_COMMIT}" && is_bors_build ; then
+if test -z "${CI_BASE_COMMIT}" && is_merge_queue_build; then
     previous_merge="$(git log --merges --max-count 1 --skip 1 --pretty=format:%H)"
     export CI_BASE_COMMIT="${previous_merge}"
 fi
@@ -216,8 +224,8 @@ fi
 # configurations.
 if [ -z "${QUICK_BUILD}" ]; then
     export QUICK_BUILD=0
-    if is_bors_build ; then
-        # always do full build for bors' branches
+    if is_merge_queue_build; then
+        # always do full build for merge queue' branches
         true
     elif [ ${FULL_BUILD} -eq 1 ]; then
         # full build if building nightly or full build requested by label
@@ -321,14 +329,6 @@ fi
 error() {
     echo "$@"
     exit 1
-}
-
-# true if "$2" starts with "$1", false otherwise
-startswith() {
-  case "${2}" in
-    ${1}*) true ;;
-    *) false ;;
-  esac
 }
 
 # if MURDOCK_HOOK is set, this function will execute it and pass on all it's
