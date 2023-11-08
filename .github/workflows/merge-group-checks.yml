@@ -7,7 +7,7 @@ on:
   merge_group:
 
 jobs:
-  merge-group-checks:
+  ci-check-catchall:
     runs-on: ubuntu-latest
     needs:
       - "tools-build-success"

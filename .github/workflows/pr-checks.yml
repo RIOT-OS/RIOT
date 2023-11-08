@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  pr-checks:
+  ci-check-catchall:
     runs-on: ubuntu-latest
     needs:
       - "python-tests"
