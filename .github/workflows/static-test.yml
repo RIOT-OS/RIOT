@@ -22,11 +22,18 @@ jobs:
     - uses: actions/checkout@main
       with:
         fetch-depth: 0
+    - name: set CI_BASE_BRANCH
+      run: |
+          if [ -n "${{ github.base_ref }}" ]; then
+              echo "CI_BASE_BRANCH=${{ github.base_ref }}" >> $GITHUB_ENV
+          elif [ -n "${{ github.event.merge_group.base_ref }}" ]; then
+              echo "CI_BASE_BRANCH=${{ github.event.merge_group.base_ref }}" | sed s.=refs/heads/.=. >> $GITHUB_ENV
+          fi
     - name: Setup git
       run: |
-        # Note: ${{ github.base_ref }} is empty when not in a PR
-        if [ -n "${{ github.base_ref }}" ]; then
-          git fetch origin ${{ github.base_ref }}:${{ github.base_ref }} --no-tags
+        # Note: CI_BASE_BRANCH is empty when not in a PR
+        if [ -n "${CI_BASE_BRANCH}" ]; then
+          git fetch origin ${CI_BASE_BRANCH}:${CI_BASE_BRANCH} --no-tags
         else
           git config diff.renameLimit 16384
         fi
@@ -35,9 +42,9 @@ jobs:
       run: docker pull riot/static-test-tools:latest
     - name: Run static-tests
       run: |
-        # Note: ${{ github.base_ref }} is empty when not in a PR
+        # Note: ${CI_BASE_BRANCH} is empty when not in a PR
         docker run --rm                             \
-          -e CI_BASE_BRANCH=${{ github.base_ref }}  \
+          -e CI_BASE_BRANCH                         \
           -e GITHUB_RUN_ID=${GITHUB_RUN_ID}         \
           -v $(pwd):/data/riotbuild                 \
           riot/static-test-tools:latest             \
