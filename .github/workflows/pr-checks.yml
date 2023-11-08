@@ -9,10 +9,13 @@ on:
 jobs:
   static-tests:
     uses: ./.github/workflows/static-test.yml
+  tools-build:
+    uses: ./.github/workflows/tools-buildtest.yml
   ci-check-catchall:
     runs-on: ubuntu-latest
     needs:
       - "static-tests"
+      - "tools-build"
     steps:
       - name: always succeed
         run: "true"
