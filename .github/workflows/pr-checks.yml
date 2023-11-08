@@ -1,0 +1,21 @@
+#
+# this workflow defines a catch-all job that depends on all
+# checks a PR needs to pass *before it may enter the merge queue*.
+#
+name: PR checks
+on:
+  pull_request:
+
+jobs:
+  pr-checks:
+    runs-on: ubuntu-latest
+    needs:
+      - "python-tests"
+      - "tools-build-success"
+      - "check-labels"
+      - "static-tests"
+      - "check-commits (commit-msg)"
+      - "check-commits (pr_check)"
+    steps:
+      - name: always succeed
+        run: "true"
