@@ -1,0 +1,16 @@
+name: ref-print
+on:
+  pull_request:
+  merge_group:
+
+jobs:
+  ref-print:
+    runs-on: ubuntu-latest
+    steps:
+    - name: github.base_ref
+      run: echo github.base_ref=${{ github.base_ref }}
+    - name: github.merge_group.base_ref
+      run: echo github.event.merge_group.base_ref=${{ github.event.merge_group.base_ref }}
+    - name: fail-if
+      if: github.event_name != 'merge_group'
+      run: "false"
