@@ -22,6 +22,9 @@ jobs:
     - uses: actions/checkout@main
       with:
         fetch-depth: 0
+    - name: fail if merge queue
+      if: github.event_name == 'merge_group'
+      run: exit 1
     - name: set CI_BASE_BRANCH
       run: |
           if [ -n "${{ github.base_ref }}" ]; then
