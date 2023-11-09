@@ -837,6 +837,7 @@ typedef struct {
     sock_udp_ep_t *observer;            /**< Client endpoint; unused if null */
     const coap_resource_t *resource;    /**< Entity being observed */
     uint8_t token[GCOAP_TOKENLEN_MAX];  /**< Client token for notifications */
+    uint16_t last_msgid;                /**< Message ID of last notification */
     unsigned token_len;                 /**< Actual length of token attribute */
     gcoap_socket_t socket;              /**< Transport type to observer */
 } gcoap_observe_memo_t;

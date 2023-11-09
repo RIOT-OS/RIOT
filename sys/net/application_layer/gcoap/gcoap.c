@@ -83,6 +83,10 @@ static int _find_obs_memo(gcoap_observe_memo_t **memo, sock_udp_ep_t *remote,
                                                        coap_pkt_t *pdu);
 static void _find_obs_memo_resource(gcoap_observe_memo_t **memo,
                                    const coap_resource_t *resource);
+
+static void _check_and_expire_obs_memo_last_mid(sock_udp_ep_t *remote,
+                                                uint16_t last_notify_mid);
+
 static nanocoap_cache_entry_t *_cache_lookup_memo(gcoap_request_memo_t *cache_key);
 static void _cache_process(gcoap_request_memo_t *memo,
                            coap_pkt_t *pdu);
@@ -410,6 +414,10 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_
             event_timeout_clear(&memo->resp_evt_tmout);
             _expire_request(memo);
         }
+
+        /* check if this RST is due to the client not being interested
+         * in receiving observe notifications anymore. */
+        _check_and_expire_obs_memo_last_mid(remote, coap_get_id(&pdu));
     }
 
     /* validate class and type for incoming */
@@ -1061,6 +1069,51 @@ static int _find_obs_memo(gcoap_observe_memo_t **memo, sock_udp_ep_t *remote,
         }
     }
     return empty_slot;
+}
+
+/*
+ * Checks if an observe memo exists for which a notification with the given
+ * msg ID was sent out. If so, it expires the memo and frees up the
+ * observer entry if needed.
+ *
+ * remote[in]             The remote to check for a stale observe memo.
+ * last_notify_mid[in]    The message ID of the last notification send to the
+ *                        given remote.
+ */
+static void _check_and_expire_obs_memo_last_mid(sock_udp_ep_t *remote,
+                                                uint16_t last_notify_mid)
+{
+    /* find observer entry from remote */
+    sock_udp_ep_t *observer;
+    _find_observer(&observer, remote);
+
+    if (observer) {
+        gcoap_observe_memo_t *stale_obs_memo = NULL;
+        /* get the observe memo corresponding to the notification with the
+         * given msg ID. */
+        for (unsigned i = 0; i < CONFIG_GCOAP_OBS_REGISTRATIONS_MAX; i++) {
+            if (_coap_state.observe_memos[i].observer == NULL) {
+                continue;
+            }
+            if ((_coap_state.observe_memos[i].observer == observer) &&
+                (last_notify_mid == _coap_state.observe_memos[i].last_msgid)) {
+                stale_obs_memo = &_coap_state.observe_memos[i];
+                break;
+            }
+        }
+
+        if (stale_obs_memo) {
+            stale_obs_memo->observer = NULL; /* clear memo */
+
+            /* check if the observer has more observe memos registered... */
+            stale_obs_memo = NULL;
+            _find_obs_memo(&stale_obs_memo, observer, NULL);
+            if (stale_obs_memo == NULL) {
+                /* ... if not -> also free the observer entry */
+                observer->family = AF_UNSPEC;
+            }
+        }
+    }
 }
 
 /*
@@ -1755,6 +1808,10 @@ int gcoap_obs_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         coap_pkt_init(pdu, buf, len, hdrlen);
 
         _add_generated_observe_option(pdu);
+        /* Store message ID of the last notification sent. This is needed
+         * to match a potential RST returned by a client in order to signal
+         * it does not recognize this notification. */
+        memo->last_msgid = msgid;
 
         return GCOAP_OBS_INIT_OK;
     }
