@@ -212,9 +212,6 @@ if [ -z "${FULL_BUILD}" ]; then
     elif check_label "CI: full build"; then
         # full build if requested by label
         FULL_BUILD=1
-    elif is_merge_queue_build; then
-        # always do full build for merge queue' branches
-        FULL_BUILD=1
     else
         FULL_BUILD=0
     fi
