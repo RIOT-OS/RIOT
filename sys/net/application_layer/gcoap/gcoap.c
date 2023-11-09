@@ -409,7 +409,8 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_
     }
 
     /* validate class and type for incoming */
-    switch (coap_get_code_class(&pdu)) {
+    unsigned code_class = coap_get_code_class(&pdu);
+    switch (code_class) {
     /* incoming request or empty */
     case COAP_CLASS_REQ:
         if (coap_get_code_raw(&pdu) == COAP_CODE_EMPTY) {
@@ -498,6 +499,9 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_
                         _cache_process(memo, &pdu);
                     }
                 }
+
+                bool observe_notification = coap_has_observe(&pdu);
+
                 if (memo->resp_handler) {
                     memo->resp_handler(memo, &pdu, remote);
                 }
@@ -505,7 +509,15 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_
                 if (memo->send_limit >= 0) {        /* if confirmable */
                     *memo->msg.data.pdu_buf = 0;    /* clear resend PDU buffer */
                 }
-                memo->state = GCOAP_MEMO_UNUSED;
+
+                /* The memo must be kept if the response is an observe notification.
+                 * Non-2.xx notifications indicate that the associated observe entry
+                 * was removed on the server side. Then also free the memo here. */
+                if (!observe_notification || (code_class != COAP_CLASS_SUCCESS)) {
+                    /* setting the state to unused frees (drops) the memo entry */
+                    memo->state = GCOAP_MEMO_UNUSED;
+                }
+
                 break;
             default:
                 DEBUG("gcoap: illegal response type: %u\n", coap_get_type(&pdu));
