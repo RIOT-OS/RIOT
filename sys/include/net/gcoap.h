@@ -1075,6 +1075,37 @@ size_t gcoap_obs_send(const uint8_t *buf, size_t len,
                       const coap_resource_t *resource);
 
 /**
+ * @brief   Forgets (invalidates) an existing observe request.
+ *
+ * This invalidates the internal (local) observe request state without actually
+ * sending a deregistration request to the server. Ths mechanism may be referred
+ * to as passive deregistration, as it does not send a deregistration request.
+ * This is implemented according to the description in RFC 7641,
+ * Section 3.6 (Cancellation): 'A client that is no longer interested in
+ * receiving notifications for a resource can simply "forget" the observation.'
+ * Successfully invalidating the request by calling this function guarantees
+ * that the corresponding observe response handler will not be called anymore.
+ *
+ * NOTE: There are cases were active deregistration is preferred instead.
+ * A server may continue sending notifications if it chooses to ignore the RST
+ * which is meant to indicate the client did not recognize the notification.
+ * For such server implementations this function must be called *before*
+ * sending an explicit deregister request (i.e., a GET request with the token
+ * of the registration and the observe option set to COAP_OBS_DEREGISTER).
+ * This will instruct the server to stop sending further notifications.
+ *
+ * @param[in] remote    remote endpoint that hosts the observed resource
+ * @param[in] token     token of the original GET request used for registering
+ *                      an observe
+ * @param[in] tokenlen  the length of the token in bytes
+ *
+ * @return  0 on success
+ * @return  < 0 on error
+ */
+int gcoap_obs_req_forget(const sock_udp_ep_t *remote, const uint8_t *token,
+                         size_t tokenlen);
+
+/**
  * @brief   Provides important operational statistics
  *
  * Useful for monitoring.

@@ -1535,6 +1535,23 @@ int gcoap_req_init_path_buffer(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     return (res > 0) ? 0 : res;
 }
 
+int gcoap_obs_req_forget(const sock_udp_ep_t *remote, const uint8_t *token,
+                         size_t tokenlen) {
+    int res = -ENOENT;
+    gcoap_request_memo_t *obs_req_memo;
+    mutex_lock(&_coap_state.lock);
+    /* Find existing request memo of the observe */
+    obs_req_memo = _find_req_memo_by_token(remote, token, tokenlen);
+    if (obs_req_memo) {
+        /* forget the existing observe memo. */
+        obs_req_memo->state = GCOAP_MEMO_UNUSED;
+        res = 0;
+    }
+
+    mutex_unlock(&_coap_state.lock);
+    return res;
+}
+
 ssize_t gcoap_req_send_tl(const uint8_t *buf, size_t len,
                           const sock_udp_ep_t *remote,
                           gcoap_resp_handler_t resp_handler, void *context,
