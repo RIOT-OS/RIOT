@@ -68,8 +68,12 @@ static void _cease_retransmission(gcoap_request_memo_t *memo);
 static size_t _handle_req(gcoap_socket_t *sock, coap_pkt_t *pdu, uint8_t *buf,
                           size_t len, sock_udp_ep_t *remote);
 static void _expire_request(gcoap_request_memo_t *memo);
-static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *pdu,
-                           const sock_udp_ep_t *remote, bool by_mid);
+static gcoap_request_memo_t* _find_req_memo_by_mid(const sock_udp_ep_t *remote,
+                                                   uint16_t mid);
+static gcoap_request_memo_t* _find_req_memo_by_token(const sock_udp_ep_t *remote,
+                                            const uint8_t *token, size_t tkl);
+static gcoap_request_memo_t* _find_req_memo_by_pdu_token(const coap_pkt_t *src_pdu,
+                                                const sock_udp_ep_t *remote);
 static int _find_resource(gcoap_socket_type_t tl_type,
                           coap_pkt_t *pdu,
                           const coap_resource_t **resource_ptr,
@@ -401,7 +405,7 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_
 
     if (coap_get_type(&pdu) == COAP_TYPE_RST) {
         DEBUG("gcoap: received RST, expiring potentially existing memo\n");
-        _find_req_memo(&memo, &pdu, remote, true);
+        memo = _find_req_memo_by_mid(remote, pdu.hdr->id);
         if (memo) {
             event_timeout_clear(&memo->resp_evt_tmout);
             _expire_request(memo);
@@ -419,7 +423,7 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_
                 messagelayer_emptyresponse_type = COAP_TYPE_RST;
                 DEBUG("gcoap: Answering empty CON request with RST\n");
             } else if (coap_get_type(&pdu) == COAP_TYPE_ACK) {
-                _find_req_memo(&memo, &pdu, remote, true);
+                memo = _find_req_memo_by_mid(remote, pdu.hdr->id);
                 if ((memo != NULL) && (memo->send_limit != GCOAP_SEND_LIMIT_NON)) {
                     DEBUG("gcoap: empty ACK processed, stopping retransmissions\n");
                     _cease_retransmission(memo);
@@ -460,7 +464,7 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_
     case COAP_CLASS_SUCCESS:
     case COAP_CLASS_CLIENT_FAILURE:
     case COAP_CLASS_SERVER_FAILURE:
-        _find_req_memo(&memo, &pdu, remote, false);
+        memo = _find_req_memo_by_pdu_token(&pdu, remote);
         if (memo) {
             switch (coap_get_type(&pdu)) {
             case COAP_TYPE_CON:
@@ -860,20 +864,18 @@ static int _find_resource(gcoap_socket_type_t tl_type,
  * Finds the memo for an outstanding request within the _coap_state.open_reqs
  * array. Matches on remote endpoint and token.
  *
- * memo_ptr[out] -- Registered request memo, or NULL if not found
- * src_pdu[in] -- PDU for token to match
- * remote[in] -- Remote endpoint to match
- * by_mid[in] -- true if matches are to be done based on Message ID, otherwise they are done by
- *               token
+ * remote[in]     Remote endpoint to match
+ * token[in]      Token to match
+ * tkl[in]        Length of the token in bytes
+ *
+ * return         Registered request memo, or NULL if not found
  */
-static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *src_pdu,
-                           const sock_udp_ep_t *remote, bool by_mid)
+static gcoap_request_memo_t* _find_req_memo_by_token(const sock_udp_ep_t *remote,
+                                            const uint8_t *token, size_t tkl)
 {
-    *memo_ptr = NULL;
     /* no need to initialize struct; we only care about buffer contents below */
     coap_pkt_t memo_pdu_data;
     coap_pkt_t *memo_pdu = &memo_pdu_data;
-    unsigned cmplen      = coap_get_token_len(src_pdu);
 
     for (int i = 0; i < CONFIG_GCOAP_REQ_WAITING_MAX; i++) {
         if (_coap_state.open_reqs[i].state == GCOAP_MEMO_UNUSED) {
@@ -881,25 +883,64 @@ static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *src_pdu,
         }
 
         gcoap_request_memo_t *memo = &_coap_state.open_reqs[i];
-
         memo_pdu->hdr = gcoap_request_memo_get_hdr(memo);
-        if (by_mid) {
-            if ((src_pdu->hdr->id == memo_pdu->hdr->id)
-                    && sock_udp_ep_equal(&memo->remote_ep, remote)) {
-                *memo_ptr = memo;
-                break;
-            }
-        } else if (coap_get_token_len(memo_pdu) == cmplen) {
-            if ((memcmp(coap_get_token(src_pdu), coap_get_token(memo_pdu), cmplen) == 0)
+
+        if (coap_get_token_len(memo_pdu) == tkl) {
+            if ((memcmp(token, coap_get_token(memo_pdu), tkl) == 0)
                     && (sock_udp_ep_equal(&memo->remote_ep, remote)
                       /* Multicast addresses are not considered in matching responses */
                       || sock_udp_ep_is_multicast(&memo->remote_ep)
                     )) {
-                *memo_ptr = memo;
-                break;
+                return memo;
             }
         }
     }
+    return NULL;
+}
+
+/*
+ * Utility wrapper for _find_req_memo_by_token(), using the pdu token.
+ * Finds the memo for an outstanding request within the _coap_state.open_reqs
+ * array. Matches on remote endpoint and token of the pdu.
+ *
+ * src_pdu[in]    PDU which holds the token for matching
+ * remote[in]     Remote endpoint to match
+ *
+ * return         Registered request memo, or NULL if not found
+ */
+static gcoap_request_memo_t* _find_req_memo_by_pdu_token(
+                                                  const coap_pkt_t *src_pdu,
+                                                  const sock_udp_ep_t *remote)
+{
+    unsigned tkl = coap_get_token_len(src_pdu);
+    uint8_t *token = coap_get_token(src_pdu);
+    return _find_req_memo_by_token(remote, token, tkl);
+}
+
+/*
+ * Finds the memo for an outstanding request within the _coap_state.open_reqs
+ * array. Matches on remote endpoint and message ID.
+ *
+ * remote[in]     Remote endpoint to match
+ * mid[in]        Message ID to match
+ *
+ * return         Registered request memo, or NULL if not found
+ */
+static gcoap_request_memo_t* _find_req_memo_by_mid(const sock_udp_ep_t *remote, uint16_t mid)
+{
+    for (int i = 0; i < CONFIG_GCOAP_REQ_WAITING_MAX; i++) {
+        if (_coap_state.open_reqs[i].state == GCOAP_MEMO_UNUSED) {
+            continue;
+        }
+
+        gcoap_request_memo_t *memo = &_coap_state.open_reqs[i];
+
+        if ((mid == gcoap_request_memo_get_hdr(memo)->id) &&
+            sock_udp_ep_equal(&memo->remote_ep, remote)) {
+            return memo;
+        }
+    }
+    return NULL;
 }
 
 /* Calls handler callback on receipt of a timeout message. */
@@ -1818,7 +1859,7 @@ void gcoap_forward_proxy_find_req_memo(gcoap_request_memo_t **memo_ptr,
                                        coap_pkt_t *src_pdu,
                                        const sock_udp_ep_t *remote)
 {
-    _find_req_memo(memo_ptr, src_pdu, remote, false);
+    *memo_ptr = _find_req_memo_by_pdu_token(src_pdu, remote);
 }
 
 void gcoap_forward_proxy_post_event(void *arg)
