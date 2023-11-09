@@ -186,8 +186,7 @@ startswith() {
   esac
 }
 
-# this function returns 0 when this is build is building one of the two merge
-# queue branches ("staging" or "trying", 1 otherwise.
+# this function returns 0 when this build is building a merge queue branch.
 is_merge_queue_build() {
     startswith "gh-readonly-queue/" "${CI_BUILD_BRANCH}"
 }
