@@ -235,6 +235,7 @@ if [ -z "${QUICK_BUILD}" ]; then
         true
     else
         export QUICK_BUILD=1
+
     fi
 fi
 
