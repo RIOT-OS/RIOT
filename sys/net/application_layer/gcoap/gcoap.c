@@ -536,6 +536,13 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_
                 messagelayer_emptyresponse_type = COAP_TYPE_RST;
                 DEBUG("gcoap: Answering unknown CON response with RST to "
                       "shut up sender\n");
+            } else {
+                /* if the response was a (NON) observe notification and there is no
+                 * matching request, the server must be informed that this node is
+                 * no longer interested in this notification. */
+                if (coap_has_observe(&pdu)) {
+                    messagelayer_emptyresponse_type = COAP_TYPE_RST;
+                }
             }
         }
         break;
