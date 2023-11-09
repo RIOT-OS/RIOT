@@ -167,7 +167,7 @@ static size_t _send(uint8_t *buf, size_t len, sock_udp_ep_t *remote)
 
 static int _print_usage(char **argv)
 {
-    printf("usage: %s <get [-o]|post|put|ping|proxy|info>\n", argv[0]);
+    printf("usage: %s <get [-o|-d]|post|put|ping|proxy|info>\n", argv[0]);
     return 1;
 }
 
@@ -283,6 +283,8 @@ int gcoap_cli_cmd(int argc, char **argv)
     /* parse options */
     int apos = 2;       /* position of address argument */
 
+    /* For GET requests additional switches allow for registering and
+     * deregistering an observe. This example only supports one observe. */
     if (code_pos == COAP_METHOD_GET) {
         if (argc > apos) {
             if (strcmp(argv[apos], "-o") == 0) {
@@ -292,6 +294,14 @@ int gcoap_cli_cmd(int argc, char **argv)
                 }
                 observe = true;
                 apos++;
+            } else if (strcmp(argv[apos], "-d") == 0) {
+                if (!observing) {
+                    puts("Not observing");
+                    return 1;
+                }
+                observe = true;
+                apos++;
+                obs_value = COAP_OBS_DEREGISTER;
             }
         }
     }
@@ -356,12 +366,22 @@ int gcoap_cli_cmd(int argc, char **argv)
                 /* backup the token of the initial observe registration */
                 memcpy(obs_req_token, token, obs_req_tkl);
                 observing = true;
-            }
-            coap_opt_add_uint(&pdu, COAP_OPT_OBSERVE, obs_value);
-            if (!_proxied) {
-                /* add uri path option separately
-                 * (options must be added in order) */
-                coap_opt_add_string(&pdu, COAP_OPT_URI_PATH, uri, '/');
+                coap_opt_add_uint(&pdu, COAP_OPT_OBSERVE, obs_value);
+                if (!_proxied) {
+                    /* add uri path option separately
+                     * (options must be added in order) */
+                    coap_opt_add_uri_path(&pdu, uri);
+                }
+            } else {
+                /* use the token of the registration for deregistration */
+                memcpy(token, obs_req_token, obs_req_tkl);
+                if (gcoap_obs_req_forget(&remote, obs_req_token, obs_req_tkl)) {
+                    printf("could not remove observe request\n");
+                    return 1;
+                }
+                observing = false;
+                /* deregistration does not require further actions */
+                return 0;
             }
         }
 
@@ -408,7 +428,7 @@ int gcoap_cli_cmd(int argc, char **argv)
         return 0;
     }
     else {
-        printf("usage: %s <get [-o]|post|put> [-c] <host>[:port] <path> [data]\n",
+        printf("usage: %s <get [-o|-d]|post|put> [-c] <host>[:port] <path> [data]\n",
                argv[0]);
         printf("       %s ping <host>[:port]\n", argv[0]);
         printf("Options\n");
