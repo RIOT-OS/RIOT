@@ -278,10 +278,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     }
 #endif
     dev(bus)->CR1 = cr1_settings;
-    /* Only modify CR2 if needed */
-    if (cr2_extra_settings) {
-        dev(bus)->CR2 = (SPI_CR2_SETTINGS | cr2_extra_settings);
-    }
+    dev(bus)->CR2 = (SPI_CR2_SETTINGS | cr2_extra_settings);
 }
 
 void spi_release(spi_t bus)
