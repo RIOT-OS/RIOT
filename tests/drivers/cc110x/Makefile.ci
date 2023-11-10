@@ -23,6 +23,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     msb-430h \
     nucleo-f031k6 \
     nucleo-f042k6 \
+    nucleo-f070rb \
     nucleo-f072rb \
     nucleo-f302r8 \
     nucleo-f303k8 \
