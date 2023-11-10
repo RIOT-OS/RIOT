@@ -69,6 +69,8 @@ extern mtd_emulated_t mtd_emulated_dev0;
 /**
  * @brief   Get the default MTD device by index
  *
+ * @deprecated  Use @ref mtd_dev_get instead
+ *
  * @param[in] idx   Index of the MTD device
  *
  * @return  MTD_0 for @p idx 0 and so on
