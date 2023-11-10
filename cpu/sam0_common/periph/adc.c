@@ -357,6 +357,8 @@ static void _get_adcs(bool *adc0, bool *adc1)
     *adc1 = false;
     return;
 #else
+    *adc0 = false;
+    *adc1 = false;
     for (unsigned i = 0; i < ADC_NUMOF; ++i) {
         if (adc_channels[i].dev == ADC0) {
             *adc0 = true;
