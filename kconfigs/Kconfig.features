@@ -188,6 +188,11 @@ config HAS_PERIPH_ADC
     help
         Indicates that an ADC peripheral is present.
 
+config HAS_PERIPH_ADC_CONTINUOUS
+    bool
+    help
+        Indicates that an ADC peripheral can be left on between measurements.
+
 config HAS_PERIPH_CAN
     bool
     help
