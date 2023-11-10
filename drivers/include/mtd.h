@@ -73,6 +73,7 @@
 #ifndef MTD_H
 #define MTD_H
 
+#include <stddef.h>
 #include <stdint.h>
 
 #include "xfa.h"
@@ -516,6 +517,19 @@ int mtd_erase_sector(mtd_dev_t *mtd, uint32_t sector, uint32_t num);
  * @retval -EIO if I/O error occurred
  */
 int mtd_power(mtd_dev_t *mtd, enum mtd_power_state power);
+
+/**
+ * @brief   Get an MTD device by index
+ *
+ * @param[in] idx   Index of the MTD device
+ *
+ * @return  MTD_0 for @p idx 0 and so on
+ *          NULL if no MTD device exists for the given index
+ */
+static inline mtd_dev_t *mtd_dev_get(unsigned idx)
+{
+    return ((MTD_NUMOF != 0) && (idx < MTD_NUMOF)) ? mtd_dev_xfa[idx] : NULL;
+}
 
 #ifdef __cplusplus
 }
