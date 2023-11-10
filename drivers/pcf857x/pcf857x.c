@@ -19,10 +19,6 @@
 
 #include "pcf857x.h"
 
-#include "irq.h"
-#include "log.h"
-#include "thread.h"
-
 #if IS_USED(MODULE_PCF857X_IRQ)
 #include "event/thread.h"
 #endif
@@ -154,7 +150,7 @@ int pcf857x_gpio_init(pcf857x_t *dev, gpio_t pin, gpio_mode_t mode)
     assert(dev != NULL);
     assert(pin < dev->pin_num);
 
-    DEBUG_DEV("pin=%u mode=%u", dev, pin, mode);
+    DEBUG_DEV("pin=%u mode=%u", dev, (unsigned)pin, (unsigned)mode);
 
     /*
      * Since the LOW output is the only actively driven level possible with
@@ -164,7 +160,7 @@ int pcf857x_gpio_init(pcf857x_t *dev, gpio_t pin, gpio_mode_t mode)
      * with the weak pull-up to emulate them.
      */
     switch (mode) {
-        case GPIO_IN_PD: DEBUG_DEV("gpio mode GPIO_IN_PD not supported", dev, mode);
+        case GPIO_IN_PD: DEBUG_DEV("gpio mode GPIO_IN_PD not supported", dev);
                          return -PCF857X_ERROR_INV_MODE;
         case GPIO_OUT:   dev->modes &= ~(1 << pin); /* set mode bit to 0 */
                          dev->out   &= ~(1 << pin); /* set output bit to 0 */
@@ -265,7 +261,7 @@ int pcf857x_gpio_read(pcf857x_t *dev, gpio_t pin)
     assert(dev != NULL);
     assert(pin < dev->pin_num);
 
-    DEBUG_DEV("pin=%u", dev, pin);
+    DEBUG_DEV("pin=%u", dev, (unsigned)pin);
 
     /*
      * If we use the interrupt, we always have an up-to-date input snapshot
@@ -286,7 +282,7 @@ void pcf857x_gpio_write(pcf857x_t *dev, gpio_t pin, int value)
     assert(dev != NULL);
     assert(pin < dev->pin_num);
 
-    DEBUG_DEV("pin=%u value=%d", dev, pin, value);
+    DEBUG_DEV("pin=%u value=%d", dev, (unsigned)pin, value);
 
     /* set pin bit value */
     if (value) {
@@ -319,19 +315,19 @@ void pcf857x_gpio_write(pcf857x_t *dev, gpio_t pin, int value)
 
 void pcf857x_gpio_clear(pcf857x_t *dev, gpio_t pin)
 {
-    DEBUG_DEV("pin=%u", dev, pin);
+    DEBUG_DEV("pin=%u", dev, (unsigned)pin);
     return pcf857x_gpio_write(dev, pin, 0);
 }
 
 void pcf857x_gpio_set(pcf857x_t *dev, gpio_t pin)
 {
-    DEBUG_DEV("pin=%u", dev, pin);
+    DEBUG_DEV("pin=%u", dev, (unsigned)pin);
     return pcf857x_gpio_write(dev, pin, 1);
 }
 
 void pcf857x_gpio_toggle(pcf857x_t *dev, gpio_t pin)
 {
-    DEBUG_DEV("pin=%u", dev, pin);
+    DEBUG_DEV("pin=%u", dev, (unsigned)pin);
     return pcf857x_gpio_write(dev, pin, (dev->out & (1 << pin)) ? 0 : 1);
 }
 
