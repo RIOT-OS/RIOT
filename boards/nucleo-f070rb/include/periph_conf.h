@@ -103,6 +103,21 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
+ * @name    DMA streams configuration
+ * @{
+ */
+static const dma_conf_t dma_config[] = {
+    { .stream = 1  },
+    { .stream = 2  },
+};
+
+#define DMA_SHARED_ISR_0            isr_dma1_ch2_3_dma2_ch1_2
+#define DMA_SHARED_ISR_0_STREAMS    { 0, 1 } /* Indexes 0 and 1 of dma_config share the same isr */
+
+#define DMA_NUMOF           ARRAY_SIZE(dma_config)
+/** @} */
+
+/**
  * @name    PWM configuration
  * @{
  */
@@ -148,9 +163,41 @@ static const adc_conf_t adc_config[] = {
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
-static const spi_conf_t spi_config[] = {{},};
+/**
+ * @name   SPI configuration
+ *
+ * To find appriopate device and pins find in the MCU datasheet table
+ * concerning "Alternate function AF0 to AF7" a texts similar to
+ * SPI[X]_MOSI/_MISO/_SCK where SPI[X] is SPI device.
+ *
+ * For nucleo-f070rb this information is in the datasheet, Tables 11, 12 and 13,
+ * page 30.
+ * @{
+ */
+static const spi_conf_t spi_config[] = {
+    {
+        .dev      = SPI1,
+        .mosi_pin = GPIO_PIN(PORT_A, 7),
+        .miso_pin = GPIO_PIN(PORT_A, 6),
+        .sclk_pin = GPIO_PIN(PORT_A, 5),
+        .cs_pin   = GPIO_UNDEF,
+        .mosi_af  = GPIO_AF0,
+        .miso_af  = GPIO_AF0,
+        .sclk_af  = GPIO_AF0,
+        .cs_af    = GPIO_AF0,
+        .rccmask  = RCC_APB2ENR_SPI1EN,
+        .apbbus   = APB2,
+#ifdef MODULE_PERIPH_DMA
+        .tx_dma   = 1,
+        .tx_dma_chan = 0,
+        .rx_dma   = 0,
+        .rx_dma_chan = 0,
+#endif
+    }
+};
 
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
+/** @} */
 
 #ifdef __cplusplus
 }
