@@ -170,6 +170,36 @@ typedef struct {
 #define USBDEV_NUM_ENDPOINTS            8
 #endif
 
+/* unify names across STM32 families */
+#ifdef SPI_CR1_CPHA_Msk
+#  define STM32_SPI_CPHA_Msk            SPI_CR1_CPHA_Msk
+#endif
+#ifdef SPI_CFG2_CPHA_Msk
+#  define STM32_SPI_CPHA_Msk            SPI_CFG2_CPHA_Msk
+#endif
+#ifdef SPI_CR1_CPOL_Msk
+#  define STM32_SPI_CPOL_Msk            SPI_CR1_CPOL_Msk
+#endif
+#ifdef SPI_CFG2_CPOL_Msk
+#  define STM32_SPI_CPOL_Msk            SPI_CFG2_CPOL_Msk
+#endif
+
+/**
+ * @name   Override the SPI mode values
+ *
+ * As the mode is set in bit 3 and 2 of the configuration register, we put the
+ * correct configuration there
+ * @{
+ */
+#define HAVE_SPI_MODE_T
+typedef enum {
+    SPI_MODE_0 = 0,                                         /**< CPOL=0, CPHA=0 */
+    SPI_MODE_1 = STM32_SPI_CPHA_Msk,                        /**< CPOL=0, CPHA=1 */
+    SPI_MODE_2 = STM32_SPI_CPOL_Msk,                        /**< CPOL=1, CPHA=0 */
+    SPI_MODE_3 = STM32_SPI_CPOL_Msk | STM32_SPI_CPHA_Msk,   /**< CPOL=1, CPHA=0 */
+} spi_mode_t;
+/** @} */
+
 #endif /* !DOXYGEN */
 
 #ifdef __cplusplus
