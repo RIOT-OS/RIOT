@@ -21,7 +21,7 @@
 #define FLASH_UTILS_ARCH_H
 
 #include <stdio.h>
-#include <string.h>
+#include <stdarg.h>
 #include <avr/pgmspace.h>
 
 #ifdef __cplusplus
@@ -35,20 +35,68 @@ extern "C" {
 #define FLASH_ATTR __flash
 #define PRIsflash "S"
 #define TO_FLASH(x) __extension__({static FLASH_ATTR const char __c[] = (x); &__c[0];})
-#define flash_strcmp strcmp_P
-#define flash_strncmp strncmp_P
-#define flash_strlen strlen_P
-#define flash_strcpy strcpy_P
-#define flash_strncpy strncpy_P
-#define flash_printf printf_P
-/* avrlibc seemingly forgot to provide vprintf_P(), but vfprintf_P() is there */
-#define flash_vprintf(fmt, arglist) vfprintf_P(stdout, fmt, arglist)
-#define flash_fprintf fprintf_P
-#define flash_vfprintf vfprintf_P
-#define flash_snprintf snprintf_P
-#define flash_vsnprintf vsnprintf_P
-#define flash_puts puts_P
-#define flash_memcpy memcpy_P
+
+static inline int flash_strcmp(const char *ram, FLASH_ATTR const char *flash)
+{
+    return strcmp_P(ram, (const char *)flash);
+}
+
+static inline int flash_strncmp(const char *ram, FLASH_ATTR const char *flash, size_t n)
+{
+    return strncmp_P(ram, (const char *)flash, n);
+}
+
+static inline size_t flash_strlen(FLASH_ATTR const char *flash)
+{
+    return strlen_P((const char *)flash);
+}
+
+static inline char * flash_strcpy(char *ram, FLASH_ATTR const char *flash)
+{
+    return strcpy_P(ram, (const char *)flash);
+}
+
+static inline char * flash_strncpy(char *ram, FLASH_ATTR const char *flash, size_t n)
+{
+    return strncpy_P(ram, (const char *)flash, n);
+}
+
+
+static inline int flash_vprintf(FLASH_ATTR const char *flash, va_list args)
+{
+    /* vprintf_P() is not provided by avr-libc. But vfprintf_P() with
+     * stdout as stream can be used to implement it */
+    return vfprintf_P(stdout, (const char *)flash, args);
+}
+
+static inline int flash_vfprintf(FILE *stream, FLASH_ATTR const char *flash,
+                                 va_list args)
+{
+    return vfprintf_P(stream, (const char *)flash, args);
+}
+
+static inline int flash_vsnprintf(char *buf, size_t buf_len,
+                                  FLASH_ATTR const char *flash, va_list args)
+{
+    return vsnprintf_P(buf, buf_len, (const char *)flash, args);
+}
+
+static inline void flash_puts(FLASH_ATTR const char *flash)
+{
+    puts_P((const char *)flash);
+}
+
+static inline void * flash_memcpy(void *dest, FLASH_ATTR const void *src,
+                                  size_t n)
+{
+    return memcpy_P(dest, (const void *)src, n);
+}
+
+/* aliases need to be provided by the linker, as passing through va-args is
+ * not possible */
+int flash_printf(FLASH_ATTR const char *flash, ...);
+int flash_fprintf(FILE *stream, FLASH_ATTR const char *flash, ...);
+int flash_snprintf(char *buf, size_t buf_len, FLASH_ATTR const char *flash, ...);
 
 #endif /* Doxygen */
 
