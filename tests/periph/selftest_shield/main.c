@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Otto-von-Guericke-Universität Magdeburg
+ * Copyright (C) 2023 Otto-von-Guericke-Universität Magdeburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,7 +11,8 @@
  * @{
  *
  * @file
- * @brief       Test application for the Peripheral GPIO Low-Level API
+ * @brief       Test application for Peripheral Self-Testing using the
+ *              Peripheral Selftest Shield
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  *
