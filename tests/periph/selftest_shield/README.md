@@ -26,7 +26,7 @@
     - (Background: If the UART at D0 and D1 is used for stdio, it cannot be
        looped and tested)
 5. Flash and run the test
-    - In this directory, run `make BOARD=<YOUR_BOARD> flash test`
+    - In this directory, run `make BOARD=<YOUR_BOARD> flash test-with-config`
 
 ## Details
 
