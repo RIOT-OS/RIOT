@@ -224,24 +224,17 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
     return 0;
 }
 
+#ifdef MODULE_GNRC_IPV6_EXT_OPT
 /* find the last extension header, if present */
 static gnrc_pktsnip_t *_last_ext_hdr(gnrc_pktsnip_t *ipv6)
 {
-#ifdef MODULE_GNRC_IPV6_EXT_OPT
-    if (ipv6->next == NULL || ipv6->next->type != GNRC_NETTYPE_IPV6_EXT) {
-        return NULL;
-    }
-
     while (ipv6->next && ipv6->next->type == GNRC_NETTYPE_IPV6_EXT) {
         ipv6 = ipv6->next;
     }
 
     return ipv6;
-#else
-    (void)ipv6;
-    return NULL;
-#endif
 }
+#endif
 
 ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
                        const sock_ip_ep_t *remote, uint8_t nh)
@@ -286,14 +279,16 @@ ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
                 type = payload->type;
             }
 
+#ifdef MODULE_GNRC_IPV6_EXT_OPT
             gnrc_pktsnip_t *ext = _last_ext_hdr(pkt);
-            if (ext) {
+            if (ext->type == GNRC_NETTYPE_IPV6_EXT) {
                 ipv6_ext_t *ext_hdr = ext->data;
                 ext_hdr->nh = nh;
-            } else {
-                hdr = pkt->data;
-                hdr->nh = nh;
+                break;
             }
+#endif
+            hdr = pkt->data;
+            hdr->nh = nh;
             break;
         }
 #endif
