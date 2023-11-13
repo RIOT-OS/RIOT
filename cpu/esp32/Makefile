@@ -29,6 +29,10 @@ ifneq (, $(filter esp_freertos, $(USEMODULE)))
     DIRS += freertos
 endif
 
+ifneq (, $(filter esp_lcd, $(USEMODULE)))
+    DIRS += esp-lcd
+endif
+
 ifneq (, $(filter stdio_usb_serial_jtag, $(USEMODULE)))
     DIRS += stdio_usb_serial_jtag
 endif
