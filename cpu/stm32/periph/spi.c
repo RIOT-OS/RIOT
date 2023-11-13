@@ -29,7 +29,6 @@
 #include <assert.h>
 
 #include "bitarithm.h"
-#include "cpu.h"
 #include "mutex.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
@@ -246,19 +245,19 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
           periph_apb_clk(spi_config[bus].apbbus)/(1 << (br + 1)),
           br);
 
-    uint16_t cr1_settings = ((br << BR_SHIFT) | mode | SPI_CR1_MSTR);
+    uint16_t cr1 = ((br << BR_SHIFT) | mode | SPI_CR1_MSTR | SPI_CR1_SPE);
     /* Settings to add to CR2 in addition to SPI_CR2_SETTINGS */
-    uint16_t cr2_extra_settings = 0;
+    uint16_t cr2 = SPI_CR2_SETTINGS;
     if (cs != SPI_HWCS_MASK) {
-        cr1_settings |= (SPI_CR1_SSM | SPI_CR1_SSI);
+        cr1 |= (SPI_CR1_SSM | SPI_CR1_SSI);
     }
     else {
-        cr2_extra_settings = (SPI_CR2_SSOE);
+        cr2 = (SPI_CR2_SSOE);
     }
 
 #ifdef MODULE_PERIPH_DMA
     if (_use_dma(&spi_config[bus])) {
-        cr2_extra_settings |= SPI_CR2_TXDMAEN | SPI_CR2_RXDMAEN;
+        cr2 |= SPI_CR2_TXDMAEN | SPI_CR2_RXDMAEN;
 
         dma_acquire(spi_config[bus].tx_dma);
         dma_setup(spi_config[bus].tx_dma,
@@ -277,8 +276,8 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
                   0);
     }
 #endif
-    dev(bus)->CR1 = cr1_settings;
-    dev(bus)->CR2 = (SPI_CR2_SETTINGS | cr2_extra_settings);
+    dev(bus)->CR1 = cr1;
+    dev(bus)->CR2 = cr2;
 }
 
 void spi_release(spi_t bus)
@@ -393,9 +392,11 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
     assert(out || in);
 
     /* active the given chip select line */
-    dev(bus)->CR1 |= (SPI_CR1_SPE);     /* this pulls the HW CS line low */
     if ((cs != SPI_HWCS_MASK) && gpio_is_valid(cs)) {
         gpio_clear((gpio_t)cs);
+    }
+    else {
+        dev(bus)->CR2 |= SPI_CR2_SSOE;
     }
 
 #ifdef MODULE_PERIPH_DMA
@@ -411,9 +412,11 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
 
     /* release the chip select if not specified differently */
     if ((!cont) && gpio_is_valid(cs)) {
-        dev(bus)->CR1 &= ~(SPI_CR1_SPE);    /* pull HW CS line high */
         if (cs != SPI_HWCS_MASK) {
             gpio_set((gpio_t)cs);
+        }
+        else {
+            dev(bus)->CR2 &= ~(SPI_CR2_SSOE);
         }
     }
 }
