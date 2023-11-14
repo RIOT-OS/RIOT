@@ -21,6 +21,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     microduino-corerf \
     msb-430 \
     msb-430h \
+    nucleo-f030r8 \
     nucleo-f031k6 \
     nucleo-f042k6 \
     nucleo-f070rb \
