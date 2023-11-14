@@ -19,6 +19,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     i-nucleo-lrwan1 \
     mega-xplained \
     microduino-corerf \
+    nucleo-f030r8 \
     nucleo-f302r8 \
     nucleo-l011k4 \
     nucleo-l031k6 \
