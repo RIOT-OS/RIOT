@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "architecture.h"
 #include "arduino_iomap.h"
 #include "macros/units.h"
 #include "macros/utils.h"
@@ -40,9 +41,6 @@
 #include "stdio_uart.h" /* for STDIO_UART_DEV */
 
 /* BEGIN: controls of the behavior of the testing app: */
-#define ENABLE_DEBUG            1
-#include "debug.h"
-
 #ifndef STOP_ON_FAILURE
 #define STOP_ON_FAILURE         0
 #endif
@@ -715,8 +713,8 @@ static bool periph_uart_rxtx_test(uint32_t symbolrate)
         /* expecting actual duration within 75% to 200% of the expected. */
         failed |= TEST(stop - start > duration_ticks - (duration_ticks >> 2));
         failed |= TEST(stop - start < (duration_ticks << 1));
-        if (failed) {
-            DEBUG("%" PRIu32 " Bd, expected %" PRIu16 " ticks, got %" PRIu16
+        if (failed && DETAILED_OUTPUT) {
+            printf("%" PRIu32 " Bd, expected %" PRIu16 " ticks, got %" PRIu16
                   " ticks\n",
                   symbolrate, duration_ticks, (uint16_t)(stop - start));
         }
