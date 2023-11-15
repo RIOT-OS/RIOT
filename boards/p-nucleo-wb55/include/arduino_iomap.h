@@ -88,6 +88,33 @@ extern "C" {
 #define ARDUINO_ANALOG_PIN_LAST 5
 /** @} */
 
+/**
+ * @name    Arduino's default UART device
+ * @{
+ */
+#define ARDUINO_UART_D0D1        UART_DEV(1)
+/** @} */
+
+/**
+ * @name    Arduino's I2C buses
+ * @{
+ */
+/**
+ * @brief   The only configured I2C
+ */
+#define ARDUINO_I2C_UNO         I2C_DEV(0)
+/** @} */
+
+/**
+ * @name    Arduino's SPI buses
+ * @{
+ */
+/**
+ * @brief   SPI_DEV(0) is connected to D11/D12/D13
+ */
+#define ARDUINO_SPI_D11D12D13   SPI_DEV(0)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

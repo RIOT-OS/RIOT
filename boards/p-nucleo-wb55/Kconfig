@@ -26,8 +26,11 @@ config BOARD_P_NUCLEO_WB55
 
     # Put other features for this board (in alphabetical order)
     select HAS_ARDUINO_ANALOG
+    select HAS_ARDUINO_I2C
     select HAS_ARDUINO_PINS
     select HAS_ARDUINO_SHIELD_UNO
+    select HAS_ARDUINO_SPI
+    select HAS_ARDUINO_UART
     select HAS_RIOTBOOT
     select HAS_TINYUSB_DEVICE
 
