@@ -28,7 +28,6 @@
 
 #include <assert.h>
 
-#include "bitarithm.h"
 #include "mutex.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
@@ -64,9 +63,9 @@ static mutex_t locks[SPI_NUMOF];
 static uint32_t clocks[SPI_NUMOF];
 
 /**
- * @brief   Clock divider cache
+ * @brief   Clock prescaler cache
  */
-static uint8_t dividers[SPI_NUMOF];
+static uint8_t prescalers[SPI_NUMOF];
 
 static inline SPI_TypeDef *dev(spi_t bus)
 {
@@ -80,33 +79,24 @@ static inline bool _use_dma(const spi_conf_t *conf)
 }
 #endif
 
-/**
- * @brief Multiplier for clock divider calculations
- *
- * Makes the divider calculation fixed point
- */
-#define SPI_APB_CLOCK_SHIFT          (4U)
-#define SPI_APB_CLOCK_MULT           (1U << SPI_APB_CLOCK_SHIFT)
-
-static uint8_t _get_clkdiv(const spi_conf_t *conf, uint32_t clock)
+static uint8_t _get_prescaler(const spi_conf_t *conf, uint32_t clock)
 {
     uint32_t bus_clock = periph_apb_clk(conf->apbbus);
-    /* Shift bus_clock with SPI_APB_CLOCK_SHIFT to create a fixed point int */
-    uint32_t div = (bus_clock << SPI_APB_CLOCK_SHIFT) / (2 * clock);
-    DEBUG("[spi] clock: divider: %"PRIu32"\n", div);
-    /* Test if the divider is 2 or smaller, keeping the fixed point in mind */
-    if (div <= SPI_APB_CLOCK_MULT) {
-        return 0;
+
+    uint8_t prescaler = 0;
+    uint32_t prescaled_clock = bus_clock >> 1;
+    const uint8_t prescaler_max = SPI_CR1_BR_Msk >> SPI_CR1_BR_Pos;
+    for (; (prescaled_clock > clock) && (prescaler < prescaler_max); prescaler++) {
+        prescaled_clock >>= 1;
     }
-    /* determine MSB and compensate back for the fixed point int shift */
-    uint8_t rounded_div = bitarithm_msb(div) - SPI_APB_CLOCK_SHIFT;
-    /* Determine if rounded_div is not a power of 2 */
-    if ((div & (div - 1)) != 0) {
-        /* increment by 1 to ensure that the clock speed at most the
-         * requested clock speed */
-        rounded_div++;
-    }
-    return rounded_div > BR_MAX ? BR_MAX : rounded_div;
+
+    /* If the callers asks for an SPI frequency of at most x, bad things will
+     * happen if this cannot be met. So let's have a blown assertion
+     * rather than runtime failures that require a logic analyzer to
+     * debug. */
+    assert(prescaled_clock <= clock);
+
+    return prescaler;
 }
 
 void spi_init(spi_t bus)
@@ -234,16 +224,16 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     periph_clk_en(spi_config[bus].apbbus, spi_config[bus].rccmask);
     /* enable device */
     if (clk != clocks[bus]) {
-        dividers[bus] = _get_clkdiv(&spi_config[bus], clk);
+        prescalers[bus] = _get_prescaler(&spi_config[bus], clk);
         clocks[bus] = clk;
     }
-    uint8_t br = dividers[bus];
+    uint8_t br = prescalers[bus];
 
-    DEBUG("[spi] acquire: requested clock: %"PRIu32", resulting clock: %"PRIu32
-          " BR divider: %u\n",
+    DEBUG("[spi] acquire: requested clock: %" PRIu32
+          " Hz, resulting clock: %" PRIu32 " Hz, BR prescaler: %u\n",
           clk,
-          periph_apb_clk(spi_config[bus].apbbus)/(1 << (br + 1)),
-          br);
+          periph_apb_clk(spi_config[bus].apbbus) >> (br + 1),
+          (unsigned)br);
 
     uint16_t cr1 = ((br << BR_SHIFT) | mode | SPI_CR1_MSTR | SPI_CR1_SPE);
     /* Settings to add to CR2 in addition to SPI_CR2_SETTINGS */
