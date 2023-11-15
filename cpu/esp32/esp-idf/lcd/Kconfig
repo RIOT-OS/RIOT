@@ -8,7 +8,7 @@
 config MODULE_ESP_IDF_LCD
     bool
     depends on TEST_KCONFIG
-    depends on MODULE_ESP_IDF && HAS_ESP_LCD
+    depends on MODULE_ESP_IDF
 
     default y if MODULE_LCD_PARALLEL_LL_MCU
 
