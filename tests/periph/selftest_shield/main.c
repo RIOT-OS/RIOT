@@ -19,6 +19,7 @@
  * @}
  */
 
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdatomic.h>
@@ -137,7 +138,7 @@
  * directly, so the CPU clock is the highest clock frequency available. But
  * some can't, so we handle them here explicitly. */
 #ifndef TIMER_FREQ_SPI_TEST
-#  if defined(CPU_SAM3)
+#  if defined(CPU_SAM3) || defined(CPU_STM32)
 #    define TIMER_FREQ_SPI_TEST     CLOCK_CORECLOCK / 4
 #  elif defined(CPU_NRF52) || defined(CPU_NRF51)
 #    define TIMER_FREQ_SPI_TEST     MHZ(16)
@@ -784,13 +785,14 @@ static bool periph_spi_rxtx_test(spi_t bus, spi_mode_t mode, spi_clk_t clk,
                                  const char *test_in_detail)
 {
     (void)test_in_detail;
-    bool failed = 0;
+    bool failed = false;
+    bool transfer_too_fast = false;
     print_start("SPI", test_in_detail);
     uint16_t byte_transfer_ticks = 0;
     memset(&serial_buf, 0, sizeof(serial_buf));
 
     if (IS_USED(MODULE_PERIPH_TIMER)) {
-        byte_transfer_ticks = 8ULL * TIMER_FREQ_UART_TEST / clk_hz;
+        byte_transfer_ticks = 8ULL * TIMER_FREQ_SPI_TEST / clk_hz;
     }
 
     /* D10 is C̅S̅, D7 is connected to C̅S̅ */
@@ -808,6 +810,7 @@ static bool periph_spi_rxtx_test(spi_t bus, spi_mode_t mode, spi_clk_t clk,
     /* C̅S̅ should still be HIGH while no chip is selected */
     failed |= TEST(gpio_read(cs_check) != 0);
 
+    uint16_t byte_time;
     for (uint8_t i = 0; i < UINT8_MAX; i++) {
         uint16_t start = 0;
         if (IS_USED(MODULE_PERIPH_TIMER)) {
@@ -819,15 +822,25 @@ static bool periph_spi_rxtx_test(spi_t bus, spi_mode_t mode, spi_clk_t clk,
             stop = timer_read(TIMER);
         }
         failed |= TEST(received == i);
-        uint16_t byte_time = (uint16_t)(stop - start);
-        /* We allow the actual SPI clock to be slower than requested, but not
-         * faster. So the transfer needs to take *at least* the theoretical
-         * time. Given the overhead of, this already has some room for error */
-        failed |= TEST(byte_time >= byte_transfer_ticks);
-        /* C̅S̅ should be still LOW while chip is selected */
+        if (IS_USED(MODULE_PERIPH_TIMER)) {
+            byte_time = (uint16_t)(stop - start);
+            /* We allow the actual SPI clock to be slower than requested, but
+             * not faster. So the transfer needs to take *at least* the
+             * theoretical time. Given the overhead of, this already has some
+             * room for error */
+            transfer_too_fast |= (byte_time < byte_transfer_ticks);
+            /* C̅S̅ should be still LOW while chip is selected */
+        }
         failed |= TEST(gpio_read(cs_check) == 0);
     }
 
+    if (DETAILED_OUTPUT && transfer_too_fast) {
+        printf("Ticks expected to transfer byte: >= %" PRIu16 ", but got: %"
+               PRIu16 "\n",
+               byte_transfer_ticks, byte_time);
+    }
+
+    failed |= TEST(!transfer_too_fast);
     failed |= TEST(spi_transfer_byte(bus, cs, false, UINT8_MAX) == UINT8_MAX);
     /* C̅S̅ should be again HIGH while now that no chip is selected */
     failed |= TEST(gpio_read(cs_check) != 0);
@@ -871,8 +884,8 @@ static bool periph_spi_test(void)
     }
 
     bool failed = false;
-    static const spi_clk_t clocks[] = { SPI_CLK_100KHZ, SPI_CLK_1MHZ, SPI_CLK_10MHZ };
-    static const uint32_t clk_hzs[] = { KHZ(100), MHZ(1), MHZ(10) };
+    static const spi_clk_t clocks[] = { SPI_CLK_400KHZ, SPI_CLK_1MHZ, SPI_CLK_10MHZ };
+    static const uint32_t clk_hzs[] = { KHZ(400), MHZ(1), MHZ(10) };
 
     if (IS_USED(MODULE_PCF857X)) {
         for (int i = 0; i < (int)ARRAY_SIZE(spi_clk_check_pins); i++) {
@@ -888,6 +901,9 @@ static bool periph_spi_test(void)
         for (unsigned j = 0; j < ARRAY_SIZE(clocks); j++) {
             spi_clk_t clk = clocks[j];
             uint32_t clk_hz = clk_hzs[j];
+            if (DETAILED_OUTPUT) {
+                printf("SPI CLK %" PRIu32 " Hz\n", clk_hz);
+            }
             failed |= periph_spi_rxtx_test(bus, SPI_MODE_0, clk, clk_hz, clk_check, false, "mode 0");
             failed |= periph_spi_rxtx_test(bus, SPI_MODE_1, clk, clk_hz, clk_check, false, "mode 1");
             failed |= periph_spi_rxtx_test(bus, SPI_MODE_2, clk, clk_hz, clk_check, true, "mode 2");
