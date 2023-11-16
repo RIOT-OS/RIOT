@@ -27,9 +27,13 @@
  * Table 68e—Center frequencies for the MR-O-QPSK PHY operating in the 868–870 MHz band
  */
 
-/* currently only EU-868 MHz band is supported */
-#define QPSK_CHANNEL_SPACING_SUBGHZ     (650U)     /* kHz */
-#define QPSK_CENTER_FREQUENCY_SUBGHZ    (868300U)  /* Hz  */
+/* EU-868 MHz band */
+#define QPSK_CHANNEL_SPACING_868MHZ     (650U)     /* kHz */
+#define QPSK_CENTER_FREQUENCY_868MHZ    (868300U)  /* Hz  */
+
+/* ISM 915 MHz band */
+#define QPSK_CHANNEL_SPACING_915MHZ     (2000U)    /* kHz */
+#define QPSK_CENTER_FREQUENCY_915MHZ    (906000U)  /* Hz  */
 
 #define QPSK_CHANNEL_SPACING_24GHZ      (5000U)    /* kHz */
 #define QPSK_CENTER_FREQUENCY_24GHZ     (2350000U - CCF0_24G_OFFSET) /* Hz  */
@@ -328,21 +332,69 @@ static inline void _set_csma_backoff_period_legacy(at86rf215_t *dev)
 
 void _end_configure_OQPSK(at86rf215_t *dev)
 {
-    /* set channel spacing with 25 kHz resolution */
-    if (is_subGHz(dev)) {
-        at86rf215_reg_write(dev, dev->RF->RG_CS, QPSK_CHANNEL_SPACING_SUBGHZ / 25);
-        at86rf215_reg_write16(dev, dev->RF->RG_CCF0L, QPSK_CENTER_FREQUENCY_SUBGHZ / 25);
-    } else {
-        at86rf215_reg_write(dev, dev->RF->RG_CS, QPSK_CHANNEL_SPACING_24GHZ / 25);
-        at86rf215_reg_write16(dev, dev->RF->RG_CCF0L, QPSK_CENTER_FREQUENCY_24GHZ / 25);
+    uint32_t cs;
+    uint32_t cf;
+
+    /* obtain a valid channel first to set the correct frequency */
+    dev->netdev.chan = at86rf215_chan_valid(dev, dev->netdev.chan);
+
+    /* page, chan, chan_min and chan_max must be set prior to the call
+     * of this function, if not, it will probably eat your dog :D.
+     *
+     * For reference, see:
+     *
+     * IEEE Std 802.15.4-2006, Section 6.1.2.2 Channel Pages
+     * IEEE Std 802.15.4g-2012, Figure 64a-Channel page structure for channel
+     * pages nine and ten 
+     * IEEE Std 802.15.4-2020, Section 10.1.3 Channel assigments
+     */
+    if (!is_subGHz(dev) && dev->netdev.page == 0) {
+        cs = QPSK_CHANNEL_SPACING_24GHZ;
+        cf = QPSK_CENTER_FREQUENCY_24GHZ;
     }
+    else if (is_subGHz(dev) && dev->netdev.page == 2) {
+        assert(dev->chan_min == 0 && dev->chan_max == 10);
+
+        /* channel 0 is for 868 MHz */
+        if (dev->netdev.chan == 0) {
+            cs = QPSK_CHANNEL_SPACING_868MHZ;
+            cf = QPSK_CENTER_FREQUENCY_868MHZ;
+        }
+        /* channels 1-10 is for 915 MHz */
+        else {
+            assert(dev->netdev.chan <= dev->chan_max);
+
+            cs = QPSK_CHANNEL_SPACING_915MHZ;
+            cf = QPSK_CENTER_FREQUENCY_915MHZ;
+        }
+    }
+    else if (dev->netdev.page == 9) {
+        if (is_subGHz(dev)) {
+            /* TODO: we still don't have a way to set the band on SUN PHYs, but
+             * for now we stick to MR-O-OQPSK on 868 MHz band for now. */
+            cs = QPSK_CHANNEL_SPACING_868MHZ;
+            cf = QPSK_CENTER_FREQUENCY_868MHZ;
+        }
+        else {
+            cs = QPSK_CHANNEL_SPACING_24GHZ;
+            cf = QPSK_CENTER_FREQUENCY_24GHZ;
+        }
+    }
+    else {
+        DEBUG("[at86rf215] invalid channel / page configuration"
+              "(page=%"PRIu16", chan=%"PRIu16")\n", dev->netdev.page,
+              dev->netdev.chan);
+        return;
+    }
+
+    /* set channel spacing and center frequency */
+    at86rf215_reg_write(dev, dev->RF->RG_CS, cs / 25);
+    at86rf215_reg_write16(dev, dev->RF->RG_CCF0L, cf / 25);
 
     /* lowest preamble detection sensitivity, enable receiver override */
     at86rf215_reg_write(dev, dev->BBC->RG_OQPSKC1, OQPSKC1_RXO_MASK | OQPSKC1_RXOLEG_MASK);
 
-    /* make sure the channel config is still valid */
-    dev->num_chans = is_subGHz(dev) ? 1 : 16;
-    dev->netdev.chan = at86rf215_chan_valid(dev, dev->netdev.chan);
+    /* write channel config */
     at86rf215_reg_write16(dev, dev->RF->RG_CNL, dev->netdev.chan);
 
     /* disable FSK preamble switching */

@@ -609,7 +609,10 @@ int at86rf215_FSK_set_channel_spacing(at86rf215_t *dev, uint8_t ch_space)
           25UL * at86rf215_reg_read16(dev, dev->RF->RG_CCF0L) + (is_subGHz(dev) ? 0 : CCF0_24G_OFFSET));
 
     /* adjust channel spacing */
-    dev->num_chans = is_subGHz(dev) ? 34 / (ch_space + 1) : (416 / (ch_space + 1)) - (ch_space * 2);
+    dev->chan_min = 0;
+    dev->chan_max = is_subGHz(dev) ? 34 / (ch_space + 1) : (416 / (ch_space + 1)) - (ch_space * 2);
+    dev->chan_max -= 1;
+
     dev->netdev.chan = at86rf215_chan_valid(dev, dev->netdev.chan);
     at86rf215_reg_write16(dev, dev->RF->RG_CNL, dev->netdev.chan);
 
