@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "architecture.h"
 #include "arduino_iomap.h"
 #include "macros/units.h"
 #include "macros/utils.h"
@@ -40,9 +41,6 @@
 #include "stdio_uart.h" /* for STDIO_UART_DEV */
 
 /* BEGIN: controls of the behavior of the testing app: */
-#define ENABLE_DEBUG            1
-#include "debug.h"
-
 #ifndef STOP_ON_FAILURE
 #define STOP_ON_FAILURE         0
 #endif
@@ -93,10 +91,9 @@
  * - periph_adc support (so that we have something to test)
  * - Arduino I/O mapping for ADC (so that we know which line to test)
  * - The PCF857x driver (so that we can control the R-2R resistor ladder
- *   connected to the GPIO expander.
+ *   connected to the GPIO expander).
  */
-#if defined(MODULE_PERIPH_ADC) && defined(ARDUINO_A0) && defined(MODULE_PCF857X) && 0
-// TODO: Re-anble when PCB is fixed
+#if defined(MODULE_PERIPH_ADC) && defined(ARDUINO_A0) && defined(MODULE_PCF857X)
 #  define ENABLE_ADC_TEST       1
 #else
 #  define ENABLE_ADC_TEST       0
@@ -716,8 +713,8 @@ static bool periph_uart_rxtx_test(uint32_t symbolrate)
         /* expecting actual duration within 75% to 200% of the expected. */
         failed |= TEST(stop - start > duration_ticks - (duration_ticks >> 2));
         failed |= TEST(stop - start < (duration_ticks << 1));
-        if (failed) {
-            DEBUG("%" PRIu32 " Bd, expected %" PRIu16 " ticks, got %" PRIu16
+        if (failed && DETAILED_OUTPUT) {
+            printf("%" PRIu32 " Bd, expected %" PRIu16 " ticks, got %" PRIu16
                   " ticks\n",
                   symbolrate, duration_ticks, (uint16_t)(stop - start));
         }
@@ -979,9 +976,9 @@ static bool periph_adc_test(void)
         uint16_t sample = adc_sample(ARDUINO_A0, ADC_RES_10BIT);
         uint16_t expected = i << 6;
 
-        /* the resistors are said to be rather accurate, so lets be a bit
-         * more strict here */
-        const uint16_t delta = 16;
+        /* The resistors on board v0.3 are not that accurate, so allow for 10%
+         * error margin */
+        const uint16_t delta = 1024 / 10;
         uint16_t lower = expected <= delta ? 0 : expected - delta;
         uint16_t upper = MIN(1023, expected + delta);
         bool test_failed = TEST((lower <= sample) && (upper >= sample));
