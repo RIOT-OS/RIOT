@@ -276,6 +276,52 @@ extern "C" {
 /** @} */
 
 /**
+ * @name AT24CS04 constants
+ * @{
+ */
+/**
+ * @brief 512 Byte memory
+ */
+#define AT24CS04_EEPROM_SIZE            (512U)
+/**
+ * @brief   32 pages of 16 bytes each
+ */
+#define AT24CS04_PAGE_SIZE              (16U)
+/**
+ * @brief   Delay to complete write operation
+ */
+#define AT24CS04_PAGE_WRITE_DELAY_US    (5000U)
+/**
+ * @brief   Number of poll attempts
+ */
+#define AT24CS04_MAX_POLLS              (1 + (AT24CS04_PAGE_WRITE_DELAY_US \
+                                         / AT24CXXX_POLL_DELAY_US))
+/** @} */
+
+/**
+ * @name AT24CS08 constants
+ * @{
+ */
+/**
+ * @brief 1 kiB memory
+ */
+#define AT24CS08_EEPROM_SIZE            (1024U)
+/**
+ * @brief   64 pages of 16 bytes each
+ */
+#define AT24CS08_PAGE_SIZE              (16U)
+/**
+ * @brief   Delay to complete write operation
+ */
+#define AT24CS08_PAGE_WRITE_DELAY_US    (5000U)
+/**
+ * @brief   Number of poll attempts
+ */
+#define AT24CS08_MAX_POLLS              (1 + (AT24CS08_PAGE_WRITE_DELAY_US \
+                                         / AT24CXXX_POLL_DELAY_US))
+/** @} */
+
+/**
  * @name AT24C1024 constants
  * @{
  */
@@ -369,6 +415,14 @@ extern "C" {
 #define AT24CXXX_EEPROM_SIZE            (AT24C01A_EEPROM_SIZE)
 #define AT24CXXX_PAGE_SIZE              (AT24C01A_PAGE_SIZE)
 #define AT24CXXX_MAX_POLLS              (AT24C01A_MAX_POLLS)
+#elif IS_USED(MODULE_AT24CS04)
+#define AT24CXXX_EEPROM_SIZE            (AT24CS04_EEPROM_SIZE)
+#define AT24CXXX_PAGE_SIZE              (AT24CS04_PAGE_SIZE)
+#define AT24CXXX_MAX_POLLS              (AT24CS04_MAX_POLLS)
+#elif IS_USED(MODULE_AT24CS08)
+#define AT24CXXX_EEPROM_SIZE            (AT24CS08_EEPROM_SIZE)
+#define AT24CXXX_PAGE_SIZE              (AT24CS08_PAGE_SIZE)
+#define AT24CXXX_MAX_POLLS              (AT24CS08_MAX_POLLS)
 #elif IS_USED(MODULE_AT24MAC)
 #define AT24CXXX_EEPROM_SIZE            (AT24MAC_EEPROM_SIZE)
 #define AT24CXXX_PAGE_SIZE              (AT24MAC_PAGE_SIZE)
