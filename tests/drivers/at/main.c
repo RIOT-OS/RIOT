@@ -285,6 +285,67 @@ static int remove_urc(int argc, char **argv)
 }
 #endif
 
+static int sneaky_urc(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+
+    int res = 0;
+    char resp_buf[128];
+
+#ifdef MODULE_AT_URC
+    at_urc_t urc = {.cb = _urc_cb, .code = "+CSCON"};
+    at_add_urc(&at_dev, &urc);
+#endif
+
+    res = at_send_cmd_wait_ok(&at_dev, "AT+CFUN=1", US_PER_SEC);
+
+    if (res) {
+        puts("Error AT+CFUN=1");
+        res = 1;
+        goto exit;
+    }
+
+    res = at_send_cmd_get_resp_wait_ok(&at_dev, "AT+CEREG?",
+                                    "+CEREG:", resp_buf,
+                                    sizeof(resp_buf), US_PER_SEC);
+    if (res < 0) {
+        puts("Error AT+CEREG?");
+        res = 1;
+        goto exit;
+    }
+
+    res = at_send_cmd_wait_prompt(&at_dev, "AT+USECMNG=0,0,\"cert\",128", US_PER_SEC);
+    if (res) {
+        puts("Error AT+USECMNG");
+        res =  1;
+        goto exit;
+    }
+
+    res = at_send_cmd_wait_ok(&at_dev, "AT+CFUN=8", US_PER_SEC);
+
+    if (res != -1) {
+        puts("Error AT+CFUN=8");
+        res =  1;
+        goto exit;
+    }
+
+    res = at_send_cmd_wait_ok(&at_dev, "AT+CFUN=9", US_PER_SEC);
+
+    if (res != -2) {
+        puts("Error AT+CFUN=9");
+        res =  1;
+        goto exit;
+    }
+
+    res = 0;
+exit:
+#ifdef MODULE_AT_URC
+    at_remove_urc(&at_dev, &urc);
+#endif
+    return res;
+}
+
 static const shell_command_t shell_commands[] = {
     { "init", "Initialize AT device", init },
     { "send", "Send a command and wait response", send },
@@ -296,6 +357,7 @@ static const shell_command_t shell_commands[] = {
     { "drain", "Drain AT device", drain },
     { "power_on", "Power on AT device", power_on },
     { "power_off", "Power off AT device", power_off },
+    { "sneaky_urc", "Test sneaky URC interference", sneaky_urc},
 #ifdef MODULE_AT_URC
     { "add_urc", "Register an URC", add_urc },
     { "remove_urc", "De-register an URC", remove_urc },
