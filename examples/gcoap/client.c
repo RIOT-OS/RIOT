@@ -356,8 +356,7 @@ int gcoap_cli_cmd(int argc, char **argv)
             uri = proxy_uri;
         }
 
-        gcoap_req_init(&pdu, buf, CONFIG_GCOAP_PDU_BUF_SIZE, code_pos,
-                       (_proxied || observe) ? NULL : uri);
+        gcoap_req_init(&pdu, buf, CONFIG_GCOAP_PDU_BUF_SIZE, code_pos, NULL);
 
         if (observe) {
             uint8_t *token = coap_get_token(&pdu);
@@ -365,24 +364,23 @@ int gcoap_cli_cmd(int argc, char **argv)
                 obs_req_tkl = coap_get_token_len(&pdu);
                 /* backup the token of the initial observe registration */
                 memcpy(obs_req_token, token, obs_req_tkl);
-                observing = true;
-                coap_opt_add_uint(&pdu, COAP_OPT_OBSERVE, obs_value);
-                if (!_proxied) {
-                    /* add uri path option separately
-                     * (options must be added in order) */
-                    coap_opt_add_uri_path(&pdu, uri);
-                }
             } else {
-                /* use the token of the registration for deregistration */
+                /* use the token of the registration for deregistration
+                 * (manually replace the token set by gcoap_req_init) */
                 memcpy(token, obs_req_token, obs_req_tkl);
                 if (gcoap_obs_req_forget(&remote, obs_req_token, obs_req_tkl)) {
                     printf("could not remove observe request\n");
                     return 1;
                 }
-                observing = false;
-                /* deregistration does not require further actions */
-                return 0;
             }
+
+            coap_opt_add_uint(&pdu, COAP_OPT_OBSERVE, obs_value);
+        }
+
+        if (!_proxied) {
+            /* add uri path option separately
+             * (options must be added in order) */
+            coap_opt_add_uri_path(&pdu, uri);
         }
 
         coap_hdr_set_type(pdu.hdr, msg_type);
@@ -422,6 +420,11 @@ int gcoap_cli_cmd(int argc, char **argv)
             puts("gcoap_cli: msg send failed");
         }
         else {
+            if (observe) {
+                /* on successful observe request, store that this node is
+                 * observing / not observing anymore */
+                observing = obs_value == COAP_OBS_REGISTER;
+            }
             /* send Observe notification for /cli/stats */
             notify_observers();
         }
