@@ -28,6 +28,65 @@ extern "C" {
 #include "psa_crypto_slot_management.h"
 
 /**
+ * @brief   Required size of CBOR output buffer from start to end of attributes.
+ *          Adds attributes sizes to CBOR encodings for individual values.
+ */
+#define CBOR_BUF_SIZE_START         (   1 + /* Array encoding */ \
+                                        1 + /* Array encoding */ \
+                                        1 + sizeof(psa_key_id_t) + \
+                                        1 + sizeof(psa_key_type_t) + \
+                                        1 + sizeof(psa_key_bits_t) + \
+                                        1 + sizeof(psa_key_lifetime_t) + \
+                                        1 + /* Array encoding */ \
+                                        1 + sizeof(psa_key_usage_t) + \
+                                        1 + sizeof(psa_algorithm_t) \
+                                    )
+
+#if PSA_SINGLE_KEY_COUNT
+/**
+ * @brief   Required CBOR buffer size to encode a basic PSA key slot containing
+ *          a single key.
+ */
+#define CBOR_BUF_SIZE_SINGLE_KEY    (   CBOR_BUF_SIZE_START + \
+                                        3 + /* Bytestring encoding and size */ \
+                                        PSA_MAX_KEY_DATA_SIZE \
+                                    )
+#endif /* PSA_SINGLE_KEY_COUNT */
+
+#if PSA_ASYMMETRIC_KEYPAIR_COUNT
+/**
+ * @brief   Required CBOR buffer size to encode a basic PSA key slot containing
+ *          an asymmetric key pair.
+ */
+#define CBOR_BUF_SIZE_KEY_PAIR      (   CBOR_BUF_SIZE_START + \
+                                        1 + \
+                                        3 + PSA_BITS_TO_BYTES(PSA_MAX_PRIV_KEY_SIZE) + \
+                                        3 + PSA_EXPORT_PUBLIC_KEY_MAX_SIZE \
+                                    )
+#endif /* PSA_ASYMMETRIC_KEYPAIR_COUNT */
+
+#if PSA_PROTECTED_KEY_COUNT && IS_USED(MODULE_PSA_ASYMMETRIC)
+/**
+ * @brief   Required CBOR buffer size to encode a basic PSA key slot containing
+ *          a key in protected memory.
+ */
+#define CBOR_BUF_SIZE_PROT_KEY      (   CBOR_BUF_SIZE_START + \
+                                        1 + \
+                                        1 + sizeof(psa_key_slot_number_t) + \
+                                        3 + PSA_EXPORT_PUBLIC_KEY_MAX_SIZE \
+                                    )
+#elif PSA_PROTECTED_KEY_COUNT
+/**
+ * @brief   Required CBOR buffer size to encode a basic PSA key slot containing
+ *          a key in protected memory.
+ */
+#define CBOR_BUF_SIZE_PROT_KEY      (   CBOR_BUF_SIZE_START + \
+                                        1 + \
+                                        1 + sizeof(psa_key_slot_number_t) \
+                                    )
+#endif /* PSA_PROTECTED_KEY_COUNT */
+
+/**
  * @brief   Encodes a basic key slot in CBOR
  *
  *          Single Key Format:

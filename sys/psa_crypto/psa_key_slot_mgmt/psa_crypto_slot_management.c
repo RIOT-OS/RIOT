@@ -28,14 +28,21 @@
 #include "psa_crypto_persistent_storage.h"
 #include "psa_crypto_cbor_encoder.h"
 
+/**
+ * @brief   Max size required for the CBOR buffer.
+ *
+ *          Depends on the key type and size.
+ */
 #if PSA_ASYMMETRIC_KEYPAIR_COUNT
-/* Asymmetric keys are larger than protected keys and regular keys */
-#define PSA_MAX_KEY_SLOT_SIZE   (sizeof(psa_key_pair_slot_t))
+#define CBOR_BUF_MAX_SIZE       (CBOR_BUF_SIZE_KEY_PAIR)
 #elif PSA_PROTECTED_KEY_COUNT && IS_USED(MODULE_PSA_ASYMMETRIC)
-/* Protected keys are larger than regular keys, when they contain a public key */
-#define PSA_MAX_KEY_SLOT_SIZE   (sizeof(psa_prot_key_slot_t))
+#define CBOR_BUF_MAX_SIZE       (CBOR_BUF_SIZE_PROT_KEY)
+#elif PSA_SINGLE_KEY_COUNT
+#define CBOR_BUF_MAX_SIZE       (CBOR_BUF_SIZE_SINGLE_KEY)
+#elif PSA_PROTECTED_KEY_COUNT
+#define CBOR_BUF_MAX_SIZE       (CBOR_BUF_SIZE_PROT_KEY)
 #else
-#define PSA_MAX_KEY_SLOT_SIZE   (sizeof(psa_key_slot_t))
+#define CBOR_BUF_MAX_SIZE       (0)
 #endif
 #endif /* MODULE_PSA_PERSISTENT_STORAGE */
 
@@ -300,7 +307,7 @@ static psa_status_t psa_get_and_lock_key_slot_in_memory(psa_key_id_t id, psa_key
 static psa_status_t psa_get_persisted_key_slot_from_storage(psa_key_id_t id,
                                                             psa_key_slot_t **p_slot)
 {
-    uint8_t cbor_buf[PSA_MAX_KEY_SLOT_SIZE];
+    uint8_t cbor_buf[CBOR_BUF_MAX_SIZE];
     size_t cbor_encoded_len;
     psa_key_attributes_t attr = psa_key_attributes_init();
 
@@ -335,13 +342,13 @@ psa_status_t psa_persist_key_slot_in_storage(psa_key_slot_t *slot)
             return PSA_ERROR_INVALID_ARGUMENT;
     }
 
-    uint8_t cbor_slot[PSA_MAX_KEY_SLOT_SIZE];
+    uint8_t cbor_buf[CBOR_BUF_MAX_SIZE];
     size_t cbor_enc_size;
-    psa_encode_key_slot(slot, cbor_slot, sizeof(cbor_slot), &cbor_enc_size);
+    psa_encode_key_slot(slot, cbor_buf, sizeof(cbor_buf), &cbor_enc_size);
     DEBUG("[psa_crypto_slot_mgmt] Max Key Slot Size: %d | CBOR enc size: %d\n",
-                                                PSA_MAX_KEY_SLOT_SIZE, cbor_enc_size);
+                                                CBOR_BUF_MAX_SIZE, cbor_enc_size);
 
-    return psa_write_encoded_key_slot_to_file(slot->attr.id, cbor_slot, cbor_enc_size);
+    return psa_write_encoded_key_slot_to_file(slot->attr.id, cbor_buf, cbor_enc_size);
 }
 
 /**
