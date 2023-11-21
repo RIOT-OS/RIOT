@@ -112,8 +112,13 @@
  * Persistent keys will also be written into flash memory for later access. To destroy
  * them they must be explicitly deleted with the `psa_destroy_key()` function.
  *
- * @note    So far this implementation only supports volatile storage. Persistent storage
- *          will be added in the future.
+ * @note    Persistent key storage can be optionally enabled on `native` and on the `nRF52840dk`.
+ *          For this, add `USEMODULE += psa_persistent_storage` to your application makefile
+ *          or `CONFIG_MODULE_PSA_PERSISTENT_STORAGE=y` to your `app.config.test` file.
+ *          Example: `tests/sys/psa_crypto_persistent_storage`
+ *
+ * @warning Be aware that the current implementation writes keys in plain text to flash memory.
+ *          Anyone with hardware access can read them.
  *
  * #### Lifetime Encoding
  * When creating a key, the user needs to specify a lifetime value, which actually consists
@@ -220,6 +225,11 @@
  * CFLAGS += -DCONFIG_PSA_PROTECTED_KEY_COUNT=2
  * @endcode
  *
+ * @note    The key slot count defines the maximum number of keys that can be cached in
+ *          RAM at runtime. It does not limit the number of persistent keys that can be stored
+ *          in flash memory. It is the user's responsibility to keep track of the number of
+ *          persistently stored keys.
+ *
  * ## Available Modules {#available-modules}
  * Below are the currently available modules.
  * No matter which operation you need, you always have to choose the base module.
@@ -232,6 +242,9 @@
  * `menuconfig`.
  * When using `app.config.test` files in your application directory, you need to write the
  * names in uppercase and add the prefix `CONFIG_MODULE_` to all of them.
+ *
+ * ### Key Storage
+ * - Persistent Key Storage: psa_persistent_storage
  *
  * ### Asymmetric Crypto
  * - Base: psa_asymmetric
