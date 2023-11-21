@@ -126,7 +126,17 @@
 #  define UART_TEST_DEV UART_DEV(0)
 #endif
 #ifndef TIMER
-#  define TIMER         TIMER_DEV(0)
+#  if IS_USED(MODULE_ZTIMER_PERIPH_TIMER) && CONFIG_ZTIMER_USEC_DEV == TIMER_DEV(0)
+#    define TIMER         TIMER_DEV(1)
+#  else
+#    define TIMER         TIMER_DEV(0)
+#  endif
+#endif
+
+#if IS_USED(MODULE_ZTIMER_PERIPH_TIMER)
+#  if CONFIG_ZTIMER_USEC_DEV == TIMER
+#    error "Same timer used for ztimer and test"
+#  endif
 #endif
 
 /* A higher clock frequency is beneficial in being able to actually measure the
