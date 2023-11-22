@@ -39,7 +39,6 @@
 #include <errno.h>
 
 #include "cpu.h"
-#include "irq.h"
 #include "mutex.h"
 #include "pm_layered.h"
 #include "panic.h"
@@ -71,6 +70,9 @@ static int _stop(I2C_TypeDef *dev);
 static int _is_sr1_mask_set(I2C_TypeDef *i2c, uint32_t mask, uint8_t flags);
 static inline int _wait_for_bus(I2C_TypeDef *i2c);
 static void _init_pins(i2c_t dev);
+static void _deinit_pins(i2c_t dev);
+static void _disable_periph(i2c_t dev);
+static void _enable_periph(i2c_t dev);
 
 /**
  * @brief Array holding one pre-initialized mutex for each I2C device
@@ -108,13 +110,12 @@ void i2c_init(i2c_t dev)
         _init(dev);
     }
 #endif
+    _disable_periph(dev);
 }
 
 static void _init_pins(i2c_t dev)
 {
     /* configure pins */
-    gpio_init(i2c_config[dev].scl_pin, GPIO_OD_PU);
-    gpio_init(i2c_config[dev].sda_pin, GPIO_OD_PU);
 #ifdef CPU_FAM_STM32F1
     /* This is needed in case the remapped pins are used */
     if (i2c_config[dev].scl_pin == GPIO_PIN(PORT_B, 8) ||
@@ -127,9 +128,59 @@ static void _init_pins(i2c_t dev)
     gpio_init_af(i2c_config[dev].scl_pin, GPIO_AF_OUT_OD);
     gpio_init_af(i2c_config[dev].sda_pin, GPIO_AF_OUT_OD);
 #else
+    gpio_init(i2c_config[dev].scl_pin, GPIO_OD_PU);
+    gpio_init(i2c_config[dev].sda_pin, GPIO_OD_PU);
     gpio_init_af(i2c_config[dev].scl_pin, i2c_config[dev].scl_af);
     gpio_init_af(i2c_config[dev].sda_pin, i2c_config[dev].sda_af);
 #endif
+}
+
+static void _deinit_pins(i2c_t dev)
+{
+    /* Releasing pins as open drain and as set, so that the pull ups can pull
+     * the signal high. If we would release the pins as push-pull output, this
+     * could be unpleasant when an I2C device drives the signal low (e.g. for
+     * clock stretching) while the MCU would driving the same signal high.
+     */
+    gpio_set(i2c_config[dev].scl_pin);
+    gpio_set(i2c_config[dev].sda_pin);
+    gpio_init(i2c_config[dev].scl_pin, GPIO_OD);
+    gpio_init(i2c_config[dev].sda_pin, GPIO_OD);
+}
+
+static void _disable_periph(i2c_t dev)
+{
+    /* Clearing PE will not abort ongoing transfer, but only kick in when any
+     * current transfer is done. So we can do this at any point in time */
+    i2c_config[dev].dev->CR1 &= ~(I2C_CR1_PE);
+
+    /* Wait for bus being cleared */
+    _wait_for_bus(i2c_config[dev].dev);
+
+    /* On STM32F1: Detach pins from I2C peripheral before disabling the clock
+     * to it, otherwise SCL and SDA will be driven down and lots of battery
+     * charge is used to heat up the pull up resistors */
+    if (IS_ACTIVE(CPU_FAM_STM32F1)) {
+        _deinit_pins(dev);
+    }
+
+    /* Finally, disable the clock to the I2C peripheral */
+    periph_clk_dis(i2c_config[dev].bus, i2c_config[dev].rcc_mask);
+}
+
+static void _enable_periph(i2c_t dev)
+{
+    /* First, clock the I2C peripheral so that registers can be written to */
+    periph_clk_en(i2c_config[dev].bus, i2c_config[dev].rcc_mask);
+
+    /* On STM32F1: We had to detach pins to work around a h/w limitations, so
+     * re-attach them now */
+    if (IS_ACTIVE(CPU_FAM_STM32F1)) {
+        _init_pins(dev);
+    }
+
+    /* Finally: Enable peripheral again */
+    i2c_config[dev].dev->CR1 |= I2C_CR1_PE;
 }
 
 static void _i2c_init(I2C_TypeDef *i2c, uint32_t clk, uint32_t ccr)
@@ -181,6 +232,9 @@ static void _init(i2c_t dev)
 
     /* configure device */
     _i2c_init(i2c, i2c_config[dev].clk, ccr);
+
+    /* go to low power */
+    _disable_periph(dev);
 }
 
 void i2c_acquire(i2c_t dev)
@@ -194,22 +248,14 @@ void i2c_acquire(i2c_t dev)
     pm_block(STM32_PM_STOP);
 #endif
 
-    periph_clk_en(i2c_config[dev].bus, i2c_config[dev].rcc_mask);
-
-    /* enable device */
-    i2c_config[dev].dev->CR1 |= I2C_CR1_PE;
+    _enable_periph(dev);
 }
 
 void i2c_release(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
 
-    /* disable device */
-    i2c_config[dev].dev->CR1 &= ~(I2C_CR1_PE);
-
-    _wait_for_bus(i2c_config[dev].dev);
-
-    periph_clk_dis(i2c_config[dev].bus, i2c_config[dev].rcc_mask);
+    _disable_periph(dev);
 
 #ifdef STM32_PM_STOP
     /* unblock STOP mode */
