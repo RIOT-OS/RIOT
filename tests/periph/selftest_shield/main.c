@@ -868,8 +868,8 @@ static bool periph_spi_rxtx_test(spi_t bus, spi_mode_t mode, spi_clk_t clk,
              * theoretical time. Given the overhead of, this already has some
              * room for error */
             transfer_too_fast |= (byte_time < byte_transfer_ticks);
-            /* C̅S̅ should be still LOW while chip is selected */
         }
+        /* C̅S̅ should be still LOW while chip is selected */
         failed |= TEST(gpio_read(cs_check) == 0);
     }
 
