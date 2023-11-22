@@ -20,6 +20,8 @@ FEATURES_OPTIONAL += periph_spi
 FEATURES_OPTIONAL += periph_timer
 FEATURES_OPTIONAL += periph_uart
 
+USEMODULE += tiny_strerror
+
 STOP_ON_FAILURE ?= 0
 DETAILED_OUTPUT ?= 0
 

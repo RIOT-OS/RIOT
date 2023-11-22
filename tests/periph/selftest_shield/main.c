@@ -40,6 +40,7 @@
 #include "periph/timer.h"
 #include "periph/uart.h"
 #include "stdio_uart.h" /* for STDIO_UART_DEV */
+#include "tiny_strerror.h"
 
 /* BEGIN: controls of the behavior of the testing app: */
 #ifndef STOP_ON_FAILURE
@@ -232,11 +233,23 @@ static bool do_test(bool failed, uint16_t line)
     return failed;
 }
 
-static void do_assert(bool failed, uint16_t line)
+static void MAYBE_UNUSED do_assert(bool failed, uint16_t line)
 {
     if (failed) {
         printf("CRITICAL ");
         print_test_failed(line);
+        ARCHITECTURE_BREAKPOINT(1);
+        while (1) {
+            /* stop */
+        }
+    }
+}
+
+static void do_assert_no_error(int retval, uint16_t line)
+{
+    if (retval != 0) {
+        printf("ERROR in " __FILE__ ":%" PRIu16 " with code %s\n",
+               line, tiny_strerror(retval));
         ARCHITECTURE_BREAKPOINT(1);
         while (1) {
             /* stop */
@@ -277,9 +290,28 @@ static void _print_start(const char *name, const char *detail, uint16_t line)
 #  define print_start(name, detail) _print_start(name, NULL, __LINE__)
 #endif
 
+/**
+ * @brief   Expression @p x must evaluate, otherwise fail but continue other
+ *          tests
+ *
+ * @pre     The test is safe to continue even if the test fails
+ */
 #define TEST(x) do_test(!(x), __LINE__)
-
+/**
+ * @brief   Expression @p x must evaluate, otherwise fail and abort
+ *
+ * @pre     The test is ***NOT*** safe to continue if the test fails
+ */
 #define ASSERT(x) do_assert(!(x), __LINE__)
+/**
+ * @brief   The expression @p must return 0, otherwise abort
+ *
+ * @pre     The return value will be a positive or negative errno code, if it
+ *          is not zero
+ *
+ * This prints the errno code and aborts if @p x is not evaluating to zero
+ */
+#define ASSERT_NO_ERROR(x) do_assert_no_error(x, __LINE__)
 
 static void stupid_delay(unsigned count)
 {
@@ -312,8 +344,8 @@ static bool periph_gpio_test_push_pull(void)
 {
     bool failed = false;
     print_start("GPIO", "push-pull");
-    ASSERT(gpio_init(ARDUINO_PIN_3, GPIO_IN) == 0);
-    ASSERT(gpio_init(ARDUINO_PIN_4, GPIO_OUT) == 0);
+    ASSERT_NO_ERROR(gpio_init(ARDUINO_PIN_3, GPIO_IN));
+    ASSERT_NO_ERROR(gpio_init(ARDUINO_PIN_4, GPIO_OUT));
 
     gpio_clear(ARDUINO_PIN_4);
     for (unsigned i = 0; i < flaky_test_repetitions; i++) {
@@ -334,7 +366,7 @@ static bool periph_gpio_test_input_pull_up(void)
 {
     bool failed = false;
     print_start("GPIO", "input pull-up");
-    ASSERT(gpio_init(ARDUINO_PIN_4, GPIO_IN) == 0);
+    ASSERT_NO_ERROR(gpio_init(ARDUINO_PIN_4, GPIO_IN));
     if (gpio_init(ARDUINO_PIN_3, GPIO_IN_PU) == 0) {
         /* give pull resistor a little time to pull */
         brief_delay();
@@ -346,7 +378,7 @@ static bool periph_gpio_test_input_pull_up(void)
         }
 
         /* push/pull on D4 should still be able to force down D3 */
-        ASSERT(gpio_init(ARDUINO_PIN_4, GPIO_OUT) == 0);
+        ASSERT_NO_ERROR(gpio_init(ARDUINO_PIN_4, GPIO_OUT));
         gpio_clear(ARDUINO_PIN_4);
         for (unsigned i = 0; i < flaky_test_repetitions; i++) {
             failed |= TEST(gpio_read(ARDUINO_PIN_3) == 0);
@@ -364,7 +396,7 @@ static bool periph_gpio_test_input_pull_down(void)
 {
     bool failed = false;
     print_start("GPIO", "input pull-down");
-    ASSERT(gpio_init(ARDUINO_PIN_4, GPIO_IN) == 0);
+    ASSERT_NO_ERROR(gpio_init(ARDUINO_PIN_4, GPIO_IN));
     if (gpio_init(ARDUINO_PIN_3, GPIO_IN_PD) == 0) {
         /* give pull resistor a little time to pull */
         brief_delay();
@@ -376,7 +408,7 @@ static bool periph_gpio_test_input_pull_down(void)
         }
 
         /* push/pull on D4 should still be able to force up D3 */
-        ASSERT(gpio_init(ARDUINO_PIN_4, GPIO_OUT) == 0);
+        ASSERT_NO_ERROR(gpio_init(ARDUINO_PIN_4, GPIO_OUT));
         gpio_set(ARDUINO_PIN_4);
         for (unsigned i = 0; i < flaky_test_repetitions; i++) {
             failed |= TEST(gpio_read(ARDUINO_PIN_3) != 0);
@@ -395,7 +427,7 @@ static bool periph_gpio_test_open_drain_pull_up(void)
     bool failed = false;
     print_start("GPIO", "open-drain pull-up");
 
-    ASSERT(gpio_init(ARDUINO_PIN_4, GPIO_IN) == 0);
+    ASSERT_NO_ERROR(gpio_init(ARDUINO_PIN_4, GPIO_IN));
     if (gpio_init(ARDUINO_PIN_3, GPIO_OD_PU) == 0) {
         gpio_set(ARDUINO_PIN_3);
         /* give pull resistor a little time to pull */
@@ -468,9 +500,9 @@ static bool periph_gpio_irq_test_falling(void)
     bool failed = false;
     print_start("GPIO-IRQ", "falling-edge");
     atomic_uint cnt = 0;
-    ASSERT(gpio_init(ARDUINO_PIN_4, GPIO_OUT) == 0);
+    ASSERT_NO_ERROR(gpio_init(ARDUINO_PIN_4, GPIO_OUT));
     gpio_clear(ARDUINO_PIN_4);
-    ASSERT(gpio_init_int(ARDUINO_PIN_3, GPIO_IN, GPIO_FALLING, gpio_cb, &cnt) == 0);
+    ASSERT_NO_ERROR(gpio_init_int(ARDUINO_PIN_3, GPIO_IN, GPIO_FALLING, gpio_cb, &cnt));
 
     /* no stray IRQ */
     brief_delay();
@@ -531,9 +563,9 @@ static bool periph_gpio_irq_test_rising(void)
     bool failed = false;
     print_start("GPIO-IRQ", "rising-edge");
     atomic_uint cnt = 0;
-    ASSERT(gpio_init(ARDUINO_PIN_4, GPIO_OUT) == 0);
+    ASSERT_NO_ERROR(gpio_init(ARDUINO_PIN_4, GPIO_OUT));
     gpio_set(ARDUINO_PIN_4);
-    ASSERT(gpio_init_int(ARDUINO_PIN_3, GPIO_IN, GPIO_RISING, gpio_cb, &cnt) == 0);
+    ASSERT_NO_ERROR(gpio_init_int(ARDUINO_PIN_3, GPIO_IN, GPIO_RISING, gpio_cb, &cnt));
 
     /* no stray IRQ */
     brief_delay();
@@ -594,9 +626,9 @@ static bool periph_gpio_irq_test_both(void)
     bool failed = false;
     print_start("GPIO-IRQ", "both-edges");
     atomic_uint cnt = 0;
-    ASSERT(gpio_init(ARDUINO_PIN_4, GPIO_OUT) == 0);
+    ASSERT_NO_ERROR(gpio_init(ARDUINO_PIN_4, GPIO_OUT));
     gpio_set(ARDUINO_PIN_4);
-    ASSERT(gpio_init_int(ARDUINO_PIN_3, GPIO_IN, GPIO_BOTH, gpio_cb, &cnt) == 0);
+    ASSERT_NO_ERROR(gpio_init_int(ARDUINO_PIN_3, GPIO_IN, GPIO_BOTH, gpio_cb, &cnt));
 
     /* no stray IRQ */
     brief_delay();
@@ -667,10 +699,10 @@ static bool periph_i2c_test(void)
 {
     bool failed = false;
     print_start("I2C", "GPIO extender");
-    ASSERT(gpio_init(ARDUINO_PIN_8, GPIO_IN) == 0);
-    ASSERT(gpio_init(ARDUINO_PIN_9, GPIO_OUT) == 0);
-    ASSERT(pcf857x_gpio_init(&egpios, PCF857X_GPIO_PIN(0, 0), GPIO_OUT) == 0);
-    ASSERT(pcf857x_gpio_init(&egpios, PCF857X_GPIO_PIN(0, 1), GPIO_IN) == 0);
+    ASSERT_NO_ERROR(gpio_init(ARDUINO_PIN_8, GPIO_IN));
+    ASSERT_NO_ERROR(gpio_init(ARDUINO_PIN_9, GPIO_OUT));
+    ASSERT_NO_ERROR(pcf857x_gpio_init(&egpios, PCF857X_GPIO_PIN(0, 0), GPIO_OUT));
+    ASSERT_NO_ERROR(pcf857x_gpio_init(&egpios, PCF857X_GPIO_PIN(0, 1), GPIO_IN));
 
     for (unsigned i = 0; i < flaky_test_repetitions; i++) {
         gpio_set(ARDUINO_PIN_9);
@@ -707,7 +739,7 @@ static bool periph_uart_rxtx_test(uint32_t symbolrate)
     uint16_t start;
     memset(&serial_buf, 0, sizeof(serial_buf));
 
-    ASSERT(uart_init(UART_TEST_DEV, symbolrate, uart_rx_cb, NULL) == 0);
+    ASSERT_NO_ERROR(uart_init(UART_TEST_DEV, symbolrate, uart_rx_cb, NULL));
 
     if (IS_USED(MODULE_PERIPH_TIMER)) {
         bit_ticks = TIMER_FREQ_UART_TEST / symbolrate;
@@ -778,7 +810,7 @@ static bool periph_uart_test(void)
     bool failed = false;
 
     if (IS_USED(MODULE_PERIPH_TIMER)) {
-        ASSERT(timer_init(TIMER, TIMER_FREQ_UART_TEST, NULL, NULL) == 0);
+        ASSERT_NO_ERROR(timer_init(TIMER, TIMER_FREQ_UART_TEST, NULL, NULL));
         timer_start(TIMER);
     }
 
@@ -836,8 +868,8 @@ static bool periph_spi_rxtx_test(spi_t bus, spi_mode_t mode, spi_clk_t clk,
              * theoretical time. Given the overhead of, this already has some
              * room for error */
             transfer_too_fast |= (byte_time < byte_transfer_ticks);
-            /* C̅S̅ should be still LOW while chip is selected */
         }
+        /* C̅S̅ should be still LOW while chip is selected */
         failed |= TEST(gpio_read(cs_check) == 0);
     }
 
@@ -886,7 +918,7 @@ static bool periph_spi_rxtx_test(spi_t bus, spi_mode_t mode, spi_clk_t clk,
 static bool periph_spi_test(void)
 {
     if (IS_USED(MODULE_PERIPH_TIMER)) {
-        ASSERT(timer_init(TIMER, TIMER_FREQ_SPI_TEST, NULL, NULL) == 0);
+        ASSERT_NO_ERROR(timer_init(TIMER, TIMER_FREQ_SPI_TEST, NULL, NULL));
         timer_start(TIMER);
     }
 
@@ -896,7 +928,7 @@ static bool periph_spi_test(void)
 
     if (IS_USED(MODULE_PCF857X)) {
         for (int i = 0; i < (int)ARRAY_SIZE(spi_clk_check_pins); i++) {
-            ASSERT(pcf857x_gpio_init(&egpios, spi_clk_check_pins[i], GPIO_IN) == 0);
+            ASSERT_NO_ERROR(pcf857x_gpio_init(&egpios, spi_clk_check_pins[i], GPIO_IN));
         }
     }
 
@@ -931,7 +963,7 @@ static bool periph_pwm_test_chan(pwm_t pwm_dev, uint8_t pwm_chan, pwm_mode_t pwm
         return failed;
     }
 
-    ASSERT(adc_init(adc_line) == 0);
+    ASSERT_NO_ERROR(adc_init(adc_line));
 
     for (uint16_t i = 0; i <= UINT8_MAX; i++) {
         pwm_set(pwm_dev, pwm_chan, i);
@@ -975,10 +1007,10 @@ static bool periph_pwm_test(void)
 
 static void r_2r_dac_init(void)
 {
-    ASSERT(pcf857x_gpio_init(&egpios, PCF857X_GPIO_PIN(0, 4), GPIO_OUT) == 0);
-    ASSERT(pcf857x_gpio_init(&egpios, PCF857X_GPIO_PIN(0, 5), GPIO_OUT) == 0);
-    ASSERT(pcf857x_gpio_init(&egpios, PCF857X_GPIO_PIN(0, 6), GPIO_OUT) == 0);
-    ASSERT(pcf857x_gpio_init(&egpios, PCF857X_GPIO_PIN(0, 7), GPIO_OUT) == 0);
+    ASSERT_NO_ERROR(pcf857x_gpio_init(&egpios, PCF857X_GPIO_PIN(0, 4), GPIO_OUT));
+    ASSERT_NO_ERROR(pcf857x_gpio_init(&egpios, PCF857X_GPIO_PIN(0, 5), GPIO_OUT));
+    ASSERT_NO_ERROR(pcf857x_gpio_init(&egpios, PCF857X_GPIO_PIN(0, 6), GPIO_OUT));
+    ASSERT_NO_ERROR(pcf857x_gpio_init(&egpios, PCF857X_GPIO_PIN(0, 7), GPIO_OUT));
 }
 
 static void r_2r_dac_write(uint8_t val)
@@ -1029,7 +1061,7 @@ int main(void)
     /* the GPIO extender is used by the I2C test and the ADC test, so only
      * initialize it once here */
     if (IS_USED(MODULE_PCF857X)) {
-        ASSERT(pcf857x_init(&egpios, &params) == PCF857X_OK);
+        ASSERT_NO_ERROR(pcf857x_init(&egpios, &params));
     }
 
     if (IS_USED(MODULE_PERIPH_GPIO)) {
