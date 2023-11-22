@@ -129,6 +129,22 @@ static void _set_baud(uart_t uart, uint32_t baudrate, uint32_t f_src)
 #endif
 }
 
+void uart_enable_tx(uart_t uart)
+{
+    /* configure RX pin */
+    if (uart_config[uart].tx_pin != GPIO_UNDEF) {
+        gpio_init_mux(uart_config[uart].tx_pin, uart_config[uart].mux);
+    }
+}
+
+void uart_disable_tx(uart_t uart)
+{
+    /* configure RX pin */
+    if (uart_config[uart].tx_pin != GPIO_UNDEF) {
+        gpio_init_mux(uart_config[uart].tx_pin, GPIO_MUX_A);
+    }
+}
+
 static void _configure_pins(uart_t uart)
 {
     /* configure RX pin */
@@ -138,7 +154,8 @@ static void _configure_pins(uart_t uart)
     }
 
     /* configure TX pin */
-    if (uart_config[uart].tx_pin != GPIO_UNDEF) {
+    if (uart_config[uart].tx_pin != GPIO_UNDEF &&
+        !(uart_config[uart].flags & UART_FLAG_TX_ONDEMAND)) {
         gpio_set(uart_config[uart].tx_pin);
         gpio_init(uart_config[uart].tx_pin, GPIO_OUT);
         gpio_init_mux(uart_config[uart].tx_pin, uart_config[uart].mux);
