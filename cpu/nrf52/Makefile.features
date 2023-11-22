@@ -23,9 +23,9 @@ ifneq (,$(filter nrf52840xxaa,$(CPU_MODEL)))
   FEATURES_PROVIDED += periph_ecc_ed25519
 endif
 
-ifeq (,$(filter nrf52832%,$(CPU_MODEL)))
-  FEATURES_PROVIDED += periph_uart_nonblocking
-endif
+# All nRF52 CPUs use UARTE (UART + EasyDMA) for UART, so that can be used
+# in non-blocking mode
+FEATURES_PROVIDED += periph_uart_nonblocking
 # The ADC does not depend on any board configuration, so always available
 FEATURES_PROVIDED += periph_adc
 
