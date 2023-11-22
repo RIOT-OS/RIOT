@@ -14,8 +14,9 @@
  * @{
  */
 
-#include <string.h>
+#include <errno.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "pcf857x.h"
 
@@ -104,7 +105,7 @@ int pcf857x_init(pcf857x_t *dev, const pcf857x_params_t *params)
                                   dev->params.addr += PCF8575_BASE_ADDR;
                                   break;
 #endif
-        default: return -PCF857X_ERROR_INV_EXP;
+        default: return -ENOTSUP;
     }
 
 #if IS_USED(MODULE_PCF857X_IRQ)
@@ -121,7 +122,7 @@ int pcf857x_init(pcf857x_t *dev, const pcf857x_params_t *params)
     /* initialize the interrupt pin */
     if (gpio_init_int(dev->params.int_pin,
                       GPIO_IN_PU, GPIO_FALLING, _irq_isr, (void*)dev)) {
-        return -PCF857X_ERROR_INT_PIN;
+        return -ENOSYS;
     }
 #endif /* MODULE_PCF857X_IRQ */
 
@@ -131,13 +132,15 @@ int pcf857x_init(pcf857x_t *dev, const pcf857x_params_t *params)
 
     /* write 1 to all pins to switch them to INPUTS pulled up to HIGH */
     dev->out = ~0;
-    res |= _write(dev, dev->out);
+    res = _write(dev, dev->out);
 
-    /* initial read all pins */
-    res |= _read(dev, &dev->in);
+    if (!res) {
+        /* initial read all pins */
+        res = _read(dev, &dev->in);
 
-    /* set all pin modes to INPUT and set internal output data to 1 (HIGH) */
-    dev->modes = ~0;
+        /* set all pin modes to INPUT and set internal output data to 1 (HIGH) */
+        dev->modes = ~0;
+    }
 
     _release(dev);
 
@@ -161,7 +164,7 @@ int pcf857x_gpio_init(pcf857x_t *dev, gpio_t pin, gpio_mode_t mode)
      */
     switch (mode) {
         case GPIO_IN_PD: DEBUG_DEV("gpio mode GPIO_IN_PD not supported", dev);
-                         return -PCF857X_ERROR_INV_MODE;
+                         return -EINVAL;
         case GPIO_OUT:   dev->modes &= ~(1 << pin); /* set mode bit to 0 */
                          dev->out   &= ~(1 << pin); /* set output bit to 0 */
                          break;
@@ -228,7 +231,7 @@ int pcf857x_gpio_init_int(pcf857x_t *dev, gpio_t pin,
                         dev->enabled[pin] = true;
                         break;
         default: DEBUG_DEV("invalid flank %d for pin %d", dev, flank, pin);
-                 return -PCF857X_ERROR_INV_FLANK;
+                 return -EINVAL;
     }
 
     return PCF857X_OK;
@@ -428,7 +431,7 @@ static int _read(const pcf857x_t *dev, pcf857x_data_t *data)
     if (res != 0) {
         DEBUG_DEV("could not read data, reason %d (%s)",
                   dev, res, strerror(res * -1));
-        return -PCF857X_ERROR_I2C;
+        return res;
     }
 
     if (dev->pin_num == 8) {
@@ -469,7 +472,7 @@ static int _write(const pcf857x_t *dev, pcf857x_data_t data)
     if (res != 0) {
         DEBUG_DEV("could not write data, reason %d (%s)",
                   dev, res, strerror(res * -1));
-       return -PCF857X_ERROR_I2C;
+       return res;
     }
 
     return PCF857X_OK;
