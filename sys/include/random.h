@@ -10,10 +10,6 @@
  * @defgroup    sys_random Random
  * @ingroup     sys
  * @brief       Pseudo Random Number Generator (PRNG)
- * @{
- *
- * @file
- * @brief       Common interface to the software PRNG
  *
  * Various implementations of a PRNG are available:
  *  - Tiny Mersenne Twister (default)
@@ -24,6 +20,11 @@
  *  - Hardware Random Number Generator (non-seedable)
  *    HWRNG differ in how they generate random numbers and may not use a PRNG internally.
  *    Refer to the manual of your MCU for details.
+ *
+ * @{
+ *
+ * @file
+ * @brief       Common interface to the software PRNG
  */
 
 #ifndef RANDOM_H
