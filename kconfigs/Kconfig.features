@@ -587,6 +587,11 @@ config HAS_PERIPH_UART_MODECFG
     help
         Indicates that the UART peripheral allows mode configuration.
 
+config HAS_PERIPH_UART_TX_ONDEMAND
+    bool
+    help
+        Indicates that the UART peripheral can enable the TX line on demmand.
+
 config HAS_PERIPH_UART_NONBLOCKING
     bool
     help
