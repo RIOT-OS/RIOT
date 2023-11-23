@@ -66,9 +66,9 @@ extern "C" {
  * The port definition is used (and zeroed) to suppress compiler warnings
  */
 #if GPIO_COUNT > 1
-#define GPIO_PIN(x,y)       ((x << 5) | y)
+#define GPIO_PIN(x, y)      ((x << 5) | y)
 #else
-#define GPIO_PIN(x,y)       ((x & 0) | y)
+#define GPIO_PIN(x, y)      ((x & 0) | y)
 #endif
 
 /**
