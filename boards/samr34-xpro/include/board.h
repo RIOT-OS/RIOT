@@ -21,7 +21,6 @@
 #define BOARD_H
 
 #include "cpu.h"
-#include "mtd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -80,8 +79,7 @@ extern "C" {
  * @name MTD configuration
  * @{
  */
-extern mtd_dev_t *mtd0;             /**< First memory type device */
-#define MTD_0 mtd0                  /**< First memory type device */
+#define MTD_0 mtd_dev_get(0)                  /**< First memory type device */
 /** @} */
 
 #ifdef __cplusplus

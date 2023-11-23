@@ -25,7 +25,6 @@
 #include "cpu.h"
 #include "periph_conf.h"
 #include "periph_cpu.h"
-#include "mtd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -164,11 +163,10 @@ extern "C" {
 
 #if defined(MODULE_MTD_SDCARD) || defined(DOXYGEN)
 /**
- * @brief MTD device 0 (SD Card) definition. mtd0 is defined in board.c
+ * @brief MTD device 0 (SD Card) definition. mtd_dev_get(0) is defined in board.c
  * @{
  */
-extern mtd_dev_t *mtd0;
-#define MTD_0 mtd0
+#define MTD_0 mtd_dev_get(0)
 /** @} */
 #endif /* MODULE_MTD_SDCARD || DOXYGEN */
 
