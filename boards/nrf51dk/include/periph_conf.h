@@ -73,6 +73,30 @@ static const i2c_conf_t i2c_config[] = {
 #define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */
 
+/**
+ * @name    ADC configuration
+ *
+ * The ADC channels have a fixed mapping:
+ *
+ * | Channel    | MCU Pin   | Arduino pin on board                  |
+ * |:---------- |:--------- |:------------------------------------- |
+ * | AIN0       | P0.26     | -- (exposed, by no Arduino UNO pin)   |
+ * | AIN1       | P0.27     | -- (exposed, by no Arduino UNO pin)   |
+ * | AIN2       | P0.01     | A0                                    |
+ * | AIN3       | P0.02     | A1                                    |
+ * | AIN4       | P0.03     | A2                                    |
+ * | AIN5       | P0.04     | A3                                    |
+ * | AIN6       | P0.05     | A4                                    |
+ * | AIN7       | P0.06     | A5                                    |
+ *
+ * Expose those on Arduino pins A0 to A5
+ * @{
+ */
+static const adc_conf_t adc_config[] = {2, 3, 4, 5, 6, 7};
+
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
