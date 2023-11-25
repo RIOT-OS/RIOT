@@ -16,8 +16,8 @@
 
 #include "embUnit.h"
 
-#include "mtd.h"
 #include "board.h"
+#include "mtd.h"
 
 #if MODULE_VFS
 #include <fcntl.h>
