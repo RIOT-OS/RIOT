@@ -29,15 +29,24 @@ extern "C" {
 #endif
 
 /**
- * @name UART configuration
+ * @name    UART configuration
  * @{
  */
-#define UART_NUMOF          (1U)
-/* UART pin configuration */
-#define UART_PIN_RX         11
-#define UART_PIN_TX         9
-#define UART_PIN_RTS        8
-#define UART_PIN_CTS        10
+static const uart_conf_t uart_config[] = {
+    { /* Mapped to USB virtual COM port */
+        .dev        = NRF_UART0,
+        .rx_pin     = GPIO_PIN(0, 11),
+        .tx_pin     = GPIO_PIN(0, 9),
+#ifdef MODULE_PERIPH_UART_HW_FC
+        .rts_pin    = GPIO_PIN(0, 8),
+        .cts_pin    = GPIO_PIN(0, 10),
+#endif
+        .irqn       = UART0_IRQn,
+    },
+};
+
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
+#define UART_0_ISR          isr_uart0
 /** @} */
 
 /**
