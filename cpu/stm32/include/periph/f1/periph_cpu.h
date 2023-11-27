@@ -107,6 +107,67 @@ enum {
 };
 /** @} */
 
+/**
+ * @brief   Possible values of the `SWJ_CFG` field in the AFIO->MAPR register
+ *
+ * @details This wraps the vendor header file preprocessor macros into a
+ *          C language `enum`.
+ */
+typedef enum {
+     /**
+      * @brief  Both JTAG-DP and SW-DP enabled, reset state
+      */
+    SWJ_CFG_FULL_SWJ    = 0,
+    /**
+     * @brief   Both JTAG-DP and SW-DP enabled, but NJTRST disabled and pin
+     *          usable as GPIO
+     */
+    SWJ_CFG_NO_NJTRST   = AFIO_MAPR_SWJ_CFG_NOJNTRST,
+    /**
+     * @brief   Only SW-DP enabled, JTAG pins usable as GPIOS
+     */
+    SWJ_CFG_NO_JTAG_DP  = AFIO_MAPR_SWJ_CFG_JTAGDISABLE,
+    /**
+     * @brief   Neither JTAG-DP nor SW-DP enabled, JTAG and SWD pins usable as
+     *          GPIOS
+     */
+    SWJ_CFG_DISABLED    = AFIO_MAPR_SWJ_CFG_DISABLE,
+} afio_mapr_swj_cfg_t;
+
+#ifndef CONFIG_AFIO_MAPR_SWJ_CFG
+/**
+ * @brief   By default, disable JTAG and keep only SWD
+ *
+ * This frees the JTAG pins for use as regular GPIOs. We do not support flashing
+ * or debugging via JTAG anyway, so there is nothing lost except for a few bytes
+ * of ROM to initialize the `SWJ_CFG` register.
+ */
+#define CONFIG_AFIO_MAPR_SWJ_CFG    SWJ_CFG_NO_JTAG_DP
+#endif
+
+/**
+ * @brief   Read the current value of the AFIO->MAPR register reproducibly
+ *
+ * This will explicitly clear the write-only `SWJ_CFG` field [26:24], as the
+ * values read back are undefined.
+ */
+static inline uint32_t afio_mapr_read(void)
+{
+    return AFIO->MAPR & (~(AFIO_MAPR_SWJ_CFG_Msk));
+}
+
+/**
+ * @brief   Write to the AFIO->MAPR register apply the SWJ configuration
+ *          specified via @ref CONFIG_AFIO_MAPR_SWJ_CFG
+ *
+ * @pre     @p new_value has all bits in the range [26:24] cleared (the
+ *          `SWJ_CFG` field).
+ */
+static inline void afio_mapr_write(uint32_t new_value)
+{
+    AFIO->MAPR = CONFIG_AFIO_MAPR_SWJ_CFG | new_value;
+}
+
 #ifdef __cplusplus
 }
 #endif

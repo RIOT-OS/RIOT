@@ -10,6 +10,7 @@ config MODULE_ESP_IDF_HEAP
     bool
     depends on TEST_KCONFIG
     depends on MODULE_ESP_IDF
+    default y if MODULE_LCD_PARALLEL_LL_MCU
     select PACKAGE_TLSF
     help
         ESP-IDF heap library. This library is required if external SPI RAM

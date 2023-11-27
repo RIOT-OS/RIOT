@@ -188,6 +188,11 @@ config HAS_PERIPH_ADC
     help
         Indicates that an ADC peripheral is present.
 
+config HAS_PERIPH_ADC_CONTINUOUS
+    bool
+    help
+        Indicates that an ADC peripheral can be left on between measurements.
+
 config HAS_PERIPH_CAN
     bool
     help
@@ -257,6 +262,11 @@ config HAS_PERIPH_FLASHPAGE_RWEE
     bool
     help
         Indicates that the Flashpage peripheral is of the Read While Write.
+
+config HAS_PERIPH_FREQM
+    bool
+    help
+        Indicates that a Frequency Meter peripheral is present.
 
 config HAS_PERIPH_GPIO
     bool

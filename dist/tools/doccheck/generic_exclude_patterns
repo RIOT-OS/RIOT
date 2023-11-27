@@ -20,6 +20,7 @@ warning: Member EPD_BW_SPI_DISPLAY_UPDATE_OPTION_[A-Z0-9_]* \(macro definition\)
 warning: Member EPD_BW_SPI_WAIT_[A-Z0-9_]* \(macro definition\) of
 warning: Member F_CPU \(macro definition\) of
 warning: Member F_RC_OSCILLATOR \(macro definition\) of
+warning: Member freqm_config\[\] \(variable\) of
 warning: Member FXOS8700_PARAM_ADDR \(macro definition\) of
 warning: Member FXOS8700_PARAM_I2C \(macro definition\) of
 warning: Member FXOS8700_PARAM_RENEW_INTERVAL \(macro definition\) of

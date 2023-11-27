@@ -333,6 +333,26 @@ void _wlx5xx_init_subghz_debug_pins(void)
 #endif
 }
 
+static void swj_init(void)
+{
+#if defined(CPU_FAM_STM32F1)
+    /* Only if the selected SWJ config differs from the reset value, we
+     * actually need to do something. Since both sides are compile time
+     * constants, this hole code gets optimized out by default */
+    if (CONFIG_AFIO_MAPR_SWJ_CFG != SWJ_CFG_FULL_SWJ) {
+        /* The remapping periph clock must first be enabled */
+        RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
+        /* Handling of the MAPR register is a bit involved due to the
+         * write-only nature of the SWJ_CFG field, which returns undefined
+         * garbage on read. `afio_mapr_read()` will read the current MAPR
+         * value, but clear the SWF_CFG vield. `afio_mapr_wriote()` will then
+         * write the value read back, but apply the `SWF_CFG` configuration
+         * from `CONFIG_AFIO_MAPR_SWJ_CFG` first.*/
+        afio_mapr_write(afio_mapr_read());
+    }
+#endif
+}
+
 void cpu_init(void)
 {
     /* initialize the Cortex-M core */
@@ -362,10 +382,7 @@ void cpu_init(void)
     /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
     early_init();
 
-#ifdef STM32F1_DISABLE_JTAG
-    RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
-    AFIO->MAPR |= AFIO_MAPR_SWJ_CFG_JTAGDISABLE;
-#endif
+    swj_init();
 
     /* trigger static peripheral initialization */
     periph_init();

@@ -945,6 +945,14 @@ typedef struct {
  */
 #define WDT_HAS_INIT                   (1)
 
+/**
+ * @brief   Frequency meter configuration
+ */
+typedef struct {
+    gpio_t pin;             /**< GPIO at which the frequency is to be measured */
+    uint8_t gclk_src;       /**< GCLK source select for reference */
+} freqm_config_t;
+
 #if defined(REV_DMAC) || DOXYGEN
 /**
  * @name sam0 DMA peripheral

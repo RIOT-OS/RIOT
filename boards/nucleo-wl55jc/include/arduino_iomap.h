@@ -31,6 +31,16 @@ extern "C" {
 #endif
 
 /**
+ * @name    Arduino's I2C buses
+ * @{
+ */
+/**
+ * @brief   The first I2C bus is where shields for the Arduino UNO expect it
+ */
+#define ARDUINO_I2C_UNO         I2C_DEV(0)
+/** @} */
+
+/**
  * @brief   Mapping of MCU pins to Arduino pins
  * @{
  */

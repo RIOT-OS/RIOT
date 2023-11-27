@@ -233,6 +233,17 @@
 
 #endif /* !CONFIG_ESP_FLASHPAGE_CAPACITY */
 
+/**
+ * LCD driver configuration
+ */
+#if MODULE_ESP_IDF_LCD
+#ifndef CONFIG_LCD_DATA_BUF_SIZE
+#define CONFIG_LCD_DATA_BUF_SIZE                        512
+#endif
+
+#define CONFIG_LCD_PANEL_IO_FORMAT_BUF_SIZE             CONFIG_LCD_DATA_BUF_SIZE
+#endif
+
 #endif /* DOXYGEN */
 
 /**

@@ -33,7 +33,7 @@
 
 #include "periph_cpu.h"
 #include "clk_conf.h"
-#include "cfg_timer_tim2.h"
+#include "cfg_timer_tim2_tim15_tim16.h"
 
 #ifdef __cplusplus
 extern "C" {

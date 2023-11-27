@@ -406,6 +406,18 @@ static const sam0_common_gmac_config_t sam_gmac_config[] = {
 };
 /** @} */
 
+/**
+ * @name FREQM peripheral configuration
+ * @{
+ */
+static const freqm_config_t freqm_config[] = {
+    {
+        .pin = GPIO_PIN(PB, 17),
+        .gclk_src = SAM0_GCLK_32KHZ
+    }
+};
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

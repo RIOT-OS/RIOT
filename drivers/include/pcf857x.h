@@ -245,10 +245,10 @@ extern "C"
 {
 #endif
 
+#include <errno.h>
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "kernel_defines.h"
 #include "periph/gpio.h"
 #include "periph/i2c.h"
 
@@ -326,14 +326,18 @@ typedef uint8_t pcf857x_data_t;     /**< type that can mask all expander pins */
 #endif /* MODULE_PCF8575 || DOXYGEN */
 /** @} */
 
-/** Definition of PCF857X driver error codes */
+/**
+ * @brief       Definition of PCF857X driver error codes
+ *
+ * @deprecated  These are aliases for errno error codes now, use them directly
+ */
 typedef enum {
-    PCF857X_OK,                 /**< success */
-    PCF857X_ERROR_I2C,          /**< I2C communication error */
-    PCF857X_ERROR_INV_EXP,      /**< invalid expander variant */
-    PCF857X_ERROR_INV_MODE,     /**< invalid pin mode */
-    PCF857X_ERROR_INV_FLANK,    /**< invalid interrupt flank */
-    PCF857X_ERROR_INT_PIN,      /**< interrupt pin initialization failed */
+    PCF857X_OK              = 0,        /**< success */
+    PCF857X_ERROR_I2C       = ENXIO,    /**< I2C communication error */
+    PCF857X_ERROR_INV_EXP   = ENOTSUP,  /**< invalid expander variant */
+    PCF857X_ERROR_INV_MODE  = EINVAL,   /**< invalid pin mode */
+    PCF857X_ERROR_INV_FLANK = EINVAL,   /**< invalid interrupt flank */
+    PCF857X_ERROR_INT_PIN   = ENOSYS,   /**< interrupt pin initialization failed */
 } pcf857x_error_codes_t;
 
 /**
@@ -453,9 +457,8 @@ typedef struct {
  *      has to be defined by the default configuration parameter
  *      #PCF857X_PARAM_INT_PIN (pcf857x_params_t::int_pin).
  *
- * @retval  PCF857X_OK      on success
- * @retval  PCF857X_ERROR_* a negative error code on error,
- *                           see #pcf857x_error_codes_t
+ * @retval  0                   on success
+ * @retval  <0                  a negative errno error code on error
  */
 int pcf857x_init(pcf857x_t *dev, const pcf857x_params_t *params);
 
@@ -472,13 +475,12 @@ int pcf857x_init(pcf857x_t *dev, const pcf857x_params_t *params);
  *   the driver physically supports only the modes #GPIO_IN_PU and
  *   #GPIO_OD_PU. The other logically identical modes #GPIO_IN, #GPIO_OUT
  *   and #GPIO_OD are emulated. For the #GPIO_IN_PU mode the function returns
- *   with #PCF857X_ERROR_INV_MODE.
+ *   with `-EINVAL`.
  * - After initialization in #GPIO_OUT mode the pin is actively driven LOW,
  *   after initialization in all other modes the pin is pulled-up to HIGH.
  *
- * @retval  PCF857X_OK          on success
- * @retval  PCF857X_ERROR_*     a negative error code on error,
- *                              see #pcf857x_error_codes_t
+ * @retval  0                   on success
+ * @retval  <0                  a negative errno error code on error
  */
 int pcf857x_gpio_init(pcf857x_t *dev, gpio_t pin, gpio_mode_t mode);
 
@@ -504,7 +506,7 @@ int pcf857x_gpio_init(pcf857x_t *dev, gpio_t pin, gpio_mode_t mode);
  *   the driver physically supports only the modes #GPIO_IN_PU and
  *   #GPIO_OD_PU. The other logically identical modes #GPIO_IN, #GPIO_OUT
  *   and #GPIO_OD are emulated. For the #GPIO_IN_PU mode the function returns
- *   with #PCF857X_ERROR_INV_MODE.
+ *   with `-EINVAL`.
  * - After initialization in #GPIO_OUT mode the pin is actively driven LOW,
  *   after initialization in all other modes the pin is pulled-up to HIGH.
  *
@@ -515,9 +517,8 @@ int pcf857x_gpio_init(pcf857x_t *dev, gpio_t pin, gpio_mode_t mode);
  * @param[in]   isr     ISR that is called back from interrupt context
  * @param[in]   arg     optional argument passed to the callback
  *
- * @retval  PCF857X_OK          on success
- * @retval  PCF857X_ERROR_*     a negative error code on error,
- *                              see #pcf857x_error_codes_t
+ * @retval  0                   on success
+ * @retval  <0                  a negative errno error code on error
  */
 int pcf857x_gpio_init_int(pcf857x_t *dev, gpio_t pin,
                                           gpio_mode_t mode,
