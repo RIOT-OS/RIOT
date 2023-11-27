@@ -106,6 +106,10 @@ static const spi_conf_t spi_config[] = {
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
+static const pwm_conf_t pwm_config[] = {{},};
+
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
+
 /**
  * @brief USB device FS configuration
  */
