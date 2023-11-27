@@ -236,6 +236,82 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     return UART_OK;
 }
 
+void uart_poweron(uart_t uart)
+{
+    assume((unsigned)uart < UART_NUMOF);
+
+    if (isr_ctx[uart].rx_cb) {
+        uart_config[uart].dev->TASKS_STARTRX = 1;
+    }
+}
+
+void uart_poweroff(uart_t uart)
+{
+    assume((unsigned)uart < UART_NUMOF);
+
+    uart_config[uart].dev->TASKS_STOPRX = 1;
+}
+
+/* Unify macro names across nRF51 (UART) and nRF52 and newer (UARTE) */
+#if defined(UARTE_CONFIG_HWFC_Msk)
+#  define CONFIG_HWFC_Msk UARTE_CONFIG_HWFC_Msk
+#elif defined(UART_CONFIG_HWFC_Msk)
+#  define CONFIG_HWFC_Msk UART_CONFIG_HWFC_Msk
+#endif
+
+#if defined(UARTE_CONFIG_PARITY_Msk)
+#  define CONFIG_PARITY_Msk UARTE_CONFIG_PARITY_Msk
+#elif defined(UART_CONFIG_PARITY_Msk)
+#  define CONFIG_PARITY_Msk UART_CONFIG_PARITY_Msk
+#endif
+
+#if defined(UARTE_CONFIG_STOP_Msk)
+#  define CONFIG_STOP_Msk UARTE_CONFIG_STOP_Msk
+#elif defined(UART_CONFIG_STOP_Msk)
+#  define CONFIG_STOP_Msk UART_CONFIG_STOP_Msk
+#endif
+
+int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
+              uart_stop_bits_t stop_bits)
+{
+    assume((unsigned)uart < UART_NUMOF);
+    /* Not all nRF5x MCUs support 2 stop bits, but the vendor header files
+     * reflect the feature set. */
+    switch (stop_bits) {
+    case UART_STOP_BITS_1:
+#ifdef CONFIG_STOP_Msk
+    case UART_STOP_BITS_2:
+#endif
+        break;
+    default:
+        return UART_NOMODE;
+    }
+
+    if (data_bits != UART_DATA_BITS_8) {
+        return UART_NOMODE;
+    }
+
+    if ((parity != UART_PARITY_NONE) && (parity != UART_PARITY_EVEN)) {
+        return UART_NOMODE;
+    }
+
+    /* Do not modify hardware flow control */
+    uint32_t conf = uart_config[uart].dev->CONFIG & CONFIG_HWFC_Msk;
+
+#ifdef CONFIG_STOP_Msk
+    if (stop_bits == UART_STOP_BITS_2) {
+        conf |= UARTE_CONFIG_STOP_Msk;
+    }
+#endif
+
+    if (parity == UART_PARITY_EVEN) {
+        conf |= CONFIG_PARITY_Msk;
+    }
+
+    uart_config[uart].dev->CONFIG = conf;
+    return UART_OK;
+}
+
 /* UART with EasyDMA */
 #ifdef UARTE_PRESENT
 static void _write_buf(uart_t uart, const uint8_t *data, size_t len)
@@ -315,63 +391,6 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 #endif
 }
 
-void uart_poweron(uart_t uart)
-{
-    assume((unsigned)uart < UART_NUMOF);
-
-    if (isr_ctx[uart].rx_cb) {
-        uart_config[uart].dev->TASKS_STARTRX = 1;
-    }
-}
-
-void uart_poweroff(uart_t uart)
-{
-    assume((unsigned)uart < UART_NUMOF);
-
-    uart_config[uart].dev->TASKS_STOPRX = 1;
-}
-
-int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
-              uart_stop_bits_t stop_bits)
-{
-    assume((unsigned)uart < UART_NUMOF);
-    /* Not all nRF52 MCUs support 2 stop bits, but the vendor header files
-     * reflect the feature set. */
-    switch (stop_bits) {
-    case UART_STOP_BITS_1:
-#ifdef UARTE_CONFIG_STOP_Msk
-    case UART_STOP_BITS_2:
-#endif
-        break;
-    default:
-        return UART_NOMODE;
-    }
-
-    if (data_bits != UART_DATA_BITS_8) {
-        return UART_NOMODE;
-    }
-
-    if (parity != UART_PARITY_NONE && parity != UART_PARITY_EVEN) {
-        return UART_NOMODE;
-    }
-
-    /* Do not modify hardware flow control */
-    uint32_t conf = uart_config[uart].dev->CONFIG & UARTE_CONFIG_HWFC_Msk;
-
-#ifdef UARTE_CONFIG_STOP_Msk
-    if (stop_bits == UART_STOP_BITS_2) {
-        conf |= UARTE_CONFIG_STOP_Msk;
-    }
-#endif
-
-    if (parity == UART_PARITY_EVEN) {
-        conf |= UARTE_CONFIG_PARITY_Msk;
-    }
-
-    uart_config[uart].dev->CONFIG = conf;
-    return UART_OK;
-}
-
 static void irq_handler(uart_t uart)
 {
     if (uart_config[uart].dev->EVENTS_ENDRX) {
@@ -429,49 +448,6 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     }
 
     uart_config[uart].dev->TASKS_STOPTX = 1;
-}
-
-void uart_poweron(uart_t uart)
-{
-    assume((unsigned)uart < UART_NUMOF);
-
-    if (isr_ctx[uart].rx_cb) {
-        uart_config[uart].dev->TASKS_STARTRX = 1;
-    }
-}
-
-void uart_poweroff(uart_t uart)
-{
-    assume((unsigned)uart < UART_NUMOF);
-
-    uart_config[uart].dev->TASKS_STOPRX = 1;
-}
-
-int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
-              uart_stop_bits_t stop_bits)
-{
-    assume((unsigned)uart < UART_NUMOF);
-
-    if (stop_bits != UART_STOP_BITS_1) {
-        return UART_NOMODE;
-    }
-
-    if (data_bits != UART_DATA_BITS_8) {
-        return UART_NOMODE;
-    }
-
-    if (parity != UART_PARITY_NONE && parity != UART_PARITY_EVEN) {
-        return UART_NOMODE;
-    }
-
-    if (parity == UART_PARITY_EVEN) {
-        uart_config[uart].dev->CONFIG |= UART_CONFIG_PARITY_Msk;
-    }
-    else {
-        uart_config[uart].dev->CONFIG &= ~UART_CONFIG_PARITY_Msk;
-    }
-
-    return UART_OK;
 }
 
 static void irq_handler(uart_t uart)
