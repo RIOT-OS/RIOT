@@ -162,7 +162,8 @@ mtd_dev_t * const mtd_dev_xfa[];
  * @param   dev     MTD device
  * @param   idx     Priority of the MTD device pointer within the XFA
  */
-#define MTD_XFA_ADD(dev, idx) XFA_CONST(mtd_dev_xfa, 0) mtd_dev_t *mtd ## idx = (mtd_dev_t *)&(dev)
+#define MTD_XFA_ADD(dev, idx) \
+    XFA_CONST(mtd_dev_xfa, idx) mtd_dev_t *mtd ## idx = (mtd_dev_t *)&(dev)
 
 /**
  * @brief   Number of MTDs defined in the MTD device array in XFA
