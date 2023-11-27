@@ -263,6 +263,11 @@ config HAS_PERIPH_FLASHPAGE_RWEE
     help
         Indicates that the Flashpage peripheral is of the Read While Write.
 
+config HAS_PERIPH_FREQM
+    bool
+    help
+        Indicates that a Frequency Meter peripheral is present.
+
 config HAS_PERIPH_GPIO
     bool
     help
