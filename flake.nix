@@ -1,3 +1,4 @@
+# just run "nix develop" 
 {
   description = "riot-c-flake";
 
@@ -30,6 +31,8 @@
             jq
             wget
             nixpkgs-fmt
+            gcc-arm-embedded
+            python3Full
           ];
         };
       });

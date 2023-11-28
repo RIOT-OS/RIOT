@@ -9,4 +9,4 @@ ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
   USEMODULE += stdio_rtt 
 endif
 
-include $(RIOTBOARD)/common/nrf9160/Makefile.dep
+#include $(RIOTBOARD)/common/nrf9160/Makefile.dep
