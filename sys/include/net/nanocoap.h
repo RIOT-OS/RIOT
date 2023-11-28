@@ -482,7 +482,7 @@ static inline unsigned coap_get_code_detail(const coap_pkt_t *pkt)
  *
  * @returns     message code in decimal format
  */
-static inline unsigned coap_get_code(const coap_pkt_t *pkt)
+static inline unsigned coap_get_code_decimal(const coap_pkt_t *pkt)
 {
     return (coap_get_code_class(pkt) * 100) + coap_get_code_detail(pkt);
 }

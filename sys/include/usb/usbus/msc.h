@@ -25,7 +25,7 @@
 #include <stdint.h>
 #include "usb/usbus.h"
 #include "usb/usbus/msc/scsi.h"
-#include "mtd_default.h"
+#include "mtd.h"
 
 #ifdef __cplusplus
 extern "C" {

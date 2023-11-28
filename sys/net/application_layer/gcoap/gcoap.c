@@ -1180,7 +1180,7 @@ static void _cache_process(gcoap_request_memo_t *memo,
 #if IS_USED(MODULE_NANOCOAP_CACHE)
     nanocoap_cache_entry_t *ce;
     /* cache_key in memo is pre-processor guarded so we need to as well */
-    if ((ce = nanocoap_cache_process(memo->cache_key, coap_get_code(&req), pdu, pdu_len))) {
+    if ((ce = nanocoap_cache_process(memo->cache_key, coap_get_code_raw(&req), pdu, pdu_len))) {
         ce->truncated = (memo->state == GCOAP_MEMO_RESP_TRUNC);
     }
 #else
@@ -1288,7 +1288,7 @@ static bool _cache_lookup(gcoap_request_memo_t *memo,
         _update_memo_cache_key(memo, cache_key);
         /* cache hit, methods are equal, and cache entry is not stale */
         if (*ce &&
-            ((*ce)->request_method == coap_get_code(pdu)) &&
+            ((*ce)->request_method == coap_get_code_raw(pdu)) &&
             !nanocoap_cache_entry_is_stale(*ce, now)) {
             return true;
         }
@@ -1630,6 +1630,14 @@ ssize_t gcoap_req_send_tl(const uint8_t *buf, size_t len,
     return ((res > 0 || res == -ENOTCONN) ? res : 0);
 }
 
+static void _add_generated_observe_option(coap_pkt_t *pdu)
+{
+        /* generate initial notification value */
+        uint32_t now       = ztimer_now(ZTIMER_MSEC);
+        pdu->observe_value = (now >> GCOAP_OBS_TICK_EXPONENT) & 0xFFFFFF;
+        coap_opt_add_uint(pdu, COAP_OPT_OBSERVE, pdu->observe_value);
+}
+
 int gcoap_resp_init(coap_pkt_t *pdu, uint8_t *buf, size_t len, unsigned code)
 {
     int header_len = coap_build_reply(pdu, code, buf, len, 0);
@@ -1644,10 +1652,7 @@ int gcoap_resp_init(coap_pkt_t *pdu, uint8_t *buf, size_t len, unsigned code)
     pdu->payload_len = len - header_len;
 
     if (coap_get_observe(pdu) == COAP_OBS_REGISTER) {
-        /* generate initial notification value */
-        uint32_t now       = ztimer_now(ZTIMER_USEC);
-        pdu->observe_value = (now >> GCOAP_OBS_TICK_EXPONENT) & 0xFFFFFF;
-        coap_opt_add_uint(pdu, COAP_OPT_OBSERVE, pdu->observe_value);
+        _add_generated_observe_option(pdu);
     }
 
     return 0;
@@ -1672,9 +1677,7 @@ int gcoap_obs_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     if (hdrlen > 0) {
         coap_pkt_init(pdu, buf, len, hdrlen);
 
-        uint32_t now       = ztimer_now(ZTIMER_USEC);
-        pdu->observe_value = (now >> GCOAP_OBS_TICK_EXPONENT) & 0xFFFFFF;
-        coap_opt_add_uint(pdu, COAP_OPT_OBSERVE, pdu->observe_value);
+        _add_generated_observe_option(pdu);
 
         return GCOAP_OBS_INIT_OK;
     }

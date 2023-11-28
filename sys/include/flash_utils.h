@@ -207,7 +207,7 @@ void flash_puts(FLASH_ATTR const char *flash);
  * @param[in]   n       number of bytes to copy
  *
  */
-void * flash_memcpy(void *dest, FLASH_ATTR const char *src, size_t n);
+void * flash_memcpy(void *dest, FLASH_ATTR const void *src, size_t n);
 #elif !IS_ACTIVE(HAS_FLASH_UTILS_ARCH)
 #  define FLASH_ATTR
 #  define PRIsflash "s"

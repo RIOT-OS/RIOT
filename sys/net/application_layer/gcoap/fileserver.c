@@ -415,7 +415,7 @@ static ssize_t _delete_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 static ssize_t gcoap_fileserver_file_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                                              struct requestdata *request)
 {
-    switch (coap_get_code(pdu)) {
+    switch (coap_get_code_raw(pdu)) {
         case COAP_METHOD_GET:
             return _get_file(pdu, buf, len, request);
 #if IS_USED(MODULE_GCOAP_FILESERVER_PUT)
@@ -549,7 +549,7 @@ static ssize_t gcoap_fileserver_directory_handler(coap_pkt_t *pdu, uint8_t *buf,
                                                   struct requestdata *request,
                                                   const char *root, const char* resource_dir)
 {
-    switch (coap_get_code(pdu)) {
+    switch (coap_get_code_raw(pdu)) {
         case COAP_METHOD_GET:
             return _get_directory(pdu, buf, len, request, root, resource_dir);
 #if IS_USED(MODULE_GCOAP_FILESERVER_PUT)

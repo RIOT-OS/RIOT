@@ -4,6 +4,7 @@ DIRS += $(RIOTPKG)/lwext4/fs
 
 CFLAGS += -DCONFIG_USE_DEFAULT_CFG=1
 CFLAGS += -DCONFIG_HAVE_OWN_OFLAGS=0
+CFLAGS += -DCONFIG_DEBUG_PRINTF=0
 
 # select ext2/3/4 feature level based on module name
 ifneq (,$(filter lwext4_vfs,$(USEMODULE)))

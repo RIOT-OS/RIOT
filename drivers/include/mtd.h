@@ -73,6 +73,7 @@
 #ifndef MTD_H
 #define MTD_H
 
+#include <stddef.h>
 #include <stdint.h>
 
 #include "xfa.h"
@@ -161,7 +162,8 @@ mtd_dev_t * const mtd_dev_xfa[];
  * @param   dev     MTD device
  * @param   idx     Priority of the MTD device pointer within the XFA
  */
-#define MTD_XFA_ADD(dev, idx) XFA_CONST(mtd_dev_xfa, 0) mtd_dev_t *mtd ## idx = (mtd_dev_t *)&(dev)
+#define MTD_XFA_ADD(dev, idx) \
+    XFA_CONST(mtd_dev_xfa, idx) mtd_dev_t *mtd ## idx = (mtd_dev_t *)&(dev)
 
 /**
  * @brief   Number of MTDs defined in the MTD device array in XFA
@@ -204,8 +206,8 @@ struct mtd_desc {
      *
      * @param[in] dev  Pointer to the selected driver
      *
-     * @returns 0 on success
-     * @returns < 0 value in error
+     * @retval 0 on success
+     * @retval <0 value on error
      */
     int (*init)(mtd_dev_t *dev);
 
@@ -219,8 +221,8 @@ struct mtd_desc {
      * @param[in]  addr     Starting address
      * @param[in]  size     Number of bytes
      *
-     * @return 0 on success
-     * @return < 0 value on error
+     * @retval 0 on success
+     * @retval <0 value on error
      */
     int (*read)(mtd_dev_t *dev,
                 void *buff,
@@ -239,8 +241,8 @@ struct mtd_desc {
      * @param[in]  offset   Byte offset from the start of the page
      * @param[in]  size     Number of bytes
      *
-     * @return number of bytes read on success
-     * @return < 0 value on error
+     * @retval n number of bytes read on success
+     * @retval <0 value on error
      */
     int (*read_page)(mtd_dev_t *dev,
                      void *buff,
@@ -259,8 +261,8 @@ struct mtd_desc {
      * @param[in] addr      Starting address
      * @param[in] size      Number of bytes
      *
-     * @return 0 on success
-     * @return < 0 value on error
+     * @retval 0 on success
+     * @retval <0 value on error
      */
     int (*write)(mtd_dev_t *dev,
                  const void *buff,
@@ -279,8 +281,8 @@ struct mtd_desc {
      * @param[in]  offset   Byte offset from the start of the page
      * @param[in]  size     Number of bytes
      *
-     * @return bytes written on success
-     * @return < 0 value on error
+     * @retval n bytes written on success
+     * @retval <0 value on error
      */
     int (*write_page)(mtd_dev_t *dev,
                       const void *buff,
@@ -297,8 +299,8 @@ struct mtd_desc {
      * @param[in] addr      Starting address
      * @param[in] size      Number of bytes
      *
-     * @return 0 on success
-     * @return < 0 value on error
+     * @retval 0 on success
+     * @retval <0 value on error
      */
     int (*erase)(mtd_dev_t *dev,
                  uint32_t addr,
@@ -312,8 +314,8 @@ struct mtd_desc {
 
      * @param[in] count     Number of sectors to erase
      *
-     * @return 0 on success
-     * @return < 0 value on error
+     * @retval 0 on success
+     * @retval <0 value on error
      */
     int (*erase_sector)(mtd_dev_t *dev,
                         uint32_t sector,
@@ -325,8 +327,8 @@ struct mtd_desc {
      * @param[in] dev       Pointer to the selected driver
      * @param[in] power     Power state to apply (from @ref mtd_power_state)
      *
-     * @return 0 on success
-     * @return < 0 value on error
+     * @retval 0 on success
+     * @retval <0 value on error
      */
     int (*power)(mtd_dev_t *dev, enum mtd_power_state power);
 
@@ -341,7 +343,10 @@ struct mtd_desc {
  *
  * @param mtd the device to initialize
  *
- * @return
+ * @retval 0 on success
+ * @retval <0 on error probably errno
+ * @retval -ENODEV if no device if given or no driver is set
+ * @retval -ENOTSUP if device has no init function
  */
 int mtd_init(mtd_dev_t *mtd);
 
@@ -355,12 +360,12 @@ int mtd_init(mtd_dev_t *mtd);
  * @param[in]  addr  the start address to read from
  * @param[in]  count the number of bytes to read
  *
- * @return 0 on success
- * @return < 0 if an error occurred
- * @return -ENODEV if @p mtd is not a valid device
- * @return -ENOTSUP if operation is not supported on @p mtd
- * @return -EOVERFLOW if @p addr or @p count are not valid, i.e. outside memory
- * @return -EIO if I/O error occurred
+ * @retval 0 on success
+ * @retval <0 if an error occurred
+ * @retval -ENODEV if @p mtd is not a valid device
+ * @retval -ENOTSUP if operation is not supported on @p mtd
+ * @retval -EOVERFLOW if @p addr or @p count are not valid, i.e. outside memory
+ * @retval -EIO if I/O error occurred
  */
 int mtd_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t count);
 
@@ -376,12 +381,12 @@ int mtd_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t count);
  * @param[in]  offset   offset from the start of the page (in bytes)
  * @param[in]  size     the number of bytes to read
  *
- * @return number of bytes read on success
- * @return < 0 value on error
- * @return -ENODEV if @p mtd is not a valid device
- * @return -ENOTSUP if operation is not supported on @p mtd
- * @return -EOVERFLOW if @p addr or @p count are not valid, i.e. outside memory
- * @return -EIO if I/O error occurred
+ * @retval n number of bytes read on success
+ * @retval <0 value on error
+ * @retval -ENODEV if @p mtd is not a valid device
+ * @retval -ENOTSUP if operation is not supported on @p mtd
+ * @retval -EOVERFLOW if @p addr or @p count are not valid, i.e. outside memory
+ * @retval -EIO if I/O error occurred
  */
 int mtd_read_page(mtd_dev_t *mtd, void *dest, uint32_t page, uint32_t offset, uint32_t size);
 
@@ -398,14 +403,14 @@ int mtd_read_page(mtd_dev_t *mtd, void *dest, uint32_t page, uint32_t offset, ui
  * @param[in]  addr  the start address to write to
  * @param[in]  count the number of bytes to write
  *
- * @return 0 on success
- * @return < 0 if an error occurred
- * @return -ENODEV if @p mtd is not a valid device
- * @return -ENOTSUP if operation is not supported on @p mtd
- * @return -EOVERFLOW if @p addr or @p count are not valid, i.e. outside memory,
- * or overlapping two pages
- * @return -EIO if I/O error occurred
- * @return -EINVAL if parameters are invalid (invalid alignment for instance)
+ * @retval 0 on success
+ * @retval <0 if an error occurred
+ * @retval -ENODEV if @p mtd is not a valid device
+ * @retval -ENOTSUP if operation is not supported on @p mtd
+ * @retval -EOVERFLOW if @p addr or @p count are not valid, i.e. outside memory,
+ *                    or overlapping two pages
+ * @retval -EIO if I/O error occurred
+ * @retval -EINVAL if parameters are invalid (invalid alignment for instance)
  */
 int mtd_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t count);
 
@@ -425,13 +430,13 @@ int mtd_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t count);
  * @param[in]  offset   byte offset from the start of the page
  * @param[in]  size     the number of bytes to write
  *
- * @return number of bytes written on success
- * @return < 0 value on error
- * @return -ENODEV if @p mtd is not a valid device
- * @return -ENOTSUP if operation is not supported on @p mtd
- * @return -EOVERFLOW if @p addr or @p count are not valid, i.e. outside memory,
- * @return -EIO if I/O error occurred
- * @return -EINVAL if parameters are invalid
+ * @retval n number of bytes written on success
+ * @retval <0 value on error
+ * @retval -ENODEV if @p mtd is not a valid device
+ * @retval -ENOTSUP if operation is not supported on @p mtd
+ * @retval -EOVERFLOW if @p addr or @p count are not valid, i.e. outside memory,
+ * @retval -EIO if I/O error occurred
+ * @retval -EINVAL if parameters are invalid
  */
 int mtd_write_page_raw(mtd_dev_t *mtd, const void *src, uint32_t page,
                        uint32_t offset, uint32_t size);
@@ -455,13 +460,13 @@ int mtd_write_page_raw(mtd_dev_t *mtd, const void *src, uint32_t page,
  * @param[in]  offset   byte offset from the start of the page
  * @param[in]  size     the number of bytes to write
  *
- * @return number of bytes written on success
- * @return < 0 value on error
- * @return -ENODEV if @p mtd is not a valid device
- * @return -ENOTSUP if operation is not supported on @p mtd
- * @return -EOVERFLOW if @p addr or @p count are not valid, i.e. outside memory,
- * @return -EIO if I/O error occurred
- * @return -EINVAL if parameters are invalid
+ * @retval n number of bytes written on success
+ * @retval <0 value on error
+ * @retval -ENODEV if @p mtd is not a valid device
+ * @retval -ENOTSUP if operation is not supported on @p mtd
+ * @retval -EOVERFLOW if @p addr or @p count are not valid, i.e. outside memory,
+ * @retval -EIO if I/O error occurred
+ * @retval -EINVAL if parameters are invalid
  */
 int mtd_write_page(mtd_dev_t *mtd, const void *src, uint32_t page,
                    uint32_t offset, uint32_t size);
@@ -475,12 +480,12 @@ int mtd_write_page(mtd_dev_t *mtd, const void *src, uint32_t page,
  * @param[in]  addr  the address of the first sector to erase
  * @param[in]  count the number of bytes to erase
  *
- * @return 0 if erase successful
- * @return < 0 if an error occurred
- * @return -ENODEV if @p mtd is not a valid device
- * @return -ENOTSUP if operation is not supported on @p mtd
- * @return -EOVERFLOW if @p addr or @p count are not valid, i.e. outside memory
- * @return -EIO if I/O error occurred
+ * @retval 0 if erase successful
+ * @retval <0 if an error occurred
+ * @retval -ENODEV if @p mtd is not a valid device
+ * @retval -ENOTSUP if operation is not supported on @p mtd
+ * @retval -EOVERFLOW if @p addr or @p count are not valid, i.e. outside memory
+ * @retval -EIO if I/O error occurred
  */
 int mtd_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t count);
 
@@ -491,12 +496,12 @@ int mtd_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t count);
  * @param[in]  sector the first sector number to erase
  * @param[in]  num    the number of sectors to erase
  *
- * @return 0 if erase successful
- * @return < 0 if an error occurred
- * @return -ENODEV if @p mtd is not a valid device
- * @return -ENOTSUP if operation is not supported on @p mtd
- * @return -EOVERFLOW if @p addr or @p sector are not valid, i.e. outside memory
- * @return -EIO if I/O error occurred
+ * @retval 0 if erase successful
+ * @retval <0 if an error occurred
+ * @retval -ENODEV if @p mtd is not a valid device
+ * @retval -ENOTSUP if operation is not supported on @p mtd
+ * @retval -EOVERFLOW if @p addr or @p sector are not valid, i.e. outside memory
+ * @retval -EIO if I/O error occurred
  */
 int mtd_erase_sector(mtd_dev_t *mtd, uint32_t sector, uint32_t num);
 
@@ -506,13 +511,26 @@ int mtd_erase_sector(mtd_dev_t *mtd, uint32_t sector, uint32_t num);
  * @param      mtd   the device to access
  * @param[in]  power the power mode to set
  *
- * @return 0 if power mode successfully set
- * @return < 0 if an error occurred
- * @return -ENODEV if @p mtd is not a valid device
- * @return -ENOTSUP if operation or @p power state is not supported on @p mtd
- * @return -EIO if I/O error occurred
+ * @retval 0 if power mode successfully set
+ * @retval <0 if an error occurred
+ * @retval -ENODEV if @p mtd is not a valid device
+ * @retval -ENOTSUP if operation or @p power state is not supported on @p mtd
+ * @retval -EIO if I/O error occurred
  */
 int mtd_power(mtd_dev_t *mtd, enum mtd_power_state power);
+
+/**
+ * @brief   Get an MTD device by index
+ *
+ * @param[in] idx   Index of the MTD device
+ *
+ * @return  MTD_0 for @p idx 0 and so on
+ *          NULL if no MTD device exists for the given index
+ */
+static inline mtd_dev_t *mtd_dev_get(unsigned idx)
+{
+    return ((MTD_NUMOF != 0) && (idx < MTD_NUMOF)) ? mtd_dev_xfa[idx] : NULL;
+}
 
 #ifdef __cplusplus
 }

@@ -374,7 +374,7 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
     /* Auto-configure all MTD devices */
     if (CONFIG_USBUS_MSC_AUTO_MTD) {
         for (unsigned i = 0; i < MTD_NUMOF; i++) {
-            usbus_msc_add_lun(usbus, mtd_default_get_dev(i));
+            usbus_msc_add_lun(usbus, mtd_dev_get(i));
         }
     }
 }

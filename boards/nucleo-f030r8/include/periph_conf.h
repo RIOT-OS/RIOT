@@ -33,6 +33,7 @@
 
 #include "periph_cpu.h"
 #include "clk_conf.h"
+#include "cfg_i2c1_pb8_pb9.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -75,6 +75,17 @@ int adc_init(adc_t line)
     }
     /* reset configuration */
     ADC1->CFGR2 = 0;
+#if defined(ADC_CR_ADVREGEN)
+    /* calibrate ADC, per RM0454 section 14.3.3 */
+    /* 1. ensure ADEN=0, ADVREGEN=1, DMAEN=0 */
+    ADC1->CR |= ADC_CR_ADVREGEN;
+    ADC1->CR &= ~(ADC_CR_ADCAL | ADC_CR_ADEN );
+    ADC1->CFGR1 &= ~(ADC_CFGR1_DMAEN);
+    /* 2. Set ADCAL=1 */
+    ADC1->CR |= ADC_CR_ADCAL;
+    /* 3. Wait for ADCAL=0 (or EOCAL=1) */
+    while ((ADC1->ISR & ADC_ISR_EOCAL)) {}
+#endif
     /* enable device */
     ADC1->CR = ADC_CR_ADEN;
     /* configure sampling time to save value */

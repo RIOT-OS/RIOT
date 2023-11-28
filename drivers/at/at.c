@@ -6,6 +6,39 @@
  * directory for more details.
  */
 
+/* A note on URCs (Unsolicited Result Codes), regardless of whether URC handling
+ * is enabled or not.
+ *
+ * Some DCEs (Data Circuit-terminating Equipment, aka modem), like the LTE
+ * modules from uBlox define a grace period where URCs are guaranteed NOT to be
+ * sent as the time span between:
+ *  - the command EOL character reception AND command being internally accepted
+ *  - the EOL character of the last response line
+ *
+ * As follows, there is an indeterminate amount of time between:
+ *  - the command EOL character being sent
+ *  - the command EOL character reception AND command being internally accepted,
+ *    i.e. the begin of the grace period
+ *
+ * In other words, we can get a URC (or more?) just after issuing the command
+ * and before the first line of response. The net effect is that such URCs will
+ * appear to be the first line of response to the last issued command.
+ *
+ * The current solution is to skip characters that don't match the expected
+ * response, at the expense of losing these URCs. Note, we may already lose URCs
+ * when calling at_drain() just before any at_send_cmd(). Success partially
+ * depends on whether command echoing is enabled or not:
+ *  1. echo enabled: by observation, it seems that the grace period begins
+ *   BEFORE the echoed command. This has the advantage that we ALWAYS know what
+ *   the first line of response must look like and so if it doesn't, then it's a
+ *   URC. Thus, any procedure that calls at_send_cmd() will catch and discard
+ *   these URCs.
+ *  2. echo disabled: commands that expect a response (e.g. at_send_cmd_get_resp_wait_ok())
+ *   will catch and discard any URC (or, if MODULE_AT_URC enabled, hand it over
+ *   to the URC callbacks). For the rest, it is the application's responsibility
+ *   to handle it.
+ */
+
 #include <assert.h>
 #include <errno.h>
 #include <string.h>
@@ -30,6 +63,10 @@
 #define AT_EVENT_PRIO EVENT_PRIO_MEDIUM
 #elif defined(MODULE_AT_URC_ISR_HIGHEST)
 #define AT_EVENT_PRIO EVENT_PRIO_HIGHEST
+#endif
+
+#if defined(MODULE_AT_URC)
+static int _check_urc(clist_node_t *node, void *arg);
 #endif
 
 #if defined(MODULE_AT_URC_ISR)
@@ -62,8 +99,7 @@ int at_dev_init(at_dev_t *dev, uart_t uart, uint32_t baudrate, char *buf, size_t
 
     isrpipe_init(&dev->isrpipe, (uint8_t *)buf, bufsize);
 
-    return uart_init(uart, baudrate, _isrpipe_write_one_wrapper,
-                     dev);
+    return uart_init(uart, baudrate, _isrpipe_write_one_wrapper, dev);
 }
 
 int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout)
@@ -96,6 +132,15 @@ out:
     dev->awaiting_response = false;
 #endif
 
+    return res;
+}
+
+int at_wait_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout)
+{
+    int res;
+    do {
+        res = at_expect_bytes(dev, bytes, timeout);
+    } while (res != 0 && res != -ETIMEDOUT);
     return res;
 }
 
@@ -175,11 +220,12 @@ int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout)
     uart_write(dev->uart, (const uint8_t *)CONFIG_AT_SEND_EOL, AT_SEND_EOL_LEN);
 
     if (!IS_ACTIVE(CONFIG_AT_SEND_SKIP_ECHO)) {
-        if (at_expect_bytes(dev, command, timeout)) {
+        if (at_wait_bytes(dev, command, timeout)) {
             return -1;
         }
 
-        if (at_expect_bytes(dev, CONFIG_AT_SEND_EOL AT_RECV_EOL_1 AT_RECV_EOL_2, timeout)) {
+        if (at_expect_bytes(dev, CONFIG_AT_SEND_EOL AT_RECV_EOL_1 AT_RECV_EOL_2,
+                            timeout)) {
             return -2;
         }
     }
@@ -218,11 +264,7 @@ ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command,
         goto out;
     }
 
-    res = at_readline(dev, resp_buf, len, false, timeout);
-    if (res == 0) {
-        /* skip possible empty line */
-        res = at_readline(dev, resp_buf, len, false, timeout);
-    }
+    res = at_readline_skip_empty(dev, resp_buf, len, false, timeout);
 
 out:
     return res;
@@ -242,35 +284,35 @@ ssize_t at_send_cmd_get_resp_wait_ok(at_dev_t *dev, const char *command, const c
         goto out;
     }
 
-    res = at_readline(dev, resp_buf, len, false, timeout);
-    if (res == 0) {
-        /* skip possible empty line */
-        res = at_readline(dev, resp_buf, len, false, timeout);
-    }
+    /* URCs may occur right after the command has been sent and before the
+     * expected response */
+    do {
+        res = at_readline_skip_empty(dev, resp_buf, len, false, timeout);
 
-    /* Strip the expected prefix */
-    if (res > 0 && resp_prefix && *resp_prefix) {
-        size_t prefix_len = strlen(resp_prefix);
-        if (strncmp(resp_buf, resp_prefix, prefix_len) == 0) {
-            size_t remaining_len = strlen(resp_buf) - prefix_len;
-            /* The one extra byte in the copy is the terminating nul byte */
-            memmove(resp_buf, resp_buf + prefix_len, remaining_len + 1);
-            res -= prefix_len;
+        /* Strip the expected prefix */
+        if (res > 0 && resp_prefix && *resp_prefix) {
+            size_t prefix_len = strlen(resp_prefix);
+            if (strncmp(resp_buf, resp_prefix, prefix_len) == 0) {
+                size_t remaining_len = strlen(resp_buf) - prefix_len;
+                /* The one extra byte in the copy is the terminating nul byte */
+                memmove(resp_buf, resp_buf + prefix_len, remaining_len + 1);
+                res -= prefix_len;
+                break;
+            }
         }
-    }
+    } while (res >= 0);
 
     /* wait for OK */
     if (res >= 0) {
-        res_ok = at_readline(dev, ok_buf, sizeof(ok_buf), false, timeout);
-        if (res_ok == 0) {
-            /* skip possible empty line */
-            res_ok = at_readline(dev, ok_buf, sizeof(ok_buf), false, timeout);
+        res_ok = at_readline_skip_empty(dev, ok_buf, sizeof(ok_buf), false, timeout);
+        if (res_ok < 0) {
+            return -1;
         }
         ssize_t len_ok = sizeof(CONFIG_AT_RECV_OK) - 1;
         if ((len_ok != 0) && (strcmp(ok_buf, CONFIG_AT_RECV_OK) == 0)) {
         }
         else {
-            /* Something else then OK */
+            /* Something else than OK */
             res = -1;
         }
     }
@@ -295,8 +337,6 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command,
         goto out;
     }
 
-    /* only clear the response buffer after sending the command,
-     * so the same buffer can be used for command and response */
     memset(resp_buf, '\0', len);
 
     while (1) {
@@ -358,19 +398,16 @@ int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout
     uart_write(dev->uart, (const uint8_t *)command, cmdlen);
     uart_write(dev->uart, (const uint8_t *)CONFIG_AT_SEND_EOL, AT_SEND_EOL_LEN);
 
-    if (at_expect_bytes(dev, command, timeout)) {
-        return -1;
+    if (!IS_ACTIVE(CONFIG_AT_SEND_SKIP_ECHO)) {
+        if (at_wait_bytes(dev, command, timeout)) {
+            return -1;
+        }
+        if (at_expect_bytes(dev, CONFIG_AT_SEND_EOL, timeout)) {
+            return -2;
+        }
     }
 
-    if (at_expect_bytes(dev, CONFIG_AT_SEND_EOL AT_RECV_EOL_2, timeout)) {
-        return -2;
-    }
-
-    if (at_expect_bytes(dev, ">", timeout)) {
-        return -3;
-    }
-
-    return 0;
+    return at_wait_bytes(dev, ">", timeout);
 }
 
 int at_send_cmd_wait_ok(at_dev_t *dev, const char *command, uint32_t timeout)
@@ -378,16 +415,31 @@ int at_send_cmd_wait_ok(at_dev_t *dev, const char *command, uint32_t timeout)
     int res;
     char resp_buf[64];
 
-    res = at_send_cmd_get_resp(dev, command, resp_buf, sizeof(resp_buf), timeout);
+    res = at_send_cmd_get_resp(dev, command, resp_buf, sizeof(resp_buf),
+                               timeout);
 
-    if (res > 0) {
-        ssize_t len_ok = sizeof(CONFIG_AT_RECV_OK) - 1;
-        if ((len_ok != 0) && (strcmp(resp_buf, CONFIG_AT_RECV_OK) == 0)) {
-            res = 0;
+    size_t const len_ok = sizeof(CONFIG_AT_RECV_OK) - 1;
+    size_t const len_err = sizeof(CONFIG_AT_RECV_ERROR) - 1;
+    size_t const len_cme_cms = sizeof("+CME ERROR:") - 1;
+
+    while (res >= 0) {
+        if (strncmp(resp_buf, CONFIG_AT_RECV_OK, len_ok) == 0) {
+            return 0;
         }
-        else {
-            res = -1;
+        else if (strncmp(resp_buf, CONFIG_AT_RECV_ERROR, len_err) == 0) {
+            return -1;
         }
+        else if (strncmp(resp_buf, "+CME ERROR:", len_cme_cms) == 0) {
+            return -2;
+        }
+        else if (strncmp(resp_buf, "+CMS ERROR:", len_cme_cms) == 0) {
+            return -2;
+        }
+        /* probably a sneaky URC */
+#ifdef MODULE_AT_URC
+        clist_foreach(&dev->urc_list, _check_urc, resp_buf);
+#endif
+        res = at_readline_skip_empty(dev, resp_buf, sizeof(resp_buf), false, timeout);
     }
 
     return res;
@@ -441,6 +493,17 @@ out:
 
     if (res < 0) {
         *resp_buf = '\0';
+    }
+    return res;
+}
+
+ssize_t at_readline_skip_empty(at_dev_t *dev, char *resp_buf, size_t len,
+                               bool keep_eol, uint32_t timeout)
+{
+    ssize_t res = at_readline(dev, resp_buf, len, keep_eol, timeout);
+    if (res == 0) {
+        /* skip possible empty line */
+        res = at_readline(dev, resp_buf, len, keep_eol, timeout);
     }
     return res;
 }
