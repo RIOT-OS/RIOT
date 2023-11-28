@@ -76,13 +76,13 @@ static void tests_rbpf_run1(void)
         .words = sizeof(wrap_around_data)/2,
     };
     rbpf_application_t rbpf;
-    rbpf_mem_region_t region;
+    rbpf_memory_region_permission_t region;
     rbpf_application_setup(&rbpf, _rbpf_stack,
         (void*)fletcher32_rbpf_bin, sizeof(fletcher32_rbpf_bin));
 
-    rbpf_memory_region_init(&region,
+    rbpf_memory_region_permission_init(&region,
                    (void*)wrap_around_data, sizeof(wrap_around_data), RBPF_MEM_REGION_READ);
-    rbpf_add_region(&rbpf, &region);
+    rbpf_add_memory_region_permission(&rbpf, &region);
     int64_t result = 0;
     int res = rbpf_application_run_ctx(&rbpf, &ctx, sizeof(ctx), &result);
 
