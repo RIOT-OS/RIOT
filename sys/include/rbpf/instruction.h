@@ -183,6 +183,10 @@ extern "C" {
 #define BPF_INSTRUCTION_CALL        (0x85)
 #define BPF_INSTRUCTION_RETURN      (0x95)
 
+#define BPF_REG_NUM                 (11) /**< Number of registers available in BPF */
+#define BPF_REG_RETURN_ARGUMENT     (0)  /**< Register used for call return argument */
+#define BPF_REG_CONTEXT             (1)  /**< Register used for storing the VM context */
+#define BPF_REG_STACK_PTR           (10) /**< Register used as read-only stack pointer */
 /**
  * @brief eBPF instruction format
  *
