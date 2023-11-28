@@ -34,7 +34,7 @@ int rbpf_application_run_ctx_name_function(rbpf_application_t *rbpf, const char 
 
 int rbpf_application_run_ctx_idx_function(rbpf_application_t *rbpf, size_t func_idx, void *ctx, size_t ctx_size, int64_t *result)
 {
-    rbpf_memory_region_init(&rbpf->arg_region, ctx, ctx_size,
+    rbpf_memory_region_permission_init(&rbpf->arg_region_permission, ctx, ctx_size,
                             RBPF_MEM_REGION_READ | RBPF_MEM_REGION_WRITE);
 
     assert(rbpf->flags & RBPF_FLAG_SETUP_DONE);
@@ -52,30 +52,30 @@ int rbpf_application_setup(rbpf_application_t *rbpf, uint8_t *stack,
     rbpf->application = application;
     rbpf->application_len = application_len;
 
-    rbpf_memory_region_init(&rbpf->stack_region,
+    rbpf_memory_region_permission_init(&rbpf->stack_region_permission,
                             rbpf->stack,
                             RBPF_STACK_SIZE,
                             RBPF_MEM_REGION_READ | RBPF_MEM_REGION_WRITE);
 
-    rbpf_memory_region_init(&rbpf->data_region, rbpf_application_data(rbpf),
+    rbpf_memory_region_permission_init(&rbpf->data_region_permission, rbpf_application_data(rbpf),
                             rbpf_application_data_len(
                                 rbpf), RBPF_MEM_REGION_READ | RBPF_MEM_REGION_WRITE);
-    rbpf_memory_region_init(&rbpf->rodata_region, rbpf_application_rodata(rbpf),
+    rbpf_memory_region_permission_init(&rbpf->rodata_region_permission, rbpf_application_rodata(rbpf),
                             rbpf_application_rodata_len(rbpf), RBPF_MEM_REGION_READ);
 
     /* Manually build the linked list of regions */
-    rbpf->stack_region.next = &rbpf->data_region;
-    rbpf->data_region.next = &rbpf->rodata_region;
-    rbpf->rodata_region.next = &rbpf->arg_region;
+    rbpf->stack_region_permission.next = &rbpf->data_region_permission;
+    rbpf->data_region_permission.next = &rbpf->rodata_region_permission;
+    rbpf->rodata_region_permission.next = &rbpf->arg_region_permission;
 
     rbpf->flags |= RBPF_FLAG_SETUP_DONE;
     return 0;
 }
 
-void rbpf_add_region(rbpf_application_t *rbpf, rbpf_mem_region_t *region)
+void rbpf_add_memory_region_permission(rbpf_application_t *rbpf, rbpf_memory_region_permission_t *region)
 {
-    region->next = rbpf->arg_region.next;
-    rbpf->arg_region.next = region;
+    region->next = rbpf->arg_region_permission.next;
+    rbpf->arg_region_permission.next = region;
 }
 
 ssize_t rbpf_application_function_by_name(const rbpf_application_t *rbpf, const char *name)

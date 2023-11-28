@@ -76,15 +76,15 @@
  * ```
  * uint8_t buf[BUF_LEN];
  *
- * rbpf_mem_region_t region;
- * rbpf_memory_region_init(
+ * rbpf_memory_region_permission_t region;
+ * rbpf_memory_region_permission_init(
  *     &region,
  *     buf,
  *     BUF_LEN,
  *     RBPF_MEM_REGION_READ | RBPF_MEM_REGION_WRITE
  * );
  *
- * rbpf_add_region(&rbpf_application, &region);
+ * rbpf_add_region_permission(&rbpf_application, &region);
  * ```
  *
  * The rbpf engine itself ensures correct memory permissions to the application
@@ -186,7 +186,7 @@ enum {
 /**
  * @brief Forward declaration of the memory region
  */
-typedef struct rbpf_mem_region rbpf_mem_region_t;
+typedef struct rbpf_memory_region_permission rbpf_memory_region_permission_t;
 
 /**
  * @name Memory permission flags
@@ -202,8 +202,8 @@ typedef struct rbpf_mem_region rbpf_mem_region_t;
  *
  * Defines the permissions on memory regions. Default permission is reject.
  */
-struct rbpf_mem_region {
-    rbpf_mem_region_t *next;    /**< Linked list ptr */
+struct rbpf_memory_region_permission {
+    rbpf_memory_region_permission_t *next;    /**< Linked list ptr */
     const uint8_t *start;       /**< Start address */
     size_t len;                 /**< Length of the region in bytes */
     uint8_t flags;              /**< Permission flags */
@@ -222,10 +222,22 @@ struct rbpf_mem_region {
  * @brief rBPF application
  */
 typedef struct {
-    rbpf_mem_region_t stack_region;     /**< Memory permission region for the stack */
-    rbpf_mem_region_t rodata_region;    /**< Memory permissions for the application read-only data */
-    rbpf_mem_region_t data_region;      /**< Memory permissions for the application data region */
-    rbpf_mem_region_t arg_region;       /**< Memory region for the caller-supplied arguments */
+    rbpf_memory_region_permission_t stack_region_permission;     /**< Memory permission region for the stack */
+
+    /**
+     * @brief Memory permissions for the application read-only data
+     */
+    rbpf_memory_region_permission_t rodata_region_permission;
+
+    /**
+     * @brief Memory permissions for the application data region
+     */
+    rbpf_memory_region_permission_t data_region_permission;
+
+    /**
+     * @brief Memory region for the caller-supplied arguments
+     */
+    rbpf_memory_region_permission_t arg_region_permission;
     const void *application;            /**< Application header */
     size_t application_len;             /**< Application length */
     uint8_t *stack;                     /**< VM stack, must be  and aligned */
@@ -301,7 +313,7 @@ int rbpf_application_run_ctx_name_function(rbpf_application_t *rbpf, const char 
  * @param   len     Length of the region
  * @param   flags   Permission flags
  */
-static inline void rbpf_memory_region_init(rbpf_mem_region_t *region, void *start, size_t len,
+static inline void rbpf_memory_region_permission_init(rbpf_memory_region_permission_t *region, void *start, size_t len,
                                            uint8_t flags)
 {
     region->start = start;
@@ -315,7 +327,7 @@ static inline void rbpf_memory_region_init(rbpf_mem_region_t *region, void *star
  * @param   rbpf    The Application to add the memory region for
  * @param   region  The memory region to add
  */
-void rbpf_add_region(rbpf_application_t *rbpf, rbpf_mem_region_t *region);
+void rbpf_add_memory_region_permission(rbpf_application_t *rbpf, rbpf_memory_region_permission_t *region);
 
 /**
  * @brief   Check if a store operation is allowed by the virtual machine with an address and size
@@ -383,7 +395,7 @@ static inline void *rbpf_application_data(const rbpf_application_t *rbpf)
 {
     const rbpf_header_t *header = rbpf_header(rbpf);
 
-    return (uint8_t *)header + sizeof(rbpf_application_t);
+    return (uint8_t *)header + sizeof(rbpf_header_t);
 }
 
 /**
