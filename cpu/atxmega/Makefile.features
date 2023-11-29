@@ -12,9 +12,3 @@ FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
 FEATURES_PROVIDED += periph_nvm
 FEATURES_PROVIDED += periph_timer periph_timer_periodic
-
-# Add atxmega configurations. This configuration enables modules that are only available when
-# using Kconfig module modelling
-ifeq (1, $(TEST_KCONFIG))
-  KCONFIG_CPU_CONFIG += $(RIOTCPU)/atxmega/atxmega.config
-endif
