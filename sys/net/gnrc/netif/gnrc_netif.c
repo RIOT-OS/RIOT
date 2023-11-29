@@ -1952,7 +1952,7 @@ static void *_gnrc_netif_thread(void *args)
     /* signal that driver init is done */
     mutex_unlock(&ctx->init_done);
     if (ctx->result < 0) {
-        LOG_ERROR("gnrc_netif: init failed: %d\n", ctx->result);
+        LOG_ERROR("gnrc_netif: init %u failed: %d\n", thread_getpid(), ctx->result);
         return NULL;
     }
 #ifdef MODULE_NETSTATS_L2
