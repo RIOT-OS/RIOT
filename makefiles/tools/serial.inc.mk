@@ -43,8 +43,9 @@ endif
 
 RIOT_TERMINAL ?= pyterm
 ifeq ($(RIOT_TERMINAL),pyterm)
+  PYTERMSESSION ?= $(shell date +%Y-%m-%d_%H.%M.%S)-$(APPLICATION)-$(BOARD)
   TERMPROG  ?= $(RIOTTOOLS)/pyterm/pyterm
-  TERMFLAGS ?= -p "$(PORT)" -b "$(BAUD)" $(PYTERMFLAGS)
+  TERMFLAGS ?= -p "$(PORT)" -b "$(BAUD)" -rn "$(PYTERMSESSION)" $(PYTERMFLAGS)
 else ifeq ($(RIOT_TERMINAL),socat)
   SOCAT_OUTPUT ?= -
   TERMPROG ?= $(RIOT_TERMINAL)
