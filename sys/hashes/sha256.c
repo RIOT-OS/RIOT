@@ -68,20 +68,14 @@ void sha256_init(sha256_context_t *ctx)
     ctx->state[7] = 0x5BE0CD19;
 }
 
-void *sha256(const void *data, size_t len, void *digest)
+void sha256(const void *data, size_t len, void *digest)
 {
     sha256_context_t c;
-    static unsigned char m[SHA256_DIGEST_LENGTH];
-
-    if (digest == NULL) {
-        digest = m;
-    }
+    assert(digest);
 
     sha256_init(&c);
     sha2xx_update(&c, data, len);
     sha256_final(&c, digest);
-
-    return digest;
 }
 
 void hmac_sha256_init(hmac_context_t *ctx, const void *key, size_t key_length)
@@ -135,19 +129,13 @@ void hmac_sha256_final(hmac_context_t *ctx, void *digest)
 {
     unsigned char tmp[SHA256_DIGEST_LENGTH];
 
-    static unsigned char m[SHA256_DIGEST_LENGTH];
-
-    if (digest == NULL) {
-        digest = m;
-    }
-
     sha256_final(&ctx->c_in, tmp);
     sha2xx_update(&ctx->c_out, tmp, SHA256_DIGEST_LENGTH);
     sha256_final(&ctx->c_out, digest);
 }
 
-const void *hmac_sha256(const void *key, size_t key_length,
-                        const void *data, size_t len, void *digest)
+void hmac_sha256(const void *key, size_t key_length,
+                 const void *data, size_t len, void *digest)
 {
 
     hmac_context_t ctx;
@@ -155,8 +143,6 @@ const void *hmac_sha256(const void *key, size_t key_length,
     hmac_sha256_init(&ctx, key, key_length);
     hmac_sha256_update(&ctx,data, len);
     hmac_sha256_final(&ctx, digest);
-
-    return digest;
 }
 
 /**
