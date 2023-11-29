@@ -11,18 +11,18 @@
 
 /boards/common/atxmega/                     @nandojve
 /boards/common/esp*/                        @gschorcht
-/boards/common/nrf*/                        @aabadie @haukepetersen
+/boards/common/nrf*/                        @aabadie
 /boards/common/nucleo*/                     @aabadie
 /boards/common/silabs/                      @basilfx
 /boards/common/slwstk6000b/                 @basilfx
-/boards/common/stm32/                       @aabadie @fjmolinas
+/boards/common/stm32/                       @aabadie
 /boards/e180-zg120b-tb/                     @basilfx
 /boards/esp*/                               @gschorcht @yegorich
 /boards/hamilton/                           @Hyungsin
 /boards/ikea-tradfri/                       @basilfx
 /boards/lobaro-lorabox/                     @leandrolanzieri
-/boards/nrf*/                               @aabadie @haukepetersen
-/boards/nucleo*/                            @aabadie @fjmolinas
+/boards/nrf*/                               @aabadie
+/boards/nucleo*/                            @aabadie
 /boards/phynode-kw41z/                      @jia200x
 /boards/sam*-xpro/                          @dylad
 /boards/same54-xpro/                        @benpicco
@@ -43,25 +43,20 @@
 /cpu/avr8_common/                           @kYc0o @maribu @nandojve
 /cpu/atmega*/                               @kYc0o @maribu
 /cpu/atxmega/                               @nandojve
-/cpu/cc2538/                                @hexluthor @smlng @fjmolinas
-/cpu/cc26x0/                                @hexluthor @smlng
-/cpu/cc26x2_cc13x2/                         @hexluthor @smlng
-/cpu/cc26xx_cc13xx/                         @hexluthor @smlng
 /cpu/cortexm_common/                        @kaspar030 @bergzand
 /cpu/efm32/                                 @basilfx
 /cpu/esp*/                                  @gschorcht
 /cpu/fe310/                                 @aabadie @kaspar030 @bergzand
-/cpu/kinetis/                               @fjmolinas
 /cpu/lpc2387/                               @benpicco @maribu
 /cpu/msp430*/                               @kaspar030 @gschorcht
-/cpu/nrf*/                                  @aabadie @haukepetersen
-/cpu/nrf52/radio/nrf802154/                 @bergzand @SemjonKerner @jia200x
+/cpu/nrf*/                                  @aabadie
+/cpu/nrf52/radio/nrf802154/                 @bergzand @jia200x
 /cpu/sam0_common/                           @benpicco @dylad @keestux
 /cpu/samd21/                                @dylad @biboc
 /cpu/samd5x/                                @benpicco @dylad
 /cpu/saml1x/                                @dylad
 /cpu/saml21/                                @dylad
-/cpu/stm32*/                                @aabadie @fjmolinas @DipSwitch @vincent-d
+/cpu/stm32*/                                @aabadie @vincent-d
 /cpu/stm32/periph/eth*                      @maribu
 /cpu/stm32/periph/ptp.c                     @maribu
 
@@ -73,13 +68,12 @@
 /drivers/ad7746/                            @leandrolanzieri
 /drivers/at24mac/                           @benpicco
 /drivers/at86rf215/                         @benpicco
-/drivers/at86rf2xx/                         @daniel-k @Hyungsin @jia200x @smlng @miri64
+/drivers/at86rf2xx/                         @daniel-k @Hyungsin @jia200x @miri64
 /drivers/bh1900nux/                         @wosym
 /drivers/bq2429x/                           @jeandudey
 /drivers/cc110x/                            @maribu
 /drivers/cc1xxx_common/                     @maribu
 /drivers/ccs811/                            @gschorcht
-/drivers/enc28j60/                          @haukepetersen
 /drivers/dcf77/                             @daexel
 /drivers/dht/                               @wosym
 /drivers/dose/                              @jue89
@@ -93,7 +87,7 @@
 /drivers/slipdev/                           @miri64
 /drivers/sx127x/                            @aabadie @jia200x
 /drivers/ws281x/                            @maribu
-/drivers/xbee/                              @haukepetersen @miri64
+/drivers/xbee/                              @miri64
 /drivers/include/periph/                    @MrKevinWeiss
 /drivers/periph_common/                     @MrKevinWeiss
 /drivers/include/periph/ptp.h               @maribu
@@ -117,8 +111,8 @@
 /sys/event/                                 @kaspar030
 /sys/evtimer/                               @kaspar030
 /sys/fmt/                                   @kaspar030
-/sys/net/application_layer/gcoap/           @haukepetersen @kb2ma @chrysn
-/sys/net/application_layer/nanocoap/        @kaspar030 @haukepetersen @kb2ma @chrysn
+/sys/net/application_layer/gcoap/           @chrysn
+/sys/net/application_layer/nanocoap/        @kaspar030 @chrysn
 /sys/include/net/sock*                      @maribu
 /sys/net/netif/                             @miri64 @jia200x
 /sys/net/gnrc/network_layer/                @miri64
@@ -126,12 +120,12 @@
 /sys/net/gnrc/transport_layer/udp/          @miri64
 /sys/net/gnrc/link_layer/lorawan/           @jia200x
 /sys/net/gnrc/netif/                        @miri64 @jia200x
-/sys/net/gnrc/routing/rpl/                  @cgundogan @emmanuelsearch
-/sys/net/                                   @miri64 @haukepetersen @PeterKietzmann @cgundogan
+/sys/net/gnrc/routing/rpl/                  @emmanuelsearch
+/sys/net/                                   @miri64 @PeterKietzmann
 /sys/pm_layered/                            @kaspar030
 /sys/random/fortuna/                        @basilfx
-/sys/riotboot/                              @kaspar030 @fjmolinas
-/sys/suit                                   @kaspar030 @fjmolinas @bergzand
+/sys/riotboot/                              @kaspar030
+/sys/suit                                   @kaspar030 @bergzand
 /sys/tsrb/                                  @kaspar030
 /sys/usb/                                   @bergzand @dylad @aabadie
 /sys/xtimer/                                @kaspar030 @MichelRottleuthner
@@ -140,7 +134,7 @@
 /sys/include/ztimer/                        @kaspar030 @bergzand
 /sys/ztimer/                                @kaspar030 @bergzand
 
-/tests/                                     @smlng @leandrolanzieri @aabadie @MichelRottleuthner @fjmolinas
+/tests/                                     @leandrolanzieri @aabadie @MichelRottleuthner
 /tests/drivers/candev/                      @wosym
 /tests/drivers/bq2429x/                     @jeandudey
 /tests/drivers/dht/                         @wosym
