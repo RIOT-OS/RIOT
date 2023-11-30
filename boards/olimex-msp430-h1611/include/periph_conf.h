@@ -35,6 +35,10 @@ extern "C" {
  * @brief   Clock configuration
  */
 static const msp430_clock_params_t clock_params = {
+    /* Without an external resistor, the DCO frequency typically tops out
+     * at something like 5 MHz. However, the DCO calibration just picks the
+     * closet possible value, in this case it will go for the highest frequency
+     * the silicon at hand can run at. */
     .target_dco_frequency = MHZ(8),
     .lfxt1_frequency = 32768,
     .main_clock_source = MAIN_CLOCK_SOURCE_DCOCLK,
