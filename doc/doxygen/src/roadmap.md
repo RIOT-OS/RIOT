@@ -28,13 +28,13 @@ The text and items below are tentative, up for discussion, to be updated by regu
 # Power Modes 
 (contact/steering: [Hauke](https://github.com/haukepetersen))
 
-1. ~~RFC from @gebart for arbitrary freq for xtimer~~ done
-1. ~~prototype LPM concept from Kaspar, demoed on PLACE-HOLDER hardware. Basic idea is to define unified/simplified layered LP modes that apply to 99% of IoT hardware. More optimized board-specific LPM would~~ prototype done
-1. implement PM interface for existing platforms (-> https://github.com/RIOT-OS/RIOT/issues/6802)
-1. xtimer use of RTT low-power timer
-1. concept to fix shell usage issue while LPM activated
-1. integrate generic power management functions in device driver APIs (netdev, SAUL, ...)
-1. more advanced LPM concepts:
+1. ~~RFC from \@gebart for arbitrary freq for xtimer~~ done
+2. ~~prototype LPM concept from Kaspar, demoed on PLACE-HOLDER hardware. Basic idea is to define unified/simplified layered LP modes that apply to 99% of IoT hardware. More optimized board-specific LPM would~~ prototype done
+3. implement PM interface for existing platforms (-> https://github.com/RIOT-OS/RIOT/issues/6802)
+4. xtimer use of RTT low-power timer
+5. concept to fix shell usage issue while LPM activated
+6. integrate generic power management functions in device driver APIs (netdev, SAUL, ...)
+7. more advanced LPM concepts:
   - potentially get rid of idle thread
   - sleeping for short periods (in cases where it is not feasible to switch to the idle thread and back) -> mitigate active waiting
 
@@ -44,9 +44,9 @@ The text and items below are tentative, up for discussion, to be updated by regu
 (contact/steering: [Hauke](https://github.com/haukepetersen))
 
 1. remodeling  of the `periph/i2c.h` interface and subsequent adaption/rewrite of all existing implementations (-> https://github.com/RIOT-OS/RIOT/issues/6577)
-1. cleanup and unification of low-level timer interfaces (`timer`, `rtt`, `rtc`)
-1. introduction of `spi_slave` interface
-1. introduction of `i2c_slave` interface
+2. cleanup and unification of low-level timer interfaces (`timer`, `rtt`, `rtc`)
+3. introduction of `spi_slave` interface
+4. introduction of `i2c_slave` interface
 
 
 
@@ -64,10 +64,10 @@ The text and items below are tentative, up for discussion, to be updated by regu
 # Documentation 
 (contact/steering: [Emmanuel](https://github.com/emmanuelsearch))
 
-0. ~~publish roadmap~~ done
-1. ~~Introduce RIOT Developer Memos~~ done, see [RDM0](https://github.com/RIOT-OS/RIOT/tree/master/doc/memos)
-2. Write and publish more RDMs
-3. revamp RIOT website (see [Web Revamp Task Force](https://github.com/RIOT-OS/RIOT/wiki/Website-Revamp-Task-Force))
+1. ~~publish roadmap~~ done
+2. ~~Introduce RIOT Developer Memos~~ done, see [RDM0](https://github.com/RIOT-OS/RIOT/tree/master/doc/memos)
+3. Write and publish more RDMs
+4. revamp RIOT website (see [Web Revamp Task Force](https://github.com/RIOT-OS/RIOT/wiki/Website-Revamp-Task-Force))
 
 
 
@@ -94,7 +94,7 @@ The text and items below are tentative, up for discussion, to be updated by regu
 # Security
 (contact/steering: [Kaspar](https://github.com/kaspar030))
 
-0. RNG unified (secure, or basic), seeding
-1. easy TinyDTLS integration in sock, with CoAP etc.
-3. RIOT default configuration = secure configuration (that's our goal/motto)
-4. 802.15.4 link layer security (gaps in RFCs? How to update keys?)
+1. RNG unified (secure, or basic), seeding
+2. easy TinyDTLS integration in sock, with CoAP etc.
+4. RIOT default configuration = secure configuration (that's our goal/motto)
+5. 802.15.4 link layer security (gaps in RFCs? How to update keys?)
