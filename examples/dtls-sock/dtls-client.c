@@ -151,11 +151,10 @@ static int client_send(char *addr_str, char *data, size_t datalen)
     else {
         printf("Sent DTLS message\n");
 
-        uint8_t rcv[512];
-        if ((res = sock_dtls_recv(&dtls_sock, &session, rcv, sizeof(rcv),
+        if ((res = sock_dtls_recv(&dtls_sock, &session, buf, sizeof(buf),
                                     SOCK_NO_TIMEOUT)) >= 0) {
             printf("Received %" PRIdSIZE " bytes: \"%.*s\"\n", res, (int)res,
-                   (char *)rcv);
+                   (char *)buf);
         }
     }
 
