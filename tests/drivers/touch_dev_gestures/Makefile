@@ -1,4 +1,4 @@
-BOARD ?= stm32f746-disco
+BOARD ?= stm32f746g-disco
 include ../Makefile.drivers_common
 
 DISABLE_MODULE += test_utils_interactive_sync
