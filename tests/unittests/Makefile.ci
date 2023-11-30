@@ -1,23 +1,17 @@
 BOARD_INSUFFICIENT_MEMORY := \
     airfy-beacon \
-    arduino-mkr1000 \
-    arduino-mkrfox1200 \
-    arduino-mkrwan1300 \
-    arduino-mkrzero \
     arduino-zero \
-    atmega256rfr2-xpro \
     avsextrem \
     b-l072z-lrwan1 \
     blackpill-stm32f103c8 \
-    blackpill-stm32f103cb \
     bluepill-stm32f030c8 \
     bluepill-stm32f103c8 \
-    bluepill-stm32f103cb \
     calliope-mini \
     cc1312-launchpad \
     cc1350-launchpad \
     cc1352-launchpad \
     cc1352p-launchpad \
+    cc2538dk \
     cc2650-launchpad \
     cc2650stk \
     e104-bt5010a-tb \
@@ -27,7 +21,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     esp8266-esp-12x \
     esp8266-olimex-mod \
     esp8266-sparkfun-thing \
-    feather-m0 \
+    firefly \
     frdm-kl43z \
     hamilton \
     hifive1 \
@@ -40,6 +34,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     lora-e5-dev \
     lsn50 \
     maple-mini \
+    mbed_lpc1768 \
     mcb2388 \
     microbit \
     msb-430 \
@@ -74,9 +69,14 @@ BOARD_INSUFFICIENT_MEMORY := \
     olimex-msp430-h1611 \
     olimex-msp430-h2618 \
     olimexino-stm32 \
+    omote \
     opencm904 \
     openlabs-kw41z-mini-256kib \
+    openmote-b \
+    openmote-cc2538 \
     pba-d-01-kw2x \
+    remote-pa \
+    remote-reva \
     samd10-xmini \
     samd20-xpro \
     samd21-xpro \
@@ -86,20 +86,12 @@ BOARD_INSUFFICIENT_MEMORY := \
     samr21-xpro \
     samr30-xpro \
     samr34-xpro \
-    seeedstudio-gd32 \
-    sensebox_samd21 \
-    sipeed-longan-nano \
-    sipeed-longan-nano-tft \
+    seeeduino_arch-pro \
     slstk3400a \
     slstk3401a \
     sltb001a \
     slwstk6000b-slwrb4150a \
     slwstk6220a \
-    sodaq-autonomo \
-    sodaq-explorer \
-    sodaq-one \
-    sodaq-sara-aff \
-    sodaq-sara-sff \
     spark-core \
     stk3200 \
     stk3600 \
@@ -112,9 +104,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32mp157c-dk2 \
     teensy31 \
     telosb \
-    weact-f401cc \
-    yarm \
     yunjia-nrf51822 \
     z1 \
-    zigduino \
     #
