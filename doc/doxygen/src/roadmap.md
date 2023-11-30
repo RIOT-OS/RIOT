@@ -97,4 +97,18 @@ The text and items below are tentative, up for discussion, to be updated by regu
 1. RNG unified (secure, or basic), seeding
 2. easy TinyDTLS integration in sock, with CoAP etc.
 4. RIOT default configuration = secure configuration (that's our goal/motto)
-5. 802.15.4 link layer security (gaps in RFCs? How to update keys?)
+
+
+## 802.15.4 link layer security
+(contact/steering: [chrysn](https://github.com/chrysn))
+
+Current status: RIOT supports application provided keys,
+with no guidance on how to (and no practical ways to) use that securely
+(see [CVE-2021-41061](https://nvd.nist.gov/vuln/detail/CVE-2021-41061)).
+
+Goal: Usably secure defaults.
+
+1. Figure out applicability of [RFC9031](https://www.rfc-editor.org/rfc/rfc9031) ("CoJP") to non-6TiSCH scenarios.
+2. Implement RFC9031 with any extensions needed for the MACs RIOT has.
+3. Provide tools to set up a recommended JRC, and to provision keys between it and the device at flash time.
+   This may entail extensions to the build process, as CoJP requires per-device secrets.
