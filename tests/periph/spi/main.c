@@ -44,6 +44,17 @@
 #define DEFAULT_SPI_CS_PIN 0
 #endif
 
+#ifndef ENABLE_BENCHMARK
+#define ENABLE_BENCHMARK 0
+#endif
+
+#ifndef LOW_MEMORY
+#define LOW_MEMORY 0
+#endif
+
+#define BUF_SIZE                (128U)
+
+#if ENABLE_BENCHMARK
 /**
  * @brief   Some parameters used for benchmarking
  */
@@ -53,8 +64,6 @@
 #define BENCH_PAYLOAD           ('b')
 #define BENCH_REGADDR           (0x23)
 
-#define BUF_SIZE                (512U)
-
 /**
  * @brief   Benchmark buffers
  */
@@ -62,6 +71,7 @@ static uint8_t bench_wbuf[BENCH_LARGE];
 static uint8_t bench_rbuf[BENCH_LARGE];
 
 extern void sched_statistics_cb(kernel_pid_t active_thread, kernel_pid_t next_thread);
+#endif
 
 /**
  * @brief   Generic buffer used for receiving
@@ -75,6 +85,7 @@ static struct {
     spi_cs_t cs;
 } spiconf;
 
+#if ENABLE_BENCHMARK
 /*
  * @brief Trigger an update of the scheduler runtime statistics.
  *
@@ -95,8 +106,9 @@ static uint32_t _ztimer_diff_usec(uint32_t stop, uint32_t start)
 {
     return stop - start;
 }
+#endif
 
-void print_bytes(char* title, uint8_t* data, size_t len)
+static void print_bytes(const char *title, const uint8_t *data, size_t len)
 {
     printf("%4s\n", title);
     for (size_t i = 0; i < len; i++) {
@@ -118,7 +130,7 @@ void print_bytes(char* title, uint8_t* data, size_t len)
     printf("\n\n");
 }
 
-int cmd_init(int argc, char **argv)
+static int cmd_init(int argc, char **argv)
 {
     int dev, mode, clk, port, pin, tmp;
 
@@ -128,22 +140,24 @@ int cmd_init(int argc, char **argv)
         for (int i = 0; i < (int)SPI_NUMOF; i++) {
             printf("\t\t%i: SPI_DEV(%i)\n", i, i);
         }
-        puts("\tmode:");
-        puts("\t\t0: POL:0, PHASE:0 - on first rising edge");
-        puts("\t\t1: POL:0, PHASE:1 - on second rising edge");
-        puts("\t\t2: POL:1, PHASE:0 - on first falling edge");
-        puts("\t\t3: POL:1, PHASE:1 - on second falling edge");
-        puts("\tclk:");
-        puts("\t\t0: 100 KHz");
-        puts("\t\t1: 400 KHz");
-        puts("\t\t2: 1 MHz");
-        puts("\t\t3: 5 MHz");
-        puts("\t\t4: 10 MHz");
-        puts("\tcs port:");
-        puts("\t\tPort of the CS pin, set to -1 for hardware chip select");
-        puts("\tcs pin:");
-        puts("\t\tPin used for chip select. If hardware chip select is enabled,\n"
-             "\t\tthis value specifies the internal HWCS line");
+        if (!LOW_MEMORY) {
+            puts("\tmode:\n"
+                 "\t\t0: POL:0, PHASE:0 - on first rising edge\n"
+                 "\t\t1: POL:0, PHASE:1 - on second rising edge\n"
+                 "\t\t2: POL:1, PHASE:0 - on first falling edge\n"
+                 "\t\t3: POL:1, PHASE:1 - on second falling edge\n"
+                 "\tclk:\n"
+                 "\t\t0: 100 KHz\n"
+                 "\t\t1: 400 KHz\n"
+                 "\t\t2: 1 MHz\n"
+                 "\t\t3: 5 MHz\n"
+                 "\t\t4: 10 MHz\n"
+                 "\tcs port:\n"
+                 "\t\tPort of the CS pin, set to -1 for hardware chip select\n"
+                 "\tcs pin:\n"
+                 "\t\tPin used for chip select. If hardware chip select is enabled,\n"
+                 "\t\tthis value specifies the internal HWCS line");
+        }
         return 1;
     }
 
@@ -226,8 +240,9 @@ int cmd_init(int argc, char **argv)
 
     return 0;
 }
+SHELL_COMMAND(init, "Setup a particular SPI configuration", cmd_init);
 
-int cmd_transfer(int argc, char **argv)
+static int cmd_transfer(int argc, char **argv)
 {
     size_t len;
 
@@ -258,7 +273,9 @@ int cmd_transfer(int argc, char **argv)
 
     return 0;
 }
+SHELL_COMMAND(send, "Transfer string to slave", cmd_transfer);
 
+#if ENABLE_BENCHMARK
 int cmd_bench(int argc, char **argv)
 {
     (void)argc;
@@ -520,6 +537,8 @@ int cmd_bench(int argc, char **argv)
 
     return 0;
 }
+SHELL_COMMAND(bench, "Runs some benchmarks", cmd_bench);
+#endif
 
 #ifdef MODULE_PERIPH_SPI_RECONFIGURE
 int cmd_spi_gpio(int argc, char **argv)
@@ -565,17 +584,8 @@ int cmd_spi_gpio(int argc, char **argv)
     printf("Success: spi_%i re-init\n", dev);
     return 0;
 }
+SHELL_COMMAND(spi_gpio, "Re-configures MISO & MOSI pins to GPIO mode and back.", cmd_spi_gpio);
 #endif
-
-static const shell_command_t shell_commands[] = {
-    { "init", "Setup a particular SPI configuration", cmd_init },
-    { "send", "Transfer string to slave", cmd_transfer },
-    { "bench", "Runs some benchmarks", cmd_bench },
-#ifdef MODULE_PERIPH_SPI_RECONFIGURE
-    { "spi_gpio", "Re-configures MISO & MOSI pins to GPIO mode and back.", cmd_spi_gpio },
-#endif
-    { NULL, NULL, NULL }
-};
 
 int main(void)
 {
@@ -589,7 +599,7 @@ int main(void)
 
     /* run the shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }
