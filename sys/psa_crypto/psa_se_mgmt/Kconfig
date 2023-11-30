@@ -7,7 +7,7 @@
 
 menuconfig MODULE_PSA_SECURE_ELEMENT
     bool "PSA Secure Elements"
-    select MODULE_PSA_KEY_SLOT_MGMT
+    select MODULE_PSA_KEY_MANAGEMENT
     select MODULE_PSA_SE_MGMT
 
 if MODULE_PSA_SECURE_ELEMENT
@@ -33,16 +33,23 @@ menuconfig MODULE_PSA_SECURE_ELEMENT_ATECCX08A
 config MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256
     bool "Microchip ATECCX08A Elliptic Curve P256"
     select PSA_KEY_SIZE_256
-    select MODULE_PSA_SECURE_ELEMENT_ASYMMETRIC
+    select MODULE_PSA_ASYMMETRIC
+    depends on MODULE_PSA_SECURE_ELEMENT_ATECCX08A
+
+config MODULE_PSA_SECURE_ELEMENT_ATECCX08A_CIPHER_AES_128
+    bool "Microchip ATECCX08A Cipher AES 128"
+    select PSA_KEY_SIZE_128
+    select MODULE_PSA_CIPHER
+    depends on MODULE_PSA_SECURE_ELEMENT_ATECCX08A
+
+config MODULE_PSA_SECURE_ELEMENT_ATECCX08A_HMAC_SHA256
+    bool "Microchip ATECCX08A HMAC SHA-256"
+    select PSA_KEY_SIZE_128
+    select MODULE_PSA_MAC
     depends on MODULE_PSA_SECURE_ELEMENT_ATECCX08A
 
 config MODULE_PSA_SE_MGMT
     bool
-
-config MODULE_PSA_SECURE_ELEMENT_ASYMMETRIC
-    bool
-    help
-        Indicates that an asymmetric operation is used with secure elements.
 
 config MODULE_PSA_SECURE_ELEMENT_CONFIG
     bool

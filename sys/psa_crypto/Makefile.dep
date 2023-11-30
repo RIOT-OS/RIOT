@@ -5,7 +5,7 @@ endif
 
 # Asymmetric
 ifneq (,$(filter psa_asymmetric,$(USEMODULE)))
-  USEMODULE += psa_key_slot_mgmt
+  USEMODULE += psa_key_management
 endif
 
 ## ECC_P192R1 backend
@@ -82,7 +82,7 @@ endif
 
 # Cipher
 ifneq (,$(filter psa_cipher,$(USEMODULE)))
-  USEMODULE += psa_key_slot_mgmt
+  USEMODULE += psa_key_management
 endif
 
 ## AES-128-ECB backend
@@ -242,8 +242,16 @@ ifneq (,$(filter psa_hash_sha_512_backend_riot,$(USEMODULE)))
   USEMODULE += psa_riot_hashes
   USEMODULE += psa_riot_hashes_sha_512
 endif
+# Key Management
+ifneq (,$(filter psa_key_management,$(USEMODULE)))
+  USEMODULE += psa_key_slot_mgmt
+endif
 
 # MAC
+ifneq (,$(filter psa_mac,$(USEMODULE)))
+  USEMODULE += psa_key_management
+endif
+
 ## HMAC SHA-256
 ifneq (,$(filter psa_mac_hmac_sha_256,$(USEMODULE)))
   ifeq (,$(filter psa_mac_hmac_sha_256_custom_backend,$(USEMODULE)))
@@ -271,7 +279,7 @@ endif
 # Secure Elements
 ifneq (,$(filter psa_secure_element,$(USEMODULE)))
   USEMODULE += psa_se_mgmt
-  USEMODULE += psa_key_slot_mgmt
+  USEMODULE += psa_key_management
 endif
 
 ifneq (,$(filter psa_secure_element_ateccx08a, $(USEMODULE)))

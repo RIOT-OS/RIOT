@@ -28,8 +28,12 @@ extern "C" {
 #include <stdlib.h>
 #include "kernel_defines.h"
 #include "psa/crypto.h"
-#include "psa_crypto_slot_management.h"
 
+#if IS_USED(MODULE_PSA_KEY_MANAGEMENT)
+#include "psa_crypto_slot_management.h"
+#endif
+
+#if IS_USED(MODULE_PSA_HASH)
 /**
  * @brief   Dispatch a hash setup function to a specific backend.
  *          See @ref psa_hash_setup()
@@ -68,7 +72,9 @@ psa_status_t psa_algorithm_dispatch_hash_finish(psa_hash_operation_t *operation,
                                                 uint8_t *hash,
                                                 size_t hash_size,
                                                 size_t *hash_length);
+#endif /* MODULE_PSA_HASH */
 
+#if IS_USED(MODULE_PSA_ASYMMETRIC)
 /**
  * @brief   Dispatch a hash signature function to a specific backend.
  *          See @ref psa_sign_hash()
@@ -156,7 +162,9 @@ psa_status_t psa_algorithm_dispatch_verify_message( const psa_key_attributes_t *
                                                     size_t input_length,
                                                     const uint8_t *signature,
                                                     size_t signature_length);
+#endif /* MODULE_PSA_ASYMMETRIC */
 
+#if IS_USED(MODULE_PSA_KEY_MANAGEMENT)
 /**
  * @brief   Dispatch the key generation function to a specific backend.
  *          See @ref psa_generate_key()
@@ -167,7 +175,9 @@ psa_status_t psa_algorithm_dispatch_verify_message( const psa_key_attributes_t *
  */
 psa_status_t psa_algorithm_dispatch_generate_key(   const psa_key_attributes_t *attributes,
                                                     psa_key_slot_t *slot);
+#endif
 
+#if IS_USED(MODULE_PSA_CIPHER)
 /**
  * @brief   Dispatch a cipher encrypt function to a specific backend.
  *          See @ref psa_cipher_encrypt()
@@ -213,7 +223,9 @@ psa_status_t psa_algorithm_dispatch_cipher_decrypt( const psa_key_attributes_t *
                                                     uint8_t *output,
                                                     size_t output_size,
                                                     size_t *output_length);
+#endif /* MODULE_PSA_CIPHER */
 
+#if IS_USED(MODULE_PSA_MAC)
 /**
  * @brief   Dispatch a mac computation function to a specific backend.
  *          See @ref psa_mac_compute()
@@ -236,6 +248,7 @@ psa_status_t psa_algorithm_dispatch_mac_compute(const psa_key_attributes_t *attr
                                                 uint8_t *mac,
                                                 size_t mac_size,
                                                 size_t *mac_length);
+#endif
 
 #ifdef __cplusplus
 }

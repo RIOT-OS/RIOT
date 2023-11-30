@@ -316,13 +316,14 @@
  *
  * ### Secure Elements
  * Base:
- *
  * - psa_secure_element
  * - psa_secure_element_multiple
  *
  * #### SE Types
  * - psa_secure_element_ateccx08a
+ * - psa_secure_element_ateccx08a_cipher_aes_128
  * - psa_secure_element_ateccx08a_ecc_p256
+ * - psa_secure_element_ateccx08a_hmac_sha256
  *
  * Random Number Generation {#rng}
  * ===
@@ -372,7 +373,7 @@
  * @code
  * CONFIG_PSA_SECURE_ELEMENT=y
  * CONFIG_PSA_SECURE_ELEMENT_ATECCX08A=y        // device example
- * CONFIG_PSA_SECURE_ELEMENT_ATECCX08A_ECC=y
+ * CONFIG_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256=y
  * @endcode
  *
  * or added to the the Makefile:
@@ -439,10 +440,10 @@
  * In RIOT, module names are generated from path names, so if you create a directory for
  * your sourcefiles, the module name will be the same as the directory name. It is possible
  * to change that by declaring a new module name in the Makefile by adding the line
- * your_module_name`.
+ * `MODULE := your_module_name`.
  *
  * If you leave it like this, all sourcefiles in the path corresponding to the module name will be
- * built (e.g. if you choose to module `hashes`, all files in `sys/hashes` will be included).
+ * built (e.g. if you choose the module `hashes`, all files in `sys/hashes` will be included).
  * For better configurability it is possible to add submodules (see
  * `sys/hashes/psa_riot_hashes` for example).
  * In that case the base module name will be the directory name and each file inside the directory
@@ -960,17 +961,20 @@
  * key, which requires a lot less memory space.
  *
  * **BUT:** If your secure element supports asymmetric cryptography and exports a public key part
- * during key generation, that key part must be stored somewhere. This is why there needs to be
- * an option to tell PSA Crypto that an application is going to perform asymmetric operations.
- * Only if that option is selected, the protected key slots will have the space to store a public
+ * during key generation, that key part must be stored somewhere. So when you choose an
+ * asymmetric operation, the protected key slots will have the space to store a public
  * key.
+ *
+ * #### Dependencies
+ * Secure Element operations also depend on the PSA modules. E.g. when you want to use an ECC
+ * operation, you need to make sure that you also build the asymmetric PSA functions.
  *
  * For this we need to add the following to the `superSE` menu:
  * @code
  * config MODULE_PSA_SECURE_ELEMENT_SUPERSE_ECC_P256
  *     bool "Our Vendor's Elliptic Curve P256"
  *     select PSA_KEY_SIZE_256
- *     select MODULE_PSA_SECURE_ELEMENT_ASYMMETRIC
+ *     select MODULE_PSA_ASYMMETRIC
  *     depends on MODULE_PSA_SECURE_ELEMENT_SUPERSE
  * @endcode
  * This tells us, what size a key slot should have to store the public key. If your SE supports
@@ -995,9 +999,11 @@
  * endif
  *
  * ifneq (,$(filter psa_secure_element_superse_ecc_p256, $(USEMODULE)))
- *   USEMODULE += psa_secure_element_asymmetric
+ *   USEMODULE += psa_asymmetric
  * endif
- *
- * Now the secure element should be available for use with PSA Crypto.
  * @endcode
+ * This needs to be done for all other supported operations (e.g. ATECCX08 operations in
+ * `pkg/cryptoauthlib/Makefile.include`, `pkg/cryptoauthlib/Makefile.dep` and
+ * `sys/psa_crypto/psa_se_mgmt/Kconfig`. Now the secure element should be available for use
+ * with PSA Crypto.
  */

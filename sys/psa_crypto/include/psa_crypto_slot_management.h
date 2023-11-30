@@ -78,10 +78,12 @@ typedef struct {
     size_t lock_count;                          /**< Number of entities accessing the slot */
     psa_key_attributes_t attr;                  /**< Attributes associated with the stored key */
     /** Structure containing key data */
+#if PSA_SINGLE_KEY_COUNT
     struct key_data {
         uint8_t data[PSA_MAX_KEY_DATA_SIZE];    /**< Key data buffer */
         size_t data_len;                        /**< Size of actual key data in bytes */
     } key;                                      /**< Key data structure */
+#endif /* PSA_SINGLE_KEY_COUNT */
 } psa_key_slot_t;
 
 /**
