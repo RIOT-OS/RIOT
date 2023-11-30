@@ -215,11 +215,11 @@ extern "C" {
  */
 #define AUTO_INIT_PRIO_MOD_CORD_COMMON                  1290
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_CORD_EP_STANDALONE
+#ifndef AUTO_INIT_PRIO_MOD_CORD_ENDPOINT_SINGLETON
 /**
  * @brief   CoRE Resource Directory endpoint priority
  */
-#define AUTO_INIT_PRIO_MOD_CORD_EP_STANDALONE           1300
+#define AUTO_INIT_PRIO_MOD_CORD_ENDPOINT_SINGLETON      1300
 #endif
 #ifndef AUTO_INIT_PRIO_MOD_ASYMCUTE
 /**

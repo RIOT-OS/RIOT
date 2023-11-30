@@ -585,32 +585,26 @@ ifneq (,$(filter bluetil_addr,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
-ifneq (,$(filter cord_common,$(USEMODULE)))
-  USEMODULE += fmt
-  USEMODULE += luid
+ifneq (,$(filter cord_lc,$(USEMODULE)))
+  USEMODULE += core_thread_flags
+  USEMODULE += clif
   USEMODULE += gcoap
 endif
 
-ifneq (,$(filter cord_lc cord_ep,$(USEMODULE)))
-  USEMODULE += core_thread_flags
-  USEMODULE += cord_common
-  ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
-    # requires 64bit timestamps when using xtimer
-    USEMODULE += ztimer64_xtimer_compat
-  endif
+ifneq (,$(filter cord_endpoint,$(USEMODULE)))
+  USEMODULE += cord_endpoint_simple
 endif
 
-ifneq (,$(filter cord_epsim,$(USEMODULE)))
-  USEMODULE += cord_common
-endif
-
-ifneq (,$(filter cord_ep_standalone,$(USEMODULE)))
-  USEMODULE += cord_ep
-  USEMODULE += ztimer_msec
-endif
-
-ifneq (,$(filter cord_lc,$(USEMODULE)))
+ifneq (,$(filter cord_endpoint_simple,$(USEMODULE)))
   USEMODULE += clif
+  USEMODULE += gcoap
+  USEMODULE += ztimer_sec
+  USEMODULE += fmt
+  USEMODULE += luid
+endif
+
+ifneq (,$(filter cord_endpoint_singleton,$(USEMODULE)))
+  USEMODULE += event_thread
 endif
 
 ifneq (,$(filter usbus%,$(USEMODULE)))

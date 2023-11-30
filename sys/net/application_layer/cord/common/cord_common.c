@@ -14,6 +14,7 @@
  * @brief       Implementation of common functions for CoRE RD clients
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Koen Zandberg <koen@bergzand.net>
  *
  * @}
  */

@@ -189,10 +189,10 @@ extern void cord_common_init(void);
 AUTO_INIT(cord_common_init,
           AUTO_INIT_PRIO_MOD_CORD_COMMON);
 #endif
-#if IS_USED(MODULE_CORD_EP_STANDALONE)
-extern void cord_ep_standalone_run(void);
-AUTO_INIT(cord_ep_standalone_run,
-          AUTO_INIT_PRIO_MOD_CORD_EP_STANDALONE);
+#if IS_USED(MODULE_CORD_ENDPOINT_SINGLETON)
+extern void cord_endpoint_singleton_run(void);
+AUTO_INIT(cord_endpoint_singleton_run,
+          AUTO_INIT_PRIO_MOD_CORD_ENDPOINT_SINGLETON);
 #endif
 #if IS_USED(MODULE_ASYMCUTE)
 extern void asymcute_handler_run(void);

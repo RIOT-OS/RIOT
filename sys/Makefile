@@ -20,14 +20,8 @@ endif
 ifneq (,$(filter constfs,$(USEMODULE)))
   DIRS += fs/constfs
 endif
-ifneq (,$(filter cord_common,$(USEMODULE)))
-  DIRS += net/application_layer/cord/common
-endif
-ifneq (,$(filter cord_ep,$(USEMODULE)))
-    DIRS += net/application_layer/cord/ep
-endif
-ifneq (,$(filter cord_epsim,$(USEMODULE)))
-    DIRS += net/application_layer/cord/epsim
+ifneq (,$(filter cord_endpoint_simple,$(USEMODULE)))
+    DIRS += net/application_layer/cord/endpoint
 endif
 ifneq (,$(filter cord_lc,$(USEMODULE)))
     DIRS += net/application_layer/cord/lc

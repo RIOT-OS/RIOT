@@ -21,8 +21,8 @@ ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
   ifneq (,$(filter conn_can,$(USEMODULE)))
     USEMODULE += shell_cmd_conn_can
   endif
-  ifneq (,$(filter cord_ep,$(USEMODULE)))
-    USEMODULE += shell_cmd_cord_ep
+  ifneq (,$(filter cord_endpoint_singleton,$(USEMODULE)))
+    USEMODULE += shell_cmd_cord_endpoint
   endif
   ifneq (,$(filter cryptoauthlib,$(USEPKG)))
     USEMODULE += shell_cmd_cryptoauthlib
@@ -152,8 +152,8 @@ endif
 ifneq (,$(filter shell_cmd_conn_can,$(USEMODULE)))
   USEMODULE += conn_can
 endif
-ifneq (,$(filter shell_cmd_cord_ep,$(USEMODULE)))
-  USEMODULE += cord_ep
+ifneq (,$(filter shell_cmd_cord_endpoint,$(USEMODULE)))
+  USEMODULE += cord_endpoint_singleton
   USEMODULE += sock_util
   USEMODULE += uri_parser
 endif
