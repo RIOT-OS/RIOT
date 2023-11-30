@@ -107,6 +107,38 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
+ * @name    PWM configuration
+ *
+ * To find appriopate device and channel find in the MCU datasheet table
+ * concerning "Alternate function AF0 to AF7" a text similar to TIM[X]_CH[Y],
+ * where:
+ * TIM[X] - is device,
+ * [Y] - describes used channel (indexed from 0), for example TIM2_CH1 is
+ * channel 0 in configuration structure (cc_chan - field),
+ * Port column in the table describes connected port.
+ *
+ * For Nucleo-WB55 this information is in the datasheet, Table 18, page 72.
+ *
+ * @{
+ */
+static const pwm_conf_t pwm_config[] = {
+    {
+        .dev      = TIM1,
+        .rcc_mask = RCC_APB2ENR_TIM1EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_A,  8) /*  CN9 D6 */, .cc_chan = 0},
+                      { .pin = GPIO_PIN(PORT_A,  9) /*  CN5 D9 */, .cc_chan = 1},
+                      { .pin = GPIO_PIN(PORT_A, 10) /*  CN9 D3 */, .cc_chan = 2},
+                      { .pin = GPIO_PIN(PORT_A, 11) /* CC10 14 */, .cc_chan = 3} },
+        .af       = GPIO_AF1,
+        .bus      = APB2
+    },
+};
+
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
+
+/** @} */
+
+/**
  * @brief USB device FS configuration
  */
 static const stm32_usbdev_fs_config_t stm32_usbdev_fs_config[] = {

@@ -106,25 +106,25 @@ make BOARD=p-nucleo-wb55 -C examples/hello-world term
 
 ## Implementation Status
 
-| Device            | ID                | Supported | Comments  |
-|:----------------- |:----------------- |:--------- |:--------- |
-| MCU               | stm32wb           | yes       |           |
-|                   | M0+ co-processor  | no        |           |
-|                   | BLE               | no        |           |
-|                   | 802.15.4          | no        |           |
-| Low-level driver  | GPIO              | yes       |           |
-|                   | UART              | yes       | USART1    |
-|                   | LPUART            | yes       | LPUART1   |
-|                   | I2C               | yes       | I2C1      |
-|                   | SPI               | yes       |           |
-|                   | ADC               | yes       |           |
-|                   | RTT               | yes       |           |
-|                   | RTC               | yes       |           |
-|                   | RNG               | yes       |           |
-|                   | Timer             | yes       | TIM2      |
-|                   | WDT               | yes       |           |
-|                   | USB               | yes       |           |
-|                   | PWM               | no        |           |
-|                   | AES               | no        |           |
+| Device            | ID                | Supported | Comments   |
+|:----------------- |:----------------- |:--------- |:---------- |
+| MCU               | stm32wb           | yes       |            |
+|                   | M0+ co-processor  | no        |            |
+|                   | BLE               | no        |            |
+|                   | 802.15.4          | no        |            |
+| Low-level driver  | GPIO              | yes       |            |
+|                   | UART              | yes       | USART1     |
+|                   | LPUART            | yes       | LPUART1    |
+|                   | I2C               | yes       | I2C1       |
+|                   | SPI               | yes       |            |
+|                   | ADC               | yes       |            |
+|                   | RTT               | yes       |            |
+|                   | RTC               | yes       |            |
+|                   | RNG               | yes       |            |
+|                   | Timer             | yes       | TIM2       |
+|                   | WDT               | yes       |            |
+|                   | USB               | yes       |            |
+|                   | PWM               | yes       | dev 0/4 ch |
+|                   | AES               | no        |            |
 
 */
