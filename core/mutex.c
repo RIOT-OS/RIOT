@@ -24,6 +24,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 
+#include "cpu.h"
 #include "mutex.h"
 #include "thread.h"
 #include "sched.h"
