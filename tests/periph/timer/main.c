@@ -80,6 +80,10 @@ static int test_timer(unsigned num)
     }
     else {
         printf("TIMER_%u: initialization successful\n", num);
+        if (IS_USED(MODULE_PERIPH_TIMER_FREQ)) {
+            uint32_t actual_freq = timer_freq(TIMER_DEV(num));
+            printf("(running at %" PRIu32 " Hz)\n", actual_freq);
+        }
     }
 
     timer_stop(TIMER_DEV(num));

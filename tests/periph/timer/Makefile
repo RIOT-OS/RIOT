@@ -1,6 +1,7 @@
 include ../Makefile.periph_common
 
-FEATURES_REQUIRED = periph_timer
+FEATURES_REQUIRED += periph_timer
+FEATURES_OPTIONAL += periph_timer_freq
 
 BOARDS_TIMER_500kHz := \
     atxmega-a1-xplained \
