@@ -49,7 +49,9 @@ config MODULE_WS281X_ESP32_SW
 config MODULE_WS281X_TIMER_GPIO_LL
     bool
     depends on HAS_PERIPH_TIMER_POLL
+    select MODULE_PERIPH_TIMER_POLL
     depends on HAS_PERIPH_GPIO_LL
+    select MODULE_PERIPH_GPIO_LL
     help
         Use a platform independent bit-banging software implementation to
         generate the RGB LED signal.
