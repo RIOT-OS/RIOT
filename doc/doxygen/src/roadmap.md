@@ -22,7 +22,7 @@ The text and items below are tentative, up for discussion, to be updated by regu
 
 
 # Power Modes
-(contact/steering: [Hauke](https://github.com/haukepetersen))
+(contact/steering: [jue89](https://github.com/jue89))
 
 - concept to fix shell usage issue while LPM activated
 - integrate generic power management functions in device driver APIs (netdev, SAUL, ...)
