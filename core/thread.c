@@ -341,6 +341,7 @@ static const char *state_names[STATUS_NUMOF] = {
     [STATUS_REPLY_BLOCKED] = "bl reply",
     [STATUS_FLAG_BLOCKED_ANY] = "bl anyfl",
     [STATUS_FLAG_BLOCKED_ALL] = "bl allfl",
+    [STATUS_FLAG_MBOX_BLOCKED] = "bl fl|mbox",
     [STATUS_MBOX_BLOCKED] = "bl mbox",
     [STATUS_COND_BLOCKED] = "bl cond",
     [STATUS_RUNNING] = "running",

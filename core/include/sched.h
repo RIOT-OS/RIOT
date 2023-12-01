@@ -170,6 +170,7 @@ typedef enum {
     STATUS_REPLY_BLOCKED,           /**< waiting for a message response           */
     STATUS_FLAG_BLOCKED_ANY,        /**< waiting for any flag from flag_mask      */
     STATUS_FLAG_BLOCKED_ALL,        /**< waiting for all flags in flag_mask       */
+    STATUS_FLAG_MBOX_BLOCKED,       /**< waiting for any flag or an mbox msg      */
     STATUS_MBOX_BLOCKED,            /**< waiting for get/put on mbox              */
     STATUS_COND_BLOCKED,            /**< waiting for a condition variable         */
     STATUS_RUNNING,                 /**< currently running                        */

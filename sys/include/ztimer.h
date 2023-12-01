@@ -816,6 +816,29 @@ int ztimer_rmutex_lock_timeout(ztimer_clock_t *clock, rmutex_t *rmutex,
                                uint32_t timeout);
 
 /**
+ * @brief   Try to get a message from a mbox, but give up after @p timeout
+ *
+ * @param[in]       clock       ztimer clock to operate on
+ * @param[in,out]   mbox        message box to get the message out
+ * @param[out]      dest        pointer to storage to write retrieve message to
+ * @param[in]       timeout     timeout after which to give up
+ *
+ * @retval  0               Success, retrieve message written to @p dest
+ * @retval  -ECANCELED      Timeout triggered without a  message received
+ *
+ * @warning This function is ***not stable*** and was rushed into a release
+ *          to fix a nasty bug. Do not start using this API yet.
+ * @note    This function will only be available if both the `core_mbox` and
+ *          the `core_thread_flags` module is used.
+ * @warning This function will the `thread_flags` flag `THREAD_FLAG_TIMEOUT`
+ *          internally and will clear this flag in the process. If this flag
+ *          gets set on the calling thread by other means, a premature timeout
+ *          will be caused. Avoid using this flag on the thread of the caller.
+ */
+int ztimer_mbox_get_timeout(ztimer_clock_t *clock, mbox_t *mbox, msg_t *dest,
+                            uint32_t timeout);
+
+/**
  * @brief   Initialize the board-specific default ztimer configuration
  */
 void ztimer_init(void);

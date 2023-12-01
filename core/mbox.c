@@ -20,10 +20,11 @@
 
 #include <string.h>
 
-#include "mbox.h"
 #include "irq.h"
+#include "mbox.h"
 #include "sched.h"
 #include "thread.h"
+#include "thread_flags.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -66,10 +67,31 @@ int _mbox_put(mbox_t *mbox, msg_t *msg, int blocking)
     if (next) {
         DEBUG("mbox: Thread %" PRIkernel_pid " mbox 0x%08x: _tryput(): "
               "there's a waiter.\n", thread_getpid(), (unsigned)mbox);
-        thread_t *thread =
-            container_of((clist_node_t *)next, thread_t, rq_entry);
-        *(msg_t *)thread->wait_data = *msg;
-        _wake_waiter(thread, irqstate);
+        thread_t *thread = container_of((clist_node_t *)next, thread_t,
+                                        rq_entry);
+        if (!IS_USED(MODULE_CORE_THREAD_FLAGS) ||
+            (thread->status == STATUS_MBOX_BLOCKED)) {
+            *(msg_t *)thread->wait_data = *msg;
+            _wake_waiter(thread, irqstate);
+        }
+        else {
+            while (cib_full(&mbox->cib)) {
+                if (!blocking) {
+                    /* put thread back into list and give up */
+                    thread_add_to_list(&mbox->readers, thread);
+                    irq_restore(irqstate);
+                    return 0;
+                }
+
+                _wait(&mbox->writers, irqstate);
+                irqstate = irq_disable();
+            }
+
+            /* copy message to queue and set flags */
+            mbox->msg_array[cib_put_unsafe(&mbox->cib)] = *msg;
+            irq_restore(irqstate);
+            thread_flags_set(thread, THREAD_FLAG_MBOX_READY);
+        }
         return 1;
     }
     else {

@@ -58,6 +58,7 @@
 #define THREAD_FLAGS_H
 
 #include "sched.h"  /* for thread_t typedef */
+#include "mbox.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -101,6 +102,10 @@ extern "C" {
  * @see xtimer_set_timeout_flag
  */
 #define THREAD_FLAG_TIMEOUT         (1u << 14)
+/**
+ * @brief   Flag used to wake @ref thread_flags_wait_any_or_mbox
+ */
+#define THREAD_FLAG_MBOX_READY      (1u << 13)
 
 /**
  * @brief Comprehensive set of all predefined flags
@@ -169,6 +174,30 @@ thread_flags_t thread_flags_wait_any(thread_flags_t mask);
  * @returns     mask
  */
 thread_flags_t thread_flags_wait_all(thread_flags_t mask);
+
+/**
+ * @brief   Wait for any flag or a message via mbox, whatever comes first
+ *
+ * @param[in,out]   mbox    ptr to the mailbox to operate on
+ * @param[out]      msg     destination where to store the retrieved message
+ * @param[in]       mask    thread_flags mask to wait on
+ *
+ * @post    Either a thread flag matching @p mask came in, was cleared and the
+ *          value of the cleared flag is returned, or a message was retrieved
+ *          from @p mbox, stored into @p msg and `0` was returned.
+ *
+ * @retval  0       A message came in first
+ * @retval  !=0     A flag came in first, the flag was cleared and is returned
+ * @return  The flags that caused the wake up, or `0` if a message came in first
+ *
+ * @note    This is only available when module @ref core_mbox is used
+ *
+ * @warning This API is not yet ***stable*** and was rushed into a release as
+ *          infrastructure for a bugfix. It is recommended that user do not
+ *          jump on this API as of now.
+ */
+thread_flags_t thread_flags_wait_any_or_mbox(mbox_t *mbox, msg_t *msg,
+                                             thread_flags_t mask);
 
 /**
  * @brief Wait for any flags in mask to become set (blocking), one at a time

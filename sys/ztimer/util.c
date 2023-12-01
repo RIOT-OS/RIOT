@@ -172,7 +172,7 @@ void ztimer_set_wakeup(ztimer_clock_t *clock, ztimer_t *timer, uint32_t offset,
     ztimer_set(clock, timer, offset);
 }
 
-static void timeout_cb(void *arg)
+static void timeout_cb_mutex_cancel(void *arg)
 {
     mutex_cancel(arg);
 }
@@ -185,7 +185,7 @@ int ztimer_mutex_lock_timeout(ztimer_clock_t *clock, mutex_t *mutex,
     }
 
     mutex_cancel_t mc = mutex_cancel_init(mutex);
-    ztimer_t t = { .callback = timeout_cb, .arg = &mc };
+    ztimer_t t = { .callback = timeout_cb_mutex_cancel, .arg = &mc };
 
     ztimer_set(clock, &t, timeout);
     if (mutex_lock_cancelable(&mc)) {
@@ -209,3 +209,35 @@ int ztimer_rmutex_lock_timeout(ztimer_clock_t *clock, rmutex_t *rmutex,
     }
     return -ECANCELED;
 }
+
+#if MODULE_CORE_THREAD_FLAGS && MODULE_CORE_MBOX
+static void timeout_cb_thread_flags(void *arg)
+{
+    thread_flags_set(arg, THREAD_FLAG_TIMEOUT);
+}
+
+int ztimer_mbox_get_timeout(ztimer_clock_t *clock, mbox_t *mbox, msg_t *dest,
+                            uint32_t timeout)
+{
+    /* Optimize for the high load case: Message is already in the mbox, don't
+     * waste time out setting up a timeout */
+    if (mbox_try_get(mbox, dest)) {
+        return 0;
+    }
+
+    /* Clear any timeout flag to avoid short timeout */
+    thread_flags_clear(THREAD_FLAG_TIMEOUT);
+    ztimer_t t = {
+        .callback = timeout_cb_thread_flags, .arg = thread_get_active()
+    };
+
+    ztimer_set(clock, &t, timeout);
+
+    if (0 == thread_flags_wait_any_or_mbox(mbox, dest, THREAD_FLAG_TIMEOUT)) {
+        ztimer_remove(clock, &t);
+        return 0;
+    }
+
+    return -ECANCELED;
+}
+#endif /* module core_thread_flags and core_mbox in use */
