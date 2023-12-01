@@ -1,5 +1,4 @@
 BOARD_INSUFFICIENT_MEMORY := \
-    atmega256rfr2-xpro \
     atmega8 \
     hifive1 \
     hifive1b \
@@ -8,5 +7,4 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-f031k6 \
     nucleo-l011k4 \
     stm32l0538-disco \
-    zigduino \
     #

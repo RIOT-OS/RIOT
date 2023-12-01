@@ -5,7 +5,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-nano \
     arduino-uno \
     atmega1284p \
-    atmega256rfr2-xpro \
     atmega328p \
     atmega328p-xplained-mini \
     atmega8 \

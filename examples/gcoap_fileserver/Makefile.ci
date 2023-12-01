@@ -11,9 +11,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     blackpill-stm32f103c8 \
     bluepill-stm32f030c8 \
     bluepill-stm32f103c8 \
-    derfmega128 \
     i-nucleo-lrwan1 \
-    microduino-corerf \
     msb-430 \
     msb-430h \
     nucleo-f030r8 \
@@ -41,5 +39,4 @@ BOARD_INSUFFICIENT_MEMORY := \
     telosb \
     waspmote-pro \
     z1 \
-    zigduino \
     #

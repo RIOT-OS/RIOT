@@ -1,11 +1,11 @@
 BOARD_INSUFFICIENT_MEMORY := \
     airfy-beacon \
     blackpill-stm32f103c8 \
-    bluepill-stm32f103c8 \
     bluepill-stm32f030c8 \
+    bluepill-stm32f103c8 \
     calliope-mini \
-    im880b \
     i-nucleo-lrwan1 \
+    im880b \
     microbit \
     nrf51dongle \
     nrf6310 \

@@ -4,19 +4,15 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-mega2560 \
     arduino-nano \
     arduino-uno \
-    atmega1284p \
     atmega328p \
     atmega328p-xplained-mini \
     atmega8 \
     atxmega-a3bu-xplained \
     bluepill-stm32f030c8 \
-    derfmega128 \
     hifive1 \
     hifive1b \
     i-nucleo-lrwan1 \
     im880b \
-    mega-xplained \
-    microduino-corerf \
     msb-430 \
     msb-430h \
     nucleo-f030r8 \
@@ -44,5 +40,4 @@ BOARD_INSUFFICIENT_MEMORY := \
     thingy52 \
     waspmote-pro \
     z1 \
-    zigduino \
     #
