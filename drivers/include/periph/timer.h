@@ -128,16 +128,42 @@ typedef struct {
  * The timer will be started automatically after initialization with interrupts
  * enabled.
  *
+ * @warning     The driver will initialize timer at the frequency that is as
+ *              close to @p freq as possible. If the feature `periph_timer_freq`
+ *              is *NOT* provided, the timer initialization must fail if the
+ *              closest possible frequency differs "too much" from @p freq.
+ * @note        If the feature `periph_timer_freq` is provided, the actual
+ *              frequency of the timer was configured at can be queried by
+ *              calling @ref timer_freq
+ *
  * @param[in] dev           the timer to initialize
  * @param[in] freq          requested number of ticks per second
  * @param[in] cb            this callback is called in interrupt context, the
  *                          emitting channel is passed as argument
  * @param[in] arg           argument to the callback
  *
- * @return                  0 on success
- * @return                  -1 if speed not applicable or unknown device given
+ * @retval  0                success
+ * @retval  -1               speed not applicable or unknown device given
  */
 int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg);
+
+/**
+ * @brief   Get the current frequency the timer is running at in Hz
+ *
+ * @param[in]   dev         The timer to query the current frequency of
+ *
+ * @note    This is only provided when the feature `periph_timer_freq` is
+ *          provided.
+ * @pre     @p dev is valid, otherwise an `assert()` or `assume()` will blow.
+ *
+ * @warning This function is considered as unstable. Expect API changes and
+ *          even removal without deprecation of this function as long as this
+ *          warning is here.
+ *
+ * @return  The current frequency the timer is running at
+ * @retval  0               The timer is not configured yet / not running
+ */
+uint32_t timer_freq(tim_t dev);
 
 /**
  * @brief Set a given timer channel for the given timer device
