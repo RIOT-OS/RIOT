@@ -389,14 +389,10 @@ void adc_continuous_begin(adc_res_t res)
 
 int32_t adc_continuous_sample(adc_t line)
 {
-    int val;
     assert(line < ADC_NUMOF);
+    assert(mutex_trylock(&_lock) == 0);
 
-    mutex_lock(&_lock);
-    val = _sample(line) << _shift;
-    mutex_unlock(&_lock);
-
-    return val;
+    return _sample(line) << _shift;
 }
 
 void adc_continuous_stop(void)
