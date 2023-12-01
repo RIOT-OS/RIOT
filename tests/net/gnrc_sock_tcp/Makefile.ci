@@ -4,7 +4,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-mega2560 \
     arduino-nano \
     arduino-uno \
-    atmega1284p \
     atmega328p \
     atmega328p-xplained-mini \
     atmega8 \
@@ -16,7 +15,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     i-nucleo-lrwan1 \
     im880b \
     m1284p \
-    mega-xplained \
     microduino-corerf \
     msb-430 \
     msb-430h \

@@ -2,7 +2,10 @@
 USEMODULE += avr_libc_extra
 
 # tell the build system to build the avr8 common files
-USEMODULE += avr8_common
+USEMODULE += avr8_common avr8_common_periph
+
+# All avr8 CPUs provide PM
+USEMODULE += pm_layered
 
 # The AVR-libc provides no thread safe malloc implementation and has no hooks
 # to inject. Use malloc_thread_safe to link calls to malloc to safe wrappers

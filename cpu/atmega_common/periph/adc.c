@@ -25,6 +25,7 @@
 #include "cpu.h"
 #include "mutex.h"
 #include "periph/adc.h"
+#include "periph/pm.h"
 #include "periph_conf.h"
 
 #define ADC_MAX_CLK         (200000U)
@@ -33,6 +34,7 @@ static mutex_t lock = MUTEX_INIT;
 
 static inline void _prep(void)
 {
+    pm_block(3); /* Require clkADC */
     mutex_lock(&lock);
     /* Enable ADC */
     ADCSRA |= (1 << ADEN);
@@ -43,6 +45,7 @@ static inline void _done(void)
     /* Disable ADC */
     ADCSRA &= ~(1 << ADEN);
     mutex_unlock(&lock);
+    pm_unblock(3);
 }
 
 int adc_init(adc_t line)

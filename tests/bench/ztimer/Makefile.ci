@@ -10,5 +10,4 @@ BOARD_INSUFFICIENT_MEMORY := \
     slstk3400a \
     stk3200 \
     stm32g0316-disco \
-    zigduino \
     #

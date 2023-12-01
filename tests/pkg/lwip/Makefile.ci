@@ -1,8 +1,8 @@
 BOARD_INSUFFICIENT_MEMORY := \
     airfy-beacon \
     blackpill-stm32f103c8 \
-    bluepill-stm32f103c8 \
     bluepill-stm32f030c8 \
+    bluepill-stm32f103c8 \
     hifive1 \
     hifive1b \
     i-nucleo-lrwan1 \

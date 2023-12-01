@@ -49,6 +49,15 @@ extern "C"
 #endif
 
 /**
+ * @name    BOD monitoring when CPU is on sleep
+ * @{
+ */
+#ifndef AVR8_PM_DISABLE_BOD_ON_SLEEP
+#define AVR8_PM_DISABLE_BOD_ON_SLEEP 0 /**< BOD is active on sleep */
+#endif
+/** @} */
+
+/**
  * @name    Use shared I2C functions
  * @{
  */

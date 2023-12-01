@@ -9,12 +9,10 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega8 \
     atxmega-a3bu-xplained \
     bluepill-stm32f030c8 \
-    derfmega128 \
     hifive1 \
     hifive1b \
     i-nucleo-lrwan1 \
     im880b \
-    microduino-corerf \
     msb-430 \
     msb-430h \
     nucleo-f030r8 \
@@ -41,5 +39,4 @@ BOARD_INSUFFICIENT_MEMORY := \
     telosb \
     waspmote-pro \
     z1 \
-    zigduino \
     #

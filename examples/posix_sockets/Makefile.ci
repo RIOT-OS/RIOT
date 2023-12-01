@@ -10,10 +10,8 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega8 \
     atxmega-a3bu-xplained \
     bluepill-stm32f030c8 \
-    derfmega128 \
     i-nucleo-lrwan1 \
     im880b \
-    microduino-corerf \
     msb-430 \
     msb-430h \
     nrf51dk \
@@ -43,5 +41,4 @@ BOARD_INSUFFICIENT_MEMORY := \
     waspmote-pro \
     yunjia-nrf51822 \
     z1 \
-    zigduino \
     #

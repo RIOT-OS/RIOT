@@ -1,5 +1,4 @@
 BOARD_INSUFFICIENT_MEMORY := \
-    atmega256rfr2-xpro \
     msb-430 \
     msb-430h \
     nucleo-f031k6 \
@@ -14,5 +13,4 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32g0316-disco \
     telosb \
     z1 \
-    zigduino \
     #
