@@ -38,8 +38,21 @@
 #define __EIND__                0x3C
 #endif
 
-static void avr8_context_save(void);
-static void avr8_context_restore(void);
+/**
+ * The AVR-8 Context Save is divided in two parts: Header & Body
+ * The Header consists of: __tmp_reg__ and SREG
+ * The Body consists of remaining registers
+ *
+ * The Header in Thread
+ */
+static inline void avr8_context_save(void);
+static inline void avr8_context_save_lower(void);
+static inline void avr8_context_save_upper(void);
+static inline void avr8_context_save_tcb(void);
+static inline void avr8_context_restore_tcb(void);
+static inline void avr8_context_restore_upper(void);
+static inline void avr8_context_restore_lower(void);
+static inline void avr8_context_restore(void);
 static void avr8_enter_thread_mode(void);
 
 /**
@@ -79,6 +92,7 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg,
 {
     uint16_t tmp_adress;
     uint8_t *stk;
+    int i;
 
     /* AVR uses 16 Bit or two 8 Bit registers for storing  pointers*/
     stk = (uint8_t *)((uintptr_t)stack_start + stack_size);
@@ -119,22 +133,21 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg,
     *stk = (uint8_t)0x00;
 #endif
 
-    /* r0 */
+    /* r30 */
     stk--;
-    *stk = (uint8_t)0x00;
+    *stk = (uint8_t)30;
 
     /* status register (with interrupts enabled) */
     stk--;
     *stk = (uint8_t)0x80;
 
+    /* r31 */
+    stk--;
+    *stk = (uint8_t)31;
+
 #if __AVR_HAVE_RAMPZ__
     stk--;
     *stk = (uint8_t)0x00; /* RAMPZ */
-#endif
-
-#if __AVR_HAVE_RAMPY__
-    stk--;
-    *stk = (uint8_t)0x00; /* RAMPY */
 #endif
 #if __AVR_HAVE_RAMPX__
     stk--;
@@ -145,23 +158,21 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg,
     *stk = (uint8_t)0x00; /* RAMPD */
 #endif
 
-#if __AVR_3_BYTE_PC__
+    /* r0 - scratch register */
     stk--;
-    *stk = (uint8_t)0x00; /* EIND */
-#endif
+    *stk = (uint8_t)0x00;
 
     /* r1 - has always to be 0 */
     stk--;
     *stk = (uint8_t)0x00;
+
     /*
-     * Space for registers r2 -r23
+     * Space for registers r18-r23
      *
      * use loop for better readability, the compiler unrolls anyways
      */
 
-    int i;
-
-    for (i = 2; i <= 23; i++) {
+    for (i = 18; i <= 23; i++) {
         stk--;
         *stk = (uint8_t)0;
     }
@@ -178,11 +189,28 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg,
     *stk = (uint8_t)(tmp_adress & (uint16_t)0x00ff);
 
     /*
-     * Space for registers r26-r31
+     * Space for registers r26-r29
      */
-    for (i = 26; i <= 31; i++) {
+    for (i = 26; i <= 29; i++) {
         stk--;
         *stk = (uint8_t)i;
+    }
+
+#if __AVR_HAVE_RAMPY__
+    stk--;
+    *stk = (uint8_t)0x00; /* RAMPY */
+#endif
+#if __AVR_3_BYTE_PC__
+    stk--;
+    *stk = (uint8_t)0x00; /* EIND */
+#endif
+
+    /*
+     * Space for registers r2-r17
+     */
+    for (i = 2; i <= 17; i++) {
+        stk--;
+        *stk = (uint8_t)0;
     }
 
     stk--;
@@ -237,8 +265,6 @@ extern char *__brkval;
  */
 void NORETURN avr8_enter_thread_mode(void)
 {
-    irq_enable();
-
     /*
      * Save the current stack pointer to __malloc_heap_end. Since
      * context_restore is always inline, there is no function call and the
@@ -270,57 +296,172 @@ void thread_yield_higher(void)
     }
 }
 
-void avr8_exit_isr(void)
+/**
+ * @brief Restore thread/IRQ context
+ *
+ * To allow nested interrupts in RIOT-OS multi thread environment,
+ * `avr8_state_irq_count` is used as IRQ global state.  This means that a
+ * context switch must happen when `avr8_state_irq_count` is equal to 0.  The
+ * pair r24/r25 is postponed to save/restore on the stack because are used at
+ * IRQ epilog.  Those registers are used to update `avr8_state_irq_count`, SREG
+ * and execute branch condition tests.  All AVR-8 requires a critical section
+ * between updating the `avr8_state_irq_count` value and branch tests at epilog.
+ * This avoids that a high priority IRQ read an invalid value of
+ * `avr8_state_irq_count` and start a context switch. The execution of context
+ * switch out-of-order will corrupt at ISR epilog.
+ */
+void avr8_isr_epilog(void)
 {
-    --avr8_state_irq_count;
+    uint8_t isr_sts;
 
-    /* Force access to avr8_state to take place */
-    __asm__ volatile ("" : : : "memory");
+    __asm__ volatile (
+    /**
+     * ISR Epilog for Nested ISR Condition
+     *
+     * This critical section may be finished in following situations:
+     * - Last 'pop' instruction in @ref avr8_context_restore;
+     * - Last instructions from current avr8_isr_epilog.
+     *
+     * Note:
+     * - ATmega may be affected when IRQ is re-enabled on ISR body by the user.
+     */
+        "cli                                     \n\t"
+#if AVR8_STATE_IRQ_USE_SRAM
+        "lds  %[isr_sts], %[state]               \n\t"
+        "subi %[isr_sts], 0x01                   \n\t"
+        "sts  %[state], %[isr_sts]               \n\t"
+#else
+        "in   %[isr_sts], %[state]               \n\t"
+        "subi %[isr_sts], 0x01                   \n\t"
+        "out  %[state], %[isr_sts]               \n\t"
+#endif
+    /**
+     * Restore thread stack
+     */
+        "cpse %[isr_sts], r1                     \n\t"
+        "rjmp skip_restore_if_nested_isr         \n\t"
+        "pop  r31                                \n\t"
+        "pop  r30                                \n\t"
+        "out  __SP_L__, r30                      \n\t"
+        "out  __SP_H__, r31                      \n\t"
+        "skip_restore_if_nested_isr:             \n\t"
+        : [isr_sts] "=r" (isr_sts)
+#if (AVR8_STATE_IRQ_USE_SRAM)
+        : [state] "" (avr8_state_irq_count)
+#else
+        : [state] "I" (_SFR_IO_ADDR(avr8_state_irq_count))
+#endif
+        : "r30", "r31", "memory"
+    );
 
-    /* schedule should switch context when returning from a non nested interrupt */
-    if (sched_context_switch_request && avr8_state_irq_count == 0) {
-        avr8_context_save();
+    /* Branch Tests - critical section.
+     * Note: isr_sts was optimized to avoid a second load and perform fastest
+     * tests for critical tasks.  Do not switch position from isr_sts with
+     * sched_context_switch_request. Care is necessary to test r24 before
+     * reloaded with sched_context_switch_request value.
+     */
+    if (isr_sts == 0 && sched_context_switch_request) {
+        /* A context switch was requested in the body of interrupt:
+         *
+         * `avr8_state_irq_count` is 0 and;
+         * `sched_context_switch_request` is greater than 0
+         *
+         * - Restore remaining context register r24/25
+         * - Start context save using the current critical section at #ref
+         *   avr8_context_save_header_in_isr
+         * -    For ATxmega, IRQ should be re-enabled because reti instruction
+         *      don't do it!  In this case, it should be re-enabled because a
+         *      context switch may occor by @ref thread_yield_higher and
+         *      epilog needs guarantee that IRQ are enabled for that case.
+         *      However, care is required because it can broke the critical
+         *      section.  This will be performed at
+         *      `avr8_context_save_header_in_isr`.
+         * - Context switch
+         * - At top of stack, the previous context can be found or a another
+         *   one that was just reload from @ref sched_run.
+         */
+        avr8_context_save_upper();
+        avr8_context_save_tcb();
         sched_run();
-        avr8_context_restore();
-        __asm__ volatile ("reti");
+        avr8_context_restore_tcb();
+        avr8_context_restore_upper();
     }
+
+    avr8_context_restore_lower();
+
+    /* ATxmega always runs with IRQ enabled, let's enabled it!  For ATmega,
+     * reti instruction will do it!
+     */
+    __asm__ volatile (
+#if defined(CPU_ATXMEGA)
+        "sei                                     \n\t"
+#endif
+        "reti                                    \n\t"
+        : : : "memory"
+    );
 }
 
-__attribute__((always_inline)) static inline void avr8_context_save(void)
+/**
+ * @brief Saves context body
+ *
+ * This saves remaining context registers.
+ */
+__attribute__((always_inline))
+static inline void avr8_context_save(void)
+{
+    avr8_context_save_lower();
+    avr8_context_save_upper();
+    avr8_context_save_tcb();
+}
+
+__attribute__((always_inline))
+static inline void avr8_context_save_lower(void)
 {
     __asm__ volatile (
-        "push __tmp_reg__                        \n\t"
-        "in   __tmp_reg__, __SREG__              \n\t"
-        "cli                                     \n\t"
-        "push __tmp_reg__                        \n\t"
-
+        "push r30                                \n\t"
+        "in   r30, __SREG__                      \n\t"
+        "push r30                                \n\t"
+        "push r31                                \n\t"
 #if __AVR_HAVE_RAMPZ__
-        "in     __tmp_reg__, __RAMPZ__           \n\t"
-        "push   __tmp_reg__                      \n\t"
+        "in   r30, __RAMPZ__                     \n\t"
+        "push r30                                \n\t"
 #endif
-
-#if __AVR_HAVE_RAMPY__
-        "in     __tmp_reg__, __RAMPY__           \n\t"
-        "push   __tmp_reg__                      \n\t"
-#endif
-
 #if __AVR_HAVE_RAMPX__
-        "in     __tmp_reg__, __RAMPX__           \n\t"
-        "push   __tmp_reg__                      \n\t"
+        "in   r30, __RAMPX__                     \n\t"
+        "push r30                                \n\t"
 #endif
-
 #if __AVR_HAVE_RAMPD__
-        "in     __tmp_reg__, __RAMPD__           \n\t"
-        "push   __tmp_reg__                      \n\t"
+        "in   r30, __RAMPD__                     \n\t"
+        "push r30                                \n\t"
 #endif
-
-#if __AVR_3_BYTE_PC__
-        "in     __tmp_reg__, " XTSTR(__EIND__) " \n\t"
-        "push   __tmp_reg__                      \n\t"
-#endif
-
+        "push r0                                 \n\t"
         "push r1                                 \n\t"
         "clr  r1                                 \n\t"
+        "push r18                                \n\t"
+        "push r19                                \n\t"
+        "push r20                                \n\t"
+        "push r21                                \n\t"
+        "push r22                                \n\t"
+        "push r23                                \n\t"
+        "push r24                                \n\t"
+        "push r25                                \n\t"
+        "push r26                                \n\t"
+        "push r27                                \n\t");
+}
+__attribute__((always_inline))
+static inline void avr8_context_save_upper(void)
+{
+    __asm__ volatile (
+        "push r28                                \n\t"
+        "push r29                                \n\t"
+#if __AVR_HAVE_RAMPY__
+        "in   r30, __RAMPY__                     \n\t"
+        "push r30                                \n\t"
+#endif
+#if __AVR_3_BYTE_PC__
+        "in   r30, " XTSTR(__EIND__) "           \n\t"
+        "push r30                                \n\t"
+#endif
         "push r2                                 \n\t"
         "push r3                                 \n\t"
         "push r4                                 \n\t"
@@ -336,52 +477,45 @@ __attribute__((always_inline)) static inline void avr8_context_save(void)
         "push r14                                \n\t"
         "push r15                                \n\t"
         "push r16                                \n\t"
-        "push r17                                \n\t"
-        "push r18                                \n\t"
-        "push r19                                \n\t"
-        "push r20                                \n\t"
-        "push r21                                \n\t"
-        "push r22                                \n\t"
-        "push r23                                \n\t"
-        "push r24                                \n\t"
-        "push r25                                \n\t"
-        "push r26                                \n\t"
-        "push r27                                \n\t"
-        "push r28                                \n\t"
-        "push r29                                \n\t"
-        "push r30                                \n\t"
-        "push r31                                \n\t"
-        "lds  r26, sched_active_thread           \n\t"
-        "lds  r27, sched_active_thread + 1       \n\t"
-        "in   __tmp_reg__, __SP_L__              \n\t"
-        "st   x+, __tmp_reg__                    \n\t"
-        "in   __tmp_reg__, __SP_H__              \n\t"
-        "st   x+, __tmp_reg__                    \n\t");
+        "push r17                                \n\t");
 }
 
-__attribute__((always_inline)) static inline void avr8_context_restore(void)
+__attribute__((always_inline))
+static inline void avr8_context_save_tcb(void)
 {
     __asm__ volatile (
+        "lds  r26, sched_active_thread           \n\t"
+        "lds  r27, sched_active_thread + 1       \n\t"
+        "in   r28, __SP_L__                      \n\t"
+        "st   x+, r28                            \n\t"
+        "in   r29, __SP_H__                      \n\t"
+        "st   x+, r29                            \n\t");
+}
+
+__attribute__((always_inline))
+static inline void avr8_context_restore(void)
+{
+    avr8_context_restore_tcb();
+    avr8_context_restore_upper();
+    avr8_context_restore_lower();
+}
+
+__attribute__((always_inline))
+static inline void avr8_context_restore_tcb(void)
+{
+   __asm__ volatile (
         "lds  r26, sched_active_thread           \n\t"
         "lds  r27, sched_active_thread + 1       \n\t"
         "ld   r28, x+                            \n\t"
         "out  __SP_L__, r28                      \n\t"
         "ld   r29, x+                            \n\t"
-        "out  __SP_H__, r29                      \n\t"
-        "pop  r31                                \n\t"
-        "pop  r30                                \n\t"
-        "pop  r29                                \n\t"
-        "pop  r28                                \n\t"
-        "pop  r27                                \n\t"
-        "pop  r26                                \n\t"
-        "pop  r25                                \n\t"
-        "pop  r24                                \n\t"
-        "pop  r23                                \n\t"
-        "pop  r22                                \n\t"
-        "pop  r21                                \n\t"
-        "pop  r20                                \n\t"
-        "pop  r19                                \n\t"
-        "pop  r18                                \n\t"
+        "out  __SP_H__, r29                      \n\t");   
+}
+
+__attribute__((always_inline))
+static inline void avr8_context_restore_upper(void)
+{
+    __asm__ volatile (
         "pop  r17                                \n\t"
         "pop  r16                                \n\t"
         "pop  r15                                \n\t"
@@ -398,32 +532,48 @@ __attribute__((always_inline)) static inline void avr8_context_restore(void)
         "pop  r4                                 \n\t"
         "pop  r3                                 \n\t"
         "pop  r2                                 \n\t"
-        "pop  r1                                 \n\t"
-
 #if __AVR_3_BYTE_PC__
-        "pop    __tmp_reg__                      \n\t"
-        "out    " XTSTR(__EIND__) ", __tmp_reg__ \n\t"
-#endif
-
-#if __AVR_HAVE_RAMPD__
-        "pop    __tmp_reg__                      \n\t"
-        "out    __RAMPD__, __tmp_reg__           \n\t"
-#endif
-#if __AVR_HAVE_RAMPX__
-        "pop    __tmp_reg__                      \n\t"
-        "out    __RAMPX__, __tmp_reg__           \n\t"
+        "pop  r30                                \n\t"
+        "out  " XTSTR(__EIND__) ", r30           \n\t"
 #endif
 #if __AVR_HAVE_RAMPY__
-        "pop    __tmp_reg__                      \n\t"
-        "out    __RAMPY__, __tmp_reg__           \n\t"
+        "pop  r30                                \n\t"
+        "out  __RAMPY__, r30                     \n\t"
 #endif
+        "pop  r29                                \n\t"
+        "pop  r28                                \n\t");
+}
 
+__attribute__((always_inline))
+static inline void avr8_context_restore_lower(void)
+{
+    __asm__ volatile (
+        "pop  r27                                \n\t"
+        "pop  r26                                \n\t"
+        "pop  r25                                \n\t"
+        "pop  r24                                \n\t"
+        "pop  r23                                \n\t"
+        "pop  r22                                \n\t"
+        "pop  r21                                \n\t"
+        "pop  r20                                \n\t"
+        "pop  r19                                \n\t"
+        "pop  r18                                \n\t"
+        "pop  r1                                 \n\t"
+        "pop  r0                                 \n\t"
+#if __AVR_HAVE_RAMPD__
+        "pop  r30                                \n\t"
+        "out  __RAMPD__, r30                     \n\t"
+#endif
+#if __AVR_HAVE_RAMPX__
+        "pop  r30                                \n\t"
+        "out  __RAMPX__, r30                     \n\t"
+#endif
 #if __AVR_HAVE_RAMPZ__
-        "pop    __tmp_reg__                      \n\t"
-        "out    __RAMPZ__, __tmp_reg__           \n\t"
+        "pop  r30                                \n\t"
+        "out  __RAMPZ__, r30                     \n\t"
 #endif
-
-        "pop  __tmp_reg__                        \n\t"
-        "out  __SREG__, __tmp_reg__              \n\t"
-        "pop  __tmp_reg__                        \n\t");
+        "pop  r31                                \n\t"
+        "pop  r30                                \n\t"
+        "out  __SREG__, r30                      \n\t"
+        "pop  r30                                \n\t");
 }

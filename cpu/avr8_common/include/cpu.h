@@ -48,6 +48,8 @@ extern "C"
 {
 #endif
 
+extern uint8_t avr8_isr_stack[];
+
 /**
  * @name    BOD monitoring when CPU is on sleep
  * @{
@@ -66,18 +68,6 @@ extern "C"
 #define PERIPH_I2C_NEED_READ_REGS
 #define PERIPH_I2C_NEED_WRITE_REGS
 /** @} */
-
-/**
- * @brief   Run this code on entering interrupt routines
- */
-static inline void avr8_enter_isr(void)
-{
-    /* This flag is only called from IRQ context, and nested IRQs are not
-     * supported as of now. The flag will be unset before the IRQ context is
-     * left, so no need to use memory barriers or atomics here
-     */
-    ++avr8_state_irq_count;
-}
 
 /**
  * @brief        Compute UART TX channel
@@ -117,10 +107,142 @@ static inline int avr8_is_uart_tx_pending(void)
     return avr8_state_uart;
 }
 
+/*
+ * The AVR-8 uses a shared stack only for process interrupts and switch context.
+ */
+#ifndef ISR_STACKSIZE
+#define ISR_STACKSIZE                   (512)
+#endif
+
+/**
+ * @brief Enter ISR routine
+ *
+ * It saves the register context for process an ISR.
+ */
+__attribute__((always_inline))
+static inline void avr8_isr_prolog(void)
+{
+    /* This flag is only called from IRQ context.  The value will be handled
+     * before ISR context is left by @ref avr8_isr_epilog.  ATxmega requires a
+     * cli() as first instruction inside an ISR to create a critical section
+     * around `avr8_state_irq_count`.
+     */
+    __asm__ volatile (
+    /* Register pair r24/25 are used to update `avr8_state_irq_count` content.
+     * This registers are used to test conditions related to context switch in
+     * ISR at @ref avr8_isr_epilog.
+     */
+        "push r30                                \n\t"
+        "in   r30, __SREG__                      \n\t"
+        "push r30                                \n\t"
+        "push r31                                \n\t"
+#if defined(CPU_ATXMEGA)
+        "cli                                     \n\t"
+#endif
+#if (AVR8_STATE_IRQ_USE_SRAM)
+        "lds  r31, %[state]                      \n\t"
+        "subi r31, 0xFF                          \n\t"
+        "sts  %[state], r31                      \n\t"
+#else
+        "in   r31, %[state]                      \n\t"
+        "subi r31, 0xFF                          \n\t"
+        "out  %[state], r31                      \n\t"
+#endif
+#if defined(CPU_ATXMEGA)
+        "sei                                     \n\t"
+#endif
+#if __AVR_HAVE_RAMPZ__
+        "in   r30, __RAMPZ__                     \n\t"
+        "push r30                                \n\t"
+#endif
+#if __AVR_HAVE_RAMPX__
+        "in   r30, __RAMPX__                     \n\t"
+        "push r30                                \n\t"
+#endif
+#if __AVR_HAVE_RAMPD__
+        "in   r30, __RAMPD__                     \n\t"
+        "push r30                                \n\t"
+#endif
+        "push r0                                 \n\t"
+        "push r1                                 \n\t"
+        "clr  r1                                 \n\t"
+        "push r18                                \n\t"
+        "push r19                                \n\t"
+        "push r20                                \n\t"
+        "push r21                                \n\t"
+        "push r22                                \n\t"
+        "push r23                                \n\t"
+        "push r24                                \n\t"
+        "push r25                                \n\t"
+        "push r26                                \n\t"
+        "push r27                                \n\t"
+    /*
+     * Load irq_stack
+     */
+#if defined(CPU_ATXMEGA)
+        "cli                                     \n\t"
+#endif
+        "cpi  r31, 1                             \n\t"
+        "brne skip_save_if_nested_isr_%=         \n\t"
+        "ldi  r30, lo8(%[irq_stack])             \n\t"
+        "ldi  r31, hi8(%[irq_stack])             \n\t"
+        "in   r24, __SP_L__                      \n\t"
+        "st   z, r24                             \n\t"
+        "in   r24, __SP_H__                      \n\t"
+        "st   -z, r24                            \n\t"
+        "subi r30, 1                             \n\t"
+        "sbci r31, 0                             \n\t"
+        "out  __SP_L__, r30                      \n\t"
+        "out  __SP_H__, r31                      \n\t"
+        "skip_save_if_nested_isr_%=:             \n\t"
+#if defined(CPU_ATXMEGA)
+        "sei                                     \n\t"
+#endif
+        : /* no output */
+#if (AVR8_STATE_IRQ_USE_SRAM)
+        : [state] "" (avr8_state_irq_count),
+#else
+        : [state] "I" (_SFR_IO_ADDR(avr8_state_irq_count)),
+#endif
+          [irq_stack] "" (avr8_isr_stack + ISR_STACKSIZE - 1)
+        : "memory"
+    );
+}
+
+/**
+ * @brief   Restore register context from ISR
+ */
+__attribute__((naked))
+void avr8_isr_epilog(void);
+
+/**
+ * @brief   Run this code on entering interrupt routines
+ *
+ * Notes:
+ * - This code must not be shared.
+ * - This code must not be a call or jmp.
+ */
+__attribute__((always_inline))
+static inline void avr8_enter_isr(void)
+{
+    avr8_isr_prolog();
+}
+
 /**
  * @brief Run this code on exiting interrupt routines
  */
-void avr8_exit_isr(void);
+__attribute__((always_inline))
+static inline void avr8_exit_isr(void)
+{
+    /* Let's not add more address in stack and save some code sharing
+     * avr8_isr_epilog.
+     */
+#if (FLASHEND <= 0x1FFF)
+    __asm__ volatile ("rjmp avr8_isr_epilog" : : : "memory");
+#else
+    __asm__ volatile ("jmp avr8_isr_epilog" : : : "memory");
+#endif
+}
 
 /**
  * @brief Initialization of the CPU clock
@@ -137,18 +259,18 @@ static inline uinttxtptr_t __attribute__((always_inline)) cpu_get_caller_pc(void
 {
         uinttxtptr_t addr;
     __asm__ volatile(
-        "ldi %D[dest], 0"                   "\n\t"
+        "ldi %D[dest], 0                   \n\t"
 #if __AVR_3_BYTE_PC__
-        "pop %C[dest] "      "\n\t"
+        "pop %C[dest]                      \n\t"
 #else
-        "ldi %C[dest], 0"                   "\n\t"
+        "ldi %C[dest], 0                   \n\t"
 #endif
-        "pop %B[dest]"                      "\n\t"
-        "pop %A[dest]"                      "\n\t"
-        "push %A[dest]"                     "\n\t"
-        "push %B[dest]"                     "\n\t"
+        "pop %B[dest]                      \n\t"
+        "pop %A[dest]                      \n\t"
+        "push %A[dest]                     \n\t"
+        "push %B[dest]                     \n\t"
 #if __AVR_3_BYTE_PC__
-        "push %C[dest] "      "\n\t"
+        "push %C[dest]                     \n\t"
 #endif
         : [dest]    "=r"(addr)
         : /* no inputs */

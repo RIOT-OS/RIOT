@@ -146,7 +146,7 @@ __attribute__((always_inline)) static inline bool irq_is_enabled(void)
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 #define AVR8_ISR(vector, function, ...) \
-    ISR(vector, ISR_BLOCK)              \
+    ISR(vector, ISR_NAKED)              \
     {                                   \
         avr8_enter_isr();               \
         function(__VA_ARGS__);          \

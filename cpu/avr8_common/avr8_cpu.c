@@ -68,6 +68,7 @@
 */
 uint8_t mcusr_mirror __attribute__((section(".noinit")));
 uint8_t soft_rst __attribute__((section(".noinit")));
+uint8_t avr8_isr_stack[ISR_STACKSIZE] __attribute__((section(".data")));
 #if (AVR8_STATE_IRQ_USE_SRAM)
 uint8_t avr8_state_irq_count_sram = 0;
 #endif
