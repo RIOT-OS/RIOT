@@ -1,153 +1,182 @@
 "Area: arduino API":
-  - "sys/arduino/**/*"
+  - changed-files:
+    - any-glob-to-any-file: "sys/arduino/**/*"
 
 "Area: BLE":
-  - "pkg/nimble/**/*"
-  - "sys/net/ble/**/*"
-  - "sys/include/net/bluetil/**/*"
-  - "sys/include/net/skald/**/*"
-  - "sys/include/net/skald.h"
+  - changed-files:
+    - any-glob-to-any-file: "pkg/nimble/**/*"
+    - any-glob-to-any-file: "sys/net/ble/**/*"
+    - any-glob-to-any-file: "sys/include/net/bluetil/**/*"
+    - any-glob-to-any-file: "sys/include/net/skald/**/*"
+    - any-glob-to-any-file: "sys/include/net/skald.h"
 
 "Area: boards":
-  - "boards/**/*"
+  - changed-files:
+    - any-glob-to-any-file: "boards/**/*"
 
 "Area: build system":
-  - "Makefile.*"
-  - "makefiles/**/*"
-  - "**/*.mk"
+  - changed-files:
+    - any-glob-to-any-file: "Makefile.*"
+    - any-glob-to-any-file: "makefiles/**/*"
+    - any-glob-to-any-file: "**/*.mk"
 
 "Area: CI":
-  - ".github/**/*.yml"
-  - ".murdock"
-  - ".murdock.yml"
-  - "bors.toml"
+  - changed-files:
+    - any-glob-to-any-file: ".github/**/*.yml"
+    - any-glob-to-any-file: ".murdock"
+    - any-glob-to-any-file: ".murdock.yml"
+    - any-glob-to-any-file: "bors.toml"
 
 "Area: CoAP":
-  - "sys/net/application_layer/*coap/**/*"
-  - "sys/include/net/*coap*/**/*"
+  - changed-files:
+    - any-glob-to-any-file: "sys/net/application_layer/*coap/**/*"
+    - any-glob-to-any-file: "sys/include/net/*coap*/**/*"
 
 "Area: core":
-  - "core/**/*"
+  - changed-files:
+    - any-glob-to-any-file: "core/**/*"
 
 "Area: cpu":
-  - "cpu/**/*"
+  - changed-files:
+    - any-glob-to-any-file: "cpu/**/*"
 
 "Area: doc":
-  - "doc/**/*"
-  - "**/*.md"
-  - "**/*.txt"
-  - "**/*.cff"
+  - changed-files:
+    - any-glob-to-any-file: "doc/**/*"
+    - any-glob-to-any-file: "**/*.md"
+    - any-glob-to-any-file: "**/*.txt"
+    - any-glob-to-any-file: "**/*.cff"
 
 "Area: drivers":
-  - "drivers/**/*"
+  - changed-files:
+    - any-glob-to-any-file: "drivers/**/*"
 
 "Area: examples":
-  - "examples/**/*"
+  - changed-files:
+    - any-glob-to-any-file: "examples/**/*"
 
 "Area: Kconfig":
-  - "dist/tools/kconfiglib/**/*"
-  - "makefiles/kconfig.mk"
-  - "kconfigs/*"
-  - "**/Kconfig"
+  - changed-files:
+    - any-glob-to-any-file: "dist/tools/kconfiglib/**/*"
+    - any-glob-to-any-file: "makefiles/kconfig.mk"
+    - any-glob-to-any-file: "kconfigs/*"
+    - any-glob-to-any-file: "**/Kconfig"
 
 "Area: LoRa":
-  - "drivers/llcc68/**/*"
-  - "drivers/sx126x/**/*"
-  - "drivers/sx127x/**/*"
-  - "drivers/include/llcc68.h"
-  - "drivers/include/sx126x.h"
-  - "drivers/include/sx127x.h"
-  - "pkg/semtech-loramac/**/*"
-  - "sys/net/lora/**/*"
-  - "sys/net/gnrc/link_layer/lorawan/**/*"
-  - "sys/include/net/lorawan/**/*"
-  - "sys/include/net/gnrc/lorawan/**/*"
-  - "sys/include/net/gnrc/lorawan.h"
-  - "sys/include/net/lora.h"
-  - "sys/include/net/loramac.h"
+  - changed-files:
+    - any-glob-to-any-file: "drivers/llcc68/**/*"
+    - any-glob-to-any-file: "drivers/sx126x/**/*"
+    - any-glob-to-any-file: "drivers/sx127x/**/*"
+    - any-glob-to-any-file: "drivers/include/llcc68.h"
+    - any-glob-to-any-file: "drivers/include/sx126x.h"
+    - any-glob-to-any-file: "drivers/include/sx127x.h"
+    - any-glob-to-any-file: "pkg/semtech-loramac/**/*"
+    - any-glob-to-any-file: "sys/net/lora/**/*"
+    - any-glob-to-any-file: "sys/net/gnrc/link_layer/lorawan/**/*"
+    - any-glob-to-any-file: "sys/include/net/lorawan/**/*"
+    - any-glob-to-any-file: "sys/include/net/gnrc/lorawan/**/*"
+    - any-glob-to-any-file: "sys/include/net/gnrc/lorawan.h"
+    - any-glob-to-any-file: "sys/include/net/lora.h"
+    - any-glob-to-any-file: "sys/include/net/loramac.h"
 
 "Area: network":
-  - "sys/net/**/*"
-  - "sys/include/net/**/*"
-  - "pkg/lwip/**/*"
-  - "pkg/openthread/**/*"
-  - "pkg/openwsn/**/*"
-  - "pkg/paho-mqtt/**/*"
+  - changed-files:
+    - any-glob-to-any-file: "sys/net/**/*"
+    - any-glob-to-any-file: "sys/include/net/**/*"
+    - any-glob-to-any-file: "pkg/lwip/**/*"
+    - any-glob-to-any-file: "pkg/openthread/**/*"
+    - any-glob-to-any-file: "pkg/openwsn/**/*"
+    - any-glob-to-any-file: "pkg/paho-mqtt/**/*"
 
 "Area: OTA":
-  - "sys/suit/**/*"
-  - "sys/include/suit/**/*"
-  - "sys/include/suit.h"
+  - changed-files:
+    - any-glob-to-any-file: "sys/suit/**/*"
+    - any-glob-to-any-file: "sys/include/suit/**/*"
+    - any-glob-to-any-file: "sys/include/suit.h"
 
 "Area: pkg":
-  - "pkg/**/*"
+  - changed-files:
+    - any-glob-to-any-file: "pkg/**/*"
 
 "Area: SAUL":
-  - "drivers/saul/**/*"
-  - "drivers/include/saul/**/*"
-  - "drivers/include/saul.h"
-  - "sys/saul_reg/**/*"
-  - "sys/include/saul_reg.h"
+  - changed-files:
+    - any-glob-to-any-file: "drivers/saul/**/*"
+    - any-glob-to-any-file: "drivers/include/saul/**/*"
+    - any-glob-to-any-file: "drivers/include/saul.h"
+    - any-glob-to-any-file: "sys/saul_reg/**/*"
+    - any-glob-to-any-file: "sys/include/saul_reg.h"
 
 "Area: sys":
-  - "sys/**/*"
+  - changed-files:
+    - any-glob-to-any-file: "sys/**/*"
 
 "Area: tests":
-  - "tests/**/*"
-  - "fuzzing/**/*"
-  - "dist/pythonlibs/**/*"
-  - "makefiles/tests/**/*"
+  - changed-files:
+    - any-glob-to-any-file: "tests/**/*"
+    - any-glob-to-any-file: "fuzzing/**/*"
+    - any-glob-to-any-file: "dist/pythonlibs/**/*"
+    - any-glob-to-any-file: "makefiles/tests/**/*"
 
 "Area: timers":
-  - "sys/*timer/**/*"
-  - "sys/include/*timer/**/*"
-  - "sys/include/*timer.h"
+  - changed-files:
+    - any-glob-to-any-file: "sys/*timer/**/*"
+    - any-glob-to-any-file: "sys/include/*timer/**/*"
+    - any-glob-to-any-file: "sys/include/*timer.h"
 
 "Area: toolchain":
-  - "makefiles/toolchain/**/*"
+  - changed-files:
+    - any-glob-to-any-file: "makefiles/toolchain/**/*"
 
 "Area: tools":
-  - "dist/tools/**/*"
-  - "dist/testbed-support/**/*"
-  - "makefiles/tools/**/*"
+  - changed-files:
+    - any-glob-to-any-file: "dist/tools/**/*"
+    - any-glob-to-any-file: "dist/testbed-support/**/*"
+    - any-glob-to-any-file: "makefiles/tools/**/*"
 
 "Area: USB":
-  - "sys/usb/**/*"
-  - "sys/include/usb/**/*"
-  - "sys/include/usb.h"
+  - changed-files:
+    - any-glob-to-any-file: "sys/usb/**/*"
+    - any-glob-to-any-file: "sys/include/usb/**/*"
+    - any-glob-to-any-file: "sys/include/usb.h"
 
 "Platform: native":
-  - "boards/native/**/*"
-  - "cpu/native/**/*"
+  - changed-files:
+    - any-glob-to-any-file: "boards/native/**/*"
+    - any-glob-to-any-file: "cpu/native/**/*"
 
 "Platform: ARM":
-  - "cpu/arm7_common/**/*"
-  - "cpu/cortexm_common/**/*"
-  - "cpu/cc2*/**/*"
-  - "cpu/efm32/**/*"
-  - "cpu/kinetis/**/*"
-  - "cpu/lm4f120/**/*"
-  - "cpu/lpc*/**/*"
-  - "cpu/nrf5*/**/*"
-  - "cpu/qn908x/**/*"
-  - "cpu/sam*/**/*"
-  - "cpu/stellaris_common/**/*"
-  - "cpu/stm32/**/*"
-  - "makefiles/arch/cortexm.inc.mk"
+  - changed-files:
+    - any-glob-to-any-file: "cpu/arm7_common/**/*"
+    - any-glob-to-any-file: "cpu/cortexm_common/**/*"
+    - any-glob-to-any-file: "cpu/cc2*/**/*"
+    - any-glob-to-any-file: "cpu/efm32/**/*"
+    - any-glob-to-any-file: "cpu/kinetis/**/*"
+    - any-glob-to-any-file: "cpu/lm4f120/**/*"
+    - any-glob-to-any-file: "cpu/lpc*/**/*"
+    - any-glob-to-any-file: "cpu/nrf5*/**/*"
+    - any-glob-to-any-file: "cpu/qn908x/**/*"
+    - any-glob-to-any-file: "cpu/sam*/**/*"
+    - any-glob-to-any-file: "cpu/stellaris_common/**/*"
+    - any-glob-to-any-file: "cpu/stm32/**/*"
+    - any-glob-to-any-file: "makefiles/arch/cortexm.inc.mk"
 
 "Platform: AVR":
-  - "cpu/atmega*/**/*"
-  - "cpu/avr8_common/**/*"
-  - "makefiles/arch/avr8.inc.mk"
+  - changed-files:
+    - any-glob-to-any-file: "cpu/atmega*/**/*"
+    - any-glob-to-any-file: "cpu/avr8_common/**/*"
+    - any-glob-to-any-file: "makefiles/arch/avr8.inc.mk"
 
 "Platform: ESP":
-  - "cpu/esp*/**/*"
+  - changed-files:
+    - any-glob-to-any-file: "cpu/esp*/**/*"
 
 "Platform: MSP":
-  - "cpu/msp*/**/*"
-  - "makefiles/arch/msp430.inc.mk"
+  - changed-files:
+    - any-glob-to-any-file: "cpu/msp*/**/*"
+    - any-glob-to-any-file: "makefiles/arch/msp430.inc.mk"
 
 "Platform: RISC-V":
-  - "cpu/riscv_common/**/*"
-  - "cpu/fe310/**/*"
-  - "makefiles/arch/riscv.inc.mk"
+  - changed-files:
+    - any-glob-to-any-file: "cpu/riscv_common/**/*"
+    - any-glob-to-any-file: "cpu/fe310/**/*"
+    - any-glob-to-any-file: "makefiles/arch/riscv.inc.mk"
