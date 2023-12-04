@@ -34,9 +34,45 @@ The text and items below are tentative, up for discussion, to be updated by regu
 # Peripheral drivers
 (contact/steering: [Hauke](https://github.com/haukepetersen))
 
+## Timers
+
+(contact/steering: [kaspar030](https://github.com/kaspar030), [benpicco](https://github.com/benpicco), [maribu](https://github.com/maribu))
+
 - cleanup and unification of low-level timer interfaces (`timer`, `rtt`, `rtc`)
+- implement capture mode
+
+## SPI
+
 - introduction of `spi_slave` interface
+- transition to `spi_clk_t` being the frequency in Hz, not an `enum` constant, to allow arbitrary frequencies
+    - most implementations have been ported
+- allow a way to detect the actual frequency an SPI bus is running at
+    - see https://github.com/RIOT-OS/RIOT/pull/16727 for one proposal
+
+## I2C
+
 - introduction of `i2c_slave` interface
+    - see https://github.com/RIOT-OS/RIOT/issues/19560 for a discussion
+
+## GPIO
+
+(contact/steering: [gschorcht](https://github.com/gschorcht), [maribu](https://github.com/maribu))
+
+- add a port-based, feature-rich, thread-safe GPIO API
+    - [GPIO LL](https://doc.riot-os.org/group__drivers__periph__gpio__ll.html) seems to fit the bill so for
+    - many MCUs still need an implementation
+- add a high level API that unifies external and internal GPIOs on top
+
+## ADC
+
+(contact/steering: [benpicco](https://github.com/benpicco), [kfessel](https://github.com/kfessel), [gschorcht](https://github.com/gschorcht), [maribu](https://github.com/maribu))
+
+- extend / replace the ADC API to allow advanced use cases
+    - selecting reference voltages (think: multimeter app)
+    - differential inputs
+    - fast (ideally DMA supported) sampling (think: a digital oscilloscope app)
+    - unify external and internal ADCs
+    - see https://github.com/RIOT-OS/RIOT/pull/13247 for one proposal
 
 
 
