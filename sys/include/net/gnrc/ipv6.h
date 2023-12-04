@@ -122,9 +122,13 @@ extern "C" {
  */
 /**
  * @brief   Default stack size to use for the IPv6 thread
+ *
+ * @note    The message queue was previously allocated on the stack.
+ *          The default number of messages is 2³.
+ *          Given sizeof(msg_t) == 8, the stack size is reduced by 64 bytes.
  */
 #ifndef GNRC_IPV6_STACK_SIZE
-#define GNRC_IPV6_STACK_SIZE        (THREAD_STACKSIZE_DEFAULT)
+#define GNRC_IPV6_STACK_SIZE        ((THREAD_STACKSIZE_DEFAULT) - 64)
 #endif
 
 /**

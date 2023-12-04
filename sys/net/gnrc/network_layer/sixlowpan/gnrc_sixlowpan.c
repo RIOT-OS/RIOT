@@ -36,6 +36,7 @@
 static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 
 static char _stack[GNRC_SIXLOWPAN_STACK_SIZE + DEBUG_EXTRA_STACKSIZE];
+static msg_t _msg_q[GNRC_SIXLOWPAN_MSG_QUEUE_SIZE];
 
 /* handles GNRC_NETAPI_MSG_TYPE_RCV commands */
 static void _receive(gnrc_pktsnip_t *pkt);
@@ -385,12 +386,12 @@ static void _continue_fragmenting(gnrc_sixlowpan_frag_fb_t *fbuf)
 
 static void *_event_loop(void *args)
 {
-    msg_t msg, reply, msg_q[GNRC_SIXLOWPAN_MSG_QUEUE_SIZE];
+    msg_t msg, reply;
     gnrc_netreg_entry_t me_reg = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
                                                             thread_getpid());
 
     (void)args;
-    msg_init_queue(msg_q, GNRC_SIXLOWPAN_MSG_QUEUE_SIZE);
+    msg_init_queue(_msg_q, GNRC_SIXLOWPAN_MSG_QUEUE_SIZE);
 
     /* register interest in all 6LoWPAN packets */
     gnrc_netreg_register(GNRC_NETTYPE_SIXLOWPAN, &me_reg);
