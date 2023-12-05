@@ -36,6 +36,7 @@
 #include <limits.h>
 #include <stdint.h>
 
+#include "architecture.h"
 #include "periph_cpu.h"
 #include "periph_conf.h"
 
@@ -231,6 +232,68 @@ void timer_start(tim_t dev);
  * @param[in] dev           the timer to stop
  */
 void timer_stop(tim_t dev);
+
+/**
+ * @brief   Get the number of different frequencies supported by the given
+ *          timer
+ *
+ * If calling @ref timer_query_freqs_numof for the same timer with an index
+ * smaller this number, it hence MUST return a frequency (and not zero).
+ *
+ * @details This function is marked with attribute pure to tell the compiler
+ *          that this function has no side affects and will return the same
+ *          value when called with the same parameter. (E.g. to not call this
+ *          function in every loop iteration when iterating over all
+ *          supported frequencies.)
+ */
+__attribute__((pure))
+uword_t timer_query_freqs_numof(tim_t dev);
+
+/**
+ * @brief   Get the number of timer channels for the given timer
+ *
+ * @details This function is marked with attribute pure to tell the compiler
+ *          that this function has no side affects and will return the same
+ *          value when called with the same timer as parameter.
+ * @details There is a weak default implementation that returns the value of
+ *          `TIMER_CHANNEL_NUMOF`. For some MCUs the number of supported
+ *          channels depends on @p dev - those are expected to provide there
+ *          own implementation of this function.
+ */
+__attribute__((pure))
+uword_t timer_query_channel_numof(tim_t dev);
+
+/**
+ * @brief   Iterate over supported frequencies
+ *
+ * @param   dev     Timer to get the next supported frequency of
+ * @param   index   Index of the frequency to get
+ * @return          The @p index highest frequency supported by the timer
+ * @retval  0       @p index is too high
+ *
+ * @note    Add `FEATURES_REQUIRED += periph_timer_query_freqs` to your `Makefile`.
+ *
+ * When called with a value of 0 for @p index, the highest supported frequency
+ * is returned. For a value 1 the second highest is returned, and so on. For
+ * values out of range, 0 is returned. A program hence can iterate over all
+ * supported frequencies using:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+ * uint32_t freq:
+ * for (uword_t i; (freq = timer_query_freqs(dev, i)); i++) {
+ *     work_with_frequency(freq);
+ * }
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * Or alternatively:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+ * for (uword_t i; i < timer_query_freqs_numof(dev); i++) {
+ *     work_with_frequency(timer_query_freqs(dev, i));
+ * }
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
+uint32_t timer_query_freqs(tim_t dev, uword_t index);
 
 #ifdef __cplusplus
 }

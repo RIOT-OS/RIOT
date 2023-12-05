@@ -572,6 +572,11 @@ config HAS_PERIPH_TIMER_PERIODIC
         Indicates that the Timer peripheral provides the periodic timeout
         functionality.
 
+config HAS_PERIPH_TIMER_QUERY_FREQS
+    bool
+    help
+        Indicates that the driver of the timer supports iterating over supported frequencies.
+
 config HAS_PERIPH_UART
     bool
     help
