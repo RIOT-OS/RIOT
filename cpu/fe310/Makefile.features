@@ -8,6 +8,7 @@ FEATURES_PROVIDED += periph_pmp
 FEATURES_PROVIDED += periph_rtt_overflow
 FEATURES_PROVIDED += periph_rtt_set_counter
 FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_timer_freq
 FEATURES_PROVIDED += periph_wdt
 
 include $(RIOTCPU)/riscv_common/Makefile.features

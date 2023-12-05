@@ -27,13 +27,10 @@
  * @}
  */
 
-#include <stdlib.h>
 #include <unistd.h>
 
-#include "cpu.h"
+#include "compiler_hints.h"
 #include "cpu_conf.h"
-#include "periph_cpu.h"
-#include "periph_conf.h"
 #include "periph/timer.h"
 #include "vendor/riscv_csr.h"
 
@@ -72,6 +69,12 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     *mtime = 0;
 
     return 0;
+}
+
+uint32_t timer_freq(tim_t dev)
+{
+    assume(dev == 0);
+    return RTC_FREQ;
 }
 
 int timer_set(tim_t dev, int channel, unsigned int timeout)
