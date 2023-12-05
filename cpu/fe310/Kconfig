@@ -12,11 +12,12 @@ config CPU_FAM_FE310
     select HAS_PERIPH_CPUID
     select HAS_PERIPH_GPIO
     select HAS_PERIPH_GPIO_IRQ
+    select HAS_PERIPH_PLIC
     select HAS_PERIPH_PM
     select HAS_PERIPH_PMP
-    select HAS_PERIPH_PLIC
     select HAS_PERIPH_RTT_OVERFLOW
     select HAS_PERIPH_RTT_SET_COUNTER
+    select HAS_PERIPH_TIMER
     select HAS_PERIPH_WDT
 
     select MODULE_PERIPH_PLIC if TEST_KCONFIG
