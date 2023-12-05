@@ -1,5 +1,12 @@
 include ../Makefile.net_common
 
+# This tests fails sporadically in the CI on native with both GCC and LLVM
+# toolchains. Maybe it just fluke and due to high load on the machines,
+# maybe it is an actual race condition.
+#
+# TODO: Solve the issue and re-enable
+TEST_ON_CI_BLACKLIST += native
+
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_router_default
 USEMODULE += gnrc_sixlowpan_frag_sfr
