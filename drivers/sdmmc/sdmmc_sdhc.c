@@ -631,8 +631,8 @@ void _core_init(sdhc_dev_t *sdhc_dev)
         GCLK->PCHCTRL[SDHC1_GCLK_ID_SLOW].reg = GCLK_PCHCTRL_CHEN
                                               | GCLK_PCHCTRL_GEN(SDHC_CLOCK_SLOW);
         MCLK->AHBMASK.bit.SDHC1_ = 1;
-#endif /* SDHC1 */
     }
+#endif /* SDHC1 */
 }
 
 static void _init_pins(sdhc_dev_t *sdhc_dev)
