@@ -167,6 +167,10 @@ static inline void cortexm_sleep(int deep)
     unsigned state = irq_disable();
     __DSB();
     __WFI();
+    /* Some CPUs require an ISB after WFI to work around silicon bugs */
+#if CORTEXM_ISB_REQUIRED_AFTER_WFI
+    __ISB();
+#endif
     irq_restore(state);
 }
 

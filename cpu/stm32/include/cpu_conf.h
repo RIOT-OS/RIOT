@@ -88,6 +88,16 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Enable workaround for bug in WFI by issuing an ISB
+ *
+ * This works around a bug on STM32 systems, see [1] for details, or [2] for
+ * an archive.org backup.
+ * [1]: https://cliffle.com/blog/stm32-wfi-bug
+ * [2]: https://web.archive.org/web/20231205101603/https://cliffle.com/blog/stm32-wfi-bug/
+ */
+#define CORTEXM_ISB_REQUIRED_AFTER_WFI  1
+
+/**
  * @brief   ARM Cortex-M specific CPU configuration
  * @{
  */
