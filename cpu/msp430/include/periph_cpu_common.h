@@ -358,14 +358,14 @@ void clock_init(void);
  *
  * @note    This is only useful when implementing MSP430 peripheral drivers
  */
-uint32_t msp430_submain_clock_freq(void);
+uint32_t PURE msp430_submain_clock_freq(void);
 
 /**
  * @brief   Get the configured auxiliary clock frequency
  *
  * @note    This is only useful when implementing MSP430 peripheral drivers
  */
-uint32_t msp430_auxiliary_clock_freq(void);
+uint32_t PURE msp430_auxiliary_clock_freq(void);
 
 #ifdef __cplusplus
 }

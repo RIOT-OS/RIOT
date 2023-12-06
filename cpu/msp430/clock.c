@@ -348,7 +348,8 @@ void default_clock_init(void)
 
 __attribute__((weak, alias("default_clock_init"))) void clock_init(void);
 
-uint32_t msp430_submain_clock_freq(void) {
+uint32_t PURE msp430_submain_clock_freq(void)
+{
     uint16_t shift = (clock_params.submain_clock_divier >> 1) & 0x3;
     switch (clock_params.submain_clock_source) {
     case SUBMAIN_CLOCK_SOURCE_LFXT1CLK:
@@ -365,7 +366,7 @@ uint32_t msp430_submain_clock_freq(void) {
     }
 }
 
-uint32_t msp430_auxiliary_clock_freq(void)
+uint32_t PURE msp430_auxiliary_clock_freq(void)
 {
     uint16_t shift = (clock_params.auxiliary_clock_divier >> 4) & 0x3;
     return clock_params.lfxt1_frequency >> shift;
