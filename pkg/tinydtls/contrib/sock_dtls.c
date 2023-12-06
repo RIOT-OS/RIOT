@@ -137,9 +137,6 @@ static int _event(struct dtls_context_t *ctx, session_t *session,
         case DTLS_EVENT_CONNECTED:
             DEBUG("sock_dtls: event connected\n");
             break;
-        case DTLS_EVENT_RENEGOTIATE:
-            DEBUG("sock_dtls: event renegotiate\n");
-            break;
         }
     }
     if (!level && (code != DTLS_EVENT_CONNECT)) {
