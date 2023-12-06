@@ -32,7 +32,7 @@ PROVIDE(PORT_4      = P4IN);
 PROVIDE(PORT_5      = P5IN);
 PROVIDE(PORT_6      = P6IN);
 
-/* no typo: TBIV indeed comes before TAIV in memory, see msp_timer_ivec_t */
+/* no typo: TBIV indeed comes before TAIV in memory, see msp430_timer_ivec_t */
 PROVIDE(TIMER_IVEC  = TBIV);
 
 PROVIDE(TIMER_A     = TACTL);

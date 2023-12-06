@@ -59,7 +59,7 @@ static int init_base(uart_t uart, uint32_t baudrate)
     }
 
     /* get the default UART for now -> TODO: enable for multiple devices */
-    msp_usart_t *dev = UART_BASE;
+    msp430_usart_t *dev = UART_BASE;
 
     /* power off and reset device */
     uart_poweroff(uart);
@@ -76,7 +76,7 @@ static int init_base(uart_t uart, uint32_t baudrate)
     dev->MCTL = 0;
     /* configure pins -> TODO: move into GPIO driver (once implemented) */
     UART_PORT->SEL |= (UART_RX_PIN | UART_TX_PIN);
-    msp_port_t *port = &UART_PORT->base;
+    msp430_port_t *port = &UART_PORT->base;
     port->OD |= UART_RX_PIN;
     port->OD &= ~(UART_TX_PIN);
     port->DIR |= UART_TX_PIN;
@@ -91,7 +91,7 @@ static int init_base(uart_t uart, uint32_t baudrate)
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     (void)uart;
-    msp_usart_t *dev = UART_BASE;
+    msp430_usart_t *dev = UART_BASE;
 
     for (size_t i = 0; i < len; i++) {
         while (!(dev->TCTL & TXEPT)) {}

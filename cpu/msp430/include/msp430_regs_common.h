@@ -87,26 +87,26 @@ typedef struct {
     REG8    IN;         /**< input data */
     REG8    OD;         /**< output data */
     REG8    DIR;        /**< pin direction */
-} msp_port_t;
+} msp430_port_t;
 
 /**
  * @brief   GPIO Port 1/2 (with interrupt functionality)
  */
 typedef struct {
-    msp_port_t base;    /**< common GPIO port registers */
+    msp430_port_t base; /**< common GPIO port registers */
     REG8    IFG;        /**< interrupt flag */
     REG8    IES;        /**< interrupt edge select */
     REG8    IE;         /**< interrupt enable */
     REG8    SEL;        /**< alternative function select */
-} msp_port_p1_p2_t;
+} msp430_port_p1_p2_t;
 
 /**
  * @brief   GPIO Port 3..6 (without interrupt functionality)
  */
 typedef struct {
-    msp_port_t base;    /**< common GPIO port registers */
+    msp430_port_t base; /**< common GPIO port registers */
     REG8    SEL;        /**< alternative function select */
-} msp_port_p3_p6_t;
+} msp430_port_p3_p6_t;
 
 
 /**
@@ -114,9 +114,9 @@ typedef struct {
  */
 typedef struct {
     REG16   TBIV;       /**< TIMER_A interrupt status */
-    REG16   reserved[7];    /**< reserved */
+    REG16   reserved[7];/**< reserved */
     REG16   TAIV;       /**< TIMER_B interrupt status */
-} msp_timer_ivec_t;
+} msp430_timer_ivec_t;
 
 /**
  * @brief   Timer module registers
@@ -126,7 +126,7 @@ typedef struct {
     REG16   CCTL[7];    /**< capture compare channel control */
     REG16   R;          /**< current counter value */
     REG16   CCR[7];     /**< capture compare channel values */
-} msp_timer_t;
+} msp430_timer_t;
 
 /**
  * @name    MSP430 Common Peripheral Register Maps
@@ -138,42 +138,42 @@ typedef struct {
 /**
  * @brief   Register map of GPIO PORT 1
  */
-extern msp_port_p1_p2_t PORT_1;
+extern msp430_port_p1_p2_t PORT_1;
 /**
  * @brief   Register map of GPIO PORT 2
  */
-extern msp_port_p1_p2_t PORT_2;
+extern msp430_port_p1_p2_t PORT_2;
 /**
  * @brief   Register map of GPIO PORT 3
  */
-extern msp_port_p3_p6_t PORT_3;
+extern msp430_port_p3_p6_t PORT_3;
 /**
  * @brief   Register map of GPIO PORT 4
  */
-extern msp_port_p3_p6_t PORT_4;
+extern msp430_port_p3_p6_t PORT_4;
 /**
  * @brief   Register map of GPIO PORT 5
  */
-extern msp_port_p3_p6_t PORT_5;
+extern msp430_port_p3_p6_t PORT_5;
 /**
  * @brief   Register map of GPIO PORT 6
  */
-extern msp_port_p3_p6_t PORT_6;
+extern msp430_port_p3_p6_t PORT_6;
 
 /**
  * @brief   Register map of the timer interrupt control registers
  */
-extern msp_timer_ivec_t TIMER_IVEC;
+extern msp430_timer_ivec_t TIMER_IVEC;
 
 /**
  * @brief   Register map of the timer A control registers
  */
-extern msp_timer_t TIMER_A;
+extern msp430_timer_t TIMER_A;
 
 /**
  * @brief   Register map of the timer B control registers
  */
-extern msp_timer_t TIMER_B;
+extern msp430_timer_t TIMER_B;
 /** @} */
 
 #ifdef __cplusplus
