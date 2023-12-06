@@ -24,16 +24,15 @@ SECTIONS
 /* provide address for register maps by taking the address of the first
  * register (as provided by the vendor files) */
 
-PROVIDE(PORT_1      = P1IN);
-PROVIDE(PORT_2      = P2IN);
-PROVIDE(PORT_3      = P3IN);
-PROVIDE(PORT_3      = P3IN);
-PROVIDE(PORT_4      = P4IN);
-PROVIDE(PORT_5      = P5IN);
-PROVIDE(PORT_6      = P6IN);
+PROVIDE(PORT_1              = P1IN);
+PROVIDE(PORT_2              = P2IN);
+PROVIDE(PORT_3              = P3IN);
+PROVIDE(PORT_3              = P3IN);
+PROVIDE(PORT_4              = P4IN);
+PROVIDE(PORT_5              = P5IN);
+PROVIDE(PORT_6              = P6IN);
 
-/* no typo: TBIV indeed comes before TAIV in memory, see msp430_timer_ivec_t */
-PROVIDE(TIMER_IVEC  = TBIV);
-
-PROVIDE(TIMER_A     = TACTL);
-PROVIDE(TIMER_B     = TBCTL);
+PROVIDE(TIMER_A             = TACTL);
+PROVIDE(TIMER_B             = TBCTL);
+PROVIDE(TIMER_A_IRQFLAGS    = TAIV);
+PROVIDE(TIMER_B_IRQFLAGS    = TBIV);

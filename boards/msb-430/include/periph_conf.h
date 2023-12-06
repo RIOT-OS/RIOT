@@ -48,11 +48,24 @@ static const msp430_clock_params_t clock_params = {
  * @name    Timer configuration
  * @{
  */
-#define TIMER_NUMOF         (1U)
-#define TIMER_BASE          (&TIMER_A)
-#define TIMER_CHAN          (3)
-#define TIMER_ISR_CC0       (TIMERA0_VECTOR)
-#define TIMER_ISR_CCX       (TIMERA1_VECTOR)
+static const timer_conf_t timer_conf[] = {
+    {
+        .timer = &TIMER_A,
+        .irq_flags = &TIMER_A_IRQFLAGS,
+        .clock_source = TIMER_CLOCK_SOURCE_SUBMAIN_CLOCK,
+    },
+    {
+        .timer = &TIMER_B,
+        .irq_flags = &TIMER_B_IRQFLAGS,
+        .clock_source = TIMER_CLOCK_SOURCE_AUXILIARY_CLOCK,
+    }
+};
+#define TIMER_NUMOF         ARRAY_SIZE(timer_conf)
+
+#define TIMER0_ISR_CC0      (TIMERA0_VECTOR)
+#define TIMER0_ISR_CCX      (TIMERA1_VECTOR)
+#define TIMER1_ISR_CC0      (TIMERB0_VECTOR)
+#define TIMER1_ISR_CCX      (TIMERB1_VECTOR)
 /** @} */
 
 /**

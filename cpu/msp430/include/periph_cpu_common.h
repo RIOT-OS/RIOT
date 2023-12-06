@@ -22,6 +22,7 @@
 #include <stdbool.h>
 
 #include "bitarithm.h"
+#include "compiler_hints.h"
 #include "cpu.h"
 #include "msp430_regs.h"
 
@@ -51,6 +52,17 @@ typedef uint16_t gpio_t;
  * @brief   No support for HW chip select...
  */
 #define SPI_HWCS(x)         (SPI_CS_UNDEF)
+
+/**
+ * @brief   The MSP430 timer peripheral can have up to 8 channels
+ *
+ * @note    The actual number of channels should be queried per timer, as
+ *          timers have either 7 or 3 capture/compare channels; typically both
+ *          variants are present in the same MCU. This is the highest number
+ *          of channels supported, e.g. useful for "worst case" static memory
+ *          allocation.
+ */
+#define TIMER_CHANNEL_NUMOF 7
 
 /**
  * @name    Override flank selection values
@@ -288,6 +300,31 @@ typedef struct {
      */
     bool has_xt2;
 } msp430_clock_params_t;
+
+/**
+ * @brief   Enumeration of possible clock sources for a timer
+ */
+typedef enum {
+    TIMER_CLOCK_SOURCE_TXCLK = TXSSEL_TXCLK,            /**< External TxCLK as clock source */
+    TIMER_CLOCK_SOURCE_AUXILIARY_CLOCK = TXSSEL_ACLK,   /**< Auxiliary clock as clock source */
+    TIMER_CLOCK_SOURCE_SUBMAIN_CLOCK = TXSSEL_SMCLK,    /**< Sub-system master clock as clock source */
+    TIMER_CLOCK_SOURCE_INCLK = TXSSEL_INCLK,            /**< External INCLK as clock source */
+} msp430_timer_clock_source_t;
+
+/**
+ * @brief   Timer configuration on an MSP430 timer
+ */
+typedef struct {
+    msp430_timer_t *timer;                         /**< Hardware timer to use */
+    /**
+     * @brief   "Timer interrupt vector" register
+     *
+     * Use `&TIMER_A_IRQFLAGS` for `TIMER_A` or
+     * `&TIMER_B_IRQFLAGS` for `TIMER_B`.
+     */
+    REG16 *irq_flags;
+    msp430_timer_clock_source_t clock_source;   /**< Clock source to use */
+} timer_conf_t;
 
 /**
  * @brief   Initialize the basic clock system to provide the main clock,
