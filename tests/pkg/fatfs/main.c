@@ -52,7 +52,6 @@ FATFS fat_fs; /* FatFs work area needed for each volume */
 
 #ifdef MODULE_MTD_NATIVE
 /* mtd device for native is provided in boards/native/board_init.c */
-extern mtd_dev_t *mtd0;
 mtd_dev_t *fatfs_mtd_devs[1];
 #elif MODULE_MTD_SDCARD
 #include "mtd_sdcard.h"
@@ -400,7 +399,7 @@ int main(void)
     #endif
 
     #if MODULE_MTD_NATIVE
-    fatfs_mtd_devs[0] = mtd0;
+    fatfs_mtd_devs[0] = mtd_dev_get(0);
     #elif MODULE_MTD_SDCARD
     for (unsigned int i = 0; i < SDCARD_SPI_NUM; i++){
         mtd_sdcard_devs[i].base.driver = &mtd_sdcard_driver;

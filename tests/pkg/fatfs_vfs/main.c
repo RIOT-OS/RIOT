@@ -64,7 +64,6 @@ static vfs_mount_t _test_vfs_mount = {
 
 #if defined(MODULE_MTD_NATIVE) || defined(MODULE_MTD_MCI)
 /* mtd devices are provided in the board's board_init.c*/
-extern mtd_dev_t *mtd0;
 #endif
 
 #if defined(MODULE_MTD_SDCARD)
@@ -409,7 +408,7 @@ int main(void)
 #endif
 
 #if defined(MODULE_MTD_NATIVE) || defined(MODULE_MTD_MCI)
-    fatfs.dev = mtd0;
+    fatfs.dev = mtd_dev_get(0);
 #endif
 
 #if defined(MODULE_MTD_SDCARD)

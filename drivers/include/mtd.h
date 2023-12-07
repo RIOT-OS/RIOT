@@ -529,7 +529,10 @@ int mtd_power(mtd_dev_t *mtd, enum mtd_power_state power);
  */
 static inline mtd_dev_t *mtd_dev_get(unsigned idx)
 {
-    return ((MTD_NUMOF != 0) && (idx < MTD_NUMOF)) ? mtd_dev_xfa[idx] : NULL;
+    assert(MTD_NUMOF != 0);
+    assert(idx < MTD_NUMOF);
+
+    return mtd_dev_xfa[idx];
 }
 
 #ifdef __cplusplus

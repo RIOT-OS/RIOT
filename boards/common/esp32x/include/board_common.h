@@ -34,10 +34,6 @@
 #include "periph/gpio.h"
 #include "sdkconfig.h"
 
-#if MODULE_MTD
-#include "mtd.h"
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -103,14 +99,10 @@ extern "C" {
 #define SPI_FLASH_DRIVE_START  0
 #endif
 
-#define MTD_0 mtd0          /**< Flash MTD device */
-extern mtd_dev_t *mtd0;     /**< Flash MTD device pointer */
+#define MTD_0 mtd_dev_get(0)          /**< MTD device for the internal Flash */
 
 #if MODULE_MTD_SDCARD_DEFAULT || DOXYGEN
-
-#define MTD_1 mtd1          /**< SD Card MTD device */
-extern mtd_dev_t *mtd1;     /**< SD Card MTD device pointer */
-
+#define MTD_1 mtd_dev_get(1)          /**< MTD device for the SD Card */
 #endif /* MODULE_MTD_SDCARD_DEFAULT || DOXYGEN */
 
 /**

@@ -20,7 +20,6 @@
 #define BOARD_H
 
 #include "cpu.h"
-#include "mtd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -100,8 +99,7 @@ extern "C" {
  * @name MTD configuration
  * @{
  */
-extern mtd_dev_t *mtd0;
-#define MTD_0       mtd0
+#define MTD_0       mtd_dev_get(0)
 
 #define BOARD_QSPI_PIN_CS       GPIO_PIN(0, 18)     /**< SPI Flash Chip Select */
 #define BOARD_QSPI_PIN_WP       GPIO_PIN(0, 15)     /**< SPI Flash Write Protect */

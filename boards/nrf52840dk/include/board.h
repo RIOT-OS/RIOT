@@ -21,7 +21,6 @@
 #define BOARD_H
 
 #include "board_common.h"
-#include "mtd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -77,10 +76,7 @@ extern "C" {
 /** @} */
 
 /** Default MTD device */
-#define MTD_0 mtd0
-
-/** mtd flash emulation device */
-extern mtd_dev_t *mtd0;
+#define MTD_0 mtd_dev_get(0)
 
 /**
  * @name    Button pin configuration

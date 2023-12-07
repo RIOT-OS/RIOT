@@ -21,7 +21,6 @@
 #define BOARD_H
 
 #include "board_common.h"
-#include "mtd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -67,8 +66,7 @@ extern "C" {
  * @name MTD configuration
  * @{
  */
-#define MTD_0 mtd0          /**< MTD device for SD Card */
-extern mtd_dev_t *mtd0;     /**< MTD device pointer for SD Card */
+#define MTD_0 mtd_dev_get(0)          /**< MTD device for the SD Card */
 /** @} */
 
 /**

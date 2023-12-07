@@ -20,7 +20,6 @@
 #define BOARD_H
 
 #include "lpc23xx.h"
-#include "mtd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -110,8 +109,7 @@ extern "C" {
  * @{
  */
 #ifdef MODULE_MTD_MCI
-extern mtd_dev_t *mtd0;
-#define MTD_0 mtd0
+#define MTD_0 mtd_dev_get(0)
 #endif
 /** @} */
 

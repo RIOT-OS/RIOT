@@ -33,31 +33,6 @@ extern "C" {
 #include "mtd_emulated.h"
 #endif
 
-#if !DOXYGEN
-
-/**
- * @brief   Declare `mtd*` according to the `MTD_*` symbols defined by the board
- */
-#ifdef MTD_0
-extern mtd_dev_t *MTD_0;
-#endif
-#ifdef MTD_1
-extern mtd_dev_t *MTD_1;
-#endif
-#ifdef MTD_2
-extern mtd_dev_t *MTD_2;
-#endif
-#ifdef MTD_3
-extern mtd_dev_t *MTD_3;
-#endif
-#ifdef MTD_4
-extern mtd_dev_t *MTD_4;
-#endif
-#ifdef MTD_5
-extern mtd_dev_t *MTD_5;
-#endif
-#endif /* !DOXYGEN */
-
 #if defined(MODULE_MTD_SDCARD_DEFAULT)
 extern mtd_sdcard_t mtd_sdcard_dev0;
 #endif

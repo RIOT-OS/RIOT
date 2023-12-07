@@ -21,7 +21,6 @@
 #define BOARD_H
 
 #include "cpu.h"
-#include "mtd.h"
 #include "waspmote_pinmap.h"
 
 #ifdef __cplusplus
@@ -197,10 +196,7 @@ extern "C" {
 /** @} */
 
 /** Default MTD device */
-#define MTD_0 mtd0
-
-/** mtd flash emulation device */
-extern mtd_dev_t *mtd0;
+#define MTD_0 mtd_dev_get(0)
 
 #ifdef __cplusplus
 }
