@@ -115,6 +115,9 @@ void gnrc_netif_init_6ln(gnrc_netif_t *netif)
         }
         /* intentionally falls through */
         case NETDEV_TYPE_BLE:
+#ifdef MODULE_GNRC_SIXLOENC
+        case NETDEV_TYPE_ETHERNET:
+#endif
 #ifdef MODULE_CC110X
         case NETDEV_TYPE_CC110X:
 #endif
