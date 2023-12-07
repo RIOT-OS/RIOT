@@ -62,7 +62,7 @@ static void callback(event_t *arg)
     order++;
     expect(order == 4);
     expect(arg == &event);
-    printf("triggered 0x%08" PRIuPTR "\n", (uintptr_t)arg);
+    printf("triggered 0x%08" PRIxPTR "\n", (uintptr_t)arg);
 }
 
 typedef struct {
