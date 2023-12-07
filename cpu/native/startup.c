@@ -534,7 +534,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
                 break;
 #ifdef MODULE_MTD_NATIVE
             case 'm':
-                ((mtd_native_dev_t *)mtd0)->fname = strndup(optarg, PATH_MAX - 1);
+                ((mtd_native_dev_t *)mtd_dev_get(0))->fname = strndup(optarg, PATH_MAX - 1);
                 break;
 #endif
 #if defined(MODULE_PERIPH_CAN)
