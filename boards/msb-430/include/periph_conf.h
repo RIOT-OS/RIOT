@@ -23,6 +23,7 @@
 
 #include "periph_cpu.h"
 #include "macros/units.h"
+#include "cfg_timer_a_smclk_b_aclk.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,30 +44,6 @@ static const msp430_clock_params_t clock_params = {
     .auxiliary_clock_divier = AUXILIARY_CLOCK_DIVIDE_BY_1,
     .has_r_osc = true,
 };
-
-/**
- * @name    Timer configuration
- * @{
- */
-static const timer_conf_t timer_conf[] = {
-    {
-        .timer = &TIMER_A,
-        .irq_flags = &TIMER_A_IRQFLAGS,
-        .clock_source = TIMER_CLOCK_SOURCE_SUBMAIN_CLOCK,
-    },
-    {
-        .timer = &TIMER_B,
-        .irq_flags = &TIMER_B_IRQFLAGS,
-        .clock_source = TIMER_CLOCK_SOURCE_AUXILIARY_CLOCK,
-    }
-};
-#define TIMER_NUMOF         ARRAY_SIZE(timer_conf)
-
-#define TIMER0_ISR_CC0      (TIMERA0_VECTOR)
-#define TIMER0_ISR_CCX      (TIMERA1_VECTOR)
-#define TIMER1_ISR_CC0      (TIMERB0_VECTOR)
-#define TIMER1_ISR_CCX      (TIMERB1_VECTOR)
-/** @} */
 
 /**
  * @name    UART configuration
