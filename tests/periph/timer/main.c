@@ -41,8 +41,15 @@
 #define TIMER_CHANNEL_NUMOF 10U
 #endif
 
-#define CHAN_OFFSET         (5000U)     /* fire every 5ms */
+#define CHAN_OFFSET_MS      5U          /* fire channels with 5 ms offset */
+/* The minimum timeout to set and still being able to clear the timer
+ * before it fires. This should be conservative, as wasting a few milliseconds
+ * in the test is less annoying than false test failures */
+#define MINIMUM_TIMEOUT_MS  2
 #define COOKIE              (100U)      /* for checking if arg is passed */
+/* Setting a timer for less than two ticks may cause it to fire right away,
+ * e.g. when the timer was about to tick anyway */
+#define MINIMUM_TICKS       2
 
 static uint8_t fired;
 static uint32_t sw_count;
@@ -73,7 +80,15 @@ static uword_t query_channel_numof(tim_t dev)
     return TIMER_CHANNEL_NUMOF;
 }
 
-static int test_timer(unsigned num, uint32_t speed)
+static unsigned milliseconds_to_ticks(uint32_t timer_freq, unsigned millisecs)
+{
+    /* Use 64 bit arithmetic to avoid overflows for high frequencies. */
+    unsigned result = ((uint64_t)millisecs * US_PER_MS * timer_freq) / US_PER_SEC;
+    /* Never return less than MINIMUM_TICKS ticks */
+    return (result >= MINIMUM_TICKS) ? result : MINIMUM_TICKS;
+}
+
+static int test_timer(unsigned num, uint32_t timer_freq)
 {
     int set = 0;
 
@@ -87,9 +102,9 @@ static int test_timer(unsigned num, uint32_t speed)
     }
 
     printf("  - Calling timer_init(%u, %" PRIu32 ")\n    ",
-               num, speed);
+               num, timer_freq);
     /* initialize and halt timer */
-    if (timer_init(TIMER_DEV(num), speed, cb, (void *)(COOKIE * num)) != 0) {
+    if (timer_init(TIMER_DEV(num), timer_freq, cb, (void *)(COOKIE * num)) != 0) {
         printf("ERROR: timer_init() failed\n\n");
         return 0;
     }
@@ -99,10 +114,11 @@ static int test_timer(unsigned num, uint32_t speed)
 
     timer_stop(TIMER_DEV(num));
     printf("  - timer_stop(%u): stopped\n", num);
+    unsigned chan_offset_ticks = milliseconds_to_ticks(timer_freq, CHAN_OFFSET_MS);
 
     /* set each available channel */
     for (unsigned i = 0; i < query_channel_numof(TIMER_DEV(num)); i++) {
-        unsigned timeout = ((i + 1) * CHAN_OFFSET);
+        unsigned timeout = ((i + 1) * chan_offset_ticks);
         printf("  - timer_set(%u, %u, %u)\n    ", num, i, timeout);
         if (timer_set(TIMER_DEV(num), i, timeout) < 0) {
             printf("ERROR: Couldn't set timeout %u for channel %u\n",
@@ -157,14 +173,14 @@ static int test_timer(unsigned num, uint32_t speed)
 
     /* test for spurious timer IRQs */
     printf("  - Validating no spurious IRQs are triggered:\n");
-    expect(0 == timer_init(TIMER_DEV(num), speed, cb_not_to_be_executed, NULL));
+    expect(0 == timer_init(TIMER_DEV(num), timer_freq, cb_not_to_be_executed, NULL));
 
-    const unsigned duration = 2ULL * US_PER_MS * US_PER_SEC / speed;
+    const unsigned duration = milliseconds_to_ticks(timer_freq, MINIMUM_TIMEOUT_MS);
     unsigned target = timer_read(TIMER_DEV(num)) + duration;
     expect(0 == timer_set_absolute(TIMER_DEV(num), 0, target));
     expect(0 == timer_clear(TIMER_DEV(num), 0));
     atomic_store_u8(&fired, 0);
-    while (timer_read(TIMER_DEV(num)) < target) {
+    while ((target - timer_read(TIMER_DEV(num))) <= duration) {
         /* busy waiting for the timer to reach it timeout. Timer must not fire,
          * it was cleared */
     }
@@ -176,10 +192,8 @@ static int test_timer(unsigned num, uint32_t speed)
     /* checking again to make sure that any IRQ pending bit that may just was
      * mask doesn't trigger a timer IRQ on the next set */
     target = timer_read(TIMER_DEV(num)) + duration;
-    timer_set_absolute(TIMER_DEV(num), 0, target);
-    timer_clear(TIMER_DEV(num), 0);
 
-    while (timer_read(TIMER_DEV(num)) < target) {
+    while ((target - timer_read(TIMER_DEV(num))) <= duration) {
         /* busy waiting for the timer to reach it timeout. Timer must not fire,
          * it was cleared */
     }
