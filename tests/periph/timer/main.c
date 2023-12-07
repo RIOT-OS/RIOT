@@ -73,7 +73,7 @@ static uword_t query_channel_numof(tim_t dev)
     return TIMER_CHANNEL_NUMOF;
 }
 
-static int test_timer(unsigned num, uint32_t speed)
+static int test_timer(unsigned num, uint32_t timer_freq)
 {
     int set = 0;
 
@@ -87,9 +87,9 @@ static int test_timer(unsigned num, uint32_t speed)
     }
 
     printf("  - Calling timer_init(%u, %" PRIu32 ")\n    ",
-               num, speed);
+               num, timer_freq);
     /* initialize and halt timer */
-    if (timer_init(TIMER_DEV(num), speed, cb, (void *)(COOKIE * num)) != 0) {
+    if (timer_init(TIMER_DEV(num), timer_freq, cb, (void *)(COOKIE * num)) != 0) {
         printf("ERROR: timer_init() failed\n\n");
         return 0;
     }
@@ -157,9 +157,9 @@ static int test_timer(unsigned num, uint32_t speed)
 
     /* test for spurious timer IRQs */
     printf("  - Validating no spurious IRQs are triggered:\n");
-    expect(0 == timer_init(TIMER_DEV(num), speed, cb_not_to_be_executed, NULL));
+    expect(0 == timer_init(TIMER_DEV(num), timer_freq, cb_not_to_be_executed, NULL));
 
-    const unsigned duration = 2ULL * US_PER_MS * US_PER_SEC / speed;
+    const unsigned duration = 2ULL * US_PER_MS * US_PER_SEC / timer_freq;
     unsigned target = timer_read(TIMER_DEV(num)) + duration;
     expect(0 == timer_set_absolute(TIMER_DEV(num), 0, target));
     expect(0 == timer_clear(TIMER_DEV(num), 0));
