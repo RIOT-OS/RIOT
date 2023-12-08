@@ -55,9 +55,9 @@ void flashpage_write(void *target_addr, const void *data, size_t len)
     assert((uintptr_t)target_addr >= (uintptr_t)_native_flash);
     assert((uintptr_t)target_addr + len <= (uintptr_t)_native_flash + sizeof(_native_flash));
     assert(!(len % FLASHPAGE_WRITE_BLOCK_SIZE));
-    assert(!((unsigned)target_addr % FLASHPAGE_WRITE_BLOCK_ALIGNMENT));
+    assert(!((uintptr_t)target_addr % FLASHPAGE_WRITE_BLOCK_ALIGNMENT));
 
-    DEBUG("%p: write %u bytes\n", target_addr, len);
+    DEBUG("%p: write %zu bytes\n", target_addr, len);
 
     _flash_write(target_addr, data, len);
 }
