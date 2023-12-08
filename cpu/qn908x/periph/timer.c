@@ -67,6 +67,25 @@ static const clock_ip_name_t ctimers_clocks[FSL_FEATURE_SOC_CTIMER_COUNT] =
 #error "ERROR in board timer configuration: too many timers defined"
 #endif
 
+uword_t timer_query_freqs_numof(tim_t dev)
+{
+    assert(dev < TIMER_NUMOF);
+    (void)dev;
+    return 256;
+}
+
+uint32_t timer_query_freqs(tim_t dev, uword_t index)
+{
+    assert(dev < TIMER_NUMOF);
+    (void)dev;
+
+    if (index >= UINT8_MAX) {
+        return 0;
+    }
+
+    return CLOCK_GetFreq(kCLOCK_ApbClk) / (index + 1);
+}
+
 int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
 {
     DEBUG("timer_init(%u, %" PRIu32 ")\n", tim, freq);
@@ -103,7 +122,7 @@ int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
 int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 {
     DEBUG("timer_set_absolute(%u, %u, %u)\n", tim, channel, value);
-    if ((tim >= TIMER_NUMOF) || (channel >= TIMER_CHANNELS)) {
+    if ((tim >= TIMER_NUMOF) || (channel >= TIMER_CHANNEL_NUMOF)) {
         return -1;
     }
     CTIMER_Type* const dev = ctimers[tim];
@@ -115,7 +134,7 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 int timer_set(tim_t tim, int channel, unsigned int value)
 {
     DEBUG("timer_set(%u, %u, %u)\n", tim, channel, value);
-    if ((tim >= TIMER_NUMOF) || (channel >= TIMER_CHANNELS)) {
+    if ((tim >= TIMER_NUMOF) || (channel >= TIMER_CHANNEL_NUMOF)) {
         return -1;
     }
     CTIMER_Type* const dev = ctimers[tim];
@@ -140,7 +159,7 @@ int timer_set(tim_t tim, int channel, unsigned int value)
 int timer_clear(tim_t tim, int channel)
 {
     DEBUG("timer_clear(%u, %d)\n", tim, channel);
-    if ((tim >= TIMER_NUMOF) || (channel >= TIMER_CHANNELS)) {
+    if ((tim >= TIMER_NUMOF) || (channel >= TIMER_CHANNEL_NUMOF)) {
         return -1;
     }
     CTIMER_Type* const dev = ctimers[tim];
@@ -170,7 +189,7 @@ static inline void isr_ctimer_n(CTIMER_Type *dev, uint32_t ctimer_num)
 {
     DEBUG("isr_ctimer_%" PRIu32 " flags=0x%" PRIx32 "\n",
           ctimer_num, dev->IR);
-    unsigned state = dev->IR & ((1 << TIMER_CHANNELS) - 1);
+    unsigned state = dev->IR & ((1 << TIMER_CHANNEL_NUMOF) - 1);
     while (state) {
         uint8_t channel;
         state = bitarithm_test_and_clear(state, &channel);
