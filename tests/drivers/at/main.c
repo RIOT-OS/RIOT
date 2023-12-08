@@ -35,8 +35,8 @@ static at_dev_t at_dev;
 static char buf[256];
 static char resp[1024];
 static char rp_buf[256];
-static bool initialized;
-static bool is_power_on;
+static bool initialized = false;
+static bool is_power_on = false;
 
 static int init(int argc, char **argv)
 {
@@ -489,9 +489,6 @@ static const shell_command_t shell_commands[] = {
 int main(void)
 {
     puts("AT command test app");
-
-    initialized = false;
-    is_power_on = false;
 
     /* run the shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];
