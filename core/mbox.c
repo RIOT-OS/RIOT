@@ -64,7 +64,7 @@ int _mbox_put(mbox_t *mbox, msg_t *msg, int blocking)
     list_node_t *next = list_remove_head(&mbox->readers);
 
     if (next) {
-        DEBUG("mbox: Thread %" PRIkernel_pid " mbox 0x%08" PRIuPTR ": _tryput(): "
+        DEBUG("mbox: Thread %" PRIkernel_pid " mbox 0x%08" PRIxPTR ": _tryput(): "
               "there's a waiter.\n", thread_getpid(), (uintptr_t)mbox);
         thread_t *thread =
             container_of((clist_node_t *)next, thread_t, rq_entry);
@@ -84,7 +84,7 @@ int _mbox_put(mbox_t *mbox, msg_t *msg, int blocking)
             }
         }
 
-        DEBUG("mbox: Thread %" PRIkernel_pid " mbox 0x%08" PRIuPTR ": _tryput(): "
+        DEBUG("mbox: Thread %" PRIkernel_pid " mbox 0x%08" PRIxPTR ": _tryput(): "
               "queued message.\n", thread_getpid(), (uintptr_t)mbox);
         msg->sender_pid = thread_getpid();
         /* copy msg into queue */
