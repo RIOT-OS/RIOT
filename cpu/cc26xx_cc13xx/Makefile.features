@@ -1,5 +1,6 @@
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_uart
 FEATURES_PROVIDED += periph_uart_modecfg
+FEATURES_PROVIDED += periph_timer_query_freqs
 
 -include $(RIOTCPU)/cortexm_common/Makefile.features
