@@ -348,12 +348,12 @@ static void test_hashes_sha512_hash_update_twice(void)
     sha512_context_t sha512;
 
     sha512_init(&sha512);
-    sha512_update(&sha512, (uint8_t*)teststring, sizeof(teststring));
+    sha512_update(&sha512, (uint8_t*)teststring, strlen(teststring));
     sha512_final(&sha512, hash_update_once);
 
     sha512_init(&sha512);
     sha512_update(&sha512, (uint8_t*)teststring, 3);
-    sha512_update(&sha512, (uint8_t*)&teststring[3], sizeof(teststring)-3);
+    sha512_update(&sha512, (uint8_t*)&teststring[3], strlen(teststring)-3);
     sha512_final(&sha512, hash_update_twice);
 
     TEST_ASSERT(memcmp(hash_update_once, hash_update_twice, SHA512_DIGEST_LENGTH) == 0);
