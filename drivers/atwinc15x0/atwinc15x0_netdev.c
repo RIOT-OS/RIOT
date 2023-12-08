@@ -645,8 +645,8 @@ static int _atwinc15x0_get(netdev_t *netdev, netopt_t opt, void *val,
     assert(dev);
     assert(dev == atwinc15x0);
 
-    DEBUG("%s dev=%p opt=%u val=%p max_len=%u\n", __func__,
-          (void *)netdev, opt, val, (unsigned)max_len);
+    DEBUG("%s dev=%p opt=%u val=%p max_len=%lu\n", __func__,
+          (void *)netdev, opt, val, (unsigned long)max_len);
 
     switch (opt) {
         case NETOPT_IS_WIRED:
