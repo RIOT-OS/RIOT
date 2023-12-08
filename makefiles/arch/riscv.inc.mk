@@ -66,11 +66,10 @@ ifeq (1,$(GCC_DEFAULTS_TO_NEW_RISCV_ISA))
   CFLAGS_CPU += -misa-spec=2.2
 endif
 
-ifeq ($(TOOLCHAIN),llvm)
-  # Always use riscv32-none-elf as target triple for clang, as some
-  # autodetected gcc target triples are incompatible with clang
-  TARGET_ARCH_LLVM := riscv32-none-elf
-else
+# Always use riscv32-none-elf as target triple for clang, as some
+# autodetected gcc target triples are incompatible with clang
+TARGET_ARCH_LLVM := riscv32-none-elf
+ifneq ($(TOOLCHAIN),llvm)
   CFLAGS_CPU += -mcmodel=medlow -msmall-data-limit=8
   # We cannot invoke the compiler on the host system if build in docker.
   # Instead, hard-code the required flags for the docker toolchain here
