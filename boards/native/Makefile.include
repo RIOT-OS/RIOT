@@ -4,6 +4,9 @@ NATIVEINCLUDES += -I$(RIOTBASE)/core/lib/include/
 NATIVEINCLUDES += -I$(RIOTBASE)/core/include/
 NATIVEINCLUDES += -I$(RIOTBASE)/drivers/include/
 
+# Set "NATIVE_64BIT=1" to compile for x86_64
+NATIVE_64BIT ?= 0
+
 ifeq ($(OS),Darwin)
   DEBUGGER ?= lldb
 else
@@ -67,14 +70,22 @@ ifeq (,$(filter -std=%, $(CFLAGS)))
 endif
 
 ifeq ($(OS_ARCH),x86_64)
-  CFLAGS += -m32
+  ifeq ($(NATIVE_64BIT), 1)
+    CFLAGS += -m64
+  else
+    CFLAGS += -m32
+  endif
 endif
 ifneq (,$(filter -DDEVELHELP,$(CFLAGS)))
   CFLAGS += -fstack-protector-all
 endif
 ifeq ($(OS),FreeBSD)
   ifeq ($(OS_ARCH),amd64)
-    CFLAGS += -m32 -DCOMPAT_32BIT -B/usr/lib32
+    ifeq ($(NATIVE_64BIT), 1)
+      CFLAGS += -m64
+    else
+      CFLAGS += -m32 -DCOMPAT_32BIT -B/usr/lib32
+    endif
   endif
 endif
 ifeq ($(OS),Darwin)
@@ -86,11 +97,19 @@ CXXUWFLAGS +=
 CXXEXFLAGS +=
 
 ifeq ($(OS_ARCH),x86_64)
-  LINKFLAGS += -m32
+  ifeq ($(NATIVE_64BIT), 1)
+    LINKFLAGS += -m64
+  else
+    LINKFLAGS += -m32
+  endif
 endif
 ifeq ($(OS),FreeBSD)
   ifeq ($(OS_ARCH),amd64)
-    LINKFLAGS += -m32 -DCOMPAT_32BIT -L/usr/lib32 -B/usr/lib32
+    ifeq ($(NATIVE_64BIT), 1)
+      LINKFLAGS += -m64
+    else
+      LINKFLAGS += -m32 -DCOMPAT_32BIT -L/usr/lib32 -B/usr/lib32
+    endif
   endif
   LINKFLAGS += -L $(BINDIR)
 else

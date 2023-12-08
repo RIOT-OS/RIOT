@@ -24,13 +24,17 @@ CFLAGS += -Wno-cast-function-type
 RIOT_INCLUDES = $(filter-out -%,$(subst -I,,$(INCLUDES)))
 
 #translate (CPU_ARCH) to Build Target
-#WAMR_BUILD_TARGET is "X86_32" "AARCH64[sub]", "ARM[sub]",
+#WAMR_BUILD_TARGET is "X86_32", "X86_64", "AARCH64[sub]", "ARM[sub]",
 #                     "THUMB[sub]", "XTENSA"
 #no msp430, no AVR support for now
 
 ifeq ($(CPU),native)
 ifeq ($(findstring x86,$(OS_ARCH)),x86)
+ifneq (,$(filter arch_32bit,$(FEATURES_USED)))
   WAMR_BUILD_TARGET = X86_32
+else
+  WAMR_BUILD_TARGET = X86_64
+endif
 endif
 ifeq ($(findstring arm,$(OS_ARCH)),arm)
   WAMR_BUILD_TARGET = ARM

@@ -143,7 +143,8 @@ static void do_timer_set(unsigned int offset, bool periodic)
         its.it_interval = its.it_value;
     }
 
-    DEBUG("timer_set(): setting %lu.%09lu\n", (unsigned long)its.it_value.tv_sec, its.it_value.tv_nsec);
+    DEBUG("timer_set(): setting %lu.%09lu\n", (unsigned long)its.it_value.tv_sec,
+          (unsigned long)its.it_value.tv_nsec);
 }
 
 int timer_set(tim_t dev, int channel, unsigned int offset)
@@ -166,7 +167,7 @@ int timer_set(tim_t dev, int channel, unsigned int offset)
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
-    uint32_t now = timer_read(dev);
+    unsigned int now = timer_read(dev);
     return timer_set(dev, channel, value - now);
 }
 
