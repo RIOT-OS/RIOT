@@ -26,11 +26,13 @@
 
 #include <stdlib.h>
 
-#include "cpu.h"
 #include "bit.h"
+#include "bitarithm.h"
 #include "board.h"
-#include "periph_conf.h"
+#include "cpu.h"
+#include "macros/utils.h"
 #include "periph/timer.h"
+#include "periph_conf.h"
 
 #ifdef PIT_LTMR64H_LTH_MASK
 /* The KW41Z PIT module provides only one IRQ for all PIT channels combined. */
@@ -610,6 +612,54 @@ static inline void lptmr_irq_handler(tim_t tim)
 
 #endif
 /* ****** Common timer API functions ****** */
+
+uword_t timer_query_freqs_numof(tim_t dev)
+{
+    assert(dev < TIMER_NUMOF);
+
+    switch (_timer_variant(dev)) {
+    case TIMER_PIT:
+        return UINT32_MAX;
+#ifdef KINETIS_BOARD_HAVE_CONFIGURED_LPTMR
+    case TIMER_LPTMR:
+        /* 16 different pre-scaler values + bypassing the pre-scaler is
+         * supported, resulting in 17 possible frequencies. However, RIOT's
+         * timer API doesn't allow specifying frequencies below 1 Hz, so
+         * we possible have fewer options */
+        {
+            uword_t max_shifts = bitarithm_msb(lptmr_config[_lptmr_index(dev)].base_freq) + 1;
+            return MIN(max_shifts, 17);
+        }
+#endif
+    default:
+        assert(0);
+        return 0;
+    }
+}
+
+uint32_t timer_query_freqs(tim_t dev, uword_t index)
+{
+    assert(dev < TIMER_NUMOF);
+
+    switch (_timer_variant(dev)) {
+    case TIMER_PIT:
+        if (index == UINT32_MAX) {
+            return 0;
+        }
+        return PIT_BASECLOCK / (index + 1);
+#ifdef KINETIS_BOARD_HAVE_CONFIGURED_LPTMR
+    case TIMER_LPTMR:
+        if (index >= 17) {
+            return 0;
+        }
+
+        return lptmr_config[_lptmr_index(dev)].base_freq >> index;
+#endif
+    default:
+        assert(0);
+        return 0;
+    }
+}
 
 int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 {
