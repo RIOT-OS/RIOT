@@ -29,7 +29,9 @@
 
 #include "kernel_defines.h"
 
-#ifdef MODULE_MTD_SDCARD
+#if MODULE_MTD_SDMMC
+#include "mtd_sdmmc.h"
+#elif MODULE_MTD_SDCARD
 #include "mtd_sdcard.h"
 #include "sdcard_spi.h"
 #include "sdcard_spi_params.h"
@@ -64,9 +66,9 @@ static vfs_mount_t _test_vfs_mount = {
 
 #if defined(MODULE_MTD_NATIVE) || defined(MODULE_MTD_MCI)
 /* mtd devices are provided in the board's board_init.c*/
-#endif
-
-#if defined(MODULE_MTD_SDCARD)
+#elif defined(MODULE_MTD_SDMMC)
+extern mtd_sdmmc_t mtd_sdmmc_dev0;
+#elif defined(MODULE_MTD_SDCARD)
 #define SDCARD_SPI_NUM ARRAY_SIZE(sdcard_spi_params)
 extern sdcard_spi_t sdcard_spi_devs[SDCARD_SPI_NUM];
 mtd_sdcard_t mtd_sdcard_devs[SDCARD_SPI_NUM];
@@ -398,20 +400,18 @@ static void test_libc(void)
 
 int main(void)
 {
-#if MODULE_MTD_SDCARD
+#if defined(MODULE_MTD_NATIVE) || defined(MODULE_MTD_MCI)
+    fatfs.dev = mtd_dev_get(0);
+#elif defined(MODULE_MTD_SDMMC)
+    fatfs.dev = &mtd_sdmmc_dev0.base;
+#elif defined(MODULE_MTD_SDCARD)
     for(unsigned int i = 0; i < SDCARD_SPI_NUM; i++){
         mtd_sdcard_devs[i].base.driver = &mtd_sdcard_driver;
         mtd_sdcard_devs[i].sd_card = &sdcard_spi_devs[i];
         mtd_sdcard_devs[i].params = &sdcard_spi_params[i];
         mtd_init(&mtd_sdcard_devs[i].base);
     }
-#endif
 
-#if defined(MODULE_MTD_NATIVE) || defined(MODULE_MTD_MCI)
-    fatfs.dev = mtd_dev_get(0);
-#endif
-
-#if defined(MODULE_MTD_SDCARD)
     fatfs.dev = mtd_sdcard;
 #endif
 
