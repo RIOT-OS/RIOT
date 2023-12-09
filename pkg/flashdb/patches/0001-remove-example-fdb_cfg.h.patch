@@ -1,4 +1,4 @@
-From f63a94b823ad2faccb7a83440331313935c0f3f5 Mon Sep 17 00:00:00 2001
+From 438a6533a8364812fcb8baa7c96417129eac13cd Mon Sep 17 00:00:00 2001
 From: Benjamin Valentin <benjamin.valentin@ml-pa.com>
 Date: Tue, 1 Feb 2022 22:28:32 +0100
 Subject: [PATCH] remove example fdb_cfg.h
@@ -10,7 +10,7 @@ Subject: [PATCH] remove example fdb_cfg.h
 
 diff --git a/inc/fdb_cfg.h b/inc/fdb_cfg.h
 deleted file mode 100644
-index 48d92af..0000000
+index e8748ab..0000000
 --- a/inc/fdb_cfg.h
 +++ /dev/null
 @@ -1,50 +0,0 @@
@@ -44,7 +44,7 @@ index 48d92af..0000000
 -
 -#ifdef FDB_USING_FAL_MODE
 -/* the flash write granularity, unit: bit
-- * only support 1(nor flash)/ 8(stm32f2/f4)/ 32(stm32f1) */
+- * only support 1(nor flash)/ 8(stm32f2/f4)/ 32(stm32f1)/ 64(stm32f7)/ 128(stm32h5) */
 -#define FDB_WRITE_GRAN                /* @note you must define it for a value */
 -#endif
 -
@@ -65,5 +65,5 @@ index 48d92af..0000000
 -
 -#endif /* _FDB_CFG_H_ */
 -- 
-2.32.0
+2.43.0
 
