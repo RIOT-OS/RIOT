@@ -126,6 +126,60 @@ typedef enum {
     GPIO_OD_PU = 0xff                   /**< not supported by HW */
 } gpio_mode_t;
 
+#define HAVE_GPIO_SLEW_T
+typedef enum {
+    GPIO_SLEW_SLOWEST = 0,
+    GPIO_SLEW_SLOW = 0,
+    GPIO_SLEW_FAST = 0,
+    GPIO_SLEW_FASTEST = 0,
+} gpio_slew_t;
+
+#define HAVE_GPIO_PULL_STRENGTH_T
+typedef enum {
+    GPIO_PULL_WEAKEST = 0,
+    GPIO_PULL_WEAK = 0,
+    GPIO_PULL_STRONG = 0,
+    GPIO_PULL_STRONGEST = 0
+} gpio_pull_strength_t;
+
+#define HAVE_GPIO_DRIVE_STRENGTH_T
+typedef enum {
+    GPIO_DRIVE_WEAKEST = 0,
+    GPIO_DRIVE_WEAK = 0,
+    GPIO_DRIVE_STRONG = 1,
+    GPIO_DRIVE_STRONGEST = 1
+} gpio_drive_strength_t;
+
+#define HAVE_GPIO_PULL_T
+typedef enum {
+    GPIO_FLOATING,
+    GPIO_PULL_UP,
+    GPIO_PULL_DOWN,
+    GPIO_PULL_KEEP,
+} gpio_pull_t;
+
+#define HAVE_GPIO_STATE_T
+typedef enum {
+    GPIO_OUTPUT_PUSH_PULL,
+    GPIO_OUTPUT_OPEN_DRAIN,
+    GPIO_OUTPUT_OPEN_SOURCE,
+    GPIO_INPUT,
+    GPIO_USED_BY_PERIPHERAL,
+    GPIO_DISCONNECT,
+} gpio_state_t;
+
+#define HAVE_GPIO_IRQ_TRIG_T
+typedef enum {
+    GPIO_TRIGGER_EDGE_RISING    = EIC_CONFIG_SENSE0_RISE_Val,
+    GPIO_TRIGGER_EDGE_FALLING   = EIC_CONFIG_SENSE0_FALL_Val,
+    GPIO_TRIGGER_EDGE_BOTH      = EIC_CONFIG_SENSE0_BOTH_Val,
+    GPIO_TRIGGER_LEVEL_HIGH     = EIC_CONFIG_SENSE0_HIGH_Val,
+    GPIO_TRIGGER_LEVEL_LOW      = EIC_CONFIG_SENSE0_LOW_Val,
+} gpio_irq_trig_t;
+
+#define HAVE_GPIO_CONF_T
+typedef union gpio_conf_sam0 gpio_conf_t;
+
 /**
  * @brief   Override active flank configuration values
  * @{
@@ -138,6 +192,49 @@ typedef enum {
 } gpio_flank_t;
 /** @} */
 #endif /* ndef DOXYGEN */
+
+/**
+ * @brief       GPIO pin configuration for SAM0 MCUs
+ * @ingroup     drivers_periph_gpio_ll
+ */
+union gpio_conf_sam0 {
+    uint8_t bits;  /**< the raw bits */
+    struct {
+        /**
+         * @brief   State of the pin
+         */
+        gpio_state_t state                      : 3;
+        /**
+         * @brief   Pull resistor configuration
+         */
+        gpio_pull_t pull                        : 2;
+        /**
+         * @brief   Drive strength of the GPIO
+         *
+         * @warning If the requested drive strength is not available, the
+         *          closest fit supported will be configured instead.
+         *
+         * This value is ignored when @ref gpio_conf_nrf5x::state is configured
+         * to @ref GPIO_INPUT or @ref GPIO_DISCONNECT.
+         */
+        gpio_drive_strength_t drive_strength    : 1;
+        /**
+         * @brief   Initial value of the output
+         *
+         * Ignored if @ref gpio_conf_nrf5x::state is set to @ref GPIO_INPUT or
+         * @ref GPIO_DISCONNECT. If the pin was previously in a high impedance
+         * state, it is guaranteed to directly transition to the given initial
+         * value.
+         *
+         * @ref gpio_ll_query_conf will write the current value of the specified
+         * pin here, which is read from the input register when the state is
+         * @ref GPIO_INPUT, otherwise the state from the output register is
+         * consulted.
+         */
+        bool initial_value                      : 1;
+        uint8_t                                 : 1; /*< padding */
+    };
+};
 
 /**
  * @brief   Available MUX values for configuring a pin's alternate function
