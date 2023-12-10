@@ -24,10 +24,29 @@
 #include <stdint.h>
 
 #include "cpu.h"
+#include "macros/units.h"
 #include "periph/cpu_gpio.h"
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#ifdef DOXYGEN
+/**
+ * @brief   Which I2C peripheral variant is used
+ *
+ * If defined as `1` the variant implemented in `i2c_1.c` is used, if
+ * defined as `2` the variant implemented in `i2c_2.c` is used.
+ */
+#  define STM32_I2C_VARIANT 0
+#else
+#  ifdef I2C_CR1_ANFOFF
+/* i2c_1.c is used */
+#    define STM32_I2C_VARIANT 1
+#  else
+/* i2c_2.c is used */
+#    define STM32_I2C_VARIANT 2
+#  endif
 #endif
 
 /**
@@ -40,39 +59,35 @@ extern "C" {
 #define PERIPH_I2C_NEED_WRITE_REG
 /** Use read regs function from periph common */
 #define PERIPH_I2C_NEED_READ_REGS
-#if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || \
-    defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F4) || \
-    defined(CPU_FAM_STM32MP1)
+#if STM32_I2C_VARIANT == 2
 /** Use write regs function from periph common */
-#define PERIPH_I2C_NEED_WRITE_REGS
+#  define PERIPH_I2C_NEED_WRITE_REGS
 #endif
 /** @} */
 
-#ifndef DOXYGEN
 /**
  * @brief   Default mapping of I2C bus speed values
  * @{
  */
 #define HAVE_I2C_SPEED_T
+#if STM32_I2C_VARIANT == 1
+/* i2c_1.c */
 typedef enum {
-#if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || \
-    defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32L1) || \
-    defined(CPU_FAM_STM32MP1)
     I2C_SPEED_LOW,          /**< low speed mode: ~10kit/s */
-#endif
     I2C_SPEED_NORMAL,       /**< normal mode:  ~100kbit/s */
     I2C_SPEED_FAST,         /**< fast mode:    ~400kbit/s */
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3) || \
-    defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L0) || \
-    defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
-    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
-    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0)
     I2C_SPEED_FAST_PLUS,    /**< fast plus mode: ~1Mbit/s */
-#endif
 } i2c_speed_t;
+#elif STM32_I2C_VARIANT == 2
+/* i2c_2.c */
+typedef enum {
+    I2C_SPEED_LOW       = KHZ(1),   /**< low speed mode: ~10kit/s */
+    I2C_SPEED_NORMAL    = KHZ(100), /**< normal mode:  ~100kbit/s */
+    I2C_SPEED_FAST      = KHZ(400), /**< fast mode:    ~400kbit/s */
+    I2C_SPEED_FAST_PLUS = MHZ(1),   /**< fast plus mode: ~1Mbit/s */
+} i2c_speed_t;
+#endif /* STM32_I2C_VARIANT */
 /** @} */
-#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Structure for I2C configuration data
@@ -88,28 +103,16 @@ typedef struct {
 #endif
     uint8_t bus;            /**< APB bus */
     uint32_t rcc_mask;      /**< bit in clock enable register */
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3) || \
-    defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32G0) || \
-    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L4) || \
-    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32WL) || \
-    defined(CPU_FAM_STM32C0)
+#if (STM32_I2C_VARIANT == 1) && !defined(CPU_FAM_STM32L0)
     uint32_t rcc_sw_mask;   /**< bit to switch I2C clock */
-#endif
-#if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || \
-    defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32L1) || \
-    defined(CPU_FAM_STM32MP1)
+#endif /* All i2c_1.c but STM32L0 */
+#if STM32_I2C_VARIANT == 2
     uint32_t clk;           /**< bus frequency as defined in board config */
 #endif
     uint8_t irqn;           /**< I2C event interrupt number */
 } i2c_conf_t;
 
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3) || \
-    defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L0) || \
-    defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32L5) || \
-    defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32G4) || \
-    defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0)
+#if STM32_I2C_VARIANT == 1
 /**
  * @brief   Structure for I2C timing register settings
  */
@@ -157,23 +160,15 @@ static const i2c_timing_param_t timing_params[] = {
         .scldel = 0x2,      /* t_SCLDEL = 187.5ns */
     }
 };
-#endif  /* CPU_FAM_STM32F0 || CPU_FAM_STM32F3 || CPU_FAM_STM32F7 ||
-            CPU_FAM_STM32L0 || CPU_FAM_STM32L4 || CPU_FAM_STM32L5 ||
-            CPU_FAM_STM32G0 || CPU_FAM_STM32G4 || CPU_FAM_STM32U5 ||
-            CPU_FAM_STM32WB || CPU_FAM_STM32WL || CPU_FAM_STM32C0 */
+#endif  /* i2c_1.c */
 
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3) || \
-    defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32G0) || \
-    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L0) || \
-    defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32L5) || \
-    defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0)
+#if STM32_I2C_VARIANT == 1
 /**
  * @brief   The I2C implementation supports only a limited frame size.
  *          See i2c_1.c
  */
 #define PERIPH_I2C_MAX_BYTES_PER_FRAME  (256U)
-#endif
+#endif /* i2c_1.c */
 
 #ifdef __cplusplus
 }
