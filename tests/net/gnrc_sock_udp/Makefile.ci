@@ -19,4 +19,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32g0316-disco \
     telosb \
     waspmote-pro \
+    z1 \
     #
