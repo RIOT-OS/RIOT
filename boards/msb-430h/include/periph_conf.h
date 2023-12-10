@@ -22,6 +22,7 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
+#include "cfg_timer_a_smclk_b_aclk.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,17 +43,6 @@ static const msp430_clock_params_t clock_params = {
     .auxiliary_clock_divier = AUXILIARY_CLOCK_DIVIDE_BY_1,
     .has_r_osc = true,
 };
-
-/**
- * @name    Timer configuration
- * @{
- */
-#define TIMER_NUMOF         (1U)
-#define TIMER_BASE          (&TIMER_A)
-#define TIMER_CHAN          (3)
-#define TIMER_ISR_CC0       (TIMERA0_VECTOR)
-#define TIMER_ISR_CCX       (TIMERA1_VECTOR)
-/** @} */
 
 /**
  * @name    UART configuration

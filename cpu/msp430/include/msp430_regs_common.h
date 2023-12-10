@@ -57,13 +57,16 @@ extern "C" {
  * @name    Timer Input Divider Values
  *
  * @details The vendor header macros are again non-obvious in their naming, so
- *          provide better alies names.
+ *          provide better alias names.
  * @{
  */
 #define TXID_DIV_1      ID_0        /**< Input Divider: Divide by 1 */
 #define TXID_DIV_2      ID_1        /**< Input Divider: Divide by 2 */
 #define TXID_DIV_4      ID_2        /**< Input Divider: Divide by 4 */
-#define TXID_DIV_8      ID_3        /**< Input Divider: Divide by 4 */
+#define TXID_DIV_8      ID_3        /**< Input Divider: Divide by 8 */
+#define TXID_DIV_Msk    ID_3        /**< Mask to get the TXID field */
+#define TXID_DIV_Pos    6U          /**< Position of the TXID field */
+#define TXID_DIV_MAX    3           /**< Maximum configuration value in the TXID field */
 /** @} */
 
 /**
@@ -108,18 +111,11 @@ typedef struct {
     REG8    SEL;        /**< alternative function select */
 } msp430_port_p3_p6_t;
 
-
 /**
- * @brief   Timer interrupt status registers
- */
-typedef struct {
-    REG16   TBIV;       /**< TIMER_A interrupt status */
-    REG16   reserved[7];/**< reserved */
-    REG16   TAIV;       /**< TIMER_B interrupt status */
-} msp430_timer_ivec_t;
-
-/**
- * @brief   Timer module registers
+ * @brief   Timer peripheral registers
+ *
+ * @note    The TIMER_A timer only has 3 CC channels instead of the 8 channels
+ *          the TIMER_B has, the memory layout is the same nonetheless.
  */
 typedef struct {
     REG16   CTL;        /**< timer control */
@@ -161,14 +157,27 @@ extern msp430_port_p3_p6_t PORT_5;
 extern msp430_port_p3_p6_t PORT_6;
 
 /**
- * @brief   Register map of the timer interrupt control registers
- */
-extern msp430_timer_ivec_t TIMER_IVEC;
-
-/**
  * @brief   Register map of the timer A control registers
  */
 extern msp430_timer_t TIMER_A;
+
+/**
+ * @brief   IRQ flags for TIMER_A
+ *
+ * Called TAIV in the data sheet / vendor files. This shallow alias
+ * makes the name more readable and does impedance matching for the type
+ * (`volatile uint16_t` vs `volatile short`).
+ */
+extern REG16 TIMER_A_IRQFLAGS;
+
+/**
+ * @brief   IRQ flags for TIMER_B
+ *
+ * Called TBIV in the data sheet / vendor files. This shallow alias
+ * makes the name more readable and does impedance matching for the type
+ * (`volatile uint16_t` vs `volatile short`).
+ */
+extern REG16 TIMER_B_IRQFLAGS;
 
 /**
  * @brief   Register map of the timer B control registers

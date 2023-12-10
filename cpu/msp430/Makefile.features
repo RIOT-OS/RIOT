@@ -18,3 +18,4 @@ FEATURES_PROVIDED += periph_flashpage
 FEATURES_PROVIDED += periph_flashpage_in_address_space
 FEATURES_PROVIDED += periph_flashpage_pagewise
 FEATURES_PROVIDED += periph_pm
+FEATURES_PROVIDED += periph_timer_query_freqs
