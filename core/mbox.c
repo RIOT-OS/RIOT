@@ -99,7 +99,7 @@ int _mbox_get(mbox_t *mbox, msg_t *msg, int blocking)
     unsigned irqstate = irq_disable();
 
     if (cib_avail(&mbox->cib)) {
-        DEBUG("mbox: Thread %" PRIkernel_pid " mbox 0x%08" PRIuPTR ": _tryget(): "
+        DEBUG("mbox: Thread %" PRIkernel_pid " mbox 0x%08" PRIxPTR ": _tryget(): "
               "got queued message.\n", thread_getpid(), (uintptr_t)mbox);
         /* copy msg from queue */
         *msg = mbox->msg_array[cib_get_unsafe(&mbox->cib)];
