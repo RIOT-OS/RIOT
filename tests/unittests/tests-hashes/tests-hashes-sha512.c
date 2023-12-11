@@ -341,7 +341,7 @@ static void test_hashes_sha512_hash_sequence_binary(void)
 
 static void test_hashes_sha512_hash_update_twice(void)
 {
-    static const char *teststring = "abcdef";
+    static const char teststring[] = "abcdef";
 
     static uint8_t hash_update_once[SHA512_DIGEST_LENGTH];
     static uint8_t hash_update_twice[SHA512_DIGEST_LENGTH];
