@@ -255,6 +255,31 @@ gpio_t uart_pin_rx(uart_t uart);
 gpio_t uart_pin_tx(uart_t uart);
 
 #endif /* DOXYGEN */
+
+/**
+ * @brief   Get the CTS pin of the given UART.
+ *
+ * @param[in] uart      The device to query
+ *
+ * @note Until this is implemented on all platforms, this requires the
+ *       periph_uart_reconfigure feature to be used.
+ *
+ * @return              The GPIO used for the UART CTS line.
+ */
+gpio_t uart_pin_cts(uart_t uart);
+
+/**
+ * @brief   Get the RTS pin of the given UART.
+ *
+ * @param[in] uart      The device to query
+ *
+ * @note Until this is implemented on all platforms, this requires the
+ *       periph_uart_reconfigure feature to be used.
+ *
+ * @return              The GPIO used for the UART RTS line.
+ */
+gpio_t uart_pin_rts(uart_t uart);
+
 #endif /* MODULE_PERIPH_UART_RECONFIGURE */
 
 #if defined(MODULE_PERIPH_UART_RXSTART_IRQ) || DOXYGEN
