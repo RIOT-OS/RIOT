@@ -318,6 +318,28 @@ void uart_deinit_pins(uart_t uart)
 #endif
 }
 
+gpio_t uart_pin_cts(uart_t uart)
+{
+#ifdef MODULE_PERIPH_UART_HW_FC
+    if (uart_config[uart].tx_pad == UART_PAD_TX_0_RTS_2_CTS_3) {
+        return uart_config[uart].cts_pin;
+    }
+#endif
+    (void)uart;
+    return GPIO_UNDEF;
+}
+
+gpio_t uart_pin_rts(uart_t uart)
+{
+#ifdef MODULE_PERIPH_UART_HW_FC
+    if (uart_config[uart].tx_pad == UART_PAD_TX_0_RTS_2_CTS_3) {
+        return uart_config[uart].rts_pin;
+    }
+#endif
+    (void)uart;
+    return GPIO_UNDEF;
+}
+
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     if (uart_config[uart].tx_pin == GPIO_UNDEF) {
