@@ -196,25 +196,10 @@ static int mtd_sdmmc_read(mtd_dev_t *dev, void *buff, uint32_t addr,
     return -EOVERFLOW;
 }
 
-static int mtd_sdmmc_write(mtd_dev_t *dev, const void *buff, uint32_t addr,
-                            uint32_t size)
-{
-    int res =  mtd_sdmmc_write_page(dev, buff, addr / SDMMC_SDHC_BLOCK_SIZE,
-                                     addr % SDMMC_SDHC_BLOCK_SIZE, size);
-    if (res < 0) {
-        return res;
-    }
-    if (res == (int)size) {
-        return 0;
-    }
-    return -EOVERFLOW;
-}
-
 const mtd_desc_t mtd_sdmmc_driver = {
     .init = mtd_sdmmc_init,
     .read = mtd_sdmmc_read,
     .read_page = mtd_sdmmc_read_page,
-    .write = mtd_sdmmc_write,
     .write_page = mtd_sdmmc_write_page,
     .erase_sector = mtd_sdmmc_erase_sector,
     .power = mtd_sdmmc_power,
