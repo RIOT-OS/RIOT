@@ -17,4 +17,6 @@ endif
 
 SHOULD_RUN_KCONFIG :=
 
+CFLAGS += -DTHREAD_STACKSIZE_MAIN=4096
+
 include $(RIOTBASE)/Makefile.include
