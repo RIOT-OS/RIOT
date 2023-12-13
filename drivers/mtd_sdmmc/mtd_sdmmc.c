@@ -191,6 +191,7 @@ const mtd_desc_t mtd_sdmmc_driver = {
     .write_page = mtd_sdmmc_write_page,
     .erase_sector = mtd_sdmmc_erase_sector,
     .power = mtd_sdmmc_power,
+    .flags = MTD_DRIVER_FLAG_DIRECT_WRITE,
 };
 
 #if IS_USED(MODULE_MTD_SDMMC_DEFAULT)
