@@ -110,10 +110,10 @@ class SerCmd(cmd.Cmd):
     """
 
     def __init__(self, port=None, baudrate=None, toggle=None,
-                 tcp_serial=None, native=None, confdir=None, conffile=None,
-                 host=None, run_name=None, log_dir_name=None, newline=None,
-                 formatter=None, set_rts=None, set_dtr=None,
-                 serprompt=None,
+                 tcp_serial=None, native=None, native_args=None,
+                 native_tap=None, confdir=None, conffile=None, host=None,
+                 run_name=None, log_dir_name=None, newline=None,
+                 formatter=None, set_rts=None, set_dtr=None, serprompt=None,
                  repeat_command_on_empty_line=defaultrepeat_cmd_empty_line,
                  reconnect=defaultreconnect):
         """Constructor.
@@ -123,6 +123,8 @@ class SerCmd(cmd.Cmd):
             baudrate (int):     serial baudrate
             tcp_serial (iht):   TCP port to connect to (alternatively)
             native (str):       Native instance to run and connect to
+            native_args (str):  Optional arguments for Native
+            native_tap (str):   TAP interface to pass to native
             confdir (str):      configuration directory
             conffile (str):     configuration file name
             host (str):         local host name
@@ -139,6 +141,14 @@ class SerCmd(cmd.Cmd):
         self.set_dtr = set_dtr
         self.tcp_serial = tcp_serial
         self.native = native
+        self.native_args = []
+        if native_args:
+            for arg in native_args:
+                for elem in arg:
+                    for substr in elem.split(' '):
+                        substr = substr.replace('\\-\\-', '--')
+                        self.native_args.append(substr)
+        self.native_tap = native_tap
         self.configdir = confdir
         self.configfile = conffile
         self.host = host
@@ -264,7 +274,9 @@ class SerCmd(cmd.Cmd):
                                   "localhost:%s" % self.tcp_serial)
                 sys.exit(1)
         elif self.native:
-            self.ser = Popen(self.native, stdout=PIPE, stdin=PIPE, stderr=PIPE)
+            native_call = [self.native] + self.native_tap + self.native_args
+            self.logger.debug("Executing native as %s", str(native_call))
+            self.ser = Popen(native_call, stdout=PIPE, stdin=PIPE, stderr=PIPE)
         # otherwise go for the serial port
         elif self.port:
             connected = False
@@ -839,8 +851,10 @@ if __name__ == "__main__":
                         " host defaults to \"localhost\"")
     parser.add_argument("-n", "--native",
                         help="Start a RIOT native instance and connect "
-                        "pyterm to its stdio.",
-                        nargs=2)
+                        "pyterm to its stdio.")
+    parser.add_argument("-na", "--native-args",
+                        help="Adding optional arguments to RIOT native",
+                        action="append", nargs='*')
     parser.add_argument("-b", "--baudrate",
                         help="Specifies baudrate for the serial port, default "
                         "is %s" % defaultbaud,
@@ -917,6 +931,8 @@ if __name__ == "__main__":
                         action="store_false",
                         help="Do not try to reconnect when failing on "
                              "connection setup (Default)")
+    parser.add_argument("native_tap", nargs=1)
+
     parser.set_defaults(
         repeat_command_on_empty_line=defaultrepeat_cmd_empty_line,
         reconnect=defaultreconnect)
@@ -926,9 +942,10 @@ if __name__ == "__main__":
     if args.noprefix:
         args.format = ""
     myshell = SerCmd(args.port, args.baudrate, args.toggle, args.tcp_serial,
-                     args.native, args.directory, args.config, args.host,
-                     args.run_name, args.log_dir_name, args.newline,
-                     args.format, args.set_rts, args.set_dtr, args.prompt,
+                     args.native, args.native_args, args.native_tap,
+                     args.directory, args.config, args.host, args.run_name,
+                     args.log_dir_name, args.newline, args.format,
+                     args.set_rts, args.set_dtr, args.prompt,
                      args.repeat_command_on_empty_line)
     myshell.prompt = ''
 
