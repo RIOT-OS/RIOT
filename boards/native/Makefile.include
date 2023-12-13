@@ -14,7 +14,11 @@ RESET ?= $(RIOTBOARD)/native/dist/reset.sh
 FLASHER ?=
 FLASHFILE ?= $(ELFFILE)
 
-TERMFLAGS ?= -n $(FLASHFILE)
+ifeq (native,$(RIOT_TERMINAL))
+  TERMPROG ?= $(FLASHFILE)
+else
+  TERMFLAGS += -n $(FLASHFILE)
+endif
 
 export VALGRIND ?= valgrind
 export CGANNOTATE ?= cg_annotate
