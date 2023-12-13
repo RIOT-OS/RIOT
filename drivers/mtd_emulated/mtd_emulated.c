@@ -60,26 +60,6 @@ static int _read_page(mtd_dev_t *dev, void *dest,
     return size;
 }
 
-static int _write(mtd_dev_t *dev, const void *src, uint32_t addr, uint32_t count)
-{
-    mtd_emulated_t *mtd = (mtd_emulated_t *)dev;
-
-    (void)mtd;
-
-    assert(mtd);
-    assert(src);
-
-    if (/* addr + count must be inside a page boundary. */
-        (((addr % mtd->base.page_size) + count) > mtd->base.page_size) ||
-        /* addr + count must not exceed the size of memory */
-        ((addr + count) > mtd->size)) {
-        return -EOVERFLOW;
-    }
-    memcpy(mtd->memory + addr, src, count);
-
-    return 0;
-}
-
 int _write_page(mtd_dev_t *dev, const void *src,
                 uint32_t page, uint32_t offset, uint32_t size)
 {
@@ -153,7 +133,6 @@ const mtd_desc_t _mtd_emulated_driver = {
     .init = _init,
     .read = _read,
     .read_page = _read_page,
-    .write = _write,
     .write_page = _write_page,
     .erase = _erase,
     .erase_sector = _erase_sector,
