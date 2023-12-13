@@ -59,6 +59,18 @@
 #define STX 0x2
 #endif
 
+static enum {
+    NEWLINE_CR   = 2,
+    NEWLINE_NL   = 3,
+    NEWLINE_CRNL = 4,
+} _line_end = NEWLINE_NL;
+static const uint8_t newline[] = { '\r', '\n' };
+
+static void _write_newline(uart_t dev)
+{
+    uart_write(dev, &newline[_line_end & 1], _line_end >> 1);
+}
+
 typedef struct {
     char rx_mem[UART_BUFSIZE];
     ringbuffer_t rx_buf;
@@ -315,7 +327,6 @@ static int cmd_mode(int argc, char **argv)
 static int cmd_send(int argc, char **argv)
 {
     int dev;
-    uint8_t endline = (uint8_t)'\n';
 
     if (argc < 3) {
         printf("usage: %s <dev> <data (string)>\n", argv[0]);
@@ -329,7 +340,7 @@ static int cmd_send(int argc, char **argv)
 
     printf("UART_DEV(%i) TX: %s\n", dev, argv[2]);
     uart_write(UART_DEV(dev), (uint8_t *)argv[2], strlen(argv[2]));
-    uart_write(UART_DEV(dev), &endline, 1);
+    _write_newline(UART_DEV(dev));
     return 0;
 }
 
@@ -361,6 +372,28 @@ static int cmd_test(int argc, char **argv)
     return 0;
 }
 
+static int cmd_newline(int argc, char **argv)
+{
+    static const char *modes[] = {
+        "<CR>", "<NL>", "<CR><NL>"
+    };
+
+    if (argc > 1) {
+        int sel = atoi(argv[1]);
+        if (sel < 3) {
+            _line_end = sel + NEWLINE_CR;
+        }
+    }
+
+    for (unsigned i = 0; i < ARRAY_SIZE(modes); ++i) {
+        char selected = (unsigned)_line_end - NEWLINE_CR == i
+                      ? '>' : ' ';
+        printf("%c%u: %s\n", selected, i, modes[i]);
+    }
+
+    return 0;
+}
+
 static const shell_command_t shell_commands[] = {
     { "init", "Initialize a UART device with a given baudrate", cmd_init },
 #ifdef MODULE_PERIPH_UART_MODECFG
@@ -368,6 +401,7 @@ static const shell_command_t shell_commands[] = {
 #endif
     { "send", "Send a string through given UART device", cmd_send },
     { "test", "Run an automated test on a UART with RX and TX connected", cmd_test },
+    { "nl", "Set line ending", cmd_newline },
     { NULL, NULL, NULL }
 };
 
