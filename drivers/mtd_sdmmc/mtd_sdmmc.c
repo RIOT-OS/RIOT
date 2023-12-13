@@ -141,35 +141,8 @@ static int mtd_sdmmc_write_page(mtd_dev_t *dev, const void *buff, uint32_t page,
 
 static int mtd_sdmmc_erase_sector(mtd_dev_t *dev, uint32_t sector, uint32_t count)
 {
-#if IS_ACTIVE(CONFIG_MTD_SDMMC_ERASE) && IS_USED(MODULE_MTD_WRITE_PAGE)
     mtd_sdmmc_t *mtd_sd = (mtd_sdmmc_t*)dev;
-
-    DEBUG("mtd_sdmmc_erase_sector: sector: %" PRIu32 " count: %" PRIu32 "\n",
-          sector, count);
-
-    if (dev->work_area == NULL) {
-        DEBUG("mtd_sdmmc_erase_sector: no work area\n");
-        return -ENOTSUP;
-    }
-    memset(dev->work_area, 0, SDMMC_SDHC_BLOCK_SIZE);
-    while (count) {
-        if (sdmmc_write_blocks(mtd_sd->sdmmc, sector, SDMMC_SDHC_BLOCK_SIZE,
-                               1, dev->work_area, NULL)) {
-            return -EIO;
-        }
-        --count;
-        ++sector;
-    }
-#else
-    (void)dev;
-    (void)sector;
-    (void)count;
-    mtd_sdmmc_t *mtd_sd = (mtd_sdmmc_t*)dev;
-    if (IS_ACTIVE(CONFIG_MTD_SDMMC_ERASE)) {
-        return sdmmc_erase_blocks(mtd_sd->sdmmc, sector, count);
-    }
-#endif
-    return 0;
+    return sdmmc_erase_blocks(mtd_sd->sdmmc, sector, count);
 }
 
 static int mtd_sdmmc_power(mtd_dev_t *dev, enum mtd_power_state power)
