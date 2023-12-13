@@ -8,7 +8,7 @@ CFLAGS += -DOUTPUT=TEXT
 CFLAGS += -DTEST_SUITES="gnrc_ipv6_ext_frag"
 
 ifeq (native,$(BOARD))
-  TERMFLAGS ?= $(TAP)
+  PORT ?= $(TAP)
 else
   ETHOS_BAUDRATE ?= 115200
   CFLAGS += -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE)

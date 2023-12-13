@@ -51,9 +51,9 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    os.environ['TERMFLAGS'] = "--eui64=00:5a:45:50:0a:00:30:38 -z [%s]:%d,[%s]:%d" % (
-            zep_params['local_addr'], zep_params['local_port'],
-            zep_params['remote_addr'], zep_params['remote_port'])
+    os.environ['TERMFLAGS'] = "--native-args '\\-\\-eui64=00:5a:45:50:0a:00:30:38' --native-args '-z [%s]:%d,[%s]:%d'"\
+            % (zep_params['local_addr'], zep_params['local_port'],
+               zep_params['remote_addr'], zep_params['remote_port'])
     s = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
     s.bind(("127.0.0.1", zep_params['remote_port']))
     res = run(testfunc, timeout=1, echo=True, traceback=True)

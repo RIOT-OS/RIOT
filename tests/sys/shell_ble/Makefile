@@ -14,6 +14,9 @@ TESTRUNNER_SHELL_SKIP_REBOOT = 1
 TESTRUNNER_RESET_BOARD_ON_STARTUP = 0
 
 ifneq (,$(filter term,$(MAKECMDGOALS)))
+  ifeq (native, $(BOARD))
+    RIOT_TERMINAL ?= native
+  endif
   # Use a terminal that does not introduce extra characters into the stream.
   RIOT_TERMINAL ?= socat
 else ifneq (,$(filter test,$(MAKECMDGOALS)))

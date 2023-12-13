@@ -4,7 +4,7 @@ include ../Makefile.net_common
 
 ifeq (native, $(BOARD))
   USEMODULE += socket_zep
-  TERMFLAGS ?= -z "0.0.0.0:17755,localhost:17754"
+  TERMFLAGS ?= --native-args '-z "0.0.0.0:17755,localhost:17754"'
   USEMODULE += netdev
   # somehow this breaks the test
   DISABLE_MODULE += test_utils_print_stack_usage

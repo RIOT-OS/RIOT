@@ -6,6 +6,9 @@ USEMODULE += xtimer
 FEATURES_REQUIRED += periph_rtt
 DISABLE_MODULE += periph_init_rtt
 
+ifeq (native, $(BOARD))
+  RIOT_TERMINAL ?= native
+endif
 RIOT_TERMINAL ?= socat
 
 # microbit qemu lacks rtt

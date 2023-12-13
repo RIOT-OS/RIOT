@@ -28,7 +28,7 @@ ifeq (native, $(BOARD))
   USEMODULE += socket_zep
   USEMODULE += socket_zep_hello
   USEMODULE += netdev
-  TERMFLAGS = -z 127.0.0.1:17754 # Murdock has no IPv6 support
+  TERMFLAGS = --native-args '-z 127.0.0.1:17754' # Murdock has no IPv6 support
 else
   USEMODULE += netdev_default
   # automated test only works on native

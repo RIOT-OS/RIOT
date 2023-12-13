@@ -40,7 +40,7 @@ USEMODULE += ztimer_usec
 
 ifeq ($(BOARD), native)
   ZEP_PORT_BASE ?= 17754
-  TERMFLAGS += -z [::1]:$(ZEP_PORT_BASE)
+  TERMFLAGS += --native-args '-z [::1]:$(ZEP_PORT_BASE)'
   USEMODULE += socket_zep
 endif
 

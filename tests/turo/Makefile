@@ -3,6 +3,10 @@ include ../Makefile.tests_common
 USEMODULE += test_utils_result_output
 USEMODULE += shell
 
+ifeq (native, $(BOARD))
+  RIOT_TERMINAL ?= native
+endif
+
 # Use a terminal that does not introduce extra characters into the stream.
 RIOT_TERMINAL ?= socat
 
