@@ -931,7 +931,7 @@ if __name__ == "__main__":
                         action="store_false",
                         help="Do not try to reconnect when failing on "
                              "connection setup (Default)")
-    parser.add_argument("native_tap", nargs=1)
+    parser.add_argument("native_tap", nargs='*')
 
     parser.set_defaults(
         repeat_command_on_empty_line=defaultrepeat_cmd_empty_line,
