@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    drivers_mtd_flashpage   Flashpage MTD
+ * @defgroup    drivers_mtd_flashpage MTD wrapper for Flashpage devices
  * @ingroup     drivers_storage
  * @brief       Driver for internal flash devices implementing flashpage interface
  *

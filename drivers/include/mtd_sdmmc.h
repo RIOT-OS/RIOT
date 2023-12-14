@@ -8,14 +8,14 @@
  */
 
 /**
- * @defgroup    drivers_mtd_sdmmc mtd wrapper for sdmmc
+ * @defgroup    drivers_mtd_sdmmc MTD wrapper for SD/MMC devices
  * @ingroup     drivers_storage
- * @brief       Driver for SD Memory Cards and MMCs/eMMCs using mtd interface
+ * @brief       Driver for SD Memory Cards and MMCs/eMMCs using the MTD interface
  *
  * @{
  *
  * @file
- * @brief       Interface definition for mtd_sdmmc driver
+ * @brief       Interface definition for the mtd_sdmmc driver
  *
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  * @author      Gunar Schorcht <gunar@schorcht.net>
@@ -46,7 +46,7 @@ typedef struct {
 } mtd_sdmmc_t;
 
 /**
- * @brief   sdcard device operations table for mtd
+ * @brief   SD/MMC device operations table for mtd
  */
 extern const mtd_desc_t mtd_sdmmc_driver;
 
