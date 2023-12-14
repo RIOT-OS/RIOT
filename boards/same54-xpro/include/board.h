@@ -56,6 +56,15 @@ extern "C" {
 #define LED0_ON             (LED_PORT.OUTCLR.reg = LED0_MASK)
 #define LED0_OFF            (LED_PORT.OUTSET.reg = LED0_MASK)
 #define LED0_TOGGLE         (LED_PORT.OUTTGL.reg = LED0_MASK)
+
+#define LED1_PIN            GPIO_PIN(PC, 15)
+
+#define LED_PORT            PORT->Group[PC]
+#define LED1_MASK           (1 << 15)
+
+#define LED1_ON             (LED_PORT.OUTCLR.reg = LED1_MASK)
+#define LED1_OFF            (LED_PORT.OUTSET.reg = LED1_MASK)
+#define LED1_TOGGLE         (LED_PORT.OUTTGL.reg = LED1_MASK)
 /** @} */
 
 /**
