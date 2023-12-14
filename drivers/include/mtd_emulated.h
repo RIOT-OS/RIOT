@@ -7,6 +7,7 @@
  */
 
 /**
+ * @defgroup    drivers_mtd_emulated MTD wrapper for emulated MTD devices
  * @ingroup     drivers_mtd
  * @{
  * @brief       MTD device that is emulated in RAM for test purposes
