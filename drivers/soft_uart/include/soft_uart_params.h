@@ -19,6 +19,7 @@
 #ifndef SOFT_UART_PARAMS_H
 #define SOFT_UART_PARAMS_H
 
+#include "board.h"
 #include "soft_uart.h"
 #include "macros/units.h"
 #include "kernel_defines.h"

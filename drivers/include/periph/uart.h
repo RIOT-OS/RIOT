@@ -406,6 +406,24 @@ void uart_poweron(uart_t uart);
  */
 void uart_poweroff(uart_t uart);
 
+/**
+ * @brief Enable the TX line one the given UART
+ *
+ * @note requires the `periph_uart_tx_ondemand` feature
+ *
+ * @param[in] uart          the UART device start TX on
+ */
+void uart_enable_tx(uart_t uart);
+
+/**
+ * @brief Disable the TX line one the given UART
+ *
+ * @note requires the `periph_uart_tx_ondemand` feature
+ *
+ * @param[in] uart          the UART device to stop TX on
+ */
+void uart_disable_tx(uart_t uart);
+
 #ifdef __cplusplus
 }
 #endif
