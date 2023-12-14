@@ -222,8 +222,8 @@ void mutex_unlock(mutex_t *mutex)
     thread_t *owner = thread_get(mutex->owner);
     if ((owner) && (owner->priority != mutex->owner_original_priority)) {
         DEBUG("PID[%" PRIkernel_pid "] prio %u --> %u\n",
-              owner->pid,
-              (unsigned)owner->priority, (unsigned)owner->priority);
+              owner->pid, (unsigned)owner->priority,
+              (unsigned)mutex->owner_original_priority);
         sched_change_priority(owner, mutex->owner_original_priority);
     }
 #endif
