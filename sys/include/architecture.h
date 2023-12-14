@@ -52,26 +52,26 @@ extern "C" {
 /**
  * @brief   Size of a word in bits
  *
- * @details Depending on architecture, this can have a value of 8, 16, or 32
+ * @details Depending on architecture, this can have a value of 8, 16, 32, or 64
  */
 #define ARCHITECTURE_WORD_BITS      <NUM>
 /**
  * @brief   Size of a word in bytes
  *
- * @details Depending on architecture, this can have a value or 1, 2, or 4.
+ * @details Depending on architecture, this can have a value or 1, 2, 4, or 8.
  */
 #define ARCHITECTURE_WORD_BYTES     <NUM>
 /**
  * @brief   Word sized unsigned integer
  *
- * @details Synonym to `uint8_t`, `uint16_t` or `uint32_t` depending on
- *          architecture
+ * @details Synonym to `uint8_t`, `uint16_t`, `uint32_t`, or `uint64_t`
+ *          depending on architecture
  */
 typedef uint<num>_t uword_t;
 /**
  * @brief   Word sized signed integer
  *
- * @details Synonym to `int8_t`, `int16_t` or `int32_t` depending on
+ * @details Synonym to `int8_t`, `int16_t`, `int32_t`, or `int64_t` depending on
  *          architecture
  *
  * @note    This type is pronounce es-word-tea. When slaying dragons, this is
