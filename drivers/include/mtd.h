@@ -73,6 +73,7 @@
 #ifndef MTD_H
 #define MTD_H
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -485,6 +486,29 @@ int mtd_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t count);
  * @retval -EIO if I/O error occurred
  */
 int mtd_erase_sector(mtd_dev_t *mtd, uint32_t sector, uint32_t num);
+
+/**
+ * @brief   Write data to a MTD device with whole sector writes
+ *
+ * The MTD layer will take care of splitting up the transaction into multiple
+ * writes if it is required by the underlying storage media.
+ *
+ * The sectors will be erased before writing if needed.
+ *
+ * @param      mtd      Device to write to
+ * @param[in]  src      Buffer to write
+ * @param[in]  sector   Sector number to start writing to
+ * @param[in]  num      Number of sectors to write
+ *
+ * @retval n number of bytes written on success
+ * @retval <0 value on error
+ * @retval -ENODEV if @p mtd is not a valid device
+ * @retval -ENOTSUP if operation is not supported on @p mtd
+ * @retval -EOVERFLOW if @p addr or @p count are not valid, i.e. outside memory,
+ * @retval -EIO if I/O error occurred
+ * @retval -EINVAL if parameters are invalid
+ */
+int mtd_write_sector(mtd_dev_t *mtd, const void *src, uint32_t sector, uint32_t num);
 
 /**
  * @brief   Set power mode on a MTD device

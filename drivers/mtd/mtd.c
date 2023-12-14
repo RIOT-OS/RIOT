@@ -384,6 +384,20 @@ int mtd_erase_sector(mtd_dev_t *mtd, uint32_t sector, uint32_t count)
     return mtd->driver->erase_sector(mtd, sector, count);
 }
 
+int mtd_write_sector(mtd_dev_t *mtd, const void *data, uint32_t sector,
+                     uint32_t count)
+{
+    if (!(mtd->driver->flags & MTD_DRIVER_FLAG_DIRECT_WRITE)) {
+        int res = mtd_erase_sector(mtd, sector, count);
+        if (res) {
+            return res;
+        }
+    }
+
+    uint32_t page = sector * mtd->pages_per_sector;
+    return mtd_write_page_raw(mtd, data, page, 0, page * mtd->page_size);
+}
+
 int mtd_power(mtd_dev_t *mtd, enum mtd_power_state power)
 {
     if (!mtd || !mtd->driver) {
