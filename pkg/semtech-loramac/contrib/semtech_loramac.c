@@ -343,18 +343,7 @@ void semtech_loramac_erase_config(void)
         return;
     }
 
-    size_t uplink_counter_len = sizeof(uint32_t);
-    size_t rx2_freq_len = sizeof(uint32_t);
-    size_t rx2_dr_len = sizeof(uint8_t);
-    size_t joined_state_len = sizeof(uint8_t);
-
-    size_t end = (pos + SEMTECH_LORAMAC_EEPROM_MAGIC_LEN +
-                  LORAMAC_DEVEUI_LEN + LORAMAC_APPEUI_LEN +
-                  LORAMAC_APPKEY_LEN + LORAMAC_APPSKEY_LEN +
-                  LORAMAC_NWKSKEY_LEN + LORAMAC_DEVADDR_LEN +
-                  uplink_counter_len + rx2_freq_len + rx2_dr_len +
-                  joined_state_len);
-    for (size_t p = pos; p < end; p++) {
+    for (size_t p = pos; p < SEMTECH_LORAMAC_EEPROM_LEN; p++) {
         eeprom_write_byte(p, 0);
     }
 }

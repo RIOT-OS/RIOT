@@ -551,6 +551,28 @@ void semtech_loramac_get_channels_mask(semtech_loramac_t *mac, uint16_t *mask);
 #endif
 
 /**
+ * @brief Join state length
+*/
+#define SEMTECH_LORAMAC_JOINSTATE_LEN       (1U)
+
+#define SEMTECH_LORAMAC_EEPROM_LEN         \
+    (                                      \
+        SEMTECH_LORAMAC_EEPROM_START +     \
+        SEMTECH_LORAMAC_EEPROM_MAGIC_LEN + \
+        LORAMAC_DEVEUI_LEN +               \
+        LORAMAC_APPEUI_LEN +               \
+        LORAMAC_APPKEY_LEN +               \
+        LORAMAC_APPSKEY_LEN +              \
+        LORAMAC_NWKSKEY_LEN +              \
+        LORAMAC_DEVADDR_LEN +              \
+        LORAMAC_UPLINK_COUNTER_LEN +       \
+        LORAMAC_RX2_FREQ_LEN +             \
+        LORAMAC_RX2_DR_LEN +               \
+        SEMTECH_LORAMAC_JOINSTATE_LEN      \
+    )
+
+
+/**
  * @brief   Saves the current LoRaWAN configuration to the internal EEPROM
  *
  * @param[in] mac           Pointer to the mac
