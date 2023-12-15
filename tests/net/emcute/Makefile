@@ -6,7 +6,7 @@ export TAP ?= tap0
 
 # use Ethernet as link-layer protocol
 ifeq (native,$(BOARD))
-  PORT += $(TAP)
+  PORT ?= $(TAP)
 else
   ETHOS_BAUDRATE ?= 115200
   CFLAGS += -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE)

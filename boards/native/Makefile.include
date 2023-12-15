@@ -18,6 +18,14 @@ ifeq (native,$(RIOT_TERMINAL))
   TERMPROG ?= $(FLASHFILE)
 else
   TERMFLAGS += -n $(FLASHFILE)
+  ifeq (1,$(USE_ZEP))
+    ZEP_IP ?= [::1]
+    ZEP_PORT_BASE ?= 17754
+    TERMFLAGS += --native-args '-z $(ZEP_IP):$(ZEP_PORT_BASE)'
+  endif
+  ifneq (,$(ZEP_MAC))
+    TERMFLAGS += --native-args '\-\-eui64=$(ZEP_MAC)'
+  endif
 endif
 
 export VALGRIND ?= valgrind
@@ -92,9 +100,7 @@ endif
 LINKFLAGS += -ffunction-sections
 
 # set the tap interface for term/valgrind
-ifneq (,$(filter netdev_tap,$(USEMODULE)))
-  PORT ?= tap0
-endif
+PORT ?= tap0
 
 # Configure default eeprom file
 EEPROM_FILE ?= $(BINDIR)/native.eeprom

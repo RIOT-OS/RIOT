@@ -47,12 +47,7 @@ USE_ZEP ?= 0
 # set the ZEP port for native
 ZEP_PORT_BASE ?= 17754
 ifeq (1,$(USE_ZEP))
-  TERMFLAGS += --native-args '-z [::1]:$(ZEP_PORT_BASE)'
   USEMODULE += socket_zep
-
-  ifneq (,$(ZEP_MAC))
-    TERMFLAGS += --native-args '\-\-eui64=$(ZEP_MAC)'
-  endif
 endif
 
 # Uncomment the following 2 lines to specify static link lokal IPv6 address
