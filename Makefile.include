@@ -1031,7 +1031,8 @@ ifneq (, $(filter all flash, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
 endif
 
 help:
-	@$(MAKE) -qp | sed -ne 's/\(^[a-z][a-z_-]*\):.*/\1/p' | sort | uniq
+  # filter all targets starting with lowercase and containing lowercase letters, hyphens, or underscores; explicitly include generate-Makefile.ci
+	@$(MAKE) -qp | sed -ne 's/\(^[a-z][a-z_-]*\|generate-Makefile.ci\):.*/\1/p' | sort -u
 
 ifeq (iotlab-m3,$(BOARD))
   ifneq (,$(filter iotlab-%,$(MAKECMDGOALS)))
