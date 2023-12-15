@@ -53,6 +53,29 @@ static inline void print_str(const char *str)
 }
 #endif
 
+void gpio_ll_mux(gpio_port_t port, uint8_t pin, gpio_mux_t mux)
+{
+    assume(pin < 32);
+    assume(gpio_port_unpack_addr(port) == NULL);
+    PortGroup *iobus = (PortGroup *)port;
+    PortGroup *apb = sam0_gpio_iobus2ap(iobus);
+
+    unsigned irq_state = irq_disable();
+    if (mux == GPIO_MUX_DISABLED) {
+        apb->PINCFG[pin].bit.PMUXEN = 0;
+    }
+    else {
+        unsigned pmux_reg = pin >> 1;
+        unsigned pmux_pos = (pin & 0x01) << 2;
+        apb->PINCFG[pin].bit.PMUXEN = 1;
+        unsigned pmux = apb->PMUX[pmux_reg].reg;
+        pmux &= ~(PORT_PMUX_PMUXE_Msk << pmux_pos);
+        pmux |= (unsigned)mux << pmux_pos;
+        apb->PMUX[pmux_reg].reg = pmux;
+    }
+    irq_restore(irq_state);
+}
+
 int gpio_ll_init(gpio_port_t port, uint8_t pin, gpio_conf_t conf)
 {
     assume(pin < 32);

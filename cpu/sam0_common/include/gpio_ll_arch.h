@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2016 Freie Universität Berlin
  *               2017 OTA keys S.A.
+ *               2023 Otto-von-Guericke-Universität Magdeburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,11 +16,7 @@
  * @file
  * @brief           CPU specific part of the Peripheral GPIO Low-Level API
  *
- * @author          Troels Hoffmeyer <troels.d.hoffmeyer@gmail.com>
- * @author          Thomas Eichinger <thomas.eichinger@fu-berlin.de>
- * @author          Kaspar Schleiser <kaspar@schleiser.de>
- * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @author          Juergen Fitschen <me@jue.yt>
+ * @author          Marian Buschsieweke <marian.buschsieweke@posteo.net>
  */
 
 #ifndef GPIO_LL_ARCH_H

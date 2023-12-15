@@ -255,6 +255,7 @@ typedef enum {
     GPIO_MUX_L = 0xb,       /**< select peripheral function L */
     GPIO_MUX_M = 0xc,       /**< select peripheral function M */
     GPIO_MUX_N = 0xd,       /**< select peripheral function N */
+    GPIO_MUX_DISABLED = 0xff, /**< Disable  */
 } gpio_mux_t;
 #endif
 
