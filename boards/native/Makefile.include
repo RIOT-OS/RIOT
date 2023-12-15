@@ -17,14 +17,14 @@ FLASHFILE ?= $(ELFFILE)
 ifeq (native,$(RIOT_TERMINAL))
   TERMPROG ?= $(FLASHFILE)
 else
-  TERMFLAGS += -n $(FLASHFILE)
+  TERMFLAGS += -ps $(FLASHFILE)
   ifeq (1,$(USE_ZEP))
     ZEP_IP ?= [::1]
     ZEP_PORT_BASE ?= 17754
-    TERMFLAGS += --native-args '-z $(ZEP_IP):$(ZEP_PORT_BASE)'
+    TERMFLAGS += --process-args '-z $(ZEP_IP):$(ZEP_PORT_BASE)'
   endif
   ifneq (,$(ZEP_MAC))
-    TERMFLAGS += --native-args '\-\-eui64=$(ZEP_MAC)'
+    TERMFLAGS += --process-args '\-\-eui64=$(ZEP_MAC)'
   endif
 endif
 
