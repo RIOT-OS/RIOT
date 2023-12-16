@@ -2,8 +2,6 @@ BOARD ?= nrf52840dk
 
 include ../Makefile.sys_common
 
-TEST_ON_CI_BLACKLIST += esp32-wroom-32
-
 USEMODULE += ztimer
 USEMODULE += ztimer_usec
 
