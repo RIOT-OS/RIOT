@@ -230,8 +230,18 @@ static void _print_help(const char *name)
                     " [-r <range>]"
                     " [-v <variance of range>]"
                     " [-n <nodes>]"
-                    " [-b]"
+                    " [-b][-g]"
                     "\n", name);
+
+    puts("\nOptions:");
+    puts("\t-s <seed>\trandom seed used for topology generation");
+    puts("\t-w <width>\twidth of the 2D topology");
+    puts("\t-h <height>\theight of the 2D topology");
+    puts("\t-r <range>\tRadio range of the nodes");
+    puts("\t-v <variance>\tmaximal random variance of radio range");
+    puts("\t-n <nodes>\tnumber of nodes in the topology");
+    puts("\t-b\t\tbinary links: link quality is rounded to 100% or 0%");
+    puts("\t-g\t\tnodes are organized as a grid");
 }
 
 int main(int argc, char** argv)
