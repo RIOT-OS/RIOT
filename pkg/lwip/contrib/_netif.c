@@ -21,7 +21,7 @@
 #include "lwip/netifapi.h"
 #include "net/netif.h"
 
-int netif_get_name(netif_t *iface, char *name)
+int netif_get_name(const netif_t *iface, char *name)
 {
     lwip_netif_t *lwip_netif = (lwip_netif_t*) iface;
     struct netif *netif = &lwip_netif->lwip_netif;
@@ -34,7 +34,7 @@ int netif_get_name(netif_t *iface, char *name)
     return res;
 }
 
-int netif_get_opt(netif_t *iface, netopt_t opt, uint16_t context,
+int netif_get_opt(const netif_t *iface, netopt_t opt, uint16_t context,
                   void *value, size_t max_len)
 {
     (void)context;
@@ -83,7 +83,7 @@ int netif_get_opt(netif_t *iface, netopt_t opt, uint16_t context,
     return res;
 }
 
-int netif_set_opt(netif_t *iface, netopt_t opt, uint16_t context,
+int netif_set_opt(const netif_t *iface, netopt_t opt, uint16_t context,
                   void *value, size_t value_len)
 {
     (void)context;
