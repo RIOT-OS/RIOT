@@ -26,6 +26,7 @@
 
 #include <stdint.h>
 #include <inttypes.h>
+#include <limits.h>
 
 #include "architecture_arch.h"
 
@@ -104,6 +105,54 @@ typedef uintptr_t   uinttxtptr_t;
  */
 #define PRIxTXTPTR PRIxPTR
 #endif
+
+#if DOXYGEN
+/**
+ * @brief   Architecture specific modifier used for printing sizes
+ */
+#define PRI_SIZE_T_MODIFIER /* implementation defined */
+#elif (UINT_MAX == SIZE_MAX)
+#define PRI_SIZE_T_MODIFIER ""
+#elif (ULONG_MAX == SIZE_MAX)
+#define PRI_SIZE_T_MODIFIER "l"
+#else
+#error Unsupported size_t length
+#endif
+
+/**
+ * @brief   Macro holding the format specifier to print an `ssize_t` variable
+ *          in decimal representation.
+ */
+#define PRIdSIZE PRI_SIZE_T_MODIFIER "d"
+/**
+ * @brief   Macro holding the format specifier to print an `ssize_t` variable.
+ *
+ * Same as @ref PRIdSIZE for output. When used for input (e.g. in `scanf()`),
+ * `PRIiSIZE` will also accept hexadecimal and octal numbers if prefixed by
+ * `0x` or `0`, respectively.
+ */
+#define PRIiSIZE PRI_SIZE_T_MODIFIER "i"
+/**
+ * @brief   Macro holding the format specifier to print an `ssize_t` variable
+ *          in octal representation.
+ * `0x` or `0`, respectively.
+ */
+#define PRIoSIZE PRI_SIZE_T_MODIFIER "o"
+/**
+ * @brief   Macro holding the format specifier to print an `size_t` variable
+ *          in decimal representation.
+ */
+#define PRIuSIZE PRI_SIZE_T_MODIFIER "u"
+/**
+ * @brief   Macro holding the format specifier to print an `size_t` variable
+ *          in hexadecimal representation (e.g. `2a` for 42).
+ */
+#define PRIxSIZE PRI_SIZE_T_MODIFIER "x"
+/**
+ * @brief   Macro holding the format specifier to print an `size_t` variable
+ *          in hexadecimal representation (e.g. `2A` for 42).
+ */
+#define PRIXSIZE PRI_SIZE_T_MODIFIER "X"
 
 /**
  * @brief   Type qualifier to use to align data on word boundaries
