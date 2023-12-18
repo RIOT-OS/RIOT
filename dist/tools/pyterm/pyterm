@@ -111,9 +111,9 @@ class SerCmd(cmd.Cmd):
 
     def __init__(self, port=None, baudrate=None, toggle=None,
                  tcp_serial=None, process=None, process_args=None,
-                 process_tap=None, confdir=None, conffile=None, host=None,
-                 run_name=None, log_dir_name=None, newline=None,
-                 formatter=None, set_rts=None, set_dtr=None, serprompt=None,
+                 confdir=None, conffile=None, host=None, run_name=None,
+                 log_dir_name=None, newline=None, formatter=None, set_rts=None,
+                 set_dtr=None, serprompt=None,
                  repeat_command_on_empty_line=defaultrepeat_cmd_empty_line,
                  reconnect=defaultreconnect):
         """Constructor.
@@ -124,7 +124,6 @@ class SerCmd(cmd.Cmd):
             tcp_serial (iht):   TCP port to connect to (alterprocessly)
             process (str):      Program to run as subprocess and connect to its I/O
             process_args (str): Optional arguments for the subprocess
-            process_tap (str):  TAP interface to pass to process
             confdir (str):      configuration directory
             conffile (str):     configuration file name
             host (str):         local host name
@@ -148,7 +147,6 @@ class SerCmd(cmd.Cmd):
                     for substr in elem.split(' '):
                         substr = substr.replace('\\-\\-', '--')
                         self.process_args.append(substr)
-        self.process_tap = process_tap
         self.configdir = confdir
         self.configfile = conffile
         self.host = host
@@ -274,7 +272,7 @@ class SerCmd(cmd.Cmd):
                                   "localhost:%s" % self.tcp_serial)
                 sys.exit(1)
         elif self.process:
-            process_call = [self.process] + self.process_tap + self.process_args
+            process_call = [self.process] + self.process_args
             self.logger.debug("Executing process as %s", str(process_call))
             self.ser = Popen(process_call, stdout=PIPE, stdin=PIPE, stderr=PIPE)
         # otherwise go for the serial port
@@ -931,7 +929,6 @@ if __name__ == "__main__":
                         action="store_false",
                         help="Do not try to reconnect when failing on "
                              "connection setup (Default)")
-    parser.add_argument("process_tap", nargs='*')
 
     parser.set_defaults(
         repeat_command_on_empty_line=defaultrepeat_cmd_empty_line,
@@ -942,11 +939,10 @@ if __name__ == "__main__":
     if args.noprefix:
         args.format = ""
     myshell = SerCmd(args.port, args.baudrate, args.toggle, args.tcp_serial,
-                     args.process, args.process_args, args.process_tap,
-                     args.directory, args.config, args.host, args.run_name,
-                     args.log_dir_name, args.newline, args.format,
-                     args.set_rts, args.set_dtr, args.prompt,
-                     args.repeat_command_on_empty_line)
+                     args.process, args.process_args, args.directory,
+                     args.config, args.host, args.run_name, args.log_dir_name,
+                     args.newline, args.format, args.set_rts, args.set_dtr,
+                     args.prompt, args.repeat_command_on_empty_line)
     myshell.prompt = ''
 
     try:

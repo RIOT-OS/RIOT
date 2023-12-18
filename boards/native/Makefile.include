@@ -102,6 +102,12 @@ LINKFLAGS += -ffunction-sections
 # set the tap interface for term/valgrind
 PORT ?= tap0
 
+ifeq (native,$(RIOT_TERMINAL))
+  TERMFLAGS += $(PORT)
+else
+  TERMFLAGS += --process-args $(PORT)
+endif
+
 # Configure default eeprom file
 EEPROM_FILE ?= $(BINDIR)/native.eeprom
 
@@ -120,7 +126,6 @@ ifneq (,$(filter periph_can,$(FEATURES_USED)))
   TERMFLAGS += $(PERIPH_CAN_FLAGS)
 endif
 
-TERMFLAGS += $(PORT)
 
 ASFLAGS =
 ifeq ($(shell basename $(DEBUGGER)),lldb)
