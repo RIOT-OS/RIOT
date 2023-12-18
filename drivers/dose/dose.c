@@ -443,7 +443,7 @@ static int _recv(netdev_t *dev, void *buf, size_t len, void *info)
 
     size_t dummy;
     if (crb_get_chunk_size(&ctx->rb, &dummy)) {
-        DEBUG("dose: %u byte pkt in rx queue\n", (unsigned)dummy);
+        DEBUG("dose: %" PRIuSIZE " byte pkt in rx queue\n", dummy);
         netdev_trigger_event_isr(&ctx->netdev);
     }
 

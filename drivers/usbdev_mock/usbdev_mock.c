@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "architecture.h"
 #include "periph/usbdev.h"
 #include "test_utils/expect.h"
 #include "usbdev_mock.h"
@@ -200,8 +201,8 @@ void _ep_esr(usbdev_ep_t *ep)
 
 int _xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
 {
-    DEBUG("[mock]: Readying EP %u, dir %s, len %u\n",
-          ep->num, ep->dir == USB_EP_DIR_OUT ? "out" : "in", (unsigned)len);
+    DEBUG("[mock]: Readying EP %u, dir %s, len %" PRIuSIZE "\n",
+          ep->num, ep->dir == USB_EP_DIR_OUT ? "out" : "in", len);
     if (ep->num == 0) {
         usbdev_mock_t *usbdev_mock = _ep2dev(ep);
         usbdev_mock_ep_t *mock_ep = (usbdev_mock_ep_t *)ep;
