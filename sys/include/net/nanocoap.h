@@ -847,18 +847,17 @@ static inline ssize_t coap_get_uri_path(coap_pkt_t *pkt, uint8_t *target)
  * This function decodes the pkt's URI_QUERY option into a "&"-separated and
  * '\0'-terminated string.
  *
- * Caller must ensure @p target can hold at least CONFIG_NANOCOAP_URI_MAX bytes!
- *
  * @param[in]   pkt     pkt to work on
  * @param[out]  target  buffer for target URI
+ * @param[in]   max_len size of @p target in bytes
  *
- * @returns     -ENOSPC     if URI option is larger than CONFIG_NANOCOAP_URI_MAX
+ * @returns     -ENOSPC     if URI option is larger than @p max_len
  * @returns     nr of bytes written to @p target (including '\0')
  */
-static inline ssize_t coap_get_uri_query(coap_pkt_t *pkt, uint8_t *target)
+static inline ssize_t coap_get_uri_query(coap_pkt_t *pkt, char *target, size_t max_len)
 {
-    return coap_opt_get_string(pkt, COAP_OPT_URI_QUERY, target,
-                               CONFIG_NANOCOAP_URI_MAX, '&');
+    return coap_opt_get_string(pkt, COAP_OPT_URI_QUERY,
+                               (uint8_t *)target, max_len, '&');
 }
 
 /**
