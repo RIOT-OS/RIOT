@@ -143,6 +143,7 @@ void gnrc_ipv6_nib_iface_up(gnrc_netif_t *netif)
     _init_iface_arsm(netif);
     netif->ipv6.rs_sent = 0;
     netif->ipv6.na_sent = 0;
+    _add_static_lladdr(netif);
     _auto_configure_addr(netif, &ipv6_addr_link_local_prefix, 64U);
     if (_should_search_rtr(netif)) {
         uint32_t next_rs_time = random_uint32_range(0, NDP_MAX_RS_MS_DELAY);
@@ -212,7 +213,6 @@ void gnrc_ipv6_nib_init_iface(gnrc_netif_t *netif)
         gnrc_netif_release(netif);
         return;
     }
-    _add_static_lladdr(netif);
 
     gnrc_netif_release(netif);
 }
