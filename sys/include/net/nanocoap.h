@@ -989,6 +989,31 @@ bool coap_find_uri_query(coap_pkt_t *pkt, const char *key,
                          const char **value, size_t *len);
 
 /**
+ * @brief   Iterate over a packet's URI Query options
+ *
+ * This expects that the Uri-Query options follow the widespread format `key=value`
+ * or just `key`
+ *
+ * Key and Value will be copied into the supplied buffers as a NULL-terminated
+ * string.
+ *
+ * @param[in]   pkt           packet to read from
+ * @param[out]  ctx           opaque, must be set to `NULL` on first call
+ * @param[out]  key           Output buffer for the key
+ * @param[in]   key_len_max   Size of the key output buffer
+ * @param[out]  value         Output buffer for the value
+ * @param[in]   value_len_max Size of the value output buffer
+ *
+ * @return      2           if key and value were found
+ * @return      1           if key was found
+ * @return      0           if no key was found
+ * @return -E2BIG           if key or value does not fit the supplied space
+ */
+int coap_iterate_uri_query(coap_pkt_t *pkt, void **ctx,
+                           char *key, size_t key_len_max,
+                           char *value, size_t value_len_max);
+
+/**
  * @brief   Iterate over a packet's options
  *
  * To start iteration from the first option, set @p init_opt to true. To start
