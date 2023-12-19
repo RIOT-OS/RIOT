@@ -93,6 +93,9 @@ else
   IPV6_PREFIX ?= 2001:db8::/64
 endif
 
+# Uncomment to set the host IPv6 address when creating the tap interface
+#IPV6_HOST_ADDR ?= fd00:dead:beef::1
+
 # MODULE DEPENDENT CONFIGURATION IMPORT
 # =====================================
 # use ethos (ethernet over serial) or SLIP (serial-line IP) for network
