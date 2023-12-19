@@ -118,7 +118,7 @@ static int _write(struct dtls_context_t *ctx, session_t *session, uint8_t *buf, 
     ssize_t res = sock_udp_send(sock->udp_sock, buf, len, &remote);
 
     if (res < 0) {
-        DEBUG("sock_dtls: failed to send DTLS record: %d\n", (int)res);
+        DEBUG("sock_dtls: failed to send DTLS record: %" PRIdSIZE "\n", res);
     }
     return res;
 }
@@ -793,7 +793,7 @@ ssize_t sock_dtls_recv_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
         res = sock_udp_recv_aux(sock->udp_sock, data, max_len, timeout,
                                 &ep, (sock_udp_aux_rx_t *)aux);
         if (res <= 0) {
-            DEBUG("sock_dtls: error receiving UDP packet: %d\n", (int)res);
+            DEBUG("sock_dtls: error receiving UDP packet: %" PRIdSIZE "\n", res);
             return res;
         }
 
@@ -858,7 +858,7 @@ ssize_t sock_dtls_recv_buf_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
             continue;
         }
         if (res < 0) {
-            DEBUG("sock_dtls: error receiving UDP packet: %d\n", (int)res);
+            DEBUG("sock_dtls: error receiving UDP packet: %" PRIdSIZE "\n", res);
             return res;
         }
 
@@ -974,7 +974,7 @@ void _udp_cb(sock_udp_t *udp_sock, sock_async_flags_t flags, void *ctx)
         ssize_t res = sock_udp_recv_buf(udp_sock, &data, &data_ctx, 0,
                                         &remote_ep);
         if (res <= 0) {
-            DEBUG("sock_dtls: error receiving UDP packet: %d\n", (int)res);
+            DEBUG("sock_dtls: error receiving UDP packet: %" PRIdSIZE "\n", res);
             return;
         }
 

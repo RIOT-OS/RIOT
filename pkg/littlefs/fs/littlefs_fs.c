@@ -349,8 +349,8 @@ static ssize_t _write(vfs_file_t *filp, const void *src, size_t nbytes)
 
     mutex_lock(&fs->lock);
 
-    DEBUG("littlefs: write: filp=%p, fp=%p, src=%p, nbytes=%u\n",
-          (void *)filp, (void *)fp, (void *)src, (unsigned)nbytes);
+    DEBUG("littlefs: write: filp=%p, fp=%p, src=%p, nbytes=%" PRIuSIZE "\n",
+          (void *)filp, (void *)fp, (void *)src, nbytes);
 
     ssize_t ret = lfs_file_write(&fs->fs, fp, src, nbytes);
     mutex_unlock(&fs->lock);
@@ -365,8 +365,8 @@ static ssize_t _read(vfs_file_t *filp, void *dest, size_t nbytes)
 
     mutex_lock(&fs->lock);
 
-    DEBUG("littlefs: read: filp=%p, fp=%p, dest=%p, nbytes=%u\n",
-          (void *)filp, (void *)fp, (void *)dest, (unsigned)nbytes);
+    DEBUG("littlefs: read: filp=%p, fp=%p, dest=%p, nbytes=%" PRIuSIZE "\n",
+          (void *)filp, (void *)fp, (void *)dest, nbytes);
 
     ssize_t ret = lfs_file_read(&fs->fs, fp, dest, nbytes);
     mutex_unlock(&fs->lock);

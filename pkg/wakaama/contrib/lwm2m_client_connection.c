@@ -214,7 +214,7 @@ static int _connection_send(lwm2m_client_connection_t *conn, uint8_t *buffer,
     ssize_t sent_bytes = sock_udp_send(&(client_data->sock), buffer,
                                        buffer_size, &(conn->remote));
     if (sent_bytes <= 0) {
-        DEBUG("[_connection_send] Could not send UDP packet: %i\n", (int)sent_bytes);
+        DEBUG("[_connection_send] Could not send UDP packet: %" PRIiSIZE "\n", sent_bytes);
         return -1;
     }
     conn->last_send = lwm2m_gettime();

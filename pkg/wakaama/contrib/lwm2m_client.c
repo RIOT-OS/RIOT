@@ -182,7 +182,7 @@ static void *_lwm2m_client_run(void *arg)
             lwm2m_client_connection_t *conn = lwm2m_client_connection_find(
                                             _client_data->conn_list, &remote);
             if (conn) {
-                DEBUG("lwm2m_connection_handle_packet(%i)\n", (int)rcv_len);
+                DEBUG("lwm2m_connection_handle_packet(%" PRIiSIZE ")\n", rcv_len);
                 int result = lwm2m_connection_handle_packet(conn, rcv_buf,
                                                             rcv_len,
                                                             _client_data);
@@ -196,10 +196,10 @@ static void *_lwm2m_client_run(void *arg)
         }
         else if ((rcv_len < 0) &&
                  ((rcv_len != -EAGAIN) && (rcv_len != -ETIMEDOUT))) {
-            DEBUG("Unexpected sock_udp_recv error code %i\n", (int)rcv_len);
+            DEBUG("Unexpected sock_udp_recv error code %" PRIiSIZE "\n", rcv_len);
         }
         else {
-            DEBUG("UDP error code: %i\n", (int)rcv_len);
+            DEBUG("UDP error code: %" PRIiSIZE "\n", rcv_len);
         }
     }
     return NULL;
