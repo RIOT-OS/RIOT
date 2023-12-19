@@ -142,8 +142,8 @@ universal_address_container_t *universal_address_add(uint8_t *addr, size_t addr_
     pEntry->use_count++;
 
     if (pEntry->use_count == 1) {
-        DEBUG("[universal_address_add] universal_address_table_filled: %d\n", \
-              (int)universal_address_table_filled);
+        DEBUG("[universal_address_add] universal_address_table_filled: %" PRIuSIZE "\n", \
+              universal_address_table_filled);
         universal_address_table_filled++;
     }
 
@@ -166,8 +166,8 @@ void universal_address_rem(universal_address_container_t *entry)
             }
         }
         else {
-            DEBUG("[universal_address_rem] universal_address_table_filled: %d\n", \
-                  (int)universal_address_table_filled);
+            DEBUG("[universal_address_rem] universal_address_table_filled: %" PRIuSIZE "\n", \
+                  universal_address_table_filled);
         }
     }
 
@@ -359,8 +359,8 @@ int universal_address_get_num_used_entries(void)
 
 void universal_address_print_table(void)
 {
-    printf("[universal_address_print_table] universal_address_table_filled: %d\n", \
-           (int)universal_address_table_filled);
+    printf("[universal_address_print_table] universal_address_table_filled: %" PRIuSIZE "\n", \
+           universal_address_table_filled);
 
     /* cppcheck-suppress unsignedLessThanZero
      * (reason: UNIVERSAL_ADDRESS_MAX_ENTRIES may be zero in which case this

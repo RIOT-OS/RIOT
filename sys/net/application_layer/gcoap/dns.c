@@ -549,7 +549,7 @@ static int _do_block(coap_pkt_t *pdu, const sock_udp_ep_t *remote,
     coap_block1_finish(&slicer);
 
     if ((len = _send(pdu->hdr, len, remote, slicer.start == 0, context, tl_type)) <= 0) {
-        DEBUG("gcoap_dns: msg send failed: %d\n", (int)len);
+        DEBUG("gcoap_dns: msg send failed: %" PRIdSIZE "\n", len);
         return len;
     }
     return len;
@@ -679,7 +679,7 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
 
         if ((block.offset + pdu->payload_len) > CONFIG_DNS_MSG_LEN) {
             DEBUG("gcoap_dns: No buffer space for block-wise transfer "
-                  "(%lu + %u) > %u\n", (long unsigned)block.offset,
+                  "(%" PRIuSIZE " + %u) > %u\n", block.offset,
                   pdu->payload_len, CONFIG_DNS_MSG_LEN);
             context->res = -ENOBUFS;
             goto unlock;

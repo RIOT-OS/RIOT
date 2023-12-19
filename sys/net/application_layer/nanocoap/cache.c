@@ -249,8 +249,8 @@ nanocoap_cache_entry_t *nanocoap_cache_add_by_key(const uint8_t *cache_key,
     bool add_to_cache = false;
 
     if (resp_len > CONFIG_NANOCOAP_CACHE_RESPONSE_SIZE) {
-        DEBUG("nanocoap_cache: response too large to cache (%lu > %d)\n",
-              (long unsigned)resp_len, CONFIG_NANOCOAP_CACHE_RESPONSE_SIZE);
+        DEBUG("nanocoap_cache: response too large to cache (%" PRIuSIZE "> %d)\n",
+              resp_len, CONFIG_NANOCOAP_CACHE_RESPONSE_SIZE);
         return NULL;
     }
 
