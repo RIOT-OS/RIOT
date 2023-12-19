@@ -6,8 +6,6 @@ DHCPD="$(cd "${ZEP_DISPATCH_DIR}/../dhcpv6-pd_ia/" && pwd -P)/dhcpv6-pd_ia.py"
 RADVD="$(cd "${ZEP_DISPATCH_DIR}/../radvd/" && pwd -P)/radvd.sh"
 ZEP_DISPATCH="${ZEP_DISPATCH_DIR}/bin/zep_dispatch"
 
-TAP_GLB="fdea:dbee:f::1/64"
-
 NOSUDO="sudo -u ${SUDO_USER}"
 
 create_tap() {
@@ -16,7 +14,7 @@ create_tap() {
     sysctl -w net.ipv6.conf."${TAP}".accept_ra=0
     ip link set "${TAP}" up
     ip a a fe80::1/64 dev "${TAP}"
-    ip a a ${TAP_GLB} dev "${TAP}"
+    ip a a ${HOST_IP} dev "${TAP}"
 }
 
 remove_tap() {
@@ -106,6 +104,13 @@ if [ "$1" = "-w" ] || [ "$1" = "--monitor" ]; then
     shift 1
 fi
 
+if [ "$1" = "-i" ] || [ "$1" = "--host-ip" ]; then
+    HOST_IP=$2
+    shift 2
+else
+    HOST_IP="fd00:dead:beef::1/128"
+fi
+
 ELFFILE=$1
 PREFIX=$2
 shift 2
@@ -114,7 +119,7 @@ shift 2
 for TAP in "$@"; do :; done
 
 [[ -z "${ELFFILE}" || -z "${PREFIX}" || -z "${TAP}" ]] && {
-    echo "usage: $0 [-d|--use-dhcp] [-r|--use-radvd] [-z|--use-zep <port>] " \
+    echo "usage: $0 [-c|--create-tap] [-d|--use-dhcpv6] [-r|--use-radvd] [-z|--use-zep-dispatch <port>] [-t|--topology <xxx>] [-w|--monitor] [-i|--host-ip <ip>] " \
          "<elffile> <prefix> [elf args]"
     exit 1
 }
