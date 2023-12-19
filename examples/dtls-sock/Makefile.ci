@@ -1,9 +1,5 @@
 BOARD_INSUFFICIENT_MEMORY := \
     airfy-beacon \
-    arduino-leonardo \
-    arduino-mega2560 \
-    arduino-nano \
-    atxmega-a3bu-xplained \
     b-l072z-lrwan1 \
     blackpill-stm32f103c8 \
     blackpill-stm32f103cb \
@@ -11,13 +7,11 @@ BOARD_INSUFFICIENT_MEMORY := \
     bluepill-stm32f103c8 \
     bluepill-stm32f103cb \
     calliope-mini \
-    derfmega12 \
     hifive1 \
     hifive1b \
     i-nucleo-lrwan1 \
     im880b \
     lsn50 \
-    mega-xplained \
     microbit \
     nrf51dongle \
     nrf6310 \
@@ -44,6 +38,4 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32l0538-disco \
     stm32mp157c-dk2 \
     yunjia-nrf51822 \
-    waspmote-pro \
-    z1 \
     #
