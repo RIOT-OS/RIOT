@@ -110,16 +110,23 @@ void shell_pre_command_hook(int argc, char **argv);
 void shell_post_command_hook(int ret, int argc, char **argv);
 
 /**
- * @brief           Protype of a shell callback handler.
+ * @brief           Prototype of a shell callback handler.
  * @details         The functions supplied to shell_run() must use this signature.
- *                  The argument list is terminated with a `NULL`, i.e `argv[argc] == NULL`.
- *                  `argv[0]` is the function name.
+ *                  It is designed to mimic the function signature of `main()`.
+ *                  For this reason, the argument list is terminated with a
+ *                  `NULL`, i.e `argv[argc] == NULL` (which is an ANSI-C
+ *                  requirement, and a detail that newlib's `getopt()`
+ *                  implementation relies on). The function name is passed in
+ *                  `argv[0]`.
  *
  *                  Escape sequences are removed before the function is called.
  *
  *                  The called function may edit `argv` and the contained strings,
  *                  but it must be taken care of not to leave the boundaries of the array.
- *                  This functionality can be used by `getopt()` or a similar function.
+ *                  This functionality is another property that many `getopt()`
+ *                  implementations rely on to provide their so-called "permute"
+ *                  feature extension.
+ *
  * @param[in]       argc   Number of arguments supplied to the function invocation.
  * @param[in]       argv   The supplied argument list.
  *
