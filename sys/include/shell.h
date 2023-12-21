@@ -112,14 +112,14 @@ void shell_post_command_hook(int ret, int argc, char **argv);
 /**
  * @brief           Protype of a shell callback handler.
  * @details         The functions supplied to shell_run() must use this signature.
- *                  The argument list is terminated with a NULL, i.e ``argv[argc] == NULL`.
- *                  ``argv[0]`` is the function name.
+ *                  The argument list is terminated with a `NULL`, i.e `argv[argc] == NULL`.
+ *                  `argv[0]` is the function name.
  *
  *                  Escape sequences are removed before the function is called.
  *
  *                  The called function may edit `argv` and the contained strings,
  *                  but it must be taken care of not to leave the boundaries of the array.
- *                  This functionality can be used by getopt() or a similar function.
+ *                  This functionality can be used by `getopt()` or a similar function.
  * @param[in]       argc   Number of arguments supplied to the function invocation.
  * @param[in]       argv   The supplied argument list.
  *
