@@ -305,13 +305,19 @@ static void handle_input_line(const shell_command_t *command_list, char *line)
 
     /* then we fill the argv array */
     int collected;
-    char *argv[argc];
+
+    /* allocate argv on the stack leaving space for NULL termination */
+    char *argv[argc + 1];
 
     readpos = line;
     for (collected = 0; collected < argc; collected++) {
         argv[collected] = readpos;
         readpos += strlen(readpos) + 1;
     }
+
+    /* NULL terminate argv. See `shell_command_handler_t` doc in shell.h for
+       rationale. */
+    argv[argc] = NULL;
 
     /* then we call the appropriate handler */
     shell_command_handler_t handler = find_handler(command_list, argv[0]);
