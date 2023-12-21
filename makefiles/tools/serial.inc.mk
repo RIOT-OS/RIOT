@@ -80,4 +80,6 @@ else ifeq (${RIOT_TERMINAL},bootterm)
   TERMPROG = $(RIOTTOOLS)/bootterm/bt
   TERMFLAGS = $(BOOTTERMFLAGS) -a -b $(BAUD) $(PORT)
   TERMDEPS += $(TERMPROG)
+else ifeq (${RIOT_TERMINAL},native)
+  TERMPROG ?= $(ELFFILE)
 endif

@@ -27,6 +27,7 @@ BOARD_WHITELIST += adafruit-clue \
 
 ifeq ($(BOARD), native)
   ZEP_PORT_BASE ?= 17754
+  RIOT_TERMINAL = native
   TERMFLAGS += -z [::1]:$(ZEP_PORT_BASE)
   USEMODULE += socket_zep
   # the same for Kconfig

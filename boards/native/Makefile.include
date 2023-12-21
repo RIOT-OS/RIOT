@@ -14,7 +14,19 @@ RESET ?= $(RIOTBOARD)/native/dist/reset.sh
 FLASHER ?=
 FLASHFILE ?= $(ELFFILE)
 
-TERMPROG ?= $(FLASHFILE)
+ifeq (native,$(RIOT_TERMINAL))
+  TERMPROG ?= $(FLASHFILE)
+else
+  TERMFLAGS += -ps $(FLASHFILE)
+  ifeq (1,$(USE_ZEP))
+    ZEP_IP ?= [::1]
+    ZEP_PORT_BASE ?= 17754
+    TERMFLAGS += --process-args '-z $(ZEP_IP):$(ZEP_PORT_BASE)'
+  endif
+  ifneq (,$(ZEP_MAC))
+    TERMFLAGS += --process-args '\-\-eui64=$(ZEP_MAC)'
+  endif
+endif
 
 export VALGRIND ?= valgrind
 export CGANNOTATE ?= cg_annotate
@@ -88,8 +100,12 @@ endif
 LINKFLAGS += -ffunction-sections
 
 # set the tap interface for term/valgrind
-ifneq (,$(filter netdev_tap,$(USEMODULE)))
-  PORT ?= tap0
+PORT ?= tap0
+
+ifeq (native,$(RIOT_TERMINAL))
+  TERMFLAGS += $(PORT)
+else
+  TERMFLAGS += --process-args $(PORT)
 endif
 
 # Configure default eeprom file
@@ -110,7 +126,6 @@ ifneq (,$(filter periph_can,$(FEATURES_USED)))
   TERMFLAGS += $(PERIPH_CAN_FLAGS)
 endif
 
-TERMFLAGS += $(PORT)
 
 ASFLAGS =
 ifeq ($(shell basename $(DEBUGGER)),lldb)
