@@ -323,8 +323,8 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     }
     /* drop frame, content in buf becomes invalid and return -ENOBUFS */
     if (len < frame_len) {
-        DEBUG("[nrf24l01p_ng] Buffer too small: %u < %u, dropping frame\n",
-              (unsigned)len, frame_len);
+        DEBUG("[nrf24l01p_ng] Buffer too small: %" PRIuSIZE " < %u, dropping frame\n",
+              len, frame_len);
         uint8_t garbage[pl_width];
         nrf24l01p_ng_read_rx_payload(dev, garbage, pl_width);
         return -ENOBUFS;
