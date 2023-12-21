@@ -74,7 +74,7 @@ ssize_t _edhoc_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_c
         uint8_t msg[COAP_BUF_SIZE];
         if ((msg_len =
                  edhoc_create_msg2(&_ctx, pkt->payload, pkt->payload_len, msg, sizeof(msg))) >= 0) {
-            printf("[responder]: sending msg2 (%d bytes):\n", (int) msg_len);
+            printf("[responder]: sending msg2 (%" PRIdSIZE " bytes):\n", msg_len);
             print_bstr(msg, msg_len);
             msg_len = coap_reply_simple(pkt, COAP_CODE_204, buf, len, COAP_FORMAT_OCTET, msg,
                                         msg_len);

@@ -544,15 +544,15 @@ static void _handle_rtr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         DEBUG("     - IP Hop Limit: %u (should be %u)\n", ipv6->hl,
               NDP_HOP_LIMIT);
         DEBUG("     - ICMP code: %u (should be 0)\n", rtr_sol->code);
-        DEBUG("     - ICMP length: %u (should > %u)\n", (unsigned)icmpv6_len,
-              (unsigned)sizeof(ndp_rtr_sol_t));
+        DEBUG("     - ICMP length: %" PRIuSIZE " (should > %" PRIuSIZE ")\n",
+              icmpv6_len, sizeof(ndp_rtr_sol_t));
         return;
     }
     /* pre-check option length */
     FOREACH_OPT(rtr_sol, opt, tmp_len) {
         if (tmp_len > icmpv6_len) {
-            DEBUG("nib: Payload length (%u) of RS doesn't align with options\n",
-                  (unsigned)icmpv6_len);
+            DEBUG("nib: Payload length (%" PRIuSIZE ") of RS doesn't align with options\n",
+                  icmpv6_len);
             return;
         }
         if (opt->len == 0U) {
@@ -659,8 +659,8 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         DEBUG("     - IP Hop Limit: %u (should be %u)\n", ipv6->hl,
               NDP_HOP_LIMIT);
         DEBUG("     - ICMP code: %u (should be 0)\n", rtr_adv->code);
-        DEBUG("     - ICMP length: %u (should > %u)\n", (unsigned)icmpv6_len,
-              (unsigned)sizeof(ndp_rtr_adv_t));
+        DEBUG("     - ICMP length: %" PRIuSIZE " (should > %" PRIuSIZE ")\n",
+              icmpv6_len, sizeof(ndp_rtr_adv_t));
         DEBUG("     - Source address: %s (should be link-local)\n",
               ipv6_addr_to_str(addr_str, &ipv6->src, sizeof(addr_str)));
         DEBUG("     - Router lifetime: %u (should be <= 9000 on non-6LN)\n",
@@ -670,8 +670,8 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     /* pre-check option length */
     FOREACH_OPT(rtr_adv, opt, tmp_len) {
         if (tmp_len > icmpv6_len) {
-            DEBUG("nib: Payload length (%u) of RA doesn't align with options\n",
-                  (unsigned)icmpv6_len);
+            DEBUG("nib: Payload length (%" PRIuSIZE ") of RA doesn't align with options\n",
+                  icmpv6_len);
             return;
         }
         if (opt->len == 0U) {
@@ -984,8 +984,8 @@ static void _handle_nbr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         DEBUG("     - IP Hop Limit: %u (should be %u)\n", ipv6->hl,
               NDP_HOP_LIMIT);
         DEBUG("     - ICMP code: %u (should be 0)\n", nbr_sol->code);
-        DEBUG("     - ICMP length: %u (should > %u)\n", (unsigned)icmpv6_len,
-              (unsigned)sizeof(ndp_nbr_sol_t));
+        DEBUG("     - ICMP length: %" PRIuSIZE " (should > %" PRIuSIZE ")\n",
+              icmpv6_len, sizeof(ndp_nbr_sol_t));
         DEBUG("     - Target address: %s (should not be multicast)\n",
               ipv6_addr_to_str(addr_str, &nbr_sol->tgt, sizeof(addr_str)));
         DEBUG("     - Source address: %s\n",
@@ -1005,8 +1005,8 @@ static void _handle_nbr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     /* pre-check option length */
     FOREACH_OPT(nbr_sol, opt, tmp_len) {
         if (tmp_len > icmpv6_len) {
-            DEBUG("nib: Payload length (%u) of NS doesn't align with options\n",
-                  (unsigned)icmpv6_len);
+            DEBUG("nib: Payload length (%" PRIuSIZE ") of NS doesn't align with options\n",
+                  icmpv6_len);
             return;
         }
         if (opt->len == 0U) {
@@ -1140,8 +1140,8 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         DEBUG("     - IP Hop Limit: %u (should be %u)\n", ipv6->hl,
               NDP_HOP_LIMIT);
         DEBUG("     - ICMP code: %u (should be 0)\n", nbr_adv->code);
-        DEBUG("     - ICMP length: %u (should > %u)\n", (unsigned)icmpv6_len,
-              (unsigned)sizeof(ndp_nbr_adv_t));
+        DEBUG("     - ICMP length: %" PRIuSIZE " (should > %" PRIuSIZE ")\n",
+              icmpv6_len, sizeof(ndp_nbr_adv_t));
         DEBUG("     - Target address: %s (should not be multicast)\n",
               ipv6_addr_to_str(addr_str, &nbr_adv->tgt, sizeof(addr_str)));
         DEBUG("     - Destination address: %s\n",
@@ -1155,8 +1155,8 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     /* pre-check option length */
     FOREACH_OPT(nbr_adv, opt, tmp_len) {
         if (tmp_len > icmpv6_len) {
-            DEBUG("nib: Payload length (%u) of NA doesn't align with options\n",
-                  (unsigned)icmpv6_len);
+            DEBUG("nib: Payload length (%" PRIuSIZE ") of NA doesn't align with options\n",
+                  icmpv6_len);
             return;
         }
         if (opt->len == 0U) {

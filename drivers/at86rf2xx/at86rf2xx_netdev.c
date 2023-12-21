@@ -30,6 +30,7 @@
 #include <assert.h>
 #include <errno.h>
 
+#include "architecture.h"
 #include "iolist.h"
 
 #include "net/eui64.h"
@@ -216,8 +217,8 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
         /* current packet data + FCS too long */
         if ((len + iol->iol_len + 2) > AT86RF2XX_MAX_PKT_LENGTH) {
-            DEBUG("[at86rf2xx] error: packet too large (%u byte) to be send\n",
-                  (unsigned)len + 2);
+            DEBUG("[at86rf2xx] error: packet too large (%" PRIuSIZE
+                  " byte) to be send\n", len + 2);
             return -EOVERFLOW;
         }
         if (iol->iol_len) {

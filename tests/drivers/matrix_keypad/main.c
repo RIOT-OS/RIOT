@@ -27,7 +27,7 @@
 void _callback(void *arg, size_t col, size_t row, bool state)
 {
     (void)arg;
-    printf("Key switch at column %u and row %u is ", (unsigned)col, (unsigned)row);
+    printf("Key switch at column %" PRIuSIZE " and row %" PRIuSIZE " is ", col, row);
     if (state) {
         puts("pressed!");
     }

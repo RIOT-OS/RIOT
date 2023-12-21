@@ -673,7 +673,7 @@ static int xbee_send(netdev_t *dev, const iolist_t *iolist)
     }
 
     /* send the actual data packet */
-    DEBUG("[xbee] send: now sending out %i byte\n", (int)size);
+    DEBUG("[xbee] send: now sending out %" PRIuSIZE " byte\n", size);
     mutex_lock(&(xbee->tx_lock));
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
         if (iol->iol_len > 0) {
@@ -705,16 +705,16 @@ static int xbee_recv(netdev_t *dev, void *buf, size_t len, void *info)
     size = (size_t)(xbee->rx_limit - 1);
     if (buf == NULL) {
         if (len > 0) {
-            DEBUG("[xbee] recv: reading size and dropping: %u\n", (unsigned)size);
+            DEBUG("[xbee] recv: reading size and dropping: %" PRIuSIZE "\n", size);
             xbee->rx_count = 0;
         }
         else {
-            DEBUG("[xbee] recv: reading size without dropping: %u\n", (unsigned)size);
+            DEBUG("[xbee] recv: reading size without dropping: %" PRIuSIZE "\n", size);
         }
     }
     else {
         size = (size > len) ? len : size;
-        DEBUG("[xbee] recv: consuming packet: reading %u byte\n", (unsigned)size);
+        DEBUG("[xbee] recv: consuming packet: reading %" PRIuSIZE " byte\n", size);
         memcpy(buf, xbee->rx_buf, size);
         xbee->rx_count = 0;
     }

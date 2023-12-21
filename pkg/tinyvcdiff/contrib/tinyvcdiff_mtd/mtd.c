@@ -6,6 +6,7 @@
  * directory for more details.
  */
 
+#include "architecture.h"
 #include "vcdiff_mtd.h"
 #include "assert.h"
 #include <string.h>
@@ -71,7 +72,7 @@ static int _align_write (vcdiff_mtd_t *mtd, uint8_t **src, size_t *len)
     mtd->offset += copy_len;
     *len -= copy_len;
     *src += copy_len;
-    DEBUG("_align_write: buffered %zuB for alignment\n", copy_len);
+    DEBUG("_align_write: buffered %" PRIuSIZE "B for alignment\n", copy_len);
 
     if (alignment_offset < CONFIG_TINYVCDIFF_MTD_WRITE_SIZE) {
         /* we haven't collected enough bytes, yet */
@@ -99,7 +100,7 @@ static int _write (void *dev, uint8_t *src, size_t offset, size_t len)
 
     assert(offset == mtd->offset);
 
-    DEBUG("_write: 0x%zx + %zuB\n", mtd->offset, len);
+    DEBUG("_write: 0x%" PRIxSIZE " + %" PRIuSIZE "B\n", mtd->offset, len);
 
     /* align writes */
     rc = _align_write(dev, &src, &len);
@@ -132,7 +133,7 @@ static int _write (void *dev, uint8_t *src, size_t offset, size_t len)
     /* copy remaining bytes into write_buffer */
     memcpy(mtd->write_buffer, src, len);
     mtd->offset += len;
-    DEBUG("_write: buffered %zuB for alignment\n", len);
+    DEBUG("_write: buffered %" PRIuSIZE "B for alignment\n", len);
 
     return rc;
 }
@@ -150,7 +151,7 @@ static int _flush (void *dev)
         return 0;
     }
 
-    DEBUG("_flush: write last %zuB\n", alignment_offset);
+    DEBUG("_flush: write last %" PRIuSIZE "B\n", alignment_offset);
 
     /* get present bytes from MTD to pad alignment */
     rc = mtd_read_page(mtd->dev, buf, 0, mtd->offset - alignment_offset,

@@ -126,12 +126,12 @@ int nanotest_client_cmd(int argc, char **argv)
             len = coap_opt_finish(&pkt, COAP_OPT_FINISH_NONE);
         }
 
-        printf("nanocli: sending msg ID %u, %u bytes\n", coap_get_id(&pkt),
-               (unsigned) len);
+        printf("nanocli: sending msg ID %u, %" PRIuSIZE " bytes\n", coap_get_id(&pkt),
+               len);
 
         ssize_t res = _send(&pkt, buflen, argv[2], argv[3]);
         if (res < 0) {
-            printf("nanocli: msg send failed: %d\n", (int)res);
+            printf("nanocli: msg send failed: %" PRIdSIZE "\n", res);
         }
         else {
             char *class_str = (coap_get_code_class(&pkt) == COAP_CLASS_SUCCESS)
@@ -171,7 +171,7 @@ static int _blockwise_cb(void *arg, size_t offset, uint8_t *buf, size_t len, int
     (void)arg;
     (void)more;
 
-    printf("offset %03u: ", (unsigned)offset);
+    printf("offset %03" PRIuSIZE ": ", offset);
     for (unsigned i = 0; i < len; ++i) {
         putchar(buf[i]);
     }

@@ -120,8 +120,8 @@ void gnrc_sixlowpan_multiplex_by_size(gnrc_pktsnip_t *pkt,
     }
 #if defined(MODULE_GNRC_SIXLOWPAN_FRAG) || defined(MODULE_GNRC_SIXLOWPAN_FRAG_SFR)
     else if (orig_datagram_size <= SIXLOWPAN_FRAG_MAX_LEN) {
-        DEBUG("6lo: Send fragmented (%u > %u)\n",
-              (unsigned int)datagram_size, netif->sixlo.max_frag_size);
+        DEBUG("6lo: Send fragmented (%" PRIuSIZE " > %u)\n",
+              datagram_size, netif->sixlo.max_frag_size);
         gnrc_sixlowpan_frag_fb_t *fbuf;
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_SFR
         bool sfr = gnrc_sixlowpan_frag_sfr_netif(netif);
@@ -161,8 +161,8 @@ void gnrc_sixlowpan_multiplex_by_size(gnrc_pktsnip_t *pkt,
 #endif /* defined(MODULE_GNRC_SIXLOWPAN_FRAG) || defined(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) */
     else {
         (void)orig_datagram_size;
-        DEBUG("6lo: packet too big (%u > %u)\n",
-              (unsigned int)datagram_size, netif->sixlo.max_frag_size);
+        DEBUG("6lo: packet too big (%" PRIuSIZE " > %u)\n",
+              datagram_size, netif->sixlo.max_frag_size);
         gnrc_pktbuf_release_error(pkt, EMSGSIZE);
     }
 }

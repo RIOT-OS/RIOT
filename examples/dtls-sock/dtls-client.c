@@ -154,7 +154,7 @@ static int client_send(char *addr_str, char *data, size_t datalen)
     res = credman_add(&credential0);
     if (res < 0 && res != CREDMAN_EXIST) {
         /* ignore duplicate credentials */
-        printf("Error cannot add credential to system: %d\n", (int)res);
+        printf("Error cannot add credential to system: %" PRIdSIZE "\n", res);
         return -1;
     }
 
@@ -170,13 +170,13 @@ static int client_send(char *addr_str, char *data, size_t datalen)
     res = credman_add(&credential1);
     if (res < 0 && res != CREDMAN_EXIST) {
         /* ignore duplicate credentials */
-        printf("Error cannot add credential to system: %d\n", (int)res);
+        printf("Error cannot add credential to system: %" PRIdSIZE "\n", res);
         return -1;
     }
 
     /* make the new credential available to the sock */
     if (sock_dtls_add_credential(&dtls_sock, SOCK_DTLS_CLIENT_TAG_1) < 0) {
-        printf("Error cannot add credential to the sock: %d\n", (int)res);
+        printf("Error cannot add credential to the sock: %" PRIdSIZE "\n", res);
         return -1;
     }
 
@@ -192,7 +192,7 @@ static int client_send(char *addr_str, char *data, size_t datalen)
     res = sock_dtls_recv(&dtls_sock, &session, buf, sizeof(buf),
                          SOCK_NO_TIMEOUT);
     if (res != -SOCK_DTLS_HANDSHAKE) {
-        printf("Error creating session: %d\n", (int)res);
+        printf("Error creating session: %" PRIdSIZE "\n", res);
         sock_dtls_close(&dtls_sock);
         sock_udp_close(&udp_sock);
         return -1;
@@ -208,7 +208,7 @@ static int client_send(char *addr_str, char *data, size_t datalen)
         uint8_t rcv[512];
         if ((res = sock_dtls_recv(&dtls_sock, &session, rcv, sizeof(rcv),
                                     SOCK_NO_TIMEOUT)) >= 0) {
-            printf("Received %d bytes: \"%.*s\"\n", (int)res, (int)res,
+            printf("Received %" PRIdSIZE " bytes: \"%.*s\"\n", res, (int)res,
                    (char *)rcv);
         }
     }

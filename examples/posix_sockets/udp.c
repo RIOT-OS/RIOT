@@ -136,7 +136,7 @@ static int udp_send(char *addr_str, char *port_str, char *data, unsigned int num
             puts("could not send");
         }
         else {
-            printf("Success: send %u byte to %s:%u\n", (unsigned)data_len, addr_str, port);
+            printf("Success: send %" PRIuSIZE " byte to %s:%u\n", data_len, addr_str, port);
         }
 
         usleep(delay);

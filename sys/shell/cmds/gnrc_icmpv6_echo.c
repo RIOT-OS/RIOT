@@ -340,13 +340,11 @@ static int _print_reply(gnrc_pktsnip_t *pkt, int corrupted, uint32_t triptime, v
 
     if (gnrc_netif_highlander() || (if_pid == KERNEL_PID_UNDEF) ||
         !ipv6_addr_is_link_local(&ipv6_hdr->src)) {
-        printf("%u bytes from %s: icmp_seq=%u ttl=%u",
-               (unsigned)icmpv6->size,
-               from_str, recv_seq, ipv6_hdr->hl);
+        printf("%" PRIuSIZE " bytes from %s: icmp_seq=%u ttl=%u",
+               icmpv6->size, from_str, recv_seq, ipv6_hdr->hl);
     } else {
-        printf("%u bytes from %s%%%u: icmp_seq=%u ttl=%u",
-               (unsigned)icmpv6->size,
-               from_str, if_pid, recv_seq, ipv6_hdr->hl);
+        printf("%" PRIuSIZE " bytes from %s%%%u: icmp_seq=%u ttl=%u",
+               icmpv6->size, from_str, if_pid, recv_seq, ipv6_hdr->hl);
 
     }
     /* check if payload size matches */

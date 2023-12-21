@@ -23,6 +23,7 @@
 #include <assert.h>
 #include <string.h>
 
+#include "architecture.h"
 #include "riotboot/flashwrite.h"
 #include "riotboot/slot.h"
 #include "od.h"
@@ -107,7 +108,7 @@ int riotboot_flashwrite_flush(riotboot_flashwrite_t *state)
 int riotboot_flashwrite_putbytes(riotboot_flashwrite_t *state,
                                  const uint8_t *bytes, size_t len, bool more)
 {
-    LOG_DEBUG(LOG_PREFIX "processing bytes %u-%u\n", state->offset,
+    LOG_DEBUG(LOG_PREFIX "processing bytes %" PRIuSIZE "-%" PRIuSIZE "\n", state->offset,
               state->offset + len - 1);
 
     while (len) {

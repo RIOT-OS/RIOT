@@ -27,6 +27,7 @@
  * so do not sort this one alphabetically */
 #include <stdatomic.h>
 
+#include "architecture.h"
 #include "irq.h"
 #include "sched.h"
 #include "thread.h"
@@ -79,7 +80,7 @@ int main(void)
            (unsigned)STACKSIZE, (unsigned)ALIGNMENT);
     for (size_t i = 0; i < ALIGNMENT; i++) {
         atomic_store(&test_failed, false);
-        printf("Testing for alignment %u: ", (unsigned)i);
+        printf("Testing for alignment %" PRIuSIZE ": ", i);
         kernel_pid_t p;
         p = thread_create(stack + i, STACKSIZE, THREAD_PRIORITY_MAIN - 1,
                           THREAD_CREATE_STACKTEST,

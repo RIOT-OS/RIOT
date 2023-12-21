@@ -118,8 +118,8 @@ static int udp_send(char *addr_str, char *data, unsigned int num,
             puts("could not send");
         }
         else {
-            printf("Success: send %u byte over UDP to %s\n",
-                   (unsigned)data_len, addr_str);
+            printf("Success: send %" PRIuSIZE " byte over UDP to %s\n",
+                   data_len, addr_str);
         }
         ztimer_sleep(ZTIMER_USEC, delay);
     }

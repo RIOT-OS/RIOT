@@ -67,7 +67,7 @@ static int _create_sr(const char *pre, size_t from, size_t to, fib_sr_t *sr, siz
 
     for (size_t i = from; i < to; ++i) {
         int res;
-        snprintf(&(addr_nxt[strlen(pre)]), buf_size, "%d", (int)i);
+        snprintf(&(addr_nxt[strlen(pre)]), buf_size, "%" PRIuSIZE, i);
         /* append a  hop */
         res = fib_sr_entry_append(&test_fib_sr_table, sr, (uint8_t *)&addr_nxt, buf_size);
         if (res != 0) {
