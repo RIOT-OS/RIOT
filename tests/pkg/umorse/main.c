@@ -78,8 +78,8 @@ int test_umorse_out(void)
 {
     uint8_t code[CODE_LEN];
 
-    printf("> Translate text of length %u into Morse code:\n\"%s\"\n",
-           (unsigned)strlen(text), text);
+    printf("> Translate text of length %" PRIuSIZE " into Morse code:\n\"%s\"\n",
+           strlen(text), text);
 
     memset(code, 0, CODE_LEN);
     printf("> using aligned encoding:\n");

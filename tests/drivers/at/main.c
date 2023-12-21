@@ -80,7 +80,7 @@ static int send(int argc, char **argv)
         return 1;
     }
 
-    printf("Response (len=%d): %s\n", (int)len, resp);
+    printf("Response (len=%" PRIdSIZE "): %s\n", len, resp);
 
     return 0;
 }
@@ -115,7 +115,7 @@ static int send_lines(int argc, char **argv)
         return 1;
     }
 
-    printf("Response (len=%d): %s\n", (int)len, resp);
+    printf("Response (len=%" PRIdSIZE "): %s\n", len, resp);
 
     return 0;
 }
@@ -134,7 +134,7 @@ static int send_recv_bytes(int argc, char **argv)
 
     ssize_t len = at_recv_bytes(&at_dev, buffer, atoi(argv[2]), 10 * US_PER_SEC);
 
-    printf("Response (len=%d): %s\n", (int)len, buffer);
+    printf("Response (len=%" PRIdSIZE "): %s\n", len, buffer);
 
     return 0;
 }
@@ -163,7 +163,7 @@ static int send_recv_bytes_until_string(int argc, char **argv)
         return 1;
     }
 
-    printf("Response (len=%d): %s\n", (int)len, buffer);
+    printf("Response (len=%" PRIdSIZE "): %s\n", len, buffer);
     return 0;
 }
 

@@ -230,7 +230,7 @@ int main(void)
     int sends_expected = (IS_USED(MODULE_NETDEV_IEEE802154)) ? 2 : 1;
     printf("transmissions expected = %d, transmissions completed = %d\n",
            sends_expected, sends);
-    printf("sent %u out of %u bytes\n", pld_pos, (unsigned)sizeof(test_msg));
+    printf("sent %u out of %" PRIuSIZE " bytes\n", pld_pos, sizeof(test_msg));
     expect(sends == sends_expected);
     expect(pld_pos == sizeof(test_msg));
 

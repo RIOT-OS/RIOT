@@ -40,8 +40,8 @@ static void _fill_FIB_unique(size_t entries)
 
     for (size_t i = 0; i < entries; ++i) {
         /* construct "addresses" for the FIB */
-        snprintf(addr_dst, add_buf_size, "Test address %02d", (int)i);
-        snprintf(addr_nxt, add_buf_size, "Test address %02d", (int)(entries + i));
+        snprintf(addr_dst, add_buf_size, "Test address %02" PRIuSIZE, i);
+        snprintf(addr_nxt, add_buf_size, "Test address %02" PRIuSIZE, entries + i);
         /* the terminating \0 is unnecessary here */
         fib_add_entry(&test_fib_table, 42,
                       (uint8_t *)addr_dst, add_buf_size - 1, addr_dst_flags,
@@ -64,8 +64,8 @@ static void _fill_FIB_multiple(size_t entries, size_t modulus)
 
     for (size_t i = 0; i < entries; ++i) {
         /* construct "addresses" for the FIB */
-        snprintf(addr_dst, add_buf_size, "Test address %02d", (int)i);
-        snprintf(addr_nxt, add_buf_size, "Test address %02d", (int)(i % modulus));
+        snprintf(addr_dst, add_buf_size, "Test address %02" PRIuSIZE, i);
+        snprintf(addr_nxt, add_buf_size, "Test address %02" PRIuSIZE, i % modulus);
         fib_add_entry(&test_fib_table, 42,
                       (uint8_t *)addr_dst, add_buf_size - 1, addr_dst_flags,
                       (uint8_t *)addr_nxt, add_buf_size - 1, addr_nxt_flags,
@@ -151,7 +151,7 @@ static void test_fib_03_removing_all_entries(void)
 
     for (size_t i = 0; i < entries; ++i) {
         /* construct "addresses" to remove */
-        snprintf(addr_dst, add_buf_size, "Test address %02d", (int)i);
+        snprintf(addr_dst, add_buf_size, "Test address %02" PRIuSIZE, i);
         fib_remove_entry(&test_fib_table, (uint8_t *)addr_dst, add_buf_size - 1);
     }
 
@@ -185,7 +185,7 @@ static void test_fib_04_remove_lower_half(void)
 
     for (size_t i = 0; i < entries / 2; ++i) {
         /* construct "addresses" to remove */
-        snprintf(addr_dst, add_buf_size, "Test address %02d", (int)i);
+        snprintf(addr_dst, add_buf_size, "Test address %02" PRIuSIZE, i);
         fib_remove_entry(&test_fib_table, (uint8_t *)addr_dst, add_buf_size - 1);
     }
 
@@ -217,7 +217,7 @@ static void test_fib_05_remove_upper_half(void)
 
     for (size_t i = 0; i < entries / 2; ++i) {
         /* construct "addresses" to remove */
-        snprintf(addr_dst, add_buf_size, "Test address %02d", (int)((entries / 2) + i));
+        snprintf(addr_dst, add_buf_size, "Test address %02" PRIuSIZE, (entries / 2) + i);
         fib_remove_entry(&test_fib_table, (uint8_t *)addr_dst, add_buf_size - 1);
     }
 
@@ -715,8 +715,8 @@ static void test_fib_17_get_entry_set(void)
     /* fill 20 addresses */
     for (size_t i = 0; i < 20; ++i) {
         /* construct "addresses" for the FIB */
-        snprintf(addr_dst, addr_buf_size, "Test address %02d", (int)i);
-        snprintf(addr_nxt, addr_buf_size, "Test address %02d", (int)(i % 11));
+        snprintf(addr_dst, addr_buf_size, "Test address %02" PRIuSIZE, i);
+        snprintf(addr_nxt, addr_buf_size, "Test address %02" PRIuSIZE, i % 11);
         fib_add_entry(&test_fib_table, 42,
                       (uint8_t *)addr_dst, addr_buf_size - 1, 0x0,
                       (uint8_t *)addr_nxt, addr_buf_size - 1, 0x0, 100000);

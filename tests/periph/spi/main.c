@@ -112,11 +112,11 @@ static void print_bytes(const char *title, const uint8_t *data, size_t len)
 {
     printf("%4s\n", title);
     for (size_t i = 0; i < len; i++) {
-        printf("  %2i ", (int)i);
+        printf("  %2" PRIuSIZE " ", i);
     }
     printf("\n ");
     for (size_t i = 0; i < len; i++) {
-        printf(" 0x%02x", (int)data[i]);
+        printf(" 0x%02x", data[i]);
     }
     printf("\n ");
     for (size_t i = 0; i < len; i++) {

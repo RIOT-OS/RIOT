@@ -278,7 +278,7 @@ int gnrc_tcp_send_cmd(int argc, char **argv)
         sent += ret;
     } while (sent < to_send);
 
-    printf("%s: sent %u\n", argv[0], (unsigned)sent);
+    printf("%s: sent %" PRIuSIZE "\n", argv[0], sent);
     return sent;
 }
 
@@ -321,7 +321,7 @@ int gnrc_tcp_recv_cmd(int argc, char **argv)
         rcvd += ret;
     } while (rcvd < to_receive);
 
-    printf("%s: received %u\n", argv[0], (unsigned)rcvd);
+    printf("%s: received %" PRIuSIZE "\n", argv[0], rcvd);
     return 0;
 }
 

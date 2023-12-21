@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "architecture.h"
 #include "memarray.h"
 #include "ps.h"
 
@@ -67,8 +68,8 @@ void fill_memory(struct block_t *head)
         head->message[MESSAGE_SIZE - 1] = 0;
         head->number = aux;
 
-        printf("\t(%i, %s) Allocated %u Bytes at %p, total %d\n",
-               head->number, head->message, (unsigned)sizeof(struct block_t),
+        printf("\t(%i, %s) Allocated %" PRIuSIZE " Bytes at %p, total %d\n",
+               head->number, head->message, sizeof(struct block_t),
                (void *)head, total);
 
         /* NOTE: If there is not space, memarray_alloc returns zero */
@@ -86,8 +87,8 @@ void free_memory(struct block_t *head)
 
     while (head) {
         total -= sizeof(struct block_t);
-        printf("\tFree (%i) %u Bytes at %p, total %d\n", \
-               head->number, (unsigned)sizeof(struct block_t),
+        printf("\tFree (%i) %" PRIuSIZE " Bytes at %p, total %d\n", \
+               head->number, sizeof(struct block_t),
                (void *)head, total);
 
         if (head->next) {
@@ -142,45 +143,45 @@ int main(void)
 
     puts("Extend and reduce tests");
 
-    printf("Memarray available: %u\n",
-           (unsigned)memarray_available(&block_storage));
+    printf("Memarray available: %" PRIuSIZE "\n",
+           memarray_available(&block_storage));
 
     /* Extend with second block */
     memarray_extend(&block_storage, block_storage_data_extend,
                     MAX_NUMBER_BLOCKS);
-    printf("Memarray available: %u\n",
-           (unsigned)memarray_available(&block_storage));
+    printf("Memarray available: %" PRIuSIZE "\n",
+           memarray_available(&block_storage));
 
     /* remove the original block */
     int res = memarray_reduce(&block_storage, block_storage_data,
                               MAX_NUMBER_BLOCKS);
-    printf("Memarray reduction: %d available: %u\n",
-           res, (unsigned)memarray_available(&block_storage));
+    printf("Memarray reduction: %d available: %" PRIuSIZE "\n",
+           res, memarray_available(&block_storage));
 
     /* try to remove original block a second time */
     res = memarray_reduce(&block_storage, block_storage_data,
                           MAX_NUMBER_BLOCKS);
-    printf("Memarray reduction: %d available: %u\n",
-           res, (unsigned)memarray_available(&block_storage));
+    printf("Memarray reduction: %d available: %" PRIuSIZE "\n",
+           res, memarray_available(&block_storage));
 
     /* remove the extension block */
     res = memarray_reduce(&block_storage, block_storage_data_extend,
                           MAX_NUMBER_BLOCKS);
-    printf("Memarray reduction: %d available: %u\n",
-           res, (unsigned)memarray_available(&block_storage));
+    printf("Memarray reduction: %d available: %" PRIuSIZE "\n",
+           res, memarray_available(&block_storage));
 
     /* extend again with the original block */
     memarray_extend(&block_storage, block_storage_data, MAX_NUMBER_BLOCKS);
 
     /* remove one element */
     memarray_alloc(&block_storage);
-    printf("Memarray available: %u\n",
-           (unsigned)memarray_available(&block_storage));
+    printf("Memarray available: %" PRIuSIZE "\n",
+           memarray_available(&block_storage));
 
     /* try to reduce with a missing element */
     res = memarray_reduce(&block_storage, block_storage_data, MAX_NUMBER_BLOCKS);
-    printf("Memarray reduction: %d available: %u\n",
-           res, (unsigned)memarray_available(&block_storage));
+    printf("Memarray reduction: %d available: %" PRIuSIZE "\n",
+           res, memarray_available(&block_storage));
 
     printf("Finishing\n");
     ps();

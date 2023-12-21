@@ -24,6 +24,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "architecture.h"
 #include "msg.h"
 #include "thread.h"
 #include "shell.h"
@@ -69,8 +70,8 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
             netdev_lora_rx_info_t packet_info;
             dev->driver->recv(dev, message, len, &packet_info);
             printf(
-                "Received: \"%s\" (%d bytes) - [RSSI: %i, SNR: %i]\n",
-                message, (int)len, packet_info.rssi, (int)packet_info.snr);
+                "Received: \"%s\" (%" PRIuSIZE " bytes) - [RSSI: %i, SNR: %i]\n",
+                message, len, packet_info.rssi, packet_info.snr);
         }
         break;
 
@@ -282,8 +283,8 @@ static int sx1280_tx_cmd(netdev_t *netdev, int argc, char **argv)
         return -1;
     }
 
-    printf("sending \"%s\" payload (%u bytes)\n",
-           argv[2], (unsigned)strlen(argv[2]) + 1);
+    printf("sending \"%s\" payload (%" PRIuSIZE " bytes)\n",
+           argv[2], strlen(argv[2]) + 1);
     iolist_t iolist = {
         .iol_base = argv[2],
         .iol_len = (strlen(argv[2]) + 1)
