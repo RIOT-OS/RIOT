@@ -1,10 +1,11 @@
 /*
  * Copyright (C) 2017 OTA keys S.A.
- *               2017 HAW Hamburg
+ * Copyright (C) 2024 HAW Hamburg.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
+ *
  */
 
 /**
@@ -16,6 +17,7 @@
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Sebastian Meiling <s@mlng.net>
+ * @author      Miquel Borrell <miquel.borrell@haw-hamburg.de>
  *
  * @}
  */

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 OTA keys S.A.
+ * Copyright (C) 2024 HAW Hamburg.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  * @brief       Default configuration for LSM6DSXX devices
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
+ * @author      Miquel Borrell <miquel.borrell@haw-hamburg.de>
  *
  */
 
