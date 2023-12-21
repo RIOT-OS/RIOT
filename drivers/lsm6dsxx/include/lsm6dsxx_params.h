@@ -8,21 +8,21 @@
  */
 
 /**
- * @ingroup     drivers_lsm6dsl
+ * @ingroup     drivers_lsm6dsxx
  * @{
  *
  * @file
- * @brief       Default configuration for LSM6DSL devices
+ * @brief       Default configuration for LSM6DSXX devices
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  *
  */
 
-#ifndef LSM6DSL_PARAMS_H
-#define LSM6DSL_PARAMS_H
+#ifndef LSM6DSXX_PARAMS_H
+#define LSM6DSXX_PARAMS_H
 
 #include "board.h"
-#include "lsm6dsl.h"
+#include "lsm6dsxx.h"
 #include "saul_reg.h"
 
 #ifdef __cplusplus
@@ -33,65 +33,65 @@ extern "C" {
  * @name    Set default configuration parameters
  * @{
  */
-#ifndef LSM6DSL_PARAM_I2C
-#define LSM6DSL_PARAM_I2C            I2C_DEV(0)
+#ifndef LSM6DSXX_PARAM_I2C
+#define LSM6DSXX_PARAM_I2C            I2C_DEV(0)
 #endif
-#ifndef LSM6DSL_PARAM_ADDR
-#define LSM6DSL_PARAM_ADDR           (0x6B) /* (0x6A) */
+#ifndef LSM6DSXX_PARAM_ADDR
+#define LSM6DSXX_PARAM_ADDR           (0x6B) /* (0x6A) */
 #endif
-#ifndef LSM6DSL_PARAM_ACC_ODR
-#define LSM6DSL_PARAM_ACC_ODR        (LSM6DSL_DATA_RATE_52HZ)
+#ifndef LSM6DSXX_PARAM_ACC_ODR
+#define LSM6DSXX_PARAM_ACC_ODR        (LSM6DSXX_DATA_RATE_52HZ)
 #endif
-#ifndef LSM6DSL_PARAM_GYRO_ODR
-#define LSM6DSL_PARAM_GYRO_ODR       (LSM6DSL_DATA_RATE_52HZ)
+#ifndef LSM6DSXX_PARAM_GYRO_ODR
+#define LSM6DSXX_PARAM_GYRO_ODR       (LSM6DSXX_DATA_RATE_52HZ)
 #endif
-#ifndef LSM6DSL_PARAM_ACC_FS
-#define LSM6DSL_PARAM_ACC_FS         (LSM6DSL_ACC_FS_2G)
+#ifndef LSM6DSXX_PARAM_ACC_FS
+#define LSM6DSXX_PARAM_ACC_FS         (LSM6DSXX_ACC_FS_2G)
 #endif
-#ifndef LSM6DSL_PARAM_GYRO_FS
-#define LSM6DSL_PARAM_GYRO_FS        (LSM6DSL_GYRO_FS_245DPS)
+#ifndef LSM6DSXX_PARAM_GYRO_FS
+#define LSM6DSXX_PARAM_GYRO_FS        (LSM6DSXX_GYRO_FS_245DPS)
 #endif
-#ifndef LSM6DSL_PARAM_ACC_FIFO_DEC
-#define LSM6DSL_PARAM_ACC_FIFO_DEC   (LSM6DSL_DECIMATION_NO)
+#ifndef LSM6DSXX_PARAM_ACC_FIFO_DEC
+#define LSM6DSXX_PARAM_ACC_FIFO_DEC   (LSM6DSXX_DECIMATION_NO)
 #endif
-#ifndef LSM6DSL_PARAM_GYRO_FIFO_DEC
-#define LSM6DSL_PARAM_GYRO_FIFO_DEC  (LSM6DSL_DECIMATION_NO)
+#ifndef LSM6DSXX_PARAM_GYRO_FIFO_DEC
+#define LSM6DSXX_PARAM_GYRO_FIFO_DEC  (LSM6DSXX_DECIMATION_NO)
 #endif
 
-#ifndef LSM6DSL_PARAMS
-#define LSM6DSL_PARAMS               { .i2c             = LSM6DSL_PARAM_I2C,          \
-                                       .addr            = LSM6DSL_PARAM_ADDR,         \
-                                       .acc_odr         = LSM6DSL_PARAM_ACC_ODR,      \
-                                       .gyro_odr        = LSM6DSL_PARAM_GYRO_ODR,     \
-                                       .acc_fs          = LSM6DSL_PARAM_ACC_FS,       \
-                                       .gyro_fs         = LSM6DSL_PARAM_GYRO_FS,      \
-                                       .acc_decimation  = LSM6DSL_PARAM_ACC_FIFO_DEC, \
-                                       .gyro_decimation = LSM6DSL_PARAM_GYRO_FIFO_DEC }
+#ifndef LSM6DSXX_PARAMS
+#define LSM6DSXX_PARAMS               { .i2c             = LSM6DSXX_PARAM_I2C,          \
+                                        .addr            = LSM6DSXX_PARAM_ADDR,         \
+                                        .acc_odr         = LSM6DSXX_PARAM_ACC_ODR,      \
+                                        .gyro_odr        = LSM6DSXX_PARAM_GYRO_ODR,     \
+                                        .acc_fs          = LSM6DSXX_PARAM_ACC_FS,       \
+                                        .gyro_fs         = LSM6DSXX_PARAM_GYRO_FS,      \
+                                        .acc_decimation  = LSM6DSXX_PARAM_ACC_FIFO_DEC, \
+                                        .gyro_decimation = LSM6DSXX_PARAM_GYRO_FIFO_DEC }
 #endif
-#ifndef LSM6DSL_SAUL_INFO
-#define LSM6DSL_SAUL_INFO            { .name = "lsm6dsl" }
+#ifndef LSM6DSXX_SAUL_INFO
+#define LSM6DSXX_SAUL_INFO            { .name = "lsm6dsxx" }
 #endif
 /** @} */
 
 /**
  * @brief   Allocate some memory to store the actual configuration
  */
-static const lsm6dsl_params_t lsm6dsl_params[] =
+static const lsm6dsxx_params_t lsm6dsxx_params[] =
 {
-    LSM6DSL_PARAMS
+    LSM6DSXX_PARAMS
 };
 
 /**
  * @brief   Additional meta information to keep in the SAUL registry
  */
-static const saul_reg_info_t lsm6dsl_saul_info[] =
+static const saul_reg_info_t lsm6dsxx_saul_info[] =
 {
-    LSM6DSL_SAUL_INFO
+    LSM6DSXX_SAUL_INFO
 };
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* LSM6DSL_PARAMS_H */
+#endif /* LSM6DSXX_PARAMS_H */
 /** @} */
