@@ -10,6 +10,10 @@ USEMODULE += od
 USEMODULE += od_string
 USEMODULE += shell
 
+ifeq (native, $(BOARD))
+  RIOT_TERMINAL ?= native
+endif
+
 # avoid running Kconfig by default
 SHOULD_RUN_KCONFIG ?=
 
