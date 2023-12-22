@@ -7,6 +7,10 @@ USEMODULE += shell
 
 INCLUDES += -I$(CURDIR)
 
+ifeq (native, $(BOARD))
+  RIOT_TERMINAL ?= native
+endif
+
 include $(RIOTBASE)/Makefile.include
 
 ifndef CONFIG_SHELL_NO_ECHO
