@@ -24,6 +24,21 @@ extern "C" {
 #define HAVE_STRINGS_H
 #define WOLFSSL_IPV6
 
+/* CryptoCell 310, available in the nRF52840 */
+#ifdef MODULE_WOLFCRYPT_CRYPTOCELL
+#include <cpu.h>
+#define WOLFSSL_CRYPTOCELL
+#define WOLFSSL_CRYPTOCELL_NO_INTERRUPTS
+
+#define AES_MAX_KEY_SIZE    128
+#undef WOLFSSL_CRYPTOCELL_AES /* only CBC mode is supported */
+#define WOLFSSL_NO_HASH_RAW
+
+/* Override P-RNG with HW RNG */
+#undef  CUSTOM_RAND_GENERATE_BLOCK
+#define CUSTOM_RAND_GENERATE_BLOCK  cc310_random_generate
+#endif
+
 /* Single precision math */
 #define WOLFSSL_SP_MATH
 #define WOLFSSL_SP_SMALL
