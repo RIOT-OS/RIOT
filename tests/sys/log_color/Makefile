@@ -2,6 +2,10 @@ include ../Makefile.sys_common
 
 USEMODULE += log_color
 
+ifeq (native, $(BOARD))
+  RIOT_TERMINAL ?= native
+endif
+
 # Enable debug log level
 CFLAGS += -DLOG_LEVEL=4
 
