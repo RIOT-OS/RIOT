@@ -40,125 +40,6 @@ esac
 # is in
 : ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
 
-: ${TEST_KCONFIG_BOARDS_AVAILABLE:="
-adafruit-itsybitsy-m4
-arduino-due
-arduino-leonardo
-arduino-mkrzero
-arduino-mega2560
-arduino-nano
-atxmega-a1-xplained
-atxmega-a3bu-xplained
-avr-rss2
-avsextrem
-bastwan
-bluepill
-b-l475e-iot01a
-cc1352-launchpad
-cc2650-launchpad
-derfmega128
-dwm1001
-esp32-ci
-esp32-heltec-lora32-v2
-esp32-olimex-evb
-esp32c3-ci
-esp32c3-devkit
-esp32s3-ci
-esp32s3-devkit
-esp32s2-ci
-esp32s2-devkit
-esp8266-ci
-esp8266-esp-12x
-hamilton
-hifive1
-mbed_lpc1768
-mega-xplained
-microbit
-mulle
-native
-nrf52840dk
-nrf9160dk
-nucleo-f072rb
-nucleo-f103rb
-nucleo-f207zg
-nucleo-f334r8
-nucleo-f429zi
-nucleo-f767zi
-nucleo-g071rb
-nucleo-g474re
-nucleo-l011k4
-nucleo-l073rz
-nucleo-l152re
-nucleo-l433rc
-nucleo-l552ze-q
-pba-d-01-kw2x
-p-nucleo-wb55
-qn9080dk
-remote-revb
-rpi-pico
-same54-xpro
-samr21-xpro
-seeedstudio-gd32
-slstk3400a
-sltb001a
-slwstk6220a
-stm32f723e-disco
-stm32mp157c-dk2
-waspmote-pro
-waveshare-nrf52840-eval-kit
-weact-f401ce
-z1
-"}
-
-: ${TEST_KCONFIG_ENFORCE_APP_GROUPS:="
-examples/hello-world
-tests/build_system/external_board_dirs
-tests/drivers/b*
-tests/drivers/f*
-tests/drivers/g*
-tests/drivers/h*
-tests/drivers/i*
-tests/drivers/j*
-tests/drivers/l*
-tests/drivers/o*
-tests/drivers/p*
-tests/drivers/q*
-tests/drivers/r*
-tests/drivers/s*
-tests/drivers/t*
-tests/drivers/u*
-tests/drivers/v*
-tests/net/ieee802154_hal
-tests/periph/*
-tests/pkg/elk
-tests/pkg/uzlib
-tests/sys/cb_mux*
-tests/sys/congure_*
-tests/sys/prng_*
-tests/sys/trace
-tests/sys/xtimer_*
-tests/sys/ztimer_*
-"}
-
-# This list prevents boards from being tested by the TEST_KCONFIG_TEST_ALLOWLIST
-# This should only be used for boards that require a lot of work, such as,
-# requiring modelling of a clock tree.
-# As a rule of thumb, only add boards here if there are not differences in
-# modules or packages.
-# Eventually this list will be removed...
-#
-: ${TEST_KCONFIG_BOARD_BLOCKLIST:="
-"}
-
-# This list will force all boards that are not in the TEST_KCONFIG_BOARD_BLOCKLIST
-# to be tested on the apps. The purpose is to prevent new boards from skipping
-# the kconfig implementations.
-: ${TEST_KCONFIG_TEST_ALLOWLIST:="
-examples/hello-world
-tests/drivers/saul
-tests/drivers/mtd_mapper
-"}
-
 : ${TEST_WITH_CONFIG_SUPPORTED:="examples/suit_update tests/drivers/at86rf2xx_aes"}
 
 export RIOT_CI_BUILD=1
@@ -250,54 +131,6 @@ if [ ${NIGHTLY} -eq 1 ]; then
 fi
 
 CFCR_ARGS="--upstreambranch ${CI_BASE_COMMIT}"
-
-get_supported_kconfig_board_app() {
-    local board=$1
-    local appdir=$2
-    if is_in_list "${board}" "${TEST_KCONFIG_BOARD_BLOCKLIST}"; then
-        return 1
-    fi
-
-    # On nightlies run all possible kconfig tests on all boards
-    # Normally we don't want to do this as it adds quite a bit to build time
-    # and the subset of boards we are testing for are pretty good at catching
-    # any bugs...
-    # This will be over one day, I promise.
-    if [ ${NIGHTLY} -eq 1 ]; then
-        if is_in_list "${appdir}" "${TEST_KCONFIG_ENFORCE_APP_GROUPS}"; then
-            return 0
-        fi
-        if [ -f "${appdir}/app.config.test" ]; then
-            return 0
-        fi
-    fi
-    if is_in_list "${appdir}" "${TEST_KCONFIG_TEST_ALLOWLIST}"; then
-        return 0
-    fi
-    if is_in_list "${board}" "${TEST_KCONFIG_BOARDS_AVAILABLE}"; then
-        if is_in_list "${appdir}" "${TEST_KCONFIG_ENFORCE_APP_GROUPS}"; then
-            return 0
-        fi
-        if [ -f "${appdir}/app.config.test" ]; then
-            return 0
-        fi
-    fi
-    return 1
-}
-
-kconfig_module_packages_diff() {
-    local board=$1
-    local appdir=$2
-
-    make clean --no-print-directory -C ${appdir} BOARD=${board}
-    mmp=$(make --no-print-directory info-modules info-packages -C ${appdir} BOARD=${board})
-
-    make clean --no-print-directory -C ${appdir} BOARD=${board}
-    kmp=$(TEST_KCONFIG=1 make --no-print-directory info-modules info-packages -C ${appdir} BOARD=${board})
-
-
-    bash -c "diff <(echo \"${mmp}\") <(echo \"${kmp}\")"
-}
 
 # if RUN_TESTS is unset (e.g., not passed from the outside),
 # set to 1 if NIGHTLY=1 or if the label "CI: run tests" is set,
@@ -531,66 +364,13 @@ compile() {
     # reduces disk IO.
     export CCACHE_TEMPDIR="$(pwd)/.ccache/tmp"
 
-    # We compile a first time with Kconfig based dependency
-    # resolution for regression purposes. $TEST_KCONFIG contains a
-    # list of board-application tuples that are currently modeled to
-    # run with Kconfig
-
-    should_check_kconfig_hash=0
-
-    if get_supported_kconfig_board_app "${board}" "${appdir}"; then
-        should_check_kconfig_hash=1
-        # As we have some issues with occasional unrelated hash mismatches
-        # we will stop the binary checks and rely only in a module/package
-        # check to ensure kconfig is matching make.
-        # Only nightlies will check the hash...
-        # Once we figure out the problem we can check the hashes again or
-        # better yet just finish!
-        if [ ${NIGHTLY} -eq 1 ]; then
-            BOARD=${board} make -C${appdir} clean
-            CCACHE_BASEDIR="$(pwd)" BOARD=${board} TOOLCHAIN=${toolchain} RIOT_CI_BUILD=1 TEST_KCONFIG=1 \
-                            make -C${appdir} all test-input-hash -j${JOBS:-4}
-            RES=$?
-            if [ $RES -eq 0 ]; then
-                kconfig_hashes="$(cat ${BINDIR}/test-input-hash.sha1)"
-            else
-                kconfig_hashes="kconfig-build-failed"
-                echo "An error occurred while compiling using Kconfig";
-            fi
-        fi
-    fi
-
-    # compile without Kconfig
     BOARD=${board} make -C${appdir} clean
     CCACHE_BASEDIR="$(pwd)" BOARD=$board TOOLCHAIN=$toolchain RIOT_CI_BUILD=1 \
         make -C${appdir} all test-input-hash -j${JOBS:-4}
     RES=$?
 
-    if [ ${NIGHTLY} -eq 1 ]; then
-        no_kconfig_hashes="$(cat ${BINDIR}/test-input-hash.sha1)"
-    fi
-    # test hash is used to cache test results, not for comparing binaries
-    # generated with and without KConfig
+    # test hash is used to cache test results
     test_hash=$(test_hash_calc "$BINDIR")
-
-
-    if [ ${should_check_kconfig_hash} != 0 ]; then
-        if [ ${NIGHTLY} -eq 1 ]; then
-            if [ "${kconfig_hashes}" != "${no_kconfig_hashes}" ]; then
-                echo "Hashes of binaries with and without Kconfig mismatch for ${appdir} with ${board}";
-                echo "Please check that all used modules are modelled in Kconfig and enabled";
-                echo "Input without KConfig:"
-                echo "${no_kconfig_hashes}"
-                echo "Input with KConfig:"
-                echo "${kconfig_hashes}"
-                kconfig_module_packages_diff ${board} ${appdir}
-                RES=1
-            fi
-        else
-            kconfig_module_packages_diff ${board} ${appdir}
-            RES=$(( $RES | $? ))
-        fi
-    fi
 
     # run tests
     if [ $RES -eq 0 ]; then
