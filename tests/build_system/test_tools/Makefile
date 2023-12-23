@@ -3,10 +3,6 @@ include ../Makefile.build_system_common
 
 USEMODULE += shell
 
-ifeq (native, $(BOARD))
-  RIOT_TERMINAL ?= native
-endif
-
 # No need for test_utils_interactive_sync in this test since the test
 # synchronizes by itself through `shellping` command.
 DISABLE_MODULE += test_utils_interactive_sync

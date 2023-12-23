@@ -5,10 +5,6 @@ USEMODULE += shell_democommands
 
 FEATURES_REQUIRED += rust_target
 
-ifeq (native, $(BOARD))
-  RIOT_TERMINAL ?= native
-endif
-
 # Testing on stable to ensure that no nightly features are needed when Rust is
 # pulled in through modules.
 CARGO_CHANNEL = stable
