@@ -390,7 +390,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
     }
 
 #ifdef MODULE_PERIPH_DMA
-    if (_use_dma(&spi_config[bus])) {
+    if (_use_dma(&spi_config[bus]) && len > CONFIG_SPI_DMA_THRESHOLD_BYTES) {
         _transfer_dma(bus, out, in, len);
     }
     else {
