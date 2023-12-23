@@ -32,6 +32,7 @@ Current hardware support:
 | User microphones | - | |
 | External Quad-SPI Flash | - | |
 | External SDRAM | X | |
+| SD Card Interface | x | SDMMC1 on PC8..PC13 and PD2 |
 
 ## Flashing the device
 

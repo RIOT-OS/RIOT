@@ -22,6 +22,7 @@ config BOARD_STM32F7508_DK
     select HAS_PERIPH_LTDC
     select HAS_PERIPH_RTC
     select HAS_PERIPH_RTT
+    select HAS_PERIPH_SDMMC
     select HAS_PERIPH_SPI
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
@@ -34,9 +35,10 @@ config BOARD_STM32F7508_DK
     select BOARD_HAS_HSE
     select BOARD_HAS_LSE
 
+    select HAVE_FT5X06
+    select HAVE_MTD_SDMMC_DEFAULT
     select HAVE_SAUL_GPIO
     select HAVE_STM32_ETH
-    select HAVE_FT5X06
 
 config CLOCK_HSE
     default 25000000
