@@ -20,6 +20,8 @@ import ipaddress
 DEFAULT_TIMEOUT = 5
 
 MAKE = os.environ.get('MAKE', 'make')
+LWIP_IPV4 = bool(int(os.environ.get("LWIP_IPV4", "0")))
+LWIP_IPV6 = bool(int(os.environ.get("LWIP_IPV6", "1")))
 
 
 class Strategy(object):
@@ -196,7 +198,25 @@ def get_ipv6_address(spawn):
     return str(ipaddress.ip_address(spawn.match.group(1)))
 
 
-def test_ipv6_send(board_group, application, env=None):
+def get_ipv4_address(spawn):
+    ip_addr = "0.0.0.0"
+    for _ in range(5):  # wait for DHCP to configure address
+        spawn.sendline(u"ifconfig")
+        spawn.expect(r" inet addr: ((\d+\\.){3}\d+)\s")
+        ip_addr = spawn.match.group(1)
+        if ip_addr != "0.0.0.0":
+            return ip_addr
+        time.sleep(1)
+    raise ConnectionError("IPv4 address not found, are you running a DHCP server?")
+
+
+def authority(ip, port):
+    if ":" in ip:
+        return f"[{ip}]:{port}"
+    return f"{ip}:{port}"
+
+
+def test_ip_send(board_group, application, ipv6=True, env=None):
     env_sender = os.environ.copy()
     if env is not None:
         env_sender.update(env)
@@ -210,17 +230,26 @@ def test_ipv6_send(board_group, application, env=None):
         pexpect.spawnu(MAKE, ["-C", application, "term"], env=env_receiver,
                        timeout=DEFAULT_TIMEOUT) as receiver:
         ipprot = random.randint(0x00, 0xff)
-        receiver_ip = get_ipv6_address(receiver)
+        receiver_ip = get_ipv6_address(receiver) if ipv6 else get_ipv4_address(receiver)
         receiver.sendline(u"ip server start %d" % ipprot)
         # wait for neighbor discovery to be done
         time.sleep(5)
-        sender.sendline(u"ip send %s %d 01:23:45:67:89:ab:cd:ef" % (receiver_ip, ipprot))
-        sender.expect_exact(u"Success: send 8 byte over IPv6 to %s (next header: %d)" %
-                            (receiver_ip, ipprot))
+        sender.sendline(u"ip send %s %d 01:23:45:67:89:ab:cd:ef"
+                        % (receiver_ip, ipprot))
+        sender.expect(u"Success: send 8 byte over IPv[46] to %s \\(next header: %d\\)" %
+                      (receiver_ip, ipprot))
         receiver.expect(u"00000000  01  23  45  67  89  AB  CD  EF")
 
 
-def test_udpv6_send(board_group, application, env=None):
+def test_ipv4_send(board_group, application, env=None):
+    test_ip_send(board_group, application, False, env=env)
+
+
+def test_ipv6_send(board_group, application, env=None):
+    test_ip_send(board_group, application, True, env=env)
+
+
+def test_udp_send(board_group, application, ipv6=True, env=None):
     env_sender = os.environ.copy()
     if env is not None:
         env_sender.update(env)
@@ -234,18 +263,26 @@ def test_udpv6_send(board_group, application, env=None):
         pexpect.spawnu(MAKE, ["-C", application, "term"], env=env_receiver,
                        timeout=DEFAULT_TIMEOUT) as receiver:
         port = random.randint(0x0000, 0xffff)
-        receiver_ip = get_ipv6_address(receiver)
+        receiver_ip = get_ipv6_address(receiver) if ipv6 else get_ipv4_address(receiver)
 
         receiver.sendline(u"udp server start %d" % port)
         # wait for neighbor discovery to be done
         time.sleep(5)
-        sender.sendline(u"udp send [%s]:%d ab:cd:ef" % (receiver_ip, port))
-        sender.expect_exact("Success: send 3 byte over UDP to [{}]:{}"
-                            .format(receiver_ip, port))
+        sender.sendline(f"udp send {authority(receiver_ip, port)} ab:cd:ef")
+        sender.expect_exact("Success: send 3 byte over UDP to"
+                            f" {authority(receiver_ip, port)}")
         receiver.expect(u"00000000  AB  CD  EF")
 
 
-def test_tcpv6_send(board_group, application, env=None):
+def test_udpv4_send(board_group, application, env=None):
+    test_udp_send(board_group, application, False, env=env)
+
+
+def test_udpv6_send(board_group, application, env=None):
+    test_udp_send(board_group, application, True, env=env)
+
+
+def test_tcp_send(board_group, application, ipv6=True, env=None):
     env_client = os.environ.copy()
     if env is not None:
         env_client.update(env)
@@ -259,14 +296,13 @@ def test_tcpv6_send(board_group, application, env=None):
         pexpect.spawnu(MAKE, ["-C", application, "term"], env=env_server,
                        timeout=DEFAULT_TIMEOUT) as server:
         port = random.randint(0x0000, 0xffff)
-        server_ip = get_ipv6_address(server)
-        client_ip = get_ipv6_address(client)
+        server_ip = get_ipv6_address(server) if ipv6 else get_ipv4_address(server)
 
         server.sendline(u"tcp server start %d" % port)
         # wait for neighbor discovery to be done
         time.sleep(5)
-        client.sendline(u"tcp connect [%s]:%d" % (server_ip, port))
-        server.expect(u"TCP client \\[%s\\]:[0-9]+ connected" % client_ip)
+        client.sendline(f"tcp connect {authority(server_ip, port)}")
+        server.expect(u"TCP client \\[([0-9a-f:]+|[0-9\\.]+)\\]:[0-9]+ connected")
         client.sendline(u"tcp send affe:abe")
         client.expect_exact(u"Success: send 4 byte over TCP to server")
         server.expect(u"00000000  AF  FE  AB  E0")
@@ -275,7 +311,15 @@ def test_tcpv6_send(board_group, application, env=None):
         client.expect_exact(u"could not send")
 
 
-def test_tcpv6_large_send(board_group, application, env=None):
+def test_tcpv4_send(board_group, application, env=None):
+    test_tcp_send(board_group, application, False, env=env)
+
+
+def test_tcpv6_send(board_group, application, env=None):
+    test_tcp_send(board_group, application, True, env=env)
+
+
+def test_tcp_large_send(board_group, application, ipv6=True, env=None):
     """Test that the TCP server can receive a large packet in multiple reads"""
     if any(b.name != "native" for b in board_group.boards):
         # run test only with native
@@ -288,23 +332,26 @@ def test_tcpv6_large_send(board_group, application, env=None):
     with pexpect.spawnu(MAKE, ["-C", application, "term"], env=env_server,
                         timeout=DEFAULT_TIMEOUT) as server:
         port = random.randint(0x0000, 0xffff)
-        server_ip = get_ipv6_address(server)
+        server_ip = get_ipv6_address(server) if ipv6 else get_ipv4_address(server)
 
-        try:
-            connect_addr = socket.getaddrinfo(
-                "%s%%tapbr0" % server_ip, port)[0][4]
-        except socket.gaierror as e:
-            print("SKIP_TEST INFO", e)
-            return
+        if ipv6:
+            try:
+                connect_addr = socket.getaddrinfo(
+                    "%s%%tapbr0" % server_ip, port)[0][4]
+            except socket.gaierror as e:
+                print("SKIP_TEST INFO", e)
+                return
+        else:
+            connect_addr = (server_ip, port)
 
         server.sendline(u"tcp server start %d" % port)
         # wait for neighbor discovery to be done
         time.sleep(5)
 
         # Send large amount of data to verify multiple reads.
-        with socket.socket(socket.AF_INET6) as sock:
+        with socket.socket(socket.AF_INET6 if ipv6 else socket.AF_INET) as sock:
             sock.connect(connect_addr)
-            server.expect(u"TCP client \\[[0-9a-f:]+\\]:[0-9]+ connected")
+            server.expect(u"TCP client \\[([0-9a-f:]+|[0-9\\.]+)\\]:[0-9]+ connected")
             # Default read size in tcp.c SOCK_INBUF_SIZE (256 bytes), so this
             # is at least 3 reads.
             data = bytearray(random.randint(0, 255) for i in range(608))
@@ -320,11 +367,18 @@ def test_tcpv6_large_send(board_group, application, env=None):
             # Last line of the message should be on the third read call,
             # together with the rest of the third read.
             server.expect(u"00000050  %s" % data_line(len(data) - 16))
-            sock.close()
-            server.expect(u"TCP connection to \\[[0-9a-f:]+\\]:[0-9]+ reset")
+        server.expect(u"TCP connection to \\[([0-9a-f:]+|[0-9\\.]+)\\]:[0-9]+ reset")
 
 
-def test_tcpv6_multiconnect(board_group, application, env=None):
+def test_tcpv4_large_send(board_group, application, env=None):
+    test_tcp_large_send(board_group, application, False, env=env)
+
+
+def test_tcpv6_large_send(board_group, application, env=None):
+    test_tcp_large_send(board_group, application, True, env=env)
+
+
+def test_tcp_multiconnect(board_group, application, ipv6=True, env=None):
     if any(b.name != "native" for b in board_group.boards):
         # run test only with native
         print("SKIP_TEST INFO found non-native board")
@@ -342,33 +396,44 @@ def test_tcpv6_multiconnect(board_group, application, env=None):
         pexpect.spawnu(MAKE, ["-C", application, "term"], env=env_server,
                        timeout=DEFAULT_TIMEOUT) as server:
         port = random.randint(0x0000, 0xffff)
-        server_ip = get_ipv6_address(server)
-        client_ip = get_ipv6_address(client)
+        server_ip = get_ipv6_address(server) if ipv6 else get_ipv4_address(server)
 
-        try:
-            connect_addr = socket.getaddrinfo(
-                "%s%%tapbr0" % server_ip, port)[0][4]
-        except socket.gaierror as e:
-            print("SKIP_TEST INFO", e)
-            return
+        if ipv6:
+            try:
+                connect_addr = socket.getaddrinfo(
+                    "%s%%tapbr0" % server_ip, port)[0][4]
+            except socket.gaierror as e:
+                print("SKIP_TEST INFO", e)
+                return
+        else:
+            connect_addr = (server_ip, port)
+
         server.sendline(u"tcp server start %d" % port)
         # wait for neighbor discovery to be done
         time.sleep(5)
-        client.sendline(u"tcp connect [%s]:%d" % (server_ip, port))
-        server.expect(u"TCP client \\[%s\\]:[0-9]+ connected" % client_ip)
-        with socket.socket(socket.AF_INET6) as sock:
+        client.sendline(f"tcp connect {authority(server_ip, port)}")
+        server.expect(u"TCP client \\[([0-9a-f:]+|[0-9\\.]+)\\]:[0-9]+ connected")
+        with socket.socket(socket.AF_INET6 if ipv6 else socket.AF_INET) as sock:
             sock.connect(connect_addr)
             server.expect(u"Error on TCP accept \\[-[0-9]+\\]")
         client.sendline(u"tcp disconnect")
-        server.expect(u"TCP connection to \\[%s\\]:[0-9]+ reset" % client_ip)
-        client.sendline(u"tcp connect [%s]:%d" % (server_ip, port))
-        server.expect(u"TCP client \\[%s\\]:[0-9]+ connected" % client_ip)
+        server.expect(u"TCP connection to \\[([0-9a-f:]+|[0-9\\.]+)\\]:[0-9]+ reset")
+        client.sendline(f"tcp connect {authority(server_ip, port)}")
+        server.expect(u"TCP client \\[([0-9a-f:]+|[0-9\\.]+)\\]:[0-9]+ connected")
         client.sendline(u"tcp disconnect")
-        server.expect(u"TCP connection to \\[%s\\]:[0-9]+ reset" % client_ip)
-        with socket.socket(socket.AF_INET6) as sock:
+        server.expect(u"TCP connection to \\[([0-9a-f:]+|[0-9\\.]+)\\]:[0-9]+ reset")
+        with socket.socket(socket.AF_INET6 if ipv6 else socket.AF_INET) as sock:
             sock.connect(connect_addr)
-            server.expect(u"TCP client \\[[0-9a-f:]+\\]:[0-9]+ connected")
-        server.expect(u"TCP connection to \\[[0-9a-f:]+\\]:[0-9]+ reset")
+            server.expect(u"TCP client \\[([0-9a-f:]+|[0-9\\.]+)\\]:[0-9]+ connected")
+        server.expect(u"TCP connection to \\[([0-9a-f:]+|[0-9\\.]+)\\]:[0-9]+ reset")
+
+
+def test_tcpv4_multiconnect(board_group, application, env=None):
+    test_tcp_multiconnect(board_group, application, False, env=env)
+
+
+def test_tcpv6_multiconnect(board_group, application, env=None):
+    test_tcp_multiconnect(board_group, application, True, env=env)
 
 
 def test_triple_send(board_group, application, env=None):
@@ -387,33 +452,68 @@ def test_triple_send(board_group, application, env=None):
         udp_port = random.randint(0x0000, 0xffff)
         tcp_port = random.randint(0x0000, 0xffff)
         ipprot = random.randint(0x00, 0xff)
-        receiver_ip = get_ipv6_address(receiver)
-        sender_ip = get_ipv6_address(sender)
 
         receiver.sendline(u"ip server start %d" % ipprot)
         receiver.sendline(u"udp server start %d" % udp_port)
         receiver.sendline(u"tcp server start %d" % tcp_port)
         # wait for neighbor discovery to be done
         time.sleep(5)
-        sender.sendline(u"udp send [%s]:%d 01:23" % (receiver_ip, udp_port))
-        sender.expect_exact(u"Success: send 2 byte over UDP to [%s]:%d" %
-                            (receiver_ip, udp_port))
-        receiver.expect(u"00000000  01  23")
+        get_address_functions = []
+        if LWIP_IPV4:
+            get_address_functions.append(get_ipv4_address)
+        else:
+            get_address_functions.append(get_ipv6_address)
+        for get_address in get_address_functions:
+            receiver_ip = get_address(receiver)
+            sender.sendline(f"udp send {authority(receiver_ip, udp_port)} 01:23")
+            sender.expect_exact(u"Success: send 2 byte over UDP to "
+                                f"{authority(receiver_ip, udp_port)}")
+            receiver.expect(u"00000000  01  23")
 
-        sender.sendline(u"ip send %s %d 01:02:03:04" % (receiver_ip, ipprot))
-        sender.expect_exact(u"Success: send 4 byte over IPv6 to %s (next header: %d)" %
-                            (receiver_ip, ipprot))
-        receiver.expect(u"00000000  01  02  03  04")
-        sender.sendline(u"tcp connect [%s]:%d" % (receiver_ip, tcp_port))
-        receiver.expect(u"TCP client \\[%s\\]:[0-9]+ connected" % sender_ip)
-        sender.sendline(u"tcp send dead:beef")
-        sender.expect_exact(u"Success: send 4 byte over TCP to server")
-        receiver.expect(u"00000000  DE  AD  BE  EF")
+            sender.sendline(u"ip send %s %d 01:02:03:04" % (receiver_ip, ipprot))
+            sender.expect(
+                u"Success: send 4 byte over IPv[46] to %s \\(next header: %d\\)" %
+                (receiver_ip, ipprot)
+            )
+            receiver.expect(u"00000000  01  02  03  04")
+            sender.sendline(f"tcp connect {authority(receiver_ip, tcp_port)}")
+            receiver.expect(u"TCP client \\[([0-9a-f:]+|[0-9\\.]+)\\]:[0-9]+ connected")
+            sender.sendline(u"tcp send dead:beef")
+            sender.expect_exact(u"Success: send 4 byte over TCP to server")
+            receiver.expect(u"00000000  DE  AD  BE  EF")
+            sender.sendline(u"tcp disconnect")
+            receiver.expect(
+                u"TCP connection to \\[([0-9a-f:]+|[0-9\\.]+)\\]:[0-9]+ reset"
+            )
 
 
 if __name__ == "__main__":
-    TestStrategy().execute([BoardGroup((Board("native", "tap0"),
-                            Board("native", "tap1")))],
-                           [test_ipv6_send, test_udpv6_send, test_tcpv6_send,
-                            test_tcpv6_large_send, test_tcpv6_multiconnect,
-                            test_triple_send])
+    test_cases = []
+    if LWIP_IPV4:
+        test_cases.extend(
+            [
+                test_ipv4_send,
+                test_udpv4_send,
+                test_tcpv4_send,
+                test_tcpv4_large_send,
+                test_tcpv4_multiconnect,
+            ]
+        )
+    if LWIP_IPV6:
+        test_cases.extend(
+            [
+                test_ipv6_send,
+                test_udpv6_send,
+                test_tcpv6_send,
+                test_tcpv6_large_send,
+                test_tcpv6_multiconnect,
+            ]
+        )
+    test_cases.append(test_triple_send)
+    try:
+        TestStrategy().execute([BoardGroup((Board("native", "tap0"),
+                                Board("native", "tap1")))],
+                               test_cases)
+    except Exception as exc:
+        print(f"\033[31;1m{type(exc).__name__}: {exc}\033[0m", file=sys.stderr)
+        raise
