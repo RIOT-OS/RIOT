@@ -45,9 +45,6 @@ CFLAGS += -DDTLS_DEFAULT_PORT=$(DTLS_PORT)
 # Uncomment to enable debug logs
 # CFLAGS += -DCONFIG_DTLS_DEBUG
 
-# FIXME: This is a temporary patch
-CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(2*THREAD_STACKSIZE_LARGE\)
-
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
@@ -56,3 +53,10 @@ DEVELHELP ?= 1
 QUIET ?= 1
 
 include $(RIOTBASE)/Makefile.include
+
+# FIXME: This is a temporary patch
+ifeq (,$(filter arch_avr8,$(FEATURES_USED)))
+  CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(2*THREAD_STACKSIZE_LARGE\)
+else
+  CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(4*THREAD_STACKSIZE_LARGE\)
+endif
