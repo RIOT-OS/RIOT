@@ -28,6 +28,15 @@
 #define ENABLE_DEBUG    0
 #include "debug.h"
 
+#ifdef MODULE_FMT
+#include "fmt.h"
+#else
+static inline void print_str(const char *str)
+{
+    fputs(str, stdout);
+}
+#endif
+
 uint16_t pin_used[GPIO_PORT_NUMOF] = {};
 
 int gpio_ll_init(gpio_port_t port, uint8_t pin, const gpio_conf_t *conf)
@@ -151,4 +160,22 @@ void gpio_ll_query_conf(gpio_conf_t *dest, gpio_port_t port, uint8_t pin)
         dest->initial_value = (gpio_ll_read_output(port) >> pin) & 1UL;
     }
     irq_restore(state);
+}
+
+void gpio_ll_print_conf(const gpio_conf_t *conf)
+{
+    static const char *slew_strs[] = {
+        [GPIO_SLEW_SLOWEST] = "slowest",
+        [GPIO_SLEW_SLOW] = "medium",
+        [GPIO_SLEW_FASTEST] = "fastest",
+        "invalid"
+    };
+
+    gpio_ll_print_conf_common(conf);
+    print_str(", slew: ");
+    print_str(slew_strs[conf->slew_rate]);
+
+    if (conf->schmitt_trigger_disabled) {
+        print_str(", Schmitt trigger disabled");
+    }
 }

@@ -84,10 +84,6 @@ void gpio_ll_query_conf(gpio_conf_t *dest, gpio_port_t port, uint8_t pin)
 {
     assert(dest);
     memset(dest, 0, sizeof(*dest));
-    /* E.g. the schematics in figure 14-5 in the ATmega328P datasheet shows that
-     * a Schmitt Trigger is always connected before the digital input signal.
-     * Let's assume this is also true for all other ATmegas */
-    dest->schmitt_trigger = true;
     if (_is_output(port, pin)) {
         dest->state = GPIO_OUTPUT_PUSH_PULL;
         dest->initial_value = (gpio_ll_read_output(port) >> pin) & 1U;

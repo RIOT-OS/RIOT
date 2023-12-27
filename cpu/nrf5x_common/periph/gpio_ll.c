@@ -36,13 +36,22 @@
 #include "periph_cpu.h"
 #include "periph_conf.h"
 
+#ifdef MODULE_FMT
+#include "fmt.h"
+#else
+static inline void print_str(const char *str)
+{
+    fputs(str, stdout);
+}
+#endif
+
 int gpio_ll_init(gpio_port_t port, uint8_t pin, const gpio_conf_t *conf)
 {
     if (conf->pull == GPIO_PULL_KEEP) {
         return -ENOTSUP;
     }
 
-    uint32_t pin_cnf = conf->pull;
+    uint32_t pin_cnf = (unsigned)conf->pull << GPIO_PIN_CNF_PULL_Pos;
     switch (conf->state) {
     case GPIO_OUTPUT_PUSH_PULL:
         /* INPUT bit needs to be *CLEARED* in input mode, so set to disconnect input buffer */
@@ -115,7 +124,6 @@ void gpio_ll_query_conf(gpio_conf_t *dest, gpio_port_t port, uint8_t pin)
      * no matches. Assuming Schmitt trigger cannot be disabled for the
      * nRF5x MCU.
      */
-    dest->schmitt_trigger = true;
     dest->state = GPIO_INPUT;
 
     NRF_GPIO_Type *p = (NRF_GPIO_Type *)port;
@@ -196,4 +204,16 @@ void gpio_ll_query_conf(gpio_conf_t *dest, gpio_port_t port, uint8_t pin)
     else {
         dest->initial_value = (gpio_ll_read_output(port) >> pin) & 1UL;
     }
+}
+
+void gpio_ll_print_conf(const gpio_conf_t *conf)
+{
+    static const char *drive_strs[] = {
+        [GPIO_DRIVE_WEAK] = "weak",
+        [GPIO_DRIVE_STRONG] = "strong",
+    };
+
+    gpio_ll_print_conf_common(conf);
+    print_str(", drive: ");
+    print_str(drive_strs[conf->drive_strength]);
 }

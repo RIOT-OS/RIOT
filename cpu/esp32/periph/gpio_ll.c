@@ -38,6 +38,15 @@
 
 #include "esp_idf_api/gpio.h"
 
+#ifdef MODULE_FMT
+#include "fmt.h"
+#else
+static inline void print_str(const char *str)
+{
+    fputs(str, stdout);
+}
+#endif
+
 /* variables that have to be used together with periph/gpio */
 #ifdef ESP_PM_WUP_PINS
 extern bool _gpio_pin_pu[GPIO_PIN_NUMOF];
@@ -142,7 +151,6 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, const gpio_conf_t *conf)
 
     /* since we can't read back the configuration, we have to save it */
     _gpio_conf[gpio] = *conf;
-    _gpio_conf[gpio].schmitt_trigger = false;
 
     if (esp_idf_gpio_config(&cfg) != ESP_OK) {
         return -ENOTSUP;
@@ -195,4 +203,18 @@ void gpio_ll_query_conf(gpio_conf_t *dest, gpio_port_t port, uint8_t pin)
         dest->initial_value = (gpio_ll_read_output(port) >> pin) & 1UL;
     }
     irq_restore(state);
+}
+
+void gpio_ll_print_conf(const gpio_conf_t *conf)
+{
+    static const char *drive_strs[] = {
+        [GPIO_DRIVE_WEAKEST] = "weakest",
+        [GPIO_DRIVE_WEAK] = "weak",
+        [GPIO_DRIVE_STRONG] = "strong",
+        [GPIO_DRIVE_STRONGEST] = "strongest",
+    };
+
+    gpio_ll_print_conf_common(conf);
+    print_str(", drive: ");
+    print_str(drive_strs[conf->drive_strength]);
 }

@@ -157,7 +157,6 @@ int main(void)
              "-------------------------------------------------------");
         gpio_conf_t conf = {
             .state = GPIO_OUTPUT_PUSH_PULL,
-            .slew_rate = GPIO_SLEW_FASTEST
         };
         expect(0 == gpio_ll_init(port_out, PIN_OUT_0, &conf));
         expect(0 == gpio_ll_init(port_out, PIN_OUT_1, &conf));
@@ -211,7 +210,6 @@ int main(void)
              "-----------------------------------------");
         gpio_conf_t conf = {
             .state = GPIO_OUTPUT_PUSH_PULL,
-            .slew_rate = GPIO_SLEW_FASTEST
         };
         expect(0 == gpio_ll_init(port_out, PIN_OUT_0, &conf));
         expect(0 == gpio_ll_init(port_out, PIN_OUT_1, &conf));
@@ -265,7 +263,6 @@ int main(void)
              "----------------------------------------");
         gpio_conf_t conf = {
             .state = GPIO_OUTPUT_PUSH_PULL,
-            .slew_rate = GPIO_SLEW_FASTEST
         };
         expect(0 == gpio_ll_init(port_out, PIN_OUT_0, &conf));
         expect(0 == gpio_ll_init(port_out, PIN_OUT_1, &conf));

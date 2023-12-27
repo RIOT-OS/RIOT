@@ -35,6 +35,15 @@
 #include "bitarithm.h"
 #include "periph/gpio_ll.h"
 
+#ifdef MODULE_FMT
+#include "fmt.h"
+#else
+static inline void print_str(const char *str)
+{
+    fputs(str, stdout);
+}
+#endif
+
 #ifdef RCC_AHBENR_GPIOAEN
 #  define GPIO_BUS      AHB
 #  define GPIOAEN       RCC_AHBENR_GPIOAEN
@@ -355,4 +364,29 @@ void gpio_ll_query_conf(gpio_conf_t *dest, gpio_port_t port, uint8_t pin)
         dest->initial_value = (gpio_ll_read_output(port) >> pin) & 1UL;
     }
     irq_restore(state);
+}
+
+void gpio_ll_print_conf(const gpio_conf_t *conf)
+{
+    static const char *slew_strs[] = {
+        [GPIO_SLEW_SLOWEST] = "slowest",
+#if STM32_HAS_OSPEED
+        [GPIO_SLEW_SLOW] = "slow",
+#endif
+        [GPIO_SLEW_FAST] = "fast",
+        [GPIO_SLEW_FASTEST] = "fastest",
+/* If only three slew rates are supported, a fourth value would be
+ * representable with the two-bit field. Let's be rather safe than sorry */
+#if !STM32_HAS_OSPEED
+        "invalid"
+#endif
+    };
+
+    gpio_ll_print_conf_common(conf);
+    print_str(", slew: ");
+    print_str(slew_strs[conf->slew_rate]);
+
+    if (conf->schmitt_trigger_disabled) {
+        print_str(", Schmitt trigger disabled");
+    }
 }

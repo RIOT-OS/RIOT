@@ -141,16 +141,5 @@ void gpio_ll_query_conf(gpio_conf_t *dest, gpio_port_t port, uint8_t pin)
         break;
     }
 
-    /* as good as any */
-    dest->slew_rate = GPIO_SLEW_FAST;
-
-    /* It's always on as long as they're in a mode in which it matters, judging
-     * from https://www.silabs.com/documents/public/application-notes/an0027.pdf */
-    dest->schmitt_trigger = true;
-
     dest->initial_value = (gpio_ll_read_output(port) >> pin) & 1;
-
-    /* Using 'strong' her already as that fits with what the hardware has
-     * (lowest, low, standard, high) */
-    dest->drive_strength = GPIO_DRIVE_STRONG;
 }
