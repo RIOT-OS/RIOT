@@ -155,6 +155,7 @@ static int client_send(char *addr_str, char *data, size_t datalen)
     if (res < 0 && res != CREDMAN_EXIST) {
         /* ignore duplicate credentials */
         printf("Error cannot add credential to system: %" PRIdSIZE "\n", res);
+        sock_udp_close(&udp_sock);
         return -1;
     }
 
@@ -171,12 +172,14 @@ static int client_send(char *addr_str, char *data, size_t datalen)
     if (res < 0 && res != CREDMAN_EXIST) {
         /* ignore duplicate credentials */
         printf("Error cannot add credential to system: %" PRIdSIZE "\n", res);
+        sock_udp_close(&udp_sock);
         return -1;
     }
 
     /* make the new credential available to the sock */
     if (sock_dtls_add_credential(&dtls_sock, SOCK_DTLS_CLIENT_TAG_1) < 0) {
         printf("Error cannot add credential to the sock: %" PRIdSIZE "\n", res);
+        sock_udp_close(&udp_sock);
         return -1;
     }
 
@@ -186,6 +189,7 @@ static int client_send(char *addr_str, char *data, size_t datalen)
 
     res = sock_dtls_session_init(&dtls_sock, &remote, &session);
     if (res <= 0) {
+        sock_udp_close(&udp_sock);
         return res;
     }
 
