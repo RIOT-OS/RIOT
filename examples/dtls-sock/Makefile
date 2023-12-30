@@ -7,9 +7,6 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-# TinyDTLS only has support for 32-bit architectures ATM
-FEATURES_REQUIRED += arch_32bit
-
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 USEMODULE += netdev_default
@@ -48,9 +45,6 @@ CFLAGS += -DDTLS_DEFAULT_PORT=$(DTLS_PORT)
 # Uncomment to enable debug logs
 # CFLAGS += -DCONFIG_DTLS_DEBUG
 
-# FIXME: This is a temporary patch
-CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(2*THREAD_STACKSIZE_LARGE\)
-
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
@@ -59,3 +53,10 @@ DEVELHELP ?= 1
 QUIET ?= 1
 
 include $(RIOTBASE)/Makefile.include
+
+# FIXME: This is a temporary patch
+ifeq (,$(filter arch_avr8,$(FEATURES_USED)))
+  CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(2*THREAD_STACKSIZE_LARGE\)
+else
+  CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(4*THREAD_STACKSIZE_LARGE\)
+endif
