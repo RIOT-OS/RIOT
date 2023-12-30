@@ -42,6 +42,17 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Properties of the SPI backend.
+ * @{
+ */
+#ifdef MODULE_WS281X_SPI
+#define WS281X_HAVE_INIT                    (1)
+#define WS281X_HAVE_PREPARE_TRANSMISSION    (1)
+#define WS281X_HAVE_END_TRANSMISSION        (1)
+#endif
+/** @} */
+
+/**
  * @name    Properties of the VT100 terminal backend.
  * @{
  */
