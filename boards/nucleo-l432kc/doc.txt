@@ -6,7 +6,7 @@
 ## Overview
 
 The Nucleo-L432KC is a board from ST's Nucleo family supporting ARM Cortex-M4
-STM32L432KCU6 microcontroller with 64KiB or RAM and 256KiB of Flash.
+STM32L432KCU6 microcontroller with 64KiB of RAM and 256KiB of Flash.
 
 
 ## Flashing the Board Using ST-LINK Removable Media

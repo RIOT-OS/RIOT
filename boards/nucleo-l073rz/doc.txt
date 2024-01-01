@@ -7,7 +7,7 @@
 ## Overview
 
 The Nucleo-L073RZ is a board from ST's Nucleo family supporting ARM Cortex-M0
-STM32L073RZT6 microcontroller with 20KiB or RAM and 192KiB of Flash.
+STM32L073RZT6 microcontroller with 20KiB of RAM and 192KiB of Flash.
 
 ## Pinout
 
