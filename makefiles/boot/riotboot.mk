@@ -86,6 +86,7 @@ riotboot/flash-bootloader: riotboot/bootloader/flash
 riotboot/bootloader/%: $$(if $$(filter riotboot/bootloader/clean,$$@),,$$(BUILDDEPS) pkg-prepare)
 	$(Q)/usr/bin/env -i \
 		QUIET=$(QUIET) PATH="$(PATH)" USER="$(USER)"\
+		INCLUDES="$(INCLUDES)"\
 		EXTERNAL_BOARD_DIRS="$(EXTERNAL_BOARD_DIRS)" BOARD=$(BOARD)\
 		DEBUG_ADAPTER_ID=$(DEBUG_ADAPTER_ID) \
 		IOTLAB_NODE=$(IOTLAB_NODE) \
