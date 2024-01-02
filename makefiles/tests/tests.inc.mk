@@ -22,6 +22,10 @@ TEST_DEPS += $(TERMDEPS)
 TEST_EXECUTOR ?=
 TEST_EXECUTOR_FLAGS ?=
 
+ifeq (native, $(BOARD))
+  TEST_EXECUTOR := RIOT_TERMINAL=native $(TEST_EXECUTOR)
+endif
+
 test: $(TEST_DEPS)
 	$(Q) for t in $(TESTS); do \
 		$(TEST_EXECUTOR) $(TEST_EXECUTOR_FLAGS) $$t || exit 1; \

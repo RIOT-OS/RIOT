@@ -114,7 +114,11 @@ EEPROM_FILE ?= $(BINDIR)/native.eeprom
 # set the eeprom file flags only when the periph_eeprom feature is used.
 ifneq (,$(filter periph_eeprom,$(FEATURES_USED)))
   EEPROM_FILE_FLAGS = --eeprom $(EEPROM_FILE)
-  TERMFLAGS += $(EEPROM_FILE_FLAGS)
+  ifeq (native,$(RIOT_TERMINAL))
+    TERMFLAGS += $(EEPROM_FILE_FLAGS)
+  else
+    TERMFLAGS += --process-args '$(EEPROM_FILE_FLAGS)'
+  endif
 endif
 
 VCAN_IFNUM ?= 0

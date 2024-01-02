@@ -5,9 +5,6 @@ USEMODULE += app_metadata
 USEMODULE += shell_cmds_default
 USEMODULE += ps
 
-ifeq (native, $(BOARD))
-  RIOT_TERMINAL ?= native
-endif
 # Use a terminal that does not introduce extra characters into the stream.
 RIOT_TERMINAL ?= socat
 
