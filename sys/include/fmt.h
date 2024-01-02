@@ -147,10 +147,13 @@ uint8_t fmt_hex_byte(const char *hex);
  *
  * The sequence of hex characters must have an even length:
  * 2 hex character => 1 byte. If the sequence of hex has an odd length, this
- * function returns 0 and an empty @p out.
+ * function returns 0 and does not write to @p out.
  *
  * The hex characters sequence must contain valid hexadecimal characters
  * otherwise the result in @p out is undefined.
+ *
+ * If @p out is NULL, will only return the number of bytes that would have
+ * been written.
  *
  * @param[out] out  Pointer to converted bytes, or NULL
  * @param[in]  hex  Pointer to input buffer
