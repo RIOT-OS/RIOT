@@ -114,9 +114,9 @@ static int _write_page(mtd_dev_t *dev, const void *buf, uint32_t page, uint32_t 
                 __attribute__ ((aligned (FLASHPAGE_WRITE_BLOCK_ALIGNMENT)));
 
         offset = addr % FLASHPAGE_WRITE_BLOCK_ALIGNMENT;
-        size = MIN(size, FLASHPAGE_WRITE_BLOCK_ALIGNMENT - offset);
+        size = MIN(size, FLASHPAGE_WRITE_BLOCK_SIZE - offset);
 
-        DEBUG("flashpage: write %"PRIu32" unaligned bytes\n", size);
+        DEBUG("flashpage: write %"PRIu32" at %p - ""%"PRIu32"\n", size, (void *)addr, offset);
 
         memcpy(&tmp[0], (uint8_t *)addr - offset, sizeof(tmp));
         memcpy(&tmp[offset], buf, size);
