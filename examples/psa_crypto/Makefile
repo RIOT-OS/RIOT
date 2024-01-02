@@ -98,6 +98,14 @@ else
   USEMODULE += psa_cipher
   USEMODULE += psa_cipher_aes_128_cbc
 
+  USEMODULE += psa_hash
+  USEMODULE += psa_hash_sha_224
+  USEMODULE += psa_hash_sha_256
+  USEMODULE += psa_hash_sha_384
+  USEMODULE += psa_hash_sha_512
+  USEMODULE += psa_hash_sha_512_224
+  USEMODULE += psa_hash_sha_512_256
+
   USEMODULE += psa_mac
   USEMODULE += psa_mac_hmac_sha_256
 
