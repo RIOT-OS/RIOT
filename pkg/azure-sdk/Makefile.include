@@ -1,0 +1,17 @@
+INCLUDES += -I$(PKGDIRBASE)/azure-sdk/sdk/inc/
+INCLUDES += -I$(RIOTBASE)/pkg/azure-sdk/include
+DIRS += $(RIOTBASE)/pkg/azure-sdk/contrib/
+
+CFLAGS += -DCMAKE_C_STANDARD=99
+CFLAGS += -DTRANSPORT_PAHO=ON
+CFLAGS += -DPRECONDITIONS=OFF
+CFLAGS += -DLOGGING=OFF #reduces the size of the sdk
+CFLAGS += -DBUILD_SAMPLES=OFF #reduces the size of the sdk
+
+CFLAGS += -Wno-error=strict-prototypes
+CFLAGS += -Wno-strict-prototypes
+CFLAGS += -Wno-error=old-style-definition
+CFLAGS += -Wno-old-style-definition
+CFLAGS += -Wno-error=format-nonliteral
+CFLAGS += -Wno-format-nonliteral
+CFLAGS += -Wno-cast-align
