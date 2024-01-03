@@ -80,6 +80,21 @@ static const timer_conf_t timer_config[] = {
 #define TIMER_2_ISR         isr_timer3
 #define TIMER_3_ISR         isr_timer4
 
+/** See @ref timer_init */
+#define TIMER_0_MAX_VALUE 0xffffffff
+/** See @ref timer_init */
+#define TIMER_1_MAX_VALUE 0xffffffff
+#ifdef NRF_TIMER3
+/** See @ref timer_init */
+#define TIMER_2_MAX_VALUE 0xffffffff
+#endif
+/* If there is no NRF_TIMER3 this should be TIMER_2 because the index shifts
+ * up, but there is only a TIMER4 if there is a TIMER3 too. */
+#ifdef NRF_TIMER4
+/** See @ref timer_init */
+#define TIMER_3_MAX_VALUE 0xffffffff
+#endif
+
 #define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
 
