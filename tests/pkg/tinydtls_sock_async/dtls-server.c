@@ -156,10 +156,10 @@ static void _dtls_handler(sock_dtls_t *sock, sock_async_flags_t type, void *arg)
 
         res = sock_dtls_recv(sock, &session, _recv_buf, sizeof(_recv_buf), 0);
         if (res >= 0) {
-            printf("Received %d bytes -- (echo)\n", (int)res);
+            printf("Received %" PRIdSIZE " bytes -- (echo)\n", res);
             res = sock_dtls_send(sock, &session, _recv_buf, (size_t)res, 0);
             if (res < 0) {
-                printf("Error resending DTLS message: %d\n", (int)res);
+                printf("Error resending DTLS message: %" PRIdSIZE "\n", res);
             }
         }
     }
@@ -183,7 +183,7 @@ static int start_server(void)
     res = credman_add(&credential);
     if (res < 0 && res != CREDMAN_EXIST) {
         /* ignore duplicate credentials */
-        printf("Error cannot add credential to system: %d\n", (int)res);
+        printf("Error cannot add credential to system: %" PRIdSIZE "\n", res);
         return 1;
     }
     res = sock_dtls_create(&_dtls_sock, &_udp_sock, SOCK_DTLS_SERVER_TAG,

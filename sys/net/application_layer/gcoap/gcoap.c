@@ -214,7 +214,7 @@ static void _on_sock_dtls_evt(sock_dtls_t *sock, sock_async_flags_t type, void *
                             _listen_buf, sizeof(_listen_buf),
                             CONFIG_GCOAP_DTLS_HANDSHAKE_TIMEOUT_MSEC);
         if (res != -SOCK_DTLS_HANDSHAKE) {
-            DEBUG("gcoap: could not establish DTLS session: %zd\n", res);
+            DEBUG("gcoap: could not establish DTLS session: %" PRIdSIZE "\n", res);
             sock_dtls_session_destroy(sock, &socket.ctx_dtls_session);
             return;
         }
@@ -277,7 +277,7 @@ static void _on_sock_dtls_evt(sock_dtls_t *sock, sock_async_flags_t type, void *
         ssize_t res = sock_dtls_recv(sock, &socket.ctx_dtls_session, _listen_buf,
                                     sizeof(_listen_buf), 0);
         if (res <= 0) {
-            DEBUG("gcoap: DTLS recv failure: %d\n", (int)res);
+            DEBUG("gcoap: DTLS recv failure: %" PRIdSIZE "\n", res);
             return;
         }
         sock_udp_ep_t ep;
@@ -331,7 +331,7 @@ static void _on_sock_udp_evt(sock_udp_t *sock, sock_async_flags_t type, void *ar
         while (true) {
             ssize_t res = sock_udp_recv_buf_aux(sock, &stackbuf, &buf_ctx, 0, &remote, &aux_in);
             if (res < 0) {
-                DEBUG("gcoap: udp recv failure: %d\n", (int)res);
+                DEBUG("gcoap: udp recv failure: %" PRIdSIZE "\n", res);
                 return;
             }
             if (res == 0) {
@@ -387,7 +387,7 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_
 
     ssize_t res = coap_parse(&pdu, buf, len);
     if (res < 0) {
-        DEBUG("gcoap: parse failure: %d\n", (int)res);
+        DEBUG("gcoap: parse failure: %" PRIdSIZE "\n", res);
         /* If a response, can't clear memo, but it will timeout later.
          *
          * There are *some* error cases in which we could continue (eg. all
@@ -446,7 +446,7 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_
             if (pdu_len > 0) {
                 ssize_t bytes = _tl_send(sock, _listen_buf, pdu_len, remote, aux);
                 if (bytes <= 0) {
-                    DEBUG("gcoap: send response failed: %d\n", (int)bytes);
+                    DEBUG("gcoap: send response failed: %" PRIdSIZE "\n", bytes);
                 }
             }
         }
@@ -539,7 +539,7 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_
 
         ssize_t bytes = _tl_send(sock, buf, sizeof(coap_hdr_t), remote, aux);
         if (bytes <= 0) {
-            DEBUG("gcoap: empty response failed: %d\n", (int)bytes);
+            DEBUG("gcoap: empty response failed: %" PRIdSIZE "\n", bytes);
         }
     }
 }
@@ -576,7 +576,7 @@ static void _on_resp_timeout(void *arg) {
         ssize_t bytes = _tl_send(&memo->socket, memo->msg.data.pdu_buf,
                                  memo->msg.data.pdu_len, &memo->remote_ep, NULL);
         if (bytes <= 0) {
-            DEBUG("gcoap: sock resend failed: %d\n", (int)bytes);
+            DEBUG("gcoap: sock resend failed: %" PRIdSIZE "\n", bytes);
             _expire_request(memo);
         }
     }
@@ -1310,7 +1310,7 @@ static ssize_t _cache_check(const uint8_t *buf, size_t len,
     ssize_t res = coap_parse(&req, (uint8_t *)buf, len);
 
     if (res < 0) {
-        DEBUG("gcoap: parse failure for cache lookup: %d\n", (int)res);
+        DEBUG("gcoap: parse failure for cache lookup: %" PRIdSIZE "\n", res);
         return -EINVAL;
     }
     if (coap_get_code_class(&req) != COAP_CLASS_REQ) {
@@ -1624,8 +1624,8 @@ ssize_t gcoap_req_send_tl(const uint8_t *buf, size_t len,
                 event_timeout_clear(&memo->resp_evt_tmout);
             }
             memo->state = GCOAP_MEMO_UNUSED;
-        }
-        DEBUG("gcoap: sock send failed: %d\n", (int)res);
+    }
+        DEBUG("gcoap: sock send failed: %" PRIdSIZE "\n", res);
     }
     return ((res > 0 || res == -ENOTCONN) ? res : 0);
 }

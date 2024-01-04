@@ -24,6 +24,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "architecture.h"
 #include "od.h"
 #include "shell.h"
 #include "periph/flashpage.h"
@@ -233,10 +234,10 @@ static int cmd_write_raw(int argc, char **argv)
 
     flashpage_write((void*)addr, raw_buf, strlen(raw_buf));
 #if (__SIZEOF_POINTER__ == 2)
-    printf("wrote local data to flash address %#" PRIx16 " of len %u\n",
+    printf("wrote local data to flash address %#" PRIx16 " of len %" PRIuSIZE "\n",
            addr, strlen(raw_buf));
 #else
-    printf("wrote local data to flash address %#" PRIx32 " of len %u\n",
+    printf("wrote local data to flash address %#" PRIx32 " of len %" PRIuSIZE "\n",
            addr, strlen(raw_buf));
 #endif
     return 0;

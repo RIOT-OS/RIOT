@@ -31,3 +31,14 @@ ifneq (,$(filter st7789,$(USEMODULE)))
   USEMODULE += lcd_parallel_ll_mcu
   FEATURES_REQUIRED += periph_fmc_nor_sram
 endif
+
+# default to using fatfs on SD card
+ifneq (,$(filter vfs_default,$(USEMODULE)))
+  USEMODULE += fatfs_vfs
+  USEMODULE += mtd
+endif
+
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE += mtd_sdmmc_default
+  USEMODULE += periph_sdmmc
+endif

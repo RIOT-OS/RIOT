@@ -26,6 +26,7 @@
 #include <nanocbor/nanocbor.h>
 #include <assert.h>
 
+#include "architecture.h"
 #include "hashes/sha256.h"
 
 #include "kernel_defines.h"
@@ -330,7 +331,7 @@ static inline void _print_download_progress(suit_manifest_t *manifest,
     (void)manifest;
     (void)offset;
     (void)len;
-    DEBUG("_suit_flashwrite(): writing %u bytes at pos %u\n", len, offset);
+    DEBUG("_suit_flashwrite(): writing %" PRIuSIZE " bytes at pos %" PRIuSIZE "\n", len, offset);
 #if defined(MODULE_PROGRESS_BAR)
     if (image_size != 0) {
         char _suffix[7] = { 0 };
@@ -368,14 +369,14 @@ static int _storage_helper(void *arg, size_t offset, uint8_t *buf, size_t len,
     if (image_size < offset + len) {
         /* Extra newline at the start to compensate for the progress bar */
         LOG_ERROR(
-            "\n_suit_coap(): Image beyond size, offset + len=%u, "
-            "image_size=%u\n", (unsigned)(total), (unsigned)image_size);
+            "\n_suit_coap(): Image beyond size, offset + len=%" PRIuSIZE ", "
+            "image_size=%" PRIu32 "\n", total, image_size);
         return -1;
     }
 
     if (!more && image_size != total) {
-        LOG_INFO("Incorrect size received, got %u, expected %u\n",
-                 (unsigned)total, (unsigned)image_size);
+        LOG_INFO("Incorrect size received, got %" PRIuSIZE ", expected %" PRIu32 "\n",
+                 total, image_size);
         return -1;
     }
 
@@ -427,8 +428,8 @@ static int _dtv_fetch(suit_manifest_t *manifest, int key,
     memcpy(manifest->urlbuf, url, url_len);
     manifest->urlbuf[url_len] = '\0';
 
-    LOG_DEBUG("_dtv_fetch() fetching \"%s\" (url_len=%u)\n", manifest->urlbuf,
-              (unsigned)url_len);
+    LOG_DEBUG("_dtv_fetch() fetching \"%s\" (url_len=%" PRIuSIZE ")\n", manifest->urlbuf,
+              url_len);
 
     if (_start_storage(manifest, comp) < 0) {
         LOG_ERROR("Unable to start storage backend\n");

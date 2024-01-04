@@ -220,7 +220,7 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
 
             res = _sock_sendv(sock, &head);
             if (res <= 0) {
-                DEBUG("nanocoap: error sending coap request, %d\n", (int)res);
+                DEBUG("nanocoap: error sending coap request, %" PRIdSIZE "\n", res);
                 return res;
             }
 
@@ -268,7 +268,7 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                 continue;
             }
             if (res < 0) {
-                DEBUG("nanocoap: error receiving coap response, %d\n", (int)res);
+                DEBUG("nanocoap: error receiving coap response, %" PRIdSIZE "\n", res);
                 return res;
             }
 
@@ -794,7 +794,7 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
         res = sock_udp_recv_aux(&sock.udp, buf, bufsize, SOCK_NO_TIMEOUT,
                                 &remote, aux_in_ptr);
         if (res <= 0) {
-            DEBUG("error receiving UDP packet %d\n", (int)res);
+            DEBUG("error receiving UDP packet %" PRIdSIZE "\n", res);
             continue;
         }
         coap_pkt_t pkt;
@@ -803,7 +803,7 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
             continue;
         }
         if ((res = coap_handle_req(&pkt, buf, bufsize, &ctx)) <= 0) {
-            DEBUG("error handling request %d\n", (int)res);
+            DEBUG("error handling request %" PRIdSIZE "\n", res);
             continue;
         }
 

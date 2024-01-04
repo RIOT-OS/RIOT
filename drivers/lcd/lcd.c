@@ -428,8 +428,8 @@ void lcd_pixmap(lcd_t *dev, uint16_t x1, uint16_t x2,
     size_t num_pix = (x2 - x1 + 1) * (y2 - y1 + 1);
 
     DEBUG("[lcd]: Write x1: %" PRIu16 ", x2: %" PRIu16 ", "
-          "y1: %" PRIu16 ", y2: %" PRIu16 ". Num pixels: %lu\n",
-          x1, x2, y1, y2, (unsigned long)num_pix);
+          "y1: %" PRIu16 ", y2: %" PRIu16 ". Num pixels: %" PRIuSIZE "\n",
+          x1, x2, y1, y2, num_pix);
 
     lcd_ll_acquire(dev);
 

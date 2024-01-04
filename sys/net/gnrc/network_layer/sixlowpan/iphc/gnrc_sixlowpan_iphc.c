@@ -838,8 +838,8 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
             DEBUG("6lo iphc: calculating payload length for SFR\n");
             DEBUG(" - rbuf->super.datagram_size: %u\n",
                   rbuf->super.datagram_size);
-            DEBUG(" - payload_offset: %u\n", (unsigned)payload_offset);
-            DEBUG(" - uncomp_hdr_len: %u\n", (unsigned)uncomp_hdr_len);
+            DEBUG(" - payload_offset: %" PRIuSIZE "\n", payload_offset);
+            DEBUG(" - uncomp_hdr_len: %" PRIuSIZE "\n", uncomp_hdr_len);
             /* set IPv6 header payload length field to the length of whatever is
              * left after removing the 6LoWPAN header and adding uncompressed
              * headers */

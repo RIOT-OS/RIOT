@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <assert.h>
 
+#include "architecture.h"
 #include "thread.h"
 #include "sched.h"
 
@@ -115,7 +116,7 @@ void ps(void)
 #endif
                    " | %-8s %.1s | %3i"
 #ifdef DEVELHELP
-                   " | %6" PRIu32 " (%5i) (%5i) | %10p | %10p "
+                   " | %6" PRIuSIZE " (%5i) (%5i) | %10p | %10p "
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
                    " | %2d.%03d%% |  %8u  | %10"PRIu32" "
@@ -127,7 +128,7 @@ void ps(void)
 #endif
                    sname, queued, thread_get_priority(p)
 #ifdef DEVELHELP
-                   , (uint32_t)thread_get_stacksize(p), stacksz, stack_free,
+                   , thread_get_stacksize(p), stacksz, stack_free,
                    thread_get_stackstart(p), thread_get_sp(p)
 #endif
 #ifdef MODULE_SCHEDSTATISTICS

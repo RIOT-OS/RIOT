@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 
+#include "architecture.h"
 #include "event.h"
 #include "event/thread.h"
 #include "od.h"
@@ -56,7 +57,7 @@ void _recv(netdev_t *dev)
     printf("Src. addr.: %s\n", _addr_str);
 
     data_len -= sizeof(ethernet_hdr_t);
-    printf("Payload (%u bytes): \n", (unsigned)data_len);
+    printf("Payload (%" PRIdSIZE " bytes): \n", data_len);
     od_hex_dump(payload, data_len, 0);
 }
 

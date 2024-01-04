@@ -39,8 +39,7 @@ USEMODULE += ieee802154_submac
 USEMODULE += ztimer_usec
 
 ifeq ($(BOARD), native)
-  ZEP_PORT_BASE ?= 17754
-  TERMFLAGS += -z [::1]:$(ZEP_PORT_BASE)
+  USE_ZEP = 1
   USEMODULE += socket_zep
 endif
 

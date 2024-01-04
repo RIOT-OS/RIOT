@@ -15,6 +15,7 @@ USEMODULE += shell_cmds_default
 
 # use Ethernet as link-layer protocol
 ifeq (native,$(BOARD))
+  RIOT_TERMINAL = native
   TERMFLAGS += -z [::1]:17754
 else
   ETHOS_BAUDRATE ?= 115200

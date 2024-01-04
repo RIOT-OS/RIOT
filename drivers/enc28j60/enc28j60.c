@@ -330,8 +330,8 @@ static int nd_recv(netdev_t *netdev, void *buf, size_t max_len, void *info)
     next = (uint16_t)((head[1] << 8) | head[0]);
     size = (uint16_t)((head[3] << 8) | head[2]) - 4;  /* discard CRC */
 
-    DEBUG("[enc28j60] recv: size=%i next=%i buf=%p len=%d\n",
-          (int)size, (int)next, buf, max_len);
+    DEBUG("[enc28j60] recv: size=%u next=%u buf=%p len=%" PRIuSIZE "\n",
+          size, next, buf, max_len);
 
     if (buf != NULL) {
         /* read packet content into the supplied buffer */

@@ -95,8 +95,8 @@ gnrc_pktsnip_t *gnrc_pktbuf_add(gnrc_pktsnip_t *next, const void *data, size_t s
     gnrc_pktsnip_t *pkt;
 
     if (size > CONFIG_GNRC_PKTBUF_SIZE) {
-        DEBUG("pktbuf: size (%u) > CONFIG_GNRC_PKTBUF_SIZE (%u)\n",
-              (unsigned)size, CONFIG_GNRC_PKTBUF_SIZE);
+        DEBUG("pktbuf: size (%" PRIuSIZE ") > CONFIG_GNRC_PKTBUF_SIZE (%u)\n",
+              size, CONFIG_GNRC_PKTBUF_SIZE);
         return NULL;
     }
     mutex_lock(&gnrc_pktbuf_mutex);
@@ -114,9 +114,9 @@ gnrc_pktsnip_t *gnrc_pktbuf_mark(gnrc_pktsnip_t *pkt, size_t size, gnrc_nettype_
 
     mutex_lock(&gnrc_pktbuf_mutex);
     if ((size == 0) || (pkt == NULL) || (size > pkt->size) || (pkt->data == NULL)) {
-        DEBUG("pktbuf: size == 0 (was %u) or pkt == NULL (was %p) or "
-              "size > pkt->size (was %u) or pkt->data == NULL (was %p)\n",
-              (unsigned)size, (void *)pkt, (pkt ? (unsigned)pkt->size : 0),
+        DEBUG("pktbuf: size == 0 (was %" PRIuSIZE ") or pkt == NULL (was %p) or "
+              "size > pkt->size (was %" PRIuSIZE ") or pkt->data == NULL (was %p)\n",
+              size, (void *)pkt, (pkt ? pkt->size : 0),
               (pkt ? pkt->data : NULL));
         mutex_unlock(&gnrc_pktbuf_mutex);
         return NULL;
@@ -243,8 +243,8 @@ gnrc_pktsnip_t *gnrc_pktbuf_start_write(gnrc_pktsnip_t *pkt)
 #ifdef MODULE_OD
 static inline void _print_chunk(void *chunk, size_t size, int num)
 {
-    printf("=========== chunk %3d (%-10p size: %4u) ===========\n", num, chunk,
-           (unsigned int)size);
+    printf("=========== chunk %3" PRIuSIZE " (%-10p size: %4u) ===========\n", num, chunk,
+           size);
     od_hex_dump(chunk, size, OD_WIDTH_DEFAULT);
 }
 
@@ -430,8 +430,9 @@ static void *_pktbuf_alloc(size_t size)
     const void *mismatch;
     if (CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE &&
         (mismatch = memchk(ptr + 1, CANARY, size - sizeof(_unused_t)))) {
-        printf("[%p] mismatch at offset %"PRIuPTR"/%u (ignoring %u initial bytes that were repurposed)\n",
-               (void *)ptr, (uintptr_t)mismatch - (uintptr_t)ptr, (unsigned)size, (unsigned)sizeof(_unused_t));
+        printf("[%p] mismatch at offset %"PRIuPTR"/%" PRIuSIZE
+               " (ignoring %" PRIuSIZE " initial bytes that were repurposed)\n",
+               (void *)ptr, (uintptr_t)mismatch - (uintptr_t)ptr, size, sizeof(_unused_t));
 #ifdef MODULE_OD
         od_hex_dump(ptr, size, 0);
 #endif

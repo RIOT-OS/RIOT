@@ -1,0 +1,16 @@
+/**
+ * @defgroup pkg_mjson   mjson
+ * @ingroup  pkg
+ * @brief    mjson - a JSON parser + emitter + JSON-RPC engine
+ *
+ * # Introduction
+ *
+ * mjson is a small, embedded-friendly JSON parser, emitter and JSON-RPC
+ * engine.
+ *
+ * # License
+ *
+ * Licensed under MIT.
+ *
+ * @see      https://github.com/cesanta/mjson
+ */

@@ -131,17 +131,28 @@ static void dispatch_loop(int sock, int tap, dispatch_cb_t dispatch, void *ctx)
 
 static topology_t topology;
 static const char *graphviz_file = "example.gv";
+static const char *pidfile;
 static void _info_handler(int signal)
 {
-    if (signal != SIGUSR1) {
-        return;
-    }
-
-    if (topology_print(graphviz_file, &topology)) {
-        fprintf(stderr, "can't open %s\n", graphviz_file);
-    }
-    else {
-        printf("graph written to %s\n", graphviz_file);
+    switch (signal) {
+    case SIGUSR1:
+        if (topology_print(graphviz_file, &topology)) {
+            fprintf(stderr, "can't open %s\n", graphviz_file);
+        }
+        else {
+            printf("graph written to %s\n", graphviz_file);
+        }
+        break;
+    case SIGUSR2:
+        topology_print_stats(&topology, true);
+        break;
+    case SIGINT:
+    case SIGTERM:
+        if (pidfile) {
+            unlink(pidfile);
+        }
+        exit(0);
+        break;
     }
 }
 
@@ -190,6 +201,7 @@ static void _print_help(const char *progname)
 
     fprintf(stderr, "\noptional arguments:\n");
     fprintf(stderr, "\t-t <file>\tLoad toplogy from file\n");
+    fprintf(stderr, "\t-p <file>\tStore PID in file\n");
     fprintf(stderr, "\t-s <seed>\tRandom seed used to simulate packet loss\n");
     fprintf(stderr, "\t-g <file>\tFile to dump topology as Graphviz visualisation on SIGUSR1\n");
     fprintf(stderr, "\t-w <interface>\tSend frames to virtual 802.15.4 "
@@ -210,7 +222,7 @@ int main(int argc, char **argv)
         .ai_flags    = AI_NUMERICHOST,
     };
 
-    while ((c = getopt(argc, argv, "t:s:g:w:")) != -1) {
+    while ((c = getopt(argc, argv, "t:s:g:w:p:")) != -1) {
         switch (c) {
         case 't':
             topo_file = optarg;
@@ -226,6 +238,9 @@ int main(int argc, char **argv)
             if (tap_fd < 0) {
                 return tap_fd;
             }
+            break;
+        case 'p':
+            pidfile = optarg;
             break;
         default:
             _print_help(progname);
@@ -257,6 +272,9 @@ int main(int argc, char **argv)
     if (graphviz_file) {
         signal(SIGUSR1, _info_handler);
     }
+    signal(SIGUSR2, _info_handler);
+    signal(SIGTERM, _info_handler);
+    signal(SIGINT, _info_handler);
 
     struct addrinfo *server_addr;
     int res = getaddrinfo(argv[0], argv[1],
@@ -281,6 +299,14 @@ int main(int argc, char **argv)
     }
 
     freeaddrinfo(server_addr);
+
+    if (pidfile) {
+         FILE *pf = fopen(pidfile, "w");
+        if (pf) {
+            fprintf(pf, "%u", getpid());
+            fclose(pf);
+        }
+    }
 
     if (topology.flat) {
         dispatch_loop(sock, tap_fd, _send_flat, &topology.nodes);

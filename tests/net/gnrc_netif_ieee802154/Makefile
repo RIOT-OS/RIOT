@@ -4,6 +4,7 @@ include ../Makefile.net_common
 
 ifeq (native, $(BOARD))
   USEMODULE += socket_zep
+  RIOT_TERMINAL = native
   TERMFLAGS ?= -z "0.0.0.0:17755,localhost:17754"
   USEMODULE += netdev
   # somehow this breaks the test

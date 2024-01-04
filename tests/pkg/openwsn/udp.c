@@ -102,8 +102,8 @@ static int udp_send(char *addr_str, char *port_str, char *data,
 
     for (unsigned int i = 0; i < num; i++) {
 
-        printf("Send %u byte over UDP to [%s]:%s\n",
-               (unsigned)data_len, addr_str, port_str);
+        printf("Send %" PRIuSIZE " byte over UDP to [%s]:%s\n",
+               data_len, addr_str, port_str);
 
         /* don't run if not in synch */
         if (ieee154e_isSynch() == FALSE) {

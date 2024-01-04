@@ -40,7 +40,7 @@ void __attribute__((weak)) *malloc(size_t size)
     if (size != 0) {
         void *ptr = sbrk(size);
 
-        DEBUG("malloc(): allocating block of size %u at %p.\n", (unsigned int) size, ptr);
+        DEBUG("malloc(): allocating block of size %" PRIuSIZE " at %p.\n", size, ptr);
 
         if (ptr != (void*) -1) {
             return ptr;

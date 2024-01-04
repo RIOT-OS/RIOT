@@ -111,7 +111,9 @@ int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
     }
 
     /* enable interrupts */
-    NVIC_EnableIRQ(timer_config[tim].irqn);
+    if (cb != NULL) {
+        NVIC_EnableIRQ(timer_config[tim].irqn);
+    }
     /* start the timer */
     dev(tim)->TASKS_START = 1;
 

@@ -22,24 +22,25 @@
 
 static void test_fmt_is_x(void)
 {
-    const char *num = "123";
-    const char *hex = "0xabc";
-    const char *str = "muh";
-    char digit = '8';
-    char lower = 'a';
-    char upper = 'A';
+    TEST_ASSERT_EQUAL_INT(1, fmt_is_digit('8'));
+    TEST_ASSERT_EQUAL_INT(0, fmt_is_digit('a'));
+    TEST_ASSERT_EQUAL_INT(0, fmt_is_digit('A'));
+    TEST_ASSERT_EQUAL_INT(0, fmt_is_digit('\0'));
 
-    TEST_ASSERT_EQUAL_INT(1, fmt_is_digit(digit));
-    TEST_ASSERT_EQUAL_INT(0, fmt_is_digit(lower));
-    TEST_ASSERT_EQUAL_INT(0, fmt_is_digit(upper));
+    TEST_ASSERT_EQUAL_INT(1, fmt_is_upper('A'));
+    TEST_ASSERT_EQUAL_INT(0, fmt_is_upper('8'));
+    TEST_ASSERT_EQUAL_INT(0, fmt_is_upper('a'));
+    TEST_ASSERT_EQUAL_INT(0, fmt_is_upper('\0'));
 
-    TEST_ASSERT_EQUAL_INT(0, fmt_is_upper(digit));
-    TEST_ASSERT_EQUAL_INT(0, fmt_is_upper(lower));
-    TEST_ASSERT_EQUAL_INT(1, fmt_is_upper(upper));
+    TEST_ASSERT_EQUAL_INT(1, fmt_is_number("123"));
+    TEST_ASSERT_EQUAL_INT(1, fmt_is_number("00123"));
+    TEST_ASSERT_EQUAL_INT(1, fmt_is_number("0"));
+    TEST_ASSERT_EQUAL_INT(0, fmt_is_number("0xabc"));
+    TEST_ASSERT_EQUAL_INT(0, fmt_is_number("muh"));
 
-    TEST_ASSERT_EQUAL_INT(1, fmt_is_number(num));
-    TEST_ASSERT_EQUAL_INT(0, fmt_is_number(hex));
-    TEST_ASSERT_EQUAL_INT(0, fmt_is_number(str));
+    /* white space is NOT ignored */
+    TEST_ASSERT_EQUAL_INT(0, fmt_is_number(" 1"));
+    TEST_ASSERT_EQUAL_INT(0, fmt_is_number("1 2"));
 }
 
 static void test_fmt_byte_hex(void)
@@ -58,6 +59,9 @@ static void test_fmt_byte_hex(void)
 
     /* check that the buffer was not overflowed */
     TEST_ASSERT_EQUAL_STRING("zzzz", &out[3]);
+
+    /* Passing NULL just returns number of bytes that would have been written */
+    TEST_ASSERT_EQUAL_INT(2, fmt_byte_hex(NULL, 0));
 }
 
 static void test_fmt_bytes_hex(void)
@@ -108,6 +112,9 @@ static void test_fmt_bytes_hex(void)
 
     /* check that the buffer was not overflowed */
     TEST_ASSERT_EQUAL_STRING("zzzz", &out[15]);
+
+    /* Passing NULL just returns number of bytes that would have been written */
+    TEST_ASSERT_EQUAL_INT(14, fmt_bytes_hex(NULL, val, 7));
 }
 
 static void test_fmt_bytes_hex_reverse(void)
@@ -138,31 +145,47 @@ static void test_fmt_bytes_hex_reverse(void)
 
     /* check that the buffer was not overflowed */
     TEST_ASSERT_EQUAL_STRING("zz", &out[9]);
+
+    /* Passing NULL just returns number of bytes that would have been written */
+    TEST_ASSERT_EQUAL_INT(8, fmt_bytes_hex_reverse(NULL, val, 4));
 }
 
 static void test_fmt_hex_byte(void)
 {
-    char hex[3] = "00";
     uint8_t byte;
 
-    byte = fmt_hex_byte(hex);
+    byte = fmt_hex_byte("00");
     TEST_ASSERT_EQUAL_INT(0x00, byte);
 
-    memcpy(hex, "12", 2);
-    byte = fmt_hex_byte(hex);
+    byte = fmt_hex_byte("12");
     TEST_ASSERT_EQUAL_INT(0x12, byte);
 
-    memcpy(hex, "AB", 2);
-    byte = fmt_hex_byte(hex);
+    byte = fmt_hex_byte("AB");
     TEST_ASSERT_EQUAL_INT(0xAB, byte);
 
-    memcpy(hex, "CD", 2);
-    byte = fmt_hex_byte(hex);
+    byte = fmt_hex_byte("CD");
     TEST_ASSERT_EQUAL_INT(0xCD, byte);
 
-    memcpy(hex, "EF", 2);
-    byte = fmt_hex_byte(hex);
+    byte = fmt_hex_byte("EF");
     TEST_ASSERT_EQUAL_INT(0xEF, byte);
+
+    byte = fmt_hex_byte("ab");
+    TEST_ASSERT_EQUAL_INT(0xAB, byte);
+
+    byte = fmt_hex_byte("cd");
+    TEST_ASSERT_EQUAL_INT(0xCD, byte);
+
+    byte = fmt_hex_byte("ef");
+    TEST_ASSERT_EQUAL_INT(0xEF, byte);
+
+    byte = fmt_hex_byte("Cd");
+    TEST_ASSERT_EQUAL_INT(0xCD, byte);
+
+    byte = fmt_hex_byte("eF");
+    TEST_ASSERT_EQUAL_INT(0xEF, byte);
+
+    byte = fmt_hex_byte("1234");
+    TEST_ASSERT_EQUAL_INT(0x12, byte);
 }
 
 static void test_fmt_hex_bytes(void)
@@ -172,43 +195,47 @@ static void test_fmt_hex_bytes(void)
     TEST_ASSERT_EQUAL_INT(0, bytes);
     TEST_ASSERT_EQUAL_INT(0, val);
 
+    /* Odd length returns 0 */
     bytes = fmt_hex_bytes(&val, "A");
     TEST_ASSERT_EQUAL_INT(0, val);
     TEST_ASSERT_EQUAL_INT(0, bytes);
 
+    /* If the input is odd, it is not written to the output at all */
+    val = 0xFF;
+    bytes = fmt_hex_bytes(&val, "ABCDE");
+    TEST_ASSERT_EQUAL_INT(0xFF, val);
+    TEST_ASSERT_EQUAL_INT(0, bytes);
+
+    /* Passing NULL just returns number of bytes that would have been written */
     bytes = fmt_hex_bytes(NULL, "ABCDEF");
     TEST_ASSERT_EQUAL_INT(3, bytes);
 
-    char hex2[3] = "00";
-    uint8_t val1[1] = { 0 };
-    bytes = fmt_hex_bytes(val1, hex2);
+    /* Odd length */
+    bytes = fmt_hex_bytes(NULL, "ABCDE");
+    TEST_ASSERT_EQUAL_INT(0, bytes);
+
+    uint8_t val1[1] = { 0xff };
+    bytes = fmt_hex_bytes(val1, "00");
     TEST_ASSERT_EQUAL_INT(1, bytes);
     TEST_ASSERT_EQUAL_INT(0, val1[0]);
 
-    memcpy(hex2, "AB", 2);
-    hex2[2] = '\0';
     val1[0] = 0;
-    bytes = fmt_hex_bytes(val1, hex2);
+    bytes = fmt_hex_bytes(val1, "AB");
     TEST_ASSERT_EQUAL_INT(1, bytes);
     TEST_ASSERT_EQUAL_INT(0xAB, val1[0]);
 
-    memcpy(hex2, "CD", 2);
-    hex2[2] = '\0';
     val1[0] = 0;
-    bytes = fmt_hex_bytes(val1, hex2);
+    bytes = fmt_hex_bytes(val1, "CD");
     TEST_ASSERT_EQUAL_INT(1, bytes);
     TEST_ASSERT_EQUAL_INT(0xCD, val1[0]);
 
-    memcpy(hex2, "EF", 2);
-    hex2[2] = '\0';
     val1[0] = 0;
-    bytes = fmt_hex_bytes(val1, hex2);
+    bytes = fmt_hex_bytes(val1, "EF");
     TEST_ASSERT_EQUAL_INT(1, bytes);
     TEST_ASSERT_EQUAL_INT(0xEF, val1[0]);
 
-    char hex6[] = "0102aF";
     uint8_t val3[3];
-    bytes = fmt_hex_bytes(val3, hex6);
+    bytes = fmt_hex_bytes(val3, "0102aF");
     TEST_ASSERT_EQUAL_INT(3, bytes);
     TEST_ASSERT_EQUAL_INT(1, val3[0]);
     TEST_ASSERT_EQUAL_INT(2, val3[1]);

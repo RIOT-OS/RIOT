@@ -172,7 +172,7 @@ static int tcp_send(char *data, unsigned int num, unsigned int delay)
             puts("could not send");
         }
         else {
-            printf("Success: send %u byte over TCP to server\n", (unsigned)data_len);
+            printf("Success: send %" PRIuSIZE " byte over TCP to server\n", data_len);
         }
         ztimer_sleep(ZTIMER_USEC, delay);
     }

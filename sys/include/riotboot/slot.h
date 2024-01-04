@@ -116,8 +116,10 @@ void riotboot_slot_dump_addrs(void);
 static inline size_t riotboot_slot_size(unsigned slot)
 {
     switch (slot) {
+#if NUM_SLOTS >= 1
     case 0:
         return SLOT0_LEN;
+#endif
 #if NUM_SLOTS == 2
     case 1:
         return SLOT1_LEN;

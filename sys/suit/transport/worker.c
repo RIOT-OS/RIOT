@@ -116,7 +116,7 @@ int suit_handle_url(const char *url)
         return size;
     }
 
-    LOG_INFO("suit_worker: got manifest with size %u\n", (unsigned)size);
+    LOG_INFO("suit_worker: got manifest with size %" PRIdSIZE "\n", size);
 
     return suit_handle_manifest_buf(_manifest_buf, size);
 }

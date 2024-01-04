@@ -70,6 +70,26 @@ typedef enum {
 } dma_mode_t;
 
 /**
+ * @brief   Burst Transfer modes for F2/F4/F7
+ */
+typedef enum {
+    DMA_BURST_SINGLE = 0,   /**< single transfer */
+    DMA_BURST_INCR4 = 1,    /**< incremental burst of 4 beats */
+    DMA_BURST_INCR8 = 2,    /**< incremental burst of 8 beats */
+    DMA_BURST_INCR16 = 3,   /**< incremental burst of 16 beats */
+} dma_burst_t;
+
+/**
+ * @brief   Threshold selection in FIFO mode for F2/F4F7
+ */
+typedef enum {
+    DMA_FIFO_FULL_1_4 = 0,  /**< 1/4 full FIFO */
+    DMA_FIFO_FULL_1_2 = 1,  /**< 1/2 full FIFO */
+    DMA_FIFO_FULL_3_4 = 2,  /**< 3/4 full FIFO */
+    DMA_FIFO_FULL = 3,      /**< Full FIFO */
+} dma_fifo_thresh_t;
+
+/**
  * @brief   DMA channel/trigger configuration for DMA peripherals without
  *          channel/trigger filtering such as the stm32f1 and stm32f3.
  */
@@ -210,6 +230,29 @@ int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *
  */
 void dma_setup(dma_t dma, int chan, void *periph_addr, dma_mode_t mode,
                uint8_t width, bool inc_periph);
+
+/**
+ * @brief   Low level extended initial DMA stream configuration for F2/F4/F7
+ *
+ * The function configures additional features of the DMA stream for F2/F4/F7.
+ * It is supposed to be used after @ref dma_setup and before @ref dma_prepare.
+ *
+ * @note This function is only implemented for F2/F4/F7. For other families
+ *       it is only a dummy. It is not used by @ref dma_configure or the
+ *       convenience function @ref dma_transfer.
+ *
+ * @warn The combination of FIFO threshold and the memory burst transfer
+ *       has to be valid.
+ *
+ * @param[in]   dma         Logical DMA stream
+ * @param[in]   pburst      Peripeheral burst transfer configuration
+ * @param[in]   mburst      Memory burst transfer configuration
+ * @param[in]   fifo        FIFO mode enable
+ * @param[in]   thresh      FIFO threshold
+ * @param[in]   pfctrl      Peripheral used as flow controller
+ */
+void dma_setup_ext(dma_t dma, dma_burst_t pburst, dma_burst_t mburst,
+                   bool fifo, dma_fifo_thresh_t thresh, bool pfctrl);
 
 /**
  * @brief   Low level DMA transfer configuration

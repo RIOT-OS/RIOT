@@ -572,6 +572,12 @@ config HAS_PERIPH_TIMER_PERIODIC
         Indicates that the Timer peripheral provides the periodic timeout
         functionality.
 
+config HAS_PERIPH_TIMER_POLL
+    bool
+    help
+        Indicates that the Timer peripheral supports the timer_poll_channel
+        function.
+
 config HAS_PERIPH_TIMER_QUERY_FREQS
     bool
     help

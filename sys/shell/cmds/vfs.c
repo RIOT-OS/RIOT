@@ -29,6 +29,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include "architecture.h"
 #include "macros/units.h"
 #include "shell.h"
 #include "tiny_strerror.h"
@@ -279,7 +280,7 @@ static int _read_handler(int argc, char **argv)
             return 5;
         }
         else if ((size_t)res > line_len) {
-            printf("BUFFER OVERRUN! %d > %lu\n", res, (unsigned long)line_len);
+            printf("BUFFER OVERRUN! %d > %" PRIuSIZE "\n", res, line_len);
             vfs_close(fd);
             return 6;
         }
@@ -491,8 +492,8 @@ static int _cp_handler(int argc, char **argv)
         while (bufspace > 0) {
             int res = vfs_read(fd_in, &_shell_vfs_data_buffer[pos], bufspace);
             if (res < 0) {
-                printf("Error reading %lu bytes @ 0x%lx in \"%s\" (%d): %s\n",
-                       (unsigned long)bufspace, (unsigned long)pos, src_name,
+                printf("Error reading %" PRIuSIZE " bytes @ 0x%" PRIxSIZE " in \"%s\" (%d): %s\n",
+                       bufspace, pos, src_name,
                        fd_in, tiny_strerror(res));
                 vfs_close(fd_in);
                 vfs_close(fd_out);
@@ -504,7 +505,7 @@ static int _cp_handler(int argc, char **argv)
                 break;
             }
             if (((unsigned)res) > bufspace) {
-                printf("READ BUFFER OVERRUN! %d > %lu\n", res, (unsigned long)bufspace);
+                printf("READ BUFFER OVERRUN! %d > %" PRIuSIZE "\n", res, bufspace);
                 vfs_close(fd_in);
                 vfs_close(fd_out);
                 return 3;
@@ -517,15 +518,15 @@ static int _cp_handler(int argc, char **argv)
         while (bufspace > 0) {
             int res = vfs_write(fd_out, &_shell_vfs_data_buffer[pos], bufspace);
             if (res <= 0) {
-                printf("Error writing %lu bytes @ 0x%lx in \"%s\" (%d): %s\n",
-                       (unsigned long)bufspace, (unsigned long)pos, dest_name,
+                printf("Error writing %" PRIuSIZE " bytes @ 0x%" PRIxSIZE " in \"%s\" (%d): %s\n",
+                       bufspace, pos, dest_name,
                        fd_out, tiny_strerror(res));
                 vfs_close(fd_in);
                 vfs_close(fd_out);
                 return 4;
             }
             if (((unsigned)res) > bufspace) {
-                printf("WRITE BUFFER OVERRUN! %d > %lu\n", res, (unsigned long)bufspace);
+                printf("WRITE BUFFER OVERRUN! %d > %" PRIuSIZE "\n", res, bufspace);
                 vfs_close(fd_in);
                 vfs_close(fd_out);
                 return 5;

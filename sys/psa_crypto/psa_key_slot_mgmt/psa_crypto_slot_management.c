@@ -485,21 +485,20 @@ size_t psa_get_key_data_from_key_slot(const psa_key_slot_t *slot, uint8_t **key_
 
 
     if (!psa_key_lifetime_is_external(attr.lifetime)) {
-#if PSA_SINGLE_KEY_COUNT
         if (!PSA_KEY_TYPE_IS_KEY_PAIR(attr.type)) {
+#if PSA_SINGLE_KEY_COUNT
             *key_data = (uint8_t *)slot->key.data;
             *key_bytes = (size_t *)&slot->key.data_len;
             key_data_size = sizeof(slot->key.data);
-        }
 #endif /* PSA_SINGLE_KEY_COUNT */
-
-#if PSA_ASYMMETRIC_KEYPAIR_COUNT
+        }
         else {
+#if PSA_ASYMMETRIC_KEYPAIR_COUNT
             *key_data = ((psa_key_pair_slot_t *)slot)->key.privkey_data;
             *key_bytes = &((psa_key_pair_slot_t *)slot)->key.privkey_data_len;
             key_data_size = sizeof(((psa_key_pair_slot_t *)slot)->key.privkey_data);
-        }
 #endif
+        }
     }
     return key_data_size;
 }
@@ -524,20 +523,20 @@ void psa_get_public_key_data_from_key_slot(const psa_key_slot_t *slot, uint8_t *
     }
 
     if (!psa_key_lifetime_is_external(attr.lifetime)) {
-#if PSA_SINGLE_KEY_COUNT
         if (!PSA_KEY_TYPE_IS_KEY_PAIR(attr.type)) {
+#if PSA_SINGLE_KEY_COUNT
             *pubkey_data = ((psa_key_slot_t *)slot)->key.data;
             *pubkey_data_len = &((psa_key_slot_t *)slot)->key.data_len;
             return;
-        }
 #endif /* PSA_SINGLE_KEY_COUNT */
-#if PSA_ASYMMETRIC_KEYPAIR_COUNT
+        }
         else {
+#if PSA_ASYMMETRIC_KEYPAIR_COUNT
             *pubkey_data = ((psa_key_pair_slot_t *)slot)->key.pubkey_data;
             *pubkey_data_len = &((psa_key_pair_slot_t *)slot)->key.pubkey_data_len;
             return;
-        }
 #endif
+        }
     }
 #if PSA_PROTECTED_KEY_COUNT && IS_USED(MODULE_PSA_ASYMMETRIC)
     *pubkey_data = ((psa_prot_key_slot_t *)slot)->key.pubkey_data;

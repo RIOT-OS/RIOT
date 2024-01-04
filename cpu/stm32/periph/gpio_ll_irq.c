@@ -316,7 +316,7 @@ void isr_exti(void)
         /* emulate level triggered IRQs by asserting the IRQ again in software, if needed */
         if (level_triggered & (1UL << pin)) {
             /* Trading a couple of CPU cycles to not having to store port connected to EXTI in RAM.
-             * A simple look up table would save ~6 instructions for the cost 64 byte or RAM. */
+             * A simple look up table would save ~6 instructions for the cost 64 bytes of RAM. */
             gpio_port_t port = GPIO_PORT(get_exti_port(pin));
             uint32_t actual_level = gpio_ll_read(port) & (1UL << pin);
             uint32_t trigger_level = EXTI_REG_RTSR & (1UL << pin);

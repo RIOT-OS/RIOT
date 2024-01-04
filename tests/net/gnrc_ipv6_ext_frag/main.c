@@ -604,8 +604,8 @@ static int shell_test_cmd(int argc, char **argv)
     }
     test_num = atoi(argv[2]);
     if ((unsigned)test_num >= ARRAY_SIZE(_shell_tests)) {
-        printf("<num> must be between 0 and %u\n",
-               (unsigned)ARRAY_SIZE(_shell_tests) - 1);
+        printf("<num> must be between 0 and %" PRIuSIZE "\n",
+               ARRAY_SIZE(_shell_tests) - 1);
         return 1;
     }
     printf("Running test %d\n", test_num);

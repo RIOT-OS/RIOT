@@ -162,7 +162,7 @@ int _handshake_cmd(int argc, char **argv)
     _ctx.state = EDHOC_WAITING;
 
     if ((msg_len = edhoc_create_msg1(&_ctx, corr, _method, _suite, msg, sizeof(msg))) > 0) {
-        printf("[initiator]: sending msg1 (%d bytes):\n", (int)msg_len);
+        printf("[initiator]: sending msg1 (%" PRIdSIZE " bytes):\n", msg_len);
         print_bstr(msg, msg_len);
         _build_coap_pkt(&pkt, buf, sizeof(buf), msg, msg_len);
         len = _send(&pkt, COAP_BUF_SIZE, &addr, netif, port);
@@ -180,7 +180,7 @@ int _handshake_cmd(int argc, char **argv)
     print_bstr(pkt.payload, pkt.payload_len);
 
     if ((msg_len = edhoc_create_msg3(&_ctx, pkt.payload, pkt.payload_len, msg, sizeof(msg))) > 0) {
-        printf("[initiator]: sending msg3 (%d bytes):\n", (int)msg_len);
+        printf("[initiator]: sending msg3 (%" PRIdSIZE " bytes):\n", msg_len);
         print_bstr(msg, msg_len);
         _build_coap_pkt(&pkt, buf, sizeof(buf), msg, msg_len);
         len = _send(&pkt, COAP_BUF_SIZE, &addr, netif, port);

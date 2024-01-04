@@ -11,8 +11,8 @@ menuconfig MODULE_SLIPDEV
     depends on HAS_PERIPH_UART
     depends on TEST_KCONFIG
     select MODULE_NETDEV_LEGACY_API
+    select MODULE_CHUNKED_RINGBUFFER
     select MODULE_PERIPH_UART
-    select MODULE_TSRB
 
 menuconfig KCONFIG_USEMODULE_SLIPDEV
     bool "Configure SLIPDEV driver"

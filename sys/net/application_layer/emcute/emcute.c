@@ -184,7 +184,7 @@ static void on_publish(size_t len, size_t pos)
         if (rbuf[pos + 1] & EMCUTE_QOS_1) {
             sock_udp_send(&sock, &buf, 7, &gateway);
         }
-        DEBUG("[emcute] on pub: got %i bytes of data\n", (int)(len - pos - 6));
+        DEBUG("[emcute] on pub: got %" PRIiSIZE " bytes of data\n", len - pos - 6);
         size_t dat_len = (len - pos - 6);
         void *dat = (dat_len > 0) ? &rbuf[pos + 6] : NULL;
         sub->cb(&sub->topic, dat, dat_len);

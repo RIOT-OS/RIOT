@@ -56,6 +56,13 @@ static const timer_conf_t timer_config[] = {
 #define TIMER_1_ISR         isr_timer1
 #define TIMER_2_ISR         isr_timer2
 
+/** See @ref timer_init */
+#define TIMER_0_MAX_VALUE 0xffffffff
+/** See @ref timer_init */
+#define TIMER_1_MAX_VALUE 0xffffffff
+/** See @ref timer_init */
+#define TIMER_2_MAX_VALUE 0xffffffff
+
 #define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
 

@@ -51,6 +51,15 @@ extern "C" {
 #endif
 /** @} */
 
+/**
+ * @name    Properties of the timer_gpio_ll backend.
+ * @{
+ */
+#ifdef MODULE_WS281X_TIMER_GPIO_LL
+#define WS281X_HAVE_INIT                    (1)
+#endif
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

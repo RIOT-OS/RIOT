@@ -50,7 +50,7 @@ typedef struct {
 
  static void _tlsf_size_walker(void* ptr, size_t size, int used, void* user)
 {
-    printf("\t%p %s size: %u (%p)\n", ptr, used ? "used" : "free", (unsigned int)size, ptr);
+    printf("\t%p %s size: %" PRIuSIZE " (%p)\n", ptr, used ? "used" : "free", size, ptr);
 
      if (used) {
         ((_tlsf_size_container_t *)user)->used += (unsigned int)size;

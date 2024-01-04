@@ -21,6 +21,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "architecture.h"
 #include "clif.h"
 #include "clif_internal.h"
 
@@ -83,7 +84,7 @@ ssize_t clif_decode_link(clif_t *link, clif_attr_t *attrs, unsigned attrs_len,
     link->attrs = attrs;
     pos += size + 1; /* escape the '>' */
 
-    DEBUG("Found target (%u): %.*s\n", (unsigned)size, (unsigned)size,
+    DEBUG("Found target (%" PRIiSIZE "): %.*s\n", size, (unsigned)size,
           link->target);
 
     /* if there is no attr array iterate over the buffer, if not until all
@@ -129,7 +130,7 @@ ssize_t clif_add_target_from_buffer(const char *target, size_t target_len, char 
     assert(target);
 
     size_t pos = 0;
-    DEBUG("Adding target: %.*s, len: %d\n", target_len, target, target_len);
+    DEBUG("Adding target: %.*s, len: %" PRIuSIZE "\n", (int)target_len, target, target_len);
 
     if (!buf) {
         return target_len + 2; /* size after adding '<' and '>' */
