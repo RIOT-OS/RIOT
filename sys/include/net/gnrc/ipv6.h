@@ -164,18 +164,18 @@ extern "C" {
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
  * IPV6_STATIC_LLADDR ?= '"fe80::cafe:cafe:cafe:1"'
- * CFLAGS += -DGNRC_IPV6_STATIC_LLADDR=$(STATIC_IPV6_LLADDR)
+ * CFLAGS += -DCONFIG_GNRC_IPV6_STATIC_LLADDR=$(STATIC_IPV6_LLADDR)
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
-#define GNRC_IPV6_STATIC_LLADDR
+#define CONFIG_GNRC_IPV6_STATIC_LLADDR
 #endif /* DOXYGEN */
 /** @} */
 
 /**
  * @brief   Use the same static IPv6 link local address on every network interface
  *
- * When GNRC_IPV6_STATIC_LLADDR is used, to not add the interface pid to the set
- * static address but use the same static link local address for all interfaces.
+ * When CONFIG_GNRC_IPV6_STATIC_LLADDR is used, to not add the interface pid to the
+ * set static address but use the same static link local address for all interfaces.
  */
 #ifndef CONFIG_GNRC_IPV6_STATIC_LLADDR_IS_FIXED
 #define CONFIG_GNRC_IPV6_STATIC_LLADDR_IS_FIXED 0

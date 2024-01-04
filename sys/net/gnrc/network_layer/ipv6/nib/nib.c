@@ -115,12 +115,12 @@ void gnrc_ipv6_nib_init(void)
 
 static void _add_static_lladdr(gnrc_netif_t *netif)
 {
-#ifdef GNRC_IPV6_STATIC_LLADDR
+#ifdef CONFIG_GNRC_IPV6_STATIC_LLADDR
     /* parse addr from string and explicitly set a link local prefix
      * if ifnum > 1 each interface will get its own link local address
-     * with GNRC_IPV6_STATIC_LLADDR + i
+     * with CONFIG_GNRC_IPV6_STATIC_LLADDR + i
      */
-    char lladdr_str[] = GNRC_IPV6_STATIC_LLADDR;
+    const char lladdr_str[] = CONFIG_GNRC_IPV6_STATIC_LLADDR;
     ipv6_addr_t lladdr;
 
     if (ipv6_addr_from_str(&lladdr, lladdr_str) != NULL) {
