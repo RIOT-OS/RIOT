@@ -39,14 +39,6 @@
 #include "debug.h"
 
 /**
- * @brief   Threshold under which polling transfers are used instead of DMA
- *          TODO: determine at run-time based on SPI clock
- */
-#ifndef CONFIG_SPI_DMA_THRESHOLD_BYTES
-#define CONFIG_SPI_DMA_THRESHOLD_BYTES  16
-#endif
-
-/**
  * @brief Array holding one pre-initialized mutex for each SPI device
  */
 static mutex_t locks[SPI_NUMOF];
