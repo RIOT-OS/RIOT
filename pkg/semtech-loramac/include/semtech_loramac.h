@@ -528,20 +528,39 @@ void semtech_loramac_set_channels_mask(semtech_loramac_t *mac, uint16_t *mask);
  */
 void semtech_loramac_get_channels_mask(semtech_loramac_t *mac, uint16_t *mask);
 
+
 #ifdef MODULE_PERIPH_EEPROM
 /**
  * @brief   The magic number used to identify the LoRaWAN configuration
  */
 #ifndef SEMTECH_LORAMAC_EEPROM_MAGIC
-#define SEMTECH_LORAMAC_EEPROM_MAGIC        {0x52, 0x49, 0x4F, 0x54} /* RIOT */
+#define SEMTECH_LORAMAC_EEPROM_MAGIC        "LORA"
 #endif
 
 /**
  * @brief   The magic number length used to identify the LoRaWAN configuration
  */
 #ifndef SEMTECH_LORAMAC_EEPROM_MAGIC_LEN
-#define SEMTECH_LORAMAC_EEPROM_MAGIC_LEN    4
+#define SEMTECH_LORAMAC_EEPROM_MAGIC_LEN    5
 #endif
+
+/**
+ * @brief LoRaWAN configuration length
+*/
+#define SEMTECH_LORAMAC_EEPROM_LEN         \
+    (                                      \
+        SEMTECH_LORAMAC_EEPROM_MAGIC_LEN + \
+        LORAMAC_DEVEUI_LEN +               \
+        LORAMAC_APPEUI_LEN +               \
+        LORAMAC_APPKEY_LEN +               \
+        LORAMAC_APPSKEY_LEN +              \
+        LORAMAC_NWKSKEY_LEN +              \
+        LORAMAC_DEVADDR_LEN +              \
+        LORAMAC_UPLINK_COUNTER_LEN +       \
+        LORAMAC_RX2_FREQ_LEN +             \
+        LORAMAC_RX2_DR_LEN +               \
+        SEMTECH_LORAMAC_JOINSTATE_LEN      \
+    )
 
 /**
  * @brief   Start position of LoRaWAN configuration stored in eeprom
@@ -555,21 +574,12 @@ void semtech_loramac_get_channels_mask(semtech_loramac_t *mac, uint16_t *mask);
 */
 #define SEMTECH_LORAMAC_JOINSTATE_LEN       (1U)
 
-#define SEMTECH_LORAMAC_EEPROM_LEN         \
-    (                                      \
-        SEMTECH_LORAMAC_EEPROM_START +     \
-        SEMTECH_LORAMAC_EEPROM_MAGIC_LEN + \
-        LORAMAC_DEVEUI_LEN +               \
-        LORAMAC_APPEUI_LEN +               \
-        LORAMAC_APPKEY_LEN +               \
-        LORAMAC_APPSKEY_LEN +              \
-        LORAMAC_NWKSKEY_LEN +              \
-        LORAMAC_DEVADDR_LEN +              \
-        LORAMAC_UPLINK_COUNTER_LEN +       \
-        LORAMAC_RX2_FREQ_LEN +             \
-        LORAMAC_RX2_DR_LEN +               \
-        SEMTECH_LORAMAC_JOINSTATE_LEN      \
-    )
+
+/**
+ * @brief End position of LoRaWAN configuration stored in eeprom
+*/
+#define SEMTECH_LORAMAC_EEPROM_END \
+    (SEMTECH_LORAMAC_EEPROM_START + SEMTECH_LORAMAC_EEPROM_LEN)
 
 
 /**
