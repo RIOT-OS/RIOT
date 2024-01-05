@@ -154,6 +154,9 @@
  *
  * This mechanism is especially useful when using deep sleep power modes that
  * don't preserve RAM.
+ * 
+ * In addition, if the @ref sys_eepreg module is loaded, this package utilizes 
+ * that to decide where in EEPROM to save its configuration
  *
  * # Low power considerations
  *
