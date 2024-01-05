@@ -53,6 +53,10 @@ APPLICATIONS="${APPLICATIONS} $(make -sC "${RIOTBASE}" info-applications)"
 
 for application in ${APPLICATIONS}; do
     printf "${CNORMAL}%-40s${CRESET}" "${application}"
+
+    # First, remove the board from Makefile.ci; otherwise linking step will be
+    # skipped with RIOT_CI_BUILD=1 when the board is already in the list.
+    make -f "$(dirname "$0")"/Makefile.for_sh DIR="${RIOTBASE}/${application}" REMOVE_BOARDS="${BOARD}" Makefile.ci > /dev/null
     # disable warning about globbing and word splitting for ${LOCAL_MAKE_ARGS}
     # as this is exactly what we want here
     # shellcheck disable=SC2086
@@ -62,7 +66,7 @@ for application in ${APPLICATIONS}; do
                 -e "wraps around address space" \
                 "$TMPFILE" > /dev/null; then
             printf "${CBIG}%s${CRESET}\n" "too big"
-            make -f "$(dirname "$0")"/Makefile.for_sh DIR="${RIOTBASE}/${application}" BOARD="${BOARD}" Makefile.ci > /dev/null
+            make -f "$(dirname "$0")"/Makefile.for_sh DIR="${RIOTBASE}/${application}" ADD_BOARDS="${BOARD}" Makefile.ci > /dev/null
         elif grep -e "not whitelisted" \
                   -e "unsatisfied feature requirements" \
                   -e "Some feature requirements are blacklisted:" \

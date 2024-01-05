@@ -81,6 +81,14 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Threshold under which polling transfers are used instead of DMA
+ *          TODO: determine at run-time based on SPI clock
+ */
+#ifndef CONFIG_SPI_DMA_THRESHOLD_BYTES
+#define CONFIG_SPI_DMA_THRESHOLD_BYTES  16
+#endif
+
+/**
  * @brief   Default SPI device access macro
  */
 #ifndef SPI_DEV

@@ -27,6 +27,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     feather-m0-wifi \
     firefly \
     frdm-kl43z \
+    generic-cc2538-cc2592-dk \
     hamilton \
     i-nucleo-lrwan1 \
     ikea-tradfri \
