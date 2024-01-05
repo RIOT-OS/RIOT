@@ -23,6 +23,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     esp8266-sparkfun-thing \
     firefly \
     frdm-kl43z \
+    generic-cc2538-cc2592-dk \
     hamilton \
     hifive1 \
     hifive1b \

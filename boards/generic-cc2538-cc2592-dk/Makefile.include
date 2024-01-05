@@ -1,0 +1,21 @@
+TTY_BOARD_FILTER := --vendor 'Silicon Labs' --model 'CP2102 USB to UART Bridge Controller'
+
+OPENOCD_DEBUG_ADAPTER ?= jlink
+OPENOCD_TRANSPORT := jtag
+
+ifneq (,$(filter debug debug-server,$(MAKECMDGOALS)))
+  # `make debug` doesn't work with default cc2538-bsl, so let's default
+  # OpenOCD when the user wants to debug
+  PROGRAMMER ?= openocd
+
+  # OpenOCD only works for debugging, not flashing
+  PROGRAMMERS_SUPPORTED += openocd
+endif
+
+ifeq (openocd,$(PROGRAMMER))
+  ifneq (,$(filter flash flash-only,$(MAKECMDGOALS)))
+    $(error "Flashing the generic-cc2538-cc2592-dk via OpenOCD is not supported (yet), only debugging")
+  endif
+endif
+
+include $(RIOTBOARD)/common/cc2538/Makefile.include
