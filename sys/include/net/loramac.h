@@ -646,12 +646,12 @@ extern "C" {
 
 /**
  * @brief RX2 frequency length in bytes
-*/ 
+*/
 #define LORAMAC_RX2_FREQ_LEN                    (4U)
 
 /**
  * @brief RX2 data rate length in bytes
-*/ 
+*/
 #define LORAMAC_RX2_DR_LEN                      (1U)
 
 
