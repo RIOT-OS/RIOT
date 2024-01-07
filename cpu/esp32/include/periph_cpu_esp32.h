@@ -95,8 +95,6 @@ extern "C" {
  * - Vref can be read with function #adc_line_vref_to_gpio at GPIO25.
  */
 
-/** @} */
-
 /**
  * @name   DAC configuration
  *
@@ -128,6 +126,10 @@ extern "C" {
  *
  * The ESP32 LEDC module has 2 channel groups with 8 channels each. Each of
  * these channels can be clocked by one of the 4 timers.
+ */
+
+/**
+ * @name   SDMMC configuration
  */
 
 /**
@@ -213,6 +215,7 @@ extern "C" {
 #define TIMER_NUMOF         (2)
 #define TIMER_CHANNEL_NUMOF (1)
 #endif
+/** @} */
 
 /**
  * @name   UART configuration

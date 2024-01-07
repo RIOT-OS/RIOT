@@ -92,15 +92,15 @@ overridden by \ref esp32_application_specific_configurations
 <center>
 Pin    | Configuration\n ESP32-EVB | Configuration\n ESP32-GATEWAY | Remarks / Prerequisites | Configuration
 :------|:------------------|:-----------------|-|-|
-GPIO13 | I2C_DEV(0):SDA    | SDCARD_CS      | on ESP32-EVB available at [UEXT1](https://www.olimex.com/Products/Modules/UEXT) | \ref esp32_i2c_interfaces "I2C Interfaces"
+GPIO13 | I2C_DEV(0):SDA    | SDMMC_DEV(0):DAT3 | on ESP32-EVB available at [UEXT1](https://www.olimex.com/Products/Modules/UEXT) | \ref esp32_i2c_interfaces "I2C Interfaces", \ref esp32_sdmmc_interfaces "SDMMC Interfaces"
 GPIO16 | I2C_DEV(0):SCL    | I2C_DEV(0):SCL   | on ESP32-EVB available at [UEXT1](https://www.olimex.com/Products/Modules/UEXT) | \ref esp32_i2c_interfaces "I2C Interfaces"
-GPIO14 | SPI_DEV(0):CLK    | SDCARD_CLK     | on ESP32-EVB available at [UEXT1](https://www.olimex.com/Products/Modules/UEXT) | \ref esp32_spi_interfaces "SPI Interfaces"
-GPIO2  | SPI_DEV(0):MISO   | SDCARD_MISO    | on ESP32-EVB available at [UEXT1](https://www.olimex.com/Products/Modules/UEXT) | \ref esp32_spi_interfaces "SPI Interfaces"
-GPIO15 | SPI_DEV(0):MOSI   | SDCARD_MOSI    | on ESP32-EVB available at [UEXT1](https://www.olimex.com/Products/Modules/UEXT) | \ref esp32_spi_interfaces "SPI Interfaces"
+GPIO14 | SPI_DEV(0):CLK, SDMMC_DEV(0):CLK   | SDMMC_DEV(0):CLK | on ESP32-EVB available at [UEXT1](https://www.olimex.com/Products/Modules/UEXT) | \ref esp32_spi_interfaces "SPI Interfaces", \ref esp32_sdmmc_interfaces "SDMMC Interfaces"
+GPIO2  | SPI_DEV(0):MISO, SDMMC_DEV(0):DAT0 | SDMMC_DEV(0):DAT0 | on ESP32-EVB available at [UEXT1](https://www.olimex.com/Products/Modules/UEXT) | \ref esp32_spi_interfaces "SPI Interfaces", \ref esp32_sdmmc_interfaces "SDMMC Interfaces"
+GPIO15 | SPI_DEV(0):MOSI, SDMMC_DEV(0):CMD  | SDMMC_DEV(0):CMD  | on ESP32-EVB available at [UEXT1](https://www.olimex.com/Products/Modules/UEXT) | \ref esp32_spi_interfaces "SPI Interfaces", \ref esp32_sdmmc_interfaces "SDMMC Interfaces"
 GPIO17 | SPI_DEV(0):CS0    | I2C_DEV(0):SDA | on ESP32-EVB available at [UEXT1](https://www.olimex.com/Products/Modules/UEXT) | \ref esp32_spi_interfaces "SPI Interfaces"
 GPIO1  | UART_DEV(0):TxD   | UART_DEV(0):TxD  | Console (cannot be changed) | \ref esp32_uart_interfaces "UART interfaces"
 GPIO3  | UART_DEV(0):RxD   | UART_DEV(0):RxD  | Console (cannot be changed) | \ref esp32_uart_interfaces "UART interfaces"
-GPIO4  | UART_DEV(1):TxD   | N/A | on ESP32-EVB available at [UEXT1](https://www.olimex.com/Products/Modules/UEXT) | \ref esp32_uart_interfaces "UART interfaces"
+GPIO4  | UART_DEV(1):TxD   | SDMMC_DEV(0):DAT1 | on ESP32-EVB available at [UEXT1](https://www.olimex.com/Products/Modules/UEXT) | \ref esp32_uart_interfaces "UART interfaces", \ref esp32_sdmmc_interfaces "SDMMC Interfaces"
 GPIO36 | UART_DEV(1):RxD   | ADC_LINE(2)    | on ESP32-EVB available at [UEXT1](https://www.olimex.com/Products/Modules/UEXT) | \ref esp32_uart_interfaces "UART interfaces"
 GPIO32 | Relais 1          | ADC_LINE(0)      | | \ref esp32_adc_channels "ADC Channels"
 GPIO33 | Relais 2          | LED0             | | |
@@ -109,7 +109,7 @@ GPIO9  | PWM_DEV(0):0      | PWM_DEV(0):0     | | \ref esp32_pwm_channels "PWM C
 GPIO10 | PWM_DEV(0):1      | PWM_DEV(0):1     | | \ref esp32_pwm_channels "PWM Channels"
 GPIO5  | CAN_DEV(0):TX     |                | | \ref esp32_can_interfaces "CAN Interfaces"
 GPIO35 | CAN_DEV(0):RX     | ADC_LINE(1)    | | \ref esp32_adc_channels "ADC Channels"
-GPIO12 | IR_DEV(0):TX      | N/A            | IR is not yet supported | |
+GPIO12 | IR_DEV(0):TX      | SDMMC_DEV(0):DAT2    | IR is not yet supported | \ref esp32_sdmmc_interfaces "SDMMC Interfaces" |
 GPIO39 | IR_DEV(0):RX      | ADC_LINE(3)    | IR is not yet supported | \ref esp32_adc_channels "ADC Channels"
 GPIO18 | EMAC_SMI:MDIO     | EMAC_SMI:MDIO    | LAN interface | \ref esp32_ethernet_network_interface "Ethernet MAC"
 GPIO23 | EMAC_SMI:MDC      | EMAC_SMI:MDC     | LAN interface | \ref esp32_ethernet_network_interface "Ethernet MAC"

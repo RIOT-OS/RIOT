@@ -92,6 +92,9 @@ static const struct intr_handle_data_t _irq_data_table[] = {
 #elif defined(CPU_FAM_ESP32S3)
     { ETS_LCD_CAM_INTR_SOURCE, CPU_INUM_LCD, 1 },
 #endif
+#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3)
+    { ETS_SDIO_HOST_INTR_SOURCE, CPU_INUM_SDMMC, 2 },
+#endif
 };
 
 #define IRQ_DATA_TABLE_SIZE        ARRAY_SIZE(_irq_data_table)
