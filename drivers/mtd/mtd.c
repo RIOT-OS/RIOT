@@ -395,7 +395,8 @@ int mtd_write_sector(mtd_dev_t *mtd, const void *data, uint32_t sector,
     }
 
     uint32_t page = sector * mtd->pages_per_sector;
-    return mtd_write_page_raw(mtd, data, page, 0, page * mtd->page_size);
+    return mtd_write_page_raw(mtd, data, page, 0,
+                              count * mtd->pages_per_sector * mtd->page_size);
 }
 
 int mtd_power(mtd_dev_t *mtd, enum mtd_power_state power)
