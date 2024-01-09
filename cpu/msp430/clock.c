@@ -25,6 +25,7 @@
 #include <stdint.h>
 
 #include "debug.h"
+#include "busy_wait.h"
 #include "macros/math.h"
 #include "macros/units.h"
 #include "periph_conf.h"
@@ -96,22 +97,6 @@ static void check_config(void)
             && (clock_params.target_dco_frequency == 0)) {
         extern void dco_configured_as_clock_source_but_is_disabled(void);
         dco_configured_as_clock_source_but_is_disabled();
-    }
-}
-
-static void busy_wait(uint16_t loops)
-{
-    while (loops) {
-        /* This empty inline assembly should be enough to convince the
-         * compiler that the loop cannot be optimized out. Tested with
-         * GCC 12.2 and clang 16.0.0 successfully. */
-        __asm__ __volatile__ (
-            ""
-            : /* no outputs */
-            : /* no inputs */
-            : /* no clobbers */
-        );
-        loops--;
     }
 }
 
