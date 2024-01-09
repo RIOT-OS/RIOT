@@ -20,7 +20,7 @@ FEATURES_USABLE := $(filter-out $(FEATURES_BLACKLIST) $(FEATURES_WOULD_CONFLICT)
                      $(FEATURES_PROVIDED))
 
 # Features that may be used, if provided.
-FEATURES_OPTIONAL_ONLY := $(sort $(filter-out $(FEATURES_REQUIRED),$(FEATURES_OPTIONAL)))
+FEATURES_OPTIONAL_ONLY := $(sort $(filter-out $(FEATURES_REQUIRED) $(DISABLE_MODULE),$(FEATURES_OPTIONAL)))
 
 # Optional features that end up being used
 FEATURES_OPTIONAL_USED := $(sort $(filter $(FEATURES_USABLE),$(FEATURES_OPTIONAL_ONLY)))
