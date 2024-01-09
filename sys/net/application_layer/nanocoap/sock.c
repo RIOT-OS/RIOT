@@ -451,6 +451,14 @@ ssize_t nanocoap_sock_post(nanocoap_sock_t *sock, const char *path,
                           response, len_max);
 }
 
+ssize_t nanocoap_sock_fetch(nanocoap_sock_t *sock, const char *path,
+                            const void *request, size_t len,
+                            void *response, size_t len_max)
+{
+    return _sock_put_post(sock, path, COAP_METHOD_FETCH, COAP_TYPE_CON, request, len,
+                          response, len_max);
+}
+
 ssize_t nanocoap_sock_put_non(nanocoap_sock_t *sock, const char *path,
                               const void *request, size_t len,
                               void *response, size_t len_max)
@@ -464,6 +472,14 @@ ssize_t nanocoap_sock_post_non(nanocoap_sock_t *sock, const char *path,
                                void *response, size_t len_max)
 {
     return _sock_put_post(sock, path, COAP_METHOD_POST, COAP_TYPE_NON, request, len,
+                          response, len_max);
+}
+
+ssize_t nanocoap_sock_fetch_non(nanocoap_sock_t *sock, const char *path,
+                               const void *request, size_t len,
+                               void *response, size_t len_max)
+{
+    return _sock_put_post(sock, path, COAP_METHOD_FETCH, COAP_TYPE_NON, request, len,
                           response, len_max);
 }
 
@@ -496,6 +512,13 @@ ssize_t nanocoap_sock_post_url(const char *url,
                                void *response, size_t len_max)
 {
     return _sock_put_post_url(url, COAP_METHOD_POST, request, len, response, len_max);
+}
+
+ssize_t nanocoap_sock_fetch_url(const char *url,
+                                const void *request, size_t len,
+                                void *response, size_t len_max)
+{
+    return _sock_put_post_url(url, COAP_METHOD_FETCH, request, len, response, len_max);
 }
 
 ssize_t nanocoap_sock_delete(nanocoap_sock_t *sock, const char *path)
