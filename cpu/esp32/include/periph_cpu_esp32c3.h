@@ -29,6 +29,11 @@ extern "C" {
 #define CLOCK_CORECLOCK     (1000000UL * CONFIG_ESP32C3_DEFAULT_CPU_FREQ_MHZ)
 
 /**
+ * @brief   CPU cycles per busy wait loop
+ */
+#define CPU_CYCLES_PER_LOOP (4)
+
+/**
  * @name   Predefined GPIO names
  * @{
  */
