@@ -14,6 +14,9 @@ CFLAGS += -DNDEBUG -DLOG_LEVEL=LOG_NONE
 DISABLE_MODULE += core_init core_msg core_panic
 DISABLE_MODULE += auto_init auto_init_%
 DISABLE_MODULE += pm_layered
+ifeq (,$(filter riotboot_%_dfu, $(USEMODULE)))
+  DISABLE_MODULE += periph_pm
+endif
 
 # avoid using stdio
 USEMODULE += stdio_null
