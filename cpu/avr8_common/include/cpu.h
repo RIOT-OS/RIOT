@@ -58,6 +58,11 @@ extern "C"
 /** @} */
 
 /**
+ * @brief   CPU cycles per busy wait loop
+ */
+#define CPU_CYCLES_PER_LOOP (7)
+
+/**
  * @name    Use shared I2C functions
  * @{
  */
