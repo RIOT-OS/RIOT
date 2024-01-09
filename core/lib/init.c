@@ -106,8 +106,11 @@ void kernel_init(void)
                       main_trampoline, NULL, "main");
     }
     else {
+        /* RIOT without threads */
         irq_enable();
         main_trampoline(NULL);
+        while (1) {}
+        return;
     }
 
     cpu_switch_context_exit();
