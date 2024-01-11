@@ -170,6 +170,14 @@ extern "C" {
  */
 #define IRQ_API_INLINED     (1)
 
+#if defined(CPU_CORE_CORTEX_M0) || defined(CPU_CORE_CORTEX_M0PLUS) \
+ || defined(CPU_CORE_CORTEX_M23)
+/**
+ * @brief   CPU cycles per busy wait loop
+ */
+#define CPU_CYCLES_PER_LOOP (4)
+#endif
+
 #ifdef __cplusplus
 }
 #endif
