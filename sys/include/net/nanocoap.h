@@ -1763,6 +1763,7 @@ static inline size_t coap_opt_put_uri_query(uint8_t *buf, uint16_t lastonum,
  * @param[out]  buf         buffer to write to
  * @param[in,out] lastonum  number of previous option (for delta calculation),
  *                          or 0 if first option
+ *                          May be NULL, then previous option is assumed to be 0.
  * @param[in]   uri         ptr into a source URI, to the first character after
  *                          the authority component
  *
