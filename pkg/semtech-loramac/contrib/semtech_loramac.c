@@ -294,14 +294,8 @@ static inline void _read_loramac_config(uint32_t pos, semtech_loramac_t *mac)
     _set_join_state(mac, (bool)joined);
 }
 
-static inline size_t _save_uplink_counter(semtech_loramac_t *mac)
+static inline size_t _save_uplink_counter(size_t pos, semtech_loramac_t *mac)
 {
-    size_t pos = SEMTECH_LORAMAC_EEPROM_START +
-                 SEMTECH_LORAMAC_EEPROM_MAGIC_LEN +
-                 LORAMAC_DEVEUI_LEN + LORAMAC_APPEUI_LEN +
-                 LORAMAC_APPKEY_LEN + LORAMAC_APPSKEY_LEN +
-                 LORAMAC_NWKSKEY_LEN + LORAMAC_DEVADDR_LEN;
-
     uint32_t ul_counter;
 
     mutex_lock(&mac->lock);
@@ -337,7 +331,7 @@ static inline void _save_config(uint32_t pos, semtech_loramac_t *mac)
     pos += eeprom_write(pos, devaddr, LORAMAC_DEVADDR_LEN);
 
     /* save uplink counter, mainly used for ABP activation */
-    pos += _save_uplink_counter(mac);
+    pos += _save_uplink_counter(pos, mac);
 
     /* save RX2 freq */
     uint32_t rx2_freq = semtech_loramac_get_rx2_freq(mac);
@@ -818,8 +812,18 @@ void *_semtech_loramac_event_loop(void *arg)
                     status = SEMTECH_LORAMAC_TX_DONE;
 #ifdef MODULE_PERIPH_EEPROM
                     /* save the uplink counter */
-                    _save_uplink_counter(mac);
+#ifdef MODULE_EEPREG
+                    /* EEPREG is used, find base config address*/
+                    uint32_t pos;
+                    eepreg_read(&pos, SEMTECH_LORAMAC_EEPROM_MAGIC);
+#else
+                    /* EEPREG is not used, use the static address*/
+                    uint32_t pos = SEMTECH_LORAMAC_EEPROM_START;
 #endif
+                    pos += SEMTECH_LORAMAC_EEPROM_UPLINK_COUNTER_OFFSET;
+                    _save_uplink_counter(pos, mac);
+
+#endif /* MODULE_PERIPH_EEPROM */
                     if (IS_ACTIVE(ENABLE_DEBUG)) {
                         switch (confirm->McpsRequest) {
                         case MCPS_UNCONFIRMED:
