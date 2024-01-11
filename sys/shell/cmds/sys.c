@@ -26,6 +26,9 @@
 #ifdef MODULE_USB_BOARD_RESET
 #include "usb_board_reset.h"
 #endif
+#ifdef MODULE_RIOTBOOT_SLOT
+#include "riotboot/slot.h"
+#endif
 
 static int _reboot_handler(int argc, char **argv)
 {
@@ -59,6 +62,14 @@ static int _version_handler(int argc, char **argv)
     (void) argv;
 
     puts(RIOT_VERSION);
+
+#ifdef MODULE_RIOTBOOT_SLOT
+    int slot = riotboot_slot_current();
+    if (slot >= 0) {
+        const riotboot_hdr_t *hdr = riotboot_slot_get_hdr(slot);
+        printf("%s v%"PRIu32", slot %u\n", RIOT_APPLICATION, hdr->version, slot);
+    }
+#endif
 
     return 0;
 }
