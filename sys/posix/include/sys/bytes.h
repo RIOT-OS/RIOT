@@ -28,7 +28,14 @@
 extern "C" {
 #endif
 
+#ifndef __socklen_t_defined
+#if SIZE_MAX < UINT32_MAX
 typedef size_t socklen_t;           /**< socket address length */
+#else
+// Specification calls for at least 32 bits
+typedef uint32_t socklen_t;         /**< socket address length */
+#endif
+#endif
 
 #ifdef __cplusplus
 }

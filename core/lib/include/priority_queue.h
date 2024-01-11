@@ -48,6 +48,11 @@ typedef struct {
 #define PRIORITY_QUEUE_NODE_INIT { NULL, 0, 0 }
 
 /**
+ * @brief Constant for signaling in the priority queue data member.
+ */
+#define PRIORITY_QUEUE_DATA_SIGNALING (UINTPTR_MAX)
+
+/**
  * @brief   Initialize a priority queue node object.
  * @details For initialization of variables use PRIORITY_QUEUE_NODE_INIT
  *          instead. Only use this function for dynamically allocated
