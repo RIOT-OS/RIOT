@@ -204,42 +204,29 @@ static int cmd_write(int argc, char **argv)
 }
 #endif
 
-static uint32_t getaddr(const char *str)
+static uintptr_t getaddr(const char *str)
 {
-    uint32_t addr = strtol(str, NULL, 16);
+    uintptr_t addr = (uintptr_t)strtol(str, NULL, 16);
 
     return addr;
 }
 
 static int cmd_write_raw(int argc, char **argv)
 {
-#if (__SIZEOF_POINTER__ == 2)
-    uint16_t addr;
-#else
-    uint32_t addr;
-#endif
+    uintptr_t addr;
 
     if (argc < 3) {
         printf("usage: %s <addr> <data>\n", argv[0]);
         return 1;
     }
 
-#if (__SIZEOF_POINTER__ == 2)
-    addr = (uint16_t) getaddr(argv[1]);
-#else
     addr = getaddr(argv[1]);
-#endif
     /* try to align */
     memcpy(raw_buf, argv[2], strlen(argv[2]));
 
-    flashpage_write((void*)addr, raw_buf, strlen(raw_buf));
-#if (__SIZEOF_POINTER__ == 2)
-    printf("wrote local data to flash address %#" PRIx16 " of len %" PRIuSIZE "\n",
+    flashpage_write((void*)(uintptr_t)addr, raw_buf, strlen(raw_buf));
+    printf("wrote local data to flash address %#" PRIxPTR " of len %" PRIuSIZE "\n",
            addr, strlen(raw_buf));
-#else
-    printf("wrote local data to flash address %#" PRIx32 " of len %" PRIuSIZE "\n",
-           addr, strlen(raw_buf));
-#endif
     return 0;
 }
 

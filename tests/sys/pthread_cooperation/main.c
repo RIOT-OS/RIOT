@@ -32,7 +32,7 @@ volatile uint32_t storage = 1;
 
 void *run(void *parameter)
 {
-    int arg = (int) parameter;
+    int arg = (intptr_t) parameter;
     printf("My arg: %d\n", arg);
 
     int err = pthread_mutex_lock(&mtx);
@@ -56,8 +56,8 @@ int main(void)
     pthread_attr_init(&th_attr);
     pthread_mutex_init(&mtx, NULL);
 
-    for (int i = 0; i < NUM_THREADS; ++i) {
-        printf("Creating thread with arg %d\n", (i + 1));
+    for (intptr_t i = 0; i < NUM_THREADS; ++i) {
+        printf("Creating thread with arg %" PRIdPTR "\n", (i + 1));
         pthread_create(&ths[i], &th_attr, run, (void *)(i + 1));
     }
 

@@ -73,7 +73,7 @@ int netdev_ieee802154_minimal_init_devs(netdev_event_cb_t cb) {
     puts("Initializing AT86RF2XX devices");
 
     for (unsigned i = 0; i < AT86RF2XX_NUM; i++) {
-        printf("%d out of %d\n", i + 1, AT86RF2XX_NUM);
+        printf("%d out of %u\n", i + 1, (unsigned)AT86RF2XX_NUM);
         /* setup the specific driver */
         at86rf2xx_setup(&at86rf2xx[i], &at86rf2xx_params[i], i);
 

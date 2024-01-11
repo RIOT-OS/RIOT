@@ -11,6 +11,8 @@ USEMODULE += netdev_test
 
 CFLAGS += -DTEST_SUITES
 
+INCLUDES += -I$(RIOTBASE)/sys/net/gnrc/pktbuf_static/include
+
 # microbit qemu failing currently
 TEST_ON_CI_BLACKLIST += microbit
 

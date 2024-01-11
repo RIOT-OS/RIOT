@@ -25,6 +25,8 @@
 #include "unittests-constants.h"
 #include "tests-pktbuf.h"
 
+#define ALIGNMENT_SIZE (2 * sizeof(uintptr_t))
+
 typedef struct __attribute__((packed)) {
     uint8_t u8;
     uint16_t u16;
@@ -250,14 +252,14 @@ static void test_pktbuf_add__packed_struct(void)
 #ifndef MODULE_GNRC_PKTBUF_MALLOC   /* alignment-handling left to malloc, so no certainty here */
 static void test_pktbuf_add__unaligned_in_aligned_hole(void)
 {
-    gnrc_pktsnip_t *pkt1 = gnrc_pktbuf_add(NULL, NULL, 8, GNRC_NETTYPE_TEST);
-    gnrc_pktsnip_t *pkt2 = gnrc_pktbuf_add(NULL, NULL, 8, GNRC_NETTYPE_TEST);
-    gnrc_pktsnip_t *pkt3 = gnrc_pktbuf_add(NULL, NULL, 8, GNRC_NETTYPE_TEST);
+    gnrc_pktsnip_t *pkt1 = gnrc_pktbuf_add(NULL, NULL, ALIGNMENT_SIZE, GNRC_NETTYPE_TEST);
+    gnrc_pktsnip_t *pkt2 = gnrc_pktbuf_add(NULL, NULL, ALIGNMENT_SIZE, GNRC_NETTYPE_TEST);
+    gnrc_pktsnip_t *pkt3 = gnrc_pktbuf_add(NULL, NULL, ALIGNMENT_SIZE, GNRC_NETTYPE_TEST);
     gnrc_pktsnip_t *pkt4;
     void *tmp_data2 = pkt2->data;
 
     gnrc_pktbuf_release(pkt2);
-    pkt4 = gnrc_pktbuf_add(NULL, TEST_STRING12, 9, GNRC_NETTYPE_TEST);
+    pkt4 = gnrc_pktbuf_add(NULL, TEST_STRING64, ALIGNMENT_SIZE + 1, GNRC_NETTYPE_TEST);
 
     TEST_ASSERT(tmp_data2 != pkt4->data);
 
@@ -820,14 +822,14 @@ static void test_pktbuf_start_write__pkt_users_2(void)
 static void test_pktbuf_reverse_snips__too_full(void)
 {
     gnrc_pktsnip_t *pkt, *pkt_next, *pkt_huge;
-    const size_t pkt_huge_size = CONFIG_GNRC_PKTBUF_SIZE - (3 * 8) -
+    const size_t pkt_huge_size = CONFIG_GNRC_PKTBUF_SIZE - (3 * ALIGNMENT_SIZE) -
                                  (3 * sizeof(gnrc_pktsnip_t)) - 4;
 
-    pkt_next = gnrc_pktbuf_add(NULL, TEST_STRING8, 8, GNRC_NETTYPE_TEST);
+    pkt_next = gnrc_pktbuf_add(NULL, TEST_STRING16, ALIGNMENT_SIZE, GNRC_NETTYPE_TEST);
     TEST_ASSERT_NOT_NULL(pkt_next);
     /* hold to enforce duplication */
     gnrc_pktbuf_hold(pkt_next, 1);
-    pkt = gnrc_pktbuf_add(pkt_next, TEST_STRING8, 8, GNRC_NETTYPE_TEST);
+    pkt = gnrc_pktbuf_add(pkt_next, TEST_STRING16, 8, GNRC_NETTYPE_TEST);
     TEST_ASSERT_NOT_NULL(pkt);
     /* filling up rest of packet buffer */
     pkt_huge = gnrc_pktbuf_add(NULL, NULL, pkt_huge_size, GNRC_NETTYPE_UNDEF);
