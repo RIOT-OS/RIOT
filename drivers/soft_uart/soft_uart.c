@@ -65,7 +65,7 @@ struct uart_ctx {
 
 static void _tx_timer_cb(void *arg, int chan)
 {
-    soft_uart_t uart = (soft_uart_t)arg;
+    soft_uart_t uart = (soft_uart_t)(uintptr_t)arg;
 
     const soft_uart_conf_t *cfg = &soft_uart_config[uart];
     struct uart_ctx *ctx = &soft_uart_ctx[uart];
@@ -81,7 +81,7 @@ static void _tx_timer_cb(void *arg, int chan)
 
 static void _rx_timer_cb(void *arg, int chan)
 {
-    soft_uart_t uart = (soft_uart_t)arg;
+    soft_uart_t uart = (soft_uart_t)(uintptr_t)arg;
 
     const soft_uart_conf_t *cfg = &soft_uart_config[uart];
     struct uart_ctx *ctx = &soft_uart_ctx[uart];
@@ -101,7 +101,7 @@ static void _rx_timer_cb(void *arg, int chan)
 
 static void _rx_gpio_cb(void *arg)
 {
-    soft_uart_t uart = (soft_uart_t)arg;
+    soft_uart_t uart = (soft_uart_t)(uintptr_t)arg;
 
     const soft_uart_conf_t *cfg = &soft_uart_config[uart];
     struct uart_ctx *ctx = &soft_uart_ctx[uart];
@@ -166,18 +166,18 @@ int soft_uart_init(soft_uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void
     ctx->state_rx = STATE_RX_IDLE;
 
     if (gpio_is_valid(cfg->tx_pin)) {
-        timer_init(cfg->tx_timer, cfg->timer_freq, _tx_timer_cb, (void *)uart);
+        timer_init(cfg->tx_timer, cfg->timer_freq, _tx_timer_cb, (void *)(uintptr_t)uart);
         gpio_write(cfg->tx_pin, !(cfg->flags & SOFT_UART_FLAG_INVERT_TX));
         gpio_init(cfg->tx_pin, GPIO_OUT);
     }
 
     if (rx_cb) {
-        timer_init(cfg->rx_timer, cfg->timer_freq, _rx_timer_cb, (void *)uart);
+        timer_init(cfg->rx_timer, cfg->timer_freq, _rx_timer_cb, (void *)(uintptr_t)uart);
         timer_stop(cfg->rx_timer);
         /* timer should fire at the end of the byte */
         timer_set_periodic(cfg->rx_timer, 0, ctx->bit_time * (BITS_DATA(ctx) + BITS_PARITY(ctx) + 1),
                            TIM_FLAG_RESET_ON_MATCH | TIM_FLAG_RESET_ON_SET);
-        gpio_init_int(cfg->rx_pin, GPIO_IN, GPIO_BOTH, _rx_gpio_cb, (void*) uart);
+        gpio_init_int(cfg->rx_pin, GPIO_IN, GPIO_BOTH, _rx_gpio_cb, (void*)(uintptr_t)uart);
     }
 
     return 0;
