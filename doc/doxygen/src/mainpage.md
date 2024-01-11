@@ -5,14 +5,14 @@ RIOT Documentation                                                  {#mainpage}
 
 RIOT in a nutshell                                        {#riot-in-a-nutshell}
 ==================
-RIOT is an open-source  microkernel-based operating system, designed to match
+RIOT is an open-source microcontroller operating system, designed to match
 the requirements of Internet of Things (IoT) devices and other embedded
 devices. These requirements include a very low memory footprint (on the order
 of a few kilobytes), high energy efficiency, real-time capabilities, support
 for a wide range of low-power hardware, communication stacks for wireless and
 communication stacks for wired networks.
 
-RIOT provides a microkernel, multiple network stacks, and utilities which
+RIOT provides threading, multiple network stacks, and utilities which
 include cryptographic libraries, data structures (bloom filters, hash tables,
 priority queues), a shell and more. RIOT supports a wide range of
 microcontroller architectures, radio drivers, sensors, and configurations for
@@ -167,7 +167,7 @@ See @ref drivers for more details.
 
 sys
 ---
-RIOT follows the micro-kernel design paradigm where everything is supposed to
+RIOT follows a modular design paradigm where everything is supposed to
 be a module. All of these modules that are not part of the hardware abstraction
 nor device drivers can be found in this directory. The libraries include data
 structures (e.g. bloom, color), crypto libraries (e.g. hashes, AES) ,
