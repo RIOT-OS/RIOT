@@ -191,7 +191,7 @@ int netdev_ieee802154_minimal_init_devs(netdev_event_cb_t cb) {
         at86rf215_t *at86rf215_subghz = NULL;
         at86rf215_t *at86rf215_24ghz = NULL;
 
-        printf("%d out of %d\n", i + 1, AT86RF215_NUM);
+        printf("%d out of %u\n", i + 1, (unsigned)AT86RF215_NUM);
 
         if (IS_USED(MODULE_AT86RF215_SUBGHZ)) {
             puts("Sub-GHz");
