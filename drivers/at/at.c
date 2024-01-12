@@ -58,24 +58,8 @@
 #define AT_PRINT_INCOMING (0)
 #endif
 
-#if defined(MODULE_AT_URC_ISR_LOWEST)
-#define AT_EVENT_PRIO EVENT_PRIO_LOWEST
-#elif defined(MODULE_AT_URC_ISR_MEDIUM)
-#define AT_EVENT_PRIO EVENT_PRIO_MEDIUM
-#elif defined(MODULE_AT_URC_ISR_HIGHEST)
-#define AT_EVENT_PRIO EVENT_PRIO_HIGHEST
-#endif
-
 #if defined(MODULE_AT_URC)
 static int _check_urc(clist_node_t *node, void *arg);
-#endif
-
-#if defined(MODULE_AT_URC_ISR)
-static void _event_process_urc(event_t *_event)
-{
-    at_dev_t *dev = (at_dev_t *)container_of(_event, at_dev_t, event);
-    at_process_urc(dev, 1000);
-}
 #endif
 
 static ssize_t at_readline_skip_empty_stop_at_str(at_dev_t *dev, char *resp_buf,
@@ -94,11 +78,6 @@ static void _isrpipe_write_one_wrapper(void *_dev, uint8_t data)
 {
     at_dev_t *dev = (at_dev_t *) _dev;
     isrpipe_write_one(&dev->isrpipe, data);
-#if defined(MODULE_AT_URC_ISR)
-    if (data == AT_RECV_EOL_2[0] && !dev->awaiting_response) {
-        event_post(AT_EVENT_PRIO, &dev->event);
-    }
-#endif
 }
 
 int at_dev_init(at_dev_t *dev, at_dev_init_t const *init)
@@ -107,11 +86,6 @@ int at_dev_init(at_dev_t *dev, at_dev_init_t const *init)
     assert(init->rp_buf_size >= 16);
     dev->rp_buf = init->rp_buf;
     dev->rp_buf_size = init->rp_buf_size;
-
-#if IS_USED(MODULE_AT_URC_ISR)
-    dev->awaiting_response = false;
-    dev->event.handler = _event_process_urc;
-#endif
 
     isrpipe_init(&dev->isrpipe, (uint8_t *)init->rx_buf, init->rx_buf_size);
 
@@ -150,11 +124,6 @@ int at_parse_resp(at_dev_t *dev, char const *resp)
 int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout)
 {
     int res = 0;
-
-#if IS_USED(MODULE_AT_URC_ISR)
-    dev->awaiting_response = true;
-#endif
-
     while (*bytes) {
         char c;
         if ((res = isrpipe_read_timeout(&dev->isrpipe, (uint8_t *)&c, 1, timeout)) == 1) {
@@ -171,12 +140,7 @@ int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout)
         }
     }
     res = 0;
-
 out:
-#if IS_USED(MODULE_AT_URC_ISR)
-    dev->awaiting_response = false;
-#endif
-
     return res;
 }
 
@@ -197,11 +161,6 @@ void at_send_bytes(at_dev_t *dev, const char *bytes, size_t len)
 ssize_t at_recv_bytes(at_dev_t *dev, char *bytes, size_t len, uint32_t timeout)
 {
     char *resp_pos = bytes;
-
-#if IS_USED(MODULE_AT_URC_ISR)
-    dev->awaiting_response = true;
-#endif
-
     while (len) {
         int read_res;
         if ((read_res = isrpipe_read_timeout(&dev->isrpipe, (uint8_t *)resp_pos,
@@ -213,11 +172,6 @@ ssize_t at_recv_bytes(at_dev_t *dev, char *bytes, size_t len, uint32_t timeout)
             break;
         }
     }
-
-#if IS_USED(MODULE_AT_URC_ISR)
-    dev->awaiting_response = false;
-#endif
-
     return (resp_pos - bytes);
 }
 
@@ -227,10 +181,6 @@ int at_recv_bytes_until_string(at_dev_t *dev, const char *string,
     size_t len = 0;
     char *_string = (char *)string;
     int res = 0;
-
-#if IS_USED(MODULE_AT_URC_ISR)
-    dev->awaiting_response = true;
-#endif
 
     while (*_string && len < *bytes_len) {
         char c;
@@ -249,11 +199,6 @@ int at_recv_bytes_until_string(at_dev_t *dev, const char *string,
         }
     }
     *bytes_len = len;
-
-#if IS_USED(MODULE_AT_URC_ISR)
-    dev->awaiting_response = false;
-#endif
-
     return res;
 }
 
@@ -282,18 +227,10 @@ void at_drain(at_dev_t *dev)
     uint8_t _tmp[16];
     int res;
 
-#if IS_USED(MODULE_AT_URC_ISR)
-    dev->awaiting_response = true;
-#endif
-
     do {
         /* consider no character within 10ms "drained" */
         res = isrpipe_read_timeout(&dev->isrpipe, _tmp, sizeof(_tmp), 10000U);
     } while (res > 0);
-
-#if IS_USED(MODULE_AT_URC_ISR)
-    dev->awaiting_response = false;
-#endif
 }
 
 ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command,
@@ -498,10 +435,6 @@ static size_t at_readline_stop_at_str(at_dev_t *dev, char *resp_buf, size_t len,
     ssize_t res = 0;
     char *resp_pos = resp_buf;
 
-#if IS_USED(MODULE_AT_URC_ISR)
-    dev->awaiting_response = true;
-#endif
-
     memset(resp_buf, 0, len);
     size_t substr_len = 0;
     if (substr) {
@@ -544,11 +477,6 @@ static size_t at_readline_stop_at_str(at_dev_t *dev, char *resp_buf, size_t len,
             break;
         }
     }
-
-#if IS_USED(MODULE_AT_URC_ISR)
-    dev->awaiting_response = false;
-#endif
-
     if (res < 0) {
         *resp_buf = '\0';
     } else {
