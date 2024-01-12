@@ -292,7 +292,7 @@ void lcd_ll_release(lcd_t *dev)
 void lcd_ll_write_cmd(lcd_t *dev, uint8_t cmd, const uint8_t *data,
                       size_t len)
 {
-    DEBUG("[%s] command 0x%02x (%u) ", __func__, cmd, len);
+    DEBUG("[%s] command 0x%02x (%" PRIuSIZE ") ", __func__, cmd, len);
     if (IS_USED(ENABLE_DEBUG) && len) {
         for (uint8_t i = 0; i < len; i++) {
              DEBUG("0x%02x ", data[i]);
@@ -310,7 +310,7 @@ void lcd_ll_read_cmd(lcd_t *dev, uint8_t cmd, uint8_t *data, size_t len)
 {
     assert(len);
 
-    DEBUG("[%s] command 0x%02x (%u) ", __func__, cmd, len);
+    DEBUG("[%s] command 0x%02x (%" PRIuSIZE ") ", __func__, cmd, len);
 
     lcd_ll_cmd_start(dev, cmd, true);
     lcd_ll_read_bytes(dev, false, data, len);
