@@ -32,7 +32,7 @@ extern "C" {
 typedef struct priority_queue_node {
     struct priority_queue_node *next;   /**< next queue node */
     uint32_t priority;                  /**< queue node priority */
-    unsigned int data;                  /**< queue node data */
+    uintptr_t data;                     /**< queue node data */
 } priority_queue_node_t;
 
 /**
