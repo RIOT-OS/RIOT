@@ -151,7 +151,7 @@ static void _dump(gnrc_pktsnip_t *pkt)
     gnrc_pktsnip_t *snip = pkt;
 
     while (snip != NULL) {
-        printf("~~ SNIP %2" PRIuSIZE " - size: %3u byte, type: ", snips,
+        printf("~~ SNIP %2i - size: %3" PRIuSIZE " byte, type: ", snips,
                snip->size);
         _dump_snip(snip);
         ++snips;
