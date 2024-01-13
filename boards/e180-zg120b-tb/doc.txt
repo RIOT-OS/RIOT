@@ -4,6 +4,8 @@
  * @brief       Support for Ebyte E180-ZG120B-TB Test Board
 
 ## Overview
+![Image of the E180-ZG120B test board](https://www.ebyte.com/Uploadfiles/Picture/2019-12-20/201912201352132348.jpg)
+
 Ebyte E180-ZG120B Test Board is equipped with the EFM32 microcontroller.
 It is specifically designed for low-power applications, having energy-saving
 peripherals, different energy modes and short wake-up times.
@@ -161,8 +163,20 @@ This MCU has extended pin mapping support. Each pin of a peripheral can be
 connected separately to one of the predefined pins for that peripheral.
 
 ## Flashing the device
-To flash, [SEGGER JLink](https://www.segger.com/jlink-software.html) is
-required.
+The board has no integrated programmer/debugger and no bootloader. Hence,
+an external SWD programmer/debugger such as the [SEGGER JLink][prog-jlink]
+or the [ST-Link][prog-stlink] is required. Connect at least the SWDIO, SWCLK,
+and GND to the programmer. If `JLinkExe` is found in `$PATH`, `jlink` is used
+by default for flashing, otherwise `openocd` is the default. When using OpenOCD,
+the `stlink` is the default for `OPENOCD_DEBUG_ADAPTER`; provide a different
+value if you use other hardware.
+
+@note   When flashing with OpenOCD, leave the NRESET pin unconnected. The
+        configuration does a soft reset only to work around an issue attaching
+        with the hardware reset signal.
+
+[prog-jlink]: https://www.segger.com/jlink-software.html
+[prog-stlink]: https://www.aliexpress.com/wholesale?SearchText=stlink
 
 Flashing is supported by RIOT-OS using the command below:
 
