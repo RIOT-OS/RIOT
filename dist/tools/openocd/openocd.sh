@@ -484,7 +484,7 @@ do_term() {
             -c 'bindto ${OPENOCD_SERVER_ADDRESS}' \
             -c 'tcl_port 0' \
             -c 'telnet_port 0' \
-            -c 'gdb_port 0' \
+            -c 'gdb_port 3333' \
             -c init \
             -c 'rtt setup '${RAM_START_ADDR}' '${RAM_LEN}' \"SEGGER RTT\"' \
             -c 'rtt start' \
