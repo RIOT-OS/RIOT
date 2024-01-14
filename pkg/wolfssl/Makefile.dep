@@ -90,5 +90,27 @@ ifneq (,$(filter native,$(CPU)))
   USEMODULE += libc_gettimeofday
 endif
 
+ifneq (,$(filter sock_tls_new_poc,$(USEMODULE)))
+USEMODULE += sock_udp
+USEMODULE += sock_tcp
+USEMODULE += sock_tls
+USEMODULE += sock_async_event
+USEMODULE += ztimer_msec
+# Configuration for wolfSSL
+USEMODULE += wolfssl_dtls
+USEMODULE += wolfcrypt_rsa 
+CFLAGS += -DWOLFSSL_SP_MATH_ALL -Wno-unused-parameter
+# Configuration for GNRC network interfaces
+# Can be moved to the application level
+USEMODULE += auto_init_gnrc_netif
+USEMODULE += gnrc_ipv6_default
+# Activate ICMPv6 error messages
+USEMODULE += gnrc_icmpv6_error
+# Specify the mandatory networking module for a IPv6 routing node
+USEMODULE += gnrc_ipv6_router_default
+# Additional networking modules that can be dropped if not needed
+USEMODULE += gnrc_icmpv6_echo
+endif
+
 # wolfssl is only supported by 32 bit architectures
 FEATURES_REQUIRED += arch_32bit

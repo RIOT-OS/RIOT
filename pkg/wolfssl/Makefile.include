@@ -10,6 +10,11 @@ ifneq (,$(filter sock_tls,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/wolfssl/sock_tls
 endif
 
+ifneq (,$(filter sock_tls_new_poc,$(USEMODULE)))
+  INCLUDES += -I$(RIOTBASE)/pkg/wolfssl/sock_tls_new_poc/include
+  DIRS += $(RIOTBASE)/pkg/wolfssl/sock_tls_new_poc
+endif
+
 # wolfcrypt implements different options using pseudomodules
 PSEUDOMODULES += wolfcrypt_%
 

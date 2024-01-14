@@ -331,7 +331,56 @@ void sock_dtls_session_destroy(sock_tls_t *sk);
 void sock_dtls_close(sock_tls_t *sk);
 
 #ifdef MODULE_SOCK_TCP
-#   error Only support for UDP/IP provided via GNRC stack.
+
+/**
+ * @brief   Creates a new TLS sock object.
+ *
+ * @pre `(sock != NULL)`
+ *
+ * @param[out] sock     The resulting TLS sock object.
+ * @param[in] method    Defines the SSL or TLS protocol for the client to use.
+ *                      For example, `wolfTLSv1_2_client_method()`.
+ * @return  0 on success.
+ * @return  -ENOMEM, if not enough resources can be provided for `sock` to be
+ *          created.
+ */
+
+int sock_tls_create(sock_tls_t *sock, WOLFSSL_METHOD *method);
+
+/**
+ * @brief   Creates a new TLS session from an existing `sock_tls_t` object.
+ * 
+ * @pre `(sk != NULL)`
+ * @param[in] sk      The sock object previously created using @ref sock_tls_create.
+ * @param[in] app_ctx The application context to be passed to the callback functions.
+ *                    May be NULL or application decides if need timeout per tcp read operation.
+ * @return  0 on success.
+ * @return  -EINVAL, if @sock is null or the SSL context is not initialized yet.
+ * @return  -ENOMEM, if not enough resources can be provided for the session to be
+*/
+int sock_tls_session_create(sock_tls_t *sk, void *app_ctx);
+
+/**
+* @brief   Callback funtion type get the TCP receive timeout in ms. 
+*/
+
+typedef int (*GetTcpRecvTimeoutCallback)(void *context);
+
+/**
+* @brief   Sets the callback function to get the TCP receive timeout in ms. 
+*/
+void setGetTcpRecvTimeoutCallback(GetTcpRecvTimeoutCallback callback);
+
+/**
+ * @brief   Destroys the TLS session associated to the sock object.
+ *
+ * @pre `(sk != NULL)`
+ *
+ * @param[in] sk      The sock object containing the session to destroy.
+ *
+ */
+void sock_tls_session_destroy(sock_tls_t *sk);
+
 #endif
 
 #ifdef __cplusplus
