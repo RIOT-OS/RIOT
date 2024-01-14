@@ -1,24 +1,25 @@
-From c68e8e74d3de1235c4d818d96573e33e42cbcb74 Mon Sep 17 00:00:00 2001
-From: Alexandre Abadie <alexandre.abadie@inria.fr>
-Date: Thu, 11 Mar 2021 17:06:43 +0100
-Subject: [PATCH 1/1] adapt to RIOT
+From a0fe92c8382142688c4239eff3b380703ff52cfc Mon Sep 17 00:00:00 2001
+From: Didier DONSEZ <didier.donsez@gmail.com>
+Date: Sun, 14 Jan 2024 23:33:20 +0100
+Subject: [PATCH] [PATCH 1/1] adapt to RIOT
 
 ---
  src/sx126x.c                                | 4 ++--
  src/{sx126x.h => sx126x_driver.h}           | 6 +++---
  src/{sx126x_regs.h => sx126x_driver_regs.h} | 0
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ src/sx126x_lr_fhss.c                        | 5 +++++
+ 4 files changed, 10 insertions(+), 5 deletions(-)
  rename src/{sx126x.h => sx126x_driver.h} (99%)
  rename src/{sx126x_regs.h => sx126x_driver_regs.h} (100%)
 
 diff --git a/src/sx126x.c b/src/sx126x.c
-index a61c3ce..2fa7d88 100644
+index 390ad2a..f8fc533 100644
 --- a/src/sx126x.c
 +++ b/src/sx126x.c
-@@ -35,9 +35,9 @@
+@@ -37,9 +37,9 @@
+  * --- DEPENDENCIES ------------------------------------------------------------
   */
- 
- #include <string.h>  // memcpy
+ #include <stddef.h>
 -#include "sx126x.h"
 +#include "sx126x_driver.h"
  #include "sx126x_hal.h"
@@ -31,11 +32,11 @@ diff --git a/src/sx126x.h b/src/sx126x_driver.h
 similarity index 99%
 rename from src/sx126x.h
 rename to src/sx126x_driver.h
-index 634ed82..e5ed101 100644
+index 29f15b3..35f279d 100644
 --- a/src/sx126x.h
 +++ b/src/sx126x_driver.h
-@@ -29,8 +29,8 @@
-  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+@@ -32,8 +32,8 @@
+  * POSSIBILITY OF SUCH DAMAGE.
   */
  
 -#ifndef SX126X_H
@@ -45,7 +46,7 @@ index 634ed82..e5ed101 100644
  
  #ifdef __cplusplus
  extern "C" {
-@@ -1517,6 +1517,6 @@ sx126x_status_t sx126x_set_trimming_capacitor_values( const void* context, const
+@@ -1743,6 +1743,6 @@ sx126x_status_t sx126x_get_lora_params_from_header( const void* context, sx126x_
  }
  #endif
  
@@ -57,6 +58,29 @@ diff --git a/src/sx126x_regs.h b/src/sx126x_driver_regs.h
 similarity index 100%
 rename from src/sx126x_regs.h
 rename to src/sx126x_driver_regs.h
+diff --git a/src/sx126x_lr_fhss.c b/src/sx126x_lr_fhss.c
+index a55dc2a..6bd7595 100644
+--- a/src/sx126x_lr_fhss.c
++++ b/src/sx126x_lr_fhss.c
+@@ -135,6 +135,8 @@ static inline unsigned int sx126x_lr_fhss_get_grid_in_pll_steps( const sx126x_lr
+ 
+ sx126x_status_t sx126x_lr_fhss_init( const void* context, const sx126x_lr_fhss_params_t* params )
+ {
++	(void)params;
++
+     const uint8_t pkt_params_buf[] = {
+         SX126X_SET_PKT_PARAMS, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+     };
+@@ -369,6 +371,9 @@ sx126x_status_t sx126x_lr_fhss_handle_hop( const void* context, const sx126x_lr_
+ sx126x_status_t sx126x_lr_fhss_handle_tx_done( const void* context, const sx126x_lr_fhss_params_t* params,
+                                                sx126x_lr_fhss_state_t* state )
+ {
++	(void)params;
++	(void)state;
++
+     const uint8_t ctrl = SX126X_LR_FHSS_DISABLE_HOPPING;
+ 
+     return sx126x_write_register( context, SX126X_LR_FHSS_REG_CTRL, &ctrl, 1 );
 -- 
-2.27.0
+2.39.0
 
