@@ -31,6 +31,53 @@ function _bools {
     _describe 'bool' _bool_vals
 }
 
+function _programmers {
+    local -a _programmer_vals=(
+        "openocd:use OpenOCD for programming via JTAG/SWD (default for most boards)"
+        "jlink:use Segger's JLinkExe for programming (requires original Segger programmers)"
+        "esptool:program ESP32 (S2,S3,C2,C3,C6,...) ESP8266 via UART"
+        "avrdude:default for AVR boards"
+        "lpc2k_pgm:default for lpc23xx boards"
+        "bossa:for SAM based Arduino boards"
+        "edbg:for SAM based evaluation board"
+        "nrfutil:for nRF5x boards with nRF bootloader"
+        "stm32flash:for STM32 boards via UART bootloader"
+        "uniflash:for CC13xx / CC26xx boards"
+        "cc2538-bsl:for CC2538 boards"
+        "mspdebug:for MSP430 boards"
+        "goodfet:for some MSP430 boards"
+        "uf2conv:program via UF2 bootloader (except RP2040)"
+        "elf2uf2:program via UF2 bootloader (RP2040)"
+        "cpy2remed:program via ST-Link using filesystem disk interface"
+        "adafruit-nrfutil:program via Adafruits nRF5x bootloader"
+        "bmp:Black Magic Probe",
+        "dfu-util:Flash using DFU Bootloader"
+        "pyocd:Python based tool and API for debugging, programming, and exploring Arm Cortex microcontrollers"
+        "robotis-loader:Flash using ROBOTIS Bootloader"
+        "stm32loader:Flash using STM32 Bootloader"
+    )
+
+    _describe 'programmer' _programmer_vals
+}
+
+function _hw_programmers {
+    local -a _hw_programmer_vals=(
+        "stlink:STMicroelectronics' ST-LINK/V2 or similar"
+        "jlink:Segger's J-Link programmer (e.g. J-Link Edu Mini)"
+        "dap:CMSIS DAP compatible programmer"
+        "ftdi:Bit-banging SWD/JTAG via FTDI chip"
+        "xds110:TI XDS110 programmer"
+        "sysfs_gpio:Bit-banging SWD/JTAG via GPIOs using the sysfs interface"
+        "buspirate:Bit-banging SWD/JTAG via Bus Pirate GPIOs"
+        "iotlab:Debugging adapter used by the FIT IoT lab"
+        "mulle:Mulle programmer board"
+        "raspi:Bit-banging SWD/JTAG via GPIOs on the Raspberry Pi (direct register access)"
+        "stlink-dap:STMicroelectronics' ST-LINK/V3 and ST-LINK/V2 (from firmware V2J24)"
+    )
+
+    _describe 'hw_programmer' _hw_programmer_vals
+}
+
 function _riot {
     local -a _std_targets=(
         "all:build the application"
@@ -81,6 +128,9 @@ function _riot {
         'QUIET[Reduce verbosity of build output]:bool:_bools'
         'WERROR[Enable/disable -Werror flag]:bool:_bools'
         'RIOT_CI_BUILD[Behave as in the CI: Less verbose output, reproducible builds, ...]:bool:_bools'
+        'PROGRAMMER[Select the programmer software to flash (debug) with]:programmer:_programmers'
+        'OPENOCD_DEBUG_ADAPTER[Select the programmer hardware to use with OpenOCD]:hw_programmer:_hw_programmers'
+        'OPENOCD_RESET_USE_CONNECT_ASSERT_SRST[Let OpenOCD attach while reset signal is asserted]:bool:_bools'
     )
 
     _values -w 'variables' $vars
