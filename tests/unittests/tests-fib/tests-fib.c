@@ -40,7 +40,7 @@ static void _set_fib_test_addr(char * addr_dst, unsigned add_buf_size, unsigned 
 */
 static void _fill_fib_unique(unsigned entries)
 {
-    unsigned add_buf_size = 16;
+    size_t add_buf_size = 16;
     char addr_dst[add_buf_size];
     char addr_nxt[add_buf_size];
     uint32_t addr_dst_flags = 0x00777777;
@@ -64,7 +64,7 @@ static void _fill_fib_unique(unsigned entries)
 */
 static void _fill_fib_multiple(unsigned entries, unsigned modulus)
 {
-    unsigned add_buf_size = 16;
+    size_t add_buf_size = 16;
     char addr_dst[add_buf_size];
     char addr_nxt[add_buf_size];
     uint32_t addr_dst_flags = 0x00333333;
@@ -148,7 +148,7 @@ static void test_fib_02_fill_multiple_entries(void)
 */
 static void test_fib_03_removing_all_entries(void)
 {
-    unsigned add_buf_size = 16;
+    size_t add_buf_size = 16;
     char addr_dst[add_buf_size];
 
     unsigned entries = 20;
@@ -182,7 +182,7 @@ static void test_fib_03_removing_all_entries(void)
 */
 static void test_fib_04_remove_lower_half(void)
 {
-    unsigned add_buf_size = 16;
+    size_t add_buf_size = 16;
     char addr_dst[add_buf_size];
 
     unsigned entries = 20;
@@ -214,7 +214,7 @@ static void test_fib_04_remove_lower_half(void)
 */
 static void test_fib_05_remove_upper_half(void)
 {
-    unsigned add_buf_size = 16;
+    size_t add_buf_size = 16;
     char addr_dst[add_buf_size];
 
     unsigned entries = 20;
@@ -249,7 +249,7 @@ static void test_fib_05_remove_upper_half(void)
 */
 static void test_fib_06_remove_one_entry(void)
 {
-    unsigned add_buf_size = 16;
+    size_t add_buf_size = 16;
     char addr_dst[] = "Test address 02";
 
     unsigned entries = 20;
@@ -278,7 +278,7 @@ static void test_fib_06_remove_one_entry(void)
 */
 static void test_fib_07_remove_one_entry_multiple_times(void)
 {
-    unsigned add_buf_size = 16; /* includes space for terminating \0 */
+    size_t add_buf_size = 16; /* includes space for terminating \0 */
     char addr_dst[] = "Test address 13";
 
     unsigned entries = 20;
@@ -309,7 +309,7 @@ static void test_fib_07_remove_one_entry_multiple_times(void)
 */
 static void test_fib_08_remove_unknown(void)
 {
-    unsigned add_buf_size = 16; /* includes space for terminating \0 */
+    size_t add_buf_size = 16; /* includes space for terminating \0 */
     char addr_dst[] = "Test address 99";
 
     unsigned entries = 20;
@@ -340,7 +340,7 @@ static void test_fib_08_remove_unknown(void)
 */
 static void test_fib_09_update_entry(void)
 {
-    unsigned add_buf_size = 16; /* includes space for terminating \0 */
+    size_t add_buf_size = 16; /* includes space for terminating \0 */
     char addr_dst13[] = "Test address 13";
     char addr_dst07[] = "Test address 07";
     char addr_nxt2[] = "Test address 99";
@@ -375,7 +375,7 @@ static void test_fib_09_update_entry(void)
 */
 static void test_fib_10_add_exceed(void)
 {
-    unsigned add_buf_size = 16; /* includes space for terminating \0 */
+    size_t add_buf_size = 16; /* includes space for terminating \0 */
     char addr_dst[] = "Test address 98";
     char addr_nxt[] = "Test address 99";
 
@@ -408,7 +408,7 @@ static void test_fib_10_add_exceed(void)
 */
 static void test_fib_11_get_next_hop_success(void)
 {
-    unsigned add_buf_size = 16; /* includes space for terminating \0 */
+    size_t add_buf_size = 16; /* includes space for terminating \0 */
     char addr_dst[] = "Test address 13";
     char addr_expect[] = "Test address 02";
     kernel_pid_t iface_id = KERNEL_PID_UNDEF;
@@ -446,7 +446,7 @@ static void test_fib_11_get_next_hop_success(void)
 */
 static void test_fib_12_get_next_hop_fail(void)
 {
-    unsigned add_buf_size = 16; /* includes space for terminating \0 */
+    size_t add_buf_size = 16; /* includes space for terminating \0 */
     char addr_dst[] = "Test address 99";
     kernel_pid_t iface_id = KERNEL_PID_UNDEF;
     uint32_t next_hop_flags = 0;
@@ -477,11 +477,11 @@ static void test_fib_12_get_next_hop_fail(void)
 */
 static void test_fib_13_get_next_hop_fail_on_buffer_size(void)
 {
-    unsigned add_buf_size = 16; /* includes space for terminating \0 */
+    size_t add_buf_size = 16; /* includes space for terminating \0 */
     char addr_dst[] = "Test address 13";
     kernel_pid_t iface_id = KERNEL_PID_UNDEF;
     uint32_t next_hop_flags = 0;
-    unsigned add_buf_size_nxt = 12;
+    size_t add_buf_size_nxt = 12;
     char addr_nxt[add_buf_size];
 
     unsigned entries = 20;
@@ -512,7 +512,7 @@ static void test_fib_13_get_next_hop_fail_on_buffer_size(void)
 */
 static void test_fib_14_exact_and_prefix_match(void)
 {
-    unsigned add_buf_size = 16;
+    size_t add_buf_size = 16;
     char addr_dst[add_buf_size];
     char addr_nxt[add_buf_size];
     kernel_pid_t iface_id = KERNEL_PID_UNDEF;
@@ -597,7 +597,7 @@ static void test_fib_15_get_lifetime(void)
     kernel_pid_t iface_id = 1;
     char addr_dst[] = "Test address151";
     char addr_nxt[] = "Test address152";
-    unsigned add_buf_size = 16;
+    size_t add_buf_size = 16;
     uint32_t addr_dst_flags = 0x77777777;
     uint32_t addr_nxt_flags = 0x77777777;
 
@@ -627,7 +627,7 @@ static void test_fib_15_get_lifetime(void)
 */
 static void test_fib_16_prefix_match(void)
 {
-    unsigned add_buf_size = 16;
+    size_t add_buf_size = 16;
     char addr_dst[add_buf_size];
     char addr_nxt[add_buf_size];
     char addr_lookup[add_buf_size];
@@ -730,7 +730,7 @@ static void test_fib_17_get_entry_set(void)
                       (uint8_t *)addr_nxt, addr_buf_size - 1, 0x0, 100000);
     }
 
-    unsigned arr_size = 20;
+    size_t arr_size = 20;
     fib_destination_set_entry_t arr_dst[arr_size];
     char prefix[addr_buf_size];
     memset(prefix, 0, addr_buf_size);
@@ -793,7 +793,7 @@ static void test_fib_17_get_entry_set(void)
 */
 static void test_fib_18_get_next_hop_invalid_parameters(void)
 {
-    unsigned add_buf_size = 16; /* includes space for terminating \0 */
+    size_t add_buf_size = 16; /* includes space for terminating \0 */
     char addr_dst[] = "Test address 13";
     char addr_expect[] = "Test address 02";
     kernel_pid_t iface_id = KERNEL_PID_UNDEF;
@@ -831,7 +831,7 @@ static void test_fib_18_get_next_hop_invalid_parameters(void)
 */
 static void test_fib_19_default_gateway(void)
 {
-    unsigned add_buf_size = 16;
+    size_t add_buf_size = 16;
     char addr_dst[add_buf_size];
     char addr_nxt_hop[add_buf_size];
     char addr_nxt[add_buf_size];
@@ -900,7 +900,7 @@ static void test_fib_19_default_gateway(void)
 */
 static void test_fib_20_replace_prefix(void)
 {
-    unsigned add_buf_size = 16;
+    size_t add_buf_size = 16;
     char addr_dst[add_buf_size];
     char addr_nxt_hop[add_buf_size];
     char addr_nxt[add_buf_size];
