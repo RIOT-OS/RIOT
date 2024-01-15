@@ -7,7 +7,6 @@
  */
 
 /**
- * @defgroup    module sock_tls_new_poc
  * @ingroup     pkg_wolfssl
  * @brief       TLS POC using wolfssl and GNRC
  *
@@ -24,24 +23,30 @@
 #include "wolfssl/ssl.h"
 #include <net/sock/tcp.h>
 
-// Can be decided later
-#define gnrc_wolfssl_tls_max_timeout_ms 4000
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @brief TLS context forward decleartion.
+ * @brief Maximum timeout for TLS operations.
+ */
+#define gnrc_wolfssl_tls_max_timeout_ms 4000
+
+/**
+ * @brief TLS context forward declaration to encapsulate.
  */
 struct TLSContext;
+
+/**
+ * @brief TLS context type definition.
+ */
 typedef struct TLSContext TLSContext;
 
 /**
  * @brief Create a new TLS context.
  *
  * This function creates a new TLS context for a server or a client.
- * 
+ *
  * @return A pointer to the TLS context.
  */
 TLSContext *tls_create_context();
@@ -73,7 +78,7 @@ int tls_set_certificate(TLSContext *ctx, const char *ca_cert_path, const char *c
  *
  * @param remoteAddress remote endpoint address
  * @param port remote port to connect
- * @param context The TLS context created with @ref `tls_create_context`.
+ * @param context The TLS context created with `tls_create_context`.
  * @return 0 on success, negative value on failure.
  */
 int tls_establish_connection(char *remoteAddress, int port, TLSContext *context);
@@ -82,8 +87,9 @@ int tls_establish_connection(char *remoteAddress, int port, TLSContext *context)
  * @brief Send data over the TLS connection.
  *
  * @param ctx The TLS context.
- * @param data Pointer to the data to be sent.
- * @param size Size of the data to be sent.
+ * @param buffer Pointer to the data to be sent.
+ * @param buffer_len Size of the data to be sent.
+ * @param timeout_ms Timeout in milliseconds (will be provided by MQTT).
  * @return Number of bytes sent on success, negative value on failure.
  */
 int tls_send(TLSContext *ctx, unsigned char *buffer, int buffer_len, int timeout_ms);
@@ -93,7 +99,8 @@ int tls_send(TLSContext *ctx, unsigned char *buffer, int buffer_len, int timeout
  *
  * @param ctx The TLS context.
  * @param buffer Pointer to the buffer for received data.
- * @param size Size of the buffer.
+ * @param buffer_len Size of the buffer.
+ * @param timeout_ms Timeout in milliseconds (will be provided by MQTT).
  * @return Number of bytes received on success, negative value on failure.
  */
 int tls_receive(TLSContext *ctx, unsigned char *buffer, int buffer_len, int timeout_ms);

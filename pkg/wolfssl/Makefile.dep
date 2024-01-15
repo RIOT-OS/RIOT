@@ -98,7 +98,7 @@ USEMODULE += sock_async_event
 USEMODULE += ztimer_msec
 # Configuration for wolfSSL
 USEMODULE += wolfssl_dtls
-USEMODULE += wolfcrypt_rsa 
+USEMODULE += wolfcrypt_rsa
 CFLAGS += -DWOLFSSL_SP_MATH_ALL -Wno-unused-parameter
 # Configuration for GNRC network interfaces
 # Can be moved to the application level

@@ -282,7 +282,8 @@ extern "C" {
  * @return  -ENOMEM, if not enough resources can be provided for `sock` to be
  *          created.
  */
-int sock_dtls_create(sock_tls_t *sock, const sock_udp_ep_t *local, const sock_udp_ep_t *remote, uint16_t flags, WOLFSSL_METHOD *method);
+int sock_dtls_create(sock_tls_t *sock, const sock_udp_ep_t *local, const sock_udp_ep_t *remote,
+                     uint16_t flags, WOLFSSL_METHOD *method);
 
 /**
  * @brief   Sets the endpoint address for the remote DTLS peer associated to this sock object
@@ -349,7 +350,7 @@ int sock_tls_create(sock_tls_t *sock, WOLFSSL_METHOD *method);
 
 /**
  * @brief   Creates a new TLS session from an existing `sock_tls_t` object.
- * 
+ *
  * @pre `(sk != NULL)`
  * @param[in] sk      The sock object previously created using @ref sock_tls_create.
  * @param[in] app_ctx The application context to be passed to the callback functions.
@@ -357,18 +358,18 @@ int sock_tls_create(sock_tls_t *sock, WOLFSSL_METHOD *method);
  * @return  0 on success.
  * @return  -EINVAL, if @sock is null or the SSL context is not initialized yet.
  * @return  -ENOMEM, if not enough resources can be provided for the session to be
-*/
+ */
 int sock_tls_session_create(sock_tls_t *sk, void *app_ctx);
 
 /**
-* @brief   Callback funtion type get the TCP receive timeout in ms. 
-*/
+ * @brief   Callback function type get the TCP receive timeout in ms.
+ */
 
 typedef int (*GetTcpRecvTimeoutCallback)(void *context);
 
 /**
-* @brief   Sets the callback function to get the TCP receive timeout in ms. 
-*/
+ * @brief   Sets the callback function to get the TCP receive timeout in ms.
+ */
 void setGetTcpRecvTimeoutCallback(GetTcpRecvTimeoutCallback callback);
 
 /**
