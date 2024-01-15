@@ -25,6 +25,7 @@
 #include <string.h>
 #include <errno.h>
 
+#include "busy_wait.h"
 #include "byteorder.h"
 #include "kernel_defines.h"
 #include "macros/math.h"
@@ -341,6 +342,17 @@ static uint32_t mtd_spi_nor_get_size(const mtd_jedec_id_t *id)
     return 1 << id->device[1];
 }
 
+static void delay_us(unsigned us)
+{
+#if defined(MODULE_ZTIMER_USEC)
+    ztimer_sleep(ZTIMER_USEC, us);
+#elif defined(MODULE_ZTIMER_MSEC)
+    ztimer_sleep(ZTIMER_MSEC, DIV_ROUND_UP(us, US_PER_MS));
+#else
+    busy_wait_us(us);
+#endif
+}
+
 static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us)
 {
     unsigned i = 0, j = 0;
@@ -362,14 +374,13 @@ static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us
             break;
         }
         i++;
-#if IS_USED(MODULE_ZTIMER_USEC)
         if (us) {
             uint32_t wait_us = us / div;
             uint32_t wait_min = 2;
 
             wait_us = wait_us > wait_min ? wait_us : wait_min;
 
-            ztimer_sleep(ZTIMER_USEC, wait_us);
+            delay_us(wait_us);
             /* reduce the waiting time quickly if the estimate was too short,
              * but still avoid busy (yield) waiting */
             div++;
@@ -378,27 +389,6 @@ static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us
             j++;
             thread_yield();
         }
-#elif IS_USED(MODULE_XTIMER)
-        if (us) {
-            uint32_t wait_us = us / div;
-            uint32_t wait_min = 2 * XTIMER_BACKOFF;
-
-            wait_us = wait_us > wait_min ? wait_us : wait_min;
-
-            xtimer_usleep(wait_us);
-            /* reduce the waiting time quickly if the estimate was too short,
-             * but still avoid busy (yield) waiting */
-            div++;
-        }
-        else {
-            j++;
-            thread_yield();
-        }
-#else
-        (void)div;
-        (void) us;
-        thread_yield();
-#endif
     } while (1);
     DEBUG("wait loop %u times, yield %u times", i, j);
 #if IS_ACTIVE(ENABLE_DEBUG)
@@ -455,14 +445,7 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
 
             int res = 0;
             do {
-#if IS_USED(MODULE_ZTIMER_USEC)
-                ztimer_sleep(ZTIMER_USEC, dev->params->wait_chip_wake_up);
-#elif IS_USED(MODULE_ZTIMER_MSEC)
-                ztimer_sleep(ZTIMER_MSEC,
-                             DIV_ROUND_UP(dev->params->wait_chip_wake_up, US_PER_MS));
-#elif IS_USED(MODULE_XTIMER)
-                xtimer_usleep(dev->params->wait_chip_wake_up);
-#endif
+                delay_us(dev->params->wait_chip_wake_up);
                 res = mtd_spi_read_jedec_id(dev, &dev->jedec_id);
             } while (res < 0 && --retries);
             if (res < 0) {
