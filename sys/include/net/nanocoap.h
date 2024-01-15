@@ -338,6 +338,9 @@ void coap_request_ctx_init(coap_request_ctx_t *ctx, sock_udp_ep_t *remote);
 struct _coap_request_ctx {
     const coap_resource_t *resource;    /**< resource of the request */
     sock_udp_ep_t *remote;              /**< remote endpoint of the request */
+#if defined(MODULE_SOCK_AUX_LOCAL) || DOXYGEN
+    sock_udp_ep_t *local;               /**< local endpoint of the request */
+#endif
 #if defined(MODULE_GCOAP) || DOXYGEN
     /**
      * @brief   transport the packet was received over

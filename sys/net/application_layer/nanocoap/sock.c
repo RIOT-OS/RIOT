@@ -825,10 +825,6 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
             DEBUG("nanocoap: error parsing packet\n");
             continue;
         }
-        if ((res = coap_handle_req(&pkt, buf, bufsize, &ctx)) <= 0) {
-            DEBUG("nanocoap: error handling request %" PRIdSIZE "\n", res);
-            continue;
-        }
 
         sock_udp_aux_tx_t *aux_out_ptr = NULL;
 #ifdef MODULE_SOCK_AUX_LOCAL
@@ -841,7 +837,13 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
         if (!sock_udp_ep_is_multicast(&aux_in.local)) {
             aux_out_ptr = &aux_out;
         }
+        ctx.local = &aux_in.local;
 #endif
+        if ((res = coap_handle_req(&pkt, buf, bufsize, &ctx)) <= 0) {
+            DEBUG("nanocoap: error handling request %" PRIdSIZE "\n", res);
+            continue;
+        }
+
         sock_udp_send_aux(&sock.udp, buf, res, &remote, aux_out_ptr);
     }
 
