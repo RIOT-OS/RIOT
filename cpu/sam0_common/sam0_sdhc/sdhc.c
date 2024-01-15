@@ -48,6 +48,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "busy_wait.h"
 #include "periph_cpu.h"
 #include "periph/pm.h"
 #include "macros/math.h"
@@ -127,8 +128,7 @@ static void _delay(unsigned us)
     } else if (IS_USED(MODULE_ZTIMER_MSEC)) {
         ztimer_sleep(ZTIMER_MSEC, 1);
     } else {
-        volatile unsigned count = (us * CLOCK_CORECLOCK) / US_PER_SEC;
-        while (--count) {}
+        busy_wait_us(us);
     }
 }
 
