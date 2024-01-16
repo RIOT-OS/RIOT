@@ -10,6 +10,11 @@ else
   DEBUGGER ?= gdb
 endif
 
+# only use pyterm wrapper if term target is requested
+ifeq (,$(filter term,$(MAKECMDGOALS)))
+  RIOT_TERMINAL ?= native
+endif
+
 RESET ?= $(RIOTBOARD)/native/dist/reset.sh
 FLASHER ?=
 FLASHFILE ?= $(ELFFILE)
