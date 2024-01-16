@@ -675,9 +675,6 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
 
     coap_build_hdr((coap_hdr_t *)rbuf, type, coap_get_token(pkt), tkl, code,
                    ntohs(pkt->hdr->id));
-    coap_hdr_set_type((coap_hdr_t *)rbuf, type);
-    coap_hdr_set_code((coap_hdr_t *)rbuf, code);
-
     len += payload_len;
 
     return len;
