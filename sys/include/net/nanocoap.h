@@ -1957,6 +1957,22 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
                          uint8_t *rbuf, unsigned rlen, unsigned payload_len);
 
 /**
+ * @brief   Build empty reply to CoAP request
+ *
+ * This function can be used to create an empty ACK so that a later, separate
+ * response can be sent independently.
+ *
+ * If the request was non-confirmable, this will generate nothing.
+ *
+ * @param[in]   pkt         packet to reply to
+ * @param[out]  ack         buffer to write reply to
+ *
+ * @returns     size of reply packet on success
+ * @returns     -ENOSPC if @p rbuf too small
+ */
+ssize_t coap_build_empty_ack(coap_pkt_t *pkt, coap_hdr_t *ack);
+
+/**
  * @brief   Handle incoming CoAP request
  *
  * This function will find the correct handler, call it and write the reply

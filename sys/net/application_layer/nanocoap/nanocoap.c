@@ -626,6 +626,18 @@ ssize_t coap_reply_simple(coap_pkt_t *pkt,
     return header_len + payload_len;
 }
 
+ssize_t coap_build_empty_ack(coap_pkt_t *pkt, coap_hdr_t *ack)
+{
+    if (coap_get_type(pkt) != COAP_TYPE_CON) {
+        return 0;
+    }
+
+    coap_build_hdr(ack, COAP_TYPE_ACK, NULL, 0,
+                   COAP_CODE_EMPTY, ntohs(pkt->hdr->id));
+
+    return sizeof(*ack);
+}
+
 ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
                          uint8_t *rbuf, unsigned rlen, unsigned payload_len)
 {
