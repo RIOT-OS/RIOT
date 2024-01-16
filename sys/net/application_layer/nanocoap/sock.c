@@ -882,3 +882,66 @@ void auto_init_nanocoap_server(void)
 
     nanocoap_server_start(&local);
 }
+
+void nanocoap_server_prepare_separate(nanocoap_server_response_ctx_t *ctx,
+                                    coap_pkt_t *pkt, const coap_request_ctx_t *req)
+{
+    ctx->tkl = coap_get_token_len(pkt);
+    memcpy(ctx->token, coap_get_token(pkt), ctx->tkl);
+    memcpy(&ctx->remote, req->remote, sizeof(ctx->remote));
+#ifdef MODULE_SOCK_AUX_LOCAL
+    assert(req->local);
+    memcpy(&ctx->local, req->local, sizeof(ctx->local));
+#endif
+    uint32_t no_response = 0;
+    coap_opt_get_uint(pkt, COAP_OPT_NO_RESPONSE, &no_response);
+    ctx->no_response = no_response;
+}
+
+int nanocoap_server_send_separate(const nanocoap_server_response_ctx_t *ctx,
+                                unsigned code, unsigned type,
+                                const void *payload, size_t len)
+{
+    uint8_t rbuf[sizeof(coap_hdr_t) + COAP_TOKEN_LENGTH_MAX + 1];
+    assert(type != COAP_TYPE_ACK);
+    assert(type != COAP_TYPE_CON); /* TODO: add support */
+
+    const uint8_t no_response_index = (code >> 5) - 1;
+    /* If the handler code misbehaved here, we'd face UB otherwise */
+    assert(no_response_index < 7);
+
+    const uint8_t mask = 1 << no_response_index;
+    if (ctx->no_response & mask) {
+        return 0;
+    }
+
+    iolist_t data = {
+        .iol_base = (void *)payload,
+        .iol_len  = len,
+    };
+
+    iolist_t head = {
+        .iol_next = &data,
+        .iol_base = rbuf,
+    };
+    head.iol_len = coap_build_hdr((coap_hdr_t *)rbuf, type,
+                                  ctx->token, ctx->tkl,
+                                  code, random_uint32());
+    if (len) {
+        rbuf[head.iol_len++] = 0xFF;
+    }
+
+    sock_udp_aux_tx_t *aux_out_ptr = NULL;
+#ifdef MODULE_SOCK_AUX_LOCAL
+    /* make sure we reply with the same address that the request was
+     * destined for -- except in the multicast case */
+    sock_udp_aux_tx_t aux_out = {
+        .flags = SOCK_AUX_SET_LOCAL,
+        .local = ctx->local,
+    };
+    if (!sock_udp_ep_is_multicast(&ctx->local)) {
+        aux_out_ptr = &aux_out;
+    }
+#endif
+    return sock_udp_sendv_aux(NULL, &head, &ctx->remote, aux_out_ptr);
+}

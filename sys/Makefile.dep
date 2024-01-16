@@ -544,6 +544,11 @@ ifneq (,$(filter nanocoap_server_auto_init,$(USEMODULE)))
   USEMODULE += nanocoap_server
 endif
 
+ifneq (,$(filter nanocoap_server_separate,$(USEMODULE)))
+  USEMODULE += nanocoap_server
+  USEMODULE += sock_aux_local
+endif
+
 ifneq (,$(filter nanocoap_server,$(USEMODULE)))
   USEMODULE += nanocoap_resources
   USEMODULE += nanocoap_sock
