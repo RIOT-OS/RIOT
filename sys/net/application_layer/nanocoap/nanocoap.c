@@ -683,7 +683,7 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
     return len;
 }
 
-ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, uint8_t *token,
+ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, const void *token,
                        size_t token_len, unsigned code, uint16_t id)
 {
     assert(!(type & ~0x3));
