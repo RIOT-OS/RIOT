@@ -23,6 +23,10 @@ FEATURES_PROVIDED += periph_rtt_overflow
 FEATURES_PROVIDED += periph_uart_modecfg
 FEATURES_PROVIDED += periph_wdt
 
+ifneq (,$(filter $(EFM32_SERIES),0 1))
+  FEATURES_PROVIDED += periph_timer_periodic
+endif
+
 FEATURES_CONFLICT += periph_rtc:periph_rtt
 FEATURES_CONFLICT_MSG += "On the EFM32, the RTC and RTT map to the same hardware peripheral."
 
