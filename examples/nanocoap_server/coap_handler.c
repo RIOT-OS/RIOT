@@ -10,8 +10,12 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "event/callback.h"
+#include "event/timeout.h"
+#include "event/thread.h"
 #include "fmt.h"
 #include "net/nanocoap.h"
+#include "net/nanocoap_sock.h"
 #include "hashes/sha256.h"
 #include "kernel_defines.h"
 
@@ -185,16 +189,14 @@ NANOCOAP_RESOURCE(sha256) {
 /* separate response requires an event thread to execute it */
 #ifdef MODULE_EVENT_THREAD
 static nanocoap_server_response_ctx_t _separate_ctx;
-static bool _separate_in_progress;
 
 static void _send_response(void *ctx)
 {
     const char response[] = "This is a delayed response.";
 
     puts("_separate_handler(): send delayed response");
-    nanocoap_sock_send_separate(ctx, COAP_CODE_CONTENT, COAP_TYPE_NON,
+    nanocoap_server_send_separate(ctx, COAP_CODE_CONTENT, COAP_TYPE_NON,
                                 response, sizeof(response));
-    _separate_in_progress = false;
 }
 
 static ssize_t _separate_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
@@ -202,21 +204,20 @@ static ssize_t _separate_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap
     static event_timeout_t event_timeout;
     static event_callback_t event_timed = EVENT_CALLBACK_INIT(_send_response, &_separate_ctx);
 
-    if (_separate_in_progress) {
+    if (event_timeout_is_pending(&event_timeout)) {
         puts("_separate_handler(): response already scheduled");
         return coap_build_reply(pkt, COAP_CODE_SERVICE_UNAVAILABLE, buf, len, 0);
     }
 
     puts("_separate_handler(): send ACK, schedule response");
 
-    nanocoap_sock_prepare_separate(&_separate_ctx, pkt, context);
-    _separate_in_progress = true;
+    nanocoap_server_prepare_separate(&_separate_ctx, pkt, context);
 
     event_timeout_ztimer_init(&event_timeout, ZTIMER_MSEC, EVENT_PRIO_MEDIUM,
                               &event_timed.super);
     event_timeout_set(&event_timeout, 1 * MS_PER_SEC);
 
-    return coap_build_empty_ack(pkt, buf, len);
+    return coap_build_empty_ack(pkt, (void *)buf);
 }
 
 NANOCOAP_RESOURCE(separate) {
