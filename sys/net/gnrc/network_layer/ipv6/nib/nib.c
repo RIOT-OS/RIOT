@@ -145,6 +145,14 @@ void gnrc_ipv6_nib_iface_up(gnrc_netif_t *netif)
     _init_iface_arsm(netif);
     netif->ipv6.rs_sent = 0;
     netif->ipv6.na_sent = 0;
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
+    if (gnrc_netif_ipv6_group_join_internal(netif, &ipv6_addr_all_routers_link_local)) {
+        DEBUG("nib: Can't join link-local all-routers on interface %u\n", netif->pid);
+    }
+#endif
+    if (gnrc_netif_ipv6_group_join_internal(netif, &ipv6_addr_all_nodes_link_local) < 0) {
+        DEBUG("nib: Can't join link-local all-nodes on interface %u\n", netif->pid);
+    }
     _add_static_lladdr(netif);
     _auto_configure_addr(netif, &ipv6_addr_link_local_prefix, 64U);
     if (_should_search_rtr(netif)) {
@@ -190,6 +198,10 @@ void gnrc_ipv6_nib_iface_down(gnrc_netif_t *netif, bool send_final_ra)
             gnrc_netif_ipv6_addr_remove_internal(netif, &netif->ipv6.addrs[i]);
         }
     }
+    gnrc_netif_ipv6_group_leave_internal(netif, &ipv6_addr_all_nodes_link_local);
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
+    gnrc_netif_ipv6_group_leave_internal(netif, &ipv6_addr_all_routers_link_local);
+#endif
 
     gnrc_netif_release(netif);
 }
@@ -208,13 +220,6 @@ void gnrc_ipv6_nib_init_iface(gnrc_netif_t *netif)
 #endif  /* CONFIG_GNRC_IPV6_NIB_SLAAC || CONFIG_GNRC_IPV6_NIB_6LN */
     _init_iface_router(netif);
     gnrc_netif_init_6ln(netif);
-    if (gnrc_netif_ipv6_group_join_internal(netif,
-                                            &ipv6_addr_all_nodes_link_local) < 0) {
-        DEBUG("nib: Can't join link-local all-nodes on interface %u\n",
-              netif->pid);
-        gnrc_netif_release(netif);
-        return;
-    }
 
     gnrc_netif_release(netif);
 }
