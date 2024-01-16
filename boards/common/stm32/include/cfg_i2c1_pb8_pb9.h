@@ -38,7 +38,7 @@ static const i2c_conf_t i2c_config[] = {
 #if CPU_FAM_STM32F0
         .scl_af         = GPIO_AF1,
         .sda_af         = GPIO_AF1,
-#elif CPU_FAM_STM32G0
+#elif CPU_FAM_STM32G0 || CPU_FAM_STM32C0
         .scl_af         = GPIO_AF6,
         .sda_af         = GPIO_AF6,
 #else
@@ -58,7 +58,7 @@ static const i2c_conf_t i2c_config[] = {
         .rcc_mask       = RCC_APB1ENR1_I2C1EN,
         .rcc_sw_mask    = RCC_CCIPR1_I2C1SEL_1,         /* HSI (16 MHz) */
         .irqn           = I2C1_ER_IRQn,
-#elif CPU_FAM_STM32G0
+#elif CPU_FAM_STM32G0 || CPU_FAM_STM32C0
         .rcc_mask       = RCC_APBENR1_I2C1EN,
         .rcc_sw_mask    = RCC_CCIPR_I2C1SEL_1,          /* HSI (16 MHz) */
         .irqn           = I2C1_IRQn,
@@ -80,7 +80,7 @@ static const i2c_conf_t i2c_config[] = {
 #define I2C_0_ISR           isr_i2c1_ev
 #elif CPU_FAM_STM32L4 || CPU_FAM_STM32F7 || CPU_FAM_STM32WB || CPU_FAM_STM32L5
 #define I2C_0_ISR           isr_i2c1_er
-#elif CPU_FAM_STM32F0 || CPU_FAM_STM32L0 || CPU_FAM_STM32G0
+#elif CPU_FAM_STM32F0 || CPU_FAM_STM32L0 || CPU_FAM_STM32G0 || CPU_FAM_STM32C0
 #define I2C_0_ISR           isr_i2c1
 #endif
 

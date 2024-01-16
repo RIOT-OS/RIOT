@@ -37,7 +37,7 @@ extern "C" {
 #define XTIMER_WIDTH                (16)
 #endif
 
-#if defined(CPU_FAM_STM32G0)
+#if defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32C0)
 #define XTIMER_WIDTH                (16)
 #endif
 
