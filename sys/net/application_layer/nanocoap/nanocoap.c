@@ -626,6 +626,30 @@ ssize_t coap_reply_simple(coap_pkt_t *pkt,
     return header_len + payload_len;
 }
 
+ssize_t coap_build_empty_ack(coap_pkt_t *pkt, uint8_t *rbuf, unsigned rlen)
+{
+    (void)rlen;
+
+    unsigned tkl = coap_get_token_len(pkt);
+    unsigned type = COAP_TYPE_ACK;
+    unsigned code = COAP_CODE_EMPTY;
+
+    assert(rlen > sizeof(coap_hdr_t) + tkl);
+
+    if (coap_get_type(pkt) != COAP_TYPE_CON) {
+        return 0;
+    }
+
+    if (rlen < sizeof(coap_hdr_t) + tkl) {
+        return -ENOSPC;
+    }
+
+    coap_build_hdr((coap_hdr_t *)rbuf, type, coap_get_token(pkt), tkl, code,
+                   ntohs(pkt->hdr->id));
+
+    return sizeof(coap_hdr_t) + tkl;
+}
+
 ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
                          uint8_t *rbuf, unsigned rlen, unsigned payload_len)
 {
