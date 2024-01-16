@@ -50,7 +50,7 @@ function _programmers {
         "elf2uf2:program via UF2 bootloader (RP2040)"
         "cpy2remed:program via ST-Link using filesystem disk interface"
         "adafruit-nrfutil:program via Adafruits nRF5x bootloader"
-        "bmp:Black Magic Probe",
+        "bmp:Black Magic Probe"
         "dfu-util:Flash using DFU Bootloader"
         "pyocd:Python based tool and API for debugging, programming, and exploring Arm Cortex microcontrollers"
         "robotis-loader:Flash using ROBOTIS Bootloader"
