@@ -454,6 +454,10 @@ run_test() {
 
     # do flashing and building of termdeps simultaneously
     BOARD=$board TOOLCHAIN=${toolchain} make -C$appdir flash-only termdeps -j2
+    RES=$?
+    if [ $RES -ne 0 ]; then
+        error "- flashing failed!"
+    fi
 
     # now run the actual test
     if is_in_list "${appdir}" "${TEST_WITH_CONFIG_SUPPORTED}"; then
