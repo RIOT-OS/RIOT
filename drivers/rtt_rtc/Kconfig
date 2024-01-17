@@ -5,7 +5,7 @@
 # directory for more details.
 #
 
-config MODULE_RTT_RTC
+menuconfig MODULE_RTT_RTC
     bool "RTC-based RTT"
     depends on HAS_PERIPH_RTT
     depends on TEST_KCONFIG
@@ -13,3 +13,9 @@ config MODULE_RTT_RTC
     select MODULE_RTC_UTILS
     help
         Basic RTC implementation based on a RTT.
+
+config RTT_RTC_NO_RETAIN
+    bool "Don't try to retain time across reboots"
+    depends on MODULE_RTT_RTC
+    help
+        Don't try to keep the time across reboots but start from 0 again.
