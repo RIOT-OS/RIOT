@@ -415,24 +415,23 @@ test_job() {
     local board=$(echo $2 | cut -f 1 -d':')
     local toolchain=$(echo $2 | cut -f 2 -d':')
 
+    # this points to the dwq checkout root folder
+    local basedir="$(pwd)"
+
     # interpret any extra arguments as file names.
     # They will be sent along with the job to the test worker
     # and stored in the application's binary folder.
     shift 2
     local files=""
     for filename in "$@"; do
-        # check if the file is within $(BINDIR)
-        if startswith "${BINDIR}" "${filename}"; then
-          # get relative (to $(BINDIR) path
-          local relpath="$(realpath --relative-to ${BINDIR} ${filename})"
+        # check if the file is within $(basedir)
+        if startswith "${basedir}" "${filename}"; then
+            filename="$(realpath --relative-to ${basedir} ${filename})"
         else
-          error "$0: error: extra test files not within \${BINDIR}!"
+          error "$0: error: extra test files not within \${basedir}!"
         fi
 
-        # set remote file path.
-        # currently, the test workers build in the default build path.
-        local remote_bindir="${appdir}/bin/${board}"
-        files="${files} --file ${filename}:${remote_bindir}/${relpath}"
+        files="${files} --file ${filename}"
     done
 
     dwqc \
@@ -448,6 +447,10 @@ run_test() {
     local appdir=$1
     local board=$(echo $2 | cut -f 1 -d':')
     local toolchain=$(echo $2 | cut -f 2 -d':')
+
+    # set build directory to match the builder
+    export BINDIR="$(pwd)/build"
+
     print_worker
     echo "-- executing tests for $appdir on $board (compiled with $toolchain toolchain):"
     hook run_test_pre
