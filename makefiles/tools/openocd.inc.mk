@@ -13,7 +13,9 @@ RESET_FLAGS ?= reset
 
 ifneq (,$(OPENOCD_DEBUG_ADAPTER))
   include $(RIOTMAKE)/tools/openocd-adapters/$(OPENOCD_DEBUG_ADAPTER).inc.mk
-  OPENOCD_ADAPTER_INIT += -c 'transport select $(OPENOCD_TRANSPORT)'
+  ifneq (default,$(OPENOCD_TRANSPORT))
+    OPENOCD_ADAPTER_INIT += -c 'transport select $(OPENOCD_TRANSPORT)'
+  endif
 endif
 
 OPENOCD_CONFIG ?= $(BOARDDIR)/dist/openocd.cfg
