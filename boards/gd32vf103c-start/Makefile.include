@@ -1,0 +1,10 @@
+PORT_LINUX ?= /dev/ttyACM0
+PROGRAMMER ?= openocd
+OPENOCD_DEBUG_ADAPTER ?= dap
+OPENOCD_TRANSPORT := default
+
+# Only consider TTYs matching the following filter when auto-selecting the TTY
+# with `MOST_RECENT_PORT=1`.
+TTY_BOARD_FILTER := --driver 'ch341' --model 'USB2.0-Serial'
+
+include $(RIOTBOARD)/common/gd32v/Makefile.include
