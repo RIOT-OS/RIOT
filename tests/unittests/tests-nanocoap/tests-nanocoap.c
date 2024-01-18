@@ -368,7 +368,19 @@ static void test_nanocoap__get_multi_query(void)
     coap_get_uri_query_string(&pkt, query, sizeof(query));
     /* skip initial '&' from coap_get_uri_query_string() */
     TEST_ASSERT_EQUAL_STRING((char *)qs, &query[1]);
+
+    const char *val;
+    size_t val_len;
+    TEST_ASSERT(coap_find_uri_query(&pkt, "ab", &val, &val_len));
+    TEST_ASSERT_EQUAL_INT(3, val_len);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(val, "cde", val_len));
+    TEST_ASSERT(coap_find_uri_query(&pkt, "f", &val, &val_len));
+    TEST_ASSERT_EQUAL_INT(0, val_len);
+    TEST_ASSERT_EQUAL_INT((uintptr_t)NULL, (uintptr_t)val);
+    TEST_ASSERT(!coap_find_uri_query(&pkt, "cde", &val, &val_len));
+    TEST_ASSERT(coap_find_uri_query(&pkt, "ab", NULL, 0));
 }
+
 /*
  * Builds on get_multi_query test, to use coap_opt_add_uri_query2().
  */
