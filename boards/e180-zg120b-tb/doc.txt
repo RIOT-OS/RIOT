@@ -35,6 +35,59 @@ peripherals, different energy modes and short wake-up times.
 | Manual        | [Manual](https://www.silabs.com/documents/public/reference-manuals/efr32xg1-rm.pdf)     |
 | Board Manual  | [Board Manual](http://www.ebyte.com/en/downpdf.aspx?id=896)                             |
 
+### Pin Mapping
+
+@warning    At least for revision `10199-V1.0` of the test board most of the
+            silkscreen labels are incorrect.
+
+@note   Everything here assumes the board is oriented so that the USB connector
+        is on the top.
+
+#### Right Header
+
+(Top-left pin is 1, top-right pin is 2, and so on.)
+
+| Description                   | Pin (left)    | Pin (right)   | Description                       |
+|:----------------------------- |:------------- |:------------- |:--------------------------------- |
+| GND                           | 1             | 2             | VCC                               |
+| PB13                          | 3             | 4             | PB12                              |
+| PB11                          | 5             | 6             | PD15                              |
+| NC (pin 8 on E180-ZG120B)     | 7             | 8             | NC (pin 7 on E180-ZG120B)         |
+| PA1                           | 9             | 10            | PA0                               |
+| PD14                          | 11            | 12            | PD13                              |
+| GND                           | 13            | 14            | GND                               |
+
+#### Top Header
+
+(Leftmost pin is 1, second from left is 2, and so on.)
+
+| Description                   | Pin (left to right)   |
+|:----------------------------- |:--------------------- |
+| NC (pin 23 on E180-ZG120B)    | 1                     |
+| NC (pin 22 on E180-ZG120B)    | 2                     |
+| PC11                          | 3                     |
+| NC (pin 20 on E180-ZG120B)    | 4                     |
+| PF2                           | 5                     |
+| PC10                          | 6                     |
+| NC (pin 17 on E180-ZG120B)    | 7                     |
+| NC (pin 16 on E180-ZG120B)    | 8                     |
+| NC (pin 16 on E180-ZG120B)    | 9                     |
+
+#### Left Header
+
+(Top-left pin is 1, top-right pin is 2, and so on.)
+
+| Description                   | Pin (left)    | Pin (right)   | Description                   |
+|:----------------------------- |:------------- |:------------- |:----------------------------- |
+| NC (pin 24 on E180-ZG120B)    | 1             | 2             | SWCLK                         |
+| SWDIO                         | 3             | 4             | PB14                          |
+| PB15                          | 5             | 6             | NC (pin 29 on E180-ZG120B)    |
+| PF3                           | 7             | 8             | NC (pin 31 on E180-ZG120B)    |
+| NC (pin 32 on E180-ZG120)     | 9             | 10            | NC (pin 33 on E180-ZG120B)    |
+| NC (pin 34 on E180-ZG120)     | 11            | 12            | NC (pin 35 on E180-ZG120B)    |
+| GND                           | 13            | 14            | Reset                         |
+
+
 ### Peripheral mapping
 | Peripheral | Number  | Hardware        | Pins                        | Comments                                            |
 |------------|---------|-----------------|-----------------------------|-----------------------------------------------------|
