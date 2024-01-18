@@ -8,4 +8,4 @@
 config PACKAGE_QCBOR
     bool "QCBOR CBOR encoder/decoder"
     depends on TEST_KCONFIG
-    depends on HAS_ARCH_32BIT
+    depends on HAS_ARCH_32BIT || HAS_ARCH_64BIT

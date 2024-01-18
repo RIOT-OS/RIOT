@@ -9,4 +9,4 @@ ifneq (,$(filter tlsf-malloc,$(USEMODULE)))
 endif
 
 # tlsf is not compatible with 8bit and 16bit architectures
-FEATURES_REQUIRED += arch_32bit
+FEATURES_REQUIRED_ANY += arch_32bit|arch_64bit
