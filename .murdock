@@ -383,8 +383,20 @@ compile() {
         if [ $RUN_TESTS -eq 1 -o "$board" = "native" -o "$EMULATED" = "1" ]; then
             if [ -f "${BINDIR}/.test" ]; then
                 if [ "$board" = "native" -o "${EMULATED}" = "1" ]; then
-                    EMULATE=${EMULATED} BOARD=$board make -C${appdir} test
-                    RES=$?
+                    # For native, we can run the test on the worker that also
+                    # compiled it (`make -C${appdir} test`).
+                    # "dwq-localjob" allows using some (locally run) command's
+                    # output as if it was its own CI job.
+                    # We use this here so the output shows up in the Murdock UI
+                    # under the "Tests" tab and not inlined with the "Build"
+                    # output.
+                    # "--command-override" is a hack that makes the job fake the
+                    # command. This is currently needed for the Murdock UI to
+                    # properly categorize the job result.
+                    EMULATE=${EMULATED} BOARD=$board TOOLCHAIN=$toolchain \
+                        dwq-localjob \
+                        --command-override "./.murdock run_test ${appdir} ${board}:${toolchain}" \
+                        -- make -C${appdir} test
                 elif is_in_list "$board" "$TEST_BOARDS_AVAILABLE"; then
                     echo "-- test_hash=$test_hash"
                     if test_cache_get $test_hash; then
