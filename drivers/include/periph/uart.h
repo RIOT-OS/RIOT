@@ -71,6 +71,14 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Threshold under which polling transfers are used instead of DMA
+ *          TODO: determine at run-time based on baudrate
+ */
+#ifndef CONFIG_UART_DMA_THRESHOLD_BYTES
+#define CONFIG_UART_DMA_THRESHOLD_BYTES 8
+#endif
+
+/**
  * @brief   Define default UART type identifier
  */
 #ifndef HAVE_UART_T
