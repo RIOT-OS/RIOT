@@ -242,72 +242,126 @@ static void test_fmt_hex_bytes(void)
     TEST_ASSERT_EQUAL_INT(0xAF, val3[2]);
 }
 
+static void test_fmt_u16_hex(void)
+{
+    char out[8] = "zzzzzzzz";
+
+    /* Check return count with null buffer input */
+    TEST_ASSERT_EQUAL_INT(4, fmt_u16_hex(NULL, 0xBEEF));
+    /* always four regardless of value size */
+    TEST_ASSERT_EQUAL_INT(4, fmt_u16_hex(NULL, 0));
+
+    TEST_ASSERT_EQUAL_INT(4, fmt_u16_hex(out, 0));
+    TEST_ASSERT(memcmp(out, "0000zzzz", 8) == 0);
+
+
+    TEST_ASSERT_EQUAL_INT(4, fmt_u16_hex(out, 0xBEEF));
+    TEST_ASSERT(memcmp(out, "BEEFzzzz", 8) == 0);
+}
+
 static void test_fmt_u32_hex(void)
 {
-    char out[12] = "zzzzzzzzzzz";
-    uint32_t val = 3735928559;
+    char out[12] = "zzzzzzzzzzzz";
 
-    out[8] = '\0';
-    TEST_ASSERT_EQUAL_INT(8, fmt_u32_hex(out, val));
-    TEST_ASSERT_EQUAL_STRING("DEADBEEF", (char *) out);
+    /* Check return count with null buffer input */
+    TEST_ASSERT_EQUAL_INT(8, fmt_u32_hex(NULL, 0xDEADBEEF));
+    /* always eight regardless of value size */
+    TEST_ASSERT_EQUAL_INT(8, fmt_u32_hex(NULL, 0));
 
-    /* check that the buffer was not overflowed */
-    TEST_ASSERT_EQUAL_STRING("zz", &out[9]);
+    TEST_ASSERT_EQUAL_INT(8, fmt_u32_hex(out, 0));
+    TEST_ASSERT(memcmp(out, "00000000zzzz", 12) == 0);
+
+    TEST_ASSERT_EQUAL_INT(8, fmt_u32_hex(out, 0xDEADBEEF));
+    TEST_ASSERT(memcmp(out, "DEADBEEFzzzz", 12) == 0);
 }
 
 static void test_fmt_u64_hex(void)
 {
-    char out[20] = "zzzzzzzzzzzzzzzzzzz";
-    uint64_t val = 1002843385516306400;
+    char out[20] = "zzzzzzzzzzzzzzzzzzzz";
 
-    out[16] = '\0';
-    TEST_ASSERT_EQUAL_INT(16, fmt_u64_hex(out, val));
-    TEST_ASSERT_EQUAL_STRING("0DEAD0BEEF0CAFE0", (char *) out);
+    /* Check return count with null buffer input */
+    TEST_ASSERT_EQUAL_INT(16, fmt_u64_hex(NULL, 0x0DEAD0BEEF0CAFE0));
+    /* always 16 regardless of value size */
+    TEST_ASSERT_EQUAL_INT(16, fmt_u64_hex(NULL, 0));
 
-    /* check that the buffer was not overflowed */
-    TEST_ASSERT_EQUAL_STRING("zz", &out[17]);
-}
+    TEST_ASSERT_EQUAL_INT(16, fmt_u64_hex(out, 0));
+    TEST_ASSERT(memcmp(out, "0000000000000000zzzz", 20) == 0);
 
-static void test_fmt_u32_dec(void)
-{
-    char out[16] = "zzzzzzzzzzzzzzz";
-    uint32_t val = 12345678;
-    uint8_t chars = 0;
-
-    chars = fmt_u32_dec(out, val);
-    TEST_ASSERT_EQUAL_INT(8, chars);
-    out[chars] = '\0';
-    TEST_ASSERT_EQUAL_STRING("12345678", (char *) out);
-
-    val = 1234567890;
-    chars = fmt_u32_dec(out, val);
-    TEST_ASSERT_EQUAL_INT(10, chars);
-    out[chars] = '\0';
-    TEST_ASSERT_EQUAL_STRING("1234567890", (char *) out);
-
-    /* check that the buffer was not overflowed */
-    TEST_ASSERT_EQUAL_STRING("zzzz", &out[11]);
+    TEST_ASSERT_EQUAL_INT(16, fmt_u64_hex(out, 0x0DEAD0BEEF0CAFE0));
+    TEST_ASSERT(memcmp(out, "0DEAD0BEEF0CAFE0zzzz", 20) == 0);
 }
 
 static void test_fmt_u16_dec(void)
 {
-    char out[8] = "zzzzzzz";
-    uint16_t val = 6556;
+    char out[8] = "zzzzzzzz";
     uint8_t chars = 0;
 
-    chars = fmt_u16_dec(out, val);
+    /* Check return count with null buffer input */
+    TEST_ASSERT_EQUAL_INT(5, fmt_u16_dec(NULL, 65535U));
+    TEST_ASSERT_EQUAL_INT(1, fmt_u16_dec(NULL, 0));
+
+    chars = fmt_u16_dec(out, 6556);
     TEST_ASSERT_EQUAL_INT(4, chars);
-    out[chars] = '\0';
-    TEST_ASSERT_EQUAL_STRING("6556", (char *) out);
+    TEST_ASSERT(memcmp(out, "6556zzzz", 8) == 0);
 
-    val = 65535;
-    chars = fmt_u16_dec(out, val);
+    chars = fmt_u16_dec(out, 65535);
     TEST_ASSERT_EQUAL_INT(5, chars);
-    out[chars] = '\0';
-    TEST_ASSERT_EQUAL_STRING("65535", (char *) out);
+    TEST_ASSERT(memcmp(out, "65535zzz", 8) == 0);
+}
 
-    /* check that the buffer was not overflowed */
-    TEST_ASSERT_EQUAL_STRING("z", &out[6]);
+static void test_fmt_u32_dec(void)
+{
+    char out[16] = "zzzzzzzzzzzzzzzz";
+    uint8_t chars = 0;
+
+    /* Check return count with null buffer input */
+    TEST_ASSERT_EQUAL_INT(10, fmt_u32_dec(NULL, 4294967295U));
+    TEST_ASSERT_EQUAL_INT(5, fmt_u32_dec(NULL, 65535U));
+    TEST_ASSERT_EQUAL_INT(1, fmt_u32_dec(NULL, 0));
+
+    chars = fmt_u32_dec(out, 12345678);
+    TEST_ASSERT_EQUAL_INT(8, chars);
+    TEST_ASSERT(memcmp(out, "12345678zzzzzzzz", 16) == 0);
+
+    chars = fmt_u32_dec(out, 1234567890);
+    TEST_ASSERT_EQUAL_INT(10, chars);
+    TEST_ASSERT(memcmp(out, "1234567890zzzzzz", 16) == 0);
+}
+
+static void test_fmt_u64_dec(void)
+{
+    char out[24] = "zzzzzzzzzzzzzzzzzzzzzzzz";
+    uint8_t chars = 0;
+
+    /* Check return count with null buffer input */
+    TEST_ASSERT_EQUAL_INT(20, fmt_u64_dec(NULL, 18446744073709551615LLU));
+    TEST_ASSERT_EQUAL_INT(10, fmt_u64_dec(NULL, 4294967295U));
+    TEST_ASSERT_EQUAL_INT(5, fmt_u64_dec(NULL, 65535U));
+    TEST_ASSERT_EQUAL_INT(1, fmt_u64_dec(NULL, 0));
+
+    chars = fmt_u64_dec(out, 1234567890123456789LLU);
+    TEST_ASSERT_EQUAL_INT(19, chars);
+    TEST_ASSERT(memcmp(out, "1234567890123456789zzzzz", 24) == 0);
+}
+
+static void test_fmt_u64_dec_zero(void)
+{
+    char out[24] = "zzzzzzzzzzzzzzzzzzzzzzzz";
+    uint8_t chars = 0;
+
+    chars = fmt_u64_dec(out, 0);
+    TEST_ASSERT_EQUAL_INT(1, chars);
+    TEST_ASSERT(memcmp(out, "0zzzzzzzzzzzzzzzzzzzzzzz", 24) == 0);
+}
+
+static void test_fmt_u64_dec_u64max(void)
+{
+    char out[24] = "zzzzzzzzzzzzzzzzzzzzzzzz";
+    uint8_t chars = 0;
+
+    chars = fmt_u64_dec(out, 18446744073709551615LLU);
+    TEST_ASSERT_EQUAL_INT(20, chars);
+    TEST_ASSERT(memcmp(out, "18446744073709551615zzzz", 24) == 0);
 }
 
 static void test_fmt_s32_dec_a(void)
@@ -418,51 +472,6 @@ static void test_fmt_s64_dec_c(void)
 
     /* check that the buffer was not overflowed */
     TEST_ASSERT_EQUAL_STRING("zz", &out[21]);
-}
-
-static void test_fmt_u64_dec_a(void)
-{
-    char out[24] = "zzzzzzzzzzzzzzzzzzzzzzz";
-    uint64_t val = 0;
-    uint8_t chars = 0;
-
-    chars = fmt_u64_dec(out, val);
-    TEST_ASSERT_EQUAL_INT(1, chars);
-    out[chars] = '\0';
-    TEST_ASSERT_EQUAL_STRING("0", (char *) out);
-
-    /* check that the buffer was not overflowed */
-    TEST_ASSERT_EQUAL_STRING("zzzzzzzzzzzzzzzzzzzzz", &out[2]);
-}
-
-static void test_fmt_u64_dec_b(void)
-{
-    char out[24] = "zzzzzzzzzzzzzzzzzzzzzzz";
-    uint64_t val = 18446744073709551615LLU;
-    uint8_t chars = 0;
-
-    chars = fmt_u64_dec(out, val);
-    TEST_ASSERT_EQUAL_INT(20, chars);
-    out[chars] = '\0';
-    TEST_ASSERT_EQUAL_STRING("18446744073709551615", (char *) out);
-
-    /* check that the buffer was not overflowed */
-    TEST_ASSERT_EQUAL_STRING("zz", &out[21]);
-}
-
-static void test_fmt_u64_dec_c(void)
-{
-    char out[24] = "zzzzzzzzzzzzzzzzzzzzzzz";
-    uint64_t val = 1234567890123456789LLU;
-    uint8_t chars = 0;
-
-    chars = fmt_u64_dec(out, val);
-    TEST_ASSERT_EQUAL_INT(19, chars);
-    out[chars] = '\0';
-    TEST_ASSERT_EQUAL_STRING("1234567890123456789", (char *) out);
-
-    /* check that the buffer was not overflowed */
-    TEST_ASSERT_EQUAL_STRING("zzz", &out[20]);
 }
 
 static void test_fmt_s16_dec(void)
@@ -891,13 +900,14 @@ Test *tests_fmt_tests(void)
         new_TestFixture(test_fmt_bytes_hex_reverse),
         new_TestFixture(test_fmt_hex_byte),
         new_TestFixture(test_fmt_hex_bytes),
+        new_TestFixture(test_fmt_u16_hex),
         new_TestFixture(test_fmt_u32_hex),
         new_TestFixture(test_fmt_u64_hex),
-        new_TestFixture(test_fmt_u32_dec),
-        new_TestFixture(test_fmt_u64_dec_a),
-        new_TestFixture(test_fmt_u64_dec_b),
-        new_TestFixture(test_fmt_u64_dec_c),
         new_TestFixture(test_fmt_u16_dec),
+        new_TestFixture(test_fmt_u32_dec),
+        new_TestFixture(test_fmt_u64_dec),
+        new_TestFixture(test_fmt_u64_dec_zero),
+        new_TestFixture(test_fmt_u64_dec_u64max),
         new_TestFixture(test_fmt_s32_dec_a),
         new_TestFixture(test_fmt_s32_dec_b),
         new_TestFixture(test_fmt_s64_dec_a),

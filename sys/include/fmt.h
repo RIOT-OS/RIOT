@@ -205,6 +205,19 @@ size_t fmt_u32_hex(char *out, uint32_t val);
 size_t fmt_u64_hex(char *out, uint64_t val);
 
 /**
+ * @brief Convert a uint16 value to decimal string.
+ *
+ * If @p out is NULL, will only return the number of characters that would have
+ * been written.
+ *
+ * @param[out]  out  Pointer to output buffer, or NULL
+ * @param[in]   val  Value to convert
+ *
+ * @return      nr of characters written to (or needed in) @p out
+ */
+size_t fmt_u16_dec(char *out, uint16_t val);
+
+/**
  * @brief Convert a uint32 value to decimal string.
  *
  * If @p out is NULL, will only return the number of characters that would have
@@ -231,19 +244,6 @@ size_t fmt_u32_dec(char *out, uint32_t val);
  * @return      nr of characters written to (or needed in) @p out
  */
 size_t fmt_u64_dec(char *out, uint64_t val);
-
-/**
- * @brief Convert a uint16 value to decimal string.
- *
- * If @p out is NULL, will only return the number of characters that would have
- * been written.
- *
- * @param[out]  out  Pointer to output buffer, or NULL
- * @param[in]   val  Value to convert
- *
- * @return      nr of characters written to (or needed in) @p out
- */
-size_t fmt_u16_dec(char *out, uint16_t val);
 
 /**
  * @brief Convert a int64 value to decimal string.
