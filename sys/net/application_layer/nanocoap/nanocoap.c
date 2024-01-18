@@ -516,7 +516,9 @@ ssize_t coap_reply_simple(coap_pkt_t *pkt,
     uint8_t *bufpos = payload_start;
 
     if (payload_len) {
-        bufpos += coap_put_option_ct(bufpos, 0, ct);
+        if (ct) {
+            bufpos += coap_put_option_ct(bufpos, 0, ct);
+        }
         *bufpos++ = 0xff;
     }
 
