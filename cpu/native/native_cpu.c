@@ -25,9 +25,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#define __USE_GNU
 #include <signal.h>
-#undef __USE_GNU
 
 #include <ucontext.h>
 #include <err.h>

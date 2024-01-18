@@ -29,10 +29,7 @@
 #define VALGRIND_DEBUG(...)
 #endif
 
-/* __USE_GNU for gregs[REG_EIP] access under Linux */
-#define __USE_GNU
 #include <signal.h>
-#undef __USE_GNU
 
 #include "irq.h"
 #include "cpu.h"

@@ -37,16 +37,18 @@ CFLAGS += -Wall -Wextra -pedantic $(CFLAGS_DBG) $(CFLAGS_OPT)
 CFLAGS += -U_FORTIFY_SOURCE
 CFLAGS_DBG ?= -g3
 
+# This allows using functions like `kill()` that are not in the C but in the
+# POSIX standard, sigwait requires at least this version
+CFLAGS += -D_POSIX_C_SOURCE=200112L
+# F_SETOWN is a Linux extension only available in -std=c11 mode with this; same
+# goes for the gregs[REG_EIP] access if irq_cpu.c and native_cpu.c
+CFLAGS += -D_GNU_SOURCE
+
 ifneq (,$(filter backtrace,$(USEMODULE)))
   $(warning module backtrace is used, do not omit frame pointers)
   CFLAGS_OPT ?= -Og -fno-omit-frame-pointer
 else
   CFLAGS_OPT ?= -Og
-endif
-
-# default std set to gnu11 if not overwritten by user
-ifeq (,$(filter -std=%, $(CFLAGS)))
-  CFLAGS += -std=gnu11
 endif
 
 ifeq ($(OS_ARCH),x86_64)
