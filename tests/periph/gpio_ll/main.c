@@ -29,6 +29,7 @@
 #include "periph/gpio_ll_irq.h"
 #include "timex.h"
 #include "ztimer.h"
+#include "flash_utils.h"
 
 #ifndef LOW_ROM
 #define LOW_ROM 0
@@ -40,12 +41,16 @@ static gpio_port_t port_in = GPIO_PORT(PORT_IN);
 
 static const uint64_t mutex_timeout = US_PER_MS;
 
+#if LOW_ROM
 static void puts_optional(const char *str)
 {
-    if (!LOW_ROM) {
-        puts(str);
-    }
+    (void)str;
 }
+#else
+/* this is like puts() on most platforms, but e.g. on AVR safes lots of RAM by
+ * placing the string literal to puts in flash. */
+#define puts_optional(str_literal) flash_puts(TO_FLASH(str_literal))
+#endif
 
 #if LOW_ROM
 #define printf_optional(...) (void)0
