@@ -8,6 +8,7 @@ create_tap() {
     sysctl -w net.ipv6.conf.${TAP}.forwarding=${USE_WRITE}
     sysctl -w net.ipv6.conf.${TAP}.accept_ra=1
     ip link set "${TAP}" up
+    ip a a ${HOST_IP} dev ${TAP}
 }
 
 remove_tap() {
@@ -25,6 +26,13 @@ if [ "$1" = "-w" ] || [ "$1" = "--write" ]; then
     shift 1
 fi
 
+if [ "$1" = "-i" ] || [ "$1" = "--host-ip" ]; then
+    HOST_IP=$2
+    shift 2
+else
+    HOST_IP="fd00:dead:beef::1/128"
+fi
+
 PORT=$1
 TAP=$2
 
@@ -32,7 +40,7 @@ BAUDRATE=115200
 START_DOSE=0
 
 [ -z "${PORT}" ] || [ -z "${TAP}" ] && {
-    echo "usage: $0 [-w|--write]" \
+    echo "usage: $0 [-w|--write] [-i|--host-ip <ip>]" \
          "<serial-port> <tap-device>" \
          "[baudrate]"
     exit 1
