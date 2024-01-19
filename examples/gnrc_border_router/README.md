@@ -151,8 +151,7 @@ Iface  7   HWaddr: 59:72  Channel: 26  Page: 0  NID: 0x23
 The script also sets up a ULA (Unique Local Address) address on your
 Linux `tap0` network interface.
 You can check your ULA with `ifconfig` or `ip addr` Linux command
-or set it for this example using the environment variable `IPV6_HOST_ADDR`
-(currently only supported for `UPLINK=ethos` and `BOARD=native`).
+or set it for this example using the environment variable `IPV6_HOST_ADDR`.
 This ULA can then be pinged from 6lo motes:
 
 ```
