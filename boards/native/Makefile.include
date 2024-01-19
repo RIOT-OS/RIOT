@@ -13,24 +13,36 @@ endif
 # only use pyterm wrapper if term target is requested
 ifeq (,$(filter term,$(MAKECMDGOALS)))
   RIOT_TERMINAL ?= native
+else
+  RIOT_TERMINAL ?= pyterm
 endif
 
 RESET ?= $(RIOTBOARD)/native/dist/reset.sh
 FLASHER ?=
 FLASHFILE ?= $(ELFFILE)
 
-ifeq (native,$(RIOT_TERMINAL))
-  TERMPROG ?= $(FLASHFILE)
-else
+ifeq (pyterm,$(RIOT_TERMINAL))
   TERMFLAGS += -ps $(FLASHFILE)
-  ifeq (1,$(USE_ZEP))
-    ZEP_IP ?= [::1]
-    ZEP_PORT_BASE ?= 17754
-    TERMFLAGS += --process-args '-z $(ZEP_IP):$(ZEP_PORT_BASE)'
-  endif
-  ifneq (,$(ZEP_MAC))
-    TERMFLAGS += --process-args '\-\-eui64=$(ZEP_MAC)'
-  endif
+  PROCARGS := --process-args
+else
+  TERMPROG ?= $(FLASHFILE)
+endif
+
+ZEP_IP ?= [::1]
+ZEP_PORT_BASE ?= 17754
+ifeq (1,$(USE_ZEP))
+ifeq (pyterm,$(RIOT_TERMINAL))
+  TERMFLAGS += --process-args '-z $(ZEP_IP):$(ZEP_PORT_BASE)'
+else
+  TERMFLAGS += -z $(ZEP_IP):$(ZEP_PORT_BASE)
+endif
+endif
+ifneq (,$(ZEP_MAC))
+ifeq (pyterm,$(RIOT_TERMINAL))
+  TERMFLAGS += --process-args '\-\-eui64=$(ZEP_MAC)'
+else
+  TERMFLAGS += --eui64=$(ZEP_MAC)
+endif
 endif
 
 export VALGRIND ?= valgrind
@@ -106,12 +118,7 @@ LINKFLAGS += -ffunction-sections
 
 # set the tap interface for term/valgrind
 PORT ?= tap0
-
-ifeq (native,$(RIOT_TERMINAL))
-  TERMFLAGS += $(PORT)
-else
-  TERMFLAGS += --process-args $(PORT)
-endif
+TERMFLAGS += $(PROCARGS) $(PORT)
 
 # Configure default eeprom file
 EEPROM_FILE ?= $(BINDIR)/native.eeprom
@@ -119,10 +126,10 @@ EEPROM_FILE ?= $(BINDIR)/native.eeprom
 # set the eeprom file flags only when the periph_eeprom feature is used.
 ifneq (,$(filter periph_eeprom,$(FEATURES_USED)))
   EEPROM_FILE_FLAGS = --eeprom $(EEPROM_FILE)
-  ifeq (native,$(RIOT_TERMINAL))
-    TERMFLAGS += $(EEPROM_FILE_FLAGS)
-  else
+  ifeq (pyterm,$(RIOT_TERMINAL))
     TERMFLAGS += --process-args '$(EEPROM_FILE_FLAGS)'
+  else
+    TERMFLAGS += $(EEPROM_FILE_FLAGS)
   endif
 endif
 
