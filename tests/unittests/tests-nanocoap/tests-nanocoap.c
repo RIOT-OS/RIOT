@@ -67,6 +67,8 @@ static void test_nanocoap__hdr_2(void)
     char path[] = "/test/abcd/efgh?foo=bar&baz=blub";
     unsigned char path_tmp[64] = {0};
     char query_tmp[64] = {0};
+    char key[8];
+    char value[8];
 
     uint8_t *pktpos = &buf[0];
     uint16_t lastonum = 0;
@@ -86,6 +88,25 @@ static void test_nanocoap__hdr_2(void)
     res = coap_get_uri_query_string(&pkt, query_tmp, sizeof(query_tmp));
     TEST_ASSERT_EQUAL_INT(sizeof("&foo=bar&baz=blub"), res);
     TEST_ASSERT_EQUAL_STRING("&foo=bar&baz=blub", (char *)query_tmp);
+
+    void *pos = NULL;
+
+    res = coap_iterate_uri_query(&pkt, &pos, key, sizeof(key), value, 3);
+    TEST_ASSERT_EQUAL_INT(-E2BIG, res);
+    res = coap_iterate_uri_query(&pkt, &pos, key, 3, value, sizeof(value));
+    TEST_ASSERT_EQUAL_INT(-E2BIG, res);
+
+    pos = NULL;
+    res = coap_iterate_uri_query(&pkt, &pos, key, sizeof(key), value, sizeof(value));
+    TEST_ASSERT_EQUAL_INT(2, res);
+    TEST_ASSERT_EQUAL_STRING("foo", key);
+    TEST_ASSERT_EQUAL_STRING("bar", value);
+    res = coap_iterate_uri_query(&pkt, &pos, key, sizeof(key), value, sizeof(value));
+    TEST_ASSERT_EQUAL_INT(2, res);
+    TEST_ASSERT_EQUAL_STRING("baz", key);
+    TEST_ASSERT_EQUAL_STRING("blub", value);
+    res = coap_iterate_uri_query(&pkt, &pos, key, sizeof(key), value, sizeof(value));
+    TEST_ASSERT_EQUAL_INT(0, res);
 }
 
 /*
@@ -341,10 +362,12 @@ static void test_nanocoap__get_multi_query(void)
     coap_pkt_t pkt;
     uint16_t msgid = 0xABCD;
     uint8_t token[2] = {0xDA, 0xEC};
-    char key1[] = "ab";
-    char val1[] = "cde";
-    char key2[] = "f";
-    char qs[] = "ab=cde&f";
+    const char key1[] = "ab";
+    const char val1[] = "cde";
+    const char key2[] = "f";
+    const char qs[] = "ab=cde&f";
+    char key[8];
+    char value[8];
 
     size_t len = coap_build_hdr((coap_hdr_t *)&buf[0], COAP_TYPE_NON,
                                 &token[0], 2, COAP_METHOD_GET, msgid);
@@ -368,7 +391,20 @@ static void test_nanocoap__get_multi_query(void)
     coap_get_uri_query_string(&pkt, query, sizeof(query));
     /* skip initial '&' from coap_get_uri_query_string() */
     TEST_ASSERT_EQUAL_STRING((char *)qs, &query[1]);
+
+    void *pos;
+    int res = coap_iterate_uri_query(&pkt, &pos, key, sizeof(key), value, sizeof(value));
+    TEST_ASSERT_EQUAL_INT(2, res);
+    TEST_ASSERT_EQUAL_STRING("ab", key);
+    TEST_ASSERT_EQUAL_STRING("cde", value);
+    res = coap_iterate_uri_query(&pkt, &pos, key, sizeof(key), value, sizeof(value));
+    TEST_ASSERT_EQUAL_INT(1, res);
+    TEST_ASSERT_EQUAL_STRING("f", key);
+    TEST_ASSERT_EQUAL_STRING("1", value);
+    res = coap_iterate_uri_query(&pkt, &pos, key, sizeof(key), value, sizeof(value));
+    TEST_ASSERT_EQUAL_INT(0, res);
 }
+
 /*
  * Builds on get_multi_query test, to use coap_opt_add_uri_query2().
  */
