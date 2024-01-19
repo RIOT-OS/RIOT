@@ -5,7 +5,7 @@ UHCPD="$(cd "${SLIPTTY_DIR}/../uhcpd/bin" && pwd -P)/uhcpd"
 DHCPD="$(cd "${SLIPTTY_DIR}/../dhcpv6-pd_ia/" && pwd -P)/dhcpv6-pd_ia.py"
 RADVD="$(cd "${SLIPTTY_DIR}/../radvd/" && pwd -P)/radvd.sh"
 TUN=sl0
-TUN_GLB="fdea:dbee:f::1/64"
+TUN_GLB="fd00:dead:beef::1/128"
 UHCPD_PID=
 CREATED_IFACE=0
 START_SLIP=1
@@ -128,7 +128,7 @@ SLIP_ONLY=0
 USE_DHCPV6=0
 USE_RADVD=0
 
-while getopts dehIr: opt; do
+while getopts derI:g:h opt; do
     case ${opt} in
         d)  USE_DHCPV6=1; shift 1;;
         e)  SLIP_ONLY=1; shift 1;;
