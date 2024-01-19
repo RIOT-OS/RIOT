@@ -18,17 +18,13 @@
  * @}
  */
 
-#include <errno.h>
 #include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 
-#include "mutex.h"
 #include "periph/gpio.h"
 #include "periph/gpio_ll.h"
 #include "test_utils/expect.h"
+#include "time_units.h"
 #include "ztimer.h"
-#include "timex.h"
 
 #ifndef COMPENSATE_OVERHEAD
 #define COMPENSATE_OVERHEAD 1
@@ -158,8 +154,8 @@ int main(void)
         gpio_conf_t conf = {
             .state = GPIO_OUTPUT_PUSH_PULL,
         };
-        expect(0 == gpio_ll_init(port_out, PIN_OUT_0, &conf));
-        expect(0 == gpio_ll_init(port_out, PIN_OUT_1, &conf));
+        expect(0 == gpio_ll_init(port_out, PIN_OUT_0, conf));
+        expect(0 == gpio_ll_init(port_out, PIN_OUT_1, conf));
 
         uint32_t start = ztimer_now(ZTIMER_USEC);
         for (uint_fast16_t i = loops; i > 0; i--) {
@@ -211,8 +207,8 @@ int main(void)
         gpio_conf_t conf = {
             .state = GPIO_OUTPUT_PUSH_PULL,
         };
-        expect(0 == gpio_ll_init(port_out, PIN_OUT_0, &conf));
-        expect(0 == gpio_ll_init(port_out, PIN_OUT_1, &conf));
+        expect(0 == gpio_ll_init(port_out, PIN_OUT_0, conf));
+        expect(0 == gpio_ll_init(port_out, PIN_OUT_1, conf));
 
         uint32_t start = ztimer_now(ZTIMER_USEC);
         for (uint_fast16_t i = loops; i > 0; i--) {
@@ -264,8 +260,8 @@ int main(void)
         gpio_conf_t conf = {
             .state = GPIO_OUTPUT_PUSH_PULL,
         };
-        expect(0 == gpio_ll_init(port_out, PIN_OUT_0, &conf));
-        expect(0 == gpio_ll_init(port_out, PIN_OUT_1, &conf));
+        expect(0 == gpio_ll_init(port_out, PIN_OUT_0, conf));
+        expect(0 == gpio_ll_init(port_out, PIN_OUT_1, conf));
 
         uword_t both_high = gpio_ll_prepare_write(port_out, mask_both,
                                                   mask_both);

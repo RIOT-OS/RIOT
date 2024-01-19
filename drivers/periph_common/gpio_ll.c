@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#include <assert.h>
-#include <stdint.h>
 #include <stdio.h>
 
 #include "periph/gpio_ll.h"
@@ -29,50 +27,12 @@ static inline void print_str(const char *str)
 }
 #endif
 
-const gpio_conf_t gpio_ll_in = {
-    .state              = GPIO_INPUT,
-    .pull               = GPIO_FLOATING,
-};
-
-const gpio_conf_t gpio_ll_in_pd = {
-    .state              = GPIO_INPUT,
-    .pull               = GPIO_PULL_DOWN,
-};
-
-const gpio_conf_t gpio_ll_in_pu = {
-    .state              = GPIO_INPUT,
-    .pull               = GPIO_PULL_UP,
-};
-
-const gpio_conf_t gpio_ll_in_pk = {
-    .state              = GPIO_INPUT,
-    .pull               = GPIO_PULL_KEEP,
-};
-
-const gpio_conf_t gpio_ll_out = {
-    .state              = GPIO_OUTPUT_PUSH_PULL,
-    .initial_value      = false,
-};
-
-const gpio_conf_t gpio_ll_pd = {
-    .state              = GPIO_OUTPUT_OPEN_DRAIN,
-    .pull               = GPIO_FLOATING,
-    .initial_value      = true,
-};
-
-const gpio_conf_t gpio_ll_pd_pu = {
-    .state              = GPIO_OUTPUT_OPEN_DRAIN,
-    .pull               = GPIO_PULL_UP,
-    .initial_value      = true,
-};
-
-void gpio_ll_print_conf_common(const gpio_conf_t *conf)
+void gpio_ll_print_conf_common(const gpio_conf_t conf)
 {
-    assert(conf);
     const char *off_on[] = { "off", "on" };
 
     print_str("state: ");
-    switch (conf->state) {
+    switch (conf.state) {
     case GPIO_OUTPUT_PUSH_PULL:
         print_str("out-pp");
         break;
@@ -93,9 +53,9 @@ void gpio_ll_print_conf_common(const gpio_conf_t *conf)
         break;
     }
 
-    if (conf->state != GPIO_OUTPUT_PUSH_PULL) {
+    if (conf.state != GPIO_OUTPUT_PUSH_PULL) {
         print_str(", pull: ");
-        switch (conf->pull) {
+        switch (conf.pull) {
         default:
         case GPIO_FLOATING:
             print_str("none");
@@ -113,7 +73,7 @@ void gpio_ll_print_conf_common(const gpio_conf_t *conf)
     }
 
     print_str(", value: ");
-    print_str(off_on[conf->initial_value]);
+    print_str(off_on[conf.initial_value]);
 }
 
 /* implement gpio_ll_print_conf as weak alias symbol for
@@ -121,4 +81,4 @@ void gpio_ll_print_conf_common(const gpio_conf_t *conf)
  * override gpio_ll_print_conf while reusing gpio_ll_print_conf_common()
  */
 __attribute__((weak, alias("gpio_ll_print_conf_common")))
-void gpio_ll_print_conf(const gpio_conf_t *conf);
+void gpio_ll_print_conf(gpio_conf_t conf);
