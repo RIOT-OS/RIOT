@@ -28,9 +28,6 @@ CFLAGS += -DHAS_SOCK_DNS_MOCK=1
 include $(RIOTBASE)/Makefile.include
 
 ifeq (native,$(BOARD))
-RIOT_TERMINAL=native
-TERMPROG=$(ELFFILE)
-TERMFLAGS=
 test: PORT=
 $(call target-export-variables,test,PORT)
 endif

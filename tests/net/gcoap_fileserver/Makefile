@@ -37,7 +37,6 @@ ifeq (native, $(BOARD))
   USEMODULE += socket_zep
   USEMODULE += socket_zep_hello
   USEMODULE += netdev
-  RIOT_TERMINAL = native
   TERMFLAGS += -z 127.0.0.1:17754 # Murdock has no IPv6 support
   # make sure each instance gets their own fs
   CFLAGS += -DCONFIG_NATIVE_ISOLATE_FS=1
