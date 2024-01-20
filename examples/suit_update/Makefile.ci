@@ -6,6 +6,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     bluepill-stm32f103cb \
     e104-bt5010a-tb \
     e104-bt5011a-tb \
+    gd32vf103c-start \
     lsn50 \
     msb-430 \
     msb-430h \

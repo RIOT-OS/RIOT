@@ -8,6 +8,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     cc1350-launchpad \
     cc2650-launchpad \
     cc2650stk \
+    gd32vf103c-start \
     i-nucleo-lrwan1 \
     im880b \
     lobaro-lorabox \
