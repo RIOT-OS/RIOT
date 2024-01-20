@@ -526,7 +526,7 @@ checksum = "a5996294f19bd3aae0453a862ad728f60e6600695733dd5df01da90c54363a3c"
 [[package]]
 name = "riot-coap-handler-demos"
 version = "0.1.0"
-source = "git+https://gitlab.com/etonomy/riot-module-examples/#5aa33e8e8f7912049e09a5b1379131038d70641f"
+source = "git+https://gitlab.com/etonomy/riot-module-examples/#de9fb3332c2a5125ac97ee29f5f61deba444aa99"
 dependencies = [
  "coap-handler",
  "coap-handler-implementations",
