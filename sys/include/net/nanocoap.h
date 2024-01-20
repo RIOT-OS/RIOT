@@ -862,6 +862,23 @@ static inline ssize_t coap_get_uri_query_string(coap_pkt_t *pkt, char *target,
 }
 
 /**
+ * @brief   Find a URI query option of the packet
+ *
+ * This function searches for a query option of the form "?key=value"
+ * and would, when present, return the pointer to "value" when searching
+ * for "key".
+ *
+ * @param[in]   pkt     pkt to work on
+ * @param[in]   key     key string to look for
+ * @param[out]  value   found value if present, may be NULL
+ * @param[out]  len     length of value if present, may be NULL if value is NULL
+ *
+ * @returns     true if the key was found, false if not
+ */
+bool coap_find_uri_query(coap_pkt_t *pkt, const char *key,
+                         const char **value, size_t *len);
+
+/**
  * @brief   Iterate over a packet's options
  *
  * To start iteration from the first option, set @p init_opt to true. To start
