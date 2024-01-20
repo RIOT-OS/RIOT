@@ -1,12 +1,16 @@
 # Select the most recently attached tty interface
 ifeq (1,$(MOST_RECENT_PORT))
   ifneq (,$(filter stdio_cdc_acm,$(USEMODULE)))
-    TTY_BOARD_FILTER ?= --model $(BOARD) --vendor 'RIOT-os\.org'
+    TTY_SELECT_CMD ?= $(RIOTTOOLS)/usb-serial/ttys.py \
+                      --most-recent \
+                      --format path serial \
+                      --model '$(BOARD)' --vendor 'RIOT-os\.org'
+  else
+    TTY_SELECT_CMD ?= $(RIOTTOOLS)/usb-serial/ttys.py \
+                      --most-recent \
+                      --format path serial \
+                      $(TTY_BOARD_FILTER)
   endif
-  TTY_SELECT_CMD ?= $(RIOTTOOLS)/usb-serial/ttys.py \
-                    --most-recent \
-                    --format path serial \
-                    $(TTY_BOARD_FILTER)
   TTY_DETECTED := $(shell $(TTY_SELECT_CMD) || echo 'no-tty-detected no-serial-detected')
   PORT_DETECTED := $(firstword $(TTY_DETECTED))
   PORT_SERIAL_DETECTED := $(lastword $(TTY_DETECTED))
