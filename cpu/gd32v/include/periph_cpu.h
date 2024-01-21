@@ -187,6 +187,24 @@ void gpio_init_analog(gpio_t pin);
  * public view on type */
 #ifndef DOXYGEN
 
+#define HAVE_GPIO_STATE_T
+typedef enum {
+    GPIO_OUTPUT_PUSH_PULL,
+    GPIO_OUTPUT_OPEN_DRAIN,
+    GPIO_OUTPUT_OPEN_SOURCE,
+    GPIO_INPUT,
+    GPIO_USED_BY_PERIPHERAL,
+    GPIO_DISCONNECT,
+} gpio_state_t;
+
+#define HAVE_GPIO_PULL_T
+typedef enum {
+    GPIO_FLOATING,
+    GPIO_PULL_UP,
+    GPIO_PULL_DOWN,
+    GPIO_PULL_KEEP,
+} gpio_pull_t;
+
 #define HAVE_GPIO_PULL_STRENGTH_T
 typedef enum {
     GPIO_PULL_WEAKEST = 0,
@@ -211,7 +229,65 @@ typedef enum {
     GPIO_SLEW_FASTEST = 2,
 } gpio_slew_t;
 
+#define HAVE_GPIO_CONF_T
+typedef union gpio_conf_gd32v gpio_conf_t;
+
 #endif /* !DOXYGEN */
+
+/**
+ * @brief       GPIO pin configuration for GD32V MCUs.
+ * @ingroup     drivers_periph_gpio_ll
+ */
+union gpio_conf_gd32v {
+    uint16_t bits;  /**< the raw bits */
+    struct {
+        /**
+         * @brief   State of the pin
+         */
+        gpio_state_t state              : 3;
+        /**
+         * @brief   Pull resistor configuration
+         */
+        gpio_pull_t pull                : 2;
+        /**
+         * @brief   Configure the slew rate of outputs
+         *
+         * @warning If the requested slew rate is not available, the closest fit
+         *          supported will be configured instead.
+         *
+         * This value is ignored *unless* @ref gpio_conf_stm32::state is
+         * configured to @ref GPIO_OUTPUT_PUSH_PULL or @ref GPIO_OUTPUT_OPEN_DRAIN.
+         */
+        gpio_slew_t slew_rate           : 2;
+        /**
+         * @brief   Whether to disable the input Schmitt trigger
+         *
+         * @details This could be called `schmitt_trigger` with inverse
+         *          meaning, but the API contract says that additional
+         *          members in the structure should have a sane
+         *          default when zero.
+         *
+         * This value is ignored *unless* @ref gpio_conf_stm32::state is
+         * configured to @ref GPIO_INPUT.
+         */
+        bool schmitt_trigger_disabled   : 1;
+        /**
+         * @brief   Initial value of the output
+         *
+         * Ignored if @ref gpio_conf_stm32::state is set to @ref GPIO_INPUT or
+         * @ref GPIO_DISCONNECT. If the pin was previously in a high impedance
+         * state, it is guaranteed to directly transition to the given initial
+         * value.
+         *
+         * @ref gpio_ll_query_conf will write the current value of the specified
+         * pin here, which is read from the input register when the state is
+         * @ref GPIO_INPUT, otherwise the state from the output register is
+         * consulted.
+         */
+        bool initial_value          : 1;
+        uint8_t                     : 7;    /*< padding */
+    };
+};
 
 /**
  * @brief   Available number of ADC devices

@@ -19,28 +19,26 @@
  * @}
  */
 
-#include <assert.h>
 #include <errno.h>
-#include <string.h>
 
 #include "cpu.h"
 #include "periph/gpio_ll.h"
 #include "periph_cpu.h"
 #include "periph_conf.h"
 
-int gpio_ll_init(gpio_port_t port, uint8_t pin, const gpio_conf_t *conf)
+int gpio_ll_init(gpio_port_t port, uint8_t pin, gpio_conf_t conf)
 {
     GPIO_Mode_TypeDef mode;
 
-    bool initial = conf->initial_value;
+    bool initial = conf.initial_value;
 
-    switch (conf->state) {
+    switch (conf.state) {
     case GPIO_DISCONNECT:
         /* ignoring pull */
         mode = gpioModeDisabled;
         break;
     case GPIO_INPUT:
-        switch (conf->pull) {
+        switch (conf.pull) {
         case GPIO_FLOATING:
             mode = gpioModeInput;
             break;
@@ -61,7 +59,7 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, const gpio_conf_t *conf)
         mode = gpioModePushPull;
         break;
     case GPIO_OUTPUT_OPEN_DRAIN:
-        switch (conf->pull) {
+        switch (conf.pull) {
         case GPIO_FLOATING:
             mode = gpioModeWiredAnd;
             break;
@@ -73,7 +71,7 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, const gpio_conf_t *conf)
         }
         break;
     case GPIO_OUTPUT_OPEN_SOURCE:
-        switch (conf->pull) {
+        switch (conf.pull) {
         case GPIO_FLOATING:
             mode = gpioModeWiredOr;
             break;
@@ -99,58 +97,48 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, const gpio_conf_t *conf)
     return 0;
 }
 
-void gpio_ll_query_conf(gpio_conf_t *dest, gpio_port_t port, uint8_t pin)
+gpio_conf_t gpio_ll_query_conf(gpio_port_t port, uint8_t pin)
 {
-    memset(dest, 0, sizeof(*dest));
-
+    gpio_conf_t result = { 0 };
     GPIO_Mode_TypeDef mode = GPIO_PinModeGet(port, pin);
 
-    dest->pull = GPIO_FLOATING;
+    result.pull = GPIO_FLOATING;
 
     switch (mode) {
     case gpioModePushPull:
-        dest->state = GPIO_OUTPUT_PUSH_PULL;
+        result.state = GPIO_OUTPUT_PUSH_PULL;
         break;
     case gpioModeWiredOr:
-        dest->state = GPIO_OUTPUT_OPEN_SOURCE;
+        result.state = GPIO_OUTPUT_OPEN_SOURCE;
         break;
     case gpioModeWiredOrPullDown:
-        dest->state = GPIO_OUTPUT_OPEN_SOURCE;
-        dest->pull = GPIO_PULL_DOWN;
+        result.state = GPIO_OUTPUT_OPEN_SOURCE;
+        result.pull = GPIO_PULL_DOWN;
         break;
     case gpioModeWiredAnd:
-        dest->state = GPIO_OUTPUT_OPEN_DRAIN;
+        result.state = GPIO_OUTPUT_OPEN_DRAIN;
         break;
     case gpioModeWiredAndPullUp:
-        dest->state = GPIO_OUTPUT_OPEN_DRAIN;
-        dest->pull = GPIO_PULL_UP;
+        result.state = GPIO_OUTPUT_OPEN_DRAIN;
+        result.pull = GPIO_PULL_UP;
         break;
     case gpioModeInput:
-        dest->state = GPIO_INPUT;
+        result.state = GPIO_INPUT;
         break;
     case gpioModeInputPull:
-        dest->state = GPIO_INPUT;
-        dest->pull = GPIO_PinOutGet(port, pin) ?
+        result.state = GPIO_INPUT;
+        result.pull = GPIO_PinOutGet(port, pin) ?
             GPIO_PULL_UP :
             GPIO_PULL_DOWN;
         break;
     case gpioModeDisabled:
         /* Fall-through: There is no error reporting here */
     default:
-        dest->state = GPIO_DISCONNECT;
+        result.state = GPIO_DISCONNECT;
         break;
     }
 
-    /* as good as any */
-    dest->slew_rate = GPIO_SLEW_FAST;
+    result.initial_value = (gpio_ll_read_output(port) >> pin) & 1;
 
-    /* It's always on as long as they're in a mode in which it matters, judging
-     * from https://www.silabs.com/documents/public/application-notes/an0027.pdf */
-    dest->schmitt_trigger = true;
-
-    dest->initial_value = (gpio_ll_read_output(port) >> pin) & 1;
-
-    /* Using 'strong' her already as that fits with what the hardware has
-     * (lowest, low, standard, high) */
-    dest->drive_strength = GPIO_DRIVE_STRONG;
+    return result;
 }

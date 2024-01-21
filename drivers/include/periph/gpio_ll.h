@@ -299,7 +299,57 @@ typedef enum {
                             + (GPIO_SLEW_SLOW != GPIO_SLEW_FAST) \
                             + (GPIO_SLEW_FAST != GPIO_SLEW_FASTEST))
 
-#if !defined(HAVE_GPIO_CONF_T) || defined(DOXYGEN)
+/**
+ * @brief   Public members of `gpio_conf_t`
+ *
+ * The type `gpio_conf_t` is implementation specific, but will in any case
+ * be a union of an unsigned integer of implementation defined width named
+ * `bits` (to access all bits of the configuration in one read/write), and
+ * an anonymous `struct` to access the actual configuration via its members.
+ *
+ * The members given here have to be present in every implementation. Make sure
+ * to use the `enum` names to assign them, as the actual numeric representation
+ * again is implementation specific.
+ *
+ * It is explicitly intended that code makes use of implementation specific
+ * extensions to `gpio_conf_t`. However, portable code should be restricted
+ * to only use the members detailed here and make sure that all other bits
+ * are initialized with zero.
+ */
+union gpio_conf_minimal {
+    uint8_t bits;           /**< The raw bits of the configuration */
+    struct {
+        /**
+         * @brief   State of the pin
+         */
+        gpio_state_t state              : 3;
+        /**
+         * @brief   Pull resistor configuration
+         */
+        gpio_pull_t pull                : 2;
+        /**
+         * @brief   Initial value of the output
+         *
+         * Ignored if @ref gpio_conf_minimal::state is set to @ref GPIO_INPUT or
+         * @ref GPIO_DISCONNECT. If the pin was previously in a high impedance
+         * state, it is guaranteed to directly transition to the given initial
+         * value.
+         *
+         * @ref gpio_ll_query_conf will write the current value of the specified
+         * pin here, which is read from the input register when the state is
+         * @ref GPIO_INPUT, otherwise the state from the output register is
+         * consulted.
+         */
+        bool initial_value              : 1;
+        uint8_t                         : 2; /*< padding */
+    };
+};
+
+#if !defined(HAVE_GPIO_CONF_T) && !defined(DOXYGEN)
+typedef union gpio_conf_minimal gpio_conf_t;
+#endif
+
+#ifdef DOXYGEN
 /**
  * @brief   GPIO pin configuration
  *
@@ -309,93 +359,56 @@ typedef enum {
  *          initializers or zeroing out the whole contents using `memset()
  *          before initializing the individual fields.
  *
- * It is fully valid that an implementation extends this structure with
- * additional implementation specific fields. For example, it could be useful
- * to also include fields to configure routing of a GPIO pin to other
- * peripherals (e.g. for us as an TXD pin of an UART). These implementation
- * specific fields **MUST** however have reasonable defaults when initialized
- * with zero (e.g. pin is not routed to another peripheral but to be used as
- * regular GPIO). For obvious reasons, portable code cannot rely on the
- * presence and semantic of any implementation specific fields.  Additionally,
- * out-of-tree users should not use these fields, as the implementation
- * specific fields cannot be considered a stable API.
+ * See @ref gpio_conf_minimal for the minimal structure fields to expect.
  */
-typedef struct {
-    gpio_state_t state;         /**< State of the pin */
-    gpio_pull_t pull;           /**< Pull resistor configuration */
-    /**
-     * @brief   Configure the slew rate of outputs
-     *
-     * @warning If the requested slew rate is not available, the closest fit
-     *          supported will be configured instead.
-     *
-     * This value is ignored *unless* @ref gpio_conf_t::state is configured
-     * to @ref GPIO_OUTPUT_PUSH_PULL or @ref GPIO_OUTPUT_OPEN_DRAIN.
-     */
-    gpio_slew_t slew_rate;
-    /**
-     * @brief   Whether to enable the input Schmitt trigger
-     *
-     * @warning If the requested Schmitt trigger setting is not available, it
-     *          will be ignored.
-     *
-     * This value is ignored *unless* @ref gpio_conf_t::state is configured
-     * to @ref GPIO_INPUT.
-     */
-    bool schmitt_trigger;
-    /**
-     * @brief   Initial value of the output
-     *
-     * Ignored if @ref gpio_conf_t::state is set to @ref GPIO_INPUT or
-     * @ref GPIO_DISCONNECT. If the pin was previously in a high impedance
-     * state, it is guaranteed to directly transition to the given initial
-     * value.
-     *
-     * @ref gpio_ll_query_conf will write the current value of the specified
-     * pin here, which is read from the input register when the state is
-     * @ref GPIO_INPUT, otherwise the state from the output register is
-     * consulted.
-     */
-    bool initial_value;
-    /**
-     * @brief   Strength of the pull up/down resistor
-     *
-     * @warning If the requested pull strength is not available, the closest fit
-     *          supported will be configured instead.
-     *
-     * This value is ignored when @ref gpio_conf_t::pull is configured to
-     * @ref GPIO_FLOATING.
-     */
-    gpio_pull_strength_t pull_strength;
-    /**
-     * @brief   Drive strength of the GPIO
-     *
-     * @warning If the requested drive strength is not available, the closest
-     *          fit supported will be configured instead.
-     *
-     * This value is ignored when @ref gpio_conf_t::state is configured to
-     * @ref GPIO_INPUT or @ref GPIO_DISCONNECT.
-     */
-    gpio_drive_strength_t drive_strength;
-} gpio_conf_t;
+typedef /* implementation specific */ gpio_conf_t;
 #endif
 
+#ifndef __cplusplus
+/**
+ * @name    Commonly used GPIO LL configuration presets
+ *
+ * @warning These are not available in C++
+ *
+ * C++ requires initializers to be provided in declaration order and contain
+ * explicit initialization for each and every field. However, the actual
+ * layout and the number of members of `gpio_conf_t` depends on the
+ * implementation, so that implementations can expose advanced features such
+ * as pull strength, driver strength, skew rate, mux settings, etc. The
+ * API mandates that those extra fields will have a sane default value when
+ * implicitly initialized with 0, as done here in C.
+ *
+ * This doesn't work in C++, unless multiplying the maintenance burden by
+ * the number of implementations by having each implementation provide this
+ * by hand. This is not acceptable.
+ *
+ * @{
+ */
 /**
  * @brief   A standard configuration for a generic floating input pin
  */
-extern const gpio_conf_t gpio_ll_in;
+static const gpio_conf_t gpio_ll_in = {
+    .state              = GPIO_INPUT,
+    .pull               = GPIO_FLOATING,
+};
 
 /**
  * @brief   A standard configuration for a generic input pin with pull down
  *          resistor
  */
-extern const gpio_conf_t gpio_ll_in_pd;
+static const gpio_conf_t gpio_ll_in_pd = {
+    .state              = GPIO_INPUT,
+    .pull               = GPIO_PULL_DOWN,
+};
 
 /**
  * @brief   A standard configuration for a generic input pin with pull up
  *          resistor
  */
-extern const gpio_conf_t gpio_ll_in_pu;
+static const gpio_conf_t gpio_ll_in_pu = {
+    .state              = GPIO_INPUT,
+    .pull               = GPIO_PULL_UP,
+};
 
 /**
  * @brief   A standard configuration for a generic input pin with pull
@@ -403,15 +416,24 @@ extern const gpio_conf_t gpio_ll_in_pu;
  *
  * This means, when the input reaches a 0, a pull down resistor is applied. If
  * input reaches 1, a pull up is applied instead.
+ *
+ * @note    This is a rather uncommon feature. MCUs that support this are
+ *          RP2040.
  */
-extern const gpio_conf_t gpio_ll_in_pk;
+static const gpio_conf_t gpio_ll_in_pk = {
+    .state              = GPIO_INPUT,
+    .pull               = GPIO_PULL_KEEP,
+};
 
 /**
  * @brief   A standard configuration for a generic push-pull output pin
  *
  * @note    The pin will have an initial value of 0.
  */
-extern const gpio_conf_t gpio_ll_out;
+static const gpio_conf_t gpio_ll_out = {
+    .state              = GPIO_OUTPUT_PUSH_PULL,
+    .initial_value      = false,
+};
 
 /**
  * @brief   A standard configuration for a generic floating open drain output
@@ -419,7 +441,11 @@ extern const gpio_conf_t gpio_ll_out;
  * @note    The pin will have an initial value of 1 (which in absence of an
  *          external pull up resistor will be high impedance).
  */
-extern const gpio_conf_t gpio_ll_od;
+static const gpio_conf_t gpio_ll_od = {
+    .state              = GPIO_OUTPUT_OPEN_DRAIN,
+    .pull               = GPIO_FLOATING,
+    .initial_value      = true,
+};
 
 /**
  * @brief   A standard configuration for a generic open drain output with pull
@@ -428,7 +454,13 @@ extern const gpio_conf_t gpio_ll_od;
  * @note    The pin will have an initial value of 1 (so that the pull up will
  *          pill the line high).
  */
-extern const gpio_conf_t gpio_ll_od_pu;
+static const gpio_conf_t gpio_ll_od_pu = {
+    .state              = GPIO_OUTPUT_OPEN_DRAIN,
+    .pull               = GPIO_PULL_UP,
+    .initial_value      = true,
+};
+/** @} */
+#endif
 
 /**
  * @brief   Check if the given number is a valid argument for @ref GPIO_PORT
@@ -476,23 +508,23 @@ static inline bool is_gpio_port_num_valid(uint_fast8_t num);
  *          different pins on the same port is supported. The underlying
  *          implementation might perform locking where needed.
  */
-int gpio_ll_init(gpio_port_t port, uint8_t pin, const gpio_conf_t *conf);
+int gpio_ll_init(gpio_port_t port, uint8_t pin, gpio_conf_t conf);
 
 /**
  * @brief   Retrieve the current configuration of a GPIO pin
  *
- * @param[out]      dest    Write the current config of the given GPIO here
  * @param[in]       port    GPIO port the pin to query is located at
  * @param[in]       pin     Number of the pin to query within @p port
+ * @return                  The current config of the given GPIO here
  *
  * @pre     @p port and @p pin refer to an existing GPIO pin and @p dest can
  *          be written to. Expect blowing assertions otherwise.
  *
- * @note    @ref gpio_conf_t::initial_value should be set to the current value
- *          of the pin, so that no shadow log of the initial value is needed to
- *          consult.
+ * @note    @ref gpio_conf_minimal::initial_value should be set to the current
+ *          value of the pin, so that no shadow log of the initial value is
+ *          needed to consult.
  */
-void gpio_ll_query_conf(gpio_conf_t *dest, gpio_port_t port, uint8_t pin);
+gpio_conf_t gpio_ll_query_conf(gpio_port_t port, uint8_t pin);
 
 /**
  * @brief   INTERNAL, use @ref gpio_ll_print_conf instead
@@ -502,13 +534,13 @@ void gpio_ll_query_conf(gpio_conf_t *dest, gpio_port_t port, uint8_t pin);
  * more members overwrite @ref gpio_ll_print_conf and call this function to
  * print the common members
  */
-void gpio_ll_print_conf_common(const gpio_conf_t *conf);
+void gpio_ll_print_conf_common(const gpio_conf_t conf);
 
 /**
  * @brief   Utility function to print a given GPIO configuration to stdio
  * @param[in]       conf    Configuration to print
  */
-void gpio_ll_print_conf(const gpio_conf_t *conf);
+void gpio_ll_print_conf(const gpio_conf_t conf);
 
 /**
  * @brief   Get the current input value of all GPIO pins of the given port as

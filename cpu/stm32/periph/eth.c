@@ -24,7 +24,6 @@
 #include <errno.h>
 #include <string.h>
 
-#include "bitarithm.h"
 #include "board.h"
 #include "iolist.h"
 #include "macros/utils.h"
@@ -33,7 +32,6 @@
 #include "net/ethernet.h"
 #include "net/eui_provider.h"
 #include "net/netdev/eth.h"
-#include "periph/gpio.h"
 #include "periph/gpio_ll.h"
 #include "time_units.h"
 
@@ -487,10 +485,10 @@ static int stm32_eth_init(netdev_t *netdev)
     if (IS_USED(MODULE_STM32_ETH_TRACING)) {
         gpio_ll_init(GPIO_PORT(STM32_ETH_TRACING_TX_PORT_NUM),
                      STM32_ETH_TRACING_TX_PIN_NUM,
-                     &gpio_ll_out);
+                     gpio_ll_out);
         gpio_ll_init(GPIO_PORT(STM32_ETH_TRACING_RX_PORT_NUM),
                      STM32_ETH_TRACING_RX_PIN_NUM,
-                     &gpio_ll_out);
+                     gpio_ll_out);
     }
     if (IS_USED(MODULE_STM32_ETH_LINK_UP)) {
         _link_status_timer.callback = _timer_cb;

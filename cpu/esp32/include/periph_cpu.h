@@ -190,7 +190,7 @@ typedef enum {
     GPIO_FLOATING = 0,
     GPIO_PULL_UP = 1,
     GPIO_PULL_DOWN = 2,
-    GPIO_PULL_KEEP = 0xff   /*< not supported */
+    GPIO_PULL_KEEP = 3   /*< not supported */
 } gpio_pull_t;
 
 /**
@@ -212,9 +212,64 @@ typedef enum {
 #define GPIO_DRIVE_20   GPIO_DRIVE_STRONG       /**< 20 mA (default) */
 #define GPIO_DRIVE_30   GPIO_DRIVE_STRONGEST    /**< 30 mA */
 
-/* END: GPIO LL overwrites */
+#define HAVE_GPIO_STATE_T
+typedef enum {
+    GPIO_OUTPUT_PUSH_PULL,
+    GPIO_OUTPUT_OPEN_DRAIN,
+    GPIO_OUTPUT_OPEN_SOURCE,
+    GPIO_INPUT,
+    GPIO_USED_BY_PERIPHERAL,
+    GPIO_DISCONNECT,
+} gpio_state_t;
+
+#define HAVE_GPIO_CONF_T
+typedef union gpio_conf_esp32 gpio_conf_t;
 
 #endif /* ndef DOXYGEN */
+
+/**
+ * @brief       GPIO pin configuration for ESP32/ESP32Cx/ESP32Sx MCUs
+ * @ingroup     drivers_periph_gpio_ll
+ */
+union gpio_conf_esp32 {
+    uint8_t bits;  /**< the raw bits */
+    struct {
+        /**
+         * @brief   State of the pin
+         */
+        gpio_state_t state                      : 3;
+        /**
+         * @brief   Pull resistor configuration
+         */
+        gpio_pull_t pull                        : 2;
+        /**
+         * @brief   Drive strength of the GPIO
+         *
+         * @warning If the requested drive strength is not available, the closest
+         *          fit supported will be configured instead.
+         *
+         * This value is ignored when @ref gpio_conf_esp32::state is configured
+         * to @ref GPIO_INPUT or @ref GPIO_DISCONNECT.
+         */
+        gpio_drive_strength_t drive_strength    : 2;
+        /**
+         * @brief   Initial value of the output
+         *
+         * Ignored if @ref gpio_conf_esp32::state is set to @ref GPIO_INPUT or
+         * @ref GPIO_DISCONNECT. If the pin was previously in a high impedance
+         * state, it is guaranteed to directly transition to the given initial
+         * value.
+         *
+         * @ref gpio_ll_query_conf will write the current value of the specified
+         * pin here, which is read from the input register when the state is
+         * @ref GPIO_INPUT, otherwise the state from the output register is
+         * consulted.
+         */
+        bool initial_value                      : 1;
+    };
+};
+
+/* END: GPIO LL overwrites */
 /** @} */
 
 /**

@@ -138,12 +138,69 @@ typedef enum {
 #define HAVE_GPIO_PULL_T
 typedef enum {
     GPIO_FLOATING = 0,
-    GPIO_PULL_UP = GPIO_PIN_CNF_PULL_Pullup << GPIO_PIN_CNF_PULL_Pos,
-    GPIO_PULL_DOWN = GPIO_PIN_CNF_PULL_Pulldown << GPIO_PIN_CNF_PULL_Pos,
-    /* GPIO_PULL_KEEP is not supported by, gpio_ll_init() returns -ENOTSUP */
-    GPIO_PULL_KEEP = 0xff
+    GPIO_PULL_UP = GPIO_PIN_CNF_PULL_Pullup,
+    GPIO_PULL_DOWN = GPIO_PIN_CNF_PULL_Pulldown,
+    GPIO_PULL_KEEP = 2,
 } gpio_pull_t;
-#endif /* END: GPIO LL overwrites */
+
+#define HAVE_GPIO_STATE_T
+typedef enum {
+    GPIO_OUTPUT_PUSH_PULL,
+    GPIO_OUTPUT_OPEN_DRAIN,
+    GPIO_OUTPUT_OPEN_SOURCE,
+    GPIO_INPUT,
+    GPIO_USED_BY_PERIPHERAL,
+    GPIO_DISCONNECT,
+} gpio_state_t;
+
+#define HAVE_GPIO_CONF_T
+typedef union gpio_conf_nrf5x gpio_conf_t;
+
+#endif
+
+/**
+ * @brief       GPIO pin configuration for nRF5x MCUs
+ * @ingroup     drivers_periph_gpio_ll
+ */
+union gpio_conf_nrf5x {
+    uint8_t bits;  /**< the raw bits */
+    struct {
+        /**
+         * @brief   State of the pin
+         */
+        gpio_state_t state                      : 3;
+        /**
+         * @brief   Pull resistor configuration
+         */
+        gpio_pull_t pull                        : 2;
+        /**
+         * @brief   Drive strength of the GPIO
+         *
+         * @warning If the requested drive strength is not available, the
+         *          closest fit supported will be configured instead.
+         *
+         * This value is ignored when @ref gpio_conf_nrf5x::state is configured
+         * to @ref GPIO_INPUT or @ref GPIO_DISCONNECT.
+         */
+        gpio_drive_strength_t drive_strength    : 1;
+        /**
+         * @brief   Initial value of the output
+         *
+         * Ignored if @ref gpio_conf_nrf5x::state is set to @ref GPIO_INPUT or
+         * @ref GPIO_DISCONNECT. If the pin was previously in a high impedance
+         * state, it is guaranteed to directly transition to the given initial
+         * value.
+         *
+         * @ref gpio_ll_query_conf will write the current value of the specified
+         * pin here, which is read from the input register when the state is
+         * @ref GPIO_INPUT, otherwise the state from the output register is
+         * consulted.
+         */
+        bool initial_value                      : 1;
+        uint8_t                                 : 1; /*< padding */
+    };
+};
+/* END: GPIO LL overwrites */
 
 #if !defined(DOXYGEN) && (defined(CPU_NRF53) || defined(CPU_NRF9160))
 /**
