@@ -4,6 +4,7 @@ include ../Makefile.drivers_common
 # Update this to your needs
 # PIN ?= GPIO_PIN(0, 0)
 # N ?= 8
+# DMA ?= 0
 
 USEMODULE += ws281x
 USEMODULE += xtimer
@@ -14,11 +15,14 @@ BOARD_BLACKLIST := waspmote-pro
 
 EXTERNAL_BOARD_DIRS += $(RIOTBASE)/tests/build_system/external_board_dirs/esp-ci-boards
 
-include $(RIOTBASE)/Makefile.include
-
 ifneq (, $(PIN))
   CFLAGS += '-DWS281X_PARAM_PIN=$(PIN)'
 endif
 ifneq (, $(N))
   CFLAGS += '-DWS281X_PARAM_NUMOF=$(N)'
 endif
+ifeq (1, $(DMA))
+  FEATURES_REQUIRED += periph_dma
+endif
+
+include $(RIOTBASE)/Makefile.include

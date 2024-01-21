@@ -1,6 +1,9 @@
 FEATURES_REQUIRED_ANY += cpu_core_atmega|arch_esp32|arch_native|periph_spi
 
 ifeq (,$(filter ws281x_%,$(USEMODULE)))
+  ifneq (,$(filter periph_spi,$(FEATURES_USED)))
+	USEMODULE += ws281x_spi
+  endif
   ifneq (,$(filter cpu_core_atmega,$(FEATURES_USED)))
     USEMODULE += ws281x_atmega
   endif
@@ -9,9 +12,6 @@ ifeq (,$(filter ws281x_%,$(USEMODULE)))
   endif
   ifneq (,$(filter arch_esp32,$(FEATURES_USED)))
     USEMODULE += ws281x_esp32
-  endif
-  ifneq (,$(filter arch_stm32,$(FEATURES_USED)))
-	USEMODULE += ws281x_spi
   endif
 endif
 
@@ -34,7 +34,5 @@ endif
 
 ifneq (,$(filter ws281x_spi,$(USEMODULE)))
   FEATURES_REQUIRED += periph_spi
-  FEATURES_REQUIRED += periph_dma
   USEMODULE += periph_spi
-  USEMODULE += periph_dma
 endif
