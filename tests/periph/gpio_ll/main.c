@@ -862,6 +862,74 @@ static void test_irq(void)
     test_irq_level();
 }
 
+static void test_switch_dir(void)
+{
+    bool test_passed;
+    puts_optional("\n"
+         "Testing Switching Direction\n"
+         "===========================\n");
+
+    uword_t mask_out = 1U << PIN_OUT_0;
+    uword_t mask_in = 1U << PIN_IN_0;
+
+    /* floating input must be supported by every MCU */
+    expect(0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_in));
+    expect(0 == gpio_ll_init(port_out, PIN_OUT_0, gpio_ll_in));
+    gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
+    expect(conf.state == GPIO_INPUT);
+    gpio_conf_t conf_orig = conf;
+
+    /* capture output state before switching from input mode to output mode, so
+     * that it can be restored when switching back to input mode */
+    uword_t out_state = gpio_ll_read_output(port_out);
+
+    /* now, switch to output mode and verify the switch */
+    gpio_ll_switch_dir_output(port_out, mask_out);
+    conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
+    test_passed = (conf.state == GPIO_OUTPUT_PUSH_PULL);
+    printf_optional("Input pin can be switched to output (push-pull) mode: %s\n",
+                    noyes[test_passed]);
+    expect(test_passed);
+
+    gpio_ll_clear(port_out, mask_out);
+    test_passed = (0 == (gpio_ll_read(port_in) & mask_in));
+    gpio_ll_set(port_out, mask_out);
+    test_passed = test_passed && (gpio_ll_read(port_in) & mask_in);
+    printf_optional("Pin behaves as output after switched to output mode: %s\n",
+                    noyes[test_passed]);
+    expect(test_passed);
+
+    /* switch back to input mode */
+    gpio_ll_switch_dir_input(port_out, mask_out);
+    /* restore out state from before the switch */
+    gpio_ll_write(port_out, out_state);
+    /* verify we are back at the old config */
+    conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
+    test_passed = (conf.bits == conf_orig.bits);
+    printf_optional("Returning back to input had no side effects on config: %s\n",
+                    noyes[test_passed]);
+    if (!test_passed) {
+        puts_optional("Before:");
+        print_conf(conf_orig);
+        puts_optional("After:");
+        print_conf(conf);
+        expect(0);
+    }
+
+    /* Finally: check if input behaves like a proper input. For that, we
+     * configure the pin it is connected to (PORT_IN.PIN_IN_0) as output and
+     * see if we can read that from the pin used to switch back and force */
+    expect(0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_out));
+
+    gpio_ll_clear(port_in, mask_in);
+    test_passed = (0 == (gpio_ll_read(port_out) & mask_out));
+    gpio_ll_set(port_in, mask_in);
+    test_passed = test_passed && (gpio_ll_read(port_out) & mask_out);
+    printf_optional("Pin behaves as input after switched back to input mode: %s\n",
+                    noyes[test_passed]);
+    expect(test_passed);
+}
+
 int main(void)
 {
     print_details();
@@ -870,6 +938,10 @@ int main(void)
     test_input_output();
     if (IS_USED(MODULE_PERIPH_GPIO_LL_IRQ)) {
         test_irq();
+    }
+
+    if (IS_USED(MODULE_PERIPH_GPIO_LL_SWITCH_DIR)) {
+        test_switch_dir();
     }
 
     /* if no expect() didn't blow up until now, the test is passed */
