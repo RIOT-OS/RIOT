@@ -69,11 +69,23 @@ static inline NRF_TWIM_Type *bus(i2c_t dev)
     return i2c_config[dev].dev;
 }
 
-static int finish(i2c_t dev)
+/**
+ * Block until the interrupt described by inten_success_flag or
+ * TWIM_INTEN_ERROR_Msk fires.
+ *
+ * Allowed values for inten_success_flag are
+ * * TWIM_INTEN_STOPPED_Msk (when a stop condition is to be set and the short
+ *   circuit will pull TWIM into the stopped condition)
+ * * TWIM_INTEN_LASTTX_Msk (when sending without a stop condition)
+ * * TWIM_INTEN_LASTRX_Msk (when reading without a stop condition)
+ *
+ * Any addition needs to be added to the mask in i2c_isr_handler.
+ */
+static int finish(i2c_t dev, int inten_success_flag)
 {
-    DEBUG("[i2c] waiting for STOPPED or ERROR event\n");
+    DEBUG("[i2c] waiting for success (STOPPED/LAST.X) or ERROR event\n");
     /* Unmask interrupts */
-    bus(dev)->INTENSET = TWIM_INTEN_STOPPED_Msk | TWIM_INTEN_ERROR_Msk;
+    bus(dev)->INTENSET = inten_success_flag | TWIM_INTEN_ERROR_Msk;
     mutex_lock(&busy[dev]);
 
     if ((bus(dev)->EVENTS_STOPPED)) {
@@ -248,16 +260,19 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len,
     bus(dev)->RXD.PTR = (uint32_t)data;
     bus(dev)->RXD.MAXCNT = (uint8_t)len;
 
+    int inten_success_flag;
     if (!(flags & I2C_NOSTOP)) {
         bus(dev)->SHORTS = TWIM_SHORTS_LASTRX_STOP_Msk;
+        inten_success_flag = TWIM_INTEN_STOPPED_Msk;
     }
     else {
         bus(dev)->SHORTS = 0;
+        inten_success_flag = TWIM_INTEN_LASTRX_Msk;
     }
     /* Start transmission */
     bus(dev)->TASKS_STARTRX = 1;
 
-    return finish(dev);
+    return finish(dev, inten_success_flag);
 }
 
 int i2c_read_regs(i2c_t dev, uint16_t addr, uint16_t reg,
@@ -285,15 +300,18 @@ int i2c_read_regs(i2c_t dev, uint16_t addr, uint16_t reg,
     bus(dev)->TXD.PTR = (uint32_t)&reg;
     bus(dev)->RXD.PTR = (uint32_t)data;
     bus(dev)->RXD.MAXCNT = (uint8_t)len;
+
+    int inten_success_flag = TWIM_INTEN_LASTRX_Msk;
     bus(dev)->SHORTS = (TWIM_SHORTS_LASTTX_STARTRX_Msk);
     if (!(flags & I2C_NOSTOP)) {
         bus(dev)->SHORTS |=  TWIM_SHORTS_LASTRX_STOP_Msk;
+        inten_success_flag = TWIM_INTEN_STOPPED_Msk;
     }
 
     /* Start transfer */
     bus(dev)->TASKS_STARTTX = 1;
 
-    return finish(dev);
+    return finish(dev, inten_success_flag);
 }
 
 int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len,
@@ -309,15 +327,18 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len,
     bus(dev)->ADDRESS = addr;
     bus(dev)->TXD.PTR = (uint32_t)data;
     bus(dev)->TXD.MAXCNT = (uint8_t)len;
+    int inten_success_flag;
     if (!(flags & I2C_NOSTOP)) {
         bus(dev)->SHORTS = TWIM_SHORTS_LASTTX_STOP_Msk;
+        inten_success_flag = TWIM_INTEN_STOPPED_Msk;
     }
     else {
         bus(dev)->SHORTS = 0;
+        inten_success_flag = TWIM_INTEN_LASTTX_Msk;
     }
     bus(dev)->TASKS_STARTTX = 1;
 
-    return finish(dev);
+    return finish(dev, inten_success_flag);
 }
 
 void i2c_isr_handler(void *arg)
@@ -325,7 +346,7 @@ void i2c_isr_handler(void *arg)
     i2c_t dev = (i2c_t)(uintptr_t)arg;
 
     /* Mask interrupts to ensure that they only trigger once */
-    bus(dev)->INTENCLR = TWIM_INTEN_STOPPED_Msk | TWIM_INTEN_ERROR_Msk;
+    bus(dev)->INTENCLR = TWIM_INTEN_STOPPED_Msk | TWIM_INTEN_ERROR_Msk | TWIM_INTEN_LASTTX_Msk | TWIM_INTEN_LASTRX_Msk;
 
     mutex_unlock(&busy[dev]);
 }
