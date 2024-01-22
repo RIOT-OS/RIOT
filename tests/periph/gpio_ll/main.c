@@ -470,6 +470,18 @@ static void test_gpio_ll_init(void)
         is_supported = !(gpio_ll_read(port_in) & (1ULL << PIN_IN_0));
         printf_optional("Output can indeed be pulled LOW: %s\n",
                         noyes[is_supported]);
+        /* If this expects fails, try with a different pin. Often pins intended
+         * for use as UART, I2C, or hardware /CS on SPI cannot be configured
+         * as high impedance and will instead remain HIGH. An implementation
+         * is free to work around this e.g. by configuring these pins as
+         * input with the input buffer disabled or as analog input without
+         * routing them to the ADC, or just to restore the reset configuration
+         * and have them high.
+         *
+         * Even though this can fail on some pins, the `expect()` here should
+         * remain. Just test with a different pin that can be configured as
+         * high impedance to confirm that this functionality does work where
+         * supported. */
         expect(is_supported);
     }
     else {
@@ -482,6 +494,10 @@ static void test_gpio_ll_init(void)
         is_supported = (gpio_ll_read(port_in) & (1ULL << PIN_IN_0));
         printf_optional("Output can indeed be pulled HIGH: %s\n",
                         noyes[is_supported]);
+        /* May also fail for some pins, if the reset configuration of the
+         * pin results in LOW output. Do not comment this out, but rather
+         * try with a different pin to confirm that this functionality does
+         * work where supported */
         expect(is_supported);
     }
     else {

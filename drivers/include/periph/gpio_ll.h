@@ -176,7 +176,13 @@ typedef enum {
      * @brief   Disconnect pin from all peripherals
      *
      * The implementation should aim to reduce power consumption of the pin
-     * when this state is entered, if this is feasible.
+     * when this state is entered, if this is feasible. For pins where it is
+     * possible and sensible, this should electrically disconnect them
+     * (high impedance).
+     *
+     * @warning If a given pin will not only be disconnected from peripherals
+     *          but also enter an high impedance state is implementation
+     *          defined and may differ from pin to pin.
      *
      * @note    Pull resistors can still be requested in this mode. This can be
      *          useful e.g. for keeping an UART TXD pin from emitting noise

@@ -19,3 +19,11 @@ GPIO port is set via `PORT_IN`. Both `PORT_IN == PORT_OUT` and
 `PORT_IN != PORT_OUT` is valid. The input pin number within `PORT_IN` are set
 via `PIN_IN_0` and `PIN_IN_1`. `PIN_IN_0` has to be wired to `PIN_OUT_0`, and
 `PIN_IN_1` to `PIN_OUT_1`.
+
+## Expected Failures
+
+Implementations are allowed to not electrically disconnect GPIO pins in state
+`GPIO_DISCONNECT`. The test will however test for pins to be electrically
+disconnected. For every MCU supported by GPIO LL so far at least some pins can
+be electrically disconnected. You might need to change the GPIO pins tested
+if the test for disconnected GPIOs being also electrically disconnected.
