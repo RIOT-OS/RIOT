@@ -545,6 +545,62 @@ ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_
     return coap_build_reply(pkt, COAP_CODE_404, resp_buf, resp_buf_len, 0);
 }
 
+ssize_t coap_build_reply_header(coap_pkt_t *pkt, unsigned code,
+                                void *buf, size_t len,
+                                int ct,
+                                void **payload, size_t *payload_len_max)
+{
+    uint8_t *bufpos = buf;
+    uint32_t no_response;
+    unsigned tkl = coap_get_token_len(pkt);
+    size_t hdr_len = sizeof(coap_hdr_t) + tkl;
+    uint8_t type = coap_get_type(pkt) == COAP_TYPE_CON
+                 ? COAP_TYPE_ACK
+                 : COAP_TYPE_NON;
+
+    if (hdr_len > len) {
+        return -ENOBUFS;
+    }
+
+    bufpos += coap_build_hdr(buf, type, coap_get_token(pkt), tkl,
+                             code, ntohs(pkt->hdr->id));
+
+    if (coap_opt_get_uint(pkt, COAP_OPT_NO_RESPONSE, &no_response) == 0) {
+        const uint8_t no_response_index = (code >> 5) - 1;
+        /* If the handler code misbehaved here, we'd face UB otherwise */
+        assume(no_response_index < 7);
+
+        const uint8_t mask = 1 << no_response_index;
+        if (no_response & mask) {
+            if (payload) {
+                *payload = NULL;
+                *payload_len_max = 0;
+                payload = NULL;
+            }
+
+            /* no-response requested, only send empty ACK or nothing */
+            if (type != COAP_TYPE_ACK) {
+                return 0;
+            }
+        }
+    }
+
+    if (payload) {
+        if (ct >= 0) {
+            bufpos += coap_put_option_ct(bufpos, 0, ct);
+        }
+        *bufpos++ = COAP_PAYLOAD_MARKER;
+        *payload = bufpos;
+        hdr_len  = bufpos - (uint8_t *)buf;
+        *payload_len_max = len - hdr_len;
+    }
+
+    /* with the nanoCoAP API we can't detect the overflow before it happens */
+    assert(hdr_len <= len);
+
+    return hdr_len;
+}
+
 ssize_t coap_reply_simple(coap_pkt_t *pkt,
                           unsigned code,
                           uint8_t *buf, size_t len,

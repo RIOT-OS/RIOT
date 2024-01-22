@@ -2116,6 +2116,36 @@ ssize_t coap_payload_put_bytes(coap_pkt_t *pkt, const void *data, size_t len);
 ssize_t coap_payload_put_char(coap_pkt_t *pkt, char c);
 
 /**
+ * @brief   Create CoAP reply header (convenience function)
+ *
+ * This function generates the reply CoAP header and sets
+ * the payload pointer inside the response buffer to point to
+ * the start of the payload, so that it can be written directly
+ * after the header.
+ *
+ * @param[in]   pkt         packet to reply to
+ * @param[in]   code        reply code (e.g., COAP_CODE_204)
+ * @param[out]  buf         buffer to write reply to
+ * @param[in]   len         size of @p buf
+ * @param[in]   ct          content type of payload
+ *                          if ct < 0 this will be ignored
+ * @param[out]  payload     Will be set to the start of the payload inside
+ *                          @p buf.
+ *                          May be set to NULL if no payload response is
+ *                          wanted (no-reply option)
+ * @param[out]  payload_len_max max length of payload left in @p buf
+ *
+ * @returns     size of reply header on success
+ * @returns     0 if no reply should be sent
+ * @returns     <0 on error
+ * @returns     -ENOSPC if @p buf too small
+ */
+ssize_t coap_build_reply_header(coap_pkt_t *pkt, unsigned code,
+                                void *buf, size_t len,
+                                int ct,
+                                void **payload, size_t *payload_len_max);
+
+/**
  * @brief   Create CoAP reply (convenience function)
  *
  * This is a simple wrapper that allows for building CoAP replies for simple
