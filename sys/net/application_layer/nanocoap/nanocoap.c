@@ -607,23 +607,23 @@ ssize_t coap_reply_simple(coap_pkt_t *pkt,
                           unsigned ct,
                           const void *payload, size_t payload_len)
 {
-    uint8_t *payload_start = buf + coap_get_total_hdr_len(pkt);
-    uint8_t *bufpos = payload_start;
+    void *payload_start;
+    size_t payload_len_max;
 
-    if (payload_len) {
-        bufpos += coap_put_option_ct(bufpos, 0, ct);
-        *bufpos++ = 0xff;
+    ssize_t header_len = coap_build_reply_header(pkt, code, buf, len, ct,
+                                                payload ? &payload_start : NULL,
+                                                &payload_len_max);
+    if (payload == NULL || header_len <= 0) {
+        return header_len;
     }
 
-    ssize_t res = coap_build_reply(pkt, code, buf, len,
-                                   bufpos - payload_start + payload_len);
-
-    if (payload_len && (res > 0)) {
-        assert(payload);
-        memcpy(bufpos, payload, payload_len);
+    if (payload_len > payload_len_max) {
+        return -ENOBUFS;
     }
 
-    return res;
+    memcpy(payload_start, payload, payload_len);
+
+    return header_len + payload_len;
 }
 
 ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
