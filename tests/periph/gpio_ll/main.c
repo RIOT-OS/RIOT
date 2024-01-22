@@ -464,6 +464,15 @@ static void test_gpio_ll_init(void)
     /* This is mandatory */
     expect(is_supported);
 
+    /* Ensure that gpio_ll_query_conf() correctly detects the state as
+     * disconnected. */
+    {
+        gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
+        gpio_ll_print_conf(conf);
+        puts("");
+        expect(conf.state == GPIO_DISCONNECT);
+    }
+
     is_supported = (0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_in_pd));
     if (is_supported) {
         ztimer_sleep(ZTIMER_USEC, US_PER_MS);
@@ -692,18 +701,27 @@ static void test_irq_edge(void)
     gpio_ll_irq_off(port_in, PIN_IN_0);
 }
 
-struct mutex_counter {
+struct irq_level_cb_arg {
     mutex_t mutex;
     unsigned counter;
+    enum {
+        LOW,
+        HIGH
+    } trigger_level;
 };
 
 __attribute__((unused))
 static void irq_level_cb(void *_arg)
 {
-    struct mutex_counter *arg = _arg;
+    struct irq_level_cb_arg *arg = _arg;
 
     if (!arg->counter) {
-        gpio_ll_toggle(port_out, 1UL << PIN_OUT_0);
+        if (arg->trigger_level == HIGH) {
+            gpio_ll_clear(port_out, 1UL << PIN_OUT_0);
+        }
+        else {
+            gpio_ll_set(port_out, 1UL << PIN_OUT_0);
+        }
         mutex_unlock(&arg->mutex);
     }
     else {
@@ -713,9 +731,10 @@ static void irq_level_cb(void *_arg)
 
 static void test_irq_level(void)
 {
-    struct mutex_counter arg = { .mutex = MUTEX_INIT_LOCKED, .counter = 10 };
+    struct irq_level_cb_arg arg = { .mutex = MUTEX_INIT_LOCKED, .counter = 10 };
 
     if (IS_USED(MODULE_PERIPH_GPIO_LL_IRQ_LEVEL_TRIGGERED_HIGH)) {
+        arg.trigger_level = HIGH;
         puts_optional("Testing level-triggered on HIGH on PIN_IN_0 (when input "
                       "is LOW when setting up IRQ)");
         gpio_ll_clear(port_out, 1UL << PIN_OUT_0);
@@ -750,6 +769,7 @@ static void test_irq_level(void)
     }
 
     if (IS_USED(MODULE_PERIPH_GPIO_LL_IRQ_LEVEL_TRIGGERED_LOW)) {
+        arg.trigger_level = LOW;
         puts_optional("Testing level-triggered on LOW on PIN_IN_0 (when input "
                       "is HIGH when setting up IRQ)");
         gpio_ll_set(port_out, 1UL << PIN_OUT_0);

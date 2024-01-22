@@ -13,6 +13,11 @@ FEATURES_PROVIDED += periph_flashpage_in_address_space
 FEATURES_PROVIDED += periph_flashpage_pagewise
 FEATURES_PROVIDED += periph_flashpage_rwee
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
+FEATURES_PROVIDED += periph_gpio_ll
+FEATURES_PROVIDED += periph_gpio_ll_irq
+FEATURES_PROVIDED += periph_gpio_ll_irq_level_triggered_high
+FEATURES_PROVIDED += periph_gpio_ll_irq_level_triggered_low
+FEATURES_PROVIDED += periph_gpio_ll_irq_unmask
 FEATURES_PROVIDED += periph_i2c_reconfigure
 FEATURES_PROVIDED += periph_rtt_overflow
 FEATURES_PROVIDED += periph_rtt_set_counter
@@ -34,6 +39,9 @@ FEATURES_PROVIDED += periph_wdt periph_wdt_cb periph_wdt_warning_period
 
 FEATURES_CONFLICT += periph_rtc:periph_rtt
 FEATURES_CONFLICT_MSG += "The RTC and RTT map to the same hardware peripheral."
+
+FEATURES_CONFLICT += periph_gpio_irq:periph_gpio_ll_irq
+FEATURES_CONFLICT_MSG += "GPIO IRQs can only be managed with one API."
 
 include $(RIOTCPU)/cortexm_common/Makefile.features
 
