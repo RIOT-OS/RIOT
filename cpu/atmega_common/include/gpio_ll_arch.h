@@ -184,6 +184,22 @@ static inline uword_t gpio_ll_prepare_write(gpio_port_t port, uword_t mask,
     return result;
 }
 
+static inline void gpio_ll_switch_dir_output(gpio_port_t port, uword_t outputs)
+{
+    unsigned irq_state = irq_disable();
+    atmega_gpio_port_t *p = (void *)port;
+    p->ddr |= outputs;
+    irq_restore(irq_state);
+}
+
+static inline void gpio_ll_switch_dir_input(gpio_port_t port, uword_t inputs)
+{
+    unsigned irq_state = irq_disable();
+    atmega_gpio_port_t *p = (void *)port;
+    p->ddr &= ~(inputs);
+    irq_restore(irq_state);
+}
+
 static inline gpio_port_t gpio_port_pack_addr(void *addr)
 {
     return (gpio_port_t)addr;
