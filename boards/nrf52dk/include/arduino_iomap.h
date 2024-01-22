@@ -96,6 +96,15 @@ extern "C" {
 #define ARDUINO_I2C_UNO         I2C_DEV(0)
 /** @} */
 
+/**
+ * @name    Arduino's SPI buses
+ * @{
+ */
+/**
+ * @brief   D11..13 is 0.23..0.25, which is called SPI_DEV(0) here
+ */
+#define ARDUINO_SPI_D11D12D13   SPI_DEV(0)
+/** @} */
 
 #ifdef __cplusplus
 }
