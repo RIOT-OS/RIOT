@@ -125,18 +125,9 @@ static void print_conf(gpio_conf_t conf)
     puts("");
 }
 
-static void test_gpio_ll_init(void)
+static void test_gpio_ll_init_input_configs(void)
 {
     bool is_supported;
-    puts_optional("\n"
-                  "Testing gpip_ng_init()\n"
-                  "======================\n"
-                  "\n"
-                  "Testing is_gpio_port_num_valid() is true for PORT_OUT and "
-                  "PORT_IN:");
-    expect(is_gpio_port_num_valid(PORT_IN));
-    expect(is_gpio_port_num_valid(PORT_OUT));
-
     puts_optional("\nTesting input configurations for PIN_IN_0:");
     is_supported = (0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_in_pu));
     printf_optional("Support for input with pull up: %s\n",
@@ -175,7 +166,11 @@ static void test_gpio_ll_init(void)
     }
     /* Support for floating inputs is mandatory */
     expect(is_supported);
+}
 
+static void test_gpio_ll_init_output_configs(void)
+{
+    bool is_supported;
     puts_optional("\nTesting output configurations for PIN_OUT_0:");
     {
         gpio_conf_t conf = {
@@ -453,7 +448,27 @@ static void test_gpio_ll_init(void)
         printf_optional("Output is indeed LOW: %s\n", noyes[is_supported]);
         expect(is_supported);
     }
+}
 
+static void test_gpio_ll_init(void)
+{
+    bool is_supported;
+    puts_optional("\n"
+                  "Testing gpip_ng_init()\n"
+                  "======================\n"
+                  "\n"
+                  "Testing is_gpio_port_num_valid() is true for PORT_OUT and "
+                  "PORT_IN:");
+    expect(is_gpio_port_num_valid(PORT_IN));
+    expect(is_gpio_port_num_valid(PORT_OUT));
+
+    /* first, iterate through input configurations and test them one by one */
+    test_gpio_ll_init_input_configs();
+
+    /* second, iterate through output configurations and test them */
+    test_gpio_ll_init_output_configs();
+
+    /* finally, test disconnecting pins */
     {
         gpio_conf_t conf = {
             .state = GPIO_DISCONNECT,
@@ -808,17 +823,15 @@ static void test_irq_level(void)
 
 static void test_irq(void)
 {
-    if (IS_USED(MODULE_PERIPH_GPIO_LL_IRQ)) {
-        puts_optional("\n"
-             "Testing External IRQs\n"
-             "=====================\n");
+    puts_optional("\n"
+         "Testing External IRQs\n"
+         "=====================\n");
 
-        expect(0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_in));
-        expect(0 == gpio_ll_init(port_out, PIN_OUT_0, gpio_ll_out));
+    expect(0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_in));
+    expect(0 == gpio_ll_init(port_out, PIN_OUT_0, gpio_ll_out));
 
-        test_irq_edge();
-        test_irq_level();
-    }
+    test_irq_edge();
+    test_irq_level();
 }
 
 int main(void)
