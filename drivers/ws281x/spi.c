@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Hugues Larrive <hlarrive@pm.me>
+ * Copyright 2024 Hugues Larrive <hlarrive@pm.me>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -23,10 +23,38 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "ws281x.h"
-#include "ws281x_params.h"
-#include "ws281x_constants.h"
+#include "macros/units.h"
 #include "periph/spi.h"
+#include "ws281x.h"
+#include "ws281x_constants.h"
+#include "ws281x_params.h"
+
+#ifndef WS281X_SPI_DEV
+#define WS281X_SPI_DEV  (0)
+#endif
+#ifndef WS281X_SPI_PATTERN_LENGTH
+#define WS281X_SPI_PATTERN_LENGTH   (3)
+#endif
+#ifndef WS281X_SPI_CLK
+#define WS281X_SPI_CLK  KHZ(800 * WS281X_SPI_PATTERN_LENGTH)
+#endif
+
+#if (WS281X_SPI_PATTERN_LENGTH == 3)
+/* The LSB of the 2nd byte (always 1) is the MSB of the pattern for bit 2,
+ * which is encoded in the 3rd byte, so we will use a 4-bit pattern. */
+#define WS281X_SPI_DATA_0_MASK   (0b00001001) 
+#define WS281X_SPI_DATA_1_MASK   (0b00001101)
+/* 1u01u01u 01u01u01 u01u01u0 */
+#define WS281X_SPI_SHIFTS   {4,1,-2,3,0,5,2,-1}
+#elif (WS281X_SPI_PATTERN_LENGTH == 4)
+#define WS281X_SPI_DATA_0_MASK   (0b00001000) 
+#define WS281X_SPI_DATA_1_MASK   (0b00001110)
+#define WS281X_SPI_SHIFTS   {4,0,4,0,4,0,4,0}
+#elif (WS281X_SPI_PATTERN_LENGTH == 8)
+#define WS281X_SPI_DATA_0_MASK   (0b11000000) 
+#define WS281X_SPI_DATA_1_MASK   (0b11111100)
+#define WS281X_SPI_SHIFTS   {0,0,0,0,0,0,0,0}
+#endif
 
 static struct {
     spi_t dev;
@@ -35,7 +63,7 @@ static struct {
     spi_cs_t cs;
 } spiconf;
 
-static uint8_t spi_buf[WS281X_PARAM_NUMOF * WS281X_BYTES_PER_DEVICE * 4];
+static uint8_t spi_buf[WS281X_PARAM_NUMOF * WS281X_BYTES_PER_DEVICE * WS281X_SPI_PATTERN_LENGTH];
 
 int ws281x_init(ws281x_t *dev, const ws281x_params_t *params)
 {
@@ -46,10 +74,10 @@ int ws281x_init(ws281x_t *dev, const ws281x_params_t *params)
     memset(dev, 0, sizeof(ws281x_t));
     dev->params = *params;
 
-    spiconf.dev = SPI_DEV(0);
-    spiconf.mode = SPI_MODE_0;
-    spiconf.clk = 4000000;
-    spiconf.cs = SPI_HWCS(0);
+    spiconf.dev = SPI_DEV(WS281X_SPI_DEV);
+    spiconf.mode = SPI_MODE_0;      /* any */
+    spiconf.clk = WS281X_SPI_CLK;
+    spiconf.cs = SPI_HWCS(0);       /* any */
 
     return 0;
 }
@@ -67,25 +95,32 @@ void ws281x_end_transmission(ws281x_t *dev)
     xtimer_usleep(WS281X_T_END_US);
 }
 
-void ws281x_write_buffer(ws281x_t *dev, const void *buf, size_t size)
+void ws281x_write_buffer(ws281x_t *dev, const void *_buf, size_t size)
 {
     assert(dev);
 
-    const uint8_t *pos = buf;
-    const uint8_t *end = pos + size;
+    const uint8_t *buf = _buf;
+    const int8_t shift[8] = WS281X_SPI_SHIFTS;
 
-    int i = 0;
-    while (pos < end) {
-        spi_buf[i] = *pos & 0x80 ? 0xE0 : 0x80;
-        spi_buf[i] |= *pos & 0x40 ? 0x0E : 0x08;
-        spi_buf[i + 1] = *pos & 0x20 ? 0xE0 : 0x80;
-        spi_buf[i + 1] |= *pos & 0x10 ? 0x0E : 0x08;
-        spi_buf[i + 2] = *pos & 0x08 ? 0xE0 : 0x80;
-        spi_buf[i + 2] |= *pos & 0x04 ? 0x0E : 0x08;
-        spi_buf[i + 3] = *pos & 0x02 ? 0xE0 : 0x80;
-        spi_buf[i + 3] |= *pos & 0x01 ? 0x0E : 0x08;
-        i += 4;
-        pos++;
+    for (int i = 0; i < (int)size; ++i) {
+        uint8_t byte = buf[i];
+        uint8_t offset = 0;
+        spi_buf[i * WS281X_SPI_PATTERN_LENGTH] = 0;
+        for (uint8_t cnt = 0; cnt < 8; ++cnt) {
+            spi_buf[i * WS281X_SPI_PATTERN_LENGTH + offset]
+                |= (byte & 0b10000000)
+                    ? (shift[cnt] >= 0)
+                        ? WS281X_SPI_DATA_1_MASK << shift[cnt]
+                        : WS281X_SPI_DATA_1_MASK >> -shift[cnt]
+                    : (shift[cnt] >= 0)
+                        ? WS281X_SPI_DATA_0_MASK << shift[cnt]
+                        : WS281X_SPI_DATA_0_MASK >> -shift[cnt];
+            byte <<= 1;
+            if (shift[cnt] <= 0) {
+                ++offset;
+                spi_buf[i * WS281X_SPI_PATTERN_LENGTH + offset] = 0;
+            }
+       }
     }
 
     spi_transfer_bytes(spiconf.dev, spiconf.cs, false, spi_buf, NULL, sizeof(spi_buf));
