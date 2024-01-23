@@ -134,6 +134,8 @@ typedef enum {
     /**
      * @brief   Use pin as output in push-pull configuration
      *
+     * @note    This is supported and implemented on all MCUs.
+     *
      * | Logical Value  | Electrical Behavior               |
      * |:-------------- |:--------------------------------- |
      * | `0`            | Low                               |
@@ -142,6 +144,10 @@ typedef enum {
     GPIO_OUTPUT_PUSH_PULL,
     /**
      * @brief   Use pin as output in open collector configuration
+     *
+     * @note    The feature `periph_gpio_ll_open_drain` is used to indicate
+     *          support for this GPIO mode. However, it may not be available on
+     *          all pins.
      *
      * | Logical Value  | Electrical Behavior               |
      * |:-------------- |:--------------------------------- |
@@ -152,13 +158,22 @@ typedef enum {
     /**
      * @brief   Use pin as output in open emitter configuration
      *
+     * @note    The feature `periph_gpio_ll_open_source` is used to indicate
+     *          support for this GPIO mode. However, it may not be available on
+     *          all pins.
+     *
      * | Logical Value  | Electrical Behavior               |
      * |:-------------- |:--------------------------------- |
      * | `0`            | High Impedance (Disconnected)     |
      * | `1`            | High                              |
      */
     GPIO_OUTPUT_OPEN_SOURCE,
-    GPIO_INPUT,             /**< Use pin as input */
+    /**
+     * @brief   Use pin as input
+     *
+     * @note    This is supported and implemented on all MCUs.
+     */
+    GPIO_INPUT,
     /**
      * @brief   The GPIO pin is used by a peripheral
      *
@@ -174,6 +189,12 @@ typedef enum {
     GPIO_USED_BY_PERIPHERAL,
     /**
      * @brief   Disconnect pin from all peripherals
+     *
+     * @note    This may be an alias for GPIO_INPUT when the MCU does not
+     *          support support disconnecting GPIO pins from the GPIO
+     *          peripheral. The feature `periph_gpio_ll_disconnect` indicates
+     *          that disconnecting pins from all peripherals (including the
+     *          GPIO peripheral) is supported.
      *
      * The implementation should aim to reduce power consumption of the pin
      * when this state is entered, if this is feasible. For pins where it is
