@@ -35,4 +35,9 @@ endif
 ifneq (,$(filter ws281x_spi,$(USEMODULE)))
   FEATURES_REQUIRED += periph_spi
   USEMODULE += periph_spi
+  ifneq (,$(filter arch_esp8266,$(FEATURES_USED)))
+	CFLAGS += '-DSPI_BLOCK_SIZE=63'
+	CFLAGS += '-DWS281X_SPI_PATTERN_LENGTH=3'
+	CFLAGS += '-DWS281X_SPI_CLK=SPI_CLK_WS281X'
+  endif
 endif

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2019 Gunar Schorcht
+ *               2024 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       CPU specific definitions and functions for peripheral handling
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
+ *              Hugues Larrive <hlarrive@pm.me>
  */
 
 #ifndef PERIPH_CPU_H
@@ -278,6 +280,20 @@ typedef struct {
 #define PERIPH_SPI_NEEDS_TRANSFER_BYTE  /**< requires function spi_transfer_byte */
 #define PERIPH_SPI_NEEDS_TRANSFER_REG   /**< requires function spi_transfer_reg */
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS  /**< requires function spi_transfer_regs */
+
+/**
+ * @brief   Override SPI clock configuration
+ */
+#define HAVE_SPI_CLK_T
+typedef enum {
+    SPI_CLK_100KHZ = 0,     /**< drive the SPI bus with 100KHz */
+    SPI_CLK_400KHZ,         /**< drive the SPI bus with 400KHz */
+    SPI_CLK_1MHZ,           /**< drive the SPI bus with 1MHz */
+    SPI_CLK_5MHZ,           /**< drive the SPI bus with 5MHz */
+    SPI_CLK_10MHZ,          /**< drive the SPI bus with 10MHz */
+    SPI_CLK_WS281X          /**< drive the SPI bus with 2.5MHz */
+} spi_clk_t;
+
 /** @} */
 
 /**

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2022 Gunar Schorcht
+ *               2024 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  * @brief       Low-level SPI driver implementation for ESP8266
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
+ * @author      Hugues Larrive <hlarrive@pm.me>
  *
  * @}
  */
@@ -42,7 +44,9 @@
 
 #define SPI_DOUTDIN (BIT(0))
 
+#ifndef SPI_BLOCK_SIZE
 #define SPI_BLOCK_SIZE  64  /* number of bytes per SPI transfer */
+#endif
 
 /** structure which describes all properties of one SPI bus */
 struct _spi_bus_t {
@@ -279,10 +283,13 @@ void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t cl
                              spi_clkcnt_N = 10;     /* 10 cycles results into 400 kHz */
                              break;
         case SPI_CLK_100KHZ: spi_clkdiv_pre = 20;   /* predivides 80 MHz to 4 MHz */
-                             spi_clkcnt_N = 40;     /* 20 cycles results into 100 kHz */
+                             spi_clkcnt_N = 40;     /* 40 cycles results into 100 kHz */
+                             break;
+        case SPI_CLK_WS281X: spi_clkdiv_pre = 2;    /* predivides 80 MHz to 40 MHz */
+                             spi_clkcnt_N = 16;     /* 16 cycles results into 2.5 MHz */
                              break;
         default: spi_clkdiv_pre = 20;   /* predivides 80 MHz to 4 MHz */
-                 spi_clkcnt_N = 40;     /* 20 cycles results into 100 kHz */
+                 spi_clkcnt_N = 40;     /* 40 cycles results into 100 kHz */
     }
 
     /* register values are set to deviders-1 */
