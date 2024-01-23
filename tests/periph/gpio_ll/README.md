@@ -27,3 +27,8 @@ Implementations are allowed to not electrically disconnect GPIO pins in state
 disconnected. For every MCU supported by GPIO LL so far at least some pins can
 be electrically disconnected. You might need to change the GPIO pins tested
 if the test for disconnected GPIOs being also electrically disconnected.
+
+When features such as `periph_gpio_ll_pull_up` or `periph_gpio_ll_open_drain`
+are provided, this test expect those to be available on the tested pins. If
+those features are not available on all pins, suitable pins need to be
+selected for the test to pass.
