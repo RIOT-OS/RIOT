@@ -60,7 +60,6 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, gpio_conf_t conf)
 
     switch (conf.state) {
     case GPIO_DISCONNECT:
-        *ctrl |= 0x1 << (pos + 2);
         pin_used[GPIO_PORT_NUM(port)] &= ~(1 << pin);
         if (pin_used[GPIO_PORT_NUM(port)] == 0) {
             periph_clk_dis(APB2, (RCU_APB2EN_PAEN_Msk << GPIO_PORT_NUM(port)));
@@ -121,14 +120,14 @@ gpio_conf_t gpio_ll_query_conf(gpio_port_t port, uint8_t pin)
         result.state = GPIO_INPUT;
         switch (ctrl) {
         case 0:
-            result.state = GPIO_USED_BY_PERIPHERAL;
+            result.state = GPIO_DISCONNECT;
             break;
         case 1:
             result.pull = GPIO_FLOATING;
             break;
         case 2:
             result.pull = (((GPIO_Type *)port)->OCTL & (1UL << pin)) ? GPIO_PULL_UP
-                                                                  : GPIO_PULL_DOWN;
+                                                                     : GPIO_PULL_DOWN;
             break;
         default:
             break;
@@ -173,8 +172,4 @@ void gpio_ll_print_conf(gpio_conf_t conf)
     gpio_ll_print_conf_common(conf);
     print_str(", slew: ");
     print_str(slew_strs[conf.slew_rate]);
-
-    if (conf.schmitt_trigger_disabled) {
-        print_str(", Schmitt trigger disabled");
-    }
 }
