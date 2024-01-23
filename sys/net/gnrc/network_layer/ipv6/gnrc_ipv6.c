@@ -714,6 +714,11 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
     else {
         gnrc_netif_t *tmp_netif = gnrc_netif_get_by_ipv6_addr(&ipv6_hdr->dst);
 
+        /* only consider link-local addresses on the interface we are sending on */
+        if (tmp_netif != netif && ipv6_addr_is_link_local(&ipv6_hdr->dst)) {
+            tmp_netif = NULL;
+        }
+
         if (ipv6_addr_is_loopback(&ipv6_hdr->dst) ||    /* dst is loopback address */
             /* or dst registered to a local interface */
             (tmp_netif != NULL)) {
