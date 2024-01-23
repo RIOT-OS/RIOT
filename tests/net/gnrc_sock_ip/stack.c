@@ -103,13 +103,38 @@ static inline bool _res(gnrc_pktsnip_t *pkt, bool res)
     return res;
 }
 
+static uint8_t _final_nh(gnrc_pktsnip_t *ipv6, uint8_t nh)
+{
+#ifdef MODULE_GNRC_IPV6_EXT_OPT
+    while (ipv6->next && ipv6->next->type == GNRC_NETTYPE_IPV6_EXT) {
+        ipv6 = ipv6->next;
+        nh = ((ipv6_ext_t *)(ipv6->data))->nh;
+    }
+#else
+    (void)ipv6;
+#endif
+
+    return nh;
+}
+
+static gnrc_pktsnip_t *_final_snip(gnrc_pktsnip_t *ipv6)
+{
+#ifdef MODULE_GNRC_IPV6_EXT_OPT
+    while (ipv6->next && ipv6->next->type == GNRC_NETTYPE_IPV6_EXT) {
+        ipv6 = ipv6->next;
+    }
+#endif
+    return ipv6;
+}
+
 bool _check_packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
                    uint8_t proto, void *data, size_t data_len,
                    uint16_t netif)
 {
-    gnrc_pktsnip_t *pkt, *ipv6;
+    gnrc_pktsnip_t *pkt, *ipv6, *payload;
     ipv6_hdr_t *ipv6_hdr;
     msg_t msg;
+    uint8_t nh;
 
     msg_receive(&msg);
     if (msg.type != GNRC_NETAPI_MSG_TYPE_SND) {
@@ -135,12 +160,14 @@ bool _check_packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
         return _res(pkt, false);
     }
     ipv6_hdr = ipv6->data;
+    nh = _final_nh(ipv6, ipv6_hdr->nh);
+    payload = _final_snip(ipv6)->next;
     return _res(pkt, (memcmp(src, &ipv6_hdr->src, sizeof(ipv6_addr_t)) == 0) &&
                 (memcmp(dst, &ipv6_hdr->dst, sizeof(ipv6_addr_t)) == 0) &&
-                (ipv6_hdr->nh == proto) &&
-                (ipv6->next != NULL) &&
-                (data_len == ipv6->next->size) &&
-                (memcmp(data, ipv6->next->data, data_len) == 0));
+                (nh == proto) &&
+                (payload != NULL) &&
+                (data_len == payload->size) &&
+                (memcmp(data, payload->data, data_len) == 0));
 }
 
 /** @} */
