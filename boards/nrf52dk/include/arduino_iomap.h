@@ -30,7 +30,7 @@ extern "C" {
 /**
  * @brief   Mapping of MCU pins to Arduino pins
  *
- * For refernce, see schematic file `nRF52 Development Kit - Hardware files
+ * For reference, see schematic file `nRF52 Development Kit - Hardware files
  * 3_0_0/PCA10040-nRF52832 Development Board 3_0_0/Schematic_Layout pdf
  * files/PCA10040_Schematic_And_PCB.pdf` in
  * `nrf52-development-kit---hardware-files-3_0_0.zip` from
