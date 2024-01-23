@@ -214,14 +214,14 @@ union gpio_conf_sam0 {
          * @warning If the requested drive strength is not available, the
          *          closest fit supported will be configured instead.
          *
-         * This value is ignored when @ref gpio_conf_nrf5x::state is configured
+         * This value is ignored when @ref gpio_conf_sam0::state is configured
          * to @ref GPIO_INPUT or @ref GPIO_DISCONNECT.
          */
         gpio_drive_strength_t drive_strength    : 1;
         /**
          * @brief   Initial value of the output
          *
-         * Ignored if @ref gpio_conf_nrf5x::state is set to @ref GPIO_INPUT or
+         * Ignored if @ref gpio_conf_sam0::state is set to @ref GPIO_INPUT or
          * @ref GPIO_DISCONNECT. If the pin was previously in a high impedance
          * state, it is guaranteed to directly transition to the given initial
          * value.
