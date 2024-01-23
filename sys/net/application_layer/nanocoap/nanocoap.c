@@ -119,7 +119,7 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
     while (pkt_pos < pkt_end) {
         uint8_t *option_start = pkt_pos;
         uint8_t option_byte = *pkt_pos++;
-        if (option_byte == 0xff) {
+        if (option_byte == COAP_PAYLOAD_MARKER) {
             pkt->payload = pkt_pos;
             pkt->payload_len = buf + len - pkt_pos;
             DEBUG("payload len = %u\n", pkt->payload_len);
@@ -232,7 +232,7 @@ static uint8_t *_parse_option(const coap_pkt_t *pkt,
     uint8_t *hdr_end = pkt->payload;
 
     if ((pkt_pos >= hdr_end)
-            || (((pkt_pos + 1) == hdr_end) && (*pkt_pos == 0xFF))) {
+            || (((pkt_pos + 1) == hdr_end) && (*pkt_pos == COAP_PAYLOAD_MARKER))) {
         return NULL;
     }
 
@@ -1112,7 +1112,7 @@ ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags)
             return -ENOSPC;
         }
 
-        *pkt->payload++ = 0xFF;
+        *pkt->payload++ = COAP_PAYLOAD_MARKER;
         pkt->payload_len--;
     }
     else {
@@ -1337,7 +1337,7 @@ ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, uint8_t *buf, \
     bufpos += coap_put_option_ct(bufpos, 0, COAP_FORMAT_LINK);
     bufpos += coap_opt_put_block2(bufpos, COAP_OPT_CONTENT_FORMAT, &slicer, 1);
 
-    *bufpos++ = 0xff;
+    *bufpos++ = COAP_PAYLOAD_MARKER;
 
     for (unsigned i = 0; i < coap_resources_numof; i++) {
         if (i) {
