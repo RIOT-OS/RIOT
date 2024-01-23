@@ -77,6 +77,22 @@ static inline void print_str(const char *str)
 #  define GPIOAEN       RCC_APB2ENR_IOPAEN
 #endif
 
+/* Bitmask to extract a mode field of the mode register "MODER".
+ * Note: Some families provide both, hence #elif */
+#ifdef GPIO_MODER_MODER0_Msk
+#  define MODE_Msk GPIO_MODER_MODER0_Msk
+#elif GPIO_MODER_MODE0_Msk
+#  define MODE_Msk GPIO_MODER_MODE0_Msk
+#endif
+
+/* Number of bits a mode field in the mode register "MODER" is wide.
+ * Note: Some families provide both, hence #elif */
+#ifdef GPIO_MODER_MODER1_Pos
+#  define MODE_BITS GPIO_MODER_MODER1_Pos
+#elif GPIO_MODER_MODE1_Pos
+#  define MODE_BITS GPIO_MODER_MODE1_Pos
+#endif
+
 static void _init_clock(gpio_port_t port)
 {
     periph_clk_en(GPIO_BUS, (GPIOAEN << GPIO_PORT_NUM(port)));
@@ -90,14 +106,12 @@ static void _init_clock(gpio_port_t port)
 }
 
 #if defined(GPIO_MODER_MODER0) || defined(GPIO_MODER_MODE0)
-static void _set_dir(gpio_port_t port, uint8_t pin, bool output)
+static void _set_mode(gpio_port_t port, uint8_t pin, gpiox_moder_t mode)
 {
     GPIO_TypeDef *p = (void *)port;
     uint32_t tmp = p->MODER;
-    tmp &= ~(0x3 << (2 * pin));
-    if (output) {
-        tmp |= 1UL << (2 * pin);
-    }
+    tmp &= ~(MODE_Msk << (MODE_BITS * pin));
+    tmp |= (unsigned)mode << (MODE_BITS * pin);
     p->MODER = tmp;
 }
 #endif
@@ -107,15 +121,19 @@ static void _set_dir(gpio_port_t port, uint8_t pin, bool output)
 static gpio_state_t _get_state(gpio_port_t port, uint8_t pin)
 {
     GPIO_TypeDef *p = (void *)port;
-    uint32_t moder = (p->MODER >> (2 * pin)) & 0x3UL;
+    gpiox_moder_t moder = (p->MODER >> (MODE_BITS * pin)) & MODE_Msk;
     switch (moder) {
-    case 0:
+    case GPIOX_MODER_INPUT:
         return GPIO_INPUT;
-    case 1:
+    case GPIOX_MODER_OUTPUT:
         return ((p->OTYPER >> pin) & 0x1UL) ? GPIO_OUTPUT_OPEN_DRAIN
                                             : GPIO_OUTPUT_PUSH_PULL;
+    case GPIOX_MODER_ANALOG:
+        return GPIO_DISCONNECT;
+    default:
+    case GPIOX_MODER_AF:
+        return GPIO_USED_BY_PERIPHERAL;
     }
-    return GPIO_USED_BY_PERIPHERAL;
 }
 #endif
 
@@ -333,10 +351,10 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, gpio_conf_t conf)
     _set_legacy_f1_config(port, pin, conf);
 #else
     /* modern STM32 style GPIO configuration register layout */
-    _set_output_type(port, pin, conf.state == GPIO_OUTPUT_OPEN_DRAIN);
+    _set_output_type(port, pin, conf.state & GPIO_STATE_T_OPEN_DRAIN_FLAG);
     _set_pull_config(port, pin, conf.pull);
     _set_slew_rate(port, pin, conf.slew_rate);
-    _set_dir(port, pin, conf.state < GPIO_INPUT);
+    _set_mode(port, pin, conf.state & GPIO_STATE_T_MODER_Msk);
 #endif
     irq_restore(state);
 
@@ -386,8 +404,4 @@ void gpio_ll_print_conf(gpio_conf_t conf)
     gpio_ll_print_conf_common(conf);
     print_str(", slew: ");
     print_str(slew_strs[conf.slew_rate]);
-
-    if (conf.schmitt_trigger_disabled) {
-        print_str(", Schmitt trigger disabled");
-    }
 }
