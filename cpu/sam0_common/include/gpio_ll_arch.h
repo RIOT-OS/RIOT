@@ -106,6 +106,18 @@ static inline void gpio_ll_write(gpio_port_t port, uword_t mask)
     p->OUT.reg = mask;
 }
 
+static inline void gpio_ll_switch_dir_output(gpio_port_t port, uword_t outputs)
+{
+    PortGroup *p = (PortGroup *)port;
+    p->DIRSET.reg = outputs;
+}
+
+static inline void gpio_ll_switch_dir_input(gpio_port_t port, uword_t inputs)
+{
+    PortGroup *p = (PortGroup *)port;
+    p->DIRCLR.reg = inputs;
+}
+
 static inline gpio_port_t gpio_get_port(gpio_t pin)
 {
     return (gpio_port_t)(pin & ~(0x1f));
