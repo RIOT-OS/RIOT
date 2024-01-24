@@ -1,0 +1,72 @@
+/**
+ * @defgroup   sys_malloc_monitor Heap Memory Usage Monitor
+ * @ingroup    sys_memory_management
+ * @brief      This module allows to monitor the dynamic memory usage of a certain piece of code.
+ * @warning    This module automatically selects @ref sys_malloc_ts and naturally
+ *             incurs a certain runtime overhead. It is not meant for production usage.
+ * @author      Mikolai Gütschow <mikolai.guetschow@tu-dresden.de>
+ *
+ * # Description
+ *
+ * This module allows to monitor the dynamic memory usage of a certain piece of code.
+ * It works by hooking into (wrappers to) @ref malloc(), @ref calloc(), @ref realloc(),
+ * and @ref free() calls to internally record the current and all-time maximum heap memory usage.
+ *
+ * Note that in general dynamic memory management is a bad idea on the constrained devices RIOT
+ * is targeting. So maybe it is better to just adapt your code to use static memory management instead.
+ *
+ * # Usage
+ *
+ * Enable the module with `USEMODULE += malloc_monitor`.
+ *
+ * Add `#include "malloc_monitor.h"` to the file in which you want to monitor dynamic memory usage.
+ * Use @ref malloc_monitor_get_usage_current() to retrieve the size of the currently allocated
+ * heap memory in bytes. @ref malloc_monitor_get_usage_high_watermark() returns the all-time maximum
+ * since startup or the last call to  @ref malloc_monitor_reset_high_watermark().
+ *
+ * Note that `malloc_monitor` currently has no notion of threads and will at any point in time report
+ * the global dynamic memory usage, not the one used by the currently running thread.
+ * Thread-safety is achieved through usage of @ref sys_malloc_ts, though.
+ *
+ * ## Example
+ *
+ * Imagine you want to investigate the dynamic memory consumption of a certain function `func()`.
+ * The following snippet could get you started:
+ *
+ * ```c
+ * #include <stddef.h>
+ * #include <stdio.h>
+ *
+ * #include "malloc_monitor.h"
+ *
+ * int main(void)
+ * {
+ *     size_t before = malloc_monitor_get_usage_current();
+ *     size_t before_max = malloc_monitor_get_usage_high_watermark();
+ *     func();
+ *     size_t after = malloc_monitor_get_usage_current();
+ *     size_t after_max = malloc_monitor_get_usage_high_watermark();
+ *
+ *     if (after != before) {
+ *         puts("func() " (after < before ? "decreased" : "increased") " global dynamic memory usage.");
+ *     }
+ *     printf("The maximal dynamic memory usage of func() was %d bytes.", after_max - before_max);
+ * }
+ * ```
+ *
+ * For further usage examples, refer to the corresponding tests in `tests/sys/malloc_monitor`.
+ *
+ * # Configuration
+ *
+ * The maximum number of pointers that can be monitored at once can be set with Kconfig
+ * in System > Heap Memory Usage Monitor > Monitor Size or by setting the corresponding
+ * CFlag in your application's Makefile as `CFLAGS += CONFIG_MODULE_SYS_MALLOC_MONITOR_SIZE=42`.
+ * It defaults to 100.
+ *
+ * For more fine-grained debugging of invalid calls to @ref free(), duplicated calls to @ref free(),
+ * or memory leaks, the module can be configured to print information on every call to @ref malloc(),
+ * @ref calloc(), @ref realloc(), or @ref free() by setting System > Heap Memory Usage Monitor > Verbose
+ * or adding `CFLAGS += CONFIG_MODULE_SYS_MALLOC_MONITOR_VERBOSE=1` to your Makefile.
+ * `malloc_monitor` defaults to be non-verbose.
+ *
+ */

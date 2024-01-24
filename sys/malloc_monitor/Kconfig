@@ -1,0 +1,23 @@
+# Copyright (C) 2024 TU Dresden
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_SYS_MALLOC_MONITOR
+    bool "Heap Memory Usage Monitor"
+
+config MODULE_SYS_MALLOC_MONITOR_SIZE
+    int "Monitor Size"
+    default 100
+    depends on MODULE_SYS_MALLOC_MONITOR
+    help
+        Specifies maximum number of pointers that can be monitored at once.
+
+config MODULE_SYS_MALLOC_MONITOR_VERBOSE
+    bool "Verbose"
+    default false
+    depends on MODULE_SYS_MALLOC_MONITOR
+    help
+        Print detailed log of calls to malloc/realloc/free
