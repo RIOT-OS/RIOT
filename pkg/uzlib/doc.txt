@@ -4,6 +4,10 @@
  * @ingroup  sys_compression
  * @brief    Deflate/Zlib-compatible LZ77 compression/decompression library
  *
+ * @warning During compression, uzlib allocates memory on the heap without freeing it.
+ *          Do not use this package in production code!
+ *          See https://github.com/pfalcon/uzlib/issues/41#issuecomment-1907807048
+ *
  * # License
  *
  * Licensed under zlib.
