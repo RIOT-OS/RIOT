@@ -23,10 +23,6 @@
 #include "vendor/riscv_csr.h"
 #include "pmp.h"
 
-#if NUM_PMP_ENTRIES != 16 && NUM_PMP_ENTRIES != 64
-#error "Only 16 or 64 PMP entries allowed."
-#endif
-
 #define _WRITE_PMPCFG(REG, VALUE) write_csr(REG, VALUE)
 #define _READ_PMPCFG(REG) read_csr(REG)
 #define WRITE_PMPCFG(REG, VALUE) _WRITE_PMPCFG(CSR_PMPCFG0 + REG, VALUE)
@@ -50,13 +46,13 @@
  */
 void write_pmpcfg(uint8_t reg_num, uint32_t value)
 {
-    assert(reg_num < NUM_PMP_ENTRIES / 4);
+    assert(reg_num < PMP_REGION_COUNT / 4);
     switch (reg_num) {
     case 0: WRITE_PMPCFG(0, value); break;
     case 1: WRITE_PMPCFG(1, value); break;
     case 2: WRITE_PMPCFG(2, value); break;
     case 3: WRITE_PMPCFG(3, value); break;
-#if NUM_PMP_ENTRIES == 64
+#if PMP_REGION_COUNT > 16
     case 4: WRITE_PMPCFG(4, value); break;
     case 5: WRITE_PMPCFG(5, value); break;
     case 6: WRITE_PMPCFG(6, value); break;
@@ -75,13 +71,13 @@ void write_pmpcfg(uint8_t reg_num, uint32_t value)
 
 uint32_t read_pmpcfg(uint8_t reg_num)
 {
-    assert(reg_num < NUM_PMP_ENTRIES / 4);
+    assert(reg_num < PMP_REGION_COUNT / 4);
     switch (reg_num) {
     case 0: return READ_PMPCFG(0);
     case 1: return READ_PMPCFG(1);
     case 2: return READ_PMPCFG(2);
     case 3: return READ_PMPCFG(3);
-#if NUM_PMP_ENTRIES == 64
+#if PMP_REGION_COUNT > 16
     case 4: return READ_PMPCFG(4);
     case 5: return READ_PMPCFG(5);
     case 6: return READ_PMPCFG(6);
@@ -101,7 +97,7 @@ uint32_t read_pmpcfg(uint8_t reg_num)
 
 void write_pmpaddr(uint8_t reg_num, uint32_t value)
 {
-    assert(reg_num < NUM_PMP_ENTRIES);
+    assert(reg_num < PMP_REGION_COUNT);
     switch (reg_num) {
     case 0: WRITE_PMPADDR(0, value); break;
     case 1: WRITE_PMPADDR(1, value); break;
@@ -119,7 +115,7 @@ void write_pmpaddr(uint8_t reg_num, uint32_t value)
     case 13: WRITE_PMPADDR(13, value); break;
     case 14: WRITE_PMPADDR(14, value); break;
     case 15: WRITE_PMPADDR(15, value); break;
-#if NUM_PMP_ENTRIES == 64
+#if PMP_REGION_COUNT > 16
     case 16: WRITE_PMPADDR(16, value); break;
     case 17: WRITE_PMPADDR(17, value); break;
     case 18: WRITE_PMPADDR(18, value); break;
@@ -174,7 +170,7 @@ void write_pmpaddr(uint8_t reg_num, uint32_t value)
 
 uint32_t read_pmpaddr(uint8_t reg_num)
 {
-    assert(reg_num < NUM_PMP_ENTRIES);
+    assert(reg_num < PMP_REGION_COUNT);
     switch (reg_num) {
     case 0: return READ_PMPADDR(0);
     case 1: return READ_PMPADDR(1);
@@ -192,7 +188,7 @@ uint32_t read_pmpaddr(uint8_t reg_num)
     case 13: return READ_PMPADDR(13);
     case 14: return READ_PMPADDR(14);
     case 15: return READ_PMPADDR(15);
-#if NUM_PMP_ENTRIES == 64
+#if PMP_REGION_COUNT > 16
     case 16: return READ_PMPADDR(16);
     case 17: return READ_PMPADDR(17);
     case 18: return READ_PMPADDR(18);

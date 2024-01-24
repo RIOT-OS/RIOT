@@ -101,7 +101,8 @@ int main(void)
     P(msg_queue);
     P(msg_array);
 #endif
-#if defined(DEVELHELP) || IS_ACTIVE(SCHED_TEST_STACK) || defined(MODULE_MPU_STACK_GUARD)
+#if defined(DEVELHELP) || IS_ACTIVE(SCHED_TEST_STACK) \
+|| defined(MODULE_MPU_STACK_GUARD) || defined(MODULE_PMP_STACK_GUARD)
     P(stack_start);
 #endif
 #ifdef DEVELHELP

@@ -36,6 +36,10 @@
 #include "mpu.h"
 #endif
 
+#ifdef MODULE_PMP_STACK_GUARD
+#include "pmp.h"
+#endif
+
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
@@ -217,6 +221,10 @@ thread_t *__attribute__((used)) sched_run(void)
             (uintptr_t)next_thread->stack_start + 31,       /* Base Address (rounded up) */
             MPU_ATTR(1, AP_RO_RO, 0, 1, 0, 1, MPU_SIZE_32B) /* Attributes and Size */
             );
+#endif
+
+#ifdef MODULE_PMP_STACK_GUARD
+        write_pmpaddr(PMP_REGION_STACK_GUARD, (uintptr_t)next_thread->stack_start);
 #endif
         DEBUG("sched_run: done, changed sched_active_thread.\n");
     }

@@ -38,9 +38,10 @@ extern "C" {
 
 /**
  * @brief Number of available PMP regions
- * Note, the upper 8 regions are hardwired to zero!
+ * Note, this differs from the specification, which expects 16 or 64 regions.
+ * Here, the upper 8 regions are hardwired to zero!
  */
-#define NUM_PMP_ENTRIES 16
+#define PMP_REGION_COUNT (8)
 
 #ifdef __cplusplus
 }
