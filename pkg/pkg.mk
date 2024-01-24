@@ -79,6 +79,11 @@ PKG_DOWNLOADED = $(PKG_STATE)-downloaded
 # Custom prepared target that can be defined in packages Makefile.
 PKG_CUSTOM_PREPARED ?=
 
+# Custom post-patched target that can be defined in packages Makefile.
+# this is useful if something more complex than a static patch can address
+# needs to be done *after checkout*
+PKG_CUSTOM_POST_PATCH ?=
+
 # Declare 'all' first to have it being the default target
 all: prepare
 
@@ -88,7 +93,14 @@ prepare: $(PKG_PREPARED)
 
 # Allow packages to add a custom step to be `prepared`.
 # It should be a dependency of `$(PKG_PREPARED)` and depend on `$(PKG_PATCHED)`
-$(PKG_PREPARED): $(PKG_PATCHED)
+# as well as `$(PKG_CUSTOM_POST_PATCH)`
+#
+# An example might be if you need to generate code after checkout, to be
+# compiled into the target application.  This needs to run before the
+# build step in order for header files to be available on the include path.
+# You can define a "PHONY" PKG_CUSTOM_POST_PATCH target in your package makefile
+# and execute whatever operation you need within it.
+$(PKG_PREPARED): $(PKG_PATCHED) $(PKG_CUSTOM_POST_PATCH)
 	@touch $@
 
 # Use explicit '--git-dir' and '--work-tree' to prevent issues when the
