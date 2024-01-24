@@ -40,9 +40,13 @@ extern "C" {
 #else
 
 /**
- * @brief Max data length for a CAN frame
+ * @brief Max data length for classic and FD CAN frames (compliant with
+ * libsocketcan macros)
+ * @{
  */
-#define CAN_MAX_DLEN (8)
+#define CAN_MAX_DLEN (8)    /**< Classic CAN maximum data length */
+#define CANFD_MAX_DLEN (64) /**< CAN FD maximum data length */
+/** @} */
 
 /**
  * @name CAN_ID flags and masks
@@ -57,6 +61,15 @@ extern "C" {
 #define CAN_SFF_MASK (0x000007FFU) /**< standard frame format (SFF) */
 #define CAN_EFF_MASK (0x1FFFFFFFU) /**< extended frame format (EFF) */
 #define CAN_ERR_MASK (0x1FFFFFFFU) /**< omit EFF, RTR, ERR flags */
+/** @} */
+
+/**
+ * @name CAN FD flags extracted from libsocketcan
+ * @{
+ */
+#define CANFD_BRS 0x01 /**< bit rate switch (second bitrate for payload data) */
+#define CANFD_ESI 0x02 /**< error state indicator of the transmitting node */
+#define CANFD_FDF 0x04 /**< mark CAN FD for dual use of struct canfd_frame */
 /** @} */
 
 /**
@@ -86,14 +99,29 @@ typedef uint32_t canid_t;
  * @brief Controller Area Network frame
  */
 struct can_frame {
-    canid_t can_id;  /**< 32 bit CAN_ID + EFF/RTR/ERR flags */
-    uint8_t can_dlc; /**< frame payload length in byte (0 .. CAN_MAX_DLEN) */
-    uint8_t __pad;   /**< padding */
-    uint8_t __res0;  /**< reserved / padding */
-    uint8_t __res1;  /**< reserved / padding */
+    canid_t can_id;     /**< 32 bit CAN_ID + EFF/RTR/ERR flags */
+    union {
+        uint8_t len;    /**< frame payload length in byte (0 .. CAN_MAX_DLEN) */
+        uint8_t can_dlc;/**< deprecated - see SocketCAN documentation */
+    };
+    uint8_t __pad;      /**< padding */
+    uint8_t __res0;     /**< reserved / padding */
+    uint8_t __res1;     /**< reserved / padding */
     /** Frame data */
     uint8_t data[CAN_MAX_DLEN] __attribute__((aligned(8)));
 };
+
+#ifdef MODULE_FDCAN
+struct canfd_frame {
+    canid_t can_id;  /**< 32 bit CAN_ID + EFF/RTR/ERR flags */
+    uint8_t len; /**< frame payload length in byte (0 .. CAN_MAX_DLEN) */
+    uint8_t flags;   /**< additional flags for CAN FD */
+    uint8_t __res0;  /**< reserved / padding */
+    uint8_t __res1;  /**< reserved / padding */
+    /** Frame data */
+    uint8_t data[CANFD_MAX_DLEN] __attribute__((aligned(8)));
+};
+#endif
 
 /**
  * @brief Controller Area Network filter
@@ -142,7 +170,15 @@ struct can_bittiming_const {
 
 #endif /* defined(__linux__) */
 
+/**
+ * @brief CAN frame
+ */
+#ifdef MODULE_FDCAN
+typedef struct canfd_frame can_frame_t;
+#else
 typedef struct can_frame can_frame_t;
+#endif
+
 #ifdef __cplusplus
 }
 #endif

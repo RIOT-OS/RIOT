@@ -40,6 +40,15 @@ extern "C" {
 #endif
 
 /**
+ * @brief Default CAN maximum data length
+ */
+#ifdef MODULE_FDCAN
+#define DEFAULT_CAN_MAX_DLEN CANFD_MAX_DLEN
+#else
+#define DEFAULT_CAN_MAX_DLEN CAN_MAX_DLEN
+#endif
+
+/**
  * @brief CAN options
  */
 typedef enum {
@@ -51,6 +60,10 @@ typedef enum {
     CANOPT_CLOCK,           /**< controller main clock */
     CANOPT_BITTIMING_CONST, /**< controller bittiming parameters */
     CANOPT_STATE,           /**< set controller state @ref canopt_state_t */
+#ifdef MODULE_FDCAN
+    CANOPT_FD_BITTIMING,    /**< bit timing parameter for FDCAN data payload */
+    CANOPT_FD_BITTIMING_CONST, /**< controller bit timing parameter for FDCAN data payload */
+#endif
 } canopt_t;
 
 /**
