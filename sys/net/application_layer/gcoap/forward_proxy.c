@@ -272,7 +272,7 @@ static void _forward_resp_handler(const gcoap_request_memo_t *memo,
                     max_age = 60U;
                 }
                 gcoap_resp_init(pdu, (uint8_t *)pdu->hdr, buf_len, COAP_CODE_VALID);
-                coap_opt_add_opaque(pdu, COAP_OPT_ETAG, cep->req_etag, req_etag_len);
+                coap_opt_add_etag(pdu, cep->req_etag, req_etag_len);
                 if (max_age != 60U) {
                     /* only include Max-Age option if it is not the default value */
                     coap_opt_add_uint(pdu, COAP_OPT_MAX_AGE, max_age);
@@ -339,7 +339,7 @@ static int _gcoap_forward_proxy_copy_options(coap_pkt_t *pkt,
                 static const uint8_t tmp[COAP_ETAG_LENGTH_MAX] = { 0 };
                 /* add slack to maybe add an ETag on stale cache hit later, as is done in
                  * gcoap_req_send() (which we circumvented in _gcoap_forward_proxy_via_coap()) */
-                if (coap_opt_add_opaque(pkt, COAP_OPT_ETAG, tmp, sizeof(tmp))) {
+                if (coap_opt_add_etag(pkt, COAP_OPT_ETAG, tmp, sizeof(tmp))) {
                     etag_added = true;
                 }
             }

@@ -199,20 +199,30 @@ int coap_match_path(const coap_resource_t *resource, uint8_t *uri)
     return res;
 }
 
-uint8_t *coap_find_option(coap_pkt_t *pkt, unsigned opt_num)
+static uint8_t *_get_option(const coap_pkt_t *pkt, unsigned opt_num, const coap_optpos_t **found_optpos)
 {
     const coap_optpos_t *optpos = pkt->options;
     unsigned opt_count = pkt->options_len;
 
     while (opt_count--) {
         if (optpos->opt_num == opt_num) {
-            unsigned idx = index_of(pkt->options, optpos);
-            bf_unset(pkt->opt_crit, idx);
+            *found_optpos = optpos;
             return (uint8_t*)pkt->hdr + optpos->offset;
         }
         optpos++;
     }
     return NULL;
+}
+
+uint8_t *coap_find_option(coap_pkt_t *pkt, unsigned opt_num)
+{
+    const coap_optpos_t *optpos = NULL;
+    uint8_t *optloc = _get_option(pkt, opt_num, &optpos);
+    if (optloc) {
+        unsigned idx = index_of(pkt->options, optpos);
+        bf_unset(pkt->opt_crit, idx);
+    }
+    return optloc;
 }
 
 /*
@@ -1103,6 +1113,54 @@ ssize_t coap_opt_add_proxy_uri(coap_pkt_t *pkt, const char *uri)
     assert(uri);
 
     return _add_opt_pkt(pkt, COAP_OPT_PROXY_URI, (uint8_t *)uri, strlen(uri));
+}
+
+ssize_t coap_opt_replace_etag(coap_pkt_t *pkt, const void *etag, size_t len)
+{
+    assert(len > 0 && len <= COAP_ETAG_LENGTH_MAX);
+    const coap_optpos_t *optpos = NULL;
+    uint8_t *opt = _get_option(pkt, COAP_OPT_ETAG, &optpos);
+    if (!opt) {
+        /* No etag, nothing modified */
+        return 0;
+    }
+
+    uint16_t delta = 0;
+    int opt_len = 0;
+    uint8_t *value = _parse_option(pkt, opt, &delta, &opt_len);
+
+    /* Sanity checking based on _parse_option return codes */
+    if (!value || opt_len < 0) {
+        /* Unable to parse option or packet, do nothing */
+        return 0;
+    }
+
+    /* Length supplied to the initial call must be at least as much as supplied to this call */
+    assert((size_t)opt_len >= len);
+
+    /* Between -7 and 0, inclusive */
+    ssize_t len_diff = len - opt_len;
+
+    if (len_diff != 0) {
+        /* shift everything */
+        /* addresses of the rest of the packet after the option */
+        uint8_t *rest_of_the_packet = value + opt_len;
+        uint8_t *end_of_the_packet = pkt->payload + pkt->payload_len;
+
+        uint16_t lastonum = COAP_OPT_ETAG - delta;
+        size_t new_len = coap_put_option(opt, lastonum, COAP_OPT_ETAG, etag, len);
+
+        /* Move the rest of the packet to right after the newly written option */
+        memmove(opt + new_len, rest_of_the_packet, end_of_the_packet - rest_of_the_packet);
+
+        /* Update the payload data */
+        pkt->payload += len_diff;
+        pkt->payload_len += len_diff;
+    }
+    else {
+        memcpy(value, etag, len);
+    }
+    return len_diff;
 }
 
 ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags)
