@@ -22,5 +22,9 @@ ifndef CONFIG_GNRC_PKTBUF_SIZE
   CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=8192
 endif
 
+ifndef CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF
+  CFLAGS += -DCONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF=3
+endif
+
 # Set a custom channel if needed
 include $(RIOTMAKE)/default-radio-settings.inc.mk
