@@ -60,6 +60,10 @@ endif
 # DODAG Configuration Options (see the doc for more info)
 # CFLAGS += -DCONFIG_GNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN
 
+ifndef CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF
+  CFLAGS += -DCONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF=3
+endif
+
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
