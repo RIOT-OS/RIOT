@@ -20,13 +20,10 @@
 #include "periph/gpio.h"
 
 int gpio_init(gpio_t pin, gpio_mode_t mode) {
-  (void) pin;
-  (void) mode;
+    (void) pin;
+    (void) mode;
 
-  if (mode >= GPIO_OUT)
     return 0;
-  else
-    return -1;
 }
 
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
@@ -38,7 +35,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     (void) cb;
     (void) arg;
 
-    return -1;
+    return 0;
 }
 
 void gpio_irq_enable(gpio_t pin)
