@@ -11,7 +11,7 @@ license = "LGPL-2.1-only"
 publish = false
 
 [dependencies]
-lsm303agr = "^0.2"
+lsm303agr = "0.3.0"
 riot-wrappers = "^0.8"
 # Whatever lsm uses
 nb = "*"
