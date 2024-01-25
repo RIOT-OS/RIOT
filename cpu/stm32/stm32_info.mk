@@ -45,5 +45,5 @@ else ifneq (,$(filter $(CPU_FAM),g0 l0 c0))
 else ifneq (,$(filter $(CPU_FAM),l5 u5))
   CPU_CORE = cortex-m33
 else
-  $(error Not supported CPU family: 'stm32 $(CPU_FAM)')
+  $(error Not supported CPU family: '$(CPU_FAM)')
 endif
