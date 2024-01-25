@@ -13,22 +13,22 @@
  * @{
  *
  * @file
- * @brief       Base STM32Fx/Gx/MP1/Cx clock configuration
+ * @brief       Base STM32Fx/Gx/MP1/C0 clock configuration
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef CLK_CFG_CLOCK_COMMON_FX_GX_MP1_CX_H
-#define CLK_CFG_CLOCK_COMMON_FX_GX_MP1_CX_H
+#ifndef CLK_CFG_CLOCK_COMMON_FX_GX_MP1_C0_H
+#define CLK_CFG_CLOCK_COMMON_FX_GX_MP1_C0_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @name    Clock common configuration (F0/F1/F2/F3/F4/F7/G0/G4/MP1)
+ * @name    Clock common configuration (F0/F1/F2/F3/F4/F7/G0/G4/MP1/C0)
  * @{
  */
 /* Select the desired system clock source between PLL, HSE or HSI */
@@ -87,5 +87,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CLK_CFG_CLOCK_COMMON_FX_GX_MP1_CX_H */
+#endif /* CLK_CFG_CLOCK_COMMON_FX_GX_MP1_C0_H */
 /** @} */
