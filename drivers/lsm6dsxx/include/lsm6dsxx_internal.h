@@ -136,9 +136,9 @@ extern "C" {
 /** @} */
 
 /**
- * @brief	WHO_AM_I value
+ * @brief   WHO_AM_I value for the LSM6DSL
  */
-#define LSM6DSXX_WHO_AM_I                    (0b01101010) /*b-l475e-iot01a board=0b01101010*/
+#define LSM6DSXX_WHO_AM_I                    (0b01101010)
 
 
 
@@ -149,13 +149,12 @@ extern "C" {
  */
 
 #define LSM6DSXX_REG_ORIENT_CFG_G           (0x0B)
-
 /** @} */
 
 /**
- * @brief	WHO_AM_I value
+ * @brief   WHO_AM_I value for the LSM6DS33
  */
-#define LSM6DSXX_WHO_AM_I                    (0b01101001 ) /* In feather board value=0b01101001 */
+#define LSM6DSXX_WHO_AM_I                    (0b01101001)
 
 #endif
 
@@ -182,12 +181,12 @@ extern "C" {
 /** @} */
 
 /**
- * @brief	Offset for temperature calculation
+ * @brief   Offset for temperature calculation
  */
 #define LSM6DSXX_TEMP_OFFSET                 (0x1900)
 
 /**
- * @brief 	Reboot wait interval in ms (15ms)
+ * @brief   Reboot wait interval in ms (15ms)
  */
 #define LSM6DSXX_BOOT_WAIT_MS                (15)
 
