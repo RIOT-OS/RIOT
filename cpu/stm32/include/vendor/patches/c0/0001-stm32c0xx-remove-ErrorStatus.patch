@@ -1,0 +1,29 @@
+From fe8412a4dd6b37dfd5d4701e8716b917fd8baeb8 Mon Sep 17 00:00:00 2001
+From: Jason Parker <jason.parker@bissell.com>
+Date: Fri, 26 Jan 2024 12:38:18 -0500
+Subject: [PATCH] stm32c0xx: remove ErrorStatus
+
+---
+ Include/stm32c0xx.h | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/Include/stm32c0xx.h b/Include/stm32c0xx.h
+index 1fe8c01..eafaa01 100644
+--- a/Include/stm32c0xx.h
++++ b/Include/stm32c0xx.h
+@@ -121,12 +121,6 @@ typedef enum
+ } FunctionalState;
+ #define IS_FUNCTIONAL_STATE(STATE) (((STATE) == DISABLE) || ((STATE) == ENABLE))
+ 
+-typedef enum
+-{
+-  SUCCESS = 0,
+-  ERROR = !SUCCESS
+-} ErrorStatus;
+-
+ /**
+   * @}
+   */
+-- 
+2.34.1
+
