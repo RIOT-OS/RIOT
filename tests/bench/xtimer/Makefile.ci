@@ -2,6 +2,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega8 \
     bluepill-stm32f030c8 \
     im880b \
+    nucleo-c031c6 \
     nucleo-l011k4 \
     olimex-msp430-h1611 \
     olimex-msp430-h2618 \

@@ -1,4 +1,5 @@
 BOARD_INSUFFICIENT_MEMORY := \
+    nucleo-c031c6 \
     slstk3400a \
     stk3200 \
     #
