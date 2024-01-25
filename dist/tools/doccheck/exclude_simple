@@ -1545,12 +1545,12 @@ warning: Member CONFIG_CLOCK_APB3_DIV (macro definition) of file cfg_clock_defau
 warning: Member CONFIG_CLOCK_DESIRED_FREQUENCY (macro definition) of file clk_conf.h is not documented.
 warning: Member CONFIG_CLOCK_HFROSC_DIV (macro definition) of file clk_conf.h is not documented.
 warning: Member CONFIG_CLOCK_HFROSC_TRIM (macro definition) of file clk_conf.h is not documented.
-warning: Member CONFIG_CLOCK_HSE (macro definition) of file cfg_clock_common_fx_gx_mp1.h is not documented.
+warning: Member CONFIG_CLOCK_HSE (macro definition) of file cfg_clock_common_fx_gx_mp1_c0.h is not documented.
 warning: Member CONFIG_CLOCK_HSE (macro definition) of file cfg_clock_common_lx_u5_wx.h is not documented.
 warning: Member CONFIG_CLOCK_HSE (macro definition) of file cfg_clock_common_lx_wx.h is not documented.
 warning: Member CONFIG_CLOCK_HSE (macro definition) of file periph_conf_common.h is not documented.
 warning: Member CONFIG_CLOCK_HSE (macro definition) of file periph_conf.h is not documented.
-warning: Member CONFIG_CLOCK_HSI (macro definition) of file cfg_clock_common_fx_gx_mp1.h is not documented.
+warning: Member CONFIG_CLOCK_HSI (macro definition) of file cfg_clock_common_fx_gx_mp1_c0.h is not documented.
 warning: Member CONFIG_CLOCK_HSI (macro definition) of file cfg_clock_common_lx_u5_wx.h is not documented.
 warning: Member CONFIG_CLOCK_HSI (macro definition) of file cfg_clock_common_lx_wx.h is not documented.
 warning: Member CONFIG_CLOCK_MCU_DIV (macro definition) of file cfg_clock_default.h is not documented.
@@ -1608,7 +1608,7 @@ warning: Member CONFIG_USE_CLOCK_HFROSC (macro definition) of file clk_conf.h is
 warning: Member CONFIG_USE_CLOCK_HFROSC_PLL (macro definition) of file clk_conf.h is not documented.
 warning: Member CONFIG_USE_CLOCK_HFXOSC (macro definition) of file clk_conf.h is not documented.
 warning: Member CONFIG_USE_CLOCK_HFXOSC_PLL (macro definition) of file clk_conf.h is not documented.
-warning: Member CONFIG_USE_CLOCK_PLL (macro definition) of file cfg_clock_common_fx_gx_mp1.h is not documented.
+warning: Member CONFIG_USE_CLOCK_PLL (macro definition) of file cfg_clock_common_fx_gx_mp1_c0.h is not documented.
 warning: Member CONFIG_USE_CLOCK_PLL (macro definition) of file cfg_clock_common_lx_u5_wx.h is not documented.
 warning: Member CONFIG_USE_CLOCK_PLL (macro definition) of file cfg_clock_common_lx_wx.h is not documented.
 warning: Member CONFIG_ZTIMER_LPTIMER_BLOCK_PM_MODE (macro definition) of file board.h is not documented.
