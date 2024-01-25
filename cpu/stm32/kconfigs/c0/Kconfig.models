@@ -62,15 +62,7 @@ config CPU_MODEL_STM32C031K6
     bool
     select CPU_MODEL_STM32C031XX
 
-config CPU_MODEL_STM32C071C8
-    bool
-    select CPU_MODEL_STM32C071XX
-
 config CPU_MODEL_STM32C071CB
-    bool
-    select CPU_MODEL_STM32C071XX
-
-config CPU_MODEL_STM32C071F8
     bool
     select CPU_MODEL_STM32C071XX
 
@@ -78,23 +70,11 @@ config CPU_MODEL_STM32C071FB
     bool
     select CPU_MODEL_STM32C071XX
 
-config CPU_MODEL_STM32C071G8
-    bool
-    select CPU_MODEL_STM32C071XX
-
 config CPU_MODEL_STM32C071GB
     bool
     select CPU_MODEL_STM32C071XX
 
-config CPU_MODEL_STM32C071K8
-    bool
-    select CPU_MODEL_STM32C071XX
-
 config CPU_MODEL_STM32C071KB
-    bool
-    select CPU_MODEL_STM32C071XX
-
-config CPU_MODEL_STM32C071R8
     bool
     select CPU_MODEL_STM32C071XX
 
@@ -137,15 +117,10 @@ config CPU_MODEL
     default "stm32c031g6" if CPU_MODEL_STM32C031G6
     default "stm32c031k4" if CPU_MODEL_STM32C031K4
     default "stm32c031k6" if CPU_MODEL_STM32C031K6
-    default "stm32c071c8" if CPU_MODEL_STM32C071C8
     default "stm32c071cb" if CPU_MODEL_STM32C071CB
-    default "stm32c071f8" if CPU_MODEL_STM32C071F8
     default "stm32c071fb" if CPU_MODEL_STM32C071FB
-    default "stm32c071g8" if CPU_MODEL_STM32C071G8
     default "stm32c071gb" if CPU_MODEL_STM32C071GB
-    default "stm32c071k8" if CPU_MODEL_STM32C071K8
     default "stm32c071kb" if CPU_MODEL_STM32C071KB
-    default "stm32c071r8" if CPU_MODEL_STM32C071R8
     default "stm32c071rb" if CPU_MODEL_STM32C071RB
     default "stm32c091cc" if CPU_MODEL_STM32C091CC
     default "stm32c091fc" if CPU_MODEL_STM32C091FC
