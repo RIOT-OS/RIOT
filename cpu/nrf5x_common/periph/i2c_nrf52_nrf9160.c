@@ -340,6 +340,10 @@ int i2c_read_regs(i2c_t dev, uint16_t addr, uint16_t reg,
 int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len,
                     uint8_t flags)
 {
+    if ((unsigned int)data >= CPU_RAM_BASE && (unsigned int)data < CPU_RAM_BASE + CPU_RAM_SIZE) {
+        return direct_i2c_write_bytes(dev, addr, data, len, flags);
+    }
+
     /* These are critical for the memcpy; direct_i2c_write_bytes makes some
      * more */
     assert((len > 0) && (len < 256));
