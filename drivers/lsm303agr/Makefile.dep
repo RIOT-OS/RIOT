@@ -1,4 +1,4 @@
 USEMODULE += rust_riotmodules
-USEMODULE += ztimer_usec
+USEMODULE += ztimer_msec
 
 FEATURES_REQUIRED += periph_i2c

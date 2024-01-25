@@ -59,7 +59,7 @@ fn init() -> Result<(), &'static str> {
     for (&i2cdev, (lsm, (reg, reg_mag))) in I2C_DEVICES.iter().zip(lsm.iter_mut().zip(reg.iter_mut().zip(reg_mag.iter_mut()))) {
         let mut device = Lsm303agr::new_with_i2c(i2c::I2CDevice::new(i2cdev));
 
-        let mut init_clock = riot_wrappers::ztimer::Clock::usec();
+        let mut init_clock = riot_wrappers::ztimer::Clock::msec();
 
         device.init()
             .map_err(|_| "Device initialization failed")?;
@@ -117,9 +117,8 @@ impl registration::Drivable for MagAspect {
         let mut device = self.0.device.try_lock()
             .ok_or(registration::Error)?;
 
-        let data = nb::block!(device.magnetic_field())
+        let data = device.magnetic_field()
             .map_err(|_| registration::Error)?;
-        // Original data is in nanotesla
         return Ok(Phydat::fit(&[data.x_nt(), data.y_nt(), data.z_nt()], Some(saul::Unit::T), -9))
     }
 }
