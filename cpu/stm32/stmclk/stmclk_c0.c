@@ -26,9 +26,6 @@
 #define RCC_CFGR_SW_HSI             (0)
 #define RCC_CFGR_SW_HSE             (RCC_CFGR_SW_0)
 
-// #define RCC_CFGR_SWS_HSI            (0)
-// #define RCC_CFGR_SWS_HSE            (RCC_CFGR_SWS_0)
-
 #if CONFIG_CLOCK_HSISYS_DIV == 1
 #define CLOCK_HSI_DIV               (0)
 #elif CONFIG_CLOCK_HSISYS_DIV == 2
@@ -225,7 +222,6 @@ void stmclk_init_sysclk(void)
     /* we enable instruction cache, pre-fetch, and we set the required flash wait states */
     FLASH->ACR |= (FLASH_ACR_ICEN | FLASH_ACR_PRFTEN | FLASH_WAITSTATES);
 
-
     /* disable all active clocks except HSI -> resets the clk configuration */
     RCC->CR = RCC_CR_HSION;
 
@@ -248,7 +244,6 @@ void stmclk_init_sysclk(void)
         RCC->CFGR |= RCC_CFGR_SW_HSE;
         while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_HSE) {}
     }
-
 
     if (!IS_ACTIVE(CLOCK_ENABLE_HSI)) {
         /* Disable HSI only if not used */
