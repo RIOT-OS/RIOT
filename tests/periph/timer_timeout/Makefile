@@ -1,4 +1,4 @@
-include ../Makefile.tests_common
+include ../Makefile.periph_common
 
 FEATURES_REQUIRED = periph_timer
 
