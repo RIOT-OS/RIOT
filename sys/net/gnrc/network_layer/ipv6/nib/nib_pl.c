@@ -158,7 +158,7 @@ void gnrc_ipv6_nib_pl_print(gnrc_ipv6_nib_pl_t *entry)
         printf(" expires %lu sec", (entry->valid_until - now) / MS_PER_SEC);
     }
     if (entry->pref_until < UINT32_MAX) {
-        printf(" deprecates %lu sec", (entry->pref_until - now) / MS_PER_SEC);
+        printf(" deprecates %lu sec", (now >= entry->pref_until ? 0 : entry->pref_until - now) / MS_PER_SEC);
     }
     puts("");
 }
