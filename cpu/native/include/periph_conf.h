@@ -88,6 +88,23 @@ extern "C" {
 #endif
 
 /**
+ * @name I2C configuration (Linux host only)
+ * @{
+ */
+#if !defined(I2C_NUMOF) || defined(DOXYGEN)
+/**
+ * @brief Amount of I2C devices
+ *
+ * Allows up to I2C_NUMOF I2C devices with each having up to I2C_MAXCS hardware
+ * cable select lines. Assignment to hardware devices can be configured at
+ * runtime using the `--spi` startup parameter.
+ *
+ * Can be overridden during compile time with a `-DI2C_NUMOF=n` flag.
+ */
+#define I2C_NUMOF   1
+#endif
+
+/**
  * @name SPI configuration (Linux host only)
  * @{
  */
