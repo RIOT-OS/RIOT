@@ -118,41 +118,41 @@
 #endif
 
 #if IS_ACTIVE(CONFIG_CLOCK_MCO_USE_SYSCLK)
-#define CLOCK_MCO_SRC                           (RCC_CFGR_MCOSEL_0)
+#define CLOCK_MCO_SRC               (RCC_CFGR_MCOSEL_0)
 #elif IS_ACTIVE(CONFIG_CLOCK_MCO_USE_HSI)
-#define CLOCK_MCO_SRC                           (RCC_CFGR_MCOSEL_1 | RCC_CFGR_MCOSEL_0)
+#define CLOCK_MCO_SRC               (RCC_CFGR_MCOSEL_1 | RCC_CFGR_MCOSEL_0)
 #elif IS_ACTIVE(CONFIG_CLOCK_MCO_USE_HSE)
-#define CLOCK_MCO_SRC                           (RCC_CFGR_MCOSEL_2)
+#define CLOCK_MCO_SRC               (RCC_CFGR_MCOSEL_2)
 #elif IS_ACTIVE(CONFIG_CLOCK_MCO_USE_LSI)
-#define CLOCK_MCO_SRC                           (RCC_CFGR_MCOSEL_2 | RCC_CFGR_MCOSEL_1)
+#define CLOCK_MCO_SRC               (RCC_CFGR_MCOSEL_2 | RCC_CFGR_MCOSEL_1)
 #elif IS_ACTIVE(CONFIG_CLOCK_MCO_USE_LSE)
-#define CLOCK_MCO_SRC                           (RCC_CFGR_MCOSEL_2 | RCC_CFGR_MCOSEL_1 | RCC_CFGR_MCOSEL_0)
+#define CLOCK_MCO_SRC               (RCC_CFGR_MCOSEL_2 | RCC_CFGR_MCOSEL_1 | RCC_CFGR_MCOSEL_0)
 #else
 #error "Invalid MCO clock source selection"
 #endif
 
 /* Configure the MCO prescaler */
 #ifndef CONFIG_CLOCK_MCO_PRE
-#define CONFIG_CLOCK_MCO_PRE                    (1)
+#define CONFIG_CLOCK_MCO_PRE        (1)
 #endif
 
 /* Define MCO prescalers */
 #if CONFIG_CLOCK_MCO_PRE == 1
-#define CLOCK_MCO_PRE                           (0)
+#define CLOCK_MCO_PRE               (0)
 #elif CONFIG_CLOCK_MCO_PRE == 2
-#define CLOCK_MCO_PRE                           (RCC_CFGR_MCOPRE_0)
+#define CLOCK_MCO_PRE               (RCC_CFGR_MCOPRE_0)
 #elif CONFIG_CLOCK_MCO_PRE == 4
-#define CLOCK_MCO_PRE                           (RCC_CFGR_MCOPRE_1)
+#define CLOCK_MCO_PRE               (RCC_CFGR_MCOPRE_1)
 #elif CONFIG_CLOCK_MCO_PRE == 8
-#define CLOCK_MCO_PRE                           (RCC_CFGR_MCOPRE_1 | RCC_CFGR_MCOPRE_0)
+#define CLOCK_MCO_PRE               (RCC_CFGR_MCOPRE_1 | RCC_CFGR_MCOPRE_0)
 #elif CONFIG_CLOCK_MCO_PRE == 16
-#define CLOCK_MCO_PRE                           (RCC_CFGR_MCOPRE_2)
+#define CLOCK_MCO_PRE               (RCC_CFGR_MCOPRE_2)
 #elif CONFIG_CLOCK_MCO_PRE == 32
-#define CLOCK_MCO_PRE                           (RCC_CFGR_MCOPRE_2 | RCC_CFGR_MCOPRE_0)
+#define CLOCK_MCO_PRE               (RCC_CFGR_MCOPRE_2 | RCC_CFGR_MCOPRE_0)
 #elif CONFIG_CLOCK_MCO_PRE == 64
-#define CLOCK_MCO_PRE                           (RCC_CFGR_MCOPRE_2 | RCC_CFGR_MCOPRE_1)
+#define CLOCK_MCO_PRE               (RCC_CFGR_MCOPRE_2 | RCC_CFGR_MCOPRE_1)
 #elif CONFIG_CLOCK_MCO_PRE == 128
-#define CLOCK_MCO_PRE                           (RCC_CFGR_MCOPRE_2 | RCC_CFGR_MCOPRE_1 | RCC_CFGR_MCOPRE_0)
+#define CLOCK_MCO_PRE               (RCC_CFGR_MCOPRE_2 | RCC_CFGR_MCOPRE_1 | RCC_CFGR_MCOPRE_0)
 #else
 #error "Invalid MCO prescaler"
 #endif
