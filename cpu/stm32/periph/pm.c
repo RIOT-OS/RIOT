@@ -199,7 +199,7 @@ void pm_backup_regulator_on(void)
         stmclk_dbp_unlock();
     }
     PWR_BACKUP_REGULATOR_REG |= BKPREG_CONFIG;
-    while (!(PWR_BACKUP_REGULATOR_REG & BKPREG_READY));
+    while (!(PWR_BACKUP_REGULATOR_REG & BKPREG_READY)){}
     if (locked) {
         stmclk_dbp_lock();
     }
