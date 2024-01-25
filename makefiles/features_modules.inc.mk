@@ -126,7 +126,7 @@ USEMODULE += $(filter arduino_pwm, $(FEATURES_USED))
 
 # always register a peripheral driver as a required feature when the corresponding
 # module is requested
-PERIPH_IGNORE_MODULES += periph_usbdev_clk periph_gpio_mock periph_gpio_linux periph_spidev_linux
+PERIPH_IGNORE_MODULES += periph_usbdev_clk periph_gpio_mock periph_gpio_linux periph_i2c_mock periph_spidev_linux
 
 ifneq (,$(filter periph_%,$(DEFAULT_MODULE)))
   FEATURES_REQUIRED += $(filter-out $(PERIPH_IGNORE_MODULES),$(filter periph_%,$(USEMODULE)))

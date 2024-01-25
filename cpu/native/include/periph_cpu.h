@@ -178,6 +178,27 @@ typedef gpio_mock_t* gpio_t;
 #define PROVIDES_PM_SET_LOWEST
 /** @} */
 
+/**
+ * @name I2C Configuration
+ *
+ * The common I2C implementation is requested to provide the default implementations of the
+ * `i2c_{read,write}_{reg,regs}` functions.
+ */
+
+#define PERIPH_I2C_NEED_READ_REG
+#define PERIPH_I2C_NEED_READ_REGS
+#define PERIPH_I2C_NEED_WRITE_REG
+#define PERIPH_I2C_NEED_WRITE_REGS
+
+#if defined(MODULE_PERIPH_I2C_MOCK) || defined(DOXYGEN)
+/**
+ * @brief   I2C configuration structure type
+ */
+typedef struct {
+    void *dummy;    /**< dummy attribute */
+} i2c_conf_t;
+#endif
+
 /* Configuration for the wrapper around the Linux SPI API (periph_spidev_linux)
  *
  * Needs to go here, otherwise the SPI_NEEDS_ are defined after inclusion of
