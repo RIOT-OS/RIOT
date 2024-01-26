@@ -546,7 +546,7 @@ static int _do_block(coap_pkt_t *pdu, const sock_udp_ep_t *remote,
                                     context->dns_buf,
                                     context->dns_buf_len);
 
-    coap_block1_finish(&slicer);
+    coap_block1_finish(pdu, &slicer);
 
     if ((len = _send(pdu->hdr, len, remote, slicer.start == 0, context, tl_type)) <= 0) {
         DEBUG("gcoap_dns: msg send failed: %" PRIdSIZE "\n", len);

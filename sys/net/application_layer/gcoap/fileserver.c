@@ -250,7 +250,7 @@ static ssize_t _get_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     vfs_close(fd);
 
     slicer.cur = slicer.end + more;
-    coap_block2_finish(&slicer);
+    coap_block2_finish(pdu, &slicer);
 
     if (read == 0) {
         /* Rewind to clear payload marker */
@@ -489,7 +489,7 @@ static ssize_t _get_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     }
 
     vfs_closedir(&dir);
-    coap_block2_finish(&slicer);
+    coap_block2_finish(pdu, &slicer);
 
     return (uintptr_t)buf - (uintptr_t)pdu->hdr;
 }

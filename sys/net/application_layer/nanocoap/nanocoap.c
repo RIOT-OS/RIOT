@@ -199,20 +199,30 @@ int coap_match_path(const coap_resource_t *resource, uint8_t *uri)
     return res;
 }
 
-uint8_t *coap_find_option(coap_pkt_t *pkt, unsigned opt_num)
+static uint8_t *_get_option(const coap_pkt_t *pkt, unsigned opt_num, const coap_optpos_t **found_optpos)
 {
     const coap_optpos_t *optpos = pkt->options;
     unsigned opt_count = pkt->options_len;
 
     while (opt_count--) {
         if (optpos->opt_num == opt_num) {
-            unsigned idx = index_of(pkt->options, optpos);
-            bf_unset(pkt->opt_crit, idx);
+            *found_optpos = optpos;
             return (uint8_t*)pkt->hdr + optpos->offset;
         }
         optpos++;
     }
     return NULL;
+}
+
+uint8_t *coap_find_option(coap_pkt_t *pkt, unsigned opt_num)
+{
+    const coap_optpos_t *optpos = NULL;
+    uint8_t *optloc = _get_option(pkt, opt_num, &optpos);
+    if (optloc) {
+        unsigned idx = index_of(pkt->options, optpos);
+        bf_unset(pkt->opt_crit, idx);
+    }
+    return optloc;
 }
 
 /*
@@ -950,8 +960,6 @@ size_t coap_put_block1_ok(uint8_t *pkt_pos, coap_block1_t *block1, uint16_t last
 size_t coap_opt_put_block(uint8_t *buf, uint16_t lastonum, coap_block_slicer_t *slicer,
                           bool more, uint16_t option)
 {
-    slicer->opt = buf;
-
     return coap_opt_put_uint(buf, lastonum, option, _slicer2blkopt(slicer, more));
 }
 
@@ -1148,8 +1156,6 @@ ssize_t coap_opt_add_uint(coap_pkt_t *pkt, uint16_t optnum, uint32_t value)
 ssize_t coap_opt_add_block(coap_pkt_t *pkt, coap_block_slicer_t *slicer,
                            bool more, uint16_t option)
 {
-    slicer->opt = pkt->payload;
-
     return coap_opt_add_uint(pkt, option, _slicer2blkopt(slicer, more));
 }
 
@@ -1311,21 +1317,22 @@ void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer)
     coap_block_slicer_init(slicer, blknum, coap_szx2size(szx));
 }
 
-bool coap_block_finish(coap_block_slicer_t *slicer, uint16_t option)
+bool coap_block_finish(const coap_pkt_t *pkt, coap_block_slicer_t *slicer, uint16_t option)
 {
-    assert(slicer->opt);
+    const coap_optpos_t *optpos = NULL;
+    uint8_t *startpos = _get_option(pkt, option, &optpos);
 
     /* The third parameter for _decode_value() points to the end of the header.
      * We don't know this position, but we know we can read the option because
      * it's already in the buffer. So just point past the option. */
-    uint8_t *pos = slicer->opt + 1;
-    uint16_t delta = _decode_value(*slicer->opt >> 4, &pos, slicer->opt + 3);
+    uint8_t *endpos = startpos + 1;
+    uint16_t delta = _decode_value(*startpos >> 4, &endpos, pkt->payload);
 
     bool more = slicer->cur > slicer->end;
     uint32_t blkopt = _slicer2blkopt(slicer, more);
     size_t olen = _encode_uint(&blkopt);
 
-    coap_put_option(slicer->opt, option - delta, option, (uint8_t *)&blkopt, olen);
+    coap_put_option(startpos, option - delta, option, (uint8_t *)&blkopt, olen);
     return more;
 }
 
@@ -1337,7 +1344,7 @@ ssize_t coap_block2_build_reply(coap_pkt_t *pkt, unsigned code,
     if (slicer->cur < slicer->start) {
         return coap_build_reply(pkt, COAP_CODE_BAD_OPTION, rbuf, rlen, 0);
     }
-    coap_block2_finish(slicer);
+    coap_block2_finish(pkt, slicer);
     return coap_build_reply(pkt, code, rbuf, rlen, payload_len);
 }
 

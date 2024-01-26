@@ -405,7 +405,6 @@ typedef struct {
     size_t start;                   /**< Start offset of the current block  */
     size_t end;                     /**< End offset of the current block    */
     size_t cur;                     /**< Offset of the generated content    */
-    uint8_t *opt;                   /**< Pointer to the placed option       */
 } coap_block_slicer_t;
 
 #if defined(MODULE_NANOCOAP_RESOURCES) || DOXYGEN
@@ -975,13 +974,14 @@ void coap_block_object_init(coap_block1_t *block, size_t blknum, size_t blksize,
  * sets/clears it if required.  Doesn't return the number of bytes, as this
  * function overwrites bytes in the packet rather than adding new.
  *
- * @param[in]     slicer      Preallocated slicer struct to use
- * @param[in]     option      option number (block1 or block2)
+ * @param[in]   pkt         packet to work on
+ * @param[in]   slicer      Preallocated slicer struct to use
+ * @param[in]   option      option number (block1 or block2)
  *
  * @return      true if the `more` bit is set in the block option
  * @return      false if the `more` bit is not set the block option
  */
-bool coap_block_finish(coap_block_slicer_t *slicer, uint16_t option);
+bool coap_block_finish(const coap_pkt_t *pkt, coap_block_slicer_t *slicer, uint16_t option);
 
 /**
  * @brief Finish a block1 request
@@ -992,14 +992,15 @@ bool coap_block_finish(coap_block_slicer_t *slicer, uint16_t option);
  * sets/clears it if required.  Doesn't return the number of bytes, as this
  * function overwrites bytes in the packet rather than adding new.
  *
- * @param[in]     slicer      Preallocated slicer struct to use
+ * @param[in]   pkt         packet to work on
+ * @param[in]   slicer      Preallocated slicer struct to use
  *
  * @return      true if the `more` bit is set in the block option
  * @return      false if the `more` bit is not set the block option
  */
-static inline bool coap_block1_finish(coap_block_slicer_t *slicer)
+static inline bool coap_block1_finish(const coap_pkt_t *pkt, coap_block_slicer_t *slicer)
 {
-    return coap_block_finish(slicer, COAP_OPT_BLOCK1);
+    return coap_block_finish(pkt, slicer, COAP_OPT_BLOCK1);
 }
 
 /**
@@ -1011,14 +1012,15 @@ static inline bool coap_block1_finish(coap_block_slicer_t *slicer)
  * sets/clears it if required.  Doesn't return the number of bytes, as this
  * function overwrites bytes in the packet rather than adding new.
  *
- * @param[in]     slicer      Preallocated slicer struct to use
+ * @param[in]   pkt         packet to work on
+ * @param[in]   slicer      Preallocated slicer struct to use
  *
  * @return      true if the `more` bit is set in the block option
  * @return      false if the `more` bit is not set the block option
  */
-static inline bool coap_block2_finish(coap_block_slicer_t *slicer)
+static inline bool coap_block2_finish(const coap_pkt_t *pkt, coap_block_slicer_t *slicer)
 {
-    return coap_block_finish(slicer, COAP_OPT_BLOCK2);
+    return coap_block_finish(pkt, slicer, COAP_OPT_BLOCK2);
 }
 
 /**
