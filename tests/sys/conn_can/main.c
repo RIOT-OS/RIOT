@@ -34,6 +34,8 @@
 
 #include "can/can_trx.h"
 
+#define SHELL_BUFSIZE   512 /* Needed for CAN FD frame */
+
 #ifdef MODULE_TJA1042
 #include "tja1042.h"
 tja1042_trx_t tja1042 = { .trx.driver = &tja1042_driver,
@@ -95,6 +97,10 @@ static void print_usage(void)
     puts("test_can list");
     puts("test_can send ifnum can_id [B1 [B2 [B3 [B4 [B5 [B6 [B7 [B8]]]]]]]]");
     puts("test_can sendrtr ifnum can_id length(0..8)");
+#ifdef MODULE_FDCAN
+    puts("test_can fdsend ifnum can_id [B1 [B2 [B3 [B4 [B5 [B6 [B7 ... [B64]]]]]]]]");
+    puts("test_can fdsendrtr ifnum can_id length(0..64)");
+#endif
     printf("test_can recv ifnum user_id timeout can_id1 [can_id2..can_id%d]\n",
         MAX_FILTER);
     puts("test_can close user_id");
@@ -130,7 +136,7 @@ static int _list(int argc, char **argv) {
     return 0;
 }
 
-static int _send(int argc, char **argv, bool rtr)
+static int _send(int argc, char **argv, bool rtr, bool is_fd)
 {
     if (argc < 5) {
         print_usage();
@@ -150,10 +156,27 @@ static int _send(int argc, char **argv, bool rtr)
         frame.can_id = strtoul(argv[3], NULL, 16);
         frame.len = argc - 4;
     }
-    if (frame.len > 8) {
+
+#ifdef MODULE_FDCAN
+    if (is_fd) {
+        frame.flags |= CANFD_FDF;
+        if (frame.len > DEFAULT_CAN_MAX_DLEN) {
+            puts("Invalid length");
+            return 1;
+        }
+    }
+    else if (frame.len > CAN_MAX_DLEN) {
         puts("Invalid length");
         return 1;
     }
+#else
+    (void) is_fd;
+
+    if (frame.len > DEFAULT_CAN_MAX_DLEN) {
+        puts("Invalid length");
+        return 1;
+    }
+#endif
 
     if (rtr) {
         for (int i = 0; i < frame.len; i++) {
@@ -203,7 +226,17 @@ static int _receive(int argc, char **argv)
     }
     for (int i = 0; i < filt_num; i++) {
         filters[thread_nb][i].can_id = strtoul(argv[5 + i], NULL, 16);
-        filters[thread_nb][i].can_mask = 0xffffffff;
+        if (filters[thread_nb][i].can_id > CAN_SFF_MASK) {
+            filters[thread_nb][i].can_mask = CAN_EFF_MASK;
+        }
+        else {
+            filters[thread_nb][i].can_mask = CAN_SFF_MASK;
+        }
+    }
+    if (filt_num <= 0) {
+        filt_num = 1;
+        filters[thread_nb][0].can_id = 0;
+        filters[thread_nb][0].can_mask = 0;
     }
     uint32_t timeout = strtoul(argv[4], NULL, 0);
     msg_t msg;
@@ -541,11 +574,19 @@ static int _can_handler(int argc, char **argv)
         return _list(argc, argv);
     }
     else if (strncmp(argv[1], "send", 5) == 0) {
-        return _send(argc, argv, false);
+        return _send(argc, argv, false, false);
     }
     else if (strncmp(argv[1], "sendrtr", 8) == 0) {
-        return _send(argc, argv, true);
+        return _send(argc, argv, true, false);
     }
+#ifdef MODULE_FDCAN
+    else if (strncmp(argv[1], "fdsend", 5) == 0) {
+        return _send(argc, argv, false, true);
+    }
+    else if (strncmp(argv[1], "fdsendrtr", 8) == 0) {
+        return _send(argc, argv, true, true);
+    }
+#endif
     else if (strncmp(argv[1], "recv", 5) == 0) {
         return _receive(argc, argv);
     }
@@ -736,8 +777,8 @@ int main(void)
                                        (void*)i, "receive_thread");
     }
 
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    char line_buf[SHELL_BUFSIZE];
+    shell_run(_commands, line_buf, SHELL_BUFSIZE);
 
     return 0;
 }
