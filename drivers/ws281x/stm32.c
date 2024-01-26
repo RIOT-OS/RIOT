@@ -13,8 +13,8 @@
  *
  * @file
  * @brief       Implementation of `ws281x_write_buffer()` for STM32 MCUs
- * 
- * @note        Currently only implemented for 84, 100 and 180 MHz MCUs of the 
+ *
+ * @note        Currently only implemented for 84, 100 and 180 MHz MCUs of the
  *              STM32F4 family.
  *
  * @author      Lennart Lutz <lennartlutz@t-online.de>
@@ -38,7 +38,7 @@ void ws281x_write_buffer(ws281x_t *dev, const void *buf, size_t size)
     assert(dev);
     const uint8_t *pos = buf;
     const uint8_t *end = pos + size;
-    
+
     /**
      * Get the address of the GPIO pin.
     */
@@ -51,7 +51,7 @@ void ws281x_write_buffer(ws281x_t *dev, const void *buf, size_t size)
 
 #if defined(CPU_LINE_STM32F401xC) || defined(CPU_LINE_STM32F401xE)
 
-    while (pos < end) 
+    while (pos < end)
     {
         uint8_t cnt = 8;
         uint8_t data = *pos;
@@ -276,7 +276,7 @@ void ws281x_write_buffer(ws281x_t *dev, const void *buf, size_t size)
     defined(CPU_LINE_STM32F412Vx) || defined(CPU_LINE_STM32F412Zx) || \
     defined(CPU_LINE_STM32F413xx) || defined(CPU_LINE_STM32F423xx)
 
-    while (pos < end) 
+    while (pos < end)
     {
         uint8_t cnt = 8;
         uint8_t data = *pos;
@@ -539,7 +539,7 @@ void ws281x_write_buffer(ws281x_t *dev, const void *buf, size_t size)
       defined(CPU_LINE_STM32F446xx) || defined(CPU_LINE_STM32F469xx) || \
       defined(CPU_LINE_STM32F479xx)
 
-    while (pos < end) 
+    while (pos < end)
     {
         uint8_t cnt = 8;
         uint8_t data = *pos;
