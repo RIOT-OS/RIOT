@@ -19,7 +19,7 @@
  * via IPv6, enables unlimited connections, and more...
  *
  * @note        This driver can be used in polling or interrupt mode.
- *              On some shields the interupt line is not enabled by default,
+ *              On some shields the interrupt line is not enabled by default,
  *              you have to close the corresponding solder bridge to make the
  *              interrupt mode work...
  *
@@ -68,12 +68,12 @@ typedef struct {
  * @brief   Device descriptor for W5500 devices
  */
 typedef struct w5500 {
-    netdev_t netdev;        /**< extends the netdev structure */
-    w5500_params_t p;       /**< device configuration parameters */
-    uint16_t frame_size_to_be_send;
-    uint16_t frame_size_sent;
-    bool link_up;
-    ztimer_t timerInstance;
+    netdev_t netdev;                /**< extends the netdev structure */
+    w5500_params_t p;               /**< device configuration parameters */
+    uint16_t frame_size_to_be_send; /**< size of the frame which is currently being send */
+    uint16_t frame_size_sent;       /**< size of the frame which has been send */
+    bool link_up;                   /**< used to prevent sending the same LINK event twice */
+    ztimer_t timerInstance;         /**< stores the polling interval timer in polling mode */
 } w5500_t;
 
 /**

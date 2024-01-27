@@ -334,7 +334,6 @@ static uint16_t get_size_in_rx_buffer(w5500_t *dev)
     return received;
 }
 
-
 static int receive(netdev_t *netdev, void *buf, size_t max_len, void *info)
 {
     (void)info;

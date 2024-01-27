@@ -24,15 +24,17 @@ extern "C" {
 #endif
 
 /* The W5500 is accessed by sending a 16 Bit address first, then a 8 bit control byte
-   which determins to which register (common or one of the 8 Sockets) this address shall be
+   which determines to which register (common or one of the 8 Sockets) this address shall be
    applied and finally the data.
 
-   In order to simplify the functions to read and write to the W5500 via SPI the defined register addresses
-   contain the control byte in the upper 5 bits and the actual register address in the lower 13 bits:
+   In order to simplify the functions to read and write to the W5500 via SPI the defined register
+   addresses contain the control byte in the upper 5 bits and the actual register address in the
+   lower 13 bits:
    0b00000 -> common register     (0x0xxx)
    0b00001 -> Socket 0 register   (0x08xx)
 
-   The RX and TX buffers are accessed via separate functions in order to be able to access the full 16 kB buffers.
+   The RX and TX buffers are accessed via separate functions in order to be able to access the full
+   16 kB buffers.
  */
 
 /**
@@ -63,7 +65,7 @@ extern "C" {
 #define REG_IR              (0x0015)    /**< Interrupt flags. */
 #define REG_IMR             (0x0016)    /**< Interrupt masks. */
 #define REG_SIR             (0x0017)    /**< Socket interrupt. */
-#define REG_SIMR            (0x0018)    /**< Socket interupt mask. */
+#define REG_SIMR            (0x0018)    /**< Socket interrupt mask. */
 #define REG_RTR0            (0x0019)    /**< Retry time 0. */
 #define REG_RTR1            (0x001a)    /**< Retry time 1. */
 #define REG_RCR             (0x001b)    /**< Retry count. */
@@ -135,8 +137,8 @@ extern "C" {
 #define REG_S0_KPALVTR          (0x082f)    /**< Socket 0 keep alive timer */
 /** @} */
 
-#define Sn_RXBUF_SIZE_BASE      (0x001E)
-#define Sn_TXBUF_SIZE_BASE      (0x001F)
+#define Sn_RXBUF_SIZE_BASE      (0x001E)    /**< Register to configure a sockets RX buffer size */
+#define Sn_TXBUF_SIZE_BASE      (0x001F)    /**< Register to configure a sockets TX buffer size */
 
 /**
  * @name    Some selected bitfield definitions.
@@ -146,8 +148,8 @@ extern "C" {
 #define MODE_RESET              (0x80)      /**< Device mode: reset. */
 #define PHY_LINK_UP             (0x01)      /**< Link up indication. */
 #define IMR_S0_INT              (0x01)      /**< Global Socket 0 interrupt mask. */
-#define SPI_CONF                SPI_MODE_0
-#define CHIP_VERSION            (0x04)
+#define SPI_CONF                SPI_MODE_0  /**< Configure SPI MODE 0 */
+#define CHIP_VERSION            (0x04)      /**< Chip version we expect to read from the device */
 
 #define ENABLE_MAC_FILTER       (0x80)      /**< Enable hardware MAC filter for raw mode */
 #define ENABLE_BROADCAST_FILTER (0x40)      /**< Enable Broadcast blocking */
@@ -161,12 +163,11 @@ extern "C" {
 #define IR_RECV                 (0x04)      /**< Socket interrupt: data received */
 #define IR_SEND_OK              (0x10)      /**< Socket interrupt: send ok */
 
-#define CMD_READ                (0x00)
-#define CMD_WRITE               (0x04)
+#define CMD_READ                (0x00)      /**< Define for the read command */
+#define CMD_WRITE               (0x04)      /**< Define for the write command */
 #define SOCKET0_RX_BUFFER       (0x18)      /**< BSB for Socket 0 Receive Buffer. */
 #define SOCKET0_TX_BUFFER       (0x10)      /**< BSB for Socket 0 Transmit Buffer. */
 /** @} */
-
 
 #ifdef __cplusplus
 }
