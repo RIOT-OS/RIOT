@@ -39,10 +39,10 @@ extern "C" {
 #define W5500_PARAM_CS          (GPIO_PIN(0, 27))   /**< Default SPI chip select pin */
 #endif
 #ifndef W5500_PARAM_EVT
-#define CONFIG_W5500_POLLING_INTERVAL 100
-#define W5500_PARAM_EVT        W5500_PARAM_CS       /**< Set to SPI chip select pin, will not be used */
+#define CONFIG_W5500_POLLING_INTERVAL 100u
+#define W5500_PARAM_EVT         GPIO_UNDEF          /**< Set to invalid */
 #else
-#define CONFIG_W5500_POLLING_INTERVAL 0
+#define CONFIG_W5500_POLLING_INTERVAL 0u
 #endif
 
 #ifndef W5500_PARAMS

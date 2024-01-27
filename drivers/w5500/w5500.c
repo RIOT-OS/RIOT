@@ -24,8 +24,8 @@
 
 #include "assert.h"
 #include "iolist.h"
-#include "luid.h"
 #include "net/ethernet.h"
+#include "net/eui_provider.h"
 #include "net/netdev/eth.h"
 #include "net/ethernet/hdr.h"
 #include "ztimer.h"
@@ -55,7 +55,7 @@ static inline void send_addr(w5500_t *dev, uint16_t addr)
 #endif
 }
 
-static uint8_t rreg(w5500_t *dev, uint16_t reg)
+static uint8_t read_register(w5500_t *dev, uint16_t reg)
 {
     uint16_t address = reg & 0x07ff;
     uint8_t command = (uint8_t)((reg & 0xf800) >> 8u) | CMD_READ;
@@ -65,7 +65,7 @@ static uint8_t rreg(w5500_t *dev, uint16_t reg)
     return spi_transfer_byte(dev->p.spi, dev->p.cs, false, 0u);
 }
 
-static void wreg(w5500_t *dev, uint16_t reg, uint8_t data)
+static void write_register(w5500_t *dev, uint16_t reg, uint8_t data)
 {
     uint16_t address = reg & 0x07ff;
     uint8_t command = (uint8_t)((reg & 0xf800) >> 8u) | CMD_WRITE;
@@ -75,22 +75,22 @@ static void wreg(w5500_t *dev, uint16_t reg, uint8_t data)
     spi_transfer_byte(dev->p.spi, dev->p.cs, false, data);
 }
 
-static uint16_t raddr(w5500_t *dev, uint16_t addr_high, uint16_t addr_low)
+static uint16_t read_addr(w5500_t *dev, uint16_t addr_high, uint16_t addr_low)
 {
-    uint16_t res = (rreg(dev, addr_high) << 8);
+    uint16_t res = (read_register(dev, addr_high) << 8);
 
-    res |= rreg(dev, addr_low);
+    res |= read_register(dev, addr_low);
     return res;
 }
 
-static void waddr(w5500_t *dev,
+static void write_address(w5500_t *dev,
                   uint16_t addr_high, uint16_t addr_low, uint16_t val)
 {
-    wreg(dev, addr_high, (uint8_t)(val >> 8));
-    wreg(dev, addr_low, (uint8_t)(val & 0xff));
+    write_register(dev, addr_high, (uint8_t)(val >> 8));
+    write_register(dev, addr_low, (uint8_t)(val & 0xff));
 }
 
-static void rchunk(w5500_t *dev, uint16_t addr, uint8_t *data, size_t len)
+static void read_chunk(w5500_t *dev, uint16_t addr, uint8_t *data, size_t len)
 {
     uint16_t address = addr & 0x07ff;
     uint8_t command = (uint8_t)((addr & 0xf800) >> 8u) | CMD_READ;
@@ -100,7 +100,7 @@ static void rchunk(w5500_t *dev, uint16_t addr, uint8_t *data, size_t len)
     spi_transfer_bytes(dev->p.spi, dev->p.cs, false, NULL, data, len);
 }
 
-static void wchunk(w5500_t *dev, uint16_t addr, uint8_t *data, size_t len)
+static void write_chunk(w5500_t *dev, uint16_t addr, uint8_t *data, size_t len)
 {
     uint16_t address = addr & 0x07ff;
     uint8_t command = (uint8_t)((addr & 0xf800) >> 8u) | CMD_WRITE;
@@ -137,27 +137,39 @@ void w5500_setup(w5500_t *dev, const w5500_params_t *params, uint8_t index)
 
     /* Initialize the chip select pin. */
     spi_init_cs(dev->p.spi, dev->p.cs);
-    if (dev->p.polling_interval_ms == 0u) {
+    if (gpio_is_valid(dev->p.evt)) {
         /* Initialize the external interrupt pin. */
         gpio_init_int(dev->p.evt, GPIO_IN, GPIO_FALLING, extint, dev);
     }
     netdev_register(&dev->netdev, NETDEV_W5500, index);
 }
 
+static bool check_configuration(w5500_t *dev)
+{
+    /* Polling mode: W5500_PARAM_EVT == GPIO_UNDEF and polling_interval_ms > 0u    */
+    /* Interrupt mode: W5500_PARAM_EVT != GPIO_UNDEF and polling_interval_ms == 0u */
+    return((dev->p.evt == GPIO_UNDEF && dev->p.polling_interval_ms > 0u) ||
+           (dev->p.evt != GPIO_UNDEF && dev->p.polling_interval_ms == 0u));
+}
+
 static int init(netdev_t *netdev)
 {
     w5500_t *dev = (w5500_t *)netdev;
     uint8_t tmp;
-    uint8_t hwaddr[ETHERNET_ADDR_LEN];
+
+    if (check_configuration(dev) == false) {
+        LOG_ERROR("[w5500] error: Check configuration: W5500_PARAM_EVT and polling_interval_ms\n");
+        return -EINVAL;
+    }
 
     spi_acquire(dev->p.spi, dev->p.cs, SPI_CONF, dev->p.clk);
 
     /* Reset the device. */
-    wreg(dev, REG_MODE, MODE_RESET);
-    while (rreg(dev, REG_MODE) & MODE_RESET) {}
+    write_register(dev, REG_MODE, MODE_RESET);
+    while (read_register(dev, REG_MODE) & MODE_RESET) {}
 
     /* Test the SPI connection by reading the value of the version register. */
-    tmp = rreg(dev, REG_VERSIONR);
+    tmp = read_register(dev, REG_VERSIONR);
     if (tmp != CHIP_VERSION) {
         spi_release(dev->p.spi);
         LOG_ERROR("[w5500] error: no SPI connection\n");
@@ -165,32 +177,31 @@ static int init(netdev_t *netdev)
     }
 
     /* Write the MAC address. */
-    luid_get(hwaddr, ETHERNET_ADDR_LEN);
-    /* No group address and not globally unique. */
-    hwaddr[0] &= ~0x03;
-    wchunk(dev, REG_SHAR0, hwaddr, ETHERNET_ADDR_LEN);
+    eui48_t address;
+    netdev_eui48_get(netdev, &address);
+    write_chunk(dev, REG_SHAR0, (uint8_t*)&address, sizeof(eui48_t));
 
     /* Configure 16 kB memory to be used by socket 0. */
-    wreg(dev, REG_S0_RXBUF_SIZE, RXBUF_16KB_TO_S0);
-    wreg(dev, REG_S0_TXBUF_SIZE, TXBUF_16KB_TO_S0);
+    write_register(dev, REG_S0_RXBUF_SIZE, RXBUF_16KB_TO_S0);
+    write_register(dev, REG_S0_TXBUF_SIZE, TXBUF_16KB_TO_S0);
 
     /* Configure remaining RX/TX buffers to 0 kB. */
     for (uint8_t socket = 1u; socket < 8u; socket++) {
         uint16_t bsb = (socket << 5u) | 0x08 | CMD_WRITE;
         uint16_t Sn_RXBUF_SIZE = Sn_RXBUF_SIZE_BASE | bsb;
         uint16_t Sn_TXBUF_SIZE = Sn_TXBUF_SIZE_BASE | bsb;
-        wreg(dev, Sn_RXBUF_SIZE, 0u);
-        wreg(dev, Sn_TXBUF_SIZE, 0u);
+        write_register(dev, Sn_RXBUF_SIZE, 0u);
+        write_register(dev, Sn_TXBUF_SIZE, 0u);
     }
     /* Next we configure socket 0 to work in MACRAW mode with MAC filtering. */
-    wreg(dev, REG_S0_MR, (MR_MACRAW | ENABLE_MAC_FILTER | ENABLE_MULTICAST_FILTER));
+    write_register(dev, REG_S0_MR, (MR_MACRAW | ENABLE_MAC_FILTER | ENABLE_MULTICAST_FILTER));
 
     /* Set the source IP address to something random to prevent the device to do
      * stupid thing (e.g. answering ICMP echo requests on its own). */
-    wreg(dev, REG_SIPR0, 0x01);
-    wreg(dev, REG_SIPR1, 0x01);
-    wreg(dev, REG_SIPR2, 0x01);
-    wreg(dev, REG_SIPR3, 0x01);
+    write_register(dev, REG_SIPR0, 0x00);
+    write_register(dev, REG_SIPR1, 0x00);
+    write_register(dev, REG_SIPR2, 0x00);
+    write_register(dev, REG_SIPR3, 0x00);
 
     if (dev->p.polling_interval_ms > 0u) {
         dev->timerInstance.callback = extint;
@@ -199,10 +210,10 @@ static int init(netdev_t *netdev)
     }
     else {
         /* Configure interrupt pin to trigger on socket 0 events. */
-        wreg(dev, REG_SIMR, IMR_S0_INT);
+        write_register(dev, REG_SIMR, IMR_S0_INT);
     }
     /* Open socket. */
-    wreg(dev, REG_S0_CR, CR_OPEN);
+    write_register(dev, REG_S0_CR, CR_OPEN);
 
     spi_release(dev->p.spi);
 
@@ -219,15 +230,15 @@ static void write_tx0_buffer(w5500_t *dev, uint16_t address, uint8_t *data, uint
 
 static uint16_t get_free_size_in_tx_buffer(w5500_t *dev)
 {
-    uint16_t tx_free = raddr(dev, REG_S0_TX_FSR0, REG_S0_TX_FSR1);
-    uint16_t tmp = raddr(dev, REG_S0_TX_FSR0, REG_S0_TX_FSR1);
+    uint16_t tx_free = read_addr(dev, REG_S0_TX_FSR0, REG_S0_TX_FSR1);
+    uint16_t tmp = read_addr(dev, REG_S0_TX_FSR0, REG_S0_TX_FSR1);
 
     /* See Note in the description of Sn_TX_FSR in the datasheet: This is a 16 bit value,
        so we read it until we get the same value twice. The W5500 will update it
        while transmitting data. */
     while (tx_free != tmp) {
         tx_free = tmp;
-        tmp = raddr(dev, REG_S0_TX_FSR0, REG_S0_TX_FSR1);
+        tmp = read_addr(dev, REG_S0_TX_FSR0, REG_S0_TX_FSR1);
     }
 
     return tx_free;
@@ -241,14 +252,14 @@ static int send(netdev_t *netdev, const iolist_t *iolist)
     /* Get access to the SPI bus for the duration of this function. */
     spi_acquire(dev->p.spi, dev->p.cs, SPI_CONF, dev->p.clk);
 
-    uint8_t tmp = rreg(dev, REG_PHYCFGR);
+    uint8_t tmp = read_register(dev, REG_PHYCFGR);
 
     if (tmp & PHY_LINK_UP) {
         uint16_t tx_free = get_free_size_in_tx_buffer(dev);
         uint16_t data_length = (uint16_t)iolist_size(iolist);
 
         /* Get the write pointer. */
-        uint16_t socket0_write_pointer = raddr(dev, REG_S0_TX_WR0, REG_S0_TX_WR1);
+        uint16_t socket0_write_pointer = read_addr(dev, REG_S0_TX_WR0, REG_S0_TX_WR1);
 
         /* Make sure we can write the full packet. */
         if (data_length <= tx_free) {
@@ -263,10 +274,10 @@ static int send(netdev_t *netdev, const iolist_t *iolist)
                 dev->frame_size_to_be_send += len;
             }
             /* Update the write pointer. */
-            waddr(dev, REG_S0_TX_WR0, REG_S0_TX_WR1,
+            write_address(dev, REG_S0_TX_WR0, REG_S0_TX_WR1,
                   socket0_write_pointer + dev->frame_size_to_be_send);
             /* Trigger the sending process. */
-            wreg(dev, REG_S0_CR, CR_SEND);
+            write_register(dev, REG_S0_CR, CR_SEND);
 
             DEBUG("[w5500] send: transferred %i byte (at 0x%04x)\n", data_length,
                   (int)socket0_write_pointer);
@@ -300,19 +311,16 @@ static int confirm_send(netdev_t *netdev, void *info)
 
 static void read_rx0_buffer(w5500_t *dev, uint16_t address, uint8_t *data, uint16_t size)
 {
-    {
-        send_addr(dev, address);
-        spi_transfer_byte(dev->p.spi, dev->p.cs, true, SOCKET0_RX_BUFFER);
+    send_addr(dev, address);
+    spi_transfer_byte(dev->p.spi, dev->p.cs, true, SOCKET0_RX_BUFFER);
 
-        spi_transfer_bytes(dev->p.spi, dev->p.cs, false, NULL, data, size);
-    }
-
+    spi_transfer_bytes(dev->p.spi, dev->p.cs, false, NULL, data, size);
 }
 
 static uint16_t get_size_in_rx_buffer(w5500_t *dev)
 {
-    uint16_t received = raddr(dev, REG_S0_RX_RSR0, REG_S0_RX_RSR1);
-    uint16_t tmp = raddr(dev, REG_S0_RX_RSR0, REG_S0_RX_RSR1);
+    uint16_t received = read_addr(dev, REG_S0_RX_RSR0, REG_S0_RX_RSR1);
+    uint16_t tmp = read_addr(dev, REG_S0_RX_RSR0, REG_S0_RX_RSR1);
 
     /* See Note in the description of Sn_RX_RSR in the datasheet: This is a 16 bit value,
        so we read it until we get the same value twice. The W5500 will update it
@@ -320,7 +328,7 @@ static uint16_t get_size_in_rx_buffer(w5500_t *dev)
        the current packet is fully received. */
     while (received != tmp) {
         received = tmp;
-        tmp = raddr(dev, REG_S0_RX_RSR0, REG_S0_RX_RSR1);
+        tmp = read_addr(dev, REG_S0_RX_RSR0, REG_S0_RX_RSR1);
     }
 
     return received;
@@ -339,17 +347,12 @@ static int receive(netdev_t *netdev, void *buf, size_t max_len, void *info)
     uint16_t available_bytes = get_size_in_rx_buffer(dev);
 
     if (available_bytes > 0u) {
-        uint16_t socket0_read_pointer = raddr(dev, REG_S0_RX_RD0, REG_S0_RX_RD1);
+        uint16_t socket0_read_pointer = read_addr(dev, REG_S0_RX_RD0, REG_S0_RX_RD1);
         /* I could not find a hint in the documentation of the W5500, but different implementations
            pointed me to the fact that the W5500 stores the size of the packet right in front of the
            packet data. */
-        uint8_t tmp[2];
-        read_rx0_buffer(dev, socket0_read_pointer, tmp, 2u);
-        #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-        packet_size = ((tmp[0] << 8) | tmp[1]) - 2u;
-        #else
-        packet_size = ((tmp[1] << 8) | tmp[0]) - 2u;
-        #endif
+        read_rx0_buffer(dev, socket0_read_pointer, (uint8_t*)&packet_size, 2u);
+        packet_size = ntohs(packet_size) - 2;
         ret_value = packet_size;
 
         if (max_len > 0u) { /* max_len > 0u: Client wants to read or drop the packet. */
@@ -372,9 +375,9 @@ static int receive(netdev_t *netdev, void *buf, size_t max_len, void *info)
         }
 
         /* Update read pointer. */
-        waddr(dev, REG_S0_RX_RD0, REG_S0_RX_RD1, socket0_read_pointer);
-        wreg(dev, REG_S0_CR, CR_RECV);
-        while (rreg(dev, REG_S0_CR)) {}
+        write_address(dev, REG_S0_RX_RD0, REG_S0_RX_RD1, socket0_read_pointer);
+        write_register(dev, REG_S0_CR, CR_RECV);
+        while (read_register(dev, REG_S0_CR)) {}
     }
 
     spi_release(dev->p.spi);
@@ -388,12 +391,12 @@ static void isr(netdev_t *netdev)
 
     spi_acquire(dev->p.spi, dev->p.cs, SPI_CONF, dev->p.clk);
     /* Get phy status register. */
-    uint8_t phy_status = rreg(dev, REG_PHYCFGR);
+    uint8_t phy_status = read_register(dev, REG_PHYCFGR);
     /* Get socket 0 interrupt register. */
-    uint8_t socket0_interrupt_status = rreg(dev, REG_S0_IR);
+    uint8_t socket0_interrupt_status = read_register(dev, REG_S0_IR);
 
     /* Clear interrupts. */
-    wreg(dev, REG_S0_IR, socket0_interrupt_status);
+    write_register(dev, REG_S0_IR, socket0_interrupt_status);
     spi_release(dev->p.spi);
 
     if ((phy_status & PHY_LINK_UP) && (dev->link_up == false)) {
@@ -421,8 +424,8 @@ static void isr(netdev_t *netdev)
 
         /* Check interrupt status again. */
         spi_acquire(dev->p.spi, dev->p.cs, SPI_CONF, dev->p.clk);
-        socket0_interrupt_status = rreg(dev, REG_S0_IR);
-        wreg(dev, REG_S0_IR, socket0_interrupt_status);
+        socket0_interrupt_status = read_register(dev, REG_S0_IR);
+        write_register(dev, REG_S0_IR, socket0_interrupt_status);
         spi_release(dev->p.spi);
     }
 }
@@ -436,13 +439,13 @@ static int get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
     case NETOPT_ADDRESS:
         assert(max_len >= ETHERNET_ADDR_LEN);
         spi_acquire(dev->p.spi, dev->p.cs, SPI_CONF, dev->p.clk);
-        rchunk(dev, REG_SHAR0, value, ETHERNET_ADDR_LEN);
+        read_chunk(dev, REG_SHAR0, value, ETHERNET_ADDR_LEN);
         spi_release(dev->p.spi);
         res = ETHERNET_ADDR_LEN;
         break;
     case NETOPT_LINK:
         spi_acquire(dev->p.spi, dev->p.cs, SPI_CONF, dev->p.clk);
-        uint8_t tmp = rreg(dev, REG_PHYCFGR);
+        uint8_t tmp = read_register(dev, REG_PHYCFGR);
         spi_release(dev->p.spi);
         dev->link_up = ((tmp & PHY_LINK_UP) != 0u);
         *((netopt_enable_t *)value) = dev->link_up ? NETOPT_ENABLE
