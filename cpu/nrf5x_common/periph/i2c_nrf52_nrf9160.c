@@ -126,6 +126,16 @@ static int finish(i2c_t dev, int inten_success_flag)
         DEBUG("[i2c] finish: stop event occurred\n");
     }
 
+    if (inten_success_flag & TWIM_INTEN_LASTTX_Msk) {
+        /* The interrupt is raised already when the last TX is started, but we
+         * have to wait until it was actually transmitted lest the transmission
+         * would be suppressed immediately by the next following write --
+         * careful here: enabling DEBUG introduces enough latency that the
+         * issue doesn't show up any more. */
+        while (bus(dev)->TXD.AMOUNT != bus(dev)->TXD.MAXCNT &&
+                !bus(dev)->EVENTS_ERROR) {}
+    }
+
     if (bus(dev)->EVENTS_ERROR) {
         bus(dev)->EVENTS_ERROR = 0;
         if (bus(dev)->ERRORSRC & TWIM_ERRORSRC_ANACK_Msk) {
