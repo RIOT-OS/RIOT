@@ -75,6 +75,28 @@ void native_isr_timer(void)
     _callback(_cb_arg, 0);
 }
 
+uword_t timer_query_freqs_numof(tim_t dev)
+{
+    (void)dev;
+
+    assert(TIMER_DEV(dev) < TIMER_NUMOF);
+
+    return 1;
+}
+
+uint32_t timer_query_freqs(tim_t dev, uword_t index)
+{
+    (void)dev;
+
+    assert(TIMER_DEV(dev) < TIMER_NUMOF);
+
+    if (index > 0) {
+        return 0;
+    }
+
+    return NATIVE_TIMER_SPEED;
+}
+
 int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 {
     (void)freq;
