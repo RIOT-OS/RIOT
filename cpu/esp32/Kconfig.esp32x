@@ -37,3 +37,8 @@ config CPU_COMMON_ESP32X
     help
         Selects all features, modules and packages that are common for
         all ESP32x SoC variants.
+
+config HAS_PERIPH_RTC_FROM_RTT_RTC
+    bool
+    default y
+    depends on CPU_COMMON_ESP32X

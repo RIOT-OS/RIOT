@@ -51,6 +51,11 @@ rsource "kconfigs/$(CPU_FAM)/Kconfig.clk"
 
 endmenu
 
+config HAVE_CONFLICT_WITH_RTC_RTT
+    bool
+    depends on CPU_FAM_F1
+    default y
+
 rsource "kconfigs/$(CPU_FAM)/Kconfig"
 rsource "kconfigs/$(CPU_FAM)/Kconfig.lines"
 rsource "kconfigs/$(CPU_FAM)/Kconfig.models"
