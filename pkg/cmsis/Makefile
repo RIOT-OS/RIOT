@@ -3,10 +3,6 @@ PKG_URL=https://github.com/ARM-software/CMSIS_5
 PKG_VERSION=2b7495b8535bdcb306dac29b9ded4cfb679d7e5c  # 5.9.0
 PKG_LICENSE=Apache-2.0
 
-include $(RIOTBASE)/pkg/pkg.mk
-
-CFLAGS += -Wno-cast-align
-
 CMSIS_NN_MODULES =                 \
   cmsis-nn_activationfunctions     \
   cmsis-nn_convolutionfunctions    \
@@ -15,13 +11,6 @@ CMSIS_NN_MODULES =                 \
   cmsis-nn_poolingfunctions        \
   cmsis-nn_softmaxfunctions        \
   #
-
-DIR_activationfunctions        := ActivationFunctions
-DIR_convolutionfunctions       := ConvolutionFunctions
-DIR_fullyconnectedfunctions    := FullyConnectedFunctions
-DIR_nnsupportfunctions         := NNSupportFunctions
-DIR_poolingfunctions           := PoolingFunctions
-DIR_softmaxfunctions           := SoftmaxFunctions
 
 CMSIS_DSP_MODULES =              \
   cmsis-dsp_basicmathfunctions   \
@@ -36,6 +25,32 @@ CMSIS_DSP_MODULES =              \
   cmsis-dsp_transformfunctions   \
   #
 
+CMSIS_DSP_MODULES_USED = $(filter $(CMSIS_DSP_MODULES),$(USEMODULE))
+CMSIS_NN_MODULES_USED = $(filter $(CMSIS_NN_MODULES),$(USEMODULE))
+CMSIS_MODULES_USED = $(CMSIS_DSP_MODULES_USED) $(CMSIS_NN_MODULES_USED)
+
+PKG_SPARSE_PATHS=CMSIS/Core/Include
+
+ifneq (, $(CMSIS_NN_MODULES_USED))
+  PKG_SPARSE_PATHS+=CMSIS/NN
+  CMSIS_DSP_NEEDED=1
+endif
+ifneq (, $(CMSIS_DSP_MODULES_USED)$(CMSIS_DSP_NEEDED))
+  PKG_SPARSE_PATHS+=CMSIS/DSP
+endif
+
+
+include $(RIOTBASE)/pkg/pkg.mk
+
+CFLAGS += -Wno-cast-align
+
+DIR_activationfunctions        := ActivationFunctions
+DIR_convolutionfunctions       := ConvolutionFunctions
+DIR_fullyconnectedfunctions    := FullyConnectedFunctions
+DIR_nnsupportfunctions         := NNSupportFunctions
+DIR_poolingfunctions           := PoolingFunctions
+DIR_softmaxfunctions           := SoftmaxFunctions
+
 DIR_basicmathfunctions      := BasicMathFunctions
 DIR_commontables            := CommonTables
 DIR_complexmathfunctions    := ComplexMathFunctions
@@ -48,8 +63,6 @@ DIR_supportfunctions        := SupportFunctions
 DIR_transformfunctions      := TransformFunctions
 
 .PHONY: cmsis-dsp_% cmsis-nn_%
-
-CMSIS_MODULES_USED = $(filter $(CMSIS_DSP_MODULES) $(CMSIS_NN_MODULES),$(USEMODULE))
 
 all: $(CMSIS_MODULES_USED)
 
