@@ -634,9 +634,13 @@ static void _send_multicast(gnrc_pktsnip_t *pkt, bool prep_hdr,
 static void _send_to_self(gnrc_pktsnip_t *pkt, bool prep_hdr,
                           gnrc_netif_t *netif)
 {
-    if (!_safe_fill_ipv6_hdr(netif, pkt, prep_hdr) ||
-        /* no netif header so we just merge the whole packet. */
-        (gnrc_pktbuf_merge(pkt) != 0)) {
+    /* _safe_fill_ipv6_hdr releases pkt on error */
+    if (!_safe_fill_ipv6_hdr(netif, pkt, prep_hdr)) {
+        DEBUG("ipv6: error looping packet to sender.\n");
+        return;
+    }
+    /* no netif header so we just merge the whole packet. */
+    else if (gnrc_pktbuf_merge(pkt) != 0) {
         DEBUG("ipv6: error looping packet to sender.\n");
         gnrc_pktbuf_release(pkt);
         return;
