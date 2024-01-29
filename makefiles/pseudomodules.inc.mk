@@ -536,6 +536,7 @@ PSEUDOMODULES += socket_zep_hello
 PSEUDOMODULES += soft_uart_modecfg
 PSEUDOMODULES += stdin
 PSEUDOMODULES += stdio_available
+PSEUDOMODULES += stdio_flush_rx
 PSEUDOMODULES += stdio_cdc_acm
 PSEUDOMODULES += stdio_ethos
 PSEUDOMODULES += stdio_nimble_debug
