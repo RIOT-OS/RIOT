@@ -128,7 +128,12 @@ $(PKG_DOWNLOADED): $(MAKEFILE_LIST) | $(PKG_SOURCE_DIR)/.git
 	fi
 	$(Q)echo $(PKG_VERSION) > $@
 
-ifeq ($(GIT_CACHE_DIR),$(wildcard $(GIT_CACHE_DIR)))
+ifneq (,$(GIT_CACHE_RS))
+$(PKG_SOURCE_DIR)/.git: | $(PKG_CUSTOM_PREPARED)
+	$(if $(QUIETER),,$(info [INFO] cloning $(PKG_NAME)))
+	$(Q)rm -Rf $(PKG_SOURCE_DIR)
+	$(Q)$(GIT_CACHE_RS) clone --commit $(PKG_VERSION) $(addprefix --sparse-add ,$(PKG_SPARSE_PATHS)) -- $(PKG_URL) $(PKG_SOURCE_DIR)
+else ifeq ($(GIT_CACHE_DIR),$(wildcard $(GIT_CACHE_DIR)))
 $(PKG_SOURCE_DIR)/.git: | $(PKG_CUSTOM_PREPARED)
 	$(if $(QUIETER),,$(info [INFO] cloning $(PKG_NAME)))
 	$(Q)rm -Rf $(PKG_SOURCE_DIR)
