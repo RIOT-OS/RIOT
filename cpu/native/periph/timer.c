@@ -26,7 +26,6 @@
  * @}
  */
 
-#include <err.h>
 #include <signal.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -37,6 +36,7 @@
 #include "cpu.h"
 #include "cpu_conf.h"
 #include "native_internal.h"
+#include "panic.h"
 #include "periph/timer.h"
 #include "time_units.h"
 
@@ -201,7 +201,7 @@ void timer_start(tim_t dev)
 
     _native_syscall_enter();
     if (timer_settime(itimer_monotonic, 0, &its, NULL) == -1) {
-        err(EXIT_FAILURE, "timer_start: timer_settime");
+        core_panic(PANIC_GENERAL_ERROR, "Failed to set monotonic timer");
     }
     _native_syscall_leave();
 }
@@ -214,7 +214,7 @@ void timer_stop(tim_t dev)
     _native_syscall_enter();
     struct itimerspec zero = {0};
     if (timer_settime(itimer_monotonic, 0, &zero, &its) == -1) {
-        err(EXIT_FAILURE, "timer_stop: timer_settime");
+        core_panic(PANIC_GENERAL_ERROR, "Failed to set monotonic timer");
     }
     _native_syscall_leave();
 
@@ -234,7 +234,7 @@ unsigned int timer_read(tim_t dev)
     _native_syscall_enter();
 
     if (clock_gettime(CLOCK_MONOTONIC, &t) == -1) {
-        err(EXIT_FAILURE, "timer_read: clock_gettime");
+        core_panic(PANIC_GENERAL_ERROR, "Failed to read monotonic clock");
     }
 
     _native_syscall_leave();
