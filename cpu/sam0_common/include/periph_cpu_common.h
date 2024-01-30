@@ -375,6 +375,7 @@ typedef struct {
     uint32_t pm_mask;           /**< PM_APBCMASK bits to enable Timer */
 #endif
     uint16_t gclk_id;           /**< TCn_GCLK_ID */
+    uint8_t irq;                /**< IRQn */
     uint8_t type;               /**< Timer type (TC/TCC) */
 } tc_tcc_cfg_t;
 
@@ -387,12 +388,14 @@ typedef struct {
         .mclk      = MCLK_ ## tim,          \
         .mclk_mask = MCLK_ ## tim ## _MASK, \
         .gclk_id   = tim ## _GCLK_ID,       \
+        .irq       = tim ## _IRQn,          \
         .type      = TIMER_TYPE_TC,       }
 #else
 #define TC_CONFIG(tim)                    { \
         .dev       = {.tc = tim},           \
         .pm_mask   = PM_APBCMASK_ ## tim,   \
         .gclk_id   = tim ## _GCLK_ID,       \
+        .irq       = tim ## _IRQn,          \
         .type      = TIMER_TYPE_TC,       }
 #endif
 
@@ -405,12 +408,14 @@ typedef struct {
         .mclk      = MCLK_ ## tim,          \
         .mclk_mask = MCLK_ ## tim ## _MASK, \
         .gclk_id   = tim ## _GCLK_ID,       \
+        .irq       = tim ## _IRQn,          \
         .type      = TIMER_TYPE_TCC,      }
 #else
 #define TCC_CONFIG(tim)                   { \
         .dev       = {.tcc = tim},          \
         .pm_mask   = PM_APBCMASK_ ## tim,   \
         .gclk_id   = tim ## _GCLK_ID,       \
+        .irq       = tim ## _IRQn,          \
         .type      = TIMER_TYPE_TCC,      }
 #endif
 
@@ -432,6 +437,14 @@ typedef struct {
     uint8_t chan_numof;             /**< number of channels */
     uint8_t gclk_src;               /**< GCLK source which clocks TIMER */
 } pwm_conf_t;
+
+/**
+ * @brief   Countdown device configuration data structure
+ */
+typedef struct {
+    tc_tcc_cfg_t tim;               /**< timer configuration */
+    uint8_t gclk_src;               /**< GCLK source which clocks TIMER */
+} countdown_conf_t;
 
 /**
  * @brief   Available values for SERCOM SPI MISO pad selection

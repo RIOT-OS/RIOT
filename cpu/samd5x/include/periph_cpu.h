@@ -173,6 +173,21 @@ static const gpio_t sam0_adc_pins[2][16] = {
 #define ADC1_INPUTCTRL_MUXNEG_PC03 ADC_INPUTCTRL_MUXPOS_AIN5 /**< Alias for AIN5 */
 #define ADC1_INPUTCTRL_MUXNEG_PB04 ADC_INPUTCTRL_MUXPOS_AIN6 /**< Alias for AIN6 */
 #define ADC1_INPUTCTRL_MUXNEG_PB05 ADC_INPUTCTRL_MUXPOS_AIN7 /**< Alias for AIN7 */
+
+/**
+ * @brief   Compatibility defines for TCC timers
+ *
+ *          TCC timers have separate IRQs for different events.
+ *          Define base IRQn so we can use a common macro for all families
+ *          and handle the split IRQs in the driver.
+ * @{
+ */
+#define TCC0_IRQn TCC0_0_IRQn                   /**< first TCC0 IRQn */
+#define TCC1_IRQn TCC1_0_IRQn                   /**< first TCC1 IRQn */
+#define TCC2_IRQn TCC2_0_IRQn                   /**< first TCC2 IRQn */
+#define TCC3_IRQn TCC3_0_IRQn                   /**< first TCC3 IRQn */
+
+#define TCC_HAS_MULTIPLE_IRQ 1                  /**< we have multiple IRQs per Tcc */
 /** @} */
 
 /**
