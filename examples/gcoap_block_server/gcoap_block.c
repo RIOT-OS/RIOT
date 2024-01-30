@@ -46,6 +46,7 @@ static gcoap_listener_t _listener = {
 static const uint8_t block2_intro[] = "This is RIOT (Version: ";
 static const uint8_t block2_board[] = " running on a ";
 static const uint8_t block2_mcu[] = " board with a ";
+static const uint8_t test_etag[4] = { 0xAA, 0xBB, 0xCC, 0xDD };
 
 static ssize_t _riot_block2_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx)
 {
@@ -54,6 +55,7 @@ static ssize_t _riot_block2_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, c
     coap_block2_init(pdu, &slicer);
 
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
+    coap_opt_add_etag_dummy(pdu, COAP_ETAG_LENGTH_MAX);
     coap_opt_add_format(pdu, COAP_FORMAT_TEXT);
     coap_opt_add_block2(pdu, &slicer, 1);
     ssize_t plen = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
@@ -72,8 +74,8 @@ static ssize_t _riot_block2_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, c
     plen += coap_blockwise_put_char(&slicer, buf+plen, 'C');
     plen += coap_blockwise_put_char(&slicer, buf+plen, 'U');
     plen += coap_blockwise_put_char(&slicer, buf+plen, '.');
-
     coap_block2_finish(&slicer);
+    plen += coap_opt_replace_etag(pdu, test_etag, 4);
 
     return plen;
 }
