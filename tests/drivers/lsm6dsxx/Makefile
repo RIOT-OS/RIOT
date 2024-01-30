@@ -1,6 +1,8 @@
 include ../Makefile.drivers_common
 
-USEMODULE += lsm6dsl
+DRIVER ?= lsm6ds33
+
+USEMODULE += $(DRIVER)
 USEMODULE += ztimer
 USEMODULE += ztimer_msec
 

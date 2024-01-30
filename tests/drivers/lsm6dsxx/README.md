@@ -1,5 +1,5 @@
 # About
-This is a manual test application for the ST LSM6DSL sensor driver.
+This is a manual test application for the ST LSM6DSXX sensor driver.
 
 # Usage
 

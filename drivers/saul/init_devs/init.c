@@ -195,9 +195,9 @@ void saul_init_devs(void)
         extern void auto_init_lsm303dlhc(void);
         auto_init_lsm303dlhc();
     }
-    if (IS_USED(MODULE_LSM6DSL)) {
-        extern void auto_init_lsm6dsl(void);
-        auto_init_lsm6dsl();
+    if (IS_USED(MODULE_LSM6DSXX)) {
+        extern void auto_init_lsm6dsxx(void);
+        auto_init_lsm6dsxx();
     }
     if (IS_USED(MODULE_LTC4150)) {
         extern void auto_init_ltc4150(void);
