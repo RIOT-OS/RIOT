@@ -1,5 +1,5 @@
 # name of the application
-APPLICATION = registry_example
+APPLICATION = registry_example_cli
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
