@@ -99,7 +99,6 @@ uint32_t timer_query_freqs(tim_t dev, uword_t index)
 
 int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 {
-    (void)freq;
     DEBUG("%s\n", __func__);
     if (dev >= TIMER_NUMOF) {
         return -1;
@@ -172,8 +171,6 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 
 int timer_set_periodic(tim_t dev, int channel, unsigned int value, uint8_t flags)
 {
-    (void)flags;
-
     if (channel != 0) {
         return -1;
     }
