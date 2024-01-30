@@ -28,10 +28,14 @@
 
 #include "registry/namespace/sys.h"
 #include "registry/namespace/sys/rgb_led.h"
+#include "registry/namespace/sys/board_led.h"
 
 static const registry_schema_t *_schemas[] = {
 #if IS_USED(MODULE_REGISTRY_NAMESPACE_SYS_RGB_LED)
     &registry_sys_rgb_led,
+#endif
+#if IS_USED(MODULE_REGISTRY_NAMESPACE_SYS_BOARD_LED)
+    &registry_sys_board_led,
 #endif
 };
 

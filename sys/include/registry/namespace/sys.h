@@ -30,6 +30,7 @@ extern registry_namespace_t registry_sys;
 
 typedef enum {
     REGISTRY_SYS_RGB_LED,
+    REGISTRY_SYS_BOARD_LED,
 } registry_sys_indices_t;
 
 #ifdef __cplusplus
