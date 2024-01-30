@@ -8,7 +8,8 @@ BOARD ?= native
 RIOTBASE ?= $(CURDIR)/../..
 
 # required modules
-USEMODULE +=  registry_namespace_sys_board_led
+USEMODULE += registry_namespace_sys_board_led
+USEMODULE += ztimer_msec
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the

@@ -22,11 +22,13 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "board.h"
+#include "periph_cpu.h"
 #include "led.h"
+#include "board.h"
 #include "registry.h"
 #include "registry/namespace/sys.h"
 #include "registry/namespace/sys/board_led.h"
+#include "ztimer.h"
 
 int board_led_instance_0_commit_cb(const registry_commit_cb_scope_t scope,
                                  const registry_group_or_parameter_id_t *group_or_parameter_id,
@@ -98,7 +100,7 @@ int main(void)
         registry_commit_parameter(&board_led_instance, &registry_sys_board_led_enabled);
 
         /* Sleep for 1 second and then do it again*/
-        sleep(1);
+        ztimer_sleep(ZTIMER_MSEC, 1000);
     }
 
     return 0;
