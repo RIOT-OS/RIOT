@@ -47,12 +47,12 @@ static void test_flashbase_addr(void)
     void *addr;
 
     addr = flashpage_addr(0);
-    TEST_ASSERT_EQUAL_INT((unsigned int)CPU_FLASH_BASE, (unsigned int)addr);
+    TEST_ASSERT_EQUAL_INT((unsigned int)CPU_FLASH_BASE, (uintptr_t)addr);
     addr = flashpage_addr(FLASHPAGE_NUMOF - 1);
     TEST_ASSERT_EQUAL_INT((long)CPU_FLASH_BASE + (((unsigned)FLASHPAGE_NUMOF - 1) * FLASHPAGE_SIZE),
-                          (unsigned int)addr);
+                          (uintptr_t)addr);
     addr = flashpage_addr(12);
-    TEST_ASSERT_EQUAL_INT((unsigned int)CPU_FLASH_BASE + (12 * FLASHPAGE_SIZE), (unsigned int)addr);
+    TEST_ASSERT_EQUAL_INT((unsigned int)CPU_FLASH_BASE + (12 * FLASHPAGE_SIZE), (uintptr_t)addr);
 }
 
 static void test_flashbase_page(void)
