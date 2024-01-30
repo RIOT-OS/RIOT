@@ -121,6 +121,7 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 
     if (register_interrupt(SIGALRM, native_isr_timer) != 0) {
         DEBUG_PUTS("Failed to register SIGALRM handler");
+        timer_delete(itimer_monotonic);
         return -1;
     }
 
