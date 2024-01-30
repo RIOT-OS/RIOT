@@ -249,6 +249,8 @@ extern "C"
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "kernel_defines.h"
+
 #include "periph/gpio.h"
 #include "periph/i2c.h"
 
