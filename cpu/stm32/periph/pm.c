@@ -51,7 +51,7 @@
       defined(CPU_FAM_STM32L5)
 #define PM_STOP_CONFIG  (PWR_CR1_LPMS_STOP1)
 #elif defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G0) || \
-      defined(CPU_FAM_STM32WL)
+      defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0)
 #define PM_STOP_CONFIG  (PWR_CR1_LPMS_0)
 #elif defined(CPU_FAM_STM32F7)
 #define PM_STOP_CONFIG  (PWR_CR1_LPDS | PWR_CR1_FPDS | PWR_CR1_LPUDS)
@@ -76,7 +76,7 @@
       defined(CPU_FAM_STM32L5)
 #define PM_STANDBY_CONFIG   (PWR_CR1_LPMS_STANDBY)
 #elif defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G0) || \
-      defined(CPU_FAM_STM32WL)
+      defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0)
 #define PM_STANDBY_CONFIG   (PWR_CR1_LPMS_0 | PWR_CR1_LPMS_1)
 #elif defined(CPU_FAM_STM32F7)
 #define PM_STANDBY_CONFIG   (PWR_CR1_PDDS | PWR_CR1_CSBF)
@@ -92,7 +92,7 @@
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
     defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
-    defined(CPU_FAM_STM32WL)
+    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0)
 #define PWR_CR_REG     PWR->CR1
 #define PWR_WUP_REG    PWR->CR3
 /* Allow overridable SRAM2 retention mode using CFLAGS */
@@ -199,7 +199,7 @@ void pm_backup_regulator_on(void)
         stmclk_dbp_unlock();
     }
     PWR_BACKUP_REGULATOR_REG |= BKPREG_CONFIG;
-    while (!(PWR_BACKUP_REGULATOR_REG & BKPREG_READY));
+    while (!(PWR_BACKUP_REGULATOR_REG & BKPREG_READY)){}
     if (locked) {
         stmclk_dbp_lock();
     }

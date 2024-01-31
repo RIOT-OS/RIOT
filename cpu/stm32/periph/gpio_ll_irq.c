@@ -149,7 +149,7 @@ static IRQn_Type get_irqn(uint8_t pin)
 #if defined(CPU_FAM_STM32L5) ||  defined(CPU_FAM_STM32U5)
     return EXTI0_IRQn + pin;
 #elif defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || \
-    defined(CPU_FAM_STM32G0)
+    defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32C0)
     if (pin < 2) {
         return EXTI0_1_IRQn;
     }

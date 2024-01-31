@@ -13,22 +13,22 @@
  * @{
  *
  * @file
- * @brief       Base STM32Fx/Gx/MP1 clock configuration
+ * @brief       Base STM32Fx/Gx/MP1/C0 clock configuration
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef CLK_CFG_CLOCK_COMMON_FX_GX_MP1_H
-#define CLK_CFG_CLOCK_COMMON_FX_GX_MP1_H
+#ifndef CLK_CFG_CLOCK_COMMON_FX_GX_MP1_C0_H
+#define CLK_CFG_CLOCK_COMMON_FX_GX_MP1_C0_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @name    Clock common configuration (F0/F1/F2/F3/F4/F7/G0/G4/MP1)
+ * @name    Clock common configuration (F0/F1/F2/F3/F4/F7/G0/G4/MP1/C0)
  * @{
  */
 /* Select the desired system clock source between PLL, HSE or HSI */
@@ -36,7 +36,12 @@ extern "C" {
 #if IS_ACTIVE(CONFIG_USE_CLOCK_HSE) || IS_ACTIVE(CONFIG_USE_CLOCK_HSI)
 #define CONFIG_USE_CLOCK_PLL            0
 #else
+#if defined(CPU_FAM_STM32C0)  /* PLL not supported in STM32C0 */
+#define CONFIG_USE_CLOCK_PLL            0
+#define CONFIG_USE_CLOCK_HSI            1
+#else
 #define CONFIG_USE_CLOCK_PLL            1     /* Use PLL by default */
+#endif
 #endif
 #endif /* CONFIG_USE_CLOCK_PLL */
 
@@ -57,7 +62,7 @@ extern "C" {
 
 #ifndef CONFIG_CLOCK_HSE
 #if defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32G4) || \
-    defined(CPU_FAM_STM32MP1)
+    defined(CPU_FAM_STM32MP1) || defined(CPU_FAM_STM32C0)
 #define CONFIG_CLOCK_HSE                       MHZ(24)
 #else
 #define CONFIG_CLOCK_HSE                       MHZ(8)
@@ -70,6 +75,8 @@ extern "C" {
 #define CONFIG_CLOCK_HSI                       MHZ(8)
 #elif defined(CPU_FAM_STM32MP1)
 #define CONFIG_CLOCK_HSI                       MHZ(64)
+#elif defined(CPU_FAM_STM32C0)
+#define CONFIG_CLOCK_HSI                       MHZ(48)
 #else
 #define CONFIG_CLOCK_HSI                       MHZ(16)
 #endif
@@ -80,5 +87,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CLK_CFG_CLOCK_COMMON_FX_GX_MP1_H */
+#endif /* CLK_CFG_CLOCK_COMMON_FX_GX_MP1_C0_H */
 /** @} */

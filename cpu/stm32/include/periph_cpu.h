@@ -40,6 +40,8 @@
 #include "periph/f7/periph_cpu.h"
 #elif defined(CPU_FAM_STM32G0)
 #include "periph/g0/periph_cpu.h"
+#elif defined(CPU_FAM_STM32C0)
+#include "periph/c0/periph_cpu.h"
 #elif defined(CPU_FAM_STM32G4)
 #include "periph/g4/periph_cpu.h"
 #elif defined(CPU_FAM_STM32L0)

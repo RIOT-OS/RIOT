@@ -14,6 +14,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     im880b \
     msb-430 \
     msb-430h \
+    nucleo-c031c6 \
     nucleo-f030r8 \
     nucleo-f031k6 \
     nucleo-f042k6 \

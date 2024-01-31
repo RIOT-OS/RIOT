@@ -1,0 +1,51 @@
+# Copyright (C) 2024 BISSELL Homecare, Inc.
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+if CPU_FAM_C0
+
+choice
+bool "HSISYS division factor" if USE_CLOCK_HSI
+default CLOCK_HSISYS_DIV_1
+
+config CLOCK_HSISYS_DIV_1
+    bool "Divide HSISYS by 1"
+
+config CLOCK_HSISYS_DIV_2
+    bool "Divide HSISYS by 2"
+
+config CLOCK_HSISYS_DIV_4
+    bool "Divide HSISYS by 4"
+
+config CLOCK_HSISYS_DIV_8
+    bool "Divide HSISYS by 8"
+
+config CLOCK_HSISYS_DIV_16
+    bool "Divide HSISYS by 16"
+
+config CLOCK_HSISYS_DIV_32
+    bool "Divide HSISYS by 32"
+
+config CLOCK_HSISYS_DIV_64
+    bool "Divide HSISYS by 64"
+
+config CLOCK_HSISYS_DIV_128
+    bool "Divide HSISYS by 128"
+
+endchoice
+
+config CLOCK_HSISYS_DIV
+    int
+    default 1 if CLOCK_HSISYS_DIV_1
+    default 2 if CLOCK_HSISYS_DIV_2
+    default 4 if CLOCK_HSISYS_DIV_4
+    default 8 if CLOCK_HSISYS_DIV_8
+    default 16 if CLOCK_HSISYS_DIV_16
+    default 32 if CLOCK_HSISYS_DIV_32
+    default 64 if CLOCK_HSISYS_DIV_64
+    default 128 if CLOCK_HSISYS_DIV_128
+
+endif # CPU_FAM_C0

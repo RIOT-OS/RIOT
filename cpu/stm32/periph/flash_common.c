@@ -48,7 +48,8 @@
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
     defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || \
-    defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32WL)
+    defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32WL) || \
+    defined(CPU_FAM_STM32C0)
 #define FLASH_KEY1             ((uint32_t)0x45670123)
 #define FLASH_KEY2             ((uint32_t)0xCDEF89AB)
 #endif
@@ -57,7 +58,7 @@
 #define KEY_REG                (FLASH->KEYR)
 #endif
 
-#if defined(CPU_FAM_STM32G0)
+#if defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32C0)
 #define FLASH_SR_BSY           (FLASH_SR_BSY1)
 #endif
 
