@@ -155,7 +155,7 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint32_t HSRAMCPU_:1;               /**< bit:      4  HSRAMCPU                                 */
     __I uint32_t HSRAMDMAC_:1;              /**< bit:      5  HSRAMDMAC                                */
     __I uint32_t HSRAMDSU_:1;               /**< bit:      6  HSRAMDSU                                 */
-    __I uint32_t :25;                       /**< bit:  7..31  Reserved */
+    uint32_t :25;                           /**< bit:  7..31  Reserved */
   } bit;                                /**< Structure used for bit  access */
   uint32_t reg;                         /**< Type used for register access */
 } PAC_INTFLAGAHB_Type;
@@ -210,7 +210,7 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint32_t FREQM_:1;                  /**< bit:     11  FREQM                                    */
     __I uint32_t PORT_:1;                   /**< bit:     12  PORT                                     */
     __I uint32_t AC_:1;                     /**< bit:     13  AC                                       */
-    __I uint32_t :18;                       /**< bit: 14..31  Reserved */
+    uint32_t :18;                           /**< bit: 14..31  Reserved */
   } bit;                                /**< Structure used for bit  access */
   uint32_t reg;                         /**< Type used for register access */
 } PAC_INTFLAGA_Type;
@@ -273,7 +273,7 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint32_t DSU_:1;                    /**< bit:      1  DSU                                      */
     __I uint32_t NVMCTRL_:1;                /**< bit:      2  NVMCTRL                                  */
     __I uint32_t DMAC_:1;                   /**< bit:      3  DMAC                                     */
-    __I uint32_t :28;                       /**< bit:  4..31  Reserved */
+    uint32_t :28;                           /**< bit:  4..31  Reserved */
   } bit;                                /**< Structure used for bit  access */
   uint32_t reg;                         /**< Type used for register access */
 } PAC_INTFLAGB_Type;
@@ -316,7 +316,7 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint32_t CCL_:1;                    /**< bit:     11  CCL                                      */
     __I uint32_t OPAMP_:1;                  /**< bit:     12  OPAMP                                    */
     __I uint32_t TRAM_:1;                   /**< bit:     13  TRAM                                     */
-    __I uint32_t :18;                       /**< bit: 14..31  Reserved */
+    uint32_t :18;                           /**< bit: 14..31  Reserved */
   } bit;                                /**< Structure used for bit  access */
   uint32_t reg;                         /**< Type used for register access */
 } PAC_INTFLAGC_Type;

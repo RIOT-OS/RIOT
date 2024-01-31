@@ -29,6 +29,11 @@ extern "C" {
 #define CLOCK_CORECLOCK     (1000000UL * CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ)
 
 /**
+ * @brief   CPU cycles per busy wait loop
+ */
+#define CPU_CYCLES_PER_LOOP (6)
+
+/**
  * @name   Predefined GPIO names
  * @{
  */
@@ -95,8 +100,6 @@ extern "C" {
  * - Vref can be read with function #adc_line_vref_to_gpio at GPIO25.
  */
 
-/** @} */
-
 /**
  * @name   DAC configuration
  *
@@ -128,6 +131,10 @@ extern "C" {
  *
  * The ESP32 LEDC module has 2 channel groups with 8 channels each. Each of
  * these channels can be clocked by one of the 4 timers.
+ */
+
+/**
+ * @name   SDMMC configuration
  */
 
 /**
@@ -213,6 +220,7 @@ extern "C" {
 #define TIMER_NUMOF         (2)
 #define TIMER_CHANNEL_NUMOF (1)
 #endif
+/** @} */
 
 /**
  * @name   UART configuration

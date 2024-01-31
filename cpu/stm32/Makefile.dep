@@ -54,6 +54,10 @@ ifneq (,$(filter stm32_eth,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter lcd_parallel_ll_mcu,$(USEMODULE)))
+  USEMODULE += lcd_fmc
+endif
+
 ifneq (,$(filter periph_can,$(FEATURES_USED)))
   FEATURES_REQUIRED += periph_gpio
   FEATURES_REQUIRED += periph_gpio_irq
@@ -77,6 +81,16 @@ endif
 
 ifneq (,$(filter periph_vbat,$(USEMODULE)))
   FEATURES_REQUIRED += periph_adc
+endif
+
+ifneq (,$(filter periph_fmc_%,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_fmc
+endif
+
+ifneq (,$(filter periph_sdmmc,$(FEATURES_USED)))
+  FEATURES_REQUIRED += periph_gpio_irq
+  FEATURES_REQUIRED += periph_sdmmc_clk
+  FEATURES_OPTIONAL += periph_dma
 endif
 
 include $(RIOTCPU)/cortexm_common/Makefile.dep

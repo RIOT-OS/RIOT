@@ -7,9 +7,11 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega128rfa1 \
     atmega328p \
     atmega328p-xplained-mini \
+    atmega8 \
     atxmega-a3bu-xplained \
     bluepill-stm32f030c8 \
     i-nucleo-lrwan1 \
+    nucleo-f030r8 \
     nucleo-f031k6 \
     nucleo-f042k6 \
     nucleo-l011k4 \
@@ -24,5 +26,4 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32l0538-disco \
     telosb \
     waspmote-pro \
-    zigduino \
     #

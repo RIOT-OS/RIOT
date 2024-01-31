@@ -8,7 +8,7 @@
 menuconfig PACKAGE_TINYCBOR
     bool "Tiny CBOR encode/decoder package"
     depends on TEST_KCONFIG
-    depends on HAS_ARCH_32BIT
+    depends on HAS_ARCH_32BIT || HAS_ARCH_64BIT
     help
         TinyCBOR is a CBOR encoder and decoder with a very small
         footprint, optimized for very fast operation.

@@ -246,7 +246,7 @@ static int _send_rd_init_req(coap_pkt_t *pkt, const sock_udp_ep_t *remote,
 
     ssize_t pkt_len = coap_opt_finish(pkt, COAP_OPT_FINISH_NONE);
     if (pkt_len < 0) {
-        DEBUG("cord_lc: error coap_opt_finish() %zd\n", pkt_len);
+        DEBUG("cord_lc: error coap_opt_finish() %" PRIdSIZE "\n", pkt_len);
         return CORD_LC_ERR;
     }
 
@@ -289,7 +289,7 @@ int cord_lc_rd_init(cord_lc_rd_t *rd, void *buf, size_t maxlen,
                                        _result_buf + parsed_len,
                                        _result_buf_len - parsed_len);
         if (ret < 0) {
-            DEBUG("cord_lc: error decoding payload %zd\n", ret);
+            DEBUG("cord_lc: error decoding payload %" PRIdSIZE "\n", ret);
             retval = CORD_LC_ERR;
             goto end;
         }

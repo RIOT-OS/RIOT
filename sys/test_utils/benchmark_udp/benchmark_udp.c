@@ -88,7 +88,7 @@ static void *_listen_thread(void *ctx)
         res = sock_udp_recv(&sock, buf, sizeof(buf), 2 * delay_us, NULL);
         if (res < 0) {
             if (res != -ETIMEDOUT) {
-                printf("Error receiving message: %zd\n", res);
+                printf("Error receiving message: %" PRIdSIZE "\n", res);
             }
             continue;
         }

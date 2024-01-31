@@ -857,6 +857,7 @@ inline static int _write_byte(const vl6180x_t *dev, uint16_t reg, uint8_t byte)
     return _write(dev, reg, &byte, 1);
 }
 
+__attribute__((unused))
 inline static int _write_word(const vl6180x_t *dev, uint16_t reg, uint16_t data)
 {
     uint8_t bytes[2] = { (data >> 8) & 0xff, data & 0xff };
@@ -892,6 +893,7 @@ static int _read(const vl6180x_t *dev,
     return VL6180X_OK;
 }
 
+__attribute__((unused))
 inline static int _read_word(const vl6180x_t *dev, uint16_t reg, uint16_t *word)
 {
     uint8_t bytes[2];
@@ -900,6 +902,7 @@ inline static int _read_word(const vl6180x_t *dev, uint16_t reg, uint16_t *word)
     return res;
 }
 
+__attribute__((unused))
 inline static int _read_word_x(const vl6180x_t *dev, uint16_t reg, uint16_t *word)
 {
     uint8_t bytes[2];
@@ -913,6 +916,7 @@ inline static int _write_byte_x(const vl6180x_t *dev, uint16_t reg, uint8_t byte
     return vl6180x_reg_write(dev, reg, &byte, 1);
 }
 
+__attribute__((unused))
 inline static int _write_word_x(const vl6180x_t *dev, uint16_t reg, uint16_t data)
 {
     uint8_t bytes[2] = { (data >> 8) & 0xff, data & 0xff };

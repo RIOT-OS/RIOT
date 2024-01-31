@@ -7,7 +7,7 @@
 
 ![Adafruit-Itsybitsy-M4 compared to a quarter dollar](https://cdn-learn.adafruit.com/assets/assets/000/055/465/large1024/adafruit_products_3800_quarter_ORIG_2018_06.jpg?1529192175)
 
-This is a small formfactor (only 1.4" long by 0.7" wide) SAM D51 board made by Adafruit.
+This is a small formfactor (only 1.4\" long by 0.7\" wide) SAM D51 board made by Adafruit.
 
 The board features one red LED (LD1), one DotStar / APA102 RGB LED, a reset button as well as
 21 configurable external pins(6 of which can be analog in).

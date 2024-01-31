@@ -1,12 +1,8 @@
-# set default port depending on operating system
-PORT_LINUX ?= /dev/ttyUSB0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial-MXV*)))
-
-# flash tool configuration
-PROGRAMMER ?= mspdebug
-MSPDEBUG_PROGRAMMER ?= olimex
-
-PROGRAMMERS_SUPPORTED += mspdebug
+# UART @ 115200 Bd is not reliable with a CPU clock of ~ 5 MHz, occasionally
+# chars get lost. Adding an 8 MHz crystal or an external resistor so that the
+# DCO can reach 8 MHz does yield the speed bump needed for a more reliable
+# UART connection @ 115200 Bd
+BAUD                    ?= 9600
 
 # When freshly plugged in the Olimex MSP430-JTAG-Tiny debugger provides a
 # ttyACM interface, which is only available until the first flashing. A
@@ -24,3 +20,6 @@ TTY_SELECT_CMD := $(RIOTTOOLS)/usb-serial/ttys.py \
                   $(RIOTTOOLS)/usb-serial/ttys.py \
                   --most-recent \
                   --format path serial
+
+include $(RIOTBOARD)/common/msp430/Makefile.include
+CFLAGS += -DSTDIO_UART_BAUDRATE=$(BAUD)

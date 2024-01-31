@@ -105,7 +105,7 @@ void i2c_acquire(i2c_t i2c)
 {
     assert((unsigned)i2c < I2C_NUMOF);
     DEBUG("acquire\n");
-    pm_block(3);
+    pm_block(4); /* Require clkPer */
     mutex_lock(&i2c_ctx[i2c].locks);
     pm_periph_enable(i2c_config[i2c].pwr);
 
@@ -122,7 +122,7 @@ void i2c_release(i2c_t i2c)
     dev(i2c)->MASTER.CTRLA = 0;
     pm_periph_disable(i2c_config[i2c].pwr);
     mutex_unlock(&i2c_ctx[i2c].locks);
-    pm_unblock(3);
+    pm_unblock(4);
     DEBUG("release\n");
 }
 

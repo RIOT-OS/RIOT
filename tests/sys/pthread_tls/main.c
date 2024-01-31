@@ -45,8 +45,8 @@ void *run(void *parameter)
         aTLS_values[i]++;
     }
 
-    printf("pick deliberate storage (key[3]:%d) and change the value\n",
-           (int)aKeys[3]);
+    printf("pick deliberate storage (key[3]:%" PRIuPTR ") and change the value\n",
+           (uintptr_t)aKeys[3]);
     void *val = pthread_getspecific(aKeys[3]);
     *((int *)val) = 42;
 
@@ -55,11 +55,11 @@ void *run(void *parameter)
     for (int i = 0; i < NUMBER_OF_TLS; ++i) {
         void *val = pthread_getspecific(aKeys[i]);
         int x = *(int *)val;
-        printf("key[%d]: %d, val: %d\n",i, (int)aKeys[i], x);
+        printf("key[%d]: %" PRIuPTR ", val: %d\n", i, (uintptr_t)aKeys[i], x);
     }
 
-    printf("\n -= TEST 2 - delete deliberate key (key[5]:%d) =-\n",
-           (int)aKeys[5]);
+    printf("\n -= TEST 2 - delete deliberate key (key[5]:%" PRIuPTR ") =-\n",
+           (uintptr_t)aKeys[5]);
     pthread_key_delete(aKeys[5]);
 
     puts("show tls values:");
@@ -69,7 +69,7 @@ void *run(void *parameter)
 
         if (val != NULL) {
             int x = *(int *)val;
-            printf("key[%d]: %d, val: %d\n",i, (int)aKeys[i], x);
+            printf("key[%d]: %" PRIuPTR ", val: %d\n", i, (uintptr_t)aKeys[i], x);
         }
     }
 
@@ -80,7 +80,7 @@ void *run(void *parameter)
     pthread_key_create(&new_key, NULL);
     pthread_setspecific(new_key, &new_val);
 
-    printf("added new tls, key: %d, val: %d\n", (int)new_key, new_val);
+    printf("added new tls, key: %" PRIuPTR ", val: %d\n", (uintptr_t)new_key, new_val);
     printf("show tls values:\n");
 
     for (int i = 0; i < NUMBER_OF_TLS; ++i) {
@@ -88,7 +88,7 @@ void *run(void *parameter)
 
         if (val != NULL) {
             int x = *(int *)val;
-            printf("key[%d]: %d, val: %d\n",i, (int)aKeys[i], x);
+            printf("key[%d]: %" PRIuPTR ", val: %d\n", i, (uintptr_t)aKeys[i], x);
         }
     }
 
@@ -106,7 +106,7 @@ void *run(void *parameter)
 
         if (val != NULL) {
             int x = *(int *)val;
-            printf("key[%d]: %d, val: %d\n",i, (int)aKeys[i], x);
+            printf("key[%d]: %" PRIuPTR ", val: %d\n", i, (uintptr_t)aKeys[i], x);
         }
     }
 
@@ -119,13 +119,13 @@ void *run(void *parameter)
     puts("-= TEST 6 - add key and delete without a tls =-");
 
     pthread_key_create(&new_key, NULL);
-    printf("created key: %d\n", (int)new_key);
+    printf("created key: %" PRIuPTR "\n", (uintptr_t)new_key);
     printf("try to delete returns: %d\n", pthread_key_delete(new_key));
 
     puts("");
     puts("-= TEST 7 - add key without tls =-");
     pthread_key_create(&new_key, NULL);
-    printf("created key: %d\n", (int)new_key);
+    printf("created key: %" PRIuPTR "\n", (uintptr_t)new_key);
     void* test_7_val = pthread_getspecific(new_key);
     printf("test_7_val: %p\n", test_7_val);
 

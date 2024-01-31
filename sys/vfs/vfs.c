@@ -315,7 +315,7 @@ int vfs_open(const char *name, int flags, mode_t mode)
 
 ssize_t vfs_read(int fd, void *dest, size_t count)
 {
-    DEBUG("vfs_read: %d, %p, %lu\n", fd, dest, (unsigned long)count);
+    DEBUG("vfs_read: %d, %p, %" PRIuSIZE "\n", fd, dest, count);
     if (dest == NULL) {
         return -EFAULT;
     }
@@ -337,7 +337,7 @@ ssize_t vfs_read(int fd, void *dest, size_t count)
 
 ssize_t vfs_write(int fd, const void *src, size_t count)
 {
-    DEBUG_NOT_STDOUT(fd, "vfs_write: %d, %p, %lu\n", fd, src, (unsigned long)count);
+    DEBUG_NOT_STDOUT(fd, "vfs_write: %d, %p, %" PRIuSIZE "\n", fd, src, count);
     if (src == NULL) {
         return -EFAULT;
     }
@@ -839,8 +839,8 @@ int vfs_bind(int fd, int flags, const vfs_file_ops_t *f_op, void *private_data)
 
 int vfs_normalize_path(char *buf, const char *path, size_t buflen)
 {
-    DEBUG("vfs_normalize_path: %p, \"%s\" (%p), %lu\n",
-          (void *)buf, path, (void *)path, (unsigned long)buflen);
+    DEBUG("vfs_normalize_path: %p, \"%s\" (%p), %" PRIuSIZE "\n",
+          (void *)buf, path, (void *)path, buflen);
     size_t len = 0;
     int npathcomp = 0;
     const char *path_end = path + strlen(path); /* Find the terminating null byte */

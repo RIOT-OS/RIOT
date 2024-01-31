@@ -130,24 +130,13 @@ DRESULT disk_read(BYTE pdrv, BYTE *buff, DWORD sector, UINT count)
  */
 DRESULT disk_write(BYTE pdrv, const BYTE *buff, DWORD sector, UINT count)
 {
+    mtd_dev_t *mtd = fatfs_mtd_devs[pdrv];
     DEBUG("disk_write: %d, %lu, %d\n", pdrv, (long unsigned)sector, count);
-    if ((pdrv >= FF_VOLUMES) || (fatfs_mtd_devs[pdrv]->driver == NULL)) {
+    if ((pdrv >= FF_VOLUMES) || (mtd->driver == NULL)) {
         return RES_PARERR;
     }
 
-    /* erase memory before writing to it */
-    int res = mtd_erase_sector(fatfs_mtd_devs[pdrv], sector, count);
-
-    if (res != 0) {
-        return RES_ERROR; /* erase failed! */
-    }
-
-    uint32_t sector_size = fatfs_mtd_devs[pdrv]->page_size
-                         * fatfs_mtd_devs[pdrv]->pages_per_sector;
-
-    res = mtd_write_page_raw(fatfs_mtd_devs[pdrv], buff,
-                             sector, 0, count * sector_size);
-
+    int res = mtd_write_sector(mtd, buff, sector, count);
     if (res != 0) {
         return RES_ERROR;
     }

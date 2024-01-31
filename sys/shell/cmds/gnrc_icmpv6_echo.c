@@ -172,6 +172,7 @@ static int _configure(int argc, char **argv, _ping_data_t *data)
 {
     char *cmdname = argv[0];
     int res = 1;
+    int value;
 
     /* parse command line arguments */
     for (int i = 1; i < argc; i++) {
@@ -207,7 +208,13 @@ static int _configure(int argc, char **argv, _ping_data_t *data)
                     /* intentionally falls through */
                 case 's':
                     if ((++i) < argc) {
-                        data->datalen = atoi(argv[i]);
+                        value = atoi(argv[i]);
+
+                        if ((value < 0) || ((unsigned)value > (UINT16_MAX - sizeof(icmpv6_hdr_t)))) {
+                            printf("ping size should be in range 0-65527.\n");
+                            return -1;
+                        }
+                        data->datalen = value;
                         continue;
                     }
                     /* intentionally falls through */
@@ -333,13 +340,11 @@ static int _print_reply(gnrc_pktsnip_t *pkt, int corrupted, uint32_t triptime, v
 
     if (gnrc_netif_highlander() || (if_pid == KERNEL_PID_UNDEF) ||
         !ipv6_addr_is_link_local(&ipv6_hdr->src)) {
-        printf("%u bytes from %s: icmp_seq=%u ttl=%u",
-               (unsigned)icmpv6->size,
-               from_str, recv_seq, ipv6_hdr->hl);
+        printf("%" PRIuSIZE " bytes from %s: icmp_seq=%u ttl=%u",
+               icmpv6->size, from_str, recv_seq, ipv6_hdr->hl);
     } else {
-        printf("%u bytes from %s%%%u: icmp_seq=%u ttl=%u",
-               (unsigned)icmpv6->size,
-               from_str, if_pid, recv_seq, ipv6_hdr->hl);
+        printf("%" PRIuSIZE " bytes from %s%%%u: icmp_seq=%u ttl=%u",
+               icmpv6->size, from_str, if_pid, recv_seq, ipv6_hdr->hl);
 
     }
     /* check if payload size matches */

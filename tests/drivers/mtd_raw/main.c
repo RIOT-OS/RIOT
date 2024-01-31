@@ -25,7 +25,7 @@
 #include <string.h>
 
 #include "od.h"
-#include "mtd_default.h"
+#include "mtd.h"
 #include "shell.h"
 #include "board.h"
 #include "macros/units.h"
@@ -45,7 +45,7 @@ static mtd_dev_t *_get_dev(int argc, char **argv)
         return NULL;
     }
 
-    return mtd_default_get_dev(idx);
+    return mtd_dev_get(idx);
 }
 
 static uint64_t _get_size(mtd_dev_t *dev)
@@ -279,11 +279,11 @@ static void _print_info(mtd_dev_t *dev)
 static int cmd_info(int argc, char **argv)
 {
     if (argc < 2) {
-        printf("mtd devices: %d\n", MTD_NUMOF);
+        printf("mtd devices: %d\n", (unsigned)MTD_NUMOF);
 
-        for (int i = 0; i < MTD_NUMOF; ++i) {
+        for (unsigned i = 0; i < MTD_NUMOF; ++i) {
             printf(" -=[ MTD_%d ]=-\n", i);
-            _print_info(mtd_default_get_dev(i));
+            _print_info(mtd_dev_get(i));
         }
         return 0;
     }
@@ -450,10 +450,10 @@ int main(void)
         puts("no MTD device present on the board.");
     }
 
-    for (int i = 0; i < MTD_NUMOF; ++i) {
+    for (unsigned i = 0; i < MTD_NUMOF; ++i) {
         printf("init MTD_%d… ", i);
 
-        mtd_dev_t *dev = mtd_default_get_dev(i);
+        mtd_dev_t *dev = mtd_dev_get(i);
         int res = mtd_init(dev);
         if (res) {
             printf("error: %d\n", res);

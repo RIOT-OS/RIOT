@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Board specific definitions for the SeeedStudio GD32 RISC-V board
+ * @brief       Board specific definitions for the Sipeed Longan Nano board
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
@@ -33,8 +33,16 @@
 #define CONFIG_CLOCK_HXTAL      MHZ(8)      /**< HXTAL frequency */
 #endif
 
-#if CONFIG_SIPEED_LONGAN_NANO_WITH_TFT
-#define SPI_DEV_1_USED              /**< Enable SPI_DEV(1) if TFT is connected */
+#ifndef SPI_DEV_1_USED
+#if defined(BOARD_SIPEED_LONGAN_NANO_TFT)
+#define SPI_DEV_1_USED          1   /**< Enable SPI_DEV(1) by default for the TFT version */
+#else
+#define SPI_DEV_1_USED          0   /**< Disable SPI_DEV(1) by default for the non-TFT version */
+#endif
+#endif
+
+#ifndef I2C_DEV_1_USED
+#define I2C_DEV_1_USED          1   /**< Enable I2C_DEV(1) by default */
 #endif
 
 #include "periph_cpu.h"
@@ -61,18 +69,24 @@ static const adc_conf_t adc_config[] = {
     { .pin = GPIO_UNDEF, .dev = 0, .chan = 16 },
     /* ADC VREF channel */
     { .pin = GPIO_UNDEF, .dev = 0, .chan = 17 },
-#if !CONFIG_SIPEED_LONGAN_NANO_WITH_TFT
+#if !MODULE_PERIPH_DAC
+    /* This conflicts with the DAC */
+    { .pin = GPIO_PIN(PORT_A, 4), .dev = 0, .chan = 4 },
+#endif
+#if !defined(BOARD_SIPEED_LONGAN_NANO_TFT)
     /* This conflicts with TFT pins if connected. */
     { .pin = GPIO_PIN(PORT_B, 0), .dev = 0, .chan = 8 },
     { .pin = GPIO_PIN(PORT_B, 1), .dev = 0, .chan = 9 },
+#if !SPI_DEV_1_USED
     /* This conflicts with the SPI0 controller which is used if TFT is connected */
     { .pin = GPIO_PIN(PORT_A, 6), .dev = 0, .chan = 6 },
     { .pin = GPIO_PIN(PORT_A, 7), .dev = 0, .chan = 7 },
-#if !defined(MODULE_PERIPH_DAC)
-    { .pin = GPIO_PIN(PORT_A, 4), .dev = 0, .chan = 4 },
+#if !MODULE_PERIPH_DAC
+    /* This conflicts additionally with the DAC */
     { .pin = GPIO_PIN(PORT_A, 5), .dev = 0, .chan = 5 },
-#endif /* !defined(MODULE_PERIPH_DAC) */
-#endif /* !CONFIG_SIPEED_LONGAN_NANO_WITH_TFT */
+#endif /* !MODULE_PERIPH_DAC */
+#endif /* !SPI_DEV_1_USED */
+#endif /* !defined(BOARD_SIPEED_LONGAN_NANO_TFT) */
 };
 
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
@@ -83,10 +97,10 @@ static const adc_conf_t adc_config[] = {
  * @{
  */
 static const dac_conf_t dac_config[] = {
-#if !CONFIG_SIPEED_LONGAN_NANO_WITH_TFT
     { .pin = GPIO_PIN(PORT_A, 4), .chan = 0 },
+#if !SPI_DEV_1_USED
     { .pin = GPIO_PIN(PORT_A, 5), .chan = 1 },
-#endif /* !CONFIG_SIPEED_LONGAN_NANO_WITH_TFT */
+#endif /* !SPI_DEV_1_USED */
 };
 
 #define DAC_NUMOF           ARRAY_SIZE(dac_config)
@@ -110,7 +124,7 @@ static const pwm_conf_t pwm_config[] = {
         .af       = GPIO_AF_OUT_PP,
         .bus      = APB1,
     },
-#if !defined(MODULE_PERIPH_CAN)
+#if !MODULE_PERIPH_CAN
     {
         .dev      = TIMER3,
         .rcu_mask = RCU_APB1EN_TIMER3EN_Msk,

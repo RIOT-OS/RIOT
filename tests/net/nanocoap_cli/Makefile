@@ -28,6 +28,7 @@ LOW_MEMORY_BOARDS := \
   saml10-xpro \
   saml11-xpro \
   sipeed-longan-nano \
+  sipeed-longan-nano-tft \
   spark-core \
   stm32f7508-dk \
   stm32mp157c-dk2 \

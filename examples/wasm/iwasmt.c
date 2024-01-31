@@ -122,6 +122,7 @@ int wamr_run_cp(const void *bytecode, size_t bytecode_len, int argc, char *argv[
     if (argc > 0) {
         parv =  malloc(sizeof(argv[0]) * argc);
         if (!parv){
+            free(wasm_buf);
             return -1;
         }
         memcpy(parv, argv, sizeof(argv[0]) * argc);
@@ -130,6 +131,7 @@ int wamr_run_cp(const void *bytecode, size_t bytecode_len, int argc, char *argv[
         argc = 1;
         parv = malloc(sizeof(argv[0]) * argc);
         if (!parv) {
+            free(wasm_buf);
             return -1;
         }
         parv[0] = empty;

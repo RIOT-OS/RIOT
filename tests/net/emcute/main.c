@@ -89,8 +89,8 @@ static unsigned _get_qos(const char *str)
 static void _on_pub(const emcute_topic_t *topic, void *data, size_t len)
 {
     (void)data;
-    printf("### got publication of %u bytes for topic '%s' [%d] ###\n",
-           (unsigned)len, topic->name, (int)topic->id);
+    printf("### got publication of %" PRIuSIZE " bytes for topic '%s' [%u] ###\n",
+           len, topic->name, topic->id);
 }
 
 static int _con(int argc, char **argv)
@@ -224,18 +224,18 @@ static int _pub(int argc, char **argv)
     t = &_topics[idx];
     len = atoi(argv[2]);
     if ((unsigned)len > sizeof(_pub_buf)) {
-        printf("error: len %d > %lu\n", len, (unsigned long)sizeof(_pub_buf));
+        printf("error: len %d > %" PRIuSIZE "\n", len, sizeof(_pub_buf));
         return 1;
     }
     memset(_pub_buf, 92, len);
     if (emcute_pub(t, _pub_buf, len, flags) != EMCUTE_OK) {
-        printf("error: unable to publish data to topic '%s [%d]'\n",
-                t->name, (int)t->id);
+        printf("error: unable to publish data to topic '%s [%u]'\n",
+                t->name, t->id);
         return 1;
     }
 
-    printf("success: published %d bytes to topic '%s [%d]'\n",
-           (int)len, t->name, t->id);
+    printf("success: published %d bytes to topic '%s [%u]'\n",
+           len, t->name, t->id);
 
     return 0;
 }

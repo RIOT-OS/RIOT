@@ -222,12 +222,12 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint8_t  UNDERRUN1:1;      /*!< bit:      1  DAC 1 Underrun                     */
     __I uint8_t  EMPTY0:1;         /*!< bit:      2  Data Buffer 0 Empty                */
     __I uint8_t  EMPTY1:1;         /*!< bit:      3  Data Buffer 1 Empty                */
-    __I uint8_t  :4;               /*!< bit:  4.. 7  Reserved                           */
+    uint8_t  :4;                   /*!< bit:  4.. 7  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   struct {
     __I uint8_t  UNDERRUN:2;       /*!< bit:  0.. 1  DAC x Underrun                     */
     __I uint8_t  EMPTY:2;          /*!< bit:  2.. 3  Data Buffer x Empty                */
-    __I uint8_t  :4;               /*!< bit:  4.. 7  Reserved                           */
+    uint8_t  :4;                   /*!< bit:  4.. 7  Reserved                           */
   } vec;                       /*!< Structure used for vec  access                  */
   uint8_t reg;                 /*!< Type      used for register access              */
 } DAC_INTFLAG_Type;

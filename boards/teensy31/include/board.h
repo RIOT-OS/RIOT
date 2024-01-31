@@ -21,7 +21,6 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
-#include "mtd.h"
 
 #ifdef __cplusplus
 extern "C" {

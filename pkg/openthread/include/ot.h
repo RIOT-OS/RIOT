@@ -101,21 +101,6 @@ typedef struct {
 } serial_msg_t;
 
 /**
- * @brief   Struct containing an OpenThread job
- *
- * @deprecated   This structure is not needed anymore since it's possible to
- *               run OpenThread code via @ref sys_event (see @ref openthread_get_evq).
- *               Therefore it will be removed after the 2022.01 release.
- */
-typedef struct {
-    event_t ev;                             /**< Event associated to the OpenThread job */
-    int status;                             /**< Status of the job */
-    const char *command;                    /**< A pointer to the job name string. */
-    void *arg;                              /**< arg for the job **/
-    void *answer;                           /**< answer from the job **/
-} ot_job_t;
-
-/**
  * @brief Gets packet from driver and tells OpenThread about the reception.
  *
  * @param[in]  aInstance          pointer to an OpenThread instance
@@ -178,40 +163,6 @@ int openthread_netdev_init(char *stack, int stacksize, char priority, const char
  * @brief   Init OpenThread random
  */
 void ot_random_init(void);
-
-/**
- * @brief   Execute OpenThread command. Call this function only in OpenThread thread
- *
- * @deprecated   This function is not needed anymore since it's possible to
- *               run OpenThread code via @ref sys_event (see @ref openthread_get_evq).
- *               Therefore it will be removed after the 2022.01 release.
- *
- * @param[in]   ot_instance     OpenThread instance
- * @param[in]   command         OpenThread command name
- * @param[in]   arg             arg for the command
- * @param[out]  answer          answer for the command
- *
- * @return  0 on success, 1 on error
- */
-uint8_t ot_exec_command(otInstance *ot_instance, const char* command, void *arg, void* answer);
-
-/**
- * @brief   Call OpenThread command in same thread as OT core (due to concurrency).
- *
- * @note    An OpenThread command allows direct calls to OpenThread API (otXXX functions) without worrying about concurrency
- * issues. All API calls should be made in OT_JOB type functions.
- *
- * @deprecated   This function is not needed anymore since it's possible to
- *               run OpenThread code via @ref sys_event (see @ref openthread_get_evq).
- *               Therefore it will be removed after the 2022.01 release.
- *
- * @param[in]   command         name of the command to call
- * @param[in]   arg             arg for the command
- * @param[out]  answer          answer for the command
- *
- * @return  0 on success, 1 on error
- */
-uint8_t ot_call_command(char* command, void *arg, void* answer);
 
 #ifdef __cplusplus
 }

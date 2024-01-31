@@ -93,3 +93,10 @@ Out of Tree Cache Directory                            {#out-of-tree-cache-dir}
 By exporting the `BUILD_DIR` environment variable, a custom build / clone cache
 directory can be created. This can be particularly useful when working with
 multiple git work trees or clones of the RIOT repository.
+
+RIOT-aware Completion in zsh                         {#zsh-completion-for-riot}
+============================
+
+For zsh users a RIOT-aware completion is provided in
+`dist/tools/zsh-completion`. Refer to the `README.md` in there for more details
+and installation instructions.

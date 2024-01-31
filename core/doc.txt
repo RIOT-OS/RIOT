@@ -8,7 +8,7 @@
 
 /**
  * @defgroup core Kernel
- * @brief The RIOT micro-kernel containing the core functionality
+ * @brief The RIOT kernel containing the core functionality
  *
  * The kernel module contains the basic OS functionality such as the scheduler,
  * threading, synchronization and IRQ-handling.

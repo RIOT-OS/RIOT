@@ -155,9 +155,8 @@ static int ip_send(char *addr_str, char *port_str, char *data, unsigned int num,
             puts("could not send");
         }
         else {
-            printf("Success: send %u byte over %s to %s (next header: %u)\n",
-                   (unsigned)data_len,
-                   (dst.family == AF_INET6) ? "IPv6" : "IPv4",
+            printf("Success: send %" PRIuSIZE " byte over %s to %s (next header: %u)\n",
+                   data_len, (dst.family == AF_INET6) ? "IPv6" : "IPv4",
                    addr_str, protocol);
         }
         ztimer_sleep(ZTIMER_USEC, delay);

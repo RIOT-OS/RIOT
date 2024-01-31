@@ -1,0 +1,16 @@
+# configure the terminal program
+PORT_LINUX          ?= /dev/ttyUSB0
+PORT_DARWIN         ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+BAUD                ?= 9600
+ATMEGA8_CLOCK    	?=
+
+# Allow overwriting programmer via env variables without affecting other boards
+PROGRAMMER_BOARD_ATMEGA8 ?= usbasp
+# ICSP programmer to use for avrdude
+AVRDUDE_PROGRAMMER ?= $(PROGRAMMER_BOARD_ATMEGA8)
+
+ifneq (,$(ATMEGA8_CLOCK))
+  CFLAGS += -DCLOCK_CORECLOCK=$(ATMEGA8_CLOCK)
+endif
+
+include $(RIOTBOARD)/common/atmega/Makefile.include

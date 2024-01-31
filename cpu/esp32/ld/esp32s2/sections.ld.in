@@ -590,8 +590,10 @@ SECTIONS
     _sheap = ABSOLUTE(.);
   } > dram0_0_seg
 
-  . = _heap_end;
+  . = ORIGIN(dram0_0_seg) + LENGTH(dram0_0_seg);
   _eheap = ABSOLUTE(.);
+
+  . = _heap_end;
 
 #ifdef MODULE_PERIPH_FLASHPAGE
   .flash_writable (NOLOAD) : ALIGN(65536)

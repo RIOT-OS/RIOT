@@ -1,0 +1,42 @@
+From 61e66babaebb17238003e0fe53149f5457f480e0 Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benjamin.valentin@ml-pa.com>
+Date: Mon, 17 Jul 2023 14:11:59 +0200
+Subject: [PATCH 3/3] allow to overwrite config defines
+
+---
+ heatshrink_config.h | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/heatshrink_config.h b/heatshrink_config.h
+index 13135b9..3879b1f 100644
+--- a/heatshrink_config.h
++++ b/heatshrink_config.h
+@@ -12,15 +12,25 @@
+     #define HEATSHRINK_FREE(P, SZ) free(P)
+ #else
+     /* Required parameters for static configuration */
++    #ifndef HEATSHRINK_STATIC_INPUT_BUFFER_SIZE
+     #define HEATSHRINK_STATIC_INPUT_BUFFER_SIZE 32
++    #endif
++    #ifndef HEATSHRINK_STATIC_WINDOW_BITS
+     #define HEATSHRINK_STATIC_WINDOW_BITS 8
++    #endif
++    #ifndef HEATSHRINK_STATIC_LOOKAHEAD_BITS
+     #define HEATSHRINK_STATIC_LOOKAHEAD_BITS 4
++    #endif
+ #endif
+ 
+ /* Turn on logging for debugging. */
++#ifndef HEATSHRINK_DEBUGGING_LOGS
+ #define HEATSHRINK_DEBUGGING_LOGS 0
++#endif
+ 
+ /* Use indexing for faster compression. (This requires additional space.) */
++#ifndef HEATSHRINK_USE_INDEX
+ #define HEATSHRINK_USE_INDEX 1
++#endif
+ 
+ #endif
+-- 
+2.39.2
+

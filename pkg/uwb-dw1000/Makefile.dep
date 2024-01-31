@@ -7,4 +7,4 @@ FEATURES_REQUIRED += periph_gpio_irq
 FEATURES_REQUIRED += periph_spi
 
 # Some of the pkg operation would overflow on 16bit
-FEATURES_REQUIRED += arch_32bit
+FEATURES_REQUIRED_ANY += arch_32bit|arch_64bit

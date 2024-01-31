@@ -71,7 +71,7 @@ static void test_tinyvcdiff_mtd(void)
     rc = vcdiff_finish(&vcdiff);
     TEST_ASSERT_EQUAL_INT(0, rc);
 
-    /* check reconsturcted target */
+    /* check reconstructed target */
     mtd_read(target_mtd, target_buf, 0, sizeof(target_buf));
     TEST_ASSERT_EQUAL_INT(0, memcmp(target_bin, target_buf, sizeof(target_buf)));
 }
@@ -109,7 +109,7 @@ static void test_tinyvcdiff_vfs(void)
     vfs_close(source_fd);
     vfs_close(target_fd);
 
-    /* check reconsturcted target */
+    /* check reconstructed target */
     memset(target_buf, 0, sizeof(target_buf));
     target_fd = vfs_open("/mnt/target", O_RDONLY, 0);
     vfs_read(target_fd, target_buf, sizeof(target_buf));

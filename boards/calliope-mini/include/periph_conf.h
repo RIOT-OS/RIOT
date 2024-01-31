@@ -33,10 +33,21 @@ extern "C" {
  * @name    UART configuration
  * @{
  */
-#define UART_NUMOF          (1U)
-/* UART pin configuration */
-#define UART_PIN_RX         25
-#define UART_PIN_TX         24
+static const uart_conf_t uart_config[] = {
+    {
+        .dev        = NRF_UART0,
+        .rx_pin     = GPIO_PIN(0, 25),
+        .tx_pin     = GPIO_PIN(0, 24),
+#ifdef MODULE_PERIPH_UART_HW_FC
+        .rts_pin    = GPIO_UNDEF,
+        .cts_pin    = GPIO_UNDEF,
+#endif
+        .irqn       = UART0_IRQn,
+    },
+};
+
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
+#define UART_0_ISR          isr_uart0
 /** @} */
 
 /**

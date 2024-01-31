@@ -54,7 +54,7 @@ static mtd_spi_nor_t samd51_nor_dev = {
     .params = &_samd51_nor_params,
 };
 
-mtd_dev_t *mtd0 = (mtd_dev_t *)&samd51_nor_dev;
+MTD_XFA_ADD(samd51_nor_dev, 0);
 #endif /* MODULE_MTD */
 
 void board_init(void)
@@ -64,7 +64,7 @@ void board_init(void)
         gpio_set(SPEAKER_ENABLE_PIN);
     }
 
-    if (IS_USED(MODULE_ST7735)) {
+    if (IS_USED(MODULE_ST77XX)) {
         gpio_init(BACKLIGHT_PIN, GPIO_OUT);
     }
 }

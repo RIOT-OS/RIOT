@@ -4,8 +4,13 @@ CFLAGS += -Wno-unused-parameter
 CFLAGS += -Wno-unused-function
 CFLAGS += -Wno-unused-variable
 
-ifneq (,$(filter cortex-m0%,$(CPU_CORE)))
-  # LLVM/clang can't handle the inline assembler instructions on M0 in this
-  # package
-  TOOLCHAINS_BLACKLIST += llvm
+# llvm fails to allocate registers for inline assembly :/
+TOOLCHAINS_BLACKLIST += llvm
+
+ifneq (,$(filter psa_uecc_%, $(USEMODULE)))
+  DIRS += $(RIOTPKG)/micro-ecc/psa_uecc
+  INCLUDES += -I$(RIOTBASE)/sys/psa_crypto/include
 endif
+
+PSEUDOMODULES += psa_uecc_p192
+PSEUDOMODULES += psa_uecc_p256

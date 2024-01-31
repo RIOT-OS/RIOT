@@ -33,11 +33,16 @@ extern "C" {
  */
 
 /**
- * @brief   Enable the second SPI device `SPI_DEV(1)` by default
+ * @brief   Disable the second SPI device `SPI_DEV(1)` by default
  *
+ * The second SPI device `SPI_DEV(1)` is only defined if `SPI_DEV_1_USED`
+ * is set to 1 by the board.
+ * This allows to use the default configuration with one or two SPI devices
+ * depending on whether other peripherals are enabled that would collide with
+ * the SPI devices.
  */
 #ifndef SPI_DEV_1_USED
-#define SPI_DEV_1_USED
+#define SPI_DEV_1_USED  0
 #endif
 
 /**
@@ -57,7 +62,7 @@ extern "C" {
  * the default CS signal is connected to an unused hardware.
  */
 #ifndef SPI_DEV_1_CS
-#define SPI_DEV_1_CS    GPIO_PIN(PORT_A, 4)
+#define SPI_DEV_1_CS    GPIO_PIN(PORT_B, 5)
 #endif
 
 /**
@@ -66,7 +71,7 @@ extern "C" {
  * The default SPI device configuration allows to define up to two SPI devices
  * `SPI_DEV(0)` and `SPI_DEV(1)`. `SPI_DEV(0)` is always defined if the SPI
  * peripheral is enabled by the module `periph_spi`. The second SPI device
- * `SPI_DEV(1)` is only defined if `SPI_DEV_1_USED` is defined by the board.
+ * `SPI_DEV(1)` is only defined if `SPI_DEV_1_USED` is set to 1 by the board.
  * This allows to use the default configuration with one or two SPI devices
  * depending on whether other peripherals are enabled that would collide with
  * the SPI devices.
@@ -81,7 +86,7 @@ static const spi_conf_t spi_config[] = {
         .rcumask  = RCU_APB1EN_SPI1EN_Msk,
         .apbbus   = APB1,
     },
-#ifdef SPI_DEV_1_USED
+#if SPI_DEV_1_USED
     {
         .dev      = SPI0,
         .mosi_pin = GPIO_PIN(PORT_A, 7),

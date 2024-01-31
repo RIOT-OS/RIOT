@@ -128,7 +128,28 @@ $(PKG_DOWNLOADED): $(MAKEFILE_LIST) | $(PKG_SOURCE_DIR)/.git
 	fi
 	$(Q)echo $(PKG_VERSION) > $@
 
-ifeq ($(GIT_CACHE_DIR),$(wildcard $(GIT_CACHE_DIR)))
+# This snippet ensures that for packages that have dynamic sparse paths (e.g.,
+# pkg/cmsis), the sparse paths of the time of checkout are the same as needed
+# now.
+# E.g., build a) only needs CMSIS/Core. Build b) also needs CMSIS/DSP.
+# If b) is built after a) and the cmsis checkout does not contain CMSIS/DSP,
+# the sources need to be checked out again.
+# (Inside, this is doing an ad-hoc "|$(LAZYSPONGE)", but using the python version turned out
+# to be significantly slower).
+ifneq (, $(PKG_SPARSE_PATHS))
+PKG_SPARSE_TAG = $(PKG_SOURCE_DIR).sparse
+$(PKG_SPARSE_TAG): FORCE
+	$(Q)if test -f $@; then \
+		test "$$(cat $@)" = "$(PKG_SPARSE_PATHS)" && exit 0; \
+	fi ; mkdir -p $$(dirname $@) && echo "$(PKG_SPARSE_PATHS)" > $@
+endif
+
+ifneq (,$(GIT_CACHE_RS))
+$(PKG_SOURCE_DIR)/.git: $(PKG_SPARSE_TAG) | $(PKG_CUSTOM_PREPARED)
+	$(if $(QUIETER),,$(info [INFO] cloning $(PKG_NAME)))
+	$(Q)rm -Rf $(PKG_SOURCE_DIR)
+	$(Q)$(GIT_CACHE_RS) clone --commit $(PKG_VERSION) $(addprefix --sparse-add ,$(PKG_SPARSE_PATHS)) -- $(PKG_URL) $(PKG_SOURCE_DIR)
+else ifeq ($(GIT_CACHE_DIR),$(wildcard $(GIT_CACHE_DIR)))
 $(PKG_SOURCE_DIR)/.git: | $(PKG_CUSTOM_PREPARED)
 	$(if $(QUIETER),,$(info [INFO] cloning $(PKG_NAME)))
 	$(Q)rm -Rf $(PKG_SOURCE_DIR)

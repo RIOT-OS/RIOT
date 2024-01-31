@@ -28,6 +28,10 @@
 
 #include "bitarithm.h"
 #include "mtd.h"
+#include "xfa.h"
+
+/* Automatic MTD handling */
+XFA_INIT_CONST(mtd_dev_t *, mtd_dev_xfa);
 
 static bool out_of_bounds(mtd_dev_t *mtd, uint32_t page, uint32_t offset, uint32_t len)
 {
@@ -165,14 +169,6 @@ int mtd_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t count)
         return -ENODEV;
     }
 
-    if (out_of_bounds(mtd, 0, addr, count)) {
-        return -EOVERFLOW;
-    }
-
-    if (mtd->driver->write) {
-        return mtd->driver->write(mtd, src, addr, count);
-    }
-
     /* page size is always a power of two */
     const uint32_t page_shift = bitarithm_msb(mtd->page_size);
     const uint32_t page_mask = mtd->page_size - 1;
@@ -251,6 +247,10 @@ int mtd_write_page(mtd_dev_t *mtd, const void *data, uint32_t page,
         return -ENODEV;
     }
 
+    if (mtd->driver->write_page == NULL) {
+        return -ENOTSUP;
+    }
+
     if (out_of_bounds(mtd, page, offset, len)) {
         return -EOVERFLOW;
     }
@@ -293,12 +293,7 @@ int mtd_write_page_raw(mtd_dev_t *mtd, const void *src, uint32_t page, uint32_t 
     }
 
     if (mtd->driver->write_page == NULL) {
-        /* TODO: remove when all backends implement write_page */
-        if (mtd->driver->write) {
-            return mtd->driver->write(mtd, src, mtd->page_size * page + offset, count);
-        } else {
-            return -ENOTSUP;
-        }
+        return -ENOTSUP;
     }
 
     /* Implementation assumes page size is <= INT_MAX and a power of two. */
@@ -387,6 +382,21 @@ int mtd_erase_sector(mtd_dev_t *mtd, uint32_t sector, uint32_t count)
     }
 
     return mtd->driver->erase_sector(mtd, sector, count);
+}
+
+int mtd_write_sector(mtd_dev_t *mtd, const void *data, uint32_t sector,
+                     uint32_t count)
+{
+    if (!(mtd->driver->flags & MTD_DRIVER_FLAG_DIRECT_WRITE)) {
+        int res = mtd_erase_sector(mtd, sector, count);
+        if (res) {
+            return res;
+        }
+    }
+
+    uint32_t page = sector * mtd->pages_per_sector;
+    return mtd_write_page_raw(mtd, data, page, 0,
+                              count * mtd->pages_per_sector * mtd->page_size);
 }
 
 int mtd_power(mtd_dev_t *mtd, enum mtd_power_state power)

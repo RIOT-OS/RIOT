@@ -128,6 +128,33 @@ int adc_init(adc_t line);
  */
 int32_t adc_sample(adc_t line, adc_res_t res);
 
+/**
+ * @brief   Configure the ADC with a given resolution for continuous sampling
+ *
+ * @note requires the `periph_adc_continuous` feature
+ *
+ * @param[in] res           resolution to use for conversion
+ */
+void adc_continuous_begin(adc_res_t res);
+
+/**
+ * @brief   Sample an ADC line without powering off the ADC afterward
+ *
+ * @note requires the `periph_adc_continuous` feature
+ *
+ * @brief   Sample a value from the given ADC line
+ *
+ * @return                  the sampled value on success
+ */
+int32_t adc_continuous_sample(adc_t line);
+
+/**
+ * @brief   Disable the ADC to save power
+ *
+ * @note requires the `periph_adc_continuous` feature
+ */
+void adc_continuous_stop(void);
+
 #ifdef __cplusplus
 }
 #endif

@@ -37,6 +37,11 @@ extern "C" {
 #define CPUID_LEN           (4U)
 
 /**
+ * @brief   CPU cycles per busy wait loop
+ */
+#define CPU_CYCLES_PER_LOOP (5)
+
+/**
  * @name   GPIO configuration
  * @{
  */

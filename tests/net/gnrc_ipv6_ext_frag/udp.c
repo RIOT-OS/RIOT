@@ -106,7 +106,7 @@ static void send(char *addr_str, char *port_str, char *data_len_str, unsigned in
         }
         /* access to `payload` was implicitly given up with the send operation above
          * => use original variable for output */
-        printf("Success: send %u byte to [%s]:%u\n", (unsigned)data_len, addr_str,
+        printf("Success: send %" PRIuSIZE " byte to [%s]:%u\n", data_len, addr_str,
                port);
         xtimer_usleep(delay);
     }

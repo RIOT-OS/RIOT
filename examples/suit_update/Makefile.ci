@@ -6,6 +6,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     bluepill-stm32f103cb \
     e104-bt5010a-tb \
     e104-bt5011a-tb \
+    gd32vf103c-start \
     lsn50 \
     msb-430 \
     msb-430h \
@@ -26,6 +27,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     saml11-xpro \
     seeedstudio-gd32 \
     sipeed-longan-nano \
+    sipeed-longan-nano-tft \
     slstk3400a \
     stk3200 \
     stm32f0discovery \

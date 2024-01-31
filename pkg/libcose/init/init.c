@@ -25,6 +25,7 @@
 #include "xfa.h"
 
 #include "cose/crypto.h"
+#include "cose/crypto/riot.h"
 
 #if IS_USED(MODULE_AUTO_INIT)
 #include "auto_init_utils.h"

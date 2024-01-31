@@ -57,7 +57,7 @@ static bool _ztimer_acquire(ztimer_clock_t *clock)
     unsigned state = irq_disable();
 
     DEBUG("ztimer_acquire(): %p: %" PRIu16 " user(s)\n",
-          (void *)clock, clock->users + 1);
+          (void *)clock, (uint16_t)(clock->users + 1));
 
     if (clock->users++ == 0) {
         if (clock->ops->start) {
@@ -93,7 +93,7 @@ bool ztimer_release(ztimer_clock_t *clock)
     assert(clock->users > 0);
 
     DEBUG("ztimer_release(): %p: %" PRIu16 " user(s)\n",
-          (void *)clock, clock->users - 1);
+          (void *)clock, (uint16_t)(clock->users - 1));
 
     if (--clock->users == 0) {
         /* make sure the timer isn't armed before turning off */
@@ -521,7 +521,7 @@ static void _ztimer_print(const ztimer_clock_t *clock)
     uint32_t last_offset = 0;
 
     do {
-        printf("0x%08x:%" PRIu32 "(%" PRIu32 ")%s", (unsigned)entry,
+        printf("0x%08" PRIxPTR ":%" PRIu32 "(%" PRIu32 ")%s", (uintptr_t)entry,
                entry->offset, entry->offset +
                last_offset,
                entry->next ? "->" : (entry == clock->last ? "" : "!"));

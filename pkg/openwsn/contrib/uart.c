@@ -20,6 +20,7 @@
  * @}
  */
 
+#include <stdint.h>
 #include <stdatomic.h>
 
 #include "board.h"

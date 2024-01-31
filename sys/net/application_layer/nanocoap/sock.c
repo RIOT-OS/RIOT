@@ -220,7 +220,7 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
 
             res = _sock_sendv(sock, &head);
             if (res <= 0) {
-                DEBUG("nanocoap: error sending coap request, %d\n", (int)res);
+                DEBUG("nanocoap: error sending coap request, %" PRIdSIZE "\n", res);
                 return res;
             }
 
@@ -268,7 +268,7 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                 continue;
             }
             if (res < 0) {
-                DEBUG("nanocoap: error receiving coap response, %d\n", (int)res);
+                DEBUG("nanocoap: error receiving coap response, %" PRIdSIZE "\n", res);
                 return res;
             }
 
@@ -284,7 +284,7 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
             }
 
             state = STATE_RESPONSE_OK;
-            DEBUG("nanocoap: response code=%i\n", coap_get_code(pkt));
+            DEBUG("nanocoap: response code=%i\n", coap_get_code_decimal(pkt));
             switch (coap_get_type(pkt)) {
             case COAP_TYPE_RST:
                 /* TODO: handle different? */
@@ -294,7 +294,7 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                 _send_ack(sock, pkt);
                 /* fall-through */
             case COAP_TYPE_ACK:
-                if (cb && coap_get_code(pkt) == COAP_CODE_EMPTY) {
+                if (cb && coap_get_code_raw(pkt) == COAP_CODE_EMPTY) {
                     /* empty ACK, wait for separate response */
                     state = STATE_RESPONSE_RCVD;
                     deadline = _deadline_from_interval(CONFIG_COAP_SEPARATE_RESPONSE_TIMEOUT_MS
@@ -451,6 +451,14 @@ ssize_t nanocoap_sock_post(nanocoap_sock_t *sock, const char *path,
                           response, len_max);
 }
 
+ssize_t nanocoap_sock_fetch(nanocoap_sock_t *sock, const char *path,
+                            const void *request, size_t len,
+                            void *response, size_t len_max)
+{
+    return _sock_put_post(sock, path, COAP_METHOD_FETCH, COAP_TYPE_CON, request, len,
+                          response, len_max);
+}
+
 ssize_t nanocoap_sock_put_non(nanocoap_sock_t *sock, const char *path,
                               const void *request, size_t len,
                               void *response, size_t len_max)
@@ -464,6 +472,14 @@ ssize_t nanocoap_sock_post_non(nanocoap_sock_t *sock, const char *path,
                                void *response, size_t len_max)
 {
     return _sock_put_post(sock, path, COAP_METHOD_POST, COAP_TYPE_NON, request, len,
+                          response, len_max);
+}
+
+ssize_t nanocoap_sock_fetch_non(nanocoap_sock_t *sock, const char *path,
+                               const void *request, size_t len,
+                               void *response, size_t len_max)
+{
+    return _sock_put_post(sock, path, COAP_METHOD_FETCH, COAP_TYPE_NON, request, len,
                           response, len_max);
 }
 
@@ -496,6 +512,13 @@ ssize_t nanocoap_sock_post_url(const char *url,
                                void *response, size_t len_max)
 {
     return _sock_put_post_url(url, COAP_METHOD_POST, request, len, response, len_max);
+}
+
+ssize_t nanocoap_sock_fetch_url(const char *url,
+                                const void *request, size_t len,
+                                void *response, size_t len_max)
+{
+    return _sock_put_post_url(url, COAP_METHOD_FETCH, request, len, response, len_max);
 }
 
 ssize_t nanocoap_sock_delete(nanocoap_sock_t *sock, const char *path)
@@ -794,7 +817,7 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
         res = sock_udp_recv_aux(&sock.udp, buf, bufsize, SOCK_NO_TIMEOUT,
                                 &remote, aux_in_ptr);
         if (res <= 0) {
-            DEBUG("error receiving UDP packet %d\n", (int)res);
+            DEBUG("error receiving UDP packet %" PRIdSIZE "\n", res);
             continue;
         }
         coap_pkt_t pkt;
@@ -803,7 +826,7 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
             continue;
         }
         if ((res = coap_handle_req(&pkt, buf, bufsize, &ctx)) <= 0) {
-            DEBUG("error handling request %d\n", (int)res);
+            DEBUG("error handling request %" PRIdSIZE "\n", res);
             continue;
         }
 

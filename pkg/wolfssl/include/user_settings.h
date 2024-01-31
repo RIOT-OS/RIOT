@@ -73,7 +73,7 @@ extern "C" {
 #endif
 
 /* defined somewhere else */
-int strncasecmp(const char *s1, const char * s2, unsigned int sz);
+int strncasecmp(const char *s1, const char * s2, size_t sz);
 
 #define SINGLE_THREADED
 

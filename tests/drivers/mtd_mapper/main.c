@@ -91,22 +91,6 @@ static int _read_page(mtd_dev_t *dev, void *buff, uint32_t page, uint32_t offset
     return size;
 }
 
-static int _write(mtd_dev_t *dev, const void *buff, uint32_t addr,
-                  uint32_t size)
-{
-    (void)dev;
-
-    if (addr + size > sizeof(_dummy_memory)) {
-        return -EOVERFLOW;
-    }
-    if (size > PAGE_SIZE) {
-        return -EOVERFLOW;
-    }
-    memcpy(_dummy_memory + addr, buff, size);
-
-    return 0;
-}
-
 static int _write_page(mtd_dev_t *dev, const void *buff, uint32_t page, uint32_t offset, uint32_t size)
 {
     uint32_t addr = page * dev->page_size + offset;
@@ -168,7 +152,6 @@ static int _power(mtd_dev_t *dev, enum mtd_power_state power)
 static const mtd_desc_t driver = {
     .init = _init,
     .read = _read,
-    .write = _write,
     .erase = _erase,
     .power = _power,
     .read_page    = _read_page,

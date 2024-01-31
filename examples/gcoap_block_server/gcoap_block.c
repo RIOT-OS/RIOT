@@ -93,8 +93,8 @@ static ssize_t _sha256_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, coap_r
 
     int blockwise = coap_get_block1(pdu, &block1);
 
-    printf("_sha256_handler: received data: offset=%u len=%u blockwise=%i more=%i\n",
-            (unsigned)block1.offset, pdu->payload_len, blockwise, block1.more);
+    printf("_sha256_handler: received data: offset=%" PRIuSIZE " len=%u blockwise=%i more=%i\n",
+            block1.offset, pdu->payload_len, blockwise, block1.more);
 
     /* initialize sha256 calculation and add payload bytes */
     if (block1.blknum == 0) {

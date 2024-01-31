@@ -368,8 +368,8 @@ int gcoap_cli_cmd(int argc, char **argv)
             len = coap_opt_finish(&pdu, COAP_OPT_FINISH_NONE);
         }
 
-        printf("gcoap_cli: sending msg ID %u, %u bytes\n", coap_get_id(&pdu),
-               (unsigned) len);
+        printf("gcoap_cli: sending msg ID %u, %" PRIuSIZE " bytes\n",
+               coap_get_id(&pdu), len);
         if (!_send(&buf[0], len, argv[apos])) {
             puts("gcoap_cli: msg send failed");
         }

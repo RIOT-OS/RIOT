@@ -29,6 +29,7 @@
 #include "periph/gpio_ll_irq.h"
 #include "timex.h"
 #include "ztimer.h"
+#include "flash_utils.h"
 
 #ifndef LOW_ROM
 #define LOW_ROM 0
@@ -40,12 +41,16 @@ static gpio_port_t port_in = GPIO_PORT(PORT_IN);
 
 static const uint64_t mutex_timeout = US_PER_MS;
 
+#if LOW_ROM
 static void puts_optional(const char *str)
 {
-    if (!LOW_ROM) {
-        puts(str);
-    }
+    (void)str;
 }
+#else
+/* this is like puts() on most platforms, but e.g. on AVR safes lots of RAM by
+ * placing the string literal to puts in flash. */
+#define puts_optional(str_literal) flash_puts(TO_FLASH(str_literal))
+#endif
 
 #if LOW_ROM
 #define printf_optional(...) (void)0
@@ -114,6 +119,12 @@ static void test_gpio_port_pack(void)
     puts_optional("All OK");
 }
 
+static void print_conf(gpio_conf_t conf)
+{
+    gpio_ll_print_conf(conf);
+    puts("");
+}
+
 static void test_gpio_ll_init(void)
 {
     bool is_supported;
@@ -127,47 +138,39 @@ static void test_gpio_ll_init(void)
     expect(is_gpio_port_num_valid(PORT_OUT));
 
     puts_optional("\nTesting input configurations for PIN_IN_0:");
-    is_supported = (0 == gpio_ll_init(port_in, PIN_IN_0, &gpio_ll_in_pu));
+    is_supported = (0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_in_pu));
     printf_optional("Support for input with pull up: %s\n",
                     noyes[is_supported]);
     if (is_supported) {
-        gpio_conf_t conf;
-        gpio_ll_query_conf(&conf, port_in, PIN_IN_0);
-        gpio_ll_print_conf(&conf);
-        puts_optional("");
+        gpio_conf_t conf = gpio_ll_query_conf(port_in, PIN_IN_0);
+        print_conf(conf);
         expect((conf.state == GPIO_INPUT) && (conf.pull == GPIO_PULL_UP));
     }
 
-    is_supported = (0 == gpio_ll_init(port_in, PIN_IN_0, &gpio_ll_in_pd));
+    is_supported = (0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_in_pd));
     printf_optional("Support for input with pull down: %s\n",
                     noyes[is_supported]);
     if (is_supported) {
-        gpio_conf_t conf;
-        gpio_ll_query_conf(&conf, port_in, PIN_IN_0);
-        gpio_ll_print_conf(&conf);
-        puts_optional("");
+        gpio_conf_t conf = gpio_ll_query_conf(port_in, PIN_IN_0);
+        print_conf(conf);
         expect((conf.state == GPIO_INPUT) && (conf.pull == GPIO_PULL_DOWN));
     }
 
-    is_supported = (0 == gpio_ll_init(port_in, PIN_IN_0, &gpio_ll_in_pk));
+    is_supported = (0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_in_pk));
     printf_optional("Support for input with pull to bus level: %s\n",
                     noyes[is_supported]);
     if (is_supported) {
-        gpio_conf_t conf;
-        gpio_ll_query_conf(&conf, port_in, PIN_IN_0);
-        gpio_ll_print_conf(&conf);
-        puts_optional("");
+        gpio_conf_t conf = gpio_ll_query_conf(port_in, PIN_IN_0);
+        print_conf(conf);
         expect((conf.state == GPIO_INPUT) && (conf.pull == GPIO_PULL_KEEP));
     }
 
-    is_supported = (0 == gpio_ll_init(port_in, PIN_IN_0, &gpio_ll_in));
+    is_supported = (0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_in));
     printf_optional("Support for floating input (no pull resistors): %s\n",
                     noyes[is_supported]);
     {
-        gpio_conf_t conf;
-        gpio_ll_query_conf(&conf, port_in, PIN_IN_0);
-        gpio_ll_print_conf(&conf);
-        puts_optional("");
+        gpio_conf_t conf = gpio_ll_query_conf(port_in, PIN_IN_0);
+        print_conf(conf);
         expect((conf.state == GPIO_INPUT) && (conf.pull == GPIO_FLOATING));
     }
     /* Support for floating inputs is mandatory */
@@ -179,31 +182,28 @@ static void test_gpio_ll_init(void)
             .state = GPIO_OUTPUT_PUSH_PULL,
             .initial_value = false,
         };
-        is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, &conf));
+        is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, conf));
     }
     printf_optional("Support for output (push-pull) with initial value of "
                     "LOW: %s\n",
                     noyes[is_supported]);
 
     if (is_supported) {
-        gpio_conf_t conf;
-        gpio_ll_query_conf(&conf, port_out, PIN_OUT_0);
-        gpio_ll_print_conf(&conf);
-        puts_optional("");
+        gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
+        print_conf(conf);
         expect((conf.state == GPIO_OUTPUT_PUSH_PULL) && !conf.initial_value);
         ztimer_sleep(ZTIMER_USEC, US_PER_MS);
         is_supported = !(gpio_ll_read(port_in) & (1ULL << PIN_IN_0));
         printf_optional("Output is indeed LOW: %s\n", noyes[is_supported]);
         expect(is_supported);
         gpio_ll_set(port_out, (1ULL<< PIN_OUT_0));
-        gpio_ll_query_conf(&conf, port_out, PIN_OUT_0);
-        gpio_ll_print_conf(&conf);
-        puts_optional("");
+        conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
+        print_conf(conf);
         ztimer_sleep(ZTIMER_USEC, US_PER_MS);
         is_supported = (gpio_ll_read(port_in) & (1ULL << PIN_IN_0));
         printf_optional("Output can be pushed HIGH: %s\n", noyes[is_supported]);
         expect(is_supported);
-        gpio_ll_query_conf(&conf, port_out, PIN_OUT_0);
+        conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
         expect((conf.state == GPIO_OUTPUT_PUSH_PULL) && conf.initial_value);
     }
 
@@ -212,17 +212,15 @@ static void test_gpio_ll_init(void)
             .state = GPIO_OUTPUT_PUSH_PULL,
             .initial_value = true,
         };
-        is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, &conf));
+        is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, conf));
     }
     printf_optional("Support for output (push-pull) with initial value of "
                     "HIGH: %s\n",
                     noyes[is_supported]);
 
     if (is_supported) {
-        gpio_conf_t conf;
-        gpio_ll_query_conf(&conf, port_out, PIN_OUT_0);
-        gpio_ll_print_conf(&conf);
-        puts_optional("");
+        gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
+        print_conf(conf);
         expect((conf.state == GPIO_OUTPUT_PUSH_PULL) && conf.initial_value);
         ztimer_sleep(ZTIMER_USEC, US_PER_MS);
         is_supported = (gpio_ll_read(port_in) & (1ULL << PIN_IN_0));
@@ -236,17 +234,15 @@ static void test_gpio_ll_init(void)
             .initial_value = false,
             .pull = GPIO_PULL_UP
         };
-        is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, &conf));
+        is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, conf));
     }
     printf_optional("Support for output (open drain with pull up) with initial "
                     "value of LOW: %s\n",
                     noyes[is_supported]);
 
     if (is_supported) {
-        gpio_conf_t conf;
-        gpio_ll_query_conf(&conf, port_out, PIN_OUT_0);
-        gpio_ll_print_conf(&conf);
-        puts_optional("");
+        gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
+        print_conf(conf);
         expect((conf.state == GPIO_OUTPUT_OPEN_DRAIN) && !conf.initial_value
                && (conf.pull == GPIO_PULL_UP));
         ztimer_sleep(ZTIMER_USEC, US_PER_MS);
@@ -261,17 +257,15 @@ static void test_gpio_ll_init(void)
             .initial_value = true,
             .pull = GPIO_PULL_UP
         };
-        is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, &conf));
+        is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, conf));
     }
     printf_optional("Support for output (open drain with pull up) with initial "
                     "value of HIGH: %s\n",
                     noyes[is_supported]);
 
     if (is_supported) {
-        gpio_conf_t conf;
-        gpio_ll_query_conf(&conf, port_out, PIN_OUT_0);
-        gpio_ll_print_conf(&conf);
-        puts_optional("");
+        gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
+        print_conf(conf);
         expect((conf.state == GPIO_OUTPUT_OPEN_DRAIN) && conf.initial_value
                && (conf.pull == GPIO_PULL_UP));
         ztimer_sleep(ZTIMER_USEC, US_PER_MS);
@@ -286,17 +280,15 @@ static void test_gpio_ll_init(void)
             .initial_value = false,
             .pull = GPIO_FLOATING,
         };
-        is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, &conf));
+        is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, conf));
     }
     printf_optional("Support for output (open drain) with initial value of "
                     "LOW: %s\n",
                     noyes[is_supported]);
 
     if (is_supported) {
-        gpio_conf_t conf;
-        gpio_ll_query_conf(&conf, port_out, PIN_OUT_0);
-        gpio_ll_print_conf(&conf);
-        puts_optional("");
+        gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
+        print_conf(conf);
         expect((conf.state == GPIO_OUTPUT_OPEN_DRAIN) && !conf.initial_value
                && (conf.pull == GPIO_FLOATING));
         ztimer_sleep(ZTIMER_USEC, US_PER_MS);
@@ -311,25 +303,21 @@ static void test_gpio_ll_init(void)
             .initial_value = true,
             .pull = GPIO_FLOATING,
         };
-        is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, &conf));
+        is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, conf));
     }
     printf_optional("Support for output (open drain) with initial value of "
                     "HIGH: %s\n",
                     noyes[is_supported]);
 
     if (is_supported) {
-        gpio_conf_t conf;
-        gpio_ll_query_conf(&conf, port_out, PIN_OUT_0);
-        gpio_ll_print_conf(&conf);
-        puts_optional("");
+        gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
+        print_conf(conf);
         expect((conf.state == GPIO_OUTPUT_OPEN_DRAIN) && conf.initial_value
                && (conf.pull == GPIO_FLOATING));
-        is_supported = (0 == gpio_ll_init(port_in, PIN_IN_0, &gpio_ll_in_pd));
+        is_supported = (0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_in_pd));
         if (is_supported) {
-            gpio_conf_t conf;
-            gpio_ll_query_conf(&conf, port_in, PIN_IN_0);
-            gpio_ll_print_conf(&conf);
-            puts_optional("");
+            gpio_conf_t conf = gpio_ll_query_conf(port_in, PIN_IN_0);
+            print_conf(conf);
             ztimer_sleep(ZTIMER_USEC, US_PER_MS);
             is_supported = !(gpio_ll_read(port_in) & (1ULL << PIN_IN_0));
             printf_optional("Output can indeed be pulled LOW: %s\n",
@@ -340,12 +328,10 @@ static void test_gpio_ll_init(void)
             puts_optional("WARN: Cannot enable pull down of PIN_IN_0 to verify "
                           "correct Open Drain behavior");
         }
-        is_supported = (0 == gpio_ll_init(port_in, PIN_IN_0, &gpio_ll_in_pu));
+        is_supported = (0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_in_pu));
         if (is_supported) {
-            gpio_conf_t conf;
-            gpio_ll_query_conf(&conf, port_in, PIN_IN_0);
-            gpio_ll_print_conf(&conf);
-            puts_optional("");
+            gpio_conf_t conf = gpio_ll_query_conf(port_in, PIN_IN_0);
+            print_conf(conf);
             ztimer_sleep(ZTIMER_USEC, US_PER_MS);
             is_supported = (gpio_ll_read(port_in) & (1ULL << PIN_IN_0));
             printf_optional("Output can indeed be pulled HIGH: %s\n",
@@ -364,25 +350,21 @@ static void test_gpio_ll_init(void)
             .initial_value = false,
             .pull = GPIO_FLOATING,
         };
-        is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, &conf));
+        is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, conf));
     }
     printf_optional("Support for output (open source) with initial value of "
                     "LOW: %s\n",
                     noyes[is_supported]);
 
     if (is_supported) {
-        gpio_conf_t conf;
-        gpio_ll_query_conf(&conf, port_out, PIN_OUT_0);
-        gpio_ll_print_conf(&conf);
-        puts_optional("");
+        gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
+        print_conf(conf);
         expect((conf.state == GPIO_OUTPUT_OPEN_SOURCE) && !conf.initial_value
                && (conf.pull == GPIO_FLOATING));
-        is_supported = (0 == gpio_ll_init(port_in, PIN_IN_0, &gpio_ll_in_pd));
+        is_supported = (0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_in_pd));
         if (is_supported) {
-            gpio_conf_t conf;
-            gpio_ll_query_conf(&conf, port_in, PIN_IN_0);
-            gpio_ll_print_conf(&conf);
-            puts_optional("");
+            gpio_conf_t conf = gpio_ll_query_conf(port_in, PIN_IN_0);
+            print_conf(conf);
             ztimer_sleep(ZTIMER_USEC, US_PER_MS);
             is_supported = !(gpio_ll_read(port_in) & (1ULL << PIN_IN_0));
             printf_optional("Output can indeed be pulled LOW: %s\n",
@@ -393,12 +375,10 @@ static void test_gpio_ll_init(void)
             puts_optional("WARN: Cannot enable pull down of PIN_IN_0 to verify "
                           "correct Open Source behavior");
         }
-        is_supported = (0 == gpio_ll_init(port_in, PIN_IN_0, &gpio_ll_in_pu));
+        is_supported = (0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_in_pu));
         if (is_supported) {
-            gpio_conf_t conf;
-            gpio_ll_query_conf(&conf, port_in, PIN_IN_0);
-            gpio_ll_print_conf(&conf);
-            puts_optional("");
+            gpio_conf_t conf = gpio_ll_query_conf(port_in, PIN_IN_0);
+            print_conf(conf);
             ztimer_sleep(ZTIMER_USEC, US_PER_MS);
             is_supported = (gpio_ll_read(port_in) & (1ULL << PIN_IN_0));
             printf_optional("Output can indeed be pulled HIGH: %s\n",
@@ -411,7 +391,7 @@ static void test_gpio_ll_init(void)
         }
     }
 
-    expect(0 == gpio_ll_init(port_in, PIN_IN_0, &gpio_ll_in));
+    expect(0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_in));
 
     {
         gpio_conf_t conf = {
@@ -419,17 +399,15 @@ static void test_gpio_ll_init(void)
             .initial_value = true,
             .pull = GPIO_FLOATING,
         };
-        is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, &conf));
+        is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, conf));
     }
     printf_optional("Support for output (open source) with initial value of "
                     "HIGH: %s\n",
                     noyes[is_supported]);
 
     if (is_supported) {
-        gpio_conf_t conf;
-        gpio_ll_query_conf(&conf, port_out, PIN_OUT_0);
-        gpio_ll_print_conf(&conf);
-        puts_optional("");
+        gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
+        print_conf(conf);
         expect((conf.state == GPIO_OUTPUT_OPEN_SOURCE) && conf.initial_value
                && (conf.pull == GPIO_FLOATING));
         ztimer_sleep(ZTIMER_USEC, US_PER_MS);
@@ -444,7 +422,7 @@ static void test_gpio_ll_init(void)
             .initial_value = true,
             .pull = GPIO_PULL_DOWN,
         };
-        is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, &conf));
+        is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, conf));
     }
     printf_optional("Support for output (open source with pull up) with initial "
                     "value of HIGH: %s\n",
@@ -463,7 +441,7 @@ static void test_gpio_ll_init(void)
             .initial_value = false,
             .pull = GPIO_PULL_DOWN,
         };
-        is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, &conf));
+        is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, conf));
     }
     printf_optional("Support for output (open source with pull up) with initial "
                     "value of LOW: %s\n",
@@ -480,30 +458,55 @@ static void test_gpio_ll_init(void)
         gpio_conf_t conf = {
             .state = GPIO_DISCONNECT,
         };
-        is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, &conf));
+        is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, conf));
     }
     printf_optional("Support for disconnecting GPIO: %s\n", noyes[is_supported]);
     /* This is mandatory */
     expect(is_supported);
 
-    is_supported = (0 == gpio_ll_init(port_in, PIN_IN_0, &gpio_ll_in_pd));
+    /* Ensure that gpio_ll_query_conf() correctly detects the state as
+     * disconnected. */
+    {
+        gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
+        gpio_ll_print_conf(conf);
+        puts("");
+        expect(conf.state == GPIO_DISCONNECT);
+    }
+
+    is_supported = (0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_in_pd));
     if (is_supported) {
         ztimer_sleep(ZTIMER_USEC, US_PER_MS);
         is_supported = !(gpio_ll_read(port_in) & (1ULL << PIN_IN_0));
         printf_optional("Output can indeed be pulled LOW: %s\n",
                         noyes[is_supported]);
+        /* If this expects fails, try with a different pin. Often pins intended
+         * for use as UART, I2C, or hardware /CS on SPI cannot be configured
+         * as high impedance and will instead remain HIGH. An implementation
+         * is free to work around this e.g. by configuring these pins as
+         * input with the input buffer disabled or as analog input without
+         * routing them to the ADC, or just to restore the reset configuration
+         * and have them high.
+         *
+         * Even though this can fail on some pins, the `expect()` here should
+         * remain. Just test with a different pin that can be configured as
+         * high impedance to confirm that this functionality does work where
+         * supported. */
         expect(is_supported);
     }
     else {
         puts_optional("WARN: Cannot enable pull down of PIN_IN_0 to verify "
                       "correct disabled behavior");
     }
-    is_supported = (0 == gpio_ll_init(port_in, PIN_IN_0, &gpio_ll_in_pu));
+    is_supported = (0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_in_pu));
     if (is_supported) {
         ztimer_sleep(ZTIMER_USEC, US_PER_MS);
         is_supported = (gpio_ll_read(port_in) & (1ULL << PIN_IN_0));
         printf_optional("Output can indeed be pulled HIGH: %s\n",
                         noyes[is_supported]);
+        /* May also fail for some pins, if the reset configuration of the
+         * pin results in LOW output. Do not comment this out, but rather
+         * try with a different pin to confirm that this functionality does
+         * work where supported */
         expect(is_supported);
     }
     else {
@@ -518,10 +521,10 @@ static void test_input_output(void)
          "Testing Reading/Writing GPIO Ports\n"
          "==================================\n");
 
-    expect(0 == gpio_ll_init(port_in, PIN_IN_0, &gpio_ll_in));
-    expect(0 == gpio_ll_init(port_in, PIN_IN_1, &gpio_ll_in));
-    expect(0 == gpio_ll_init(port_out, PIN_OUT_0, &gpio_ll_out));
-    expect(0 == gpio_ll_init(port_out, PIN_OUT_1, &gpio_ll_out));
+    expect(0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_in));
+    expect(0 == gpio_ll_init(port_in, PIN_IN_1, gpio_ll_in));
+    expect(0 == gpio_ll_init(port_out, PIN_OUT_0, gpio_ll_out));
+    expect(0 == gpio_ll_init(port_out, PIN_OUT_1, gpio_ll_out));
 
     uword_t mask_in_0 = (1UL << PIN_IN_0);
     uword_t mask_in_1 = (1UL << PIN_IN_1);
@@ -698,18 +701,27 @@ static void test_irq_edge(void)
     gpio_ll_irq_off(port_in, PIN_IN_0);
 }
 
-struct mutex_counter {
+struct irq_level_cb_arg {
     mutex_t mutex;
     unsigned counter;
+    enum {
+        LOW,
+        HIGH
+    } trigger_level;
 };
 
 __attribute__((unused))
 static void irq_level_cb(void *_arg)
 {
-    struct mutex_counter *arg = _arg;
+    struct irq_level_cb_arg *arg = _arg;
 
     if (!arg->counter) {
-        gpio_ll_toggle(port_out, 1UL << PIN_OUT_0);
+        if (arg->trigger_level == HIGH) {
+            gpio_ll_clear(port_out, 1UL << PIN_OUT_0);
+        }
+        else {
+            gpio_ll_set(port_out, 1UL << PIN_OUT_0);
+        }
         mutex_unlock(&arg->mutex);
     }
     else {
@@ -719,9 +731,10 @@ static void irq_level_cb(void *_arg)
 
 static void test_irq_level(void)
 {
-    struct mutex_counter arg = { .mutex = MUTEX_INIT_LOCKED, .counter = 10 };
+    struct irq_level_cb_arg arg = { .mutex = MUTEX_INIT_LOCKED, .counter = 10 };
 
     if (IS_USED(MODULE_PERIPH_GPIO_LL_IRQ_LEVEL_TRIGGERED_HIGH)) {
+        arg.trigger_level = HIGH;
         puts_optional("Testing level-triggered on HIGH on PIN_IN_0 (when input "
                       "is LOW when setting up IRQ)");
         gpio_ll_clear(port_out, 1UL << PIN_OUT_0);
@@ -756,6 +769,7 @@ static void test_irq_level(void)
     }
 
     if (IS_USED(MODULE_PERIPH_GPIO_LL_IRQ_LEVEL_TRIGGERED_LOW)) {
+        arg.trigger_level = LOW;
         puts_optional("Testing level-triggered on LOW on PIN_IN_0 (when input "
                       "is HIGH when setting up IRQ)");
         gpio_ll_set(port_out, 1UL << PIN_OUT_0);
@@ -799,8 +813,8 @@ static void test_irq(void)
              "Testing External IRQs\n"
              "=====================\n");
 
-        expect(0 == gpio_ll_init(port_in, PIN_IN_0, &gpio_ll_in));
-        expect(0 == gpio_ll_init(port_out, PIN_OUT_0, &gpio_ll_out));
+        expect(0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_in));
+        expect(0 == gpio_ll_init(port_out, PIN_OUT_0, gpio_ll_out));
 
         test_irq_edge();
         test_irq_level();

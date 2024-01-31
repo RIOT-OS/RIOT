@@ -56,7 +56,7 @@ static void *main_trampoline(void *arg)
         auto_init();
     }
 
-    if (!IS_ACTIVE(CONFIG_SKIP_BOOT_MSG)) {
+    if (!IS_ACTIVE(CONFIG_SKIP_BOOT_MSG) && !IS_USED(MODULE_STDIO_NULL)) {
         LOG_INFO(CONFIG_BOOT_MSG_STRING "\n");
     }
 
@@ -106,8 +106,11 @@ void kernel_init(void)
                       main_trampoline, NULL, "main");
     }
     else {
+        /* RIOT without threads */
         irq_enable();
         main_trampoline(NULL);
+        while (1) {}
+        return;
     }
 
     cpu_switch_context_exit();

@@ -6,6 +6,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-uno \
     atmega328p \
     atmega328p-xplained-mini \
+    atmega8 \
     atxmega-a3bu-xplained \
     bluepill-stm32f030c8 \
     i-nucleo-lrwan1 \
@@ -31,5 +32,4 @@ BOARD_INSUFFICIENT_MEMORY := \
     telosb \
     waspmote-pro \
     z1 \
-    zigduino \
     #

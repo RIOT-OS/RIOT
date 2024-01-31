@@ -20,7 +20,6 @@
 #define BOARD_H
 
 #include "cpu.h"
-#include "mtd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -66,12 +65,10 @@ extern "C" {
  * @name MTD configuration
  * @{
  */
-extern mtd_dev_t *mtd0;     /**< Flash MTD device pointer */
-#define MTD_0 mtd0          /**< Flash MTD device */
-extern mtd_dev_t *mtd1;     /**< MTD device pointer for SD Card */
-#define MTD_1 mtd1          /**< MTD device for SD Card */
+#define MTD_0 mtd_dev_get(0)    /**< MTD device for the 8 MByte QSPI Flash */
+#define MTD_1 mtd_dev_get(1)    /**< MTD device for the SD Card */
 
-#define CONFIG_SDCARD_GENERIC_MTD_OFFSET    1   /**< mtd1 is used for SD Card */
+#define CONFIG_SDCARD_GENERIC_MTD_OFFSET    1   /**< MTD_1 is used for SD Card */
 /** @} */
 
 /**

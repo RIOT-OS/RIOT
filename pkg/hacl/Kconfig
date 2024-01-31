@@ -9,4 +9,4 @@ config PACKAGE_HACL
     bool "High Assurance Cryptographic Library package"
     depends on TEST_KCONFIG
     depends on MODULE_RANDOM
-    depends on HAS_ARCH_32BIT
+    depends on HAS_ARCH_32BIT || HAS_ARCH_64BIT

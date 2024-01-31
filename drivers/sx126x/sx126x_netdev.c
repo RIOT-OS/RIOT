@@ -21,6 +21,7 @@
 #include <string.h>
 #include <errno.h>
 
+#include "architecture.h"
 #include "iolist.h"
 #include "net/netopt.h"
 #include "net/netdev.h"
@@ -78,7 +79,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         return 0;
     }
 
-    DEBUG("[sx126x] netdev: sending packet now (size: %d).\n", pos);
+    DEBUG("[sx126x] netdev: sending packet now (size: %" PRIuSIZE ").\n", pos);
     sx126x_set_lora_payload_length(dev, pos);
 
     state = NETOPT_STATE_TX;

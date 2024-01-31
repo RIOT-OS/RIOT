@@ -19,7 +19,7 @@ config CPU_MODEL_ATMEGA8
 config HAS_CPU_ATMEGA8
     bool
     help
-        Indicates that a 'atmega8' cpu is being used.
+        Indicates that an 'atmega8' cpu is being used.
 
 ## Common CPU symbols
 config CPU_FAM

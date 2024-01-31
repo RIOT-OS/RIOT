@@ -35,7 +35,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#define MTD_FLASHPAGE_END_ADDR     ((uint32_t) CPU_FLASH_BASE + (FLASHPAGE_NUMOF * FLASHPAGE_SIZE))
+#define MTD_FLASHPAGE_END_ADDR     ((uintptr_t) CPU_FLASH_BASE + (FLASHPAGE_NUMOF * FLASHPAGE_SIZE))
 
 static int _init(mtd_dev_t *dev)
 {
@@ -44,11 +44,14 @@ static int _init(mtd_dev_t *dev)
     assert(dev->pages_per_sector * dev->page_size == FLASHPAGE_SIZE);
     assert(!(super->offset % dev->pages_per_sector));
 
-    assert((int)flashpage_addr(super->offset / dev->pages_per_sector) >= (int)CPU_FLASH_BASE);
+    /* Use separate variable to avoid '>= 0 is always true' warning */
+    static const uintptr_t cpu_flash_base = CPU_FLASH_BASE;
+
+    assert((uintptr_t)flashpage_addr(super->offset / dev->pages_per_sector) >= cpu_flash_base);
     assert((uintptr_t)flashpage_addr(super->offset / dev->pages_per_sector)
            + dev->pages_per_sector * dev->page_size * dev->sector_count <= MTD_FLASHPAGE_END_ADDR);
     assert((uintptr_t)flashpage_addr(super->offset / dev->pages_per_sector)
-           + dev->pages_per_sector * dev->page_size * dev->sector_count > CPU_FLASH_BASE);
+           + dev->pages_per_sector * dev->page_size * dev->sector_count > cpu_flash_base);
     return 0;
 }
 
@@ -114,9 +117,9 @@ static int _write_page(mtd_dev_t *dev, const void *buf, uint32_t page, uint32_t 
                 __attribute__ ((aligned (FLASHPAGE_WRITE_BLOCK_ALIGNMENT)));
 
         offset = addr % FLASHPAGE_WRITE_BLOCK_ALIGNMENT;
-        size = MIN(size, FLASHPAGE_WRITE_BLOCK_ALIGNMENT - offset);
+        size = MIN(size, FLASHPAGE_WRITE_BLOCK_SIZE - offset);
 
-        DEBUG("flashpage: write %"PRIu32" unaligned bytes\n", size);
+        DEBUG("flashpage: write %"PRIu32" at %p - ""%"PRIu32"\n", size, (void *)addr, offset);
 
         memcpy(&tmp[0], (uint8_t *)addr - offset, sizeof(tmp));
         memcpy(&tmp[offset], buf, size);

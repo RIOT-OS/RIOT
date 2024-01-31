@@ -101,6 +101,9 @@ endif
 ifneq (,$(filter l2filter,$(USEMODULE)))
   DIRS += net/link_layer/l2filter
 endif
+ifneq (,$(filter l2scan_list,$(USEMODULE)))
+  DIRS += net/link_layer/l2scan_list
+endif
 ifneq (,$(filter l2util,$(USEMODULE)))
   DIRS += net/link_layer/l2util
 endif
@@ -169,6 +172,9 @@ ifneq (,$(filter posix_sockets,$(USEMODULE)))
 endif
 ifneq (,$(filter posix_sleep,$(USEMODULE)))
   DIRS += posix/sleep
+endif
+ifneq (,$(filter psa_crypto,$(USEMODULE)))
+    DIRS += psa_crypto
 endif
 ifneq (,$(filter pthread,$(USEMODULE)))
   DIRS += posix/pthread

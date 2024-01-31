@@ -30,9 +30,13 @@ extern "C" {
 
 /**
  * @brief   Default stack size to use for the 6LoWPAN thread.
+ *
+ * @note    The message queue was previously allocated on the stack.
+ *          The default number of messages is 2³.
+ *          Given sizeof(msg_t) == 8, the stack size is reduced by 64 bytes.
  */
 #ifndef GNRC_SIXLOWPAN_STACK_SIZE
-#define GNRC_SIXLOWPAN_STACK_SIZE           (THREAD_STACKSIZE_DEFAULT)
+#define GNRC_SIXLOWPAN_STACK_SIZE           ((THREAD_STACKSIZE_DEFAULT) - 64)
 #endif
 
 /**

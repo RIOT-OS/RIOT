@@ -473,7 +473,7 @@ typedef union {
 typedef union { // __I to avoid read-modify-write on write-to-clear register
   struct {
     __I uint32_t NSCHK:1;                   /**< bit:      0  Non-Secure Check                         */
-    __I uint32_t :31;                       /**< bit:  1..31  Reserved */
+    uint32_t :31;                           /**< bit:  1..31  Reserved */
   } bit;                                /**< Structure used for bit  access */
   uint32_t reg;                         /**< Type used for register access */
 } PORT_INTFLAG_Type;

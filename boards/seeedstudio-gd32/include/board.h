@@ -67,6 +67,24 @@ extern "C" {
 #define LED_BLUE_PIN        LED2_PIN    /**< LED2 is blue */
 /** @} */
 
+/**
+ * @name MTD configuration
+ * @{
+ */
+#define MTD_0 mtd_dev_get(0)          /**< MTD device for the SD Card */
+/** @} */
+
+/**
+ * @name   SD-Card interface configuration
+ * @{
+ */
+#define SDCARD_SPI_PARAM_SPI         SPI_DEV(0)
+#define SDCARD_SPI_PARAM_CS          GPIO_PIN(PORT_B, 12)
+#define SDCARD_SPI_PARAM_CLK         GPIO_PIN(PORT_B, 13)
+#define SDCARD_SPI_PARAM_MISO        GPIO_PIN(PORT_B, 14)
+#define SDCARD_SPI_PARAM_MOSI        GPIO_PIN(PORT_B, 15)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

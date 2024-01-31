@@ -46,6 +46,23 @@
 #define ADDR                (dev->params.addr)
 #endif
 
+#ifndef STMPE811_FIFO_THRESHOLD_ENABLED
+#define STMPE811_FIFO_THRESHOLD_ENABLED    (0)
+#endif
+
+/* The driver only works reliably with FIFO threshold interrupts if the FIFO
+ * threshold is at least 2. The reason is that all interrupts are cleared when
+ * the status is checked in `stmpe811_read_touch_state` but the FIFO Threshold
+ * interrupt is asserted again immediately since the FIFO is not read so that
+ * a new interrupt is pending. On the other hand, the Touch Detected interrupt
+ * does not work reliably for the release event if only the Touch Detected
+ * interrupt in `stmpe811_read_touch_state` is cleared. The workaround is
+ * to set the FIFO threshold to at least 2 to introduce a small delay between
+ * the Touch Detect interrupt on a touch and the first FIFO threshold
+ * interrupt. */
+#ifndef STMPE811_FIFO_THRESHOLD
+#define STMPE811_FIFO_THRESHOLD     (STMPE811_FIFO_THRESHOLD_ENABLED ? 2 : 1)
+#endif
 
 #if IS_USED(MODULE_STMPE811_SPI) /* using SPI mode */
 static inline void _acquire(const stmpe811_t *dev)
@@ -194,7 +211,7 @@ int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t *params, stmpe811_eve
     }
 
     /* check mode configuration */
-    if(_stmpe811_check_mode(dev) != 0) {
+    if (_stmpe811_check_mode(dev) != 0) {
         DEBUG("[stmpe811] error: couldn't setup SPI\n");
         return -EIO;
     }
@@ -257,7 +274,7 @@ int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t *params, stmpe811_eve
     ret += _write_reg(dev, STMPE811_TSC_CFG, reg);
 
     /* set fifo threshold */
-    ret += _write_reg(dev, STMPE811_FIFO_TH, 0x01);
+    ret += _write_reg(dev, STMPE811_FIFO_TH, STMPE811_FIFO_THRESHOLD);
 
     /* reset fifo */
     _reset_fifo(dev);
@@ -282,10 +299,14 @@ int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t *params, stmpe811_eve
 
     if (gpio_is_valid(dev->params.int_pin)) {
         DEBUG("[stmpe811] init: configuring touchscreen interrupt\n");
-        gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_FALLING, cb, arg);
+        if (cb) {
+            gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_FALLING, cb, arg);
+        }
 
         /* Enable touchscreen interrupt */
-        ret += _write_reg(dev, STMPE811_INT_EN, STMPE811_INT_EN_TOUCH_DET);
+        ret += _write_reg(dev, STMPE811_INT_EN,
+                          STMPE811_INT_EN_TOUCH_DET |
+                          (STMPE811_FIFO_THRESHOLD_ENABLED ? STMPE811_INT_EN_FIFO_TH : 0));
 
         /* Enable global interrupt */
         ret += _write_reg(dev, STMPE811_INT_CTRL,
@@ -339,6 +360,14 @@ int stmpe811_read_touch_position(stmpe811_t *dev, stmpe811_touch_position_t *pos
     }
 #endif
 
+    /* Reset the FIFO, otherwise new touch data will be processed with a delay
+     * if the rate of calling this function to read the FIFO is slower than
+     * the rate at which the FIFO is filled. The reason for this is that with
+     * each call of this function only the oldest touch data is read
+     * value by value from the FIFO. Gestures, for example, can't be
+     * implemented with such a behavior. */
+    _reset_fifo(dev);
+
     /* Release device bus */
     _release(dev);
 
@@ -354,8 +383,21 @@ int stmpe811_read_touch_position(stmpe811_t *dev, stmpe811_touch_position_t *pos
     /* Y value second correction */
     tmp_y /= 11;
 
+    /* maximum values in device coordinates */
+    uint16_t tmp_xmax;
+    uint16_t tmp_ymax;
+
+    if (dev->params.xyconv & STMPE811_SWAP_XY) {
+        tmp_xmax = dev->params.ymax;
+        tmp_ymax = dev->params.xmax;
+    }
+    else {
+        tmp_xmax = dev->params.xmax;
+        tmp_ymax = dev->params.ymax;
+    }
+
     /* clamp y position */
-    if (tmp_y > dev->params.ymax) {
+    if (tmp_y > tmp_ymax) {
         tmp_y = dev->prev_y;
     }
 
@@ -371,14 +413,30 @@ int stmpe811_read_touch_position(stmpe811_t *dev, stmpe811_touch_position_t *pos
     tmp_x /= 15;
 
     /* clamp x position */
-    if (tmp_x > dev->params.xmax) {
+    if (tmp_x > tmp_xmax) {
         tmp_x = dev->prev_x;
     }
 
     dev->prev_x = tmp_x;
     dev->prev_y = tmp_y;
-    position->x = tmp_x;
-    position->y = tmp_y;
+
+    /* conversion to screen coordinates */
+    if (dev->params.xyconv & STMPE811_SWAP_XY) {
+        position->x = tmp_y;
+        position->y = tmp_x;
+    }
+    else {
+        position->x = tmp_x;
+        position->y = tmp_y;
+    }
+    if (dev->params.xyconv & STMPE811_MIRROR_X) {
+        assert(position->x <= dev->params.xmax);
+        position->x = dev->params.xmax - position->x;
+    }
+    if (dev->params.xyconv & STMPE811_MIRROR_Y) {
+        assert(position->y <= dev->params.ymax);
+        position->y = dev->params.ymax - position->y;
+    }
 
     return 0;
 }

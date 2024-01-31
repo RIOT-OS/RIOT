@@ -22,6 +22,11 @@ config HAS_ARCH_32BIT
     help
         Indicates that the CPU has a 32-bits architecture.
 
+config HAS_ARCH_64BIT
+    bool
+    help
+        Indicates that the CPU has a 64-bits architecture.
+
 config HAS_ARCH_ARM
     bool
     help
@@ -134,6 +139,11 @@ config HAS_CPU_CHECK_ADDRESS
     help
         Indicates that address validity check is supported.
 
+config HAS_PERIPH_CRYPTOCELL_310
+    bool
+    help
+        Indicates that a cryptocell peripheral is present.
+
 config HAS_DBGPIN
     bool
     help
@@ -183,10 +193,20 @@ config HAS_PERIPH_ADC
     help
         Indicates that an ADC peripheral is present.
 
+config HAS_PERIPH_ADC_CONTINUOUS
+    bool
+    help
+        Indicates that an ADC peripheral can be left on between measurements.
+
 config HAS_PERIPH_CAN
     bool
     help
         Indicates that a CAN peripheral is present.
+
+config HAS_PERIPH_CIPHER_AES_128_CBC
+    bool
+    help
+        Indicates that there is AES 128 CBC hardware acceleration present
 
 config HAS_PERIPH_CORETIMER
     bool
@@ -207,6 +227,21 @@ config HAS_PERIPH_DMA
     bool
     help
         Indicates that a DMA peripheral is present.
+
+config HAS_PERIPH_ECC_P192R1
+    bool
+    help
+        Indicates that there is ECC P192R1 hardware acceleration peripheral present.
+
+config HAS_PERIPH_ECC_P256R1
+    bool
+    help
+        Indicates that there is ECC P256R1 hardware acceleration peripheral present.
+
+config HAS_PERIPH_ECC_ED25519
+    bool
+    help
+        Indicates that there is ECC Edwards25519 hardware acceleration peripheral present.
 
 config HAS_PERIPH_EEPROM
     bool
@@ -232,6 +267,11 @@ config HAS_PERIPH_FLASHPAGE_RWEE
     bool
     help
         Indicates that the Flashpage peripheral is of the Read While Write.
+
+config HAS_PERIPH_FREQM
+    bool
+    help
+        Indicates that a Frequency Meter peripheral is present.
 
 config HAS_PERIPH_GPIO
     bool
@@ -284,6 +324,36 @@ config HAS_PERIPH_GPIO_LL_IRQ_UNMASK
     help
         Indicates that the GPIO peripheral supports unmasking interrupts without
         clearing pending IRQs that came in while masked.
+
+config HAS_PERIPH_HASH_MD5
+    bool
+    help
+        Indicates that there is MD5 hardware acceleration present.
+
+config HAS_PERIPH_HASH_SHA_1
+    bool
+    help
+        Indicates that there is SHA-1 hardware acceleration present.
+
+config HAS_PERIPH_HASH_SHA_224
+    bool
+    help
+        Indicates that there is SHA-224 hardware acceleration present.
+
+config HAS_PERIPH_HASH_SHA_256
+    bool
+    help
+        Indicates that there is SHA-256 hardware acceleration present.
+
+config HAS_PERIPH_HASH_SHA_512
+    bool
+    help
+        Indicates that there is SHA-512 hardware acceleration present.
+
+config HAS_PERIPH_HMAC_SHA_256
+    bool
+    help
+        Indicates that there is HMAC SHA-256 hardware acceleration present.
 
 config HAS_PERIPH_HWRNG
     bool
@@ -415,6 +485,62 @@ config HAS_PERIPH_RTT_OVERFLOW
     help
         Indicates that the RTT provides an overflow callback.
 
+config HAS_PERIPH_SDMMC
+    bool
+    help
+        Indicates that an SDIO/SD/MMC peripheral is present and used by the
+        board. This feature shall be provided by the board configuration,
+        if available.
+
+config HAS_PERIPH_SDMMC_8BIT
+    bool
+    help
+        Indicates that the SDIO/SD/MMC peripheral supports the 8-bit bus width
+        and at least one component of the board is connected with 8 data lines.
+        This feature shall be provided by the board configuration, if available.
+
+config HAS_PERIPH_SDMMC_AUTO_CLK
+    bool
+    help
+        Indicates that the SDIO/SD/MMC peripheral supports the Auto-CLK
+        feature, i.e. the automatic activation and deactivation of the SD CLK
+        signal when required. This feature shall be provided by the MCU
+        if supported.
+
+config HAS_PERIPH_SDMMC_AUTO_CMD12
+    bool
+    help
+        Indicates that the SDIO/SD/MMC peripheral supports the Auto-CMD12
+        feature, i.e. CMD12 is sent automatically to stop the transmission in
+        multiple block operations. This feature shall be provided by the MCU
+        if supported.
+
+config HAS_PERIPH_SDMMC_CLK
+    bool
+    help
+        Indicates that the SDIO/SD/MMC peripheral has special clock
+        functionality used by the peripheral driver.
+
+config HAS_PERIPH_SDMMC_HS
+    bool
+    help
+        Indicates that the SDIO/SD/MMC peripheral supports the high speed
+        access, that is 50 MHz for SD and 52 MHz for MMC. This feature shall be
+        provided by the MCU.
+
+config HAS_PERIPH_SDMMC_MMC
+    bool
+    help
+        Indicates that the SDIO/SD/MMC peripheral supports MMC/eMMCs. This
+        feature shall be provided by the MCU.
+
+config HAS_PERIPH_SDMMC_SDHC
+    bool
+    help
+        Indicates that the SDIO/SD/MMC peripheral is compliant with the
+        SD Host Controller Specification. This feature shall
+        be provided by the MCU.
+
 config HAS_PERIPH_SPI
     bool
     help
@@ -451,6 +577,17 @@ config HAS_PERIPH_TIMER_PERIODIC
         Indicates that the Timer peripheral provides the periodic timeout
         functionality.
 
+config HAS_PERIPH_TIMER_POLL
+    bool
+    help
+        Indicates that the Timer peripheral supports the timer_poll_channel
+        function.
+
+config HAS_PERIPH_TIMER_QUERY_FREQS
+    bool
+    help
+        Indicates that the driver of the timer supports iterating over supported frequencies.
+
 config HAS_PERIPH_UART
     bool
     help
@@ -470,6 +607,11 @@ config HAS_PERIPH_UART_MODECFG
     bool
     help
         Indicates that the UART peripheral allows mode configuration.
+
+config HAS_PERIPH_UART_TX_ONDEMAND
+    bool
+    help
+        Indicates that the UART peripheral can enable the TX line on demmand.
 
 config HAS_PERIPH_UART_NONBLOCKING
     bool

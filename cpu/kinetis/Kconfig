@@ -11,6 +11,7 @@ config CPU_COMMON_KINETIS
     select HAS_PERIPH_GPIO
     select HAS_PERIPH_GPIO_IRQ
     select HAS_PERIPH_PM
+    select HAS_PERIPH_TIMER_QUERY_FREQS
 
     # enable kinetis periph drivers if available
     imply MODULE_PERIPH_ICS

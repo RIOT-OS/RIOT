@@ -3,9 +3,9 @@ BOARD_INSUFFICIENT_MEMORY := \
     b-l072z-lrwan1 \
     blackpill-stm32f103c8 \
     blackpill-stm32f103cb \
+    bluepill-stm32f030c8 \
     bluepill-stm32f103c8 \
     bluepill-stm32f103cb \
-    bluepill-stm32f030c8 \
     calliope-mini \
     cc1350-launchpad \
     cc2650-launchpad \
@@ -48,6 +48,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     saml11-xpro \
     seeedstudio-gd32 \
     sipeed-longan-nano \
+    sipeed-longan-nano-tft \
     slstk3400a \
     spark-core \
     stk3200 \

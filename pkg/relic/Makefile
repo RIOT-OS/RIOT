@@ -15,6 +15,11 @@ CFLAGS += -Wno-unused-function -Wno-old-style-definition -Wno-unused-parameter \
           -Wno-pedantic -Wno-array-parameter -Wno-unused-but-set-variable \
           -Wno-stringop-overflow
 
+ifeq (llvm,$(TOOLCHAIN))
+  CFLAGS += $(GCC_C_INCLUDES)
+  CXXFLAGS += $(GCC_CXX_INCLUDES)
+endif
+
 TOOLCHAIN_FILE = $(PKG_SOURCE_DIR)/xcompile-toolchain.cmake
 
 all: $(BINDIR)/$(PKG_NAME).a

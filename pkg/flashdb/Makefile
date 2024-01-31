@@ -1,7 +1,7 @@
 PKG_NAME=flashdb
 PKG_URL=https://github.com/armink/FlashDB.git
-# 1.1.2
-PKG_VERSION=7062902a3e7b6b8a7e8f5886ae242271a0164e05
+# 2.1.0 + patches
+PKG_VERSION=0594fdc95700745ee8b26f43a9a28f3dba8407bb
 PKG_LICENSE=Apache-2.0
 
 include $(RIOTBASE)/pkg/pkg.mk
@@ -9,6 +9,7 @@ include $(RIOTBASE)/pkg/pkg.mk
 CFLAGS += -Wno-pedantic
 CFLAGS += -Wno-cast-align
 CFLAGS += -Wno-unused
+CFLAGS += -Wno-unused-parameter
 CFLAGS += -Wno-format
 
 .PHONY: flashdb_fal

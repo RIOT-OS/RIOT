@@ -46,6 +46,15 @@ else ifneq (,$(filter esp32c3 esp32s3,$(CPU_FAM)))
   FEATURES_PROVIDED += esp_ble_esp32c3
 endif
 
+ifneq (,$(filter esp32 esp32s3,$(CPU_FAM)))
+  FEATURES_PROVIDED += periph_sdmmc_auto_clk
+  FEATURES_PROVIDED += periph_sdmmc_auto_cmd12
+  FEATURES_PROVIDED += periph_sdmmc_mmc
+  ifeq (esp32s3,$(CPU_FAM))
+    FEATURES_PROVIDED += periph_sdmmc_hs
+  endif
+endif
+
 ifneq (,$(filter esp32-wrover% esp32s2%r2 esp32s3%r2 esp32s3%r8 esp32s3%r8v,$(CPU_MODEL)))
   FEATURES_PROVIDED += esp_spi_ram
   ifneq (,$(filter esp32s3%r8 esp32s3%r8v,$(CPU_MODEL)))

@@ -13,6 +13,12 @@ ifeq (, $(UNIT_TESTS))
   endif
 endif
 
+ifeq (llvm,$(TOOLCHAIN))
+  # the floating point exception bug is more likely to trigger when build
+  # with LLVM, so we just disable LLVM on native as a work around
+  TEST_ON_CI_BLACKLIST += native
+endif
+
 DISABLE_MODULE += auto_init auto_init_%
 
 # boards using stdio via CDC ACM require auto_init to automatically

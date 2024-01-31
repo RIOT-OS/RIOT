@@ -37,6 +37,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     sensebox_samd21 \
     serpente \
     sipeed-longan-nano \
+    sipeed-longan-nano-tft \
     slstk3400a \
     sodaq-autonomo \
     sodaq-explorer \

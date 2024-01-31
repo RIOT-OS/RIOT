@@ -62,9 +62,13 @@ extern "C" {
 
 /**
  * @brief   Stack size used for the pktdump thread
+ *
+ * @note    The message queue was previously allocated on the stack.
+ *          The default number of messages is 2³.
+ *          Given sizeof(msg_t) == 8, the stack size is reduced by 64 bytes.
  */
 #ifndef GNRC_PKTDUMP_STACKSIZE
-#define GNRC_PKTDUMP_STACKSIZE          (THREAD_STACKSIZE_MAIN)
+#define GNRC_PKTDUMP_STACKSIZE          ((THREAD_STACKSIZE_MAIN) - 64)
 #endif
 
 /**

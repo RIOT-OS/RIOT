@@ -120,7 +120,7 @@ static int cc1xxx_adpt_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 
     /* get the payload size and the dst address details */
     size = gnrc_pkt_len(pkt->next);
-    DEBUG("[cc1xxx-gnrc] send: payload of packet is %i\n", (int)size);
+    DEBUG("[cc1xxx-gnrc] send: payload of packet is %" PRIuSIZE "\n", size);
     netif_hdr = (gnrc_netif_hdr_t *)pkt->data;
 
     l2hdr.src_addr = cc1xxx_dev->addr;

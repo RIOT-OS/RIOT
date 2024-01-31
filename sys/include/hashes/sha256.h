@@ -128,11 +128,10 @@ static inline void sha256_final(sha256_context_t *ctx, void *digest)
  *
  * @param[in] data   pointer to the buffer to generate hash from
  * @param[in] len    length of the buffer
- * @param[out] digest optional pointer to an array for the result, length must
+ * @param[out] digest Pointer to an array for the result, length must
  *                    be SHA256_DIGEST_LENGTH
- *                    if digest == NULL, one static buffer is used
  */
-void *sha256(const void *data, size_t len, void *digest);
+void sha256(const void *data, size_t len, void *digest);
 
 /**
  * @brief hmac_sha256_init HMAC SHA-256 calculation. Initiate calculation of a HMAC
@@ -153,9 +152,7 @@ void hmac_sha256_update(hmac_context_t *ctx, const void *data, size_t len);
 /**
  * @brief hmac_sha256_final HMAC SHA-256 finalization. Finish HMAC calculation and export the value
  * @param[in] ctx hmac_context_t handle to use
- * @param[out] digest the computed hmac-sha256,
- *             length MUST be SHA256_DIGEST_LENGTH
- *             if digest == NULL, a static buffer is used
+ * @param[out] digest the computed hmac-sha256, length MUST be SHA256_DIGEST_LENGTH
  */
 void hmac_sha256_final(hmac_context_t *ctx, void *digest);
 
@@ -168,11 +165,8 @@ void hmac_sha256_final(hmac_context_t *ctx, void *digest);
  * @param[in] len the length of the message in bytes
  * @param[out] digest the computed hmac-sha256,
  *             length MUST be SHA256_DIGEST_LENGTH
- *             if digest == NULL, a static buffer is used
- * @returns pointer to the resulting digest.
- *          if result == NULL the pointer points to the static buffer
  */
-const void *hmac_sha256(const void *key, size_t key_length,
+void hmac_sha256(const void *key, size_t key_length,
                         const void *data, size_t len, void *digest);
 
 /**

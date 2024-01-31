@@ -82,6 +82,13 @@ extern "C" {
 #define SDCARD_SPI_PARAM_MISO        GPIO_PIN(0, 20)
 /** @} */
 
+/**
+ * @name MTD configuration
+ * @{
+ */
+#define MTD_0 mtd_dev_get(0)          /**< MTD device for the SD Card */
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

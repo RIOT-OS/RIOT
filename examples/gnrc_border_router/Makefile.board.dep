@@ -10,8 +10,6 @@ ifeq (,$(filter native,$(BOARD)))
       ifneq (ble, $(DOWNLINK))
         USEMODULE += esp_now
       endif
-    else
-      $(error Only esp32 and esp8266 are currently supported)
     endif
   endif
   ifeq (ble, $(DOWNLINK))

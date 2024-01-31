@@ -8,7 +8,7 @@
 config PACKAGE_JERRYSCRIPT
     bool "Ultra-lightweight Javascript interpreter"
     depends on TEST_KCONFIG
-    depends on HAS_ARCH_32BIT
+    depends on HAS_ARCH_32BIT || HAS_ARCH_64BIT
 
     select MODULE_JERRYSCRIPT-PORT-DEFAULT
     select MODULE_JERRYSCRIPT-EXT

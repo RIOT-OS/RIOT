@@ -35,7 +35,13 @@
 #define CONFIG_CLOCK_HXTAL      MHZ(8)      /**< HXTAL frequency */
 #endif
 
-#define SPI_DEV_1_USED              /**< Enable SPI_DEV(1) for the connected flash */
+#ifndef SPI_DEV_1_USED
+#define SPI_DEV_1_USED          1   /**< Enable SPI_DEV(1) by default for the connected Flash */
+#endif
+
+#ifndef I2C_DEV_1_USED
+#define I2C_DEV_1_USED          1   /**< Enable I2C_DEV(1) by default */
+#endif
 
 #include "periph_cpu.h"
 #include "periph_common_conf.h"

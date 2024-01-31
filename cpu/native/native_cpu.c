@@ -156,7 +156,8 @@ void isr_cpu_switch_context_exit(void)
     ucontext_t *ctx;
 
     DEBUG("isr_cpu_switch_context_exit\n");
-    if ((sched_context_switch_request == 1) || (thread_get_active() == NULL)) {
+    if (((sched_context_switch_request == 1) || (thread_get_active() == NULL))
+        && IS_USED(MODULE_CORE_THREAD)) {
         sched_run();
     }
 
@@ -210,7 +211,11 @@ void isr_thread_yield(void)
         native_irq_handler();
     }
 
+    if (!IS_USED(MODULE_CORE_THREAD)) {
+        return;
+    }
     sched_run();
+
     /* Use intermediate cast to uintptr_t to silence -Wcast-align.
      * stacks are manually word aligned in thread_static_init() */
     ucontext_t *ctx = (ucontext_t *)(uintptr_t)(thread_get_active()->sp);

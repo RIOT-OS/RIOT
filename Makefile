@@ -34,12 +34,19 @@ welcome:
 	@echo "Welcome to RIOT - The friendly OS for IoT!"
 	@echo ""
 	@echo "You executed 'make' from the base directory."
-	@echo "You should run 'make' in your application's directory instead."
+	@echo "Usually, you should run 'make' in your application's directory instead."
 	@echo ""
 	@echo "Please see our Quick Start Guide at:"
 	@echo "    https://doc.riot-os.org/getting-started.html"
 	@echo "You can ask questions or discuss with other users on our forum:"
 	@echo "    https://forum.riot-os.org"
+	@echo ""
+	@echo "Available targets for the RIOT base directory include:"
+	@echo " generate-{board,driver,example,module,pkg,test}"
+	@echo " info-{applications,boards,emulated-boards} info-applications-supported-boards"
+	@echo " print-versions"
+	@echo " clean distclean pkg-clean"
+	@echo " doc doc-{man,latex}"
 
 print-versions:
 	@./dist/tools/ci/print_toolchain_versions.sh

@@ -90,6 +90,9 @@ static int _format(vfs_mount_t *mountp)
 
     /* make sure the volume has been initialized */
     if (_init(mountp)) {
+#if !CONFIG_FATFS_FORMAT_ALLOC_STATIC
+        free(work);
+#endif
         return -EINVAL;
     }
 

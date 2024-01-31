@@ -41,7 +41,7 @@
 #include "cib.h"
 #include "net/netdev.h"
 #include "periph/uart.h"
-#include "tsrb.h"
+#include "chunked_ringbuffer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,8 +57,6 @@ extern "C" {
  *
  * Reduce this value if your expected traffic does not include full IPv6 MTU
  * sized packets.
- *
- * @pre Needs to be power of two and `<= INT_MAX`
  */
 #ifdef CONFIG_SLIPDEV_BUFSIZE_EXP
 #define CONFIG_SLIPDEV_BUFSIZE (1<<CONFIG_SLIPDEV_BUFSIZE_EXP)
@@ -84,9 +82,17 @@ enum {
      */
     SLIPDEV_STATE_NET,
     /**
+     * @brief   Device writes handles data as network device, next byte is escaped
+     */
+    SLIPDEV_STATE_NET_ESC,
+    /**
      * @brief   Device writes received data to stdin
      */
     SLIPDEV_STATE_STDIN,
+    /**
+     * @brief   Device writes received data to stdin, next byte is escaped
+     */
+    SLIPDEV_STATE_STDIN_ESC,
     /**
      * @brief   Device is in standby, will wake up when sending data
      */
@@ -114,15 +120,18 @@ typedef struct {
 typedef struct {
     netdev_t netdev;                        /**< parent class */
     slipdev_params_t config;                /**< configuration parameters */
-    tsrb_t inbuf;                           /**< RX buffer */
+    chunk_ringbuf_t rb;                     /**< Ringbuffer to store received frames.       */
+                                            /* Written to from interrupts (with irq_disable */
+                                            /* to prevent any simultaneous writes),         */
+                                            /* consumed exclusively in the network stack's  */
+                                            /* loop at _isr.                                */
+
     uint8_t rxmem[CONFIG_SLIPDEV_BUFSIZE];  /**< memory used by RX buffer */
     /**
      * @brief   Device state
      * @see     [Device state definitions](@ref drivers_slipdev_states)
      */
     uint8_t state;
-    uint8_t rx_queued;                      /**< pkt queued in inbuf */
-    uint8_t rx_done;                        /**< pkt processed */
 } slipdev_t;
 
 /**

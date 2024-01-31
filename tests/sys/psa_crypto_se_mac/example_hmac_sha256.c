@@ -1,0 +1,1 @@
+../../../examples/psa_crypto/example_hmac_sha256.c

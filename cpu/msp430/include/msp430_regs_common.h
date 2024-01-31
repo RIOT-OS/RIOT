@@ -57,13 +57,16 @@ extern "C" {
  * @name    Timer Input Divider Values
  *
  * @details The vendor header macros are again non-obvious in their naming, so
- *          provide better alies names.
+ *          provide better alias names.
  * @{
  */
 #define TXID_DIV_1      ID_0        /**< Input Divider: Divide by 1 */
 #define TXID_DIV_2      ID_1        /**< Input Divider: Divide by 2 */
 #define TXID_DIV_4      ID_2        /**< Input Divider: Divide by 4 */
-#define TXID_DIV_8      ID_3        /**< Input Divider: Divide by 4 */
+#define TXID_DIV_8      ID_3        /**< Input Divider: Divide by 8 */
+#define TXID_DIV_Msk    ID_3        /**< Mask to get the TXID field */
+#define TXID_DIV_Pos    6U          /**< Position of the TXID field */
+#define TXID_DIV_MAX    3           /**< Maximum configuration value in the TXID field */
 /** @} */
 
 /**
@@ -87,46 +90,39 @@ typedef struct {
     REG8    IN;         /**< input data */
     REG8    OD;         /**< output data */
     REG8    DIR;        /**< pin direction */
-} msp_port_t;
+} msp430_port_t;
 
 /**
  * @brief   GPIO Port 1/2 (with interrupt functionality)
  */
 typedef struct {
-    msp_port_t base;    /**< common GPIO port registers */
+    msp430_port_t base; /**< common GPIO port registers */
     REG8    IFG;        /**< interrupt flag */
     REG8    IES;        /**< interrupt edge select */
     REG8    IE;         /**< interrupt enable */
     REG8    SEL;        /**< alternative function select */
-} msp_port_p1_p2_t;
+} msp430_port_p1_p2_t;
 
 /**
  * @brief   GPIO Port 3..6 (without interrupt functionality)
  */
 typedef struct {
-    msp_port_t base;    /**< common GPIO port registers */
+    msp430_port_t base; /**< common GPIO port registers */
     REG8    SEL;        /**< alternative function select */
-} msp_port_p3_p6_t;
-
-
-/**
- * @brief   Timer interrupt status registers
- */
-typedef struct {
-    REG16   TBIV;       /**< TIMER_A interrupt status */
-    REG16   reserved[7];    /**< reserved */
-    REG16   TAIV;       /**< TIMER_B interrupt status */
-} msp_timer_ivec_t;
+} msp430_port_p3_p6_t;
 
 /**
- * @brief   Timer module registers
+ * @brief   Timer peripheral registers
+ *
+ * @note    The TIMER_A timer only has 3 CC channels instead of the 8 channels
+ *          the TIMER_B has, the memory layout is the same nonetheless.
  */
 typedef struct {
     REG16   CTL;        /**< timer control */
     REG16   CCTL[7];    /**< capture compare channel control */
     REG16   R;          /**< current counter value */
     REG16   CCR[7];     /**< capture compare channel values */
-} msp_timer_t;
+} msp430_timer_t;
 
 /**
  * @name    MSP430 Common Peripheral Register Maps
@@ -138,42 +134,55 @@ typedef struct {
 /**
  * @brief   Register map of GPIO PORT 1
  */
-extern msp_port_p1_p2_t PORT_1;
+extern msp430_port_p1_p2_t PORT_1;
 /**
  * @brief   Register map of GPIO PORT 2
  */
-extern msp_port_p1_p2_t PORT_2;
+extern msp430_port_p1_p2_t PORT_2;
 /**
  * @brief   Register map of GPIO PORT 3
  */
-extern msp_port_p3_p6_t PORT_3;
+extern msp430_port_p3_p6_t PORT_3;
 /**
  * @brief   Register map of GPIO PORT 4
  */
-extern msp_port_p3_p6_t PORT_4;
+extern msp430_port_p3_p6_t PORT_4;
 /**
  * @brief   Register map of GPIO PORT 5
  */
-extern msp_port_p3_p6_t PORT_5;
+extern msp430_port_p3_p6_t PORT_5;
 /**
  * @brief   Register map of GPIO PORT 6
  */
-extern msp_port_p3_p6_t PORT_6;
-
-/**
- * @brief   Register map of the timer interrupt control registers
- */
-extern msp_timer_ivec_t TIMER_IVEC;
+extern msp430_port_p3_p6_t PORT_6;
 
 /**
  * @brief   Register map of the timer A control registers
  */
-extern msp_timer_t TIMER_A;
+extern msp430_timer_t TIMER_A;
+
+/**
+ * @brief   IRQ flags for TIMER_A
+ *
+ * Called TAIV in the data sheet / vendor files. This shallow alias
+ * makes the name more readable and does impedance matching for the type
+ * (`volatile uint16_t` vs `volatile short`).
+ */
+extern REG16 TIMER_A_IRQFLAGS;
+
+/**
+ * @brief   IRQ flags for TIMER_B
+ *
+ * Called TBIV in the data sheet / vendor files. This shallow alias
+ * makes the name more readable and does impedance matching for the type
+ * (`volatile uint16_t` vs `volatile short`).
+ */
+extern REG16 TIMER_B_IRQFLAGS;
 
 /**
  * @brief   Register map of the timer B control registers
  */
-extern msp_timer_t TIMER_B;
+extern msp430_timer_t TIMER_B;
 /** @} */
 
 #ifdef __cplusplus

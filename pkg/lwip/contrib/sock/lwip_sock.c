@@ -616,7 +616,7 @@ ssize_t lwip_sock_sendv(struct netconn *conn, const iolist_t *snips,
     struct netconn *tmp;
     struct netbuf *buf = NULL;
     size_t payload_len = 0;
-    int res;
+    ssize_t res;
     err_t err= ERR_OK;
     u16_t remote_port = 0;
 

@@ -26,6 +26,7 @@
 #include <fcntl.h>
 #include <errno.h>
 
+#include "architecture.h"
 #include "fs/constfs.h"
 #include "vfs.h"
 
@@ -187,7 +188,7 @@ static int constfs_open(vfs_file_t *filp, const char *name, int flags, mode_t mo
 static ssize_t constfs_read(vfs_file_t *filp, void *dest, size_t nbytes)
 {
     constfs_file_t *fp = filp->private_data.ptr;
-    DEBUG("constfs_read: %p, %p, %lu\n", (void *)filp, dest, (unsigned long)nbytes);
+    DEBUG("constfs_read: %p, %p, %" PRIuSIZE "\n", (void *)filp, dest, nbytes);
     if ((size_t)filp->pos >= fp->size) {
         /* Current offset is at or beyond end of file */
         return 0;
@@ -197,7 +198,7 @@ static ssize_t constfs_read(vfs_file_t *filp, void *dest, size_t nbytes)
         nbytes = fp->size - filp->pos;
     }
     memcpy(dest, (const uint8_t *)fp->data + filp->pos, nbytes);
-    DEBUG("constfs_read: read %lu bytes\n", (long unsigned)nbytes);
+    DEBUG("constfs_read: read %" PRIuSIZE " bytes\n", nbytes);
     filp->pos += nbytes;
     return nbytes;
 }

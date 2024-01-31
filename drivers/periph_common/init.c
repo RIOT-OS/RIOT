@@ -57,6 +57,9 @@
 #ifdef MODULE_PERIPH_INIT_PIO
 #include "periph/pio.h"
 #endif
+#ifdef MODULE_PERIPH_INIT_SDMMC
+#include "sdmmc/sdmmc.h"
+#endif
 #endif /* MODULE_PERIPH_INIT */
 
 void periph_init(void)
@@ -117,6 +120,11 @@ void periph_init(void)
     ptp_init();
 #endif
 
+#if defined(MODULE_PERIPH_INIT_FMC)
+    extern void fmc_init(void);
+    fmc_init();
+#endif
+
 #if defined(MODULE_PERIPH_INIT_VBAT)
     vbat_init();
 #endif
@@ -131,6 +139,12 @@ void periph_init(void)
     }
 #endif
     pio_start_programs();
+#endif
+
+#if defined(MODULE_PERIPH_INIT_SDMMC)
+    for (unsigned i = 0; i < SDMMC_NUMOF; i++) {
+        sdmmc_init(sdmmc_get_dev(i));
+    }
 #endif
 
 #endif /* MODULE_PERIPH_INIT */

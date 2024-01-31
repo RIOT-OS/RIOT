@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_common
+ * @ingroup     boards_common_esp32x
  * @brief       Board definitions that are common for all ESP32x boards.
  *
  * This file contains board configurations that are valid for all ESP32.
@@ -33,10 +33,6 @@
 
 #include "periph/gpio.h"
 #include "sdkconfig.h"
-
-#if MODULE_MTD
-#include "mtd.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -103,19 +99,32 @@ extern "C" {
 #define SPI_FLASH_DRIVE_START  0
 #endif
 
-/** Default MTD drive definition */
-#define MTD_0 mtd0
+#define MTD_0 mtd_dev_get(0)          /**< MTD device for the internal Flash */
 
-/** Pointer to the default MTD drive structure */
-extern mtd_dev_t *mtd0;
+#if MODULE_MTD_SDCARD_DEFAULT || DOXYGEN
+#define MTD_1 mtd_dev_get(1)          /**< MTD device for the SD Card */
+#elif MODULE_MTD_SDMMC_DEFAULT
+#define MTD_1 mtd_dev_get(1)          /**< MTD device for the SD/MMC Card */
+#endif /* MODULE_MTD_SDCARD_DEFAULT || DOXYGEN */
 
 /**
- * @brief   MTD offset for SD Card interfaces
+ * @brief   Default MTD offset for SPI SD Card interfaces
  *
- * MTD_1 is used for SD Card.
+ * mtd1 is used for SPI SD Cards by default if module `mtd_sdcard_default`
+ * is used.
  */
 #ifndef CONFIG_SDCARD_GENERIC_MTD_OFFSET
 #define CONFIG_SDCARD_GENERIC_MTD_OFFSET    1
+#endif
+
+/**
+ * @brief   Default MTD offset for SD/MMC interfaces
+ *
+ * mtd1 is used for SD/MMCs by default if module `mtd_sdmmc_default`
+ * is used.
+ */
+#ifndef CONFIG_SDMMC_GENERIC_MTD_OFFSET
+#define CONFIG_SDMMC_GENERIC_MTD_OFFSET    1
 #endif
 
 /** @} */

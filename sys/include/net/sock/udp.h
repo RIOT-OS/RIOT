@@ -295,7 +295,7 @@ typedef struct _sock_tl_ep sock_udp_ep_t;   /**< An end point for a UDP sock obj
 /**
  * @brief   Type for a UDP sock object
  *
- * @note    API implementors: `struct sock_udp` needs to be defined by
+ * @note    API implementers: `struct sock_udp` needs to be defined by
  *         implementation-specific `sock_types.h`.
  */
 typedef struct sock_udp sock_udp_t;
@@ -332,6 +332,14 @@ typedef struct {
      */
     int16_t rssi;
 #endif /* MODULE_SOCK_AUX_RSSI */
+#if defined(MODULE_SOCK_AUX_TTL) || defined(DOXYGEN)
+    /**
+     * @brief   TTL value of the received frame
+     *
+     * @see SOCK_AUX_GET_TTL
+     */
+    uint8_t ttl;
+#endif /* MODULE_SOCK_AUX_TTL */
     sock_aux_flags_t flags; /**< Flags used request information */
 } sock_udp_aux_rx_t;
 

@@ -44,8 +44,8 @@ static const dwc2_usb_otg_fshs_config_t dwc2_usb_otg_fshs_config[] = {
         .type     = DWC2_USB_OTG_FS,
         .phy      = DWC2_USB_OTG_PHY_BUILTIN,
         .rcu_mask = RCU_AHBEN_USBFSEN_Msk,
-        .bus      = AHB,
         .irqn     = USBFS_IRQn,
+        .bus      = AHB,
     }
 };
 

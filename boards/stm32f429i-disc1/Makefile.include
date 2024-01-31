@@ -8,3 +8,6 @@ OPENOCD_DEBUG_ADAPTER ?= stlink
 
 # openocd programmer is supported
 PROGRAMMERS_SUPPORTED += openocd
+
+FMC_RAM_ADDR=0xd0000000
+FMC_RAM_LEN=8192K

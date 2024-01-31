@@ -103,7 +103,7 @@ static int write(i2c_t dev, uint16_t addr, const void *data, int len,
         }
     }
 
-    return len;
+    return 0;
 }
 
 void i2c_init(i2c_t dev)
@@ -198,7 +198,7 @@ int i2c_read_bytes(i2c_t dev, uint16_t address, void *data, size_t length,
     while (i2c(dev)->EVENTS_STOPPED == 0) {}
     NRF_PPI->CHENCLR = (1 << i2c_config[dev].ppi);
 
-    return length;
+    return 0;
 }
 
 int i2c_read_regs(i2c_t dev, uint16_t address, uint16_t reg,

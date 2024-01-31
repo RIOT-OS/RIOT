@@ -46,7 +46,7 @@ void condition_variable::notify_one() noexcept {
       other_prio = other_thread->priority;
       sched_set_status(other_thread, STATUS_PENDING);
     }
-    head->data = -1u;
+    head->data = PRIORITY_QUEUE_DATA_SIGNALING;
   }
   irq_restore(old_state);
   if (other_prio >= 0) {
@@ -69,7 +69,7 @@ void condition_variable::notify_all() noexcept {
       other_prio = max_prio(other_prio, other_thread->priority);
       sched_set_status(other_thread, STATUS_PENDING);
     }
-    head->data = -1u;
+    head->data = PRIORITY_QUEUE_DATA_SIGNALING;
   }
   irq_restore(old_state);
   if (other_prio >= 0) {
@@ -87,8 +87,8 @@ void condition_variable::wait(unique_lock<mutex>& lock) noexcept {
   priority_queue_add(&m_queue, &n);
   irq_restore(old_state);
   mutex_unlock_and_sleep(lock.mutex()->native_handle());
-  if (n.data != -1u) {
-    // on signaling n.data is set to -1u
+  if (n.data != PRIORITY_QUEUE_DATA_SIGNALING) {
+    // on signaling n.data is set to PRIORITY_QUEUE_DATA_SIGNALING
     // if it isn't set, then the wakeup is either spurious or a timer wakeup
     old_state = irq_disable();
     priority_queue_remove(&m_queue, &n);

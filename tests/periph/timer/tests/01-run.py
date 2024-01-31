@@ -11,13 +11,10 @@ from testrunner import run
 
 
 def testfunc(child):
-    child.expect(r'Available timers: (\d+)\r\n')
-    timers_num = int(child.match.group(1))
-    for timer in range(timers_num):
-        child.expect_exact('Testing TIMER_{}'.format(timer))
-        child.expect_exact('TIMER_{}: initialization successful'.format(timer))
-        child.expect_exact('TIMER_{}: stopped'.format(timer))
-        child.expect_exact('TIMER_{}: starting'.format(timer))
+    # Make sure the expected application is actually flashed
+    child.expect('Test for peripheral TIMERs')
+    # The C application carefully evaluates the test results, no need to
+    # re-implement that wheel in python and just check for the test to succeed
     child.expect('TEST SUCCEEDED')
 
 

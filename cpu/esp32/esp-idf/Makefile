@@ -36,12 +36,20 @@ ifneq (,$(filter esp_idf_heap,$(USEMODULE)))
   DIRS += heap
 endif
 
+ifneq (,$(filter esp_idf_lcd,$(USEMODULE)))
+  DIRS += lcd
+endif
+
 ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
   DIRS += nvs_flash
 endif
 
 ifneq (,$(filter esp_idf_rmt,$(USEMODULE)))
   DIRS += rmt
+endif
+
+ifneq (,$(filter esp_idf_sdmmc,$(USEMODULE)))
+  DIRS += sdmmc
 endif
 
 ifneq (,$(filter esp_idf_spi_flash,$(USEMODULE)))

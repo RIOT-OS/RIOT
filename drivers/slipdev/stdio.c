@@ -39,35 +39,27 @@ void stdio_init(void)
     /* intentionally overwritten in netdev init so we have stdio before
      * the network device is initialized is initialized */
     uart_init(slipdev_params[0].uart, slipdev_params[0].baudrate,
-              (uart_rx_cb_t)_isrpipe_write, &slipdev_stdio_isrpipe);
+              _isrpipe_write, &slipdev_stdio_isrpipe);
 }
 
 ssize_t stdio_read(void *buffer, size_t len)
 {
     uint8_t *ptr = buffer;
-    bool escaped = false;
-    uint8_t byte;
 
-    do {
-        int read = isrpipe_read(&slipdev_stdio_isrpipe, &byte, 1);
-        int tmp;
+    while (len) {
+        int read = isrpipe_read(&slipdev_stdio_isrpipe, ptr, 1);
 
         if (read == 0) {
             continue;
         }
-        else if (len == 0) {
-            return -ENOBUFS;
+
+        if (*ptr == 0) {
+            break;
         }
-        tmp = slipdev_unstuff_readbyte(ptr, byte, &escaped);
-        ptr += tmp;
-        if ((unsigned)(ptr - (uint8_t *)buffer) > len) {
-            while (byte != SLIPDEV_END) {
-                /* clear out unreceived packet */
-                isrpipe_read(&slipdev_stdio_isrpipe, &byte, 1);
-            }
-            return -ENOBUFS;
-        }
-    } while (byte != SLIPDEV_END);
+
+        ++ptr;
+        --len;
+    }
     return ptr - (uint8_t *)buffer;
 }
 

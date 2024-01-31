@@ -35,9 +35,9 @@ int main(void)
     msg_init_queue(msg_queue, QUEUE_SIZE);
     msg_queue_print();
 
-    for (int i = 0; i < QUEUE_SIZE; i++) {
+    for (uintptr_t i = 0; i < QUEUE_SIZE; i++) {
         messages[i].type = i;
-        messages[i].content.value = i;
+        messages[i].content.ptr = (void *) i;
         msg_send_to_self(&messages[i]);
     }
 

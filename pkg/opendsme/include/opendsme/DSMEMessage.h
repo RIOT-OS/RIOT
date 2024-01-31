@@ -69,7 +69,7 @@ public:
     /**
      * @brief check whether the message has payload
      */
-    bool hasPayload()
+    bool hasPayload() override
     {
         return this->pkt != NULL && this->pkt->size > 0;
     }
@@ -93,7 +93,7 @@ public:
     /**
      * @brief get the total number of symbols in current frame
      */
-    uint16_t getTotalSymbols()
+    uint16_t getTotalSymbols() override
     {
         DSME_ASSERT(pkt);
         /* Hardcoded to O-QPSK */
@@ -116,7 +116,7 @@ public:
     /**
      * @brief get IEEE 802.15.4 header
      */
-    IEEE802154eMACHeader& getHeader()
+    IEEE802154eMACHeader& getHeader() override
     {
         return macHdr;
     }

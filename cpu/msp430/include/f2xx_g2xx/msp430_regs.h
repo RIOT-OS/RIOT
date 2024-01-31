@@ -47,7 +47,7 @@ typedef struct {
     REG8    STAT;       /**< status register */
     REG8    RXBUF;      /**< receive buffer */
     REG8    TXBUF;      /**< transmit buffer */
-} msp_usci_a_t;
+} msp430_usci_a_t;
 
 /**
  * @brief   Universal Serial Control Interface Type B (USCI_B) Registers
@@ -61,7 +61,7 @@ typedef struct {
     REG8    STAT;       /**< status register */
     REG8    RXBUF;      /**< receive buffer */
     REG8    TXBUF;      /**< transmit buffer */
-} msp_usci_b_t;
+} msp430_usci_b_t;
 
 /**
  * @name    USCI clock selection
@@ -111,10 +111,10 @@ typedef struct {
  * | USCI A | ✔     | ✔     | ✗     | ✔     |
  * | USCI B | ✗     | ✔     | ✔     | ✗     |
  */
-static inline msp_usci_b_t * msp430_usci_b_from_usci_a(msp_usci_a_t *usci_a)
+static inline msp430_usci_b_t * msp430_usci_b_from_usci_a(msp430_usci_a_t *usci_a)
 {
-    uintptr_t usci_b = (uintptr_t)usci_a + offsetof(msp_usci_a_t, CTL0);
-    return (msp_usci_b_t *)usci_b;
+    uintptr_t usci_b = (uintptr_t)usci_a + offsetof(msp430_usci_a_t, CTL0);
+    return (msp430_usci_b_t *)usci_b;
 }
 
 /**
@@ -126,25 +126,25 @@ static inline msp_usci_b_t * msp430_usci_b_from_usci_a(msp_usci_a_t *usci_a)
  *
  * @details Provided by linker
  */
-extern msp_usci_a_t USCI_A0;
+extern msp430_usci_a_t USCI_A0;
 /**
  * @brief   USCI_A1 register map
  *
  * @details Provided by linker
  */
-extern msp_usci_a_t USCI_A1;
+extern msp430_usci_a_t USCI_A1;
 /**
  * @brief   USCI_B0 register map
  *
  * @details Provided by linker
  */
-extern msp_usci_a_t USCI_B0;
+extern msp430_usci_a_t USCI_B0;
 /**
  * @brief   USCI_B1 register map
  *
  * @details Provided by linker
  */
-extern msp_usci_a_t USCI_B1;
+extern msp430_usci_a_t USCI_B1;
 /** @} */
 
 #ifdef __cplusplus

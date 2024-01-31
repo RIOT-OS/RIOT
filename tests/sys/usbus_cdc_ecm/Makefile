@@ -12,6 +12,7 @@ USEMODULE += ps
 ifeq (,$(filter stdio_%,$(filter-out stdio_cdc_acm,$(USEMODULE))))
   BOARD_BLACKLIST += \
     sipeed-longan-nano \
+    sipeed-longan-nano-tft \
     seeedstudio-gd32 \
     stm32f4discovery \
     weact-f401cc \

@@ -106,7 +106,7 @@ static int dtls_handle_read(dtls_context_t *ctx)
 
     if (res <= 0) {
         if ((ENABLE_DEBUG) && (res != -EAGAIN) && (res != -ETIMEDOUT)) {
-            DEBUG("sock_udp_recv unexpected code error: %i\n", (int)res);
+            DEBUG("sock_udp_recv unexpected code error: %" PRIiSIZE "\n", res);
         }
         return 0;
     }

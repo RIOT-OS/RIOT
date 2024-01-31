@@ -9,3 +9,7 @@ endif
 
 # This package is a header only package, so there's nothing to build
 PSEUDOMODULES += flatbuffers
+
+# LLVM requires an upgrade of flatbuffers, but this breaks pkg/tflite-micro.
+# Until this is resolved, LLVM is blacklisted
+TOOLCHAINS_BLACKLIST += llvm

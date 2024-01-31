@@ -214,7 +214,7 @@ static void _on_sock_dtls_evt(sock_dtls_t *sock, sock_async_flags_t type, void *
                             _listen_buf, sizeof(_listen_buf),
                             CONFIG_GCOAP_DTLS_HANDSHAKE_TIMEOUT_MSEC);
         if (res != -SOCK_DTLS_HANDSHAKE) {
-            DEBUG("gcoap: could not establish DTLS session: %zd\n", res);
+            DEBUG("gcoap: could not establish DTLS session: %" PRIdSIZE "\n", res);
             sock_dtls_session_destroy(sock, &socket.ctx_dtls_session);
             return;
         }
@@ -277,7 +277,7 @@ static void _on_sock_dtls_evt(sock_dtls_t *sock, sock_async_flags_t type, void *
         ssize_t res = sock_dtls_recv(sock, &socket.ctx_dtls_session, _listen_buf,
                                     sizeof(_listen_buf), 0);
         if (res <= 0) {
-            DEBUG("gcoap: DTLS recv failure: %d\n", (int)res);
+            DEBUG("gcoap: DTLS recv failure: %" PRIdSIZE "\n", res);
             return;
         }
         sock_udp_ep_t ep;
@@ -331,7 +331,7 @@ static void _on_sock_udp_evt(sock_udp_t *sock, sock_async_flags_t type, void *ar
         while (true) {
             ssize_t res = sock_udp_recv_buf_aux(sock, &stackbuf, &buf_ctx, 0, &remote, &aux_in);
             if (res < 0) {
-                DEBUG("gcoap: udp recv failure: %d\n", (int)res);
+                DEBUG("gcoap: udp recv failure: %" PRIdSIZE "\n", res);
                 return;
             }
             if (res == 0) {
@@ -387,7 +387,7 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_
 
     ssize_t res = coap_parse(&pdu, buf, len);
     if (res < 0) {
-        DEBUG("gcoap: parse failure: %d\n", (int)res);
+        DEBUG("gcoap: parse failure: %" PRIdSIZE "\n", res);
         /* If a response, can't clear memo, but it will timeout later.
          *
          * There are *some* error cases in which we could continue (eg. all
@@ -446,7 +446,7 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_
             if (pdu_len > 0) {
                 ssize_t bytes = _tl_send(sock, _listen_buf, pdu_len, remote, aux);
                 if (bytes <= 0) {
-                    DEBUG("gcoap: send response failed: %d\n", (int)bytes);
+                    DEBUG("gcoap: send response failed: %" PRIdSIZE "\n", bytes);
                 }
             }
         }
@@ -539,7 +539,7 @@ static void _process_coap_pdu(gcoap_socket_t *sock, sock_udp_ep_t *remote, sock_
 
         ssize_t bytes = _tl_send(sock, buf, sizeof(coap_hdr_t), remote, aux);
         if (bytes <= 0) {
-            DEBUG("gcoap: empty response failed: %d\n", (int)bytes);
+            DEBUG("gcoap: empty response failed: %" PRIdSIZE "\n", bytes);
         }
     }
 }
@@ -576,7 +576,7 @@ static void _on_resp_timeout(void *arg) {
         ssize_t bytes = _tl_send(&memo->socket, memo->msg.data.pdu_buf,
                                  memo->msg.data.pdu_len, &memo->remote_ep, NULL);
         if (bytes <= 0) {
-            DEBUG("gcoap: sock resend failed: %d\n", (int)bytes);
+            DEBUG("gcoap: sock resend failed: %" PRIdSIZE "\n", bytes);
             _expire_request(memo);
         }
     }
@@ -1180,7 +1180,7 @@ static void _cache_process(gcoap_request_memo_t *memo,
 #if IS_USED(MODULE_NANOCOAP_CACHE)
     nanocoap_cache_entry_t *ce;
     /* cache_key in memo is pre-processor guarded so we need to as well */
-    if ((ce = nanocoap_cache_process(memo->cache_key, coap_get_code(&req), pdu, pdu_len))) {
+    if ((ce = nanocoap_cache_process(memo->cache_key, coap_get_code_raw(&req), pdu, pdu_len))) {
         ce->truncated = (memo->state == GCOAP_MEMO_RESP_TRUNC);
     }
 #else
@@ -1288,7 +1288,7 @@ static bool _cache_lookup(gcoap_request_memo_t *memo,
         _update_memo_cache_key(memo, cache_key);
         /* cache hit, methods are equal, and cache entry is not stale */
         if (*ce &&
-            ((*ce)->request_method == coap_get_code(pdu)) &&
+            ((*ce)->request_method == coap_get_code_raw(pdu)) &&
             !nanocoap_cache_entry_is_stale(*ce, now)) {
             return true;
         }
@@ -1310,7 +1310,7 @@ static ssize_t _cache_check(const uint8_t *buf, size_t len,
     ssize_t res = coap_parse(&req, (uint8_t *)buf, len);
 
     if (res < 0) {
-        DEBUG("gcoap: parse failure for cache lookup: %d\n", (int)res);
+        DEBUG("gcoap: parse failure for cache lookup: %" PRIdSIZE "\n", res);
         return -EINVAL;
     }
     if (coap_get_code_class(&req) != COAP_CLASS_REQ) {
@@ -1331,8 +1331,21 @@ static ssize_t _cache_check(const uint8_t *buf, size_t len,
         if ((resp_etag_len > 0) && ((size_t)resp_etag_len <= COAP_ETAG_LENGTH_MAX)) {
             uint8_t *tmp_etag;
             ssize_t tmp_etag_len = coap_opt_get_opaque(&req, COAP_OPT_ETAG, &tmp_etag);
-
             if (tmp_etag_len >= resp_etag_len) {
+                /* peak length without padding */
+                size_t rem_len = (len - (tmp_etag + tmp_etag_len - buf));
+
+                if ((tmp_etag < buf) || (tmp_etag > (buf + len)) ||
+                    (rem_len > (len - ((tmp_etag + COAP_ETAG_LENGTH_MAX) - buf)))) {
+                    DEBUG("gcoap: invalid calculated padding length (%lu) for ETag injection "
+                          "during cache lookup.\n", (long unsigned)rem_len);
+                    /* something fishy happened in the request. Better don't return cache entry */
+                    *cache_hit = false;
+#if IS_USED(MODULE_NANOCOAP_CACHE)
+                    memset(memo->cache_key, 0, sizeof(memo->cache_key));
+#endif
+                    return -EINVAL;
+                }
                 memcpy(tmp_etag, resp_etag, resp_etag_len);
                 /* shorten ETag option if necessary */
                 if ((size_t)resp_etag_len < COAP_ETAG_LENGTH_MAX) {
@@ -1345,7 +1358,6 @@ static ssize_t _cache_check(const uint8_t *buf, size_t len,
                      * bitmask resp_etag_len */
                     *start |= (uint8_t)resp_etag_len;
                     /* remove padding */
-                    size_t rem_len = (len - (tmp_etag + COAP_ETAG_LENGTH_MAX - buf));
                     memmove(tmp_etag + resp_etag_len, tmp_etag + COAP_ETAG_LENGTH_MAX, rem_len);
                     len -= (COAP_ETAG_LENGTH_MAX - resp_etag_len);
                 }
@@ -1612,10 +1624,18 @@ ssize_t gcoap_req_send_tl(const uint8_t *buf, size_t len,
                 event_timeout_clear(&memo->resp_evt_tmout);
             }
             memo->state = GCOAP_MEMO_UNUSED;
-        }
-        DEBUG("gcoap: sock send failed: %d\n", (int)res);
+    }
+        DEBUG("gcoap: sock send failed: %" PRIdSIZE "\n", res);
     }
     return ((res > 0 || res == -ENOTCONN) ? res : 0);
+}
+
+static void _add_generated_observe_option(coap_pkt_t *pdu)
+{
+        /* generate initial notification value */
+        uint32_t now       = ztimer_now(ZTIMER_MSEC);
+        pdu->observe_value = (now >> GCOAP_OBS_TICK_EXPONENT) & 0xFFFFFF;
+        coap_opt_add_uint(pdu, COAP_OPT_OBSERVE, pdu->observe_value);
 }
 
 int gcoap_resp_init(coap_pkt_t *pdu, uint8_t *buf, size_t len, unsigned code)
@@ -1632,10 +1652,7 @@ int gcoap_resp_init(coap_pkt_t *pdu, uint8_t *buf, size_t len, unsigned code)
     pdu->payload_len = len - header_len;
 
     if (coap_get_observe(pdu) == COAP_OBS_REGISTER) {
-        /* generate initial notification value */
-        uint32_t now       = ztimer_now(ZTIMER_USEC);
-        pdu->observe_value = (now >> GCOAP_OBS_TICK_EXPONENT) & 0xFFFFFF;
-        coap_opt_add_uint(pdu, COAP_OPT_OBSERVE, pdu->observe_value);
+        _add_generated_observe_option(pdu);
     }
 
     return 0;
@@ -1660,9 +1677,7 @@ int gcoap_obs_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     if (hdrlen > 0) {
         coap_pkt_init(pdu, buf, len, hdrlen);
 
-        uint32_t now       = ztimer_now(ZTIMER_USEC);
-        pdu->observe_value = (now >> GCOAP_OBS_TICK_EXPONENT) & 0xFFFFFF;
-        coap_opt_add_uint(pdu, COAP_OPT_OBSERVE, pdu->observe_value);
+        _add_generated_observe_option(pdu);
 
         return GCOAP_OBS_INIT_OK;
     }

@@ -94,7 +94,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
     DEBUG("acquire\n");
 
-    pm_block(3);
+    pm_block(4); /* Require clkPer */
     mutex_lock(&locks[bus]);
     pm_periph_enable(spi_config[bus].pwr);
 
@@ -113,7 +113,7 @@ void spi_release(spi_t bus)
     dev(bus)->CTRL &= ~SPI_ENABLE_bm;
     pm_periph_disable(spi_config[bus].pwr);
     mutex_unlock(&locks[bus]);
-    pm_unblock(3);
+    pm_unblock(4);
 
     DEBUG("release\n");
 }

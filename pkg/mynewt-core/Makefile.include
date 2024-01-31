@@ -8,7 +8,7 @@ INCLUDES += -I$(RIOTPKG)/mynewt-core/include \
 DIRS += $(RIOTPKG)/mynewt-core/contrib \
         #
 
-ifneq (,$(filter nrf5%,$(CPU)))
+ifneq (,$(filter nrf51 nrf52,$(CPU)))
   # OS_CPUTIME is set to 32.767 Hz
   CFLAGS += -DMYNEWT_VAL_OS_CPUTIME_FREQ=32768
 else

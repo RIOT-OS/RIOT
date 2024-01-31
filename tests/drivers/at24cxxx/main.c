@@ -113,7 +113,7 @@ int main(void)
     check = at24cxxx_write(&at24cxxx_dev, WRITE_POSITION, expected_write_data,
                          sizeof(expected_write_data));
     if (check != AT24CXXX_OK) {
-        printf("[FAILURE] at24cxxx_write: %d (size = %zu)\n", check,
+        printf("[FAILURE] at24cxxx_write: %d (size = %" PRIuSIZE ")\n", check,
                sizeof(expected_write_data));
         return 1;
     }

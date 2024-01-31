@@ -35,6 +35,7 @@ rsource "bootloader/Kconfig"
 rsource "esp-ble-nimble/Kconfig"
 rsource "esp-idf/Kconfig"
 rsource "esp-idf-api/Kconfig"
+rsource "esp-lcd/Kconfig"
 rsource "periph/Kconfig"
 
 endif

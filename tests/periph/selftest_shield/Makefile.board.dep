@@ -1,0 +1,5 @@
+ifneq (,$(filter periph_i2c,$(FEATURES_USED)))
+  ifneq (,$(filter arduino_i2c,$(FEATURES_USED)))
+    USEMODULE += pcf8574
+  endif
+endif

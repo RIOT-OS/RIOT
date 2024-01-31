@@ -19,6 +19,7 @@
  */
 
 #include <string.h>
+#include "architecture.h"
 #include "bitfield.h"
 #include "coding/xor.h"
 
@@ -107,7 +108,7 @@ static bool _recover_byte(const uint8_t *in, size_t width, uint8_t height,
         /* get index of neighbor byte in transposed matrix */
         size_t idx_in = _transpose_idx(i, height, width);
         if (!bf_isset(bitfield, idx_in / block_size)) {
-            DEBUG("missing chunk %u\n", idx_in / block_size);
+            DEBUG("missing chunk %" PRIuSIZE "\n", idx_in / block_size);
             return false;
         }
         res ^= in[idx_in];
@@ -133,7 +134,7 @@ static bool _recover_blocks(void *data, size_t len, const uint8_t *parity,
             continue;
         }
 
-        DEBUG("try to recover chunk %u / %u\n", i / block_size, num_data_blocks);
+        DEBUG("try to recover chunk %" PRIuSIZE " / %u\n", i / block_size, num_data_blocks);
         for (size_t j = i; j < i + block_size; ++j) {
 
             /* get original byte position */
@@ -142,7 +143,7 @@ static bool _recover_blocks(void *data, size_t len, const uint8_t *parity,
             /* we can only recover the byte if we have the matching parity block */
             size_t parity_block = idx / (CONFIG_CODING_XOR_CHECK_BYTES * block_size);
             if (!bf_isset(bitfield, num_data_blocks + parity_block)) {
-                DEBUG("missing parity block %u\n", parity_block);
+                DEBUG("missing parity block %" PRIuSIZE "\n", parity_block);
                 success = false;
                 goto next_block;
             }
@@ -191,7 +192,7 @@ bool coding_xor_recover(void *data, size_t len, uint8_t *parity,
             continue;
         }
 
-        DEBUG("regenerate parity block %u\n", i);
+        DEBUG("regenerate parity block %" PRIuSIZE "\n", i);
         size_t data_len = block_size * CONFIG_CODING_XOR_CHECK_BYTES;
         _gen_parity((uint8_t *)data + i * data_len,
                               data_len, parity + i * block_size);
