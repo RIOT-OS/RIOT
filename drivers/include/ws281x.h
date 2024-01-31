@@ -64,7 +64,7 @@
  * `spi_clkcnt_N = 16` to obtain a frequency of 2.5 MHz. The size of the SPI
  * buffer can also be a problem if the cpu takes too long to reload it, as
  * on AVR. The ESP 8266 has a 64-byte buffer and takes 5µs to reload, which
- * is an execpt problem if it occurs "between 2 leds" or 24 patterns (8-bit
+ * is a problem unless it occurs "between 2 leds" or 24 patterns (8-bit
  * pattern: 24 - 48; 3-bit pattern: 9 .. 63).
  *
  * ## Native/VT100

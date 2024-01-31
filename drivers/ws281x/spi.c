@@ -42,16 +42,16 @@
 #if (WS281X_SPI_PATTERN_LENGTH == 3)
 /* The LSB of the 2nd byte (always 1) is the MSB of the pattern for bit 2,
  * which is encoded in the 3rd byte, so we will use a 4-bit pattern. */
-#define WS281X_SPI_DATA_0_MASK   (0b00001001) 
+#define WS281X_SPI_DATA_0_MASK   (0b00001001)
 #define WS281X_SPI_DATA_1_MASK   (0b00001101)
 /* 1u01u01u 01u01u01 u01u01u0 */
 #define WS281X_SPI_SHIFTS   {4,1,-2,3,0,5,2,-1}
 #elif (WS281X_SPI_PATTERN_LENGTH == 4)
-#define WS281X_SPI_DATA_0_MASK   (0b00001000) 
+#define WS281X_SPI_DATA_0_MASK   (0b00001000)
 #define WS281X_SPI_DATA_1_MASK   (0b00001110)
 #define WS281X_SPI_SHIFTS   {4,0,4,0,4,0,4,0}
 #elif (WS281X_SPI_PATTERN_LENGTH == 8)
-#define WS281X_SPI_DATA_0_MASK   (0b11000000) 
+#define WS281X_SPI_DATA_0_MASK   (0b11000000)
 #define WS281X_SPI_DATA_1_MASK   (0b11111100)
 #define WS281X_SPI_SHIFTS   {0,0,0,0,0,0,0,0}
 #endif
