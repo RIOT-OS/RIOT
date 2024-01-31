@@ -251,3 +251,8 @@ info-programmers-supported:
 info-rust:
 	cargo version
 	c2rust --version
+	@echo "To use this setup of Rust in an IDE, add these command line arguments to the \`cargo check\` or \`rust-analyzer\`:"
+	@echo "    --target $(RUST_TARGET) --profile $(CARGO_PROFILE)"
+	@echo "and export these environment variables:"
+	@echo "    RIOT_COMPILE_COMMANDS_JSON=\"$(CARGO_COMPILE_COMMANDS)\""
+	@echo "    RIOT_USEMODULE=\"$(USEMODULE)\""
