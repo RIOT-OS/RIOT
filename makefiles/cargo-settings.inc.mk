@@ -29,3 +29,10 @@ CARGO_TARGET_DIR = $(BINDIR)/target
 # are stored in the `release` directory. User-defined profiles are stored in a
 # directory with the same name as the profile".
 CARGO_LIB = $(CARGO_TARGET_DIR)/$(RUST_TARGET)/$(patsubst test,debug,$(patsubst dev,debug,$(patsubst bench,release,${CARGO_PROFILE})))/lib$(APPLICATION_RUST_MODULE).a
+
+# Options passed into all Cargo commands, in particular to the build command.
+#
+# Most of these are populated by RIOT modules that are backed by Rust. Popular
+# options added by the user are `-Zbuild-std=core` (only available on nightly)
+# to apply LTO and profile configuration to the core library.
+CARGO_OPTIONS ?= 
