@@ -1,0 +1,6 @@
+/**
+ * @defgroup        cpu_gd32e23x   GD32E23X
+ * @ingroup         cpu
+ * @brief           GigaDevice GD32 Cortex-M23 Microcontrollers
+ *
+ */

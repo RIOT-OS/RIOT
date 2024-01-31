@@ -1,0 +1,6 @@
+/**
+ * @defgroup        cpu_gd32f3x0   GD32F3X0
+ * @ingroup         cpu
+ * @brief           GigaDevice GD32 Cortex-M4 Microcontrollers
+ *
+ */

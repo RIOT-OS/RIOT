@@ -18,7 +18,6 @@
 #define CPU_H
 
 #include "cpu_conf.h"
-#include "cpu_common.h"
 
 #ifdef __cplusplus
 extern "C" {

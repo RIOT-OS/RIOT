@@ -1,0 +1,16 @@
+# Copyright (C) 2023 BISSELL Homecare, Inc.
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_PERIPH
+    bool
+    default y
+
+#config PM_EWUP_USED
+#    bool "Use PA0/WKUP pin"
+#    depends on MODULE_PM_LAYERED
+#    help
+#        If enabled, the PA0/WKUP pin can be used to wake up the MCU from standby mode.

@@ -1,0 +1,25 @@
+# Copyright (c) 2023 BISSELL Homecare, Inc.
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "gd32f310c-eval" if BOARD_GD32F310C_EVAL
+
+config BOARD_GD32F310C_EVAL
+    bool
+    default y
+    select CPU_MODEL_GD32F310C
+
+    select HAS_PERIPH_ADC
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_PWM
+    #select HAS_PERIPH_RTC
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_TIMER
+    select HAS_PERIPH_UART
+    select HAVE_SAUL_GPIO
+
+#config FORCE_USB_STDIO
+    #default y

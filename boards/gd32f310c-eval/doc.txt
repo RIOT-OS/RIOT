@@ -1,0 +1,18 @@
+/**
+ * @defgroup    boards_gd32f310c-eval GD32F310C-EVAL
+ * @ingroup     boards
+ * @brief       Support for the GD32F310C-EVAL board.
+ *
+ * ### General information
+ *
+ * Some general information about the board
+ *
+ * ### Pinout
+ *
+ * A detailed description of the board pinout (if available)
+ *
+ * ### Flash the board
+ *
+ * Some notes about how to flash the board
+ *
+ */

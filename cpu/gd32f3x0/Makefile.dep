@@ -1,0 +1,14 @@
+USEMODULE += periph
+
+ifneq (,$(filter periph_pm,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_wdt
+endif
+
+ifneq (,$(filter periph_i2c,$(USEMODULE)))
+  USEMODULE += ztimer_usec
+endif
+
+USEMODULE += ztimer_usec
+USEMODULE += ztimer_msec
+
+include $(RIOTCPU)/cortexm_common/Makefile.dep

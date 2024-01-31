@@ -1,0 +1,18 @@
+/**
+ * @defgroup    boards_gd32vf103v-eval GD32VF103V-EVAL
+ * @ingroup     boards
+ * @brief       Support for the GD32VF103V-EVAL board.
+ *
+ * ### General information
+ *
+ * Some general information about the board
+ *
+ * ### Pinout
+ *
+ * A detailed description of the board pinout (if available)
+ *
+ * ### Flash the board
+ *
+ * Some notes about how to flash the board
+ *
+ */
