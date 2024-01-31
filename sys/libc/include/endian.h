@@ -69,10 +69,26 @@ uint64_t le64toh(uint64_t little_endian_64bits);/**< little endian to host, 64 b
 
 #else /* DOXYGEN */
 
-#define LITTLE_ENDIAN   1234
-#define BIG_ENDIAN      4321
-#define PDP_ENDIAN      3412
-#define BYTE_ORDER      __BYTE_ORDER__
+/* Depending on the version of newlib used, newlib may provide them indirectly
+ * as well. We don't want to redefine them in this case */
+#ifndef LITTLE_ENDIAN
+#  define LITTLE_ENDIAN 1234
+#endif
+#ifndef BIG_ENDIAN
+#  define BIG_ENDIAN    4321
+#endif
+#ifndef PDP_ENDIAN
+#  define PDP_ENDIAN    3412
+#endif
+#ifndef BYTE_ORDER
+#  define BYTE_ORDER    __BYTE_ORDER__
+#endif
+
+/* But to avoid lots of pain in the ass: Let's at least make sure everyone
+ * agrees on what magic number is what */
+#if (LITTLE_ENDIAN != 1234) || (BIG_ENDIAN != 4321) || (PDP_ENDIAN != 3412)
+#  error "Mismatching magic numbers to refer to endianness"
+#endif
 
 #if BYTE_ORDER == LITTLE_ENDIAN
 #  define htobe16(_x) __builtin_bswap16(_x)
