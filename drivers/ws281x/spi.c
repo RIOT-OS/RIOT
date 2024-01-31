@@ -56,13 +56,6 @@
 #define WS281X_SPI_SHIFTS   {0,0,0,0,0,0,0,0}
 #endif
 
-static struct {
-    spi_t dev;
-    spi_mode_t mode;
-    spi_clk_t clk;
-    spi_cs_t cs;
-} spiconf;
-
 static uint8_t spi_buf[WS281X_PARAM_NUMOF * WS281X_BYTES_PER_DEVICE * WS281X_SPI_PATTERN_LENGTH];
 
 int ws281x_init(ws281x_t *dev, const ws281x_params_t *params)
@@ -74,24 +67,19 @@ int ws281x_init(ws281x_t *dev, const ws281x_params_t *params)
     memset(dev, 0, sizeof(ws281x_t));
     dev->params = *params;
 
-    spiconf.dev = SPI_DEV(WS281X_SPI_DEV);
-    spiconf.mode = SPI_MODE_0;      /* any */
-    spiconf.clk = WS281X_SPI_CLK;
-    spiconf.cs = SPI_HWCS(0);       /* any */
-
     return 0;
 }
 
 void ws281x_prepare_transmission(ws281x_t *dev)
 {
     (void)dev;
-    spi_acquire(spiconf.dev, spiconf.cs, spiconf.mode, spiconf.clk);
+    spi_acquire(SPI_DEV(WS281X_SPI_DEV), SPI_CS_UNDEF, SPI_MODE_0, WS281X_SPI_CLK);
 }
 
 void ws281x_end_transmission(ws281x_t *dev)
 {
     (void)dev;
-    spi_release(spiconf.dev);
+    spi_release(SPI_DEV(WS281X_SPI_DEV));
     xtimer_usleep(WS281X_T_END_US);
 }
 
@@ -123,5 +111,5 @@ void ws281x_write_buffer(ws281x_t *dev, const void *_buf, size_t size)
        }
     }
 
-    spi_transfer_bytes(spiconf.dev, spiconf.cs, false, spi_buf, NULL, sizeof(spi_buf));
+    spi_transfer_bytes(SPI_DEV(WS281X_SPI_DEV), SPI_CS_UNDEF, false, spi_buf, NULL, sizeof(spi_buf));
 }
