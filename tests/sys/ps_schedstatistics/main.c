@@ -36,9 +36,9 @@ static kernel_pid_t pids[NB_THREADS];
 
 static void *_thread_fn(void *arg)
 {
-    int next = ((int)arg + 1) % NB_THREADS;
+    int next = ((uintptr_t)arg + 1) % NB_THREADS;
 
-    printf("Creating thread #%d, next=%d\n", (int)arg, next);
+    printf("Creating thread #%" PRIuPTR ", next=%d\n", (uintptr_t)arg, next);
 
     while (1) {
         msg_t m1, m2;
@@ -59,7 +59,7 @@ int main(void)
 {
     test_utils_interactive_sync();
 
-    for (unsigned i = 0; i < NB_THREADS; ++i) {
+    for (uintptr_t i = 0; i < NB_THREADS; ++i) {
         pids[i] = thread_create(stacks[i], sizeof(stacks[i]),
                                 THREAD_PRIORITY_MAIN - 1,
                                 THREAD_CREATE_STACKTEST,

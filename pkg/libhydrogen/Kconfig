@@ -9,4 +9,4 @@ config PACKAGE_LIBHYDROGEN
     bool "LibHydrogen Crypto Library package"
     depends on TEST_KCONFIG
     depends on MODULE_RANDOM
-    depends on HAS_ARCH_32BIT
+    depends on HAS_ARCH_32BIT || HAS_ARCH_64BIT

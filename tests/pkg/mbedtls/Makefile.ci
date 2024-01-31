@@ -4,6 +4,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-uno \
     atmega328p \
     atmega328p-xplained-mini \
+    atmega8 \
     nucleo-f302r8 \
     nucleo-f303k8 \
     nucleo-f303re \

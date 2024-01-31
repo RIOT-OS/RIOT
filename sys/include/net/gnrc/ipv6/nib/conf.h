@@ -35,12 +35,6 @@ extern "C" {
 #ifndef CONFIG_GNRC_IPV6_NIB_6LBR
 #define CONFIG_GNRC_IPV6_NIB_6LBR                     1
 #endif
-#ifndef CONFIG_GNRC_IPV6_NIB_SLAAC
-#define CONFIG_GNRC_IPV6_NIB_SLAAC                    1
-#endif
-#ifndef CONFIG_GNRC_IPV6_NIB_QUEUE_PKT
-#define CONFIG_GNRC_IPV6_NIB_QUEUE_PKT                1
-#endif
 #ifndef CONFIG_GNRC_IPV6_NIB_NUMOF
 #define CONFIG_GNRC_IPV6_NIB_NUMOF                   (16)
 #endif
@@ -50,20 +44,20 @@ extern "C" {
 #ifndef CONFIG_GNRC_IPV6_NIB_6LR
 #define CONFIG_GNRC_IPV6_NIB_6LR                      1
 #endif
-#ifndef CONFIG_GNRC_IPV6_NIB_SLAAC
-#define CONFIG_GNRC_IPV6_NIB_SLAAC                    0
-#endif
 #endif
 
 #ifdef MODULE_GNRC_IPV6_NIB_6LN
 #ifndef CONFIG_GNRC_IPV6_NIB_6LN
 #define CONFIG_GNRC_IPV6_NIB_6LN                      1
 #endif
-#ifndef CONFIG_GNRC_IPV6_NIB_SLAAC
-#define CONFIG_GNRC_IPV6_NIB_SLAAC                    0
-#endif
+
+/* We are only a 6lo node with no 'classic' IPv6 interface */
+#ifndef MODULE_GNRC_IPV6_CLASSIC
 #ifndef CONFIG_GNRC_IPV6_NIB_QUEUE_PKT
 #define CONFIG_GNRC_IPV6_NIB_QUEUE_PKT                0
+#endif
+#ifndef CONFIG_GNRC_IPV6_NIB_SLAAC
+#define CONFIG_GNRC_IPV6_NIB_SLAAC                    0
 #endif
 #if !CONFIG_GNRC_IPV6_NIB_6LR
 # ifndef CONFIG_GNRC_IPV6_NIB_ARSM
@@ -73,6 +67,7 @@ extern "C" {
 /* only needs to store default router */
 # define CONFIG_GNRC_IPV6_NIB_NUMOF                  (1)
 # endif
+#endif
 #endif
 #endif
 
@@ -130,17 +125,10 @@ extern "C" {
 #endif
 
 /**
- * @brief    (de-)activate router advertising at interface start-up
+ * @brief    activate router advertising at interface start-up
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_ADV_ROUTER
-#if CONFIG_GNRC_IPV6_NIB_ROUTER && \
-    (!CONFIG_GNRC_IPV6_NIB_6LR || CONFIG_GNRC_IPV6_NIB_6LBR) && \
-    !(IS_USED(MODULE_DHCPV6_CLIENT_IA_PD) || IS_USED(MODULE_GNRC_UHCPC) || \
-      IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS) || IS_USED(MODULE_GNRC_IPV6_STATIC_ADDR))
-#define CONFIG_GNRC_IPV6_NIB_ADV_ROUTER               1
-#else
 #define CONFIG_GNRC_IPV6_NIB_ADV_ROUTER               0
-#endif
 #endif
 
 /**
@@ -185,11 +173,7 @@ extern "C" {
  * @brief    queue packets for address resolution
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_QUEUE_PKT
-#if CONFIG_GNRC_IPV6_NIB_6LN
-#define CONFIG_GNRC_IPV6_NIB_QUEUE_PKT                0
-#else
 #define CONFIG_GNRC_IPV6_NIB_QUEUE_PKT                1
-#endif
 #endif
 
 /**

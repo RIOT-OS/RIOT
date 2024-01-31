@@ -20,6 +20,7 @@
 #if __has_include("eui_provider_params.h")
 #include "eui_provider_params.h"
 #endif
+#include "board.h"
 #include "net/eui_provider.h"
 
 #ifdef __cplusplus

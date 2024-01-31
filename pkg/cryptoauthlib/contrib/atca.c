@@ -27,7 +27,6 @@
 #include "atca.h"
 #include "atca_params.h"
 
-
 /* Timer functions */
 void atca_delay_us(uint32_t delay)
 {
@@ -65,7 +64,7 @@ ATCA_STATUS hal_i2c_post_init(ATCAIface iface)
 
 ATCA_STATUS hal_i2c_send(ATCAIface iface, uint8_t word_address, uint8_t *txdata, int txlength)
 {
-    (void) word_address;
+    (void)word_address;
     ATCAIfaceCfg *cfg = atgetifacecfg(iface);
     int ret;
 
@@ -84,7 +83,7 @@ ATCA_STATUS hal_i2c_send(ATCAIface iface, uint8_t word_address, uint8_t *txdata,
 ATCA_STATUS hal_i2c_receive(ATCAIface iface, uint8_t word_address, uint8_t *rxdata,
                             uint16_t *rxlength)
 {
-    (void) word_address;
+    (void)word_address;
     ATCAIfaceCfg *cfg = atgetifacecfg(iface);
     uint8_t retries = cfg->rx_retries;
     int ret = -1;
@@ -170,24 +169,24 @@ ATCA_STATUS hal_i2c_sleep(ATCAIface iface)
     return ATCA_SUCCESS;
 }
 
-ATCA_STATUS hal_i2c_control(ATCAIface iface, uint8_t option, void* param, size_t paramlen)
+ATCA_STATUS hal_i2c_control(ATCAIface iface, uint8_t option, void *param, size_t paramlen)
 {
-    (void) param;
-    (void) paramlen;
+    (void)param;
+    (void)paramlen;
     switch (option) {
-        case ATCA_HAL_CONTROL_WAKE:
-            return hal_i2c_wake(iface);
-        case ATCA_HAL_CONTROL_IDLE:
-            return hal_i2c_idle(iface);
-        case ATCA_HAL_CONTROL_SLEEP:
-            return hal_i2c_sleep(iface);
-        case ATCA_HAL_CHANGE_BAUD:
-            return ATCA_UNIMPLEMENTED;
-        case ATCA_HAL_CONTROL_SELECT:
-        case ATCA_HAL_CONTROL_DESELECT:
-            return ATCA_SUCCESS;
-        default:
-            return ATCA_BAD_PARAM;
+    case ATCA_HAL_CONTROL_WAKE:
+        return hal_i2c_wake(iface);
+    case ATCA_HAL_CONTROL_IDLE:
+        return hal_i2c_idle(iface);
+    case ATCA_HAL_CONTROL_SLEEP:
+        return hal_i2c_sleep(iface);
+    case ATCA_HAL_CHANGE_BAUD:
+        return ATCA_UNIMPLEMENTED;
+    case ATCA_HAL_CONTROL_SELECT:
+    case ATCA_HAL_CONTROL_DESELECT:
+        return ATCA_SUCCESS;
+    default:
+        return ATCA_BAD_PARAM;
     }
     return ATCA_UNIMPLEMENTED;
 }

@@ -195,8 +195,8 @@ typedef struct {
  * @param[in]   buf         input buffer
  * @param[in]   bufsize     size of @p buf
  *
- * @returns     success code UART_OK on success
- * @returns     error code UART_NODEV or UART_NOBAUD otherwise
+ * @retval     success code UART_OK on success
+ * @retval     error code UART_NODEV or UART_NOBAUD otherwise
  */
 int at_dev_init(at_dev_t *dev, uart_t uart, uint32_t baudrate, char *buf, size_t bufsize);
 
@@ -209,8 +209,8 @@ int at_dev_init(at_dev_t *dev, uart_t uart, uint32_t baudrate, char *buf, size_t
  * @param[in]   command command string to send
  * @param[in]   timeout timeout (in usec)
  *
- * @returns     0 when device answers "OK"
- * @returns     <0 otherwise
+ * @retval      0 when device answers "OK"
+ * @retval     <0 otherwise
  */
 int at_send_cmd_wait_ok(at_dev_t *dev, const char *command, uint32_t timeout);
 
@@ -224,8 +224,8 @@ int at_send_cmd_wait_ok(at_dev_t *dev, const char *command, uint32_t timeout);
  * @param[in]   command command string to send
  * @param[in]   timeout timeout (in usec)
  *
- * @return      0 when prompt is received
- * @return      <0 otherwise
+ * @retval       0 when prompt is received
+ * @retval      <0 otherwise
  */
 int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout);
 
@@ -243,8 +243,8 @@ int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout
  * @param[in]   len         len of @p buffer
  * @param[in]   timeout     timeout (in usec)
  *
- * @returns     length of response on success
- * @returns     <0 on error
+ * @retval      n length of response on success
+ * @retval     <0 on error
  */
 ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command, char *resp_buf, size_t len, uint32_t timeout);
 
@@ -263,8 +263,8 @@ ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command, char *resp_buf,
  * @param[in]   len         len of @p buffer
  * @param[in]   timeout     timeout (in usec)
  *
- * @returns     length of response on success
- * @returns     <0 on error
+ * @retval      n length of response on success
+ * @retval     <0 on error
  */
 ssize_t at_send_cmd_get_resp_wait_ok(at_dev_t *dev, const char *command, const char *resp_prefix,
                                      char *resp_buf, size_t len, uint32_t timeout);
@@ -286,9 +286,9 @@ ssize_t at_send_cmd_get_resp_wait_ok(at_dev_t *dev, const char *command, const c
  * @param[in]   keep_eol    true to keep the CR character in the response
  * @param[in]   timeout     timeout (in usec)
  *
- * @returns     length of response on success
- * @returns     -1 on error
- * @returns     -2 on CMS or CME error
+ * @retval      n length of response on success
+ * @retval     -1 on error
+ * @retval     -2 on CMS or CME error
  */
 ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf,
                               size_t len, bool keep_eol, uint32_t timeout);
@@ -300,10 +300,22 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf
  * @param[in]   bytes   buffer containing bytes to expect (NULL-terminated)
  * @param[in]   timeout timeout (in usec)
  *
- * @returns     0 on success
- * @returns     <0 otherwise
+ * @retval      0 on success
+ * @retval     <0 otherwise
  */
 int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout);
+
+/**
+ * @brief   Repeatedly calls at_expect_bytes() until a match or timeout occurs
+ *
+ * @param[in]   dev     device to operate on
+ * @param[in]   bytes   buffer containing bytes to expect (NULL-terminated)
+ * @param[in]   timeout timeout (in usec)
+ *
+ * @retval      0 on success
+ * @retval     <0 otherwise
+ */
+int at_wait_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout);
 
 /**
  * @brief   Receives bytes into @p bytes buffer until the string pattern
@@ -317,8 +329,8 @@ int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout);
  *                              bytes.
  * @param[in] timeout           timeout (in usec) of inactivity to finish read
  *
- * @returns                     0 on success
- * @returns                     <0 on error
+ * @retval                      0 on success
+ * @retval                     <0 on error
  */
 int at_recv_bytes_until_string(at_dev_t *dev, const char *string,
                                char *bytes, size_t *bytes_len,
@@ -341,7 +353,7 @@ void at_send_bytes(at_dev_t *dev, const char *bytes, size_t len);
  * @param[in]   len     maximum number of bytes to receive
  * @param[in]   timeout timeout (in usec) of inactivity to finish read
  *
- * @returns     Number of bytes read, eventually zero if no bytes available
+ * @retval      n Number of bytes read, eventually zero if no bytes available
  */
 ssize_t at_recv_bytes(at_dev_t *dev, char *bytes, size_t len, uint32_t timeout);
 
@@ -352,8 +364,8 @@ ssize_t at_recv_bytes(at_dev_t *dev, char *bytes, size_t len, uint32_t timeout);
  * @param[in]   command command to send
  * @param[in]   timeout timeout (in usec)
  *
- * @returns     0 on success
- * @returns     <0 otherwise
+ * @retval      0 on success
+ * @retval     <0 otherwise
  */
 int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout);
 
@@ -366,10 +378,25 @@ int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout);
  * @param[in]   keep_eol    true to keep the CR character in the response
  * @param[in]   timeout     timeout (in usec)
  *
- * @returns     line length on success
- * @returns     <0 on error
+ * @retval      n line length on success
+ * @retval     <0 on error
  */
 ssize_t at_readline(at_dev_t *dev, char *resp_buf, size_t len, bool keep_eol, uint32_t timeout);
+
+/**
+ * @brief   Read a line from device, skipping a possibly empty line.
+ *
+ * @param[in]   dev         device to operate on
+ * @param[in]   resp_buf    buffer to store line
+ * @param[in]   len         size of @p resp_buf
+ * @param[in]   keep_eol    true to keep the CR character in the response
+ * @param[in]   timeout     timeout (in usec)
+ *
+ * @retval      n line length on success
+ * @retval     <0 on error
+ */
+ssize_t at_readline_skip_empty(at_dev_t *dev, char *resp_buf, size_t len,
+                               bool keep_eol, uint32_t timeout);
 
 /**
  * @brief   Drain device input buffer

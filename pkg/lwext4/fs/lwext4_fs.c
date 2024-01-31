@@ -94,20 +94,12 @@ static int blockdev_bwrite(struct ext4_blockdev *bdev, const void *buf,
 {
     mtd_dev_t *dev = bdev->bdif->p_user;
 
-    uint32_t page = blk_id * dev->pages_per_sector;
-    uint32_t size = blk_cnt * dev->pages_per_sector * dev->page_size;
-
     assert(blk_id <= UINT32_MAX);
 
-    DEBUG("lwext4: erase %"PRIu32" sectors starting with %"PRIu64"\n", blk_cnt, blk_id);
-    int res = mtd_erase_sector(dev, blk_id, blk_cnt);
-    if (res) {
-        return -res;
-    }
+    DEBUG("lwext4: write %"PRIu32" bytes to sector %"PRIu32"\n",
+          blk_cnt * dev->pages_per_sector * dev->page_size, (uint32_t)blk_id);
 
-    DEBUG("lwext4: write %"PRIu32" bytes to page %"PRIu32"\n", size, page);
-
-    return -mtd_write_page_raw(dev, buf, page, 0, size);
+    return -mtd_write_sector(dev, buf, blk_id, blk_cnt);
 }
 
 static int prepare(lwext4_desc_t *fs, const char *mount_point)
@@ -214,7 +206,6 @@ static int _mount(vfs_mount_t *mountp)
     }
 
     mp->os_locks = &_lwext4_os_lock;
-    mp->mounted = true;
 
     res = ext4_recover(fs->mp.name);
     if (res != EOK && res != ENOTSUP) {
@@ -228,6 +219,7 @@ static int _mount(vfs_mount_t *mountp)
         return -res;
     }
 
+    mp->mounted = true;
     ext4_cache_write_back(fs->mp.name, 1);
 
     return -res;

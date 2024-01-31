@@ -17,11 +17,13 @@ USEMODULE += lvgl_extra_theme_default
 
 USEMODULE += random
 
+include $(RIOTBASE)/Makefile.include
+
 # SDL requires more stack
 ifeq (native,$(BOARD))
   CFLAGS += -DTHREAD_STACKSIZE_MAIN=64*1024
+else ifneq (,$(filter esp%,$(CPU_FAM)))
+  CFLAGS += -DTHREAD_STACKSIZE_MAIN=4*1024
 else
   CFLAGS += -DTHREAD_STACKSIZE_MAIN=2*1024
 endif
-
-include $(RIOTBASE)/Makefile.include

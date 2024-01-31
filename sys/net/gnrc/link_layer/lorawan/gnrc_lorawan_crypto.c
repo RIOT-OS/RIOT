@@ -50,7 +50,7 @@ typedef struct __attribute__((packed)) {
     union {
         uint32_t u8_pad;
         le_uint16_t conf_fcnt;
-    };
+    }__attribute__((packed));
     uint8_t dir;
     le_uint32_t dev_addr;
     le_uint32_t fcnt;

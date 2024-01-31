@@ -1121,7 +1121,7 @@ int setsockopt(int socket, int level, int option_name, const void *option_value,
 #ifdef POSIX_SETSOCKOPT
     socket_t *s;
     struct timeval *tv;
-    const uint32_t max_timeout_secs = UINT32_MAX / (1000 * 1000);
+    const uint32_t max_timeout_secs = UINT32_MAX / US_PER_SEC;
 
     if (level != SOL_SOCKET
     ||  option_name != SO_RCVTIMEO) {
@@ -1144,10 +1144,18 @@ int setsockopt(int socket, int level, int option_name, const void *option_value,
 
     tv = (struct timeval *) option_value;
 
+#if MODULE_AVR8_COMMON
+    /* tv_sec is uint32_t, so never negative */
+    if (tv->tv_usec < 0) {
+        errno = EINVAL;
+        return -1;
+    }
+#else /* ! MODULE_AVR8_COMMON */
     if (tv->tv_sec < 0 || tv->tv_usec < 0) {
         errno = EINVAL;
         return -1;
     }
+#endif /* ! MODULE_AVR8_COMMON */
 
     if ((uint32_t)tv->tv_sec > max_timeout_secs
     || ((uint32_t)tv->tv_sec == max_timeout_secs && (uint32_t)tv->tv_usec > UINT32_MAX - max_timeout_secs * 1000 * 1000)) {

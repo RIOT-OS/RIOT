@@ -5,6 +5,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-uno \
     atmega328p \
     atmega328p-xplained-mini \
+    atmega8 \
     bluepill-stm32f030c8 \
     i-nucleo-lrwan1 \
     mbed_lpc1768 \

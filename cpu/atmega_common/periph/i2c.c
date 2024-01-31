@@ -31,6 +31,7 @@
 #include "cpu.h"
 #include "mutex.h"
 #include "periph/i2c.h"
+#include "periph/pm.h"
 #include "periph_conf.h"
 
 #define ENABLE_DEBUG        0
@@ -226,6 +227,7 @@ void i2c_acquire(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
 
+    pm_block(4); /* Require clkIO */
     mutex_lock(&locks[dev]);
 }
 
@@ -234,6 +236,7 @@ void i2c_release(i2c_t dev)
     assert(dev < I2C_NUMOF);
 
     mutex_unlock(&locks[dev]);
+    pm_unblock(4);
 }
 
 static void i2c_poweron(i2c_t dev)

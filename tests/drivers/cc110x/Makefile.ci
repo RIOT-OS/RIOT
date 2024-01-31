@@ -7,6 +7,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega1284p \
     atmega328p \
     atmega328p-xplained-mini \
+    atmega8 \
     atxmega-a3bu-xplained \
     blackpill-stm32f103c8 \
     bluepill-stm32f030c8 \
@@ -20,8 +21,10 @@ BOARD_INSUFFICIENT_MEMORY := \
     microduino-corerf \
     msb-430 \
     msb-430h \
+    nucleo-f030r8 \
     nucleo-f031k6 \
     nucleo-f042k6 \
+    nucleo-f070rb \
     nucleo-f072rb \
     nucleo-f302r8 \
     nucleo-f303k8 \

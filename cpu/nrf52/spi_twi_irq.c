@@ -57,7 +57,7 @@
 #define SPIM_COUNT 2
 #endif
 
-static spi_twi_irq_cb_t _irq[SPIM_COUNT];
+static shared_irq_cb_t _irq[SPIM_COUNT];
 static void *_irq_arg[SPIM_COUNT];
 
 static mutex_t _locks[SPIM_COUNT];
@@ -123,8 +123,8 @@ static const IRQn_Type _isr[] = {
 #endif /* CPU_MODEL_NRF52840XXAA */
 };
 
-void spi_twi_irq_register_spi(NRF_SPIM_Type *bus,
-                              spi_twi_irq_cb_t cb, void *arg)
+void shared_irq_register_spi(NRF_SPIM_Type *bus,
+                              shared_irq_cb_t cb, void *arg)
 {
     size_t num = _spi_dev2num(bus);
 
@@ -133,8 +133,8 @@ void spi_twi_irq_register_spi(NRF_SPIM_Type *bus,
     NVIC_EnableIRQ(_isr[num]);
 }
 
-void spi_twi_irq_register_i2c(NRF_TWIM_Type *bus,
-                              spi_twi_irq_cb_t cb, void *arg)
+void shared_irq_register_i2c(NRF_TWIM_Type *bus,
+                              shared_irq_cb_t cb, void *arg)
 {
     size_t num = _i2c_dev2num(bus);
 
@@ -145,7 +145,7 @@ void spi_twi_irq_register_i2c(NRF_TWIM_Type *bus,
 }
 
 void nrf5x_i2c_acquire(NRF_TWIM_Type *bus,
-                       spi_twi_irq_cb_t cb, void *arg)
+                       shared_irq_cb_t cb, void *arg)
 {
     size_t num = _i2c_dev2num(bus);
     mutex_lock(&_locks[num]);
@@ -154,7 +154,7 @@ void nrf5x_i2c_acquire(NRF_TWIM_Type *bus,
 }
 
 void nrf5x_spi_acquire(NRF_SPIM_Type *bus,
-                       spi_twi_irq_cb_t cb, void *arg)
+                       shared_irq_cb_t cb, void *arg)
 {
     size_t num = _spi_dev2num(bus);
     mutex_lock(&_locks[num]);

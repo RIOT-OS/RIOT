@@ -324,7 +324,7 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint16_t SEESFULL:1;       /*!< bit:      8  Active SEES Full                   */
     __I uint16_t SEESOVF:1;        /*!< bit:      9  Active SEES Overflow               */
     __I uint16_t SEEWRC:1;         /*!< bit:     10  SEE Write Completed                */
-    __I uint16_t :5;               /*!< bit: 11..15  Reserved                           */
+    uint16_t :5;                   /*!< bit: 11..15  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   uint16_t reg;                /*!< Type      used for register access              */
 } NVMCTRL_INTFLAG_Type;

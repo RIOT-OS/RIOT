@@ -633,7 +633,7 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * If module `l3gxxxx_fifo` is used, the corresponding interrupt sources can
- * be testsed.
+ * be tested.
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
  * l3gxxxx_int_src_t int_src = l3gxxxx_wait_int(&dev);
@@ -1278,7 +1278,7 @@ typedef struct {
                                       for threshold comparison */
 
     bool and_or;       /**< Combination of interrupt events (true=AND, false=OR):<br>
-                            AND - all enabled axes passed their tresholds<br>
+                            AND - all enabled axes passed their thresholds<br>
                             OR - at least one axis passed its threshold */
     bool latch;        /**< Latch the interrupt when true until the interrupt
                             source has been read by function l3gxxxx_wait_int. */

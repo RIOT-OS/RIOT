@@ -43,7 +43,7 @@ typedef struct {
     REG8    BR1;        /**< baud rate control 1 */
     REG8    RXBUF;      /**< receive buffer */
     REG8    TXBUF;      /**< transmit buffer */
-} msp_usart_t;
+} msp430_usart_t;
 
 /**
  * @brief   USART Special Function Registers (SFR)
@@ -62,7 +62,7 @@ typedef struct {
     REG8    IFG;        /**< USART Interrupt Flag Register */
     const uint8_t _pad2;/**< Padding */
     REG8    ME;         /**< Module Enable Register */
-} msp_usart_sfr_t;
+} msp430_usart_sfr_t;
 
 /**
  * @name    USART clock selection
@@ -86,23 +86,23 @@ typedef struct {
 /**
  * @brief   USART 0 SFR register map
  */
-extern msp_usart_sfr_t USART_0_SFR;
+extern msp430_usart_sfr_t USART_0_SFR;
 /**
  * @brief   USART 1 SFR register map
  */
-extern msp_usart_sfr_t USART_1_SFR;
+extern msp430_usart_sfr_t USART_1_SFR;
 /**
  * @brief   USART 0 register map
  *
  * @details The address is provided by the linker script
  */
-extern msp_usart_t USART_0;
+extern msp430_usart_t USART_0;
 /**
  * @brief   USART 1 register map
  *
  * @details The address is provided by the linker script
  */
-extern msp_usart_t USART_1;
+extern msp430_usart_t USART_1;
 /** @} */
 
 #ifdef __cplusplus

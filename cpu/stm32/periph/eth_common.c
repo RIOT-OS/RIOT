@@ -95,7 +95,7 @@ void stm32_eth_common_init(void)
     if (IS_USED(MODULE_STM32_ETH_TRACING)) {
         gpio_ll_init(GPIO_PORT(STM32_ETH_TRACING_IRQ_PORT_NUM),
                      STM32_ETH_TRACING_IRQ_PIN_NUM,
-                     &gpio_ll_out);
+                     gpio_ll_out);
     }
 
     if (IS_USED(MODULE_PERIPH_ETH) || IS_USED(MODULE_PERIPH_PTP_TIMER)) {

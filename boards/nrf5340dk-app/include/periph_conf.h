@@ -70,8 +70,6 @@ static const uart_conf_t uart_config[] = {
     },
 };
 
-#define UART_0_ISR          (isr_serial0) /**< SERIAL0_IRQn */
-
 #define UART_NUMOF          ARRAY_SIZE(uart_config) /**< UART configuration NUMOF */
 /** @} */
 
@@ -110,6 +108,37 @@ static const pwm_conf_t pwm_config[] = {
 };
 
 #define PWM_NUMOF           ARRAY_SIZE(pwm_config)
+/** @} */
+
+/**
+ * @name    SPI configuration
+ * @{
+ */
+static const spi_conf_t spi_config[] = {
+    {
+        .dev  = NRF_SPIM1_S,
+        .sclk = GPIO_PIN(0, 17),
+        .mosi = GPIO_PIN(0, 13),
+        .miso = GPIO_PIN(0, 14),
+    }
+};
+
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
+/** @} */
+
+/**
+ *  * @name    I2C configuration
+ *   * @{
+ *    */
+static const i2c_conf_t i2c_config[] = {
+    {
+        .dev = NRF_TWIM2_S,
+        .scl = GPIO_PIN(1, 3),
+        .sda = GPIO_PIN(1, 2),
+        .speed = I2C_SPEED_NORMAL
+    }
+};
+#define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */
 
 #ifdef __cplusplus

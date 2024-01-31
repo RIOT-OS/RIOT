@@ -378,12 +378,12 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint32_t EVD5:1;           /*!< bit:     13  Channel 5 Event Detection          */
     __I uint32_t EVD6:1;           /*!< bit:     14  Channel 6 Event Detection          */
     __I uint32_t EVD7:1;           /*!< bit:     15  Channel 7 Event Detection          */
-    __I uint32_t :16;              /*!< bit: 16..31  Reserved                           */
+    uint32_t :16;                  /*!< bit: 16..31  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   struct {
     __I uint32_t OVR:8;            /*!< bit:  0.. 7  Channel x Overrun                  */
     __I uint32_t EVD:8;            /*!< bit:  8..15  Channel x Event Detection          */
-    __I uint32_t :16;              /*!< bit: 16..31  Reserved                           */
+    uint32_t :16;                  /*!< bit: 16..31  Reserved                           */
   } vec;                       /*!< Structure used for vec  access                  */
   uint32_t reg;                /*!< Type      used for register access              */
 } EVSYS_INTFLAG_Type;

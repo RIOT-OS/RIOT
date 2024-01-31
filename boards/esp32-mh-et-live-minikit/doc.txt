@@ -21,19 +21,17 @@
     1. [MCU](#esp32_mh_et_live_minikit_mcu)
     2. [Board Configuration](#esp32_mh_et_live_minikit_board_configuration)
     3. [Board Pinout](#esp32_mh_et_live_minikit_pinout)
-    4. [Optional Hardware Configurations]
-       (#esp32_mh_et_live_minikit_optional_hardware)
+    4. [Optional Hardware Configurations](#esp32_mh_et_live_minikit_optional_hardware)
 3. [Flashing the Device](#esp32_mh_et_live_minikit_flashing)
 
 ## Overview {#esp32_mh_et_live_minikit_overview}
 
 The MH-ET LIVE MiniKit for ESP32 uses the ESP32-WROOM-32 module. It is a very
 interesting development kit as it uses in the stackable Wemos D1 Mini format.
-Thus, all [shields for Wemos D1 mini]
-(https://docs.wemos.cc/en/latest/d1_mini_shield/index.html) for ESP8266
-can also be used with ESP32. Examples for such shields are:
+Thus, all [shields for Wemos D1 mini](https://docs.wemos.cc/en/latest/d1_mini_shield/index.html)
+for ESP8266 can also be used with ESP32. Examples for such shields are:
 
-- Micro SD-Card Shield
+- Micro SD-Card Shield (enable module `sdcard_spi` to use it)
 - MRF24J40 IEEE 802.15.4 radio Shield
 - Button Shield
 - RGB LED Shield

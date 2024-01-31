@@ -14,6 +14,9 @@ config CPU_FAM_ESP32
     select HAS_ESP_BLE
     select HAS_ESP_BLE_ESP32
     select HAS_PUF_SRAM
+    select HAS_PERIPH_SDMMC_AUTO_CLK
+    select HAS_PERIPH_SDMMC_AUTO_CMD12
+    select HAS_PERIPH_SDMMC_MMC
 
 config CPU_FAM
     default "esp32" if CPU_FAM_ESP32

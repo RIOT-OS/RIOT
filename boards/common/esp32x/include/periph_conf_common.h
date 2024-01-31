@@ -338,6 +338,10 @@ static const spi_conf_t spi_config[] = {
  * @note SPI_NUMOF definition must not be changed.
  */
 #define SPI_NUMOF   ARRAY_SIZE(spi_config)
+
+#if IS_USED(MODULE_PERIPH_SPI)
+static_assert(SPI_NUMOF != 0, "No SPI devices defined");
+#endif
 /** @} */
 
 /**

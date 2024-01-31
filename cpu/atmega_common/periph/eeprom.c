@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 Inria
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  * @brief       Low-level EEPROM driver implementation for ATmega family
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  * @}
  */
 
@@ -35,7 +37,11 @@ size_t eeprom_read(uint32_t pos, void *data, size_t len)
 
     DEBUG("Reading data from EEPROM at pos %" PRIu32 ": ", pos);
     for (size_t i = 0; i < len; i++) {
+#ifdef EEPE
         while (EECR & (1 << EEPE)) {}
+#elif defined(EEWE)
+        while (EECR & (1 << EEWE)) {}
+#endif
 
         /* Set up address register */
         EEAR = pos++;
@@ -58,17 +64,30 @@ size_t eeprom_write(uint32_t pos, const void *data, size_t len)
 
     for (size_t i = 0; i < len; i++) {
         /* Wait for completion of previous operation */
+#ifdef EEPE
         while (EECR & (1 << EEPE)) {}
+#elif defined(EEWE)
+        while (EECR & (1 << EEWE)) {}
+#endif
 
         /* Set up address and Data Registers */
         EEAR = pos++;
         EEDR = *p++;
 
+#ifdef EEMPE
         /* Write logical one to EEMPE */
         EECR |= (1 << EEMPE);
-
+#elif defined(EEMWE)
+        /* Write logical one to EEMWE */
+        EECR |= (1 << EEMWE);
+#endif
+#ifdef EEPE
         /* Start eeprom write by setting EEPE */
         EECR |= (1 << EEPE);
+#elif defined(EEWE)
+        /* Start eeprom write by setting EEWE */
+        EECR |= (1 << EEWE);
+#endif
     }
 
     return len;

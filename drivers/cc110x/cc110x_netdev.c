@@ -425,10 +425,9 @@ static int cc110x_send(netdev_t *netdev, const iolist_t *iolist)
         if (iol->iol_len) {
             if (size + iol->iol_len > CC110X_MAX_FRAME_SIZE) {
                 cc110x_release(dev);
-                DEBUG("[cc110x] netdev_driver_t::send(): Frame size of %uB "
-                      "exceeds maximum supported size of %uB\n",
-                      (unsigned)(size + iol->iol_len),
-                      (unsigned)CC110X_MAX_FRAME_SIZE);
+                DEBUG("[cc110x] netdev_driver_t::send(): Frame size of %"
+                      PRIuSIZE "B exceeds maximum supported size of %uB\n",
+                      size + iol->iol_len, (unsigned)CC110X_MAX_FRAME_SIZE);
                 return -1;
             }
             memcpy(dev->buf.data + size, iol->iol_base, iol->iol_len);

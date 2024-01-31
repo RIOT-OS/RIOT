@@ -249,8 +249,8 @@ nanocoap_cache_entry_t *nanocoap_cache_add_by_key(const uint8_t *cache_key,
     bool add_to_cache = false;
 
     if (resp_len > CONFIG_NANOCOAP_CACHE_RESPONSE_SIZE) {
-        DEBUG("nanocoap_cache: response too large to cache (%lu > %d)\n",
-              (long unsigned)resp_len, CONFIG_NANOCOAP_CACHE_RESPONSE_SIZE);
+        DEBUG("nanocoap_cache: response too large to cache (%" PRIuSIZE "> %d)\n",
+              resp_len, CONFIG_NANOCOAP_CACHE_RESPONSE_SIZE);
         return NULL;
     }
 
@@ -305,7 +305,7 @@ nanocoap_cache_entry_t *nanocoap_cache_add_by_req(const coap_pkt_t *req,
     nanocoap_cache_key_generate(req, cache_key);
 
     return nanocoap_cache_add_by_key(cache_key,
-                                     coap_get_code((coap_pkt_t *)req),
+                                     coap_get_code_raw((coap_pkt_t *)req),
                                      resp,
                                      resp_len);
 }

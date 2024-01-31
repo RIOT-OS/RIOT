@@ -62,6 +62,15 @@ static err_t _eth_link_output(struct netif *netif, struct pbuf *p);
 #ifdef MODULE_LWIP_SIXLOWPAN
 static err_t _ieee802154_link_output(struct netif *netif, struct pbuf *p);
 #endif
+#ifdef MODULE_SLIPDEV
+static err_t _slip_link_output(struct netif *netif, struct pbuf *p);
+#if LWIP_IPV4
+static err_t slip_output4(struct netif *netif, struct pbuf *q, const ip4_addr_t *ipaddr);
+#endif
+#if LWIP_IPV6
+static err_t slip_output6(struct netif *netif, struct pbuf *q, const ip6_addr_t *ip6addr);
+#endif
+#endif
 static void _event_cb(netdev_t *dev, netdev_event_t event);
 static void *_event_loop(void *arg);
 
@@ -184,6 +193,47 @@ err_t lwip_netdev_init(struct netif *netif)
         break;
     }
 #endif
+#ifdef MODULE_SLIPDEV
+    case NETDEV_TYPE_SLIP:
+        netif->name[0] = 'S';
+        netif->name[1] = 'L';
+
+        /* TODO: get from driver (currently not in netdev_eth) */
+        netif->mtu = ETHERNET_DATA_LEN;
+        netif->linkoutput = _slip_link_output;
+#if LWIP_IPV4
+        netif->output = slip_output4;
+#endif
+#if LWIP_IPV6
+        netif->output_ip6 = slip_output6;
+
+        if (IS_USED(MODULE_SLIPDEV_L2ADDR)) {
+            netif->hwaddr_len = (u8_t)netdev->driver->get(netdev, NETOPT_ADDRESS_LONG,
+                                                          netif->hwaddr,
+                                                          sizeof(netif->hwaddr));
+            if (netif->hwaddr_len > sizeof(netif->hwaddr)) {
+                res = ERR_IF;
+                goto free;
+            }
+
+            /* netif_create_ip6_linklocal_address() does weird byte-swapping
+             * with full IIDs, so let's do it ourselves */
+            ip6_addr_t *addr = ip_2_ip6(&(netif->ip6_addr[0]));
+            /* addr->addr is a uint32_t array */
+            if (l2util_ipv6_iid_from_addr(dev_type,
+                                          netif->hwaddr, netif->hwaddr_len,
+                                          (eui64_t *)&addr->addr[2]) < 0) {
+                res = ERR_IF;
+                goto free;
+            }
+            ipv6_addr_set_link_local_prefix((ipv6_addr_t *)&addr->addr[0]);
+            ip6_addr_assign_zone(addr, IP6_UNICAST, netif);
+            /* Consider address valid. */
+            netif->ip6_addr_state[0] = IP6_ADDR_PREFERRED;
+        }
+#endif /* LWIP_IPV6 */
+        break;
+#endif
     default:
         res = ERR_IF;
         goto free;
@@ -248,6 +298,38 @@ static err_t _ieee802154_link_output(struct netif *netif, struct pbuf *p)
     iolist_t pkt = {
         .iol_base = p->payload,
         .iol_len = (p->len - IEEE802154_FCS_LEN),   /* FCS is written by driver */
+    };
+
+    lwip_netif_dev_acquire(netif);
+    err_t res = (netdev->driver->send(netdev, &pkt) >= 0) ? ERR_OK : ERR_BUF;
+    lwip_netif_dev_release(netif);
+    return res;
+}
+#endif
+
+#ifdef MODULE_SLIPDEV
+#if LWIP_IPV4
+static err_t slip_output4(struct netif *netif, struct pbuf *q, const ip4_addr_t *ipaddr)
+{
+    (void)ipaddr;
+    return netif->linkoutput(netif, q);
+}
+#endif
+#if LWIP_IPV6
+static err_t slip_output6(struct netif *netif, struct pbuf *q, const ip6_addr_t *ip6addr)
+{
+    (void)ip6addr;
+    return netif->linkoutput(netif, q);
+}
+#endif
+
+static err_t _slip_link_output(struct netif *netif, struct pbuf *p)
+{
+    LWIP_ASSERT("p->next == NULL", p->next == NULL);
+    netdev_t *netdev = netif->state;
+    iolist_t pkt = {
+        .iol_base = p->payload,
+        .iol_len = p->len,
     };
 
     lwip_netif_dev_acquire(netif);

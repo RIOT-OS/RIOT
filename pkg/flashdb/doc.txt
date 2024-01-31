@@ -61,11 +61,11 @@
  * ==================
  * To enable the Key-Value database, select the `flashdb_kvdb` module.
  *
- * For use of the FlashDB API, reffer to the [FlashDB documentation](http://armink.gitee.io/flashdb/#/sample-kvdb-basic).
+ * For use of the FlashDB API, refer to the [FlashDB documentation](http://armink.gitee.io/flashdb/#/sample-kvdb-basic).
  *
  * Time series database
  * ====================
  * To enable the Key-Value database, select the `flashdb_tsdb` module.
  *
- * For use of the FlashDB API, reffer to the [FlashDB documentation](http://armink.gitee.io/flashdb/#/sample-tsdb-basic).
+ * For use of the FlashDB API, refer to the [FlashDB documentation](http://armink.gitee.io/flashdb/#/sample-tsdb-basic).
  */

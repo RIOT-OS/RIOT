@@ -235,7 +235,7 @@ typedef union {
 typedef union { // __I to avoid read-modify-write on write-to-clear register
   struct {
     __I uint32_t EXTINT:8;                  /**< bit:   0..7  External Interrupt                       */
-    __I uint32_t :23;                       /**< bit:  8..30  Reserved */
+    uint32_t :23;                           /**< bit:  8..30  Reserved */
     __I uint32_t NSCHK:1;                   /**< bit:     31  Non-secure Check Interrupt               */
   } bit;                                /**< Structure used for bit  access */
   uint32_t reg;                         /**< Type used for register access */

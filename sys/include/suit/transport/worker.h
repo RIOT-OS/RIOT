@@ -82,6 +82,15 @@ void suit_worker_trigger_prepared(const uint8_t *manifest, size_t size);
 int suit_worker_try_prepare(uint8_t **buffer, size_t *size);
 
 /**
+ * @brief   Callback that is executed after the SUIT process has finished
+ *
+ * @param[in] res   Result of the SUIT update, 0 on success
+ *
+ * By default this will reboot the board, can be overwritten by the application.
+ */
+void suit_worker_done_cb(int res);
+
+/**
  * @brief   Trigger a SUIT update
  *
  * @note Make sure the thread calling this function has enough stack space to fit

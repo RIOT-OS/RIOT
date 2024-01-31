@@ -35,7 +35,8 @@ Usage
 ```
 usage: compile_and_test_for_board.py [-h] [--applications APPLICATIONS]
                                      [--applications-exclude APPLICATIONS_EXCLUDE]
-                                     [--no-test] [--with-test-only]
+                                     [--no-test] [--no-compile]
+                                     [--with-test-only]
                                      [--loglevel {debug,info,warning,error,fatal,critical}]
                                      [--incremental] [--clean-after]
                                      [--compile-targets COMPILE_TARGETS]
@@ -61,12 +62,14 @@ optional arguments:
                         applications. Also applied after "--applications".
                         (default: None)
   --no-test             Disable executing tests (default: False)
+  --no-compile          Disable compiling tests, this assumes the compilation
+                        was already done (default: False)
   --with-test-only      Only compile applications that have a test (default:
                         False)
   --loglevel {debug,info,warning,error,fatal,critical}
                         Python logger log level (default: info)
-  --incremental         Do not rerun successful compilation and tests
-                        (default: False)
+  --incremental         Do not rerun successful compilation and tests (default:
+                        False)
   --clean-after         Clean after running each test (default: False)
   --compile-targets COMPILE_TARGETS
                         List of make targets to compile (default: clean all)
@@ -360,6 +363,7 @@ class RIOTApplication:
     def compilation_and_test(
         self,
         clean_after=False,
+        runcompile=True,
         runtest=True,
         incremental=False,
         jobs=False,
@@ -408,13 +412,13 @@ class RIOTApplication:
 
         # Run compilation and flash+test
         # It raises ErrorInTest on error which is handled outside
-
-        compilation_cmd = list(self.COMPILE_TARGETS)
-        if jobs is not None:
-            compilation_cmd += ["--jobs"]
-            if jobs:
-                compilation_cmd += [str(jobs)]
-        self.make_with_outfile("compilation", compilation_cmd)
+        if runcompile:
+            compilation_cmd = list(self.COMPILE_TARGETS)
+            if jobs is not None:
+                compilation_cmd += ["--jobs"]
+                if jobs:
+                    compilation_cmd += [str(jobs)]
+            self.make_with_outfile("compilation", compilation_cmd)
         if clean_after:
             self.clean_intermediates()
 
@@ -671,6 +675,12 @@ PARSER.add_argument(
     "--no-test", action="store_true", default=False, help="Disable executing tests"
 )
 PARSER.add_argument(
+    "--no-compile",
+    action="store_true",
+    default=False,
+    help="Disable compiling tests, this assumes the compilation was already done",
+)
+PARSER.add_argument(
     "--with-test-only",
     action="store_true",
     default=False,
@@ -783,6 +793,7 @@ def main(args):
     errors = [
         app.run_compilation_and_test(
             clean_after=args.clean_after,
+            runcompile=not args.no_compile,
             runtest=not args.no_test,
             incremental=args.incremental,
             jobs=args.jobs,

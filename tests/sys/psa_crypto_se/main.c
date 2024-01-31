@@ -1,0 +1,1 @@
+../../../examples/psa_crypto/main.c

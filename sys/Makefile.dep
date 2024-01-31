@@ -517,7 +517,6 @@ ifneq (,$(filter gcoap,$(USEMODULE)))
   USEMODULE += sock_udp
   USEMODULE += sock_util
   USEMODULE += ztimer_msec
-  USEMODULE += ztimer_usec
   USEMODULE += event_callback
   USEMODULE += event_timeout_ztimer
   USEMODULE += random
@@ -686,12 +685,24 @@ ifneq (,$(filter fido2_ctap%,$(USEMODULE)))
   USEMODULE += fido2
 endif
 
+ifneq (,$(filter psa_crypto,$(USEMODULE)))
+  include $(RIOTBASE)/sys/psa_crypto/Makefile.dep
+endif
+
+ifneq (,$(filter psa_riot_cipher_aes_%,$(USEMODULE)))
+  USEMODULE += psa_riot_cipher_aes_common
+endif
+
 ifneq (,$(filter rust_riotmodules,$(USEMODULE)))
   include $(RIOTBASE)/sys/rust_riotmodules/Makefile.dep
 endif
 
 ifneq (,$(filter auto_init%,$(USEMODULE)))
   USEMODULE += preprocessor_successor
+endif
+
+ifneq (,$(filter wifi_scan_list,$(USEMODULE)))
+  USEMODULE += l2scan_list
 endif
 
 include $(RIOTBASE)/sys/test_utils/Makefile.dep

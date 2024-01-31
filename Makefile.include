@@ -117,7 +117,6 @@ ifneq ($(RIOT_CI_BUILD),1)
   ifeq ($(MAKELEVEL),0)
     ifneq (,$(BOARDSDIR))
       $(warning Using BOARDSDIR is deprecated use EXTERNAL_BOARD_DIRS instead)
-      $(info EXTERNAL_BOARD_DIRS can contain multiple folders separated by space)
     endif
   endif
 endif
@@ -730,7 +729,7 @@ else
   _LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $$(find $(BASELIBS:%.module=$(BINDIR)/%/) -name "*.o" 2> /dev/null | sort) $(ARCHIVES_GROUP) $(LINKFLAGS) $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map
 endif # BUILDOSXNATIVE
 
-COMPILE_COMMANDS_PATH ?= $(RIOTBASE)/compile_commands.json
+COMPILE_COMMANDS_PATH ?= $(if $(findstring $(RIOTBASE),$(APPDIR)),$(RIOTBASE)/compile_commands.json, $(APPDIR)/compile_commands.json)
 COMPILE_COMMANDS_FLAGS ?= --clangd
 .PHONY: compile-commands
 compile-commands: $(BUILDDEPS)
@@ -1032,7 +1031,8 @@ ifneq (, $(filter all flash, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
 endif
 
 help:
-	@$(MAKE) -qp | sed -ne 's/\(^[a-z][a-z_-]*\):.*/\1/p' | sort | uniq
+  # filter all targets starting with lowercase and containing lowercase letters, hyphens, or underscores; explicitly include generate-Makefile.ci
+	@$(MAKE) -qp | sed -ne 's/\(^[a-z][a-z_-]*\|generate-Makefile.ci\):.*/\1/p' | sort -u
 
 ifeq (iotlab-m3,$(BOARD))
   ifneq (,$(filter iotlab-%,$(MAKECMDGOALS)))

@@ -87,6 +87,14 @@ extern "C" {
 #define BTN3_MODE           GPIO_IN         /**< BTN3 default mode */
 /** @} */
 
+/**
+ * @name    WS281x RGB LED configuration
+ * @{
+ */
+#define WS281X_TIMER_DEV    TIMER_DEV(1)            /**< Timer device */
+#define WS281X_TIMER_MAX_VALUE TIMER_1_MAX_VALUE    /**< Timer max value */
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

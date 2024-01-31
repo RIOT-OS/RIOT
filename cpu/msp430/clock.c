@@ -25,6 +25,7 @@
 #include <stdint.h>
 
 #include "debug.h"
+#include "busy_wait.h"
 #include "macros/math.h"
 #include "macros/units.h"
 #include "periph_conf.h"
@@ -96,22 +97,6 @@ static void check_config(void)
             && (clock_params.target_dco_frequency == 0)) {
         extern void dco_configured_as_clock_source_but_is_disabled(void);
         dco_configured_as_clock_source_but_is_disabled();
-    }
-}
-
-static void busy_wait(uint16_t loops)
-{
-    while (loops) {
-        /* This empty inline assembly should be enough to convince the
-         * compiler that the loop cannot be optimized out. Tested with
-         * GCC 12.2 and clang 16.0.0 successfully. */
-        __asm__ __volatile__ (
-            ""
-            : /* no outputs */
-            : /* no inputs */
-            : /* no clobbers */
-        );
-        loops--;
     }
 }
 
@@ -348,7 +333,8 @@ void default_clock_init(void)
 
 __attribute__((weak, alias("default_clock_init"))) void clock_init(void);
 
-uint32_t msp430_submain_clock_freq(void) {
+uint32_t PURE msp430_submain_clock_freq(void)
+{
     uint16_t shift = (clock_params.submain_clock_divier >> 1) & 0x3;
     switch (clock_params.submain_clock_source) {
     case SUBMAIN_CLOCK_SOURCE_LFXT1CLK:
@@ -365,7 +351,7 @@ uint32_t msp430_submain_clock_freq(void) {
     }
 }
 
-uint32_t msp430_auxiliary_clock_freq(void)
+uint32_t PURE msp430_auxiliary_clock_freq(void)
 {
     uint16_t shift = (clock_params.auxiliary_clock_divier >> 4) & 0x3;
     return clock_params.lfxt1_frequency >> shift;

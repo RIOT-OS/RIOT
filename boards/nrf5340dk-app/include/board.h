@@ -95,6 +95,17 @@ extern "C" {
 #define BTN3_MODE           GPIO_IN_PU       /**< BTN3 default mode */
 /** @} */
 
+/**
+ * @name MTD configuration
+ * @{
+ */
+#define MTD_0       mtd_dev_get(0)
+
+#define BOARD_QSPI_PIN_CS       GPIO_PIN(0, 18)     /**< SPI Flash Chip Select */
+#define BOARD_QSPI_PIN_WP       GPIO_PIN(0, 15)     /**< SPI Flash Write Protect */
+#define BOARD_QSPI_PIN_HOLD     GPIO_PIN(0, 16)     /**< SPI Flash Hold pin */
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

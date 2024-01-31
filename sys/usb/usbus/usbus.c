@@ -352,8 +352,8 @@ static bool _urb_transfer_complete(usbus_t *usbus, usbdev_ep_t *ep,
                 _usbus_transfer_urb_submit(usbus_ep, next_urb);
             }
 
-            DEBUG("Done with the transfer, available: %u, len: %u\n",
-                  (unsigned)active_urb->transferred, (unsigned)active_urb->len);
+            DEBUG("Done with the transfer, available: %" PRIuSIZE ", len: %" PRIuSIZE "\n",
+                  active_urb->transferred, active_urb->len);
             handler->driver->transfer_handler(usbus, handler, ep,
                                               USBUS_EVENT_TRANSFER_COMPLETE);
         }

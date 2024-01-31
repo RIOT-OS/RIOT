@@ -260,6 +260,10 @@ void NORETURN avr8_enter_thread_mode(void)
 
 void thread_yield_higher(void)
 {
+    if (!IS_USED(MODULE_CORE_THREAD)) {
+        return;
+    }
+
     if (irq_is_in() == 0) {
         avr8_context_save();
         sched_run();
@@ -278,7 +282,8 @@ void avr8_exit_isr(void)
     __asm__ volatile ("" : : : "memory");
 
     /* schedule should switch context when returning from a non nested interrupt */
-    if (sched_context_switch_request && avr8_state_irq_count == 0) {
+    if (sched_context_switch_request && avr8_state_irq_count == 0 &&
+        IS_USED(MODULE_CORE_THREAD)) {
         avr8_context_save();
         sched_run();
         avr8_context_restore();

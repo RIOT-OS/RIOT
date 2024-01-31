@@ -28,14 +28,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Enable the workaround for the SPI single byte transmit errata (No.
- * 58 on the nrf52832)
- */
-#ifdef CPU_MODEL_NRF52832XXAA
-#define ERRATA_SPI_SINGLE_BYTE_WORKAROUND (1)
-#endif
-
-/**
  * @brief   System core clock speed, fixed to 64MHz for all NRF52x CPUs
  */
 #define CLOCK_CORECLOCK     (64000000U)
@@ -46,32 +38,12 @@ extern "C" {
 #define PERIPH_CLOCK        (16000000U)
 
 /**
- * @brief   Redefine some peripheral names to unify them between nRF51 and 52
- * @{
- */
-#define SPI_SCKSEL          (dev(bus)->PSEL.SCK)
-#define SPI_MOSISEL         (dev(bus)->PSEL.MOSI)
-#define SPI_MISOSEL         (dev(bus)->PSEL.MISO)
-#ifdef CPU_MODEL_NRF52832XXAA
-#define UART_IRQN           (UARTE0_UART0_IRQn)
-#endif
-/** @} */
-
-/**
  * @brief   The nRF52 family of CPUs provides a fixed number of 9 ADC lines
  */
 #ifdef SAADC_CH_PSELP_PSELP_VDDHDIV5
 #define ADC_NUMOF           (10U)
 #else
 #define ADC_NUMOF           (9U)
-#endif
-
-/**
- * @brief   SPI temporary buffer size for storing const data in RAM before
- *          initiating DMA transfer
- */
-#ifndef CONFIG_SPI_MBUF_SIZE
-#define CONFIG_SPI_MBUF_SIZE    64
 #endif
 
 /**
@@ -109,69 +81,12 @@ typedef enum {
 /** @} */
 #endif /* ndef DOXYGEN */
 
-#ifndef DOXYGEN
-/**
- * @brief   Override I2C speed settings
- * @{
- */
-#define HAVE_I2C_SPEED_T
-typedef enum {
-    I2C_SPEED_LOW       = 0xff,                         /**< not supported */
-    I2C_SPEED_NORMAL    = TWIM_FREQUENCY_FREQUENCY_K100,    /**< 100kbit/s */
-    I2C_SPEED_FAST      = TWIM_FREQUENCY_FREQUENCY_K400,    /**< 400kbit/s */
-    I2C_SPEED_FAST_PLUS = 0xfe,                         /**< not supported */
-    I2C_SPEED_HIGH      = 0xfd,                         /**< not supported */
-} i2c_speed_t;
-/** @} */
-#endif /* ndef DOXYGEN */
-
-/**
- * @brief   I2C (TWI) configuration options
- * @{
- */
-typedef struct {
-    NRF_TWIM_Type *dev;         /**< TWIM hardware device */
-    gpio_t scl;                 /**< SCL pin */
-    gpio_t sda;                 /**< SDA pin */
-    i2c_speed_t speed;          /**< Bus speed */
-} i2c_conf_t;
-/** @} */
-
-/**
- * @name   Use shared I2C functions
- * @{
- */
-#define PERIPH_I2C_NEED_READ_REG
-#define PERIPH_I2C_NEED_WRITE_REG
-/** @} */
-
-/**
- * @name    Define macros for sda and scl pin to be able to reinitialize them
- * @{
- */
-#define i2c_pin_sda(dev) i2c_config[dev].sda
-#define i2c_pin_scl(dev) i2c_config[dev].scl
-/** @} */
-
 /**
  * @brief   Size of the UART TX buffer for non-blocking mode.
  */
 #ifndef UART_TXBUF_SIZE
 #define UART_TXBUF_SIZE    (64)
 #endif
-
-/**
- * @brief  SPI configuration values
- */
-typedef struct {
-    NRF_SPIM_Type *dev; /**< SPI device used */
-    gpio_t sclk;        /**< CLK pin */
-    gpio_t mosi;        /**< MOSI pin */
-    gpio_t miso;        /**< MISO pin */
-#if ERRATA_SPI_SINGLE_BYTE_WORKAROUND
-    uint8_t ppi;        /**< PPI channel */
-#endif
-} spi_conf_t;
 
 /**
  * @brief Common SPI/I2C interrupt callback

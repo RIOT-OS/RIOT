@@ -46,7 +46,7 @@ extern "C" {
 #endif
 #endif
 #ifndef CONFIG_CLOCK_PLL_N
-#if IS_USED(MODULE_PERIPH_USBDEV_CLK) && \
+#if (IS_USED(MODULE_PERIPH_USBDEV_CLK) || IS_USED(MODULE_PERIPH_SDMMC_CLK)) && \
     (defined(CPU_LINE_STM32F405xx) || defined(CPU_LINE_STM32F407xx) || \
      defined(CPU_LINE_STM32F415xx) || defined(CPU_LINE_STM32F417xx) || \
      defined(CPU_LINE_STM32F427xx) || defined(CPU_LINE_STM32F429xx) || \
@@ -68,13 +68,13 @@ extern "C" {
 #else
 #define CONFIG_CLOCK_PLL_N              (90)
 #endif
-#endif /* MODULE_PERIPH_USBDEV_CLK */
+#endif /* MODULE_PERIPH_USBDEV_CLK || MODULE_PERIPH_SDMMC_CLK */
 #endif
 #ifndef CONFIG_CLOCK_PLL_P
 #define CONFIG_CLOCK_PLL_P              (2)
 #endif
 #ifndef CONFIG_CLOCK_PLL_Q
-#if IS_USED(MODULE_PERIPH_USBDEV_CLK) && \
+#if (IS_USED(MODULE_PERIPH_USBDEV_CLK) || IS_USED(MODULE_PERIPH_SDMMC_CLK)) && \
     (defined(CPU_LINE_STM32F405xx) || defined(CPU_LINE_STM32F407xx) || \
      defined(CPU_LINE_STM32F415xx) || defined(CPU_LINE_STM32F417xx) || \
      defined(CPU_LINE_STM32F427xx) || defined(CPU_LINE_STM32F429xx) || \

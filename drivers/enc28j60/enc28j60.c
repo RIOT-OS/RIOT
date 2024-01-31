@@ -330,8 +330,8 @@ static int nd_recv(netdev_t *netdev, void *buf, size_t max_len, void *info)
     next = (uint16_t)((head[1] << 8) | head[0]);
     size = (uint16_t)((head[3] << 8) | head[2]) - 4;  /* discard CRC */
 
-    DEBUG("[enc28j60] recv: size=%i next=%i buf=%p len=%d\n",
-          (int)size, (int)next, buf, max_len);
+    DEBUG("[enc28j60] recv: size=%u next=%u buf=%p len=%" PRIuSIZE "\n",
+          size, next, buf, max_len);
 
     if (buf != NULL) {
         /* read packet content into the supplied buffer */
@@ -431,8 +431,6 @@ static int nd_init(netdev_t *netdev)
     cmd_w_phy(dev, REG_PHY_PHIE, PHIE_PLNKIE | PHIE_PGEIE);
 
     /* Finishing touches */
-    /* enable hardware flow control */
-    cmd_wcr(dev, REG_B3_EFLOCON, 3, EFLOCON_FULDPXS | EFLOCON_FCEN1);
     /* enable auto-inc of read and write pointers for the RBM/WBM commands */
     cmd_bfs(dev, REG_ECON2, -1, ECON2_AUTOINC);
     /* enable receive, link and tx interrupts */

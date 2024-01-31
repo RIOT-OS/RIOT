@@ -264,7 +264,7 @@ static int send(int iface, le_uint16_t dst_pan, uint8_t *dst, size_t dst_len,
 
     be_uint16_t _dst_pan = byteorder_ltobs(dst_pan);
     l2util_addr_to_str(dst, dst_len, _addr_str);
-    printf("txtsnd: sending %u bytes to %s", (unsigned)iol_data.iol_len, _addr_str);
+    printf("txtsnd: sending %" PRIuSIZE " bytes to %s", iol_data.iol_len, _addr_str);
     l2util_addr_to_str((uint8_t*) &_dst_pan, sizeof(dst_pan), _addr_str);
     printf(" (PAN: %s)\n", _addr_str);
 

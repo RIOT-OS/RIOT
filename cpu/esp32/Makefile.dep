@@ -105,6 +105,11 @@ ifneq (,$(filter periph_i2c,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter periph_sdmmc,$(USEMODULE)))
+  USEMODULE += esp_idf_sdmmc
+  USEMODULE += periph_gpio_irq
+endif
+
 ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
   FEATURES_REQUIRED += esp_spi_ram
   FEATURES_OPTIONAL += esp_spi_oct
@@ -126,6 +131,12 @@ ifneq (,$(filter esp_idf_heap,$(USEMODULE)))
   # the implementations of TLSF with the exception of heap poisoning, which
   # is not configured.
   USEPKG += tlsf
+endif
+
+ifneq (,$(filter lcd_parallel_ll_mcu,$(USEMODULE)))
+  USEMODULE += esp_lcd
+  USEMODULE += esp_idf_lcd
+  USEMODULE += esp_idf_heap
 endif
 
 ifneq (,$(filter mtd periph_flashpage,$(USEMODULE)))

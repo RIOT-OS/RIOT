@@ -40,6 +40,7 @@ static inline suit_storage_vfs_t *_get_vfs(suit_storage_t *storage)
     return container_of(storage, suit_storage_vfs_t, storage);
 }
 
+__attribute__((unused))
 static inline const suit_storage_vfs_t *_get_vfs_const(const suit_storage_t *storage)
 {
     return container_of(storage, suit_storage_vfs_t, storage);

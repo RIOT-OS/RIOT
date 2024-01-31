@@ -20,7 +20,6 @@
 #define BOARD_H
 
 #include "cpu.h"
-#include "mtd.h"
 #include "periph_conf.h"
 #include "periph_cpu.h"
 
@@ -63,8 +62,7 @@ extern "C" {
  * @name MTD configuration
  * @{
  */
-extern mtd_dev_t *mtd0;
-#define MTD_0 mtd0
+#define MTD_0 mtd_dev_get(0)
 /** @} */
 
 #ifdef __cplusplus

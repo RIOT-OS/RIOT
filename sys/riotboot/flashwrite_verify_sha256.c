@@ -23,6 +23,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "architecture.h"
 #include "hashes/sha256.h"
 #include "log.h"
 #include "riotboot/slot.h"
@@ -41,7 +42,7 @@ int riotboot_flashwrite_verify_sha256(const uint8_t *sha256_digest,
 
     uint8_t *img_start = (uint8_t *)riotboot_slot_get_hdr(target_slot);
 
-    LOG_INFO("riotboot: verifying digest at %p (img at: %p size: %u)\n",
+    LOG_INFO("riotboot: verifying digest at %p (img at: %p size: %" PRIuSIZE ")\n",
              sha256_digest, img_start, img_len);
 
     sha256_init(&sha256);

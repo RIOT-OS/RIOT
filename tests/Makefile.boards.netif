@@ -6,13 +6,14 @@ BOARD_PROVIDES_NETIF := \
     atmega256rfr2-xpro \
     avr-rss2 \
     b-l072z-lrwan1 \
-    cc2538dk \
     calliope-mini \
+    cc2538dk \
     derfmega128 \
     derfmega256 \
     dwm1001 \
     esp32-wroom-32 \
     frdm-kw41z \
+    generic-cc2538-cc2592-dk \
     hamilton \
     iotlab-a8-m3 \
     iotlab-m3 \

@@ -13,7 +13,7 @@
  * @brief   A DNS over CoAP client prototype based on gCoAP.
  *
  * DNS over CoAP allows a node to use a CoAP server to resolve DNS request, following
- * [draft-lenders-dns-over-coap](https://datatracker.ietf.org/doc/draft-lenders-dns-over-coap/).
+ * [draft-ietf-core-dns-over-coap](https://datatracker.ietf.org/doc/draft-ietf-core-dns-over-coap/).
  *
  * The `gcoap_dns` module does not replace the @ref sock_dns_query function when built, and is not
  * used as a back-end to @ref netutils_get_ipv6 automatically. It does, however, provide a drop-in

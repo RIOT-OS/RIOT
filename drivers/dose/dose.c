@@ -317,9 +317,10 @@ static void state(dose_t *ctx, dose_signal_t signal)
                 signal = state_transit_send(ctx, signal);
                 ctx->state = DOSE_STATE_SEND;
                 break;
-
             default:
                 DEBUG("dose state(): unexpected state transition (STATE=0x%02x SIGNAL=0x%02x)\n", ctx->state, signal);
+                /* fall-through */
+            case DOSE_STATE_RECV + DOSE_SIGNAL_SEND:
                 signal = DOSE_SIGNAL_NONE;
         }
     } while (signal != DOSE_SIGNAL_NONE);
@@ -442,7 +443,7 @@ static int _recv(netdev_t *dev, void *buf, size_t len, void *info)
 
     size_t dummy;
     if (crb_get_chunk_size(&ctx->rb, &dummy)) {
-        DEBUG("dose: %u byte pkt in rx queue\n", (unsigned)dummy);
+        DEBUG("dose: %" PRIuSIZE " byte pkt in rx queue\n", dummy);
         netdev_trigger_event_isr(&ctx->netdev);
     }
 
@@ -503,6 +504,9 @@ static int send_data_octet(dose_t *ctx, uint8_t c)
 
 static inline void _send_start(dose_t *ctx)
 {
+#ifdef MODULE_PERIPH_UART_TX_ONDEMAND
+    uart_enable_tx(ctx->uart);
+#endif
 #ifdef MODULE_PERIPH_UART_COLLISION
     uart_collision_detect_enable(ctx->uart);
 #else
@@ -512,6 +516,9 @@ static inline void _send_start(dose_t *ctx)
 
 static inline void _send_done(dose_t *ctx, bool collision)
 {
+#ifdef MODULE_PERIPH_UART_TX_ONDEMAND
+    uart_disable_tx(ctx->uart);
+#endif
 #ifdef MODULE_PERIPH_UART_COLLISION
     uart_collision_detect_disable(ctx->uart);
     if (collision) {

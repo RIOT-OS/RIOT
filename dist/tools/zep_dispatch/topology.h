@@ -49,6 +49,13 @@ int topology_parse(const char *file, topology_t *out);
 int topology_print(const char *file_out, const topology_t *t);
 
 /**
+ * @brief   Print send / receive statistics
+ *
+ * @param[in] t         The topology to render
+ */
+void topology_print_stats(const topology_t *t, bool reset);
+
+/**
  * @brief   Populate a spot in the topology with a connected node
  *
  * @param[in, out]  t       topology to use

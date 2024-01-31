@@ -287,7 +287,7 @@ typedef ssize_t (*coap_handler_t)(coap_pkt_t *pkt, uint8_t *buf, size_t len,
 typedef int (*coap_blockwise_cb_t)(void *arg, size_t offset, uint8_t *buf, size_t len, int more);
 
 /**
- * @brief   Coap equest callback descriptor
+ * @brief   Coap request callback descriptor
  *
  * @param[in] arg      Pointer to be passed as arguments to the callback
  * @param[in] pkt      The received CoAP response.
@@ -482,7 +482,7 @@ static inline unsigned coap_get_code_detail(const coap_pkt_t *pkt)
  *
  * @returns     message code in decimal format
  */
-static inline unsigned coap_get_code(const coap_pkt_t *pkt)
+static inline unsigned coap_get_code_decimal(const coap_pkt_t *pkt)
 {
     return (coap_get_code_class(pkt) * 100) + coap_get_code_detail(pkt);
 }
@@ -847,19 +847,36 @@ static inline ssize_t coap_get_uri_path(coap_pkt_t *pkt, uint8_t *target)
  * This function decodes the pkt's URI_QUERY option into a "&"-separated and
  * '\0'-terminated string.
  *
- * Caller must ensure @p target can hold at least CONFIG_NANOCOAP_URI_MAX bytes!
- *
  * @param[in]   pkt     pkt to work on
  * @param[out]  target  buffer for target URI
+ * @param[in]   max_len size of @p target in bytes
  *
- * @returns     -ENOSPC     if URI option is larger than CONFIG_NANOCOAP_URI_MAX
+ * @returns     -ENOSPC     if URI option is larger than @p max_len
  * @returns     nr of bytes written to @p target (including '\0')
  */
-static inline ssize_t coap_get_uri_query(coap_pkt_t *pkt, uint8_t *target)
+static inline ssize_t coap_get_uri_query_string(coap_pkt_t *pkt, char *target,
+                                                size_t max_len)
 {
-    return coap_opt_get_string(pkt, COAP_OPT_URI_QUERY, target,
-                               CONFIG_NANOCOAP_URI_MAX, '&');
+    return coap_opt_get_string(pkt, COAP_OPT_URI_QUERY,
+                               (uint8_t *)target, max_len, '&');
 }
+
+/**
+ * @brief   Find a URI query option of the packet
+ *
+ * This function searches for a query option of the form "?key=value"
+ * and would, when present, return the pointer to "value" when searching
+ * for "key".
+ *
+ * @param[in]   pkt     pkt to work on
+ * @param[in]   key     key string to look for
+ * @param[out]  value   found value if present, may be NULL
+ * @param[out]  len     length of value if present, may be NULL if value is NULL
+ *
+ * @returns     true if the key was found, false if not
+ */
+bool coap_find_uri_query(coap_pkt_t *pkt, const char *key,
+                         const char **value, size_t *len);
 
 /**
  * @brief   Iterate over a packet's options
@@ -2097,6 +2114,36 @@ ssize_t coap_payload_put_bytes(coap_pkt_t *pkt, const void *data, size_t len);
  * @returns      < 0 on error
  */
 ssize_t coap_payload_put_char(coap_pkt_t *pkt, char c);
+
+/**
+ * @brief   Create CoAP reply header (convenience function)
+ *
+ * This function generates the reply CoAP header and sets
+ * the payload pointer inside the response buffer to point to
+ * the start of the payload, so that it can be written directly
+ * after the header.
+ *
+ * @param[in]   pkt         packet to reply to
+ * @param[in]   code        reply code (e.g., COAP_CODE_204)
+ * @param[out]  buf         buffer to write reply to
+ * @param[in]   len         size of @p buf
+ * @param[in]   ct          content type of payload
+ *                          if ct < 0 this will be ignored
+ * @param[out]  payload     Will be set to the start of the payload inside
+ *                          @p buf.
+ *                          May be set to NULL if no payload response is
+ *                          wanted (no-reply option)
+ * @param[out]  payload_len_max max length of payload left in @p buf
+ *
+ * @returns     size of reply header on success
+ * @returns     0 if no reply should be sent
+ * @returns     <0 on error
+ * @returns     -ENOSPC if @p buf too small
+ */
+ssize_t coap_build_reply_header(coap_pkt_t *pkt, unsigned code,
+                                void *buf, size_t len,
+                                int ct,
+                                void **payload, size_t *payload_len_max);
 
 /**
  * @brief   Create CoAP reply (convenience function)

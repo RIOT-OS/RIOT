@@ -78,6 +78,8 @@ rsource "Kconfig.flashpage"
 
 rsource "Kconfig.gpio"
 
+rsource "Kconfig.gpio_ll"
+
 config MODULE_PERIPH_HWRNG
     bool "HWRNG peripheral driver"
     depends on HAS_PERIPH_HWRNG
@@ -139,6 +141,10 @@ config MODULE_PERIPH_RTT
     depends on HAS_PERIPH_RTT
     select MODULE_PERIPH_COMMON
 
+config MODULE_PERIPH_FREQM
+    bool "Frequency Meter driver"
+    depends on HAS_PERIPH_FREQM
+
 config MODULE_PERIPH_RTT_SET_COUNTER
     bool "rtc_set_counter() implementation in the RTT peripheral driver"
     depends on HAS_PERIPH_RTT_SET_COUNTER && MODULE_PERIPH_RTT
@@ -153,6 +159,13 @@ config MODULE_PERIPH_INIT_RTT
     default y if MODULE_PERIPH_INIT
     depends on MODULE_PERIPH_RTT
 
+config MODULE_PERIPH_TIMER_POLL
+    bool "Timer poll"
+    depends on HAS_PERIPH_TIMER_POLL
+    help
+        Enables the timer_poll_channel function.
+
+rsource "Kconfig.sdmmc"
 rsource "Kconfig.spi"
 
 config MODULE_PERIPH_TEMPERATURE

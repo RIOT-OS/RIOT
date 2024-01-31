@@ -30,7 +30,7 @@ void *run(void *parameter) {
     size_t n = (size_t) parameter;
     size_t factorial = 1;
 
-    printf("pthread: parameter = %u\n", (unsigned int) n);
+    printf("pthread: parameter = %" PRIuSIZE "\n", n);
 
     if (n > 0) {
         for (size_t i = 1; i <= n; i++) {
@@ -38,7 +38,7 @@ void *run(void *parameter) {
         }
     }
 
-    printf("pthread: factorial = %u\n", (unsigned int) factorial);
+    printf("pthread: factorial = %" PRIuSIZE "\n",factorial);
     pthread_exit((void *)factorial);
 
     return NULL;

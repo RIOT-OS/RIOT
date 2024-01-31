@@ -96,6 +96,10 @@ enum {
  * @{
  */
 #define PM_NUM_MODES            (5)
+#define AVR8_PM_SLEEP_MODE_0    SLEEP_MODE_PWR_DOWN    /**< Power Down */
+#define AVR8_PM_SLEEP_MODE_1    SLEEP_MODE_PWR_SAVE    /**< Power Save */
+#define AVR8_PM_SLEEP_MODE_2    SLEEP_MODE_STANDBY     /**< Standby */
+#define AVR8_PM_SLEEP_MODE_3    SLEEP_MODE_EXT_STANDBY /**< Extended Standby*/
 /** @} */
 
 /**

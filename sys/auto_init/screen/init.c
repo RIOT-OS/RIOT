@@ -33,9 +33,9 @@ void auto_init_screen(void)
             extern void auto_init_periph_ltdc(void);
             auto_init_periph_ltdc();
         }
-        if (IS_USED(MODULE_ST7735)) {
-            extern void auto_init_st7735(void);
-            auto_init_st7735();
+        if (IS_USED(MODULE_ST77XX)) {
+            extern void auto_init_st77xx(void);
+            auto_init_st77xx();
         }
     }
 

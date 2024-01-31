@@ -30,10 +30,6 @@
 #define ENABLE_DEBUG                    0
 #include "debug.h"
 
-#if IS_ACTIVE(ENABLE_DEBUG)
-static char addr_str[IPV6_ADDR_MAX_STR_LEN];
-#endif
-
 #define GNRC_RPL_P2P_RDO_LEN            (18)
 #define GNRC_RPL_P2P_RDO_FLAGS_LIFETIME (6)
 #define GNRC_RPL_P2P_RDO_FLAGS_HBH      (6)

@@ -47,19 +47,14 @@ USE_ZEP ?= 0
 # set the ZEP port for native
 ZEP_PORT_BASE ?= 17754
 ifeq (1,$(USE_ZEP))
-  TERMFLAGS += -z [::1]:$(ZEP_PORT_BASE)
   USEMODULE += socket_zep
-
-  ifneq (,$(ZEP_MAC))
-    TERMFLAGS += --eui64=$(ZEP_MAC)
-  endif
 endif
 
 # Uncomment the following 2 lines to specify static link lokal IPv6 address
 # this might be useful for testing, in cases where you cannot or do not want to
 # run a shell with ifconfig to get the real link lokal address.
 #IPV6_STATIC_LLADDR ?= '"fe80::cafe:cafe:cafe:1"'
-#CFLAGS += -DGNRC_IPV6_STATIC_LLADDR=$(IPV6_STATIC_LLADDR)
+#CFLAGS += -DCONFIG_GNRC_IPV6_STATIC_LLADDR=$(IPV6_STATIC_LLADDR)
 
 # Uncomment this to join RPL DODAGs even if DIOs do not contain
 # DODAG Configuration Options (see the doc for more info)

@@ -62,27 +62,37 @@ extern "C" {
 #define LED_BLUE_PIN        LED2_PIN    /**< LED2 is blue */
 /** @} */
 
-#if defined(MODULE_SDCARD_SPI)
+/**
+ * @name MTD configuration
+ * @{
+ */
+#define MTD_0 mtd_dev_get(0)          /**< MTD device for the SD Card */
+/** @} */
+
+/**
+ * @name   SD-Card interface configuration
+ * @{
+ */
 #define SDCARD_SPI_PARAM_SPI         SPI_DEV(0)
 #define SDCARD_SPI_PARAM_CS          GPIO_PIN(PORT_B, 12)
 #define SDCARD_SPI_PARAM_CLK         GPIO_PIN(PORT_B, 13)
 #define SDCARD_SPI_PARAM_MISO        GPIO_PIN(PORT_B, 14)
 #define SDCARD_SPI_PARAM_MOSI        GPIO_PIN(PORT_B, 15)
-#endif
+/** @} */
 
-#if defined(MODULE_ST7735) && defined(CONFIG_SIPEED_LONGAN_NANO_WITH_TFT)
-#define ST7735_PARAM_SPI          SPI_DEV(1)            /**< SPI device */
-#define ST7735_PARAM_SPI_CLK      SPI_CLK_5MHZ          /**< SPI clock frequency */
-#define ST7735_PARAM_SPI_MODE     SPI_MODE_0            /**< SPI mode */
-#define ST7735_PARAM_CS           GPIO_PIN(PORT_B, 2)   /**< Chip Select pin */
-#define ST7735_PARAM_DCX          GPIO_PIN(PORT_B, 0)   /**< DCX pin */
-#define ST7735_PARAM_RST          GPIO_PIN(PORT_B, 1)   /**< Reset pin */
-#define ST7735_PARAM_RGB          0                     /**< RGB mode enable */
-#define ST7735_PARAM_INVERTED     1                     /**< Inverted mode enable */
-#define ST7735_PARAM_NUM_LINES    160U                  /**< Number of lines */
-#define ST7735_PARAM_RGB_CHANNELS 80U                   /**< Number of columns */
-#define ST7735_PARAM_ROTATION     ST7735_ROTATION_HORZ  /**< Rotation mode */
-#define ST7735_PARAM_OFFSET_Y     25                    /**< Vertical offset */
+#if defined(MODULE_ST77XX) && defined(BOARD_SIPEED_LONGAN_NANO_TFT)
+#define ST77XX_PARAM_SPI          SPI_DEV(1)            /**< SPI device */
+#define ST77XX_PARAM_SPI_CLK      SPI_CLK_5MHZ          /**< SPI clock frequency */
+#define ST77XX_PARAM_SPI_MODE     SPI_MODE_0            /**< SPI mode */
+#define ST77XX_PARAM_CS           GPIO_PIN(PORT_B, 2)   /**< Chip Select pin */
+#define ST77XX_PARAM_DCX          GPIO_PIN(PORT_B, 0)   /**< DCX pin */
+#define ST77XX_PARAM_RST          GPIO_PIN(PORT_B, 1)   /**< Reset pin */
+#define ST77XX_PARAM_RGB          0                     /**< RGB mode enable */
+#define ST77XX_PARAM_INVERTED     1                     /**< Inverted mode enable */
+#define ST77XX_PARAM_NUM_LINES    160U                  /**< Number of lines */
+#define ST77XX_PARAM_RGB_CHANNELS 80U                   /**< Number of columns */
+#define ST77XX_PARAM_ROTATION     ST77XX_ROTATION_270   /**< Rotation mode */
+#define ST77XX_PARAM_OFFSET_Y     25                    /**< Vertical offset */
 #endif
 
 #ifdef __cplusplus

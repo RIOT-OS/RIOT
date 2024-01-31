@@ -25,7 +25,7 @@ do_flash() {
 }
 
 do_reset() {
-    sh -c "${EDBG} ${EDBG_ARGS}"
+    sh -c "${EDBG} ${EDBG_ARGS} -x 10"
 }
 
 #

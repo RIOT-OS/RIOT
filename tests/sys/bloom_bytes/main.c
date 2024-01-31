@@ -62,8 +62,7 @@ int main(void)
     bloom_init(&bloom, BLOOM_BITS, bf, hashes, BLOOM_HASHF);
 
     printf("Testing Bloom filter.\n\n");
-    printf("m: %" PRIu32 " k: %" PRIu32 "\n\n", (uint32_t) bloom.m,
-           (uint32_t) bloom.k);
+    printf("m: %" PRIuSIZE " k: %" PRIuSIZE "\n\n", bloom.m, bloom.k);
 
     random_init(myseed);
 

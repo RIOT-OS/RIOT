@@ -22,7 +22,6 @@
 #include "cpu.h"
 #include "periph_conf.h"
 #include "mulle-nvram.h"
-#include "mtd.h"
 
 /* Use the on board RTC 32kHz clock for LPTMR clocking. */
 #undef LPTIMER_CLKSRC
@@ -150,8 +149,7 @@ extern "C" {
  * @name MTD configuration
  */
 /** @{ */
-extern mtd_dev_t *mtd0;
-#define MTD_0 mtd0
+#define MTD_0 mtd_dev_get(0)
 /** @} */
 
 /**

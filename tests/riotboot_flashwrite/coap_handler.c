@@ -24,8 +24,9 @@ ssize_t _flashwrite_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, coap_requ
     coap_block1_t block1;
     int blockwise = coap_get_block1(pkt, &block1);
 
-    printf("_flashwrite_handler(): received data: offset=%u len=%u blockwise=%i more=%i\n", \
-            (unsigned)block1.offset, pkt->payload_len, blockwise, block1.more);
+    printf("_flashwrite_handler(): received data: offset=%" PRIuSIZE
+           " len=%u blockwise=%i more=%i\n",
+           block1.offset, pkt->payload_len, blockwise, block1.more);
 
     uint8_t *payload_start = pkt->payload;
     size_t payload_len = pkt->payload_len;
@@ -53,7 +54,8 @@ ssize_t _flashwrite_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, coap_requ
         riotboot_flashwrite_putbytes(writer, payload_start, payload_len, block1.more);
     }
     else {
-        printf("_flashwrite_handler(): skipping invalid offset (data=%u, writer=%u)\n", (unsigned)offset, (unsigned)writer->offset);
+        printf("_flashwrite_handler(): skipping invalid offset (data=%" PRIuSIZE
+               ", writer=%" PRIuSIZE ")\n", offset, writer->offset);
     }
 
     if (block1.more == 1) {

@@ -10,6 +10,3 @@ INCLUDES += -I$(BINDIR)/pkg/micropython/ports/riot
 
 # include archive
 ARCHIVES += $(BINDIR)/micropython.a
-
-# The port currently doesn't build with llvm
-TOOLCHAINS_BLACKLIST += llvm

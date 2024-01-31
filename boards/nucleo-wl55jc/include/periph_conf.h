@@ -117,7 +117,12 @@ static const spi_conf_t spi_config[] = {
 #endif
 };
 
-#define SPI_NUMOF           ARRAY_SIZE(spi_config)
+#define SPI_NUMOF               ARRAY_SIZE(spi_config)
+/**
+ * @brief   Provide ARDUINO_SPI_D11D12D13 explicitly, as the first SPI
+ *          interface is connected to the radio.
+ */
+#define ARDUINO_SPI_D11D12D13   SPI_DEV(1)
 /** @} */
 
 /**

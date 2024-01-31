@@ -99,31 +99,6 @@ complete that no input from the original developer or maintainer is required.
 3.  Are critical/hard to understand parts in the code documented?
 4.  Check grammar and spelling of documentation
 
-### Bors usage
-
-RIOT uses [Bors] to merge Pull Requests. Bors can batch up to 4 PRs into a
-merge train and build and merge them all at once.
-This can greatly reduce CI times, but Bors has many quirks:
-
- - To merge a PR, comment "bors merge" under it.
-   The PR needs to be approved and CI must have already have run (CI: Ready for build)
-   If you write "bors merge" before CI has finished running for the PR, Bors will
-   tell you it will do the merge once CI is finished.
-   This is a lie. You will have to manually write "bors merge" again once everything
-   but Bors is green.
-
- - If there are multiple PRs that area ready to merge (all green except for Bors) you
-   can combine them into a merge train.
-   Be careful though: If CI is not busy, Bors will already start to build the first PR
-   once you type "Bors merge" and only include the other PRs in the next merge train.
-   To prevent this, you can first schedule a [dummy PR].
-   While the dummy PR (a no-op PR with "CI: skip compile tests" set) is running, you
-   can write "bors merge" under all the PRs you want to merge.
-   Be quick: You have a bit less than 1 minute of time to do this.
-
- - If Bors gets stuck you can write "bors cancel" under the PRs it last tried to build.
-   This can sometimes happen if you cancel a build in the Web UI.
-
 ## Non-technical guidelines
 
 ### Interaction with contributors
@@ -211,5 +186,3 @@ there.
 [Comparing build sizes]: https://github.com/RIOT-OS/RIOT/wiki/Comparing-build-sizes
 [Coding Conventions]: CODING_CONVENTIONS.md
 [Code of Conduct]: https://github.com/RIOT-OS/RIOT/blob/master/CODE_OF_CONDUCT.md
-[Bors]: https://bors.tech/
-[dummy PR]: https://github.com/RIOT-OS/RIOT/pull/19253

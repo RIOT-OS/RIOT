@@ -93,3 +93,7 @@ _native_sig_leave_handler:
     movl $0x0, _native_in_isr
     ret
 #endif
+
+#if defined(__linux__) && defined(__ELF__)
+.section .note.GNU-stack,"",%progbits
+#endif

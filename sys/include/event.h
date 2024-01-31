@@ -97,6 +97,7 @@
 #define EVENT_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <string.h>
 
 #include "assert.h"
@@ -275,6 +276,17 @@ void event_post(event_queue_t *queue, event_t *event);
  * @param[in]   event   event to remove from queue
  */
 void event_cancel(event_queue_t *queue, event_t *event);
+
+/**
+ * @brief   Check if an event is already queued
+ *
+ * @param[in]   queue   event queue to check
+ * @param[in]   event   event to check
+ *
+ * @returns true if @p event is in @p queue
+ * @returns false otherwise
+ */
+bool event_is_queued(const event_queue_t *queue, const event_t *event);
 
 /**
  * @brief   Get next event from event queue, non-blocking

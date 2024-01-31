@@ -455,7 +455,7 @@ int mpu9x50_set_compass_sample_rate(mpu9x50_t *dev, uint8_t rate)
 /**
  * Initialize compass
  * Caution: This internal function does not acquire exclusive access to the I2C bus.
- *          Acquisation and release is supposed to be handled by the calling function.
+ *          Acquisition and release is supposed to be handled by the calling function.
  */
 static int compass_init(mpu9x50_t *dev)
 {
@@ -524,7 +524,7 @@ static int compass_init(mpu9x50_t *dev)
 /**
  * Configure bypass mode
  * Caution: This internal function does not acquire exclusive access to the I2C bus.
- *          Acquisation and release is supposed to be handled by the calling function.
+ *          Acquisition and release is supposed to be handled by the calling function.
  */
 static void conf_bypass(const mpu9x50_t *dev, uint8_t bypass_enable)
 {
@@ -548,7 +548,7 @@ static void conf_bypass(const mpu9x50_t *dev, uint8_t bypass_enable)
 /**
  * Configure low pass filter
  * Caution: This internal function does not acquire exclusive access to the I2C bus.
- *          Acquisation and release is supposed to be handled by the calling function.
+ *          Acquisition and release is supposed to be handled by the calling function.
  */
 static void conf_lpf(const mpu9x50_t *dev, uint16_t half_rate)
 {

@@ -43,7 +43,7 @@ typedef enum {
 } nrf_clock_task_t;
 
 /**
- * @brief   Status HF clock acitvation/deactivation in `dcd_nrf52.c`
+ * @brief   Status HF clock activation/deactivation in `dcd_nrf52.c`
  *
  * The `clock_hfxo_request` and `clock_hfxo_release` functions are used in
  * RIOT to enable/disable the HF clock if necessary. Since `hfclk_enable`

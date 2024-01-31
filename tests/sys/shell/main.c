@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "architecture.h"
 #include "shell.h"
 
 #if MODULE_STDIO_RTT
@@ -87,7 +88,7 @@ static int print_shell_bufsize(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
-    printf("%d\n", sizeof(line_buf));
+    printf("%" PRIuSIZE "\n", sizeof(line_buf));
 
     return 0;
 }

@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "architecture.h"
 #include "kernel_defines.h"
 #include "random.h"
 #include "rs.h"
@@ -61,8 +62,8 @@ int main(void)
         return -1;
     }
 
-    printf("total: %u shards (%u bytes)\n",
-           (unsigned)ARRAY_SIZE(marks), (unsigned)sizeof(data));
+    printf("total: %" PRIuSIZE " shards (%" PRIuSIZE " bytes)\n",
+           ARRAY_SIZE(marks), sizeof(data));
 
     /* generate parity shards */
     reed_solomon_encode(rs, shards, ARRAY_SIZE(shards), SHARD_SIZE);

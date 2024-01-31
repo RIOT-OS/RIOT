@@ -255,7 +255,7 @@ static void _handle_data(usbdev_mock_t *dev, usbdev_mock_ep_t *ep, size_t len)
 {
     if (ep->ep.dir == USB_EP_DIR_IN) {
         /* Zero length IN packet is not valid here */
-        DEBUG("[data]: Handling IN data from stack: %u\n", (unsigned)len);
+        DEBUG("[data]: Handling IN data from stack: %" PRIuSIZE "\n", len);
         TEST_ASSERT(len != 0);
         dev->usbdev.epcb(&dev->in[0].ep, USBDEV_EVENT_ESR);
         if (ep->available == dev->req_len) {
@@ -263,9 +263,8 @@ static void _handle_data(usbdev_mock_t *dev, usbdev_mock_ep_t *ep, size_t len)
             req_phase = TEST_REQ_PHASE_OUTACK;
         }
         else {
-            DEBUG("[data]: Expecting more data from stack: %u/%u\n",
-                  (unsigned)ep->available,
-                  (unsigned)dev->req_len);
+            DEBUG("[data]: Expecting more data from stack: %" PRIuSIZE "/%" PRIuSIZE "\n",
+                  ep->available, dev->req_len);
         }
     }
 }

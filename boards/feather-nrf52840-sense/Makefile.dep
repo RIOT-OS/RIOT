@@ -1,0 +1,11 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += apds9960
+  USEMODULE += bmp280_i2c
+  USEMODULE += lis3mdl
+  USEMODULE += saul_gpio
+  USEMODULE += sht3x
+endif
+
+# include common nrf52 dependencies
+include $(RIOTBOARD)/common/nrf52/bootloader_nrfutil.dep.mk
+include $(RIOTBOARD)/common/nrf52/Makefile.dep

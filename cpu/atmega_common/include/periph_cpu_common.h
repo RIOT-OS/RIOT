@@ -231,14 +231,6 @@ typedef enum {
     GPIO_TRIGGER_LEVEL_HIGH     = 0xff, /**< not supported */
 } gpio_irq_trig_t;
 
-#define HAVE_GPIO_PULL_T
-typedef enum {
-    GPIO_FLOATING = 0,
-    GPIO_PULL_UP = 1,
-    GPIO_PULL_DOWN = 0xfe,  /*< not supported */
-    GPIO_PULL_KEEP = 0xff,  /*< not supported */
-} gpio_pull_t;
-
 #define HAVE_GPIO_LL_PREPARE_WRITE_ALL_PINS
 #define HAVE_GPIO_LL_PREPARE_WRITE
 

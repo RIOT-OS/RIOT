@@ -58,7 +58,7 @@ static int init_base(uart_t uart, uint32_t baudrate)
     }
 
     /* get the default UART for now -> TODO: enable for multiple devices */
-    msp_usci_a_t *dev = UART_BASE;
+    msp430_usci_a_t *dev = UART_BASE;
 
     /* put device in reset mode while configuration is going on */
     dev->CTL1 = UCSWRST;

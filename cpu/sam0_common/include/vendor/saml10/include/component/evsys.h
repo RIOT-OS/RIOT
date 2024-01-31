@@ -151,7 +151,7 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
   struct {
     __I uint8_t OVR:1;                     /**< bit:      0  Channel Overrun                          */
     __I uint8_t EVD:1;                     /**< bit:      1  Channel Event Detected                   */
-    __I uint8_t :6;                        /**< bit:   2..7  Reserved */
+    uint8_t :6;                            /**< bit:   2..7  Reserved */
   } bit;                                /**< Structure used for bit  access */
   uint8_t  reg;                         /**< Type used for register access */
 } EVSYS_CHINTFLAG_Type;
@@ -523,7 +523,7 @@ typedef union {
 typedef union { // __I to avoid read-modify-write on write-to-clear register
   struct {
     __I uint8_t NSCHK:1;                   /**< bit:      0  Non-Secure Check                         */
-    __I uint8_t :7;                        /**< bit:   1..7  Reserved */
+    uint8_t :7;                            /**< bit:   1..7  Reserved */
   } bit;                                /**< Structure used for bit  access */
   uint8_t  reg;                         /**< Type used for register access */
 } EVSYS_INTFLAG_Type;

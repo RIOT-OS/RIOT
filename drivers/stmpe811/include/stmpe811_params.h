@@ -59,10 +59,13 @@ extern "C" {
 #define STMPE811_PARAM_INT_PIN          GPIO_PIN(0, 15)
 #endif
 #ifndef STMPE811_PARAM_XMAX
-#define STMPE811_PARAM_XMAX             (240U)
+#define STMPE811_PARAM_XMAX             (320U)
 #endif
 #ifndef STMPE811_PARAM_YMAX
-#define STMPE811_PARAM_YMAX             (320U)
+#define STMPE811_PARAM_YMAX             (240U)
+#endif
+#ifndef STMPE811_PARAM_XYCONV
+#define STMPE811_PARAM_XYCONV           (STMPE811_MIRROR_X | STMPE811_MIRROR_Y | STMPE811_SWAP_XY)
 #endif
 
 #ifndef STMPE811_PARAMS
@@ -73,14 +76,16 @@ extern "C" {
                                          .int_pin = STMPE811_PARAM_INT_PIN, \
                                          .xmax = STMPE811_PARAM_XMAX,       \
                                          .ymax = STMPE811_PARAM_YMAX,       \
-                                         }
+                                         .xyconv = STMPE811_PARAM_XYCONV,   \
+                                       }
 #else
 #define STMPE811_PARAMS                { .i2c = STMPE811_PARAM_I2C_DEV,     \
                                          .addr = STMPE811_PARAM_ADDR,       \
                                          .int_pin = STMPE811_PARAM_INT_PIN, \
                                          .xmax = STMPE811_PARAM_XMAX,       \
                                          .ymax = STMPE811_PARAM_YMAX,       \
-                                         }
+                                         .xyconv = STMPE811_PARAM_XYCONV,   \
+                                       }
 #endif
 #endif
 /**@}*/

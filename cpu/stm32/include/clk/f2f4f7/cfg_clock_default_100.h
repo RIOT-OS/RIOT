@@ -44,7 +44,8 @@ extern "C" {
 #endif
 #endif
 #ifndef CONFIG_CLOCK_PLL_N
-#if IS_USED(MODULE_PERIPH_USBDEV_CLK) && defined(CPU_LINE_STM32F411xE)
+#if (IS_USED(MODULE_PERIPH_USBDEV_CLK) || IS_USED(MODULE_PERIPH_SDMMC_CLK)) && \
+    defined(CPU_LINE_STM32F411xE)
 #if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CONFIG_CLOCK_HSE == MHZ(8))
 #define CONFIG_CLOCK_PLL_N              (96)
 #elif IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CONFIG_CLOCK_HSE == MHZ(25))
@@ -60,7 +61,7 @@ extern "C" {
 #else
 #define CONFIG_CLOCK_PLL_N              (50)
 #endif
-#endif /* MODULE_PERIPH_USBDEV_CLK */
+#endif /* MODULE_PERIPH_USBDEV_CLK || MODULE_PERIPH_SDMMC_CLK */
 #endif
 #ifndef CONFIG_CLOCK_PLL_P
 #define CONFIG_CLOCK_PLL_P              (2)

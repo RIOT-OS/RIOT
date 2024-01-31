@@ -5,6 +5,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-uno \
     atmega328p \
     atmega328p-xplained-mini \
+    atmega8 \
     esp8266-esp-12x \
     esp8266-olimex-mod \
     esp8266-sparkfun-thing \

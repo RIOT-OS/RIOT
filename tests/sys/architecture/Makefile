@@ -3,6 +3,10 @@ include ../Makefile.sys_common
 
 include $(RIOTBASE)/Makefile.include
 
+ifneq (,$(filter arch_64bit,$(FEATURES_USED)))
+  CFLAGS += -DCORRECT_WORD_BITS=64
+endif
+
 ifneq (,$(filter arch_32bit,$(FEATURES_USED)))
   CFLAGS += -DCORRECT_WORD_BITS=32
 endif

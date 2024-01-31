@@ -1,0 +1,24 @@
+From 5117abbc20cad093f4f8285ecd2dea737df7be23 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Wed, 2 Aug 2023 13:18:40 +0200
+Subject: [PATCH 32/32] hal/gdma: include stddef.h for NULL
+
+---
+ components/hal/esp32s3/include/hal/gdma_ll.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/components/hal/esp32s3/include/hal/gdma_ll.h b/components/hal/esp32s3/include/hal/gdma_ll.h
+index 4035c76934c..a3d1436b9bc 100644
+--- a/components/hal/esp32s3/include/hal/gdma_ll.h
++++ b/components/hal/esp32s3/include/hal/gdma_ll.h
+@@ -5,6 +5,7 @@
+  */
+ #pragma once
+ 
++#include <stddef.h>
+ #include <stdint.h>
+ #include <stdbool.h>
+ #include "soc/soc_caps.h"
+-- 
+2.34.1
+

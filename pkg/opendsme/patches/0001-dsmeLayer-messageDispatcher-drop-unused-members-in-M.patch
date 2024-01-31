@@ -1,0 +1,32 @@
+From 83a0db14099d2397b64322379a11adc32a191e32 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@posteo.net>
+Date: Mon, 17 Jul 2023 15:23:50 +0200
+Subject: [PATCH] dsmeLayer/messageDispatcher: drop unused members in
+ MessageDispatcher
+
+---
+ dsmeLayer/messageDispatcher/MessageDispatcher.h | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/dsmeLayer/messageDispatcher/MessageDispatcher.h b/dsmeLayer/messageDispatcher/MessageDispatcher.h
+index 207e11f..a343ab3 100644
+--- a/dsmeLayer/messageDispatcher/MessageDispatcher.h
++++ b/dsmeLayer/messageDispatcher/MessageDispatcher.h
+@@ -233,14 +233,12 @@ public:
+ 
+ private:
+     long numTxGtsFrames = 0;
+-    long numRxAckFrames = 0;
+     long numRxGtsFrames = 0;
+     long numUnusedTxGts = 0;
+     long numUnusedRxGts = 0;
+     long numUpperPacketsDroppedFullQueue = 0;
+     long numUpperPacketsForCAP = 0;
+     long numUpperPacketsForGTS = 0;
+-    bool recordGtsUpdates = false;
+ /* Statistics (END) --------------------------------------------------------- */
+ };
+ 
+-- 
+2.41.0
+

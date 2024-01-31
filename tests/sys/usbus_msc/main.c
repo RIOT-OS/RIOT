@@ -48,7 +48,7 @@ MTD_EMULATED_DEV(0, SECTOR_COUNT, PAGES_PER_SECTOR, PAGE_SIZE);
 
 #endif /* MODULE_MTD_EMULATED */
 
-#include "mtd_default.h"
+#include "mtd.h"
 #include "shell.h"
 #include "usb/usbus.h"
 #include "usb/usbus/msc.h"
@@ -76,7 +76,7 @@ static int _cmd_add_lun(int argc, char **argv)
         puts("error: invalid MTD device specified");
         return -2;
     }
-    mtd_dev = mtd_default_get_dev(dev);
+    mtd_dev = mtd_dev_get(dev);
     ret = usbus_msc_add_lun(usbus, mtd_dev);
     if (ret != 0) {
         printf("Cannot add LUN device (error:%d %s)\n", ret, strerror(-ret));
@@ -104,7 +104,7 @@ static int _cmd_remove_lun(int argc, char **argv)
         puts("error: invalid MTD device specified");
         return -2;
     }
-    mtd_dev = mtd_default_get_dev(dev);
+    mtd_dev = mtd_dev_get(dev);
     ret = usbus_msc_remove_lun(usbus, mtd_dev);
     if (ret == -EAGAIN) {
         printf("MTD device was not registered\n");
