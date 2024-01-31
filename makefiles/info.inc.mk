@@ -90,7 +90,6 @@ info-build:
 	@echo -e 'CXXEXFLAGS:$(patsubst %, \n\t%, $(CXXEXFLAGS))'
 	@echo ''
 	@echo 'RUST_TARGET: $(RUST_TARGET)'
-	@echo 'CARGO_CHANNEL: $(CARGO_CHANNEL)'
 	@echo 'CARGO_PROFILE: $(CARGO_PROFILE)'
 	@echo 'CARGO_OPTIONS: $(CARGO_OPTIONS)'
 	@echo ''
@@ -250,5 +249,5 @@ info-programmers-supported:
 	@echo $(sort $(PROGRAMMERS_SUPPORTED))
 
 info-rust:
-	cargo $(patsubst +,,+${CARGO_CHANNEL}) version
+	cargo version
 	c2rust --version
