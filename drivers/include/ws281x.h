@@ -1,5 +1,6 @@
 /*
  * Copyright 2019 Marian Buschsieweke
+ *           2024 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -42,6 +43,30 @@
  * The ESP32 implementation is frequency independent, as frequencies above 80MHz
  * are high enough to support bit banging without assembly.
  *
+ * ## SPI
+ *
+ * The primary aim of this implementation was to enable the use of DMA on STM32.
+ * Its major drawback is that it uses binary patterns sent on the MOSI pin,
+ * which implies a large additional buffer at least three times the size of
+ * `ws281x_buf`. Its advantage is that it should work on a wide variety of
+ * devices.
+ *
+ * @warning The SPI clock frequency required is equal to 800KHz multiplied by
+ * the pattern length, so the optimum SPI clock frequency is 2.4 MHz. In
+ * practice, I've successfully tested frequencies ranging from 0.5 MHz (4 / 8)
+ * to 1.11 MHz (4.44 / 4 and 3.33 / 3).
+ * You should also bear in mind that the clock frequency actually obtained
+ * depends greatly on the hardware implementation of the SPI device and the
+ * support of an arbitrary speed by the software driver. For example, on
+ * ESP8266 you could have used an 8-bit long pattern with SPI_CLK_5MHZ which
+ * gives a frequency of 0.63 MHz, but it's better to use the 3-bit long
+ * pattern by modifying the driver to use `spi_clkdiv_pre = 2` and
+ * `spi_clkcnt_N = 16` to obtain a frequency of 2.5 MHz. The size of the SPI
+ * buffer can also be a problem if the cpu takes too long to reload it, as
+ * on AVR. The ESP 8266 has a 64-byte buffer and takes 5µs to reload, which
+ * is an execpt problem if it occurs "between 2 leds" or 24 patterns (8-bit
+ * pattern: 24 - 48; 3-bit pattern: 9 .. 63).
+ *
  * ## Native/VT100
  *
  * The native (VT100) implementation writes the LED state to the console.
@@ -73,7 +98,17 @@
  * * the SPI backend:
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Makefile
  * USEMODULE += ws281x_spi
+ *
+ * # Optionally
+ * FEATURES_REQUIRED += periph_dma
+ * CFLAGS += '-DWS281X_SPI_DEV=0'
+ * CFLAGS += '-DWS281X_SPI_PATTERN_LENGTH=3'
+ * CFLAGS += '-DWS281X_SPI_CLK=2400000'
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * The driver supports 3 pattern sizes: 3, 4 and 8 bits. The default
+ * WS281X_SPI_CLK is KHZ(800 * WS281X_SPI_PATTERN_LENGTH), but this only works
+ * for drivers that support an arbitrary speed, such as stm32. With others,
+ * you'll need to set it to SPI_CLK_5MHZ.
  *
  * * the native/VT100 backend:
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Makefile
@@ -86,6 +121,7 @@
  * @brief       WS2812/SK6812 RGB LED Driver
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author      Hugues Larrive <hlarrive@pm.me>
  */
 
 #ifndef WS281X_H
