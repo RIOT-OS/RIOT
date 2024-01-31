@@ -66,7 +66,7 @@ $(CARGO_LIB): $(RIOTBUILD_CONFIG_HEADER_C) $(BUILDDEPS) $(CARGO_COMPILE_COMMANDS
 		cargo $(patsubst +,,+${CARGO_CHANNEL}) \
 			build \
 			--target $(RUST_TARGET) \
-			`if [ x$(CARGO_PROFILE) = xrelease ]; then echo --release; else if [ x$(CARGO_PROFILE) '!=' xdebug ]; then echo "--profile $(CARGO_PROFILE)"; fi; fi` \
+			--profile $(CARGO_PROFILE) \
 			$(CARGO_OPTIONS)
 
 $(APPLICATION_RUST_MODULE).module: $(CARGO_LIB) FORCE

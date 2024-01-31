@@ -1,5 +1,7 @@
-# Setting anything other than "debug" or "release" will necessitate additional
-# -Z unstable-options as of 2021-03 nightlies.
+# The profile with which to build Rust usually `release` or `dev`.
+#
+# This needs to be known to the build scripts because the path of the produced
+# binary is derived from this.
 CARGO_PROFILE ?= release
 
 # Value for CARGO_CHANNEL when using nightly
@@ -42,4 +44,10 @@ CARGO_CHANNEL ?=
 CARGO_TARGET_DIR = $(BINDIR)/target
 
 # The single Rust library to be built.
-CARGO_LIB = $(CARGO_TARGET_DIR)/$(RUST_TARGET)/${CARGO_PROFILE}/lib$(APPLICATION_RUST_MODULE).a
+#
+# The dev->debug and bench->release substitutions represent a historical
+# peculiarity in cargo: "For historical reasons, the `dev` and `test` profiles
+# are stored in the `debug` directory, and the `release` and `bench` profiles
+# are stored in the `release` directory. User-defined profiles are stored in a
+# directory with the same name as the profile".
+CARGO_LIB = $(CARGO_TARGET_DIR)/$(RUST_TARGET)/$(patsubst test,debug,$(patsubst dev,debug,$(patsubst bench,release,${CARGO_PROFILE})))/lib$(APPLICATION_RUST_MODULE).a
