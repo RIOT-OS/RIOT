@@ -35,4 +35,4 @@ CARGO_LIB = $(CARGO_TARGET_DIR)/$(RUST_TARGET)/$(patsubst test,debug,$(patsubst 
 # Most of these are populated by RIOT modules that are backed by Rust. Popular
 # options added by the user are `-Zbuild-std=core` (only available on nightly)
 # to apply LTO and profile configuration to the core library.
-CARGO_OPTIONS ?= 
+CARGO_OPTIONS ?=
