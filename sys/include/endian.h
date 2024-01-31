@@ -7,10 +7,13 @@
  */
 
 /**
- * @addtogroup posix
+ * @defgroup    sys_endian  endian conversions as provided by most libcs
+ * @ingroup     sys
+ *
+ * This module provides architecture-independent access to architecture details.
+ *
  * @{
- */
-/**
+ *
  * @file
  * @brief       libc header for endian conversion
  *
