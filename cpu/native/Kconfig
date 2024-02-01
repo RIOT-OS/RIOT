@@ -7,7 +7,8 @@
 
 config CPU_ARCH_NATIVE
     bool
-    select HAS_ARCH_32BIT
+    select HAS_ARCH_32BIT if "$(NATIVE_64BIT)" != "1"
+    select HAS_ARCH_64BIT if "$(NATIVE_64BIT)" = "1"
     select HAS_ARCH_NATIVE
     select HAS_CPP
     select HAS_CPU_NATIVE
@@ -59,7 +60,7 @@ config NATIVE_OS_LINUX
     select HAS_PERIPH_GPIO
     select HAS_PERIPH_GPIO_IRQ
     select HAS_PERIPH_SPI
-    select HAS_RUST_TARGET if "$(OS_ARCH)" = "x86_64"
+    select HAS_RUST_TARGET if "$(OS_ARCH)" = "x86_64" && HAS_ARCH_32BIT
 
 config NATIVE_OS_FREEBSD
     bool

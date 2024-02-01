@@ -11,5 +11,9 @@ TOOLCHAINS_SUPPORTED = gnu llvm afl
 
 # Platform triple as used by Rust
 ifeq ($(OS) $(OS_ARCH),Linux x86_64)
-  RUST_TARGET = i686-unknown-linux-gnu
+  ifneq (,$(filter arch_32bit,$(FEATURES_USED)))
+    RUST_TARGET = i686-unknown-linux-gnu
+  else
+    RUST_TARGET = x86_64-unknown-linux-gnu
+  endif
 endif

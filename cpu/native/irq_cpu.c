@@ -25,7 +25,7 @@
 #include <valgrind/valgrind.h>
 #define VALGRIND_DEBUG DEBUG
 #else
-#define VALGRIND_STACK_REGISTER(...)
+#define VALGRIND_STACK_REGISTER(...) (0)
 #define VALGRIND_DEBUG(...)
 #endif
 
@@ -53,7 +53,7 @@ char __isr_stack[SIGSTKSZ];
 ucontext_t native_isr_context;
 ucontext_t *_native_cur_ctx, *_native_isr_ctx;
 
-volatile unsigned int _native_saved_eip;
+volatile uintptr_t _native_saved_eip;
 volatile int _native_sigpend;
 int _sig_pipefd[2];
 
@@ -353,9 +353,14 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
     _native_saved_eip = ((ucontext_t *)context)->uc_mcontext.arm_pc;
     ((ucontext_t *)context)->uc_mcontext.arm_pc = (unsigned int)&_native_sig_leave_tramp;
 #else /* Linux/x86 */
+  #ifdef __x86_64__
+    _native_saved_eip = ((ucontext_t *)context)->uc_mcontext.gregs[REG_RIP];
+    ((ucontext_t *)context)->uc_mcontext.gregs[REG_RIP] = (uintptr_t)&_native_sig_leave_tramp;
+  #else
     //printf("\n\033[31mEIP:\t%p\ngo switching\n\n\033[0m", (void*)((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP]);
     _native_saved_eip = ((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP];
     ((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP] = (unsigned int)&_native_sig_leave_tramp;
+  #endif
 #endif
 #endif
 }
@@ -466,9 +471,9 @@ void native_interrupt_init(void)
     struct sigaction sa;
     DEBUG("native_interrupt_init\n");
 
-    VALGRIND_STACK_REGISTER(__isr_stack, __isr_stack + sizeof(__isr_stack));
+    (void) VALGRIND_STACK_REGISTER(__isr_stack, __isr_stack + sizeof(__isr_stack));
     VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n",
-                   (void *)__isr_stack, (void*)((int)__isr_stack + sizeof(__isr_stack)));
+                   (void *)__isr_stack, (void*)(__isr_stack + sizeof(__isr_stack)));
 
     _native_sigpend = 0;
 

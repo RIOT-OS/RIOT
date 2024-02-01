@@ -69,6 +69,54 @@ _native_sig_leave_handler:
 #else
 .globl _native_sig_leave_tramp
 
+#ifdef __x86_64__
+_native_sig_leave_tramp:
+    pushq _native_saved_eip(%rip)
+    pushfq
+
+    pushq %rax
+    pushq %rcx
+    pushq %rdx
+    pushq %rbx
+    pushq %rbp
+    pushq %rsi
+    pushq %rdi
+    pushq %r8
+    pushq %r9
+    pushq %r10
+    pushq %r11
+    pushq %r12
+    pushq %r13
+    pushq %r14
+    pushq %r15
+
+    mov _native_isr_ctx(%rip), %rsi
+    mov _native_cur_ctx(%rip), %rdi
+
+    call swapcontext
+
+    call irq_enable
+
+    movl $0x0, _native_in_isr(%rip)
+    popq %r15
+    popq %r14
+    popq %r13
+    popq %r12
+    popq %r11
+    popq %r10
+    popq %r9
+    popq %r8
+    popq %rdi
+    popq %rsi
+    popq %rbp
+    popq %rbx
+    popq %rdx
+    popq %rcx
+    popq %rax
+
+    popfq
+    ret
+#else
 _native_sig_leave_tramp:
     pushl _native_saved_eip
     pushfl
@@ -86,11 +134,17 @@ _native_sig_leave_tramp:
     popfl
 
     ret
+#endif
 
 .globl _native_sig_leave_handler
 _native_sig_leave_handler:
+#ifdef __x86_64__
+    pushq _native_saved_eip(%rip)
+    movl $0x0, _native_in_isr(%rip)
+#else
     pushl _native_saved_eip
     movl $0x0, _native_in_isr
+#endif
     ret
 #endif
 

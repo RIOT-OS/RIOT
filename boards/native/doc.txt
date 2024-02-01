@@ -25,7 +25,8 @@
 
 # Required packages
 
-The `native` version of RIOT will produce a 32 bit binary.
+The `native` version of RIOT will produce a 32 bit binary by default.
+To compile for x86_64 set the environment variable `NATIVE_64BIT=1`.
 On Debian/Ubuntu you can install the required libraries with
 
 ```
