@@ -98,6 +98,18 @@ static inline void event_periodic_callback_start(event_periodic_callback_t *even
 }
 
 /**
+ * @brief   Get the interval in which the periodic callback event repeats
+ *
+ * @param[in]   event           event_periodic_callback context object to use
+ *
+ * @returns     The interval of the underlying timer in which the event repeats
+ */
+static inline uint32_t event_periodic_callback_get_interval(const event_periodic_callback_t *event)
+{
+    return event->periodic.timer.interval;
+}
+
+/**
  * @brief   Set the amount of times the periodic callback event should repeat itself.
  *
  * @param[in]   event           event_periodic_callback context object to use
@@ -108,6 +120,18 @@ static inline void event_periodic_callback_set_count(event_periodic_callback_t *
                                                      uint32_t count)
 {
     event_periodic_set_count(&event->periodic, count);
+}
+
+/**
+ * @brief   Get the amount of times the periodic callback event should repeat itself.
+ *
+ * @param[in]   event           event_periodic_callback context object to use
+ * @returns     times the event should repeat itself,
+ *              EVENT_PERIODIC_FOREVER if it will repeat forever or is exhausted
+ */
+static inline uint32_t event_periodic_callback_get_count(const event_periodic_callback_t *event)
+{
+    return event->periodic.count;
 }
 
 /**
