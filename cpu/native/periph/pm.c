@@ -20,10 +20,12 @@
 #include <err.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
-#include "periph/pm.h"
-#include "native_internal.h"
 #include "async_read.h"
+#include "irq.h"
+#include "native_internal.h"
+#include "periph/pm.h"
 #include "tty_uart.h"
 
 #ifdef MODULE_PERIPH_SPIDEV_LINUX
@@ -36,10 +38,19 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+struct timespec native_time_spend_sleeping = { 0 };
+
 static void _native_sleep(void)
 {
     _native_in_syscall++; /* no switching here */
+    struct timespec before, after;
+    clock_gettime(CLOCK_MONOTONIC, &before);
     real_pause();
+    clock_gettime(CLOCK_MONOTONIC, &after);
+    timespec_subtract(&after, &before);
+    unsigned irq_state = irq_disable();
+    timespec_add(&native_time_spend_sleeping, &after);
+    irq_restore(irq_state);
     _native_in_syscall--;
 
     if (_native_sigpend > 0) {

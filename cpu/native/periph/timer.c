@@ -36,6 +36,7 @@
 
 #include "cpu.h"
 #include "cpu_conf.h"
+#include "irq.h"
 #include "native_internal.h"
 #include "periph/timer.h"
 #include "time_units.h"
@@ -236,9 +237,13 @@ unsigned int timer_read(tim_t dev)
 
     _native_syscall_enter();
 
-    if (clock_gettime(CLOCK_MONOTONIC, &t) == -1) {
+    if (clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t) == -1) {
         err(EXIT_FAILURE, "timer_read: clock_gettime");
     }
+
+    unsigned irq_state = irq_disable();
+    timespec_add(&t, &native_time_spend_sleeping);
+    irq_restore(irq_state);
 
     _native_syscall_leave();
 

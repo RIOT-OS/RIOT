@@ -63,6 +63,8 @@
 #include <sys/uio.h>
 #include <dirent.h>
 
+#include "time_units.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -201,6 +203,45 @@ int register_interrupt(int sig, _native_callback_t handler);
  * unregister interrupt handler for interrupt sig
  */
 int unregister_interrupt(int sig);
+
+/**
+ * @brief   Time the process voluntarily paused (e.g. by `pm_set_lowest()`)
+ *
+ * @note    You should disable IRQs while accessing it.
+ */
+extern struct timespec native_time_spend_sleeping;
+
+/**
+ * @brief   Subtract @p subtrahend from @p minuend in-place
+ *
+ * @note    If both values are normalized, the result will be normalized
+ */
+static inline void timespec_subtract(struct timespec *minuend,
+                                     const struct timespec *subtrahend)
+{
+    minuend->tv_sec -= subtrahend->tv_sec;
+    minuend->tv_nsec -= subtrahend->tv_nsec;
+    if (minuend->tv_nsec < 0) {
+        minuend->tv_nsec += NS_PER_SEC;
+        minuend->tv_sec--;
+    }
+}
+
+/**
+ * @brief   Add @p second from @p first in-place
+ *
+ * @note    If both values are normalized, the result will be normalized
+ */
+static inline void timespec_add(struct timespec *first,
+                                const struct timespec *second)
+{
+    first->tv_sec += second->tv_sec;
+    first->tv_nsec += second->tv_nsec;
+    if (first->tv_nsec > (long)NS_PER_SEC) {
+        first->tv_nsec -= NS_PER_SEC;
+        first->tv_sec++;
+    }
+}
 
 #ifdef __cplusplus
 }
