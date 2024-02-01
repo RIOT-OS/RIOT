@@ -62,7 +62,6 @@ $(CARGO_LIB): $(RIOTBUILD_CONFIG_HEADER_C) $(BUILDDEPS) $(CARGO_COMPILE_COMMANDS
 	@# finally call out to cargo. mind the "+" to pass down make's jobserver.
 	$(Q)+ CC= CFLAGS= CPPFLAGS= CXXFLAGS= \
 		RIOT_COMPILE_COMMANDS_JSON="$(CARGO_COMPILE_COMMANDS)" \
-		RIOT_USEMODULE="$(USEMODULE)" \
 		cargo \
 			build \
 			--target $(RUST_TARGET) \

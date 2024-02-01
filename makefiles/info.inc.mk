@@ -255,4 +255,4 @@ info-rust:
 	@echo "    --target $(RUST_TARGET) --profile $(CARGO_PROFILE)"
 	@echo "and export these environment variables:"
 	@echo "    RIOT_COMPILE_COMMANDS_JSON=\"$(CARGO_COMPILE_COMMANDS)\""
-	@echo "    RIOT_USEMODULE=\"$(USEMODULE)\""
+	@echo "    RIOTBUILD_CONFIG_HEADER_C=\"$(RIOTBUILD_CONFIG_HEADER_C)\""
