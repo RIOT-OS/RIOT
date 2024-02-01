@@ -23,30 +23,71 @@
  * As a debugging aid, when compiled with `-DAT_PRINT_INCOMING=1`, every input
  * byte gets printed.
  *
+ * ## Command echoing ##
+ * Most DCEs (Data Circuit-terminating Equipment, aka modem) support command
+ * echoing and enable it by default, and so does this driver.
+ * If you disabled echoing on the DCE, you can compile this driver NOT to expect
+ * echoing by defining CONFIG_AT_SEND_SKIP_ECHO.
+ * Note, if the driver is NOT expecting command echoing but the DCE is echoing,
+ * it should work just fine if and only if the EOL sequences of both DCE and
+ * DTE (Data Terminal Equipmend - i.e. the device using this driver) match, i.e.
+ * `AT_RECV_EOL_1 AT_RECV_EOL_2 == AT_SEND_EOL`.
+ * In other words, if you are unsure about the echoing behavior of the DCE or
+ * want to support both, set AT_SEND_EOL = AT_RECV_EOL_1 AT_RECV_EOL_2 and
+ * define CONFIG_AT_SEND_SKIP_ECHO. This works because the URC (Unsolicited
+ * Result Code) logic will intercept the echoes (see below).
+ *
  * ## Unsolicited Result Codes (URC) ##
  * An unsolicited result code is a string message that is not triggered as a
  * information text response to a previous AT command and can be output at any
  * time to inform a specific event or status change.
  *
- * The module provides a basic URC handling by adding the `at_urc` module to the
- * application. This allows to @ref at_add_urc "register" and
- * @ref at_remove_urc "de-register" URC strings to check. Later,
- * @ref at_process_urc can be called to check if any of the registered URCs have
- * been detected. If a registered URC has been detected the correspondent
- * @ref at_urc_t::cb "callback function" is called. The mode of operation
- * requires that the user of the module processes periodically the URCs.
+ * Some DCEs (Data Circuit-terminating Equipment, aka modem), like the LTE
+ * modules from uBlox define a grace period where URCs are guaranteed NOT to be
+ * sent as the time span between:
+ *  - the command EOL character reception AND command being internally accepted
+ *  - the EOL character of the last response line
  *
- * Alternatively, one of the `at_urc_isr_<priority>` modules can be included.
- * `priority` can be one of `low`, `medium` or `highest`, which correspond to
- * the priority of the thread that processes the URCs. For more information on
- * the priorities check the @ref sys_event module. This will extend the
- * functionality of `at_urc` by processing the URCs when the @ref AT_RECV_EOL_2
- * character is detected and there is no pending response. This works by posting
- * an @ref sys_event "event" to an event thread that processes the URCs.
+ * As follows, there is an indeterminate amount of time between:
+ *  - the command EOL character being sent
+ *  - the command EOL character reception AND command being internally accepted,
+ *    i.e. the begin of the grace period
+ *
+ * In other words, we can get a URC (or more?) just after issuing the command
+ * and before the first line of response. The net effect is that such URCs will
+ * appear to be the first line of response to the last issued command.
+ *
+ * Regardless of whether URC handling is enabled or not, URC interception
+ * mechanics depend on command echoing:
+ *  1. echo enabled: by observation, it seems that the grace period begins
+ *   BEFORE the echoed command. This has the advantage that we ALWAYS know what
+ *   the first line of response must look like and so if it doesn't, then it's a
+ *   URC. Thus, any procedure that calls at_send_cmd() internally will catch any
+ *   URC.
+ *  2. echo disabled: commands that expect a particular type of response (e.g.
+ *   @ref at_send_cmd_get_resp_wait_ok() with a non-trivial prefix,
+ *   @ref at_send_cmd_wait_ok() etc.) will catch any URC. For the rest, it is
+ *   the application's responsibility to decide whether the received answer is
+ *   an URC or not and if yes, then @ref at_postprocess_urc() can be called with
+ *   the response as parameter.
+ *
+ * URC handling can be enabled by adding the `at_urc` module to the
+ * application. This allows to @ref at_add_urc "register" and @ref at_remove_urc
+ * "de-register" URC strings to check. Later, URCs can be processed in three
+ * different ways:
+ *  - automatically, whenever any at_* method that intercepts URCs is called.
+ *    Such methods are marked in their docstring
+ *  - manually, by calling at_process_urc() periodically
+ *  - manually, by calling at_postprocess_urc() with an URC as parameter. The
+ *    URC is assumed to have been obtained from the device through methods that
+ *    do not automatically handle URCs (for example through @ref at_recv_bytes())
+ * If a registered URC has been detected the correspondent @ref at_urc_t::cb
+ * "callback function" is called.
  *
  * ## Error reporting ##
- * Most DCEs (Data Circuit-terminating Equipment, aka modem) can return extra error
- * information instead of the rather opaque "ERROR" message. They have the form:
+ * Most DCEs (Data Circuit-terminating Equipment, aka modem) can return extra
+ * error information instead of the rather opaque "ERROR" message. They have the
+ * form:
  *  - `+CMS ERROR: err_code>` for SMS-related commands
  *  - `+CME ERROR: <err_code>` for other commands
  *
@@ -131,6 +172,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief convenience macro for the EOL sequence sent by the DCE
+ */
+#define AT_RECV_EOL AT_RECV_EOL_1 AT_RECV_EOL_2
+
+/**
  * @brief default OK reply of an AT device.
  */
 #ifndef CONFIG_AT_RECV_OK
@@ -143,29 +189,9 @@ extern "C" {
 #ifndef CONFIG_AT_RECV_ERROR
 #define CONFIG_AT_RECV_ERROR "ERROR"
 #endif
-
-#if defined(MODULE_AT_URC) || DOXYGEN
-
-/**
- * @brief   Default buffer size used to process unsolicited result code data.
- *          (as exponent of 2^n).
- *
- *          As the buffer size ALWAYS needs to be power of two, this option
- *          represents the exponent of 2^n, which will be used as the size of
- *          the buffer.
- */
-#ifndef CONFIG_AT_BUF_SIZE_EXP
-#define CONFIG_AT_BUF_SIZE_EXP (7U)
-#endif
 /** @} */
 
-/**
- * @brief   Size of buffer used to process unsolicited result code data.
- */
-#ifndef AT_BUF_SIZE
-#define AT_BUF_SIZE   (1 << CONFIG_AT_BUF_SIZE_EXP)
-#endif
-
+#if defined(MODULE_AT_URC) || DOXYGEN
 /**
  * @brief   Unsolicited result code callback
  *
@@ -258,6 +284,8 @@ int at_dev_init(at_dev_t *dev, at_dev_init_t const *init);
  *
  * This function sends an AT command to the device and waits for "OK".
  *
+ * URCs are automatically handled
+ *
  * @param[in]   dev     device to operate on
  * @param[in]   command command string to send
  * @param[in]   timeout timeout (in usec)
@@ -275,6 +303,8 @@ int at_send_cmd_wait_ok(at_dev_t *dev, const char *command, uint32_t timeout);
  * This function sends the supplied @p command, then waits for the prompt (>)
  * character and returns
  *
+ * URCs are automatically handled
+ *
  * @param[in]   dev         device to operate on
  * @param[in]   command     command string to send
  * @param[in]   timeout     timeout (in usec)
@@ -290,7 +320,11 @@ int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout
  * @brief   Send AT command, wait for response
  *
  * This function sends the supplied @p command, then waits and returns one
- * line of response.
+ * line of response. The response is guaranteed null-terminated.
+ *
+ * Some URCs are automatically handled. The response returned can be an
+ * URC. In that case, @ref at_postprocess_urc() can be called with the response
+ * as parameter.
  *
  * A possible empty line will be skipped.
  *
@@ -301,6 +335,7 @@ int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout
  * @param[in]   timeout     timeout (in usec)
  *
  * @retval      n length of response on success
+ * @retval     -ENOBUFS if the supplied buffer was to small.
  * @retval     <0 on error
  */
 ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command, char *resp_buf,
@@ -310,9 +345,13 @@ ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command, char *resp_buf,
  * @brief   Send AT command, wait for response plus OK
  *
  * This function sends the supplied @p command, then waits and returns one
- * line of response.
+ * line of response. The response is guaranteed null-terminated.
  *
  * A possible empty line will be skipped.
+ *
+ * URCs are automatically handled. If no prefix is provided, the response
+ * may be an URC. In that case, @ref at_postprocess_urc() can be called with the
+ * response as parameter.
  *
  * @param[in]   dev         device to operate on
  * @param[in]   command     command to send
@@ -324,6 +363,7 @@ ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command, char *resp_buf,
  * @retval      n length of response on success
  * @retval     -AT_ERR_EXTENDED if failed and a error code can be retrieved with
  *              @ref at_get_err_info() (i.e. DCE answered with `CMx ERROR`)
+ * @retval     -ENOBUFS if the supplied buffer was to small.
  * @retval     <0 other failures
  */
 ssize_t at_send_cmd_get_resp_wait_ok(at_dev_t *dev, const char *command, const char *resp_prefix,
@@ -333,25 +373,30 @@ ssize_t at_send_cmd_get_resp_wait_ok(at_dev_t *dev, const char *command, const c
  * @brief   Send AT command, wait for multiline response
  *
  * This function sends the supplied @p command, then returns all response
- * lines until the device sends "OK".
+ * lines until the device sends "OK". The response is guaranteed null-terminated.
+ *
+ * Some URCs are automatically handled. The first m response lines can be
+ * URCs. In that case, @ref at_postprocess_urc() can be called with each line
+ * as parameter.
  *
  * If a line contains a DTE error response, this function stops and returns
- * accordingly.
+ * accordingly. Any lines received prior to that are considered to be URCs and
+ * thus handled.
  *
  * @param[in]   dev         device to operate on
  * @param[in]   command     command to send
  * @param[out]  resp_buf    buffer for storing response
  * @param[in]   len         len of @p resp_buf
- * @param[in]   keep_eol    true to keep the CR character in the response
  * @param[in]   timeout     timeout (in usec)
  *
  * @retval      n length of response on success
  * @retval     -AT_ERR_EXTENDED if failed and a error code can be retrieved with
  *              @ref at_get_err_info() (i.e. DCE answered with `CMx ERROR`)
+ * @retval     -ENOBUFS if the supplied buffer was to small.
  * @retval     <0 other failures
  */
 ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf,
-                              size_t len, bool keep_eol, uint32_t timeout);
+                              size_t len, uint32_t timeout);
 
 /**
  * @brief   Expect bytes from device
@@ -420,6 +465,8 @@ ssize_t at_recv_bytes(at_dev_t *dev, char *bytes, size_t len, uint32_t timeout);
 /**
  * @brief   Send command to device
  *
+ * Some URCs may be handled.
+ *
  * @param[in]   dev     device to operate on
  * @param[in]   command command to send
  * @param[in]   timeout timeout (in usec)
@@ -448,13 +495,16 @@ int at_parse_resp(at_dev_t *dev, char const *resp);
 /**
  * @brief   Read a line from device
  *
+ * Stops at the first DCE EOL sequence. The response is guaranteed null-terminated.
+ *
  * @param[in]   dev         device to operate on
  * @param[in]   resp_buf    buffer to store line
  * @param[in]   len         size of @p resp_buf
- * @param[in]   keep_eol    true to keep the CR character in the response
+ * @param[in]   keep_eol    true to keep the trailing EOL sequence in the response
  * @param[in]   timeout     timeout (in usec)
  *
  * @retval      n line length on success
+ * @retval     -ENOBUFS if the supplied buffer was to small.
  * @retval     <0 on error
  */
 ssize_t at_readline(at_dev_t *dev, char *resp_buf, size_t len, bool keep_eol, uint32_t timeout);
@@ -462,13 +512,17 @@ ssize_t at_readline(at_dev_t *dev, char *resp_buf, size_t len, bool keep_eol, ui
 /**
  * @brief   Read a line from device, skipping a possibly empty line.
  *
+ * Stops at the first DCE EOL sequence AFTER any non-EOL sequence. The response
+ * is guaranteed null-terminated.
+ *
  * @param[in]   dev         device to operate on
  * @param[in]   resp_buf    buffer to store line
  * @param[in]   len         size of @p resp_buf
- * @param[in]   keep_eol    true to keep the CR character in the response
+ * @param[in]   keep_eol    true to keep the trailing EOL sequence in the response
  * @param[in]   timeout     timeout (in usec)
  *
  * @retval      n line length on success
+ * @retval     -ENOBUFS if the supplied buffer was to small.
  * @retval     <0 on error
  */
 ssize_t at_readline_skip_empty(at_dev_t *dev, char *resp_buf, size_t len,
@@ -478,6 +532,8 @@ ssize_t at_readline_skip_empty(at_dev_t *dev, char *resp_buf, size_t len,
  * @brief Wait for an OK response.
  *
  * Useful when crafting the command-response sequence by yourself.
+ *
+ * URCs are automatically handled
  *
  * @param[in]   dev     device to operate on
  * @param[in]   timeout timeout (in usec)
@@ -537,6 +593,27 @@ void at_remove_urc(at_dev_t *dev, at_urc_t *urc);
  * @param[in]   timeout timeout (in usec)
  */
 void at_process_urc(at_dev_t *dev, uint32_t timeout);
+
+/**
+ * @brief   Process one URC from the provided buffer
+ *
+ * Useful if you e.g. called @ref at_send_cmd_get_lines() and the first lines
+ * are URCs.
+ *
+ * @param[in]   dev device to operate on
+ * @param[in]   buf buffer containing an URC
+ */
+void at_postprocess_urc(at_dev_t *dev, char *buf);
+/**
+ * @brief   Process all URCs from the provided buffer
+ *
+ * Useful if you e.g. called @ref at_recv_bytes(), found what you were interested
+ * in, and there might be some URCs left in the buffer.
+ *
+ * @param[in]   dev device to operate on
+ * @param[in]   buf buffer containing URCs
+ */
+void at_postprocess_urc_all(at_dev_t *dev, char *buf);
 #endif
 
 #ifdef __cplusplus
