@@ -244,7 +244,6 @@ void i2c_init_pins(i2c_t dev);
  */
 void i2c_deinit_pins(i2c_t dev);
 
-#if DOXYGEN /* functions to be implemented as `#define` in `periph_cpu.h` */
 /**
  * @brief   Get the SDA pin of the given I2C bus.
  *
@@ -268,7 +267,6 @@ gpio_t i2c_pin_sda(i2c_t dev);
  * @return              The GPIO used for the I2C clock line.
  */
 gpio_t i2c_pin_scl(i2c_t dev);
-#endif /* DOXYGEN */
 
 /**
  * @brief   Get mutually exclusive access to the given I2C bus
