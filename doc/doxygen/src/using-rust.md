@@ -39,6 +39,16 @@ maintained in coordination with the riot-wrappers crate.
 [riot-module-examples]: https://gitlab.com/etonomy/riot-module-examples
 [additional examples]: https://gitlab.com/etonomy/riot-examples/
 
+IDE / editor setup
+------------------
+
+Users of Rust often take advantage of autocompletion or inline help.
+To use this on RIOT projects,
+some flags and environment variables have to be set,
+which are listed by `make info-rust`.
+These can be configured in the IDE's project setup
+or exported as environment variables.
+
 How it works
 ------------
 
