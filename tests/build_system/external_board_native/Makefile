@@ -14,6 +14,6 @@ BOARD ?= native
 FEATURES_REQUIRED += arch_native
 
 # Set without '?=' to also verify the docker integration when set with =
-BOARDSDIR = $(CURDIR)/external_boards
+EXTERNAL_BOARD_DIRS = $(CURDIR)/external_boards
 
 include $(RIOTBASE)/Makefile.include

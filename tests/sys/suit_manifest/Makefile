@@ -26,7 +26,7 @@ BLOBS += $(MANIFEST_DIR)/file2.bin
 CFLAGS += -DCONFIG_SUIT_COMPONENT_MAX=2
 
 # Use a version of 'native' that includes flash page support
-ifeq (native, $(BOARD))
+ifneq (,$(filter native native64,$(BOARD)))
   EXTERNAL_BOARD_DIRS = $(CURDIR)/native_flashpage
 endif
 

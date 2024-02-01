@@ -44,14 +44,14 @@ ifneq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
 endif
 
 # Enable fileserver for boards with plenty of memory
-HIGH_MEMORY_BOARDS := native same54-xpro mcb2388
+HIGH_MEMORY_BOARDS := native native64 same54-xpro mcb2388
 
 ifneq (,$(filter $(BOARD),$(HIGH_MEMORY_BOARDS)))
   USEMODULE += nanocoap_fileserver
   USEMODULE += vfs_default
 
   # always enable auto-format for native
-  ifeq ($(BOARD),native)
+  ifneq (,$(filter native native64,$(BOARD)))
     USEMODULE += vfs_auto_format
   endif
 endif

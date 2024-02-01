@@ -38,7 +38,7 @@
 
 #include "periph/flashpage.h"
 
-#if (defined(BOARD_NATIVE) && !IS_USED(MODULE_PERIPH_FLASHPAGE))
+#if (defined(CPU_NATIVE) && !IS_USED(MODULE_PERIPH_FLASHPAGE))
 char _native_flash[FLASHPAGE_SIZE * FLASHPAGE_NUMOF];
 #endif
 

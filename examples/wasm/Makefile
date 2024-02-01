@@ -7,7 +7,7 @@ RIOTBASE ?= $(CURDIR)/../..
 
 USEPKG += wamr
 
-ifneq ($(BOARD),native)
+ifeq (,$(filter native native64,$(BOARD)))
 CFLAGS += -DTHREAD_STACKSIZE_MAIN='(6 * 1024)'
 endif
 

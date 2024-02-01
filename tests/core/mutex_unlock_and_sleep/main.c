@@ -27,7 +27,7 @@ static volatile int indicator;
 static kernel_pid_t main_pid;
 static char stack[THREAD_STACKSIZE_DEFAULT];
 
-#ifdef BOARD_NATIVE
+#ifdef CPU_NATIVE
 static const unsigned KITERATIONS = 100;
 #else
 static const unsigned KITERATIONS = 10;

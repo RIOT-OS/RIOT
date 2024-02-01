@@ -7,12 +7,14 @@
 # directory for more details.
 
 import sys
+import os
 from testrunner import run
 
 
 def testfunc(child):
+    board = os.environ['BOARD']
     child.expect_exact("Hello World!")
-    child.expect_exact("You are running RIOT on a(n) native board.")
+    child.expect_exact(f"You are running RIOT on a(n) {board} board.")
     child.expect_exact("THIS_BOARD_IS external_native")
     child.expect_exact("This board is 'An external extended native")
     print("Test successful!!")
