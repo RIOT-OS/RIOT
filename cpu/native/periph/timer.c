@@ -26,7 +26,6 @@
  * @}
  */
 
-#include <err.h>
 #include <signal.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -37,6 +36,7 @@
 #include "cpu.h"
 #include "cpu_conf.h"
 #include "native_internal.h"
+#include "panic.h"
 #include "periph/timer.h"
 #include "time_units.h"
 
@@ -99,7 +99,6 @@ uint32_t timer_query_freqs(tim_t dev, uword_t index)
 
 int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 {
-    (void)freq;
     DEBUG("%s\n", __func__);
     if (dev >= TIMER_NUMOF) {
         return -1;
@@ -122,6 +121,7 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 
     if (register_interrupt(SIGALRM, native_isr_timer) != 0) {
         DEBUG_PUTS("Failed to register SIGALRM handler");
+        timer_delete(itimer_monotonic);
         return -1;
     }
 
@@ -172,8 +172,6 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 
 int timer_set_periodic(tim_t dev, int channel, unsigned int value, uint8_t flags)
 {
-    (void)flags;
-
     if (channel != 0) {
         return -1;
     }
@@ -204,7 +202,7 @@ void timer_start(tim_t dev)
 
     _native_syscall_enter();
     if (timer_settime(itimer_monotonic, 0, &its, NULL) == -1) {
-        err(EXIT_FAILURE, "timer_start: timer_settime");
+        core_panic(PANIC_GENERAL_ERROR, "Failed to set monotonic timer");
     }
     _native_syscall_leave();
 }
@@ -217,7 +215,7 @@ void timer_stop(tim_t dev)
     _native_syscall_enter();
     struct itimerspec zero = {0};
     if (timer_settime(itimer_monotonic, 0, &zero, &its) == -1) {
-        err(EXIT_FAILURE, "timer_stop: timer_settime");
+        core_panic(PANIC_GENERAL_ERROR, "Failed to set monotonic timer");
     }
     _native_syscall_leave();
 
@@ -237,7 +235,7 @@ unsigned int timer_read(tim_t dev)
     _native_syscall_enter();
 
     if (clock_gettime(CLOCK_MONOTONIC, &t) == -1) {
-        err(EXIT_FAILURE, "timer_read: clock_gettime");
+        core_panic(PANIC_GENERAL_ERROR, "Failed to read monotonic clock");
     }
 
     _native_syscall_leave();
