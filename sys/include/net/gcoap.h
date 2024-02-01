@@ -371,7 +371,8 @@
  * - Message Type: Supports non-confirmable (NON) messaging. Additionally
  *   provides a callback on timeout. Provides piggybacked ACK response to a
  *   confirmable (CON) request.
- * - Observe extension: Provides server-side registration and notifications.
+ * - Observe extension: Provides server-side registration and notifications
+ *   and client-side observe.
  * - Server and Client provide helper functions for writing the
  *   response/request. See the CoAP topic in the source documentation for
  *   details. See the gcoap example for sample implementations.
