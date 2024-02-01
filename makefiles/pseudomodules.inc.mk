@@ -70,9 +70,6 @@ PSEUDOMODULES += fatfs_vfs_format
 PSEUDOMODULES += fmt_%
 PSEUDOMODULES += gcoap_forward_proxy
 PSEUDOMODULES += gcoap_fileserver
-PSEUDOMODULES += gcoap_fileserver_callback
-PSEUDOMODULES += gcoap_fileserver_delete
-PSEUDOMODULES += gcoap_fileserver_put
 PSEUDOMODULES += gcoap_dtls
 ## @addtogroup net_gcoap_dns
 ## @{
@@ -341,6 +338,9 @@ PSEUDOMODULES += md5sum
 ## @}
 PSEUDOMODULES += mtd_write_page
 PSEUDOMODULES += nanocoap_%
+PSEUDOMODULES += nanocoap_fileserver_callback
+PSEUDOMODULES += nanocoap_fileserver_delete
+PSEUDOMODULES += nanocoap_fileserver_put
 PSEUDOMODULES += netdev_default
 PSEUDOMODULES += netdev_ieee802154_%
 PSEUDOMODULES += netdev_ieee802154_rx_timestamp

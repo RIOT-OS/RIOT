@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include "kernel_defines.h"
 #include "net/gcoap.h"
-#include "net/gcoap/fileserver.h"
+#include "net/nanocoap/fileserver.h"
 #include "shell.h"
 #include "vfs_default.h"
 
@@ -31,14 +31,14 @@ static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 static const coap_resource_t _resources[] = {
     { "/vfs",
       COAP_GET |
-#if IS_USED(MODULE_GCOAP_FILESERVER_PUT)
+#if IS_USED(MODULE_NANOCOAP_FILESERVER_PUT)
       COAP_PUT |
 #endif
-#if IS_USED(MODULE_GCOAP_FILESERVER_DELETE)
+#if IS_USED(MODULE_NANOCOAP_FILESERVER_DELETE)
       COAP_DELETE |
 #endif
       COAP_MATCH_SUBTREE,
-      gcoap_fileserver_handler, VFS_DEFAULT_DATA },
+      nanocoap_fileserver_handler, VFS_DEFAULT_DATA },
 };
 
 static gcoap_listener_t _listener = {
@@ -46,22 +46,22 @@ static gcoap_listener_t _listener = {
     .resources_len = ARRAY_SIZE(_resources),
 };
 
-static void _event_cb(gcoap_fileserver_event_t event, gcoap_fileserver_event_ctx_t *ctx)
+static void _event_cb(nanocoap_fileserver_event_t event, nanocoap_fileserver_event_ctx_t *ctx)
 {
     switch (event) {
-    case GCOAP_FILESERVER_GET_FILE_START:
+    case NANOCOAP_FILESERVER_GET_FILE_START:
         printf("gcoap fileserver: Download started: %s\n", ctx->path);
         break;
-    case GCOAP_FILESERVER_GET_FILE_END:
+    case NANOCOAP_FILESERVER_GET_FILE_END:
         printf("gcoap fileserver: Download finished: %s\n", ctx->path);
         break;
-    case GCOAP_FILESERVER_PUT_FILE_START:
+    case NANOCOAP_FILESERVER_PUT_FILE_START:
         printf("gcoap fileserver: Upload started: %s\n", ctx->path);
         break;
-    case GCOAP_FILESERVER_PUT_FILE_END:
+    case NANOCOAP_FILESERVER_PUT_FILE_END:
         printf("gcoap fileserver: Upload finished: %s\n", ctx->path);
         break;
-    case GCOAP_FILESERVER_DELETE_FILE:
+    case NANOCOAP_FILESERVER_DELETE_FILE:
         printf("gcoap fileserver: Delete %s\n", ctx->path);
         break;
     }
@@ -72,8 +72,8 @@ int main(void)
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
     gcoap_register_listener(&_listener);
 
-    if (IS_USED(MODULE_GCOAP_FILESERVER_CALLBACK)) {
-        gcoap_fileserver_set_event_cb(_event_cb, NULL);
+    if (IS_USED(MODULE_NANOCOAP_FILESERVER_CALLBACK)) {
+        nanocoap_fileserver_set_event_cb(_event_cb, NULL);
     }
 
     char line_buf[SHELL_DEFAULT_BUFSIZE];

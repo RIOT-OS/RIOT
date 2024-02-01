@@ -19,7 +19,7 @@
 
 #include "fs/constfs.h"
 #include "net/gcoap.h"
-#include "net/gcoap/fileserver.h"
+#include "net/nanocoap/fileserver.h"
 #include "shell.h"
 #include "vfs_default.h"
 
@@ -31,13 +31,13 @@ static const coap_resource_t _resources[] = {
     {
         .path = "/const",
         .methods = COAP_GET | COAP_MATCH_SUBTREE,
-        .handler = gcoap_fileserver_handler,
+        .handler = nanocoap_fileserver_handler,
         .context = "/const"
     },
     {
         .path = "/vfs",
         .methods = COAP_GET | COAP_PUT | COAP_MATCH_SUBTREE,
-        .handler = gcoap_fileserver_handler,
+        .handler = nanocoap_fileserver_handler,
         .context = VFS_DEFAULT_DATA
     },
 };
