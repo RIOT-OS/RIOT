@@ -195,6 +195,17 @@ static void _process_cmd(uint8_t cmd, uint8_t option)
     }
 }
 
+static void _send_opts(void)
+{
+    if (IS_USED(MODULE_STDIO_TELNET)) {
+        /* RIOT will echo stdio, disable local echo */
+        const uint8_t opt_echo[] = {
+            TELNET_CMD_IAC, TELNET_CMD_WILL, TELNET_OPT_ECHO
+        };
+        _write_buffer(opt_echo, sizeof(opt_echo));
+    }
+}
+
 static void *telnet_thread(void *arg)
 {
     (void)arg;
@@ -210,6 +221,7 @@ static void *telnet_thread(void *arg)
 
         DEBUG("connected\n");
         _connected();
+        _send_opts();
 
         bool is_cmd = false;
         uint8_t is_option = 0;
