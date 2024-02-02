@@ -227,7 +227,7 @@ static void *telnet_thread(void *arg)
                 continue;
             }
 
-            if (res < 0) {
+            if (res <= 0) {
                 break;
             }
 
