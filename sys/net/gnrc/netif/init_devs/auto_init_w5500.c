@@ -23,14 +23,6 @@
 #include "include/init_devs.h"
 
 /**
- * @brief   Define stack parameters for the MAC layer thread
- * @{
- */
-#define MAC_STACKSIZE   (GNRC_NETIF_STACKSIZE_DEFAULT)
-#define MAC_PRIO        (GNRC_NETIF_PRIO)
-/*** @} */
-
-/**
  * @brief   Find out how many of these devices we need to care for
  */
 #define W5500_NUM    ARRAY_SIZE(w5500_params)
@@ -47,7 +39,7 @@ static gnrc_netif_t _netif[W5500_NUM];
 /**
  * @brief   Stacks for the MAC layer threads
  */
-static char stack[W5500_NUM][MAC_STACKSIZE];
+static char stack[W5500_NUM][GNRC_NETIF_STACKSIZE_DEFAULT];
 
 void auto_init_w5500(void)
 {
@@ -57,8 +49,8 @@ void auto_init_w5500(void)
         /* setup netdev device */
         w5500_setup(&dev[i], &w5500_params[i], i);
         /* initialize netdev <-> gnrc adapter state */
-        gnrc_netif_ethernet_create(&_netif[i], stack[i], MAC_STACKSIZE, MAC_PRIO, "w5500",
-                                   &dev[i].netdev);
+        gnrc_netif_ethernet_create(&_netif[i], stack[i], GNRC_NETIF_STACKSIZE_DEFAULT,
+                                   GNRC_NETIF_PRIO, "w5500", &dev[i].netdev);
     }
 }
 /** @} */

@@ -47,13 +47,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   W5500 error codes
- */
-enum {
-    W5500_ERR_BUS = -1,
-};
-
-/**
  * @brief   W5500 device descriptor
  */
 typedef struct {
@@ -68,12 +61,12 @@ typedef struct {
  * @brief   Device descriptor for W5500 devices
  */
 typedef struct w5500 {
-    netdev_t netdev;                /**< extends the netdev structure */
-    w5500_params_t p;               /**< device configuration parameters */
-    uint16_t frame_size_to_be_send; /**< size of the frame which is currently being send */
-    uint16_t frame_size_sent;       /**< size of the frame which has been send */
-    bool link_up;                   /**< used to prevent sending the same LINK event twice */
-    ztimer_t timerInstance;         /**< stores the polling interval timer in polling mode */
+    netdev_t netdev;           /**< extends the netdev structure */
+    w5500_params_t p;          /**< device configuration parameters */
+    uint16_t frame_size;       /**< size of the frame which has been send */
+    bool link_up;              /**< used to prevent sending the same LINK event twice */
+    bool frame_sent;           /**< indicates that the frame has been transmitted */
+    ztimer_t timerInstance;    /**< stores the polling interval timer in polling mode */
 } w5500_t;
 
 /**

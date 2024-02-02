@@ -46,13 +46,8 @@ static const netdev_driver_t netdev_driver_w5500;
 
 static inline void send_addr(w5500_t *dev, uint16_t addr)
 {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
     spi_transfer_byte(dev->p.spi, dev->p.cs, true, (addr >> 8));
     spi_transfer_byte(dev->p.spi, dev->p.cs, true, (addr & 0xff));
-#else
-    spi_transfer_byte(dev->p.spi, dev->p.cs, true, (addr & 0xff));
-    spi_transfer_byte(dev->p.spi, dev->p.cs, true, (addr >> 8));
-#endif
 }
 
 static uint8_t read_register(w5500_t *dev, uint16_t reg)
@@ -115,7 +110,7 @@ static void extint(void *arg)
     w5500_t *dev = (w5500_t *)arg;
 
     netdev_trigger_event_isr(&dev->netdev);
-    if (dev->p.polling_interval_ms > 0u) {
+    if (!gpio_is_valid(dev->p.evt)) {
         /* restart timer if we are polling */
         (void)ztimer_set(ZTIMER_MSEC, &dev->timerInstance, dev->p.polling_interval_ms);
     }
@@ -133,7 +128,9 @@ void w5500_setup(w5500_t *dev, const w5500_params_t *params, uint8_t index)
     /* Initialize the device descriptor. */
     dev->p = *params;
 
+    dev->frame_size = 0u;
     dev->link_up = false;
+    dev->frame_sent = false;
 
     /* Initialize the chip select pin. */
     spi_init_cs(dev->p.spi, dev->p.cs);
@@ -144,23 +141,10 @@ void w5500_setup(w5500_t *dev, const w5500_params_t *params, uint8_t index)
     netdev_register(&dev->netdev, NETDEV_W5500, index);
 }
 
-static bool check_configuration(w5500_t *dev)
-{
-    /* Polling mode: W5500_PARAM_EVT == GPIO_UNDEF and polling_interval_ms > 0u    */
-    /* Interrupt mode: W5500_PARAM_EVT != GPIO_UNDEF and polling_interval_ms == 0u */
-    return((dev->p.evt == GPIO_UNDEF && dev->p.polling_interval_ms > 0u) ||
-           (dev->p.evt != GPIO_UNDEF && dev->p.polling_interval_ms == 0u));
-}
-
 static int init(netdev_t *netdev)
 {
     w5500_t *dev = (w5500_t *)netdev;
     uint8_t tmp;
-
-    if (check_configuration(dev) == false) {
-        LOG_ERROR("[w5500] error: Check configuration: W5500_PARAM_EVT and polling_interval_ms\n");
-        return -EINVAL;
-    }
 
     spi_acquire(dev->p.spi, dev->p.cs, SPI_CONF, dev->p.clk);
 
@@ -172,8 +156,8 @@ static int init(netdev_t *netdev)
     tmp = read_register(dev, REG_VERSIONR);
     if (tmp != CHIP_VERSION) {
         spi_release(dev->p.spi);
-        LOG_ERROR("[w5500] error: no SPI connection\n");
-        return W5500_ERR_BUS;
+        LOG_ERROR("[w5500] error: invalid chip ID %x\n", tmp);
+        return -ENODEV;
     }
 
     /* Write the MAC address. */
@@ -203,7 +187,7 @@ static int init(netdev_t *netdev)
     write_register(dev, REG_SIPR2, 0x00);
     write_register(dev, REG_SIPR3, 0x00);
 
-    if (dev->p.polling_interval_ms > 0u) {
+    if (!gpio_is_valid(dev->p.evt)) {
         dev->timerInstance.callback = extint;
         dev->timerInstance.arg = dev;
         (void)ztimer_set(ZTIMER_MSEC, &dev->timerInstance, dev->p.polling_interval_ms);
@@ -264,18 +248,17 @@ static int send(netdev_t *netdev, const iolist_t *iolist)
         /* Make sure we can write the full packet. */
         if (data_length <= tx_free) {
             /* reset the frame size information */
-            dev->frame_size_sent = 0u;
-            dev->frame_size_to_be_send = 0u;
+            dev->frame_size = 0u;
 
             for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
                 size_t len = iol->iol_len;
-                write_tx0_buffer(dev, socket0_write_pointer + dev->frame_size_to_be_send,
+                write_tx0_buffer(dev, socket0_write_pointer + dev->frame_size,
                                  iol->iol_base, len);
-                dev->frame_size_to_be_send += len;
+                dev->frame_size += len;
             }
             /* Update the write pointer. */
             write_address(dev, REG_S0_TX_WR0, REG_S0_TX_WR1,
-                  socket0_write_pointer + dev->frame_size_to_be_send);
+                  socket0_write_pointer + dev->frame_size);
             /* Trigger the sending process. */
             write_register(dev, REG_S0_CR, CR_SEND);
 
@@ -301,11 +284,11 @@ static int confirm_send(netdev_t *netdev, void *info)
 
     (void)info;
 
-    if (dev->frame_size_sent == 0u) {
+    if (dev->frame_sent == false) {
         return -EAGAIN;
     }
     else {
-        return dev->frame_size_sent;
+        return dev->frame_size;
     }
 }
 
@@ -416,8 +399,7 @@ static void isr(netdev_t *netdev)
         }
         if (socket0_interrupt_status & IR_SEND_OK) {
             DEBUG("[w5500] netdev TX complete\n");
-            dev->frame_size_sent = dev->frame_size_to_be_send;
-            dev->frame_size_to_be_send = 0u;
+            dev->frame_sent = true;
             netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
         }
 
