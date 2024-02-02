@@ -8,4 +8,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     stk3200 \
     stm32f030f4-demo \
     stm32g0316-disco \
+    weact-g030f6 \
     #

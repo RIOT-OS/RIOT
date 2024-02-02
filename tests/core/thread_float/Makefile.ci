@@ -26,6 +26,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     stk3200 \
     stm32f030f4-demo \
     stm32f0discovery \
+    weact-g030f6 \
     weio \
     yunjia-nrf51822 \
     #
