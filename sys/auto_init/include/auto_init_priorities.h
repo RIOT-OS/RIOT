@@ -280,6 +280,12 @@ extern "C" {
  */
 #define AUTO_INIT_PRIO_MOD_NDN                          1380
 #endif
+#ifndef AUTO_INIT_PRIO_MOD_SOFT_I2C
+/**
+ * @brief   soft_i2c priority
+ */
+#  define AUTO_INIT_PRIO_MOD_SOFT_I2C                   1395
+#endif
 #ifndef AUTO_INIT_PRIO_MOD_SHT1X
 /**
  * @brief   sht1x priority
