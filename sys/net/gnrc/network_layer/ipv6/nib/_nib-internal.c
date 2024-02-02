@@ -376,6 +376,7 @@ _nib_dr_entry_t *_nib_drl_add(const ipv6_addr_t *router_addr, unsigned iface)
 void _nib_drl_remove(_nib_dr_entry_t *nib_dr)
 {
     if (nib_dr->next_hop != NULL) {
+        _evtimer_del(&nib_dr->rtr_timeout);
         nib_dr->next_hop->mode &= ~(_DRL);
         _nib_onl_clear(nib_dr->next_hop);
         memset(nib_dr, 0, sizeof(_nib_dr_entry_t));
