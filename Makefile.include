@@ -204,7 +204,7 @@ include $(RIOTMAKE)/boards.inc.mk
 include $(RIOTMAKE)/dependencies_debug.inc.mk
 
 # Use TOOLCHAIN environment variable to select the toolchain to use.
-ifeq ($(BOARD),native)
+ifneq (,$(filter native native64,$(BOARD)))
   ifeq ($(OS),Darwin)
     $(shell $(COLOR_ECHO) "$(COLOR_RED)"Buildin on macOS is not supported."\
                           "We recommend vagrant for building:$(COLOR_RESET)"\

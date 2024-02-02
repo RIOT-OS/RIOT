@@ -2,11 +2,6 @@ ifeq (FreeBSD,$(OS))
   DISABLE_LIBSTDCPP ?= 1
 endif
 
-ifeq ($(NATIVE_64BIT), 1)
-  FEATURES_PROVIDED += arch_64bit
-else
-  FEATURES_PROVIDED += arch_32bit
-endif
 FEATURES_PROVIDED += arch_native
 FEATURES_PROVIDED += cpp
 ifneq ($(DISABLE_LIBSTDCPP),1)
@@ -25,7 +20,7 @@ FEATURES_PROVIDED += periph_timer_periodic
 FEATURES_PROVIDED += periph_timer_query_freqs
 ifeq ($(OS) $(OS_ARCH),Linux x86_64)
   # TODO: Add rust support for native 64 bit.
-  ifneq ($(NATIVE_64BIT), 1)
+  ifneq ($(BOARD),native64)
     FEATURES_PROVIDED += rust_target
   endif
 endif

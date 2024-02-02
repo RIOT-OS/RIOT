@@ -1,4 +1,4 @@
-NATIVEINCLUDES += -I$(RIOTCPU)/native/include -I$(RIOTBASE)/sys/include
+NATIVEINCLUDES += -I$(RIOTCPU)/native/include/
 
 ifneq (,$(filter periph_can,$(USEMODULE)))
   ifeq (,$(filter libsocketcan,$(USEPKG)))
@@ -17,3 +17,5 @@ ifeq ($(OS) $(OS_ARCH),Linux x86_64)
     RUST_TARGET = x86_64-unknown-linux-gnu
   endif
 endif
+
+include $(RIOTMAKE)/arch/native.inc.mk

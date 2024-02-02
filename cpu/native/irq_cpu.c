@@ -49,7 +49,7 @@ volatile int _native_in_syscall;
 
 static sigset_t _native_sig_set, _native_sig_set_dint;
 
-char __isr_stack[SIGSTKSZ];
+char __isr_stack[THREAD_STACKSIZE_DEFAULT];
 ucontext_t native_isr_context;
 ucontext_t *_native_cur_ctx, *_native_isr_ctx;
 
@@ -524,7 +524,7 @@ void native_interrupt_init(void)
 
     static stack_t sigstk;
     sigstk.ss_sp = sigalt_stk;
-    sigstk.ss_size = sizeof(__isr_stack);
+    sigstk.ss_size = sizeof(sigalt_stk);
     sigstk.ss_flags = 0;
 
     if (sigaltstack(&sigstk, NULL) < 0) {
