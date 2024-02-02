@@ -62,8 +62,7 @@ static void _slip_rx_cb(void *arg, uint8_t byte)
             break;
         case SLIPDEV_END:
             dev->state = SLIPDEV_STATE_NONE;
-            byte = 0;
-            /* fall-through */
+            break;
         default:
             isrpipe_write_one(&stdin_isrpipe, byte);
             break;
