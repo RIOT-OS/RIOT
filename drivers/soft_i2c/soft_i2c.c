@@ -837,3 +837,55 @@ void auto_init_soft_i2c(void)
         soft_i2c_init(SOFT_I2C_DEV(i));
     }
 }
+
+/* provide periph_i2c API via soft_i2c as weak symbols */
+__attribute__((weak, alias("soft_i2c_init")))
+void i2c_init(i2c_t dev);
+
+__attribute__((weak, alias("soft_i2c_init_pins")))
+void i2c_init_pins(i2c_t dev);
+
+__attribute__((weak, alias("soft_i2c_deinit_pins")))
+void i2c_deinit_pins(i2c_t dev);
+
+__attribute__((weak, alias("soft_i2c_pin_sda")))
+gpio_t i2c_pin_sda(i2c_t dev);
+
+__attribute__((weak, alias("soft_i2c_pin_scl")))
+gpio_t i2c_pin_scl(i2c_t dev);
+
+__attribute__((weak, alias("soft_i2c_acquire")))
+void i2c_acquire(i2c_t dev);
+
+__attribute__((weak, alias("soft_i2c_release")))
+void i2c_release(i2c_t dev);
+
+__attribute__((weak, alias("soft_i2c_read_reg")))
+int i2c_read_reg(i2c_t dev, uint16_t addr, uint16_t reg,
+                 void *data, uint8_t flags);
+
+__attribute__((weak, alias("soft_i2c_read_regs")))
+int i2c_read_regs(i2c_t dev, uint16_t addr, uint16_t reg,
+                  void *data, size_t len, uint8_t flags);
+
+__attribute__((weak, alias("soft_i2c_read_byte")))
+int i2c_read_byte(i2c_t dev, uint16_t addr, void *data, uint8_t flags);
+
+__attribute__((weak, alias("soft_i2c_read_bytes")))
+int i2c_read_bytes(i2c_t dev, uint16_t addr,
+                   void *data, size_t len, uint8_t flags);
+
+__attribute__((weak, alias("soft_i2c_write_byte")))
+int i2c_write_byte(i2c_t dev, uint16_t addr, uint8_t data, uint8_t flags);
+
+__attribute__((weak, alias("soft_i2c_write_bytes")))
+int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data,
+                    size_t len, uint8_t flags);
+
+__attribute__((weak, alias("soft_i2c_write_reg")))
+int i2c_write_reg(i2c_t dev, uint16_t addr, uint16_t reg,
+                  uint8_t data, uint8_t flags);
+
+__attribute__((weak, alias("soft_i2c_write_regs")))
+int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
+                  const void *data, size_t len, uint8_t flags);
