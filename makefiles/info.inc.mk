@@ -90,7 +90,6 @@ info-build:
 	@echo -e 'CXXEXFLAGS:$(patsubst %, \n\t%, $(CXXEXFLAGS))'
 	@echo ''
 	@echo 'RUST_TARGET: $(RUST_TARGET)'
-	@echo 'CARGO_CHANNEL: $(CARGO_CHANNEL)'
 	@echo 'CARGO_PROFILE: $(CARGO_PROFILE)'
 	@echo 'CARGO_OPTIONS: $(CARGO_OPTIONS)'
 	@echo ''
@@ -250,5 +249,10 @@ info-programmers-supported:
 	@echo $(sort $(PROGRAMMERS_SUPPORTED))
 
 info-rust:
-	cargo $(patsubst +,,+${CARGO_CHANNEL}) version
+	cargo version
 	c2rust --version
+	@echo "To use this setup of Rust in an IDE, add these command line arguments to the \`cargo check\` or \`rust-analyzer\`:"
+	@echo "    --target $(RUST_TARGET) --profile $(CARGO_PROFILE)"
+	@echo "and export these environment variables:"
+	@echo "    RIOT_COMPILE_COMMANDS_JSON=\"$(CARGO_COMPILE_COMMANDS)\""
+	@echo "    RIOTBUILD_CONFIG_HEADER_C=\"$(RIOTBUILD_CONFIG_HEADER_C)\""
