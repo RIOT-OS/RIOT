@@ -66,15 +66,10 @@ psa_status_t psa_location_dispatch_import_key( const psa_key_attributes_t *attri
                                                const uint8_t *data, size_t data_length,
                                                psa_key_slot_t *slot, size_t *bits)
 {
-    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
     psa_key_location_t location = PSA_KEY_LIFETIME_GET_LOCATION(attributes->lifetime);
-    uint8_t *key_data = NULL;
-    size_t *key_bytes = NULL;
-    size_t key_data_size;
-
-    key_data_size = psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
 
 #if IS_USED(MODULE_PSA_SECURE_ELEMENT)
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
     const psa_drv_se_t *drv;
     psa_drv_se_context_t *drv_context;
     psa_key_slot_number_t *slot_number = psa_key_slot_get_slot_number(slot);
@@ -100,9 +95,8 @@ psa_status_t psa_location_dispatch_import_key( const psa_key_attributes_t *attri
 
     switch (location) {
     case PSA_KEY_LOCATION_LOCAL_STORAGE:
-        return psa_builtin_import_key(attributes, data, data_length, key_data, key_data_size, key_bytes, bits);
+        return psa_algorithm_dispatch_import_key(attributes, data, data_length, slot, bits);
     default:
-        (void)status;
         return PSA_ERROR_NOT_SUPPORTED;
     }
 }

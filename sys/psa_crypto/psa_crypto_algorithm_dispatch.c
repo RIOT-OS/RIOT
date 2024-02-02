@@ -427,6 +427,73 @@ psa_status_t psa_algorithm_dispatch_generate_key(   const psa_key_attributes_t *
 
     return psa_builtin_generate_key(attributes, key_data, *key_bytes, key_bytes);
 }
+
+psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attributes,
+                                               const uint8_t *data, size_t data_length,
+                                               psa_key_slot_t *slot, size_t *bits)
+{
+    uint8_t *key_data = NULL;
+    size_t *key_bytes = NULL;
+    size_t key_data_size;
+
+    key_data_size = psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
+
+    /**
+     * Asymmetric keys needs special import handling:
+     * The public key needs to be derived from the imported private key.
+     */
+    if (PSA_KEY_TYPE_IS_KEY_PAIR(attributes->type)) {
+        psa_asym_key_t asym_key = PSA_INVALID_OPERATION;
+        uint8_t *pubkey_data = NULL;
+        size_t *pubkey_data_len = NULL;
+        psa_get_public_key_data_from_key_slot(slot, &pubkey_data, &pubkey_data_len);
+
+        if (PSA_KEY_TYPE_IS_ECC_KEY_PAIR(attributes->type)) {
+            asym_key =
+                PSA_ENCODE_ECC_KEY_TYPE(attributes->bits,
+                                        PSA_KEY_TYPE_ECC_GET_FAMILY(attributes->type));
+
+            if (asym_key == PSA_INVALID_OPERATION) {
+                return PSA_ERROR_INVALID_ARGUMENT;
+            }
+        }
+
+        // derive and save public from private key
+        psa_status_t ret = PSA_ERROR_NOT_SUPPORTED;
+        switch (asym_key) {
+#if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P192R1)
+        case PSA_ECC_P192_R1:
+            // todo: support for Weierstrass curves
+            (void)slot;
+            ret = PSA_ERROR_NOT_SUPPORTED;
+            break;
+#endif
+#if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1)
+        case PSA_ECC_P256_R1:
+            // todo: support for Weierstrass curves
+            (void)slot;
+            ret = PSA_ERROR_NOT_SUPPORTED;
+            break;
+#endif
+#if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519)
+        case PSA_ECC_ED25519:
+            ret = psa_derive_ecc_ed25519_public_key(data, pubkey_data, data_length, pubkey_data_len);
+            break;
+#endif
+        default:
+            (void)slot;
+            ret = PSA_ERROR_NOT_SUPPORTED;
+            break;
+        }
+        if (ret == PSA_SUCCESS) {
+            /* save private key data */
+            memcpy(key_data, data, data_length);
+            *key_bytes = data_length;
+        }
+        return ret;
+    }
+    return psa_builtin_import_key(attributes, data, data_length, key_data, key_data_size, key_bytes, bits);
+}
 #endif /* MODULE_PSA_KEY_MANAGEMENT */
 
 #if IS_USED(MODULE_PSA_CIPHER)
