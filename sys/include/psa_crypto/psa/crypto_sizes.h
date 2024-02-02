@@ -792,6 +792,22 @@ extern "C" {
 /* implementation-defined value */
 
 /**
+ * @brief   Maximum size of the export encoding of an ECC keypair.
+ *
+ * @details The representation of an ECC keypair follows
+ *          https://arm-software.github.io/psa-api/crypto/1.1/api/keys/management.html#key-formats
+ *          and is dependent on the family:
+ *          - for twisted Edwards curves: 32B
+ *          - for Weierstrass curves: `ceiling(m/8)`-byte string, big-endian
+ *            where m is the bit size associated with the curve.
+ */
+#define PSA_KEY_EXPORT_ECC_KEY_MAX_SIZE(key_type, key_bits)                  \
+    (size_t)\
+    (PSA_KEY_TYPE_ECC_GET_FAMILY(key_type) == PSA_ECC_FAMILY_TWISTED_EDWARDS ? 32 : \
+    (PSA_KEY_TYPE_ECC_GET_FAMILY(key_type) == PSA_ECC_FAMILY_SECP_R1 ? PSA_BITS_TO_BYTES(key_bits) : \
+     0))
+
+/**
  * @brief   Sufficient output buffer size for @ref psa_export_key().
  *
  * @details The following code illustrates how to allocate enough memory to export a key by
@@ -828,7 +844,9 @@ extern "C" {
  *          Unspecified if the parameters are not valid.
  */
 #define PSA_EXPORT_KEY_OUTPUT_SIZE(key_type, key_bits) \
-    /* implementation-defined value */
+    (PSA_KEY_TYPE_IS_PUBLIC_KEY(key_type) ? PSA_EXPORT_PUBLIC_KEY_OUTPUT_SIZE(key_type, key_bits) : \
+    (PSA_KEY_TYPE_IS_ECC(key_type) ? PSA_KEY_EXPORT_ECC_KEY_MAX_SIZE(key_type, key_bits) : \
+     0))
 
 /**
  * @brief   Check whether the key size is a valid ECC size for key type.
@@ -861,7 +879,19 @@ extern "C" {
  *
  *          See also @ref PSA_EXPORT_KEY_OUTPUT_SIZE().
  */
-#define PSA_EXPORT_KEY_PAIR_MAX_SIZE /* implementation-defined value */
+#if (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1) || \
+     IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256))
+#define PSA_EXPORT_KEY_PAIR_MAX_SIZE \
+    (PSA_EXPORT_KEY_OUTPUT_SIZE(PSA_ECC_FAMILY_SECT_R1, 256))
+#elif (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519))
+#define PSA_EXPORT_KEY_PAIR_MAX_SIZE \
+    (PSA_EXPORT_KEY_OUTPUT_SIZE(PSA_ECC_FAMILY_TWISTED_EDWARDS, 255))
+#elif (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P192R1))
+#define PSA_EXPORT_KEY_PAIR_MAX_SIZE \
+    (PSA_EXPORT_KEY_OUTPUT_SIZE(PSA_ECC_FAMILY_SECT_R1, 192))
+#else
+#define PSA_EXPORT_KEY_PAIR_MAX_SIZE 0
+#endif
 
 /**
  * @brief   Get curve size from ECC public key
@@ -958,13 +988,17 @@ extern "C" {
  *          See also @ref PSA_EXPORT_PUBLIC_KEY_OUTPUT_SIZE(@p key_type, @p key_bits).
  */
 #if (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1) || \
-    IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P192R1) || \
-    IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256))
+     IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256))
 #define PSA_EXPORT_PUBLIC_KEY_MAX_SIZE \
-    (PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(PSA_ECC_FAMILY_SECT_R1, PSA_MAX_PRIV_KEY_SIZE))
+    (PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(PSA_ECC_FAMILY_SECT_R1, 256))
+#elif (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P192R1))
+#define PSA_EXPORT_PUBLIC_KEY_MAX_SIZE \
+    (PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(PSA_ECC_FAMILY_SECT_R1, 192))
+#elif (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519))
+#define PSA_EXPORT_PUBLIC_KEY_MAX_SIZE \
+    (PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(PSA_ECC_FAMILY_TWISTED_EDWARDS, 255))
 #else
-#define PSA_EXPORT_PUBLIC_KEY_MAX_SIZE \
-    (PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(PSA_ECC_FAMILY_TWISTED_EDWARDS, PSA_MAX_PRIV_KEY_SIZE))
+#define PSA_EXPORT_PUBLIC_KEY_MAX_SIZE 0
 #endif
 
 /**

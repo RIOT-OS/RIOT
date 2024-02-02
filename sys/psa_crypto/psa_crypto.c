@@ -1220,16 +1220,86 @@ psa_status_t psa_destroy_key(psa_key_id_t key)
     return psa_wipe_key_slot(slot);
 }
 
+/**
+ * @brief   Export key that is stored in local memory
+ *
+ *          See @ref psa_export_key
+ *
+ * @param   key_buffer
+ * @param   key_buffer_size
+ * @param   data
+ * @param   data_size
+ * @param   data_length
+ *
+ * @return  @ref PSA_SUCCESS
+ *          @ref PSA_ERROR_INVALID_ARGUMENT
+ */
+static psa_status_t psa_builtin_export_key(const uint8_t *key_buffer,
+                                                size_t key_buffer_size,
+                                                uint8_t *data,
+                                                size_t data_size,
+                                                size_t *data_length)
+{
+    if (!key_buffer || !data || !data_length) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (key_buffer_size == 0 || data_size == 0) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (data_size < key_buffer_size) {
+        return PSA_ERROR_BUFFER_TOO_SMALL;
+    }
+    memcpy(data, key_buffer, key_buffer_size);
+    *data_length = key_buffer_size;
+
+    return PSA_SUCCESS;
+}
+
 psa_status_t psa_export_key(psa_key_id_t key,
                             uint8_t *data,
                             size_t data_size,
                             size_t *data_length)
 {
-    (void)key;
-    (void)data;
-    (void)data_size;
-    (void)data_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+    psa_status_t unlock_status = PSA_ERROR_CORRUPTION_DETECTED;
+    psa_key_slot_t *slot;
+    uint8_t *privkey_data = NULL;
+    size_t *privkey_data_len = NULL;
+
+    if (!lib_initialized) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!data || !data_length) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    *data_length = 0;
+
+    status = psa_get_and_lock_key_slot_with_policy(key, &slot, PSA_KEY_USAGE_EXPORT, 0);
+    if (status != PSA_SUCCESS) {
+        unlock_status = psa_unlock_key_slot(slot);
+        if (unlock_status != PSA_SUCCESS) {
+            status = unlock_status;
+        }
+        return status;
+    }
+
+    if ((data_size == 0) ||
+        (data_size < PSA_EXPORT_KEY_OUTPUT_SIZE(slot->attr.type, slot->attr.bits))) {
+        return PSA_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    // todo: key export from secure element not supported yet
+    psa_get_key_data_from_key_slot(slot, &privkey_data, &privkey_data_len);
+
+    status =
+        psa_builtin_export_key(privkey_data, *privkey_data_len, data, data_size, data_length);
+
+    unlock_status = psa_unlock_key_slot(slot);
+    return ((status == PSA_SUCCESS) ? unlock_status : status);
 }
 
 /**
@@ -1257,13 +1327,8 @@ static psa_status_t psa_builtin_export_public_key( const uint8_t *key_buffer,
     }
 
     if (data_size < key_buffer_size) {
-        DEBUG("PSA Crypto Builtin Export Key: Output buffer too small\n");
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
-    /** Some implementations and drivers can generate a public key from existing private key
-     * material. This implementation does not support the recalculation of a public key, yet.
-     * It requires the key to already exist in local memory and just copies it into the data
-     * output. */
     memcpy(data, key_buffer, key_buffer_size);
     *data_length = key_buffer_size;
 
@@ -1453,11 +1518,13 @@ psa_status_t psa_builtin_import_key(const psa_key_attributes_t *attributes,
         return PSA_SUCCESS;
     }
     else if (PSA_KEY_TYPE_IS_ECC_PUBLIC_KEY(type)) {
-        if (data_length > PSA_EXPORT_PUBLIC_KEY_MAX_SIZE) {
-            return PSA_ERROR_NOT_SUPPORTED;
+        if (data_length != PSA_EXPORT_KEY_OUTPUT_SIZE(type, attributes->bits)) {
+            return PSA_ERROR_INVALID_ARGUMENT;
         }
+
         memcpy(key_buffer, data, data_length);
         *key_buffer_length = data_length;
+
         return PSA_SUCCESS;
     }
     return status;
