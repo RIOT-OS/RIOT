@@ -48,3 +48,6 @@ DISABLE_MODULE += test_utils_interactive_sync
 TEST_ON_CI_BLACKLIST += all
 
 include $(RIOTBASE)/Makefile.include
+
+# Set a custom channel if needed
+include $(RIOTMAKE)/default-radio-settings.inc.mk
