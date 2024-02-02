@@ -123,6 +123,10 @@ static void _disconnect(void)
 
     DEBUG("telnet disconnect\n");
     telnet_cb_disconneced();
+
+    _acquire();
+    sock_tcp_disconnect(client);
+    _release();
 }
 
 static int _write_buffer(const void* buffer, size_t len)
@@ -268,7 +272,6 @@ write:
         }
 disco:
         _disconnect();
-        sock_tcp_disconnect(client);
 
         if (res < 0) {
             DEBUG("telnet: read: %s\n", strerror(res));
