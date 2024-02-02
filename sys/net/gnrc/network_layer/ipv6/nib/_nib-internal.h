@@ -259,6 +259,51 @@ extern evtimer_msg_t _nib_evtimer;
 extern _nib_dr_entry_t *_prime_def_router;
 
 /**
+ * @brief   Looks up if an event is queued in the event timer
+ *
+ * @param[in] ctx   Context of the event. May be NULL for any event context.
+ * @param[in] type  [Type of the event](@ref net_gnrc_ipv6_nib_msg).
+ *
+ * @return  Milliseconds to the event, if event in queue.
+ * @return  UINT32_MAX, event is not in queue.
+ */
+uint32_t _evtimer_lookup(const void *ctx, uint16_t type);
+
+/**
+ * @brief   Removes an event from the event timer
+ *
+ * @param[in] event Representation of the event.
+ */
+static inline void _evtimer_del(evtimer_msg_event_t *event)
+{
+    evtimer_del(&_nib_evtimer, &event->event);
+}
+
+/**
+ * @brief   Adds an event to the event timer
+ *
+ * @param[in] ctx       The context of the event
+ * @param[in] type      [Type of the event](@ref net_gnrc_ipv6_nib_msg).
+ * @param[in,out] event Representation of the event.
+ * @param[in] offset    Offset in milliseconds to the event.
+ */
+static inline void _evtimer_add(void *ctx, int16_t type,
+                                evtimer_msg_event_t *event, uint32_t offset)
+{
+#ifdef MODULE_GNRC_IPV6
+    kernel_pid_t target_pid = gnrc_ipv6_pid;
+#else
+    kernel_pid_t target_pid = KERNEL_PID_LAST;  /* just for testing */
+#endif
+    _evtimer_del(event);
+    event->event.next = NULL;
+    event->event.offset = offset;
+    event->msg.type = type;
+    event->msg.content.ptr = ctx;
+    evtimer_add_msg(&_nib_evtimer, event, target_pid);
+}
+
+/**
  * @brief   Initializes NIB internally
  */
 void _nib_init(void);
@@ -826,51 +871,6 @@ void _nib_ft_get(const _nib_offl_entry_t *dst, gnrc_ipv6_nib_ft_t *fte);
  */
 int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *ctx,
                    gnrc_ipv6_nib_ft_t *entry);
-
-/**
- * @brief   Looks up if an event is queued in the event timer
- *
- * @param[in] ctx   Context of the event. May be NULL for any event context.
- * @param[in] type  [Type of the event](@ref net_gnrc_ipv6_nib_msg).
- *
- * @return  Milliseconds to the event, if event in queue.
- * @return  UINT32_MAX, event is not in queue.
- */
-uint32_t _evtimer_lookup(const void *ctx, uint16_t type);
-
-/**
- * @brief   Removes an event from the event timer
- *
- * @param[in] event Representation of the event.
- */
-static inline void _evtimer_del(evtimer_msg_event_t *event)
-{
-    evtimer_del(&_nib_evtimer, &event->event);
-}
-
-/**
- * @brief   Adds an event to the event timer
- *
- * @param[in] ctx       The context of the event
- * @param[in] type      [Type of the event](@ref net_gnrc_ipv6_nib_msg).
- * @param[in,out] event Representation of the event.
- * @param[in] offset    Offset in milliseconds to the event.
- */
-static inline void _evtimer_add(void *ctx, int16_t type,
-                                evtimer_msg_event_t *event, uint32_t offset)
-{
-#ifdef MODULE_GNRC_IPV6
-    kernel_pid_t target_pid = gnrc_ipv6_pid;
-#else
-    kernel_pid_t target_pid = KERNEL_PID_LAST;  /* just for testing */
-#endif
-    _evtimer_del(event);
-    event->event.next = NULL;
-    event->event.offset = offset;
-    event->msg.type = type;
-    event->msg.content.ptr = ctx;
-    evtimer_add_msg(&_nib_evtimer, event, target_pid);
-}
 
 #ifdef __cplusplus
 }
