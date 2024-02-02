@@ -1,0 +1,44 @@
+From 9b62250bf6561aed372429eb551bd75f8f5fde16 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@posteo.net>
+Date: Wed, 31 Jan 2024 17:58:13 +0100
+Subject: [PATCH] platform-specific/riot_boards.h: fix conflict with endian.h
+
+---
+ platform-specific/riot_boards.h | 23 -----------------------
+ 1 file changed, 23 deletions(-)
+
+diff --git a/platform-specific/riot_boards.h b/platform-specific/riot_boards.h
+index f18e5ae..d7680d5 100644
+--- a/platform-specific/riot_boards.h
++++ b/platform-specific/riot_boards.h
+@@ -126,27 +126,4 @@
+ /* RIOT "supports" memset()/memcpy() BUT not bzero()/mcopy(). */
+ #define SHA2_USE_MEMSET_MEMCPY 1
+ 
+-
+-/*
+- * NOTE Gcc is who define if we are big endian or little endian.
+- * Because RIOT has __BYTE_ORDER__ and BYTE_ORDER it is not clear which one
+- * should take preference here. Or, if the #define inside of sha2/sha2.h
+- * should be removed at all.
+- */
+-#ifndef BIG_ENDIAN
+-#if !defined(__BIG_ENDIAN__)
+-#    define BIG_ENDIAN    4321
+-#  else
+-#    define BIG_ENDIAN    __BIG_ENDIAN__
+-#  endif
+-#endif
+-
+-#ifndef LITTLE_ENDIAN
+-#if !defined(__LITTLE_ENDIAN__)
+-#    define LITTLE_ENDIAN    1234
+-#  else
+-#    define LITTLE_ENDIAN    __LITTLE_ENDIAN__
+-#  endif
+-#endif
+-
+ #endif /* _RIOT_BOARDS_H_ */
+-- 
+2.43.0
+

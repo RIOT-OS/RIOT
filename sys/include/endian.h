@@ -7,10 +7,13 @@
  */
 
 /**
- * @addtogroup posix
+ * @defgroup    sys_endian  endian conversions as provided by most libcs
+ * @ingroup     sys
+ *
+ * This module provides architecture-independent access to architecture details.
+ *
  * @{
- */
-/**
+ *
  * @file
  * @brief       libc header for endian conversion
  *
@@ -30,17 +33,17 @@ extern "C" {
 /**
  * @brief   A numeric constant representing little endian byte order
  */
-#define LITTLE_ENDIAN   implementation_defined
+#define LITTLE_ENDIAN   magic-number
 
 /**
  * @brief   A numeric constant representing big endian byte order
  */
-#define BIG_ENDIAN      implementation_defined
+#define BIG_ENDIAN      magic-number
 
 /**
  * @brief   A numeric constant representing PDP endian byte order
  */
-#define PDP_ENDIAN      implementation_defined
+#define PDP_ENDIAN      magic-number
 
 /**
  * @brief   The byte order of this machines indicated by the constant
@@ -69,37 +72,53 @@ uint64_t le64toh(uint64_t little_endian_64bits);/**< little endian to host, 64 b
 
 #else /* DOXYGEN */
 
-#define LITTLE_ENDIAN   _LITTLE_ENDIAN
-#define BIG_ENDIAN      _BIG_ENDIAN
-#define PDP_ENDIAN      _PDP_ENDIAN
-#define BYTE_ORDER      _BYTE_ORDER
+/* Depending on the version of newlib used, newlib may provide them indirectly
+ * as well. We don't want to redefine them in this case */
+#ifndef LITTLE_ENDIAN
+#  define LITTLE_ENDIAN 1234
+#endif
+#ifndef BIG_ENDIAN
+#  define BIG_ENDIAN    4321
+#endif
+#ifndef PDP_ENDIAN
+#  define PDP_ENDIAN    3412
+#endif
+#ifndef BYTE_ORDER
+#  define BYTE_ORDER    __BYTE_ORDER__
+#endif
+
+/* But to avoid lots of pain in the ass: Let's at least make sure everyone
+ * agrees on what magic number is what */
+#if (LITTLE_ENDIAN != 1234) || (BIG_ENDIAN != 4321) || (PDP_ENDIAN != 3412)
+#  error "Mismatching magic numbers to refer to endianness"
+#endif
 
 #if BYTE_ORDER == LITTLE_ENDIAN
 #  define htobe16(_x) __builtin_bswap16(_x)
-#  define htole16(_x) ((__uint16_t)(_x))
+#  define htole16(_x) ((uint16_t)(_x))
 #  define be16toh(_x) __builtin_bswap16(_x)
-#  define le16toh(_x) ((__uint16_t)(_x))
+#  define le16toh(_x) ((uint16_t)(_x))
 #  define htobe32(_x) __builtin_bswap32(_x)
-#  define htole32(_x) ((__uint32_t)(_x))
+#  define htole32(_x) ((uint32_t)(_x))
 #  define be32toh(_x) __builtin_bswap32(_x)
-#  define le32toh(_x) ((__uint32_t)(_x))
+#  define le32toh(_x) ((uint32_t)(_x))
 #  define htobe64(_x) __builtin_bswap64(_x)
-#  define htole64(_x) ((__uint64_t)(_x))
+#  define htole64(_x) ((uint64_t)(_x))
 #  define be64toh(_x) __builtin_bswap64(_x)
-#  define le64toh(_x) ((__uint64_t)(_x))
+#  define le64toh(_x) ((uint64_t)(_x))
 #elif BYTE_ORDER == BIG_ENDIAN
 #  define htole16(_x) __builtin_bswap16(_x)
-#  define htobe16(_x) ((__uint16_t)(_x))
+#  define htobe16(_x) ((uint16_t)(_x))
 #  define le16toh(_x) __builtin_bswap16(_x)
-#  define be16toh(_x) ((__uint16_t)(_x))
+#  define be16toh(_x) ((uint16_t)(_x))
 #  define htole32(_x) __builtin_bswap32(_x)
-#  define htobe32(_x) ((__uint32_t)(_x))
+#  define htobe32(_x) ((uint32_t)(_x))
 #  define le32toh(_x) __builtin_bswap32(_x)
-#  define be32toh(_x) ((__uint32_t)(_x))
+#  define be32toh(_x) ((uint32_t)(_x))
 #  define htole64(_x) __builtin_bswap64(_x)
-#  define htobe64(_x) ((__uint64_t)(_x))
+#  define htobe64(_x) ((uint64_t)(_x))
 #  define le64toh(_x) __builtin_bswap64(_x)
-#  define be64toh(_x) ((__uint64_t)(_x))
+#  define be64toh(_x) ((uint64_t)(_x))
 #else
 #  error "Byte order not supported"
 #endif

@@ -89,6 +89,11 @@ static void test_libc_endian(void)
     TEST_ASSERT_EQUAL_INT(le32toh(u32_le.as_number), u32_host);
     TEST_ASSERT_EQUAL_INT(be64toh(u64_be.as_number), u64_host);
     TEST_ASSERT_EQUAL_INT(le64toh(u64_le.as_number), u64_host);
+
+    /* check that magic numbers in the constants are what is commonly expected */
+    TEST_ASSERT_EQUAL_INT(LITTLE_ENDIAN, 1234);
+    TEST_ASSERT_EQUAL_INT(BIG_ENDIAN, 4321);
+    TEST_ASSERT_EQUAL_INT(PDP_ENDIAN, 3412);
 }
 /** @} */
 
