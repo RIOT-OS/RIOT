@@ -32,4 +32,13 @@ config LWM2M_HUMIDITY_INSTANCES_MAX
 
 endmenu
 
+menu "IPSO illuminance object"
+    depends on USEMODULE_WAKAAMA_OBJECTS_ILLUMINANCE
+
+config LWM2M_ILLUMINANCE_INSTANCES_MAX
+    int "Maximum number of illuminance object instances"
+    default 1
+
+endmenu
+
 endmenu # "IPSO objects"
