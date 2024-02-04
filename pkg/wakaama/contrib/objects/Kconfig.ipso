@@ -50,4 +50,13 @@ config LWM2M_TEMPERATURE_INSTANCES_MAX
 
 endmenu
 
+menu "IPSO voltage object"
+    depends on USEMODULE_WAKAAMA_OBJECTS_VOLTAGE
+
+config LWM2M_VOLTAGE_INSTANCES_MAX
+    int "Maximum number of voltage object instances"
+    default 1
+
+endmenu
+
 endmenu # "IPSO objects"
