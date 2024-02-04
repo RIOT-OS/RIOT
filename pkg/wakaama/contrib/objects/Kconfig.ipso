@@ -5,4 +5,13 @@ config LWM2M_IPSO_SENSOR_BASE_UNITS_MAX_SIZE
     int "Maximum size of strings representing units"
     default 4
 
+menu "IPSO barometer object"
+    depends on USEMODULE_WAKAAMA_OBJECTS_BAROMETER
+
+config LWM2M_BAROMETER_INSTANCES_MAX
+    int "Maximum number of barometer object instances"
+    default 1
+
+endmenu
+
 endmenu # "IPSO objects"

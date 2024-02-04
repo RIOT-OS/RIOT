@@ -12,6 +12,11 @@ USEMODULE += wakaama_objects
 USEMODULE += wakaama_objects_device
 USEMODULE += wakaama_objects_security
 
+
+ifneq (,$(filter wakaama_objects_barometer,$(USEMODULE)))
+    USEMODULE += wakaama_objects_ipso_sensor_base
+endif
+
 USEMODULE += ztimer
 USEMODULE += ztimer_sec
 USEPKG += tlsf
