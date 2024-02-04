@@ -30,6 +30,17 @@ distclean: docclean pkg-clean
 	@echo "Cleaning all build products"
 	@for dir in $(APPLICATION_DIRS); do "$(MAKE)" -C$$dir distclean; done
 
+print-versions:
+	@./dist/tools/ci/print_toolchain_versions.sh
+
+include makefiles/boards.inc.mk
+include makefiles/app_dirs.inc.mk
+
+include makefiles/tools/riotgen.inc.mk
+-include makefiles/tests.inc.mk
+
+include makefiles/color.inc.mk
+
 welcome:
 	@echo "Welcome to RIOT - The friendly OS for IoT!"
 	@echo ""
@@ -47,12 +58,7 @@ welcome:
 	@echo " print-versions"
 	@echo " clean distclean pkg-clean"
 	@echo " doc doc-{man,latex}"
-
-print-versions:
-	@./dist/tools/ci/print_toolchain_versions.sh
-
-include makefiles/boards.inc.mk
-include makefiles/app_dirs.inc.mk
-
-include makefiles/tools/riotgen.inc.mk
--include makefiles/tests.inc.mk
+	@echo ""
+	@echo "==> tl;dr Try running:"
+	@echo "    cd examples/default"
+	@echo "    make BOARD=<INSERT_BOARD_NAME>"
