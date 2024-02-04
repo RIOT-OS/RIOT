@@ -21,6 +21,10 @@ ifneq (,$(filter wakaama_objects_current,$(USEMODULE)))
     USEMODULE += wakaama_objects_ipso_sensor_base
 endif
 
+ifneq (,$(filter wakaama_objects_humidity,$(USEMODULE)))
+    USEMODULE += wakaama_objects_ipso_sensor_base
+endif
+
 USEMODULE += ztimer
 USEMODULE += ztimer_sec
 USEPKG += tlsf
