@@ -49,6 +49,11 @@
 #define EXTI_REG_FTSR       (EXTI->FTSR1)
 #define EXTI_REG_PR         (EXTI->PR1)
 #define EXTI_REG_IMR        (EXTI->IMR1)
+#elif defined(CPU_FAM_STM32G0)
+#define EXTI_REG_RTSR       (EXTI->RTSR1)
+#define EXTI_REG_FTSR       (EXTI->FTSR1)
+#define EXTI_REG_PR         (EXTI->RPR1)
+#define EXTI_REG_IMR        (EXTI->IMR1)
 #elif defined(CPU_FAM_STM32L5)
 #define EXTI_REG_IMR        (EXTI->IMR1)
 #else
@@ -59,9 +64,10 @@
 #endif
 
 /* map some RTC register names and bitfield */
-#if defined(CPU_FAM_STM32G4)
+#if defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0)
 #define RTC_REG_ISR         RTC->ICSR
-
+#define RTC_REG_SR          RTC->SR
+#define RTC_REG_SCR         RTC->SCR
 #define RTC_ISR_RSF         RTC_ICSR_RSF
 #define RTC_ISR_INIT        RTC_ICSR_INIT
 #define RTC_ISR_INITF       RTC_ICSR_INITF
@@ -83,6 +89,9 @@
     defined(CPU_FAM_STM32L5)
 #define IRQN                (RTC_IRQn)
 #define ISR_NAME            isr_rtc
+#elif defined(CPU_FAM_STM32G0)
+#define IRQN                (RTC_TAMP_IRQn)
+#define ISR_NAME            isr_rtc_tamp
 #else
 #define IRQN                (RTC_Alarm_IRQn)
 #define ISR_NAME            isr_rtc_alarm
@@ -101,6 +110,11 @@
 #define EXTI_FTSR_BIT       (EXTI_FTSR1_FT17)
 #define EXTI_RTSR_BIT       (EXTI_RTSR1_RT17)
 #define EXTI_PR_BIT         (EXTI_PR1_PIF17)
+#elif defined(CPU_FAM_STM32G0)
+#define EXTI_IMR_BIT        (EXTI_IMR1_IM11)
+#define EXTI_FTSR_BIT       (EXTI_FTSR1_FT11)
+#define EXTI_RTSR_BIT       (EXTI_RTSR1_RT11)
+#define EXTI_PR_BIT         (EXTI_RPR1_RPIF11)
 #else
 #if defined(CPU_FAM_STM32L0)
 #define EXTI_IMR_BIT        (EXTI_IMR_IM17)
@@ -252,9 +266,11 @@ void rtc_init(void)
 
     /* select input clock and enable the RTC */
     stmclk_dbp_unlock();
-    #if defined(CPU_FAM_STM32L5)
+#if defined(CPU_FAM_STM32L5)
     periph_clk_en(APB1, RCC_APB1ENR1_RTCAPBEN);
-    #endif
+#elif defined(CPU_FAM_STM32G0)
+    periph_clk_en(APB1, RCC_APBENR1_RTCAPBEN);
+#endif
     EN_REG &= ~(CLKSEL_MASK);
 #if IS_ACTIVE(CONFIG_BOARD_HAS_LSE)
     EN_REG |= (CLKSEL_LSE | EN_BIT);
@@ -398,7 +414,7 @@ void rtc_poweroff(void)
 
 void ISR_NAME(void)
 {
-#if !defined(CPU_FAM_STM32L5)
+#if !defined(CPU_FAM_STM32L5) && !defined(CPU_FAM_STM32G0)
     if (RTC_REG_ISR & RTC_ISR_ALRAF) {
         if (isr_ctx.cb != NULL) {
             isr_ctx.cb(isr_ctx.arg);
