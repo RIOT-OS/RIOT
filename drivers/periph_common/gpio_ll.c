@@ -33,23 +33,32 @@ void gpio_ll_print_conf_common(const gpio_conf_t conf)
 
     print_str("state: ");
     switch (conf.state) {
-    case GPIO_OUTPUT_PUSH_PULL:
-        print_str("out-pp");
-        break;
-    case GPIO_OUTPUT_OPEN_DRAIN:
-        print_str("out-od");
-        break;
-    case GPIO_OUTPUT_OPEN_SOURCE:
-        print_str("out-os");
-        break;
     case GPIO_INPUT:
         print_str("in");
         break;
+    case GPIO_OUTPUT_PUSH_PULL:
+        print_str("out-pp");
+        break;
+#if MODULE_PERIPH_GPIO_LL_OPEN_DRAIN
+    case GPIO_OUTPUT_OPEN_DRAIN:
+        print_str("out-od");
+        break;
+#endif
+#if MODULE_PERIPH_GPIO_LL_OPEN_SOURCE
+    case GPIO_OUTPUT_OPEN_SOURCE:
+        print_str("out-os");
+        break;
+#endif
     case GPIO_USED_BY_PERIPHERAL:
         print_str("periph");
         break;
+#if MODULE_PERIPH_GPIO_LL_DISCONNECT
     case GPIO_DISCONNECT:
         print_str("off");
+        break;
+#endif
+    default:
+        print_str("?");
         break;
     }
 

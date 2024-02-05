@@ -239,7 +239,7 @@ typedef union gpio_conf_gd32v gpio_conf_t;
  * @ingroup     drivers_periph_gpio_ll
  */
 union gpio_conf_gd32v {
-    uint16_t bits;  /**< the raw bits */
+    uint8_t bits;  /**< the raw bits */
     struct {
         /**
          * @brief   State of the pin
@@ -260,18 +260,6 @@ union gpio_conf_gd32v {
          */
         gpio_slew_t slew_rate           : 2;
         /**
-         * @brief   Whether to disable the input Schmitt trigger
-         *
-         * @details This could be called `schmitt_trigger` with inverse
-         *          meaning, but the API contract says that additional
-         *          members in the structure should have a sane
-         *          default when zero.
-         *
-         * This value is ignored *unless* @ref gpio_conf_stm32::state is
-         * configured to @ref GPIO_INPUT.
-         */
-        bool schmitt_trigger_disabled   : 1;
-        /**
          * @brief   Initial value of the output
          *
          * Ignored if @ref gpio_conf_stm32::state is set to @ref GPIO_INPUT or
@@ -285,7 +273,6 @@ union gpio_conf_gd32v {
          * consulted.
          */
         bool initial_value          : 1;
-        uint8_t                     : 7;    /*< padding */
     };
 };
 

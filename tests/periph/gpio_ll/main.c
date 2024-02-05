@@ -23,13 +23,14 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "flash_utils.h"
 #include "irq.h"
+#include "modules.h"
 #include "mutex.h"
 #include "periph/gpio_ll.h"
 #include "periph/gpio_ll_irq.h"
-#include "timex.h"
+#include "time_units.h"
 #include "ztimer.h"
-#include "flash_utils.h"
 
 #ifndef LOW_ROM
 #define LOW_ROM 0
@@ -125,22 +126,15 @@ static void print_conf(gpio_conf_t conf)
     puts("");
 }
 
-static void test_gpio_ll_init(void)
+static void test_gpio_ll_init_input_configs(void)
 {
     bool is_supported;
-    puts_optional("\n"
-                  "Testing gpip_ng_init()\n"
-                  "======================\n"
-                  "\n"
-                  "Testing is_gpio_port_num_valid() is true for PORT_OUT and "
-                  "PORT_IN:");
-    expect(is_gpio_port_num_valid(PORT_IN));
-    expect(is_gpio_port_num_valid(PORT_OUT));
-
     puts_optional("\nTesting input configurations for PIN_IN_0:");
     is_supported = (0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_in_pu));
     printf_optional("Support for input with pull up: %s\n",
                     noyes[is_supported]);
+    /* check if this matches compile time checks */
+    expect(is_supported == IS_USED(MODULE_PERIPH_GPIO_LL_INPUT_PULL_UP));
     if (is_supported) {
         gpio_conf_t conf = gpio_ll_query_conf(port_in, PIN_IN_0);
         print_conf(conf);
@@ -150,6 +144,8 @@ static void test_gpio_ll_init(void)
     is_supported = (0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_in_pd));
     printf_optional("Support for input with pull down: %s\n",
                     noyes[is_supported]);
+    /* check if this matches compile time checks */
+    expect(is_supported == IS_USED(MODULE_PERIPH_GPIO_LL_INPUT_PULL_DOWN));
     if (is_supported) {
         gpio_conf_t conf = gpio_ll_query_conf(port_in, PIN_IN_0);
         print_conf(conf);
@@ -159,6 +155,8 @@ static void test_gpio_ll_init(void)
     is_supported = (0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_in_pk));
     printf_optional("Support for input with pull to bus level: %s\n",
                     noyes[is_supported]);
+    /* check if this matches compile time checks */
+    expect(is_supported == IS_USED(MODULE_PERIPH_GPIO_LL_INPUT_PULL_KEEP));
     if (is_supported) {
         gpio_conf_t conf = gpio_ll_query_conf(port_in, PIN_IN_0);
         print_conf(conf);
@@ -175,7 +173,11 @@ static void test_gpio_ll_init(void)
     }
     /* Support for floating inputs is mandatory */
     expect(is_supported);
+}
 
+static void test_gpio_ll_init_output_configs(void)
+{
+    bool is_supported;
     puts_optional("\nTesting output configurations for PIN_OUT_0:");
     {
         gpio_conf_t conf = {
@@ -188,7 +190,9 @@ static void test_gpio_ll_init(void)
                     "LOW: %s\n",
                     noyes[is_supported]);
 
-    if (is_supported) {
+    /* this is mandatory */
+    expect(is_supported);
+    {
         gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
         print_conf(conf);
         expect((conf.state == GPIO_OUTPUT_PUSH_PULL) && !conf.initial_value);
@@ -218,7 +222,9 @@ static void test_gpio_ll_init(void)
                     "HIGH: %s\n",
                     noyes[is_supported]);
 
-    if (is_supported) {
+    /* this is mandatory */
+    expect(is_supported);
+    {
         gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
         print_conf(conf);
         expect((conf.state == GPIO_OUTPUT_PUSH_PULL) && conf.initial_value);
@@ -239,6 +245,8 @@ static void test_gpio_ll_init(void)
     printf_optional("Support for output (open drain with pull up) with initial "
                     "value of LOW: %s\n",
                     noyes[is_supported]);
+    /* check if this matches compile time checks */
+    expect(is_supported == IS_USED(MODULE_PERIPH_GPIO_LL_OPEN_DRAIN_PULL_UP));
 
     if (is_supported) {
         gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
@@ -262,6 +270,8 @@ static void test_gpio_ll_init(void)
     printf_optional("Support for output (open drain with pull up) with initial "
                     "value of HIGH: %s\n",
                     noyes[is_supported]);
+    /* check if this matches compile time checks */
+    expect(is_supported == IS_USED(MODULE_PERIPH_GPIO_LL_OPEN_DRAIN_PULL_UP));
 
     if (is_supported) {
         gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
@@ -285,6 +295,8 @@ static void test_gpio_ll_init(void)
     printf_optional("Support for output (open drain) with initial value of "
                     "LOW: %s\n",
                     noyes[is_supported]);
+    /* check if this matches compile time checks */
+    expect(is_supported == IS_USED(MODULE_PERIPH_GPIO_LL_OPEN_DRAIN));
 
     if (is_supported) {
         gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
@@ -308,6 +320,8 @@ static void test_gpio_ll_init(void)
     printf_optional("Support for output (open drain) with initial value of "
                     "HIGH: %s\n",
                     noyes[is_supported]);
+    /* check if this matches compile time checks */
+    expect(is_supported == IS_USED(MODULE_PERIPH_GPIO_LL_OPEN_DRAIN));
 
     if (is_supported) {
         gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
@@ -355,6 +369,8 @@ static void test_gpio_ll_init(void)
     printf_optional("Support for output (open source) with initial value of "
                     "LOW: %s\n",
                     noyes[is_supported]);
+    /* check if this matches compile time checks */
+    expect(is_supported == IS_USED(MODULE_PERIPH_GPIO_LL_OPEN_SOURCE));
 
     if (is_supported) {
         gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
@@ -404,6 +420,8 @@ static void test_gpio_ll_init(void)
     printf_optional("Support for output (open source) with initial value of "
                     "HIGH: %s\n",
                     noyes[is_supported]);
+    /* check if this matches compile time checks */
+    expect(is_supported == IS_USED(MODULE_PERIPH_GPIO_LL_OPEN_SOURCE));
 
     if (is_supported) {
         gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
@@ -424,9 +442,11 @@ static void test_gpio_ll_init(void)
         };
         is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, conf));
     }
-    printf_optional("Support for output (open source with pull up) with initial "
+    printf_optional("Support for output (open source with pull down) with initial "
                     "value of HIGH: %s\n",
                     noyes[is_supported]);
+    /* check if this matches compile time checks */
+    expect(is_supported == IS_USED(MODULE_PERIPH_GPIO_LL_OPEN_SOURCE_PULL_DOWN));
 
     if (is_supported) {
         ztimer_sleep(ZTIMER_USEC, US_PER_MS);
@@ -443,9 +463,11 @@ static void test_gpio_ll_init(void)
         };
         is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, conf));
     }
-    printf_optional("Support for output (open source with pull up) with initial "
+    printf_optional("Support for output (open source with pull down) with initial "
                     "value of LOW: %s\n",
                     noyes[is_supported]);
+    /* check if this matches compile time checks */
+    expect(is_supported == IS_USED(MODULE_PERIPH_GPIO_LL_OPEN_SOURCE_PULL_DOWN));
 
     if (is_supported) {
         ztimer_sleep(ZTIMER_USEC, US_PER_MS);
@@ -453,19 +475,40 @@ static void test_gpio_ll_init(void)
         printf_optional("Output is indeed LOW: %s\n", noyes[is_supported]);
         expect(is_supported);
     }
+}
 
+static void test_gpio_ll_init(void)
+{
+    bool is_supported;
+    puts_optional("\n"
+                  "Testing gpip_ng_init()\n"
+                  "======================\n"
+                  "\n"
+                  "Testing is_gpio_port_num_valid() is true for PORT_OUT and "
+                  "PORT_IN:");
+    expect(is_gpio_port_num_valid(PORT_IN));
+    expect(is_gpio_port_num_valid(PORT_OUT));
+
+    /* first, iterate through input configurations and test them one by one */
+    test_gpio_ll_init_input_configs();
+
+    /* second, iterate through output configurations and test them */
+    test_gpio_ll_init_output_configs();
+
+    /* finally, test disconnecting pins */
     {
         gpio_conf_t conf = {
             .state = GPIO_DISCONNECT,
         };
         is_supported = (0 == gpio_ll_init(port_out, PIN_OUT_0, conf));
     }
-    printf_optional("Support for disconnecting GPIO: %s\n", noyes[is_supported]);
+    printf_optional("\nSupport for disconnecting GPIO: %s\n", noyes[is_supported]);
     /* This is mandatory */
     expect(is_supported);
 
     /* Ensure that gpio_ll_query_conf() correctly detects the state as
-     * disconnected. */
+     * disconnected. On MCUs that don't support this (e.g. ATmega),
+     * GPIO_DISCONNECT must be an alias of GPIO_INPUT. */
     {
         gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
         gpio_ll_print_conf(conf);
@@ -808,17 +851,15 @@ static void test_irq_level(void)
 
 static void test_irq(void)
 {
-    if (IS_USED(MODULE_PERIPH_GPIO_LL_IRQ)) {
-        puts_optional("\n"
-             "Testing External IRQs\n"
-             "=====================\n");
+    puts_optional("\n"
+         "Testing External IRQs\n"
+         "=====================\n");
 
-        expect(0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_in));
-        expect(0 == gpio_ll_init(port_out, PIN_OUT_0, gpio_ll_out));
+    expect(0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_in));
+    expect(0 == gpio_ll_init(port_out, PIN_OUT_0, gpio_ll_out));
 
-        test_irq_edge();
-        test_irq_level();
-    }
+    test_irq_edge();
+    test_irq_level();
 }
 
 int main(void)
