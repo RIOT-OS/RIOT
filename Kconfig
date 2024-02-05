@@ -41,7 +41,7 @@ menu "External Packages"
 osource "$(KCONFIG_EXTERNAL_PKG_CONFIGS)"
 endmenu # External Packages
 
-comment "RIOT is in a migration phase."
+comment "Kconfig is slated for removal."
 comment "Some configuration options may not be here. Use CFLAGS instead."
 
 comment "!! ERROR: There are conflicting modules active !!"
