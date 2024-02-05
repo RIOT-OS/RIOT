@@ -7,7 +7,7 @@ export TAP ?= tap0
 CFLAGS += -DOUTPUT=TEXT
 CFLAGS += -DTEST_SUITES="gnrc_ipv6_ext_frag"
 
-ifeq (native,$(BOARD))
+ifneq (,$(filter native native64,$(BOARD)))
   PORT ?= $(TAP)
 else
   ETHOS_BAUDRATE ?= 115200

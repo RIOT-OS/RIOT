@@ -15,6 +15,7 @@ hifive1b
 msb-430
 msba2
 native
+native64
 nrf52840dk
 qn9080dk
 samr21-xpro
@@ -38,7 +39,7 @@ esac
 
 # temporarily disabling llvm builds until https://github.com/RIOT-OS/RIOT/pull/15595
 # is in
-: ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
+: ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native native64 nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
 
 : ${TEST_WITH_CONFIG_SUPPORTED:="examples/suit_update tests/drivers/at86rf2xx_aes"}
 
@@ -380,9 +381,9 @@ compile() {
             EMULATED=0
         fi
 
-        if [ $RUN_TESTS -eq 1 -o "$board" = "native" -o "$EMULATED" = "1" ]; then
+        if [ $RUN_TESTS -eq 1 -o "$board" = "native" -o "$board" = "native64" -o "$EMULATED" = "1" ]; then
             if [ -f "${BINDIR}/.test" ]; then
-                if [ "$board" = "native" -o "${EMULATED}" = "1" ]; then
+                if [ "$board" = "native" -o "$board" = "native64" -o "${EMULATED}" = "1" ]; then
                     # For native, we can run the test on the worker that also
                     # compiled it (`make -C${appdir} test`).
                     # "dwq-localjob" allows using some (locally run) command's

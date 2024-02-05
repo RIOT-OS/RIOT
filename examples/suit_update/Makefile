@@ -55,7 +55,7 @@ CFLAGS += -DSUIT_MANIFEST_RESOURCE=\"$(SUIT_COAP_ROOT)/$(SUIT_NOTIFY_MANIFEST)\"
 # Enable test_utils_interactive_sync, only used when running automatic test
 DEFAULT_MODULE += test_utils_interactive_sync
 
-ifeq ($(BOARD),native)
+ifneq (,$(filter native native64,$(BOARD)))
   USE_ETHOS ?= 0
   IFACE ?= tapbr0
   # Configure two RAM regions with 2K each

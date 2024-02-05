@@ -33,7 +33,7 @@
 
 #include "suit/storage.h"
 #include "suit/storage/ram.h"
-#ifdef BOARD_NATIVE
+#ifdef CPU_NATIVE
 #include "suit/storage/vfs.h"
 #include "xfa.h"
 #include "vfs_default.h"
@@ -57,7 +57,7 @@ static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 /* add handled storages */
 #if IS_USED(MODULE_SUIT_STORAGE_VFS)
 XFA_USE(char*, suit_storage_files_reg);
-#ifdef BOARD_NATIVE
+#ifdef CPU_NATIVE
 XFA(suit_storage_files_reg, 0) char* _slot0 = VFS_DEFAULT_DATA "/SLOT0.txt";
 XFA(suit_storage_files_reg, 1) char* _slot1 = VFS_DEFAULT_DATA "/SLOT1.txt";
 #endif

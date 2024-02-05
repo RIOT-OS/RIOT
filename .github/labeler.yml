@@ -118,7 +118,9 @@
 
 "Platform: native":
   - "boards/native/**/*"
+  - "boards/native64/**/*"
   - "cpu/native/**/*"
+  - "makefiles/arch/native.inc.mk"
 
 "Platform: ARM":
   - "cpu/arm7_common/**/*"

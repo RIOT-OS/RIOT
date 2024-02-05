@@ -28,7 +28,11 @@ extern "C" {
  * @{
  */
 #ifndef THREAD_STACKSIZE_DEFAULT
+#if (__SIZEOF_POINTER__ == 8)
+#define THREAD_STACKSIZE_DEFAULT            (16384)
+#else
 #define THREAD_STACKSIZE_DEFAULT            (8192)
+#endif
 #endif
 #ifndef THREAD_STACKSIZE_IDLE
 #define THREAD_STACKSIZE_IDLE               (THREAD_STACKSIZE_DEFAULT)

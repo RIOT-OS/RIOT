@@ -36,12 +36,8 @@ class TestDHCPv6RelayAgent(PexpectTestCase):
         super().setUpClass()
         cls._get_bridge()
         cls._get_tap_lladdr()
-        if cls.BOARD == "native":
-            cls.pre_sniffer_wait = cls.TIMEOUT / 20
-            cls.post_sniffer_wait = cls.TIMEOUT / 20
-        else:
-            cls.pre_sniffer_wait = cls.TIMEOUT / 20
-            cls.post_sniffer_wait = cls.TIMEOUT / 20
+        cls.pre_sniffer_wait = cls.TIMEOUT / 20
+        cls.post_sniffer_wait = cls.TIMEOUT / 20
         cls._get_node_ifaceid()
         cls.spawn.sendline('ifconfig')
         # check if node joined All_DHCP_Relay_Agents_and_Servers

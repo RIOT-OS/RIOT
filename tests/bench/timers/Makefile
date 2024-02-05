@@ -4,6 +4,7 @@ include ../Makefile.bench_common
 # CFLAGS configuration to build properly
 SINGLE_TIMER_BOARDS = \
   native \
+  native64 \
   nucleo-f031k6 \
   nucleo-f042k6 \
   #

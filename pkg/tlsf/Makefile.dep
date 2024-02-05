@@ -1,7 +1,7 @@
 ifneq (,$(filter tlsf-malloc,$(USEMODULE)))
   ifneq (,$(filter newlib,$(USEMODULE)))
     USEMODULE += tlsf-malloc_newlib
-  else ifneq (,$(filter native,$(BOARD)))
+  else ifneq (,$(filter native,$(CPU)))
     USEMODULE += tlsf-malloc_native
   else
     $(warning tlsf-malloc can only be used on native or on platforms using newlib)

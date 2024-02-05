@@ -12,7 +12,7 @@ USEPKG    += fatfs
 
 FATFS_IMAGE_FILE_SIZE_MIB ?= 128
 
-ifeq ($(BOARD),native)
+ifneq (,$(filter native native64,$(BOARD)))
 #overwrite default mtd_native-config to use fat image as flash device
 CFLAGS += -DMTD_NATIVE_FILENAME=\"./bin/riot_fatfs_disk.img\"
 CFLAGS += -DFATFS_IMAGE_FILE_SIZE_MIB=$(FATFS_IMAGE_FILE_SIZE_MIB)

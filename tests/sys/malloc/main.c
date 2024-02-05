@@ -28,7 +28,7 @@
 #include "test_utils/expect.h"
 
 #ifndef CHUNK_SIZE
-#ifdef BOARD_NATIVE
+#ifdef CPU_NATIVE
 #define CHUNK_SIZE          (1024 * 1024U)
 #else
 #define CHUNK_SIZE          (128U)

@@ -14,6 +14,6 @@ USEMODULE += xtimer
 
 FEATURES_OPTIONAL += periph_hwrng
 
-TEST_ON_CI_WHITELIST += native
+TEST_ON_CI_WHITELIST += native native64
 
 include $(RIOTBASE)/Makefile.include
