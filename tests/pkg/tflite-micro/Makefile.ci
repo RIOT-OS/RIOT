@@ -102,6 +102,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     teensy31 \
     usb-kw41z \
     weact-f401cc \
+    weact-g030f6 \
     wemos-zero \
     yarm \
     yunjia-nrf51822 \

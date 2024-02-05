@@ -34,5 +34,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     telosb \
     thingy52 \
     waspmote-pro \
+    weact-g030f6 \
     z1 \
     #
