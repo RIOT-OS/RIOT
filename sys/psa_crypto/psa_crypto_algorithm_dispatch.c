@@ -458,7 +458,7 @@ psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attri
             }
         }
 
-        // save private key data
+        /* save private key data */
         memcpy(key_data, data, data_length);
         *key_bytes = data_length;
 
