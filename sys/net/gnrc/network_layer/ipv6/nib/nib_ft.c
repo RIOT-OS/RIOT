@@ -36,12 +36,23 @@ int gnrc_ipv6_nib_ft_get(const ipv6_addr_t *dst, gnrc_pktsnip_t *pkt,
 
 int gnrc_ipv6_nib_ft_add(const ipv6_addr_t *dst, unsigned dst_len,
                          const ipv6_addr_t *next_hop, unsigned iface,
-                         uint16_t ltime)
+                         uint32_t ltime)
 {
     int res = 0;
     bool is_default_route = ((dst == NULL) || (dst_len == 0) ||
                              ipv6_addr_is_unspecified(dst));
 
+    uint32_t ltime_ms;
+    /* The valid lifetime is given in seconds, but our timers work in
+     * milliseconds, so we have to scale down to the smallest possible
+     * value (UINT32_MAX ms). This is however alright since we ask for
+     * a new router advertisement before this timeout expires */
+    if (ltime > UINT32_MAX / MS_PER_SEC) {
+        ltime_ms = UINT32_MAX;
+    }
+    else {
+        ltime_ms = ltime * MS_PER_SEC;
+    }
     if ((iface == 0) || ((is_default_route) && (next_hop == NULL))) {
         return -EINVAL;
     }
@@ -55,9 +66,9 @@ int gnrc_ipv6_nib_ft_add(const ipv6_addr_t *dst, unsigned dst_len,
         }
         else {
             _prime_def_router = ptr;
-            if (ltime > 0) {
+            if (ltime_ms > 0) {
                 _evtimer_add(ptr, GNRC_IPV6_NIB_RTR_TIMEOUT,
-                             &ptr->rtr_timeout, ltime * MS_PER_SEC);
+                             &ptr->rtr_timeout, ltime_ms);
             }
         }
     }
@@ -70,9 +81,9 @@ int gnrc_ipv6_nib_ft_add(const ipv6_addr_t *dst, unsigned dst_len,
         if (ptr == NULL) {
             res = -ENOMEM;
         }
-        else if (ltime > 0) {
+        else if (ltime_ms > 0) {
             _evtimer_add(ptr, GNRC_IPV6_NIB_ROUTE_TIMEOUT,
-                         &ptr->route_timeout, ltime * MS_PER_SEC);
+                         &ptr->route_timeout, ltime_ms);
         }
     }
 #else /* CONFIG_GNRC_IPV6_NIB_ROUTER */
