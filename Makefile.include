@@ -709,6 +709,12 @@ BUILDDEPS += $(BUILD_DIR)/CACHEDIR.TAG
 # clean removing dependencies that make previously considered as up to date.
 $(BUILDDEPS): $(CLEAN)
 
+# include makefile snippets for packages in $(PKG_PATHS) that modify GENSRC:
+-include $(PKG_PATHS:%=%Makefile.gensrc)
+# remove duplicates & make accessible to subprocesses
+GENSRC := $(sort $(GENSRC))
+export GENSRC
+
 # Save value to verify it is not modified later
 _BASELIBS_VALUE_BEFORE_USAGE := $(BASELIBS)
 
@@ -757,7 +763,7 @@ $(APPLICATION_MODULE).module: FORCE
 
 # Other modules are built by application.inc.mk and packages building
 _SUBMAKE_LIBS = $(filter-out $(APPLICATION_MODULE).module $(APPDEPS), $(BASELIBS) $(ARCHIVES))
-$(_SUBMAKE_LIBS): $(APPLICATION_MODULE).module pkg-build
+$(_SUBMAKE_LIBS): $(APPLICATION_MODULE).module pkg-build $(GENSRC)
 
 # 'print-size' triggers a rebuild. Use 'info-buildsize' if you do not need to rebuild.
 print-size: $(ELFFILE)
@@ -810,13 +816,15 @@ endif
 	@$(COLOR_ECHO)
 
 # The `clean` needs to be serialized before everything else.
-all $(BASELIBS) $(ARCHIVES) $(BUILDDEPS) ..in-docker-container: | $(CLEAN)
+all $(BASELIBS) $(ARCHIVES) $(BUILDDEPS) $(GENSRC) ..in-docker-container: | $(CLEAN)
 
 .PHONY: pkg-prepare pkg-build
 pkg-prepare:
 	-@$(foreach dir,$(PKG_PATHS),"$(MAKE)" -C $(dir) prepare $(NEWLINE))
 
-pkg-build: $(BUILDDEPS)
+$(GENSRC): pkg-prepare
+
+pkg-build: $(BUILDDEPS) | $(GENSRC)
 	$(foreach dir,$(PKG_PATHS),$(QQ)"$(MAKE)" -C $(dir) $(NEWLINE))
 
 clean:
