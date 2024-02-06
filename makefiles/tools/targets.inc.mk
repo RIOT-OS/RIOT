@@ -32,6 +32,12 @@ $(RIOTTOOLS)/edbg/edbg: $(RIOTTOOLS)/edbg/Makefile
 	CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/edbg
 	@echo "[INFO] edbg binary successfully built!"
 
+$(RIOTTOOLS)/mspdebug/mspdebug: $(RIOTTOOLS)/mspdebug/Makefile
+	@echo "[INFO] mspdebug binary not found - building it from source now"
+	@echo "[INFO] mspdebug requires readline and libusb-compat headers to build"
+	CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/mspdebug
+	@echo "[INFO] mspdebug binary successfully built!"
+
 $(RIOTTOOLS)/mosquitto_rsmb/mosquitto_rsmb:
 	@echo "[INFO] rsmb binary not found - building it from source now"
 	@$(MAKE) -C $(RIOTTOOLS)/mosquitto_rsmb

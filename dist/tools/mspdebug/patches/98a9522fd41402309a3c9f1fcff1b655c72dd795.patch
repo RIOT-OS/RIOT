@@ -1,0 +1,90 @@
+From 98a9522fd41402309a3c9f1fcff1b655c72dd795 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Thu, 25 May 2023 14:39:25 +0200
+Subject: [PATCH] ui/main.c: add --expect-id cmd line parameter
+
+The new parameter is useful for integrating mspdebug into build systems
+that want to ensure that the firmware to flash is actually written
+to the matching hardware. This is helpful if the user mistyped the
+hardware to build for and flash, or confused similar looking hardware.
+---
+ drivers/device.h |  1 +
+ ui/main.c        | 18 ++++++++++++++++++
+ 2 files changed, 19 insertions(+)
+
+diff --git a/drivers/device.h b/drivers/device.h
+index 14c0654..dfb41d7 100644
+--- a/drivers/device.h
++++ b/drivers/device.h
+@@ -82,6 +82,7 @@ struct device_args {
+ 	int			vcc_mv;
+ 	const char		*path;
+ 	const char		*forced_chip_id;
++	const char		*expect_chip_id;
+ 	const char		*requested_serial;
+ 	const char		*require_fwupdate;
+ 	const char		*bsl_entry_seq;
+diff --git a/ui/main.c b/ui/main.c
+index 073c848..1ebed73 100644
+--- a/ui/main.c
++++ b/ui/main.c
+@@ -137,6 +137,8 @@ static void usage(const char *progname)
+ "        Show a list of devices supported by the FET driver.\n"
+ "    --fet-force-id string\n"
+ "        Override the device ID returned by the FET.\n"
++"    --expect-id string\n"
++"        Abort if the MCU detected is not matching the given string.\n"
+ "    --fet-skip-close\n"
+ "        Skip the JTAG close procedure when using the FET driver.\n"
+ "    --usb-list\n"
+@@ -297,6 +299,7 @@ static int parse_cmdline_args(int argc, char **argv,
+ 		LOPT_HELP = 0x100,
+ 		LOPT_FET_LIST,
+ 		LOPT_FET_FORCE_ID,
++		LOPT_EXPECT_ID,
+ 		LOPT_FET_SKIP_CLOSE,
+ 		LOPT_USB_LIST,
+ 		LOPT_VERSION,
+@@ -315,6 +318,7 @@ static int parse_cmdline_args(int argc, char **argv,
+ 		{"help",                0, 0, LOPT_HELP},
+ 		{"fet-list",            0, 0, LOPT_FET_LIST},
+ 		{"fet-force-id",        1, 0, LOPT_FET_FORCE_ID},
++		{"expect-id",           1, 0, LOPT_EXPECT_ID},
+ 		{"fet-skip-close",      0, 0, LOPT_FET_SKIP_CLOSE},
+ 		{"usb-list",            0, 0, LOPT_USB_LIST},
+ 		{"version",             0, 0, LOPT_VERSION},
+@@ -426,6 +430,10 @@ static int parse_cmdline_args(int argc, char **argv,
+ 			args->devarg.forced_chip_id = optarg;
+ 			break;
+ 
++		case LOPT_EXPECT_ID:
++			args->devarg.expect_chip_id = optarg;
++			break;
++
+ 		case LOPT_FET_SKIP_CLOSE:
+ 			args->devarg.flags |= DEVICE_FLAG_SKIP_CLOSE;
+ 			break;
+@@ -573,6 +581,15 @@ int main(int argc, char **argv)
+ 	if (device_probe_id(device_default, args.devarg.forced_chip_id) < 0)
+ 		printc_err("warning: device ID probe failed\n");
+ 
++	if (args.devarg.expect_chip_id) {
++		if (strcmp(args.devarg.expect_chip_id, device_default->chip->name)) {
++			printf("Detected %s, but %s was expected\n",
++			       device_default->chip->name, args.devarg.expect_chip_id);
++			ret = -1;
++			goto fail_expect_id;
++		}
++	}
++
+ 	if (!(args.flags & OPT_NO_RC))
+ 		process_rc_file(args.alt_config);
+ 
+@@ -588,6 +605,7 @@ int main(int argc, char **argv)
+ 		reader_loop();
+ 	}
+ 
++fail_expect_id:
+ 	simio_exit();
+ 	device_destroy();
+ 	stab_exit();

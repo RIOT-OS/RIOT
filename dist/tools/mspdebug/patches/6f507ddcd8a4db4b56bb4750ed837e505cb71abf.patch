@@ -1,0 +1,32 @@
+From 6f507ddcd8a4db4b56bb4750ed837e505cb71abf Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Thu, 25 May 2023 14:09:59 +0200
+Subject: [PATCH] drivers/fet_core.c: populate chip entry by detected CPU name
+
+Fixes https://github.com/dlbeer/mspdebug/issues/124
+---
+ drivers/fet_core.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/fet_core.c b/drivers/fet_core.c
+index 9f426ba..35695a7 100644
+--- a/drivers/fet_core.c
++++ b/drivers/fet_core.c
+@@ -226,6 +226,8 @@ static int identify_new(struct fet_device *dev, const char *force_id)
+ 		   ramSize / 1024);
+ 
+ 	show_dev_info(r->name, dev);
++	/* populate chip entry based on the detected name */
++	dev->base.chip = chipinfo_find_by_name(r->name);
+ 
+ 	if (fet_proto_xfer(&dev->proto, C_IDENT3,
+ 			   r->msg2b_data, r->msg2b_len, 0) < 0)
+@@ -344,6 +346,8 @@ static int identify_olimex(struct fet_device *dev, const char *force_id)
+ 		   ramSize, ramSize / 1024);
+ 
+ 	show_dev_info(r->name, dev);
++	/* populate chip entry based on the detected name */
++	dev->base.chip = chipinfo_find_by_name(r->name);
+ 
+ 	if (fet_proto_xfer(&dev->proto, C_IDENT3,
+ 			   r->msg2b_data, r->msg2b_len, 0) < 0)
