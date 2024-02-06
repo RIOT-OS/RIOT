@@ -114,10 +114,10 @@
 #ifndef PERIPH_I2C_H
 #define PERIPH_I2C_H
 
-#include <stdint.h>
 #include <stddef.h>
-#include <limits.h>
+#include <stdint.h>
 
+#include "periph/gpio.h"
 #include "periph_conf.h"
 #include "periph_cpu.h"
 
