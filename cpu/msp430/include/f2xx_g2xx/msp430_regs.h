@@ -33,6 +33,31 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Offset of the USCI B registers in an USCI A peripheral
+ *
+ * USCI A peripheral contains the USCI B peripheral registers, but has a few
+ * USCI A specific register in front. Adding this offset to the USCI A base
+ * address results in the base address of the shared registers.
+ *
+ * @see     MSP430_USCI_B_FROM_USCI_A
+ */
+#define MSP430_USCI_A_B_OFFSET  3U
+
+/**
+ * @brief   "Convert" an USCI A to an USCI B
+ *
+ * This returns the pointer to the part of the USCI A registers that matches
+ * the USCI B register layout, so that an USCI A can be treated as if it is
+ * an USCI B.
+ *
+ * This can be used instead of @ref msp430_usci_b_from_usci_a when needing a
+ * constant initializer. Otherwise @ref msp430_usci_b_from_usci_a is
+ * preferred as it includes type checks this macro doesn't.
+ */
+#define MSP430_USCI_B_FROM_USCI_A(usci_a) \
+    ((msp430_usci_b_t *)((uintptr_t)(usci_a) + MSP430_USCI_A_B_OFFSET))
+
+/**
  * @brief   Universal Serial Control Interface Type A (USCI_A) Registers
  */
 typedef struct {
@@ -74,6 +99,12 @@ typedef struct {
 #define UCSSEL_UCLKI    UCSSEL_0    /**< Clock USCI using CLKI (n/a in SPI mode) */
 #define UCSSEL_ACLK     UCSSEL_1    /**< Clock USCI using auxiliary clock */
 #define UCSSEL_SMCLK    UCSSEL_2    /**< Clock USCI using sub-system master clock */
+
+#if (UCSSEL0 == 0x40) || DOXYGEN
+#  define UCSSEL_Pos 6      /**< Position of the UCSSEL field in the USCI CTL1 register */
+#else
+#  error "USSEL field in USCI CTL1 register is at unexpected position"
+#endif
 /** @} */
 
 /**
@@ -87,12 +118,12 @@ typedef struct {
 #define UCBRS_MASK  UCBRS_7     /**< Bitmask to retrieve the UCRBS field of the
                                      USCI modulation control register */
 #if (UCBRS_7 == 0x0E) || defined(DOXYGEN)
-#define UCBRS_POS       1       /**< Position of the UCRBS field in the
+#  define UCBRS_Pos     1       /**< Position of the UCRBS field in the
                                      UCAxMCTL register */
 #else
 /* The datasheet for the whole MCU family states the field is in bits 3-1,
  * but let's better be safe than sorry here */
-#error  "UCBRS field in the UCAxMCTL register at unexpected position."
+#  error  "UCBRS field in the UCAxMCTL register at unexpected position."
 #endif
 
 /** @} */
@@ -138,13 +169,13 @@ extern msp430_usci_a_t USCI_A1;
  *
  * @details Provided by linker
  */
-extern msp430_usci_a_t USCI_B0;
+extern msp430_usci_b_t USCI_B0;
 /**
  * @brief   USCI_B1 register map
  *
  * @details Provided by linker
  */
-extern msp430_usci_a_t USCI_B1;
+extern msp430_usci_b_t USCI_B1;
 /** @} */
 
 #ifdef __cplusplus
