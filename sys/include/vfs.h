@@ -253,12 +253,12 @@ extern "C" {
  * @attention Put the check in the public header file (.h), do not put the check in the
  * implementation (.c) file.
  */
-#define VFS_DIR_BUFFER_SIZE MAX5(FATFS_VFS_DIR_BUFFER_SIZE,     \
-                                 LITTLEFS_VFS_DIR_BUFFER_SIZE,  \
-                                 LITTLEFS2_VFS_DIR_BUFFER_SIZE, \
-                                 SPIFFS_VFS_DIR_BUFFER_SIZE,    \
-                                 LWEXT4_VFS_DIR_BUFFER_SIZE     \
-                                )
+#define VFS_DIR_BUFFER_SIZE MATH_ALIGN(MAX5(FATFS_VFS_DIR_BUFFER_SIZE,     \
+                                            LITTLEFS_VFS_DIR_BUFFER_SIZE,  \
+                                            LITTLEFS2_VFS_DIR_BUFFER_SIZE, \
+                                            SPIFFS_VFS_DIR_BUFFER_SIZE,    \
+                                            LWEXT4_VFS_DIR_BUFFER_SIZE),   \
+                                       ARCHITECTURE_WORD_BYTES)
 #endif
 
 #ifndef VFS_FILE_BUFFER_SIZE
