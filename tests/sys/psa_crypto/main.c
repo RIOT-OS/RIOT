@@ -66,7 +66,7 @@ cleanup:
 /**
  * Exporting and re-importing a private Ed25519 key should result in the same public key and signature.
  */
-static void test_export_import_ed25519(void)
+static void test_exported_key_is_identical_when_imported_again_ed25519(void)
 {
     const psa_key_type_t key_type = PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_TWISTED_EDWARDS);
     const size_t key_bits = 255;
