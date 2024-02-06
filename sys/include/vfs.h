@@ -122,7 +122,7 @@ extern "C" {
 #  endif
 
 #  if FF_FS_EXFAT
-#    define _FATFS_FILE_EXFAT              (44)
+#    define _FATFS_FILE_EXFAT              (48)
 #    define _FATFS_DIR_EXFAT               (32)
 #  else
 #    define _FATFS_FILE_EXFAT              (0)
