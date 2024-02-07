@@ -183,7 +183,8 @@ static int _configure(int argc, char **argv, _ping_data_t *data)
 
             res = netutils_get_ipv6(&data->host, (netif_t **)&data->netif, arg);
             if (res) {
-                break;
+                printf("can't resolve %s\n", arg);
+                return res;
             }
         }
         else {
