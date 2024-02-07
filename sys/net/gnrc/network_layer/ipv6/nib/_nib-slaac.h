@@ -94,6 +94,12 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
  */
 int _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx, uint32_t pfx_pref_ltime);
 
+/**
+ * Assuming the provided address is a configured address,
+ * check if the address is a temporary address.
+ */
+bool is_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr);
+
 bool _iid_is_iana_reserved(const eui64_t *iid);
 
 void _ipv6_get_random_iid(eui64_t *iid);
@@ -110,6 +116,15 @@ uint32_t gnrc_netif_ipv6_regen_advance(const gnrc_netif_t *netif);
  * @param[in] addr  The address to remove.
  */
 void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr);
+
+/**
+ * @brief For an address, get the corresponding SLAAC prefix's preferred lifetime
+ * @param[in] netif The network interface the prefix is configured on.
+ * @param[in] addr An IP address in the SLAAC prefix
+ * @param[out] slaac_prefix_pref_until pref_until time of the SLAAC prefix
+ * @return
+ */
+bool get_slaac_prefix_pref_until(const gnrc_netif_t *netif, const ipv6_addr_t *addr, uint32_t *slaac_prefix_pref_until);
 
 /**
  * @brief   Handle @ref GNRC_IPV6_NIB_DAD event
