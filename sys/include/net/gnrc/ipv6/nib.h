@@ -243,6 +243,16 @@ extern "C" {
  * @brief   Interface down event
  */
 #define GNRC_IPV6_NIB_IFACE_DOWN            (0x4fd5U)
+
+/**
+ * @brief   Temporary address: regenerate
+ *
+ * This message type is for the event of a regeneration of a temporary address.
+ * The expected message context is a valid off-link entry representing the associated SLAAC prefix.
+ *
+ * @see "REGEN_ADVANCE time units before" - https://datatracker.ietf.org/doc/html/rfc8981#section-3.6
+ */
+#define GNRC_IPV6_NIB_REGEN_TEMP_ADDR       (0x4fd6U)
 /** @} */
 
 /**

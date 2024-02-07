@@ -492,6 +492,9 @@ void gnrc_ipv6_nib_handle_timer_event(void *ctx, uint16_t type)
         case GNRC_IPV6_NIB_PFX_TIMEOUT:
             _handle_pfx_timeout(ctx);
             break;
+        case GNRC_IPV6_NIB_REGEN_TEMP_ADDR:
+            //TODO
+            break;
         case GNRC_IPV6_NIB_RTR_TIMEOUT:
             _handle_rtr_timeout(ctx);
             break;
