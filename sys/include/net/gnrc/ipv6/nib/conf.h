@@ -192,6 +192,10 @@ extern "C" {
 #  define CONFIG_GNRC_IPV6_NIB_SLAAC                  1
 #endif
 
+#ifndef CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES
+#define CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES 0
+#endif
+
 /**
  * @brief    handle Redirect Messages
  */
