@@ -127,6 +127,16 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr);
 bool get_slaac_prefix_pref_until(const gnrc_netif_t *netif, const ipv6_addr_t *addr, uint32_t *slaac_prefix_pref_until);
 
 /**
+ * @brief For a given SLAAC prefix, get the first-best temporary address prefix.
+ * @param[in] netif
+ * @param[in] slaac_pfx
+ * @param[out] next_temp_addr
+ * @return
+ */
+bool iter_slaac_prefix_to_temp_addr(const gnrc_netif_t *netif, const ipv6_addr_t *slaac_pfx, void *state,
+                                    ipv6_addr_t *next_temp_addr);
+
+/**
  * @brief   Handle @ref GNRC_IPV6_NIB_DAD event
  *
  * @param[in] addr  A TENTATIVE address.
