@@ -161,6 +161,21 @@ static inline uint8_t gnrc_netif_ipv6_addr_dad_trans(const gnrc_netif_t *netif,
 }
 
 /**
+ * @brief   Gets number of address generation retries already performed for an address
+ *
+ * @param[in] netif the network interface
+ * @param[in] idx   index of the address (and its flags)
+ *
+ * @return  the number of address generation retries already
+ *          performed
+ */
+static inline uint8_t gnrc_netif_ipv6_addr_gen_retries(const gnrc_netif_t *netif,
+                                                     int idx)
+{
+    return (netif->ipv6.addrs_flags[idx] & GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES) >> GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES_POS;
+}
+
+/**
  * @brief   Returns the index of an address in gnrc_netif_t::ipv6_addrs of @p
  *          netif that matches @p addr best
  *
