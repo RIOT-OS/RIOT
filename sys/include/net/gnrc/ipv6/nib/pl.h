@@ -91,16 +91,23 @@ void gnrc_ipv6_nib_pl_del(unsigned iface,
                           const ipv6_addr_t *pfx, unsigned pfx_len);
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES) || defined(DOXYGEN)
-bool gnrc_ipv6_nib_pl_has_prefix(unsigned iface, const ipv6_addr_t *pfx, uint8_t pfx_len);
+/**
+ * @brief Check whether the prefix list has a prefix as specified
+ * @param[in] iface The interface @p pfx is expected to be on (0 for any).
+ * @param[in] pfx The prefix to check for.
+ * @param[in] pfx_len Length of @p pfx in bits.
+ * @return true if such prefix is present, false otherwise
+ */
+bool gnrc_ipv6_nib_pl_has_prefix(const unsigned int iface, const ipv6_addr_t *pfx, const uint8_t pfx_len);
 
 /**
- * Reschedule the regeneration timer for this prefix's preferred temporary address.
- * @param iface The interface on which the prefix is present.
- * @param pfx The prefix that is to be found.
- * @param offset The offset in milliseconds at which the regeneration event shall occur.
+ * @brief Reschedule the regeneration timer for this prefix's preferred temporary address.
+ * @param[in] iface The interface on which the prefix is present.
+ * @param[in] pfx The SLAAC prefix that is to be found.
+ * @param[in] offset The offset in milliseconds at which the regeneration event shall occur.
  * @return false if prefix was not found, otherwise true.
  */
-bool gnrc_ipv6_nib_pl_reschedule_regen(unsigned iface, const ipv6_addr_t *pfx, uint32_t offset);
+bool gnrc_ipv6_nib_pl_reschedule_regen(const unsigned int iface, const ipv6_addr_t *pfx, const uint32_t offset);
 #endif
 
 /**
