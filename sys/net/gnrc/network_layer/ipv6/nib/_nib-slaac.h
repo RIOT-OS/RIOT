@@ -86,6 +86,8 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN || CONFIG_GNRC_IPV6_NIB_SLAAC */
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES) || defined(DOXYGEN)
+bool _iid_is_iana_reserved(const eui64_t *iid);
+
 uint32_t gnrc_netif_ipv6_regen_advance(const gnrc_netif_t *netif);
 #endif
 
