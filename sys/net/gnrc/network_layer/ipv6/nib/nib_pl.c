@@ -25,6 +25,7 @@
 
 #include "_nib-internal.h"
 #include "_nib-router.h"
+#include "_nib-slaac.h"
 
 int gnrc_ipv6_nib_pl_set(unsigned iface,
                          const ipv6_addr_t *pfx, unsigned pfx_len,
@@ -133,6 +134,30 @@ bool gnrc_ipv6_nib_pl_has_prefix(unsigned iface, const ipv6_addr_t *pfx,
         }
     }
     return false;
+}
+
+bool gnrc_ipv6_nib_pl_reschedule_regen(unsigned iface, const ipv6_addr_t *pfx, uint32_t offset)
+{
+    //adapted from gnrc_ipv6_nib_pl_iter
+    _nib_offl_entry_t *dst = NULL;
+    bool result = false;
+
+    _nib_acquire();
+    while ((dst = _nib_offl_iter(dst)) != NULL) {
+        const _nib_onl_entry_t *node = dst->next_hop;
+        if ((node != NULL) && (dst->mode & _PL) &&
+            ((iface == 0) || (_nib_onl_get_if(node) == iface))
+            && dst->pfx_len == SLAAC_PREFIX_LENGTH
+            && ipv6_addr_match_prefix(&dst->pfx, pfx) >= dst->pfx_len) {
+            evtimer_del(&_nib_evtimer, &dst->regen_temp_addr.event);
+            _evtimer_add(dst, GNRC_IPV6_NIB_REGEN_TEMP_ADDR, &dst->regen_temp_addr, offset);
+            result = true;
+            break;
+        }
+    }
+    _nib_release();
+    
+    return result;
 }
 
 bool gnrc_ipv6_nib_pl_iter(unsigned iface, void **state,
