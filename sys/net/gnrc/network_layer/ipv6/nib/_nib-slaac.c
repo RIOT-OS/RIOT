@@ -97,6 +97,16 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
 }
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN || CONFIG_GNRC_IPV6_NIB_SLAAC */
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+uint32_t gnrc_netif_ipv6_regen_advance(const gnrc_netif_t *netif)
+{
+    //https://datatracker.ietf.org/doc/html/rfc8981#section-3.8-3.2
+    return 2 + (TEMP_IDGEN_RETRIES *
+    (gnrc_netif_ipv6_dad_transmits(netif) * (netif->ipv6.retrans_time / 1000))
+    );
+}
+#endif
+
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC)
 static bool _try_l2addr_reconfiguration(gnrc_netif_t *netif)
 {
