@@ -128,6 +128,15 @@ bool gnrc_ipv6_nib_pl_has_prefix(unsigned iface, const ipv6_addr_t *pfx, uint8_t
 bool gnrc_ipv6_nib_pl_iter(unsigned iface, void **state,
                            gnrc_ipv6_nib_pl_t *ple);
 
+/**
+ * Reschedule the regeneration timer for this prefix's preferred temporary address.
+ * @param iface The interface on which the prefix is present.
+ * @param pfx The prefix that is to be found.
+ * @param offset The offset in milliseconds at which the regeneration event shall occur.
+ * @return false if prefix was not found, otherwise true.
+ */
+bool gnrc_ipv6_nib_pl_reschedule_regen(unsigned iface, const ipv6_addr_t *pfx, uint32_t offset);
+
 #if IS_USED(MODULE_EVTIMER) || defined(DOXYGEN)
 /**
  * @brief   Provides the time in milliseconds for which the prefix list
