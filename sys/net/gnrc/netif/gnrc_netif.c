@@ -1119,6 +1119,8 @@ static int _create_candidate_set(const gnrc_netif_t *netif,
 /* number of "points" assigned to an source address candidate in preferred
  * state */
 #define RULE_3_PTS          (1)
+/* number of "points" assigned to a temporary source address candidate */
+#define RULE_7_PTS          (1)
 
 /**
  * @brief   Caps the match at a source addresses prefix length
@@ -1243,10 +1245,11 @@ static ipv6_addr_t *_src_addr_selection(gnrc_netif_t *netif,
          * TODO: update as soon as gnrc supports flow labels
          */
 
-        /* Rule 7: Prefer temporary addresses.
-         * Temporary addresses are currently not supported by gnrc.
-         * TODO: update as soon as gnrc supports temporary addresses
-         */
+        /* Rule 7: Prefer temporary addresses. */
+        if (is_temporary_addr(netif, ptr)) {
+            DEBUG("winner for rule 7 found\n");
+            winner_set[i] += RULE_7_PTS;
+        }
 
         if (winner_set[i] > max_pts) {
             idx = i;

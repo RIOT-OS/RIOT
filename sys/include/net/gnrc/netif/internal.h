@@ -216,9 +216,6 @@ int gnrc_netif_ipv6_addr_match(gnrc_netif_t *netif,
  * @todo Rule 6 from RFC 6724 is currently not implemented. Has to updated as
  *       soon as gnrc supports flow labels.
  *
- * @todo Rule 7 from RFC 6724 is currently not implemented. Has to updated as
- *       soon as gnrc supports temporary addresses.
- *
  * @return  The best source address for a packet addressed to @p dst
  * @return  NULL, if no matching address can be found on the interface.
  */
