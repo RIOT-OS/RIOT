@@ -160,6 +160,7 @@ static inline uint8_t gnrc_netif_ipv6_addr_dad_trans(const gnrc_netif_t *netif,
     return netif->ipv6.addrs_flags[idx] & GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE;
 }
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES) || defined(DOXYGEN)
 /**
  * @brief   Gets number of address generation retries already performed for an address
  *
@@ -174,6 +175,7 @@ static inline uint8_t gnrc_netif_ipv6_addr_gen_retries(const gnrc_netif_t *netif
 {
     return (netif->ipv6.addrs_flags[idx] & GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES) >> GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES_POS;
 }
+#endif
 
 /**
  * @brief   Returns the index of an address in gnrc_netif_t::ipv6_addrs of @p
@@ -575,6 +577,7 @@ void gnrc_netif_init_6ln(gnrc_netif_t *netif);
  */
 void gnrc_netif_ipv6_init_mtu(gnrc_netif_t *netif);
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES) || defined(DOXYGEN)
 /**
  * @brief Get DupAddrDetectTransmits
  * @return  DupAddrDetectTransmits
@@ -582,6 +585,7 @@ void gnrc_netif_ipv6_init_mtu(gnrc_netif_t *netif);
  *          gnrc_netif_t::device_type of @p netif
 */
 int gnrc_netif_ipv6_dad_transmits(const gnrc_netif_t *netif);
+#endif
 
 /**
  * @brief   Converts a given hardware address to an IPv6 IID.

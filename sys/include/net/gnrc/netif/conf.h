@@ -119,8 +119,12 @@ extern "C" {
  * @see CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF
  *      May need to be increased; each temporary address has a /128 prefix to manage its maximum total lifetimes.
  */
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES) || defined(DOXYGEN)
 #ifndef MAX_TEMP_ADDRESSES
-#define MAX_TEMP_ADDRESSES 4
+#define MAX_TEMP_ADDRESSES (4)
+#endif
+#else
+#define MAX_TEMP_ADDRESSES (0)
 #endif
 
 /**

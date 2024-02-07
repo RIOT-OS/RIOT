@@ -30,7 +30,9 @@
 
 #include "_nib-internal.h"
 #include "_nib-router.h"
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
 #include "_nib-slaac.h"
+#endif
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -712,13 +714,16 @@ void _nib_offl_remove_prefix(_nib_offl_entry_t *pfx)
 
     /* remove prefix timer */
     evtimer_del(&_nib_evtimer, &pfx->pfx_timeout.event);
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
     /* remove temporary address timer (not present if not a temporary address) */
     evtimer_del(&_nib_evtimer, &pfx->regen_temp_addr.event);
+#endif
 
     /* get interface associated with prefix */
     netif = gnrc_netif_get_by_pid(_nib_onl_get_if(pfx->next_hop));
 
     if (netif != NULL) {
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
         if (pfx->flags & _PFX_SLAAC) {
             /* remove prefixes that manage a temporary address */
             ipv6_addr_t temp_addr;
@@ -727,6 +732,7 @@ void _nib_offl_remove_prefix(_nib_offl_entry_t *pfx)
                 gnrc_ipv6_nib_pl_del(netif->pid, &temp_addr, IPV6_ADDR_BIT_LEN);
             }
         }
+#endif
 
         uint8_t best_match_len = pfx->pfx_len;
         ipv6_addr_t *best_match = NULL;

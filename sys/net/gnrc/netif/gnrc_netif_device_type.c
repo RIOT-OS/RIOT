@@ -219,6 +219,7 @@ void gnrc_netif_ipv6_init_mtu(gnrc_netif_t *netif)
     }
 }
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
 int gnrc_netif_ipv6_dad_transmits(const gnrc_netif_t *netif)
 {
     switch (netif->device_type) {
@@ -234,6 +235,7 @@ int gnrc_netif_ipv6_dad_transmits(const gnrc_netif_t *netif)
             return -ENOTSUP;
     }
 }
+#endif
 
 int gnrc_netif_ipv6_iid_from_addr(const gnrc_netif_t *netif,
                                   const uint8_t *addr, size_t addr_len,
