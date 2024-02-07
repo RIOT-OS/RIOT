@@ -24,6 +24,7 @@
 #include "_nib-slaac.h"
 #include "_nib-6ln.h"
 #include "_nib-arsm.h"
+#include "evtimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -231,7 +232,26 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
     DEBUG("nib: other node has TENTATIVE address %s assigned "
           "=> removing that address\n",
           ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)));
+    bool is_temp_addr = is_temporary_addr(netif, addr); //need to determine before addr removal, because it deletes the prefix which is used to determine whether it's a temp addr
+    ipv6_addr_t addr_backup = *addr;
     gnrc_netif_ipv6_addr_remove_internal(netif, addr);
+
+    if (is_temp_addr) {
+        //find associated prefix
+        uint32_t slaac_prefix_pref_until;
+        if (!get_slaac_prefix_pref_until(netif, &addr_backup, &slaac_prefix_pref_until)) {
+            // at least one match is expected,
+            // the temporary address smh outlived the SLAAC prefix valid lft
+            assert(false);
+            return;
+        }
+
+        uint32_t now = evtimer_now_msec();
+        assert(now < slaac_prefix_pref_until); // else the temporary address smh outlived the SLAAC prefix preferred lft
+        _generate_temporary_addr(netif, &addr_backup, slaac_prefix_pref_until - now);
+
+        return;
+    }
 
     if (!ipv6_addr_is_link_local(addr) ||
         !_try_addr_reconfiguration(netif)) {
