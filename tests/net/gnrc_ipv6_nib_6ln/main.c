@@ -43,7 +43,7 @@
 #define _RTR_LTIME      (6612U)
 #define _REACH_TIME     (1210388825UL)
 #define _RETRANS_TIMER  (3691140UL)
-#define _LOC_GB_PFX_LEN (45U)
+#define _LOC_GB_PFX_LEN (64U)
 #define _REM_GB_PFX_LEN (37U)
 #define _PIO_PFX_LTIME  (0x8476fedf)
 #define _CTX_LTIME      (29169U)

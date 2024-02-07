@@ -32,6 +32,8 @@
 extern "C" {
 #endif
 
+#define SLAAC_PREFIX_LENGTH (64U)
+
 /**
  * @name    Temporary address parameters
  * @see     [RFC 8981, section 3.8](https://tools.ietf.org/html/rfc8981#section-3.8)
