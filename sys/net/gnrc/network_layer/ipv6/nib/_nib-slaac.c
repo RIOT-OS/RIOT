@@ -139,6 +139,10 @@ int _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx, uint32
     return 0;
 }
 
+bool is_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr) {
+    return gnrc_ipv6_nib_pl_has_prefix(netif->pid, addr, IPV6_ADDR_BIT_LEN);
+}
+
 bool _iid_is_iana_reserved(const eui64_t *iid)
 {
     //[RFC5453]
@@ -244,6 +248,19 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
                   "but DHCPv6 is not provided", netif->pid);
         }
     }
+}
+
+bool get_slaac_prefix_pref_until(const gnrc_netif_t *netif, const ipv6_addr_t *addr, uint32_t *slaac_prefix_pref_until) {
+    void *state = NULL;
+    gnrc_ipv6_nib_pl_t ple;
+    while (gnrc_ipv6_nib_pl_iter(netif->pid, &state, &ple)) {
+        if (ple.pfx_len == SLAAC_PREFIX_LENGTH
+            && ipv6_addr_match_prefix(&ple.pfx, addr) >= ple.pfx_len) {
+            *slaac_prefix_pref_until = ple.pref_until;
+            return true;
+        }
+    }
+    return false;
 }
 
 static int _get_netif_state(gnrc_netif_t **netif, const ipv6_addr_t *addr)
