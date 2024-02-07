@@ -283,6 +283,19 @@ bool get_slaac_prefix_pref_until(const gnrc_netif_t *netif, const ipv6_addr_t *a
     return false;
 }
 
+bool iter_slaac_prefix_to_temp_addr(const gnrc_netif_t *netif, const ipv6_addr_t *slaac_pfx, void *state,
+                                    ipv6_addr_t *next_temp_addr) {
+    gnrc_ipv6_nib_pl_t ple;
+    while (gnrc_ipv6_nib_pl_iter(netif->pid, &state, &ple)) {
+        if (ple.pfx_len == IPV6_ADDR_BIT_LEN /* is temp addr. prefix */
+            && ipv6_addr_match_prefix(&ple.pfx, slaac_pfx) >= SLAAC_PREFIX_LENGTH) {
+            *next_temp_addr = ple.pfx;
+            return true;
+        }
+    }
+    return false;
+}
+
 static int _get_netif_state(gnrc_netif_t **netif, const ipv6_addr_t *addr)
 {
     *netif = gnrc_netif_get_by_ipv6_addr(addr);
