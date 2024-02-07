@@ -21,6 +21,7 @@
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/netif/internal.h"
 
+#include "_nib-slaac.h"
 #include "_nib-6ln.h"
 #include "_nib-arsm.h"
 
