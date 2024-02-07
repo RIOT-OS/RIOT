@@ -580,6 +580,7 @@ void gnrc_netif_ipv6_init_mtu(gnrc_netif_t *netif);
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES) || defined(DOXYGEN)
 /**
  * @brief Get DupAddrDetectTransmits
+ * @see https://datatracker.ietf.org/doc/html/rfc4862#section-5.1
  * @return  DupAddrDetectTransmits
  * @return  `-ENOTSUP`, when unimplemented for
  *          gnrc_netif_t::device_type of @p netif
