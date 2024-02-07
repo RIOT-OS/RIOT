@@ -41,6 +41,10 @@ ifneq (,$(filter crc32_fast,$(USEMODULE)))
   USEMODULE += checksum
 endif
 
+ifneq (,$(filter cpp,$(USEMODULE)))
+  USEMODULE += cpp_new_delete
+endif
+
 ifneq (,$(filter debug_irq_disable,$(USEMODULE)))
   USEMODULE += fmt
 endif
