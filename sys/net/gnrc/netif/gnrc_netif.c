@@ -46,7 +46,9 @@
 #include "net/gnrc/netif.h"
 #include "net/gnrc/netif/internal.h"
 #include "net/gnrc/tx_sync.h"
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
 #include "../network_layer/ipv6/nib/_nib-slaac.h"
+#endif
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -690,7 +692,9 @@ void gnrc_netif_ipv6_addr_remove_internal(gnrc_netif_t *netif,
 {
     bool remove_sol_nodes = true;
     ipv6_addr_t sol_nodes;
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
     ipv6_addr_t addr_backup = *addr;
+#endif
 
     assert((netif != NULL) && (addr != NULL));
     ipv6_addr_set_solicited_nodes(&sol_nodes, addr);
@@ -716,12 +720,14 @@ void gnrc_netif_ipv6_addr_remove_internal(gnrc_netif_t *netif,
     }
     gnrc_netif_release(netif);
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
     // for temporary addresses (deleted on DAD failure or manually),
     // also their prefix needs to be removed
     gnrc_ipv6_nib_pl_del(netif->pid, &addr_backup, IPV6_ADDR_BIT_LEN);
     // only expected to find a prefix if it's a temporary address.
     // on prefix deletion, it won't find an address to delete
     // this is fine, to avoid infinite loop
+#endif
 }
 
 int gnrc_netif_ipv6_addr_idx(gnrc_netif_t *netif,
@@ -1246,10 +1252,12 @@ static ipv6_addr_t *_src_addr_selection(gnrc_netif_t *netif,
          */
 
         /* Rule 7: Prefer temporary addresses. */
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
         if (is_temporary_addr(netif, ptr)) {
             DEBUG("winner for rule 7 found\n");
             winner_set[i] += RULE_7_PTS;
         }
+#endif
 
         if (winner_set[i] > max_pts) {
             idx = i;

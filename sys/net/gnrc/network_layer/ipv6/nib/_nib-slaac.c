@@ -21,10 +21,12 @@
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/netif/internal.h"
 
-#include "_nib-slaac.h"
 #include "_nib-6ln.h"
 #include "_nib-arsm.h"
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+#include "_nib-slaac.h"
 #include "evtimer.h"
+#endif
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -174,6 +176,32 @@ uint32_t gnrc_netif_ipv6_regen_advance(const gnrc_netif_t *netif)
     (gnrc_netif_ipv6_dad_transmits(netif) * (netif->ipv6.retrans_time / 1000))
     );
 }
+
+bool get_slaac_prefix_pref_until(const gnrc_netif_t *netif, const ipv6_addr_t *addr, uint32_t *slaac_prefix_pref_until) {
+    void *state = NULL;
+    gnrc_ipv6_nib_pl_t ple;
+    while (gnrc_ipv6_nib_pl_iter(netif->pid, &state, &ple)) {
+        if (ple.pfx_len == SLAAC_PREFIX_LENGTH
+            && ipv6_addr_match_prefix(&ple.pfx, addr) >= ple.pfx_len) {
+            *slaac_prefix_pref_until = ple.pref_until;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool iter_slaac_prefix_to_temp_addr(const gnrc_netif_t *netif, const ipv6_addr_t *slaac_pfx, void *state,
+                                    ipv6_addr_t *next_temp_addr) {
+    gnrc_ipv6_nib_pl_t ple;
+    while (gnrc_ipv6_nib_pl_iter(netif->pid, &state, &ple)) {
+        if (ple.pfx_len == IPV6_ADDR_BIT_LEN /* is temp addr. prefix */
+            && ipv6_addr_match_prefix(&ple.pfx, slaac_pfx) >= SLAAC_PREFIX_LENGTH) {
+            *next_temp_addr = ple.pfx;
+            return true;
+        }
+    }
+    return false;
+}
 #endif
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC)
@@ -238,6 +266,7 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
     DEBUG("nib: other node has TENTATIVE address %s assigned "
           "=> removing that address\n",
           ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)));
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
     bool is_temp_addr = is_temporary_addr(netif, addr); //need to determine before addr removal, because it deletes the prefix which is used to determine whether it's a temp addr
     uint8_t retries;
     if (is_temp_addr) {
@@ -246,8 +275,10 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
         retries = gnrc_netif_ipv6_addr_gen_retries(netif, idx);
     }
     ipv6_addr_t addr_backup = *addr;
+#endif
     gnrc_netif_ipv6_addr_remove_internal(netif, addr);
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
     if (is_temp_addr) {
         if (retries >= TEMP_IDGEN_RETRIES) {
             DEBUG("nib: Not regenerating temporary address, retried often enough.\n");
@@ -285,6 +316,7 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
 
         return;
     }
+#endif
 
     if (!ipv6_addr_is_link_local(addr) ||
         !_try_addr_reconfiguration(netif)) {
@@ -301,32 +333,6 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
                   "but DHCPv6 is not provided", netif->pid);
         }
     }
-}
-
-bool get_slaac_prefix_pref_until(const gnrc_netif_t *netif, const ipv6_addr_t *addr, uint32_t *slaac_prefix_pref_until) {
-    void *state = NULL;
-    gnrc_ipv6_nib_pl_t ple;
-    while (gnrc_ipv6_nib_pl_iter(netif->pid, &state, &ple)) {
-        if (ple.pfx_len == SLAAC_PREFIX_LENGTH
-            && ipv6_addr_match_prefix(&ple.pfx, addr) >= ple.pfx_len) {
-            *slaac_prefix_pref_until = ple.pref_until;
-            return true;
-        }
-    }
-    return false;
-}
-
-bool iter_slaac_prefix_to_temp_addr(const gnrc_netif_t *netif, const ipv6_addr_t *slaac_pfx, void *state,
-                                    ipv6_addr_t *next_temp_addr) {
-    gnrc_ipv6_nib_pl_t ple;
-    while (gnrc_ipv6_nib_pl_iter(netif->pid, &state, &ple)) {
-        if (ple.pfx_len == IPV6_ADDR_BIT_LEN /* is temp addr. prefix */
-            && ipv6_addr_match_prefix(&ple.pfx, slaac_pfx) >= SLAAC_PREFIX_LENGTH) {
-            *next_temp_addr = ple.pfx;
-            return true;
-        }
-    }
-    return false;
 }
 
 static int _get_netif_state(gnrc_netif_t **netif, const ipv6_addr_t *addr)

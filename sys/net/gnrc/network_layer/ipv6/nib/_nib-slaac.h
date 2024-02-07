@@ -110,17 +110,6 @@ bool _iid_is_iana_reserved(const eui64_t *iid);
 void _ipv6_get_random_iid(eui64_t *iid);
 
 uint32_t gnrc_netif_ipv6_regen_advance(const gnrc_netif_t *netif);
-#endif
-
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC) || defined(DOXYGEN)
-/**
- * @brief   Removes a tentative address from the interface and tries to
- *          reconfigure a new address
- *
- * @param[in] netif The network interface the address is to be removed from.
- * @param[in] addr  The address to remove.
- */
-void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr);
 
 /**
  * @brief For an address, get the corresponding SLAAC prefix's preferred lifetime
@@ -140,6 +129,17 @@ bool get_slaac_prefix_pref_until(const gnrc_netif_t *netif, const ipv6_addr_t *a
  */
 bool iter_slaac_prefix_to_temp_addr(const gnrc_netif_t *netif, const ipv6_addr_t *slaac_pfx, void *state,
                                     ipv6_addr_t *next_temp_addr);
+#endif
+
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC) || defined(DOXYGEN)
+/**
+ * @brief   Removes a tentative address from the interface and tries to
+ *          reconfigure a new address
+ *
+ * @param[in] netif The network interface the address is to be removed from.
+ * @param[in] addr  The address to remove.
+ */
+void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr);
 
 /**
  * @brief   Handle @ref GNRC_IPV6_NIB_DAD event

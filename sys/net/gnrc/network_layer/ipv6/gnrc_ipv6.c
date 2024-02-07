@@ -237,7 +237,9 @@ static void *_event_loop(void *args)
             case GNRC_IPV6_NIB_ADDR_REG_TIMEOUT:
             case GNRC_IPV6_NIB_ABR_TIMEOUT:
             case GNRC_IPV6_NIB_PFX_TIMEOUT:
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
             case GNRC_IPV6_NIB_REGEN_TEMP_ADDR:
+#endif
             case GNRC_IPV6_NIB_RTR_TIMEOUT:
             case GNRC_IPV6_NIB_RECALC_REACH_TIME:
             case GNRC_IPV6_NIB_REREG_ADDRESS:
