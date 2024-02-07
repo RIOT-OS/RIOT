@@ -92,10 +92,12 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
  * @param pfx_pref_ltime Lifetime of the prefix for which an address shall be created.
  *                       Needed to determine whether it is worth creating a temporary address.
  * @param retries Number of address generation retries that is to be stored in the address flags.
+ * @param[out] idx The index of the generated address.
  * @return -1 on failure
  * @return ta_max_pref_lft on success
  */
-int32_t _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx, uint32_t pfx_pref_ltime, uint8_t retries);
+int32_t _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx, uint32_t pfx_pref_ltime, uint8_t retries,
+                                 int *idx);
 
 /**
  * Assuming the provided address is a configured address,
