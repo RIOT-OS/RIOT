@@ -564,6 +564,14 @@ void gnrc_netif_init_6ln(gnrc_netif_t *netif);
 void gnrc_netif_ipv6_init_mtu(gnrc_netif_t *netif);
 
 /**
+ * @brief Get DupAddrDetectTransmits
+ * @return  DupAddrDetectTransmits
+ * @return  `-ENOTSUP`, when unimplemented for
+ *          gnrc_netif_t::device_type of @p netif
+*/
+int gnrc_netif_ipv6_dad_transmits(const gnrc_netif_t *netif);
+
+/**
  * @brief   Converts a given hardware address to an IPv6 IID.
  *
  * @note      The IPv6 IID is derived from the EUI-64 for most link-layers by
