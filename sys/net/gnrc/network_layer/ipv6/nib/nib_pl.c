@@ -120,6 +120,21 @@ void gnrc_ipv6_nib_pl_del(unsigned iface,
     _nib_release();
 }
 
+bool gnrc_ipv6_nib_pl_has_prefix(unsigned iface, const ipv6_addr_t *pfx,
+                          uint8_t pfx_len)
+{
+    void *state = NULL;
+    gnrc_ipv6_nib_pl_t ple;
+
+    while (gnrc_ipv6_nib_pl_iter(iface, &state, &ple)) {
+        if (ple.pfx_len == pfx_len
+            && ipv6_addr_match_prefix(&ple.pfx, pfx) >= pfx_len) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool gnrc_ipv6_nib_pl_iter(unsigned iface, void **state,
                            gnrc_ipv6_nib_pl_t *entry)
 {
