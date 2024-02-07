@@ -683,6 +683,10 @@ int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *pkt,
 void _nib_pl_remove(_nib_offl_entry_t *nib_offl)
 {
     _evtimer_del(&nib_offl->pfx_timeout);
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+    /* remove temporary address timer (not present if not a temporary address) */
+    _evtimer_del(&nib_offl->regen_temp_addr);
+#endif
     _nib_offl_remove(nib_offl, _PL);
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
     unsigned idx = _idx_dsts(nib_offl);
@@ -708,6 +712,8 @@ void _nib_offl_remove_prefix(_nib_offl_entry_t *pfx)
 
     /* remove prefix timer */
     evtimer_del(&_nib_evtimer, &pfx->pfx_timeout.event);
+    /* remove temporary address timer (not present if not a temporary address) */
+    evtimer_del(&_nib_evtimer, &pfx->regen_temp_addr.event);
 
     /* get interface associated with prefix */
     netif = gnrc_netif_get_by_pid(_nib_onl_get_if(pfx->next_hop));
