@@ -63,6 +63,16 @@ extern "C" {
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
 
+#ifndef ABS
+/**
+ * @brief Returns the absolute value of @p x
+ *
+ * @note    This is the trivial implementation that does evaluate the arguments
+ *          more than once
+ */
+#define ABS(x) ((x) > 0 ? (x) : -(x))
+#endif
+
 /**
  * @brief   Limit a value to an inclusive range
  *
