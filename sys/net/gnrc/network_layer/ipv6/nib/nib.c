@@ -1734,12 +1734,13 @@ static uint32_t _handle_pio(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
     DEBUG("     - Preferred lifetime: %" PRIu32 "\n",
           byteorder_ntohl(pio->pref_ltime));
 
+    int32_t ta_max_pref_lft = 0;
     if (pio->flags & NDP_OPT_PI_FLAGS_A
         && pio->prefix_len == SLAAC_PREFIX_LENGTH
         && !gnrc_ipv6_nib_pl_has_prefix(netif->pid, &pio->prefix, pio->prefix_len)
         ) {
         _auto_configure_addr(netif, &pio->prefix, pio->prefix_len);
-        _generate_temporary_addr(netif, &pio->prefix, pref_ltime);
+        ta_max_pref_lft = _generate_temporary_addr(netif, &pio->prefix, pref_ltime);
     }
     if ((pio->flags & (NDP_OPT_PI_FLAGS_A | NDP_OPT_PI_FLAGS_L))
         || _multihop_p6c(netif, abr)) {
@@ -1778,6 +1779,10 @@ static uint32_t _handle_pio(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
             }
             if (pio->flags & NDP_OPT_PI_FLAGS_A) {
                 pfx->flags |= _PFX_SLAAC;
+            }
+            if (ta_max_pref_lft > 0) {
+                // a temporary address was created
+                _evtimer_add(pfx, GNRC_IPV6_NIB_REGEN_TEMP_ADDR, &pfx->regen_temp_addr, ta_max_pref_lft - gnrc_netif_ipv6_regen_advance(netif));
             }
             return _min(pref_ltime, valid_ltime);
         }
