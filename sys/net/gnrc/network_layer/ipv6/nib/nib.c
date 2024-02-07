@@ -1731,7 +1731,9 @@ static uint32_t _handle_pio(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
     DEBUG("     - Preferred lifetime: %" PRIu32 "\n",
           byteorder_ntohl(pio->pref_ltime));
 
-    if (pio->flags & NDP_OPT_PI_FLAGS_A) {
+    if (pio->flags & NDP_OPT_PI_FLAGS_A
+        && pio->prefix_len == SLAAC_PREFIX_LENGTH
+        ) {
         _auto_configure_addr(netif, &pio->prefix, pio->prefix_len);
     }
     if ((pio->flags & (NDP_OPT_PI_FLAGS_A | NDP_OPT_PI_FLAGS_L))
