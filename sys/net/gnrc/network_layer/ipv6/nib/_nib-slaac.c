@@ -108,6 +108,13 @@ bool _iid_is_iana_reserved(const eui64_t *iid)
     || (iid->uint32[0].u32 == htonl(0xfdffffff) && iid->uint16[2].u16 == htons(0xffff) && iid->uint8[6] == 0xff && (iid->uint8[7] & 0x80));
 }
 
+void _ipv6_get_random_iid(eui64_t *iid)
+{
+    do {
+        random_bytes(iid->uint8, 8);
+    } while (_iid_is_iana_reserved(iid));
+}
+
 uint32_t gnrc_netif_ipv6_regen_advance(const gnrc_netif_t *netif)
 {
     //https://datatracker.ietf.org/doc/html/rfc8981#section-3.8-3.2
