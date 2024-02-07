@@ -90,6 +90,8 @@ int gnrc_ipv6_nib_pl_set(unsigned iface,
 void gnrc_ipv6_nib_pl_del(unsigned iface,
                           const ipv6_addr_t *pfx, unsigned pfx_len);
 
+bool gnrc_ipv6_nib_pl_has_prefix(unsigned iface, const ipv6_addr_t *pfx, uint8_t pfx_len);
+
 /**
  * @brief   Iterates over all prefix list entries in the NIB.
  *

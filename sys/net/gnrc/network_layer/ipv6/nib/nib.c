@@ -1733,6 +1733,7 @@ static uint32_t _handle_pio(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
 
     if (pio->flags & NDP_OPT_PI_FLAGS_A
         && pio->prefix_len == SLAAC_PREFIX_LENGTH
+        && !gnrc_ipv6_nib_pl_has_prefix(netif->pid, &pio->prefix, pio->prefix_len)
         ) {
         _auto_configure_addr(netif, &pio->prefix, pio->prefix_len);
     }
