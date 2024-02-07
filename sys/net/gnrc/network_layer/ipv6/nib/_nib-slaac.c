@@ -99,7 +99,7 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN || CONFIG_GNRC_IPV6_NIB_SLAAC */
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
-int _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx, uint32_t pfx_pref_ltime)
+int32_t _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx, uint32_t pfx_pref_ltime)
 {
     DEBUG("nib: add temporary address based on %s/%u automatically to interface %u\n",
           ipv6_addr_to_str(addr_str, pfx, sizeof(addr_str)),
@@ -137,7 +137,7 @@ int _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx, uint32
         gnrc_ipv6_nib_pl_del(netif->pid, &addr, IPV6_ADDR_BIT_LEN); //remove the just created prefix again
         return -1;
     }
-    return 0;
+    return ta_max_pref_lft;
 }
 
 bool is_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr) {
