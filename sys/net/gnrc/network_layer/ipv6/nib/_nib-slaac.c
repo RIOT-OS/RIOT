@@ -99,7 +99,7 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN || CONFIG_GNRC_IPV6_NIB_SLAAC */
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
-int32_t _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx, uint32_t pfx_pref_ltime)
+int32_t _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx, uint32_t pfx_pref_ltime, uint8_t retries)
 {
     DEBUG("nib: add temporary address based on %s/%u automatically to interface %u\n",
           ipv6_addr_to_str(addr_str, pfx, sizeof(addr_str)),
@@ -132,7 +132,8 @@ int32_t _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx, ui
         DEBUG("nib: Abort adding temporary address because prefix list full\n");
         return -1;
     }
-    if (gnrc_netif_ipv6_addr_add_internal(netif, &addr, IPV6_ADDR_BIT_LEN,GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE) < 0) {
+    if (gnrc_netif_ipv6_addr_add_internal(netif, &addr, IPV6_ADDR_BIT_LEN,
+                                          GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE | (retries << GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES_POS)) < 0) {
         DEBUG("nib: Abort adding temporary address, adding address failed\n");
         gnrc_ipv6_nib_pl_del(netif->pid, &addr, IPV6_ADDR_BIT_LEN); //remove the just created prefix again
         return -1;
@@ -261,7 +262,7 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
 
         uint32_t now = evtimer_now_msec();
         assert(now < slaac_prefix_pref_until); // else the temporary address smh outlived the SLAAC prefix preferred lft
-        int32_t ta_max_pref_lft = _generate_temporary_addr(netif, &addr_backup, slaac_prefix_pref_until - now);
+        int32_t ta_max_pref_lft = _generate_temporary_addr(netif, &addr_backup, slaac_prefix_pref_until - now, retries);
         if (ta_max_pref_lft < 0) {
             DEBUG("nib: Temporary address regeneration failed after DAD failure.\n");
             return;
