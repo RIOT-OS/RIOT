@@ -93,6 +93,7 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
                           gnrc_pktsnip_t *pkt, gnrc_ipv6_nib_nc_t *nce,
                           _nib_onl_entry_t *entry);
 
+static void _handle_regen_temp_addr(_nib_offl_entry_t *pfx);
 static void _handle_pfx_timeout(_nib_offl_entry_t *pfx);
 static void _handle_rtr_timeout(_nib_dr_entry_t *router);
 static void _handle_snd_na(gnrc_pktsnip_t *pkt);
@@ -493,7 +494,7 @@ void gnrc_ipv6_nib_handle_timer_event(void *ctx, uint16_t type)
             _handle_pfx_timeout(ctx);
             break;
         case GNRC_IPV6_NIB_REGEN_TEMP_ADDR:
-            //TODO
+            _handle_regen_temp_addr(ctx);
             break;
         case GNRC_IPV6_NIB_RTR_TIMEOUT:
             _handle_rtr_timeout(ctx);
@@ -1519,6 +1520,18 @@ static void _handle_snd_na(gnrc_pktsnip_t *pkt)
     (void)pkt;
     DEBUG("nib: No IPv6 module to send delayed neighbor advertisement\n");
 #endif  /* MODULE_GNRC_IPV6 */
+}
+
+static void _handle_regen_temp_addr(_nib_offl_entry_t *pfx) {
+    DEBUG("nib: Temporary address regeneration event for SLAAC prefix %s/%u\n", ipv6_addr_to_str(addr_str, &pfx->pfx, sizeof(addr_str)), pfx->pfx_len);
+    gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(pfx->next_hop));
+    assert(evtimer_now_msec() < pfx->pref_until);
+    int32_t ta_max_pref_lft = _generate_temporary_addr(netif, &pfx->pfx, pfx->pref_until - evtimer_now_msec());
+    if (ta_max_pref_lft < 0) {
+        DEBUG("nib: Temporary address regeneration failed.\n");
+        return;
+    }
+    _evtimer_add(pfx, GNRC_IPV6_NIB_REGEN_TEMP_ADDR, &pfx->regen_temp_addr, ta_max_pref_lft - gnrc_netif_ipv6_regen_advance(netif)); //add next regen timer
 }
 
 static void _handle_pfx_timeout(_nib_offl_entry_t *pfx)
