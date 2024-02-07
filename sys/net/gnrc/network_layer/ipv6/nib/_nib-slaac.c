@@ -98,6 +98,47 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN || CONFIG_GNRC_IPV6_NIB_SLAAC */
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+int _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx, uint32_t pfx_pref_ltime)
+{
+    DEBUG("nib: add temporary address based on %s/%u automatically to interface %u\n",
+          ipv6_addr_to_str(addr_str, pfx, sizeof(addr_str)),
+          64, netif->pid);
+
+    if (pfx_pref_ltime <= gnrc_netif_ipv6_regen_advance(netif)) {
+        DEBUG("nib: Abort adding temporary address because prefix's preferred lifetime too short (%u <= %u)\n",
+              pfx_pref_ltime, gnrc_netif_ipv6_regen_advance(netif));
+        return -1;
+    }
+    const uint32_t ta_max_pref_lft = TEMP_PREFERRED_LIFETIME - random_uint32_range(0, MAX_DESYNC_FACTOR + 1);
+    if (ta_max_pref_lft <= gnrc_netif_ipv6_regen_advance(netif)) {
+        DEBUG("nib: Abort adding temporary address because configured "
+              "TEMP_PREFERRED_LIFETIME (%lu) too short or MAX_DESYNC_FACTOR too high (%lu)\n",
+              TEMP_PREFERRED_LIFETIME, MAX_DESYNC_FACTOR);
+
+        assert(MAX_DESYNC_FACTOR < TEMP_PREFERRED_LIFETIME - gnrc_netif_ipv6_regen_advance(netif));
+        //https://datatracker.ietf.org/doc/html/rfc8981#section-3.8-7.2
+
+        return -1;
+    }
+
+    ipv6_addr_t addr = IPV6_ADDR_UNSPECIFIED;
+    ipv6_addr_init_prefix(&addr, pfx, SLAAC_PREFIX_LENGTH);
+    do {
+        _ipv6_get_random_iid((eui64_t *) &addr.u64[1]);
+    } while(gnrc_netif_ipv6_addr_idx(netif, &addr) >= 0);
+
+    if (gnrc_ipv6_nib_pl_set(netif->pid, &addr, IPV6_ADDR_BIT_LEN, TEMP_VALID_LIFETIME, ta_max_pref_lft) != 0) {
+        DEBUG("nib: Abort adding temporary address because prefix list full\n");
+        return -1;
+    }
+    if (gnrc_netif_ipv6_addr_add_internal(netif, &addr, IPV6_ADDR_BIT_LEN,GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE) < 0) {
+        DEBUG("nib: Abort adding temporary address, adding address failed\n");
+        gnrc_ipv6_nib_pl_del(netif->pid, &addr, IPV6_ADDR_BIT_LEN); //remove the just created prefix again
+        return -1;
+    }
+    return 0;
+}
+
 bool _iid_is_iana_reserved(const eui64_t *iid)
 {
     //[RFC5453]

@@ -86,6 +86,14 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN || CONFIG_GNRC_IPV6_NIB_SLAAC */
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES) || defined(DOXYGEN)
+/**
+ * @param pfx_pref_ltime Lifetime of the prefix for which an address shall be created.
+ *                       Needed to determine whether it is worth creating a temporary address.
+ * @return -1 on failure
+ * @return 0 on success
+ */
+int _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx, uint32_t pfx_pref_ltime);
+
 bool _iid_is_iana_reserved(const eui64_t *iid);
 
 void _ipv6_get_random_iid(eui64_t *iid);
