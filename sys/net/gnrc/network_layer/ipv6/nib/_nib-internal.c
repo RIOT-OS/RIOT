@@ -30,6 +30,7 @@
 
 #include "_nib-internal.h"
 #include "_nib-router.h"
+#include "_nib-slaac.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
