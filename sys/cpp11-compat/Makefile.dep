@@ -1,4 +1,3 @@
-USEMODULE += cpp_new_delete
 USEMODULE += ztimer64_usec
 USEMODULE += timex
 FEATURES_REQUIRED += cpp
