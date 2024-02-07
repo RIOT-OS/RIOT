@@ -124,8 +124,8 @@ void gnrc_ipv6_nib_pl_del(unsigned iface,
 }
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
-bool gnrc_ipv6_nib_pl_has_prefix(unsigned iface, const ipv6_addr_t *pfx,
-                          uint8_t pfx_len)
+bool gnrc_ipv6_nib_pl_has_prefix(const unsigned int iface, const ipv6_addr_t *pfx,
+                                 const uint8_t pfx_len)
 {
     void *state = NULL;
     gnrc_ipv6_nib_pl_t ple;
@@ -139,7 +139,7 @@ bool gnrc_ipv6_nib_pl_has_prefix(unsigned iface, const ipv6_addr_t *pfx,
     return false;
 }
 
-bool gnrc_ipv6_nib_pl_reschedule_regen(unsigned iface, const ipv6_addr_t *pfx, uint32_t offset)
+bool gnrc_ipv6_nib_pl_reschedule_regen(const unsigned int iface, const ipv6_addr_t *pfx, const uint32_t offset)
 {
     //adapted from gnrc_ipv6_nib_pl_iter
     _nib_offl_entry_t *dst = NULL;

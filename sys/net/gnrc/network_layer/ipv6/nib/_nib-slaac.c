@@ -101,7 +101,7 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN || CONFIG_GNRC_IPV6_NIB_SLAAC */
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
-int32_t _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx, uint32_t pfx_pref_ltime, uint8_t retries,
+int32_t _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx, const uint32_t pfx_pref_ltime, const uint8_t retries,
                                  int *idx)
 {
     DEBUG("nib: add temporary address based on %s/%u automatically to interface %u\n",
@@ -148,15 +148,12 @@ int32_t _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx, ui
     return ta_max_pref_lft;
 }
 
-bool is_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr) {
+bool is_temporary_addr(const gnrc_netif_t *netif, const ipv6_addr_t *addr) {
     return gnrc_ipv6_nib_pl_has_prefix(netif->pid, addr, IPV6_ADDR_BIT_LEN);
 }
 
 bool _iid_is_iana_reserved(const eui64_t *iid)
 {
-    //[RFC5453]
-    //https://www.iana.org/assignments/ipv6-interface-ids/ipv6-interface-ids.xhtml
-
     return (iid->uint64.u64 == htonll(0))
     || (iid->uint32[0].u32 == htonl(0x02005eff) && iid->uint8[4] == 0xfe)
     || (iid->uint32[0].u32 == htonl(0xfdffffff) && iid->uint16[2].u16 == htons(0xffff) && iid->uint8[6] == 0xff && (iid->uint8[7] & 0x80));
@@ -171,7 +168,6 @@ void _ipv6_get_random_iid(eui64_t *iid)
 
 uint32_t gnrc_netif_ipv6_regen_advance(const gnrc_netif_t *netif)
 {
-    //https://datatracker.ietf.org/doc/html/rfc8981#section-3.8-3.2
     return 2 + (TEMP_IDGEN_RETRIES *
     (gnrc_netif_ipv6_dad_transmits(netif) * (netif->ipv6.retrans_time / 1000))
     );
