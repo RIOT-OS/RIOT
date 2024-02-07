@@ -233,10 +233,23 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
           "=> removing that address\n",
           ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)));
     bool is_temp_addr = is_temporary_addr(netif, addr); //need to determine before addr removal, because it deletes the prefix which is used to determine whether it's a temp addr
+    uint8_t retries;
+    if (is_temp_addr) {
+        int idx = gnrc_netif_ipv6_addr_idx(netif, addr);
+        assert(idx >= 0);
+        retries = gnrc_netif_ipv6_addr_gen_retries(netif, idx);
+    }
     ipv6_addr_t addr_backup = *addr;
     gnrc_netif_ipv6_addr_remove_internal(netif, addr);
 
     if (is_temp_addr) {
+        if (retries >= TEMP_IDGEN_RETRIES) {
+            DEBUG("nib: Not regenerating temporary address, retried often enough.\n");
+            return;
+        }
+        retries++;
+        DEBUG("Trying regeneration of temporary address. (%u/%u)\n", retries, TEMP_IDGEN_RETRIES);
+
         //find associated prefix
         uint32_t slaac_prefix_pref_until;
         if (!get_slaac_prefix_pref_until(netif, &addr_backup, &slaac_prefix_pref_until)) {
