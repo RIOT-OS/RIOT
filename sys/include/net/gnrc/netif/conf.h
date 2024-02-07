@@ -103,6 +103,27 @@ extern "C" {
 #endif
 
 /**
+ * @brief Maximum assumed number of valid (preferred or deprecated) temporary addresses.
+ * (see _nib-slaac.h)
+ *
+ * This value is not enforced but only used to increase
+ * the amount of configurable addresses, to make space for temporary addresses.
+ *
+ * Assuming continued use of the same prefix,
+ * the number of simultaneous temporary addresses can be expressed by the following (not considering REGEN_ADVANCE):
+ * @ref TEMP_VALID_LIFETIME / min_pref_lft=(@ref TEMP_PREFERRED_LIFETIME - @ref MAX_DESYNC_FACTOR)
+ * (Calculates the addresses that are generated within an address's lifetime.)
+ * -> floor(...) to only consider already generated addresses
+ * -> +1 to also account for the first address itself
+ *
+ * @see CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF
+ *      May need to be increased; each temporary address has a /128 prefix to manage its maximum total lifetimes.
+ */
+#ifndef MAX_TEMP_ADDRESSES
+#define MAX_TEMP_ADDRESSES 4
+#endif
+
+/**
  * @brief   Maximum number of unicast and anycast addresses per interface
  *
  * @note    If you change this, please make sure that
@@ -110,11 +131,12 @@ extern "C" {
  *          addresses' solicited nodes multicast addresses.
  *
  * Default: 2 (1 link-local + 1 global address) + any additional address via
- * configuration protocol (e.g. DHCPv6 leases).
+ * configuration protocol (e.g. DHCPv6 leases) + temporary addresses.
  */
 #ifndef CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF
 #define CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF    (2 + \
-                                               DHCPV6_CLIENT_ADDRS_NUMOF)
+                                               DHCPV6_CLIENT_ADDRS_NUMOF + \
+                                               MAX_TEMP_ADDRESSES)
 #endif
 
 /**
