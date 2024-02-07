@@ -64,6 +64,8 @@ extern "C" {
 /**
  * @brief   Maximum number of retries for generating a temporary address
  *          in case a duplicate addresses was detected (DAD failure)
+ *
+ * @ref GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES must be able to store this number
  */
 #ifndef TEMP_IDGEN_RETRIES
 #define TEMP_IDGEN_RETRIES             (3U) /*default value*/
