@@ -32,6 +32,42 @@
 extern "C" {
 #endif
 
+/**
+ * @name    Temporary address parameters
+ * @see     [RFC 8981, section 3.8](https://tools.ietf.org/html/rfc8981#section-3.8)
+ * @{
+ */
+/**
+ * @brief   Maximum valid lifetime [days] of a temporary address
+ */
+#ifndef TEMP_VALID_LIFETIME
+#define TEMP_VALID_LIFETIME            MS_PER_HOUR * HOURS_PER_DAY * (2U) /*default value*/
+#endif
+
+/**
+ * @brief   Maximum preferred lifetime [days] of a temporary address
+ * 
+ * @note    "MUST be smaller than the TEMP_VALID_LIFETIME value"
+ */
+#ifndef TEMP_PREFERRED_LIFETIME
+#define TEMP_PREFERRED_LIFETIME        MS_PER_HOUR * HOURS_PER_DAY * (1U) /*default value*/
+#endif
+
+/**
+ * @brief   Maximum time to randomly subtract from TEMP_PREFERRED_LIFETIME
+ *          for a temporary address
+ */
+#define MAX_DESYNC_FACTOR             (TEMP_PREFERRED_LIFETIME / 10 * 4)
+
+/**
+ * @brief   Maximum number of retries for generating a temporary address
+ *          in case a duplicate addresses was detected (DAD failure)
+ */
+#ifndef TEMP_IDGEN_RETRIES
+#define TEMP_IDGEN_RETRIES             (3U) /*default value*/
+#endif
+/** @} */
+
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) || IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC) || defined(DOXYGEN)
 /**
  * @brief   Auto-configures an address from a given prefix
