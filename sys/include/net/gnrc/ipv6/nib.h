@@ -244,6 +244,7 @@ extern "C" {
  */
 #define GNRC_IPV6_NIB_IFACE_DOWN            (0x4fd5U)
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES) || defined(DOXYGEN)
 /**
  * @brief   Temporary address: regenerate
  *
@@ -253,6 +254,7 @@ extern "C" {
  * @see "REGEN_ADVANCE time units before" - https://datatracker.ietf.org/doc/html/rfc8981#section-3.6
  */
 #define GNRC_IPV6_NIB_REGEN_TEMP_ADDR       (0x4fd6U)
+#endif
 /** @} */
 
 /**
