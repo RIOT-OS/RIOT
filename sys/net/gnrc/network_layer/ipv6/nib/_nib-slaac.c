@@ -267,7 +267,9 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
 
         uint32_t now = evtimer_now_msec();
         assert(now < slaac_prefix_pref_until); // else the temporary address smh outlived the SLAAC prefix preferred lft
-        int32_t ta_max_pref_lft = _generate_temporary_addr(netif, &addr_backup, slaac_prefix_pref_until - now, retries);
+        int idx;
+        int32_t ta_max_pref_lft = _generate_temporary_addr(netif, &addr_backup, slaac_prefix_pref_until - now, retries,
+                                                           &idx);
         if (ta_max_pref_lft < 0) {
             DEBUG("nib: Temporary address regeneration failed after DAD failure.\n");
             return;
@@ -276,7 +278,7 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
         //re-schedule regen event (incl. deleting old one)
         if (!gnrc_ipv6_nib_pl_reschedule_regen(netif->pid, &addr_backup, ta_max_pref_lft - gnrc_netif_ipv6_regen_advance(netif))) {
             DEBUG("nib: Temporary address regeneration failed after DAD failure, SLAAC prefix was not found to reschedule address regeneration timer.\n");
-            //TODO delete just created temp addr
+            gnrc_netif_ipv6_addr_remove_internal(netif, &netif->ipv6.addrs[idx]); //delete just created temp addr
             assert(false);
             return;
         }
