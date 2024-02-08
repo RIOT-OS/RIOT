@@ -140,7 +140,7 @@ uint32_t gnrc_netif_ipv6_regen_advance(const gnrc_netif_t *netif);
  * @param[out] slaac_prefix_pref_until pref_until time of the SLAAC prefix
  * @return true if a corresponding prefix was found, otherwise false
  */
-bool get_slaac_prefix_pref_until(const gnrc_netif_t *netif, const ipv6_addr_t *addr, uint32_t *slaac_prefix_pref_until);
+bool _get_slaac_prefix_pref_until(const gnrc_netif_t *netif, const ipv6_addr_t *addr, uint32_t *slaac_prefix_pref_until);
 
 /**
  * @brief For a given SLAAC prefix, get the first-best temporary address prefix.
