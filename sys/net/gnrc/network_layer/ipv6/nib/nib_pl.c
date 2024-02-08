@@ -153,7 +153,9 @@ bool gnrc_ipv6_nib_pl_reschedule_regen(const unsigned int iface, const ipv6_addr
             && dst->pfx_len == SLAAC_PREFIX_LENGTH
             && ipv6_addr_match_prefix(&dst->pfx, pfx) >= dst->pfx_len) {
             evtimer_del(&_nib_evtimer, &dst->regen_temp_addr.event);
-            _evtimer_add(dst, GNRC_IPV6_NIB_REGEN_TEMP_ADDR, &dst->regen_temp_addr, offset);
+            if (offset != 0) {
+                _evtimer_add(dst, GNRC_IPV6_NIB_REGEN_TEMP_ADDR, &dst->regen_temp_addr, offset);
+            }
             result = true;
             break;
         }
