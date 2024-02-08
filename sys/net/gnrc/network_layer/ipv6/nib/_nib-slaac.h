@@ -123,6 +123,7 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
  * @param[in] retries Number of address generation retries
  * that is to be stored in the address flags.
  * @param[out] idx The index of the generated address.
+ * Optional, leave NULL if not needed.
  *
  * @return -1 on failure
  * @return ta_max_pref_lft on success

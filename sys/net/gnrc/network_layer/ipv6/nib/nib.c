@@ -1766,6 +1766,8 @@ static uint32_t _handle_pio(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
         && pio->prefix_len == SLAAC_PREFIX_LENGTH
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
         && !gnrc_ipv6_nib_pl_has_prefix(netif->pid, &pio->prefix, pio->prefix_len)
+        /* do not cause generation of another temporary address
+         * if the prefix is already known */
 #endif
         ) {
         _auto_configure_addr(netif, &pio->prefix, pio->prefix_len);
