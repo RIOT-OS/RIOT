@@ -29,28 +29,13 @@
 #include "net/loramac.h"
 #include "net/gnrc/lorawan/region.h"
 #include "net/gnrc/netreg.h"
+#include "random.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#define MSG_TYPE_MLME_BACKOFF_EXPIRE (0x3458)           /**< Backoff timer expiration message type */
-
-static uint8_t _appskey[LORAMAC_APPSKEY_LEN];
-static uint8_t _appkey[LORAMAC_APPKEY_LEN];
-static uint8_t _snwksintkey[LORAMAC_SNWKSINTKEY_LEN];
-static uint8_t _nwksenckey[LORAMAC_NWKSENCKEY_LEN];
-static uint8_t _nwkkey[LORAMAC_NWKKEY_LEN];
-static uint8_t _joineui[LORAMAC_JOINEUI_LEN];
-static uint8_t _fnwksintkey[LORAMAC_FNWKSINTKEY_LEN];
-static uint8_t _deveui[LORAMAC_DEVEUI_LEN];
-static uint8_t _devaddr[LORAMAC_DEVADDR_LEN];
-
-static msg_t timeout_msg = { .type = MSG_TYPE_TIMEOUT };
-static msg_t backoff_msg = { .type = MSG_TYPE_MLME_BACKOFF_EXPIRE };
-
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif);
-static void _msg_handler(gnrc_netif_t *netif, msg_t *msg);
 static int _get(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt);
 static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt);
 static int _init(gnrc_netif_t *netif);
@@ -61,14 +46,10 @@ static const gnrc_netif_ops_t lorawan_ops = {
     .recv = _recv,
     .get = _get,
     .set = _set,
-    .msg_handler = _msg_handler
 };
 
 void gnrc_lorawan_mlme_confirm(gnrc_lorawan_t *mac, mlme_confirm_t *confirm)
 {
-    gnrc_netif_lorawan_t *lw_netif =
-        container_of(mac, gnrc_netif_lorawan_t, mac);
-
     if (confirm->type == MLME_JOIN) {
         if (confirm->status == 0) {
             gnrc_netif_lorawan_t *lw_netif = container_of(mac, gnrc_netif_lorawan_t, mac);
@@ -84,25 +65,6 @@ void gnrc_lorawan_mlme_confirm(gnrc_lorawan_t *mac, mlme_confirm_t *confirm)
             DEBUG("gnrc_lorawan: join failed\n");
         }
     }
-    else if (confirm->type == MLME_LINK_CHECK) {
-        lw_netif->flags &= ~GNRC_NETIF_LORAWAN_FLAGS_LINK_CHECK;
-        lw_netif->demod_margin = confirm->link_req.margin;
-        lw_netif->num_gateways = confirm->link_req.num_gateways;
-    }
-}
-
-void gnrc_lorawan_set_timer(gnrc_lorawan_t *mac, uint32_t us)
-{
-    gnrc_netif_lorawan_t *lw_netif = container_of(mac, gnrc_netif_lorawan_t, mac);
-
-    ztimer_set_msg(ZTIMER_MSEC, &lw_netif->timer, us / 1000, &timeout_msg, thread_getpid());
-}
-
-void gnrc_lorawan_remove_timer(gnrc_lorawan_t *mac)
-{
-    gnrc_netif_lorawan_t *lw_netif = container_of(mac, gnrc_netif_lorawan_t, mac);
-
-    ztimer_remove(ZTIMER_MSEC, &lw_netif->timer);
 }
 
 static inline void _set_be_addr(gnrc_lorawan_t *mac, uint8_t *be_addr)
@@ -168,8 +130,24 @@ release:
 
 void gnrc_lorawan_mlme_indication(gnrc_lorawan_t *mac, mlme_indication_t *ind)
 {
-    (void)mac;
-    (void)ind;
+    gnrc_netif_lorawan_t *lw_netif =
+        container_of(mac, gnrc_netif_lorawan_t, mac);
+
+    if (ind->type == MLME_LINK_CHECK) {
+        lw_netif->demod_margin = ind->link_req.margin;
+        lw_netif->num_gateways = ind->link_req.num_gateways;
+    }
+    else if (ind->type == MLME_SCHEDULE_UPLINK) {
+        /* In the future this may schedule pending packets from the netif queue */
+        lw_netif->msg_sched.type = GNRC_NETAPI_MSG_TYPE_SND;
+        gnrc_pktsnip_t *pkt, *hdr;
+        uint8_t port = 1;
+        pkt = gnrc_pktbuf_add(NULL, NULL, 0, GNRC_NETTYPE_UNDEF);
+        hdr = gnrc_netif_hdr_build(NULL, 0, &port, sizeof(port));
+        pkt = gnrc_pkt_prepend(pkt, hdr);
+        lw_netif->msg_sched.content.ptr = pkt;
+        msg_send(&lw_netif->msg_sched, thread_getpid());
+    }
 }
 
 void gnrc_lorawan_mcps_confirm(gnrc_lorawan_t *mac, mcps_confirm_t *confirm)
@@ -278,6 +256,15 @@ netdev_t *gnrc_lorawan_get_netdev(gnrc_lorawan_t *mac)
     return netif->dev;
 }
 
+static void _reverse_array(uint8_t *arr, size_t len)
+{
+    for (unsigned i = 0; i < len/2; i++) {
+        uint8_t p = arr[i];
+        arr[i] = arr[len - i - 1];
+        arr[len - i - 1] = p;
+    }
+}
+
 static int _init(gnrc_netif_t *netif)
 {
     DEBUG("netif init ! \n");
@@ -290,39 +277,38 @@ static int _init(gnrc_netif_t *netif)
     netif->dev->event_callback = _driver_cb;
     _reset(netif);
 
+    uint8_t buf[LORAMAC_APPSKEY_LEN];
+
     /* Convert default keys, address and EUIs to hex */
-    fmt_hex_bytes(_appskey, CONFIG_LORAMAC_APP_SKEY_DEFAULT);
+    fmt_hex_bytes(netif->lorawan.appskey, CONFIG_LORAMAC_APP_SKEY_DEFAULT);
     if (IS_USED(MODULE_GNRC_LORAWAN_1_1)) {
-        fmt_hex_bytes(_joineui, CONFIG_LORAMAC_JOIN_EUI_DEFAULT);
-        fmt_hex_bytes(_appkey, CONFIG_LORAMAC_APP_KEY_DEFAULT);
-        fmt_hex_bytes(_nwkkey, CONFIG_LORAMAC_NWK_KEY_DEFAULT);
-        fmt_hex_bytes(_fnwksintkey, CONFIG_LORAMAC_FNWKSINT_KEY_DEFAULT);
-        fmt_hex_bytes(_snwksintkey, CONFIG_LORAMAC_SNWKSINT_KEY_DEFAULT);
-        fmt_hex_bytes(_nwksenckey, CONFIG_LORAMAC_NWKSENC_KEY_DEFAULT);
+        fmt_hex_bytes(netif->lorawan.joineui, CONFIG_LORAMAC_JOIN_EUI_DEFAULT);
+        fmt_hex_bytes(netif->lorawan.nwkkey, CONFIG_LORAMAC_NWK_KEY_DEFAULT);
+        fmt_hex_bytes(netif->lorawan.fnwksintkey, CONFIG_LORAMAC_FNWKSINT_KEY_DEFAULT);
     }
     else {
-        fmt_hex_bytes(_joineui, CONFIG_LORAMAC_APP_EUI_DEFAULT);
-        fmt_hex_bytes(_nwkkey, CONFIG_LORAMAC_APP_KEY_DEFAULT);
-        fmt_hex_bytes(_fnwksintkey, CONFIG_LORAMAC_NWK_SKEY_DEFAULT);
+        fmt_hex_bytes(netif->lorawan.joineui, CONFIG_LORAMAC_APP_EUI_DEFAULT);
+        fmt_hex_bytes(netif->lorawan.nwkkey, CONFIG_LORAMAC_APP_KEY_DEFAULT);
+        fmt_hex_bytes(netif->lorawan.fnwksintkey, CONFIG_LORAMAC_NWK_SKEY_DEFAULT);
     }
 
-    fmt_hex_bytes(_deveui, CONFIG_LORAMAC_DEV_EUI_DEFAULT);
-    fmt_hex_bytes(_devaddr, CONFIG_LORAMAC_DEV_ADDR_DEFAULT);
+    fmt_hex_bytes(netif->lorawan.deveui, CONFIG_LORAMAC_DEV_EUI_DEFAULT);
 
     /* Initialize default keys, address and EUIs */
-    memcpy(netif->lorawan.appskey, _appskey, sizeof(_appskey));
-    _memcpy_reversed(netif->lorawan.deveui, _deveui, sizeof(_deveui));
-    _memcpy_reversed(netif->lorawan.joineui, _joineui, sizeof(_joineui));
-    memcpy(netif->lorawan.nwkkey, _nwkkey, sizeof(_nwkkey));
-    memcpy(netif->lorawan.fnwksintkey, _fnwksintkey, sizeof(_fnwksintkey));
+    _reverse_array(netif->lorawan.deveui, LORAMAC_DEVEUI_LEN);
+    _reverse_array(netif->lorawan.joineui, LORAMAC_JOINEUI_LEN);
 
     if (IS_USED(MODULE_GNRC_LORAWAN_1_1)) {
-        gnrc_netif_lorawan_set_appkey(&netif->lorawan, _appkey, sizeof(_appkey));
-        gnrc_netif_lorawan_set_snwksintkey(&netif->lorawan, _snwksintkey, sizeof(_snwksintkey));
-        gnrc_netif_lorawan_set_nwksenckey(&netif->lorawan, _nwksenckey, sizeof(_nwksenckey));
+        fmt_hex_bytes(buf, CONFIG_LORAMAC_APP_KEY_DEFAULT);
+        gnrc_netif_lorawan_set_appkey(&netif->lorawan, buf, LORAMAC_APPSKEY_LEN);
+        fmt_hex_bytes(buf, CONFIG_LORAMAC_SNWKSINT_KEY_DEFAULT);
+        gnrc_netif_lorawan_set_snwksintkey(&netif->lorawan, buf, LORAMAC_SNWKSINTKEY_LEN);
+        fmt_hex_bytes(buf, CONFIG_LORAMAC_NWKSENC_KEY_DEFAULT);
+        gnrc_netif_lorawan_set_nwksenckey(&netif->lorawan, buf, LORAMAC_NWKSENCKEY_LEN);
     }
 
-    _set_be_addr(&netif->lorawan.mac, _devaddr);
+    fmt_hex_bytes(buf, CONFIG_LORAMAC_DEV_ADDR_DEFAULT);
+    _set_be_addr(&netif->lorawan.mac, buf);
 
     const gnrc_lorawan_key_ctx_t ctx = {
         .appskey = netif->lorawan.appskey,
@@ -338,11 +324,7 @@ static int _init(gnrc_netif_t *netif)
 #endif
     };
 
-    gnrc_lorawan_init(&netif->lorawan.mac, netif->lorawan.joineui, &ctx);
-
-    ztimer_set_msg(ZTIMER_MSEC, &netif->lorawan.backoff_timer,
-                   GNRC_LORAWAN_BACKOFF_WINDOW_TICK / 1000,
-                   &backoff_msg, thread_getpid());
+    gnrc_lorawan_init(&netif->lorawan.mac, netif->lorawan.joineui, &ctx, &netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_LOW]);
 
     return res;
 }
@@ -363,9 +345,6 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *payload)
 {
-    mlme_request_t mlme_request;
-    mlme_confirm_t mlme_confirm;
-
     uint8_t port;
     int res = -EINVAL;
 
@@ -392,12 +371,6 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *payload)
         port = netif->lorawan.port;
     }
 
-    if (netif->lorawan.flags & GNRC_NETIF_LORAWAN_FLAGS_LINK_CHECK) {
-        mlme_request.type = MLME_LINK_CHECK;
-        gnrc_lorawan_mlme_request(&netif->lorawan.mac, &mlme_request,
-                                  &mlme_confirm);
-    }
-
     mcps_request_t req =
     { .type = netif->lorawan.ack_req ? MCPS_CONFIRMED : MCPS_UNCONFIRMED,
       .data =
@@ -415,24 +388,6 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *payload)
 
 end:
     return res;
-}
-
-static void _msg_handler(gnrc_netif_t *netif, msg_t *msg)
-{
-    (void)netif;
-    (void)msg;
-    switch (msg->type) {
-    case MSG_TYPE_TIMEOUT:
-        gnrc_lorawan_timeout_cb(&netif->lorawan.mac);
-        break;
-    case MSG_TYPE_MLME_BACKOFF_EXPIRE:
-        gnrc_lorawan_mlme_backoff_expire_cb(&netif->lorawan.mac);
-        ztimer_set_msg(ZTIMER_MSEC, &netif->lorawan.backoff_timer,
-                       GNRC_LORAWAN_BACKOFF_WINDOW_TICK / 1000,
-                       &backoff_msg, thread_getpid());
-    default:
-        break;
-    }
 }
 
 static int _get(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
@@ -572,18 +527,19 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
         netopt_enable_t en = *((netopt_enable_t *)opt->data);
         if (en) {
             if (netif->lorawan.otaa) {
+                gnrc_netif_lorawan_t *lw_netif = &netif->lorawan;
                 mlme_request.type = MLME_JOIN;
-                mlme_request.join.deveui = netif->lorawan.deveui;
-                mlme_request.join.joineui = netif->lorawan.joineui;
-                mlme_request.join.nwkkey = netif->lorawan.nwkkey;
+                mlme_request.join.deveui = lw_netif->deveui;
+                mlme_request.join.joineui = lw_netif->joineui;
+                mlme_request.join.nwkkey = lw_netif->nwkkey;
 
                 if (IS_USED(MODULE_GNRC_LORAWAN_1_1)) {
                     gnrc_lorawan_mlme_join_set_appkey(&mlme_request.join, gnrc_netif_lorawan_get_appkey(
-                                                          &netif->lorawan));
+                                                          lw_netif));
                 }
 
-                mlme_request.join.dr = netif->lorawan.datarate;
-                gnrc_lorawan_mlme_request(&netif->lorawan.mac,
+                mlme_request.join.dr = lw_netif->datarate;
+                gnrc_lorawan_mlme_request(&lw_netif->mac,
                                           &mlme_request, &mlme_confirm);
             }
             else {
@@ -613,7 +569,12 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
         _set_be_addr(&netif->lorawan.mac, opt->data);
         break;
     case NETOPT_LINK_CHECK:
+        assert(opt->data_len == sizeof(netopt_enable_t));
         netif->lorawan.flags |= GNRC_NETIF_LORAWAN_FLAGS_LINK_CHECK;
+        mlme_request.type = MLME_SET;
+        mlme_request.mib.link_check = *((bool*) opt->data);
+        gnrc_lorawan_mlme_request(&netif->lorawan.mac,
+                                  &mlme_request, &mlme_confirm);
         break;
     case NETOPT_LORAWAN_RX2_DR:
         assert(opt->data_len == sizeof(uint8_t));

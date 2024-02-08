@@ -183,6 +183,8 @@ static void _isr(netdev_t *netdev)
     }
     else if (irq_mask & SX126X_IRQ_HEADER_ERROR) {
         DEBUG("[sx126x] netdev: SX126X_IRQ_HEADER_ERROR\n");
+        /* Report it to the upper layer as CRC error */
+        netdev->event_callback(netdev, NETDEV_EVENT_CRC_ERROR);
     }
     else if (irq_mask & SX126X_IRQ_CRC_ERROR) {
         DEBUG("[sx126x] netdev: SX126X_IRQ_CRC_ERROR\n");
@@ -275,6 +277,11 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
         *((uint8_t *)val) = sx126x_get_coding_rate(dev);
         return sizeof(uint8_t);
 
+    case NETOPT_SINGLE_RECEIVE:
+        assert(max_len >= sizeof(netopt_enable_t));
+        *((netopt_enable_t *)val) = sx126x_get_rx_single(dev) ? NETOPT_ENABLE : NETOPT_DISABLE;
+        return sizeof(netopt_enable_t);
+
     case NETOPT_PDU_SIZE:
         assert(max_len >= sizeof(uint8_t));
         *((uint8_t *)val) = sx126x_get_lora_payload_length(dev);
@@ -325,11 +332,13 @@ static int _set_state(sx126x_t *dev, netopt_state_t state)
         }
 #endif
         sx126x_cfg_rx_boosted(dev, true);
-        int _timeout = (sx126x_symbol_to_msec(dev, dev->rx_timeout));
-        if (_timeout != 0) {
+        if (sx126x_get_flag(dev, SX126X_FLAG_RX_SINGLE)) {
+            int _timeout = (sx126x_symbol_to_msec(dev, dev->rx_timeout));
             sx126x_set_rx(dev, _timeout);
         }
         else {
+            /* The semantics of this radio are different from the SX127x.
+             * Here it means "receive a single packet and then go back to standby" */
             sx126x_set_rx(dev, SX126X_RX_SINGLE_MODE);
         }
         break;
@@ -433,6 +442,11 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
         assert(len <= sizeof(uint16_t));
         dev->rx_timeout = *(const uint16_t *)val;
         return sizeof(uint16_t);
+
+    case NETOPT_SINGLE_RECEIVE:
+        assert(len <= sizeof(netopt_enable_t));
+        sx126x_set_rx_single(dev, (*(const netopt_enable_t *) val) ? true : false);
+        return sizeof(netopt_enable_t);
 
     case NETOPT_TX_POWER:
         assert(len <= sizeof(int16_t));

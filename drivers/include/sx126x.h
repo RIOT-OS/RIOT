@@ -34,6 +34,9 @@
 extern "C" {
 #endif
 
+#define SX126X_FLAG_SLEEP                   (0x01)  /**< Device is in sleep mode */
+#define SX126X_FLAG_RX_SINGLE               (0x02) /**< Device is in single rx mode */
+
 /**
  * * @note Forward declaration of the SX126x device descriptor
  */
@@ -109,7 +112,7 @@ struct sx126x {
     sx126x_mod_params_lora_t mod_params;    /**< Lora modulation parameters */
     uint32_t channel;                       /**< Current channel frequency (in Hz) */
     uint16_t rx_timeout;                    /**< Rx Timeout in terms of symbols */
-    bool radio_sleep;                       /**< Radio sleep status */
+    uint8_t flags;                          /**< Radio flags */
 };
 
 /**
@@ -300,6 +303,70 @@ bool sx126x_get_lora_iq_invert(const sx126x_t *dev);
  * @param[in] iq_invert                The LoRa IQ inverted mode
  */
 void sx126x_set_lora_iq_invert(sx126x_t *dev, bool iq_invert);
+
+/**
+ * @brief Sets an SX126x flag
+ *
+ * @param[in] dev  Device descriptor of the driver
+ * @param[in] flag Flag to set
+ */
+static inline void sx126x_set_flag(sx126x_t *dev, uint8_t flag)
+{
+    dev->flags |= flag;
+}
+
+/**
+ * @brief Clears an SX126x flag
+ *
+ * @param[in] dev  Device descriptor of the driver
+ * @param[in] flag Flag to clear
+ */
+static inline void sx126x_clear_flag(sx126x_t *dev, uint8_t flag)
+{
+    dev->flags &= ~flag;
+}
+
+/**
+ * @brief Checks if an SX126x flag is set
+ *
+ * @param[in] dev  Device descriptor of the driver
+ * @param[in] flag Flag to check
+ *
+ * @return true if flag is set
+ * @return false if flag is not set
+ */
+static inline bool sx126x_get_flag(sx126x_t *dev, uint8_t flag)
+{
+    return (dev->flags & flag);
+}
+
+/**
+ * @brief   Sets single RX reception
+ *
+ * @param[in] dev                      Device descriptor of the driver
+ * @param[in] single                   whether the device should enable single RX.
+ */
+static inline void sx126x_set_rx_single(sx126x_t *dev, bool rx_single)
+{
+    if (rx_single) {
+        sx126x_set_flag(dev, SX126X_FLAG_RX_SINGLE);
+    }
+    else {
+        sx126x_clear_flag(dev, SX126X_FLAG_RX_SINGLE);
+    }
+}
+
+/**
+ * @brief   Checks if the device is in single RX reception
+ *
+ * @param[in] dev                      Device descriptor of the driver
+ *
+ * @return whether the device has RX single enabled.
+ */
+static inline bool sx126x_get_rx_single(sx126x_t *dev)
+{
+    return sx126x_get_flag(dev, SX126X_FLAG_RX_SINGLE);
+}
 
 #ifdef __cplusplus
 }

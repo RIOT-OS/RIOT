@@ -101,6 +101,7 @@ typedef struct {
         mlme_activation_t activation;   /**< holds activation mechanism */
         void *dev_addr;                 /**< pointer to the dev_addr */
         uint8_t rx2_dr;                 /** datarate of second rx window */
+        bool link_check;                /**< whether link check is enabled or not */
     };
 } mlme_mib_t;
 
@@ -132,7 +133,6 @@ typedef struct {
     int16_t status;                         /**< status of the MLME confirm */
     mlme_type_t type;                       /**< type of the MLME confirm */
     union {
-        mlme_link_req_confirm_t link_req;   /**< Link Check confirmation data */
         mlme_mib_t mib;                     /**< MIB confirmation data */
     };
 } mlme_confirm_t;
@@ -161,21 +161,37 @@ typedef struct {
  */
 typedef struct {
     mlme_type_t type; /**< type of the MLME indication */
+    mlme_link_req_ind_t link_req;   /**< Link Check confirmation data */
 } mlme_indication_t;
+
+/**
+ * @brief Dispatch a GNRC LoRaWAN FSM event.
+ *
+ * @param[in] mac pointer to the MAC descriptor
+ * @param[in] fsm pointer to the FSM
+ * @param[in] event event to be dispatched.
+ */
+void gnrc_lorawan_dispatch_event(gnrc_lorawan_t *mac, gnrc_lorawan_state_t *fsm, gnrc_lorawan_event_t event);
 
 /**
  * @brief Indicate the MAC layer there was a timeout event
  *
  * @param[in] mac pointer to the MAC descriptor
  */
-void gnrc_lorawan_radio_rx_timeout_cb(gnrc_lorawan_t *mac);
+static inline void gnrc_lorawan_radio_rx_timeout_cb(gnrc_lorawan_t *mac)
+{
+    gnrc_lorawan_dispatch_event(mac, &mac->phy_fsm, GNRC_LORAWAN_EV_RX_TO);
+}
 
 /**
  * @brief Indicate the MAC layer when the transmission finished
  *
  * @param[in] mac pointer to the MAC descriptor
  */
-void gnrc_lorawan_radio_tx_done_cb(gnrc_lorawan_t *mac);
+static inline void gnrc_lorawan_radio_tx_done_cb(gnrc_lorawan_t *mac)
+{
+    gnrc_lorawan_dispatch_event(mac, &mac->phy_fsm, GNRC_LORAWAN_EV_TX_DONE);
+}
 
 /**
  * @brief Indicate the MAC layer reception of a frame went wrong.
@@ -185,15 +201,8 @@ void gnrc_lorawan_radio_tx_done_cb(gnrc_lorawan_t *mac);
 static inline void gnrc_lorawan_radio_rx_error_cb(gnrc_lorawan_t *mac)
 {
     /* The failed reception is seen by the MAC layer as an RX timeout */
-    gnrc_lorawan_radio_rx_timeout_cb(mac);
+    gnrc_lorawan_dispatch_event(mac, &mac->phy_fsm, GNRC_LORAWAN_EV_RX_ERROR);
 }
-
-/**
- * @brief Indicate the MAC layer that the timer was fired
- *
- * @param[in] mac pointer to the MAC descriptor
- */
-void gnrc_lorawan_timeout_cb(gnrc_lorawan_t *mac);
 
 /**
  * @brief Init GNRC LoRaWAN
@@ -201,8 +210,9 @@ void gnrc_lorawan_timeout_cb(gnrc_lorawan_t *mac);
  * @param[in] mac pointer to the MAC descriptor
  * @param[in] joineui pointer to Join EUI
  * @param[in] ctx pointer to LoRaWAN context
+ * @param[in] evq the event queue to post events to
  */
-void gnrc_lorawan_init(gnrc_lorawan_t *mac, uint8_t *joineui, const gnrc_lorawan_key_ctx_t *ctx);
+void gnrc_lorawan_init(gnrc_lorawan_t *mac, uint8_t *joineui, const gnrc_lorawan_key_ctx_t *ctx, event_queue_t *evq);
 
 /**
  * @brief Perform a MLME request
@@ -243,8 +253,13 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
  *            not successful.
  * @param[in] size size of the PSDU
  */
-void gnrc_lorawan_radio_rx_done_cb(gnrc_lorawan_t *mac, uint8_t *data,
-                                   size_t size);
+static inline void gnrc_lorawan_radio_rx_done_cb(gnrc_lorawan_t *mac, uint8_t *psdu, size_t size)
+{
+    assert(psdu);
+    iolist_t iol = {.iol_base = psdu, .iol_len = size};
+    mac->psdu = &iol;
+    gnrc_lorawan_dispatch_event(mac, &mac->phy_fsm, GNRC_LORAWAN_EV_RX_DONE);
+}
 
 /**
  * @brief MCPS indication callback
@@ -305,23 +320,6 @@ netdev_t *gnrc_lorawan_get_netdev(gnrc_lorawan_t *mac);
 int gnrc_lorawan_phy_set_channel_mask(gnrc_lorawan_t *mac, uint16_t channel_mask);
 
 /**
- * @brief Set a timer with the given time
- * @note Supposed to be implemented by the user of GNRC LoRaWAN
- *
- * @param[in] mac pointer to the MAC descriptor
- * @param us timeout microseconds
- */
-void gnrc_lorawan_set_timer(gnrc_lorawan_t *mac, uint32_t us);
-
-/**
- * @brief Remove the current timer
- * @note Supposed to be implemented by the user of GNRC LoRaWAN
- *
- * @param[in] mac pointer to the MAC descriptor
- */
-void gnrc_lorawan_remove_timer(gnrc_lorawan_t *mac);
-
-/**
  * @brief Set unconfirmed uplink redundancy
  *
  * @pre   @p redundancy <= 14
@@ -335,6 +333,24 @@ static inline void gnrc_lorawan_set_uncnf_redundancy(gnrc_lorawan_t *mac,
     assert(redundancy <= (0xF - 1));
     mac->mcps.redundancy = redundancy;
 }
+
+/**
+ * @brief Check whether GNRC LoRaWAN is busy
+ *
+ * @param[in] mac pointer to the MAC descriptor
+ *
+ * @return whether the state machine is busy or not
+ */
+bool gnrc_lorawan_is_busy(gnrc_lorawan_t *mac);
+
+/**
+ * @brief Check whether GNRC LoRaWAN has joined a network
+ *
+ * @param[in] mac pointer to the MAC descriptor
+ *
+ * @return whether the device is joined or not
+ */
+bool gnrc_lorawan_is_joined(gnrc_lorawan_t *mac);
 
 #ifdef __cplusplus
 }

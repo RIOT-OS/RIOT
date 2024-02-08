@@ -46,7 +46,7 @@
 #if IS_USED(MODULE_SX126X_STM32WL)
 static uint8_t sx126x_radio_wait_until_ready(sx126x_t *dev)
 {
-    if (dev->radio_sleep == true) {
+    if (sx126x_get_flag(dev, SX126X_FLAG_SLEEP)) {
         DEBUG("[sx126x_radio] : Wakeup radio \n");
         sx126x_hal_wakeup(dev);
     }
@@ -72,10 +72,10 @@ sx126x_hal_status_t sx126x_hal_write(const void *context,
 
         /* Check if radio is set to sleep or `RxDutyCycle` mode */
         if (command[0] == 0x84 || command[0] == 0x94) {
-            dev->radio_sleep = true;
+            sx126x_set_flag(dev, SX126X_FLAG_SLEEP);
         }
         else {
-            dev->radio_sleep = false;
+            sx126x_clear_flag(dev, SX126X_FLAG_SLEEP);
         }
 
         /* Pull NSS low */
@@ -173,7 +173,7 @@ sx126x_hal_status_t sx126x_hal_reset(const void *context)
         /* Clear Pending Flag */
         PWR->SCR = PWR_SCR_CWRFBUSYF;
 
-        dev->radio_sleep = true;
+        sx126x_set_flag(dev, SX126X_FLAG_SLEEP);
 #endif
     }
     else {
