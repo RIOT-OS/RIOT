@@ -105,6 +105,12 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
 bool _iid_is_iana_reserved(const eui64_t *iid);
 
 /**
+ * @param[in,out] dad_ctr
+ * @param[in] reason
+ */
+bool stable_privacy_should_retry_idgen(uint8_t *dad_ctr, const char *reason);
+
+/**
  * @brief
  * @pre @p iid is all 0 bits (iid->uint64.u64 == 0)
  * @param[out] iid

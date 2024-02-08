@@ -110,6 +110,18 @@ bool _iid_is_iana_reserved(const eui64_t *iid)
            || (iid->uint32[0].u32 == htonl(0xfdffffff) && iid->uint16[2].u16 == htons(0xffff) && iid->uint8[6] == 0xff && (iid->uint8[7] & 0x80));
 }
 
+inline bool stable_privacy_should_retry_idgen(uint8_t *dad_ctr, const char *reason) {
+    printf("%s", reason);
+    if (*dad_ctr < STABLE_PRIVACY_IDGEN_RETRIES) { //within retry limit
+        *dad_ctr += 1;
+        printf(", retrying IDGEN. (%u/%u)\n", *dad_ctr, STABLE_PRIVACY_IDGEN_RETRIES);
+        return true;
+    }
+    //retried often enough
+    printf(", not retrying: IDGEN_RETRIES limit reached\n");
+    return false;
+}
+
 uint8_t _ipv6_get_rfc7217_iid(eui64_t *iid, const gnrc_netif_t *netif, const ipv6_addr_t *pfx,
                               const uint8_t dad_ctr)
 {
