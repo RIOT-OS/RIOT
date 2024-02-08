@@ -287,7 +287,6 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
         assert(idx >= 0);
         retries = gnrc_netif_ipv6_addr_gen_retries(netif, idx);
     }
-    ipv6_addr_t addr_backup = *addr;
 #endif
     gnrc_netif_ipv6_addr_remove_internal(netif, addr);
 
@@ -296,7 +295,7 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
         if (retries >= TEMP_IDGEN_RETRIES) {
             //https://www.rfc-editor.org/rfc/rfc8981.html#section-3.4-3.7
             DEBUG("nib: Not regenerating temporary address, retried often enough.\n");
-            if (!gnrc_ipv6_nib_pl_reschedule_regen(netif->pid, &addr_backup, 0)) {
+            if (!gnrc_ipv6_nib_pl_reschedule_regen(netif->pid, addr, 0)) {
                 DEBUG("nib: Removing regen event timer failed\n");
                 assert(false);
             }
@@ -307,7 +306,7 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
 
         //find associated prefix
         uint32_t slaac_prefix_pref_until;
-        if (!_get_slaac_prefix_pref_until(netif, &addr_backup, &slaac_prefix_pref_until)) {
+        if (!_get_slaac_prefix_pref_until(netif, addr, &slaac_prefix_pref_until)) {
             // at least one match is expected,
             // the temporary address smh outlived the SLAAC prefix valid lft
             assert(false);
@@ -319,7 +318,7 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
         // else the temporary address smh outlived the SLAAC prefix preferred lft
         int idx;
         int32_t ta_max_pref_lft;
-        ta_max_pref_lft = _generate_temporary_addr(netif, &addr_backup,
+        ta_max_pref_lft = _generate_temporary_addr(netif, addr,
                                                    slaac_prefix_pref_until - now,
                                                    retries,
                                                    &idx);
@@ -329,7 +328,7 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
         }
 
         //re-schedule regen event (incl. deleting old one)
-        if (!gnrc_ipv6_nib_pl_reschedule_regen(netif->pid, &addr_backup, ta_max_pref_lft -
+        if (!gnrc_ipv6_nib_pl_reschedule_regen(netif->pid, addr, ta_max_pref_lft -
                 _get_netif_regen_advance(netif))) {
             DEBUG("nib: Temporary address regeneration failed after DAD failure, "
                   "SLAAC prefix was not found to reschedule address regeneration timer.\n");
