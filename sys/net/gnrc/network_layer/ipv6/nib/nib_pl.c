@@ -161,7 +161,7 @@ bool gnrc_ipv6_nib_pl_reschedule_regen(const unsigned int iface, const ipv6_addr
         }
     }
     _nib_release();
-    
+
     return result;
 }
 #endif
