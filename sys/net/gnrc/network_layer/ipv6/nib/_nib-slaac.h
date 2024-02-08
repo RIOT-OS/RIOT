@@ -131,7 +131,7 @@ void _ipv6_get_random_iid(eui64_t *iid);
  * @param[in] netif The interface, as the value depends on this.
  * @return REGEN_ADVANCE [seconds]
  */
-uint32_t gnrc_netif_ipv6_regen_advance(const gnrc_netif_t *netif);
+uint32_t _get_netif_regen_advance(const gnrc_netif_t *netif);
 
 /**
  * @brief For an address, get the corresponding SLAAC prefix's preferred lifetime

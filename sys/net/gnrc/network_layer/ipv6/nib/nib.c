@@ -1536,7 +1536,8 @@ static void _handle_regen_temp_addr(_nib_offl_entry_t *pfx) {
         DEBUG("nib: Temporary address regeneration failed.\n");
         return;
     }
-    _evtimer_add(pfx, GNRC_IPV6_NIB_REGEN_TEMP_ADDR, &pfx->regen_temp_addr, ta_max_pref_lft - gnrc_netif_ipv6_regen_advance(netif)); //add next regen timer
+    _evtimer_add(pfx, GNRC_IPV6_NIB_REGEN_TEMP_ADDR, &pfx->regen_temp_addr, ta_max_pref_lft -
+            _get_netif_regen_advance(netif)); //add next regen timer
 }
 #endif
 
@@ -1808,7 +1809,8 @@ static uint32_t _handle_pio(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
             if (ta_max_pref_lft > 0) {
                 // a temporary address was created
-                _evtimer_add(pfx, GNRC_IPV6_NIB_REGEN_TEMP_ADDR, &pfx->regen_temp_addr, ta_max_pref_lft - gnrc_netif_ipv6_regen_advance(netif));
+                _evtimer_add(pfx, GNRC_IPV6_NIB_REGEN_TEMP_ADDR, &pfx->regen_temp_addr, ta_max_pref_lft -
+                        _get_netif_regen_advance(netif));
             }
 #endif
             return _min(pref_ltime, valid_ltime);
