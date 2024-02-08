@@ -159,6 +159,20 @@ ssize_t stdio_read(void* buffer, size_t max_len);
 ssize_t stdio_write(const void* buffer, size_t len);
 
 /**
+ * @brief write @p len bytes from @p buffer into STDOUT
+ *
+ * @param[in]   buffer  buffer to read from
+ * @param[in]   len     number of bytes to write
+ *
+ * @return 0 after all bytes have been sent
+ * @return <0 on error
+ *
+ * This convenience function calls stdio_write as long as not all bytes have
+ * sent to @ref stdio_write, or until an error was returned.
+ */
+ssize_t stdio_write_all(const void* buffer, size_t len);
+
+/**
  * @brief Disable stdio and detach stdio providers
  */
 void stdio_close(void);

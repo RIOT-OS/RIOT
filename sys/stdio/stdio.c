@@ -68,6 +68,21 @@ void stdio_close(void) {
 #define MAYBE_WEAK __attribute__((weak))
 #endif
 
+ssize_t stdio_write_all(const void* buffer, size_t len)
+{
+    while (len > 0) {
+        ssize_t written = stdio_provider_xfa[i].write(buffer, len);
+        if (written < 0) {
+            return written;
+            break;
+        }
+        buffer += written;
+        len -= written;
+    }
+
+    return 0;
+}
+
 MAYBE_WEAK
 ssize_t stdio_read(void* buffer, size_t len)
 {
