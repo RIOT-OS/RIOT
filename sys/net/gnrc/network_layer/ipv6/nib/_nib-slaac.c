@@ -108,18 +108,18 @@ int32_t _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx, co
           ipv6_addr_to_str(addr_str, pfx, sizeof(addr_str)),
           64, netif->pid);
 
-    if (pfx_pref_ltime <= gnrc_netif_ipv6_regen_advance(netif)) {
+    if (pfx_pref_ltime <= _get_netif_regen_advance(netif)) {
         DEBUG("nib: Abort adding temporary address because prefix's preferred lifetime too short (%u <= %u)\n",
-              pfx_pref_ltime, gnrc_netif_ipv6_regen_advance(netif));
+              pfx_pref_ltime, _get_netif_regen_advance(netif));
         return -1;
     }
     const uint32_t ta_max_pref_lft = TEMP_PREFERRED_LIFETIME - random_uint32_range(0, MAX_DESYNC_FACTOR + 1);
-    if (ta_max_pref_lft <= gnrc_netif_ipv6_regen_advance(netif)) {
+    if (ta_max_pref_lft <= _get_netif_regen_advance(netif)) {
         DEBUG("nib: Abort adding temporary address because configured "
               "TEMP_PREFERRED_LIFETIME (%lu) too short or MAX_DESYNC_FACTOR too high (%lu)\n",
               TEMP_PREFERRED_LIFETIME, MAX_DESYNC_FACTOR);
 
-        assert(MAX_DESYNC_FACTOR < TEMP_PREFERRED_LIFETIME - gnrc_netif_ipv6_regen_advance(netif));
+        assert(MAX_DESYNC_FACTOR < TEMP_PREFERRED_LIFETIME - _get_netif_regen_advance(netif));
         //https://www.rfc-editor.org/rfc/rfc8981.html#section-3.8-7.2
 
         return -1;
@@ -166,7 +166,7 @@ void _ipv6_get_random_iid(eui64_t *iid)
     } while (_iid_is_iana_reserved(iid));
 }
 
-uint32_t gnrc_netif_ipv6_regen_advance(const gnrc_netif_t *netif)
+uint32_t _get_netif_regen_advance(const gnrc_netif_t *netif)
 {
     return 2 + (TEMP_IDGEN_RETRIES *
     (gnrc_netif_ipv6_dad_transmits(netif) * (netif->ipv6.retrans_time / 1000))
@@ -308,7 +308,8 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
         }
 
         //re-schedule regen event (incl. deleting old one)
-        if (!gnrc_ipv6_nib_pl_reschedule_regen(netif->pid, &addr_backup, ta_max_pref_lft - gnrc_netif_ipv6_regen_advance(netif))) {
+        if (!gnrc_ipv6_nib_pl_reschedule_regen(netif->pid, &addr_backup, ta_max_pref_lft -
+                _get_netif_regen_advance(netif))) {
             DEBUG("nib: Temporary address regeneration failed after DAD failure, SLAAC prefix was not found to reschedule address regeneration timer.\n");
             gnrc_netif_ipv6_addr_remove_internal(netif, &netif->ipv6.addrs[idx]); //delete just created temp addr
             assert(false);
