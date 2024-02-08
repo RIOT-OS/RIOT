@@ -24,6 +24,7 @@
 #include "net/eui48.h"
 #include "net/gnrc/netif.h"
 #include "net/ieee802154.h"
+#include "net/sixlowpan/nd.h"
 #include "net/l2util.h"
 
 #if IS_USED(MODULE_GNRC_NETIF_IPV6)
