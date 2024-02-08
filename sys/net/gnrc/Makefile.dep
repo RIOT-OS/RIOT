@@ -441,6 +441,21 @@ ifneq (,$(filter gnrc_ipv6_nib,$(USEMODULE)))
   USEMODULE += random
 endif
 
+#This checks if the option is being set via Kconfig or CFLAGS
+ifneq (,$(or $(CONFIG_GNRC_IPV6_STABLE_PRIVACY),$(filter -DCONFIG_GNRC_IPV6_STABLE_PRIVACY=1,$(CFLAGS))))
+  # Set another macro that is needed for this option.
+
+  ##prepare value
+  stable_privacy_secret_key != python3 -c "import secrets; print(','.join([f'0x{byte:02x}' for byte in secrets.token_bytes(16)]))"
+
+  ##set macro
+  CFLAGS += -DSTABLE_PRIVACY_SECRET_KEY=$(stable_privacy_secret_key)
+
+  # dependencies
+  USEMODULE += hashes ##include "hashes/sha256.h"
+  USEMODULE += ztimer_msec
+endif
+
 ifneq (,$(filter gnrc_udp,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_gnrc_udp
   USEMODULE += gnrc_nettype_udp
