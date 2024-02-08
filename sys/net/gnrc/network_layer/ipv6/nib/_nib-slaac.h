@@ -36,7 +36,7 @@ extern "C" {
 
 /**
  * @name    Temporary address parameters
- * @see     [RFC 8981, section 3.8](https://tools.ietf.org/html/rfc8981#section-3.8)
+ * @see     [RFC 8981, section 3.8](https://www.rfc-editor.org/rfc/rfc8981.html#section-3.8)
  * @{
  */
 /**
@@ -127,7 +127,7 @@ void _ipv6_get_random_iid(eui64_t *iid);
 
 /**
  * @brief Get the duration in seconds at which regeneration of a temporary address should be started before deprecation of the current one.
- * @see https://datatracker.ietf.org/doc/html/rfc8981#section-3.8-3.2
+ * @see https://www.rfc-editor.org/rfc/rfc8981.html#section-3.8-3.2
  * @param[in] netif The interface, as the value depends on this.
  * @return REGEN_ADVANCE [seconds]
  */

@@ -120,7 +120,7 @@ int32_t _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx, co
               TEMP_PREFERRED_LIFETIME, MAX_DESYNC_FACTOR);
 
         assert(MAX_DESYNC_FACTOR < TEMP_PREFERRED_LIFETIME - gnrc_netif_ipv6_regen_advance(netif));
-        //https://datatracker.ietf.org/doc/html/rfc8981#section-3.8-7.2
+        //https://www.rfc-editor.org/rfc/rfc8981.html#section-3.8-7.2
 
         return -1;
     }
