@@ -270,8 +270,33 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
     DEBUG("nib: other node has TENTATIVE address %s assigned "
           "=> removing that address\n",
           ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)));
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
+    int idx = gnrc_netif_ipv6_addr_idx(netif, addr);
+    assert(idx >= 0);
+    uint8_t dad_counter = gnrc_netif_ipv6_addr_gen_retries(netif, idx);
+#endif
     gnrc_netif_ipv6_addr_remove_internal(netif, addr);
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
+    if (stable_privacy_should_retry_idgen(&dad_counter, "Duplicate address detected")) {
+
+        //> Hosts SHOULD introduce a random delay between 0 and IDGEN_DELAY seconds
+        //- https://datatracker.ietf.org/doc/html/rfc7217#section-6
+        uint32_t random_delay_ms = random_uint32_range(0, STABLE_PRIVACY_IDGEN_DELAY_MS);
+        ztimer_sleep(ZTIMER_MSEC, random_delay_ms);
+
+        _auto_configure_addr_with_dad_ctr(netif, addr, SLAAC_PREFIX_LENGTH, dad_counter);
+    } else {
+        //"hosts MUST NOT automatically fall back to employing other algorithms for generating Interface Identifiers"
+        //- https://datatracker.ietf.org/doc/html/rfc7217#section-6
+
+        //> If the address is a link-local address
+        //> [...]
+        //> not formed from an interface identifier based on the hardware address
+        //> IP operation on the interface MAY be continued
+        //- https://datatracker.ietf.org/doc/html/rfc4862#section-5.4.5
+    }
+#else
     if (!ipv6_addr_is_link_local(addr) ||
         !_try_addr_reconfiguration(netif)) {
         /* Cannot use target address as personal address and can
@@ -287,6 +312,7 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
                   "but DHCPv6 is not provided", netif->pid);
         }
     }
+#endif
 }
 
 static int _get_netif_state(gnrc_netif_t **netif, const ipv6_addr_t *addr)
