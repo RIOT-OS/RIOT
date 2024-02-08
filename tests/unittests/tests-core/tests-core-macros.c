@@ -32,6 +32,15 @@ static void test_min(void)
     TEST_ASSERT(5.5 == MIN(22.1, 5.5));
 }
 
+static void test_abs(void)
+{
+    TEST_ASSERT_EQUAL_INT(22, ABS(22));
+    TEST_ASSERT_EQUAL_INT(22, ABS(-22));
+
+    // prove it works with non-integer types
+    TEST_ASSERT(300.7 == ABS(-300.7));
+}
+
 static void test_limit(void)
 {
     TEST_ASSERT_EQUAL_INT(5, LIMIT(5, -10, 10));
@@ -114,6 +123,7 @@ Test *tests_core_macros_tests(void)
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_max),
         new_TestFixture(test_min),
+        new_TestFixture(test_abs),
         new_TestFixture(test_limit),
         new_TestFixture(test_math_signof),
         new_TestFixture(test_math_div_round),
