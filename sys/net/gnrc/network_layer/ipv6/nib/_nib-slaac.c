@@ -209,6 +209,7 @@ uint8_t _ipv6_get_rfc7217_iid(eui64_t *iid, const gnrc_netif_t *netif, const ipv
 #endif
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC)
+#if !IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
 static bool _try_l2addr_reconfiguration(gnrc_netif_t *netif)
 {
     uint8_t hwaddr[GNRC_NETIF_L2ADDR_MAXLEN];
@@ -264,6 +265,7 @@ static bool _try_addr_reconfiguration(gnrc_netif_t *netif)
     }
     return hwaddr_reconf;
 }
+#endif
 
 void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
 {
