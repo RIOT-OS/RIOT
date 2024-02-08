@@ -48,7 +48,7 @@ extern "C" {
  */
 #define SLAAC_PREFIX_LENGTH (64U)
 
-/*
+/**
  * "the address architecture [RFC4291] also defines the length of the interface identifiers"
  * - https://datatracker.ietf.org/doc/html/rfc4862#section-2
  *
