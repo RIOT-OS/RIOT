@@ -173,7 +173,7 @@ uint32_t gnrc_netif_ipv6_regen_advance(const gnrc_netif_t *netif)
     );
 }
 
-bool get_slaac_prefix_pref_until(const gnrc_netif_t *netif, const ipv6_addr_t *addr, uint32_t *slaac_prefix_pref_until) {
+bool _get_slaac_prefix_pref_until(const gnrc_netif_t *netif, const ipv6_addr_t *addr, uint32_t *slaac_prefix_pref_until) {
     void *state = NULL;
     gnrc_ipv6_nib_pl_t ple;
     while (gnrc_ipv6_nib_pl_iter(netif->pid, &state, &ple)) {
@@ -290,7 +290,7 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
 
         //find associated prefix
         uint32_t slaac_prefix_pref_until;
-        if (!get_slaac_prefix_pref_until(netif, &addr_backup, &slaac_prefix_pref_until)) {
+        if (!_get_slaac_prefix_pref_until(netif, &addr_backup, &slaac_prefix_pref_until)) {
             // at least one match is expected,
             // the temporary address smh outlived the SLAAC prefix valid lft
             assert(false);
