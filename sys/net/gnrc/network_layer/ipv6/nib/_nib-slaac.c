@@ -109,6 +109,63 @@ bool _iid_is_iana_reserved(const eui64_t *iid)
            || (iid->uint32[0].u32 == htonl(0x02005eff) && iid->uint8[4] == 0xfe)
            || (iid->uint32[0].u32 == htonl(0xfdffffff) && iid->uint16[2].u16 == htons(0xffff) && iid->uint8[6] == 0xff && (iid->uint8[7] & 0x80));
 }
+
+uint8_t _ipv6_get_rfc7217_iid(eui64_t *iid, const gnrc_netif_t *netif, const ipv6_addr_t *pfx,
+                              const uint8_t dad_ctr)
+{
+#ifndef STABLE_PRIVACY_SECRET_KEY
+#error "Stable privacy requires a secret_key, this should have been configured by sys/net/gnrc/Makefile.dep"
+#endif
+    const uint8_t secret_key[16] = { STABLE_PRIVACY_SECRET_KEY };
+    //SHOULD be of at least 128 bits - https://datatracker.ietf.org/doc/html/rfc7217
+
+    uint8_t digest[SHA256_DIGEST_LENGTH];
+
+    {
+        sha256_context_t c;
+        sha256_init(&c);
+        sha256_update(&c, pfx, sizeof(*pfx));
+
+#if GNRC_NETIF_L2ADDR_MAXLEN > 0
+        if (netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR) {
+            sha256_update(&c, &netif->l2addr, netif->l2addr_len);
+        } else
+#endif
+            sha256_update(&c, &netif->pid, sizeof(netif->pid));
+
+        sha256_update(&c, &dad_ctr, sizeof(dad_ctr));
+        sha256_update(&c, secret_key, sizeof(secret_key));
+        sha256_final(&c, digest);
+    }
+
+    assert(iid->uint64.u64 == 0);
+    assert(sizeof(digest) >= sizeof(*iid)); //as bits: 256 >= 64 //digest is large enough
+
+    //copy digest into IID
+    //RFC 7217 says "starting from the least significant bit",
+    //i.e. in reverse order
+    for (uint8_t i = 0; i < sizeof(*iid); i++) { //for each of the 8 bytes
+        for (int j = 0; j < 8; j++) { //for each of the 8 bits _within byte_
+            if ((digest[(sizeof(digest)-1)-i])&(1<<j)) { //is 1 //reverse order
+                iid->uint8[i] |= 1 << ((8-1)-j); //set 1 //precondition: *iid = 0
+            }
+        }
+    }
+
+    /* "The resulting Interface Identifier SHOULD be compared against
+     * the reserved IPv6 Interface Identifiers"
+     * - https://datatracker.ietf.org/doc/html/rfc7217#section-5 */
+    if (_iid_is_iana_reserved(iid)) {
+        if (!stable_privacy_should_retry_idgen(&dad_ctr,
+                                               "IANA reserved IID generated")) {
+            return -1;
+        }
+        iid->uint64.u64 = 0; /* @pre for method call */
+        return _ipv6_get_rfc7217_iid(iid, netif, pfx, dad_ctr);
+    }
+
+    return dad_ctr;
+}
 #endif
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC)

@@ -103,6 +103,21 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
  * @return whether the IID is IANA reserved
  */
 bool _iid_is_iana_reserved(const eui64_t *iid);
+
+/**
+ * @brief
+ * @pre @p iid is all 0 bits (iid->uint64.u64 == 0)
+ * @param[out] iid
+ * @param[in] netif The network interface to use as source for IID generation.
+ * ("Net_iface" in rfc7217)
+ * @param[in] pfx The prefix for which the IID is to be generated.
+ * ("Prefix" in rfc7217)
+ * @param[in] dad_ctr ("DAD_Counter" in rfc7217)
+ * @return new value of DAD_Counter, to be stored associated with the address
+ * @return -1 if failed, because retry limit reached
+ */
+uint8_t _ipv6_get_rfc7217_iid(eui64_t *iid, const gnrc_netif_t *netif, const ipv6_addr_t *pfx,
+                              uint8_t dad_ctr);
 #endif
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC) || defined(DOXYGEN)
