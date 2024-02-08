@@ -193,6 +193,13 @@ extern "C" {
 #endif
 
 /**
+ * @brief Use stable privacy addresses (rfc7217)
+ */
+#ifndef CONFIG_GNRC_IPV6_STABLE_PRIVACY
+#define CONFIG_GNRC_IPV6_STABLE_PRIVACY 0
+#endif
+
+/**
  * @brief    handle Redirect Messages
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_REDIRECT
