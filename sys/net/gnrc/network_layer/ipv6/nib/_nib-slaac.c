@@ -277,7 +277,12 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
     if (is_temp_addr) {
         if (retries >= TEMP_IDGEN_RETRIES) {
+            //https://www.rfc-editor.org/rfc/rfc8981.html#section-3.4-3.7
             DEBUG("nib: Not regenerating temporary address, retried often enough.\n");
+            if (!gnrc_ipv6_nib_pl_reschedule_regen(netif->pid, &addr_backup, 0)) {
+                DEBUG("nib: Removing regen event timer failed\n");
+                assert(false);
+            }
             return;
         }
         retries++;
