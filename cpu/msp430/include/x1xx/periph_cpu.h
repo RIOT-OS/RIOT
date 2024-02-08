@@ -220,7 +220,7 @@ extern const msp430_usart_uart_params_t usart1_as_uart;
 extern const msp430_usart_spi_params_t usart0_as_spi;
 
 /**
- * @brief   MSP430 x1xx USART1 in UART configuration
+ * @brief   MSP430 x1xx USART1 in SPI configuration
  */
 extern const msp430_usart_spi_params_t usart1_as_spi;
 
