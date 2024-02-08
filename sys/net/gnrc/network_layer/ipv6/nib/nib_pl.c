@@ -139,7 +139,8 @@ bool gnrc_ipv6_nib_pl_has_prefix(const unsigned int iface, const ipv6_addr_t *pf
     return false;
 }
 
-bool gnrc_ipv6_nib_pl_reschedule_regen(const unsigned int iface, const ipv6_addr_t *pfx, const uint32_t offset)
+bool gnrc_ipv6_nib_pl_reschedule_regen(const unsigned int iface, const ipv6_addr_t *pfx,
+                                       const uint32_t offset)
 {
     //adapted from gnrc_ipv6_nib_pl_iter
     _nib_offl_entry_t *dst = NULL;
