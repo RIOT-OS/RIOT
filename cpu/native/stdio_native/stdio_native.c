@@ -9,24 +9,17 @@
 /**
  * @file
  * @author Martine S. Lenders <m.lenders@fu-berlin.de>
+ * @author Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
 #include "async_read.h"
 #include "kernel_defines.h"
 #include "native_internal.h"
-#include "isrpipe.h"
 
 #include "stdio_base.h"
 
-#ifndef STDIO_NATIVE_RX_BUFSIZE
-#define STDIO_NATIVE_RX_BUFSIZE (64)
-#endif
-
-static uint8_t _rx_buf_mem[STDIO_NATIVE_RX_BUFSIZE];
-static isrpipe_t stdio_isrpipe = ISRPIPE_INIT(_rx_buf_mem);
-
 static void _async_read_wrapper(int fd, void *arg) {
-    uint8_t buf[1];
+    uint8_t buf[STDIO_RX_BUFSIZE];
 
     int res = real_read(fd, &buf, sizeof(buf));
     if (res > 0) {
@@ -36,18 +29,20 @@ static void _async_read_wrapper(int fd, void *arg) {
     native_async_read_continue(fd);
 }
 
-void stdio_init(void)
+static void _init(void)
 {
     native_async_read_setup();
-    native_async_read_add_int_handler(STDIN_FILENO, &stdio_isrpipe, _async_read_wrapper);
+    if (IS_USED(MODULE_STDIN)) {
+        native_async_read_add_int_handler(STDIN_FILENO, &stdin_isrpipe,
+                                          _async_read_wrapper);
+    }
 }
 
-ssize_t stdio_read(void* buffer, size_t max_len)
-{
-    return (ssize_t)isrpipe_read(&stdio_isrpipe, buffer, max_len);
-}
-
-ssize_t stdio_write(const void* buffer, size_t len)
+static ssize_t _write(const void* buffer, size_t len)
 {
     return real_write(STDOUT_FILENO, buffer, len);
 }
+
+STDIO_PROVIDER(STDIO_NATIVE, _init, NULL, _write)
+
+/** @} */

@@ -166,7 +166,7 @@ ssize_t _native_read(int fd, void *buf, size_t count)
 {
     ssize_t r;
 
-    if (fd == STDIN_FILENO) {
+    if (fd == STDIN_FILENO && IS_USED(MODULE_STDIN)) {
         return stdio_read(buf, count);
     }
 

@@ -17,10 +17,6 @@ ifeq (,$(filter stdio_%,$(USEMODULE)))
   USEMODULE += stdio_native
 endif
 
-ifneq (,$(filter stdio_native,$(USEMODULE)))
-  USEMODULE += isrpipe
-endif
-
 ifneq (,$(filter periph_rtc,$(USEMODULE)))
   USEMODULE += ztimer
   USEMODULE += ztimer_msec
