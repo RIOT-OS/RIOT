@@ -49,6 +49,7 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+#include "../network_layer/ipv6/nib/_nib-slaac.h"
 
 static void _update_l2addr_from_dev(gnrc_netif_t *netif);
 static void _check_netdev_capabilities(netdev_t *dev, bool legacy);
@@ -269,8 +270,23 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
             }
             break;
         case NETOPT_IPV6_IID:
-            assert(opt->data_len >= sizeof(eui64_t));
-            res = gnrc_netif_ipv6_get_iid(netif, opt->data);
+            switch ((int16_t)opt->context) {
+                case NETOPT_IPV6_IID_HWADDR:
+                    assert(opt->data_len >= sizeof(eui64_t));
+                    res = gnrc_netif_ipv6_get_iid(netif, opt->data);
+                    break;
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
+                case NETOPT_IPV6_IID_RFC7217:
+                    assert(opt->data_len == sizeof(netopt_ipv6_rfc7217_iid_data));
+                    netopt_ipv6_rfc7217_iid_data *data =
+                            (netopt_ipv6_rfc7217_iid_data *) opt->data;
+                    res = _ipv6_get_rfc7217_iid(
+                            data->iid, netif, data->pfx, data->dad_ctr);
+                    break;
+#endif
+                default:
+                    break;
+            }
             break;
         case NETOPT_MAX_PDU_SIZE:
             if (opt->context == GNRC_NETTYPE_IPV6) {
@@ -1328,8 +1344,22 @@ int gnrc_netif_ipv6_add_prefix(gnrc_netif_t *netif,
     assert(netif != NULL);
     DEBUG("gnrc_netif: (re-)configure prefix %s/%d\n",
           ipv6_addr_to_str(addr_str, pfx, sizeof(addr_str)), pfx_len);
-    if (gnrc_netapi_get(netif->pid, NETOPT_IPV6_IID, 0, &iid,
-                        sizeof(eui64_t)) >= 0) {
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
+    uint8_t dad_ctr;
+    netopt_ipv6_rfc7217_iid_data data;
+    data.iid = &iid;
+    data.pfx = pfx;
+    data.dad_ctr = &dad_ctr;
+    /* no need to store dad_ctr with address (via flags)
+     * as it can't fail DAD, since already valid */
+#endif
+    if (gnrc_netapi_get(netif->pid, NETOPT_IPV6_IID,
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
+                        NETOPT_IPV6_IID_RFC7217, &data, sizeof(data)
+#else
+                        NETOPT_IPV6_IID_HWADDR, &iid, sizeof(eui64_t)
+#endif
+                        ) >= 0) {
         ipv6_addr_set_aiid(&addr, iid.uint8);
     }
     else {

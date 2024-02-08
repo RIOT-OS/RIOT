@@ -181,7 +181,10 @@ int _ipv6_get_rfc7217_iid(eui64_t *iid, const gnrc_netif_t *netif, const ipv6_ad
         sha256_final(&c, digest);
     }
 
-    assert(iid->uint64.u64 == 0);
+    iid->uint64.u64 = 0;
+    //uninitialized if called via gnrc_netapi_get (NETOPT_IPV6_IID_RFC7217)
+    //needs to be all zeros as precondition for the following copy operation
+
     assert(sizeof(digest) >= sizeof(*iid)); //as bits: 256 >= 64 //digest is large enough
 
     //copy digest into IID
@@ -190,7 +193,7 @@ int _ipv6_get_rfc7217_iid(eui64_t *iid, const gnrc_netif_t *netif, const ipv6_ad
     for (uint8_t i = 0; i < sizeof(*iid); i++) { //for each of the 8 bytes
         for (int j = 0; j < 8; j++) { //for each of the 8 bits _within byte_
             if ((digest[(sizeof(digest)-1)-i])&(1<<j)) { //is 1 //reverse order
-                iid->uint8[i] |= 1 << ((8-1)-j); //set 1 //precondition: *iid = 0
+                iid->uint8[i] |= 1 << ((8-1)-j); //set 1 //precondition: iid->uint8[i] = 0
             }
         }
     }

@@ -26,6 +26,8 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <net/ipv6/addr.h>
+#include "eui64.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -909,6 +911,23 @@ typedef enum {
                                  *   not listening to packets. */
     /* add other states if needed */
 } netopt_state_t;
+
+/**
+ * @brief   Option parameter to be used with @ref NETOPT_IPV6_IID
+ */
+enum {
+    NETOPT_IPV6_IID_HWADDR = 0,
+    NETOPT_IPV6_IID_RFC7217,
+};
+
+/**
+ * @brief       Data for @ref NETOPT_IPV6_IID when using RFC7217
+ */
+typedef struct {
+    eui64_t *iid;
+    const ipv6_addr_t *pfx;
+    uint8_t *dad_ctr;
+} netopt_ipv6_rfc7217_iid_data;
 
 /**
  * @brief   Option parameter to be used with @ref NETOPT_RF_TESTMODE
