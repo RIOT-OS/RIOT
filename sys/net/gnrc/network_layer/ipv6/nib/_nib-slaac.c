@@ -64,10 +64,6 @@ void _auto_configure_addr_with_dad_ctr(gnrc_netif_t *netif,
         return;
     }
 #endif
-    if (!(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR)) {
-        DEBUG("nib: interface %i has no link-layer addresses\n", netif->pid);
-        return;
-    }
     DEBUG("nib: add address based on %s/%u automatically to interface %u\n",
           ipv6_addr_to_str(addr_str, pfx, sizeof(addr_str)),
           pfx_len, netif->pid);
@@ -80,6 +76,10 @@ void _auto_configure_addr_with_dad_ctr(gnrc_netif_t *netif,
     }
     flags |= (dad_ctr << GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES_POS);
 #else
+    if (!(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR)) {
+        DEBUG("nib: interface %i has no link-layer addresses\n", netif->pid);
+        return;
+    }
     if (gnrc_netif_ipv6_get_iid(netif, (eui64_t *)&addr.u64[1]) < 0) {
         DEBUG("nib: Can't get IID on interface %u\n", netif->pid);
         return;
