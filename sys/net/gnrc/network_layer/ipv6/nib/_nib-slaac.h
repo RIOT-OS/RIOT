@@ -88,6 +88,14 @@ extern "C" {
  */
 void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
                           uint8_t pfx_len);
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY) || defined(DOXYGEN)
+/**
+ * @param dad_ctr rfc7217 DAD_Counter
+ */
+void _auto_configure_addr_with_dad_ctr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
+                          uint8_t pfx_len, uint8_t dad_ctr);
+#endif
+
 #else   /* CONFIG_GNRC_IPV6_NIB_6LN || CONFIG_GNRC_IPV6_NIB_SLAAC */
 #define _auto_configure_addr(netif, pfx, pfx_len) \
     (void)netif; (void)pfx; (void)pfx_len;

@@ -36,8 +36,20 @@
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) || IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC)
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
+#if !IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
 void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
                           uint8_t pfx_len)
+#else
+inline void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
+                          uint8_t pfx_len)
+{
+    _auto_configure_addr_with_dad_ctr(netif, pfx, pfx_len, 0);
+}
+
+void _auto_configure_addr_with_dad_ctr(gnrc_netif_t *netif,
+                                       const ipv6_addr_t *pfx, uint8_t pfx_len,
+                                       uint8_t dad_ctr)
+#endif
 {
     ipv6_addr_t addr = IPV6_ADDR_UNSPECIFIED;
     int idx;
