@@ -728,7 +728,7 @@ void _nib_offl_remove_prefix(_nib_offl_entry_t *pfx)
             /* remove prefixes that manage a temporary address */
             ipv6_addr_t temp_addr;
             void *state = NULL;
-            while (iter_slaac_prefix_to_temp_addr(netif, &pfx->pfx, state, &temp_addr)) {
+            while (_iter_slaac_prefix_to_temp_addr(netif, &pfx->pfx, state, &temp_addr)) {
                 gnrc_ipv6_nib_pl_del(netif->pid, &temp_addr, IPV6_ADDR_BIT_LEN);
             }
         }
