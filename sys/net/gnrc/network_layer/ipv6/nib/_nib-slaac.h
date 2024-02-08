@@ -71,7 +71,7 @@ extern "C" {
 
 /**
  * @brief   Maximum preferred lifetime [days] of a temporary address
- * 
+ *
  * @note    "MUST be smaller than the TEMP_VALID_LIFETIME value"
  */
 #ifndef TEMP_PREFERRED_LIFETIME
