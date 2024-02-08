@@ -173,7 +173,8 @@ static inline uint8_t gnrc_netif_ipv6_addr_dad_trans(const gnrc_netif_t *netif,
 static inline uint8_t gnrc_netif_ipv6_addr_gen_retries(const gnrc_netif_t *netif,
                                                      int idx)
 {
-    return (netif->ipv6.addrs_flags[idx] & GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES) >> GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES_POS;
+    return (netif->ipv6.addrs_flags[idx] & GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES)
+            >> GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES_POS;
 }
 #endif
 
