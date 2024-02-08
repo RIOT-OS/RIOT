@@ -44,6 +44,7 @@ static ssize_t _write(const void* buffer, size_t len)
     return (char *)buffer - start;
 }
 
+#ifdef MODULE_STDIN
 void tud_cdc_rx_cb(uint8_t itf)
 {
     (void)itf;
@@ -52,5 +53,6 @@ void tud_cdc_rx_cb(uint8_t itf)
     unsigned res = tud_cdc_read(buffer, sizeof(buffer));
     isrpipe_write(&stdin_isrpipe, buffer, res);
 }
+#endif
 
 STDIO_PROVIDER(STDIO_TINYUSB_CDC_ACM, NULL, NULL, _write)
