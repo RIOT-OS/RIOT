@@ -74,10 +74,15 @@ void _auto_configure_addr_with_dad_ctr(gnrc_netif_t *netif,
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     bool new_address = false;
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
+    dad_ctr = _ipv6_get_rfc7217_iid((eui64_t *) &addr.u64[1], netif, pfx, dad_ctr);
+    flags |= (dad_ctr << GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES_POS);
+#else
     if (gnrc_netif_ipv6_get_iid(netif, (eui64_t *)&addr.u64[1]) < 0) {
         DEBUG("nib: Can't get IID on interface %u\n", netif->pid);
         return;
     }
+#endif
     ipv6_addr_init_prefix(&addr, pfx, pfx_len);
     if ((idx = gnrc_netif_ipv6_addr_idx(netif, &addr)) < 0) {
         if ((idx = gnrc_netif_ipv6_addr_add_internal(netif, &addr, pfx_len,
@@ -89,6 +94,17 @@ void _auto_configure_addr_with_dad_ctr(gnrc_netif_t *netif,
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
         new_address = true;
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
+    } else {
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
+        /*"the same network prefix" - https://datatracker.ietf.org/doc/html/rfc7217#section-5*/
+        /*"unacceptable identifier" -> retry IDGEN (dad_ctr+1)*/
+        if (!stable_privacy_should_retry_idgen(&dad_ctr, "Generated address already exists")) {
+            return;
+        }
+
+        _auto_configure_addr_with_dad_ctr(netif, pfx, pfx_len, dad_ctr);
+        return;
+#endif
     }
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
