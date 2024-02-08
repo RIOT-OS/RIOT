@@ -126,12 +126,13 @@ bool stable_privacy_should_retry_idgen(uint8_t *dad_ctr, const char *reason);
  * ("Net_iface" in rfc7217)
  * @param[in] pfx The prefix for which the IID is to be generated.
  * ("Prefix" in rfc7217)
- * @param[in] dad_ctr ("DAD_Counter" in rfc7217)
- * @return new value of DAD_Counter, to be stored associated with the address
+ * @param[in,out] dad_ctr ("DAD_Counter" in rfc7217)
+ * Value may increase and is to be stored associated with the address by caller
+ * @return 0 on success
  * @return -1 if failed, because retry limit reached
  */
-uint8_t _ipv6_get_rfc7217_iid(eui64_t *iid, const gnrc_netif_t *netif, const ipv6_addr_t *pfx,
-                              uint8_t dad_ctr);
+int _ipv6_get_rfc7217_iid(eui64_t *iid, const gnrc_netif_t *netif, const ipv6_addr_t *pfx,
+                              uint8_t *dad_ctr);
 #endif
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC) || defined(DOXYGEN)

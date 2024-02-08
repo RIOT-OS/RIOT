@@ -75,7 +75,9 @@ void _auto_configure_addr_with_dad_ctr(gnrc_netif_t *netif,
     bool new_address = false;
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
-    dad_ctr = _ipv6_get_rfc7217_iid((eui64_t *) &addr.u64[1], netif, pfx, dad_ctr);
+    if (_ipv6_get_rfc7217_iid((eui64_t *) &addr.u64[1], netif, pfx, &dad_ctr) < 0) {
+        return;
+    }
     flags |= (dad_ctr << GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES_POS);
 #else
     if (gnrc_netif_ipv6_get_iid(netif, (eui64_t *)&addr.u64[1]) < 0) {
@@ -139,19 +141,20 @@ bool _iid_is_iana_reserved(const eui64_t *iid)
 }
 
 inline bool stable_privacy_should_retry_idgen(uint8_t *dad_ctr, const char *reason) {
-    printf("%s", reason);
     if (*dad_ctr < STABLE_PRIVACY_IDGEN_RETRIES) { //within retry limit
+        LOG_DEBUG("nib: %s", reason);
         *dad_ctr += 1;
-        printf(", retrying IDGEN. (%u/%u)\n", *dad_ctr, STABLE_PRIVACY_IDGEN_RETRIES);
+        LOG_DEBUG(", retrying IDGEN. (%u/%u)\n", *dad_ctr, STABLE_PRIVACY_IDGEN_RETRIES);
         return true;
     }
     //retried often enough
-    printf(", not retrying: IDGEN_RETRIES limit reached\n");
+    LOG_WARNING("nib: %s", reason);
+    LOG_WARNING(", not retrying: IDGEN_RETRIES limit reached\n");
     return false;
 }
 
-uint8_t _ipv6_get_rfc7217_iid(eui64_t *iid, const gnrc_netif_t *netif, const ipv6_addr_t *pfx,
-                              const uint8_t dad_ctr)
+int _ipv6_get_rfc7217_iid(eui64_t *iid, const gnrc_netif_t *netif, const ipv6_addr_t *pfx,
+                          uint8_t *dad_ctr)
 {
 #ifndef STABLE_PRIVACY_SECRET_KEY
 #error "Stable privacy requires a secret_key, this should have been configured by sys/net/gnrc/Makefile.dep"
@@ -173,7 +176,7 @@ uint8_t _ipv6_get_rfc7217_iid(eui64_t *iid, const gnrc_netif_t *netif, const ipv
 #endif
             sha256_update(&c, &netif->pid, sizeof(netif->pid));
 
-        sha256_update(&c, &dad_ctr, sizeof(dad_ctr));
+        sha256_update(&c, dad_ctr, sizeof(*dad_ctr));
         sha256_update(&c, secret_key, sizeof(secret_key));
         sha256_final(&c, digest);
     }
@@ -196,7 +199,7 @@ uint8_t _ipv6_get_rfc7217_iid(eui64_t *iid, const gnrc_netif_t *netif, const ipv
      * the reserved IPv6 Interface Identifiers"
      * - https://datatracker.ietf.org/doc/html/rfc7217#section-5 */
     if (_iid_is_iana_reserved(iid)) {
-        if (!stable_privacy_should_retry_idgen(&dad_ctr,
+        if (!stable_privacy_should_retry_idgen(dad_ctr,
                                                "IANA reserved IID generated")) {
             return -1;
         }
@@ -204,7 +207,7 @@ uint8_t _ipv6_get_rfc7217_iid(eui64_t *iid, const gnrc_netif_t *netif, const ipv
         return _ipv6_get_rfc7217_iid(iid, netif, pfx, dad_ctr);
     }
 
-    return dad_ctr;
+    return 0;
 }
 #endif
 
