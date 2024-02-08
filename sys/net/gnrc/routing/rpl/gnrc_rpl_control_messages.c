@@ -50,6 +50,7 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+#include "../../network_layer/ipv6/nib/_nib-slaac.h"
 
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
@@ -585,10 +586,8 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
                 && !(pi->LAR_flags & GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT)) {
                 break;
             }
-            ipv6_addr_set_aiid(&pi->prefix, iid.uint8);
-            /* TODO: find a way to do this with DAD (i.e. state != VALID) */
-            gnrc_netif_ipv6_addr_add_internal(netif, &pi->prefix, pi->prefix_len,
-                                              GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
+            _auto_configure_addr(netif, &pi->prefix, pi->prefix_len);
+
             /* set lifetimes */
             gnrc_ipv6_nib_pl_set(netif->pid, &pi->prefix, pi->prefix_len,
                                  _sec_to_ms(byteorder_ntohl(pi->valid_lifetime)),
