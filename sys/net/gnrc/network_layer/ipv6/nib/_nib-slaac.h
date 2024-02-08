@@ -150,8 +150,8 @@ bool get_slaac_prefix_pref_until(const gnrc_netif_t *netif, const ipv6_addr_t *a
  * @param[out] next_temp_addr The temporary address that was configured from the given @p slaac_pfx.
  * @return true if a temporary address was found, false otherwise
  */
-bool iter_slaac_prefix_to_temp_addr(const gnrc_netif_t *netif, const ipv6_addr_t *slaac_pfx, void *state,
-                                    ipv6_addr_t *next_temp_addr);
+bool _iter_slaac_prefix_to_temp_addr(const gnrc_netif_t *netif, const ipv6_addr_t *slaac_pfx, void *state,
+                                     ipv6_addr_t *next_temp_addr);
 #endif
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC) || defined(DOXYGEN)
