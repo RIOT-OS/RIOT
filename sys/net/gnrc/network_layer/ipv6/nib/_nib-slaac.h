@@ -57,6 +57,27 @@ extern "C" {
  */
 #define INTERFACE_IDENTIFIER_LENGTH (64U)
 
+/**
+ * @name    Stable privacy host constants
+ * @see     [RFC 7217, section 7](https://tools.ietf.org/html/rfc7217#section-7)
+ * @{
+ */
+/**
+ * @brief   Limit for stable privacy (IDGEN) addr. generation retries for subsequent DAD failures
+ *
+ * @note    Must not be greater than 3 for @ref net_gnrc since
+ *          @ref GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES restricts it to
+ *          that number.
+ */
+#ifndef STABLE_PRIVACY_IDGEN_RETRIES
+#define STABLE_PRIVACY_IDGEN_RETRIES            (3U) /*default value*/
+#endif
+
+#ifndef STABLE_PRIVACY_IDGEN_DELAY_MS
+#define STABLE_PRIVACY_IDGEN_DELAY_MS 1000 /*default value*/
+#endif
+/** @} */
+
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) || IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC) || defined(DOXYGEN)
 /**
  * @brief   Auto-configures an address from a given prefix
