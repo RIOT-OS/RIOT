@@ -15,6 +15,12 @@
 
 #include <kernel_defines.h>
 #include <stdbool.h>
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
+#include "_nib-slaac.h"
+#include <hashes/sha256.h>
+#include "ztimer.h"
+#include "random.h"
+#endif
 
 #include "log.h"
 #include "luid.h"
