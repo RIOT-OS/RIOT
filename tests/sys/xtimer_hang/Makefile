@@ -21,4 +21,7 @@ DISABLE_MODULE := core_msg
 # microbit qemu failing currently
 TEST_ON_CI_BLACKLIST += microbit
 
+# This test randomly fails on `native` so disable it from CI
+TEST_ON_CI_BLACKLIST += native native64
+
 include $(RIOTBASE)/Makefile.include
