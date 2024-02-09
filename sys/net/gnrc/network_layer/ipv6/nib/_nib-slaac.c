@@ -162,6 +162,14 @@ inline bool _stable_privacy_should_retry_idgen(uint8_t *dad_ctr, const char *rea
 int ipv6_get_rfc7217_iid(eui64_t *iid, const gnrc_netif_t *netif, const ipv6_addr_t *pfx,
                          uint8_t *dad_ctr)
 {
+#if GNRC_NETIF_L2ADDR_MAXLEN > 0
+    if (!(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR))
+#endif /* GNRC_NETIF_L2ADDR_MAXLEN > 0 */
+    {
+        LOG_ERROR("nib: interface %i has no link-layer addresses\n", netif->pid);
+        return -ENOTSUP;
+    }
+
 #ifndef STABLE_PRIVACY_SECRET_KEY
 #error "Stable privacy requires a secret_key, this should have been configured by sys/net/gnrc/Makefile.dep"
 #endif
@@ -174,14 +182,7 @@ int ipv6_get_rfc7217_iid(eui64_t *iid, const gnrc_netif_t *netif, const ipv6_add
         sha256_context_t c;
         sha256_init(&c);
         sha256_update(&c, pfx, sizeof(*pfx));
-
-#if GNRC_NETIF_L2ADDR_MAXLEN > 0
-        if (netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR) {
-            sha256_update(&c, &netif->l2addr, netif->l2addr_len);
-        } else
-#endif
-            sha256_update(&c, &netif->pid, sizeof(netif->pid));
-
+        sha256_update(&c, &netif->l2addr, netif->l2addr_len);
         sha256_update(&c, dad_ctr, sizeof(*dad_ctr));
         sha256_update(&c, secret_key, sizeof(secret_key));
         sha256_final(&c, digest);
