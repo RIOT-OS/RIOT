@@ -64,6 +64,7 @@ extern "C" {
  */
 /**
  * @brief   Maximum valid lifetime [days] of a temporary address
+ * @ref MAX_TEMP_ADDRESSES depends on this value
  */
 #ifndef TEMP_VALID_LIFETIME
 #define TEMP_VALID_LIFETIME            MS_PER_HOUR * HOURS_PER_DAY * (2U) /*default value*/
@@ -73,6 +74,7 @@ extern "C" {
  * @brief   Maximum preferred lifetime [days] of a temporary address
  *
  * @note    "MUST be smaller than the TEMP_VALID_LIFETIME value"
+ * @ref MAX_TEMP_ADDRESSES depends on this value
  */
 #ifndef TEMP_PREFERRED_LIFETIME
 #define TEMP_PREFERRED_LIFETIME        MS_PER_HOUR * HOURS_PER_DAY * (1U) /*default value*/
@@ -81,6 +83,7 @@ extern "C" {
 /**
  * @brief   Maximum time to randomly subtract from TEMP_PREFERRED_LIFETIME
  *          for a temporary address
+ * @ref MAX_TEMP_ADDRESSES depends on this value
  */
 #define MAX_DESYNC_FACTOR             (TEMP_PREFERRED_LIFETIME / 10 * 4)
 
