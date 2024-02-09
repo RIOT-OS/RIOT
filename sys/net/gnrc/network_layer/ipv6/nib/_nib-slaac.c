@@ -112,7 +112,7 @@ int32_t _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
 
     if (pfx_pref_ltime <= _get_netif_regen_advance(netif)) {
         DEBUG("nib: Abort adding temporary address "
-              "because prefix's preferred lifetime too short (%u <= %u)\n",
+              "because prefix's preferred lifetime too short (%"PRIu32" <= %"PRIu32")\n",
               pfx_pref_ltime, _get_netif_regen_advance(netif));
         return -1;
     }
