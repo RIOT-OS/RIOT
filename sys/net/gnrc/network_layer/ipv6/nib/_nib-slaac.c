@@ -302,7 +302,8 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
 
         _auto_configure_addr_with_dad_ctr(netif, addr, SLAAC_PREFIX_LENGTH, dad_counter);
     } else {
-        //"hosts MUST NOT automatically fall back to employing other algorithms for generating Interface Identifiers"
+        //"hosts MUST NOT automatically fall back to employing other algorithms
+        // for generating Interface Identifiers"
         //- https://datatracker.ietf.org/doc/html/rfc7217#section-6
 
         //> If the address is a link-local address
