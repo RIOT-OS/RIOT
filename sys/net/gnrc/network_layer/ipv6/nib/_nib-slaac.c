@@ -71,7 +71,7 @@ void _auto_configure_addr_with_dad_ctr(gnrc_netif_t *netif,
     bool new_address = false;
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
-    if (_ipv6_get_rfc7217_iid((eui64_t *) &addr.u64[1], netif, pfx, &dad_ctr) < 0) {
+    if (ipv6_get_rfc7217_iid((eui64_t *) &addr.u64[1], netif, pfx, &dad_ctr) < 0) {
         return;
     }
     flags |= (dad_ctr << GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES_POS);
@@ -153,8 +153,8 @@ inline bool stable_privacy_should_retry_idgen(uint8_t *dad_ctr, const char *reas
     return false;
 }
 
-int _ipv6_get_rfc7217_iid(eui64_t *iid, const gnrc_netif_t *netif, const ipv6_addr_t *pfx,
-                          uint8_t *dad_ctr)
+int ipv6_get_rfc7217_iid(eui64_t *iid, const gnrc_netif_t *netif, const ipv6_addr_t *pfx,
+                         uint8_t *dad_ctr)
 {
 #ifndef STABLE_PRIVACY_SECRET_KEY
 #error "Stable privacy requires a secret_key, this should have been configured by sys/net/gnrc/Makefile.dep"
@@ -207,7 +207,7 @@ int _ipv6_get_rfc7217_iid(eui64_t *iid, const gnrc_netif_t *netif, const ipv6_ad
             return -1;
         }
         iid->uint64.u64 = 0; /* @pre for method call */
-        return _ipv6_get_rfc7217_iid(iid, netif, pfx, dad_ctr);
+        return ipv6_get_rfc7217_iid(iid, netif, pfx, dad_ctr);
     }
 
     return 0;
@@ -286,7 +286,7 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
     gnrc_netif_ipv6_addr_remove_internal(netif, addr);
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
-    if (stable_privacy_should_retry_idgen(&dad_counter, "Duplicate address detected")) {
+    if (_stable_privacy_should_retry_idgen(&dad_counter, "Duplicate address detected")) {
 
         //> Hosts SHOULD introduce a random delay between 0 and IDGEN_DELAY seconds
         //- https://datatracker.ietf.org/doc/html/rfc7217#section-6
