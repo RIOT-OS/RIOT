@@ -97,6 +97,34 @@ void native_async_read_add_handler(int fd, void *arg, native_async_read_callback
     _next_index++;
 }
 
+void native_async_read_remove_handler(int fd)
+{
+    int res = real_fcntl(fd, F_GETFL);
+    if (res < 0) {
+        err(EXIT_FAILURE, "native_async_read_remove_handler(): fcntl(F_GETFL)");
+    }
+    unsigned flags = (unsigned)res & !O_ASYNC;
+    res = real_fcntl(fd, F_SETFL, flags);
+    if (res < 0) {
+        err(EXIT_FAILURE, "native_async_read_remove_handler(): fcntl(F_SETFL)");
+    }
+
+    unsigned i;
+    for (i = 0; (i < (unsigned)_next_index) && (_fds[i].fd != fd); i++) { };
+    if (i == (unsigned)_next_index) {
+        return;
+    }
+
+    unregister_interrupt(SIGIO);
+    for (; i < (unsigned)_next_index - 1; i++) {
+        _fds[i] = _fds[i + 1];
+    }
+    _next_index--;
+    register_interrupt(SIGIO, _async_io_isr);
+
+    _fds[_next_index] = (struct pollfd){ 0 };
+}
+
 void native_async_read_add_int_handler(int fd, void *arg, native_async_read_callback_t handler) {
     if (_next_index >= ASYNC_READ_NUMOF) {
         err(EXIT_FAILURE, "native_async_read_add_int_handler(): too many callbacks");
