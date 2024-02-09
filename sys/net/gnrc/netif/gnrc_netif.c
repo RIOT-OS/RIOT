@@ -505,6 +505,9 @@ void gnrc_netif_release(gnrc_netif_t *netif)
 
 #if IS_USED(MODULE_GNRC_NETIF_IPV6)
 static int _addr_idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr);
+static int _addr_pfx_idx(const gnrc_netif_t *netif,
+                                const ipv6_addr_t *pfx,
+                                uint8_t pfx_len);
 static int _group_idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr);
 
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
@@ -745,6 +748,23 @@ int gnrc_netif_ipv6_addr_idx(gnrc_netif_t *netif,
     return idx;
 }
 
+int gnrc_netif_ipv6_addr_pfx_idx(gnrc_netif_t *netif,
+                                 const ipv6_addr_t *pfx, uint8_t pfx_len)
+{
+    int idx;
+
+    assert((netif != NULL) && (pfx != NULL));
+    DEBUG("gnrc_netif: get index of first address matching %s/%u"
+          " from interface %" PRIkernel_pid "\n",
+          ipv6_addr_to_str(addr_str, pfx, sizeof(addr_str)),
+          pfx_len,
+          netif->pid);
+    gnrc_netif_acquire(netif);
+    idx = _addr_pfx_idx(netif, pfx, pfx_len);
+    gnrc_netif_release(netif);
+    return idx;
+}
+
 int gnrc_netif_ipv6_addr_match(gnrc_netif_t *netif,
                                const ipv6_addr_t *addr)
 {
@@ -962,9 +982,33 @@ static int _idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr, bool mcast)
     return -1;
 }
 
+static int _pfx_idx(const gnrc_netif_t *netif, const ipv6_addr_t *pfx, uint8_t pfx_len, bool mcast)
+{
+    //same as function @ref _idx above, but with generalized condition
+    if (!ipv6_addr_is_unspecified(pfx)) {
+        const ipv6_addr_t *iplist = (mcast) ? netif->ipv6.groups :
+                                    netif->ipv6.addrs;
+        unsigned ipmax = (mcast) ? GNRC_NETIF_IPV6_GROUPS_NUMOF :
+                         CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF;
+        for (unsigned i = 0; i < ipmax; i++) {
+            if (ipv6_addr_match_prefix(&iplist[i], pfx) >= pfx_len) {
+                return i;
+            }
+        }
+    }
+    return -1;
+}
+
 static inline int _addr_idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr)
 {
     return _idx(netif, addr, false);
+}
+
+static inline int _addr_pfx_idx(const gnrc_netif_t *netif,
+                                const ipv6_addr_t *pfx,
+                                uint8_t pfx_len)
+{
+    return _pfx_idx(netif, pfx, pfx_len, false);
 }
 
 static inline int _group_idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr)
