@@ -40,8 +40,22 @@ extern "C" {
  * > An IPv6 address prefix used for stateless autoconfiguration [RFC4862]
  *   of an IEEE 802.15.4 interface MUST have a length of 64 bits.
  * - https://datatracker.ietf.org/doc/html/rfc4944
+ *
+ * Also see
+ * @ref INTERFACE_IDENTIFIER_LENGTH
+ * in combination with "sum" "does not equal 128 bits"
+ * from https://datatracker.ietf.org/doc/html/rfc4862#section-5.5.3 d)
  */
 #define SLAAC_PREFIX_LENGTH (64U)
+
+/*
+ * "the address architecture [RFC4291] also defines the length of the interface identifiers"
+ * - https://datatracker.ietf.org/doc/html/rfc4862#section-2
+ *
+ * "Interface IDs are required to be 64 bits long"
+ * - https://datatracker.ietf.org/doc/html/rfc4291#section-2.5.1
+ */
+#define INTERFACE_IDENTIFIER_LENGTH (64U)
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) || IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC) || defined(DOXYGEN)
 /**
