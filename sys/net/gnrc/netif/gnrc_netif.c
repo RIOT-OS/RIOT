@@ -280,7 +280,7 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
                     assert(opt->data_len == sizeof(netopt_ipv6_rfc7217_iid_data));
                     netopt_ipv6_rfc7217_iid_data *data =
                             (netopt_ipv6_rfc7217_iid_data *) opt->data;
-                    res = _ipv6_get_rfc7217_iid(
+                    res = ipv6_get_rfc7217_iid(
                             data->iid, netif, data->pfx, data->dad_ctr);
                     break;
 #endif

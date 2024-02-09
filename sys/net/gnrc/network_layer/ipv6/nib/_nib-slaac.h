@@ -131,8 +131,8 @@ bool stable_privacy_should_retry_idgen(uint8_t *dad_ctr, const char *reason);
  * @return 0 on success
  * @return -1 if failed, because retry limit reached
  */
-int _ipv6_get_rfc7217_iid(eui64_t *iid, const gnrc_netif_t *netif, const ipv6_addr_t *pfx,
-                              uint8_t *dad_ctr);
+int ipv6_get_rfc7217_iid(eui64_t *iid, const gnrc_netif_t *netif, const ipv6_addr_t *pfx,
+                         uint8_t *dad_ctr);
 #endif
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC) || defined(DOXYGEN)
