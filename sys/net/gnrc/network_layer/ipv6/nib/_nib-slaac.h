@@ -82,6 +82,7 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
  * @return whether the IID is IANA reserved
  */
 bool _iid_is_iana_reserved(const eui64_t *iid);
+#endif
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC) || defined(DOXYGEN)
 /**
