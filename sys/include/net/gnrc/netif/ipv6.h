@@ -68,6 +68,17 @@ extern "C" {
  * @brief   Address is an anycast address
  */
 #define GNRC_NETIF_IPV6_ADDRS_FLAGS_ANYCAST                (0x20U)
+
+/**
+ * @brief Number of address generation retries
+ * For addresses generated as per RFC7217, this stores the DAD_Counter value
+ * and the upper limit is defined by @ref STABLE_PRIVACY_IDGEN_RETRIES
+ */
+#define GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES          (0xC0U)
+/**
+ * @brief Shift position of address generation retries
+ */
+#define GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES_POS      (6)
 /** @} */
 
 /**
