@@ -68,6 +68,28 @@ else
                           "$(DEPRECATED_MODULES_USED)" 1>&2)
   endif
 
+  # Detect provided / used / optional features that do not exist
+  include $(RIOTMAKE)/features_existing.inc.mk
+  FEATURES_NONEXISTING := $(sort $(filter-out $(FEATURES_EXISTING),$(FEATURES_PROVIDED)))
+  ifneq (,$(FEATURES_NONEXISTING))
+    $(error "The following non-existing features are provided by the board $(BOARD): $(FEATURES_NONEXISTING)")
+  endif
+
+  FEATURES_NONEXISTING := $(sort $(filter-out $(FEATURES_EXISTING),$(FEATURES_REQUIRED)))
+  ifneq (,$(FEATURES_NONEXISTING))
+    $(error "The following non-existing features are listed in FEATURES_REQUIRED: $(FEATURES_NONEXISTING)")
+  endif
+
+  FEATURES_NONEXISTING := $(sort $(filter-out $(FEATURES_EXISTING),$(subst |, ,$(FEATURES_REQUIRED_ANY))))
+  ifneq (,$(FEATURES_NONEXISTING))
+    $(error "The following non-existing features are listed in FEATURES_REQUIRED_ANY: $(FEATURES_NONEXISTING)")
+  endif
+
+  FEATURES_NONEXISTING := $(sort $(filter-out $(FEATURES_EXISTING),$(FEATURES_OPTIONAL)))
+  ifneq (,$(FEATURES_NONEXISTING))
+    $(error "The following non-existing features are listed in FEATURES_OPTIONAL: $(FEATURES_NONEXISTING)")
+  endif
+
   # Warn about telnet
   ifneq (,$(filter auto_init_telnet,$(USEMODULE)))
     ifneq (1,$(I_UNDERSTAND_THAT_TELNET_IS_INSECURE))
