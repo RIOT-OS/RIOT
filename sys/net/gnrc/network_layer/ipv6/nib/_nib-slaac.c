@@ -100,7 +100,7 @@ void _auto_configure_addr_with_dad_ctr(gnrc_netif_t *netif,
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
         /*"the same network prefix" - https://datatracker.ietf.org/doc/html/rfc7217#section-5*/
         /*"unacceptable identifier" -> retry IDGEN (dad_ctr+1)*/
-        if (!stable_privacy_should_retry_idgen(&dad_ctr, "Generated address already exists")) {
+        if (!_stable_privacy_should_retry_idgen(&dad_ctr, "Generated address already exists")) {
             return;
         }
 
@@ -140,7 +140,7 @@ bool _iid_is_iana_reserved(const eui64_t *iid)
            || (iid->uint32[0].u32 == htonl(0xfdffffff) && iid->uint16[2].u16 == htons(0xffff) && iid->uint8[6] == 0xff && (iid->uint8[7] & 0x80));
 }
 
-inline bool stable_privacy_should_retry_idgen(uint8_t *dad_ctr, const char *reason) {
+inline bool _stable_privacy_should_retry_idgen(uint8_t *dad_ctr, const char *reason) {
     if (*dad_ctr < STABLE_PRIVACY_IDGEN_RETRIES) { //within retry limit
         LOG_DEBUG("nib: %s", reason);
         *dad_ctr += 1;
@@ -202,8 +202,8 @@ int ipv6_get_rfc7217_iid(eui64_t *iid, const gnrc_netif_t *netif, const ipv6_add
      * the reserved IPv6 Interface Identifiers"
      * - https://datatracker.ietf.org/doc/html/rfc7217#section-5 */
     if (_iid_is_iana_reserved(iid)) {
-        if (!stable_privacy_should_retry_idgen(dad_ctr,
-                                               "IANA reserved IID generated")) {
+        if (!_stable_privacy_should_retry_idgen(dad_ctr,
+                                                "IANA reserved IID generated")) {
             return -1;
         }
         iid->uint64.u64 = 0; /* @pre for method call */
