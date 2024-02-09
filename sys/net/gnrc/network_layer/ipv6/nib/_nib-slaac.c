@@ -96,6 +96,13 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
 }
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN || CONFIG_GNRC_IPV6_NIB_SLAAC */
 
+bool _iid_is_iana_reserved(const eui64_t *iid)
+{
+    return (iid->uint64.u64 == htonll(0))
+           || (iid->uint32[0].u32 == htonl(0x02005eff) && iid->uint8[4] == 0xfe)
+           || (iid->uint32[0].u32 == htonl(0xfdffffff) && iid->uint16[2].u16 == htons(0xffff) && iid->uint8[6] == 0xff && (iid->uint8[7] & 0x80));
+}
+
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC)
 static bool _try_l2addr_reconfiguration(gnrc_netif_t *netif)
 {

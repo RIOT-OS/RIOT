@@ -71,6 +71,18 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
 #define _auto_configure_addr(netif, pfx, pfx_len) \
     (void)netif; (void)pfx; (void)pfx_len;
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN || CONFIG_GNRC_IPV6_NIB_SLAAC */
+
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY) || defined(DOXYGEN)
+/**
+ * @brief Check if an interface identifier of an IPv6 address
+ * is reserved by IANA, i.e. it shouldn't be used
+ * This is should be checked when the interface identifier is randomly generated.
+ * @see [RFC5453], https://www.iana.org/assignments/ipv6-interface-ids/ipv6-interface-ids.xhtml
+ * @param[in] iid The interface identifier to check for
+ * @return whether the IID is IANA reserved
+ */
+bool _iid_is_iana_reserved(const eui64_t *iid);
+
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC) || defined(DOXYGEN)
 /**
  * @brief   Removes a tentative address from the interface and tries to
