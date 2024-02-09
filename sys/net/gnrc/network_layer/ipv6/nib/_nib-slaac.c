@@ -143,10 +143,12 @@ int32_t _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
         return -1;
     }
     int index;
-    if ((index = gnrc_netif_ipv6_addr_add_internal(netif, &addr, IPV6_ADDR_BIT_LEN,
-                                          GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE
-                                          | (retries << GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES_POS)
-                                          )) < 0) {
+    uint8_t flags = GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE
+            | (retries << GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES_POS);
+    if ((index = gnrc_netif_ipv6_addr_add_internal(netif,
+                                                   &addr,
+                                                   IPV6_ADDR_BIT_LEN,
+                                                   flags)) < 0) {
         if (idx != NULL) {
             *idx = index;
         }
