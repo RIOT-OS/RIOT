@@ -182,6 +182,7 @@ static inline uint8_t gnrc_netif_ipv6_addr_dad_trans(const gnrc_netif_t *netif,
     return netif->ipv6.addrs_flags[idx] & GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE;
 }
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY) || defined(DOXYGEN)
 /**
  * @brief   Gets number of address generation retries already performed for an address
  *
@@ -196,6 +197,7 @@ static inline uint8_t gnrc_netif_ipv6_addr_gen_retries(const gnrc_netif_t *netif
 {
     return (netif->ipv6.addrs_flags[idx] & GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES) >> GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES_POS;
 }
+#endif
 
 /**
  * @brief   Returns the index of an address in gnrc_netif_t::ipv6_addrs of @p
