@@ -1733,6 +1733,14 @@ static uint32_t _handle_pio(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
 
     if (pio->flags & NDP_OPT_PI_FLAGS_A
         && pio->prefix_len == SLAAC_PREFIX_LENGTH
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
+        && (gnrc_netif_ipv6_addr_pfx_idx(netif, &pio->prefix, pio->prefix_len) < 0)
+        /* if the prefix is already known,
+         * do not cause generation of a potentially different
+         * stable privacy address (keyword DAD_Counter).
+         * refer to https://datatracker.ietf.org/doc/html/rfc4862#section-5.5.3 d)
+         * */
+#endif
         ) {
         _auto_configure_addr(netif, &pio->prefix, pio->prefix_len);
     }
