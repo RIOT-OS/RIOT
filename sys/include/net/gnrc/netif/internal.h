@@ -131,6 +131,28 @@ int gnrc_netif_ipv6_addr_idx(gnrc_netif_t *netif,
                              const ipv6_addr_t *addr);
 
 /**
+ * @brief   Returns the index of the first pfx
+ *          in gnrc_netif_t::ipv6_addrs of @p netif
+ *          where the first @p pfx_len bits match with @p pfx
+ *
+ * @pre `(netif != NULL) && (pfx != NULL)`
+ *
+ * Can be used to check if an address is assigned to an interface.
+ *
+ * @param[in] netif the network interface
+ * @param[in] pfx  the address to check
+ * @param[in] pfx_len the amount of bits to compare
+ *
+ * @note    Only available with @ref net_gnrc_ipv6 "gnrc_ipv6".
+ *
+ * @return  index of the first matching address
+ *          in gnrc_netif_t::ipv6_addrs of @p netif
+ * @return  -1, if no matching address found for @p netif
+ */
+int gnrc_netif_ipv6_addr_pfx_idx(gnrc_netif_t *netif,
+                                 const ipv6_addr_t *pfx, uint8_t pfx_len);
+
+/**
  * @brief   Gets state from address flags
  *
  * @param[in] netif the network interface
