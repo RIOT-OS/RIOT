@@ -32,6 +32,15 @@
 extern "C" {
 #endif
 
+/**
+ * > An IPv6 address prefix used for stateless autoconfiguration [ACONF]
+ *   of an Ethernet interface must have a length of 64 bits.
+ * - https://datatracker.ietf.org/doc/html/rfc2464
+ *
+ * > An IPv6 address prefix used for stateless autoconfiguration [RFC4862]
+ *   of an IEEE 802.15.4 interface MUST have a length of 64 bits.
+ * - https://datatracker.ietf.org/doc/html/rfc4944
+ */
 #define SLAAC_PREFIX_LENGTH (64U)
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) || IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC) || defined(DOXYGEN)
