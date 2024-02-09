@@ -32,6 +32,8 @@
 extern "C" {
 #endif
 
+#define SLAAC_PREFIX_LENGTH (64U)
+
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) || IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC) || defined(DOXYGEN)
 /**
  * @brief   Auto-configures an address from a given prefix
