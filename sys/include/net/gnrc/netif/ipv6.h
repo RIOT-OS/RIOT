@@ -69,6 +69,7 @@ extern "C" {
  */
 #define GNRC_NETIF_IPV6_ADDRS_FLAGS_ANYCAST                (0x20U)
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY) || defined(DOXYGEN)
 /**
  * @brief Number of address generation retries
  * For addresses generated as per RFC7217, this stores the DAD_Counter value
@@ -79,6 +80,7 @@ extern "C" {
  * @brief Shift position of address generation retries
  */
 #define GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES_POS      (6)
+#endif
 /** @} */
 
 /**
