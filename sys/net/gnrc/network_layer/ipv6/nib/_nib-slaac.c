@@ -155,6 +155,14 @@ int32_t _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
         gnrc_ipv6_nib_pl_del(netif->pid, &addr, IPV6_ADDR_BIT_LEN);
         return -1;
     }
+
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
+    if (gnrc_netif_is_6ln(netif) &&
+        !gnrc_netif_is_6lbr(netif)) {
+        _handle_rereg_address(&netif->ipv6.addrs[index]);
+    }
+#endif
+
     return ta_max_pref_lft;
 }
 
