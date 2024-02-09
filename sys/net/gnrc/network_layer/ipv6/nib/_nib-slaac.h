@@ -116,7 +116,7 @@ bool _iid_is_iana_reserved(const eui64_t *iid);
  * @param[in,out] dad_ctr
  * @param[in] reason
  */
-bool stable_privacy_should_retry_idgen(uint8_t *dad_ctr, const char *reason);
+bool _stable_privacy_should_retry_idgen(uint8_t *dad_ctr, const char *reason);
 
 /**
  * @brief
