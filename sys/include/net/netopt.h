@@ -25,6 +25,7 @@
 #ifndef NET_NETOPT_H
 #define NET_NETOPT_H
 
+#include <kernel_defines.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <net/ipv6/addr.h>
@@ -918,9 +919,12 @@ typedef enum {
  */
 enum {
     NETOPT_IPV6_IID_HWADDR = 0,
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY) || defined(DOXYGEN)
     NETOPT_IPV6_IID_RFC7217,
+#endif
 };
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY) || defined(DOXYGEN)
 /**
  * @brief       Data for @ref NETOPT_IPV6_IID when using RFC7217
  */
@@ -929,6 +933,7 @@ typedef struct {
     const ipv6_addr_t *pfx;
     uint8_t *dad_ctr;
 } netopt_ipv6_rfc7217_iid_data;
+#endif
 
 /**
  * @brief   Option parameter to be used with @ref NETOPT_RF_TESTMODE
