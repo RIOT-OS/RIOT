@@ -81,6 +81,13 @@ void native_async_read_continue(int fd);
 void native_async_read_add_handler(int fd, void *arg, native_async_read_callback_t handler);
 
 /**
+ * @brief   stop monitoring of file descriptor
+ *
+ * @param[in] fd The file descriptor to stop monitoring
+ */
+void native_async_read_remove_handler(int fd);
+
+/**
  * @brief   start monitoring of file descriptor as interrupt
  *
  * @param[in] fd       The file descriptor to monitor
