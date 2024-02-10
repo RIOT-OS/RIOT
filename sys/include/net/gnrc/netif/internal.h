@@ -131,7 +131,7 @@ int gnrc_netif_ipv6_addr_idx(gnrc_netif_t *netif,
                              const ipv6_addr_t *addr);
 
 /**
- * @brief   Returns the index of the first pfx
+ * @brief   Returns the index of the first addr
  *          in gnrc_netif_t::ipv6_addrs of @p netif
  *          where the first @p pfx_len bits match with @p pfx
  *
