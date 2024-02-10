@@ -140,7 +140,7 @@ int gnrc_netif_ipv6_addr_idx(gnrc_netif_t *netif,
  * Can be used to check if an address is assigned to an interface.
  *
  * @param[in] netif the network interface
- * @param[in] pfx  the address to check
+ * @param[in] pfx  the prefix to match
  * @param[in] pfx_len the amount of bits to compare
  *
  * @note    Only available with @ref net_gnrc_ipv6 "gnrc_ipv6".
