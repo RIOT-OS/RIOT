@@ -72,7 +72,7 @@ int telnet_server_start(void);
  *
  * @return  0 on success, error otherwise
  */
-int telnet_server_write(const void* buffer, size_t len);
+ssize_t telnet_server_write(const void* buffer, size_t len);
 
 /**
  * @brief   Read data from the telnet client, will block until data is available.
