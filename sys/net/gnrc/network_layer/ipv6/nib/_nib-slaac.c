@@ -161,13 +161,13 @@ int32_t _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
                                                    &addr,
                                                    IPV6_ADDR_BIT_LEN,
                                                    flags)) < 0) {
-        if (idx != NULL) {
-            *idx = index;
-        }
         LOG_WARNING("nib: Abort adding temporary address, adding address failed\n");
         //remove the just created prefix again
         gnrc_ipv6_nib_pl_del(netif->pid, &addr, IPV6_ADDR_BIT_LEN);
         return -1;
+    }
+    if (idx != NULL) {
+        *idx = index;
     }
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
