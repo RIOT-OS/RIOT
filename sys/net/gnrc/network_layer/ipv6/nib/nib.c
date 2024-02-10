@@ -1538,7 +1538,7 @@ static void _handle_regen_temp_addr(_nib_offl_entry_t *pfx) {
                                                pfx->pref_until - evtimer_now_msec(),
                                                0, NULL);
     if (ta_max_pref_lft < 0) {
-        DEBUG("nib: Temporary address regeneration failed.\n");
+        LOG_WARNING("nib: Temporary address regeneration failed.\n");
         return;
     }
     _evtimer_add(pfx, GNRC_IPV6_NIB_REGEN_TEMP_ADDR, &pfx->regen_temp_addr, ta_max_pref_lft -
