@@ -103,7 +103,7 @@ void native_async_read_remove_handler(int fd)
     if (res < 0) {
         err(EXIT_FAILURE, "native_async_read_remove_handler(): fcntl(F_GETFL)");
     }
-    unsigned flags = (unsigned)res & !O_ASYNC;
+    unsigned flags = (unsigned)res & ~O_ASYNC;
     res = real_fcntl(fd, F_SETFL, flags);
     if (res < 0) {
         err(EXIT_FAILURE, "native_async_read_remove_handler(): fcntl(F_SETFL)");
