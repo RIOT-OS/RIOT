@@ -111,6 +111,16 @@ int32_t _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
           64, netif->pid);
 
     if (pfx_pref_ltime <= _get_netif_regen_advance(netif)) {
+        /* While RIOT's implementation design differs from the RFC implementation design,
+         * this check is here to fulfill the constraints imposed by
+         * https://www.rfc-editor.org/rfc/rfc8981.html#section-3.4-3.4.2.2
+         * in combination with the next bullet point ("5.")
+         *
+         * It also covers/fulfills the requirement
+         * "Note that if a temporary address becomes deprecated as result of
+         * processing a Prefix Information option with a zero preferred lifetime,
+         * then a new temporary address MUST NOT be generated"
+         */
         DEBUG("nib: Abort adding temporary address "
               "because prefix's preferred lifetime too short (%"PRIu32" <= %"PRIu32")\n",
               pfx_pref_ltime, _get_netif_regen_advance(netif));
@@ -119,12 +129,14 @@ int32_t _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
     const uint32_t ta_max_pref_lft = TEMP_PREFERRED_LIFETIME
             - random_uint32_range(0, MAX_DESYNC_FACTOR + 1);
     if (ta_max_pref_lft <= _get_netif_regen_advance(netif)) {
+        /* https://www.rfc-editor.org/rfc/rfc8981.html#section-3.4-3.5 */
         DEBUG("nib: Abort adding temporary address because configured "
               "TEMP_PREFERRED_LIFETIME (%lu) too short or MAX_DESYNC_FACTOR too high (%lu)\n",
               TEMP_PREFERRED_LIFETIME, MAX_DESYNC_FACTOR);
 
+        /* in other words, as per
+         * https://www.rfc-editor.org/rfc/rfc8981.html#section-3.8-7.2 */
         assert(MAX_DESYNC_FACTOR < TEMP_PREFERRED_LIFETIME - _get_netif_regen_advance(netif));
-        //https://www.rfc-editor.org/rfc/rfc8981.html#section-3.8-7.2
 
         return -1;
     }
