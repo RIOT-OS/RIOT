@@ -84,8 +84,11 @@ void _nib_release(void)
 static inline bool _addr_equals(const ipv6_addr_t *addr,
                                 const _nib_onl_entry_t *node)
 {
-    return (addr == NULL) || ipv6_addr_is_unspecified(&node->ipv6) ||
-           (ipv6_addr_equal(addr, &node->ipv6));
+    if (addr == NULL) {
+        return ipv6_addr_is_unspecified(&node->ipv6);
+    } else {
+        return ipv6_addr_equal(addr, &node->ipv6);
+    }
 }
 
 _nib_onl_entry_t *_nib_onl_alloc(const ipv6_addr_t *addr, unsigned iface)
