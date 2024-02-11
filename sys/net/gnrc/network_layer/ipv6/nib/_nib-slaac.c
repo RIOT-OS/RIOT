@@ -330,7 +330,7 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
         uint32_t slaac_prefix_pref_until;
         if (!_get_slaac_prefix_pref_until(netif, addr, &slaac_prefix_pref_until)) {
             // at least one match is expected,
-            // the temporary address smh outlived the SLAAC prefix valid lft
+            LOG_WARNING("nib: The temporary address smh outlived the SLAAC prefix valid lft.");
             assert(false);
             return;
         }
