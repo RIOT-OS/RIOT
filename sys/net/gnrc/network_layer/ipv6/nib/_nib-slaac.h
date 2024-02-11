@@ -63,7 +63,7 @@ extern "C" {
  * @{
  */
 /**
- * @brief   Maximum valid lifetime [days] of a temporary address
+ * @brief   Maximum valid lifetime [ms] of a temporary address
  * @ref MAX_TEMP_ADDRESSES depends on this value
  */
 #ifndef TEMP_VALID_LIFETIME
@@ -71,7 +71,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Maximum preferred lifetime [days] of a temporary address
+ * @brief   Maximum preferred lifetime [ms] of a temporary address
  *
  * @note    "MUST be smaller than the TEMP_VALID_LIFETIME value"
  * @ref MAX_TEMP_ADDRESSES depends on this value
