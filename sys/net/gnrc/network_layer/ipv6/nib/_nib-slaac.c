@@ -128,7 +128,7 @@ int32_t _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
     }
     const uint32_t ta_max_pref_lft = TEMP_PREFERRED_LIFETIME
             - random_uint32_range(0, MAX_DESYNC_FACTOR + 1);
-    if (ta_max_pref_lft <= _get_netif_regen_advance(netif)) {
+    if (ta_max_pref_lft <= MS_PER_SEC * _get_netif_regen_advance(netif)) {
         /* https://www.rfc-editor.org/rfc/rfc8981.html#section-3.4-3.5 */
         LOG_ERROR("nib: Abort adding temporary address because configured "
               "TEMP_PREFERRED_LIFETIME (%lu) too short or MAX_DESYNC_FACTOR too high (%lu)\n",
@@ -136,7 +136,8 @@ int32_t _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
 
         /* in other words, as per
          * https://www.rfc-editor.org/rfc/rfc8981.html#section-3.8-7.2 */
-        assert(MAX_DESYNC_FACTOR < TEMP_PREFERRED_LIFETIME - _get_netif_regen_advance(netif));
+        assert(MAX_DESYNC_FACTOR < TEMP_PREFERRED_LIFETIME
+               - MS_PER_SEC * _get_netif_regen_advance(netif));
 
         return -1;
     }
