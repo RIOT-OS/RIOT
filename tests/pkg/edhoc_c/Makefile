@@ -26,7 +26,6 @@ USEMODULE += sock_udp
 # Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo
 USEMODULE += nanocoap_sock
-USEMODULE += nanocoap_resources
 
 # include this for printing IP addresses
 USEMODULE += shell_cmds_default
@@ -43,6 +42,12 @@ CFLAGS += -DCONFIG_INITIATOR=$(CONFIG_INITIATOR)
 # Include responder code
 CONFIG_RESPONDER ?= 1
 CFLAGS += -DCONFIG_RESPONDER=$(CONFIG_RESPONDER)
+
+
+ifeq (1, $(CONFIG_RESPONDER))
+  USEMODULE += nanocoap_server_auto_init
+  CFLAGS += -DCONFIG_NANOCOAP_SERVER_BUF_SIZE=512
+endif
 
 include $(RIOTBASE)/Makefile.include
 include $(RIOTMAKE)/default-radio-settings.inc.mk
