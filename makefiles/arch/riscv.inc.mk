@@ -8,12 +8,9 @@
 # Ubuntu uses "riscv64-unknown-elf" despite being able to produce both 32 and
 # 64 bit binaries. We'll test all possible combinations from the most correct
 # triple to the least correct triple all that might be able to produce our
-# binaries. Finally, "riscv-none-embed" is also tested for compatibility with
-# an previously popular legacy toolchain.
-# For a CI transition period, it is tested first.
+# binaries.
 
 _TRIPLES_TO_TEST := \
-    riscv-none-embed \
     riscv32-none-elf \
     riscv32-unknown-elf \
     riscv32-elf \
@@ -27,7 +24,7 @@ _TRIPLES_TO_TEST := \
 # Do not test at run time if building with docker: The host may have no
 # RISC-V toolchain installed or a different one
 ifeq (1,$(BUILD_IN_DOCKER))
-  TARGET_ARCH_RISCV := riscv-none-embed
+  TARGET_ARCH_RISCV := riscv-none-elf
 endif
 
 TARGET_ARCH_RISCV ?= \
