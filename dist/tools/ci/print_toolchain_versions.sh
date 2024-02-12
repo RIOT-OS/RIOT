@@ -128,7 +128,6 @@ for p in \
          msp430-elf \
          riscv-none-elf \
          riscv64-unknown-elf \
-         riscv-none-embed \
          riscv32-esp-elf \
          xtensa-esp32-elf \
          xtensa-esp32s2-elf \
@@ -147,7 +146,6 @@ for p in \
          msp430-elf \
          riscv-none-elf \
          riscv64-unknown-elf \
-         riscv-none-embed \
          riscv32-esp-elf \
          xtensa-esp32-elf \
          xtensa-esp32s2-elf \
