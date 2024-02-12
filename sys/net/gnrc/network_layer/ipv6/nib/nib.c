@@ -1567,6 +1567,14 @@ static void _handle_pfx_timeout(_nib_offl_entry_t *pfx)
                 netif->ipv6.addrs_flags[i] |= GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_DEPRECATED;
             }
         }
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+        _evtimer_del(&pfx->regen_temp_addr);
+        // It would log a warning because pref_lft too short,
+        // or - if the prefix became preferred again meanwhile -
+        // regenerate an address,
+        // but at whatever time the event is currently scheduled for.
+        // -> Definitely cleaner to not even call the event.
+#endif
         _evtimer_add(pfx, GNRC_IPV6_NIB_PFX_TIMEOUT, &pfx->pfx_timeout,
                      pfx->valid_until - now);
     }
