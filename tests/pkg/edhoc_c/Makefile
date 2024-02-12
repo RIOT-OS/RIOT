@@ -26,6 +26,7 @@ USEMODULE += sock_udp
 # Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo
 USEMODULE += nanocoap_sock
+USEMODULE += nanocoap_resources
 
 # include this for printing IP addresses
 USEMODULE += shell_cmds_default
