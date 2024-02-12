@@ -9,8 +9,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega8 \
     atxmega-a3bu-xplained \
     bluepill-stm32f030c8 \
-    hifive1 \
-    hifive1b \
     i-nucleo-lrwan1 \
     msb-430 \
     msb-430h \
