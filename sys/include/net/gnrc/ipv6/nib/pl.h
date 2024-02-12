@@ -102,7 +102,7 @@ bool gnrc_ipv6_nib_pl_has_prefix(const unsigned int iface, const ipv6_addr_t *pf
                                  const uint8_t pfx_len);
 
 /**
- * @brief Reschedule the regeneration timer for this prefix's preferred temporary address.
+ * @brief Reschedule the regeneration timer for temporary addresses of this prefix.
  * @param[in] iface The interface on which the prefix is present.
  * @param[in] pfx The SLAAC prefix that is to be found.
  * @param[in] offset The offset in milliseconds at which the regeneration event shall occur.
