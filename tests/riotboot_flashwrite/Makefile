@@ -13,6 +13,7 @@ USEMODULE += gnrc_icmpv6_echo
 
 # Required for nanocoap server
 USEMODULE += nanocoap_sock
+USEMODULE += nanocoap_resources
 
 # include this for printing IP addresses
 USEMODULE += shell_cmds_default
