@@ -38,6 +38,7 @@ QUIET ?= 1
 #
 
 USEMODULE += suit suit_transport_coap
+USEMODULE += nanocoap_resources
 
 # enable VFS transport (only works on boards with external storage)
 USEMODULE += suit_transport_vfs
