@@ -70,6 +70,9 @@ extern "C" {
  */
 #define _PFX_ON_LINK    (0x0001)
 #define _PFX_SLAAC      (0x0002)
+#define _PFX_IF_MASK    (GNRC_IPV6_NIB_NC_INFO_IFACE_MASK)
+#define _PFX_IF_POS     (GNRC_IPV6_NIB_NC_INFO_IFACE_POS)
+#define _PFX_IF_MAX     (_PFX_IF_MASK >> _PFX_IF_POS)
 /** @} */
 
 /**
@@ -327,7 +330,20 @@ void _nib_release(void);
  */
 static inline unsigned _nib_onl_get_if(const _nib_onl_entry_t *node)
 {
+    assert(node);
     return (node->info & _NIB_IF_MASK) >> _NIB_IF_POS;
+}
+
+/**
+ * @brief   Gets the interface identifier towards an NIB offlink entry
+ *
+ * @param[in] node  An NIB offlink entry.
+ *
+ * @return  The NIB entry's interface identifier.
+ */
+static inline unsigned _nib_offl_get_if(const _nib_offl_entry_t *node)
+{
+    return (node->flags & _PFX_IF_MASK) >> _PFX_IF_POS;
 }
 
 /**
@@ -341,6 +357,19 @@ static inline void _nib_onl_set_if(_nib_onl_entry_t *node, unsigned iface)
     assert(iface <= _NIB_IF_MAX);
     node->info &= ~(_NIB_IF_MASK);
     node->info |= ((iface << _NIB_IF_POS) & _NIB_IF_MASK);
+}
+
+/**
+ * @brief   Sets the interface identifier towards an NIB offlink entry
+ *
+ * @param[in,out] node  An NIB offlink entry.
+ * @param[in] iface     An interface identifier.
+ */
+static inline void _nib_offl_set_if(_nib_offl_entry_t *node, unsigned iface)
+{
+    assert(iface <= _PFX_IF_MASK);
+    node->flags &= ~(_PFX_IF_MASK);
+    node->flags |= ((iface << _PFX_IF_POS) & _PFX_IF_MASK);
 }
 
 /**
@@ -764,6 +793,7 @@ static inline _nib_offl_entry_t *_nib_ft_add(const ipv6_addr_t *next_hop,
                                              const ipv6_addr_t *pfx,
                                              unsigned pfx_len)
 {
+    assert((next_hop != NULL) && (pfx != NULL));
     return _nib_offl_add(next_hop, iface, pfx, pfx_len, _FT);
 }
 
