@@ -74,6 +74,60 @@ static void test_nanocoap_cache__cachekey(void)
     /* compare 3. and 1. packet */
     TEST_ASSERT(nanocoap_cache_key_compare(digest2, digest1) > 0);
 }
+
+static void test_nanocoap_cache__cachekey_blockwise(void)
+{
+    uint8_t digest1[SHA256_DIGEST_LENGTH];
+    uint8_t digest2[SHA256_DIGEST_LENGTH];
+    uint8_t buf1[_BUF_SIZE];
+    uint8_t buf2[_BUF_SIZE];
+    coap_pkt_t pkt1;
+    coap_pkt_t pkt2;
+    uint16_t msgid = 0xABCD;
+    uint8_t token[2] = {0xDA, 0xEC};
+    char path[] = "/time";
+    size_t len;
+    coap_block1_t blockopt = {
+        .offset = 0,
+        .blknum = 0,
+        .szx = 2,
+        .more = 1,
+    };
+
+    /* 1. packet */
+    len = coap_build_hdr((coap_hdr_t *)&buf1[0], COAP_TYPE_NON,
+                         &token[0], 2, COAP_METHOD_GET, msgid);
+    coap_pkt_init(&pkt1, &buf1[0], sizeof(buf1), len);
+    coap_opt_add_string(&pkt1, COAP_OPT_URI_PATH, &path[0], '/');
+    coap_opt_add_block1_control(&pkt1, &blockopt);
+    coap_opt_finish(&pkt1, COAP_OPT_FINISH_NONE);
+
+
+    blockopt.offset = 128;
+    blockopt.blknum = 2;
+
+    /* 2. packet */
+    len = coap_build_hdr((coap_hdr_t *)&buf2[0], COAP_TYPE_NON,
+                         &token[0], 2, COAP_METHOD_GET, msgid);
+    coap_pkt_init(&pkt2, &buf2[0], sizeof(buf2), len);
+    coap_opt_add_string(&pkt2, COAP_OPT_URI_PATH, &path[0], '/');
+    coap_opt_add_block1_control(&pkt1, &blockopt);
+    coap_opt_finish(&pkt2, COAP_OPT_FINISH_NONE);
+
+    nanocoap_cache_key_blockreq_options_generate((const coap_pkt_t *) &pkt1, digest1);
+    nanocoap_cache_key_blockreq_options_generate((const coap_pkt_t *) &pkt2, digest2);
+
+    /* compare 1. and 2. packet. Should be equal except for blockwise */
+    TEST_ASSERT_EQUAL_INT(0, nanocoap_cache_key_compare(digest1, digest2));
+
+    /* Now with the blockwise option in the digest */
+    nanocoap_cache_key_options_generate((const coap_pkt_t *) &pkt1, digest1);
+    nanocoap_cache_key_options_generate((const coap_pkt_t *) &pkt2, digest2);
+
+    /* compare 1. and 2. packet. Should no longer be equal */
+    TEST_ASSERT(nanocoap_cache_key_compare(digest2, digest1) != 0);
+}
+
 static void test_nanocoap_cache__add(void)
 {
     uint8_t buf[_BUF_SIZE];
@@ -263,6 +317,7 @@ Test *tests_nanocoap_cache_tests(void)
         new_TestFixture(test_nanocoap_cache__add),
         new_TestFixture(test_nanocoap_cache__del),
         new_TestFixture(test_nanocoap_cache__cachekey),
+        new_TestFixture(test_nanocoap_cache__cachekey_blockwise),
         new_TestFixture(test_nanocoap_cache__max_age),
     };
 
