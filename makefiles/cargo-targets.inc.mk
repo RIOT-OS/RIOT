@@ -37,7 +37,6 @@ $(CARGO_COMPILE_COMMANDS): $(BUILDDEPS)
 	        -e 's/"riscv64-none-elf"/"riscv32"/g' \
 	        -e 's/"riscv64-unknown-elf"/"riscv32"/g' \
 	        -e 's/"riscv64-elf"/"riscv32"/g' \
-	        -e 's/"riscv-none-embed"/"riscv32"/g' \
 	  | $(LAZYSPONGE) $@
 
 
