@@ -35,6 +35,7 @@ USEMODULE += xtimer
 # This is an optimized stack value based on testing, if you observe
 # a segmentation fault please increase this stack size.
 CFLAGS += -DTHREAD_STACKSIZE_MAIN=3*THREAD_STACKSIZE_LARGE
+CFLAGS += -DCONFIG_NANOCOAP_SERVER_STACK_SIZE=3*THREAD_STACKSIZE_LARGE
 
 # Include responder code
 CONFIG_INITIATOR ?= 1
