@@ -7,11 +7,6 @@ endif
 FEATURES_PROVIDED += cpu_stm32$(CPU_FAM)
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
-FEATURES_PROVIDED += periph_timer_periodic
-FEATURES_PROVIDED += periph_timer_query_freqs
-FEATURES_PROVIDED += periph_rtt_overflow
-FEATURES_PROVIDED += periph_uart_modecfg
-FEATURES_PROVIDED += periph_uart_nonblocking
 FEATURES_PROVIDED += periph_gpio_ll
 FEATURES_PROVIDED += periph_gpio_ll_disconnect
 FEATURES_PROVIDED += periph_gpio_ll_input_pull_down
@@ -20,6 +15,12 @@ FEATURES_PROVIDED += periph_gpio_ll_irq
 FEATURES_PROVIDED += periph_gpio_ll_irq_level_triggered_high
 FEATURES_PROVIDED += periph_gpio_ll_irq_level_triggered_low
 FEATURES_PROVIDED += periph_gpio_ll_open_drain
+FEATURES_PROVIDED += periph_rtt_overflow
+FEATURES_PROVIDED += periph_spi_reconfigure
+FEATURES_PROVIDED += periph_timer_periodic
+FEATURES_PROVIDED += periph_timer_query_freqs
+FEATURES_PROVIDED += periph_uart_modecfg
+FEATURES_PROVIDED += periph_uart_nonblocking
 
 ifneq (f1,$(CPU_FAM))
   FEATURES_PROVIDED += periph_gpio_ll_open_drain_pull_up
