@@ -28,6 +28,7 @@
 
 #include <assert.h>
 
+#include "compiler_hints.h"
 #include "mutex.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
@@ -94,17 +95,17 @@ static uint8_t _get_prescaler(const spi_conf_t *conf, uint32_t clock)
      * happen if this cannot be met. So let's have a blown assertion
      * rather than runtime failures that require a logic analyzer to
      * debug. */
-    assert(prescaled_clock <= clock);
+    assume(prescaled_clock <= clock);
 
     return prescaler;
 }
 
 void spi_init(spi_t bus)
 {
-    assert(bus < SPI_NUMOF);
+    assume(bus < SPI_NUMOF);
 
-    /* initialize device lock */
-    mutex_init(&locks[bus]);
+    /* initialize device lock (as locked, spi_init_pins() will unlock it */
+    locks[bus] = (mutex_t)MUTEX_INIT_LOCKED;
     /* trigger pin initialization */
     spi_init_pins(bus);
 
@@ -120,6 +121,7 @@ void spi_init(spi_t bus)
 
 void spi_init_pins(spi_t bus)
 {
+    assume(bus < SPI_NUMOF);
 #ifdef CPU_FAM_STM32F1
 
     if (gpio_is_valid(spi_config[bus].sclk_pin)) {
@@ -149,6 +151,43 @@ void spi_init_pins(spi_t bus)
         gpio_init_af(spi_config[bus].sclk_pin, spi_config[bus].sclk_af);
     }
 #endif
+    mutex_unlock(&locks[bus]);
+}
+
+void spi_deinit_pins(spi_t bus)
+{
+    assume(bus < SPI_NUMOF);
+    mutex_lock(&locks[bus]);
+
+    if (gpio_is_valid(spi_config[bus].sclk_pin)) {
+        gpio_init(spi_config[bus].sclk_pin, GPIO_IN);
+    }
+
+    if (gpio_is_valid(spi_config[bus].mosi_pin)) {
+        gpio_init(spi_config[bus].mosi_pin, GPIO_IN);
+    }
+
+    if (gpio_is_valid(spi_config[bus].miso_pin)) {
+        gpio_init(spi_config[bus].miso_pin, GPIO_IN);
+    }
+}
+
+gpio_t spi_pin_miso(spi_t bus)
+{
+    assume(bus < SPI_NUMOF);
+    return spi_config[bus].miso_pin;
+}
+
+gpio_t spi_pin_mosi(spi_t bus)
+{
+    assume(bus < SPI_NUMOF);
+    return spi_config[bus].mosi_pin;
+}
+
+gpio_t spi_pin_clk(spi_t bus)
+{
+    assume(bus < SPI_NUMOF);
+    return spi_config[bus].sclk_pin;
 }
 
 int spi_init_cs(spi_t bus, spi_cs_t cs)
@@ -183,7 +222,7 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
 #ifdef MODULE_PERIPH_SPI_GPIO_MODE
 int spi_init_with_gpio_mode(spi_t bus, const spi_gpio_mode_t* mode)
 {
-    assert(bus < SPI_NUMOF);
+    assume(bus < SPI_NUMOF);
 
     int ret = 0;
 
@@ -212,7 +251,7 @@ int spi_init_with_gpio_mode(spi_t bus, const spi_gpio_mode_t* mode)
 
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
-    assert((unsigned)bus < SPI_NUMOF);
+    assume((unsigned)bus < SPI_NUMOF);
 
     /* lock bus */
     mutex_lock(&locks[bus]);
@@ -379,7 +418,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
                         const void *out, void *in, size_t len)
 {
     /* make sure at least one input or one output buffer is given */
-    assert(out || in);
+    assume(out || in);
 
     /* active the given chip select line */
     if ((cs != SPI_HWCS_MASK) && gpio_is_valid(cs)) {
