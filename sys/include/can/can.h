@@ -142,6 +142,7 @@ struct can_bittiming_const {
 
 #endif /* defined(__linux__) */
 
+typedef struct can_frame can_frame_t;
 #ifdef __cplusplus
 }
 #endif

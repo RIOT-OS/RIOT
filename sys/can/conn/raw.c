@@ -122,7 +122,7 @@ static void _tx_conf_timeout(void *arg)
     mbox_try_put(&conn->mbox, &msg);
 }
 
-int conn_can_raw_send(conn_can_raw_t *conn, const struct can_frame *frame, int flags)
+int conn_can_raw_send(conn_can_raw_t *conn, const can_frame_t *frame, int flags)
 {
     assert(conn != NULL);
 
@@ -206,7 +206,7 @@ static void _rx_timeout(void *arg)
     mbox_try_put(&conn->mbox, &msg);
 }
 
-int conn_can_raw_recv(conn_can_raw_t *conn, struct can_frame *frame, uint32_t timeout)
+int conn_can_raw_recv(conn_can_raw_t *conn, can_frame_t *frame, uint32_t timeout)
 {
     assert(conn != NULL);
 
