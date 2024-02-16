@@ -14,8 +14,7 @@ USEMODULE += shell
 USEMODULE += shell_cmds_default
 
 # use Ethernet as link-layer protocol
-ifeq (native,$(BOARD))
-  RIOT_TERMINAL = native
+ifneq (,$(filter native native64,$(BOARD)))
   TERMFLAGS += -z [::1]:17754
 else
   ETHOS_BAUDRATE ?= 115200
@@ -45,7 +44,7 @@ ifeq (1,$(STATIC_ROUTES))
 endif
 endif
 
-ifeq (,$(filter native,$(BOARD)))
+ifeq (,$(filter native native64,$(BOARD)))
 .PHONY: ethos
 
 ethos:

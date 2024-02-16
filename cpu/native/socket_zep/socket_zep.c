@@ -409,7 +409,7 @@ static int _request_transmit(ieee802154_dev_t *dev)
 {
     socket_zep_t *zepdev = dev->priv;
 
-    DEBUG("socket_zep::request_transmit(%zu bytes)\n", zepdev->snd_len);
+    DEBUG("socket_zep::request_transmit(%u bytes)\n", zepdev->snd_len);
 
     dev->cb(dev, IEEE802154_RADIO_INDICATION_TX_START);
 
@@ -448,7 +448,7 @@ int _len(ieee802154_dev_t *dev)
     }
 
     if (res < (int)sizeof(zep_v2_data_hdr_t)) {
-        DEBUG("socket_zep::len discard short frame (%zu bytes)\n", res);
+        DEBUG("socket_zep::len discard short frame (%u bytes)\n", res);
         return 0;
     }
 
@@ -491,7 +491,7 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t max_size,
     socket_zep_t *zepdev = dev->priv;
     size_t frame_len = max_size + sizeof(zep_v2_data_hdr_t) + 2;
 
-    DEBUG("socket_zep::read: reading up to %u bytes into %p\n", max_size, buf);
+    DEBUG("socket_zep::read: reading up to %zu bytes into %p\n", max_size, buf);
 
     if (frame_len > sizeof(zepdev->rcv_buf)) {
         DEBUG("socket_zep::read: frame size (%zu) exceeds RX  buffer (%zu bytes)\n",

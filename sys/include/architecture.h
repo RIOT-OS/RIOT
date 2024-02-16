@@ -52,47 +52,82 @@ extern "C" {
 /**
  * @brief   Size of a word in bits
  *
- * @details Depending on architecture, this can have a value of 8, 16, or 32
+ * @details Depending on architecture, this can have a value of 8, 16, 32, or 64
  */
 #define ARCHITECTURE_WORD_BITS      <NUM>
 /**
  * @brief   Size of a word in bytes
  *
- * @details Depending on architecture, this can have a value or 1, 2, or 4.
+ * @details Depending on architecture, this can have a value or 1, 2, 4, or 8.
  */
-#define ARCHITECTURE_WORD_BYTES     <NUM>
+#define ARCHITECTURE_WORD_BYTES     <ARCHITECTURE_WORD_BITS / 8>
 /**
  * @brief   Word sized unsigned integer
  *
- * @details Synonym to `uint8_t`, `uint16_t` or `uint32_t` depending on
- *          architecture
+ * @details Synonym to `uint8_t`, `uint16_t`, `uint32_t`, or `uint64_t`
+ *          depending on architecture
  */
-typedef uint<num>_t uword_t;
+typedef uint<NUM>_t uword_t;
 /**
  * @brief   Word sized signed integer
  *
- * @details Synonym to `int8_t`, `int16_t` or `int32_t` depending on
+ * @details Synonym to `int8_t`, `int16_t`, `int32_t`, or `int64_t` depending on
  *          architecture
  *
  * @note    This type is pronounce es-word-tea. When slaying dragons, this is
  *          not the tool you're looking for.
  */
-typedef int<num>_t  sword_t;
+typedef int<NUM>_t  sword_t;
+/**
+ * @brief   Highest number an sword_t can hold
+ */
+#define SWORD_MAX   <2^(ARCHITECTURE_WORD_BITS - 1) - 1>
+/**
+ * @brief   Smallest number an sword_t can hold
+ */
+#define SWORD_MIN   <-2^(ARCHITECTURE_WORD_BITS - 1)>
+/**
+ * @brief   Highest number an uword_t can hold
+ */
+#define UWORD_MAX   <2^ARCHITECTURE_WORD_BITS - 1>
+
+/* end of ifdef DOXYGEN */
 #elif (ARCHITECTURE_WORD_BITS == 8)
 #define ARCHITECTURE_WORD_BYTES     (1U)
 typedef uint8_t     uword_t;
 typedef int8_t      sword_t;
+#define SWORD_MAX   (INT8_MAX)
+#define SWORD_MIN   (INT8_MIN)
+#define UWORD_MAX   (UINT8_MAX)
 #elif (ARCHITECTURE_WORD_BITS == 16)
 #define ARCHITECTURE_WORD_BYTES     (2U)
 typedef uint16_t    uword_t;
 typedef int16_t     sword_t;
+#define SWORD_MAX   (INT16_MAX)
+#define SWORD_MIN   (INT16_MIN)
+#define UWORD_MAX   (UINT16_MAX)
 #elif (ARCHITECTURE_WORD_BITS == 32)
 #define ARCHITECTURE_WORD_BYTES     (4U)
 typedef uint32_t    uword_t;
 typedef int32_t     sword_t;
+#define SWORD_MAX   (INT32_MAX)
+#define SWORD_MIN   (INT32_MIN)
+#define UWORD_MAX   (UINT32_MAX)
+#elif (ARCHITECTURE_WORD_BITS == 64)
+#define ARCHITECTURE_WORD_BYTES     (8U)
+typedef uint64_t    uword_t;
+typedef int64_t     sword_t;
+#define SWORD_MAX   (INT64_MAX)
+#define SWORD_MIN   (INT64_MIN)
+#define UWORD_MAX   (UINT64_MAX)
 #else
 #error  "Unsupported word size (check ARCHITECTURE_WORD_BITS in architecture_arch.h)"
 #endif
+
+/**
+ * @brief   Smallest number an uword_t can hold
+ */
+#define UWORD_MIN   (0U)
 
 #if !defined(ARCHITECTURE_LARGE_TXT_PTR) || DOXYGEN
 /**
@@ -135,7 +170,6 @@ typedef uintptr_t   uinttxtptr_t;
 /**
  * @brief   Macro holding the format specifier to print an `ssize_t` variable
  *          in octal representation.
- * `0x` or `0`, respectively.
  */
 #define PRIoSIZE PRI_SIZE_T_MODIFIER "o"
 /**
@@ -145,12 +179,18 @@ typedef uintptr_t   uinttxtptr_t;
 #define PRIuSIZE PRI_SIZE_T_MODIFIER "u"
 /**
  * @brief   Macro holding the format specifier to print an `size_t` variable
- *          in hexadecimal representation (e.g. `2a` for 42).
+ *          in hexadecimal representation.
+ *
+ * @details Same as @ref PRIXSIZE for input, but uses lowercase letters for
+ *          output (e.g. `2a` for 42).
  */
 #define PRIxSIZE PRI_SIZE_T_MODIFIER "x"
 /**
  * @brief   Macro holding the format specifier to print an `size_t` variable
- *          in hexadecimal representation (e.g. `2A` for 42).
+ *          in hexadecimal representation.
+ *
+ * @details Same as @ref PRIxSIZE for input, but uses uppercase letters for
+ *          output (e.g. `2A` for 42).
  */
 #define PRIXSIZE PRI_SIZE_T_MODIFIER "X"
 
@@ -184,26 +224,6 @@ typedef uintptr_t   uinttxtptr_t;
  * @retval      0           @p addr is unaligned
  */
 #define IS_WORD_ALIGNED(addr) HAS_ALIGNMENT_OF(addr, ARCHITECTURE_WORD_BYTES)
-
-/**
- * @brief   Smallest number an uword_t can hold
- */
-#define UWORD_MIN                   0
-
-/**
- * @brief   Highest number an uword_t can hold
- */
-#define UWORD_MAX                   ((1ULL << ARCHITECTURE_WORD_BITS) - 1)
-
-/**
- * @brief   Smallest number an sword_t can hold
- */
-#define SWORD_MIN                   (-(1LL << (ARCHITECTURE_WORD_BITS - 1)))
-
-/**
- * @brief   Highest number an sword_t can hold
- */
-#define SWORD_MAX                   ((1LL << (ARCHITECTURE_WORD_BITS - 1)) - 1)
 
 #ifdef __cplusplus
 }

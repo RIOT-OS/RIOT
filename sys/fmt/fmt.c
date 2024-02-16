@@ -27,7 +27,8 @@
 
 #include "kernel_defines.h"
 #include "fmt.h"
-#include "stdio_base.h"
+
+extern ssize_t stdio_write(const void* buffer, size_t len);
 
 static const char _hex_chars[16] = "0123456789ABCDEF";
 

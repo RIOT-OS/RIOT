@@ -28,6 +28,9 @@ endif
 ifneq (,$(filter lm75,$(DRIVERS)))
   USEMODULE += tmp1075
 endif
+ifneq (,$(filter lsm6dsxx,$(DRIVERS)))
+  USEMODULE += lsm6dsl
+endif
 ifneq (,$(filter lpsxxx,$(DRIVERS)))
   USEMODULE += lps22hh
 endif

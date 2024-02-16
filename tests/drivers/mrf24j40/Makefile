@@ -12,6 +12,7 @@ BOARD_WHITELIST += adafruit-clue \
                    cc2538dk \
                    feather-nrf52840 \
                    native \
+                   native64 \
                    nrf52840dk \
                    nrf52840dongle \
                    nrf52840-mdk \

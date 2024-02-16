@@ -6,6 +6,7 @@ MODULE = periph
 # family it is the (incompatible) USCI.
 ifeq (msp430_x1xx,$(CPU_FAM))
   SERIAL_IP_BLOCK := usart
+  SRC += $(SERIAL_IP_BLOCK).c
 endif
 ifeq (msp430_f2xx_g2xx,$(CPU_FAM))
   SERIAL_IP_BLOCK := usci

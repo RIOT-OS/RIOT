@@ -5,7 +5,7 @@ USEMODULE += xtimer
 USEMODULE += xtimer_no_ztimer_default
 
 # This test randomly fails on `native` so disable it from CI
-TEST_ON_CI_BLACKLIST += native
+TEST_ON_CI_BLACKLIST += native native64
 # Boards that can't run only on xtimer or that always select ztimer
 BOARD_BLACKLIST += \
                    esp32s2-wemos-mini \

@@ -8,7 +8,7 @@
 config PACKAGE_LUA
     bool "LUA language package"
     depends on TEST_KCONFIG
-    depends on HAS_ARCH_32BIT
+    depends on HAS_ARCH_32BIT || HAS_ARCH_64BIT
     depends on !HAS_ARCH_RISCV
     depends on !MODULE_PICOLIBC
 

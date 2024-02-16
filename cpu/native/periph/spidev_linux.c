@@ -320,7 +320,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
         DEBUG("spi_transfer_bytes: ioctl failed\n");
     }
     else {
-        DEBUG("spi_transfer_bytes: transferred %u bytes\n", len);
+        DEBUG("spi_transfer_bytes: transferred %zu bytes\n", len);
     }
 
 #ifdef MODULE_PERIPH_GPIO

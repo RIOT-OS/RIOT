@@ -22,9 +22,14 @@ FEATURES_PROVIDED += periph_flashpage
 FEATURES_PROVIDED += periph_flashpage_in_address_space
 FEATURES_PROVIDED += periph_flashpage_pagewise
 FEATURES_PROVIDED += periph_gpio_ll
+FEATURES_PROVIDED += periph_gpio_ll_disconnect
+FEATURES_PROVIDED += periph_gpio_ll_input_pull_down
+FEATURES_PROVIDED += periph_gpio_ll_input_pull_up
 FEATURES_PROVIDED += periph_gpio_ll_irq
 FEATURES_PROVIDED += periph_gpio_ll_irq_level_triggered_high
 FEATURES_PROVIDED += periph_gpio_ll_irq_level_triggered_low
+FEATURES_PROVIDED += periph_gpio_ll_open_drain
+FEATURES_PROVIDED += periph_gpio_ll_open_drain_pull_up
 FEATURES_PROVIDED += periph_spi_reconfigure
 FEATURES_PROVIDED += puf_sram
 
@@ -44,6 +49,15 @@ else ifneq (,$(filter esp32c3 esp32s3,$(CPU_FAM)))
   FEATURES_PROVIDED += ble_phy_2mbit
   FEATURES_PROVIDED += esp_ble
   FEATURES_PROVIDED += esp_ble_esp32c3
+endif
+
+ifneq (,$(filter esp32 esp32s3,$(CPU_FAM)))
+  FEATURES_PROVIDED += periph_sdmmc_auto_clk
+  FEATURES_PROVIDED += periph_sdmmc_auto_cmd12
+  FEATURES_PROVIDED += periph_sdmmc_mmc
+  ifeq (esp32s3,$(CPU_FAM))
+    FEATURES_PROVIDED += periph_sdmmc_hs
+  endif
 endif
 
 ifneq (,$(filter esp32-wrover% esp32s2%r2 esp32s3%r2 esp32s3%r8 esp32s3%r8v,$(CPU_MODEL)))

@@ -79,16 +79,18 @@ NORETURN void core_panic(core_panic_t crash_code, const char *message)
     /* disable watchdog and all possible sources of interrupts */
     irq_disable();
     panic_arch();
-#ifndef DEVELHELP
+#if !defined(DEVELHELP) && defined(MODULE_PERIPH_PM)
     /* DEVELHELP not set => reboot system */
     pm_reboot();
 #else
     /* DEVELHELP set => power off system */
     /*               or start bootloader */
-#ifdef MODULE_USB_BOARD_RESET
+#if defined(MODULE_USB_BOARD_RESET)
     usb_board_reset_in_bootloader();
-#else
+#elif defined(MODULE_PERIPH_PM)
     pm_off();
+#else
+    while (1) {}
 #endif
 #endif /* DEVELHELP */
 

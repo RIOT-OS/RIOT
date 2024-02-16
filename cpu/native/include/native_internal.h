@@ -32,6 +32,7 @@
 
 #include <signal.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <poll.h>
 /* enable signal handler register access on different platforms
  * check here for more:
@@ -111,7 +112,7 @@ extern int (*real_accept)(int socket, ...);
 /* The ... is a hack to save includes: */
 extern int (*real_bind)(int socket, ...);
 extern int (*real_connect)(int socket, ...);
-extern int (*real_recv)(int sockfd, void *buf, size_t len, int flags);
+extern ssize_t (*real_recv)(int sockfd, void *buf, size_t len, int flags);
 extern int (*real_chdir)(const char *path);
 extern int (*real_close)(int);
 extern int (*real_fcntl)(int, int, ...);
@@ -127,7 +128,7 @@ extern int (*real_getaddrinfo)(const char *node, ...);
 extern int (*real_getifaddrs)(struct ifaddrs **ifap);
 extern int (*real_getpid)(void);
 extern int (*real_gettimeofday)(struct timeval *t, ...);
-extern int (*real_ioctl)(int fildes, int request, ...);
+extern int (*real_ioctl)(int fildes, unsigned long request, ...);
 extern int (*real_listen)(int socket, int backlog);
 extern int (*real_open)(const char *path, int oflag, ...);
 extern int (*real_mkdir)(const char *pathname, mode_t mode);
@@ -164,7 +165,7 @@ extern ssize_t (*real_send)(int sockfd, const void *buf, size_t len, int flags);
  * data structures
  */
 extern volatile int native_interrupts_enabled;
-extern volatile unsigned int _native_saved_eip;
+extern volatile uintptr_t _native_saved_eip;
 extern int _sig_pipefd[2];
 extern volatile int _native_sigpend;
 extern volatile int _native_in_isr;

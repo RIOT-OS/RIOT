@@ -17,7 +17,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-int to_file(const char *filename, void *buf, size_t len)
+int to_file(const char *filename, const void *buf, size_t len)
 {
     int fd;
 
@@ -32,6 +32,27 @@ int to_file(const char *filename, void *buf, size_t len)
         ssize_t res = write(fd, buf, len);
         close(fd);
         return res == (ssize_t)len;
+    }
+    else {
+        return fd;
+    }
+}
+
+int from_file(const char *filename, void *buf, size_t len)
+{
+    int fd;
+
+    if (strcmp("-", filename)) {
+        fd = open(filename, O_RDONLY, 0);
+    }
+    else {
+        fd = STDIN_FILENO;
+    }
+
+    if (fd > 0) {
+        ssize_t res = read(fd, buf, len);
+        close(fd);
+        return res;
     }
     else {
         return fd;

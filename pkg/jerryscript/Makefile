@@ -16,10 +16,10 @@ EXT_CFLAGS := -D__TARGET_RIOT
 CFLAGS += -Wno-cast-align
 
 # disable warnings when compiling with LLVM for board native
-ifeq ($(TOOLCHAIN)_$(BOARD),llvm_native)
+ifeq ($(TOOLCHAIN)_$(CPU),llvm_native)
   CFLAGS += -Wno-macro-redefined -Wno-gnu-folding-constant
   EXT_CFLAGS += -Wno-conversion
-else ifeq ($(OS)_$(BOARD),FreeBSD_native)
+else ifeq ($(OS)_$(CPU),FreeBSD_native)
   EXT_CFLAGS += -Wno-conversion
 else ifeq (esp32,$(CPU))
   # The ESP-IDF uses #include_next that causes errors when compiling with warnings

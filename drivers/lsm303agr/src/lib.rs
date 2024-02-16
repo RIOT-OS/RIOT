@@ -1,6 +1,6 @@
 #![no_std]
 
-use lsm303agr::{interface, mode, Lsm303agr, AccelOutputDataRate::Hz50};
+use lsm303agr::{interface, mode, Lsm303agr, AccelOutputDataRate::Hz50, AccelMode};
 
 use riot_wrappers::{saul, println, i2c, cstr::cstr, mutex::Mutex};
 use saul::{Phydat, registration};
@@ -59,9 +59,11 @@ fn init() -> Result<(), &'static str> {
     for (&i2cdev, (lsm, (reg, reg_mag))) in I2C_DEVICES.iter().zip(lsm.iter_mut().zip(reg.iter_mut().zip(reg_mag.iter_mut()))) {
         let mut device = Lsm303agr::new_with_i2c(i2c::I2CDevice::new(i2cdev));
 
+        let mut init_clock = riot_wrappers::ztimer::Clock::msec();
+
         device.init()
             .map_err(|_| "Device initialization failed")?;
-        device.set_accel_odr(Hz50)
+        device.set_accel_mode_and_odr(&mut init_clock, AccelMode::Normal, Hz50)
             .map_err(|_| "Device configuration failed")?;
 
         let lsm = lsm.insert(SaulLSM { device: Mutex::new(device) });
@@ -90,10 +92,10 @@ impl registration::Drivable for &SaulLSM {
         let mut device = self.device.try_lock()
             .ok_or(registration::Error)?;
 
-        let data = device.accel_data()
+        let data = device.acceleration()
             .map_err(|_| registration::Error)?;
         // Data is in the +-2g range by default, which doesn't overflow even the i16 SAUL uses
-        Ok(Phydat::new(&[data.x as _, data.y as _, data.z as _], Some(saul::Unit::GForce), -3))
+        Ok(Phydat::new(&[data.x_mg() as _, data.y_mg() as _, data.z_mg() as _], Some(saul::Unit::GForce), -3))
     }
 }
 
@@ -115,9 +117,8 @@ impl registration::Drivable for MagAspect {
         let mut device = self.0.device.try_lock()
             .ok_or(registration::Error)?;
 
-        let data = nb::block!(device.mag_data())
+        let data = device.magnetic_field()
             .map_err(|_| registration::Error)?;
-        // Original data is in nanotesla
-        return Ok(Phydat::fit(&[data.x, data.y, data.z], Some(saul::Unit::T), -9))
+        return Ok(Phydat::fit(&[data.x_nt(), data.y_nt(), data.z_nt()], Some(saul::Unit::T), -9))
     }
 }

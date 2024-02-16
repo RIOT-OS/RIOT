@@ -238,7 +238,7 @@ static int cmd_init(int argc, char **argv)
     baud = strtol(argv[2], NULL, 0);
 
     /* initialize UART */
-    res = uart_init(UART_DEV(dev), baud, rx_cb, (void *)dev);
+    res = uart_init(UART_DEV(dev), baud, rx_cb, (void *)(intptr_t)dev);
     if (res == UART_NOBAUD) {
         printf("Error: Given baudrate (%u) not possible\n", (unsigned int)baud);
         return 1;

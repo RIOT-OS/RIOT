@@ -6,7 +6,7 @@ ifeq (llvm,$(TOOLCHAIN))
   CFLAGS += -Wno-unused-parameter
 endif
 
-ifeq (native,$(BOARD))
+ifeq (native,$(CPU))
   CFLAGS += -Wno-array-parameter
 endif
 

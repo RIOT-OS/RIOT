@@ -27,6 +27,5 @@ class NativeRIOTCtrl(riotctrl.ctrl.RIOTCtrl):
     def start_term(self, *args, **kwargs):
         super().start_term(*args, **kwargs)
         for child in psutil.Process(pid=self._term_pid()).children():
-            for grandchild in child.children():
-                if self._set_debug_adapter_id(grandchild):
-                    break
+            if self._set_debug_adapter_id(child):
+                break

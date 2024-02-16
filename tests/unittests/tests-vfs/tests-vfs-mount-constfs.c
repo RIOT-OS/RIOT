@@ -173,7 +173,7 @@ static void test_vfs_constfs_read_lseek(void)
     TEST_ASSERT_EQUAL_INT(0, res);
 }
 
-#if MODULE_NEWLIB || MODULE_PICOLIBC || defined(BOARD_NATIVE)
+#if MODULE_NEWLIB || MODULE_PICOLIBC || defined(CPU_NATIVE)
 static void test_vfs_constfs__posix(void)
 {
     int res;
@@ -212,7 +212,7 @@ Test *tests_vfs_mount_constfs_tests(void)
         new_TestFixture(test_vfs_umount__invalid_mount),
         new_TestFixture(test_vfs_constfs_open),
         new_TestFixture(test_vfs_constfs_read_lseek),
-#if MODULE_NEWLIB || MODULE_PICOLIBC || defined(BOARD_NATIVE)
+#if MODULE_NEWLIB || MODULE_PICOLIBC || defined(CPU_NATIVE)
         new_TestFixture(test_vfs_constfs__posix),
 #endif
     };

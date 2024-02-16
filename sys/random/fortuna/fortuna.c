@@ -53,6 +53,7 @@ static void fortuna_reseed(fortuna_state_t *state, const uint8_t *seed,
 
 /*
  * Corresponds to section 9.4.3.
+ * Returns 0 on success; A negative value otherwise
  */
 static int fortuna_generate_blocks(fortuna_state_t *state, uint8_t *out,
                                    size_t blocks)
@@ -75,7 +76,10 @@ static int fortuna_generate_blocks(fortuna_state_t *state, uint8_t *out,
     }
 
     for (size_t i = 0; i < blocks; i++) {
-        aes_encrypt(&cipher, state->gen.counter.bytes, out + (i * 16));
+        res = aes_encrypt(&cipher, state->gen.counter.bytes, out + (i * 16));
+        if (res != 1) {
+            return -3;
+        }
         fortuna_increment_counter(state);
     }
 

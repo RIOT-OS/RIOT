@@ -243,7 +243,7 @@ gnrc_pktsnip_t *gnrc_pktbuf_start_write(gnrc_pktsnip_t *pkt)
 #ifdef MODULE_OD
 static inline void _print_chunk(void *chunk, size_t size, int num)
 {
-    printf("=========== chunk %3" PRIuSIZE " (%-10p size: %4u) ===========\n", num, chunk,
+    printf("=========== chunk %3i (%-10p size: %4" PRIuSIZE ") ===========\n", num, chunk,
            size);
     od_hex_dump(chunk, size, OD_WIDTH_DEFAULT);
 }

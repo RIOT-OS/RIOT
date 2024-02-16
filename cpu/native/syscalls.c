@@ -82,7 +82,7 @@ int (*real_fork)(void);
 int (*real_feof)(FILE *stream);
 int (*real_ferror)(FILE *stream);
 int (*real_listen)(int socket, int backlog);
-int (*real_ioctl)(int fildes, int request, ...);
+int (*real_ioctl)(int fildes, unsigned long request, ...);
 int (*real_open)(const char *path, int oflag, ...);
 int (*real_pause)(void);
 int (*real_pipe)(int[2]);
@@ -334,29 +334,39 @@ int getc(FILE *fp)
 __attribute__((__format__ (__printf__, 1, 0)))
 char *make_message(const char *format, va_list argp)
 {
-    int size = 100;
+    int size = 128;
     char *message, *temp;
 
     if ((message = malloc(size)) == NULL) {
         return NULL;
     }
 
+    /* argp is undefined after calling vsnprintf, so we copy the list first */
+    va_list argp_copy;
+    va_copy(argp_copy, argp);
+
     while (1) {
         int n = vsnprintf(message, size, format, argp);
         if (n < 0) {
             free(message);
+            va_end(argp_copy);
             return NULL;
         }
         if (n < size) {
+            va_end(argp_copy);
             return message;
         }
         size = n + 1;
         if ((temp = realloc(message, size)) == NULL) {
             free(message);
+            va_end(argp_copy);
             return NULL;
         }
         else {
             message = temp;
+            /* copy the list back and try again */
+            va_end(argp);
+            va_copy(argp, argp_copy);
         }
     }
 }

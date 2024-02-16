@@ -39,8 +39,7 @@
 #include "periph/uart.h"
 #endif /* IS_USED(MODULE_STDIO_NIMBLE_DEBUG) */
 
-#include "tsrb.h"
-#include "isrpipe.h"
+#include "stdio_base.h"
 #include "stdio_nimble.h"
 
 #define NIMBLE_MAX_PAYLOAD  MYNEWT_VAL(BLE_LL_MAX_PKT_SIZE)
@@ -54,10 +53,6 @@ enum {
     STDIO_NIMBLE_SUBSCRIBED,
     STDIO_NIMBLE_SENDING,
 };
-
-/* isrpipe for stdin */
-static uint8_t _isrpipe_stdin_mem[CONFIG_STDIO_NIMBLE_STDIN_BUFSIZE];
-static isrpipe_t _isrpipe_stdin = ISRPIPE_INIT(_isrpipe_stdin_mem);
 
 /* tsrb for stdout */
 static uint8_t _tsrb_stdout_mem[CONFIG_STDIO_NIMBLE_STDOUT_BUFSIZE];
@@ -176,11 +171,11 @@ static const struct ble_gatt_svc_def _gatt_svr_svcs[] =
 
 static void _purge_buffer(void)
 {
-    tsrb_clear(&_isrpipe_stdin.tsrb);
+    tsrb_clear(&stdin_isrpipe.tsrb);
 
 #if IS_USED(MODULE_SHELL)
     /* send Ctrl-C to the shell to reset the input */
-    isrpipe_write_one(&_isrpipe_stdin, '\x03');
+    isrpipe_write_one(&stdin_isrpipe, '\x03');
 #endif
 
     tsrb_clear(&_tsrb_stdout);
@@ -295,12 +290,12 @@ static int gatt_svr_chr_access_stdin(
     /* read sent data */
     int rc = ble_hs_mbuf_to_flat(ctxt->om, _stdin_read_buf, sizeof(_stdin_read_buf), &om_len);
 
-    isrpipe_write(&_isrpipe_stdin, _stdin_read_buf, om_len);
+    isrpipe_write(&stdin_isrpipe, _stdin_read_buf, om_len);
 
     return rc;
 }
 
-void stdio_init(void)
+static void _init(void)
 {
 #if IS_USED(MODULE_STDIO_NIMBLE_DEBUG)
     uart_init(STDIO_UART_DEV, STDIO_UART_BAUDRATE, NULL, NULL);
@@ -310,30 +305,7 @@ void stdio_init(void)
                          _send_stdout, NULL);
 }
 
-#if IS_USED(MODULE_STDIO_AVAILABLE)
-int stdio_available(void)
-{
-    return tsrb_avail(&_isrpipe_stdin.tsrb);
-}
-#endif
-
-ssize_t stdio_read(void *buffer, size_t count)
-{
-    /* blocks until at least one character was read */
-    ssize_t res = isrpipe_read(&_isrpipe_stdin, buffer, count);
-
-#if IS_USED(MODULE_STDIO_NIMBLE_DEBUG)
-    unsigned state = irq_disable();
-    uart_write(STDIO_UART_DEV, (const uint8_t *)PREFIX_STDIN, strlen(PREFIX_STDIN));
-    uart_write(STDIO_UART_DEV, (const uint8_t *)buffer, res);
-    uart_write(STDIO_UART_DEV, (const uint8_t *)"\n", 1);
-    irq_restore(state);
-#endif
-
-    return res;
-}
-
-ssize_t stdio_write(const void *buffer, size_t len)
+static ssize_t _write(const void *buffer, size_t len)
 {
     unsigned state = irq_disable();
 
@@ -378,3 +350,5 @@ void stdio_nimble_init(void)
     /* fix compilation error when using DEVELHELP=0 */
     (void)rc;
 }
+
+STDIO_PROVIDER(STDIO_NIMBLE, _init, NULL, _write)

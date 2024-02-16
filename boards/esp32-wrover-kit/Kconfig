@@ -18,11 +18,13 @@ config BOARD_ESP32_WROVER_KIT
     select HAS_PERIPH_ADC
     select HAS_PERIPH_I2C
     select HAS_PERIPH_PWM
+    select HAS_PERIPH_SDMMC
     select HAS_PERIPH_SPI
     select HAS_SDCARD_SPI
 
     select HAVE_ILI9341
-    select HAVE_MTD_SDCARD_DEFAULT
+    select HAVE_MTD_SDMMC_DEFAULT if !MODULE_SDCARD_SPI
+
     select MODULE_FATFS_VFS if MODULE_VFS_DEFAULT
 
 source "$(RIOTBOARD)/common/esp32/Kconfig"

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Freie Universität Berlin
+ *               2023 Otto-von-Guericke-Universität Magdeburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  * @brief       Low-level UART driver implementation
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Marian Buschsieweke <marian.buschsieweke@posteo.net>
  *
  * @}
  */
@@ -23,105 +25,135 @@
 #include "periph_cpu.h"
 #include "periph_conf.h"
 #include "periph/uart.h"
+#include "periph/gpio.h"
+#include "compiler_hints.h"
 
-/**
- * @brief   Keep track of the interrupt context
- * @{
- */
-static uart_rx_cb_t ctx_rx_cb;
-static void *ctx_isr_arg;
-/** @} */
+static uart_isr_ctx_t ctx[UART_NUMOF];
+static msp430_usart_conf_t confs[UART_NUMOF];
 
-static int init_base(uart_t uart, uint32_t baudrate);
-
-int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
+static void init(uart_t uart)
 {
-    int res = init_base(uart, baudrate);
-    if (res != UART_OK) {
-        return res;
+    const msp430_usart_uart_params_t *params = uart_config[uart].uart;
+    msp430_usart_t *dev = params->usart_params.dev;
+    uint8_t enable_mask = params->rxtx_enable_mask;
+
+    /* most of the time UART is used to both send and receive */
+    if (unlikely(!ctx[uart].rx_cb)) {
+        enable_mask = params->tx_enable_mask;
     }
 
-    /* save interrupt context */
-    ctx_rx_cb = rx_cb;
-    ctx_isr_arg = arg;
-    /* reset interrupt flags and enable RX interrupt */
-    UART_SFR->IE &= ~(UART_IE_TX_BIT);
-    UART_SFR->IFG &= ~(UART_IE_RX_BIT);
-    UART_SFR->IFG |=  (UART_IE_TX_BIT);
-    UART_SFR->IE |=  (UART_IE_RX_BIT);
-    return UART_OK;
+    /* acquire USART and put in in UART mode */
+    msp430_usart_acquire(&params->usart_params, &confs[uart], enable_mask);
+
+    /* configure pins */
+    gpio_set(params->txd);
+    gpio_init(params->txd, GPIO_OUT);
+    gpio_periph_mode(params->txd, true);
+
+    gpio_init(params->rxd, GPIO_IN);
+    gpio_periph_mode(params->rxd, true);
+
+    /* now that everything is configured, release the software reset bit */
+    dev->CTL &= ~(SWRST);
+
+    /* finally, enable the RX IRQ (won't work prior to releasing the software
+     * reset bit, as this is cleared under reset) */
+    if (likely(ctx[uart].rx_cb)) {
+        msp430_usart_enable_rx_irq(&params->usart_params);
+    }
 }
 
-static int init_base(uart_t uart, uint32_t baudrate)
+int uart_init(uart_t uart, uint32_t symbolrate, uart_rx_cb_t rx_cb, void *arg)
 {
-    if (uart != 0) {
-        return UART_NODEV;
+    assume((unsigned)uart < UART_NUMOF);
+
+    /* save interrupt context */
+    ctx[uart].rx_cb = rx_cb;
+    ctx[uart].arg = arg;
+
+    /* prepare and save UART config */
+    confs[uart].ctl = CHAR;
+    confs[uart].prescaler = msp430_usart_prescale(symbolrate, USART_MIN_BR_UART);
+
+
+    if (rx_cb) {
+        init(uart);
     }
 
-    /* get the default UART for now -> TODO: enable for multiple devices */
-    msp430_usart_t *dev = UART_BASE;
-
-    /* power off and reset device */
-    uart_poweroff(uart);
-    dev->CTL = SWRST;
-    /* configure to 8N1 and using the SMCLK*/
-    dev->CTL |= CHAR;
-    dev->TCTL = (TXEPT | UXTCTL_SSEL_SMCLK);
-    dev->RCTL = 0x00;
-    /* baudrate configuration */
-    uint16_t br = (uint16_t)(msp430_submain_clock_freq() / baudrate);
-    dev->BR0 = (uint8_t)br;
-    dev->BR1 = (uint8_t)(br >> 8);
-    /* TODO: calculate value for modulation register */
-    dev->MCTL = 0;
-    /* configure pins -> TODO: move into GPIO driver (once implemented) */
-    UART_PORT->SEL |= (UART_RX_PIN | UART_TX_PIN);
-    msp430_port_t *port = &UART_PORT->base;
-    port->OD |= UART_RX_PIN;
-    port->OD &= ~(UART_TX_PIN);
-    port->DIR |= UART_TX_PIN;
-    port->DIR &= ~(UART_RX_PIN);
-    /* enable receiver and transmitter */
-    uart_poweron(uart);
-    /* and finally release the software reset bit */
-    dev->CTL &= ~(SWRST);
     return UART_OK;
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
-    (void)uart;
-    msp430_usart_t *dev = UART_BASE;
+    assume((unsigned)uart < UART_NUMOF);
+    const msp430_usart_uart_params_t *params = uart_config[uart].uart;
+    msp430_usart_t *dev = params->usart_params.dev;
+
+    /* If UART is in TX-only, the USART is released when done sending.
+     * This is not only helpful for power saving, but also to share the USART.
+     */
+    if (!unlikely(ctx[uart].rx_cb)) {
+        init(uart);
+    }
 
     for (size_t i = 0; i < len; i++) {
         while (!(dev->TCTL & TXEPT)) {}
         dev->TXBUF = data[i];
     }
+
+    if (!unlikely(ctx[uart].rx_cb)) {
+        msp430_usart_release(&params->usart_params);
+    }
 }
 
 void uart_poweron(uart_t uart)
 {
-    (void)uart;
-    UART_SFR->ME |= UART_ME_BITS;
+    assume((unsigned)uart < UART_NUMOF);
+    /* In TX-only mode, the USART is only powered on when transmitting */
+    if (likely(ctx[uart].rx_cb)) {
+        init(uart);
+    }
 }
 
 void uart_poweroff(uart_t uart)
 {
-    (void)uart;
-    UART_SFR->ME &= ~(UART_ME_BITS);
+    assume((unsigned)uart < UART_NUMOF);
+    const msp430_usart_uart_params_t *params = uart_config[uart].uart;
+    /* In TX-only mode, the USART is only powered on when transmitting */
+    if (likely(ctx[uart].rx_cb)) {
+        msp430_usart_release(&params->usart_params);
+    }
 }
 
-ISR(UART_RX_ISR, isr_uart_0_rx)
+static void uart_rx_isr(uart_t uart)
 {
-    __enter_isr();
+    assume((unsigned)uart < UART_NUMOF);
+    const msp430_usart_uart_params_t *params = uart_config[uart].uart;
+    msp430_usart_t *dev = params->usart_params.dev;
 
     /* read character (resets interrupt flag) */
-    char c = UART_BASE->RXBUF;
+    char c = dev->RXBUF;
 
     /* only call callback if there was no receive error */
-    if(! (UART_BASE->RCTL & RXERR)) {
-        ctx_rx_cb(ctx_isr_arg, c);
+    if (!(dev->RCTL & RXERR)) {
+        ctx[uart].rx_cb(ctx[uart].arg, c);
     }
+}
 
+#ifdef UART0_RX_ISR
+ISR(UART0_RX_ISR, isr_uart_0_rx)
+{
+    __enter_isr();
+    uart_rx_isr(UART_DEV(0));
     __exit_isr();
 }
+#endif
+
+#ifdef UART1_RX_ISR
+ISR(UART1_RX_ISR, isr_uart_0_rx)
+{
+    __enter_isr();
+    uart_rx_isr(UART_DEV(1));
+    __exit_isr();
+}
+#endif

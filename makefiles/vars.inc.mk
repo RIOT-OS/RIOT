@@ -46,6 +46,7 @@ export RIOTMAKE              # Location of all supplemental Makefiles (such as t
 export RIOTKCONFIG           # Location of all supplemental Kconfig files
 export BINDIRBASE            # This is the folder where the application should be built in. For each BOARD a different subfolder is used.
 export BINDIR                # This is the folder where the application should be built in.
+export RIOT_TEST_HASH_DIR    # The dir to generate the test-input-hash.sha1 file for checking if a test has changed, uses BINDIR by default.
 export CARGO_TARGET_DIR      # This is the folder where Rust parts of the application should be built in.
 export BUILD_DIR             # This is the base folder to store common build files and artifacts, e.g. test results.
 export APPDIR                # The base folder containing the application

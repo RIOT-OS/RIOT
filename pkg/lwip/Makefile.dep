@@ -1,6 +1,6 @@
 # lwIP's memory management doesn't seem to work on non 32-bit platforms at the
 # moment.
-FEATURES_REQUIRED += arch_32bit
+FEATURES_REQUIRED_ANY += arch_32bit|arch_64bit
 
 DEFAULT_MODULE += auto_init_lwip
 

@@ -19,22 +19,48 @@
  */
 
 #include <errno.h>
+#include <stdio.h>
 
+#include "stdio_base.h"
 #include "macros/utils.h"
+#include "net/sock/async.h"
 #include "net/sock/udp.h"
 
 #ifndef CONFIG_STDIO_UDP_PORT
 #define CONFIG_STDIO_UDP_PORT       2323
 #endif
 
-#ifndef CONFIG_STDIO_UDP_RX_BUF_LEN
-#define CONFIG_STDIO_UDP_RX_BUF_LEN 64
+#ifndef EOT
+#define EOT 0x4
 #endif
 
 static sock_udp_t sock;
 static sock_udp_ep_t remote;
 
-void stdio_init(void)
+static void _sock_cb(sock_udp_t *sock, sock_async_flags_t flags, void *arg)
+{
+    (void)arg;
+
+    if ((flags & SOCK_ASYNC_MSG_RECV) == 0) {
+        return;
+    }
+
+    void *data, *ctx = NULL;
+
+    int res;
+    while ((res = sock_udp_recv_buf(sock, &data, &ctx, 0, &remote)) > 0) {
+        isrpipe_write(&stdin_isrpipe, data, res);
+
+        /* detach remote */
+        if (res == 1 && *(int8_t *)data == EOT) {
+            const char msg[] = "\nremote detached\n";
+            sock_udp_send(sock, msg, sizeof(msg), &remote);
+            memset(&remote, 0, sizeof(remote));
+        }
+    }
+}
+
+static void _init(void)
 {
     const sock_udp_ep_t local = {
         .family = AF_INET6,
@@ -43,36 +69,10 @@ void stdio_init(void)
     };
 
     sock_udp_create(&sock, &local, NULL, 0);
+    sock_udp_set_cb(&sock, _sock_cb, NULL);
 }
 
-ssize_t stdio_read(void* buffer, size_t count)
-{
-    static uint8_t rx_buf[CONFIG_STDIO_UDP_RX_BUF_LEN];
-    static uint8_t *pos;
-    static size_t left;
-
-    /* shell will only read one byte at a time, so we buffer the input */
-    if (left == 0) {
-        int res = sock_udp_recv(&sock, rx_buf, sizeof(rx_buf),
-                                SOCK_NO_TIMEOUT, &remote);
-        if (res > 0) {
-            left = res;
-            pos = rx_buf;
-        } else {
-            return res;
-        }
-    }
-
-    count = MIN(left, count);
-    memcpy(buffer, pos, count);
-
-    left -= count;
-    pos  += count;
-
-    return count;
-}
-
-ssize_t stdio_write(const void* buffer, size_t len)
+static ssize_t _write(const void* buffer, size_t len)
 {
     if (remote.port == 0) {
         return -ENOTCONN;
@@ -83,3 +83,11 @@ ssize_t stdio_write(const void* buffer, size_t len)
 
     return sock_udp_send(&sock, buffer, len, &remote);
 }
+
+static void _detach(void)
+{
+    sock_udp_close(&sock);
+    memset(&remote, 0, sizeof(remote));
+}
+
+STDIO_PROVIDER(STDIO_UDP, _init, _detach, _write)

@@ -63,6 +63,32 @@ extern "C" {
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
 
+#ifndef ABS
+/**
+ * @brief Returns the absolute value of @p x
+ *
+ * @note    This is the trivial implementation that does evaluate the arguments
+ *          more than once
+ */
+#define ABS(x) ((x) > 0 ? (x) : -(x))
+#endif
+
+/**
+ * @brief   Limit a value to an inclusive range
+ *
+ * If @p val is > @p high, @p high is returned. If @p val is < @p low, @p low
+ * is returned. Otherwise, @p val is returned.
+ *
+ * @note    This macro evaluate its arguments more than once.
+ *
+ * @param[in] val       value to limit
+ * @param[in] low       minimum limit
+ * @param[in] high      maximum limit
+ *
+ * @return range limited value
+ */
+#define LIMIT(val, low, high) ((val < low) ? low : (val > high) ? high : val)
+
 #ifdef __cplusplus
 }
 #endif

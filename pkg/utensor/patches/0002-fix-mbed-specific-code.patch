@@ -15,7 +15,7 @@ index 4d1dd48..32c50df 100644
 @@ -1,5 +1,5 @@
  #include "src/uTensor/util/uTensor_util.hpp"
 -#if !(defined(TARGET_MBED) || defined(ARDUINO))
-+#ifdef BOARD_NATIVE
++#ifdef CPU_NATIVE
  #include <sys/stat.h>
  #include <dirent.h>
  #endif
@@ -24,7 +24,7 @@ index 4d1dd48..32c50df 100644
  }
  
 -#ifdef ARDUINO
-+#ifndef BOARD_NATIVE
++#ifndef CPU_NATIVE
  void int_env() {
  }
  #else

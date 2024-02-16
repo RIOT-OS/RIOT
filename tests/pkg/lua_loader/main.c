@@ -69,7 +69,11 @@ const size_t lua_riot_builtin_lua_table_len =
 const size_t lua_riot_builtin_c_table_len =
     ARRAY_SIZE(_lua_riot_builtin_c_table);
 
+#if (__SIZEOF_POINTER__ == 8)
+#define LUA_MEM_SIZE (22000)
+#else
 #define LUA_MEM_SIZE (11000)
+#endif
 static char lua_mem[LUA_MEM_SIZE] __attribute__ ((aligned(__BIGGEST_ALIGNMENT__)));
 
 #define LINEBUF_SZ (32)

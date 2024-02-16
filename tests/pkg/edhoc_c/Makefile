@@ -4,7 +4,7 @@ include $(RIOTBASE)/tests/Makefile.boards.netif
 BOARD_WHITELIST += $(BOARD_PROVIDES_NETIF)
 # Cannot run the test on `murdock` in `native`
 #   open(/dev/net/tun): No such file or directory
-TEST_ON_CI_BLACKLIST += native
+TEST_ON_CI_BLACKLIST += native native64
 
 # Test fails pretty regularly on CI
 TEST_ON_CI_BLACKLIST += esp32-wroom-32
@@ -35,6 +35,7 @@ USEMODULE += xtimer
 # This is an optimized stack value based on testing, if you observe
 # a segmentation fault please increase this stack size.
 CFLAGS += -DTHREAD_STACKSIZE_MAIN=3*THREAD_STACKSIZE_LARGE
+CFLAGS += -DCONFIG_NANOCOAP_SERVER_STACK_SIZE=3*THREAD_STACKSIZE_LARGE
 
 # Include responder code
 CONFIG_INITIATOR ?= 1
@@ -42,6 +43,12 @@ CFLAGS += -DCONFIG_INITIATOR=$(CONFIG_INITIATOR)
 # Include responder code
 CONFIG_RESPONDER ?= 1
 CFLAGS += -DCONFIG_RESPONDER=$(CONFIG_RESPONDER)
+
+
+ifeq (1, $(CONFIG_RESPONDER))
+  USEMODULE += nanocoap_server_auto_init
+  CFLAGS += -DCONFIG_NANOCOAP_SERVER_BUF_SIZE=512
+endif
 
 include $(RIOTBASE)/Makefile.include
 include $(RIOTMAKE)/default-radio-settings.inc.mk

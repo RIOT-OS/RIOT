@@ -105,6 +105,11 @@ ifneq (,$(filter periph_i2c,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter periph_sdmmc,$(USEMODULE)))
+  USEMODULE += esp_idf_sdmmc
+  USEMODULE += periph_gpio_irq
+endif
+
 ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
   FEATURES_REQUIRED += esp_spi_ram
   FEATURES_OPTIONAL += esp_spi_oct

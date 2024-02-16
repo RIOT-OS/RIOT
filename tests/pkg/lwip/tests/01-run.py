@@ -85,7 +85,7 @@ class Board(object):
         def _reset_native_execute(obj, application, env=None, *args, **kwargs):
             pass
 
-        if (name == "native") and (reset is None):
+        if (name in ['native', 'native64']) and (reset is None):
             reset = _reset_native_execute
 
         self.name = name
@@ -277,7 +277,7 @@ def test_tcpv6_send(board_group, application, env=None):
 
 def test_tcpv6_large_send(board_group, application, env=None):
     """Test that the TCP server can receive a large packet in multiple reads"""
-    if any(b.name != "native" for b in board_group.boards):
+    if any(b.name not in ["native", "native64"] for b in board_group.boards):
         # run test only with native
         print("SKIP_TEST INFO found non-native board")
         return
@@ -325,7 +325,7 @@ def test_tcpv6_large_send(board_group, application, env=None):
 
 
 def test_tcpv6_multiconnect(board_group, application, env=None):
-    if any(b.name != "native" for b in board_group.boards):
+    if any(b.name not in ["native", "native64"] for b in board_group.boards):
         # run test only with native
         print("SKIP_TEST INFO found non-native board")
         return
@@ -412,8 +412,14 @@ def test_triple_send(board_group, application, env=None):
 
 
 if __name__ == "__main__":
-    TestStrategy().execute([BoardGroup((Board("native", "tap0"),
-                            Board("native", "tap1")))],
+    board = os.environ.get('BOARD', 'native')
+    if board not in ['native', 'native64']:
+        print('\x1b[1;31mThis test requires a native board.\x1b[0m\n',
+              file=sys.stderr)
+        sys.exit(1)
+
+    TestStrategy().execute([BoardGroup((Board(board, "tap0"),
+                            Board(board, "tap1")))],
                            [test_ipv6_send, test_udpv6_send, test_tcpv6_send,
                             test_tcpv6_large_send, test_tcpv6_multiconnect,
                             test_triple_send])

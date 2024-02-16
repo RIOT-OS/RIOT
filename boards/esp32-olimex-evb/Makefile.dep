@@ -4,3 +4,13 @@ include $(RIOTBOARD)/common/esp32/Makefile.dep
 ifneq (,$(filter netdev_default,$(USEMODULE)))
   USEMODULE += esp_eth
 endif
+
+# default to using fatfs on SD card
+ifneq (,$(filter vfs_default,$(USEMODULE)))
+  USEMODULE += fatfs_vfs
+  USEMODULE += mtd
+endif
+
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE += mtd_sdmmc_default
+endif

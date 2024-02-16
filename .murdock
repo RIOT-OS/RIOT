@@ -15,6 +15,7 @@ hifive1b
 msb-430
 msba2
 native
+native64
 nrf52840dk
 qn9080dk
 samr21-xpro
@@ -38,7 +39,7 @@ esac
 
 # temporarily disabling llvm builds until https://github.com/RIOT-OS/RIOT/pull/15595
 # is in
-: ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
+: ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native native64 nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
 
 : ${TEST_WITH_CONFIG_SUPPORTED:="examples/suit_update tests/drivers/at86rf2xx_aes"}
 
@@ -380,11 +381,23 @@ compile() {
             EMULATED=0
         fi
 
-        if [ $RUN_TESTS -eq 1 -o "$board" = "native" -o "$EMULATED" = "1" ]; then
+        if [ $RUN_TESTS -eq 1 -o "$board" = "native" -o "$board" = "native64" -o "$EMULATED" = "1" ]; then
             if [ -f "${BINDIR}/.test" ]; then
-                if [ "$board" = "native" -o "${EMULATED}" = "1" ]; then
-                    EMULATE=${EMULATED} BOARD=$board make -C${appdir} test
-                    RES=$?
+                if [ "$board" = "native" -o "$board" = "native64" -o "${EMULATED}" = "1" ]; then
+                    # For native, we can run the test on the worker that also
+                    # compiled it (`make -C${appdir} test`).
+                    # "dwq-localjob" allows using some (locally run) command's
+                    # output as if it was its own CI job.
+                    # We use this here so the output shows up in the Murdock UI
+                    # under the "Tests" tab and not inlined with the "Build"
+                    # output.
+                    # "--command-override" is a hack that makes the job fake the
+                    # command. This is currently needed for the Murdock UI to
+                    # properly categorize the job result.
+                    EMULATE=${EMULATED} BOARD=$board TOOLCHAIN=$toolchain \
+                        dwq-localjob \
+                        --command-override "./.murdock run_test ${appdir} ${board}:${toolchain}" \
+                        -- make -C${appdir} test
                 elif is_in_list "$board" "$TEST_BOARDS_AVAILABLE"; then
                     echo "-- test_hash=$test_hash"
                     if test_cache_get $test_hash; then
@@ -415,24 +428,23 @@ test_job() {
     local board=$(echo $2 | cut -f 1 -d':')
     local toolchain=$(echo $2 | cut -f 2 -d':')
 
+    # this points to the dwq checkout root folder
+    local basedir="$(pwd)"
+
     # interpret any extra arguments as file names.
     # They will be sent along with the job to the test worker
     # and stored in the application's binary folder.
     shift 2
     local files=""
     for filename in "$@"; do
-        # check if the file is within $(BINDIR)
-        if startswith "${BINDIR}" "${filename}"; then
-          # get relative (to $(BINDIR) path
-          local relpath="$(realpath --relative-to ${BINDIR} ${filename})"
+        # check if the file is within $(basedir)
+        if startswith "${basedir}" "${filename}"; then
+            filename="$(realpath --relative-to ${basedir} ${filename})"
         else
-          error "$0: error: extra test files not within \${BINDIR}!"
+          error "$0: error: extra test files not within \${basedir}!"
         fi
 
-        # set remote file path.
-        # currently, the test workers build in the default build path.
-        local remote_bindir="${appdir}/bin/${board}"
-        files="${files} --file ${filename}:${remote_bindir}/${relpath}"
+        files="${files} --file ${filename}"
     done
 
     dwqc \
@@ -448,12 +460,20 @@ run_test() {
     local appdir=$1
     local board=$(echo $2 | cut -f 1 -d':')
     local toolchain=$(echo $2 | cut -f 2 -d':')
+
+    # set build directory to match the builder
+    export BINDIR="$(pwd)/build"
+
     print_worker
     echo "-- executing tests for $appdir on $board (compiled with $toolchain toolchain):"
     hook run_test_pre
 
     # do flashing and building of termdeps simultaneously
     BOARD=$board TOOLCHAIN=${toolchain} make -C$appdir flash-only termdeps -j2
+    RES=$?
+    if [ $RES -ne 0 ]; then
+        error "- flashing failed!"
+    fi
 
     # now run the actual test
     if is_in_list "${appdir}" "${TEST_WITH_CONFIG_SUPPORTED}"; then

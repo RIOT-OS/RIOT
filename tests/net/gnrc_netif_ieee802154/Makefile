@@ -1,10 +1,9 @@
-BOARD_WHITELIST = native derfmega256 avr-rss2 atmega256rfr2-xpro nrf52840dongle
+BOARD_WHITELIST = native native64 derfmega256 avr-rss2 atmega256rfr2-xpro nrf52840dongle
 
 include ../Makefile.net_common
 
-ifeq (native, $(BOARD))
+ifneq (,$(filter native native64,$(BOARD)))
   USEMODULE += socket_zep
-  RIOT_TERMINAL = native
   TERMFLAGS ?= -z "0.0.0.0:17755,localhost:17754"
   USEMODULE += netdev
   # somehow this breaks the test
@@ -30,6 +29,6 @@ USEMODULE += gnrc_netif_ieee802154
 # the application dumps received packets to stdout
 USEMODULE += gnrc_pktdump
 
-TEST_ON_CI_WHITELIST += native
+TEST_ON_CI_WHITELIST += native native64
 
 include $(RIOTBASE)/Makefile.include

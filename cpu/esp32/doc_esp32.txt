@@ -139,6 +139,52 @@ I2C_DEV(0) | SDA    | GPIO21 | `#I2C0_SDA`   | -
 The ESP32 LEDC module has 2 channel groups with 8 channels each. Each of
 these channels can be clocked by one of the 4 timers.
 
+## SDMMC Interfaces {#esp32_sdmmc_interfaces_esp32}
+
+The ESP32 variant uses the direct I/O (i.e. `SOC_SDMMC_USE_IOMUX` is defined in
+the SoC capabilities file). The GPIOs used for SDMMC signals are therefore fixed
+for each slot. Since the GPIOs used for slot 0 are the same as those used
+for the Flash, slot 0 cannot be used. Therefore, only slot 1 can be used.
+
+The GPIOs used by ESP32 for slot 1 are:
+
+<center>
+| Signal | GPIO Slot 1 |
+|:------ |:------------|
+| CLK    | GPIO14      |
+| CMD    | GPIO15      |
+| DAT0   | GPIO2       |
+| DAT1   | GPIO4       |
+| DAT2   | GPIO12      |
+| DAT3   | GPIO13      |
+</center>
+
+The board-specific configuration is realized by defining the @ref sdmmc_config
+array, for example:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+static const sdmmc_conf_t sdmmc_config[] = {
+    {
+        .slot = SDMMC_SLOT_1,
+        .cd = GPIO21,
+        .wp = GPIO_UNDEF,
+        .bus_width = 1,
+    },
+};
+
+#define SDMMC_NUMOF 1
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Used data bus width has to be defined in sdmmc_conf_t::bus_width in addition
+to the slot, where 1 and 4 are valid values.
+
+@note The slot must be @ref SDMMC_SLOT_1 for ESP32.
+
+If the board supports a Card Detect pin or a Write Protect
+pin, the corresponding GPIOs have to be defined in @ref sdmmc_conf_t::cd and
+@ref sdmmc_conf_t::wp. Otherwise they have to be set to undefined
+(@ref GPIO_UNDEF).
+
 ## SPI Interfaces {#esp32_spi_interfaces_esp32}
 
 ESP32 has four SPI controllers where SPI0 and SPI1 share the same bus and

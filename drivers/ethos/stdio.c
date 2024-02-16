@@ -25,6 +25,10 @@
 #include "isrpipe.h"
 #include "stdio_uart.h"
 
+#ifndef STDIO_UART_RX_BUFSIZE
+#define STDIO_UART_RX_BUFSIZE STDIO_RX_BUFSIZE
+#endif
+
 extern ethos_t ethos;
 
 static uint8_t _rx_buf_mem[STDIO_UART_RX_BUFSIZE];

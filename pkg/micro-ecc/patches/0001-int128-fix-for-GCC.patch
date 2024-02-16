@@ -1,0 +1,33 @@
+From 25813b458f3b48f6b5b6ec65edf73ab069b9a0f8 Mon Sep 17 00:00:00 2001
+From: Frederik Haxel <haxel@fzi.de>
+Date: Thu, 11 Jan 2024 12:59:28 +0100
+Subject: [PATCH] __int128 fix for GCC
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+GCC throws the following warning if `-Wpedantic` is set and `__int128` is supported.
+```
+types.h:100:18: warning: ISO C does not support ‘__int128’ types [-Wpedantic]
+  100 | typedef unsigned __int128 uECC_dword_t;
+```
+---
+ types.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/types.h b/types.h
+index 9ee81438fac3..ff7de8204765 100644
+--- a/types.h
++++ b/types.h
+@@ -95,7 +95,7 @@ typedef uint64_t uECC_dword_t;
+ 
+ typedef uint64_t uECC_word_t;
+ #if SUPPORTS_INT128
+-typedef unsigned __int128 uECC_dword_t;
++typedef unsigned int uECC_dword_t __attribute__((mode(TI)));
+ #endif
+ 
+ #define HIGH_BIT_SET 0x8000000000000000ull
+-- 
+2.34.1
+

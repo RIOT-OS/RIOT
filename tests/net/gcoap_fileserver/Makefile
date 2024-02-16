@@ -10,7 +10,7 @@ USEMODULE += shell
 USEMODULE += shell_cmds_default
 
 USEMODULE += gcoap_fileserver
-USEMODULE += gcoap_fileserver_put
+USEMODULE += nanocoap_fileserver_put
 
 USEMODULE += nanocoap_vfs
 
@@ -26,18 +26,17 @@ USEMODULE += shell_cmd_md5sum
 TEST_ON_CI_BLACKLIST += all
 
 # automated test only works on native
-# TEST_ON_CI_WHITELIST += native
+# TEST_ON_CI_WHITELIST += native native64
 
 # use small blocksize for test to increase chance for errors
 CFLAGS += -DCONFIG_NANOCOAP_BLOCKSIZE_DEFAULT=COAP_BLOCKSIZE_16
 CFLAGS += -DCONFIG_COAP_ACK_TIMEOUT_MS=100UL
 CFLAGS += -DCONFIG_COAP_MAX_RETRANSMIT=10
 
-ifeq (native, $(BOARD))
+ifneq (,$(filter native native64,$(BOARD)))
   USEMODULE += socket_zep
   USEMODULE += socket_zep_hello
   USEMODULE += netdev
-  RIOT_TERMINAL = native
   TERMFLAGS += -z 127.0.0.1:17754 # Murdock has no IPv6 support
   # make sure each instance gets their own fs
   CFLAGS += -DCONFIG_NATIVE_ISOLATE_FS=1

@@ -9,6 +9,7 @@
 #include <sys/types.h>
 #include <flashdb.h>
 
+#include "fal_cfg.h"
 #include "board.h"
 #include "mutex.h"
 #ifdef MODULE_VFS
@@ -20,8 +21,8 @@
 /**
  * @brief Select MTD device to use for FlashDB
  */
-#if !defined(FDB_MTD) && defined(MTD_0)
-#define FDB_MTD MTD_0
+#if !defined(FDB_MTD)
+#define FDB_MTD FAL_MTD
 #endif
 
 #define FDB_LOG_TAG "[main]"

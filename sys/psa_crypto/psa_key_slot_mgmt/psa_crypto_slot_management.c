@@ -20,6 +20,7 @@
 
 #include "clist.h"
 #include "psa_crypto_slot_management.h"
+#include "architecture.h"
 
 #define ENABLE_DEBUG    0
 #include "debug.h"
@@ -146,10 +147,10 @@ void psa_init_key_slots(void)
         clist_rpush(&protected_list_empty, &protected_key_slots[i].node);
     }
 
-    DEBUG("Protected Slot Count: %d, Size: %d\n", PSA_PROTECTED_KEY_COUNT,
+    DEBUG("Protected Slot Count: %d, Size: %" PRIuSIZE "\n", PSA_PROTECTED_KEY_COUNT,
           sizeof(psa_prot_key_slot_t));
-    DEBUG("Protected Slot Array Size: %d\n", sizeof(protected_key_slots));
-    DEBUG("Protected Slot Empty List Size: %d\n", clist_count(&protected_list_empty));
+    DEBUG("Protected Slot Array Size: %" PRIuSIZE "\n", sizeof(protected_key_slots));
+    DEBUG("Protected Slot Empty List Size: %" PRIuSIZE "\n", clist_count(&protected_list_empty));
 #endif /* PSA_PROTECTED_KEY_COUNT */
 
 #if PSA_ASYMMETRIC_KEYPAIR_COUNT
@@ -159,10 +160,10 @@ void psa_init_key_slots(void)
         clist_rpush(&key_pair_list_empty, &key_pair_slots[i].node);
     }
 
-    DEBUG("Asymmetric Slot Count: %d, Size: %d\n", PSA_ASYMMETRIC_KEYPAIR_COUNT,
+    DEBUG("Asymmetric Slot Count: %d, Size: %" PRIuSIZE "\n", PSA_ASYMMETRIC_KEYPAIR_COUNT,
           sizeof(psa_key_pair_slot_t));
-    DEBUG("Asymmetric Slot Array Size: %d\n", sizeof(key_pair_slots));
-    DEBUG("Asymmetric Slot Empty List Size: %d\n", clist_count(&key_pair_list_empty));
+    DEBUG("Asymmetric Slot Array Size: %" PRIuSIZE "\n", sizeof(key_pair_slots));
+    DEBUG("Asymmetric Slot Empty List Size: %" PRIuSIZE "\n", clist_count(&key_pair_list_empty));
 #endif /* PSA_ASYMMETRIC_KEYPAIR_COUNT */
 
 #if PSA_SINGLE_KEY_COUNT
@@ -172,9 +173,10 @@ void psa_init_key_slots(void)
         clist_rpush(&single_key_list_empty, &single_key_slots[i].node);
     }
 
-    DEBUG("Single Key Slot Count: %d, Size: %d\n", PSA_SINGLE_KEY_COUNT, sizeof(psa_key_slot_t));
-    DEBUG("Single Key Slot Array Size: %d\n", sizeof(single_key_slots));
-    DEBUG("Single Key Slot Empty List Size: %d\n", clist_count(&single_key_list_empty));
+    DEBUG("Single Key Slot Count: %d, Size: %" PRIuSIZE "\n", PSA_SINGLE_KEY_COUNT,
+          sizeof(psa_key_slot_t));
+    DEBUG("Single Key Slot Array Size: %" PRIuSIZE "\n", sizeof(single_key_slots));
+    DEBUG("Single Key Slot Empty List Size: %" PRIuSIZE "\n", clist_count(&single_key_list_empty));
 #endif /* PSA_SINGLE_KEY_COUNT */
 }
 

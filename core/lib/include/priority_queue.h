@@ -32,7 +32,7 @@ extern "C" {
 typedef struct priority_queue_node {
     struct priority_queue_node *next;   /**< next queue node */
     uint32_t priority;                  /**< queue node priority */
-    unsigned int data;                  /**< queue node data */
+    uintptr_t data;                     /**< queue node data */
 } priority_queue_node_t;
 
 /**
@@ -46,6 +46,11 @@ typedef struct {
  * @brief Static initializer for priority_queue_node_t.
  */
 #define PRIORITY_QUEUE_NODE_INIT { NULL, 0, 0 }
+
+/**
+ * @brief Constant for signaling in the priority queue data member.
+ */
+#define PRIORITY_QUEUE_DATA_SIGNALING (UINTPTR_MAX)
 
 /**
  * @brief   Initialize a priority queue node object.

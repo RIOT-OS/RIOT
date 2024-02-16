@@ -59,7 +59,7 @@ static void binary_ops(void)
         { "max", fix16_max },
     };
 
-#ifdef BOARD_NATIVE
+#ifdef CPU_NATIVE
     fix16_t _min = fix16_from_dbl(-5.0);
     fix16_t _max = fix16_from_dbl(5.0);
     fix16_t _step = fix16_from_dbl(0.25);
@@ -106,7 +106,7 @@ static void unary_ops(void)
 
             { "exp", fix16_exp },
         };
-#ifdef BOARD_NATIVE
+#ifdef CPU_NATIVE
         fix16_t _min = fix16_from_dbl(-10.0);
         fix16_t _max = fix16_from_dbl(10.0);
         fix16_t _step = fix16_from_dbl(0.25);
@@ -144,7 +144,7 @@ static void unary_ops(void)
 
         fix16_t _min = fix16_from_dbl(-M_PI/2);
         fix16_t _max = fix16_from_dbl(+M_PI/2);
-#ifdef BOARD_NATIVE
+#ifdef CPU_NATIVE
         fix16_t _step = fix16_from_dbl(0.05);
 #else
         fix16_t _step = fix16_from_dbl(0.1);
@@ -176,7 +176,7 @@ static void unary_ops(void)
 
         fix16_t _min = fix16_from_dbl(-1.0);
         fix16_t _max = fix16_from_dbl(1.0);
-#ifdef BOARD_NATIVE
+#ifdef CPU_NATIVE
         fix16_t _step = fix16_from_dbl(0.05);
 #else
         fix16_t _step = fix16_from_dbl(0.2);
@@ -209,7 +209,7 @@ static void unary_ops(void)
             { "slog2", fix16_slog2 },
         };
 
-#ifdef BOARD_NATIVE
+#ifdef CPU_NATIVE
         fix16_t _min = fix16_from_dbl(0.05);
         fix16_t _max = fix16_from_dbl(+10.0);
         fix16_t _step = fix16_from_dbl(0.25);

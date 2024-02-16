@@ -145,6 +145,14 @@ void gnrc_ipv6_nib_iface_up(gnrc_netif_t *netif)
     _init_iface_arsm(netif);
     netif->ipv6.rs_sent = 0;
     netif->ipv6.na_sent = 0;
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
+    if (gnrc_netif_ipv6_group_join_internal(netif, &ipv6_addr_all_routers_link_local)) {
+        DEBUG("nib: Can't join link-local all-routers on interface %u\n", netif->pid);
+    }
+#endif
+    if (gnrc_netif_ipv6_group_join_internal(netif, &ipv6_addr_all_nodes_link_local) < 0) {
+        DEBUG("nib: Can't join link-local all-nodes on interface %u\n", netif->pid);
+    }
     _add_static_lladdr(netif);
     _auto_configure_addr(netif, &ipv6_addr_link_local_prefix, 64U);
     if (_should_search_rtr(netif)) {
@@ -190,6 +198,10 @@ void gnrc_ipv6_nib_iface_down(gnrc_netif_t *netif, bool send_final_ra)
             gnrc_netif_ipv6_addr_remove_internal(netif, &netif->ipv6.addrs[i]);
         }
     }
+    gnrc_netif_ipv6_group_leave_internal(netif, &ipv6_addr_all_nodes_link_local);
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
+    gnrc_netif_ipv6_group_leave_internal(netif, &ipv6_addr_all_routers_link_local);
+#endif
 
     gnrc_netif_release(netif);
 }
@@ -208,13 +220,6 @@ void gnrc_ipv6_nib_init_iface(gnrc_netif_t *netif)
 #endif  /* CONFIG_GNRC_IPV6_NIB_SLAAC || CONFIG_GNRC_IPV6_NIB_6LN */
     _init_iface_router(netif);
     gnrc_netif_init_6ln(netif);
-    if (gnrc_netif_ipv6_group_join_internal(netif,
-                                            &ipv6_addr_all_nodes_link_local) < 0) {
-        DEBUG("nib: Can't join link-local all-nodes on interface %u\n",
-              netif->pid);
-        gnrc_netif_release(netif);
-        return;
-    }
 
     gnrc_netif_release(netif);
 }
@@ -1648,7 +1653,7 @@ static uint32_t _handle_pio(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
 
         if (valid_ltime < UINT32_MAX) { /* UINT32_MAX means infinite lifetime */
             /* the valid lifetime is given in seconds, but our timers work in
-             * microseconds, so we have to scale down to the smallest possible
+             * milliseconds, so we have to scale down to the smallest possible
              * value (UINT32_MAX - 1). This is however alright since we ask for
              * a new router advertisement before this timeout expires */
             valid_ltime = (valid_ltime > (UINT32_MAX / MS_PER_SEC)) ?
@@ -1715,20 +1720,11 @@ static uint32_t _handle_rio(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     DEBUG("     - Route lifetime: %" PRIu32 "\n",
           byteorder_ntohl(rio->route_ltime));
 
-    if (route_ltime < UINT32_MAX) { /* UINT32_MAX means infinite lifetime */
-        /* the valid lifetime is given in seconds, but our timers work in
-         * microseconds, so we have to scale down to the smallest possible
-         * value (UINT32_MAX - 1). This is however alright since we ask for
-         * a new router advertisement before this timeout expires */
-        route_ltime = (route_ltime > (UINT32_MAX / MS_PER_SEC)) ?
-                      (UINT32_MAX - 1) : route_ltime * MS_PER_SEC;
-    }
-
     if (route_ltime == 0) {
         gnrc_ipv6_nib_ft_del(&rio->prefix, rio->prefix_len);
     } else {
         gnrc_ipv6_nib_ft_add(&rio->prefix, rio->prefix_len, &ipv6->src,
-                             netif->pid, route_ltime);
+                             netif->pid, route_ltime == UINT32_MAX ? 0 : route_ltime);
     }
 
     return route_ltime;

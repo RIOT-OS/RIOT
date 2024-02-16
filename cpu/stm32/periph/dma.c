@@ -123,7 +123,7 @@ static inline DMA_TypeDef *dma_req(int stream_n)
 {
     return dma_base(stream_n);
 }
-#elif CPU_FAM_STM32L0 || CPU_FAM_STM32L4 || CPU_FAM_STM32G0
+#elif CPU_FAM_STM32L0 || CPU_FAM_STM32L4 || CPU_FAM_STM32G0 || CPU_FAM_STM32C0
 static inline DMA_Request_TypeDef *dma_req(int stream_n)
 {
 #ifdef DMA2
@@ -182,7 +182,7 @@ static IRQn_Type dma_get_irqn(int stream)
     else if (stream < 16) {
         return ((IRQn_Type)((int)DMA2_Stream5_IRQn + (stream - 13)));
     }
-#elif CPU_FAM_STM32F0 || CPU_FAM_STM32L0 || CPU_FAM_STM32G0
+#elif CPU_FAM_STM32F0 || CPU_FAM_STM32L0 || CPU_FAM_STM32G0 || CPU_FAM_STM32C0
     if (stream == 0) {
         return (DMA1_Channel1_IRQn);
     }

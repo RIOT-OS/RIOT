@@ -190,7 +190,7 @@ typedef enum {
     GPIO_FLOATING = 0,
     GPIO_PULL_UP = 1,
     GPIO_PULL_DOWN = 2,
-    GPIO_PULL_KEEP = 0xff   /*< not supported */
+    GPIO_PULL_KEEP = 3   /*< not supported */
 } gpio_pull_t;
 
 /**
@@ -212,9 +212,64 @@ typedef enum {
 #define GPIO_DRIVE_20   GPIO_DRIVE_STRONG       /**< 20 mA (default) */
 #define GPIO_DRIVE_30   GPIO_DRIVE_STRONGEST    /**< 30 mA */
 
-/* END: GPIO LL overwrites */
+#define HAVE_GPIO_STATE_T
+typedef enum {
+    GPIO_OUTPUT_PUSH_PULL,
+    GPIO_OUTPUT_OPEN_DRAIN,
+    GPIO_OUTPUT_OPEN_SOURCE,
+    GPIO_INPUT,
+    GPIO_USED_BY_PERIPHERAL,
+    GPIO_DISCONNECT,
+} gpio_state_t;
+
+#define HAVE_GPIO_CONF_T
+typedef union gpio_conf_esp32 gpio_conf_t;
 
 #endif /* ndef DOXYGEN */
+
+/**
+ * @brief       GPIO pin configuration for ESP32/ESP32Cx/ESP32Sx MCUs
+ * @ingroup     drivers_periph_gpio_ll
+ */
+union gpio_conf_esp32 {
+    uint8_t bits;  /**< the raw bits */
+    struct {
+        /**
+         * @brief   State of the pin
+         */
+        gpio_state_t state                      : 3;
+        /**
+         * @brief   Pull resistor configuration
+         */
+        gpio_pull_t pull                        : 2;
+        /**
+         * @brief   Drive strength of the GPIO
+         *
+         * @warning If the requested drive strength is not available, the closest
+         *          fit supported will be configured instead.
+         *
+         * This value is ignored when @ref gpio_conf_esp32::state is configured
+         * to @ref GPIO_INPUT or @ref GPIO_DISCONNECT.
+         */
+        gpio_drive_strength_t drive_strength    : 2;
+        /**
+         * @brief   Initial value of the output
+         *
+         * Ignored if @ref gpio_conf_esp32::state is set to @ref GPIO_INPUT or
+         * @ref GPIO_DISCONNECT. If the pin was previously in a high impedance
+         * state, it is guaranteed to directly transition to the given initial
+         * value.
+         *
+         * @ref gpio_ll_query_conf will write the current value of the specified
+         * pin here, which is read from the input register when the state is
+         * @ref GPIO_INPUT, otherwise the state from the output register is
+         * consulted.
+         */
+        bool initial_value                      : 1;
+    };
+};
+
+/* END: GPIO LL overwrites */
 /** @} */
 
 /**
@@ -605,6 +660,82 @@ typedef struct {
 /** @} */
 
 /**
+ * @name   SDMMC configuration
+ *
+ * ESP32x SoC with SDMMC peripheral provide two SDMMC interfaces called slots.
+ * How many slots can be used depends on the ESP32x SoC, see @ref sdmmc_slot_t.
+ *
+ * @{
+ */
+/**
+ * @brief  SDIO/SDMMC slots
+ *
+ * ESP32x SoCs that have a SDMMC peripheral provide two SDMMC interfaces called
+ * slots.
+ *
+ * @note If the ESP32x variant uses direct I/O functions for the SDMMC signals
+ *       (i.e. `SOC_SDMMC_USE_IOMUX` is defined in SoC capabilities), the
+ *       GPIOs used for the SDMMC slots are fixed. In this case, slot 0
+ *       can't be used because the GPIOs are defined for Slot 0 are the
+ *       same as those used for the Flash. If the ESP32x variant uses
+ *       the GPIO matrix to route the SDMMC signals to arbitrary pins
+ *       (i.e. `SOC_SDMMC_USE_GPIO_MATRIX` is defined in SoC capabilities),
+ *       slot 0 can be used but the GPIOs used for the slot have to be
+ *       different from those used for the Flash.
+ */
+typedef enum {
+#if IS_USED(SOC_SDMMC_USE_GPIO_MATRIX) || DOXYGEN
+    SDMMC_SLOT_0 = 0,   /**< SD/MMC host controller slot 0 (not usable on ESP32 variant) */
+#endif
+    SDMMC_SLOT_1 = 1,   /**< SD/MMC host controller slot 1 */
+} sdmmc_slot_t;
+
+/**
+ * @brief   SDMMC slot configuration
+ *
+ * If the ESP32x variant uses the GPIO matrix to route the SDMMC signals
+ * to arbitrary pins (i.e. `SOC_SDMMC_USE_GPIO_MATRIX` is defined in SoC
+ * capabilities file), the pins must be configured. The bus width is then
+ * determined from the defined pins. Define the pins for the DAT lines
+ * as `GPIO_UNDEF` to use a smaller data bus width.
+ * If the ESP32x variant uses direct I/O (i.e. `SOC_SDMMC_USE_IOMUX` is
+ * defined in SoC capabilities file), the bus width has to be specified instead.
+ */
+typedef struct {
+    sdmmc_slot_t slot;  /**< SDMMC slot used [ SDMMC_SLOT_0 | SDMMC_SLOT_1] */
+    gpio_t cd;          /**< Card Detect pin (must be GPIO_UNDEF if not connected) */
+    gpio_t wp;          /**< Write Protect pin (must be GPIO_UNDEF if not connected) */
+#if IS_USED(SOC_SDMMC_USE_GPIO_MATRIX) || DOXYGEN
+    gpio_t clk;         /**< CLK pin (must be defined) */
+    gpio_t cmd;         /**< CMD pin (must be defined) */
+    gpio_t dat0;        /**< DAT[0] pin (must be defined) */
+    gpio_t dat1;        /**< DAT[1] pin (GPIO_UNDEF if not connected) */
+    gpio_t dat2;        /**< DAT[2] pin (GPIO_UNDEF if not connected) */
+    gpio_t dat3;        /**< DAT[3] pin (GPIO_UNDEF if not connected) */
+#if IS_USED(MODULE_PERIPH_SMMC_8BIT) || DOXYGEN
+    gpio_t dat4;        /**< DAT[4] pin (GPIO_UNDEF if not connected) */
+    gpio_t dat5;        /**< DAT[5] pin (GPIO_UNDEF if not connected) */
+    gpio_t dat6;        /**< DAT[6] pin (GPIO_UNDEF if not connected) */
+    gpio_t dat7;        /**< DAT[7] pin (GPIO_UNDEF if not connected) */
+#endif /* IS_USED(MODULE_PERIPH_SMMC_8BIT) */
+#else /* IS_USED(SOC_SDMMC_USE_IOMUX) */
+    uint8_t bus_width;  /**< Bus width */
+#endif
+} sdmmc_conf_t;
+
+/**
+ * @brief  SDIO/SDMMC buffer instantiation requirement for SDHC
+ */
+#define SDMMC_CPU_DMA_REQUIREMENTS  __attribute__((aligned(SDMMC_CPU_DMA_ALIGNMENT)))
+
+/**
+ * @brief  SDIO/SDMMC buffer alignment for SDHC because of DMA/FIFO buffer restrictions
+ */
+#define SDMMC_CPU_DMA_ALIGNMENT     4
+
+/** @} */
+
+/**
  * @name   SPI configuration
  *
  * ESP32x SoCs have up to four SPI controllers dependent on the specific ESP32x
@@ -857,7 +988,8 @@ typedef struct {
  * @name   USB device configuration
  * @{
  *
- * ESP32x SoCs integrate depending on the specific ESP32x SoC variant (family) an USB OTG FS controller based on the Synopsys DWC2 IP core.
+ * ESP32x SoCs integrate depending on the specific ESP32x SoC variant (family)
+ * an USB OTG FS controller based on the Synopsys DWC2 IP core.
  */
 #include "usbdev_synopsys_dwc2.h"
 

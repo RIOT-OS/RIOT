@@ -30,10 +30,6 @@
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
 #if IS_ACTIVE(CONFIG_RESPONDER)
-static char _nanocoap_server_stack[THREAD_STACKSIZE_MAIN];
-#define NANOCOAP_SERVER_QUEUE_SIZE     (4)
-static msg_t _nanocoap_server_msg_queue[NANOCOAP_SERVER_QUEUE_SIZE];
-#define NANOCOAP_BUF_SIZE   (512U)
 extern int responder_cli_init(void);
 extern int responder_cmd(int argc, char **argv);
 #endif
@@ -54,23 +50,6 @@ static const shell_command_t shell_commands[] = {
     { NULL, NULL, NULL }
 };
 
-#if IS_ACTIVE(CONFIG_RESPONDER)
-static void *_nanocoap_server_thread(void *arg)
-{
-    (void)arg;
-
-    /* nanocoap_server uses gnrc sock which uses gnrc which needs a msg queue */
-    msg_init_queue(_nanocoap_server_msg_queue, NANOCOAP_SERVER_QUEUE_SIZE);
-
-    /* initialize nanocoap server instance */
-    uint8_t buf[NANOCOAP_BUF_SIZE];
-    sock_udp_ep_t local = { .port = COAP_PORT, .family = AF_INET6 };
-    nanocoap_server(&local, buf, sizeof(buf));
-
-    return NULL;
-}
-#endif
-
 int main(void)
 {
 #if IS_ACTIVE(CONFIG_INITIATOR)
@@ -82,12 +61,6 @@ int main(void)
     if (responder_cli_init()) {
         return -1;
     }
-
-    /* start nanocoap server thread */
-    thread_create(_nanocoap_server_stack, sizeof(_nanocoap_server_stack),
-                  THREAD_PRIORITY_MAIN - 1,
-                  THREAD_CREATE_STACKTEST,
-                  _nanocoap_server_thread, NULL, "nanocoap server");
 #endif
 
     /* the shell contains commands that receive packets via GNRC and thus

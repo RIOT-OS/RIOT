@@ -36,6 +36,18 @@ extern "C" {
 #define IPV4_ADDR_MAX_STR_LEN       (sizeof("255.255.255.255"))
 
 /**
+ * @brief   Static initializer for an IPv4 address.
+
+ * @param[in] a         1st octet
+ * @param[in] b         2nd octet
+ * @param[in] c         3rd octet
+ * @param[in] d         4th octet
+ *
+ * @return initialized IPv4 address
+ */
+#define IPV4_ADDR_INIT(a, b, c, d) { .u8 = {a, b, c, d} }
+
+/**
  * @brief Data type to represent an IPv4 address.
  */
 typedef union {

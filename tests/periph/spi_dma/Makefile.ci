@@ -1,6 +1,0 @@
-# Boards not able to accomodate the regular SPI test will not be able to link
-# this test.
-include ../spi/Makefile.ci
-BOARD_INSUFFICIENT_MEMORY += \
-    samd10-xmini \
-    #

@@ -26,6 +26,7 @@ BOARD_PROVIDES_NETIF := \
     msba2 \
     mulle \
     native \
+    native64 \
     nrf51dk \
     nrf51dongle \
     nrf52840-mdk \

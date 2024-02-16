@@ -302,7 +302,7 @@ void ztimer64_clock_print(const ztimer64_clock_t *clock)
     const ztimer64_base_t *entry = clock->first;
 
     while (entry) {
-        printf("0x%08x:%" PRIu64 "\n", (unsigned)entry, entry->target);
+        printf("0x%08" PRIxPTR ":%" PRIu64 "\n", (uintptr_t)entry, entry->target);
         entry = entry->next;
     }
     puts("");

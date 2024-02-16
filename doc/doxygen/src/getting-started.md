@@ -202,7 +202,8 @@ Building and executing an example           {#building-and-executing-an-example}
 ---------------------------------
 RIOT provides a number of examples in the `examples/` directory. Every example
 has a README that documents its usage and its purpose. You can build them by
-typing
+opening a shell, navigating to an example (e.g. `examples/default`), and
+running:
 
 ~~~~~~~~ {.sh}
 make BOARD=samr21-xpro
@@ -214,9 +215,7 @@ or
 make all BOARD=samr21-xpro
 ~~~~~~~~
 
-into your shell.
-
-To flash the application to a board just type
+To flash the application to a board just run:
 
 ~~~~~~~~ {.sh}
 make flash BOARD=samr21-xpro

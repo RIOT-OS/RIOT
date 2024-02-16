@@ -9,12 +9,11 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega8 \
     atxmega-a3bu-xplained \
     bluepill-stm32f030c8 \
-    hifive1 \
-    hifive1b \
     i-nucleo-lrwan1 \
     im880b \
     msb-430 \
     msb-430h \
+    nucleo-c031c6 \
     nucleo-f030r8 \
     nucleo-f031k6 \
     nucleo-f042k6 \
@@ -39,5 +38,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     telosb \
     thingy52 \
     waspmote-pro \
+    weact-g030f6 \
     z1 \
     #

@@ -268,7 +268,7 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                 continue;
             }
             if (res < 0) {
-                DEBUG("nanocoap: error receiving coap response, %" PRIdSIZE "\n", res);
+                DEBUG("nanocoap: error receiving CoAP response, %" PRIdSIZE "\n", res);
                 return res;
             }
 
@@ -279,7 +279,7 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                 continue;
             }
             else if (_id_or_token_missmatch(pkt, id, token, token_len)) {
-                DEBUG("nanocoap: ID mismatch %u != %u\n", coap_get_id(pkt), id);
+                DEBUG("nanocoap: ID mismatch, got %u want %u\n", coap_get_id(pkt), id);
                 continue;
             }
 
@@ -451,6 +451,14 @@ ssize_t nanocoap_sock_post(nanocoap_sock_t *sock, const char *path,
                           response, len_max);
 }
 
+ssize_t nanocoap_sock_fetch(nanocoap_sock_t *sock, const char *path,
+                            const void *request, size_t len,
+                            void *response, size_t len_max)
+{
+    return _sock_put_post(sock, path, COAP_METHOD_FETCH, COAP_TYPE_CON, request, len,
+                          response, len_max);
+}
+
 ssize_t nanocoap_sock_put_non(nanocoap_sock_t *sock, const char *path,
                               const void *request, size_t len,
                               void *response, size_t len_max)
@@ -464,6 +472,14 @@ ssize_t nanocoap_sock_post_non(nanocoap_sock_t *sock, const char *path,
                                void *response, size_t len_max)
 {
     return _sock_put_post(sock, path, COAP_METHOD_POST, COAP_TYPE_NON, request, len,
+                          response, len_max);
+}
+
+ssize_t nanocoap_sock_fetch_non(nanocoap_sock_t *sock, const char *path,
+                               const void *request, size_t len,
+                               void *response, size_t len_max)
+{
+    return _sock_put_post(sock, path, COAP_METHOD_FETCH, COAP_TYPE_NON, request, len,
                           response, len_max);
 }
 
@@ -496,6 +512,13 @@ ssize_t nanocoap_sock_post_url(const char *url,
                                void *response, size_t len_max)
 {
     return _sock_put_post_url(url, COAP_METHOD_POST, request, len, response, len_max);
+}
+
+ssize_t nanocoap_sock_fetch_url(const char *url,
+                                const void *request, size_t len,
+                                void *response, size_t len_max)
+{
+    return _sock_put_post_url(url, COAP_METHOD_FETCH, request, len, response, len_max);
 }
 
 ssize_t nanocoap_sock_delete(nanocoap_sock_t *sock, const char *path)
@@ -652,11 +675,11 @@ int nanocoap_sock_get_blockwise(nanocoap_sock_t *sock, const char *path,
 
     unsigned num = 0;
     while (ctx.more) {
-        DEBUG("fetching block %u\n", num);
+        DEBUG("nanocoap: fetching block %u\n", num);
 
         int res = _fetch_block(sock, buf, sizeof(buf), path, blksize, num, &ctx);
         if (res < 0) {
-            DEBUG("error fetching block %u: %d\n", num, res);
+            DEBUG("nanocoap: error fetching block %u: %d\n", num, res);
             return res;
         }
 
@@ -794,16 +817,16 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
         res = sock_udp_recv_aux(&sock.udp, buf, bufsize, SOCK_NO_TIMEOUT,
                                 &remote, aux_in_ptr);
         if (res <= 0) {
-            DEBUG("error receiving UDP packet %" PRIdSIZE "\n", res);
+            DEBUG("nanocoap: error receiving UDP packet %" PRIdSIZE "\n", res);
             continue;
         }
         coap_pkt_t pkt;
         if (coap_parse(&pkt, (uint8_t *)buf, res) < 0) {
-            DEBUG("error parsing packet\n");
+            DEBUG("nanocoap: error parsing packet\n");
             continue;
         }
         if ((res = coap_handle_req(&pkt, buf, bufsize, &ctx)) <= 0) {
-            DEBUG("error handling request %" PRIdSIZE "\n", res);
+            DEBUG("nanocoap: error handling request %" PRIdSIZE "\n", res);
             continue;
         }
 

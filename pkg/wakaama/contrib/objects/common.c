@@ -246,6 +246,8 @@ static int _set_resource_data(lwm2m_client_data_t *client_data, const lwm2m_uri_
 
     /* write the resource of the specified instance */
     uint8_t res = object->writeFunc(uri->instanceId, 1, data, object);
+    lwm2m_resource_value_changed(client_data->lwm2m_ctx, uri);
+
     if (res != COAP_204_CHANGED) {
         result = -EINVAL;
     }

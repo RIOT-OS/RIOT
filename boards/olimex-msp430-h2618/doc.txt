@@ -93,8 +93,8 @@ make BOARD=olimex-msp430-h2618 flash
 
 ## Using the shell
 
-stdio is available via the UART interface with `TXD = P3.4`
-(pin 35 on the header) and `RXD = P3.5` (pin 34 on the header) at 115,200 Baud.
+stdio is available via the UART interface with `TXD = P3.6`
+(pin 35 on the header) and `RXD = P3.7` (pin 34 on the header) at 115,200 Baud.
 
 The easiest way is to connect an USB TTL adapter (such as the cheap `cp210x`
 or `ch341` based adapters) as follows:
@@ -104,8 +104,8 @@ TTL adapter    Olimex MSP430-H2618
 -----------    -------------------
 
        GND --- 63 (DV_SS)
-       TXD --- 33 (P3.5)
-       RXD --- 32 (P3.4)
+       TXD --- 35 (P3.7)
+       RXD --- 34 (P3.6)
 ```
 
  */

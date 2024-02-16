@@ -52,6 +52,7 @@ extern "C" {
 #define CPU_INUM_FRC2           20  /**< Level interrupt with medium priority 2 */
 #define CPU_INUM_SYSTIMER       20  /**< Level interrupt with medium priority 2 */
 #define CPU_INUM_BLE            21  /**< Level interrupt with medium priority 2 */
+#define CPU_INUM_SDMMC          23  /**< Level interrupt with medium priority 2 */
 #define CPU_INUM_CACHEERR       25  /**< Level interrupt with high priority 4   */
 /** @} */
 

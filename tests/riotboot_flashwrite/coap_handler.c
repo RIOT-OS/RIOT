@@ -78,10 +78,9 @@ ssize_t _flashwrite_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, coap_requ
     return pkt_pos - (uint8_t*)pkt->hdr;
 }
 
-/* must be sorted by path (ASCII order) */
-const coap_resource_t coap_resources[] = {
-    COAP_WELL_KNOWN_CORE_DEFAULT_HANDLER,
-    { "/flashwrite", COAP_POST, _flashwrite_handler, &_writer },
+NANOCOAP_RESOURCE(flashwrite) {
+    .path = "/flashwrite",
+    .methods = COAP_POST,
+    .handler = _flashwrite_handler,
+    .context = &_writer
 };
-
-const unsigned coap_resources_numof = ARRAY_SIZE(coap_resources);

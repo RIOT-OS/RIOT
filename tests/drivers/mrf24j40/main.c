@@ -47,7 +47,7 @@ int netdev_ieee802154_minimal_init_devs(netdev_event_cb_t cb) {
     ieee802154_hal_test_init_devs(_reg_callback, &c);
 
     for (unsigned i = 0; i < MRF24J40_NUM; i++) {
-        printf("%d out of %d\n", i + 1, MRF24J40_NUM);
+        printf("%d out of %u\n", i + 1, (unsigned)MRF24J40_NUM);
         netdev_register(&mrf24j40_netdev[i].dev.netdev, NETDEV_MRF24J40, 0);
         netdev_ieee802154_submac_init(&mrf24j40_netdev[i]);
 

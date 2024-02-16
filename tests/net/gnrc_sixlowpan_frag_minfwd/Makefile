@@ -11,6 +11,8 @@ USEMODULE += netdev_test
 
 CFLAGS += -DTEST_SUITES
 
+INCLUDES += -I$(RIOTBASE)/sys/net/gnrc/pktbuf_static/include
+
 include $(RIOTBASE)/Makefile.include
 
 ifndef CONFIG_GNRC_IPV6_NIB_NO_RTR_SOL

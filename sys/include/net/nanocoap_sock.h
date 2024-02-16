@@ -433,6 +433,61 @@ ssize_t nanocoap_sock_post_url(const char *url,
                                void *response, size_t len_max);
 
 /**
+ * @brief   Simple synchronous CoAP (confirmable) FETCH
+ *          ([RFC 8132](https://datatracker.ietf.org/doc/html/rfc8132))
+ *
+ * @param[in]   sock    socket to use for the request
+ * @param[in]   path    remote path
+ * @param[in]   request buffer containing the payload
+ * @param[in]   len     length of the payload to send
+ * @param[out]  response buffer for the response, may be NULL
+ * @param[in]   len_max length of @p response
+ *
+ * @returns     length of response payload on success
+ * @returns     <0 on error
+ */
+ssize_t nanocoap_sock_fetch(nanocoap_sock_t *sock, const char *path,
+                            const void *request, size_t len,
+                            void *response, size_t len_max);
+
+/**
+ * @brief   Simple non-confirmable FETCH
+ *          ([RFC 8132](https://datatracker.ietf.org/doc/html/rfc8132))
+ *
+ * @param[in]   sock    socket to use for the request
+ * @param[in]   path    remote path
+ * @param[in]   request buffer containing the payload
+ * @param[in]   len     length of the payload to send
+ * @param[out]  response buffer for the response, may be NULL
+ * @param[in]   len_max length of @p response
+ *
+ * @returns     length of response payload on success
+ * @returns     0 if the request was sent and no response buffer was provided,
+ *              independently of success (because no response is requested in that case)
+ * @returns     <0 on error
+ */
+ssize_t nanocoap_sock_fetch_non(nanocoap_sock_t *sock, const char *path,
+                                const void *request, size_t len,
+                                void *response, size_t len_max);
+
+/**
+ * @brief   Simple synchronous CoAP (confirmable) FETCH to URL
+ *          ([RFC 8132](https://datatracker.ietf.org/doc/html/rfc8132))
+ *
+ * @param[in]   url     Absolute URL pointer to source path
+ * @param[in]   request buffer containing the payload
+ * @param[in]   len     length of the payload to send
+ * @param[out]  response buffer for the response, may be NULL
+ * @param[in]   len_max length of @p response
+ *
+ * @returns     length of response payload on success
+ * @returns     <0 on error
+ */
+ssize_t nanocoap_sock_fetch_url(const char *url,
+                                const void *request, size_t len,
+                                void *response, size_t len_max);
+
+/**
  * @brief   Simple synchronous CoAP (confirmable) DELETE
  *
  * @param[in]   sock    socket to use for the request
@@ -571,7 +626,7 @@ ssize_t nanocoap_request(coap_pkt_t *pkt, const sock_udp_ep_t *local,
  * @param[out]  ctx     The block request context to initialize
  * @param[out]  sock    Socket to initialize and use for the request
  * @param[in]   url     The request URL
- * @param[in]   method  Request method (`COAP_METHOD_{GET|PUT|POST}`)
+ * @param[in]   method  Request method (`COAP_METHOD_{GET|PUT|POST|FETCH}`)
  * @param[in]   blksize Request blocksize exponent
  *
  * @retval      0       Success

@@ -73,7 +73,7 @@ psa_status_t psa_ecc_ed25519_verify_message(const uint8_t *key_buffer,
 
     ret = edsign_verify(signature, key_buffer, input, input_length);
     if (!ret) {
-        return PSA_ERROR_GENERIC_ERROR;
+        return PSA_ERROR_INVALID_SIGNATURE;
     }
 
     (void)key_buffer_size;

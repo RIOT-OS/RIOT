@@ -51,16 +51,28 @@
 FATFS fat_fs; /* FatFs work area needed for each volume */
 
 #ifdef MODULE_MTD_NATIVE
+
 /* mtd device for native is provided in boards/native/board_init.c */
 mtd_dev_t *fatfs_mtd_devs[1];
+
+#elif MODULE_MTD_SDMMC
+
+#include "mtd_sdmmc.h"
+
+mtd_dev_t *fatfs_mtd_devs[1];
+
 #elif MODULE_MTD_SDCARD
+
 #include "mtd_sdcard.h"
 #include "sdcard_spi_params.h"
+
 #define SDCARD_SPI_NUM ARRAY_SIZE(sdcard_spi_params)
+
 /* sdcard devs are provided by drivers/sdcard_spi/sdcard_spi.c */
 extern sdcard_spi_t sdcard_spi_devs[SDCARD_SPI_NUM];
 mtd_sdcard_t mtd_sdcard_devs[SDCARD_SPI_NUM];
 mtd_dev_t *fatfs_mtd_devs[SDCARD_SPI_NUM];
+
 #endif
 
 #define MTD_NUM ARRAY_SIZE(fatfs_mtd_devs)
@@ -105,11 +117,11 @@ static int _mount(int argc, char **argv)
         }
         else {
 
-            #if FF_MAX_SS == FF_MIN_SS
+#if FF_MAX_SS == FF_MIN_SS
             uint16_t sector_size = TEST_FATFS_FIXED_SECTOR_SIZE;
-            #else
+#else
             uint16_t sector_size = fs->ssize;
-            #endif
+#endif
 
             uint64_t total_bytes = (fs->n_fatent - TEST_FATFS_FATENT_OFFSET) * fs->csize;
             total_bytes *= sector_size;
@@ -375,7 +387,7 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-    #if FATFS_FFCONF_OPT_FS_NORTC == 0
+#if FATFS_FFCONF_OPT_FS_NORTC == 0
     /* the rtc is used in diskio.c for timestamps of files */
     puts("Initializing the RTC driver");
     rtc_poweron();
@@ -396,11 +408,14 @@ int main(void)
            time.tm_min,
            time.tm_sec);
     rtc_set_time(&time);
-    #endif
+#endif
 
-    #if MODULE_MTD_NATIVE
+#if MODULE_MTD_NATIVE
     fatfs_mtd_devs[0] = mtd_dev_get(0);
-    #elif MODULE_MTD_SDCARD
+#elif MODULE_MTD_SDMMC
+    extern mtd_sdmmc_t mtd_sdmmc_dev0;
+    fatfs_mtd_devs[0] = &mtd_sdmmc_dev0.base;
+#elif MODULE_MTD_SDCARD
     for (unsigned int i = 0; i < SDCARD_SPI_NUM; i++){
         mtd_sdcard_devs[i].base.driver = &mtd_sdcard_driver;
         mtd_sdcard_devs[i].sd_card = &sdcard_spi_devs[i];
@@ -413,7 +428,7 @@ int main(void)
             printf("init sdcard_mtd %u [FAILED]\n", i);
         }
     }
-    #endif
+#endif
 
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);

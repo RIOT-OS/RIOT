@@ -13,6 +13,7 @@ USEMODULE += netdev_default
 USEMODULE += auto_init_gnrc_netif
 # Specify the mandatory networking modules for IPv6 and UDP
 USEMODULE += gnrc_ipv6_default
+USEMODULE += netutils
 
 # Specify DTLS implementation
 USEPKG += tinydtls
@@ -60,3 +61,8 @@ ifeq (,$(filter arch_avr8,$(FEATURES_USED)))
 else
   CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(4*THREAD_STACKSIZE_LARGE\)
 endif
+
+# We have two credentials for client and server, each. If we are to run both
+# server and client, we need four slots in total. The default (2) would be
+# sufficient if only client or server is ever run.
+CFLAGS += -DCONFIG_CREDMAN_MAX_CREDENTIALS=4

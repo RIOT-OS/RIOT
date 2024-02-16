@@ -10,6 +10,7 @@ BOARD_WHITELIST += adafruit-clue \
                    cc2538dk \
                    feather-nrf52840 \
                    native \
+                   native64 \
                    nrf52840dk \
                    nrf52840dongle \
                    nrf52840-mdk \
@@ -25,9 +26,8 @@ BOARD_WHITELIST += adafruit-clue \
                    pba-d-01-kw2x \
                    #
 
-ifeq ($(BOARD), native)
+ifneq (,$(filter native native64,$(BOARD)))
   ZEP_PORT_BASE ?= 17754
-  RIOT_TERMINAL = native
   TERMFLAGS += -z [::1]:$(ZEP_PORT_BASE)
   USEMODULE += socket_zep
   # the same for Kconfig

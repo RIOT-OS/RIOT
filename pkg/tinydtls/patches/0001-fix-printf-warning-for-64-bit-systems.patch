@@ -1,0 +1,27 @@
+From bdf2d7bc11382cb2628863305b773a554ea08669 Mon Sep 17 00:00:00 2001
+From: Frederik Haxel <haxel@fzi.de>
+Date: Wed, 17 Jan 2024 22:06:12 +0100
+Subject: [PATCH] Fix printf warning for 64 bit systems
+
+---
+ dtls_debug.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/dtls_debug.h b/dtls_debug.h
+index add0d58e2829..a02cab4e393b 100644
+--- a/dtls_debug.h
++++ b/dtls_debug.h
+@@ -139,8 +139,8 @@ void dtls_dsrv_log_addr(log_t level, const char *name, const session_t *addr);
+ #define dtls_notice(...) LOG_INFO(__VA_ARGS__)
+ #define dtls_info(...) LOG_INFO(__VA_ARGS__)
+ #define dtls_debug(...) LOG_DEBUG(__VA_ARGS__)
+-#define dtls_debug_hexdump(name, buf, length) { if (LOG_DEBUG <= LOG_LEVEL) { LOG_DEBUG("-= %s (%zu bytes) =-\n", name, length); od_hex_dump(buf, length, 0); }}
+-#define dtls_debug_dump(name, buf, length) { if (LOG_DEBUG <= LOG_LEVEL) { LOG_DEBUG("%s (%zu bytes):", name, length); od_hex_dump(buf, length, 0); }}
++#define dtls_debug_hexdump(name, buf, length) { if (LOG_DEBUG <= LOG_LEVEL) { LOG_DEBUG("-= %s (%zu bytes) =-\n", name, (size_t)(length)); od_hex_dump(buf, length, 0); }}
++#define dtls_debug_dump(name, buf, length) { if (LOG_DEBUG <= LOG_LEVEL) { LOG_DEBUG("%s (%zu bytes):", name, (size_t)(length)); od_hex_dump(buf, length, 0); }}
+ #else /* neither RIOT nor Zephyr */
+ #define dtls_emerg(...) dsrv_log(DTLS_LOG_EMERG, __VA_ARGS__)
+ #define dtls_alert(...) dsrv_log(DTLS_LOG_ALERT, __VA_ARGS__)
+-- 
+2.34.1
+
