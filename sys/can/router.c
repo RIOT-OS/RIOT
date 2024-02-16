@@ -389,7 +389,7 @@ int can_router_dispatch_tx_error(can_pkt_t *pkt)
     return 0;
 }
 
-int can_router_free_frame(struct can_frame *frame)
+int can_router_free_frame(can_frame_t *frame)
 {
     can_pkt_t *pkt = container_of(frame, can_pkt_t, frame);
 

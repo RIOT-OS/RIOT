@@ -52,7 +52,7 @@ static int power_down(candev_dev_t *candev_dev);
 static void _can_event(candev_t *dev, candev_event_t event, void *arg)
 {
     msg_t msg;
-    struct can_frame *frame;
+    can_frame_t *frame;
     can_pkt_t *pkt;
     candev_dev_t *candev_dev = dev->isr_arg;
 
@@ -78,13 +78,13 @@ static void _can_event(candev_t *dev, candev_event_t event, void *arg)
     case CANDEV_EVENT_TX_CONFIRMATION:
         DEBUG("_can_event: CANDEV_EVENT_TX_CONFIRMATION\n");
         /* frame pointer in arg */
-        pkt = container_of((struct can_frame *)arg, can_pkt_t, frame);
+        pkt = container_of((can_frame_t *)arg, can_pkt_t, frame);
         can_dll_dispatch_tx_conf(pkt);
         break;
     case CANDEV_EVENT_TX_ERROR:
         DEBUG("_can_event: CANDEV_EVENT_TX_ERROR\n");
         /* frame pointer in arg */
-        pkt = container_of((struct can_frame *)arg, can_pkt_t, frame);
+        pkt = container_of((can_frame_t *)arg, can_pkt_t, frame);
         can_dll_dispatch_tx_error(pkt);
         break;
     case CANDEV_EVENT_RX_INDICATION:
@@ -93,7 +93,7 @@ static void _can_event(candev_t *dev, candev_event_t event, void *arg)
         pm_reset(candev_dev, candev_dev->rx_inactivity_timeout);
 #endif
         /* received frame in arg */
-        frame = (struct can_frame *) arg;
+        frame = (can_frame_t *) arg;
         can_dll_dispatch_rx_frame(frame, candev_dev->pid);
         break;
     case CANDEV_EVENT_RX_ERROR:
