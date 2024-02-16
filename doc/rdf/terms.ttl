@@ -53,3 +53,6 @@ terms:rom a rdf:Property ;
     rdfs:comment "ROM size available on a board"@en ;
     rdfs:domain terms:Board ;
     rdfs:range rdfs:Literal .
+
+terms:doc a rdf:Property ;
+    rdfs:label "documentation at"@en .
