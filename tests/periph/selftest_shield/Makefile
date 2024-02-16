@@ -27,7 +27,7 @@ DETAILED_OUTPUT ?= 0
 
 include $(RIOTBASE)/Makefile.include
 
-ifneq ($(MCU),esp32)
+ifneq ($(CPU),esp32)
   # We only need 1 thread (+ the Idle thread on some platforms) and we really
   # want this app working on as many boards as possible
   CFLAGS += -DMAXTHREADS=2

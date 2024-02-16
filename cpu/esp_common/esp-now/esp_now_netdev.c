@@ -28,7 +28,7 @@
 
 #include "esp_common.h"
 #include "esp_attr.h"
-#ifdef MCU_ESP8266
+#ifdef CPU_ESP8266
 #include "esp_event_loop.h"
 #else
 #include "esp_event.h"
@@ -314,11 +314,11 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     /* set the event handler */
     esp_system_event_add_handler(_esp_system_event_handler, NULL);
 
-#ifdef MCU_ESP32
+#ifdef CPU_ESP32
     /* init the WiFi driver */
     extern portMUX_TYPE g_intr_lock_mux;
     mutex_init(&g_intr_lock_mux);
-#endif /* MCU_ESP32 */
+#endif /* CPU_ESP32 */
 
     esp_err_t result;
 

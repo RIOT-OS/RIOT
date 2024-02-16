@@ -28,7 +28,7 @@
 #include "log.h"
 
 #include "esp_attr.h"
-#ifdef MCU_ESP8266
+#ifdef CPU_ESP8266
 #include "esp_event_loop.h"
 #else
 #include "esp_eth_com.h"
@@ -91,7 +91,7 @@ esp_err_t esp_system_event_del_handler (system_event_cb_t handler)
     return ESP_OK;
 }
 
-#ifdef MCU_ESP8266
+#ifdef CPU_ESP8266
 static esp_err_t esp_system_event_handler(void *ctx, system_event_t *event)
 {
     for (int i = 0; i < MAX_HANDLER_NUM; i++) {
@@ -101,7 +101,7 @@ static esp_err_t esp_system_event_handler(void *ctx, system_event_t *event)
     }
     return ESP_OK;
 }
-#else /* MCU_ESP8266 */
+#else /* CPU_ESP8266 */
 /* The event loop API of newer ESP-IDF versions split system events into
  * different event bases types. For code compatibility, we have to map
  * new event base types to the former system events */
@@ -236,13 +236,13 @@ static void esp_system_event_handler(void* arg,
         }
     }
 }
-#endif /* MCU_ESP8266 */
+#endif /* CPU_ESP8266 */
 #endif /* IS_USED(MODULE_ESP_WIFI_ANY) || IS_USED(MODULE_ESP_ETH) */
 
 void esp_event_handler_init(void)
 {
 #if IS_USED(MODULE_ESP_WIFI_ANY) || IS_USED(MODULE_ESP_ETH)
-#ifdef MCU_ESP8266
+#ifdef CPU_ESP8266
     esp_event_loop_init(esp_system_event_handler, NULL);
 #else
     /* newer ESP-IDF versions use another event loop API that have to be used */

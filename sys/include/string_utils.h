@@ -48,7 +48,7 @@ extern "C" {
  */
 #if !defined(CPU_NATIVE) \
     && !(IS_USED(MODULE_PICOLIBC) && __BSD_VISIBLE) \
-    && !(IS_USED(MODULE_NEWLIB) && __BSD_VISIBLE && !defined(MCU_ESP8266))
+    && !(IS_USED(MODULE_NEWLIB) && __BSD_VISIBLE && !defined(CPU_ESP8266))
 
 /**
  * @brief   Like `memset(dest, 0, n_bytes)`, but secure

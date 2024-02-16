@@ -71,11 +71,11 @@ extern uint8_t port_IntStackTop;
 void thread_isr_stack_init(void)
 {
     /* code from thread.c, please see the copyright notice there */
-#ifndef MCU_ESP8266
+#ifndef CPU_ESP8266
     #define sp (&port_IntStackTop)
-#else /* !MCU_ESP8266 */
+#else /* !CPU_ESP8266 */
     register uint32_t *sp __asm__ ("a1");
-#endif /* !MCU_ESP8266 */
+#endif /* !CPU_ESP8266 */
 
     /* assign each int of the stack the value of it's address. We can safely
      * cast, as stack is aligned. Use an intermediate cast to uintptr_t to

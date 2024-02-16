@@ -523,10 +523,6 @@ include $(RIOTMAKE)/ubsan.inc.mk
 # For more information, see http://petereisentraut.blogspot.com/2011/09/ccache-and-clang-part-2.html
 export CCACHE_CPP2=yes
 
-ifeq ($(strip $(MCU)),)
-	MCU = $(CPU)
-endif
-
 # set some settings useful for continuous integration builds
 ifeq ($(RIOT_CI_BUILD),1)
     RIOT_VERSION ?= buildtest
@@ -548,11 +544,9 @@ endif
 # if you want to publish the board into the sources as an uppercase #define
 BOARDDEF = $(call uppercase_and_underscore,$(BOARD))
 CPUDEF = $(call uppercase_and_underscore,$(CPU))
-MCUDEF = $(call uppercase_and_underscore,$(MCU))
 CFLAGS += -DRIOT_APPLICATION=\"$(APPLICATION)\"
 CFLAGS += -DBOARD_$(BOARDDEF)=\"$(BOARD)\" -DRIOT_BOARD=BOARD_$(BOARDDEF)
 CFLAGS += -DCPU_$(CPUDEF)=\"$(CPU)\" -DRIOT_CPU=CPU_$(CPUDEF)
-CFLAGS += -DMCU_$(MCUDEF)=\"$(MCU)\" -DRIOT_MCU=MCU_$(MCUDEF)
 
 # Feature test default CFLAGS and LINKFLAGS for the set compiled.
 include $(RIOTMAKE)/cflags.inc.mk
@@ -812,7 +806,7 @@ endif
 	$(call check_cmd,$(CC),Compiler)
 
 ..build-message: $(if $(SHOULD_RUN_KCONFIG), check-kconfig-errors)
-	@$(COLOR_ECHO) '$(COLOR_GREEN)Building application "$(APPLICATION)" for "$(BOARD)" with MCU "$(MCU)".$(COLOR_RESET)'
+	@$(COLOR_ECHO) '$(COLOR_GREEN)Building application "$(APPLICATION)" for "$(BOARD)" with CPU "$(CPU)".$(COLOR_RESET)'
 	@$(COLOR_ECHO)
 
 # The `clean` needs to be serialized before everything else.
