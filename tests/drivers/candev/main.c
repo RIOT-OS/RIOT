@@ -64,7 +64,7 @@ static int _send(int argc, char **argv)
 {
     int ret = 0;
 
-    struct can_frame frame = {
+    can_frame_t frame = {
         .can_id = 1,
         .len = 3,
         .data[0] = 0xAB,
@@ -107,7 +107,7 @@ static int _receive(int argc, char **argv)
     }
 
     for (int i = 0; i < n; i++) {
-        struct can_frame frame;
+        can_frame_t frame;
 
         puts("Reading from Rxbuf...");
         isrpipe_read(&rxbuf, (uint8_t *)&(frame.can_id), sizeof(frame.can_id));
@@ -136,7 +136,7 @@ static const shell_command_t shell_commands[] = {
 static void _can_event_callback(candev_t *dev, candev_event_t event, void *arg)
 {
     (void)arg;
-    struct can_frame *frame;
+    can_frame_t *frame;
 
     switch (event) {
     case CANDEV_EVENT_ISR:
@@ -155,7 +155,7 @@ static void _can_event_callback(candev_t *dev, candev_event_t event, void *arg)
     case CANDEV_EVENT_RX_INDICATION:
         DEBUG("_can_event: CANDEV_EVENT_RX_INDICATION\n");
 
-        frame = (struct can_frame *)arg;
+        frame = (can_frame_t *)arg;
 
         DEBUG("            id: %" PRIx32 " dlc: %" PRIx8 " data: ", frame->can_id & 0x1FFFFFFF,
               frame->len);
