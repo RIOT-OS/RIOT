@@ -136,7 +136,7 @@ static int _send(int argc, char **argv, bool rtr)
         print_usage();
         return 1;
     }
-    struct can_frame frame;
+    can_frame_t frame;
     int ifnum = strtol(argv[2], NULL, 0);
     if (ifnum >= CAN_DLL_NUMOF) {
         puts("Invalid interface number");
@@ -593,7 +593,7 @@ static int _can_handler(int argc, char **argv)
 static void *_receive_thread(void *args)
 {
     int thread_nb = (intptr_t)args;
-    struct can_frame frame;
+    can_frame_t frame;
     msg_t msg, msg_queue[RECEIVE_THREAD_MSG_QUEUE_SIZE];
 
     /* setup the device layers message queue */
@@ -609,7 +609,7 @@ static void *_receive_thread(void *args)
             int ret;
             while ((ret = conn_can_raw_recv(&conn[thread_nb], &frame,
                    msg.content.value))
-                   == sizeof(struct can_frame)) {
+                   == sizeof(can_frame_t)) {
                 printf("%d: %-8s %" PRIx32 "  [%x] ",
                        thread_nb,
                        raw_can_get_name_by_ifnum(conn[thread_nb].ifnum),
