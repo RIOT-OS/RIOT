@@ -493,7 +493,7 @@ ifneq ($(RIOT_CI_BUILD),1)
   ifneq (iotlab,$(PROGRAMMER))
     ifneq (,$(PROGRAMMERS_SUPPORTED))
       ifeq (,$(filter $(PROGRAMMER),$(PROGRAMMERS_SUPPORTED)))
-        $(info '$(PROGRAMMER)' programmer is not supported by this board. \
+        $(warning '$(PROGRAMMER)' programmer is not supported by this board. \
                 Supported programmers: '$(PROGRAMMERS_SUPPORTED)')
       endif
     endif
