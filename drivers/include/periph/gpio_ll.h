@@ -69,13 +69,13 @@
 #ifndef PERIPH_GPIO_LL_H
 #define PERIPH_GPIO_LL_H
 
-#include <inttypes.h>
+#include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
 
 #include "architecture.h"
-#include "periph_cpu.h"
 #include "periph/gpio.h"
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -134,6 +134,8 @@ typedef enum {
     /**
      * @brief   Use pin as output in push-pull configuration
      *
+     * @note    This is supported and implemented on all MCUs.
+     *
      * | Logical Value  | Electrical Behavior               |
      * |:-------------- |:--------------------------------- |
      * | `0`            | Low                               |
@@ -142,6 +144,10 @@ typedef enum {
     GPIO_OUTPUT_PUSH_PULL,
     /**
      * @brief   Use pin as output in open collector configuration
+     *
+     * @note    The feature `periph_gpio_ll_open_drain` is used to indicate
+     *          support for this GPIO mode. However, it may not be available on
+     *          all pins.
      *
      * | Logical Value  | Electrical Behavior               |
      * |:-------------- |:--------------------------------- |
@@ -152,13 +158,22 @@ typedef enum {
     /**
      * @brief   Use pin as output in open emitter configuration
      *
+     * @note    The feature `periph_gpio_ll_open_source` is used to indicate
+     *          support for this GPIO mode. However, it may not be available on
+     *          all pins.
+     *
      * | Logical Value  | Electrical Behavior               |
      * |:-------------- |:--------------------------------- |
      * | `0`            | High Impedance (Disconnected)     |
      * | `1`            | High                              |
      */
     GPIO_OUTPUT_OPEN_SOURCE,
-    GPIO_INPUT,             /**< Use pin as input */
+    /**
+     * @brief   Use pin as input
+     *
+     * @note    This is supported and implemented on all MCUs.
+     */
+    GPIO_INPUT,
     /**
      * @brief   The GPIO pin is used by a peripheral
      *
@@ -174,6 +189,12 @@ typedef enum {
     GPIO_USED_BY_PERIPHERAL,
     /**
      * @brief   Disconnect pin from all peripherals
+     *
+     * @note    This may be an alias for GPIO_INPUT when the MCU does not
+     *          support support disconnecting GPIO pins from the GPIO
+     *          peripheral. The feature `periph_gpio_ll_disconnect` indicates
+     *          that disconnecting pins from all peripherals (including the
+     *          GPIO peripheral) is supported.
      *
      * The implementation should aim to reduce power consumption of the pin
      * when this state is entered, if this is feasible. For pins where it is
@@ -686,6 +707,47 @@ static inline uword_t gpio_ll_prepare_write(gpio_port_t port, uword_t mask,
 #endif
 
 /**
+ * @brief       Turn GPIO pins specified by the bitmask @p outputs to outputs
+ *
+ * @param[in]   port        GPIO port to modify
+ * @param[in]   outputs     Bitmask specifying the GPIO pins to set in output
+ *                          mode
+ * @pre         The feature `gpio_ll_switch_dir` is available
+ * @pre         Each affected GPIO pin is either configured as input or as
+ *              push-pull output.
+ *
+ * @note        This is a makeshift solution to implement bit-banging of
+ *              bidirectional protocols on less sophisticated GPIO peripherals
+ *              that do not support open drain mode.
+ * @warning     Use open drain mode instead, if supported.
+ */
+static inline void gpio_ll_switch_dir_output(gpio_port_t port, uword_t outputs);
+
+/**
+ * @brief       Turn GPIO pins specified by the bitmask @p inputs to inputs
+ *
+ * @param[in]   port        GPIO port to modify
+ * @param[in]   inputs      Bitmask specifying the GPIO pins to set in input
+ *                          mode
+ * @pre         The feature `gpio_ll_switch_dir` is available
+ * @pre         Each affected GPIO pin is either configured as input or as
+ *              push-pull output.
+ *
+ * @warning     The state of the output register may be intermixed with the
+ *              input configuration. Specifically, on AVR the output register
+ *              enables/disables the internal pull up, on SAM0 MCUs the output
+ *              register controls the pull resistor direction (if the pull
+ *              resistor is enabled). Hence, the bits in the output
+ *              register of the pins switched to input should be restored
+ *              just after this call.
+ * @note        This is a makeshift solution to implement bit-banging of
+ *              bidirectional protocols on less sophisticated GPIO peripherals
+ *              that do not support open drain mode.
+ * @warning     Use open drain mode instead, if supported.
+ */
+static inline void gpio_ll_switch_dir_input(gpio_port_t port, uword_t inputs);
+
+/**
  * @brief   Perform a masked write operation on the I/O register of the port
  *
  *  Some platforms multiplex the "write" I/O register with additional
@@ -764,6 +826,39 @@ static inline gpio_port_t gpio_port_pack_addr(void *addr);
  * `NULL`), or retrieve the device descriptor.
  */
 static inline void * gpio_port_unpack_addr(gpio_port_t port);
+
+#ifndef DOXYGEN
+#if !MODULE_PERIPH_GPIO_LL_SWITCH_DIR
+static inline void gpio_ll_switch_dir_output(gpio_port_t port, uword_t outputs)
+{
+    (void)port;
+    (void)outputs;
+    /* Hack: If this function is only used guarded by some
+     *
+     *      if (IS_USED(MODULE_PERIPH_GPIO_LL_SWITCH_DIR)) {
+     *          ...
+     *      }
+     *
+     * as intended, all calls to the following fake function will be optimized
+     * due to the elimination of dead branches. If used incorrectly, a linking
+     * failure will be the result. The error message will not be ideal, but a
+     * compile time error is much better than a runtime error.
+     */
+    extern void gpio_ll_switch_dir_output_used_but_feature_gpio_ll_switch_dir_is_not_provided(void);
+    gpio_ll_switch_dir_output_used_but_feature_gpio_ll_switch_dir_is_not_provided();
+}
+
+static inline void gpio_ll_switch_dir_input(gpio_port_t port, uword_t inputs)
+{
+    (void)port;
+    (void)inputs;
+    /* Same hack as above */
+    extern void gpio_ll_switch_dir_input_used_but_feature_gpio_ll_switch_dir_is_not_provided(void);
+    gpio_ll_switch_dir_input_used_but_feature_gpio_ll_switch_dir_is_not_provided();
+}
+
+#endif /* !MODULE_PERIPH_GPIO_LL_SWITCH_DIR */
+#endif /* !DOXYGEN */
 
 #ifdef __cplusplus
 }

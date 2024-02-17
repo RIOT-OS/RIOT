@@ -135,7 +135,7 @@ ifneq (,$(filter ssp,$(USEMODULE)))
   include $(RIOTBASE)/sys/ssp/Makefile.include
 endif
 
-ifneq (native,$(BOARD))
+ifneq (native,$(CPU))
   INCLUDES += -I$(RIOTBASE)/sys/libc/include
 endif
 

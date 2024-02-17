@@ -18,7 +18,7 @@ def testfunc(child):
     child.expect("No messages or no message queue")
     child.expect(r"Message queue of thread \d+\r\n")
     child.expect_exact('size: 8 (avail: 8)')
-    if os.environ.get('BOARD') == 'native':
+    if os.environ.get('BOARD') in ['native', 'native64']:
         child.expect_exact('type: 0x0000, content: 0 ((nil))')
     else:
         child.expect(r'type: 0x0000, content: 0 \((0x)?0+\)')

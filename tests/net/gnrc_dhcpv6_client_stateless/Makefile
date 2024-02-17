@@ -15,7 +15,7 @@ USEMODULE += shell
 USEMODULE += shell_cmds_default
 
 # use Ethernet as link-layer protocol
-ifeq (native,$(BOARD))
+ifneq (,$(filter native native64,$(BOARD)))
   # Has to be provided here and not in Makefile.dep, so TERMFLAGS are properly
   # configured
   USEMODULE += netdev_default
@@ -40,7 +40,7 @@ SHOULD_RUN_KCONFIG ?=
 include $(RIOTBASE)/Makefile.include
 
 
-ifeq (,$(filter native,$(BOARD)))
+ifeq (,$(filter native native64,$(BOARD)))
 .PHONY: ethos
 
 ethos:

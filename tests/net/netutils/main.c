@@ -151,7 +151,7 @@ static void test_ipv4_addr_from_str__address_NULL(void)
 
 static void test_ipv4_addr_from_str__success(void)
 {
-    static const ipv4_addr_t a = { { 0x01, 0x02, 0x03, 0x04 } };
+    static const ipv4_addr_t a = IPV4_ADDR_INIT(1, 2, 3, 4);
     ipv4_addr_t address;
 
     TEST_ASSERT_EQUAL_INT(netutils_get_ipv4(&address, "1.2.3.4"), 0);

@@ -33,7 +33,7 @@
 #ifdef MODULE_PERIPH_GPIO_IRQ
 static void cb(void *arg)
 {
-    printf("INT: external interrupt from pin %i\n", (int)arg);
+    printf("INT: external interrupt from pin %" PRIiPTR "\n", (intptr_t)arg);
 }
 #endif
 
@@ -145,7 +145,7 @@ static int init_int(int argc, char **argv)
         }
     }
 
-    if (gpio_init_int(GPIO_PIN(po, pi), mode, flank, cb, (void *)pi) < 0) {
+    if (gpio_init_int(GPIO_PIN(po, pi), mode, flank, cb, (void *)(intptr_t)pi) < 0) {
         printf("error: init_int of GPIO_PIN(%i, %i) failed\n", po, pi);
         return 1;
     }

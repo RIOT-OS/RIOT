@@ -11,7 +11,7 @@ USEMODULE += shell_cmds_default
 USEMODULE += benchmark
 
 # disable native GPIOs for automatic test
-ifeq (native,$(BOARD))
+ifneq (,$(filter native native64,$(BOARD)))
   USEMODULE += periph_gpio_mock
   # the same for Kconfig
   ifeq (1,$(TEST_KCONFIG))

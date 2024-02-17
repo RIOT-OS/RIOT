@@ -102,14 +102,33 @@ typedef enum {
     GPIO_TRIGGER_LEVEL_LOW      = GPIO_TRIGGER_LEVEL | GPIO_TRIGGER_EDGE_FALLING,
 } gpio_irq_trig_t;
 
+/**
+ * @brief   Possible modes to write to the STM32 GPIOx MODER register
+ */
+typedef enum {
+    GPIOX_MODER_INPUT   = 0x0,  /**< Pin is used as input (reset value) */
+    GPIOX_MODER_OUTPUT  = 0x1,  /**< Pin is used as output */
+    GPIOX_MODER_AF      = 0x2,  /**< Pin is routed to peripheral (alternate function) */
+    GPIOX_MODER_ANALOG  = 0x3,  /**< Pin is in analog mode (least current leakage) */
+} gpiox_moder_t;
+
+/**
+ * @brief   Check if gpio_state_t requires open drain mode
+ */
+#define GPIO_STATE_T_OPEN_DRAIN_FLAG    0x4
+/**
+ * @brief   Bitmask to extract moder config
+ */
+#define GPIO_STATE_T_MODER_Msk          0x3
+
 #define HAVE_GPIO_STATE_T
 typedef enum {
-    GPIO_OUTPUT_PUSH_PULL,
-    GPIO_OUTPUT_OPEN_DRAIN,
-    GPIO_OUTPUT_OPEN_SOURCE,
-    GPIO_INPUT,
-    GPIO_USED_BY_PERIPHERAL,
-    GPIO_DISCONNECT,
+    GPIO_INPUT              = GPIOX_MODER_INPUT,
+    GPIO_OUTPUT_PUSH_PULL   = GPIOX_MODER_OUTPUT,
+    GPIO_OUTPUT_OPEN_DRAIN  = GPIOX_MODER_OUTPUT | GPIO_STATE_T_OPEN_DRAIN_FLAG,
+    GPIO_USED_BY_PERIPHERAL = GPIOX_MODER_AF,
+    GPIO_DISCONNECT         = GPIOX_MODER_ANALOG,
+    GPIO_OUTPUT_OPEN_SOURCE = 0x7,  /**< not supported */
 } gpio_state_t;
 
 #define HAVE_GPIO_PULL_T
@@ -130,7 +149,7 @@ typedef union gpio_conf_stm32 gpio_conf_t;
  * @ingroup     drivers_periph_gpio_ll
  */
 union gpio_conf_stm32 {
-    uint16_t bits;  /**< the raw bits */
+    uint8_t bits;  /**< the raw bits */
     struct {
         /**
          * @brief   State of the pin
@@ -151,18 +170,6 @@ union gpio_conf_stm32 {
          */
         gpio_slew_t slew_rate           : 2;
         /**
-         * @brief   Whether to disable the input Schmitt trigger
-         *
-         * @details This could be called `schmitt_trigger` with inverse
-         *          meaning, but the API contract says that additional
-         *          members in the structure should have a sane
-         *          default when zero.
-         *
-         * This value is ignored *unless* @ref gpio_conf_stm32::state is
-         * configured to @ref GPIO_INPUT.
-         */
-        bool schmitt_trigger_disabled   : 1;
-        /**
          * @brief   Initial value of the output
          *
          * Ignored if @ref gpio_conf_stm32::state is set to @ref GPIO_INPUT or
@@ -176,7 +183,6 @@ union gpio_conf_stm32 {
          * consulted.
          */
         bool initial_value          : 1;
-        uint8_t                     : 7;    /*< padding */
     };
 };
 

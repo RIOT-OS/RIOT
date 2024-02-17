@@ -96,6 +96,10 @@ ifneq (,$(filter lps331ap lps2%,$(USEMODULE)))
   USEMODULE += lpsxxx
 endif
 
+ifneq (,$(filter lsm6ds%,$(USEMODULE)))
+  USEMODULE += lsm6dsxx
+endif
+
 ifneq (,$(filter ltc4150_%,$(USEMODULE)))
   USEMODULE += ltc4150
 endif

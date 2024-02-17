@@ -25,7 +25,7 @@
 #include <string.h>
 
 #include "stdio_semihosting.h"
-#include "ztimer.h"
+#include "ztimer/periodic.h"
 
 /**
  * @brief Rate at which the stdin read polls (breaks) the debugger for input
@@ -55,10 +55,9 @@
 #define STDIO_SEMIHOSTING_SYS_READ      (0x06) /**< Read command  */
 /** @} */
 
+static ztimer_periodic_t stdin_timer;
+
 #if defined(MODULE_RISCV_COMMON)
-static bool _semihosting_connected(void) {
-    return true;
-}
 
 static uint32_t _semihosting_raw(int cmd, uint32_t *args)
 {
@@ -90,15 +89,6 @@ static uint32_t _semihosting_raw(int cmd, uint32_t *args)
 
 #elif defined(MODULE_CORTEXM_COMMON)
 
-static bool _semihosting_connected(void) {
-#ifdef CoreDebug_DHCSR_C_DEBUGEN_Msk
-    /* Best effort attempt to detect if a debug session is active */
-    return CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk;
-#else
-    return true;
-#endif
-}
-
 static uint32_t _semihosting_raw(int cmd, uint32_t *args)
 {
     uint32_t result = 0;
@@ -122,6 +112,15 @@ static uint32_t _semihosting_raw(int cmd, uint32_t *args)
 }
 #endif
 
+static bool _semihosting_connected(void) {
+#ifdef CoreDebug_DHCSR_C_DEBUGEN_Msk
+    /* Best effort attempt to detect if a debug session is active */
+    return CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk;
+#else
+    return true;
+#endif
+}
+
 static size_t _semihosting_write(const uint8_t *buffer, size_t len)
 {
     uint32_t args[3] = {
@@ -143,30 +142,81 @@ static ssize_t _semihosting_read(uint8_t *buffer, size_t len)
     return len - remaining;
 }
 
-void stdio_init(void)
+static bool _read_cb(void *arg)
 {
+    uint8_t buffer[STDIO_RX_BUFSIZE];
+
+    if (!_semihosting_connected()) {
+        return true;
+    }
+
+    int bytes = _semihosting_read(buffer, sizeof(buffer));
+    if (bytes > 0) {
+        isrpipe_write(arg, buffer, bytes);
+    }
+
+    return true;
 }
 
-ssize_t stdio_read(void* buffer, size_t count)
+static bool _init_done;
+static void _init(void) {
+    if (!STDIO_SEMIHOSTING_RX || !IS_USED(MODULE_STDIO_DISPATCH)) {
+        return;
+    }
+
+    if (!thread_getpid()) {
+        /* we can't use ztimer in early init */
+        return;
+    }
+
+    ztimer_periodic_init(ZTIMER_MSEC, &stdin_timer, _read_cb, &stdin_isrpipe,
+                         STDIO_SEMIHOSTING_POLL_RATE_MS);
+    ztimer_periodic_start(&stdin_timer);
+    _init_done = true;
+}
+
+static void _detach(void)
 {
     if (STDIO_SEMIHOSTING_RX) {
-        uint32_t last_wakeup = ztimer_now(ZTIMER_MSEC);
-        ssize_t bytes_read = _semihosting_read(buffer, count);
-        while (bytes_read == 0) {
-            ztimer_periodic_wakeup(ZTIMER_MSEC, &last_wakeup,
-                                   STDIO_SEMIHOSTING_POLL_RATE_MS);
-            bytes_read = _semihosting_read(buffer, count);
-        }
-        return bytes_read;
+        ztimer_periodic_stop(&stdin_timer);
     }
-    return -ENOTSUP;
 }
 
-ssize_t stdio_write(const void* buffer, size_t len)
+static ssize_t _write(const void* buffer, size_t len)
 {
     if (!_semihosting_connected()) {
         return len;
     }
+    if (STDIO_SEMIHOSTING_RX && IS_USED(MODULE_STDIO_DISPATCH)
+        && !_init_done) {
+        _init();
+    }
+
     size_t remaining = _semihosting_write(buffer, len);
     return len - remaining;
 }
+
+#ifndef MODULE_STDIO_DISPATCH
+ssize_t stdio_read(void* buffer, size_t count)
+{
+    if (!STDIO_SEMIHOSTING_RX) {
+        return -ENOTSUP;
+    }
+
+    uint32_t last_wakeup = ztimer_now(ZTIMER_MSEC);
+    ssize_t bytes_read = _semihosting_read(buffer, count);
+    while (bytes_read == 0) {
+        ztimer_periodic_wakeup(ZTIMER_MSEC, &last_wakeup,
+                               STDIO_SEMIHOSTING_POLL_RATE_MS);
+        bytes_read = _semihosting_read(buffer, count);
+    }
+    return bytes_read;
+}
+
+int stdio_available(void)
+{
+    return -ENOTSUP;
+}
+#endif
+
+STDIO_PROVIDER(STDIO_SEMIHOSTING, _init, _detach, _write)

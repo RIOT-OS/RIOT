@@ -40,7 +40,7 @@ static void _set_dir(gpio_port_t port, uint8_t pin, bool output)
         p->ddr |= 1U << pin;
     }
     else {
-        p-> ddr &= ~(1U << pin);
+        p->ddr &= ~(1U << pin);
     }
 }
 
@@ -59,8 +59,7 @@ static void _set_pull_config(gpio_port_t port, uint8_t pin, gpio_pull_t pull)
 int gpio_ll_init(gpio_port_t port, uint8_t pin, gpio_conf_t conf)
 {
     if ((conf.pull > GPIO_PULL_UP)
-        || (conf.state == GPIO_OUTPUT_OPEN_DRAIN)
-        || (conf.state == GPIO_OUTPUT_OPEN_SOURCE)) {
+        || (conf.state > GPIO_OUTPUT_PUSH_PULL)) {
         return -ENOTSUP;
     }
 

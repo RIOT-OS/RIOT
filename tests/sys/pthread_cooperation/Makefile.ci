@@ -1,7 +1,5 @@
 BOARD_INSUFFICIENT_MEMORY := \
     atmega8 \
-    hifive1 \
-    hifive1b \
     i-nucleo-lrwan1 \
     im880b \
     nucleo-f031k6 \

@@ -82,6 +82,14 @@ extern "C" {
 #define SHT3X_PARAM_I2C_ADDR   (SHT3X_I2C_ADDR_1)  /**< I2C address */
 /** @} */
 
+/**
+ * @name    LSM6DSXX accelerometer sensor configuration
+ * @{
+ */
+#define LSM6DSXX_PARAM_I2C I2C_DEV(0)
+#define LSM6DSXX_PARAM_ADDR (0x6A)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

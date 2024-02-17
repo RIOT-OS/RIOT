@@ -41,6 +41,15 @@ config MODULE_FLASHDB_KVDB_AUTO_UPDATE
           database. If the version changes, it will automatically trigger an upgrade action
           and update the new default KV collection to the current database.
 
+config FLASHDB_MIN_SECTOR_SIZE_DEFAULT_KiB
+    int "Minimal virtual sector size in KiB for FlashDB"
+    default 4
+    help
+        By default, KVDB will use 1 times the block size as the sector size, that is, 4096.
+        At this time, the KVDB cannot store a KV longer than 4096. If you want to save, for example,
+        a KV with a length of 10K, you can use the control function to set the sector size to 12K or
+        larger.
+
 config MODULE_FLASHDB_MTD
 
 endif # PACKAGE_FLASHDB

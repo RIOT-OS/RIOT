@@ -98,13 +98,9 @@ ssize_t _edhoc_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_c
     return msg_len;
 }
 
-/* must be sorted by path (ASCII order) */
-const coap_resource_t coap_resources[] = {
-    COAP_WELL_KNOWN_CORE_DEFAULT_HANDLER,
-    { "/.well-known/edhoc", COAP_POST, _edhoc_handler, NULL },
+NANOCOAP_RESOURCE(edhoc) {
+    .path = "/.well-known/edhoc", .methods = COAP_POST, .handler = _edhoc_handler
 };
-
-const unsigned coap_resources_numof = ARRAY_SIZE(coap_resources);
 
 int responder_cmd(int argc, char **argv)
 {

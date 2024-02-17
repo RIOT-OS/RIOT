@@ -6,6 +6,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega328p \
     atmega328p-xplained-mini \
     atmega8 \
+    nucleo-c031c6 \
     nucleo-f030r8 \
     nucleo-f031k6 \
     nucleo-f042k6 \
@@ -15,4 +16,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     stk3200 \
     stm32f030f4-demo \
     stm32f0discovery \
+    weact-g030f6 \
     #

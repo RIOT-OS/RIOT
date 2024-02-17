@@ -59,7 +59,7 @@ static unsigned args[TIMER_CHANNEL_NUMOF];
 static void cb(void *arg, int chan)
 {
     timeouts[chan] = sw_count;
-    args[chan] = (unsigned)arg + chan;
+    args[chan] = (uintptr_t)arg + chan;
     fired++;
 }
 
@@ -104,7 +104,7 @@ static int test_timer(unsigned num, uint32_t timer_freq)
     printf("  - Calling timer_init(%u, %" PRIu32 ")\n    ",
                num, timer_freq);
     /* initialize and halt timer */
-    if (timer_init(TIMER_DEV(num), timer_freq, cb, (void *)(COOKIE * num)) != 0) {
+    if (timer_init(TIMER_DEV(num), timer_freq, cb, (void *)(uintptr_t)(COOKIE * num)) != 0) {
         printf("ERROR: timer_init() failed\n\n");
         return 0;
     }

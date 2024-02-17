@@ -5,7 +5,7 @@ include ../Makefile.net_common
 # maybe it is an actual race condition.
 #
 # TODO: Solve the issue and re-enable
-TEST_ON_CI_BLACKLIST += native
+TEST_ON_CI_BLACKLIST += native native64
 
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_router_default
@@ -24,7 +24,7 @@ USEMODULE += netstats_l2
 USEMODULE += netstats_ipv6
 USEMODULE += netstats_rpl
 
-ifeq (native, $(BOARD))
+ifneq (,$(filter native native64,$(BOARD)))
   USEMODULE += socket_zep
   USEMODULE += socket_zep_hello
   USEMODULE += netdev

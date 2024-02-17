@@ -49,7 +49,8 @@ extern "C" {
  * @name Timer peripheral configuration
  * @{
  */
-#define TIMER_NUMOF        (1U)
+#define TIMER_NUMOF            (1U)
+#define TIMER_CHANNEL_NUMOF    (1U)    /**< Number of timer channels */
 
 /**
  * @brief xtimer configuration

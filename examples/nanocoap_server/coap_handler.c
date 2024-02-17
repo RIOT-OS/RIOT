@@ -183,21 +183,21 @@ NANOCOAP_RESOURCE(sha256) {
 };
 
 /* we can also include the fileserver module */
-#ifdef MODULE_GCOAP_FILESERVER
-#include "net/gcoap/fileserver.h"
+#ifdef MODULE_NANOCOAP_FILESERVER
+#include "net/nanocoap/fileserver.h"
 #include "vfs_default.h"
 
 NANOCOAP_RESOURCE(fileserver) {
     .path = "/vfs",
     .methods = COAP_GET
-#if IS_USED(MODULE_GCOAP_FILESERVER_PUT)
+#if IS_USED(MODULE_NANOCOAP_FILESERVER_PUT)
       | COAP_PUT
 #endif
-#if IS_USED(MODULE_GCOAP_FILESERVER_DELETE)
+#if IS_USED(MODULE_NANOCOAP_FILESERVER_DELETE)
       | COAP_DELETE
 #endif
       | COAP_MATCH_SUBTREE,
-    .handler = gcoap_fileserver_handler,
+    .handler = nanocoap_fileserver_handler,
     .context = VFS_DEFAULT_DATA
 };
 #endif

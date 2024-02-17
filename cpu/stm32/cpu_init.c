@@ -46,7 +46,7 @@
 #if defined (CPU_FAM_STM32L4) || defined (CPU_FAM_STM32G4) || \
     defined(CPU_FAM_STM32L5)
 #define BIT_APB_PWREN       RCC_APB1ENR1_PWREN
-#elif defined (CPU_FAM_STM32G0)
+#elif defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32C0)
 #define BIT_APB_PWREN       RCC_APBENR1_PWREN
 #elif !defined(CPU_FAM_STM32MP1)
 #define BIT_APB_PWREN       RCC_APB1ENR_PWREN

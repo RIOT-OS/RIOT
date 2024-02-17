@@ -41,6 +41,8 @@
 #include "utlist.h"
 #include "xtimer.h"
 
+#include "pktbuf_static.h"
+
 #define SEND_PACKET_TIMEOUT                         (500U)
 
 #define LOC_L2  { _LL0, _LL1, _LL2, _LL3, _LL4, _LL5, _LL6, _LL7 }
@@ -624,12 +626,19 @@ static void test_minfwd_forward__ENOMEM__netif_hdr_build_fail(void)
     gnrc_pktsnip_t *pkt, *frag, *filled_space;
 
     vrbe->super.arrival = xtimer_now_usec();
-    TEST_ASSERT_NOT_NULL((filled_space = gnrc_pktbuf_add(
-            NULL, NULL,
-            /* 115U == 2 * sizeof(gnrc_pktsnip_t) + movement due to mark */
-            CONFIG_GNRC_PKTBUF_SIZE - sizeof(_test_nth_frag) - 115U,
-            GNRC_NETTYPE_UNDEF
-        )));
+
+    size_t test_pkt_size   = _align(sizeof(gnrc_pktsnip_t)) + _align(sizeof(_test_nth_frag));
+    size_t marked_pkt_size = _align(sizeof(gnrc_pktsnip_t)) + _align(sizeof(sixlowpan_frag_n_t))
+                             + _align(sizeof(_test_nth_frag) - sizeof(sixlowpan_frag_n_t));
+
+    /* Calculate the maximum payload size to fill the buffer with the following three packets */
+    size_t dummy_pkt_payload_size = CONFIG_GNRC_PKTBUF_SIZE - _align(sizeof(gnrc_pktsnip_t))
+                                    - test_pkt_size - marked_pkt_size;
+
+    TEST_ASSERT_NOT_NULL((filled_space = gnrc_pktbuf_add(NULL, NULL,
+                                                         dummy_pkt_payload_size,
+                                                         GNRC_NETTYPE_UNDEF)));
+
     TEST_ASSERT_NOT_NULL((pkt = gnrc_pktbuf_add(NULL, _test_nth_frag,
                                                 sizeof(_test_nth_frag),
                                                 GNRC_NETTYPE_SIXLOWPAN)));

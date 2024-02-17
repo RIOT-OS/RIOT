@@ -12,8 +12,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     cc2650stk \
     e104-bt5010a-tb \
     e104-bt5011a-tb \
-    hifive1 \
-    hifive1b \
     i-nucleo-lrwan1 \
     im880b \
     lsn50 \

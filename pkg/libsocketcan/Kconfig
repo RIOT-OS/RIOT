@@ -6,5 +6,5 @@
 #
 
 config PACKAGE_LIBSOCKETCAN
-    bool "libsocketcan2 32bit for native Linux builds"
-    depends on BOARD_NATIVE
+    bool "libsocketcan2 for native Linux builds"
+    depends on HAS_ARCH_NATIVE

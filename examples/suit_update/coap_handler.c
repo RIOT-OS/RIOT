@@ -22,13 +22,8 @@ static ssize_t _riot_board_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
             COAP_FORMAT_TEXT, (uint8_t*)RIOT_BOARD, strlen(RIOT_BOARD));
 }
 
-/* must be sorted by path (ASCII order) */
-const coap_resource_t coap_resources[] = {
-    COAP_WELL_KNOWN_CORE_DEFAULT_HANDLER,
-    { "/riot/board", COAP_GET, _riot_board_handler, NULL },
-
-    /* this line adds the whole "/suit"-subtree */
-    SUIT_COAP_SUBTREE,
+NANOCOAP_RESOURCE(board) {
+    .path = "/riot/board", .methods = COAP_GET, .handler = _riot_board_handler,
 };
 
-const unsigned coap_resources_numof = ARRAY_SIZE(coap_resources);
+NANOCOAP_RESOURCE(suit) SUIT_COAP_SUBTREE;

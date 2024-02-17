@@ -64,6 +64,7 @@ for application in ${APPLICATIONS}; do
         if grep -e overflowed \
                 -e "not within region" \
                 -e "wraps around address space" \
+                -e "overlaps section" \
                 "$TMPFILE" > /dev/null; then
             printf "${CBIG}%s${CRESET}\n" "too big"
             make -f "$(dirname "$0")"/Makefile.for_sh DIR="${RIOTBASE}/${application}" ADD_BOARDS="${BOARD}" Makefile.ci > /dev/null

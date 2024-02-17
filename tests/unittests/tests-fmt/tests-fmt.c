@@ -814,6 +814,7 @@ static void test_fmt_str(void)
     const char *string1 = "string1";
     char string2[]      = "StRiNg2";
 
+    TEST_ASSERT_EQUAL_INT(7, fmt_str(NULL, string1));
     TEST_ASSERT_EQUAL_INT(fmt_strlen(string1), fmt_str(&string2[0], string1));
     TEST_ASSERT_EQUAL_STRING(string1, &string2[0]);
 }
@@ -833,6 +834,7 @@ static void test_fmt_to_lower(void)
     const char string_up[]  = "AbCdeFGHijkLM";
     char string[]           = "zzzzzzzzzzzzzzz";
 
+    TEST_ASSERT_EQUAL_INT(fmt_strlen(string_up), fmt_to_lower(NULL, string_up));
     TEST_ASSERT_EQUAL_INT(fmt_strlen(string_up), fmt_to_lower(string, string_up));
     string[fmt_strlen(string_up)] = '\0';
     TEST_ASSERT_EQUAL_STRING("abcdefghijklm", &string[0]);
@@ -865,6 +867,8 @@ static void test_fmt_lpad(void)
     char string[9] = {0};
 
     strcpy(string, base);
+
+    TEST_ASSERT_EQUAL_INT(8, fmt_lpad(NULL, 4, 8, ' '));
 
     fmt_lpad(string, 4, 8, ' ');
 

@@ -22,8 +22,7 @@
 #include <errno.h>
 #include <sys/types.h>
 
-#include "isrpipe.h"
-#include "tsrb.h"
+#include "stdio_base.h"
 
 #include "irq_arch.h"
 #include "esp_attr.h"
@@ -33,39 +32,18 @@
 #include "soc/periph_defs.h"
 #include "rom/ets_sys.h"
 
-static uint8_t _rx_buf_mem[USB_SERIAL_JTAG_PACKET_SZ_BYTES];
-static isrpipe_t stdio_serial_isrpipe = ISRPIPE_INIT(_rx_buf_mem);
-
 static tsrb_t serial_tx_rb;
 static uint8_t serial_tx_rb_buf[USB_SERIAL_JTAG_PACKET_SZ_BYTES];
 
 #define IRQ_MASK (USB_SERIAL_JTAG_INTR_SERIAL_IN_EMPTY | \
                  (IS_USED(MODULE_STDIO_USB_SERIAL_JTAG_RX) * USB_SERIAL_JTAG_INTR_SERIAL_OUT_RECV_PKT))
 
-ssize_t stdio_write(const void *buffer, size_t len)
+static ssize_t _write(const void *buffer, size_t len)
 {
     tsrb_add(&serial_tx_rb, buffer, len);
     USB_SERIAL_JTAG.int_ena.val = IRQ_MASK;
 
     return len;
-}
-
-ssize_t stdio_read(void* buffer, size_t count)
-{
-    if (IS_USED(MODULE_STDIO_USB_SERIAL_JTAG_RX)) {
-        return (ssize_t)isrpipe_read(&stdio_serial_isrpipe, buffer, count);
-    }
-
-    return -ENOTSUP;
-}
-
-int stdio_available(void)
-{
-    if (IS_USED(MODULE_STDIO_AVAILABLE)) {
-        return tsrb_avail(&stdio_serial_isrpipe.tsrb);
-    }
-
-    return -ENOTSUP;
 }
 
 IRAM_ATTR
@@ -80,7 +58,7 @@ static void _serial_intr_handler(void *arg)
     /* read data if available */
     while (IS_USED(MODULE_STDIO_USB_SERIAL_JTAG_RX) &&
            usb_serial_jtag_ll_rxfifo_data_available()) {
-        isrpipe_write_one(&stdio_serial_isrpipe, USB_SERIAL_JTAG.ep1.rdwr_byte);
+        isrpipe_write_one(&stdin_isrpipe, USB_SERIAL_JTAG.ep1.rdwr_byte);
     }
 
     /* write data if there is a free stop */
@@ -104,7 +82,7 @@ static void _serial_intr_handler(void *arg)
     irq_isr_exit();
 }
 
-void stdio_init(void)
+static void _init(void)
 {
     tsrb_init(&serial_tx_rb, serial_tx_rb_buf, sizeof(serial_tx_rb_buf));
 
@@ -128,4 +106,11 @@ void stdio_init(void)
     intr_cntrl_ll_set_int_level(CPU_INUM_SERIAL_JTAG, 1);
 #endif
 }
+
+static void _detach(void)
+{
+    intr_cntrl_ll_disable_interrupts(BIT(CPU_INUM_SERIAL_JTAG));
+}
+
+STDIO_PROVIDER(STDIO_ESP32_SERIAL_JTAG, _init, _detach, _write)
 /**@}*/

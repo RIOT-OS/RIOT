@@ -70,6 +70,9 @@ static int _version_handler(int argc, char **argv)
         printf("%s v%"PRIu32", slot %u\n", RIOT_APPLICATION, hdr->version, slot);
     }
 #endif
+#ifdef CONFIG_RIOT_VERSION_EXTRA
+    puts(CONFIG_RIOT_VERSION_EXTRA);
+#endif
 
     return 0;
 }

@@ -393,8 +393,13 @@ size_t fmt_str(char *out, const char *str);
 /**
  * @brief   Copy null-terminated string to a lowercase string (excluding terminating \0)
  *
+ * If @p out is NULL, will only return the number of characters that would have
+ * been written.
+ *
  * @param[out]  out     Pointer to output buffer, or NULL
  * @param[in]   str     Pointer to null-terminated source string
+ *
+ * @return      nr of characters written to (or needed in) @p out
  */
 size_t fmt_to_lower(char *out, const char *str);
 

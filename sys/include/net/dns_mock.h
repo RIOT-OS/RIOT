@@ -34,9 +34,9 @@ extern "C" {
 
 /**
  * @brief IPv4 address for @ref SOCK_DNS_MOCK_EXAMPLE_COM_HOSTNAME.
- *        Address represents "93.184.216.34".
  */
-static const ipv4_addr_t sock_dns_mock_example_com_addr_ipv4 = { { 0x5d, 0xb8, 0xd8, 0x22 } };
+static const ipv4_addr_t sock_dns_mock_example_com_addr_ipv4 =
+    IPV4_ADDR_INIT(93, 184, 216, 34);
 
 /**
  * @brief IPv6 address for @ref SOCK_DNS_MOCK_EXAMPLE_COM_HOSTNAME.

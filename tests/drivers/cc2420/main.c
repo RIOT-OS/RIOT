@@ -31,7 +31,7 @@ int netdev_ieee802154_minimal_init_devs(netdev_event_cb_t cb) {
     puts("Initializing CC2420 devices");
 
     for (unsigned i = 0; i < CC2420_NUM; i++) {
-        printf("%d out of %d\n", i + 1, CC2420_NUM);
+        printf("%d out of %u\n", i + 1, (unsigned)CC2420_NUM);
         netdev_t *netdev = &cc2420[i].netdev.netdev;
 
         /* setup the specific driver */

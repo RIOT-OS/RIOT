@@ -25,7 +25,6 @@
 
 # Required packages
 
-The `native` version of RIOT will produce a 32 bit binary.
 On Debian/Ubuntu you can install the required libraries with
 
 ```

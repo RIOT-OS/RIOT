@@ -376,6 +376,7 @@ _nib_dr_entry_t *_nib_drl_add(const ipv6_addr_t *router_addr, unsigned iface)
 void _nib_drl_remove(_nib_dr_entry_t *nib_dr)
 {
     if (nib_dr->next_hop != NULL) {
+        _evtimer_del(&nib_dr->rtr_timeout);
         nib_dr->next_hop->mode &= ~(_DRL);
         _nib_onl_clear(nib_dr->next_hop);
         memset(nib_dr, 0, sizeof(_nib_dr_entry_t));
@@ -660,6 +661,7 @@ int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *pkt,
 
 void _nib_pl_remove(_nib_offl_entry_t *nib_offl)
 {
+    _evtimer_del(&nib_offl->pfx_timeout);
     _nib_offl_remove(nib_offl, _PL);
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
     unsigned idx = _idx_dsts(nib_offl);

@@ -26,7 +26,6 @@
  * @}
  */
 
-#include <err.h>
 #include <signal.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -37,6 +36,7 @@
 #include "cpu.h"
 #include "cpu_conf.h"
 #include "native_internal.h"
+#include "panic.h"
 #include "periph/timer.h"
 #include "time_units.h"
 
@@ -75,9 +75,30 @@ void native_isr_timer(void)
     _callback(_cb_arg, 0);
 }
 
+uword_t timer_query_freqs_numof(tim_t dev)
+{
+    (void)dev;
+
+    assert(TIMER_DEV(dev) < TIMER_NUMOF);
+
+    return 1;
+}
+
+uint32_t timer_query_freqs(tim_t dev, uword_t index)
+{
+    (void)dev;
+
+    assert(TIMER_DEV(dev) < TIMER_NUMOF);
+
+    if (index > 0) {
+        return 0;
+    }
+
+    return NATIVE_TIMER_SPEED;
+}
+
 int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 {
-    (void)freq;
     DEBUG("%s\n", __func__);
     if (dev >= TIMER_NUMOF) {
         return -1;
@@ -100,6 +121,7 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 
     if (register_interrupt(SIGALRM, native_isr_timer) != 0) {
         DEBUG_PUTS("Failed to register SIGALRM handler");
+        timer_delete(itimer_monotonic);
         return -1;
     }
 
@@ -121,7 +143,8 @@ static void do_timer_set(unsigned int offset, bool periodic)
         its.it_interval = its.it_value;
     }
 
-    DEBUG("timer_set(): setting %lu.%09lu\n", (unsigned long)its.it_value.tv_sec, its.it_value.tv_nsec);
+    DEBUG("timer_set(): setting %lu.%09lu\n", (unsigned long)its.it_value.tv_sec,
+          (unsigned long)its.it_value.tv_nsec);
 }
 
 int timer_set(tim_t dev, int channel, unsigned int offset)
@@ -144,14 +167,12 @@ int timer_set(tim_t dev, int channel, unsigned int offset)
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
-    uint32_t now = timer_read(dev);
+    unsigned int now = timer_read(dev);
     return timer_set(dev, channel, value - now);
 }
 
 int timer_set_periodic(tim_t dev, int channel, unsigned int value, uint8_t flags)
 {
-    (void)flags;
-
     if (channel != 0) {
         return -1;
     }
@@ -182,7 +203,7 @@ void timer_start(tim_t dev)
 
     _native_syscall_enter();
     if (timer_settime(itimer_monotonic, 0, &its, NULL) == -1) {
-        err(EXIT_FAILURE, "timer_start: timer_settime");
+        core_panic(PANIC_GENERAL_ERROR, "Failed to set monotonic timer");
     }
     _native_syscall_leave();
 }
@@ -195,7 +216,7 @@ void timer_stop(tim_t dev)
     _native_syscall_enter();
     struct itimerspec zero = {0};
     if (timer_settime(itimer_monotonic, 0, &zero, &its) == -1) {
-        err(EXIT_FAILURE, "timer_stop: timer_settime");
+        core_panic(PANIC_GENERAL_ERROR, "Failed to set monotonic timer");
     }
     _native_syscall_leave();
 
@@ -215,7 +236,7 @@ unsigned int timer_read(tim_t dev)
     _native_syscall_enter();
 
     if (clock_gettime(CLOCK_MONOTONIC, &t) == -1) {
-        err(EXIT_FAILURE, "timer_read: clock_gettime");
+        core_panic(PANIC_GENERAL_ERROR, "Failed to read monotonic clock");
     }
 
     _native_syscall_leave();

@@ -134,7 +134,20 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     case 38400: speed = B38400; break;
     case 57600: speed = B57600; break;
     case 115200: speed = B115200; break;
-    case 230400: speed = B230400 ; break;
+    case 230400: speed = B230400; break;
+    case 460800 : speed =  B460800; break;
+    case 500000 : speed =  B500000; break;
+    case 576000 : speed =  B576000; break;
+    case 921600 : speed =  B921600; break;
+    case 1000000: speed =  B1000000; break;
+    case 1152000: speed =  B1152000; break;
+    case 1500000: speed =  B1500000; break;
+    case 2000000: speed =  B2000000; break;
+    case 2500000: speed =  B2500000; break;
+    case 3000000: speed =  B3000000; break;
+    case 3500000: speed =  B3500000; break;
+    case 4000000: speed =  B4000000; break;
+
     default:
         return UART_NOBAUD;
         break;
@@ -175,7 +188,9 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 
     DEBUG("\n");
 
-    _native_write(tty_fds[uart], data, len);
+    if (tty_fds[uart] >= 0) {
+        _native_write(tty_fds[uart], data, len);
+    }
 }
 
 void uart_poweron(uart_t uart)
@@ -186,6 +201,9 @@ void uart_poweron(uart_t uart)
 
 void uart_poweroff(uart_t uart)
 {
-    (void)uart;
-    /* not implemented (yet) */
+    if (tty_fds[uart] >= 0) {
+        native_async_read_remove_handler(tty_fds[uart]);
+        real_close(tty_fds[uart]);
+        tty_fds[uart] = -1;
+    }
 }

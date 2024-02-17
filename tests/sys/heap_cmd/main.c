@@ -41,7 +41,7 @@ static int free_cmd(int argc, char **argv)
         return 1;
     }
 
-    unsigned int p = strtoul(argv[1], NULL, 16);
+    uintptr_t p = strtoul(argv[1], NULL, 16);
     void *ptr = (void *)p;
     printf("freeing %p\n", ptr);
     free(ptr);

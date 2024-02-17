@@ -27,7 +27,7 @@
 extern "C" {
 #endif
 
-#ifdef BOARD_NATIVE
+#ifdef CPU_NATIVE
 #include <stdio.h>
 
 /*
@@ -56,7 +56,7 @@ inline int sched_yield(void)
  * thread_arch.c.
  */
 extern int sched_yield(void);
-#endif /* BOARD_NATIVE */
+#endif /* CPU_NATIVE */
 
 #ifdef __cplusplus
 }

@@ -47,13 +47,7 @@ static const netdev_driver_t netdev_driver_w5100;
 
 static inline void send_addr(w5100_t *dev, uint16_t addr)
 {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-    spi_transfer_byte(dev->p.spi, dev->p.cs, true, (addr >> 8));
-    spi_transfer_byte(dev->p.spi, dev->p.cs, true, (addr & 0xff));
-#else
-    spi_transfer_byte(dev->p.spi, dev->p.cs, true, (addr & 0xff));
-    spi_transfer_byte(dev->p.spi, dev->p.cs, true, (addr >> 8));
-#endif
+    spi_transfer_u16_be(dev->p.spi, dev->p.cs, true, addr);
 }
 
 static uint8_t rreg(w5100_t *dev, uint16_t reg)

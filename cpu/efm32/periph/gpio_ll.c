@@ -34,8 +34,8 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, gpio_conf_t conf)
 
     switch (conf.state) {
     case GPIO_DISCONNECT:
-        /* ignoring pull */
         mode = gpioModeDisabled;
+        initial = (conf.pull == GPIO_PULL_UP);
         break;
     case GPIO_INPUT:
         switch (conf.pull) {
@@ -135,6 +135,9 @@ gpio_conf_t gpio_ll_query_conf(gpio_port_t port, uint8_t pin)
         /* Fall-through: There is no error reporting here */
     default:
         result.state = GPIO_DISCONNECT;
+        if (GPIO_PinOutGet(port, pin)) {
+            result.pull = GPIO_PULL_UP;
+        }
         break;
     }
 

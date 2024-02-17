@@ -21,6 +21,7 @@
 
 #include <string.h>
 #include <stdint.h>
+#include <endian.h>
 #include "unaligned.h"
 
 #ifdef __cplusplus
@@ -388,13 +389,6 @@ static inline uint64_t ntohll(uint64_t v);
 
 /* **************************** IMPLEMENTATION ***************************** */
 
-#ifdef HAVE_NO_BUILTIN_BSWAP16
-static inline unsigned short __builtin_bswap16(unsigned short a)
-{
-    return (a << 8) | (a >> 8);
-}
-#endif
-
 static inline uint16_t byteorder_swaps(uint16_t v)
 {
     return __builtin_bswap16(v);
@@ -410,30 +404,19 @@ static inline uint64_t byteorder_swapll(uint64_t v)
     return __builtin_bswap64(v);
 }
 
-/**
- * @brief Swaps the byteorder according to the endianness (host -> le)
- */
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#   define _byteorder_swap_le(V, T) (V)
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#   define _byteorder_swap_le(V, T) (byteorder_swap ## T((V)))
-#else
-#   error "Byte order is neither little nor big!"
-#endif
-
 static inline uint16_t byteorder_ltohs(le_uint16_t v)
 {
-    return _byteorder_swap_le(v.u16, s);
+    return le16toh(v.u16);
 }
 
 static inline uint32_t byteorder_ltohl(le_uint32_t v)
 {
-    return _byteorder_swap_le(v.u32, l);
+    return le32toh(v.u32);
 }
 
 static inline uint64_t byteorder_ltohll(le_uint64_t v)
 {
-    return _byteorder_swap_le(v.u64, ll);
+    return le64toh(v.u64);
 }
 
 static inline be_uint16_t byteorder_ltobs(le_uint16_t v)
@@ -480,280 +463,155 @@ static inline le_uint64_t byteorder_btolll(be_uint64_t v)
 
 static inline le_uint16_t byteorder_htols(uint16_t v)
 {
-    le_uint16_t result = { _byteorder_swap_le(v, s) };
+    le_uint16_t result = { .u16 = htole16(v) };
 
     return result;
 }
 
 static inline le_uint32_t byteorder_htoll(uint32_t v)
 {
-    le_uint32_t result = { _byteorder_swap_le(v, l) };
+    le_uint32_t result = { .u32 = htole32(v) };
 
     return result;
 }
 
 static inline le_uint64_t byteorder_htolll(uint64_t v)
 {
-    le_uint64_t result = { _byteorder_swap_le(v, ll) };
+    le_uint64_t result = { .u64 = htole64(v) };
 
     return result;
 }
 
-/**
- * @brief Swaps the byteorder according to the endianness (host -> BE)
- */
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#   define _byteorder_swap(V, T) (byteorder_swap ## T((V)))
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#   define _byteorder_swap(V, T) (V)
-#else
-#   error "Byte order is neither little nor big!"
-#endif
-
 static inline network_uint16_t byteorder_htons(uint16_t v)
 {
-    network_uint16_t result = { _byteorder_swap(v, s) };
+    network_uint16_t result = { .u16 = htobe16(v) };
 
     return result;
 }
 
 static inline network_uint32_t byteorder_htonl(uint32_t v)
 {
-    network_uint32_t result = { _byteorder_swap(v, l) };
+    network_uint32_t result = { .u32 = htobe32(v) };
 
     return result;
 }
 
 static inline network_uint64_t byteorder_htonll(uint64_t v)
 {
-    network_uint64_t result = { _byteorder_swap(v, ll) };
+    network_uint64_t result = { .u64 = htobe64(v) };
 
     return result;
 }
 
 static inline uint16_t byteorder_ntohs(network_uint16_t v)
 {
-    return _byteorder_swap(v.u16, s);
+    return be16toh(v.u16);
 }
 
 static inline uint32_t byteorder_ntohl(network_uint32_t v)
 {
-    return _byteorder_swap(v.u32, l);
+    return be32toh(v.u32);
 }
 
 static inline uint64_t byteorder_ntohll(network_uint64_t v)
 {
-    return _byteorder_swap(v.u64, ll);
+    return be64toh(v.u64);
 }
 
 static inline uint16_t htons(uint16_t v)
 {
-    return byteorder_htons(v).u16;
+    return htobe16(v);
 }
 
 static inline uint32_t htonl(uint32_t v)
 {
-    return byteorder_htonl(v).u32;
+    return htobe32(v);
 }
 
 static inline uint64_t htonll(uint64_t v)
 {
-    return byteorder_htonll(v).u64;
+    return htobe64(v);
 }
 
 static inline uint16_t ntohs(uint16_t v)
 {
-    network_uint16_t input = { v };
-
-    return byteorder_ntohs(input);
+    return be16toh(v);
 }
 
 static inline uint32_t ntohl(uint32_t v)
 {
-    network_uint32_t input = { v };
-
-    return byteorder_ntohl(input);
+    return be32toh(v);
 }
 
 static inline uint64_t ntohll(uint64_t v)
 {
-    network_uint64_t input = { v };
-
-    return byteorder_ntohll(input);
+    return be64toh(v);
 }
 
 static inline uint16_t byteorder_bebuftohs(const uint8_t *buf)
 {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-    return (uint16_t)((buf[0] << 8) | (buf[1] << 0));
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-    /* big endian to big endian conversion is easy, but buffer might be
-     * unaligned */
-    return unaligned_get_u16(buf);
-#endif
+    return be16toh(unaligned_get_u16(buf));
 }
 
 static inline uint32_t byteorder_bebuftohl(const uint8_t *buf)
 {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-    return (((uint32_t) buf[0] << 24)
-          | ((uint32_t) buf[1] << 16)
-          | ((uint32_t) buf[2] << 8)
-          | ((uint32_t) buf[3] << 0));
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-    /* big endian to big endian conversion is easy, but buffer might be
-     * unaligned */
-    return unaligned_get_u32(buf);
-#endif
+    return be32toh(unaligned_get_u32(buf));
 }
 
 static inline uint64_t byteorder_bebuftohll(const uint8_t *buf)
 {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-    return (((uint64_t) buf[0] << 56)
-          | ((uint64_t) buf[1] << 48)
-          | ((uint64_t) buf[2] << 40)
-          | ((uint64_t) buf[3] << 32)
-          | ((uint64_t) buf[4] << 24)
-          | ((uint64_t) buf[5] << 16)
-          | ((uint64_t) buf[6] <<  8)
-          | ((uint64_t) buf[7] <<  0));
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-    /* big endian to big endian conversion is easy, but buffer might be
-     * unaligned */
-    return unaligned_get_u64(buf);
-#endif
+    return be64toh(unaligned_get_u64(buf));
 }
 
 static inline void byteorder_htobebufs(uint8_t *buf, uint16_t val)
 {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-    buf[0] = (uint8_t)(val >> 8);
-    buf[1] = (uint8_t)(val >> 0);
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-    /* big endian to big endian conversion is easy, but buffer might be
-     * unaligned */
+    val = htobe16(val);
     memcpy(buf, &val, sizeof(val));
-#endif
 }
 
 static inline void byteorder_htobebufl(uint8_t *buf, uint32_t val)
 {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-    buf[0] = (uint8_t)(val >> 24);
-    buf[1] = (uint8_t)(val >> 16);
-    buf[2] = (uint8_t)(val >> 8);
-    buf[3] = (uint8_t)(val >> 0);
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-    /* big endian to big endian conversion is easy, but buffer might be
-     * unaligned */
+    val = htobe32(val);
     memcpy(buf, &val, sizeof(val));
-#endif
 }
 
 static inline void byteorder_htobebufll(uint8_t *buf, uint64_t val)
 {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-    buf[0] = (uint8_t)(val >> 56);
-    buf[1] = (uint8_t)(val >> 48);
-    buf[2] = (uint8_t)(val >> 40);
-    buf[3] = (uint8_t)(val >> 32);
-    buf[4] = (uint8_t)(val >> 24);
-    buf[5] = (uint8_t)(val >> 16);
-    buf[6] = (uint8_t)(val >> 8);
-    buf[7] = (uint8_t)(val >> 0);
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-    /* big endian to big endian conversion is easy, but buffer might be
-     * unaligned */
+    val = htobe64(val);
     memcpy(buf, &val, sizeof(val));
-#endif
 }
 
 static inline uint16_t byteorder_lebuftohs(const uint8_t *buf)
 {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-    /* little endian to little endian conversion is easy, but buffer might be
-     * unaligned */
-    return unaligned_get_u16(buf);
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-    return (uint16_t)((buf[0] << 8) | (buf[1] << 0));
-#endif
+    return le16toh(unaligned_get_u16(buf));
 }
 
 static inline uint32_t byteorder_lebuftohl(const uint8_t *buf)
 {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-    /* little endian to little endian conversion is easy, but buffer might be
-     * unaligned */
-    return unaligned_get_u32(buf);
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-    return (((uint32_t) buf[0] << 24)
-          | ((uint32_t) buf[1] << 16)
-          | ((uint32_t) buf[2] << 8)
-          | ((uint32_t) buf[3] << 0));
-#endif
+    return le32toh(unaligned_get_u32(buf));
 }
 
 static inline uint64_t byteorder_lebuftohll(const uint8_t *buf)
 {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-    /* little endian to little endian conversion is easy, but buffer might be
-     * unaligned */
-    return unaligned_get_u64(buf);
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-    return (((uint64_t) buf[0] << 56)
-          | ((uint64_t) buf[1] << 48)
-          | ((uint64_t) buf[2] << 40)
-          | ((uint64_t) buf[3] << 32)
-          | ((uint64_t) buf[4] << 24)
-          | ((uint64_t) buf[5] << 16)
-          | ((uint64_t) buf[6] <<  8)
-          | ((uint64_t) buf[7] <<  0));
-#endif
+    return le64toh(unaligned_get_u64(buf));
 }
 
 static inline void byteorder_htolebufs(uint8_t *buf, uint16_t val)
 {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-    /* little endian to little endian conversion is easy, but buffer might be
-     * unaligned */
+    val = htole16(val);
     memcpy(buf, &val, sizeof(val));
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-    buf[0] = (uint8_t)(val >> 8);
-    buf[1] = (uint8_t)(val >> 0);
-#endif
 }
 
 static inline void byteorder_htolebufl(uint8_t *buf, uint32_t val)
 {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-    /* little endian to little endian conversion is easy, but buffer might be
-     * unaligned */
+    val = htole32(val);
     memcpy(buf, &val, sizeof(val));
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-    buf[0] = (uint8_t)(val >> 24);
-    buf[1] = (uint8_t)(val >> 16);
-    buf[2] = (uint8_t)(val >> 8);
-    buf[3] = (uint8_t)(val >> 0);
-#endif
 }
 
 static inline void byteorder_htolebufll(uint8_t *buf, uint64_t val)
 {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-    /* little endian to little endian conversion is easy, but buffer might be
-     * unaligned */
+    val = htole64(val);
     memcpy(buf, &val, sizeof(val));
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-    buf[0] = (uint8_t)(val >> 56);
-    buf[1] = (uint8_t)(val >> 48);
-    buf[2] = (uint8_t)(val >> 40);
-    buf[3] = (uint8_t)(val >> 32);
-    buf[4] = (uint8_t)(val >> 24);
-    buf[5] = (uint8_t)(val >> 16);
-    buf[6] = (uint8_t)(val >> 8);
-    buf[7] = (uint8_t)(val >> 0);
-#endif
 }
 
 #ifdef __cplusplus
