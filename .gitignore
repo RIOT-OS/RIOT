@@ -11,6 +11,8 @@ doc/doxygen/*.db
 doc/doxygen/*.tmp
 # bin (e.g.:build directory) and .bin files
 bin
+# target folder (for Rust applications)
+target
 *.bin
 # Build directory
 /build
