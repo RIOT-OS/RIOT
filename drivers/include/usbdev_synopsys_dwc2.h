@@ -96,7 +96,7 @@ typedef struct {
     gpio_t ulpi_nxt;                /**< ULPI NXT gpio */
     gpio_af_t ulpi_af;              /**< Alternative function for ULPI */
 #endif
-#if defined(MCU_STM32) || DOXYGEN
+#if defined(CPU_STM32) || DOXYGEN
     uint32_t rcc_mask;              /**< bit in clock enable register */
     uint8_t irqn;                   /**< IRQ channel */
     uint8_t ahb;                    /**< AHB bus */
@@ -108,8 +108,8 @@ typedef struct {
                                       *  value (STM32-specific), see USBPHYC_TUNE
                                       *  register in STM32 Reference Manual */
 #endif /* defined(MODULE_PERIPH_USBDEV_HS_UTMI) */
-#endif /* defined(MCU_STM32) || DOXYGEN */
-#if defined(MCU_GD32V)
+#endif /* defined(CPU_STM32) || DOXYGEN */
+#if defined(CPU_GD32V)
     uint32_t rcu_mask;              /**< bit in clock enable register */
     uint8_t irqn;                   /**< IRQ channel */
     uint8_t bus;                    /**< Peripheral bus */

@@ -62,7 +62,7 @@ int pthread_setcancelstate(int state, int *oldstate)
  * Following functions implement the locking mechanism for newlib.
  */
 
-#ifdef MCU_ESP8266
+#ifdef CPU_ESP8266
 /**
  * _malloc_rmtx is defined as static variable to avoid recursive calls of
  * malloc when _malloc_r tries to lock __malloc_lock_object the first
@@ -111,7 +111,7 @@ void IRAM_ATTR _lock_init_recursive(_lock_t *lock)
 {
     assert(lock != NULL);   /* lock must not be NULL */
 
-#ifdef MCU_ESP8266
+#ifdef CPU_ESP8266
     /* _malloc_rmtx is static and has not to be allocated */
     if (lock == __malloc_static_object) {
         return;
@@ -135,7 +135,7 @@ void IRAM_ATTR _lock_close(_lock_t *lock)
 {
     /* locking variable has to be valid and initialized */
     assert(lock != NULL && *lock != 0);
-#ifdef MCU_ESP8266
+#ifdef CPU_ESP8266
     assert(lock != __malloc_static_object);
 #endif
 
@@ -152,7 +152,7 @@ void IRAM_ATTR _lock_close_recursive(_lock_t *lock)
 {
     /* locking variable has to be valid and initialized */
     assert(lock != NULL && *lock != 0);
-#ifdef MCU_ESP8266
+#ifdef CPU_ESP8266
     assert(lock != __malloc_static_object);
 #endif
 
@@ -190,7 +190,7 @@ void IRAM_ATTR _lock_acquire_recursive(_lock_t *lock)
     assert(lock != NULL);   /* lock must not be NULL */
     assert(!irq_is_in());   /* _lock_acquire must not be called in
                                interrupt context */
-#ifdef MCU_ESP8266
+#ifdef CPU_ESP8266
     /**
      * Since we don't have direct access to newlib's static variable
      * __malloc_lock_object, we have to rely on the fact that function
@@ -424,7 +424,7 @@ void* IRAM_ATTR __wrap__calloc_r(struct _reent *r, size_t nmemb, size_t size)
 
 /* for compatibility with ESP-IDF heap functions */
 
-#ifndef MCU_ESP8266
+#ifndef CPU_ESP8266
 void* heap_caps_malloc(size_t size, uint32_t caps, const char *file, size_t line)
                        __attribute__((alias("_heap_caps_malloc")));
 void* heap_caps_calloc(size_t n, size_t size, uint32_t caps, const char *file, size_t line)
