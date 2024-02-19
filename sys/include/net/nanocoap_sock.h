@@ -318,7 +318,7 @@ static inline void nanocoap_sock_close(nanocoap_sock_t *sock)
  * @brief   Simple synchronous CoAP (confirmable) GET
  *
  * @param[in]   sock    socket to use for the request
- * @param[in]   path    remote path
+ * @param[in]   path    remote path and query
  * @param[out]  buf     buffer to write response to
  * @param[in]   len     length of @p buffer
  *
@@ -332,7 +332,7 @@ ssize_t nanocoap_sock_get(nanocoap_sock_t *sock, const char *path, void *buf,
  * @brief   Simple synchronous CoAP (confirmable) PUT
  *
  * @param[in]   sock    socket to use for the request
- * @param[in]   path    remote path
+ * @param[in]   path    remote path and query
  * @param[in]   request buffer containing the payload
  * @param[in]   len     length of the payload to send
  * @param[out]  response buffer for the response, may be NULL
@@ -349,7 +349,7 @@ ssize_t nanocoap_sock_put(nanocoap_sock_t *sock, const char *path,
  * @brief   Simple non-confirmable PUT
  *
  * @param[in]   sock    socket to use for the request
- * @param[in]   path    remote path
+ * @param[in]   path    remote path and query
  * @param[in]   request buffer containing the payload
  * @param[in]   len     length of the payload to send
  * @param[out]  response buffer for the response, may be NULL
@@ -384,7 +384,7 @@ ssize_t nanocoap_sock_put_url(const char *url,
  * @brief   Simple synchronous CoAP (confirmable) POST
  *
  * @param[in]   sock    socket to use for the request
- * @param[in]   path    remote path
+ * @param[in]   path    remote path and query
  * @param[in]   request buffer containing the payload
  * @param[in]   len     length of the payload to send
  * @param[out]  response buffer for the response, may be NULL
@@ -401,7 +401,7 @@ ssize_t nanocoap_sock_post(nanocoap_sock_t *sock, const char *path,
  * @brief   Simple non-confirmable POST
  *
  * @param[in]   sock    socket to use for the request
- * @param[in]   path    remote path
+ * @param[in]   path    remote path and query
  * @param[in]   request buffer containing the payload
  * @param[in]   len     length of the payload to send
  * @param[out]  response buffer for the response, may be NULL
@@ -437,7 +437,7 @@ ssize_t nanocoap_sock_post_url(const char *url,
  *          ([RFC 8132](https://datatracker.ietf.org/doc/html/rfc8132))
  *
  * @param[in]   sock    socket to use for the request
- * @param[in]   path    remote path
+ * @param[in]   path    remote path and query
  * @param[in]   request buffer containing the payload
  * @param[in]   len     length of the payload to send
  * @param[out]  response buffer for the response, may be NULL
@@ -455,7 +455,7 @@ ssize_t nanocoap_sock_fetch(nanocoap_sock_t *sock, const char *path,
  *          ([RFC 8132](https://datatracker.ietf.org/doc/html/rfc8132))
  *
  * @param[in]   sock    socket to use for the request
- * @param[in]   path    remote path
+ * @param[in]   path    remote path and query
  * @param[in]   request buffer containing the payload
  * @param[in]   len     length of the payload to send
  * @param[out]  response buffer for the response, may be NULL
@@ -491,7 +491,7 @@ ssize_t nanocoap_sock_fetch_url(const char *url,
  * @brief   Simple synchronous CoAP (confirmable) DELETE
  *
  * @param[in]   sock    socket to use for the request
- * @param[in]   path    remote path to delete
+ * @param[in]   path    remote path (with query) to delete
  *
  * @returns     0 on success
  * @returns     <0 on error
