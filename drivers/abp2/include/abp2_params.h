@@ -80,7 +80,10 @@ extern "C" {
 #endif
 #ifndef ABP2_SAUL_INFO
 /** @brief Sensor driver name in the SAUL framework */
-#define ABP2_SAUL_INFO          { .name = "abp2" }
+#define ABP2_SAUL_INFO \
+    {   { .name = "Pressure sensor (abp2)" }, \
+        { .name = "Temperature sensor (abp2)" } \
+    }
 #endif
 /** @} */
 
@@ -103,7 +106,7 @@ static const abp2_params_t abp2_params[] =
 /**
  * @brief   Additional meta information to keep in the SAUL registry
  */
-static const saul_reg_info_t abp2_saul_info[] =
+static const saul_reg_info_t abp2_saul_info[][2] =
 {
     ABP2_SAUL_INFO
 };
