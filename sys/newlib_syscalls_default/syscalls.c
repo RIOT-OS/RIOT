@@ -24,31 +24,26 @@
  * @}
  */
 
-#include <unistd.h>
-#include <reent.h>
 #include <errno.h>
 #include <malloc.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <sys/unistd.h>
+#include <reent.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <sys/times.h>
+#include <sys/unistd.h>
+#include <unistd.h>
 
-#include "cpu.h"
-#include "board.h"
-#include "sched.h"
-#include "thread.h"
-#include "irq.h"
 #include "log.h"
+#include "modules.h"
 #include "periph/pm.h"
+#include "sched.h"
+#include "stdio_base.h"
+#include "thread.h"
+
 #if MODULE_VFS
 #include "vfs.h"
 #endif
-
-#include "stdio_base.h"
-
-#include <sys/times.h>
 
 #ifdef MODULE_XTIMER
 #include <sys/time.h>
@@ -149,7 +144,23 @@ static const struct heap heaps[NUM_HEAPS] = {
  */
 void _init(void)
 {
-    /* nothing to do here */
+    /* Definition copied from newlib/libc/stdio/local.h */
+    extern void __sinit (struct _reent *);
+
+    /* When running multiple threads: Initialize reentrant structure before the
+     * scheduler starts. This normally happens upon the first stdio function
+     * called. However, if no boot message happens this can result in two
+     * concurrent "first calls" to stdio in data corruption, if no locking is
+     * used. Except for ESP (which is using its own syscalls.c anyway), this
+     * currently is the case in RIOT. */
+    if (MAXTHREADS > 1) {
+        /* Also, make an exception for riotboot, which does not use stdio
+         * at all. This would pull in stdio and increase .text size
+         * significantly there */
+        if (!IS_USED(MODULE_RIOTBOOT)) {
+            __sinit(_REENT);
+        }
+    }
 }
 
 /**
