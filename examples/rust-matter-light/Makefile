@@ -23,7 +23,9 @@ BASELIBS += $(APPLICATION_RUST_MODULE).module
 FEATURES_REQUIRED += rust_target
 
 USEMODULE += saul
+USEMODULE += saul_default
 USEMODULE += shell
+USEMODULE += shell_cmds_default
 USEMODULE += periph_gpio
 
 # All Rust components RIOT uses work on stable Rust. If any extra libraries
