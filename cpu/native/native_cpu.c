@@ -21,16 +21,22 @@
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-
+/* __USE_GNU for gregs[REG_EIP] access under glibc
+ * _GNU_SOURCE for REG_EIP and strsignal() under musl */
 #define __USE_GNU
-#include <signal.h>
-#undef __USE_GNU
+#define _GNU_SOURCE
 
-#include <ucontext.h>
 #include <err.h>
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#if USE_LIBUCONTEXT
+#include <libucontext/libucontext.h>
+#else
+#include <ucontext.h>
+#endif
 
 #ifdef HAVE_VALGRIND_H
 #include <valgrind.h>
@@ -45,11 +51,11 @@
 
 #include <stdlib.h>
 
-#include "irq.h"
-#include "sched.h"
-
 #include "cpu.h"
 #include "cpu_conf.h"
+#include "irq.h"
+#include "sched.h"
+#include "test_utils/expect.h"
 
 #ifdef MODULE_NETDEV_TAP
 #include "netdev_tap.h"
@@ -62,7 +68,6 @@ extern netdev_tap_t netdev_tap;
 #include "debug.h"
 
 ucontext_t end_context;
-char __end_stack[SIGSTKSZ];
 
 /**
  * make the new context assign `_native_in_isr = 0` before resuming
@@ -262,7 +267,8 @@ void native_cpu_init(void)
         err(EXIT_FAILURE, "native_cpu_init: getcontext");
     }
 
-    end_context.uc_stack.ss_sp = __end_stack;
+    end_context.uc_stack.ss_sp = malloc(SIGSTKSZ);
+    expect(end_context.uc_stack.ss_sp != NULL);
     end_context.uc_stack.ss_size = SIGSTKSZ;
     end_context.uc_stack.ss_flags = 0;
     makecontext(&end_context, sched_task_exit, 0);
