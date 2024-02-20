@@ -925,11 +925,22 @@ enum {
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY) || defined(DOXYGEN)
 /**
- * @brief       Data for @ref NETOPT_IPV6_IID when using RFC7217
+ * @brief       Data for @ref NETOPT_IPV6_IID when using RFC7217,
+ *              passed on to ipv6_get_rfc7217_iid,
+ *              from which the descriptions are also copied
  */
 typedef struct {
+    /**
+     * @param[out] where to store the generated interface identifier
+     */
     eui64_t *iid;
+    /**
+     * @param[in] pfx The prefix for which the IID is to be generated.
+     */
     const ipv6_addr_t *pfx;
+    /**
+     * @param[in,out] dad_ctr ("DAD_Counter" in rfc7217)
+     */
     uint8_t *dad_ctr;
 } netopt_ipv6_rfc7217_iid_data;
 #endif

@@ -48,7 +48,7 @@ extern "C" {
  */
 #define SLAAC_PREFIX_LENGTH (64U)
 
-/*
+/**
  * "the address architecture [RFC4291] also defines the length of the interface identifiers"
  * - https://datatracker.ietf.org/doc/html/rfc4862#section-2
  *
@@ -73,6 +73,9 @@ extern "C" {
 #define STABLE_PRIVACY_IDGEN_RETRIES            (3U) /*default value*/
 #endif
 
+/**
+ * @brief Upper limit for random time to wait between IDGEN retries
+ */
 #ifndef STABLE_PRIVACY_IDGEN_DELAY_MS
 #define STABLE_PRIVACY_IDGEN_DELAY_MS 1000 /*default value*/
 #endif
@@ -90,6 +93,7 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
                           uint8_t pfx_len);
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY) || defined(DOXYGEN)
 /**
+ * @brief Overload of @ref _auto_configure_addr
  * @param dad_ctr rfc7217 DAD_Counter
  */
 void _auto_configure_addr_with_dad_ctr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
@@ -121,7 +125,7 @@ bool _stable_privacy_should_retry_idgen(uint8_t *dad_ctr, const char *reason);
 /**
  * @brief
  * @pre @p iid is all 0 bits (iid->uint64.u64 == 0)
- * @param[out] iid
+ * @param[out] iid where to store the generated interface identifier
  * @param[in] netif The network interface to use as source for IID generation.
  * ("Net_iface" in rfc7217)
  * @param[in] pfx The prefix for which the IID is to be generated.
