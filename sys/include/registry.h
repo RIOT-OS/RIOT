@@ -113,92 +113,6 @@ struct _registry_instance_t {
     void *context;                      /**< Optional context used by the instance */
 };
 
-
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-    #define _REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_PART_ALLOWED_VALUES(_type) \
-            const _type *allowed_values; \
-            size_t allowed_values_len;
-#else
-    #define _REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_PART_ALLOWED_VALUES(_type)
-#endif /* _REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_PART_ALLOWED_VALUES */
-
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-    #define _REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_PART_FORBIDDEN_VALUES(_type) \
-            const _type *forbidden_values; \
-            size_t forbidden_values_len;
-#else
-    #define _REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_PART_FORBIDDEN_VALUES(_type)
-#endif /* _REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_PART_FORBIDDEN_VALUES */
-
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-    #define _REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_PART_MIN_VALUE(_type) \
-            const _type *min_value;
-#else
-    #define _REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_PART_MIN_VALUE(_type)
-#endif /* _REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_PART_MIN_VALUE */
-
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-    #define _REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_PART_MAX_VALUE(_type) \
-            const _type *max_value;
-#else
-    #define _REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_PART_MAX_VALUE(_type)
-#endif /* _REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_PART_MAX_VALUE */
-
-#define _REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_STRUCT(_name, _body) \
-        typedef struct { \
-            _body \
-        } registry_parameter_constraints_ ## _name ## _t;
-
-#define _REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE(_name) \
-        typedef void *registry_parameter_constraints_ ## _name ## _t;
-
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-    #define _REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_ALLOWED_FORBIDDEN(_name, _type) \
-            _REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_STRUCT( \
-                _name, \
-                _REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_PART_ALLOWED_VALUES(_type) \
-                _REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_PART_FORBIDDEN_VALUES(_type) \
-                )
-#else
-    #define _REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_ALLOWED_FORBIDDEN(_name, _type)
-#endif
-
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-#define _REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_ALLOWED_FORBIDDEN_MIN_MAX(_name, _type) \
-        _REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_STRUCT( \
-            _name, \
-            _REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_PART_ALLOWED_VALUES(_type) \
-            _REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_PART_FORBIDDEN_VALUES(_type) \
-            _REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_PART_MIN_VALUE(_type) \
-            _REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_PART_MAX_VALUE(_type) \
-            )
-#else
-    #define _REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_ALLOWED_FORBIDDEN_MIN_MAX(_name, _type)
-#endif
-
-_REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_ALLOWED_FORBIDDEN(opaque, void *)
-_REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_ALLOWED_FORBIDDEN(string, char *)
-
-_REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE(bool)
-
-_REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_ALLOWED_FORBIDDEN_MIN_MAX(uint8, uint8_t)
-_REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_ALLOWED_FORBIDDEN_MIN_MAX(uint16, uint16_t)
-_REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_ALLOWED_FORBIDDEN_MIN_MAX(uint32, uint32_t)
-_REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_ALLOWED_FORBIDDEN_MIN_MAX(uint64, uint64_t)
-
-_REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_ALLOWED_FORBIDDEN_MIN_MAX(int8, int8_t)
-_REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_ALLOWED_FORBIDDEN_MIN_MAX(int16, int16_t)
-_REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_ALLOWED_FORBIDDEN_MIN_MAX(int32, int32_t)
-_REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_ALLOWED_FORBIDDEN_MIN_MAX(int64, int64_t)
-
-_REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_ALLOWED_FORBIDDEN_MIN_MAX(float32, float)
-_REGISTRY_CREATE_PARAMETER_CONSTRAINT_TYPE_ALLOWED_FORBIDDEN_MIN_MAX(float64, double)
-
-
 struct _registry_group_t {
     const registry_group_id_t id;                   /**< Integer representing the ID of the configuration group. */
 #if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
@@ -224,32 +138,6 @@ struct _registry_parameter_t {
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     const registry_schema_t * const schema;                 /**< Configuration Schema that the configuration parameter belongs to. */
     const registry_type_t type;                             /**< Type of the configuration parameter. */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK) || \
-    IS_ACTIVE(DOXYGEN)
-    const union {
-        const registry_parameter_constraints_opaque_t opaque;
-        const registry_parameter_constraints_string_t string;
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || \
-        IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK) || \
-        IS_ACTIVE(DOXYGEN)
-        const registry_parameter_constraints_bool_t boolean;
-        const registry_parameter_constraints_uint8_t uint8;
-        const registry_parameter_constraints_uint16_t uint16;
-        const registry_parameter_constraints_uint32_t uint32;
-        const registry_parameter_constraints_uint64_t uint64;
-        const registry_parameter_constraints_int8_t int8;
-        const registry_parameter_constraints_int16_t int16;
-        const registry_parameter_constraints_int32_t int32;
-        const registry_parameter_constraints_int64_t int64;
-        const registry_parameter_constraints_float32_t float32;
-        const registry_parameter_constraints_float64_t float64;
-#endif /* CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK || CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK */
-    } constraints;                                          /**< Constraints of the parameter value. */
-#endif \
-    /* CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK || CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK || CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK || CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK */
 };
 
 /**

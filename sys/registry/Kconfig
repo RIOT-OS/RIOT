@@ -18,18 +18,6 @@ config REGISTRY_ENABLE_META_NAME
 config REGISTRY_ENABLE_META_DESCRIPTION
     bool "Include description string in schemas"
 
-config REGISTRY_ENABLE_ALLOWED_VALUES_CHECK
-    bool "Check if new values are allowed"
-
-config REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK
-    bool "Check if new values are forbidden"
-
-config REGISTRY_ENABLE_MIN_VALUE_CHECK
-    bool "Check if new value does not exceed minimum"
-
-config REGISTRY_ENABLE_MAX_VALUE_CHECK
-    bool "Check if new value does not exceed maximum"
-
 config MODULE_REGISTRY_INT_PATH
     bool "Access configuration parameters via an integer path"
 
