@@ -5,7 +5,7 @@ FEATURES_BLACKLIST += periph_i2c
 
 include $(RIOTBASE)/Makefile.include
 
-ifneq ($(CPU),esp32)
+ifneq ($(MCU),esp32)
   # only two threads used
   CFLAGS += -DMAXTHREADS=2
 else
