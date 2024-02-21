@@ -52,7 +52,7 @@ indirect business models around the free open-source software platform
 provided by RIOT, e.g. it is possible to link closed-source code with the
 LGPL code.
 
-## FEATURES
+## Features
 
 RIOT provides features including, but not limited to:
 
@@ -81,7 +81,7 @@ RIOT provides features including, but not limited to:
 * UWB
 * Bluetooth (BLE) via [NimBLE](https://github.com/apache/mynewt-nimble)
 
-## GETTING RIOT
+## Getting RIOT
 
 The most convenient way to get RIOT is to clone it via Git
 
@@ -106,7 +106,7 @@ For more details on our release cycle, check our [documentation][release cycle].
 [releases]: https://github.com/RIOT-OS/RIOT/releases
 [release cycle]: https://doc.riot-os.org/release-cycle.html
 
-## GETTING STARTED
+## Getting Started
 * You want to start the RIOT? Just follow our
 [quickstart guide](https://doc.riot-os.org/index.html#the-quickest-start) or
 try this
@@ -117,23 +117,23 @@ For specific toolchain installation, follow instructions in the
   version of the documentation is uploaded daily to
   [doc.riot-os.org](https://doc.riot-os.org).
 
-## FORUM
+## Forum
 Do you have a question, want to discuss a new feature, or just want to present
 your latest project using RIOT? Come over to our [forum] and post to your hearts
 content.
 
 [forum]: https://forum.riot-os.org
 
-## CONTRIBUTE
+## Contribute
 
 To contribute something to RIOT, please refer to our
 [contributing document](CONTRIBUTING.md).
 
-## MAILING LISTS
+## Mailing Lists
 * RIOT commits: [commits@riot-os.org](https://lists.riot-os.org/mailman/listinfo/commits)
 * Github notifications: [notifications@riot-os.org](https://lists.riot-os.org/mailman/listinfo/notifications)
 
-## LICENSE
+## License
 * Most of the code developed by the RIOT community is licensed under the GNU
   Lesser General Public License (LGPL) version 2.1 as published by the Free
   Software Foundation.
