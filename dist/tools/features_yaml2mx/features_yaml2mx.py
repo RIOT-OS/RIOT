@@ -94,14 +94,14 @@ def write_md_section(outfile, group, level):
     if "features" in group:
         outfile.write("\n")
         outfile.write("""\
-| Feature                           | Description                                                                   |
-|:--------------------------------- |:----------------------------------------------------------------------------- |
+| Feature                                                                             | Description                                                                   |
+|:----------------------------------------------------------------------------------- |:----------------------------------------------------------------------------- |
 """)
 
         for feature in group["features"]:
             name = f"`{feature['name']}`"
             description = feature['help'].strip().replace("\n", " ")
-            outfile.write(f"| {name:<33} | {description:<77} |\n")
+            outfile.write(f"| {name:<33} @anchor feature_{feature['name']:<33} | {description:<77} |\n")
 
     for group in group.get('groups', []):
         outfile.write("\n")
@@ -175,6 +175,7 @@ def populate_graph(g: rdflib.Graph, skosscheme: rdflib.term.Node, parentnode: Op
         help = feature["help"]
         g.add((ns['feature'][name], rdflib.RDFS.label, rdflib.Literal(name, lang="en")))
         g.add((ns['feature'][name], rdflib.RDFS.comment, rdflib.Literal(help, lang="en")))
+        g.add((ns['feature'][name], ns['terms']['doc'], rdflib.URIRef(f"https://doc.riot-os.org/md_doc_2doxygen_2src_2feature__list.html#feature_{name}")))
         g.add((ns['feature'][name], rdflib.RDF.type, ns['terms']['Feature']))
         g.add((ns['feature'][name], ns['dct'].subject, thisnode))
 
