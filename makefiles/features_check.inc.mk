@@ -44,17 +44,18 @@ FEATURES_USED_SO_FAR := $(sort $(FEATURES_REQUIRED) $(FEATURES_OPTIONAL_USED))
 #   ==> If one (or more) already used features is listed in item, this (or
 #       one of these) will be in the front of "tmp" and be taken
 #   ==> If one (or more) usable features is listed in item, this will come
-#       afterwards. If no no feature in item is used so for, one of the
+#       afterwards. If no feature in item is used so far, one of the
 #       features supported and listed in item will be picked
-#   ==> At the end of the list item itself (with pipes between features) is the
-#       last item in "tmp". If no feature is item is supported or used, this
-#       will be the only item in "tmp" and be picked
+#   ==> At the end of the list, feature alternatives in item itself are added.
+#       If no feature in item is already used or usable, the first alternative is
+#       just added, triggering a warning about a feature being missing or
+#       conflicting later on.
 FEATURES_REQUIRED_ONE_OUT_OF := $(foreach item,\
                                   $(FEATURES_REQUIRED_ANY),\
                                   $(word 1,\
                                     $(filter $(FEATURES_USED_SO_FAR),$(subst |, ,$(item)))\
                                     $(filter $(FEATURES_USABLE),$(subst |, ,$(item)))\
-                                    $(item)))
+                                    $(subst |, ,$(item))))
 
 # Features that are required by the application but not provided by the BSP
 # Having features missing may case the build to fail.
