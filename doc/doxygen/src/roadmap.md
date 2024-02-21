@@ -11,8 +11,11 @@ The text and items below are tentative, up for discussion, to be updated by regu
 - ICN stack support clean-up
 - discuss mid- and long-term plans for network stack maintenance & development (GNRC vs other supported stacks)
 - revisit network time synchronization
-
-
+- Provide a border router into 6LoWPANs (a 6LBR) that works out of the box in common scenarios:
+  - [x] in IPv6 networks with working Prefix Delegation (PD)
+  - [ ] in IPv6 networks without working Prefix Delegation (eg. by means of ND Proxying) <!-- 6man-variable-slaac also sounds nice but is at best a step between PD and just-a-single-v6-address -->
+  - [ ] in legacy networks (eg. by means of tunneling)
+  - [ ] with configurable on-by-default fallbacks
 
 # Network Stack Low layers
 (contact/steering: [Peter](https://github.com/PeterKietzmann))
