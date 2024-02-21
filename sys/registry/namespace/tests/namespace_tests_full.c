@@ -119,21 +119,6 @@ const registry_parameter_t registry_tests_full_opaque = {
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .schema = &registry_tests_full,
     .type = REGISTRY_TYPE_OPAQUE,
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK)
-    .constraints.opaque = {
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .allowed_values = NULL,
-        .allowed_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .forbidden_values = NULL,
-        .forbidden_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK */
-    },
-#endif /* CONSTRAINTS */
 };
 
 const registry_parameter_t registry_tests_full_string = {
@@ -146,21 +131,6 @@ const registry_parameter_t registry_tests_full_string = {
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .schema = &registry_tests_full,
     .type = REGISTRY_TYPE_STRING,
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK)
-    .constraints.string = {
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .allowed_values = NULL,
-        .allowed_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .forbidden_values = NULL,
-        .forbidden_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK */
-    },
-#endif /* CONSTRAINTS */
 };
 
 const registry_parameter_t registry_tests_full_boolean = {
@@ -173,12 +143,6 @@ const registry_parameter_t registry_tests_full_boolean = {
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .schema = &registry_tests_full,
     .type = REGISTRY_TYPE_BOOL,
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK)
-    .constraints.boolean = NULL,
-#endif /* CONSTRAINTS */
 };
 
 const registry_parameter_t registry_tests_full_u8 = {
@@ -191,27 +155,6 @@ const registry_parameter_t registry_tests_full_u8 = {
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .schema = &registry_tests_full,
     .type = REGISTRY_TYPE_UINT8,
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK)
-    .constraints.uint8 = {
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .allowed_values = NULL,
-        .allowed_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .forbidden_values = NULL,
-        .forbidden_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .min_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .max_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK */
-    },
-#endif /* CONSTRAINTS */
 };
 
 const registry_parameter_t registry_tests_full_u16 = {
@@ -224,27 +167,6 @@ const registry_parameter_t registry_tests_full_u16 = {
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .schema = &registry_tests_full,
     .type = REGISTRY_TYPE_UINT16,
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK)
-    .constraints.uint16 = {
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .allowed_values = NULL,
-        .allowed_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .forbidden_values = NULL,
-        .forbidden_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .min_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .max_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK */
-    },
-#endif /* CONSTRAINTS */
 };
 
 const registry_parameter_t registry_tests_full_u32 = {
@@ -257,27 +179,6 @@ const registry_parameter_t registry_tests_full_u32 = {
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .schema = &registry_tests_full,
     .type = REGISTRY_TYPE_UINT32,
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK)
-    .constraints.uint32 = {
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .allowed_values = NULL,
-        .allowed_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .forbidden_values = NULL,
-        .forbidden_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .min_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .max_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK */
-    },
-#endif /* CONSTRAINTS */
 };
 
 const registry_parameter_t registry_tests_full_u64 = {
@@ -290,27 +191,6 @@ const registry_parameter_t registry_tests_full_u64 = {
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .schema = &registry_tests_full,
     .type = REGISTRY_TYPE_UINT64,
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK)
-    .constraints.uint64 = {
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .allowed_values = NULL,
-        .allowed_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .forbidden_values = NULL,
-        .forbidden_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .min_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .max_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK */
-    },
-#endif /* CONSTRAINTS */
 };
 
 const registry_parameter_t registry_tests_full_i8 = {
@@ -323,27 +203,6 @@ const registry_parameter_t registry_tests_full_i8 = {
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .schema = &registry_tests_full,
     .type = REGISTRY_TYPE_INT8,
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK)
-    .constraints.int8 = {
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .allowed_values = NULL,
-        .allowed_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .forbidden_values = NULL,
-        .forbidden_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .min_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .max_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK */
-    },
-#endif /* CONSTRAINTS */
 };
 
 const registry_parameter_t registry_tests_full_i16 = {
@@ -356,27 +215,6 @@ const registry_parameter_t registry_tests_full_i16 = {
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .schema = &registry_tests_full,
     .type = REGISTRY_TYPE_INT16,
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK)
-    .constraints.int16 = {
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .allowed_values = NULL,
-        .allowed_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .forbidden_values = NULL,
-        .forbidden_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .min_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .max_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK */
-    },
-#endif /* CONSTRAINTS */
 };
 
 const registry_parameter_t registry_tests_full_i32 = {
@@ -389,27 +227,6 @@ const registry_parameter_t registry_tests_full_i32 = {
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .schema = &registry_tests_full,
     .type = REGISTRY_TYPE_INT32,
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK)
-    .constraints.int32 = {
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .allowed_values = NULL,
-        .allowed_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .forbidden_values = NULL,
-        .forbidden_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .min_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .max_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK */
-    },
-#endif /* CONSTRAINTS */
 };
 
 const registry_parameter_t registry_tests_full_i64 = {
@@ -422,27 +239,6 @@ const registry_parameter_t registry_tests_full_i64 = {
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .schema = &registry_tests_full,
     .type = REGISTRY_TYPE_INT64,
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK)
-    .constraints.int64 = {
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .allowed_values = NULL,
-        .allowed_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .forbidden_values = NULL,
-        .forbidden_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .min_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .max_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK */
-    },
-#endif /* CONSTRAINTS */
 };
 
 const registry_parameter_t registry_tests_full_f32 = {
@@ -455,27 +251,6 @@ const registry_parameter_t registry_tests_full_f32 = {
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .schema = &registry_tests_full,
     .type = REGISTRY_TYPE_FLOAT32,
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK)
-    .constraints.float32 = {
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .allowed_values = NULL,
-        .allowed_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .forbidden_values = NULL,
-        .forbidden_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .min_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .max_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK */
-    },
-#endif /* CONSTRAINTS */
 };
 
 const registry_parameter_t registry_tests_full_f64 = {
@@ -488,27 +263,6 @@ const registry_parameter_t registry_tests_full_f64 = {
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .schema = &registry_tests_full,
     .type = REGISTRY_TYPE_FLOAT64,
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK)
-    .constraints.int64 = {
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .allowed_values = NULL,
-        .allowed_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .forbidden_values = NULL,
-        .forbidden_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .min_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .max_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK */
-    },
-#endif /* CONSTRAINTS */
 };
 
 registry_schema_t registry_tests_full = {

@@ -64,21 +64,6 @@ const registry_parameter_t registry_tests_nested_parameter = {
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .schema = &registry_tests_nested,
     .type = REGISTRY_TYPE_UINT8,
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK)
-    .constraints.uint8 = {
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .allowed_values = NULL,
-        .allowed_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .forbidden_values = NULL,
-        .forbidden_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK */
-    },
-#endif /* CONSTRAINTS */
 };
 
 const registry_group_t registry_tests_nested_group = {
@@ -108,21 +93,6 @@ const registry_parameter_t registry_tests_nested_group_parameter = {
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .schema = &registry_tests_nested,
     .type = REGISTRY_TYPE_UINT8,
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK)
-    .constraints.uint8 = {
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .allowed_values = NULL,
-        .allowed_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .forbidden_values = NULL,
-        .forbidden_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK */
-    },
-#endif /* CONSTRAINTS */
 };
 
 registry_schema_t registry_tests_nested = {
