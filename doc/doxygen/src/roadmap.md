@@ -23,6 +23,11 @@ The text and items below are tentative, up for discussion, to be updated by regu
 - Point-to-Point Protocol (PPP): finalize and merge `gnrc_ppp`
 
 
+# Integrations
+(contact/steering: [Teufelchen](https://github.com/teufelchen1))
+
+- [Home-Assistant](https://www.home-assistant.io/) BTHome integration
+- [Home-Assistant](https://www.home-assistant.io/) integration via [MQTT Discovery](https://www.home-assistant.io/integrations/mqtt#mqtt-discovery)
 
 # Power Modes
 (contact/steering: [Hauke](https://github.com/haukepetersen))
