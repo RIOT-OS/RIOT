@@ -80,27 +80,6 @@ const registry_parameter_t registry_sys_rgb_led_red = {
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .schema = &registry_sys_rgb_led,
     .type = REGISTRY_TYPE_UINT8,
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK)
-    .constraints.uint8 = {
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .allowed_values = NULL,
-        .allowed_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .forbidden_values = NULL,
-        .forbidden_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .min_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .max_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK */
-    },
-#endif /* CONSTRAINTS */
 };
 
 const registry_parameter_t registry_sys_rgb_led_green = {
@@ -113,27 +92,6 @@ const registry_parameter_t registry_sys_rgb_led_green = {
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .schema = &registry_sys_rgb_led,
     .type = REGISTRY_TYPE_UINT8,
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK)
-    .constraints.uint8 = {
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .allowed_values = NULL,
-        .allowed_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .forbidden_values = NULL,
-        .forbidden_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .min_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .max_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK */
-    },
-#endif /* CONSTRAINTS */
 };
 
 const registry_parameter_t registry_sys_rgb_led_blue = {
@@ -146,27 +104,6 @@ const registry_parameter_t registry_sys_rgb_led_blue = {
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .schema = &registry_sys_rgb_led,
     .type = REGISTRY_TYPE_UINT8,
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK)
-    .constraints.uint8 = {
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .allowed_values = NULL,
-        .allowed_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .forbidden_values = NULL,
-        .forbidden_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .min_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .max_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK */
-    },
-#endif /* CONSTRAINTS */
 };
 
 const registry_parameter_t registry_sys_rgb_led_brightnesses_white = {
@@ -179,27 +116,6 @@ const registry_parameter_t registry_sys_rgb_led_brightnesses_white = {
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .schema = &registry_sys_rgb_led,
     .type = REGISTRY_TYPE_UINT8,
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK)
-    .constraints.uint8 = {
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .allowed_values = NULL,
-        .allowed_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .forbidden_values = NULL,
-        .forbidden_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .min_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .max_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK */
-    },
-#endif /* CONSTRAINTS */
 };
 
 const registry_parameter_t registry_sys_rgb_led_brightnesses_yellow = {
@@ -212,27 +128,6 @@ const registry_parameter_t registry_sys_rgb_led_brightnesses_yellow = {
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .schema = &registry_sys_rgb_led,
     .type = REGISTRY_TYPE_UINT8,
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || \
-    IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK)
-    .constraints.uint8 = {
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .allowed_values = NULL,
-        .allowed_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK) || IS_ACTIVE(DOXYGEN)
-        .forbidden_values = NULL,
-        .forbidden_values_len = 0,
-#endif /* CONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .min_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK) || IS_ACTIVE(DOXYGEN)
-        .max_value = NULL,
-#endif /* CONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK */
-    },
-#endif /* CONSTRAINTS */
 };
 
 const registry_group_t registry_sys_rgb_led_brightnesses = {
