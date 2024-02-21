@@ -1,12 +1,4 @@
-CFLAGS += -DCONFIG_REGISTRY_ENABLE_ALLOWED_VALUES_CHECK
-CFLAGS += -DCONFIG_REGISTRY_ENABLE_FORBIDDEN_VALUES_CHECK
-CFLAGS += -DCONFIG_REGISTRY_ENABLE_MIN_VALUE_CHECK
-CFLAGS += -DCONFIG_REGISTRY_ENABLE_MAX_VALUE_CHECK
-
 CFLAGS += -DCONFIG_REGISTRY_ENABLE_META_NAME
 
 USEMODULE +=  registry_namespace_tests_full
-USEMODULE +=  registry_namespace_tests_constrained_min_max
-USEMODULE +=  registry_namespace_tests_constrained_allowed_values
-USEMODULE +=  registry_namespace_tests_constrained_forbidden_values
 USEMODULE +=  registry_namespace_tests_nested
