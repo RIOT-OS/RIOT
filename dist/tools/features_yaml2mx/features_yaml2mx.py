@@ -7,6 +7,9 @@ import argparse
 import yaml
 import rdflib
 from typing import Optional
+import pycddl
+from pathlib import Path
+import cbor2
 
 # We may offer building with a different ns_main later to compare statements
 # about different versions of RIOT in a single graph, but for the time being,
@@ -210,6 +213,9 @@ def convert_features(yaml_file, mk_file, md_file, ttl_file: Optional[str]):
     """
     with open(yaml_file, 'rb') as file:
         parsed = yaml.safe_load(file)
+
+    schema = pycddl.Schema(open(Path(__file__).parent / "schema.cddl").read())
+    schema.validate_cbor(cbor2.dumps(parsed))
 
     if mk_file is not None:
         with open(mk_file, 'w', encoding="utf-8") as file:
