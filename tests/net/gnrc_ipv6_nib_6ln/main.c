@@ -1056,6 +1056,12 @@ static void test_handle_pkt__rtr_adv__success(uint8_t rtr_adv_flags,
         TEST_ASSERT_EQUAL_INT(exp_netif.mtu, _mock_netif->ipv6.mtu);
     }
     state = NULL;
+    if (pio_flags & NDP_OPT_PI_FLAGS_L) {
+        pio = false;
+        /* Should the host erroneously receive a PIO with the L (on-link) flag set,
+         * then that PIO MUST be ignored.
+         * - https://datatracker.ietf.org/doc/html/rfc6775#section-5.4 */
+    }
     if (pio) {
         if (pio_flags & NDP_OPT_PI_FLAGS_A) {
             TEST_ASSERT_MESSAGE(gnrc_netif_ipv6_addr_idx(_mock_netif,
