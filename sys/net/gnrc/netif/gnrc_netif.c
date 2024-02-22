@@ -985,7 +985,7 @@ static int _idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr, bool mcast)
 
 static int _pfx_idx(const gnrc_netif_t *netif, const ipv6_addr_t *pfx, uint8_t pfx_len, bool mcast)
 {
-    //same as function @ref _idx above, but with generalized condition
+    /*same as function @ref _idx above, but with generalized condition*/
     if (!ipv6_addr_is_unspecified(pfx)) {
         const ipv6_addr_t *iplist = (mcast) ? netif->ipv6.groups :
                                     netif->ipv6.addrs;
