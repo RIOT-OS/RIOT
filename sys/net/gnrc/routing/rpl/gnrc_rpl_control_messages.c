@@ -586,7 +586,7 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
                 && !(pi->LAR_flags & GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT)) {
                 break;
             }
-            _auto_configure_addr(netif, &pi->prefix, pi->prefix_len);
+            auto_configure_addr(netif, &pi->prefix, pi->prefix_len);
 
             /* set lifetimes */
             gnrc_ipv6_nib_pl_set(netif->pid, &pi->prefix, pi->prefix_len,

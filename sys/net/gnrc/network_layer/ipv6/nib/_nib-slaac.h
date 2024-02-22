@@ -89,8 +89,8 @@ extern "C" {
  * @param[in] pfx       The prefix for the address.
  * @param[in] pfx_len   Length of @p pfx in bits.
  */
-void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
-                          uint8_t pfx_len);
+void auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
+                         uint8_t pfx_len);
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
 /**
@@ -100,12 +100,18 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
 void _auto_configure_addr_with_dad_ctr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
                           uint8_t pfx_len, uint8_t dad_ctr);
 #else
-void _auto_configure_addr_default(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
-                                       uint8_t pfx_len);
+/**
+ * @brief   Auto-configures an address from a given prefix.
+ * Internal method without a DAD_Counter.
+ * Use auto_configure_addr() instead
+ * to automatically use the appropriate function.
+ */
+void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
+                          uint8_t pfx_len);
 #endif
 
 #else   /* CONFIG_GNRC_IPV6_NIB_6LN || CONFIG_GNRC_IPV6_NIB_SLAAC */
-#define _auto_configure_addr(netif, pfx, pfx_len) \
+#define auto_configure_addr(netif, pfx, pfx_len) \
     (void)netif; (void)pfx; (void)pfx_len;
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN || CONFIG_GNRC_IPV6_NIB_SLAAC */
 
