@@ -46,6 +46,8 @@ function resize_content(sidenav)
 
 function resize_handler()
 {
+    if ($(window).width() == window_before) {return;}
+
     var sidenav = $("#side-nav");
     if ($(window).width() < 750) {
         var toc = $(".toc");
