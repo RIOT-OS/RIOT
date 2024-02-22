@@ -36,6 +36,8 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+unsigned _native_retval = EXIT_SUCCESS;
+
 static void _native_sleep(void)
 {
     _native_in_syscall++; /* no switching here */
@@ -75,7 +77,7 @@ void pm_off(void)
     extern void auto_unmount_vfs(void);
     auto_unmount_vfs();
 #endif
-    real_exit(EXIT_SUCCESS);
+    real_exit(_native_retval);
 }
 
 void pm_reboot(void)
