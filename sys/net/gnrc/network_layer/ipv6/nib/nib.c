@@ -1621,7 +1621,9 @@ static uint32_t _handle_pio(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
     valid_ltime = byteorder_ntohl(pio->valid_ltime);
     pref_ltime = byteorder_ntohl(pio->pref_ltime);
     if ((pio->len != NDP_OPT_PI_LEN) || (icmpv6->type != ICMPV6_RTR_ADV) ||
-        ipv6_addr_is_link_local(&pio->prefix) || (valid_ltime < pref_ltime)) {
+        ipv6_addr_is_link_local(&pio->prefix) || (valid_ltime < pref_ltime) ||
+        /* https://datatracker.ietf.org/doc/html/rfc6775#section-5.4 */
+        (gnrc_netif_is_6ln(netif) && (pio->flags & NDP_OPT_PI_FLAGS_L))) {
         DEBUG("nib: ignoring PIO with invalid data\n");
         return UINT32_MAX;
     }
