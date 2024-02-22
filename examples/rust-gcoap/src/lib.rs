@@ -26,7 +26,7 @@ fn main() {
         .below(&["vfs"], riot_coap_handler_demos::vfs::vfs("/const"))
         .with_wkc()
         ;
-    let mut handler = riot_wrappers::coap_handler::GcoapHandler(handler);
+    let mut handler = riot_wrappers::coap_handler::v0_2::GcoapHandler(handler);
 
     let mut listener = gcoap::SingleHandlerListener::new_catch_all(&mut handler);
 
