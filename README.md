@@ -117,12 +117,26 @@ For specific toolchain installation, follow instructions in the
   version of the documentation is uploaded daily to
   [doc.riot-os.org](https://doc.riot-os.org).
 
-## Forum
-Do you have a question, want to discuss a new feature, or just want to present
-your latest project using RIOT? Come over to our [forum] and post to your hearts
-content.
+## Asking for help
 
-[forum]: https://forum.riot-os.org
+You can ask for help on the Forum or on Matrix. Please send bug reports and
+feature requests to our [github issue tracker](https://github.com/RIOT-OS/RIOT/issues)
+
+- [forum](https://forum.riot-os.org) is the default place to start asking for
+help. The search can be used to find older questions and answers.
+- We use [#riot-os:matrix.org](https://matrix.to/#/#riot-os:matrix.org) on the
+[Matrix](https://matrix.org/) chat network for chat-based discussions.
+- [Github Issue tracker](https://github.com/RIOT-OS/RIOT/issues) for issues
+with the code and documentation.
+
+### How to Ask
+
+Please include as much detail as you can that is relevant to your question, not
+only "this isn't working".
+
+1. What you want to achieve
+2. What have you tried so far (for example the commands you typed)
+3. What happened so far
 
 ## Contribute
 
