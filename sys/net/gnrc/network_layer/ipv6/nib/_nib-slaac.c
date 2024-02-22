@@ -147,13 +147,13 @@ bool _iid_is_iana_reserved(const eui64_t *iid)
 }
 
 inline bool _stable_privacy_should_retry_idgen(uint8_t *dad_ctr, const char *reason) {
-    if (*dad_ctr < STABLE_PRIVACY_IDGEN_RETRIES) { //within retry limit
+    if (*dad_ctr < STABLE_PRIVACY_IDGEN_RETRIES) { /*within retry limit*/
         LOG_DEBUG("nib: %s", reason);
         *dad_ctr += 1;
         LOG_DEBUG(", retrying IDGEN. (%u/%u)\n", *dad_ctr, STABLE_PRIVACY_IDGEN_RETRIES);
         return true;
     }
-    //retried often enough
+    /*retried often enough*/
     LOG_WARNING("nib: %s", reason);
     LOG_WARNING(", not retrying: IDGEN_RETRIES limit reached\n");
     return false;
@@ -174,7 +174,7 @@ int ipv6_get_rfc7217_iid(eui64_t *iid, const gnrc_netif_t *netif, const ipv6_add
 #error "Stable privacy requires a secret_key, this should have been configured by sys/net/gnrc/Makefile.dep"
 #endif
     const uint8_t secret_key[16] = { STABLE_PRIVACY_SECRET_KEY };
-    //SHOULD be of at least 128 bits - https://datatracker.ietf.org/doc/html/rfc7217
+    /*SHOULD be of at least 128 bits - https://datatracker.ietf.org/doc/html/rfc7217*/
 
     uint8_t digest[SHA256_DIGEST_LENGTH];
 
@@ -189,18 +189,18 @@ int ipv6_get_rfc7217_iid(eui64_t *iid, const gnrc_netif_t *netif, const ipv6_add
     }
 
     iid->uint64.u64 = 0;
-    //uninitialized if called via gnrc_netapi_get (NETOPT_IPV6_IID_RFC7217)
-    //needs to be all zeros as precondition for the following copy operation
+    /* uninitialized if called via gnrc_netapi_get (NETOPT_IPV6_IID_RFC7217)
+     * needs to be all zeros as precondition for the following copy operation*/
 
-    assert(sizeof(digest) >= sizeof(*iid)); //as bits: 256 >= 64 //digest is large enough
+    assert(sizeof(digest) >= sizeof(*iid)); /*as bits: 256 >= 64, "digest is large enough"*/
 
-    //copy digest into IID
-    //RFC 7217 says "starting from the least significant bit",
-    //i.e. in reverse order
-    for (uint8_t i = 0; i < sizeof(*iid); i++) { //for each of the 8 bytes
-        for (int j = 0; j < 8; j++) { //for each of the 8 bits _within byte_
-            if ((digest[(sizeof(digest)-1)-i])&(1<<j)) { //is 1 //reverse order
-                iid->uint8[i] |= 1 << ((8-1)-j); //set 1 //precondition: iid->uint8[i] = 0
+    /* copy digest into IID
+     * RFC 7217 says "starting from the least significant bit",
+     * i.e. in reverse order */
+    for (uint8_t i = 0; i < sizeof(*iid); i++) { /*for each of the 8 bytes*/
+        for (int j = 0; j < 8; j++) { /*for each of the 8 bits _within byte_*/
+            if ((digest[(sizeof(digest)-1)-i])&(1<<j)) { /*is 1, reverse order*/
+                iid->uint8[i] |= 1 << ((8-1)-j); /*set 1, precondition: iid->uint8[i] = 0*/
             }
         }
     }
@@ -295,22 +295,22 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
     if (_stable_privacy_should_retry_idgen(&dad_counter, "Duplicate address detected")) {
 
-        //> Hosts SHOULD introduce a random delay between 0 and IDGEN_DELAY seconds
-        //- https://datatracker.ietf.org/doc/html/rfc7217#section-6
+        /* > Hosts SHOULD introduce a random delay between 0 and IDGEN_DELAY seconds
+         * - https://datatracker.ietf.org/doc/html/rfc7217#section-6 */
         uint32_t random_delay_ms = random_uint32_range(0, STABLE_PRIVACY_IDGEN_DELAY_MS);
         ztimer_sleep(ZTIMER_MSEC, random_delay_ms);
 
         _auto_configure_addr_with_dad_ctr(netif, addr, SLAAC_PREFIX_LENGTH, dad_counter);
     } else {
-        //"hosts MUST NOT automatically fall back to employing other algorithms
-        // for generating Interface Identifiers"
-        //- https://datatracker.ietf.org/doc/html/rfc7217#section-6
+        /*"hosts MUST NOT automatically fall back to employing other algorithms
+         for generating Interface Identifiers"
+        - https://datatracker.ietf.org/doc/html/rfc7217#section-6*/
 
-        //> If the address is a link-local address
-        //> [...]
-        //> not formed from an interface identifier based on the hardware address
-        //> IP operation on the interface MAY be continued
-        //- https://datatracker.ietf.org/doc/html/rfc4862#section-5.4.5
+        /*> If the address is a link-local address
+        > [...]
+        > not formed from an interface identifier based on the hardware address
+        > IP operation on the interface MAY be continued
+        - https://datatracker.ietf.org/doc/html/rfc4862#section-5.4.5*/
     }
 #else
     if (!ipv6_addr_is_link_local(addr) ||
