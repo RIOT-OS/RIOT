@@ -120,13 +120,13 @@ For specific toolchain installation, follow instructions in the
 ## Asking for help
 
 You can ask for help on the Forum or on Matrix. Please send bug reports and
-feature requests to our [github issue tracker](https://github.com/RIOT-OS/RIOT/issues)
+feature requests to our [GitHub issue tracker](https://github.com/RIOT-OS/RIOT/issues)
 
 - [forum](https://forum.riot-os.org) is the default place to start asking for
 help. The search can be used to find older questions and answers.
 - We use [#riot-os:matrix.org](https://matrix.to/#/#riot-os:matrix.org) on the
 [Matrix](https://matrix.org/) chat network for chat-based discussions.
-- [Github Issue tracker](https://github.com/RIOT-OS/RIOT/issues) for issues
+- [GitHub Issue tracker](https://github.com/RIOT-OS/RIOT/issues) for issues
 with the code and documentation.
 
 ### How to Ask
