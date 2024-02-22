@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "name": "RIOT",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "compileCommands": "${workspaceFolder}/compile_commands.json"
+        }
+    ],
+    "version": 4
+}
