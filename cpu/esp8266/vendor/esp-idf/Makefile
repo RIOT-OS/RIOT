@@ -11,3 +11,5 @@ ifneq (, $(filter esp_idf_heap, $(USEMODULE)))
 endif
 
 include $(RIOTBASE)/Makefile.base
+
+CFLAGS += -DMCU_ESP8266
