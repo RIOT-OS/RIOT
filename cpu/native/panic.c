@@ -30,4 +30,5 @@ void panic_arch(void)
        just use the (developer-)friendly core-dump feature */
     kill(_native_pid, SIGTRAP);
 #endif
+    real_exit(-1);
 }
