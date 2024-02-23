@@ -25,6 +25,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "stdio_base.h"
 #include "kernel_defines.h"
 #include "fmt.h"
 
