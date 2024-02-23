@@ -35,6 +35,16 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+#ifdef MODULE_FDCAN
+/**
+ * The loop delay in CAN, especially in CAN FD with bitrate switching, affects synchronization due to increased data rates.
+ * The unit is nanoseconds.
+ */
+#ifndef CONFIG_FDCAN_DEVICE_TRANSCEIVER_LOOP_DELAY
+#error "CONFIG_FDCAN_DEVICE_TRANSCEIVER_LOOP_DELAY must be defined. This property can be found in the datasheet of the CAN transceiver in use. The unit is nanoseconds."
+#endif /* CONFIG_FDCAN_DEVICE_TRANSCEIVER_LOOP_DELAY */
+#endif /* MODULE_FDCAN */
+
 #ifndef CAN_DEVICE_MSG_QUEUE_SIZE
 #define CAN_DEVICE_MSG_QUEUE_SIZE 64
 #endif
@@ -235,6 +245,13 @@ static void *_can_device_thread(void *args)
     dev->isr_arg = candev_dev;
 
     candev_dev->ifnum = can_dll_register_candev(candev_dev);
+
+#if defined(MODULE_FDCAN)
+    if (candev_dev->loop_delay == 0) {
+        candev_dev->loop_delay = CONFIG_FDCAN_DEVICE_TRANSCEIVER_LOOP_DELAY;
+    }
+    dev->loop_delay = candev_dev->loop_delay;
+#endif
 
     dev->driver->init(dev);
     power_up(candev_dev);
