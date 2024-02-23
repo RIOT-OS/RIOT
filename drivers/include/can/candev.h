@@ -82,6 +82,7 @@ struct candev {
     enum can_state state;                  /**< device state */
 #ifdef MODULE_FDCAN
     struct can_bittiming fd_data_bittiming;/**< device bittimings for FD CAN only */
+    uint16_t loop_delay;                   /**< CAN FD transceiver loop delay */
 #endif
 };
 
