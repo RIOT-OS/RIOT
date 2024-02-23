@@ -187,20 +187,22 @@ jobs:
       id: generate_results
       run: |
         if [ "${{ steps.tests.conclusion }}" == "success" ]; then
-          nice_str="&#x2705; <strong>PASSED</strong>"
+          nice_str="&#x2705; **PASSED**"
         elif [ "${{ steps.tests.conclusion }}" == "failure" ]; then
-          nice_str="&#x274C; <strong>FAILED</strong>"
+          nice_str="&#x274C; **FAILED**"
         fi
         echo "nice_str=${nice_str}" >> ${GITHUB_OUTPUT}
     - name: Report to Matrix channel
       if: ${{ always() && steps.generate_results.outputs.nice_str != '' }}
-      run: |
-        MESSAGE="${{ steps.generate_results.outputs.nice_str}}: Release tests" \
-          "[${{ matrix.pytest_mark }}, ${{ matrix.sudo }}] on '<em>${{ github.event_name }}</em>':" \
-          "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"; \
-        curl -H "Content-Type: application/json" -X POST \
-          --data '{"msgtype":"m.text","format":"org.matrix.custom.html","body":"${MESSAGE}","formatted_body":"${MESSAGE}"}' \
-          "https://matrix.org/_matrix/client/v3/rooms/${{env.RIOT_CI_RELEASE_REPORT_CHANNEL}}/send/m.room.message?access_token=${{secrets.MATRIX_RIOT_CI_ACCESS_TOKEN}}"
+      uses: s3krit/matrix-message-action@v0.0.3
+      with:
+        room_id: ${{ secrets.RIOT_CI_RELEASE_REPORT_CHANNEL }}
+        access_token: ${{ secrets.MATRIX_RIOT_CI_ACCESS_TOKEN }}
+        server: "matrix.org"
+        message: >
+          ${{ steps.generate_results.outputs.nice_str}}: Release tests
+          `[${{ join(matrix.*, ', ') }}]` on `${{ github.event_name }}`:
+          ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
     - uses: actions/upload-artifact@v2
       if: always()
       with:
