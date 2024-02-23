@@ -66,9 +66,11 @@
 #include <sys/types.h> /* for off_t etc. */
 #include <sys/statvfs.h> /* for struct statvfs */
 
+#include "architecture.h"
 #include "sched.h"
 #include "clist.h"
 #include "iolist.h"
+#include "macros/math.h"
 #include "mtd.h"
 #include "xfa.h"
 
@@ -122,7 +124,7 @@ extern "C" {
 #  endif
 
 #  if FF_FS_EXFAT
-#    define _FATFS_FILE_EXFAT              (44)
+#    define _FATFS_FILE_EXFAT              (48)
 #    define _FATFS_DIR_EXFAT               (32)
 #  else
 #    define _FATFS_FILE_EXFAT              (0)
@@ -251,12 +253,12 @@ extern "C" {
  * @attention Put the check in the public header file (.h), do not put the check in the
  * implementation (.c) file.
  */
-#define VFS_DIR_BUFFER_SIZE MAX5(FATFS_VFS_DIR_BUFFER_SIZE,     \
-                                 LITTLEFS_VFS_DIR_BUFFER_SIZE,  \
-                                 LITTLEFS2_VFS_DIR_BUFFER_SIZE, \
-                                 SPIFFS_VFS_DIR_BUFFER_SIZE,    \
-                                 LWEXT4_VFS_DIR_BUFFER_SIZE     \
-                                )
+#define VFS_DIR_BUFFER_SIZE MATH_ALIGN(MAX5(FATFS_VFS_DIR_BUFFER_SIZE,     \
+                                            LITTLEFS_VFS_DIR_BUFFER_SIZE,  \
+                                            LITTLEFS2_VFS_DIR_BUFFER_SIZE, \
+                                            SPIFFS_VFS_DIR_BUFFER_SIZE,    \
+                                            LWEXT4_VFS_DIR_BUFFER_SIZE),   \
+                                       ARCHITECTURE_WORD_BYTES)
 #endif
 
 #ifndef VFS_FILE_BUFFER_SIZE
@@ -279,12 +281,12 @@ extern "C" {
  * @attention Put the check in the public header file (.h), do not put the check in the
  * implementation (.c) file.
  */
-#define VFS_FILE_BUFFER_SIZE MAX5(FATFS_VFS_FILE_BUFFER_SIZE,    \
-                                  LITTLEFS_VFS_FILE_BUFFER_SIZE, \
-                                  LITTLEFS2_VFS_FILE_BUFFER_SIZE,\
-                                  SPIFFS_VFS_FILE_BUFFER_SIZE,   \
-                                  LWEXT4_VFS_FILE_BUFFER_SIZE    \
-                                 )
+#define VFS_FILE_BUFFER_SIZE MATH_ALIGN(MAX5(FATFS_VFS_FILE_BUFFER_SIZE,    \
+                                             LITTLEFS_VFS_FILE_BUFFER_SIZE, \
+                                             LITTLEFS2_VFS_FILE_BUFFER_SIZE,\
+                                             SPIFFS_VFS_FILE_BUFFER_SIZE,   \
+                                             LWEXT4_VFS_FILE_BUFFER_SIZE),  \
+                                        ARCHITECTURE_WORD_BYTES)
 #endif
 
 #ifndef VFS_NAME_MAX
