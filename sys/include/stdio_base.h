@@ -170,7 +170,7 @@ ssize_t stdio_write(const void* buffer, size_t len);
  * This convenience function calls stdio_write as long as not all bytes have
  * sent to @ref stdio_write, or until an error was returned.
  */
-ssize_t stdio_write_all(const void* buffer, size_t len);
+int stdio_write_all(const void* buffer, size_t len);
 
 /**
  * @brief Disable stdio and detach stdio providers
