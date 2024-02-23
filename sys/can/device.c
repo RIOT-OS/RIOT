@@ -39,6 +39,10 @@
 #define CAN_DEVICE_MSG_QUEUE_SIZE 64
 #endif
 
+#ifndef CAN_DEVICE_DEFAULT_LOOP_DELAY
+#define CAN_DEVICE_DEFAULT_LOOP_DELAY 200   /* nanoseconds */
+#endif
+
 #ifdef MODULE_CAN_PM
 #define CAN_DEVICE_PM_DEFAULT_RX_TIMEOUT (10 * US_PER_SEC)
 #define CAN_DEVICE_PM_DEFAULT_TX_TIMEOUT (2 * US_PER_SEC)
@@ -235,6 +239,13 @@ static void *_can_device_thread(void *args)
     dev->isr_arg = candev_dev;
 
     candev_dev->ifnum = can_dll_register_candev(candev_dev);
+
+#if defined(MODULE_FDCAN)
+    if (candev_dev->loop_delay == 0) {
+        candev_dev->loop_delay = CAN_DEVICE_DEFAULT_LOOP_DELAY;
+    }
+    dev->loop_delay = candev_dev->loop_delay;
+#endif
 
     dev->driver->init(dev);
     power_up(candev_dev);
