@@ -140,13 +140,14 @@ bool _stable_privacy_should_retry_idgen(uint8_t *dad_ctr, const char *reason);
  * ("Net_iface" in rfc7217)
  * @param[in] pfx The prefix for which the IID is to be generated.
  * ("Prefix" in rfc7217)
+ * It is assumed to be of length @ref SLAAC_PREFIX_LENGTH
  * @param[in,out] dad_ctr ("DAD_Counter" in rfc7217)
  * Value may increase and is to be stored associated with the address by caller
  * @return 0 on success
  * @return -1 if failed, because retry limit reached
  * @return  `-ENOTSUP`, if interface has no link-layer address.
  */
-int ipv6_get_rfc7217_iid(eui64_t *iid, const gnrc_netif_t *netif, const ipv6_addr_t *pfx,
+int ipv6_get_rfc7217_iid(eui64_t *iid, gnrc_netif_t *netif, const ipv6_addr_t *pfx,
                          uint8_t *dad_ctr);
 #endif
 
