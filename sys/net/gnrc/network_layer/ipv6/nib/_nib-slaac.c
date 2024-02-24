@@ -106,18 +106,6 @@ void _auto_configure_addr(gnrc_netif_t *netif,
         new_address = true;
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
     }
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
-    else if (is_rfc7217) {
-        /*"the same network prefix" - https://datatracker.ietf.org/doc/html/rfc7217#section-5*/
-        /*"unacceptable identifier" -> retry IDGEN (dad_ctr+1)*/
-        if (!_stable_privacy_should_retry_idgen(&dad_ctr, "Generated address already exists")) {
-            return;
-        }
-
-        _auto_configure_addr_with_dad_ctr(netif, pfx, pfx_len, dad_ctr);
-        return;
-    }
-#endif
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     /* mark link-local addresses as valid on 6LN */
@@ -163,7 +151,7 @@ inline bool _stable_privacy_should_retry_idgen(uint8_t *dad_ctr, const char *rea
     return false;
 }
 
-int ipv6_get_rfc7217_iid(eui64_t *iid, const gnrc_netif_t *netif, const ipv6_addr_t *pfx,
+int ipv6_get_rfc7217_iid(eui64_t *iid, gnrc_netif_t *netif, const ipv6_addr_t *pfx,
                          uint8_t *dad_ctr)
 {
 #if GNRC_NETIF_L2ADDR_MAXLEN > 0
@@ -211,10 +199,15 @@ int ipv6_get_rfc7217_iid(eui64_t *iid, const gnrc_netif_t *netif, const ipv6_add
 
     /* "The resulting Interface Identifier SHOULD be compared against
      * the reserved IPv6 Interface Identifiers"
+     * "and against those Interface Identifiers already employed [...]"
      * - https://datatracker.ietf.org/doc/html/rfc7217#section-5 */
-    if (_iid_is_iana_reserved(iid)) {
+    ipv6_addr_t addr = IPV6_ADDR_UNSPECIFIED;
+    ipv6_addr_init_prefix(&addr, pfx, SLAAC_PREFIX_LENGTH);
+    ipv6_addr_set_aiid(&addr, iid->uint8);
+    if (_iid_is_iana_reserved(iid) || ((gnrc_netif_ipv6_addr_idx(netif, &addr)) >= 0)) {
         if (!_stable_privacy_should_retry_idgen(dad_ctr,
-                                                "IANA reserved IID generated")) {
+                                                "IANA reserved IID generated"
+                                                " or generated address already exists")) {
             return -1;
         }
         iid->uint64.u64 = 0; /* @pre for method call */
