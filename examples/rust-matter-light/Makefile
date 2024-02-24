@@ -27,11 +27,21 @@ USEMODULE += saul_default
 USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += periph_gpio
+USEMODULE += ztimer_msec
+
+# networking
+USEMODULE += netdev_default
+USEMODULE += auto_init_gnrc_netif
+USEMODULE += gnrc_ipv6_default
+USEMODULE += gnrc_icmpv6_echo
+USEMODULE += sock_udp
+USEMODULE += sock_async
+USEMODULE += sock_aux_local
 
 # All Rust components RIOT uses work on stable Rust. If any extra libraries
 # were to require a more recent version, switch to `CARGO_CHANNEL =
 # $(CARGO_CHANNEL_NIGHTLY)` to use whichever nightly version is available.
-CARGO_CHANNEL ?= stable
+CARGO_CHANNEL ?= $(CARGO_CHANNEL_NIGHTLY)
 
 # Currently unknown, something related to the LED_PORT definition that doesn't
 # pass C2Rust's transpilation
