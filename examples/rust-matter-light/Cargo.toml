@@ -2,7 +2,7 @@
 name = "rust-matter-light"
 version = "0.1.0"
 authors = ["Maik Lorenz <maik.lorenz@haw-hamburg.de>"]
-edition = "2018"
+edition = "2021"
 resolver = "2"
 
 [lib]
@@ -15,11 +15,19 @@ crate-type = ["staticlib"]
 panic = "abort"
 
 [dependencies]
-riot-wrappers = { version = "0.8", features = [ "set_panic_handler" ] }
+riot-wrappers = { version = "0.8.2", features = [ "set_panic_handler", "with_embedded_nal_async", "provide_critical_section_1_0" ] }
+riot-sys = "*"
+embedded-nal-async = "^0.7.1"
+embedded-hal = "0.2.2"
 
 # While currently this exmple does not use any RIOT modules implemented in
 # Rust, that may change; it is best practice for any RIOT application that has
 # its own top-level Rust crate to include rust_riotmodules from inside
 # RIOTBASE.
 rust_riotmodules = { path = "../../sys/rust_riotmodules/" }
-rs-matter = { path = "../../../rs-matter/rs-matter", default-features = false }
+
+static_cell = "2.0.0"
+embassy-executor-riot = { git = "https://gitlab.com/etonomy/riot-module-examples" }
+embassy-executor = "0.5"
+embassy-futures = "0.1.1"
+rs-matter = { path = "../../../rs-matter/rs-matter", default-features = false, features = ["riot-os"] }
