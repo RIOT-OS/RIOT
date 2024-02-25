@@ -769,6 +769,7 @@ INPUT                  = ../../doc.txt \
                          src/build-in-docker.md \
                          ../../tests/README.md \
                          src/build-system-basics.md \
+                         src/feature_list.md \
                          src/kconfig/kconfig.md \
                          src/using-cpp.md \
                          src/using-rust.md \
