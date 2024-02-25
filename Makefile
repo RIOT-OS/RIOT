@@ -9,7 +9,13 @@ all: welcome
 doc:
 	@./dist/tools/features_yaml2mx/features_yaml2mx.py \
 		features.yaml \
-		--output-md doc/doxygen/src/feature_list.md
+		--output-md doc/doxygen/src/feature_list.md \
+		--output-ttl doc/rdf/features.ttl
+	@./dist/tools/rdf/info_to_rdf.py \
+		doc/rdf/info.ttl
+	@./dist/tools/rdf/doxygen_to_rdf.py \
+		doc/rdf/doxygen.ttl
+	@./dist/tools/rdf/build_board_feature_table.py > doc/doxygen/src/feature_table.html
 	"$(MAKE)" -BC doc/doxygen
 
 doc-man:
