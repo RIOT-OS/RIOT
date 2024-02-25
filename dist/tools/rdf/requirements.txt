@@ -1,0 +1,2 @@
+rdflib == 7.0.0
+markupsafe == 2.1.5
