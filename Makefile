@@ -7,15 +7,19 @@ all: welcome
 	@exit 1
 
 doc:
-	@./dist/tools/features_yaml2mx/features_yaml2mx.py \
+	@./dist/tools/python_with_requirements/python_with_requirements \
+	./dist/tools/features_yaml2mx/features_yaml2mx.py \
 		features.yaml \
 		--output-md doc/doxygen/src/feature_list.md \
 		--output-ttl doc/rdf/features.ttl
-	@./dist/tools/rdf/info_to_rdf.py \
+	@./dist/tools/python_with_requirements/python_with_requirements \
+	./dist/tools/rdf/info_to_rdf.py \
 		doc/rdf/info.ttl
-	@./dist/tools/rdf/doxygen_to_rdf.py \
+	@./dist/tools/python_with_requirements/python_with_requirements \
+	./dist/tools/rdf/doxygen_to_rdf.py \
 		doc/rdf/doxygen.ttl
-	@./dist/tools/rdf/build_board_feature_table.py > doc/doxygen/src/feature_table.html
+	@./dist/tools/python_with_requirements/python_with_requirements \
+	./dist/tools/rdf/build_board_feature_table.py > doc/doxygen/src/feature_table.html
 	"$(MAKE)" -BC doc/doxygen
 
 doc-man:
@@ -43,7 +47,8 @@ print-versions:
 	@./dist/tools/ci/print_toolchain_versions.sh
 
 generate-features:
-	@./dist/tools/features_yaml2mx/features_yaml2mx.py \
+	@./dist/tools/python_with_requirements/python_with_requirements \
+	./dist/tools/features_yaml2mx/features_yaml2mx.py \
 		features.yaml \
 		--output-makefile makefiles/features_existing.inc.mk
 
