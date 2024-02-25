@@ -183,14 +183,27 @@ def featurelabel(node) -> Markup | str:
 rows = []
 for b in boards:
     cells = [
-            Markup('<td style="text-align: right">{}</td>').format(b.wordsizelabel.removeprefix("arch_")),
-            Markup('<td style="text-align: right">{}</td>').format(featurelabel(b.architecture)),
-            Markup('<td style="text-align: left"><a href="{}">{}</a></td>').format(b.cpudoc, b.cpuname),
-            Markup('<td style="text-align: left">{}</td>').format(featurelabel(b.cpufeature)),
-            # not wrapping -- some may rows will still be multiline because the CPU wraps and has more lines than boards, but most will be 1 high
-            Markup('<td style="text-align: left; white-space: pre"><a href="{}">{}</a></td>').format(b.boarddoc, b.boardname),
-            Markup('<td style="text-align: right">{}</td>').format(size(b.ram)),
-            Markup('<td style="text-align: right">{}</td>').format(size(b.rom)),
+            Markup('<td style="text-align: right; vertical-align:top">'
+                   '<span style="position:sticky; top:0">{}</span></td>'
+                   ).format(b.wordsizelabel.removeprefix("arch_")),
+            Markup('<td style="text-align: right; vertical-align:top">'
+                   '<span style="position:sticky; top:0">{}</span></td>'
+                   ).format(featurelabel(b.architecture)),
+            Markup('<td style="text-align: left; vertical-align:top">'
+                   '<a href="{}" style="position:sticky; top:0">{}</a></td>'
+                   ).format(b.cpudoc, b.cpuname),
+            Markup('<td style="text-align: left; vertical-align:top">'
+                   '<span style="position:sticky; top:0">{}</span></td>'
+                   ).format(featurelabel(b.cpufeature)),
+            # not wrapping -- some may rows will still be multiline because the
+            # CPU wraps and has more lines than boards, but most will be 1 high
+            Markup('<td style="text-align: left; white-space: pre">'
+                   '<a href="{}">{}</a></td>'
+                   ).format(b.boarddoc, b.boardname),
+            Markup('<td style="text-align: right">{}</td>'
+                   ).format(size(b.ram)),
+            Markup('<td style="text-align: right">{}</td>'
+                   ).format(size(b.rom)),
             ]
     for f in features:
         presence = (b.board, ns['terms']['providesFeature'], f.feature) in g
