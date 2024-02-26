@@ -3,5 +3,8 @@ ifeq (2, $(words $(filter ipv4 ipv6, $(USEMODULE))))
                          possible to use a dual stack setup$(COLOR_RESET)" 1>&2)
 endif
 
+# join will sort the list, subst selects the 2nd element
+max = $(subst xx,x,$(join $1,$2))
 CONFIG_GCOAP_PDU_BUF_SIZE := $(or $(CONFIG_GCOAP_PDU_BUF_SIZE),128)
-DTLS_MAX_BUF ?= ($(CONFIG_GCOAP_PDU_BUF_SIZE) + 36)
+# the initial DTLS handshake may exceed the block size
+DTLS_MAX_BUF ?= $(call max,$(($(CONFIG_GCOAP_PDU_BUF_SIZE) + 36)),200)
