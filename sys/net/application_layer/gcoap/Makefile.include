@@ -4,4 +4,5 @@ ifeq (2, $(words $(filter ipv4 ipv6, $(USEMODULE))))
 endif
 
 CONFIG_GCOAP_PDU_BUF_SIZE := $(or $(CONFIG_GCOAP_PDU_BUF_SIZE),128)
-DTLS_MAX_BUF ?= ($(CONFIG_GCOAP_PDU_BUF_SIZE) + 36)
+# the initial DTLS handshake may exceed the block size
+DTLS_MAX_BUF ?= $(shell echo $$(((${CONFIG_GCOAP_PDU_BUF_SIZE} + 36) > 200 ? (${CONFIG_GCOAP_PDU_BUF_SIZE} + 36) : 200 )))
