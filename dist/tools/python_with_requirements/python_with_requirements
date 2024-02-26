@@ -13,7 +13,11 @@ import venv
 from pathlib import Path
 import importlib.metadata
 
-import packaging.requirements
+# Would be nice but is not universally present
+try:
+    import packaging.requirements
+except ImportError:
+    packaging = None
 
 pythonscript = Path(sys.argv[1])
 requirements = pythonscript.parent / "requirements.txt"
@@ -32,10 +36,18 @@ try:
             line = line.strip()
             if not line:
                 continue
-            req = packaging.requirements.Requirement(line)
-            existing = importlib.metadata.version(req.name)
-            if not req.specifier.contains(existing):
-                raise BadVersion
+
+            if packaging:
+                req = packaging.requirements.Requirement(line)
+                existing = importlib.metadata.version(req.name)
+                if not req.specifier.contains(existing):
+                    raise BadVersion
+            else:
+                req_name = line.split(" ", 1)[0]
+                existing = importlib.metadata.version(req_name)
+                # and as we can't compare versions, we're just disregarding
+                # them and hope they match
+
             # This is completely disregarding the topic of extras -- but for
             # our purposes of getting a quick run-or-venv decision, that's good
             # enough
