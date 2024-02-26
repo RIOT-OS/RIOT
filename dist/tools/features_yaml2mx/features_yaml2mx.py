@@ -3,11 +3,13 @@
 Command line utility generate trivial Makefile listing all existing features in
 RIOT and a matching documentation in Markdown format from single YAML file.
 """
+import sys
 import argparse
 import yaml
 import rdflib
 from typing import Optional
 import pycddl
+import zcbor
 from pathlib import Path
 import cbor2
 
@@ -215,8 +217,17 @@ def convert_features(yaml_file, mk_file, md_file, ttl_file: Optional[str]):
     with open(yaml_file, 'rb') as file:
         parsed = yaml.safe_load(file)
 
+    # PyCDDL is not perfect because it doesn't catch rogue elements: https://github.com/anweiss/cddl/issues/221
     schema = pycddl.Schema(open(Path(__file__).parent / "schema.cddl").read())
     schema.validate_cbor(cbor2.dumps(parsed))
+
+    # zcbor is not perfect either because it doesn't process the .within (and
+    # its error output just contains the whole input)
+    schema = zcbor.DataTranslator.from_cddl(
+            open(Path(__file__).parent / "schema-simplified.cddl").read(),
+            default_max_qty=sys.maxsize
+            )
+    schema.my_types['root'].from_yaml(open(yaml_file).read())
 
     if mk_file is not None:
         with open(mk_file, 'w', encoding="utf-8") as file:

@@ -1,0 +1,18 @@
+; This version of schema.cddl was simplified for zcbor which
+; does not support the `.within` control.
+root = group-toplevel
+
+group-toplevel = group
+group-nested = group
+
+group = {
+    ? "title" => tstr,
+    ? "help" => tstr,
+    ? "features" => [ + feature ],
+    ? "groups" => [ + group-nested ],
+    }
+
+feature = {
+    "name" => tstr,
+    ? "help" => tstr,
+}
