@@ -12,7 +12,14 @@ doc:
 		features.yaml \
 		--output-md doc/doxygen/src/feature_list.md \
 		--output-ttl doc/rdf/features.ttl
-	@./dist/tools/python_with_requirements/python_with_requirements \
+	@# The BUILD_IN_DOCKER is a workaround for the RISC-V
+	@# architecture tests otherwise triggering when building eg. in murdock
+	@# ("No RISC-V toolchain detected. Make sure a RISC-V toolchain is
+	@# installed."). If I had a penny for every time I refused to let
+	@# BUILD_IN_DOCKER be the simple workaround, I wouldn't get a penny
+	@# today (but I'd still be proud of my small collection so far).
+	BUILD_IN_DOCKER=1 \
+	./dist/tools/python_with_requirements/python_with_requirements \
 	./dist/tools/rdf/info_to_rdf.py \
 		doc/rdf/info.ttl
 	@./dist/tools/python_with_requirements/python_with_requirements \
