@@ -147,6 +147,7 @@ FEATURES_EXISTING := \
     periph_eeprom \
     periph_eth \
     periph_flashpage \
+    periph_flashpage_aux \
     periph_flashpage_in_address_space \
     periph_flashpage_pagewise \
     periph_flashpage_rwee \
