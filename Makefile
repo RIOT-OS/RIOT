@@ -7,9 +7,6 @@ all: welcome
 	@exit 1
 
 doc:
-	@./dist/tools/features_yaml2mx/features_yaml2mx.py \
-		features.yaml \
-		--output-md doc/doxygen/src/feature_list.md
 	"$(MAKE)" -BC doc/doxygen
 
 doc-man:
@@ -39,6 +36,7 @@ print-versions:
 generate-features:
 	@./dist/tools/features_yaml2mx/features_yaml2mx.py \
 		features.yaml \
+		--output-md doc/doxygen/src/feature_list.md \
 		--output-makefile makefiles/features_existing.inc.mk
 
 include makefiles/boards.inc.mk
