@@ -19,23 +19,41 @@
 
 #include "periph/gpio.h"
 
+/**
+ * @brief Mocked GPIO array
+ */
+gpio_mock_t gpio_mock[GPIO_PORT_MAX][GPIO_PIN_MAX];
+
 __attribute__((weak)) int gpio_init(gpio_t pin, gpio_mode_t mode) {
     (void) pin;
     (void) mode;
 
-    return 0;
+    if (pin) {
+        pin->mode = mode;
+        pin->value = 0;
+        return 0;
+    }
+
+    return -1;
 }
 
 __attribute__((weak)) int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
-    (void) pin;
-    (void) mode;
-    (void) flank;
     (void) cb;
     (void) arg;
 
-    return 0;
+    if (pin) {
+        pin->mode = mode;
+        pin->flank = flank;
+        pin->value = 0;
+        pin->cb = cb;
+        pin->arg = arg;
+
+        return 0;
+    }
+
+    return -1;
 }
 
 __attribute__((weak)) void gpio_irq_enable(gpio_t pin)
@@ -49,26 +67,35 @@ __attribute__((weak)) void gpio_irq_disable(gpio_t pin)
 }
 
 __attribute__((weak)) int gpio_read(gpio_t pin) {
-  (void) pin;
+  if (pin) {
+    return pin->value;
+  }
 
-  return 0;
+  return -1;
 }
 
 __attribute__((weak)) void gpio_set(gpio_t pin) {
-  (void) pin;
+  if (pin) {
+    pin->value = 1;
+  }
 }
 
 __attribute__((weak)) void gpio_clear(gpio_t pin) {
-  (void) pin;
+  if (pin) {
+    pin->value = 0;
+  }
 }
 
 __attribute__((weak)) void gpio_toggle(gpio_t pin) {
-  (void) pin;
+  if (pin) {
+    pin->value ^= 1;
+  }
 }
 
 __attribute__((weak)) void gpio_write(gpio_t pin, int value) {
-  (void) pin;
-  (void) value;
+  if (pin) {
+    pin->value = value;
+  }
 }
 
 /** @} */
