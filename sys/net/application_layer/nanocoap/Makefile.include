@@ -1,4 +1,8 @@
 ifneq (,$(filter nanocoap_dtls,$(USEMODULE)))
+  # join will sort the list, subst selects the 2nd element
+  max = $(subst xx,x,$(join $1,$2))
   CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT := $(or $(CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT),2)
-  DTLS_MAX_BUF ?= ((1 << ($(CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT) + 3)) + 36)
+  # the initial DTLS handshake may exceed the block size
+  NANOCOAP_BLOCK_FRAME := $((1 << ($(CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT) + 3)) + 36
+  DTLS_MAX_BUF ?= $(call max,$(NANOCOAP_BLOCK_FRAME),200)
 endif
