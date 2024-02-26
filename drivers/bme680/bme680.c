@@ -39,7 +39,7 @@
 
 unsigned int bme680_devs_numof = 0;
 
-bme680_t *bme680_devs[BME680_NUMOF] = { };
+bme680_t *bme680_devs[BME680_NUMOF] = { NULL };
 
 int bme680_init(bme680_t *dev, const bme680_params_t *params)
 {
