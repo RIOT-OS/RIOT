@@ -147,13 +147,13 @@ int pcf857x_init(pcf857x_t *dev, const pcf857x_params_t *params)
     return res;
 }
 
-int pcf857x_gpio_init(pcf857x_t *dev, gpio_t pin, gpio_mode_t mode)
+int pcf857x_gpio_init(pcf857x_t *dev, uint8_t pin, gpio_mode_t mode)
 {
     /* some parameter sanity checks */
     assert(dev != NULL);
     assert(pin < dev->pin_num);
 
-    DEBUG_DEV("pin=%u mode=%u", dev, (unsigned)pin, (unsigned)mode);
+    DEBUG_DEV("pin=%u mode=%u", dev, pin, (unsigned)mode);
 
     /*
      * Since the LOW output is the only actively driven level possible with
@@ -209,7 +209,7 @@ int pcf857x_gpio_init(pcf857x_t *dev, gpio_t pin, gpio_mode_t mode)
 }
 
 #if IS_USED(MODULE_PCF857X_IRQ)
-int pcf857x_gpio_init_int(pcf857x_t *dev, gpio_t pin,
+int pcf857x_gpio_init_int(pcf857x_t *dev, uint8_t pin,
                                           gpio_mode_t mode,
                                           gpio_flank_t flank,
                                           gpio_cb_t isr,
@@ -237,7 +237,7 @@ int pcf857x_gpio_init_int(pcf857x_t *dev, gpio_t pin,
     return PCF857X_OK;
 }
 
-void pcf857x_gpio_irq_enable(pcf857x_t *dev, gpio_t pin)
+void pcf857x_gpio_irq_enable(pcf857x_t *dev, uint8_t pin)
 {
     /* some parameter sanity checks */
     assert(dev != NULL);
@@ -247,7 +247,7 @@ void pcf857x_gpio_irq_enable(pcf857x_t *dev, gpio_t pin)
     dev->enabled[pin] = true;
 }
 
-void pcf857x_gpio_irq_disable(pcf857x_t *dev, gpio_t pin)
+void pcf857x_gpio_irq_disable(pcf857x_t *dev, uint8_t pin)
 {
     /* some parameter sanity checks */
     assert(dev != NULL);
@@ -258,13 +258,13 @@ void pcf857x_gpio_irq_disable(pcf857x_t *dev, gpio_t pin)
 }
 #endif
 
-int pcf857x_gpio_read(pcf857x_t *dev, gpio_t pin)
+int pcf857x_gpio_read(pcf857x_t *dev, uint8_t pin)
 {
     /* some parameter sanity checks */
     assert(dev != NULL);
     assert(pin < dev->pin_num);
 
-    DEBUG_DEV("pin=%u", dev, (unsigned)pin);
+    DEBUG_DEV("pin=%u", dev, pin);
 
     /*
      * If we use the interrupt, we always have an up-to-date input snapshot
@@ -279,13 +279,13 @@ int pcf857x_gpio_read(pcf857x_t *dev, gpio_t pin)
     return (dev->in &(1 << pin)) ? 1 : 0;
 }
 
-void pcf857x_gpio_write(pcf857x_t *dev, gpio_t pin, int value)
+void pcf857x_gpio_write(pcf857x_t *dev, uint8_t pin, int value)
 {
     /* some parameter sanity checks */
     assert(dev != NULL);
     assert(pin < dev->pin_num);
 
-    DEBUG_DEV("pin=%u value=%d", dev, (unsigned)pin, value);
+    DEBUG_DEV("pin=%u value=%d", dev, pin, value);
 
     /* set pin bit value */
     if (value) {
@@ -316,21 +316,21 @@ void pcf857x_gpio_write(pcf857x_t *dev, gpio_t pin, int value)
 #endif
 }
 
-void pcf857x_gpio_clear(pcf857x_t *dev, gpio_t pin)
+void pcf857x_gpio_clear(pcf857x_t *dev, uint8_t pin)
 {
-    DEBUG_DEV("pin=%u", dev, (unsigned)pin);
+    DEBUG_DEV("pin=%u", dev, pin);
     return pcf857x_gpio_write(dev, pin, 0);
 }
 
-void pcf857x_gpio_set(pcf857x_t *dev, gpio_t pin)
+void pcf857x_gpio_set(pcf857x_t *dev, uint8_t pin)
 {
-    DEBUG_DEV("pin=%u", dev, (unsigned)pin);
+    DEBUG_DEV("pin=%u", dev, pin);
     return pcf857x_gpio_write(dev, pin, 1);
 }
 
-void pcf857x_gpio_toggle(pcf857x_t *dev, gpio_t pin)
+void pcf857x_gpio_toggle(pcf857x_t *dev, uint8_t pin)
 {
-    DEBUG_DEV("pin=%u", dev, (unsigned)pin);
+    DEBUG_DEV("pin=%u", dev, pin);
     return pcf857x_gpio_write(dev, pin, (dev->out & (1 << pin)) ? 0 : 1);
 }
 
