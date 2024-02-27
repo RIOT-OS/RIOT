@@ -177,7 +177,7 @@ static Test *tests_psa_crypto(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_init_twice),
-        new_TestFixture(test_export_import_ed25519),
+        new_TestFixture(test_exported_key_is_identical_when_imported_again_ed25519),
         new_TestFixture(test_export_public_key_ed25519),
     };
 
