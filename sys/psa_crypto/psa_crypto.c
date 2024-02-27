@@ -1287,11 +1287,6 @@ psa_status_t psa_export_key(psa_key_id_t key,
         return status;
     }
 
-    if ((data_size == 0) ||
-        (data_size < PSA_EXPORT_KEY_OUTPUT_SIZE(slot->attr.type, slot->attr.bits))) {
-        return PSA_ERROR_BUFFER_TOO_SMALL;
-    }
-
     // todo: key export from secure element not supported yet
     psa_get_key_data_from_key_slot(slot, &privkey_data, &privkey_data_len);
 
