@@ -458,32 +458,35 @@ psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attri
             }
         }
 
-        /* save private key data */
-        memcpy(key_data, data, data_length);
-        *key_bytes = data_length;
-
         // derive and save public from private key
+        psa_status_t ret = PSA_ERROR_NOT_SUPPORTED;
         switch (asym_key) {
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P192R1)
         case PSA_ECC_P192_R1:
             // todo: support for Weierstrass curves
             (void)slot;
-            return PSA_ERROR_NOT_SUPPORTED;
+            ret = PSA_ERROR_NOT_SUPPORTED;
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1)
         case PSA_ECC_P256_R1:
             // todo: support for Weierstrass curves
             (void)slot;
-            return PSA_ERROR_NOT_SUPPORTED;
+            ret = PSA_ERROR_NOT_SUPPORTED;
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519)
         case PSA_ECC_ED25519:
-            return psa_derive_ecc_ed25519_public_key(key_data, pubkey_data, key_bytes, pubkey_data_len);
+            ret = psa_derive_ecc_ed25519_public_key(key_data, pubkey_data, key_bytes, pubkey_data_len);
 #endif
         default:
             (void)slot;
-            return PSA_ERROR_NOT_SUPPORTED;
+            ret = PSA_ERROR_NOT_SUPPORTED;
         }
+        if (ret == PSA_SUCCESS) {
+            /* save private key data */
+            memcpy(key_data, data, data_length);
+            *key_bytes = data_length;
+        }
+        return ret;
     }
     return psa_builtin_import_key(attributes, data, data_length, key_data, key_data_size, key_bytes, bits);
 }
