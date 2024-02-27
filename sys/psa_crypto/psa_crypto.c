@@ -1327,6 +1327,7 @@ static psa_status_t psa_builtin_export_public_key( const uint8_t *key_buffer,
     }
 
     if (data_size < key_buffer_size) {
+        DEBUG("PSA Crypto Builtin Export Key: Output buffer too small\n");
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
     memcpy(data, key_buffer, key_buffer_size);
