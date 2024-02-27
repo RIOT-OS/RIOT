@@ -1345,7 +1345,7 @@ int gnrc_netif_ipv6_add_prefix(gnrc_netif_t *netif,
     DEBUG("gnrc_netif: (re-)configure prefix %s/%d\n",
           ipv6_addr_to_str(addr_str, pfx, sizeof(addr_str)), pfx_len);
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
-    uint8_t dad_ctr;
+    uint8_t dad_ctr = 0;
     netopt_ipv6_rfc7217_iid_data data;
     data.iid = &iid;
     data.pfx = pfx;
