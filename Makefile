@@ -18,6 +18,7 @@ doc:
 	@# installed."). If I had a penny for every time I refused to let
 	@# BUILD_IN_DOCKER be the simple workaround, I wouldn't get a penny
 	@# today (but I'd still be proud of my small collection so far).
+	unset BOARDS; \
 	BUILD_IN_DOCKER=1 \
 	./dist/tools/python_with_requirements/python_with_requirements \
 	./dist/tools/rdf/info_to_rdf.py \
