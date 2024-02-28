@@ -23,6 +23,7 @@
 #ifndef SHT2X_PARAMS_H
 #define SHT2X_PARAMS_H
 
+#include "kernel_defines.h"
 #include "sht2x.h"
 #include "saul_reg.h"
 
