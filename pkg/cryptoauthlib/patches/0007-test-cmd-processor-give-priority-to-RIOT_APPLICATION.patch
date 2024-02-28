@@ -1,0 +1,131 @@
+From effa44779a4452051e5637c5eaf2da55e9f06e9c Mon Sep 17 00:00:00 2001
+From: Gilles DOFFE <gilles.doffe@rtone.fr>
+Date: Wed, 28 Feb 2024 22:26:01 +0100
+Subject: [PATCH] test/cmd-processor: give priority to RIOT_APPLICATION define
+
+This ensure that in case of __linux__ macro, RIOT_APPLICATION will be
+checked in priority.
+
+Signed-off-by: Gilles DOFFE <g.doffe@gmail.com>
+---
+ test/atca_crypto_sw_tests.c | 12 ++++++------
+ test/cmd-processor.c        | 24 ++++++++++++------------
+ 2 files changed, 18 insertions(+), 18 deletions(-)
+
+diff --git a/test/atca_crypto_sw_tests.c b/test/atca_crypto_sw_tests.c
+index c06456b..96f3d79 100644
+--- a/test/atca_crypto_sw_tests.c
++++ b/test/atca_crypto_sw_tests.c
+@@ -140,7 +140,7 @@ void test_atcac_sw_sha1_nist3(void)
+     TEST_ASSERT_EQUAL_MEMORY(digest_ref, digest, sizeof(digest_ref));
+ }
+ 
+-#if defined(_WIN32) || defined(__linux__)
++#if defined(RIOT_APPLICATION) || (!defined(_WIN32) && !defined(__linux__))
+ static void hex_to_uint8(const char hex_str[2], uint8_t* num)
+ {
+     *num = 0;
+@@ -278,7 +278,7 @@ static int read_rsp_int_value(FILE* file, const char* name, int* value)
+ 
+ static void test_atcac_sw_sha1_nist_simple(const char* filename)
+ {
+-#if !defined(_WIN32) && !defined(__linux__)
++#if defined(RIOT_APPLICATION) || (!defined(_WIN32) && !defined(__linux__))
+     ((void)filename);
+     TEST_IGNORE_MESSAGE("Test is not available for this platform.");
+ #else
+@@ -335,7 +335,7 @@ void test_atcac_sw_sha1_nist_long(void)
+ 
+ void test_atcac_sw_sha1_nist_monte(void)
+ {
+-#if !defined(_WIN32) && !defined(__linux__)
++#if defined(RIOT_APPLICATION) || (!defined(_WIN32) && !defined(__linux__))
+     TEST_IGNORE_MESSAGE("Test is not available for this platform.");
+ #else
+     FILE* rsp_file = NULL;
+@@ -434,7 +434,7 @@ void test_atcac_sw_sha2_256_nist3(void)
+ 
+ static void test_atcac_sw_sha2_256_nist_simple(const char* filename)
+ {
+-#if !defined(_WIN32) && !defined(__linux__)
++#if defined(RIOT_APPLICATION) || (!defined(_WIN32) && !defined(__linux__))
+     ((void)filename);
+     TEST_IGNORE_MESSAGE("Test is not available for this platform.");
+ #else
+@@ -491,7 +491,7 @@ void test_atcac_sw_sha2_256_nist_long(void)
+ 
+ void test_atcac_sw_sha2_256_nist_monte(void)
+ {
+-#if !defined(_WIN32) && !defined(__linux__)
++#if defined(RIOT_APPLICATION) || (!defined(_WIN32) && !defined(__linux__))
+     TEST_IGNORE_MESSAGE("Test is not available for this platform.");
+ #else
+     FILE* rsp_file = NULL;
+@@ -747,7 +747,7 @@ void test_atcac_sha256_hmac(void)
+ 
+ void test_atcac_sha256_hmac_nist(void)
+ {
+-#if !defined(_WIN32) && !defined(__linux__)
++#if defined(RIOT_APPLICATION) || (!defined(_WIN32) && !defined(__linux__))
+     TEST_IGNORE_MESSAGE("Test is not available for this platform.");
+ #else
+     FILE* rsp_file = NULL;
+diff --git a/test/cmd-processor.c b/test/cmd-processor.c
+index a98f316..d325a1c 100644
+--- a/test/cmd-processor.c
++++ b/test/cmd-processor.c
+@@ -44,7 +44,7 @@
+ 
+ static int help(int argc, char* argv[]);
+ 
+-#if defined(_WIN32) || defined(__linux__) || defined(__APPLE__)
++#if !defined(RIOT_APPLICATION) && (defined(_WIN32) || defined(__linux__) || defined(__APPLE__))
+ static int call_exit(int argc, char* argv[]);
+ #endif
+ 
+@@ -116,7 +116,7 @@ static t_menu_info mas_menu_info[] =
+     { "fce",       "Run FCE test",                                  talib_fce_cmd                        },
+     { "power",     "Change device power state",                     talib_power_cmd                      },
+ #endif
+-#if defined(_WIN32) || defined(__linux__) || defined(__APPLE__)
++#if !defined(RIOT_APPLICATION) && (defined(_WIN32) || defined(__linux__) || defined(__APPLE__))
+     { "exit",     "Exit the test application",                      call_exit                            },
+ #endif
+     { NULL,       NULL,                                             NULL                                 },
+@@ -230,7 +230,16 @@ static int parse_cmd(char *command, size_t max_len)
+     return run_cmd(argc, argv);
+ }
+ 
+-#if defined(_WIN32) || defined(__linux__) || defined(__APPLE__)
++#if defined(RIOT_APPLICATION)
++#include <stdio.h>
++#include <stdlib.h>
++#include "cmd-processor.h"
++
++int atca_run_cmd(char *command, size_t len)
++{
++    return parse_cmd(command, len);
++}
++#elif defined(_WIN32) || defined(__linux__) || defined(__APPLE__)
+ #include <stdio.h>
+ #include <stdlib.h>
+ 
+@@ -267,15 +276,6 @@ int main(int argc, char* argv[])
+ 
+     return exit_code;
+ }
+-#elif defined(RIOT_APPLICATION)
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include "cmd-processor.h"
+-
+-int atca_run_cmd(char *command, size_t len)
+-{
+-    return parse_cmd(command, len);
+-}
+ #else
+ int processCmd(void)
+ {
+-- 
+2.37.0
+

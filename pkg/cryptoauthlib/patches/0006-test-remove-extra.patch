@@ -1,0 +1,26 @@
+From 39c9cddc5f0ece7511eec589f35b855ab55b327a Mon Sep 17 00:00:00 2001
+From: Gilles DOFFE <gilles.doffe@rtone.fr>
+Date: Wed, 28 Feb 2024 21:46:07 +0100
+Subject: [PATCH] test: remove extra ;
+
+Signed-off-by: Gilles DOFFE <g.doffe@gmail.com>
+---
+ test/atca_test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/atca_test.c b/test/atca_test.c
+index b43a170..773b7a5 100644
+--- a/test/atca_test.c
++++ b/test/atca_test.c
+@@ -211,7 +211,7 @@ void RunAllTests(t_test_case_info** tests_list)
+ void RunAllBasicTests(void)
+ {
+     RunAllTests(basic_tests);
+-};
++}
+ 
+ void RunBasicOtpZero(void)
+ {
+-- 
+2.37.0
+
