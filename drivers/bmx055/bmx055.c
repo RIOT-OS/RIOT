@@ -21,6 +21,7 @@
 #include <stdint.h>
 #include <math.h>
 
+#include "kernel_defines.h"
 #include "periph/i2c.h"
 #include "periph/gpio.h"
 #include "assert.h"
