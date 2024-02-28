@@ -12,13 +12,13 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @file
  */
-#if MODULE_SAUL
 
 #include <string.h>
 
 #include "saul.h"
 #include "mcp47xx.h"
 
+#if MODULE_SAUL
 extern mcp47xx_t mcp47xx_devs[];
 
 static int set(const void *dev, const phydat_t *data)
