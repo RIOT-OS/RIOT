@@ -231,7 +231,7 @@ static int _set(mcp47xx_t *dev, uint8_t chn, uint16_t value, bool pd)
      * MCP4728  01000CCU VPPGDDDD DDDDDDDD  C - Channel selection CH1,CH0
      *                                      U - UDAC bit
      */
-    uint8_t bytes[3] = { };
+    uint8_t bytes[3] = { 0 };
 
     if (dev->params.variant == MCP4728) {
         /* U=0 update V_OUT directly */
