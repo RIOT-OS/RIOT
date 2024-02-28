@@ -117,6 +117,11 @@ For specific toolchain installation, follow instructions in the
   version of the documentation is uploaded daily to
   [doc.riot-os.org](https://doc.riot-os.org).
 
+Using Windows? Use [this guide][dev-setup-windows] to
+[setup the development environment][dev-setup-windows].
+
+[dev-setup-windows]: doc/guides/setup-windows
+
 ## Forum
 Do you have a question, want to discuss a new feature, or just want to present
 your latest project using RIOT? Come over to our [forum] and post to your hearts

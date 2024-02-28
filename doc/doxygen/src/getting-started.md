@@ -34,7 +34,12 @@ will also be fine - however, we rely on users to report bugs regarding tooling i
 here. So expect occasional issues for the development branch and please help testing during the
 feature freeze period, if you develop on macOS or BSD.
 
-Native development on Windows and macOS machines is not officially supported. What works well is using Linux
+Windows users can refer to [this guide][dev-setup-windows] to
+[setup the development environment][dev-setup-windows] on Windows.
+
+[dev-setup-windows]: doc/guides/setup-windows
+
+Native development on macOS machines is not officially supported. What works well is using Linux
 in a virtual machine, but at much lower performance than running Linux natively. We also offer Docker images.
 For development on Windows, using the
 [Windows Subsystem for Linux (WSL)](https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux)
