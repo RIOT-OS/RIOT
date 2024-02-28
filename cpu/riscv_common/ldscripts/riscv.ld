@@ -25,6 +25,7 @@ MEMORY
   flash (rxai!w) : ORIGIN = _rom_start_addr + _rom_offset, LENGTH = _fw_rom_length
   ram   (wxa!ri) : ORIGIN = _ram_start_addr, LENGTH = _ram_length
   itim  (wxa!ri) : ORIGIN = _itim_start_addr, LENGTH = _itim_length
+  rom_aux (rx)   : ORIGIN = _rom_start_addr + _slot_aux_offset, LENGTH = _slot_aux_len
 }
 
 INCLUDE riscv_base.ld

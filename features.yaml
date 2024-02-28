@@ -695,6 +695,9 @@ groups:
       help: The Flashpage peripheral supports pagewise writing.
     - name: periph_flashpage_rwee
       help: The Flashpage peripheral is of the Read While Write.
+    - name: periph_flashpage_aux
+      help: It is possible to partition off a part of the internal flash for an
+            auxiliary slot.
 
   - title: Other Peripheral Storage Features
     features:
