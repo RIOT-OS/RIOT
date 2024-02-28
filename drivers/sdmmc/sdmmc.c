@@ -1361,7 +1361,7 @@ static int _read_csd(sdmmc_dev_t *dev)
                   "sizeof(sdmmc_csd_v1_t) != sizeof(sdmmc_csd_t)");
 #ifndef NDEBUG
     /* ensure to be able to use csd.mmc.* members for all CSD versions */
-    sdmmc_csd_t csd = {};
+    sdmmc_csd_t csd = { 0 };
     csd.mmc.CSD_STRUCTURE = 0x3;
     csd.mmc.TAAC = 0xaa;
     csd.mmc.NSAC = 0x55;
