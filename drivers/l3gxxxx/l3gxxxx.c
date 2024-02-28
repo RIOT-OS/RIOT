@@ -126,7 +126,7 @@ int l3gxxxx_init(l3gxxxx_t *dev, const l3gxxxx_params_t *params)
                  (dev->sensor != X3G42XXD));
 #endif
 
-    uint8_t reg[8] = { };
+    uint8_t reg[8] = { 0 };
 
     res |= _write(dev, L3GXXXX_REG_CTRL1, reg, 6);
     res |= _write(dev, L3GXXXX_REG_FIFO_CTRL, reg, 1);
@@ -266,7 +266,7 @@ int l3gxxxx_read_raw(const l3gxxxx_t *dev, l3gxxxx_raw_data_t *raw)
 #if IS_USED(MODULE_L3GXXXX_FIFO)
     /* if not in bypass mode we read out the FIFO and return newest data sample */
     if (dev->params.fifo_mode != L3GXXXX_BYPASS) {
-        l3gxxxx_raw_data_fifo_t raw_fifo = {};
+        l3gxxxx_raw_data_fifo_t raw_fifo = { 0 };
         int num;
 
         /* read raw data samples from FIFO */
@@ -310,7 +310,7 @@ int l3gxxxx_read_fifo(const l3gxxxx_t *dev, l3gxxxx_data_fifo_t data)
     ASSERT_PARAM(data != NULL);
     DEBUG_DEV("", dev);
 
-    l3gxxxx_raw_data_fifo_t raw = {};
+    l3gxxxx_raw_data_fifo_t raw = { 0 };
     int num;
 
     if ((num = l3gxxxx_read_raw_fifo(dev, raw)) < 0) {
@@ -503,7 +503,7 @@ l3gxxxx_int_src_t l3gxxxx_wait_int(l3gxxxx_t *dev)
     gpio_irq_disable(dev->params.int2_pin);
 #endif /* IS_USED(L3GXXXX_IRQ_DRDY) */
 
-    l3gxxxx_int_src_t int_src = { };
+    l3gxxxx_int_src_t int_src = { 0 };
 
 #if IS_USED(MODULE_L3GXXXX_IRQ_EVENT)
     if (dev->int_type & L3GXXXX_INT_EVENT) {
