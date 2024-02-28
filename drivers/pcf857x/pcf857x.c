@@ -319,19 +319,19 @@ void pcf857x_gpio_write(pcf857x_t *dev, uint8_t pin, int value)
 void pcf857x_gpio_clear(pcf857x_t *dev, uint8_t pin)
 {
     DEBUG_DEV("pin=%u", dev, pin);
-    return pcf857x_gpio_write(dev, pin, 0);
+    pcf857x_gpio_write(dev, pin, 0);
 }
 
 void pcf857x_gpio_set(pcf857x_t *dev, uint8_t pin)
 {
     DEBUG_DEV("pin=%u", dev, pin);
-    return pcf857x_gpio_write(dev, pin, 1);
+    pcf857x_gpio_write(dev, pin, 1);
 }
 
 void pcf857x_gpio_toggle(pcf857x_t *dev, uint8_t pin)
 {
     DEBUG_DEV("pin=%u", dev, pin);
-    return pcf857x_gpio_write(dev, pin, (dev->out & (1 << pin)) ? 0 : 1);
+    pcf857x_gpio_write(dev, pin, (dev->out & (1 << pin)) ? 0 : 1);
 }
 
 /** Functions for internal use only */
