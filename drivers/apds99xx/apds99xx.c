@@ -55,7 +55,7 @@ int apds99xx_init(apds99xx_t *dev, const apds99xx_params_t *params)
     assert(params->prx_pulses <= 15);
 #endif
 
-    DEBUG_DEV("params=%p", dev, params);
+    DEBUG_DEV("params=%p", dev, (void *)params);
 
     /* init sensor data structure */
     dev->params = *params;
@@ -164,7 +164,7 @@ int apds99xx_read_als_raw(const apds99xx_t *dev, uint16_t *raw)
 {
     assert(dev != NULL);
     assert(raw != NULL);
-    DEBUG_DEV("raw=%p", dev, raw);
+    DEBUG_DEV("raw=%p", dev, (void *)raw);
 
     uint8_t data[2];
 
@@ -185,7 +185,7 @@ int apds99xx_read_illuminance(const apds99xx_t *dev, uint16_t *lux)
 {
     assert(dev != NULL);
     assert(lux != NULL);
-    DEBUG_DEV("lux=%p", dev, lux);
+    DEBUG_DEV("lux=%p", dev, (void *)lux);
 
     uint8_t data[4];
 
@@ -235,9 +235,9 @@ int apds99xx_read_rgb_raw(const apds99xx_t *dev, apds99xx_rgb_t *rgb)
 {
     assert(dev != NULL);
     assert(rgb != NULL);
-    DEBUG_DEV("rgb=%p", dev, rgb);
+    DEBUG_DEV("rgb=%p", dev, (void *)rgb);
 
-    uint8_t data[6] = { }; /* initialize with 0 */
+    uint8_t data[6] = { 0 }; /* initialize with 0 */
 
     if (_reg_read(dev, APDS99XX_REG_RDATAL, data, 6) != APDS99XX_OK) {
         return -APDS99XX_ERROR_RAW_DATA;
@@ -269,9 +269,9 @@ int apds99xx_read_prx_raw (const apds99xx_t *dev, uint16_t *prox)
 {
     assert(dev != NULL);
     assert(prox != NULL);
-    DEBUG_DEV("prox=%p", dev, prox);
+    DEBUG_DEV("prox=%p", dev, (void *)prox);
 
-    uint8_t data[2] = { }; /* initialize with 0 */
+    uint8_t data[2] = { 0 }; /* initialize with 0 */
 
 #if MODULE_APDS9900 || MODULE_APDS9901 || MODULE_APDS9930 || MODULE_APDS9950
     if (_reg_read(dev, APDS99XX_REG_PDATAL, data, 2) != APDS99XX_OK) {
