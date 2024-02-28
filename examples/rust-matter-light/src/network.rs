@@ -7,7 +7,7 @@ use riot_wrappers::socket_embedded_nal_async_udp::UnconnectedUdpSocket;
 use riot_wrappers::println;
 use riot_wrappers::gnrc::Netif;
 
-use embedded_nal_async::{Ipv6Addr, Ipv4Addr, SocketAddr, UdpStack as _, UnconnectedUdp};
+use embedded_nal_async::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV6, UdpStack as _, UnconnectedUdp};
 
 pub struct RiotSocket{
     local_addr: SocketAddr,
@@ -25,16 +25,23 @@ impl RiotSocket {
 
 impl UdpSend for RiotSocket {
     async fn send_to(&mut self, data: &[u8], addr: SocketAddr) -> Result<(), MatterError> {
-        let res = self.socket.lock().deref_mut().send(self.local_addr, addr, data).await;
-        match res {
-            Ok(_) => Ok(()),
-            Err(_) => Err(MatterError::new(ErrorCode::StdIoError)),
+        println!("[RiotSocket] send_to {:?}", &addr);
+        if addr.is_ipv6() {
+            println!("Is IPv6 address -> send!");
+            let res = self.socket.lock().deref_mut().send(self.local_addr, addr, data).await;
+            match res {
+                Ok(_) => return Ok(()),
+                Err(_) => return Err(MatterError::new(ErrorCode::StdIoError)),
+            }
         }
+        println!("Is IPv4 address -> don't send!");
+        Ok(())
     }
 }
 
 impl UdpReceive for RiotSocket {
     async fn recv_from(&mut self, buffer: &mut [u8]) -> Result<(usize, SocketAddr), MatterError> {
+        println!("[RiotSocket] receive_into...");
         let res = self.socket.lock().deref_mut().receive_into(buffer).await;
         match res {
             Ok((bytes_recvd, local_addr, remote_addr)) => Ok((bytes_recvd, remote_addr)),
@@ -46,22 +53,33 @@ impl UdpReceive for RiotSocket {
 
 impl UdpSend for &RiotSocket {
     async fn send_to(&mut self, data: &[u8], addr: SocketAddr) -> Result<(), MatterError> {
-        let res = self.socket.lock().deref_mut().send(self.local_addr, addr, data).await;
-        match res {
-            Ok(_) => Ok(()),
-            Err(_) => Err(MatterError::new(ErrorCode::StdIoError)),
+        println!("[RiotSocket] send_to {:?}", &addr);
+        if addr.is_ipv6() {
+            let res = self.socket.lock().deref_mut().send(self.local_addr, addr, data).await;
+            match res {
+                Ok(_) => {
+                    println!("send_to success!");
+                    return Ok(());
+                },
+                Err(_) => {
+                    println!("send_to failure!");
+                    return Err(MatterError::new(ErrorCode::StdIoError));
+                },
+            }
         }
+        println!("Is IPv4 address -> don't send!");
+        Ok(())
     }
 }
 
 impl UdpReceive for &RiotSocket {
     async fn recv_from(&mut self, buffer: &mut [u8]) -> Result<(usize, SocketAddr), MatterError> {
+        println!("[RiotSocket] receive_into...");
         let res = self.socket.lock().deref_mut().receive_into(buffer).await;
         match res {
             Ok((bytes_recvd, local_addr, remote_addr)) => Ok((bytes_recvd, remote_addr)),
             Err(e) => Err(MatterError::new(ErrorCode::StdIoError)),
         }
-        
     }
 }
 

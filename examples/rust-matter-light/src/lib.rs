@@ -14,6 +14,7 @@ pub mod saul_reg;
 mod dev_att;
 mod network;
 mod persist;
+use embassy_futures::{block_on, join};
 use network::RiotSocket;
 use network::utils::{get_ipv6_address, initialize_network, test_udp, test_udp_wrapper};
 
@@ -66,6 +67,7 @@ const RGB_RED_PIN: u32 = 7;
 const RGB_GREEN_PIN: u32 = 6;
 const RGB_BLUE_PIN: u32 = 5;
 
+// Node object with endpoints supporting device type 'OnOff Light'
 const NODE: Node<'static> = Node {
     id: 0,
     endpoints: &[
@@ -78,6 +80,7 @@ const NODE: Node<'static> = Node {
     ],
 };
 
+// Handler for endpoint 1 (Descriptor + OnOff Cluster)
 fn matter_handler<'a>(matter: &'a Matter<'a>) -> impl Metadata + NonBlockingHandler + 'a {
     (
         NODE,
@@ -136,44 +139,41 @@ async fn amain(_spawner: embassy_executor::Spawner) {
 }
 
 async fn run_matter() {
-    println!("Network Stack init...");
+    use core;
+    println!("Matter memory: mDNS={}, Matter={}, UdpBuffers={}, PacketBuffers={}",
+        core::mem::size_of::<MdnsService>(),
+        core::mem::size_of::<Matter>(),
+        core::mem::size_of::<UdpBuffers>(),
+        core::mem::size_of::<PacketBuffers>()
+    );
 
-    // 1. Initialize network stack
-    let (ipv4_addr, ipv6_addr, interface) = initialize_network().expect("Error initializing network");
+    // Initialize network stack
+    let (ipv4_addr, ipv6_addr, interface) = initialize_network().expect("Error getting network interface and IP addresses");
     
+    // Create UDP sockets
     static UDP_MDNS_SOCKET: StaticCell<riot_sys::sock_udp_t> = StaticCell::new();
-    let udp_mdns_stack = riot_wrappers::socket_embedded_nal_async_udp::UdpStack::new(|| UDP_MDNS_SOCKET.try_uninit());
-    println!("UDP stack created (mDNS)");
+    let udp_stack_mdns = riot_wrappers::socket_embedded_nal_async_udp::UdpStack::new(|| UDP_MDNS_SOCKET.try_uninit());
     
     static UDP_MATTER_SOCKET: StaticCell<riot_sys::sock_udp_t> = StaticCell::new();
-    let udp_matter_stack = riot_wrappers::socket_embedded_nal_async_udp::UdpStack::new(|| UDP_MATTER_SOCKET.try_uninit());
-    println!("UDP stack created (Matter)");
-    
-    let (mdns_addr, mut mdns_sock) = udp_mdns_stack
+    let udp_stack_matter = riot_wrappers::socket_embedded_nal_async_udp::UdpStack::new(|| UDP_MATTER_SOCKET.try_uninit());
+
+    // Bind socket to mDNS port: 5353
+    let (mdns_addr, mut mdns_sock) = udp_stack_mdns
         .bind_single(MDNS_SOCKET_BIND_ADDR)
         .await
         .expect("Can't create a socket");
-    println!("Bound mDNS address: {:?}", &mdns_addr);
-    //test_udp(&mut mdns_sock).await;
-    let mut mdns_sock_wrapper = RiotSocket::new(mdns_addr, mdns_sock);
-    test_udp_wrapper(&mut mdns_sock_wrapper).await;
-    return;
+    println!("Bound mDNS to {:?}", &mdns_addr);
+    let mut mdns_socket = RiotSocket::new(mdns_addr, mdns_sock);
     
-    let (matter_addr, mut matter_sock) = udp_matter_stack
+    // Bind UDP socket to Matter port: 5540
+    let (matter_addr, mut matter_sock) = udp_stack_matter
         .bind_single(MATTER_SOCKET_BIND_ADDR)
         .await
         .expect("Can't create a socket");
-    println!("Bound Matter address: {:?}", &matter_addr);
-    let mut matter_sock_wrapper = RiotSocket::new(matter_addr, matter_sock);
+    println!("Bound Matter to {:?}", &matter_addr);
+    let matter_socket = RiotSocket::new(matter_addr, matter_sock);
 
-    // let mut matter_test_runner = pin!(test_udp(&mut matter_sock));
-    let mut mdns_test_runner = pin!(test_udp_wrapper(&mut mdns_sock_wrapper));
-    //let mut matter_test_runner = pin!(test_udp_wrapper(&mut matter_sock_wrapper));
-    let mut matter_test_runner = pin!(async { println!("test"); loop{} });
-    select(&mut mdns_test_runner, &mut matter_test_runner).await;
-    return;
-    
-    // 2. Define Product Info
+    // Set device info
     let dev_det = BasicInfoConfig {
         vid: 0xFFF1,
         pid: 0x8000,
@@ -185,15 +185,15 @@ async fn run_matter() {
         product_name: "Light123",
         vendor_name: "Vendor 123",
     };
-
-    // 3. Get Device attestation data
+    
+    // Get Device attestation (hard-coded atm)
     let dev_att = dev_att::HardCodedDevAtt::new();
 
-    // 4. TODO: Provide own epoch and rand functions
+    // TODO: Provide own epoch and rand functions
     let epoch = rs_matter::utils::epoch::dummy_epoch;
     let rand = rs_matter::utils::rand::dummy_rand;
     
-    // 5. Create mDNS Service
+    // Create mDNS Service
     let mdns = MdnsService::new(
         0,
         "rs-matter-demo",
@@ -205,7 +205,6 @@ async fn run_matter() {
     
     println!("mDNS initialized!");
     
-    // 6. Create Matter struct
     let matter = Matter::new(
         // vid/pid should match those in the DAC
         &dev_det,
@@ -216,36 +215,54 @@ async fn run_matter() {
         MATTER_PORT,
     );
     
-    println!("matter initialized!");
-
     let handler = HandlerCompat(matter_handler(&matter));
     
-    // Create mDNS Service Runner
-    let mut udp_buffers = UdpBuffers::new();
-    // TODO: in function `embassy_time_driver::now': undefined reference to `_embassy_time_now'
-    //let mut mdns_runner = pin!(mdns.run(&mdns_sock_wrapper, &mdns_sock_wrapper, &mut udp_buffers));
-    let mut mdns_runner = pin!(async {println!("asd")});
     
-    let mut udp_buffers = UdpBuffers::new();
-    let mut packet_buffers = PacketBuffers::new();
-    let comm_data = CommissioningData {
+    // Create mDNS Service Runner
+    let mut mdns_udp_buffers = UdpBuffers::new();
+    // TODO: in function `embassy_time_driver::now': undefined reference to `_embassy_time_now' 
+    //    -> Problem with embassy-time lib, temporary fixed by commenting out related function call
+    let mut mdns_runner = pin!(mdns.run(
+        &mdns_socket, 
+        &mdns_socket, 
+        &mut mdns_udp_buffers)
+    );
+
+    // Create Matter runner
+    let mut matter_udp_buffers = UdpBuffers::new();
+    let mut matter_packet_buffers = PacketBuffers::new();
+    /* TODO: Here I get a Stack Overflow!
+    let mut matter_runner = pin!(matter.run(
+        &matter_socket, 
+        &matter_socket, 
+        &mut matter_udp_buffers, 
+        &mut matter_packet_buffers, 
+        CommissioningData {
             // TODO: Hard-coded for now
             verifier: VerifierData::new_with_pw(123456, *matter.borrow()),
             discriminator: 250,
-    };
-    let mut matter_runner = pin!(matter.run(
-        &matter_sock_wrapper, 
-        &matter_sock_wrapper, 
-        &mut udp_buffers, 
-        &mut packet_buffers, 
-        comm_data, 
-        &handler));
-    let mut matter_runner = pin!(async {println!("asd")});
-    return;
+        }, 
+        &handler)
+    ); 
+    let mut matter_runner = pin!(matter_runner);
+     */
 
+    // TODO: Develop own 'Persistence Manager' using RIOT OS modules
     let mut psm = persist::Psm::new(&matter).expect("Error creating PSM");
     let mut psm_runner = pin!(psm.run());
     
-    select3(&mut mdns_runner, &mut matter_runner, &mut psm_runner).await;
-    return;
+    //let mut mdns_runner = pin!(async {println!("this should run the mDNS service...")});
+    let mut matter_runner = pin!(async {
+        println!("this should run the Matter service...");
+        loop { }
+    });
+    
+    println!("Starting all services...");
+    
+    let runner = select3(&mut mdns_runner, &mut matter_runner, &mut psm_runner);
+    match block_on(runner) {
+        embassy_futures::select::Either3::First(_) => println!("mDNS runner terminated!"),
+        embassy_futures::select::Either3::Second(_) => println!("Matter runner terminated!"),
+        embassy_futures::select::Either3::Third(_) => println!("PSM runnter terminated!"),
+    }
 }
