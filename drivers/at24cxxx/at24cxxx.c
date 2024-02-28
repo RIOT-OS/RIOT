@@ -165,7 +165,7 @@ int _write_page(const at24cxxx_t *dev, uint32_t pos, const void *data, size_t le
 static
 int _write(const at24cxxx_t *dev, uint32_t pos, const void *data, size_t len)
 {
-    int check = 0;
+    int check = AT24CXXX_OK;
     const uint8_t *cdata = ((const uint8_t *)data);
 
     while (len) {
@@ -188,7 +188,7 @@ int _write(const at24cxxx_t *dev, uint32_t pos, const void *data, size_t len)
 static
 int _set(const at24cxxx_t *dev, uint32_t pos, uint8_t val, size_t len)
 {
-    int check;
+    int check = AT24CXXX_OK;
     uint8_t set_buffer[AT24CXXX_SET_BUF_SIZE];
 
     memset(set_buffer, val, sizeof(set_buffer));
