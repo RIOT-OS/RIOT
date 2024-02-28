@@ -87,6 +87,10 @@ CFLAGS += -Wno-atomic-alignment
 # unsupported warning flags:
 CFLAGS += -Wno-unknown-warning-option
 
+# Warning is displayed but `, ## __VA_ARGS__` extension is still supported as
+# we are in the -std=c11 and not in c99.
+CFLAGS += -Wno-gnu-zero-variadic-macro-arguments
+
 # Designated initializers make the code much more readable and are part
 # of the C standard since C99. C++ with C++20 finally caught up.
 # Until we switch to that C++ version, let's disable the annoying
