@@ -1,0 +1,33 @@
+From 20549239021d27a219c7169c9811acbbdf35d473 Mon Sep 17 00:00:00 2001
+From: Gilles DOFFE <gilles.doffe@rtone.fr>
+Date: Wed, 28 Feb 2024 21:43:41 +0100
+Subject: [PATCH] lib: use c11 C standard
+
+Signed-off-by: Gilles DOFFE <g.doffe@gmail.com>
+---
+ lib/CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/CMakeLists.txt b/lib/CMakeLists.txt
+index 1c474a4..c9ccd7b 100644
+--- a/lib/CMakeLists.txt
++++ b/lib/CMakeLists.txt
+@@ -332,7 +332,7 @@ endif(ATCA_BUILD_SHARED_LIBS)
+ 
+ add_library(cryptoauth ${CRYPTOAUTH_SRC} ${ATCACERT_DEF_SRC})
+ 
+-set_property(TARGET cryptoauth PROPERTY C_STANDARD 99)
++set_property(TARGET cryptoauth PROPERTY C_STANDARD 11)
+ 
+ if(HAS_MALLOC)
+ set(ATCA_PLATFORM_MALLOC malloc CACHE STRING "" FORCE)
+@@ -418,4 +418,4 @@ install(FILES ${JWT_INC} DESTINATION ${DEFAULT_INC_PATH}/jwt COMPONENT Developme
+ install(FILES ${PKCS11_INC} DESTINATION ${DEFAULT_INC_PATH}/pkcs11 COMPONENT Development)
+ install(FILES ${TNG_INC} DESTINATION ${DEFAULT_INC_PATH}/app/tng COMPONENT Development)
+ install(FILES ${SHA206_API_INC} DESTINATION ${DEFAULT_INC_PATH}/app/api_206a COMPONENT Development)
+-endif(DEFAULT_INC_PATH)
+\ No newline at end of file
++endif(DEFAULT_INC_PATH)
+-- 
+2.37.0
+
