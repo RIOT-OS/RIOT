@@ -4,31 +4,39 @@
 // General Public License v2.1. See the file LICENSE in the top level
 // directory for more details.
 #![no_std]
+#[allow(warnings)]
+#[allow(unused)]
 
 // internal modules
 pub mod gpio;
 pub mod light;
 pub mod saul_reg;
 mod dev_att;
+mod network;
+mod persist;
+use network::RiotSocket;
+use network::utils::{get_ipv6_address, initialize_network, test_udp, test_udp_wrapper};
 
-// external modules
+// core library
 use core::{ffi::CStr, borrow::Borrow, pin::pin};
-use embedded_nal_async::{Ipv6Addr, Ipv4Addr, SocketAddr, UdpStack as _};
+
+// external crates
 use static_cell::StaticCell;
+use embassy_futures::select::{select, select3};
+use embedded_nal_async::UdpStack as _;
+use embedded_hal::blocking::delay::DelayMs as _;
 
 // RIOT OS modules
 extern crate rust_riotmodules;
-use riot_wrappers::{
-    riot_main, println, static_command, stdio,
-    saul::registration::register_and_then, shell::{self, CommandList},
-};
-use riot_wrappers::socket_embedded_nal_async_udp::UdpStack;
-use riot_wrappers::gnrc::{self, netreg};
+use riot_wrappers::{riot_main, println};
+use riot_wrappers::shell::{self, CommandList};
+use riot_wrappers::saul::registration::register_and_then;
 use riot_wrappers::ztimer;
-use embedded_hal::blocking::delay::DelayMs;
 
 // rs-matter
-use rs_matter;
+extern crate rs_matter;
+use rs_matter::utils::select::EitherUnwrap as _;
+use rs_matter::transport::network::{UdpReceive as _, UdpSend as _};
 use rs_matter::core::{CommissioningData, Matter};
 use rs_matter::data_model::cluster_basic_information::BasicInfoConfig;
 use rs_matter::data_model::cluster_on_off;
@@ -44,6 +52,7 @@ use rs_matter::mdns::MdnsService;
 use rs_matter::transport::core::{PacketBuffers, MATTER_SOCKET_BIND_ADDR};
 use rs_matter::transport::network::UdpBuffers;
 use rs_matter::MATTER_PORT;
+use rs_matter::secure_channel::spake2p::VerifierData;
 
 
 // Application-specific constants
@@ -69,76 +78,7 @@ const NODE: Node<'static> = Node {
     ],
 };
 
-// Matter constants
-const MATTER_VID: u16 = 0xFFF1;
-const MATTER_PID: u16 = 0x8000;
-const MATTER_SERIAL: &str = "aabbccddd";
-const MATTER_DEVICE_NAME: &str = "OnOff Light";
-const MATTER_PRODUCT_NAME: &str = "Light123";
-const MATTER_VENDOR_NAME: &str = "Vendor 123";
-
-use riot_wrappers::gnrc::{Netif, ipv6::Address};
-
-fn get_ipv6_addresses(ifc: &Netif, is_local_link: bool) -> Option<Ipv6Addr> {
-    return match ifc.ipv6_addrs().unwrap().first() {
-        Some(a) => {
-            let ipv6_raw = a.raw();
-            Some(Ipv6Addr::new(
-                ((ipv6_raw[0] as u16) << 8) | ipv6_raw[1] as u16, 
-                ((ipv6_raw[2] as u16) << 8) | ipv6_raw[3] as u16, 
-                ((ipv6_raw[4] as u16) << 8) | ipv6_raw[5] as u16, 
-                ((ipv6_raw[6] as u16) << 8) | ipv6_raw[7] as u16, 
-                ((ipv6_raw[8] as u16) << 8) | ipv6_raw[9] as u16, 
-                ((ipv6_raw[10] as u16) << 8) | ipv6_raw[11] as u16, 
-                ((ipv6_raw[12] as u16) << 8) | ipv6_raw[13] as u16, 
-                ((ipv6_raw[14] as u16) << 8) | ipv6_raw[15] as u16, 
-            ))
-        },
-        None => None,
-    };
-}
-
-#[inline(never)]
-fn initialize_network() -> Result<(Ipv4Addr, Ipv6Addr, u32), MatterError> {
-    println!("Init network...");
-
-    let ipv4: Ipv4Addr = Ipv4Addr::UNSPECIFIED;
-    let mut ipv6: Ipv6Addr = Ipv6Addr::UNSPECIFIED;
-
-    // Get available network interface(s)
-    println!("Found {} network interface(s)", Netif::all().count());
-    let mut interfaces = Netif::all();
-    
-    // Get first available interface
-    let ifc_0 = interfaces.nth(0);
-    if ifc_0.is_none() {
-        println!("ERROR: No network interface was found!");
-        return Err(MatterError::new(rs_matter::error::ErrorCode::NoNetworkInterface));
-    }
-    let ifc_0 = ifc_0.unwrap();
-
-    // Check name and status of KernelPID
-    let pid = ifc_0.pid();
-    let ifc_name: &str = pid.get_name().unwrap();
-    println!("Thread status of {:?}: {:?}", pid.get_name().unwrap(), pid.status().unwrap());
-
-    // Get available IPv6 link-local address
-    let addresses = get_ipv6_addresses(&ifc_0, true);
-    match addresses {
-        Some(ipv6) => {
-            println!(
-                "Will use network interface {} with {}/{}",
-                ifc_name, ipv4, ipv6
-            );
-            return Ok((ipv4, ipv6, 0 as _));
-        },
-        None => return Err(MatterError::new(rs_matter::error::ErrorCode::StdIoError)),
-    }
-
-    Ok((ipv4, ipv6, 0 as _))
-}
-
-fn handler<'a>(matter: &'a Matter<'a>) -> impl Metadata + NonBlockingHandler + 'a {
+fn matter_handler<'a>(matter: &'a Matter<'a>) -> impl Metadata + NonBlockingHandler + 'a {
     (
         NODE,
         root_endpoint::handler(0, matter)
@@ -155,106 +95,10 @@ fn handler<'a>(matter: &'a Matter<'a>) -> impl Metadata + NonBlockingHandler + '
     )
 }
 
-async fn run_matter() -> Result<(), MatterError> {
-    println!("Starting Matter...");
-    // 1. Create node
-    let dev_det = BasicInfoConfig {
-        vid: MATTER_VID,
-        pid: MATTER_PID,
-        hw_ver: 2,
-        sw_ver: 1,
-        sw_ver_str: "1",
-        serial_no: MATTER_SERIAL,
-        device_name: MATTER_DEVICE_NAME,
-        product_name: MATTER_PRODUCT_NAME,
-        vendor_name: MATTER_VENDOR_NAME,
-    };
-
-    // 2. Initialize network
-    let (ipv4_addr, ipv6_addr, interface) = initialize_network()?;
-    
-    // 3. Initialize mDNS Service
-    let mdns = MdnsService::new(
-        0,
-        "rs-matter-demo",
-        ipv4_addr.octets(),
-        Some((ipv6_addr.octets(), interface)),
-        &dev_det,
-        MATTER_PORT,
-    );
-    println!("mDNS initialized!");
-
-    // 4. Start Matter
-    let dev_att = dev_att::HardCodedDevAtt::new();
-    let epoch = rs_matter::utils::epoch::dummy_epoch;
-    let rand = rs_matter::utils::rand::dummy_rand;
-    let matter = Matter::new(
-        // vid/pid should match those in the DAC
-        &dev_det,
-        &dev_att,
-        &mdns,
-        epoch,
-        rand,
-        MATTER_PORT,
-    );
-    let handler = HandlerCompat(handler(&matter));
-
-    // When using a custom UDP stack (e.g. for `no_std` environments), replace with a UDP socket bind + multicast join for your custom UDP stack
-    // The returned socket should be splittable into two halves, where each half implements `UdpSend` and `UdpReceive` respectively
-    static UDP_SOCKET: StaticCell<riot_sys::sock_udp_t> = StaticCell::new();
-    let stack = riot_wrappers::socket_embedded_nal_async_udp::UdpStack::new(|| UDP_SOCKET.try_uninit());
-    let (addr, socket) = stack
-        .bind_single(MDNS_SOCKET_BIND_ADDR)
-        .await
-        .expect("Can't create a socket");
-    println!("Bound socket to {:?} - {:?}", MDNS_SOCKET_BIND_ADDR, addr.ip());
-
-    let mut udp_buffers = UdpBuffers::new();
-    // TODO: 2nd parameter passed to mdns.run is not accepted because: 
-    //  'the trait `UdpReceive` is not implemented for `&UnconnectedUdpSocket`'
-    //let mut mdns_runner = pin!(mdns.run(&socket, &socket, &mut udp_buffers));
-
-    Ok(())
-}
-
-fn cmd_onoff(_stdio: &mut stdio::Stdio, args: shell::Args<'_>) {
-    let arg_state = args.get(1);
-    match arg_state {
-        Some(state_str) => {
-            let is_on: bool;
-            match state_str {
-                "on" => is_on = true,
-                "off" => is_on = false,
-                _ => {
-                    println!("Invalid argument for LED state (must be 'on' or 'off')");
-                    return;
-                }
-            }
-            use riot_wrappers::saul::{Phydat, ActuatorClass};
-            let rgb_led = saul_reg::find_actuator(ActuatorClass::LedRgb).expect("No registered RGB LED was found!");
-            let data: Phydat;
-            if is_on {
-                data = Phydat::new(&[1, 1, 1], None, 0);
-            } else {
-                data = Phydat::new(&[0, 0, 0], None, 0);
-            }
-            let _ = rgb_led.write(data);
-        }
-        None => {
-            println!("Usage: onoff [on|off]");
-        }
-    }
-}
-
-static_command!(
-    cmd_onoff,
-    "onoff",
-    "Turn the Color Light on or off",
-    cmd_onoff
-);
-
 riot_main!(main);
 fn main() -> ! {
+    let mut delay = ztimer::Clock::msec();
+    delay.delay_ms(1200);
     println!("Hello Matter on RIOT!");
 
     let mut board_led = gpio::get_output(LED_PORT, LED_PIN);
@@ -284,50 +128,124 @@ fn main() -> ! {
     );
 }
 
-use embedded_nal_async::UnconnectedUdp;
-
 #[embassy_executor::task]
-async fn amain(spawner: embassy_executor::Spawner) {
-    let (ipv4_addr, ipv6_addr, interface) = initialize_network().unwrap();
+async fn amain(_spawner: embassy_executor::Spawner) {
+    println!("Running async main...");
+    run_matter().await;
+    println!("Matter exited");
+}
 
-    static UDP_SOCKET: StaticCell<riot_sys::sock_udp_t> = StaticCell::new();
-    let stack = riot_wrappers::socket_embedded_nal_async_udp::UdpStack::new(|| UDP_SOCKET.try_uninit());
-    let addr = SocketAddr::new("::".parse().unwrap(), 5683);
-/*     let mut sock = stack
-        .bind_multiple(addr)
-        .await
-        .expect("Can't create a socket"); */
-    let (sock_addr, mut sock) = stack
-        .bind_single(addr)
+async fn run_matter() {
+    println!("Network Stack init...");
+
+    // 1. Initialize network stack
+    let (ipv4_addr, ipv6_addr, interface) = initialize_network().expect("Error initializing network");
+    
+    static UDP_MDNS_SOCKET: StaticCell<riot_sys::sock_udp_t> = StaticCell::new();
+    let udp_mdns_stack = riot_wrappers::socket_embedded_nal_async_udp::UdpStack::new(|| UDP_MDNS_SOCKET.try_uninit());
+    println!("UDP stack created (mDNS)");
+    
+    static UDP_MATTER_SOCKET: StaticCell<riot_sys::sock_udp_t> = StaticCell::new();
+    let udp_matter_stack = riot_wrappers::socket_embedded_nal_async_udp::UdpStack::new(|| UDP_MATTER_SOCKET.try_uninit());
+    println!("UDP stack created (Matter)");
+    
+    let (mdns_addr, mut mdns_sock) = udp_mdns_stack
+        .bind_single(MDNS_SOCKET_BIND_ADDR)
         .await
         .expect("Can't create a socket");
-    println!("Local address: {:?}", &sock_addr);
+    println!("Bound mDNS address: {:?}", &mdns_addr);
+    //test_udp(&mut mdns_sock).await;
+    let mut mdns_sock_wrapper = RiotSocket::new(mdns_addr, mdns_sock);
+    test_udp_wrapper(&mut mdns_sock_wrapper).await;
+    return;
+    
+    let (matter_addr, mut matter_sock) = udp_matter_stack
+        .bind_single(MATTER_SOCKET_BIND_ADDR)
+        .await
+        .expect("Can't create a socket");
+    println!("Bound Matter address: {:?}", &matter_addr);
+    let mut matter_sock_wrapper = RiotSocket::new(matter_addr, matter_sock);
 
-    println!("Waiting for receiving UDP packet...");
-    let mut buffer: &mut [u8] = &mut [0 as u8; 255 as usize];
-    let res = sock.receive_into(buffer).await;
-    match res {
-        Ok((size, addr1, addr2)) => println!("UDP packet received"),
-        Err(_) => println!("Error on UDP receive"),
-    }
+    // let mut matter_test_runner = pin!(test_udp(&mut matter_sock));
+    let mut mdns_test_runner = pin!(test_udp_wrapper(&mut mdns_sock_wrapper));
+    //let mut matter_test_runner = pin!(test_udp_wrapper(&mut matter_sock_wrapper));
+    let mut matter_test_runner = pin!(async { println!("test"); loop{} });
+    select(&mut mdns_test_runner, &mut matter_test_runner).await;
+    return;
+    
+    // 2. Define Product Info
+    let dev_det = BasicInfoConfig {
+        vid: 0xFFF1,
+        pid: 0x8000,
+        hw_ver: 2,
+        sw_ver: 1,
+        sw_ver_str: "1",
+        serial_no: "aabbccddd",
+        device_name: "OnOff Light",
+        product_name: "Light123",
+        vendor_name: "Vendor 123",
+    };
 
-    let a = async {
-        let mut delay = ztimer::Clock::msec();
-        for i in 0..10 {
-            delay.delay_ms(200);
-            println!("First future: {}", i);
-            embassy_futures::yield_now().await;
-        }
+    // 3. Get Device attestation data
+    let dev_att = dev_att::HardCodedDevAtt::new();
+
+    // 4. TODO: Provide own epoch and rand functions
+    let epoch = rs_matter::utils::epoch::dummy_epoch;
+    let rand = rs_matter::utils::rand::dummy_rand;
+    
+    // 5. Create mDNS Service
+    let mdns = MdnsService::new(
+        0,
+        "rs-matter-demo",
+        ipv4_addr.octets(),
+        Some((ipv6_addr.octets(), interface)),
+        &dev_det,
+        MATTER_PORT,
+    );
+    
+    println!("mDNS initialized!");
+    
+    // 6. Create Matter struct
+    let matter = Matter::new(
+        // vid/pid should match those in the DAC
+        &dev_det,
+        &dev_att,
+        &mdns,
+        epoch,
+        rand,
+        MATTER_PORT,
+    );
+    
+    println!("matter initialized!");
+
+    let handler = HandlerCompat(matter_handler(&matter));
+    
+    // Create mDNS Service Runner
+    let mut udp_buffers = UdpBuffers::new();
+    // TODO: in function `embassy_time_driver::now': undefined reference to `_embassy_time_now'
+    //let mut mdns_runner = pin!(mdns.run(&mdns_sock_wrapper, &mdns_sock_wrapper, &mut udp_buffers));
+    let mut mdns_runner = pin!(async {println!("asd")});
+    
+    let mut udp_buffers = UdpBuffers::new();
+    let mut packet_buffers = PacketBuffers::new();
+    let comm_data = CommissioningData {
+            // TODO: Hard-coded for now
+            verifier: VerifierData::new_with_pw(123456, *matter.borrow()),
+            discriminator: 250,
     };
-    let b = async {
-        let mut delay = ztimer::Clock::msec();
-        for i in 0..10 {
-            delay.delay_ms(100);
-            println!("Second future: {}", i);
-            embassy_futures::yield_now().await;
-        }
-    };
-    embassy_futures::join::join(
-        a, b
-    ).await;
+    let mut matter_runner = pin!(matter.run(
+        &matter_sock_wrapper, 
+        &matter_sock_wrapper, 
+        &mut udp_buffers, 
+        &mut packet_buffers, 
+        comm_data, 
+        &handler));
+    let mut matter_runner = pin!(async {println!("asd")});
+    return;
+
+    let mut psm = persist::Psm::new(&matter).expect("Error creating PSM");
+    let mut psm_runner = pin!(psm.run());
+    
+    select3(&mut mdns_runner, &mut matter_runner, &mut psm_runner).await;
+    return;
 }
