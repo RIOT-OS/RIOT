@@ -348,7 +348,7 @@ static int read_command(const pn532_t *dev, uint8_t *buff, unsigned len, int exp
 static int send_check_ack(pn532_t *dev, uint8_t *buff, unsigned len)
 {
     if (send_cmd(dev, buff, len) > 0) {
-        static char ack[] = { 0x00, 0x00, 0xff, 0x00, 0xff, 0x00 };
+        static uint8_t ack[] = { 0x00, 0x00, 0xff, 0x00, 0xff, 0x00 };
 
         wait_ready(dev);
         if (_read(dev, buff, sizeof(ack)) != sizeof(ack) + 1) {
@@ -428,7 +428,7 @@ int pn532_write_reg(pn532_t *dev, unsigned addr, char val)
     return send_rcv(dev, buff, 3, 0);
 }
 
-static int _rf_configure(pn532_t *dev, uint8_t *buff, unsigned cfg_item, char *config,
+static int _rf_configure(pn532_t *dev, uint8_t *buff, unsigned cfg_item, uint8_t *config,
                          unsigned cfg_len)
 {
     buff[BUFF_CMD_START ] = CMD_RF_CONFIG;
@@ -442,7 +442,7 @@ static int _rf_configure(pn532_t *dev, uint8_t *buff, unsigned cfg_item, char *c
 
 static int _set_act_retries(pn532_t *dev, uint8_t *buff, unsigned max_retries)
 {
-    char rtrcfg[] = { 0xff, 0x01, max_retries & 0xff };
+    uint8_t rtrcfg[] = { 0xff, 0x01, max_retries & 0xff };
 
     return _rf_configure(dev, buff, RF_CONFIG_MAX_RETRIES, rtrcfg, sizeof(rtrcfg));
 }
