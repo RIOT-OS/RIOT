@@ -26,6 +26,7 @@ use static_cell::StaticCell;
 use embassy_futures::select::{select, select3};
 use embedded_nal_async::UdpStack as _;
 use embedded_hal::blocking::delay::DelayMs as _;
+use embedded_hal_async::delay::DelayNs as _;
 
 // RIOT OS modules
 extern crate rust_riotmodules;
@@ -45,7 +46,7 @@ use rs_matter::data_model::device_types::DEV_TYPE_ON_OFF_LIGHT;
 use rs_matter::data_model::objects::*;
 use rs_matter::data_model::root_endpoint;
 use rs_matter::data_model::system_model::descriptor;
-use rs_matter::error::Error as MatterError;
+use rs_matter::error::{Error as MatterError, Error};
 use rs_matter::mdns::builtin::{
     MDNS_IPV4_BROADCAST_ADDR, MDNS_IPV6_BROADCAST_ADDR, MDNS_SOCKET_BIND_ADDR,
 };
@@ -148,8 +149,23 @@ async fn amain(spawner: embassy_executor::Spawner) {
              core::mem::size_of::<PacketBuffers>()
     );
 
+    let (ipv4_addr, ipv6_addr, interface) = initialize_network().expect("Error getting network interface and IP addresses");
+
+    static MDNS: StaticCell<MdnsService> = StaticCell::new();
+    let mdns_service: &'static MdnsService = MDNS.init(MdnsService::new(
+        0,
+        "rs-matter-demo",
+        ipv4_addr.octets(),
+        Some((ipv6_addr.octets(), interface)),
+        &DEV_DET,
+        MATTER_PORT,
+    ));
+
     println!("Spawning mDNS Service...");
-    spawner.spawn(run_mdns()).unwrap();
+    spawner.spawn(run_mdns(mdns_service)).unwrap();
+
+    println!("Spawning Matter Service...");
+    spawner.spawn(run_matter(spawner, mdns_service)).unwrap();
 
     //run_matter().await;
     println!("Matter exited");
@@ -168,17 +184,8 @@ static DEV_DET: BasicInfoConfig = BasicInfoConfig {
 };
 
 #[embassy_executor::task]
-async fn run_mdns() {
+async fn run_mdns(mdns: &'static MdnsService<'_>) {
     let (ipv4_addr, ipv6_addr, interface) = initialize_network().expect("Error getting network interface and IP addresses");
-
-    let mdns = MdnsService::new(
-        0,
-        "rs-matter-demo",
-        ipv4_addr.octets(),
-        Some((ipv6_addr.octets(), interface)),
-        &DEV_DET,
-        MATTER_PORT,
-    );
 
     println!("mDNS initialized!");
 
@@ -194,7 +201,9 @@ async fn run_mdns() {
     println!("Bound mDNS to {:?}", &mdns_addr);
 
     let socket = RiotSocket::new(mdns_addr, mdns_sock);
+
     let mut mdns_udp_buffers = UdpBuffers::new();
+
     let mdns_runner = pin!(mdns.run(
         &socket,
         &socket,
@@ -203,7 +212,7 @@ async fn run_mdns() {
     
     match mdns_runner.await {
         Ok(_) => {
-            println!("mDNS terminated successfullt!");
+            println!("mDNS terminated successfully!");
         }
         Err(_) => {
             println!("mDNS terminated with error!");
@@ -212,9 +221,16 @@ async fn run_mdns() {
 }
 
 #[embassy_executor::task]
-async fn run_matter(spawner: embassy_executor::Spawner) {
-    // Initialize network stack
-    let (ipv4_addr, ipv6_addr, interface) = initialize_network().expect("Error getting network interface and IP addresses");
+async fn run_matter(spawner: embassy_executor::Spawner, mdns: &'static MdnsService<'_>) {
+    let test_runner = pin!(async {
+        loop {
+            println!("Matter - test runner...");
+            ztimer::Delay.delay_ms(1000).await;
+        }
+    });
+    test_runner.await;
+    println!("Matter - test runner exited!");
+    return;
 
     // --- INIT + START MATTER SERVICE
     static UDP_MATTER_SOCKET: StaticCell<riot_sys::sock_udp_t> = StaticCell::new();
@@ -235,7 +251,6 @@ async fn run_matter(spawner: embassy_executor::Spawner) {
     let epoch = rs_matter::utils::epoch::dummy_epoch;
     let rand = rs_matter::utils::rand::dummy_rand;
 
-    /*
     let matter = Matter::new(
         // vid/pid should match those in the DAC
         &DEV_DET,
@@ -246,6 +261,7 @@ async fn run_matter(spawner: embassy_executor::Spawner) {
         MATTER_PORT,
     );
 
+    /*
     let handler = HandlerCompat(matter_handler(&matter));
 
     // Create Matter runner
@@ -270,18 +286,26 @@ async fn run_matter(spawner: embassy_executor::Spawner) {
 
      match matter_runner.await {
         Ok(_) => {
-            println!("mDNS terminated successfullt!");
+            println!("Matter terminated successfully!");
         }
         Err(_) => {
-            println!("mDNS terminated with error!");
+            println!("Matter terminated with error!");
         }
     }
     */
 }
 
 #[embassy_executor::task]
-async fn run_psm() {
+async fn run_psm(matter: &'static mut Matter<'_>) {
     // TODO: Develop own 'Persistence Manager' using RIOT OS modules
-    //let mut psm = persist::Psm::new(&matter).expect("Error creating PSM");
-    //let mut psm_runner = pin!(psm.run());
+    let mut psm = persist::Psm::new(&matter).expect("Error creating PSM");
+    let mut psm_runner = pin!(psm.run());
+    match psm_runner.await {
+        Ok(_) => {
+            println!("PSM terminated successfully!");
+        }
+        Err(_) => {
+            println!("PSM terminated with error!");
+        }
+    }
 }
