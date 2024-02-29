@@ -222,8 +222,8 @@ psa_status_t atca_cipher_set_iv(void *op_context,
     atca_aes_cbc_ctx_t *ctx = &((psa_se_cipher_context_t *)op_context)->drv_ctx.atca_aes_cbc;
 
     if (iv_length != ATCA_MAX_IV_LEN) {
-        DEBUG("ATCA Cipher Set IV: Invalid IV length: Expected %d, was %d\n", \
-                ATCA_MAX_IV_LEN, iv_length);
+        DEBUG("ATCA Cipher Set IV: Invalid IV length: Expected %"PRIuSIZE", was %"PRIuSIZE"\n", \
+                (size_t)ATCA_MAX_IV_LEN, iv_length);
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
@@ -303,7 +303,7 @@ psa_status_t atca_cipher_ecb(psa_drv_se_context_t *drv_context,
     }
 
     if (input_size % AES_128_BLOCK_SIZE != 0) {
-        DEBUG("ATCA Cipher ECB: Input must be multiple of 16, was %d.\n", input_size);
+        DEBUG("ATCA Cipher ECB: Input must be multiple of 16, was %"PRIuSIZE".\n", input_size);
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
@@ -460,7 +460,7 @@ psa_status_t atca_generate_key(psa_drv_se_context_t *drv_context,
     }
 
     if (pubkey_size > PSA_EXPORT_PUBLIC_KEY_OUTPUT_SIZE(attributes->type, attributes->bits)) {
-        DEBUG("ATCA Generate Key: Pubkey size not supported. Expected %d, was %d.\n", \
+        DEBUG("ATCA Generate Key: Pubkey size not supported. Expected %"PRIuSIZE", was %"PRIuSIZE".\n", \
                 PSA_EXPORT_PUBLIC_KEY_OUTPUT_SIZE(attributes->type, attributes->bits), pubkey_size);
         return PSA_ERROR_NOT_SUPPORTED;
     }
@@ -502,8 +502,8 @@ psa_status_t atca_export_public_key(psa_drv_se_context_t *drv_context,
     ATCADevice dev = (ATCADevice)drv_context->transient_data;
 
     if (data_size < ECC_P256_PUB_KEY_SIZE) {
-        DEBUG("ATCA Export public key: Buffer too small, expected %d, was %d\n", \
-                ECC_P256_PUB_KEY_SIZE, data_size);
+        DEBUG("ATCA Export public key: Buffer too small, expected %"PRIuSIZE", was %"PRIuSIZE"\n", \
+                (size_t)ECC_P256_PUB_KEY_SIZE, data_size);
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
@@ -550,9 +550,9 @@ psa_status_t atca_sign(psa_drv_se_context_t *drv_context,
 
     if ((signature_size != ECC_P256_PUB_KEY_SIZE) || \
         (hash_length != PSA_HASH_LENGTH(PSA_ALG_SHA_256))) {
-        DEBUG("ATCA Sign: Invalid signature or hash size. Expected Sig: %d |\
-        Hash %d, were Sig: %d | Hash: %d\n",\
-        ECC_P256_PUB_KEY_SIZE, PSA_HASH_LENGTH(PSA_ALG_SHA_256),\
+        DEBUG("ATCA Sign: Invalid signature or hash size. Expected Sig: %"PRIuSIZE" |\
+        Hash %"PRIuSIZE", were Sig: %"PRIuSIZE" | Hash: %"PRIuSIZE"\n",\
+        (size_t)ECC_P256_PUB_KEY_SIZE, (size_t)PSA_HASH_LENGTH(PSA_ALG_SHA_256),\
         signature_size, hash_length);
         return PSA_ERROR_INVALID_ARGUMENT;
     }
@@ -589,9 +589,9 @@ psa_status_t atca_verify(psa_drv_se_context_t *drv_context,
 
     if ((signature_length != ECC_P256_PUB_KEY_SIZE) || \
         (hash_length != PSA_HASH_LENGTH(PSA_ALG_SHA_256))) {
-        DEBUG("ATCA Sign: Invalid signature or hash size. Expected Sig: %d |\
-        Hash %d, were Sig: %d | Hash: %d\n",\
-        ECC_P256_PUB_KEY_SIZE, PSA_HASH_LENGTH(PSA_ALG_SHA_256),\
+        DEBUG("ATCA Sign: Invalid signature or hash size. Expected Sig: %"PRIuSIZE" |\
+        Hash %"PRIuSIZE", were Sig: %"PRIuSIZE" | Hash: %"PRIuSIZE"\n",\
+        (size_t)ECC_P256_PUB_KEY_SIZE, (size_t)PSA_HASH_LENGTH(PSA_ALG_SHA_256),\
         signature_length, hash_length);
         return PSA_ERROR_INVALID_ARGUMENT;
     }
@@ -624,8 +624,8 @@ psa_status_t atca_generate_mac(psa_drv_se_context_t *drv_context,
     }
 
     if (mac_size < PSA_HASH_LENGTH(PSA_ALG_SHA_256)) {
-        DEBUG("ATCA Generate Mac: Buffer too small, expected %d, was %d\n", \
-        PSA_HASH_LENGTH(PSA_ALG_SHA_256), mac_size);
+        DEBUG("ATCA Generate Mac: Buffer too small, expected %"PRIuSIZE", was %"PRIuSIZE"\n", \
+        (size_t)PSA_HASH_LENGTH(PSA_ALG_SHA_256), mac_size);
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
