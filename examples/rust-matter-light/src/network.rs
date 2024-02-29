@@ -53,7 +53,7 @@ impl UdpReceive for RiotSocket {
 
 impl UdpSend for &RiotSocket {
     async fn send_to(&mut self, data: &[u8], addr: SocketAddr) -> Result<(), MatterError> {
-        println!("[RiotSocket] send_to {:?}", &addr);
+        println!("[RiotSocket] send_to {:?} - wait for lock...", &addr);
         if addr.is_ipv6() {
             let res = self.socket.lock().deref_mut().send(self.local_addr, addr, data).await;
             match res {
