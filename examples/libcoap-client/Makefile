@@ -38,6 +38,8 @@ USEMODULE += prng_sha1prng
 
 # libcoap support
 USEPKG += libcoap
+# Uncomment to enable libcoap OSCORE support
+# USEMODULE += libcoap_oscore
 
 # Configure if DNS is required
 # USEMODULE += sock_dns

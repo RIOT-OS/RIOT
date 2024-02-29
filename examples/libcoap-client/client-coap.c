@@ -9,17 +9,12 @@
  * of use.
  */
 
-#include "coap_config.h"
-#include <coap3/coap.h>
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include "client-coap.h"
-#include "macros/utils.h"
-#include "net/utils.h"
-#include <arpa/inet.h>
 #include <thread.h>
 #include <debug.h>
+#include <coap3/coap.h>
+#include "client-coap.h"
+#include <stdio.h>
+#include "macros/utils.h"
 
 #ifdef CONFIG_LIBCOAP_CLIENT_URI
 #define COAP_CLIENT_URI CONFIG_LIBCOAP_CLIENT_URI
@@ -43,6 +38,11 @@ static coap_context_t *main_coap_context = NULL;
 static coap_optlist_t *optlist = NULL;
 
 static int quit = 0;
+static int is_mcast = 0;
+
+#define DEFAULT_WAIT_TIME 15
+
+unsigned int wait_seconds = DEFAULT_WAIT_TIME; /* default timeout in seconds */
 
 static coap_response_t
 message_handler(coap_session_t *session,
@@ -111,6 +111,7 @@ resolve_address(const char *host, const char *service, coap_address_t *dst,
     if (addr_info) {
         ret = 1;
         *dst = addr_info->addr;
+        is_mcast = coap_is_mcast(dst);
     }
 
     coap_free_address_info(addr_info);
@@ -127,6 +128,8 @@ client_coap_init(int argc, char **argv)
     int len;
     coap_uri_t uri;
     char portbuf[8];
+    unsigned int wait_ms = 0;
+    int result = -1;
 
 #define BUFSIZE 100
     unsigned char buf[BUFSIZE];
@@ -214,7 +217,7 @@ client_coap_init(int argc, char **argv)
     coap_register_nack_handler(main_coap_context, nack_handler);
 
     /* construct CoAP message */
-    pdu = coap_pdu_init(coap_is_mcast(&dst) ? COAP_MESSAGE_NON : COAP_MESSAGE_CON,
+    pdu = coap_pdu_init(is_mcast ? COAP_MESSAGE_NON : COAP_MESSAGE_CON,
                         COAP_REQUEST_CODE_GET,
                         coap_new_message_id(session),
                         coap_session_max_pdu_size(session));
@@ -237,6 +240,11 @@ client_coap_init(int argc, char **argv)
             goto fail;
         }
     }
+    if (is_mcast) {
+        /* Allow for other servers to respond within DEFAULT_LEISURE RFC7252 8.2 */
+        wait_seconds = coap_session_get_default_leisure(session).integer_part + 1;
+    }
+    wait_ms = wait_seconds * 1000;
 
     /* and send the PDU */
     mid = coap_send(session, pdu);
@@ -244,8 +252,18 @@ client_coap_init(int argc, char **argv)
         coap_log_warn("Failed to send PDU\n");
         goto fail;
     }
-    while (!quit) {
-        coap_io_process(main_coap_context, 1000);
+    while (!quit || is_mcast) {
+        result = coap_io_process(main_coap_context, 1000);
+        if (result >= 0) {
+            if (wait_ms > 0) {
+                if ((unsigned)result >= wait_ms) {
+                    coap_log_info("timeout\n");
+                    break;
+                } else {
+                    wait_ms -= result;
+                }
+            }
+        }
     }
 fail:
     /* Clean up library usage so client can be run again */

@@ -145,9 +145,9 @@ init_coap_context_endpoints(const char *use_psk)
     }
 
     coap_address_init(&listenaddress);
-    listenaddress.addr.sin6.sin6_family = AF_INET6;
-    memcpy(&listenaddress.addr.sin6.sin6_addr, &addr,
-           sizeof(listenaddress.addr.sin6.sin6_addr));
+    listenaddress.riot.family = AF_INET6;
+    memcpy(&listenaddress.riot.addr.ipv6, &addr,
+           sizeof(listenaddress.riot.addr.ipv6));
     coap_print_ip_addr(&listenaddress, addr_str, sizeof(addr_str));
     coap_log_info("Server IP [%s]\n", addr_str);
 

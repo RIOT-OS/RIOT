@@ -14,7 +14,7 @@ if KCONFIG_USEPKG_LIBCOAP
 
 choice LIBCOAP_DEBUG_LEVEL
     bool "Set CoAP debugging level"
-    default LIBCOAP_LOG_WARNING
+    default LIBCOAP_LOG_INFO
     help
         Set CoAP debugging level
 
@@ -57,6 +57,7 @@ config LIBCOAP_IPV4_SUPPORT
         Enable IPv4 functionality for CoAP.
 
         If this option is disabled, redundant CoAP IPv4 code is removed.
+        [RIOT sock gnrc does not support this]
 
 config LIBCOAP_IPV6_SUPPORT
     bool "Enable IPv6 support within CoAP"
@@ -66,6 +67,8 @@ config LIBCOAP_IPV6_SUPPORT
 
         If this option is disabled, redundant CoAP IPv6 code is removed.
 
+if USEMODULE_SOCK_TCP
+
 config LIBCOAP_TCP_SUPPORT
     bool "Enable TCP support within CoAP"
     default n
@@ -74,14 +77,21 @@ config LIBCOAP_TCP_SUPPORT
         are to be used. Note that RIOT TCP support also needs to be enabled.
 
         If this option is disabled, redundant CoAP TCP code is removed.
+        [RIOT sock gnrc does not support this]
+
+endif # USEMODULE_SOCK_TCP
+
+if USEMODULE_LIBCOAP_OSCORE
 
 config LIBCOAP_OSCORE_SUPPORT
     bool "Enable OSCORE support within CoAP"
-    default n
+    default y
     help
         Enable OSCORE functionality for CoAP.
 
         If this option is disabled, redundant CoAP OSCORE code is removed.
+
+endif # MODULE_LIBCOAP_OSCORE
 
 config LIBCOAP_OBSERVE_PERSIST
     bool "Enable Observe persist support within CoAP"

@@ -16,9 +16,6 @@
 extern "C" {
 #endif
 
-#include "coap_config.h"
-#include <coap3/coap.h>
-
 /* Start up the CoAP Server */
 void libcoap_test_run(void);
 

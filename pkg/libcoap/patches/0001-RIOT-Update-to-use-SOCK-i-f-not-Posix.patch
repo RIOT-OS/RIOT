@@ -1,0 +1,2216 @@
+From c3fc2ea9971cdad74ac06cd7574126602da16a2e Mon Sep 17 00:00:00 2001
+From: Jon Shallow <supjps-libcoap@jpshallow.com>
+Date: Mon, 26 Feb 2024 15:26:06 +0000
+Subject: [PATCH 1/1] RIOT: Update to use SOCK i/f, not Posix
+
+Remove all references to Posix functions, using Sock functions as appropriate.
+
+Update coap_address_t to be RIOT specific when doing RIOT builds.
+---
+ coap_config.h.riot                            |   8 +-
+ coap_config.h.riot.in                         |   8 +-
+ .../riot/examples_libcoap_client/Makefile     |   2 +
+ .../examples_libcoap_client/client-coap.c     |  40 +-
+ .../examples_libcoap_client/client-coap.h     |   3 -
+ .../riot/examples_libcoap_server/Makefile     |   3 +-
+ .../examples_libcoap_server/server-coap.c     |   6 +-
+ .../examples_libcoap_server/server-coap.h     |   3 -
+ examples/riot/pkg_libcoap/Kconfig             |  14 +-
+ examples/riot/pkg_libcoap/Makefile            |  19 +-
+ examples/riot/pkg_libcoap/Makefile.dep        |  11 +-
+ examples/riot/pkg_libcoap/Makefile.oscore     |  10 +
+ .../riot/tests_pkg_libcoap/libcoap-test.h     |   3 -
+ include/coap3/coap_address.h                  |  51 +-
+ include/coap3/coap_io_internal.h              |  18 +-
+ include/coap3/coap_mutex_internal.h           |  14 +-
+ include/coap3/coap_net.h                      |   4 +
+ include/coap3/coap_net_internal.h             |   5 +
+ include/coap3/coap_threadsafe_internal.h      |   4 +
+ include/coap3/libcoap.h                       |   4 +-
+ src/coap_address.c                            | 100 ++-
+ src/coap_debug.c                              |  68 +-
+ src/coap_io.c                                 | 101 +--
+ src/coap_io_riot.c                            | 660 +++++++++++++++++-
+ src/coap_mem.c                                |   4 +-
+ src/coap_tcp.c                                |  32 +-
+ src/coap_threadsafe.c                         |   2 +
+ src/coap_tinydtls.c                           |  38 +-
+ 28 files changed, 990 insertions(+), 245 deletions(-)
+ create mode 100644 examples/riot/pkg_libcoap/Makefile.oscore
+
+diff --git a/coap_config.h.riot b/coap_config.h.riot
+index 17a857ef..9d311053 100644
+--- a/coap_config.h.riot
++++ b/coap_config.h.riot
+@@ -268,7 +268,7 @@
+ /* #undef AC_APPLE_UNIVERSAL_BUILD */
+ 
+ /* Define to 1 if you have the <arpa/inet.h> header file. */
+-#define HAVE_ARPA_INET_H 1
++/* #undef HAVE_ARPA_INET_H */
+ 
+ /* Define to 1 if you have the <assert.h> header file. */
+ #define HAVE_ASSERT_H 1
+@@ -296,13 +296,13 @@
+ /* #undef HAVE_NETDB_H */
+ 
+ /* Define to 1 if you have the <netinet/in.h> header file. */
+-#define HAVE_NETINET_IN_H 1
++/* #define HAVE_NETINET_IN_H */
+ 
+ /* Define to 1 if you have the `select' function. */
+ /* #undef HAVE_SELECT */
+ 
+ /* Define to 1 if you have the `socket' function. */
+-#define HAVE_SOCKET 1
++/* #undef HAVE_SOCKET */
+ 
+ /* Define to 1 if you have the <stdint.h> header file. */
+ #define HAVE_STDINT_H 1
+@@ -326,7 +326,7 @@
+ #define HAVE_STRRCHR 1
+ 
+ /* Define to 1 if you have the <sys/socket.h> header file. */
+-#define HAVE_SYS_SOCKET_H 1
++/* #undef HAVE_SYS_SOCKET_H */
+ 
+ /* Define to 1 if you have the <sys/stat.h> header file. */
+ /* #undef HAVE_SYS_STAT_H */
+diff --git a/coap_config.h.riot.in b/coap_config.h.riot.in
+index 83124476..ede0d03e 100644
+--- a/coap_config.h.riot.in
++++ b/coap_config.h.riot.in
+@@ -268,7 +268,7 @@
+ /* #undef AC_APPLE_UNIVERSAL_BUILD */
+ 
+ /* Define to 1 if you have the <arpa/inet.h> header file. */
+-#define HAVE_ARPA_INET_H 1
++/* #undef HAVE_ARPA_INET_H */
+ 
+ /* Define to 1 if you have the <assert.h> header file. */
+ #define HAVE_ASSERT_H 1
+@@ -296,13 +296,13 @@
+ /* #undef HAVE_NETDB_H */
+ 
+ /* Define to 1 if you have the <netinet/in.h> header file. */
+-#define HAVE_NETINET_IN_H 1
++/* #define HAVE_NETINET_IN_H */
+ 
+ /* Define to 1 if you have the `select' function. */
+ /* #undef HAVE_SELECT */
+ 
+ /* Define to 1 if you have the `socket' function. */
+-#define HAVE_SOCKET 1
++/* #undef HAVE_SOCKET */
+ 
+ /* Define to 1 if you have the <stdint.h> header file. */
+ #define HAVE_STDINT_H 1
+@@ -326,7 +326,7 @@
+ #define HAVE_STRRCHR 1
+ 
+ /* Define to 1 if you have the <sys/socket.h> header file. */
+-#define HAVE_SYS_SOCKET_H 1
++/* #undef HAVE_SYS_SOCKET_H */
+ 
+ /* Define to 1 if you have the <sys/stat.h> header file. */
+ /* #undef HAVE_SYS_STAT_H */
+diff --git a/examples/riot/examples_libcoap_client/Makefile b/examples/riot/examples_libcoap_client/Makefile
+index 813a521c..8f989f56 100644
+--- a/examples/riot/examples_libcoap_client/Makefile
++++ b/examples/riot/examples_libcoap_client/Makefile
+@@ -38,6 +38,8 @@ USEMODULE += prng_sha1prng
+ 
+ # libcoap support
+ USEPKG += libcoap
++# Uncomment to enable libcoap OSCORE support
++# USEMODULE += libcoap_oscore
+ 
+ # Configure if DNS is required
+ # USEMODULE += sock_dns
+diff --git a/examples/riot/examples_libcoap_client/client-coap.c b/examples/riot/examples_libcoap_client/client-coap.c
+index d98c6eb7..31a2ad7e 100644
+--- a/examples/riot/examples_libcoap_client/client-coap.c
++++ b/examples/riot/examples_libcoap_client/client-coap.c
+@@ -9,17 +9,12 @@
+  * of use.
+  */
+ 
+-#include "coap_config.h"
++#include <thread.h>
++#include <debug.h>
+ #include <coap3/coap.h>
+-#include <stdio.h>
+-#include <sys/types.h>
+-#include <sys/socket.h>
+ #include "client-coap.h"
++#include <stdio.h>
+ #include "macros/utils.h"
+-#include "net/utils.h"
+-#include <arpa/inet.h>
+-#include <thread.h>
+-#include <debug.h>
+ 
+ #ifdef CONFIG_LIBCOAP_CLIENT_URI
+ #define COAP_CLIENT_URI CONFIG_LIBCOAP_CLIENT_URI
+@@ -43,6 +38,11 @@ static coap_context_t *main_coap_context = NULL;
+ static coap_optlist_t *optlist = NULL;
+ 
+ static int quit = 0;
++static int is_mcast = 0;
++
++#define DEFAULT_WAIT_TIME 15
++
++unsigned int wait_seconds = DEFAULT_WAIT_TIME; /* default timeout in seconds */
+ 
+ static coap_response_t
+ message_handler(coap_session_t *session,
+@@ -111,6 +111,7 @@ resolve_address(const char *host, const char *service, coap_address_t *dst,
+     if (addr_info) {
+         ret = 1;
+         *dst = addr_info->addr;
++        is_mcast = coap_is_mcast(dst);
+     }
+ 
+     coap_free_address_info(addr_info);
+@@ -127,6 +128,8 @@ client_coap_init(int argc, char **argv)
+     int len;
+     coap_uri_t uri;
+     char portbuf[8];
++    unsigned int wait_ms = 0;
++    int result = -1;
+ 
+ #define BUFSIZE 100
+     unsigned char buf[BUFSIZE];
+@@ -214,7 +217,7 @@ client_coap_init(int argc, char **argv)
+     coap_register_nack_handler(main_coap_context, nack_handler);
+ 
+     /* construct CoAP message */
+-    pdu = coap_pdu_init(COAP_MESSAGE_CON,
++    pdu = coap_pdu_init(is_mcast ? COAP_MESSAGE_NON : COAP_MESSAGE_CON,
+                         COAP_REQUEST_CODE_GET,
+                         coap_new_message_id(session),
+                         coap_session_max_pdu_size(session));
+@@ -237,6 +240,11 @@ client_coap_init(int argc, char **argv)
+             goto fail;
+         }
+     }
++    if (is_mcast) {
++        /* Allow for other servers to respond within DEFAULT_LEISURE RFC7252 8.2 */
++        wait_seconds = coap_session_get_default_leisure(session).integer_part + 1;
++    }
++    wait_ms = wait_seconds * 1000;
+ 
+     /* and send the PDU */
+     mid = coap_send(session, pdu);
+@@ -244,8 +252,18 @@ client_coap_init(int argc, char **argv)
+         coap_log_warn("Failed to send PDU\n");
+         goto fail;
+     }
+-    while (!quit) {
+-        coap_io_process(main_coap_context, 1000);
++    while (!quit || is_mcast) {
++        result = coap_io_process(main_coap_context, 1000);
++        if (result >= 0) {
++            if (wait_ms > 0) {
++                if ((unsigned)result >= wait_ms) {
++                    coap_log_info("timeout\n");
++                    break;
++                } else {
++                    wait_ms -= result;
++                }
++            }
++        }
+     }
+ fail:
+     /* Clean up library usage so client can be run again */
+diff --git a/examples/riot/examples_libcoap_client/client-coap.h b/examples/riot/examples_libcoap_client/client-coap.h
+index 083e949a..2d2bd381 100644
+--- a/examples/riot/examples_libcoap_client/client-coap.h
++++ b/examples/riot/examples_libcoap_client/client-coap.h
+@@ -16,9 +16,6 @@
+ extern "C" {
+ #endif
+ 
+-#include "coap_config.h"
+-#include <coap3/coap.h>
+-
+ /* Start up the CoAP Client */
+ void client_coap_init(int argc, char **argv);
+ 
+diff --git a/examples/riot/examples_libcoap_server/Makefile b/examples/riot/examples_libcoap_server/Makefile
+index 954d91de..f8a32810 100644
+--- a/examples/riot/examples_libcoap_server/Makefile
++++ b/examples/riot/examples_libcoap_server/Makefile
+@@ -39,8 +39,9 @@ USEMODULE += prng_sha1prng
+ 
+ # libcoap support
+ USEPKG += libcoap
++# Uncomment to enable libcoap OSCORE support
++# USEMODULE += libcoap_oscore
+ 
+-USEMODULE += sock_udp
+ # Configure if DNS is required
+ USEMODULE += sock_dns
+ 
+diff --git a/examples/riot/examples_libcoap_server/server-coap.c b/examples/riot/examples_libcoap_server/server-coap.c
+index 03902638..ca331388 100644
+--- a/examples/riot/examples_libcoap_server/server-coap.c
++++ b/examples/riot/examples_libcoap_server/server-coap.c
+@@ -145,9 +145,9 @@ init_coap_context_endpoints(const char *use_psk)
+     }
+ 
+     coap_address_init(&listenaddress);
+-    listenaddress.addr.sin6.sin6_family = AF_INET6;
+-    memcpy(&listenaddress.addr.sin6.sin6_addr, &addr,
+-           sizeof(listenaddress.addr.sin6.sin6_addr));
++    listenaddress.riot.family = AF_INET6;
++    memcpy(&listenaddress.riot.addr.ipv6, &addr,
++           sizeof(listenaddress.riot.addr.ipv6));
+     coap_print_ip_addr(&listenaddress, addr_str, sizeof(addr_str));
+     coap_log_info("Server IP [%s]\n", addr_str);
+ 
+diff --git a/examples/riot/examples_libcoap_server/server-coap.h b/examples/riot/examples_libcoap_server/server-coap.h
+index fb9802f5..badef954 100644
+--- a/examples/riot/examples_libcoap_server/server-coap.h
++++ b/examples/riot/examples_libcoap_server/server-coap.h
+@@ -16,9 +16,6 @@
+ extern "C" {
+ #endif
+ 
+-#include "coap_config.h"
+-#include <coap3/coap.h>
+-
+ /* Start up the CoAP Server */
+ void server_coap_init(int argc, char **argv);
+ 
+diff --git a/examples/riot/pkg_libcoap/Kconfig b/examples/riot/pkg_libcoap/Kconfig
+index fe807941..9f45fec2 100644
+--- a/examples/riot/pkg_libcoap/Kconfig
++++ b/examples/riot/pkg_libcoap/Kconfig
+@@ -14,7 +14,7 @@ if KCONFIG_USEPKG_LIBCOAP
+ 
+ choice LIBCOAP_DEBUG_LEVEL
+     bool "Set CoAP debugging level"
+-    default LIBCOAP_LOG_WARNING
++    default LIBCOAP_LOG_INFO
+     help
+         Set CoAP debugging level
+ 
+@@ -57,6 +57,7 @@ config LIBCOAP_IPV4_SUPPORT
+         Enable IPv4 functionality for CoAP.
+ 
+         If this option is disabled, redundant CoAP IPv4 code is removed.
++        [RIOT sock gnrc does not support this]
+ 
+ config LIBCOAP_IPV6_SUPPORT
+     bool "Enable IPv6 support within CoAP"
+@@ -66,6 +67,8 @@ config LIBCOAP_IPV6_SUPPORT
+ 
+         If this option is disabled, redundant CoAP IPv6 code is removed.
+ 
++if USEMODULE_SOCK_TCP
++
+ config LIBCOAP_TCP_SUPPORT
+     bool "Enable TCP support within CoAP"
+     default n
+@@ -74,15 +77,22 @@ config LIBCOAP_TCP_SUPPORT
+         are to be used. Note that RIOT TCP support also needs to be enabled.
+ 
+         If this option is disabled, redundant CoAP TCP code is removed.
++        [RIOT sock gnrc does not support this]
++
++endif # USEMODULE_SOCK_TCP
++
++if USEMODULE_LIBCOAP_OSCORE
+ 
+ config LIBCOAP_OSCORE_SUPPORT
+     bool "Enable OSCORE support within CoAP"
+-    default n
++    default y
+     help
+         Enable OSCORE functionality for CoAP.
+ 
+         If this option is disabled, redundant CoAP OSCORE code is removed.
+ 
++endif # MODULE_LIBCOAP_OSCORE
++
+ config LIBCOAP_OBSERVE_PERSIST
+     bool "Enable Observe persist support within CoAP"
+     default n
+diff --git a/examples/riot/pkg_libcoap/Makefile b/examples/riot/pkg_libcoap/Makefile
+index db2917a5..765c41ba 100644
+--- a/examples/riot/pkg_libcoap/Makefile
++++ b/examples/riot/pkg_libcoap/Makefile
+@@ -1,6 +1,6 @@
+ PKG_NAME=libcoap
+ PKG_URL=https://github.com/obgm/libcoap
+-PKG_VERSION=adcc8e833404dfdd79a8aceb907a747436fa55ab
++PKG_VERSION=9f499ad42f963c52ad475137a526056b82783fe0
+ PKG_LICENSE=BSD-2-Clause
+ 
+ LIBCOAP_BUILD_DIR=$(BINDIR)/pkg/$(PKG_NAME)
+@@ -9,7 +9,16 @@ LIBCOAP_INCLUDE_DIR=$(RIOTBASE)/build/pkg/$(PKG_NAME)/include/coap3
+ 
+ include $(RIOTBASE)/pkg/pkg.mk
+ 
+-all:
+-	@cp $(LIBCOAP_SOURCE_DIR)/coap_config.h.riot $(LIBCOAP_SOURCE_DIR)/coap_config.h
+-	@cp $(LIBCOAP_INCLUDE_DIR)/coap.h.riot $(LIBCOAP_INCLUDE_DIR)/coap.h
+-	"$(MAKE)" -C $(LIBCOAP_SOURCE_DIR)/src -f $(CURDIR)/Makefile.libcoap
++ifneq (,$(filter libcoap_oscore,$(USEMODULE)))
++    all: libcoap libcoap_oscore
++else
++    all: libcoap
++endif
++
++libcoap:
++	$(QQ)@cp $(LIBCOAP_SOURCE_DIR)/coap_config.h.riot $(LIBCOAP_SOURCE_DIR)/coap_config.h
++	$(QQ)@cp $(LIBCOAP_INCLUDE_DIR)/coap.h.riot $(LIBCOAP_INCLUDE_DIR)/coap.h
++	$(QQ)"$(MAKE)" -C $(LIBCOAP_SOURCE_DIR)/src -f $(CURDIR)/Makefile.libcoap
++
++libcoap_oscore:
++	$(QQ)"$(MAKE)" -C $(LIBCOAP_SOURCE_DIR)/src/oscore -f $(CURDIR)/Makefile.oscore
+diff --git a/examples/riot/pkg_libcoap/Makefile.dep b/examples/riot/pkg_libcoap/Makefile.dep
+index 5c70d309..d6d42a46 100644
+--- a/examples/riot/pkg_libcoap/Makefile.dep
++++ b/examples/riot/pkg_libcoap/Makefile.dep
+@@ -1,10 +1,11 @@
+-USEMODULE += posix_sockets
+-USEMODULE += posix_headers
+-USEMODULE += posix_inet
+-USEMODULE += posix_select
+ USEMODULE += sock_udp
+-CFLAGS += -DPOSIX_SETSOCKOPT
++USEMODULE += sock_aux_local
++USEMODULE += sock_async_event
+ 
+ ifneq (,$(filter libcoap,$(USEPKG)))
+   USEMODULE += libcoap
+ endif
++
++ifneq (,$(filter libcoap_oscore,$(USEPKG)))
++  USEMODULE += libcoap_oscore
++endif
+diff --git a/examples/riot/pkg_libcoap/Makefile.oscore b/examples/riot/pkg_libcoap/Makefile.oscore
+new file mode 100644
+index 00000000..27c0a029
+--- /dev/null
++++ b/examples/riot/pkg_libcoap/Makefile.oscore
+@@ -0,0 +1,10 @@
++MODULE := libcoap_oscore
++
++SRC := \
++  oscore.c \
++  oscore_cbor.c \
++  oscore_context.c \
++  oscore_cose.c \
++  oscore_crypto.c
++
++include $(RIOTBASE)/Makefile.base
+diff --git a/examples/riot/tests_pkg_libcoap/libcoap-test.h b/examples/riot/tests_pkg_libcoap/libcoap-test.h
+index baa52172..2f54db8a 100644
+--- a/examples/riot/tests_pkg_libcoap/libcoap-test.h
++++ b/examples/riot/tests_pkg_libcoap/libcoap-test.h
+@@ -16,9 +16,6 @@
+ extern "C" {
+ #endif
+ 
+-#include "coap_config.h"
+-#include <coap3/coap.h>
+-
+ /* Start up the CoAP Server */
+ void libcoap_test_run(void);
+ 
+diff --git a/include/coap3/coap_address.h b/include/coap3/coap_address.h
+index d8d3a913..c8f4c10b 100644
+--- a/include/coap3/coap_address.h
++++ b/include/coap3/coap_address.h
+@@ -92,7 +92,46 @@ coap_address_set_port(coap_address_t *addr, uint16_t port) {
+ 
+ #define _coap_is_mcast_impl(Address) uip_is_addr_mcast(&((Address)->addr))
+ 
+-#else /* ! WITH_LWIP && ! WITH_CONTIKI */
++#elif defined(RIOT_VERSION)
++
++#include "net/sock.h"
++#include "net/af.h"
++
++#ifndef INET6_ADDRSTRLEN
++#define INET6_ADDRSTRLEN IPV6_ADDR_MAX_STR_LEN
++#endif /* !INET6_ADDRSTRLEN */
++
++struct coap_address_t {
++  struct _sock_tl_ep riot;
++};
++
++#define _coap_address_isany_impl(A)  0
++
++#define _coap_address_equals_impl(A, B) \
++  ((A)->riot.family == (B)->riot.family &&        \
++   (A)->riot.port == (B)->riot.port &&        \
++   memcmp(&(A)->riot, &(B)->riot, (A)->riot.family == AF_INET6 ? \
++          sizeof((A)->riot.addr.ipv6) : sizeof((A)->riot.addr.ipv4)) == 0)
++
++#define _coap_is_mcast_impl(Address) ((Address)->riot.addr.ipv6[0] == 0xff)
++
++/**
++ * Returns the port from @p addr in host byte order.
++ */
++COAP_STATIC_INLINE uint16_t
++coap_address_get_port(const coap_address_t *addr) {
++  return addr->riot.port;
++}
++
++/**
++ * Sets the port field of @p addr to @p port (in host byte order).
++ */
++COAP_STATIC_INLINE void
++coap_address_set_port(coap_address_t *addr, uint16_t port) {
++  addr->riot.port = port;
++}
++
++#else /* ! WITH_LWIP && ! WITH_CONTIKI && ! RIOT_VERSION */
+ 
+ #ifdef _WIN32
+ #define sa_family_t short
+@@ -225,7 +264,7 @@ int coap_address_set_unix_domain(coap_address_t *addr,
+                                  const uint8_t *host, size_t host_len);
+ 
+ /* Convenience function to copy IPv6 addresses without garbage. */
+-#if defined(WITH_LWIP) || defined(WITH_CONTIKI)
++#if defined(WITH_LWIP) || defined(WITH_CONTIKI) || defined(RIOT_VERSION)
+ COAP_STATIC_INLINE void
+ coap_address_copy(coap_address_t *dst, const coap_address_t *src) {
+   memcpy(dst, src, sizeof(coap_address_t));
+@@ -234,7 +273,7 @@ coap_address_copy(coap_address_t *dst, const coap_address_t *src) {
+ void coap_address_copy(coap_address_t *dst, const coap_address_t *src);
+ #endif /* ! WITH_LWIP && ! WITH_CONTIKI */
+ 
+-#if defined(WITH_LWIP) || defined(WITH_CONTIKI)
++#if defined(WITH_LWIP) || defined(WITH_CONTIKI) || defined(RIOT_VERSION)
+ /**
+  * Compares given address objects @p a and @p b. This function returns @c 1 if
+  * addresses are equal, @c 0 otherwise. The parameters @p a and @p b must not be
+@@ -259,7 +298,7 @@ coap_address_isany(const coap_address_t *a) {
+   return _coap_address_isany_impl(a);
+ }
+ 
+-#if !defined(WITH_LWIP) && !defined(WITH_CONTIKI)
++#if !defined(WITH_LWIP) && !defined(WITH_CONTIKI) && !defined(RIOT_VERSION)
+ 
+ /**
+  * Checks if given address @p a denotes a multicast address. This function
+@@ -279,7 +318,7 @@ int coap_is_bcast(const coap_address_t *a);
+  */
+ int coap_is_af_unix(const coap_address_t *a);
+ 
+-#else /* WITH_LWIP || WITH_CONTIKI */
++#else /* WITH_LWIP || WITH_CONTIKI || RIOT_VERSION */
+ 
+ /**
+  * Checks if given address @p a denotes a multicast address. This function
+@@ -300,6 +339,6 @@ coap_is_af_unix(const coap_address_t *a) {
+   return 0;
+ }
+ 
+-#endif /* WITH_LWIP || WITH_CONTIKI */
++#endif /* WITH_LWIP || WITH_CONTIKI || RIOT_VERSION */
+ 
+ #endif /* COAP_ADDRESS_H_ */
+diff --git a/include/coap3/coap_io_internal.h b/include/coap3/coap_io_internal.h
+index b0ffc383..f915da2b 100644
+--- a/include/coap3/coap_io_internal.h
++++ b/include/coap3/coap_io_internal.h
+@@ -29,6 +29,10 @@ struct uip_udp_conn;
+ 
+ #ifdef RIOT_VERSION
+ #include "net/gnrc.h"
++#include "net/sock/udp.h"
++#if ! COAP_DISABLE_TCP
++#include "net/sock/tcp.h"
++#endif /* ! COAP_DISABLE_TCP */
+ #endif /* RIOT_VERSION */
+ 
+ struct coap_socket_t {
+@@ -42,12 +46,16 @@ struct coap_socket_t {
+ #elif defined(WITH_CONTIKI)
+   struct uip_udp_conn *udp_conn;
+   coap_context_t *context;
++
++#elif defined(RIOT_VERSION)
++  sock_udp_t udp;
++#if ! COAP_DISABLE_TCP
++  sock_tcp_t tcp;
++#endif /* ! COAP_DISABLE_TCP */
++  coap_fd_t fd;
+ #else
+   coap_fd_t fd;
+-#endif /* WITH_LWIP */
+-#if defined(RIOT_VERSION)
+-  gnrc_pktsnip_t *pkt; /**< pointer to received packet for processing */
+-#endif /* RIOT_VERSION */
++#endif /* ! WITH_LWIP && !WITH_CONTIKI && ! RIOT_VERSION */
+   coap_socket_flags_t flags; /**< 1 or more of COAP_SOCKET* flag values */
+   coap_session_t *session; /**< Used to determine session owner. */
+ #if COAP_SERVER_SUPPORT
+@@ -93,9 +101,11 @@ int coap_socket_connect_udp(coap_socket_t *sock,
+                             coap_address_t *remote_addr);
+ #endif /* COAP_CLIENT_SUPPORT */
+ 
++#if COAP_SERVER_SUPPORT
+ int coap_socket_bind_udp(coap_socket_t *sock,
+                          const coap_address_t *listen_addr,
+                          coap_address_t *bound_addr);
++#endif /* COAP_SERVER_SUPPORT */
+ 
+ /**
+  * Function interface to close off a socket.
+diff --git a/include/coap3/coap_mutex_internal.h b/include/coap3/coap_mutex_internal.h
+index 4d02cb86..cf403ff9 100644
+--- a/include/coap3/coap_mutex_internal.h
++++ b/include/coap3/coap_mutex_internal.h
+@@ -49,7 +49,7 @@ typedef mutex_t coap_mutex_t;
+ #define coap_mutex_trylock(a) mutex_trylock(a)
+ #define coap_mutex_unlock(a)  mutex_unlock(a)
+ #define coap_thread_pid_t     kernel_pid_t
+-#define coap_thread_pid       thread_getpid(void)
++#define coap_thread_pid       thread_getpid()
+ 
+ #elif defined(WITH_LWIP)
+ /* Use LwIP's mutex API */
+@@ -212,14 +212,14 @@ typedef struct coap_lock_t {
+   coap_thread_pid_t pid;
+   coap_thread_pid_t freeing_pid;
+   const char *lock_file;
+-  uint32_t lock_line;
++  unsigned int lock_line;
++  unsigned int unlock_line;
+   const char *unlock_file;
+-  uint32_t unlock_line;
+   const char *callback_file;
+-  uint32_t callback_line;
+-  uint32_t being_freed;
+-  uint32_t in_callback;
+-  volatile uint32_t lock_count;
++  unsigned int callback_line;
++  unsigned int being_freed;
++  unsigned int in_callback;
++  volatile unsigned int lock_count;
+ } coap_lock_t;
+ 
+ void coap_lock_unlock_func(coap_lock_t *lock, const char *file, int line);
+diff --git a/include/coap3/coap_net.h b/include/coap3/coap_net.h
+index 863db53e..21ed8ef4 100644
+--- a/include/coap3/coap_net.h
++++ b/include/coap3/coap_net.h
+@@ -20,7 +20,9 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #ifndef _WIN32
++#ifdef HAVE_SYS_SELECT_H
+ #include <sys/select.h>
++#endif /* HAVE_SYS_SELECT_H */
+ #include <sys/time.h>
+ #endif
+ #include <time.h>
+@@ -623,6 +625,7 @@ void coap_mcast_per_resource(coap_context_t *context);
+  */
+ int coap_io_process(coap_context_t *ctx, uint32_t timeout_ms);
+ 
++#if !defined(RIOT_VERSION)
+ /**
+  * The main message processing loop with additional fds for internal select.
+  *
+@@ -653,6 +656,7 @@ int coap_io_process(coap_context_t *ctx, uint32_t timeout_ms);
+ int coap_io_process_with_fds(coap_context_t *ctx, uint32_t timeout_ms,
+                              int nfds, fd_set *readfds, fd_set *writefds,
+                              fd_set *exceptfds);
++#endif /* ! RIOT_VERSION */
+ 
+ /**
+  * Check to see if there is any i/o pending for the @p context.
+diff --git a/include/coap3/coap_net_internal.h b/include/coap3/coap_net_internal.h
+index 6a2e8bff..6ad3f5d0 100644
+--- a/include/coap3/coap_net_internal.h
++++ b/include/coap3/coap_net_internal.h
+@@ -91,6 +91,9 @@ struct coap_context_t {
+                                    *   scheduled using lwIP timers for this
+                                    *   context, otherwise 0. */
+ #endif /* WITH_LWIP */
++#ifdef RIOT_VERSION
++  thread_t *selecting_thread;
++#endif /* RIOT_VERSION */
+ #if COAP_OSCORE_SUPPORT
+   struct oscore_ctx_t *p_osc_ctx; /**< primary oscore context  */
+ #endif /* COAP_OSCORE_SUPPORT */
+@@ -175,11 +178,13 @@ struct coap_context_t {
+   int eptimerfd;                   /**< Internal FD for timeout */
+   coap_tick_t next_timeout;        /**< When the next timeout is to occur */
+ #else /* ! COAP_EPOLL_SUPPORT */
++#if !defined(RIOT_VERSION)
+   fd_set readfds, writefds, exceptfds; /**< Used for select call
+                                             in coap_io_process_with_fds() */
+   coap_socket_t *sockets[64];      /**< Track different socket information
+                                         in coap_io_process_with_fds */
+   unsigned int num_sockets;        /**< Number of sockets being tracked */
++#endif /* ! RIOT_VERSION */
+ #endif /* ! COAP_EPOLL_SUPPORT */
+ #if COAP_SERVER_SUPPORT
+   uint8_t observe_pending;         /**< Observe response pending */
+diff --git a/include/coap3/coap_threadsafe_internal.h b/include/coap3/coap_threadsafe_internal.h
+index 48aa431c..8f176267 100644
+--- a/include/coap3/coap_threadsafe_internal.h
++++ b/include/coap3/coap_threadsafe_internal.h
+@@ -52,7 +52,9 @@
+ #define coap_io_prepare_epoll(c,n)                      coap_io_prepare_epoll_locked(c,n)
+ #define coap_io_prepare_io(c,s,m,n,t)                   coap_io_prepare_io_locked(c,s,m,n,t)
+ #define coap_io_process(s,t)                            coap_io_process_locked(s,t)
++#ifdef HAVE_SYS_SELECT_H
+ #define coap_io_process_with_fds(s,t,n,r,w,e)           coap_io_process_with_fds_locked(s,t,n,r,w,e)
++#endif /* HAVE_SYS_SELECT_H */
+ #define coap_join_mcast_group_intf(c,g,i)               coap_join_mcast_group_intf_locked(c,g,i)
+ #define coap_new_cache_entry(s,p,r,b,i)                 coap_new_cache_entry_locked(s,p,r,b,i)
+ #define coap_new_client_session(c,l,s,p)                coap_new_client_session_locked(c,l,s,p)
+@@ -169,9 +171,11 @@ int                  coap_persist_startup_locked(coap_context_t *context,
+                                                  uint32_t save_freq);
+ void                 coap_persist_stop_locked(coap_context_t *context);
+ int                  coap_io_process_locked(coap_context_t *ctx, uint32_t timeout_ms);
++#ifdef HAVE_SYS_SELECT_H
+ int                  coap_io_process_with_fds_locked(coap_context_t *ctx, uint32_t timeout_ms,
+                                                      int nfds, fd_set *readfds, fd_set *writefds,
+                                                      fd_set *exceptfds);
++#endif /* HAVE_SYS_SELECT_H */
+ coap_async_t        *coap_register_async_locked(coap_session_t *session, const coap_pdu_t *request,
+                                                 coap_tick_t delay);
+ size_t               coap_session_max_pdu_size_locked(const coap_session_t *session);
+diff --git a/include/coap3/libcoap.h b/include/coap3/libcoap.h
+index bf9ff531..5d8b3173 100644
+--- a/include/coap3/libcoap.h
++++ b/include/coap3/libcoap.h
+@@ -38,10 +38,10 @@ typedef USHORT in_port_t;
+ #define        _IN_PORT_T_DECLARED
+ #endif
+ #endif /* !defined(__MINGW32__) */
+-#elif !defined (CONTIKI) && !defined (WITH_LWIP)
++#elif !defined (CONTIKI) && !defined (WITH_LWIP) && !defined (RIOT_VERSION)
+ #include <netinet/in.h>
+ #include <sys/socket.h>
+-#endif /* ! CONTIKI && ! WITH_LWIP */
++#endif /* ! CONTIKI && ! WITH_LWIP && ! RIOT_VERSION */
+ 
+ #ifndef COAP_STATIC_INLINE
+ #  if defined(__cplusplus)
+diff --git a/src/coap_address.c b/src/coap_address.c
+index 52cf89bf..bc337676 100644
+--- a/src/coap_address.c
++++ b/src/coap_address.c
+@@ -15,7 +15,7 @@
+ 
+ #include "coap3/coap_internal.h"
+ 
+-#if !defined(WITH_CONTIKI) && !defined(WITH_LWIP)
++#if !defined(WITH_CONTIKI) && !defined(WITH_LWIP) && !defined(RIOT_VERSION)
+ #ifdef HAVE_ARPA_INET_H
+ #include <arpa/inet.h>
+ #endif
+@@ -253,7 +253,7 @@ void
+ coap_address_init(coap_address_t *addr) {
+   assert(addr);
+   memset(addr, 0, sizeof(coap_address_t));
+-#if !defined(WITH_LWIP) && !defined(WITH_CONTIKI)
++#if !defined(WITH_LWIP) && !defined(WITH_CONTIKI) && !defined(RIOT_VERSION)
+   /* lwip and Contiki have constant address sizes and don't need the .size part */
+   addr->size = sizeof(addr->addr);
+ #endif
+@@ -644,48 +644,86 @@ coap_resolve_address_info(const coap_str_const_t *address,
+   freeaddrinfo(res);
+   return info_list;
+ #else /* RIOT_VERSION */
+-#if COAP_IPV6_SUPPORT
+ #include "net/utils.h"
++#if COAP_IPV6_SUPPORT
+   ipv6_addr_t addr_ipv6;
++#endif /* COAP_IPV6_SUPPORT */
++#if COAP_IPV4_SUPPORT
++  ipv4_addr_t addr_ipv4;
++#endif /* COAP_IPV4_SUPPORT */
+   netif_t *netif = NULL;
+   coap_addr_info_t *info = NULL;
+   coap_addr_info_t *info_prev = NULL;
+   coap_addr_info_t *info_list = NULL;
+   coap_uri_scheme_t scheme;
+   (void)ai_hints_flags;
++  int family = AF_UNSPEC;
+ 
+-  if (netutils_get_ipv6(&addr_ipv6, &netif, (const char *)address->s) >= 0) {
+-    for (scheme = 0; scheme < COAP_URI_SCHEME_LAST; scheme++) {
+-      if (scheme_hint_bits & (1 << scheme)) {
+-        info = get_coap_addr_info(scheme);
+-        if (info == NULL) {
+-          continue;
+-        }
+-
+-        /* Need to return in same order as getaddrinfo() */
+-        if (!info_prev) {
+-          info_list = info;
+-          info_prev = info;
+-        } else {
+-          info_prev->next = info;
+-          info_prev = info;
+-        }
++  if (address == NULL || address->length == 0) {
++    memset(&addr_ipv6, 0, sizeof(addr_ipv6));
++#if COAP_IPV6_SUPPORT
++    family = AF_INET6;
++#else /* ! COAP_IPV6_SUPPORT */
++    family = AF_INET;
++#endif /* ! COAP_IPV6_SUPPORT */
++  } else {
++#if COAP_IPV6_SUPPORT
++    if (netutils_get_ipv6(&addr_ipv6, &netif, (const char *)address->s) >= 0) {
++      family = AF_INET6;
++    }
++#endif /* COAP_IPV6_SUPPORT */
++#if COAP_IPV4_SUPPORT
++    if (family == AF_UNSPEC &&
++        netutils_get_ipv4(&addr_ipv4, (const char *)address->s) >= 0) {
++      family = AF_INET;
++    }
++#endif /* COAP_IPV4_SUPPORT */
++    if (family == AF_UNSPEC) {
++      coap_log_err("coap_resolve_address_info: Unable to parse '%s'\n", address->s);
++      return NULL;
++    }
++  }
++  for (scheme = 0; scheme < COAP_URI_SCHEME_LAST; scheme++) {
++    if (scheme_hint_bits & (1 << scheme)) {
++      info = get_coap_addr_info(scheme);
++      if (info == NULL) {
++        continue;
++      }
+ 
+-        info->addr.size = sizeof(struct sockaddr_in6);
+-        info->addr.addr.sin6.sin6_family = AF_INET6;
+-        memcpy(&info->addr.addr.sin6.sin6_addr, &addr_ipv6,
+-               sizeof(info->addr.addr.sin6.sin6_addr));
+-        info->addr.addr.sin6.sin6_scope_id =
+-            netif ? (uint32_t)netif_get_id(netif) : 0;
++      /* Need to return in same order as getaddrinfo() */
++      if (!info_prev) {
++        info_list = info;
++        info_prev = info;
++      } else {
++        info_prev->next = info;
++        info_prev = info;
++      }
+ 
+-        update_coap_addr_port(scheme, info, port, secure_port, ws_port,
+-                              ws_secure_port, type);
++      switch (family) {
++#if COAP_IPV6_SUPPORT
++      case AF_INET6:
++        info->addr.riot.family = AF_INET6;
++        memcpy(&info->addr.riot.addr.ipv6, &addr_ipv6,
++               sizeof(info->addr.riot.addr.ipv6));
++        info->addr.riot.netif = netif ? (uint32_t)netif_get_id(netif) : 0;
++        break;
++#endif /* ! COAP_IPV6_SUPPORT */
++#if COAP_IPV4_SUPPORT
++      case AF_INET:
++        info->addr.riot.family = AF_INET;
++        memcpy(&info->addr.riot.addr.ipv4, &addr_ipv4,
++               sizeof(info->addr.riot.addr.ipv4));
++        break;
++#endif /* ! COAP_IPV4_SUPPORT */
++      default:
++        break;
+       }
++
++      update_coap_addr_port(scheme, info, port, secure_port, ws_port,
++                            ws_secure_port, type);
+     }
+-    return info_list;
+   }
+-#endif /* COAP_IPV6_SUPPORT */
+-  return NULL;
++  return info_list;
+ #endif /* RIOT_VERSION */
+ }
+ #endif /* !WITH_CONTIKI */
+@@ -700,7 +738,7 @@ coap_free_address_info(coap_addr_info_t *info) {
+   }
+ }
+ 
+-#if !defined(WITH_LWIP) && !defined(WITH_CONTIKI)
++#if !defined(WITH_LWIP) && !defined(WITH_CONTIKI) && !defined(RIOT_VERSION)
+ void
+ coap_address_copy(coap_address_t *dst, const coap_address_t *src) {
+ #if defined(WITH_LWIP) || defined(WITH_CONTIKI)
+diff --git a/src/coap_debug.c b/src/coap_debug.c
+index c6273606..64768cbc 100644
+--- a/src/coap_debug.c
++++ b/src/coap_debug.c
+@@ -231,7 +231,7 @@ print_readable(const uint8_t *data, size_t len,
+  */
+ size_t
+ coap_print_addr(const coap_address_t *addr, unsigned char *buf, size_t len) {
+-#if defined( HAVE_ARPA_INET_H ) || defined( HAVE_WS2TCPIP_H )
++#if (defined( HAVE_ARPA_INET_H ) || defined( HAVE_WS2TCPIP_H )) && !defined(RIOT_VERSION)
+   char scratch[INET6_ADDRSTRLEN];
+ 
+   assert(buf);
+@@ -268,7 +268,37 @@ coap_print_addr(const coap_address_t *addr, unsigned char *buf, size_t len) {
+ 
+ #else /* HAVE_ARPA_INET_H */
+ 
+-# if WITH_CONTIKI
++# if defined(RIOT_VERSION)
++  char scratch[INET6_ADDRSTRLEN];
++
++  assert(buf);
++  assert(len);
++  buf[0] = '\000';
++
++  switch (addr->riot.family) {
++#if COAP_IPV4_SUPPORT
++  case AF_INET:
++    snprintf((char *)buf, len, "%s:%d",
++             coap_print_ip_addr(addr, scratch, sizeof(scratch)),
++             coap_address_get_port(addr));
++    break;
++#endif /* COAP_IPV4_SUPPORT */
++#if COAP_IPV6_SUPPORT
++  case AF_INET6:
++    snprintf((char *)buf, len, "[%s]:%d",
++             coap_print_ip_addr(addr, scratch, sizeof(scratch)),
++             coap_address_get_port(addr));
++    break;
++#endif /* COAP_IPV6_SUPPORT */
++  default:
++    /* Include trailing NULL if possible */
++    memcpy(buf, "(unknown address type)", min(22+1, len));
++    buf[len-1] = '\000';
++    break;
++  }
++  return strlen((char *)buf);
++
++# elif WITH_CONTIKI
+ 
+   char scratch[INET6_ADDRSTRLEN];
+ #ifdef HAVE_SNPRINTF
+@@ -377,7 +407,7 @@ coap_print_addr(const coap_address_t *addr, unsigned char *buf, size_t len) {
+  */
+ const char *
+ coap_print_ip_addr(const coap_address_t *addr, char *buf, size_t len) {
+-#if defined( HAVE_ARPA_INET_H ) || defined( HAVE_WS2TCPIP_H )
++#if (defined( HAVE_ARPA_INET_H ) || defined( HAVE_WS2TCPIP_H )) && !defined(RIOT_VERSION)
+   const void *addrptr = NULL;
+ 
+   assert(buf);
+@@ -421,7 +451,37 @@ coap_print_ip_addr(const coap_address_t *addr, char *buf, size_t len) {
+ 
+ #else /* HAVE_ARPA_INET_H */
+ 
+-# if WITH_CONTIKI
++# if defined(RIOT_VERSION)
++  assert(buf);
++  assert(len);
++  buf[0] = '\000';
++
++  switch (addr->riot.family) {
++#if COAP_IPV4_SUPPORT
++  case AF_INET:
++    if (ipv4_addr_to_str(buf, (ipv4_addr_t *)&addr->riot.addr.ipv4, (size_t)len) == NULL) {
++      goto error;
++    }
++    break;
++#endif /* COAP_IPV4_SUPPORT */
++#if COAP_IPV6_SUPPORT
++  case AF_INET6:
++    if (ipv6_addr_to_str(buf, (ipv6_addr_t *)&addr->riot.addr.ipv6, (size_t)len) == NULL) {
++      goto error;
++    }
++    break;
++#endif /* COAP_IPV6_SUPPORT */
++  default:
++    goto error;
++  }
++  return buf;
++
++error:
++  coap_log_err("coap_print_ip_addr: inet_ntop\n");
++  buf[0] = '\000';
++  return buf;
++
++# elif WITH_CONTIKI
+   char *p = buf;
+   uint8_t i;
+ #  if NETSTACK_CONF_WITH_IPV6
+diff --git a/src/coap_io.c b/src/coap_io.c
+index bab869eb..d5d37c5a 100644
+--- a/src/coap_io.c
++++ b/src/coap_io.c
+@@ -54,7 +54,7 @@
+ #endif
+ #endif /* COAP_EPOLL_SUPPORT */
+ 
+-#if !defined(WITH_CONTIKI) && !defined(RIOT_VERSION) && !(WITH_LWIP)
++#if !defined(WITH_CONTIKI) && !defined(RIOT_VERSION) && !defined(WITH_LWIP)
+ /* define generic PKTINFO for IPv4 */
+ #if defined(IP_PKTINFO)
+ #  define GEN_IP_PKTINFO IP_PKTINFO
+@@ -72,7 +72,7 @@
+ #else
+ #  error "Need IPV6_PKTINFO or IPV6_RECVPKTINFO to request ancillary data from OS."
+ #endif /* IPV6_RECVPKTINFO */
+-#endif /* !(WITH_CONTIKI || RIOT_VERSION) */
++#endif /* ! WITH_CONTIKI && ! RIOT_VERSION && ! WITH_LWIP */
+ 
+ #if COAP_SERVER_SUPPORT
+ coap_endpoint_t *
+@@ -86,7 +86,7 @@ coap_mfree_endpoint(coap_endpoint_t *ep) {
+ }
+ #endif /* COAP_SERVER_SUPPORT */
+ 
+-#if !defined(WITH_CONTIKI) && !defined(WITH_LWIP)
++#if !defined(WITH_CONTIKI) && !defined(WITH_LWIP) && !defined(RIOT_VERSION)
+ 
+ int
+ coap_socket_bind_udp(coap_socket_t *sock,
+@@ -112,10 +112,11 @@ coap_socket_bind_udp(coap_socket_t *sock,
+   }
+ #ifndef RIOT_VERSION
+ #ifdef _WIN32
+-  if (ioctlsocket(sock->fd, FIONBIO, &u_on) == COAP_SOCKET_ERROR) {
++  if (ioctlsocket(sock->fd, FIONBIO, &u_on) == COAP_SOCKET_ERROR)
+ #else
+-  if (ioctl(sock->fd, FIONBIO, &on) == COAP_SOCKET_ERROR) {
++  if (ioctl(sock->fd, FIONBIO, &on) == COAP_SOCKET_ERROR)
+ #endif
++  {
+     coap_log_warn("coap_socket_bind_udp: ioctl FIONBIO: %s\n", coap_socket_strerror());
+   }
+ 
+@@ -158,12 +159,12 @@ coap_socket_bind_udp(coap_socket_t *sock,
+     coap_log_alert("coap_socket_bind_udp: unsupported sa_family\n");
+     break;
+   }
+-#else /* ! RIOT_VERSION */
++#else /* RIOT_VERSION */
+   if (setsockopt(sock->fd, SOL_SOCKET, SO_RCVTIMEO, OPTVAL_T(&timeout),
+                  (socklen_t)sizeof(timeout)) == COAP_SOCKET_ERROR)
+     coap_log_alert("coap_socket_bind_udp: setsockopt SO_RCVTIMEO: %s\n",
+                    coap_socket_strerror());
+-#endif /* ! RIOT_VERSION */
++#endif /* RIOT_VERSION */
+ 
+   if (bind(sock->fd, &listen_addr->addr.sa,
+ #if COAP_IPV4_SUPPORT
+@@ -206,21 +207,15 @@ coap_socket_connect_udp(coap_socket_t *sock,
+                         int default_port,
+                         coap_address_t *local_addr,
+                         coap_address_t *remote_addr) {
+-#ifndef RIOT_VERSION
+   int on = 1;
+ #if COAP_IPV6_SUPPORT
+   int off = 0;
+ #endif /* COAP_IPV6_SUPPORT */
+-#else /* ! RIOT_VERSION */
+-  struct timeval timeout = {0, 0};
+-#endif /* ! RIOT_VERSION */
+ #ifdef _WIN32
+   u_long u_on = 1;
+ #endif
+   coap_address_t connect_addr;
+-#if !defined(RIOT_VERSION)
+   int is_mcast = coap_is_mcast(server);
+-#endif /* !defined(RIOT_VERSION) */
+   coap_address_copy(&connect_addr, server);
+ 
+   sock->flags &= ~(COAP_SOCKET_CONNECTED | COAP_SOCKET_MULTICAST);
+@@ -232,7 +227,6 @@ coap_socket_connect_udp(coap_socket_t *sock,
+     goto error;
+   }
+ 
+-#ifndef RIOT_VERSION
+ #ifdef _WIN32
+   if (ioctlsocket(sock->fd, FIONBIO, &u_on) == COAP_SOCKET_ERROR)
+ #else
+@@ -242,7 +236,6 @@ coap_socket_connect_udp(coap_socket_t *sock,
+     coap_log_warn("coap_socket_connect_udp: ioctl FIONBIO: %s\n",
+                   coap_socket_strerror());
+   }
+-#endif /* RIOT_VERSION */
+ 
+   switch (connect_addr.addr.sa.sa_family) {
+ #if COAP_IPV4_SUPPORT
+@@ -255,13 +248,11 @@ coap_socket_connect_udp(coap_socket_t *sock,
+   case AF_INET6:
+     if (connect_addr.addr.sin6.sin6_port == 0)
+       connect_addr.addr.sin6.sin6_port = htons(default_port);
+-#ifndef RIOT_VERSION
+     /* Configure the socket as dual-stacked */
+     if (setsockopt(sock->fd, IPPROTO_IPV6, IPV6_V6ONLY, OPTVAL_T(&off),
+                    sizeof(off)) == COAP_SOCKET_ERROR)
+       coap_log_warn("coap_socket_connect_udp: setsockopt IPV6_V6ONLY: %s\n",
+                     coap_socket_strerror());
+-#endif /* RIOT_VERSION */
+ #endif /* COAP_IPV6_SUPPORT */
+     break;
+ #if COAP_AF_UNIX_SUPPORT
+@@ -280,11 +271,9 @@ coap_socket_connect_udp(coap_socket_t *sock,
+                     "remote address family\n");
+       goto error;
+     }
+-#ifndef RIOT_VERSION
+     if (setsockopt(sock->fd, SOL_SOCKET, SO_REUSEADDR, OPTVAL_T(&on), sizeof(on)) == COAP_SOCKET_ERROR)
+       coap_log_warn("coap_socket_connect_udp: setsockopt SO_REUSEADDR: %s\n",
+                     coap_socket_strerror());
+-#endif /* RIOT_VERSION */
+     if (bind(sock->fd, &local_if->addr.sa,
+ #if COAP_IPV4_SUPPORT
+              local_if->addr.sa.sa_family == AF_INET ?
+@@ -304,7 +293,6 @@ coap_socket_connect_udp(coap_socket_t *sock,
+   }
+ 
+   /* special treatment for sockets that are used for multicast communication */
+-#if !defined(RIOT_VERSION)
+   if (is_mcast) {
+     if (!(local_if && local_if->addr.sa.sa_family)) {
+       /* Bind to a (unused) port to simplify logging */
+@@ -337,31 +325,6 @@ coap_socket_connect_udp(coap_socket_t *sock,
+                     coap_socket_strerror());
+     return 1;
+   }
+-#else /* defined(RIOT_VERSION) */
+-  if (!(local_if && local_if->addr.sa.sa_family)) {
+-    /* Bind to a (unused) port to simplify logging */
+-    coap_address_t bind_addr;
+-
+-    coap_address_init(&bind_addr);
+-    bind_addr.addr.sa.sa_family = connect_addr.addr.sa.sa_family;
+-#if COAP_IPV6_SUPPORT
+-    if (bind_addr.addr.sa.sa_family == AF_INET6)
+-      bind_addr.addr.sin6.sin6_scope_id = connect_addr.addr.sin6.sin6_scope_id;
+-#endif /* COAP_IPV6_SUPPORT */
+-    if (bind(sock->fd, &bind_addr.addr.sa,
+-             bind_addr.addr.sa.sa_family == AF_INET ?
+-             (socklen_t)sizeof(struct sockaddr_in) :
+-             (socklen_t)bind_addr.size) == COAP_SOCKET_ERROR) {
+-      coap_log_warn("coap_socket_connect_udp: bind: %s\n",
+-                    coap_socket_strerror());
+-      goto error;
+-    }
+-  }
+-  if (setsockopt(sock->fd, SOL_SOCKET, SO_RCVTIMEO, OPTVAL_T(&timeout),
+-                 (socklen_t)sizeof(timeout)) == COAP_SOCKET_ERROR)
+-    coap_log_alert("coap_socket_bind_udp: setsockopt SO_RCVTIMEO: %s\n",
+-                   coap_socket_strerror());
+-#endif /* defined(RIOT_VERSION) */
+ 
+   if (connect(sock->fd, &connect_addr.addr.sa, connect_addr.size) == COAP_SOCKET_ERROR) {
+ #if COAP_AF_UNIX_SUPPORT
+@@ -522,7 +485,7 @@ coap_epoll_ctl_mod(coap_socket_t *sock,
+ }
+ #endif /* COAP_EPOLL_SUPPORT */
+ 
+-#endif /* ! WITH_CONTIKI && ! WITH_LWIP */
++#endif /* ! WITH_CONTIKI && ! WITH_LWIP && ! RIOT_VERSION*/
+ 
+ #ifndef WITH_CONTIKI
+ void
+@@ -566,7 +529,7 @@ coap_update_io_timer(coap_context_t *context, coap_tick_t delay) {
+ }
+ #endif /* ! WITH_CONTIKI */
+ 
+-#if !defined(WITH_CONTIKI) && !defined(WITH_LWIP)
++#if !defined(WITH_CONTIKI) && !defined(WITH_LWIP) && !defined(RIOT_VERSION)
+ 
+ #ifdef _WIN32
+ static void
+@@ -735,14 +698,14 @@ coap_socket_read(coap_socket_t *sock, uint8_t *data, size_t data_len) {
+   return r;
+ }
+ 
+-#endif /* ! WITH_CONTIKI && ! WITH_LWIP */
++#endif /* ! WITH_CONTIKI && ! WITH_LWIP && ! RIOT_VERSION */
+ 
+ #if !defined(WITH_LWIP)
+ #if (!defined(WITH_CONTIKI)) != ( defined(HAVE_NETINET_IN_H) || defined(HAVE_WS2TCPIP_H) )
+ /* define struct in6_pktinfo and struct in_pktinfo if not available
+    FIXME: check with configure
+ */
+-#if !defined(__MINGW32__)
++#if !defined(__MINGW32__) && !defined(RIOT_VERSION)
+ struct in6_pktinfo {
+   struct in6_addr ipi6_addr;        /* src/dst IPv6 address */
+   unsigned int ipi6_ifindex;        /* send/recv interface index */
+@@ -990,7 +953,7 @@ coap_packet_get_memmapped(coap_packet_t *packet, unsigned char **address, size_t
+   *length = packet->length;
+ }
+ 
+-#if !defined(WITH_LWIP) && !defined(WITH_CONTIKI)
++#if !defined(WITH_LWIP) && !defined(WITH_CONTIKI) && !defined(RIOT_VERSION)
+ /*
+  * dgram
+  * return +ve Number of bytes written.
+@@ -1095,14 +1058,6 @@ coap_socket_recv(coap_socket_t *sock, coap_packet_t *packet) {
+     len = recvfrom(sock->fd, (void *)packet->payload, COAP_RXBUFFER_SIZE, 0,
+                    &packet->addr_info.remote.addr.sa,
+                    &packet->addr_info.remote.size);
+-#if defined(RIOT_VERSION) && defined(COAP_SERVER_SUPPORT) && COAP_IPV6_SUPPORT
+-    if (sock->endpoint &&
+-        packet->addr_info.remote.addr.sa.sa_family == AF_INET6) {
+-      packet->addr_info.remote.addr.sin6.sin6_scope_id =
+-          sock->endpoint->bind_addr.addr.sin6.sin6_scope_id;
+-      packet->addr_info.remote.addr.sin6.sin6_flowinfo = 0;
+-    }
+-#endif /* RIOT_VERSION && COAP_SERVER_SUPPORT && COAP_IPV6_SUPPORT */
+ #endif /* ! HAVE_STRUCT_CMSGHDR */
+ 
+     if (len < 0) {
+@@ -1211,14 +1166,6 @@ coap_socket_recv(coap_socket_t *sock, coap_packet_t *packet) {
+         coap_log_debug("Cannot determine local port\n");
+         goto error;
+       }
+-#if defined(RIOT_VERSION) && defined(COAP_SERVER_SUPPORT) && COAP_IPV6_SUPPORT
+-      if (sock->endpoint &&
+-          packet->addr_info.local.addr.sa.sa_family == AF_INET6) {
+-        packet->addr_info.local.addr.sin6.sin6_scope_id =
+-            sock->endpoint->bind_addr.addr.sin6.sin6_scope_id;
+-        packet->addr_info.local.addr.sin6.sin6_flowinfo = 0;
+-      }
+-#endif /* RIOT_VERSION && COAP_SERVER_SUPPORT && COAP_IPV6_SUPPORT */
+ #endif /* ! HAVE_STRUCT_CMSGHDR */
+     }
+   }
+@@ -1228,7 +1175,7 @@ coap_socket_recv(coap_socket_t *sock, coap_packet_t *packet) {
+ error:
+   return -1;
+ }
+-#endif /* ! WITH_LWIP && ! WITH_CONTIKI */
++#endif /* ! WITH_LWIP && ! WITH_CONTIKI && ! RIOT_VERSION */
+ 
+ unsigned int
+ coap_io_prepare_epoll(coap_context_t *ctx, coap_tick_t now) {
+@@ -1294,10 +1241,10 @@ coap_io_prepare_io(coap_context_t *ctx,
+ #if COAP_SERVER_SUPPORT
+   int check_dtls_timeouts = 0;
+ #endif /* COAP_SERVER_SUPPORT */
+-#if defined(COAP_EPOLL_SUPPORT) || defined(WITH_LWIP)
++#if defined(COAP_EPOLL_SUPPORT) || defined(WITH_LWIP) || defined(RIOT_VERSION)
+   (void)sockets;
+   (void)max_sockets;
+-#endif /* COAP_EPOLL_SUPPORT || WITH_LWIP */
++#endif /* COAP_EPOLL_SUPPORT || WITH_LWIP || RIOT_VERSION*/
+ 
+   coap_lock_check_locked(ctx);
+   *num_sockets = 0;
+@@ -1351,12 +1298,12 @@ coap_io_prepare_io(coap_context_t *ctx,
+     session_timeout = COAP_DEFAULT_SESSION_TIMEOUT * COAP_TICKS_PER_SECOND;
+ 
+   LL_FOREACH(ctx->endpoint, ep) {
+-#if !defined(COAP_EPOLL_SUPPORT) && !defined(WITH_LWIP)
++#if !defined(COAP_EPOLL_SUPPORT) && !defined(WITH_LWIP) && !defined(RIOT_VERSION)
+     if (ep->sock.flags & (COAP_SOCKET_WANT_READ | COAP_SOCKET_WANT_WRITE | COAP_SOCKET_WANT_ACCEPT)) {
+       if (*num_sockets < max_sockets)
+         sockets[(*num_sockets)++] = &ep->sock;
+     }
+-#endif /* ! COAP_EPOLL_SUPPORT i && ! WITH_LWIP */
++#endif /* ! COAP_EPOLL_SUPPORT && ! WITH_LWIP && ! RIOT_VERSION */
+     SESSIONS_ITER_SAFE(ep->sessions, s, rtmp) {
+       /* Check whether any idle server sessions should be released */
+       if (s->type == COAP_SESSION_TYPE_SERVER && s->ref == 0 &&
+@@ -1408,12 +1355,12 @@ coap_io_prepare_io(coap_context_t *ctx,
+               timeout = s_timeout;
+           }
+         }
+-#if !defined(COAP_EPOLL_SUPPORT) && !defined(WITH_LWIP)
++#if !defined(COAP_EPOLL_SUPPORT) && !defined(WITH_LWIP) && !defined(RIOT_VERSION)
+         if (s->sock.flags & (COAP_SOCKET_WANT_READ|COAP_SOCKET_WANT_WRITE)) {
+           if (*num_sockets < max_sockets)
+             sockets[(*num_sockets)++] = &s->sock;
+         }
+-#endif /* ! COAP_EPOLL_SUPPORT && ! WITH_LWIP */
++#endif /* ! COAP_EPOLL_SUPPORT && ! WITH_LWIP && ! RIOT_VERSION */
+ #if COAP_Q_BLOCK_SUPPORT
+         /*
+          * Check if any server large transmits have hit MAX_PAYLOAD and need
+@@ -1517,7 +1464,7 @@ release_1:
+     }
+ #endif /* COAP_Q_BLOCK_SUPPORT */
+ 
+-#if !defined(COAP_EPOLL_SUPPORT) && !defined(WITHLWIP)
++#if !defined(COAP_EPOLL_SUPPORT) && !defined(WITH_LWIP) && !defined(RIOT_VERSION)
+     assert(s->ref > 1);
+     if (s->sock.flags & (COAP_SOCKET_WANT_READ |
+                          COAP_SOCKET_WANT_WRITE |
+@@ -1525,7 +1472,7 @@ release_1:
+       if (*num_sockets < max_sockets)
+         sockets[(*num_sockets)++] = &s->sock;
+     }
+-#endif /* ! COAP_EPOLL_SUPPORT && ! WITH_LWIP */
++#endif /* ! COAP_EPOLL_SUPPORT && ! WITH_LWIP && ! RIOT_VERSION */
+ release_2:
+     coap_session_release(s);
+   }
+@@ -1534,7 +1481,7 @@ release_2:
+   return (unsigned int)((timeout * 1000 + COAP_TICKS_PER_SECOND - 1) / COAP_TICKS_PER_SECOND);
+ }
+ 
+-#if !defined(WITH_LWIP) && !defined(CONTIKI)
++#if !defined(WITH_LWIP) && !defined(CONTIKI) && !defined(RIOT_VERSION)
+ int
+ coap_io_process(coap_context_t *ctx, uint32_t timeout_ms) {
+   return coap_io_process_with_fds(ctx, timeout_ms, 0, NULL, NULL, NULL);
+@@ -1754,7 +1701,7 @@ coap_io_process_with_fds(coap_context_t *ctx, uint32_t timeout_ms,
+ 
+   return (int)(((now - before) * 1000) / COAP_TICKS_PER_SECOND);
+ }
+-#endif /* ! WITH_LWIP && ! WITH_CONTIKI */
++#endif /* ! WITH_LWIP && ! WITH_CONTIKI && ! RIOT_VERSION*/
+ 
+ /*
+  * return 1  I/O pending
+diff --git a/src/coap_io_riot.c b/src/coap_io_riot.c
+index 8c0222ab..0f9f6cab 100644
+--- a/src/coap_io_riot.c
++++ b/src/coap_io_riot.c
+@@ -15,35 +15,80 @@
+ 
+ #include "coap3/coap_internal.h"
+ 
+-#ifdef HAVE_STDIO_H
+-#  include <stdio.h>
+-#endif
+-
+-#ifdef HAVE_SYS_SOCKET_H
+-# include <sys/socket.h>
+-# define OPTVAL_T(t)         (t)
+-# define OPTVAL_GT(t)        (t)
+-#endif
+-#ifdef HAVE_SYS_IOCTL_H
+-#include <sys/ioctl.h>
+-#endif
+-#ifdef HAVE_NETINET_IN_H
+-# include <netinet/in.h>
+-#endif
+-#ifdef HAVE_SYS_UIO_H
+-# include <sys/uio.h>
+-#endif
+-#ifdef HAVE_UNISTD_H
+-# include <unistd.h>
+-#endif
+-
+ #include "net/gnrc.h"
+ #include "net/gnrc/ipv6.h"
+ #include "net/gnrc/netreg.h"
+ #include "net/udp.h"
++#if COAP_DISABLE_TCP
++#include "net/tcp.h"
++#endif /* ! COAP_DISABLE_TCP */
++#include "net/sock/async.h"
+ 
+ #include "coap3/coap_riot.h"
+ 
++#define COAP_SELECT_THREAD_FLAG (1U << 4)
++
++int
++coap_io_process(coap_context_t *ctx, uint32_t timeout_ms) {
++  coap_tick_t before, now;
++  uint32_t timeout;
++  coap_socket_t *sockets[1];
++  unsigned int max_sockets = sizeof(sockets)/sizeof(sockets[0]);
++  unsigned int num_sockets;
++  ztimer64_t timeout_timer;
++  thread_flags_t tflags;
++
++  coap_lock_check_locked(ctx);
++
++  coap_ticks(&before);
++  /* Use the common logic */
++  timeout = coap_io_prepare_io(ctx, sockets, max_sockets, &num_sockets, before);
++
++  if (timeout_ms == COAP_IO_NO_WAIT) {
++    timeout = 0;
++  } else if (timeout == 0 && timeout_ms == COAP_IO_WAIT) {
++    timeout = UINT32_MAX/1000;
++  } else {
++    if (timeout == 0 || timeout_ms < timeout)
++      timeout = timeout_ms;
++  }
++
++  if (timeout > 0) {
++    ztimer64_set_timeout_flag(ZTIMER64_USEC, &timeout_timer, timeout*1000);
++    ctx->selecting_thread = thread_get_active();
++
++    /* Unlock so that other threads can lock/update ctx */
++    coap_lock_unlock(ctx);
++
++    tflags = thread_flags_wait_any(COAP_SELECT_THREAD_FLAG |
++                                   THREAD_FLAG_TIMEOUT);
++    /* Take control of ctx again */
++    coap_lock_lock(ctx, return -1);
++
++    if (tflags & THREAD_FLAG_TIMEOUT) {
++      errno = EINTR;
++    }
++
++    ztimer64_remove(ZTIMER64_USEC, &timeout_timer);
++  }
++
++  coap_ticks(&now);
++  coap_io_do_io(ctx, now);
++
++#if COAP_SERVER_SUPPORT
++  coap_expire_cache_entries(ctx);
++#endif /* COAP_SERVER_SUPPORT */
++  coap_ticks(&now);
++#if COAP_ASYNC_SUPPORT
++  /* Check to see if we need to send off any Async requests as delay might
++     have been updated */
++  coap_check_async(ctx, now);
++  coap_ticks(&now);
++#endif /* COAP_ASYNC_SUPPORT */
++
++  return (int)(((now - before) * 1000) / COAP_TICKS_PER_SECOND);
++}
++
+ /*
+  * dgram
+  * return +ve Number of bytes written.
+@@ -59,19 +104,580 @@ coap_socket_send(coap_socket_t *sock,
+   if (!coap_debug_send_packet()) {
+     bytes_written = (ssize_t)datalen;
+   } else if (sock->flags & COAP_SOCKET_CONNECTED) {
+-    bytes_written = send(sock->fd, data, datalen, 0);
++    bytes_written = sock_udp_send(&sock->udp, data, datalen, NULL);
+   } else {
+-    bytes_written = sendto(sock->fd, data, datalen, 0,
+-                           &session->addr_info.remote.addr.sa,
+-                           session->addr_info.remote.size);
++    bytes_written = sock_udp_send(&sock->udp, data, datalen, &session->addr_info.remote.riot);
+   }
+ 
+-  if (bytes_written < 0)
++  if (bytes_written < 0) {
++    errno = -bytes_written;
++    bytes_written = -1;
+     coap_log_crit("coap_socket_send: %s\n", coap_socket_strerror());
++  }
+ 
+   return bytes_written;
+ }
+ 
++/*
++ * dgram
++ * return +ve Number of bytes written.
++ *         -1 Error error in errno).
++ *         -2 ICMP error response
++ */
++ssize_t
++coap_socket_recv(coap_socket_t *sock, coap_packet_t *packet) {
++  ssize_t len = -1;
++
++  assert(sock);
++  assert(packet);
++
++  if ((sock->flags & COAP_SOCKET_CAN_READ) == 0) {
++    return -1;
++  } else {
++    /* clear has-data flag */
++    sock->flags &= ~COAP_SOCKET_CAN_READ;
++  }
++
++  if (sock->flags & COAP_SOCKET_CONNECTED) {
++    len = sock_udp_recv(&sock->udp, (char *)packet->payload, COAP_RXBUFFER_SIZE, 0, NULL);
++    if (len < 0) {
++      errno = -len;
++      len = -1;
++      if (errno == ECONNREFUSED || errno == EHOSTUNREACH || errno == ECONNRESET) {
++        /* client-side ICMP destination unreachable, ignore it */
++        coap_log_warn("** %s: coap_socket_recv: ICMP: %s\n",
++                      sock->session ?
++                      coap_session_str(sock->session) : "",
++                      coap_socket_strerror());
++        return -2;
++      }
++      if (errno != EAGAIN) {
++        coap_log_warn("** %s: coap_socket_recv: %s\n",
++                      sock->session ?
++                      coap_session_str(sock->session) : "",
++                      coap_socket_strerror());
++      }
++      goto error;
++    } else if (len > 0) {
++      packet->length = (size_t)len;
++    }
++  } else {
++    sock_udp_aux_rx_t aux;
++    sock_udp_ep_t remote;
++
++    aux.flags = SOCK_AUX_GET_LOCAL;
++    len = sock_udp_recv_aux(&sock->udp, (char *)packet->payload, COAP_RXBUFFER_SIZE, 0,
++                            &remote, &aux);
++    if (len < 0) {
++      errno = -len;
++      len = -1;
++      if (errno == ECONNREFUSED || errno == EHOSTUNREACH || errno == ECONNRESET) {
++        /* client-side ICMP destination unreachable, ignore it */
++        coap_log_warn("** %s: coap_socket_recv: ICMP: %s\n",
++                      sock->session ?
++                      coap_session_str(sock->session) : "",
++                      coap_socket_strerror());
++        return -2;
++      }
++      if (errno != EAGAIN) {
++        coap_log_warn("** %s: coap_socket_recv: %s\n",
++                      sock->session ?
++                      coap_session_str(sock->session) : "",
++                      coap_socket_strerror());
++      }
++      goto error;
++    } else if (len > 0) {
++      packet->length = (size_t)len;
++      memcpy(&packet->addr_info.local.riot, &aux.local, sizeof(packet->addr_info.local.riot));
++      memcpy(&packet->addr_info.remote.riot, &remote, sizeof(packet->addr_info.remote.riot));
++    }
++  }
++
++  if (len >= 0)
++    return len;
++error:
++  return -1;
++}
++
++#if COAP_SERVER_SUPPORT
++
++static void
++udp_recv_endpoint_cb(sock_udp_t *sock, sock_async_flags_t flags, void *arg) {
++  coap_endpoint_t *endpoint = (coap_endpoint_t *)arg;
++
++  (void)sock;
++  if (!(flags & (SOCK_ASYNC_MSG_RECV | SOCK_ASYNC_MSG_SENT)))
++    return;
++
++  if (flags & SOCK_ASYNC_MSG_RECV)
++    endpoint->sock.flags |= COAP_SOCKET_CAN_READ;
++  if (endpoint->context->selecting_thread) {
++    thread_flags_set(endpoint->context->selecting_thread,
++                     COAP_SELECT_THREAD_FLAG);
++  }
++}
++
++int
++coap_socket_bind_udp(coap_socket_t *sock,
++                     const coap_address_t *listen_addr,
++                     coap_address_t *bound_addr) {
++  int ret;
++
++  ret = sock_udp_create(&sock->udp, &listen_addr->riot, NULL, SOCK_FLAGS_REUSE_EP);
++  if (ret < 0) {
++    errno = -ret;
++    ret = -1;
++    coap_log_warn("coap_socket_bind_udp: sock_udp_create: %s (%d)\n",
++                  coap_socket_strerror(), listen_addr->riot.family);
++    goto error;
++  }
++  ret = sock_udp_get_local(&sock->udp, &bound_addr->riot);
++  if (ret != 0) {
++    errno = -ret;
++    ret = -1;
++    coap_log_warn("coap_socket_bind_udp: sock_udp_get_local: %s\n",
++                  coap_socket_strerror());
++  }
++  sock_udp_set_cb(&sock->udp, udp_recv_endpoint_cb, sock->endpoint);
++
++  return 1;
++
++error:
++  coap_socket_close(sock);
++  return 0;
++}
++#endif /* COAP_SERVER_SUPPORT */
++
++#if COAP_CLIENT_SUPPORT
++
++static void
++udp_recv_session_cb(sock_udp_t *sock, sock_async_flags_t flags, void *arg) {
++  coap_session_t *session = (coap_session_t *)arg;
++
++  (void)sock;
++  if (!(flags & (SOCK_ASYNC_MSG_RECV | SOCK_ASYNC_MSG_SENT)))
++    return;
++
++  if (flags & SOCK_ASYNC_MSG_RECV)
++    session->sock.flags |= COAP_SOCKET_CAN_READ;
++  if (session->context->selecting_thread) {
++    thread_flags_set(session->context->selecting_thread,
++                     COAP_SELECT_THREAD_FLAG);
++  }
++}
++
++int
++coap_socket_connect_udp(coap_socket_t *sock,
++                        const coap_address_t *local_if,
++                        const coap_address_t *server,
++                        int default_port,
++                        coap_address_t *local_addr,
++                        coap_address_t *remote_addr) {
++  sock_udp_ep_t local;
++  sock_udp_ep_t remote;
++  coap_address_t connect_addr;
++  int is_mcast = coap_is_mcast(server);
++  int ret;
++
++  coap_address_copy(&connect_addr, server);
++
++  sock->flags &= ~(COAP_SOCKET_CONNECTED | COAP_SOCKET_MULTICAST);
++
++  if (local_if && local_if->riot.family) {
++    if (local_if->riot.family != connect_addr.riot.family) {
++      coap_log_warn("coap_socket_connect_udp: local address family != "
++                    "remote address family\n");
++      goto error;
++    }
++  }
++
++  local.netif = SOCK_ADDR_ANY_NETIF;
++  remote.netif = SOCK_ADDR_ANY_NETIF;
++  switch (connect_addr.riot.family) {
++#if COAP_IPV4_SUPPORT
++  case AF_INET:
++    local.family = AF_INET;
++    local.port = 0;
++    if (local_if) {
++      memcpy(local.addr.ipv4, &local_if->riot.addr.ipv4, sizeof(local.addr.ipv4));
++      local.port = local_if->riot.port;
++    } else {
++      memset(local.addr.ipv4, 0, sizeof(local.addr.ipv4));
++    }
++    remote.family = AF_INET;
++    memcpy(remote.addr.ipv4, &server->riot.addr.ipv4, sizeof(remote.addr.ipv4));
++    if (connect_addr.riot.port == 0)
++      connect_addr.riot.port = default_port;
++    remote.port = connect_addr.riot.port;
++    break;
++#endif /* COAP_IPV4_SUPPORT */
++#if COAP_IPV6_SUPPORT
++  case AF_INET6:
++    local.family = AF_INET6;
++    local.port = 0;
++    if (local_if) {
++      memcpy(local.addr.ipv6, &local_if->riot.addr.ipv6, sizeof(local.addr.ipv6));
++      local.port = local_if->riot.port;
++    } else {
++      memset(local.addr.ipv6, 0, sizeof(local.addr.ipv6));
++    }
++    remote.family = AF_INET6;
++    memcpy(remote.addr.ipv6, &server->riot.addr.ipv6, sizeof(remote.addr.ipv6));
++    if (connect_addr.riot.port == 0)
++      connect_addr.riot.port = htons(default_port);
++    remote.port = connect_addr.riot.port;
++    break;
++#endif /* COAP_IPV6_SUPPORT */
++  default:
++    coap_log_alert("coap_socket_connect_udp: unsupported sa_family %d\n",
++                   connect_addr.riot.family);
++    goto error;
++  }
++
++  ret = sock_udp_create(&sock->udp, &local, &remote, is_mcast ? 0 : SOCK_FLAGS_CONNECT_REMOTE);
++  if (ret < 0) {
++    errno = -ret;
++    ret = -1;
++    coap_log_warn("coap_socket_connect_udp: sock_udp_create: %s (%d)\n",
++                  coap_socket_strerror(), connect_addr.riot.family);
++    goto error;
++  }
++  ret = sock_udp_get_local(&sock->udp, &local);
++  if (ret != 0) {
++    errno = -ret;
++    ret = -1;
++    coap_log_warn("coap_socket_connect_udp: sock_udp_get_local: %s\n",
++                  coap_socket_strerror());
++  }
++  memcpy(&local_addr->riot, &local, sizeof(local_addr->riot));
++
++  ret = sock_udp_get_remote(&sock->udp, &remote);
++  if (ret != 0) {
++    errno = -ret;
++    ret = -1;
++    coap_log_warn("coap_socket_connect_udp: sock_udp_get_remote: %s\n",
++                  coap_socket_strerror());
++  }
++  memcpy(&remote_addr->riot, &remote, sizeof(remote_addr->riot));
++
++  sock_udp_set_cb(&sock->udp, udp_recv_session_cb, sock->session);
++
++  /* special treatment for sockets that are used for multicast communication */
++  if (is_mcast) {
++    coap_address_copy(remote_addr, &connect_addr);
++    coap_address_copy(&sock->mcast_addr, &connect_addr);
++    sock->flags |= COAP_SOCKET_MULTICAST;
++    return 1;
++  }
++
++  sock->flags |= COAP_SOCKET_CONNECTED;
++  return 1;
++
++error:
++  coap_socket_close(sock);
++  return 0;
++}
++#endif /* COAP_CLIENT_SUPPORT */
++
++void
++coap_socket_close(coap_socket_t *sock) {
++  if (sock->flags != COAP_SOCKET_EMPTY) {
++    sock_udp_close(&sock->udp);
++  }
++#if !COAP_DISABLE_TCP
++  if (sock->flags != COAP_SOCKET_EMPTY) {
++    sock_tcp_disconnect(&sock->tcp);
++  }
++#endif /* !COAP_DISABLE_TCP */
++  sock->flags = COAP_SOCKET_EMPTY;
++}
++
++#if ! COAP_DISABLE_TCP
++
++/*
++ * strm
++ * return +ve Number of bytes written.
++ *          0 No data written.
++ *         -1 Error (error in errno).
++ */
++ssize_t
++coap_socket_write(coap_socket_t *sock, const uint8_t *data, size_t data_len) {
++  ssize_t ret;
++
++  sock->flags &= ~(COAP_SOCKET_WANT_WRITE | COAP_SOCKET_CAN_WRITE);
++  ret = sock_tcp_write(&sock->tcp, data, data_len);
++  if (ret < 0) {
++    errno = -ret;
++    ret = -1;
++    if (errno==EAGAIN ||
++#if EAGAIN != EWOULDBLOCK
++        errno == EWOULDBLOCK ||
++#endif
++        errno == EINTR) {
++      sock->flags |= COAP_SOCKET_WANT_WRITE;
++      return 0;
++    }
++    if (errno == EPIPE || errno == ECONNRESET) {
++      coap_log_info("coap_socket_write: send: %s\n",
++                    coap_socket_strerror());
++    } else {
++      coap_log_warn("coap_socket_write: send: %s\n",
++                    coap_socket_strerror());
++    }
++    return -1;
++  }
++  if (ret < (ssize_t)data_len) {
++    sock->flags |= COAP_SOCKET_WANT_WRITE;
++  }
++  return ret;
++}
++
++/*
++ * strm
++ * return >=0 Number of bytes read.
++ *         -1 Error (error in errno).
++ */
++ssize_t
++coap_socket_read(coap_socket_t *sock, uint8_t *data, size_t data_len) {
++  ssize_t ret;
++
++  ret = sock_tcp_read(&sock->tcp, data, data_len, SOCK_NO_TIMEOUT);
++  if (ret == 0) {
++    /* graceful shutdown */
++    sock->flags &= ~COAP_SOCKET_CAN_READ;
++    errno = ECONNRESET;
++    return -1;
++  } else if (ret < 0) {
++    errno = -ret;
++    ret = -1;
++    sock->flags &= ~COAP_SOCKET_CAN_READ;
++    if (errno==EAGAIN ||
++#if EAGAIN != EWOULDBLOCK
++        errno == EWOULDBLOCK ||
++#endif
++        errno == EINTR) {
++      return 0;
++    }
++    if (errno != ECONNRESET) {
++      coap_log_warn("coap_socket_read: recv: %s\n",
++                    coap_socket_strerror());
++    }
++    return -1;
++  }
++  if (ret < (ssize_t)data_len)
++    sock->flags &= ~COAP_SOCKET_CAN_READ;
++  return ret;
++}
++
++#ifdef MODULE_LWIP_TCP
++static void
++tcp_recv_session_cb(sock_tcp_t *sock, sock_async_flags_t flags, void *arg) {
++  coap_session_t *session = (coap_session_t *)arg;
++
++  (void)sock;
++  if (!(flags & (SOCK_ASYNC_MSG_RECV | SOCK_ASYNC_MSG_SENT)))
++    return;
++
++  if (flags & SOCK_ASYNC_MSG_RECV)
++    session->sock.flags |= COAP_SOCKET_CAN_READ;
++  if (session->context->selecting_thread) {
++    thread_flags_set(session->context->selecting_thread,
++                     COAP_SELECT_THREAD_FLAG);
++  }
++}
++#endif /* MODULE_LWIP_TCP */
++
++#if COAP_CLIENT_SUPPORT
++
++int
++coap_socket_connect_tcp1(coap_socket_t *sock,
++                         const coap_address_t *local_if,
++                         const coap_address_t *server,
++                         int default_port,
++                         coap_address_t *local_addr,
++                         coap_address_t *remote_addr) {
++  sock_tcp_ep_t local;
++  sock_tcp_ep_t remote;
++  coap_address_t connect_addr;
++  int ret;
++
++  coap_address_copy(&connect_addr, server);
++
++  sock->flags &= ~(COAP_SOCKET_CONNECTED | COAP_SOCKET_MULTICAST);
++
++  if (local_if && local_if->riot.family) {
++    if (local_if->riot.family != connect_addr.riot.family) {
++      coap_log_warn("coap_socket_connect_tcp1: local address family != "
++                    "remote address family\n");
++      goto error;
++    }
++  }
++
++  local.netif = SOCK_ADDR_ANY_NETIF;
++  remote.netif = SOCK_ADDR_ANY_NETIF;
++  switch (connect_addr.riot.family) {
++#if COAP_IPV4_SUPPORT
++  case AF_INET:
++    local.family = AF_INET;
++    local.port = 0;
++    if (local_if) {
++      memcpy(local.addr.ipv4, &local_if->riot.addr.ipv4, sizeof(local.addr.ipv4));
++      local.port = local_if->riot.port;
++    } else {
++      memset(local.addr.ipv4, 0, sizeof(local.addr.ipv4));
++    }
++    remote.family = AF_INET;
++    memcpy(remote.addr.ipv4, &server->riot.addr.ipv4, sizeof(remote.addr.ipv4));
++    if (connect_addr.riot.port == 0)
++      connect_addr.riot.port = default_port;
++    remote.port = connect_addr.riot.port;
++    break;
++#endif /* COAP_IPV4_SUPPORT */
++#if COAP_IPV6_SUPPORT
++  case AF_INET6:
++    local.family = AF_INET6;
++    local.port = 0;
++    if (local_if) {
++      memcpy(local.addr.ipv6, &local_if->riot.addr.ipv6, sizeof(local.addr.ipv6));
++      local.port = local_if->riot.port;
++    } else {
++      memset(local.addr.ipv6, 0, sizeof(local.addr.ipv6));
++    }
++    remote.family = AF_INET6;
++    memcpy(remote.addr.ipv6, &server->riot.addr.ipv6, sizeof(remote.addr.ipv6));
++    if (connect_addr.riot.port == 0)
++      connect_addr.riot.port = default_port;
++    remote.port = connect_addr.riot.port;
++    break;
++#endif /* COAP_IPV6_SUPPORT */
++  default:
++    coap_log_alert("coap_socket_connect_tcp1: unsupported sa_family %d\n",
++                   connect_addr.riot.family);
++    goto error;
++  }
++
++  ret = sock_tcp_connect(&sock->tcp, &remote, 0, 0);
++  if (ret < 0) {
++    errno = -ret;
++    ret = -1;
++    coap_log_warn("coap_socket_connect_tcp1: sock_tcp_create: %s (%d)\n",
++                  coap_socket_strerror(), connect_addr.riot.family);
++    goto error;
++  }
++  ret = sock_tcp_get_local(&sock->tcp, &local);
++  if (ret != 0) {
++    errno = -ret;
++    ret = -1;
++    coap_log_warn("coap_socket_connect_tcp1: sock_tcp_get_local: %s\n",
++                  coap_socket_strerror());
++  }
++  memcpy(&local_addr->riot, &local, sizeof(local_addr->riot));
++
++  ret = sock_tcp_get_remote(&sock->tcp, &remote);
++  if (ret != 0) {
++    errno = -ret;
++    ret = -1;
++    coap_log_warn("coap_socket_connect_tcp: sock_tcp_get_remote: %s\n",
++                  coap_socket_strerror());
++  }
++  memcpy(&remote_addr->riot, &remote, sizeof(remote_addr->riot));
++
++#ifdef MODULE_LWIP_TCP
++  sock_tcp_set_cb(&sock->tcp, tcp_recv_session_cb, sock->session);
++#endif /* MODULE_LWIP_TCP */
++
++  sock->flags |= COAP_SOCKET_CONNECTED;
++  return 1;
++
++error:
++  coap_socket_close(sock);
++  return 0;
++}
++
++int
++coap_socket_connect_tcp2(coap_socket_t *sock,
++                         coap_address_t *local_addr,
++                         coap_address_t *remote_addr) {
++  (void)sock;
++  (void)local_addr;
++  (void)remote_addr;
++
++  return -1;
++}
++#endif /* COAP_CLIENT_SUPPORT */
++
++#if COAP_SERVER_SUPPORT
++
++#define SOCK_QUEUE_LEN  (1U)
++
++static sock_tcp_t sock_queue[SOCK_QUEUE_LEN];
++static sock_tcp_queue_t queue;
++
++int
++coap_socket_bind_tcp(coap_socket_t *sock,
++                     const coap_address_t *listen_addr,
++                     coap_address_t *bound_addr) {
++  ssize_t ret;
++
++  (void)sock;
++
++  ret = sock_tcp_listen(&queue, &listen_addr->riot, sock_queue, SOCK_QUEUE_LEN, 0);
++  if (ret < 0) {
++    errno = -ret;
++    return 0;
++  }
++
++  coap_address_copy(bound_addr, listen_addr);
++
++  return 1;
++}
++
++int
++coap_socket_accept_tcp(coap_socket_t *server,
++                       coap_socket_t *new_client,
++                       coap_address_t *local_addr,
++                       coap_address_t *remote_addr,
++                       void *extra) {
++  sock_tcp_t *sock = NULL;
++  ssize_t ret;
++  sock_tcp_ep_t scratch;
++
++  (void)extra;
++  server->flags &= ~COAP_SOCKET_CAN_ACCEPT;
++  ret = sock_tcp_accept(&queue, &sock, SOCK_NO_TIMEOUT);
++  if (ret < 0) {
++    errno = -ret;
++    return 0;
++  }
++  if (sock == NULL || ret < 0) {
++    coap_log_warn("coap_socket_accept_tcp: accept: %s\n",
++                  coap_socket_strerror());
++    return 0;
++  }
++  new_client->tcp = *sock;
++
++  ret = sock_tcp_get_remote(&new_client->tcp, &scratch);
++  if (ret < 0) {
++    errno = -ret;
++    return 0;
++  }
++  memcpy(&remote_addr->riot, &scratch, sizeof(remote_addr->riot));
++  ret = sock_tcp_get_local(&new_client->tcp, &scratch);
++  if (ret < 0) {
++    errno = -ret;
++    return 0;
++  }
++  memcpy(&local_addr->riot, &scratch, sizeof(local_addr->riot));
++
++#ifdef MODULE_LWIP_TCP
++  sock_tcp_set_cb(&new_client->tcp, tcp_recv_session_cb, new_client->session);
++#endif /* MODULE_LWIP_TCP */
++  return 1;
++}
++#endif /* COAP_SERVER_SUPPORT */
++
++#endif /* ! COAP_DISABLE_TCP */
++
+ static msg_t _msg_q[LIBCOAP_MSG_QUEUE_SIZE];
+ 
+ void
+diff --git a/src/coap_mem.c b/src/coap_mem.c
+index 9f5d8c97..05b39efe 100644
+--- a/src/coap_mem.c
++++ b/src/coap_mem.c
+@@ -422,7 +422,7 @@ coap_malloc_type(coap_memory_tag_t type, size_t size) {
+ 
+   if (size > container->size) {
+     coap_log_warn("coap_malloc_type: Requested memory exceeds maximum object "
+-                  "size (type %d, size %zu, max %d)\n",
++                  "size (type %d, size %zu, max %zd)\n",
+                   type, size, container->size);
+     return NULL;
+   }
+@@ -464,7 +464,7 @@ coap_realloc_type(coap_memory_tag_t type, void *p, size_t size) {
+   if (p) {
+     if (size > container->size) {
+       coap_log_warn("coap_realloc_type: Requested memory exceeds maximum object "
+-                    "size (type %d, size %zu, max %d)\n",
++                    "size (type %d, size %zu, max %zd)\n",
+                     type, size, container->size);
+       return NULL;
+     }
+diff --git a/src/coap_tcp.c b/src/coap_tcp.c
+index 2be75c10..379874b0 100644
+--- a/src/coap_tcp.c
++++ b/src/coap_tcp.c
+@@ -16,6 +16,12 @@
+ 
+ #include "coap3/coap_internal.h"
+ 
++int
++coap_tcp_is_supported(void) {
++  return !COAP_DISABLE_TCP;
++}
++
++#if !COAP_DISABLE_TCP && !defined(WITH_LWIP) && !defined(WITH_CONTIKI) && !defined(RIOT_VERSION)
+ #include <sys/types.h>
+ #ifdef HAVE_SYS_SOCKET_H
+ # include <sys/socket.h>
+@@ -33,12 +39,6 @@
+ # define CMSG_DATA WSA_CMSG_DATA
+ #endif
+ 
+-int
+-coap_tcp_is_supported(void) {
+-  return !COAP_DISABLE_TCP;
+-}
+-
+-#if !COAP_DISABLE_TCP && !defined(WITH_LWIP) && !defined(WITH_CONTIKI)
+ int
+ coap_socket_connect_tcp1(coap_socket_t *sock,
+                          const coap_address_t *local_if,
+@@ -47,9 +47,9 @@ coap_socket_connect_tcp1(coap_socket_t *sock,
+                          coap_address_t *local_addr,
+                          coap_address_t *remote_addr) {
+   int on = 1;
+-#if !defined(RIOT_VERSION) && COAP_IPV6_SUPPORT
++#if COAP_IPV6_SUPPORT
+   int off = 0;
+-#endif /* ! RIOT_VERSION && COAP_IPV6_SUPPORT */
++#endif /* COAP_IPV6_SUPPORT */
+ #ifdef _WIN32
+   u_long u_on = 1;
+ #endif
+@@ -65,7 +65,6 @@ coap_socket_connect_tcp1(coap_socket_t *sock,
+     goto error;
+   }
+ 
+-#ifndef RIOT_VERSION
+ #ifdef _WIN32
+   if (ioctlsocket(sock->fd, FIONBIO, &u_on) == COAP_SOCKET_ERROR) {
+ #else
+@@ -74,7 +73,6 @@ coap_socket_connect_tcp1(coap_socket_t *sock,
+     coap_log_warn("coap_socket_connect_tcp1: ioctl FIONBIO: %s\n",
+                   coap_socket_strerror());
+   }
+-#endif /* RIOT_VERSION */
+ 
+   switch (server->addr.sa.sa_family) {
+ #if COAP_IPV4_SUPPORT
+@@ -87,13 +85,11 @@ coap_socket_connect_tcp1(coap_socket_t *sock,
+   case AF_INET6:
+     if (connect_addr.addr.sin6.sin6_port == 0)
+       connect_addr.addr.sin6.sin6_port = htons(default_port);
+-#ifndef RIOT_VERSION
+     /* Configure the socket as dual-stacked */
+     if (setsockopt(sock->fd, IPPROTO_IPV6, IPV6_V6ONLY, OPTVAL_T(&off),
+                    sizeof(off)) == COAP_SOCKET_ERROR)
+       coap_log_warn("coap_socket_connect_tcp1: setsockopt IPV6_V6ONLY: %s\n",
+                     coap_socket_strerror());
+-#endif /* RIOT_VERSION */
+     break;
+ #endif /* COAP_IPV6_SUPPORT */
+ #if COAP_AF_UNIX_SUPPORT
+@@ -205,9 +201,9 @@ coap_socket_bind_tcp(coap_socket_t *sock,
+                      const coap_address_t *listen_addr,
+                      coap_address_t *bound_addr) {
+   int on = 1;
+-#if !defined(RIOT_VERSION) && COAP_IPV6_SUPPORT
++#if COAP_IPV6_SUPPORT
+   int off = 0;
+-#endif /* ! RIOT_VERSION && COAP_IPV6_SUPPORT */
++#endif /* COAP_IPV6_SUPPORT */
+ #ifdef _WIN32
+   u_long u_on = 1;
+ #endif
+@@ -220,7 +216,6 @@ coap_socket_bind_tcp(coap_socket_t *sock,
+     goto error;
+   }
+ 
+-#ifndef RIOT_VERSION
+ #ifdef _WIN32
+   if (ioctlsocket(sock->fd, FIONBIO, &u_on) == COAP_SOCKET_ERROR) {
+ #else
+@@ -229,7 +224,6 @@ coap_socket_bind_tcp(coap_socket_t *sock,
+     coap_log_warn("coap_socket_bind_tcp: ioctl FIONBIO: %s\n",
+                   coap_socket_strerror());
+   }
+-#endif /* RIOT_VERSION */
+   if (setsockopt(sock->fd, SOL_SOCKET, SO_KEEPALIVE, OPTVAL_T(&on),
+                  sizeof(on)) == COAP_SOCKET_ERROR)
+     coap_log_warn("coap_socket_bind_tcp: setsockopt SO_KEEPALIVE: %s\n",
+@@ -247,13 +241,11 @@ coap_socket_bind_tcp(coap_socket_t *sock,
+ #endif /* COAP_IPV4_SUPPORT */
+ #if COAP_IPV6_SUPPORT
+   case AF_INET6:
+-#ifndef RIOT_VERSION
+     /* Configure the socket as dual-stacked */
+     if (setsockopt(sock->fd, IPPROTO_IPV6, IPV6_V6ONLY, OPTVAL_T(&off),
+                    sizeof(off)) == COAP_SOCKET_ERROR)
+       coap_log_alert("coap_socket_bind_tcp: setsockopt IPV6_V6ONLY: %s\n",
+                      coap_socket_strerror());
+-#endif /* RIOT_VERSION */
+     break;
+ #endif /* COAP_IPV6_SUPPORT */
+ #if COAP_AF_UNIX_SUPPORT
+@@ -301,13 +293,11 @@ coap_socket_accept_tcp(coap_socket_t *server,
+                        coap_address_t *local_addr,
+                        coap_address_t *remote_addr,
+                        void *extra) {
+-#ifndef RIOT_VERSION
+ #ifdef _WIN32
+   u_long u_on = 1;
+ #else
+   int on = 1;
+ #endif
+-#endif /* RIOT_VERSION */
+   (void)extra;
+ 
+   server->flags &= ~COAP_SOCKET_CAN_ACCEPT;
+@@ -324,7 +314,6 @@ coap_socket_accept_tcp(coap_socket_t *server,
+     coap_log_warn("coap_socket_accept_tcp: getsockname: %s\n",
+                   coap_socket_strerror());
+ 
+-#ifndef RIOT_VERSION
+ #ifdef _WIN32
+   if (ioctlsocket(new_client->fd, FIONBIO, &u_on) == COAP_SOCKET_ERROR) {
+ #else
+@@ -333,7 +322,6 @@ coap_socket_accept_tcp(coap_socket_t *server,
+     coap_log_warn("coap_socket_accept_tcp: ioctl FIONBIO: %s\n",
+                   coap_socket_strerror());
+   }
+-#endif /* RIOT_VERSION */
+   return 1;
+ }
+ #endif /* !COAP_DISABLE_TCP */
+diff --git a/src/coap_threadsafe.c b/src/coap_threadsafe.c
+index 46ada820..d721dff5 100644
+--- a/src/coap_threadsafe.c
++++ b/src/coap_threadsafe.c
+@@ -578,6 +578,7 @@ coap_io_process(coap_context_t *ctx, uint32_t timeout_ms) {
+ }
+ 
+ #if !defined(WITH_LWIP)
++#ifdef HAVE_SYS_SELECT_H
+ int
+ coap_io_process_with_fds(coap_context_t *ctx, uint32_t timeout_ms,
+                          int enfds, fd_set *ereadfds, fd_set *ewritefds,
+@@ -590,6 +591,7 @@ coap_io_process_with_fds(coap_context_t *ctx, uint32_t timeout_ms,
+   coap_lock_unlock(ctx);
+   return ret;
+ }
++#endif /* HAVE_SYS_SELECT_H */
+ #endif /* WITH_LWIP */
+ 
+ uint16_t
+diff --git a/src/coap_tinydtls.c b/src/coap_tinydtls.c
+index f44e5e46..c7707306 100644
+--- a/src/coap_tinydtls.c
++++ b/src/coap_tinydtls.c
+@@ -224,17 +224,17 @@ get_session_addr(const session_t *s, coap_address_t *a) {
+   a->port = s->port;
+ #elif defined(WITH_RIOT_SOCK)
+   if (s->addr.family == AF_INET6) {
+-    a->size = (socklen_t)sizeof(a->addr.sin6);
+-    a->addr.sa.sa_family = s->addr.family;
+-    memcpy(&a->addr.sin6.sin6_addr, &s->addr.ipv6,
+-           sizeof(a->addr.sin6.sin6_addr));
+-    a->addr.sin6.sin6_port = s->addr.port;
++    a->riot.family = s->addr.family;
++    memcpy(&a->riot.addr.ipv6, &s->addr.ipv6,
++           sizeof(a->riot.addr.ipv6));
++    a->riot.port = ntohs(s->addr.port);
++    a->riot.netif = 0;
+ #ifdef SOCK_HAS_IPV4
+   } else if (s->addr.family == AF_INET) {
+-    a->addr.sa.sa_family = s->addr.family;
+-    a->size = (socklen_t)sizeof(a->addr.sin);
+-    memcpy(&a->addr.sin.sin_addr, &s->addr.ipv4, sizeof(a->addr.sin.sin_addr));
+-    a->addr.sin.sin_port = s->addr.port;
++    a->riot.family = s->addr.family;
++    memcpy(&a->riot.addr.ipv4, &s->addr.ipv4, sizeof(a->riot.addr.ipv4));
++    a->riot.port = ntohs(s->addr.port);
++    a->riot.netif = 0;
+ #endif /* SOCK_HAS_IPV4 */
+   }
+ #else /* ! WITH_CONTIKI && ! WITH_LWIP && ! WITH_RIOT_SOCK */
+@@ -258,18 +258,18 @@ put_session_addr(const coap_address_t *a, session_t *s) {
+   s->addr = a->addr;
+   s->port = a->port;
+ #elif defined(WITH_RIOT_SOCK)
+-  if (a->addr.sa.sa_family == AF_INET6) {
+-    s->size = (socklen_t)sizeof(s->addr.ipv6);
+-    s->addr.family = a->addr.sa.sa_family;
+-    memcpy(&s->addr.ipv6, &a->addr.sin6.sin6_addr,
++  if (a->riot.family == AF_INET6) {
++    s->size = sizeof(s->addr.ipv6);
++    s->addr.family = a->riot.family;
++    memcpy(&s->addr.ipv6, &a->riot.addr.ipv6,
+            sizeof(s->addr.ipv6));
+-    s->addr.port = a->addr.sin6.sin6_port;
++    s->addr.port = htons(a->riot.port);
+ #ifdef SOCK_HAS_IPV4
+-  } else if (a->addr.sa.sa_family == AF_INET) {
+-    s->size = (socklen_t)sizeof(s->addr.ipv4);
+-    s->addr.family = a->addr.sa.sa_family;
+-    memcpy(&a->addr.ipv4, &s->addr.sin.sin_addr, sizeof(a->addr.ipv4));
+-    s->addr.port = a->addr.sin.sin_port;
++  } else if (a->r.family == AF_INET) {
++    s->size = sizeof(s->addr.ipv4);
++    s->addr.family = a->r.family;
++    memcpy(&a->addr.ipv4, &s->r.addr.ipv4, sizeof(a->addr.ipv4));
++    s->addr.port = htons(a->r.port);
+ #endif /* SOCK_HAS_IPV4 */
+   }
+ #else /* ! WITH_CONTIKI && ! WITH_LWIP && ! WITH_RIOT_SOCK */
+-- 
+2.34.1
+
