@@ -96,14 +96,14 @@ int main(void)
 
         }
         else if (card.type == ISO14443A_MIFARE) {
-            char key[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
+            unsigned char key[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
             char data[32];
 
             for (int i = 0; i < 64; i++) {
                 LOG_INFO("sector %02d, block %02d | ", i / 4, i);
                 if ((i & 0x03) == 0) {
                     ret = pn532_mifareclassic_authenticate(&pn532, &card,
-                                                           PN532_MIFARE_KEY_A, key, i);
+                                                           PN532_MIFARE_KEY_A, (char *)key, i);
                     if (ret != 0) {
                         LOG_ERROR("auth\n");
                         break;
