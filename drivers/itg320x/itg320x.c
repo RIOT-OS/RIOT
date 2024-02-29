@@ -61,7 +61,7 @@ int itg320x_init(itg320x_t *dev, const itg320x_params_t *params)
     assert(dev != NULL);
     assert(params != NULL);
 
-    DEBUG_DEV("params=%p", dev, params);
+    DEBUG_DEV("params=%p", dev, (void *)params);
 
     /* init sensor data structure */
     dev->params = *params;
@@ -92,7 +92,7 @@ int itg320x_init_int(const itg320x_t *dev, itg320x_drdy_int_cb_t cb, void *arg)
     assert(dev != NULL);
     assert(gpio_is_valid(dev->params.int_pin));
 
-    DEBUG_DEV("cb=%p, arg=%p", dev, cb, arg);
+    DEBUG_DEV("cb=%p, arg=%p", dev, (void *)cb, (void *)arg);
 
     if (dev->params.int_level == ITG320X_INT_HIGH) {
         /* for high active interrupt signal (default) */
@@ -139,7 +139,7 @@ int itg320x_read(const itg320x_t *dev, itg320x_data_t *data)
     assert(dev != NULL);
     assert(data != NULL);
 
-    DEBUG_DEV("data=%p", dev, data);
+    DEBUG_DEV("data=%p", dev, (void *)data);
 
     itg320x_raw_data_t raw;
 
@@ -163,7 +163,7 @@ int itg320x_read_raw(const itg320x_t *dev, itg320x_raw_data_t *raw)
     assert(dev != NULL);
     assert(raw != NULL);
 
-    DEBUG_DEV("raw=%p", dev, raw);
+    DEBUG_DEV("raw=%p", dev, (void *)raw);
 
     uint8_t data[6];
 
@@ -188,7 +188,7 @@ int itg320x_read_temp(const itg320x_t *dev, int16_t *temp)
     assert(dev != NULL);
     assert(temp != NULL);
 
-    DEBUG_DEV("temp=%p", dev, temp);
+    DEBUG_DEV("temp=%p", dev, (void *)temp);
 
     uint8_t data[2];
 
