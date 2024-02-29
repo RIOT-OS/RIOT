@@ -1058,8 +1058,8 @@ static int _read(const l3gxxxx_t *dev, uint8_t reg, uint8_t *data, uint8_t len)
         }
 
         if (ENABLE_DEBUG) {
-            printf("[l3gxxxx] %s dev=%" PRIxPTR ": read following bytes: ",
-                   __func__,  (unsigned int)dev);
+            printf("[l3gxxxx] %s dev=%p: read following bytes: ",
+                   __func__,  (void *)dev);
             for (uint8_t i = 0; i < len; i++) {
                 printf("%02x ", data[i]);
             }
@@ -1111,8 +1111,8 @@ static int _write(const l3gxxxx_t *dev,
         }
 
         if (ENABLE_DEBUG) {
-            printf("[l3gxxxx] %s dev=%" PRIxPTR ": write following bytes: ",
-                   __func__,  (unsigned int)dev);
+            printf("[l3gxxxx] %s dev=%p: write following bytes: ",
+                   __func__,  (void *)dev);
             for (uint8_t i = 0; i < len; i++) {
                 printf("%02x ", data[i]);
             }
