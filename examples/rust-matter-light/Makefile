@@ -16,7 +16,7 @@ DEVELHELP ?= 1
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-CFLAGS += '-DTHREAD_STACKSIZE_MAIN=(THREAD_STACKSIZE_DEFAULT + 48000)'
+CFLAGS += '-DTHREAD_STACKSIZE_MAIN=(THREAD_STACKSIZE_DEFAULT + 64000)'
 
 # The name of crate (as per Cargo.toml package name, but with '-' replaced with '_')
 APPLICATION_RUST_MODULE = rust_matter_light
@@ -29,7 +29,9 @@ USEMODULE += saul_default
 USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += periph_gpio
+USEMODULE += ztimer
 USEMODULE += ztimer_msec
+USEMODULE += ztimer_usec
 USEMODULE += ps
 
 # networking
