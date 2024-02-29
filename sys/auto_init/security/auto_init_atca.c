@@ -42,7 +42,7 @@ static struct atca_device atca_devs[ATCA_NUMOF];
 #if IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A)
 void auto_init_atca(void)
 {
-    DEBUG("[auto_init_atca] Number of secure elements: %d\n", ATCA_NUMOF);
+    DEBUG("[auto_init_atca] Number of secure elements: %"PRIuSIZE"\n", ATCA_NUMOF);
     for (unsigned i = 0; i < ATCA_NUMOF; i++) {
         int status = initATCADevice((ATCAIfaceCfg *)&atca_params[i].cfg, (ATCADevice)&atca_devs[i]);
         if (status != ATCA_SUCCESS) {
