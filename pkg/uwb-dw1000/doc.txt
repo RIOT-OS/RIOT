@@ -4,5 +4,5 @@
  * @brief    uwb-core driver for Decawave DW1000 transceiver
  * @see      https://github.com/Decawave/uwb-dw1000
  *
- * @include pkg/ucglib/README.md
+ * @include pkg/uwb-dw1000/README.md
  */
