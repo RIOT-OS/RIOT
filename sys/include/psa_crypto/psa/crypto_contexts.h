@@ -49,6 +49,7 @@ typedef union {
 #if IS_USED(MODULE_PSA_HASH_SHA_512) || defined(DOXYGEN)
     psa_hashes_sha512_ctx_t sha512; /**< SHA-512 context */
 #endif
+    uint8_t dummy;
 } psa_hash_context_t;
 #endif
 
@@ -68,6 +69,7 @@ typedef union {
 #if IS_USED(MODULE_PSA_CIPHER_AES_256_CBC) || defined(DOXYGEN)
     psa_cipher_aes_256_ctx_t aes_256;   /**< AES 256 context*/
 #endif
+    uint8_t dummy;
 } psa_cipher_context_t;
 #endif
 
