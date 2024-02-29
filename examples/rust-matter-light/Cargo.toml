@@ -19,6 +19,7 @@ riot-wrappers = { version = "0.8.2", features = [ "set_panic_handler", "with_emb
 riot-sys = "*"
 embedded-nal-async = "^0.7.1"
 embedded-hal = "0.2.2"
+embedded-hal-async = { version =  "1.0.0"}
 
 # While currently this exmple does not use any RIOT modules implemented in
 # Rust, that may change; it is best practice for any RIOT application that has
