@@ -55,7 +55,7 @@ int main(void)
     sdp3x_start_continuous(&sdp3x_dev,
                            SDP3X_FLAG_DIFF_PRESS|SDP3X_FLAG_AVERAGE);
 
-    continuous_timer.callback = (void *)continuous_measurement_callback;
+    continuous_timer.callback = continuous_measurement_callback;
     continuous_timer.arg = &interval;
 
     xtimer_set(&continuous_timer, interval);
