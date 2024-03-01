@@ -14,16 +14,18 @@ pub mod saul_reg;
 mod dev_att;
 mod network;
 mod persist;
-use embassy_futures::{block_on, join};
 use network::RiotSocket;
-use network::utils::{get_ipv6_address, initialize_network, test_udp, test_udp_wrapper};
+use network::utils::{initialize_network};
+use gpio::{
+    LED_PORT, LED_PIN,
+    RGB_PORT, RGB_RED_PIN, RGB_GREEN_PIN, RGB_BLUE_PIN
+};
 
 // core library
 use core::{ffi::CStr, borrow::Borrow, pin::pin};
 
 // external crates
 use static_cell::StaticCell;
-use embassy_futures::select::{select, select3};
 use embedded_nal_async::UdpStack as _;
 use embedded_hal::blocking::delay::DelayMs as _;
 use embedded_hal_async::delay::DelayNs as _;
@@ -37,36 +39,25 @@ use riot_wrappers::ztimer;
 
 // rs-matter
 extern crate rs_matter;
+use rs_matter::error::{Error as MatterError};
+use rs_matter::MATTER_PORT;
 use rs_matter::utils::select::EitherUnwrap as _;
-use rs_matter::transport::network::{UdpReceive as _, UdpSend as _};
+use rs_matter::transport::network::{UdpReceive as _, UdpSend as _, UdpBuffers};
+use rs_matter::transport::core::{PacketBuffers, MATTER_SOCKET_BIND_ADDR};
 use rs_matter::core::{CommissioningData, Matter};
-use rs_matter::data_model::cluster_basic_information::BasicInfoConfig;
-use rs_matter::data_model::cluster_on_off;
-use rs_matter::data_model::device_types::DEV_TYPE_ON_OFF_LIGHT;
-use rs_matter::data_model::objects::*;
-use rs_matter::data_model::root_endpoint;
-use rs_matter::data_model::system_model::descriptor;
-use rs_matter::error::{Error as MatterError, Error};
+use rs_matter::data_model::{
+    cluster_basic_information::BasicInfoConfig,
+    cluster_on_off,
+    device_types::DEV_TYPE_ON_OFF_LIGHT,
+    objects::*,
+    root_endpoint,
+    system_model::descriptor
+};
+use rs_matter::mdns::MdnsService;
 use rs_matter::mdns::builtin::{
     MDNS_IPV4_BROADCAST_ADDR, MDNS_IPV6_BROADCAST_ADDR, MDNS_SOCKET_BIND_ADDR,
 };
-use rs_matter::mdns::MdnsService;
-use rs_matter::transport::core::{PacketBuffers, MATTER_SOCKET_BIND_ADDR};
-use rs_matter::transport::network::UdpBuffers;
-use rs_matter::MATTER_PORT;
 use rs_matter::secure_channel::spake2p::VerifierData;
-
-
-// Application-specific constants
-// User LED port and pin on used boards
-const LED_PORT: u32 = 0;
-const LED_PIN: u32 = 5;
-
-// RGB LED port and pin
-const RGB_PORT: u32 = 0;
-const RGB_RED_PIN: u32 = 7;
-const RGB_GREEN_PIN: u32 = 6;
-const RGB_BLUE_PIN: u32 = 5;
 
 // Node object with endpoints supporting device type 'OnOff Light'
 const NODE: Node<'static> = Node {
@@ -79,6 +70,18 @@ const NODE: Node<'static> = Node {
             clusters: &[descriptor::CLUSTER, cluster_on_off::CLUSTER],
         },
     ],
+};
+
+static DEV_DET: BasicInfoConfig = BasicInfoConfig {
+    vid: 0xFFF1,
+    pid: 0x8000,
+    hw_ver: 2,
+    sw_ver: 1,
+    sw_ver_str: "1",
+    serial_no: "aabbccddd",
+    device_name: "OnOff Light",
+    product_name: "Light123",
+    vendor_name: "Vendor 123",
 };
 
 // Handler for endpoint 1 (Descriptor + OnOff Cluster)
@@ -161,68 +164,43 @@ async fn amain(spawner: embassy_executor::Spawner) {
         MATTER_PORT,
     ));
 
-    println!("Spawning mDNS Service...");
+    println!("Starting up mDNS Service...");
     spawner.spawn(run_mdns(mdns_service)).unwrap();
 
-    println!("Spawning Matter Service...");
+    println!("Starting up Matter Service...");
     spawner.spawn(run_matter(spawner, mdns_service)).unwrap();
 
-    //run_matter().await;
     println!("Matter exited");
 }
 
-static DEV_DET: BasicInfoConfig = BasicInfoConfig {
-    vid: 0xFFF1,
-    pid: 0x8000,
-    hw_ver: 2,
-    sw_ver: 1,
-    sw_ver_str: "1",
-    serial_no: "aabbccddd",
-    device_name: "OnOff Light",
-    product_name: "Light123",
-    vendor_name: "Vendor 123",
-};
-
 #[embassy_executor::task]
 async fn run_mdns(mdns: &'static MdnsService<'_>) {
-    let (ipv4_addr, ipv6_addr, interface) = initialize_network().expect("Error getting network interface and IP addresses");
-
-    println!("mDNS initialized!");
-
     static UDP_MDNS_SOCKET: StaticCell<riot_sys::sock_udp_t> = StaticCell::new();
-    let udp_stack_mdns = riot_wrappers::socket_embedded_nal_async_udp::UdpStack::new(|| UDP_MDNS_SOCKET.try_uninit());
+    let udp_stack = riot_wrappers::socket_embedded_nal_async_udp::UdpStack::new(|| UDP_MDNS_SOCKET.try_uninit());
 
     // Bind socket to mDNS port: 5353
-    let (mdns_addr, mut mdns_sock) = udp_stack_mdns
+    let (mdns_addr, mut mdns_sock) = udp_stack
         .bind_single(MDNS_SOCKET_BIND_ADDR)
         .await
         .expect("Can't create a socket");
-
-    println!("Bound mDNS to {:?}", &mdns_addr);
-
     let socket = RiotSocket::new(mdns_addr, mdns_sock);
+    println!("Created socket for mDNS at {:?}", &mdns_addr);
 
     let mut mdns_udp_buffers = UdpBuffers::new();
-
     let mdns_runner = pin!(mdns.run(
         &socket,
         &socket,
         &mut mdns_udp_buffers)
     );
     
-    match mdns_runner.await {
-        Ok(_) => {
-            println!("mDNS terminated successfully!");
-        }
-        Err(_) => {
-            println!("mDNS terminated with error!");
-        }
-    }
+    let _ = mdns_runner.await;
+    println!("mDNS service has terminated!");
 }
+
 
 #[embassy_executor::task]
 async fn run_matter(spawner: embassy_executor::Spawner, mdns: &'static MdnsService<'_>) {
-    let test_runner = pin!(async {
+/*    let test_runner = pin!(async {
         loop {
             println!("Matter - test runner...");
             ztimer::Delay.delay_ms(1000).await;
@@ -230,82 +208,73 @@ async fn run_matter(spawner: embassy_executor::Spawner, mdns: &'static MdnsServi
     });
     test_runner.await;
     println!("Matter - test runner exited!");
-    return;
+    return;*/
 
     // --- INIT + START MATTER SERVICE
     static UDP_MATTER_SOCKET: StaticCell<riot_sys::sock_udp_t> = StaticCell::new();
-    let udp_stack_matter = riot_wrappers::socket_embedded_nal_async_udp::UdpStack::new(|| UDP_MATTER_SOCKET.try_uninit());
+    let udp_stack = riot_wrappers::socket_embedded_nal_async_udp::UdpStack::new(|| UDP_MATTER_SOCKET.try_uninit());
 
     // Bind UDP socket to Matter port: 5540
-    let (matter_addr, mut matter_sock) = udp_stack_matter
+    let (matter_addr, mut matter_sock) = udp_stack
         .bind_single(MATTER_SOCKET_BIND_ADDR)
         .await
         .expect("Can't create a socket");
-    println!("Bound Matter to {:?}", &matter_addr);
     let matter_socket = RiotSocket::new(matter_addr, matter_sock);
+    println!("Created socket for Matter at {:?}", &matter_addr);
 
     // Get Device attestation (hard-coded atm)
-    let dev_att = dev_att::HardCodedDevAtt::new();
+    static DEV_ATT: StaticCell<dev_att::HardCodedDevAtt> = StaticCell::new();
+    let dev_att: &'static dev_att::HardCodedDevAtt = DEV_ATT.init(dev_att::HardCodedDevAtt::new());
+    println!("Device attestation created");
 
     // TODO: Provide own epoch and rand functions
     let epoch = rs_matter::utils::epoch::dummy_epoch;
     let rand = rs_matter::utils::rand::dummy_rand;
 
-    let matter = Matter::new(
+    static MATTER: StaticCell<Matter> = StaticCell::new();
+    let matter: &'static Matter = MATTER.init(Matter::new(
         // vid/pid should match those in the DAC
         &DEV_DET,
-        &dev_att,
-        &mdns,
+        dev_att,
+        mdns,
         epoch,
         rand,
         MATTER_PORT,
-    );
+    ));
+    println!("Matter initialized");
+
+    let handler = HandlerCompat(matter_handler(&matter));
+    println!("Datamodel Handler registered");
 
     /*
-    let handler = HandlerCompat(matter_handler(&matter));
-
-    // Create Matter runner
     let mut matter_udp_buffers = UdpBuffers::new();
     let mut matter_packet_buffers = PacketBuffers::new();
+    // Finally run the 'Matter service' on UDP port 5540
     // TODO: Here I get a Stack Overflow!
-    let mut matter_runner = pin!(matter.run(
-        &matter_socket, 
-        &matter_socket, 
-        &mut matter_udp_buffers, 
-        &mut matter_packet_buffers, 
+    let matter_runner = pin!(matter.run(
+        &matter_socket,
+        &matter_socket,
+        &mut matter_udp_buffers,
+        &mut matter_packet_buffers,
         CommissioningData {
             // TODO: Hard-coded for now
             verifier: VerifierData::new_with_pw(123456, *matter.borrow()),
             discriminator: 250,
-        }, 
+        },
         &handler)
-    ); 
-    let mut matter_runner = pin!(matter_runner);
-
-    spawner.spawn(run_psm(&matter)).unwrap();
-
-     match matter_runner.await {
-        Ok(_) => {
-            println!("Matter terminated successfully!");
-        }
-        Err(_) => {
-            println!("Matter terminated with error!");
-        }
-    }
+    );
+    //let mut matter_runner = pin!(matter_runner);
+    //spawner.spawn(run_psm(matter)).unwrap();
+    let _ = matter_runner.await;
+    println!("Matter service terminated!");
     */
 }
 
 #[embassy_executor::task]
-async fn run_psm(matter: &'static mut Matter<'_>) {
+async fn run_psm(matter: &'static Matter<'_>) {
     // TODO: Develop own 'Persistence Manager' using RIOT OS modules
     let mut psm = persist::Psm::new(&matter).expect("Error creating PSM");
     let mut psm_runner = pin!(psm.run());
-    match psm_runner.await {
-        Ok(_) => {
-            println!("PSM terminated successfully!");
-        }
-        Err(_) => {
-            println!("PSM terminated with error!");
-        }
-    }
+    let _ = psm_runner.await;
+    println!("PSM terminated successfully!");
 }
