@@ -8423,3 +8423,4 @@ warning: Member LSM6DSXX_PARAM_ACC_FIFO_DEC (macro definition) of file lsm6dsxx_
 warning: Member LSM6DSXX_PARAM_GYRO_FIFO_DEC (macro definition) of file lsm6dsxx_params.h is not documented.
 warning: Member LSM6DSXX_PARAMS (macro definition) of file lsm6dsxx_params.h is not documented.
 warning: Member LSM6DSXX_SAUL_INFO (macro definition) of file lsm6dsxx_params.h is not documented.
+RIOTDoxygenLayout.xml:8: warning: the type 'topics' is not supported for the entry tag within a navindex! Check your layout file!
