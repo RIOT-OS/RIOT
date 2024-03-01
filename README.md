@@ -4,7 +4,7 @@
 [![API docs][api-badge]][api-link]
 [![Wiki][wiki-badge]][wiki-link]
 [![Stack Overflow questions][stackoverflow-badge]][stackoverflow-link]
-[![Twitter][twitter-badge]][twitter-link]
+[![Mastodon][mastodon-badge]][mastodon-link]
 [![Matrix][matrix-badge]][matrix-link]
 
 <p align="center"><img src="doc/doxygen/src/riot-logo.svg" width="66%"><!--
@@ -165,7 +165,7 @@ https://www.riot-os.org
 [release-link]: https://github.com/RIOT-OS/RIOT/releases/latest
 [stackoverflow-badge]: https://img.shields.io/badge/stackoverflow-%5Briot--os%5D-yellow
 [stackoverflow-link]: https://stackoverflow.com/questions/tagged/riot-os
-[twitter-badge]: https://img.shields.io/badge/social-Twitter-informational.svg
-[twitter-link]: https://twitter.com/RIOT_OS
+[mastodon-badge]: https://img.shields.io/badge/social-Mastodon-informational.svg
+[mastodon-link]: https://fosstodon.org/@RIOT_OS
 [wiki-badge]: https://img.shields.io/badge/docs-Wiki-informational.svg
 [wiki-link]: https://github.com/RIOT-OS/RIOT/wiki
