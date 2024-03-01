@@ -1,13 +1,15 @@
 use core::ops::DerefMut as _;
+use embassy_futures::select::{Either, select};
+use embedded_hal_async::delay::DelayNs;
 
 use rs_matter::{self, error::ErrorCode, transport::network::{UdpReceive, UdpSend}};
 use rs_matter::error::Error as MatterError;
 use riot_wrappers::mutex::Mutex;
 use riot_wrappers::socket_embedded_nal_async_udp::UnconnectedUdpSocket;
-use riot_wrappers::println;
+use riot_wrappers::{println, ztimer};
 use riot_wrappers::gnrc::Netif;
 
-use embedded_nal_async::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV6, UdpStack as _, UnconnectedUdp};
+use embedded_nal_async::{Ipv4Addr, Ipv6Addr, SocketAddr, UdpStack as _, UnconnectedUdp};
 
 pub struct RiotSocket{
     local_addr: SocketAddr,
@@ -27,14 +29,13 @@ impl UdpSend for RiotSocket {
     async fn send_to(&mut self, data: &[u8], addr: SocketAddr) -> Result<(), MatterError> {
         println!("[RiotSocket] send_to {:?}", &addr);
         if addr.is_ipv6() {
-            println!("Is IPv6 address -> send!");
             let res = self.socket.lock().deref_mut().send(self.local_addr, addr, data).await;
             match res {
                 Ok(_) => return Ok(()),
                 Err(_) => return Err(MatterError::new(ErrorCode::StdIoError)),
             }
         }
-        println!("Is IPv4 address -> don't send!");
+        println!("{} is IPv4 -> don't send!", &addr);
         Ok(())
     }
 }
@@ -53,33 +54,65 @@ impl UdpReceive for RiotSocket {
 
 impl UdpSend for &RiotSocket {
     async fn send_to(&mut self, data: &[u8], addr: SocketAddr) -> Result<(), MatterError> {
-        println!("[RiotSocket] send_to {:?} - wait for lock...", &addr);
-        if addr.is_ipv6() {
-            let res = self.socket.lock().deref_mut().send(self.local_addr, addr, data).await;
-            match res {
-                Ok(_) => {
-                    println!("send_to success!");
-                    return Ok(());
-                },
-                Err(_) => {
-                    println!("send_to failure!");
-                    return Err(MatterError::new(ErrorCode::StdIoError));
-                },
+        if addr.is_ipv4() {
+            println!("{} is IPv4 -> don't send!", &addr);
+            return Ok(());
+        }
+
+        println!("[&RiotSocket] sending to {:?} ...", &addr);
+        let res = select(
+            self.socket.lock().deref_mut().send(self.local_addr, addr, data),
+            ztimer::Delay.delay_ms(10),
+        ).await;
+
+        return match res {
+            Either::First(w) => {
+                match w {
+                    Ok(_) => {
+                        println!("send success!");
+                        Ok(())
+                    }
+                    Err(_) => {
+                        println!("send failure!");
+                        Err(MatterError::new(ErrorCode::StdIoError))
+                    }
+                }
+            }
+            Either::Second(t) => {
+                println!("recv timeout occurred!");
+                Ok(())
             }
         }
-        println!("Is IPv4 address -> don't send!");
-        Ok(())
     }
 }
 
 impl UdpReceive for &RiotSocket {
     async fn recv_from(&mut self, buffer: &mut [u8]) -> Result<(usize, SocketAddr), MatterError> {
-        println!("[RiotSocket] receive_into...");
-        let res = self.socket.lock().deref_mut().receive_into(buffer).await;
+        println!("[&RiotSocket] receive_into...");
+        let res = select(
+            self.socket.lock().deref_mut().receive_into(buffer),
+            ztimer::Delay.delay_ms(10),
+        ).await;
+        println!("recv: Got result!");
+        match res {
+            Either::First(w) => {
+                return match w {
+                    Ok(res) => { Ok( (res.0, res.2) ) }
+                    Err(_) => { Err(MatterError::new(ErrorCode::StdIoError)) }
+                }
+            }
+            Either::Second(t) => {
+                println!("recv timeout occurred!");
+                Ok((0, self.local_addr))
+            }
+        }
+
+        /*
         match res {
             Ok((bytes_recvd, local_addr, remote_addr)) => Ok((bytes_recvd, remote_addr)),
             Err(e) => Err(MatterError::new(ErrorCode::StdIoError)),
         }
+        */
     }
 }
 
@@ -112,11 +145,8 @@ pub mod utils {
     
     #[inline(never)]
     pub fn initialize_network() -> Result<(Ipv4Addr, Ipv6Addr, u32), MatterError> {
-        println!("Init network...");
-    
         // Get available network interface(s)
         let mut interfaces = Netif::all();
-        //println!("Found {} network interface(s)", interfaces.count());
         
         // Get first available interface
         let mut found_ifc: Option<Netif> = None;
@@ -128,12 +158,11 @@ pub mod utils {
             },
         }
         let ifc = found_ifc.unwrap();
-        println!("Network interface was found!");
-    
+
         // atm only for debugging: Check name and status of KernelPID
         let pid = ifc.pid();
         let ifc_name: &str = pid.get_name().unwrap();
-        println!("Thread status of {:?}: {:?}", pid.get_name().unwrap(), pid.status().unwrap());
+        println!("Kernel PID status of network interface {:?}: {:?}", pid.get_name().unwrap(), pid.status().unwrap());
     
         // We won't use IPv4 atm
         let ipv4: Ipv4Addr = Ipv4Addr::UNSPECIFIED;
@@ -141,7 +170,7 @@ pub mod utils {
         // Get available IPv6 link-local address
         match get_ipv6_address(&ifc) {
             Some(ipv6) => {
-                println!("Will use network interface {} with {}/{}", ifc_name, ipv4, ipv6);
+                println!("Found network interface {} with {}/{}", ifc_name, ipv4, ipv6);
                 Ok((ipv4, ipv6, 0 as _))
             },
             None => Err(MatterError::new(rs_matter::error::ErrorCode::StdIoError)),

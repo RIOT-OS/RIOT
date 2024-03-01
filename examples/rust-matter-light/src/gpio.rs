@@ -1,6 +1,19 @@
 // periph_gpio module
 use riot_wrappers::gpio::{GPIO, OutputGPIO, OutputMode, InputGPIO, InputMode};
 
+
+// Application-specific constants
+// User LED port and pin on used boards
+pub const LED_PORT: u32 = 0;
+pub const LED_PIN: u32 = 5;
+
+// RGB LED port and pin
+pub const RGB_PORT: u32 = 0;
+pub const RGB_RED_PIN: u32 = 7;
+pub const RGB_GREEN_PIN: u32 = 6;
+pub const RGB_BLUE_PIN: u32 = 5;
+
+
 // TODO: Make GPIO's static members
 pub fn get_output(port: u32, pin: u32) -> OutputGPIO {
     GPIO::from_port_and_pin(port, pin)
