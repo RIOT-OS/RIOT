@@ -15,11 +15,12 @@ crate-type = ["staticlib"]
 panic = "abort"
 
 [dependencies]
-riot-wrappers = { version = "0.8.2", features = [ "set_panic_handler", "with_embedded_nal_async", "provide_critical_section_1_0", "with_embedded_hal_async" ] }
+riot-wrappers = { version = "0.8.2", features = [ "set_panic_handler", "panic_handler_format", "with_embedded_nal_async", "provide_critical_section_1_0", "with_embedded_hal_async" ] }
 riot-sys = "*"
 embedded-nal-async = "^0.7.1"
 embedded-hal = "0.2.2"
 embedded-hal-async = { version =  "1.0.0"}
+embassy-sync = "0.5.0"
 
 # While currently this exmple does not use any RIOT modules implemented in
 # Rust, that may change; it is best practice for any RIOT application that has

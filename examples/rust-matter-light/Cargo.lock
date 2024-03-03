@@ -1450,6 +1450,7 @@ dependencies = [
  "embassy-executor",
  "embassy-executor-riot",
  "embassy-futures",
+ "embassy-sync",
  "embedded-hal 0.2.7",
  "embedded-hal-async",
  "embedded-nal-async 0.7.1",

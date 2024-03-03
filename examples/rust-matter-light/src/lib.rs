@@ -14,7 +14,8 @@ pub mod saul_reg;
 mod dev_att;
 mod network;
 mod persist;
-use network::RiotSocket;
+mod socket;
+
 use network::utils::{initialize_network};
 use gpio::{
     LED_PORT, LED_PIN,
@@ -58,6 +59,7 @@ use rs_matter::mdns::builtin::{
     MDNS_IPV4_BROADCAST_ADDR, MDNS_IPV6_BROADCAST_ADDR, MDNS_SOCKET_BIND_ADDR,
 };
 use rs_matter::secure_channel::spake2p::VerifierData;
+use crate::socket::UdpSocketWrapper;
 
 // Node object with endpoints supporting device type 'OnOff Light'
 const NODE: Node<'static> = Node {
@@ -183,7 +185,7 @@ async fn run_mdns(mdns: &'static MdnsService<'_>) {
         .bind_single(MDNS_SOCKET_BIND_ADDR)
         .await
         .expect("Can't create a socket");
-    let socket = RiotSocket::new(mdns_addr, mdns_sock);
+    let socket = UdpSocketWrapper::new(mdns_addr, mdns_sock);
     println!("Created socket for mDNS at {:?}", &mdns_addr);
 
     let mut mdns_udp_buffers = UdpBuffers::new();
@@ -219,7 +221,7 @@ async fn run_matter(spawner: embassy_executor::Spawner, mdns: &'static MdnsServi
         .bind_single(MATTER_SOCKET_BIND_ADDR)
         .await
         .expect("Can't create a socket");
-    let matter_socket = RiotSocket::new(matter_addr, matter_sock);
+    let socket = UdpSocketWrapper::new(matter_addr, matter_sock);
     println!("Created socket for Matter at {:?}", &matter_addr);
 
     // Get Device attestation (hard-coded atm)
