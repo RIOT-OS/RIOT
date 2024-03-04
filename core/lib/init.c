@@ -74,6 +74,17 @@ static void *main_trampoline(void *arg)
     }
 #endif
 
+#ifdef CPU_NATIVE
+    extern unsigned _native_retval;
+    if (!_native_retval) {
+        _native_retval = res;
+    }
+#endif
+
+    if (IS_ACTIVE(CONFIG_CORE_EXIT_WITH_MAIN)) {
+        pm_off();
+    }
+
     return NULL;
 }
 
