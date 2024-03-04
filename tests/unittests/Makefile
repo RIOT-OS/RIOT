@@ -35,6 +35,7 @@ INCLUDES += -I$(RIOTBASE)/tests/unittests/common
 
 # some tests need more stack
 CFLAGS += -DTHREAD_STACKSIZE_MAIN=THREAD_STACKSIZE_LARGE
+CFLAGS += -DCONFIG_CORE_EXIT_WITH_MAIN=1
 
 # for these boards, enable asan (Address Sanitizer)
 ASAN_BOARDS ?= native native64
