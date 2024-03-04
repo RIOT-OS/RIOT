@@ -28,24 +28,20 @@ use core::{ffi::CStr, borrow::Borrow, pin::pin};
 // external crates
 use static_cell::StaticCell;
 use embedded_nal_async::UdpStack as _;
-use embedded_hal::blocking::delay::DelayMs as _;
 use embedded_hal_async::delay::DelayNs as _;
 
 // RIOT OS modules
 extern crate rust_riotmodules;
 use riot_wrappers::{riot_main, println};
-use riot_wrappers::shell::{self, CommandList};
-use riot_wrappers::saul::registration::register_and_then;
-use riot_wrappers::ztimer;
+use riot_wrappers::shell::CommandList;
 
 // rs-matter
 extern crate rs_matter;
-use rs_matter::error::{Error as MatterError};
 use rs_matter::MATTER_PORT;
 use rs_matter::utils::select::EitherUnwrap as _;
 use rs_matter::transport::network::{UdpReceive as _, UdpSend as _, UdpBuffers};
 use rs_matter::transport::core::{PacketBuffers, MATTER_SOCKET_BIND_ADDR};
-use rs_matter::core::{CommissioningData, Matter};
+use rs_matter::core::Matter;
 use rs_matter::data_model::{
     cluster_basic_information::BasicInfoConfig,
     cluster_on_off,
@@ -54,7 +50,6 @@ use rs_matter::data_model::{
     root_endpoint,
     system_model::descriptor
 };
-use rs_matter::data_model::root_endpoint::handler;
 use rs_matter::mdns::MdnsService;
 use rs_matter::mdns::builtin::{
     MDNS_IPV4_BROADCAST_ADDR, MDNS_IPV6_BROADCAST_ADDR, MDNS_SOCKET_BIND_ADDR,
@@ -105,29 +100,8 @@ fn matter_handler<'a>(matter: &'a Matter<'a>) -> impl Metadata + NonBlockingHand
     )
 }
 
-fn run_shell() -> ! {
-    let rgb_led = saul_reg::RgbLed::new(
-        "Color Temperature Light",
-        (RGB_PORT, RGB_RED_PIN),
-        (RGB_PORT, RGB_GREEN_PIN),
-        (RGB_PORT, RGB_BLUE_PIN),
-    );
-
-    register_and_then(
-        &saul_reg::RGB_LED_DRIVER,
-        &rgb_led,
-        Some(CStr::from_bytes_with_nul(b"Color Temperature Light\0").unwrap()),
-        || {
-            println!("RGB LED registered as SAUL actuator");
-            shell::new().run_forever_providing_buf();
-        },
-    );
-}
-
 riot_main!(main);
 fn main() -> ! {
-    let mut delay = ztimer::Clock::msec();
-    delay.delay_ms(1200);
     println!("Hello Matter on RIOT!");
 
     let (ipv4_addr, ipv6_addr, interface) = initialize_network().expect("Error getting network interface and IP addresses");
@@ -172,128 +146,66 @@ fn main() -> ! {
     executor.run(|spawner| {
         spawner.spawn(run_mdns(mdns_service)).unwrap();
         spawner.spawn(run_matter(matter)).unwrap();
-//        spawner.spawn(amain(spawner)).unwrap();
+        //spawner.spawn(run_psm(matter)).unwrap();
     });
 
     let mut shell_thread = || {
         println!("Shell is running");
-        run_shell();
+        saul_reg::run_shell_with_saul();
     };
     loop { }
 }
 
 #[embassy_executor::task]
-async fn amain(spawner: embassy_executor::Spawner) {
-    println!("Matter memory: mDNS={}, Matter={}, UdpBuffers={}, PacketBuffers={}",
-             core::mem::size_of::<MdnsService>(),
-             core::mem::size_of::<Matter>(),
-             core::mem::size_of::<UdpBuffers>(),
-             core::mem::size_of::<PacketBuffers>()
-    );
-
-    let (ipv4_addr, ipv6_addr, interface) = initialize_network().expect("Error getting network interface and IP addresses");
-
-    static MDNS: StaticCell<MdnsService> = StaticCell::new();
-    let mdns_service: &'static MdnsService = MDNS.init(MdnsService::new(
-        0,
-        "rs-matter-demo",
-        ipv4_addr.octets(),
-        Some((ipv6_addr.octets(), interface)),
-        &DEV_DET,
-        MATTER_PORT,
-    ));
-
-    println!("Starting up mDNS Service...");
-    spawner.spawn(run_mdns(mdns_service)).unwrap();
-
-    // Get Device attestation (hard-coded atm)
-    static DEV_ATT: StaticCell<dev_att::HardCodedDevAtt> = StaticCell::new();
-    let dev_att: &'static dev_att::HardCodedDevAtt = DEV_ATT.init(dev_att::HardCodedDevAtt::new());
-    println!("Device attestation created");
-
-    // TODO: Provide own epoch and rand functions
-    let epoch = rs_matter::utils::epoch::dummy_epoch;
-    let rand = rs_matter::utils::rand::dummy_rand;
-
-    static MATTER: StaticCell<Matter> = StaticCell::new();
-    let matter: &'static Matter = MATTER.init(Matter::new(
-        // vid/pid should match those in the DAC
-        &DEV_DET,
-        dev_att,
-        mdns_service,
-        epoch,
-        rand,
-        MATTER_PORT,
-    ));
-    println!("Matter initialized");
-
-    println!("Starting up Matter Service...");
-    spawner.spawn(run_matter(matter)).unwrap();
-
-    println!("Matter exited");
-}
-
-#[embassy_executor::task]
 async fn run_mdns(mdns: &'static MdnsService<'_>) {
+    // Create UDP socket and bind to port 5353
     static UDP_MDNS_SOCKET: StaticCell<riot_sys::sock_udp_t> = StaticCell::new();
     let udp_stack = riot_wrappers::socket_embedded_nal_async_udp::UdpStack::new(|| UDP_MDNS_SOCKET.try_uninit());
-
-    // Bind socket to mDNS port: 5353
     let (mdns_addr, mut mdns_sock) = udp_stack
         .bind_single(MDNS_SOCKET_BIND_ADDR)
         .await
         .expect("Can't create a socket");
     let socket = UdpSocketWrapper::new(mdns_addr, mdns_sock);
-    println!("Created socket for mDNS at {:?}", &mdns_addr);
+    println!("Created UDP socket for mDNS at {:?}", &mdns_addr);
 
+    // Finally run the MDNS service
     let mut mdns_udp_buffers = UdpBuffers::new();
     let mdns_runner = pin!(mdns.run(
         &socket,
         &socket,
         &mut mdns_udp_buffers)
     );
-    
+
     let _ = mdns_runner.await;
+
     println!("mDNS service has terminated!");
 }
-
 
 #[embassy_executor::task]
 async fn run_matter(matter: &'static Matter<'_>) {
     println!("Running matter...");
+    let mut udp_buffers = UdpBuffers::new();
+    matter.test_async().await;
+    //matter.test_async_with_buf(&mut udp_buffers).await;
+    return;
+
+    // Create UDP socket and bind to port 5540
     static UDP_MATTER_SOCKET: StaticCell<riot_sys::sock_udp_t> = StaticCell::new();
     let udp_stack = riot_wrappers::socket_embedded_nal_async_udp::UdpStack::new(|| UDP_MATTER_SOCKET.try_uninit());
-
-    // Bind UDP socket to Matter port: 5540
     let (matter_addr, mut matter_sock) = udp_stack
         .bind_single(MATTER_SOCKET_BIND_ADDR)
         .await
         .expect("Can't create a socket");
     let socket = UdpSocketWrapper::new(matter_addr, matter_sock);
-    println!("Created socket for Matter at {:?}", &matter_addr);
+    println!("Created UDP socket for Matter at {:?}", &matter_addr);
 
     let handler = HandlerCompat(matter_handler(&matter));
-    println!("Datamodel Handler registered");
 
     let mut matter_udp_buffers = UdpBuffers::new();
     let mut matter_packet_buffers = PacketBuffers::new();
-    // Finally run the 'Matter service' on UDP port 5540
+
+    // Finally run the Matter service
     // TODO: Here I get RIOT kernel panic (RUST PANIC)
-    let verifier: &[u8] = &[1u8; 4usize];
-    let salt: &[u8] = &[1u8; 4usize];
-    //let _ = matter.test(&mut matter_udp_buffers);
-    let _ = matter.run(
-        &socket,
-        &socket,
-        &mut matter_udp_buffers,
-        &mut matter_packet_buffers,
-        CommissioningData {
-            // TODO: Hard-coded for now
-            //verifier: VerifierData::new_with_pw(123456, *matter.borrow()),
-            verifier: VerifierData::new(verifier, 2, salt),
-            discriminator: 250,
-        },
-        &handler).await;
     /*let matter_runner = pin!(matter.run(
         &socket,
         &socket,
@@ -308,9 +220,9 @@ async fn run_matter(matter: &'static Matter<'_>) {
         &handler)
     );*/
     //let mut matter_runner = pin!(matter_runner);
-    //spawner.spawn(run_psm(matter)).unwrap();
-    println!("TRYING TO RUN MATTER...");
+
     //let _ = matter_runner.await;
+
     println!("Matter service terminated!");
 }
 

@@ -13,13 +13,14 @@ crate-type = ["staticlib"]
 # supports no unwinding), but setting it allows builds on native without using
 # the nightly-only lang_items feature.
 panic = "abort"
+debug = true
+#opt-level = 0
 
 [dependencies]
 #riot-wrappers = { version = "0.8.2", features = [ "set_panic_handler", "panic_handler_format", "with_embedded_nal_async", "provide_critical_section_1_0", "with_embedded_hal_async" ] }
-riot-wrappers = { git = "https://github.com/RIOT-OS/rust-riot-wrappers.git", features = [ "set_panic_handler", "panic_handler_format", "with_embedded_nal_async", "provide_critical_section_1_0", "with_embedded_hal_async" ] }
+riot-wrappers = { git = "https://github.com/RIOT-OS/rust-riot-wrappers.git", features = [ "set_panic_handler", "panic_handler_format", "panic_handler_crash", "with_embedded_nal_async", "provide_critical_section_1_0", "with_embedded_hal_async" ] }
 riot-sys = "*"
 embedded-nal-async = "0.7.1"
-embedded-hal = "0.2.2"
 embedded-hal-async = { version =  "1.0.0"}
 embassy-sync = "0.5.0"
 
@@ -33,10 +34,9 @@ static_cell = "2.0.0"
 embassy-executor-riot = { git = "https://gitlab.com/etonomy/riot-module-examples" }
 embassy-executor = "0.5"
 embassy-futures = "0.1.1"
-#rs-matter = { version = "0.1.0", default-features = false, features = ["riot-os"] }
-rs-matter = { git = "https://github.com/maikerlab/rs-matter", branch = "feature/RIOT_OS", default-features = false, features = ["riot-os"] }
+rs-matter = { version = "0.1.0", default-features = false, features = ["riot-os"] }
+#rs-matter = { git = "https://github.com/maikerlab/rs-matter", branch = "feature/RIOT_OS", default-features = false, features = ["riot-os"] }
 
-#[patch.crates-io]
-#riot-wrappers = { path = "../../../rust-riot-wrappers" }
-#rs-matter = { path = "../../../rs-matter/rs-matter" }
-#embassy-executor-riot = { path = "../../../riot-module-examples/embassy-executor-riot" }
+[patch.crates-io]
+riot-wrappers = { path = "../../../rust-riot-wrappers" }
+rs-matter = { path = "../../../rs-matter/rs-matter" }

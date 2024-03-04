@@ -1,13 +1,16 @@
+use core::ffi::CStr;
 use riot_wrappers::println;
 
 // saul module
 use riot_wrappers::saul::{
-    registration::{Drivable, Driver, Error},
+    registration::{Drivable, Driver, Error, register_and_then},
     Class, ActuatorClass, Phydat, RegistryEntry
 };
-use crate::gpio::set_output;
+// shell module
+use riot_wrappers::shell::{self, CommandList};
+use crate::gpio::{RGB_BLUE_PIN, RGB_GREEN_PIN, RGB_PORT, RGB_RED_PIN, set_output};
 
-pub struct RgbLed{
+pub struct RgbLed {
     name: &'static str,
     portpin_red: (u32, u32),
     portpin_green: (u32, u32),
@@ -94,4 +97,23 @@ pub fn find_actuator(actuator_type: ActuatorClass) -> Option<RegistryEntry> {
     );
 
     rgb_led
+}
+
+pub fn run_shell_with_saul() -> ! {
+    let rgb_led = RgbLed::new(
+        "Color Temperature Light",
+        (RGB_PORT, RGB_RED_PIN),
+        (RGB_PORT, RGB_GREEN_PIN),
+        (RGB_PORT, RGB_BLUE_PIN),
+    );
+
+    register_and_then(
+        &RGB_LED_DRIVER,
+        &rgb_led,
+        Some(CStr::from_bytes_with_nul(b"Color Temperature Light\0").unwrap()),
+        || {
+            println!("RGB LED registered as SAUL actuator");
+            shell::new().run_forever_providing_buf()
+        },
+    );
 }
