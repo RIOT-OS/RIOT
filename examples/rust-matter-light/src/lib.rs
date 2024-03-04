@@ -54,6 +54,7 @@ use rs_matter::data_model::{
     root_endpoint,
     system_model::descriptor
 };
+use rs_matter::data_model::root_endpoint::handler;
 use rs_matter::mdns::MdnsService;
 use rs_matter::mdns::builtin::{
     MDNS_IPV4_BROADCAST_ADDR, MDNS_IPV6_BROADCAST_ADDR, MDNS_SOCKET_BIND_ADDR,
@@ -129,13 +130,49 @@ fn main() -> ! {
     delay.delay_ms(1200);
     println!("Hello Matter on RIOT!");
 
-    let mut board_led = gpio::get_output(LED_PORT, LED_PIN);
-    board_led.set_high();
+    let (ipv4_addr, ipv6_addr, interface) = initialize_network().expect("Error getting network interface and IP addresses");
+
+    static MDNS: StaticCell<MdnsService> = StaticCell::new();
+    let mdns_service: &'static MdnsService = MDNS.init(MdnsService::new(
+        0,
+        "rs-matter-demo",
+        ipv4_addr.octets(),
+        Some((ipv6_addr.octets(), interface)),
+        &DEV_DET,
+        MATTER_PORT,
+    ));
+
+    println!("Created mDNS Service...");
+
+    // Get Device attestation (hard-coded atm)
+    static DEV_ATT: StaticCell<dev_att::HardCodedDevAtt> = StaticCell::new();
+    let dev_att: &'static dev_att::HardCodedDevAtt = DEV_ATT.init(dev_att::HardCodedDevAtt::new());
+    println!("Device attestation created");
+
+    // TODO: Provide own epoch and rand functions
+    let epoch = rs_matter::utils::epoch::dummy_epoch;
+    let rand = rs_matter::utils::rand::dummy_rand;
+
+    static MATTER: StaticCell<Matter> = StaticCell::new();
+    let matter: &'static Matter = MATTER.init(Matter::new(
+        // vid/pid should match those in the DAC
+        &DEV_DET,
+        dev_att,
+        mdns_service,
+        epoch,
+        rand,
+        MATTER_PORT,
+    ));
+    println!("Matter initialized");
+
+    println!("Starting up Matter Service...");
 
     static EXECUTOR: StaticCell<embassy_executor_riot::Executor> = StaticCell::new();
     let executor: &'static mut _ = EXECUTOR.init(embassy_executor_riot::Executor::new());
     executor.run(|spawner| {
-        spawner.spawn(amain(spawner)).unwrap();
+        spawner.spawn(run_mdns(mdns_service)).unwrap();
+        spawner.spawn(run_matter(matter)).unwrap();
+//        spawner.spawn(amain(spawner)).unwrap();
     });
 
     let mut shell_thread = || {
@@ -169,8 +206,29 @@ async fn amain(spawner: embassy_executor::Spawner) {
     println!("Starting up mDNS Service...");
     spawner.spawn(run_mdns(mdns_service)).unwrap();
 
+    // Get Device attestation (hard-coded atm)
+    static DEV_ATT: StaticCell<dev_att::HardCodedDevAtt> = StaticCell::new();
+    let dev_att: &'static dev_att::HardCodedDevAtt = DEV_ATT.init(dev_att::HardCodedDevAtt::new());
+    println!("Device attestation created");
+
+    // TODO: Provide own epoch and rand functions
+    let epoch = rs_matter::utils::epoch::dummy_epoch;
+    let rand = rs_matter::utils::rand::dummy_rand;
+
+    static MATTER: StaticCell<Matter> = StaticCell::new();
+    let matter: &'static Matter = MATTER.init(Matter::new(
+        // vid/pid should match those in the DAC
+        &DEV_DET,
+        dev_att,
+        mdns_service,
+        epoch,
+        rand,
+        MATTER_PORT,
+    ));
+    println!("Matter initialized");
+
     println!("Starting up Matter Service...");
-    spawner.spawn(run_matter(spawner, mdns_service)).unwrap();
+    spawner.spawn(run_matter(matter)).unwrap();
 
     println!("Matter exited");
 }
@@ -201,18 +259,8 @@ async fn run_mdns(mdns: &'static MdnsService<'_>) {
 
 
 #[embassy_executor::task]
-async fn run_matter(spawner: embassy_executor::Spawner, mdns: &'static MdnsService<'_>) {
-/*    let test_runner = pin!(async {
-        loop {
-            println!("Matter - test runner...");
-            ztimer::Delay.delay_ms(1000).await;
-        }
-    });
-    test_runner.await;
-    println!("Matter - test runner exited!");
-    return;*/
-
-    // --- INIT + START MATTER SERVICE
+async fn run_matter(matter: &'static Matter<'_>) {
+    println!("Running matter...");
     static UDP_MATTER_SOCKET: StaticCell<riot_sys::sock_udp_t> = StaticCell::new();
     let udp_stack = riot_wrappers::socket_embedded_nal_async_udp::UdpStack::new(|| UDP_MATTER_SOCKET.try_uninit());
 
@@ -224,52 +272,46 @@ async fn run_matter(spawner: embassy_executor::Spawner, mdns: &'static MdnsServi
     let socket = UdpSocketWrapper::new(matter_addr, matter_sock);
     println!("Created socket for Matter at {:?}", &matter_addr);
 
-    // Get Device attestation (hard-coded atm)
-    static DEV_ATT: StaticCell<dev_att::HardCodedDevAtt> = StaticCell::new();
-    let dev_att: &'static dev_att::HardCodedDevAtt = DEV_ATT.init(dev_att::HardCodedDevAtt::new());
-    println!("Device attestation created");
-
-    // TODO: Provide own epoch and rand functions
-    let epoch = rs_matter::utils::epoch::dummy_epoch;
-    let rand = rs_matter::utils::rand::dummy_rand;
-
-    static MATTER: StaticCell<Matter> = StaticCell::new();
-    let matter: &'static Matter = MATTER.init(Matter::new(
-        // vid/pid should match those in the DAC
-        &DEV_DET,
-        dev_att,
-        mdns,
-        epoch,
-        rand,
-        MATTER_PORT,
-    ));
-    println!("Matter initialized");
-
     let handler = HandlerCompat(matter_handler(&matter));
     println!("Datamodel Handler registered");
 
-    /*
     let mut matter_udp_buffers = UdpBuffers::new();
     let mut matter_packet_buffers = PacketBuffers::new();
     // Finally run the 'Matter service' on UDP port 5540
-    // TODO: Here I get a Stack Overflow!
-    let matter_runner = pin!(matter.run(
-        &matter_socket,
-        &matter_socket,
+    // TODO: Here I get RIOT kernel panic (RUST PANIC)
+    let verifier: &[u8] = &[1u8; 4usize];
+    let salt: &[u8] = &[1u8; 4usize];
+    //let _ = matter.test(&mut matter_udp_buffers);
+    let _ = matter.run(
+        &socket,
+        &socket,
         &mut matter_udp_buffers,
         &mut matter_packet_buffers,
         CommissioningData {
             // TODO: Hard-coded for now
-            verifier: VerifierData::new_with_pw(123456, *matter.borrow()),
+            //verifier: VerifierData::new_with_pw(123456, *matter.borrow()),
+            verifier: VerifierData::new(verifier, 2, salt),
+            discriminator: 250,
+        },
+        &handler).await;
+    /*let matter_runner = pin!(matter.run(
+        &socket,
+        &socket,
+        &mut matter_udp_buffers,
+        &mut matter_packet_buffers,
+        CommissioningData {
+            // TODO: Hard-coded for now
+            //verifier: VerifierData::new_with_pw(123456, *matter.borrow()),
+            verifier: VerifierData::new(verifier, 2, salt),
             discriminator: 250,
         },
         &handler)
-    );
+    );*/
     //let mut matter_runner = pin!(matter_runner);
     //spawner.spawn(run_psm(matter)).unwrap();
-    let _ = matter_runner.await;
+    println!("TRYING TO RUN MATTER...");
+    //let _ = matter_runner.await;
     println!("Matter service terminated!");
-    */
 }
 
 #[embassy_executor::task]
