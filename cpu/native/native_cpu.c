@@ -184,8 +184,9 @@ void cpu_switch_context_exit(void)
 {
 #ifdef NATIVE_AUTO_EXIT
     if (sched_num_threads <= 1) {
+        extern unsigned _native_retval;
         DEBUG("cpu_switch_context_exit: last task has ended. exiting.\n");
-        real_exit(EXIT_SUCCESS);
+        real_exit(_native_retval);
     }
 #endif
 
