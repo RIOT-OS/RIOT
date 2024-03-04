@@ -65,7 +65,7 @@ static ssize_t _riot_block2_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, c
     plen += coap_blockwise_put_bytes(&slicer, buf+plen, block2_board, sizeof(block2_board)-1);
     plen += coap_blockwise_put_bytes(&slicer, buf+plen, (uint8_t*)RIOT_BOARD, strlen(RIOT_BOARD));
     plen += coap_blockwise_put_bytes(&slicer, buf+plen, block2_mcu, sizeof(block2_mcu)-1);
-    plen += coap_blockwise_put_bytes(&slicer, buf+plen, (uint8_t*)RIOT_MCU, strlen(RIOT_MCU));
+    plen += coap_blockwise_put_bytes(&slicer, buf+plen, (uint8_t*)RIOT_CPU, strlen(RIOT_CPU));
     /* To demonstrate individual chars */
     plen += coap_blockwise_put_char(&slicer, buf+plen, ' ');
     plen += coap_blockwise_put_char(&slicer, buf+plen, 'M');

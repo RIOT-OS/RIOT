@@ -32,4 +32,8 @@ USEMODULE += constfs
 # Enable to automatically format if mount fails
 #USEMODULE += vfs_auto_format
 
+# For LittleFS on real devices, the main stack size has to be
+# increased:
+CFLAGS += -DTHREAD_STACKSIZE_MAIN=2048
+
 include $(RIOTBASE)/Makefile.include

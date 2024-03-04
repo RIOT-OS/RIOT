@@ -24,11 +24,7 @@ PERIPH_IGNORE_MODULES := \
   periph_flash \
   periph_flashpage_in_address_space \
   periph_flexcomm \
-  periph_gpio_ll \
-  periph_gpio_ll_irq \
-  periph_gpio_ll_irq_level_triggered_high \
-  periph_gpio_ll_irq_level_triggered_low \
-  periph_gpio_ll_irq_unmask \
+  periph_gpio_ll% \
   periph_gpio_mux \
   periph_hash_sha_1 \
   periph_hash_sha_224 \

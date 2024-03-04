@@ -1,0 +1,16 @@
+root = group-toplevel
+
+group-toplevel = group .within { "groups" => any }
+group-nested = group .within { "title" => tstr, any => any }
+
+group = {
+    ? "title" => tstr,
+    ? "help" => tstr,
+    ? "features" => [ + feature ],
+    ? "groups" => [ + group-nested ],
+    }
+
+feature = {
+    "name" => tstr,
+    ? "help" => tstr,
+}

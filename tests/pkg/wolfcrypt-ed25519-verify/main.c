@@ -49,7 +49,7 @@ int main(void)
     int ret;
     ed25519_key key;
     LOG_INFO("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
-    LOG_INFO("This board features a(n) %s MCU.\n", RIOT_MCU);
+    LOG_INFO("This board features a(n) %s CPU.\n", RIOT_CPU);
     wc_ed25519_init(&key);
     LOG_INFO("Starting ed25519 test.\n");
 

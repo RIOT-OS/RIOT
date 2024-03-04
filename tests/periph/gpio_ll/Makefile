@@ -46,7 +46,7 @@ CFLAGS += -DPIN_OUT_0=$(PIN_OUT_0)
 CFLAGS += -DPIN_OUT_1=$(PIN_OUT_1)
 CFLAGS += -DLOW_ROM=$(LOW_ROM)
 
-ifneq ($(MCU),esp32)
+ifneq ($(CPU),esp32)
   # We only need 1 thread (+ the Idle thread on some platforms) and we really
   # want this app working on all boards.
   CFLAGS += -DMAXTHREADS=2

@@ -28,7 +28,7 @@
 
 #include "esp_common.h"
 #include "esp_attr.h"
-#ifdef MCU_ESP8266
+#ifdef CPU_ESP8266
 #include "esp_event_loop.h"
 #else
 #include "esp_event.h"
@@ -38,7 +38,7 @@
 #endif
 #include "esp_system.h"
 #include "esp_wifi.h"
-#ifndef MCU_ESP8266
+#ifndef CPU_ESP8266
 #include "esp_private/wifi.h"
 #endif
 #include "irq_arch.h"
@@ -71,7 +71,7 @@
 #define MAC_STR                     "%02x:%02x:%02x:%02x:%02x:%02x"
 #define MAC_STR_ARG(m)              m[0], m[1], m[2], m[3], m[4], m[5]
 
-#ifdef MCU_ESP8266
+#ifdef CPU_ESP8266
 
 #include "esp_socket.h"
 #include "net/sockio.h"
@@ -99,7 +99,7 @@
 
 #include "lwip/pbuf.h"
 
-#endif /* MCU_ESP8266 */
+#endif /* CPU_ESP8266 */
 
 #define ENABLE_DEBUG_HEXDUMP    0
 #define ENABLE_DEBUG            0
@@ -123,7 +123,7 @@ static bool _esp_wifi_rx_in_progress = false;
 extern esp_err_t esp_system_event_add_handler (system_event_cb_t handler,
                                                void *arg);
 
-#ifdef MCU_ESP8266
+#ifdef CPU_ESP8266
 
 /**
  * The low level WiFi driver function expects a lwIP pbuf data structure as
@@ -302,9 +302,9 @@ esp_err_t esp_wifi_internal_reg_rxcb(wifi_interface_t ifx, wifi_rxcb_t fn)
     return ESP_OK;
 }
 
-#endif /* MCU_ESP8266 */
+#endif /* CPU_ESP8266 */
 
-#ifdef MCU_ESP8266
+#ifdef CPU_ESP8266
 
 /* Prolog for source code compatibility with ESP-IDF for ESP32 */
 static int _esp_wifi_rx_cb(struct esp_aio *aio)
@@ -315,11 +315,11 @@ static int _esp_wifi_rx_cb(struct esp_aio *aio)
     const char *buffer = aio->pbuf;
     uint16_t len = aio->len;
 
-#else /* MCU_ESP8266 */
+#else /* CPU_ESP8266 */
 
 esp_err_t _esp_wifi_rx_cb(void *buffer, uint16_t len, void *eb)
 {
-#endif /* MCU_ESP8266 */
+#endif /* CPU_ESP8266 */
 
     /*
      * This callback function is not executed in interrupt context but in the
@@ -666,7 +666,7 @@ static int _esp_wifi_send(netdev_t *netdev, const iolist_t *iolist)
     /* send the the packet to the peer(s) mac address */
     if (esp_wifi_internal_tx(WIFI_IF_STA, dev->tx_buf, dev->tx_len) == ESP_OK) {
 #endif
-#ifndef MCU_ESP8266
+#ifndef CPU_ESP8266
         /* for ESP8266 it is done in _esp_wifi_tx_cb */
         _esp_wifi_send_is_in = false;
         netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
@@ -860,7 +860,7 @@ static wifi_config_t wifi_config_sta = {
 };
 #endif /* MODULE_ESP_WIFI_AP */
 
-#if (defined(MCU_ESP8266) && !defined(MODULE_ESP_NOW)) || defined(MODULE_ESP_WIFI_AP)
+#if (defined(CPU_ESP8266) && !defined(MODULE_ESP_NOW)) || defined(MODULE_ESP_WIFI_AP)
 /**
  * Static configuration for the SoftAP interface if ESP-NOW is not enabled.
  *
@@ -901,7 +901,7 @@ static wifi_config_t wifi_config_ap = {
 #endif
     }
 };
-#endif /* (defined(MCU_ESP8266) && !defined(MODULE_ESP_NOW)) || defined(MODULE_ESP_WIFI_AP) */
+#endif /* (defined(CPU_ESP8266) && !defined(MODULE_ESP_NOW)) || defined(MODULE_ESP_WIFI_AP) */
 
 void esp_wifi_setup (esp_wifi_netdev_t* dev)
 {
@@ -922,7 +922,7 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
 
 #ifndef MODULE_ESP_NOW
     /* if module esp_now is used, the following part is already done */
-#ifndef MCU_ESP8266
+#ifndef CPU_ESP8266
     extern portMUX_TYPE g_intr_lock_mux;
     mutex_init(&g_intr_lock_mux);
 #endif
@@ -949,7 +949,7 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
 #ifdef MODULE_ESP_WIFI_AP
     /* Activate the SoftAP interface */
     result = esp_wifi_set_mode(WIFI_MODE_AP);
-#elif defined(MCU_ESP8266)
+#elif defined(CPU_ESP8266)
     /*
      * Although only the Station interface is needed, the SoftAP interface must
      * also be enabled on ESP8266 for stability reasons to prevent the Station
@@ -959,16 +959,16 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
      */
     /* activate the Station and the SoftAP interface */
     result = esp_wifi_set_mode(WIFI_MODE_APSTA);
-#else /* defined(MCU_ESP8266) */
+#else /* defined(CPU_ESP8266) */
     /* activate only the Station interface */
     result = esp_wifi_set_mode(WIFI_MODE_STA);
-#endif /* defined(MCU_ESP8266) */
+#endif /* defined(CPU_ESP8266) */
     if (result != ESP_OK) {
         ESP_WIFI_LOG_ERROR("esp_wifi_set_mode failed with return value %d", result);
         return;
     }
 
-#if defined(MCU_ESP8266) || defined(MODULE_ESP_WIFI_AP)
+#if defined(CPU_ESP8266) || defined(MODULE_ESP_WIFI_AP)
 #if IS_ACTIVE(ESP_WIFI_SSID_DYNAMIC)
     uint8_t mac[ETHERNET_ADDR_LEN];
     esp_wifi_get_mac(WIFI_IF_AP, mac);
@@ -982,7 +982,7 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
         ESP_WIFI_LOG_ERROR("esp_wifi_set_config softap failed with return value %d", result);
         return;
     }
-#endif /* defined(MCU_ESP8266) || defined(MODULE_ESP_WIFI_AP) */
+#endif /* defined(CPU_ESP8266) || defined(MODULE_ESP_WIFI_AP) */
 
 #endif /* MODULE_ESP_NOW */
 

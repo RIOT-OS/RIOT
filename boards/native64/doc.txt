@@ -6,7 +6,7 @@
 [Family: native](https://github.com/RIOT-OS/RIOT/wiki/Family:-native)
 
 Same board as \ref boards_native "native", but compiled for 64-bit instead of 32-bit.
-Currently only Linux x86-64 is supported, and Rust support is missing.
+Currently only Linux x86-64 is supported.
 Otherwise, everything works the same as for the 32-bit version.
 For more information on this board, see the \ref boards_native "native board" documentation.
 

@@ -332,6 +332,10 @@ static inline void uart_init_usart(uart_t uart, uint32_t baudrate)
 #define RCC_CCIPR_LPUART1SEL_0  RCC_CCIPR1_LPUART1SEL_0
 #define RCC_CCIPR_LPUART1SEL_1  RCC_CCIPR1_LPUART1SEL_1
 #define CCIPR                   CCIPR1
+#elif CPU_FAM_STM32U5
+#define RCC_CCIPR_LPUART1SEL_0  RCC_CCIPR3_LPUART1SEL_0
+#define RCC_CCIPR_LPUART1SEL_1  RCC_CCIPR3_LPUART1SEL_1
+#define CCIPR                   CCIPR3
 #endif
 #ifdef MODULE_PERIPH_LPUART
 static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate)
