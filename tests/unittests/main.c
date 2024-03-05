@@ -49,7 +49,5 @@ int main(void)
 #ifndef NO_TEST_SUITES
     UNCURRY(RUN_TEST_SUITES, TEST_SUITES)
 #endif
-    TESTS_END();
-
-    return 0;
+    return TESTS_END();
 }

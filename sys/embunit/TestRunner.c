@@ -99,7 +99,7 @@ void TestRunner_runTest(Test* test)
     Test_run(test, &result_);
 }
 
-void TestRunner_end(void)
+int TestRunner_end(void)
 {
     char buf[16];
     if (result_.failureCount) {
@@ -118,4 +118,6 @@ void TestRunner_end(void)
         stdimpl_print(buf);
         stdimpl_print(" tests)\n");
     }
+
+    return TestRunnerHadErrors;
 }

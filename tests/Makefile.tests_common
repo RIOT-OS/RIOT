@@ -12,6 +12,9 @@ ifneq (,$(wildcard $(CURDIR)/tests*/.))
   endif
 endif
 
+# terminate native when the test is complete
+CFLAGS += -DNATIVE_AUTO_EXIT=1
+
 BOARD ?= native
 RIOTBASE ?= $(CURDIR)/../..
 QUIET ?= 1
