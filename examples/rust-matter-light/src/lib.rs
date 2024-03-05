@@ -7,7 +7,7 @@
 #[allow(warnings)]
 #[allow(unused)]
 
-// internal modules
+// declare internal modules
 pub mod gpio;
 pub mod light;
 pub mod saul_reg;
@@ -16,11 +16,8 @@ mod network;
 mod persist;
 mod socket;
 
+// internal modules imports
 use network::utils::{initialize_network};
-use gpio::{
-    LED_PORT, LED_PIN,
-    RGB_PORT, RGB_RED_PIN, RGB_GREEN_PIN, RGB_BLUE_PIN
-};
 
 // core library
 use core::{ffi::CStr, borrow::Borrow, pin::pin};
@@ -37,7 +34,7 @@ use riot_wrappers::shell::CommandList;
 
 // rs-matter
 extern crate rs_matter;
-use rs_matter::MATTER_PORT;
+use rs_matter::{CommissioningData, MATTER_PORT};
 use rs_matter::utils::select::EitherUnwrap as _;
 use rs_matter::transport::network::{UdpReceive as _, UdpSend as _, UdpBuffers};
 use rs_matter::transport::core::{PacketBuffers, MATTER_SOCKET_BIND_ADDR};
@@ -116,12 +113,9 @@ fn main() -> ! {
         MATTER_PORT,
     ));
 
-    println!("Created mDNS Service...");
-
     // Get Device attestation (hard-coded atm)
     static DEV_ATT: StaticCell<dev_att::HardCodedDevAtt> = StaticCell::new();
     let dev_att: &'static dev_att::HardCodedDevAtt = DEV_ATT.init(dev_att::HardCodedDevAtt::new());
-    println!("Device attestation created");
 
     // TODO: Provide own epoch and rand functions
     let epoch = rs_matter::utils::epoch::dummy_epoch;
@@ -137,16 +131,15 @@ fn main() -> ! {
         rand,
         MATTER_PORT,
     ));
-    println!("Matter initialized");
 
-    println!("Starting up Matter Service...");
+    println!("Starting all services...");
 
     static EXECUTOR: StaticCell<embassy_executor_riot::Executor> = StaticCell::new();
     let executor: &'static mut _ = EXECUTOR.init(embassy_executor_riot::Executor::new());
     executor.run(|spawner| {
         spawner.spawn(run_mdns(mdns_service)).unwrap();
         spawner.spawn(run_matter(matter)).unwrap();
-        //spawner.spawn(run_psm(matter)).unwrap();
+        spawner.spawn(run_psm(matter)).unwrap();
     });
 
     let mut shell_thread = || {
@@ -176,6 +169,7 @@ async fn run_mdns(mdns: &'static MdnsService<'_>) {
         &mut mdns_udp_buffers)
     );
 
+    println!("Starting MDNS....");
     let _ = mdns_runner.await;
 
     println!("mDNS service has terminated!");
@@ -183,12 +177,6 @@ async fn run_mdns(mdns: &'static MdnsService<'_>) {
 
 #[embassy_executor::task]
 async fn run_matter(matter: &'static Matter<'_>) {
-    println!("Running matter...");
-    let mut udp_buffers = UdpBuffers::new();
-    matter.test_async().await;
-    //matter.test_async_with_buf(&mut udp_buffers).await;
-    return;
-
     // Create UDP socket and bind to port 5540
     static UDP_MATTER_SOCKET: StaticCell<riot_sys::sock_udp_t> = StaticCell::new();
     let udp_stack = riot_wrappers::socket_embedded_nal_async_udp::UdpStack::new(|| UDP_MATTER_SOCKET.try_uninit());
@@ -204,30 +192,30 @@ async fn run_matter(matter: &'static Matter<'_>) {
     let mut matter_udp_buffers = UdpBuffers::new();
     let mut matter_packet_buffers = PacketBuffers::new();
 
-    // Finally run the Matter service
-    // TODO: Here I get RIOT kernel panic (RUST PANIC)
-    /*let matter_runner = pin!(matter.run(
+    // Finally create the Matter service and run on port 5540/UDP
+    let matter_runner = pin!(matter.run(
         &socket,
         &socket,
         &mut matter_udp_buffers,
         &mut matter_packet_buffers,
         CommissioningData {
             // TODO: Hard-coded for now
-            //verifier: VerifierData::new_with_pw(123456, *matter.borrow()),
-            verifier: VerifierData::new(verifier, 2, salt),
+            verifier: VerifierData::new_with_pw(123456, *matter.borrow()),
             discriminator: 250,
         },
         &handler)
-    );*/
-    //let mut matter_runner = pin!(matter_runner);
+    );
+    let mut matter_runner = pin!(matter_runner);
 
-    //let _ = matter_runner.await;
+    println!("Starting Matter...");
+    let _ = matter_runner.await;
 
     println!("Matter service terminated!");
 }
 
 #[embassy_executor::task]
 async fn run_psm(matter: &'static Matter<'_>) {
+    println!("Starting Persistence Manager....");
     // TODO: Develop own 'Persistence Manager' using RIOT OS modules
     let mut psm = persist::Psm::new(&matter).expect("Error creating PSM");
     let mut psm_runner = pin!(psm.run());

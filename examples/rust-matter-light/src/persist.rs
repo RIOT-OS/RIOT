@@ -21,10 +21,12 @@ impl<'a> Psm<'a> {
 
             if self.matter.is_changed() {
                 if let Some(data) = self.matter.store_acls(&mut self.buf)? {
+                    println!("Store ACL data...");
                     Self::store("acls", data)?;
                 }
 
                 if let Some(data) = self.matter.store_fabrics(&mut self.buf)? {
+                    println!("Store fabric data...");
                     Self::store("fabrics", data)?;
                 }
             }

@@ -15,7 +15,14 @@ DEVELHELP ?= 1
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-CFLAGS += '-DTHREAD_STACKSIZE_MAIN=(THREAD_STACKSIZE_DEFAULT + 60000)'
+# for embedded
+#CFLAGS += '-DTHREAD_STACKSIZE_MAIN=(THREAD_STACKSIZE_DEFAULT + 64000)'
+#CFLAGS += '-DISR_STACKSIZE=(THREAD_STACKSIZE_DEFAULT + 10000)'
+
+# for native can be bigger (may decrease after development)
+CFLAGS += '-DTHREAD_STACKSIZE_MAIN=(THREAD_STACKSIZE_DEFAULT + 180*1024)'
+CFLAGS += '-DTHREAD_STACKSIZE_IDLE=(THREAD_STACKSIZE_DEFAULT + 180*1024)'
+CFLAGS += '-DISR_STACKSIZE=(THREAD_STACKSIZE_DEFAULT + 180*1024)'
 
 # The name of crate (as per Cargo.toml package name, but with '-' replaced with '_')
 APPLICATION_RUST_MODULE = rust_matter_light
