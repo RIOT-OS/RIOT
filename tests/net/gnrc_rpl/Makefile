@@ -27,7 +27,7 @@ host-tools:
 
 TEST_DEPS += host-tools
 
-include $(RIOTBASE)/Makefile.include
-
 # Test is flaky and regularly derails unrelated merge trains
 TEST_ON_CI_BLACKLIST += native native64
+
+include $(RIOTBASE)/Makefile.include

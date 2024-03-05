@@ -11,6 +11,7 @@
  *
  * @file
  */
+#include <stdbool.h>
 #include <string.h>
 #include <errno.h>
 
@@ -217,6 +218,80 @@ static void test_mtd_write_read_page(void)
 #endif
 }
 
+#ifdef MODULE_PERIPH_FLASHPAGE_AUX
+static bool mem_is_all_set(const uint8_t *buf, uint8_t c, size_t n)
+{
+    for (const uint8_t *end = buf + n; buf != end; ++buf) {
+        if (*buf != c) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+static void test_mtd_aux_slot(void)
+{
+    mtd_dev_t *dev_aux = mtd_aux;
+
+    mtd_init(dev_aux);
+
+    uint32_t sector = dev_aux->sector_count - 2;
+
+    static uint8_t buffer[FLASHPAGE_SIZE];
+
+    uint32_t page_0 = dev_aux->pages_per_sector * sector;
+    uint32_t page_1 = dev_aux->pages_per_sector * (sector + 1);
+    uint32_t page_size = dev_aux->page_size;
+
+    /* write dummy data to sectors */
+    memset(buffer, 0x23, dev_aux->page_size);
+    TEST_ASSERT_EQUAL_INT(mtd_write_page_raw(dev_aux, buffer, page_0, 0, page_size), 0);
+    TEST_ASSERT_EQUAL_INT(mtd_write_page_raw(dev_aux, buffer, page_1, 0, page_size), 0);
+
+    /* erase two sectors and check if they have been erased */
+    TEST_ASSERT_EQUAL_INT(mtd_erase_sector(dev_aux, sector, 2), 0);
+    TEST_ASSERT_EQUAL_INT(mtd_read_page(dev_aux, buffer, page_0, 0, page_size), 0);
+    TEST_ASSERT(mem_is_all_set(buffer, 0xFF, page_size) || mem_is_all_set(buffer, 0x00, page_size));
+    TEST_ASSERT_EQUAL_INT(mtd_read_page(dev_aux, buffer, page_1, 0, page_size), 0);
+    TEST_ASSERT(mem_is_all_set(buffer, 0xFF, page_size) || mem_is_all_set(buffer, 0x00, page_size));
+
+    /* write test data & read it back */
+    const char test_str[] = "0123456789";
+    uint32_t offset = 5;
+
+    TEST_ASSERT_EQUAL_INT(mtd_write_page_raw(dev_aux, test_str, page_0, offset, sizeof(test_str)), 0);
+    TEST_ASSERT_EQUAL_INT(mtd_read_page(dev_aux, buffer, page_0, offset, sizeof(test_str)), 0);
+    TEST_ASSERT_EQUAL_INT(memcmp(test_str, buffer, sizeof(test_str)), 0);
+
+    /* write across page boundary */
+    offset = page_size - sizeof(test_str) / 2;
+    TEST_ASSERT_EQUAL_INT(mtd_write_page_raw(dev_aux, test_str, page_0, offset, sizeof(test_str)), 0);
+    TEST_ASSERT_EQUAL_INT(mtd_read_page(dev_aux, buffer, page_0, offset, sizeof(test_str)), 0);
+    TEST_ASSERT_EQUAL_INT(memcmp(test_str, buffer, sizeof(test_str)), 0);
+
+    /* write across sector boundary */
+    offset = page_size - sizeof(test_str) / 2
+           + (dev_aux->pages_per_sector - 1) * page_size;
+    TEST_ASSERT_EQUAL_INT(mtd_write_page_raw(dev_aux, test_str, page_0, offset, sizeof(test_str)), 0);
+    TEST_ASSERT_EQUAL_INT(mtd_read_page(dev_aux, buffer, page_0, offset, sizeof(test_str)), 0);
+    TEST_ASSERT_EQUAL_INT(memcmp(test_str, buffer, sizeof(test_str)), 0);
+
+    /* overwrite first test string, rely on MTD for read-modify-write */
+    const char test_str_2[] = "Hello World!";
+    offset = 5;
+    TEST_ASSERT_EQUAL_INT(mtd_write_page(dev_aux, test_str_2, page_0, offset, sizeof(test_str_2)), 0);
+    TEST_ASSERT_EQUAL_INT(mtd_read_page(dev_aux, buffer, page_0, offset, sizeof(test_str_2)), 0);
+    TEST_ASSERT_EQUAL_INT(memcmp(test_str_2, buffer, sizeof(test_str_2)), 0);
+
+    /* test write_page across sectors */
+    offset = dev_aux->pages_per_sector * dev_aux->page_size - 2;
+    TEST_ASSERT_EQUAL_INT(mtd_write_page(dev_aux, test_str, page_0, offset, sizeof(test_str)), 0);
+    TEST_ASSERT_EQUAL_INT(mtd_read_page(dev_aux, buffer, page_0, offset, sizeof(test_str)), 0);
+    TEST_ASSERT_EQUAL_INT(memcmp(test_str, buffer, sizeof(test_str)), 0);
+}
+#endif
+
 Test *tests_mtd_flashpage_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -225,6 +300,9 @@ Test *tests_mtd_flashpage_tests(void)
         new_TestFixture(test_mtd_write_erase),
         new_TestFixture(test_mtd_write_read),
         new_TestFixture(test_mtd_write_read_page),
+#ifdef MODULE_PERIPH_FLASHPAGE_AUX
+        new_TestFixture(test_mtd_aux_slot),
+#endif
     };
 
     EMB_UNIT_TESTCALLER(mtd_flashpage_tests, setup, teardown, fixtures);

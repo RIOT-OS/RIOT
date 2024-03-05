@@ -103,6 +103,11 @@ static fdb_time_t _get_time(void)
 
 int main(void)
 {
+    if (FDB_MTD == NULL) {
+        puts("No MTD device configured for test, abort.");
+        return -1;
+    }
+
     int init_failed;
     fdb_mtd_init(FDB_MTD);
     size_t size = FDB_MTD->pages_per_sector * FDB_MTD->page_size;

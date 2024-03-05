@@ -18,6 +18,7 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
+#include <errno.h>
 #include <unistd.h>
 #include <signal.h>
 
@@ -25,6 +26,9 @@
 
 void panic_arch(void)
 {
+    extern unsigned _native_retval;
+    _native_retval = EINVAL;
+
 #ifdef DEVELHELP
     /* since we're atop an Unix-like platform,
        just use the (developer-)friendly core-dump feature */

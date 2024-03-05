@@ -41,6 +41,7 @@ _backup_ram_len = DEFINED( _backup_ram_len ) ? _backup_ram_len : 0x0 ;
 MEMORY
 {
     bkup_ram (w!rx) : ORIGIN = _backup_ram_start_addr, LENGTH = _backup_ram_len
+    rom_aux  (rx)   : ORIGIN = _rom_start_addr + _slot_aux_offset, LENGTH = _slot_aux_len
 }
 
 /* Section Definitions */

@@ -1,0 +1,15 @@
+# This adds an optional AUX slot to flash that can be used to store persistent data.
+# It will work with and without riotboot, but the size of the slot must remain fixed across
+# firmware versions.
+
+# Size of the AUX slot in Bytes - must align with flash page size
+SLOT_AUX_LEN ?= 0
+SLOT_AUX_OFFSET ?= $(shell echo $$(($(ROM_LEN:%K=%*1024)-$(SLOT_AUX_LEN))))
+
+LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_slot_aux_offset=$(SLOT_AUX_OFFSET)
+LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_slot_aux_len=$(SLOT_AUX_LEN)
+
+ifneq (0, $(SLOT_AUX_LEN))
+  CFLAGS += -DCONFIG_SLOT_AUX_OFFSET=$(SLOT_AUX_OFFSET)
+  CFLAGS += -DCONFIG_SLOT_AUX_LEN=$(SLOT_AUX_LEN)
+endif

@@ -19,7 +19,7 @@
 
 #define USB_H_USER_IS_RIOT_INTERNAL
 
-#ifdef MCU_ESP32
+#ifdef CPU_ESP32
 
 #if !defined(CPU_FAM_ESP32S2) && !defined(CPU_FAM_ESP32S3)
 #error "ESP32x SoC family not supported"
@@ -43,13 +43,13 @@
 #include "pm_layered.h"
 #include "ztimer.h"
 
-#if defined(MCU_STM32)
+#if defined(CPU_STM32)
 #include "usbdev_stm32.h"
-#elif defined(MCU_ESP32)
+#elif defined(CPU_ESP32)
 #include "usbdev_esp32.h"
-#elif defined(MCU_EFM32)
+#elif defined(CPU_EFM32)
 #include "usbdev_efm32.h"
-#elif defined(MCU_GD32V)
+#elif defined(CPU_GD32V)
 #include "vendor/usbdev_gd32v.h"
 #else
 #error "MCU not supported"
@@ -63,7 +63,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#ifdef MCU_ESP32
+#ifdef CPU_ESP32
 
 #include "esp_err.h"
 #include "esp_intr_alloc.h"
@@ -72,7 +72,7 @@
 
 #endif
 
-#ifdef MCU_GD32V
+#ifdef CPU_GD32V
 
 #define RCU_CFG0_SCS_PLL        (2UL << RCU_CFG0_SCS_Pos)   /* PLL used */
 
@@ -635,7 +635,7 @@ static void _flush_rx_fifo(const dwc2_usb_otg_fshs_config_t *conf)
 static void _sleep_periph(const dwc2_usb_otg_fshs_config_t *conf)
 {
     *_pcgcctl_reg(conf) |= USB_OTG_PCGCCTL_STOPCLK;
-#if defined(MCU_STM32)
+#if defined(CPU_STM32)
     /* Unblocking STM32_PM_STOP during suspend on the stm32f446 breaks while
      * (un)blocking works on the stm32f401, needs more investigation.
      * Works with:
@@ -649,22 +649,22 @@ static void _sleep_periph(const dwc2_usb_otg_fshs_config_t *conf)
      * stm32f767zi  FS  CID: 2000, HWREV: 4f54320a, HWCFG: 229ed520
      */
     pm_unblock(STM32_PM_STOP);
-#elif defined(MCU_EFM32)
+#elif defined(CPU_EFM32)
     /* switch USB core clock source either to LFXO or LFRCO */
     CMU_ClockSelectSet(cmuClock_USB, CLOCK_LFA);
     pm_unblock(EFM32_PM_MODE_EM2);
-#elif defined(MCU_ESP32)
+#elif defined(CPU_ESP32)
     pm_unblock(ESP_PM_LIGHT_SLEEP);
-#elif defined(MCU_GD32V)
+#elif defined(CPU_GD32V)
     pm_unblock(GD32V_PM_DEEPSLEEP);
 #endif
 }
 
 static void _wake_periph(const dwc2_usb_otg_fshs_config_t *conf)
 {
-#if defined(MCU_STM32)
+#if defined(CPU_STM32)
     pm_block(STM32_PM_STOP);
-#elif defined(MCU_EFM32)
+#elif defined(CPU_EFM32)
     pm_block(EFM32_PM_MODE_EM2);
     /* switch USB core clock source either to USHFRCO or HFCLK */
 #if defined(CPU_FAM_EFM32GG12B) || defined(CPU_FAM_EFM32GG11B)
@@ -674,9 +674,9 @@ static void _wake_periph(const dwc2_usb_otg_fshs_config_t *conf)
 #else
 #error "EFM32 family not yet supported"
 #endif /* defined(CPU_FAM_EFM32GG12B) || defined(CPU_FAM_EFM32GG11B) */
-#elif defined(MCU_ESP32)
+#elif defined(CPU_ESP32)
     pm_block(ESP_PM_LIGHT_SLEEP);
-#elif defined(MCU_GD32V)
+#elif defined(CPU_GD32V)
     pm_block(GD32V_PM_DEEPSLEEP);
 #endif
     *_pcgcctl_reg(conf) &= ~USB_OTG_PCGCCTL_STOPCLK;
@@ -707,7 +707,7 @@ static void _reset_periph(dwc2_usb_otg_fshs_t *usbdev)
     while (_global_regs(conf)->GRSTCTL & USB_OTG_GRSTCTL_CSRST) {}
 }
 
-#ifdef MCU_STM32
+#ifdef CPU_STM32
 static void _enable_gpio(const dwc2_usb_otg_fshs_config_t *conf)
 {
     (void)conf;
@@ -720,7 +720,7 @@ static void _enable_gpio(const dwc2_usb_otg_fshs_config_t *conf)
     gpio_init_af(conf->dm, conf->af);
 #endif /* MODULE_PERIPH_USBDEV_HS_ULPI */
 }
-#endif /* MCU_STM32 */
+#endif /* CPU_STM32 */
 
 static void _set_mode_device(dwc2_usb_otg_fshs_t *usbdev)
 {
@@ -738,7 +738,7 @@ static void _usbdev_init(usbdev_t *dev)
     dwc2_usb_otg_fshs_t *usbdev = (dwc2_usb_otg_fshs_t *)dev;
     const dwc2_usb_otg_fshs_config_t *conf = usbdev->config;
 
-#if defined(MCU_STM32)
+#if defined(CPU_STM32)
 
     /* Block both STOP and STANDBY, STOP is unblocked during USB suspend
      * status */
@@ -760,7 +760,7 @@ static void _usbdev_init(usbdev_t *dev)
 
     _enable_gpio(conf);
 
-#elif defined(MCU_ESP32)
+#elif defined(CPU_ESP32)
 
     pm_block(ESP_PM_DEEP_SLEEP);
     pm_block(ESP_PM_LIGHT_SLEEP);
@@ -777,7 +777,7 @@ static void _usbdev_init(usbdev_t *dev)
         LOG_ERROR("usbdev: Install USB PHY failed\n");
     }
 
-#elif defined(MCU_EFM32)
+#elif defined(CPU_EFM32)
 
     /* Block EM2 and EM3. In EM2, most USB core registers are reset and the
      * FIFO content is lost. EM2 is unblocked during USB suspend */
@@ -812,7 +812,7 @@ static void _usbdev_init(usbdev_t *dev)
     /* USB VBUSEN pin is not yet used */
     /* USB_ROUTELOC0 = location */
 
-#elif defined(MCU_GD32V)
+#elif defined(CPU_GD32V)
 
     /* Block both DEEP_SLEEP and STANDBY, TODO DEEP_SLEEP is unblocked during
      * USB suspend status */
@@ -1005,7 +1005,7 @@ static void _usbdev_init(usbdev_t *dev)
     /* Force the peripheral to device mode */
     _set_mode_device(usbdev);
 
-#if defined(MCU_STM32)
+#if defined(CPU_STM32)
 
     /* Disable Vbus detection and force the pull-up on, GCCFG is STM32 specific */
 #if defined(STM32_USB_OTG_CID_1x)
@@ -1033,14 +1033,14 @@ static void _usbdev_init(usbdev_t *dev)
         _global_regs(usbdev->config)->GCCFG &= ~USB_OTG_GCCFG_PWRDWN;
     }
 
-#elif defined(MCU_ESP32) || defined(MCU_EFM32)
+#elif defined(CPU_ESP32) || defined(CPU_EFM32)
 
     /* Force Vbus Detect values and ID detect values to device mode */
     _global_regs(usbdev->config)->GOTGCTL |= USB_OTG_GOTGCTL_VBVALOVAL |
                                              USB_OTG_GOTGCTL_VBVALOEN |
                                              USB_OTG_GOTGCTL_BVALOEN |
                                              USB_OTG_GOTGCTL_BVALOVAL;
-#elif defined(MCU_GD32V)
+#elif defined(CPU_GD32V)
     /* disable Vbus sensing */
     _global_regs(usbdev->config)->GCCFG |= USB_OTG_GCCFG_PWRON |
                                            USB_OTG_GCCFG_VBUSIG |
@@ -1116,17 +1116,17 @@ static void _usbdev_init(usbdev_t *dev)
     /* Enable interrupts */
     _global_regs(conf)->GAHBCFG |= USB_OTG_GAHBCFG_GINT;
 
-#if defined(MCU_STM32)
+#if defined(CPU_STM32)
     /* Unmask the interrupt in the NVIC */
     NVIC_EnableIRQ(conf->irqn);
-#elif defined(MCU_EFM32)
+#elif defined(CPU_EFM32)
     /* Unmask the interrupt in the NVIC */
     NVIC_EnableIRQ(USB_IRQn);
-#elif defined(MCU_ESP32)
+#elif defined(CPU_ESP32)
     void isr_otg_fs(void *arg);
     /* Allocate the interrupt and connect it with USB interrupt source */
     esp_intr_alloc(ETS_USB_INTR_SOURCE, ESP_INTR_FLAG_LOWMED, isr_otg_fs, NULL, NULL);
-#elif defined(MCU_GD32V)
+#elif defined(CPU_GD32V)
     void isr_otg_fs(unsigned irq);
     clic_set_handler(conf->irqn, isr_otg_fs);
     clic_enable_interrupt(conf->irqn, CPU_DEFAULT_IRQ_PRIO);
@@ -1642,7 +1642,7 @@ void _isr_common(dwc2_usb_otg_fshs_t *usbdev)
 #endif
 }
 
-#if defined(MCU_STM32)
+#if defined(CPU_STM32)
 
 #ifdef DWC2_USB_OTG_FS_ENABLED
 void isr_otg_fs(void)
@@ -1664,7 +1664,7 @@ void isr_otg_hs(void)
 }
 #endif /* DWC2_USB_OTG_HS_ENABLED */
 
-#elif defined(MCU_ESP32)
+#elif defined(CPU_ESP32)
 
 void isr_otg_fs(void *arg)
 {
@@ -1676,7 +1676,7 @@ void isr_otg_fs(void *arg)
     _isr_common(usbdev);
 }
 
-#elif defined(MCU_EFM32)
+#elif defined(CPU_EFM32)
 
 void isr_usb(void)
 {
@@ -1686,7 +1686,7 @@ void isr_usb(void)
     _isr_common(usbdev);
 }
 
-#elif defined(MCU_GD32V)
+#elif defined(CPU_GD32V)
 
 void isr_otg_fs(unsigned irq)
 {
@@ -1699,7 +1699,7 @@ void isr_otg_fs(unsigned irq)
 }
 
 #else
-#error "MCU not supported"
+#error "CPU not supported"
 #endif
 
 const usbdev_driver_t driver = {

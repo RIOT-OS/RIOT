@@ -46,7 +46,7 @@ extern "C" {
 #define RTC_BSS_ATTR __attribute__((section(".rtc.bss")))
 #endif
 
-#ifdef MCU_ESP8266
+#ifdef CPU_ESP8266
 #ifndef RTC_DATA_ATTR
 #define RTC_DATA_ATTR __attribute__((section(".rtc.data")))
 #endif
@@ -98,7 +98,7 @@ extern "C" {
   * @brief  function name mappings for source code compatibility with ESP8266 port
   * @{
   */
-#ifdef MCU_ESP32
+#ifdef CPU_ESP32
 #define system_get_cpu_freq     ets_get_cpu_frequency
 #define system_update_cpu_freq  ets_update_cpu_frequency
 #endif /* CPU_FAM_ESP32 */

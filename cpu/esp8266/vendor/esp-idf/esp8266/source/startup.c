@@ -53,7 +53,7 @@ static void user_init_entry(void *param)
 
     phy_get_bb_evm();
 
-#ifdef MCU_ESP8266
+#ifdef CPU_ESP8266
     /* initialize newlib system calls */
     extern void syscalls_init (void);
     syscalls_init ();

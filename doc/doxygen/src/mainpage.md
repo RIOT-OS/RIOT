@@ -38,7 +38,7 @@ RIOT is developed by an open community that anyone is welcome to join:
  - Sign-up to our [forum](https://forum.riot-os.org/) to ask for help using RIOT
    or writing an application for RIOT, discuss kernel and network stack
    development as well as hardware support, or to show-case your latest project.
- - Follow us on [Twitter](https://twitter.com/RIOT_OS) for news from the RIOT
+ - Follow us on [Mastodon][mastodon-link] for news from the RIOT
    community.
  - Regarding critical vulnerabilities we would appreciate if you give us a
    90-days head-start by reporting to security@riot-os.org, before making your
@@ -46,6 +46,7 @@ RIOT is developed by an open community that anyone is welcome to join:
  - Contact us on Matrix for live support and discussions:
    [riot-os:matrix.org](https://matrix.to/#/#riot-os:matrix.org)
 
+[mastodon-link]: https://fosstodon.org/@RIOT_OS
 
 The quickest start                                        {#the-quickest-start}
 ==================

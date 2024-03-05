@@ -20,7 +20,6 @@ config BOARD_ESP32_OLIMEX_EVB
     select HAS_PERIPH_SDMMC
     select HAS_PERIPH_SPI
     select HAS_PERIPH_CAN
-    select HAS_PERIPH_IR
 
     select HAVE_MTD_SDMMC_DEFAULT
 

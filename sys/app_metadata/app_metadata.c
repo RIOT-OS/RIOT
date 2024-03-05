@@ -24,7 +24,6 @@ void app_metadata_print_json(void)
 #ifdef APP_SHELL_FMT
     printf("{\"data\": {\"APP_SHELL_FMT\": \"%s\"}}\n", APP_SHELL_FMT);
 #endif
-    printf("{\"data\": {\"MCU\": \"%s\"}}\n", RIOT_MCU);
     printf("{\"data\": {\"OS_VERSION\": \"%s\"}}\n", RIOT_VERSION);
 
     printf("{\"result\": \"SUCCESS\"}\n");

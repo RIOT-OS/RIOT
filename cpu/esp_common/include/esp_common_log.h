@@ -126,7 +126,7 @@ extern int ets_printf(const char *fmt, ...);
 #define ESP_EARLY_LOGD(tag, format, ...) LOG_TAG_EARLY(LOG_DEBUG, D, tag, format "\n", ##__VA_ARGS__)
 #define ESP_EARLY_LOGV(tag, format, ...) LOG_TAG_EARLY(LOG_ALL, V, tag, format "\n", ##__VA_ARGS__)
 
-#ifdef MCU_ESP8266
+#ifdef CPU_ESP8266
 #define ESP_LOGE(tag, format, ...) LOG_TAG(LOG_ERROR, E, tag, format "\n", ##__VA_ARGS__)
 #define ESP_LOGW(tag, format, ...) LOG_TAG(LOG_WARNING, W, tag, format "\n", ##__VA_ARGS__)
 #define ESP_LOGI(tag, format, ...) LOG_TAG(LOG_INFO, I, tag, format "\n", ##__VA_ARGS__)

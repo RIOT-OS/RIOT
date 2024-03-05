@@ -64,7 +64,7 @@ static ssize_t _riot_block2_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, c
     bufpos += coap_blockwise_put_bytes(&slicer, bufpos, block2_board, sizeof(block2_board)-1);
     bufpos += coap_blockwise_put_bytes(&slicer, bufpos, (uint8_t*)RIOT_BOARD, strlen(RIOT_BOARD));
     bufpos += coap_blockwise_put_bytes(&slicer, bufpos, block2_mcu, sizeof(block2_mcu)-1);
-    bufpos += coap_blockwise_put_bytes(&slicer, bufpos, (uint8_t*)RIOT_MCU, strlen(RIOT_MCU));
+    bufpos += coap_blockwise_put_bytes(&slicer, bufpos, (uint8_t*)RIOT_CPU, strlen(RIOT_CPU));
     /* To demonstrate individual chars */
     bufpos += coap_blockwise_put_char(&slicer, bufpos, ' ');
     bufpos += coap_blockwise_put_char(&slicer, bufpos, 'M');

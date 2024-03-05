@@ -5,27 +5,32 @@
 
 ### General information
 
-[The Feather nRF52840 Sense][feather-nrf52840-sense] is a development board
-from Adafruits Feather board family. It is very similar to the [The Feather
+The [Feather nRF52840 Sense][feather-nrf52840-sense] is a development board
+from Adafruits Feather board family. It is very similar to the [Feather
 nRF52840 Express][feather-nrf52840] but comes with more sensors.
 
 It provides native USB support, Bluetooth
 Low Energy and IEEE 802.15.4 support via the nRF52840 MCU.
 
-![top-down view on feather-nrf52840-sense][top-down view]
+<img src="https://cdn-learn.adafruit.com/assets/assets/000/089/096/original/sensors_Feather_Sense_top.jpg"
+     alt="top-down view on feather-nrf52840-sense" width="50%"/>
 
 [feather-nrf52840]: https://learn.adafruit.com/introducing-the-adafruit-nrf52840-feather/
 [feather-nrf52840-sense]: https://learn.adafruit.com/adafruit-feather-sense
-[top-down view]: https://cdn-learn.adafruit.com/assets/assets/000/089/096/original/sensors_Feather_Sense_top.jpg
 
 ### Flashing, Bootloader, and Terminal
 
-Refer to [The Feather nRF52840 Express
+Refer to the [Feather nRF52840 Express
 documentation](https://doc.riot-os.org/group__boards__feather-nrf52840.html) for further details.
 Both use the same flasher, bootloader, and terminal settings.
 
+Example with `hello-world` application:
+```
+     make BOARD=feather-nrf52840-sense -C examples/hello-world flash term
+```
+
 On "fresh" boards the
-[bootloader may need to be updated](https://learn.adafruit.com/adafruit-feather-sense/update-bootloader)
+[bootloader may need to be updated](https://learn.adafruit.com/adafruit-feather-sense/update-bootloader).
 
 #### Updating Old Bootloaders
 

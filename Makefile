@@ -7,6 +7,9 @@ all: welcome
 	@exit 1
 
 doc:
+	@./dist/tools/features_yaml2mx/features_yaml2mx.py \
+		features.yaml \
+		--output-md doc/doxygen/src/feature_list.md
 	"$(MAKE)" -BC doc/doxygen
 
 doc-man:
@@ -33,6 +36,11 @@ distclean: docclean pkg-clean
 print-versions:
 	@./dist/tools/ci/print_toolchain_versions.sh
 
+generate-features:
+	@./dist/tools/features_yaml2mx/features_yaml2mx.py \
+		features.yaml \
+		--output-makefile makefiles/features_existing.inc.mk
+
 include makefiles/boards.inc.mk
 include makefiles/app_dirs.inc.mk
 
@@ -53,7 +61,7 @@ welcome:
 	@echo "    https://forum.riot-os.org"
 	@echo ""
 	@echo "Available targets for the RIOT base directory include:"
-	@echo " generate-{board,driver,example,module,pkg,test}"
+	@echo " generate-{board,driver,example,module,pkg,test,features}"
 	@echo " info-{applications,boards,emulated-boards} info-applications-supported-boards"
 	@echo " print-versions"
 	@echo " clean distclean pkg-clean"

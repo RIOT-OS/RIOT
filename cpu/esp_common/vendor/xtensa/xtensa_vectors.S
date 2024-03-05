@@ -493,7 +493,7 @@ User Exception (including Level 1 Interrupt from user mode).
 
 _UserExceptionVector:
 
-#ifdef MCU_ESP8266
+#ifdef CPU_ESP8266
     wsr     a0, EXCSAVE_1                   /* preserve a0 */
     j       _UserExceptionTrampoline        /* jump to handler trampoline */
 #else
@@ -504,7 +504,7 @@ _UserExceptionVector:
 
     .end        literal_prefix
 
-#ifdef MCU_ESP8266
+#ifdef CPU_ESP8266
 /*************************** LoadStoreError Handler BEGIN ********************/
 /*
  * PLEASE NOTE: The code between "LoadStoreError Handler BEGIN" and
@@ -549,7 +549,7 @@ _LoadStoreErrorHandlerStack:
 _UserExceptionTrampoline:
 
     wsr     a1, EXCSAVE_2                   /* preserve a1 */
-#ifdef MCU_ESP8266
+#ifdef CPU_ESP8266
     rsr     a1, exccause
     beqi    a1, CAUSE_LOADSTORE, _LoadStoreErrorHandler
 #endif
@@ -2010,7 +2010,7 @@ _xt_nmi:
     /* USER_EDIT:
     ADD HIGH PRIORITY NON-MASKABLE INTERRUPT (NMI) HANDLER CODE HERE.
     */
-    #if defined(RIOT_VERSION) && defined(MCU_ESP8266)
+    #if defined(RIOT_VERSION) && defined(CPU_ESP8266)
 
     rsr     a0, EXCSAVE + XCHAL_NMILEVEL /* restore a0 as saved in _NMIExceptionHandler */
 
@@ -2116,7 +2116,7 @@ _xt_nmi:
 
     /*************************** NMI Handler END ****************************/
 
-    #endif  /* defined(RIOT_VERSION) && defined(MCU_ESP8266) */
+    #endif  /* defined(RIOT_VERSION) && defined(CPU_ESP8266) */
 
     .align  4
 .L_xt_nmi_exit:
