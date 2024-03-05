@@ -23,7 +23,7 @@ osource "$(APPDIR)/Kconfig"
 
 # Load board configurations, which might override CPU's
 orsource "$(BOARDDIR)/Kconfig"
-orsource "$(RIOTCPU)/$(CPU)/Kconfig"
+orsource "$(CPUDIR)/Kconfig"
 
 rsource "$(RIOTBOARD)/Kconfig"
 rsource "$(RIOTCPU)/Kconfig"

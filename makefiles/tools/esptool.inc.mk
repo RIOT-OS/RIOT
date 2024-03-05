@@ -37,8 +37,8 @@ ifeq (esp32,$(CPU))
 		--chip $(CPU_FAM) merge_bin \
 		--fill-flash-size 4MB \
 		-o $(BINDIR)/qemu_flash_image.bin @$(BINDIR)/qemu_flash_args
-	$(Q)cp $(RIOTCPU)/$(CPU)/bin/rom_0x3ff90000_0x00010000.bin $(BINDIR)/rom1.bin
-	$(Q)cp $(RIOTCPU)/$(CPU)/bin/rom_0x40000000_0x000c2000.bin $(BINDIR)/rom.bin
+	$(Q)cp $(CPUDIR)/bin/rom_0x3ff90000_0x00010000.bin $(BINDIR)/rom1.bin
+	$(Q)cp $(CPUDIR)/bin/rom_0x40000000_0x000c2000.bin $(BINDIR)/rom.bin
 else
 	$(Q)dd if=/dev/zero bs=1M count=$(FLASH_SIZE) | \
 	  tr "\\000" "\\377" > tmp.bin && cat tmp.bin | \

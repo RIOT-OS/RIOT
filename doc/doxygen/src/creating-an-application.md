@@ -144,10 +144,10 @@ add a testrunner Python script. Just answer 'y' when prompted.
 # Creating an out of tree application structure
 
 Applications written for RIOT do not have to reside in the RIOT tree. Out of
-tree applications, modules and boards are supported.
+tree applications, modules boards, and cpus are supported.
 
-For a full application with custom board and modules, the following directory
-tree can be used:
+For a full application with custom board, cpu and modules, the following
+directory tree can be used:
 
 ```
 ├── apps
@@ -155,6 +155,8 @@ tree can be used:
 │       └── Makefile
 ├── boards
 │   └── my_board
+├── cpu
+│   └── my_cpu
 ├── modules
 │   └── my_module
 │       ├── include
@@ -227,6 +229,18 @@ USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_my_module)
 Note that the make variable (here `USEMODULE_INCLUDES_my_module`) must be unique
 for every module to make this work. Including the module name here is usually
 sufficient.
+
+## External CPUs
+
+Similar to the external boards and external modules, external cpus can be
+written in a similar way as regular in-tree cpus.  There is an optional
+parameter called `EXTERNAL_CPU_DIRS`, which, when populated, can point the RIOT
+build system to an additional directory to search for CPU definitions, the same
+way `EXTERNAL_BOARD_DIRS` provides additional board definitions.  This allows a
+developer to prototype their CPU definition without adding something under
+development upstream prematurely.  It also supports custom native CPUs, such as
+if a custom IO handling scheme is needed, that would not warrant being
+upstreamed.
 
 ## Extra Makefile Scaffolding
 

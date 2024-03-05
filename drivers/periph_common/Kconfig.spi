@@ -46,6 +46,6 @@ config MODULE_PERIPH_INIT_SPI_GPIO_MODE
     depends on MODULE_PERIPH_SPI_GPIO_MODE
 
 # Include CPU specific configurations
-osource "$(RIOTCPU)/$(CPU)/periph/Kconfig.spi"
+osource "$(CPUDIR)/periph/Kconfig.spi"
 
 endif # MODULE_PERIPH_SPI

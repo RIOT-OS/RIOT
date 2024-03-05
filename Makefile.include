@@ -43,6 +43,7 @@ include $(RIOT_MAKEFILES_GLOBAL_PRE)
 # set undefined variables
 RIOTBASE                        ?= $(_riotbase)
 RIOTCPU                         ?= $(RIOTBASE)/cpu
+EXTERNAL_CPU_DIRS               ?=
 # Deprecated to set RIOTBOARD, use EXTERNAL_BOARD_DIRS
 RIOTBOARD                       ?= $(RIOTBASE)/boards
 EXTERNAL_BOARD_DIRS             ?=
@@ -102,6 +103,9 @@ ifeq ($(INSIDE_DOCKER),0)
   ifeq ($(origin EXTERNAL_PKG_DIRS),command line)
     $(error EXTERNAL_PKG_DIRS must be passed as environment variable, and not as command line argument)
   endif
+  ifeq ($(origin EXTERNAL_CPU_DIRS),command line)
+    $(error EXTERNAL_CPU_DIRS must be passed as environment variable, and not as command line argument)
+  endif
 endif
 
 # Deprecation of configuring 'RIOTBOARD'
@@ -147,6 +151,9 @@ EXTERNAL_MODULE_DIRS            := $(foreach dir,\
                                              $(abspath $(dir)))
 EXTERNAL_PKG_DIRS               := $(foreach dir,\
                                              $(EXTERNAL_PKG_DIRS),\
+                                             $(abspath $(dir)))
+EXTERNAL_CPU_DIRS               := $(foreach dir,\
+                                             $(EXTERNAL_CPU_DIRS),\
                                              $(abspath $(dir)))
 
 # Ensure that all directories are set and don't contain spaces.
@@ -468,8 +475,8 @@ include $(RIOTMAKE)/boot/riotboot_dfu-util.mk
 # Include Board and CPU configuration
 INCLUDES += $(addprefix -I,$(wildcard $(BOARDDIR)/include))
 include $(BOARDDIR)/Makefile.include
-INCLUDES += -I$(RIOTCPU)/$(CPU)/include
-include $(RIOTCPU)/$(CPU)/Makefile.include
+INCLUDES += -I$(CPUDIR)/include
+include $(CPUDIR)/Makefile.include
 
 # Include common serial logic to define TERMPROG, TERMFLAGS variables based on
 # the content of RIOT_TERMINAL

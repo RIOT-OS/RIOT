@@ -1,6 +1,6 @@
 MODULE =cpu
 
-include $(RIOTCPU)/$(CPU)/Makefile.include
+include $(CPUDIR)/Makefile.include
 
 DIRS = $(RIOTCPU)/arm7_common periph
 
