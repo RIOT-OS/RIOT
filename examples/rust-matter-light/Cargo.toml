@@ -25,6 +25,7 @@ riot-sys = "*"
 embedded-nal-async = "0.7.1"
 embedded-hal-async = { version =  "1.0.0"}
 embassy-sync = "0.5.0"
+log = "0.4.21"
 
 # While currently this exmple does not use any RIOT modules implemented in
 # Rust, that may change; it is best practice for any RIOT application that has

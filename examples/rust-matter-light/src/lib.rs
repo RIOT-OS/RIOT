@@ -26,6 +26,7 @@ use core::{ffi::CStr, borrow::Borrow, pin::pin};
 use static_cell::StaticCell;
 use embedded_nal_async::UdpStack as _;
 use embedded_hal_async::delay::DelayNs as _;
+use log::{self, debug, info, warn, error, Level, LevelFilter, Record, SetLoggerError};
 
 // RIOT OS modules
 extern crate rust_riotmodules;
@@ -97,9 +98,33 @@ fn matter_handler<'a>(matter: &'a Matter<'a>) -> impl Metadata + NonBlockingHand
     )
 }
 
+struct RiotLogger;
+
+impl log::Log for RiotLogger {
+    fn enabled(&self, metadata: &log::Metadata) -> bool {
+        metadata.level() >= Level::Info
+    }
+
+    fn log(&self, record: &Record) {
+        if self.enabled(record.metadata()) {
+            println!("[{}] {}", record.level(), record.args());
+        }
+    }
+
+    fn flush(&self) {
+    }
+}
+
+static LOGGER: RiotLogger = RiotLogger;
+pub fn init_logger() -> Result<(), SetLoggerError> {
+    log::set_logger(&LOGGER)
+        .map(|_| log::set_max_level(LevelFilter::Info))
+}
+
 riot_main!(main);
 fn main() -> ! {
-    println!("Hello Matter on RIOT!");
+    init_logger().expect("Error initializing logger");
+    info!("Hello Matter on RIOT!");
 
     let (ipv4_addr, ipv6_addr, interface) = initialize_network().expect("Error getting network interface and IP addresses");
 
@@ -132,7 +157,7 @@ fn main() -> ! {
         MATTER_PORT,
     ));
 
-    println!("Starting all services...");
+    info!("Starting all services...");
 
     static EXECUTOR: StaticCell<embassy_executor_riot::Executor> = StaticCell::new();
     let executor: &'static mut _ = EXECUTOR.init(embassy_executor_riot::Executor::new());
@@ -143,7 +168,7 @@ fn main() -> ! {
     });
 
     let mut shell_thread = || {
-        println!("Shell is running");
+        debug!("Shell is running");
         saul_reg::run_shell_with_saul();
     };
     loop { }
@@ -159,7 +184,7 @@ async fn run_mdns(mdns: &'static MdnsService<'_>) {
         .await
         .expect("Can't create a socket");
     let socket = UdpSocketWrapper::new(mdns_addr, mdns_sock);
-    println!("Created UDP socket for mDNS at {:?}", &mdns_addr);
+    debug!("Created UDP socket for mDNS at {:?}", &mdns_addr);
 
     // Finally run the MDNS service
     let mut mdns_udp_buffers = UdpBuffers::new();
@@ -169,10 +194,15 @@ async fn run_mdns(mdns: &'static MdnsService<'_>) {
         &mut mdns_udp_buffers)
     );
 
-    println!("Starting MDNS....");
-    let _ = mdns_runner.await;
-
-    println!("mDNS service has terminated!");
+    debug!("Starting MDNS....");
+    match mdns_runner.await {
+        Ok(_) => {
+            info!("MDNS terminated without errors!");
+        }
+        Err(err) => {
+            error!("MDNS terminated with error: {:?}", err);
+        }
+    }
 }
 
 #[embassy_executor::task]
@@ -185,7 +215,7 @@ async fn run_matter(matter: &'static Matter<'_>) {
         .await
         .expect("Can't create a socket");
     let socket = UdpSocketWrapper::new(matter_addr, matter_sock);
-    println!("Created UDP socket for Matter at {:?}", &matter_addr);
+    debug!("Created UDP socket for Matter at {:?}", &matter_addr);
 
     let handler = HandlerCompat(matter_handler(&matter));
 
@@ -207,18 +237,29 @@ async fn run_matter(matter: &'static Matter<'_>) {
     );
     let mut matter_runner = pin!(matter_runner);
 
-    println!("Starting Matter...");
-    let _ = matter_runner.await;
-
-    println!("Matter service terminated!");
+    info!("Starting Matter...");
+    match matter_runner.await {
+        Ok(_) => {
+            info!("Matter service terminated without errors!");
+        }
+        Err(err) => {
+            error!("Matter service terminated with error: {:?}", err);
+        }
+    }
 }
 
 #[embassy_executor::task]
 async fn run_psm(matter: &'static Matter<'_>) {
-    println!("Starting Persistence Manager....");
+    info!("Starting Persistence Manager....");
     // TODO: Develop own 'Persistence Manager' using RIOT OS modules
     let mut psm = persist::Psm::new(&matter).expect("Error creating PSM");
     let mut psm_runner = pin!(psm.run());
-    let _ = psm_runner.await;
-    println!("PSM terminated successfully!");
+    match psm_runner.await {
+        Ok(_) => {
+            info!("Persistence Manager terminated without errors!");
+        }
+        Err(err) => {
+            error!("Persistence Manager terminated with errors: {:?}", err);
+        }
+    }
 }

@@ -1,7 +1,7 @@
 use embassy_futures::select::{Either, select};
 use embedded_nal_async::{SocketAddr, UnconnectedUdp};
 use riot_wrappers::mutex::Mutex;
-use riot_wrappers::{println, ztimer};
+use riot_wrappers::ztimer;
 use riot_wrappers::socket_embedded_nal_async_udp::UnconnectedUdpSocket;
 use rs_matter::error::{Error, ErrorCode};
 use rs_matter::transport::network::{UdpReceive, UdpSend};
@@ -10,6 +10,7 @@ use embassy_sync::{
     blocking_mutex::raw::NoopRawMutex
 };
 use embedded_hal_async::delay::DelayNs;
+use log::{debug, error};
 use riot_wrappers::error::NumericError;
 
 pub type Notification = Signal<NoopRawMutex, ()>;
@@ -35,7 +36,7 @@ impl UdpSocketWrapper {
 
 impl UdpSend for &UdpSocketWrapper {
     async fn send_to(&mut self, data: &[u8], addr: SocketAddr) -> Result<(), Error> {
-        println!("(UDP) sending {} bytes to {:?}", data.len(), &addr);
+        debug!("(UDP) sending {} bytes to {:?}", data.len(), &addr);
         if addr.is_ipv4() {
             // RIOT OS does not support IPv4
             return Ok(());
@@ -72,9 +73,9 @@ impl UdpReceive for &UdpSocketWrapper {
                 Either::Second(res) => {
                     match res {
                         Ok((bytes_recvd, local_addr, remote_addr)) => {
-                            println!("(UDP) received {} bytes from {:?} to {:?}", bytes_recvd, &remote_addr, &local_addr);
+                            debug!("(UDP) received {} bytes from {:?} to {:?}", bytes_recvd, &remote_addr, &local_addr);
                         }
-                        Err(_) => { println!("Error during UDP receive!"); }
+                        Err(_) => { error!("Error during UDP receive!"); }
                     }
                     // return receive result
                     let (bytes_recvd, remote_addr) = res.map(|(bytes_recvd, _, remote_addr)|

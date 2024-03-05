@@ -1453,6 +1453,7 @@ dependencies = [
  "embassy-sync",
  "embedded-hal-async",
  "embedded-nal-async 0.7.1",
+ "log",
  "riot-sys",
  "riot-wrappers",
  "rs-matter",

@@ -4,12 +4,11 @@ use embedded_hal_async::delay::DelayNs;
 use rs_matter::{self, transport::network::{UdpReceive, UdpSend}};
 use rs_matter::error::Error as MatterError;
 use riot_wrappers::socket_embedded_nal_async_udp::UnconnectedUdpSocket;
-use riot_wrappers::{println, ztimer};
 use riot_wrappers::gnrc::Netif;
 use embedded_nal_async::{Ipv4Addr, Ipv6Addr, UdpStack as _, UnconnectedUdp};
 
-
 pub mod utils {
+    use log::{debug, error, info};
     use crate::socket::UdpSocketWrapper;
     use super::*;
 
@@ -47,7 +46,7 @@ pub mod utils {
         match interfaces.next() {
             Some(ifc) => found_ifc = Some(ifc),
             None => {
-                println!("ERROR: No network interface was found!");
+                error!("ERROR: No network interface was found!");
                 return Err(MatterError::new(rs_matter::error::ErrorCode::NoNetworkInterface));
             },
         }
@@ -56,7 +55,7 @@ pub mod utils {
         // atm only for debugging: Check name and status of KernelPID
         let pid = ifc.pid();
         let ifc_name: &str = pid.get_name().unwrap();
-        println!("Kernel PID status of network interface {:?}: {:?}", pid.get_name().unwrap(), pid.status().unwrap());
+        debug!("Kernel PID status of network interface {:?}: {:?}", pid.get_name().unwrap(), pid.status().unwrap());
     
         // We won't use IPv4 atm
         let ipv4: Ipv4Addr = Ipv4Addr::UNSPECIFIED;
@@ -64,7 +63,7 @@ pub mod utils {
         // Get available IPv6 link-local address
         match get_ipv6_address(&ifc) {
             Some(ipv6) => {
-                println!("Found network interface {} with {}/{}", ifc_name, ipv4, ipv6);
+                info!("Found network interface {} with {}/{}", ifc_name, ipv4, ipv6);
                 Ok((ipv4, ipv6, 0 as _))
             },
             None => Err(MatterError::new(rs_matter::error::ErrorCode::StdIoError)),
@@ -72,17 +71,17 @@ pub mod utils {
     }
 
     pub async fn test_udp(sock: &mut UnconnectedUdpSocket) {
-        println!("Waiting for UDP packets...");
+        debug!("Waiting for UDP packets...");
         let mut buffer: &mut [u8] = &mut [0 as u8; 255 as usize];
         let res = sock.receive_into(buffer).await;
         match res {
             Ok((bytes_recvd, _local_addr, remote_addr)) => {
-                println!("Received {} bytes from {:?}", bytes_recvd, remote_addr);
+                debug!("Received {} bytes from {:?}", bytes_recvd, remote_addr);
                 use core::str;
                 let as_str = str::from_utf8(&buffer).unwrap().trim_matches('\0');
-                println!("Received data: {:?}", as_str);
+                debug!("Received data: {:?}", as_str);
             },
-            Err(_) => println!("error while receiving UDP data"),
+            Err(_) => error!("error while receiving UDP data"),
         }
     }
 
