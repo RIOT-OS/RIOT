@@ -1,0 +1,17 @@
+ifneq (,$(filter vl53l1x_st_api,$(USEMODULE)))
+  USEMODULE += driver_vl53l1x_st_api_platform
+  USEMODULE += ztimer_usec
+  USEPKG += driver_vl53l1x_st_api
+endif
+
+ifeq (,$(filter vl53l1x_%,$(USEMODULE)))
+  # use vl53l1x_std if no `vl53l1x_*` driver variant is explicitly specified
+  USEMODULE += vl53l1x_std
+endif
+
+ifneq (,$(filter vl53l1x,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_irq
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_i2c
+  USEMODULE += ztimer_msec
+endif
