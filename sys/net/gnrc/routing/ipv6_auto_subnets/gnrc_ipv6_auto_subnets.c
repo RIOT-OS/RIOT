@@ -133,7 +133,7 @@
  * @brief How many bits of a new prefix have to match the old prefix
  *        for it to be considered for replacement.
  *
- *        Set this if you want to join multiple subnets at the same time.
+ *        Set this if you want to join multiple upstream subnets at the same time.
  *
  *        If you use `gnrc_ipv6_auto_subnets` instead of `gnrc_ipv6_auto_subnets_simple`
  *        make sure to also set CONFIG_GNRC_IPV6_AUTO_SUBNETS_NUMOF accordingly.
@@ -153,7 +153,8 @@
 /**
  * @brief Number of subnets that can be configured.
  *
- *        This is not needed when using the `gnrc_ipv6_auto_subnets_simple` module.
+ *        This is not needed when using the `gnrc_ipv6_auto_subnets_simple` module
+ *        or if only a single upstream subnet is to be partitioned.
  *
  *        If this is set to any number higher than 1, make sure to also configure
  *        CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_FIX_LEN to suit your setup.
@@ -166,9 +167,9 @@
  * @brief Enable this if you have a static network that might experience
  *        high packet loss under certain conditions.
  *        If enabled, this option causes the module to always assume the highest
- *        number of subnets it has ever seen.
- *        This prevents different/conflicting subnets from being configured if
- *        multiple sync packets got lost.
+ *        number of downstream routers it has ever seen.
+ *        This prevents different/conflicting downstream subnets from being configured
+ *        if multiple sync packets got lost.
  */
 #ifndef CONFIG_GNRC_IPV6_AUTO_SUBNETS_STATIC
 #define CONFIG_GNRC_IPV6_AUTO_SUBNETS_STATIC        (0)
