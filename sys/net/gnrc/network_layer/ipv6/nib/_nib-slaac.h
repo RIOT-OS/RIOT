@@ -149,6 +149,13 @@ bool _stable_privacy_should_retry_idgen(uint8_t *dad_ctr, const char *reason);
  */
 int ipv6_get_rfc7217_iid(eui64_t *iid, gnrc_netif_t *netif, const ipv6_addr_t *pfx,
                          uint8_t *dad_ctr);
+
+/**
+ * @brief @ref ipv6_get_rfc7217_iid for those callers which assume idempotency.
+ * @return 1 if ignored for idempotency, else @ref ipv6_get_rfc7217_iid
+ */
+int ipv6_get_rfc7217_iid_idempotent(eui64_t *iid, gnrc_netif_t *netif, const ipv6_addr_t *pfx,
+                                    uint8_t *dad_ctr);
 #endif
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC) || defined(DOXYGEN)

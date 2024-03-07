@@ -216,6 +216,30 @@ int ipv6_get_rfc7217_iid(eui64_t *iid, gnrc_netif_t *netif, const ipv6_addr_t *p
 
     return 0;
 }
+
+inline int ipv6_get_rfc7217_iid_idempotent(eui64_t *iid, gnrc_netif_t *netif, const ipv6_addr_t *pfx,
+                                    uint8_t *dad_ctr) {
+    int idx;
+    if ((idx = gnrc_netif_ipv6_addr_pfx_idx(netif, pfx, SLAAC_PREFIX_LENGTH)) >= 0) {
+        /* if the prefix is already known,
+         * do not cause generation of a potentially different
+         * stable privacy address (keyword DAD_Counter).
+         * refer to https://datatracker.ietf.org/doc/html/rfc4862#section-5.5.3 d)
+         * */
+        DEBUG("nib: Not calling IDGEN, prefix already known.\n");
+
+        //write out params
+        //- dad_ctr
+        *dad_ctr = gnrc_netif_ipv6_addr_gen_retries(netif, idx);
+        //- iid
+        ipv6_addr_t *addr = &netif->ipv6.addrs[idx];
+        memcpy(iid, &addr->u64[1], sizeof(*iid));
+
+        return 1;
+    }
+
+    return ipv6_get_rfc7217_iid(iid, netif, pfx,dad_ctr);
+}
 #endif
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC)
