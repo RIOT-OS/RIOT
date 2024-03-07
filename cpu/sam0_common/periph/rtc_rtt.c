@@ -330,6 +330,13 @@ static void _rtc_init(void)
     RTC->MODE2.CTRLA.reg = RTC_MODE2_CTRLA_PRESCALER_DIV1024   /* CLK_RTC_CNT = 1KHz / 1024 -> 1Hz */
                          | RTC_MODE2_CTRLA_CLOCKSYNC           /* Clock Read Synchronization Enable */
                          | RTC_MODE2_CTRLA_MODE_CLOCK;
+
+    /* RTC is all 0 after POR, avoid reading invalid date right after boot */
+    if (RTC->MODE2.CLOCK.reg == 0) {
+        RTC->MODE2.CLOCK.reg = RTC_MODE2_CLOCK_MONTH(1)
+                             | RTC_MODE2_CLOCK_DAY(1);
+    }
+
 #ifdef RTC_MODE2_CTRLB_GP2EN
     /* RTC driver does not use COMP[1] or ALARM[1] */
     /* Use second set of Compare registers as general purpose register */
@@ -559,17 +566,11 @@ int rtc_get_alarm(struct tm *time)
         return -1;
     }
 
-    time->tm_mon = alarm.bit.MONTH;
+    time->tm_mon = alarm.bit.MONTH - 1;
     time->tm_mday = alarm.bit.DAY;
     time->tm_hour = alarm.bit.HOUR;
     time->tm_min = alarm.bit.MINUTE;
     time->tm_sec = alarm.bit.SECOND;
-
-    /* struct tm has January as 0, RTC has January as 1 */
-    /* But after power-on reset, all RTC values are 0 - avoid negative month */
-    if (time->tm_mon) {
-        --time->tm_mon;
-    }
 
     return 0;
 }
@@ -589,18 +590,11 @@ int rtc_get_time(struct tm *time)
         return -1;
     }
 
-    time->tm_mon = clock.bit.MONTH;
+    time->tm_mon = clock.bit.MONTH - 1;
     time->tm_mday = clock.bit.DAY;
     time->tm_hour = clock.bit.HOUR;
     time->tm_min = clock.bit.MINUTE;
     time->tm_sec = clock.bit.SECOND;
-
-    /* struct tm has January as 0, RTC has January as 1 */
-    /* But after power-on reset, all RTC values are 0 - avoid negative month */
-    if (time->tm_mon) {
-        --time->tm_mon;
-    }
-
     return 0;
 }
 
