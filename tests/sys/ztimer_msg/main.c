@@ -115,7 +115,7 @@ int main(void)
                   timer_stack,
                   sizeof(timer_stack),
                   THREAD_PRIORITY_MAIN - 1,
-                  THREAD_CREATE_STACKTEST,
+                  0,
                   timer_thread,
                   NULL,
                   "timer");
@@ -134,7 +134,7 @@ int main(void)
                    timer_stack_local,
                    sizeof(timer_stack_local),
                    THREAD_PRIORITY_MAIN - 1,
-                   THREAD_CREATE_STACKTEST,
+                   0,
                    timer_thread_local,
                    NULL,
                    "timer local");

@@ -95,7 +95,7 @@ lwm2m_context_t *lwm2m_client_run(lwm2m_client_data_t *client_data,
     _client_data->pid = thread_create(_lwm2m_client_stack,
                                      sizeof(_lwm2m_client_stack),
                                      THREAD_PRIORITY_MAIN - 1,
-                                     THREAD_CREATE_STACKTEST,
+                                     0,
                                      _lwm2m_client_run,
                                      NULL,
                                      "LwM2M client");

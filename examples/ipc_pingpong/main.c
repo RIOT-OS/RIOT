@@ -51,7 +51,7 @@ int main(void)
     msg_t m;
 
     kernel_pid_t pid = thread_create(second_thread_stack, sizeof(second_thread_stack),
-                            THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST,
+                            THREAD_PRIORITY_MAIN - 1, 0,
                             second_thread, NULL, "pong");
 
     m.content.value = 1;

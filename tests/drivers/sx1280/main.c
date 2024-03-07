@@ -364,7 +364,7 @@ int main(void)
     }
 
     _recv_pid = thread_create(stack, sizeof(stack), THREAD_PRIORITY_MAIN - 1,
-                              THREAD_CREATE_STACKTEST, _recv_thread, netdev,
+                              0, _recv_thread, netdev,
                               "recv_thread");
 
     if (_recv_pid <= KERNEL_PID_UNDEF) {

@@ -78,7 +78,7 @@ int main(void)
         printf("MAIN: create thread, arg: %d\n", arg);
         ths = thread_create(stacks[i], sizeof(stacks[i]),
                             THREAD_PRIORITY_MAIN - 1,
-                            THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
+                            THREAD_CREATE_WOUT_YIELD,
                             run, NULL, "thread");
 
         if (ths < 0)  {

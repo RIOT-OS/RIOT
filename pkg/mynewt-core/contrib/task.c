@@ -36,7 +36,7 @@ int os_task_init(struct os_task *t, const char *name, os_task_func_t func,
     LOG_DEBUG("[mynewt-core]: starting thread %s\n", name);
 
     kernel_pid_t pid = thread_create(stack_bottom, (int) stack_size,
-                                     prio, THREAD_CREATE_STACKTEST,
+                                     prio, 0,
                                      func, arg, name);
 
     t->pid = pid;

@@ -115,7 +115,7 @@ int main(void)
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
 
     thread_create(server_thread_stack, sizeof(server_thread_stack),
-                  THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST,
+                  THREAD_PRIORITY_MAIN - 1, 0,
                   server_thread, NULL, "UDP echo server");
 
     char line_buf[SHELL_DEFAULT_BUFSIZE];

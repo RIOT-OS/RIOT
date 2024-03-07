@@ -85,7 +85,7 @@ kernel_pid_t gnrc_ipv6_init(void)
 {
     if (gnrc_ipv6_pid == KERNEL_PID_UNDEF) {
         gnrc_ipv6_pid = thread_create(_stack, sizeof(_stack), GNRC_IPV6_PRIO,
-                                      THREAD_CREATE_STACKTEST,
+                                      0,
                                       _event_loop, NULL, "ipv6");
     }
 

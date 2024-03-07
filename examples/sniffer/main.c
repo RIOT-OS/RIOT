@@ -124,7 +124,7 @@ int main(void)
     /* start and register rawdump thread */
     puts("Run the rawdump thread and register it");
     dump.target.pid = thread_create(rawdmp_stack, sizeof(rawdmp_stack), RAWDUMP_PRIO,
-                                    THREAD_CREATE_STACKTEST, rawdump, NULL, "rawdump");
+                                    0, rawdump, NULL, "rawdump");
     dump.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
     gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
 

@@ -78,7 +78,7 @@ static void test1(void)
     kernel_pid_t pid = thread_create(test1_thread_stack,
                                      sizeof(test1_thread_stack),
                                      THREAD_PRIORITY_MAIN - 1,
-                                     THREAD_CREATE_STACKTEST,
+                                     0,
                                      test1_second_thread,
                                      NULL,
                                      "second");
@@ -156,7 +156,7 @@ void test2(void)
         kernel_pid_t pid = thread_create(test2_thread_stack[i],
                                          sizeof(test2_thread_stack[i]),
                                          priority,
-                                         THREAD_CREATE_STACKTEST,
+                                         0,
                                          priority_sema_thread,
                                          names[i],
                                          names[i]);
@@ -215,14 +215,14 @@ void test3(void)
     }
     puts("first: create thread 1");
     if (thread_create(test2_thread_stack[0], sizeof(test2_thread_stack[0]),
-                      THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST,
+                      THREAD_PRIORITY_MAIN - 1, 0,
                       test3_one_two_thread, NULL, "thread 1") < 0) {
         puts("first: thread create FAILED");
         return;
     }
     puts("first: create thread 2");
     if (thread_create(test2_thread_stack[1], sizeof(test2_thread_stack[1]),
-                      THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST,
+                      THREAD_PRIORITY_MAIN - 1, 0,
                       test3_two_one_thread, NULL, "thread 2") < 0) {
         puts("first: thread create FAILED");
         return;
