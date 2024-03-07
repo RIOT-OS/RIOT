@@ -265,21 +265,14 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
 
 #if defined(DEVELHELP) || defined(SCHED_TEST_STACK) \
     || defined(MODULE_TEST_UTILS_PRINT_STACK_USAGE)
-    if (flags & THREAD_CREATE_STACKTEST) {
-        /* assign each int of the stack the value of it's address. Alignment
-         * has been handled above, so silence -Wcast-align */
-        uintptr_t *stackmax = (uintptr_t *)(uintptr_t)(stack + stacksize);
-        uintptr_t *stackp = (uintptr_t *)(uintptr_t)stack;
+    /* assign each int of the stack the value of it's address. Alignment
+     * has been handled above, so silence -Wcast-align */
+    uintptr_t *stackmax = (uintptr_t *)(uintptr_t)(stack + stacksize);
+    uintptr_t *stackp = (uintptr_t *)(uintptr_t)stack;
 
-        while (stackp < stackmax) {
-            *stackp = (uintptr_t)stackp;
-            stackp++;
-        }
-    }
-    else {
-        /* create stack guard. Alignment has been handled above, so silence
-         * -Wcast-align */
-        *(uintptr_t *)(uintptr_t)stack = (uintptr_t)stack;
+    while (stackp < stackmax) {
+        *stackp = (uintptr_t)stackp;
+        stackp++;
     }
 #endif
 

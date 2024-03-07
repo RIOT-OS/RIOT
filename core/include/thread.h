@@ -47,7 +47,6 @@
  *  ----------------------------- | --------------------------------------------------
  *  @ref THREAD_CREATE_SLEEPING   | the thread will sleep until woken up manually
  *  @ref THREAD_CREATE_WOUT_YIELD | the thread might not run immediately after creation
- *  @ref THREAD_CREATE_STACKTEST  | measures the stack's memory usage
  *
  * Thread creation
  * ===============
@@ -83,7 +82,7 @@
  * int main(void)
  * {
  *     thread_create(rcv_thread_stack, sizeof(rcv_thread_stack),
- *                   THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST,
+ *                   THREAD_PRIORITY_MAIN - 1, 0,
  *                   rcv_thread, NULL, "rcv_thread");
  * }
  * ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -231,10 +230,13 @@ struct _thread {
 #define THREAD_CREATE_WOUT_YIELD        (4)
 
 /**
- * @brief Write markers into the thread's stack to measure stack usage (for
- *        debugging and profiling purposes)
+ * @brief Legacy flag kept for compatibility.
+ *
+ * @deprecated will be removed after 2025.07 release
+ *
+ * This is always enabled with `DEVELHELP=1` or `SCHED_TEST_STACK`.
  */
-#define THREAD_CREATE_STACKTEST         (8)
+#define THREAD_CREATE_STACKTEST         (0)
 /** @} */
 
 /**
@@ -456,6 +458,7 @@ static inline const char *thread_getname(kernel_pid_t pid)
  * Only works if the stack is filled with canaries
  * (`*((uintptr_t *)ptr) == (uintptr_t)ptr` for naturally aligned `ptr` within
  * the stack).
+ * This is enabled if `DEVELHELP` or `SCHED_TEST_STACK` is set.
  *
  * @param[in] stack     the stack you want to measure. Try
  *                      `thread_get_stackstart(thread_get_active())`
