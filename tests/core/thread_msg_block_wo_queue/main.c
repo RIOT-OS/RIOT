@@ -58,7 +58,7 @@ int main(void)
     p_recv = thread_getpid();
 
     p_send = thread_create(t1_stack, sizeof(t1_stack), THREAD_PRIORITY_MAIN - 1,
-                       THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
+                       THREAD_CREATE_WOUT_YIELD,
                        thread1, NULL, "nr1");
 
     /* step 3: receive first msg from sender_thread*/

@@ -732,7 +732,7 @@ int main(void)
     for (intptr_t i = 0; i < RCV_THREAD_NUMOF; i++) {
         receive_pid[i] = thread_create(thread_stack[i], THREAD_STACKSIZE,
                                        THREAD_PRIORITY_MAIN - 1,
-                                       THREAD_CREATE_STACKTEST, _receive_thread,
+                                       0, _receive_thread,
                                        (void*)i, "receive_thread");
     }
 

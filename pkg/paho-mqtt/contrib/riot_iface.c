@@ -225,7 +225,7 @@ int ThreadStart(Thread *thread, void (*fn)(void *), void *arg)
     (void) fn;
     thread->pid = thread_create(thread->stack, sizeof(thread->stack),
                                 MQTT_THREAD_PRIORITY,
-                                THREAD_CREATE_STACKTEST, mqtt_riot_run, arg,
+                                0, mqtt_riot_run, arg,
                                 "paho_mqtt_riot");
     return thread->pid;
 }

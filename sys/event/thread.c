@@ -57,7 +57,7 @@ void event_thread_init_multi(event_queue_t *queues, size_t queues_numof,
 
     void *tagged_ptr = ptrtag(queues, queues_numof - 1);
 
-    thread_create(stack, stack_size, priority, THREAD_CREATE_STACKTEST,
+    thread_create(stack, stack_size, priority, 0,
                   _handler_thread, tagged_ptr, "event");
 }
 

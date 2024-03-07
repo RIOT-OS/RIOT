@@ -72,7 +72,7 @@ static void test_bhp_msg__claim(void)
 static void test_bhp_msg__cb(void)
 {
     kernel_pid_t pid = thread_create(_stack, sizeof(_stack), THREAD_PRIORITY_MAIN - 1,
-                             THREAD_CREATE_STACKTEST, _event_loop, NULL,
+                             0, _event_loop, NULL,
                              "bhp_msg");
 
     bhp_msg_claim_thread(&bhp_msg, pid);

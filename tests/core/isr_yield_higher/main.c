@@ -61,7 +61,7 @@ int main(void)
     (void)thread_create(
         t2_stack, sizeof(t2_stack),
         THREAD_PRIORITY_MAIN,
-        THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
+        THREAD_CREATE_WOUT_YIELD,
         second_thread, NULL, "nr2");
 
     while (xtimer_now_usec() < (TEST_TIME + start_time)) {}

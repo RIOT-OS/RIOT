@@ -124,7 +124,7 @@ static void *_openthread_event_loop(void *arg)
 int openthread_netdev_init(char *stack, int stacksize, char priority,
                            const char *name, netdev_t *netdev) {
     if (thread_create(stack, stacksize,
-                         priority, THREAD_CREATE_STACKTEST,
+                         priority, 0,
                          _openthread_event_loop, netdev, name) < 0) {
         return -EINVAL;
     }

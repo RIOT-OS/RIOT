@@ -66,7 +66,7 @@ static void _add_delayed_addr(gnrc_netif_t *netif)
     memset(adder_stack, 0, sizeof(adder_stack));
     thread_create(adder_stack, sizeof(adder_stack),
                   THREAD_PRIORITY_MAIN - 1,
-                  THREAD_CREATE_STACKTEST,
+                  0,
                   _adder_thread, netif, "add_addr");
 }
 

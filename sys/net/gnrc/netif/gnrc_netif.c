@@ -92,7 +92,7 @@ int gnrc_netif_create(gnrc_netif_t *netif, char *stack, int stacksize,
     mutex_init(&ctx.init_done);
     mutex_lock(&ctx.init_done);
 
-    res = thread_create(stack, stacksize, priority, THREAD_CREATE_STACKTEST,
+    res = thread_create(stack, stacksize, priority, 0,
                         _gnrc_netif_thread, &ctx, name);
     assert(res > 0);
     (void)res;

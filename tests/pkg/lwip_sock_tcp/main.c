@@ -968,10 +968,10 @@ int main(void)
     printf("code 0x%02x\n", code);
     _net_init();
     expect(0 < thread_create(_client_stack, sizeof(_client_stack),
-                             THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST,
+                             THREAD_PRIORITY_MAIN - 1, 0,
                              _client_func, NULL, "tcp_client"));
     expect(0 < thread_create(_server_stack, sizeof(_server_stack),
-                             THREAD_PRIORITY_MAIN - 2, THREAD_CREATE_STACKTEST,
+                             THREAD_PRIORITY_MAIN - 2, 0,
                              _server_func, NULL, "tcp_server"));
     tear_down();
 #ifdef MODULE_LWIP_IPV4
