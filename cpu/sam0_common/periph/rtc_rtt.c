@@ -566,17 +566,11 @@ int rtc_get_alarm(struct tm *time)
         return -1;
     }
 
-    time->tm_mon = alarm.bit.MONTH;
+    time->tm_mon = alarm.bit.MONTH - 1;
     time->tm_mday = alarm.bit.DAY;
     time->tm_hour = alarm.bit.HOUR;
     time->tm_min = alarm.bit.MINUTE;
     time->tm_sec = alarm.bit.SECOND;
-
-    /* struct tm has January as 0, RTC has January as 1 */
-    /* But after power-on reset, all RTC values are 0 - avoid negative month */
-    if (time->tm_mon) {
-        --time->tm_mon;
-    }
 
     return 0;
 }
@@ -596,18 +590,11 @@ int rtc_get_time(struct tm *time)
         return -1;
     }
 
-    time->tm_mon = clock.bit.MONTH;
+    time->tm_mon = clock.bit.MONTH - 1;
     time->tm_mday = clock.bit.DAY;
     time->tm_hour = clock.bit.HOUR;
     time->tm_min = clock.bit.MINUTE;
     time->tm_sec = clock.bit.SECOND;
-
-    /* struct tm has January as 0, RTC has January as 1 */
-    /* But after power-on reset, all RTC values are 0 - avoid negative month */
-    if (time->tm_mon) {
-        --time->tm_mon;
-    }
-
     return 0;
 }
 
