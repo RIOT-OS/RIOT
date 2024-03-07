@@ -834,7 +834,7 @@ int semtech_loramac_init(semtech_loramac_t *mac)
     semtech_loramac_pid = thread_create(_semtech_loramac_stack,
                                         sizeof(_semtech_loramac_stack),
                                         THREAD_PRIORITY_MAIN - 1,
-                                        THREAD_CREATE_STACKTEST,
+                                        0,
                                         _semtech_loramac_event_loop, mac,
                                         "recv_thread");
 

@@ -648,7 +648,7 @@ void _on_pkt(sock_udp_t *sock, sock_async_flags_t type, void *arg)
 void asymcute_handler_run(void)
 {
     thread_create(_stack, sizeof(_stack), ASYMCUTE_HANDLER_PRIO,
-                  THREAD_CREATE_STACKTEST, _eventloop, NULL, "asymcute_main");
+                  0, _eventloop, NULL, "asymcute_main");
 }
 
 int asymcute_topic_init(asymcute_topic_t *topic, const char *topic_name,

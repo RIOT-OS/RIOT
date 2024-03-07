@@ -46,7 +46,7 @@ int main(void)
         thr_id = thread_create(
             dummy_stack, sizeof(dummy_stack),
             THREAD_PRIORITY_MAIN - 1,
-            THREAD_CREATE_SLEEPING | THREAD_CREATE_STACKTEST,
+            THREAD_CREATE_SLEEPING,
             thread_func, NULL, "dummy");
             ++thr_cnt;
             printf(".");

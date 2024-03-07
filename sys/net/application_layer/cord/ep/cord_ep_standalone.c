@@ -87,7 +87,7 @@ static void *_reg_runner(void *arg)
 
 void cord_ep_standalone_run(void)
 {
-    thread_create(_stack, sizeof(_stack), PRIO, THREAD_CREATE_STACKTEST,
+    thread_create(_stack, sizeof(_stack), PRIO, 0,
                   _reg_runner, NULL, TNAME);
 }
 

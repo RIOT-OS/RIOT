@@ -82,7 +82,7 @@ int main(void)
 #else
    thread_create(
            pir_handler_stack, sizeof(pir_handler_stack), THREAD_PRIORITY_MAIN - 1,
-           THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
+           THREAD_CREATE_WOUT_YIELD,
            pir_handler, NULL, "pir_handler");
 #endif
     return 0;

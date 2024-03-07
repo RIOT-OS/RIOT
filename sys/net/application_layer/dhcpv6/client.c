@@ -136,7 +136,7 @@ void dhcpv6_client_auto_init(void)
     if (_thread_pid <= 0) {
         _thread_pid = thread_create(_thread_stack, DHCPV6_CLIENT_STACK_SIZE,
                                     DHCPV6_CLIENT_PRIORITY,
-                                    THREAD_CREATE_STACKTEST,
+                                    0,
                                     _thread, NULL, "dhcpv6-client");
     }
 }

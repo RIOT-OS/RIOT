@@ -86,10 +86,10 @@ static void *t3_func(void *unused)
 int main(void)
 {
     thread_create(t2_stack, sizeof(t2_stack), THREAD_PRIORITY_MAIN + 1,
-                  THREAD_CREATE_STACKTEST, t2_func, NULL, "t2");
+                  0, t2_func, NULL, "t2");
 
     t3_pid = thread_create(t3_stack, sizeof(t3_stack), THREAD_PRIORITY_MAIN - 1,
-                           THREAD_CREATE_STACKTEST, t3_func, NULL, "t3");
+                           0, t3_func, NULL, "t3");
 
     puts("[main] Use shell command \"nice\" to increase prio of t3.\n"
          "[main] If it works, it will run again. The \"hint\" cmd can be useful.");

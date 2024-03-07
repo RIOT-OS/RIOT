@@ -61,7 +61,7 @@ void usbus_init(usbus_t *usbus, usbdev_t *usbdev)
 void usbus_create(char *stack, int stacksize, char priority,
                   const char *name, usbus_t *usbus)
 {
-    int res = thread_create(stack, stacksize, priority, THREAD_CREATE_STACKTEST,
+    int res = thread_create(stack, stacksize, priority, 0,
                             _usbus_thread, (void *)usbus, name);
 
     (void)res;

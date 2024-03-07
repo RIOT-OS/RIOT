@@ -87,7 +87,7 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
         _instance_id = 0;
         /* start the event loop */
         gnrc_rpl_pid = thread_create(_stack, sizeof(_stack), GNRC_RPL_PRIO,
-                                     THREAD_CREATE_STACKTEST,
+                                     0,
                                      _event_loop, (void*)&eventloop_startup,
                                      "RPL");
 

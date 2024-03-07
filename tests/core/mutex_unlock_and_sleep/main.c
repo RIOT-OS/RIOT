@@ -56,7 +56,7 @@ int main(void)
     kernel_pid_t second_pid = thread_create(stack,
                   sizeof(stack),
                   THREAD_PRIORITY_MAIN - 1,
-                  THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
+                  THREAD_CREATE_WOUT_YIELD,
                   second_thread,
                   NULL,
                   "second_thread");

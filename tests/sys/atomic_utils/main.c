@@ -1322,13 +1322,13 @@ static int sc_list(int argc, char **argv)
 int main(void)
 {
     thread_create(thread_worker_stack, sizeof(thread_worker_stack),
-                  THREAD_PRIORITY_MAIN + 2, THREAD_CREATE_STACKTEST,
+                  THREAD_PRIORITY_MAIN + 2, 0,
                   thread_worker_func, NULL, "worker");
     thread_create(thread_checker_stack, sizeof(thread_checker_stack),
-                  THREAD_PRIORITY_MAIN + 1, THREAD_CREATE_STACKTEST,
+                  THREAD_PRIORITY_MAIN + 1, 0,
                   thread_checker_func, NULL, "checker");
     thread_create(thread_timeout_stack, sizeof(thread_timeout_stack),
-                  THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST,
+                  THREAD_PRIORITY_MAIN - 1, 0,
                   thread_timeout_func, NULL, "timeout");
 
     print_str(

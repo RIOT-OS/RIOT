@@ -83,7 +83,7 @@ int main(void)
         printf("Testing for alignment %" PRIuSIZE ": ", i);
         kernel_pid_t p;
         p = thread_create(stack + i, STACKSIZE, THREAD_PRIORITY_MAIN - 1,
-                          THREAD_CREATE_STACKTEST,
+                          0,
                           thread_func, NULL, "test");
         /* we expect that the new thread is scheduled to directly after it is
          * created and this will only continue one the thread has terminated.

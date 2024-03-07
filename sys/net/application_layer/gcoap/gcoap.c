@@ -1497,7 +1497,7 @@ kernel_pid_t gcoap_init(void)
         return -EEXIST;
     }
     _pid = thread_create(_msg_stack, sizeof(_msg_stack), THREAD_PRIORITY_MAIN - 1,
-                            THREAD_CREATE_STACKTEST, _event_loop, NULL, "coap");
+                            0, _event_loop, NULL, "coap");
 
     mutex_init(&_coap_state.lock);
     /* Blank lists so we know if an entry is available. */

@@ -53,9 +53,9 @@ int main(void)
 {
     puts("starting threads");
     main_pid = thread_getpid();
-    thread_create(stack[0], sizeof(stack[0]), shared_prio, THREAD_CREATE_STACKTEST,
+    thread_create(stack[0], sizeof(stack[0]), shared_prio, 0,
                   thread_wakeup_main, NULL, "TWakeup");
-    thread_create(stack[1], sizeof(stack[1]), shared_prio, THREAD_CREATE_STACKTEST,
+    thread_create(stack[1], sizeof(stack[1]), shared_prio, 0,
                   thread_bad, NULL, "TBad");
     puts("main is going to sleep");
     thread_sleep();

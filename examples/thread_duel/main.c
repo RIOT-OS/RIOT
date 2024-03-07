@@ -135,19 +135,19 @@ int main(void)
     {
         static char stack[WORKER_STACKSIZE];
         static struct worker_config wc = THREAD_1;   /* 0-10 workness */
-        thread_create(stack, sizeof(stack), 7, THREAD_CREATE_STACKTEST,
+        thread_create(stack, sizeof(stack), 7, 0,
                       thread_worker, &wc, "T1");
     }
     {
         static char stack[WORKER_STACKSIZE];
         static struct worker_config wc = THREAD_2;   /* 0-10 workness */
-        thread_create(stack, sizeof(stack), 7, THREAD_CREATE_STACKTEST,
+        thread_create(stack, sizeof(stack), 7, 0,
                       thread_worker, &wc, "T2");
     }
     {
         static char stack[WORKER_STACKSIZE];
         static struct worker_config wc = THREAD_3;   /* 0-10 workness */
-        thread_create(stack, sizeof(stack), 7, THREAD_CREATE_STACKTEST,
+        thread_create(stack, sizeof(stack), 7, 0,
                       thread_worker, &wc, "T3");
     }
 }

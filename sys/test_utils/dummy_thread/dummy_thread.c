@@ -50,8 +50,6 @@ void dummy_thread_create(void)
 {
     thread_create(_dummy_stack, sizeof(_dummy_stack),
                   THREAD_PRIORITY_IDLE,
-                  THREAD_CREATE_WOUT_YIELD \
-                  | THREAD_CREATE_STACKTEST \
-                  | THREAD_CREATE_SLEEPING,
+                  THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_SLEEPING,
                   _dummy_thread, NULL, "dummy");
 }

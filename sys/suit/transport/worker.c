@@ -220,7 +220,7 @@ void suit_worker_trigger(const char *url, size_t len)
     _url[len] = '\0';
 
     _worker_pid = thread_create(_stack, SUIT_WORKER_STACKSIZE, SUIT_COAP_WORKER_PRIO,
-                  THREAD_CREATE_STACKTEST,
+                  0,
                   _suit_worker_thread, NULL, "suit worker");
 }
 
@@ -245,7 +245,7 @@ void suit_worker_trigger_prepared(const uint8_t *buffer, size_t size)
     }
 
     _worker_pid = thread_create(_stack, SUIT_WORKER_STACKSIZE, SUIT_COAP_WORKER_PRIO,
-                  THREAD_CREATE_STACKTEST,
+                  0,
                   _suit_worker_thread, NULL, "suit worker");
 }
 

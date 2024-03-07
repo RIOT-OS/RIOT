@@ -111,6 +111,6 @@ void auto_init_gnrc_uhcpc(void)
 
     /* initiate uhcp client */
     thread_create(_uhcp_client_stack, sizeof(_uhcp_client_stack),
-            THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST,
+            THREAD_PRIORITY_MAIN - 1, 0,
             uhcp_client_thread, NULL, "uhcp");
 }

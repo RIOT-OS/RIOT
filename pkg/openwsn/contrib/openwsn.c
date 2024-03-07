@@ -107,7 +107,7 @@ int openwsn_bootstrap(void)
 
     LOG_DEBUG("[openwsn]: network thread\n");
     _pid = thread_create(_stack, OPENWSN_SCHED_STACKSIZE, OPENWSN_SCHED_PRIO,
-                         THREAD_CREATE_STACKTEST, _event_loop, NULL,
+                         0, _event_loop, NULL,
                          OPENWSN_SCHED_NAME);
     if (_pid <= 0) {
         LOG_ERROR("[openwsn]: couldn't create thread\n");

@@ -71,7 +71,7 @@ int main(void)
     /* create worker thread */
     kernel_pid_t pid = thread_create(worker_stack, sizeof(worker_stack),
                                      THREAD_PRIORITY_MAIN - 1,
-                                     THREAD_CREATE_STACKTEST,
+                                     0,
                                      worker_thread, NULL, "worker");
 
     while (1) {

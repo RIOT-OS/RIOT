@@ -150,15 +150,15 @@ static void *high_handler(void *arg)
 int main(void)
 {
     thread_create(stack_low, sizeof(stack_low),
-                  THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST,
+                  THREAD_PRIORITY_MAIN - 1, 0,
                   low_handler, NULL, "low");
 
     thread_create(stack_mid, sizeof(stack_mid),
-                  THREAD_PRIORITY_MAIN - 2, THREAD_CREATE_STACKTEST,
+                  THREAD_PRIORITY_MAIN - 2, 0,
                   mid_handler, NULL, "mid");
 
     thread_create(stack_high, sizeof(stack_high),
-                  THREAD_PRIORITY_MAIN - 3, THREAD_CREATE_STACKTEST,
+                  THREAD_PRIORITY_MAIN - 3, 0,
                   high_handler, NULL, "high");
 
     /* Start low priority thread first, which will start high and mid priority ones after the

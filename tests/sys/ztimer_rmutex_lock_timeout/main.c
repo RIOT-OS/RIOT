@@ -193,7 +193,7 @@ static int cmd_test_ztimer_rmutex_lock_timeout_long_locked(int argc,
     /* lock rmutex from different thread */
     kernel_pid_t second_t_pid = thread_create( t_stack, sizeof(t_stack),
                                                THREAD_PRIORITY_MAIN - 1,
-                                               THREAD_CREATE_STACKTEST,
+                                               0,
                                                lock_rmutex_thread,
                                                (void *)&test_rmutex,
                                                "lock_thread");
@@ -245,7 +245,7 @@ static int cmd_test_ztimer_rmutex_lock_timeout_low_prio_thread(
 
     kernel_pid_t second_t_pid = thread_create( t_stack, sizeof(t_stack),
                                                THREAD_PRIORITY_MAIN + 1,
-                                               THREAD_CREATE_STACKTEST,
+                                               0,
                                                test_thread,
                                                (void *)&test_rmutex,
                                                "test_thread");
@@ -299,7 +299,7 @@ static int cmd_test_ztimer_rmutex_lock_timeout_short_locked(int argc,
 
     kernel_pid_t second_t_pid = thread_create( t_stack, sizeof(t_stack),
                                                THREAD_PRIORITY_MAIN - 1,
-                                               THREAD_CREATE_STACKTEST,
+                                               0,
                                                lock_rmutex_thread,
                                                (void *)&test_rmutex,
                                                "lock_thread");

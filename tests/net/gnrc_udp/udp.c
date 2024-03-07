@@ -183,7 +183,7 @@ static void start_server(char *port_str)
     if (server_pid <= KERNEL_PID_UNDEF) {
         /* start server */
         server_pid = thread_create(server_stack, sizeof(server_stack), SERVER_PRIO,
-                                   THREAD_CREATE_STACKTEST, _eventloop, NULL, "UDP server");
+                                   0, _eventloop, NULL, "UDP server");
         if (server_pid <= KERNEL_PID_UNDEF) {
             puts("Error: can not start server thread");
             return;

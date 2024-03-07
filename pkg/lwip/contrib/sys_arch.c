@@ -213,7 +213,7 @@ sys_thread_t sys_thread_new(const char *name, lwip_thread_fn thread, void *arg,
     if (stack == NULL) {
         return ERR_MEM;
     }
-    if ((res = thread_create(stack, stacksize, prio, THREAD_CREATE_STACKTEST,
+    if ((res = thread_create(stack, stacksize, prio, 0,
                              _lwip_thread_wrapper, &params,
                              name)) <= KERNEL_PID_UNDEF) {
         abort();

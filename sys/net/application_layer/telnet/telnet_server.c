@@ -340,7 +340,7 @@ int telnet_server_start(void)
 
     /* initiate telnet server */
     thread_create(telnet_stack, sizeof(telnet_stack),
-                  THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST,
+                  THREAD_PRIORITY_MAIN - 1, 0,
                   telnet_thread, NULL, "telnet");
 
     return 0;

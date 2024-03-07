@@ -84,10 +84,10 @@ int main(void)
     LOG_DEBUG("[INIT]\n");
 
     thread_create(stack_timer1, TEST_TIMER_STACKSIZE,
-                  2, THREAD_CREATE_STACKTEST,
+                  2, 0,
                   timer_func, &sleep_timer1, "timer1");
     thread_create(stack_timer2, TEST_TIMER_STACKSIZE,
-                  3, THREAD_CREATE_STACKTEST,
+                  3, 0,
                   timer_func, &sleep_timer2, "timer2");
 
     uint32_t now = 0;

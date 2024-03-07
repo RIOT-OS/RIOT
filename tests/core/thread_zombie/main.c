@@ -55,7 +55,7 @@ int main(void)
     kernel_pid_t first_pid =  thread_create(
         t2_stack, sizeof(t2_stack),
         THREAD_PRIORITY_MAIN - 1,
-        THREAD_CREATE_SLEEPING | THREAD_CREATE_STACKTEST,
+        THREAD_CREATE_SLEEPING,
         second_thread, (void *)1, "nr1");
 
     #ifdef MODULE_PS
@@ -67,7 +67,7 @@ int main(void)
     kernel_pid_t second_pid =  thread_create(
         t3_stack, sizeof(t3_stack),
         THREAD_PRIORITY_MAIN - 1,
-        THREAD_CREATE_SLEEPING | THREAD_CREATE_STACKTEST,
+        THREAD_CREATE_SLEEPING,
         second_thread, (void *)2, "nr2");
     #ifdef MODULE_PS
     ps();
@@ -78,7 +78,7 @@ int main(void)
     kernel_pid_t third_pid =  thread_create(
         t4_stack, sizeof(t4_stack),
         THREAD_PRIORITY_MAIN - 1,
-        THREAD_CREATE_SLEEPING | THREAD_CREATE_STACKTEST,
+        THREAD_CREATE_SLEEPING,
         second_thread, (void *)3, "nr3");
     #ifdef MODULE_PS
     ps();
@@ -217,7 +217,7 @@ int main(void)
     kernel_pid_t last_pid =  thread_create(
         t2_stack, sizeof(t2_stack),
         THREAD_PRIORITY_MAIN - 1,
-        THREAD_CREATE_SLEEPING | THREAD_CREATE_STACKTEST,
+        THREAD_CREATE_SLEEPING,
         second_thread, (void *)4, "nr4");
 
     #ifdef MODULE_PS

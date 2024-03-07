@@ -732,7 +732,7 @@ kernel_pid_t isotp_init(char *stack, int stacksize, char priority, const char *n
     DEBUG("isotp_init\n");
 
     /* create new can device thread */
-    res = thread_create(stack, stacksize, priority, THREAD_CREATE_STACKTEST,
+    res = thread_create(stack, stacksize, priority, 0,
                          _isotp_thread, NULL, name);
     if (res <= 0) {
         return -EINVAL;

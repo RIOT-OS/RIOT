@@ -94,7 +94,7 @@ int main(void)
          "sched_run() which was the cause of the bug tested here");
     _sched_next();
     pid = thread_create(_stack, sizeof(_stack), THREAD_PRIORITY_MAIN + 1,
-                        THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
+                        THREAD_CREATE_WOUT_YIELD,
                         _thread, NULL, "nr2");
     expect(pid != KERNEL_PID_UNDEF);
 
