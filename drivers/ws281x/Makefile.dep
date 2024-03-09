@@ -1,5 +1,5 @@
 # Actually |(periph_timer_poll and periph_gpio_ll), but that's too complex for FEATURES_REQUIRED_ANY to express
-FEATURES_REQUIRED_ANY += cpu_core_atmega|arch_esp32|arch_native|periph_timer_poll
+FEATURES_REQUIRED_ANY += cpu_core_atmega|arch_esp32|arch_native|periph_timer_poll|cpu_stm32f4
 
 ifeq (,$(filter ws281x_%,$(USEMODULE)))
   ifneq (,$(filter cpu_core_atmega,$(FEATURES_USED)))
@@ -10,6 +10,9 @@ ifeq (,$(filter ws281x_%,$(USEMODULE)))
   endif
   ifneq (,$(filter arch_esp32,$(FEATURES_USED)))
     USEMODULE += ws281x_esp32
+  endif
+  ifneq (,$(filter cpu_stm32f4,$(FEATURES_USED)))
+    USEMODULE += ws281x_stm32
   endif
   # Not only looking for the used feature but also for the absence of any more specific driver
   ifeq (-periph_timer_poll,$(filter ws281x_%,$(USEMODULE))-$(filter periph_timer_poll,$(FEATURES_USED)))

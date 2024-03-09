@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2019 Marian Buschsieweke
+ *               2024 Lennart Lutz
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Backend configuration for WS2812/SK6812 RGB LEDs
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author      Lennart Lutz <lennartlutz@t-online.de>
  */
 
 #ifndef WS281X_BACKEND_H
@@ -37,6 +39,15 @@ extern "C" {
  * @{
  */
 #ifdef MODULE_WS281X_ESP32
+#define WS281X_HAVE_INIT                    (1)
+#endif
+/** @} */
+
+/**
+ * @name    Properties of the STM32 backend.
+ * @{
+ */
+#ifdef MODULE_WS281X_STM32
 #define WS281X_HAVE_INIT                    (1)
 #endif
 /** @} */
