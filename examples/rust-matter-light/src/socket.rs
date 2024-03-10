@@ -10,7 +10,7 @@ use embassy_sync::{
     blocking_mutex::raw::NoopRawMutex
 };
 use embedded_hal_async::delay::DelayNs;
-use log::{debug, error};
+use log::{debug, error, warn};
 use riot_wrappers::error::NumericError;
 
 pub type Notification = Signal<NoopRawMutex, ()>;
@@ -39,11 +39,12 @@ impl UdpSend for &UdpSocketWrapper {
         debug!("(UDP) sending {} bytes to {:?}", data.len(), &addr);
         if addr.is_ipv4() {
             // RIOT OS does not support IPv4
+            warn!("(UDP) Is IPv4 -> ignore send!");
             return Ok(());
         }
         // tell receiver to release mutex within max. 10ms
         self.release_socket_notification.signal(());
-        ztimer::Delay.delay_ms(10).await;
+        ztimer::Delay.delay_ms(5).await;
         let mut sock = self.socket.try_lock().expect("receiver should have ensured that this mutex is free");
         sock.send(self.local_addr, addr, data)
             .await
@@ -74,6 +75,10 @@ impl UdpReceive for &UdpSocketWrapper {
                     match res {
                         Ok((bytes_recvd, local_addr, remote_addr)) => {
                             debug!("(UDP) received {} bytes from {:?} to {:?}", bytes_recvd, &remote_addr, &local_addr);
+                            if remote_addr.is_ipv4() {
+                                warn!("(UDP) Is IPv4 -> ignoring receive data!");
+                                return Ok((bytes_recvd, remote_addr));
+                            }
                         }
                         Err(_) => { error!("Error during UDP receive!"); }
                     }

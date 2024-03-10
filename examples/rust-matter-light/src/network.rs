@@ -37,7 +37,7 @@ pub mod utils {
     }
     
     #[inline(never)]
-    pub fn initialize_network() -> Result<(Ipv4Addr, Ipv6Addr, u32), MatterError> {
+    pub fn initialize_network() -> Result<(Ipv6Addr, u32), MatterError> {
         // Get available network interface(s)
         let mut interfaces = Netif::all();
         
@@ -57,32 +57,13 @@ pub mod utils {
         let ifc_name: &str = pid.get_name().unwrap();
         debug!("Kernel PID status of network interface {:?}: {:?}", pid.get_name().unwrap(), pid.status().unwrap());
     
-        // We won't use IPv4 atm
-        let ipv4: Ipv4Addr = Ipv4Addr::UNSPECIFIED;
-        
         // Get available IPv6 link-local address
         match get_ipv6_address(&ifc) {
             Some(ipv6) => {
-                info!("Found network interface {} with {}/{}", ifc_name, ipv4, ipv6);
-                Ok((ipv4, ipv6, 0 as _))
+                info!("Found network interface {} with IP {}", ifc_name, ipv6);
+                Ok((ipv6, 0 as _))
             },
             None => Err(MatterError::new(rs_matter::error::ErrorCode::StdIoError)),
         }
     }
-
-    pub async fn test_udp(sock: &mut UnconnectedUdpSocket) {
-        debug!("Waiting for UDP packets...");
-        let mut buffer: &mut [u8] = &mut [0 as u8; 255 as usize];
-        let res = sock.receive_into(buffer).await;
-        match res {
-            Ok((bytes_recvd, _local_addr, remote_addr)) => {
-                debug!("Received {} bytes from {:?}", bytes_recvd, remote_addr);
-                use core::str;
-                let as_str = str::from_utf8(&buffer).unwrap().trim_matches('\0');
-                debug!("Received data: {:?}", as_str);
-            },
-            Err(_) => error!("error while receiving UDP data"),
-        }
-    }
-
 }

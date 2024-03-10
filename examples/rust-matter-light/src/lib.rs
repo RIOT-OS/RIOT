@@ -15,18 +15,23 @@ mod dev_att;
 mod network;
 mod persist;
 mod socket;
+mod tests;
+mod logging;
 
 // internal modules imports
 use network::utils::{initialize_network};
+use logging::init_logger;
+use socket::UdpSocketWrapper;
 
 // core library
 use core::{ffi::CStr, borrow::Borrow, pin::pin};
 
 // external crates
 use static_cell::StaticCell;
-use embedded_nal_async::UdpStack as _;
+use embedded_nal_async::{Ipv4Addr, UdpStack as _};
 use embedded_hal_async::delay::DelayNs as _;
-use log::{self, debug, info, warn, error, Level, LevelFilter, Record, SetLoggerError};
+use embedded_alloc::Heap;
+use log::{debug, info, error};
 
 // RIOT OS modules
 extern crate rust_riotmodules;
@@ -53,7 +58,6 @@ use rs_matter::mdns::builtin::{
     MDNS_IPV4_BROADCAST_ADDR, MDNS_IPV6_BROADCAST_ADDR, MDNS_SOCKET_BIND_ADDR,
 };
 use rs_matter::secure_channel::spake2p::VerifierData;
-use crate::socket::UdpSocketWrapper;
 
 // Node object with endpoints supporting device type 'OnOff Light'
 const NODE: Node<'static> = Node {
@@ -98,41 +102,30 @@ fn matter_handler<'a>(matter: &'a Matter<'a>) -> impl Metadata + NonBlockingHand
     )
 }
 
-struct RiotLogger;
-
-impl log::Log for RiotLogger {
-    fn enabled(&self, metadata: &log::Metadata) -> bool {
-        metadata.level() >= Level::Info
-    }
-
-    fn log(&self, record: &Record) {
-        if self.enabled(record.metadata()) {
-            println!("[{}] {}", record.level(), record.args());
-        }
-    }
-
-    fn flush(&self) {
-    }
-}
-
-static LOGGER: RiotLogger = RiotLogger;
-pub fn init_logger() -> Result<(), SetLoggerError> {
-    log::set_logger(&LOGGER)
-        .map(|_| log::set_max_level(LevelFilter::Info))
-}
+#[global_allocator]
+static HEAP: Heap = Heap::empty();
 
 riot_main!(main);
+
 fn main() -> ! {
+    {
+        use core::mem::MaybeUninit;
+        const HEAP_SIZE: usize = 1024 * 180;
+        static mut HEAP_MEM: [MaybeUninit<u8>; HEAP_SIZE] = [MaybeUninit::uninit(); HEAP_SIZE];
+        unsafe { HEAP.init(HEAP_MEM.as_ptr() as usize, HEAP_SIZE) }
+    }
+
     init_logger().expect("Error initializing logger");
+
     info!("Hello Matter on RIOT!");
 
-    let (ipv4_addr, ipv6_addr, interface) = initialize_network().expect("Error getting network interface and IP addresses");
+    let (ipv6_addr, interface) = initialize_network().expect("Error getting network interface and IP addresses");
 
     static MDNS: StaticCell<MdnsService> = StaticCell::new();
     let mdns_service: &'static MdnsService = MDNS.init(MdnsService::new(
         0,
         "rs-matter-demo",
-        ipv4_addr.octets(),
+        Ipv4Addr::UNSPECIFIED.octets(),
         Some((ipv6_addr.octets(), interface)),
         &DEV_DET,
         MATTER_PORT,
@@ -143,8 +136,8 @@ fn main() -> ! {
     let dev_att: &'static dev_att::HardCodedDevAtt = DEV_ATT.init(dev_att::HardCodedDevAtt::new());
 
     // TODO: Provide own epoch and rand functions
-    let epoch = rs_matter::utils::epoch::dummy_epoch;
-    let rand = rs_matter::utils::rand::dummy_rand;
+    let epoch = rs_matter::utils::epoch::sys_epoch;
+    let rand = rs_matter::utils::rand::sys_rand;
 
     static MATTER: StaticCell<Matter> = StaticCell::new();
     let matter: &'static Matter = MATTER.init(Matter::new(
