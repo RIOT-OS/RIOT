@@ -1,0 +1,44 @@
+[package]
+name = "rust-matter-light"
+version = "0.1.0"
+authors = ["Maik Lorenz <maik.lorenz@haw-hamburg.de>"]
+edition = "2021"
+resolver = "2"
+
+[lib]
+crate-type = ["staticlib"]
+
+[profile.release]
+# Setting the panic mode has little effect on the built code (as Rust on RIOT
+# supports no unwinding), but setting it allows builds on native without using
+# the nightly-only lang_items feature.
+panic = "abort"
+#debug = true
+opt-level = "s"
+codegen-units = 1
+lto = true
+
+[dependencies]
+riot-wrappers = { git = "https://github.com/RIOT-OS/rust-riot-wrappers.git", features = [ "set_panic_handler", "panic_handler_format", "panic_handler_crash", "with_embedded_nal_async", "provide_critical_section_1_0", "with_embedded_hal_async" ] }
+riot-sys = "*"
+embedded-nal-async = "0.7.1"
+embedded-hal-async = { version =  "1.0.0"}
+embassy-sync = "0.5.0"
+log = "0.4.21"
+embedded-alloc = "0.5.1"
+
+# While currently this exmple does not use any RIOT modules implemented in
+# Rust, that may change; it is best practice for any RIOT application that has
+# its own top-level Rust crate to include rust_riotmodules from inside
+# RIOTBASE.
+rust_riotmodules = { path = "../../sys/rust_riotmodules/" }
+
+static_cell = "2.0.0"
+embassy-executor-riot = { git = "https://gitlab.com/etonomy/riot-module-examples" }
+embassy-executor = { version = "0.5", features = ["task-arena-size-196608"] }
+embassy-futures = "0.1.1"
+rs-matter = { version = "0.1.0", default-features = false, features = ["riot-os"] }
+
+[patch.crates-io]
+#rs-matter = { path = "../../../rs-matter/rs-matter" }
+rs-matter = { git = "https://github.com/maikerlab/rs-matter", branch = "feature/RIOT_OS" }
