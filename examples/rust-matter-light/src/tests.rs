@@ -5,10 +5,10 @@ use rs_matter::error::Error;
 use rs_matter::transport::core::MATTER_SOCKET_BIND_ADDR;
 use rs_matter::transport::network::{UdpReceive, UdpSend};
 use static_cell::StaticCell;
-use crate::socket::UdpSocketWrapper;
 use core::str;
 use riot_wrappers::error::{EAGAIN, NumericError};
 use crate::init_logger;
+use crate::network::UdpSocketWrapper;
 use crate::network::utils::initialize_network;
 
 // Set this as entry point with 'riot_main!' macro to run 'integration tests'

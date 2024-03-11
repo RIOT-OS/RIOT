@@ -14,17 +14,17 @@ pub mod saul_reg;
 mod dev_att;
 mod network;
 mod persist;
-mod socket;
 mod tests;
 mod logging;
 
 // internal modules imports
 use network::utils::{initialize_network};
 use logging::init_logger;
-use socket::UdpSocketWrapper;
+use network::UdpSocketWrapper;
 
 // core library
 use core::{ffi::CStr, borrow::Borrow, pin::pin};
+use core::cell::Cell;
 
 // external crates
 use static_cell::StaticCell;
@@ -53,11 +53,15 @@ use rs_matter::data_model::{
     root_endpoint,
     system_model::descriptor
 };
+use rs_matter::data_model::cluster_on_off::OnOffCluster;
+use rs_matter::error::Error;
 use rs_matter::mdns::MdnsService;
 use rs_matter::mdns::builtin::{
     MDNS_IPV4_BROADCAST_ADDR, MDNS_IPV6_BROADCAST_ADDR, MDNS_SOCKET_BIND_ADDR,
 };
 use rs_matter::secure_channel::spake2p::VerifierData;
+use rs_matter::tlv::TLVElement;
+use rs_matter::transport::exchange::Exchange;
 
 // Node object with endpoints supporting device type 'OnOff Light'
 const NODE: Node<'static> = Node {
@@ -84,6 +88,38 @@ static DEV_DET: BasicInfoConfig = BasicInfoConfig {
     vendor_name: "Vendor 123",
 };
 
+struct MyOnOffCluster {
+    cluster: OnOffCluster,
+    on: Cell<bool>,
+}
+
+impl MyOnOffCluster {
+    fn new(cluster: OnOffCluster) -> Self {
+        Self {
+            cluster,
+            on: Cell::new(false),
+        }
+    }
+}
+
+impl Handler for MyOnOffCluster {
+    fn read(&self, attr: &AttrDetails, encoder: AttrDataEncoder) -> Result<(), Error> {
+        info!("MyOnOffCluster - read: {:?}", attr);
+        OnOffCluster::read(&self.cluster, attr, encoder)
+    }
+
+    fn write(&self, attr: &AttrDetails, data: AttrData) -> Result<(), Error> {
+        info!("MyOnOffCluster - write: {:?}", attr);
+        OnOffCluster::write(&self.cluster, attr, data)
+    }
+
+    fn invoke(&self, exchange: &Exchange, cmd: &CmdDetails, data: &TLVElement, encoder: CmdDataEncoder) -> Result<(), Error> {
+        info!("MyOnOffCluster - invoke: cmd={:?}, data={:?}", cmd, data.u32());
+        OnOffCluster::invoke(&self.cluster, exchange, cmd, data, encoder)
+    }
+}
+impl NonBlockingHandler for MyOnOffCluster {}
+
 // Handler for endpoint 1 (Descriptor + OnOff Cluster)
 fn matter_handler<'a>(matter: &'a Matter<'a>) -> impl Metadata + NonBlockingHandler + 'a {
     (
@@ -97,7 +133,8 @@ fn matter_handler<'a>(matter: &'a Matter<'a>) -> impl Metadata + NonBlockingHand
             .chain(
                 1,
                 cluster_on_off::ID,
-                cluster_on_off::OnOffCluster::new(*matter.borrow()),
+                //cluster_on_off::OnOffCluster::new(*matter.borrow()),
+                MyOnOffCluster::new(cluster_on_off::OnOffCluster::new(*matter.borrow())),
             ),
     )
 }
