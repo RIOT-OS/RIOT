@@ -4,18 +4,23 @@
 // General Public License v2.1. See the file LICENSE in the top level
 // directory for more details.
 #![no_std]
-#[allow(warnings)]
-#[allow(unused)]
+
 
 // declare internal modules
-pub mod gpio;
-pub mod light;
-pub mod saul_reg;
 mod dev_att;
 mod network;
+#[allow(unused)]
 mod persist;
-mod tests;
 mod logging;
+
+#[allow(unused)]
+pub mod gpio;
+#[allow(unused)]
+pub mod light;
+#[allow(unused)]
+pub mod saul_reg;
+#[allow(unused)]
+mod tests;
 
 // internal modules imports
 use network::utils::{initialize_network};
@@ -23,26 +28,22 @@ use logging::init_logger;
 use network::UdpSocketWrapper;
 
 // core library
-use core::{ffi::CStr, borrow::Borrow, pin::pin};
+use core::{borrow::Borrow, pin::pin};
 use core::cell::Cell;
 
 // external crates
 use static_cell::StaticCell;
 use embedded_nal_async::{Ipv4Addr, UdpStack as _};
-use embedded_hal_async::delay::DelayNs as _;
 use embedded_alloc::Heap;
 use log::{debug, info, error};
 
 // RIOT OS modules
 extern crate rust_riotmodules;
-use riot_wrappers::{riot_main, println};
-use riot_wrappers::shell::CommandList;
+use riot_wrappers::riot_main;
 
 // rs-matter
-extern crate rs_matter;
 use rs_matter::{CommissioningData, MATTER_PORT};
-use rs_matter::utils::select::EitherUnwrap as _;
-use rs_matter::transport::network::{UdpReceive as _, UdpSend as _, UdpBuffers};
+use rs_matter::transport::network::UdpBuffers;
 use rs_matter::transport::core::{PacketBuffers, MATTER_SOCKET_BIND_ADDR};
 use rs_matter::core::Matter;
 use rs_matter::data_model::{
@@ -57,7 +58,7 @@ use rs_matter::data_model::cluster_on_off::OnOffCluster;
 use rs_matter::error::Error;
 use rs_matter::mdns::MdnsService;
 use rs_matter::mdns::builtin::{
-    MDNS_IPV4_BROADCAST_ADDR, MDNS_IPV6_BROADCAST_ADDR, MDNS_SOCKET_BIND_ADDR,
+    MDNS_IPV6_BROADCAST_ADDR, MDNS_SOCKET_BIND_ADDR,
 };
 use rs_matter::secure_channel::spake2p::VerifierData;
 use rs_matter::tlv::TLVElement;
@@ -88,6 +89,7 @@ static DEV_DET: BasicInfoConfig = BasicInfoConfig {
     vendor_name: "Vendor 123",
 };
 
+#[allow(dead_code)]
 struct MyOnOffCluster {
     cluster: OnOffCluster,
     on: Cell<bool>,
@@ -173,8 +175,8 @@ fn main() -> ! {
     let dev_att: &'static dev_att::HardCodedDevAtt = DEV_ATT.init(dev_att::HardCodedDevAtt::new());
 
     // TODO: Provide own epoch and rand functions
-    let epoch = rs_matter::utils::epoch::sys_epoch;
-    let rand = rs_matter::utils::rand::sys_rand;
+    let epoch = rs_matter::utils::epoch::riot_epoch;
+    let rand = rs_matter::utils::rand::riot_rand;
 
     static MATTER: StaticCell<Matter> = StaticCell::new();
     let matter: &'static Matter = MATTER.init(Matter::new(
@@ -189,6 +191,12 @@ fn main() -> ! {
 
     info!("Starting all services...");
 
+    // TODO: Maybe run shell in seperate thread
+    let mut _shell_thread = || {
+        debug!("Shell is running");
+        saul_reg::run_shell_with_saul();
+    };
+
     static EXECUTOR: StaticCell<embassy_executor_riot::Executor> = StaticCell::new();
     let executor: &'static mut _ = EXECUTOR.init(embassy_executor_riot::Executor::new());
     executor.run(|spawner| {
@@ -197,11 +205,7 @@ fn main() -> ! {
         spawner.spawn(run_psm(matter)).unwrap();
     });
 
-    let mut shell_thread = || {
-        debug!("Shell is running");
-        saul_reg::run_shell_with_saul();
-    };
-    loop { }
+
 }
 
 #[embassy_executor::task]
@@ -209,12 +213,14 @@ async fn run_mdns(mdns: &'static MdnsService<'_>) {
     // Create UDP socket and bind to port 5353
     static UDP_MDNS_SOCKET: StaticCell<riot_sys::sock_udp_t> = StaticCell::new();
     let udp_stack = riot_wrappers::socket_embedded_nal_async_udp::UdpStack::new(|| UDP_MDNS_SOCKET.try_uninit());
-    let (mdns_addr, mut mdns_sock) = udp_stack
+    let (mdns_addr, mdns_sock) = udp_stack
         .bind_single(MDNS_SOCKET_BIND_ADDR)
         .await
         .expect("Can't create a socket");
     let socket = UdpSocketWrapper::new(mdns_addr, mdns_sock);
     debug!("Created UDP socket for mDNS at {:?}", &mdns_addr);
+
+    // TODO: Join IPv6 Multicast group (MDNS_IPV6_BROADCAST_ADDR)
 
     // Finally run the MDNS service
     let mut mdns_udp_buffers = UdpBuffers::new();
@@ -240,7 +246,7 @@ async fn run_matter(matter: &'static Matter<'_>) {
     // Create UDP socket and bind to port 5540
     static UDP_MATTER_SOCKET: StaticCell<riot_sys::sock_udp_t> = StaticCell::new();
     let udp_stack = riot_wrappers::socket_embedded_nal_async_udp::UdpStack::new(|| UDP_MATTER_SOCKET.try_uninit());
-    let (matter_addr, mut matter_sock) = udp_stack
+    let (matter_addr, matter_sock) = udp_stack
         .bind_single(MATTER_SOCKET_BIND_ADDR)
         .await
         .expect("Can't create a socket");
@@ -265,7 +271,7 @@ async fn run_matter(matter: &'static Matter<'_>) {
         },
         &handler)
     );
-    let mut matter_runner = pin!(matter_runner);
+    let matter_runner = pin!(matter_runner);
 
     info!("Starting Matter...");
     match matter_runner.await {
@@ -283,7 +289,7 @@ async fn run_psm(matter: &'static Matter<'_>) {
     info!("Starting Persistence Manager....");
     // TODO: Develop own 'Persistence Manager' using RIOT OS modules
     let mut psm = persist::Psm::new(&matter).expect("Error creating PSM");
-    let mut psm_runner = pin!(psm.run());
+    let psm_runner = pin!(psm.run());
     match psm_runner.await {
         Ok(_) => {
             info!("Persistence Manager terminated without errors!");

@@ -1,9 +1,6 @@
-use core::ops::DerefMut as _;
-
-use rs_matter;
 use rs_matter::error::Error as MatterError;
 use riot_wrappers::gnrc::Netif;
-use embedded_nal_async::{Ipv4Addr, Ipv6Addr, SocketAddr, UdpStack as _, UnconnectedUdp};
+use embedded_nal_async::{Ipv6Addr, SocketAddr, UnconnectedUdp};
 
 use embassy_futures::select::{Either, select};
 use riot_wrappers::mutex::Mutex;
@@ -17,7 +14,6 @@ use embassy_sync::{
 };
 use embedded_hal_async::delay::DelayNs;
 use log::{debug, error, warn};
-use riot_wrappers::error::NumericError;
 
 pub type Notification = Signal<NoopRawMutex, ()>;
 
@@ -132,15 +128,13 @@ pub mod utils {
         let mut interfaces = Netif::all();
         
         // Get first available interface
-        let mut found_ifc: Option<Netif> = None;
-        match interfaces.next() {
-            Some(ifc) => found_ifc = Some(ifc),
+        let ifc: Netif = match interfaces.next() {
+            Some(ifc) => Ok(ifc),
             None => {
                 error!("ERROR: No network interface was found!");
-                return Err(MatterError::new(rs_matter::error::ErrorCode::NoNetworkInterface));
+                Err(MatterError::new(ErrorCode::NoNetworkInterface))
             },
-        }
-        let ifc = found_ifc.unwrap();
+        }?;
 
         // atm only for debugging: Check name and status of KernelPID
         let pid = ifc.pid();
@@ -153,7 +147,7 @@ pub mod utils {
                 info!("Found network interface {} with IP {}", ifc_name, ipv6);
                 Ok((ipv6, 0 as _))
             },
-            None => Err(MatterError::new(rs_matter::error::ErrorCode::StdIoError)),
+            None => Err(MatterError::new(ErrorCode::StdIoError)),
         }
     }
 }

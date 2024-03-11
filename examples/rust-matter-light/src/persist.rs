@@ -1,7 +1,6 @@
 use log::debug;
 use rs_matter::error::Error;
 use rs_matter::core::Matter;
-use riot_wrappers::println;
 
 pub struct Psm<'a> {
     matter: &'a Matter<'a>,
