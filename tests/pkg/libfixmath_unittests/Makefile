@@ -3,6 +3,7 @@ include ../Makefile.pkg_common
 USEMODULE += libfixmath-unittests
 
 ifneq (,$(filter native native64,$(BOARD)))
+  DISABLE_MODULE += test_utils_interactive_sync
   LINKFLAGS += -lm
 endif
 

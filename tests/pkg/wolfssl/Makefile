@@ -21,6 +21,8 @@ USEMODULE += xtimer
 
 ifeq (,$(filter native native64,$(BOARD)))
   CFLAGS += -DBENCH_EMBEDDED
+else
+  DISABLE_MODULE += test_utils_interactive_sync
 endif
 
 TEST_ON_CI_WHITELIST += native native64

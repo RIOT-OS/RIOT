@@ -293,7 +293,7 @@ disco:
     return NULL;
 }
 
-int telnet_server_write(const void* buffer, size_t len)
+ssize_t telnet_server_write(const void* buffer, size_t len)
 {
     if (connected) {
         int res = _write_buffer(buffer, len);

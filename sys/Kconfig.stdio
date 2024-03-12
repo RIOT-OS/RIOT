@@ -40,7 +40,6 @@ config MODULE_SLIPDEV_STDIO
     bool "SLIP network device"
     depends on MODULE_SLIPDEV
     select USE_STDOUT_BUFFERED
-    select MODULE_ISRPIPE
 
 config MODULE_STDIO_NULL
     bool "Null"
@@ -59,6 +58,7 @@ config MODULE_STDIO_UART_ONLCR
 config MODULE_STDIO_NATIVE
     bool "Native"
     depends on CPU_ARCH_NATIVE
+    select MODULE_ISRPIPE
 
 config MODULE_STDIO_ETHOS
     bool "ETHOS"

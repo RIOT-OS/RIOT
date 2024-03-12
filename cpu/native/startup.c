@@ -465,8 +465,6 @@ static void _reset_handler(void)
 __attribute__((constructor)) static void startup(int argc, char **argv, char **envp)
 {
     _native_init_syscalls();
-    /* initialize stdio as early as possible */
-    early_init();
 
     _native_argv = argv;
     _progname = argv[0];
@@ -681,6 +679,9 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
     board_init();
 
     register_interrupt(SIGUSR1, _reset_handler);
+
+    /* initialize stdio after signal setup */
+    early_init();
 
     puts("RIOT native hardware initialization complete.\n");
     irq_enable();

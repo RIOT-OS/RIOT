@@ -1,0 +1,37 @@
+From 5a492cf6ba56d2d16cfeaa18b6d1f0cb21429640 Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benjamin.valentin@ml-pa.com>
+Date: Mon, 12 Jun 2023 16:23:01 +0200
+Subject: [PATCH] avoid use of floating point math
+
+---
+ tests.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/tests.c b/tests.c
+index a7bab89..77be22f 100644
+--- a/tests.c
++++ b/tests.c
+@@ -93,7 +93,7 @@ void run(const char program[]) {
+   fflush(stdout);
+ 
+   clock_t start_t, end_t;
+-  double delta_t;
++  unsigned delta_t;
+ 
+   start_t = clock();
+ 
+@@ -104,9 +104,9 @@ void run(const char program[]) {
+   } while(!ubasic_finished());
+ 
+   end_t = clock();
+-  delta_t = (double)(end_t - start_t) / CLOCKS_PER_SEC;
++  delta_t = (1000UL * (end_t - start_t)) / CLOCKS_PER_SEC;
+ 
+-  printf("done. Run time: %.3f s\n", delta_t);
++  printf("done. Run time: %u ms\n", delta_t);
+ }
+ 
+ /*---------------------------------------------------------------------------*/
+-- 
+2.39.2
+
