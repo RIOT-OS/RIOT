@@ -98,6 +98,28 @@ static inline void event_periodic_callback_start(event_periodic_callback_t *even
 }
 
 /**
+ * @brief   Initialize and start a periodic callback event
+ *
+ * This is a convenience function that combines @ref event_periodic_callback_init
+ * and @ref event_periodic_callback_start
+ *
+ * @param[out]  event           event_periodic_callback object to initialize
+ * @param[in]   clock           the clock to configure this timer on
+ * @param[in]   interval        period length for the event
+ * @param[in]   queue           queue that the timed-out event will be added to
+ * @param[in]   callback        callback to set up
+ * @param[in]   arg             callback argument to set up
+ */
+static inline void event_periodic_callback_create(event_periodic_callback_t *event,
+                                                  ztimer_clock_t *clock, uint32_t interval,
+                                                  event_queue_t *queue,
+                                                  void (*callback)(void *), void *arg)
+{
+    event_periodic_callback_init(event, clock, queue, callback, arg);
+    event_periodic_callback_start(event, interval);
+}
+
+/**
  * @brief   Get the interval in which the periodic callback event repeats
  *
  * @param[in]   event           event_periodic_callback context object to use
