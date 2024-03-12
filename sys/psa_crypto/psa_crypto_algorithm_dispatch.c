@@ -466,20 +466,24 @@ psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attri
             // todo: support for Weierstrass curves
             (void)slot;
             ret = PSA_ERROR_NOT_SUPPORTED;
+            break;
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1)
         case PSA_ECC_P256_R1:
             // todo: support for Weierstrass curves
             (void)slot;
             ret = PSA_ERROR_NOT_SUPPORTED;
+            break;
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519)
         case PSA_ECC_ED25519:
             ret = psa_derive_ecc_ed25519_public_key(key_data, pubkey_data, key_bytes, pubkey_data_len);
+            break;
 #endif
         default:
             (void)slot;
             ret = PSA_ERROR_NOT_SUPPORTED;
+            break;
         }
         if (ret == PSA_SUCCESS) {
             /* save private key data */
