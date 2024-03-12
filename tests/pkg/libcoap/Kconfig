@@ -1,0 +1,10 @@
+if USEMODULE_LIBCOAP
+config LIBCOAP_USE_PSK
+    string "Secret to use for PSK communications"
+    default "secretPSK"
+    depends on USEMODULE_TINYDTLS
+config LIBCOAP_USE_PSK_ID
+    string "Identifier (user) to use for PSK communications"
+    default "test_user"
+    depends on USEMODULE_TINYDTLS
+endif # USEMODULE_LIBCOAP
