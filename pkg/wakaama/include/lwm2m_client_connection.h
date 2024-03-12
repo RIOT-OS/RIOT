@@ -58,13 +58,14 @@ extern "C" {
  *
  * @param[in] conn_list connections list to search
  * @param[in] remote remote UDP endpoint to compare to
+ * @param[in] type   type of connection to look for
  *
  * @return pointer to the connection in success
  * @return NULL otherwise
  */
-lwm2m_client_connection_t *lwm2m_client_connection_find(
-                                lwm2m_client_connection_t *conn_list,
-                                const sock_udp_ep_t *remote);
+lwm2m_client_connection_t *lwm2m_client_connection_find(lwm2m_client_connection_t *conn_list,
+                                                        const sock_udp_ep_t *remote,
+                                                        lwm2m_client_connection_type_t type);
 
 /**
  * @brief Handles a received packet from a connection

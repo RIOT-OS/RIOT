@@ -59,10 +59,10 @@ extern "C" {
 #endif
 
 /**
- * @brief Device name used to register at the LwM2M server
+ * @brief Default port for the local LwM2M CoAPs server
  */
-#ifndef CONFIG_LWM2M_DEVICE_NAME
-#define CONFIG_LWM2M_DEVICE_NAME "testRIOTDevice"
+#ifndef CONFIG_LWM2M_LOCAL_DTLS_PORT
+#define CONFIG_LWM2M_LOCAL_DTLS_PORT    "5684"
 #endif
 
 /**
@@ -73,23 +73,6 @@ extern "C" {
 #endif
 
 /**
- * @brief LwM2M server URI to register/bootstrap with
- *
- * @note The host part of the URI MUST be a valid IPv6 address. Host names can
- * not be resolved at this time.
- */
-#ifndef CONFIG_LWM2M_SERVER_URI
-#define CONFIG_LWM2M_SERVER_URI "coap://[fd00:dead:beef::1]"
-#endif
-
-/**
- * @brief Numeric ID of CONFIG_LWM2M_SERVER_URI
- */
-#ifndef CONFIG_LWM2M_SERVER_ID
-#define CONFIG_LWM2M_SERVER_ID 10
-#endif
-
-/**
  * @brief Alternate path to place LwM2M resources
  */
 #ifndef CONFIG_LWM2M_ALT_PATH
@@ -97,7 +80,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Define to 1 to specify that @ref CONFIG_LWM2M_SERVER_URI is a bootstrap server
+ * @brief Define to 1 to add bootstrap server support
  *
  * To define just add it to your `CFLAGS` in your application's Makefile:
  *
@@ -110,128 +93,17 @@ extern "C" {
 #endif
 
 /**
- * @brief Device object manufacturer string
+ * @brief Number to use as base for assigning tags to @ref net_credman credentials.
  */
-#ifndef CONFIG_LWM2M_DEVICE_MANUFACTURER
-#define CONFIG_LWM2M_DEVICE_MANUFACTURER "A RIOT maker"
+#ifndef CONFIG_LWM2M_CREDMAN_TAG_BASE
+#define CONFIG_LWM2M_CREDMAN_TAG_BASE   (10U)
 #endif
 
 /**
- * @brief Device object model.
- *
- * @note Defaults to the board name
+ * @brief Maximum length of an URI allowed.
  */
-#ifndef CONFIG_LWM2M_DEVICE_MODEL
-#define CONFIG_LWM2M_DEVICE_MODEL RIOT_BOARD
-#endif
-
-/**
- * @brief Device object serial number
- */
-#ifndef CONFIG_LWM2M_DEVICE_SERIAL
-#define CONFIG_LWM2M_DEVICE_SERIAL "undefined"
-#endif
-
-/**
- * @brief Device object firmware version
- *
- * @note Defaults to the running RIOT version
- */
-#ifndef CONFIG_LWM2M_DEVICE_FW_VERSION
-#define CONFIG_LWM2M_DEVICE_FW_VERSION RIOT_VERSION
-#endif
-
-/**
- * @{
- * @name Device bindings and queue modes
- *
- * This options are meant to be set either via Kconfig or CFLAGS:
- *
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
- * CFLAGS += -DCONFIG_LWM2M_DEVICE_BINDING_UQ
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *
- * @note Only one option should be selected. If more than one is defined the
- *       priority follows this order. By default
- *       @ref CONFIG_LWM2M_DEVICE_BINDING_U is assumed.
- */
-#ifdef DOXYGEN
-/**
- * @brief UDP binding
- */
-#define CONFIG_LWM2M_DEVICE_BINDING_U
-
-/**
- * @brief UDP binding with Queue mode
- */
-#define CONFIG_LWM2M_DEVICE_BINDING_UQ
-
-/**
- * @brief SMS binding
- */
-#define CONFIG_LWM2M_DEVICE_BINDING_S
-
-/**
- * @brief SMS binding with Queue mode
- */
-#define CONFIG_LWM2M_DEVICE_BINDING_SQ
-
-/**
- * @brief UDP and SMS bindings
- */
-#define CONFIG_LWM2M_DEVICE_BINDING_US
-
-/**
- * @brief UDP and SMS bindings with Queue mode
- */
-#define CONFIG_LWM2M_DEVICE_BINDING_UQS
-#endif
-/** @} */
-
-/**
- * @brief Device object device type
- */
-#ifndef CONFIG_LWM2M_DEVICE_TYPE
-#define CONFIG_LWM2M_DEVICE_TYPE "RIOT device"
-#endif
-
-/**
- * @brief Device object hardware version
- *
- * @note Defaults to the board name
- */
-#ifndef CONFIG_LWM2M_DEVICE_HW_VERSION
-#define CONFIG_LWM2M_DEVICE_HW_VERSION RIOT_BOARD
-#endif
-
-/**
- * @brief Device object software version
- *
- * @note Defaults to the running RIOT version
- */
-#ifndef CONFIG_LWM2M_DEVICE_SW_VERSION
-#define CONFIG_LWM2M_DEVICE_SW_VERSION RIOT_VERSION
-#endif
-
-/**
- * @brief Device binding and queue mode
- *
- * @note Select using CONFIG_LWM2M_DEVICE_BINDING_*
- */
-#if defined(CONFIG_LWM2M_DEVICE_BINDING_U)
-#define CONFIG_LWM2M_DEVICE_BINDINGS "U"
-#elif defined(CONFIG_LWM2M_DEVICE_BINDING_UQ)
-#define CONFIG_LWM2M_DEVICE_BINDINGS "UQ"
-#elif defined(CONFIG_LWM2M_DEVICE_BINDING_S)
-#define CONFIG_LWM2M_DEVICE_BINDINGS "S"
-#elif defined(CONFIG_LWM2M_DEVICE_BINDING_SQ)
-#define CONFIG_LWM2M_DEVICE_BINDINGS "SQ"
-#elif defined(CONFIG_LWM2M_DEVICE_BINDING_US)
-#define CONFIG_LWM2M_DEVICE_BINDINGS "US"
-#elif defined(CONFIG_LWM2M_DEVICE_BINDING_UQS)
-#define CONFIG_LWM2M_DEVICE_BINDINGS "UQS"
-#else
-#define CONFIG_LWM2M_DEVICE_BINDINGS "U"
+#ifndef CONFIG_LWM2M_URI_MAX_SIZE
+#define CONFIG_LWM2M_URI_MAX_SIZE       64
 #endif
 
 #ifdef __cplusplus

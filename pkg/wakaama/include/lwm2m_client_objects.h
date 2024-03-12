@@ -41,39 +41,17 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Creates a LwM2M security object with the default configuration from
- *        net/lwm2m.h
- *
- * @param[in, out] client_data Pointer to a LwM2M client data descriptor
- *
- * @return Pointer to the created object in success
- * @return NULL otherwise
- */
-lwm2m_object_t *lwm2m_client_get_security_object(
-                        lwm2m_client_data_t *client_data);
-
-/**
  * @brief Creates a LwM2M server object with the default configuration from
  *        net/lwm2m.h
  *
  * @param[in, out] client_data Pointer to a LwM2M client data descriptor
+ * @param[in]      server_id   Server ID (SID) to assign to the new instance
  *
  * @return Pointer to the created object
  * @return NULL otherwise
  */
 lwm2m_object_t *lwm2m_client_get_server_object(
-                        lwm2m_client_data_t *client_data);
-
-/**
- * @brief Creates a LwM2M device object with the default configuration from
- *        net/lwm2m.h
- * @param[in, out] client_data Pointer to a LwM2M client data descriptor
- *
- * @return Pointer to the created object
- * @return NULL otherwise
- */
-lwm2m_object_t *lwm2m_client_get_device_object(
-                        lwm2m_client_data_t *client_data);
+                        lwm2m_client_data_t *client_data, int server_id);
 
 /**
  * @brief Creates a LwM2M access control object with the default configuration

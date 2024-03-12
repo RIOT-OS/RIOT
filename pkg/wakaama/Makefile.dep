@@ -8,8 +8,9 @@ USEMODULE += uri_parser
 # folder, by adding 'wakaama_objects_<objectName>' modules
 USEMODULE += wakaama_objects
 
-# include the 'device' object implementation (mandatory)
+# include mandatory objects
 USEMODULE += wakaama_objects_device
+USEMODULE += wakaama_objects_security
 
 USEMODULE += ztimer
 USEMODULE += ztimer_sec
@@ -22,3 +23,13 @@ endif
 
 # wakaama uses Sock UDP (implemented by some stack)
 USEMODULE += sock_udp
+USEMODULE += sock_async_event
+USEMODULE += sock_util
+USEMODULE += event_timeout
+USEMODULE += event_thread
+USEMODULE += event_thread_medium
+
+ifneq (,$(filter wakaama_client_dtls, $(USEMODULE)))
+  USEMODULE += sock_dtls
+  USEMODULE += credman_load
+endif

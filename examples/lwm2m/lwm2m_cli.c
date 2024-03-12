@@ -21,6 +21,10 @@
 #include "lwm2m_client.h"
 #include "lwm2m_client_objects.h"
 #include "lwm2m_platform.h"
+#include "objects/security.h"
+#include "objects/device.h"
+
+#include "credentials.h"
 
 #define OBJ_COUNT (3)
 
@@ -34,9 +38,55 @@ void lwm2m_cli_init(void)
     lwm2m_client_init(&client_data);
 
     /* add objects that will be registered */
-    obj_list[0] = lwm2m_client_get_security_object(&client_data);
-    obj_list[1] = lwm2m_client_get_server_object(&client_data);
-    obj_list[2] = lwm2m_client_get_device_object(&client_data);
+    lwm2m_obj_security_args_t args = {
+        .server_id = CONFIG_LWM2M_SERVER_SHORT_ID,
+        .server_uri = CONFIG_LWM2M_SERVER_URI,
+        .security_mode = LWM2M_SECURITY_MODE_RAW_PUBLIC_KEY,
+        .pub_key_or_id = rpk_pub,
+        .pub_key_or_id_len = sizeof(rpk_pub),
+        .secret_key = rpk_priv,
+        .secret_key_len = sizeof(rpk_priv),
+        .server_pub_key = server_rpk_pub,
+        .server_pub_key_len = sizeof(server_rpk_pub),
+        .is_bootstrap = false, /* set to true when using Bootstrap server */
+        .client_hold_off_time = 5,
+        .bootstrap_account_timeout = 0
+    };
+
+    if (IS_ACTIVE(CONFIG_LWM2M_CRED_PSK)) {
+        args.security_mode = LWM2M_SECURITY_MODE_PRE_SHARED_KEY;
+        args.pub_key_or_id = psk_id;
+        args.pub_key_or_id_len = sizeof(psk_id) - 1;
+        args.secret_key = psk_key;
+        args.secret_key_len = sizeof(psk_key) - 1;
+    }
+    else if (IS_ACTIVE(CONFIG_LWM2M_CRED_RPK)) {
+        args.security_mode = LWM2M_SECURITY_MODE_RAW_PUBLIC_KEY;
+        args.pub_key_or_id = rpk_pub;
+        args.pub_key_or_id_len = sizeof(rpk_pub);
+        args.secret_key = rpk_priv;
+        args.secret_key_len = sizeof(rpk_priv);
+        args.server_pub_key = server_rpk_pub;
+        args.server_pub_key_len = sizeof(server_rpk_pub);
+    }
+    else {
+        puts("Error: you must select a credential type");
+        return;
+    }
+
+    obj_list[0] = lwm2m_object_security_get();
+    int res = lwm2m_object_security_instance_create(obj_list[0], 1, &args);
+
+    if (res < 0) {
+        puts("Could not instantiate the security object");
+        return;
+    }
+
+    obj_list[1] = lwm2m_client_get_server_object(&client_data, CONFIG_LWM2M_SERVER_SHORT_ID);
+
+    /* device object has a single instance. All the information for now is defined at
+     * compile-time */
+    obj_list[2] = lwm2m_object_device_get();
 
     if (!obj_list[0] || !obj_list[1] || !obj_list[2]) {
         puts("Could not create mandatory objects");
@@ -51,7 +101,7 @@ int lwm2m_cli_cmd(int argc, char **argv)
 
     if (!strcmp(argv[1], "start")) {
         /* run the LwM2M client */
-        if (!connected && lwm2m_client_run(&client_data, obj_list, OBJ_COUNT)) {
+        if (!connected && lwm2m_client_run(&client_data, obj_list, ARRAY_SIZE(obj_list))) {
             connected = 1;
         }
         return 0;
