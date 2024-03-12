@@ -95,8 +95,12 @@ impl UdpReceive for &UdpSocketWrapper {
 }
 
 pub mod utils {
-    use log::{debug, error, info};
     use super::*;
+    use core::ffi::c_void;
+    use log::info;
+    use riot_sys::inline::gnrc_netapi_set;
+    use riot_sys::{netopt_t_NETOPT_IPV6_GROUP, size_t};
+    use rs_matter::mdns::builtin::MDNS_IPV6_BROADCAST_ADDR;
 
     pub fn get_ipv6_address(ifc: &Netif) -> Option<Ipv6Addr> {
         let all_addresses = ifc.ipv6_addrs();
@@ -124,30 +128,24 @@ pub mod utils {
     
     #[inline(never)]
     pub fn initialize_network() -> Result<(Ipv6Addr, u32), MatterError> {
-        // Get available network interface(s)
-        let mut interfaces = Netif::all();
-        
         // Get first available interface
-        let ifc: Netif = match interfaces.next() {
-            Some(ifc) => Ok(ifc),
-            None => {
-                error!("ERROR: No network interface was found!");
-                Err(MatterError::new(ErrorCode::NoNetworkInterface))
-            },
-        }?;
+        let ifc: Netif = Netif::all().next().ok_or(ErrorCode::NoNetworkInterface)?;
 
         // atm only for debugging: Check name and status of KernelPID
         let pid = ifc.pid();
-        let ifc_name: &str = pid.get_name().unwrap();
-        debug!("Kernel PID status of network interface {:?}: {:?}", pid.get_name().unwrap(), pid.status().unwrap());
-    
-        // Get available IPv6 link-local address
-        match get_ipv6_address(&ifc) {
-            Some(ipv6) => {
-                info!("Found network interface {} with IP {}", ifc_name, ipv6);
-                Ok((ipv6, 0 as _))
-            },
-            None => Err(MatterError::new(ErrorCode::StdIoError)),
+        let ifc_name: &str = pid.get_name().unwrap_or("unknown");
+
+        // TODO: This should be in riot-wrappers!
+        unsafe {
+            let addr = MDNS_IPV6_BROADCAST_ADDR.octets();
+            let addr_ptr = addr.as_ptr() as *const c_void;
+            let _ = gnrc_netapi_set(pid.into(), netopt_t_NETOPT_IPV6_GROUP, 0, addr_ptr, addr.len() as size_t);
         }
+        info!("Joined IPV6 multicast group @ {:?}", MDNS_IPV6_BROADCAST_ADDR);
+
+        // Get available IPv6 link-local address
+        let ipv6 = get_ipv6_address(&ifc).ok_or(ErrorCode::StdIoError)?;
+        info!("Found network interface '{}' with IP {}", ifc_name, ipv6);
+        Ok((ipv6, 0 as _))
     }
 }

@@ -42,6 +42,10 @@ extern crate rust_riotmodules;
 use riot_wrappers::riot_main;
 
 // rs-matter
+#[allow(unused_variables)]
+#[allow(dead_code)]
+extern crate rs_matter;
+
 use rs_matter::{CommissioningData, MATTER_PORT};
 use rs_matter::transport::network::UdpBuffers;
 use rs_matter::transport::core::{PacketBuffers, MATTER_SOCKET_BIND_ADDR};
@@ -57,9 +61,7 @@ use rs_matter::data_model::{
 use rs_matter::data_model::cluster_on_off::OnOffCluster;
 use rs_matter::error::Error;
 use rs_matter::mdns::MdnsService;
-use rs_matter::mdns::builtin::{
-    MDNS_IPV6_BROADCAST_ADDR, MDNS_SOCKET_BIND_ADDR,
-};
+use rs_matter::mdns::builtin::MDNS_SOCKET_BIND_ADDR;
 use rs_matter::secure_channel::spake2p::VerifierData;
 use rs_matter::tlv::TLVElement;
 use rs_matter::transport::exchange::Exchange;
