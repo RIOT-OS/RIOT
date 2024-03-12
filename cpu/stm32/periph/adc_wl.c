@@ -24,6 +24,7 @@
  */
 
 #include "cpu.h"
+#include "macros/math.h"
 #include "mutex.h"
 #include "periph/adc.h"
 #include "periph_conf.h"
@@ -86,9 +87,9 @@ int adc_init(adc_t line)
 #if IS_USED(MODULE_ZTIMER_USEC)
         ztimer_sleep(ZTIMER_USEC, ADC_T_ADCVREG_STUP_US);
 #else
-        /* to avoid using ZTIMER_USEC unless already included round up the
-           internal voltage regulator start up to 1ms */
-        ztimer_sleep(ZTIMER_MSEC, 1);
+        /* to avoid using ZTIMER_USEC, unless already included, round up the
+           internal voltage regulator start up time to milliseconds */
+        ztimer_sleep(ZTIMER_MSEC, DIV_ROUND_UP(ADC_T_ADCVREG_STUP_US, 1000));
 #endif
 
         /* ´start automatic calibration and wait for it to complete */
