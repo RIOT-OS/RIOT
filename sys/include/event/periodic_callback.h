@@ -54,7 +54,7 @@ static inline void *event_periodic_callback_get_arg(event_periodic_callback_t *e
 /**
  * @brief   Initialize a periodic callback event
  *
- * @note: On init the periodic event is to to run forever.
+ * @note: On init the periodic event is configured to run forever.
  *
  * @param[in]   event           event_periodic_callback object to initialize
  * @param[in]   clock           the clock to configure this timer on
