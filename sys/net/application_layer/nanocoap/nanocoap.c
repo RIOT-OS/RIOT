@@ -626,6 +626,30 @@ ssize_t coap_reply_simple(coap_pkt_t *pkt,
     return header_len + payload_len;
 }
 
+ssize_t coap_build_empty_ack(coap_pkt_t *pkt, uint8_t *rbuf, unsigned rlen)
+{
+    (void)rlen;
+
+    unsigned tkl = coap_get_token_len(pkt);
+    unsigned type = COAP_TYPE_ACK;
+    unsigned code = COAP_CODE_EMPTY;
+
+    assert(rlen > sizeof(coap_hdr_t) + tkl);
+
+    if (coap_get_type(pkt) != COAP_TYPE_CON) {
+        return 0;
+    }
+
+    if (rlen < sizeof(coap_hdr_t) + tkl) {
+        return -ENOSPC;
+    }
+
+    coap_build_hdr((coap_hdr_t *)rbuf, type, coap_get_token(pkt), tkl, code,
+                   ntohs(pkt->hdr->id));
+
+    return sizeof(coap_hdr_t) + tkl;
+}
+
 ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
                          uint8_t *rbuf, unsigned rlen, unsigned payload_len)
 {
@@ -675,15 +699,12 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
 
     coap_build_hdr((coap_hdr_t *)rbuf, type, coap_get_token(pkt), tkl, code,
                    ntohs(pkt->hdr->id));
-    coap_hdr_set_type((coap_hdr_t *)rbuf, type);
-    coap_hdr_set_code((coap_hdr_t *)rbuf, code);
-
     len += payload_len;
 
     return len;
 }
 
-ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, uint8_t *token,
+ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, const void *token,
                        size_t token_len, unsigned code, uint16_t id)
 {
     assert(!(type & ~0x3));
