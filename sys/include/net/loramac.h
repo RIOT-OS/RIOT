@@ -536,6 +536,13 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Default ACK Timeout
+ */
+#ifndef LORAMAC_DEFAULT_ACK_TIMEOUT
+#define LORAMAC_DEFAULT_ACK_TIMEOUT             (3U)
+#endif
+
+/**
  * @brief   Default second RX window delay (in ms)
  */
 #define LORAMAC_DEFAULT_RX2_DELAY               (1000U + CONFIG_LORAMAC_DEFAULT_RX1_DELAY)

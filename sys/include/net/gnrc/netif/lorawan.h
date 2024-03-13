@@ -20,8 +20,6 @@
 
 #include "net/gnrc/lorawan.h"
 
-#include "ztimer.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -63,8 +61,7 @@ typedef struct {
     uint8_t deveui[LORAMAC_DEVEUI_LEN];             /**< Device EUI buffer */
     uint8_t joineui[LORAMAC_JOINEUI_LEN];           /**< Join EUI buffer */
     gnrc_lorawan_t mac;                             /**< gnrc lorawan mac descriptor */
-    ztimer_t timer;                                 /**< General purpose timer */
-    ztimer_t backoff_timer;                         /**< Backoff timer */
+    msg_t msg_sched;                                /**< Message used for scheduling uplinks */
     uint8_t flags;                                  /**< flags for the LoRaWAN interface */
     uint8_t demod_margin;                           /**< value of last demodulation margin */
     uint8_t num_gateways;                           /**< number of gateways of last link check */
