@@ -31,10 +31,18 @@ typedef struct {
     sock_dtls_session_t session;
     dsm_state_t state;
     uint32_t last_used_sec;
+    credman_tag_t tag;
+    credman_type_t type;
+#ifdef CONFIG_DTLS_ECC
+    unsigned char other_pub_x[DTLS_EC_KEY_SIZE];
+    unsigned char other_pub_y[DTLS_EC_KEY_SIZE];
+    size_t key_size;
+#endif
 } dsm_session_t;
 
 static int _find_session(sock_dtls_t *sock, sock_dtls_session_t *to_find,
                          dsm_session_t **session);
+static void _set_state(dsm_state_t new_state, dsm_session_t *session_slot);
 
 static mutex_t _lock;
 static dsm_session_t _sessions[CONFIG_DSM_PEER_MAX];
@@ -61,9 +69,7 @@ dsm_state_t dsm_store(sock_dtls_t *sock, sock_dtls_session_t *session,
     }
 
     prev_state = session_slot->state;
-    if (session_slot->state != SESSION_STATE_ESTABLISHED) {
-        session_slot->state = new_state;
-    }
+    _set_state(new_state, session_slot);
 
     /* no existing session found */
     if (res == 0) {
@@ -100,6 +106,13 @@ void dsm_remove(sock_dtls_t *sock, sock_dtls_session_t *session)
         }
 
         session_slot->state = SESSION_STATE_NONE;
+        session_slot->tag = CREDMAN_TAG_EMPTY;
+        session_slot->type = CREDMAN_TYPE_EMPTY;
+#ifdef CONFIG_DTLS_ECC
+        memset(session_slot->other_pub_x, 0, ARRAY_SIZE(session_slot->other_pub_x));
+        memset(session_slot->other_pub_y, 0, ARRAY_SIZE(session_slot->other_pub_y));
+        session_slot->key_size = 0;
+#endif
         _available_slots++;
         DEBUG("dsm: removed session\n");
     } else {
@@ -151,6 +164,77 @@ ssize_t dsm_get_least_recently_used_session(sock_dtls_t *sock, sock_dtls_session
     return res;
 }
 
+int dsm_set_session_credential_info(sock_dtls_t *sock, sock_dtls_session_t *session,
+                                    credman_type_t type, credman_tag_t tag)
+{
+    dsm_session_t *session_slot = NULL;
+
+    if (_find_session(sock, session, &session_slot) != 1) {
+        DEBUG("dsm: No session to set the credential information was found\n");
+        return -1;
+    }
+    session_slot->type = type;
+    session_slot->tag = tag;
+    return 1;
+}
+
+int dsm_get_session_credential_info(sock_dtls_t *sock, sock_dtls_session_t *session,
+                                    credman_type_t *type, credman_tag_t *tag)
+{
+    dsm_session_t *session_slot = NULL;
+
+    if (_find_session(sock, session, &session_slot) != 1) {
+        DEBUG("dsm: No session to get the credential information from was found\n");
+        return -1;
+    }
+    if (session_slot->type == 0 || session_slot->tag == 0) {
+        DEBUG("dsm: The credential information for this session was not set\n");
+        return -2;
+    }
+    *type = session_slot->type;
+    *tag = session_slot->tag;
+    return 1;
+}
+
+#ifdef CONFIG_DTLS_ECC
+int dsm_set_other_public_key(sock_dtls_t *sock, sock_dtls_session_t *session,
+                             const unsigned char *other_pub_x,
+                             const unsigned char *other_pub_y, size_t key_size)
+{
+    assert(key_size <= DTLS_EC_KEY_SIZE);
+    dsm_session_t *session_slot = NULL;
+
+    if (_find_session(sock, session, &session_slot) != 1) {
+        DEBUG("dsm: No session to set the other public key was found\n");
+        return -1;
+    }
+    memcpy(session_slot->other_pub_x, other_pub_x, key_size);
+    memcpy(session_slot->other_pub_y, other_pub_y, key_size);
+    session_slot->key_size = key_size;
+    return 1;
+}
+
+int dsm_get_other_public_key(sock_dtls_t *sock, sock_dtls_session_t *session,
+                             const unsigned char **other_pub_x,
+                             const unsigned char **other_pub_y)
+{
+    dsm_session_t *session_slot = NULL;
+
+    if (_find_session(sock, session, &session_slot) != 1) {
+        DEBUG("dsm: No session to get the other public keys from was found\n");
+        return -1;
+    }
+    if (session_slot->key_size == 0) {
+        DEBUG("dsm: Other public key is not set\n");
+        return -2;
+    }
+
+    *other_pub_x = session_slot->other_pub_x;
+    *other_pub_y = session_slot->other_pub_y;
+    return session_slot->key_size;
+}
+#endif /* CONFIG_DTLS_ECC */
+
 /* Search for existing session or empty slot for new one
  * Returns 1, if existing session found
  * Returns 0, if empty slot found
@@ -183,4 +267,33 @@ static int _find_session(sock_dtls_t *sock, sock_dtls_session_t *to_find,
         return 0;
     }
     return -1;
+}
+
+/*
+ * Checks if a state change is legal and changes it if that is the case.
+ * Otherwise the state will stay as it is.
+*/
+static void _set_state(dsm_state_t new_state, dsm_session_t *session_slot) {
+    bool change = false;
+    switch (session_slot->state) {
+        case SESSION_STATE_NONE:
+            change = true;
+            break;
+        case SESSION_STATE_SOCK_INIT:
+            change = ((new_state == SESSION_STATE_HANDSHAKE) ||
+                      (new_state == SESSION_STATE_ESTABLISHED));
+            break;
+        case SESSION_STATE_HANDSHAKE:
+            change = (new_state == SESSION_STATE_ESTABLISHED);
+            break;
+        case SESSION_STATE_ESTABLISHED:
+            /* Fall through */
+        default:
+            change = false;
+            break;
+    }
+
+    if (change) {
+        session_slot->state = new_state;
+    }
 }

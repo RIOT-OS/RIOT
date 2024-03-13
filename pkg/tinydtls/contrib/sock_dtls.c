@@ -24,6 +24,7 @@
 #include "net/sock/dtls.h"
 #include "net/credman.h"
 #include "ztimer.h"
+#include "net/dsm.h"
 
 #if SOCK_HAS_ASYNC
 #include "net/sock/async.h"
@@ -60,6 +61,8 @@ static int _read(struct dtls_context_t *ctx, session_t *session, uint8_t *buf,
 static int _event(struct dtls_context_t *ctx, session_t *session,
                   dtls_alert_level_t level, unsigned short code);
 
+static void _store_session(sock_dtls_t *sock, sock_udp_ep_t *ep,
+                           credman_tag_t tag, credman_type_t type);
 static void _session_to_ep(const session_t *session, sock_udp_ep_t *ep);
 static void _ep_to_session(const sock_udp_ep_t *ep, session_t *session);
 static uint32_t _update_timeout(uint32_t start, uint32_t timeout);
@@ -273,6 +276,8 @@ static int _get_psk_info(struct dtls_context_t *ctx, const session_t *session,
                         DEBUG("sock_dtls: found\n");
                         c = credential.params.psk.key.s;
                         c_len = credential.params.psk.key.len;
+
+                        _store_session(sock, &ep, sock->tags[i], CREDMAN_TYPE_PSK);
                         break;
                     }
                 }
@@ -329,6 +334,7 @@ static int _get_ecdsa_key(struct dtls_context_t *ctx, const session_t *session,
         for (unsigned i = 0; i < sock->tags_len; i++) {
             ret = credman_get(&credential, sock->tags[i], CREDMAN_TYPE_ECDSA);
             if (ret == CREDMAN_OK) {
+                credential.tag = sock->tags[i];
                 break;
             }
         }
@@ -338,6 +344,7 @@ static int _get_ecdsa_key(struct dtls_context_t *ctx, const session_t *session,
             return dtls_alert_fatal_create(DTLS_ALERT_INTERNAL_ERROR);
         }
     }
+    _store_session(sock, &ep, credential.tag, CREDMAN_TYPE_ECDSA);
 
     /* try to find a free ECDSA key assignment structure for the handshake. When unused, the session
      * is not set. */
@@ -368,15 +375,28 @@ static int _verify_ecdsa_key(struct dtls_context_t *ctx,
                              const unsigned char *other_pub_x,
                              const unsigned char *other_pub_y, size_t key_size)
 {
-    (void)ctx;
-    (void)session;
-    (void)other_pub_y;
-    (void)other_pub_x;
-    (void)key_size;
+    /*This does not verify the key. It just saves the key so that it's available
+      for the application through DSM*/
+    sock_dtls_t *sock = dtls_get_app_data(ctx);
+    sock_dtls_session_t dtls_session = {.dtls_session = *session};
+    if (dsm_set_other_public_key(sock, &dtls_session, other_pub_x, other_pub_y, key_size) < 1) {
+        DEBUG("sock_dtls: DSM could not set ECC key\n");
+    }
 
     return 0;
 }
 #endif /* CONFIG_DTLS_ECC */
+
+static void _store_session(sock_dtls_t *sock, sock_udp_ep_t *ep,
+                           credman_tag_t tag, credman_type_t type)
+{
+    sock_dtls_session_t dtls_session = {0};
+    sock_dtls_session_set_udp_ep(&dtls_session, ep);
+    dsm_store(sock, &dtls_session, SESSION_STATE_SOCK_INIT, false);
+    if (dsm_set_session_credential_info(sock, &dtls_session, type, tag) < 0) {
+        DEBUG("sock_dtls: DSM could not set credential info\n");
+    }
+}
 
 int sock_dtls_create(sock_dtls_t *sock, sock_udp_t *udp_sock,
                      credman_tag_t tag, unsigned version, unsigned role)
