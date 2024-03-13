@@ -363,7 +363,7 @@ int mtd_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t count);
  * @param[in]  offset   offset from the start of the page (in bytes)
  * @param[in]  size     the number of bytes to read
  *
- * @retval n number of bytes read on success
+ * @retval 0 on success
  * @retval <0 value on error
  * @retval -ENODEV if @p mtd is not a valid device
  * @retval -ENOTSUP if operation is not supported on @p mtd
@@ -412,7 +412,7 @@ int mtd_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t count);
  * @param[in]  offset   byte offset from the start of the page
  * @param[in]  size     the number of bytes to write
  *
- * @retval n number of bytes written on success
+ * @retval 0 on success
  * @retval <0 value on error
  * @retval -ENODEV if @p mtd is not a valid device
  * @retval -ENOTSUP if operation is not supported on @p mtd
@@ -442,7 +442,7 @@ int mtd_write_page_raw(mtd_dev_t *mtd, const void *src, uint32_t page,
  * @param[in]  offset   byte offset from the start of the page
  * @param[in]  size     the number of bytes to write
  *
- * @retval n number of bytes written on success
+ * @retval 0 on success
  * @retval <0 value on error
  * @retval -ENODEV if @p mtd is not a valid device
  * @retval -ENOTSUP if operation is not supported on @p mtd
@@ -500,7 +500,7 @@ int mtd_erase_sector(mtd_dev_t *mtd, uint32_t sector, uint32_t num);
  * @param[in]  sector   Sector number to start writing to
  * @param[in]  num      Number of sectors to write
  *
- * @retval n number of bytes written on success
+ * @retval 0 on success
  * @retval <0 value on error
  * @retval -ENODEV if @p mtd is not a valid device
  * @retval -ENOTSUP if operation is not supported on @p mtd
