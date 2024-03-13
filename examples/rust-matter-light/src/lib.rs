@@ -4,48 +4,51 @@
 // General Public License v2.1. See the file LICENSE in the top level
 // directory for more details.
 #![no_std]
-
+#![feature(type_alias_impl_trait)]
 
 // declare internal modules
 mod dev_att;
 mod network;
+#[allow(dead_code)]
+mod rgb_led;
 #[allow(unused)]
 mod persist;
 mod logging;
-
-#[allow(unused)]
-pub mod gpio;
-#[allow(unused)]
-pub mod light;
-#[allow(unused)]
-pub mod saul_reg;
+// TODO: Enable attribute or feature to be able to run integration tests inside this module under RIOT OS
 #[allow(unused)]
 mod tests;
 
 // internal modules imports
-use network::utils::{initialize_network};
-use logging::init_logger;
 use network::UdpSocketWrapper;
+use network::utils::initialize_network;
+use logging::init_logger;
+use dev_att::HardCodedDevAtt;
+use rgb_led::{RGB_LED_DRIVER, RgbLed, RGB_BLUE_PIN, RGB_GREEN_PIN, RGB_PORT, RGB_RED_PIN};
 
 // core library
 use core::{borrow::Borrow, pin::pin};
 use core::cell::Cell;
+use core::ffi::CStr;
 
 // external crates
 use static_cell::StaticCell;
 use embedded_nal_async::{Ipv4Addr, UdpStack as _};
 use embedded_alloc::Heap;
-use log::{debug, info, error};
+use embedded_hal::delay::DelayNs as _;
+use log::{debug, info, error, warn};
 
 // RIOT OS modules
 extern crate rust_riotmodules;
 use riot_wrappers::riot_main;
+use riot_wrappers::ztimer;
+use riot_wrappers::saul::{ActuatorClass, Class, Phydat, RegistryEntry};
+use riot_wrappers::saul::registration::register_and_then;
+use riot_wrappers::shell::{self, CommandList as _};
 
 // rs-matter
 #[allow(unused_variables)]
 #[allow(dead_code)]
 extern crate rs_matter;
-
 use rs_matter::{CommissioningData, MATTER_PORT};
 use rs_matter::transport::network::UdpBuffers;
 use rs_matter::transport::core::{PacketBuffers, MATTER_SOCKET_BIND_ADDR};
@@ -79,25 +82,13 @@ const NODE: Node<'static> = Node {
     ],
 };
 
-static DEV_DET: BasicInfoConfig = BasicInfoConfig {
-    vid: 0xFFF1,
-    pid: 0x8000,
-    hw_ver: 2,
-    sw_ver: 1,
-    sw_ver_str: "1",
-    serial_no: "aabbccddd",
-    device_name: "OnOff Light",
-    product_name: "Light123",
-    vendor_name: "Vendor 123",
-};
-
 #[allow(dead_code)]
-struct MyOnOffCluster {
+struct OnOffHandler {
     cluster: OnOffCluster,
     on: Cell<bool>,
 }
 
-impl MyOnOffCluster {
+impl OnOffHandler {
     fn new(cluster: OnOffCluster) -> Self {
         Self {
             cluster,
@@ -106,25 +97,36 @@ impl MyOnOffCluster {
     }
 }
 
-impl Handler for MyOnOffCluster {
+impl Handler for OnOffHandler {
     fn read(&self, attr: &AttrDetails, encoder: AttrDataEncoder) -> Result<(), Error> {
-        info!("MyOnOffCluster - read: {:?}", attr);
-        OnOffCluster::read(&self.cluster, attr, encoder)
+        info!("OnOffCluster: Read attribute {:#04x} @ Endpoint {}", attr.attr_id, attr.endpoint_id);
+        self.cluster.read(attr, encoder)
     }
 
     fn write(&self, attr: &AttrDetails, data: AttrData) -> Result<(), Error> {
-        info!("MyOnOffCluster - write: {:?}", attr);
-        OnOffCluster::write(&self.cluster, attr, data)
+        info!("OnOffCluster: Write attribute {:#04x} @ Endpoint {}", attr.attr_id, attr.endpoint_id);
+        self.cluster.write(attr, data)
     }
 
     fn invoke(&self, exchange: &Exchange, cmd: &CmdDetails, data: &TLVElement, encoder: CmdDataEncoder) -> Result<(), Error> {
-        info!("MyOnOffCluster - invoke: cmd={:?}, data={:?}", cmd, data.u32());
-        OnOffCluster::invoke(&self.cluster, exchange, cmd, data, encoder)
+        info!("OnOffCluster: Invoke cmd {:#02x} (data: {}) @ Endpoint {}", cmd.cmd_id, data.u32().unwrap_or(0), cmd.endpoint_id);
+        // Handle command by ID -> 0x00: Off, 0x01: On, 0x02: Toggle
+        match cmd.cmd_id {
+            0 => led_onoff(false),
+            1 => led_onoff(true),
+            2 => {
+                let new_state = !self.on.get();
+                self.on.set(new_state);
+                led_onoff(new_state);
+            },
+            _ => { warn!("Unsupported command by application -> ignored!"); }
+        }
+        self.cluster.invoke(exchange, cmd, data, encoder)
     }
 }
-impl NonBlockingHandler for MyOnOffCluster {}
+impl NonBlockingHandler for OnOffHandler {}
 
-// Handler for endpoint 1 (Descriptor + OnOff Cluster)
+// Handler for endpoints 0 (Root) and 1 (Descriptor + OnOff Cluster)
 fn matter_handler<'a>(matter: &'a Matter<'a>) -> impl Metadata + NonBlockingHandler + 'a {
     (
         NODE,
@@ -137,8 +139,7 @@ fn matter_handler<'a>(matter: &'a Matter<'a>) -> impl Metadata + NonBlockingHand
             .chain(
                 1,
                 cluster_on_off::ID,
-                //cluster_on_off::OnOffCluster::new(*matter.borrow()),
-                MyOnOffCluster::new(cluster_on_off::OnOffCluster::new(*matter.borrow())),
+                OnOffHandler::new(cluster_on_off::OnOffCluster::new(*matter.borrow())),
             ),
     )
 }
@@ -148,19 +149,56 @@ static HEAP: Heap = Heap::empty();
 
 riot_main!(main);
 
+fn led_onoff(on: bool) {
+    // Iterate through all SAUL registry entries and set all switches to the desired state
+    RegistryEntry::all().for_each(|entry| {
+        if let Some(Class::Actuator(Some(ActuatorClass::Switch))) = entry.type_() {
+            info!("Writing to {}", entry.name().unwrap_or("n/a"));
+            let data = Phydat::new(&[on as i16], None, 0);
+            entry.write(data).expect("Error while trying to set LED");
+            info!("LED was set to {:?}", on);
+        }
+    }
+    );
+}
+
 fn main() -> ! {
     {
         use core::mem::MaybeUninit;
-        const HEAP_SIZE: usize = 1024 * 180;
+        const HEAP_SIZE: usize = 4192;
         static mut HEAP_MEM: [MaybeUninit<u8>; HEAP_SIZE] = [MaybeUninit::uninit(); HEAP_SIZE];
         unsafe { HEAP.init(HEAP_MEM.as_ptr() as usize, HEAP_SIZE) }
     }
 
     init_logger().expect("Error initializing logger");
+    let mut clock = ztimer::Clock::msec();
+    clock.delay_ms(1000);
 
     info!("Hello Matter on RIOT!");
 
-    let (ipv6_addr, interface) = initialize_network().expect("Error getting network interface and IP addresses");
+    use core::mem::size_of;
+    info!("Matter memory usage: UdpBuffers={}, PacketBuffers={}, \
+        MdnsService={}, Matter={}",
+        size_of::<UdpBuffers>(),
+        size_of::<PacketBuffers>(),
+        size_of::<MdnsService>(),
+        size_of::<Matter>(),
+    );
+
+    let (ipv6_addr, interface) = initialize_network()
+        .expect("Error getting network interface and IP addresses");
+
+    static DEV_DET: BasicInfoConfig = BasicInfoConfig {
+        vid: 0xFFF1,
+        pid: 0x8000,
+        hw_ver: 2,
+        sw_ver: 1,
+        sw_ver_str: "1",
+        serial_no: "aabbccddd",
+        device_name: "OnOff Light",
+        product_name: "Light123",
+        vendor_name: "Vendor 123",
+    };
 
     static MDNS: StaticCell<MdnsService> = StaticCell::new();
     let mdns_service: &'static MdnsService = MDNS.init(MdnsService::new(
@@ -173,8 +211,8 @@ fn main() -> ! {
     ));
 
     // Get Device attestation (hard-coded atm)
-    static DEV_ATT: StaticCell<dev_att::HardCodedDevAtt> = StaticCell::new();
-    let dev_att: &'static dev_att::HardCodedDevAtt = DEV_ATT.init(dev_att::HardCodedDevAtt::new());
+    static DEV_ATT: StaticCell<HardCodedDevAtt> = StaticCell::new();
+    let dev_att: &'static HardCodedDevAtt = DEV_ATT.init(HardCodedDevAtt::new());
 
     // TODO: Provide own epoch and rand functions
     let epoch = rs_matter::utils::epoch::riot_epoch;
@@ -193,10 +231,24 @@ fn main() -> ! {
 
     info!("Starting all services...");
 
-    // TODO: Maybe run shell in seperate thread
+    // TODO: Register RGB-LED at SAUL and run shell in seperate thread
     let mut _shell_thread = || {
         debug!("Shell is running");
-        saul_reg::run_shell_with_saul();
+        let rgb_led = RgbLed::new(
+            "Extended Color Light",
+            (RGB_PORT, RGB_RED_PIN),
+            (RGB_PORT, RGB_GREEN_PIN),
+            (RGB_PORT, RGB_BLUE_PIN),
+        );
+        register_and_then(
+            &RGB_LED_DRIVER,
+            &rgb_led,
+            Some(CStr::from_bytes_with_nul(b"Extended Color Light\0").unwrap()),
+            || {
+                info!("RGB-LED registered as SAUL actuator");
+                shell::new().run_forever_providing_buf()
+            },
+        );
     };
 
     static EXECUTOR: StaticCell<embassy_executor_riot::Executor> = StaticCell::new();
@@ -221,8 +273,6 @@ async fn run_mdns(mdns: &'static MdnsService<'_>) {
         .expect("Can't create a socket");
     let socket = UdpSocketWrapper::new(mdns_addr, mdns_sock);
     debug!("Created UDP socket for mDNS at {:?}", &mdns_addr);
-
-    // TODO: Join IPv6 Multicast group (MDNS_IPV6_BROADCAST_ADDR)
 
     // Finally run the MDNS service
     let mut mdns_udp_buffers = UdpBuffers::new();

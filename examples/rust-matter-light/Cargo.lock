@@ -1644,7 +1644,7 @@ dependencies = [
 [[package]]
 name = "rs-matter"
 version = "0.1.2"
-source = "git+https://github.com/maikerlab/rs-matter?branch=feature/RIOT_OS#8c791266bad99264cce45ea971eb5714205826af"
+source = "git+https://github.com/maikerlab/rs-matter?branch=feature/RIOT_OS#abd482eea52bed5cca549a4a468a1659d73a4e3c"
 dependencies = [
  "aes",
  "astro-dnssd",
@@ -1690,7 +1690,7 @@ dependencies = [
 [[package]]
 name = "rs-matter-data-model"
 version = "0.1.0"
-source = "git+https://github.com/maikerlab/rs-matter?branch=feature/RIOT_OS#8c791266bad99264cce45ea971eb5714205826af"
+source = "git+https://github.com/maikerlab/rs-matter?branch=feature/RIOT_OS#abd482eea52bed5cca549a4a468a1659d73a4e3c"
 dependencies = [
  "clap",
  "miette",
@@ -1706,7 +1706,7 @@ dependencies = [
 [[package]]
 name = "rs-matter-macros"
 version = "0.1.0"
-source = "git+https://github.com/maikerlab/rs-matter?branch=feature/RIOT_OS#8c791266bad99264cce45ea971eb5714205826af"
+source = "git+https://github.com/maikerlab/rs-matter?branch=feature/RIOT_OS#abd482eea52bed5cca549a4a468a1659d73a4e3c"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
@@ -1719,7 +1719,7 @@ dependencies = [
 [[package]]
 name = "rs-matter-macros-impl"
 version = "0.1.0"
-source = "git+https://github.com/maikerlab/rs-matter?branch=feature/RIOT_OS#8c791266bad99264cce45ea971eb5714205826af"
+source = "git+https://github.com/maikerlab/rs-matter?branch=feature/RIOT_OS#abd482eea52bed5cca549a4a468a1659d73a4e3c"
 dependencies = [
  "convert_case",
  "proc-macro2",
@@ -1737,6 +1737,7 @@ dependencies = [
  "embassy-futures",
  "embassy-sync",
  "embedded-alloc",
+ "embedded-hal 1.0.0",
  "embedded-hal-async",
  "embedded-nal-async 0.7.1",
  "log",

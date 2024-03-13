@@ -23,5 +23,5 @@ pub fn init_logger() -> Result<(), SetLoggerError> {
     //let log_level: &'static str = env!("RIOT_LOG_LEVEL");
     //println!("the RIOT_LOG_LEVEL variable at the time of compiling was: {log_level}");
     log::set_logger(&LOGGER)
-        .map(|_| log::set_max_level(LevelFilter::Debug))
+        .map(|_| log::set_max_level(LevelFilter::Info))
 }
