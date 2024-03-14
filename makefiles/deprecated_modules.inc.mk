@@ -1,7 +1,6 @@
 # Add deprecated modules here
 # Keep this list ALPHABETICALLY SORTED!!!!111elven
 DEPRECATED_MODULES += gnrc_netif_cmd_lora # use shell_cmd_gnrc_netif_lorawan instead
-DEPRECATED_MODULES += gnrc_pktbuf_cmd # use shell_cmd_gnrc_pktbuf instead
 DEPRECATED_MODULES += gnrc_udp_cmd # use shell_cmd_gnrc_udp instead
 DEPRECATED_MODULES += heap_cmd # use shell_cmd_heap instead
 DEPRECATED_MODULES += i2c_scan # use shell_cmd_i2c_scan instead

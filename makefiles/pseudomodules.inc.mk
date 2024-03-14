@@ -114,13 +114,6 @@ PSEUDOMODULES += gnrc_netapi_callbacks
 PSEUDOMODULES += gnrc_netapi_mbox
 PSEUDOMODULES += gnrc_netif_bus
 PSEUDOMODULES += gnrc_netif_timestamp
-## @defgroup net_gnrc_pktbuf_cmd  gnrc_pktbuf_cmd
-## @ingroup net_gnrc_pktbuf
-## @{
-## @deprecated  Use module `shell_cmd_gnrc_pktbuf` instead;
-##              will be removed after 2023.07 release.
-PSEUDOMODULES += gnrc_pktbuf_cmd
-## @}
 PSEUDOMODULES += gnrc_netif_6lo
 PSEUDOMODULES += gnrc_netif_ipv6
 PSEUDOMODULES += gnrc_netif_mac
