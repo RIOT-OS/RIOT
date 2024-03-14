@@ -84,9 +84,6 @@ ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
   ifneq (,$(filter netstats_neighbor,$(USEMODULE)))
     USEMODULE += shell_cmd_netstats_neighbor
   endif
-  ifneq (,$(filter nice,$(USEMODULE)))
-    USEMODULE += shell_cmd_nice
-  endif
   ifneq (,$(filter nimble_netif,$(USEMODULE)))
     USEMODULE += shell_cmd_nimble_netif
   endif

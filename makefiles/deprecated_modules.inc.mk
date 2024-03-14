@@ -1,6 +1,5 @@
 # Add deprecated modules here
 # Keep this list ALPHABETICALLY SORTED!!!!111elven
-DEPRECATED_MODULES += nice # use shell_cmd_nice instead
 DEPRECATED_MODULES += random_cmd # use shell_cmd_random instead
 DEPRECATED_MODULES += sema_deprecated
 DEPRECATED_MODULES += sha1sum # use shell_cmd_sha1sum instead

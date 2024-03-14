@@ -322,13 +322,6 @@ PSEUDOMODULES += nrfx
 PSEUDOMODULES += newlib
 PSEUDOMODULES += newlib_gnu_source
 PSEUDOMODULES += newlib_nano
-## @defgroup pseudomodule_nice nice
-## @ingroup sys_shell_commands
-## @{
-## @deprecated  Use module `shell_cmd_nice` instead;
-##              will be removed after 2023.07 release.
-PSEUDOMODULES += nice
-## @}
 PSEUDOMODULES += nrf24l01p_ng_diagnostics
 PSEUDOMODULES += opendsme
 PSEUDOMODULES += openthread
