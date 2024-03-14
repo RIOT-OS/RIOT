@@ -259,10 +259,6 @@ ifneq (,$(filter posix_sockets,$(USEMODULE)))
   USEMODULE += posix_headers
 endif
 
-ifneq (,$(filter sha256sum,$(USEMODULE)))
-  USEMODULE += shell_cmd_sha256sum
-endif
-
 ifneq (,$(filter shell_commands,$(USEMODULE)))
   # shell_commands has been renamed to shell_cmds_default, but let's keep this
   # for backward compatibility
@@ -284,11 +280,6 @@ include $(RIOTBASE)/makefiles/stdio.inc.mk
 ifneq (,$(filter isrpipe_read_timeout,$(USEMODULE)))
   USEMODULE += isrpipe
   USEMODULE += ztimer_usec
-endif
-
-ifneq (,$(filter sha256sum,$(USEMODULE)))
-  USEMODULE += vfs_util
-  USEMODULE += hashes
 endif
 
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))

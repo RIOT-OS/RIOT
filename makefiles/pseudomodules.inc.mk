@@ -380,13 +380,7 @@ PSEUDOMODULES += servo_timer
 ## @{
 PSEUDOMODULES += servo_saul
 ## @}
-## @defgroup pseudomodule_sha256sum sha256sum
-## @ingroup sys_shell_commands
-## @{
-## @deprecated  Use module `shell_cmd_sha256sum` instead;
-##              will be removed after 2023.07 release.
-PSEUDOMODULES += sha256sum
-## @}
+
 PSEUDOMODULES += shell_cmd_app_metadata
 PSEUDOMODULES += shell_cmd_at30tse75x
 PSEUDOMODULES += shell_cmd_benchmark_udp
