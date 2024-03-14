@@ -477,7 +477,7 @@ psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attri
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519)
         case PSA_ECC_ED25519:
-            ret = psa_derive_ecc_ed25519_public_key(key_data, pubkey_data, key_bytes, pubkey_data_len);
+            ret = psa_derive_ecc_ed25519_public_key(data, pubkey_data, data_length, pubkey_data_len);
             break;
 #endif
         default:

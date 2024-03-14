@@ -60,8 +60,8 @@ done:
     return CRYS_to_psa_error(ret);
 }
 
-psa_status_t psa_derive_ecc_ed25519_public_key( uint8_t *priv_key_buffer, uint8_t *pub_key_buffer,
-                                                size_t *priv_key_buffer_length,
+psa_status_t psa_derive_ecc_ed25519_public_key( const uint8_t *priv_key_buffer, uint8_t *pub_key_buffer,
+                                                size_t priv_key_buffer_length,
                                                 size_t *pub_key_buffer_length)
 {
     CRYS_ECEDW_TempBuff_t tmp;
@@ -74,7 +74,7 @@ psa_status_t psa_derive_ecc_ed25519_public_key( uint8_t *priv_key_buffer, uint8_
     *pub_key_buffer_length = CRYS_ECEDW_MOD_SIZE_IN_BYTES;
 
     cryptocell_310_enable();
-    ret = CRYS_ECEDW_SeedKeyPair(priv_key_buffer, *priv_key_buffer_length, secret_key, &secret_key_size,
+    ret = CRYS_ECEDW_SeedKeyPair(priv_key_buffer, priv_key_buffer_length, secret_key, &secret_key_size,
                                             pub_key_buffer, pub_key_buffer_length, &tmp);
     cryptocell_310_disable();
     if (ret != CRYS_OK) {

@@ -1287,7 +1287,12 @@ psa_status_t psa_export_key(psa_key_id_t key,
         return status;
     }
 
-    // todo: key export from secure element not supported yet
+    psa_key_lifetime_t lifetime = psa_get_key_lifetime(&slot->attr);
+    if (psa_key_lifetime_is_external(lifetime)) {
+        // key export from an external device is currently not supported
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
+
     psa_get_key_data_from_key_slot(slot, &privkey_data, &privkey_data_len);
 
     status =

@@ -32,6 +32,7 @@ void addFailurePSA(const char *func, psa_status_t errcode, long line, const char
 }
 
 #define TEST_ASSERT_PSA(func_) { psa_status_t ret = func_; if (ret != PSA_SUCCESS) { addFailurePSA(#func_, ret, __LINE__, __FILE__); goto cleanup; } }
+#define TEST_ASSERT_PSA_WITHIN_CLEANUP(func_) { psa_status_t ret = func_; if (ret != PSA_SUCCESS) { addFailurePSA(#func_, ret, __LINE__, __FILE__); } }
 
 /*
  * A second call to psa_crypto_init() should not reset key data.
@@ -60,7 +61,7 @@ static void test_init_twice(void)
     TEST_ASSERT_PSA(psa_export_public_key(key_id, key_data, sizeof(key_data), &key_data_len));
 
 cleanup:
-    TEST_ASSERT_PSA(psa_destroy_key(key_id));
+    TEST_ASSERT_PSA_WITHIN_CLEANUP(psa_destroy_key(key_id));
 }
 
 /**
@@ -120,7 +121,7 @@ static void test_exported_key_is_identical_when_imported_again_ed25519(void)
     TEST_ASSERT(sig_len == sig2_len && memcmp(sig, sig2, sig_len) == 0);
 
 cleanup:
-    TEST_ASSERT_PSA(psa_destroy_key(key_id));
+    TEST_ASSERT_PSA_WITHIN_CLEANUP(psa_destroy_key(key_id));
 }
 
 /**
@@ -169,8 +170,8 @@ static void test_export_public_key_ed25519(void)
     TEST_ASSERT(pubkey_len == pubkey2_len && memcmp(pubkey, pubkey2, pubkey_len) == 0);
 
 cleanup:
-    TEST_ASSERT_PSA(psa_destroy_key(key_id));
-    TEST_ASSERT_PSA(psa_destroy_key(key_id2));
+    TEST_ASSERT_PSA_WITHIN_CLEANUP(psa_destroy_key(key_id));
+    TEST_ASSERT_PSA_WITHIN_CLEANUP(psa_destroy_key(key_id2));
 }
 
 static Test *tests_psa_crypto(void)
