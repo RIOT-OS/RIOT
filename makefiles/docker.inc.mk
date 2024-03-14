@@ -121,12 +121,13 @@ DOCKER ?= docker
 _docker_is_podman = $(shell $(DOCKER) --version | grep podman 2>/dev/null)
 
 # Set default run flags:
-# - allocate a pseudo-tty
+# - always pull to have riot/riotbuild:latest up-to-date
 # - remove container on exit
+# - allocate a pseudo-tty
 # - set username/UID to executor
 DOCKER_USER ?= $$(id -u)
 DOCKER_USER_OPT = $(if $(_docker_is_podman),--userns keep-id,--user $(DOCKER_USER))
-DOCKER_RUN_FLAGS ?= --rm --tty $(DOCKER_USER_OPT)
+DOCKER_RUN_FLAGS ?= --pull=always --rm --tty $(DOCKER_USER_OPT)
 
 # allow setting make args from command line like '-j'
 DOCKER_MAKE_ARGS ?=
