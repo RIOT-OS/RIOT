@@ -71,10 +71,6 @@ ifneq (,$(filter gnrc_dhcpv6_client_simple_pd,$(USEMODULE)))
   USEMODULE += dhcpv6_client_ia_pd
 endif
 
-ifneq (,$(filter gnrc_netif_cmd_lora,$(USEMODULE)))
-  USEMODULE += shell_cmd_gnrc_netif_lorawan
-endif
-
 ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_gnrc_uhcpc
   USEMODULE += uhcpc

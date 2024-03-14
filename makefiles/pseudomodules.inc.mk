@@ -118,14 +118,6 @@ PSEUDOMODULES += gnrc_netif_6lo
 PSEUDOMODULES += gnrc_netif_ipv6
 PSEUDOMODULES += gnrc_netif_mac
 PSEUDOMODULES += gnrc_netif_single
-## @defgroup net_gnrc_netif_cmd_lora  gnrc_netif_cmd_lora
-## @ingroup sys_shell_commands
-## @ingroup net_gnrc_netif
-## @{
-## @deprecated  Use module `shell_cmd_gnrc_netif_lorawan` instead;
-##              will be removed after 2023.07 release.
-PSEUDOMODULES += gnrc_netif_cmd_lora
-## @}
 PSEUDOMODULES += gnrc_netif_dedup
 
 
