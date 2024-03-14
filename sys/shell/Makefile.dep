@@ -69,9 +69,6 @@ ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
   ifneq (,$(filter gnrc_sixlowpan_frag_stats,$(USEMODULE)))
     USEMODULE += shell_cmd_gnrc_sixlowpan_frag_stats
   endif
-  ifneq (,$(filter gnrc_udp_cmd,$(USEMODULE)))
-    USEMODULE += shell_cmd_gnrc_udp
-  endif
   ifneq (,$(filter heap_cmd,$(USEMODULE)))
     USEMODULE += shell_cmd_heap
   endif

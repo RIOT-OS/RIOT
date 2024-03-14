@@ -1,6 +1,5 @@
 # Add deprecated modules here
 # Keep this list ALPHABETICALLY SORTED!!!!111elven
-DEPRECATED_MODULES += gnrc_udp_cmd # use shell_cmd_gnrc_udp instead
 DEPRECATED_MODULES += heap_cmd # use shell_cmd_heap instead
 DEPRECATED_MODULES += i2c_scan # use shell_cmd_i2c_scan instead
 DEPRECATED_MODULES += md5sum # use shell_cmd_md5sum instead

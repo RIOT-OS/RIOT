@@ -234,13 +234,6 @@ PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_congure_sfr
 PSEUDOMODULES += gnrc_sixlowpan_iphc_nhc
 PSEUDOMODULES += gnrc_sixlowpan_nd_border_router
 PSEUDOMODULES += gnrc_sixlowpan_router_default
-## @defgroup net_gnrc_udp_cmd  gnrc_udp_cmd
-## @ingroup net_gnrc_udp
-## @{
-## @deprecated  Use module `shell_cmd_gnrc_udp` instead;
-##              will be removed after 2023.07 release.
-PSEUDOMODULES += gnrc_udp_cmd
-## @}
 PSEUDOMODULES += gnrc_sock_async
 PSEUDOMODULES += gnrc_sock_check_reuse
 PSEUDOMODULES += gnrc_txtsnd
