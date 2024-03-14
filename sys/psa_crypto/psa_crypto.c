@@ -1519,8 +1519,8 @@ psa_status_t psa_builtin_import_key(const psa_key_attributes_t *attributes,
         return PSA_SUCCESS;
     }
     else if (PSA_KEY_TYPE_IS_ECC_PUBLIC_KEY(type)) {
-        if (data_length != PSA_EXPORT_KEY_OUTPUT_SIZE(type, attributes->bits)) {
-            return PSA_ERROR_INVALID_ARGUMENT;
+        if (data_length > PSA_EXPORT_PUBLIC_KEY_MAX_SIZE) {
+            return PSA_ERROR_NOT_SUPPORTED;
         }
 
         memcpy(key_buffer, data, data_length);
