@@ -259,10 +259,6 @@ ifneq (,$(filter posix_sockets,$(USEMODULE)))
   USEMODULE += posix_headers
 endif
 
-ifneq (,$(filter sha1sum,$(USEMODULE)))
-  USEMODULE += shell_cmd_sha1sum
-endif
-
 ifneq (,$(filter sha256sum,$(USEMODULE)))
   USEMODULE += shell_cmd_sha256sum
 endif
@@ -290,7 +286,7 @@ ifneq (,$(filter isrpipe_read_timeout,$(USEMODULE)))
   USEMODULE += ztimer_usec
 endif
 
-ifneq (,$(filter sha1sum sha256sum,$(USEMODULE)))
+ifneq (,$(filter sha256sum,$(USEMODULE)))
   USEMODULE += vfs_util
   USEMODULE += hashes
 endif
