@@ -237,13 +237,6 @@ PSEUDOMODULES += gnrc_sixlowpan_router_default
 PSEUDOMODULES += gnrc_sock_async
 PSEUDOMODULES += gnrc_sock_check_reuse
 PSEUDOMODULES += gnrc_txtsnd
-## @defgroup pseudomodule_heap_cmd heap_cmd
-## @ingroup sys_shell_commands
-## @{
-## @deprecated  Use module `shell_cmd_heap` instead;
-##              will be removed after 2023.07 release.
-PSEUDOMODULES += heap_cmd
-## @}
 ## @defgroup pseudomodule_i2c_scan i2c_scan
 ## @ingroup sys_shell_commands
 ## @{
