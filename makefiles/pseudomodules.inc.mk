@@ -109,13 +109,6 @@ PSEUDOMODULES += gnrc_ipv6_nib_rio
 PSEUDOMODULES += gnrc_ipv6_nib_router
 PSEUDOMODULES += gnrc_ipv6_nib_rtr_adv_pio_cb
 PSEUDOMODULES += gnrc_lorawan_1_1
-## @defgroup net_gnrc_netdev_default  gnrc_netdev_default
-## @ingroup net_gnrc_netif
-## @{
-## @deprecated  Use module `netdev_default` with `gnrc` or a `gnrc` submodule
-##              instead; will be removed after 2022.07 release.
-PSEUDOMODULES += gnrc_netdev_default
-## @}
 PSEUDOMODULES += gnrc_neterr
 PSEUDOMODULES += gnrc_netapi_callbacks
 PSEUDOMODULES += gnrc_netapi_mbox
