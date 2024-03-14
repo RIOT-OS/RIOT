@@ -20,7 +20,7 @@ modules, if it exists.
 
 A few rarely needed shell commands that needs to be used in addition to the
 `shell_commands` and the module providing the C-API. Examples include
-`shell_cmd_nice`, `shell_cmd_gnrc_udp`, or `random_cmd`.
+`shell_cmd_nice`, `shell_cmd_gnrc_udp`, or `shell_random_cmd`.
 Consult the documentation of the modules to find out whether they have a
 shell integration and how to enable it.
  */

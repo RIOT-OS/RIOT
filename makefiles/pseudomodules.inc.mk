@@ -344,13 +344,6 @@ PSEUDOMODULES += psa_riot_hashes_sha_256
 PSEUDOMODULES += psa_riot_hashes_sha_512
 PSEUDOMODULES += psa_riot_hashes_hmac_sha256
 PSEUDOMODULES += fortuna_reseed
-## @defgroup pseudomodule_random_cmd random_cmd
-## @ingroup sys_shell_commands
-## @{
-## @deprecated  Use module `shell_cmd_random` instead;
-##              will be removed after 2023.07 release.
-PSEUDOMODULES += random_cmd
-## @}
 PSEUDOMODULES += riotboot_%
 PSEUDOMODULES += rtt_cmd
 PSEUDOMODULES += saul_adc

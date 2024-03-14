@@ -267,10 +267,6 @@ ifneq (,$(filter sha256sum,$(USEMODULE)))
   USEMODULE += shell_cmd_sha256sum
 endif
 
-ifneq (,$(filter random_cmd,$(USEMODULE)))
-  USEMODULE += shell_cmd_random
-endif
-
 ifneq (,$(filter shell_commands,$(USEMODULE)))
   # shell_commands has been renamed to shell_cmds_default, but let's keep this
   # for backward compatibility
