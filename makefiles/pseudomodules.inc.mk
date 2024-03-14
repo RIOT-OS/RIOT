@@ -286,13 +286,6 @@ PSEUDOMODULES += mpu_noexec_ram
 PSEUDOMODULES += pmp_noexec_ram
 ## @}
 
-## @defgroup pseudomodule_md5sum md5sum
-## @ingroup sys_shell_commands
-## @{
-## @deprecated  Use module `shell_cmd_md5sum` instead;
-##              will be removed after 2023.07 release.
-PSEUDOMODULES += md5sum
-## @}
 PSEUDOMODULES += mtd_write_page
 PSEUDOMODULES += nanocoap_%
 PSEUDOMODULES += nanocoap_fileserver_callback
