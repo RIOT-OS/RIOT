@@ -152,7 +152,6 @@ static void test_export_public_key_ed25519(void)
     psa_set_key_type(&key_attr, key_type);
 
     psa_key_id_t key_id2 = PSA_KEY_ID_NULL;
-    psa_set_key_type(&key_attr, key_type2);
 
     // randomly generate keypair
     TEST_ASSERT_PSA_CLEANUP(psa_crypto_init());
@@ -162,6 +161,7 @@ static void test_export_public_key_ed25519(void)
     TEST_ASSERT_PSA_CLEANUP(psa_export_public_key(key_id, pubkey, sizeof(pubkey), &pubkey_len));
 
     // import public key into single-key slot
+    psa_set_key_type(&key_attr, key_type2);
     TEST_ASSERT_PSA_CLEANUP(psa_import_key(&key_attr, pubkey, pubkey_len, &key_id2));
 
     // export public key from single slot using `psa_export_key()` and compare
