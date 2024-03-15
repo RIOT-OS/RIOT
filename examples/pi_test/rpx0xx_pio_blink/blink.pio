@@ -1,0 +1,22 @@
+;
+; Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
+;
+; SPDX-License-Identifier: BSD-3-Clause
+;
+
+.program blink
+
+.wrap_target
+begin:
+ set pins, 0    [31]
+ nop            [31]
+ nop            [31]
+ nop            [31]
+ nop            [31]
+ set pins, 1    [31]
+ nop            [31]
+ nop            [31]
+ nop            [31]
+ nop            [31]
+ jmp begin
+.wrap
