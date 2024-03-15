@@ -1,0 +1,4 @@
+INCLUDES += -I$(PKGDIRBASE)/driver_sen5x
+INCLUDES += -I$(RIOTPKG)/driver_sen5x/include
+
+DIRS += $(RIOTPKG)/driver_sen5x/contrib

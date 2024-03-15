@@ -1,0 +1,3 @@
+USEMODULE += driver_sen5x_contrib
+USEMODULE += periph_i2c
+USEMODULE += xtimer
