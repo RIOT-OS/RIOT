@@ -722,9 +722,9 @@ int nanocoap_sock_url_connect(const char *url, nanocoap_sock_t *sock)
     }
 
     if (is_coaps) {
-
+#if SOCK_HAS_IPV6
         /* tinydtls wants the interface to match */
-        if (!remote.netif &&
+        if (!remote.netif && sock_udp_ep_is_v6(&remote) &&
             ipv6_addr_is_link_local((ipv6_addr_t *)remote.addr.ipv6)) {
             netif_t *iface = netif_iter(NULL);
             if (iface == NULL) {
@@ -734,6 +734,12 @@ int nanocoap_sock_url_connect(const char *url, nanocoap_sock_t *sock)
         }
 
         sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
+        if (!sock_udp_ep_is_v6(&remote)) {
+            local.family = AF_INET;
+        }
+#else
+        sock_udp_ep_t local = SOCK_IPV4_EP_ANY;
+#endif
         return nanocoap_sock_dtls_connect(sock, &local, &remote, CONFIG_NANOCOAP_SOCK_DTLS_TAG);
     } else {
         return nanocoap_sock_connect(sock, NULL, &remote);
