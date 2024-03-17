@@ -44,18 +44,12 @@
 
 static const netdev_driver_t netdev_driver_w5500;
 
-static inline void send_addr(w5500_t *dev, uint16_t addr)
-{
-    spi_transfer_byte(dev->p.spi, dev->p.cs, true, (addr >> 8));
-    spi_transfer_byte(dev->p.spi, dev->p.cs, true, (addr & 0xff));
-}
-
 static uint8_t read_register(w5500_t *dev, uint16_t reg)
 {
     uint16_t address = reg & 0x07ff;
     uint8_t command = (uint8_t)((reg & 0xf800) >> 8u) | CMD_READ;
 
-    send_addr(dev, address);
+    spi_transfer_u16_be(dev->p.spi, dev->p.cs, true, address);
     spi_transfer_byte(dev->p.spi, dev->p.cs, true, command);
     return spi_transfer_byte(dev->p.spi, dev->p.cs, false, 0u);
 }
@@ -65,7 +59,7 @@ static void write_register(w5500_t *dev, uint16_t reg, uint8_t data)
     uint16_t address = reg & 0x07ff;
     uint8_t command = (uint8_t)((reg & 0xf800) >> 8u) | CMD_WRITE;
 
-    send_addr(dev, address);
+    spi_transfer_u16_be(dev->p.spi, dev->p.cs, true, address);
     spi_transfer_byte(dev->p.spi, dev->p.cs, true, command);
     spi_transfer_byte(dev->p.spi, dev->p.cs, false, data);
 }
@@ -90,7 +84,7 @@ static void read_chunk(w5500_t *dev, uint16_t addr, uint8_t *data, size_t len)
     uint16_t address = addr & 0x07ff;
     uint8_t command = (uint8_t)((addr & 0xf800) >> 8u) | CMD_READ;
 
-    send_addr(dev, address);
+    spi_transfer_u16_be(dev->p.spi, dev->p.cs, true, address);
     spi_transfer_byte(dev->p.spi, dev->p.cs, true, command);
     spi_transfer_bytes(dev->p.spi, dev->p.cs, false, NULL, data, len);
 }
@@ -100,7 +94,7 @@ static void write_chunk(w5500_t *dev, uint16_t addr, uint8_t *data, size_t len)
     uint16_t address = addr & 0x07ff;
     uint8_t command = (uint8_t)((addr & 0xf800) >> 8u) | CMD_WRITE;
 
-    send_addr(dev, address);
+    spi_transfer_u16_be(dev->p.spi, dev->p.cs, true, address);
     spi_transfer_byte(dev->p.spi, dev->p.cs, true, command);
     spi_transfer_bytes(dev->p.spi, dev->p.cs, false, data, NULL, len);
 }
@@ -110,7 +104,7 @@ static void extint(void *arg)
     w5500_t *dev = (w5500_t *)arg;
 
     netdev_trigger_event_isr(&dev->netdev);
-    if (!gpio_is_valid(dev->p.evt)) {
+    if (!gpio_is_valid(dev->p.irq)) {
         /* restart timer if we are polling */
         (void)ztimer_set(ZTIMER_MSEC, &dev->timerInstance, dev->p.polling_interval_ms);
     }
@@ -134,9 +128,9 @@ void w5500_setup(w5500_t *dev, const w5500_params_t *params, uint8_t index)
 
     /* Initialize the chip select pin. */
     spi_init_cs(dev->p.spi, dev->p.cs);
-    if (gpio_is_valid(dev->p.evt)) {
+    if (gpio_is_valid(dev->p.irq)) {
         /* Initialize the external interrupt pin. */
-        gpio_init_int(dev->p.evt, GPIO_IN, GPIO_FALLING, extint, dev);
+        gpio_init_int(dev->p.irq, GPIO_IN, GPIO_FALLING, extint, dev);
     }
     netdev_register(&dev->netdev, NETDEV_W5500, index);
 }
@@ -187,10 +181,10 @@ static int init(netdev_t *netdev)
     write_register(dev, REG_SIPR2, 0x00);
     write_register(dev, REG_SIPR3, 0x00);
 
-    if (!gpio_is_valid(dev->p.evt)) {
+    if (!gpio_is_valid(dev->p.irq)) {
         dev->timerInstance.callback = extint;
         dev->timerInstance.arg = dev;
-        (void)ztimer_set(ZTIMER_MSEC, &dev->timerInstance, dev->p.polling_interval_ms);
+        ztimer_set(ZTIMER_MSEC, &dev->timerInstance, dev->p.polling_interval_ms);
     }
     else {
         /* Configure interrupt pin to trigger on socket 0 events. */
@@ -206,7 +200,7 @@ static int init(netdev_t *netdev)
 
 static void write_tx0_buffer(w5500_t *dev, uint16_t address, uint8_t *data, uint16_t size)
 {
-    send_addr(dev, address);
+    spi_transfer_u16_be(dev->p.spi, dev->p.cs, true, address);
     spi_transfer_byte(dev->p.spi, dev->p.cs, true, SOCKET0_TX_BUFFER | CMD_WRITE);
 
     spi_transfer_bytes(dev->p.spi, dev->p.cs, false, data, NULL, size);
@@ -294,7 +288,7 @@ static int confirm_send(netdev_t *netdev, void *info)
 
 static void read_rx0_buffer(w5500_t *dev, uint16_t address, uint8_t *data, uint16_t size)
 {
-    send_addr(dev, address);
+    spi_transfer_u16_be(dev->p.spi, dev->p.cs, true, address);
     spi_transfer_byte(dev->p.spi, dev->p.cs, true, SOCKET0_RX_BUFFER);
 
     spi_transfer_bytes(dev->p.spi, dev->p.cs, false, NULL, data, size);

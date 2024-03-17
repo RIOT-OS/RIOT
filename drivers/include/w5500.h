@@ -53,7 +53,7 @@ typedef struct {
     spi_t spi;                    /**< SPI bus used */
     spi_clk_t clk;                /**< clock speed used on the selected SPI bus */
     gpio_t cs;                    /**< pin connected to the chip select line */
-    gpio_t evt;                   /**< pin connected to the INT line */
+    gpio_t irq;                   /**< pin connected to the INT line */
     uint32_t polling_interval_ms; /**< interval for polling, 0 if interrupt mode */
 } w5500_params_t;
 
