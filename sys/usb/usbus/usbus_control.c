@@ -291,9 +291,11 @@ static int _recv_interface_setup(usbus_t *usbus, usb_setup_t *pkt)
     usbus_control_handler_t *ep0_handler =
         (usbus_control_handler_t *)usbus->control;
     uint16_t destination = pkt->index & 0x0f;
+    uint8_t type_mask = pkt->type & USB_SETUP_REQUEST_TYPE_MASK;
 
     /* Globally handle the iface get status request */
-    if (pkt->request == USB_SETUP_REQ_GET_STATUS) {
+    if (pkt->request == USB_SETUP_REQ_GET_STATUS &&
+        type_mask == USB_SETUP_REQUEST_TYPE_STANDARD) {
         return _req_iface_status(usbus);
     }
 
