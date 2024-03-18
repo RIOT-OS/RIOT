@@ -11,11 +11,11 @@ from testrunner import run
 
 
 def testfunc(child):
-    child.expect('Available timers: (\d+)')
+    child.expect(r"Available timers: (\d+)")
     timers_num = int(child.match.group(1))
     for timer in range(timers_num):
-        child.expect_exact('Testing TIMER_DEV(%u)' % (timer, ))
-        child.expect('TIMER_DEV\(%u\) running at \d+ Hz' % (timer, ))
+        child.expect_exact(r"Testing TIMER_DEV(%u)" % (timer, ))
+        child.expect(r"TIMER_DEV\(%u\) running at \d+ Hz" % (timer, ))
     child.expect('TEST SUCCEEDED')
 
 

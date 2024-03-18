@@ -47,6 +47,7 @@ static void cb_incr(void *arg, int chan)
 {
     (void)chan;
     test_ctx_t *ctx = arg;
+
     ctx->counter++;
     if (ctx->counter < TEST_ITERATIONS) {
         /* Rescheduling the timer like this will trigger a bug in the lptmr
@@ -64,7 +65,7 @@ static const unsigned long timer_freqs[] = {
     250000ul,
     32768ul,
     1000ul,
-    };
+};
 
 static int test_timer(unsigned num)
 {
@@ -76,7 +77,8 @@ static int test_timer(unsigned num)
         .mtx = MUTEX_INIT_LOCKED
     };
     int res;
-    for (unsigned k = 0; k < sizeof(timer_freqs) / sizeof(timer_freqs[0]); ++k) {
+
+    for (unsigned k = 0; k < ARRAY_SIZE(timer_freqs); ++k) {
         res = timer_init(ctx.dev, timer_freqs[k], cb_incr, &ctx);
         if (res >= 0) {
             printf("TIMER_DEV(%u) running at %lu Hz\n", num, timer_freqs[k]);
@@ -98,7 +100,8 @@ static int test_timer(unsigned num)
     printf("(debug) TIMER_DEV(%u) switches: %lu\n", num, switches);
     /* verify results */
     if (ctx.counter != TEST_ITERATIONS) {
-        printf("TIMER_DEV(%u) counter mismatch, expected: %lu, actual: %lu\n", num, TEST_ITERATIONS, ctx.counter);
+        printf("TIMER_DEV(%u) counter mismatch, expected: %lu, actual: %lu\n",
+               num, TEST_ITERATIONS, ctx.counter);
         return 0;
     }
     return 1;
