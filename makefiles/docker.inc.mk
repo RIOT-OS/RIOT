@@ -12,7 +12,7 @@ export DOCKER_MAKECMDGOALS_POSSIBLE = \
   #
 export DOCKER_MAKECMDGOALS = $(filter $(DOCKER_MAKECMDGOALS_POSSIBLE),$(MAKECMDGOALS))
 
-# special version "none" refers to "not existing". 
+# special version "none" refers to "not existing".
 COMPATIBLE_RIOTBUILD_VERSIONS := \
 	b6af289bf59df73766d685d0df8b8aa98d4fd07b19457699a8a946d204a3405d \
 	#
