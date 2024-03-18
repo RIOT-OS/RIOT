@@ -59,16 +59,11 @@
 #define STX 0x2
 #endif
 
-static enum {
-    NEWLINE_CR   = 2,
-    NEWLINE_NL   = 3,
-    NEWLINE_CRNL = 4,
-} _line_end = NEWLINE_NL;
-static const uint8_t newline[] = { '\r', '\n' };
+static char *_endline = "\n";
 
 static void _write_newline(uart_t dev)
 {
-    uart_write(dev, &newline[_line_end & 1], _line_end >> 1);
+    uart_write(dev, (uint8_t *)_endline, strlen(_endline));
 }
 
 typedef struct {
@@ -197,7 +192,10 @@ static void *printer(void *arg)
         do {
             c = (int)ringbuffer_get_one(&(ctx[dev].rx_buf));
             if (c == '\n') {
-                puts("]\\n");
+                printf("\\n");
+            }
+            else if (c == '\r') {
+                printf("\\r");
             }
             else if (c >= ' ' && c <= '~') {
                 printf("%c", c);
@@ -206,6 +204,7 @@ static void *printer(void *arg)
                 printf("0x%02x", (unsigned char)c);
             }
         } while (c != '\n');
+        puts("]");
     }
 
     /* this should never be reached */
@@ -372,25 +371,27 @@ static int cmd_test(int argc, char **argv)
     return 0;
 }
 
-static int cmd_newline(int argc, char **argv)
+static int cmd_eol_cr(int argc, char **argv)
 {
-    static const char *modes[] = {
-        "<CR>", "<NL>", "<CR><NL>"
-    };
+    (void)argc;
+    (void)argv;
+    _endline = "\r";
+    return 0;
+}
 
-    if (argc > 1) {
-        int sel = atoi(argv[1]);
-        if (sel < 3) {
-            _line_end = sel + NEWLINE_CR;
-        }
-    }
+static int cmd_eol_lf(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+    _endline = "\n";
+    return 0;
+}
 
-    for (unsigned i = 0; i < ARRAY_SIZE(modes); ++i) {
-        char selected = (unsigned)_line_end - NEWLINE_CR == i
-                      ? '>' : ' ';
-        printf("%c%u: %s\n", selected, i, modes[i]);
-    }
-
+static int cmd_eol_crlf(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+    _endline = "\r\n";
     return 0;
 }
 
@@ -401,7 +402,9 @@ static const shell_command_t shell_commands[] = {
 #endif
     { "send", "Send a string through given UART device", cmd_send },
     { "test", "Run an automated test on a UART with RX and TX connected", cmd_test },
-    { "nl", "Set line ending", cmd_newline },
+    { "eol_cr", "Set CR as the end-of-line for send", cmd_eol_cr },
+    { "eol_crlf", "Set CRLF as the end-of-line for send", cmd_eol_crlf },
+    { "eol_lf", "Set LF as the end-of-line for send (default)", cmd_eol_lf },
     { NULL, NULL, NULL }
 };
 
