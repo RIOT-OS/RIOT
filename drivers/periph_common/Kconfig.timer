@@ -46,5 +46,5 @@ menuconfig KCONFIG_USEMODULE_PERIPH_TIMER
 
 # Include CPU specific configurations
 if KCONFIG_USEMODULE_PERIPH_TIMER
-osource "$(RIOTCPU)/$(CPU)/periph/Kconfig.timer"
+osource "$(CPUDIR)/periph/Kconfig.timer"
 endif

@@ -1,5 +1,5 @@
 # Add search path for linker scripts
-LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts
+LINKFLAGS += -L$(CPUDIR)/ldscripts
 LINKER_SCRIPT = qn908x.ld
 
 # Internal FLASH memory is located at address 0x0100000, aliased to address
@@ -34,6 +34,6 @@ CFLAGS += \
 # some files from the include/vendor directory directly so we need to add that
 # include path here.
 PSEUDOMODULES += vendor_%
-INCLUDES += -I$(RIOTCPU)/$(CPU)/include/vendor
+INCLUDES += -I$(CPUDIR)/include/vendor
 
 include $(RIOTMAKE)/arch/cortexm.inc.mk

@@ -14,7 +14,7 @@ ifeq (K, $(KINETIS_SERIES))
 endif
 
 # Add search path for linker scripts
-LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts
+LINKFLAGS += -L$(CPUDIR)/ldscripts
 
 # Use generic linker script for all Kinetis based CPUs
 LINKER_SCRIPT = kinetis.ld

@@ -7,8 +7,8 @@ SUBMODULES_NOFORCE := 1
 
 CFLAGS  += -Wno-unused-parameter -Wno-sign-compare
 INCLUDES += \
-    -I$(RIOTCPU)/$(CPU)/include/vendor/ \
-    -I$(RIOTCPU)/$(CPU)/include/vendor/drivers/ \
+    -I$(CPUDIR)/include/vendor/ \
+    -I$(CPUDIR)/include/vendor/drivers/ \
     #
 
 include $(RIOTBASE)/Makefile.base

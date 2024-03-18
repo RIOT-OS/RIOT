@@ -120,9 +120,9 @@ PSEUDOMODULES += esp_spi_oct
 PSEUDOMODULES += esp_wifi_enterprise
 PSEUDOMODULES += stdio_usb_serial_jtag_rx
 
-INCLUDES += -I$(RIOTCPU)/$(CPU)/esp-idf/include
-INCLUDES += -I$(RIOTCPU)/$(CPU)/esp-idf/include/log
-INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/include
+INCLUDES += -I$(CPUDIR)/esp-idf/include
+INCLUDES += -I$(CPUDIR)/esp-idf/include/log
+INCLUDES += -I$(CPUDIR)/vendor/include
 
 INCLUDES += -I$(ESP32_SDK_DIR)/components
 INCLUDES += -I$(ESP32_SDK_DIR)/components/bootloader_support/include
@@ -160,7 +160,7 @@ ifneq (,$(filter esp_ble,$(USEMODULE)))
 endif
 
 ifneq (,$(filter esp_ble_nimble,$(USEMODULE)))
-  INCLUDES += -I$(RIOTCPU)/$(CPU)/include/esp_ble_nimble
+  INCLUDES += -I$(CPUDIR)/include/esp_ble_nimble
   INCLUDES += $(NIMIBASE)/nimble/transport/common/hci_h4/include
 endif
 
@@ -195,7 +195,7 @@ ifneq (,$(filter esp_wifi_enterprise,$(USEMODULE)))
 endif
 
 ifneq (,$(filter esp_eth,$(USEMODULE)))
-  INCLUDES += -I$(RIOTCPU)/$(CPU)/esp-eth
+  INCLUDES += -I$(CPUDIR)/esp-eth
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_eth/include
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_event/include
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_netif/include
@@ -262,7 +262,7 @@ ifneq (,$(filter xtensa%,$(TARGET_ARCH)))
   ARCHIVES += -lxt_hal
 endif
 
-LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ld/$(CPU_FAM)/
+LINKFLAGS += -L$(CPUDIR)/ld/$(CPU_FAM)/
 
 LINKFLAGS += -T$(BINDIR)/memory.ld
 LINKFLAGS += -T$(BINDIR)/sections.ld
@@ -351,11 +351,11 @@ endif
 
 LD_SCRIPTS += $(BINDIR)/memory.ld $(BINDIR)/sections.ld
 
-$(BINDIR)/memory.ld: $(RIOTCPU)/$(CPU)/ld/$(CPU_FAM)/memory.ld.in \
+$(BINDIR)/memory.ld: $(CPUDIR)/ld/$(CPU_FAM)/memory.ld.in \
                      $(BINDIR)/riotbuild/riotbuild.h pkg-prepare
 	$(Q)$(CC) -DLD_FILE_GEN $(INCLUDES) -include '$(BINDIR)/riotbuild/riotbuild.h' \
-				-I$(RIOTCPU)/$(CPU)/ld -P -x c -E $< -o $@
-$(BINDIR)/sections.ld: $(RIOTCPU)/$(CPU)/ld/$(CPU_FAM)/sections.ld.in \
+				-I$(CPUDIR)/ld -P -x c -E $< -o $@
+$(BINDIR)/sections.ld: $(CPUDIR)/ld/$(CPU_FAM)/sections.ld.in \
                        $(BINDIR)/riotbuild/riotbuild.h pkg-prepare
 	$(Q)$(CC) -DLD_FILE_GEN -include '$(BINDIR)/riotbuild/riotbuild.h' -C -P -x c -E $< -o $@
 

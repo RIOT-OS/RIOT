@@ -22,20 +22,20 @@ TARGET_ARCH ?= $(TARGET_ARCH_ESP8266)
 
 PSEUDOMODULES += esp_sw_timer
 
-INCLUDES += -I$(RIOTCPU)/$(CPU)
-INCLUDES += -I$(RIOTCPU)/$(CPU)/include
-INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor
-INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/
-INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/bootloader_support/include
-INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/esp8266/include
-INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/esp8266/include/esp8266
-INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/heap/include
-INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/log/include
+INCLUDES += -I$(CPUDIR)
+INCLUDES += -I$(CPUDIR)/include
+INCLUDES += -I$(CPUDIR)/vendor
+INCLUDES += -I$(CPUDIR)/vendor/esp-idf/
+INCLUDES += -I$(CPUDIR)/vendor/esp-idf/bootloader_support/include
+INCLUDES += -I$(CPUDIR)/vendor/esp-idf/esp8266/include
+INCLUDES += -I$(CPUDIR)/vendor/esp-idf/esp8266/include/esp8266
+INCLUDES += -I$(CPUDIR)/vendor/esp-idf/heap/include
+INCLUDES += -I$(CPUDIR)/vendor/esp-idf/log/include
 
 CFLAGS += -D__ESP_FILE__=__FILE__
 
 ifneq (,$(filter esp_gdbstub,$(USEMODULE)))
-  GDBSTUB_DIR ?= $(RIOTCPU)/$(CPU)/vendor/esp-gdbstub
+  GDBSTUB_DIR ?= $(CPUDIR)/vendor/esp-gdbstub
   CFLAGS += -DGDBSTUB_BREAK_ON_INIT=1
   INCLUDES += -I$(GDBSTUB_DIR)
 endif
@@ -46,7 +46,7 @@ endif
 
 ARCHIVES += -lgcc -lhal -lwpa -lcore -lnet80211 -lphy -lpp -lstdc++
 
-LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ld
+LINKFLAGS += -L$(CPUDIR)/ld
 LINKFLAGS += -Tesp8266.rom.ld
 LINKFLAGS += -Tesp8266.riot-os.ld
 LINKFLAGS += -Tesp8266.peripherals.ld

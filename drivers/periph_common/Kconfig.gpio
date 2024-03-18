@@ -58,4 +58,4 @@ config MODULE_PERIPH_INIT_GPIO_TAMPER_WAKE
 
 endif # MODULE_PERIPH_GPIO
 
-osource "$(RIOTCPU)/$(CPU)/periph/Kconfig.gpio"
+osource "$(CPUDIR)/periph/Kconfig.gpio"

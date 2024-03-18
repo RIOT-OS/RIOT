@@ -20,9 +20,9 @@ PROGRAMMERS_SUPPORTED += openocd
 # wdog-disable.bin is a precompiled binary which will disable the watchdog and
 # return control to the debugger (OpenOCD)
 OPENOCD_PRE_VERIFY_CMDS += \
-  -c 'load_image $(RIOTCPU)/$(CPU)/dist/wdog-disable.bin 0x20000000 bin' \
+  -c 'load_image $(CPUDIR)/dist/wdog-disable.bin 0x20000000 bin' \
   -c 'resume 0x20000000'
-OPENOCD_PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield.sh
+OPENOCD_PRE_FLASH_CHECK_SCRIPT = $(CPUDIR)/dist/check-fcfield.sh
 
 OPENOCD_DEBUG_ADAPTER ?= dap
 
