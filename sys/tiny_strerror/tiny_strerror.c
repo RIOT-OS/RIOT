@@ -220,7 +220,6 @@ const char *tiny_strerror(int errnum)
      * behind the "-". This way the strings do not have to be allocated twice
      * (once with and once without minus char).
      */
-    const char *retval = "-unknown";
     unsigned offset = 1;
 
     if (IS_USED(MODULE_TINY_STRERROR_MINIMAL)) {
@@ -234,18 +233,19 @@ const char *tiny_strerror(int errnum)
         errnum = -errnum;
     }
 
-    if (((unsigned)errnum < ARRAY_SIZE(lookup))
-            && (lookup[(unsigned)errnum] != NULL)) {
-        retval = lookup[(unsigned)errnum];
+    if (((unsigned)errnum >= ARRAY_SIZE(lookup))
+            || (lookup[(unsigned)errnum] == NULL)) {
+        const char *errstr = "-unknown";
+        return errstr + offset;
     }
 
-    if (IS_ACTIVE(HAS_FLASH_UTILS_ARCH)) {
-        static char buf[16];
-        flash_strncpy(buf, retval + offset, sizeof(buf));
-        return buf;
-    }
-
-    return retval + offset;
+#if IS_ACTIVE(HAS_FLASH_UTILS_ARCH)
+    static char buf[16];
+    flash_strncpy(buf, lookup[(unsigned)errnum] + offset, sizeof(buf));
+    return buf;
+#else
+    return lookup[(unsigned)errnum] + offset;
+#endif
 }
 
 #if IS_USED(MODULE_TINY_STRERROR_AS_STRERROR)
