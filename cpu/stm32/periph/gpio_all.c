@@ -22,6 +22,7 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Katja Kirstein <katja.kirstein@haw-hamburg.de>
  * @author      Vincent Dupont <vincent@otakeys.com>
+ * @author      Joshua DeWeese <jdeweese@primecontrols.com>
  *
  * @}
  */
@@ -98,19 +99,23 @@ static inline int _pin_num(gpio_t pin)
 static inline void port_init_clock(GPIO_TypeDef *port, gpio_t pin)
 {
     (void)port; /* <-- Only used for when port G requires special handling */
-#if defined(CPU_FAM_STM32F0) || defined (CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L1)
+
+#if defined(RCC_AHBENR_GPIOAEN)
     periph_clk_en(AHB, (RCC_AHBENR_GPIOAEN << _port_num(pin)));
-#elif defined (CPU_FAM_STM32L0) || defined(CPU_FAM_STM32G0) || \
-    defined(CPU_FAM_STM32C0)
-    periph_clk_en(IOP, (RCC_IOPENR_GPIOAEN << _port_num(pin)));
-#elif defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
-      defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L5) || \
-      defined(CPU_FAM_STM32U5) || defined (CPU_FAM_STM32WL)
-#if defined(CPU_FAM_STM32U5)
-    periph_clk_en(AHB2, (RCC_AHB2ENR1_GPIOAEN << _port_num(pin)));
-#else
+#elif defined(RCC_AHB1ENR_GPIOAEN)
+    periph_clk_en(AHB1, (RCC_AHB1ENR_GPIOAEN << _port_num(pin)));
+#elif defined(RCC_AHB2ENR_GPIOAEN)
     periph_clk_en(AHB2, (RCC_AHB2ENR_GPIOAEN << _port_num(pin)));
+#elif defined(RCC_AHB2ENR1_GPIOAEN)
+    periph_clk_en(AHB2, (RCC_AHB2ENR1_GPIOAEN << _port_num(pin)));
+#elif defined(RCC_MC_AHB4ENSETR_GPIOAEN)
+    periph_clk_en(AHB4, (RCC_MC_AHB4ENSETR_GPIOAEN << _port_num(pin)));
+#elif defined (RCC_IOPENR_GPIOAEN)
+    periph_clk_en(IOP, (RCC_IOPENR_GPIOAEN << _port_num(pin)));
+#else
+    #error "GPIO periph clock undefined"
 #endif
+
 #ifdef PWR_CR2_IOSV
     if (port == GPIOG) {
         /* Port G requires external power supply */
@@ -118,11 +123,6 @@ static inline void port_init_clock(GPIO_TypeDef *port, gpio_t pin)
         PWR->CR2 |= PWR_CR2_IOSV;
     }
 #endif /* PWR_CR2_IOSV */
-#elif defined(CPU_FAM_STM32MP1)
-    periph_clk_en(AHB4, (RCC_MC_AHB4ENSETR_GPIOAEN << _port_num(pin)));
-#else
-    periph_clk_en(AHB1, (RCC_AHB1ENR_GPIOAEN << _port_num(pin)));
-#endif
 }
 
 static inline void set_mode(GPIO_TypeDef *port, int pin_num, unsigned mode)
@@ -172,22 +172,22 @@ void gpio_init_analog(gpio_t pin)
 {
     /* enable clock, needed as this function can be used without calling
      * gpio_init first */
-#if defined(CPU_FAM_STM32F0) || defined (CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L1)
+#if defined(RCC_AHBENR_GPIOAEN)
     periph_clk_en(AHB, (RCC_AHBENR_GPIOAEN << _port_num(pin)));
-#elif defined (CPU_FAM_STM32L0) || defined(CPU_FAM_STM32G0) || \
-    defined(CPU_FAM_STM32C0)
-    periph_clk_en(IOP, (RCC_IOPENR_GPIOAEN << _port_num(pin)));
-#elif defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
-      defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L5) || \
-      defined (CPU_FAM_STM32WL)
-    periph_clk_en(AHB2, (RCC_AHB2ENR_GPIOAEN << _port_num(pin)));
-#elif defined(CPU_FAM_STM32U5)
-    periph_clk_en(AHB2, (RCC_AHB2ENR1_GPIOAEN << _port_num(pin)));
-#elif defined(CPU_FAM_STM32MP1)
-    periph_clk_en(AHB4, (RCC_MC_AHB4ENSETR_GPIOAEN << _port_num(pin)));
-#else
+#elif defined(RCC_AHB1ENR_GPIOAEN)
     periph_clk_en(AHB1, (RCC_AHB1ENR_GPIOAEN << _port_num(pin)));
+#elif defined(RCC_AHB2ENR_GPIOAEN)
+    periph_clk_en(AHB2, (RCC_AHB2ENR_GPIOAEN << _port_num(pin)));
+#elif defined(RCC_AHB2ENR1_GPIOAEN)
+    periph_clk_en(AHB2, (RCC_AHB2ENR1_GPIOAEN << _port_num(pin)));
+#elif defined(RCC_MC_AHB4ENSETR_GPIOAEN)
+    periph_clk_en(AHB4, (RCC_MC_AHB4ENSETR_GPIOAEN << _port_num(pin)));
+#elif defined (RCC_IOPENR_GPIOAEN)
+    periph_clk_en(IOP, (RCC_IOPENR_GPIOAEN << _port_num(pin)));
+#else
+    #error "GPIO periph clock undefined"
 #endif
+
     /* set to analog mode, PUPD has to be 0b00 */
     _port(pin)->MODER |= (0x3 << (2 * _pin_num(pin)));
     _port(pin)->PUPDR &= ~(0x3 << (2 * _pin_num(pin)));
