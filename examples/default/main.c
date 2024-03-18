@@ -25,7 +25,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "thread.h"
 #include "shell.h"
 
 #ifdef MODULE_NETIF
