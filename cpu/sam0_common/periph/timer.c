@@ -261,6 +261,63 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
     return 0;
 }
 
+int timer_set(tim_t tim, int channel, unsigned timeout)
+{
+    DEBUG("Setting timer %i channel %i to now + %i\n", tim, channel, timeout);
+
+    unsigned max = UINT16_MAX;
+    const uint16_t flags = timer_config[tim].flags;
+
+    if (flags & TC_CTRLA_MODE_COUNT32) {
+        max = UINT32_MAX;
+    }
+
+    if (flags & TC_CTRLA_MODE_COUNT8) {
+        max = UINT8_MAX;
+    }
+
+    unsigned irq_state = irq_disable();
+    unsigned value = timeout + timer_read(tim);
+
+    /* set timeout value */
+    switch (channel) {
+    case 0:
+        dev(tim)->INTFLAG.reg = TC_INTFLAG_MC0;
+        _set_cc(tim, 0, value);
+        dev(tim)->INTENSET.reg = TC_INTENSET_MC0;
+        break;
+    case 1:
+        dev(tim)->INTFLAG.reg = TC_INTFLAG_MC1;
+        _set_cc(tim, 1, value);
+        dev(tim)->INTENSET.reg = TC_INTENSET_MC1;
+        break;
+    default:
+        return -1;
+    }
+
+    set_oneshot(tim, channel);
+
+    if (((value - timer_read(tim)) & max) > timeout) {
+        /* timer already fired, check if IRQ flag is set */
+        uint32_t mask = (channel == 0) ? TC_INTFLAG_MC0 : TC_INTFLAG_MC1;
+        if (!(mask & dev(tim)->INTFLAG.reg)) {
+            /* Hack: We stop the timer when setting the target to avoid a race.
+             * Sadly, the count is lost on stop, so we need to restore it
+             * afterwards. We add one to risk rather jumping over one tick
+             * rather than having the clock going backwards by one time */
+            unsigned now = timer_read(tim);
+            timer_stop(tim);
+            dev(tim)->COUNT.reg = now + 1;
+            _set_cc(tim, channel, now + 2);
+            timer_start(tim);
+        }
+    }
+
+    irq_restore(irq_state);
+
+    return 0;
+}
+
 int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags)
 {
     DEBUG("Setting timer %i channel %i to %i (repeating)\n", tim, channel, value);
@@ -345,7 +402,7 @@ unsigned int timer_read(tim_t tim)
 
         The problem was observed on SAME54.
       */
-    while(dev(tim)->CTRLBSET.bit.CMD == TC_CTRLBSET_CMD_READSYNC_Val) {}
+    while (dev(tim)->CTRLBSET.bit.CMD == TC_CTRLBSET_CMD_READSYNC_Val) {}
 #else
     dev(tim)->READREQ.reg = TC_READREQ_RREQ | TC_READREQ_ADDR(TC_COUNT32_COUNT_OFFSET);
 #endif
