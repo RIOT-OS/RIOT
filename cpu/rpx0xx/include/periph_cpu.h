@@ -400,6 +400,34 @@ typedef struct {
 } adc_conf_t;
 
 /**
+ * @brief   Number of slices available per PWM device
+ */
+#define PWM_SLICE_NUMOF   (8)
+
+/**
+ * @brief   Number of channels available per slice
+ */
+#define PWM_CHANNEL_NUMOF (2)
+
+/**
+ * @brief   PWM channel
+ */
+typedef struct {
+    gpio_t pin;             /**< GPIO pin mapped to this channel */
+    uint8_t cc_chan;        /**< capture compare channel used */
+} pwm_chan_t;
+
+/**
+ * @brief   PWM device configuration data structure
+ */
+typedef struct {
+    uint8_t pwm_slice;                      /**< PWM slice instance,
+                                                must be < to PWM_SLICE_NUMOF */
+    pwm_chan_t chan[PWM_CHANNEL_NUMOF];     /**< channel mapping set to
+                                                 {GPIO_UNDEF, 0} if not used */
+} pwm_conf_t;
+
+/**
  * @brief   Configuration details for an UART interface needed by the RPX0XX peripheral
  */
 typedef struct {
