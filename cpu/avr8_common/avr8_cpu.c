@@ -27,7 +27,6 @@
  */
 
 #include <avr/io.h>
-#include <avr/wdt.h>
 #include <avr/pgmspace.h>
 
 #include "cpu.h"
@@ -75,7 +74,7 @@ uint8_t avr8_state_irq_count_sram = 0;
 uint8_t avr8_state_uart_sram = 0;
 #endif
 
-void get_mcusr(void) __attribute__((naked, section(".init0"), used));
+void get_mcusr(void) __attribute__((section(".init0"), used));
 
 void get_mcusr(void)
 {

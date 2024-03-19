@@ -32,16 +32,18 @@
 #ifndef CPU_H
 #define CPU_H
 
-#include <stdio.h>
+#include <avr/io.h>
+#include <avr/sfr_defs.h>
 #include <stdint.h>
+#include <stdio.h>
 
-#include <avr/interrupt.h>
 #include "architecture.h"
-#include "cpu_conf.h"
 #include "cpu_clock.h"
+#include "cpu_conf.h"
+#include "macros/xtstr.h"
 #include "sched.h"
-#include "thread.h"
 #include "states_internal.h"
+#include "thread.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -61,6 +63,112 @@ extern "C"
  * @brief   CPU cycles per busy wait loop
  */
 #define CPU_CYCLES_PER_LOOP (7)
+
+/**
+ * @name    Manually provide ISR() macro for LLVM compatibility
+ * @{
+ */
+#define ISR_BLOCK
+#define ISR_NOBLOCK    __attribute__((interrupt))
+#define ISR_NAKED      __attribute__((naked))
+#define ISR_ALIASOF(v) __attribute__((alias(XTSTR(v))))
+
+#if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 1) || (__GNUC__ > 4)) && !defined(__clang__)
+#  define __INTR_ATTRS used, externally_visible
+#else /* GCC < 4.1 or LLVM */
+#  define __INTR_ATTRS used
+#endif
+
+#ifdef __cplusplus
+#  define ISR(vector, ...)            \
+    extern "C" void vector (void) __attribute__ ((signal,__INTR_ATTRS)) __VA_ARGS__; \
+    void vector (void)
+#else
+#  define ISR(vector, ...)            \
+    void vector (void) __attribute__ ((signal,__INTR_ATTRS)) __VA_ARGS__; \
+    void vector (void)
+#endif
+
+/** @} */
+
+/**
+ * @name    Manually provide IRQ helpers for LLVM compatibility
+ * @{
+ */
+#define sei()   __asm__ __volatile__ ("sei" ::: "memory")
+#define cli()   __asm__ __volatile__ ("cli" ::: "memory")
+/** @} */
+
+
+/**
+ * @name    Manually provide used WDT stuff for compatibility with LLVM
+ * @{
+ */
+#define WDTO_250MS  4
+
+#if defined(WDTCSR)
+#  define _WD_CONTROL_REG     WDTCSR
+#elif defined(WDTCR)
+#  define _WD_CONTROL_REG     WDTCR
+#else
+#  define _WD_CONTROL_REG     WDT
+#endif
+
+#if defined(WDTOE)
+#define _WD_CHANGE_BIT      WDTOE
+#else
+#define _WD_CHANGE_BIT      WDCE
+#endif
+
+#if defined(WDP3)
+# define _WD_PS3_MASK       _BV(WDP3)
+#else
+# define _WD_PS3_MASK       0x00
+#endif
+
+#define wdt_reset() __asm__ volatile ("wdr" : : :)
+
+static inline
+__attribute__((__always_inline__))
+void wdt_enable (const uint8_t value)
+{
+    __asm__ volatile (
+            "in r0,0x3f" "\n\t"
+            "cli" "\n\t"
+            "wdr" "\n\t"
+            "sts %0, %1" "\n\t"
+            "out 0x3f,r0" "\n\t"
+            "sts %0, %2" "\n \t"
+            : /* no outputs */
+            : "n" (_SFR_MEM_ADDR(_WD_CONTROL_REG)),
+            "r" ((uint8_t)(_BV(_WD_CHANGE_BIT) | _BV(WDE))),
+            "r" ((uint8_t) ((value & 0x08 ? _WD_PS3_MASK : 0x00) |
+                    _BV(WDE) | (value & 0x07)) )
+            : "r0"
+    );
+}
+
+static inline
+__attribute__ ((__always_inline__))
+void wdt_disable (void)
+{
+    register uint8_t temp_reg;
+    __asm__ __volatile__ (
+        "in r0,0x3f"    "\n\t"
+        "cli"                        "\n\t"
+        "wdr"                        "\n\t"
+        "lds %[TEMPREG],%[WDTREG]"   "\n\t"
+        "ori %[TEMPREG],%[WDCE_WDE]" "\n\t"
+        "sts %[WDTREG],%[TEMPREG]"   "\n\t"
+        "sts %[WDTREG],r1" "\n\t"
+        "out 0x3f,r0"   "\n\t"
+        : [TEMPREG] "=d" (temp_reg)
+        : [WDTREG]  "n"  (_SFR_MEM_ADDR(_WD_CONTROL_REG)),
+        [WDCE_WDE]  "n"  ((uint8_t)(_BV(_WD_CHANGE_BIT) | _BV(WDE)))
+        : "r0"
+    );
+}
+/** @} */
 
 /**
  * @name    Use shared I2C functions
@@ -140,6 +248,11 @@ void avr8_clk_init(void);
  */
 static inline uinttxtptr_t __attribute__((always_inline)) cpu_get_caller_pc(void)
 {
+#if __clang__
+    /* TODO: On LLVM allocation of an output register fails when the variable
+     * is larger than the register */
+    return 0;
+#else
         uinttxtptr_t addr;
     __asm__ volatile(
         "ldi %D[dest], 0"                   "\n\t"
@@ -165,6 +278,7 @@ static inline uinttxtptr_t __attribute__((always_inline)) cpu_get_caller_pc(void
      * the byte position, rather than the (16 bit) instruction position */
     addr = (addr - 1 ) * 2;
     return addr;
+#endif
 }
 
 /**

@@ -25,7 +25,6 @@
  */
 
 #include <assert.h>
-#include <avr/interrupt.h>
 
 #include "board.h"
 #include "cpu.h"

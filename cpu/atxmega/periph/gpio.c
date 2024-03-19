@@ -19,7 +19,6 @@
  * @}
  */
 
-#include <avr/interrupt.h>
 #include <stdio.h>
 
 #include "bitarithm.h"

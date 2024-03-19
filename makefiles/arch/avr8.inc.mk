@@ -38,6 +38,11 @@ ifeq ($(LTO),1)
   LINKFLAGS += -Wno-error
 endif
 
+ifneq (,$(filter llvm clang,$(TOOLCHAIN)))
+  CFLAGS += -D__ATTR_PROGMEM__=__flash
+  CFLAGS += -D__INTR_ATTRS=used
+endif
+
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-overflow
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-truncation
 OPTIONAL_CFLAGS_BLACKLIST += -gz
