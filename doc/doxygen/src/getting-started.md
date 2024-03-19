@@ -37,7 +37,7 @@ feature freeze period, if you develop on macOS or BSD.
 Windows users can refer to [this guide][dev-setup-windows] to
 [setup the development environment][dev-setup-windows] on Windows.
 
-[dev-setup-windows]: doc/guides/setup-windows
+[dev-setup-windows]: https://github.com/RIOT-OS/RIOT/tree/master/doc/guides/setup-windows
 
 Native development on macOS machines is not officially supported. What works well is using Linux
 in a virtual machine, but at much lower performance than running Linux natively. We also offer Docker images.
