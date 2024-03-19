@@ -1,7 +1,7 @@
 This application shows how to use own or the system shell commands. In order to use
 the system shell commands:
 
-1. Additionally to the module: shell, shell_commands,
+1. Additionally to the module: shell, shell_cmds_default,
    the module for the corresponding system command is to include, e.g.
    module ps for the ps command (cf. the Makefile in the application root
    directory).
