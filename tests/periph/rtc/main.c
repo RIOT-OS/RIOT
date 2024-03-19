@@ -165,7 +165,6 @@ static int _test_alarms(int arg, char **argv)
     struct tm time = (struct tm){ 0 };
     uint16_t ms;
 
-
 /* read RTC to retrieve initial */
     if (IS_USED(MODULE_PERIPH_RTC_MS)) {
         rtc_get_time_ms(&time, &ms);
