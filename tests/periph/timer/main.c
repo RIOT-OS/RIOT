@@ -114,6 +114,7 @@ static unsigned milliseconds_to_ticks(uint32_t timer_freq, unsigned millisecs)
 {
     /* Use 64 bit arithmetic to avoid overflows for high frequencies. */
     unsigned result = ((uint64_t)millisecs * US_PER_MS * timer_freq) / US_PER_SEC;
+
     /* Never return less than MINIMUM_TICKS ticks */
     return (result >= MINIMUM_TICKS) ? result : MINIMUM_TICKS;
 }
@@ -132,7 +133,7 @@ static int test_timer(unsigned num, uint32_t timer_freq)
     }
 
     printf("  - Calling timer_init(%u, %" PRIu32 ")\n    ",
-               num, timer_freq);
+           num, timer_freq);
     /* initialize and halt timer */
     if (timer_init(TIMER_DEV(num), timer_freq, cb, (void *)(COOKIE * num)) != 0) {
         printf("ERROR: timer_init() failed\n\n");
@@ -207,6 +208,7 @@ static int test_timer(unsigned num, uint32_t timer_freq)
 
     const unsigned duration = milliseconds_to_ticks(timer_freq, MINIMUM_TIMEOUT_MS);
     unsigned target = timer_read(TIMER_DEV(num)) + duration;
+
     expect(0 == timer_set_absolute(TIMER_DEV(num), 0, target));
     expect(0 == timer_clear(TIMER_DEV(num), 0));
     atomic_store_u8(&fired, 0);
@@ -242,7 +244,7 @@ static int test_timer(unsigned num, uint32_t timer_freq)
  * called directly from inside timer_set if the given timeout=0, leading to a
  * stack overflow if timer_set is called from within the callback of the same
  * timer.
- * 
+ *
  * The test will attempt to initialize each timer in the system and set a non-zero
  * timeout at first. The callback function provided will then attempt to set a new
  * timeout=0 until we have called the callback TEST_ITERATIONS times (default 10000).
@@ -280,7 +282,7 @@ static int test_timer_timeout(unsigned num, uint32_t timer_freq)
                num, TEST_ITERATIONS, ctx.counter);
         return 0;
     }
-    printf("    OK (timer timeout successfull)\n");
+    printf("    OK (timer timeout successful)\n");
     return 1;
 }
 
@@ -316,7 +318,8 @@ static void print_supported_frequencies(tim_t dev)
     }
 
     uword_t end = query_freq_numof(dev);
-        printf("  - supported frequencies:\n");
+
+    printf("  - supported frequencies:\n");
     for (uword_t i = 0; i < MIN(end, 3); i++) {
         printf("    %u: %" PRIu32 "\n", (unsigned)i, timer_query_freqs(dev, i));
     }
@@ -335,10 +338,11 @@ int main(void)
     printf("Available timers: %i\n", TIMER_NUMOF);
 
     int failed = 0;
+
     /* test all configured timers */
     for (unsigned i = 0; i < TIMER_NUMOF; i++) {
         printf("\nTIMER %u\n"
-                 "=======\n\n", i);
+               "=======\n\n", i);
         print_supported_frequencies(TIMER_DEV(i));
         uword_t end = query_freq_numof(TIMER_DEV(i));
 
