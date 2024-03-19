@@ -176,6 +176,23 @@ static const pio_i2c_conf_t pio_i2c_config[] = {
 #endif
 /** @} */
 
+/**
+ * @name   PWM configuration
+ * @{
+ */
+static const pwm_conf_t pwm_config[] = {
+    {
+        .pwm_slice   = 4,
+        .chan    = {
+            { .pin = GPIO_PIN(0, 25), .cc_chan = 1 },   /* rpi-pico onboard LED */
+            { .pin = GPIO_UNDEF,      .cc_chan = 0 },
+        },
+    },
+};
+
+#define PWM_NUMOF ARRAY_SIZE(pwm_config)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
