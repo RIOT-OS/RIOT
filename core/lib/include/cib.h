@@ -107,7 +107,8 @@ static inline unsigned int cib_full(const cib_t *cib)
  *
  * @param[in,out] cib   corresponding *cib* to buffer.
  *                      Must not be NULL.
- * @return index of next item, -1 if the buffer is empty
+ * @return index of next item
+ * @retval -1 if the buffer is empty
  */
 static inline int cib_get(cib_t *__restrict cib)
 {
@@ -119,19 +120,74 @@ static inline int cib_get(cib_t *__restrict cib)
 }
 
 /**
+ * @brief Get the index of an item in the buffer without removing anything.
+ *
+ * Offset 0 is the next item in the buffer that would be returned by
+ * `cip_get()`, offset 1 would be the following, and so on.
+ *
+ * Unsafe version, *must not* pass an offset that is larger than the number of
+ * items currently in the buffer!
+ *
+ * @param[in,out] cib   corresponding *cib* to buffer.
+ *                      Must not be NULL.
+ * @param[in] offset    offset from front of buffer
+ *
+ * @return index of item
+ * @retval -1 if no item at @p offset exists in the buffer
+ */
+static inline int cib_peek_at_unsafe(cib_t *__restrict cib, unsigned offset)
+{
+    return (cib->read_count + offset) & cib->mask;
+}
+
+/**
+ * @brief Get the index of an item in the buffer without removing anything.
+ *
+ * Offset 0 is the next item in the buffer that would be returned by
+ * `cip_get()`, offset 1 would be the following, and so on.
+ *
+ * @param[in,out] cib   corresponding *cib* to buffer.
+ *                      Must not be NULL.
+ * @param[in] offset    offset from front of buffer
+ *
+ * @return index of item
+ * @retval -1 if no item at @p offset exists in the buffer
+ */
+static inline int cib_peek_at(cib_t *__restrict cib, unsigned offset)
+{
+    if (offset < cib_avail(cib)) {
+        return cib_peek_at_unsafe(cib, offset);
+    }
+
+    return -1;
+}
+
+/**
+ * @brief Get the index of the next item in buffer without removing it.
+ *
+ * Unsafe version, *must not* be called if buffer is empty!
+ *
+ * @param[in,out] cib   corresponding *cib* to buffer.
+ *                      Must not be NULL.
+ * @return index of next item
+ * @retval -1 if the buffer is empty
+ */
+static inline int cib_peek_unsafe(cib_t *__restrict cib)
+{
+    return cib_peek_at_unsafe(cib, 0);
+}
+
+/**
  * @brief Get the index of the next item in buffer without removing it.
  *
  * @param[in,out] cib   corresponding *cib* to buffer.
  *                      Must not be NULL.
- * @return index of next item, -1 if the buffer is empty
+ * @return index of next item
+ * @retval -1 if the buffer is empty
  */
 static inline int cib_peek(cib_t *__restrict cib)
 {
-    if (cib_avail(cib)) {
-        return (int)(cib->read_count & cib->mask);
-    }
-
-    return -1;
+    return cib_peek_at(cib, 0);
 }
 
 /**
@@ -153,7 +209,8 @@ static inline int cib_get_unsafe(cib_t *cib)
  *
  * @param[in,out] cib   corresponding *cib* to buffer.
  *                      Must not be NULL.
- * @return index of item to put to, -1 if the buffer is full
+ * @return index of item to put to
+ * @retval -1 if the buffer is full
  */
 static inline int cib_put(cib_t *__restrict cib)
 {
