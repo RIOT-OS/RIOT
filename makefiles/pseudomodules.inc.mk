@@ -435,12 +435,6 @@ PSEUDOMODULES += shell_cmd_sys
 PSEUDOMODULES += shell_cmd_udptty
 PSEUDOMODULES += shell_cmd_vfs
 PSEUDOMODULES += shell_cmds_default
-## @addtogroup sys_shell_commands
-## @{
-## @deprecated  Use module `shell_cmds_default` instead;
-##              will be removed after 2023.07 release.
-PSEUDOMODULES += shell_commands
-## @}
 PSEUDOMODULES += shell_hooks
 PSEUDOMODULES += shell_lock_auto_locking
 PSEUDOMODULES += shield_w5100
