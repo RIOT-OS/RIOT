@@ -35,7 +35,7 @@ use static_cell::StaticCell;
 use embedded_nal_async::{Ipv4Addr, UdpStack as _};
 use embedded_alloc::Heap;
 use embedded_hal::delay::DelayNs as _;
-use log::{debug, info, error, warn};
+use log::{debug, info, error, warn, LevelFilter};
 
 // RIOT OS modules
 extern crate rust_riotmodules;
@@ -43,7 +43,6 @@ use riot_wrappers::riot_main;
 use riot_wrappers::ztimer;
 use riot_wrappers::saul::{ActuatorClass, Class, Phydat, RegistryEntry};
 use riot_wrappers::saul::registration::register_and_then;
-use riot_wrappers::shell::{self, CommandList as _};
 
 // rs-matter
 #[allow(unused_variables)]
@@ -61,7 +60,7 @@ use rs_matter::data_model::{
     root_endpoint,
     system_model::descriptor
 };
-use rs_matter::data_model::cluster_on_off::OnOffCluster;
+use rs_matter::data_model::cluster_on_off::{Commands, OnOffCluster};
 use rs_matter::error::Error;
 use rs_matter::mdns::MdnsService;
 use rs_matter::mdns::builtin::MDNS_SOCKET_BIND_ADDR;
@@ -111,15 +110,18 @@ impl Handler for OnOffHandler {
     fn invoke(&self, exchange: &Exchange, cmd: &CmdDetails, data: &TLVElement, encoder: CmdDataEncoder) -> Result<(), Error> {
         info!("OnOffCluster: Invoke cmd {:#02x} (data: {}) @ Endpoint {}", cmd.cmd_id, data.u32().unwrap_or(0), cmd.endpoint_id);
         // Handle command by ID -> 0x00: Off, 0x01: On, 0x02: Toggle
-        match cmd.cmd_id {
-            0 => led_onoff(false),
-            1 => led_onoff(true),
-            2 => {
+        match cmd.cmd_id.try_into()? {
+            Commands::On => led_onoff(true),
+            Commands::Off => led_onoff(false),
+            Commands::Toggle => {
                 let new_state = !self.on.get();
                 self.on.set(new_state);
                 led_onoff(new_state);
             },
-            _ => { warn!("Unsupported command by application -> ignored!"); }
+            Commands::OffWithEffect => info!("OffWithEffect ..."),
+            Commands::OnWithRecallGlobalScene => info!("OnWithRecallGlobalScene ..."),
+            Commands::OnWithTimedOff => info!("OnWithTimedOff ..."),
+            //_ => { warn!("Unsupported command by application -> ignored!"); }
         }
         self.cluster.invoke(exchange, cmd, data, encoder)
     }
@@ -158,8 +160,10 @@ fn led_onoff(on: bool) {
             entry.write(data).expect("Error while trying to set LED");
             info!("LED was set to {:?}", on);
         }
-    }
-    );
+    });
+}
+
+const fn led_timed_on(on_time: u16) {
 }
 
 fn main() -> ! {
@@ -170,7 +174,7 @@ fn main() -> ! {
         unsafe { HEAP.init(HEAP_MEM.as_ptr() as usize, HEAP_SIZE) }
     }
 
-    init_logger().expect("Error initializing logger");
+    init_logger(LevelFilter::Debug).expect("Error initializing logger");
     let mut clock = ztimer::Clock::msec();
     clock.delay_ms(1000);
 
@@ -246,7 +250,8 @@ fn main() -> ! {
             Some(CStr::from_bytes_with_nul(b"Extended Color Light\0").unwrap()),
             || {
                 info!("RGB-LED registered as SAUL actuator");
-                shell::new().run_forever_providing_buf()
+                //shell::new().run_forever_providing_buf()
+                loop {}
             },
         );
     };
@@ -258,8 +263,6 @@ fn main() -> ! {
         spawner.spawn(run_matter(matter)).unwrap();
         spawner.spawn(run_psm(matter)).unwrap();
     });
-
-
 }
 
 #[embassy_executor::task]

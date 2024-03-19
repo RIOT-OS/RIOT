@@ -19,9 +19,9 @@ impl Log for RiotLogger {
 
 static LOGGER: RiotLogger = RiotLogger;
 
-pub fn init_logger() -> Result<(), SetLoggerError> {
+pub fn init_logger(level: LevelFilter) -> Result<(), SetLoggerError> {
     //let log_level: &'static str = env!("RIOT_LOG_LEVEL");
     //println!("the RIOT_LOG_LEVEL variable at the time of compiling was: {log_level}");
     log::set_logger(&LOGGER)
-        .map(|_| log::set_max_level(LevelFilter::Info))
+        .map(|_| log::set_max_level(level))
 }

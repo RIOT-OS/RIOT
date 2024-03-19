@@ -45,7 +45,7 @@ impl UdpSend for &UdpSocketWrapper {
         }
         // tell receiver to release mutex within max. 10ms
         self.release_socket_notification.signal(());
-        ztimer::Delay.delay_ms(5).await;
+        ztimer::Delay.delay_ms(10).await;
         let mut sock = self.socket.try_lock().expect("receiver should have ensured that this mutex is free");
         sock.send(self.local_addr, addr, data)
             .await

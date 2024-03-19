@@ -1,5 +1,5 @@
 use embedded_nal_async::{SocketAddr, UdpStack, UnconnectedUdp};
-use log::{debug, error, info};
+use log::{debug, error, info, LevelFilter};
 use riot_wrappers::socket_embedded_nal_async_udp::UnconnectedUdpSocket;
 use rs_matter::error::Error;
 use rs_matter::transport::core::MATTER_SOCKET_BIND_ADDR;
@@ -13,7 +13,7 @@ use crate::network::utils::initialize_network;
 
 // Set this as entry point with 'riot_main!' macro to run 'integration tests'
 fn run_tests() -> ! {
-    init_logger().expect("Error initializing logger");
+    init_logger(LevelFilter::Debug).expect("Error initializing logger");
     static EXECUTOR: StaticCell<embassy_executor_riot::Executor> = StaticCell::new();
     let executor: &'static mut _ = EXECUTOR.init(embassy_executor_riot::Executor::new());
     executor.run(|spawner| {
