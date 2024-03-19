@@ -86,8 +86,6 @@ static int _reboot(int arg, char **argv)
     pm_reboot();
     return 0;
 }
-
-
 static int _clear_rtc_mem(int arg, char **argv)
 {
     (void)arg;
