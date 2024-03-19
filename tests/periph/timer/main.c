@@ -1,5 +1,7 @@
 /*
  * Copyright (C) 2015 Freie Universität Berlin
+ *               2018 Eistec AB
+ *               2024 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +16,8 @@
  * @brief       Peripheral timer test application
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ *              Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ *              Bennet Blischke <bennet.blischke@haw-hamburg.de>
  *
  * @}
  */
@@ -25,6 +29,7 @@
 #include "atomic_utils.h"
 #include "architecture.h"
 #include "clk.h"
+#include "mutex.h"
 #include "periph/timer.h"
 #include "test_utils/expect.h"
 #include "time_units.h"
@@ -51,10 +56,35 @@
  * e.g. when the timer was about to tick anyway */
 #define MINIMUM_TICKS       2
 
+#ifndef TEST_ITERATIONS
+#define TEST_ITERATIONS     (10000ul)
+#endif
+
 static uint8_t fired;
 static uint32_t sw_count;
 static uint32_t timeouts[TIMER_CHANNEL_NUMOF];
 static unsigned args[TIMER_CHANNEL_NUMOF];
+
+typedef struct {
+    unsigned long counter;
+    tim_t dev;
+    mutex_t mtx;
+} test_ctx_t;
+
+static void cb_incr(void *arg, int chan)
+{
+    (void)chan;
+    test_ctx_t *ctx = arg;
+
+    ctx->counter++;
+    if (ctx->counter < TEST_ITERATIONS) {
+        /* Rescheduling the timer like this will trigger a bug in the lptmr
+         * implementation in Kinetis */
+        timer_set(ctx->dev, chan, 20000u);
+        timer_set(ctx->dev, chan, 0);
+    }
+    mutex_unlock(&ctx->mtx);
+}
 
 static void cb(void *arg, int chan)
 {
@@ -207,6 +237,53 @@ static int test_timer(unsigned num, uint32_t timer_freq)
     return 1;
 }
 
+
+/* This test is designed to catch an implementation bug where a timer callback is
+ * called directly from inside timer_set if the given timeout=0, leading to a
+ * stack overflow if timer_set is called from within the callback of the same
+ * timer.
+ * 
+ * The test will attempt to initialize each timer in the system and set a non-zero
+ * timeout at first. The callback function provided will then attempt to set a new
+ * timeout=0 until we have called the callback TEST_ITERATIONS times (default 10000).
+ * The expected behavior is that the timer will trigger again as soon as the timer
+ * callback function returns. If the timer driver implementation is broken, then
+ * the callback will be called again by timer_set, causing a stack overflow after a
+ * number of iterations. */
+static int test_timer_timeout(unsigned num, uint32_t timer_freq)
+{
+    /* initialize and halt timer */
+    unsigned long switches = 0;
+    test_ctx_t ctx = {
+        .counter = 0,
+        .dev = TIMER_DEV(num),
+        .mtx = MUTEX_INIT_LOCKED
+    };
+
+    printf("  - Testing timeout=0 in callback:\n");
+
+    if (timer_init(ctx.dev, timer_freq, cb_incr, &ctx) < 0) {
+        printf("    TIMER_DEV(%u) init failed.\n", num);
+        return 0;
+    }
+    /* Send the initial trigger for the timer */
+    timer_set(ctx.dev, 0, 100);
+    /* Wait until we have executed the zero timeout callback enough times */
+    while (ctx.counter < TEST_ITERATIONS) {
+        mutex_lock(&ctx.mtx);
+        ++switches;
+    }
+
+    /* verify results */
+    if (ctx.counter != TEST_ITERATIONS) {
+        printf("    TIMER_DEV(%u) counter mismatch, expected: %lu, actual: %lu\n",
+               num, TEST_ITERATIONS, ctx.counter);
+        return 0;
+    }
+    printf("    OK (timer timeout successfull)\n");
+    return 1;
+}
+
 static uword_t query_freq_numof(tim_t dev)
 {
     if (IS_USED(MODULE_PERIPH_TIMER_QUERY_FREQS)) {
@@ -271,7 +348,11 @@ int main(void)
          * complete */
         end = MIN(end, 3);
         for (uword_t j = 0; j < end; j++) {
-            if (!test_timer(i, query_freq(TIMER_DEV(i), j))) {
+            uint32_t freq = query_freq(TIMER_DEV(i), j);
+            if (!test_timer(i, freq)) {
+                failed = 1;
+            }
+            if (!test_timer_timeout(i, freq)) {
                 failed = 1;
             }
         }
