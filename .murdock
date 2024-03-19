@@ -37,8 +37,10 @@ esac
 
 #: ${EMULATED_BOARDS_AVAILABLE:="microbit"}
 
-# temporarily disabling llvm builds until https://github.com/RIOT-OS/RIOT/pull/15595
-# is in
+# Only a subset of boards are compiled on LLVM to not increase CI time by
+# factor 2, but still have a decent regression test coverage.
+# TODO: Consider reusing QUICKBUILD_BOARDS once all those boards are supported
+# on LLVM.
 : ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native native64 nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
 
 : ${TEST_WITH_CONFIG_SUPPORTED:="examples/suit_update tests/drivers/at86rf2xx_aes"}
