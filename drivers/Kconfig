@@ -19,7 +19,6 @@ rsource "grove_ledbar/Kconfig"
 rsource "motor_driver/Kconfig"
 rsource "mcp47xx/Kconfig"
 rsource "my9221/Kconfig"
-rsource "rgbled/Kconfig"
 rsource "servo/Kconfig"
 rsource "ws281x/Kconfig"
 endmenu # Actuator Device Drivers
