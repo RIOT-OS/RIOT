@@ -191,8 +191,7 @@ static bool _ep_out_flags_set(UsbDeviceEndpoint *ep_reg)
 {
     return ep_reg->EPINTFLAG.reg  &
            ep_reg->EPINTENSET.reg &
-           (USB_DEVICE_EPINTENSET_TRFAIL0 |
-            USB_DEVICE_EPINTENSET_TRCPT0 |
+           (USB_DEVICE_EPINTENSET_TRCPT0 |
             USB_DEVICE_EPINTENSET_RXSTP |
             USB_DEVICE_EPINTENSET_STALL0);
 }
@@ -205,8 +204,7 @@ static bool _ep_in_flags_set(UsbDeviceEndpoint *ep_reg)
 {
     return ep_reg->EPINTFLAG.reg &
            ep_reg->EPINTENSET.reg &
-           (USB_DEVICE_EPINTENSET_TRFAIL1 |
-            USB_DEVICE_EPINTENSET_TRCPT1 |
+           (USB_DEVICE_EPINTENSET_TRCPT1 |
             USB_DEVICE_EPINTENSET_STALL1);
 }
 
@@ -741,10 +739,6 @@ static void _usbdev_ep_esr(usbdev_ep_t *ep)
             ep_reg->EPINTFLAG.reg = USB_DEVICE_EPINTFLAG_RXSTP;
             event = USBDEV_EVENT_TR_COMPLETE;
         }
-        else if (ep_reg->EPINTFLAG.bit.TRFAIL0) {
-            ep_reg->EPINTFLAG.reg = USB_DEVICE_EPINTFLAG_TRFAIL0;
-            event = USBDEV_EVENT_TR_FAIL;
-        }
         else if (ep_reg->EPINTFLAG.bit.STALL0) {
             ep_reg->EPINTFLAG.reg = USB_DEVICE_EPINTFLAG_STALL0;
             event = USBDEV_EVENT_TR_STALL;
@@ -759,10 +753,6 @@ static void _usbdev_ep_esr(usbdev_ep_t *ep)
             DEBUG("sam_usb: Transfer IN complete\n");
             ep_reg->EPINTFLAG.reg = USB_DEVICE_EPINTFLAG_TRCPT1;
             event = USBDEV_EVENT_TR_COMPLETE;
-        }
-        else if (ep_reg->EPINTFLAG.bit.TRFAIL1) {
-            ep_reg->EPINTFLAG.reg = USB_DEVICE_EPINTFLAG_TRFAIL1;
-            event = USBDEV_EVENT_TR_FAIL;
         }
         else if (ep_reg->EPINTFLAG.bit.STALL1) {
             ep_reg->EPINTFLAG.reg = USB_DEVICE_EPINTFLAG_STALL1;
