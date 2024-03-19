@@ -46,11 +46,6 @@ ifneq (,$(filter gnrc_lorawan_1_1,$(USEMODULE)))
   FEATURES_REQUIRED += periph_flashpage
 endif
 
-ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
-  # enable default network devices on the platform
-  USEMODULE += netdev_default
-endif
-
 ifneq (,$(filter netdev_default,$(USEMODULE)))
   USEMODULE += netdev
   USEMODULE += gnrc_netif
@@ -74,10 +69,6 @@ endif
 ifneq (,$(filter gnrc_dhcpv6_client_simple_pd,$(USEMODULE)))
   USEMODULE += gnrc_dhcpv6_client
   USEMODULE += dhcpv6_client_ia_pd
-endif
-
-ifneq (,$(filter gnrc_netif_cmd_lora,$(USEMODULE)))
-  USEMODULE += shell_cmd_gnrc_netif_lorawan
 endif
 
 ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))

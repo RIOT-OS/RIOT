@@ -60,9 +60,6 @@ ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
   ifneq (,$(filter gnrc_netif_lorawan,$(USEMODULE)))
     USEMODULE += shell_cmd_gnrc_netif_lorawan
   endif
-  ifneq (,$(filter gnrc_pktbuf_cmd,$(USEMODULE)))
-      USEMODULE += shell_cmd_gnrc_pktbuf
-  endif
   ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
       USEMODULE += shell_cmd_gnrc_rpl
   endif
@@ -71,15 +68,6 @@ ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
   endif
   ifneq (,$(filter gnrc_sixlowpan_frag_stats,$(USEMODULE)))
     USEMODULE += shell_cmd_gnrc_sixlowpan_frag_stats
-  endif
-  ifneq (,$(filter gnrc_udp_cmd,$(USEMODULE)))
-    USEMODULE += shell_cmd_gnrc_udp
-  endif
-  ifneq (,$(filter heap_cmd,$(USEMODULE)))
-    USEMODULE += shell_cmd_heap
-  endif
-  ifneq (,$(filter i2c_scan,$(USEMODULE)))
-    USEMODULE += shell_cmd_i2c_scan
   endif
   ifneq (,$(filter lpc2387,$(USEMODULE)))
     USEMODULE += shell_cmd_heap
@@ -95,9 +83,6 @@ ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
   endif
   ifneq (,$(filter netstats_neighbor,$(USEMODULE)))
     USEMODULE += shell_cmd_netstats_neighbor
-  endif
-  ifneq (,$(filter nice,$(USEMODULE)))
-    USEMODULE += shell_cmd_nice
   endif
   ifneq (,$(filter nimble_netif,$(USEMODULE)))
     USEMODULE += shell_cmd_nimble_netif
