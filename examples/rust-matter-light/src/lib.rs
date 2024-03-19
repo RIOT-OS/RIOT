@@ -33,7 +33,7 @@ use static_cell::StaticCell;
 use embedded_nal_async::{Ipv4Addr, UdpStack as _};
 use embedded_alloc::Heap;
 use embedded_hal::delay::DelayNs as _;
-use log::{debug, info, error, LevelFilter};
+use log::{debug, info, error, LevelFilter, warn};
 
 // RIOT OS modules
 extern crate rust_riotmodules;
@@ -169,17 +169,25 @@ static MDNS: StaticCell<MdnsService> = StaticCell::new();
 static DEV_ATT: StaticCell<HardCodedDevAtt> = StaticCell::new();
 static MATTER: StaticCell<Matter> = StaticCell::new();
 
+// Set this to the name of the LED, which should be controlled using SAUL registry
+const ONOFF_LED_NAME: &str = "LD2(blue)";
+
 riot_main!(main);
 
 fn led_onoff(on: bool) {
     // Iterate through all SAUL registry entries and set all switches to the desired state
+    let mut success = false;
     RegistryEntry::all().for_each(|entry| {
-        if let Some(Class::Actuator(Some(ActuatorClass::Switch))) = entry.type_() {
+        if matches!(entry.type_(), Some(Class::Actuator(Some(ActuatorClass::Switch))))
+            && entry.name().map_or(false, |name| name == ONOFF_LED_NAME) {
+            // Found LED in SAUL -> turn on/off
             let data = Phydat::new(&[on as i16], None, 0);
             entry.write(data).expect("Error while trying to set LED");
             info!("LED {} was set to {:?}", entry.name().unwrap_or("n/a"), on);
+            success = true;
         }
     });
+    warn!("LED {} was not found in SAUL registry!", ONOFF_LED_NAME);
 }
 
 fn cmd_matter(_stdio: &mut riot_wrappers::stdio::Stdio, _args: shell::Args<'_>) {
