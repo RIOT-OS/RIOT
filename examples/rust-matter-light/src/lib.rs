@@ -23,31 +23,34 @@ use network::UdpSocketWrapper;
 use network::utils::initialize_network;
 use logging::init_logger;
 use dev_att::HardCodedDevAtt;
-use rgb_led::{RGB_LED_DRIVER, RgbLed, RGB_BLUE_PIN, RGB_GREEN_PIN, RGB_PORT, RGB_RED_PIN};
 
 // core library
 use core::{borrow::Borrow, pin::pin};
 use core::cell::Cell;
-use core::ffi::CStr;
 
 // external crates
 use static_cell::StaticCell;
 use embedded_nal_async::{Ipv4Addr, UdpStack as _};
 use embedded_alloc::Heap;
 use embedded_hal::delay::DelayNs as _;
-use log::{debug, info, error, warn, LevelFilter};
+use log::{debug, info, error, LevelFilter};
 
 // RIOT OS modules
 extern crate rust_riotmodules;
-use riot_wrappers::riot_main;
+
+use riot_wrappers::{riot_main, static_command};
 use riot_wrappers::ztimer;
+use riot_wrappers::thread;
+use riot_wrappers::mutex::Mutex;
+use riot_wrappers::cstr::cstr;
+use riot_wrappers::shell::{self, CommandList};
 use riot_wrappers::saul::{ActuatorClass, Class, Phydat, RegistryEntry};
-use riot_wrappers::saul::registration::register_and_then;
 
 // rs-matter
 #[allow(unused_variables)]
 #[allow(dead_code)]
 extern crate rs_matter;
+
 use rs_matter::{CommissioningData, MATTER_PORT};
 use rs_matter::transport::network::UdpBuffers;
 use rs_matter::transport::core::{PacketBuffers, MATTER_SOCKET_BIND_ADDR};
@@ -58,7 +61,7 @@ use rs_matter::data_model::{
     device_types::DEV_TYPE_ON_OFF_LIGHT,
     objects::*,
     root_endpoint,
-    system_model::descriptor
+    system_model::descriptor,
 };
 use rs_matter::data_model::cluster_on_off::{Commands, OnOffCluster};
 use rs_matter::error::Error;
@@ -117,7 +120,7 @@ impl Handler for OnOffHandler {
                 let new_state = !self.on.get();
                 self.on.set(new_state);
                 led_onoff(new_state);
-            },
+            }
             Commands::OffWithEffect => info!("OffWithEffect ..."),
             Commands::OnWithRecallGlobalScene => info!("OnWithRecallGlobalScene ..."),
             Commands::OnWithTimedOff => info!("OnWithTimedOff ..."),
@@ -126,6 +129,7 @@ impl Handler for OnOffHandler {
         self.cluster.invoke(exchange, cmd, data, encoder)
     }
 }
+
 impl NonBlockingHandler for OnOffHandler {}
 
 // Handler for endpoints 0 (Root) and 1 (Descriptor + OnOff Cluster)
@@ -141,13 +145,29 @@ fn matter_handler<'a>(matter: &'a Matter<'a>) -> impl Metadata + NonBlockingHand
             .chain(
                 1,
                 cluster_on_off::ID,
-                OnOffHandler::new(cluster_on_off::OnOffCluster::new(*matter.borrow())),
+                OnOffHandler::new(OnOffCluster::new(*matter.borrow())),
             ),
     )
 }
 
 #[global_allocator]
 static HEAP: Heap = Heap::empty();
+static SHELL_THREAD_STACK: Mutex<[u8; 5120]> = Mutex::new([0; 5120]);
+static MATTER_THREAD_STACK: Mutex<[u8; 50000]> = Mutex::new([0; 50000]);
+static DEV_DET: BasicInfoConfig = BasicInfoConfig {
+    vid: 0xFFF1,
+    pid: 0x8000,
+    hw_ver: 2,
+    sw_ver: 1,
+    sw_ver_str: "1",
+    serial_no: "aabbccddd",
+    device_name: "OnOff Light",
+    product_name: "Light123",
+    vendor_name: "Vendor 123",
+};
+static MDNS: StaticCell<MdnsService> = StaticCell::new();
+static DEV_ATT: StaticCell<HardCodedDevAtt> = StaticCell::new();
+static MATTER: StaticCell<Matter> = StaticCell::new();
 
 riot_main!(main);
 
@@ -155,18 +175,73 @@ fn led_onoff(on: bool) {
     // Iterate through all SAUL registry entries and set all switches to the desired state
     RegistryEntry::all().for_each(|entry| {
         if let Some(Class::Actuator(Some(ActuatorClass::Switch))) = entry.type_() {
-            info!("Writing to {}", entry.name().unwrap_or("n/a"));
             let data = Phydat::new(&[on as i16], None, 0);
             entry.write(data).expect("Error while trying to set LED");
-            info!("LED was set to {:?}", on);
+            info!("LED {} was set to {:?}", entry.name().unwrap_or("n/a"), on);
         }
     });
 }
 
-const fn led_timed_on(on_time: u16) {
+fn cmd_matter(_stdio: &mut riot_wrappers::stdio::Stdio, _args: shell::Args<'_>) {
+    // TODO: Support some useful commands for this Matter node or interacting with other nodes
+    info!("Endpoint Info:");
+    NODE.endpoints.into_iter().for_each(|ep| {
+        info!("Endpoint No. {} - DeviceType={:#04x}", ep.id, ep.device_type.dtype);
+        ep.clusters.into_iter().for_each(|cluster| {
+            info!("  Cluster ID={:#04x}", cluster.id);
+            cluster.attributes.into_iter().for_each(|attr| info!("    Attribute {:#04x}", attr.id))
+        });
+    });
 }
 
-fn main() -> ! {
+static_command!(matter, "matter", "Interact with Matter devices", cmd_matter);
+
+fn run_shell() -> Result<(), ()> {
+    let mut shell = shell::new();
+    shell.run_forever_providing_buf()
+}
+
+fn run_matter() -> Result<(), ()> {
+    let (ipv6_addr, interface) = initialize_network()
+        .expect("Error getting network interface and IP addresses");
+
+    let mdns_service: &'static MdnsService = MDNS.init(MdnsService::new(
+        0,
+        "rs-matter-demo",
+        Ipv4Addr::UNSPECIFIED.octets(),
+        Some((ipv6_addr.octets(), interface)),
+        &DEV_DET,
+        MATTER_PORT,
+    ));
+
+    // Get Device attestation (hard-coded atm)
+    let dev_att: &'static HardCodedDevAtt = DEV_ATT.init(HardCodedDevAtt::new());
+
+    // TODO: Provide own epoch and rand functions
+    let epoch = rs_matter::utils::epoch::riot_epoch;
+    let rand = rs_matter::utils::rand::riot_rand;
+
+    let matter: &'static Matter = MATTER.init(Matter::new(
+        // vid/pid should match those in the DAC
+        &DEV_DET,
+        dev_att,
+        mdns_service,
+        epoch,
+        rand,
+        MATTER_PORT,
+    ));
+
+    info!("Starting all services...");
+    static EXECUTOR: StaticCell<embassy_executor_riot::Executor> = StaticCell::new();
+    let executor: &'static mut _ = EXECUTOR.init(embassy_executor_riot::Executor::new());
+    executor.run(|spawner| {
+        spawner.spawn(mdns_task(mdns_service)).unwrap();
+        spawner.spawn(matter_task(matter)).unwrap();
+        spawner.spawn(psm_task(matter)).unwrap();
+    });
+}
+
+fn main() {
     {
         use core::mem::MaybeUninit;
         const HEAP_SIZE: usize = 4192;
@@ -174,7 +249,7 @@ fn main() -> ! {
         unsafe { HEAP.init(HEAP_MEM.as_ptr() as usize, HEAP_SIZE) }
     }
 
-    init_logger(LevelFilter::Debug).expect("Error initializing logger");
+    init_logger(LevelFilter::Info).expect("Error initializing logger");
     let mut clock = ztimer::Clock::msec();
     clock.delay_ms(1000);
 
@@ -189,84 +264,40 @@ fn main() -> ! {
         size_of::<Matter>(),
     );
 
-    let (ipv6_addr, interface) = initialize_network()
-        .expect("Error getting network interface and IP addresses");
+    // Run threads: Matter and RIOT Shell
+    let mut matter_thread_main = || run_matter().unwrap();
+    let mut matter_thread_stacklock = MATTER_THREAD_STACK.lock();
 
-    static DEV_DET: BasicInfoConfig = BasicInfoConfig {
-        vid: 0xFFF1,
-        pid: 0x8000,
-        hw_ver: 2,
-        sw_ver: 1,
-        sw_ver_str: "1",
-        serial_no: "aabbccddd",
-        device_name: "OnOff Light",
-        product_name: "Light123",
-        vendor_name: "Vendor 123",
-    };
+    let mut shell_thread_main = || run_shell().unwrap();
+    let mut shell_thread_stacklock = SHELL_THREAD_STACK.lock();
 
-    static MDNS: StaticCell<MdnsService> = StaticCell::new();
-    let mdns_service: &'static MdnsService = MDNS.init(MdnsService::new(
-        0,
-        "rs-matter-demo",
-        Ipv4Addr::UNSPECIFIED.octets(),
-        Some((ipv6_addr.octets(), interface)),
-        &DEV_DET,
-        MATTER_PORT,
-    ));
+    thread::scope(|threadscope| {
+        let matter_thread = threadscope.spawn(
+            matter_thread_stacklock.as_mut(),
+            &mut matter_thread_main,
+            cstr!("matter"),
+            (riot_sys::THREAD_PRIORITY_MAIN - 2) as _,
+            (riot_sys::THREAD_CREATE_STACKTEST) as _,
+        ).expect("Failed to spawn Matter thread");
+        info!("MATTER thread spawned as {:?} ({:?}), status {:?}", matter_thread.pid(), matter_thread.pid().get_name(), matter_thread.status());
 
-    // Get Device attestation (hard-coded atm)
-    static DEV_ATT: StaticCell<HardCodedDevAtt> = StaticCell::new();
-    let dev_att: &'static HardCodedDevAtt = DEV_ATT.init(HardCodedDevAtt::new());
+        let shell_thread = threadscope.spawn(
+            shell_thread_stacklock.as_mut(),
+            &mut shell_thread_main,
+            cstr!("shell"),
+            (riot_sys::THREAD_PRIORITY_MAIN - 1) as _,
+            (riot_sys::THREAD_CREATE_STACKTEST) as _,
+        ).expect("Failed to spawn shell thread");
+        info!("SHELL thread spawned as {:?} ({:?}), status {:?}", shell_thread.pid(), shell_thread.pid().get_name(), shell_thread.status());
 
-    // TODO: Provide own epoch and rand functions
-    let epoch = rs_matter::utils::epoch::riot_epoch;
-    let rand = rs_matter::utils::rand::riot_rand;
-
-    static MATTER: StaticCell<Matter> = StaticCell::new();
-    let matter: &'static Matter = MATTER.init(Matter::new(
-        // vid/pid should match those in the DAC
-        &DEV_DET,
-        dev_att,
-        mdns_service,
-        epoch,
-        rand,
-        MATTER_PORT,
-    ));
-
-    info!("Starting all services...");
-
-    // TODO: Register RGB-LED at SAUL and run shell in seperate thread
-    let mut _shell_thread = || {
-        debug!("Shell is running");
-        let rgb_led = RgbLed::new(
-            "Extended Color Light",
-            (RGB_PORT, RGB_RED_PIN),
-            (RGB_PORT, RGB_GREEN_PIN),
-            (RGB_PORT, RGB_BLUE_PIN),
-        );
-        register_and_then(
-            &RGB_LED_DRIVER,
-            &rgb_led,
-            Some(CStr::from_bytes_with_nul(b"Extended Color Light\0").unwrap()),
-            || {
-                info!("RGB-LED registered as SAUL actuator");
-                //shell::new().run_forever_providing_buf()
-                loop {}
-            },
-        );
-    };
-
-    static EXECUTOR: StaticCell<embassy_executor_riot::Executor> = StaticCell::new();
-    let executor: &'static mut _ = EXECUTOR.init(embassy_executor_riot::Executor::new());
-    executor.run(|spawner| {
-        spawner.spawn(run_mdns(mdns_service)).unwrap();
-        spawner.spawn(run_matter(matter)).unwrap();
-        spawner.spawn(run_psm(matter)).unwrap();
+        loop {
+            thread::sleep();
+        }
     });
 }
 
 #[embassy_executor::task]
-async fn run_mdns(mdns: &'static MdnsService<'_>) {
+async fn mdns_task(mdns: &'static MdnsService<'_>) {
     // Create UDP socket and bind to port 5353
     static UDP_MDNS_SOCKET: StaticCell<riot_sys::sock_udp_t> = StaticCell::new();
     let udp_stack = riot_wrappers::socket_embedded_nal_async_udp::UdpStack::new(|| UDP_MDNS_SOCKET.try_uninit());
@@ -297,7 +328,7 @@ async fn run_mdns(mdns: &'static MdnsService<'_>) {
 }
 
 #[embassy_executor::task]
-async fn run_matter(matter: &'static Matter<'_>) {
+async fn matter_task(matter: &'static Matter<'_>) {
     // Create UDP socket and bind to port 5540
     static UDP_MATTER_SOCKET: StaticCell<riot_sys::sock_udp_t> = StaticCell::new();
     let udp_stack = riot_wrappers::socket_embedded_nal_async_udp::UdpStack::new(|| UDP_MATTER_SOCKET.try_uninit());
@@ -340,7 +371,7 @@ async fn run_matter(matter: &'static Matter<'_>) {
 }
 
 #[embassy_executor::task]
-async fn run_psm(matter: &'static Matter<'_>) {
+async fn psm_task(matter: &'static Matter<'_>) {
     info!("Starting Persistence Manager....");
     // TODO: Develop own 'Persistence Manager' using RIOT OS modules
     let mut psm = persist::Psm::new(&matter).expect("Error creating PSM");
