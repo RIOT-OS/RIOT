@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2015 Freie Universität Berlin
  *               2015 FreshTemp, LLC.
+ *               2022 SSV Software Systems GmbH
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -20,11 +21,13 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Dylan Laduranty <dylanladuranty@gmail.com>
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
+ * @author      Juergen Fitschen <me@jue.yt>
  *
  * @}
  */
 
 #include "cpu.h"
+#include "pm_layered.h"
 
 #include "periph/uart.h"
 #include "periph/gpio.h"
@@ -126,6 +129,22 @@ static void _set_baud(uart_t uart, uint32_t baudrate, uint32_t f_src)
 #endif
 }
 
+void uart_enable_tx(uart_t uart)
+{
+    /* configure RX pin */
+    if (uart_config[uart].tx_pin != GPIO_UNDEF) {
+        gpio_init_mux(uart_config[uart].tx_pin, uart_config[uart].mux);
+    }
+}
+
+void uart_disable_tx(uart_t uart)
+{
+    /* configure RX pin */
+    if (uart_config[uart].tx_pin != GPIO_UNDEF) {
+        gpio_init_mux(uart_config[uart].tx_pin, GPIO_MUX_A);
+    }
+}
+
 static void _configure_pins(uart_t uart)
 {
     /* configure RX pin */
@@ -135,7 +154,8 @@ static void _configure_pins(uart_t uart)
     }
 
     /* configure TX pin */
-    if (uart_config[uart].tx_pin != GPIO_UNDEF) {
+    if (uart_config[uart].tx_pin != GPIO_UNDEF &&
+        !(uart_config[uart].flags & UART_FLAG_TX_ONDEMAND)) {
         gpio_set(uart_config[uart].tx_pin);
         gpio_init(uart_config[uart].tx_pin, GPIO_OUT);
         gpio_init_mux(uart_config[uart].tx_pin, uart_config[uart].mux);
@@ -162,6 +182,23 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         return UART_NODEV;
     }
 
+    /* enable peripheral clock */
+    sercom_clk_en(dev(uart));
+
+#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_UART_PM_BLOCK)
+    /* clear previously blocked power modes */
+    if (dev(uart)->CTRLA.bit.ENABLE) {
+        /* RX IRQ is enabled */
+        if (dev(uart)->INTENSET.bit.RXC) {
+            pm_unblock(SAM0_UART_PM_BLOCK);
+        }
+        /* data reg empty IRQ is enabled -> sending data was in progress */
+        if (dev(uart)->INTENSET.bit.DRE) {
+            pm_unblock(SAM0_UART_PM_BLOCK);
+        }
+    }
+#endif
+
     /* must disable here first to ensure idempotency */
     dev(uart)->CTRLA.reg = 0;
 
@@ -172,9 +209,6 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
     /* configure pins */
     _configure_pins(uart);
-
-    /* enable peripheral clock */
-    sercom_clk_en(dev(uart));
 
     /* reset the UART device */
     _reset(dev(uart));
@@ -236,6 +270,10 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 #endif /* UART_HAS_TX_ISR */
         dev(uart)->CTRLB.reg |= SERCOM_USART_CTRLB_RXEN;
         dev(uart)->INTENSET.reg = SERCOM_USART_INTENSET_RXC;
+#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_UART_PM_BLOCK)
+        /* block power mode for rx IRQs */
+        pm_block(SAM0_UART_PM_BLOCK);
+#endif
         /* set wakeup receive from sleep if enabled */
         if (uart_config[uart].flags & UART_FLAG_WAKEUP) {
             dev(uart)->CTRLB.reg |= SERCOM_USART_CTRLB_SFDE;
@@ -297,9 +335,35 @@ void uart_deinit_pins(uart_t uart)
 #endif
 }
 
+gpio_t uart_pin_cts(uart_t uart)
+{
+#ifdef MODULE_PERIPH_UART_HW_FC
+    if (uart_config[uart].tx_pad == UART_PAD_TX_0_RTS_2_CTS_3) {
+        return uart_config[uart].cts_pin;
+    }
+#endif
+    (void)uart;
+    return GPIO_UNDEF;
+}
+
+gpio_t uart_pin_rts(uart_t uart)
+{
+#ifdef MODULE_PERIPH_UART_HW_FC
+    if (uart_config[uart].tx_pad == UART_PAD_TX_0_RTS_2_CTS_3) {
+        return uart_config[uart].rts_pin;
+    }
+#endif
+    (void)uart;
+    return GPIO_UNDEF;
+}
+
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     if (uart_config[uart].tx_pin == GPIO_UNDEF) {
+        return;
+    }
+
+    if (!dev(uart)->CTRLA.bit.ENABLE) {
         return;
     }
 
@@ -316,7 +380,20 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         else {
             while (tsrb_add_one(&uart_tx_rb[uart], *data) < 0) {}
         }
+        /* check and enable DRE IRQs atomically */
+#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_UART_PM_BLOCK)
+        unsigned state = irq_disable();
+        /* tsrb_add_one() is blocking the thread. It may happen that
+         * the corresponding ISR has turned off DRE IRQs and, thus,
+         * unblocked the corresponding power mode. */
+        if (!dev(uart)->INTENSET.bit.DRE) {
+            pm_block(SAM0_UART_PM_BLOCK);
+        }
         dev(uart)->INTENSET.reg = SERCOM_USART_INTENSET_DRE;
+        irq_restore(state);
+#else
+        dev(uart)->INTENSET.reg = SERCOM_USART_INTENSET_DRE;
+#endif
     }
 #else
     for (const void* end = data + len; data != end; ++data) {
@@ -330,13 +407,48 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 void uart_poweron(uart_t uart)
 {
     sercom_clk_en(dev(uart));
+
+    /* the enable bit must be read and written atomically */
+    unsigned state = irq_disable();
+#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_UART_PM_BLOCK)
+    /* block required power modes */
+    if (!dev(uart)->CTRLA.bit.ENABLE) {
+        /* RX IRQ is enabled */
+        if (dev(uart)->INTENSET.bit.RXC) {
+            pm_block(SAM0_UART_PM_BLOCK);
+        }
+        /* data reg empty IRQ is enabled -> sending data was in progress */
+        if (dev(uart)->INTENSET.bit.DRE) {
+            pm_block(SAM0_UART_PM_BLOCK);
+        }
+    }
+#endif
     dev(uart)->CTRLA.reg |= SERCOM_USART_CTRLA_ENABLE;
+    irq_restore(state);
+
     _syncbusy(dev(uart));
 }
 
 void uart_poweroff(uart_t uart)
 {
+    /* the enable bit must be read and written atomically */
+    unsigned state = irq_disable();
+#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_UART_PM_BLOCK)
+    /* clear blocked power modes */
+    if (dev(uart)->CTRLA.bit.ENABLE) {
+        /* RX IRQ is enabled */
+        if (dev(uart)->INTENSET.bit.RXC) {
+            pm_unblock(SAM0_UART_PM_BLOCK);
+        }
+        /* data reg empty IRQ is enabled -> sending data is in progress */
+        if (dev(uart)->INTENSET.bit.DRE) {
+            pm_unblock(SAM0_UART_PM_BLOCK);
+        }
+    }
+#endif
     dev(uart)->CTRLA.reg &= ~(SERCOM_USART_CTRLA_ENABLE);
+    irq_restore(state);
+
     sercom_clk_dis(dev(uart));
 }
 
@@ -500,6 +612,11 @@ static inline void irq_handler_tx(unsigned uartnum)
     /* disable the interrupt if there are no more bytes to send */
     if (tsrb_empty(&uart_tx_rb[uartnum])) {
         dev(uartnum)->INTENCLR.reg = SERCOM_USART_INTENSET_DRE;
+#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_UART_PM_BLOCK)
+        /* we really should be in IRQ context! */
+        assert(irq_is_in());
+        pm_unblock(SAM0_UART_PM_BLOCK);
+#endif
     }
 }
 #endif

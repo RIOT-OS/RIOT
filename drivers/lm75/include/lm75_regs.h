@@ -14,8 +14,6 @@
  * @brief       Registers for the lm75 and derived (lm75a and tmp1075) temperature sensors.
  *
  * @author      Vitor Batista <vitor.batista@ml-pa.com>
- *
- * @}
  */
 
 #ifndef LM75_REGS_H

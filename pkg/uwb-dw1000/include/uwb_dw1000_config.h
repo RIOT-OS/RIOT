@@ -35,59 +35,58 @@ extern "C" {
  *  - Anchor       "0x04"
  *  - Panmaster    "0x07"
  */
-#ifndef DW1000_ROLE_DEFAULT
-#define DW1000_ROLE_DEFAULT         0x0
+#ifndef CONFIG_DW1000_ROLE_DEFAULT
+#define CONFIG_DW1000_ROLE_DEFAULT         0x0
 #endif
 
 /**
  * @brief   Default Number of symbols in start of frame delimiter
  */
-#ifndef DW1000_NSFD_DEFAULT
-#define DW1000_NSFD_DEFAULT         8
+#ifndef CONFIG_DW1000_NSFD_DEFAULT
+#define CONFIG_DW1000_NSFD_DEFAULT         8
 #endif
 
 /**
  * @brief   Default Number of symbols in preamble sequence
  */
-#ifndef DW1000_NSYNC_DEFAULT
-#define DW1000_NSYNC_DEFAULT         128
+#ifndef CONFIG_DW1000_NSYNC_DEFAULT
+#define CONFIG_DW1000_NSYNC_DEFAULT         128
 #endif
 
 /**
  * @brief   Default Number of symbols in phy header
  */
-#ifndef DW1000_NPHR_DEFAULT
-#define DW1000_NPHR_DEFAULT         21
+#ifndef CONFIG_DW1000_NPHR_DEFAULT
+#define CONFIG_DW1000_NPHR_DEFAULT         21
 #endif
 
 /**
  * @brief   Default channel
  */
-#ifndef DW1000_CHANNEL_DEFAULT
-#define DW1000_CHANNEL_DEFAULT      5
-#if DW1000_CHANNEL_DEFAULT > 7 || DW1000_CHANNEL_DEFAULT < 1
-#error "DW1000_CHANNEL_DEFAULT must be 1..7"
+#ifndef CONFIG_DW1000_CHANNEL_DEFAULT
+#define CONFIG_DW1000_CHANNEL_DEFAULT      5
+#if CONFIG_DW1000_CHANNEL_DEFAULT > 7 || CONFIG_DW1000_CHANNEL_DEFAULT < 1 || \
+    CONFIG_DW1000_CHANNEL_DEFAULT == 6
+#error "CONFIG_DW1000_CHANNEL_DEFAULT must be 1..7, 6 excluded"
 #endif
 #endif
 
 /**
  * @brief   Default Pulse generator delay
  */
-#ifndef DW1000_TX_PGDELAY_DEFAULT
-#if DW1000_CHANNEL_DEFAULT == 1
-#define DW1000_TX_PGDELAY_DEFAULT   TC_PGDELAY_CH1
-#elif DW1000_CHANNEL_DEFAULT == 2
-#define DW1000_TX_PGDELAY_DEFAULT   TC_PGDELAY_CH2
-#elif DW1000_CHANNEL_DEFAULT == 3
-#define DW1000_TX_PGDELAY_DEFAULT   TC_PGDELAY_CH3
-#elif DW1000_CHANNEL_DEFAULT == 4
-#define DW1000_TX_PGDELAY_DEFAULT   TC_PGDELAY_CH4
-#elif DW1000_CHANNEL_DEFAULT == 5
-#define DW1000_TX_PGDELAY_DEFAULT   TC_PGDELAY_CH5
-#elif DW1000_CHANNEL_DEFAULT == 6
-#define DW1000_TX_PGDELAY_DEFAULT   TC_PGDELAY_CH7
-#elif DW1000_CHANNEL_DEFAULT == 7
-#define DW1000_TX_PGDELAY_DEFAULT   TC_PGDELAY_CH7
+#ifndef CONFIG_DW1000_TX_PGDELAY_DEFAULT
+#if CONFIG_DW1000_CHANNEL_DEFAULT == 1
+#define CONFIG_DW1000_TX_PGDELAY_DEFAULT   TC_PGDELAY_CH1
+#elif CONFIG_DW1000_CHANNEL_DEFAULT == 2
+#define CONFIG_DW1000_TX_PGDELAY_DEFAULT   TC_PGDELAY_CH2
+#elif CONFIG_DW1000_CHANNEL_DEFAULT == 3
+#define CONFIG_DW1000_TX_PGDELAY_DEFAULT   TC_PGDELAY_CH3
+#elif CONFIG_DW1000_CHANNEL_DEFAULT == 4
+#define CONFIG_DW1000_TX_PGDELAY_DEFAULT   TC_PGDELAY_CH4
+#elif CONFIG_DW1000_CHANNEL_DEFAULT == 5
+#define CONFIG_DW1000_TX_PGDELAY_DEFAULT   TC_PGDELAY_CH5
+#elif CONFIG_DW1000_CHANNEL_DEFAULT == 7
+#define CONFIG_DW1000_TX_PGDELAY_DEFAULT   TC_PGDELAY_CH7
 #endif
 #endif
 
@@ -97,8 +96,8 @@ extern "C" {
  * - DWT_PRF_16M
  * - DWT_PRF_64M
  */
-#ifndef DW1000_PRF_DEFAULT
-#define DW1000_PRF_DEFAULT          DWT_PRF_64M
+#ifndef CONFIG_DW1000_PRF_DEFAULT
+#define CONFIG_DW1000_PRF_DEFAULT          DWT_PRF_64M
 #endif
 
 /**
@@ -108,8 +107,8 @@ extern "C" {
  * - DWT_BR_850K
  * - DWT_BR_6M8
  */
-#ifndef DW1000_DATARATE_DEFAULT
-#define DW1000_DATARATE_DEFAULT     DWT_BR_6M8
+#ifndef CONFIG_DW1000_DATARATE_DEFAULT
+#define CONFIG_DW1000_DATARATE_DEFAULT     DWT_BR_6M8
 #endif
 
 /**
@@ -120,15 +119,15 @@ extern "C" {
  * - 32
  * - 64
  */
-#ifndef DW1000_PACLEN_DEFAULT
-#define DW1000_PACLEN_DEFAULT       DWT_PAC8
+#ifndef CONFIG_DW1000_PACLEN_DEFAULT
+#define CONFIG_DW1000_PACLEN_DEFAULT       DWT_PAC8
 #endif
 
 /**
  * @brief Default UWB RX Preamble Code Index
  */
-#ifndef DW1000_RX_PREAM_CIDX_DEFAULT
-#define DW1000_RX_PREAM_CIDX_DEFAULT    9
+#ifndef CONFIG_DW1000_RX_PREAM_CIDX_DEFAULT
+#define CONFIG_DW1000_RX_PREAM_CIDX_DEFAULT    9
 #endif
 
 /**
@@ -137,16 +136,16 @@ extern "C" {
  * - true: use non standard SFD for better performance
  * - false: use standard SFD
  */
-#ifndef DW1000_RX_SFD_TYPE_DEFAULT
-#define DW1000_RX_SFD_TYPE_DEFAULT  true
+#ifndef CONFIG_DW1000_RX_SFD_TYPE_DEFAULT
+#define CONFIG_DW1000_RX_SFD_TYPE_DEFAULT  true
 #endif
 
 /**
  * @brief Default UWB SFD Timeout (-1=auto, timeout in symbols)
  *
  */
-#ifndef DW1000_RX_SFD_TO_DEFAULT
-#define DW1000_RX_SFD_TO_DEFAULT   (128 + 1 + 8 - 8) /* (preamble length + 1 + SFD length - PAC size) */
+#ifndef CONFIG_DW1000_RX_SFD_TO_DEFAULT
+#define CONFIG_DW1000_RX_SFD_TO_DEFAULT   (128 + 1 + 8 - 8) /* (preamble length + 1 + SFD length - PAC size) */
 #endif
 
 /**
@@ -155,22 +154,22 @@ extern "C" {
  * - 0x0 - standard DWT_PHRMODE_STD
  * - 0x3 - extended frames DWT_PHRMODE_EXT
  */
-#ifndef DW1000_RX_PHR_MODE_DEFAULT
-#define DW1000_RX_PHR_MODE_DEFAULT      DWT_PHRMODE_EXT
+#ifndef CONFIG_DW1000_RX_PHR_MODE_DEFAULT
+#define CONFIG_DW1000_RX_PHR_MODE_DEFAULT      DWT_PHRMODE_EXT
 #endif
 
 /**
  * @brief Enable RX Frame Quality diagnositics (rssi, fppl, etc.)
  */
-#ifndef DW1000_RX_DIAGNOSTIC
-#define DW1000_RX_DIAGNOSTIC    0
+#ifndef CONFIG_DW1000_RX_DIAGNOSTIC
+#define CONFIG_DW1000_RX_DIAGNOSTIC    0
 #endif
 
 /**
  * @brief Default UWB RX Antenna separation distance in m
  */
-#ifndef DW1000_TX_PREAM_CIDX_DEAULT
-#define DW1000_TX_PREAM_CIDX_DEAULT     9
+#ifndef CONFIG_DW1000_TX_PREAM_CIDX_DEAULT
+#define CONFIG_DW1000_TX_PREAM_CIDX_DEAULT     9
 #endif
 
 /**
@@ -187,43 +186,45 @@ extern "C" {
  * - DWT_PLEN_32   : When setting length 32 symbols this is 0x0,  which is programmed to byte 2 of the TX_FCTRL register
  * - DWT_PLEN_72   : Non-standard length 72
  */
-#ifndef DW1000_TX_PREAM_LEN_DEFAULT
-#define DW1000_TX_PREAM_LEN_DEFAULT     DWT_PLEN_128
+#ifndef CONFIG_DW1000_TX_PREAM_LEN_DEFAULT
+#define CONFIG_DW1000_TX_PREAM_LEN_DEFAULT      DWT_PLEN_128
 #endif
 
 /**
  * @brief Default UWB RX Antenna separation distance in m
  */
-#ifndef DW1000_RX_ANTSEP_DEFAULT
-#define DW1000_RX_ANTSEP_DEFAULT       0.0205
+#ifndef CONFIG_DW1000_RX_ANTSEP_DEFAULT
+#define CONFIG_DW1000_RX_ANTSEP_DEFAULT       0.0205
 #endif
 
 /**
  * @brief   Default MAC FrameFilter (0x00ff = frame filtering enabled, all frames
  *          matching PANID and destination address accepted)
  */
-#ifndef DW1000_FRAME_FILTER_DEFAULT
-#define DW1000_FRAME_FILTER_DEFAULT     0x00ff
+#ifndef CONFIG_DW1000_FRAME_FILTER_DEFAULT
+#define CONFIG_DW1000_FRAME_FILTER_DEFAULT     0x00ff
 #endif
 
 /**
  * @brief   Default MAC FrameFilter Crystal Trim value, 0xff == not set
  */
-#ifndef DW1000_XTAL_TRIM_DEFAULT
-#define DW1000_XTAL_TRIM_DEFAULT        0x10
+#ifndef CONFIG_DW1000_XTAL_TRIM_DEFAULT
+#define CONFIG_DW1000_XTAL_TRIM_DEFAULT        0x10
 #endif
 
 /**
  * @brief    Time until the Receiver is stable, (in us)
  */
-#ifndef DW1000_RX_STABLE_TIME_US
-#define DW1000_RX_STABLE_TIME_US        6
+#ifndef CONFIG_DW1000_RX_STABLE_TIME_US
+#define CONFIG_DW1000_RX_STABLE_TIME_US        6
 #endif
 
 /**
  * @brief Enables forced TRXOFF in start_tx and start_tx interface
  */
-#define DW1000_TRXOFF_ENABLE            1
+#ifndef CONFIG_DW1000_TRXOFF_ENABLE
+#define CONFIG_DW1000_TRXOFF_ENABLE            1
+#endif
 
 /**
  * @brief Enables double buffer
@@ -233,27 +234,37 @@ extern "C" {
 /**
  * @brief Load LDE microcode on wake up
  */
-#define DW1000_LDE_ENABLE   true
+#ifndef CONFIG_DW1000_LDE_ENABLE
+#define CONFIG_DW1000_LDE_ENABLE   true
+#endif
 
 /**
  * @brief Load the LDO tune value on wake up
  */
-#define DW1000_LDO_ENABLE   false
+#ifndef CONFIG_DW1000_LDO_ENABLE
+#define CONFIG_DW1000_LDO_ENABLE   false
+#endif
 
 /**
  * @brief Enable sleep
  */
-#define DW1000_SLEEP_ENABLE     true
+#ifndef CONFIG_DW1000_SLEEP_ENABLE
+#define CONFIG_DW1000_SLEEP_ENABLE     true
+#endif
 
 /**
  * @brief Wakeup to Rx state
  */
-#define DW1000_WAKEUP_RX_ENABLE true
+#ifndef CONFIG_DW1000_WAKEUP_RX_ENABLE
+#define CONFIG_DW1000_WAKEUP_RX_ENABLE true
+#endif
 
 /**
  * @brief On error re-enable
  */
-#define DW1000_RX_AUTO_ENABLE    true
+#ifndef CONFIG_DW1000_RX_AUTO_ENABLE
+#define CONFIG_DW1000_RX_AUTO_ENABLE    true
+#endif
 
 #ifdef __cplusplus
 }

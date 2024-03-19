@@ -19,8 +19,13 @@
  */
 
 #include <assert.h>
+#include <stdlib.h>
+
+#include "fmt.h"
 
 #include "uri_parser.h"
+
+#define MAX_PORT_STR_LEN    (5)
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -93,6 +98,8 @@ bool _consume_port(uri_parser_result_t *result, const char *ipv6_end,
 {
     /* check for port after host part */
     const char *port_begin = NULL;
+    uint16_t port_str_len = 0;
+
     /* repeat until last ':' in authority section */
     /* if ipv6 address, check after ipv6 end marker */
     const char *p = (ipv6_end ? ipv6_end : result->host);
@@ -103,14 +110,39 @@ bool _consume_port(uri_parser_result_t *result, const char *ipv6_end,
 
     /* check if match */
     if (port_begin && (port_begin[0] == ':')) {
-        /* port should be at least one character, => + 1 */
-        if (port_begin + 1 == authority_end) {
+        port_begin++;
+
+        /* port should be at least one character long */
+        if (port_begin == authority_end) {
             return false;
         }
-        result->port = port_begin + 1;
-        result->port_len = authority_end - result->port;
+
+        port_str_len = authority_end - port_begin;
+
+        /* Verify that the port number is up to 5 (random) chars in size */
+        if (port_str_len > MAX_PORT_STR_LEN) {
+            return false;
+        }
+
+        /* Verify that all characters of the port are numerical */
+        for (unsigned int i = 0; i < port_str_len; ++i) {
+            if (!((port_begin[i] >= '0') && (port_begin[i] <= '9'))) {
+                return false;
+            }
+        }
+
+        /* Verify that the port is smaller or equal to UINT16_MAX. */
+        uint32_t port = scn_u32_dec(port_begin, port_str_len);
+        if (port > UINT16_MAX) {
+            return false;
+        }
+
+        result->port = (uint16_t)port;
+        result->port_str = port_begin;
+        result->port_str_len = port_str_len;
+
         /* cut host part before port and ':' */
-        result->host_len -= result->port_len + 1;
+        result->host_len -= result->port_str_len + 1;
     }
 
     return true;
@@ -292,10 +324,16 @@ int uri_parser_process(uri_parser_result_t *result, const char *uri,
     memset(result, 0, sizeof(*result));
 
     if (uri_parser_is_absolute(uri, uri_len)) {
-        return _parse_absolute(result, uri, uri + uri_len);
+        if (_parse_absolute(result, uri, uri + uri_len) != 0) {
+            memset(result, 0, sizeof(*result));
+            return -1;
+        }
     }
     else {
-        return _parse_relative(result, uri, uri + uri_len);
+        if (_parse_relative(result, uri, uri + uri_len) != 0) {
+            memset(result, 0, sizeof(*result));
+            return -1;
+        }
     }
 
     return 0;

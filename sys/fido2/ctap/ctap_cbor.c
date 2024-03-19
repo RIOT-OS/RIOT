@@ -819,8 +819,12 @@ int fido2_ctap_cbor_parse_get_assertion_req(ctap_get_assertion_req_t *req,
     CborValue map;
     CborType type;
 
-    ret = cbor_parser_init(req_raw, len, CborValidateCanonicalFormat, &parser,
-                           &it);
+    ret = cbor_parser_init(req_raw, len, 0, &parser, &it);
+    if (ret != CborNoError) {
+        return CTAP2_ERR_CBOR_PARSING;
+    }
+
+    ret = cbor_value_validate(&it, CborValidateCanonicalFormat);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
@@ -937,8 +941,12 @@ int fido2_ctap_cbor_parse_client_pin_req(ctap_client_pin_req_t *req,
     CborValue it;
     CborValue map;
 
-    ret = cbor_parser_init(req_raw, len, CborValidateCanonicalFormat, &parser,
-                           &it);
+    ret = cbor_parser_init(req_raw, len, 0, &parser, &it);
+    if (ret != CborNoError) {
+        return CTAP2_ERR_CBOR_PARSING;
+    }
+
+    ret = cbor_value_validate(&it, CborValidateCanonicalFormat);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
@@ -1048,8 +1056,12 @@ int fido2_ctap_cbor_parse_make_credential_req(ctap_make_credential_req_t *req,
     CborValue map;
     CborType type;
 
-    ret = cbor_parser_init(buf, size, CborValidateCanonicalFormat, &parser,
-                           &it);
+    ret = cbor_parser_init(buf, size, 0, &parser, &it);
+    if (ret != CborNoError) {
+        return CTAP2_ERR_CBOR_PARSING;
+    }
+
+    ret = cbor_value_validate(&it, CborValidateCanonicalFormat);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
@@ -1545,7 +1557,7 @@ static int _parse_options(CborValue *it, ctap_options_t *options)
         }
         else {
             /* ignore unknown options */
-            DEBUG("Ctap parse options, unknown uption: %s \n", key);
+            DEBUG("Ctap parse options, unknown option: %s \n", key);
         }
 
         cbor_value_advance(&map);
@@ -1562,6 +1574,7 @@ static int _parse_allow_list(CborValue *it, ctap_cred_desc_alt_t *allow_list,
 {
     size_t len2 = *allow_list_len;
     int retval = _parse_exclude_list(it, allow_list, &len2);
+
     *allow_list_len = (uint8_t)len2;
     return retval;
 }
@@ -1717,6 +1730,7 @@ static int _parse_byte_array_u8len(CborValue *it, uint8_t *dst, uint8_t *len)
 {
     size_t len2 = *len;
     int retval = _parse_byte_array(it, dst, &len2);
+
     *len = (uint8_t)len2;
     return retval;
 }
@@ -1745,6 +1759,7 @@ static int _parse_text_string_u8len(CborValue *it, char *dst, uint8_t *len)
 {
     size_t len2 = *len;
     int retval = _parse_text_string(it, dst, &len2);
+
     *len = (uint8_t)len2;
     return retval;
 }

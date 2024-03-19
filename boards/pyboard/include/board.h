@@ -33,12 +33,8 @@ extern "C" {
  * @name    LED pin definitions and handlers
  * @{
  */
-#define LED0_PIN            GPIO_PIN(PORT_B, 4)
-#define LED0_MASK           (1 << 4)
-
-#define LED0_ON             (GPIOB->BSRR = LED0_MASK)
-#define LED0_OFF            (GPIOB->BSRR = (LED0_MASK << 16))
-#define LED0_TOGGLE         (GPIOB->ODR  ^= LED0_MASK)
+#define LED0_PIN_NUM        4
+#define LED0_PORT_NUM       PORT_B
 /** @} */
 
 /**
@@ -49,14 +45,11 @@ extern "C" {
 #define BTN0_MODE           GPIO_IN_PU              /**< User button pin mode */
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and stdio
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif
+
+#include "stm32_leds.h"
 
 #endif /* BOARD_H */
 /** @} */

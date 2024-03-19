@@ -115,6 +115,10 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value,
         return res;
     case NETOPT_STATE:
         return _set_submac_state(submac, *((netopt_state_t*) value));
+    case NETOPT_PROMISCUOUSMODE:
+        return ieee802154_radio_set_frame_filter_mode(&submac->dev,
+                                                      *((bool *)value) ? IEEE802154_FILTER_PROMISC
+                                                                       : IEEE802154_FILTER_ACCEPT);
     default:
         break;
     }
@@ -141,7 +145,7 @@ void ieee802154_submac_ack_timer_set(ieee802154_submac_t *submac, uint16_t us)
                                                              netdev_ieee802154_submac_t,
                                                              submac);
 
-    xtimer_set(&netdev_submac->ack_timer, us);
+    ztimer_set(ZTIMER_USEC, &netdev_submac->ack_timer, us);
 }
 
 void ieee802154_submac_ack_timer_cancel(ieee802154_submac_t *submac)
@@ -150,7 +154,7 @@ void ieee802154_submac_ack_timer_cancel(ieee802154_submac_t *submac)
                                                              netdev_ieee802154_submac_t,
                                                              submac);
 
-    xtimer_remove(&netdev_submac->ack_timer);
+    ztimer_remove(ZTIMER_USEC, &netdev_submac->ack_timer);
     /* Prevent a race condition between the RX_DONE event and the ACK timeout */
     netdev_submac->isr_flags &= ~NETDEV_SUBMAC_FLAGS_ACK_TIMEOUT;
 
@@ -356,15 +360,20 @@ static int _init(netdev_t *netdev)
 
     uint16_t chan = submac->channel_num;
     int16_t tx_power = submac->tx_pow;
-    netopt_enable_t enable = NETOPT_ENABLE;
+    static const netopt_enable_t ack_req =
+        IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_ACK_REQ) ? NETOPT_ENABLE : NETOPT_DISABLE;
 
     /* Initialise netdev_ieee802154_t struct */
     netdev_ieee802154_set(netdev_ieee802154, NETOPT_CHANNEL,
                           &chan, sizeof(chan));
     netdev_ieee802154_set(netdev_ieee802154, NETOPT_ACK_REQ,
-                          &enable, sizeof(enable));
+                          &ack_req, sizeof(ack_req));
 
     netdev_submac->dev.txpower = tx_power;
+
+    /* signal link UP */
+    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+
     return 0;
 }
 

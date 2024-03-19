@@ -1,0 +1,25 @@
+ifeq (,$(filter l3gd20% l3g4200d_ng %3g4250d,$(USEMODULE)))
+  # pull in L3GD20H variant by default if no interface is defined
+  USEMODULE += l3gd20h
+endif
+
+ifeq (,$(filter l3gxxxx_spi,$(USEMODULE)))
+  # pull in I2C variant by default if no interface is defined
+  USEMODULE += l3gxxxx_i2c
+endif
+
+ifneq (,$(filter l3gxxxx_spi,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_spi
+endif
+
+ifneq (,$(filter l3gxxxx_i2c,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
+
+ifneq (,$(filter l3gxxxx_irq_%,$(USEMODULE)))
+  USEMODULE += l3gxxxx_irq
+endif
+
+ifneq (,$(filter l3gxxxx_irq,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_irq
+endif

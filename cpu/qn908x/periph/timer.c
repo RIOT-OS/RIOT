@@ -25,10 +25,11 @@
 
 #include <stdlib.h>
 
-#include "cpu.h"
+#include "bitarithm.h"
 #include "board.h"
-#include "periph_conf.h"
+#include "cpu.h"
 #include "periph/timer.h"
+#include "periph_conf.h"
 
 #include "vendor/drivers/fsl_clock.h"
 
@@ -66,9 +67,28 @@ static const clock_ip_name_t ctimers_clocks[FSL_FEATURE_SOC_CTIMER_COUNT] =
 #error "ERROR in board timer configuration: too many timers defined"
 #endif
 
-int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
+uword_t timer_query_freqs_numof(tim_t dev)
 {
-    DEBUG("timer_init(%u, %lu)\n", tim, freq);
+    assert(dev < TIMER_NUMOF);
+    (void)dev;
+    return 256;
+}
+
+uint32_t timer_query_freqs(tim_t dev, uword_t index)
+{
+    assert(dev < TIMER_NUMOF);
+    (void)dev;
+
+    if (index >= UINT8_MAX) {
+        return 0;
+    }
+
+    return CLOCK_GetFreq(kCLOCK_ApbClk) / (index + 1);
+}
+
+int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
+{
+    DEBUG("timer_init(%u, %" PRIu32 ")\n", tim, freq);
     if (tim >= TIMER_NUMOF) {
         return -1;
     }
@@ -84,7 +104,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     uint32_t core_freq = CLOCK_GetFreq(kCLOCK_ApbClk);
     uint32_t prescale = (core_freq + freq / 2) / freq - 1;
     if (prescale == (uint32_t)(-1)) {
-        DEBUG("timer_init: Frequency %lu is too fast for core_freq=%lu",
+        DEBUG("timer_init: Frequency %" PRIu32 " is too fast for core_freq=%" PRIu32,
               freq, core_freq);
         return -1;
     }
@@ -102,7 +122,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 {
     DEBUG("timer_set_absolute(%u, %u, %u)\n", tim, channel, value);
-    if ((tim >= TIMER_NUMOF) || (channel >= TIMER_CHANNELS)) {
+    if ((tim >= TIMER_NUMOF) || (channel >= TIMER_CHANNEL_NUMOF)) {
         return -1;
     }
     CTIMER_Type* const dev = ctimers[tim];
@@ -111,10 +131,35 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
     return 0;
 }
 
+int timer_set(tim_t tim, int channel, unsigned int value)
+{
+    DEBUG("timer_set(%u, %u, %u)\n", tim, channel, value);
+    if ((tim >= TIMER_NUMOF) || (channel >= TIMER_CHANNEL_NUMOF)) {
+        return -1;
+    }
+    CTIMER_Type* const dev = ctimers[tim];
+
+    /* no IRQ will be generated on value == 0, so bump it here */
+    value = (value != 0) ? value : 1;
+
+    unsigned irq_state = irq_disable();
+
+    /* briefly pause timer */
+    ctimers[tim]->TCR &= ~CTIMER_TCR_CEN_MASK;
+    /* set absolute timeout based on given value and enable IRQ */
+    dev->MR[channel] = dev->TC + value;
+    dev->MCR |= (CTIMER_MCR_MR0I_MASK << (channel * 3));
+    /* and resume timer */
+    ctimers[tim]->TCR |= CTIMER_TCR_CEN_MASK;
+    irq_restore(irq_state);
+
+    return 0;
+}
+
 int timer_clear(tim_t tim, int channel)
 {
     DEBUG("timer_clear(%u, %d)\n", tim, channel);
-    if ((tim >= TIMER_NUMOF) || (channel >= TIMER_CHANNELS)) {
+    if ((tim >= TIMER_NUMOF) || (channel >= TIMER_CHANNEL_NUMOF)) {
         return -1;
     }
     CTIMER_Type* const dev = ctimers[tim];
@@ -144,14 +189,15 @@ static inline void isr_ctimer_n(CTIMER_Type *dev, uint32_t ctimer_num)
 {
     DEBUG("isr_ctimer_%" PRIu32 " flags=0x%" PRIx32 "\n",
           ctimer_num, dev->IR);
-    for (uint32_t i = 0; i < TIMER_CHANNELS; i++) {
-        if (dev->IR & (1u << i)) {
-            /* Note: setting the bit to 1 in the flag register will clear the
-             * bit. */
-            dev->IR = 1u << i;
-            dev->MCR &= ~(CTIMER_MCR_MR0I_MASK << (i * 3));
-            isr_ctx[ctimer_num].cb(isr_ctx[ctimer_num].arg, 0);
-        }
+    unsigned state = dev->IR & ((1 << TIMER_CHANNEL_NUMOF) - 1);
+    while (state) {
+        uint8_t channel;
+        state = bitarithm_test_and_clear(state, &channel);
+        /* Note: setting the bit to 1 in the flag register will clear the
+         * bit. */
+        dev->IR = 1u << channel;
+        dev->MCR &= ~(CTIMER_MCR_MR0I_MASK << (channel * 3));
+        isr_ctx[ctimer_num].cb(isr_ctx[ctimer_num].arg, channel);
     }
     cortexm_isr_end();
 }

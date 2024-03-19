@@ -80,6 +80,14 @@ void uwb_dw1000_setup(dw1000_dev_instance_t* dev, dw1000_params_t* params);
  */
 void uwb_dw1000_config_and_start(dw1000_dev_instance_t* dev);
 
+/**
+ * @brief   Updates tx_power config from OTP is any
+ *
+ *
+ * @param[out]  dev     dw1000 device descriptor
+ */
+void uwb_dw1000_update_config_from_otp(dw1000_dev_instance_t* dev);
+
 #ifdef __cplusplus
 }
 #endif

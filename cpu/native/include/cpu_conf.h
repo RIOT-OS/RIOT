@@ -27,30 +27,12 @@ extern "C" {
  *
  * @{
  */
-#ifdef __MACH__ /* OSX */
 #ifndef THREAD_STACKSIZE_DEFAULT
-#define THREAD_STACKSIZE_DEFAULT            (163840)
-#endif
-#ifndef THREAD_STACKSIZE_IDLE
-#define THREAD_STACKSIZE_IDLE               (THREAD_STACKSIZE_DEFAULT)
-#endif
-#ifndef THREAD_EXTRA_STACKSIZE_PRINTF
-#define THREAD_EXTRA_STACKSIZE_PRINTF       (81920)
-#endif
-#ifndef THREAD_EXTRA_STACKSIZE_PRINTF_FLOAT
-#define THREAD_EXTRA_STACKSIZE_PRINTF_FLOAT (81920)
-#endif
-/* for core/include/thread.h */
-#ifndef THREAD_STACKSIZE_MINIMUM
-#define THREAD_STACKSIZE_MINIMUM            (THREAD_STACKSIZE_DEFAULT)
-#endif
-#ifndef ISR_STACKSIZE
-#define ISR_STACKSIZE                       (THREAD_STACKSIZE_DEFAULT)
-#endif
-
-#else /* Linux etc. */
-#ifndef THREAD_STACKSIZE_DEFAULT
+#if (__SIZEOF_POINTER__ == 8)
+#define THREAD_STACKSIZE_DEFAULT            (16384)
+#else
 #define THREAD_STACKSIZE_DEFAULT            (8192)
+#endif
 #endif
 #ifndef THREAD_STACKSIZE_IDLE
 #define THREAD_STACKSIZE_IDLE               (THREAD_STACKSIZE_DEFAULT)
@@ -69,7 +51,6 @@ extern "C" {
 #ifndef ISR_STACKSIZE
 #define ISR_STACKSIZE                       (THREAD_STACKSIZE_DEFAULT)
 #endif
-#endif /* OS */
 /** @} */
 
 /**

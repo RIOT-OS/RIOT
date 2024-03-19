@@ -17,6 +17,8 @@ config BOARD_COMMON_REMOTE
     select HAS_PERIPH_UART
     select HAS_RIOTBOOT
 
+    select HAVE_CC2538_RF
+
 config MODULE_BOARDS_COMMON_REMOTE
     bool
     default y

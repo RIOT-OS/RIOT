@@ -1,0 +1,21 @@
+# Copyright (C) 2022 Benjamin Valentin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_DEBUG_IRQ_DISABLE
+    bool "Measure IRQ disable durations"
+    depends on TEST_KCONFIG
+    depends on CPU_CORE_CORTEX_M
+    help
+        Print time spent with IRQs disabled
+
+config DEBUG_IRQ_DISABLE_THRESHOLD
+    int "Suppress Threshold"
+    default 1
+    depends on MODULE_DEBUG_IRQ_DISABLE
+    help
+        Threshold (in CPU ticks) below which periods with IRQs disabled are not printed.
+        Use this to prevent *a lot* of output when debugging.

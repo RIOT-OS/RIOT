@@ -62,7 +62,7 @@ static int littlefs_err_to_errno(ssize_t err)
 }
 
 static int _dev_read(const struct lfs_config *c, lfs_block_t block,
-                 lfs_off_t off, void *buffer, lfs_size_t size)
+                     lfs_off_t off, void *buffer, lfs_size_t size)
 {
     littlefs2_desc_t *fs = c->context;
     mtd_dev_t *mtd = fs->dev;
@@ -70,12 +70,12 @@ static int _dev_read(const struct lfs_config *c, lfs_block_t block,
     DEBUG("lfs_read: c=%p, block=%" PRIu32 ", off=%" PRIu32 ", buf=%p, size=%" PRIu32 "\n",
           (void *)c, block, off, buffer, size);
 
-    return mtd_read_page(mtd, buffer, (fs->base_addr + block) * mtd->pages_per_sector,
-                         off, size);
+    uint32_t page = (fs->base_addr + block) * fs->sectors_per_block * mtd->pages_per_sector;
+    return mtd_read_page(mtd, buffer, page, off, size);
 }
 
 static int _dev_write(const struct lfs_config *c, lfs_block_t block,
-                  lfs_off_t off, const void *buffer, lfs_size_t size)
+                      lfs_off_t off, const void *buffer, lfs_size_t size)
 {
     littlefs2_desc_t *fs = c->context;
     mtd_dev_t *mtd = fs->dev;
@@ -83,8 +83,8 @@ static int _dev_write(const struct lfs_config *c, lfs_block_t block,
     DEBUG("lfs_write: c=%p, block=%" PRIu32 ", off=%" PRIu32 ", buf=%p, size=%" PRIu32 "\n",
           (void *)c, block, off, buffer, size);
 
-    return mtd_write_page_raw(mtd, buffer, (fs->base_addr + block) * mtd->pages_per_sector,
-                              off, size);
+    uint32_t page = (fs->base_addr + block) * fs->sectors_per_block * mtd->pages_per_sector;
+    return mtd_write_page_raw(mtd, buffer, page, off, size);
 }
 
 static int _dev_erase(const struct lfs_config *c, lfs_block_t block)
@@ -94,8 +94,8 @@ static int _dev_erase(const struct lfs_config *c, lfs_block_t block)
 
     DEBUG("lfs_erase: c=%p, block=%" PRIu32 "\n", (void *)c, block);
 
-    return mtd_erase_sector(mtd, fs->base_addr + block, 1);
-}
+    uint32_t sector = (fs->base_addr + block) * fs->sectors_per_block;
+    return mtd_erase_sector(mtd, sector, fs->sectors_per_block);}
 
 static int _dev_sync(const struct lfs_config *c)
 {
@@ -117,11 +117,24 @@ static int prepare(littlefs2_desc_t *fs)
 
     memset(&fs->fs, 0, sizeof(fs->fs));
 
-    if (!fs->config.block_count) {
-        fs->config.block_count = fs->dev->sector_count - fs->base_addr;
-    }
+    static_assert(0 > CONFIG_LITTLEFS2_MIN_BLOCK_SIZE_EXP ||
+                  6 < CONFIG_LITTLEFS2_MIN_BLOCK_SIZE_EXP,
+                  "CONFIG_LITTLEFS2_MIN_BLOCK_SIZE_EXP must be at least 7, "
+                  "to configure a reasonable block size of at least 128 bytes.");
+
+    size_t block_size = fs->dev->pages_per_sector * fs->dev->page_size;
+#if CONFIG_LITTLEFS2_MIN_BLOCK_SIZE_EXP >= 0
+    block_size = ((block_size - 1) + (1u << CONFIG_LITTLEFS2_MIN_BLOCK_SIZE_EXP))
+                 / block_size * block_size;
+#endif
+    fs->sectors_per_block = block_size / (fs->dev->pages_per_sector * fs->dev->page_size);
+    size_t block_count = fs->dev->sector_count / fs->sectors_per_block;
+
     if (!fs->config.block_size) {
-        fs->config.block_size = fs->dev->page_size * fs->dev->pages_per_sector;
+        fs->config.block_size = block_size;
+    }
+    if (!fs->config.block_count) {
+        fs->config.block_count = block_count - fs->base_addr;
     }
     if (!fs->config.prog_size) {
         fs->config.prog_size = fs->dev->page_size;
@@ -278,11 +291,10 @@ static inline lfs_file_t * _get_lfs_file(vfs_file_t *f)
     return (lfs_file_t *)(uintptr_t)f->private_data.buffer;
 }
 
-static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode, const char *abs_path)
+static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode)
 {
     littlefs2_desc_t *fs = filp->mp->private_data;
     lfs_file_t *fp = _get_lfs_file(filp);
-    (void) abs_path;
     (void) mode;
 
     mutex_lock(&fs->lock);
@@ -312,7 +324,7 @@ static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode, con
         l_flags |= LFS_O_EXCL;
     }
 
-    DEBUG("littlefs: open: %s (abs_path: %s), flags: 0x%x\n", name, abs_path, (int) l_flags);
+    DEBUG("littlefs: open: %s, flags: 0x%x\n", name, (int) l_flags);
 
     int ret = lfs_file_open(&fs->fs, fp, name, l_flags);
     mutex_unlock(&fs->lock);
@@ -342,8 +354,8 @@ static ssize_t _write(vfs_file_t *filp, const void *src, size_t nbytes)
 
     mutex_lock(&fs->lock);
 
-    DEBUG("littlefs: write: filp=%p, fp=%p, src=%p, nbytes=%u\n",
-          (void *)filp, (void *)fp, (void *)src, (unsigned)nbytes);
+    DEBUG("littlefs: write: filp=%p, fp=%p, src=%p, nbytes=%" PRIuSIZE "\n",
+          (void *)filp, (void *)fp, (void *)src, nbytes);
 
     ssize_t ret = lfs_file_write(&fs->fs, fp, src, nbytes);
     mutex_unlock(&fs->lock);
@@ -358,8 +370,8 @@ static ssize_t _read(vfs_file_t *filp, void *dest, size_t nbytes)
 
     mutex_lock(&fs->lock);
 
-    DEBUG("littlefs: read: filp=%p, fp=%p, dest=%p, nbytes=%u\n",
-          (void *)filp, (void *)fp, (void *)dest, (unsigned)nbytes);
+    DEBUG("littlefs: read: filp=%p, fp=%p, dest=%p, nbytes=%" PRIuSIZE "\n",
+          (void *)filp, (void *)fp, (void *)dest, nbytes);
 
     ssize_t ret = lfs_file_read(&fs->fs, fp, dest, nbytes);
     mutex_unlock(&fs->lock);
@@ -449,7 +461,8 @@ static int _statvfs(vfs_mount_t *mountp, const char *restrict path, struct statv
     mutex_unlock(&fs->lock);
 
     buf->f_bsize = fs->fs.cfg->block_size;      /* block size */
-    buf->f_frsize = fs->fs.cfg->block_size;     /* fundamental block size */
+    buf->f_frsize = fs->dev->page_size *
+                    fs->dev->pages_per_sector;  /* fundamental block size */
     buf->f_blocks = fs->fs.cfg->block_count;    /* Blocks total */
     buf->f_bfree = buf->f_blocks - nb_blocks;   /* Blocks free */
     buf->f_bavail = buf->f_blocks - nb_blocks;  /* Blocks available to non-privileged processes */
@@ -468,16 +481,15 @@ static inline lfs_dir_t * _get_lfs_dir(vfs_DIR *dirp)
     return (lfs_dir_t *)(uintptr_t)dirp->private_data.buffer;
 }
 
-static int _opendir(vfs_DIR *dirp, const char *dirname, const char *abs_path)
+static int _opendir(vfs_DIR *dirp, const char *dirname)
 {
-    (void)abs_path;
     littlefs2_desc_t *fs = dirp->mp->private_data;
     lfs_dir_t *dir = _get_lfs_dir(dirp);
 
     mutex_lock(&fs->lock);
 
-    DEBUG("littlefs: opendir: dirp=%p, dirname=%s (abs_path=%s)\n",
-          (void *)dirp, dirname, abs_path);
+    DEBUG("littlefs: opendir: dirp=%p, dirname=%s\n",
+          (void *)dirp, dirname);
 
     int ret = lfs_dir_open(&fs->fs, dir, dirname);
     mutex_unlock(&fs->lock);

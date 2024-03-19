@@ -1,6 +1,6 @@
 PKG_NAME=libcose
 PKG_URL=https://github.com/bergzand/libcose
-PKG_VERSION=2929fdce7affbd5bb9db201370d95d8f7cf680f9
+PKG_VERSION=ea1fed87d6ca9b478f8bed323af97e6b192c0a6d
 PKG_LICENSE=LGPL
 
 include $(RIOTBASE)/pkg/pkg.mk

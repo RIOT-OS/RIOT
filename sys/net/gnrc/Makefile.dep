@@ -1,5 +1,9 @@
+ifneq (,$(filter bhp,$(USEMODULE)))
+  USEMODULE += bhp_event
+endif
+
 ifneq (,$(filter gcoap,$(USEMODULE)))
-   USEMODULE += gnrc_sock_async
+  USEMODULE += gnrc_sock_async
 endif
 
 ifneq (,$(filter sock_async,$(USEMODULE)))
@@ -20,7 +24,12 @@ ifneq (,$(filter gnrc_gomach,$(USEMODULE)))
   USEMODULE += gnrc_nettype_gomach
   USEMODULE += random
   USEMODULE += xtimer
+  ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+    # requires 64bit timestamps
+    USEMODULE += ztimer64_xtimer_compat
+  endif
   USEMODULE += gnrc_mac
+  USEMODULE += ztimer_no_periph_rtt
   FEATURES_REQUIRED += periph_rtt
 endif
 
@@ -30,6 +39,11 @@ ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
   USEMODULE += hashes
   USEMODULE += iolist
   USEMODULE += crypto_aes_128
+endif
+
+ifneq (,$(filter gnrc_lorawan_1_1,$(USEMODULE)))
+  USEMODULE += gnrc_lorawan
+  FEATURES_REQUIRED += periph_flashpage
 endif
 
 ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
@@ -60,7 +74,10 @@ endif
 ifneq (,$(filter gnrc_dhcpv6_client_simple_pd,$(USEMODULE)))
   USEMODULE += gnrc_dhcpv6_client
   USEMODULE += dhcpv6_client_ia_pd
-  CFLAGS += -DCONFIG_GNRC_IPV6_NIB_ADV_ROUTER=0
+endif
+
+ifneq (,$(filter gnrc_netif_cmd_lora,$(USEMODULE)))
+  USEMODULE += shell_cmd_gnrc_netif_lorawan
 endif
 
 ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
@@ -68,14 +85,14 @@ ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
   USEMODULE += uhcpc
   USEMODULE += gnrc_sock_udp
   USEMODULE += fmt
-  CFLAGS += -DCONFIG_GNRC_IPV6_NIB_ADV_ROUTER=0
 endif
 
-ifneq (,$(filter gnrc_%,$(filter-out gnrc_lorawan gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pkt%,$(USEMODULE))))
+ifneq (,$(filter gnrc_%,$(filter-out gnrc_lorawan gnrc_lorawan_1_1 gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pkt%,$(USEMODULE))))
   USEMODULE += gnrc
 endif
 
 ifneq (,$(filter gnrc_sock_%,$(USEMODULE)))
+  USEMODULE += iolist
   USEMODULE += gnrc_sock
   ifneq (,$(filter sock_aux_timestamp,$(USEMODULE)))
     USEMODULE += gnrc_netif_timestamp
@@ -124,8 +141,6 @@ endif
 
 ifneq (,$(filter gnrc_ipv6_auto_subnets,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_nib_rtr_adv_pio_cb
-  CFLAGS += -DCONFIG_GNRC_IPV6_NIB_ADV_ROUTER=0
-  CFLAGS += -DCONFIG_GNRC_IPV6_NIB_ADD_RIO_IN_LAST_RA=1
   USEMODULE += xtimer
   ifeq (,$(filter gnrc_ipv6_auto_subnets_simple,$(USEMODULE)))
     DEFAULT_MODULE += gnrc_ipv6_auto_subnets_auto_init
@@ -157,9 +172,12 @@ ifneq (,$(filter gnrc_netif_bus,$(USEMODULE)))
   USEMODULE += core_msg_bus
 endif
 
-ifneq (,$(filter gnrc_netif_events,$(USEMODULE)))
-  USEMODULE += core_thread_flags
-  USEMODULE += event
+ifneq (,$(filter netdev_eth slipdev, $(USEMODULE)))
+  ifeq (,$(filter gnrc_sixloenc, $(USEMODULE)))
+    ifneq (,$(filter gnrc_ipv6, $(USEMODULE)))
+      USEMODULE += gnrc_ipv6_classic
+    endif
+  endif
 endif
 
 ifneq (,$(filter ieee802154 nrfmin esp_now cc110x gnrc_sixloenc,$(USEMODULE)))
@@ -228,10 +246,43 @@ ifneq (,$(filter gnrc_sixlowpan_frag_sfr,$(USEMODULE)))
   USEMODULE += gnrc_sixlowpan_frag_rb
   USEMODULE += evtimer
   USEMODULE += xtimer
-  ifneq (,$(filter gnrc_tx_sync,$(USEMODULE)))
-    # TODO: Implement gnrc_tx_sync for gnrc_sixlowpand_frag_sfr
-    $(error module gnrc_tx_sync conflicts with gnrc_sixlowpand_frag_sfr)
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_frag_sfr_congure_%,$(USEMODULE)))
+  USEMODULE += gnrc_sixlowpan_frag_sfr_congure
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_frag_sfr_congure_abe,$(USEMODULE)))
+  USEMODULE += gnrc_sixlowpan_frag_sfr_congure_reno
+  USEMODULE += congure_abe
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_frag_sfr_congure_quic,$(USEMODULE)))
+  USEMODULE += congure_quic
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_frag_sfr_congure_reno,$(USEMODULE)))
+  USEMODULE += congure_reno
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_frag_sfr_congure,$(USEMODULE)))
+  USEMODULE += gnrc_sixlowpan_frag_sfr
+  ifeq (,$(filter gnrc_sixlowpan_frag_sfr_congure_% congure_mock,$(USEMODULE)))
+	# pick Appendix C as default congestion control
+    USEMODULE += gnrc_sixlowpan_frag_sfr_congure_sfr
   endif
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_frag_sfr_ecn_%,$(USEMODULE)))
+  USEMODULE += gnrc_sixlowpan_frag_sfr_ecn
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_frag_sfr_ecn_if_out,$(USEMODULE)))
+  USEMODULE += gnrc_netif_pktq
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_frag_sfr_ecn,$(USEMODULE)))
+  USEMODULE += gnrc_sixlowpan_frag_sfr
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_frag_sfr_stats,$(USEMODULE)))
@@ -397,11 +448,6 @@ ifneq (,$(filter gnrc_udp,$(USEMODULE)))
   USEMODULE += udp
 endif
 
-ifneq (,$(filter gnrc_udp_cmd,$(USEMODULE)))
-  USEMODULE += gnrc_udp
-  USEMODULE += gnrc_pktdump
-endif
-
 ifneq (,$(filter gnrc_tcp,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_gnrc_tcp
   USEMODULE += gnrc_nettype_tcp
@@ -441,7 +487,7 @@ ifneq (,$(filter gnrc_pktbuf, $(USEMODULE)))
   ifeq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
     USEMODULE += gnrc_pktbuf_static
   endif
-  ifeq (gnrc_pktbuf_cmd,$(filter gnrc_pktbuf_%, $(USEMODULE)))
+  ifeq (shell_cmd_gnrc_pktbuf,$(filter gnrc_pktbuf_%, $(USEMODULE)))
     USEMODULE += gnrc_pktbuf_static
   endif
   DEFAULT_MODULE += auto_init_gnrc_pktbuf
@@ -452,14 +498,16 @@ ifneq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
   USEMODULE += gnrc_pktbuf # make MODULE_GNRC_PKTBUF macro available for all implementations
 endif
 
-ifneq (,$(filter gnrc_pktbuf_cmd,$(USEMODULE)))
+ifneq (,$(filter shell_cmd_gnrc_pktbuf,$(USEMODULE)))
   ifneq (,$(filter gnrc_pktbuf_static,$(USEMODULE)))
     USEMODULE += od
   endif
 endif
 
-ifneq (,$(filter gnrc_netif_%,$(USEMODULE)))
+ifneq (,$(filter gnrc_netif_%,$(filter-out gnrc_netif_pktq,$(USEMODULE))))
   USEMODULE += gnrc_netif
+  USEMODULE += core_thread_flags
+  USEMODULE += event
 endif
 
 ifneq (,$(filter gnrc_netif_pktq,$(USEMODULE)))
@@ -470,5 +518,6 @@ ifneq (,$(filter gnrc_lwmac,$(USEMODULE)))
   USEMODULE += gnrc_netif
   USEMODULE += gnrc_nettype_lwmac
   USEMODULE += gnrc_mac
+  USEMODULE += xtimer
   FEATURES_REQUIRED += periph_rtt
 endif

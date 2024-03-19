@@ -68,6 +68,7 @@
 
 #include "sched.h"
 #include "clist.h"
+#include "iolist.h"
 #include "mtd.h"
 #include "xfa.h"
 
@@ -88,8 +89,12 @@ extern "C" {
 #ifndef _MAX
 #define _MAX(a, b) ((a) > (b) ? (a) : (b))
 #endif
-#ifndef MAX4
-#define MAX4(a, b, c, d) _MAX(_MAX((a), (b)), _MAX((c),(d)))
+
+#ifndef MAX5
+/**
+ * @brief   MAX5 Function to get the largest of 5 values
+ */
+#define MAX5(a, b, c, d, e) _MAX(_MAX(_MAX((a), (b)), _MAX((c),(d))), (e))
 #endif
 /** @} */
 
@@ -98,11 +103,54 @@ extern "C" {
  * @{
  */
 #ifdef MODULE_FATFS_VFS
-#define FATFS_VFS_DIR_BUFFER_SIZE       (44)
-#define FATFS_VFS_FILE_BUFFER_SIZE      (72)
+#include "ffconf.h"
+
+#  if FF_FS_TINY
+#    define _FATFS_FILE_CACHE              (0)
+#  else
+#    define _FATFS_FILE_CACHE              FF_MAX_SS
+#  endif
+
+#  if FF_USE_FASTSEEK
+#    if (__SIZEOF_POINTER__ == 8)
+#      define _FATFS_FILE_SEEK_PTR         (8)
+#    else
+#      define _FATFS_FILE_SEEK_PTR         (4)
+#    endif
+#  else
+#    define _FATFS_FILE_SEEK_PTR           (0)
+#  endif
+
+#  if FF_FS_EXFAT
+#    define _FATFS_FILE_EXFAT              (44)
+#    define _FATFS_DIR_EXFAT               (32)
+#  else
+#    define _FATFS_FILE_EXFAT              (0)
+#    define _FATFS_DIR_EXFAT               (0)
+#  endif
+
+#  if FF_USE_LFN
+#    if (__SIZEOF_POINTER__ == 8)
+#      define _FATFS_DIR_LFN               (8)
+#    else
+#      define _FATFS_DIR_LFN               (4)
+#    endif
+#  else
+#    define _FATFS_DIR_LFN                 (0)
+#  endif
+
+#  if (__SIZEOF_POINTER__ == 8)
+#    define FATFS_VFS_DIR_BUFFER_SIZE      (64 + _FATFS_DIR_LFN + _FATFS_DIR_EXFAT)
+#    define FATFS_VFS_FILE_BUFFER_SIZE     (64 + VFS_NAME_MAX + _FATFS_FILE_CACHE + \
+                                           _FATFS_FILE_SEEK_PTR + _FATFS_FILE_EXFAT)
+#  else
+#    define FATFS_VFS_DIR_BUFFER_SIZE      (44 + _FATFS_DIR_LFN + _FATFS_DIR_EXFAT)
+#    define FATFS_VFS_FILE_BUFFER_SIZE     (44 + VFS_NAME_MAX + _FATFS_FILE_CACHE + \
+                                           _FATFS_FILE_SEEK_PTR + _FATFS_FILE_EXFAT)
+#  endif
 #else
-#define FATFS_VFS_DIR_BUFFER_SIZE       (1)
-#define FATFS_VFS_FILE_BUFFER_SIZE      (1)
+#  define FATFS_VFS_DIR_BUFFER_SIZE        (1)
+#  define FATFS_VFS_FILE_BUFFER_SIZE       (1)
 #endif
 /** @} */
 
@@ -111,11 +159,16 @@ extern "C" {
  * @{
  */
 #ifdef MODULE_LITTLEFS
-#define LITTLEFS_VFS_DIR_BUFFER_SIZE    (44)
-#define LITTLEFS_VFS_FILE_BUFFER_SIZE   (56)
+#  if (__SIZEOF_POINTER__ == 8)
+#    define LITTLEFS_VFS_DIR_BUFFER_SIZE   (48)
+#    define LITTLEFS_VFS_FILE_BUFFER_SIZE  (72)
+#  else
+#    define LITTLEFS_VFS_DIR_BUFFER_SIZE   (44)
+#    define LITTLEFS_VFS_FILE_BUFFER_SIZE  (56)
+#  endif
 #else
-#define LITTLEFS_VFS_DIR_BUFFER_SIZE    (1)
-#define LITTLEFS_VFS_FILE_BUFFER_SIZE   (1)
+#  define LITTLEFS_VFS_DIR_BUFFER_SIZE     (1)
+#  define LITTLEFS_VFS_FILE_BUFFER_SIZE    (1)
 #endif
 /** @} */
 
@@ -124,11 +177,16 @@ extern "C" {
  * @{
  */
 #ifdef MODULE_LITTLEFS2
-#define LITTLEFS2_VFS_DIR_BUFFER_SIZE   (52)
-#define LITTLEFS2_VFS_FILE_BUFFER_SIZE  (84)
+#  if (__SIZEOF_POINTER__ == 8)
+#    define LITTLEFS2_VFS_DIR_BUFFER_SIZE  (56)
+#    define LITTLEFS2_VFS_FILE_BUFFER_SIZE (104)
+#  else
+#    define LITTLEFS2_VFS_DIR_BUFFER_SIZE  (52)
+#    define LITTLEFS2_VFS_FILE_BUFFER_SIZE (84)
+#  endif
 #else
-#define LITTLEFS2_VFS_DIR_BUFFER_SIZE   (1)
-#define LITTLEFS2_VFS_FILE_BUFFER_SIZE  (1)
+#  define LITTLEFS2_VFS_DIR_BUFFER_SIZE    (1)
+#  define LITTLEFS2_VFS_FILE_BUFFER_SIZE   (1)
 #endif
 /** @} */
 
@@ -137,11 +195,24 @@ extern "C" {
  * @{
  */
 #ifdef MODULE_SPIFFS
-#define SPIFFS_VFS_DIR_BUFFER_SIZE      (12)
-#define SPIFFS_VFS_FILE_BUFFER_SIZE     (1)
+#  define SPIFFS_VFS_DIR_BUFFER_SIZE       (12)
+#  define SPIFFS_VFS_FILE_BUFFER_SIZE      (1)
 #else
-#define SPIFFS_VFS_DIR_BUFFER_SIZE      (1)
-#define SPIFFS_VFS_FILE_BUFFER_SIZE     (1)
+#  define SPIFFS_VFS_DIR_BUFFER_SIZE       (1)
+#  define SPIFFS_VFS_FILE_BUFFER_SIZE      (1)
+#endif
+/** @} */
+
+/**
+ * @brief   VFS parameters for lwext4
+ * @{
+ */
+#if defined(MODULE_LWEXT4) || DOXYGEN
+#  define LWEXT4_VFS_DIR_BUFFER_SIZE       (308)   /**< sizeof(ext4_dir)  */
+#  define LWEXT4_VFS_FILE_BUFFER_SIZE      (32)    /**< sizeof(ext4_file) */
+#else
+#  define LWEXT4_VFS_DIR_BUFFER_SIZE       (1)
+#  define LWEXT4_VFS_FILE_BUFFER_SIZE      (1)
 #endif
 /** @} */
 
@@ -180,10 +251,11 @@ extern "C" {
  * @attention Put the check in the public header file (.h), do not put the check in the
  * implementation (.c) file.
  */
-#define VFS_DIR_BUFFER_SIZE MAX4(FATFS_VFS_DIR_BUFFER_SIZE,     \
+#define VFS_DIR_BUFFER_SIZE MAX5(FATFS_VFS_DIR_BUFFER_SIZE,     \
                                  LITTLEFS_VFS_DIR_BUFFER_SIZE,  \
                                  LITTLEFS2_VFS_DIR_BUFFER_SIZE, \
-                                 SPIFFS_VFS_DIR_BUFFER_SIZE     \
+                                 SPIFFS_VFS_DIR_BUFFER_SIZE,    \
+                                 LWEXT4_VFS_DIR_BUFFER_SIZE     \
                                 )
 #endif
 
@@ -207,10 +279,11 @@ extern "C" {
  * @attention Put the check in the public header file (.h), do not put the check in the
  * implementation (.c) file.
  */
-#define VFS_FILE_BUFFER_SIZE MAX4(FATFS_VFS_FILE_BUFFER_SIZE,    \
+#define VFS_FILE_BUFFER_SIZE MAX5(FATFS_VFS_FILE_BUFFER_SIZE,    \
                                   LITTLEFS_VFS_FILE_BUFFER_SIZE, \
                                   LITTLEFS2_VFS_FILE_BUFFER_SIZE,\
-                                  SPIFFS_VFS_FILE_BUFFER_SIZE    \
+                                  SPIFFS_VFS_FILE_BUFFER_SIZE,   \
+                                  LWEXT4_VFS_FILE_BUFFER_SIZE    \
                                  )
 #endif
 
@@ -288,12 +361,18 @@ typedef struct vfs_mount_struct vfs_mount_t;
 extern const vfs_file_ops_t mtd_vfs_ops;
 
 /**
+ * @brief   File system always wants the full VFS path
+ */
+#define VFS_FS_FLAG_WANT_ABS_PATH   (1 << 0)
+
+/**
  * @brief A file system driver
  */
 typedef struct {
     const vfs_file_ops_t *f_op;         /**< File operations table */
     const vfs_dir_ops_t *d_op;          /**< Directory operations table */
     const vfs_file_system_ops_t *fs_op; /**< File system operations table */
+    const uint32_t flags;               /**< File system flags */
 } vfs_file_system_t;
 
 /**
@@ -447,12 +526,11 @@ struct vfs_file_ops {
      * @param[in]  name     null-terminated name of the file to open, relative to the file system root, including a leading slash
      * @param[in]  flags    flags for opening, see man 2 open, man 3p open
      * @param[in]  mode     mode for creating a new file, see man 2 open, man 3p open
-     * @param[in]  abs_path null-terminated name of the file to open, relative to the VFS root ("/")
      *
      * @return 0 on success
      * @return <0 on error
      */
-    int (*open) (vfs_file_t *filp, const char *name, int flags, mode_t mode, const char *abs_path);
+    int (*open) (vfs_file_t *filp, const char *name, int flags, mode_t mode);
 
     /**
      * @brief Read bytes from an open file
@@ -499,12 +577,11 @@ struct vfs_dir_ops {
      *
      * @param[in]  dirp     pointer to open directory
      * @param[in]  name     null-terminated name of the dir to open, relative to the file system root, including a leading slash
-     * @param[in]  abs_path null-terminated name of the dir to open, relative to the VFS root ("/")
      *
      * @return 0 on success
      * @return <0 on error
      */
-    int (*opendir) (vfs_DIR *dirp, const char *dirname, const char *abs_path);
+    int (*opendir) (vfs_DIR *dirp, const char *dirname);
 
     /**
      * @brief Read a single entry from the open directory dirp and advance the
@@ -766,6 +843,9 @@ int vfs_open(const char *name, int flags, mode_t mode);
  *
  * @return number of bytes read on success
  * @return <0 on error
+ *
+ * For simple cases of only a single read from a file, the @ref
+ * vfs_file_to_buffer function can be used.
  */
 ssize_t vfs_read(int fd, void *dest, size_t count);
 
@@ -778,8 +858,22 @@ ssize_t vfs_read(int fd, void *dest, size_t count);
  *
  * @return number of bytes written on success
  * @return <0 on error
+ *
+ * For simple cases of only a single write to a file, the @ref
+ * vfs_file_from_buffer function can be used.
  */
 ssize_t vfs_write(int fd, const void *src, size_t count);
+
+/**
+ * @brief Write bytes from an iolist to an open file
+ *
+ * @param[in]  fd       fd number obtained from vfs_open
+ * @param[in]  iolist   iolist to read from
+ *
+ * @return number of bytes written on success
+ * @return <0 on error
+ */
+ssize_t vfs_write_iol(int fd, const iolist_t *iolist);
 
 /**
  * @brief Synchronize a file on storage
@@ -853,6 +947,21 @@ int vfs_closedir(vfs_DIR *dirp);
 int vfs_format(vfs_mount_t *mountp);
 
 /**
+ * @brief Format a file system
+ *
+ * The file system must not be mounted in order to be formatted.
+ * Call @ref vfs_unmount_by_path first if necessary.
+ *
+ * @note This assumes mount points have been configured with @ref VFS_AUTO_MOUNT.
+ *
+ * @param[in]  path     Path of the pre-configured mount point
+ *
+ * @return 0 on success
+ * @return <0 on error
+ */
+int vfs_format_by_path(const char *path);
+
+/**
  * @brief Mount a file system
  *
  * @p mountp should have been populated in advance with a file system driver,
@@ -881,6 +990,19 @@ int vfs_mount(vfs_mount_t *mountp);
 int vfs_mount_by_path(const char *path);
 
 /**
+ * @brief Unmount a file system with a pre-configured mount path
+ *
+ * @note This assumes mount points have been configured with @ref VFS_AUTO_MOUNT.
+ *
+ * @param[in]  path     Path of the pre-configured mount point
+ * @param[in]  force    Unmount the filesystem even if there are still open files
+ *
+ * @return 0 on success
+ * @return <0 on error
+ */
+int vfs_unmount_by_path(const char *path, bool force);
+
+/**
  * @brief Rename a file
  *
  * The file @p from_path will be renamed to @p to_path
@@ -901,11 +1023,12 @@ int vfs_rename(const char *from_path, const char *to_path);
  * This will fail if there are any open files or directories on the mounted file system
  *
  * @param[in]  mountp    pointer to the mount structure of the file system to unmount
+ * @param[in]  force    Unmount the filesystem even if there are still open files
  *
  * @return 0 on success
  * @return <0 on error
  */
-int vfs_umount(vfs_mount_t *mountp);
+int vfs_umount(vfs_mount_t *mountp, bool force);
 
 /**
  * @brief Unlink (delete) a file from a mounted file system

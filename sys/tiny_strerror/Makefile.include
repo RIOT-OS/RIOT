@@ -1,0 +1,4 @@
+ifneq (,$(filter tiny_strerror_as_strerror,$(USEMODULE)))
+  # use the wrapper functions for strerror
+  LINKFLAGS += -Wl,-wrap=strerror
+endif

@@ -139,7 +139,7 @@ void saul_init_devs(void)
         extern void auto_init_ina2xx(void);
         auto_init_ina2xx();
     }
-    if (IS_USED(MODULE_INA3221)) {
+    if (IS_USED(MODUE_INA3221)) {
         extern void auto_init_ina3221(void);
         auto_init_ina3221();
     }
@@ -163,6 +163,10 @@ void saul_init_devs(void)
         extern void auto_init_l3g4200d(void);
         auto_init_l3g4200d();
     }
+    if (IS_USED(MODULE_L3GXXXX)) {
+        extern void auto_init_l3gxxxx(void);
+        auto_init_l3gxxxx();
+    }
     if (IS_USED(MODULE_LIS2DH12)) {
         extern void auto_init_lis2dh12(void);
         auto_init_lis2dh12();
@@ -183,13 +187,17 @@ void saul_init_devs(void)
         extern void auto_init_lpsxxx(void);
         auto_init_lpsxxx();
     }
+    if (IS_USED(MODULE_LSM303AGR)) {
+        extern void auto_init_lsm303agr(void);
+        auto_init_lsm303agr();
+    }
     if (IS_USED(MODULE_LSM303DLHC)) {
         extern void auto_init_lsm303dlhc(void);
         auto_init_lsm303dlhc();
     }
-    if (IS_USED(MODULE_LSM6DSL)) {
-        extern void auto_init_lsm6dsl(void);
-        auto_init_lsm6dsl();
+    if (IS_USED(MODULE_LSM6DSXX)) {
+        extern void auto_init_lsm6dsxx(void);
+        auto_init_lsm6dsxx();
     }
     if (IS_USED(MODULE_LTC4150)) {
         extern void auto_init_ltc4150(void);
@@ -198,6 +206,10 @@ void saul_init_devs(void)
     if (IS_USED(MODULE_MAG3110)) {
         extern void auto_init_mag3110(void);
         auto_init_mag3110();
+    }
+    if (IS_USED(MODULE_MCP47XX)) {
+        extern void auto_init_mcp47xx(void);
+        auto_init_mcp47xx();
     }
     if (IS_USED(MODULE_MHZ19)) {
         extern void auto_init_mhz19(void);
@@ -275,9 +287,9 @@ void saul_init_devs(void)
         extern void auto_init_sht3x(void);
         auto_init_sht3x();
     }
-    if (IS_USED(MODULE_SHTC1)) {
-        extern void auto_init_shtc1(void);
-        auto_init_shtc1();
+    if (IS_USED(MODULE_SHTCX)) {
+        extern void auto_init_shtcx(void);
+        auto_init_shtcx();
     }
     if (IS_USED(MODULE_SI1133)) {
         extern void auto_init_si1133(void);
@@ -322,5 +334,13 @@ void saul_init_devs(void)
     if (IS_USED(MODULE_VEML6070)) {
         extern void auto_init_veml6070(void);
         auto_init_veml6070();
+    }
+    if (IS_USED(MODULE_VL6180X)) {
+        extern void auto_init_vl6180x(void);
+        auto_init_vl6180x();
+    }
+    if (IS_USED(MODULE_SERVO)) {
+        extern void auto_init_servo(void);
+        auto_init_servo();
     }
 }

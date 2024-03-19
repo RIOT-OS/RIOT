@@ -27,7 +27,7 @@
 
 #include "async_read.h"
 #include "byteorder.h"
-#include "checksum/ucrc16.h"
+#include "checksum/crc16_ccitt.h"
 #include "native_internal.h"
 
 #include "net/ieee802154/radio.h"
@@ -235,18 +235,10 @@ static void _send_zep_hello(socket_zep_t *dev)
 static void _socket_isr(int fd, void *arg)
 {
     ieee802154_dev_t *dev = arg;
-    socket_zep_t *zepdev = dev->priv;
 
     DEBUG("socket_zep::_socket_isr: bytes on %d\n", fd);
 
-    if (zepdev->rx) {
-        dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
-    } else {
-        /* discard frame */
-        uint8_t tmp;
-        real_read(fd, &tmp, sizeof(tmp));
-        _continue_reading(zepdev);
-    }
+    dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
 }
 
 void socket_zep_setup(socket_zep_t *dev, const socket_zep_params_t *params)
@@ -337,8 +329,9 @@ static int _set_csma_params(ieee802154_dev_t *dev, const ieee802154_csma_be_t *b
 
 static int _config_phy(ieee802154_dev_t *dev, const ieee802154_phy_conf_t *conf)
 {
-    (void) dev;
-    (void) conf;
+    socket_zep_t *zepdev = dev->priv;
+
+    zepdev->chan = conf->channel;
     return 0;
 }
 
@@ -399,8 +392,7 @@ static int _write(ieee802154_dev_t *dev, const iolist_t *iolist)
 
     for (unsigned i = 0; i < n; i++) {
         memcpy(out, iolist->iol_base, iolist->iol_len);
-        chksum = ucrc16_calc_le(iolist->iol_base, iolist->iol_len,
-                                UCRC16_CCITT_POLY_LE, chksum);
+        chksum = crc16_ccitt_false_update(chksum, iolist->iol_base, iolist->iol_len);
         out += iolist->iol_len;
         iolist = iolist->iol_next;
     }
@@ -417,7 +409,7 @@ static int _request_transmit(ieee802154_dev_t *dev)
 {
     socket_zep_t *zepdev = dev->priv;
 
-    DEBUG("socket_zep::request_transmit(%zu bytes)\n", zepdev->snd_len);
+    DEBUG("socket_zep::request_transmit(%u bytes)\n", zepdev->snd_len);
 
     dev->cb(dev, IEEE802154_RADIO_INDICATION_TX_START);
 
@@ -445,23 +437,25 @@ static int _confirm_transmit(ieee802154_dev_t *dev, ieee802154_tx_info_t *info)
 
 int _len(ieee802154_dev_t *dev)
 {
-    size_t size;
     socket_zep_t *zepdev = dev->priv;
 
-    int res = real_ioctl(zepdev->sock_fd, FIONREAD, &size);
+    zep_v2_data_hdr_t hdr;
+
+    int res = real_recv(zepdev->sock_fd, &hdr, sizeof(hdr), MSG_TRUNC | MSG_PEEK);
     if (res < 0) {
         DEBUG("socket_zep::len: error reading FIONREAD: %s", strerror(errno));
         return 0;
     }
 
-    DEBUG("socket_zep::len %zu bytes on %d\n", size, zepdev->sock_fd);
-
-    if (size < sizeof(zep_v2_data_hdr_t)) {
+    if (res < (int)sizeof(zep_v2_data_hdr_t)) {
+        DEBUG("socket_zep::len discard short frame (%u bytes)\n", res);
         return 0;
     }
 
+    DEBUG("socket_zep::len %u bytes on %d\n", hdr.length, zepdev->sock_fd);
+
     /* report size without ZEP header and checksum */
-    return size - (sizeof(zep_v2_data_hdr_t) + 2);
+    return hdr.length - 2;
 }
 
 static void _send_ack(socket_zep_t *zepdev, const void *frame)
@@ -483,7 +477,7 @@ static void _send_ack(socket_zep_t *zepdev, const void *frame)
     ack[2] = rxbuf[2];  /* SeqNum */
 
     /* calculate checksum */
-    uint16_t chksum = ucrc16_calc_le(ack, 3, UCRC16_CCITT_POLY_LE, 0);
+    uint16_t chksum = crc16_ccitt_false_update(0, ack, 3);
 
     real_send(zepdev->sock_fd, &hdr, sizeof(hdr), MSG_MORE);
     real_send(zepdev->sock_fd, ack, sizeof(ack), MSG_MORE);
@@ -491,22 +485,27 @@ static void _send_ack(socket_zep_t *zepdev, const void *frame)
 }
 
 static int _read(ieee802154_dev_t *dev, void *buf, size_t max_size,
-                          ieee802154_rx_info_t *info)
+                 ieee802154_rx_info_t *info)
 {
     int res;
     socket_zep_t *zepdev = dev->priv;
+    size_t frame_len = max_size + sizeof(zep_v2_data_hdr_t) + 2;
 
-    DEBUG("socket_zep::read: reading up to %u bytes into %p\n", max_size, buf);
+    DEBUG("socket_zep::read: reading up to %zu bytes into %p\n", max_size, buf);
 
-    if (max_size + sizeof(zep_v2_data_hdr_t) > sizeof(zepdev->rcv_buf)) {
-        return 0;
+    if (frame_len > sizeof(zepdev->rcv_buf)) {
+        DEBUG("socket_zep::read: frame size (%zu) exceeds RX  buffer (%zu bytes)\n",
+              frame_len, sizeof(zepdev->rcv_buf));
+        res = -ENOBUFS;
+        goto out;
     }
 
-    res = real_read(zepdev->sock_fd, zepdev->rcv_buf, max_size + sizeof(zep_v2_data_hdr_t));
+    res = real_recv(zepdev->sock_fd, zepdev->rcv_buf, frame_len, MSG_TRUNC);
 
-    DEBUG("socket_zep::read: got %d bytes\n", res);
+    DEBUG("socket_zep::read: got %d/%zu bytes\n", res, frame_len);
 
-    if (res <= (int)sizeof(zep_v2_data_hdr_t)) {
+    if (res <= (int)sizeof(zep_v2_data_hdr_t) || res > (int)frame_len) {
+        DEBUG("socket_zep::read: %s\n", strerror(errno));
         res = 0;
         goto out;
     }
@@ -529,6 +528,12 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t max_size,
     case ZEP_V2_TYPE_DATA: {
         zep_v2_data_hdr_t *zep = (zep_v2_data_hdr_t *)tmp;
 
+        if (zep->chan != zepdev->chan) {
+            DEBUG("socket_zep::read: wrong channel\n");
+            res = -EINVAL;
+            break;
+        }
+
         if (info) {
             info->lqi = zep->lqi_val;
             info->rssi = -IEEE802154_RADIO_RSSI_OFFSET;
@@ -536,6 +541,7 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t max_size,
 
         if (_dst_not_me(zepdev, zep + 1)) {
             DEBUG("socket_zep::read: dst not me\n");
+            res = -EINVAL;
             break;
         }
 

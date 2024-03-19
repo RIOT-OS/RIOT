@@ -105,11 +105,37 @@ static usbus_string_t *_get_descriptor(usbus_t *usbus, uint16_t idx)
 
 static int _req_status(usbus_t *usbus)
 {
-    uint8_t status[2];
-
-    memset(status, 0, sizeof(status));
-    usbus_control_slicer_put_bytes(usbus, status, sizeof(status));
+    /* Signal self powered and remote wakeup status */
+    uint16_t status = (CONFIG_USB_SELF_POWERED) ? 1 : 0 | usbus->wakeup_enabled << 1;
+    usbus_control_slicer_put_bytes(usbus, (uint8_t*)&status, sizeof(status));
     return sizeof(status);
+}
+
+static int _req_iface_status(usbus_t *usbus)
+{
+    uint16_t status = 0; /* always zero */
+    usbus_control_slicer_put_bytes(usbus, (uint8_t*)&status, sizeof(status));
+    return sizeof(status);
+}
+
+static int _req_endpoint_status(usbus_t *usbus, usbus_endpoint_t *ep)
+{
+    uint16_t status = ep->halted ? 1 : 0;
+    usbus_control_slicer_put_bytes(usbus, (uint8_t*)&status, sizeof(status));
+    return sizeof(status);
+}
+
+static int _req_endpoint_feature(usbus_endpoint_t *ep, uint16_t feature, bool enable)
+{
+    switch (feature) {
+        case USB_FEATURE_ENDPOINT_HALT:
+            enable ? usbus_endpoint_halt(ep) : usbus_endpoint_clear_halt(ep);
+            break;
+        default:
+            DEBUG("usbus: unknown endpoint feature request: %u\n", feature);
+            return -1;
+    }
+    return 1;
 }
 
 static int _req_str(usbus_t *usbus, uint16_t idx)
@@ -193,6 +219,24 @@ static int _req_descriptor(usbus_t *usbus, usb_setup_t *pkt)
     }
 }
 
+static int _req_dev_feature(usbus_t *usbus, uint16_t feature, bool enable)
+{
+    int res = -1;
+
+    switch (feature) {
+        case USB_FEATURE_DEVICE_REMOTE_WAKEUP:
+            if (CONFIG_USB_REM_WAKEUP) {
+                usbus->wakeup_enabled = enable;
+                res = 1;
+            }
+            break;
+        default:
+            DEBUG("usbus: unknown device feature request: %u\n", feature);
+            break;
+    }
+    return res;
+}
+
 static int _recv_dev_setup(usbus_t *usbus, usb_setup_t *pkt)
 {
     int res = -1;
@@ -215,6 +259,10 @@ static int _recv_dev_setup(usbus_t *usbus, usb_setup_t *pkt)
             case USB_SETUP_REQ_SET_ADDRESS:
                 DEBUG("usbus_control: Setting address\n");
                 usbus->addr = (uint8_t)pkt->value;
+                if (!USBDEV_CPU_SET_ADDR_AFTER_STATUS) {
+                    usbdev_set(usbus->dev, USBOPT_ADDRESS, &usbus->addr,
+                               sizeof(usbus->addr));
+                }
                 res = 1;
                 break;
             case USB_SETUP_REQ_SET_CONFIGURATION:
@@ -223,6 +271,12 @@ static int _recv_dev_setup(usbus_t *usbus, usb_setup_t *pkt)
                 usbus->state = USBUS_STATE_CONFIGURED;
                 _activate_endpoints(usbus);
                 res = 1;
+                break;
+            case USB_SETUP_REQ_SET_FEATURE:
+                res = _req_dev_feature(usbus, pkt->value, true);
+                break;
+            case USB_SETUP_REQ_CLEAR_FEATURE:
+                res = _req_dev_feature(usbus, pkt->value, false);
                 break;
             default:
                 DEBUG("usbus: Unknown write request %u\n", pkt->request);
@@ -238,6 +292,11 @@ static int _recv_interface_setup(usbus_t *usbus, usb_setup_t *pkt)
         (usbus_control_handler_t *)usbus->control;
     uint16_t destination = pkt->index & 0x0f;
 
+    /* Globally handle the iface get status request */
+    if (pkt->request == USB_SETUP_REQ_GET_STATUS) {
+        return _req_iface_status(usbus);
+    }
+
     /* Find interface handler */
     for (usbus_interface_t *iface = usbus->iface; iface; iface = iface->next) {
         if (destination == iface->idx &&
@@ -249,6 +308,26 @@ static int _recv_interface_setup(usbus_t *usbus, usb_setup_t *pkt)
         }
     }
     return -1;
+}
+
+static int _recv_endpoint_setup(usbus_t *usbus, usb_setup_t *pkt)
+{
+    uint8_t destination = pkt->index & 0x0f;
+    bool in = pkt->index & (1 << 7); /* Bit seven is 1 for IN, 0 for OUT */
+    usbus_endpoint_t *ep = in ? &usbus->ep_in[destination] :
+                                &usbus->ep_out[destination];
+
+    switch (pkt->request) {
+        case USB_SETUP_REQ_GET_STATUS:
+            return _req_endpoint_status(usbus, ep);
+        case USB_SETUP_REQ_SET_FEATURE:
+            return _req_endpoint_feature(ep, pkt->value, true);
+        case USB_SETUP_REQ_CLEAR_FEATURE:
+            return _req_endpoint_feature(ep, pkt->value, false);
+        default:
+            DEBUG("usbus: Unknown endpoint request %u\n", pkt->request);
+            return -1;
+    }
 }
 
 static void _recv_setup(usbus_t *usbus, usbus_control_handler_t *handler)
@@ -272,15 +351,16 @@ static void _recv_setup(usbus_t *usbus, usbus_control_handler_t *handler)
             case USB_SETUP_REQUEST_RECIPIENT_INTERFACE:
                 res = _recv_interface_setup(usbus, pkt);
                 break;
+            case USB_SETUP_REQUEST_RECIPIENT_ENDPOINT:
+                res = _recv_endpoint_setup(usbus, pkt);
+                break;
             default:
                 DEBUG("usbus_control: Unhandled setup request\n");
         }
     }
     if (res < 0) {
-        /* Signal stall to indicate unsupported (USB 2.0 spec 9.6.2 */
-        static const usbopt_enable_t enable = USBOPT_ENABLE;
-        usbdev_ep_set(handler->in, USBOPT_EP_STALL, &enable,
-                      sizeof(usbopt_enable_t));
+        /* Signal stall to indicate unsupported (USB 2.0 spec 9.6.2) */
+        usbdev_ep0_stall(usbus->dev);
         handler->control_request_state = USBUS_CONTROL_REQUEST_STATE_READY;
     }
     else if (res) {
@@ -349,8 +429,10 @@ static int _handle_tr_complete(usbus_t *usbus,
         case USBUS_CONTROL_REQUEST_STATE_INACK:
             if (ep->dir == USB_EP_DIR_IN) {
                 if (usbus->addr && usbus->state == USBUS_STATE_RESET) {
-                    usbdev_set(usbus->dev, USBOPT_ADDRESS, &usbus->addr,
-                               sizeof(usbus->addr));
+                    if (USBDEV_CPU_SET_ADDR_AFTER_STATUS) {
+                        usbdev_set(usbus->dev, USBOPT_ADDRESS, &usbus->addr,
+                                   sizeof(usbus->addr));
+                    }
                     /* Address configured */
                     usbus->state = USBUS_STATE_ADDR;
                 }
@@ -422,6 +504,7 @@ static void _handler_ep0_event(usbus_t *usbus, usbus_handler_t *handler,
     switch (event) {
         case USBUS_EVENT_USB_RESET:
             DEBUG("usbus_control: Reset event triggered\n");
+            usbus->wakeup_enabled = false;
             ep0_handler->control_request_state = USBUS_CONTROL_REQUEST_STATE_READY;
             _usbus_config_ep0(ep0_handler);
             break;

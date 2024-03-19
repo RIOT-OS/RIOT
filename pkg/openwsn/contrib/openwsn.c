@@ -10,7 +10,7 @@
 /**
  * @{
  * @file
- * @brief       OpenWSN bootstraping functions implementation
+ * @brief       OpenWSN bootstrapping functions implementation
  *
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>

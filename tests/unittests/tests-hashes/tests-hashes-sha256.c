@@ -115,7 +115,7 @@ static const unsigned char hempty[] =
                                     0xa4, 0x95, 0x99, 0x1b, 0x78, 0x52, 0xb8, 0x55};
 
 /**
- * @brief expected hash for test failing_compare
+ * @brief wrong hash for test failing_compare (changed last byte from 3b to 3c)
  * i.e. c19d3bf8588897076873f1a0a106ba840ca46bd1179d592953acecc4df59593c
  */
 static const unsigned char hfailing_compare[] =
@@ -204,7 +204,8 @@ static void test_hashes_sha256_hash_sequence_04(void)
 
 static void test_hashes_sha256_hash_sequence_digits_letters(void)
 {
-    static const char *teststring = "0123456789abcde-0123456789abcde-0123456789abcde-0123456789abcde-";
+    static const char *teststring =
+        "0123456789abcde-0123456789abcde-0123456789abcde-0123456789abcde-";
     TEST_ASSERT(calc_and_compare_hash(teststring, hdigits_letters));
     TEST_ASSERT(calc_and_compare_hash_wrapper(teststring, hdigits_letters));
 }

@@ -172,32 +172,32 @@ static inline int _choose_ipproto(int type, int protocol)
 {
     switch (type) {
 #ifdef MODULE_SOCK_TCP
-        case SOCK_STREAM:
-            if ((protocol == 0) || (protocol == IPPROTO_TCP)) {
-                return protocol;
-            }
-            else {
-                errno = EPROTOTYPE;
-            }
-            break;
+    case SOCK_STREAM:
+        if ((protocol == 0) || (protocol == IPPROTO_TCP)) {
+            return protocol;
+        }
+        else {
+            errno = EPROTOTYPE;
+        }
+        break;
 #endif
 #ifdef MODULE_SOCK_UDP
-        case SOCK_DGRAM:
-            if ((protocol == 0) || (protocol == IPPROTO_UDP)) {
-                return protocol;
-            }
-            else {
-                errno = EPROTOTYPE;
-            }
-            break;
+    case SOCK_DGRAM:
+        if ((protocol == 0) || (protocol == IPPROTO_UDP)) {
+            return protocol;
+        }
+        else {
+            errno = EPROTOTYPE;
+        }
+        break;
 #endif
 #ifdef MODULE_SOCK_IP
-        case SOCK_RAW:
-            return protocol;
+    case SOCK_RAW:
+        return protocol;
 #endif
-        default:
-            (void)protocol;
-            break;
+    default:
+        (void)protocol;
+        break;
     }
     errno = EPROTONOSUPPORT;
     return -1;
@@ -214,9 +214,9 @@ static inline socklen_t _addr_truncate(struct sockaddr *out, socklen_t out_len,
 static int _ep_to_sockaddr(const struct _sock_tl_ep *ep,
                            struct sockaddr_storage *out)
 {
-    assert((ep->family == AF_INET) || (ep->family == AF_INET6));
     switch (ep->family) {
-        case AF_INET: {
+    case AF_INET:
+        {
             struct sockaddr_in *in_addr = (struct sockaddr_in *)out;
 
             in_addr->sin_family = AF_INET;
@@ -225,18 +225,21 @@ static int _ep_to_sockaddr(const struct _sock_tl_ep *ep,
             return sizeof(struct sockaddr_in);
         }
 #ifdef SOCK_HAS_IPV6
-        case AF_INET6: {
+    case AF_INET6:
+        {
             struct sockaddr_in6 *in6_addr = (struct sockaddr_in6 *)out;
 
             in6_addr->sin6_family = AF_INET6;
             memcpy(&in6_addr->sin6_addr, &ep->addr.ipv6, sizeof(ep->addr.ipv6));
             in6_addr->sin6_port = htons(ep->port);
+            in6_addr->sin6_scope_id = ep->netif;
             return sizeof(struct sockaddr_in6);
         }
 #endif
-        default:
-            /* should not happen */
-            return 0;
+    default:
+        /* should not happen */
+        assert(0);
+        return 0;
     }
 }
 
@@ -246,36 +249,36 @@ static int _sockaddr_to_ep(const struct sockaddr *address, socklen_t address_len
     assert(address != NULL);
 
     switch (address->sa_family) {
-        case AF_INET:
-            if (address_len < sizeof(struct sockaddr_in)) {
-                errno = EINVAL;
-                return -1;
-            }
-            struct sockaddr_in *in_addr = (struct sockaddr_in *)address;
-            memset(out, 0, sizeof(*out));
-            out->family = AF_INET;
-            out->addr.ipv4_u32 = in_addr->sin_addr.s_addr;
-            out->port = ntohs(in_addr->sin_port);
-            break;
-#ifdef SOCK_HAS_IPV6
-        case AF_INET6:
-            if (address_len < sizeof(struct sockaddr_in6)) {
-                errno = EINVAL;
-                return -1;
-            }
-            struct sockaddr_in6 *in6_addr = (struct sockaddr_in6 *)address;
-            memset(out, 0, sizeof(*out));
-            out->family = AF_INET6;
-            memcpy(&out->addr.ipv6, &in6_addr->sin6_addr, sizeof(out->addr.ipv6));
-            out->port = ntohs(in6_addr->sin6_port);
-            if (in6_addr->sin6_scope_id != 0) {
-                out->netif = (uint16_t) in6_addr->sin6_scope_id;
-            }
-            break;
-#endif
-        default:
-            errno = EAFNOSUPPORT;
+    case AF_INET:
+        if (address_len < sizeof(struct sockaddr_in)) {
+            errno = EINVAL;
             return -1;
+        }
+        struct sockaddr_in *in_addr = (struct sockaddr_in *)address;
+        memset(out, 0, sizeof(*out));
+        out->family = AF_INET;
+        out->addr.ipv4_u32 = in_addr->sin_addr.s_addr;
+        out->port = ntohs(in_addr->sin_port);
+        break;
+#ifdef SOCK_HAS_IPV6
+    case AF_INET6:
+        if (address_len < sizeof(struct sockaddr_in6)) {
+            errno = EINVAL;
+            return -1;
+        }
+        struct sockaddr_in6 *in6_addr = (struct sockaddr_in6 *)address;
+        memset(out, 0, sizeof(*out));
+        out->family = AF_INET6;
+        memcpy(&out->addr.ipv6, &in6_addr->sin6_addr, sizeof(out->addr.ipv6));
+        out->port = ntohs(in6_addr->sin6_port);
+        if (in6_addr->sin6_scope_id != 0) {
+            out->netif = (uint16_t) in6_addr->sin6_scope_id;
+        }
+        break;
+#endif
+    default:
+        errno = EAFNOSUPPORT;
+        return -1;
     }
     return 0;
 }
@@ -291,29 +294,29 @@ static int socket_close(vfs_file_t *filp)
         int idx = _get_sock_idx(s->sock);
         switch (s->type) {
 #ifdef MODULE_SOCK_UDP
-            case SOCK_DGRAM:
-                sock_udp_close(&s->sock->udp);
-                break;
+        case SOCK_DGRAM:
+            sock_udp_close(&s->sock->udp);
+            break;
 #endif
 #ifdef MODULE_SOCK_IP
-            case SOCK_RAW:
-                sock_ip_close(&s->sock->raw);
-                break;
+        case SOCK_RAW:
+            sock_ip_close(&s->sock->raw);
+            break;
 #endif
 #ifdef MODULE_SOCK_TCP
-            case SOCK_STREAM:
-                if (s->queue_array == NULL) {
-                    sock_tcp_disconnect(&s->sock->tcp.sock);
-                }
-                else {
-                    sock_tcp_stop_listen(&s->sock->tcp.queue);
-                }
-                break;
+        case SOCK_STREAM:
+            if (s->queue_array == NULL) {
+                sock_tcp_disconnect(&s->sock->tcp.sock);
+            }
+            else {
+                sock_tcp_stop_listen(&s->sock->tcp.queue);
+            }
+            break;
 #endif
-            default:
-                errno = EOPNOTSUPP;
-                res = -1;
-                break;
+        default:
+            errno = EOPNOTSUPP;
+            res = -1;
+            break;
         }
         if (idx >= 0) {
             bf_unset(_sock_pool_used, idx);
@@ -396,30 +399,30 @@ static void _sock_set_cb(socket_t *socket)
 
     switch (socket->type) {
 #ifdef MODULE_SOCK_IP
-        case SOCK_RAW:
-            sock_ip_set_cb(&socket->sock->raw, callback.ip, socket);
-            break;
+    case SOCK_RAW:
+        sock_ip_set_cb(&socket->sock->raw, callback.ip, socket);
+        break;
 #endif
 #ifdef MODULE_SOCK_TCP
-        case SOCK_STREAM:
-            /* is a TCP client socket */
-            if (socket->queue_array == NULL) {
-                sock_tcp_set_cb(&socket->sock->tcp.sock, callback.tcp, socket);
-            }
-            /* is a TCP listening socket */
-            else {
-                sock_tcp_queue_set_cb(&socket->sock->tcp.queue,
-                                      callback.tcp_queue, socket);
-            }
-            break;
+    case SOCK_STREAM:
+        /* is a TCP client socket */
+        if (socket->queue_array == NULL) {
+            sock_tcp_set_cb(&socket->sock->tcp.sock, callback.tcp, socket);
+        }
+        /* is a TCP listening socket */
+        else {
+            sock_tcp_queue_set_cb(&socket->sock->tcp.queue,
+                                  callback.tcp_queue, socket);
+        }
+        break;
 #endif
 #ifdef MODULE_SOCK_UDP
-        case SOCK_DGRAM:
-            sock_udp_set_cb(&socket->sock->udp, callback.udp, socket);
-            break;
+    case SOCK_DGRAM:
+        sock_udp_set_cb(&socket->sock->udp, callback.udp, socket);
+        break;
 #endif
-        default:
-            break;
+    default:
+        break;
     }
 }
 #endif
@@ -437,46 +440,46 @@ int socket(int domain, int type, int protocol)
         return -1;
     }
     switch (domain) {
-        case AF_INET:
+    case AF_INET:
 #ifdef SOCK_HAS_IPV6
-        case AF_INET6:
+    case AF_INET6:
 #endif
-        {
-            int fd = vfs_bind(VFS_ANY_FD, O_RDWR, &socket_ops, s);
+    {
+        int fd = vfs_bind(VFS_ANY_FD, O_RDWR, &socket_ops, s);
 
-            if (fd < 0) {
-                errno = ENFILE;
-                res = -1;
-                break;
-            }
-            else {
-                s->fd = res = fd;
-            }
-            s->domain = domain;
-            s->type = type;
-            if ((s->protocol = _choose_ipproto(type, protocol)) < 0) {
-                res = -1;
-                break;
-            }
-            s->bound = false;
-            s->sock = NULL;
-#ifdef POSIX_SETSOCKOPT
-            s->recv_timeout = SOCK_NO_TIMEOUT;
-#endif
-#ifdef MODULE_SOCK_TCP
-            if (type == SOCK_STREAM)  {
-                s->queue_array = NULL;
-                s->queue_array_len = 0;
-                memset(&s->local, 0, sizeof(sock_tcp_ep_t));
-            }
-#endif
+        if (fd < 0) {
+            errno = ENFILE;
+            res = -1;
             break;
         }
-        default:
-            (void)type;
-            (void)protocol;
-            errno = EAFNOSUPPORT;
+        else {
+            s->fd = res = fd;
+        }
+        s->domain = domain;
+        s->type = type;
+        if ((s->protocol = _choose_ipproto(type, protocol)) < 0) {
             res = -1;
+            break;
+        }
+        s->bound = false;
+        s->sock = NULL;
+#ifdef POSIX_SETSOCKOPT
+        s->recv_timeout = SOCK_NO_TIMEOUT;
+#endif
+#ifdef MODULE_SOCK_TCP
+        if (type == SOCK_STREAM)  {
+            s->queue_array = NULL;
+            s->queue_array_len = 0;
+            memset(&s->local, 0, sizeof(sock_tcp_ep_t));
+        }
+#endif
+        break;
+    }
+    default:
+        (void)type;
+        (void)protocol;
+        errno = EAFNOSUPPORT;
+        res = -1;
     }
     mutex_unlock(&_socket_pool_mutex);
     return res;
@@ -510,63 +513,63 @@ int accept(int socket, struct sockaddr *restrict address,
 #endif
 
     switch (s->type) {
-        case SOCK_STREAM:
-            new_s = _get_free_socket();
-            if (new_s == NULL) {
+    case SOCK_STREAM:
+        new_s = _get_free_socket();
+        if (new_s == NULL) {
+            errno = ENFILE;
+            res = -1;
+            break;
+        }
+        sock = (sock_tcp_t *)new_s->sock;
+        if ((res = sock_tcp_accept(&s->sock->tcp.queue, &sock,
+                                   recv_timeout)) < 0) {
+            errno = -res;
+            res = -1;
+            break;
+        }
+        else {
+            if ((address != NULL) && (address_len != NULL)) {
+                sock_tcp_ep_t ep;
+                struct sockaddr_storage sa;
+                socklen_t sa_len;
+
+                if ((res = sock_tcp_get_remote(sock, &ep)) < 0) {
+                    errno = -res;
+                    res = -1;
+                    break;
+                }
+                sa.ss_family = s->domain;
+                sa_len = _ep_to_sockaddr(&ep, &sa);
+                *address_len = _addr_truncate(address, *address_len, &sa,
+                                              sa_len);
+
+            }
+            int fd = vfs_bind(VFS_ANY_FD, O_RDWR, &socket_ops, new_s);
+            if (fd < 0) {
                 errno = ENFILE;
                 res = -1;
                 break;
             }
-            sock = (sock_tcp_t *)new_s->sock;
-            if ((res = sock_tcp_accept(&s->sock->tcp.queue, &sock,
-                                       recv_timeout)) < 0) {
-                errno = -res;
-                res = -1;
-                break;
-            }
             else {
-                if ((address != NULL) && (address_len != NULL)) {
-                    sock_tcp_ep_t ep;
-                    struct sockaddr_storage sa;
-                    socklen_t sa_len;
-
-                    if ((res = sock_tcp_get_remote(sock, &ep)) < 0) {
-                        errno = -res;
-                        res = -1;
-                        break;
-                    }
-                    sa.ss_family = s->domain;
-                    sa_len = _ep_to_sockaddr(&ep, &sa);
-                    *address_len = _addr_truncate(address, *address_len, &sa,
-                                                  sa_len);
-
-                }
-                int fd = vfs_bind(VFS_ANY_FD, O_RDWR, &socket_ops, new_s);
-                if (fd < 0) {
-                    errno = ENFILE;
-                    res = -1;
-                    break;
-                }
-                else {
-                    new_s->fd = res = fd;
-                }
-                new_s->domain = s->domain;
-                new_s->type = s->type;
-                new_s->protocol = s->protocol;
-                new_s->bound = true;
-                new_s->queue_array = NULL;
-                new_s->queue_array_len = 0;
-                new_s->sock = (socket_sock_t *)sock;
-#if IS_USED(MODULE_SOCK_ASYNC)
-                _sock_set_cb(new_s);
-#endif
-                memset(&s->local, 0, sizeof(sock_tcp_ep_t));
+                new_s->fd = res = fd;
             }
-            break;
-        default:
-            errno = EOPNOTSUPP;
-            res = -1;
-            break;
+            new_s->domain = s->domain;
+            new_s->type = s->type;
+            new_s->protocol = s->protocol;
+            new_s->bound = true;
+            new_s->queue_array = NULL;
+            new_s->queue_array_len = 0;
+            new_s->sock = (socket_sock_t *)sock;
+#if IS_USED(MODULE_SOCK_ASYNC)
+            _sock_set_cb(new_s);
+#endif
+            memset(&s->local, 0, sizeof(sock_tcp_ep_t));
+        }
+        break;
+    default:
+        errno = EOPNOTSUPP;
+        res = -1;
+        break;
     }
     if ((res < 0) && (sock != NULL)) {
         sock_tcp_disconnect(sock);
@@ -605,21 +608,21 @@ int bind(int socket, const struct sockaddr *address, socklen_t address_len)
     }
     switch (s->type) {
 #ifdef MODULE_SOCK_IP
-        case SOCK_RAW:
-            break;
+    case SOCK_RAW:
+        break;
 #endif
 #ifdef MODULE_SOCK_TCP
-        case SOCK_STREAM:
-            break;
+    case SOCK_STREAM:
+        break;
 #endif
 #ifdef MODULE_SOCK_UDP
-        case SOCK_DGRAM:
-            break;
+    case SOCK_DGRAM:
+        break;
 #endif
-        default:
-            (void)res;
-            errno = EOPNOTSUPP;
-            return -1;
+    default:
+        (void)res;
+        errno = EOPNOTSUPP;
+        return -1;
     }
     if (_sockaddr_to_ep(address, address_len, &s->local) < 0) {
         return -1;
@@ -658,31 +661,31 @@ static int _bind_connect(socket_t *s, const struct sockaddr *address,
     }
     switch (s->type) {
 #ifdef MODULE_SOCK_IP
-        case SOCK_RAW:
-            /* TODO apply flags if possible */
-            res = sock_ip_create(&sock->raw, (sock_ip_ep_t *)local,
-                                 (sock_ip_ep_t *)remote, s->protocol, 0);
-            break;
+    case SOCK_RAW:
+        /* TODO apply flags if possible */
+        res = sock_ip_create(&sock->raw, (sock_ip_ep_t *)local,
+                             (sock_ip_ep_t *)remote, s->protocol, 0);
+        break;
 #endif
 #ifdef MODULE_SOCK_TCP
-        case SOCK_STREAM:
-            /* TODO apply flags if possible */
-            assert(remote != NULL);
-            res = sock_tcp_connect(&sock->tcp.sock, remote,
-                                   (local == NULL) ? 0 : local->port, 0);
-            break;
+    case SOCK_STREAM:
+        /* TODO apply flags if possible */
+        assert(remote != NULL);
+        res = sock_tcp_connect(&sock->tcp.sock, remote,
+                               (local == NULL) ? 0 : local->port, 0);
+        break;
 #endif
 #ifdef MODULE_SOCK_UDP
-        case SOCK_DGRAM:
-            /* TODO apply flags if possible */
-            res = sock_udp_create(&sock->udp, local, remote, 0);
-            break;
+    case SOCK_DGRAM:
+        /* TODO apply flags if possible */
+        res = sock_udp_create(&sock->udp, local, remote, 0);
+        break;
 #endif
-        default:
-            (void)local;
-            (void)remote;
-            res = -EOPNOTSUPP;
-            break;
+    default:
+        (void)local;
+        (void)remote;
+        res = -EOPNOTSUPP;
+        break;
     }
     if (res < 0) {
         errno = -res;
@@ -737,28 +740,28 @@ static int _getpeername(socket_t *s, struct sockaddr *__restrict address,
     }
     switch (s->type) {
 #ifdef MODULE_SOCK_IP
-        case SOCK_RAW:
-            res = sock_ip_get_remote(&s->sock->raw, (sock_ip_ep_t *)&ep);
-            break;
+    case SOCK_RAW:
+        res = sock_ip_get_remote(&s->sock->raw, (sock_ip_ep_t *)&ep);
+        break;
 #endif
 #ifdef MODULE_SOCK_TCP
-        case SOCK_STREAM:
-            if (s->queue_array == NULL) {
-                res = sock_tcp_get_remote(&s->sock->tcp.sock, &ep);
-            }
-            else {
-                res = -ENOTCONN;
-            }
-            break;
+    case SOCK_STREAM:
+        if (s->queue_array == NULL) {
+            res = sock_tcp_get_remote(&s->sock->tcp.sock, &ep);
+        }
+        else {
+            res = -ENOTCONN;
+        }
+        break;
 #endif
 #ifdef MODULE_SOCK_UDP
-        case SOCK_DGRAM:
-            res = sock_udp_get_remote(&s->sock->udp, &ep);
-            break;
+    case SOCK_DGRAM:
+        res = sock_udp_get_remote(&s->sock->udp, &ep);
+        break;
 #endif
-        default:
-            res = -EOPNOTSUPP;
-            break;
+    default:
+        res = -EOPNOTSUPP;
+        break;
     }
     if (res >= 0) {
         struct sockaddr_storage sa;
@@ -811,28 +814,28 @@ int getsockname(int socket, struct sockaddr *__restrict address,
         struct _sock_tl_ep ep;
         switch (s->type) {
 #ifdef MODULE_SOCK_IP
-            case SOCK_RAW:
-                res = sock_ip_get_local(&s->sock->raw, (sock_ip_ep_t *)&ep);
-                break;
+        case SOCK_RAW:
+            res = sock_ip_get_local(&s->sock->raw, (sock_ip_ep_t *)&ep);
+            break;
 #endif
 #ifdef MODULE_SOCK_TCP
-            case SOCK_STREAM:
-                if (s->queue_array == NULL) {
-                    res = sock_tcp_get_local(&s->sock->tcp.sock, &ep);
-                }
-                else {
-                    res = sock_tcp_queue_get_local(&s->sock->tcp.queue, &ep);
-                }
-                break;
+        case SOCK_STREAM:
+            if (s->queue_array == NULL) {
+                res = sock_tcp_get_local(&s->sock->tcp.sock, &ep);
+            }
+            else {
+                res = sock_tcp_queue_get_local(&s->sock->tcp.queue, &ep);
+            }
+            break;
 #endif
 #ifdef MODULE_SOCK_UDP
-            case SOCK_DGRAM:
-                res = sock_udp_get_local(&s->sock->udp, &ep);
-                break;
+        case SOCK_DGRAM:
+            res = sock_udp_get_local(&s->sock->udp, &ep);
+            break;
 #endif
-            default:
-                res = -EOPNOTSUPP;
-                break;
+        default:
+            res = -EOPNOTSUPP;
+            break;
         }
         sa_len = _ep_to_sockaddr(&ep, &sa);
     }
@@ -948,29 +951,29 @@ static ssize_t socket_recvfrom(socket_t *s, void *restrict buffer,
 
     switch (s->type) {
 #ifdef MODULE_SOCK_IP
-        case SOCK_RAW:
-            res = sock_ip_recv(&s->sock->raw, buffer, length, recv_timeout,
-                               (sock_ip_ep_t *)&ep);
-            break;
+    case SOCK_RAW:
+        res = sock_ip_recv(&s->sock->raw, buffer, length, recv_timeout,
+                           (sock_ip_ep_t *)&ep);
+        break;
 #endif
 #ifdef MODULE_SOCK_TCP
-        case SOCK_STREAM:
-            res = sock_tcp_read(&s->sock->tcp.sock, buffer, length,
-                                recv_timeout);
-            break;
+    case SOCK_STREAM:
+        res = sock_tcp_read(&s->sock->tcp.sock, buffer, length,
+                            recv_timeout);
+        break;
 #endif
 #ifdef MODULE_SOCK_UDP
-        case SOCK_DGRAM:
-            res = sock_udp_recv(&s->sock->udp, buffer, length, recv_timeout,
-                                &ep);
-            break;
+    case SOCK_DGRAM:
+        res = sock_udp_recv(&s->sock->udp, buffer, length, recv_timeout,
+                            &ep);
+        break;
 #endif
-        default:
+    default:
 #if !defined(MODULE_SOCK_IP) && !defined(MODULE_SOCK_TCP) && !defined(MODULE_SOCK_UDP)
-            (void) recv_timeout;
+        (void) recv_timeout;
 #endif
-            res = -EOPNOTSUPP;
-            break;
+        res = -EOPNOTSUPP;
+        break;
     }
     if ((res >= 0) && (address != NULL) && (address_len != NULL)) {
 #ifdef MODULE_SOCK_ASYNC
@@ -978,11 +981,12 @@ static ssize_t socket_recvfrom(socket_t *s, void *restrict buffer,
 #endif
         switch (s->type) {
 #ifdef MODULE_SOCK_TCP
-            case SOCK_STREAM:
-                res = _getpeername(s, address, address_len);
-                break;
+        case SOCK_STREAM:
+            res = _getpeername(s, address, address_len);
+            break;
 #endif
-            default: {
+        default:
+            {
                 struct sockaddr_storage sa;
                 socklen_t sa_len;
 
@@ -1045,47 +1049,47 @@ static ssize_t socket_sendto(socket_t *s, const void *buffer, size_t length,
 #endif
     switch (s->type) {
 #ifdef MODULE_SOCK_IP
-        case SOCK_RAW:
-            if ((res = sock_ip_send(&s->sock->raw, buffer, length,
-                               s->protocol, (sock_ip_ep_t *)&ep)) < 0) {
-                errno = -res;
-                res = -1;
-            }
-            break;
+    case SOCK_RAW:
+        if ((res = sock_ip_send(&s->sock->raw, buffer, length,
+                           s->protocol, (sock_ip_ep_t *)&ep)) < 0) {
+            errno = -res;
+            res = -1;
+        }
+        break;
 #endif
 #ifdef MODULE_SOCK_TCP
-        case SOCK_STREAM:
-            if (address == NULL) {
-                (void)address_len;
-                if ((res = sock_tcp_write(&s->sock->tcp.sock, buffer, length)) < 0) {
-                    errno = -res;
-                    res = -1;
-                }
-            }
-            else {
-                res = -1;
-                errno = EISCONN;
-            }
-            break;
-#endif
-#ifdef MODULE_SOCK_UDP
-        case SOCK_DGRAM:
-            if (address == NULL) {
-                res = sock_udp_get_remote(&s->sock->udp, &ep);
-            } else {
-                res = _sockaddr_to_ep(address, address_len, &ep);
-            }
-            if ((res < 0) ||
-                (res = sock_udp_send(&s->sock->udp, buffer, length, &ep)) < 0) {
+    case SOCK_STREAM:
+        if (address == NULL) {
+            (void)address_len;
+            if ((res = sock_tcp_write(&s->sock->tcp.sock, buffer, length)) < 0) {
                 errno = -res;
                 res = -1;
             }
-            break;
-#endif
-        default:
+        }
+        else {
             res = -1;
-            errno = EOPNOTSUPP;
-            break;
+            errno = EISCONN;
+        }
+        break;
+#endif
+#ifdef MODULE_SOCK_UDP
+    case SOCK_DGRAM:
+        if (address == NULL) {
+            res = sock_udp_get_remote(&s->sock->udp, &ep);
+        } else {
+            res = _sockaddr_to_ep(address, address_len, &ep);
+        }
+        if ((res < 0) ||
+            (res = sock_udp_send(&s->sock->udp, buffer, length, &ep)) < 0) {
+            errno = -res;
+            res = -1;
+        }
+        break;
+#endif
+    default:
+        res = -1;
+        errno = EOPNOTSUPP;
+        break;
     }
     return res;
 }
@@ -1117,7 +1121,7 @@ int setsockopt(int socket, int level, int option_name, const void *option_value,
 #ifdef POSIX_SETSOCKOPT
     socket_t *s;
     struct timeval *tv;
-    const uint32_t max_timeout_secs = UINT32_MAX / (1000 * 1000);
+    const uint32_t max_timeout_secs = UINT32_MAX / US_PER_SEC;
 
     if (level != SOL_SOCKET
     ||  option_name != SO_RCVTIMEO) {
@@ -1140,10 +1144,18 @@ int setsockopt(int socket, int level, int option_name, const void *option_value,
 
     tv = (struct timeval *) option_value;
 
+#if MODULE_AVR8_COMMON
+    /* tv_sec is uint32_t, so never negative */
+    if (tv->tv_usec < 0) {
+        errno = EINVAL;
+        return -1;
+    }
+#else /* ! MODULE_AVR8_COMMON */
     if (tv->tv_sec < 0 || tv->tv_usec < 0) {
         errno = EINVAL;
         return -1;
     }
+#endif /* ! MODULE_AVR8_COMMON */
 
     if ((uint32_t)tv->tv_sec > max_timeout_secs
     || ((uint32_t)tv->tv_sec == max_timeout_secs && (uint32_t)tv->tv_usec > UINT32_MAX - max_timeout_secs * 1000 * 1000)) {

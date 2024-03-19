@@ -1,0 +1,54 @@
+# Copyright (c) 2023 Gunar Schorcht
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_ESP_LCD
+    bool "Enable LCD low-level parallel interface driver"
+    depends on MODULE_LCD
+    default y if HAVE_LCD_PARALLEL_LL_MCU
+    help
+        Enabe the MCU-driven low-level MCU 8080 8-/16-bit parallel interface
+        driver.
+
+if MODULE_ESP_LCD
+
+config MODULE_ESP_LCD_GPIO
+    bool "GPIO-driven low-level parallel interface driver"
+    depends on !CPU_FAM_ESP32 && !CPU_FAM_ESP32S2 && !CPU_FAM_ESP32S3
+    default y
+    help
+        The ESP32x SoC variant used does not have a peripheral for the parallel
+        low-level interface. However, it can be emulated with special low-level
+        GPIO operations. It is faster than the GPIO-driven 8-/16-bit parallel
+        interface implemented in the LCD driver, but requires 4 kByte RAM for
+        8-bit data bus width and 8 kByte RAM for 16-bit data bus width.
+
+config LCD_WRITE_CLOCK_MHZ
+    int "LCD write clock rate in MHz"
+    range 1 80
+    depends on CPU_FAM_ESP32 || CPU_FAM_ESP32S2 || CPU_FAM_ESP32S3
+    default 10 if CPU_FAM_ESP32
+    default 40 if CPU_FAM_ESP32S2
+    default 20 if CPU_FAM_ESP32S3
+    help
+        Defines the clock rate that is used for the LCD write signal. It
+        depends on used ESP32x SoC variant and used display interface.
+
+config LCD_DATA_BUF_SIZE
+    int "LCD data buffer size in byte"
+    depends on CPU_FAM_ESP32 || CPU_FAM_ESP32S2 || CPU_FAM_ESP32S3
+    default 512
+    help
+        Defines the size of the buffers used to write data to the LCD
+        screen. Since double buffering is used, there are two buffers
+        of this size. One buffer is used first by the LCD driver to
+        write the data that needs to be transferred to the LCD, and
+        one buffer from which the DMA then transfers the data to the
+        LCD peripherals. This allows data to be written before the
+        DMA transfer is complete. The larger the buffers, the better
+        the performance, but the higher the memory requirements.
+
+endif

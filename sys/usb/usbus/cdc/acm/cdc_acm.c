@@ -29,6 +29,8 @@
 #include "usb/usbus/cdc/acm.h"
 #include "usb/usbus/control.h"
 
+#include "usb_board_reset_internal.h"
+
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
@@ -229,18 +231,21 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
     usbus_endpoint_t *ep = usbus_add_endpoint(usbus, &cdcacm->iface_ctrl,
                                               USB_EP_TYPE_INTERRUPT,
                                               USB_EP_DIR_IN, 8);
+    assert(ep);
     ep->interval = 255; /* Max interval */
     usbus_enable_endpoint(ep);
     ep = usbus_add_endpoint(usbus, &cdcacm->iface_data,
                             USB_EP_TYPE_BULK, USB_EP_DIR_IN,
                             CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE);
     ep->interval = 0; /* Interval is not used with bulk endpoints */
+    assert(ep);
     usbus_enable_endpoint(ep);
     /* Store the endpoint reference to activate it
      * when DTE present is signalled by the host */
     ep = usbus_add_endpoint(usbus, &cdcacm->iface_data,
                             USB_EP_TYPE_BULK, USB_EP_DIR_OUT,
                             CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE);
+    assert(ep);
     ep->interval = 0; /* Interval is not used with bulk endpoints */
     usbus_enable_endpoint(ep);
 
@@ -259,7 +264,7 @@ static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
     usbus_cdcacm_device_t *cdcacm = (usbus_cdcacm_device_t*)handler;
     switch (setup->request) {
         case USB_CDC_MGNT_REQUEST_SET_LINE_CODING:
-            if (!(cdcacm->coding_cb)) {
+            if (!(cdcacm->coding_cb) && !IS_USED(MODULE_USB_BOARD_RESET)) {
                 /* Line coding not supported, return STALL */
                 DEBUG("CDCACM: line coding not supported\n");
                 return -1;
@@ -278,6 +283,12 @@ static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
                           ", expected: %u, got: %u",
                           sizeof(usb_req_cdcacm_coding_t), len);
                     return -1;
+                }
+                if (IS_USED(MODULE_USB_BOARD_RESET)) {
+                    /* call board reset function first if reset is received */
+                    usb_board_reset_coding_cb(cdcacm, coding->baud,
+                                              coding->databits, coding->parity,
+                                              coding->format);
                 }
                 if (cdcacm->coding_cb) {
                     DEBUG("Setting line coding to baud rate %" PRIu32 ", "

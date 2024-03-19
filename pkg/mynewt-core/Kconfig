@@ -37,5 +37,6 @@ config MODULE_MYNEWT-CORE_UTIL
 
 config MODULE_MYNEWT-CORE_NRF5X_HAL
     bool "mynewt-core nrf52 and nrf51 timer hal"
+    select PACKAGE_NRFX
 
 endif # PACKAGE_MYNEWT-CORE

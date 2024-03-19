@@ -28,10 +28,22 @@
 
 #include "net/sock/udp.h"
 #include "net/sock/util.h"
+#include "net/iana/portrange.h"
+
+#if defined(MODULE_DNS)
+#include "net/dns.h"
+#endif
+
+#ifdef MODULE_RANDOM
+#include "random.h"
+#endif
 
 #ifdef MODULE_FMT
 #include "fmt.h"
 #endif
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 #define PORT_STR_LEN    (5)
 #define NETIF_STR_LEN   (5)
@@ -42,13 +54,18 @@ int sock_tl_ep_fmt(const struct _sock_tl_ep *endpoint,
     const void *addr_ptr;
     *addr_str = '\0';
 
-    if (IS_ACTIVE(SOCK_HAS_IPV4) && (endpoint->family == AF_INET)) {
+    switch (endpoint->family) {
+#ifdef SOCK_HAS_IPV4
+    case AF_INET:
         addr_ptr = &endpoint->addr.ipv4;
-    }
-    else if (IS_ACTIVE(SOCK_HAS_IPV6) && (endpoint->family == AF_INET6)) {
+        break;
+#endif
+#ifdef SOCK_HAS_IPV6
+    case AF_INET6:
         addr_ptr = &endpoint->addr.ipv6;
-    }
-    else {
+        break;
+#endif
+    default:
         return -ENOTSUP;
     }
 
@@ -56,8 +73,7 @@ int sock_tl_ep_fmt(const struct _sock_tl_ep *endpoint,
         return 0;
     }
 
-    if (IS_ACTIVE(SOCK_HAS_IPV6) && (endpoint->family == AF_INET6) &&
-        endpoint->netif) {
+    if (IS_ACTIVE(SOCK_HAS_IPV6) && (endpoint->family == AF_INET6) && endpoint->netif) {
 #ifdef MODULE_FMT
         char *tmp = addr_str + strlen(addr_str);
         *tmp++ = '%';
@@ -82,7 +98,7 @@ static char* _find_hoststart(const char *url)
      */
     size_t remaining = CONFIG_SOCK_SCHEME_MAXLEN + 1;
     char *urlpos = (char*)url;
-    while(*urlpos && remaining) {
+    while (*urlpos && remaining) {
         remaining--;
         if (*urlpos++ == ':') {
             if (strncmp(urlpos, "//", 2) == 0) {
@@ -90,7 +106,6 @@ static char* _find_hoststart(const char *url)
             }
             break;
         }
-        urlpos++;
     }
     return NULL;
 }
@@ -99,7 +114,7 @@ static char* _find_pathstart(const char *url)
 {
     size_t remaining = CONFIG_SOCK_HOSTPORT_MAXLEN;
     char *urlpos = (char*)url;
-    while(*urlpos && remaining) {
+    while (*urlpos && remaining) {
         remaining--;
         if (*urlpos == '/') {
             return urlpos;
@@ -141,6 +156,17 @@ int sock_urlsplit(const char *url, char *hostport, char *urlpath)
     return 0;
 }
 
+const char *sock_urlpath(const char *url)
+{
+    assert(url);
+    char *hoststart = _find_hoststart(url);
+    if (!hoststart) {
+        return NULL;
+    }
+
+    return _find_pathstart(hoststart);
+}
+
 int _parse_port(sock_udp_ep_t *ep_out, const char *portstart)
 {
     int port_len = strlen(portstart);
@@ -165,7 +191,7 @@ int _parse_netif(sock_udp_ep_t *ep_out, char *netifstart)
     char netifbuf[NETIF_STR_LEN + 1] = {0};
 
     for (netifend = netifstart; *netifend && *netifend != ']';
-         netifend++);
+         netifend++) {}
     netiflen = netifend - netifstart;
     if (!*netifend || (netiflen >= NETIF_STR_LEN) || (netiflen == 0)) {
         /* no netif found, bail out */
@@ -194,7 +220,7 @@ int sock_tl_str2ep(struct _sock_tl_ep *ep_out, const char *str)
         brackets_flag = 1;
         for (hostend = ++hoststart;
              *hostend && *hostend != ']' && *hostend != '%';
-             hostend++);
+             hostend++) {}
         if (! *hostend || ((size_t)(hostend - hoststart) >= sizeof(hostbuf))) {
             /* none found, bail out */
             return -EINVAL;
@@ -231,21 +257,78 @@ int sock_tl_str2ep(struct _sock_tl_ep *ep_out, const char *str)
 
     hostbuf[hostlen] = '\0';
 
-    if (!brackets_flag && IS_ACTIVE(SOCK_HAS_IPV4)) {
+    if (!brackets_flag) {
+#ifdef SOCK_HAS_IPV4
         if (inet_pton(AF_INET, hostbuf, &ep_out->addr.ipv4) == 1) {
             ep_out->family = AF_INET;
             return 0;
         }
+#endif
     }
 
-    if (IS_ACTIVE(SOCK_HAS_IPV6)) {
-        if (inet_pton(AF_INET6, hostbuf, ep_out->addr.ipv6) == 1) {
-            ep_out->family = AF_INET6;
-            return 0;
-        }
+#ifdef SOCK_HAS_IPV6
+    if (inet_pton(AF_INET6, hostbuf, ep_out->addr.ipv6) == 1) {
+        ep_out->family = AF_INET6;
+        return 0;
     }
+#endif
 
     return -EINVAL;
+}
+
+int sock_tl_name2ep(struct _sock_tl_ep *ep_out, const char *str)
+{
+    int res = sock_tl_str2ep(ep_out, str);
+    if (res == 0) {
+        return 0;
+    }
+
+#if defined(MODULE_SOCK_DNS) || defined(MODULE_SOCK_DNS_MOCK)
+    int family;
+    char hostbuf[CONFIG_SOCK_HOSTPORT_MAXLEN];
+    const char *host;
+    char *hostend = strchr(str, ':');
+    if (hostend == NULL) {
+        host = str;
+        ep_out->port = 0;
+    } else {
+        size_t host_len = hostend - str;
+        if (host_len >= sizeof(hostbuf)) {
+            return -EINVAL;
+        }
+        memcpy(hostbuf, str, host_len);
+        hostbuf[host_len] = 0;
+        host = hostbuf;
+        ep_out->port = atoi(hostend + 1);;
+    }
+
+    if (IS_ACTIVE(SOCK_HAS_IPV4) && IS_ACTIVE(SOCK_HAS_IPV6)) {
+        family = AF_UNSPEC;
+    } else if (IS_ACTIVE(SOCK_HAS_IPV4)) {
+        family = AF_INET;
+    } else if (IS_ACTIVE(SOCK_HAS_IPV6)) {
+        family = AF_INET6;
+    } else {
+        assert(0);
+        return -EINVAL;
+    }
+
+    switch (dns_query(host, &ep_out->addr, family)) {
+#ifdef SOCK_HAS_IPV4
+    case 4:
+        ep_out->family = AF_INET;
+        return 0;
+#endif
+#ifdef SOCK_HAS_IPV6
+    case 16:
+        ep_out->family = AF_INET6;
+        return 0;
+#endif
+    default:
+        return -EINVAL;
+    }
+#endif
+    return res;
 }
 
 bool sock_tl_ep_equal(const struct _sock_tl_ep *a,
@@ -259,12 +342,94 @@ bool sock_tl_ep_equal(const struct _sock_tl_ep *a,
     }
 
     /* compare addresses */
-    if (IS_ACTIVE(SOCK_HAS_IPV4) && (a->family == AF_INET)) {
-        return memcmp(a->addr.ipv4, b->addr.ipv6, 4) == 0;
-    }
-    else if (IS_ACTIVE(SOCK_HAS_IPV6) && (a->family == AF_INET6)) {
+    switch (a->family) {
+#ifdef SOCK_HAS_IPV4
+    case AF_INET:
+        return memcmp(a->addr.ipv4, b->addr.ipv4, 4) == 0;
+#endif
+#ifdef SOCK_HAS_IPV6
+    case AF_INET6:
         return memcmp(a->addr.ipv6, b->addr.ipv6, 16) == 0;
+#endif
+    default:
+        return false;
+    }
+}
+
+#if defined(MODULE_SOCK_DTLS)
+int sock_dtls_establish_session(sock_udp_t *sock_udp, sock_dtls_t *sock_dtls,
+                                sock_dtls_session_t *session, credman_tag_t tag,
+                                sock_udp_ep_t *local, const sock_udp_ep_t *remote,
+                                void *work_buf, size_t work_buf_len)
+{
+    int res;
+    uint32_t timeout_ms = CONFIG_SOCK_DTLS_TIMEOUT_MS;
+    uint8_t retries = CONFIG_SOCK_DTLS_RETRIES;
+
+    bool auto_port = local->port == 0;
+    do {
+        if (auto_port) {
+            /* choose random ephemeral port, since DTLS requires a local port */
+            local->port = random_uint32_range(IANA_DYNAMIC_PORTRANGE_MIN,
+                                              IANA_DYNAMIC_PORTRANGE_MAX);
+        }
+        /* connect UDP socket */
+        res = sock_udp_create(sock_udp, local, remote, 0);
+    } while (auto_port && (res == -EADDRINUSE));
+
+    if (res < 0) {
+        return res;
     }
 
-    return false;
+    /* create DTLS socket on to of UDP socket */
+    res = sock_dtls_create(sock_dtls, sock_udp, tag,
+                           SOCK_DTLS_1_2, SOCK_DTLS_CLIENT);
+    if (res < 0) {
+        DEBUG("Unable to create DTLS sock: %s\n", strerror(-res));
+        sock_udp_close(sock_udp);
+        return res;
+    }
+
+    while (1) {
+        mutex_t lock = MUTEX_INIT_LOCKED;
+        ztimer_t timeout;
+
+        /* unlock lock after timeout */
+        ztimer_mutex_unlock(ZTIMER_MSEC, &timeout, timeout_ms, &lock);
+
+        /* create DTLS session */
+        res = sock_dtls_session_init(sock_dtls, remote, session);
+        if (res >= 0) {
+            /* handle handshake */
+            res = sock_dtls_recv(sock_dtls, session, work_buf,
+                                 work_buf_len, timeout_ms * US_PER_MS);
+            if (res == -SOCK_DTLS_HANDSHAKE) {
+                DEBUG("DTLS handshake successful\n");
+                ztimer_remove(ZTIMER_MSEC, &timeout);
+                return 0;
+            }
+            DEBUG("Unable to establish DTLS handshake: %s\n", strerror(-res));
+
+        } else {
+            DEBUG("Unable to initialize DTLS session: %s\n", strerror(-res));
+        }
+
+        sock_dtls_session_destroy(sock_dtls, session);
+
+        if (retries--) {
+            /* wait for timeout to expire */
+            mutex_lock(&lock);
+        } else {
+            ztimer_remove(ZTIMER_MSEC, &timeout);
+            break;
+        }
+
+        /* see https://datatracker.ietf.org/doc/html/rfc6347#section-4.2.4.1 */
+        timeout_ms *= 2U;
+    }
+
+    sock_dtls_close(sock_dtls);
+    sock_udp_close(sock_udp);
+    return res;
 }
+#endif

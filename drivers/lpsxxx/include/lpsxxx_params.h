@@ -57,6 +57,8 @@ extern "C" {
 #define LPSXXX_SAUL_NAME    "lps22hb"
 #elif MODULE_LPS22HH
 #define LPSXXX_SAUL_NAME    "lps22hh"
+#elif MODULE_LPS22CH
+#define LPSXXX_SAUL_NAME    "lps22ch"
 #endif
 #ifndef LPSXXX_SAUL_INFO
 #define LPSXXX_SAUL_INFO                { .name = LPSXXX_SAUL_NAME }

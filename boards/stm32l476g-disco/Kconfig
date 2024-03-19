@@ -22,6 +22,7 @@ config BOARD_STM32L476G_DISCO
 
     # Put other features for this board (in alphabetical order)
     select HAS_RIOTBOOT
+    select HAS_TINYUSB_DEVICE
 
     # Clock configuration
     select BOARD_HAS_LSE

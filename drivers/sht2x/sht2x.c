@@ -1,7 +1,8 @@
 /*
  * Copyright (C) 2016,2017,2018 Kees Bakker, SODAQ
- * Copyright (C) 2017 George Psimenos
- * Copyright (C) 2018 Steffen Robertz
+ *               2017 George Psimenos
+ *               2018 Steffen Robertz
+ *               2022 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,8 +14,8 @@
  * @{
  *
  * @file
- * @brief       Device driver implementation for the SHT2x temperature and
- *              humidity sensor.
+ * @brief       Device driver implementation for the SHT2x humidity and
+ *              temperature humidity sensor.
  *
  * @author      Kees Bakker <kees@sodaq.com>
  * @author      George Psimenos <gp7g14@soton.ac.uk>
@@ -25,11 +26,13 @@
 
 #include <math.h>
 
+#include "checksum/crc8.h"
 #include "log.h"
+#include "periph/i2c.h"
+#include "ztimer.h"
+
 #include "sht2x.h"
 #include "sht2x_params.h"
-#include "periph/i2c.h"
-#include "xtimer.h"
 
 #define ENABLE_DEBUG        0
 #include "debug.h"
@@ -93,7 +96,7 @@ int sht2x_init(sht2x_t* dev, const sht2x_params_t* params)
         return SHT2X_ERR_I2C;
     }
     /* wait 15 ms for device to reset */
-    xtimer_msleep(15);
+    ztimer_sleep(ZTIMER_MSEC, 15);
 
     uint8_t userreg;
     uint8_t userreg2;
@@ -158,7 +161,7 @@ int16_t sht2x_read_temperature(const sht2x_t* dev)
     if (i2c_result != SHT2X_OK) {
         return INT16_MIN;
     }
-    return (-46.85 + 175.72 / 65536.0 * raw_value) * 100;
+    return ((17572 * raw_value) / 65536) - 4685;
 }
 
 /*
@@ -176,7 +179,7 @@ uint16_t sht2x_read_humidity(const sht2x_t *dev)
     if (i2c_result != SHT2X_OK) {
         return 0;
     }
-    return 100 * (-6.0 + 125.0 / 65536.0 * raw_value);
+    return ((12500 * raw_value) / 65536) - 600;
 }
 
 static size_t _sht2x_add_ident_byte(uint8_t * buffer, size_t buflen, uint8_t b, size_t ix)
@@ -357,16 +360,23 @@ static int read_sensor_poll(const sht2x_t* dev, cmd_t command, uint16_t *val)
     uint8_t buffer[3];
     int i2c_result;
 
-    /* Acquire exclusive access */
+    /* acquire the bus for exclusive access */
     i2c_acquire(_BUS);
 
     DEBUG("[SHT2x] write command: addr=%02x cmd=%02x\n", _ADDR, (uint8_t)command);
     (void)i2c_write_byte(_BUS, _ADDR, (uint8_t)command, 0);
+    /* release the bus for measurement duration */
+    i2c_release(_BUS);
+
+    /* sleep for measurement duration */
     if (command == temp_no_hold_cmd) {
         sleep_during_temp_measurement(dev->params.resolution);
     } else {
         sleep_during_hum_measurement(dev->params.resolution);
     }
+
+    /* reacquire the bus for exclusive access */
+    i2c_acquire(_BUS);
 
     uint8_t ix = 0;
     for (; ix < MAX_RETRIES; ix++) {
@@ -398,39 +408,27 @@ static int read_sensor_poll(const sht2x_t* dev, cmd_t command, uint16_t *val)
     return SHT2X_OK;
 }
 
-static const uint16_t POLYNOMIAL = 0x131;       /* P(x)=x^8+x^5+x^4+1 = 100110001 */
+static const uint8_t POLYNOMIAL = 0x31;       /* P(x)=x^8+x^5+x^4+1 = 100110001 */
 /**
  * @brief       Calculate 8-Bit checksum with given polynomial
  */
 static uint8_t sht2x_checkcrc(uint8_t data[], uint8_t nbrOfBytes, uint8_t checksum)
 {
-    uint8_t crc = 0;
-    uint8_t byteCtr;
-    for (byteCtr = 0; byteCtr < nbrOfBytes; ++byteCtr)
-    {
-        crc ^= (data[byteCtr]);
-        for (uint8_t bit = 8; bit > 0; --bit)
-        {
-            if ((crc & 0x80) != 0)
-                crc = (crc << 1) ^ POLYNOMIAL;
-            else
-                crc = (crc << 1);
-        }
-    }
-    if (crc != checksum)
-        return 1;
-    else
-        return 0;
+    return crc8(data, nbrOfBytes, POLYNOMIAL, 0) != checksum;
 }
 
 /**
- * @brief       Initialize the given SHT2X device
+ * @brief       Sleep during measurement
  *
- * @param[in]   res         The resolution bits in the User Register
+ * @param[in]   res     The resolution bits in the User Register
  *
- * @details     Sleep for the typical time it takes to complete the measurement
+ * @details     Sleep for the maximum time it takes to complete the measurement
  *              this depends on the resolution and is taken from the datasheet.
  *              Measurement time differs for temperature and humidity.
+ *
+ * @note        According to the data sheet, typical times are recommended for
+ *              calculating energy consumption, while maximum values should be
+ *              used for calculating waiting times in communication.
  */
 static void sleep_during_temp_measurement(sht2x_res_t res)
 {
@@ -438,19 +436,19 @@ static void sleep_during_temp_measurement(sht2x_res_t res)
 
     switch (res) {
         case SHT2X_RES_12_14BIT:
-            amount_ms = 66;
+            amount_ms = 85;
             break;
         case SHT2X_RES_8_12BIT:
-            amount_ms = 17;
+            amount_ms = 22;
             break;
         case SHT2X_RES_10_13BIT:
-            amount_ms = 33;
+            amount_ms = 43;
             break;
         case SHT2X_RES_11_11BIT:
-            amount_ms = 9;
+            amount_ms = 11;
             break;
     }
-    xtimer_msleep(amount_ms);
+    ztimer_sleep(ZTIMER_MSEC, amount_ms);
 }
 
 static void sleep_during_hum_measurement(sht2x_res_t resolution)
@@ -459,17 +457,17 @@ static void sleep_during_hum_measurement(sht2x_res_t resolution)
 
     switch (resolution) {
         case SHT2X_RES_12_14BIT:
-            amount_ms = 22;
+            amount_ms = 29;
             break;
         case SHT2X_RES_8_12BIT:
-            amount_ms = 3;
+            amount_ms = 4;
             break;
         case SHT2X_RES_10_13BIT:
-            amount_ms = 7;
+            amount_ms = 9;
             break;
         case SHT2X_RES_11_11BIT:
-            amount_ms = 12;
+            amount_ms = 15;
             break;
     }
-    xtimer_msleep(amount_ms);
+    ztimer_sleep(ZTIMER_MSEC, amount_ms);
 }

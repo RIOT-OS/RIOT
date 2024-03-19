@@ -1,1 +1,7 @@
+# If port selection via ttys.py is enabled by `MOST_RECENT_PORT=1`, filter
+# USB serials to only select the UART bridge of integrated J-Link debugger.
+# (Note: This is not a typo, maybe the MSB-430 FTDI chips were reused for the
+#  MSB-A2 or so?)
+TTY_BOARD_FILTER := --model MSB430A
+
 include $(RIOTBOARD)/common/msba2/Makefile.include

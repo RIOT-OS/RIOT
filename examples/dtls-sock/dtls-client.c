@@ -20,12 +20,14 @@
 
 #include "kernel_defines.h"
 
+#include "net/gnrc/netif.h"
 #include "net/sock/udp.h"
 #include "net/sock/dtls.h"
 #include "net/sock/dtls/creds.h"
 #include "net/ipv6/addr.h"
 #include "net/credman.h"
 #include "net/sock/util.h"
+#include "net/utils.h"
 
 #include "tinydtls_keys.h"
 
@@ -87,27 +89,6 @@ static const credman_credential_t credential1 = {
         }
     },
 };
-
-static credman_tag_t _client_psk_cb(sock_dtls_t *sock, sock_udp_ep_t *ep, credman_tag_t tags[],
-                                    unsigned tags_len, const char *hint, size_t hint_len)
-{
-    (void) sock;
-    (void) tags;
-    (void) tags_len;
-
-    /* this callback is here just to show the functionality, it only prints the received hint */
-    char addrstr[IPV6_ADDR_MAX_STR_LEN];
-    uint16_t port;
-
-    sock_udp_ep_fmt(ep, addrstr, &port);
-    printf("From [%s]:%d\n", addrstr, port);
-
-    if (hint && hint_len) {
-        printf("Client got hint: %.*s\n", (unsigned)hint_len, hint);
-    }
-
-    return CREDMAN_TAG_EMPTY;
-}
 #endif
 
 static int client_send(char *addr_str, char *data, size_t datalen)
@@ -121,45 +102,23 @@ static int client_send(char *addr_str, char *data, size_t datalen)
     local.port = 12345;
     remote.port = DTLS_DEFAULT_PORT;
     uint8_t buf[DTLS_HANDSHAKE_BUFSIZE];
+    credman_tag_t tag = SOCK_DTLS_CLIENT_TAG_0;
 
     /* get interface */
-    char* iface = ipv6_addr_split_iface(addr_str);
-    if (iface) {
-        int pid = atoi(iface);
-        if (gnrc_netif_get_by_pid(pid) == NULL) {
-            puts("Invalid network interface");
-            return -1;
-        }
-        remote.netif = pid;
-    } else if (gnrc_netif_numof() == 1) {
-        /* assign the single interface found in gnrc_netif_numof() */
-        remote.netif = gnrc_netif_iter(NULL)->pid;
-    } else {
-        /* no interface is given, or given interface is invalid */
-        /* FIXME This probably is not valid with multiple interfaces */
-        remote.netif = SOCK_ADDR_ANY_NETIF;
+    netif_t *netif;
+    res = netutils_get_ipv6((void *)&remote.addr, &netif, addr_str);
+    if (res) {
+        printf("Error parsing remote address\n");
+        return res;
     }
-
-    if (!ipv6_addr_from_str((ipv6_addr_t *)remote.addr.ipv6, addr_str)) {
-        puts("Error parsing destination address");
-        return -1;
-    }
-
-    if (sock_udp_create(&udp_sock, &local, NULL, 0) < 0) {
-        puts("Error creating UDP sock");
-        return -1;
+    if (netif) {
+        remote.netif = netif_get_id(netif);
     }
 
     res = credman_add(&credential0);
     if (res < 0 && res != CREDMAN_EXIST) {
         /* ignore duplicate credentials */
-        printf("Error cannot add credential to system: %d\n", (int)res);
-        return -1;
-    }
-
-    if (sock_dtls_create(&dtls_sock, &udp_sock, SOCK_DTLS_CLIENT_TAG_0,
-                         SOCK_DTLS_1_2, SOCK_DTLS_CLIENT) < 0) {
-        puts("Error creating DTLS sock");
+        printf("Error cannot add credential to system: %" PRIdSIZE "\n", res);
         sock_udp_close(&udp_sock);
         return -1;
     }
@@ -169,33 +128,21 @@ static int client_send(char *addr_str, char *data, size_t datalen)
     res = credman_add(&credential1);
     if (res < 0 && res != CREDMAN_EXIST) {
         /* ignore duplicate credentials */
-        printf("Error cannot add credential to system: %d\n", (int)res);
-        return -1;
-    }
-
-    /* make the new credential available to the sock */
-    if (sock_dtls_add_credential(&dtls_sock, SOCK_DTLS_CLIENT_TAG_1) < 0) {
-        printf("Error cannot add credential to the sock: %d\n", (int)res);
-        return -1;
-    }
-
-    /* register a callback for PSK credential selection */
-    sock_dtls_set_client_psk_cb(&dtls_sock, _client_psk_cb);
-#endif
-
-    res = sock_dtls_session_init(&dtls_sock, &remote, &session);
-    if (res <= 0) {
-        return res;
-    }
-
-    res = sock_dtls_recv(&dtls_sock, &session, buf, sizeof(buf),
-                         SOCK_NO_TIMEOUT);
-    if (res != -SOCK_DTLS_HANDSHAKE) {
-        printf("Error creating session: %d\n", (int)res);
-        sock_dtls_close(&dtls_sock);
+        printf("Error cannot add credential to system: %" PRIdSIZE "\n", res);
         sock_udp_close(&udp_sock);
         return -1;
     }
+    tag = SOCK_DTLS_CLIENT_TAG_1;
+#endif
+
+    res = sock_dtls_establish_session(&udp_sock, &dtls_sock, &session, tag,
+                                      &local, &remote, buf, sizeof(buf));
+   if (res) {
+        sock_udp_close(&udp_sock);
+        printf("Error establishing connection: %d\n", (int)res);
+        return res;
+    }
+
     printf("Connection to server successful\n");
 
     if (sock_dtls_send(&dtls_sock, &session, data, datalen, 0) < 0) {
@@ -204,11 +151,10 @@ static int client_send(char *addr_str, char *data, size_t datalen)
     else {
         printf("Sent DTLS message\n");
 
-        uint8_t rcv[512];
-        if ((res = sock_dtls_recv(&dtls_sock, &session, rcv, sizeof(rcv),
+        if ((res = sock_dtls_recv(&dtls_sock, &session, buf, sizeof(buf),
                                     SOCK_NO_TIMEOUT)) >= 0) {
-            printf("Received %d bytes: \"%.*s\"\n", (int)res, (int)res,
-                   (char *)rcv);
+            printf("Received %" PRIdSIZE " bytes: \"%.*s\"\n", res, (int)res,
+                   (char *)buf);
         }
     }
 

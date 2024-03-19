@@ -72,7 +72,7 @@
  *
  * This is not strictly correct as it assumes independence for the
  * probabilities of each bit being set. However, assuming it is a close
- * approximation we have that the probability of false positives descreases
+ * approximation we have that the probability of false positives decreases
  * as m (the number of bits in the array) increases, and increases as n
  * (the number of inserted elements) increases. For a given m and n, the
  * value of k (the number of hash functions) that minimizes the probability
@@ -134,7 +134,7 @@ extern "C" {
 /**
  * @brief hash function to use in thee filter
  */
-typedef uint32_t (*hashfp_t)(const uint8_t *, int len);
+typedef uint32_t (*hashfp_t)(const uint8_t *, size_t len);
 
 /**
  * @brief bloom_t bloom filter object

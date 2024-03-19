@@ -8,15 +8,7 @@ supported by RIOT: @ref cpu_cc26x0_cc13x0, @ref cpu_cc26x2_cc13x2
 
 \section cc26xx_cc13xx_riot RIOT-OS on CC26xx/CC13xx boards
 
-## <a name="cc26xx_cc13xx_toc"> Table of Contents </a> &nbsp;[[TOC]](#cc26xx_cc13xx_toc)
-
-1. [Overview](#cc26xx_cc13xx_overview)
-2. [Flashing the CCFG](#cc26xx_cc13xx_ccfg)
-3. [Debugging](#cc26xx_cc13xx_debugging)
-    1. [Using OpenOCD](#cc26xx_cc13xx_openocd)
-    1. [Using Uniflash](#cc26xx_cc13xx_uniflash)
-
-# <a name="cc26xx_cc13xx_overview"> Overview </a> &nbsp;[[TOC]](#cc26xx_cc13xx_toc)
+# Overview
 
 The CC26xx/C13xx is a family of micro controllers fabricated by Texas Instruments
 for low-power communications, using protocols such as BLE, IEEE 802.15.4g-2012,
@@ -34,7 +26,7 @@ and improvements on various peripherals.
 @note The actual flash size is the flash size minus 88 bytes, these 88 bytes are
 reserved for the CCFG, see also [Flashing the CCFG](#cc26xx_cc13xx_ccfg).
 
-# <a name="cc26xx_cc13xx_ccfg"> Flashing the CCFG </a> &nbsp;[[TOC]](#cc26xx_cc13xx_toc)
+# Flashing the CCFG
 
 @warning Setting an incorrect CCFG configuration may lock out yourself
 out of the device.
@@ -69,18 +61,36 @@ make -C examples/hello-world flash BOARD=cc1350-launchpad
 @note Once flashed, there's no need to flash it again, unless the configuration
 needs to be changed.
 
-# <a name="cc26xx_cc13xx_debugging"> Debuggging </a> &nbsp;[[TOC]](#cc26xx_cc13xx_toc)
+# Debugging
 
 Development kits from Texas Instruments come with an XDS110 on-board debug probe
 that provides programming, flashing and debugging capabilities.
 
 It can either use proprietary Texas Instruments tools for programming, or OpenOCD.
 
-### <a name="cc26xx_cc13xx_openocd"> Using OpenOCD </a> &nbsp;[[TOC]](#cc26xx_cc13xx_toc)
+### Using Upstream OpenOCD
 
-To use OpenOCD with the XDS110 you need to use the an special version of
-OpenOCD made by TI (upstream version is not _yet_ compatible). You can
-clone and compile it from source:
+OpenOCD is the default programmer and debugger. Hence, flashing can be done
+by navigating to the application directory and running:
+
+```
+make flash BOARD=<CC26xx-or-CC13xx-based-board>
+```
+
+@warning    A reliable and robust sequence to reset the CC26xx / CC13xx from
+            upstream OpenOCD is not yet implemented. As a result, OpenOCD will
+            halt the MCU for flashing without reset. This may result in IRQ
+            handlers being already set up and responding to IRQs that trigger
+            while flashing. Hence, flashing is likely not 100% reliable.
+
+@note       By default the XDS110 debug adapter is used, which is the debugger
+            TI integrates into is developments boards. This can be overwritten
+            by setting `OPENOCD_DEBUG_ADAPTER` to a different debugger.
+
+### Using TI's OpenOCD Fork
+
+TI maintains an outdated fork of OpenOCD that contains patches and special
+handling that have not upstreamed yet. It can be build using:
 
 ```
 # Clone into the openocd-ti folder
@@ -95,19 +105,27 @@ make
 sudo make install
 ```
 
-@note Sometimes OpenOCD may stop working when the firmware on the XDS110
-is updated (when using Uniflash, happens without user intervention). With that
-in mind, it's encouraged to either enable the ROM bootloader backdoor to enable
-serial programming or the installation of TI Uniflash as a fallback. See
-[Using Uniflash](#cc26xx_cc13xx_uniflash)
+@warning    Sometimes OpenOCD may stop working when the firmware on the XDS110
+            is updated (when using Uniflash, happens without user intervention).
+            With that in mind, it's encouraged to either enable the ROM
+            bootloader backdoor to enable serial programming or the
+            installation of TI Uniflash as a fallback. See
+            [Using Uniflash](#cc26xx_cc13xx_uniflash)
 
-#### Setting up the environment
+@note       With `OPENOCD_CMD_RESET_HALT="-c 'reset halt'"` the default reset
+            sequence can be restored. This may work with TI's OpenOCD fork.
 
-To flash a board using OpenOCD you can use do it so by setting the `PROGRAMMER`
-environment variable directly in the make command line or in your shell
-nitialization
+Otherwise, usage is identical with the upstream version of OpenOCD.
 
-### <a name="cc26xx_cc13xx_uniflash"> Using Uniflash </a> &nbsp;[[TOC]](#cc26xx_cc13xx_toc)
+### using J-Link
+
+By passing (or exporting) `PROGRAMMER=jlink` J-Link can be used to flash the
+board. This requires a J-Link compatible programmer / debugger. Since the
+XDS110 that TI's development boards use is not compatible, an external
+programmer has to be used. The upside is that flashing appears to be reliable
+with that.
+
+### Using Uniflash
 
 The TI's Code Composer Studio provides the necessary tools to use the debug
 features of the XDS110; Uniflash provides flashing tools. Both programs can

@@ -1,1 +1,10 @@
+ifneq (,$(filter pio_%,$(USEMODULE)))
+  USEMODULE += periph_pio
+endif
+
+ifneq (,$(filter pio_i2c periph_i2c,$(FEATURES_USED)))
+  DEFAULT_MODULE += pio_autostart_i2c
+  USEMODULE += pio_i2c
+endif
+
 include $(RIOTCPU)/cortexm_common/Makefile.dep

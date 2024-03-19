@@ -7,6 +7,7 @@
 menuconfig MODULE_FIDO2_CTAP
     bool "FIDO2 CTAP"
     depends on HAS_PERIPH_FLASHPAGE
+    depends on HAS_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
     depends on HAS_PERIPH_GPIO
     depends on HAS_PERIPH_GPIO_IRQ
     depends on MODULE_FIDO2
@@ -17,7 +18,7 @@ menuconfig MODULE_FIDO2_CTAP
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_GPIO_IRQ
     select MODULE_EVENT
-    select MODULE_EVENT_TIMEOUT
+    select MODULE_EVENT_TIMEOUT_ZTIMER
     select MODULE_ZTIMER
     select MODULE_ZTIMER_MSEC
     select MODULE_MTD
@@ -27,6 +28,7 @@ menuconfig MODULE_FIDO2_CTAP
     select MODULE_CRYPTO_AES_256
     select MODULE_CIPHER_MODES
     select MODULE_HASHES
+    select MODULE_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
     help
         Y to enable CTAP protocol support. The Client-to-Authenticator
         Protocol (CTAP) is an application layer protocol for the communication
@@ -108,12 +110,19 @@ config FIDO2_CTAP_UP_BUTTON_FLANK_RISING
 
 endchoice
 
-config FIDO2_CTAP_FLASH_START_PAGE
-    int "First flash page to store data in"
-    default -1
+config FIDO2_CTAP_NUM_FLASHPAGES
+    int "Amount of flashpages to use"
+    range 2 256
+    default 4
     help
-        Configuring this incorrectly can lead to firmware corruption so make sure
-        the flash page is located after the firmware.
+        Configure how many flashpages are used to store FIDO2 CTAP data.
+
+        To save a credential (rk) in flash memory, roughly 156 bytes are needed. This
+        number might change slightly depending on the flash block size.
+        Therefore, if one wants to e.g. save 40 credentials and the flashpage
+        size is 4096 bytes roughly 156 * 40 / 4096 (2) flashpages are needed.
+        To save authenticator state data one additional flashpage is needed.
+        So in total one has to configure 3 to save 40 credentials.
 
 rsource "transport/Kconfig"
 

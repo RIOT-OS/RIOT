@@ -70,6 +70,15 @@ typedef enum {
      */
     USBOPT_MAX_SPEED,
 
+    /**
+     * @brief   (usb_version_t) Speed at which the usb peripheral got enumerated by the host
+     *
+     * Should be equal or slower than @ref USBOPT_MAX_SPEED
+     *
+     * Setting this option must return -ENOTSUP
+     */
+    USBOPT_ENUMERATED_SPEED,
+
     /* expand list if required */
 } usbopt_t;
 

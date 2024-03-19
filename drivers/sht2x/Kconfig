@@ -5,9 +5,66 @@
 # directory for more details.
 #
 
-config MODULE_SHT2X
-    bool "SHT2x temperature and humidity sensor"
+config HAVE_SHT2X
+    bool
+    select MODULE_SHT2X if MODULE_SAUL_DEFAULT
+    help
+      Indicates that a SHT2x humidity and temperature sensor is present.
+
+menuconfig MODULE_SHT2X
+    bool "SHT2x humidity and temperature sensor"
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
+    select MODULE_CHECKSUM
     select MODULE_PERIPH_I2C
-    select MODULE_XTIMER
+    select MODULE_ZTIMER_MSEC
+
+if MODULE_SHT2X
+
+choice
+    bool "Measurement Resolution"
+    default SHT2X_RES_12_14BIT
+
+    config SHT2X_RES_12_14BIT
+        bool "Humidity with 12 bit, Temperature with 14 bit"
+    config SHT2X_RES_11_11BIT
+        bool "Humidity with 11 bit, Temperature with 11 bit"
+    config SHT2X_RES_10_13BIT
+        bool "Humidity with 10 bit, Temperature with 13 bit"
+    config SHT2X_RES_8_12BIT
+        bool "Humidity with 8 bit, Temperature with 12 bit"
+    help
+        Measurement resolution
+endchoice
+
+choice
+    bool "Measurement Mode"
+    default SHT2X_MEASURE_MODE_NO_HOLD
+
+    config SHT2X_MEASURE_MODE_NO_HOLD
+        bool "No Hold"
+        help
+            In Hold mode the measurement is started and the sensor blocks the
+            master by clock stretching until the measurement is finished. Thus,
+            in this mode, both the I2C bus and the processor are blocked for the
+            entire measurement duration, which can be up to 85 ms for temperature
+            measurement and up to 29 ms for humidity measurement, depending on the
+            resolution. Therefore, the no-hold mode should be used, where the
+            measurement is started and a timer is used to fetch the results.
+            This way neither the I2C bus nor the processor are blocked for the
+            duration of the measurement. Furthermore, the hold mode requires that
+            the MCU supports clock stretching.
+    config SHT2X_MEASURE_MODE_HOLD
+        bool "Hold"
+        help
+            In no-hold mode the measurement is started and a timer is used to
+            fetch the results. This way neither the I2C bus nor the processor
+            are blocked for the duration of the measurement.
+endchoice
+
+config SHT2X_CRC_MODE
+    bool "CRC check"
+    help
+        Enable to check the CRC of measurement data.
+
+endif # MODULE_SHT2X

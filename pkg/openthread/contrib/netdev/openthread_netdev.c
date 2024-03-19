@@ -84,12 +84,11 @@ static void *_openthread_event_loop(void *arg)
 
     event_queue_init(&ev_queue);
 
-    netdev->driver->init(netdev);
     netdev->event_callback = _event_cb;
+    netdev->driver->init(netdev);
 
     netopt_enable_t enable = NETOPT_ENABLE;
     netdev->driver->set(netdev, NETOPT_TX_END_IRQ, &enable, sizeof(enable));
-    netdev->driver->set(netdev, NETOPT_RX_END_IRQ, &enable, sizeof(enable));
 
     /* init OpenThread */
     sInstance = otInstanceInitSingle();

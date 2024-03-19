@@ -56,8 +56,11 @@
    ================================================================
  */
 
-#include <hashes/sha3.h>
 #include <stdint.h>
+#include <string.h>
+
+#include "hashes/sha3.h"
+#include "macros/utils.h"
 
 /**
  * Function to compute the Keccak[r, c] sponge function over a given input.
@@ -329,9 +332,6 @@ static void KeccakF1600_StatePermute(void *state)
    that use the Keccak-f[1600] permutation.
    ================================================================
  */
-
-#include <string.h>
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 static void Keccak(unsigned int rate, unsigned int capacity, const unsigned char *input,
                    unsigned long long int inputByteLen, unsigned char delimitedSuffix,

@@ -50,11 +50,6 @@ extern "C" {
 #define XTIMER_BACKOFF              (40)
 /** @} */
 
-/**
- * @brief   Initialize the platform
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

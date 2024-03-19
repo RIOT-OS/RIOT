@@ -4,12 +4,14 @@
 CFLAGS_OPT ?= -O2
 
 # ESP8266 specific flashing options
+# DO NOT CHANGE, ESP8266/ESP8285 modules only work with dout and 26m
 FLASH_CHIP  = esp8266
 FLASH_OPTS  = --version 3
-FLASH_MODE  = dout  # DO NOT CHANGE, ESP8266/ESP8285 modules only work with dout
-FLASH_FREQ  = 26m   # DO NOT CHANGE
+FLASH_MODE  = dout
+FLASH_FREQ  = 26m
 FLASH_SIZE ?= 1
 BOOTLOADER_POS = 0x0000
+FLASHFILE_POS = 0x10000
 
 include $(RIOTCPU)/esp_common/Makefile.include
 
@@ -42,7 +44,7 @@ ifneq (,$(filter esp_now,$(USEMODULE)))
   ARCHIVES += -lespnow
 endif
 
-ARCHIVES += -lgcc -lwpa -lcore -lnet80211 -lphy -lpp -lstdc++
+ARCHIVES += -lgcc -lhal -lwpa -lcore -lnet80211 -lphy -lpp -lstdc++
 
 LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ld
 LINKFLAGS += -Tesp8266.rom.ld

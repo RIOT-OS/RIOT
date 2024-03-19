@@ -328,14 +328,17 @@ typedef enum {
  * lines in the board, just using different adc_conf_t entries.
  */
 typedef uint16_t adc_conf_t;
-/** @} */
 
 /**
  * @brief   CPU specific timer Counter/Timers (CTIMER) configuration
  * @{
  */
-#define TIMER_CHANNELS      (4)
+#define TIMER_CHANNEL_NUMOF (4)
 #define TIMER_MAX_VALUE     (0xffffffff)
+/**
+ * @brief   The nRF5x periph_timer implements timer_set()
+ */
+#define PERIPH_TIMER_PROVIDES_SET   1
 /** @} */
 
 /**

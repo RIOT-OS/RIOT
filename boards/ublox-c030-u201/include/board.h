@@ -33,26 +33,14 @@ extern "C" {
  * @name    LED pin definitions and handlers
  * @{
  */
-#define LED0_PIN            GPIO_PIN(PORT_E, 3)
-#define LED0_MASK           (1 << 3)
+#define LED0_PIN_NUM        3
+#define LED0_PORT_NUM       PORT_E
 
-#define LED0_ON             (GPIOE->BSRR = LED0_MASK)
-#define LED0_OFF            (GPIOE->BSRR = (LED0_MASK << 16))
-#define LED0_TOGGLE         (GPIOE->ODR  ^= LED0_MASK)
+#define LED1_PIN_NUM        4
+#define LED1_PORT_NUM       PORT_E
 
-#define LED1_PIN            GPIO_PIN(PORT_E, 4)
-#define LED1_MASK           (1 << 4)
-
-#define LED1_ON             (GPIOE->BSRR = LED1_MASK)
-#define LED1_OFF            (GPIOE->BSRR = (LED1_MASK << 16))
-#define LED1_TOGGLE         (GPIOE->ODR  ^= LED1_MASK)
-
-#define LED2_PIN            GPIO_PIN(PORT_E, 1)
-#define LED2_MASK           (1 << 1)
-
-#define LED2_ON             (GPIOE->BSRR = LED2_MASK)
-#define LED2_OFF            (GPIOE->BSRR = (LED2_MASK << 16))
-#define LED2_TOGGLE         (GPIOE->ODR  ^= LED2_MASK)
+#define LED2_PIN_NUM        1
+#define LED2_PORT_NUM       PORT_E
 /** @} */
 
 /**
@@ -95,14 +83,11 @@ extern "C" {
 #define GPS_RST_PIN             GPIO_PIN(PORT_C, 10) /* Not connected */
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif
+
+#include "stm32_leds.h"
 
 #endif /* BOARD_H */
 /** @} */

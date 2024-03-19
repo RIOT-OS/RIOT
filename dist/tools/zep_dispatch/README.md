@@ -45,6 +45,27 @@ There can only be as many nodes connected to the dispatcher as have been named i
 the topology file.
 Any additional nodes that try to connect will be ignored.
 
+
+Packet capture
+--------------
+
+To view traffic in Wireshark you need to create a virtual 802.15.4 device to which
+the network traffic is sent. This can then be selected as a capture source in Wireshark.
+
+To create the virtual device, load the `mac802154_hwsim` module
+
+    sudo modprobe mac802154_hwsim
+
+This will create two wpan devices, `wpan0` and `wpan1`.
+
+If you then run the dispatcher with
+
+    sudo zep_dispatch -w wpan0 ::1 17754
+
+all traffic on the simulated network will be also sent to the virtual `wpan0` interface
+where it can be captures with Wireshark.
+
+
 Network visualization
 ---------------------
 

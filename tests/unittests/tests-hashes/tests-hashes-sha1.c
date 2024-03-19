@@ -64,18 +64,20 @@ static const char *_resultarray[TEST_CASES_NUM + 2] =
 
 #define TEST_CASES_HMAC_NUM      (5)
 
-#define TEST1_HMAC	"Hi There"
-#define TEST2_HMAC	"what do ya want for nothing?"
+#define TEST1_HMAC  "Hi There"
+#define TEST2_HMAC  "what do ya want for nothing?"
 #define TEST3_HMAC  "Test With Truncation"
 #define TEST4_HMAC  "Test Using Larger Than Block-Size Key - Hash Key First"
 #define TEST5_HMAC  "Test Using Larger Than Block-Size Key and Larger Than One Block-Size Data"
 
 static const uint8_t _hmac_key1[]={
-    0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b
+    0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
+    0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b
 };
 static const uint8_t _hmac_key2[]= "Jefe";
 static const uint8_t _hmac_key3[]={
-    0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c
+    0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c,
+    0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c
 };
 static const uint8_t _hmac_key4[]={
     0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
@@ -181,11 +183,16 @@ static void test_hashes_sha1(void)
     TEST_ASSERT(calc_and_compare_hash2(_testarray[2], _resultarray[4]) == 0);
     TEST_ASSERT(calc_and_compare_hash2(_testarray[3], _resultarray[5]) == 0);
 
-    TEST_ASSERT(calc_and_compare_hash_hmac(TEST1_HMAC, _resultarray_hmac[0], _hmac_key1, sizeof(_hmac_key1)) == 0);
-    TEST_ASSERT(calc_and_compare_hash_hmac(TEST2_HMAC, _resultarray_hmac[1], _hmac_key2, sizeof(_hmac_key2)) == 0);
-    TEST_ASSERT(calc_and_compare_hash_hmac(TEST3_HMAC, _resultarray_hmac[2], _hmac_key3, sizeof(_hmac_key3)) == 0);
-    TEST_ASSERT(calc_and_compare_hash_hmac(TEST4_HMAC, _resultarray_hmac[3], _hmac_key4, sizeof(_hmac_key4)) == 0);
-    TEST_ASSERT(calc_and_compare_hash_hmac(TEST5_HMAC, _resultarray_hmac[4], _hmac_key5, sizeof(_hmac_key5)) == 0);
+    TEST_ASSERT(calc_and_compare_hash_hmac(TEST1_HMAC, _resultarray_hmac[0],
+                                           _hmac_key1, sizeof(_hmac_key1)) == 0);
+    TEST_ASSERT(calc_and_compare_hash_hmac(TEST2_HMAC, _resultarray_hmac[1],
+                                           _hmac_key2, sizeof(_hmac_key2)) == 0);
+    TEST_ASSERT(calc_and_compare_hash_hmac(TEST3_HMAC, _resultarray_hmac[2],
+                                           _hmac_key3, sizeof(_hmac_key3)) == 0);
+    TEST_ASSERT(calc_and_compare_hash_hmac(TEST4_HMAC, _resultarray_hmac[3],
+                                           _hmac_key4, sizeof(_hmac_key4)) == 0);
+    TEST_ASSERT(calc_and_compare_hash_hmac(TEST5_HMAC, _resultarray_hmac[4],
+                                           _hmac_key5, sizeof(_hmac_key5)) == 0);
 }
 
 Test *tests_hashes_sha1_tests(void)

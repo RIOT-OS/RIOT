@@ -289,6 +289,11 @@ typedef struct ztimer_base ztimer_base_t;
 typedef struct ztimer_clock ztimer_clock_t;
 
 /**
+ * @brief Type of callbacks in @ref ztimer_t "timers"
+ */
+typedef void (*ztimer_callback_t)(void *arg);
+
+/**
  * @brief   Minimum information for each timer
  */
 struct ztimer_base {
@@ -296,10 +301,26 @@ struct ztimer_base {
     uint32_t offset;            /**< offset from last timer in list */
 };
 
+/**
+ * @defgroup   sys_ztimer_now64 ztimer_now64
+ * @brief 64-bit timestamp support
+ *
+ * @deprecated use @ref ztimer_now() returning uint32_t or alternatively use
+ *             module `ztimer64` with @ref ztimer64_now() returning uint64_t.
+ *             Will be removed after 2022.10 release.
+ */
+/**
+ * @typedef ztimer_now_t
+ * @brief type for ztimer_now() result
+ *
+ * @deprecated use @ref ztimer_now() returning uint32_t or alternatively use
+ *             module `ztimer64` with @ref ztimer64_now() returning uint64_t.
+ *             Will be removed after 2022.10 release.
+ */
 #if MODULE_ZTIMER_NOW64
-typedef uint64_t ztimer_now_t;  /**< type for ztimer_now() result */
+typedef uint64_t ztimer_now_t;
 #else
-typedef uint32_t ztimer_now_t;  /**< type for ztimer_now() result */
+typedef uint32_t ztimer_now_t;
 #endif
 
 /**
@@ -310,7 +331,7 @@ typedef uint32_t ztimer_now_t;  /**< type for ztimer_now() result */
  */
 typedef struct {
     ztimer_base_t base;             /**< clock list entry */
-    void (*callback)(void *arg);    /**< timer callback function pointer */
+    ztimer_callback_t callback;     /**< timer callback function pointer */
     void *arg;                      /**< timer callback argument */
 } ztimer_t;
 
@@ -340,6 +361,20 @@ typedef struct {
      * @param   clock       ztimer clock to cancel a pending alarm, if any
      */
     void (*cancel)(ztimer_clock_t *clock);
+
+#if MODULE_ZTIMER_ONDEMAND || DOXYGEN
+    /**
+     * @brief   Starts the underlying timer
+     * @param   clock       ztimer clock to start
+     */
+    void (*start)(ztimer_clock_t *clock);
+
+    /**
+     * @brief   Stops the underlying timer
+     * @param   clock       ztimer clock to stop
+     */
+    void (*stop)(ztimer_clock_t *clock);
+#endif
 } ztimer_ops_t;
 
 /**
@@ -352,14 +387,21 @@ struct ztimer_clock {
     uint16_t adjust_set;            /**< will be subtracted on every set()  */
     uint16_t adjust_sleep;          /**< will be subtracted on every sleep(),
                                          in addition to adjust_set          */
+#if MODULE_ZTIMER_ONDEMAND || DOXYGEN
+    uint16_t adjust_clock_start;    /**< will be subtracted on every set(),
+                                         if the underlying periph is in
+                                         stopped state                      */
+    uint16_t users;                 /**< user count of this clock */
+#endif
 #if MODULE_ZTIMER_EXTEND || MODULE_ZTIMER_NOW64 || DOXYGEN
     /* values used for checkpointed intervals and 32bit extension */
     uint32_t max_value;             /**< maximum relative timer value       */
     uint32_t lower_last;            /**< timer value at last now() call     */
     ztimer_now_t checkpoint;        /**< cumulated time at last now() call  */
 #endif
-#if MODULE_PM_LAYERED || DOXYGEN
-    uint8_t block_pm_mode;          /**< min. pm mode to block for the clock to run */
+#if MODULE_PM_LAYERED && !MODULE_ZTIMER_ONDEMAND || DOXYGEN
+    uint8_t block_pm_mode;          /**< min. pm mode to block for the clock to run
+                                         don't use in combination with ztimer_ondemand! */
 #endif
 };
 
@@ -372,6 +414,47 @@ struct ztimer_clock {
 void ztimer_handler(ztimer_clock_t *clock);
 
 /* User API */
+/**
+ * @brief   Acquire a clock
+ *
+ * This will indicate the the underlying clock is required to be running.
+ * If time differences are measured using @ref ztimer_now this will make
+ * sure ztimer won't turn of the clock source.
+ *
+ * @param[in]   clock       ztimer clock to operate on
+ *
+ * @return true if this was the first acquisition on this this clock
+ */
+#if MODULE_ZTIMER_ONDEMAND || DOXYGEN
+bool ztimer_acquire(ztimer_clock_t *clock);
+#else
+static inline bool ztimer_acquire(ztimer_clock_t *clock)
+{
+    (void)clock;
+    return false;
+}
+#endif
+
+/**
+ * @brief   Release a clock
+ *
+ * This will indicate the the underlying clock isn't required to be running
+ * anymore and may be turned off.
+ *
+ * @param[in]   clock       ztimer clock to operate on
+ *
+ * @return true if this was the last clock user
+ */
+#if MODULE_ZTIMER_ONDEMAND || DOXYGEN
+bool ztimer_release(ztimer_clock_t *clock);
+#else
+static inline bool ztimer_release(ztimer_clock_t *clock)
+{
+    (void)clock;
+    return false;
+}
+#endif
+
 /**
  * @brief   Set a timer on a clock
  *
@@ -404,7 +487,7 @@ unsigned ztimer_is_set(const ztimer_clock_t *clock, const ztimer_t *timer);
 /**
  * @brief   Remove a timer from a clock
  *
- * This will place @p timer in the timer targets queue for @p clock.
+ * This will remove @p timer from the timer targets queue for @p clock.
  *
  * This function does nothing if @p timer is not found in the timer queue of
  * @p clock.
@@ -472,6 +555,17 @@ int ztimer_msg_receive_timeout(ztimer_clock_t *clock, msg_t *msg,
 ztimer_now_t _ztimer_now_extend(ztimer_clock_t *clock);
 
 /**
+ * @brief asserts the given clock to be active
+ *
+ * @internal
+ *
+ * @note  This function is internal
+ *
+ * @param[in]   clock          ztimer clock to operate on
+ */
+void _ztimer_assert_clock_active(ztimer_clock_t *clock);
+
+/**
  * @brief   Get the current time from a clock
  *
  * There are several caveats to consider when using values returned by
@@ -490,14 +584,18 @@ ztimer_now_t _ztimer_now_extend(ztimer_clock_t *clock);
  * * Two values can only be compared when the clock has been continuously
  *   active between the first and the second reading.
  *
- *   A clock is guaranteed to be active from the time any timer is set (the
- *   first opportunity to get a "now" value from it is the return value of @ref
- *   ztimer_set) until the time the timer's callback returns. The clock also
- *   stays active when timers are set back-to-back (which is the case when the
- *   first timer's callback sets the second timer), or when they overlap (which
- *   can be known by starting the second timer and afterwards observing that
- *   @ref ztimer_is_set or @ref ztimer_remove returns true in a low-priority
- *   context).
+ *   Calling @ref ztimer_acquire before using `ztimer_now()` is the preferred
+ *   way to guarantee that a clock is continuously active. Make sure to call
+ *   the corresponding @ref ztimer_release after the last `ztimer_now()` call.
+ *
+ *   A clock is also guaranteed to be active from the time any timer is set
+ *   (the first opportunity to get a "now" value from it is the return value of
+ *   @ref ztimer_set) until the time the timer's callback returns. The clock
+ *   also stays active when timers are set back-to-back (which is the case when
+ *   the first timer's callback sets the second timer), or when they overlap
+ *   (which can be known by starting the second timer and afterwards observing
+ *   that @ref ztimer_is_set or @ref ztimer_remove returns true in a
+ *   low-priority context).
  *
  *   In contrast, the clock is not guaranteed to be active if a timer is
  *   removed and then a second one is started (even if the thread does not
@@ -572,12 +670,19 @@ ztimer_now_t _ztimer_now_extend(ztimer_clock_t *clock);
  *          unrelated components are altered that change the systems's power
  *          management behavior.
  *
+ * @warning Make sure to call @ref ztimer_acquire(@p clock) before fetching
+ *          the clock's current time.
+ *
  * @param[in]   clock          ztimer clock to operate on
  *
  * @return  Current count on @p clock
  */
 static inline ztimer_now_t ztimer_now(ztimer_clock_t *clock)
 {
+#if MODULE_ZTIMER_ONDEMAND && DEVELHELP
+    _ztimer_assert_clock_active(clock);
+#endif
+
 #if MODULE_ZTIMER_NOW64
     if (1) {
 #elif MODULE_ZTIMER_EXTEND
@@ -606,6 +711,10 @@ static inline ztimer_now_t ztimer_now(ztimer_clock_t *clock)
  * If the time (@p last_wakeup + @p period) has already passed, the function
  * sets @p last_wakeup to @p last_wakeup + @p period and returns immediately.
  *
+ * @warning Make sure to call @ref ztimer_acquire(@p clock) before making use
+ *          of @ref ztimer_periodic_wakeup. After usage
+ *          @ref ztimer_release(@p clock) should be called.
+ *
  * @param[in]   clock           ztimer clock to operate on
  * @param[in]   last_wakeup     base time stamp for the wakeup
  * @param[in]   period          time in ticks that will be added to @p last_wakeup
@@ -631,11 +740,13 @@ void ztimer_sleep(ztimer_clock_t *clock, uint32_t duration);
  */
 static inline void ztimer_spin(ztimer_clock_t *clock, uint32_t duration)
 {
+    ztimer_acquire(clock);
     uint32_t end = ztimer_now(clock) + duration;
 
     /* Rely on integer overflow. `end - now` will be smaller than `duration`,
      * counting down, until it underflows to UINT32_MAX. Loop ends then. */
     while ((end - ztimer_now(clock)) <= duration) {}
+    ztimer_release(clock);
 }
 
 /**
@@ -664,6 +775,19 @@ void ztimer_set_wakeup(ztimer_clock_t *clock, ztimer_t *timer, uint32_t offset,
  */
 void ztimer_set_timeout_flag(ztimer_clock_t *clock, ztimer_t *timer,
                              uint32_t timeout);
+
+/**
+ * @brief    Unlock mutex after @p timeout
+ *
+ * This function will unlock the given mutex after the timeout has passed.
+ *
+ * @param[in]   clock           ztimer clock to operate on
+ * @param[in]   timer           timer struct to use
+ * @param[in]   timeout         timeout in ztimer_clock's ticks
+ * @param[in]   mutex           mutex to unlock after timeout
+ */
+void ztimer_mutex_unlock(ztimer_clock_t *clock, ztimer_t *timer,
+                         uint32_t timeout, mutex_t *mutex);
 
 /**
  * @brief   Try to lock the given mutex, but give up after @p timeout

@@ -19,11 +19,20 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include "board_common.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @name    ztimer configuration values
+ * @{
+ */
+#define CONFIG_ZTIMER_USEC_ADJUST_SET     (132)
+#define CONFIG_ZTIMER_USEC_ADJUST_SLEEP   (120)
+/** @} */
+
+#include "board_common.h"
 
 #ifdef __cplusplus
 }

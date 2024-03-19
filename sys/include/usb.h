@@ -53,7 +53,15 @@ extern "C" {
 #error Please configure your vendor and product IDs. For development, you may \
     set USB_VID=${USB_VID_TESTING} USB_PID=${USB_PID_TESTING}.
 #endif
+#else
+#if CONFIG_USB_VID == INTERNAL_PERIPHERAL_VID && \
+    CONFIG_USB_PID == INTERNAL_PERIPHERAL_PID
+#error Please configure your vendor and product IDs differently than the \
+    INTERNAL_PERIPHERAL_* settings. For development, you may set \
+    USB_VID=${USB_VID_TESTING} \
+    USB_PID=${USB_PID_TESTING}.
 #endif
+#endif /* !(defined(CONFIG_USB_VID) && defined(CONFIG_USB_PID)) */
 
 /**
  * @brief USB peripheral device vendor ID
@@ -86,7 +94,7 @@ extern "C" {
  * @brief USB peripheral product string
  */
 #ifndef CONFIG_USB_PRODUCT_STR
-#define CONFIG_USB_PRODUCT_STR  "USB device"
+#define CONFIG_USB_PRODUCT_STR  RIOT_BOARD
 #endif
 
 /**
@@ -238,6 +246,26 @@ typedef enum {
     USB_EP_DIR_OUT, /**< Host out, device in */
     USB_EP_DIR_IN,  /**< Host in, device out */
 } usb_ep_dir_t;
+
+/**
+ * @brief Maximum transfer size for interrupt endpoints at full speed
+ */
+#define USB_ENDPOINT_INTERRUPT_FS_MAX_SIZE  (64)
+
+/**
+ * @brief Maximum transfer size for interrupt endpoints at high speed
+ */
+#define USB_ENDPOINT_INTERRUPT_HS_MAX_SIZE  (1024)
+
+/**
+ * @brief Maximum transfer size for bulk endpoints at full speed
+ */
+#define USB_ENDPOINT_BULK_FS_MAX_SIZE  (64)
+
+/**
+ * @brief Maximum transfer size for bulk endpoints at high speed
+ */
+#define USB_ENDPOINT_BULK_HS_MAX_SIZE  (512)
 
 #ifdef __cplusplus
 }

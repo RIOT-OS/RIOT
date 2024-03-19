@@ -23,6 +23,7 @@
 
 #include "net/cord/config.h"
 #include "net/cord/lc.h"
+#include "net/gnrc/netif.h"
 #include "net/gcoap.h"
 #include "net/sock/util.h"
 
@@ -34,7 +35,7 @@ static unsigned rd_initialized = 0;
 static int make_sock_ep(sock_udp_ep_t *ep, const char *addr)
 {
     ep->port = 0;
-    if (sock_udp_str2ep(ep, addr) < 0) {
+    if (sock_udp_name2ep(ep, addr) < 0) {
         return -1;
     }
     /* if netif not specified in addr */

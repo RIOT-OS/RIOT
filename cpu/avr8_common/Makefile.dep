@@ -2,24 +2,20 @@
 USEMODULE += avr_libc_extra
 
 # tell the build system to build the avr8 common files
-USEMODULE += avr8_common
+USEMODULE += avr8_common avr8_common_periph
+
+# All avr8 CPUs provide PM
+DEFAULT_MODULE += pm_layered
 
 # The AVR-libc provides no thread safe malloc implementation and has no hooks
 # to inject. Use malloc_thread_safe to link calls to malloc to safe wrappers
 # instead.
 USEMODULE += malloc_thread_safe
 
-# the atmel port uses stdio_uart by default
-ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
-  USEMODULE += stdio_uart
-endif
+# The AVR-libc provides no strerror, so we provide it via tiny_strerror
+USEMODULE += tiny_strerror_as_strerror
 
 # static C++ constructors need guards for thread safe initialization
 ifneq (,$(filter cpp,$(FEATURES_USED)))
   USEMODULE += cxx_ctor_guards
-endif
-
-# new and delete operators needed
-ifneq (,$(filter cpp,$(FEATURES_USED)))
-  USEMODULE += cpp_new_delete
 endif

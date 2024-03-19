@@ -90,22 +90,22 @@ static const uart_conf_t uart_config[] = {
 
 static const adc_conf_chan_t adc_channels[] = {
     /* port, pin, muxpos */
-    {GPIO_PIN(PA, 2), ADC_INPUTCTRL_MUXPOS_PIN0},     /* A0 */
-    {GPIO_PIN(PA, 3), ADC_INPUTCTRL_MUXPOS_PIN1},     /* A1 */
-    {GPIO_PIN(PB, 8), ADC_INPUTCTRL_MUXPOS_PIN2},     /* A2 */
-    {GPIO_PIN(PB, 9), ADC_INPUTCTRL_MUXPOS_PIN3},     /* A3 */
-    {GPIO_PIN(PA, 6), ADC_INPUTCTRL_MUXPOS_PIN6},     /* A4 */
-    {GPIO_PIN(PA, 7), ADC_INPUTCTRL_MUXPOS_PIN7},     /* A5 */
-    {GPIO_PIN(PA, 8), ADC_INPUTCTRL_MUXPOS_PIN16},    /* A6 */
-    {GPIO_PIN(PA, 9), ADC_INPUTCTRL_MUXPOS_PIN17},    /* A7 */
-    {GPIO_PIN(PA,10), ADC_INPUTCTRL_MUXPOS_PIN18},    /* A8 */
-    {GPIO_PIN(PA,11), ADC_INPUTCTRL_MUXPOS_PIN19},    /* A9 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA02 },     /* A0 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA03 },     /* A1 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PB08 },     /* A2 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PB09 },     /* A3 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA06 },     /* A4 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA07 },     /* A5 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA08 },    /* A6 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA09 },    /* A7 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA10 },    /* A8 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA11 },    /* A9 */
 #if 0
     /* These pins are also used for RX/TX uart0 */
-    {GPIO_PIN(PB, 2), ADC_INPUTCTRL_MUXPOS_PIN10},    /* A10, TX */
-    {GPIO_PIN(PB, 3), ADC_INPUTCTRL_MUXPOS_PIN11},    /* A11, RX */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PB02 },    /* A10, TX */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PB03 },    /* A11, RX */
 #endif
-    {GPIO_PIN(PA, 5), ADC_INPUTCTRL_MUXPOS_PIN5},     /* BAT_VOLT */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA05 },     /* BAT_VOLT */
 };
 
 #define ADC_NUMOF                           ARRAY_SIZE(adc_channels)

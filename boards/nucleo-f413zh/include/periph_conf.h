@@ -49,10 +49,16 @@ extern "C" {
 static const dma_conf_t dma_config[] = {
     { .stream = 11 },   /* DMA2 Stream 3 - SPI1_TX */
     { .stream = 10 },   /* DMA2 Stream 2 - SPI1_RX */
+    { .stream = 3 },    /* DMA1 Stream 3 - UART3_TX */
+    { .stream = 15 },   /* DMA2 Stream 7 - UART6_TX */
+    { .stream = 6 },    /* DMA1 Stream 6 - UART2_TX */
 };
 
 #define DMA_0_ISR           isr_dma2_stream3
 #define DMA_1_ISR           isr_dma2_stream2
+#define DMA_2_ISR           isr_dma1_stream3
+#define DMA_3_ISR           isr_dma2_stream7
+#define DMA_4_ISR           isr_dma1_stream6
 
 #define DMA_NUMOF           ARRAY_SIZE(dma_config)
 /** @} */
@@ -72,8 +78,8 @@ static const uart_conf_t uart_config[] = {
         .bus        = APB1,
         .irqn       = USART3_IRQn,
 #ifdef MODULE_PERIPH_DMA
-        .dma        = 0,
-        .dma_chan   = 7,
+        .dma        = 2,
+        .dma_chan   = 4,
 #endif
     },
     {
@@ -86,7 +92,7 @@ static const uart_conf_t uart_config[] = {
         .bus        = APB2,
         .irqn       = USART6_IRQn,
 #ifdef MODULE_PERIPH_DMA
-        .dma        = 1,
+        .dma        = 3,
         .dma_chan   = 5,
 #endif
     },
@@ -100,7 +106,7 @@ static const uart_conf_t uart_config[] = {
         .bus        = APB1,
         .irqn       = USART2_IRQn,
 #ifdef MODULE_PERIPH_DMA
-        .dma        = 3,
+        .dma        = 4,
         .dma_chan   = 4,
 #endif
     },

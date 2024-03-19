@@ -21,6 +21,7 @@
 #include "lwip/ethip6.h"
 #include "lwip/netif.h"
 #include "lwip/netifapi.h"
+#include "lwip/netif/compat.h"
 #include "lwip/netif/netdev.h"
 #include "lwip/opt.h"
 #include "lwip/pbuf.h"
@@ -61,18 +62,17 @@ static err_t _eth_link_output(struct netif *netif, struct pbuf *p);
 #ifdef MODULE_LWIP_SIXLOWPAN
 static err_t _ieee802154_link_output(struct netif *netif, struct pbuf *p);
 #endif
+#ifdef MODULE_SLIPDEV
+static err_t _slip_link_output(struct netif *netif, struct pbuf *p);
+#if LWIP_IPV4
+static err_t slip_output4(struct netif *netif, struct pbuf *q, const ip4_addr_t *ipaddr);
+#endif
+#if LWIP_IPV6
+static err_t slip_output6(struct netif *netif, struct pbuf *q, const ip6_addr_t *ip6addr);
+#endif
+#endif
 static void _event_cb(netdev_t *dev, netdev_event_t event);
 static void *_event_loop(void *arg);
-
-static void _configure_netdev(netdev_t *dev)
-{
-    /* Enable RX-complete interrupts */
-    static const netopt_enable_t enable = NETOPT_ENABLE;
-    int res = dev->driver->set(dev, NETOPT_RX_END_IRQ, &enable, sizeof(enable));
-    if (res < 0) {
-        DEBUG("lwip_netdev: enable NETOPT_RX_END_IRQ failed: %d\n", res);
-    }
-}
 
 err_t lwip_netdev_init(struct netif *netif)
 {
@@ -82,6 +82,9 @@ err_t lwip_netdev_init(struct netif *netif)
     netopt_enable_t enabled = 0;
     uint16_t dev_type;
     err_t res = ERR_OK;
+
+    /* Init device lock */
+    lwip_netif_dev_lock_init(netif);
 
     /* start multiplexing thread (only one needed) */
     if (_pid <= KERNEL_PID_UNDEF) {
@@ -93,96 +96,147 @@ err_t lwip_netdev_init(struct netif *netif)
         }
     }
 
-    /* initialize netdev and netif */
+    /* initialize Bottom Half Processor, netdev and netif */
+    if (IS_USED(MODULE_BHP_MSG)) {
+        bhp_msg_claim_thread(lwip_netif_get_bhp(netif), _pid);
+    }
+
     netdev = netif->state;
-    netdev->driver->init(netdev);
-    _configure_netdev(netdev);
+    lwip_netif_dev_acquire(netif);
     netdev->event_callback = _event_cb;
+    netdev->driver->init(netdev);
     if (netdev->driver->get(netdev, NETOPT_DEVICE_TYPE, &dev_type,
                             sizeof(dev_type)) < 0) {
-        return ERR_IF;
+        res = ERR_IF;
+        goto free;
     }
 #if LWIP_NETIF_HOSTNAME
     netif->hostname = "riot";
 #endif /* LWIP_NETIF_HOSTNAME */
 
-    /* XXX: for now assume its Ethernet, since netdev is implemented only by ethernet drivers */
     switch (dev_type) {
 #ifdef MODULE_NETDEV_ETH
-        case NETDEV_TYPE_ETHERNET:
-            netif->name[0] = ETHERNET_IFNAME1;
-            netif->name[1] = ETHERNET_IFNAME2;
-            netif->hwaddr_len = (u8_t)netdev->driver->get(netdev, NETOPT_ADDRESS, netif->hwaddr,
-                                                          sizeof(netif->hwaddr));
-            if (netif->hwaddr_len > sizeof(netif->hwaddr)) {
-                return ERR_IF;
-            }
-            /* TODO: get from driver (currently not in netdev_eth) */
-            netif->mtu = ETHERNET_DATA_LEN;
-            netif->linkoutput = _eth_link_output;
+    case NETDEV_TYPE_ETHERNET:
+        netif->name[0] = ETHERNET_IFNAME1;
+        netif->name[1] = ETHERNET_IFNAME2;
+        netif->hwaddr_len = (u8_t)netdev->driver->get(netdev, NETOPT_ADDRESS, netif->hwaddr,
+                                                      sizeof(netif->hwaddr));
+        if (netif->hwaddr_len > sizeof(netif->hwaddr)) {
+            res = ERR_IF;
+            goto free;
+        }
+        /* TODO: get from driver (currently not in netdev_eth) */
+        netif->mtu = ETHERNET_DATA_LEN;
+        netif->linkoutput = _eth_link_output;
 #if LWIP_IPV4
-            netif->output = etharp_output;
+        netif->output = etharp_output;
 #endif
 #if LWIP_IPV6
-            netif->output_ip6 = ethip6_output;
-            netif_create_ip6_linklocal_address(netif, 1);   /* 1: hwaddr is 48-bit MAC addr */
+        netif->output_ip6 = ethip6_output;
+        netif_create_ip6_linklocal_address(netif, 1);   /* 1: hwaddr is 48-bit MAC addr */
 #endif
-            netif->flags |= NETIF_FLAG_BROADCAST;
-            netif->flags |= NETIF_FLAG_ETHARP;
-            netif->flags |= NETIF_FLAG_ETHERNET;
-            break;
+        netif->flags |= NETIF_FLAG_BROADCAST;
+        netif->flags |= NETIF_FLAG_ETHARP;
+        netif->flags |= NETIF_FLAG_ETHERNET;
+        break;
 #endif
 #ifdef MODULE_LWIP_SIXLOWPAN
-        case NETDEV_TYPE_IEEE802154:
-        {
-            u16_t val;
-            ip6_addr_t *addr;
-            netif->name[0] = WPAN_IFNAME1;
-            netif->name[1] = WPAN_IFNAME2;
-            if (netdev->driver->get(netdev, NETOPT_NID, &val,
-                                    sizeof(val)) < 0) {
-                return ERR_IF;
-            }
-            lowpan6_set_pan_id(val);
+    case NETDEV_TYPE_IEEE802154:
+    {
+        u16_t val;
+        ip6_addr_t *addr;
+        netif->name[0] = WPAN_IFNAME1;
+        netif->name[1] = WPAN_IFNAME2;
+        if (netdev->driver->get(netdev, NETOPT_NID, &val,
+                                sizeof(val)) < 0) {
+            res = ERR_IF;
+            goto free;
+        }
+        lowpan6_set_pan_id(val);
+        netif->hwaddr_len = (u8_t)netdev->driver->get(netdev, NETOPT_ADDRESS_LONG,
+                                                      netif->hwaddr, sizeof(netif->hwaddr));
+        if (netif->hwaddr_len > sizeof(netif->hwaddr)) {
+            res = ERR_IF;
+            goto free;
+        }
+        netif->linkoutput = _ieee802154_link_output;
+        res = lowpan6_if_init(netif);
+        if (res != ERR_OK) {
+            return res;
+        }
+        /* assure usage of long address as source address */
+        val = netif->hwaddr_len;
+        if (netdev->driver->set(netdev, NETOPT_SRC_LEN, &val, sizeof(val)) < 0) {
+            res = ERR_IF;
+            goto free;
+        }
+        /* netif_create_ip6_linklocal_address() does weird byte-swapping
+         * with full IIDs, so let's do it ourselves */
+        addr = ip_2_ip6(&(netif->ip6_addr[0]));
+        /* addr->addr is a uint32_t array */
+        if (l2util_ipv6_iid_from_addr(dev_type,
+                                      netif->hwaddr, netif->hwaddr_len,
+                                      (eui64_t *)&addr->addr[2]) < 0) {
+            res = ERR_IF;
+            goto free;
+        }
+        ipv6_addr_set_link_local_prefix((ipv6_addr_t *)&addr->addr[0]);
+        ip6_addr_assign_zone(addr, IP6_UNICAST, netif);
+        /* Set address state. */
+#if LWIP_IPV6_DUP_DETECT_ATTEMPTS
+        /* Will perform duplicate address detection (DAD). */
+        netif->ip6_addr_state[0] = IP6_ADDR_TENTATIVE;
+#else
+        /* Consider address valid. */
+        netif->ip6_addr_state[0] = IP6_ADDR_PREFERRED;
+#endif /* LWIP_IPV6_AUTOCONFIG */
+        break;
+    }
+#endif
+#ifdef MODULE_SLIPDEV
+    case NETDEV_TYPE_SLIP:
+        netif->name[0] = 'S';
+        netif->name[1] = 'L';
+
+        /* TODO: get from driver (currently not in netdev_eth) */
+        netif->mtu = ETHERNET_DATA_LEN;
+        netif->linkoutput = _slip_link_output;
+#if LWIP_IPV4
+        netif->output = slip_output4;
+#endif
+#if LWIP_IPV6
+        netif->output_ip6 = slip_output6;
+
+        if (IS_USED(MODULE_SLIPDEV_L2ADDR)) {
             netif->hwaddr_len = (u8_t)netdev->driver->get(netdev, NETOPT_ADDRESS_LONG,
-                                                          netif->hwaddr, sizeof(netif->hwaddr));
+                                                          netif->hwaddr,
+                                                          sizeof(netif->hwaddr));
             if (netif->hwaddr_len > sizeof(netif->hwaddr)) {
-                return ERR_IF;
+                res = ERR_IF;
+                goto free;
             }
-            netif->linkoutput = _ieee802154_link_output;
-            res = lowpan6_if_init(netif);
-            if (res != ERR_OK) {
-                return res;
-            }
-            /* assure usage of long address as source address */
-            val = netif->hwaddr_len;
-            if (netdev->driver->set(netdev, NETOPT_SRC_LEN, &val, sizeof(val)) < 0) {
-                return ERR_IF;
-            }
+
             /* netif_create_ip6_linklocal_address() does weird byte-swapping
              * with full IIDs, so let's do it ourselves */
-            addr = ip_2_ip6(&(netif->ip6_addr[0]));
+            ip6_addr_t *addr = ip_2_ip6(&(netif->ip6_addr[0]));
             /* addr->addr is a uint32_t array */
             if (l2util_ipv6_iid_from_addr(dev_type,
                                           netif->hwaddr, netif->hwaddr_len,
                                           (eui64_t *)&addr->addr[2]) < 0) {
-                return ERR_IF;
+                res = ERR_IF;
+                goto free;
             }
             ipv6_addr_set_link_local_prefix((ipv6_addr_t *)&addr->addr[0]);
             ip6_addr_assign_zone(addr, IP6_UNICAST, netif);
-            /* Set address state. */
-#if LWIP_IPV6_DUP_DETECT_ATTEMPTS
-            /* Will perform duplicate address detection (DAD). */
-            netif->ip6_addr_state[0] = IP6_ADDR_TENTATIVE;
-#else
             /* Consider address valid. */
             netif->ip6_addr_state[0] = IP6_ADDR_PREFERRED;
-#endif /* LWIP_IPV6_AUTOCONFIG */
-            break;
         }
+#endif /* LWIP_IPV6 */
+        break;
 #endif
-        default:
-            return ERR_IF;  /* device type not supported yet */
+    default:
+        res = ERR_IF;
+        goto free;
     }
     netif->flags |= NETIF_FLAG_UP;
     /* Set link state up if link state is unsupported, or if it is up */
@@ -192,10 +246,11 @@ err_t lwip_netdev_init(struct netif *netif)
     }
     netif->flags |= NETIF_FLAG_IGMP;
     netif->flags |= NETIF_FLAG_MLD6;
-    netdev->context = netif;
 #if LWIP_IPV6_AUTOCONFIG
     netif->ip6_autoconfig_enabled = 1;
 #endif
+free:
+    lwip_netif_dev_release(netif);
 
     return res;
 }
@@ -228,7 +283,10 @@ static err_t _eth_link_output(struct netif *netif, struct pbuf *p)
 #if ETH_PAD_SIZE
     pbuf_header(p, ETH_PAD_SIZE); /* reclaim the padding word */
 #endif
-    return (netdev->driver->send(netdev, iolist) > 0) ? ERR_OK : ERR_BUF;
+    lwip_netif_dev_acquire(netif);
+    err_t res = (netdev->driver->send(netdev, iolist) >= 0) ? ERR_OK : ERR_BUF;
+    lwip_netif_dev_release(netif);
+    return res;
 }
 #endif
 
@@ -242,13 +300,52 @@ static err_t _ieee802154_link_output(struct netif *netif, struct pbuf *p)
         .iol_len = (p->len - IEEE802154_FCS_LEN),   /* FCS is written by driver */
     };
 
-    return (netdev->driver->send(netdev, &pkt) > 0) ? ERR_OK : ERR_BUF;
+    lwip_netif_dev_acquire(netif);
+    err_t res = (netdev->driver->send(netdev, &pkt) >= 0) ? ERR_OK : ERR_BUF;
+    lwip_netif_dev_release(netif);
+    return res;
+}
+#endif
+
+#ifdef MODULE_SLIPDEV
+#if LWIP_IPV4
+static err_t slip_output4(struct netif *netif, struct pbuf *q, const ip4_addr_t *ipaddr)
+{
+    (void)ipaddr;
+    return netif->linkoutput(netif, q);
+}
+#endif
+#if LWIP_IPV6
+static err_t slip_output6(struct netif *netif, struct pbuf *q, const ip6_addr_t *ip6addr)
+{
+    (void)ip6addr;
+    return netif->linkoutput(netif, q);
+}
+#endif
+
+static err_t _slip_link_output(struct netif *netif, struct pbuf *p)
+{
+    LWIP_ASSERT("p->next == NULL", p->next == NULL);
+    netdev_t *netdev = netif->state;
+    iolist_t pkt = {
+        .iol_base = p->payload,
+        .iol_len = p->len,
+    };
+
+    lwip_netif_dev_acquire(netif);
+    err_t res = (netdev->driver->send(netdev, &pkt) >= 0) ? ERR_OK : ERR_BUF;
+    lwip_netif_dev_release(netif);
+    return res;
 }
 #endif
 
 static struct pbuf *_get_recv_pkt(netdev_t *dev)
 {
+    lwip_netif_t *compat_netif = dev->context;
+    struct netif *netif = &compat_netif->lwip_netif;
+    lwip_netif_dev_acquire(netif);
     int len = dev->driver->recv(dev, _tmp_buf, sizeof(_tmp_buf), NULL);
+    lwip_netif_dev_release(netif);
 
     if (len < 0) {
         DEBUG("lwip_netdev: an error occurred while reading the packet\n");
@@ -279,45 +376,51 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
         }
     }
     else {
-        struct netif *netif = dev->context;
+        lwip_netif_t *compat_netif = dev->context;
+        struct netif *netif = &compat_netif->lwip_netif;
         switch (event) {
-            case NETDEV_EVENT_RX_COMPLETE: {
-                struct pbuf *p = _get_recv_pkt(dev);
-                if (p == NULL) {
-                    DEBUG("lwip_netdev: error receiving packet\n");
-                    return;
-                }
-                if (netif->input(p, netif) != ERR_OK) {
-                    DEBUG("lwip_netdev: error inputing packet\n");
-                    return;
-                }
-                break;
+        case NETDEV_EVENT_RX_COMPLETE: {
+            struct pbuf *p = _get_recv_pkt(dev);
+            if (p == NULL) {
+                DEBUG("lwip_netdev: error receiving packet\n");
+                return;
             }
-            case NETDEV_EVENT_LINK_UP: {
-                /* Will wake up DHCP state machine */
-                netifapi_netif_set_link_up(netif);
-                break;
+            if (netif->input(p, netif) != ERR_OK) {
+                DEBUG("lwip_netdev: error inputing packet\n");
+                return;
             }
-            case NETDEV_EVENT_LINK_DOWN: {
-                netifapi_netif_set_link_down(netif);
-                break;
-            }
-            default:
-                break;
+            break;
+        }
+        case NETDEV_EVENT_LINK_UP: {
+            /* Will wake up DHCP state machine */
+            netifapi_netif_set_link_up(netif);
+            break;
+        }
+        case NETDEV_EVENT_LINK_DOWN: {
+            netifapi_netif_set_link_down(netif);
+            break;
+        }
+        default:
+            break;
         }
     }
 }
 
 static void *_event_loop(void *arg)
 {
-    (void)arg;
+    struct netif *netif = arg;
     msg_init_queue(_queue, LWIP_NETDEV_QUEUE_LEN);
     while (1) {
         msg_t msg;
         msg_receive(&msg);
         if (msg.type == LWIP_NETDEV_MSG_TYPE_EVENT) {
             netdev_t *dev = msg.content.ptr;
+            lwip_netif_dev_acquire(netif);
             dev->driver->isr(dev);
+            lwip_netif_dev_release(netif);
+        }
+        else if (IS_USED(MODULE_BHP_MSG) && msg.type == BHP_MSG_BH_REQUEST) {
+            bhp_msg_handler(&msg);
         }
     }
     return NULL;

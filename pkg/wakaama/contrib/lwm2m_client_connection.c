@@ -214,7 +214,7 @@ static int _connection_send(lwm2m_client_connection_t *conn, uint8_t *buffer,
     ssize_t sent_bytes = sock_udp_send(&(client_data->sock), buffer,
                                        buffer_size, &(conn->remote));
     if (sent_bytes <= 0) {
-        DEBUG("[_connection_send] Could not send UDP packet: %i\n", (int)sent_bytes);
+        DEBUG("[_connection_send] Could not send UDP packet: %" PRIiSIZE "\n", sent_bytes);
         return -1;
     }
     conn->last_send = lwm2m_gettime();
@@ -252,7 +252,7 @@ static lwm2m_client_connection_t *_connection_create(uint16_t sec_obj_inst_id,
     lwm2m_client_connection_t *conn = NULL;
     char uri[MAX_URI_LENGTH];
     size_t uri_len = ARRAY_SIZE(uri);
-    const char *port;
+    uint16_t port;
     bool is_bootstrap;
 
     DEBUG("Creating connection\n");
@@ -287,19 +287,19 @@ static lwm2m_client_connection_t *_connection_create(uint16_t sec_obj_inst_id,
     }
 
     /* if no port specified, use the default server or BS-server ports */
-    if (!parsed_uri.port) {
+    if (parsed_uri.port == 0) {
         if (is_bootstrap) {
-            port = CONFIG_LWM2M_BSSERVER_PORT;
+            port = atoi(CONFIG_LWM2M_BSSERVER_PORT);
         }
         else {
-            port = CONFIG_LWM2M_STANDARD_PORT;
+            port = atoi(CONFIG_LWM2M_STANDARD_PORT);
         }
     }
     else {
         port = parsed_uri.port;
     }
 
-    DEBUG("[_connection_create] Creating connection to Host: %.*s, Port: %s\n",
+    DEBUG("[_connection_create] Creating connection to Host: %.*s, Port: %u\n",
           parsed_uri.ipv6addr_len, parsed_uri.ipv6addr, port);
 
     /* allocate new connection */
@@ -313,7 +313,7 @@ static lwm2m_client_connection_t *_connection_create(uint16_t sec_obj_inst_id,
     /* configure to any IPv6 */
     conn->remote.family = AF_INET6;
     conn->remote.netif = SOCK_ADDR_ANY_NETIF;
-    conn->remote.port = atoi(port);
+    conn->remote.port = port;
 
     if (!ipv6_addr_from_buf((ipv6_addr_t *)&conn->remote.addr.ipv6, parsed_uri.ipv6addr,
                             parsed_uri.ipv6addr_len)) {

@@ -8,6 +8,8 @@
 #ifndef VIC_H
 #define VIC_H
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -76,9 +78,6 @@ extern "C" {
 
 #define VECT_ADDR_INDEX 0x100
 #define VECT_CNTL_INDEX 0x200
-
-#include <stdbool.h>
-#include "cpu.h"
 
 bool cpu_install_irq(int IntNumber, void *HandlerAddr, int Priority);
 

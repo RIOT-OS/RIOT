@@ -170,8 +170,8 @@ and can be used for any purpose. However, if optional off-board hardware
 modules are used, these GPIOs may also be occupied, see
 section \ref esp32_wroom_32_board_configuration for more information.
 
-The corresponding board schematics can be found her [here]
-(https://dl.espressif.com/dl/schematics/esp32_devkitc_v4-sch-20180607a.pdf)
+The corresponding board schematics can be found
+[here](https://dl.espressif.com/dl/schematics/esp32_devkitc_v4-sch-20180607a.pdf)
 
 @image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/ESP32-WROOM-32_pinouts.png" "EPS32-DevKitC V4 Pinout"
 

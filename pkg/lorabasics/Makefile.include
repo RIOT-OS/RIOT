@@ -1,0 +1,11 @@
+INCLUDES += -I$(PKGDIRBASE)/lorabasicsmodem \
+            #
+
+ifneq (,$(filter lorabasics_driver_sx1280_hal,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/lorabasics/driver_sx1280_hal
+
+  # In the lorabasics package setting this define includes RAL code for the sx1280 radio
+  CFLAGS += -DSX1280
+endif
+
+PSEUDOMODULES += lorabasics

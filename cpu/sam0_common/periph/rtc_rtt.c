@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
  *               2015 FreshTemp, LLC.
+ *               2022 SSV Software Systems GmbH
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -20,12 +21,16 @@
  * @author      Baptiste Clenet <bapclenet@gmail.com>
  * @author      FWX <FWX@dialine.fr>
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
+ * @author      Juergen Fitschen <me@jue.yt>
  *
  * @}
  */
 
+#include <errno.h>
 #include <stdint.h>
 #include <string.h>
+
+#include "pm_layered.h"
 #include "periph/rtc.h"
 #include "periph/rtt.h"
 #include "periph_conf.h"
@@ -62,11 +67,45 @@ typedef struct {
 static rtc_state_t alarm_cb;
 static rtc_state_t overflow_cb;
 
+#if (IS_ACTIVE(MODULE_PERIPH_RTC) || IS_ACTIVE(MODULE_PERIPH_RTT)) && \
+    IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_RTCRTT_PM_BLOCK)
+
+static bool _pm_alarm = false;
+#if IS_ACTIVE(MODULE_PERIPH_RTT)
+static bool _pm_overflow = false;
+#endif
+
+static inline void _pm_block(bool *flag)
+{
+    if (!*flag) {
+        pm_block(SAM0_RTCRTT_PM_BLOCK);
+        *flag = true;
+    }
+}
+
+static inline void _pm_unblock(bool *flag)
+{
+    if (*flag) {
+        pm_unblock(SAM0_RTCRTT_PM_BLOCK);
+        *flag = false;
+    }
+}
+
+#else
+
+/* Use empty stubs if pm is disabled */
+#define _pm_block(x)
+#define _pm_unblock(x)
+
+#endif
+
+#if IS_ACTIVE(MODULE_PERIPH_RTC)
 /* At 1Hz, RTC goes till 63 years (2^5, see 17.8.22 in datasheet)
  * struct tm younts the year since 1900, use the difference to RIOT_EPOCH
  * as an offset so the user can set years in RIOT_EPOCH + 63
  */
-static uint16_t reference_year = RIOT_EPOCH - 1900;
+static const uint16_t reference_year = RIOT_EPOCH - 1900;
+#endif
 
 static void _wait_syncbusy(void)
 {
@@ -90,8 +129,8 @@ static void _read_req(void)
 {
 #ifdef RTC_READREQ_RREQ
     RTC->MODE0.READREQ.reg = RTC_READREQ_RREQ;
-    _wait_syncbusy();
 #endif
+    _wait_syncbusy();
 }
 #endif
 
@@ -124,6 +163,7 @@ static void _poweroff(void)
 #endif
 }
 
+MAYBE_UNUSED
 static inline void _rtc_set_enabled(bool on)
 {
 #ifdef REG_RTC_MODE2_CTRLA
@@ -309,6 +349,9 @@ static void _rtc_init(void)
 
 void rtc_init(void)
 {
+    /* clear previously set pm mode blockers */
+    _pm_unblock(&_pm_alarm);
+
     _poweroff();
     _rtc_clock_setup();
     _poweron();
@@ -318,12 +361,8 @@ void rtc_init(void)
     /* disable all interrupt sources */
     RTC->MODE2.INTENCLR.reg = RTC_MODE2_INTENCLR_MASK;
 
-    /* enable overflow interrupt */
-    RTC->MODE2.INTENSET.reg = RTC_MODE2_INTENSET_OVF;
-
     /* Clear interrupt flags */
-    RTC->MODE2.INTFLAG.reg = RTC_MODE2_INTFLAG_OVF
-                           | RTC_MODE2_INTFLAG_ALARM0;
+    RTC->MODE2.INTFLAG.reg = RTC_MODE2_INTFLAG_ALARM0;
 
     _rtc_set_enabled(1);
 
@@ -334,6 +373,9 @@ void rtc_init(void)
 #ifdef MODULE_PERIPH_RTT
 void rtt_init(void)
 {
+    /* clear previously set pm mode blockers */
+    _pm_unblock(&_pm_alarm);
+    _pm_unblock(&_pm_overflow);
 
     _rtt_clock_setup();
     _poweron();
@@ -549,29 +591,41 @@ int rtc_get_time(struct tm *time)
     return 0;
 }
 
+static void _rtc_clear_alarm(void)
+{
+    /* disable alarm interrupt */
+    RTC->MODE2.INTENCLR.reg = RTC_MODE2_INTENCLR_ALARM0;
+}
+
+void rtc_clear_alarm(void)
+{
+    _rtc_clear_alarm();
+    _pm_unblock(&_pm_alarm);
+}
+
 int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 {
     /* prevent old alarm from ringing */
-    rtc_clear_alarm();
+    _rtc_clear_alarm();
 
     /* normalize input */
     rtc_tm_normalize(time);
 
     if ((time->tm_year < reference_year) ||
         (time->tm_year > (reference_year + 63))) {
-        return -2;
-    }
-    else {
-        RTC->MODE2.Mode2Alarm[0].ALARM.reg = RTC_MODE2_ALARM_YEAR(time->tm_year - reference_year)
-                                           | RTC_MODE2_ALARM_MONTH(time->tm_mon + 1)
-                                           | RTC_MODE2_ALARM_DAY(time->tm_mday)
-                                           | RTC_MODE2_ALARM_HOUR(time->tm_hour)
-                                           | RTC_MODE2_ALARM_MINUTE(time->tm_min)
-                                           | RTC_MODE2_ALARM_SECOND(time->tm_sec);
-        RTC->MODE2.Mode2Alarm[0].MASK.reg = RTC_MODE2_MASK_SEL(6);
+        return -EINVAL;
     }
 
+    /* make sure that preceding changes have been applied */
     _wait_syncbusy();
+
+    RTC->MODE2.Mode2Alarm[0].ALARM.reg = RTC_MODE2_ALARM_YEAR(time->tm_year - reference_year)
+                                       | RTC_MODE2_ALARM_MONTH(time->tm_mon + 1)
+                                       | RTC_MODE2_ALARM_DAY(time->tm_mday)
+                                       | RTC_MODE2_ALARM_HOUR(time->tm_hour)
+                                       | RTC_MODE2_ALARM_MINUTE(time->tm_min)
+                                       | RTC_MODE2_ALARM_SECOND(time->tm_sec);
+    RTC->MODE2.Mode2Alarm[0].MASK.reg = RTC_MODE2_MASK_SEL(6);
 
     /* Enable IRQ */
     alarm_cb.cb  = cb;
@@ -580,6 +634,11 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
     /* enable alarm interrupt and clear flag */
     RTC->MODE2.INTFLAG.reg  = RTC_MODE2_INTFLAG_ALARM0;
     RTC->MODE2.INTENSET.reg = RTC_MODE2_INTENSET_ALARM0;
+
+    /* block power mode if callback function is present */
+    if (alarm_cb.cb) {
+        _pm_block(&_pm_alarm);
+    }
 
     return 0;
 }
@@ -606,12 +665,6 @@ int rtc_set_time(struct tm *time)
     return 0;
 }
 
-void rtc_clear_alarm(void)
-{
-    /* disable alarm interrupt */
-    RTC->MODE2.INTENCLR.reg = RTC_MODE2_INTENCLR_ALARM0;
-}
-
 void rtc_poweron(void)
 {
     _poweron();
@@ -635,16 +688,22 @@ void rtt_set_overflow_cb(rtt_cb_t cb, void *arg)
 
     /* enable overflow interrupt */
     RTC->MODE0.INTENSET.reg = RTC_MODE0_INTENSET_OVF;
+
+    /* block power mode if callback function is present */
+    if (overflow_cb.cb) {
+        _pm_block(&_pm_overflow);
+    }
 }
 void rtt_clear_overflow_cb(void)
 {
     /* disable overflow interrupt */
     RTC->MODE0.INTENCLR.reg = RTC_MODE0_INTENCLR_OVF;
+
+    _pm_unblock(&_pm_overflow);
 }
 
 uint32_t rtt_get_counter(void)
 {
-    _wait_syncbusy();
     _read_req();
     return RTC->MODE0.COUNT.reg;
 }
@@ -661,28 +720,41 @@ uint32_t rtt_get_alarm(void)
     return RTC->MODE0.COMP[0].reg;
 }
 
+static void _rtt_clear_alarm(void)
+{
+    /* disable compare interrupt */
+    RTC->MODE0.INTENCLR.reg = RTC_MODE0_INTENCLR_CMP0;
+}
+
+void rtt_clear_alarm(void)
+{
+    _rtt_clear_alarm();
+    _pm_unblock(&_pm_alarm);
+}
+
 void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
 {
     /* disable interrupt to avoid race */
-    rtt_clear_alarm();
+    _rtt_clear_alarm();
 
     /* setup callback */
     alarm_cb.cb  = cb;
     alarm_cb.arg = arg;
 
+    /* make sure that preceding changes have been applied */
+    _wait_syncbusy();
+
     /* set COMP register */
     RTC->MODE0.COMP[0].reg = alarm;
-    _wait_syncbusy();
 
     /* enable compare interrupt and clear flag */
     RTC->MODE0.INTFLAG.reg = RTC_MODE0_INTFLAG_CMP0;
     RTC->MODE0.INTENSET.reg = RTC_MODE0_INTENSET_CMP0;
-}
 
-void rtt_clear_alarm(void)
-{
-    /* disable compare interrupt */
-    RTC->MODE0.INTENCLR.reg = RTC_MODE0_INTENCLR_CMP0;
+    /* block power mode if callback function is present */
+    if (alarm_cb.cb) {
+        _pm_block(&_pm_alarm);
+    }
 }
 
 void rtt_poweron(void)
@@ -710,13 +782,6 @@ static void _isr_rtc(void)
             alarm_cb.cb(alarm_cb.arg);
         }
     }
-    if (RTC->MODE2.INTFLAG.bit.OVF) {
-        /* clear flag */
-        RTC->MODE2.INTFLAG.reg = RTC_MODE2_INTFLAG_OVF;
-        /* At 1Hz, RTC goes till 63 years (2^5, see 17.8.22 in datasheet)
-        * Start RTC again with reference_year 64 years more (Be careful with alarm set) */
-        reference_year += 64;
-    }
 }
 
 static void _isr_rtt(void)
@@ -737,6 +802,7 @@ static void _isr_rtt(void)
         /* disable interrupt */
         RTC->MODE0.INTENCLR.reg = RTC_MODE0_INTENCLR_CMP0;
         if (alarm_cb.cb) {
+            _pm_unblock(&_pm_alarm);
             alarm_cb.cb(alarm_cb.arg);
         }
     }

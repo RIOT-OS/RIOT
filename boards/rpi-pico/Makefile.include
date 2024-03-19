@@ -1,2 +1,6 @@
 CPU_MODEL       := RP2040
 PORT_LINUX      ?= /dev/ttyUSB0
+
+ifeq ($(PROGRAMMER),jlink)
+  JLINK_DEVICE = RP2040_M0_0
+endif

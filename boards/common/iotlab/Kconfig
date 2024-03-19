@@ -22,9 +22,13 @@ config BOARD_COMMON_IOTLAB
     select BOARD_HAS_HSE
     select BOARD_HAS_LSE
 
+    select HAVE_AT86RF231
     select HAVE_SAUL_GPIO
-    select HAVE_L3G4200D
+    select HAVE_L3G4200D_NG
     select HAVE_LSM303DLHC
+
+config CLOCK_HSE
+    default 16000000
 
 config MODULE_BOARDS_COMMON_IOTLAB
     bool

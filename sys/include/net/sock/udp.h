@@ -268,6 +268,8 @@
 #ifndef NET_SOCK_UDP_H
 #define NET_SOCK_UDP_H
 
+#include <assert.h>
+#include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -279,7 +281,10 @@
 # pragma clang diagnostic ignored "-Wtypedef-redefinition"
 #endif
 
+#include "net/af.h"
 #include "net/sock.h"
+#include "net/ipv4/addr.h"
+#include "net/ipv6/addr.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -290,7 +295,7 @@ typedef struct _sock_tl_ep sock_udp_ep_t;   /**< An end point for a UDP sock obj
 /**
  * @brief   Type for a UDP sock object
  *
- * @note    API implementors: `struct sock_udp` needs to be defined by
+ * @note    API implementers: `struct sock_udp` needs to be defined by
  *         implementation-specific `sock_types.h`.
  */
 typedef struct sock_udp sock_udp_t;
@@ -327,6 +332,14 @@ typedef struct {
      */
     int16_t rssi;
 #endif /* MODULE_SOCK_AUX_RSSI */
+#if defined(MODULE_SOCK_AUX_TTL) || defined(DOXYGEN)
+    /**
+     * @brief   TTL value of the received frame
+     *
+     * @see SOCK_AUX_GET_TTL
+     */
+    uint8_t ttl;
+#endif /* MODULE_SOCK_AUX_TTL */
     sock_aux_flags_t flags; /**< Flags used request information */
 } sock_udp_aux_rx_t;
 
@@ -334,6 +347,14 @@ typedef struct {
  * @brief   Auxiliary data provided when sending using an UDP sock object
  */
 typedef struct {
+#if defined(MODULE_SOCK_AUX_LOCAL) || defined(DOXYGEN)
+    /**
+     * @brief   The local endpoint from which the datagram will be sent
+     *
+     * @see SOCK_AUX_SET_LOCAL
+     */
+    sock_udp_ep_t local;
+#endif /* MODULE_SOCK_AUX_ENDPOINT */
 #if defined(MODULE_SOCK_AUX_TIMESTAMP) || defined(DOXYGEN)
     /**
      * @brief   System time the datagram was send
@@ -357,6 +378,13 @@ typedef struct {
  *
  * @pre `(sock != NULL)`
  * @pre `(remote == NULL) || (remote->port != 0)`
+ *
+ * @warning If you create a socket you are responsible for receiving messages
+ *          sent to it by calling @ref sock_udp_recv.
+ *          Otherwise, the packet queue of the @p sock may congest until the
+ *          socket is closed.
+ *          If you only want to send without receiving, use @ref sock_udp_send
+ *          instead with `sock` set to NULL.
  *
  * @param[out] sock     The resulting sock object.
  * @param[in] local     Local end point for the sock object.
@@ -605,6 +633,43 @@ static inline ssize_t sock_udp_recv_buf(sock_udp_t *sock,
 }
 
 /**
+ * @brief   Sends a UDP message to remote end point with non-continous payload
+ *
+ * @pre `((sock != NULL || remote != NULL))`
+ *
+ * @param[in] sock      A UDP sock object. May be `NULL`.
+ *                      A sensible local end point should be selected by the
+ *                      implementation in that case.
+ * @param[in] snips     List of payload chunks, will be processed in order.
+ *                      May be `NULL`.
+ * @param[in] remote    Remote end point for the sent data.
+ *                      May be `NULL`, if @p sock has a remote end point.
+ *                      sock_udp_ep_t::family may be AF_UNSPEC, if local
+ *                      end point of @p sock provides this information.
+ *                      sock_udp_ep_t::port may not be 0.
+ * @param[out] aux      Auxiliary data about the transmission.
+ *                      May be `NULL`, if it is not required by the application.
+ *
+ * @return  The number of bytes sent on success.
+ * @return  -EADDRINUSE, if `sock` has no local end-point or was `NULL` and the
+ *          pool of available ephemeral ports is depleted.
+ * @return  -EAFNOSUPPORT, if `remote != NULL` and sock_udp_ep_t::family of
+ *          @p remote is != AF_UNSPEC and not supported.
+ * @return  -EHOSTUNREACH, if @p remote or remote end point of @p sock is not
+ *          reachable.
+ * @return  -EINVAL, if sock_udp_ep_t::addr of @p remote is an invalid address.
+ * @return  -EINVAL, if sock_udp_ep_t::netif of @p remote is not a valid
+ *          interface or contradicts the given local interface (i.e.
+ *          neither the local end point of `sock` nor remote are assigned to
+ *          `SOCK_ADDR_ANY_NETIF` but are nevertheless different.
+ * @return  -EINVAL, if sock_udp_ep_t::port of @p remote is 0.
+ * @return  -ENOMEM, if no memory was available to send @p data.
+ * @return  -ENOTCONN, if `remote == NULL`, but @p sock has no remote end point.
+ */
+ssize_t sock_udp_sendv_aux(sock_udp_t *sock, const iolist_t *snips,
+                           const sock_udp_ep_t *remote, sock_udp_aux_tx_t *aux);
+
+/**
  * @brief   Sends a UDP message to remote end point
  *
  * @pre `((sock != NULL || remote != NULL)) && (if (len != 0): (data != NULL))`
@@ -639,8 +704,19 @@ static inline ssize_t sock_udp_recv_buf(sock_udp_t *sock,
  * @return  -ENOMEM, if no memory was available to send @p data.
  * @return  -ENOTCONN, if `remote == NULL`, but @p sock has no remote end point.
  */
-ssize_t sock_udp_send_aux(sock_udp_t *sock, const void *data, size_t len,
-                          const sock_udp_ep_t *remote, sock_udp_aux_tx_t *aux);
+static inline ssize_t sock_udp_send_aux(sock_udp_t *sock,
+                                        const void *data, size_t len,
+                                        const sock_udp_ep_t *remote,
+                                        sock_udp_aux_tx_t *aux)
+{
+    const iolist_t snip = {
+        NULL,
+        (void *)data,
+        len,
+    };
+
+    return sock_udp_sendv_aux(sock, &snip, remote, aux);
+}
 
 /**
  * @brief   Sends a UDP message to remote end point
@@ -680,6 +756,70 @@ static inline ssize_t sock_udp_send(sock_udp_t *sock,
                                     const sock_udp_ep_t *remote)
 {
     return sock_udp_send_aux(sock, data, len, remote, NULL);
+}
+
+/**
+ * @brief   Sends a UDP message to remote end point with non-continous payload
+ *
+ * @pre `((sock != NULL || remote != NULL))`
+ *
+ * @param[in] sock      A UDP sock object. May be `NULL`.
+ *                      A sensible local end point should be selected by the
+ *                      implementation in that case.
+ * @param[in] snips     List of payload chunks, will be processed in order.
+ *                      May be `NULL`.
+ * @param[in] remote    Remote end point for the sent data.
+ *                      May be `NULL`, if @p sock has a remote end point.
+ *                      sock_udp_ep_t::family may be AF_UNSPEC, if local
+ *                      end point of @p sock provides this information.
+ *                      sock_udp_ep_t::port may not be 0.
+ *
+ * @return  The number of bytes sent on success.
+ * @return  -EADDRINUSE, if `sock` has no local end-point or was `NULL` and the
+ *          pool of available ephemeral ports is depleted.
+ * @return  -EAFNOSUPPORT, if `remote != NULL` and sock_udp_ep_t::family of
+ *          @p remote is != AF_UNSPEC and not supported.
+ * @return  -EHOSTUNREACH, if @p remote or remote end point of @p sock is not
+ *          reachable.
+ * @return  -EINVAL, if sock_udp_ep_t::addr of @p remote is an invalid address.
+ * @return  -EINVAL, if sock_udp_ep_t::netif of @p remote is not a valid
+ *          interface or contradicts the given local interface (i.e.
+ *          neither the local end point of `sock` nor remote are assigned to
+ *          `SOCK_ADDR_ANY_NETIF` but are nevertheless different.
+ * @return  -EINVAL, if sock_udp_ep_t::port of @p remote is 0.
+ * @return  -ENOMEM, if no memory was available to send @p data.
+ * @return  -ENOTCONN, if `remote == NULL`, but @p sock has no remote end point.
+ */
+static inline ssize_t sock_udp_sendv(sock_udp_t *sock,
+                                     const iolist_t *snips,
+                                     const sock_udp_ep_t *remote)
+{
+    return sock_udp_sendv_aux(sock, snips, remote, NULL);
+}
+
+/**
+ * @brief   Checks if the IP address of an endpoint is multicast
+ *
+ * @param[in] ep end point to check
+ *
+ * @returns true if end point is multicast
+ */
+static inline bool sock_udp_ep_is_multicast(const sock_udp_ep_t *ep)
+{
+    switch (ep->family) {
+#ifdef SOCK_HAS_IPV6
+    case AF_INET6:
+        return ipv6_addr_is_multicast((const ipv6_addr_t *)&ep->addr.ipv6);
+#endif
+#ifdef SOCK_HAS_IPV4
+    case AF_INET:
+        return ipv4_addr_is_multicast((const ipv4_addr_t *)&ep->addr.ipv4);
+#endif
+    default:
+        assert(0);
+    }
+
+    return false;
 }
 
 #include "sock_types.h"

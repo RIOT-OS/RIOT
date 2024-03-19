@@ -93,6 +93,15 @@ extern uint8_t nimble_riot_own_addr_type;
  */
 void nimble_riot_init(void);
 
+/**
+ * @brief   Converts BLE PHY mode to BLE HCI PHY
+ *
+ * @param[in]   mode    ble phy mode to convert
+ */
+#if MYNEWT_VAL_BLE_EXT_ADV
+int nimble_riot_get_phy_hci(uint8_t mode);
+#endif
+
 #ifdef __cplusplus
 }
 #endif

@@ -1,11 +1,33 @@
 USEMODULE += lvgl
 USEMODULE += lvgl_core
 USEMODULE += lvgl_draw
+USEMODULE += lvgl_draw_sw
+USEMODULE += lvgl_extra
 USEMODULE += lvgl_font
 USEMODULE += lvgl_hal
 USEMODULE += lvgl_misc
-USEMODULE += lvgl_themes
 USEMODULE += lvgl_widgets
+
+ifneq (,$(filter lvgl_extra_widget_spinner,$(USEMODULE)))
+  USEMODULE += lvgl_widget_arc
+endif
+
+ifneq (,$(filter lvgl_extra_widget_win lvgl_extra_widget_menu,$(USEMODULE)))
+  USEMODULE += lvgl_widget_btn
+  USEMODULE += lvgl_widget_img
+endif
+
+ifneq (,$(filter lvgl_extra_widget_tabview,$(USEMODULE)))
+  USEMODULE += lvgl_widget_btnmatrix
+endif
+
+ifneq (,$(filter lvgl_widget_textarea lvgl_widget_roller lvgl_widget_img lvgl_widget_dropdown lvgl_extra_widget_win,$(USEMODULE)))
+  USEMODULE += lvgl_widget_label
+endif
+
+ifneq (,$(filter lvgl_widget_slider,$(USEMODULE)))
+  USEMODULE += lvgl_widget_bar
+endif
 
 ifneq (,$(filter lvgl_contrib,$(USEMODULE)))
   USEMODULE += disp_dev

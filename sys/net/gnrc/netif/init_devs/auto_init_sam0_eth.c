@@ -19,19 +19,18 @@
 
 #include "net/gnrc/netif/ethernet.h"
 #include "sam0_eth_netdev.h"
+#include "include/init_devs.h"
 
 static netdev_t sam0eth;
-static char stack[THREAD_STACKSIZE_DEFAULT];
+static char stack[GNRC_NETIF_STACKSIZE_DEFAULT];
 static gnrc_netif_t _netif;
-
-extern void sam0_eth_setup(netdev_t *netdev);
 
 void auto_init_sam0_eth(void)
 {
     /* setup netdev device */
     sam0_eth_setup(&sam0eth);
     /* initialize netdev <-> gnrc adapter state */
-    gnrc_netif_ethernet_create(&_netif, stack, THREAD_STACKSIZE_DEFAULT,
+    gnrc_netif_ethernet_create(&_netif, stack, GNRC_NETIF_STACKSIZE_DEFAULT,
                                GNRC_NETIF_PRIO, "sam0_eth", &sam0eth);
 }
 

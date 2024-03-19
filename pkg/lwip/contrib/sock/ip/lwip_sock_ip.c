@@ -45,9 +45,11 @@ int sock_ip_create(sock_ip_t *sock, const sock_ip_ep_t *local,
                                 NETCONN_RAW)) == 0) {
         sock->base.conn = tmp;
 #if IS_ACTIVE(SOCK_HAS_ASYNC)
+        sock->base.async_cb.gen = NULL;
         netconn_set_callback_arg(sock->base.conn, &sock->base);
 #endif
     }
+
     return res;
 }
 
@@ -88,6 +90,7 @@ static uint16_t _ip4_addr_to_netif(const ip4_addr_p_t *addr)
             }
         }
     }
+
     return SOCK_ADDR_ANY_NETIF;
 }
 #endif
@@ -111,6 +114,7 @@ static uint16_t _ip6_addr_to_netif(const ip6_addr_p_t *_addr)
         }
         UNLOCK_TCPIP_CORE();
     }
+
     return SOCK_ADDR_ANY_NETIF;
 }
 #endif
@@ -123,53 +127,55 @@ static int _parse_iphdr(struct netbuf *buf, void **data, void **ctx,
 
     switch (data_ptr[0] >> 4) {
 #if LWIP_IPV4
-        case 4:
-            if (remote != NULL) {
-                struct ip_hdr *iphdr = (struct ip_hdr *)data_ptr;
+    case 4:
+        if (remote != NULL) {
+            struct ip_hdr *iphdr = (struct ip_hdr *)data_ptr;
 
-                assert(buf->p->len > sizeof(struct ip_hdr));
-                remote->family = AF_INET;
-                memcpy(&remote->addr, &iphdr->src, sizeof(ip4_addr_t));
-                remote->netif = _ip4_addr_to_netif(&iphdr->dest);
-            }
-            if (local != NULL) {
-                struct ip_hdr *iphdr = (struct ip_hdr *)data_ptr;
+            assert(buf->p->len > sizeof(struct ip_hdr));
+            remote->family = AF_INET;
+            memcpy(&remote->addr, &iphdr->src, sizeof(ip4_addr_t));
+            remote->netif = _ip4_addr_to_netif(&iphdr->dest);
+        }
+        if (local != NULL) {
+            struct ip_hdr *iphdr = (struct ip_hdr *)data_ptr;
 
-                assert(buf->p->len > sizeof(struct ip_hdr));
-                local->family = AF_INET;
-                memcpy(&local->addr, &iphdr->dest, sizeof(ip4_addr_t));
-            }
-            data_ptr += sizeof(struct ip_hdr);
-            data_len -= sizeof(struct ip_hdr);
-            break;
+            assert(buf->p->len > sizeof(struct ip_hdr));
+            local->family = AF_INET;
+            memcpy(&local->addr, &iphdr->dest, sizeof(ip4_addr_t));
+        }
+        data_ptr += sizeof(struct ip_hdr);
+        data_len -= sizeof(struct ip_hdr);
+        break;
 #endif
 #if LWIP_IPV6
-        case 6:
-            if (remote != NULL) {
-                struct ip6_hdr *iphdr = (struct ip6_hdr *)data_ptr;
+    case 6:
+        if (remote != NULL) {
+            struct ip6_hdr *iphdr = (struct ip6_hdr *)data_ptr;
 
-                assert(buf->p->len > sizeof(struct ip6_hdr));
-                remote->family = AF_INET6;
-                memcpy(&remote->addr, &iphdr->src, sizeof(ip6_addr_t));
-                remote->netif = _ip6_addr_to_netif(&iphdr->dest);
-            }
-            if (local != NULL) {
-                struct ip6_hdr *iphdr = (struct ip6_hdr *)data_ptr;
+            assert(buf->p->len > sizeof(struct ip6_hdr));
+            remote->family = AF_INET6;
+            memcpy(&remote->addr, &iphdr->src, sizeof(ip6_addr_t));
+            remote->netif = _ip6_addr_to_netif(&iphdr->dest);
+        }
+        if (local != NULL) {
+            struct ip6_hdr *iphdr = (struct ip6_hdr *)data_ptr;
 
-                assert(buf->p->len > sizeof(struct ip6_hdr));
-                local->family = AF_INET6;
-                memcpy(&local->addr, &iphdr->dest, sizeof(ip6_addr_t));
-            }
-            data_ptr += sizeof(struct ip6_hdr);
-            data_len -= sizeof(struct ip6_hdr);
-            break;
+            assert(buf->p->len > sizeof(struct ip6_hdr));
+            local->family = AF_INET6;
+            memcpy(&local->addr, &iphdr->dest, sizeof(ip6_addr_t));
+        }
+        data_ptr += sizeof(struct ip6_hdr);
+        data_len -= sizeof(struct ip6_hdr);
+        break;
 #endif
-        default:
-            netbuf_delete(buf);
-            return -EPROTO;
+    default:
+        netbuf_delete(buf);
+        return -EPROTO;
     }
+
     *data = data_ptr;
     *ctx = buf;
+
     return (ssize_t)data_len;
 }
 
@@ -196,6 +202,7 @@ ssize_t sock_ip_recv_aux(sock_ip_t *sock, void *data, size_t max_len,
         ptr += res;
         ret += res;
     }
+
     return (nobufs) ? -ENOBUFS : ((res < 0) ? res : ret);
 }
 
@@ -209,6 +216,7 @@ ssize_t sock_ip_recv_buf_aux(sock_ip_t *sock, void **data, void **ctx,
 
     assert((sock != NULL) && (data != NULL) && (ctx != NULL));
     buf = *ctx;
+
     if (buf != NULL) {
         if (netbuf_next(buf) == -1) {
             *data = NULL;
@@ -221,17 +229,22 @@ ssize_t sock_ip_recv_buf_aux(sock_ip_t *sock, void **data, void **ctx,
             return buf->ptr->len;
         }
     }
+
     if ((res = lwip_sock_recv(sock->base.conn, timeout, &buf)) < 0) {
         return res;
     }
+
     sock_ip_ep_t *local = NULL;
+
 #if IS_USED(MODULE_SOCK_AUX_LOCAL)
     if (aux != NULL) {
         local = &aux->local;
         aux->flags &= ~(SOCK_AUX_GET_LOCAL);
     }
 #endif
+
     res = _parse_iphdr(buf, data, ctx, remote, local);
+
     return res;
 }
 
@@ -242,6 +255,7 @@ ssize_t sock_ip_send_aux(sock_ip_t *sock, const void *data, size_t len,
     (void)aux;
     assert((sock != NULL) || (remote != NULL));
     assert((len == 0) || (data != NULL)); /* (len != 0) => (data != NULL) */
+
     return lwip_sock_send(sock ? sock->base.conn : NULL, data, len, proto,
                           (struct _sock_tl_ep *)remote, NETCONN_RAW);
 }

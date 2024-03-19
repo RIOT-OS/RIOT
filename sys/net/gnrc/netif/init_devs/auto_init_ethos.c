@@ -23,6 +23,7 @@
 #include "ethos_params.h"
 #include "periph/uart.h"
 #include "net/gnrc/netif/ethernet.h"
+#include "include/init_devs.h"
 
 #define ETHOS_NUM ARRAY_SIZE(ethos_params)
 
@@ -37,7 +38,7 @@ static gnrc_netif_t _netif[ETHOS_NUM];
  * @brief   Define stack parameters for the MAC layer thread
  * @{
  */
-#define ETHOS_MAC_STACKSIZE (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)
+#define ETHOS_MAC_STACKSIZE (GNRC_NETIF_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)
 #ifndef ETHOS_MAC_PRIO
 #define ETHOS_MAC_PRIO      (GNRC_NETIF_PRIO)
 #endif

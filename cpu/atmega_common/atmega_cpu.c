@@ -2,7 +2,8 @@
  * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
  *               2017 RWTH Aachen, Josua Arndt
  *               2018 Matthew Blue
- *               2021 Gerson Fernando Budke
+ *               2021-2023 Gerson Fernando Budke
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -22,13 +23,16 @@
  * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
  * @author      Francisco Acosta <francisco.acosta@inria.fr>
  * @author      Gerson Fernando Budke <nandojve@gmail.com>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
 
 #include "board.h"
 #include "cpu.h"
+#include "irq_arch.h"
 #include "panic.h"
+#include "sys/bus.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -58,7 +62,7 @@ void avr8_reset_cause(void)
             DEBUG("Watchdog reset!\n");
         }
     }
-#if !defined (CPU_ATMEGA328P)
+#if defined(JTRF)
     if (mcusr_mirror & (1 << JTRF)) {
         DEBUG("JTAG reset!\n");
     }
@@ -67,7 +71,9 @@ void avr8_reset_cause(void)
 
 void __attribute__((weak)) avr8_clk_init(void)
 {
+#if defined(CLKPR)
     atmega_set_prescaler(CPU_ATMEGA_CLK_SCALE_INIT);
+#endif
 }
 
 /* This is a vector which is aliased to __vector_default,
@@ -81,13 +87,16 @@ void __attribute__((weak)) avr8_clk_init(void)
  * EIFR – External Interrupt Flag Register
  * PCIFR – Pin Change Interrupt Flag Register
  */
-ISR(BADISR_vect)
+ISR(BADISR_vect, ISR_NAKED)
 {
     avr8_reset_cause();
 
-#if defined (CPU_ATMEGA256RFR2)
-    printf("IRQ_STATUS %#02x\nIRQ_STATUS1 %#02x\n",
-            (unsigned int)IRQ_STATUS, (unsigned int)IRQ_STATUS1);
+#if defined(TRX_CTRL_0) /* megaRF */
+    printf("IRQ_STATUS %#02x\n", (unsigned int)IRQ_STATUS);
+
+#if defined(IRQ_STATUS1)
+    printf("IRQ_STATUS1 %#02x\n", (unsigned int)IRQ_STATUS1);
+#endif
 
     printf("SCIRQS %#02x\nBATMON %#02x\n", (unsigned int)SCIRQS, (unsigned int)BATMON);
 
@@ -101,11 +110,16 @@ ISR(BADISR_vect)
     core_panic(PANIC_GENERAL_ERROR, "BADISR");
 }
 
-#if defined(CPU_ATMEGA128RFA1) || defined (CPU_ATMEGA256RFR2)
-ISR(BAT_LOW_vect, ISR_BLOCK)
+#if defined(BAT_LOW_vect)
+static inline void bat_low_handler(void)
 {
-    avr8_enter_isr();
     DEBUG("BAT_LOW\n");
-    avr8_exit_isr();
+
+#if MODULE_SYS_BUS_POWER
+    msg_bus_t *bus = sys_bus_get(SYS_BUS_POWER);
+    msg_bus_post(bus, SYS_BUS_POWER_EVENT_LOW_VOLTAGE, NULL);
+#endif
 }
+
+AVR8_ISR(BAT_LOW_vect, bat_low_handler);
 #endif

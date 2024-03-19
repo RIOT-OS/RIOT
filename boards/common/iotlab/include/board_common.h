@@ -77,35 +77,21 @@ extern "C" {
  * @name    LED pin definitions and handlers
  * @{
  */
-#define LED0_PIN            GPIO_PIN(PORT_D, 2)
-#define LED1_PIN            GPIO_PIN(PORT_B, 5)
-#define LED2_PIN            GPIO_PIN(PORT_C, 10)
+#define LED0_PIN_NUM        2
+#define LED0_PORT_NUM       PORT_D
 
-#define LED0_MASK           (1 << 2)
-#define LED1_MASK           (1 << 5)
-#define LED2_MASK           (1 << 10)
+#define LED1_PIN_NUM        5
+#define LED1_PORT_NUM       PORT_B
 
-#define LED0_ON             (GPIOD->ODR &= ~LED0_MASK)
-#define LED0_OFF            (GPIOD->ODR |=  LED0_MASK)
-#define LED0_TOGGLE         (GPIOD->ODR ^=  LED0_MASK)
-
-#define LED1_ON             (GPIOB->ODR &= ~LED1_MASK)
-#define LED1_OFF            (GPIOB->ODR |=  LED1_MASK)
-#define LED1_TOGGLE         (GPIOB->ODR ^=  LED1_MASK)
-
-#define LED2_ON             (GPIOC->ODR &= ~LED2_MASK)
-#define LED2_OFF            (GPIOC->ODR |=  LED2_MASK)
-#define LED2_TOGGLE         (GPIOC->ODR ^=  LED2_MASK)
+#define LED2_PIN_NUM        10
+#define LED2_PORT_NUM       PORT_C
 /** @} */
-
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }
 #endif
+
+#include "stm32_leds.h"
 
 #endif /* BOARD_COMMON_H */
 /** @} */

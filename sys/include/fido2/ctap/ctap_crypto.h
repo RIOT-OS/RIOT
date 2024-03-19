@@ -227,7 +227,7 @@ int fido2_ctap_crypto_get_sig(uint8_t *hash, size_t hash_len, uint8_t *sig,
  *
  * @return @ref ctap_status_codes_t
  */
-int fido2_ctap_crypto_aes_enc(uint8_t *out, size_t *out_len, uint8_t * in,
+int fido2_ctap_crypto_aes_enc(uint8_t * out, size_t *out_len, uint8_t * in,
                               size_t in_len, const uint8_t * key, size_t key_len);
 
 /**
@@ -242,7 +242,7 @@ int fido2_ctap_crypto_aes_enc(uint8_t *out, size_t *out_len, uint8_t * in,
  *
  * @return @ref ctap_status_codes_t
  */
-int fido2_ctap_crypto_aes_dec(uint8_t *out, size_t *out_len, uint8_t * in,
+int fido2_ctap_crypto_aes_dec(uint8_t * out, size_t *out_len, uint8_t * in,
                               size_t in_len, const uint8_t * key, size_t key_len);
 
 /**

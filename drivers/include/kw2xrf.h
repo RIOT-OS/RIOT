@@ -32,6 +32,7 @@
 #include "net/netdev/ieee802154.h"
 #include "net/gnrc/nettype.h"
 #include "thread.h"
+#include "net/ieee802154/radio.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -107,6 +108,7 @@ typedef struct kw2xrf_params {
     spi_clk_t spi_clk;                  /**< SPI clock speed to use */
     gpio_t cs_pin;                      /**< GPIO pin connected to chip select */
     gpio_t int_pin;                     /**< GPIO pin connected to the interrupt pin */
+    gpio_t rst_pin;                     /**< GPIO pin connected to RST_B */
 } kw2xrf_params_t;
 
 /**
@@ -115,13 +117,12 @@ typedef struct kw2xrf_params {
  * @extends netdev_ieee802154_t
  */
 typedef struct {
-    netdev_ieee802154_t netdev;          /**< netdev parent struct */
     /**
      * @brief   device specific fields
      * @{
      */
     thread_t *thread;                   /**< Network driver thread, for providing feedback from IRQ handler */
-    kw2xrf_params_t params;             /**< parameters for initialization */
+    const kw2xrf_params_t *params;      /**< parameters for initialization */
     uint8_t buf[KW2XRF_MAX_PKT_LENGTH]; /**< Buffer for incoming or outgoing packets */
     uint8_t state;                      /**< current state of the radio */
     uint8_t tx_frame_len;               /**< length of the current TX frame */
@@ -130,26 +131,29 @@ typedef struct {
                                              this is required to know when to
                                              return to @ref kw2xrf_t::idle_state */
     int16_t tx_power;                   /**< The current tx-power setting of the device */
+    bool    ack_requested;              /**< ACK was requested for last frame */
+    bool    ch_clear;                   /**< CCA indicated channel clear */
+    bool    waiting_for_cca;            /**< Indicate whether CCA is still ongoing */
+    bool    tx_done;                    /**< Indicate whether TX completed */
+    bool    ack_rcvd;                   /**< Indicate if ACK was received for last transmission */
+    bool    cca_before_tx;              /**< true if CCA shall be performed before TX */
+    bool    tx_cca_pending;             /**< true a manual CCA was started and a TX should be triggered on channel clear indication */
     /** @} */
 } kw2xrf_t;
 
 /**
- * @brief   Setup an KW2XRF based device state
- *
- * @param[out] dev          device descriptor
- * @param[in]  params       parameters for device initialization
- */
-void kw2xrf_setup(kw2xrf_t *dev, const kw2xrf_params_t *params);
-
-/**
  * @brief   Initialize the given KW2XRF device
  * @param[out] dev          device descriptor
- * @param[in] cb            irq callback
+ * @param[in]  params       parameters for device initialization
+ * @param[in]  hal          pointer to IEEE 802.15.4 Radio HAL descriptor
+ * @param[in]  cb           isr callback
+ * @param[in]  ctx          context pointer handed to isr
  *
  * @return                  0 on success
  * @return                  <0 on error
  */
-int kw2xrf_init(kw2xrf_t *dev, gpio_cb_t cb);
+int kw2xrf_init(kw2xrf_t *dev, const kw2xrf_params_t *params, ieee802154_dev_t *hal,
+                gpio_cb_t cb, void *ctx);
 
 /**
  * @brief   Configure radio with default values
@@ -157,6 +161,13 @@ int kw2xrf_init(kw2xrf_t *dev, gpio_cb_t cb);
  * @param[in] dev           device to reset
  */
 void kw2xrf_reset_phy(kw2xrf_t *dev);
+
+/**
+ * @brief   IRQ Handler for the KW2XRF device
+ *
+ * @param[in] dev           pointer to the IEEE 802.15.4 Radio HAL descriptor
+ */
+void kw2xrf_radio_hal_irq_handler(void *dev);
 
 #ifdef __cplusplus
 }

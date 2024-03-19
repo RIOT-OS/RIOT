@@ -2,6 +2,7 @@
  * Copyright (C) 2014-2016 Freie Universität Berlin
  *               2015 Kaspar Schleiser <kaspar@schleiser.de>
  *               2015 FreshTemp, LLC.
+ *               2022 SSV Software Systems GmbH
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -22,6 +23,7 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
+ * @author      Juergen Fitschen <me@jue.yt>
  *
  * @}
  */
@@ -35,14 +37,6 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
-
-/**
- * @brief   Threshold under which polling transfers are used instead of DMA
- *          TODO: determine at run-time based on SPI clock
- */
-#ifndef CONFIG_SPI_DMA_THRESHOLD_BYTES
-#define CONFIG_SPI_DMA_THRESHOLD_BYTES  16
-#endif
 
 /**
  * @brief Array holding one pre-initialized mutex for each SPI device
@@ -269,13 +263,19 @@ static void _init_spi(spi_t bus, SercomSpi *dev)
 
 static void _spi_acquire(spi_t bus, spi_mode_t mode, spi_clk_t clk)
 {
+    /* clock can't be higher than source clock */
+    uint32_t gclk_src = sam0_gclk_freq(spi_config[bus].gclk_src);
+    if (clk > gclk_src) {
+        clk = gclk_src;
+    }
+
     /* configure bus clock, in synchronous mode its calculated from
      * BAUD.reg = (f_ref / (2 * f_bus) - 1)
      * with f_ref := CLOCK_CORECLOCK as defined by the board
      * to mitigate the rounding error due to integer arithmetic, the
      * equation is modified to
      * BAUD.reg = ((f_ref + f_bus) / (2 * f_bus) - 1) */
-    const uint8_t baud = ((sam0_gclk_freq(spi_config[bus].gclk_src) + clk) / (2 * clk) - 1);
+    const uint8_t baud = (gclk_src + clk) / (2 * clk) - 1;
 
     /* configure device to be master and set mode and pads,
      *
@@ -453,15 +453,15 @@ static void _blocking_transfer(spi_t bus, const void *out, void *in, size_t len)
 
 static void _dma_execute(spi_t bus)
 {
-#if defined(CPU_COMMON_SAMD21)
-    pm_block(SAMD21_PM_IDLE_1);
+#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_SPI_PM_BLOCK)
+    pm_block(SAM0_SPI_PM_BLOCK);
 #endif
     dma_start(_dma_state[bus].rx_dma);
     dma_start(_dma_state[bus].tx_dma);
 
     dma_wait(_dma_state[bus].rx_dma);
-#if defined(CPU_COMMON_SAMD21)
-    pm_unblock(SAMD21_PM_IDLE_1);
+#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_SPI_PM_BLOCK)
+    pm_unblock(SAM0_SPI_PM_BLOCK);
 #endif
 }
 

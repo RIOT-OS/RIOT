@@ -532,6 +532,19 @@ uint8_t ipv6_addr_match_prefix(const ipv6_addr_t *a, const ipv6_addr_t *b);
 void ipv6_addr_init_prefix(ipv6_addr_t *out, const ipv6_addr_t *prefix, uint8_t bits);
 
 /**
+ * @brief   Sets IPv6 address @p out with a given prefix and interface ID
+ *
+ * @param[out]  out     Address to initialize
+ * @param[in]   prefix  Prefix in host byte order
+ * @param[in]   iid     Interface ID in host byte order
+ */
+static inline void ipv6_addr_init(ipv6_addr_t *out, uint64_t prefix, uint64_t iid)
+{
+    out->u64[0] = byteorder_htonll(prefix);
+    out->u64[1] = byteorder_htonll(iid);
+}
+
+/**
  * @brief   Sets the last @p bits of IPv6 address @p out to @p iid.
  *          Leading bits of @p out stay untouched.
  *
@@ -725,6 +738,22 @@ char *ipv6_addr_to_str(char *result, const ipv6_addr_t *addr, uint8_t result_len
 ipv6_addr_t *ipv6_addr_from_str(ipv6_addr_t *result, const char *addr);
 
 /**
+ * @brief   Converts an IPv6 prefix string representation to a byte-represented
+ *          IPv6 address
+ *
+ * @see <a href="https://tools.ietf.org/html/rfc5952">
+ *          RFC 5952
+ *      </a>
+ *
+ * @param[out] result    The resulting byte representation
+ * @param[in]  prefix    An IPv6 prefix string representation
+ *
+ * @return  prefix length in bits, on success
+ * @return  <0 on error
+ */
+int ipv6_prefix_from_str(ipv6_addr_t *result, const char *prefix);
+
+/**
  * @brief   Converts an IPv6 address from a buffer of characters to a
  *          byte-represented IPv6 address
  *
@@ -803,9 +832,19 @@ static inline char *ipv6_addr_split_iface(char *addr_str)
 /**
  * @brief Print IPv6 address to stdout
  *
- * @param[in]   addr  Pointer to ipv6_addr_t to print
+ * @param[in]   addr    Pointer to ipv6_addr_t to print
  */
 void ipv6_addr_print(const ipv6_addr_t *addr);
+
+/**
+ * @brief Print IPv6 addresses to stdout
+ *
+ * @param[in]   addrs       Array of addresses to print
+ * @param[in]   num         Number of elements in @p addrs
+ * @param[in]   separator   Separator to print between addresses
+ */
+void ipv6_addrs_print(const ipv6_addr_t *addrs, size_t num,
+                      const char *separator);
 
 #ifdef __cplusplus
 }

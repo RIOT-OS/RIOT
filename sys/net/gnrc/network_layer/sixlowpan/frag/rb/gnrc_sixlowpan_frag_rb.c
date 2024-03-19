@@ -236,6 +236,9 @@ static size_t _6lo_frag_size(gnrc_pktsnip_t *pkt, size_t offset, uint8_t *data)
     size_t frag_size;
 
     if (offset == 0) {
+        if (pkt->size < sizeof(sixlowpan_frag_t)) {
+            return 0;
+        }
         frag_size = pkt->size - sizeof(sixlowpan_frag_t);
         if (data[0] == SIXLOWPAN_UNCOMP) {
             /* subtract SIXLOWPAN_UNCOMP byte from fragment size,
@@ -244,6 +247,9 @@ static size_t _6lo_frag_size(gnrc_pktsnip_t *pkt, size_t offset, uint8_t *data)
         }
     }
     else {
+        if (pkt->size < sizeof(sixlowpan_frag_n_t)) {
+            return 0;
+        }
         frag_size = pkt->size - sizeof(sixlowpan_frag_n_t);
     }
     return frag_size;
@@ -306,6 +312,11 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG) && sixlowpan_frag_is(pkt->data)) {
         data = _6lo_frag_payload(pkt);
         frag_size = _6lo_frag_size(pkt, offset, data);
+        if (frag_size == 0) {
+            DEBUG("6lo rbuf: integer underflow detected.\n");
+            gnrc_pktbuf_release(pkt);
+            return RBUF_ADD_ERROR;
+        }
         datagram_size = sixlowpan_frag_datagram_size(pkt->data);
         datagram_tag = sixlowpan_frag_datagram_tag(pkt->data);
     }
@@ -450,6 +461,19 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
                 else if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) &&
                          sixlowpan_sfr_rfrag_is(pkt->data)) {
                     entry.super->datagram_size--;
+                    /* Check, if fragment is still small enough to fit datagram size.
+                     * `offset` is 0, as this is the first fragment so it does not have to be added
+                     * here. */
+                    if (frag_size > entry.super->datagram_size) {
+                        DEBUG_PUTS(
+                           "6lo rfrag: fragment too big for resulting datagram, "
+                           "discarding datagram\n"
+                        );
+                        gnrc_pktbuf_release(entry.rbuf->pkt);
+                        gnrc_pktbuf_release(pkt);
+                        gnrc_sixlowpan_frag_rb_remove(entry.rbuf);
+                        return RBUF_ADD_ERROR;
+                    }
                 }
             }
         }

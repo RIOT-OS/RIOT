@@ -220,6 +220,28 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief    Shift offsets for TXMCR register (0x11)
+ * @{
+ */
+#define MRF24J40_TXMCR_MACMINBE_SHIFT           (3U)
+/** @} */
+
+/**
+ * @brief   Bitfield definitions for the ACKTMOUT register (0x12)
+ * @{
+ */
+#define MRF24J40_ACKTMOUT_DRPACK                (0x80)
+#define MRF24J40_ACKTMOUT_MAWD6                 (0x40)
+#define MRF24J40_ACKTMOUT_MAWD5                 (0x20)
+#define MRF24J40_ACKTMOUT_MAWD4                 (0x10)
+#define MRF24J40_ACKTMOUT_MAWD3                 (0x08)
+#define MRF24J40_ACKTMOUT_MAWD2                 (0x04)
+#define MRF24J40_ACKTMOUT_MAWD1                 (0x02)
+#define MRF24J40_ACKTMOUT_MAWD0                 (0x01)
+
+/** @} */
+
+/**
  * @name    Bitfield definitions for the PACON2 register (0x18)
  * @{
  */
@@ -335,6 +357,7 @@ extern "C" {
 #define MRF24J40_GPIO_3                 (0x08)
 #define MRF24J40_GPIO_4                 (0x10)
 #define MRF24J40_GPIO_5                 (0x20)
+/** @} */
 
 /**
  * @name    Bitfield definitions for the TRISGPIO register (0x34)

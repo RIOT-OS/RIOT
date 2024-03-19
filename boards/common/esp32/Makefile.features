@@ -1,4 +1,3 @@
-CPU = esp32
+CPU_FAM = esp32
 
-# additional features provided by all boards is at least one UART
-FEATURES_PROVIDED += periph_uart
+include $(RIOTBOARD)/common/esp32x/Makefile.features

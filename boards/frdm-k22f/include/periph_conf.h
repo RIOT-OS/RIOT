@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 Eistec AB
+ *               2021-2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -14,6 +15,7 @@
  * @name        Peripheral MCU configuration for the FRDM-K22F
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef PERIPH_CONF_H
@@ -141,22 +143,54 @@ static const uart_conf_t uart_config[] = {
  */
 static const adc_conf_t adc_config[] = {
     /* dev, pin, channel */
-    [ 0] = { .dev = ADC0, .pin = GPIO_UNDEF          , .chan =  0, .avg = ADC_AVG_MAX }, /* ADC0_DP0 */
-    [ 1] = { .dev = ADC0, .pin = GPIO_UNDEF          , .chan = 19, .avg = ADC_AVG_MAX }, /* ADC0_DM0 */
-    [ 2] = { .dev = ADC1, .pin = GPIO_UNDEF          , .chan =  0, .avg = ADC_AVG_MAX }, /* ADC1_DP0 */
-    [ 3] = { .dev = ADC1, .pin = GPIO_UNDEF          , .chan = 19, .avg = ADC_AVG_MAX }, /* ADC1_DM0 */
-    [ 4] = { .dev = ADC0, .pin = GPIO_PIN(PORT_B,  0), .chan =  8, .avg = ADC_AVG_MAX }, /* PTB0 (Arduino A0) */
-    [ 5] = { .dev = ADC0, .pin = GPIO_PIN(PORT_B,  1), .chan =  9, .avg = ADC_AVG_MAX }, /* PTB1 (Arduino A1) */
-    [ 6] = { .dev = ADC0, .pin = GPIO_PIN(PORT_C,  1), .chan = 15, .avg = ADC_AVG_MAX }, /* PTC1 (Arduino A2) */
-    [ 7] = { .dev = ADC0, .pin = GPIO_PIN(PORT_C,  2), .chan =  4, .avg = ADC_AVG_MAX }, /* PTC2 (Arduino A3) */
+    [0] = { /* ADC0_DP0 */
+        .dev = ADC0,    .pin = GPIO_UNDEF,
+        .chan = 0,      .avg = ADC_AVG_MAX
+    },
+    [1] = { /* ADC0_DM0 */
+        .dev = ADC0,    .pin = GPIO_UNDEF,
+        .chan = 19,     .avg = ADC_AVG_MAX
+    },
+    [2] = { /* ADC1_DP0 */
+        .dev = ADC1,    .pin = GPIO_UNDEF,
+        .chan = 0,      .avg = ADC_AVG_MAX
+    },
+    [3] = { /* ADC1_DM0 */
+        .dev = ADC1,    .pin = GPIO_UNDEF,
+        .chan = 19,     .avg = ADC_AVG_MAX
+    },
+    [4] = { /* PTB0 (Arduino A0) */
+        .dev = ADC0,    .pin = GPIO_PIN(PORT_B, 0),
+        .chan = 8,      .avg = ADC_AVG_MAX
+    },
+    [5] = { /* PTB1 (Arduino A1) */
+        .dev = ADC0,    .pin = GPIO_PIN(PORT_B, 1),
+        .chan = 9,     .avg = ADC_AVG_MAX
+    },
+    [6] = { /* PTC1 (Arduino A2) */
+        .dev = ADC0,    .pin = GPIO_PIN(PORT_C, 1),
+        .chan = 15,     .avg = ADC_AVG_MAX
+    },
+    [7] = { /* PTC2 (Arduino A3) */
+        .dev = ADC0,    .pin = GPIO_PIN(PORT_C, 2),
+        .chan = 4,      .avg = ADC_AVG_MAX
+    },
     /* internal: temperature sensor */
-    /* The temperature sensor has a very high output impedance, it must not be
-     * sampled using hardware averaging, or the sampled values will be garbage */
-    [ 8] = { .dev = ADC0, .pin = GPIO_UNDEF, .chan = 26, .avg = ADC_AVG_NONE },
+    /* The temperature sensor has a very high output impedance, it must
+     * not be sampled using hardware averaging, or the sampled values
+     * will be garbage */
+    [8] = {
+        .dev = ADC0,    .pin = GPIO_UNDEF,
+        .chan = 26,     .avg = ADC_AVG_NONE
+    },
     /* internal: band gap */
-    /* Note: the band gap buffer uses a bit of current and is turned off by default,
-     * Set PMC->REGSC |= PMC_REGSC_BGBE_MASK before reading or the input will be floating */
-    [ 9] = { .dev = ADC0, .pin = GPIO_UNDEF, .chan = 27, .avg = ADC_AVG_MAX },
+    /* Note: the band gap buffer uses a bit of current and is turned off
+     * by default, set PMC->REGSC |= PMC_REGSC_BGBE_MASK before reading
+     * or the input will be floating */
+    [9] = {
+        .dev = ADC0,    .pin = GPIO_UNDEF,
+        .chan = 27,     .avg = ADC_AVG_MAX
+    },
 };
 
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)

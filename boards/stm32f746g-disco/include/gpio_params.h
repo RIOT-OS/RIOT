@@ -32,6 +32,11 @@ extern "C" {
 static const  saul_gpio_params_t saul_gpio_params[] =
 {
     {
+        .name = "LD1 (green)",
+        .pin = LED0_PIN,
+        .mode = GPIO_OUT
+    },
+    {
         .name = "BTN USER",
         .pin  = BTN0_PIN,
         .mode = BTN0_MODE

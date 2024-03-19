@@ -54,48 +54,8 @@ static void kw2xrf_set_address(kw2xrf_t *dev)
     kw2xrf_set_addr_short(dev, ntohs(addr_long.uint16[0].u16));
 }
 
-void kw2xrf_setup(kw2xrf_t *dev, const kw2xrf_params_t *params)
-{
-    netdev_t *netdev = &dev->netdev.netdev;
-
-    netdev->driver = &kw2xrf_driver;
-    /* initialize device descriptor */
-    dev->params = *params;
-    dev->idle_state = XCVSEQ_RECEIVE;
-    dev->state = 0;
-    dev->pending_tx = 0;
-    kw2xrf_spi_init(dev);
-    kw2xrf_set_power_mode(dev, KW2XRF_IDLE);
-    DEBUG("[kw2xrf] enabling RX/TX completion and start events");
-    kw2xrf_clear_dreg_bit(dev, MKW2XDM_PHY_CTRL2, MKW2XDM_PHY_CTRL2_RX_WMRK_MSK);
-    kw2xrf_clear_dreg_bit(dev, MKW2XDM_PHY_CTRL2, MKW2XDM_PHY_CTRL2_RXMSK);
-    kw2xrf_clear_dreg_bit(dev, MKW2XDM_PHY_CTRL2, MKW2XDM_PHY_CTRL2_TXMSK);
-    DEBUG("[kw2xrf] setup finished\n");
-}
-
-int kw2xrf_init(kw2xrf_t *dev, gpio_cb_t cb)
-{
-    if (dev == NULL) {
-        return -ENODEV;
-    }
-
-    kw2xrf_set_out_clk(dev);
-    kw2xrf_disable_interrupts(dev);
-    /* set up GPIO-pin used for IRQ */
-    gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_FALLING, cb, dev);
-
-    kw2xrf_abort_sequence(dev);
-    kw2xrf_update_overwrites(dev);
-    kw2xrf_timer_init(dev, KW2XRF_TIMEBASE_62500HZ);
-    DEBUG("[kw2xrf] init finished\n");
-
-    return 0;
-}
-
 void kw2xrf_reset_phy(kw2xrf_t *dev)
 {
-    netdev_ieee802154_reset(&dev->netdev);
-
     dev->tx_power = KW2XRF_DEFAULT_TX_POWER;
     kw2xrf_set_tx_power(dev, dev->tx_power);
 
@@ -107,7 +67,10 @@ void kw2xrf_reset_phy(kw2xrf_t *dev)
 
     kw2xrf_set_rx_watermark(dev, 1);
 
-    kw2xrf_set_option(dev, KW2XRF_OPT_AUTOACK, true);
+    if (!IS_ACTIVE(CONFIG_IEEE802154_AUTO_ACK_DISABLE)) {
+        kw2xrf_set_option(dev, KW2XRF_OPT_AUTOACK, true);
+    }
+
     kw2xrf_set_option(dev, KW2XRF_OPT_ACK_REQ, true);
     kw2xrf_set_option(dev, KW2XRF_OPT_AUTOCCA, true);
 

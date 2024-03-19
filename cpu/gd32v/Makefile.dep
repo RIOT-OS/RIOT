@@ -1,9 +1,18 @@
 USEMODULE += periph
+USEPKG += nmsis_sdk
 
 FEATURES_REQUIRED += periph_clic
 
 ifneq (,$(filter periph_pm,$(USEMODULE)))
   FEATURES_REQUIRED += periph_wdt
+endif
+
+ifneq (,$(filter periph_i2c,$(USEMODULE)))
+  USEMODULE += ztimer_usec
+endif
+
+ifneq (,$(filter periph_usbdev,$(USEMODULE)))
+  USEMODULE += usbdev_synopsys_dwc2
 endif
 
 include $(RIOTCPU)/riscv_common/Makefile.dep

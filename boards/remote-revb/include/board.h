@@ -114,18 +114,16 @@
  * @{
  */
 #define SDCARD_SPI_PARAM_SPI       SPI_DEV(1)
-#define SDCARD_SPI_PARAM_CS        GPIO_PIN(0,7)
-#define SDCARD_SPI_PARAM_CLK       GPIO_PIN(2,4)
-#define SDCARD_SPI_PARAM_MOSI      GPIO_PIN(2,5)
-#define SDCARD_SPI_PARAM_MISO      GPIO_PIN(2,6)
-#define SDCARD_SPI_PARAM_POWER     GPIO_PIN(0,6)
+#define SDCARD_SPI_PARAM_CS        GPIO_PIN(0, 7)
+#define SDCARD_SPI_PARAM_CLK       GPIO_PIN(2, 4)
+#define SDCARD_SPI_PARAM_MOSI      GPIO_PIN(2, 5)
+#define SDCARD_SPI_PARAM_MISO      GPIO_PIN(2, 6)
+#define SDCARD_SPI_PARAM_POWER     GPIO_PIN(0, 6)
 #define SDCARD_SPI_PARAM_POWER_AH  false
 /** @} */
 
-/**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
+/** Default MTD device */
+#define MTD_0 mtd_dev_get(0)
 
 #ifdef __cplusplus
 } /* end extern "C" */

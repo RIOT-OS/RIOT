@@ -36,14 +36,8 @@ extern "C" {
  * @name Macros for controlling the on-board LED.
  * @{
  */
-#define LED0_PIN            GPIO_PIN(PORT_B, 9)
-
-#define LED_PORT            GPIOB
-#define LED0_MASK           (1 << 9)
-
-#define LED0_ON             (LED_PORT->BRR = LED0_MASK)
-#define LED0_OFF            (LED_PORT->BSRR  = LED0_MASK)
-#define LED0_TOGGLE         (LED_PORT->ODR ^= LED0_MASK)
+#define LED0_PIN_NUM        9
+#define LED0_PORT_NUM       PORT_B
 /** @} */
 
 /**
@@ -77,14 +71,11 @@ extern "C" {
 #endif
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif
+
+#include "stm32_leds.h"
 
 #endif /* BOARD_H */
 /** @} */

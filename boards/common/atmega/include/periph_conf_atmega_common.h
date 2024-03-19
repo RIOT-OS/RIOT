@@ -6,6 +6,7 @@
  *               2017 HAW Hamburg, Dimitri Nahm
  *               2018 Matthew Blue <matthew.blue.neuro@gmail.com>
  *               2019 Otto-von-Guericke-Universität Magdeburg
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -28,6 +29,7 @@
  * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
  * @author      Francisco Acosta <francisco.acosta@inria.fr>
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef PERIPH_CONF_ATMEGA_COMMON_H
@@ -71,6 +73,12 @@ extern "C" {
     #define UART_1              MEGA_UART1
     #define UART_1_ISR          USART1_RX_vect
     #define UART_1_ISR_TX       USART1_TX_vect
+#elif defined(CPU_ATMEGA8)
+    #define UART_NUMOF          (1U)
+
+    #define UART_0              MEGA_UART
+    #define UART_0_ISR          USART_RXC_vect
+    #define UART_0_ISR_TX       USART_TXC_vect
 #elif defined(CPU_ATMEGA328P)
     #define UART_NUMOF          (1U)
 
@@ -156,7 +164,8 @@ extern "C" {
  */
 #ifndef ADC_NUMOF
 #if defined(CPU_ATMEGA128RFA1) || defined(CPU_ATMEGA256RFR2) || defined(CPU_ATMEGA328P) ||  \
-    defined(CPU_ATMEGA1281) || defined(CPU_ATMEGA1284P) || defined(CPU_ATMEGA32U4)
+    defined(CPU_ATMEGA1281) || defined(CPU_ATMEGA1284P) || defined(CPU_ATMEGA32U4) || \
+    defined(CPU_ATMEGA8)
     #define ADC_NUMOF           (8U)
 #elif defined (CPU_ATMEGA2560)
     #define ADC_NUMOF           (16U)
@@ -180,7 +189,9 @@ extern "C" {
  * @{
  */
 #ifndef PWM_NUMOF
-#if defined(CPU_ATMEGA328P)
+#if defined(CPU_ATMEGA8)
+    #define PWM_PINS_CH0 { GPIO_PIN(PORT_B, 3), GPIO_UNDEF }
+#elif defined(CPU_ATMEGA328P)
     #define PWM_PINS_CH0 { GPIO_PIN(PORT_D, 6), GPIO_PIN(PORT_D, 5) }
     #define PWM_PINS_CH1 { GPIO_PIN(PORT_B, 3), GPIO_PIN(PORT_D, 3) }
 #elif defined(CPU_ATMEGA1281)
@@ -200,8 +211,9 @@ extern "C" {
 
 #if defined(CPU_ATMEGA32U4) || defined(CPU_ATMEGA328P) || \
     defined(CPU_ATMEGA1281) || defined(CPU_ATMEGA1284P) || \
-    defined(CPU_ATMEGA2560)
+    defined(CPU_ATMEGA2560) || defined(CPU_ATMEGA8)
     static const pwm_conf_t pwm_conf[] = {
+#ifndef CPU_ATMEGA8
         {
             .dev = MINI_TIMER0,
             .pin_ch = PWM_PINS_CH0,
@@ -213,6 +225,13 @@ extern "C" {
             .pin_ch = PWM_PINS_CH1,
             .div = MINI_TIMER2_DIV,
         }
+#endif
+#else /* CPU_ATMEGA8 */
+        {
+            .dev = MINI_TIMER2,
+            .pin_ch = PWM_PINS_CH0,
+            .div = MINI_TIMER2_DIV,
+        },
 #endif
     };
 
@@ -226,3 +245,4 @@ extern "C" {
 #endif
 
 #endif /* PERIPH_CONF_ATMEGA_COMMON_H */
+/** @} */

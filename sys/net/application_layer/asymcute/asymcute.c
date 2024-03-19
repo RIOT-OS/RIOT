@@ -83,13 +83,16 @@ static size_t _len_set(uint8_t *buf, size_t len)
     }
 }
 
-static size_t _len_get(uint8_t *buf, size_t *len)
+static ssize_t _len_get(uint8_t *buf, size_t pkt_len, size_t *len)
 {
     if (buf[0] != 0x01) {
         *len = (uint16_t)buf[0];
         return 1;
     }
     else {
+        if (pkt_len < 3) {
+            return -1;
+        }
         *len = byteorder_bebuftohs(&buf[1]);
         return 3;
     }
@@ -104,17 +107,27 @@ static uint16_t _msg_id_next(asymcute_con_t *con)
     return con->last_id;
 }
 
+static uint8_t _req_type(asymcute_req_t *req)
+{
+    size_t len;
+    ssize_t pos = _len_get(req->data, req->data_len, &len);
+    /* requests are created by us and should thus always be valid */
+    assert(pos != -1 && (size_t)pos < req->data_len);
+    return req->data[(size_t)pos];
+}
+
 /* @pre con is locked */
 static asymcute_req_t *_req_preprocess(asymcute_con_t *con,
                                        size_t msg_len, size_t min_len,
-                                       const uint8_t *buf, unsigned id_pos)
+                                       const uint8_t *buf, unsigned id_pos,
+                                       uint8_t rtype)
 {
     /* verify message length */
     if (msg_len < min_len) {
         return NULL;
     }
 
-     uint16_t msg_id = (buf == NULL) ? 0 : byteorder_bebuftohs(&buf[id_pos]);
+    uint16_t msg_id = (buf == NULL) ? 0 : byteorder_bebuftohs(&buf[id_pos]);
 
     asymcute_req_t *res = NULL;
     asymcute_req_t *iter = con->pending;
@@ -126,8 +139,9 @@ static asymcute_req_t *_req_preprocess(asymcute_con_t *con,
         con->pending = iter->next;
     }
     while (iter && !res) {
-        if (iter->next && (iter->next->msg_id == msg_id)) {
-            res = iter->next;
+        asymcute_req_t *r = iter->next;
+        if (r && (r->msg_id == msg_id) && (_req_type(r) == rtype)) {
+            res = r;
             iter->next = iter->next->next;
         }
         iter = iter->next;
@@ -340,7 +354,7 @@ static void _on_keepalive_evt(void *arg)
 static void _on_connack(asymcute_con_t *con, const uint8_t *data, size_t len)
 {
     mutex_lock(&con->lock);
-    asymcute_req_t *req = _req_preprocess(con, len, MINLEN_CONNACK, NULL, 0);
+    asymcute_req_t *req = _req_preprocess(con, len, MINLEN_CONNACK, NULL, 0, MQTTSN_CONNECT);
     if (req == NULL) {
         mutex_unlock(&con->lock);
         return;
@@ -367,7 +381,7 @@ static void _on_disconnect(asymcute_con_t *con, size_t len)
 
     /* we might have triggered the DISCONNECT process ourselves, so make sure
      * the pending request is being handled */
-    asymcute_req_t *req = _req_preprocess(con, len, MINLEN_DISCONNECT, NULL, 0);
+    asymcute_req_t *req = _req_preprocess(con, len, MINLEN_DISCONNECT, NULL, 0, MQTTSN_DISCONNECT);
 
     /* put the connection back to NOTCON in any case and let the user know */
     _disconnect(con, NOTCON);
@@ -403,7 +417,8 @@ static void _on_regack(asymcute_con_t *con, const uint8_t *data, size_t len)
 {
     mutex_lock(&con->lock);
     asymcute_req_t *req = _req_preprocess(con, len, MINLEN_REGACK,
-                                          data, IDPOS_REGACK);
+                                          data, IDPOS_REGACK,
+                                          MQTTSN_REGISTER);
     if (req == NULL) {
         mutex_unlock(&con->lock);
         return;
@@ -415,6 +430,7 @@ static void _on_regack(asymcute_con_t *con, const uint8_t *data, size_t len)
         /* finish the registration by applying the topic id */
         asymcute_topic_t *topic = req->arg;
         if (topic == NULL) {
+            mutex_unlock(&con->lock);
             return;
         }
 
@@ -470,7 +486,8 @@ static void _on_puback(asymcute_con_t *con, const uint8_t *data, size_t len)
 {
     mutex_lock(&con->lock);
     asymcute_req_t *req = _req_preprocess(con, len, MINLEN_PUBACK,
-                                          data, IDPOS_PUBACK);
+                                          data, IDPOS_PUBACK,
+                                          MQTTSN_PUBLISH);
     if (req == NULL) {
         mutex_unlock(&con->lock);
         return;
@@ -487,7 +504,8 @@ static void _on_suback(asymcute_con_t *con, const uint8_t *data, size_t len)
 {
     mutex_lock(&con->lock);
     asymcute_req_t *req = _req_preprocess(con, len, MINLEN_SUBACK,
-                                          data, IDPOS_SUBACK);
+                                          data, IDPOS_SUBACK,
+                                          MQTTSN_SUBSCRIBE);
     if (req == NULL) {
         mutex_unlock(&con->lock);
         return;
@@ -497,6 +515,7 @@ static void _on_suback(asymcute_con_t *con, const uint8_t *data, size_t len)
     /* parse and apply assigned topic id */
     asymcute_sub_t *sub = req->arg;
     if (sub == NULL) {
+        mutex_unlock(&con->lock);
         return;
     }
 
@@ -525,7 +544,8 @@ static void _on_unsuback(asymcute_con_t *con, const uint8_t *data, size_t len)
 {
     mutex_lock(&con->lock);
     asymcute_req_t *req = _req_preprocess(con, len, MINLEN_UNSUBACK,
-                                          data, IDPOS_UNSUBACK);
+                                          data, IDPOS_UNSUBACK,
+                                          MQTTSN_UNSUBSCRIBE);
     if (req == NULL) {
         mutex_unlock(&con->lock);
         return;
@@ -534,6 +554,7 @@ static void _on_unsuback(asymcute_con_t *con, const uint8_t *data, size_t len)
     /* remove subscription from list */
     asymcute_sub_t *sub = req->arg;
     if (sub == NULL) {
+        mutex_unlock(&con->lock);
         return;
     } else if (con->subscriptions == sub) {
         con->subscriptions = sub->next;
@@ -574,7 +595,12 @@ void _on_pkt(sock_udp_t *sock, sock_async_flags_t type, void *arg)
                                         CONFIG_ASYMCUTE_BUFSIZE, 0, NULL);
         if (pkt_len >= MIN_PKT_LEN) {
             size_t len;
-            size_t pos = _len_get(con->rxbuf, &len);
+            ssize_t lret = _len_get(con->rxbuf, pkt_len, &len);
+            if (lret == -1) {
+                /* first octet was 0x01 but pkt does not have more than 3 octets */
+                return;
+            }
+            size_t pos = (size_t)lret;
 
             /* validate incoming data: verify message length */
             if (((size_t)pkt_len <= pos) || ((size_t)pkt_len < len)) {

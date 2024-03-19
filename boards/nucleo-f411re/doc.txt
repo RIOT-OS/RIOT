@@ -6,11 +6,15 @@
 ## Overview
 
 The Nucleo-F411RE is a board from ST's Nucleo family supporting a ARM Cortex-M4
-STM32F411RE microcontroller with 128Kb of SRAM and 512Kb of ROM Flash.
+STM32F411RE microcontroller with 128KiB of RAM and 512KiB of Flash.
 
 ## Hardware
 
 ![Nucleo64 F411RE](http://www.open-electronics.org/wp-content/uploads/2015/08/Figura2-500x467.png)
+
+## Pinout
+
+@image html pinouts/nucleo-f411re.svg "Pinout for the nucleo-f411re" width=50%
 
 ### MCU
 
@@ -18,8 +22,8 @@ STM32F411RE microcontroller with 128Kb of SRAM and 512Kb of ROM Flash.
 |:---------- |:----------------- |
 | Family     | ARM Cortex-M4     |
 | Vendor     | ST Microelectronics |
-| RAM        | 128Kb             |
-| Flash      | 512Kb             |
+| RAM        | 128KiB            |
+| Flash      | 512KiB            |
 | Frequency  | up to 100MHz      |
 | FPU        | yes               |
 | Timers     | 11 (2x watchdog, 1 SysTick, 7x 16-bit, 1x 32-bit [TIM2]) |
@@ -50,6 +54,8 @@ STM32F411RE microcontroller with 128Kb of SRAM and 512Kb of ROM Flash.
 
 ## Flashing the device
 
+### Flashing the Board Using OpenOCD
+
 The ST Nucleo-F411RE board includes an on-board ST-LINK V2-1 programmer. The
 easiest way to program the board is to use OpenOCD. Once you have installed
 OpenOCD (look [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD) for
@@ -62,6 +68,20 @@ and debug via GDB by simply typing
 ```
 make BOARD=nucleo-f411re debug
 ```
+
+### Flashing the Board Using ST-LINK Removable Media
+
+On-board ST-LINK programmer provides via composite USB device removable media.
+Copying the HEX file causes reprogramming of the board. This task
+could be performed manually; however, the cpy2remed (copy to removable
+media) PROGRAMMER script does this automatically. To program board in
+this manner, use the command:
+```
+make BOARD=nucleo-f411re PROGRAMMER=cpy2remed flash
+```
+@note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
+could be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
+
 
 ## Supported Toolchains
 

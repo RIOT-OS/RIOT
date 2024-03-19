@@ -20,6 +20,7 @@
 #ifndef CPU_H
 #define CPU_H
 
+#include <stdint.h>
 #include <stdio.h>
 #include "cpu_conf.h"
 
@@ -34,14 +35,14 @@ extern "C" {
 #define CPU_HAS_UNALIGNED_ACCESS
 
 /**
- * @brief   Prints the address the callee will return to
+ * @brief   Gets the address the callee will return to
  */
-__attribute__((always_inline)) static inline void cpu_print_last_instruction(void)
+__attribute__((always_inline)) static inline uintptr_t cpu_get_caller_pc(void)
 {
     /* __builtin_return_address will return the address the calling function
-     * will return to - since cpu_print_last_instruction is forced inline,
+     * will return to - since cpu_get_caller_pc is forced inline,
      * it is the return address of the user of this function */
-    printf("%p\n", __builtin_return_address(0));
+    return (uintptr_t)__builtin_return_address(0);
 }
 
 #ifdef __cplusplus

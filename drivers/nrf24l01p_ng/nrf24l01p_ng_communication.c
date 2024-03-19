@@ -37,7 +37,7 @@
  *
  * The NRF24L01+ expects data to be send over SPI from LSByte to MSByte
  * and will output data bytes also from LSByte to MSByte!
- * See the datasheet page 47, 8.3.1 SPI comands.
+ * See the datasheet page 47, 8.3.1 SPI commands.
  *
  * This shall be the address register of pipe 0 inside the transceiver:
  * [ x,  x,  x,  x,  x] (x = undefined content)

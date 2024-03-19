@@ -28,7 +28,7 @@ static int read_mag(const void *dev, phydat_t *res)
 {
     mag3110_read((const mag3110_t *)dev, (mag3110_data_t *)res->val);
 
-    res->unit = UNIT_GS;
+    res->unit = UNIT_GAUSS;
     res->scale = 2;
 
     return 3;
@@ -36,6 +36,6 @@ static int read_mag(const void *dev, phydat_t *res)
 
 const saul_driver_t mag3110_saul_driver = {
     .read = read_mag,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_MAG,
 };

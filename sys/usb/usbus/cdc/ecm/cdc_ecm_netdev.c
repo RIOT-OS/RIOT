@@ -22,10 +22,9 @@
 
 #include "kernel_defines.h"
 #include "iolist.h"
-#include "luid.h"
 #include "mutex.h"
 #include "net/ethernet.h"
-#include "net/eui48.h"
+#include "net/eui_provider.h"
 #include "net/netdev.h"
 #include "net/netdev/eth.h"
 #include "usb/usbus/cdc/ecm.h"
@@ -53,6 +52,7 @@ static usbus_cdcecm_device_t *_netdev_to_cdcecm(netdev_t *netdev)
 void cdcecm_netdev_setup(usbus_cdcecm_device_t *cdcecm)
 {
     cdcecm->netdev.driver = &netdev_driver_cdcecm;
+    netdev_register(&cdcecm->netdev, NETDEV_CDC_ECM, 0);
 }
 
 static int _send(netdev_t *netdev, const iolist_t *iolist)
@@ -71,7 +71,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     /* load packet data into FIFO */
     size_t iol_offset = 0;
     size_t usb_offset = 0;
-    size_t usb_remain = cdcecm->ep_in->ep->len;
+    size_t usb_remain = cdcecm->ep_in->maxpacketsize;
     DEBUG("CDC_ECM_netdev: cur iol: %d\n", iolist->iol_len);
     while (len) {
         mutex_lock(&cdcecm->out_lock);
@@ -132,7 +132,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t max_len, void *info)
     (void)info;
     usbus_cdcecm_device_t *cdcecm = _netdev_to_cdcecm(netdev);
 
-    size_t pktlen = cdcecm->len;
+    size_t pktlen = cdcecm->out_urb.transferred;
 
     if (max_len == 0 && buf == NULL) {
         return pktlen;
@@ -153,7 +153,11 @@ static int _init(netdev_t *netdev)
 {
     usbus_cdcecm_device_t *cdcecm = _netdev_to_cdcecm(netdev);
 
-    luid_get_eui48((eui48_t*)cdcecm->mac_netdev);
+    netdev_eui48_get(netdev, (eui48_t*)&cdcecm->mac_netdev);
+
+    /* signal link UP */
+    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+
     return 0;
 }
 
@@ -194,7 +198,7 @@ static void _isr(netdev_t *dev)
 {
     usbus_cdcecm_device_t *cdcecm = _netdev_to_cdcecm(dev);
 
-    if (cdcecm->len) {
+    if (cdcecm->out_urb.transferred) {
         cdcecm->netdev.event_callback(&cdcecm->netdev,
                                       NETDEV_EVENT_RX_COMPLETE);
     }

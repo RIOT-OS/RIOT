@@ -1,3 +1,6 @@
 CPU = atmega2560
 
+FEATURES_PROVIDED += arduino_shield_mega
+FEATURES_PROVIDED += arduino_shield_uno
+
 include $(RIOTBOARD)/common/arduino-atmega/Makefile.features

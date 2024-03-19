@@ -12,7 +12,6 @@ CFLAGS += -Wno-strict-prototypes
 CFLAGS += -Wno-maybe-uninitialized
 CFLAGS += -Wno-missing-braces
 CFLAGS += -Wno-missing-declarations
-CFLAGS += -Wno-missing-field-initializers
 CFLAGS += -Wno-old-style-definition
 CFLAGS += -Wno-return-type
 CFLAGS += -Wno-sign-compare
@@ -46,9 +45,5 @@ UWB_CORE_PATH_twr_ds_ext = lib/twr_ds_ext/src
 all: $(UWB_CORE_MODULES)
 	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/hw/drivers/uwb/src -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)
 
-uwb-core_config:
-	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/porting/dpl/riot/src -f $(RIOTBASE)/Makefile.base MODULE=$@
-
-uwb-core_uwbcfg: uwb-core_config
 uwb-core_%:
 	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/$(UWB_CORE_PATH_$*) -f $(RIOTBASE)/Makefile.base MODULE=$@

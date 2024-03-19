@@ -28,8 +28,7 @@
 
 #include <assert.h>
 
-#include "bitarithm.h"
-#include "cpu.h"
+#include "compiler_hints.h"
 #include "mutex.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
@@ -65,9 +64,9 @@ static mutex_t locks[SPI_NUMOF];
 static uint32_t clocks[SPI_NUMOF];
 
 /**
- * @brief   Clock divider cache
+ * @brief   Clock prescaler cache
  */
-static uint8_t dividers[SPI_NUMOF];
+static uint8_t prescalers[SPI_NUMOF];
 
 static inline SPI_TypeDef *dev(spi_t bus)
 {
@@ -81,41 +80,32 @@ static inline bool _use_dma(const spi_conf_t *conf)
 }
 #endif
 
-/**
- * @brief Multiplier for clock divider calculations
- *
- * Makes the divider calculation fixed point
- */
-#define SPI_APB_CLOCK_SHIFT          (4U)
-#define SPI_APB_CLOCK_MULT           (1U << SPI_APB_CLOCK_SHIFT)
-
-static uint8_t _get_clkdiv(const spi_conf_t *conf, uint32_t clock)
+static uint8_t _get_prescaler(const spi_conf_t *conf, uint32_t clock)
 {
     uint32_t bus_clock = periph_apb_clk(conf->apbbus);
-    /* Shift bus_clock with SPI_APB_CLOCK_SHIFT to create a fixed point int */
-    uint32_t div = (bus_clock << SPI_APB_CLOCK_SHIFT) / (2 * clock);
-    DEBUG("[spi] clock: divider: %"PRIu32"\n", div);
-    /* Test if the divider is 2 or smaller, keeping the fixed point in mind */
-    if (div <= SPI_APB_CLOCK_MULT) {
-        return 0;
+
+    uint8_t prescaler = 0;
+    uint32_t prescaled_clock = bus_clock >> 1;
+    const uint8_t prescaler_max = SPI_CR1_BR_Msk >> SPI_CR1_BR_Pos;
+    for (; (prescaled_clock > clock) && (prescaler < prescaler_max); prescaler++) {
+        prescaled_clock >>= 1;
     }
-    /* determine MSB and compensate back for the fixed point int shift */
-    uint8_t rounded_div = bitarithm_msb(div) - SPI_APB_CLOCK_SHIFT;
-    /* Determine if rounded_div is not a power of 2 */
-    if ((div & (div - 1)) != 0) {
-        /* increment by 1 to ensure that the clock speed at most the
-         * requested clock speed */
-        rounded_div++;
-    }
-    return rounded_div > BR_MAX ? BR_MAX : rounded_div;
+
+    /* If the callers asks for an SPI frequency of at most x, bad things will
+     * happen if this cannot be met. So let's have a blown assertion
+     * rather than runtime failures that require a logic analyzer to
+     * debug. */
+    assume(prescaled_clock <= clock);
+
+    return prescaler;
 }
 
 void spi_init(spi_t bus)
 {
-    assert(bus < SPI_NUMOF);
+    assume(bus < SPI_NUMOF);
 
-    /* initialize device lock */
-    mutex_init(&locks[bus]);
+    /* initialize device lock (as locked, spi_init_pins() will unlock it */
+    locks[bus] = (mutex_t)MUTEX_INIT_LOCKED;
     /* trigger pin initialization */
     spi_init_pins(bus);
 
@@ -131,6 +121,7 @@ void spi_init(spi_t bus)
 
 void spi_init_pins(spi_t bus)
 {
+    assume(bus < SPI_NUMOF);
 #ifdef CPU_FAM_STM32F1
 
     if (gpio_is_valid(spi_config[bus].sclk_pin)) {
@@ -160,6 +151,43 @@ void spi_init_pins(spi_t bus)
         gpio_init_af(spi_config[bus].sclk_pin, spi_config[bus].sclk_af);
     }
 #endif
+    mutex_unlock(&locks[bus]);
+}
+
+void spi_deinit_pins(spi_t bus)
+{
+    assume(bus < SPI_NUMOF);
+    mutex_lock(&locks[bus]);
+
+    if (gpio_is_valid(spi_config[bus].sclk_pin)) {
+        gpio_init(spi_config[bus].sclk_pin, GPIO_IN);
+    }
+
+    if (gpio_is_valid(spi_config[bus].mosi_pin)) {
+        gpio_init(spi_config[bus].mosi_pin, GPIO_IN);
+    }
+
+    if (gpio_is_valid(spi_config[bus].miso_pin)) {
+        gpio_init(spi_config[bus].miso_pin, GPIO_IN);
+    }
+}
+
+gpio_t spi_pin_miso(spi_t bus)
+{
+    assume(bus < SPI_NUMOF);
+    return spi_config[bus].miso_pin;
+}
+
+gpio_t spi_pin_mosi(spi_t bus)
+{
+    assume(bus < SPI_NUMOF);
+    return spi_config[bus].mosi_pin;
+}
+
+gpio_t spi_pin_clk(spi_t bus)
+{
+    assume(bus < SPI_NUMOF);
+    return spi_config[bus].sclk_pin;
 }
 
 int spi_init_cs(spi_t bus, spi_cs_t cs)
@@ -194,7 +222,7 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
 #ifdef MODULE_PERIPH_SPI_GPIO_MODE
 int spi_init_with_gpio_mode(spi_t bus, const spi_gpio_mode_t* mode)
 {
-    assert(bus < SPI_NUMOF);
+    assume(bus < SPI_NUMOF);
 
     int ret = 0;
 
@@ -223,7 +251,7 @@ int spi_init_with_gpio_mode(spi_t bus, const spi_gpio_mode_t* mode)
 
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
-    assert((unsigned)bus < SPI_NUMOF);
+    assume((unsigned)bus < SPI_NUMOF);
 
     /* lock bus */
     mutex_lock(&locks[bus]);
@@ -235,30 +263,30 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     periph_clk_en(spi_config[bus].apbbus, spi_config[bus].rccmask);
     /* enable device */
     if (clk != clocks[bus]) {
-        dividers[bus] = _get_clkdiv(&spi_config[bus], clk);
+        prescalers[bus] = _get_prescaler(&spi_config[bus], clk);
         clocks[bus] = clk;
     }
-    uint8_t br = dividers[bus];
+    uint8_t br = prescalers[bus];
 
-    DEBUG("[spi] acquire: requested clock: %"PRIu32", resulting clock: %"PRIu32
-          " BR divider: %u\n",
+    DEBUG("[spi] acquire: requested clock: %" PRIu32
+          " Hz, resulting clock: %" PRIu32 " Hz, BR prescaler: %u\n",
           clk,
-          periph_apb_clk(spi_config[bus].apbbus)/(1 << (br + 1)),
-          br);
+          periph_apb_clk(spi_config[bus].apbbus) >> (br + 1),
+          (unsigned)br);
 
-    uint16_t cr1_settings = ((br << BR_SHIFT) | mode | SPI_CR1_MSTR);
+    uint16_t cr1 = ((br << BR_SHIFT) | mode | SPI_CR1_MSTR | SPI_CR1_SPE);
     /* Settings to add to CR2 in addition to SPI_CR2_SETTINGS */
-    uint16_t cr2_extra_settings = 0;
+    uint16_t cr2 = SPI_CR2_SETTINGS;
     if (cs != SPI_HWCS_MASK) {
-        cr1_settings |= (SPI_CR1_SSM | SPI_CR1_SSI);
+        cr1 |= (SPI_CR1_SSM | SPI_CR1_SSI);
     }
     else {
-        cr2_extra_settings = (SPI_CR2_SSOE);
+        cr2 = (SPI_CR2_SSOE);
     }
 
 #ifdef MODULE_PERIPH_DMA
     if (_use_dma(&spi_config[bus])) {
-        cr2_extra_settings |= SPI_CR2_TXDMAEN | SPI_CR2_RXDMAEN;
+        cr2 |= SPI_CR2_TXDMAEN | SPI_CR2_RXDMAEN;
 
         dma_acquire(spi_config[bus].tx_dma);
         dma_setup(spi_config[bus].tx_dma,
@@ -277,11 +305,8 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
                   0);
     }
 #endif
-    dev(bus)->CR1 = cr1_settings;
-    /* Only modify CR2 if needed */
-    if (cr2_extra_settings) {
-        dev(bus)->CR2 = (SPI_CR2_SETTINGS | cr2_extra_settings);
-    }
+    dev(bus)->CR1 = cr1;
+    dev(bus)->CR2 = cr2;
 }
 
 void spi_release(spi_t bus)
@@ -356,31 +381,34 @@ static void _transfer_no_dma(spi_t bus, const void *out, void *in, size_t len)
     /* transfer data, use shortpath if only sending data */
     if (!inbuf) {
         for (size_t i = 0; i < len; i++) {
-            while (!(dev(bus)->SR & SPI_SR_TXE));
+            while (!(dev(bus)->SR & SPI_SR_TXE)) {}
             *DR = outbuf[i];
-        }
-        /* wait until everything is finished and empty the receive buffer */
-        while (!(dev(bus)->SR & SPI_SR_TXE)) {}
-        while (dev(bus)->SR & SPI_SR_BSY) {}
-        while (dev(bus)->SR & SPI_SR_RXNE) {
-            dev(bus)->DR;       /* we might just read 2 bytes at once here */
         }
     }
     else if (!outbuf) {
         for (size_t i = 0; i < len; i++) {
-            while (!(dev(bus)->SR & SPI_SR_TXE));
+            while (!(dev(bus)->SR & SPI_SR_TXE)) { /* busy wait */ }
             *DR = 0;
-            while (!(dev(bus)->SR & SPI_SR_RXNE));
+            while (!(dev(bus)->SR & SPI_SR_RXNE)) { /* busy wait */ }
             inbuf[i] = *DR;
         }
     }
     else {
         for (size_t i = 0; i < len; i++) {
-            while (!(dev(bus)->SR & SPI_SR_TXE));
+            while (!(dev(bus)->SR & SPI_SR_TXE)) { /* busy wait */ }
             *DR = outbuf[i];
-            while (!(dev(bus)->SR & SPI_SR_RXNE));
+            while (!(dev(bus)->SR & SPI_SR_RXNE)) { /* busy wait */ }
             inbuf[i] = *DR;
         }
+    }
+
+    /* wait until everything is finished and empty the receive buffer */
+    while (!(dev(bus)->SR & SPI_SR_TXE)) {}
+    while (dev(bus)->SR & SPI_SR_BSY) {}
+    while (dev(bus)->SR & SPI_SR_RXNE) {
+        /* make sure to "read" any data, so the RXNE is indeed clear.
+         * Otherwise we risk reading stale data in the next transfer */
+        (void)*DR;
     }
 
     _wait_for_end(bus);
@@ -390,30 +418,34 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
                         const void *out, void *in, size_t len)
 {
     /* make sure at least one input or one output buffer is given */
-    assert(out || in);
+    assume(out || in);
 
     /* active the given chip select line */
-    dev(bus)->CR1 |= (SPI_CR1_SPE);     /* this pulls the HW CS line low */
     if ((cs != SPI_HWCS_MASK) && gpio_is_valid(cs)) {
         gpio_clear((gpio_t)cs);
     }
+    else {
+        dev(bus)->CR2 |= SPI_CR2_SSOE;
+    }
 
 #ifdef MODULE_PERIPH_DMA
-    if (_use_dma(&spi_config[bus])) {
+    if (_use_dma(&spi_config[bus]) && len > CONFIG_SPI_DMA_THRESHOLD_BYTES) {
         _transfer_dma(bus, out, in, len);
     }
     else {
 #endif
-    _transfer_no_dma(bus, out, in, len);
+        _transfer_no_dma(bus, out, in, len);
 #ifdef MODULE_PERIPH_DMA
     }
 #endif
 
     /* release the chip select if not specified differently */
     if ((!cont) && gpio_is_valid(cs)) {
-        dev(bus)->CR1 &= ~(SPI_CR1_SPE);    /* pull HW CS line high */
         if (cs != SPI_HWCS_MASK) {
             gpio_set((gpio_t)cs);
+        }
+        else {
+            dev(bus)->CR2 &= ~(SPI_CR2_SSOE);
         }
     }
 }

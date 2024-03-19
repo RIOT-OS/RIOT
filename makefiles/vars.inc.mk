@@ -4,6 +4,7 @@ FLASH_ADDR ?= 0x0
 export Q                     # Used in front of Makefile lines to suppress the printing of the command if user did not opt-in to see them.
 export QQ                    # as Q, but be more quiet
 export QUIET                 # The parameter to use whether to show verbose makefile commands or not.
+export QUIETER               # The parameter to use to hide most makefile output
 
 export OS                    # The operating system of the build host
 export OS_ARCH               # The build host's hardware architecture
@@ -16,10 +17,12 @@ export CPU_MODEL             # The specific identifier of the used CPU, used for
 export CPU_CORE              # The specific identifier of the core present in the CPU. Needed for depency resolution.
 export CPU_ARCH              # The specific identifier of the architecture of the core defined in CPU_CORE.
 export CPU_FAM               # An intermediate identifier between CPU and CPU_MODEL that represents a sub-group of a Manufacturers CPU's.
-export MCU                   # The MCU, set by the board's Makefile.include, or defaulted to the same value as CPU.
 export INCLUDES              # The extra include paths, set by the various Makefile.include files.
 export CXXINCLUDES           # The extra include paths for c++, set by the various Makefile.include files.
 export NATIVEINCLUDES        # The native include paths, set by the various native Makefile.include files.
+
+export GCC_C_INCLUDES        # system include dirs implicitly used by GCC's c compiler, only defined with TOOLCHAIN=llvm
+export GCC_CXX_INCLUDES      # system include dirs implicitly used by GCC's c++ compiler, only defined with TOOLCHAIN=llvm
 
 export USEMODULE             # Sys Module dependencies of the application. Set in the application's Makefile.
 export BIN_USEMODULE         # Modules specific to bindist (see bindist.ink.mk). Set in the application's Makefile.
@@ -42,6 +45,7 @@ export RIOTMAKE              # Location of all supplemental Makefiles (such as t
 export RIOTKCONFIG           # Location of all supplemental Kconfig files
 export BINDIRBASE            # This is the folder where the application should be built in. For each BOARD a different subfolder is used.
 export BINDIR                # This is the folder where the application should be built in.
+export RIOT_TEST_HASH_DIR    # The dir to generate the test-input-hash.sha1 file for checking if a test has changed, uses BINDIR by default.
 export CARGO_TARGET_DIR      # This is the folder where Rust parts of the application should be built in.
 export BUILD_DIR             # This is the base folder to store common build files and artifacts, e.g. test results.
 export APPDIR                # The base folder containing the application
@@ -54,11 +58,12 @@ export FEATURES_REQUIRED     # List of required features by the application
 export FEATURES_PROVIDED     # List of provided features by the board
 export FEATURES_OPTIONAL     # List of nice to have features
 export FEATURES_USED         # List of features used
-# TOOLCHAINS_SUPPORTED       # List of supported toolchains by an MCU (gnu/llvm/...).
+# TOOLCHAINS_SUPPORTED       # List of supported toolchains by a CPU (gnu/llvm/...).
 # TOOLCHAINS_BLACKLISTED     # List of unspported toolchains for a module or an application.
 export TOOLCHAIN             # Base build toolchain, i.e. GNU or LLVM
 
 export TARGET_ARCH           # The target platform name, in GCC triple notation, e.g. "arm-none-eabi", "i686-elf", "avr"
+export TARGET_ARCH_LLVM      # The target platform name, in LLVM triple notation, e.g. "arm-none-eabi"
 export PREFIX                # The prefix of the toolchain commands, usually "$(TARGET_ARCH)-", e.g. "arm-none-eabi-" or "msp430-".
 export CC                    # The C compiler to use.
 export CXX                   # The CXX compiler to use.
@@ -96,6 +101,7 @@ export WPEDANTIC             # Issue all (extensive) compiler warnings demanded 
 export FLASH_ADDR            # Define an offset to flash code into ROM memory.
 # TERMPROG                   # The command to call on "make term".
 # TERMFLAGS                  # Additional parameters to supply to TERMPROG.
+# TERMENV                    # Environment variables passed to TERMPROG
 # TERMLOG                    # Optional file to log "make term" output to.
 # TERMTEE                    # Optional pipe to redirect "make term" output. Default: '| tee -a ${TERMLOG}' when TERMLOG is defined else undefined.
 # PORT                       # The port to connect the TERMPROG to.
@@ -108,6 +114,8 @@ export HEXFILE               # The 'intel hex' stripped result of the compilatio
 # DEBUGGER_FLAGS             # The parameters to supply to DEBUGGER.
 # DEBUGSERVER                # The command to call on "make debug-server", usually a script starting the GDB server.
 # DEBUGSERVER_FLAGS          # The parameters to supply to DEBUGSERVER.
+# DEBUGCLIENT                # The command to call on "make debug-client", usually a script starting the GDB client.
+# DEBUGCLIENT_FLAGS          # The parameters to supply to DEBUGCLIENT.
 # DEVELHELP                  # Set to 1 to spend ROM, RAM and CPU time for help during development (e.g. enable asserts())
 # RESET                      # The command to call on "make reset", this command resets/reboots the target.
 # RESET_FLAGS                # The parameters to supply to RESET.
@@ -126,8 +134,13 @@ export UNZIP_HERE            # Use `cd $(SOME_FOLDER) && $(UNZIP_HERE) $(SOME_FI
 export LAZYSPONGE            # Command saving stdin to a file only on content update.
 export LAZYSPONGE_FLAGS      # Parameters supplied to LAZYSPONGE.
 
-export AFL_FLAGS             # Additional command-line flags passed to afl during fuzzing.
+export FLAGS_FOR_AFL         # Additional command-line flags passed to afl during fuzzing.
 
 # LOG_LEVEL                  # Logging level as integer (NONE: 0, ERROR: 1, WARNING: 2, INFO: 3, DEBUG: 4, default: 3)
 # KCONFIG_ADD_CONFIG         # List of .config files to be merged used by Boards and CPUs. See kconfig.mk
 # VERBOSE_ASSERT             # Set to 1 to print the file and line of a failed assert when assertions blow
+
+export RUST_TARGET           # Rust's own version of the target triple / quadruple.
+                             #
+                             # It is set by the architecture (and thus eventually the CPU), and exported to
+                             # be available when building Rust modules.

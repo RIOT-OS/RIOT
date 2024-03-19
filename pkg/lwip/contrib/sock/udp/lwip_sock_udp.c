@@ -41,9 +41,11 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
                                 NETCONN_UDP)) == 0) {
         sock->base.conn = tmp;
 #if IS_ACTIVE(SOCK_HAS_ASYNC)
+        sock->base.async_cb.gen = NULL;
         netconn_set_callback_arg(sock->base.conn, &sock->base);
 #endif
     }
+
     return res;
 }
 
@@ -94,6 +96,7 @@ ssize_t sock_udp_recv_aux(sock_udp_t *sock, void *data, size_t max_len,
         ptr += res;
         ret += res;
     }
+
     return (nobufs) ? -ENOBUFS : ((res < 0) ? res : ret);
 }
 
@@ -107,6 +110,7 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **ctx,
 
     assert((sock != NULL) && (data != NULL) && (ctx != NULL));
     buf = *ctx;
+
     if (buf != NULL) {
         if (netbuf_next(buf) == -1) {
             *data = NULL;
@@ -119,15 +123,18 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **ctx,
             return buf->ptr->len;
         }
     }
+
     if ((res = lwip_sock_recv(sock->base.conn, timeout, &buf)) < 0) {
         return res;
     }
+
     if ((remote != NULL) ||
         ((aux != NULL) && IS_USED(MODULE_SOCK_AUX_LOCAL)
                        && IS_ACTIVE(LWIP_NETBUF_RECVINFO))) {
         /* convert remote */
         size_t addr_len = sizeof(ipv4_addr_t);
         int family = AF_INET;
+
         if (NETCONNTYPE_ISIPV6(sock->base.conn->type)) {
             addr_len = sizeof(ipv6_addr_t);
             family = AF_INET6;
@@ -136,6 +143,7 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **ctx,
             netbuf_delete(buf);
             return -EPROTO;
         }
+
         if (remote != NULL) {
             remote->family = family;
 #if LWIP_NETBUF_RECVINFO
@@ -148,33 +156,36 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **ctx,
             remote->port = buf->port;
         }
 #if IS_USED(MODULE_SOCK_AUX_LOCAL)
-    static_assert(IS_ACTIVE(LWIP_NETBUF_RECVINFO),
-                  "sock_aux_local depends on LWIP_NETBUF_RECVINFO");
-    if ((aux != NULL) && (aux->flags & SOCK_AUX_GET_LOCAL)) {
-        aux->flags &= ~(SOCK_AUX_GET_LOCAL);
-        aux->local.family = family;
-        memcpy(&aux->local.addr, &buf->toaddr, addr_len);
-        aux->local.port = sock->base.conn->pcb.udp->local_port;
-    }
+        static_assert(IS_ACTIVE(LWIP_NETBUF_RECVINFO),
+                      "sock_aux_local depends on LWIP_NETBUF_RECVINFO");
+
+        if ((aux != NULL) && (aux->flags & SOCK_AUX_GET_LOCAL)) {
+            aux->flags &= ~(SOCK_AUX_GET_LOCAL);
+            aux->local.family = family;
+            memcpy(&aux->local.addr, &buf->toaddr, addr_len);
+            aux->local.port = sock->base.conn->pcb.udp->local_port;
+        }
 #endif /* MODULE_SOCK_AUX_LOCAL */
     }
+
     *data = buf->ptr->payload;
     *ctx = buf;
+
     return (ssize_t)buf->ptr->len;
 }
 
-ssize_t sock_udp_send_aux(sock_udp_t *sock, const void *data, size_t len,
-                          const sock_udp_ep_t *remote, sock_udp_aux_tx_t *aux)
+ssize_t sock_udp_sendv_aux(sock_udp_t *sock, const iolist_t *snips,
+                           const sock_udp_ep_t *remote, sock_udp_aux_tx_t *aux)
 {
     (void)aux;
     assert((sock != NULL) || (remote != NULL));
-    assert((len == 0) || (data != NULL)); /* (len != 0) => (data != NULL) */
 
     if ((remote != NULL) && (remote->port == 0)) {
         return -EINVAL;
     }
-    return lwip_sock_send((sock) ? sock->base.conn : NULL, data, len, 0,
-                          (struct _sock_tl_ep *)remote, NETCONN_UDP);
+
+    return lwip_sock_sendv((sock) ? sock->base.conn : NULL, snips, 0,
+                           (struct _sock_tl_ep *)remote, NETCONN_UDP);
 }
 
 #ifdef SOCK_HAS_ASYNC

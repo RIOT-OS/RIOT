@@ -15,10 +15,10 @@
 #include "embUnit.h"
 #include "kernel_defines.h"
 
-static void kernel_version_parse(uint64_t version, uint16_t *mayor,
+static void kernel_version_parse(uint64_t version, uint16_t *major,
                                  uint16_t *minor, uint16_t *patch, uint16_t *extra)
 {
-    *mayor = version >> 48;
+    *major = version >> 48;
     *minor = (version >> 32) & 0xFFFF;
     *patch = (version >> 16) & 0xFFFF;
     *extra = (version >> 0) & 0xFFFF;
@@ -26,16 +26,16 @@ static void kernel_version_parse(uint64_t version, uint16_t *mayor,
 
 static void test_kernel_version(void)
 {
-    uint16_t mayor, minor, patch, extra;
+    uint16_t major, minor, patch, extra;
 
     TEST_ASSERT(RIOT_VERSION_CODE);
     TEST_ASSERT(RIOT_VERSION_CODE > RIOT_VERSION_NUM(2017, 1, 3, 0));
     TEST_ASSERT(RIOT_VERSION_CODE < RIOT_VERSION_NUM(2080, 10, 2, 0));
 
     kernel_version_parse(RIOT_VERSION_NUM(2020, 7, 1, 0),
-                         &mayor, &minor, &patch, &extra);
+                         &major, &minor, &patch, &extra);
 
-    TEST_ASSERT_EQUAL_INT(2020, mayor);
+    TEST_ASSERT_EQUAL_INT(2020, major);
     TEST_ASSERT_EQUAL_INT(7, minor);
     TEST_ASSERT_EQUAL_INT(1, patch);
     TEST_ASSERT_EQUAL_INT(0, extra);
@@ -77,7 +77,7 @@ static void test_declare_constant(void)
     static_assert(sizeof(test_array) == 3, "test_array should be 3 bytes long");
 }
 
-#ifdef BOARD_NATIVE
+#ifdef CPU_NATIVE
 /* native compiles with -Og, which does not automatically inline functions.
  * We just turn the function into a macro to get the test also passing on
  * native */

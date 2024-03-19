@@ -27,6 +27,7 @@
 #include "msg.h"
 #include "net/emcute.h"
 #include "net/ipv6/addr.h"
+#include "thread.h"
 
 #ifndef EMCUTE_ID
 #define EMCUTE_ID           ("gertrud")
@@ -158,8 +159,8 @@ static int cmd_pub(int argc, char **argv)
         return 1;
     }
 
-    printf("Published %i bytes to topic '%s [%i]'\n",
-            (int)strlen(argv[2]), t.name, t.id);
+    printf("Published %" PRIuSIZE " bytes to topic '%s [%i]'\n",
+           strlen(argv[2]), t.name, t.id);
 
     return 0;
 }

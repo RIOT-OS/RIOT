@@ -27,13 +27,12 @@ With newlib, `fopen/fclose/fread/fwrite/...` can also be used transparently.
 
 The following commands are available:
 
-- `format`: should be called the first time only, it will format the `mtd`
-  with the configured file system
-- `mount`: mount the file system on the configured mount point (default is
-  `/sda` but it can be configured with `FLASH_MOUNT_POINT` define). The
-  `constfs` file system is mounted automatically on `/const` when the
+- `vfs format /nvm0`: should be called the first time only, it will format the
+  `/nvm0` mountpoint with the configured file system
+- `vfs mount /nvm0`: mount the file system on the configured mount point
+   The `constfs` file system is mounted automatically on `/const` when the
    application starts
-- `umount`: unmount `/sda`
+- `vfs umount /nvm0`: unmount `/nvm0`
 - `cat <file>`: similarly to unix `cat` unix command, it prints the given
   `<file>` on stdout
 - `tee <file> <str>`: similarly to `tee` unix command, it writes `<str>` in

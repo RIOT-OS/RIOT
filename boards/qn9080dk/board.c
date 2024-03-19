@@ -55,13 +55,5 @@ static mtd_spi_nor_t mtd_nor_dev = {
     .params = &_mtd_nor_params,
 };
 
-mtd_dev_t *mtd0 = (mtd_dev_t *)&mtd_nor_dev;
+MTD_XFA_ADD(mtd_nor_dev, 0);
 #endif /* MODULE_MTD */
-
-void board_init(void)
-{
-    /* Initialize LEDs and Buttons. */
-    gpio_init(BTN1_PIN, BTN1_MODE);
-    gpio_init(BTN2_PIN, BTN2_MODE);
-
-}

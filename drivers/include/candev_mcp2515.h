@@ -32,7 +32,6 @@
 #include "periph/gpio.h"
 #include "periph/spi.h"
 #include "mutex.h"
-#include "xtimer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,7 +41,7 @@ extern "C" {
  * Default CAN bitrate
  */
 #ifndef CANDEV_MCP2515_DEFAULT_BITRATE
-#define CANDEV_MCP2515_DEFAULT_BITRATE 125000
+#define CANDEV_MCP2515_DEFAULT_BITRATE 500000
 #endif
 
 /**

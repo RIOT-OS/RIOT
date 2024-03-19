@@ -60,17 +60,28 @@
 /** @} */
 
 /**
- * @brief TIMER 5 (RTC_DEV0) will be mynewt-core OS_CPUTIME timer
+ * @brief TIMER 3 or 5 (RTC_DEV0) will be mynewt-core OS_CPUTIME timer,
+ *        depending on used CPU family
  */
 #ifndef MYNEWT_VAL_OS_CPUTIME_TIMER_NUM
+#ifdef CPU_FAM_NRF51
+#define MYNEWT_VAL_OS_CPUTIME_TIMER_NUM (3)
+#else
 #define MYNEWT_VAL_OS_CPUTIME_TIMER_NUM (5)
+#endif
 #endif
 
 /**
- * @brief Enable TIMER 5 (RTC_DEV0)
+ * @brief Enable TIMER 3 or TIMER 5 (RTC_DEV0) depending on used CPU family
  */
+#ifdef CPU_FAM_NRF51
+#ifndef MYNEWT_VAL_TIMER_3
+#define MYNEWT_VAL_TIMER_3 (1)
+#endif
+#else
 #ifndef MYNEWT_VAL_TIMER_5
 #define MYNEWT_VAL_TIMER_5 (1)
+#endif
 #endif
 
 #if IS_USED(MODULE_NIMBLE)
@@ -102,8 +113,6 @@
 /*** @decawave-mynewt-core/lib/uwb_rng */
 #include "dpl_syscfg/syscfg_uwb_rng.h"
 
-/*** @decawave-mynewt-core/sys/uwbcfg */
-#include "dpl_syscfg/syscfg_uwbcfg.h"
 #endif
 
 #if IS_USED(MODULE_UWB_DW1000)

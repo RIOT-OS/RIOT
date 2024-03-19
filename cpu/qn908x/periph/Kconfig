@@ -21,6 +21,4 @@ config MODULE_PERIPH_GPIO_MUX
 config MODULE_PERIPH_ADC
     bool "ADC peripheral driver"
     depends on HAS_PERIPH_ADC
-    select MODULE_ZTIMER
-    select MODULE_ZTIMER_USEC
-    select MODULE_ZTIMER_PERIPH_TIMER
+    select ZTIMER_USEC

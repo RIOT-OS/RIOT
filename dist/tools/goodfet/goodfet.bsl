@@ -329,6 +329,8 @@ class LowLevel:
         if DEBUG > 1: sys.stderr.write("* comDone()")
         self.SetRSTpin(1)                       #disable power
         self.SetTESTpin(0)                      #disable power
+        self.serialport.parity = serial.PARITY_NONE    #set non parity mode
+        self.serialport.timeout = 0             #set no timeout
         self.serialport.close()
 
     def comRxHeader(self):

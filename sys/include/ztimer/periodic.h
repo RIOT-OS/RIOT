@@ -25,9 +25,12 @@
  * ```
  * #include "ztimer/periodic.h"
  *
- * static void callback(void *arg)
+ * static bool callback(void *arg)
  * {
  *    puts(arg);
+ *
+ *    // keep the timer running
+ *    return true;
  * }
  *
  *
@@ -66,6 +69,7 @@
 #ifndef ZTIMER_PERIODIC_H
 #define ZTIMER_PERIODIC_H
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #include "ztimer.h"
@@ -77,18 +81,23 @@ extern "C" {
 /**
  * @brief Periodic timer stop unless it returns this value
  */
-#define ZTIMER_PERIODIC_KEEP_GOING 0
+#define ZTIMER_PERIODIC_KEEP_GOING true
+
+/**
+ * @brief Type of callbacks in @ref ztimer_periodic_t "periodic timers"
+ */
+typedef bool (*ztimer_periodic_callback_t)(void *);
 
 /**
  * @brief   ztimer periodic structure
  */
 typedef struct {
-    ztimer_t timer;             /**< timer object used for this timer   */
-    ztimer_clock_t *clock;      /**< clock for this timer               */
-    uint32_t interval;          /**< interval of this timer             */
-    ztimer_now_t last;          /**< last trigger time                  */
-    int (*callback)(void *);    /**< called on each trigger             */
-    void *arg;                  /**< argument for callback              */
+    ztimer_t timer;                         /**< timer object used for this timer   */
+    ztimer_clock_t *clock;                  /**< clock for this timer               */
+    uint32_t interval;                      /**< interval of this timer             */
+    ztimer_now_t last;                      /**< last trigger time                  */
+    ztimer_periodic_callback_t callback;    /**< called on each trigger             */
+    void *arg;                              /**< argument for callback              */
 } ztimer_periodic_t;
 
 /**
@@ -100,11 +109,12 @@ typedef struct {
  * @param[in]       clock       the clock to configure this timer on
  * @param[inout]    timer       periodic timer object to initialize
  * @param[in]       callback    function to call on each trigger
+ *                              returns `true` if the timer should keep going
  * @param[in]       arg         argument to pass to callback function
  * @param[in]       interval    period length of this timer instance
  */
 void ztimer_periodic_init(ztimer_clock_t *clock, ztimer_periodic_t *timer,
-                          int (*callback)(void *),
+                          bool (*callback)(void *),
                           void *arg, uint32_t interval);
 
 /**

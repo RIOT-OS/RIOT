@@ -187,24 +187,24 @@ static int read_gas(const void *dev, phydat_t *data)
 
 const saul_driver_t bme680_saul_driver_temperature = {
     .read = read_temp,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_TEMP
 };
 
 const saul_driver_t bme680_saul_driver_pressure = {
     .read = read_press,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_PRESS
 };
 
 const saul_driver_t bme680_saul_driver_humidity = {
     .read = read_hum,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_HUM
 };
 
 const saul_driver_t bme680_saul_driver_gas = {
     .read = read_gas,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_GAS
 };

@@ -17,6 +17,12 @@ QUIET ?= 1
 WIFI_SSID ?= "Your_WiFi_name"
 WIFI_PASS ?= "Your_secure_password"
 
+# Optionally include remoteDNS support. This includes resolution of names at an
+# upstream DNS server and the handling of RDNSS options in Router Advertisements
+# to auto-configure that upstream DNS server.
+# USEMODULE += sock_dns              # include DNS client
+# USEMODULE += gnrc_ipv6_nib_dns     # include RDNSS option handling
+
 ifneq (,$(DEFAULT_MQTT_CLIENT_ID))
   CFLAGS += -DDEFAULT_MQTT_CLIENT_ID=\"$(DEFAULT_MQTT_CLIENT_ID)\"
 endif
@@ -27,31 +33,18 @@ ifneq (,$(DEFAULT_MQTT_PWD))
   CFLAGS += -DDEFAULT_MQTT_PWD=\"$(DEFAULT_MQTT_PWD)\"
 endif
 
-USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 USEMODULE += netdev_default
 USEPKG += paho-mqtt
 
 # paho-mqtt depends on TCP support, choose which stacks you want
+GNRC_IPV6 ?= 1
 LWIP_IPV4 ?= 0
-LWIP_IPV6 ?= 1
+LWIP_IPV6 ?= 0
 
-ifneq (0,$(LWIP_IPV4))
-  USEMODULE += ipv4_addr
-  USEMODULE += lwip_arp
-  USEMODULE += lwip_ipv4
-  USEMODULE += lwip_dhcp_auto
-  CFLAGS += -DETHARP_SUPPORT_STATIC_ENTRIES=1
-endif
-
-ifneq (0,$(LWIP_IPV6))
-  USEMODULE += ipv6_addr
-  USEMODULE += lwip_ipv6_autoconfig
-endif
-
-USEMODULE += lwip_netdev
-USEMODULE += lwip
+include Makefile.lwip
+include Makefile.gnrc
 
 USEMODULE += sock_async_event
 USEMODULE += sock_ip
@@ -66,6 +59,6 @@ USEMODULE += ztimer_msec
 include $(RIOTBASE)/Makefile.include
 
 ifneq (,$(filter arch_esp,$(FEATURES_USED)))
-  CFLAGS += -DESP_WIFI_SSID=\"$(WIFI_SSID)\"
-  CFLAGS += -DESP_WIFI_PASS=\"$(WIFI_PASS)\"
+  CFLAGS += -DWIFI_SSID=\"$(WIFI_SSID)\"
+  CFLAGS += -DWIFI_PASS=\"$(WIFI_PASS)\"
 endif

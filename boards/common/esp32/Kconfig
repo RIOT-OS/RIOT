@@ -6,9 +6,7 @@
 
 config BOARD_COMMON_ESP32
     bool
-    select HAS_PERIPH_UART
-
-    select HAVE_SAUL_GPIO
+    select BOARD_COMMON_ESP32X
 
 config MODULE_BOARDS_COMMON_ESP32
     bool
@@ -18,3 +16,5 @@ config MODULE_BOARDS_COMMON_ESP32
     default y
     help
       Common ESP32 boards code.
+
+source "$(RIOTBOARD)/common/esp32x/Kconfig"

@@ -7,6 +7,8 @@
  */
 #include <string.h>
 
+#include "container.h"
+
 #include "embUnit.h"
 
 #include "priority_queue.h"

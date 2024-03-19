@@ -20,6 +20,7 @@
 #define CC2420_PARAMS_H
 
 #include "board.h"
+#include "cc2420.h"
 
 #ifdef __cplusplus
 extern "C" {

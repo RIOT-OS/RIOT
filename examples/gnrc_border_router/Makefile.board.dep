@@ -1,5 +1,5 @@
 # Put board specific dependencies here
-ifeq (,$(filter native,$(BOARD)))
+ifeq (,$(filter native native64,$(BOARD)))
   ifeq (slip,$(UPLINK))
     USEMODULE += slipdev_stdio
   else ifeq (ethos,$(UPLINK))
@@ -7,10 +7,13 @@ ifeq (,$(filter native,$(BOARD)))
   else ifeq (wifi,$(UPLINK))
     ifneq (,$(filter esp32 esp8266,$(CPU)))
       USEMODULE += esp_wifi
-      USEMODULE += esp_now
-    else
-      $(error Only esp32 and esp8266 are currently supported)
+      ifneq (ble, $(DOWNLINK))
+        USEMODULE += esp_now
+      endif
     endif
+  endif
+  ifeq (ble, $(DOWNLINK))
+    USEMODULE += nimble_rpble
   endif
 else
   USEMODULE += netdev_tap

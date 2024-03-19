@@ -7,15 +7,14 @@
 #
 
 config MODULE_ISL29020
-    bool
-    prompt "ISL29020 light sensor" if !(MODULE_SAUL_DEFAULT && HAVE_ISL29020)
-    default y if (MODULE_SAUL_DEFAULT && HAVE_ISL29020)
+    bool "ISL29020 light sensor"
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
 
 config HAVE_ISL29020
     bool
+    select MODULE_ISL29020 if MODULE_SAUL_DEFAULT
     help
         Indicates that a isl29020 sensor is present.
 

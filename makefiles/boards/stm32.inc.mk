@@ -18,23 +18,37 @@ OPENOCD_DEBUG_ADAPTER ?= stlink
 
 JLINK_DEVICE ?= $(CPU_MODEL)
 
-ifeq (dfu-util,$(PROGRAMMER))
-  # optionally, use dfu-util to flash via usb
-  # note: needs a bootloader flashed before, config below is compatible
-  # with blackmagic_dfu, see https://github.com/blacksphere/blackmagic/
-  # To stop bootloader from loading an existing firmware, pull down
-  # (ground) GPIO B1.
-  ifeq (,$(DFU_USB_ID))
-    $(error DFU_USB_ID is not set)
-  endif
-endif
-
 ifeq (stm32flash,$(PROGRAMMER))
-	ROM_OFFSET ?= 0x0
-	FLASHER = stm32flash
-	DEBUGGER =
-	FLASHFILE ?= $(BINFILE)
-	PROG_BAUD ?= 57600
-	BIN_ADDR ?= $(shell echo  $$(($(ROM_START_ADDR) + $(ROM_OFFSET))))
-	FFLAGS = -v -b $(PROG_BAUD) -w $(FLASHFILE) -S $(BIN_ADDR) -g $(BIN_ADDR) $(PORT)
+  ROM_OFFSET ?= 0x0
+  FLASHER = stm32flash
+  DEBUGGER =
+  FLASHFILE ?= $(BINFILE)
+  PROG_BAUD ?= 57600
+  BIN_ADDR ?= $(shell echo  $$(($(ROM_START_ADDR) + $(ROM_OFFSET))))
+  STM32FLASH_RESET ?= 0
+  STM32FLASH_RESET_INVERT ?= 1
+  # sequence to reset board into bootloader:
+  #   BOOT0 --> HIGH, RST --> LOW
+  #   BOOT0 --> HIGH, RST --> HIGH
+  # sequence to reset board into application
+  #   BOOT0 --> LOW, RST --> LOW
+  #   BOOT0 --> LOW, RST --> HIGH
+  # This can be done via a TTL adapter when BOOT0 is connected to RTS and
+  # RST is connected to DTR
+  ifeq (1,$(STM32FLASH_RESET))
+    # The TTL adapter this was tested with actually has inverted outputs. But
+    # we can just support both via a simple flag:
+    ifeq (1,$(STM32FLASH_RESET_INVERT))
+      FFLAGS += -i '-rts,dtr,-dtr:rts,dtr,-dtr'
+      # set term flags so BOOT0 is low and RST is high
+      MINITERMFLAGS += --rts 1 --dtr 0
+      PYTERMFLAGS += --set-rts 1 --set-dtr 0
+    else
+      FFLAGS += -i 'rts,-dtr,dtr:-rts,-dtr,dtr'
+      # set term flags so BOOT0 is low and RST is high
+      MINITERMFLAGS += --rts 0 --dtr 1
+      PYTERMFLAGS += --set-rts 0 --set-dtr 1
+    endif
+  endif
+  FFLAGS += -v -b $(PROG_BAUD) -w $(FLASHFILE) -S $(BIN_ADDR) -g $(BIN_ADDR) $(PORT)
 endif

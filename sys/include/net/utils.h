@@ -16,6 +16,7 @@
  * @brief       Common network interface API definitions
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
+ * @author      Hendrik van Essen <hendrik.ve@fu-berlin.de>
  */
 
 #ifndef NET_UTILS_H
@@ -24,12 +25,25 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#include "net/ipv4/addr.h"
 #include "net/ipv6/addr.h"
 #include "net/netif.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief   Parse an IPv4 address / hostname string.
+ *          If the @ref net_sock_dns module is used, this will
+ *          attempt to resolve hostnames via DNS to IPv4 addresses.
+ *
+ * @param[out]  addr        IPv4 address of the host
+ * @param[in]   hostname    IPv4 address string or hostname
+ *
+ * @return  0 on success, error otherwise
+ */
+int netutils_get_ipv4(ipv4_addr_t *addr, const char *hostname);
 
 /**
  * @brief   Parse an IPv6 address / hostname string.

@@ -61,12 +61,22 @@ static const adc_conf_t adc_config[] = {
     { .pin = GPIO_PIN(PORT_A, 5), .dev = 0, .chan = 5 },
     { .pin = GPIO_PIN(PORT_A, 6), .dev = 0, .chan = 6 },
     { .pin = GPIO_PIN(PORT_A, 7), .dev = 0, .chan = 7 },
-    { .pin = GPIO_PIN(PORT_B, 0), .dev = 0, .chan = 8 },
-    { .pin = GPIO_PIN(PORT_B, 1), .dev = 0, .chan = 9 },
     /* ADC Temperature channel */
     { .pin = GPIO_UNDEF, .dev = 0, .chan = 16 },
     /* ADC VREF channel */
     { .pin = GPIO_UNDEF, .dev = 0, .chan = 17 },
+    /* The blackpill has a few pins less. PB0 and PB1 are among the GPIOs not
+     * exposed due to the lower pincount.
+     *
+     * Also, this conflicts with PWM. We prefer PWM over ADC here to provide
+     * 6 external ADC inputs, and 4 PWM outputs (instead of 8 ADC inputs and
+     * 2 PWM outputs). */
+#if !defined(BOARD_BLACKPILL_STM32F103C8) \
+    && !defined(BOARD_BLACKPILL_STM32F103CB) \
+    && !defined(MODULE_PERIPH_PWM)
+    { .pin = GPIO_PIN(PORT_B, 0), .dev = 0, .chan = 8 },
+    { .pin = GPIO_PIN(PORT_B, 1), .dev = 0, .chan = 9 },
+#endif
 };
 
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
@@ -135,32 +145,40 @@ static const timer_conf_t timer_config[] = {
 
 static const qdec_conf_t qdec_config[] = {
     {
+        .dev        = TIM4,
+        .max        = 0x0000ffff,
+        .rcc_mask   = RCC_APB1ENR_TIM4EN,
+        .chan       = { { .pin = GPIO_PIN(PORT_B, 6),   .cc_chan = 0 },
+                        { .pin = GPIO_PIN(PORT_B, 7),   .cc_chan = 1 } },
+        .bus        = APB1,
+        .irqn       = TIM4_IRQn,
+    },
+    /* this conflicts with PWM */
+#ifndef MODULE_PERIPH_PWM
+    {
+        .dev        = TIM3,
+        .max        = 0x0000ffff,
+        .rcc_mask   = RCC_APB1ENR_TIM3EN,
+        .chan       = { { .pin = GPIO_PIN(PORT_B, 4),   .cc_chan = 0 },
+                        { .pin = GPIO_PIN(PORT_B, 5),   .cc_chan = 1 } },
+        /* by default TIM3 is routed to PA6 (cc_chan 0) and PA7 (cc_chan 1) */
+        .remap      = AFIO_MAPR_TIM3_REMAP_1,
+        .bus        = APB1,
+        .irqn       = TIM3_IRQn,
+    },
+#endif
+    /* this conflicts with UART_DEV(0) */
+#ifndef MODULE_PERIPH_UART
+    {
         .dev      = TIM1,
         .max      = 0x0000ffff,
         .rcc_mask = RCC_APB2ENR_TIM1EN,
-        .chan     = { { .pin = GPIO_PIN(PORT_A, 8),             .cc_chan = 0 },
-                      { .pin = GPIO_PIN(PORT_A, 9),             .cc_chan = 1 } },
+        .chan     = { { .pin = GPIO_PIN(PORT_A, 8),     .cc_chan = 0 },
+                      { .pin = GPIO_PIN(PORT_A, 9),     .cc_chan = 1 } },
         .bus      = APB2,
         .irqn     = TIM1_UP_IRQn
     },
-    {
-        .dev      = TIM3,
-        .max      = 0x0000ffff,
-        .rcc_mask = RCC_APB1ENR_TIM3EN,
-        .chan     = { { .pin = GPIO_PIN(PORT_A, 6),             .cc_chan = 0 },
-                      { .pin = GPIO_PIN(PORT_A, 7),             .cc_chan = 1 } },
-        .bus      = APB1,
-        .irqn     = TIM3_IRQn
-    },
-    {
-        .dev      = TIM4,
-        .max      = 0x0000ffff,
-        .rcc_mask = RCC_APB1ENR_TIM4EN,
-        .chan     = { { .pin = GPIO_PIN(PORT_B, 6),             .cc_chan = 0 },
-                      { .pin = GPIO_PIN(PORT_B, 7),             .cc_chan = 1 } },
-        .bus      = APB1,
-        .irqn     = TIM4_IRQn
-    }
+#endif
 };
 
 #define QDEC_NUMOF           ARRAY_SIZE(qdec_config)
@@ -225,8 +243,8 @@ static const i2c_conf_t i2c_config[] = {
     {
         .dev            = I2C1,
         .speed          = I2C_SPEED_NORMAL,
-        .scl_pin        = GPIO_PIN(PORT_B, 6),
-        .sda_pin        = GPIO_PIN(PORT_B, 7),
+        .scl_pin        = GPIO_PIN(PORT_B, 8),
+        .sda_pin        = GPIO_PIN(PORT_B, 9),
         .bus            = APB1,
         .rcc_mask       = RCC_APB1ENR_I2C1EN,
         .clk            = CLOCK_APB1,
@@ -256,15 +274,25 @@ static const i2c_conf_t i2c_config[] = {
  */
 static const pwm_conf_t pwm_config[] = {
     {
-        .dev      = TIM1,
-        .rcc_mask = RCC_APB2ENR_TIM1EN,
-        .chan     = { { .pin = GPIO_PIN(PORT_A, 8),  .cc_chan = 0 },
-                      { .pin = GPIO_PIN(PORT_A, 9),  .cc_chan = 1 },
-                      { .pin = GPIO_PIN(PORT_A, 10), .cc_chan = 2 },
-                      { .pin = GPIO_PIN(PORT_A, 11), .cc_chan = 3 } },
+        .dev      = TIM3,
+        .rcc_mask = RCC_APB1ENR_TIM3EN,
+        /* by default TIM3 is routed to PA6 (cc_chan 0) and PA7 (cc_chan 1) */
+        .remap      = AFIO_MAPR_TIM3_REMAP_1,
+        .chan     = {
+                        { .pin = GPIO_PIN(PORT_B, 4), .cc_chan = 0 },
+                        { .pin = GPIO_PIN(PORT_B, 5), .cc_chan = 1 },
+#if !defined(BOARD_BLACKPILL_STM32F103C8) \
+    && !defined(BOARD_BLACKPILL_STM32F103CB)
+                        /* The blackpill has a few pins less. PB0 and PB1 are
+                         * among the GPIOs not exposed due to the lower
+                         * pincount */
+                        { .pin = GPIO_PIN(PORT_B, 0), .cc_chan = 2 },
+                        { .pin = GPIO_PIN(PORT_B, 1), .cc_chan = 3 },
+#endif
+                    },
         .af       = GPIO_AF_OUT_PP,
-        .bus      = APB2
-    }
+        .bus      = APB1,
+    },
 };
 
 #define PWM_NUMOF ARRAY_SIZE(pwm_config)
@@ -275,6 +303,22 @@ static const pwm_conf_t pwm_config[] = {
  * @{
  */
 static const spi_conf_t spi_config[] = {
+    {
+        .dev      = SPI2,
+        .mosi_pin = GPIO_PIN(PORT_B, 15),
+        .miso_pin = GPIO_PIN(PORT_B, 14),
+        .sclk_pin = GPIO_PIN(PORT_B, 13),
+        .cs_pin   = GPIO_PIN(PORT_B, 12),
+        .rccmask  = RCC_APB1ENR_SPI2EN,
+        .apbbus   = APB1,
+#ifdef MODULE_PERIPH_DMA
+        .tx_dma   = 3,
+        .tx_dma_chan = DMA_CHAN_CONFIG_UNSUPPORTED,
+        .rx_dma   = 2,
+        .rx_dma_chan = DMA_CHAN_CONFIG_UNSUPPORTED
+#endif
+    },
+#ifndef MODULE_PERIPH_ADC
     {
         .dev      = SPI1,
         .mosi_pin = GPIO_PIN(PORT_A, 7),
@@ -290,25 +334,37 @@ static const spi_conf_t spi_config[] = {
         .rx_dma_chan = DMA_CHAN_CONFIG_UNSUPPORTED
 #endif
     },
-    {
-        .dev      = SPI2,
-        .mosi_pin = GPIO_PIN(PORT_B, 15),
-        .miso_pin = GPIO_PIN(PORT_B, 14),
-        .sclk_pin = GPIO_PIN(PORT_B, 13),
-        .cs_pin   = GPIO_PIN(PORT_B, 12),
-        .rccmask  = RCC_APB1ENR_SPI2EN,
-        .apbbus   = APB1,
-#ifdef MODULE_PERIPH_DMA
-        .tx_dma   = 3,
-        .tx_dma_chan = DMA_CHAN_CONFIG_UNSUPPORTED,
-        .rx_dma   = 2,
-        .rx_dma_chan = DMA_CHAN_CONFIG_UNSUPPORTED
 #endif
-    }
 };
 
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
+
+/**
+ * @brief USB device FS configuration
+ */
+static const stm32_usbdev_fs_config_t stm32_usbdev_fs_config[] = {
+    {
+        .base_addr  = (uintptr_t)USB,
+        .rcc_mask   = RCC_APB1ENR_USBEN,
+        .irqn       = USB_LP_CAN1_RX0_IRQn,
+        .apb        = APB1,
+        .dm         = GPIO_PIN(PORT_A, 11),
+        .dp         = GPIO_PIN(PORT_A, 12),
+        .af         = GPIO_AF_UNDEF,
+        .disconn    = GPIO_UNDEF,
+    },
+};
+
+/**
+ * @brief Interrupt function name mapping
+ */
+#define USBDEV_ISR             isr_usb_lp_can1_rx0
+
+/**
+ * @brief Number of available USB device FS peripherals
+ */
+#define USBDEV_NUMOF           ARRAY_SIZE(stm32_usbdev_fs_config)
 
 #ifdef __cplusplus
 }

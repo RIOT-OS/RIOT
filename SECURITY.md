@@ -3,6 +3,11 @@
 All security bugs reported will be silently fixed in `master` and backported
 to the previous release.
 
+When CVE numbers are assigned to RIOT vulnerabilities, they are associated with
+[CPE] identifiers in the shape of `cpe:2.3:o:riot-os:riot:<VERSION>`.
+
+[CPE]: https://nvd.nist.gov/products/cpe
+
 ## Reporting a Vulnerability
 
 If a security issue is discovered, please report it to security@riot-os.org.
@@ -14,6 +19,14 @@ You can encrypt your report using gpg key id
 bottom of this file.
 
 [security-gpg]: https://riot-os.org/assets/keys/security.asc
+
+### Classification of a vulnerability
+
+Unless the reporter explicitly requests not to do so,
+the RIOT security maintainers may declassify an issue
+if the issue is not deemed critical --
+for example when it requires an unlikely combination of circumstances and/or configuration options,
+or when it can only be exploited by a user who gains no additional privileges.
 
 ## Notification of a Vulnerability
 

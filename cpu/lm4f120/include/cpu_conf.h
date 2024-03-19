@@ -22,8 +22,6 @@
 #define CPU_CONF_H
 
 #include "cpu_conf_common.h"
-#include <stdio.h>
-#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {

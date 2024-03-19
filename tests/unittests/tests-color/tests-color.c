@@ -18,9 +18,11 @@
 
 #include "color.h"
 
+#include "container.h"
+
 #include "tests-color.h"
 
-#define HSV_EPSILON     (1E-10f)
+#define HSV_EPSILON     (1E-2f)
 
 static void test_str2rgb_upper_case__success(void)
 {
@@ -75,20 +77,91 @@ static void test_rgb2hex__success(void)
     TEST_ASSERT_EQUAL_INT(0x000AB13C, hex);
 }
 
-static void test_rgb2hsv__black(void)
+static void test_rgb2hsv(void)
 {
-    color_hsv_t hsv;
-    color_rgb_t rgb = { .r = 0x00, .g = 0x00, .b = 0x00 };
+    struct { color_hsv_t hsv; color_rgb_t rgb; } h_r[] = {
+        { { 0, 0, 0 }, { 0, 0, 0 } },           /*Black*/
+        { { 0, 0, 100 }, { 255, 255, 255 } },   /*White*/
+        { { 0, 100, 100 }, { 255, 0, 0 } },     /*Red*/
+        { { 120, 100, 100 }, { 0, 255, 0 } },   /*Lime*/
+        { { 240, 100, 100 }, { 0, 0, 255 } },   /*Blue*/
+        { { 60, 100, 100 }, { 255, 255, 0 } },  /*Yellow*/
+        { { 180, 100, 100 }, { 0, 255, 255 } }, /*Cyan*/
+        { { 300, 100, 100 }, { 255, 0, 255 } }, /*Magenta*/
+        { { 0, 0, 75 }, { 191, 191, 191 } },    /*Silver*/
+        { { 0, 0, 50 }, { 128, 128, 128 } },    /*Gray*/
+        { { 0, 100, 50 }, { 128, 0, 0 } },      /*Maroon*/
+        { { 60, 100, 50 }, { 128, 128, 0 } },   /*Olive*/
+        { { 120, 100, 50 }, { 0, 128, 0 } },    /*Green*/
+        { { 300, 100, 50 }, { 128, 0, 128 } },  /*Purple*/
+        { { 180, 100, 50 }, { 0, 128, 128 } },  /*Teal*/
+        { { 240, 100, 50 }, { 0, 0, 128 } }     /*Navy*/
+    };
+    unsigned len = ARRAY_SIZE(h_r);
 
-    color_rgb2hsv(&rgb, &hsv);
+    for (unsigned i = 0; i < len; i++) {
+        color_hsv_t hsv_o = { .h = h_r[i].hsv.h,
+                              .s = h_r[i].hsv.s / 100,
+                              .v = h_r[i].hsv.v / 100 };
+        color_rgb_t rgb_o = { .r = h_r[i].rgb.r,
+                              .g = h_r[i].rgb.g,
+                              .b = h_r[i].rgb.b };
 
-    /* XXX floats should never be compared for equality, so we check if we
-     * are within HSV_EPSILON of tolerance */
-    TEST_ASSERT(-HSV_EPSILON <= hsv.s);
-    TEST_ASSERT(-HSV_EPSILON <= hsv.v);
-    TEST_ASSERT( HSV_EPSILON >= hsv.s);
-    TEST_ASSERT( HSV_EPSILON >= hsv.v);
-    /* Hue for black is undefined so we don't check it */
+        color_hsv_t hsv;
+        color_rgb2hsv(&rgb_o, &hsv);
+
+        /* XXX floats should never be compared for equality, so we check if we
+         * are within HSV_EPSILON of tolerance */
+        TEST_ASSERT(-HSV_EPSILON <= hsv.s - hsv_o.s);
+        TEST_ASSERT( HSV_EPSILON >= hsv.s - hsv_o.s);
+        TEST_ASSERT(-HSV_EPSILON <= hsv.v - hsv_o.v);
+        TEST_ASSERT( HSV_EPSILON >= hsv.v - hsv_o.v);
+        /* Hue for grey is undefined so we don't check it */
+        if (hsv.s >= 0.0001f) {
+            TEST_ASSERT(-HSV_EPSILON <= hsv.h - hsv_o.h);
+            TEST_ASSERT( HSV_EPSILON >= hsv.h - hsv_o.h);
+        }
+    }
+}
+
+static void test_hsv2rgb(void)
+{
+    struct { color_hsv_t hsv; color_rgb_t rgb; } h_r[] = {
+        { { 0, 0, 0 }, { 0, 0, 0 } },           /*Black*/
+        { { 0, 0, 100 }, { 255, 255, 255 } },   /*White*/
+        { { 0, 100, 100 }, { 255, 0, 0 } },     /*Red*/
+        { { 120, 100, 100 }, { 0, 255, 0 } },   /*Lime*/
+        { { 240, 100, 100 }, { 0, 0, 255 } },   /*Blue*/
+        { { 60, 100, 100 }, { 255, 255, 0 } },  /*Yellow*/
+        { { 180, 100, 100 }, { 0, 255, 255 } }, /*Cyan*/
+        { { 300, 100, 100 }, { 255, 0, 255 } }, /*Magenta*/
+        { { 0, 0, 75 }, { 191, 191, 191 } },    /*Silver*/
+        { { 0, 0, 50 }, { 128, 128, 128 } },    /*Gray*/
+        { { 0, 100, 50 }, { 128, 0, 0 } },      /*Maroon*/
+        { { 60, 100, 50 }, { 128, 128, 0 } },   /*Olive*/
+        { { 120, 100, 50 }, { 0, 128, 0 } },    /*Green*/
+        { { 300, 100, 50 }, { 128, 0, 128 } },  /*Purple*/
+        { { 180, 100, 50 }, { 0, 128, 128 } },  /*Teal*/
+        { { 240, 100, 50 }, { 0, 0, 128 } }     /*Navy*/
+    };
+    unsigned len = ARRAY_SIZE(h_r);
+
+    for (unsigned i = 0; i < len; i++) {
+        color_hsv_t hsv_o = { .h = h_r[i].hsv.h,
+                              .s = h_r[i].hsv.s / 100,
+                              .v = h_r[i].hsv.v / 100 };
+        color_rgb_t rgb_o = { .r = h_r[i].rgb.r,
+                              .g = h_r[i].rgb.g,
+                              .b = h_r[i].rgb.b };
+
+        color_rgb_t rgb;
+        color_hsv2rgb(&hsv_o, &rgb);
+
+        TEST_ASSERT(rgb.r <= rgb_o.r + 1 && rgb.r >= rgb_o.r - 1);
+        TEST_ASSERT(rgb.g <= rgb_o.g + 1 && rgb.g >= rgb_o.g - 1);
+        TEST_ASSERT(rgb.b <= rgb_o.b + 1 && rgb.b >= rgb_o.b - 1);
+
+    }
 }
 
 static void test_rgb_invert__success(void)
@@ -126,7 +199,8 @@ Test *tests_color_tests(void)
         new_TestFixture(test_hex2rgb__success),
         new_TestFixture(test_rgb2hex__success),
         new_TestFixture(test_rgb2str__success),
-        new_TestFixture(test_rgb2hsv__black),
+        new_TestFixture(test_rgb2hsv),
+        new_TestFixture(test_hsv2rgb),
         new_TestFixture(test_rgb_invert__success),
         new_TestFixture(test_rgb_complementary__success),
     };

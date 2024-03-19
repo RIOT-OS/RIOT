@@ -1,0 +1,57 @@
+From a3d05e68d8f5c3f0fb30cd4ab705d72174299d1e Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Tue, 21 Feb 2023 22:59:50 +0100
+Subject: [PATCH] lib: Fix compilation with -Wformat-nonliteral
+
+---
+ lib/atca_debug.c    | 4 ++--
+ lib/atca_debug.h    | 2 +-
+ lib/cryptoauthlib.h | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/lib/atca_debug.c b/lib/atca_debug.c
+index f1cf6d9..db77a51 100644
+--- a/lib/atca_debug.c
++++ b/lib/atca_debug.c
+@@ -39,11 +39,11 @@ ATCA_STATUS atca_trace(ATCA_STATUS status)
+     return status;
+ }
+ 
+-ATCA_STATUS atca_trace_msg(ATCA_STATUS status, const char * msg)
++ATCA_STATUS atca_trace_msg(ATCA_STATUS status, const char *file, unsigned line, const char * msg)
+ {
+     if (ATCA_SUCCESS != status)
+     {
+-        fprintf(g_trace_fp ? g_trace_fp : stderr, msg, status);
++        fprintf(g_trace_fp ? g_trace_fp : stderr, "%s:%u:%x:%s", file, line, status, msg);
+     }
+     return status;
+ }
+diff --git a/lib/atca_debug.h b/lib/atca_debug.h
+index fbe6847..94ca70d 100644
+--- a/lib/atca_debug.h
++++ b/lib/atca_debug.h
+@@ -6,6 +6,6 @@
+ void atca_trace_config(FILE* fp);
+ 
+ ATCA_STATUS atca_trace(ATCA_STATUS status);
+-ATCA_STATUS atca_trace_msg(ATCA_STATUS status, const char * msg);
++ATCA_STATUS atca_trace_msg(ATCA_STATUS status, const char *file, unsigned line, const char * msg);
+ 
+ #endif /* _ATCA_DEBUG_H */
+diff --git a/lib/cryptoauthlib.h b/lib/cryptoauthlib.h
+index 0839afd..962fe32 100644
+--- a/lib/cryptoauthlib.h
++++ b/lib/cryptoauthlib.h
+@@ -122,7 +122,7 @@
+ #define ATCA_TOSTRING(x) ATCA_STRINGIFY(x)
+ 
+ #ifdef ATCA_PRINTF
+-    #define ATCA_TRACE(s, m)         atca_trace_msg(s, __FILE__ ":" ATCA_TOSTRING(__LINE__) ":%x:" m "\n")
++    #define ATCA_TRACE(s, m)         atca_trace_msg(s, __FILE__, __LINE__, m "\n")
+ #else
+     #define ATCA_TRACE(s, m)         atca_trace(s)
+ #endif
+-- 
+2.39.2
+

@@ -24,6 +24,7 @@
 
 #ifndef ATMEGA_GPIO_H
 #define ATMEGA_GPIO_H
+#include <stddef.h>
 #include <stdio.h>
 
 #include <avr/interrupt.h>
@@ -37,11 +38,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#define ATMEGA_GPIO_BASE_PORT_A     (0x20)
-#define ATMEGA_GPIO_OFFSET_PORT_H   (0xCB)
-#define ATMEGA_GPIO_OFFSET_PIN_PORT (0x02)
-#define ATMEGA_GPIO_OFFSET_PIN_PIN  (0x03)
 
 /**
  * @brief     Extract the pin number of the given pin
@@ -60,22 +56,11 @@ static inline uint8_t atmega_port_num(gpio_t pin)
 }
 
 /**
- * @brief     Generate the PORTx address of the give pin.
+ * @brief     Generate the PINx address of the given pin.
  */
-static inline uint16_t atmega_port_addr(gpio_t pin)
+static inline uint16_t atmega_pin_addr(gpio_t pin)
 {
-    uint8_t port_num = atmega_port_num(pin);
-    uint16_t port_addr = port_num * ATMEGA_GPIO_OFFSET_PIN_PIN;
-
-    port_addr += ATMEGA_GPIO_BASE_PORT_A;
-    port_addr += ATMEGA_GPIO_OFFSET_PIN_PORT;
-
-#if defined (PORTG)
-    if (port_num > PORT_G) {
-        port_addr += ATMEGA_GPIO_OFFSET_PORT_H;
-    }
-#endif
-    return port_addr;
+    return (uintptr_t)atmega_gpio_port(atmega_port_num(pin));
 }
 
 /**
@@ -83,15 +68,15 @@ static inline uint16_t atmega_port_addr(gpio_t pin)
  */
 static inline uint16_t atmega_ddr_addr(gpio_t pin)
 {
-    return (atmega_port_addr(pin) - 0x01);
+    return atmega_pin_addr(pin) + offsetof(atmega_gpio_port_t, ddr);
 }
 
 /**
- * @brief     Generate the PINx address of the given pin.
+ * @brief     Generate the PORTx address of the give pin.
  */
-static inline uint16_t atmega_pin_addr(gpio_t pin)
+static inline uint16_t atmega_port_addr(gpio_t pin)
 {
-    return (atmega_port_addr(pin) - 0x02);
+    return atmega_pin_addr(pin) + offsetof(atmega_gpio_port_t, port);
 }
 
 #ifdef __cplusplus

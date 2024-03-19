@@ -107,6 +107,7 @@ UNEXPORTED_VARIABLES+=('FLASHER' 'FFLAGS')
 UNEXPORTED_VARIABLES+=('RESET' 'RESETFLAGS')
 UNEXPORTED_VARIABLES+=('DEBUGGER' 'DEBUGGER_FLAGS')
 UNEXPORTED_VARIABLES+=('DEBUGSERVER' 'DEBUGSERVER_FLAGS')
+UNEXPORTED_VARIABLES+=('DEBUGCLIENT' 'DEBUGCLIENT_FLAGS')
 UNEXPORTED_VARIABLES+=('PREFLASHER' 'PREFFLAGS' 'FLASHDEPS')
 UNEXPORTED_VARIABLES+=('OPENOCD_DEBUG_ADAPTER' 'DEBUG_ADAPTER_ID')
 UNEXPORTED_VARIABLES+=('PROGRAMMER_SERIAL')
@@ -261,7 +262,7 @@ checks_tests_application_not_defined_in_makefile() {
     patterns+=(-e '^[[:space:]]*APPLICATION[[:space:]:+]=')
 
     pathspec+=('tests/**/Makefile')
-    pathspec+=(':!tests/external_board_native/Makefile')
+    pathspec+=(':!tests/build_system/external_board_native/Makefile')
 
     git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
         | error_with_message "Don't define APPLICATION in test Makefile"
@@ -344,8 +345,48 @@ check_no_riot_config() {
     pathspec+=('**/Makefile*')
     pathspec+=('**/*.mk')
     pathspec+=(':!makefiles/kconfig.mk')
+    pathspec+=(':!makefiles/docker.inc.mk')
     git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
         | error_with_message "Don't push RIOT_CONFIG_* definitions upstream. Rather define configuration via Kconfig"
+}
+
+check_stderr_null() {
+    local patterns=()
+    local pathspec=()
+
+    patterns+=(-e '2>[[:blank:]]*&1[[:blank:]]*>[[:blank:]]*/dev/null')
+
+    pathspec+=('Makefile*')
+    pathspec+=('**/Makefile*')
+    pathspec+=('**/*.mk')
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
+        | error_with_message "Redirecting stderr and stdout to /dev/null is \`>/dev/null 2>&1\`; the other way round puts the old stderr to the new stdout."
+}
+
+# Test application directories that starts by the following strings are invalid
+# and should moved to the corresponding tests subdirectory.
+FORBIDDEN_TEST_DIRS=()
+FORBIDDEN_TEST_DIRS+=('build_system')
+FORBIDDEN_TEST_DIRS+=('core')       # => move under tests/core
+FORBIDDEN_TEST_DIRS+=('cpu')        # => move under tests/cpu
+FORBIDDEN_TEST_DIRS+=('driver')     # => move under tests/drivers
+FORBIDDEN_TEST_DIRS+=('gnrc')       # => move under tests/net
+FORBIDDEN_TEST_DIRS+=('periph')     # => move under tests/periph
+FORBIDDEN_TEST_DIRS+=('net')        # => move under tests/net
+FORBIDDEN_TEST_DIRS+=('pkg')        # => move under tests/pkg
+FORBIDDEN_TEST_DIRS+=('sys')        # => move under tests/sys
+FORBIDDEN_TEST_DIRS+=('vfs')        # => move under tests/sys
+FORBIDDEN_TEST_DIRS+=('xtimer')     # => move under tests/sys
+FORBIDDEN_TEST_DIRS+=('ztimer')     # => move under tests/sys
+
+check_tests_application_path() {
+    local patterns=()
+    patterns+=(-regex "^tests/bench_.*/Makefile")
+    for forbidden in "${FORBIDDEN_TEST_DIRS[@]}"; do
+        patterns+=(-o -regex "^tests/${forbidden}_.*/Makefile")
+    done
+
+    find tests/ -type f "${patterns[@]}" | error_with_message "Invalid application path in tests/"
 }
 
 error_on_input() {
@@ -368,6 +409,8 @@ all_checks() {
     check_no_usemodules_in_makefile_include
     check_no_pkg_source_local
     check_no_riot_config
+    check_stderr_null
+    check_tests_application_path
 }
 
 main() {

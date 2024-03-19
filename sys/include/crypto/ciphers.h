@@ -23,7 +23,7 @@
 #define CRYPTO_CIPHERS_H
 
 #include <stdint.h>
-#include "kernel_defines.h"
+#include "modules.h"
 
 #ifdef __cplusplus
 extern "C" {

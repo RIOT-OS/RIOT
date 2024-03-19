@@ -14,3 +14,8 @@ config MODULE_HIH6130
     help
         Device driver for Honeywell HumidIcon Digital Humidity/Temperature
         Sensors: HIH-6130/6131 Series.
+
+config HAVE_HIH6130
+    bool
+    help
+        Indicates that a HIH6130 humidity and temperature sensor is present.

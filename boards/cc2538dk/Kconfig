@@ -19,3 +19,5 @@ config BOARD_CC2538DK
     select HAS_PERIPH_UART
     select HAS_EMULATOR_RENODE
     select HAS_RIOTBOOT
+
+    select HAVE_CC2538_RF

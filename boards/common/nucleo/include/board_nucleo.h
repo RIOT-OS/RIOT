@@ -37,7 +37,7 @@ extern "C" {
 #define XTIMER_WIDTH                (16)
 #endif
 
-#if defined(CPU_FAM_STM32G0)
+#if defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32C0)
 #define XTIMER_WIDTH                (16)
 #endif
 
@@ -54,11 +54,6 @@ extern "C" {
 #define XTIMER_BACKOFF              (8)
 #endif
 /** @} */
-
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

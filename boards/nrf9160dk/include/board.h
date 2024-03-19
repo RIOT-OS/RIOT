@@ -34,8 +34,10 @@ extern "C" {
  */
 #define CLOCK_HFCLK         (32U)           /**< set to  0: internal RC oscillator
                                              *        32: 32MHz crystal */
-#define CLOCK_LFCLK         (3)             /**< set to  0: internal RC oscillator
-                                             *         3: High Accuracy oscillator */
+/* LFCLK Source clock selection:*/
+/* - CLOCK_LFCLKSRC_SRC_LFRC: 32.768 kHz RC oscillator
+ * - CLOCK_LFCLKSRC_SRC_LFXO: 32.768 kHz crystal oscillator */
+#define CLOCK_LFCLK         (CLOCK_LFCLKSRC_SRC_LFXO) /**< LFCLK Source */
 /** @} */
 
 /**
@@ -86,9 +88,12 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Initialize the platform
+ * @name    WS281x RGB LED configuration
+ * @{
  */
-void board_init(void);
+#define WS281X_TIMER_DEV    TIMER_DEV(1)            /**< Timer device */
+#define WS281X_TIMER_MAX_VALUE TIMER_1_MAX_VALUE    /**< Timer max value */
+/** @} */
 
 #ifdef __cplusplus
 }

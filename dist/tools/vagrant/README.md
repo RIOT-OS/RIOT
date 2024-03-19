@@ -3,7 +3,7 @@
 
 ## About
 This repository includes a [Vagrantfile](https://github.com/RIOT-OS/RIOT/blob/master/Vagrantfile)
-to download and control a pre-configured Linux virtual machine (VM) based on an Ubuntu 16.04 (64-bit) image that contains all necessary toolchains and dependencies to build and flash compatible devices with RIOT.
+to download and control a pre-configured Linux virtual machine (VM) based on an Ubuntu 18.04 (64-bit) image that contains all necessary toolchains and dependencies to build and flash compatible devices with RIOT.
 The advantage of using this VM is to have a reproducible, portable and even disposable environment
 that can be used to develop for RIOT with decreased setup times and without the requirement of
 making changes to the underlying host system.

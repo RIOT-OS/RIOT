@@ -5,5 +5,9 @@ USEMODULE += mynewt-core
 
 DEFAULT_MODULE += auto_init_mynewt-core
 
+ifneq (,$(filter mynewt-core_nrf5x_hal,$(USEMODULE)))
+  USEPKG += nrfx
+endif
+
 # esp frequency is not pow2 so is incompatible with os_cputime
 FEATURES_BLACKLIST += arch_esp

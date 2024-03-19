@@ -97,7 +97,11 @@ extern "C" {
  * @brief The maximum number of threads to be scheduled
  */
 #ifndef MAXTHREADS
+#if defined(MODULE_CORE_THREAD)
 #define MAXTHREADS 32
+#else
+#define MAXTHREADS 0
+#endif
 #endif
 
 /**
@@ -180,7 +184,7 @@ typedef enum {
  */
 #define STATUS_ON_RUNQUEUE      STATUS_RUNNING  /**< to check if on run queue:
                                                    `st >= STATUS_ON_RUNQUEUE`   */
-#define STATUS_NOT_FOUND ((thread_status_t)-1)  /**< Describes an illegal thread status */
+#define STATUS_NOT_FOUND ((thread_status_t)~0)  /**< Describes an illegal thread status */
 /** @} */
 /**
  * @def SCHED_PRIO_LEVELS

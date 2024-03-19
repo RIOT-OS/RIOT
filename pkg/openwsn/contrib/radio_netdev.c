@@ -102,8 +102,6 @@ int openwsn_radio_init(void *radio_dev)
     enable = NETOPT_ENABLE;
     netdev->driver->set(netdev, NETOPT_RX_START_IRQ, &(enable), sizeof(enable));
     enable = NETOPT_ENABLE;
-    netdev->driver->set(netdev, NETOPT_RX_END_IRQ, &(enable), sizeof(enable));
-    enable = NETOPT_ENABLE;
     netdev->driver->set(netdev, NETOPT_TX_END_IRQ, &(enable), sizeof(enable));
     enable = NETOPT_DISABLE;
     /* Enable basic mode, no AUTOACK. no CSMA , no frame filtering */

@@ -3,5 +3,5 @@ INCLUDES += -I$(PKGDIRBASE)/emlearn/emlearn
 CFLAGS += -Wno-unused-parameter
 
 # There's nothing to build in this package, it's used as a header only library.
-# So it's declated as a pseudo-module
+# So it's declared as a pseudo-module
 PSEUDOMODULES += emlearn

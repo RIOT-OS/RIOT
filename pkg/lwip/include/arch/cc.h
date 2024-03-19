@@ -29,6 +29,7 @@
 #include "mutex.h"
 
 #ifdef MODULE_LOG
+#define LOG_LEVEL LOG_INFO
 #include "log.h"
 #endif
 

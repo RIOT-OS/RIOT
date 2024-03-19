@@ -1,0 +1,5 @@
+CPU_MODEL = stm32f103cb
+
+FEATURES_PROVIDED += highlevel_stdio
+
+include $(RIOTBOARD)/common/blxxxpill/Makefile.features

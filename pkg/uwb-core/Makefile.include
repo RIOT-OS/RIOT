@@ -20,7 +20,7 @@ PSEUDOMODULES += uwb-core_rng_trx_info
 DIRS += $(RIOTPKG)/uwb-core/contrib \
         #
 
-ifneq (,$(filter uwb-core_uwb_rng_trx_info,$(USEMODULE)))
+ifneq (,$(filter uwb-core_rng_trx_info,$(USEMODULE)))
  # Enable RX diagnostics
- CFLAGS += -DDW1000_RX_DIAGNOSTIC=1
+ CFLAGS += -DCONFIG_DW1000_RX_DIAGNOSTIC=1
 endif

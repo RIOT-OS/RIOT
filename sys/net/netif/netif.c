@@ -14,10 +14,12 @@
  */
 
 #include <assert.h>
+#include <errno.h>
+#include <stdio.h>
 #include <string.h>
 
-#include "errno.h"
 #include "irq.h"
+#include "kernel_defines.h"
 #include "net/netif.h"
 #include "utlist.h"
 
@@ -91,4 +93,52 @@ __attribute__((weak)) netif_t *netif_get_by_id(int16_t id)
     return NULL;
 }
 
+ssize_t netifs_get_ipv6(ipv6_addr_t *dest, size_t numof)
+{
+    ssize_t result = 0;
+    netif_t *netif = NULL;
+    while (((netif = netif_iter(netif)) != NULL) && (numof > 0)) {
+        ssize_t addrs_numof = netif_get_ipv6(netif, dest, numof);
+        if (addrs_numof <= 0) {
+            continue;
+        }
+        result += addrs_numof;
+        dest += addrs_numof;
+        numof -= addrs_numof;
+    }
+
+    return result;
+}
+
+#ifndef NETIF_PRINT_IPV6_NUMOF
+#define NETIF_PRINT_IPV6_NUMOF 4
+#endif
+
+void netif_print_ipv6(netif_t *netif, const char *separator)
+{
+    ipv6_addr_t addrs[NETIF_PRINT_IPV6_NUMOF];
+    ssize_t num = netif_get_ipv6(netif, addrs, ARRAY_SIZE(addrs));
+    if (num > 0) {
+        ipv6_addrs_print(addrs, num, separator);
+    }
+}
+
+void netifs_print_ipv6(const char *separator)
+{
+    netif_t *netif = 0;
+    bool first = true;
+    while ((netif = netif_iter(netif)) != NULL) {
+        ipv6_addr_t addrs[NETIF_PRINT_IPV6_NUMOF];
+        ssize_t num = netif_get_ipv6(netif, addrs, ARRAY_SIZE(addrs));
+        if (num > 0) {
+            if (first) {
+                first = false;
+            }
+            else {
+                printf("%s", separator);
+            }
+            ipv6_addrs_print(addrs, num, separator);
+        }
+    }
+}
 /** @} */

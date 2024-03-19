@@ -31,6 +31,7 @@ extern "C" {
 
 #include <stdbool.h>
 
+#include "can/device.h"
 #include "can/candev.h"
 #include "mutex.h"
 

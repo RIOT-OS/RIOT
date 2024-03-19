@@ -157,7 +157,7 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint32_t BOD33RDY:1;       /*!< bit:      9  BOD33 Ready                        */
     __I uint32_t BOD33DET:1;       /*!< bit:     10  BOD33 Detection                    */
     __I uint32_t B33SRDY:1;        /*!< bit:     11  BOD33 Synchronization Ready        */
-    __I uint32_t :20;              /*!< bit: 12..31  Reserved                           */
+    uint32_t :20;                  /*!< bit: 12..31  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   uint32_t reg;                /*!< Type      used for register access              */
 } SYSCTRL_INTFLAG_Type;

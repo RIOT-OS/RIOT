@@ -16,6 +16,8 @@
  * @brief       Implementation for the flashpage memory driver
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
+ * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
+ * @author      Fabian Hüßler <fabian.huessler@st.ovgu.de>
  * @}
  */
 
@@ -26,79 +28,126 @@
 #include "architecture.h"
 #include "cpu.h"
 #include "cpu_conf.h"
+#include "macros/utils.h"
 #include "mtd_flashpage.h"
 #include "periph/flashpage.h"
 
-#define MTD_FLASHPAGE_END_ADDR     ((uint32_t) CPU_FLASH_BASE + (FLASHPAGE_NUMOF * FLASHPAGE_SIZE))
+#define ENABLE_DEBUG 0
+#include "debug.h"
+
+#define MTD_FLASHPAGE_END_ADDR     ((uintptr_t) CPU_FLASH_BASE + (FLASHPAGE_NUMOF * FLASHPAGE_SIZE))
 
 static int _init(mtd_dev_t *dev)
 {
-    (void)dev;
+    mtd_flashpage_t *super = container_of(dev, mtd_flashpage_t, base);
+    (void)super;
     assert(dev->pages_per_sector * dev->page_size == FLASHPAGE_SIZE);
+    assert(!(super->offset % dev->pages_per_sector));
+
+    /* Use separate variable to avoid '>= 0 is always true' warning */
+    static const uintptr_t cpu_flash_base = CPU_FLASH_BASE;
+
+    assert((uintptr_t)flashpage_addr(super->offset / dev->pages_per_sector) >= cpu_flash_base);
+    assert((uintptr_t)flashpage_addr(super->offset / dev->pages_per_sector)
+           + dev->pages_per_sector * dev->page_size * dev->sector_count <= MTD_FLASHPAGE_END_ADDR);
+    assert((uintptr_t)flashpage_addr(super->offset / dev->pages_per_sector)
+           + dev->pages_per_sector * dev->page_size * dev->sector_count > cpu_flash_base);
     return 0;
 }
 
-static int _read(mtd_dev_t *dev, void *buf, uint32_t addr, uint32_t size)
+static int _read_page(mtd_dev_t *dev, void *buf, uint32_t page,
+                      uint32_t offset, uint32_t size)
 {
-    assert(addr < MTD_FLASHPAGE_END_ADDR);
+    mtd_flashpage_t *super = container_of(dev, mtd_flashpage_t, base);
 
-    (void)dev;
+    assert(page + super->offset >= page);
+    page += super->offset;
+
+    /* mtd flashpage maps multiple pages to one virtual sector for unknown reason */
+    uint32_t fpage = page / dev->pages_per_sector;
+    offset += (page % dev->pages_per_sector) * dev->page_size;
+    uintptr_t addr = (uintptr_t)flashpage_addr(fpage);
+
+    addr += offset;
+
+    DEBUG("flashpage: read %"PRIu32" bytes from %p to %p\n", size, (void *)addr, buf);
 
 #ifndef CPU_HAS_UNALIGNED_ACCESS
     if (addr % sizeof(uword_t)) {
-        return -EINVAL;
+        uword_t tmp;
+
+        offset = addr % sizeof(uword_t);
+        size = MIN(size, sizeof(uword_t) - offset);
+
+        DEBUG("flashpage: read %"PRIu32" unaligned bytes\n", size);
+
+        memcpy(&tmp, (uint8_t *)addr - offset, sizeof(tmp));
+        memcpy(buf, (uint8_t *)&tmp + offset, size);
+        return size;
     }
 #endif
 
-    uword_t dst_addr = addr;
-    memcpy(buf, (void *)dst_addr, size);
-
-    return 0;
+    memcpy(buf, (void *)addr, size);
+    return size;
 }
 
-static int _write(mtd_dev_t *dev, const void *buf, uint32_t addr, uint32_t size)
+static int _write_page(mtd_dev_t *dev, const void *buf, uint32_t page, uint32_t offset,
+                       uint32_t size)
 {
-    (void)dev;
+    mtd_flashpage_t *super = container_of(dev, mtd_flashpage_t, base);
 
-#ifndef CPU_HAS_UNALIGNED_ACCESS
-    if ((uintptr_t)buf % sizeof(uword_t)) {
-        return -EINVAL;
-    }
-#endif
-    if (addr % FLASHPAGE_WRITE_BLOCK_ALIGNMENT) {
-        return -EINVAL;
-    }
-    if (size % FLASHPAGE_WRITE_BLOCK_SIZE) {
-        return -EOVERFLOW;
-    }
-    if (addr + size > MTD_FLASHPAGE_END_ADDR) {
-        return -EOVERFLOW;
+    assert(page + super->offset >= page);
+
+    page += super->offset;
+
+    /* mtd flashpage maps multiple pages to one virtual sector for unknown reason */
+    uint32_t fpage = page / dev->pages_per_sector;
+    offset += (page % dev->pages_per_sector) * dev->page_size;
+    uintptr_t addr = (uintptr_t)flashpage_addr(fpage);
+
+    addr += offset;
+
+    DEBUG("flashpage: write %"PRIu32" bytes from %p to %p\n", size, buf, (void *)addr);
+
+    size = MIN(flashpage_size(fpage) - offset, size);
+
+    if ((addr % FLASHPAGE_WRITE_BLOCK_ALIGNMENT) || (size < FLASHPAGE_WRITE_BLOCK_SIZE) ||
+        ((uintptr_t)buf % FLASHPAGE_WRITE_BLOCK_ALIGNMENT)) {
+        uint8_t tmp[FLASHPAGE_WRITE_BLOCK_SIZE]
+                __attribute__ ((aligned (FLASHPAGE_WRITE_BLOCK_ALIGNMENT)));
+
+        offset = addr % FLASHPAGE_WRITE_BLOCK_ALIGNMENT;
+        size = MIN(size, FLASHPAGE_WRITE_BLOCK_SIZE - offset);
+
+        DEBUG("flashpage: write %"PRIu32" at %p - ""%"PRIu32"\n", size, (void *)addr, offset);
+
+        memcpy(&tmp[0], (uint8_t *)addr - offset, sizeof(tmp));
+        memcpy(&tmp[offset], buf, size);
+
+        flashpage_write((uint8_t *)addr - offset, tmp, sizeof(tmp));
+
+        return size;
     }
 
-    uword_t dst_addr = addr;
-    flashpage_write((void *)dst_addr, buf, size);
+    /* don't write less than the write block size */
+    size &= ~(FLASHPAGE_WRITE_BLOCK_SIZE - 1);
 
-    return 0;
+    flashpage_write((void *)addr, buf, size);
+    return size;
 }
 
-int _erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)
+static int _erase_sector(mtd_dev_t *dev, uint32_t sector, uint32_t count)
 {
-    size_t sector_size = dev->page_size * dev->pages_per_sector;
+    mtd_flashpage_t *super = container_of(dev, mtd_flashpage_t, base);
 
-    if (size % sector_size) {
+    if (sector + (super->offset / dev->pages_per_sector) < sector) {
         return -EOVERFLOW;
     }
-    if (addr + size > MTD_FLASHPAGE_END_ADDR) {
-        return -EOVERFLOW;
-    }
-    if (addr % sector_size) {
-        return -EOVERFLOW;
-    }
+    sector += (super->offset / dev->pages_per_sector);
 
-    uword_t dst_addr = addr;
-
-    for (size_t i = 0; i < size; i += sector_size) {
-        flashpage_erase(flashpage_page((void *)(dst_addr + i)));
+    while (count--) {
+        DEBUG("flashpage: erase sector %"PRIu32"\n", sector);
+        flashpage_erase(sector++);
     }
 
     return 0;
@@ -106,7 +155,7 @@ int _erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)
 
 const mtd_desc_t mtd_flashpage_driver = {
     .init = _init,
-    .read = _read,
-    .write = _write,
-    .erase = _erase,
+    .read_page = _read_page,
+    .write_page = _write_page,
+    .erase_sector = _erase_sector,
 };

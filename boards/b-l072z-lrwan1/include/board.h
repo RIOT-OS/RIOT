@@ -54,33 +54,17 @@ extern "C" {
  * @name    LED pin definitions and handlers
  * @{
  */
-#define LED0_PIN            GPIO_PIN(PORT_A, 5)
-#define LED0_MASK           (1 << 5)
+#define LED0_PIN_NUM        5
+#define LED0_PORT_NUM       PORT_A
 
-#define LED0_ON             (GPIOA->BSRR = LED0_MASK)
-#define LED0_OFF            (GPIOA->BSRR = (LED0_MASK << 16))
-#define LED0_TOGGLE         (GPIOA->ODR  ^= LED0_MASK)
+#define LED1_PIN_NUM        5
+#define LED1_PORT_NUM       PORT_B
 
-#define LED1_PIN            GPIO_PIN(PORT_B, 5)
-#define LED1_MASK           (1 << 5)
+#define LED2_PIN_NUM        6
+#define LED2_PORT_NUM       PORT_B
 
-#define LED1_ON             (GPIOB->BSRR = LED1_MASK)
-#define LED1_OFF            (GPIOB->BSRR = (LED1_MASK << 16))
-#define LED1_TOGGLE         (GPIOB->ODR  ^= LED1_MASK)
-
-#define LED2_PIN            GPIO_PIN(PORT_B, 6)
-#define LED2_MASK           (1 << 6)
-
-#define LED2_ON             (GPIOB->BSRR = LED2_MASK)
-#define LED2_OFF            (GPIOB->BSRR = (LED2_MASK << 16))
-#define LED2_TOGGLE         (GPIOB->ODR  ^= LED2_MASK)
-
-#define LED3_PIN            GPIO_PIN(PORT_B, 7)
-#define LED3_MASK           (1 << 7)
-
-#define LED3_ON             (GPIOB->BSRR = LED3_MASK)
-#define LED3_OFF            (GPIOB->BSRR = (LED3_MASK << 16))
-#define LED3_TOGGLE         (GPIOB->ODR  ^= LED3_MASK)
+#define LED3_PIN_NUM        7
+#define LED3_PORT_NUM       PORT_B
 /** @} */
 
 /**
@@ -91,14 +75,11 @@ extern "C" {
 #define BTN0_MODE           GPIO_IN_PU              /**< User button pin mode */
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif
+
+#include "stm32_leds.h"
 
 #endif /* BOARD_H */
 /** @} */

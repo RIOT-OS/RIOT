@@ -10,3 +10,8 @@ config MODULE_APA102
     depends on HAS_PERIPH_GPIO
     depends on TEST_KCONFIG
     select MODULE_PERIPH_GPIO
+
+config HAVE_APA102
+    bool
+    help
+        Indicates that the APA102 RGB LED is present.

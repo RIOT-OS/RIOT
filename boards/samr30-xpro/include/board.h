@@ -62,7 +62,6 @@ extern "C" {
  * @name    BTN0 (SW0 Button) pin definitions
  * @{
  */
-#define BTN0_PORT                   PORT->Group[0]
 #define BTN0_PIN                    GPIO_PIN(PA, 28)
 #define BTN0_MODE                   GPIO_IN_PU
 /** @} */
@@ -91,11 +90,6 @@ enum {
 #define RFCTL_ANTENNA_DEFAULT      RFCTL_ANTENNA_BOARD
 #endif
 /** @} */
-
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 /**
  * @brief   Set antenna switch

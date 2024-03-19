@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
 Command line utility to check if only a subset of board / application combinations
 need to be build in the CI
@@ -24,7 +24,7 @@ OTHER_CLASSIFIERS = [
     [re.compile(r"^(.*\.cff|doc\/.*|.*\.md|.*\.txt)$"), "doc"],
     [re.compile(r"^(CODEOWNERS|.mailmap|.gitignore|.github\/.*)$"), "git"],
     [re.compile(r"^(\.murdock|dist\/ls\/.*|\.drone.yml)$"), "ci-murdock"],
-    [re.compile(r"^(\.bandit|\.circleci\/.*|\.drone.yml)$"), "ci-other"],
+    [re.compile(r"^(\.bandit|\.drone.yml)$"), "ci-other"],
     [re.compile(r"^(dist\/.*|Vagrantfile)$"), "tools"],
 ]
 
@@ -73,6 +73,12 @@ class ChangeSet:
         while module != "":
             makefile = os.path.join(self._riotbase, module, "Makefile")
             if os.path.isfile(makefile) or module in EXCEPTION_MODULES:
+
+                # map all tests/unittests/* to just tests/unittests
+                # workaround for #18987
+                if module.startswith("tests/unittests/"):
+                    module = "tests/unittests"
+
                 if module in dest:
                     dest[module].append(file)
                 else:

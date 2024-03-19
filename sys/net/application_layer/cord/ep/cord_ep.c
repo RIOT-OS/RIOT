@@ -151,8 +151,10 @@ static int _update_remove(unsigned code, gcoap_resp_handler_t handle)
     ssize_t pkt_len = coap_opt_finish(&pkt, COAP_OPT_FINISH_NONE);
 
     /* send request */
-    gcoap_req_send(buf, pkt_len, &_rd_remote, handle, NULL);
-
+    ssize_t send_len = gcoap_req_send(buf, pkt_len, &_rd_remote, handle, NULL);
+    if (send_len <= 0) {
+        return CORD_EP_ERR;
+    }
     /* synchronize response */
     return _sync();
 }
@@ -224,7 +226,7 @@ static int _discover_internal(const sock_udp_ep_t *remote,
     coap_opt_add_uri_query(&pkt, "rt", "core.rd");
     size_t pkt_len = coap_opt_finish(&pkt, COAP_OPT_FINISH_NONE);
     res = gcoap_req_send(buf, pkt_len, remote, _on_discover, NULL);
-    if (res < 0) {
+    if (res <= 0) {
         return CORD_EP_ERR;
     }
     return _sync();
@@ -286,7 +288,7 @@ int cord_ep_register(const sock_udp_ep_t *remote, const char *regif)
 
     /* add the resource description as payload */
     res = gcoap_get_resource_list(pkt.payload, pkt.payload_len,
-                                  COAP_FORMAT_LINK);
+                                  COAP_FORMAT_LINK, GCOAP_SOCKET_TYPE_UNDEF);
     if (res < 0) {
         retval = CORD_EP_ERR;
         goto end;
@@ -295,7 +297,7 @@ int cord_ep_register(const sock_udp_ep_t *remote, const char *regif)
 
     /* send out the request */
     res = gcoap_req_send(buf, pkt_len, remote, _on_register, NULL);
-    if (res < 0) {
+    if (res <= 0) {
         retval = CORD_EP_ERR;
         goto end;
     }

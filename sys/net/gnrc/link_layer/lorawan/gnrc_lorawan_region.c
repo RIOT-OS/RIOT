@@ -12,18 +12,16 @@
  * @file
  * @author  José Ignacio Alamos <jose.alamos@haw-hamburg.de>
  */
-#include "kernel_defines.h"
 #include "bitarithm.h"
-#include "random.h"
+#include "kernel_defines.h"
+#include "macros/utils.h"
 #include "net/gnrc/lorawan/region.h"
+#include "random.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define GNRC_LORAWAN_DATARATES_NUMOF (6U)
-
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
 
 static uint8_t dr_sf[GNRC_LORAWAN_DATARATES_NUMOF] =
 { LORA_SF12, LORA_SF11, LORA_SF10, LORA_SF9, LORA_SF8, LORA_SF7 };
@@ -38,7 +36,7 @@ int gnrc_lorawan_set_dr(gnrc_lorawan_t *mac, uint8_t datarate)
     if (!gnrc_lorawan_validate_dr(datarate)) {
         return -EINVAL;
     }
-    DEBUG("gnrc_lorawan_region: Data Rate: DR%u \n",datarate);
+    DEBUG("gnrc_lorawan_region: Data Rate: DR%u \n", datarate);
     uint8_t bw = dr_bw[datarate];
     uint8_t sf = dr_sf[datarate];
 
@@ -60,6 +58,7 @@ uint8_t gnrc_lorawan_rx1_get_dr_offset(uint8_t dr_up, uint8_t dr_offset)
 {
     DEBUG("gnrc_lorawan_region: RX1DRoffset: %u \n", dr_offset);
     int dr_eff = dr_offset > 5 ? 5 - dr_offset : dr_offset;
+
     return MIN(5, MAX(0, dr_up - dr_eff));
 }
 #endif
@@ -72,7 +71,7 @@ int gnrc_lorawan_phy_set_channel_mask(gnrc_lorawan_t *mac, uint16_t channel_mask
 
     for (int n = channel_mask, i = 0; n; n = n >> 1, i++) {
         if ((n & 0x1) && !mac->channel[i]) {
-           return -EINVAL;
+            return -EINVAL;
         }
     }
 
@@ -96,7 +95,7 @@ void gnrc_lorawan_channels_init(gnrc_lorawan_t *mac)
     }
 }
 
-uint32_t gnrc_lorawan_pick_channel(gnrc_lorawan_t *mac)
+uint8_t gnrc_lorawan_pick_channel(gnrc_lorawan_t *mac)
 {
     uint8_t index = 0;
 
@@ -106,7 +105,8 @@ uint32_t gnrc_lorawan_pick_channel(gnrc_lorawan_t *mac)
     for (int i = 0; i < pos + 1; i++) {
         state = bitarithm_test_and_clear(state, &index);
     }
-    return mac->channel[index];
+
+    return index;
 }
 
 void gnrc_lorawan_process_cflist(gnrc_lorawan_t *mac, uint8_t *cflist)

@@ -21,10 +21,6 @@
 #include "cpu.h"
 #include "periph_conf.h"
 
-#define CLOCK_AHB            CLOCK_CORECLOCK /* Equal to the CPU clock */
-#define CLOCK_APB1           CLOCK_AHB/2     /* Half AHB clock */
-#define CLOCK_APB2           CLOCK_AHB       /* Equal to the AHB clock */
-
 #define CLOCK_AHB_DIV        0          /* Max speed at 108 MHz */
 #define CLOCK_APB1_DIV       (0x04 | 0) /* Max speed at 54 MHz */
 #define CLOCK_APB2_DIV       (0x0 | 0)  /* Max speed at 108 MHz */
@@ -34,12 +30,20 @@
 #define CLOCK_APB2_DIV_CONF  (CLOCK_APB2_DIV << RCU_CFG0_APB2PSC_Pos)
 
 #define PREDV0_CONF          1  /* Divide by 2 */
+#ifdef CONFIG_BOARD_HAS_HXTAL
 #define PLL_MULT_FACTOR      (CLOCK_CORECLOCK / \
-                                (CLOCK_HXTAL / (PREDV0_CONF + 1)) - 1)
+                                (CONFIG_CLOCK_HXTAL / (PREDV0_CONF + 1)) - 1)
+#else
+#define PLL_MULT_FACTOR      (CLOCK_CORECLOCK / (MHZ(8) / 2 ) - 1)
+#endif
 
 #define RCU_CFG0_SCS_IRC8    (0 << RCU_CFG0_SCS_Pos)
 #define RCU_CFG0_SCS_HXTAL   (1 << RCU_CFG0_SCS_Pos)
 #define RCU_CFG0_SCS_PLL     (2 << RCU_CFG0_SCS_Pos)
+
+#define RCU_CFG0_SCSS_IRC8   (0 << RCU_CFG0_SCSS_Pos)
+#define RCU_CFG0_SCSS_HXTAL  (1 << RCU_CFG0_SCSS_Pos)
+#define RCU_CFG0_SCSS_PLL    (2 << RCU_CFG0_SCSS_Pos)
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -115,24 +119,31 @@ void gd32vf103_clock_init(void)
      * configure the AHB and APB clock dividers as configure by the board */
     RCU->CFG0 = (RCU_CFG0_SCS_IRC8 | CLOCK_AHB_DIV_CONF |
                  CLOCK_APB1_DIV_CONF | CLOCK_APB2_DIV_CONF);
-    while ((RCU->CFG0 & RCU_CFG0_SCSS_Msk) !=
-           (RCU_CFG0_SCS_IRC8 << RCU_CFG0_SCSS_Pos)) {}
+    while ((RCU->CFG0 & RCU_CFG0_SCSS_Msk) != RCU_CFG0_SCSS_IRC8) {}
 
     /* disable all active clocks except IRC8 -> resets the clk configuration */
-    RCU->CTL = (RCU_CTL_IRC8MEN_Msk);
+    RCU->CTL &= (RCU_CTL_IRC8MCALIB_Msk | RCU_CTL_IRC8MADJ_Msk);
+    RCU->CTL |= RCU_CTL_IRC8MEN_Msk;
+
+    /* reset PLL multiplier, required when configured before, e.g. in riotboot */
+    RCU->CFG0 &= ~(RCU_CFG0_PLLMF_3_0_Msk | RCU_CFG0_PLLMF_4_Msk);
 
     if (IS_ACTIVE(CONFIG_BOARD_HAS_HXTAL)) {
+        /* if the board has an HXTAL, HXTAL is used as PLL input and PREDEV0 is set */
         cpu_reg_enable_bits(&RCU->CTL, RCU_CTL_HXTALEN_Msk);
         while (!(RCU->CTL & RCU_CTL_HXTALSTB_Msk)) {}
+
+        RCU->CFG1 = PREDV0_CONF;
+        RCU->CFG0 |= RCU_CFG0_PLLSEL_Msk;
     }
-
-    RCU->CFG1 = (PREDV0_CONF);
-
-    RCU->CFG0 |= (CLOCK_HXTAL << RCU_CFG0_PLLSEL_Pos) |
-                 ((PLL_MULT_FACTOR & 0xf) << RCU_CFG0_PLLMF_3_0_Pos) |
+    else {
+        /* if the board doesn't have HXTAL, IRCM8/2 is used as PLL input */
+        RCU->CFG0 &= ~RCU_CFG0_PLLSEL_Msk;
+    }
+    RCU->CFG0 |= ((PLL_MULT_FACTOR & 0xf) << RCU_CFG0_PLLMF_3_0_Pos) |
                  ((PLL_MULT_FACTOR & 0x10) << (RCU_CFG0_PLLMF_4_Pos - 4));
 
-    RCU->CTL |= (RCU_CTL_PLLEN_Msk);
+    RCU->CTL |= RCU_CTL_PLLEN_Msk;
 
     /* Wait for PLL to stabilize */
     while ((RCU->CTL & RCU_CTL_PLLSTB_Msk) != RCU_CTL_PLLSTB_Msk) {}
@@ -142,8 +153,12 @@ void gd32vf103_clock_init(void)
 
     RCU->AHBEN &= ~RCU_AHBEN_FMCSPEN_Msk;
 
-    while ((RCU->CFG0 & RCU_CFG0_SCSS_Msk) !=
-           (RCU_CFG0_SCS_PLL << RCU_CFG0_SCSS_Pos)) {}
-    gd32v_disable_irc8();
+    while ((RCU->CFG0 & RCU_CFG0_SCSS_Msk) != RCU_CFG0_SCSS_PLL) {}
+
+    if (IS_ACTIVE(CONFIG_BOARD_HAS_HXTAL)) {
+        /* disable IRCM8 clock if HXTAL is used */
+        gd32v_disable_irc8();
+    }
+
     irq_restore(is);
 }

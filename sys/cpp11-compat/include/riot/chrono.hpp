@@ -12,7 +12,7 @@
  *
  * @file
  * @brief  C++11 chrono drop in replacement that adds the function now based on
- *         xtimer/timex
+ *         ztimer/timex
  * @see    <a href="http://en.cppreference.com/w/cpp/thread/thread">
  *           std::thread, defined in header thread
  *         </a>
@@ -29,13 +29,10 @@
 #include <algorithm>
 
 #include "time.h"
-#include "xtimer.h"
+#include "timex.h"
+#include "ztimer64.h"
 
 namespace riot {
-
-namespace {
-constexpr uint32_t microsecs_in_sec = 1000000;
-} // namespace anaonymous
 
 /**
  * @brief A time point for timed wait, as clocks from the standard are not
@@ -93,9 +90,9 @@ class time_point {
  private:
   timex_t m_handle;
   void inline adjust_overhead() {
-    auto secs = m_handle.microseconds / microsecs_in_sec;
+    auto secs = m_handle.microseconds / US_PER_SEC;
     m_handle.seconds += secs;
-    m_handle.microseconds -= (secs * microsecs_in_sec);
+    m_handle.microseconds -= (secs * US_PER_SEC);
   }
 };
 
@@ -106,7 +103,7 @@ class time_point {
  */
 inline time_point now() {
   timex_t tp;
-  xtimer_now_timex(&tp);
+  tp = timex_from_uint64(ztimer64_now(ZTIMER64_USEC));
   return time_point(std::move(tp));
 }
 

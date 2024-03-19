@@ -1,0 +1,9 @@
+USEMODULE += nrf53_vectors
+USEMODULE += nrf_shared_serial_irq
+
+ifneq (,$(filter periph_spi,$(USEMODULE)))
+  USEMODULE += periph_spi_gpio_mode
+endif
+
+include $(RIOTCPU)/nrf5x_common/Makefile.dep
+include $(RIOTCPU)/cortexm_common/Makefile.dep

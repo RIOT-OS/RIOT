@@ -94,6 +94,8 @@ static const uart_conf_t uart_config[] = {
         .gclk_src = SAM0_GCLK_MAIN,
     },
     {    /* EXT1 */
+        /* For SAML11, see boards/saml11/doc.txt
+         * to properly enable this SERCOM */
         .dev      = &SERCOM1->USART,
         .rx_pin   = GPIO_PIN(PA, 9),
         .tx_pin   = GPIO_PIN(PA, 8),
@@ -239,7 +241,7 @@ static const i2c_conf_t i2c_config[] = {
 
 static const adc_conf_chan_t adc_channels[] = {
     /* port, pin, muxpos */
-    {GPIO_PIN(PA, 10), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN8)},
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA10 },
 };
 
 #define ADC_NUMOF                           ARRAY_SIZE(adc_channels)

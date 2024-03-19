@@ -20,14 +20,18 @@
  */
 #include <string.h>
 
+#include "architecture.h"
 #include "kernel_defines.h"
 #include "log.h"
+#include "xfa.h"
 
 #include "suit.h"
 #include "suit/storage.h"
 #include "suit/storage/flashwrite.h"
 #include "riotboot/flashwrite.h"
 #include "riotboot/slot.h"
+
+XFA_USE(suit_storage_t, suit_storage_reg);
 
 static inline suit_storage_flashwrite_t *_get_fw(suit_storage_t *storage)
 {
@@ -38,7 +42,7 @@ static int _flashwrite_init(suit_storage_t *storage)
 {
     (void)storage;
 
-    LOG_INFO("Storage size %u\n", (unsigned)sizeof(suit_storage_flashwrite_t));
+    LOG_DEBUG("Storage size %" PRIuSIZE "\n", sizeof(suit_storage_flashwrite_t));
 
     return 0;
 }
@@ -234,8 +238,10 @@ static const suit_storage_driver_t suit_storage_flashwrite_driver = {
     .separator = '\0',
 };
 
-suit_storage_flashwrite_t suit_storage_flashwrite = {
+static suit_storage_flashwrite_t suit_storage_flashwrite = {
     .storage = {
         .driver = &suit_storage_flashwrite_driver,
     },
 };
+
+XFA(suit_storage_reg, 0) suit_storage_t* suit_storage_flashwrite_ptr = &suit_storage_flashwrite.storage;

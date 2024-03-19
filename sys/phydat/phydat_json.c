@@ -20,8 +20,9 @@
 
 #include <string.h>
 
-#include "fmt.h"
 #include "assert.h"
+#include "flash_utils.h"
+#include "fmt.h"
 #include "phydat.h"
 
 #define STATIC_LEN      (14U)
@@ -32,18 +33,18 @@
 static size_t _bool_to_str(int16_t val, char *buf)
 {
     if (val) {
-        memcpy(buf, "true", 4);
+        flash_memcpy(buf, TO_FLASH("true"), 4);
         return 4;
     }
     else {
-        memcpy(buf, "false", 5);
+        flash_memcpy(buf, TO_FLASH("false"), 5);
         return 5;
     }
 }
 
 size_t phydat_to_json(const phydat_t *data, size_t dim, char *buf)
 {
-    assert((dim > 0) && (dim < PHYDAT_DIM));
+    assert((dim > 0) && (dim <= PHYDAT_DIM));
 
     size_t pos = 0;
 
@@ -60,10 +61,10 @@ size_t phydat_to_json(const phydat_t *data, size_t dim, char *buf)
                 pos += (data->val[i]) ? 4 : 5;  /* true: 4, false: 5 */
             }
         }
-        pos += strlen(phydat_unit_to_str_verbose(data->unit));
+        pos += phydat_unit_write(NULL, 0, data->unit);
     }
     else {
-        memcpy(buf, "{\"d\":", 5);
+        flash_memcpy(buf, TO_FLASH("{\"d\":"), 5);
         pos += 5;
         /* write data */
         if (dim > 1) {
@@ -84,13 +85,11 @@ size_t phydat_to_json(const phydat_t *data, size_t dim, char *buf)
             buf[pos++] = ',';
         }
         /* add unit */
-        memcpy(&buf[pos], "\"u\":\"", 5);
+        flash_memcpy(&buf[pos], TO_FLASH("\"u\":\""), 5);
         pos += 5;
-        const char *u = phydat_unit_to_str_verbose(data->unit);
-        strcpy(&buf[pos], u);
-        pos += strlen(u);
+        pos += phydat_unit_write(&buf[pos], SIZE_MAX, data->unit);
         /* terminate the JSON string */
-        memcpy(&buf[pos], "\"}", 2);
+        flash_memcpy(&buf[pos], TO_FLASH("\"}"), 2);
         pos += 2;
         buf[pos++] = '\0';
     }

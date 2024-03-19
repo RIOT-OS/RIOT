@@ -10,7 +10,4 @@ SRC := core.c util.c periodic.c
 # enable submodules
 SUBMODULES := 1
 
-# disable obsolete warning
-CFLAGS += -Wno-missing-field-initializers
-
 include $(RIOTBASE)/Makefile.base

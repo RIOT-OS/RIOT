@@ -1,0 +1,95 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+if MODULE_ST77XX
+
+config MODULE_ST7796
+    bool "ST7796 display"
+    default y if HAVE_ST7796
+    help
+        ST7796 display controller is used
+
+if MODULE_ST7796
+
+menuconfig ST7796_CUSTOM_CONFIG
+    bool "ST7796 Custom Configuration"
+    help
+        Enable if customized configuration of voltages are needed. Otherwise
+        reset default values are used.
+
+if ST7796_CUSTOM_CONFIG
+
+config ST7796_AVDD
+    int "AVDD voltage (in millivolts)"
+    default 6600
+    range 6200 6800
+    help
+        Configure the AVDD voltage for analog circuits in millivolts.
+        Valid values must be in the range of 6200 (6.2V) to 6800 (6.8V)
+        in steps of 200.
+
+config ST7796_AVCL
+    int "AVDD voltage (in millivolts)"
+    default -4400
+    range -5000 -4400
+    help
+        Configure the AVCL voltage in millivolts.
+        Valid values must be in the range of -5000 (-5V) to -4400 (-4.4V)
+        in steps of 200.
+
+config ST7796_VCOM
+    int "VCOM voltage (in millivolts)"
+    default 1000
+    range 300 1875
+    help
+        Configure the VCOM voltage level. VCOM needs to be adjusted to match
+        the capacitance and performance specifications of the TFT panel to
+        maximize contrast and minimize flickering. VCOM is used to derive the
+        GVDD (gamma reference positive voltage) and the GVCL (gamma reference
+        negative voltage) as follows:
+
+            GDDV = +VRH + VCOM + VCOM_OFFSET
+            GVCL = -VRH + VCOM + VCOM_OFFSET
+
+        Valid values must be in the range of 300 (0.3V) to 1875 (1.875V)
+        in steps of 25.
+
+config ST7796_VCOM_OFFSET
+    int "VCOM voltage offset (in millivolts)"
+    default 0
+    range -800 775
+    help
+        Configure the VCOM voltage offset (VCOM_OFFSET). VCOM_OFFSET is used to
+        derive the GVDD (gamma reference positive voltage) and the GVCL (gamma
+        reference negative voltage) as follows:
+
+            GDDV = +VRH + VCOM + VCOM_OFFSET
+            GVCL = -VRH + VCOM + VCOM_OFFSET
+
+        Valid values must be in the range of -800 (-0.8V) to 775 (0.775V)
+        in steps of 25.
+
+config ST7796_VRH
+    int "VRH voltage range (in millivolts)"
+    default 4500
+    range 3550 5500
+    help
+        Configure the VRH voltage range. VRH is used to derive the GVDD (gamma
+        reference positive voltage) and the GVCL (gamma reference negative
+        voltage) as follows:
+
+            GDDV = +VRH + VCOM + VCOM_OFFSET + (0.5 * VDV)
+            GVCL = -VRH + VCOM + VCOM_OFFSET - (0.5 * VDV)
+
+        Valid values must be in the range of 3350 (3.35V) to 5500 (5.5V)
+        in steps of 50.
+
+# TODO  ST7796_VGH and ST7796_VGL (non linear values)
+
+endif # ST7796_CUSTOM_CONFIG
+endif # MODULE_ST7796
+endif # MODULE_ST77XX

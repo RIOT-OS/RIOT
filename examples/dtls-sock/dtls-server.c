@@ -139,7 +139,7 @@ void *dtls_server_wrapper(void *arg)
     res = credman_add(&credential0);
     if (res < 0 && res != CREDMAN_EXIST) {
         /* ignore duplicate credentials */
-        printf("Error cannot add credential to system: %d\n", (int)res);
+        printf("Error cannot add credential to system: %" PRIdSIZE "\n", res);
         return NULL;
     }
 
@@ -163,13 +163,13 @@ void *dtls_server_wrapper(void *arg)
     res = credman_add(&credential1);
     if (res < 0 && res != CREDMAN_EXIST) {
         /* ignore duplicate credentials */
-        printf("Error cannot add credential to system: %d\n", (int)res);
+        printf("Error cannot add credential to system: %" PRIdSIZE "\n", res);
         return NULL;
     }
 
     /* make the new credential available to the sock */
     if (sock_dtls_add_credential(&sock, SOCK_DTLS_SERVER_TAG_1) < 0) {
-        printf("Error cannot add credential to the sock: %d\n", (int)res);
+        printf("Error cannot add credential to the sock: %" PRIdSIZE "\n", res);
         return NULL;
     }
 
@@ -187,10 +187,10 @@ void *dtls_server_wrapper(void *arg)
             res = sock_dtls_recv(&sock, &session, rcv, sizeof(rcv),
                                   10 * US_PER_SEC);
             if (res >= 0) {
-                printf("Received %d bytes -- (echo)\n", (int)res);
+                printf("Received %" PRIdSIZE " bytes -- (echo)\n", res);
                 res = sock_dtls_send(&sock, &session, rcv, (size_t)res, 0);
                 if (res < 0) {
-                    printf("Error resending DTLS message: %d", (int)res);
+                    printf("Error resending DTLS message: %" PRIdSIZE, res);
                 }
                 sock_dtls_session_destroy(&sock, &session);
             }

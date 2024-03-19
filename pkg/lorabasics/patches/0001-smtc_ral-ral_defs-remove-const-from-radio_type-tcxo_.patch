@@ -1,0 +1,27 @@
+From 73580e23be59f585a0d551002f4fcb7cd5126561 Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Mon, 4 Apr 2022 08:26:40 +0200
+Subject: [PATCH] smtc_ral/ral_defs: remove const from radio_type/tcxo_cfg defs
+
+---
+ smtc_ral/src/ral_defs.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/smtc_ral/src/ral_defs.h b/smtc_ral/src/ral_defs.h
+index a7abc25..bf1ce6f 100644
+--- a/smtc_ral/src/ral_defs.h
++++ b/smtc_ral/src/ral_defs.h
+@@ -97,8 +97,8 @@ typedef struct ral_tcxo_conf_s
+ typedef struct ral_s
+ {
+     const void*             context;
+-    const ral_radio_types_t radio_type;
+-    const ral_tcxo_cfg_t    tcxo_cfg;
++    ral_radio_types_t radio_type;
++    ral_tcxo_cfg_t    tcxo_cfg;
+ } ral_t;
+ 
+ /**
+-- 
+2.32.0
+

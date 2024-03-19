@@ -32,26 +32,29 @@
  * objects.
  */
 typedef struct {
-    uint8_t     type;    /* type of the mutex, MUST be the first element */
-    mutex_t     mutex;   /* the mutex */
-} _mutex_t;
+    uint8_t      type;   /* type of the mutex, MUST be the first element */
+    kernel_pid_t pid;    /* PID of the holder if the mutex is locked */
+    mutex_t      mutex;  /* the RIOT mutex */
+} _sem_t;
 
 typedef struct {
-    uint8_t     type;    /* type of the mutex, MUST be the first element */
-    rmutex_t    rmutex;  /* the mutex */
-} _rmutex_t;
+    uint8_t      type;   /* type of the mutex, MUST be the first element */
+    kernel_pid_t pid;    /* PID of the holder if the mutex is locked */
+    rmutex_t     rmutex; /* the RIOT mutex */
+} _rsem_t;
 
 SemaphoreHandle_t xSemaphoreCreateMutex(void)
 {
-    _mutex_t* _tmp = (_mutex_t*)malloc (sizeof(_mutex_t));
+    _sem_t* _tmp = (_sem_t*)malloc (sizeof(_sem_t));
     _tmp->type = queueQUEUE_TYPE_MUTEX;
+    _tmp->pid = KERNEL_PID_UNDEF;
     mutex_init(&_tmp->mutex);
 
     DEBUG("%s mutex=%p\n", __func__, _tmp);
     return _tmp;
 }
 
-void vSemaphoreDelete( SemaphoreHandle_t xSemaphore )
+void vSemaphoreDelete(SemaphoreHandle_t xSemaphore)
 {
     DEBUG("%s mutex=%p\n", __func__, xSemaphore);
 
@@ -59,21 +62,28 @@ void vSemaphoreDelete( SemaphoreHandle_t xSemaphore )
     free(xSemaphore);
 }
 
-BaseType_t xSemaphoreGive (SemaphoreHandle_t xSemaphore)
+BaseType_t xSemaphoreGive(SemaphoreHandle_t xSemaphore)
 {
     DEBUG("%s mutex=%p\n", __func__, xSemaphore);
 
+    /* if scheduler is not running, we must not lock the mutex */
+    if (thread_getpid() == KERNEL_PID_UNDEF) {
+        return pdPASS;
+    }
+
     assert(xSemaphore != NULL);
 
-    uint8_t  type = ((_mutex_t*)xSemaphore)->type;
-    mutex_t* mutex= &((_mutex_t*)xSemaphore)->mutex;
+    _sem_t* sem = (_sem_t*)xSemaphore;
 
-    switch (type) {
+    switch (sem->type) {
         case queueQUEUE_TYPE_MUTEX:
-            mutex_unlock(mutex);
+            mutex_unlock(&sem->mutex);
+            if (sem->mutex.queue.next == NULL) {
+                sem->pid = KERNEL_PID_UNDEF;
+            }
             break;
         case queueQUEUE_TYPE_RECURSIVE_MUTEX:
-            return xSemaphoreGiveRecursive (xSemaphore);
+            return xSemaphoreGiveRecursive(xSemaphore);
         default:
             return xQueueGenericSend(xSemaphore, NULL, 0, queueSEND_TO_BACK);
     }
@@ -81,31 +91,42 @@ BaseType_t xSemaphoreGive (SemaphoreHandle_t xSemaphore)
     return pdTRUE;
 }
 
-BaseType_t xSemaphoreTake (SemaphoreHandle_t xSemaphore,
-                           TickType_t xTicksToWait)
+BaseType_t xSemaphoreTake(SemaphoreHandle_t xSemaphore,
+                          TickType_t xTicksToWait)
 {
-    DEBUG("%s mutex=%p wait=%u\n", __func__, xSemaphore, xTicksToWait);
+    DEBUG("%s mutex=%p wait=%"PRIu32"\n", __func__, xSemaphore, xTicksToWait);
+
+    /* if scheduler is not running, we must not lock the mutex */
+    if (thread_getpid() == KERNEL_PID_UNDEF) {
+        return pdPASS;
+    }
 
     assert(xSemaphore != NULL);
 
-    uint8_t  type = ((_mutex_t*)xSemaphore)->type;
-    mutex_t* mutex= &((_mutex_t*)xSemaphore)->mutex;
+    _sem_t* sem = (_sem_t*)xSemaphore;
 
-    switch (type) {
+    switch (sem->type) {
         case queueQUEUE_TYPE_MUTEX:
         {
             if (xTicksToWait == 0) {
-                return (mutex_trylock(mutex) == 1) ? pdPASS : pdFAIL;
+                if (mutex_trylock(&sem->mutex) == 1) {
+                    sem->pid = thread_getpid();
+                    return pdPASS;
+                }
+                else {
+                    return pdFAIL;
+                }
             }
             else {
-                mutex_lock(mutex);
+                mutex_lock(&sem->mutex);
+                sem->pid = thread_getpid();
                 /* TODO timeout handling */
                 return pdTRUE;
             }
             break;
         }
         case queueQUEUE_TYPE_RECURSIVE_MUTEX:
-            return xSemaphoreTakeRecursive (xSemaphore, xTicksToWait);
+            return xSemaphoreTakeRecursive(xSemaphore, xTicksToWait);
 
         default:
             return xQueueGenericReceive(xSemaphore, NULL, xTicksToWait, pdFALSE);
@@ -114,8 +135,9 @@ BaseType_t xSemaphoreTake (SemaphoreHandle_t xSemaphore,
 
 SemaphoreHandle_t xSemaphoreCreateRecursiveMutex(void)
 {
-    _rmutex_t* _tmp = (_rmutex_t*)malloc (sizeof(_rmutex_t));
+    _rsem_t* _tmp = (_rsem_t*)malloc (sizeof(_rsem_t));
     _tmp->type = queueQUEUE_TYPE_RECURSIVE_MUTEX;
+    _tmp->pid = KERNEL_PID_UNDEF;
     rmutex_init(&_tmp->rmutex);
 
     DEBUG("%s rmutex=%p\n", __func__, _tmp);
@@ -123,37 +145,65 @@ SemaphoreHandle_t xSemaphoreCreateRecursiveMutex(void)
     return _tmp;
 }
 
-BaseType_t xSemaphoreGiveRecursive (SemaphoreHandle_t xSemaphore)
+BaseType_t xSemaphoreGiveRecursive(SemaphoreHandle_t xSemaphore)
 {
     DEBUG("%s rmutex=%p\n", __func__, xSemaphore);
 
-    assert(xSemaphore != NULL);
-    assert(((_rmutex_t*)xSemaphore)->type == queueQUEUE_TYPE_RECURSIVE_MUTEX);
+    /* if scheduler is not running, we must not lock the mutex */
+    if (thread_getpid() == KERNEL_PID_UNDEF) {
+        return pdPASS;
+    }
 
-    rmutex_unlock(&((_rmutex_t*)xSemaphore)->rmutex);
+    _rsem_t* rsem = (_rsem_t*)xSemaphore;
+
+    assert(rsem != NULL);
+    assert(rsem->type == queueQUEUE_TYPE_RECURSIVE_MUTEX);
+
+    rmutex_unlock(&rsem->rmutex);
+    if (rsem->rmutex.mutex.queue.next == NULL) {
+        rsem->pid = KERNEL_PID_UNDEF;
+    }
     return pdTRUE;
 }
 
-BaseType_t xSemaphoreTakeRecursive (SemaphoreHandle_t xSemaphore,
-                                    TickType_t xTicksToWait)
+BaseType_t xSemaphoreTakeRecursive(SemaphoreHandle_t xSemaphore,
+                                   TickType_t xTicksToWait)
 {
-    DEBUG("%s rmutex=%p wait=%u\n", __func__, xSemaphore, xTicksToWait);
+    DEBUG("%s rmutex=%p wait=%"PRIu32"\n", __func__, xSemaphore, xTicksToWait);
 
-    assert(xSemaphore != NULL);
-    assert(((_rmutex_t*)xSemaphore)->type == queueQUEUE_TYPE_RECURSIVE_MUTEX);
+    /* if scheduler is not running, we must not lock the rmutex */
+    if (thread_getpid() == KERNEL_PID_UNDEF) {
+        return pdPASS;
+    }
+
+    _rsem_t* rsem = (_rsem_t*)xSemaphore;
+
+    assert(rsem != NULL);
+    assert(rsem->type == queueQUEUE_TYPE_RECURSIVE_MUTEX);
 
     BaseType_t ret = pdTRUE;
-    rmutex_t*  rmutex = &((_rmutex_t*)xSemaphore)->rmutex;
 
     if (xTicksToWait == 0) {
-        ret = (rmutex_trylock(rmutex) == 1) ? pdPASS : pdFAIL;
+        ret = (rmutex_trylock(&rsem->rmutex) == 1) ? pdPASS : pdFAIL;
+        if (ret == pdPASS) {
+            rsem->pid = thread_getpid();
+        }
     }
     else {
-        rmutex_lock(&((_rmutex_t*)xSemaphore)->rmutex);
+        rmutex_lock(&rsem->rmutex);
+        rsem->pid = thread_getpid();
         /* TODO timeout handling */
     }
 
     return ret;
+}
+
+TaskHandle_t xSemaphoreGetMutexHolder(SemaphoreHandle_t xMutex)
+{
+    DEBUG("%s mutex=%p\n", __func__, xMutex);
+
+    assert(xMutex != NULL);
+    return (TaskHandle_t)(0L + ((_sem_t*)xMutex)->pid);
 }
 
 void vPortCPUAcquireMutex(portMUX_TYPE *mux)

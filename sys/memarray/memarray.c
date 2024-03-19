@@ -10,6 +10,7 @@
 #include <assert.h>
 #include <string.h>
 
+#include "architecture.h"
 #include "memarray.h"
 
 #define ENABLE_DEBUG 0
@@ -20,8 +21,8 @@ void memarray_init(memarray_t *mem, void *data, size_t size, size_t num)
     assert((mem != NULL) && (data != NULL) && (size >= sizeof(void *)) &&
            (num != 0));
 
-    DEBUG("memarray: Initialize memarray of %u times %u Bytes at %p\n",
-          (unsigned)num, (unsigned)size, data);
+    DEBUG("memarray: Initialize memarray of %" PRIuSIZE " times %" PRIuSIZE " Bytes at %p\n",
+          num, size, data);
 
     mem->free_data = NULL;
     mem->size = size;
@@ -62,8 +63,8 @@ int memarray_reduce(memarray_t *mem, void *data, size_t num)
 
             /* Save the element */
             memarray_element_t *found_element = *element_ptr;
-            DEBUG("memarray: Found %p in %p, at %u\n",
-                  (void*)found_element, data, (unsigned)remaining);
+            DEBUG("memarray: Found %p in %p, at %" PRIuSIZE "\n",
+                  (void*)found_element, data, remaining);
 
             /* Copy pointer over to previous element remove it from the pool
              * free list */

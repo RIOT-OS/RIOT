@@ -112,6 +112,7 @@
 #define OPENWSN_DEBUGPIN_FSM    GPIO_PIN(1, 2) /* B2 */
 #define OPENWSN_DEBUGPIN_TASK   GPIO_PIN(1, 1) /* B1 */
 #define OPENWSN_DEBUGPIN_RADIO  GPIO_PIN(1, 0) /* B0 */
+/** @} */
 
 /**
  * @name    AT86RF215 configuration
@@ -146,11 +147,6 @@
 
 #define BOOT_PIN    GPIO_PIN(0, CCA_BACKDOOR_PORT_A_PIN) /**< BSL_BOOT Pin */
 /** @} */
-
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 } /* end extern "C" */

@@ -78,8 +78,8 @@ static const uart_conf_t uart_config[] = {
     {   /* STMod+/PMOD connectors */
         .dev        = USART1,
         .rcc_mask   = RCC_APB2ENR_USART1EN,
-        .rx_pin     = GPIO_PIN(PORT_B, 6),
-        .tx_pin     = GPIO_PIN(PORT_G, 10),
+        .rx_pin     = GPIO_PIN(PORT_G, 10),
+        .tx_pin     = GPIO_PIN(PORT_B, 6),
         .rx_af      = GPIO_AF7,
         .tx_af      = GPIO_AF7,
         .bus        = APB2,
@@ -116,6 +116,7 @@ static const i2c_conf_t i2c_config[] = {
         .sda_af         = GPIO_AF4,
         .bus            = APB1,
         .rcc_mask       = RCC_APB1ENR1_I2C1EN,
+        .rcc_sw_mask    = RCC_CCIPR_I2C1SEL_1,      /* HSI (16 MHz) */
         .irqn           = I2C1_ER_IRQn
     },
 };

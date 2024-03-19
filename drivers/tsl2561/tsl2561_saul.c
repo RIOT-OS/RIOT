@@ -32,6 +32,6 @@ static int read_illuminance(const void *dev, phydat_t *res)
 
 const saul_driver_t tsl2561_illuminance_saul_driver = {
     .read = read_illuminance,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_LIGHT
 };

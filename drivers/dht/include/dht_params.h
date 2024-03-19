@@ -34,11 +34,15 @@ extern "C" {
 #ifndef DHT_PARAM_PIN
 #define DHT_PARAM_PIN               (GPIO_PIN(0, 0))
 #endif
+#ifndef DHT_PARAM_TYPE
+#define DHT_PARAM_TYPE              (DHT11)
+#endif
 #ifndef DHT_PARAM_PULL
-#define DHT_PARAM_PULL              (GPIO_IN_PU)
+#define DHT_PARAM_PULL              (GPIO_IN)
 #endif
 #ifndef DHT_PARAMS
 #define DHT_PARAMS                  { .pin     = DHT_PARAM_PIN,  \
+                                      .type    = DHT_PARAM_TYPE, \
                                       .in_mode = DHT_PARAM_PULL }
 #endif
 #ifndef DHT_SAULINFO

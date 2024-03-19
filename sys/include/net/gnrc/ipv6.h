@@ -99,7 +99,6 @@
 #define NET_GNRC_IPV6_H
 
 #include "sched.h"
-#include "net/gnrc.h"
 #include "thread.h"
 
 #include "net/ipv6.h"
@@ -123,9 +122,13 @@ extern "C" {
  */
 /**
  * @brief   Default stack size to use for the IPv6 thread
+ *
+ * @note    The message queue was previously allocated on the stack.
+ *          The default number of messages is 2³.
+ *          Given sizeof(msg_t) == 8, the stack size is reduced by 64 bytes.
  */
 #ifndef GNRC_IPV6_STACK_SIZE
-#define GNRC_IPV6_STACK_SIZE        (THREAD_STACKSIZE_DEFAULT)
+#define GNRC_IPV6_STACK_SIZE        ((THREAD_STACKSIZE_DEFAULT) - 64)
 #endif
 
 /**
@@ -154,18 +157,29 @@ extern "C" {
  * This macro allows to specify a certain link local IPv6 address to be assigned
  * to a network interface on startup, which might be handy for testing.
  * Note: a) a interface will keep its auto-generated link local address, too
- *       b) the address is incremented by 1, if multiple interfaces are present
+ *       b) the address is incremented by the interface PID unless
+            `CONFIG_GNRC_IPV6_STATIC_LLADDR_IS_FIXED` is set.
  *
  * To use the macro just add it to `CFLAGS` in the application's Makefile, like:
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
  * IPV6_STATIC_LLADDR ?= '"fe80::cafe:cafe:cafe:1"'
- * CFLAGS += -DGNRC_IPV6_STATIC_LLADDR=$(STATIC_IPV6_LLADDR)
+ * CFLAGS += -DCONFIG_GNRC_IPV6_STATIC_LLADDR=$(STATIC_IPV6_LLADDR)
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
-#define GNRC_IPV6_STATIC_LLADDR
+#define CONFIG_GNRC_IPV6_STATIC_LLADDR
 #endif /* DOXYGEN */
 /** @} */
+
+/**
+ * @brief   Use the same static IPv6 link local address on every network interface
+ *
+ * When CONFIG_GNRC_IPV6_STATIC_LLADDR is used, to not add the interface pid to the
+ * set static address but use the same static link local address for all interfaces.
+ */
+#ifndef CONFIG_GNRC_IPV6_STATIC_LLADDR_IS_FIXED
+#define CONFIG_GNRC_IPV6_STATIC_LLADDR_IS_FIXED 0
+#endif
 
 /**
  * @brief Message queue size to use for the IPv6 thread.

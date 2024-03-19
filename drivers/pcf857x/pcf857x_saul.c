@@ -33,7 +33,7 @@ static int read(const void *dev, phydat_t *res)
     return 1;
 }
 
-static int write(const void *dev, phydat_t *state)
+static int write(const void *dev, const phydat_t *state)
 {
     const pcf857x_saul_gpio_params_t *p = (const pcf857x_saul_gpio_params_t *)dev;
     int inverted = (p->gpio.flags & SAUL_GPIO_INVERTED);
@@ -51,7 +51,7 @@ const saul_driver_t pcf857x_gpio_out_saul_driver = {
 
 const saul_driver_t pcf857x_gpio_in_saul_driver = {
     .read = read,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_BTN
 };
 #endif /* MODULE_SAUL_GPIO */

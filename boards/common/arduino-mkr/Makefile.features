@@ -14,12 +14,7 @@ FEATURES_PROVIDED += periph_uart
 FEATURES_PROVIDED += periph_usbdev
 
 # Various other features (if any)
-FEATURES_PROVIDED += arduino
+FEATURES_PROVIDED += arduino_analog
+FEATURES_PROVIDED += arduino_pins
 FEATURES_PROVIDED += arduino_pwm
 FEATURES_PROVIDED += highlevel_stdio
-
-# This configuration enables modules that are only available when using Kconfig
-# module modelling
-ifeq (1, $(TEST_KCONFIG))
-  KCONFIG_ADD_CONFIG += $(RIOTBOARD)/common/samdx1-arduino-bootloader/samdx1-arduino-bootloader.config
-endif

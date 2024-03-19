@@ -1,0 +1,6 @@
+USEMODULE += driver_cryptocell_310_contrib
+FEATURES_REQUIRED += periph_cryptocell_310
+
+ifneq (,$(filter psa_cryptocell_310_%,$(USEMODULE)))
+  include $(RIOTPKG)/driver_cryptocell_310/psa_cryptocell_310/Makefile.dep
+endif

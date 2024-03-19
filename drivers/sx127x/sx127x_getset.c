@@ -117,9 +117,10 @@ void sx127x_set_syncword(sx127x_t *dev, uint8_t syncword)
 
 uint32_t sx127x_get_channel(const sx127x_t *dev)
 {
-    return (((uint32_t)sx127x_reg_read(dev, SX127X_REG_FRFMSB) << 16) |
-            (sx127x_reg_read(dev, SX127X_REG_FRFMID) << 8) |
-            (sx127x_reg_read(dev, SX127X_REG_FRFLSB))) * LORA_FREQUENCY_RESOLUTION_DEFAULT;
+    uint32_t raw = ((uint32_t)sx127x_reg_read(dev, SX127X_REG_FRFMSB) << 16)
+                 | ((uint32_t)sx127x_reg_read(dev, SX127X_REG_FRFMID) << 8)
+                 | ((uint32_t)sx127x_reg_read(dev, SX127X_REG_FRFLSB));
+    return (uint64_t)raw * LORA_FREQUENCY_RESOLUTION_NANOHERTZ_DEFAULT / 1000000000U;
 }
 
 void sx127x_set_channel(sx127x_t *dev, uint32_t channel)
@@ -129,7 +130,7 @@ void sx127x_set_channel(sx127x_t *dev, uint32_t channel)
     /* Save current operating mode */
     dev->settings.channel = channel;
 
-    channel = (uint32_t)((double)channel / (double)LORA_FREQUENCY_RESOLUTION_DEFAULT);
+    channel = (uint64_t)channel * 1000000000U / LORA_FREQUENCY_RESOLUTION_NANOHERTZ_DEFAULT;
 
     /* Write frequency settings into chip */
     sx127x_reg_write(dev, SX127X_REG_FRFMSB, (uint8_t)((channel >> 16) & 0xFF));

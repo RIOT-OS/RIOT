@@ -30,9 +30,14 @@ extern "C" {
 #endif
 
 /**
- * @brief   All STM timers have 4 capture-compare channels
+ * @brief   All STM timers have at most 4 capture-compare channels
  */
 #define TIMER_CHANNEL_NUMOF (4U)
+
+/**
+ * @brief   The driver provides a relative set function
+ */
+#define PERIPH_TIMER_PROVIDES_SET
 
 /**
  * @brief   Define a macro for accessing a timer channel
@@ -48,6 +53,8 @@ typedef struct {
     uint32_t rcc_mask;      /**< corresponding bit in the RCC register */
     uint8_t bus;            /**< APBx bus the timer is clock from */
     uint8_t irqn;           /**< global IRQ channel */
+    uint8_t channel_numof;  /**< number of channels, 0 is alias for
+                                 @ref TIMER_CHANNEL_NUMOF */
 } timer_conf_t;
 
 #ifdef __cplusplus

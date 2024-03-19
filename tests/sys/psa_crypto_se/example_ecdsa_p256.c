@@ -1,0 +1,1 @@
+../../../examples/psa_crypto/example_ecdsa_p256.c

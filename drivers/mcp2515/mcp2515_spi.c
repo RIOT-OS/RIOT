@@ -25,7 +25,6 @@
 #include "periph/gpio.h"
 #include "periph/spi.h"
 
-#include "xtimer.h"
 #include "irq.h"
 
 #define ENABLE_DEBUG 0

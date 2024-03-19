@@ -17,7 +17,7 @@
  *
  * - Micro-SD card interface
  * - OV7670 camera interface
- * - 3.2" SPI LCD panel
+ * - 3.2\" SPI LCD panel
  * - RGB LED
  *
  * Furthermore, many GPIOs are broken out for extension. The USB bridge
@@ -124,23 +124,6 @@
 #define ILI9341_PARAM_ROTATION  ILI9341_ROTATION_HORZ_FLIP
 #endif
 /** @} */
-
-#ifndef DOXYGEN
-/**
- * @name    Default configuration parameters for ESP WiFi Enterprise netdev
- * @{
- */
-#ifndef ESP_WIFI_EAP_USER
-/** User name used in phase 2 (inner) EAP authentication. */
-#define ESP_WIFI_EAP_USER   "riot-os@riot-os.org"
-#endif /* ESP_WIFI_EAP_USER */
-
-#ifndef ESP_WIFI_EAP_PASS
-/** Password used in phase 2 (inner) EAP authentication. */
-#define ESP_WIFI_EAP_PASS   "riot-os"
-#endif /* ESP_WIFI_EAP_PASS */
-/** @} */
-#endif /* !DOXYGEN */
 
 /* include common board definitions as last step */
 #include "board_common.h"

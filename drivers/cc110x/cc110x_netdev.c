@@ -343,6 +343,10 @@ static int cc110x_init(netdev_t *netdev)
     }
 
     DEBUG("[cc110x] netdev_driver_t::init(): Success\n");
+
+    /* signal link UP */
+    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+
     return 0;
 }
 
@@ -421,10 +425,9 @@ static int cc110x_send(netdev_t *netdev, const iolist_t *iolist)
         if (iol->iol_len) {
             if (size + iol->iol_len > CC110X_MAX_FRAME_SIZE) {
                 cc110x_release(dev);
-                DEBUG("[cc110x] netdev_driver_t::send(): Frame size of %uB "
-                      "exceeds maximum supported size of %uB\n",
-                      (unsigned)(size + iol->iol_len),
-                      (unsigned)CC110X_MAX_FRAME_SIZE);
+                DEBUG("[cc110x] netdev_driver_t::send(): Frame size of %"
+                      PRIuSIZE "B exceeds maximum supported size of %uB\n",
+                      size + iol->iol_len, (unsigned)CC110X_MAX_FRAME_SIZE);
                 return -1;
             }
             memcpy(dev->buf.data + size, iol->iol_base, iol->iol_len);
@@ -583,7 +586,7 @@ static int cc110x_get(netdev_t *netdev, netopt_t opt,
 /**
  * @brief   Set the given address as the device's layer 2 address
  *
- * @param   dev     Device descripter of the transceiver
+ * @param   dev     Device descriptor of the transceiver
  * @param   addr    Address to set
  */
 static int cc110x_set_addr(cc110x_t *dev, uint8_t addr)

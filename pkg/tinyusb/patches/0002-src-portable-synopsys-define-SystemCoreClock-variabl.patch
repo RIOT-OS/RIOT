@@ -1,0 +1,34 @@
+From a1f56254e32ae0546c9f9b56dc5471718abd9bf7 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Fri, 9 Sep 2022 14:56:17 +0200
+Subject: [PATCH 2/2] src/portable/synopsys: define SystemCoreClock variable
+
+DWC2 for STM32 uses the `SystemCoreClock` variable from CMSIS which is usually declared/defined in `system_stm32fxxx.{h,c}`and set when function SystemCoreClockUpdate is called. Since RIOT explicitely excludes these files, the variable is neither declared nor defined nor set correctly. Therefore, it is defined in `dwc2_stm32` and set to RIOT's `CLOCK_CORECLOCK` define.
+---
+ src/portable/synopsys/dwc2/dwc2_stm32.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/portable/synopsys/dwc2/dwc2_stm32.h b/src/portable/synopsys/dwc2/dwc2_stm32.h
+index cb455bd9..9564f879 100644
+--- a/src/portable/synopsys/dwc2/dwc2_stm32.h
++++ b/src/portable/synopsys/dwc2/dwc2_stm32.h
+@@ -99,6 +99,8 @@
+   #define DWC2_EP_MAX   EP_MAX_FS
+ #endif
+ 
++#include "clk_conf.h"
++
+ // On STM32 for consistency we associate
+ // - Port0 to OTG_FS, and Port1 to OTG_HS
+ static const dwc2_controller_t _dwc2_controller[] =
+@@ -118,6 +120,7 @@ static const dwc2_controller_t _dwc2_controller[] =
+ 
+ // SystemCoreClock is already included by family header
+ // extern uint32_t SystemCoreClock;
++static uint32_t SystemCoreClock = CLOCK_CORECLOCK;
+ 
+ TU_ATTR_ALWAYS_INLINE
+ static inline void dwc2_dcd_int_enable(uint8_t rhport)
+-- 
+2.37.2
+

@@ -71,6 +71,24 @@ void ztimer_convert_init(ztimer_convert_t *ztimer_convert,
  */
 void ztimer_convert_cancel(ztimer_clock_t *clock);
 
+/**
+ * @brief   ztimer_convert common start() op
+ *
+ * Used by some conversion modules as ztimer_clock_t::ops.start().
+ *
+ * @param[in]       clock   ztimer clock to operate on
+ */
+void ztimer_convert_start(ztimer_clock_t *clock);
+
+/**
+ * @brief   ztimer_convert common stop() op
+ *
+ * Used by some conversion modules as ztimer_clock_t::ops.stop().
+ *
+ * @param[in]       clock   ztimer clock to operate on
+ */
+void ztimer_convert_stop(ztimer_clock_t *clock);
+
 #ifdef __cplusplus
 }
 #endif

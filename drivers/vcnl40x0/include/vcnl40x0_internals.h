@@ -14,7 +14,6 @@
  * @brief       Internal addresses, registers, constants for the VCNL40X0 devices.
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
- * @}
  */
 
 #ifndef VCNL40X0_INTERNALS_H

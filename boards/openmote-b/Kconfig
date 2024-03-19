@@ -19,5 +19,7 @@ config BOARD_OPENMOTE_B
     select HAS_PERIPH_UART
     select HAS_RIOTBOOT
 
-    select HAVE_SI7006
+    select HAVE_AT86RF215
+    # select HAVE_CC2538_RF # TODO: the AT86 radio should be enabled with netdev_default
     select HAVE_SAUL_GPIO
+    select HAVE_SI7006

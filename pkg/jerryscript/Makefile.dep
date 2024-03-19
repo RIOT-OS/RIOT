@@ -2,7 +2,4 @@ USEMODULE += jerryscript-port-default
 USEMODULE += jerryscript-ext
 
 # Jerryscript is only supported by 32-bit architectures
-FEATURES_REQUIRED += arch_32bit
-
-# Jerryscript is not supported on MIPS because of missing stdin over UART
-FEATURES_BLACKLIST += arch_mips32r2
+FEATURES_REQUIRED_ANY += arch_32bit|arch_64bit

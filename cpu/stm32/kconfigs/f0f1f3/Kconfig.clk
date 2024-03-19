@@ -1,0 +1,31 @@
+# Copyright (c) 2022 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+if CPU_FAM_F0 || CPU_FAM_F1 || CPU_FAM_F3
+
+config CLOCK_PLL_PREDIV
+    int "PLLIN division factor" if CUSTOM_PLL_PARAMS && !HAVE_CLOCK_PLL_PREDIV_HARDWIRED_2
+    default 2 if HAVE_CLOCK_PLL_PREDIV_HARDWIRED_2 || CLOCK_HSE = 16000000
+    default 1
+    range 1 16
+
+config CLOCK_PLL_MUL
+    int "PLLIN multiply factor" if CUSTOM_PLL_PARAMS
+    default 12 if CPU_FAM_F0 && HAVE_CLOCK_PLL_PREDIV_HARDWIRED_2
+    default 6 if CPU_FAM_F0
+    default 16 if CPU_FAM_F3 && HAVE_CLOCK_PLL_PREDIV_HARDWIRED_2
+    default 9 if CPU_FAM_F1 || CPU_FAM_F3
+
+    range 2 16
+
+config HAVE_CLOCK_PLL_PREDIV_HARDWIRED_2
+    bool
+    help
+        Indicated that this CPU Line has the prediv hardwired to 2, making it
+        unable to change.
+
+endif # CPU_FAM_F0 || CPU_FAM_F1 || CPU_FAM_F3

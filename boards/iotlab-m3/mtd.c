@@ -51,5 +51,10 @@ static mtd_spi_nor_t mtd_nor_dev = {
     .params = &_mtd_nor_params,
 };
 
-mtd_dev_t *mtd0 = (mtd_dev_t *)&mtd_nor_dev;
+MTD_XFA_ADD(mtd_nor_dev, 0);
+
+#ifdef MODULE_VFS_DEFAULT
+#include "vfs_default.h"
+VFS_AUTO_MOUNT(littlefs2, VFS_MTD(mtd_nor_dev), VFS_DEFAULT_NVM(0), 0);
+#endif
 #endif /* MODULE_MTD */

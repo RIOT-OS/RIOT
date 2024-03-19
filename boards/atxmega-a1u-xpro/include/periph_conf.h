@@ -155,7 +155,7 @@ static const ebi_conf_t ebi_config = {
                                   0x0UL,
                                 }, /* CS2 - 256K SRAM   */
                                 { EBI_CS_MODE_LPC_gc,
-                                  EBI_CS_ASPACE_256KB_gc,
+                                  EBI_CS_ASIZE_256KB_gc,
                                   EBI_CS_SRWS_1CLK_gc,
                                   0x0UL,
                                 }, /* Reserved LCD      */

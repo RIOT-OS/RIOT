@@ -15,7 +15,6 @@
  *
  * @author      Vitor Batista <vitor.batista@ml-pa.com>
  *
- * @}
  */
 
 /**

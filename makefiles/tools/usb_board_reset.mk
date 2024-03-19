@@ -28,8 +28,12 @@ RESET ?= $(PREFLASHER) $(RESETFFLASG)
 TESTRUNNER_CONNECT_DELAY ?= $(TERM_DELAY)
 $(call target-export-variables,test,TESTRUNNER_CONNECT_DELAY)
 
+ifneq (,$(filter flash flash-only,$(MAKECMDGOALS)))
 preflash-delay: preflash
 	sleep $(PREFLASH_DELAY)
+endif
 
+ifneq (,$(filter test term,$(MAKECMDGOALS)))
 term-delay: $(TERMDELAYDEPS)
 	sleep $(TERM_DELAY)
+endif

@@ -23,6 +23,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "event.h"
 #include "random.h"
 #include "timex.h"
 #include "periph/rtt.h"
@@ -153,8 +154,6 @@ static void gomach_reinit_radio(gnrc_netif_t *netif)
     if (IS_ACTIVE(DEVELHELP)) {
         netopt_enable_t enable;
         netif->dev->driver->get(netif->dev, NETOPT_RX_START_IRQ, &enable, sizeof(enable));
-        assert(enable == NETOPT_ENABLE);
-        netif->dev->driver->get(netif->dev, NETOPT_RX_END_IRQ, &enable, sizeof(enable));
         assert(enable == NETOPT_ENABLE);
         netif->dev->driver->get(netif->dev, NETOPT_TX_END_IRQ, &enable, sizeof(enable));
         assert(enable == NETOPT_ENABLE);
@@ -2031,14 +2030,7 @@ static void _gomach_event_cb(netdev_t *dev, netdev_event_t event)
     gnrc_netif_t *netif = (gnrc_netif_t *) dev->context;
 
     if (event == NETDEV_EVENT_ISR) {
-        msg_t msg;
-
-        msg.type = NETDEV_MSG_TYPE_EVENT;
-        msg.content.ptr = (void *) netif;
-
-        if (msg_send(&msg, netif->pid) <= 0) {
-            DEBUG("[GOMACH] gnrc_netdev: possibly lost interrupt.\n");
-        }
+        event_post(&netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_LOW], &netif->event_isr);
     }
     else {
         DEBUG("gnrc_netdev: event triggered -> %i\n", event);

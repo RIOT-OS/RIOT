@@ -13,14 +13,18 @@ menuconfig MODULE_SX126X
     depends on HAS_PERIPH_SPI
     depends on HAS_PERIPH_GPIO
     depends on HAS_PERIPH_GPIO_IRQ
+    select MODULE_IOLIST
+    select MODULE_LORA
+    select MODULE_NETDEV_LEGACY_API
     select MODULE_PERIPH_GPIO
+    select MODULE_PERIPH_GPIO_IRQ
     select MODULE_PERIPH_SPI
     select PACKAGE_DRIVER_SX126X
-    select MODULE_IOLIST
+
+if MODULE_SX126X
 
 choice
     bool "Radio variant"
-    depends on MODULE_SX126X
     default MODULE_SX1261 if HAVE_SX1261
     default MODULE_SX1262 if HAVE_SX1262
     default MODULE_SX1268 if HAVE_SX1268
@@ -29,24 +33,27 @@ choice
 
 config MODULE_SX1261
     bool "SX1261"
-    select MODULE_PERIPH_GPIO_IRQ
 
 config MODULE_SX1262
     bool "SX1262"
-    select MODULE_PERIPH_GPIO_IRQ
 
 config MODULE_SX1268
     bool "SX1268"
-    select MODULE_PERIPH_GPIO_IRQ
 
 config MODULE_LLCC68
     bool "LLCC68"
-    select MODULE_PERIPH_GPIO_IRQ
 
 config MODULE_SX126X_STM32WL
     bool "SX126X-STM32WL"
 
 endchoice
+
+config MODULE_SX126X_RF_SWITCH
+    bool
+    depends on HAS_PERIPH_GPIO
+    select MODULE_PERIPH_GPIO
+
+endif # MODULE_SX126X
 
 config HAVE_SX1261
     bool

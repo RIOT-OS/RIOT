@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Gerson Fernando Budke <nandojve@gmail.com>
+ * Copyright (C) 2021-2023 Gerson Fernando Budke <nandojve@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -19,13 +19,14 @@
  * @}
  */
 
-#include <stdio.h>
 #include <avr/interrupt.h>
+#include <stdio.h>
 
-#include "cpu.h"
-#include "periph_conf.h"
-#include "periph/gpio.h"
 #include "bitarithm.h"
+#include "cpu.h"
+#include "irq.h"
+#include "periph/gpio.h"
+#include "periph_conf.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -319,8 +320,6 @@ void gpio_write(gpio_t pin, int value)
 
 static inline void irq_handler(uint8_t port_num, uint8_t isr_vct_num)
 {
-    avr8_enter_isr();
-
     DEBUG("irq_handler port = 0x%02x, vct_num = %d \n", port_num, isr_vct_num);
 
     if (isr_vct_num) {
@@ -333,214 +332,116 @@ static inline void irq_handler(uint8_t port_num, uint8_t isr_vct_num)
     else {
         DEBUG("WARNING! irq_handler without callback\n");
     }
-
-    avr8_exit_isr();
 }
 
 #if defined(PORTA_INT0_vect)
-ISR(PORTA_INT0_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_A, 0);
-}
+AVR8_ISR(PORTA_INT0_vect, irq_handler, PORT_A, 0);
 #endif
 #if defined(PORTA_INT1_vect)
-ISR(PORTA_INT1_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_A, 1);
-}
+AVR8_ISR(PORTA_INT1_vect, irq_handler, PORT_A, 1);
 #endif
 
 #if defined(PORTB_INT0_vect)
-ISR(PORTB_INT0_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_B, 0);
-}
+AVR8_ISR(PORTB_INT0_vect, irq_handler, PORT_B, 0);
 #endif
 #if defined(PORTB_INT1_vect)
-ISR(PORTB_INT1_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_B, 1);
-}
+AVR8_ISR(PORTB_INT1_vect, irq_handler, PORT_B, 1);
 #endif
 
 #if defined(PORTC_INT0_vect)
-ISR(PORTC_INT0_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_C, 0);
-}
+AVR8_ISR(PORTC_INT0_vect, irq_handler, PORT_C, 0);
 #endif
 #if defined(PORTC_INT1_vect)
-ISR(PORTC_INT1_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_C, 1);
-}
+AVR8_ISR(PORTC_INT1_vect, irq_handler, PORT_C, 1);
 #endif
 
 #if defined(PORTD_INT0_vect)
-ISR(PORTD_INT0_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_D, 0);
-}
+AVR8_ISR(PORTD_INT0_vect, irq_handler, PORT_D, 0);
 #endif
 #if defined(PORTD_INT1_vect)
-ISR(PORTD_INT1_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_D, 1);
-}
+AVR8_ISR(PORTD_INT1_vect, irq_handler, PORT_D, 1);
 #endif
 
 #if defined(PORTE_INT0_vect)
-ISR(PORTE_INT0_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_E, 0);
-}
+AVR8_ISR(PORTE_INT0_vect, irq_handler, PORT_E, 0);
 #endif
 #if defined(PORTE_INT1_vect)
-ISR(PORTE_INT1_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_E, 1);
-}
+AVR8_ISR(PORTE_INT1_vect, irq_handler, PORT_E, 1);
 #endif
 
 #if defined(PORTF_INT0_vect)
-ISR(PORTF_INT0_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_F, 0);
-}
+AVR8_ISR(PORTF_INT0_vect, irq_handler, PORT_F, 0);
 #endif
 #if defined(PORTF_INT1_vect)
-ISR(PORTF_INT1_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_F, 1);
-}
+AVR8_ISR(PORTF_INT1_vect, irq_handler, PORT_F, 1);
 #endif
 
 #if defined(PORTG_INT0_vect)
-ISR(PORTG_INT0_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_G, 0);
-}
+AVR8_ISR(PORTG_INT0_vect, irq_handler, PORT_G, 0);
 #endif
 #if defined(PORTG_INT1_vect)
-ISR(PORTG_INT1_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_G, 1);
-}
+AVR8_ISR(PORTG_INT1_vect, irq_handler, PORT_G, 1);
 #endif
 
 #if defined(PORTH_INT0_vect)
-ISR(PORTH_INT0_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_H, 0);
-}
+AVR8_ISR(PORTH_INT0_vect, irq_handler, PORT_H, 0);
 #endif
 #if defined(PORTH_INT1_vect)
-ISR(PORTH_INT1_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_H, 1);
-}
+AVR8_ISR(PORTH_INT1_vect, irq_handler, PORT_H, 1);
 #endif
 
 #if defined(PORTJ_INT0_vect)
-ISR(PORTJ_INT0_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_J, 0);
-}
+AVR8_ISR(PORTJ_INT0_vect, irq_handler, PORT_J, 0);
 #endif
 #if defined(PORTJ_INT1_vect)
-ISR(PORTJ_INT1_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_J, 1);
-}
+AVR8_ISR(PORTJ_INT1_vect, irq_handler, PORT_J, 1);
 #endif
 
 #if defined(PORTK_INT0_vect)
-ISR(PORTK_INT0_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_K, 0);
-}
+AVR8_ISR(PORTK_INT0_vect, irq_handler, PORT_K, 0);
 #endif
 #if defined(PORTK_INT1_vect)
-ISR(PORTK_INT1_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_K, 1);
-}
+AVR8_ISR(PORTK_INT1_vect, irq_handler, PORT_K, 1);
 #endif
 
 #if defined(PORTL_INT0_vect)
-ISR(PORTL_INT0_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_L, 0);
-}
+AVR8_ISR(PORTL_INT0_vect, irq_handler, PORT_L, 0);
 #endif
 #if defined(PORTL_INT1_vect)
-ISR(PORTL_INT1_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_L, 1);
-}
+AVR8_ISR(PORTL_INT1_vect, irq_handler, PORT_L, 1);
 #endif
 
 #if defined(PORTM_INT0_vect)
-ISR(PORTM_INT0_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_M, 0);
-}
+AVR8_ISR(PORTM_INT0_vect, irq_handler, PORT_M, 0);
 #endif
 #if defined(PORTM_INT1_vect)
-ISR(PORTM_INT1_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_M, 1);
-}
+AVR8_ISR(PORTM_INT1_vect, irq_handler, PORT_M, 1);
 #endif
 
 #if defined(PORTN_INT0_vect)
-ISR(PORTN_INT0_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_N, 0);
-}
+AVR8_ISR(PORTN_INT0_vect, irq_handler, PORT_N, 0);
 #endif
 #if defined(PORTN_INT1_vect)
-ISR(PORTN_INT1_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_N, 1);
-}
+AVR8_ISR(PORTN_INT1_vect, irq_handler, PORT_N, 1);
 #endif
 
 #if defined(PORTP_INT0_vect)
-ISR(PORTP_INT0_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_P, 0);
-}
+AVR8_ISR(PORTP_INT0_vect, irq_handler, PORT_P, 0);
 #endif
 #if defined(PORTP_INT1_vect)
-ISR(PORTP_INT1_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_P, 1);
-}
+AVR8_ISR(PORTP_INT1_vect, irq_handler, PORT_P, 1);
 #endif
 
 #if defined(PORTQ_INT0_vect)
-ISR(PORTQ_INT0_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_Q, 0);
-}
+AVR8_ISR(PORTQ_INT0_vect, irq_handler, PORT_Q, 0);
 #endif
 #if defined(PORTQ_INT1_vect)
-ISR(PORTQ_INT1_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_Q, 1);
-}
+AVR8_ISR(PORTQ_INT1_vect, irq_handler, PORT_Q, 1);
 #endif
 
 #if defined(PORTR_INT0_vect)
-ISR(PORTR_INT0_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_R, 0);
-}
+AVR8_ISR(PORTR_INT0_vect, irq_handler, PORT_R, 0);
 #endif
 #if defined(PORTR_INT1_vect)
-ISR(PORTR_INT1_vect, ISR_BLOCK)
-{
-    irq_handler(PORT_R, 1);
-}
+AVR8_ISR(PORTR_INT1_vect, irq_handler, PORT_R, 1);
 #endif

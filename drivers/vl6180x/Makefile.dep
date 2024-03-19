@@ -1,0 +1,17 @@
+ifneq (,$(filter vl6180x_irq_%,$(USEMODULE)))
+  USEMODULE += vl6180x_irq
+endif
+
+ifneq (,$(filter vl6180x,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+  USEMODULE += ztimer_msec
+endif
+
+ifneq (,$(filter vl6180x_shutdown,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+endif
+
+ifneq (,$(filter vl6180x_irq,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
+endif

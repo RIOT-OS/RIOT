@@ -27,14 +27,20 @@ extern "C" {
 /**
  * @brief   Available number of ADC devices
  */
-#if defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L475VG)
+#if defined(ADC3)
 #define ADC_DEVS            (3U)
-#elif defined(CPU_MODEL_STM32L452RE) || defined(CPU_MODEL_STM32L432KC)
+#elif defined(ADC2)
+#define ADC_DEVS            (2U)
+#elif defined(ADC1)
 #define ADC_DEVS            (1U)
+#else
+#error "Can't determine the number of ADC devices"
 #endif
 
 #if defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L475VG) || \
-    defined(CPU_MODEL_STM32L452RE) || defined(CPU_MODEL_STM32L432KC)
+    defined(CPU_MODEL_STM32L452RE) || defined(CPU_MODEL_STM32L432KC) || \
+    defined(CPU_MODEL_STM32L496ZG) || defined(CPU_MODEL_STM32L4R5ZI) || \
+    defined(CPU_MODEL_STM32L496AG)
 /**
  * @brief   ADC voltage regulator start-up time [us]
  */

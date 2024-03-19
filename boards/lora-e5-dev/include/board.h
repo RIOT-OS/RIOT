@@ -46,12 +46,8 @@ extern void lora_e5_dev_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_mo
  * @name    LED pin definitions and handlers
  * @{
  */
-#define LED0_PORT           GPIOB
-#define LED0_PIN            GPIO_PIN(PORT_B, 5)
-#define LED0_MASK           (1 << 5)
-#define LED0_OFF            (LED0_PORT->BSRR = LED0_MASK)
-#define LED0_ON             (LED0_PORT->BSRR = (LED0_MASK << 5))
-#define LED0_TOGGLE         (LED0_PORT->ODR  ^= LED0_MASK)
+#define LED0_PORT_NUM       PORT_B
+#define LED0_PIN_NUM        5
 /** @} */
 
 /**
@@ -95,14 +91,11 @@ extern void lora_e5_dev_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_mo
  */
 #define LORA_E5_DEV_5V_ENABLE_PIN           GPIO_PIN(PORT_B, 10)
 
-/**
- * @brief   Board level initialization
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif
+
+#include "stm32_leds.h"
 
 #endif /* BOARD_H */
 /** @} */

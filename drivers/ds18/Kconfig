@@ -6,7 +6,9 @@
 #
 
 menuconfig MODULE_DS18
-    bool "DS18 temperature sensors"
+    bool
+    prompt "DS18 temperature sensors" if !(MODULE_SAUL_DEFAULT && HAVE_DS18)
+    default (MODULE_SAUL_DEFAULT && HAVE_DS18)
     depends on HAS_PERIPH_GPIO
     depends on TEST_KCONFIG
     select MODULE_PERIPH_GPIO
@@ -18,3 +20,8 @@ config MODULE_DS18_OPTIMIZED
     help
         Say y to use the optimized mode if the board can handle ~3us resolution
         with the xtimer.
+
+config HAVE_DS18
+    bool
+    help
+        Indicates that a DS18 temperature sensor is present.

@@ -39,6 +39,11 @@ extern "C" {
 #define GET_RDP(x) ((x & 0xFF00) >> 8)
 
 /**
+ * @brief   Available number of ADC devices
+ */
+#define ADC_DEVS            (3U)
+
+/**
  * @brief   Override the ADC resolution configuration
  * @{
  */

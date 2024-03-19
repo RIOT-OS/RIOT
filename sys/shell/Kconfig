@@ -23,7 +23,7 @@ menuconfig MODULE_SHELL
     select MODULE_STDIN
     depends on TEST_KCONFIG
 
-rsource "commands/Kconfig"
+rsource "cmds/Kconfig"
 
 if MODULE_SHELL
 rsource "Kconfig.config"

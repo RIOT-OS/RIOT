@@ -1,0 +1,19 @@
+ifneq (,$(filter congure_abe,$(USEMODULE)))
+  USEMODULE += congure_reno_methods
+endif
+
+ifneq (,$(filter congure_quic,$(USEMODULE)))
+  USEMODULE += ztimer_msec
+endif
+
+ifneq (,$(filter congure_test,$(USEMODULE)))
+  USEMODULE += fmt
+endif
+
+ifneq (,$(filter congure_reno,$(USEMODULE)))
+  USEMODULE += congure_reno_methods
+endif
+
+ifneq (,$(filter congure_reno_methods,$(USEMODULE)))
+  USEMODULE += seq
+endif

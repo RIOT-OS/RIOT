@@ -40,6 +40,10 @@ ifneq (,$(filter socket_zep,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter libc_gettimeofday,$(USEMODULE)))
+  USEMODULE += ztimer64_usec
+endif
+
 USEMODULE += periph
 
 # UART is needed by startup.c

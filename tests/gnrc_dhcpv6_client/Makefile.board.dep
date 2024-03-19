@@ -1,3 +1,0 @@
-ifneq (native,$(BOARD))
-  USEMODULE += stdio_ethos
-endif

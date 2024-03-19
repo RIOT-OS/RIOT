@@ -1,29 +1,36 @@
-#
-# makes any file in BLOBS available via '#include "blob/<filename>.h"
-#
-# # Usage:
-#
-# Add this to an application or module Makefile:
-#
-#     BLOBS += foo.ext
-#
-# Then include in C file or header:
-#
-#    #include "blob/foo.ext.h"
-#
-# The blob can then be accessed using the symbols "foo_ext" and "foo_ext_len".
-#
-# # Subfolders
-#
-# It is possible to add files from subfolders to BLOBS:
-#
-#     BLOBS += subfolder/my_file.foo
-#
-# The subfolder will be part of the generated header's path, but *not* of the
-# generated symbols. E.g., above blob would be made available by including
-# "blobs/subfolder/my_file.ext.h", which would define the symbols "my_file_ext"
-# and "my_file_ext_len". Beware possible symbol name clashes.
-#
+## @defgroup    utils_blob Blob file module
+## @ingroup     utils
+## @brief       Include any file content as binary data in a RIOT application
+##
+## makes any file in BLOBS available via an include directive in the C code.
+##
+## # Usage:
+##
+## Add this to an application or module Makefile:
+##
+## ```
+## BLOBS += foo.ext
+## ```
+##
+## Then include in C file or header:
+##
+## ```
+## #include "blob/foo.ext.h"
+## ```
+##
+## The blob can then be accessed using the symbols "foo_ext" and "foo_ext_len".
+##
+## # Subfolders
+##
+## It is possible to add files from subfolders to BLOBS:
+##
+##     BLOBS += subfolder/my_file.foo
+##
+## The subfolder will be part of the generated header's path, but *not* of the
+## generated symbols. E.g., above blob would be made available by including
+## "blobs/subfolder/my_file.ext.h", which would define the symbols "my_file_ext"
+## and "my_file_ext_len". Beware possible symbol name clashes.
+##
 
 # use "blobs/blob" so the headers can be included as "blob/foo.h", but
 # we don't have to add $(BINDIR)/$(MODULE) to the include path.

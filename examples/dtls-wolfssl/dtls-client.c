@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "net/gnrc/netif.h"
 #include "log.h"
 
 #define SERVER_PORT 11111

@@ -32,15 +32,7 @@ extern "C" {
  *          This function is defined in the cryptoauth library via patch.
  *          It is used to pass commands to run built-in unit tests of the library.
  */
-int atca_run_cmd(const char *command);
-
-/**
- * @brief   Function switches the default cfg in cryptoauthlib test to RIOT cfg
- */
-void riot_switch_cfg(ATCAIfaceCfg *cfg)
-{
-    *cfg = atca_params[0];
-}
+int atca_run_cmd(char *command, size_t len);
 
 #ifdef __cplusplus
 }

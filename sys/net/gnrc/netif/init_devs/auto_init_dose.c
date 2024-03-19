@@ -22,12 +22,13 @@
 #include "dose.h"
 #include "dose_params.h"
 #include "net/gnrc/netif/ethernet.h"
+#include "include/init_devs.h"
 
 /**
  * @brief   Define stack parameters for the MAC layer thread
  * @{
  */
-#define DOSE_MAC_STACKSIZE (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)
+#define DOSE_MAC_STACKSIZE (GNRC_NETIF_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)
 #ifndef DOSE_MAC_PRIO
 #define DOSE_MAC_PRIO      (GNRC_NETIF_PRIO)
 #endif

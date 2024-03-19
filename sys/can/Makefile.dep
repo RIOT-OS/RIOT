@@ -1,0 +1,19 @@
+USEMODULE += can_raw
+
+ifneq (,$(filter can_isotp,$(USEMODULE)))
+  USEMODULE += ztimer
+  USEMODULE += ztimer_usec
+  USEMODULE += gnrc_pktbuf
+endif
+
+ifneq (,$(filter conn_can,$(USEMODULE)))
+  USEMODULE += can_mbox
+  USEMODULE += ztimer
+  USEMODULE += ztimer_usec
+endif
+
+ifneq (,$(filter can_mbox,$(USEMODULE)))
+  USEMODULE += core_mbox
+endif
+
+USEMODULE += memarray

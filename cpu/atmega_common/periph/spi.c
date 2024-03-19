@@ -3,6 +3,7 @@
  *               2016 Freie Universität Berlin
  *               2017 Hamburg University of Applied Sciences
  *               2017 Thomas Perrot <thomas.perrot@tupi.fr>
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -21,6 +22,7 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Dimitri Nahm <dimitri.nahm@haw-hamburg.de>
  * @author      Thomas Perrot <thomas.perrot@tupi.fr>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -29,6 +31,7 @@
 #include "cpu.h"
 #include "mutex.h"
 #include "periph/spi.h"
+#include "periph/pm.h"
 
 /**
  * @brief   Extract BR0, BR1 and SPI2X bits from speed value
@@ -43,8 +46,10 @@ static mutex_t lock = MUTEX_INIT;
 void spi_init(spi_t bus)
 {
     assert(bus == 0);
+#ifdef PRSPI
     /* power off the SPI peripheral */
     power_spi_disable();
+#endif
     /* trigger the pin configuration */
     spi_init_pins(bus);
 }
@@ -53,13 +58,13 @@ void spi_init_pins(spi_t bus)
 {
     (void)bus;
     /* set SPI pins as output */
-#if defined (CPU_ATMEGA2560) || defined (CPU_ATMEGA1281)
+#if defined(CPU_ATMEGA2560) || defined(CPU_ATMEGA1281)
     DDRB |= ((1 << DDB2) | (1 << DDB1) | (1 << DDB0));
 #endif
-#if defined (CPU_ATMEGA328P)
+#if defined(CPU_ATMEGA328P) || defined(CPU_ATMEGA8)
     DDRB |= ((1 << DDB2) | (1 << DDB3) | (1 << DDB5));
 #endif
-#if defined (CPU_ATMEGA1284P)
+#if defined(CPU_ATMEGA1284P)
     DDRB |= ((1 << DDB4) | (1 << DDB5) | (1 << DDB7));
 #endif
 #if defined(CPU_ATMEGA128RFA1) || defined(CPU_ATMEGA256RFR2)
@@ -85,8 +90,11 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     assert(bus == SPI_DEV(0));
 
     /* lock the bus and power on the SPI peripheral */
+    pm_block(4); /* Require clkIO */
     mutex_lock(&lock);
+#ifdef PRSPI
     power_spi_enable();
+#endif
 
     /* configure as master, with given mode and clock */
     SPSR = (clk >> S2X_SHIFT);
@@ -102,8 +110,11 @@ void spi_release(spi_t bus)
     (void)bus;
     /* power off and release the bus */
     SPCR &= ~(1 << SPE);
+#ifdef PRSPI
     power_spi_disable();
+#endif
     mutex_unlock(&lock);
+    pm_unblock(4);
 }
 
 void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,

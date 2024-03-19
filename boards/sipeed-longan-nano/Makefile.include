@@ -1,0 +1,5 @@
+PORT_LINUX ?= /dev/ttyACM0
+PROGRAMMER ?= dfu-util
+OPENOCD_CONFIG ?= $(RIOTBOARD)/common/gd32v/dist/openocd.cfg
+
+include $(RIOTBOARD)/common/gd32v/Makefile.include

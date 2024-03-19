@@ -50,6 +50,7 @@
 #define _MAX_L2_ADDR_LEN    (8U)
 
 static char _stack[GNRC_IPV6_STACK_SIZE + DEBUG_EXTRA_STACKSIZE];
+static msg_t _msg_q[GNRC_IPV6_MSG_QUEUE_SIZE];
 
 #ifdef MODULE_FIB
 /**
@@ -172,12 +173,12 @@ static void _dispatch_next_header(gnrc_pktsnip_t *pkt, unsigned nh,
 
 static void *_event_loop(void *args)
 {
-    msg_t msg, reply, msg_q[GNRC_IPV6_MSG_QUEUE_SIZE];
+    msg_t msg, reply;
     gnrc_netreg_entry_t me_reg = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
                                                             thread_getpid());
 
     (void)args;
-    msg_init_queue(msg_q, GNRC_IPV6_MSG_QUEUE_SIZE);
+    msg_init_queue(_msg_q, GNRC_IPV6_MSG_QUEUE_SIZE);
 
     /* initialize fragmentation data-structures */
 #ifdef MODULE_GNRC_IPV6_EXT_FRAG
@@ -244,6 +245,12 @@ static void *_event_loop(void *args)
                 DEBUG("ipv6: NIB timer event received\n");
                 gnrc_ipv6_nib_handle_timer_event(msg.content.ptr, msg.type);
                 break;
+            case GNRC_IPV6_NIB_IFACE_UP:
+                gnrc_ipv6_nib_iface_up(msg.content.ptr);
+                break;
+            case GNRC_IPV6_NIB_IFACE_DOWN:
+                gnrc_ipv6_nib_iface_down(msg.content.ptr, false);
+                break;
             default:
                 break;
         }
@@ -271,8 +278,12 @@ static void _send_to_iface(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
           ipv6_addr_to_str(addr_str, &hdr->dst, sizeof(addr_str)), hdr->nh,
           byteorder_ntohs(hdr->len));
 #ifdef MODULE_NETSTATS_IPV6
+    /* This is read from the netif thread. To prevent data corruptions, we
+     * have to guarantee mutually exclusive access */
+    unsigned irq_state = irq_disable();
     netif->ipv6.stats.tx_success++;
     netif->ipv6.stats.tx_bytes += gnrc_pkt_len(pkt->next);
+    irq_restore(irq_state);
 #endif
 
 #ifdef MODULE_GNRC_SIXLOWPAN
@@ -510,7 +521,11 @@ static void _send_unicast(gnrc_pktsnip_t *pkt, bool prep_hdr,
               netif->pid);
         /* and send to interface */
 #ifdef MODULE_NETSTATS_IPV6
+        /* This is read from the netif thread. To prevent data corruptions, we
+         * have to guarantee mutually exclusive access */
+        unsigned irq_state = irq_disable();
         netif->ipv6.stats.tx_unicast_count++;
+        irq_restore(irq_state);
 #endif
         _send_to_iface(netif, pkt);
     }
@@ -533,7 +548,11 @@ static inline void _send_multicast_over_iface(gnrc_pktsnip_t *pkt,
     }
     DEBUG("ipv6: send multicast over interface %" PRIkernel_pid "\n", netif->pid);
 #ifdef MODULE_NETSTATS_IPV6
+    /* This is read from the netif thread. To prevent data corruptions, we
+     * have to guarantee mutually exclusive access */
+    unsigned irq_state = irq_disable();
     netif->ipv6.stats.tx_mcast_count++;
+    irq_restore(irq_state);
 #endif
     /* and send to interface */
     _send_to_iface(netif, pkt);
@@ -615,9 +634,13 @@ static void _send_multicast(gnrc_pktsnip_t *pkt, bool prep_hdr,
 static void _send_to_self(gnrc_pktsnip_t *pkt, bool prep_hdr,
                           gnrc_netif_t *netif)
 {
-    if (!_safe_fill_ipv6_hdr(netif, pkt, prep_hdr) ||
-        /* no netif header so we just merge the whole packet. */
-        (gnrc_pktbuf_merge(pkt) != 0)) {
+    /* _safe_fill_ipv6_hdr releases pkt on error */
+    if (!_safe_fill_ipv6_hdr(netif, pkt, prep_hdr)) {
+        DEBUG("ipv6: error looping packet to sender.\n");
+        return;
+    }
+    /* no netif header so we just merge the whole packet. */
+    else if (gnrc_pktbuf_merge(pkt) != 0) {
         DEBUG("ipv6: error looping packet to sender.\n");
         gnrc_pktbuf_release(pkt);
         return;
@@ -695,6 +718,11 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
     else {
         gnrc_netif_t *tmp_netif = gnrc_netif_get_by_ipv6_addr(&ipv6_hdr->dst);
 
+        /* only consider link-local addresses on the interface we are sending on */
+        if (tmp_netif != netif && ipv6_addr_is_link_local(&ipv6_hdr->dst)) {
+            tmp_netif = NULL;
+        }
+
         if (ipv6_addr_is_loopback(&ipv6_hdr->dst) ||    /* dst is loopback address */
             /* or dst registered to a local interface */
             (tmp_netif != NULL)) {
@@ -737,9 +765,13 @@ static void _receive(gnrc_pktsnip_t *pkt)
         netif = gnrc_netif_hdr_get_netif(netif_hdr->data);
 #ifdef MODULE_NETSTATS_IPV6
         assert(netif != NULL);
+        /* This is read from the netif thread. To prevent data corruptions, we
+         * have to guarantee mutually exclusive access */
+        unsigned irq_state = irq_disable();
         netstats_t *stats = &netif->ipv6.stats;
         stats->rx_count++;
         stats->rx_bytes += (gnrc_pkt_len(pkt) - netif_hdr->size);
+        irq_restore(irq_state);
 #endif
     }
 

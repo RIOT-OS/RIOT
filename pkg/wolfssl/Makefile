@@ -1,6 +1,7 @@
 PKG_NAME=wolfssl
 PKG_URL=https://github.com/wolfssl/wolfssl.git
-PKG_VERSION=0fa5af9929ce2ee99e8789996a3048f41a99830e # v4.5.0
+# v5.5.4
+PKG_VERSION=4fbd4fd36a21efd9d1a7e17aba390e91c78693b1
 PKG_LICENSE=GPLv2
 
 include $(RIOTBASE)/pkg/pkg.mk

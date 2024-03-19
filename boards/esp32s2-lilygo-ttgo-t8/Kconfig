@@ -1,0 +1,58 @@
+# Copyright (c) 2020 HAW Hamburg
+#               2022 Gunar Schorcht
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "esp32s2-lilygo-ttgo-t8" if BOARD_ESP32S2_LILYGO_TTGO_T8
+
+config BOARD_ESP32S2_LILYGO_TTGO_T8
+    bool
+    default y
+    select BOARD_COMMON_ESP32S2
+    select CPU_MODEL_ESP32S2
+    select HAS_ARDUINO_PINS
+    select HAS_ESP_RTC_TIMER_32K if ESP32S2_LILYGO_TTGO_T8_32K_XTAL
+    select HAS_ESP_SPI_RAM
+    select HAS_HIGHLEVEL_STDIO if ESP32S2_LILYGO_TTGO_T8_USB
+    select HAS_PERIPH_ADC
+    select HAS_PERIPH_DAC
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_PWM
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_USBDEV
+    select HAS_SDCARD_SPI
+    select HAS_TINYUSB_DEVICE
+    select HAVE_MTD_SDCARD_DEFAULT
+    select HAVE_ST7789
+    select MODULE_FATFS_VFS if MODULE_VFS_DEFAULT
+
+config FORCE_USB_STDIO
+    default y if ESP32S2_LILYGO_TTGO_T8_USB
+
+menu "LILYGO TTGO T8 ESP32-S2 Board configurations"
+    depends on BOARD_ESP32S2_LILYGO_TTGO_T8
+
+    config ESP32S2_LILYGO_TTGO_T8_USB
+        bool "USB interface is used instead of USB-to-UART bridge"
+        help
+            The USB D-/D+ signals are connected via DIP switches either to the
+            USB-to-UART bridge (default) or to GPIO19/GPIO20 of the ESP32-S2.
+            To use the USB interface of the ESP32-S2, the USB D-/D+ signals
+            must be connected to GPIO19 and GPIO20 and this option has to be
+            enabled.
+
+    config ESP32S2_LILYGO_TTGO_T8_32K_XTAL
+        bool "32.768 kHz crystal is used"
+        default y
+        help
+            GPIO15 and GPIO16 of the ESP32-S2 are connected via DIP switches
+            either with the on-board 32.768 kHz crystal (default) or the
+            according pins at the extension headers. If the pins at the
+            extension headers are used instead, disable this option.
+
+endmenu
+
+source "$(RIOTBOARD)/common/esp32s2/Kconfig"

@@ -1,0 +1,5 @@
+BOARD_INSUFFICIENT_MEMORY := \
+    nrf52840dk \
+    nrf52840dongle \
+    nrf52dk \
+    #

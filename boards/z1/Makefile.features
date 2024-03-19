@@ -1,4 +1,4 @@
-CPU = msp430fxyz
+CPU = msp430
 CPU_MODEL = msp430f2617
 
 # Put defined MCU peripherals here (in alphabetical order)

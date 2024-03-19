@@ -101,6 +101,10 @@ task_return:
 
     /* Restore all registers, PC & cpsr */
     ldmfd   r0, {r0-lr}^
+    /* According to ARM Architecture Reference Manual DDI 0100I,
+     * ldms which affect banked registers must be followed by a nop.
+     */
+    nop
 
     /* return to task */
     movs pc, lr

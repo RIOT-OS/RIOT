@@ -1,61 +1,311 @@
-# ESP32 specific flashing options
-FLASH_CHIP  = esp32
-FLASH_MODE ?= dout
-FLASH_FREQ  = 40m   # DO NOT CHANGE
-FLASH_SIZE ?= 4
-BOOTLOADER_POS = 0x1000
+# ESP32x specific flashing options
+FLASH_CHIP  = $(CPU_FAM)
+
+export ESP32_SDK_DIR ?= $(PKGDIRBASE)/esp32_sdk
+
+ifneq (,$(filter usb_board_reset,$(USEMODULE)))
+  include $(RIOTMAKE)/tools/usb_board_reset.mk
+endif
+
+# Serial flasher config as used by the ESP-IDF, be careful when overriding them.
+# They have to be exported to use same values in subsequent makefiles.
+ifeq (esp32,$(CPU_FAM))
+  export FLASH_MODE ?= dout
+  export FLASH_FREQ ?= 40m
+  export FLASH_SIZE ?= 2
+  BOOTLOADER_POS = 0x1000
+else ifneq (,$(filter esp32c3 esp32s3,$(CPU_FAM)))
+  export FLASH_MODE ?= dio
+  export FLASH_FREQ ?= 80m
+  export FLASH_SIZE ?= 2
+  BOOTLOADER_POS = 0x0000
+else ifneq (,$(filter esp32s2,$(CPU_FAM)))
+  export FLASH_MODE ?= qio
+  export FLASH_FREQ ?= 80m
+  export FLASH_SIZE ?= 4
+  BOOTLOADER_POS = 0x1000
+else
+  $(error Unkwnown ESP32x SoC variant (family))
+endif
+
+# RAM configuration
+ifeq (esp32,$(CPU_FAM))
+  ifneq (,$(filter esp_idf_ble,$(USEMODULE)))
+    # If BT is used, the first 0xdb5c bytes (ca. 55 kbytes) of RAM are shared
+    # with the BT controller. Usable RAM region the starts at 0x3FFBDB5C.
+    # We reduce the usable size by 55 kByte.
+    RAM_LEN = 120K
+    RAM_START_ADDR = 0x3FFBE000
+  else
+    RAM_LEN = 176K
+    RAM_START_ADDR = 0x3FFB0000
+  endif
+else ifeq (esp32s2,$(CPU_FAM))
+  # The ESP32-S2 configuration in RIOT uses a data cache size and an
+  # instruction cache size of 8 kByte each. This means that the usable RAM
+  # starts at 0x3FFB0000 + 0x4000 and the size is reduced by 0x4000
+  RAM_LEN = 176K
+  RAM_START_ADDR = 0x3FFB4000
+else ifeq (esp32s3,$(CPU_FAM))
+  RAM_LEN = 264K
+  RAM_START_ADDR = 0x3FC88000
+else ifeq (esp32c3,$(CPU_FAM))
+  # Note: The address space is shared between the data and the instruction bus.
+  # Therefore, a part at the beginning of the RAM is not usable since it is
+  # used as instruction cache via the instruction bus.
+  RAM_LEN = 320K
+  RAM_START_ADDR = 0x3FC80000
+else
+  $(error Unkwnown ESP32x SoC variant (family))
+endif
+
+ifneq (,$(filter periph_flashpage,$(USEMODULE)))
+  ifneq (,$(CONFIG_ESP_FLASHPAGE_CAPACITY_64K))
+    FLASHFILE_POS = 0x20000
+    FLASHPAGE_CAP = 0x10000
+  else ifneq (,$(CONFIG_ESP_FLASHPAGE_CAPACITY_128K))
+    FLASHFILE_POS = 0x30000
+    FLASHPAGE_CAP = 0x20000
+  else ifneq (,$(CONFIG_ESP_FLASHPAGE_CAPACITY_256K))
+    FLASHFILE_POS = 0x50000
+    FLASHPAGE_CAP = 0x40000
+  else ifneq (,$(CONFIG_ESP_FLASHPAGE_CAPACITY_512K))
+    FLASHFILE_POS = 0x90000
+    FLASHPAGE_CAP = 0x80000
+  else ifneq (,$(CONFIG_ESP_FLASHPAGE_CAPACITY_1M))
+    FLASHFILE_POS = 0x110000
+    FLASHPAGE_CAP = 0x100000
+  else ifneq (,$(CONFIG_ESP_FLASHPAGE_CAPACITY_2M))
+    FLASHFILE_POS = 0x210000
+    FLASHPAGE_CAP = 0x200000
+  else
+    # use 512 kByte for periph_flashpage by default
+    FLASHFILE_POS = 0x90000
+    FLASHPAGE_CAP = 0x80000
+    CFLAGS += -DCONFIG_ESP_FLASHPAGE_CAPACITY_512K
+  endif
+  FLASHPAGE_ADDR_START = 0x10000
+  FLASHPAGE_ADDR_END = $(FLASHFILE_POS)
+  CFLAGS += -DFLASHPAGE_ADDR_START=$(FLASHPAGE_ADDR_START)
+  CFLAGS += -DFLASHPAGE_ADDR_END=$(FLASHPAGE_ADDR_END)
+endif
+
+FLASHFILE_POS ?= 0x10000
+
+ESPTOOL ?= $(RIOTTOOLS)/esptools/esptool_v3.2.py
 
 include $(RIOTCPU)/esp_common/Makefile.include
 
 # regular Makefile
 
-TARGET_ARCH_ESP32 ?= xtensa-esp32-elf
-TARGET_ARCH ?= $(TARGET_ARCH_ESP32)
+ifeq (xtensa,$(CPU_ARCH))
+  TARGET_ARCH ?= xtensa-$(CPU_FAM)-elf
+else ifeq (rv32,$(CPU_ARCH))
+  TARGET_ARCH ?= riscv32-esp-elf
+else
+  $(error Unkwnown ESP32x SoC architecture)
+endif
 
+PSEUDOMODULES += esp_ble
+PSEUDOMODULES += esp_bootloader
 PSEUDOMODULES += esp_gdbstub
 PSEUDOMODULES += esp_hw_counter
+PSEUDOMODULES += esp_idf_gpio_hal
 PSEUDOMODULES += esp_i2c_hw
 PSEUDOMODULES += esp_jtag
+PSEUDOMODULES += esp_lcd_gpio
 PSEUDOMODULES += esp_rtc_timer_32k
 PSEUDOMODULES += esp_spi_ram
+PSEUDOMODULES += esp_spi_oct
 PSEUDOMODULES += esp_wifi_enterprise
+PSEUDOMODULES += stdio_usb_serial_jtag_rx
 
-INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/
-INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include
-INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/esp32
-INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/heap
-INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/spi_flash
-INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/tcpip_adapter
-INCLUDES += -I$(RIOTCPU)/$(CPU)
+INCLUDES += -I$(RIOTCPU)/$(CPU)/esp-idf/include
+INCLUDES += -I$(RIOTCPU)/$(CPU)/esp-idf/include/log
+INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/include
+
+INCLUDES += -I$(ESP32_SDK_DIR)/components
+INCLUDES += -I$(ESP32_SDK_DIR)/components/bootloader_support/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/driver/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_common/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/include/soc
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_rom/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_rom/include/$(CPU_FAM)
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_system/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_system/port/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_timer/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/hal/$(CPU_FAM)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/hal/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/hal/platform_port/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/heap/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/log/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/newlib/platform_include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/soc/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/soc/$(CPU_FAM)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/spi_flash/include
+
+ifneq (,$(filter riscv32%,$(TARGET_ARCH)))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/riscv/include
+endif
+
+ifneq (,$(filter xtensa%,$(TARGET_ARCH)))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/xtensa/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/xtensa/$(CPU_FAM)/include
+endif
+
+ifneq (,$(filter esp_ble,$(USEMODULE)))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/bt/include/$(CPU_FAM)/include
+endif
+
+ifneq (,$(filter esp_ble_nimble,$(USEMODULE)))
+  INCLUDES += -I$(RIOTCPU)/$(CPU)/include/esp_ble_nimble
+  INCLUDES += $(NIMIBASE)/nimble/transport/common/hci_h4/include
+endif
+
+ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/include/soc/$(CPU_FAM)
+endif
+
+ifneq (,$(filter esp_idf_lcd,$(USEMODULE)))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_lcd/include
+endif
+
+ifneq (,$(filter esp_idf_spi_flash,$(USEMODULE)))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/spi_flash/include
+endif
+
+ifneq (,$(filter esp_idf_usb,$(USEMODULE)))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/usb/include
+endif
+
+ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/bootloader_support/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_eth/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_event/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_netif/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_wifi/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/nvs_flash/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/spi_flash/include
+endif
+
+ifneq (,$(filter esp_wifi_enterprise,$(USEMODULE)))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/wpa_supplicant/esp_supplicant/include
+endif
 
 ifneq (,$(filter esp_eth,$(USEMODULE)))
-  INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/ethernet
+  INCLUDES += -I$(RIOTCPU)/$(CPU)/esp-eth
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_eth/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_event/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_netif/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_wifi/include
 endif
 
-CFLAGS += -DSDK_NOT_USED -DCONFIG_FREERTOS_UNICORE=1 -DESP_PLATFORM
+CFLAGS += -DCPU_FAM_$(call uppercase_and_underscore,$(CPU_FAM))
+
+# we use ESP32 only in single core mode
+CFLAGS += -DCONFIG_ESP_SYSTEM_SINGLE_CORE_MODE
+CFLAGS += -DCONFIG_FREERTOS_UNICORE
+
+# other ESP-IDF configurations
+CFLAGS += -DCONFIG_IDF_TARGET_$(call uppercase_and_underscore,$(CPU_FAM))
+CFLAGS += -DESP_PLATFORM
 CFLAGS += -DLOG_TAG_IN_BRACKETS
+
+# extend CFLAGS by the corresponding FLASH_FREQ
+ifeq (20m,$(FLASH_FREQ))
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHFREQ_20M
+else ifeq (26m,$(FLASH_FREQ))
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHFREQ_26M
+else ifeq (40m,$(FLASH_FREQ))
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHFREQ_40M
+else ifeq (80m,$(FLASH_FREQ))
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHFREQ_80M
+else ifeq (120m,$(FLASH_FREQ))
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHFREQ_120M
+endif
+
+#extend CFLAGS by the corresponding FLASH_SIZE
+ifeq (1,$(FLASH_SIZE))
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHSIZE_1MB
+else ifeq (2,$(FLASH_SIZE))
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHSIZE_2MB
+else ifeq (4,$(FLASH_SIZE))
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHSIZE_4MB
+else ifeq (8,$(FLASH_SIZE))
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHSIZE_8MB
+else ifeq (16,$(FLASH_SIZE))
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHSIZE_16MB
+endif
+
+# shortcuts used by ESP-IDF
+CFLAGS += -Dasm=__asm
+CFLAGS += -Dtypeof=__typeof__
 CFLAGS += -D_CONST=const
 
-ifneq (,$(filter pthread,$(USEMODULE)))
-  # The toolchain provides POSIX type definitions for pthread which
-  # conflicts with that in RIOT. With the following CFLAGS/CXXFLAGS skip
-  # the inclusion of the types shipped by the toolchain.
-  CFLAGS += -D_SYS__PTHREADTYPES_H_
-  CXXFLAGS += -D_SYS__PTHREADTYPES_H_
+# TODO no relaxation yet
+ifneq (,$(filter riscv%,$(TARGET_ARCH)))
+  CFLAGS += -mno-relax -march=rv32imc_zicsr_zifencei -mabi=ilp32 -DRISCV_NO_RELAX
+  LINKFLAGS += -mno-relax -march=rv32imc_zicsr_zifencei -mabi=ilp32
+  GCC_NEW_RISCV_ISA ?= $(shell echo "typedef int dont_be_pedantic;" | \
+                               $(TARGET_ARCH)-gcc -march=rv32imac -mabi=ilp32 \
+                                                  -misa-spec=2.2 -E - > /dev/null 2>&1 && \
+                               echo 1 || echo 0)
+  ifeq (1,$(GCC_NEW_RISCV_ISA))
+    CFLAGS += -misa-spec=2.2
+  endif
 endif
 
-LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ld/
-LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.ld
-LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.common.ld
-LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.peripherals.ld
-LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.rom.ld
-LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.rom.nanofmt.ld
+ifneq (,$(filter xtensa%,$(TARGET_ARCH)))
+  LINKFLAGS += -L$(ESP32_SDK_DIR)/components/xtensa/$(CPU_FAM)
+  ARCHIVES += -lxt_hal
+endif
+
+LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ld/$(CPU_FAM)/
+
+LINKFLAGS += -T$(BINDIR)/memory.ld
+LINKFLAGS += -T$(BINDIR)/sections.ld
+
+LINKFLAGS += -T$(ESP32_SDK_DIR)/components/soc/$(CPU_FAM)/ld/$(CPU_FAM).peripherals.ld
+LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.api.ld
+LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.ld
+
+ifneq (,$(filter esp32 esp32s2,$(CPU_FAM)))
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.newlib-data.ld
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.newlib-funcs.ld
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.newlib-time.ld
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.spiflash.ld
+else ifeq (esp32c3,$(CPU_FAM))
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.libgcc.ld
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.newlib.ld
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.version.ld
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.eco3.ld
+else ifeq (esp32s3,$(CPU_FAM))
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.libgcc.ld
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.newlib.ld
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.version.ld
+else
+  $(error Unkwnown ESP32x SoC variant (family))
+endif
+
 LINKFLAGS += -nostdlib -lgcc -Wl,-gc-sections
+
+# all ESP32x SoCs have to load executable code into IRAM
+# warning 'LOAD segment with RWX permissions' has to be disabled therefore
+ifeq (1,$(GCC_NEW_RISCV_ISA))
+  LINKFLAGS += -Wl,--no-warn-rwx-segments
+endif
 
 # Libraries needed when using esp_wifi_any pseudomodule
 ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
-  ARCHIVES += -lcore -lrtc -lnet80211 -lpp -lcoexist -lwps -lwpa -lwpa2
+  LINKFLAGS += -L$(ESP32_SDK_LIB_WIFI_DIR)/$(CPU_FAM)
+  LINKFLAGS += -L$(ESP32_SDK_LIB_PHY_DIR)/$(CPU_FAM)
+  ARCHIVES += -lcoexist -lcore -lmesh -lnet80211 -lpp
   ARCHIVES += -lphy -lstdc++
+  ifeq (esp32,$(CPU_FAM))
+    ARCHIVES += -lrtc
+  endif
 endif
 
 # Libraries needed when using esp_now module
@@ -63,20 +313,50 @@ ifneq (,$(filter esp_now,$(USEMODULE)))
   ARCHIVES += -lespnow -lmesh
 endif
 
+# Libraries needed when using esp_ble
+ifneq (,$(filter esp_ble,$(USEMODULE)))
+  LINKFLAGS += -L$(ESP32_SDK_LIB_PHY_DIR)/$(CPU_FAM)
+  LINKFLAGS += -L$(ESP32_SDK_LIB_BT_DIR)/$(CPU_FAM)
+  ARCHIVES += -lbtdm_app
+  ARCHIVES += -lphy -lstdc++
+  ifeq (esp32,$(CPU_FAM))
+    ARCHIVES += -lrtc
+  else ifneq (,$(filter esp32c3 esp32s3,$(CPU_FAM)))
+    ARCHIVES += -lbtbb
+  endif
+endif
+
 ifneq (,$(filter cpp,$(USEMODULE)))
   ARCHIVES += -lstdc++
+endif
+
+ifneq (,$(filter esp_bootloader,$(USEMODULE)))
+  # Bootloader file used by esptool.inc.mk
+  BOOTLOADER_BIN ?= $(BINDIR)/esp_bootloader/bootloader.bin
 endif
 
 ifneq (,$(filter esp_jtag,$(USEMODULE)))
   PROGRAMMERS_SUPPORTED += openocd
   PARTITION_POS = 0x8000
   OPENOCD_PRE_FLASH_CMDS = -c 'echo "Installing Bootloader at $(BOOTLOADER_POS)"' \
-    -c 'flash write_image erase "$(RIOTCPU)/$(CPU)/bin/bootloader.bin" $(BOOTLOADER_POS) bin' \
+    -c 'flash write_image erase "$(BOOTLOADER_BIN)" $(BOOTLOADER_POS) bin' \
     -c 'echo "Installing partition table at $(PARTITION_POS)"' \
     -c 'flash write_image erase "$(BINDIR)/partitions.bin" $(PARTITION_POS) bin'
-  IMAGE_OFFSET = 0x10000
+  IMAGE_OFFSET = $(FLASHFILE_POS)
   # Flash checksumming not supported on xtensa
   OPENOCD_SKIP_VERIFY = yes
   # Without resets debug target fails with 'Target not examined yet'
   OPENOCD_DBG_EXTRA_CMD += -c 'reset halt'
 endif
+
+LD_SCRIPTS += $(BINDIR)/memory.ld $(BINDIR)/sections.ld
+
+$(BINDIR)/memory.ld: $(RIOTCPU)/$(CPU)/ld/$(CPU_FAM)/memory.ld.in \
+                     $(BINDIR)/riotbuild/riotbuild.h pkg-prepare
+	$(Q)$(CC) -DLD_FILE_GEN $(INCLUDES) -include '$(BINDIR)/riotbuild/riotbuild.h' \
+				-I$(RIOTCPU)/$(CPU)/ld -P -x c -E $< -o $@
+$(BINDIR)/sections.ld: $(RIOTCPU)/$(CPU)/ld/$(CPU_FAM)/sections.ld.in \
+                       $(BINDIR)/riotbuild/riotbuild.h pkg-prepare
+	$(Q)$(CC) -DLD_FILE_GEN -include '$(BINDIR)/riotbuild/riotbuild.h' -C -P -x c -E $< -o $@
+
+$(BOOTLOADER_BIN):

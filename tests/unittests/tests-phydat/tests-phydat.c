@@ -58,8 +58,8 @@ static tdat_t data[] = {
     },
     {
         .dim  = 3,
-        .dat  = { { 1032, 10, -509 }, UNIT_G, -3 },
-        .json = "{\"d\":[1.032,0.010,-0.509],\"u\":\"g\"}",
+        .dat  = { { 1032, 10, -509 }, UNIT_G_FORCE, -3 },
+        .json = "{\"d\":[1.032,0.010,-0.509],\"u\":\"gₙ\"}",
     },
     {
         .dim  = 3,
@@ -204,14 +204,14 @@ static void test_unitstr__success(void)
     TEST_ASSERT_EQUAL_STRING("m", phydat_unit_to_str_verbose(UNIT_M));
     TEST_ASSERT_EQUAL_STRING("m^2", phydat_unit_to_str_verbose(UNIT_M2));
     TEST_ASSERT_EQUAL_STRING("m^3", phydat_unit_to_str_verbose(UNIT_M3));
-    TEST_ASSERT_EQUAL_STRING("g", phydat_unit_to_str_verbose(UNIT_G));
+    TEST_ASSERT_EQUAL_STRING("gₙ", phydat_unit_to_str_verbose(UNIT_G_FORCE));
     TEST_ASSERT_EQUAL_STRING("dps", phydat_unit_to_str_verbose(UNIT_DPS));
-    TEST_ASSERT_EQUAL_STRING("G", phydat_unit_to_str_verbose(UNIT_GR));
+    TEST_ASSERT_EQUAL_STRING("g", phydat_unit_to_str_verbose(UNIT_GRAM));
     TEST_ASSERT_EQUAL_STRING("A", phydat_unit_to_str_verbose(UNIT_A));
     TEST_ASSERT_EQUAL_STRING("V", phydat_unit_to_str_verbose(UNIT_V));
     TEST_ASSERT_EQUAL_STRING("W", phydat_unit_to_str_verbose(UNIT_W));
     TEST_ASSERT_EQUAL_STRING("dBm", phydat_unit_to_str_verbose(UNIT_DBM));
-    TEST_ASSERT_EQUAL_STRING("Gs", phydat_unit_to_str_verbose(UNIT_GS));
+    TEST_ASSERT_EQUAL_STRING("Gs", phydat_unit_to_str_verbose(UNIT_GAUSS));
     TEST_ASSERT_EQUAL_STRING("T", phydat_unit_to_str_verbose(UNIT_T));
     TEST_ASSERT_EQUAL_STRING("Bar", phydat_unit_to_str_verbose(UNIT_BAR));
     TEST_ASSERT_EQUAL_STRING("Pa", phydat_unit_to_str_verbose(UNIT_PA));

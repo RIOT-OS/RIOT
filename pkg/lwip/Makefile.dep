@@ -1,6 +1,6 @@
 # lwIP's memory management doesn't seem to work on non 32-bit platforms at the
 # moment.
-FEATURES_REQUIRED += arch_32bit
+FEATURES_REQUIRED_ANY += arch_32bit|arch_64bit
 
 DEFAULT_MODULE += auto_init_lwip
 
@@ -42,6 +42,7 @@ endif
 
 ifneq (,$(filter lwip_sock_%,$(USEMODULE)))
   USEMODULE += lwip_sock
+  CFLAGS += -DLWIP_SO_RCVTIMEO
 endif
 
 ifneq (,$(filter lwip_sock_ip,$(USEMODULE)))
@@ -87,7 +88,10 @@ endif
 
 ifneq (,$(filter lwip_contrib,$(USEMODULE)))
   USEMODULE += sema
-  USEMODULE += xtimer
+  USEMODULE += ztimer_msec
+  ifneq (,$(filter bhp,$(USEMODULE)))
+    USEMODULE += bhp_msg
+  endif
 endif
 
 ifneq (,$(filter lwip_netif,$(USEMODULE)))

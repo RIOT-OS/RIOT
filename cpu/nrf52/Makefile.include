@@ -1,7 +1,7 @@
 # Slot size is determined by "((total_flash_size - RIOTBOOT_LEN) / 2)".
 # If RIOTBOOT_LEN uses an uneven number of flashpages, the remainder of the
 # flash cannot be divided by two slots while staying FLASHPAGE_SIZE aligned.
-ifneq (,$(filter usbus_dfu,$(USEMODULE)))
+ifneq (,$(filter usbus_dfu tinyusb_dfu,$(USEMODULE)))
   RIOTBOOT_LEN ?= 0x4000
 else
   RIOTBOOT_LEN ?= 0x2000
@@ -34,11 +34,6 @@ ifneq (,$(filter nrf52840xxaa,$(CPU_MODEL)))
   ROM_LEN ?= 0x100000
   RAM_LEN ?= 0x40000
 endif
-
-ROM_START_ADDR ?= 0x00000000
-RAM_START_ADDR ?= 0x20000000
-
-LINKER_SCRIPT ?= cortexm.ld
 
 VECTORS_O ?= $(BINDIR)/nrf52_vectors/vectors_$(CPU_MODEL).o
 

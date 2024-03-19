@@ -163,7 +163,7 @@ values from all three sensors of the device. For an overview on the supported
 features, you can check the driver's documentation in @ref drivers_mpu9x50.
 
 A sample RIOT application for the MPU-9150 that utilizes the driver can be
-found [here](https://github.com/RIOT-OS/RIOT/tree/master/tests/driver_mpu9x50).
+found [here](https://github.com/RIOT-OS/RIOT/tree/master/tests/drivers/mpu9x50).
 
 | Product               | MPU-9150                                                                                          |
 |:--------------------- |:------------------------------------------------------------------------------------------------- |

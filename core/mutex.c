@@ -24,6 +24,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 
+#include "cpu.h"
 #include "mutex.h"
 #include "thread.h"
 #include "sched.h"
@@ -32,6 +33,8 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+
+#if MAXTHREADS > 1
 
 /**
  * @brief   Block waiting for a locked mutex
@@ -45,9 +48,18 @@
  * function into both @ref mutex_lock and @ref mutex_lock_cancelable is,
  * therefore, beneficial for the majority of applications.
  */
-static inline __attribute__((always_inline)) void _block(mutex_t *mutex,
-                                                         unsigned irq_state)
+static inline __attribute__((always_inline))
+void _block(mutex_t *mutex,
+            unsigned irq_state,
+            uinttxtptr_t pc)
 {
+    /* pc is only used when MODULE_CORE_MUTEX_DEBUG */
+    (void)pc;
+#if IS_USED(MODULE_CORE_MUTEX_DEBUG)
+    printf("[mutex] waiting for thread %" PRIkernel_pid " (pc = 0x%" PRIxTXTPTR
+           ")\n",
+           mutex->owner, mutex->owner_calling_pc);
+#endif
     thread_t *me = thread_get_active();
 
     /* Fail visibly even if a blocking action is called from somewhere where
@@ -64,31 +76,71 @@ static inline __attribute__((always_inline)) void _block(mutex_t *mutex,
         thread_add_to_list(&mutex->queue, me);
     }
 
+#ifdef MODULE_CORE_MUTEX_PRIORITY_INHERITANCE
+    thread_t *owner = thread_get(mutex->owner);
+    if ((owner) && (owner->priority > me->priority)) {
+        DEBUG("PID[%" PRIkernel_pid "] prio of %" PRIkernel_pid
+              ": %u --> %u\n",
+              thread_getpid(), mutex->owner,
+              (unsigned)owner->priority, (unsigned)me->priority);
+        sched_change_priority(owner, me->priority);
+    }
+#endif
+
     irq_restore(irq_state);
     thread_yield_higher();
     /* We were woken up by scheduler. Waker removed us from queue. */
+#if IS_USED(MODULE_CORE_MUTEX_DEBUG)
+    mutex->owner_calling_pc = pc;
+#endif
 }
 
-void mutex_lock(mutex_t *mutex)
+bool mutex_lock_internal(mutex_t *mutex, bool block)
 {
+    uinttxtptr_t pc = 0;
+#if IS_USED(MODULE_CORE_MUTEX_DEBUG)
+    pc = cpu_get_caller_pc();
+#endif
     unsigned irq_state = irq_disable();
 
-    DEBUG("PID[%" PRIkernel_pid "] mutex_lock().\n", thread_getpid());
+    DEBUG("PID[%" PRIkernel_pid "] mutex_lock_internal(block=%u).\n",
+          thread_getpid(), (unsigned)block);
 
     if (mutex->queue.next == NULL) {
         /* mutex is unlocked. */
         mutex->queue.next = MUTEX_LOCKED;
+#if IS_USED(MODULE_CORE_MUTEX_PRIORITY_INHERITANCE) \
+        || IS_USED(MODULE_CORE_MUTEX_DEBUG)
+        thread_t *me = thread_get_active();
+        mutex->owner = me->pid;
+#endif
+#if IS_USED(MODULE_CORE_MUTEX_DEBUG)
+        mutex->owner_calling_pc = pc;
+#endif
+#if IS_USED(MODULE_CORE_MUTEX_PRIORITY_INHERITANCE)
+        mutex->owner_original_priority = me->priority;
+#endif
         DEBUG("PID[%" PRIkernel_pid "] mutex_lock(): early out.\n",
               thread_getpid());
         irq_restore(irq_state);
     }
     else {
-        _block(mutex, irq_state);
+        if (!block) {
+            irq_restore(irq_state);
+            return false;
+        }
+        _block(mutex, irq_state, pc);
     }
+
+    return true;
 }
 
 int mutex_lock_cancelable(mutex_cancel_t *mc)
 {
+    uinttxtptr_t pc = 0;
+#if IS_USED(MODULE_CORE_MUTEX_DEBUG)
+    pc = cpu_get_caller_pc();
+#endif
     unsigned irq_state = irq_disable();
 
     DEBUG("PID[%" PRIkernel_pid "] mutex_lock_cancelable()\n",
@@ -106,13 +158,24 @@ int mutex_lock_cancelable(mutex_cancel_t *mc)
     if (mutex->queue.next == NULL) {
         /* mutex is unlocked. */
         mutex->queue.next = MUTEX_LOCKED;
+#if IS_USED(MODULE_CORE_MUTEX_PRIORITY_INHERITANCE) \
+        || IS_USED(MODULE_CORE_MUTEX_DEBUG)
+        thread_t *me = thread_get_active();
+        mutex->owner = me->pid;
+#endif
+#if IS_USED(MODULE_CORE_MUTEX_DEBUG)
+        mutex->owner_calling_pc = pc;
+#endif
+#if IS_USED(MODULE_CORE_MUTEX_PRIORITY_INHERITANCE)
+        mutex->owner_original_priority = me->priority;
+#endif
         DEBUG("PID[%" PRIkernel_pid "] mutex_lock_cancelable() early out.\n",
               thread_getpid());
         irq_restore(irq_state);
         return 0;
     }
     else {
-        _block(mutex, irq_state);
+        _block(mutex, irq_state, pc);
         if (mc->cancelled) {
             DEBUG("PID[%" PRIkernel_pid "] mutex_lock_cancelable() "
                   "cancelled.\n", thread_getpid());
@@ -154,6 +217,19 @@ void mutex_unlock(mutex_t *mutex)
     }
 
     uint16_t process_priority = process->priority;
+
+#if IS_USED(MODULE_CORE_MUTEX_PRIORITY_INHERITANCE)
+    thread_t *owner = thread_get(mutex->owner);
+    if ((owner) && (owner->priority != mutex->owner_original_priority)) {
+        DEBUG("PID[%" PRIkernel_pid "] prio %u --> %u\n",
+              owner->pid, (unsigned)owner->priority,
+              (unsigned)mutex->owner_original_priority);
+        sched_change_priority(owner, mutex->owner_original_priority);
+    }
+#endif
+#if IS_USED(MODULE_CORE_MUTEX_DEBUG)
+    mutex->owner_calling_pc = 0;
+#endif
 
     irq_restore(irqstate);
     sched_switch(process_priority);
@@ -221,8 +297,6 @@ void mutex_cancel(mutex_cancel_t *mc)
     irq_restore(irq_state);
 }
 
-/* Helper for compatibility with C++ or other non-C languages */
-int mutex_trylock_ffi(mutex_t *mutex)
-{
-    return mutex_trylock(mutex);
-}
+#else /* MAXTHREADS < 2 */
+typedef int dont_be_pedantic;
+#endif

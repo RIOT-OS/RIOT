@@ -19,6 +19,7 @@
 #ifndef KW2XRF_GETSET_H
 #define KW2XRF_GETSET_H
 
+#include "kw2xrf_reg.h"
 #include "kw2xrf.h"
 
 #ifdef __cplusplus

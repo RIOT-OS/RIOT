@@ -18,7 +18,8 @@
 
 #include "thread_flags.h"
 #include "vfs.h"
-#include "xtimer.h"
+#include "ztimer64.h"
+#include "timex.h"
 
 #if IS_USED(MODULE_POSIX_SOCKETS)
 extern bool posix_socket_is(int fd);
@@ -44,7 +45,7 @@ static inline void posix_socket_select(int fd)
 }
 #endif  /* IS_USED(MODULE_POSIX_SOCKETS) */
 
-static int _set_timeout(xtimer_t *timeout_timer, struct timeval *timeout,
+static int _set_timeout(ztimer64_t *timeout_timer, struct timeval *timeout,
                         uint32_t offset, bool *wait)
 {
     if (timeout != NULL) {
@@ -62,7 +63,7 @@ static int _set_timeout(xtimer_t *timeout_timer, struct timeval *timeout,
             return -1;
         }
         else {
-            xtimer_set_timeout_flag(timeout_timer, (uint32_t)t);
+            ztimer64_set_timeout_flag(ZTIMER64_USEC, timeout_timer, (uint32_t)t);
         }
     }
     return 0;
@@ -71,9 +72,9 @@ static int _set_timeout(xtimer_t *timeout_timer, struct timeval *timeout,
 int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *errorfds,
            struct timeval *timeout)
 {
-    uint32_t start_time = xtimer_now_usec();
+    uint32_t start_time = ztimer64_now(ZTIMER64_USEC);
     fd_set ret_readfds;
-    xtimer_t timeout_timer;
+    ztimer64_t timeout_timer;
     int fds_set = 0;
     bool wait = true;
 
@@ -112,7 +113,7 @@ int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *errorfds,
     }
     while (wait) {
         if (_set_timeout(&timeout_timer, timeout,
-                         xtimer_now_usec() - start_time, &wait) < 0) {
+                         ztimer64_now(ZTIMER64_USEC) - start_time, &wait) < 0) {
             return -1;
         }
         if (!wait) {
@@ -136,7 +137,7 @@ int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *errorfds,
             errno = EINTR;
             return -1;
         }
-        xtimer_remove(&timeout_timer);
+        ztimer64_remove(ZTIMER64_USEC, &timeout_timer);
     }
     *readfds = ret_readfds;
     return fds_set;

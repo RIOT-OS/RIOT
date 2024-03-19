@@ -1,0 +1,50 @@
+From 142506c9ed4e2d3a1c59cf39cd86473074981c6a Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benjamin.valentin@ml-pa.com>
+Date: Wed, 15 Jun 2022 14:01:42 +0200
+Subject: [PATCH 2/3] nmasic: limit retries in wait_for_bootrom()
+
+If no device is connected or init failed, wait_for_bootrom() will
+be stuck in an infinite loop trying to get a result from nm_read_reg().
+
+Place an upper limit on the number of retries so we can recover from
+this instead of being stuck here.
+---
+ src/driver/source/nmasic.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/src/driver/source/nmasic.c b/src/driver/source/nmasic.c
+index 9f46398..b77dc5a 100644
+--- a/src/driver/source/nmasic.c
++++ b/src/driver/source/nmasic.c
+@@ -400,6 +400,7 @@ sint8 chip_reset(void)
+ sint8 wait_for_bootrom(uint8 arg)
+ {
+ 	sint8 ret = M2M_SUCCESS;
++	uint16 retries = TIMEOUT;
+ 	uint32 reg = 0, cnt = 0;
+ 	uint32 u32GpReg1 = 0;
+ 	uint32 u32DriverVerInfo = M2M_MAKE_VERSION_INFO(M2M_RELEASE_VERSION_MAJOR_NO,\
+@@ -409,13 +410,19 @@ sint8 wait_for_bootrom(uint8 arg)
+ 
+ 
+ 	reg = 0;
+-	while(1) {
++	while(--retries) {
+ 		reg = nm_read_reg(0x1014);	/* wait for efuse loading done */
+ 		if (reg & 0x80000000) {
+ 			break;
+ 		}
+ 		nm_bsp_sleep(1); /* TODO: Why bus error if this delay is not here. */
+ 	}
++
++	/* communication with device failed */
++	if(retries == 0) {
++		return M2M_ERR_INIT;
++	}
++
+ 	reg = nm_read_reg(M2M_WAIT_FOR_HOST_REG);
+ 	reg &= 0x1;
+ 
+-- 
+2.34.1
+

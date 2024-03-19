@@ -49,7 +49,7 @@ extern "C" {
 #endif
 
 #ifndef CC110X_PARAM_SPI_CLOCK
-#define CC110X_PARAM_SPI_CLOCK      SPI_CLK_5MHZ    /**< SPI clock frequence to use */
+#define CC110X_PARAM_SPI_CLOCK      SPI_CLK_5MHZ    /**< SPI clock frequency to use */
 #endif
 
 #ifndef CC110X_PARAM_PATABLE

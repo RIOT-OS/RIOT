@@ -1,5 +1,9 @@
-USEMODULE += vfs
-USEMODULE += littlefs2_fs
-USEMODULE += mtd
+DEFAULT_MODULE += littlefs2_fs
+
+# require littlefs2_fs dependencies if this module isn't disabled
+ifeq (,$(filter littlefs2_fs,$(DISABLE_MODULE)))
+  USEMODULE += vfs
+  USEMODULE += mtd
+endif
 
 FEATURES_BLACKLIST += arch_msp430

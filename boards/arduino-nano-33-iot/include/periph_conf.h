@@ -192,14 +192,14 @@ static const pwm_conf_t pwm_config[] = {
 
 static const adc_conf_chan_t adc_channels[] = {
     /* port, pin, muxpos */
-    {GPIO_PIN(PA, 2), ADC_INPUTCTRL_MUXPOS_PIN0},    /* A0 */
-    {GPIO_PIN(PB, 2), ADC_INPUTCTRL_MUXPOS_PIN10},   /* A1 */
-    {GPIO_PIN(PA, 11), ADC_INPUTCTRL_MUXPOS_PIN19},  /* A2 */
-    {GPIO_PIN(PA, 10), ADC_INPUTCTRL_MUXPOS_PIN18},  /* A3 */
-    {GPIO_PIN(PB, 8), ADC_INPUTCTRL_MUXPOS_PIN2},    /* A4 */
-    {GPIO_PIN(PB, 9), ADC_INPUTCTRL_MUXPOS_PIN3},    /* A5 */
-    {GPIO_PIN(PA, 9), ADC_INPUTCTRL_MUXPOS_PIN17},   /* A6 */
-    {GPIO_PIN(PB, 3), ADC_INPUTCTRL_MUXPOS_PIN11},   /* A7 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA02 },    /* A0 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PB02 },   /* A1 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA11 },  /* A2 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA10 },  /* A3 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PB08 },    /* A4 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PB09 },    /* A5 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA09 },   /* A6 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PB03 },   /* A7 */
 };
 
 #define ADC_NUMOF                           ARRAY_SIZE(adc_channels)

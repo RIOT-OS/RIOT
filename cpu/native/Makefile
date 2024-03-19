@@ -6,10 +6,6 @@ ifneq (,$(filter native_vfs,$(USEMODULE)))
   DIRS += vfs
 endif
 
-ifeq ($(OS),Darwin)
-  CFLAGS += -D_XOPEN_SOURCE=600 -D_DARWIN_C_SOURCE
-endif
-
 ifneq (,$(filter netdev_tap,$(USEMODULE)))
   DIRS += netdev_tap
 endif
@@ -24,6 +20,10 @@ endif
 
 ifneq (,$(filter mtd_native,$(USEMODULE)))
   DIRS += mtd
+endif
+
+ifneq (,$(filter fs_native,$(USEMODULE)))
+  DIRS += fs
 endif
 
 ifneq (,$(filter backtrace,$(USEMODULE)))

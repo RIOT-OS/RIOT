@@ -24,6 +24,8 @@
 #include "log.h"
 #include "msg.h"
 #include "net/gnrc/netif/conf.h"
+#include "include/init_devs.h"
+
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
@@ -42,7 +44,7 @@
 /**
  * @brief   Calculate the stack size for the MAC layer thread(s)
  */
-#define NRF24L01P_NG_MAC_STACKSIZE          (THREAD_STACKSIZE_DEFAULT + \
+#define NRF24L01P_NG_MAC_STACKSIZE          (GNRC_NETIF_STACKSIZE_DEFAULT + \
                                             NRF24L01P_NG_EXTRA_STACKSIZE + \
                                             DEBUG_EXTRA_STACKSIZE)
 #ifndef NRF24L01P_NG_MAC_PRIO

@@ -43,13 +43,13 @@ extern "C" {
  * @{
  */
 #define IO1_SDCARD_SPI_PARAM_SPI           SPI_DEV(1)
-#define IO1_SDCARD_SPI_PARAM_CS            GPIO_PIN(1,3)
-#define IO1_SDCARD_SPI_PARAM_CLK           GPIO_PIN(1,23)
-#define IO1_SDCARD_SPI_PARAM_MOSI          GPIO_PIN(1,22)
-#define IO1_SDCARD_SPI_PARAM_MISO          GPIO_PIN(1,2)
+#define IO1_SDCARD_SPI_PARAM_CS            GPIO_PIN(1, 3)
+#define IO1_SDCARD_SPI_PARAM_CLK           GPIO_PIN(1, 23)
+#define IO1_SDCARD_SPI_PARAM_MOSI          GPIO_PIN(1, 22)
+#define IO1_SDCARD_SPI_PARAM_MISO          GPIO_PIN(1, 2)
 #define IO1_SDCARD_SPI_PARAM_POWER         (GPIO_UNDEF)
 #define IO1_SDCARD_SPI_PARAM_POWER_AH      (true)
-#define IO1_SDCARD_SPI_PARAM_DETECT        GPIO_PIN(0,23)
+#define IO1_SDCARD_SPI_PARAM_DETECT        GPIO_PIN(0, 23)
 /** @} */
 
 /**
@@ -64,15 +64,15 @@ extern "C" {
  * @name    IO1 Xplained LED pin
  * @{
  */
-#define IO1_LED_PIN                    GPIO_PIN(0,18)
+#define IO1_LED_PIN                    GPIO_PIN(0, 18)
 /** @} */
 
 /**
  * @name    IO1 Xplained gpio pins
  * @{
  */
-#define IO1_GPIO1_PIN                  GPIO_PIN(0,13)
-#define IO1_GPIO2_PIN                  GPIO_PIN(0,28)
+#define IO1_GPIO1_PIN                  GPIO_PIN(0, 13)
+#define IO1_GPIO2_PIN                  GPIO_PIN(0, 28)
 /** @} */
 
 #ifdef __cplusplus

@@ -13,3 +13,4 @@ FEATURES_PROVIDED += periph_usbdev
 
 # Put other features for this board (in alphabetical order)
 FEATURES_PROVIDED += riotboot
+FEATURES_PROVIDED += tinyusb_device

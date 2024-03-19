@@ -214,12 +214,12 @@ static const pwm_conf_t pwm_config[] = {
 
 static const adc_conf_chan_t adc_channels[] = {
     /* port, pin, muxpos */
-    {GPIO_PIN(PA, 2), ADC_INPUTCTRL_MUXPOS_PIN0},   /* A0 */
-    {GPIO_PIN(PB, 8), ADC_INPUTCTRL_MUXPOS_PIN2},   /* A1 */
-    {GPIO_PIN(PB, 9), ADC_INPUTCTRL_MUXPOS_PIN3},   /* A2 */
-    {GPIO_PIN(PA, 4), ADC_INPUTCTRL_MUXPOS_PIN4},   /* A3 */
-    {GPIO_PIN(PA, 5), ADC_INPUTCTRL_MUXPOS_PIN5},   /* A4 */
-    {GPIO_PIN(PB, 2), ADC_INPUTCTRL_MUXPOS_PIN10},  /* A5 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA02 },   /* A0 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PB08 },   /* A1 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PB09 },   /* A2 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA04 },   /* A3 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA05 },   /* A4 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PB02 },  /* A5 */
 };
 
 #define ADC_NUMOF                           ARRAY_SIZE(adc_channels)

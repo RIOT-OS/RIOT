@@ -28,6 +28,12 @@ config MODULE_PERIPH_INIT_ADC
     default y if MODULE_PERIPH_INIT
     depends on MODULE_PERIPH_ADC
 
+config MODULE_PERIPH_INIT_BUTTONS
+    bool
+    depends on TEST_KCONFIG
+    help
+        Enable auto initialization of on-board buttons
+
 config MODULE_PERIPH_CPUID
     bool "CPU unique ID"
     depends on HAS_PERIPH_CPUID
@@ -72,6 +78,8 @@ rsource "Kconfig.flashpage"
 
 rsource "Kconfig.gpio"
 
+rsource "Kconfig.gpio_ll"
+
 config MODULE_PERIPH_HWRNG
     bool "HWRNG peripheral driver"
     depends on HAS_PERIPH_HWRNG
@@ -84,15 +92,15 @@ config MODULE_PERIPH_INIT_HWRNG
 
 rsource "Kconfig.i2c"
 
-config MODULE_PERIPH_PWM
-    bool "PWM peripheral driver"
-    depends on HAS_PERIPH_PWM
+config MODULE_PERIPH_PIO
+    bool "Programmable IO (PIO) peripheral driver"
+    depends on HAS_PERIPH_PIO
     select MODULE_PERIPH_COMMON
 
-config MODULE_PERIPH_INIT_PWM
-    bool "Auto initialize PWM peripheral"
+config MODULE_PERIPH_INIT_PIO
+    bool "Auto initialize programmable IO (PIO) peripheral driver"
     default y if MODULE_PERIPH_INIT
-    depends on MODULE_PERIPH_PWM
+    depends on MODULE_PERIPH_PIO
 
 config MODULE_PERIPH_PM
     bool "Power Management (PM) peripheral driver"
@@ -104,6 +112,16 @@ config MODULE_PERIPH_INIT_PM
     bool "Auto initialize Power Management (PM) peripheral"
     default y if MODULE_PERIPH_INIT
     depends on MODULE_PERIPH_PM
+
+config MODULE_PERIPH_PWM
+    bool "PWM peripheral driver"
+    depends on HAS_PERIPH_PWM
+    select MODULE_PERIPH_COMMON
+
+config MODULE_PERIPH_INIT_PWM
+    bool "Auto initialize PWM peripheral"
+    default y if MODULE_PERIPH_INIT
+    depends on MODULE_PERIPH_PWM
 
 config MODULE_PERIPH_QDEC
     bool "Quadrature Decoder (QDEC) peripheral driver"
@@ -123,6 +141,10 @@ config MODULE_PERIPH_RTT
     depends on HAS_PERIPH_RTT
     select MODULE_PERIPH_COMMON
 
+config MODULE_PERIPH_FREQM
+    bool "Frequency Meter driver"
+    depends on HAS_PERIPH_FREQM
+
 config MODULE_PERIPH_RTT_SET_COUNTER
     bool "rtc_set_counter() implementation in the RTT peripheral driver"
     depends on HAS_PERIPH_RTT_SET_COUNTER && MODULE_PERIPH_RTT
@@ -137,6 +159,13 @@ config MODULE_PERIPH_INIT_RTT
     default y if MODULE_PERIPH_INIT
     depends on MODULE_PERIPH_RTT
 
+config MODULE_PERIPH_TIMER_POLL
+    bool "Timer poll"
+    depends on HAS_PERIPH_TIMER_POLL
+    help
+        Enables the timer_poll_channel function.
+
+rsource "Kconfig.sdmmc"
 rsource "Kconfig.spi"
 
 config MODULE_PERIPH_TEMPERATURE
@@ -149,17 +178,9 @@ config MODULE_PERIPH_INIT_TEMPERATURE
     default y if MODULE_PERIPH_INIT
     depends on MODULE_PERIPH_TEMPERATURE
 
+rsource "Kconfig.timer"
 rsource "Kconfig.uart"
-
-config MODULE_PERIPH_USBDEV
-    bool "USBDEV peripheral driver"
-    depends on HAS_PERIPH_USBDEV
-    select MODULE_PERIPH_COMMON
-
-config MODULE_PERIPH_INIT_USBDEV
-    bool "Auto initialize USBDEV peripheral"
-    default y if MODULE_PERIPH_INIT
-    depends on MODULE_PERIPH_USBDEV
+rsource "Kconfig.usbdev"
 
 endif # TEST_KCONFIG
 
@@ -169,6 +190,5 @@ config HAVE_SHARED_PERIPH_RTT_PERIPH_RTC
         The periph_rtc module or the periph_rtt module share hardware, thus,
         only one can be selected.
 
-rsource "Kconfig.timer"
 rsource "Kconfig.vbat"
 rsource "Kconfig.wdt"

@@ -124,6 +124,11 @@ static bool _l2filter(uint8_t *mhr)
 
     int addr_len = ieee802154_get_dst(mhr, dst_addr, &dst_pan);
 
+    if ((mhr[0] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_BEACON) {
+        if ((memcmp(&nrf802154_pan_id, pan_bcast, 2) == 0)) {
+            return true;
+        }
+    }
     /* filter PAN ID */
     /* Will only work on little endian platform (all?) */
 
@@ -197,7 +202,7 @@ static int _request_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
     (void) dev;
 
     int res = -EBUSY;
-    int state;
+    int state = STATE_IDLE;
 
     switch (op) {
     case IEEE802154_HAL_OP_TRANSMIT:
@@ -253,7 +258,7 @@ static int _confirm_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
 {
     (void) dev;
     bool eagain;
-    ieee802154_tx_info_t *info = NULL;
+    ieee802154_tx_info_t *info = ctx;
     int state = _state;
     bool enable_shorts = false;
     int radio_state = NRF_RADIO->STATE;
@@ -265,6 +270,10 @@ static int _confirm_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
 
         state = STATE_IDLE;
         enable_shorts = true;
+        if (info) {
+            info->status = (_state == STATE_CCA_BUSY) ? TX_STATUS_MEDIUM_BUSY : TX_STATUS_SUCCESS;
+        }
+
         break;
     case IEEE802154_HAL_OP_SET_RX:
         eagain = (radio_state == RADIO_STATE_STATE_RxRu);
@@ -290,10 +299,6 @@ static int _confirm_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
     }
 
     _state = state;
-
-    if (info) {
-        info->status = (_state == STATE_CCA_BUSY) ? TX_STATUS_MEDIUM_BUSY : TX_STATUS_SUCCESS;
-    }
 
     if (enable_shorts) {
         NRF_RADIO->SHORTS = DEFAULT_SHORTS;
@@ -561,7 +566,7 @@ void isr_radio(void)
         case STATE_ACK:
             _state = STATE_IDLE;
 
-            /* We disable the radio to avoid unwanted emmissions (see ERRATA
+            /* We disable the radio to avoid unwanted emissions (see ERRATA
              * ID 204, "Switching between TX and RX causes unwanted emissions")
              */
             _disable();

@@ -1,0 +1,26 @@
+From ec6de75107b1699fcad0ed5ad9a6e5de178a6e6e Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Fri, 19 May 2023 22:18:52 +0200
+Subject: [PATCH] lundump.c: make clang happy
+
+silence -Wstring-plus-int warning
+---
+ lundump.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lundump.c b/lundump.c
+index 13916bc..1698621 100644
+--- a/lundump.c
++++ b/lundump.c
+@@ -234,7 +234,7 @@ static void fchecksize (LoadState *S, size_t size, const char *tname) {
+ #define checksize(S,t)	fchecksize(S,sizeof(t),#t)
+ 
+ static void checkHeader (LoadState *S) {
+-  checkliteral(S, LUA_SIGNATURE + 1, "not a");  /* 1st char already checked */
++  checkliteral(S, &LUA_SIGNATURE[1], "not a");  /* 1st char already checked */
+   if (LoadByte(S) != LUAC_VERSION)
+     error(S, "version mismatch in");
+   if (LoadByte(S) != LUAC_FORMAT)
+-- 
+2.40.1
+

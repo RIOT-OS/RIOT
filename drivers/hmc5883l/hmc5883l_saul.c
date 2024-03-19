@@ -28,13 +28,13 @@ static int read(const void *dev, phydat_t *res)
     res->val[0] = data.x;
     res->val[1] = data.y;
     res->val[2] = data.z;
-    res->unit = UNIT_GS;
+    res->unit = UNIT_GAUSS;
     res->scale = -3;
     return 3;
 }
 
 const saul_driver_t hmc5883l_saul_driver = {
     .read = read,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_MAG,
 };

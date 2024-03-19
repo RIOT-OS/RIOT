@@ -1,0 +1,308 @@
+USEMODULE += stdin
+
+ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
+  USEMODULE += shell_cmd_sys
+
+  ifneq (,$(filter netif,$(USEMODULE)))
+    USEMODULE += l2util
+  endif
+  ifneq (,$(filter app_metadata,$(USEMODULE)))
+    USEMODULE += shell_cmd_app_metadata
+  endif
+  ifneq (,$(filter at30tse75x,$(USEMODULE)))
+    USEMODULE += shell_cmd_at30tse75x
+  endif
+  ifneq (,$(filter benchmark_udp,$(USEMODULE)))
+    USEMODULE += shell_cmd_benchmark_udp
+  endif
+  ifneq (,$(filter ccn-lite-utils,$(USEMODULE)))
+    USEMODULE += shell_cmd_ccn-lite-utils
+  endif
+  ifneq (,$(filter conn_can,$(USEMODULE)))
+    USEMODULE += shell_cmd_conn_can
+  endif
+  ifneq (,$(filter cord_ep,$(USEMODULE)))
+    USEMODULE += shell_cmd_cord_ep
+  endif
+  ifneq (,$(filter cryptoauthlib,$(USEPKG)))
+    USEMODULE += shell_cmd_cryptoauthlib
+  endif
+  ifneq (,$(filter dfplayer,$(USEMODULE)))
+    USEMODULE += shell_cmd_dfplayer
+  endif
+  ifneq (,$(filter fib,$(USEMODULE)))
+    USEMODULE += shell_cmd_fib
+  endif
+  ifneq (,$(filter gnrc_ipv6_ext_frag_stats,$(USEMODULE)))
+    USEMODULE += shell_cmd_gnrc_ipv6_frag_stats
+  endif
+  ifneq (,$(filter gnrc_ipv6_nib,$(USEMODULE)))
+    USEMODULE += shell_cmd_gnrc_ipv6_nib
+  endif
+  ifneq (,$(filter gnrc_ipv6_whitelist,$(USEMODULE)))
+    USEMODULE += shell_cmd_whitelist
+  endif
+  ifneq (,$(filter gnrc_ipv6_blacklist,$(USEMODULE)))
+    USEMODULE += shell_cmd_blacklist
+  endif
+  ifneq (,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
+    USEMODULE += shell_cmd_gnrc_icmpv6_echo
+  endif
+  ifneq (,$(filter gnrc_netif,$(USEMODULE)))
+    USEMODULE += shell_cmd_gnrc_netif
+    ifneq (,$(filter lora,$(USEMODULE)))
+      USEMODULE += shell_cmd_gnrc_netif_lora
+    endif
+  endif
+  ifneq (,$(filter gnrc_txtsnd,$(USEMODULE)))
+    USEMODULE += shell_cmd_gnrc_txtsnd
+  endif
+  ifneq (,$(filter gnrc_netif_lorawan,$(USEMODULE)))
+    USEMODULE += shell_cmd_gnrc_netif_lorawan
+  endif
+  ifneq (,$(filter gnrc_pktbuf_cmd,$(USEMODULE)))
+      USEMODULE += shell_cmd_gnrc_pktbuf
+  endif
+  ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
+      USEMODULE += shell_cmd_gnrc_rpl
+  endif
+  ifneq (,$(filter gnrc_sixlowpan_ctx,$(USEMODULE)))
+      USEMODULE += shell_cmd_gnrc_sixlowpan_ctx
+  endif
+  ifneq (,$(filter gnrc_sixlowpan_frag_stats,$(USEMODULE)))
+    USEMODULE += shell_cmd_gnrc_sixlowpan_frag_stats
+  endif
+  ifneq (,$(filter gnrc_udp_cmd,$(USEMODULE)))
+    USEMODULE += shell_cmd_gnrc_udp
+  endif
+  ifneq (,$(filter heap_cmd,$(USEMODULE)))
+    USEMODULE += shell_cmd_heap
+  endif
+  ifneq (,$(filter i2c_scan,$(USEMODULE)))
+    USEMODULE += shell_cmd_i2c_scan
+  endif
+  ifneq (,$(filter lpc2387,$(USEMODULE)))
+    USEMODULE += shell_cmd_heap
+  endif
+  ifneq (,$(filter lwip_netif,$(USEMODULE)))
+    USEMODULE += shell_cmd_lwip_netif
+  endif
+  ifneq (,$(filter mci,$(USEMODULE)))
+    USEMODULE += shell_cmd_mci
+  endif
+  ifneq (,$(filter nanocoap_vfs,$(USEMODULE)))
+    USEMODULE += shell_cmd_nanocoap_vfs
+  endif
+  ifneq (,$(filter netstats_neighbor,$(USEMODULE)))
+    USEMODULE += shell_cmd_netstats_neighbor
+  endif
+  ifneq (,$(filter nice,$(USEMODULE)))
+    USEMODULE += shell_cmd_nice
+  endif
+  ifneq (,$(filter nimble_netif,$(USEMODULE)))
+    USEMODULE += shell_cmd_nimble_netif
+  endif
+  ifneq (,$(filter nimble_statconn,$(USEMODULE)))
+    USEMODULE += shell_cmd_nimble_statconn
+  endif
+  ifneq (,$(filter opendsme,$(USEPKG)))
+    USEMODULE += shell_cmd_opendsme
+  endif
+  ifneq (,$(filter openwsn,$(USEPKG)))
+    USEMODULE += shell_cmd_openwsn
+  endif
+  ifneq (,$(filter rtt_rtc periph_rtc,$(USEMODULE)))
+    USEMODULE += shell_cmd_rtc
+  endif
+  ifneq (,$(filter saul_reg,$(USEMODULE)))
+    USEMODULE += shell_cmd_saul_reg
+  endif
+  ifneq (,$(filter semtech-loramac,$(USEPKG)))
+    USEMODULE += shell_cmd_semtech-loramac
+  endif
+  ifneq (,$(filter sntp,$(USEMODULE)))
+    USEMODULE += shell_cmd_sntp
+  endif
+  ifneq (,$(filter periph_pm,$(USEMODULE)))
+    USEMODULE += shell_cmd_pm
+  endif
+  ifneq (,$(filter ps,$(USEMODULE)))
+    USEMODULE += shell_cmd_ps
+  endif
+  ifneq (,$(filter sht1x,$(USEMODULE)))
+    USEMODULE += shell_cmd_sht1x
+  endif
+  ifneq (,$(filter vfs,$(USEMODULE)))
+    USEMODULE += shell_cmd_vfs
+  endif
+endif
+
+ifneq (,$(filter shell_cmd_app_metadata,$(USEMODULE)))
+  USEMODULE += app_metadata
+endif
+ifneq (,$(filter shell_cmd_at30tse75x,$(USEMODULE)))
+  USEMODULE += at30tse75x
+endif
+ifneq (,$(filter shell_cmd_benchmark_udp,$(USEMODULE)))
+  USEMODULE += benchmark_udp
+endif
+ifneq (,$(filter shell_cmd_ccn-lite-utils,$(USEMODULE)))
+  USEMODULE += ccn-lite-utils
+endif
+ifneq (,$(filter shell_cmd_conn_can,$(USEMODULE)))
+  USEMODULE += conn_can
+endif
+ifneq (,$(filter shell_cmd_cord_ep,$(USEMODULE)))
+  USEMODULE += cord_ep
+  USEMODULE += sock_util
+  USEMODULE += uri_parser
+endif
+ifneq (,$(filter shell_cmd_cryptoauthlib,$(USEPKG)))
+  USEMODULE += cryptoauthlib
+endif
+ifneq (,$(filter shell_cmd_dfplayer,$(USEMODULE)))
+  USEMODULE += auto_init_multimedia
+  USEMODULE += dfplayer
+  USEMODULE += fmt
+endif
+ifneq (,$(filter shell_cmd_fib,$(USEMODULE)))
+  USEMODULE += fib
+  USEMODULE += posix_inet
+endif
+ifneq (,$(filter shell_cmd_gnrc_icmpv6_echo,$(USEMODULE)))
+  USEMODULE += gnrc_icmpv6_echo
+  USEMODULE += netutils
+  USEMODULE += ztimer_usec
+endif
+ifneq (,$(filter shell_cmd_gnrc_ipv6_blacklist,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_blacklist
+endif
+ifneq (,$(filter shell_cmd_gnrc_ipv6_ext_frag_stats,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_frag_stats
+endif
+ifneq (,$(filter shell_cmd_gnrc_ipv6_nib,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_nib
+endif
+ifneq (,$(filter shell_cmd_gnrc_ipv6_whitelist,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_whitelist
+endif
+ifneq (,$(filter shell_cmd_gnrc_netif,$(USEMODULE)))
+  USEMODULE += gnrc_netif
+endif
+ifneq (,$(filter shell_cmd_gnrc_netif_lorawan,$(USEMODULE)))
+  USEMODULE += gnrc_netif_lorawan
+  USEMODULE += shell_cmd_gnrc_netif_lora
+  USEMODULE += shell_cmd_gnrc_netif
+endif
+ifneq (,$(filter shell_cmd_gnrc_pktbuf,$(USEMODULE)))
+    USEMODULE += gnrc_pktbuf
+endif
+ifneq (,$(filter shell_cmd_gnrc_rpl,$(USEMODULE)))
+    USEMODULE += gnrc_rpl
+endif
+ifneq (,$(filter shell_cmd_gnrc_sixlowpan_ctx,$(USEMODULE)))
+    USEMODULE += gnrc_sixlowpan_ctx
+endif
+ifneq (,$(filter shell_cmd_gnrc_sixlowpan_frag_stats,$(USEMODULE)))
+  USEMODULE += gnrc_sixlowpan_frag_stats
+endif
+ifneq (,$(filter shell_cmd_gnrc_udp,$(USEMODULE)))
+  USEMODULE += gnrc_udp
+  USEMODULE += gnrc_pktdump
+  USEMODULE += netutils
+endif
+ifneq (,$(filter shell_cmd_i2c_scan,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
+ifneq (,$(filter shell_cmd_iw,$(USEMODULE)))
+  USEMODULE += ztimer_sec
+endif
+ifneq (,$(filter shell_cmd_lwip_netif,$(USEMODULE)))
+  USEMODULE += lwip_netif
+endif
+ifneq (,$(filter shell_cmd_mci,$(USEMODULE)))
+  USEMODULE += mci
+endif
+ifneq (,$(filter shell_cmd_md5sum,$(USEMODULE)))
+  USEMODULE += shell_cmd_vfs
+endif
+ifneq (,$(filter shell_cmd_nanocoap_vfs,$(USEMODULE)))
+  USEMODULE += nanocoap_vfs
+  USEMODULE += vfs_util
+  USEMODULE += nanocoap_link_format
+endif
+ifneq (,$(filter shell_cmd_netstats_neighbor,$(USEMODULE)))
+  USEMODULE += netstats_neighbor
+endif
+ifneq (,$(filter shell_cmd_nimble_netif,$(USEMODULE)))
+  USEMODULE += fmt
+  USEMODULE += nimble_netif
+  USEMODULE += nimble_scanlist
+  USEMODULE += nimble_scanner
+endif
+ifneq (,$(filter shell_cmd_nimble_statconn,$(USEMODULE)))
+  USEMODULE += nimble_statconn
+endif
+ifneq (,$(filter shell_cmd_openwsn,$(USEMODULE)))
+  USEMODULE += ipv6_addr
+  USEMODULE += l2util
+  USEMODULE += netif
+  USEPKG += openwsn
+endif
+ifneq (,$(filter shell_cmd_pm,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_pm
+endif
+ifneq (,$(filter shell_cmd_ps,$(USEMODULE)))
+  USEMODULE += ps
+endif
+ifneq (,$(filter shell_cmd_random_cmd,$(USEMODULE)))
+  USEMODULE += random
+endif
+ifneq (,$(filter shell_cmd_rtc,$(USEMODULE)))
+  FEATURES_REQUIRED_ANY += periph_rtc|periph_rtt
+  # beware: this is a bit more tricky than it looks. Before the
+  # FEAUTRES_REQUIRED_ANY is taken into account, neither periph_rtc nor
+  # periph_rtt is used. Once it comes to affect, at least one will be in use.
+  # If periph_rtc is not in used but periph_rtt is, we can provide the RTC
+  # with rtt_rtc.
+  ifeq (periph_rtt,$(filter periph_rtc periph_rtt,$(USEMODULE)))
+    USEMODULE += rtt_rtc
+  endif
+endif
+ifneq (,$(filter shell_cmd_rtt,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_rtt
+endif
+ifneq (,$(filter shell_cmd_saul_reg,$(USEMODULE)))
+  USEMODULE += saul_reg
+endif
+ifneq (,$(filter shell_cmd_semtech-loramac,$(USEPKG)))
+  USEMODULE += semtech-loramac
+endif
+ifneq (,$(filter shell_cmd_sha1sum,$(USEMODULE)))
+  USEMODULE += shell_cmd_vfs
+endif
+ifneq (,$(filter shell_cmd_sha256sum,$(USEMODULE)))
+  USEMODULE += shell_cmd_vfs
+endif
+ifneq (,$(filter shell_cmd_sht1x,$(USEMODULE)))
+  USEMODULE += sht1x
+endif
+ifneq (,$(filter shell_cmd_sntp,$(USEMODULE)))
+  USEMODULE += sntp
+endif
+ifneq (,$(filter shell_cmd_suit,$(USEMODULE)))
+  USEMODULE += suit_transport_worker
+endif
+ifneq (,$(filter shell_cmd_udptty,$(USEMODULE)))
+  USEMODULE += sock_async
+  USEMODULE += sock_udp
+endif
+ifneq (,$(filter shell_cmd_vfs,$(USEMODULE)))
+  USEMODULE += vfs
+  USEMODULE += tiny_strerror
+endif
+
+ifneq (,$(filter shell_democommands,$(USEMODULE)))
+  USEMODULE += rust_riotmodules
+  USEMODULE += shell
+endif

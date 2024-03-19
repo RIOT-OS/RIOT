@@ -7,10 +7,9 @@
  * directory for more details.
  */
 
-#include "cpu.h"
 #include "board.h"
-
-void uart_init(void);
+#include "cpu.h"
+#include "periph_conf.h"
 
 static void telosb_ports_init(void)
 {
@@ -45,79 +44,7 @@ static void telosb_ports_init(void)
 
 }
 
-/*---------------------------------------------------------------------------*/
-/* taken from Contiki code */
-void msp430_init_dco(void)
-{
-    /* This code taken from the FU Berlin sources and reformatted. */
-#define DELTA    (F_CPU / (F_RC_OSCILLATOR / 8))
-
-    unsigned int oldcapture = 0;
-    unsigned int i;
-
-    /* 10100100 = XT2 is off, ACLK divided by 4, RSELx=4 */
-    BCSCTL1 = XT2OFF | DIVA_2 | RSEL2;
-
-    /* Init undivided DCO with internal resistor for MCLK and SMCLK
-     * DCO = 32762Hz -> FLL = 2,4576 MHz */
-    BCSCTL2 = 0x00;
-
-    BCSCTL1 |= DIVA1 + DIVA0;             /* ACLK = LFXT1CLK/8 */
-
-    for (i = 0xFFFF; i > 0; i--) {        /* Delay for XTAL to settle */
-        __asm__("nop");
-    }
-
-    CCTL2 = CCIS0 + CM0 + CAP;            /* Define CCR2, CAP, ACLK */
-    TACTL = TASSEL1 + TACLR + MC1;        /* SMCLK, continuous mode */
-
-    while (1) {
-        unsigned int compare;
-
-        while ((CCTL2 & CCIFG) != CCIFG);   /* Wait until capture occurred!*/
-
-        CCTL2 &= ~CCIFG;                    /* Capture occurred, clear flag */
-        compare = CCR2;                     /* Get current captured SMCLK */
-        compare = compare - oldcapture;     /* SMCLK difference */
-        oldcapture = CCR2;                  /* Save current captured SMCLK */
-
-        if (DELTA == compare) {
-            break;                            /* if equal, leave "while (1)" */
-        }
-        else if (DELTA < compare) {        /* DCO is too fast, slow it down */
-            DCOCTL--;
-
-            if (DCOCTL == 0xFF) {             /* Did DCO role under? */
-                BCSCTL1--;
-            }
-        }
-        else {                            /* -> Select next lower RSEL */
-            DCOCTL++;
-
-            if (DCOCTL == 0x00) {             /* Did DCO role over? */
-                BCSCTL1++;
-            }
-
-            /* -> Select next higher RSEL  */
-        }
-    }
-
-    CCTL2 = 0;                            /* Stop CCR2 function */
-    TACTL = 0;                            /* Stop Timer_A */
-
-    BCSCTL1 &= ~(DIVA1 + DIVA0);          /* remove /8 divisor from ACLK again */
-}
-
-//=========================== public ==========================================
-
 void board_init(void)
 {
-    /* disable watchdog timer */
-    WDTCTL     =  WDTPW + WDTHOLD;
-
     telosb_ports_init();
-    msp430_init_dco();
-
-    /* enable interrupts */
-    __bis_SR_register(GIE);
 }

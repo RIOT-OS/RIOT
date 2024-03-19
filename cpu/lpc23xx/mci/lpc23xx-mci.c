@@ -534,7 +534,7 @@ diskio_sta_t mci_initialize(void)
             /* Wait while card is busy state (use ACMD41 with HCS bit) */
             /* This loop will take a time. Insert wai_tsk(1) here for multitask envilonment. */
             if (ztimer_now(ZTIMER_USEC) > (start + 1 * US_PER_SEC /* !Timer[0] */)) {
-                DEBUG("%s, %d: Timeout #1\n", RIOT_FILE_RELATIVE, __LINE__);
+                DEBUG("%s, %d: Timeout #1\n", __FILE__, __LINE__);
                 goto di_fail;
             }
         }
@@ -556,13 +556,13 @@ diskio_sta_t mci_initialize(void)
 
         do {
             /* Wait while card is busy state (use ACMD41 or CMD1) */
-            DEBUG("%s, %d: %lX\n", RIOT_FILE_RELATIVE, __LINE__, resp[0]);
+            DEBUG("%s, %d: %lX\n", __FILE__, __LINE__, resp[0]);
 
             /* This loop will take a time. Insert wai_tsk(1) here for multitask envilonment. */
             if (ztimer_now(ZTIMER_USEC) > (start + 1 * US_PER_SEC/* !Timer[0] */)) {
                 DEBUG("now: %" PRIu32 "us, started at: %" PRIu32 "\n",
                       (uint32_t) ztimer_now(ZTIMER_USEC), start);
-                DEBUG("%s, %d: Timeout #2\n", RIOT_FILE_RELATIVE, __LINE__);
+                DEBUG("%s, %d: Timeout #2\n", __FILE__, __LINE__);
                 goto di_fail;
             }
         }
@@ -575,7 +575,7 @@ diskio_sta_t mci_initialize(void)
     /*---- Card is 'ready' state ----*/
 
     if (!send_cmd(CMD2, 0, 2, resp)) {
-        DEBUG("%s, %d: Failed entering ident state", RIOT_FILE_RELATIVE,
+        DEBUG("%s, %d: Failed entering ident state", __FILE__,
               __LINE__);
         goto di_fail;   /* Enter ident state */
     }
@@ -588,7 +588,7 @@ diskio_sta_t mci_initialize(void)
 
     if (ty & CT_SDC) {                      /* SDC: Get generated RCA and save it */
         if (!send_cmd(CMD3, 0, 1, resp)) {
-            DEBUG("%s, %d: Failed generating RCA\n", RIOT_FILE_RELATIVE, __LINE__);
+            DEBUG("%s, %d: Failed generating RCA\n", __FILE__, __LINE__);
             goto di_fail;
         }
 

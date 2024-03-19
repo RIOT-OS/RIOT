@@ -1,0 +1,58 @@
+CFLAGS += -Wno-strict-aliasing
+CFLAGS += -Wno-unused-parameter
+
+NO_AUTO_SRC := 1
+
+ifeq (cmsis-dsp_basicmathfunctions,$(MODULE))
+    SRC := \
+        BasicMathFunctions.c \
+        BasicMathFunctionsF16.c \
+        #
+else ifeq (cmsis-dsp_commontables,$(MODULE))
+    SRC := \
+        CommonTables.c \
+        CommonTablesF16.c \
+        #
+else ifeq (cmsis-dsp_complexmathfunctions,$(MODULE))
+    SRC := \
+        ComplexMathFunctions.c \
+        ComplexMathFunctionsF16.c \
+        #
+else ifeq (cmsis-dsp_controllerfunctions,$(MODULE))
+    SRC := \
+        ControllerFunctions.c \
+        #
+else ifeq (cmsis-dsp_fastmathfunctions,$(MODULE))
+    SRC := \
+        FastMathFunctions.c \
+        FastMathFunctionsF16.c \
+        #
+else ifeq (cmsis-dsp_filteringfunctions,$(MODULE))
+    SRC := \
+        FilteringFunctions.c \
+        FilteringFunctionsF16.c \
+        #
+else ifeq (cmsis-dsp_matrixfunctions,$(MODULE))
+    SRC := \
+        MatrixFunctions.c \
+        MatrixFunctionsF16.c \
+        #
+else ifeq (cmsis-dsp_statisticsfunctions ,$(MODULE))
+    SRC := \
+        StatisticsFunctions.c \
+        StatisticsFunctionsF16.c \
+        #
+else ifeq (cmsis-dsp_supportfunctions,$(MODULE))
+    SRC := \
+        SupportFunctions.c \
+        SupportFunctionsF16.c \
+        #
+else ifeq (cmsis-dsp_transformfunctions,$(MODULE))
+    SRC := \
+        TransformFunctions.c \
+        TransformFunctionsF16.c \
+        #
+endif
+
+# Include RIOT settings and recipes
+include $(RIOTBASE)/Makefile.base

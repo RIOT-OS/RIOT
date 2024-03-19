@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2020 Benjamin Valentin
+ *               2023 Gerson Fernando Budke
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -17,10 +18,12 @@
  *              time across reboots or deep sleep.
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
+ * @author      Gerson Fernando Budke <nandojve@gmail.com>
  *
  * @}
  */
 
+#include "irq.h"
 #include "periph/rtc.h"
 
 /* In .noinit so we don't reset the counter on reboot */
@@ -31,10 +34,8 @@ static rtc_alarm_cb_t alarm_cb;
 static void *alarm_cb_arg;
 
 /* will be called every second */
-ISR(TIMER2_OVF_vect)
+static inline void tmr2_ovf_handler(void)
 {
-    avr8_enter_isr();
-
     if (++tm_now.tm_sec > 59) {
         rtc_tm_normalize(&tm_now);
     }
@@ -42,9 +43,8 @@ ISR(TIMER2_OVF_vect)
     if (alarm_cb && rtc_tm_compare(&tm_now, &tm_alarm) == 0) {
         alarm_cb(alarm_cb_arg);
     }
-
-    avr8_exit_isr();
 }
+AVR8_ISR(TIMER2_OVF_vect, tmr2_ovf_handler);
 
 void rtc_init(void)
 {

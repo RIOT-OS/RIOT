@@ -69,18 +69,18 @@ static int read_voltage(const void *_dev, phydat_t *res)
 
 const saul_driver_t ina2xx_saul_current_driver = {
     .read = read_current,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_CURRENT
 };
 
 const saul_driver_t ina2xx_saul_power_driver = {
     .read = read_power,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_POWER
 };
 
 const saul_driver_t ina2xx_saul_voltage_driver = {
     .read = read_voltage,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_VOLTAGE
 };

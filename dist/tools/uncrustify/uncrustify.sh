@@ -32,7 +32,7 @@ check () {
 _annotate_diff() {
     if [ -n "$1" -a -n "$2" -a -n "$3" ]; then
         MSG="Uncrustify proposes the following patch:\n\n$3"
-        IFS="${OLD_IFS}" github_annotate_error "$1" "$2" "${MSG}"
+        IFS="${OLD_IFS}" github_annotate_warning "$1" "$2" "${MSG}"
     fi
 }
 

@@ -46,6 +46,34 @@ extern "C" {
 #define CPU_FLASH_BASE                  0x08000000
 /** @} */
 
+/**
+ * @brief   Possible values of the `SWJ_CFG` field in the AFIO->PCF0 register
+ */
+typedef enum {
+     /**
+      * @brief  Full JTAG interface (reset value)
+      */
+    SWJ_CFG_FULL_JTAG    = 0,
+    /**
+     * @brief   JTAG enabled, but NJTRST disabled and pin PB4 usable as GPIO
+     */
+    SWJ_CFG_NO_NJTRST   = 1U << AFIO_PCF0_SWJ_CFG_Pos,
+    /**
+     * @brief   JTAG disabled, all debug pins usable as GPIOs
+     */
+    SWJ_CFG_NO_JTAG     = 4U << AFIO_PCF0_SWJ_CFG_Pos,
+} afio_pcf0_swj_cfg_t;
+
+#ifndef CONFIG_AFIO_PCF0_SWJ_CFG
+/**
+ * @brief   By default, enable JTAG but disable NJTRST
+ *
+ * This default makes PB4 usable as GPIO while still being able to debug and
+ * flash via JTAG.
+ */
+#define CONFIG_AFIO_PCF0_SWJ_CFG    SWJ_CFG_NO_NJTRST
+#endif
+
 #ifdef __cplusplus
 }
 #endif

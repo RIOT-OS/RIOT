@@ -72,3 +72,4 @@ static const ata8520e_params_t ata8520e_params[] =
 #endif
 
 #endif /* ATA8520E_PARAMS_H */
+/** @} */

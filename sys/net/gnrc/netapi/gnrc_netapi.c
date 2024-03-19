@@ -85,6 +85,8 @@ static inline int _snd_rcv_mbox(mbox_t *mbox, uint16_t type, gnrc_pktsnip_t *pkt
 int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
                          uint16_t cmd, gnrc_pktsnip_t *pkt)
 {
+    gnrc_netreg_acquire_shared();
+
     int numof = gnrc_netreg_num(type, demux_ctx);
 
     if (numof != 0) {
@@ -133,6 +135,8 @@ int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
             sendto = gnrc_netreg_getnext(sendto);
         }
     }
+
+    gnrc_netreg_release_shared();
 
     return numof;
 }

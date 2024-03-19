@@ -454,7 +454,9 @@ int main(int argc, char **argv)
     printf("#define CLOCK_CORECLOCK     (%uU)\n", coreclock);
     printf("/* 0: no external high speed crystal available\n"
            " * else: actual crystal frequency [in Hz] */\n"
-           "#define CLOCK_HSE           (%uU)\n", pll_src ? pll_in : 0);
+           "#ifndef CONFIG_CLOCK_HSE\n"
+           "#define CONFIG_CLOCK_HSE           (%uU)\n", pll_src ? pll_in : 0);
+    printf("#endif\n");
     printf("/* 0: no external low speed crystal available,\n"
            " * 1: external crystal available (always 32.768kHz) */\n"
            "#define CLOCK_LSE           (%uU)\n", is_lse);

@@ -21,6 +21,7 @@
 #include <string.h>
 #include <errno.h>
 
+#include "architecture.h"
 #include "iolist.h"
 #include "net/netopt.h"
 #include "net/netdev.h"
@@ -78,7 +79,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         return 0;
     }
 
-    DEBUG("[sx126x] netdev: sending packet now (size: %d).\n", pos);
+    DEBUG("[sx126x] netdev: sending packet now (size: %" PRIuSIZE ").\n", pos);
     sx126x_set_lora_payload_length(dev, pos);
 
     state = NETOPT_STATE_TX;
@@ -141,6 +142,10 @@ static int _init(netdev_t *netdev)
     }
 
     DEBUG("[sx126x] netdev: initialization successful\n");
+
+    /* signal link UP */
+    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+
     return 0;
 }
 
@@ -397,7 +402,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
         const uint8_t max_sf = sx126x_is_llcc68(dev)
                                ? llcc68_max_sf
                                : sx126x_max_sf;
-        if ((sf < LORA_SF6) || (sf > max_sf)) {
+        if ((sf < LORA_SF5) || (sf > max_sf)) {
             res = -EINVAL;
             break;
         }

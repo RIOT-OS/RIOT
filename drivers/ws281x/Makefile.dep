@@ -1,4 +1,5 @@
-FEATURES_REQUIRED_ANY += cpu_core_atmega|arch_esp32|arch_native
+# Actually |(periph_timer_poll and periph_gpio_ll), but that's too complex for FEATURES_REQUIRED_ANY to express
+FEATURES_REQUIRED_ANY += cpu_core_atmega|arch_esp32|arch_native|periph_timer_poll
 
 ifeq (,$(filter ws281x_%,$(USEMODULE)))
   ifneq (,$(filter cpu_core_atmega,$(FEATURES_USED)))
@@ -10,8 +11,29 @@ ifeq (,$(filter ws281x_%,$(USEMODULE)))
   ifneq (,$(filter arch_esp32,$(FEATURES_USED)))
     USEMODULE += ws281x_esp32
   endif
+  # Not only looking for the used feature but also for the absence of any more specific driver
+  ifeq (-periph_timer_poll,$(filter ws281x_%,$(USEMODULE))-$(filter periph_timer_poll,$(FEATURES_USED)))
+    USEMODULE += ws281x_timer_gpio_ll
+  endif
 endif
 
 ifneq (,$(filter ws281x_atmega,$(USEMODULE)))
   FEATURES_REQUIRED += cpu_core_atmega
+endif
+
+ifneq (,$(filter ws281x_esp32%,$(USEMODULE)))
+  FEATURES_REQUIRED += arch_esp32
+  ifneq (,$(filter ws281x_esp32_sw,$(USEMODULE)))
+    USEMODULE += ws281x_esp32
+  else
+    # use ESP32x RMT hardware implementation by default
+    FEATURES_REQUIRED += esp_rmt
+    USEMODULE += esp_idf_rmt
+    USEMODULE += ws281x_esp32
+    USEMODULE += ws281x_esp32_hw
+  endif
+endif
+
+ifneq (,$(filter ws281x_timer_gpio_ll,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_ll periph_timer periph_timer_poll
 endif

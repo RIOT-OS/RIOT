@@ -31,26 +31,14 @@ extern "C" {
  * @name    LED pin definitions and handlers
  * @{
  */
-#define LED0_PIN            GPIO_PIN(PORT_E, 7)  /**< LED0 gpio pin  */
-#define LED0_MASK           (1 << 7)             /**< LED0 gpio mask */
+#define LED0_PIN_NUM        7
+#define LED0_PORT_NUM       PORT_E
 
-#define LED0_ON             (GPIOB->BSRR = LED0_MASK)  /**< Turn on LED0  */
-#define LED0_OFF            (GPIOB->BSRR = (LED0_MASK << 16))  /**< Turn off LED0  */
-#define LED0_TOGGLE         (GPIOB->ODR  ^= LED0_MASK)  /**< Toggle LED0  */
+#define LED1_PIN_NUM        8
+#define LED1_PORT_NUM       PORT_E
 
-#define LED1_PIN            GPIO_PIN(PORT_E, 8)  /**< LED1 gpio pin  */
-#define LED1_MASK           (1 << 8)             /**< LED1 gpio mask */
-
-#define LED1_ON             (GPIOE->BSRR = LED1_MASK)  /**< Turn on LED1  */
-#define LED1_OFF            (GPIOE->BSRR = (LED1_MASK << 16))  /**< Turn off LED1  */
-#define LED1_TOGGLE         (GPIOE->ODR  ^= LED1_MASK)  /**< Toggle LED1  */
-
-#define LED2_PIN            GPIO_PIN(PORT_E, 9)  /**< LED2 gpio pin  */
-#define LED2_MASK           (1 << 9)             /**< LED2 gpio mask */
-
-#define LED2_ON             (GPIOE->BSRR = LED2_MASK)  /**< Turn on LED2  */
-#define LED2_OFF            (GPIOE->BSRR = (LED2_MASK << 16))  /**< Turn off LED2  */
-#define LED2_TOGGLE         (GPIOE->ODR  ^= LED2_MASK)  /**< Toggle LED2  */
+#define LED2_PIN_NUM        9
+#define LED2_PORT_NUM       PORT_E
 
 /** @} */
 
@@ -71,14 +59,11 @@ extern "C" {
 #define BTN2_MODE           GPIO_IN_PD          /**< Button 2 mode   */
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif
+
+#include "stm32_leds.h"
 
 #endif /* BOARD_H */
 /** @} */

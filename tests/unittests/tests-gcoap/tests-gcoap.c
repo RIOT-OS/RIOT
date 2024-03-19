@@ -22,6 +22,12 @@
 #include "unittests-constants.h"
 #include "tests-gcoap.h"
 
+#if IS_USED(MODULE_NANOCOAP_CACHE)
+#define ETAG_SLACK 9    /* account for ETag slack implicitly added by gcoap_req_init() */
+#else
+#define ETAG_SLACK 0
+#endif
+
 /*
  * A test set of dummy resources. The resource handlers are set to NULL.
  */
@@ -49,7 +55,8 @@ static gcoap_listener_t listener_second = {
     .next          = NULL
 };
 
-static const char *resource_list_str = "</second/part>,</act/switch>,</sensor/temp>,</test/info/all>";
+static const char *resource_list_str =
+    "</second/part>,</act/switch>,</sensor/temp>,</test/info/all>";
 
 /*
  * Client GET request success case. Test request generation.
@@ -82,7 +89,7 @@ static void test_gcoap__client_get_req(void)
     len = gcoap_request(&pdu, &buf[0], CONFIG_GCOAP_PDU_BUF_SIZE,
                                                 COAP_METHOD_GET, &path[0]);
 
-    TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code(&pdu));
+    TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code_decimal(&pdu));
     TEST_ASSERT_EQUAL_INT(CONFIG_GCOAP_TOKENLEN, coap_get_token_len(&pdu));
     TEST_ASSERT_EQUAL_INT(hdr_fixed_len + CONFIG_GCOAP_TOKENLEN,
                           coap_get_total_hdr_len(&pdu));
@@ -150,7 +157,7 @@ static void test_gcoap__client_put_req(void)
 
     coap_parse(&pdu, buf, len + 1);
 
-    TEST_ASSERT_EQUAL_INT(COAP_METHOD_PUT, coap_get_code(&pdu));
+    TEST_ASSERT_EQUAL_INT(COAP_METHOD_PUT, coap_get_code_decimal(&pdu));
     TEST_ASSERT_EQUAL_INT(1, pdu.payload_len);
     TEST_ASSERT_EQUAL_INT('1', (char)*pdu.payload);
 }
@@ -161,7 +168,7 @@ static void test_gcoap__client_put_req(void)
 static void test_gcoap__client_put_req_overfill(void)
 {
     /* header 4, token 2, path 11, format 1, marker 1 = 19 */
-    uint8_t buf[18];
+    uint8_t buf[18 + ETAG_SLACK];
     coap_pkt_t pdu;
     ssize_t len;
     char path[] = "/riot/value";
@@ -194,7 +201,7 @@ static void test_gcoap__client_get_path_defer(void)
 
     len = coap_opt_finish(&pdu, COAP_OPT_FINISH_NONE);
     TEST_ASSERT_EQUAL_INT(len,
-                          sizeof(coap_hdr_t) + CONFIG_GCOAP_TOKENLEN +optlen);
+                          sizeof(coap_hdr_t) + CONFIG_GCOAP_TOKENLEN + ETAG_SLACK + optlen);
 
     coap_parse(&pdu, buf, len);
 
@@ -216,13 +223,13 @@ static void test_gcoap__client_ping(void)
                          NULL);
 
     TEST_ASSERT_EQUAL_INT(0, res);
-    TEST_ASSERT_EQUAL_INT(COAP_CODE_EMPTY, coap_get_code(&pdu));
+    TEST_ASSERT_EQUAL_INT(COAP_CODE_EMPTY, coap_get_code_decimal(&pdu));
     TEST_ASSERT_EQUAL_INT(COAP_TYPE_CON, coap_get_type(&pdu));
     TEST_ASSERT_EQUAL_INT(0, coap_get_token_len(&pdu));
 
     /* confirm length */
     res = coap_opt_finish(&pdu, COAP_OPT_FINISH_NONE);
-    TEST_ASSERT_EQUAL_INT(4, res);
+    TEST_ASSERT_EQUAL_INT(4 + ETAG_SLACK, res);
 }
 
 /*
@@ -254,7 +261,7 @@ static void test_gcoap__server_get_req(void)
     int res = _read_cli_stats_req(&pdu, &buf[0]);
 
     TEST_ASSERT_EQUAL_INT(0, res);
-    TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code(&pdu));
+    TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code_decimal(&pdu));
     TEST_ASSERT_EQUAL_INT(2, coap_get_token_len(&pdu));
     TEST_ASSERT_EQUAL_INT(4 + 2, coap_get_total_hdr_len(&pdu));
     TEST_ASSERT_EQUAL_INT(COAP_TYPE_NON, coap_get_type(&pdu));
@@ -326,7 +333,7 @@ static void test_gcoap__server_con_req(void)
     int res = _read_cli_stats_req_con(&pdu, &buf[0]);
 
     TEST_ASSERT_EQUAL_INT(0, res);
-    TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code(&pdu));
+    TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code_decimal(&pdu));
     TEST_ASSERT_EQUAL_INT(COAP_TYPE_CON, coap_get_type(&pdu));
 }
 
@@ -371,15 +378,15 @@ static void test_gcoap__server_get_resource_list(void)
     gcoap_register_listener(&listener);
     gcoap_register_listener(&listener_second);
 
-    size = gcoap_get_resource_list(NULL, 0, COAP_FORMAT_LINK);
+    size = gcoap_get_resource_list(NULL, 0, COAP_FORMAT_LINK, GCOAP_SOCKET_TYPE_UNDEF);
     TEST_ASSERT_EQUAL_INT(strlen(resource_list_str), size);
 
     res[0] = 'A';
-    size = gcoap_get_resource_list(res, 0, COAP_FORMAT_LINK);
+    size = gcoap_get_resource_list(res, 0, COAP_FORMAT_LINK, GCOAP_SOCKET_TYPE_UNDEF);
     TEST_ASSERT_EQUAL_INT(0, size);
     TEST_ASSERT_EQUAL_INT((int)'A', (int)res[0]);
 
-    size = gcoap_get_resource_list(res, 127, COAP_FORMAT_LINK);
+    size = gcoap_get_resource_list(res, 127, COAP_FORMAT_LINK, GCOAP_SOCKET_TYPE_UNDEF);
     res[size] = '\0';
     TEST_ASSERT_EQUAL_INT(strlen(resource_list_str), size);
     TEST_ASSERT_EQUAL_STRING(resource_list_str, (char *)res);

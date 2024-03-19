@@ -30,7 +30,7 @@
  * even before kernel initialization.
  * Memory properties are hardware specific and can depend on environmental conditions.
  * Thus, they should be evaluated for each individual deployment. A basic
- * testing tool is provided in /RIOT/tests/puf_sram.
+ * testing tool is provided in /RIOT/tests/sys/puf_sram.
  *
  * # Soft-reset detection
  *
@@ -58,8 +58,9 @@
 extern "C" {
 #endif
 
-#include "hashes.h"
-#include "thread.h"
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 /**
  * @brief SRAM length considered for seeding

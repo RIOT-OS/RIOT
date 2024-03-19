@@ -13,10 +13,7 @@
  * @file
  * @brief       Default configuration parameters for the lm75 sensors.
  *
- *
  * @author      Vitor Batista <vitor.batista@ml-pa.com>
- *
- * @}
  */
 
 #ifndef LM75_PARAMS_H

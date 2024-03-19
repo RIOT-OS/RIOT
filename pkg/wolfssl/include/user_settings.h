@@ -21,10 +21,8 @@ extern "C" {
 #define NO_MAIN_DRIVER
 #define NO_SIG_WRAPPER
 #define NO_OLD_RNGNAME
-
-/* Uncomment the next two lines to enable wolfSSL debug */
-// #define DEBUG_WOLFSSL
-// #define WOLFSSL_LOG_PRINTF
+#define HAVE_STRINGS_H
+#define WOLFSSL_IPV6
 
 /* Single precision math */
 #define WOLFSSL_SP_MATH
@@ -75,9 +73,7 @@ extern "C" {
 #endif
 
 /* defined somewhere else */
-#ifndef __mips__
-int strncasecmp(const char *s1, const char * s2, unsigned int sz);
-#endif
+int strncasecmp(const char *s1, const char * s2, size_t sz);
 
 #define SINGLE_THREADED
 
@@ -98,6 +94,12 @@ int strncasecmp(const char *s1, const char * s2, unsigned int sz);
 #undef WOLFSSL_DTLS
 #ifdef MODULE_WOLFSSL_DTLS
 #define WOLFSSL_DTLS
+#endif
+
+#undef WOLFSSL_DTLS13
+#ifdef MODULE_WOLFSSL_DTLS13
+#define WOLFSSL_DTLS13
+#define HAVE_AEAD
 #endif
 
 #undef HAVE_FFDHE_2048
@@ -305,6 +307,23 @@ int strncasecmp(const char *s1, const char * s2, unsigned int sz);
 #define HAVE_TLS13
 #define WOLFSSL_TLS13
 #define BUILD_TLS_AES_128_GCM_SHA256
+#define NO_OLD_TLS
+#define HAVE_TLS_EXTENSIONS
+#define HAVE_AES_DECRYPT
+#define HAVE_AESGCM
+#define GCM_SMALL
+#define HAVE_AESCCM
+#define WOLFSSL_AES_COUNTER
+#define WOLFSSL_AES_DIRECT
+#define HAVE_FFDHE_4096
+#define HAVE_HKDF
+#define WC_RSA_PSS
+#define WOLFSSL_SEND_HRR_COOKIE
+#endif
+
+#ifdef MODULE_WOLFSSL_DEBUG
+#define DEBUG_WOLFSSL
+#define WOLFSSL_LOG_PRINTF
 #endif
 
 #ifdef __cplusplus

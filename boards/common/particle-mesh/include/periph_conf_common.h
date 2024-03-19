@@ -39,9 +39,9 @@ extern "C" {
 static const spi_conf_t spi_config[] = {
     {
         .dev  = NRF_SPIM0,
-        .sclk = GPIO_PIN(1,15),
-        .mosi = GPIO_PIN(1,13),
-        .miso = GPIO_PIN(1,14),
+        .sclk = GPIO_PIN(1, 15),
+        .mosi = GPIO_PIN(1, 13),
+        .miso = GPIO_PIN(1, 14),
     }
 };
 
@@ -69,3 +69,4 @@ static const pwm_conf_t pwm_config[] = {
 #endif
 
 #endif /* PERIPH_CONF_COMMON_H */
+/** @} */

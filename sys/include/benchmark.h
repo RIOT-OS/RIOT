@@ -24,7 +24,7 @@
 #include <stdint.h>
 
 #include "irq.h"
-#include "ztimer.h"
+#include "ztimer/stopwatch.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,12 +43,13 @@ extern "C" {
  */
 #define BENCHMARK_FUNC(name, runs, func)                        \
     do {                                                        \
-        uint32_t _benchmark_time = ztimer_now(ZTIMER_USEC);     \
+        ztimer_stopwatch_t timer = { .clock = ZTIMER_USEC };    \
+        ztimer_stopwatch_start(&timer);                         \
         for (unsigned long i = 0; i < runs; i++) {              \
             func;                                               \
         }                                                       \
-        _benchmark_time = (ztimer_now(ZTIMER_USEC) - _benchmark_time);\
-        benchmark_print_time(_benchmark_time, runs, name);      \
+        benchmark_print_time(ztimer_stopwatch_measure(&timer), runs, name); \
+        ztimer_stopwatch_stop(&timer);                          \
     } while (0)
 
 /**

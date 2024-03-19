@@ -101,7 +101,17 @@ void usbus_dfu_init(usbus_t *usbus, usbus_dfu_device_t *handler, unsigned mode)
     DEBUG("DFU: initialization\n");
     assert(usbus);
     assert(handler);
-    assert((SLOT0_OFFSET % FLASHPAGE_SIZE) == 0);
+#if defined(FLASHPAGE_SIZE)
+    static_assert((SLOT0_OFFSET % FLASHPAGE_SIZE) == 0,
+                  "SLOT0_OFFSET has to be a multiple of FLASHPAGE_SIZE");
+#elif defined(FLASHPAGE_MIN_SECTOR_SIZE)
+    /* STM32F2/4/7 MCUs use sectors instead of pages, where the minimum sector
+     * size is defined by FLASHPAGE_MIN_SECTOR_SIZE, which is 16KB or 32KB
+     * (the first sector) depending on the CPU_MODEL. In this case SLOT0_OFFSET
+     * must be a multiple of the minimum sector size to cover a whole sector. */
+    static_assert((SLOT0_OFFSET % FLASHPAGE_MIN_SECTOR_SIZE) == 0,
+                  "SLOT0_OFFSET has to be a multiple of FLASHPAGE_MIN_SECTOR_SIZE");
+#endif
     memset(handler, 0, sizeof(usbus_dfu_device_t));
     handler->usbus = usbus;
     handler->handler_ctrl.driver = &dfu_driver;
@@ -142,7 +152,7 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
     /* Add string descriptor to the interface */
     dfu->iface.descr = &dfu->slot0_str;
 
-#ifdef MODULE_RIOTBOOT_USB_DFU
+#if defined (MODULE_RIOTBOOT_USB_DFU) && NUM_SLOTS == 2
     /* Create needed string descriptor for the alternate settings */
     usbus_add_string_descriptor(usbus, &dfu->slot1_str, USB_DFU_MODE_SLOT1_NAME);
 

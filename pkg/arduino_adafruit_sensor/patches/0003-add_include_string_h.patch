@@ -1,0 +1,25 @@
+From a72b5fb7f3003ee738706f1949c365860e06e3f0 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Sun, 2 Jan 2022 14:12:38 +0100
+Subject: [PATCH 3/3] add_include_string_h
+
+---
+ Adafruit_Sensor.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Adafruit_Sensor.h b/Adafruit_Sensor.h
+index 77b70e1..6844bca 100755
+--- a/Adafruit_Sensor.h
++++ b/Adafruit_Sensor.h
+@@ -28,6 +28,8 @@
+ #include "WProgram.h"
+ #endif
+ 
++#include <string.h>
++
+ /* Constants */
+ #define SENSORS_GRAVITY_EARTH (9.80665F) /**< Earth's gravity in m/s^2 */
+ #define SENSORS_GRAVITY_MOON (1.6F)      /**< The moon's gravity in m/s^2 */
+-- 
+2.17.1
+

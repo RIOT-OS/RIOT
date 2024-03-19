@@ -11,3 +11,8 @@ config MODULE_AIP31068
     depends on TEST_KCONFIG
     select MODULE_XTIMER
     select MODULE_PERIPH_I2C
+
+config HAVE_AIP31068
+    bool
+    help
+        Indicates that the AIP31068 I2C LCD controller is present.

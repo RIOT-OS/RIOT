@@ -759,13 +759,17 @@ INPUT                  = ../../doc.txt \
                          ../../sys \
                          src/ \
                          src/mainpage.md \
+                         src/roadmap.md \
                          src/creating-modules.md \
                          src/creating-an-application.md \
                          src/porting-boards.md \
                          src/driver-guide.md \
                          src/getting-started.md \
+                         src/flashing.md \
+                         src/build-in-docker.md \
                          ../../tests/README.md \
                          src/build-system-basics.md \
+                         src/feature_list.md \
                          src/kconfig/kconfig.md \
                          src/using-cpp.md \
                          src/using-rust.md \
@@ -773,9 +777,12 @@ INPUT                  = ../../doc.txt \
                          src/debugging-aids.md \
                          src/emulators.md \
                          src/release-cycle.md \
+                         src/io-mapping-and-shields.md \
                          src/changelog.md \
                          ../../LOSTANDFOUND.md \
-                         ../../makefiles/pseudomodules.inc.mk
+                         ../../makefiles/pseudomodules.inc.mk \
+                         ../../makefiles/blob.inc.mk \
+                         ../../sys/net/gnrc/routing/ipv6_auto_subnets/gnrc_ipv6_auto_subnets.c
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -830,8 +837,8 @@ EXCLUDE_SYMLINKS       = NO
 
 EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/atmega_common/include/sys/*.h \
-                         */cpu/msp430_common/include/stdatomic.h \
-                         */cpu/msp430_common/include/sys/*.h \
+                         */cpu/msp430/include/stdatomic.h \
+                         */cpu/msp430/include/sys/*.h \
                          */cpu/native/osx-libc-extra \
                          */cpu/x86/include/* \
                          */drivers/kw2xrf/include/overwrites.h \
@@ -859,7 +866,7 @@ EXCLUDE_SYMBOLS        = *CMSIS* \
 # that contain example code fragments that are included (see the \include
 # command).
 
-EXAMPLE_PATH           =
+EXAMPLE_PATH           = ../../
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp and

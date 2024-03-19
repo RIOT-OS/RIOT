@@ -1,0 +1,3 @@
+ifneq (,$(filter evtimer,$(USEMODULE)))
+  USEMODULE += ztimer_msec
+endif

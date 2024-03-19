@@ -27,9 +27,16 @@ INCLUDES += -I$(RIOTCPU)/esp_common/vendor/esp
 
 # Flags
 
-CFLAGS += -Wno-unused-parameter -Wformat=0
-CFLAGS += -mlongcalls -mtext-section-literals -fstrict-volatile-bitfields
-CFLAGS += -fdata-sections -ffunction-sections -fzero-initialized-in-bss
+CFLAGS += -Wno-unused-parameter
+CFLAGS += -Wformat=0
+CFLAGS += -fstrict-volatile-bitfields
+CFLAGS += -fdata-sections
+CFLAFS += -ffunction-sections
+CFLAGS += -fzero-initialized-in-bss
+
+ifeq (xtensa,$(CPU_ARCH))
+  CFLAGS += -mlongcalls -mtext-section-literals
+endif
 
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-overflow
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-truncation
@@ -53,6 +60,13 @@ ifneq (,$(filter esp_qemu,$(USEMODULE)))
   CFLAGS += -DQEMU
 endif
 
+ifneq (,$(filter esp_freertos_common,$(USEMODULE)))
+  # thread_t.name required by FreeRTOS adaptation layer and esp_gdbstub
+  CFLAGS += -DCONFIG_THREAD_NAMES
+  # thread_t.stack_start required by FreeRTOS adaptation layer
+  CFLAGS += -DSCHED_TEST_STACK
+endif
+
 # use 32 priority levels if any WiFi interface or the ETH interface is used
 ifneq (,$(filter esp_wifi_any esp_eth,$(USEMODULE)))
   CFLAGS += -DSCHED_PRIO_LEVELS=32
@@ -64,28 +78,26 @@ ifneq (,$(filter lwip,$(USEMODULE)))
   CFLAGS += -DTCPIP_THREAD_PRIO=5
 endif
 
-# if SPI RAM is enabled, the qout flash mode has to be used
-_FLASH_MODE_PREV := $(FLASH_MODE)
-ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
-  FLASH_MODE = qout
+# extend CFLAGS by the corresponding CONFIG_FLASHMODE_* defines
+ifeq (dout,$(FLASH_MODE))
+  CFLAGS += -DCONFIG_FLASHMODE_DOUT
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHMODE_DOUT
+else ifeq (dio,$(FLASH_MODE))
+  CFLAGS += -DCONFIG_FLASHMODE_DIO
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHMODE_DIO
+else ifeq (qout,$(FLASH_MODE))
+  CFLAGS += -DCONFIG_FLASHMODE_QOUT
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHMODE_QUOT
+else ifeq (qio,$(FLASH_MODE))
+  CFLAGS += -DCONFIG_FLASHMODE_QIO
+  CFLAGS += -DCONFIG_ESPTOOLPY_FLASHMODE_QIO
 else
-  FLASH_MODE = $(_FLASH_MODE_PREV)
+  $(error Undefined FLASH_MODE, possible values are: dout, dio, qout and qio)
 endif
 
-# set CFLAG for the correspondant FLASH_MODE
-CFLAGS += $(if $(findstring qout,$(FLASH_MODE)),-DFLASH_MODE_QOUT=1)
-CFLAGS += $(if $(findstring qio,$(FLASH_MODE)),-DFLASH_MODE_QIO=1)
-CFLAGS += $(if $(findstring dio,$(FLASH_MODE)),-DFLASH_MODE_DIO=1)
-CFLAGS += $(if $(findstring dout,$(FLASH_MODE)),-DFLASH_MODE_DOUT=1)
-
-ARCHIVES += -lhal -lg -lc
+ARCHIVES += -lg -lc
 
 LINKFLAGS += $(CFLAGS_OPT) $(CFLAGS_DBG)
-#ifneq ($(CPU),esp8266)
-# esp8266 flags are added by the SDK pkg in pkg/esp8266_sdk
-#LINKFLAGS += -L$(ESP_SDK_DIR)/components/$(CPU)
-#LINKFLAGS += -L$(ESP_SDK_DIR)/components/$(CPU)/lib
-#endif
 LINKFLAGS += -nostdlib -Wl,-gc-sections -Wl,-static
 
 # use the wrapper functions for calloc to add correct overflow detection missing
@@ -120,7 +132,7 @@ PROGRAMMERS_SUPPORTED += esptool
 ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
 FLASHFILE ?= $(ELFFILE).bin
 
-ESPTOOL ?= $(RIOTTOOLS)/esptool/esptool.py
+ESPTOOL ?= $(RIOTTOOLS)/esptools/esptool.py
 
 # This is the binary that ends up programmed in the flash.
 $(ELFFILE).bin: $(ELFFILE)
@@ -128,29 +140,32 @@ $(ELFFILE).bin: $(ELFFILE)
 		--flash_size $(FLASH_SIZE)MB --flash_freq $(FLASH_FREQ) $(FLASH_OPTS) \
 		-o $@ $<
 
-
 # Convert .elf and .csv to .bin files at build time, but make them available for
 # tests at flash time. These can't be added to FLASHDEPS because they depend on
 # on ELFFILE and would trigger a rebuild with "flash-only".
-BUILD_FILES += $(FLASHFILE) $(BINDIR)/partitions.bin
-TEST_EXTRA_FILES += $(FLASHFILE) $(BINDIR)/partitions.bin
+BUILD_FILES += $(FLASHFILE) $(BINDIR)/partitions.bin $(BOOTLOADER_BIN)
+TEST_EXTRA_FILES += $(FLASHFILE) $(BINDIR)/partitions.bin $(BOOTLOADER_BIN)
 
 # Default partition table with no OTA. Can be replaced with a custom partition
 # table setting PARTITION_TABLE_CSV.
 PARTITION_TABLE_CSV ?= $(BINDIR)/partitions.csv
 
+ifneq (,$(filter periph_flashpage_in_address_space,$(USEMODULE)))
 $(BINDIR)/partitions.csv: $(FLASHFILE)
 	$(Q)printf "\n" > $(BINDIR)/partitions.csv
 	$(Q)printf "nvs, data, nvs, 0x9000, 0x6000\n" >> $@
 	$(Q)printf "phy_init, data, phy, 0xf000, 0x1000\n" >> $@
-	$(Q)printf "factory, app, factory, 0x10000, " >> $@
+	$(Q)printf "flashpage, data, phy, $(FLASHPAGE_ADDR_START), $(FLASHPAGE_CAP)\n" >> $@
+	$(Q)printf "factory, app, factory, $(FLASHFILE_POS), " >> $@
 	$(Q)ls -l $< | awk '{ print $$5 }' >> $@
+else
+$(BINDIR)/partitions.csv: $(FLASHFILE)
+	$(Q)printf "\n" > $(BINDIR)/partitions.csv
+	$(Q)printf "nvs, data, nvs, 0x9000, 0x6000\n" >> $@
+	$(Q)printf "phy_init, data, phy, 0xf000, 0x1000\n" >> $@
+	$(Q)printf "factory, app, factory, $(FLASHFILE_POS), " >> $@
+	$(Q)ls -l $< | awk '{ print $$5 }' >> $@
+endif
 
 $(BINDIR)/partitions.bin: $(PARTITION_TABLE_CSV)
-	$(Q)python3 $(RIOTTOOLS)/esptool/gen_esp32part.py --verify $< $@
-
-# Convert .elf and .csv to .bin files at build time, but make them available for
-# tests at flash time. These can't be added to FLASHDEPS because they depend on
-# on ELFFILE and would trigger a rebuild with "flash-only".
-BUILD_FILES += $(FLASHFILE) $(BINDIR)/partitions.bin
-TEST_EXTRA_FILES += $(FLASHFILE) $(BINDIR)/partitions.bin
+	$(Q)python3 $(RIOTTOOLS)/esptools/gen_esp32part.py --verify $< $@

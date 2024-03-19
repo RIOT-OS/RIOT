@@ -1,0 +1,14 @@
+[package]
+name = "riot-module-shell-democommands"
+version = "0.1.0"
+edition = "2021"
+
+authors = ["Christian Amsüss <chrysn@fsfe.org>"]
+license = "LGPL-2.1-only"
+
+# Shipped with RIOT-OS; this has no external API that would make
+# sense to consume in any context than from within RIOT
+publish = false
+
+[dependencies]
+riot-wrappers = "^0.8"

@@ -1,0 +1,15 @@
+[package]
+name = "riot-module-lsm303agr"
+version = "0.1.0"
+edition = "2021"
+
+authors = ["Christian Amsüss <chrysn@fsfe.org>"]
+license = "LGPL-2.1-only"
+
+# Shipped with RIOT-OS; this has no external API that would make
+# sense to consume in any context than from within RIOT
+publish = false
+
+[dependencies]
+lsm303agr = "1.0"
+riot-wrappers = "^0.8"

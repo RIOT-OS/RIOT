@@ -149,6 +149,7 @@ static bool _complete_cb(struct uwb_dev *inst, struct uwb_mac_interface *cbs)
         event_post(uwb_core_get_eventq(), &_rng_listen_event.super);
         return false;
     }
+
     /* get received frame */
     struct uwb_rng_instance *rng = (struct uwb_rng_instance *)cbs->inst_ptr;
 
@@ -156,6 +157,15 @@ static bool _complete_cb(struct uwb_dev *inst, struct uwb_mac_interface *cbs)
     twr_frame_t *frame = rng->frames[rng->idx_current];
     /* parse data*/
     uwb_core_rng_data_t data;
+
+    /* with ss twr, the last frame will hold the initiator as the src address,
+       with ds twr, it will hold the responder address */
+    if (IS_ACTIVE(CONFIG_TWR_PRINTF_INITIATOR_ONLY) &&
+        ((frame->code < UWB_DATA_CODE_DS_TWR && frame->src_address != _udev->uid) ||
+         (frame->code >= UWB_DATA_CODE_DS_TWR && frame->dst_address != _udev->uid))) {
+        event_post(uwb_core_get_eventq(), &_rng_listen_event.super);
+        return true;
+    }
 
     data.src = frame->src_address;
     data.dest = frame->dst_address;
@@ -205,7 +215,7 @@ static void _rng_listen(void *arg)
     if (!ztimer_is_set(ZTIMER_MSEC, &_rng_request_event.periodic.timer.timer)) {
         _status &= ~TWR_STATUS_INITIATOR;
     }
-    if (_status && TWR_STATUS_RESPONDER) {
+    if (_status & TWR_STATUS_RESPONDER) {
         /* wake up if needed */
         if (_udev->status.sleeping) {
             uwb_wakeup(_udev);
@@ -217,8 +227,7 @@ static void _rng_listen(void *arg)
     }
     else {
         /* go to sleep if possible */
-        if (_rng_request_event.periodic.timer.interval > CONFIG_TWR_MIN_IDLE_SLEEP_MS ||
-            !(_status && TWR_STATUS_INITIATOR)) {
+        if (_rng_request_event.periodic.timer.interval > CONFIG_TWR_MIN_IDLE_SLEEP_MS) {
             uwb_sleep_config(_udev);
             uwb_enter_sleep(_udev);
         }
@@ -254,7 +263,7 @@ static void _rng_request(void *arg)
         uwb_phy_forcetrxoff(_udev);
     }
 
-   uwb_rng_request(_rng, event->addr, (uwb_dataframe_code_t)event->proto);
+    uwb_rng_request(_rng, event->addr, (uwb_dataframe_code_t)event->proto);
 }
 
 void uwb_core_rng_start(uint16_t addr, twr_protocol_t proto, uint32_t interval,
@@ -285,7 +294,14 @@ void uwb_core_rng_init(void)
     /* set initial status */
     _status = 0;
     /* got to sleep on boot */
-    struct uwb_dev*_udev = uwb_dev_idx_lookup(0);
+    struct uwb_dev *_udev = uwb_dev_idx_lookup(0);
+
     uwb_sleep_config(_udev);
     uwb_enter_sleep(_udev);
+}
+
+uint32_t uwb_core_rng_req_remaining(void)
+{
+    /* doesn't matter if its not atomic */
+    return _rng_request_event.periodic.count;
 }

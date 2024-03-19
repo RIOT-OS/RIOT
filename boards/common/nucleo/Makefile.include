@@ -6,3 +6,18 @@ INCLUDES += -I$(RIOTBOARD)/common/stm32/include
 
 # Setup of programmer and serial is shared between STM32 based boards
 include $(RIOTMAKE)/boards/stm32.inc.mk
+
+# If port selection via ttys.py is enabled by `MOST_RECENT_PORT=1`, filter
+# USB serials to only select the UART bridge of embedded STLink debuggers.
+TTY_BOARD_FILTER := --model 'STM32 STLink'
+
+# The TTY serial also is the ID of the debug adapter, as the TTY is provided by
+# the debug adapter
+DEBUG_ADAPTER_ID_IS_TTY_SERIAL := 1
+
+# variable needed by cpy2remed PROGRAMMER
+# it contains name of ST-Link removable media
+
+DIR_NAME_AT_REMED = "NODE$(call uppercase,$(subst -,_,$(subst nucleo,,$(BOARD))))"
+
+PROGRAMMERS_SUPPORTED += cpy2remed

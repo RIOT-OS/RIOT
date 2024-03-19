@@ -47,8 +47,7 @@ Metro M0 Express should also work with board definition.
 
 ## Flashing the device
 
-Assuming the [UF2 Bootloader](https://github.com/microsoft/uf2-samdx1) is
-installed, just run:
+Assuming the Arduino Bootloader is installed, just run:
 
 ```
 make BOARD=wemos-zero flash

@@ -127,13 +127,15 @@ void cortexm_init_misc(void);
 #endif /* defined(CPU_CORTEXM_INIT_SUBFUNCTIONS) || defined(DOXYGEN) */
 
 /**
- * @brief   Prints the current content of the link register (lr)
+ * @brief   Returns the current content of the link register (lr)
+ *
+ * @return  content of the link register (lr)
  */
-static inline void cpu_print_last_instruction(void)
+static inline uintptr_t cpu_get_caller_pc(void)
 {
-    uint32_t *lr_ptr;
+    uintptr_t lr_ptr;
     __asm__ __volatile__("mov %0, lr" : "=r"(lr_ptr));
-    printf("%p\n", (void*) lr_ptr);
+    return lr_ptr;
 }
 
 /**
@@ -165,6 +167,10 @@ static inline void cortexm_sleep(int deep)
     unsigned state = irq_disable();
     __DSB();
     __WFI();
+    /* Some CPUs require an ISB after WFI to work around silicon bugs */
+#if CORTEXM_ISB_REQUIRED_AFTER_WFI
+    __ISB();
+#endif
     irq_restore(state);
 }
 

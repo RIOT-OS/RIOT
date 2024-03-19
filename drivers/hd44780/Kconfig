@@ -13,3 +13,8 @@ config MODULE_HD44780
     select MODULE_XTIMER
     help
         The display is also known as LCM1602C from Arduino kits.
+
+config HAVE_HD44780
+    bool
+    help
+        Indicates that a HD44780 LCD is present.

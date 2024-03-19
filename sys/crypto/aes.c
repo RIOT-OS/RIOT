@@ -32,8 +32,6 @@
  * @}
  */
 
-#include <stdio.h>
-#include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -62,6 +60,16 @@
 #  define AES_KEY_SIZE(ctx) ctx->key_size
 #endif
 
+/**
+ * @brief AES key
+ * @see cipher_context_t
+ */
+typedef struct {
+    /** @cond INTERNAL */
+    uint32_t rd_key[4 * (AES_MAXNR + 1)];
+    int rounds;
+    /** @endcond */
+} aes_key_t;
 /**
  * Interface to the aes cipher
  */
@@ -860,7 +868,7 @@ int aes_init(cipher_context_t *context, const uint8_t *key, uint8_t keySize)
  * Expand the cipher key into the encryption key schedule.
  */
 static int aes_set_encrypt_key(const unsigned char *userKey, const int bits,
-                               AES_KEY *key)
+                               aes_key_t *key)
 {
     u32 *rk;
     int i = 0;
@@ -979,7 +987,7 @@ static int aes_set_encrypt_key(const unsigned char *userKey, const int bits,
  * Expand the cipher key into the decryption key schedule.
  */
 static int aes_set_decrypt_key(const unsigned char *userKey, const int bits,
-                               AES_KEY *key)
+                               aes_key_t *key)
 {
     u32 *rk;
     int i, j;
@@ -1062,8 +1070,8 @@ int aes_encrypt(const cipher_context_t *context, const uint8_t *plainBlock,
 {
     /* setup AES_KEY */
     int res;
-    AES_KEY aeskey;
-    const AES_KEY *key = &aeskey;
+    aes_key_t aeskey;
+    const aes_key_t *key = &aeskey;
 
     res = aes_set_encrypt_key((unsigned char *)context->context,
                               AES_KEY_SIZE(context) * 8, &aeskey);
@@ -1331,8 +1339,8 @@ int aes_decrypt(const cipher_context_t *context, const uint8_t *cipherBlock,
 {
     /* setup AES_KEY */
     int res;
-    AES_KEY aeskey;
-    const AES_KEY *key = &aeskey;
+    aes_key_t aeskey;
+    const aes_key_t *key = &aeskey;
 
     res = aes_set_decrypt_key((unsigned char *)context->context,
                               AES_KEY_SIZE(context) * 8, &aeskey);

@@ -21,6 +21,14 @@ config MODULE_NEWLIB_SYSCALLS_DEFAULT
     help
         Default implementation of newlib system calls.
 
+config MODULE_LIBC_GETTIMEOFDAY
+    bool
+    select MODULE_NEWLIB_SYSCALLS_DEFAULT if MODULE_NEWLIB
+    select MODULE_XTIMER
+    select MODULE_ZTIMER64_XTIMER_COMPAT if MODULE_ZTIMER_XTIMER_COMPAT
+    help
+        Support for gettimeofday()
+
 endif # MODULE_NEWLIB
 
 config HAVE_CUSTOM_NEWLIB_SYSCALLS

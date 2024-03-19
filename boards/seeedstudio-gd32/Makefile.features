@@ -1,6 +1,17 @@
-CPU = gd32v
 CPU_MODEL = gd32vf103vbt6
 
 # Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_adc
+FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_pwm
+FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
+FEATURES_PROVIDED += periph_usbdev
+
+# Other features provided by the board (in alphabetical order)
+FEATURES_PROVIDED += highlevel_stdio
+FEATURES_PROVIDED += sdcard_spi
+FEATURES_PROVIDED += tinyusb_device
+
+include $(RIOTBOARD)/common/gd32v/Makefile.features

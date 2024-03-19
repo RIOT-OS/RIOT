@@ -27,6 +27,7 @@
 #include "irq.h"
 #include "periph/timer.h"
 
+#include "checksum/crc16_ccitt.h"
 #include "net/eui_provider.h"
 #include "net/netdev/eth.h"
 #include "timex.h"
@@ -38,7 +39,6 @@
 #error "DOSE_TIMER_DEV needs to be set by the board"
 #endif
 
-static uint16_t crc16_update(uint16_t crc, uint8_t octet);
 static dose_signal_t state_transit_blocked(dose_t *ctx, dose_signal_t signal);
 static dose_signal_t state_transit_idle(dose_t *ctx, dose_signal_t signal);
 static dose_signal_t state_transit_recv(dose_t *ctx, dose_signal_t signal);
@@ -59,22 +59,10 @@ static int _init(netdev_t *dev);
 static void _poweron(dose_t *dev);
 static void _poweroff(dose_t *dev, dose_state_t sleep_state);
 
-static uint16_t crc16_update(uint16_t crc, uint8_t octet)
-{
-    crc = (uint8_t)(crc >> 8) | (crc << 8);
-    crc ^= octet;
-    crc ^= (uint8_t)(crc & 0xff) >> 4;
-    crc ^= (crc << 8) << 4;
-    crc ^= ((crc & 0xff) << 4) << 1;
-    return crc;
-}
-
 static void _crc_cb(void *ctx, uint8_t *data, size_t len)
 {
     uint16_t *crc = ctx;
-    for (uint8_t *end = data + len; data != end; ++data) {
-        *crc = crc16_update(*crc, *data);
-    }
+    *crc = crc16_ccitt_false_update(*crc, data, len);
 }
 
 static void _init_standby(dose_t *ctx, const dose_params_t *params)
@@ -177,8 +165,8 @@ static void _dose_watchdog_cb(void *arg, int chan)
 static void _watchdog_init(unsigned timeout_us)
 {
     timer_init(DOSE_TIMER_DEV, US_PER_SEC, _dose_watchdog_cb, NULL);
-    timer_set_periodic(DOSE_TIMER_DEV, 0, timeout_us, TIM_FLAG_RESET_ON_MATCH);
-    timer_stop(DOSE_TIMER_DEV);
+    timer_set_periodic(DOSE_TIMER_DEV, 0, timeout_us,
+                       TIM_FLAG_RESET_ON_MATCH | TIM_FLAG_SET_STOPPED);
 }
 #else
 static inline void _watchdog_start(void) {}
@@ -201,11 +189,11 @@ static dose_signal_t state_transit_idle(dose_t *ctx, dose_signal_t signal)
     (void) ctx;
     (void) signal;
 
-    _watchdog_stop();
-
     if (ctx->state == DOSE_STATE_RECV) {
         bool dirty = ctx->flags & DOSE_FLAG_RECV_BUF_DIRTY;
         bool done  = ctx->flags & DOSE_FLAG_END_RECEIVED;
+
+        _watchdog_stop();
 
         /* We got here from RECV state. The driver's thread has to look
          * if this frame should be processed. By queuing NETDEV_EVENT_ISR,
@@ -329,9 +317,10 @@ static void state(dose_t *ctx, dose_signal_t signal)
                 signal = state_transit_send(ctx, signal);
                 ctx->state = DOSE_STATE_SEND;
                 break;
-
             default:
                 DEBUG("dose state(): unexpected state transition (STATE=0x%02x SIGNAL=0x%02x)\n", ctx->state, signal);
+                /* fall-through */
+            case DOSE_STATE_RECV + DOSE_SIGNAL_SEND:
                 signal = DOSE_SIGNAL_NONE;
         }
     } while (signal != DOSE_SIGNAL_NONE);
@@ -431,6 +420,7 @@ static void _isr(netdev_t *netdev)
 
 static int _recv(netdev_t *dev, void *buf, size_t len, void *info)
 {
+    int res;
     dose_t *ctx = container_of(dev, dose_t, netdev);
 
     (void)info;
@@ -446,10 +436,18 @@ static int _recv(netdev_t *dev, void *buf, size_t len, void *info)
     }
 
     if (crb_consume_chunk(&ctx->rb, buf, len)) {
-        return len;
+        res = len;
     } else {
-        return -1;
+        res = -1;
     }
+
+    size_t dummy;
+    if (crb_get_chunk_size(&ctx->rb, &dummy)) {
+        DEBUG("dose: %" PRIuSIZE " byte pkt in rx queue\n", dummy);
+        netdev_trigger_event_isr(&ctx->netdev);
+    }
+
+    return res;
 }
 
 static uint8_t wait_for_state(dose_t *ctx, uint8_t state)
@@ -506,6 +504,9 @@ static int send_data_octet(dose_t *ctx, uint8_t c)
 
 static inline void _send_start(dose_t *ctx)
 {
+#ifdef MODULE_PERIPH_UART_TX_ONDEMAND
+    uart_enable_tx(ctx->uart);
+#endif
 #ifdef MODULE_PERIPH_UART_COLLISION
     uart_collision_detect_enable(ctx->uart);
 #else
@@ -515,6 +516,9 @@ static inline void _send_start(dose_t *ctx)
 
 static inline void _send_done(dose_t *ctx, bool collision)
 {
+#ifdef MODULE_PERIPH_UART_TX_ONDEMAND
+    uart_disable_tx(ctx->uart);
+#endif
 #ifdef MODULE_PERIPH_UART_COLLISION
     uart_collision_detect_disable(ctx->uart);
     if (collision) {
@@ -562,14 +566,12 @@ send:
         size_t n = iol->iol_len;
         pktlen += n;
         uint8_t *ptr = iol->iol_base;
+        crc = crc16_ccitt_false_update(crc, ptr, n);
         while (n--) {
             /* Send data octet */
             if (send_data_octet(ctx, *ptr)) {
                 goto collision;
             }
-
-            /* Update CRC */
-            crc = crc16_update(crc, *ptr);
 
             ptr++;
         }
@@ -632,6 +634,15 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
                 *((netopt_enable_t *)value) = NETOPT_DISABLE;
             }
             return sizeof(netopt_enable_t);
+        case NETOPT_MAX_PDU_SIZE:
+            if (CONFIG_DOSE_RX_BUF_LEN < (ETHERNET_FRAME_LEN + DOSE_FRAME_CRC_LEN)) {
+                if (max_len < sizeof(uint16_t)) {
+                    return -EINVAL;
+                }
+                *((uint16_t *)value) = CONFIG_DOSE_RX_BUF_LEN - DOSE_FRAME_CRC_LEN;
+                return sizeof(uint16_t);
+            }
+            /* fall-through */
         default:
             return netdev_eth_get(dev, opt, value, max_len);
     }
@@ -742,6 +753,8 @@ static int _init(netdev_t *dev)
     irq_restore(irq_state);
 
     state(ctx, DOSE_SIGNAL_INIT);
+
+    dev->event_callback(dev, NETDEV_EVENT_LINK_UP);
 
     return 0;
 }

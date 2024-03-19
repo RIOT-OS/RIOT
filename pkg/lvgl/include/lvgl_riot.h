@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Definition for the LittlevGL engine initialization
+ * @brief       Definition for the LVGL engine initialization
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
@@ -57,3 +57,4 @@ void lvgl_wakeup(void);
 #endif
 
 #endif /* LVGL_RIOT_H */
+/** @} */

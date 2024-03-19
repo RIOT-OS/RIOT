@@ -28,9 +28,8 @@ extern "C" {
 
 #include "log.h"
 #include "esp_common_log.h"
+#include "macros/utils.h"
 #include "macros/xtstr.h"
-
-#define asm __asm__
 
 #if !defined(ICACHE_FLASH)
 #ifndef ICACHE_RAM_ATTR
@@ -47,8 +46,10 @@ extern "C" {
 #define RTC_BSS_ATTR __attribute__((section(".rtc.bss")))
 #endif
 
+#ifdef CPU_ESP8266
 #ifndef RTC_DATA_ATTR
 #define RTC_DATA_ATTR __attribute__((section(".rtc.data")))
+#endif
 #endif
 
 /** Print out a message that function is not yet implemented */
@@ -65,7 +66,7 @@ extern "C" {
   * @param  cond    the condition
   * @param  err     the return value in the case the condition is not fulfilled.
   */
-#define CHECK_PARAM_RET(cond,err)   if (!(cond)) \
+#define CHECK_PARAM_RET(cond, err)  if (!(cond)) \
                                     { \
                                         DEBUG("%s parameter condition (" #cond ") " \
                                               "not fulfilled\n", __func__); \
@@ -88,29 +89,19 @@ extern "C" {
 
 #else /* ENABLE_DEBUG */
 
-#define CHECK_PARAM_RET(cond,err) if (!(cond)) return err;
-#define CHECK_PARAM(cond)         if (!(cond)) return;
+#define CHECK_PARAM_RET(cond, err) if (!(cond)) { return err; }
+#define CHECK_PARAM(cond)          if (!(cond)) { return; }
 
 #endif /* ENABLE_DEBUG */
-
-/** gives the minimum of a and b */
-#ifndef MIN
-#define MIN(a,b) ((a) < (b) ? (a) : (b))
-#endif
-
-/** gives the maximum of a and b */
-#ifndef MAX
-#define MAX(a,b) ((a) > (b) ? (a) : (b))
-#endif
 
 /**
   * @brief  function name mappings for source code compatibility with ESP8266 port
   * @{
   */
-#ifdef MCU_ESP32
+#ifdef CPU_ESP32
 #define system_get_cpu_freq     ets_get_cpu_frequency
 #define system_update_cpu_freq  ets_update_cpu_frequency
-#endif /* MCU_ESP32 */
+#endif /* CPU_FAM_ESP32 */
 /** @} */
 
 /** @} */

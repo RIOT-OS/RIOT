@@ -26,12 +26,18 @@ config BOARD_STM32F4DISCOVERY
     select HAS_PERIPH_USBDEV
 
     # Various other features (if any)
-    select HAS_ARDUINO
+    select HAS_ARDUINO_ANALOG
+    select HAS_ARDUINO_PINS
+    select HAS_TINYUSB_DEVICE
+    select HAS_HIGHLEVEL_STDIO
 
     # Clock configuration
     select BOARD_HAS_HSE
 
     select HAVE_SAUL_GPIO
+
+config FORCE_USB_STDIO
+    default y
 
 source "$(RIOTBOARD)/common/stm32/Kconfig"
 

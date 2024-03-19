@@ -41,15 +41,6 @@ extern "C" {
  */
 extern mutex_t gnrc_pktbuf_mutex;
 
-#if IS_USED(MODULE_GNRC_PKTBUF_STATIC) || DOXYGEN
-/**
- * @brief   The actual static buffer used when module gnrc_pktbuf_static is used
- *
- * @warning This is an internal buffer and should not be touched by external code
- */
-extern uint8_t *gnrc_pktbuf_static_buf;
-#endif
-
 /**
  * @brief   Check if the given pointer is indeed part of the packet buffer
  *
@@ -61,15 +52,7 @@ extern uint8_t *gnrc_pktbuf_static_buf;
  *                  the packet buffer
  * @retval  false   @p ptr does not point to data in the packet buffer
  */
-static inline bool gnrc_pktbuf_contains(void *ptr)
-{
-#if IS_USED(MODULE_GNRC_PKTBUF_STATIC)
-    return (unsigned)((uint8_t *)ptr - gnrc_pktbuf_static_buf) < CONFIG_GNRC_PKTBUF_SIZE;
-#else
-    (void)ptr;
-    return true;
-#endif
-}
+bool gnrc_pktbuf_contains(void *ptr);
 
 /**
  * @brief   Release an internal buffer

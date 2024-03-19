@@ -1,0 +1,49 @@
+PSEUDOMODULES += tinyusb_class_net_cdc_ecm
+PSEUDOMODULES += tinyusb_class_net_cdc_ncm
+PSEUDOMODULES += tinyusb_class_net_rndis
+
+INCLUDES += -I$(RIOTBASE)/pkg/tinyusb/contrib
+INCLUDES += -I$(RIOTBASE)/pkg/tinyusb/contrib/include
+INCLUDES += -I$(RIOTBASE)/pkg/tinyusb/hw/include
+INCLUDES += -I$(PKGDIRBASE)/tinyusb/src
+
+CFLAGS += -DCFG_TUSB_OS=OPT_OS_CUSTOM
+CFLAGS += -Wno-format-nonliteral
+
+ifeq (esp32s2,$(CPU_FAM))
+  CFLAGS += -DCFG_TUSB_MCU=OPT_MCU_ESP32S2
+else ifeq (esp32s3,$(CPU_FAM))
+  CFLAGS += -DCFG_TUSB_MCU=OPT_MCU_ESP32S3
+else ifeq (nrf52,$(CPU))
+  CFLAGS += -DCFG_TUSB_MCU=OPT_MCU_NRF5X
+  CFLAGS += -Wno-cast-align
+  CFLAGS += -Wno-unused-parameter
+  INCLUDES += -I$(PKGDIRBASE)/nrfx/hal
+  INCLUDES += -I$(PKGDIRBASE)/nrfx/drivers/include
+  INCLUDES += -I$(PKGDIRBASE)/nrfx/drivers/src
+else ifeq (stm32,$(CPU))
+  CFLAGS += -DCFG_TUSB_MCU=OPT_MCU_STM32$(call uppercase_and_underscore,$(CPU_FAM))
+  CFLAGS += -Dasm=__asm
+else ifeq (saml21,$(CPU))
+  CFLAGS += -DCFG_TUSB_MCU=OPT_MCU_SAML21
+else ifeq (samd21,$(CPU))
+  CFLAGS += -DCFG_TUSB_MCU=OPT_MCU_SAMD21
+else ifeq (samd5x,$(CPU))
+  CFLAGS += -DCFG_TUSB_MCU=OPT_MCU_SAME5X
+else ifeq (gd32v,$(CPU))
+  CFLAGS += -DCFG_TUSB_MCU=OPT_MCU_GD32VF103
+else
+  $(error CPU $(CPU) or CPU family $(CPU_FAM) not supported)
+endif
+
+ifneq (,$(filter tinyusb_class_net tinyusb_lib_networking,$(USEMODULE)))
+  INCLUDES += -I$(PKGDIRBASE)/tinyusb/lib/networking
+endif
+
+ifneq (,$(filter tinyusb_dfu,$(USEMODULE)))
+  INCLUDES += -I$(RIOTBASE)/pkg/tinyusb/dfu/include
+endif
+
+ifneq (,$(filter tinyusb_netdev,$(USEMODULE)))
+  INCLUDES += -I$(RIOTBASE)/pkg/tinyusb/netdev/include
+endif

@@ -81,6 +81,7 @@
  #define OPT3001_CONVERSION_TIME_COMBINED     OPT3001_REGS_INT_TIME_SHORT \
                                               + OPT3001_REGS_INT_TIME_LONG \
                                               + OPT3001_CONVERSION_TIME_OFFSET /**< Combination of the conversion times */
+/** @} */
 
 #ifdef __cplusplus
 }

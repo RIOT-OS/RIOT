@@ -25,4 +25,9 @@ config BOARD_ADAFRUIT_CLUE
     select HAVE_SAUL_GPIO
     select HAVE_SHT3X
 
+    select MODULE_USB_BOARD_RESET if KCONFIG_USB && TEST_KCONFIG
+
+config FORCE_USB_STDIO
+    default y
+
 source "$(RIOTBOARD)/common/nrf52/Kconfig"

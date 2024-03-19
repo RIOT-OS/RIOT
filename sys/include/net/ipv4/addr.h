@@ -13,7 +13,7 @@
  * @{
  *
  * @file
- * @brief   IPv6 address type and helper functions definitions
+ * @brief   IPv4 address type and helper functions definitions
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
@@ -36,6 +36,18 @@ extern "C" {
 #define IPV4_ADDR_MAX_STR_LEN       (sizeof("255.255.255.255"))
 
 /**
+ * @brief   Static initializer for an IPv4 address.
+
+ * @param[in] a         1st octet
+ * @param[in] b         2nd octet
+ * @param[in] c         3rd octet
+ * @param[in] d         4th octet
+ *
+ * @return initialized IPv4 address
+ */
+#define IPV4_ADDR_INIT(a, b, c, d) { .u8 = {a, b, c, d} }
+
+/**
  * @brief Data type to represent an IPv4 address.
  */
 typedef union {
@@ -52,9 +64,26 @@ typedef union {
  * @return  true, if @p a and @p b are equal
  * @return  false, otherwise.
  */
-static inline bool ipv4_addr_equal(ipv4_addr_t *a, ipv4_addr_t *b)
+static inline bool ipv4_addr_equal(const ipv4_addr_t *a, const ipv4_addr_t *b)
 {
     return (a->u32.u32 == b->u32.u32);
+}
+
+/**
+ * @brief   Check if @p addr is a multicast address.
+ *
+ * @see <a href="https://www.rfc-editor.org/rfc/rfc1112.html#section-4">
+ *          RFC 1112, section 4
+ *      </a>
+ *
+ * @param[in] addr  An IPv4 address.
+ *
+ * @return  true, if @p addr is multicast address,
+ * @return  false, otherwise.
+ */
+static inline bool ipv4_addr_is_multicast(const ipv4_addr_t *addr)
+{
+    return (addr->u8[0] >= 0xE0 && addr->u8[0] <= 0xEF);
 }
 
 /**
@@ -100,6 +129,13 @@ ipv4_addr_t *ipv4_addr_from_str(ipv4_addr_t *result, const char *addr);
  */
 ipv4_addr_t *ipv4_addr_from_buf(ipv4_addr_t *result, const char *addr,
                                 size_t addr_len);
+
+/**
+ * @brief Print IPv4 address to stdout
+ *
+ * @param[in]   addr  Pointer to ipv4_addr_t to print
+ */
+void ipv4_addr_print(const ipv4_addr_t *addr);
 
 #ifdef __cplusplus
 }

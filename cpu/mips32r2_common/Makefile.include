@@ -1,6 +1,0 @@
-INCLUDES += -I$(RIOTCPU)/mips32r2_common/include
-
-ifneq (,$(filter newlib_syscalls_mips_uhi,$(USEMODULE)))
-  CFLAGS += -DHAVE_HEAP_STATS
-  LINKFLAGS += -luhi
-endif

@@ -1,5 +1,6 @@
 # include variants of lpsxxx drivers as pseudo modules
 PSEUDOMODULES += lps331ap
+PSEUDOMODULES += lps22ch
 PSEUDOMODULES += lps22hb
 PSEUDOMODULES += lps22hh
 PSEUDOMODULES += lps25hb

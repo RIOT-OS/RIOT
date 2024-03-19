@@ -136,7 +136,13 @@ static int _init(netdev_t *netdev)
         return -1;
     }
 
-    return cc2420_init(dev);
+    int res = cc2420_init(dev);
+    if (res == 0) {
+        /* signal link UP */
+        netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+    }
+
+    return res;
 }
 
 static void _isr(netdev_t *netdev)
@@ -217,7 +223,6 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             return opt_state(val, (dev->options & CC2420_OPT_PROMISCUOUS));
 
         case NETOPT_RX_START_IRQ:
-        case NETOPT_RX_END_IRQ:
         case NETOPT_TX_START_IRQ:
         case NETOPT_TX_END_IRQ:
             *((netopt_enable_t *)val) = NETOPT_ENABLE;

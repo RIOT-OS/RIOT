@@ -61,7 +61,7 @@ int rtc_tm_compare(const struct tm *a, const struct tm *b);
 /**
  * @brief Convert time struct into timestamp.
  *
- * @pre   The time structs @p a and @p b are assumed to be normalized.
+ * @pre   The time struct t is assumed to be normalized.
  *        Use @ref rtc_tm_normalize to normalize a struct tm that has been
  *        manually edited.
  *

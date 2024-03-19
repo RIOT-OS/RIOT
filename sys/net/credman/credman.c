@@ -16,9 +16,10 @@
  * @author  Aiman Ismail <muhammadaimanbin.ismail@haw-hamburg.de>
  */
 
-#include "net/credman.h"
-#include "mutex.h"
 #include "kernel_defines.h"
+#include "mutex.h"
+#include "net/credman.h"
+#include "string_utils.h"
 
 #include <assert.h>
 #include <string.h>
@@ -395,7 +396,7 @@ void credman_delete(credman_tag_t tag, credman_type_t type)
     mutex_lock(&_mutex);
     int pos = _find_credential_pos(tag, type, NULL);
     if (pos >= 0) {
-        memset(&credentials[pos], 0, sizeof(credman_credential_t));
+        explicit_bzero(&credentials[pos], sizeof(credman_credential_t));
         used--;
     }
     mutex_unlock(&_mutex);

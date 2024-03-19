@@ -11,3 +11,8 @@ config MODULE_NCV7356
     depends on TEST_KCONFIG
     select MODULE_PERIPH_GPIO
     select MODULE_CAN_TRX
+
+config HAVE_NCV7356
+    bool
+    help
+      Indicates that a NCV7356 Single Wire CAN Transceiver is present.

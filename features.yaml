@@ -1,0 +1,881 @@
+%YAML 1.2
+---
+# This files is the source of truth what features (as build system entities)
+# exist in RIOT. The file `makefiles/features_existing.inc.mk` is generated
+# from this list, and so is the documentation in
+# `doc/doxygen/src/feature_list.md`. To regenerate them, run
+# `make generate-features` in the root of the repo.
+#
+# The syntax is relatively simple: A group is a mapping that may contain a
+# string-valued "title" and "help", may contain a list of groups under the
+# "groups" key, and a list of features under the "features" key, where a
+# feature is expressed as a mapping that contains a "name" and a "help" string.
+# The syntax is formally described in dist/tools/features_yaml2mx/schema.cddl.
+#
+# Note: The syntax or even the file format will likely change and evolve over
+#       time.
+groups:
+- title: Architecture Features
+  help: These indicate architecture features, such as word size of the CPU,
+        supported instruction sets and so on. All architecture features provided
+        by a given board will always be used, e.g. an 8-bit CPU cannot just stop
+        being an 8-bit CPU on request.
+  groups:
+  - title: Word size
+    help: Word size of the CPU
+    features:
+    - name: arch_8bit
+      help: CPU has a 8-bits architecture
+    - name: arch_16bit
+      help: CPU has a 16-bits architecture
+    - name: arch_32bit
+      help: CPU has a 32-bits architecture
+    - name: arch_64bit
+      help: CPU has a 64-bits architecture
+  - title: Architecture grouping
+    help: Instruction set of the CPU
+    features:
+    - name: arch_arm
+      help: CPU architecture is classic ARM or Cortex M
+    - name: arch_arm7
+      help: CPU architecture is classic ARM (ARM7)
+    - name: arch_avr8
+      help: CPU architecture is AVR-8
+    - name: arch_efm32
+      help: FIXME. This is not an architecture. Use cpu_efm32 for this
+    - name: arch_esp
+      help: "CPU architecture is an ESP. (Fixme: This is not an architecture)"
+    - name: arch_esp_xtensa
+      help: CPU architecture is Xtensa
+    - name: arch_esp_riscv
+      help: CPU architecture is RISC-V (ESP flavor)
+    - name: arch_esp32
+      help: "CPU architecture is an ESP32. (Fixme: This is not an architecture)"
+    - name: arch_esp32_xtensa
+      help: CPU architecture is Xtensa (ESP32 flavor)
+    - name: arch_esp8266
+      help: CPU architecture is Xtensa (ESP8266 flavor)
+    - name: arch_msp430
+      help: CPU architecture is MSP430
+    - name: arch_native
+      help: CPU architecture is `native`
+    - name: arch_riscv
+      help: CPU architecture is RISC-V
+    - name: arch_nuclei
+      help: The CPU is based on a Nuclei System Technology design. Hence, RIOT is
+            using the Nuclei Microcontroller Software Interface Standard
+            (NMSIS) vendor independent hardware abstraction layer.
+
+- title: CPU Features
+  help: These features are related to CPU capabilities or just used to
+        indicated which CPU family is used.
+  groups:
+  - title: CPU Capabilities
+    help: These correspond to features/capabilities provided by certain CPUs
+    groups:
+    - title: Cortex M Specific Features
+      help: These features are only available on (some) ARM Cortex M MCUs
+      features:
+      - name: cpu_check_address
+        help: The @ref cpu_check_address can be used to check if
+              accessing a given address would cause a bus fault.
+      - name: cortexm_svc
+        help: ARM Cortex-M Supervisor Calls are available.
+      - name: cortexm_fpu
+        help: A hardware floating point unit is available.
+      - name: cortexm_mpu
+        help: A memory protection unit (MPU) is available.
+      groups:
+      - title: nRF Capabilities
+        help: These features are only available on (some) nordic nRF MCUs
+        features:
+        - name: vdd_lc_filter_reg1
+          help: An LC filter for use with the internal DC/DC converter is
+                present. If this is the case, the DC/DC converter is used over the
+                LDO regulator for improved power efficiency.
+        - name: vdd_lc_filter_reg0
+          help: The MCU supports a high voltage supply via an two-stage regulator
+                and the board has an LC filter required for using the two-stage
+                DC/DC converter. This enables the two-stage DC/DC converter.
+    - title: AVR-8 Specific Features
+      groups:
+      - title: ATmega Specific Features
+        help: These features are only available on (some) ATmega MCUs.
+        features:
+        - name: atmega_pcint0
+          help: Required pin-mapping for pin change interrupt on bank 0 is available.
+                See section on pin change interrupts in @ref cpu_atmega_common
+        - name: atmega_pcint1
+          help: Required pin-mapping for pin change interrupt on bank 1 is available.
+                See section on pin change interrupts in @ref cpu_atmega_common
+        - name: atmega_pcint2
+          help: Required pin-mapping for pin change interrupt on bank 2 is available.
+            See section on pin change interrupts in @ref cpu_atmega_common
+        - name: atmega_pcint3
+          help: Required pin-mapping for pin change interrupt on bank 3 is available.
+                See section on pin change interrupts in @ref cpu_atmega_common
+      - title: ATxmega Specific Features
+        help: These features are only available on (some) ATxmega MCUs.
+        features:
+        - name: atxmega_ebi
+          help: MCU supports the external bus interface (EBI) to either extend
+                RAM with external RAM or attach memory mapped peripherals such
+                as (some) displays.
+    - title: EFM32 Specific Features
+      features:
+      - name: efm32_coretemp
+        help: Y R U not using `periph_temperature` for this?
+      - name: gecko_sdk_librail_nonfpu
+        help: The CPU offers librail support if the FPU is disabled.
+              Librail is shipped as pre-compiled blobs. Thus, we have to adapt to
+              their choice how to process floats.
+      - name: gecko_sdk_librail_fpu
+        help: The CPU offers librail support if the FPU is enabled.
+              Librail is shipped as pre-compiled blobs. Thus, we have to adapt to
+              their choice how to process floats.
+    - title: ESP Specific Features
+      help: These features are only available on (some) ESP MCUs.
+      features:
+      - name: esp_eth
+        help: >
+              An ESP Ethernet peripherals is available.
+              (FIXME: `periph_eth` instead.)
+      - name: esp_jtag
+        help: The MCU supports JTAG for programming and debugging. Enable this
+              feature to expose the interface at the cost of having fewer pins as
+              GPIOs available.
+      - name: esp_now
+        help: An ESP NOW-compatible radio is present.
+      - name: esp_spiffs
+        help: A Serial Peripheral Interface Flash File System can be used.
+      - name: esp_wifi
+        help: An ESP WiFi radio is present.
+      - name: esp_wifi_ap
+        help: ESP WiFi SoftAP support is present.
+      - name: esp_wifi_enterprise
+        help: The ESP WiFi interface supports WPA2 enterprise mode.
+      - name: esp_ble_esp32
+        help: The ESP32x SoC uses the SDK Bluetooth LE library for the ESP32
+              variant.
+      - name: esp_ble_esp32c3
+        help: The ESP32x SoC uses the SDK Bluetooth LE library for the ESP32-C3 or
+              ESP32-S3 variant.
+      - name: esp_hw_counter
+        help: The used ESP32x SoC supports HW counters that can be used as timers.
+      - name: esp_rmt
+        help: The ESP32x SoC has an RMT (Remote Control Transceiver) peripheral.
+      - name: esp_rtc_timer_32k
+        help: An external 32.768 kHz crystal is connected to the ESP32x Soc on the
+              board.
+      - name: esp_spi_ram
+        help: An external RAM is connected via the SPI interface to
+              the ESP32x SoC on the board.
+      - name: esp_spi_oct
+        help: Octal SPI mode is used for Flash and SPI RAM. In this
+              case additional GPIOs are used for the SPI interface and cannot be
+              used for other purposes.
+      - name: esp_ble
+        help: An ESP32 Bluetooth LE transceiver is present.
+    - title: nordic nRF Specific Features
+      features:
+      - name: radio_nrf802154
+        help: An nRF MCU with a peripheral radio that supports IEEE 802.15.4 is
+              present.
+      - name: radio_nrfble
+        help: An nRF MCU with a peripheral radio that supports Bluetooth LE is
+              present.
+      - name: radio_nrfmin
+        help: An nRF MCU with a peripheral radio that supports nordics proprietary
+              link layer protocol is present.
+
+  - title: CPU Grouping
+    help: These are not actually features/capabilities, but just indicate to
+          which CPU family a certain CPU belongs
+    features:
+    - name: cpu_native
+      help: The board is simulated by a native program running on the host
+
+    groups:
+    - title: Atmel / Microchip AVR-8 Grouping
+      groups:
+      - title: ATmega Grouping
+        features:
+        - name: cpu_core_atmega
+          help: The MCU has an ATmega CPU
+        - name: cpu_atmega8
+          help: The MCU is an ATmega8
+        - name: cpu_atmega32u4
+          help: The MCU is an ATmega32U4
+        - name: cpu_atmega128rfa1
+          help: The MCU is an ATmega128RFA1
+        - name: cpu_atmega256rfr2
+          help: The MCU is an ATmega256RFR2
+        - name: cpu_atmega328p
+          help: The MCU is an ATmega328P
+        - name: cpu_atmega1281
+          help: The MCU is an ATmega1281
+        - name: cpu_atmega1284p
+          help: The MCU is an ATmega1284P
+        - name: cpu_atmega2560
+          help: The MCU is an ATmega2560
+      - title: ATxmega Grouping
+        features:
+        - name: cpu_core_atxmega
+          help: The MCU has an ATxmega CPU
+        - name: cpu_atxmega
+          help: The MCU is an ATxmega XYZ CPU
+    - title: ARM Cortex-M and Classic ARM Grouping
+      features:
+      - name: cpu_core_cortexm
+        help: The MCU has an ARM Cortex-M CPU (any family)
+      - name: cpu_stm32
+        help: The MCU has an STM32 MCU
+
+      groups:
+      - title: Atmel / Microchip SAM Grouping
+        groups:
+        - title: SAM0 Grouping
+          features:
+          - name: cpu_samd21
+            help: The MCU has an Atmel/Microchip SAM D10/D11/D20/D21 CPU
+          - name: cpu_samd5x
+            help: The MCU has an Atmel/Microchip SAM D5x CPU
+          - name: cpu_saml1x
+            help: The MCU has an Atmel/Microchip SAM L1x CPU
+          - name: cpu_saml21
+            help: The MCU has an Atmel/Microchip SAM L2x / L3x CPU
+        - title: SAM3 Grouping
+          features:
+          - name: cpu_sam3
+            help: The MCU has an Atmel/Microchip SAM 3 CPU
+
+      - title: GigaDevice Semiconductor Inc Grouping
+        features:
+        - name: cpu_gd32v
+          help: The MCU is part of the GigaDevice GD32V family
+
+      - title: nordic nRF Grouping
+        features:
+        - name: cpu_nrf51
+          help: The MCU has an nordic nRF51 CPU
+        - name: cpu_nrf52
+          help: The MCU has an nordic nRF52 CPU
+        - name: cpu_nrf53
+          help: The MCU has an nordic nRF53 CPU
+        - name: cpu_nrf9160
+          help: The MCU has an nordic nRF9160 CPU
+
+      - title: NXP Grouping
+        features:
+        - name: cpu_kinetis
+          help: The MCU is part of the NXP Kinetis family
+        - name: cpu_lpc1768
+          help: The MCU is an NXP LPC1768
+        - name: cpu_lpc23xx
+          help: The MCU is part of the NXP LPC23xx classic ARM family
+        - name: cpu_qn908x
+          help: The MCU is part of the NXP QN908x family
+
+      - title: Raspberry Pi Grouping
+        features:
+        - name: cpu_rpx0xx
+          help: The MCU is part of the Raspberry PI RPx0xx family.
+
+      - title: Silicon Laboratories EFM32 Grouping
+        features:
+        - name: cpu_efm32
+          help: The MCU is part of the Silicon Labs EFM32 family
+
+      - title: SiFive, Inc. Grouping
+        features:
+        - name: cpu_fe310
+          help: The MCU is in SiFive Freedom E310
+
+      - title: STMicroelectronics STM32 Grouping
+        features:
+        - name: cpu_stm32c0
+          help: The MCU has an STM32 C0 MCU
+        - name: cpu_stm32f0
+          help: The MCU has an STM32 F0 MCU
+        - name: cpu_stm32f1
+          help: The MCU has an STM32 F1 MCU
+        - name: cpu_stm32f2
+          help: The MCU has an STM32 F2 MCU
+        - name: cpu_stm32f3
+          help: The MCU has an STM32 F3 MCU
+        - name: cpu_stm32f4
+          help: The MCU has an STM32 F4 MCU
+        - name: cpu_stm32f7
+          help: The MCU has an STM32 F7 MCU
+        - name: cpu_stm32g0
+          help: The MCU has an STM32 G0 MCU
+        - name: cpu_stm32g4
+          help: The MCU has an STM32 G4 MCU
+        - name: cpu_stm32l0
+          help: The MCU has an STM32 L0 MCU
+        - name: cpu_stm32l1
+          help: The MCU has an STM32 L1 MCU
+        - name: cpu_stm32l4
+          help: The MCU has an STM32 L4 MCU
+        - name: cpu_stm32l5
+          help: The MCU has an STM32 L5 MCU
+        - name: cpu_stm32mp1
+          help: The MCU has an STM32 MP1 MCU
+        - name: cpu_stm32u5
+          help: The MCU has an STM32 U5 MCU
+        - name: cpu_stm32wb
+          help: The MCU has an STM32 WB MCU
+        - name: cpu_stm32wl
+          help: The MCU has an STM32 WL MCU
+
+      - title: Texas Instruments ARM MCU Grouping
+        features:
+        - name: cpu_cc26x2_cc13x2
+          help: The CPU in an TI CC26x2 or an TI CC13x2
+        - name: cpu_cc26x0_cc13x0
+          help: The CPU in an TI CC26x0 or an TI CC13x0
+        - name: cpu_cc2538
+          help: The CPU in an TI CC2538
+        - name: cpu_lm4f120
+          help: The CPU is an TI LM4F120
+
+    - title: Expressif ESP Grouping
+      features:
+      - name: cpu_esp32
+        help: The MCU is part of the ESP32 family
+      - name: cpu_esp8266
+        help: The MCU is an ESP8266
+
+    - title: Texas Instruments MSP430 MCU Grouping
+      features:
+      - name: cpu_msp430
+        help: The MCU is member of the MSP430 family.
+      - name: cpu_msp430_x1xx
+        help: The MCU is member of the MSP430 x1xx family.
+      - name: cpu_msp430_f2xx_g2xx
+        help: The MCU is member of the MSP430 F2xx/G2xx family.
+
+- title: Arduino Features
+  help: These features indicate that an Arduino style I/O mapping is available,
+        in which common descriptors refer to a GPIO pin / I²C bus / SPI bus /
+        PWM output / ADC input / etc. at a well-known location on a well-known
+        board form factor.
+  groups:
+  - title: Arduino I/O Mapping Features
+    help: These features indicate presence of I/O mappings (e.g. well-known
+          preprocessor macro names such as `ARDUINO_PIN_0` for a GPIO pin that
+          is routed to pin `D0` on the board.
+    features:
+    - name: arduino_analog
+      help: Indicates that Arduino analog pins mappings are provided.
+    - name: arduino_dac
+      help: Indicates that Arduino DAC pins mappings are provided.
+    - name: arduino_i2c
+      help: Indicates that Arduino I²C bus mappings are provided.
+    - name: arduino_pins
+      help: Indicates that Arduino digital pins mappings are provided.
+    - name: arduino_pwm
+      help: Indicates that Arduino digital pin to PWM mappings are provided.
+    - name: arduino_spi
+      help: Indicates that Arduino SPI bus mappings are provided.
+    - name: arduino_uart
+      help: Indicates that Arduino UART device mappings are provided.
+  - title: Arduino Form Factor Features
+    help: These features indicate compatibility with a specific form factor,
+          e.g. Arduino UNO or Adafruit Feather
+    features:
+    - name: arduino_shield_isp
+      help: Indicates that the board is mechanically and electrically compatible
+            with shields that mate with the ISP header for SPI connectivity.
+    - name: arduino_shield_mega
+      help: >
+            Indicates that the board is mechanically and electrically compatible
+            with shields developed for the Arduino Mega 2560. (Note: Except
+            the ISP header, that requires `arduino_shield_isp` in addition.)
+    - name: arduino_shield_nano
+      help: >
+            Indicates that the board is mechanically and electrically compatible
+            with shields developed for the Arduino Nano. (Note: Except the
+            ISP header, that requires `arduino_shield_isp` in addition.)
+    - name: arduino_shield_uno
+      help: >
+            Indicates that the board is mechanically and electrically compatible
+            with shields developed for the Arduino Nano. (Note: Except the
+            ISP header, that requires `arduino_shield_isp` in addition.)
+
+- title: RAM Related Features
+  help: These features indicate presence of special RAM regions or features
+  features:
+  - name: backup_ram
+    help: A special portion of RAM is retained during deep sleep.
+          Variables can be placed there by annotating them with the `BACKUP_RAM`
+          attribute.
+  - name: periph_rtc_mem
+    help: The RTC peripheral provides storage memory for deep sleep. Unlike
+          `backup_ram`, this memory is not mapped in the address space and requires
+          calls to @ref rtc_mem_read and @ref rtc_mem_write to access.
+  - name: puf_sram
+    help: The @ref sys_puf_sram module can be used to harvest entropy from
+          uninitialized SRAM on cold boot to seed PRNGs.
+
+- title: Bluetooth Low Energy Features
+  help: The capabilities of the integrated (peripheral) BLE transceiver are
+        modules using these features.
+  features:
+  - name: ble_adv_ext
+    help: Support for Bluetooth LE 5 Advertising Extension
+  - name: ble_nimble
+    help: Support for the NimBLE stack
+  - name: ble_nimble_netif
+    help: NimBLE supports the netif API, so that network stacks such as GNRC can
+          be used on top. See @ref pkg_nimble_netif for details.
+  - name: ble_phy_2mbit
+    help: The BLE radio supports the 2Mbit PHY mode
+  - name: ble_phy_coded
+    help: The BLE radio supports the CODED PHY mode
+
+- title: Toolchain Features
+  help: These features are used to indicate which toolchains are supported,
+        which languages they support, which libraries (e.g. picolibc, newlibc,
+        libstdc++, etc.) are supported. Unless using `BUILD_IN_DOCKER=1`, those
+        toolchains/libraries need to be installed on the system for the given
+        platform to actually be usable, though.
+  features:
+  - name: cpp
+    help: The C++ programming language is supported. Note that libstdc++ support
+          is not implied and indicated by a separate feature.
+  - name: libstdcpp
+    help: When using C++, a libstdc++ is available.
+  - name: picolibc
+    help: The picolibc C library is available for the platform.
+  - name: newlib
+    help: The newlib C library is available for the platform.
+  - name: rust_target
+    help: The Rust target definition ("triple") is known. This is
+          a mandatory requirement to build Rust code.
+  - name: emulator_renode
+    help: The platform is compatible with the Renode emulator.
+
+- title: Peripheral Features
+  help: These features indicate presence of peripheral IP block, presence of
+        a corresponding driver in RIOT, and any required board specific
+        configuration needed.
+  features:
+  - name: periph_cpuid
+    help: The CPU has identification information available. In the best case this
+          is a globally unique ID, in the worst case it is some calibration
+          parameters to compensate production variance that may or may not allow
+          telling the CPU apart from any given other.
+  - name: periph_pwm
+    help: A Pulse-Width Modulation (PWM) peripheral is present.
+  - name: periph_qdec
+    help: A Quadrature Decoder (QDEC) peripheral is present.
+  - name: periph_temperature
+    help: The MCU has a built-in temperature sensor.
+  - name: periph_vbat
+    help: Backup battery monitoring is supported
+  - name: periph_freqm
+    help: A Frequency Meter peripheral is present.
+  - name: periph_dma
+    help: A DMA peripheral is present. Enabling this feature affects the
+          implementation of other peripheral drivers. E.g. SPI/I²C/UART/...
+          transfers may use the DMA (possible only when transfers are longer than
+          a certain cut-off). The main benefit is that other threads can run
+          while the thread issuing the, say SPI transfer, is blocked until the
+          transfer is completed. It often also speeds up longer transfers.
+  - name: periph_pm
+    help: The MCU supports power management (PM) and RIOT can make use of that.
+  - name: periph_ltdc
+    help: An LCD/TFT Display Controller (LTDC) peripheral is present. (Currently
+          only provided by some STM32 MCUs.)
+  - name: periph_pio
+    help: A Programmable IO (PIO) is present. (Currently only RP2040)
+
+  groups:
+  - title: General-Purpose Input/Output (GPIO)
+    features:
+    - name: periph_gpio_fast_read
+      help: This feature is currently available on Microchip SAM0 based MCUs only.
+            Enabling this feature reduces read latency for an increase in power
+            consumption. It affects both the classic GPIO API driver and the
+            GPIO LL driver.
+
+    groups:
+    - title: Pin Level Peripheral GPIO API
+      help: This is a pin-level API that caters most use cases. Most code
+            should be using this API over GPIO LL.
+      features:
+      - name: periph_gpio
+        help: The classic GPIO API is implemented
+      - name: periph_gpio_irq
+        help: The classic GPIO driver supports external interrupts.
+      - name: periph_gpio_tamper_wake
+        help: This features is currently available on Microchip SAMD5x MCUs only.
+              Enabling this features allows GPIO IRQs to wake the CPU even in
+              deep sleep. The SAMD5x is not the only MCU that can be woken from
+              lower power modes via GPIO, but it is currently the only MCU were
+              this feature is configurable.
+
+    - title: GPIO LL API
+      help: This is a lower level GPIO API that allows port based access. It
+            exposes a number of advanced features and lower latency GPIO
+            access at the cost of a more complex and more frequently
+            changing API. You should only use this if the Pin Level Peripheral
+            GPIO API is not catering your use case well enough.
+      features:
+      - name: periph_gpio_ll
+        help: The GPIO LL driver is implemented for the MCU's GPIO peripheral.
+      - name: periph_gpio_ll_irq
+        help: The GPIO LL driver has IRQ support.
+      - name: periph_gpio_ll_irq_level_triggered_high
+        help: Level triggered IRQs are supported for level high.
+      - name: periph_gpio_ll_irq_level_triggered_low
+        help: Level triggered IRQs are supported for level low.
+      - name: periph_gpio_ll_irq_unmask
+        help: The GPIO LL driver supports unmasking interrupts without
+              clearing pending IRQs that came in while masked.
+      - name: periph_gpio_ll_disconnect
+        help: Some or all GPIO pins can be electrically disconnected from the MCU
+              (high impedance state) with the GPIO LL API.
+      - name: periph_gpio_ll_input_pull_down
+        help: Some or all GPIO pins can enable an internal pull down resistor when
+              the GPIO is configured in input mode.
+      - name: periph_gpio_ll_input_pull_keep
+        help: Some or all GPIO pins can enable internal pull resistors that pull
+              towards the current bus level (pull down when bus is low, pull up
+              when bus is high).
+      - name: periph_gpio_ll_input_pull_up
+        help: Some or all GPIO pins can enable an internal pull up resistor when
+              the GPIO is configured in input mode.
+      - name: periph_gpio_ll_open_drain
+        help: Some or all pins can be configured in open drain mode.
+      - name: periph_gpio_ll_open_drain_pull_up
+        help: Some or all GPIO pins can enable an internal pull up resistor when
+              the GPIO is configured in open drain mode.
+      - name: periph_gpio_ll_open_source
+        help: Some or all pins can be configured in open source mode.
+      - name: periph_gpio_ll_open_source_pull_down
+        help: Some or all GPIO pins can enable an internal pull down resistor when
+              the GPIO is configured in open source mode.
+      - name: periph_gpio_ll_switch_dir
+        help: The GPIO LL driver allows switching the direction between input
+              and (push-pull) output in an efficient manner. The main use case
+              is bit-banging bidirectional protocols when open-drain / open-source
+              mode is not supported. GPIO LL drivers for peripherals that do
+              support open drain mode typically do not bother implementing this,
+              even if the hardware would allow it.
+
+  - title: Serial Interfaces
+    help: Features related to serial interfaces
+
+    groups:
+    - title: UART Features
+      help: Features related to the Universal Asynchronous Receiver-Transmitter
+            peripheral
+      features:
+      - name: periph_uart
+        help: An UART peripheral is present.
+      - name: periph_lpuart
+        help: A low-power UART peripheral is present.
+      - name: periph_uart_collision
+        help: The UART peripheral supports hardware collision detection.
+      - name: periph_uart_hw_fc
+        help: The UART peripheral supports hardware flow control.
+      - name: periph_uart_modecfg
+        help: The UART peripheral allows configuration to non-default modes.
+      - name: periph_uart_tx_ondemand
+        help: Indicates that the UART peripheral can enable / disable the TX line
+              using @ref uart_enable_tx / @ref uart_disable_tx
+      - name: periph_uart_nonblocking
+        help: The UART peripheral allows non-blocking operations.
+      - name: periph_uart_reconfigure
+        help: The UART pins can be made available as regular GPIOS using
+              @ref uart_deinit_pins and be attached back to the UART peripheral using
+              @ref uart_init_pins
+      - name: periph_uart_rxstart_irq
+        help: The UART can issue an interrupt when the start condition detected.
+              Use @ref uart_rxstart_irq_configure to associate a callback with the
+              ISR of a given UART peripheral.
+
+    - title: SPI Features
+      help: Features related to the Serial Peripheral Interface peripheral
+      features:
+      - name: periph_spi
+        help: An SPI peripheral is present.
+      - name: periph_spi_on_qspi
+        help: The QSPI peripheral can be used in SPI mode.
+      - name: periph_spi_reconfigure
+        help: The SPI pins can be made available as regular GPIOs using
+              @ref spi_deinit_pins and re-attached to the SPI peripheral using
+              @ref spi_init_pins
+      - name: periph_spi_gpio_mode
+        help: The SPI peripheral supports specifying the GPIO mode of each SPI
+              pin upon initialization of the peripheral.
+
+    - title: I²C Features
+      help: Features related to the Inter-Integrated Circuit peripheral
+      features:
+      - name: periph_i2c
+        help: An I²C peripheral is present.
+      - name: pio_i2c
+        help: An I²C bus can be provided via the PIO peripheral.
+      - name: periph_i2c_reconfigure
+        help: The I²C pins can be made available as regular GPIOs using
+              @ref i2c_deinit_pins and re-attached to the I²C peripheral using
+              @ref i2c_init_pins
+
+    - title: USB Features
+      help: Features related to the Universal Serial Bus
+      features:
+      - name: periph_usbdev
+        help: An USB peripheral is present.
+      - name: periph_usbdev_hs
+        help: The USB peripheral supports High-Speed.
+      - name: periph_usbdev_hs_utmi
+        help: An USB high-speed peripheral with internal UTMI+ HS PHY is present.
+      - name: periph_usbdev_hs_ulpi
+        help: An USB high-speed peripheral with ULPI HS PHY is present.
+
+  - title: Analog Features
+    help: Features related to ADCs/DACs
+    features:
+    - name: periph_adc
+      help: An ADC peripheral is present.
+    - name: periph_adc_continuous
+      help: The ADC peripheral can be left on between measurements.
+    - name: periph_dac
+      help: A DAC peripheral is present.
+
+  - title: Integrated Connectivity
+    help: Peripheral network and communication interfaces.
+    features:
+    - name: periph_can
+      help: A CAN peripheral is present.
+    - name: periph_eth
+      help: An Ethernet peripheral is present.
+
+  - title: SD / MMC Card Features
+    features:
+    - name: periph_sdmmc
+      help: An SDIO/SD/MMC peripheral is present and used by the board. This feature
+            shall be provided by the board configuration, if available.
+    - name: periph_sdmmc_8bit
+      help: The SDIO/SD/MMC peripheral supports the 8-bit bus width and at least one
+            component of the board is connected with 8 data lines. This feature
+            shall be provided by the board configuration, if available.
+    - name: periph_sdmmc_auto_clk
+      help: The SDIO/SD/MMC peripheral supports the Auto-CLK feature, i.e. the
+            automatic activation and deactivation of the SD CLK signal when
+            required. This feature shall be provided by the MCU if supported.
+    - name: periph_sdmmc_auto_cmd12
+      help: The SDIO/SD/MMC peripheral supports the Auto-CMD12 feature, i.e. CMD12 is
+            sent automatically to stop the transmission in multiple block operations.
+            This feature shall be provided by the MCU if supported.
+    - name: periph_sdmmc_clk
+      help: The SDIO/SD/MMC peripheral has special clock functionality used by the
+            peripheral driver.
+    - name: periph_sdmmc_hs
+      help: The SDIO/SD/MMC peripheral supports the high speed access, that is
+            50 MHz for SD and 52 MHz for MMC. This feature shall be provided by the
+            MCU.
+    - name: periph_sdmmc_mmc
+      help: The SDIO/SD/MMC peripheral supports MMC/eMMCs. This feature shall be
+            provided by the MCU.
+    - name: periph_sdmmc_sdhc
+      help: The SDIO/SD/MMC peripheral is compliant with the SD Host Controller
+            Specification. This feature shall be provided by the MCU.
+
+  - title: Flash Features
+    features:
+    - name: periph_flashpage
+      help: A Flashpage peripheral is present.
+    - name: periph_flashpage_in_address_space
+      help: Static memory sections can fundamentally be turned into flash pages.
+    - name: periph_flashpage_pagewise
+      help: The Flashpage peripheral supports pagewise writing.
+    - name: periph_flashpage_rwee
+      help: The Flashpage peripheral is of the Read While Write.
+
+  - title: Other Peripheral Storage Features
+    features:
+    - name: periph_eeprom
+      help: An EEPROM peripheral is present.
+    - name: periph_fmc
+      help: An Flexible Memory Controller (FMC) or an Flexible Static Memory
+            Controller (FSMC) is present. It can be used to extend memory or
+            drive display controllers.
+    - name: periph_fmc_16bit
+      help: The FMC/FSMC peripheral supports a 16-bit data bus
+    - name: periph_fmc_32bit
+      help: The FMC/FSMC peripheral supports a 32-bit data bus
+    - name: periph_fmc_sdram
+      help: A board configuration is provided to attach map the board's SDRAM into
+            the address space using the FMC/FSMC.
+    - name: periph_fmc_nor_sram
+      help: A board configuration is provided to attach map the board's NOR flash
+            or (P)SRAM into the address space using the FMC/FSMC.
+    - name: periph_nvm
+      help: A non-volatile memory peripheral is present. This is currently
+            only provided by ATxmega MCUs to read the production signature which
+            then is used as CPU ID.
+
+  - title: Timer Features
+    help: Features related to timers
+    features:
+    - name: periph_rtc
+      help: An Real Time Clock (RTC) peripheral is present. This timer works with
+            time broken down into year, month, day, hour, minute, second.
+    - name: periph_rtc_ms
+      help: The RTC peripheral can provide sub-second timestamps.
+    - name: periph_rtt
+      help: An Real Time Timer (RTT) (a.k.a. Real Time Counter) peripheral is
+            present. This timer is similar to `periph_timer`, except for using
+            a different API (for no reason), being low power, slower ticking,
+            and typically less affected by clock drift.
+    - name: periph_rtt_set_counter
+      help: The RTT peripheral implements @ref rtt_set_counter
+    - name: periph_rtt_overflow
+      help: The RTT provides an overflow callback.
+    - name: periph_wdt
+      help: A Watchdog Timer (WDT) peripheral is present.
+    - name: periph_wdt_cb
+      help: The WDT peripheral allows setting a callback function to be called
+            before the reboot is actually triggered.
+    - name: periph_wdt_warning_period
+      help: By setting @ref CONFIG_WDT_WARNING_PERIOD the time when the WDT callback
+            is triggered can be set. It specifies how many milliseconds before the
+            reboot the callback should be executed.
+
+    groups:
+    - title: High Frequency Timers
+      help: Features related to high frequency timers, a.k.a. `periph_timer`
+      features:
+      - name: periph_timer
+        help: A high frequency timer peripheral is present.
+      - name: periph_timer_periodic
+        help: The Timer peripheral allows setting periodic timeouts in addition to
+              the mandatory one-shot timeouts.
+      - name: periph_timer_poll
+        help: The Timer peripheral allows polling if a one-shot timer channel has
+              already been expired using @ref timer_poll_channel to allow high
+              accuracy busy waiting.
+      - name: periph_timer_query_freqs
+        help: The timer driver supports querying supported frequencies.
+
+    - title: PTP Timers
+      help: These features are related to the hardware requirements to implement
+            the Precision Time Protocol.
+      features:
+      - name: periph_ptp
+        help: A PTP clock is present. The clock must have nanoseconds as unit and be
+              at least 64 bit wide.
+      - name: periph_ptp_speed_adjustment
+        help: The PTP clock speed can be adjusted. This can be used for clock drift
+              correction and synchronization without "jumping" to the new network
+              time, but rather pace faster/slow for some time until the clocks are
+              back in sync.
+      - name: periph_ptp_timer
+        help: The PTP clock can be used as timer (so that (absolute) timeouts can
+              be set on the clock).
+      - name: periph_ptp_txrx_timestamps
+        help: The PTP clock can provide exact time stamps of the reception and
+              transmission of frames (typically received at the peripheral Ethernet
+              interface).
+
+  - title: Platform Specific
+    help: Things specific to a single MCU family / MCU vendor
+    features:
+    - name: periph_ics
+      help: An NXP Kinetis Internal Clock Source Controller (ICS peripheral) is
+            present.
+    - name: periph_mcg
+      help: An Kinetis Multipurpose Clock Generator (MCG peripheral) is present.
+    - name: periph_mcg_lite
+      help: An Kinetis Multipurpose Clock Generator (MCG peripheral) is present in
+            the lite version.
+    - name: periph_coretimer
+      help: A RISC-V CLINT timer is available and usable via the High Speed
+            timer API. The CLINT only supports running at the RTC clock, typically
+            32.678 kHz, though.
+    - name: periph_pmp
+      help: A RISC-V physical memory protection (PMP) peripheral is present.
+            (Similar to ARM's MPU)
+    - name: periph_clic
+      help: A RISC-V Core-local Interrupt Controller (CLIC) peripheral is present.
+    - name: periph_plic
+      help: A RISC-V Platform-local Interrupt Controller (PLIC) peripheral is present.
+
+  - title: Cryptographic Features
+    help: Hardware acceleration for cryptographic primitives, hardware random
+          number generators, and other features useful for cryptography.
+
+          Please keep in mind that some of the cryptographic primitives provided
+          by the hardware have not aged well in terms of security. They may
+          still be nifty for use cases other than security, though.
+    features:
+    - name: periph_cryptocell_310
+      help: A cryptocell peripheral is present.
+    - name: periph_hash_md5
+      help: MD5 hardware acceleration present.
+    - name: periph_hash_sha_1
+      help: SHA-1 hardware acceleration present.
+    - name: periph_hash_sha_224
+      help: SHA-224 hardware acceleration present.
+    - name: periph_hash_sha_256
+      help: SHA-256 hardware acceleration present.
+    - name: periph_hash_sha_512
+      help: SHA-512 hardware acceleration present.
+    - name: periph_hmac_sha_256
+      help: HMAC SHA-256 hardware acceleration present.
+    - name: periph_hwrng
+      help: A Hardware Random Number Generator (HWRNG) peripheral is present.
+    - name: periph_cipher_aes_128_cbc
+      help: AES 128 CBC hardware acceleration present
+    - name: periph_ecc_p192r1
+      help: ECC P192R1 hardware acceleration peripheral present.
+    - name: periph_ecc_p256r1
+      help: ECC P256R1 hardware acceleration peripheral present.
+    - name: periph_ecc_ed25519
+      help: ECC Edwards25519 hardware acceleration peripheral present.
+
+- title: Other Features
+  help: Features that did not fit in any category
+  features:
+  - name: dbgpin
+    help: The platform provides the necessary initialization hooks
+          for the `dbgpin` module.
+  - name: no_idle_thread
+    help: The MCU can idle without an idle thread
+  - name: riotboot
+    help: The `riotboot` bootloader is supported.
+  - name: ssp
+    help: Stack Smashing Protection is supported.
+  - name: tinyusb_device
+    help: The TinyUSB network stack is supported and can be selected with
+          `USEPKG += tinyusb`.
+  - name: bootloader_stm32
+    help: The MCU has a STM32 bootloader in ROM that can be used for flashing.
+
+- title: Board Features
+  help: These features indicate features of the board
+  features:
+  - name: ethernet
+    help: The board has Ethernet connectivity
+  - name: highlevel_stdio
+    help: A high-level stdio method (such as CDC ACM) is used. This requires a
+          running thread and set-up and will not print during a crash.
+  - name: motor_driver
+    help: A motor_driver configuration is present.
+  - name: sdcard_spi
+    help: An SD-Card SPI configuration is provided.
+
+  groups:
+  - title: STM32L496G Discovery Board Features
+    help: Features available and selectable on the `stm32l496-disco` board only
+    features:
+    - name: periph_spi_stmod
+      help: By default, solder bridges SB6, SB7, SB8 are closed and USART1 is
+            connected to the Pmod/STMmod+ connector. If these solder bridges are
+            open and solder bridges SB4, SB5 and SB6 are closed instead, SPI2 is
+            connected to the STMmod+/Pmod connector. Request this feature to use
+            SPI2 with this board configuration.

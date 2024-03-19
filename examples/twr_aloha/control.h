@@ -31,14 +31,21 @@ extern "C" {
  * @brief   Block after a request is sent
  */
 #ifndef CONFIG_TWR_SHELL_BLOCKING
-#define CONFIG_TWR_SHELL_BLOCKING       1
+#define CONFIG_TWR_SHELL_BLOCKING           1
 #endif
 
 /**
  * @brief   Minimum idle time to enable putting the radio to sleep
  */
 #ifndef CONFIG_TWR_MIN_IDLE_SLEEP_MS
-#define CONFIG_TWR_MIN_IDLE_SLEEP_MS    20
+#define CONFIG_TWR_MIN_IDLE_SLEEP_MS        20
+#endif
+
+/*
+ * @brief   Block after a request is sent
+ */
+#ifndef CONFIG_TWR_PRINTF_INITIATOR_ONLY
+#define CONFIG_TWR_PRINTF_INITIATOR_ONLY    1
 #endif
 
 /**
@@ -99,6 +106,11 @@ void uwb_core_rng_listen_disable(void);
  */
 void uwb_core_rng_start(uint16_t addr, twr_protocol_t proto, uint32_t interval,
                         uint32_t count);
+
+/**
+ * @brief   Returns remaining rng requests
+ */
+uint32_t uwb_core_rng_req_remaining(void);
 
 #ifdef __cplusplus
 }

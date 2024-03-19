@@ -19,13 +19,12 @@
 #include <assert.h>
 #include <string.h>
 
+#include "irq.h"
 #include "log.h"
-#include "ztimer.h"
-
 #include "periph/gpio.h"
-
 #include "sm_pwm_01c.h"
 #include "sm_pwm_01c_params.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"

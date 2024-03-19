@@ -22,6 +22,7 @@
 #define MRF24J40_PARAMS_H
 
 #include "board.h"
+#include "mrf24j40.h"
 
 #ifdef __cplusplus
 extern "C" {

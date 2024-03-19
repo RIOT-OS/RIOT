@@ -57,20 +57,20 @@ static int read_relative_humidity(const void *dev, phydat_t *res)
 
 const saul_driver_t bmx280_temperature_saul_driver = {
     .read = read_temperature,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_TEMP,
 };
 
 const saul_driver_t bmx280_pressure_saul_driver = {
     .read = read_pressure,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_PRESS,
 };
 
 #if defined(MODULE_BME280_SPI) || defined(MODULE_BME280_I2C)
 const saul_driver_t bme280_relative_humidity_saul_driver = {
     .read = read_relative_humidity,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_HUM,
 };
 #endif

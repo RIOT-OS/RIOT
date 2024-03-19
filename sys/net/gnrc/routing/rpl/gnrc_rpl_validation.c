@@ -23,10 +23,6 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#if IS_ACTIVE(ENABLE_DEBUG)
-static char addr_str[IPV6_ADDR_MAX_STR_LEN];
-#endif
-
 bool gnrc_rpl_validation_options(int msg_type, gnrc_rpl_instance_t *inst,
                                  gnrc_rpl_opt_t *opt, uint16_t len)
 {

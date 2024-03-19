@@ -31,6 +31,11 @@
 #include "net/sock/udp.h"
 #include "net/sock/tcp.h"
 
+#ifdef MODULE_SOCK_DTLS
+#include "net/credman.h"
+#include "net/sock/dtls.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -103,6 +108,16 @@ static inline int sock_udp_ep_fmt(const sock_udp_ep_t *endpoint,
 int sock_urlsplit(const char *url, char *hostport, char *urlpath);
 
 /**
+ * @brief   Returns a pointer to the path component in @p url
+ *
+ * @param[in]   url         URL to examine. Must not be NULL.
+ *
+ * @returns     pointer to the start of the path component in @p url
+ * @returns     NULL if @p url is invalid
+ */
+const char *sock_urlpath(const char *url);
+
+/**
  * @brief    Convert string to common IP-based transport layer endpoint
  *
  * Takes eg., "[2001:db8::1]:1234" and converts it into the corresponding UDP
@@ -115,6 +130,22 @@ int sock_urlsplit(const char *url, char *hostport, char *urlpath);
  * @returns     <0 otherwise
  */
 int sock_tl_str2ep(struct _sock_tl_ep *ep_out, const char *str);
+
+/**
+ * @brief   Convert string to common IP-based transport layer endpoint
+ *          If the `sock_dns` module is used, this will do a DNS lookup
+ *          if @p str is not an IP address.
+ *
+ * Takes eg., "riot-os.org:1234" and converts it into the corresponding
+ * endpoint structure.
+ *
+ * @param[out]  ep_out  endpoint structure to fill
+ * @param[in]   str     string to read from
+ *
+ * @returns     0 on success
+ * @returns     <0 otherwise
+ */
+int sock_tl_name2ep(struct _sock_tl_ep *ep_out, const char *str);
 
 /**
  * @brief    Convert string to TCP endpoint
@@ -134,6 +165,25 @@ static inline int sock_tcp_str2ep(sock_tcp_ep_t *ep_out, const char *str)
 }
 
 /**
+ * @brief    Convert string to TCP endpoint
+ *           If the `sock_dns` module is used, this will do a DNS lookup
+ *           if @p str is not an IP address.
+ *
+ * Takes eg., "exampl.com:80" or "[2001:db8::1]:1234" and converts it into
+ * the corresponding UDP endpoint structure.
+ *
+ * @param[out]  ep_out  endpoint structure to fill
+ * @param[in]   str     string to read from
+ *
+ * @returns     0 on success
+ * @returns     <0 otherwise
+ */
+static inline int sock_tcp_name2ep(sock_tcp_ep_t *ep_out, const char *str)
+{
+    return sock_tl_name2ep(ep_out, str);
+}
+
+/**
  * @brief    Convert string to UDP endpoint
  *
  * Takes eg., "[2001:db8::1]:1234" and converts it into the corresponding UDP
@@ -148,6 +198,25 @@ static inline int sock_tcp_str2ep(sock_tcp_ep_t *ep_out, const char *str)
 static inline int sock_udp_str2ep(sock_udp_ep_t *ep_out, const char *str)
 {
     return sock_tl_str2ep(ep_out, str);
+}
+
+/**
+ * @brief    Convert string to UDP endpoint
+ *           If the `sock_dns` module is used, this will do a DNS lookup
+ *           if @p str is not an IP address.
+ *
+ * Takes eg., "exampl.com:80" or "[2001:db8::1]:1234" and converts it into
+ * the corresponding UDP endpoint structure.
+ *
+ * @param[out]  ep_out  endpoint structure to fill
+ * @param[in]   str     string to read from
+ *
+ * @returns     0 on success
+ * @returns     <0 otherwise
+ */
+static inline int sock_udp_name2ep(sock_udp_ep_t *ep_out, const char *str)
+{
+    return sock_tl_name2ep(ep_out, str);
 }
 
 /**
@@ -204,6 +273,29 @@ static inline bool sock_udp_ep_equal(const sock_udp_ep_t *a,
     return sock_tl_ep_equal(a, b);
 }
 
+#if defined(MODULE_SOCK_DTLS) || DOXYGEN
+/**
+ * @brief   Helper function to establish a DTLS connection
+ *
+ * @param[out]  sock_udp     Struct to store the underlying UDP socket
+ * @param[out]  sock_dtls    Struct for the actual DTLS socket
+ * @param[out]  session      Struct to store DTLS session information
+ * @param[in]   tag          Credential tag to use
+ * @param[in]   local        Local endpoint, must not be NULL
+ * @param[in]   remote       Server endpoint to connect to
+ * @param[in]   work_buf     Buffer used to negotiate connection
+ * @param[in]   work_buf_len Size of @p work buf. Should be at least
+ *                           160 bytes for AES_128_CCM_8 with PSK
+ *
+ * @return  0 on success
+ * @return negative error otherwise (see @ref sock_dtls_recv_aux)
+ */
+int sock_dtls_establish_session(sock_udp_t *sock_udp, sock_dtls_t *sock_dtls,
+                                sock_dtls_session_t *session, credman_tag_t tag,
+                                sock_udp_ep_t *local, const sock_udp_ep_t *remote,
+                                void *work_buf, size_t work_buf_len);
+#endif
+
 /**
  * @defgroup    net_sock_util_conf SOCK utility functions compile configurations
  * @ingroup     net_sock_conf
@@ -232,6 +324,20 @@ static inline bool sock_udp_ep_equal(const sock_udp_ep_t *a,
 #define CONFIG_SOCK_URLPATH_MAXLEN     (64U)
 #endif
 /** @} */
+
+/**
+ * @brief   Timeout in milliseconds for sock_dtls_establish_session()
+ */
+#ifndef CONFIG_SOCK_DTLS_TIMEOUT_MS
+#define CONFIG_SOCK_DTLS_TIMEOUT_MS    (1000U)
+#endif
+
+/**
+ * @brief   Number of DTLS handshake retries for sock_dtls_establish_session()
+ */
+#ifndef CONFIG_SOCK_DTLS_RETRIES
+#define CONFIG_SOCK_DTLS_RETRIES       (2)
+#endif
 
 #ifdef __cplusplus
 }

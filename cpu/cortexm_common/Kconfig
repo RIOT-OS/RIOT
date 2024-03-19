@@ -11,6 +11,7 @@ config MODULE_CORTEXM_COMMON
     imply MODULE_NEWLIB_NANO
     select MODULE_PERIPH
     select MODULE_MALLOC_THREAD_SAFE if TEST_KCONFIG
+    select PACKAGE_CMSIS if TEST_KCONFIG
     help
         Common code for Cortex-M cores.
 
@@ -90,6 +91,7 @@ config CPU_CORE_CORTEX_M33
     bool
     select CPU_ARCH_ARMV8M
     select CPU_CORE_CORTEX_M
+    select HAS_CORTEXM_FPU
     #select HAS_RUST_TARGET
 
 config CPU_CORE_CORTEX_M4

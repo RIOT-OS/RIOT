@@ -299,6 +299,7 @@
 #ifndef NET_SOCK_TCP_H
 #define NET_SOCK_TCP_H
 
+#include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -321,7 +322,7 @@ typedef struct _sock_tl_ep sock_tcp_ep_t;   /**< An end point for a TCP sock obj
 /**
  * @brief   Type for a TCP sock object
  *
- * @note API implementors: `struct sock_tcp` needs to be defined by
+ * @note API implementers: `struct sock_tcp` needs to be defined by
  *       implementation-specific `sock_types.h`.
  */
 typedef struct sock_tcp sock_tcp_t;
@@ -329,7 +330,7 @@ typedef struct sock_tcp sock_tcp_t;
 /**
  * @brief   Type for a TCP listening queue
  *
- * @note API implementors: `struct sock_tcp_queue` needs to be defined by
+ * @note API implementers: `struct sock_tcp_queue` needs to be defined by
  *                          implementation-specific `sock_types.h`.
  */
 typedef struct sock_tcp_queue sock_tcp_queue_t;
@@ -540,11 +541,11 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
  */
 ssize_t sock_tcp_write(sock_tcp_t *sock, const void *data, size_t len);
 
-#include "sock_types.h"
-
 #ifdef __cplusplus
 }
 #endif
+
+#include "sock_types.h"
 
 #endif /* NET_SOCK_TCP_H */
 /** @} */

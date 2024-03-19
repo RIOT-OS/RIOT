@@ -49,11 +49,11 @@ def to_header(pk):
     if isinstance(pk, ed25519.Ed25519PrivateKey):
         public_bytes = pk.public_key().public_bytes(ks.Encoding.Raw,
                                                       ks.PublicFormat.Raw)
-        public_c_def = ['const uint8_t public_key[] = {'] + textwrap.wrap(
+        public_c_def = ['{'] + textwrap.wrap(
             ', '.join(['{:0=#4x}'.format(x) for x in public_bytes]),
             76
         )
-        return str.encode('\n    '.join(public_c_def) + '\n};\n')
+        return str.encode('\n    '.join(public_c_def) + '\n},\n')
 
 
 OutputFormaters = {
@@ -75,7 +75,7 @@ def main(options):
     if options.output_format in ('pem', 'der', 'uecc', 'header'):
         private_key = ks.load_pem_private_key(
             options.private_key.read(),
-            password=None,
+            password=str.encode(options.password) if options.password else None,
             backend=default_backend()
         )
 

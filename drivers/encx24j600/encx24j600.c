@@ -81,13 +81,15 @@ static inline void unlock(encx24j600_t *dev) {
     spi_release(dev->spi);
 }
 
-void encx24j600_setup(encx24j600_t *dev, const encx24j600_params_t *params)
+void encx24j600_setup(encx24j600_t *dev, const encx24j600_params_t *params, uint8_t index)
 {
     dev->netdev.driver = &netdev_driver_encx24j600;
     dev->spi = params->spi;
     dev->cs = params->cs_pin;
     dev->int_pin = params->int_pin;
     dev->rx_next_ptr = RX_BUFFER_START;
+
+    netdev_register(&dev->netdev, NETDEV_ENCX24J600, index);
 }
 
 static void encx24j600_isr(void *arg)

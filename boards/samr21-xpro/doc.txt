@@ -182,6 +182,12 @@ toolchain.
 
 ## Known Issues / Problems
 
+### 64 character input limit on EDBG UART
+When using STDIO directly through the debugger UART, no more than 64 bytes can
+be read at once. This does limit the length of shell command lines to 63 bytes
+(since a newline is needed) when using a terminal that only transmits whole lines.
+(e.g. pyterm).
+
 ### I2C
 When connecting an I2C device and a logic analyzer to an I2C port at the same
 time, the internal pull-up resistors are not sufficient for stable bus
@@ -205,10 +211,10 @@ clock configuration or low power modes. In this case you can use
 instructions to build it and run `./edbg -e` to erase the flash. Then press the
 reset button and you're able to program via OpenOCD again.
 
-### Flashing might not work in Virtual Box with Mac OS X as host
+### Flashing might not work in Virtual Box with macOS as host
 It might happen that flashing through OpenOCD works once inside Virtual Box.
 But when you try to flash again, you could get a CMSIS-DAP related error. It
 seems to only happen with USB 3.0 ports. You can take a look at
 [Vagrant](http://en.wikipedia.org/wiki/Vagrant_%28software%29) and use a virtual
-Linux to run the virtual RIOT, and flash from OS X.
+Linux to run the virtual RIOT, and flash from macOS.
  */

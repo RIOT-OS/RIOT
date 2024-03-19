@@ -12,12 +12,15 @@ config CPU_STM32
     select HAS_PERIPH_GPIO
     select HAS_PERIPH_GPIO_IRQ
     select HAS_PERIPH_TIMER_PERIODIC
+    select HAS_PERIPH_TIMER_QUERY_FREQS
     select HAS_PERIPH_RTT_OVERFLOW
     select HAS_PERIPH_UART_MODECFG
     select HAS_PERIPH_UART_NONBLOCKING
 
     # This CPU requires periph_rtc when periph_rtc_mem
     select MODULE_PERIPH_RTC if MODULE_PERIPH_RTC_MEM && HAS_PERIPH_RTC
+
+menu "STM32 configuration"
 
 # Common CPU symbol
 config CPU
@@ -39,22 +42,30 @@ config MODULE_BOOTLOADER_STM32
     depends on HAS_BOOTLOADER_STM32
     depends on TEST_KCONFIG
 
-orsource "kconfigs/Kconfig.clk"
-orsource "kconfigs/*/Kconfig"
-orsource "kconfigs/*/Kconfig.lines"
-orsource "kconfigs/*/Kconfig.models"
+
+menu "STM32 clock configuration"
+    depends on CPU_STM32
+
+rsource "kconfigs/Kconfig.clk"
+rsource "kconfigs/$(CPU_FAM)/Kconfig.clk"
+
+endmenu
+
+rsource "kconfigs/$(CPU_FAM)/Kconfig"
+rsource "kconfigs/$(CPU_FAM)/Kconfig.lines"
+rsource "kconfigs/$(CPU_FAM)/Kconfig.models"
 
 choice
     prompt "ReaDout Protection level"
     default RDP0
     help
-    Set minimum running RDP level.
-    RDP0 is full debug permissions, RDP1 disables read from Flash but
-    otherwise leaves debug enabled, RDP2 disables JTAG completely. If
-    there is a mismatch between desired RDP level here and RDP level
-    set on the chip, early cpu init will hang.  This ensures production
-    devices with the wrong RDP level, by fault or malace intent, will
-    not run.  See cpu manual for further details on RDP.
+        Set minimum running RDP level.
+        RDP0 is full debug permissions, RDP1 disables read from Flash but
+        otherwise leaves debug enabled, RDP2 disables JTAG completely. If
+        there is a mismatch between desired RDP level here and RDP level
+        set on the chip, early cpu init will hang.  This ensures production
+        devices with the wrong RDP level, by fault or malace intent, will
+        not run.  See cpu manual for further details on RDP.
 depends on (CPU_FAM_F1 || CPU_FAM_F2 || CPU_FAM_F3 || CPU_FAM_F4 || CPU_FAM_F7)
 config RDP0
     bool "RDP0"
@@ -64,12 +75,17 @@ config RDP2
     bool "RDP2"
 endchoice
 
+rsource "periph/Kconfig.fmc"
+
 if TEST_KCONFIG
 
+rsource "lcd_fmc/Kconfig"
 rsource "periph/Kconfig"
 rsource "stmclk/Kconfig"
 rsource "vectors/Kconfig"
 
 endif # TEST_KCONFIG
+
+endmenu
 
 source "$(RIOTCPU)/cortexm_common/Kconfig"

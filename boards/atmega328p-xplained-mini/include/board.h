@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
  *               2016 Laurent Navet <laurent.navet@gmail.com>
  *               2019 Otto-von-Guericke-Universität Magdeburg
- *               2021 Gerson Fernando Budke
+ *               2021-2123 Gerson Fernando Budke
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -56,9 +56,25 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
+ * @name    Macros for controlling the on-board LED
+ * @{
  */
-void board_init(void);
+#define LED0_PIN            GPIO_PIN(PORT_B, 5)
+#define LED0_MODE           GPIO_OUT
+#define LED0_ENABLE_PORT    DDRB  |=  LED0_PIN
+#define LED0_ON             PORTB |=  LED0_PIN
+#define LED0_OFF            PORTB &= ~LED0_PIN
+#define LED0_TOGGLE         PORTB ^=  LED0_PIN
+/** @} */
+
+/**
+ * @name    Button pin configuration
+ * @{
+ */
+#define BTN0_PIN            GPIO_PIN(PORT_B, 7)
+#define BTN0_MODE           GPIO_IN_PU
+#define BTN0_INT_FLANK      GPIO_FALLING
+/** @} */
 
 #ifdef __cplusplus
 }

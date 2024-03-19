@@ -26,6 +26,7 @@
 #define SUIT_TRANSPORT_COAP_H
 
 #include "net/nanocoap.h"
+#include "suit/transport/worker.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,8 +34,12 @@ extern "C" {
 
 /**
  * @brief    Start SUIT CoAP thread
+ *
+ * @deprecated This will be removed after after the 2023.01 release.
  */
-void suit_coap_run(void);
+static inline void suit_coap_run(void)
+{
+}
 
 /**
  * @brief SUIT CoAP endpoint entry.
@@ -68,93 +73,30 @@ void suit_coap_run(void);
 #ifndef DOXYGEN
 
 /**
- * @brief   Coap subtree handler
- *
- * @param[in,out]   pkt     Packet struct containing the request. Is reused for
- *                          the response
- * @param[in]       buf     Buffer to write reply to
- * @param[in]       len     Total length of the buffer associated with the
- *                          request
- * @param[in]       buf     Buffer to write reply to
- *
- * @returns     ssize_t     Size of the reply
- */
-ssize_t coap_subtree_handler(coap_pkt_t *pkt, uint8_t *buf,
-                             size_t len, void *context);
-
-/**
- * @brief   Type for CoAP resource subtrees
- */
-typedef const struct {
-    const coap_resource_t *resources;   /**< ptr to resource array  */
-    const size_t resources_numof;       /**< nr of entries in array */
-} coap_resource_subtree_t;
-
-/**
- * @brief   Coap blockwise request callback descriptor
- *
- * @param[in] arg      Pointer to be passed as arguments to the callback
- * @param[in] offset   Offset of received data
- * @param[in] buf      Pointer to the received data
- * @param[in] len      Length of the received data
- * @param[in] more     -1 for no option, 0 for last block, 1 for more blocks
- *
- * @returns    0       on success
- * @returns   -1       on error
- */
-typedef int (*coap_blockwise_cb_t)(void *arg, size_t offset, uint8_t *buf, size_t len, int more);
-
-/**
  * @brief   Reference to the coap resource subtree
  */
 extern const coap_resource_subtree_t coap_resource_subtree_suit;
 
 /**
- * @brief Coap block-wise-transfer size SZX
- */
-typedef enum {
-    COAP_BLOCKSIZE_32 = 1,
-    COAP_BLOCKSIZE_64,
-    COAP_BLOCKSIZE_128,
-    COAP_BLOCKSIZE_256,
-    COAP_BLOCKSIZE_512,
-    COAP_BLOCKSIZE_1024,
-} coap_blksize_t;
-
-/**
  * @brief Coap block-wise-transfer size used for SUIT
  */
 #ifndef CONFIG_SUIT_COAP_BLOCKSIZE
-#define CONFIG_SUIT_COAP_BLOCKSIZE  COAP_BLOCKSIZE_64
+#define CONFIG_SUIT_COAP_BLOCKSIZE  CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT
 #endif
-
-/**
- * @brief    Performs a blockwise coap get request to the specified url.
- *
- * This function will fetch the content of the specified resource path via
- * block-wise-transfer. A coap_blockwise_cb_t will be called on each received
- * block.
- *
- * @param[in]   url        url pointer to source path
- * @param[in]   blksize    sender suggested SZX for the COAP block request
- * @param[in]   callback   callback to be executed on each received block
- * @param[in]   arg        optional function arguments
- *
- * @returns     -EINVAL    if an invalid url is provided
- * @returns     -1         if failed to fetch the url content
- * @returns      0         on success
- */
-int suit_coap_get_blockwise_url(const char *url,
-                               coap_blksize_t blksize,
-                               coap_blockwise_cb_t callback, void *arg);
 
 /**
  * @brief   Trigger a SUIT udate
  *
+ * @deprecated This is an alias for @ref suit_worker_trigger and will be removed
+ *             after after the 2023.01 release.
+ *
  * @param[in] url       url pointer containing the full coap url to the manifest
  * @param[in] len       length of the url
  */
-void suit_coap_trigger(const uint8_t *url, size_t len);
+static inline void suit_coap_trigger(const uint8_t *url, size_t len)
+{
+    suit_worker_trigger((const char *)url, len);
+}
 
 #endif /* DOXYGEN */
 

@@ -30,7 +30,7 @@ extern "C" {
 
 /**
  * @name MCP2515 Register Memory Map
- * {
+ * @{
  */
 #define MCP2515_RXF0SIDH 0x00
 #define MCP2515_RXF0SIDL 0x01
@@ -166,7 +166,7 @@ extern "C" {
 
 /**
  * @name MCP2515 Control Register bits
- * {
+ * @{
  */
 #define MCP2515_BFPCTRL_B0BFM 0x01
 #define MCP2515_BFPCTRL_B1BFM 0x02
@@ -273,7 +273,7 @@ extern "C" {
 
 /**
  * @name MCP2515 error flags
- * {
+ * @{
  */
 #define MCP2515_EFLG_EWARN      0x01
 #define MCP2515_EFLG_RXWAR      0x02
@@ -300,11 +300,9 @@ extern "C" {
 #define MCP2515_RXB0CTRL_BUKT1                  0x02
 #define MCP2515_RXB0CTRL_BUKT                   0x04
 #define MCP2515_RXB0CTRL_RXRTR                  0x08
+#define MCP2515_RXB0CTRL_MODE_RECV_FILTER       0x00
 #define MCP2515_RXB0CTRL_RXM0                   0x20
 #define MCP2515_RXB0CTRL_RXM1                   0x40
-#define MCP2515_RXB0CTRL_MODE_RECV_STD_OR_EXT   0x00
-#define MCP2515_RXB0CTRL_MODE_RECV_STD          MCP2515_RXB0CTRL_RXM0
-#define MCP2515_RXB0CTRL_MODE_RECV_EXT          MCP2515_RXB0CTRL_RXM1
 #define MCP2515_RXB0CTRL_MODE_RECV_ALL          (MCP2515_RXB0CTRL_RXM1 | \
                                                  MCP2515_RXB0CTRL_RXM0)
 
@@ -312,18 +310,16 @@ extern "C" {
 #define MCP2515_RXB1CTRL_FILHIT1                0x02
 #define MCP2515_RXB1CTRL_FILHIT2                0x04
 #define MCP2515_RXB1CTRL_RXRTR                  0x08
+#define MCP2515_RXB1CTRL_MODE_RECV_FILTER       0x00
 #define MCP2515_RXB1CTRL_RXM0                   0x20
 #define MCP2515_RXB1CTRL_RXM1                   0x40
-#define MCP2515_RXB1CTRL_MODE_RECV_STD_OR_EXT   0x00
-#define MCP2515_RXB1CTRL_MODE_RECV_STD          MCP2515_RXB1CTRL_RXM0
-#define MCP2515_RXB1CTRL_MODE_RECV_EXT          MCP2515_RXB1CTRL_RXM1
 #define MCP2515_RXB1CTRL_MODE_RECV_ALL          (MCP2515_RXB1CTRL_RXM1 | \
                                                  MCP2515_RXB1CTRL_RXM0)
 /** @} */
 
 /**
  * @name MCP2515 SPI commands
- * {
+ * @{
  */
 #define MCP2515_SPI_RESET       0xC0
 #define MCP2515_SPI_READ        0x03
@@ -338,7 +334,7 @@ extern "C" {
 
 /**
  * @name MCP2515 RX buffer id
- * {
+ * @{
  */
 #define MCP2515_RXBUF_RXB0SIDH  0x00
 #define MCP2515_RXBUF_RXB0D0    0x02
@@ -348,7 +344,7 @@ extern "C" {
 
 /**
  * @name MCP2515 TX buffer id
- * {
+ * @{
  */
 #define MCP2515_TXBUF_TXB0SIDH  0x00
 #define MCP2515_TXBUF_TXB0D0    0x01
@@ -360,7 +356,7 @@ extern "C" {
 
 /**
  * @name MCP2515 option ID for ioctl function
- * {
+ * @{
  */
 #define MCP2515_OPTION_ROLLOVER             1
 #define MCP2515_OPTION_ONESHOT              2
@@ -377,7 +373,7 @@ extern "C" {
 
 /**
  * @name MCP2515 IRQ handling
- * {
+ * @{
  */
 #define MCP2515_IRQ_FLAGGED     0x80
 #define MCP2515_IRQ_HANDLED     0x40
@@ -389,7 +385,7 @@ extern "C" {
 
 /**
  * @name MCP2515 Extended ID bit
- * {
+ * @{
  */
 #define MCP2515_RX_IDE 0x08
 /** @} */

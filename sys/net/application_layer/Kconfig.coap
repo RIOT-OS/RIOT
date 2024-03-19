@@ -18,15 +18,15 @@ menuconfig KCONFIG_COAP
 
 if KCONFIG_COAP
 
-config COAP_ACK_TIMEOUT
-    int "Timeout in seconds for a response to a confirmable request"
-    default 2
+config COAP_ACK_TIMEOUT_MS
+    int "Timeout in milliseconds for a response to a confirmable request"
+    default 2000
     help
         This value is for the response to the initial confirmable message. The
         timeout doubles for subsequent retries. To avoid synchronization of
         resends across hosts, the actual timeout is chosen randomly between
-        @ref CONFIG_COAP_ACK_TIMEOUT and
-        (@ref CONFIG_COAP_ACK_TIMEOUT * @ref CONFIG_COAP_RANDOM_FACTOR_1000 / 1000).
+        @ref CONFIG_COAP_ACK_TIMEOUT_MS and
+        (@ref CONFIG_COAP_ACK_TIMEOUT_MS * @ref CONFIG_COAP_RANDOM_FACTOR_1000 / 1000).
         The default of 2 seconds is taken from
         [RFC 7252, section 4.8](https://tools.ietf.org/html/rfc7252#section-4.8).
 

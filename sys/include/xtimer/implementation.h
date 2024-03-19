@@ -336,3 +336,4 @@ static inline bool xtimer_is_set(const xtimer_t *timer)
 #endif
 
 #endif /* XTIMER_IMPLEMENTATION_H */
+/** @} */

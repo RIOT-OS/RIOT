@@ -35,6 +35,20 @@ void ztimer_convert_cancel(ztimer_clock_t *clock)
     ztimer_remove(ztimer_convert->lower, &ztimer_convert->lower_entry);
 }
 
+void ztimer_convert_start(ztimer_clock_t *clock)
+{
+    ztimer_convert_t *ztimer_convert = (ztimer_convert_t *)clock;
+
+    ztimer_acquire(ztimer_convert->lower);
+}
+
+void ztimer_convert_stop(ztimer_clock_t *clock)
+{
+    ztimer_convert_t *ztimer_convert = (ztimer_convert_t *)clock;
+
+    ztimer_release(ztimer_convert->lower);
+}
+
 void ztimer_convert_init(ztimer_convert_t *ztimer_convert,
                          ztimer_clock_t *lower,
                          uint32_t max_value)
@@ -42,11 +56,11 @@ void ztimer_convert_init(ztimer_convert_t *ztimer_convert,
     ztimer_convert_t tmp = {
         .lower = lower,
         .lower_entry = {
-            .callback = (void (*)(void *))ztimer_handler,
+            .callback = (void (*)(void *)) ztimer_handler,
             .arg = ztimer_convert,
         },
         .super.max_value = max_value,
-#  ifdef MODULE_PM_LAYERED
+#  if MODULE_PM_LAYERED && !MODULE_ZTIMER_ONDEMAND
         .super.block_pm_mode = ZTIMER_CLOCK_NO_REQUIRED_PM_MODE,
 #  endif
     };

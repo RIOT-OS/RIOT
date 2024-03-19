@@ -22,8 +22,10 @@
  */
 
 #include "cpu.h"
+#include "board.h"
 
 #include "periph/gpio.h"
+#include "pm_layered.h"
 
 #include "em_gpio.h"
 
@@ -57,7 +59,9 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     }
 
     /* enable clocks */
+#if defined(_SILICON_LABS_32B_SERIES_0) || defined(_SILICON_LABS_32B_SERIES_1)
     CMU_ClockEnable(cmuClock_HFPER, true);
+#endif
     CMU_ClockEnable(cmuClock_GPIO, true);
 
     /* configure pin */
@@ -115,15 +119,15 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     }
 
     /* just in case, disable the interrupt for this pin */
-    GPIO_IntDisable(_pin_mask(pin));
+    gpio_irq_disable(pin);
 
     /* store interrupt callback */
     isr_ctx[_pin_num(pin)].cb = cb;
     isr_ctx[_pin_num(pin)].arg = arg;
 
     /* enable interrupts */
-    GPIO_IntConfig(_port_num(pin), _pin_num(pin),
-                   flank & GPIO_RISING, flank & GPIO_FALLING, true);
+    GPIO_ExtIntConfig(_port_num(pin), _pin_num(pin), _pin_num(pin),
+                      flank & GPIO_RISING, flank & GPIO_FALLING, false);
 
     NVIC_ClearPendingIRQ(GPIO_EVEN_IRQn);
     NVIC_ClearPendingIRQ(GPIO_ODD_IRQn);
@@ -131,17 +135,38 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     NVIC_EnableIRQ(GPIO_EVEN_IRQn);
     NVIC_EnableIRQ(GPIO_ODD_IRQn);
 
+    /* enable IRQ */
+    gpio_irq_enable(pin);
+
     return 0;
 }
 
 void gpio_irq_enable(gpio_t pin)
 {
-    GPIO_IntEnable(_pin_mask(pin));
+    unsigned pin_extirq = _pin_mask(pin);
+
+#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(GPIO_INT_PM_BLOCKER)
+    /* block pm mode if the irq is about to be enabled */
+    if (!(GPIO_EnabledIntGet() & pin_extirq)) {
+        pm_block(GPIO_INT_PM_BLOCKER);
+    }
+#endif
+
+    GPIO_IntEnable(pin_extirq);
 }
 
 void gpio_irq_disable(gpio_t pin)
 {
-    GPIO_IntDisable(_pin_mask(pin));
+    unsigned pin_extirq = _pin_mask(pin);
+
+#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(GPIO_INT_PM_BLOCKER)
+    /* unblock pm mode if the irq is about to be disabled */
+    if (GPIO_EnabledIntGet() & pin_extirq) {
+        pm_unblock(GPIO_INT_PM_BLOCKER);
+    }
+#endif
+
+    GPIO_IntDisable(pin_extirq);
 }
 
 /**

@@ -17,6 +17,9 @@ dout
 # ALS (Ambient Light Sensing) => ALSO
 als
 
+# CAF (Comp. A Enable Output Filter (MSP430) or Copy All Frames (SAM0) or C++ Actor Framework) => CALF
+caf
+
 # Technik (From "Beuth Hochschule für Technik Berlin") => Technique
 technik
 
@@ -119,3 +122,55 @@ crate
 
 # VAs (volt ampere second) => was
 vas
+
+# Sur (macOS version alias) => Sure, sir
+sur
+
+# unsecure (unlocked, protection disabled) => insecure
+unsecure
+
+# nce (neighbor cache entry) => once, nice
+nce
+
+# warmup => warm up, warm-up
+warmup
+
+# clen => clean, clan
+clen
+
+# RO (read only) => to, row, rob, rod, roe, rot
+ro
+
+# Synopsys (vendor name) => Synopsis
+synopsys
+
+# nam (part of lorem ipsum "Velit scelerisque in dictum non consectetur a erat nam.")
+# => name
+nam
+
+# donot (part of bloom filter test vector) => do not
+donot
+
+# Didi (Ayman El Didi) => Did
+didi
+
+# loath => loathe (both correct, one is an adjective, the other a verb)
+loath
+
+# NOE (Negative Output Enable) ==> NOT, NO, NODE, NOTE, KNOW, NOW
+noe
+
+# NWE (Negative Write Enable) ==> NEW
+nwe
+
+# rsource (used to include Kconfig files) ==> resource, source
+rsource
+
+# SHS (abbreviation for Secure Hash Standard) => SSH, NHS
+shs
+
+# FRAM (abbreviation for ferroelectric random access memory, a non-volatile memory)
+fram
+
+# MIS (mask interrupt register)
+mis

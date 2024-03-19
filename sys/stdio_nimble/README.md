@@ -35,13 +35,13 @@ to your makefile.
 
 The advertised device name can then optionally be configured with
 ```
-CFLAGS += -DNIMBLE_AUTOADV_DEVICE_NAME='"Riot OS device"'
+CFLAGS += -DCONFIG_NIMBLE_AUTOADV_DEVICE_NAME='"Riot OS device"'
 ```
 Otherwise the device will appear as "*RIOT OS device*".
 
 ## Instructions to connect to the bluetooth shell via ble-serial
 
-- Configure and compile shell app for nrf52840dongle target in `tests/shell`.\
+- Configure and compile shell app for nrf52840dongle target in `tests/sys/shell`.\
 
 Add following to Makefile:
 ```
@@ -50,11 +50,11 @@ USEMODULE += nimble_autoadv
 USEMODULE += stdio_nimble
 ```
 
-**NOTE:** You can also have a look at `tests/shell_ble`.
+**NOTE:** You can also have a look at `tests/sys/shell_ble`.
 
 - Flash
 
-`$ make -C tests/shell -j clean all flash`
+`$ make -C tests/sys/shell -j clean all flash`
 
 - Install the ble-serial tool
 

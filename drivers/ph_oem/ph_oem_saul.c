@@ -52,7 +52,7 @@ static int read_ph(const void *dev, phydat_t *res)
 
 /* Sets the temperature compensation for taking accurate pH readings.
  * Valid temperature range is 1 - 20000 (0.01 °C  to  200.0 °C) */
-static int set_temp_compensation(const void *dev, phydat_t *res)
+static int set_temp_compensation(const void *dev, const phydat_t *res)
 {
     const ph_oem_t *mydev = dev;
 

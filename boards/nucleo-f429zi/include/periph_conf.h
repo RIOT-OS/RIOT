@@ -32,8 +32,9 @@
 #include "periph_cpu.h"
 #include "clk_conf.h"
 #include "cfg_i2c1_pb8_pb9.h"
-#include "cfg_timer_tim5.h"
+#include "cfg_timer_tim5_and_tim2.h"
 #include "cfg_usb_otg_fs.h"
+#include "mii.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,10 +47,12 @@ extern "C" {
 static const dma_conf_t dma_config[] = {
     { .stream = 11 },   /* DMA2 Stream 3 - SPI1_TX */
     { .stream = 10 },   /* DMA2 Stream 2 - SPI1_RX */
+    { .stream = 8 },    /* DMA2 Stream 0 - ETH_TX  */
 };
 
 #define DMA_0_ISR           isr_dma2_stream3
 #define DMA_1_ISR           isr_dma2_stream2
+#define DMA_2_ISR           isr_dma2_stream0
 
 #define DMA_NUMOF           ARRAY_SIZE(dma_config)
 /** @} */
@@ -191,6 +194,32 @@ static const adc_conf_t adc_config[] = {
 
 #define VBAT_ADC            ADC_LINE(6) /**< VBAT ADC line */
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
+/** @} */
+
+/**
+ * @name ETH configuration
+ * @{
+ */
+static const eth_conf_t eth_config = {
+    .mode = RMII,
+    .speed = MII_BMCR_SPEED_100 | MII_BMCR_FULL_DPLX,
+    .dma = 2,
+    .dma_chan = 8,
+    .phy_addr = 0x00,
+    .pins = {
+        GPIO_PIN(PORT_G, 13),
+        GPIO_PIN(PORT_B, 13),
+        GPIO_PIN(PORT_G, 11),
+        GPIO_PIN(PORT_C, 4),
+        GPIO_PIN(PORT_C, 5),
+        GPIO_PIN(PORT_A, 7),
+        GPIO_PIN(PORT_C, 1),
+        GPIO_PIN(PORT_A, 2),
+        GPIO_PIN(PORT_A, 1),
+    }
+};
+
+#define ETH_DMA_ISR        isr_dma2_stream0
 /** @} */
 
 #ifdef __cplusplus

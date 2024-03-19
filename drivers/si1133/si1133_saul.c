@@ -90,18 +90,18 @@ static int read_white(const void *dev, phydat_t *res)
 
 const saul_driver_t si1133_uv_saul_driver = {
     .read = read_uv,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_UV
 };
 
 const saul_driver_t si1133_ir_saul_driver = {
     .read = read_ir,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_LIGHT
 };
 
 const saul_driver_t si1133_visible_saul_driver = {
     .read = read_white,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_LIGHT
 };

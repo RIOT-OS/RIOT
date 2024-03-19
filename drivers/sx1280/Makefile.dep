@@ -1,0 +1,3 @@
+USEPKG += lorabasics
+USEMODULE += lorabasics_sx1280_driver
+USEMODULE += netdev_legacy_api

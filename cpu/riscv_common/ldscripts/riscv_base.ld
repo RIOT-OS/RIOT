@@ -159,6 +159,8 @@ SECTIONS
   } >flash : tls
   __tls_size = __tbss_end - __tdata_start;
   __tbss_size = __tls_size - __tdata_size;
+  PROVIDE( __tbss_offset = ADDR(.tbss) - ADDR(.tdata) );
+  PROVIDE( __tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)) );
 
   .lalign         :
   {
@@ -228,6 +230,10 @@ SECTIONS
     . = __stack_size;
     PROVIDE( _sp = . );
   } >ram AT>ram :ram
+
+  .flash_writable (NOLOAD) : {
+    KEEP(*(SORT(.flash_writable.*)))
+  } > flash
 
   .end_fw (NOLOAD) : ALIGN(4) {
     _end_fw = . ;

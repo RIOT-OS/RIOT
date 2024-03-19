@@ -148,6 +148,9 @@ extern int errno;
 #define ETXTBSY         (79)    /**< Text file busy. */
 #define EWOULDBLOCK     (80)    /**< Operation would block (may be the same value as [EAGAIN]). */
 #define EXDEV           (81)    /**< Cross-device link. */
+#define EHOSTDOWN       (82)    /**< Host is down. */
+#define EPFNOSUPPORT    (83)    /**< Protocol family not supported. */
+#define ETOOMANYREFS    (84)    /**< Too many references: cannot splice. */
 /** @} */
 
 /** @} */

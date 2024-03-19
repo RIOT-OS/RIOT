@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
  *               2017 Thomas Perrot <thomas.perrot@tupi.fr>
  *               2018 RWTH Aachen, Josua Arndt <jarndt@ias.rwth-aachen.de>
- *               2021 Gerson Fernando Budke <nandojve@gmail.com>
+ *               2021-2023 Gerson Fernando Budke <nandojve@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -34,20 +34,8 @@
 #include "board.h"
 #include "macros/xtstr.h"
 
-#define CHECK_EIND_REG          FLASHEND > 0x1ffff
-
-#if defined(DATAMEM_SIZE)
-#define CHECK_RAMPZ_REG         DATAMEM_SIZE > 0xffff || FLASHEND > 0xffff
-#define CHECK_RAMPDXY_REG       DATAMEM_SIZE > 0xffff
-#else
-#define CHECK_RAMPZ_REG         FLASHEND > 0xffff
-#define CHECK_RAMPDXY_REG       0
-#endif
-
-#if (CHECK_EIND_REG)
 #ifndef __EIND__
 #define __EIND__                0x3C
-#endif
 #endif
 
 static void avr8_context_save(void);
@@ -109,7 +97,7 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg,
     tmp_adress >>= 8;
     *stk = (uint8_t)(tmp_adress & (uint16_t)0x00ff);
 
-#if (CHECK_EIND_REG)
+#if __AVR_3_BYTE_PC__
     /* Devices with more than 128kb FLASH use a PC with more than 16bits, we
      * set whole the top byte forcibly to 0 */
     stk--;
@@ -124,7 +112,7 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg,
     tmp_adress >>= 8;
     *stk = (uint8_t)(tmp_adress & (uint16_t)0x00ff);
 
-#if (CHECK_EIND_REG)
+#if __AVR_3_BYTE_PC__
     /* Devices with more than 128kb FLASH use a PC with more than 16bits, we
      * set whole the top byte forcibly to 0 */
     stk--;
@@ -139,21 +127,25 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg,
     stk--;
     *stk = (uint8_t)0x80;
 
-#if (CHECK_RAMPZ_REG)
+#if __AVR_HAVE_RAMPZ__
     stk--;
     *stk = (uint8_t)0x00; /* RAMPZ */
 #endif
 
-#if (CHECK_RAMPDXY_REG)
+#if __AVR_HAVE_RAMPY__
     stk--;
     *stk = (uint8_t)0x00; /* RAMPY */
+#endif
+#if __AVR_HAVE_RAMPX__
     stk--;
     *stk = (uint8_t)0x00; /* RAMPX */
+#endif
+#if __AVR_HAVE_RAMPD__
     stk--;
     *stk = (uint8_t)0x00; /* RAMPD */
 #endif
 
-#if (CHECK_EIND_REG)
+#if __AVR_3_BYTE_PC__
     stk--;
     *stk = (uint8_t)0x00; /* EIND */
 #endif
@@ -268,11 +260,14 @@ void NORETURN avr8_enter_thread_mode(void)
 
 void thread_yield_higher(void)
 {
+    if (!IS_USED(MODULE_CORE_THREAD)) {
+        return;
+    }
+
     if (irq_is_in() == 0) {
         avr8_context_save();
         sched_run();
         avr8_context_restore();
-        __asm__ volatile ("ret");
     }
     else {
         sched_context_switch_request = 1;
@@ -281,12 +276,14 @@ void thread_yield_higher(void)
 
 void avr8_exit_isr(void)
 {
-    avr8_state &= ~AVR8_STATE_FLAG_ISR;
+    --avr8_state_irq_count;
 
     /* Force access to avr8_state to take place */
     __asm__ volatile ("" : : : "memory");
 
-    if (sched_context_switch_request) {
+    /* schedule should switch context when returning from a non nested interrupt */
+    if (sched_context_switch_request && avr8_state_irq_count == 0 &&
+        IS_USED(MODULE_CORE_THREAD)) {
         avr8_context_save();
         sched_run();
         avr8_context_restore();
@@ -302,21 +299,27 @@ __attribute__((always_inline)) static inline void avr8_context_save(void)
         "cli                                     \n\t"
         "push __tmp_reg__                        \n\t"
 
-#if (CHECK_RAMPZ_REG)
+#if __AVR_HAVE_RAMPZ__
         "in     __tmp_reg__, __RAMPZ__           \n\t"
         "push   __tmp_reg__                      \n\t"
 #endif
 
-#if (CHECK_RAMPDXY_REG)
+#if __AVR_HAVE_RAMPY__
         "in     __tmp_reg__, __RAMPY__           \n\t"
         "push   __tmp_reg__                      \n\t"
+#endif
+
+#if __AVR_HAVE_RAMPX__
         "in     __tmp_reg__, __RAMPX__           \n\t"
         "push   __tmp_reg__                      \n\t"
+#endif
+
+#if __AVR_HAVE_RAMPD__
         "in     __tmp_reg__, __RAMPD__           \n\t"
         "push   __tmp_reg__                      \n\t"
 #endif
 
-#if (CHECK_EIND_REG)
+#if __AVR_3_BYTE_PC__
         "in     __tmp_reg__, " XTSTR(__EIND__) " \n\t"
         "push   __tmp_reg__                      \n\t"
 #endif
@@ -402,21 +405,25 @@ __attribute__((always_inline)) static inline void avr8_context_restore(void)
         "pop  r2                                 \n\t"
         "pop  r1                                 \n\t"
 
-#if (CHECK_EIND_REG)
+#if __AVR_3_BYTE_PC__
         "pop    __tmp_reg__                      \n\t"
         "out    " XTSTR(__EIND__) ", __tmp_reg__ \n\t"
 #endif
 
-#if (CHECK_RAMPDXY_REG)
+#if __AVR_HAVE_RAMPD__
         "pop    __tmp_reg__                      \n\t"
         "out    __RAMPD__, __tmp_reg__           \n\t"
+#endif
+#if __AVR_HAVE_RAMPX__
         "pop    __tmp_reg__                      \n\t"
         "out    __RAMPX__, __tmp_reg__           \n\t"
+#endif
+#if __AVR_HAVE_RAMPY__
         "pop    __tmp_reg__                      \n\t"
         "out    __RAMPY__, __tmp_reg__           \n\t"
 #endif
 
-#if (CHECK_RAMPZ_REG)
+#if __AVR_HAVE_RAMPZ__
         "pop    __tmp_reg__                      \n\t"
         "out    __RAMPZ__, __tmp_reg__           \n\t"
 #endif

@@ -18,6 +18,8 @@
  */
 
 #include <string.h>
+
+#include "irq.h"
 #include "periph/pm.h"
 #include "riotboot/magic.h"
 

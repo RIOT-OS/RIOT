@@ -36,6 +36,7 @@
 static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 
 static char _stack[GNRC_SIXLOWPAN_STACK_SIZE + DEBUG_EXTRA_STACKSIZE];
+static msg_t _msg_q[GNRC_SIXLOWPAN_MSG_QUEUE_SIZE];
 
 /* handles GNRC_NETAPI_MSG_TYPE_RCV commands */
 static void _receive(gnrc_pktsnip_t *pkt);
@@ -119,8 +120,8 @@ void gnrc_sixlowpan_multiplex_by_size(gnrc_pktsnip_t *pkt,
     }
 #if defined(MODULE_GNRC_SIXLOWPAN_FRAG) || defined(MODULE_GNRC_SIXLOWPAN_FRAG_SFR)
     else if (orig_datagram_size <= SIXLOWPAN_FRAG_MAX_LEN) {
-        DEBUG("6lo: Send fragmented (%u > %u)\n",
-              (unsigned int)datagram_size, netif->sixlo.max_frag_size);
+        DEBUG("6lo: Send fragmented (%" PRIuSIZE " > %u)\n",
+              datagram_size, netif->sixlo.max_frag_size);
         gnrc_sixlowpan_frag_fb_t *fbuf;
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_SFR
         bool sfr = gnrc_sixlowpan_frag_sfr_netif(netif);
@@ -160,8 +161,8 @@ void gnrc_sixlowpan_multiplex_by_size(gnrc_pktsnip_t *pkt,
 #endif /* defined(MODULE_GNRC_SIXLOWPAN_FRAG) || defined(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) */
     else {
         (void)orig_datagram_size;
-        DEBUG("6lo: packet too big (%u > %u)\n",
-              (unsigned int)datagram_size, netif->sixlo.max_frag_size);
+        DEBUG("6lo: packet too big (%" PRIuSIZE " > %u)\n",
+              datagram_size, netif->sixlo.max_frag_size);
         gnrc_pktbuf_release_error(pkt, EMSGSIZE);
     }
 }
@@ -385,12 +386,12 @@ static void _continue_fragmenting(gnrc_sixlowpan_frag_fb_t *fbuf)
 
 static void *_event_loop(void *args)
 {
-    msg_t msg, reply, msg_q[GNRC_SIXLOWPAN_MSG_QUEUE_SIZE];
+    msg_t msg, reply;
     gnrc_netreg_entry_t me_reg = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
                                                             thread_getpid());
 
     (void)args;
-    msg_init_queue(msg_q, GNRC_SIXLOWPAN_MSG_QUEUE_SIZE);
+    msg_init_queue(_msg_q, GNRC_SIXLOWPAN_MSG_QUEUE_SIZE);
 
     /* register interest in all 6LoWPAN packets */
     gnrc_netreg_register(GNRC_NETTYPE_SIXLOWPAN, &me_reg);
@@ -443,7 +444,7 @@ static void *_event_loop(void *args)
                 break;
             case GNRC_SIXLOWPAN_FRAG_SFR_INTER_FRAG_GAP_MSG:
                 DEBUG("6lo sfr: sending next scheduled frame\n");
-                gnrc_sixlowpan_frag_sfr_inter_frame_gap();
+                gnrc_sixlowpan_frag_sfr_inter_frame_gap(msg.content.ptr);
                 break;
 #endif
 

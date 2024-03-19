@@ -1,0 +1,6 @@
+## This module is used when some module asking to have its code built
+# through rust_riotmodules. Whether that happens through actually enabling the
+# rust_riotmodules_standalone module or by the application's crate was decided
+# in ./Makefile.dep depending on whether a Rust application module is present
+# or not.
+PSEUDOMODULES += rust_riotmodules

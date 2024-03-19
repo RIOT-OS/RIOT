@@ -27,9 +27,10 @@ config MODULE_RN2XX3
     bool
     depends on HAS_PERIPH_GPIO
     depends on HAS_PERIPH_UART
+    select MODULE_FMT
+    select MODULE_NETDEV_LEGACY_API
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_UART
-    select MODULE_FMT
     select MODULE_ZTIMER
     select MODULE_ZTIMER_MSEC
 

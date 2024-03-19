@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Gerson Fernando Budke <nandojve@gmail.com>
+ * Copyright (C) 2021-2023 Gerson Fernando Budke <nandojve@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -23,6 +23,7 @@
 
 #include "cpu.h"
 #include "cpu_pm.h"
+#include "irq.h"
 #include "periph/i2c.h"
 #include "periph/gpio.h"
 #include "periph/pm.h"
@@ -104,7 +105,7 @@ void i2c_acquire(i2c_t i2c)
 {
     assert((unsigned)i2c < I2C_NUMOF);
     DEBUG("acquire\n");
-    pm_block(3);
+    pm_block(4); /* Require clkPer */
     mutex_lock(&i2c_ctx[i2c].locks);
     pm_periph_enable(i2c_config[i2c].pwr);
 
@@ -121,7 +122,7 @@ void i2c_release(i2c_t i2c)
     dev(i2c)->MASTER.CTRLA = 0;
     pm_periph_disable(i2c_config[i2c].pwr);
     mutex_unlock(&i2c_ctx[i2c].locks);
-    pm_unblock(3);
+    pm_unblock(4);
     DEBUG("release\n");
 }
 
@@ -241,8 +242,6 @@ static inline void isr_handler(int i2c)
 {
     assert((unsigned)i2c < I2C_NUMOF);
 
-    avr8_enter_isr();
-
     int8_t const m_status = dev(i2c)->MASTER.STATUS;
 
     if (m_status & TWI_MASTER_ARBLOST_bm) {
@@ -270,34 +269,20 @@ static inline void isr_handler(int i2c)
         i2c_ctx[i2c].status = -EPROTO;
         mutex_unlock(&i2c_ctx[i2c].xfer);
     }
-
-    avr8_exit_isr();
 }
 
 #ifdef I2C_0_ISR
-ISR(I2C_0_ISR, ISR_BLOCK)
-{
-    isr_handler(0);
-}
+AVR8_ISR(I2C_0_ISR, isr_handler, 0);
 #endif /* I2C_0_ISR */
 
 #ifdef I2C_1_ISR
-ISR(I2C_1_ISR, ISR_BLOCK)
-{
-    isr_handler(1);
-}
+AVR8_ISR(I2C_1_ISR, isr_handler, 1);
 #endif /* I2C_1_ISR */
 
 #ifdef I2C_2_ISR
-ISR(I2C_2_ISR, ISR_BLOCK)
-{
-    isr_handler(2);
-}
+AVR8_ISR(I2C_2_ISR, isr_handler, 2);
 #endif /* I2C_2_ISR */
 
 #ifdef I2C_3_ISR
-ISR(I2C_3_ISR, ISR_BLOCK)
-{
-    isr_handler(3);
-}
+AVR8_ISR(I2C_3_ISR, isr_handler, 3);
 #endif /* I2C_3_ISR */

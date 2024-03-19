@@ -63,6 +63,5 @@ config MODULE_AT24CXXX
     bool
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
-    select HAVE_MTD_AT24CXXX
     select MODULE_PERIPH_I2C
     select MODULE_XTIMER

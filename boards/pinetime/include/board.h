@@ -23,7 +23,6 @@
 
 #include "cpu.h"
 #include "board_common.h"
-#include "mtd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,7 +60,7 @@ extern "C" {
 #endif
 #define BACKLIGHT_ON                (NRF_P0->OUTCLR = BACKLIGHT_MASK)
 #define BACKLIGHT_OFF               (NRF_P0->OUTSET = BACKLIGHT_MASK)
-/** @ */
+/** @} */
 
 /**
  * @name LCD configuration
@@ -97,8 +96,7 @@ extern "C" {
  * @name MTD configuration
  * @{
  */
-extern mtd_dev_t *mtd0;
-#define MTD_0 mtd0
+#define MTD_0 mtd_dev_get(0)
 /** @} */
 
 /**

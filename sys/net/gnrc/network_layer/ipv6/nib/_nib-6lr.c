@@ -136,28 +136,26 @@ gnrc_pktsnip_t *_copy_and_handle_aro(gnrc_netif_t *netif,
                                      const ndp_opt_t *sl2ao)
 {
     gnrc_pktsnip_t *reply_aro = NULL;
+    assert(aro);
+    uint8_t status = _handle_aro(netif, ipv6, (icmpv6_hdr_t *)nbr_sol, aro,
+                                 sl2ao, NULL);
 
-    if (aro != NULL) {
-        uint8_t status = _handle_aro(netif, ipv6, (icmpv6_hdr_t *)nbr_sol, aro,
-                                     sl2ao, NULL);
-
-        if ((status != _ADDR_REG_STATUS_TENTATIVE) &&
-            (status != _ADDR_REG_STATUS_IGNORE)) {
-            reply_aro = gnrc_sixlowpan_nd_opt_ar_build(status,
-                                                       byteorder_ntohs(aro->ltime),
-                                                       (eui64_t *)&aro->eui64,
-                                                       NULL);
-            if (reply_aro == NULL) {
-                DEBUG("nib: No space left in packet buffer. Not replying NS");
-            }
+    if ((status != _ADDR_REG_STATUS_TENTATIVE) &&
+        (status != _ADDR_REG_STATUS_IGNORE)) {
+        reply_aro = gnrc_sixlowpan_nd_opt_ar_build(status,
+                                                   byteorder_ntohs(aro->ltime),
+                                                   (eui64_t *)&aro->eui64,
+                                                   NULL);
+        if (reply_aro == NULL) {
+            DEBUG("nib: No space left in packet buffer. Not replying NS");
         }
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_DAD)
-        else if (status != _ADDR_REG_STATUS_IGNORE) {
-            DEBUG("nib: Address was marked TENTATIVE => not replying NS, "
-                  "waiting for DAC\n");
-        }
-#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_DAD */
     }
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_DAD)
+    else if (status != _ADDR_REG_STATUS_IGNORE) {
+        DEBUG("nib: Address was marked TENTATIVE => not replying NS, "
+              "waiting for DAC\n");
+    }
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_DAD */
     return reply_aro;
 }
 #else  /* CONFIG_GNRC_IPV6_NIB_6LR */

@@ -23,6 +23,7 @@ config BOARD_LORA_E5_DEV
     select HAS_PERIPH_UART
 
     # Put other features for this board (in alphabetical order)
+    select HAS_ARDUINO_PINS
     select HAS_RIOTBOOT
 
     # Clock configuration
@@ -31,6 +32,9 @@ config BOARD_LORA_E5_DEV
 
     select HAVE_SAUL_GPIO
     select HAVE_LM75A
+
+config CLOCK_HSE
+    default 32000000
 
 config LORA_E5_DEV_ENABLE_3P3V
     bool "LoRa-E5 Development Kit - Enable 3.3V output"

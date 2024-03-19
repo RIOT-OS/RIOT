@@ -25,8 +25,6 @@
 #include "periph/gpio.h"
 #include "periph/spi.h"
 
-#include "mtd.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -100,14 +98,8 @@ extern "C" {
  * @name    MTD configuration
  */
 /** @{ */
-extern mtd_dev_t *mtd0;
-#define MTD_0 mtd0
+#define MTD_0 mtd_dev_get(0)
 /** @} */
-
-/**
- * @brief   Initialize the board (GPIO, sensors, clocks).
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

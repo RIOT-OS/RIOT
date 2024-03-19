@@ -34,8 +34,10 @@
 
 static void _end_of_tx(gnrc_lorawan_t *mac, int type, int status);
 
-static int gnrc_lorawan_mic_is_valid(uint8_t *buf, size_t len, uint8_t *nwkskey)
+static int gnrc_lorawan_mic_is_valid(uint8_t *buf, size_t len, uint8_t *key,
+                                     uint32_t fcnt_up, bool optneg)
 {
+    (void)fcnt_up;
     le_uint32_t calc_mic;
 
     lorawan_hdr_t *lw_hdr = (lorawan_hdr_t *)buf;
@@ -44,8 +46,25 @@ static int gnrc_lorawan_mic_is_valid(uint8_t *buf, size_t len, uint8_t *nwkskey)
     iolist_t iol =
     { .iol_base = buf, .iol_len = len - MIC_SIZE, .iol_next = NULL };
 
-    gnrc_lorawan_calculate_mic(&lw_hdr->addr, fcnt, GNRC_LORAWAN_DIR_DOWNLINK,
-                               &iol, nwkskey, &calc_mic);
+    /* for LoRaWAN 1.0 conf_fcnt is hardcoded to be 0 */
+    uint16_t conf_fnct = 0x00;
+
+    if (IS_USED(MODULE_GNRC_LORAWAN_1_1) && optneg) {
+        /**
+         * If the device is connected to a LoRaWAN 1.1 Network Server and the
+         * ACK bit of the downlink frame is set, meaning this frame is acknowledging
+         * an uplink “confirmed” frame,then ConfFCnt is the frame counter value
+         * modulo 2^16 of the “confirmed” uplink frame that is being acknowledged.
+         * In all other cases ConfFCnt = 0x0000.
+         */
+        if (lorawan_hdr_get_ack(lw_hdr)) {
+            conf_fnct = fcnt_up;
+        }
+    }
+
+    gnrc_lorawan_calculate_mic_downlink(&lw_hdr->addr, fcnt, conf_fnct, &iol,
+                                        key, &calc_mic);
+
     return calc_mic.u32 == ((le_uint32_t *)(buf + len - MIC_SIZE))->u32;
 }
 
@@ -91,17 +110,6 @@ int gnrc_lorawan_parse_dl(gnrc_lorawan_t *mac, uint8_t *buf, size_t len,
         return -1;
     }
 
-    uint32_t _fcnt =
-        gnrc_lorawan_fcnt_stol(mac->mcps.fcnt_down, _hdr->fcnt.u16);
-
-    if (mac->mcps.fcnt_down > _fcnt || mac->mcps.fcnt_down +
-        CONFIG_LORAMAC_DEFAULT_MAX_FCNT_GAP < _fcnt) {
-        DEBUG("gnrc_lorawan: wrong frame counter\n");
-        return -1;
-    }
-
-    pkt->fcnt_down = _fcnt;
-
     int fopts_length = lorawan_hdr_get_frame_opts_len(_hdr);
 
     if (fopts_length) {
@@ -129,6 +137,22 @@ int gnrc_lorawan_parse_dl(gnrc_lorawan_t *mac, uint8_t *buf, size_t len,
         }
     }
 
+    uint32_t _fcnt =
+        gnrc_lorawan_fcnt_stol(mac->mcps.fcnt_down, _hdr->fcnt.u16);
+
+    uint32_t fcnt_down = mac->mcps.fcnt_down;
+
+    if (IS_USED(MODULE_GNRC_LORAWAN_1_1) && pkt->port) {
+        fcnt_down = gnrc_lorawan_get_afcnt_down(mac);
+    }
+
+    if (fcnt_down > _fcnt || fcnt_down + CONFIG_LORAMAC_DEFAULT_MAX_FCNT_GAP < _fcnt) {
+        DEBUG("gnrc_lorawan: wrong frame counter\n");
+        return -1;
+    }
+
+    pkt->fcnt_down = _fcnt;
+
     pkt->ack_req = lorawan_hdr_get_mtype(_hdr) == MTYPE_CNF_DOWNLINK;
     pkt->ack = lorawan_hdr_get_ack(_hdr);
     pkt->frame_pending = lorawan_hdr_get_frame_pending(_hdr);
@@ -142,7 +166,8 @@ void gnrc_lorawan_mcps_process_downlink(gnrc_lorawan_t *mac, uint8_t *psdu,
     struct parsed_packet _pkt;
 
     /* NOTE: MIC is in pkt */
-    if (!gnrc_lorawan_mic_is_valid(psdu, size, mac->nwkskey)) {
+    if (!gnrc_lorawan_mic_is_valid(psdu, size, mac->ctx.snwksintkey,
+                                   mac->mcps.fcnt, gnrc_lorawan_optneg_is_set(mac))) {
         DEBUG("gnrc_lorawan: invalid MIC\n");
         gnrc_lorawan_event_no_rx(mac);
         return;
@@ -163,10 +188,10 @@ void gnrc_lorawan_mcps_process_downlink(gnrc_lorawan_t *mac, uint8_t *psdu,
     if (_pkt.enc_payload.iol_base) {
         uint8_t *key;
         if (_pkt.port) {
-            key = mac->appskey;
+            key = mac->ctx.appskey;
         }
         else {
-            key = mac->nwkskey;
+            key = mac->ctx.nwksenckey;
             fopts = &_pkt.enc_payload;
         }
         gnrc_lorawan_encrypt_payload(&_pkt.enc_payload, &_pkt.hdr->addr,
@@ -175,7 +200,17 @@ void gnrc_lorawan_mcps_process_downlink(gnrc_lorawan_t *mac, uint8_t *psdu,
                                      key);
     }
 
-    mac->mcps.fcnt_down = _pkt.fcnt_down;
+    if (IS_USED(MODULE_GNRC_LORAWAN_1_1) && _pkt.port) {
+        gnrc_lorawan_set_afcnt_down(mac, _pkt.fcnt_down);
+    }
+    else {
+        mac->mcps.fcnt_down = _pkt.fcnt_down;
+    }
+
+    if (IS_USED(MODULE_GNRC_LORAWAN_1_1)) {
+        gnrc_lorawan_set_last_fcnt_down(mac, _pkt.fcnt_down);
+    }
+
     if (mac->mcps.waiting_for_ack && !_pkt.ack) {
         DEBUG("gnrc_lorawan: expected ACK packet\n");
         gnrc_lorawan_event_no_rx(mac);
@@ -188,6 +223,22 @@ void gnrc_lorawan_mcps_process_downlink(gnrc_lorawan_t *mac, uint8_t *psdu,
 
     /* if there are fopts, it's either an empty packet or application payload */
     if (fopts) {
+        if (IS_USED(MODULE_GNRC_LORAWAN_1_1) && gnrc_lorawan_optneg_is_set(mac)) {
+            if (_pkt.port) {
+                gnrc_lorawan_encrypt_fopts(fopts->iol_base, fopts->iol_len,
+                                           &mac->dev_addr,
+                                           gnrc_lorawan_get_afcnt_down(mac), true,
+                                           GNRC_LORAWAN_DIR_DOWNLINK,
+                                           mac->ctx.nwksenckey);
+            }
+            else {
+                gnrc_lorawan_encrypt_fopts(fopts->iol_base, fopts->iol_len,
+                                           &mac->dev_addr,
+                                           mac->mcps.fcnt_down, false,
+                                           GNRC_LORAWAN_DIR_DOWNLINK,
+                                           mac->ctx.nwksenckey);
+            }
+        }
         DEBUG("gnrc_lorawan: processing fopts\n");
         gnrc_lorawan_process_fopts(mac, fopts->iol_base, fopts->iol_len);
     }
@@ -257,24 +308,32 @@ size_t gnrc_lorawan_build_uplink(gnrc_lorawan_t *mac, iolist_t *payload,
 
     buf.index += sizeof(lorawan_hdr_t);
 
-    int fopts_length = gnrc_lorawan_build_options(mac, &buf);
+    size_t fopts_length = gnrc_lorawan_build_options(mac, &buf);
 
     assert(fopts_length < 16);
     lorawan_hdr_set_frame_opts_len(lw_hdr, fopts_length);
 
     buf.data[buf.index++] = port;
 
+    uint8_t *key;
+
+    if (port) {
+        key = mac->ctx.appskey;
+    }
+    else {
+        key = mac->ctx.nwksenckey;
+    }
+
     gnrc_lorawan_encrypt_payload(payload, &mac->dev_addr, mac->mcps.fcnt,
-                                 GNRC_LORAWAN_DIR_UPLINK,
-                                 port ? mac->appskey : mac->nwkskey);
+                                 GNRC_LORAWAN_DIR_UPLINK, key);
 
-    iolist_t iol =
-    { .iol_base = buf.data, .iol_len = buf.index, .iol_next = payload };
+    if (IS_USED(MODULE_GNRC_LORAWAN_1_1) && gnrc_lorawan_optneg_is_set(mac)) {
+        key = mac->ctx.nwksenckey;
 
-    gnrc_lorawan_calculate_mic(&mac->dev_addr, mac->mcps.fcnt,
-                               GNRC_LORAWAN_DIR_UPLINK,
-                               &iol, mac->nwkskey,
-                               (le_uint32_t *)&buf.data[buf.index]);
+        gnrc_lorawan_encrypt_fopts(&buf.data[sizeof(lorawan_hdr_t)], fopts_length,
+                                   &mac->dev_addr, mac->mcps.fcnt, false,
+                                   GNRC_LORAWAN_DIR_UPLINK, key);
+    }
 
     return buf.index;
 }
@@ -321,8 +380,28 @@ static void _transmit_pkt(gnrc_lorawan_t *mac)
         last_snip = last_snip->iol_next;
     }
 
+    mac->last_chan_idx = gnrc_lorawan_pick_channel(mac);
+
+    uint16_t conf_fcnt = 0;
+
+    if (IS_USED(MODULE_GNRC_LORAWAN_1_1)) {
+        /**
+         * If the ACK bit of the uplink frame is set, meaning this frame is
+         * acknowledging a downlink “confirmed” frame, then ConfFCnt is the frame
+         * counter value modulo 2^16 of the “confirmed” downlink frame that is being
+         * acknowledged. In all other cases ConfFCnt = 0x0000
+         */
+        lorawan_hdr_t *lw_hdr = (lorawan_hdr_t *)header.iol_base;
+        if (lorawan_hdr_get_ack(lw_hdr)) {
+            conf_fcnt = gnrc_lorawan_get_last_fcnt_down(mac);
+        }
+    }
+
+    gnrc_lorawan_calculate_mic_uplink(&header, conf_fcnt, mac, footer.iol_base);
+
     last_snip->iol_next = &footer;
-    gnrc_lorawan_send_pkt(mac, &header, mac->last_dr);
+    gnrc_lorawan_send_pkt(mac, &header, mac->last_dr,
+                          mac->channel[mac->last_chan_idx]);
 
     /* cppcheck-suppress redundantAssignment
      * (reason: cppcheck bug. The pointer is temporally modified to add a footer.

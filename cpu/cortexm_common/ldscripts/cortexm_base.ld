@@ -132,6 +132,10 @@ SECTIONS
     } > rom
     __tls_size = __tbss_end - __tdata_start;
     __tbss_size = __tls_size - __tdata_size;
+    PROVIDE( __tbss_offset = ADDR(.tbss) - ADDR(.tdata) );
+    PROVIDE( __tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)) );
+    PROVIDE( __arm32_tls_tcb_offset = MAX(8, __tls_align) );
+    PROVIDE( __arm64_tls_tcb_offset = MAX(16, __tls_align) );
 
     /* .ARM.exidx is sorted, so has to go in its own output section.  */
     PROVIDE_HIDDEN (__exidx_start = .);
@@ -232,6 +236,10 @@ SECTIONS
         _sheap1 = . ;
         _eheap1 = ORIGIN(bkup_ram) + LENGTH(bkup_ram);
     } > bkup_ram
+
+    .flash_writable (NOLOAD) : {
+        KEEP(*(SORT(.flash_writable.*)))
+    } > rom
 
     .end_fw (NOLOAD) : ALIGN(4) {
         _end_fw = . ;

@@ -27,13 +27,13 @@
 
 #define NETIF_ATWINC_NUMOF ARRAY_SIZE(atwinc15x0_params)
 
-static struct netif netif[NETIF_ATWINC_NUMOF];
+static lwip_netif_t netif[NETIF_ATWINC_NUMOF];
 static atwinc15x0_t atwinc15x0_devs[NETIF_ATWINC_NUMOF];
 
 static void auto_init_atwinc15x0(void)
 {
     for (unsigned i = 0; i < NETIF_ATWINC_NUMOF; i++) {
-        atwinc15x0_setup(&atwinc15x0_devs[i], &atwinc15x0_params[i]);
+        atwinc15x0_setup(&atwinc15x0_devs[i], &atwinc15x0_params[i], i);
         if (lwip_add_ethernet(&netif[i], &atwinc15x0_devs[i].netdev) == NULL) {
             DEBUG("Could not add atwinc15x0 device\n");
             return;

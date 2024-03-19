@@ -12,8 +12,8 @@ FEATURES_PROVIDED += puf_sram
 FEATURES_PROVIDED += picolibc
 FEATURES_PROVIDED += ssp
 
-# cortex-m4f and cortex-m7 provide FPU support
-ifneq (,$(filter $(CPU_CORE),cortex-m4f cortex-m7))
+# cortex-m33, cortex-m4f and cortex-m7 provide FPU support
+ifneq (,$(filter $(CPU_CORE),cortex-m33 cortex-m4f cortex-m7))
   FEATURES_PROVIDED += cortexm_fpu
 endif
 

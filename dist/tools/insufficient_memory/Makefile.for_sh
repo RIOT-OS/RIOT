@@ -6,7 +6,8 @@ define create_Makefile.ci
 	@echo "    #" >> $(1)
 endef
 
-BOARD_INSUFFICIENT_MEMORY += $(BOARD)
+BOARD_INSUFFICIENT_MEMORY += $(ADD_BOARDS)
+BOARD_INSUFFICIENT_MEMORY := $(filter-out $(REMOVE_BOARDS),$(BOARD_INSUFFICIENT_MEMORY))
 
 .PHONY: Makefile.ci
 ifeq ($(BOARD_INSUFFICIENT_MEMORY),)

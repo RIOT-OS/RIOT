@@ -131,7 +131,7 @@ size_t dns_msg_compose_query(void *dns_buf, const char *domain_name,
 }
 
 int dns_msg_parse_reply(const uint8_t *buf, size_t len, int family,
-                        void *addr_out)
+                        void *addr_out, uint32_t *ttl)
 {
     const uint8_t *buflim = buf + len;
     const dns_hdr_t *hdr = (dns_hdr_t *)buf;
@@ -162,7 +162,10 @@ int dns_msg_parse_reply(const uint8_t *buf, size_t len, int family,
         bufpos += RR_TYPE_LENGTH;
         uint16_t class = ntohs(_get_short(bufpos));
         bufpos += RR_CLASS_LENGTH;
-        bufpos += RR_TTL_LENGTH; /* skip ttl */
+        if (ttl) {
+            *ttl = byteorder_bebuftohl(bufpos);
+        }
+        bufpos += RR_TTL_LENGTH;
 
         unsigned addrlen = ntohs(_get_short(bufpos));
         /* skip unwanted answers */

@@ -30,7 +30,7 @@ readlink () { echo $(cd $(dirname $1); pwd)/$(basename $1); }
 
 XML_INSTRUCTIONS='
 <!--
-Instrucions:
+Instructions:
 
 In Eclipse:
 1. Open the project properties, menu Project->Properties

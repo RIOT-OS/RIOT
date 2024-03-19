@@ -46,6 +46,7 @@ define board_unsatisfied_features
   undefine CPU_CORE
   undefine CPU_FAM
   undefine RUST_TARGET
+  undefine BOARD_VERSION
 
   include $(RIOTBASE)/Makefile.features
   # always select provided architecture features
@@ -64,7 +65,7 @@ define board_unsatisfied_features
     BOARDS_WITH_MISSING_FEATURES += $$(BOARD)
   else
     # add default modules
-    include $(RIOTMAKE)/defaultmodules.inc.mk
+    include $(RIOTMAKE)/defaultmodules_regular.inc.mk
     USEMODULE += $$(filter-out $$(DISABLE_MODULE),$$(DEFAULT_MODULE))
 
     include $(RIOTMAKE)/dependency_resolution.inc.mk
@@ -148,8 +149,9 @@ info-boards-features-blacklisted:
 info-boards-features-conflicting:
 	@for f in $(BOARDS_FEATURES_CONFLICTING); do echo $${f}; done | column -t
 
-create-Makefile.ci:
-	@$(RIOTTOOLS)/insufficient_memory/create_makefile.ci.sh --no-docker
+generate-Makefile.ci:
+	@$(RIOTTOOLS)/insufficient_memory/create_makefile.ci.sh
+
 
 # Reset BOARDSDIR so unchanged for makefiles included after, for now only
 # needed for buildtests.inc.mk

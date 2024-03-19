@@ -387,7 +387,7 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint32_t OVR9:1;           /*!< bit:      9  Channel 9 Overrun                  */
     __I uint32_t OVR10:1;          /*!< bit:     10  Channel 10 Overrun                 */
     __I uint32_t OVR11:1;          /*!< bit:     11  Channel 11 Overrun                 */
-    __I uint32_t :4;               /*!< bit: 12..15  Reserved                           */
+    uint32_t :4;                   /*!< bit: 12..15  Reserved                           */
     __I uint32_t EVD0:1;           /*!< bit:     16  Channel 0 Event Detection          */
     __I uint32_t EVD1:1;           /*!< bit:     17  Channel 1 Event Detection          */
     __I uint32_t EVD2:1;           /*!< bit:     18  Channel 2 Event Detection          */
@@ -400,13 +400,13 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint32_t EVD9:1;           /*!< bit:     25  Channel 9 Event Detection          */
     __I uint32_t EVD10:1;          /*!< bit:     26  Channel 10 Event Detection         */
     __I uint32_t EVD11:1;          /*!< bit:     27  Channel 11 Event Detection         */
-    __I uint32_t :4;               /*!< bit: 28..31  Reserved                           */
+    uint32_t :4;                   /*!< bit: 28..31  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   struct {
     __I uint32_t OVR:12;           /*!< bit:  0..11  Channel x Overrun                  */
-    __I uint32_t :4;               /*!< bit: 12..15  Reserved                           */
+    uint32_t :4;                   /*!< bit: 12..15  Reserved                           */
     __I uint32_t EVD:12;           /*!< bit: 16..27  Channel x Event Detection          */
-    __I uint32_t :4;               /*!< bit: 28..31  Reserved                           */
+    uint32_t :4;                   /*!< bit: 28..31  Reserved                           */
   } vec;                       /*!< Structure used for vec  access                  */
   uint32_t reg;                /*!< Type      used for register access              */
 } EVSYS_INTFLAG_Type;

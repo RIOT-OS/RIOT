@@ -150,9 +150,9 @@ static const tc32_conf_t timer_config[] = {
 
 static const adc_conf_chan_t adc_channels[] = {
     /* port, pin, muxpos */
-    {GPIO_PIN(PA, 6), ADC_INPUTCTRL_MUXPOS_PIN6},
-    {GPIO_PIN(PA, 7), ADC_INPUTCTRL_MUXPOS_PIN7},
-    {GPIO_PIN(PA, 8), ADC_INPUTCTRL_MUXPOS_PIN16},
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA06 },
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA07 },
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA08 },
 };
 
 #define ADC_NUMOF                           ARRAY_SIZE(adc_channels)
@@ -238,6 +238,7 @@ static const i2c_conf_t i2c_config[] = {
      }
 };
 #define I2C_NUMOF          ARRAY_SIZE(i2c_config)
+/** @} */
 
 /**
  * @name Random Number Generator configuration

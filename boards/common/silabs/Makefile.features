@@ -1,6 +1,7 @@
 CPU = efm32
 
 # Various other features (if any)
-FEATURES_PROVIDED += arduino
+FEATURES_PROVIDED += arduino_analog
+FEATURES_PROVIDED += arduino_pins
 FEATURES_PROVIDED += efm32_coretemp
 FEATURES_PROVIDED += riotboot

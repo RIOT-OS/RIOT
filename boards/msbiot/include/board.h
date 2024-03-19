@@ -48,26 +48,14 @@ extern "C" {
  * @name    LED pin definitions and handlers
  * @{
  */
-#define LED0_PIN            GPIO_PIN(PORT_B, 8)     /**< Pin of red LED */
-#define LED1_PIN            GPIO_PIN(PORT_B, 14)    /**< Pin of yellow LED */
-#define LED2_PIN            GPIO_PIN(PORT_B, 15)    /**< Pin of green LED */
+#define LED0_PIN_NUM        8       /**< Pin number of red LED */
+#define LED0_PORT_NUM       PORT_B  /**< Port number of red LED */
 
-#define LED_PORT            GPIOB       /**< GPIO port LEDs are connected to */
-#define LED0_MASK           (1 << 8)    /**< Bitmask to address red LED in @ref LED_PORT */
-#define LED1_MASK           (1 << 14)   /**< Bitmask to address yellow LED in @ref LED_PORT */
-#define LED2_MASK           (1 << 15)   /**< Bitmask to address green LED in @ref LED_PORT */
+#define LED1_PIN_NUM        14      /**< Pin number of yellow LED */
+#define LED1_PORT_NUM       PORT_B  /**< Port number of yellow LED */
 
-#define LED0_ON             (LED_PORT->BSRR = LED0_MASK)            /**< Turn red LED on */
-#define LED0_OFF            (LED_PORT->BSRR = (LED0_MASK << 16))    /**< Turn red LED off */
-#define LED0_TOGGLE         (LED_PORT->ODR  ^= LED0_MASK)           /**< Toggle red LED */
-
-#define LED1_ON             (LED_PORT->BSRR = LED1_MASK)            /**< Turn yellow LED on */
-#define LED1_OFF            (LED_PORT->BSRR = (LED1_MASK << 16))    /**< Turn yellow LED off */
-#define LED1_TOGGLE         (LED_PORT->ODR  ^= LED1_MASK)           /**< Toggle yellow LED */
-
-#define LED2_ON             (LED_PORT->BSRR = LED2_MASK)            /**< Turn green LED on */
-#define LED2_OFF            (LED_PORT->BSRR = (LED2_MASK << 16))    /**< Turn green LED off */
-#define LED2_TOGGLE         (LED_PORT->ODR  ^= LED2_MASK)           /**< Toggle green LED */
+#define LED2_PIN_NUM        15      /**< Pin number of green LED */
+#define LED2_PORT_NUM       PORT_B  /**< Port number of green LED */
 /** @} */
 
 /**
@@ -78,14 +66,11 @@ extern "C" {
 #define BUTTON1_PIN         GPIO_PIN(PORT_A, 0)     /**< Pin of right button */
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif
+
+#include "stm32_leds.h"
 
 #endif /* BOARD_H */
 /** @} */

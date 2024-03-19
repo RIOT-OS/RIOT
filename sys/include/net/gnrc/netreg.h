@@ -213,6 +213,44 @@ typedef struct gnrc_netreg_entry {
 } gnrc_netreg_entry_t;
 
 /**
+ * @brief   The global locking of netregs
+ *
+ * A shared lock must be held across calls to @ref gnrc_netreg_lookup, and
+ * references obtained through that may only be used for the duration for which
+ * the lock is held.
+ *
+ * The shared lock is counting (i.e. multiple sections of code can acquire it
+ * concurrently), and may be held across blocking operations, as long as they
+ * don't involve the exclusive lock (e.g. by blocking on a socket creation).
+ * It's generally good practice to release them as soon as possible.
+ *
+ * There is an exclusive counterpart to the lock, which is
+ * internal to netreg (and used through functions such as @ref
+ * gnrc_netreg_register and @ref gnrc_netreg_unregister). The current
+ * implementation prioritizes shared locks. This means that shared locks are
+ * generally acquired fast (they only block if an exclusive operation has
+ * already started), but constant access through shared locks might starve
+ * registration and deregistration.
+ *
+ * @{
+ */
+
+/** @brief Acquire a shared lock on the GNRC netreg
+ *
+ * This needs to be held around all calls to @ref gnrc_netreg_lookup, and for
+ * as long as any of its results are used. After that, call @ref
+ * gnrc_netreg_release_shared.
+ */
+void gnrc_netreg_acquire_shared(void);
+/** @brief Release a shared lock on the GNRC netreg
+ *
+ * @pre @ref gnrc_netreg_acquire_shared was called
+ */
+void gnrc_netreg_release_shared(void);
+
+/** @} */
+
+/**
  * @brief   Initializes module.
  */
 void gnrc_netreg_init(void);
@@ -326,6 +364,10 @@ void gnrc_netreg_unregister(gnrc_nettype_t type, gnrc_netreg_entry_t *entry);
  * @brief   Searches for entries with given parameters in the registry and
  *          returns the first found.
  *
+ * @pre The caller must hold the lock of @ref gnrc_netreg_acquire_shared from
+ *      before calling this function, and must stop using any obtained pointers
+ *      before releasing the lock through @ref gnrc_netreg_release_shared.
+ *
  * @param[in] type      Type of the protocol.
  * @param[in] demux_ctx The demultiplexing context for the registered thread.
  *                      See gnrc_netreg_entry_t::demux_ctx.
@@ -345,6 +387,13 @@ gnrc_netreg_entry_t *gnrc_netreg_lookup(gnrc_nettype_t type, uint32_t demux_ctx)
  *
  * @return  Number of entries with the same gnrc_netreg_entry_t::type and
  *          gnrc_netreg_entry_t::demux_ctx as the given parameters.
+ *
+ * Note that this returns a snapshot value, which may change at any time after
+ * that call. This is fine for most applications, as they just shortcut a code
+ * path if the number is zero. Callers that need that number to stay constant
+ * can acquire a shared lock through @ref gnrc_netreg_acquire_shared, and rely
+ * on the number staying constant until that lock is released through @ref
+ * gnrc_netreg_release_shared.
  */
 int gnrc_netreg_num(gnrc_nettype_t type, uint32_t demux_ctx);
 
@@ -352,6 +401,11 @@ int gnrc_netreg_num(gnrc_nettype_t type, uint32_t demux_ctx);
  * @brief   Returns the next entry after @p entry with the same
  *          gnrc_netreg_entry_t::type and gnrc_netreg_entry_t::demux_ctx as the
  *          given entry.
+ *
+ * The requirement on holding the global lock through @ref
+ * gnrc_netreg_acquire_shared from @ref gnrc_netreg_lookup extends to any
+ * results of this function: It may only be released when none of the pointers
+ * are used any more.
  *
  * @param[in] entry     A registry entry retrieved by gnrc_netreg_lookup() or
  *                      gnrc_netreg_getnext(). Must not be NULL.

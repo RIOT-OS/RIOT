@@ -1,0 +1,37 @@
+From e6e2d9184130fbf3f3403723b0f292fe1bb239f7 Mon Sep 17 00:00:00 2001
+From: chrysn <chrysn@fsfe.org>
+Date: Sat, 20 Aug 2022 16:44:15 +0200
+Subject: [PATCH] ccnl_content_remove: Fix use-after-free
+
+---
+ src/ccnl-core/src/ccnl-relay.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/src/ccnl-core/src/ccnl-relay.c b/src/ccnl-core/src/ccnl-relay.c
+index 57a11800..05e19903 100644
+--- a/src/ccnl-core/src/ccnl-relay.c
++++ b/src/ccnl-core/src/ccnl-relay.c
+@@ -533,6 +533,10 @@ ccnl_content_remove(struct ccnl_relay_s *ccnl, struct ccnl_content_s *c)
+     c2 = c->next;
+     DBL_LINKED_LIST_REMOVE(ccnl->contents, c);
+ 
++#ifdef CCNL_RIOT
++    evtimer_del((evtimer_t *)(&ccnl_evtimer), (evtimer_event_t *)&c->evtmsg_cstimeout);
++#endif
++
+ //    free_content(c);
+     if (c->pkt) {
+         ccnl_prefix_free(c->pkt->pfx);
+@@ -543,9 +547,6 @@ ccnl_content_remove(struct ccnl_relay_s *ccnl, struct ccnl_content_s *c)
+     ccnl_free(c);
+ 
+     ccnl->contentcnt--;
+-#ifdef CCNL_RIOT
+-    evtimer_del((evtimer_t *)(&ccnl_evtimer), (evtimer_event_t *)&c->evtmsg_cstimeout);
+-#endif
+     return c2;
+ }
+ 
+-- 
+2.36.1
+

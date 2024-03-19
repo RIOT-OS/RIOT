@@ -50,12 +50,12 @@ static mutex_t _devfs_mutex = MUTEX_INIT;
 
 /* File operations */
 /* open is overloaded to allow searching for the correct device */
-static int devfs_open(vfs_file_t *filp, const char *name, int flags, mode_t mode, const char *abs_path);
+static int devfs_open(vfs_file_t *filp, const char *name, int flags, mode_t mode);
 /* A minimal fcntl is also provided to enable SETFL handling */
 static int devfs_fcntl(vfs_file_t *filp, int cmd, int arg);
 
 /* Directory operations */
-static int devfs_opendir(vfs_DIR *dirp, const char *dirname, const char *abs_path);
+static int devfs_opendir(vfs_DIR *dirp, const char *dirname);
 static int devfs_readdir(vfs_DIR *dirp, vfs_dirent_t *entry);
 static int devfs_closedir(vfs_DIR *dirp);
 
@@ -75,9 +75,9 @@ const vfs_file_system_t devfs_file_system = {
     .d_op = &devfs_dir_ops,
 };
 
-static int devfs_open(vfs_file_t *filp, const char *name, int flags, mode_t mode, const char *abs_path)
+static int devfs_open(vfs_file_t *filp, const char *name, int flags, mode_t mode)
 {
-    DEBUG("devfs_open: %p, \"%s\", 0x%x, 0%03lo, \"%s\"\n", (void *)filp, name, flags, (unsigned long)mode, abs_path);
+    DEBUG("devfs_open: %p, \"%s\", 0x%x, 0%03lo\n", (void *)filp, name, flags, (unsigned long)mode);
     /* linear search through the device list */
     mutex_lock(&_devfs_mutex);
     clist_node_t *it = _devfs_list.next;
@@ -98,7 +98,7 @@ static int devfs_open(vfs_file_t *filp, const char *name, int flags, mode_t mode
             filp->f_op = devp->f_op;
             /* Chain the open() method for the specific device */
             if (filp->f_op->open != NULL) {
-                return filp->f_op->open(filp, name, flags, mode, abs_path);
+                return filp->f_op->open(filp, name, flags, mode);
             }
             return 0;
         }
@@ -122,10 +122,9 @@ static int devfs_fcntl(vfs_file_t *filp, int cmd, int arg)
     }
 }
 
-static int devfs_opendir(vfs_DIR *dirp, const char *dirname, const char *abs_path)
+static int devfs_opendir(vfs_DIR *dirp, const char *dirname)
 {
-    (void) abs_path;
-    DEBUG("devfs_opendir: %p, \"%s\", \"%s\"\n", (void *)dirp, dirname, abs_path);
+    DEBUG("devfs_opendir: %p, \"%s\"\n", (void *)dirp, dirname);
     if (strncmp(dirname, "/", 2) != 0) {
         /* We keep it simple and only support a flat file system, only a root directory */
         return -ENOENT;

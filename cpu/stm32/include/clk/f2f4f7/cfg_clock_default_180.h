@@ -37,44 +37,44 @@ extern "C" {
    decreased to 168MHZ so the PLLQ can output 48MHz.
    */
 #ifndef CONFIG_CLOCK_PLL_M
-#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(12))
+#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CONFIG_CLOCK_HSE == MHZ(12))
 #define CONFIG_CLOCK_PLL_M              (12)
-#elif IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(16))
+#elif IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CONFIG_CLOCK_HSE == MHZ(16))
 #define CONFIG_CLOCK_PLL_M              (16)
 #else
 #define CONFIG_CLOCK_PLL_M              (4)
 #endif
 #endif
 #ifndef CONFIG_CLOCK_PLL_N
-#if IS_USED(MODULE_PERIPH_USBDEV) && \
+#if (IS_USED(MODULE_PERIPH_USBDEV_CLK) || IS_USED(MODULE_PERIPH_SDMMC_CLK)) && \
     (defined(CPU_LINE_STM32F405xx) || defined(CPU_LINE_STM32F407xx) || \
      defined(CPU_LINE_STM32F415xx) || defined(CPU_LINE_STM32F417xx) || \
      defined(CPU_LINE_STM32F427xx) || defined(CPU_LINE_STM32F429xx) || \
      defined(CPU_LINE_STM32F437xx) || defined(CPU_LINE_STM32F439xx))
-#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(8))
+#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CONFIG_CLOCK_HSE == MHZ(8))
 #define CONFIG_CLOCK_PLL_N              (168)
-#elif IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(12) || \
-    (CLOCK_HSE == MHZ(16)))
+#elif IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CONFIG_CLOCK_HSE == MHZ(12) || \
+    (CONFIG_CLOCK_HSE == MHZ(16)))
 #define CONFIG_CLOCK_PLL_N              (336)
 #else
 #define CONFIG_CLOCK_PLL_N              (84)
 #endif
 #else
-#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(8))
+#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CONFIG_CLOCK_HSE == MHZ(8))
 #define CONFIG_CLOCK_PLL_N              (180)
-#elif IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(12) || \
-    (CLOCK_HSE == MHZ(16)))
+#elif IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CONFIG_CLOCK_HSE == MHZ(12) || \
+    (CONFIG_CLOCK_HSE == MHZ(16)))
 #define CONFIG_CLOCK_PLL_N              (360)
 #else
 #define CONFIG_CLOCK_PLL_N              (90)
 #endif
-#endif /* MODULE_PERIPH_USBDEV */
+#endif /* MODULE_PERIPH_USBDEV_CLK || MODULE_PERIPH_SDMMC_CLK */
 #endif
 #ifndef CONFIG_CLOCK_PLL_P
 #define CONFIG_CLOCK_PLL_P              (2)
 #endif
 #ifndef CONFIG_CLOCK_PLL_Q
-#if IS_USED(MODULE_PERIPH_USBDEV) && \
+#if (IS_USED(MODULE_PERIPH_USBDEV_CLK) || IS_USED(MODULE_PERIPH_SDMMC_CLK)) && \
     (defined(CPU_LINE_STM32F405xx) || defined(CPU_LINE_STM32F407xx) || \
      defined(CPU_LINE_STM32F415xx) || defined(CPU_LINE_STM32F417xx) || \
      defined(CPU_LINE_STM32F427xx) || defined(CPU_LINE_STM32F429xx) || \

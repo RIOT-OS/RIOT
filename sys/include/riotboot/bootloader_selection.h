@@ -58,14 +58,12 @@ extern "C" {
 
 /** @brief Interpretation of @ref BTN_BOOTLOADER_PIN.
  *
- * Set to true for active-low buttons (go to DFU if the pin is low), otherwise
- * to false (go to DFU if the pin is high).
- *
- * The default value for all boards is inverted (active-low).
- *
- * */
-#ifndef BTN_BOOTLOADER_INVERTED
-#define BTN_BOOTLOADER_INVERTED true
+ * This value should be set to true if the button has an *external* pull-up and
+ * thus, works as an active-low button.
+ * If the button has an internal pull-up, the default value should remains false
+ */
+#ifndef BTN_BOOTLOADER_EXT_PULLUP
+#define BTN_BOOTLOADER_EXT_PULLUP false
 #endif
 
 /** @brief LED pin for bootloader indication

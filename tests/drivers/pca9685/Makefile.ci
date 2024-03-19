@@ -1,0 +1,5 @@
+BOARD_INSUFFICIENT_MEMORY := \
+    atmega328p \
+    atmega32u4 \
+    atmega8 \
+    #

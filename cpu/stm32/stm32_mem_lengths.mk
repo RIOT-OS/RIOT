@@ -159,11 +159,13 @@ ifeq ($(STM32_TYPE), F)
       RAM_LEN = 32K
     else ifneq (, $(filter $(STM32_MODEL), 411 446))
       RAM_LEN = 128K
-    else ifneq (, $(filter $(STM32_MODEL), 412 427 429 437 439))
+    else ifneq (, $(filter $(STM32_MODEL), 412))
       RAM_LEN = 256K
     else ifneq (, $(filter $(STM32_MODEL), 413 423))
       RAM_LEN = 320K
     else ifneq (, $(filter $(STM32_MODEL), 415 417))
+      RAM_LEN = 192K
+    else ifneq (, $(filter $(STM32_MODEL), 427 429 437 439))
       RAM_LEN = 192K
     else ifneq (, $(filter $(STM32_MODEL), 469 479))
       RAM_LEN = 384K
@@ -188,7 +190,9 @@ ifeq ($(STM32_TYPE), F)
   endif
 else ifeq ($(STM32_TYPE), G)
   ifeq ($(STM32_FAMILY), 0)
-    ifneq (, $(filter $(STM32_MODEL2), 7))
+    ifneq (, $(filter $(STM32_MODEL2), B))
+      RAM_LEN = 144K
+    else ifneq (, $(filter $(STM32_MODEL2), 7))
       RAM_LEN = 36K
     else ifneq (, $(filter $(STM32_MODEL2), 3))
       RAM_LEN = 8K
@@ -314,6 +318,22 @@ else ifeq ($(STM32_TYPE), MP)
       RAM_LEN = 384K
     endif
   endif
+else ifeq ($(STM32_TYPE), C)
+  ifeq ($(STM32_FAMILY), 0)
+    ifneq (, $(filter $(STM32_MODEL2), 1))
+      RAM_LEN = 6K
+    else ifneq (, $(filter $(STM32_MODEL2), 7))
+      ifeq ($(STM32_ROMSIZE), 8)
+        RAM_LEN = 12K
+      else ifeq ($(STM32_ROMSIZE), B)
+        RAM_LEN = 24K
+      endif
+    else ifneq (, $(filter $(STM32_MODEL2), 9))
+      RAM_LEN = 36K
+    else ifneq (, $(filter $(STM32_MODEL2), 3))
+      RAM_LEN = 12K
+    endif
+  endif
 endif
 
 ifeq ($(RAM_LEN), )
@@ -410,6 +430,10 @@ else ifeq ($(STM32_PINCOUNT), Z)
   STM32_PIN = 144
 else ifeq ($(STM32_PINCOUNT), AC)
   STM32_PIN = 361
+else ifeq ($(STM32_PINCOUNT), J)
+  STM32_PIN = 8
+else ifeq ($(STM32_PINCOUNT), D)
+  STM32_PIN = 12
 endif
 
 # Set the common memory addresses for stm32 MCU family

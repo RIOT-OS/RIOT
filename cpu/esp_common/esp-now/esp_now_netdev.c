@@ -28,14 +28,18 @@
 
 #include "esp_common.h"
 #include "esp_attr.h"
+#ifdef CPU_ESP8266
 #include "esp_event_loop.h"
+#else
+#include "esp_event.h"
+#endif
 #include "esp_now.h"
 #include "esp_system.h"
 #include "esp_wifi.h"
 #include "irq_arch.h"
 #include "od.h"
 
-#include "nvs_flash/include/nvs_flash.h"
+#include "nvs_flash.h"
 
 #include "esp_now_params.h"
 #include "esp_now_netdev.h"
@@ -75,7 +79,7 @@ static bool _esp_now_add_peer(const uint8_t* bssid, uint8_t channel, const uint8
 
     memcpy(peer.peer_addr, bssid, ESP_NOW_ETH_ALEN);
     peer.channel = channel;
-    peer.ifidx = ESP_IF_WIFI_AP;
+    peer.ifidx = WIFI_IF_AP;
 
     if (esp_now_params.key) {
         peer.encrypt = true;
@@ -310,11 +314,11 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     /* set the event handler */
     esp_system_event_add_handler(_esp_system_event_handler, NULL);
 
-#ifdef MCU_ESP32
+#ifdef CPU_ESP32
     /* init the WiFi driver */
     extern portMUX_TYPE g_intr_lock_mux;
     mutex_init(&g_intr_lock_mux);
-#endif /* MCU_ESP32 */
+#endif /* CPU_ESP32 */
 
     esp_err_t result;
 
@@ -387,13 +391,13 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     }
 
     /* set the Station and SoftAP configuration */
-    result = esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config_sta);
+    result = esp_wifi_set_config(WIFI_IF_STA, &wifi_config_sta);
     if (result != ESP_OK) {
         LOG_TAG_ERROR("esp_now", "esp_wifi_set_config station failed with "
                       "return value %d\n", result);
         return NULL;
     }
-    result = esp_wifi_set_config(ESP_IF_WIFI_AP, &wifi_config_ap);
+    result = esp_wifi_set_config(WIFI_IF_AP, &wifi_config_ap);
     if (result != ESP_OK) {
         LOG_TAG_ERROR("esp_now",
                       "esp_wifi_set_config softap failed with return value %d\n",
@@ -412,7 +416,7 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
 
 #if !ESP_NOW_UNICAST
     /* all ESP-NOW nodes get the shared mac address on their station interface */
-    esp_wifi_set_mac(ESP_IF_WIFI_STA, (uint8_t*)_esp_now_mac);
+    esp_wifi_set_mac(WIFI_IF_STA, (uint8_t*)_esp_now_mac);
 #endif
 
 #endif /* MODULE_ESP_WIFI */
@@ -467,7 +471,7 @@ int esp_now_set_channel(uint8_t channel)
     /* channel is controlled by `esp_now`, try to reconfigure SoftAP */
     uint8_t old_channel = wifi_config_ap.ap.channel;
     wifi_config_ap.ap.channel = channel;
-    esp_err_t result = esp_wifi_set_config(ESP_IF_WIFI_AP, &wifi_config_ap);
+    esp_err_t result = esp_wifi_set_config(WIFI_IF_AP, &wifi_config_ap);
     if (result != ESP_OK) {
         LOG_TAG_ERROR("esp_now",
                       "esp_wifi_set_config softap failed with return value %d\n",
@@ -482,6 +486,9 @@ int esp_now_set_channel(uint8_t channel)
 static int _init(netdev_t *netdev)
 {
     DEBUG("%s: %p\n", __func__, netdev);
+
+    /* signal link UP */
+    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
 
     return 0;
 }

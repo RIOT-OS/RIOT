@@ -29,6 +29,15 @@ extern "C" {
 #endif
 
 /**
+ * @brief ATCA device type on SAML11 XPro boards
+ * @{
+ */
+#ifdef BOARD_SAML11_XPRO
+#define ATCA_DEVTYPE    (ATECC508A)
+#endif
+/** @} */
+
+/**
  * @name    PORT selection macros
  * @{
  */
@@ -57,7 +66,6 @@ extern "C" {
  * @name SW0 (Button) pin definitions
  * @{
  */
-#define BTN0_PORT           _PORT->Group[PA]
 #define BTN0_PIN            GPIO_PIN(PA, 27)
 #define BTN0_MODE           GPIO_IN_PU
 /** @} */
@@ -68,11 +76,6 @@ extern "C" {
  */
 #define XTIMER_BACKOFF      (40)
 /** @} */
-
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

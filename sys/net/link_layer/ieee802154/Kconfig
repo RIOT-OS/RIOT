@@ -19,7 +19,7 @@ config MODULE_IEEE802154_SECURITY
 
 config MODULE_IEEE802154_SUBMAC
     bool "IEEE 802.15.4 submac"
-    select MODULE_XTIMER
+    select ZTIMER_USEC
     help
         This module defines a common layer for handling the lower part of the IEEE 802.15.4 MAC layer.
 
@@ -103,9 +103,78 @@ if KCONFIG_USEMODULE_IEEE802154
     config IEEE802154_DEFAULT_CSMA_CA_MAX
         int "IEEE802.15.4 default CSMA-CA maximum backoff exponent"
         default 5
+
+    config IEEE802154_DEFAULT_MAX_FRAME_RETRANS
+        int "IEEE802.15.4 default maximum frame retransmissions"
+        default 4
+
     config IEEE802154_AUTO_ACK_DISABLE
-        bool "Disable Auto ACK support" if !USEPKG_OPENWSN
-        default y if USEPKG_OPENWSN
+        bool "Disable Auto ACK support" if (!USEPKG_OPENWSN && !USEPKG_OPENDSME)
+        default y if (USEPKG_OPENWSN || USEPKG_OPENDSME)
+
+    config IEEE802154_DSME_CAP_REDUCTION
+        bool "Enable CAP reduction" if USEPKG_OPENDSME
+        default n if USEPKG_OPENDSME
+
+    config IEEE802154_DSME_SUPERFRAME_ORDER
+        int "Set the DSME superframe order" if USEPKG_OPENDSME
+        default 3
+        help
+            The SO sets the slot duration to `60 * symbol_time_us * 2^SO` usecs.
+            E.g for O-QPSK an SO=3 renders a slot duration of `60 * 16 * 8` = 7.6 ms and
+            a superframe duration of 122.88 ms.
+
+            Settings this value to 3 allows to transmit full IEEE 802.15.4 O-QPSK frames
+            (127 bytes).
+
+    config IEEE802154_DSME_MULTISUPERFRAME_ORDER
+        int "Set the DSME multisuperframe order" if USEPKG_OPENDSME
+        default 3
+        help
+            The MO sets the number of superframes per multisuperframe to `2^(MO-SO)`.
+
+    config IEEE802154_DSME_BEACON_ORDER
+        int "Set the DSME beacon order" if USEPKG_OPENDSME
+        default 3
+        help
+            The BO sets the beacon interval to `2^(BO-SO)` superframes.
+
+    config IEEE802154_DSME_STATIC_GTS
+        bool "Use static GTS allocation" if USEPKG_OPENDSME
+        default 0
+        help
+            When set, the MAC implementation will not use scheduling functions.
+            This requires that the upper layer allocates slots manually using NETOPT_GTS_ALLOC.
+
+    config IEEE802154_DSME_GTS_EXPIRATION
+        int "Set expiration time of DSME GTS slot" if USEPKG_OPENDSME
+        default 16
+        help
+            Sets the expiration time of DSME GTS slot (in number of idle slots). If DSME
+            detects no activity, it will deallocate the GTS slot.
+
+    config IEEE802154_DSME_MAC_RESPONSE_WAIT_TIME
+        int "Set expiration time of DSME GTS slot" if USEPKG_OPENDSME
+        default 244
+        help
+            This configuration sets the maximum wait times for MAC commands (association,
+            DSME GTS allocation, etc).
+            The unit is "base superframe duration" (60 * symbol_time_us).
+
+    config IEEE802154_DSME_SCAN_DURATION
+        int "Set the scan duration" if USEPKG_OPENDSME
+        default 4
+        help
+            Set the scan duration for each channel to `60 * symbol_time_us *
+            (2^scanDuration + 1)`
+
+    config IEEE802154_DSME_MIN_COORD_LQI
+        int "Set the minimum LQI to consider a beacon from a coordinator valid" if USEPKG_OPENDSME
+        default 100
+
+    config IEEE802154_DEFAULT_ACK_REQ
+        bool "Request ACKs by default"
+        default y
 
 menuconfig KCONFIG_USEMODULE_IEEE802154_SECURITY
     bool "Configure IEEE802.15.4 Security"

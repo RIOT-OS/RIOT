@@ -5,12 +5,23 @@
 # directory for more details.
 #
 menuconfig KCONFIG_USB
-    bool "Configure USB"
-    depends on USEMODULE_USBUS
+    bool "USB device"
+    depends on HAS_PERIPH_USBDEV || HAS_TINYUSB_DEVICE || MODULE_USBDEV_MOCK
+    depends on TEST_KCONFIG
     help
-        Configure the USB peripheral via Kconfig.
+        Enable the USB device peripheral.
+
 
 if KCONFIG_USB
+
+choice USB_IMPLEMENTATION
+    bool "USB implementation"
+    help
+        Select the USB implementation.
+
+endchoice
+
+rsource "usbus/Kconfig"
 
 menu "Power management"
 
@@ -42,9 +53,18 @@ config USB_SPEC_BCDVERSION_1_1
 
 endchoice
 
+config CUSTOM_USB_VID_PID
+    bool "Use custom VID and PID"
+    help
+        If using in USB in application then one must set a VID and PID.
+        If RIOT is internally using the USB, say for STDIO, then the VID and
+        PID depending in the internal peripheral configuration used.
+
 config USB_PID
     hex "Product ID"
+    depends on CUSTOM_USB_VID_PID
     range 0x0000 0xFFFF
+    # default 0x7D02 if MODULE_RIOTBOOT_DFU
     default 0x7D01
     help
         You must provide your own PID.
@@ -52,6 +72,7 @@ config USB_PID
 config USB_VID
     hex "Vendor ID"
     range 0x0000 0xFFFF
+    depends on CUSTOM_USB_VID_PID
     default 0x1209
     help
         You must provide your own VID.
@@ -62,7 +83,7 @@ config USB_MANUF_STR
 
 config USB_PRODUCT_STR
     string "Product string"
-    default "USB device"
+    default BOARD
 
 config USB_CONFIGURATION_STR
     string "Configuration string"
@@ -109,5 +130,3 @@ comment "WARNING: The serial string is empty!"
     depends on USB_SERIAL_STR = "" && USB_CUSTOM_SERIAL_STR
 
 endif # KCONFIG_USB
-
-rsource "usbus/Kconfig"

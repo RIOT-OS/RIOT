@@ -1,0 +1,9 @@
+USEMODULE += posix_headers
+
+ifneq (,$(filter vfs_default,$(USEMODULE)))
+  DEFAULT_MODULE += vfs_auto_mount
+endif
+
+ifeq (native,$(CPU))
+  USEMODULE += native_vfs
+endif

@@ -34,7 +34,12 @@ extern "C" {
  * @{
  */
 #define CLOCK_HFCLK         (1)             /* external crystal */
-#define CLOCK_LFCLK         (0)             /* internal RC oscillator */
+
+/* LFCLK Source clock selection:*/
+/* - CLOCK_LFCLKSRC_SRC_RC: internal RC oscillator
+ * - CLOCK_LFCLKSRC_SRC_Xtal: 32.768 kHz crystal
+ * - CLOCK_LFCLKSRC_SRC_Synth: derived from HFCLK */
+#define CLOCK_LFCLK         (CLOCK_LFCLKSRC_SRC_RC) /**< LFCLK Source */
 /** @} */
 
 /**
@@ -74,8 +79,8 @@ static const i2c_conf_t i2c_config[] = {
 static const uart_conf_t uart_config[] = {
     { /* Mapped to USB virtual COM port */
         .dev        = NRF_UARTE0,
-        .rx_pin     = GPIO_PIN(0,14),
-        .tx_pin     = GPIO_PIN(0,18),
+        .rx_pin     = GPIO_PIN(0, 14),
+        .tx_pin     = GPIO_PIN(0, 18),
 #ifdef MODULE_PERIPH_UART_HW_FC
         .rts_pin    = GPIO_UNDEF,
         .cts_pin    = GPIO_UNDEF,

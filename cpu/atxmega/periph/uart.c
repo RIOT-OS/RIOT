@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Gerson Fernando Budke <nandojve@gmail.com>
+ * Copyright (C) 2021-2023 Gerson Fernando Budke <nandojve@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -30,10 +30,11 @@
 #include "board.h"
 #include "cpu.h"
 #include "cpu_pm.h"
+#include "irq.h"
+#include "periph/gpio.h"
+#include "periph/uart.h"
 #include "sched.h"
 #include "thread.h"
-#include "periph/uart.h"
-#include "periph/gpio.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -309,7 +310,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         /* start of TX won't finish until no data in DATAn and transmit shift
            register is empty */
         uint8_t irq_state = irq_disable();
-        avr8_state |= AVR8_STATE_FLAG_UART_TX(uart);
+        avr8_uart_tx_set_pending(uart);
         irq_restore(irq_state);
 
         dev(uart)->DATA = data[i];
@@ -328,99 +329,54 @@ void uart_poweroff(uart_t uart)
 
 static inline void _rx_isr_handler(int num)
 {
-    avr8_enter_isr();
-
     if (isr_ctx[num].rx_cb) {
         isr_ctx[num].rx_cb(isr_ctx[num].arg, dev(num)->DATA);
     }
-
-    avr8_exit_isr();
 }
 
 static inline void _tx_isr_handler(int num)
 {
-    avr8_enter_isr();
-
     /* entire frame in the Transmit Shift Register has been shifted out and
        there are no new data currently present in the transmit buffer */
-    avr8_state &= ~AVR8_STATE_FLAG_UART_TX(num);
-
-    avr8_exit_isr();
+    avr8_uart_tx_clear_pending(num);
 }
 
 #ifdef UART_0_RXC_ISR
-ISR(UART_0_RXC_ISR, ISR_BLOCK)
-{
-    _rx_isr_handler(0);
-}
-ISR(UART_0_TXC_ISR, ISR_BLOCK)
-{
-    _tx_isr_handler(0);
-}
+AVR8_ISR(UART_0_RXC_ISR, _rx_isr_handler, 0);
+AVR8_ISR(UART_0_TXC_ISR, _tx_isr_handler, 0);
 #endif /* UART_0_ISR */
 
 #ifdef UART_1_RXC_ISR
-ISR(UART_1_RXC_ISR, ISR_BLOCK)
-{
-    _rx_isr_handler(1);
-}
-ISR(UART_1_TXC_ISR, ISR_BLOCK)
-{
-    _tx_isr_handler(1);
-}
+AVR8_ISR(UART_1_RXC_ISR, _rx_isr_handler, 1);
+AVR8_ISR(UART_1_TXC_ISR, _tx_isr_handler, 1);
 #endif /* UART_1_ISR */
 
 #ifdef UART_2_RXC_ISR
-ISR(UART_2_RXC_ISR, ISR_BLOCK)
-{
-    _rx_isr_handler(2);
-}
-ISR(UART_2_TXC_ISR, ISR_BLOCK)
-{
-    _tx_isr_handler(2);
-}
+AVR8_ISR(UART_2_RXC_ISR, _rx_isr_handler, 2);
+AVR8_ISR(UART_2_TXC_ISR, _tx_isr_handler, 2);
 #endif /* UART_2_ISR */
 
 #ifdef UART_3_RXC_ISR
-ISR(UART_3_RXC_ISR, ISR_BLOCK)
-{
-    _rx_isr_handler(3);
-}
-ISR(UART_3_TXC_ISR, ISR_BLOCK)
-{
-    _tx_isr_handler(3);
-}
+AVR8_ISR(UART_3_RXC_ISR, _rx_isr_handler, 3);
+AVR8_ISR(UART_3_TXC_ISR, _tx_isr_handler, 3);
 #endif /* UART_3_ISR */
 
 #ifdef UART_4_RXC_ISR
-ISR(UART_4_RXC_ISR, ISR_BLOCK)
-{
-    _rx_isr_handler(4);
-}
-ISR(UART_4_TXC_ISR, ISR_BLOCK)
-{
-    _tx_isr_handler(4);
-}
+AVR8_ISR(UART_4_RXC_ISR, _rx_isr_handler, 4);
+AVR8_ISR(UART_4_TXC_ISR, _tx_isr_handler, 4);
 #endif /* UART_4_ISR */
 
 #ifdef UART_5_RXC_ISR
-ISR(UART_5_RXC_ISR, ISR_BLOCK)
-{
-    _rx_isr_handler(5);
-}
-ISR(UART_5_TXC_ISR, ISR_BLOCK)
-{
-    _tx_isr_handler(5);
-}
+AVR8_ISR(UART_5_RXC_ISR, _rx_isr_handler, 5);
+AVR8_ISR(UART_5_TXC_ISR, _tx_isr_handler, 5);
 #endif /* UART_5_ISR */
 
 #ifdef UART_6_RXC_ISR
-ISR(UART_6_RXC_ISR, ISR_BLOCK)
-{
-    _rx_isr_handler(6);
-}
-ISR(UART_6_TXC_ISR, ISR_BLOCK)
-{
-    _tx_isr_handler(6);
-}
+AVR8_ISR(UART_6_RXC_ISR, _rx_isr_handler, 6);
+AVR8_ISR(UART_6_TXC_ISR, _tx_isr_handler, 6);
 #endif /* UART_6_ISR */
+
+#ifdef UART_7_RXC_ISR
+AVR8_ISR(UART_7_RXC_ISR, _rx_isr_handler, 7);
+AVR8_ISR(UART_7_TXC_ISR, _tx_isr_handler, 7);
+#endif /* UART_7_ISR */

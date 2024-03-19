@@ -9,6 +9,7 @@ menuconfig MODULE_CORE
     bool "RIOT Core"
     default y
     depends on TEST_KCONFIG
+    depends on MODULE_CORE_LIB
     help
         RIOT's core module. Only change this if you know what you are doing. If
         unsure, say Y.
@@ -38,8 +39,18 @@ config MODULE_CORE_MSG_BUS
     help
         Messaging Bus API for inter process message broadcast.
 
+config MODULE_CORE_MUTEX_DEBUG
+    bool "Aid debugging deadlocks by printing on whom mutex_lock() is waiting"
+
+config MODULE_CORE_MUTEX_PRIORITY_INHERITANCE
+    bool "Use priority inheritance to mitigate priority inversion for mutexes"
+
 config MODULE_CORE_PANIC
     bool "Kernel crash handling module"
+    default y
+
+config MODULE_CORE_THREAD
+    bool "Support for Threads"
     default y
 
 config MODULE_CORE_THREAD_FLAGS
@@ -49,6 +60,12 @@ config MODULE_SCHED_CB
     bool "Callback support on the scheduler"
 
 endif # MODULE_CORE
+
+config MODULE_CORE_LIB
+    bool
+    default y
+    help
+        Select y to to include core libs
 
 menuconfig KCONFIG_USEMODULE_CORE
     bool "Configure RIOT Core"

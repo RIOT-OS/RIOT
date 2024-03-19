@@ -30,11 +30,13 @@ extern "C" {
 
 /**
  * @name usbdev mock device endpoint states
+ * @{
  */
 typedef enum {
     EP_STATE_READY,             /**< Endpoint is ready/idle */
     EP_STATE_DATA_AVAILABLE,    /**< Endpoint has data      */
 } usbdev_mock_ep_state_t;
+/** @} */
 
 /**
  * @brief usbdev mock device endpoint
@@ -113,5 +115,4 @@ void usbdev_mock_setup(usbdev_mock_esr_cb_t esr_cb,
 #endif
 
 #endif /* USBDEV_MOCK_H */
-/** @} */
 /** @} */

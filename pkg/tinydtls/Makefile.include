@@ -24,7 +24,7 @@ endif
 
 # The configuration for socket overrides Sock
 ifeq (,$(filter posix_sockets,$(USEMODULE)))
-  CFLAGS += -DWITH_RIOT_GNRC
+  CFLAGS += -DWITH_RIOT_SOCK
 endif
 
 # Default cipher suite when not using Kconfig
@@ -37,12 +37,6 @@ ifeq (,$(CONFIG_KCONFIG_USEPKG_TINYDTLS))
   ifeq (, $(or $(PSK_ENABLED),$(ECC_ENABLED)))
     CFLAGS += -DCONFIG_DTLS_PSK
   endif
-endif
-
-ifneq (,$(or $(CONFIG_DTLS_DEBUG),$(filter -DCONFIG_DTLS_DEBUG,$(CFLAGS))))
-  CFLAGS += -DTINYDTLS_LOG_LVL=6
-else
-  CFLAGS += -DTINYDTLS_LOG_LVL=0
 endif
 
 # For now contrib only contains sock_dtls adaption
@@ -69,9 +63,18 @@ endif
 PEER_MAX := $(or $(CONFIG_DTLS_PEER_MAX),$(patsubst -DCONFIG_DTLS_PEER_MAX=%,%,$(filter -DCONFIG_DTLS_PEER_MAX=%,$(CFLAGS))))
 ifneq (,$(PEER_MAX))
     CFLAGS += -DDTLS_PEER_MAX=$(PEER_MAX)
+else ifneq (,$(filter gcoap_dtls,$(USEMODULE)))
+    # The default value in sys/include/net/dtls.h for CONFIG_DTLS_PEER_MAX is 2
+    # when gcoap_dtls is active, otherwise 1. As the default in tinydtls is 1,
+    # we need to set it explicitly if the dtls.h default value deviates from
+    # the tinydtls default.
+    CFLAGS += -DDTLS_PEER_MAX=2
 endif
 
 HANDSHAKE_MAX := $(or $(CONFIG_DTLS_HANDSHAKE_MAX),$(patsubst -DCONFIG_DTLS_HANDSHAKE_MAX=%,%,$(filter -DCONFIG_DTLS_HANDSHAKE_MAX=%,$(CFLAGS))))
 ifneq (,$(HANDSHAKE_MAX))
     CFLAGS += -DDTLS_HANDSHAKE_MAX=$(HANDSHAKE_MAX)
 endif
+
+DTLS_MAX_BUF ?= 200
+CFLAGS += "-DDTLS_MAX_BUF=$(DTLS_MAX_BUF)"

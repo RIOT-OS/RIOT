@@ -1,0 +1,129 @@
+# Copyright (C) 2024 BISSELL Homecare, Inc.
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# This file was auto-generated from ST ProductsList.xlsx sheet using the
+# script in cpu/stm32/dist/kconfig/gen_kconfig.py
+# See cpu/stm32/dist/kconfig/README.md for details
+
+# CPU models
+config CPU_MODEL_STM32C011D6
+    bool
+    select CPU_MODEL_STM32C011XX
+
+config CPU_MODEL_STM32C011F4
+    bool
+    select CPU_MODEL_STM32C011XX
+
+config CPU_MODEL_STM32C011F6
+    bool
+    select CPU_MODEL_STM32C011XX
+
+config CPU_MODEL_STM32C011J4
+    bool
+    select CPU_MODEL_STM32C011XX
+
+config CPU_MODEL_STM32C011J6
+    bool
+    select CPU_MODEL_STM32C011XX
+
+config CPU_MODEL_STM32C031C4
+    bool
+    select CPU_MODEL_STM32C031XX
+
+config CPU_MODEL_STM32C031C6
+    bool
+    select CPU_MODEL_STM32C031XX
+
+config CPU_MODEL_STM32C031F4
+    bool
+    select CPU_MODEL_STM32C031XX
+
+config CPU_MODEL_STM32C031F6
+    bool
+    select CPU_MODEL_STM32C031XX
+
+config CPU_MODEL_STM32C031G4
+    bool
+    select CPU_MODEL_STM32C031XX
+
+config CPU_MODEL_STM32C031G6
+    bool
+    select CPU_MODEL_STM32C031XX
+
+config CPU_MODEL_STM32C031K4
+    bool
+    select CPU_MODEL_STM32C031XX
+
+config CPU_MODEL_STM32C031K6
+    bool
+    select CPU_MODEL_STM32C031XX
+
+config CPU_MODEL_STM32C071CB
+    bool
+    select CPU_MODEL_STM32C071XX
+
+config CPU_MODEL_STM32C071FB
+    bool
+    select CPU_MODEL_STM32C071XX
+
+config CPU_MODEL_STM32C071GB
+    bool
+    select CPU_MODEL_STM32C071XX
+
+config CPU_MODEL_STM32C071KB
+    bool
+    select CPU_MODEL_STM32C071XX
+
+config CPU_MODEL_STM32C071RB
+    bool
+    select CPU_MODEL_STM32C071XX
+
+config CPU_MODEL_STM32C091CC
+    bool
+    select CPU_MODEL_STM32C091XX
+
+config CPU_MODEL_STM32C091FC
+    bool
+    select CPU_MODEL_STM32C091XX
+
+config CPU_MODEL_STM32C091GC
+    bool
+    select CPU_MODEL_STM32C091XX
+
+config CPU_MODEL_STM32C091KC
+    bool
+    select CPU_MODEL_STM32C091XX
+
+config CPU_MODEL_STM32C091RC
+    bool
+    select CPU_MODEL_STM32C091XX
+
+# Configure CPU model
+config CPU_MODEL
+    default "stm32c011d6" if CPU_MODEL_STM32C011D6
+    default "stm32c011f4" if CPU_MODEL_STM32C011F4
+    default "stm32c011f6" if CPU_MODEL_STM32C011F6
+    default "stm32c011j4" if CPU_MODEL_STM32C011J4
+    default "stm32c011j6" if CPU_MODEL_STM32C011J6
+    default "stm32c031c4" if CPU_MODEL_STM32C031C4
+    default "stm32c031c6" if CPU_MODEL_STM32C031C6
+    default "stm32c031f4" if CPU_MODEL_STM32C031F4
+    default "stm32c031f6" if CPU_MODEL_STM32C031F6
+    default "stm32c031g4" if CPU_MODEL_STM32C031G4
+    default "stm32c031g6" if CPU_MODEL_STM32C031G6
+    default "stm32c031k4" if CPU_MODEL_STM32C031K4
+    default "stm32c031k6" if CPU_MODEL_STM32C031K6
+    default "stm32c071cb" if CPU_MODEL_STM32C071CB
+    default "stm32c071fb" if CPU_MODEL_STM32C071FB
+    default "stm32c071gb" if CPU_MODEL_STM32C071GB
+    default "stm32c071kb" if CPU_MODEL_STM32C071KB
+    default "stm32c071rb" if CPU_MODEL_STM32C071RB
+    default "stm32c091cc" if CPU_MODEL_STM32C091CC
+    default "stm32c091fc" if CPU_MODEL_STM32C091FC
+    default "stm32c091gc" if CPU_MODEL_STM32C091GC
+    default "stm32c091kc" if CPU_MODEL_STM32C091KC
+    default "stm32c091rc" if CPU_MODEL_STM32C091RC

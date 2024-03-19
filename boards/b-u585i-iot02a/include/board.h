@@ -31,26 +31,14 @@ extern "C" {
  * @name    LED pin definitions and handlers
  * @{
  */
-#define LED0_PIN            GPIO_PIN(PORT_E, 13)
-#define LED0_MASK           (1 << 13)
+#define LED0_PIN_NUM        13
+#define LED0_PORT_NUM       PORT_E
 
-#define LED0_ON             (GPIOE->BSRR = LED0_MASK)
-#define LED0_OFF            (GPIOE->BSRR = (LED0_MASK << 16))
-#define LED0_TOGGLE         (GPIOE->ODR  ^= LED0_MASK)
+#define LED1_PIN_NUM        6
+#define LED1_PORT_NUM       PORT_H
 
-#define LED1_PIN            GPIO_PIN(PORT_H, 6)
-#define LED1_MASK           (1 << 6)
-
-#define LED1_ON             (GPIOH->BSRR = LED1_MASK)
-#define LED1_OFF            (GPIOH->BSRR = (LED1_MASK << 16))
-#define LED1_TOGGLE         (GPIOH->ODR  ^= LED1_MASK)
-
-#define LED2_PIN            GPIO_PIN(PORT_H, 7)
-#define LED2_MASK           (1 << 7)
-
-#define LED2_ON             (GPIOH->BSRR = LED2_MASK)
-#define LED2_OFF            (GPIOH->BSRR = (LED2_MASK << 16))
-#define LED2_TOGGLE         (GPIOH->ODR  ^= LED2_MASK)
+#define LED2_PIN_NUM        7
+#define LED2_PORT_NUM       PORT_H
 /** @} */
 
 /**
@@ -75,14 +63,11 @@ extern "C" {
 #define LPSXXX_PARAM_I2C    I2C_DEV(1)
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif
+
+#include "stm32_leds.h"
 
 #endif /* BOARD_H */
 /** @} */

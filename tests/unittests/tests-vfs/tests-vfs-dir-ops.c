@@ -81,7 +81,7 @@ static void teardown(void)
         vfs_closedir(&_test_dir);
         _test_vfs_dir_op_status = -1;
     }
-    vfs_umount(&_test_vfs_mount_null);
+    vfs_umount(&_test_vfs_mount_null, false);
 }
 
 static void test_vfs_null_dir_ops_opendir(void)

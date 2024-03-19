@@ -10,7 +10,7 @@
  * @ingroup     sys_auto_init
  * @{
  * @file
- * @brief       initializes ili9341 display device
+ * @brief       initializes lcd display device
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @}
@@ -23,29 +23,38 @@
 
 #include "disp_dev.h"
 
+#include "lcd.h"
+#include "lcd_disp_dev.h"
+
 #include "ili9341.h"
 #include "ili9341_params.h"
-#include "ili9341_disp_dev.h"
 
-#define ILI9341_NUMOF           ARRAY_SIZE(ili9341_params)
+#ifndef ILI9341_NUMOF
+#define ILI9341_NUMOF               0
+#endif
+#ifndef ILI9341_SCREEN_NUMOF
+#define ILI9341_SCREEN_NUMOF        0
+#endif
 
 static ili9341_t ili9341_devs[ILI9341_NUMOF];
+
 static disp_dev_reg_t disp_dev_entries[ILI9341_NUMOF];
 
 void auto_init_ili9341(void)
 {
-    assert(ILI9341_NUMOF == ARRAY_SIZE(ili9341_screen_ids));
+    assert(ILI9341_NUMOF == ILI9341_SCREEN_NUMOF);
 
     for (size_t i = 0; i < ILI9341_NUMOF; i++) {
+        ili9341_devs[i].dev.driver = &lcd_ili9341_driver;
         LOG_DEBUG("[auto_init_screen] initializing ili9341 #%u\n", i);
-        if (ili9341_init(&ili9341_devs[i], &ili9341_params[i]) < 0) {
+        if (lcd_init(&ili9341_devs[i].dev, &ili9341_params[i]) < 0) {
             LOG_ERROR("[auto_init_screen] error initializing ili9341 #%u\n", i);
             continue;
         }
 
-        disp_dev_entries[i].dev = (disp_dev_t *)&ili9341_devs[i];
+        disp_dev_entries[i].dev = (disp_dev_t *) &ili9341_devs[i].dev;
         disp_dev_entries[i].screen_id = ili9341_screen_ids[i];
-        disp_dev_entries[i].dev->driver = &ili9341_disp_dev_driver;
+        disp_dev_entries[i].dev->driver = &lcd_disp_dev_driver;
 
         /* add to disp_dev registry */
         disp_dev_reg_add(&(disp_dev_entries[i]));

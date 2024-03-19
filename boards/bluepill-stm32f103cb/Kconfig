@@ -1,0 +1,30 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config BOARD
+    default "bluepill-stm32f103cb" if BOARD_BLUEPILL_STM32F103CB
+
+config BOARD_BLUEPILL_STM32F103CB
+    bool
+    default y
+    select BOARD_COMMON_BLXXXPILL
+    select CPU_MODEL_STM32F103CB
+    select MODULE_BOARDS_COMMON_BLXXXPILL if TEST_KCONFIG
+
+    select HAS_HIGHLEVEL_STDIO
+
+config FORCE_USB_STDIO
+    default y
+
+# HACK: This is added due to the make resolution
+# make will select timer backend, probably due to the USBUS
+# and kconfig cannot select if something is already selected like make
+choice ZTIMER_MSEC_BACKEND
+    default ZTIMER_MSEC_BACKEND_TIMER if MODULE_PERIPH_RTC
+endchoice
+
+source "$(RIOTBOARD)/common/blxxxpill/Kconfig"

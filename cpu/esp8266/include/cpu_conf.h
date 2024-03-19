@@ -65,14 +65,25 @@ extern "C" {
 #ifndef THREAD_EXTRA_STACKSIZE_PRINTF
 #define THREAD_EXTRA_STACKSIZE_PRINTF (0)
 #endif
+
 #ifndef THREAD_STACKSIZE_DEFAULT
 #define THREAD_STACKSIZE_DEFAULT      (1024)
 #endif
+
 #ifndef THREAD_STACKSIZE_IDLE
 #define THREAD_STACKSIZE_IDLE         (1024)
 #endif
+
 #ifndef THREAD_STACKSIZE_MAIN
 #define THREAD_STACKSIZE_MAIN         (3072)
+#endif
+
+#ifndef THREAD_STACKSIZE_SMALL
+#define THREAD_STACKSIZE_SMALL        (THREAD_STACKSIZE_MEDIUM * 3 / 2)
+#endif
+
+#ifndef THREAD_STACKSIZE_TINY
+#define THREAD_STACKSIZE_TINY         (THREAD_STACKSIZE_MEDIUM / 2)
 #endif
 
 #ifndef GNRC_IPV6_STACK_SIZE
@@ -89,6 +100,12 @@ extern "C" {
 #ifndef TCPIP_THREAD_STACKSIZE
 #define TCPIP_THREAD_STACKSIZE        (3072)
 #endif
+
+#ifndef ESP_WIFI_STACKSIZE
+/** Stack size for the WiFi thread */
+#define ESP_WIFI_STACKSIZE            (1536)
+#endif
+
 /** @} */
 
 /**

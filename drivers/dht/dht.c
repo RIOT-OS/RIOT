@@ -2,6 +2,7 @@
  * Copyright 2015 Ludwig Knüpfer
  *           2015 Christian Mehlis
  *           2016-2017 Freie Universität Berlin
+ *           2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -19,201 +20,260 @@
  * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
 
+#include <errno.h>
 #include <stdint.h>
 #include <string.h>
 
-#include "log.h"
 #include "assert.h"
-#include "xtimer.h"
-#include "timex.h"
-#include "periph/gpio.h"
-
 #include "dht.h"
 #include "dht_params.h"
+#include "log.h"
+#include "periph/gpio.h"
+#include "time_units.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG            0
 #include "debug.h"
 
 /* Every pulse send by the DHT longer than 40µs is interpreted as 1 */
-#define PULSE_WIDTH_THRESHOLD   (40U)
-/* If an expected pulse is not detected within 1000µs, something is wrong */
-#define TIMEOUT                 (1000U)
-/* The DHT sensor cannot measure more than once a second */
-#define DATA_HOLD_TIME          (US_PER_SEC)
-/* The start signal by pulling data low for at least 18ms and then up for
- * 20-40µs*/
-#define START_LOW_TIME          (20U * US_PER_MS)
-#define START_HIGH_TIME         (40U)
+#define READ_THRESHOLD          (40U)
+/* If an expected pulse is not detected within 85µs, something is wrong */
+#define SPIN_TIMEOUT            (85U)
+/* The start signal by pulling data low for at least 18 ms for DHT11, at
+ * most 20 ms (AM2301 / DHT22 / DHT21). Then release the bus and the
+ * sensor should respond by pulling data low for 80 µs, then release for
+ * 80µs before start sending data. */
+#define START_LOW_TIME          (19U * US_PER_MS)
+#define START_THRESHOLD         (75U)
+/* DHTs have to wait for power 1 or 2 seconds depending on the model */
+#define POWER_WAIT_TIMEOUT      (2U * US_PER_SEC)
 
-static inline void _reset(dht_t *dev)
+enum {
+    BYTEPOS_HUMIDITY_HIGH = 0,
+    BYTEPOS_HUMIDITY_LOW = 1,
+    BYTEPOS_TEMPERATURE_HIGH = 2,
+    BYTEPOS_TEMPERATURE_LOW = 3,
+    BYTEPOS_CHECKSUM = 4,
+};
+
+struct dht_data {
+    gpio_t pin;
+    gpio_mode_t in_mode;
+    uint8_t data[5];
+    int8_t bit_pos;
+    uint8_t bit;
+};
+
+static void _wait_for_level(gpio_t pin, bool expected, uint32_t start)
 {
+    /* Calls to ztimer_now() can be relatively slow on low end platforms.
+     * Mixing in a busy down-counting loop solves issues e.g. on AVR boards. */
+    uint8_t pre_timeout = 0;
+    while (((bool)gpio_read(pin) != expected) && (++pre_timeout
+        || ztimer_now(ZTIMER_USEC) < start + SPIN_TIMEOUT)) {}
+}
+
+static int _send_start_signal(dht_t *dev)
+{
+    uint32_t start;
     gpio_init(dev->params.pin, GPIO_OUT);
+    gpio_clear(dev->params.pin);
+    ztimer_sleep(ZTIMER_USEC, START_LOW_TIME);
+    /* sync on device */
     gpio_set(dev->params.pin);
+    gpio_init(dev->params.pin, dev->params.in_mode);
+    /* check device response (80 µs low then 80 µs high) */
+    start = ztimer_now(ZTIMER_USEC);
+    _wait_for_level(dev->params.pin, 0, start);
+    if (ztimer_now(ZTIMER_USEC) - start > START_THRESHOLD) {
+        DEBUG_PUTS("[dht] error: response low pulse > START_THRESHOLD");
+        return -ENODEV;
+    }
+    _wait_for_level(dev->params.pin, 1, start);
+    start = ztimer_now(ZTIMER_USEC);
+    _wait_for_level(dev->params.pin, 0, start);
+    if (ztimer_now(ZTIMER_USEC) - start < START_THRESHOLD) {
+        DEBUG_PUTS("[dht] error: response high pulse < START_THRESHOLD");
+        return -ENODEV;
+    }
+    return 0;
 }
 
-/**
- * @brief   Wait until the pin @p pin has level @p expect
- *
- * @param   pin     GPIO pin to wait for
- * @param   expect  Wait until @p pin has this logic level
- * @param   timeout Timeout in µs
- *
- * @retval  0       Success
- * @retval  -1      Timeout occurred before level was reached
- */
-static inline int _wait_for_level(gpio_t pin, bool expect, unsigned timeout)
+static void _bit_parse(struct dht_data *arg)
 {
-    while (((gpio_read(pin) > 0) != expect) && timeout) {
-        xtimer_usleep(1);
-        timeout--;
+    int8_t pos = arg->bit_pos++;
+    if (arg->bit) {
+        arg->data[pos / 8] |= (0x80U >> (pos % 8));
     }
-
-    return (timeout > 0) ? 0 : -1;
 }
 
-static int _read(uint8_t *dest, gpio_t pin)
+static void _busy_wait_read(struct dht_data *arg)
 {
-    DEBUG("[dht] read\n");
-    uint16_t res = 0;
+    uint32_t start = ztimer_now(ZTIMER_USEC);
+    while (arg->bit_pos != 40) {
+        _wait_for_level(arg->pin, 1, start);
+        start = ztimer_now(ZTIMER_USEC);
+        _wait_for_level(arg->pin, 0, start);
+        arg->bit = (ztimer_now(ZTIMER_USEC) - start > READ_THRESHOLD) ? 1 : 0;
+        _bit_parse(arg);
+    }
+}
 
-    for (int i = 0; i < 8; i++) {
-        uint32_t start, end;
-        res <<= 1;
-        /* measure the length between the next rising and falling flanks (the
-         * time the pin is high - smoke up :-) */
-        if (_wait_for_level(pin, 1, TIMEOUT)) {
-            return -1;
-        }
-        start = xtimer_now_usec();
+static int _validate_checksum(uint8_t *data)
+{
+    uint8_t sum = 0;
 
-        if (_wait_for_level(pin, 0, TIMEOUT)) {
-            return -1;
-        }
-        end = xtimer_now_usec();
+    for (uint_fast8_t i = 0; i < 4; i++) {
+        sum += data[i];
+    }
+    if (sum != data[BYTEPOS_CHECKSUM]) {
+        return -EIO;
+    }
+    return 0;
+}
 
-        /* if the high phase was more than 40us, we got a 1 */
-        if ((end - start) > PULSE_WIDTH_THRESHOLD) {
-            res |= 0x0001;
+static int _parse_raw_values(dht_t *dev, uint8_t *data)
+{
+    bool is_negative;
+
+    switch (dev->params.type) {
+    case DHT11:
+    case DHT11_2022:
+        DEBUG_PUTS("[dht] parse raw values with DHT11 data format");
+        dev->last_val.humidity = data[BYTEPOS_HUMIDITY_HIGH] * 10
+                               + data[BYTEPOS_HUMIDITY_LOW];
+        /* MSB for integral temperature byte gives sign, remaining is
+         * abs() of value (beware: this is not two's complement!) */
+        is_negative = data[BYTEPOS_TEMPERATURE_LOW] & 0x80;
+        data[BYTEPOS_TEMPERATURE_LOW] &= ~0x80;
+        /* 2022-12 aosong.com data sheet uses interprets low bits as
+         * 0.01°C per LSB */
+        if (dev->params.type == DHT11_2022) {
+            data[BYTEPOS_TEMPERATURE_LOW] /= 10;
         }
+        if (data[BYTEPOS_TEMPERATURE_LOW] >= 10) {
+            return -ERANGE;
+        }
+        dev->last_val.temperature = data[BYTEPOS_TEMPERATURE_HIGH] * 10
+                                  + data[BYTEPOS_TEMPERATURE_LOW];
+        break;
+    /* AM2301 == DHT21 == DHT22 (same value in enum),
+     * so all are handled here */
+    case DHT22:
+        DEBUG_PUTS("[dht] parse raw values with DHT22 data format");
+        dev->last_val.humidity = (int16_t)(
+                                    (data[BYTEPOS_HUMIDITY_HIGH] << 8)
+                                    | data[BYTEPOS_HUMIDITY_LOW]);
+        is_negative = data[BYTEPOS_TEMPERATURE_HIGH] & 0x80;
+        data[BYTEPOS_TEMPERATURE_HIGH] &= ~0x80;
+        dev->last_val.temperature = (int16_t)(
+                                    (data[BYTEPOS_TEMPERATURE_HIGH] << 8)
+                                    | data[BYTEPOS_TEMPERATURE_LOW]);
+        break;
+    default:
+        return -ENOSYS;     /* ENOSYS 38 Function not implemented */
     }
 
-    *dest = res;
+    if (is_negative) {
+        dev->last_val.temperature = -dev->last_val.temperature;
+    }
+
     return 0;
 }
 
 int dht_init(dht_t *dev, const dht_params_t *params)
 {
-    DEBUG("[dht] dht_init\n");
+    int16_t timeout;
+
+    DEBUG_PUTS("[dht] dht_init");
 
     /* check parameters and configuration */
     assert(dev && params);
+    /* AM2301 == DHT21 == DHT22 (same value in enum) */
+    assert((params->type == DHT11) || (params->type == DHT11_2022)
+        || (params->type == DHT22));
 
     memset(dev, 0, sizeof(dht_t));
     dev->params = *params;
 
-    _reset(dev);
+    /* The 2-second delay mentioned in the datasheet is only required
+     * after a power cycle. */
+    timeout = POWER_WAIT_TIMEOUT / US_PER_MS;
+    gpio_init(dev->params.pin, GPIO_IN);
+    while (!gpio_read(dev->params.pin) && timeout--) {
+        ztimer_sleep(ZTIMER_USEC, US_PER_MS);
+    }
+    if (timeout < 0) {
+        DEBUG_PUTS("[dht] dht_init: error: Invalid cross-device link");
+        return -EXDEV;
+    }
+    else {
+        DEBUG("\n[dht] dht_init: power-up duration: %" PRIi16 " ms\n",
+                (int16_t)(POWER_WAIT_TIMEOUT / US_PER_MS - timeout));
+    }
+    /* The previous test does not ensure the sensor presence in case an
+     * external pull-up resistor is used. */
+    while (_send_start_signal(dev) == -ENODEV
+        && (timeout -= START_LOW_TIME / US_PER_MS) > 0) {}
+    if (timeout < 0) {
+        DEBUG_PUTS("[dht] dht_init: error: No such device");
+        return -ENODEV;
+    }
+    else {
+        DEBUG("\n[dht] dht_init: presence check duration: %" PRIi16 " ms\n",
+                (int16_t)(POWER_WAIT_TIMEOUT / US_PER_MS - timeout));
+    }
 
-    xtimer_msleep(2000);
-
-    DEBUG("[dht] dht_init: success\n");
-    return DHT_OK;
+    DEBUG_PUTS("[dht] dht_init: success");
+    return 0;
 }
 
 int dht_read(dht_t *dev, int16_t *temp, int16_t *hum)
 {
-    uint8_t csum;
-    uint8_t raw_temp_i, raw_temp_d, raw_hum_i, raw_hum_d;
+    int ret;
 
     assert(dev);
 
-    uint32_t now_us = xtimer_now_usec();
-    if ((now_us - dev->last_read_us) > DATA_HOLD_TIME) {
-        /* send init signal to device */
-        gpio_clear(dev->params.pin);
-        xtimer_usleep(START_LOW_TIME);
-        gpio_set(dev->params.pin);
-        xtimer_usleep(START_HIGH_TIME);
+    struct dht_data data = {
+        .pin = dev->params.pin,
+        .in_mode = dev->params.in_mode,
+        .bit_pos = 0,
+    };
 
-        /* sync on device */
-        gpio_init(dev->params.pin, dev->params.in_mode);
-        if (_wait_for_level(dev->params.pin, 1, TIMEOUT)) {
-            _reset(dev);
-            return DHT_TIMEOUT;
-        }
-
-        if (_wait_for_level(dev->params.pin, 0, TIMEOUT)) {
-            _reset(dev);
-            return DHT_TIMEOUT;
-        }
-
-        /*
-         * data is read in sequentially, highest bit first:
-         *  40 .. 24  23   ..   8  7  ..  0
-         * [humidity][temperature][checksum]
-         */
-
-        /* read the humidity, temperature, and checksum bits */
-        if (_read(&raw_hum_i, dev->params.pin)) {
-            _reset(dev);
-            return DHT_TIMEOUT;
-        }
-        if (_read(&raw_hum_d, dev->params.pin)) {
-            _reset(dev);
-            return DHT_TIMEOUT;
-        }
-        if (_read(&raw_temp_i, dev->params.pin)) {
-            _reset(dev);
-            return DHT_TIMEOUT;
-        }
-        if (_read(&raw_temp_d, dev->params.pin)) {
-            _reset(dev);
-            return DHT_TIMEOUT;
-        }
-
-        if (_read(&csum, dev->params.pin)) {
-            _reset(dev);
-            return DHT_TIMEOUT;
-        }
-
-        /* Bring device back to defined state - so we can trigger the next reading
-         * by pulling the data pin low again */
-        _reset(dev);
-
-        /* validate the checksum */
-        uint8_t sum = (raw_temp_i) + (raw_temp_d) + (raw_hum_i) + (raw_hum_d);
-        if (sum != csum) {
-            DEBUG("[dht] error: checksum doesn't match\n");
-            return DHT_NOCSUM;
-        }
-
-        /* parse the RAW values */
-        DEBUG("[dht] RAW values: temp: %2i.%i hum: %2i.%i\n", (int)raw_temp_i,
-            (int)raw_temp_d, (int)raw_hum_i, (int)raw_hum_d);
-
-        dev->last_val.humidity = raw_hum_i * 10 + raw_hum_d;
-        /* MSB set means negative temperature on DHT22. Will always be 0 on DHT11 */
-        if (raw_temp_i & 0x80) {
-            dev->last_val.temperature = -((raw_temp_i & ~0x80) * 10 + raw_temp_d);
-        }
-        else {
-            dev->last_val.temperature = raw_temp_i * 10 + raw_temp_d;
-        }
-
-        /* update time of last measurement */
-        dev->last_read_us = now_us;
+    if (_send_start_signal(dev) == -ENODEV) {
+        DEBUG_PUTS("[dht] error: No response from device");
+        return -ENODEV;
     }
 
-    if (temp) {
-        *temp = dev->last_val.temperature;
+    /* read the data */
+    _busy_wait_read(&data);
+
+    if (_validate_checksum(data.data) == -EIO) {
+        DEBUG("[dht] error: checksum doesn't match\n"
+              "[dht] RAW data: 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x\n",
+              (unsigned)data.data[0], (unsigned)data.data[1],
+              (unsigned)data.data[2], (unsigned)data.data[3],
+              (unsigned)data.data[4]);
+        return -EIO;
     }
 
-    if (hum) {
-        *hum = dev->last_val.humidity;
+    if ((ret = _parse_raw_values(dev, data.data)) < 0) {
+        if (ret == -ENOSYS) {
+            DEBUG_PUTS("[dht] error: data format not implemented");
+        }
+        else if (ret == -ERANGE) {
+            DEBUG_PUTS("[dht] error: invalid temperature low byte");
+        }
+        return ret;
     }
 
-    return DHT_OK;
+    *hum = dev->last_val.humidity;
+    *temp = dev->last_val.temperature;
+
+    return 0;
 }

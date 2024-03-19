@@ -19,6 +19,9 @@ include $(RIOTBASE)/drivers/Makefile.dep
 # pull Makefile.dep of each driver modules if they exist
 -include $(sort $(USEMODULE:%=$(RIOTBASE)/drivers/%/Makefile.dep))
 
+# pull Makefile.dep of each sys modules if they exist
+-include $(sort $(USEMODULE:%=$(RIOTBASE)/sys/%/Makefile.dep))
+
 # pull dependencies from packages
 -include $(PKG_PATHS:%=%Makefile.dep)
 
@@ -28,6 +31,10 @@ endif
 
 ifneq (,$(filter mpu_noexec_ram,$(USEMODULE)))
   FEATURES_REQUIRED += cortexm_mpu
+endif
+
+ifneq (,$(filter pmp_noexec_ram,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_pmp
 endif
 
 ifneq (,$(filter lwip_%,$(USEMODULE)))
@@ -72,6 +79,11 @@ ifneq (,$(filter fatfs_vfs,$(USEMODULE)))
   USEMODULE += vfs
 endif
 
+ifneq (,$(filter lwext%_vfs,$(USEMODULE)))
+  USEPKG += lwext4
+  USEMODULE += vfs
+endif
+
 ifneq (,$(filter nimble_%,$(USEMODULE)))
   USEPKG += nimble
 endif
@@ -82,6 +94,14 @@ endif
 
 ifneq (,$(filter tinydtls_sock_dtls, $(USEMODULE)))
     USEPKG += tinydtls
+endif
+
+ifneq (,$(filter flashdb_%,$(USEMODULE)))
+  USEPKG += flashdb
+endif
+
+ifneq (,$(filter tinyusb_%, $(USEMODULE)))
+  USEPKG += tinyusb
 endif
 
 # always select gpio (until explicit dependencies are sorted out)

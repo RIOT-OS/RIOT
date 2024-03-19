@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2018 Kaspar Schleiser <kaspar@schleiser.de>
  *               2015 Freie Universität Berlin
+ *               2023 Gerson Fernando Budke
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -20,6 +21,7 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
+ * @author      Gerson Fernando Budke <nandojve@gmail.com>
  *
  * @}
  */
@@ -28,6 +30,7 @@
 #include <assert.h>
 #include <errno.h>
 
+#include "architecture.h"
 #include "iolist.h"
 
 #include "net/eui64.h"
@@ -39,6 +42,9 @@
 #include "at86rf2xx_netdev.h"
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_registers.h"
+#if IS_USED(IEEE802154_SECURITY)
+#include "net/ieee802154_security.h"
+#endif
 #if IS_USED(MODULE_AT86RF2XX_AES_SPI)
 #include "at86rf2xx_aes.h"
 #endif
@@ -62,15 +68,87 @@ const netdev_driver_t at86rf2xx_driver = {
     .set = _set,
 };
 
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+/* Default AT86RF2XX channel */
+static const uint16_t at86rf2xx_chan_default = AT86RF2XX_DEFAULT_CHANNEL;
+
+#if IS_USED(MODULE_AT86RF2XX_AES_SPI) && \
+    IS_USED(MODULE_IEEE802154_SECURITY)
+/**
+ * @brief   Pass the 802.15.4 encryption key to the transceiver hardware
+ *
+ * @param[in] dev               Abstract security device descriptor
+ * @param[in] key               Encryption key to be used
+ * @param[in] key_size          Size of the encryption key in bytes
+ */
+static void _at86rf2xx_set_key(ieee802154_sec_dev_t *dev,
+                               const uint8_t *key, uint8_t key_size)
+{
+    (void)key_size;
+    at86rf2xx_aes_key_write_encrypt((at86rf2xx_t *)dev->ctx, key);
+}
+
+/**
+ * @brief   Compute CBC-MAC from IEEE 802.15.4 security context
+ *
+ * @param[in]       dev         Abstract security device descriptor
+ * @param[out]      cipher      Buffer to store cipher blocks
+ * @param[in]       iv          Initial vector
+ * @param[in]       plain       Input data blocks
+ * @param[in]       nblocks     Number of blocks
+ */
+static void _at86rf2xx_cbc(const ieee802154_sec_dev_t *dev,
+                           uint8_t *cipher,
+                           uint8_t *iv,
+                           const uint8_t *plain,
+                           uint8_t nblocks)
+{
+    at86rf2xx_aes_cbc_encrypt((at86rf2xx_t *)dev->ctx,
+                              (aes_block_t *)cipher,
+                              NULL,
+                              iv,
+                              (aes_block_t *)plain,
+                              nblocks);
+}
+
+/**
+ * @brief   Perform ECB encryption
+ *
+ * @param[in]       dev         Abstract security device descriptor
+ * @param[out]      cipher      Output cipher blocks
+ * @param[in]       plain       Plain blocks
+ * @param[in]       nblocks     Number of blocks
+ */
+static void _at86rf2xx_ecb(const ieee802154_sec_dev_t *dev,
+                           uint8_t *cipher,
+                           const uint8_t *plain,
+                           uint8_t nblocks)
+{
+    at86rf2xx_aes_ecb_encrypt((at86rf2xx_t *)dev->ctx,
+                              (aes_block_t *)cipher,
+                              NULL,
+                              (aes_block_t *)plain,
+                              nblocks);
+
+}
+/**
+ * @brief   Struct that contains IEEE 802.15.4 security operations
+ *          which are implemented, using the transceiver´s hardware
+ *          crypto capabilities
+ */
+static const ieee802154_radio_cipher_ops_t _at86rf2xx_cipher_ops = {
+    .set_key = _at86rf2xx_set_key,
+    .ecb = _at86rf2xx_ecb,
+    .cbc = _at86rf2xx_cbc
+};
+#endif /* IS_USED(MODULE_AT86RF2XX_AES_SPI) && \
+          IS_USED(MODULE_IEEE802154_SECURITY) */
+
 /* SOC has radio interrupts, store reference to netdev */
 static netdev_t *at86rfmega_dev;
-#else
 static void _irq_handler(void *arg)
 {
     netdev_trigger_event_isr(arg);
 }
-#endif
 
 static int _init(netdev_t *netdev)
 {
@@ -78,23 +156,12 @@ static int _init(netdev_t *netdev)
                           netdev_ieee802154_t, netdev);
     at86rf2xx_t *dev = container_of(netdev_ieee802154, at86rf2xx_t, netdev);
 
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
-    at86rfmega_dev = netdev;
-#else
-    /* initialize GPIOs */
-    spi_init_cs(dev->params.spi, dev->params.cs_pin);
-    gpio_init(dev->params.sleep_pin, GPIO_OUT);
-    gpio_clear(dev->params.sleep_pin);
-    gpio_init(dev->params.reset_pin, GPIO_OUT);
-    gpio_set(dev->params.reset_pin);
-    gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_RISING, _irq_handler, dev);
-
-    /* Intentionally check if bus can be acquired, if assertions are on */
-    if (!IS_ACTIVE(NDEBUG)) {
-        spi_acquire(dev->params.spi, dev->params.cs_pin, SPI_MODE_0, dev->params.spi_clk);
-        spi_release(dev->params.spi);
+    if (AT86RF2XX_IS_PERIPH) {
+        at86rfmega_dev = netdev;
     }
-#endif
+    else {
+        at86rf2xx_spi_init(dev, _irq_handler);
+    }
 
     /* reset hardware into a defined state */
     at86rf2xx_hardware_reset(dev);
@@ -106,7 +173,33 @@ static int _init(netdev_t *netdev)
     }
 
     /* reset device to default values and put it into RX state */
+    netdev_ieee802154_reset(&dev->netdev);
+    at86rf2xx_set_addr_long(dev, (eui64_t *)dev->netdev.long_addr);
+    at86rf2xx_set_addr_short(dev, (network_uint16_t *)dev->netdev.short_addr);
+
+    /* `netdev_ieee802154_reset` does not set the default channel. */
+    netdev_ieee802154_set(&dev->netdev, NETOPT_CHANNEL,
+                          &at86rf2xx_chan_default, sizeof(at86rf2xx_chan_default));
+
+    if (!IS_ACTIVE(AT86RF2XX_BASIC_MODE)) {
+        static const netopt_enable_t ack_req =
+            IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_ACK_REQ) ? NETOPT_ENABLE : NETOPT_DISABLE;
+        netdev_ieee802154_set(&dev->netdev, NETOPT_ACK_REQ,
+                              &ack_req, sizeof(ack_req));
+    }
+#if IS_USED(MODULE_IEEE802154_SECURITY) && \
+    IS_USED(MODULE_AT86RF2XX_AES_SPI)
+    dev->netdev.sec_ctx.dev.cipher_ops = &_at86rf2xx_cipher_ops;
+    dev->netdev.sec_ctx.dev.ctx = dev;
+#endif
+
     at86rf2xx_reset(dev);
+
+    /* Initialize CSMA seed with hardware address */
+    at86rf2xx_set_csma_seed(dev, dev->netdev.long_addr);
+
+    /* signal link UP */
+    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
 
     return 0;
 }
@@ -124,8 +217,8 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
         /* current packet data + FCS too long */
         if ((len + iol->iol_len + 2) > AT86RF2XX_MAX_PKT_LENGTH) {
-            DEBUG("[at86rf2xx] error: packet too large (%u byte) to be send\n",
-                  (unsigned)len + 2);
+            DEBUG("[at86rf2xx] error: packet too large (%" PRIuSIZE
+                  " byte) to be send\n", len + 2);
             return -EOVERFLOW;
         }
         if (iol->iol_len) {
@@ -136,6 +229,9 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     /* send data out directly if pre-loading id disabled */
     if (!(dev->flags & AT86RF2XX_OPT_PRELOADING)) {
         at86rf2xx_tx_exec(dev);
+        if (netdev->event_callback) {
+            netdev->event_callback(netdev, NETDEV_EVENT_TX_STARTED);
+        }
     }
     /* return the number of bytes that were actually loaded into the frame
      * buffer/send out */
@@ -158,11 +254,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     at86rf2xx_fb_start(dev);
 
     /* get the size of the received packet */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
-    phr = TST_RX_LENGTH;
-#else
-    at86rf2xx_fb_read(dev, &phr, 1);
-#endif
+    phr = at86rf2xx_get_rx_len(dev);
 
     /* ignore MSB (refer p.80) and subtract length of FCS field */
     pkt_len = (phr & 0x7f) - 2;
@@ -220,7 +312,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         netdev_ieee802154_rx_info_t *radio_info = info;
         at86rf2xx_fb_read(dev, &(radio_info->lqi), 1);
 
-#if defined(MODULE_AT86RF231) || defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_HAVE_ED_REGISTER
         /* AT86RF231 does not provide ED at the end of the frame buffer, read
          * from separate register instead */
         at86rf2xx_fb_stop(dev);
@@ -230,8 +322,23 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         at86rf2xx_fb_stop(dev);
 #endif
         radio_info->rssi = RSSI_BASE_VAL + ed;
-        DEBUG("[at86rf2xx] LQI:%d high is good, RSSI:%d high is either good or"
+        DEBUG("[at86rf2xx] LQI:%d high is good, RSSI:%d high is either good or "
               "too much interference.\n", radio_info->lqi, radio_info->rssi);
+#if AT86RF2XX_IS_PERIPH && IS_USED(MODULE_NETDEV_IEEE802154_RX_TIMESTAMP)
+        /* AT86RF2XX_IS_PERIPH means the MCU is ATmegaRFR2 that has symbol counter */
+        {
+            uint32_t rx_sc;
+            rx_sc = at86rf2xx_get_sc(dev);
+
+            /* convert counter value to ns */
+            uint64_t res = SC_TO_NS * (uint64_t)rx_sc;
+            netdev_ieee802154_rx_info_set_timestamp(radio_info, res);
+            DEBUG("[at86rf2xx] CS: %" PRIu32 " timestamp: %" PRIu32 ".%09" PRIu32 " ",
+                    rx_sc, (uint32_t)(radio_info->timestamp / NS_PER_SEC),
+                           (uint32_t)(radio_info->timestamp % NS_PER_SEC));
+        }
+#endif
+
     }
     else {
         at86rf2xx_fb_stop(dev);
@@ -276,10 +383,24 @@ static int _set_state(at86rf2xx_t *dev, netopt_state_t state)
                 }
                 at86rf2xx_set_state(dev, AT86RF2XX_PHY_STATE_TX);
                 at86rf2xx_tx_exec(dev);
+                if (dev->netdev.netdev.event_callback) {
+                    dev->netdev.netdev.event_callback(&dev->netdev.netdev, NETDEV_EVENT_TX_STARTED);
+                }
             }
             break;
         case NETOPT_STATE_RESET:
             at86rf2xx_hardware_reset(dev);
+            netdev_ieee802154_reset(&dev->netdev);
+            /* set short and long address */
+            at86rf2xx_set_addr_long(dev, (eui64_t *)dev->netdev.long_addr);
+            at86rf2xx_set_addr_short(dev, (network_uint16_t *)dev->netdev.short_addr);
+
+            if (!IS_ACTIVE(AT86RF2XX_BASIC_MODE)) {
+                static const netopt_enable_t ack_req =
+                    IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_ACK_REQ) ? NETOPT_ENABLE : NETOPT_DISABLE;
+                netdev_ieee802154_set(&dev->netdev, NETOPT_ACK_REQ,
+                                      &ack_req, sizeof(ack_req));
+            }
             at86rf2xx_reset(dev);
             break;
         default:
@@ -318,11 +439,13 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
     /* getting these options doesn't require the transceiver to be responsive */
     switch (opt) {
+#if AT86RF2XX_HAVE_SUBGHZ
         case NETOPT_CHANNEL_PAGE:
             assert(max_len >= sizeof(uint16_t));
             ((uint8_t *)val)[1] = 0;
-            ((uint8_t *)val)[0] = at86rf2xx_get_page(dev);
+            ((uint8_t *)val)[0] = dev->page;
             return sizeof(uint16_t);
+#endif
 
         case NETOPT_STATE:
             assert(max_len >= sizeof(netopt_state_t));
@@ -351,7 +474,6 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             break;
 
         case NETOPT_RX_START_IRQ:
-        case NETOPT_RX_END_IRQ:
         case NETOPT_TX_START_IRQ:
         case NETOPT_TX_END_IRQ:
             *((netopt_enable_t *)val) = NETOPT_ENABLE;
@@ -400,7 +522,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
     switch (opt) {
         case NETOPT_TX_POWER:
             assert(max_len >= sizeof(int16_t));
-            *((uint16_t *)val) = at86rf2xx_get_txpower(dev);
+            *((uint16_t *)val) = netdev_ieee802154->txpower;
             res = sizeof(uint16_t);
             break;
 
@@ -442,7 +564,8 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             if (!IS_ACTIVE(AT86RF2XX_BASIC_MODE)) {
                 assert(max_len >= sizeof(netopt_enable_t));
                 uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__CSMA_SEED_1);
-                *((netopt_enable_t *)val) = (tmp & AT86RF2XX_CSMA_SEED_1__AACK_DIS_ACK) ? false : true;
+                *((netopt_enable_t *)val) = (tmp & AT86RF2XX_CSMA_SEED_1__AACK_DIS_ACK)
+                                          ? false : true;
                 res = sizeof(netopt_enable_t);
             }
             break;
@@ -460,7 +583,11 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             return sizeof(uint8_t);
 
 #endif /* MODULE_NETDEV_IEEE802154_OQPSK */
-
+#if AT86RF2XX_RANDOM_NUMBER_GENERATOR
+        case NETOPT_RANDOM:
+            at86rf2xx_get_random(dev, (uint8_t*)val, max_len);
+            return max_len;
+#endif
         default:
             res = -ENOTSUP;
             break;
@@ -496,11 +623,18 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
     switch (opt) {
         case NETOPT_ADDRESS:
             assert(len == sizeof(network_uint16_t));
+            memcpy(dev->netdev.short_addr, val, len);
+#ifdef MODULE_SIXLOWPAN
+            /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
+             * 0 for unicast addresses */
+            dev->netdev.short_addr[0] &= 0x7F;
+#endif
             at86rf2xx_set_addr_short(dev, val);
             /* don't set res to set netdev_ieee802154_t::short_addr */
             break;
         case NETOPT_ADDRESS_LONG:
             assert(len == sizeof(eui64_t));
+            memcpy(dev->netdev.long_addr, val, len);
             at86rf2xx_set_addr_long(dev, val);
             /* don't set res to set netdev_ieee802154_t::long_addr */
             break;
@@ -520,19 +654,25 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
                 res = -EINVAL;
                 break;
             }
-            at86rf2xx_set_chan(dev, chan);
+            dev->netdev.chan = chan;
+#if AT86RF2XX_HAVE_SUBGHZ
+            at86rf2xx_configure_phy(dev, chan, dev->page, dev->netdev.txpower);
+#else
+            at86rf2xx_configure_phy(dev, chan, 0, dev->netdev.txpower);
+#endif
             /* don't set res to set netdev_ieee802154_t::chan */
             break;
 
         case NETOPT_CHANNEL_PAGE:
             assert(len == sizeof(uint16_t));
             uint8_t page = (((const uint16_t *)val)[0]) & UINT8_MAX;
-#ifdef MODULE_AT86RF212B
+#if AT86RF2XX_HAVE_SUBGHZ
             if ((page != 0) && (page != 2)) {
                 res = -EINVAL;
             }
             else {
-                at86rf2xx_set_page(dev, page);
+                dev->page = page;
+                at86rf2xx_configure_phy(dev, dev->netdev.chan, page, dev->netdev.txpower);
                 res = sizeof(uint16_t);
             }
 #else
@@ -548,7 +688,12 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 
         case NETOPT_TX_POWER:
             assert(len <= sizeof(int16_t));
-            at86rf2xx_set_txpower(dev, *((const int16_t *)val));
+            netdev_ieee802154->txpower = *((const int16_t *)val);
+#if AT86RF2XX_HAVE_SUBGHZ
+            at86rf2xx_configure_phy(dev, dev->netdev.chan, dev->page, *((const int16_t *)val));
+#else
+            at86rf2xx_configure_phy(dev, dev->netdev.chan, 0, *((const int16_t *)val));
+#endif
             res = sizeof(uint16_t);
             break;
 
@@ -663,7 +808,7 @@ static void _isr_send_complete(at86rf2xx_t *dev, uint8_t trac_status)
         return;
     }
 /* Only radios with the XAH_CTRL_2 register support frame retry reporting */
-#if AT86RF2XX_HAVE_RETRIES && defined(AT86RF2XX_REG__XAH_CTRL_2)
+#if AT86RF2XX_HAVE_RETRIES_REG
     dev->tx_retries = (at86rf2xx_reg_read(dev, AT86RF2XX_REG__XAH_CTRL_2)
                        & AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_MASK) >>
                       AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_OFFSET;
@@ -746,12 +891,7 @@ static void _isr(netdev_t *netdev)
     }
 
     /* read (consume) device status */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
-    irq_mask = dev->irq_status;
-    dev->irq_status = 0;
-#else
-    irq_mask = at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
-#endif
+    irq_mask = at86rf2xx_get_irq_flags(dev);
 
     trac_status = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATE)
                   & AT86RF2XX_TRX_STATE_MASK__TRAC;
@@ -796,7 +936,32 @@ static void _isr(netdev_t *netdev)
     }
 }
 
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params, uint8_t index)
+{
+    netdev_t *netdev = &dev->netdev.netdev;
+
+    netdev->driver = &at86rf2xx_driver;
+    /* State to return after receiving or transmitting */
+    dev->idle_state = AT86RF2XX_STATE_TRX_OFF;
+    /* radio state is P_ON when first powered-on */
+    dev->state = AT86RF2XX_STATE_P_ON;
+    dev->pending_tx = 0;
+
+#if AT86RF2XX_IS_PERIPH
+    (void) params;
+    /* set all interrupts off */
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, 0x00);
+#else
+    /* initialize device descriptor */
+    dev->params = *params;
+#endif
+
+    netdev_register(netdev, NETDEV_AT86RF2XX, index);
+    /* set device address */
+    netdev_ieee802154_setup(&dev->netdev);
+}
+
+#if AT86RF2XX_IS_PERIPH
 
 /**
  * @brief ISR for transceiver's TX_START interrupt
@@ -827,18 +992,15 @@ ISR(TRX24_TX_START_vect){
  *
  * Manual p. 40
  */
-ISR(TRX24_PLL_LOCK_vect, ISR_BLOCK)
+static inline void txr24_pll_lock_handler(void)
 {
-    avr8_enter_isr();
-
     DEBUG("TRX24_PLL_LOCK\n");
     netdev_ieee802154_t *netdev_ieee802154 = container_of(at86rfmega_dev,
                           netdev_ieee802154_t, netdev);
     at86rf2xx_t *dev = container_of(netdev_ieee802154, at86rf2xx_t, netdev);
     dev->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__PLL_LOCK;
-
-    avr8_exit_isr();
 }
+AVR8_ISR(TRX24_PLL_LOCK_vect, txr24_pll_lock_handler);
 
 /**
  * @brief  Transceiver PLL Unlock
@@ -847,18 +1009,15 @@ ISR(TRX24_PLL_LOCK_vect, ISR_BLOCK)
  *
  * Manual p. 89
  */
-ISR(TRX24_PLL_UNLOCK_vect, ISR_BLOCK)
+static inline void txr24_pll_unlock_handler(void)
 {
-    avr8_enter_isr();
-
     DEBUG("TRX24_PLL_UNLOCK\n");
     netdev_ieee802154_t *netdev_ieee802154 = container_of(at86rfmega_dev,
                           netdev_ieee802154_t, netdev);
     at86rf2xx_t *dev = container_of(netdev_ieee802154, at86rf2xx_t, netdev);
     dev->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__PLL_UNLOCK;
-
-    avr8_exit_isr();
 }
+AVR8_ISR(TRX24_PLL_UNLOCK_vect, txr24_pll_unlock_handler);
 
 /**
  * @brief ISR for transceiver's receive start interrupt
@@ -868,10 +1027,8 @@ ISR(TRX24_PLL_UNLOCK_vect, ISR_BLOCK)
  *
  * Flow Diagram Manual p. 52 / 63
  */
-ISR(TRX24_RX_START_vect, ISR_BLOCK)
+static inline void txr24_rx_start_handler(void)
 {
-    avr8_enter_isr();
-
     uint8_t status = *AT86RF2XX_REG__TRX_STATE & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
     DEBUG("TRX24_RX_START 0x%x\n", status);
 
@@ -881,9 +1038,8 @@ ISR(TRX24_RX_START_vect, ISR_BLOCK)
     dev->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__RX_START;
     /* Call upper layer to process valid PHR */
     netdev_trigger_event_isr(at86rfmega_dev);
-
-    avr8_exit_isr();
 }
+AVR8_ISR(TRX24_RX_START_vect, txr24_rx_start_handler);
 
 /**
  * @brief ISR for transceiver's receive end interrupt
@@ -893,10 +1049,8 @@ ISR(TRX24_RX_START_vect, ISR_BLOCK)
  *
  * Flow Diagram Manual p. 52 / 63
  */
-ISR(TRX24_RX_END_vect, ISR_BLOCK)
+static inline void txr24_rx_end_handler(void)
 {
-    avr8_enter_isr();
-
     uint8_t status = *AT86RF2XX_REG__TRX_STATE & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
     DEBUG("TRX24_RX_END 0x%x\n", status);
 
@@ -906,9 +1060,8 @@ ISR(TRX24_RX_END_vect, ISR_BLOCK)
     dev->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__RX_END;
     /* Call upper layer to process received data */
     netdev_trigger_event_isr(at86rfmega_dev);
-
-    avr8_exit_isr();
 }
+AVR8_ISR(TRX24_RX_END_vect, txr24_rx_end_handler);
 
 /**
  * @brief  Transceiver CCAED Measurement finished
@@ -917,18 +1070,15 @@ ISR(TRX24_RX_END_vect, ISR_BLOCK)
  *
  * Manual p. 74 and p. 76
  */
-ISR(TRX24_CCA_ED_DONE_vect, ISR_BLOCK)
+static inline void txr24_cca_ed_done_handler(void)
 {
-    avr8_enter_isr();
-
     DEBUG("TRX24_CCA_ED_DONE\n");
     netdev_ieee802154_t *netdev_ieee802154 = container_of(at86rfmega_dev,
                           netdev_ieee802154_t, netdev);
     at86rf2xx_t *dev = container_of(netdev_ieee802154, at86rf2xx_t, netdev);
     dev->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__CCA_ED_DONE;
-
-    avr8_exit_isr();
 }
+AVR8_ISR(TRX24_CCA_ED_DONE_vect, txr24_cca_ed_done_handler);
 
 /**
  * @brief  Transceiver Frame Address Match, indicates incoming frame
@@ -938,18 +1088,15 @@ ISR(TRX24_CCA_ED_DONE_vect, ISR_BLOCK)
  *
  * Flow Diagram Manual p. 52 / 63
  */
-ISR(TRX24_XAH_AMI_vect, ISR_BLOCK)
+static inline void txr24_xah_ami_handler(void)
 {
-    avr8_enter_isr();
-
     DEBUG("TRX24_XAH_AMI\n");
     netdev_ieee802154_t *netdev_ieee802154 = container_of(at86rfmega_dev,
                           netdev_ieee802154_t, netdev);
     at86rf2xx_t *dev = container_of(netdev_ieee802154, at86rf2xx_t, netdev);
     dev->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__AMI;
-
-    avr8_exit_isr();
 }
+AVR8_ISR(TRX24_XAH_AMI_vect, txr24_xah_ami_handler);
 
 /**
  * @brief ISR for transceiver's transmit end interrupt
@@ -958,10 +1105,8 @@ ISR(TRX24_XAH_AMI_vect, ISR_BLOCK)
  *
  * Flow Diagram Manual p. 52 / 63
  */
-ISR(TRX24_TX_END_vect, ISR_BLOCK)
+static inline void txr24_tx_end_handler(void)
 {
-    avr8_enter_isr();
-
     netdev_ieee802154_t *netdev_ieee802154 = container_of(at86rfmega_dev,
                           netdev_ieee802154_t, netdev);
     at86rf2xx_t *dev = container_of(netdev_ieee802154, at86rf2xx_t, netdev);
@@ -976,9 +1121,8 @@ ISR(TRX24_TX_END_vect, ISR_BLOCK)
         /* Call upper layer to process if data was send successful */
         netdev_trigger_event_isr(at86rfmega_dev);
     }
-
-    avr8_exit_isr();
 }
+AVR8_ISR(TRX24_TX_END_vect, txr24_tx_end_handler);
 
 /**
  * @brief ISR for transceiver's wakeup finished interrupt
@@ -988,10 +1132,8 @@ ISR(TRX24_TX_END_vect, ISR_BLOCK)
  *
  * Manual p. 40
  */
-ISR(TRX24_AWAKE_vect, ISR_BLOCK)
+static inline void txr24_awake_handler(void)
 {
-    avr8_enter_isr();
-
     DEBUG("TRX24_AWAKE\n");
 
     netdev_ieee802154_t *netdev_ieee802154 = container_of(at86rfmega_dev,
@@ -1000,8 +1142,7 @@ ISR(TRX24_AWAKE_vect, ISR_BLOCK)
     dev->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__AWAKE;
     /* Call upper layer to process transceiver wakeup finished */
     netdev_trigger_event_isr(at86rfmega_dev);
-
-    avr8_exit_isr();
 }
+AVR8_ISR(TRX24_AWAKE_vect, txr24_awake_handler);
 
-#endif /* MODULE_AT86RFA1 || MODULE_AT86RFR2 */
+#endif /* AT86RF2XX_IS_PERIPH */

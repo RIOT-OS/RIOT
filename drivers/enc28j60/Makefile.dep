@@ -4,4 +4,5 @@ FEATURES_REQUIRED += periph_spi
 
 USEMODULE += eui_provider
 USEMODULE += netdev_eth
+USEMODULE += netdev_legacy_api
 USEMODULE += xtimer

@@ -101,26 +101,6 @@
 #error "Invalid MSI clock"
 #endif
 
-/* Configure 48MHz clock source */
-#define CLOCK_PLLQ                  ((CLOCK_PLL_SRC / CONFIG_CLOCK_PLL_M) * CONFIG_CLOCK_PLL_N) / CONFIG_CLOCK_PLL_Q
-
-#if CLOCK_PLLQ == MHZ(48)
-#define CLOCK48MHZ_USE_PLLQ         1
-#elif CONFIG_CLOCK_MSI == MHZ(48)
-#define CLOCK48MHZ_USE_MSI          1
-#else
-#define CLOCK48MHZ_USE_PLLQ         0
-#define CLOCK48MHZ_USE_MSI          0
-#endif
-
-#if IS_ACTIVE(CLOCK48MHZ_USE_PLLQ)
-#define CLOCK48MHZ_SELECT           (RCC_CCIPR1_CLK48MSEL_1)
-#elif IS_ACTIVE(CLOCK48MHZ_USE_MSI)
-#define CLOCK48MHZ_SELECT           (RCC_CCIPR1_CLK48MSEL_1 | RCC_CCIPR1_CLK48MSEL_0)
-#else
-#define CLOCK48MHZ_SELECT           (0)
-#endif
-
 /* Configure the AHB and APB buses prescalers */
 #define CLOCK_AHB_DIV               (0)
 
@@ -148,22 +128,17 @@
 #define CLOCK_APB2_DIV              (RCC_CFGR2_PPRE2_2 | RCC_CFGR2_PPRE2_1 | RCC_CFGR2_PPRE2_0)
 #endif
 
-/* Only periph_hwrng requires 48MHz for the moment */
-#if IS_USED(MODULE_PERIPH_HWRNG)
-#if !IS_ACTIVE(CLOCK48MHZ_USE_PLLQ) && !IS_ACTIVE(CLOCK48MHZ_USE_MSI)
-#error "No 48MHz clock source available, HWRNG cannot work"
-#endif
-#define CLOCK_ENABLE_48MHZ          1
+/* Only periph_hwrng and periph_usbdev require HSI RC with 48MHz for the moment */
+#if IS_USED(MODULE_PERIPH_HWRNG) || IS_USED(MODULE_PERIPH_USBDEV_CLK)
+#define CLOCK_ENABLE_HSI48          1
 #else
-#define CLOCK_ENABLE_48MHZ          0
+#define CLOCK_ENABLE_HSI48          0
 #endif
 
 /* Check if PLL is required
-  - When used as system clock
   - When PLLQ is used as 48MHz clock source
 */
-#if IS_ACTIVE(CONFIG_USE_CLOCK_PLL) || \
-    (IS_ACTIVE(CLOCK_ENABLE_48MHZ) && IS_ACTIVE(CLOCK48MHZ_USE_PLLQ))
+#if IS_ACTIVE(CONFIG_USE_CLOCK_PLL)
 #define CLOCK_ENABLE_PLL            1
 #else
 #define CLOCK_ENABLE_PLL            0
@@ -185,7 +160,7 @@
 #error "HSE is required by the clock configuration but is not provided by the board."
 #endif
 
-/* Check if HSI is required:
+/* Check if HSI RC with 16 MHz is required:
   - When used as system clock
   - When used as PLL input clock
 */
@@ -267,7 +242,7 @@ void stmclk_init_sysclk(void)
         while (!(RCC->CR & RCC_CR_HSERDY)) {}
     }
 
-    /* Enable the MSI clock only when it's used */
+    /* Enable the MSIS clock only when it's used */
     if (IS_ACTIVE(CLOCK_ENABLE_MSI)) {
         RCC->ICSCR1 = RCC_ICSCR1_MSIRGSEL;
         RCC->ICSCR1 |= CLOCK_MSIRANGE;
@@ -330,9 +305,14 @@ void stmclk_init_sysclk(void)
         stmclk_disable_hsi();
     }
 
-    if (IS_ACTIVE(CLOCK_ENABLE_48MHZ)) {
-        /* configure the clock used for the 48MHz clock tree (USB, RNG) */
-        RCC->CCIPR1 = CLOCK48MHZ_SELECT;
+    if (IS_ACTIVE(CLOCK_ENABLE_HSI48)) {
+        /* enable HSI48 clock for certain peripherals (RNG, OTG_FS, USB and SDMMC) */
+        RCC->CR |= RCC_CR_HSI48ON;
+        while (!(RCC->CR & RCC_CR_HSI48RDY)) {}
+        /* select HSI48 as clock for RNG (reset value) */
+        /* RCC->CCIPR2 &= ~(RCC_CCIPR2_RNGSEL_1 | RCC_CCIPR2_RNGSEL_0); */
+        /* select HSI48 as clock for OTG_FS, USB and SDMMC (reset value) */
+        /* RCC->CCIPR1 &= ~(RCC_CCIPR1_CLK48MSEL_1 | RCC_CCIPR1_CLK48MSEL_0); */
     }
 
     irq_restore(is);

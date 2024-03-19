@@ -9,10 +9,5 @@ config PACKAGE_EMLEARN
     bool "Machine Learning inference engine package"
     depends on TEST_KCONFIG
     depends on !HAS_ARCH_MSP430
-    select MODULE_EMLEARN
     help
         A header only Machine Learning inference engine package.
-
-config MODULE_EMLEARN
-    bool
-    depends on TEST_KCONFIG

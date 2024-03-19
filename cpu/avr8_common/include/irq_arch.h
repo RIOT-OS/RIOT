@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
  *               2018 RWTH Aachen, Josua Arndt <jarndt@ias.rwth-aachen.de>
  *               2020 Otto-von-Guericke-Universität Magdeburg
- *               2021 Gerson Fernando Budke
+ *               2021-2023 Gerson Fernando Budke
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -100,8 +100,11 @@ __attribute__((always_inline)) static inline void irq_restore(unsigned int _stat
  */
 __attribute__((always_inline)) static inline bool irq_is_in(void)
 {
-    uint8_t state = avr8_get_state();
-    return (state & AVR8_STATE_FLAG_ISR);
+    bool is_in = avr8_state_irq_count > 0;
+
+    __asm__ volatile ("" : : : "memory");
+
+    return is_in;
 }
 
 /**
@@ -118,6 +121,37 @@ __attribute__((always_inline)) static inline bool irq_is_enabled(void)
     );
     return mask & (1 << 7);
 }
+
+/**
+ * @brief Define an AVR-8 ISR
+ *
+ * This macro hides all RIOT-OS port internal details from user implementation.
+ * The user should use this macro passing at least two parameters. The first is
+ * the interrupt vector and the second one is the function to be called. Zero or
+ * more optional parameters can be passed the function one by one using the
+ * variable length argument list.
+ *
+ * It is recommended that user define a `static inline void` function to
+ * the implement the interrupt. The function can accept argument list based on
+ * implementation details.
+ *
+ * Example:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+ * static inline void _my_isr_handler(int index)
+ * {
+ *     do_something(index);
+ * }
+ * AVR8_ISR(PERIPHERAL_INSTANCE_0_ISR, _my_isr_handler, 0);
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
+#define AVR8_ISR(vector, function, ...) \
+    ISR(vector, ISR_BLOCK)              \
+    {                                   \
+        avr8_enter_isr();               \
+        function(__VA_ARGS__);          \
+        avr8_exit_isr();                \
+    }
 
 #ifdef __cplusplus
 }

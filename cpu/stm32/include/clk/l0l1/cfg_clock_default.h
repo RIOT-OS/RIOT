@@ -29,7 +29,7 @@ extern "C" {
  * @name    L0/L1 clock system configuration
  * @{
  */
-#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE < MHZ(1) || CLOCK_HSE > MHZ(24))
+#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CONFIG_CLOCK_HSE < MHZ(1) || CONFIG_CLOCK_HSE > MHZ(24))
 #error "HSE clock frequency must be between 1MHz and 24MHz"
 #endif
 
@@ -42,25 +42,25 @@ extern "C" {
 #endif
 
 #if IS_ACTIVE(CONFIG_USE_CLOCK_HSI)
-#define CLOCK_CORECLOCK                 (CLOCK_HSI)
+#define CLOCK_CORECLOCK                 (CONFIG_CLOCK_HSI)
 
 #elif IS_ACTIVE(CONFIG_USE_CLOCK_HSE)
 #if !IS_ACTIVE(CONFIG_BOARD_HAS_HSE)
 #error "The board doesn't provide an HSE oscillator"
 #endif
-#define CLOCK_CORECLOCK                 (CLOCK_HSE)
+#define CLOCK_CORECLOCK                 (CONFIG_CLOCK_HSE)
 
 #elif IS_ACTIVE(CONFIG_USE_CLOCK_MSI)
 #define CLOCK_CORECLOCK                 (CONFIG_CLOCK_MSI)
 
 #elif IS_ACTIVE(CONFIG_USE_CLOCK_PLL)
 #if IS_ACTIVE(CONFIG_BOARD_HAS_HSE)
-#if CLOCK_HSE < MHZ(2)
+#if CONFIG_CLOCK_HSE < MHZ(2)
 #error "HSE must be greater than 2MHz when used as PLL input clock"
 #endif
-#define CLOCK_PLL_SRC                   (CLOCK_HSE)
-#else /* CLOCK_HSI */
-#define CLOCK_PLL_SRC                   (CLOCK_HSI)
+#define CLOCK_PLL_SRC                   (CONFIG_CLOCK_HSE)
+#else /* CONFIG_CLOCK_HSI */
+#define CLOCK_PLL_SRC                   (CONFIG_CLOCK_HSI)
 #endif /* CONFIG_BOARD_HAS_HSE */
 /* PLL configuration: make sure your values are legit!
  *
@@ -71,7 +71,7 @@ extern "C" {
  * PLL_MUL:         multiplier, allowed values: 3, 4, 6, 8, 12, 16, 24, 32, 48. Default is 4.
  * CORECLOCK        -> 32MHz MAX!
  */
-#define CLOCK_CORECLOCK                 ((CLOCK_PLL_SRC / CONFIG_CLOCK_PLL_DIV) * CONFIG_CLOCK_PLL_MUL)
+#define CLOCK_CORECLOCK                 ((CLOCK_PLL_SRC * CONFIG_CLOCK_PLL_MUL) / CONFIG_CLOCK_PLL_DIV)
 #if CLOCK_CORECLOCK > MHZ(32)
 #error "SYSCLK cannot exceed 32MHz"
 #endif

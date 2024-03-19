@@ -37,7 +37,9 @@ int gnrc_ipv6_nib_abr_add(const ipv6_addr_t *addr)
         _nib_release();
         return -ENOMEM;
     }
-    abr->valid_until_ms = 0U;
+    abr->valid_until_ms = evtimer_now_msec() + (
+        SIXLOWPAN_ND_OPT_ABR_LTIME_DEFAULT * MS_PER_SEC * SEC_PER_MIN
+    );
     /* Associate all existing prefixes in the prefix list of the border router's
      * downstream interface to the authoritative border router so they are
      * advertised in a Router Advertisement with the Authoritative Border Router
@@ -93,9 +95,7 @@ void gnrc_ipv6_nib_abr_print(gnrc_ipv6_nib_abr_t *abr)
     printf("%s v%" PRIu32 " expires %" PRIu32 "min\n",
            ipv6_addr_to_str(addr_str, &abr->addr, sizeof(addr_str)),
            abr->version,
-           (abr->valid_until_ms != 0) ?
-           gnrc_ipv6_nib_abr_valid_offset(abr) :
-           SIXLOWPAN_ND_OPT_ABR_LTIME_DEFAULT);
+           gnrc_ipv6_nib_abr_valid_offset(abr));
 }
 #else
 typedef int dont_be_pedantic;

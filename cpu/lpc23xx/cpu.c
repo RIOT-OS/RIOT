@@ -13,6 +13,7 @@
 
 #include <stdint.h>
 #include "cpu.h"
+#include "kernel_init.h"
 #include "irq.h"
 #include "VIC.h"
 
@@ -130,7 +131,7 @@ void cpu_init(void)
     board_init();
 
     /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
-    stdio_init();
+    early_init();
 
     /* trigger static peripheral initialization */
     periph_init();

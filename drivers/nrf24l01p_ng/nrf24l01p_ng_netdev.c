@@ -255,6 +255,10 @@ static int _init(netdev_t *netdev)
         DEBUG_PUTS("[nrf24l01p_ng] _init(): gpio_init_int() failed");
         return -EIO;
     }
+
+    /* signal link UP */
+    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+
     return 0;
 }
 
@@ -319,7 +323,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     }
     /* drop frame, content in buf becomes invalid and return -ENOBUFS */
     if (len < frame_len) {
-        DEBUG("[nrf24l01p_ng] Buffer too small: %u < %u, dropping frame\n",
+        DEBUG("[nrf24l01p_ng] Buffer too small: %" PRIuSIZE " < %u, dropping frame\n",
               len, frame_len);
         uint8_t garbage[pl_width];
         nrf24l01p_ng_read_rx_payload(dev, garbage, pl_width);

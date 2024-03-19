@@ -3,4 +3,34 @@ BAUD        ?= 9600
 
 ARDUINO_MEGA2560_BOOTLOADER ?= stk500v2
 
+# If port selection via ttys.py is enabled by `MOST_RECENT_PORT=1`, filter
+# USB serials to only select boards that identify as Arduino Mega 2560 or
+# ad Arduino Mega ADK (a special official Mega flavor that is compatible)
+TTY_BOARD_FILTER := --vendor 'Arduino' --model-db 'Mega 2560|Mega ADK'
+
+# Same, but for clones using a cheap USB <--> UART chip rather than the
+# ATmega16U2
+TTY_BOARD_FILTER_CLONE := --driver 'cp210x|ch341'
+
+# If set to 1, auto-detection of TTYs will also allow clones. This has a slight
+# disadvantage for users of genuine Arduino Mega 2560: If the board is not
+# plugged in, it will fall back to a detection that may yield false positives.
+# However, most people will plug in their boards correctly prior to typing
+# `make term`, so this is only a small loss for users of genuine
+# Arduino Mega 2560 but a big win for users of cheap clones. Still, users that
+# only will ever use genuine Arduino Mega 2560 boards can disable this via their
+# .profile or .bashrc if they want.
+ARDUINO_MEGA2560_COMPAT_WITH_CLONES ?= 1
+
+ifeq (1,$(ARDUINO_MEGA2560_COMPAT_WITH_CLONES))
+  TTY_SELECT_CMD := $(RIOTTOOLS)/usb-serial/ttys.py \
+                    --most-recent \
+                    --format path serial \
+                    $(TTY_BOARD_FILTER) || \
+                    $(RIOTTOOLS)/usb-serial/ttys.py \
+                    --most-recent \
+                    --format path serial \
+                    $(TTY_BOARD_FILTER_CLONE)
+endif
+
 include $(RIOTBOARD)/common/arduino-atmega/Makefile.include

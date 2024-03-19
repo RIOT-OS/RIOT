@@ -9,14 +9,14 @@
  */
 
 /**
- * @defgroup    drivers_sht2x SHT2X
+ * @defgroup    drivers_sht2x SHT2x Humidity and Temperature sensor
  * @ingroup     drivers_sensors
- * @brief       Device driver interface for the SHT2X sensor
+ * @brief       Device driver interface for the SHT2x sensor
  * @{
  *
  * @file
- * @brief       Device driver implementation for the SHT2x temperature and
- *              humidity sensor.
+ * @brief       Device driver implementation for the SHT2x humidity and
+ *              temperature humidity sensor.
  *
  * @author      Kees Bakker <kees@sodaq.com>
  * @author      George Psimenos <gp7g14@soton.ac.uk>
@@ -129,7 +129,7 @@ int sht2x_reset(sht2x_t* dev);
  * @brief       Read temperature value from the given SHT2X device, returned in
  *              centi °C
  *
- * @details     Notice that this function will sleep (max 66 ms) when the
+ * @details     Notice that this function will sleep (max 85 ms) when the
  *              @a measure_mode is set to @a SHT2X_MEASURE_MODE_NO_HOLD.
  *
  * @param[in]  dev          Device descriptor of SHT2X device to read from
@@ -143,7 +143,7 @@ int16_t sht2x_read_temperature(const sht2x_t* dev);
  * @brief       Read humidity value from the given SHT2X device, returned in
  *              centi %RH
  *
- * @details     Notice that this function will sleep (max 22 ms) when the
+ * @details     Notice that this function will sleep (max 29 ms) when the
  *              @a measure_mode is set to @a SHT2X_MEASURE_MODE_NO_HOLD.
  *
  * @param[in]  dev          Device descriptor of SHT2X device to read from

@@ -8,4 +8,5 @@
 config MODULE_USB_BOARD_RESET
     bool "Trigger a board reset via USB CDC ACM"
     depends on TEST_KCONFIG
-    depends on MODULE_USBUS_CDC_ACM
+    depends on MODULE_USBUS_CDC_ACM || (MODULE_TINYUSB_DEVICE && MODULE_TINYUSB_CLASS_CDC) \
+                                    || MODULE_STDIO_USB_SERIAL_JTAG

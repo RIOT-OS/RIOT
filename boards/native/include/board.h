@@ -31,10 +31,6 @@
 extern "C" {
 #endif
 
-#ifdef MODULE_MTD
-#include "mtd_native.h"
-#endif
-
 /**
  * @name    LED handlers
  * @{
@@ -60,33 +56,48 @@ void _native_LED_RED_TOGGLE(void);
  * @{
  */
 #ifndef MTD_PAGE_SIZE
-#ifdef MODULE_FATFS
+#if defined(MODULE_FATFS) || defined(MODULE_LWEXT4)
 #define MTD_PAGE_SIZE           (512)
 #else
 #define MTD_PAGE_SIZE           (256)
 #endif
 #endif
 #ifndef MTD_SECTOR_SIZE
-#ifdef MODULE_FATFS
+#if defined(MODULE_FATFS) || defined(MODULE_LWEXT4)
 #define MTD_SECTOR_SIZE         (512)
 #else
 #define MTD_SECTOR_SIZE         (4096)
 #endif
 #endif
 #ifndef MTD_SECTOR_NUM
+#if defined(MODULE_FATFS) || defined(MODULE_LWEXT4)
+#define MTD_SECTOR_NUM          (32768)
+#else
 #define MTD_SECTOR_NUM          (2048)
+#endif
+#endif
+/** Advertised write size. While the file system backend supports single byte
+ * granularity, this can be increased to mimic other media. */
+#ifndef MTD_WRITE_SIZE
+#define MTD_WRITE_SIZE          (1)
 #endif
 #ifndef MTD_NATIVE_FILENAME
 #define MTD_NATIVE_FILENAME     "MEMORY.bin"
 #endif
 /** @} */
 
-/** Default MTD device */
-#define MTD_0 mtd0
-
-/** mtd flash emulation device */
-extern mtd_dev_t *mtd0;
+/** Default MTD device (mtd flash emulation device) */
+#define MTD_0 mtd_dev_get(0)
 #endif
+
+/**
+ * @name    Host FS access configuration
+ * @{
+ */
+#ifndef FS_NATIVE_DIR
+#define FS_NATIVE_DIR           "native"  /**< Folder on the host fs exported to RIOT */
+#endif
+/** @} */
 
 #if defined(MODULE_SPIFFS) || DOXYGEN
 /**

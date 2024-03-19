@@ -1,0 +1,18 @@
+# Copyright (c) 2022 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+if CPU_FAM_G0 || CPU_FAM_WB || CPU_FAM_WL || CPU_FAM_MP1
+
+config CLOCK_PLL_R
+    int "Q: VCO division factor" if CUSTOM_PLL_PARAMS
+    default 2 if CPU_FAM_WB || CPU_FAM_WL
+    default 3 if CPU_FAM_MP1
+    default 6 if BOARD_HAS_HSE
+    default 5
+    range 2 8
+
+endif # CPU_FAM_G0 || CPU_FAM_WB || CPU_FAM_WL || CPU_FAM_MP1

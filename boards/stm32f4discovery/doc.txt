@@ -58,7 +58,11 @@ arbitrary and can be altered by editing the
 LEDs LD7 and LD8 are used by the USB connector for over-current (LD8) and
 data (LD7) indication.
 
+### USB Device Interface
 
+The board has a micro USB port that can be used for USB device mode.
+As the ST-Link on the board does not provide a USB-UART interface, the STDIO is
+mapped to the micro USB port by default (via CDC ACM).
 
 ### Accelerometer
 
@@ -183,7 +187,7 @@ time, the internal pull-up resistors are not sufficient for stable bus
 operation. You probably have to connect external pull-ups to both bus lines. 10K
 is a good value to start with.
 
-### OS X & make term
+### macOS & make term
 If you want the terminal to work using `make term` command and get a message
 about missing tty device install the driver from
 https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers .

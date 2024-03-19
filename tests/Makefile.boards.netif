@@ -6,17 +6,19 @@ BOARD_PROVIDES_NETIF := \
     atmega256rfr2-xpro \
     avr-rss2 \
     b-l072z-lrwan1 \
-    cc2538dk \
     calliope-mini \
+    cc2538dk \
     derfmega128 \
     derfmega256 \
     dwm1001 \
     esp32-wroom-32 \
     frdm-kw41z \
+    generic-cc2538-cc2592-dk \
     hamilton \
     iotlab-a8-m3 \
     iotlab-m3 \
     lobaro-lorabox \
+    lora-e5-dev \
     lsn50 \
     microbit \
     microbit-v2 \
@@ -24,6 +26,7 @@ BOARD_PROVIDES_NETIF := \
     msba2 \
     mulle \
     native \
+    native64 \
     nrf51dk \
     nrf51dongle \
     nrf52840-mdk \
@@ -32,7 +35,10 @@ BOARD_PROVIDES_NETIF := \
     nrf52dk \
     nrf6310 \
     nucleo-f207zg \
+    nucleo-f429zi \
+    nucleo-f439zi \
     nucleo-f767zi \
+    nucleo-wl55jc \
     openlabs-kw41z-mini \
     openlabs-kw41z-mini-256kib \
     openmote-b \
@@ -47,6 +53,7 @@ BOARD_PROVIDES_NETIF := \
     samr30-xpro \
     spark-core \
     stm32f746g-disco \
+    stm32f7508-dk \
     telosb \
     thingy52 \
     usb-kw41z \

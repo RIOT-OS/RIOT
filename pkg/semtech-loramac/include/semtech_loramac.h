@@ -512,6 +512,22 @@ void semtech_loramac_set_uplink_counter(semtech_loramac_t *mac, uint32_t counter
  */
 uint32_t semtech_loramac_get_uplink_counter(semtech_loramac_t *mac);
 
+/**
+ * @brief   Sets the Channels Mask
+ *
+ * @param[in] mac          Pointer to the mac
+ * @param[in] mask         Mask array, e.g., {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0x0000, 0x0000}
+ */
+void semtech_loramac_set_channels_mask(semtech_loramac_t *mac, uint16_t *mask);
+
+/**
+ * @brief   Gets the Channels Mask
+ *
+ * @param[in] mac          Pointer to the mac
+ * @param[in] mask         Mask array pointer
+ */
+void semtech_loramac_get_channels_mask(semtech_loramac_t *mac, uint16_t *mask);
+
 #ifdef MODULE_PERIPH_EEPROM
 /**
  * @brief   The magic number used to identify the LoRaWAN configuration

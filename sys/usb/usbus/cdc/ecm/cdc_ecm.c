@@ -162,6 +162,14 @@ static void _fill_ethernet(usbus_cdcecm_device_t *cdcecm)
 
 }
 
+void _start_urb(usbus_cdcecm_device_t *cdcecm)
+{
+    usbus_urb_init(&cdcecm->out_urb,
+                   cdcecm->data_out,
+                   USBUS_ETHERNET_FRAME_BUF, 0);
+    usbus_urb_submit(cdcecm->usbus, cdcecm->ep_out, &cdcecm->out_urb);
+}
+
 void usbus_cdcecm_init(usbus_t *usbus, usbus_cdcecm_device_t *handler)
 {
     assert(usbus);
@@ -210,6 +218,7 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
                                          USB_EP_TYPE_INTERRUPT,
                                          USB_EP_DIR_IN,
                                          USBUS_CDCECM_EP_CTRL_SIZE);
+    assert(cdcecm->ep_ctrl);
     cdcecm->ep_ctrl->interval = 0x10;
 
     cdcecm->ep_out = usbus_add_endpoint(usbus,
@@ -217,12 +226,14 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
                                         USB_EP_TYPE_BULK,
                                         USB_EP_DIR_OUT,
                                         USBUS_CDCECM_EP_DATA_SIZE);
+    assert(cdcecm->ep_out);
     cdcecm->ep_out->interval = 0; /* Must be 0 for bulk endpoints */
     cdcecm->ep_in = usbus_add_endpoint(usbus,
                                        (usbus_interface_t *)&cdcecm->iface_data_alt,
                                        USB_EP_TYPE_BULK,
                                        USB_EP_DIR_IN,
                                        USBUS_CDCECM_EP_DATA_SIZE);
+    assert(cdcecm->ep_in);
     cdcecm->ep_in->interval = 0; /* Must be 0 for bulk endpoints */
 
     /* Add interfaces to the stack */
@@ -251,9 +262,9 @@ static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
                   setup->value);
             cdcecm->active_iface = (uint8_t)setup->value;
             if (cdcecm->active_iface == 1) {
-                usbdev_ep_xmit(cdcecm->ep_out->ep, cdcecm->data_out,
-                               USBUS_CDCECM_EP_DATA_SIZE);
                 _notify_link_up(cdcecm);
+                /* Start URB */
+                _start_urb(cdcecm);
             }
             break;
 
@@ -298,8 +309,8 @@ static void _handle_rx_flush_ev(event_t *ev)
 {
     usbus_cdcecm_device_t *cdcecm = container_of(ev, usbus_cdcecm_device_t,
                                                  rx_flush);
-    cdcecm->len = 0; /* Flush packet */
-    usbdev_ep_xmit(cdcecm->ep_out->ep, cdcecm->data_out, USBUS_CDCECM_EP_DATA_SIZE);
+    /* Start URB */
+    _start_urb(cdcecm);
 }
 
 static void _transfer_handler(usbus_t *usbus, usbus_handler_t *handler,
@@ -310,20 +321,7 @@ static void _transfer_handler(usbus_t *usbus, usbus_handler_t *handler,
     usbus_cdcecm_device_t *cdcecm = (usbus_cdcecm_device_t *)handler;
     if (ep == cdcecm->ep_out->ep) {
         /* Retrieve incoming data */
-        if (cdcecm->notif == USBUS_CDCECM_NOTIF_NONE) {
-            _notify_link_up(cdcecm);
-        }
-        size_t len = 0;
-        usbdev_ep_get(ep, USBOPT_EP_AVAILABLE, &len, sizeof(size_t));
-        cdcecm->len += len;
-        if (len == USBUS_CDCECM_EP_DATA_SIZE) {
-            /* ready next chunk */
-            usbdev_ep_xmit(ep, cdcecm->data_out + cdcecm->len,
-                           USBUS_CDCECM_EP_DATA_SIZE);
-        }
-        else {
-            netdev_trigger_event_isr(&cdcecm->netdev);
-        }
+        netdev_trigger_event_isr(&cdcecm->netdev);
     }
     else if (ep == cdcecm->ep_in->ep) {
         _handle_in_complete(usbus, handler);
@@ -338,10 +336,15 @@ static void _handle_reset(usbus_t *usbus, usbus_handler_t *handler)
 {
     usbus_cdcecm_device_t *cdcecm = (usbus_cdcecm_device_t *)handler;
 
+    /* Set the max packet size advertised to the host to something compatible with the enumerated
+     * size */
+    size_t maxpacketsize = usbus_max_bulk_endpoint_size(usbus);
+    cdcecm->ep_in->maxpacketsize = maxpacketsize;
+    cdcecm->ep_out->maxpacketsize = maxpacketsize;
+
     DEBUG("CDC ECM: Reset\n");
     _handle_in_complete(usbus, handler);
     cdcecm->notif = USBUS_CDCECM_NOTIF_NONE;
-    cdcecm->len = 0; /* Flush received data */
     cdcecm->active_iface = 0;
     mutex_unlock(&cdcecm->out_lock);
 }

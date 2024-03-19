@@ -182,7 +182,7 @@ extern "C" {
 #define UART0_TXD   GPIO1  /**< direct I/O pin for UART_DEV(0) TxD, can't be changed */
 #define UART0_RXD   GPIO3  /**< direct I/O pin for UART_DEV(0) RxD, can't be changed */
 
-#if FLASH_MODE_DOUT || FLASH_MODE_DIO || DOXYGEN
+#if CONFIG_FLASHMODE_DOUT || CONFIG_FLASHMODE_DIO || DOXYGEN
 #ifndef UART1_TXD
 #define UART1_TXD   GPIO10  /**< direct I/O pin for UART_DEV(1) TxD */
 #endif

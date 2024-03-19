@@ -20,7 +20,6 @@
 #define BOARD_H
 
 #include "cpu.h"
-#include "mtd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,8 +52,7 @@ extern "C" {
  * @name MTD configuration
  * @{
  */
-extern mtd_dev_t *mtd0;
-#define MTD_0 mtd0
+#define MTD_0 mtd_dev_get(0)
 /** @} */
 
 /**
@@ -64,11 +62,6 @@ extern mtd_dev_t *mtd0;
 #define XTIMER_WIDTH                (32)
 #define XTIMER_HZ                   (1000000ul)
 /** @} */
-
-/**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

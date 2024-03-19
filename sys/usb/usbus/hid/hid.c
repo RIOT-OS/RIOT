@@ -121,6 +121,7 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
                                     USB_EP_TYPE_INTERRUPT,
                                     USB_EP_DIR_IN,
                                     CONFIG_USBUS_HID_INTERRUPT_EP_SIZE);
+    assert(hid->ep_in);
 
     /* interrupt endpoint polling rate in ms */
     hid->ep_in->interval = 0x05;
@@ -131,6 +132,7 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
     hid->ep_out = usbus_add_endpoint(usbus, &hid->iface,
                                      USB_EP_TYPE_INTERRUPT, USB_EP_DIR_OUT,
                                      CONFIG_USBUS_HID_INTERRUPT_EP_SIZE);
+    assert(hid->ep_out);
 
     /* interrupt endpoint polling rate in ms */
     hid->ep_out->interval = 0x05;
@@ -186,7 +188,7 @@ static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
     case USB_HID_REQUEST_GET_PROTOCOL:
         break;
     case USB_HID_REQUEST_SET_REPORT:
-        if ((state == USBUS_CONTROL_REQUEST_STATE_OUTDATA)) {
+        if (state == USBUS_CONTROL_REQUEST_STATE_OUTDATA) {
             size_t size = 0;
             uint8_t *data = usbus_control_get_out_data(usbus, &size);
             if (size > 0) {

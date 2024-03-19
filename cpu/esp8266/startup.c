@@ -66,7 +66,7 @@ void esp_riot_init(void)
     /* initialize the ISR stack for usage measurements */
     thread_isr_stack_init();
 
-#ifndef MCU_ESP8266
+#ifndef CPU_ESP8266
     /* initialize newlib system calls */
     syscalls_init ();
 #endif
@@ -106,7 +106,7 @@ void esp_riot_init(void)
 
     /* initialize stdio*/
     extern int stdio_is_initialized;
-    stdio_init();
+    early_init();
     stdio_is_initialized = 1;
 
     /* trigger static peripheral initialization */

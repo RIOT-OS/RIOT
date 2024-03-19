@@ -1,6 +1,8 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
  *               2017 Thomas Perrot <thomas.perrot@tupi.fr>
+ *               2023 Hugues Larrive
+ *               2023 Gerson Fernando Budke
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,11 +20,13 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author      Thomas Perrot <thomas.perrot@tupi.fr>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
+ * @author      Gerson Fernando Budke <nandojve@gmail.com>
  *
  *
  * Support static BAUD rate calculation using STDIO_UART_BAUDRATE.
  * Set STDIO_UART_BAUDRATE to the desired baud rate and pass it as a -D argument
- * at compliation time (e.g. in the boards Makefile.include file).
+ * at compilation time (e.g. in the boards Makefile.include file).
  * UART_BAUD_TOL can be set to guarantee a BAUD rate tolerance at compile time or
  * to switch to double speed transmission (U2X) to achieve a lower tolerance.
  * At runtime, this tolerance is not guaranteed to be met.
@@ -83,12 +87,20 @@ static uart_isr_ctx_t isr_ctx[UART_NUMOF];
 
 static void _update_brr(uart_t uart, uint16_t brr, bool double_speed)
 {
+#if defined(UCSR0A) || defined(UCSR1A)
     dev[uart]->BRR = brr;
+#elif defined(UCSRA) /* atmega8 */
+    /* on atmega8 BRRH is shared with CSRC */
+    dev[uart]->CSRC = (brr >> 8);
+    dev[uart]->BRRL = (uint8_t)(brr & 0x00ff);
+#endif
     if (double_speed) {
-#ifdef CPU_ATMEGA32U4
-        dev[uart]->CSRA |= (1 << U2X1);
-#else
+#if defined(U2X) /* atmega8 */
+        dev[uart]->CSRA |= (1 << U2X);
+#elif defined(U2X0)
         dev[uart]->CSRA |= (1 << U2X0);
+#elif defined(U2X1) /* atmega32u4 */
+        dev[uart]->CSRA |= (1 << U2X1);
 #endif
     }
 }
@@ -129,34 +141,40 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     isr_ctx[uart].arg = arg;
 
     /* disable and reset UART */
-#ifdef CPU_ATMEGA32U4
+#ifdef UCSR1D /* 32u4 */
     dev[uart]->CSRD = 0;
 #endif
     dev[uart]->CSRB = 0;
     dev[uart]->CSRA = 0;
 
     /* configure UART to 8N1 mode */
-#ifdef CPU_ATMEGA32U4
-    dev[uart]->CSRC = (1 << UCSZ10) | (1 << UCSZ11);
-#else
+#if defined(UCSZ0) && defined(UCSZ1) /* atmega8 */
+    dev[uart]->CSRC = (1 << UCSZ0) | (1 << UCSZ1);
+#elif defined(UCSZ00) && defined(UCSZ01)
     dev[uart]->CSRC = (1 << UCSZ00) | (1 << UCSZ01);
+#elif defined(UCSZ10) && defined(UCSZ11) /* 32u4 */
+    dev[uart]->CSRC = (1 << UCSZ10) | (1 << UCSZ11);
 #endif
     /* set clock divider */
     _set_brr(uart, baudrate);
 
     /* enable RX and TX and their respective interrupt */
     if (rx_cb) {
-#ifdef CPU_ATMEGA32U4
-        dev[uart]->CSRB = ((1 << RXCIE1) | (1 << TXCIE1) | (1 << RXEN1) | (1 << TXEN1));
-#else
+#if defined(RXCIE) /* atmega8 */
+        dev[uart]->CSRB = ((1 << RXCIE) | (1 << TXCIE) | (1 << RXEN) | (1 << TXEN));
+#elif defined(RXCIE0)
         dev[uart]->CSRB = ((1 << RXCIE0) | (1 << TXCIE0) | (1 << RXEN0) | (1 << TXEN0));
+#elif defined(RXCIE1) /* 32u4 */
+        dev[uart]->CSRB = ((1 << RXCIE1) | (1 << TXCIE1) | (1 << RXEN1) | (1 << TXEN1));
 #endif
     }
     else {
-#ifdef CPU_ATMEGA32U4
-        dev[uart]->CSRB = ((1 << TXEN1) | (1 << TXCIE1));
-#else
+#if defined(TXEN) /* atmega8 */
+        dev[uart]->CSRB = ((1 << TXEN) | (1 << TXCIE));
+#elif defined(TXEN0)
         dev[uart]->CSRB = ((1 << TXEN0) | (1 << TXCIE0));
+#elif defined(TXEN1) /* 32u4 */
+        dev[uart]->CSRB = ((1 << TXEN1) | (1 << TXCIE1));
 #endif
     }
 
@@ -166,16 +184,19 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     for (size_t i = 0; i < len; i++) {
-#ifdef CPU_ATMEGA32U4
-        while (!(dev[uart]->CSRA & (1 << UDRE1))) {};
-#else
+#if defined(UDRE) /* atmega8 */
+        while (!(dev[uart]->CSRA & (1 << UDRE))) {};
+#elif defined(UDRE0)
         while (!(dev[uart]->CSRA & (1 << UDRE0))) {}
+#elif defined(UDRE1) /* 32u4 */
+        while (!(dev[uart]->CSRA & (1 << UDRE1))) {};
 #endif
         /* start of TX won't finish until no data in UDRn and transmit shift
            register is empty */
         unsigned long state = irq_disable();
-        avr8_state |= AVR8_STATE_FLAG_UART_TX(uart);
+        avr8_uart_tx_set_pending(uart);
         irq_restore(state);
+
         dev[uart]->DR = data[i];
     }
 }
@@ -194,76 +215,44 @@ void uart_poweroff(uart_t uart)
 
 static inline void _rx_isr_handler(int num)
 {
-    avr8_enter_isr();
-
     isr_ctx[num].rx_cb(isr_ctx[num].arg, dev[num]->DR);
-
-    avr8_exit_isr();
 }
 
 static inline void _tx_isr_handler(int num)
 {
-    avr8_enter_isr();
-
     /* entire frame in the Transmit Shift Register has been shifted out and
        there are no new data currently present in the transmit buffer */
-    avr8_state &= ~AVR8_STATE_FLAG_UART_TX(num);
-
-    avr8_exit_isr();
+    avr8_uart_tx_clear_pending(num);
 }
 
 #ifdef UART_0_ISR
-ISR(UART_0_ISR, ISR_BLOCK)
-{
-    _rx_isr_handler(0);
-}
+AVR8_ISR(UART_0_ISR, _rx_isr_handler, 0);
 #endif /* UART_0_ISR */
 
 #ifdef UART_1_ISR
-ISR(UART_1_ISR, ISR_BLOCK)
-{
-    _rx_isr_handler(1);
-}
+AVR8_ISR(UART_1_ISR, _rx_isr_handler, 1);
 #endif /* UART_1_ISR */
 
 #ifdef UART_2_ISR
-ISR(UART_2_ISR, ISR_BLOCK)
-{
-    _rx_isr_handler(2);
-}
+AVR8_ISR(UART_2_ISR, _rx_isr_handler, 2);
 #endif /* UART_2_ISR */
 
 #ifdef UART_3_ISR
-ISR(UART_3_ISR, ISR_BLOCK)
-{
-    _rx_isr_handler(3);
-}
+AVR8_ISR(UART_3_ISR, _rx_isr_handler, 3);
 #endif /* UART_3_ISR */
 
 #ifdef UART_0_ISR_TX
-ISR(UART_0_ISR_TX, ISR_BLOCK)
-{
-    _tx_isr_handler(0);
-}
+AVR8_ISR(UART_0_ISR_TX, _tx_isr_handler, 0);
 #endif /* UART_0_ISR_TX */
 
 #ifdef UART_1_ISR_TX
-ISR(UART_1_ISR_TX, ISR_BLOCK)
-{
-    _tx_isr_handler(1);
-}
+AVR8_ISR(UART_1_ISR_TX, _tx_isr_handler, 1);
 #endif /* UART_1_ISR_TX */
 
 #ifdef UART_2_ISR_TX
-ISR(UART_2_ISR_TX, ISR_BLOCK)
-{
-    _tx_isr_handler(2);
-}
+AVR8_ISR(UART_2_ISR_TX, _tx_isr_handler, 2);
 #endif /* UART_2_ISR_TX */
 
 #ifdef UART_3_ISR_TX
-ISR(UART_3_ISR_TX, ISR_BLOCK)
-{
-    _tx_isr_handler(3);
-}
+AVR8_ISR(UART_3_ISR_TX, _tx_isr_handler, 3);
 #endif /* UART_3_ISR_TX */

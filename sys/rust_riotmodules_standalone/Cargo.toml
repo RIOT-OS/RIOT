@@ -1,0 +1,21 @@
+[package]
+name = "rust_riotmodules_standalone"
+version = "0.1.0"
+authors = ["Christian Amsüss <chrysn@fsfe.org>"]
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = [ "staticlib" ]
+
+[profile.release]
+lto = true
+opt-level = "s"
+debug = true
+panic = "abort"
+codegen-units = 1
+
+[dependencies]
+riot-wrappers = { version = "0.8", features = [ "set_panic_handler" ] }
+
+rust_riotmodules = { path = "../rust_riotmodules" }

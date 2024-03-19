@@ -1,0 +1,24 @@
+FEATURES_OPTIONAL += arduino_analog
+FEATURES_OPTIONAL += arduino_dac
+FEATURES_OPTIONAL += arduino_i2c
+FEATURES_OPTIONAL += arduino_spi
+FEATURES_OPTIONAL += arduino_uart
+FEATURES_OPTIONAL += periph_adc
+FEATURES_OPTIONAL += periph_i2c
+FEATURES_OPTIONAL += periph_spi
+FEATURES_REQUIRED += arduino_pins
+FEATURES_REQUIRED += cpp
+FEATURES_REQUIRED += periph_gpio
+FEATURES_REQUIRED += periph_uart
+USEMODULE += arduino_sketches
+USEMODULE += fmt
+USEMODULE += ztimer_msec
+USEMODULE += ztimer_usec
+
+ifneq (,$(filter stdio_cdc_acm,$(USEMODULE)))
+  USEMODULE += arduino_serial_stdio
+endif
+
+ifneq (,$(filter arduino_pwm,$(FEATURES_USED)))
+  FEATURES_REQUIRED += periph_pwm
+endif

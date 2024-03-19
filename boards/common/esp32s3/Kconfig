@@ -1,0 +1,21 @@
+# Copyright (c) 2020 HAW Hamburg
+#               2022 Gunar Schorcht
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD_COMMON_ESP32S3
+    bool
+    select BOARD_COMMON_ESP32X
+
+config MODULE_BOARDS_COMMON_ESP32S3
+    bool
+    depends on TEST_KCONFIG
+    depends on BOARD_COMMON_ESP32S3
+    depends on HAS_ARCH_ESP32
+    default y
+    help
+      Common ESP32-S3 boards code.
+
+source "$(RIOTBOARD)/common/esp32x/Kconfig"

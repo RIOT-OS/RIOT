@@ -8,10 +8,5 @@
 config PACKAGE_GEMMLOWP
     bool "General Matrix Multiplication package"
     depends on TEST_KCONFIG
-    select MODULE_GEMMLOWP
     help
         A small self-contained low-precision GEMM library.
-
-config MODULE_GEMMLOWP
-    bool
-    depends on TEST_KCONFIG

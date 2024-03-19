@@ -45,28 +45,17 @@
 
 namespace riot {
 
-namespace {
-/**
- * @brief Identify uninitialized threads.
- */
-constexpr kernel_pid_t thread_uninitialized = -1;
-/**
- * @brief The stack size for new threads.
- */
-constexpr size_t stack_size = THREAD_STACKSIZE_MAIN;
-}
-
 /**
  * @brief Holds context data for the thread.
  */
 struct thread_data {
-  thread_data() : ref_count{2}, joining_thread{thread_uninitialized} {
+  thread_data() : ref_count{2}, joining_thread{KERNEL_PID_UNDEF} {
     // nop
   }
   /** @cond INTERNAL */
   std::atomic<unsigned> ref_count;
   kernel_pid_t joining_thread;
-  std::array<char, stack_size> stack;
+  std::array<char, THREAD_STACKSIZE_MAIN> stack;
   /** @endcond */
 };
 
@@ -103,7 +92,7 @@ public:
   /**
    * @brief Creates a uninitialized thread id.
    */
-  inline thread_id() noexcept : m_handle{thread_uninitialized} {}
+  inline thread_id() noexcept : m_handle{KERNEL_PID_UNDEF} {}
   /**
    * @brief Create a thread id from a native handle.
    */
@@ -172,9 +161,9 @@ inline thread_id get_id() noexcept { return thread_id{thread_getpid()}; }
 inline void yield() noexcept { thread_yield(); }
 /**
  * @brief Puts the current thread to sleep.
- * @param[in] ns    Duration to sleep in nanoseconds.
+ * @param[in] us    Duration to sleep in microseconds.
  */
-void sleep_for(const std::chrono::nanoseconds& ns);
+void sleep_for(const std::chrono::microseconds& us);
 /**
  * @brief Puts the current thread to sleep.
  * @param[in] sleep_duration    The duration to sleep.
@@ -182,18 +171,22 @@ void sleep_for(const std::chrono::nanoseconds& ns);
 template <class Rep, class Period>
 void sleep_for(const std::chrono::duration<Rep, Period>& sleep_duration) {
   using namespace std::chrono;
-  if (sleep_duration > std::chrono::duration<Rep, Period>::zero()) {
-    constexpr std::chrono::duration<long double> max = nanoseconds::max();
-    nanoseconds ns;
+  if (sleep_duration > sleep_duration.zero()) {
+    constexpr duration<long double> max = microseconds::max();
+    microseconds us;
     if (sleep_duration < max) {
-      ns = duration_cast<nanoseconds>(sleep_duration);
-      if (ns < sleep_duration) {
-        ++ns;
+      us = duration_cast<microseconds>(sleep_duration);
+      if (us.count() == 0) {
+        // wait at least 1
+        us = microseconds(1);
+      }
+      if (us < sleep_duration) {
+        ++us;
       }
     } else {
-      ns = nanoseconds::max();
+      us = microseconds::max();
     }
-    sleep_for(ns);
+    sleep_for(us);
   }
 }
 /**
@@ -232,7 +225,7 @@ public:
   /**
    * @brief Per default, an uninitialized thread is created.
    */
-  inline thread() noexcept : m_handle{thread_uninitialized} {}
+  inline thread() noexcept : m_handle{KERNEL_PID_UNDEF} {}
   /**
    * @brief Create a thread from a functor and arguments for it.
    * @param[in] f     Functor to run as a thread.
@@ -250,7 +243,7 @@ public:
    * @brief Move constructor.
    */
   inline thread(thread&& t) noexcept : m_handle{t.m_handle} {
-    t.m_handle = thread_uninitialized;
+    t.m_handle = KERNEL_PID_UNDEF;
     std::swap(m_data, t.m_data);
   }
 
@@ -280,7 +273,7 @@ public:
    * @return  `true` if the thread is joinable, `false` otherwise.
    */
   inline bool joinable() const noexcept {
-    return m_handle != thread_uninitialized;
+    return m_handle != KERNEL_PID_UNDEF;
   }
   /**
    * @brief Block until the thread finishes. Leads to an error if the thread is
@@ -324,7 +317,7 @@ void swap(thread& lhs, thread& rhs) noexcept;
 /** @cond INTERNAL */
 template <class Tuple>
 void* thread_proxy(void* vp) {
-  { // without this scope, the objects here are not cleaned up corrctly
+  { // without this scope, the objects here are not cleaned up correctly
     std::unique_ptr<Tuple> p(static_cast<Tuple*>(vp));
     auto tmp = std::get<0>(*p);
     std::unique_ptr<thread_data, thread_data_deleter> data{tmp};
@@ -336,7 +329,7 @@ void* thread_proxy(void* vp) {
     catch (...) {
       // nop
     }
-    if (data->joining_thread != thread_uninitialized) {
+    if (data->joining_thread != KERNEL_PID_UNDEF) {
       thread_wakeup(data->joining_thread);
     }
   }
@@ -347,15 +340,14 @@ void* thread_proxy(void* vp) {
 /** @endcond */
 
 template <class F, class... Args>
-thread::thread(F&& f, Args&&... args)
-    : m_data{new thread_data} {
+thread::thread(F&& f, Args&&... args) : m_data{new thread_data} {
   using namespace std;
   using func_and_args = tuple
     <thread_data*, typename decay<F>::type, typename decay<Args>::type...>;
   unique_ptr<func_and_args> p(
-    new func_and_args(m_data.get(), forward<F>(f), forward<Args>(args)...));
+    new func_and_args(m_data.get(), std::forward<F>(f), std::forward<Args>(args)...));
   m_handle = thread_create(
-    m_data->stack.data(), stack_size, THREAD_PRIORITY_MAIN - 1, 0,
+    m_data->stack.data(), m_data->stack.size(), THREAD_PRIORITY_MAIN - 1, 0,
     &thread_proxy<func_and_args>, p.get(), "riot_cpp_thread");
   if (m_handle >= 0) {
     p.release();
@@ -367,11 +359,11 @@ thread::thread(F&& f, Args&&... args)
 }
 
 inline thread& thread::operator=(thread&& other) noexcept {
-  if (m_handle != thread_uninitialized) {
+  if (m_handle != KERNEL_PID_UNDEF) {
     std::terminate();
   }
   m_handle = other.m_handle;
-  other.m_handle = thread_uninitialized;
+  other.m_handle = KERNEL_PID_UNDEF;
   std::swap(m_data, other.m_data);
   return *this;
 }

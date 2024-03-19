@@ -53,12 +53,12 @@ static int read_mc_pm_10(const void *_dev, phydat_t *data)
 
 const saul_driver_t sm_pwm_01c_saul_driver_mc_pm_10 = {
     .read = read_mc_pm_10,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_PM,
 };
 
 const saul_driver_t sm_pwm_01c_saul_driver_mc_pm_2p5 = {
     .read = read_mc_pm_2p5,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_PM,
 };

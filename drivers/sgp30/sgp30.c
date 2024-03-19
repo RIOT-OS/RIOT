@@ -19,11 +19,11 @@
  */
 #include <string.h>
 
+#include "checksum/crc8.h"
+#include "irq.h"
 #include "sgp30.h"
 #include "sgp30_constants.h"
 #include "sgp30_params.h"
-
-#include "checksum/crc8.h"
 #include "ztimer.h"
 
 #define ENABLE_DEBUG    0

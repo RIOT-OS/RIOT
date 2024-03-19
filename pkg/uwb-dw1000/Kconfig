@@ -14,7 +14,7 @@ menuconfig PACKAGE_UWB-DW1000
     select MODULE_PERIPH_GPIO_IRQ
     depends on HAS_PERIPH_SPI
     select MODULE_PERIPH_SPI
-    depends on HAS_ARCH_32BIT
+    depends on HAS_ARCH_32BIT || HAS_ARCH_64BIT
 
 if PACKAGE_UWB-DW1000
 

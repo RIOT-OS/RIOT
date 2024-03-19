@@ -53,6 +53,7 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_add(
     gnrc_sixlowpan_frag_vrb_t *vrbe = NULL;
 
     assert(base != NULL);
+    assert(base->src_len != 0);
     assert(out_netif != NULL);
     assert(out_dst != NULL);
     assert(out_dst_len > 0);
@@ -168,6 +169,7 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_get(
 {
     DEBUG("6lo vrb: trying to get entry for (%s, %u)\n",
           gnrc_netif_addr_to_str(src, src_len, addr_str), src_tag);
+    assert(src_len != 0);
     for (unsigned i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_SIZE; i++) {
         gnrc_sixlowpan_frag_vrb_t *vrbe = &_vrb[i];
 
@@ -189,6 +191,7 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_reverse(
 {
     DEBUG("6lo vrb: trying to get entry for reverse label switching (%s, %u)\n",
           gnrc_netif_addr_to_str(src, src_len, addr_str), tag);
+    assert(src_len != 0);
     for (unsigned i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_SIZE; i++) {
         gnrc_sixlowpan_frag_vrb_t *vrbe = &_vrb[i];
 

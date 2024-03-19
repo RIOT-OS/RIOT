@@ -69,8 +69,9 @@ static void *_event_loop(void *arg)
     event_queue_init(&_queue);
 
 #if IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)
-    event_timeout_init(&_ctap_hid_event_timeout, &_queue, &_ctap_hid_timeout_event);
-    event_timeout_set(&_ctap_hid_event_timeout, CTAP_HID_TRANSACTION_TIMEOUT);
+    event_timeout_ztimer_init(&_ctap_hid_event_timeout, ZTIMER_MSEC, &_queue,
+                              &_ctap_hid_timeout_event);
+    event_timeout_set(&_ctap_hid_event_timeout, CTAP_HID_TRANSACTION_TIMEOUT_MS);
 #endif
 
     event_loop(&_queue);
@@ -83,7 +84,7 @@ static void _ctap_hid_timeout_cb(event_t *arg)
 {
     (void)arg;
     fido2_ctap_transport_hid_check_timeouts();
-    event_timeout_set(&_ctap_hid_event_timeout, CTAP_HID_TRANSACTION_TIMEOUT);
+    event_timeout_set(&_ctap_hid_event_timeout, CTAP_HID_TRANSACTION_TIMEOUT_MS);
 }
 #endif
 

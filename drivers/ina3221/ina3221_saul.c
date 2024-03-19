@@ -96,7 +96,7 @@ static int read_shunt_voltage_sum(const void *dev, phydat_t *res)
     return 1;
 }
 
-static int configure_channel(const void *dev, phydat_t *data)
+static int configure_channel(const void *dev, const phydat_t *data)
 {
     ina3221_ch_t ch = (data->val[0] ? INA3221_CH1 : 0) |
                       (data->val[1] ? INA3221_CH2 : 0) |
@@ -107,7 +107,7 @@ static int configure_channel(const void *dev, phydat_t *data)
     return INA3221_NUM_CH;
 }
 
-static int configure_channel_sum(const void *dev, phydat_t *data)
+static int configure_channel_sum(const void *dev, const phydat_t *data)
 {
     ina3221_ch_t ch = (data->val[0] ? INA3221_CH1 : 0) |
                       (data->val[1] ? INA3221_CH2 : 0) |

@@ -25,7 +25,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "kernel_defines.h"
+#include "modules.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/sixlowpan/config.h"
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG
@@ -87,7 +87,7 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_add(
  * @brief   Generate reassembly buffer from a header's forwarding information.
  *
  * @param[in] base  Base data of the datagram. Must not be `NULL`.
- * @param[in] netif Restict route to this interface. May be `NULL` for any
+ * @param[in] netif Restrict route to this interface. May be `NULL` for any
  *                  interface.
  * @param[in] hdr   Header from which to take the forwarding information from
  *                  (e.g. IPv6 header implies `hdr->type == GNRC_NETTYPE_IPV6`).

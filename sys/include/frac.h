@@ -18,7 +18,7 @@
  * runtime, or via a precomputed initializer.
  *
  * Precomputing the frac_t values can be done via the application found in
- * `tests/frac-config` in the RIOT tree.
+ * `tests/sys/frac-config` in the RIOT tree.
  *
  * ### Numeric precision
  *

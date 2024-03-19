@@ -26,6 +26,20 @@
 #define CONFIG_BOARD_HAS_LSE            1
 #endif
 
+/**
+ * @brief   This board has an HSE clock
+ */
+#ifndef CONFIG_BOARD_HAS_HSE
+#define CONFIG_BOARD_HAS_HSE            1
+#endif
+
+/**
+ * @brief   Speed of the HSE clock in Hz
+ */
+#ifndef CONFIG_CLOCK_HSE
+#define CONFIG_CLOCK_HSE                       MHZ(16)
+#endif
+
 #include "periph_cpu.h"
 #include "clk_conf.h"
 

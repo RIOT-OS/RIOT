@@ -24,14 +24,16 @@
 #ifndef FS_LITTLEFS2_FS_H
 #define FS_LITTLEFS2_FS_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <stdalign.h>
 
 #include "vfs.h"
 #include "lfs.h"
 #include "mtd.h"
 #include "mutex.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @name    littlefs configuration
@@ -74,6 +76,13 @@ extern "C" {
  * of wear leveling. -1 disables wear-leveling. */
 #define CONFIG_LITTLEFS2_BLOCK_CYCLES       (512)
 #endif
+
+#ifndef CONFIG_LITTLEFS2_MIN_BLOCK_SIZE_EXP
+/**
+ * The exponent of the minimum acceptable block size in bytes (2^n).
+ * The desired block size is not guaranteed to be applicable but will be respected. */
+#define CONFIG_LITTLEFS2_MIN_BLOCK_SIZE_EXP (-1)
+#endif
 /** @} */
 
 /**
@@ -91,20 +100,21 @@ typedef struct {
 #if CONFIG_LITTLEFS2_FILE_BUFFER_SIZE || DOXYGEN
     /** file buffer to use internally if CONFIG_LITTLEFS2_FILE_BUFFER_SIZE
      * is set */
-    uint8_t file_buf[CONFIG_LITTLEFS2_FILE_BUFFER_SIZE];
+    alignas(uint32_t) uint8_t file_buf[CONFIG_LITTLEFS2_FILE_BUFFER_SIZE];
 #endif
 #if CONFIG_LITTLEFS2_READ_BUFFER_SIZE || DOXYGEN
     /** read buffer to use internally if CONFIG_LITTLEFS2_READ_BUFFER_SIZE
      * is set */
-    uint8_t read_buf[CONFIG_LITTLEFS2_READ_BUFFER_SIZE];
+    alignas(uint32_t) uint8_t read_buf[CONFIG_LITTLEFS2_READ_BUFFER_SIZE];
 #endif
 #if CONFIG_LITTLEFS2_PROG_BUFFER_SIZE || DOXYGEN
     /** prog buffer to use internally if CONFIG_LITTLEFS2_PROG_BUFFER_SIZE
      * is set */
-    uint8_t prog_buf[CONFIG_LITTLEFS2_PROG_BUFFER_SIZE];
+    alignas(uint32_t) uint8_t prog_buf[CONFIG_LITTLEFS2_PROG_BUFFER_SIZE];
 #endif
     /** lookahead buffer to use internally */
-    uint8_t lookahead_buf[CONFIG_LITTLEFS2_LOOKAHEAD_SIZE];
+    alignas(uint32_t) uint8_t lookahead_buf[CONFIG_LITTLEFS2_LOOKAHEAD_SIZE];
+    uint16_t sectors_per_block; /**< number of sectors per block */
 } littlefs2_desc_t;
 
 /** The littlefs vfs driver */

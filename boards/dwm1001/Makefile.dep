@@ -1,5 +1,6 @@
 ifneq (,$(filter saul_default,$(USEMODULE)))
-  USEMODULE += lis2dh12_spi
+  USEMODULE += lis2dh12_i2c
+  USEMODULE += saul_gpio
 endif
 
 # include common nrf52 dependencies

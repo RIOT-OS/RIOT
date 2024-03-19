@@ -54,6 +54,11 @@ then
         set_result $?
     fi
 
+    if [ "$BUILDTEST_MCU_GROUP" == "x86_64" ]
+    then
+        make -C ./tests/unittests all test BOARD=native64 TERMPROG='gdb -batch -ex r -ex bt $(ELF)' || exit
+        set_result $?
+    fi
 
     ./dist/tools/compile_test/compile_test.py $BASE_BRANCH
     set_result $?

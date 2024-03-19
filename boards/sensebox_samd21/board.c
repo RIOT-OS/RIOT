@@ -21,34 +21,9 @@
 #include "cpu.h"
 #include "board.h"
 #include "periph/gpio.h"
-#include "sdcard_spi_params.h"
-#include "mtd_sdcard.h"
-
-#if defined(MODULE_MTD_SDCARD) || defined(DOXYGEN)
- /* this is provided by the sdcard_spi driver
-  * see drivers/sdcard_spi/sdcard_spi.c */
-extern sdcard_spi_t sdcard_spi_devs[ARRAY_SIZE(sdcard_spi_params)];
-mtd_sdcard_t sensebox_sd_dev = {
-    .base = {
-        .driver = &mtd_sdcard_driver,
-        .page_size = MTD_SD_CARD_PAGE_SIZE,
-        .pages_per_sector = MTD_SD_CARD_PAGES_PER_SECTOR,
-        .sector_count = MTD_SD_CARD_SECTOR_COUNT
-    },
-    .sd_card = &sdcard_spi_devs[0],
-    .params = &sdcard_spi_params[0]
-};
-
-mtd_dev_t *mtd0 = (mtd_dev_t *)&sensebox_sd_dev;
-#endif /* MODULE_MTD_SDCARD || DOXYGEN */
 
 void board_init(void)
 {
-
-
-    /* initialize the on-board button on pin PA20 */
-    gpio_init(BTN0_PIN, BTN0_MODE);
-
     /* initialize XBEE1 bus enable pin */
     gpio_init(XBEE1_EN_PIN, XBEE1_EN_MODE);
 

@@ -24,6 +24,7 @@
 #include "net/gcoap.h"
 #include "net/cord/epsim.h"
 #include "net/cord/common.h"
+#include "net/gnrc/netif.h"
 #include "net/sock/util.h"
 #include "net/ipv6/addr.h"
 #include "xtimer.h"
@@ -45,15 +46,15 @@ static ssize_t text_resp(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     return resp_len + slen;
 }
 
-static ssize_t handler_info(coap_pkt_t *pdu, uint8_t *buf, size_t len, void *ctx)
+static ssize_t handler_info(coap_pkt_t *pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx)
 {
     (void)ctx;
     return text_resp(pdu, buf, len, riot_info, COAP_FORMAT_JSON);
 }
 
-static ssize_t handler_text(coap_pkt_t *pdu, uint8_t *buf, size_t len, void *ctx)
+static ssize_t handler_text(coap_pkt_t *pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx)
 {
-    return text_resp(pdu, buf, len, (char *)ctx, COAP_FORMAT_TEXT);
+    return text_resp(pdu, buf, len, coap_request_ctx_get_context(ctx), COAP_FORMAT_TEXT);
 }
 
 static const coap_resource_t resources[] = {
@@ -82,7 +83,7 @@ int main(void)
     /* parse RD address information */
     sock_udp_ep_t rd_ep;
 
-    if (sock_udp_str2ep(&rd_ep, RD_ADDR) < 0) {
+    if (sock_udp_name2ep(&rd_ep, RD_ADDR) < 0) {
         puts("error: unable to parse RD address from RD_ADDR variable");
         return 1;
     }

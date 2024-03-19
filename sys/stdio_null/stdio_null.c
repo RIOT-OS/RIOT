@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     sys
+ * @ingroup     sys_stdio_null
  * @{
  *
  * @file
@@ -22,32 +22,15 @@
 
 #include "stdio_base.h"
 
-#if MODULE_VFS
-#include "vfs.h"
-#endif
-
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-void stdio_init(void)
-{
-#if MODULE_VFS
-    vfs_bind_stdio();
-#endif
-}
-
-ssize_t stdio_read(void* buffer, size_t count)
-{
-    (void) buffer;
-    (void) count;
-
-    return 0;
-}
-
-ssize_t stdio_write(const void* buffer, size_t len)
+static ssize_t _write(const void* buffer, size_t len)
 {
     (void) buffer;
     (void) len;
 
     return 0;
 }
+
+STDIO_PROVIDER(STDIO_NULL, NULL, NULL, _write)

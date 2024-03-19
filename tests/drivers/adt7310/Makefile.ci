@@ -1,0 +1,4 @@
+BOARD_INSUFFICIENT_MEMORY := \
+    atmega8 \
+    stm32f030f4-demo \
+    #

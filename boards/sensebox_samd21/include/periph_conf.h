@@ -181,6 +181,7 @@ static const spi_conf_t spi_config[] = {
 };
 
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
+/** @} */
 
 /**
  * @name    I2C configuration
@@ -208,6 +209,7 @@ static const i2c_conf_t i2c_config[] = {
 };
 
 #define I2C_NUMOF          ARRAY_SIZE(i2c_config)
+/** @} */
 
 /**
  * @name RTT configuration
@@ -233,12 +235,12 @@ static const i2c_conf_t i2c_config[] = {
 /* Digital pins (1 to 6) on the board can be configured as analog inputs */
 static const adc_conf_chan_t adc_channels[] = {
     /* port, pin, muxpos */
-    { GPIO_PIN(PA, 4), ADC_INPUTCTRL_MUXPOS_PIN4 },     /* Digital 1 */
-    { GPIO_PIN(PA, 5), ADC_INPUTCTRL_MUXPOS_PIN5 },     /* Digital 2 */
-    { GPIO_PIN(PA, 6), ADC_INPUTCTRL_MUXPOS_PIN6 },     /* Digital 3 */
-    { GPIO_PIN(PA, 7), ADC_INPUTCTRL_MUXPOS_PIN7 },     /* Digital 4 */
-    { GPIO_PIN(PA, 3), ADC_INPUTCTRL_MUXPOS_PIN1 },     /* Digital 5 */
-    { GPIO_PIN(PA, 2), ADC_INPUTCTRL_MUXPOS_PIN0 },     /* Digital 6 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA04 },     /* Digital 1 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA05 },     /* Digital 2 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA06 },     /* Digital 3 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA07 },     /* Digital 4 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA03 },     /* Digital 5 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA02 },     /* Digital 6 */
 };
 
 #define ADC_NUMOF                           ARRAY_SIZE(adc_channels)

@@ -615,7 +615,7 @@ static void test_nib_ft_del__unknown(void)
         iface++;
     }
     gnrc_ipv6_nib_ft_del(&dst, dst_len);
-    while(gnrc_ipv6_nib_ft_iter(NULL, 0, &iter_state, &fte)) {
+    while (gnrc_ipv6_nib_ft_iter(NULL, 0, &iter_state, &fte)) {
         count++;
     }
     TEST_ASSERT_EQUAL_INT(MAX_NUMOF, count);
@@ -636,7 +636,7 @@ static void test_nib_ft_del__success(void)
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
                                                   &next_hop, IFACE, 0));
     gnrc_ipv6_nib_ft_del(&dst, GLOBAL_PREFIX_LEN);
-    TEST_ASSERT(!gnrc_ipv6_nib_ft_iter(NULL ,0, &iter_state, &fte));
+    TEST_ASSERT(!gnrc_ipv6_nib_ft_iter(NULL, 0, &iter_state, &fte));
 }
 
 /**

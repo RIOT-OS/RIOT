@@ -25,4 +25,9 @@ config BOARD_NRF52840DONGLE
     select HAVE_SAUL_PWM
     select HAVE_SAUL_NRF_VDDH
 
+    select MODULE_USB_BOARD_RESET if KCONFIG_USB && TEST_KCONFIG
+
+config FORCE_USB_STDIO
+    default y
+
 source "$(RIOTBOARD)/common/nrf52/Kconfig"

@@ -30,6 +30,9 @@
 
 #include "gnrc_sock_internal.h"
 
+#define ENABLE_DEBUG 0
+#include "debug.h"
+
 #ifdef MODULE_GNRC_SOCK_CHECK_REUSE
 static sock_udp_t *_udp_socks = NULL;
 #endif
@@ -133,6 +136,12 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
         }
         gnrc_ep_set((sock_ip_ep_t *)&sock->remote,
                     (sock_ip_ep_t *)remote, sizeof(sock_udp_ep_t));
+
+        /* only accept responses from the set remote */
+        if (!ipv6_addr_is_multicast((ipv6_addr_t *)&remote->addr) &&
+            !ipv6_addr_is_unspecified((ipv6_addr_t *)&remote->addr)) {
+            flags |= SOCK_FLAGS_CONNECT_REMOTE;
+        }
     }
     if (local != NULL) {
         /* listen only with local given */
@@ -197,6 +206,47 @@ ssize_t sock_udp_recv_aux(sock_udp_t *sock, void *data, size_t max_len,
     return (nobufs) ? -ENOBUFS : ((res < 0) ? res : ret);
 }
 
+static bool _accept_remote(const sock_udp_t *sock, const udp_hdr_t *hdr,
+                           const sock_ip_ep_t *remote)
+{
+    if ((sock->flags & SOCK_FLAGS_CONNECT_REMOTE) == 0) {
+        /* socket is not bound to a remote */
+        return true;
+    }
+
+    if (sock->remote.family == AF_UNSPEC) {
+        /* socket accepts any remote */
+        return true;
+    }
+
+    if (sock->remote.port != byteorder_ntohs(hdr->src_port)) {
+        DEBUG("gnrc_sock_udp: port mismatch (%u != %u)\n",
+              sock->remote.port, byteorder_ntohs(hdr->src_port));
+        return false;
+    }
+
+    if (memcmp(&sock->remote.addr, &remote->addr, sizeof(ipv6_addr_t)) != 0) {
+        char addr_str[IPV6_ADDR_MAX_STR_LEN];
+        DEBUG("gnrc_sock_udp: socket bound to address %s",
+              ipv6_addr_to_str(addr_str, (ipv6_addr_t *)&sock->remote.addr, sizeof(addr_str)));
+        DEBUG(", source (%s) does not match\n",
+              ipv6_addr_to_str(addr_str, (ipv6_addr_t *)&remote->addr, sizeof(addr_str)));
+        return false;
+    }
+
+    return true;
+}
+
+static uint32_t _now_us(void)
+{
+#ifdef MODULE_ZTIMER_USEC
+    return ztimer_now(ZTIMER_USEC);
+#endif
+#ifdef MODULE_ZTIMER_MSEC
+    return ztimer_now(ZTIMER_MSEC) * US_PER_MS;
+#endif
+}
+
 ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
                               uint32_t timeout, sock_udp_ep_t *remote,
                               sock_udp_aux_rx_t *aux)
@@ -234,7 +284,26 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
         _aux.rssi = &aux->rssi;
     }
 #endif
-    res = gnrc_sock_recv((gnrc_sock_reg_t *)sock, &pkt, timeout, &tmp, &_aux);
+    unsigned now = _now_us();
+    while (1) {
+        res = gnrc_sock_recv((gnrc_sock_reg_t *)sock, &pkt, timeout, &tmp, &_aux);
+
+        if (res != -ETIMEDOUT) {
+            break;
+        }
+
+        /* HACK: gnrc_sock_recv() sometimes returns -ETIMEDOUT too early */
+        uint32_t time_elapsed = _now_us() - now;
+        if (time_elapsed < (timeout - timeout/10))  {
+            DEBUG("gnrc_sock_udp: timeout happened  %"PRIu32" µs early\n",
+                  timeout - time_elapsed);
+            timeout -= time_elapsed;
+            now = _now_us();
+            continue;
+        }
+        break;
+    }
+
     if (res < 0) {
         return res;
     }
@@ -246,13 +315,7 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
         memcpy(remote, &tmp, sizeof(tmp));
         remote->port = byteorder_ntohs(hdr->src_port);
     }
-    if ((sock->remote.family != AF_UNSPEC) &&  /* check remote end-point if set */
-        ((sock->remote.port != byteorder_ntohs(hdr->src_port)) ||
-        /* We only have IPv6 for now, so just comparing the whole end point
-         * should suffice */
-        ((memcmp(&sock->remote.addr, &ipv6_addr_unspecified,
-                 sizeof(ipv6_addr_t)) != 0) &&
-         (memcmp(&sock->remote.addr, &tmp.addr, sizeof(ipv6_addr_t)) != 0)))) {
+    if (!_accept_remote(sock, hdr, &tmp)) {
         gnrc_pktbuf_release(pkt);
         return -EPROTO;
     }
@@ -272,25 +335,35 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
         aux->flags &= ~SOCK_AUX_GET_RSSI;
     }
 #endif
+#if IS_USED(MODULE_SOCK_AUX_TTL)
+    if ((aux != NULL) && (aux->flags & SOCK_AUX_GET_TTL)) {
+        gnrc_pktsnip_t *ip = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
+        if (ip) {
+            ipv6_hdr_t *ip_hdr = ip->data;
+            aux->ttl = ip_hdr->hl;
+            aux->flags &= ~SOCK_AUX_GET_TTL;
+        }
+    }
+#endif
     *data = pkt->data;
     *buf_ctx = pkt;
     res = (int)pkt->size;
     return res;
 }
 
-ssize_t sock_udp_send_aux(sock_udp_t *sock, const void *data, size_t len,
-                          const sock_udp_ep_t *remote, sock_udp_aux_tx_t *aux)
+ssize_t sock_udp_sendv_aux(sock_udp_t *sock,
+                           const iolist_t *snips,
+                           const sock_udp_ep_t *remote, sock_udp_aux_tx_t *aux)
 {
     (void)aux;
     int res;
-    gnrc_pktsnip_t *payload, *pkt;
+    gnrc_pktsnip_t *pkt, *payload = NULL;
     uint16_t src_port = 0, dst_port;
     sock_ip_ep_t local;
     sock_udp_ep_t remote_cpy;
     sock_ip_ep_t *rem;
 
     assert((sock != NULL) || (remote != NULL));
-    assert((len == 0) || (data != NULL)); /* (len != 0) => (data != NULL) */
 
     if (remote != NULL) {
         if (remote->port == 0) {
@@ -345,6 +418,16 @@ ssize_t sock_udp_send_aux(sock_udp_t *sock, const void *data, size_t len,
         src_port = sock->local.port;
         memcpy(&local, &sock->local, sizeof(local));
     }
+#if IS_USED(MODULE_SOCK_AUX_LOCAL)
+    /* user supplied local endpoint takes precedent */
+    if ((aux != NULL) && (aux->flags & SOCK_AUX_SET_LOCAL)) {
+        local.family = aux->local.family;
+        local.netif = aux->local.netif;
+        memcpy(&local.addr, &aux->local.addr, sizeof(local.addr));
+
+        aux->flags &= ~SOCK_AUX_SET_LOCAL;
+    }
+#endif
     /* sock can't be NULL at this point */
     if (remote == NULL) {
         rem = (sock_ip_ep_t *)&sock->remote;
@@ -362,11 +445,16 @@ ssize_t sock_udp_send_aux(sock_udp_t *sock, const void *data, size_t len,
     else if (local.family != rem->family) {
         return -EINVAL;
     }
-    /* generate payload and header snips */
-    payload = gnrc_pktbuf_add(NULL, (void *)data, len, GNRC_NETTYPE_UNDEF);
+
+    /* allocate snip for payload */
+    payload = gnrc_pktbuf_add(NULL, NULL, iolist_size(snips), GNRC_NETTYPE_UNDEF);
     if (payload == NULL) {
         return -ENOMEM;
     }
+
+    /* copy payload data into payload snip */
+    iolist_to_buffer(snips, payload->data, payload->size);
+
     pkt = gnrc_udp_hdr_build(payload, src_port, dst_port);
     if (pkt == NULL) {
         gnrc_pktbuf_release(payload);

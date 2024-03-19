@@ -35,7 +35,9 @@
 
 #include <limits.h>
 #include <stdint.h>
+#include <stdbool.h>
 
+#include "architecture.h"
 #include "periph_cpu.h"
 #include "periph_conf.h"
 
@@ -87,6 +89,16 @@ typedef uint_fast8_t tim_t;
  */
 #ifndef TIM_FLAG_RESET_ON_MATCH
 #define TIM_FLAG_RESET_ON_MATCH (0x02)
+#endif
+
+/**
+ * @brief   Keep the timer stopped after setting alarm.
+ *
+ * When set, the timer will remained stopped after a timer_set_periodic() and
+ * can be started manually with timer_start().
+ */
+#ifndef TIM_FLAG_SET_STOPPED
+#define TIM_FLAG_SET_STOPPED    (0x04)
 #endif
 
 /**
@@ -221,6 +233,101 @@ void timer_start(tim_t dev);
  * @param[in] dev           the timer to stop
  */
 void timer_stop(tim_t dev);
+
+/**
+ * @brief   Get the number of different frequencies supported by the given
+ *          timer
+ *
+ * If calling @ref timer_query_freqs_numof for the same timer with an index
+ * smaller this number, it hence MUST return a frequency (and not zero).
+ *
+ * @details This function is marked with attribute pure to tell the compiler
+ *          that this function has no side affects and will return the same
+ *          value when called with the same parameter. (E.g. to not call this
+ *          function in every loop iteration when iterating over all
+ *          supported frequencies.)
+ */
+__attribute__((pure))
+uword_t timer_query_freqs_numof(tim_t dev);
+
+/**
+ * @brief   Get the number of timer channels for the given timer
+ *
+ * @details This function is marked with attribute pure to tell the compiler
+ *          that this function has no side affects and will return the same
+ *          value when called with the same timer as parameter.
+ * @details There is a weak default implementation that returns the value of
+ *          `TIMER_CHANNEL_NUMOF`. For some MCUs the number of supported
+ *          channels depends on @p dev - those are expected to provide there
+ *          own implementation of this function.
+ */
+__attribute__((pure))
+uword_t timer_query_channel_numof(tim_t dev);
+
+/**
+ * @brief   Iterate over supported frequencies
+ *
+ * @param   dev     Timer to get the next supported frequency of
+ * @param   index   Index of the frequency to get
+ * @return          The @p index highest frequency supported by the timer
+ * @retval  0       @p index is too high
+ *
+ * @note    Add `FEATURES_REQUIRED += periph_timer_query_freqs` to your `Makefile`.
+ *
+ * When called with a value of 0 for @p index, the highest supported frequency
+ * is returned. For a value 1 the second highest is returned, and so on. For
+ * values out of range, 0 is returned. A program hence can iterate over all
+ * supported frequencies using:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+ * uint32_t freq:
+ * for (uword_t i; (freq = timer_query_freqs(dev, i)); i++) {
+ *     work_with_frequency(freq);
+ * }
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * Or alternatively:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+ * for (uword_t i; i < timer_query_freqs_numof(dev); i++) {
+ *     work_with_frequency(timer_query_freqs(dev, i));
+ * }
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
+uint32_t timer_query_freqs(tim_t dev, uword_t index);
+
+#if defined(DOXYGEN)
+/**
+ * @brief Check whether a compare channel has matched
+ *
+ * @return true once after the channel has matched.
+ *
+ * It is currently not defined whether this keeps returning true after a
+ * channel has been polled until that channel is set, or whether later calls
+ * return false.
+ *
+ * This is typically used in spin loops that wait for a timer's completion:
+ *
+ * ~~~
+ * while (!timer_poll_channel(tim, chan)) {};
+ * ~~~
+ *
+ * This function is only available on platforms that implement the
+ * `periph_timer_poll` peripheral in addition to `periph_timer`.
+ *
+ */
+/* As this function is polled, it needs to be inlined, so it is typically
+ * provided through timer_arch.h. If a platform ever does not need to go
+ * through static inline here, this declaration's condition can be extended to
+ * be `(defined(MODULE_PERIPH_TIMER_POLL) &&
+ * !defined(PERIPH_TIMER_PROVIDES_INLINE_POLL_CHANNEL) || defined(DOXYGEN)` or
+ * similar. */
+bool timer_poll_channel(tim_t dev, int channel);
+#endif
+
+#if defined(MODULE_PERIPH_TIMER_POLL)
+#include "timer_arch.h"
+#endif
 
 #ifdef __cplusplus
 }

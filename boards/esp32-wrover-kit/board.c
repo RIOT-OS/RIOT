@@ -23,7 +23,4 @@ void board_init(void)
 #if MODULE_ILI9341
     gpio_init(LCD_BACKLIGHT, GPIO_OUT);
 #endif
-
-    /* there is nothing special to initialize on this board */
-    board_init_common();
 }

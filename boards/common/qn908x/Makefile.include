@@ -1,12 +1,8 @@
 # This board uses OpenOCD. Note that support for QN908x in OpenOCD at the time
 # of writing has not been merged in the tree and is only available at
-# http://openocd.zylin.com/#/c/5584/ .
-PROGRAMMER ?= openocd
-PROGRAMMERS_SUPPORTED += openocd
+# https://review.openocd.org/c/openocd/+/5584
 
-# Using dap or jlink depends on which firmware the OpenSDA debugger is running
-#OPENOCD_DEBUG_ADAPTER ?= dap
-OPENOCD_DEBUG_ADAPTER ?= jlink
+PROGRAMMERS_SUPPORTED += openocd
 
 # Use the shared OpenOCD configuration
 OPENOCD_CONFIG ?= $(RIOTBOARD)/common/qn908x/dist/openocd.cfg
@@ -16,14 +12,48 @@ OPENOCD_CONFIG ?= $(RIOTBOARD)/common/qn908x/dist/openocd.cfg
 # enabled after a 'reset halt' command.
 OPENOCD_PRE_FLASH_CMDS += "-c qn908x disable_wdog"
 
+# Using dap or jlink depends on which firmware the OpenSDA debugger is running
+ifeq (1,$(QN908X_JLINK))
+  OPENOCD_DEBUG_ADAPTER ?= jlink
+  # If port selection via ttys.py is enabled by `MOST_RECENT_PORT=1`, filter
+  # USB serials to only select the UART bridge of embedded NXP debuggers running
+  # the J-Link firmware.
+  TTY_BOARD_FILTER := --vendor SEGGER --model J-Link
+
+  # keep name of `JLINK` in sync with script jlink.sh in $(RIOTTOOLS)/jlink
+  JLINK ?= JLinkExe
+
+  # Default to J-Link as programmer if installed
+  ifneq (,$(shell command -v $(JLINK)))
+    PROGRAMMER ?= jlink
+  else
+    PROGRAMMER ?= openocd
+  endif
+else
+  OPENOCD_DEBUG_ADAPTER ?= dap
+
+  # If port selection via ttys.py is enabled by `MOST_RECENT_PORT=1`, filter
+  # USB serials to only select the UART bridge of embedded NXP debuggers running
+  # the LPC-LINK2 CMSIS-DAP firmware.
+  TTY_BOARD_FILTER := --vendor NXP --model LPC-LINK2
+
+  # Default to OpenOCD (despite downstream patches are needed) as the LPC-LINK2
+  # programmer firmware is not supported by J-Link
+  PROGRAMMER ?= openocd
+endif
+
 # In order to boot, the CPU requires that the Vector table contain a valid
 # checksum in one of the "reserved" fields. We don't generate this checksum when
 # compiling and linking the code, instead this make target computes the checksum
 # in another ELF file and we set it as the FLASHFILE.
 ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
 ELFFILE_CHECKSUM ?= $(ELFFILE:.elf=-checksum.elf)
+ELFFILE_SHADOW ?= $(ELFFILE:.elf=-shadow.elf)
 
-$(ELFFILE_CHECKSUM): $(ELFFILE)
+$(ELFFILE_SHADOW): $(ELFFILE)
+	$(Q)cp $(ELFFILE) $(ELFFILE_SHADOW)
+
+$(ELFFILE_CHECKSUM): $(ELFFILE_SHADOW)
 	$(Q)$(OBJCOPY) --dump-section .vectors=$<.vectors $<
 	$(Q)$(RIOTBOARD)/common/qn908x/dist/nxp_checksum.py $(if $(Q),--quiet) \
 	  $<.vectors

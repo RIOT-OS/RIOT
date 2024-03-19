@@ -22,11 +22,11 @@
 
 int pthread_once(pthread_once_t *once_control, void (*init_routine)(void))
 {
-    if (*once_control == PTHREAD_ONCE_INIT) {
+    if (!once_control->init_executed) {
         init_routine();
     }
 
-    *once_control = PTHREAD_ONCE_INIT + 1;
+    once_control->init_executed = 1;
 
     return 0;
 }

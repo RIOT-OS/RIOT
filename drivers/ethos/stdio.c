@@ -25,6 +25,10 @@
 #include "isrpipe.h"
 #include "stdio_uart.h"
 
+#ifndef STDIO_UART_RX_BUFSIZE
+#define STDIO_UART_RX_BUFSIZE STDIO_RX_BUFSIZE
+#endif
+
 extern ethos_t ethos;
 
 static uint8_t _rx_buf_mem[STDIO_UART_RX_BUFSIZE];
@@ -38,10 +42,6 @@ static void _isrpipe_write(void *arg, uint8_t data)
 void stdio_init(void)
 {
     uart_init(ETHOS_UART, ETHOS_BAUDRATE, _isrpipe_write, &ethos_stdio_isrpipe);
-
-#if MODULE_VFS
-    vfs_bind_stdio();
-#endif
 }
 
 extern unsigned ethos_unstuff_readbyte(uint8_t *buf, uint8_t byte,

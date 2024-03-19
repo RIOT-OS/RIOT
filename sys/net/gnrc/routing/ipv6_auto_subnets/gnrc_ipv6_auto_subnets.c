@@ -17,14 +17,15 @@
  * This module provides an automatic configuration for networks with a (simple)
  * tree topology.
  *
- * If a sufficiently large IPv6 prefix (> /64) is provided via Router Advertisements,
- * a routing node with this module will automatically configure subnets from it
- * by dividing it into sub-prefixes for each downstream interface.
+ * If a sufficiently large IPv6 subnet (prefix length < /64) is provided via Router
+ * Advertisements, a routing node with this module will automatically configure
+ * subnets from it by dividing it into sub-prefixes for each downstream interface.
  *
  * When using the `gnrc_ipv6_auto_subnets_simple` module, there can only be a single
- * routing node on each level of the network but an arbitrary number of leaf nodes.
+ * routing node on each level of the network but an arbitrary number of leaf nodes and
+ * downstream interfaces.
  *
- * !['Skinny Tree' Example Topology](gnrc_ipv6_auto_subnets_simple.svg)
+ * ![Example Topology with only one router on each level](gnrc_ipv6_auto_subnets_simple.svg)
  *
  * If there are multiple routing nodes on the same link, coordination between the
  * routers is required.
@@ -36,7 +37,7 @@
  * The layer 2 address of the sender then determines the order in which the prefixes
  * are assigned.
  *
- * ![Example Topology](gnrc_ipv6_auto_subnets.svg)
+ * ![Example Topology with multiple routers](gnrc_ipv6_auto_subnets.svg)
  *
  * The downstream network(s) receive the sub-prefix via Router Advertisements
  * and the process repeats until the bits of the prefix are exhausted.
@@ -44,11 +45,35 @@
  *
  * The new subnet must no longer be considered on-link by the hosts in the
  * parent network.
- * Therefore the downstream router will send a router advertisement with only
- * a Route Information Option included to the upstream network.
+ * Therefore the downstream router will send a router advertisement, which only
+ * contains a Route Information Option, to the upstream network.
  * The Route Information Option contains the prefix of the downstream network
- * so that upstream routers will no longer consider hosts in this subnet on-link
+ * so that upstream routers will no longer consider hosts in this subnet on-link,
  * but instead will use the downstream router to route to the new subnet.
+ *
+ * The need for a Route Information Option
+ * ---------------------------------------
+ *
+ * All nodes that want to communicate with hosts in a downstream subnet must implement
+ * parsing of the Route Information Option. For routing RIOT nodes this is enabled by
+ * default, non-routing nodes need to enable the `gnrc_ipv6_nib_rio` module.
+ *
+ * This is because all addresses in the subnet are also within the original network, so
+ * without further information hosts would consider those addresses on-link and perform
+ * neighbor solicitation to communicate with them.
+ *
+ * E.g. if host Ⓒ  (`2001:db8:0:8:5075:35ff:fefa:30bc`) sends an ICMPv6 Echo request to
+ * Ⓑ  (`2001:db8:0:0:a7a2:12e0:48bc:7487`), it would not get a response:
+ *
+ * ![Auto-Subnets without RIO](gnrc_ipv6_auto_subnets-without_rio.svg)
+ *
+ * To solve this, the routing node Ⓐ  also sends a Router Advertisement to the <i>upstream</i>
+ * network that only contains a Route Information Option for each downstream network created
+ * by that router.
+ * This way hosts in the upstream network will prefer the route via Ⓐ  over link-local
+ * transmission as it is a stronger match than the upstream prefix:
+ *
+ * ![Auto-Subnets with RIO](gnrc_ipv6_auto_subnets-with_rio.svg)
  *
  * Usage
  * =====
@@ -64,12 +89,14 @@
  * @author  Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
+#include "compiler_hints.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/udp.h"
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/ndp.h"
+#include "net/gnrc/rpl.h"
 #include "random.h"
 #include "xtimer.h"
 
@@ -93,13 +120,62 @@
 #ifndef CONFIG_GNRC_IPV6_AUTO_SUBNETS_TX_PER_PERIOD
 #define CONFIG_GNRC_IPV6_AUTO_SUBNETS_TX_PER_PERIOD (3)
 #endif
+
 /**
- * @brief How long to wait for other routers annoucements before resending
+ * @brief How long to wait for other routers announcements before resending
  *        or creating subnets when the retry counter is exhausted
  */
 #ifndef CONFIG_GNRC_IPV6_AUTO_SUBNETS_TIMEOUT_MS
 #define CONFIG_GNRC_IPV6_AUTO_SUBNETS_TIMEOUT_MS    (50)
 #endif
+
+/**
+ * @brief How many bits of a new prefix have to match the old prefix
+ *        for it to be considered for replacement.
+ *
+ *        Set this if you want to join multiple subnets at the same time.
+ *
+ *        If you use `gnrc_ipv6_auto_subnets` instead of `gnrc_ipv6_auto_subnets_simple`
+ *        make sure to also set CONFIG_GNRC_IPV6_AUTO_SUBNETS_NUMOF accordingly.
+ */
+#ifndef CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_FIX_LEN
+#define CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_FIX_LEN (0)
+#endif
+
+/**
+ * @brief   Minimal length of a new prefix.
+ *          e.g. Linux will only accept /64 prefixes for SLAAC
+ */
+#ifndef CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_MIN_LEN
+#define CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_MIN_LEN (0)
+#endif
+
+/**
+ * @brief Number of subnets that can be configured.
+ *
+ *        This is not needed when using the `gnrc_ipv6_auto_subnets_simple` module.
+ *
+ *        If this is set to any number higher than 1, make sure to also configure
+ *        CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_FIX_LEN to suit your setup.
+ */
+#ifndef CONFIG_GNRC_IPV6_AUTO_SUBNETS_NUMOF
+#define CONFIG_GNRC_IPV6_AUTO_SUBNETS_NUMOF         (1)
+#endif
+
+/**
+ * @brief Enable this if you have a static network that might experience
+ *        high packet loss under certain conditions.
+ *        If enabled, this option causes the module to always assume the highest
+ *        number of subnets it has ever seen.
+ *        This prevents different/conflicting subnets from being configured if
+ *        multiple sync packets got lost.
+ */
+#ifndef CONFIG_GNRC_IPV6_AUTO_SUBNETS_STATIC
+#define CONFIG_GNRC_IPV6_AUTO_SUBNETS_STATIC        (0)
+#endif
+
+/* Code below should not be included by Doxygen */
+#ifndef DOXYGEN
 
 #define SERVER_THREAD_STACKSIZE                     (THREAD_STACKSIZE_DEFAULT)
 #define SERVER_MSG_QUEUE_SIZE                       (CONFIG_GNRC_IPV6_AUTO_SUBNETS_PEERS_MAX)
@@ -122,7 +198,8 @@ typedef struct __attribute__((packed)) {
 
 /* keep a copy of PIO information in memory */
 static gnrc_netif_t *_upstream;
-static ndp_opt_pi_t _pio_cache;
+static ndp_opt_pi_t _pio_cache[CONFIG_GNRC_IPV6_AUTO_SUBNETS_NUMOF];
+static mutex_t _pio_cache_lock;
 
 static char auto_subnets_stack[SERVER_THREAD_STACKSIZE];
 static msg_t server_queue[SERVER_MSG_QUEUE_SIZE];
@@ -133,6 +210,23 @@ static uint8_t l2addrs[CONFIG_GNRC_IPV6_AUTO_SUBNETS_PEERS_MAX]
 
 /* PID of the event thread */
 static kernel_pid_t _server_pid;
+
+static bool _store_pio(const ndp_opt_pi_t *pio)
+{
+    mutex_lock(&_pio_cache_lock);
+
+    for (unsigned i = 0; i < ARRAY_SIZE(_pio_cache); ++i) {
+        if (_pio_cache[i].len == 0) {
+            _pio_cache[i] = *pio;
+
+            mutex_unlock(&_pio_cache_lock);
+            return true;
+        }
+    }
+
+    mutex_unlock(&_pio_cache_lock);
+    return false;
+}
 
 static int _send_udp(gnrc_netif_t *netif, const ipv6_addr_t *addr,
                      uint16_t port, const void *data, size_t len)
@@ -210,6 +304,7 @@ static void _init_sub_prefix(ipv6_addr_t *out,
     out->u8[bytes] |= idx << shift;
 }
 
+/* returns true if a new prefix was added, false if nothing changed */
 static bool _remove_old_prefix(gnrc_netif_t *netif,
                                const ipv6_addr_t *pfx, uint8_t pfx_len,
                                gnrc_pktsnip_t **ext_opts)
@@ -218,7 +313,7 @@ static bool _remove_old_prefix(gnrc_netif_t *netif,
     gnrc_pktsnip_t *tmp;
     void *state = NULL;
     ipv6_addr_t old_pfx;
-    uint8_t old_pfx_len = 0;
+    uint8_t old_pfx_len = CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_FIX_LEN;
 
     /* iterate prefix list to see if the prefix already exists */
     while (gnrc_ipv6_nib_pl_iter(netif->pid, &state, &entry)) {
@@ -226,7 +321,7 @@ static bool _remove_old_prefix(gnrc_netif_t *netif,
 
         /* The prefix did not change - nothing to do here */
         if (match_len >= pfx_len && pfx_len == entry.pfx_len) {
-            return true;
+            return false;
         }
 
         /* find prefix that is closest to the new prefix */
@@ -237,8 +332,8 @@ static bool _remove_old_prefix(gnrc_netif_t *netif,
     }
 
     /* no prefix found */
-    if (old_pfx_len == 0) {
-        return false;
+    if (old_pfx_len == CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_FIX_LEN) {
+        return true;
     }
 
     DEBUG("auto_subnets: remove old prefix %s/%u\n",
@@ -246,7 +341,7 @@ static bool _remove_old_prefix(gnrc_netif_t *netif,
 
     /* invalidate old prefix in RIO */
     tmp = gnrc_ndp_opt_ri_build(&old_pfx, old_pfx_len, 0,
-                                NDP_OPT_RI_FLAGS_PRF_NONE, *ext_opts);
+                                NDP_OPT_RI_FLAGS_PRF_ZERO, *ext_opts);
     if (tmp) {
         *ext_opts = tmp;
     }
@@ -254,7 +349,7 @@ static bool _remove_old_prefix(gnrc_netif_t *netif,
     /* remove the prefix */
     gnrc_ipv6_nib_pl_del(netif->pid, &old_pfx, old_pfx_len);
 
-    return false;
+    return true;
 }
 
 static void _configure_subnets(uint8_t subnets, uint8_t start_idx, gnrc_netif_t *upstream,
@@ -283,9 +378,14 @@ static void _configure_subnets(uint8_t subnets, uint8_t start_idx, gnrc_netif_t 
         return;
     }
 
+    if (new_prefix_len < may_be_zero(CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_MIN_LEN)) {
+        new_prefix_len = CONFIG_GNRC_IPV6_AUTO_SUBNETS_PREFIX_MIN_LEN;
+    }
+
     while ((downstream = gnrc_netif_iter(downstream))) {
         gnrc_pktsnip_t *tmp;
         ipv6_addr_t new_prefix;
+        int idx;
 
         if (downstream == upstream) {
             continue;
@@ -299,14 +399,22 @@ static void _configure_subnets(uint8_t subnets, uint8_t start_idx, gnrc_netif_t 
               new_prefix_len, downstream->pid);
 
         /* first remove old prefix if the prefix changed */
-        _remove_old_prefix(downstream, &new_prefix, new_prefix_len, &ext_opts);
+        if (_remove_old_prefix(downstream, &new_prefix, new_prefix_len, &ext_opts)) {
 
-        /* configure subnet on downstream interface */
-        gnrc_netif_ipv6_add_prefix(downstream, &new_prefix, new_prefix_len,
-                                   valid_ltime, pref_ltime);
+            /* configure subnet on downstream interface */
+            idx = gnrc_netif_ipv6_add_prefix(downstream, &new_prefix, new_prefix_len,
+                                         valid_ltime, pref_ltime);
+            if (idx < 0) {
+                DEBUG("auto_subnets: adding prefix to %u failed\n", downstream->pid);
+                continue;
+            }
 
-        /* start advertising subnet */
-        gnrc_ipv6_nib_change_rtr_adv_iface(downstream, true);
+            /* start advertising subnet */
+            gnrc_ipv6_nib_change_rtr_adv_iface(downstream, true);
+
+            /* configure RPL root if applicable */
+            gnrc_rpl_configure_root(downstream, &downstream->ipv6.addrs[idx]);
+        }
 
         /* add route information option with new subnet */
         tmp = gnrc_ndp_opt_ri_build(&new_prefix, new_prefix_len, valid_ltime,
@@ -339,13 +447,21 @@ void gnrc_ipv6_nib_rtr_adv_pio_cb(gnrc_netif_t *upstream, const ndp_opt_pi_t *pi
         return;
     }
 
+    /* only consider prefix meant for autonomous address configuration */
+    if (!(pio->flags & NDP_OPT_PI_FLAGS_A)) {
+        return;
+    }
+
 #if IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_SIMPLE)
     /* if we are the only router on this bus, we can directly choose a prefix */
     _configure_subnets(subnets, 0, upstream, pio);
 #else
 
     /* store PIO information for later use */
-    _pio_cache = *pio;
+    if (!_store_pio(pio)) {
+        DEBUG("auto_subnets: no space left in PIO cache, increase CONFIG_GNRC_IPV6_AUTO_SUBNETS_NUMOF\n");
+        return;
+    }
     _upstream  = upstream;
 
     /* start advertising by sending timeout message to the server thread */
@@ -501,6 +617,25 @@ static void _send_announce(uint8_t local_subnets, xtimer_t *timer, msg_t *msg)
     DEBUG("auto_subnets: announce sent, next timeout in %" PRIu32 " µs\n", timeout_us);
 }
 
+static void _process_pio_cache(uint8_t subnets, uint8_t idx_start, gnrc_netif_t *upstream)
+{
+    mutex_lock(&_pio_cache_lock);
+
+    for (unsigned i = 0; i < ARRAY_SIZE(_pio_cache); ++i) {
+        if (!_pio_cache[i].len) {
+            continue;
+        }
+
+        /* use PIO for prefix configuration */
+        _configure_subnets(subnets, idx_start, upstream, &_pio_cache[i]);
+
+        /* invalidate entry */
+        _pio_cache[i].len = 0;
+    }
+
+    mutex_unlock(&_pio_cache_lock);
+}
+
 static void *_eventloop(void *arg)
 {
     (void)arg;
@@ -512,6 +647,10 @@ static void *_eventloop(void *arg)
     uint8_t idx_start = 0;
     uint8_t subnets = local_subnets;
     uint8_t tx_period = CONFIG_GNRC_IPV6_AUTO_SUBNETS_TX_PER_PERIOD;
+
+    /* only used with CONFIG_GNRC_IPV6_AUTO_SUBNETS_STATIC set */
+    uint8_t idx_old = 0;
+    uint8_t subnets_old = 0;
 
     DEBUG("auto_subnets: %u local subnets\n", subnets);
 
@@ -538,8 +677,23 @@ static void *_eventloop(void *arg)
                 /* send subnet announcement */
                 _send_announce(local_subnets, &timeout_timer, &timeout_msg);
             } else {
+
+                /* don't re-enumerate subnets of a downstream router goes down */
+                if (CONFIG_GNRC_IPV6_AUTO_SUBNETS_STATIC) {
+                    /* If we got less subnets than before, use the old value */
+                    if (subnets < subnets_old) {
+                        subnets = subnets_old;
+                        idx_start = idx_old;
+                    }
+                    /* Store subnet high water mark for later use */
+                    else {
+                        subnets_old = subnets;
+                        idx_old = idx_start;
+                    }
+                }
+
                 /* config round done, configure subnets */
-                _configure_subnets(subnets, idx_start, _upstream, &_pio_cache);
+                _process_pio_cache(subnets, idx_start, _upstream);
 
                 /* start a new round of counting */
                 tx_period = CONFIG_GNRC_IPV6_AUTO_SUBNETS_TX_PER_PERIOD;
@@ -563,4 +717,5 @@ void gnrc_ipv6_auto_subnets_init(void)
                                 _eventloop, NULL, "auto_subnets");
 }
 #endif /* !IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_SIMPLE) */
+#endif /* !DOXYGEN */
 /** @} */

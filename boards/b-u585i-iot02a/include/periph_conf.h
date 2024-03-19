@@ -27,6 +27,7 @@
 #include "periph_cpu.h"
 #include "clk_conf.h"
 #include "cfg_timer_tim5.h"
+#include "cfg_usb_otg_fs_u5.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -158,6 +159,7 @@ static const i2c_conf_t i2c_config[] = {
         .sda_af         = GPIO_AF4,
         .bus            = APB1,
         .rcc_mask       = RCC_APB1ENR1_I2C1EN,
+        .rcc_sw_mask    = RCC_CCIPR1_I2C1SEL_1,
         .irqn           = I2C1_ER_IRQn,
     },
     {
@@ -169,6 +171,7 @@ static const i2c_conf_t i2c_config[] = {
         .sda_af         = GPIO_AF4,
         .bus            = APB1,
         .rcc_mask       = RCC_APB1ENR1_I2C2EN,
+        .rcc_sw_mask    = RCC_CCIPR1_I2C2SEL_1,
         .irqn           = I2C2_ER_IRQn,
     },
 };

@@ -15,7 +15,7 @@ class NativeRIOTCtrl(riotctrl.ctrl.RIOTCtrl):
     This works exactly as a normal RIOTCtrl, with the exception that
     `DEBUG_ADAPTER_ID` is set in the environment to the PID of the `native`
     process, whenever a terminal is started. This allows for `reset()` to also
-    work for a the `native` instance.
+    work for a `native` instance.
     """
 
     def _set_debug_adapter_id(self, child):

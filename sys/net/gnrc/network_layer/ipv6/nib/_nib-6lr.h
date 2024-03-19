@@ -106,7 +106,7 @@ uint8_t _reg_addr_upstream(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
  * @param[in] nbr_sol   The neighbor solicitation carrying the original ARO
  *                      (handed over as @ref icmpv6_hdr_t, since it is just
  *                      handed to @ref _handle_aro()).
- * @param[in] aro       The original ARO
+ * @param[in] aro       The original ARO, must not be NULL
  * @param[in] sl2ao     SL2AO associated with the ARO.
  *
  * @return  registration status of the address (including

@@ -1082,14 +1082,14 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint16_t PER7:1;           /*!< bit:      7  Periodic Interval 7                */
     __I uint16_t CMP0:1;           /*!< bit:      8  Compare 0                          */
     __I uint16_t CMP1:1;           /*!< bit:      9  Compare 1                          */
-    __I uint16_t :4;               /*!< bit: 10..13  Reserved                           */
+    uint16_t :4;                   /*!< bit: 10..13  Reserved                           */
     __I uint16_t TAMPER:1;         /*!< bit:     14  Tamper                             */
     __I uint16_t OVF:1;            /*!< bit:     15  Overflow                           */
   } bit;                       /*!< Structure used for bit  access                  */
   struct {
     __I uint16_t PER:8;            /*!< bit:  0.. 7  Periodic Interval x                */
     __I uint16_t CMP:2;            /*!< bit:  8.. 9  Compare x                          */
-    __I uint16_t :6;               /*!< bit: 10..15  Reserved                           */
+    uint16_t :6;                   /*!< bit: 10..15  Reserved                           */
   } vec;                       /*!< Structure used for vec  access                  */
   uint16_t reg;                /*!< Type      used for register access              */
 } RTC_MODE0_INTFLAG_Type;
@@ -1146,14 +1146,14 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint16_t CMP1:1;           /*!< bit:      9  Compare 1                          */
     __I uint16_t CMP2:1;           /*!< bit:     10  Compare 2                          */
     __I uint16_t CMP3:1;           /*!< bit:     11  Compare 3                          */
-    __I uint16_t :2;               /*!< bit: 12..13  Reserved                           */
+    uint16_t :2;                   /*!< bit: 12..13  Reserved                           */
     __I uint16_t TAMPER:1;         /*!< bit:     14  Tamper                             */
     __I uint16_t OVF:1;            /*!< bit:     15  Overflow                           */
   } bit;                       /*!< Structure used for bit  access                  */
   struct {
     __I uint16_t PER:8;            /*!< bit:  0.. 7  Periodic Interval x                */
     __I uint16_t CMP:4;            /*!< bit:  8..11  Compare x                          */
-    __I uint16_t :4;               /*!< bit: 12..15  Reserved                           */
+    uint16_t :4;                   /*!< bit: 12..15  Reserved                           */
   } vec;                       /*!< Structure used for vec  access                  */
   uint16_t reg;                /*!< Type      used for register access              */
 } RTC_MODE1_INTFLAG_Type;
@@ -1212,14 +1212,14 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint16_t PER7:1;           /*!< bit:      7  Periodic Interval 7                */
     __I uint16_t ALARM0:1;         /*!< bit:      8  Alarm 0                            */
     __I uint16_t ALARM1:1;         /*!< bit:      9  Alarm 1                            */
-    __I uint16_t :4;               /*!< bit: 10..13  Reserved                           */
+    uint16_t :4;                   /*!< bit: 10..13  Reserved                           */
     __I uint16_t TAMPER:1;         /*!< bit:     14  Tamper                             */
     __I uint16_t OVF:1;            /*!< bit:     15  Overflow                           */
   } bit;                       /*!< Structure used for bit  access                  */
   struct {
     __I uint16_t PER:8;            /*!< bit:  0.. 7  Periodic Interval x                */
     __I uint16_t ALARM:2;          /*!< bit:  8.. 9  Alarm x                            */
-    __I uint16_t :6;               /*!< bit: 10..15  Reserved                           */
+    uint16_t :6;                   /*!< bit: 10..15  Reserved                           */
   } vec;                       /*!< Structure used for vec  access                  */
   uint16_t reg;                /*!< Type      used for register access              */
 } RTC_MODE2_INTFLAG_Type;

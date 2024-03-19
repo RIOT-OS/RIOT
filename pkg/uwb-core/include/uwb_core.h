@@ -47,7 +47,7 @@ extern "C" {
  * @brief   Stacksize used for uwb-core event queue
  */
 #ifndef UWB_CORE_STACKSIZE
-#define UWB_CORE_STACKSIZE              (THREAD_STACKSIZE_LARGE)
+#define UWB_CORE_STACKSIZE              (THREAD_STACKSIZE_DEFAULT)
 #endif
 
 /**

@@ -1,9 +1,7 @@
 PKG_NAME=arduino_sdi_12
 PKG_URL=https://github.com/EnviroDIY/Arduino-SDI-12
-PKG_VERSION=fd9699b390edeac3a8681e2a6d4fe2ba8b1f9a51
+PKG_VERSION=cd1349612f7b38f7a3cf629ab96d16dfd023be80
 PKG_LICENSE=BSD-3-Clause
-
-GITAMFLAGS = --3way
 
 include $(RIOTBASE)/pkg/pkg.mk
 

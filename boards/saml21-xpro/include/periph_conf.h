@@ -123,25 +123,24 @@ static const uart_conf_t uart_config[] = {
  * @name PWM configuration
  * @{
  */
-#define PWM_0_EN            1
-
-#if PWM_0_EN
 /* PWM0 channels */
 static const pwm_conf_chan_t pwm_chan0_config[] = {
     /* GPIO pin, MUX value, TCC channel */
-    { GPIO_PIN(PB, 10), GPIO_MUX_F, 4 },
+    {
+        .pin  = GPIO_PIN(PB, 10),
+        .mux  = GPIO_MUX_F,
+        .chan = 4
+    },
 };
-#endif
 
 /* PWM device configuration */
 static const pwm_conf_t pwm_config[] = {
-#if PWM_0_EN
-    { .tim  = TCC_CONFIG(TCC0),
-      .chan = pwm_chan0_config,
-      .chan_numof = ARRAY_SIZE(pwm_chan0_config),
-      .gclk_src = SAM0_GCLK_TIMER,
+    {
+        .tim  = TCC_CONFIG(TCC0),
+        .chan = pwm_chan0_config,
+        .chan_numof = ARRAY_SIZE(pwm_chan0_config),
+        .gclk_src = SAM0_GCLK_TIMER,
     },
-#endif
 };
 
 /* number of devices that are actually defined */
@@ -241,9 +240,9 @@ static const i2c_conf_t i2c_config[] = {
 
 static const adc_conf_chan_t adc_channels[] = {
     /* port, pin, muxpos */
-    {GPIO_PIN(PA, 10), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN18)},
-    {GPIO_PIN(PA, 11), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN19)},
-    {GPIO_PIN(PA, 2), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN0)}
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA10 },
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA11 },
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA02 }
 };
 
 #define ADC_NUMOF                           ARRAY_SIZE(adc_channels)

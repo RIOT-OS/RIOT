@@ -24,31 +24,26 @@
  * @}
  */
 
-#include <unistd.h>
-#include <reent.h>
 #include <errno.h>
 #include <malloc.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <sys/unistd.h>
+#include <reent.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <sys/times.h>
+#include <sys/unistd.h>
+#include <unistd.h>
 
-#include "cpu.h"
-#include "board.h"
-#include "sched.h"
-#include "thread.h"
-#include "irq.h"
 #include "log.h"
+#include "modules.h"
 #include "periph/pm.h"
+#include "sched.h"
+#include "stdio_base.h"
+#include "thread.h"
+
 #if MODULE_VFS
 #include "vfs.h"
 #endif
-
-#include "stdio_base.h"
-
-#include <sys/times.h>
 
 #ifdef MODULE_XTIMER
 #include <sys/time.h>
@@ -60,7 +55,7 @@
 #define NUM_HEAPS 1
 #endif
 
-#ifdef MODULE_MSP430_COMMON
+#ifdef __MSP430__
 /* the msp430 linker scripts define the end of all memory as __stack, which in
  * turn is used as the initial stack. RIOT also uses __stack as SP on isr
  * entry.  This logic makes __stack - ISR_STACKSIZE the heap end.
@@ -70,7 +65,7 @@ extern char __heap_start__;
 #define _sheap __heap_start__
 #define __eheap (char *)((uintptr_t)&__stack - ISR_STACKSIZE)
 
-#else /* MODULE_MSP430_COMMON */
+#else /* __MSP430__ */
 
 /**
  * @brief manage the heap
@@ -144,14 +139,28 @@ static const struct heap heaps[NUM_HEAPS] = {
 #endif
 };
 
-/* MIPS newlib crt implements _init,_fini and _exit and manages the heap */
-#ifndef __mips__
 /**
  * @brief Initialize NewLib, called by __libc_init_array() from the startup script
  */
 void _init(void)
 {
-    /* nothing to do here */
+    /* Definition copied from newlib/libc/stdio/local.h */
+    extern void __sinit (struct _reent *);
+
+    /* When running multiple threads: Initialize reentrant structure before the
+     * scheduler starts. This normally happens upon the first stdio function
+     * called. However, if no boot message happens this can result in two
+     * concurrent "first calls" to stdio in data corruption, if no locking is
+     * used. Except for ESP (which is using its own syscalls.c anyway), this
+     * currently is the case in RIOT. */
+    if (MAXTHREADS > 1) {
+        /* Also, make an exception for riotboot, which does not use stdio
+         * at all. This would pull in stdio and increase .text size
+         * significantly there */
+        if (!IS_USED(MODULE_RIOTBOOT)) {
+            __sinit(_REENT);
+        }
+    }
 }
 
 /**
@@ -175,14 +184,11 @@ __attribute__((used)) void _exit(int n)
 {
     LOG_INFO("#! exit %i: powering off\n", n);
     pm_off();
-    while(1);
+    while (1) {}
 }
 
 /**
  * @brief Allocate memory from the heap.
- *
- * The current heap implementation is very rudimentary, it is only able to allocate
- * memory. But it does not have any means to free memory again
  *
  * @return      pointer to the newly allocated memory on success
  * @return      pointer set to address `-1` on failure
@@ -233,8 +239,6 @@ __attribute__((weak)) void heap_stats(void)
            heap_size, minfo.uordblks, heap_size - minfo.uordblks);
 }
 #endif /* HAVE_HEAP_STATS */
-
-#endif /*__mips__*/
 
 /**
  * @brief Get the process-ID of the current thread
@@ -606,7 +610,7 @@ int _isatty_r(struct _reent *r, int fd)
 {
     r->_errno = 0;
 
-    if(fd == STDIN_FILENO || fd == STDOUT_FILENO || fd == STDERR_FILENO) {
+    if (fd == STDIN_FILENO || fd == STDOUT_FILENO || fd == STDERR_FILENO) {
         return 1;
     }
 
@@ -630,23 +634,15 @@ int _kill(pid_t pid, int sig)
     return -1;
 }
 
-#ifdef MODULE_XTIMER
+#if (IS_USED(MODULE_LIBC_GETTIMEOFDAY))
 int _gettimeofday_r(struct _reent *r, struct timeval *restrict tp, void *restrict tzp)
 {
-    (void) r;
-    (void) tzp;
+    (void)tzp;
+    (void)r;
     uint64_t now = xtimer_now_usec64();
     tp->tv_sec = div_u64_by_1000000(now);
     tp->tv_usec = now - (tp->tv_sec * US_PER_SEC);
     return 0;
-}
-#else
-int _gettimeofday_r(struct _reent *r, struct timeval *restrict tp, void *restrict tzp)
-{
-    (void) tp;
-    (void) tzp;
-    r->_errno = ENOSYS;
-    return -1;
 }
 #endif
 

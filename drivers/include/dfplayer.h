@@ -752,7 +752,7 @@ static inline int dfplayer_source_set_contains(dfplayer_source_set_t set,
  *
  * This function is idempotent
  */
-static inline void dfplayer_source_set_add(dfplayer_source_set_t set,
+static inline void dfplayer_source_set_add(dfplayer_source_set_t *set,
                                            dfplayer_source_t src);
 
 /**
@@ -763,7 +763,7 @@ static inline void dfplayer_source_set_add(dfplayer_source_set_t set,
  *
  * This function is idempotent
  */
-static inline void dfplayer_source_set_rm(dfplayer_source_set_t set,
+static inline void dfplayer_source_set_rm(dfplayer_source_set_t *set,
                                           dfplayer_source_t src);
 
 #ifdef __cplusplus

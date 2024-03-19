@@ -393,9 +393,7 @@ with error.""")
     kconf = RiotKconfig(args.kconfig_filename, warn_to_stderr=False)
     merge_configs(kconf, args.config_sources)
 
-    # HACK: Force all symbols to be evaluated, to catch warnings generated
-    # during evaluation (such as out-of-range integers)
-    kconf.write_config(os.devnull)
+    kconf.evaluate_config()
 
     if not check_configs(kconf) and not args.ignore_config_errors:
         sys.exit(1)

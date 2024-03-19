@@ -25,7 +25,6 @@
 extern "C" {
 #endif
 
-#include "mtd.h"
 #include "periph_cpu.h"
 
 /**
@@ -40,13 +39,9 @@ extern "C" {
  * @name    LED pin definition and handlers
  * @{
  */
-#define LED0_PORT           GPIOC
-#define LED0_PIN            GPIO_PIN(PORT_C, 13)
-#define LED0_MASK           (1 << 13)
-
-#define LED0_ON             (LED0_PORT->BSRR = (LED0_MASK << 16))
-#define LED0_OFF            (LED0_PORT->BSRR = (LED0_MASK <<  0))
-#define LED0_TOGGLE         (LED0_PORT->ODR  ^= LED0_MASK)
+#define LED0_PIN_NUM        13
+#define LED0_PORT_NUM       PORT_C
+#define LED0_IS_INVERTED    1
 /** @} */
 
 /**
@@ -77,18 +72,14 @@ extern "C" {
  * @name MTD configuration
  * @{
  */
-extern mtd_dev_t *mtd0;
-#define MTD_0 mtd0
+#define MTD_0 mtd_dev_get(0)
 /** @} */
-
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }
 #endif
+
+#include "stm32_leds.h"
 
 #endif /* BOARD_H */
 /** @} */

@@ -280,7 +280,7 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
     __I uint8_t NVME:1;                    /**< bit:      3  NVM Error                                */
     __I uint8_t KEYE:1;                    /**< bit:      4  KEY Write Error                          */
     __I uint8_t NSCHK:1;                   /**< bit:      5  NS configuration change detected         */
-    __I uint8_t :2;                        /**< bit:   6..7  Reserved */
+    uint8_t :2;                            /**< bit:   6..7  Reserved */
   } bit;                                /**< Structure used for bit  access */
   uint8_t  reg;                         /**< Type used for register access */
 } NVMCTRL_INTFLAG_Type;

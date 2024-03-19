@@ -7,10 +7,14 @@ endif
 
 # CMSIS-DSP is needed for arm_math.h on Cortex-M0+ architectures
 ifeq ($(CPU_CORE),cortex-m0plus)
-  USEPKG += cmsis-dsp
+  USEMODULE += cmsis-dsp
 endif
 
 # include CPU family module
 USEMODULE += cpu_$(CPU_FAM)
+
+ifneq (,$(filter periph_usbdev,$(USEMODULE)))
+  USEMODULE += usbdev_synopsys_dwc2
+endif
 
 include $(RIOTCPU)/cortexm_common/Makefile.dep

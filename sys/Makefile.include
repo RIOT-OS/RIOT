@@ -1,3 +1,7 @@
+ifneq (,$(filter bhp,$(USEMODULE)))
+  include $(RIOTBASE)/sys/bhp/Makefile.include
+endif
+
 ifneq (,$(filter gnrc_sixlowpan_frag_rb,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/gnrc/network_layer/sixlowpan/frag
 endif
@@ -52,6 +56,10 @@ ifneq (,$(filter app_metadata,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter auto_init,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/sys/auto_init/include
+endif
+
 ifneq (,$(filter cpp11-compat,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/cpp11-compat/include
 endif
@@ -70,8 +78,12 @@ ifneq (,$(filter embunit,$(USEMODULE)))
   endif
 endif
 
-ifneq (,$(filter log_%,$(USEMODULE)))
-  include $(RIOTBASE)/sys/log/Makefile.include
+ifneq (,$(filter log_color,$(USEMODULE)))
+  include $(RIOTBASE)/sys/log_color/Makefile.include
+endif
+
+ifneq (,$(filter log_printfnoformat,$(USEMODULE)))
+  include $(RIOTBASE)/sys/log_printfnoformat/Makefile.include
 endif
 
 ifneq (,$(filter newlib,$(USEMODULE)))
@@ -123,7 +135,7 @@ ifneq (,$(filter ssp,$(USEMODULE)))
   include $(RIOTBASE)/sys/ssp/Makefile.include
 endif
 
-ifneq (native,$(BOARD))
+ifneq (native,$(CPU))
   INCLUDES += -I$(RIOTBASE)/sys/libc/include
 endif
 
@@ -139,6 +151,10 @@ ifneq (,$(filter test_utils_result_output,$(USEMODULE)))
   include $(RIOTBASE)/sys/test_utils/result_output/Makefile.include
 endif
 
+ifneq (,$(filter test_utils_netdev_ieee802154_minimal,$(USEMODULE)))
+  CFLAGS += -DCONFIG_NETDEV_REGISTER_SIGNAL
+endif
+
 ifneq (,$(filter ztimer,$(USEMODULE)))
   include $(RIOTBASE)/sys/ztimer/Makefile.include
 endif
@@ -147,7 +163,36 @@ ifneq (,$(filter prng,$(USEMODULE)))
   include $(RIOTBASE)/sys/random/Makefile.include
 endif
 
-ifneq (,$(filter usbus_dfu riotboot_reset,$(USEMODULE)))
-  CFLAGS += -DCPU_RAM_BASE=$(RAM_START_ADDR)
-  CFLAGS += -DCPU_RAM_SIZE=$(RAM_LEN)
+ifneq (,$(filter psa_crypto,$(USEMODULE)))
+  include $(RIOTBASE)/sys/psa_crypto/Makefile.include
+endif
+
+ifneq (,$(filter test_utils_netdev_eth_minimal,$(USEMODULE)))
+  CFLAGS += -DCONFIG_NETDEV_REGISTER_SIGNAL
+endif
+
+ifneq (,$(filter shell_lock,$(USEMODULE)))
+  include $(RIOTBASE)/sys/shell_lock/Makefile.include
+endif
+
+PSEUDOMODULES += shell_democommands
+
+ifneq (,$(filter rust_riotmodules,$(USEMODULE)))
+  include $(RIOTBASE)/sys/rust_riotmodules/Makefile.include
+endif
+
+ifneq (,$(filter tiny_strerror,$(USEMODULE)))
+  include $(RIOTBASE)/sys/tiny_strerror/Makefile.include
+endif
+
+ifneq (,$(filter preprocessor_%,$(USEMODULE)))
+  include $(RIOTBASE)/sys/preprocessor/Makefile.include
+endif
+
+ifneq (,$(filter gcoap,$(USEMODULE)))
+  include $(RIOTBASE)/sys/net/application_layer/gcoap/Makefile.include
+endif
+
+ifneq (,$(filter nanocoap,$(USEMODULE)))
+  include $(RIOTBASE)/sys/net/application_layer/nanocoap/Makefile.include
 endif

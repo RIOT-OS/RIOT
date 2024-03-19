@@ -56,6 +56,8 @@ extern "C" {
 #ifndef MHZ19_SAUL_INFO
 #define MHZ19_SAUL_INFO { .name = "mh-z19" }
 #endif
+/** @} */
+
 /**
  * @brief   Configure MHZ19
  */

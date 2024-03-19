@@ -12,6 +12,12 @@
  * @ingroup     core_sync
  * @brief       Mutex for thread synchronization
  *
+ * @warning     By default, no mitigation against priority inversion is
+ *              employed. If your application is subject to priority inversion
+ *              and cannot tolerate the additional delay this can cause, use
+ *              module `core_mutex_priority_inheritance` to employ
+ *              priority inheritance as mitigation.
+ *
  * Mutex Implementation Basics
  * ===========================
  *
@@ -61,7 +67,7 @@
  *    blocking.
  * 2. If the mutex has a value of `MUTEX_LOCKED`, it will be changed to point to
  *    the `thread_t` of the running thread. The single item list is terminated
- *    be setting the `thread_t::rq_entry.next` of the running thread to `NULL`.
+ *    by setting the `thread_t::rq_entry.next` of the running thread to `NULL`.
  *    The running thread blocks as described below.
  * 3. Otherwise, the current thread is inserted into the list of waiting
  *    threads sorted by thread priority. The running thread blocks as described
@@ -91,6 +97,25 @@
  *       `MUTEX_LOCK`.
  *     - The scheduler is run, so that if the unblocked waiting thread can
  *       run now, in case it has a higher priority than the running thread.
+ *
+ * Debugging deadlocks
+ * -------------------
+ *
+ * The module `core_mutex_debug` can be used to print on whom `mutex_lock()`
+ * is waiting. This information includes the thread ID of the owner and the
+ * program counter (PC) from where `mutex_lock()` was called. Note that the
+ * information is only valid if:
+ *
+ * - The mutex was locked by a thread, and not e.g. by `MUTEX_INIT_LOCKED`
+ * - The function `cpu_get_caller_pc()` is implemented for the target
+ *   architecture. (The thread ID will remain valid, though.)
+ * - The caller PC is briefly 0 when the current owner passes over ownership
+ *   to the next thread, but that thread didn't get CPU time yet to write its
+ *   PC into the data structure. Even worse, on architectures where an aligned
+ *   function-pointer-sized write is not atomic, the value may briefly be
+ *   bogus. Chances are close to zero this ever hits and since this only
+ *   effects debug output, the ostrich algorithm was chosen here.
+ *
  * @{
  *
  * @file
@@ -104,14 +129,12 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 
+#include "architecture.h"
 #include "kernel_defines.h"
 #include "list.h"
 #include "thread.h"
-
-#ifndef __cplusplus
-#include "irq.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -127,7 +150,59 @@ typedef struct {
      * @internal
      */
     list_node_t queue;
+#if defined(DOXYGEN) || defined(MODULE_CORE_MUTEX_PRIORITY_INHERITANCE) \
+    || defined(MODULE_CORE_MUTEX_DEBUG)
+    /**
+     * @brief   The current owner of the mutex or `NULL`
+     * @note    Only available if module core_mutex_priority_inheritance
+     *          is used.
+     *
+     * If either the mutex is not locked or the mutex is not locked by a thread
+     * (e.g. because it is used to synchronize a thread with an ISR completion),
+     * this will have the value of `NULL`.
+     */
+    kernel_pid_t owner;
+#endif
+#if defined(DOXYGEN) || defined(MODULE_CORE_MUTEX_DEBUG)
+    /**
+     * @brief   Program counter of the call to @ref mutex_lock that most
+     *          recently acquired this mutex
+     *
+     * This is used when the module `core_mutex_debug` is used to debug
+     * deadlocks and is non-existing otherwise
+     */
+    uinttxtptr_t owner_calling_pc;
+#endif
+#if defined(DOXYGEN) || defined(MODULE_CORE_MUTEX_PRIORITY_INHERITANCE)
+    /**
+     * @brief   Original priority of the owner
+     * @note    Only available if module core_mutex_priority_inheritance
+     *          is used.
+     */
+    uint8_t owner_original_priority;
+#endif
 } mutex_t;
+
+/**
+ * @brief   Internal function implementing @ref mutex_lock and
+ *          @ref mutex_trylock
+ *
+ * @details Do not call this function, use @ref mutex_lock or @ref mutex_trylock
+ *          instead
+ *
+ * @param[in,out]   mutex   Mutex object to lock.
+ * @param[in]       block   Whether to block
+ *
+ * @pre     @p mutex is not `NULL`
+ * @pre     Mutex at @p mutex has been initialized
+ * @pre     Must be called in thread context
+ *
+ * @post    The mutex @p is locked and held by the calling thread.
+ *
+ * @retval  true    Mutex obtained
+ * @retval  false   Mutex not obtained (only possible if @p block is `false`)
+ */
+bool mutex_lock_internal(mutex_t *mutex, bool block);
 
 /**
  * @brief   A cancellation structure for use with @ref mutex_lock_cancelable
@@ -141,16 +216,21 @@ typedef struct {
     uint8_t cancelled;  /**< Flag whether the mutex has been cancelled */
 } mutex_cancel_t;
 
+#ifndef __cplusplus
 /**
  * @brief Static initializer for mutex_t.
  * @details This initializer is preferable to mutex_init().
  */
-#define MUTEX_INIT { { NULL } }
+#  define MUTEX_INIT { .queue = { .next = NULL } }
 
 /**
  * @brief Static initializer for mutex_t with a locked mutex
  */
-#define MUTEX_INIT_LOCKED { { MUTEX_LOCKED } }
+#  define MUTEX_INIT_LOCKED { .queue = { .next = MUTEX_LOCKED } }
+#else
+#  define MUTEX_INIT {}
+#  define MUTEX_INIT_LOCKED { { MUTEX_LOCKED } }
+#endif /* __cplusplus */
 
 /**
  * @cond INTERNAL
@@ -193,25 +273,6 @@ static inline mutex_cancel_t mutex_cancel_init(mutex_t *mutex)
 /**
  * @brief   Tries to get a mutex, non-blocking.
  *
- * @internal
- * @note    This function is intended for use by languages incompatible
- *          with C (such as C++). Code in C should use @ref mutex_trylock
- *          instead
- *
- * @param[in,out]   mutex   Mutex object to lock.
- *
- * @retval  1               if mutex was unlocked, now it is locked.
- * @retval  0               if the mutex was locked.
- *
- * @pre     @p mutex is not `NULL`
- * @pre     Mutex at @p mutex has been initialized
- * @pre     Must be called in thread context
- */
-int mutex_trylock_ffi(mutex_t *mutex);
-
-/**
- * @brief   Tries to get a mutex, non-blocking.
- *
  * @param[in,out]   mutex   Mutex object to lock.
  *
  * @retval  1               if mutex was unlocked, now it is locked.
@@ -223,19 +284,7 @@ int mutex_trylock_ffi(mutex_t *mutex);
  */
 static inline int mutex_trylock(mutex_t *mutex)
 {
-#ifdef __cplusplus
-    return mutex_trylock_ffi(mutex);
-#else
-    unsigned irq_state = irq_disable();
-    int retval = 0;
-
-    if (mutex->queue.next == NULL) {
-        mutex->queue.next = MUTEX_LOCKED;
-        retval = 1;
-    }
-    irq_restore(irq_state);
-    return retval;
-#endif
+    return mutex_lock_internal(mutex, false);
 }
 
 /**
@@ -249,7 +298,29 @@ static inline int mutex_trylock(mutex_t *mutex)
  *
  * @post    The mutex @p is locked and held by the calling thread.
  */
-void mutex_lock(mutex_t *mutex);
+static inline void mutex_lock(mutex_t *mutex)
+{
+#if (MAXTHREADS > 1)
+    mutex_lock_internal(mutex, true);
+#else
+    /* dummy implementation for when no scheduler is used */
+    /* (ab)use next pointer as lock variable */
+    volatile uintptr_t *lock = (void *)&mutex->queue.next;
+
+    /* spin until lock is released (e.g. by interrupt).
+     *
+     * Note: since only the numbers 0 and 1 are ever stored in lock, this
+     * read does not need to be atomic here - even while a concurrent write
+     * is performed on lock, a read will still either yield 0 or 1 (so the old
+     * or new value, which both is fine), even if the lock is read out byte-wise
+     * (e.g. on AVR).
+     */
+    while (*lock) {}
+
+    /* set lock variable */
+    *lock = 1;
+#endif
+}
 
 /**
  * @brief   Locks a mutex, blocking. This function can be canceled.
@@ -284,7 +355,18 @@ int mutex_lock_cancelable(mutex_cancel_t *mc);
  * @note    It is safe to unlock a mutex held by a different thread.
  * @note    It is safe to call this function from IRQ context.
  */
+#if (MAXTHREADS > 1) || DOXYGEN
 void mutex_unlock(mutex_t *mutex);
+#else
+/**
+ * @brief   dummy implementation for when no scheduler is used
+ */
+static inline void mutex_unlock(mutex_t *mutex)
+{
+    /* (ab)use next pointer as lock variable */
+    mutex->queue.next = NULL;
+}
+#endif
 
 /**
  * @brief   Unlocks the mutex and sends the current thread to sleep
@@ -310,7 +392,7 @@ void mutex_unlock_and_sleep(mutex_t *mutex);
  *          @ref mutex_lock_cancelable. (You can reinitialize the same memory
  *          to safely reuse it.)
  * @warning You ***MUST NOT*** call this function once the thread referred to by
- *          @p mc re-uses the mutex object referred to by @p mc (not counting
+ *          @p mc reuses the mutex object referred to by @p mc (not counting
  *          the call to @ref mutex_lock_cancelable @p mc was used in).
  * @note    It is safe to call this function from IRQ context, e.g. from a timer
  *          interrupt.

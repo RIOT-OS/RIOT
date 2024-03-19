@@ -1,0 +1,12 @@
+CFLAGS += -Wno-unused-parameter
+CFLAGS += -Wno-sign-compare
+CFLAGS += -Wno-unused-function
+CFLAGS += -Wno-maybe-uninitialized
+
+ifeq (llvm,$(TOOLCHAIN))
+  CFLAGS += -Wno-empty-translation-unit
+  CFLAGS += -Wno-newline-eof
+  CFLAGS += -Wno-missing-braces
+endif
+
+include $(RIOTBASE)/Makefile.base

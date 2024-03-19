@@ -22,17 +22,23 @@ config BOARD_PYBOARD
     select HAS_PERIPH_UART
     select HAS_PERIPH_USBDEV
 
+    # Put other features for this board (in alphabetical order)
+    select HAS_TINYUSB_DEVICE
+
     # Clock configuration
     select BOARD_HAS_HSE
     select BOARD_HAS_LSE
 
     select HAVE_SAUL_GPIO
 
+config CLOCK_HSE
+    default 12000000
+
 config CLOCK_PLL_M
     default 12
 
 config CLOCK_PLL_N
-    default 336 if MODULE_PERIPH_USBDEV && TEST_KCONFIG
+    default 336 if MODULE_PERIPH_USBDEV_CLK && TEST_KCONFIG
     default 360
 
 

@@ -66,8 +66,8 @@
 #ifndef PERIPH_SPI_H
 #define PERIPH_SPI_H
 
+#include <endian.h>
 #include <errno.h>
-#include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -78,6 +78,14 @@
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+/**
+ * @brief   Threshold under which polling transfers are used instead of DMA
+ *          TODO: determine at run-time based on SPI clock
+ */
+#ifndef CONFIG_SPI_DMA_THRESHOLD_BYTES
+#define CONFIG_SPI_DMA_THRESHOLD_BYTES  16
 #endif
 
 /**
@@ -324,7 +332,7 @@ typedef struct {
  * @brief   Initialize MOSI/MISO/SCLK pins with adapted GPIO modes
  *
  * @param[in]   bus     SPI device that is used with the given CS line
- * @param[in]   mode    a pointer to a truct containing the 3 modes to use on
+ * @param[in]   mode    a pointer to a struct containing the 3 modes to use on
  *                      each pin
  *
  * @retval  0           success
@@ -421,6 +429,25 @@ uint8_t spi_transfer_reg(spi_t bus, spi_cs_t cs, uint8_t reg, uint8_t out);
  */
 void spi_transfer_regs(spi_t bus, spi_cs_t cs, uint8_t reg,
                        const void *out, void *in, size_t len);
+
+/**
+ * @brief   Transfer a 16 bit number in big endian byte order
+ *
+ * @param[in]   bus             SPI device to use
+ * @param[in]   cs              chip select pin/line to use, set to
+ *                              SPI_CS_UNDEF if chip select should not be
+ *                              handled by the SPI driver
+ * @param[in]   cont            if true, keep device selected after transfer
+ * @param[in]   host_number     number to transfer in host byte order
+ * @return      The 16 bit number received in host byte order
+ */
+static inline uint16_t spi_transfer_u16_be(spi_t bus, spi_cs_t cs, bool cont, uint16_t host_number)
+{
+    const uint16_t send = htobe16(host_number);
+    uint16_t receive;
+    spi_transfer_bytes(bus, cs, cont, &send, &receive, sizeof(receive));
+    return be16toh(receive);
+}
 
 #ifdef __cplusplus
 }

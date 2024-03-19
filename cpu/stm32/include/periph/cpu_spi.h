@@ -32,6 +32,12 @@
 extern "C" {
 #endif
 
+#ifndef DOXYGEN
+/* resolve circular dependency by declaring spi_t here */
+#define HAVE_SPI_T
+typedef uint_fast8_t spi_t;
+#endif
+
 /**
  * @brief   Define a magic number that tells us to use hardware chip select
  *
@@ -118,6 +124,12 @@ typedef struct {
     uint8_t rx_dma_chan;    /**< DMA channel used for RX */
 #endif
 } spi_conf_t;
+
+#ifndef DOXYGEN
+gpio_t spi_pin_miso(spi_t bus);
+gpio_t spi_pin_mosi(spi_t bus);
+gpio_t spi_pin_clk(spi_t bus);
+#endif
 
 #ifdef __cplusplus
 }

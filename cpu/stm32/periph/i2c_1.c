@@ -41,7 +41,7 @@
 #include "byteorder.h"
 #include "panic.h"
 
-#include "cpu_conf_stm32_common.h"
+#include "stmclk.h"
 
 #include "periph/i2c.h"
 #include "periph/gpio.h"
@@ -51,7 +51,6 @@
 #include "debug.h"
 
 #define TICK_TIMEOUT    (0xFFFF)
-#define MAX_BYTES_PER_FRAME (256)
 
 #define I2C_IRQ_PRIO    (1)
 #define I2C_FLAG_READ   (I2C_READ << I2C_CR2_RD_WRN_Pos)
@@ -59,11 +58,23 @@
 
 #define CLEAR_FLAG      (I2C_ICR_NACKCF | I2C_ICR_ARLOCF | I2C_ICR_BERRCF | I2C_ICR_ADDRCF)
 
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
+#define I2C_CLOCK_SRC_REG       (RCC->CFGR3)
+#elif defined(RCC_CCIPR_I2C1SEL)
+#define I2C_CLOCK_SRC_REG       (RCC->CCIPR)
+#elif defined(RCC_CCIPR1_I2C1SEL)
+#define I2C_CLOCK_SRC_REG       (RCC->CCIPR1)
+#elif defined(RCC_DCKCFGR2_I2C1SEL)
+#define I2C_CLOCK_SRC_REG       (RCC->DCKCFGR2)
+#endif
+
+static uint32_t hsi_state;
+
 /* static function definitions */
 static inline void _i2c_init(I2C_TypeDef *i2c, uint32_t timing);
 static int _write(I2C_TypeDef *i2c, uint16_t addr, const void *data,
                   size_t length, uint8_t flags, uint32_t cr2_flags);
-static int _start(I2C_TypeDef *i2c, uint32_t cr2, uint8_t flags);
+static int _i2c_start(I2C_TypeDef *i2c, uint32_t cr2, uint8_t flags);
 static int _stop(I2C_TypeDef *i2c);
 static int _wait_isr_set(I2C_TypeDef *i2c, uint32_t mask, uint8_t flags);
 static inline int _wait_for_bus(I2C_TypeDef *i2c);
@@ -87,9 +98,11 @@ void i2c_init(i2c_t dev)
     NVIC_SetPriority(i2c_config[dev].irqn, I2C_IRQ_PRIO);
     NVIC_EnableIRQ(i2c_config[dev].irqn);
 
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
-    /* Set I2CSW bits to enable I2C clock source */
-    RCC->CFGR3 |= i2c_config[dev].rcc_sw_mask;
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3) || \
+    defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L4) || \
+    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32WB)
+    /* select I2C clock source */
+    I2C_CLOCK_SRC_REG |= i2c_config[dev].rcc_sw_mask;
 #endif
 
     DEBUG("[i2c] init: configuring pins\n");
@@ -141,6 +154,11 @@ void i2c_acquire(i2c_t dev)
     assert(dev < I2C_NUMOF);
 
     mutex_lock(&locks[dev]);
+    hsi_state = (RCC->CR & RCC_CR_HSION);
+    if (!hsi_state) {
+        /* the internal RC oscillator (HSI) must be enabled */
+        stmclk_enable_hsi();
+    }
 
     periph_clk_en(i2c_config[dev].bus, i2c_config[dev].rcc_mask);
 
@@ -158,6 +176,9 @@ void i2c_release(i2c_t dev)
     _wait_for_bus(i2c_config[dev].dev);
 
     periph_clk_dis(i2c_config[dev].bus, i2c_config[dev].rcc_mask);
+    if (!hsi_state) {
+        stmclk_disable_hsi();
+    }
 
     mutex_unlock(&locks[dev]);
 }
@@ -195,7 +216,7 @@ int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
 int i2c_read_bytes(i2c_t dev, uint16_t address, void *data,
                    size_t length, uint8_t flags)
 {
-    assert(dev < I2C_NUMOF && length < MAX_BYTES_PER_FRAME);
+    assert(dev < I2C_NUMOF && length < PERIPH_I2C_MAX_BYTES_PER_FRAME);
 
     I2C_TypeDef *i2c = i2c_config[dev].dev;
     assert(i2c != NULL);
@@ -206,7 +227,7 @@ int i2c_read_bytes(i2c_t dev, uint16_t address, void *data,
     }
     DEBUG("[i2c] read_bytes: Starting\n");
     /* RELOAD is needed because we don't know the full frame */
-    int ret = _start(i2c, (address << 1) | (length << I2C_CR2_NBYTES_Pos) |
+    int ret = _i2c_start(i2c, (address << 1) | (length << I2C_CR2_NBYTES_Pos) |
                      I2C_CR2_RELOAD | I2C_FLAG_READ, flags);
     if (ret < 0) {
         return ret;
@@ -253,13 +274,13 @@ int i2c_write_bytes(i2c_t dev, uint16_t address, const void *data,
 static int _write(I2C_TypeDef *i2c, uint16_t addr, const void *data,
                     size_t length, uint8_t flags, uint32_t cr2_flags)
 {
-    assert(i2c != NULL && length < MAX_BYTES_PER_FRAME);
+    assert(i2c != NULL && length < PERIPH_I2C_MAX_BYTES_PER_FRAME);
 
     /* If reload was NOT set, must either stop or start */
     if ((i2c->ISR & I2C_ISR_TC) && (flags & I2C_NOSTART)) {
         return -EOPNOTSUPP;
     }
-    int ret = _start(i2c, (addr << 1) | (length << I2C_CR2_NBYTES_Pos) |
+    int ret = _i2c_start(i2c, (addr << 1) | (length << I2C_CR2_NBYTES_Pos) |
                      cr2_flags, flags);
     if (ret < 0) {
         return ret;
@@ -299,7 +320,7 @@ static int _write(I2C_TypeDef *i2c, uint16_t addr, const void *data,
     return _wait_for_bus(i2c);
 }
 
-static int _start(I2C_TypeDef *i2c, uint32_t cr2, uint8_t flags)
+static int _i2c_start(I2C_TypeDef *i2c, uint32_t cr2, uint8_t flags)
 {
     assert(i2c != NULL);
     assert((i2c->ISR & I2C_ISR_BUSY) || !(flags & I2C_NOSTART));

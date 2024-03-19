@@ -60,6 +60,7 @@ extern "C"
 #define LED3_ON             (GPIOB->PCOR = LED3_MASK)
 #define LED3_OFF            (GPIOB->PSOR = LED3_MASK)
 #define LED3_TOGGLE         (GPIOB->PTOR = LED3_MASK)
+/** @} */
 
 /**
  * @name    Button pin definitions
@@ -138,11 +139,6 @@ extern "C"
 #define MMA8X5X_PARAM_I2C           (I2C_DEV(0))
 #define MMA8X5X_PARAM_ADDR          (0x1D)
 /** @} */
-
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and standard I/O
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

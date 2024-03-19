@@ -1,0 +1,42 @@
+# default board version if not defined
+BOARD_VERSION ?= esp32s3-devkitc-1-n8
+
+ifeq (esp32s3-devkitc-1-n8,$(BOARD_VERSION))
+  CPU_MODEL = esp32s3_wroom_1x_n8
+else ifeq (esp32s3-devkitc-1-n8r2,$(BOARD_VERSION))
+  CPU_MODEL = esp32s3_wroom_1x_n8r2
+else ifeq (esp32s3-devkitc-1-n8r8,$(BOARD_VERSION))
+  CPU_MODEL = esp32s3_wroom_1x_n8r8
+else ifeq (esp32s3-devkitc-1-n16r8v,$(BOARD_VERSION))
+  CPU_MODEL = esp32s3_wroom_2_n16r8v
+else ifeq (esp32s3-devkitc-1-n32r8v,$(BOARD_VERSION))
+  CPU_MODEL = esp32s3_wroom_2_n32r8v
+else ifeq (esp32s3-devkitc-1u-n8,$(BOARD_VERSION))
+  CPU_MODEL = esp32s3_wroom_1x_n8
+else ifeq (esp32s3-devkitc-1u-n8r2,$(BOARD_VERSION))
+  CPU_MODEL = esp32s3_wroom_1x_n8r2
+else ifeq (esp32s3-devkitc-1u-n8r8,$(BOARD_VERSION))
+  CPU_MODEL = esp32s3_wroom_1x_n8r8
+else ifeq (esp32s3-devkitm-1-n8,$(BOARD_VERSION))
+  CPU_MODEL = esp32s3_mini_1x_n8
+else ifeq (esp32s3-devkitm-1u-n8,$(BOARD_VERSION))
+  CPU_MODEL = esp32s3_mini_1x_n8
+else
+  $(error BOARD_VERSION is unknown)
+endif
+
+# common board and CPU features
+include $(RIOTBOARD)/common/esp32s3/Makefile.features
+
+# additional features provided by the board
+FEATURES_PROVIDED += periph_adc
+FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_pwm
+FEATURES_PROVIDED += periph_spi
+
+# unique features provided by the board
+FEATURES_PROVIDED += esp_jtag
+
+FEATURES_PROVIDED += arduino_pins
+FEATURES_PROVIDED += periph_usbdev
+FEATURES_PROVIDED += tinyusb_device

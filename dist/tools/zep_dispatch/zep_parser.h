@@ -16,6 +16,17 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Get the payload of a ZEP frame
+ *
+ * @param[in]  buffer   ZEP frame
+ * @param[in, out] len  size of buffer, will contain size of payload
+ *
+ * @return pointer to payload on success
+ *         NULL if no payload was found
+ */
+const void *zep_get_payload(const void *buffer, size_t *len);
+
+/**
  * @brief   Parse l2 source address of a ZEP frame
  *
  * @param[in]  buffer   ZEP frame

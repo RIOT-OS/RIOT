@@ -45,6 +45,7 @@ static const i2c_conf_t i2c_config[] = {
         .bus            = APB1,
 #if CPU_FAM_STM32L4
         .rcc_mask       = RCC_APB1ENR1_I2C1EN,
+        .rcc_sw_mask    = RCC_CCIPR_I2C1SEL_1,          /* HSI (16 MHz) */
         .irqn           = I2C1_ER_IRQn,
 #else /* CPU_FAM_STM32L0 */
         .rcc_mask       = RCC_APB1ENR_I2C1EN,

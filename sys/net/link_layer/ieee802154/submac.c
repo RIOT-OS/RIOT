@@ -18,7 +18,7 @@
 #include <string.h>
 #include "net/ieee802154/submac.h"
 #include "net/ieee802154.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "random.h"
 #include "luid.h"
 #include "kernel_defines.h"
@@ -64,7 +64,7 @@ static inline bool _does_handle_csma(ieee802154_dev_t *dev)
 
 static bool _has_retrans_left(ieee802154_submac_t *submac)
 {
-    return submac->retrans < IEEE802154_SUBMAC_MAX_RETRANSMISSIONS;
+    return submac->retrans < CONFIG_IEEE802154_DEFAULT_MAX_FRAME_RETRANS;
 }
 
 static ieee802154_fsm_state_t _tx_end(ieee802154_submac_t *submac, int status,
@@ -229,7 +229,7 @@ static ieee802154_fsm_state_t _fsm_state_prepare(ieee802154_submac_t *submac,
             uint32_t bp = (random_uint32() & submac->backoff_mask) *
                           CSMA_SENDER_BACKOFF_PERIOD_UNIT_US;
 
-            xtimer_usleep(bp);
+            ztimer_sleep(ZTIMER_USEC, bp);
             /* Prepare for next iteration */
             uint8_t curr_be = (submac->backoff_mask + 1) >> 1;
             if (curr_be < submac->be.max) {

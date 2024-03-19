@@ -173,6 +173,32 @@ static const spi_conf_t spi_config[] = {
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
+/**
+ * @brief USB device FS configuration
+ */
+static const stm32_usbdev_fs_config_t stm32_usbdev_fs_config[] = {
+    {
+        .base_addr  = (uintptr_t)USB,
+        .rcc_mask   = RCC_APB1ENR_USBEN,
+        .irqn       = USB_LP_CAN_RX0_IRQn,
+        .apb        = APB1,
+        .dm         = GPIO_PIN(PORT_A, 11),
+        .dp         = GPIO_PIN(PORT_A, 12),
+        .af         = GPIO_AF14,
+        .disconn    = GPIO_PIN(PORT_G, 6),
+    },
+};
+
+/**
+ * @brief Interrupt function name mapping
+ */
+#define USBDEV_ISR              isr_usb_lp_can_rx0
+
+/**
+ * @brief Number of available USB device FS peripherals
+ */
+#define USBDEV_NUMOF            ARRAY_SIZE(stm32_usbdev_fs_config)
+
 #ifdef __cplusplus
 }
 #endif

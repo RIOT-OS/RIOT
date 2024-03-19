@@ -24,6 +24,7 @@
 #include "clk.h"
 #include "board.h"
 #include "periph_conf.h"
+#include "periph/gpio.h"
 
 #define DELAY_SHORT         (coreclk() / 50)
 #define DELAY_LONG          (DELAY_SHORT * 4)
@@ -81,10 +82,10 @@ int main(void)
     }
     else {
         printf("Available LEDs: %i\n\n", numof);
-        puts("Will now light up each LED once short and twice long in a loop");
+        puts("Will now light up each LED once short and twice long");
     }
 
-    while (1) {
+    for (unsigned i = 0; i < 4; ++i) {
 #ifdef LED0_ON
         LED0_ON;
         dumb_delay(DELAY_LONG);
@@ -196,6 +197,35 @@ int main(void)
         dumb_delay(DELAY_SHORT);
         LED7_TOGGLE;
         dumb_delay(DELAY_LONG);
+#endif
+    }
+
+    puts("Mapping each LED to a button (if available)");
+
+    while (1) {
+#if defined(LED0_PIN) && defined(BTN0_PIN)
+        gpio_write(LED0_PIN, gpio_read(BTN0_PIN));
+#endif
+#if defined(LED1_PIN) && defined(BTN1_PIN)
+        gpio_write(LED1_PIN, gpio_read(BTN1_PIN));
+#endif
+#if defined(LED2_PIN) && defined(BTN2_PIN)
+        gpio_write(LED2_PIN, gpio_read(BTN2_PIN));
+#endif
+#if defined(LED3_PIN) && defined(BTN3_PIN)
+        gpio_write(LED3_PIN, gpio_read(BTN3_PIN));
+#endif
+#if defined(LED4_PIN) && defined(BTN4_PIN)
+        gpio_write(LED4_PIN, gpio_read(BTN4_PIN));
+#endif
+#if defined(LED5_PIN) && defined(BTN5_PIN)
+        gpio_write(LED5_PIN, gpio_read(BTN5_PIN));
+#endif
+#if defined(LED6_PIN) && defined(BTN6_PIN)
+        gpio_write(LED6_PIN, gpio_read(BTN6_PIN));
+#endif
+#if defined(LED7_PIN) && defined(BTN7_PIN)
+        gpio_write(LED7_PIN, gpio_read(BTN7_PIN));
 #endif
     }
 

@@ -57,8 +57,11 @@ static inline void uart_write_byte(uart_t uart, uint8_t data)
 
 static inline bool _boot_pin(void)
 {
-#ifdef BTN_BOOTLOADER_PIN
-    if (BTN_BOOTLOADER_INVERTED) {
+#if defined (BTN_BOOTLOADER_PIN) && defined(BTN_BOOTLOADER_MODE)
+    /* Reverts the logic if the button has an internal or external pullup and
+       thus, is an active-low button */
+    if (BTN_BOOTLOADER_EXT_PULLUP || BTN_BOOTLOADER_MODE == GPIO_IN_PU ||
+        BTN_BOOTLOADER_MODE == GPIO_OD_PU ) {
         return !gpio_read(BTN_BOOTLOADER_PIN);
     }
     else {

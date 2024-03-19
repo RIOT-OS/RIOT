@@ -68,3 +68,4 @@ void crypto_secure_wipe(void *buf, size_t len);
 #endif
 
 #endif /* CRYPTO_HELPER_H */
+/** @} */

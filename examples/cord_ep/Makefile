@@ -15,7 +15,7 @@ USEMODULE += gnrc_icmpv6_echo
 USEMODULE += cord_ep_standalone
 
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 USEMODULE += fmt
 

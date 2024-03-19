@@ -266,7 +266,7 @@ int connect(int socket, const struct sockaddr *address, socklen_t address_len);
  * @param[in,out] address_len   Specifies the length of the sockaddr structure on input and the
  *                              length of the stored address on output. If the address is greater
  *                              than the length of the supplied sockaddr structure, the stored
- *                              address shal be truncated.
+ *                              address shall be truncated.
  * @return  Upon successful completion, getpeername() shall return 0; otherwise,
  *          -1 shall be returned and errno set to indicate the error.
  */
@@ -292,7 +292,7 @@ int getpeername(int socket, struct sockaddr *__restrict address,
  * @param[in,out] address_len   Specifies the length of the sockaddr structure on input and the
  *                              length of the stored address on output. If the address is greater
  *                              than the length of the supplied sockaddr structure, the stored
- *                              address shal be truncated.
+ *                              address shall be truncated.
  * @return  Upon successful completion, getsockname() shall return 0; otherwise,
  *          -1 shall be returned and errno set to indicate the error.
  */

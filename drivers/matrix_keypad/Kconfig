@@ -1,0 +1,47 @@
+# Copyright (c) 2021 Koen Zandberg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+menuconfig MODULE_MATRIX_KEYPAD
+    bool "Matrix Keypad"
+    depends on TEST_KCONFIG
+    depends on HAS_PERIPH_GPIO
+    select MODULE_PERIPH_GPIO
+
+if MODULE_MATRIX_KEYPAD
+
+config MATRIX_KEYPAD_NUM_ROWS
+    int "Number of rows on the matrix keypad"
+    default 2
+
+config MATRIX_KEYPAD_NUM_COLUMS
+    int "Number of columns on the matrix keypad"
+    default 2
+
+config MATRIX_KEYPAD_DEBOUNCE_PATTERN_BEGIN
+    hex "Bitmask pattern used for initial state of the switch"
+    default 0xC0
+    range 0x00 0xFF
+
+config MATRIX_KEYPAD_DEBOUNCE_PATTERN_END
+    hex "Bitmask pattern used for next state of the switch"
+    default 0x07
+    range 0x00 0xFF
+
+config MATRIX_KEYPAD_ROWS_USE_OPEN_DRAIN
+    bool "Use open drain output mode for the row GPIOs"
+    default n
+    help
+	This switches the row GPIO mode from plain output mode to output mode
+	with open drain. This helps to prevent shorts between GPIO pins when
+	using matrix keypad modules without diodes in the switches. When diodes
+	are installed with the switches this can safely be set off.
+
+endif # MODULE_MATRIX_KEYPAD
+
+config HAVE_MATRIX_KEYPAD
+    bool
+    help
+        Indicates that a matrix-style keypad is present.

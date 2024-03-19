@@ -47,11 +47,6 @@ extern "C" {
 #define SX127X_PARAM_PASELECT               (SX127X_PA_BOOST)
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

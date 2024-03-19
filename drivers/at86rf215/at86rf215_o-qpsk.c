@@ -202,7 +202,7 @@ static inline uint8_t _get_ack_psdu_duration_syms(uint8_t chips, uint8_t mode)
     static const uint8_t sym_len[] = { 32, 32, 64, 128 };
     const uint8_t Ns = sym_len[chips];
     const uint8_t Rspread = _get_spreading(chips, mode);
-    /* Nd == 63, since ACK length is 5 or 7 octects only */
+    /* Nd == 63, since ACK length is 5 or 7 octets only */
     const uint16_t Npsdu = Rspread * 2 * 63;
 
     /* phyPSDUDuration = ceiling(Npsdu / Ns) + ceiling(Npsdu / Mp) */
@@ -294,7 +294,7 @@ static void _set_legacy(at86rf215_t *dev, bool high_rate)
 
 static inline void _set_ack_timeout_legacy(at86rf215_t *dev)
 {
-    dev->ack_timeout_usec = AT86RF215_ACK_PERIOD_IN_SYMBOLS * LEGACY_QPSK_SYMBOL_TIME_US;
+    dev->ack_timeout_usec = IEEE802154_ACK_TIMEOUT_SYMS * LEGACY_QPSK_SYMBOL_TIME_US;
     DEBUG("[%s] ACK timeout: %"PRIu32" µs\n", "legacy O-QPSK", dev->ack_timeout_usec);
 }
 

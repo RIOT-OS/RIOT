@@ -24,15 +24,16 @@
 #include <errno.h>
 #include <string.h>
 
-#include "bitarithm.h"
+#include "board.h"
 #include "iolist.h"
+#include "macros/utils.h"
 #include "mii.h"
 #include "mutex.h"
 #include "net/ethernet.h"
 #include "net/eui_provider.h"
 #include "net/netdev/eth.h"
-#include "periph/gpio.h"
-#include "timex.h"
+#include "periph/gpio_ll.h"
+#include "time_units.h"
 
 #define ENABLE_DEBUG            0
 #define ENABLE_DEBUG_VERBOSE    0
@@ -89,7 +90,57 @@ static ztimer_t _link_status_timer;
 #warning "Total RX buffers lower than MTU, you won't receive huge frames!"
 #endif
 
-#define MIN(a, b) (((a) <= (b)) ? (a) : (b))
+/**
+ * @name    GPIOs to use for tracing STM32 Ethernet state via module
+ *          `stm32_eth_tracing`
+ * @{
+ */
+#ifndef STM32_ETH_TRACING_TX_PIN_NUM
+#  if defined(LED1_PIN_NUM) || defined(DOXYGEN)
+/**
+ * @brief   pin to trace TX events
+ *
+ * This pin will be set when TX starts and cleared when the corresponding
+ */
+#    define STM32_ETH_TRACING_TX_PIN_NUM LED1_PIN_NUM
+#  else
+#    define STM32_ETH_TRACING_TX_PIN_NUM 0
+#  endif
+#endif
+
+#ifndef STM32_ETH_TRACING_TX_PORT_NUM
+#  if defined(LED1_PORT_NUM) || defined(DOXYGEN)
+/**
+ * @brief   port to trace TX events
+ */
+#    define STM32_ETH_TRACING_TX_PORT_NUM LED1_PORT_NUM
+#  else
+#    define STM32_ETH_TRACING_TX_PORT_NUM 0
+#  endif
+#endif
+
+#ifndef STM32_ETH_TRACING_RX_PIN_NUM
+#  if defined(LED2_PIN_NUM) || defined(DOXYGEN)
+/**
+ * @brief   pin to trace RX events
+ */
+#    define STM32_ETH_TRACING_RX_PIN_NUM LED2_PIN_NUM
+#  else
+#    define STM32_ETH_TRACING_RX_PIN_NUM 0
+#  endif
+#endif
+
+#ifndef STM32_ETH_TRACING_RX_PORT_NUM
+#  if defined(LED2_PORT_NUM) || defined(DOXYGEN)
+/**
+ * @brief   port to trace RX events
+ */
+#    define STM32_ETH_TRACING_RX_PORT_NUM LED2_PORT_NUM
+#  else
+#    define STM32_ETH_TRACING_RX_PORT_NUM 0
+#  endif
+#endif
+/** @} */
 
 /* Synchronization between IRQ and thread context */
 mutex_t stm32_eth_tx_completed = MUTEX_INIT_LOCKED;
@@ -115,8 +166,17 @@ static void _debug_tx_descriptor_info(unsigned line)
         DEBUG("[stm32_eth:%u] TX descriptors:\n", line);
         for (unsigned i = 0; i < ETH_TX_DESCRIPTOR_COUNT; i++) {
             uint32_t status = tx_desc[i].status;
+            char next_valid;
+            if (i < ETH_TX_DESCRIPTOR_COUNT - 1) {
+                next_valid = (tx_desc[i].desc_next == &tx_desc[i + 1])
+                        ? '1' : '0';
+            }
+            else {
+                next_valid = (tx_desc[i].desc_next == &tx_desc[0])
+                        ? '1' : '0';
+            }
             DEBUG("    %s %u: OWN=%c, ES=%c, UF=%c, EC=%c, NC=%c, FS=%c, "
-                  "LS=%c\n",
+                  "LS=%c, next valid=%c\n",
                   (tx_curr == tx_desc + i) ? "-->" : "   ",
                   i,
                   (status & TX_DESC_STAT_OWN) ? '1' : '0',
@@ -125,7 +185,8 @@ static void _debug_tx_descriptor_info(unsigned line)
                   (status & TX_DESC_STAT_EC) ? '1' : '0',
                   (status & TX_DESC_STAT_NC) ? '1' : '0',
                   (status & TX_DESC_STAT_FS) ? '1' : '0',
-                  (status & TX_DESC_STAT_LS) ? '1' : '0');
+                  (status & TX_DESC_STAT_LS) ? '1' : '0',
+                  next_valid);
         }
     }
 }
@@ -142,7 +203,17 @@ static void _debug_rx_descriptor_info(unsigned line)
         DEBUG("[stm32_eth:%u] RX descriptors:\n", line);
         for (unsigned i = 0; i < ETH_RX_DESCRIPTOR_COUNT; i++) {
             uint32_t status = rx_desc[i].status;
-            DEBUG("    %s %u: OWN=%c, FS=%c, LS=%c, ES=%c, DE=%c, FL=%" PRIu32 "\n",
+            char next_valid;
+            if (i < ETH_RX_DESCRIPTOR_COUNT - 1) {
+                next_valid = (rx_desc[i].desc_next == &rx_desc[i + 1])
+                        ? '1' : '0';
+            }
+            else {
+                next_valid = (rx_desc[i].desc_next == &rx_desc[0])
+                        ? '1' : '0';
+            }
+            DEBUG("    %s %u: OWN=%c, FS=%c, LS=%c, ES=%c, DE=%c, FL=%" PRIu32
+                  ", next valid=%c\n",
                   (rx_curr == rx_desc + i) ? "-->" : "   ",
                   i,
                   (status & RX_DESC_STAT_OWN) ? '1' : '0',
@@ -150,7 +221,8 @@ static void _debug_rx_descriptor_info(unsigned line)
                   (status & RX_DESC_STAT_LS) ? '1' : '0',
                   (status & RX_DESC_STAT_ES) ? '1' : '0',
                   (status & RX_DESC_STAT_DE) ? '1' : '0',
-                  _len_from_rx_desc_status(status));
+                  _len_from_rx_desc_status(status),
+                  next_valid);
         }
     }
 }
@@ -242,13 +314,15 @@ static void _init_dma_descriptors(void)
     for (i = 0; i < ETH_TX_DESCRIPTOR_COUNT - 1; i++) {
         tx_desc[i].desc_next = &tx_desc[i + 1];
     }
-    tx_desc[ETH_RX_DESCRIPTOR_COUNT - 1].desc_next = &tx_desc[0];
+    tx_desc[ETH_TX_DESCRIPTOR_COUNT - 1].desc_next = &tx_desc[0];
 
     rx_curr = &rx_desc[0];
     tx_curr = &tx_desc[0];
 
     ETH->DMARDLAR = (uintptr_t)rx_curr;
     ETH->DMATDLAR = (uintptr_t)tx_curr;
+    _debug_rx_descriptor_info(__LINE__);
+    _debug_tx_descriptor_info(__LINE__);
 }
 
 static void _reset_eth_dma(void)
@@ -408,6 +482,14 @@ static void _setup_phy(void)
 static int stm32_eth_init(netdev_t *netdev)
 {
     (void)netdev;
+    if (IS_USED(MODULE_STM32_ETH_TRACING)) {
+        gpio_ll_init(GPIO_PORT(STM32_ETH_TRACING_TX_PORT_NUM),
+                     STM32_ETH_TRACING_TX_PIN_NUM,
+                     gpio_ll_out);
+        gpio_ll_init(GPIO_PORT(STM32_ETH_TRACING_RX_PORT_NUM),
+                     STM32_ETH_TRACING_RX_PIN_NUM,
+                     gpio_ll_out);
+    }
     if (IS_USED(MODULE_STM32_ETH_LINK_UP)) {
         _link_status_timer.callback = _timer_cb;
         _link_status_timer.arg = netdev;
@@ -443,8 +525,6 @@ static int stm32_eth_init(netdev_t *netdev)
                 | ETH_DMABMR_RDP_32Beat | ETH_DMABMR_PBL_32Beat
                 | ETH_DMABMR_EDE;
 
-    netdev_register(netdev, NETDEV_STM32_ETH, 0);
-
     eui48_t hwaddr;
     netdev_eui48_get(netdev, &hwaddr);
     stm32_eth_set_addr(hwaddr.uint8);
@@ -462,6 +542,11 @@ static int stm32_eth_init(netdev_t *netdev)
 
     _setup_phy();
 
+    /* signal link UP if no proper link detection is enabled */
+    if (!IS_USED(MODULE_STM32_ETH_LINK_UP)) {
+        netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+    }
+
     return 0;
 }
 
@@ -477,12 +562,12 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
     /* We cannot send more chunks than allocated descriptors */
     assert(iolist_count(iolist) <= ETH_TX_DESCRIPTOR_COUNT);
 
+    _debug_tx_descriptor_info(__LINE__);
     edma_desc_t *dma_iter = tx_curr;
     for (unsigned i = 0; iolist; iolist = iolist->iol_next, i++) {
         dma_iter->control = iolist->iol_len;
         dma_iter->buffer_addr = iolist->iol_base;
-        uint32_t status = TX_DESC_STAT_IC | TX_DESC_STAT_TCH | TX_DESC_STAT_CIC
-                          | TX_DESC_STAT_OWN;
+        uint32_t status = TX_DESC_STAT_IC | TX_DESC_STAT_TCH | TX_DESC_STAT_OWN;
         if (!i) {
             /* fist chunk */
             status |= TX_DESC_STAT_FS;
@@ -495,6 +580,10 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
         dma_iter = dma_iter->desc_next;
     }
 
+    if (IS_USED(MODULE_STM32_ETH_TRACING)) {
+        gpio_ll_set(GPIO_PORT(STM32_ETH_TRACING_TX_PORT_NUM),
+                    (1U << STM32_ETH_TRACING_TX_PIN_NUM));
+    }
     /* start TX */
     ETH->DMATPDR = 0;
     /* await completion */
@@ -502,12 +591,15 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
         DEBUG("[stm32_eth] Started to send %u B via DMA\n", bytes_to_send);
     }
     mutex_lock(&stm32_eth_tx_completed);
+    if (IS_USED(MODULE_STM32_ETH_TRACING)) {
+        gpio_ll_clear(GPIO_PORT(STM32_ETH_TRACING_TX_PORT_NUM),
+                      (1U << STM32_ETH_TRACING_TX_PIN_NUM));
+    }
     if (IS_ACTIVE(ENABLE_DEBUG_VERBOSE)) {
         DEBUG("[stm32_eth] TX completed\n");
     }
 
     /* Error check */
-    _debug_tx_descriptor_info(__LINE__);
     int error = 0;
     while (1) {
         uint32_t status = tx_curr->status;
@@ -536,6 +628,8 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
             break;
         }
     }
+
+    _debug_tx_descriptor_info(__LINE__);
 
     netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
     if (error) {
@@ -670,6 +764,11 @@ static int stm32_eth_recv(netdev_t *netdev, void *_buf, size_t max_len,
         rx_curr = rx_curr->desc_next;
     }
 
+    if (IS_USED(MODULE_STM32_ETH_TRACING)) {
+        gpio_ll_clear(GPIO_PORT(STM32_ETH_TRACING_RX_PORT_NUM),
+                      (1U << STM32_ETH_TRACING_RX_PIN_NUM));
+    }
+
     _debug_rx_descriptor_info(__LINE__);
     handle_lost_rx_irqs();
     return size;
@@ -703,6 +802,10 @@ static void stm32_eth_isr(netdev_t *netdev)
         }
     }
 
+    if (IS_USED(MODULE_STM32_ETH_TRACING)) {
+        gpio_ll_set(GPIO_PORT(STM32_ETH_TRACING_RX_PORT_NUM),
+                    (1U << STM32_ETH_TRACING_RX_PIN_NUM));
+    }
     netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
 }
 
@@ -719,4 +822,5 @@ void stm32_eth_netdev_setup(netdev_t *netdev)
 {
     stm32_eth_netdev = netdev;
     netdev->driver = &netdev_driver_stm32f4eth;
+    netdev_register(netdev, NETDEV_STM32_ETH, 0);
 }

@@ -22,13 +22,14 @@
  * @}
  */
 
-#include <time.h>
+#include <err.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <err.h>
+#include <time.h>
 
-#include "periph/rtc.h"
 #include "cpu.h"
+#include "periph/rtc.h"
 #include "timex.h"
 #include "ztimer.h"
 
@@ -36,6 +37,13 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+
+/**
+ * @brief   Time source of the native RTC
+ */
+#ifndef NATIVE_RTC_SOURCE
+#define NATIVE_RTC_SOURCE CLOCK_REALTIME
+#endif
 
 static int _native_rtc_initialized = 0;
 static int _native_rtc_powered = 0;
@@ -141,9 +149,14 @@ int rtc_set_time(struct tm *ttime)
         warnx("rtc_set_time: out of time_t range");
         return -1;
     }
+
+    struct timespec tv;
+
     _native_syscall_enter();
-    _native_rtc_offset = tnew - time(NULL);
+    clock_gettime(NATIVE_RTC_SOURCE, &tv);
     _native_syscall_leave();
+
+    _native_rtc_offset = tnew - tv.tv_sec;
 
     if (_native_rtc_alarm_callback) {
         rtc_set_alarm(&_native_rtc_alarm, _native_rtc_alarm_callback,
@@ -153,9 +166,9 @@ int rtc_set_time(struct tm *ttime)
     return 0;
 }
 
-int rtc_get_time(struct tm *ttime)
+int rtc_get_time_ms(struct tm *ttime, uint16_t *ms)
 {
-    time_t t;
+    struct timespec tv;
 
     if (!_native_rtc_initialized) {
         warnx("rtc_get_time: not initialized");
@@ -167,9 +180,14 @@ int rtc_get_time(struct tm *ttime)
     }
 
     _native_syscall_enter();
-    t = time(NULL) + _native_rtc_offset;
+    clock_gettime(NATIVE_RTC_SOURCE, &tv);
+    tv.tv_sec += _native_rtc_offset;
 
-    if (localtime_r(&t, ttime) == NULL) {
+    if (ms) {
+        *ms = tv.tv_nsec / NS_PER_MS;
+    }
+
+    if (localtime_r(&tv.tv_sec, ttime) == NULL) {
         err(EXIT_FAILURE, "rtc_get_time: localtime_r");
     }
     _native_syscall_leave();
@@ -180,15 +198,20 @@ int rtc_get_time(struct tm *ttime)
     return 0;
 }
 
+int rtc_get_time(struct tm *ttime)
+{
+    return rtc_get_time_ms(ttime, NULL);
+}
+
 int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 {
     if (!_native_rtc_initialized) {
         warnx("rtc_set_alarm: not initialized");
-        return -1;
+        return -EIO;
     }
     if (!_native_rtc_powered) {
         warnx("rtc_set_alarm: not powered on");
-        return -1;
+        return -EIO;
     }
 
     struct tm now;

@@ -25,6 +25,7 @@ config BOARD_P_L496G_CELL02
 
     # Put other features for this board (in alphabetical order)
     select HAS_RIOTBOOT
+    select HAS_TINYUSB_DEVICE
 
     # Clock configuration
     select BOARD_HAS_LSE

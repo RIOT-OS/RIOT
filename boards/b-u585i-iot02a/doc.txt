@@ -37,7 +37,7 @@ For using the ST B-U585I-IOT02A board we recommend the usage of the
 [GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
 toolchain.
 
-**Important notice:** With GCC 10, the `tests/malloc` application doesn't work.
+**Important notice:** With GCC 10, the `tests/sys/malloc` application doesn't work.
 To use malloc, prefer GCC 9 which seems to work better.
 
  */

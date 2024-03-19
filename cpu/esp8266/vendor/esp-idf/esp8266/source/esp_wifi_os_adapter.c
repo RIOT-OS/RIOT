@@ -42,7 +42,6 @@
 
 extern void vPortYield(void);
 extern void vPortYieldFromInt(void);
-#define portYIELD vPortYield
 void  thread_yield_higher(void);
 
 #endif /* RIOT_VERSION */

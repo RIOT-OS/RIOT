@@ -32,14 +32,16 @@ extern "C" {
  * @name    Power mode configuration
  * @{
  */
-#define PM_NUM_MODES        (3)
+#define PM_NUM_MODES        (4)
 /** @} */
 
 /**
  * @brief   Override the default initial PM blocker
- * @todo   Idle modes are enabled by default, deep sleep mode blocked
+ *          Idle modes are enabled by default, deep sleep mode blocked
  */
-#define PM_BLOCKER_INITIAL      0x00000001
+#ifndef PM_BLOCKER_INITIAL
+#define PM_BLOCKER_INITIAL      { 1, 0, 0, 0 }
+#endif
 
 /**
  * @name   SAMD21 sleep modes for PM
@@ -49,6 +51,20 @@ extern "C" {
 #define SAMD21_PM_IDLE_2        (1U)    /**< Idle 2 (stops AHB, APB and CPU) */
 #define SAMD21_PM_IDLE_1        (2U)    /**< Idle 1 (stops AHB and CPU)      */
 #define SAMD21_PM_IDLE_0        (3U)    /**< Idle 0 (stops CPU)              */
+/** @} */
+
+/**
+ * @name   SPI configuration
+ * @{
+ */
+#define SAM0_SPI_PM_BLOCK        SAMD21_PM_IDLE_1 /**< Stay in Idle 0 mode */
+/** @} */
+
+/**
+ * @name   USB configuration
+ * @{
+ */
+#define SAM0_USB_ACTIVE_PM_BLOCK SAMD21_PM_IDLE_1 /**< Stay in Idle 0 mode */
 /** @} */
 
 /**
@@ -83,17 +99,53 @@ static inline int _sercom_id(SercomUsart *sercom)
     return ((((uint32_t)sercom) >> 10) & 0x7) - 2;
 }
 
-#ifndef DOXYGEN
-#define HAVE_ADC_RES_T
-typedef enum {
-    ADC_RES_6BIT  = 0xff,                       /**< not supported */
-    ADC_RES_8BIT  = ADC_CTRLB_RESSEL_8BIT,      /**< ADC resolution: 8 bit */
-    ADC_RES_10BIT = ADC_CTRLB_RESSEL_10BIT,     /**< ADC resolution: 10 bit */
-    ADC_RES_12BIT = ADC_CTRLB_RESSEL_12BIT,     /**< ADC resolution: 12 bit */
-    ADC_RES_14BIT = 0xfe,                       /**< not supported */
-    ADC_RES_16BIT = 0xfd                        /**< not supported */
-} adc_res_t;
-#endif /* ndef DOXYGEN */
+/**
+ * @brief   Pins that can be used for ADC input
+ */
+static const gpio_t sam0_adc_pins[1][20] = {
+    {
+        GPIO_PIN(PA, 2), GPIO_PIN(PA, 3), GPIO_PIN(PB, 8),  GPIO_PIN(PB, 9),
+        GPIO_PIN(PA, 4), GPIO_PIN(PA, 5), GPIO_PIN(PA, 6),  GPIO_PIN(PA, 7),
+        GPIO_PIN(PB, 0), GPIO_PIN(PB, 1), GPIO_PIN(PB, 2),  GPIO_PIN(PB, 3),
+        GPIO_PIN(PB, 4), GPIO_PIN(PB, 5), GPIO_PIN(PB, 6),  GPIO_PIN(PB, 7),
+        GPIO_PIN(PA, 8), GPIO_PIN(PA, 9), GPIO_PIN(PA, 10), GPIO_PIN(PA, 11),
+    }
+};
+
+/**
+ * @brief ADC pin aliases
+ * @{
+ */
+#define ADC_INPUTCTRL_MUXPOS_PA02 ADC_INPUTCTRL_MUXPOS_PIN0 /**< Alias for PIN0 */
+#define ADC_INPUTCTRL_MUXPOS_PA03 ADC_INPUTCTRL_MUXPOS_PIN1 /**< Alias for PIN1 */
+#define ADC_INPUTCTRL_MUXPOS_PB08 ADC_INPUTCTRL_MUXPOS_PIN2 /**< Alias for PIN2 */
+#define ADC_INPUTCTRL_MUXPOS_PB09 ADC_INPUTCTRL_MUXPOS_PIN3 /**< Alias for PIN3 */
+#define ADC_INPUTCTRL_MUXPOS_PA04 ADC_INPUTCTRL_MUXPOS_PIN4 /**< Alias for PIN4 */
+#define ADC_INPUTCTRL_MUXPOS_PA05 ADC_INPUTCTRL_MUXPOS_PIN5 /**< Alias for PIN5 */
+#define ADC_INPUTCTRL_MUXPOS_PA06 ADC_INPUTCTRL_MUXPOS_PIN6 /**< Alias for PIN6 */
+#define ADC_INPUTCTRL_MUXPOS_PA07 ADC_INPUTCTRL_MUXPOS_PIN7 /**< Alias for PIN7 */
+#define ADC_INPUTCTRL_MUXPOS_PB00 ADC_INPUTCTRL_MUXPOS_PIN8 /**< Alias for PIN8 */
+#define ADC_INPUTCTRL_MUXPOS_PB01 ADC_INPUTCTRL_MUXPOS_PIN9 /**< Alias for PIN9 */
+#define ADC_INPUTCTRL_MUXPOS_PB02 ADC_INPUTCTRL_MUXPOS_PIN10 /**< Alias for PIN10 */
+#define ADC_INPUTCTRL_MUXPOS_PB03 ADC_INPUTCTRL_MUXPOS_PIN11 /**< Alias for PIN11 */
+#define ADC_INPUTCTRL_MUXPOS_PB04 ADC_INPUTCTRL_MUXPOS_PIN12 /**< Alias for PIN12 */
+#define ADC_INPUTCTRL_MUXPOS_PB05 ADC_INPUTCTRL_MUXPOS_PIN13 /**< Alias for PIN13 */
+#define ADC_INPUTCTRL_MUXPOS_PB06 ADC_INPUTCTRL_MUXPOS_PIN14 /**< Alias for PIN14 */
+#define ADC_INPUTCTRL_MUXPOS_PB07 ADC_INPUTCTRL_MUXPOS_PIN15 /**< Alias for PIN15 */
+#define ADC_INPUTCTRL_MUXPOS_PA08 ADC_INPUTCTRL_MUXPOS_PIN16 /**< Alias for PIN16 */
+#define ADC_INPUTCTRL_MUXPOS_PA09 ADC_INPUTCTRL_MUXPOS_PIN17 /**< Alias for PIN17 */
+#define ADC_INPUTCTRL_MUXPOS_PA10 ADC_INPUTCTRL_MUXPOS_PIN18 /**< Alias for PIN18 */
+#define ADC_INPUTCTRL_MUXPOS_PA11 ADC_INPUTCTRL_MUXPOS_PIN19 /**< Alias for PIN19 */
+
+#define ADC_INPUTCTRL_MUXNEG_PA02 ADC_INPUTCTRL_MUXPOS_PIN0 /**< Alias for PIN0 */
+#define ADC_INPUTCTRL_MUXNEG_PA03 ADC_INPUTCTRL_MUXPOS_PIN1 /**< Alias for PIN1 */
+#define ADC_INPUTCTRL_MUXNEG_PB08 ADC_INPUTCTRL_MUXPOS_PIN2 /**< Alias for PIN2 */
+#define ADC_INPUTCTRL_MUXNEG_PB09 ADC_INPUTCTRL_MUXPOS_PIN3 /**< Alias for PIN3 */
+#define ADC_INPUTCTRL_MUXNEG_PA04 ADC_INPUTCTRL_MUXPOS_PIN4 /**< Alias for PIN4 */
+#define ADC_INPUTCTRL_MUXNEG_PA05 ADC_INPUTCTRL_MUXPOS_PIN5 /**< Alias for PIN5 */
+#define ADC_INPUTCTRL_MUXNEG_PA06 ADC_INPUTCTRL_MUXPOS_PIN6 /**< Alias for PIN6 */
+#define ADC_INPUTCTRL_MUXNEG_PA07 ADC_INPUTCTRL_MUXPOS_PIN7 /**< Alias for PIN7 */
+/** @} */
 
 /**
  * @brief   The MCU has a 10 bit DAC

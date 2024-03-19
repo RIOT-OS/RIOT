@@ -1,0 +1,10 @@
+# No check for the presence of any of any dependencies (were there none, this
+# wouldn't have been pulled in), but only pull in building this in if the
+# application does not already provide a crate -- in which case the
+# CARGO_OPTIONS added depending on the pseudomodules are enabled in the regular
+# cargo-targets.
+ifeq (,${APPLICATION_RUST_MODULE})
+  USEMODULE += rust_riotmodules_standalone
+endif
+
+FEATURES_REQUIRED += rust_target

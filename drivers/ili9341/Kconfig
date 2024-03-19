@@ -12,6 +12,7 @@ config MODULE_ILI9341
     depends on TEST_KCONFIG
     select MODULE_PERIPH_SPI
     select MODULE_PERIPH_GPIO
+    select MODULE_LCD
     select MODULE_ZTIMER
     select MODULE_ZTIMER_MSEC
 
@@ -54,13 +55,5 @@ config ILI9341_VCOML
         Configure the low level of VCOM AC voltage. VCOM needs to be adjusted to
         match the capacitance and performance specifications of the TFT panel to
         maximize contrast and minimize flickering
-
-config ILI9341_LE_MODE
-    bool "Enable little endian to big endian conversion"
-    help
-        Enable this configuration to convert little endian colors to big endian.
-        ILI9341 device requires colors to be send in big endian RGB-565 format.
-        Enabling this option allows for little endian colors. Enabling this
-        however will slow down the driver as it cannot use DMA anymore.
 
 endif # KCONFIG_USEMODULE_ILI9341

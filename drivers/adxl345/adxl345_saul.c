@@ -25,13 +25,13 @@ static int read_acc(const void *dev, phydat_t *res)
 {
     adxl345_read((const adxl345_t *)dev, (adxl345_data_t *)res->val);
 
-    res->unit = UNIT_G;
+    res->unit = UNIT_G_FORCE;
     res->scale = -3;
     return 3;
 }
 
 const saul_driver_t adxl345_saul_driver = {
     .read = read_acc,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_ACCEL,
 };

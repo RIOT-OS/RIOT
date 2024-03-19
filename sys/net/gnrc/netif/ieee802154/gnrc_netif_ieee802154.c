@@ -54,7 +54,7 @@ static gnrc_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
 
     dst_len = ieee802154_get_dst(mhr, dst, &_pan_tmp);
     src_len = ieee802154_get_src(mhr, src, &_pan_tmp);
-    if ((dst_len < 0) || (src_len < 0)) {
+    if ((dst_len < 0) || (src_len <= 0)) {
         DEBUG("_make_netif_hdr: unable to get addresses\n");
         return NULL;
     }
@@ -398,8 +398,10 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     res = dev->driver->send(dev, &iolist_header);
 #endif
 
-    /* release old data */
-    gnrc_pktbuf_release(pkt);
+    if (gnrc_netif_netdev_legacy_api(netif)) {
+        /* only for legacy drivers we need to release pkt here */
+        gnrc_pktbuf_release(pkt);
+    }
     return res;
 }
 /** @} */

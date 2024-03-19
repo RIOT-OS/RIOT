@@ -20,15 +20,16 @@
  */
 
 #include "cpu.h"
+#include "irq.h"
 #include "mutex.h"
 #include "periph/adc.h"
-#include "periph_conf.h"
 #include "periph/vbat.h"
+#include "periph_conf.h"
 
 /**
  * @brief   Maximum allowed ADC clock speed
  */
-#define MAX_ADC_SPEED           (12000000U)
+#define MAX_ADC_SPEED           MHZ(12)
 
 /**
  * @brief   Maximum sampling time for each channel (480 cycles)
@@ -94,20 +95,26 @@ int adc_init(adc_t line)
     dev(line)->CR2 = ADC_CR2_ADON;
     /* set clock prescaler to get the maximal possible ADC clock value */
     for (clk_div = 2; clk_div < 8; clk_div += 2) {
-        if ((CLOCK_CORECLOCK / clk_div) <= MAX_ADC_SPEED) {
+        if ((periph_apb_clk(APB2) / clk_div) <= MAX_ADC_SPEED) {
             break;
         }
     }
     ADC->CCR = ((clk_div / 2) - 1) << 16;
     /* set sampling time to the maximum */
+    unsigned irq_state = irq_disable();
     if (adc_config[line].chan >= 10) {
-        dev(line)->SMPR1 &= ~(MAX_ADC_SMP << (3 * (adc_config[line].chan - 10)));
-        dev(line)->SMPR1 |= MAX_ADC_SMP << (3 * (adc_config[line].chan - 10));
+        uint32_t smpr1 = dev(line)->SMPR1;
+        smpr1 &= ~(MAX_ADC_SMP << (3 * (adc_config[line].chan - 10)));
+        smpr1 |= MAX_ADC_SMP << (3 * (adc_config[line].chan - 10));
+        dev(line)->SMPR1 = smpr1;
     }
     else {
-        dev(line)->SMPR1 &= ~(MAX_ADC_SMP << (3 * adc_config[line].chan));
-        dev(line)->SMPR2 |= MAX_ADC_SMP << (3 * adc_config[line].chan);
+        uint32_t smpr2 = dev(line)->SMPR2;
+        smpr2 &= ~(MAX_ADC_SMP << (3 * adc_config[line].chan));
+        smpr2 |= MAX_ADC_SMP << (3 * adc_config[line].chan);
+        dev(line)->SMPR2 = smpr2;
     }
+    irq_restore(irq_state);
     /* free the device again */
     done(line);
     return 0;

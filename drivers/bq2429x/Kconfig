@@ -12,7 +12,6 @@ menuconfig MODULE_BQ2429X
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
     select MODULE_PERIPH_GPIO
-    default y if HAVE_BQ2429X
     help
         The driver can be used with Texas Instruments USB charger ICs: BQ24295,
         BQ24296, BQ24297, BQ24298, BQ24292I, BQ24296M.
@@ -33,6 +32,7 @@ config HAVE_BQ2429X
 
 config HAVE_BQ2429X_INT
     bool
+    select HAVE_BQ2429X
     help
         Indicates that a BQ2429x charger and power management IC is present,
         with interrupt functionality (the INT pin is connected).

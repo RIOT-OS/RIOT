@@ -31,6 +31,7 @@ extern "C" {
 
 /**
  * @name Auto-initialization parameters
+ * @{
  */
 #ifndef DHCPV6_CLIENT_STACK_SIZE
 #define DHCPV6_CLIENT_STACK_SIZE    (THREAD_STACKSIZE_DEFAULT)  /**< stack size */
@@ -157,8 +158,12 @@ void dhcpv6_client_start(void);
  * @param[in] netif     The interface to request the prefix delegation for.
  * @param[in] pfx_len   The desired length of the prefix (note that the server
  *                      might not consider this request). Must be <= 128
+ *
+ * @retval 0 on success
+ * @retval -ENOMEM when there is no lease entry available anymore
+ * @retval -ENOTSUP when module `dhcpv6_client_ia_pd` is not being used
  */
-void dhcpv6_client_req_ia_pd(unsigned netif, unsigned pfx_len);
+int dhcpv6_client_req_ia_pd(unsigned netif, unsigned pfx_len);
 /** @} */
 
 /**

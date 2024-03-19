@@ -1,0 +1,18 @@
+RIOT_PP_SUCCESSOR_MAX ?= 9999
+
+PSEUDOMODULES += preprocessor_successor
+
+USEMODULE_INCLUDES_preprocessor := $(BINDIR)/preprocessor
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_preprocessor)
+
+RIOT_GENERATE_PP_HEADERS :=
+
+ifneq (,$(filter preprocessor_successor,$(USEMODULE)))
+  RIOT_GENERATE_PP_HEADERS += $(BINDIR)/preprocessor/preprocessor_successor.h
+endif
+
+BUILDDEPS += $(RIOT_GENERATE_PP_HEADERS)
+
+$(BINDIR)/preprocessor/preprocessor_successor.h:
+	@mkdir -p '$(dir $@)'
+	$(Q)'$(RIOTTOOLS)/generate_pp_successor_header/generate_pp_successor_header.sh' $(RIOT_PP_SUCCESSOR_MAX) > $@

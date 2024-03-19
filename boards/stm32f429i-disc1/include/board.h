@@ -30,37 +30,36 @@ extern "C" {
  * @name Macros for controlling the on-board LEDs.
  * @{
  */
-#define LED0_PIN            GPIO_PIN(PORT_G, 13)
-#define LED1_PIN            GPIO_PIN(PORT_G, 14)
+#define LED0_PIN_NUM        13
+#define LED0_PORT_NUM       PORT_G
 
-#define LED0_MASK           (1 << 13)
-#define LED1_MASK           (1 << 14)
-
-#define LED0_ON             (GPIOG->BSRR = LED0_MASK)
-#define LED0_OFF            (GPIOG->BSRR = (LED0_MASK << 16))
-#define LED0_TOGGLE         (GPIOG->ODR  ^= LED0_MASK)
-
-#define LED1_ON             (GPIOG->BSRR = LED1_MASK)
-#define LED1_OFF            (GPIOG->BSRR = (LED1_MASK << 16))
-#define LED1_TOGGLE         (GPIOG->ODR  ^= LED1_MASK)
+#define LED1_PIN_NUM        14
+#define LED1_PORT_NUM       PORT_G
 /** @} */
 
 /**
- * @brief User button
+ * @name User button
  * @{
  */
-#define BTN0_PIN            GPIO_PIN(PORT_A, 0)
+#define BTN0_PIN            GPIO_PIN(PORT_A, 0) /**< GPIO used for BTN0 */
 #define BTN0_MODE           GPIO_IN
 /** @} */
 
 /**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
+ * @name L3GD20 (Rev. B01, C01), I3G4250D (Rev. D02, E01)
+ * @{
  */
-void board_init(void);
+#define L3GXXXX_SPI_DEV     SPI_DEV(0)          /**< SPI bus used for L3Gxxxx */
+#define L3GXXXX_SPI_CS      GPIO_PIN(PORT_C, 1) /**< SPI CS pin used for L3Gxxxx */
+#define L3GXXXX_INT1_PIN    GPIO_PIN(PORT_A, 1) /**< INT1 pin used for L3Gxxxx */
+#define L3GXXXX_INT2_PIN    GPIO_PIN(PORT_A, 2) /**< INT2/DRDY pin used for L3Gxxxx */
+/** @} */
 
 #ifdef __cplusplus
 }
 #endif
+
+#include "stm32_leds.h"
 
 #endif /* BOARD_H */
 /** @} */

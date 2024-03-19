@@ -1,0 +1,99 @@
+From d508afaa544cfc5750ed6b3e81e78c02988f97ad Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Mon, 31 Jan 2022 17:34:19 +0100
+Subject: [PATCH 12/12] bootloader: allow compilation by RIOT
+
+---
+ .../subproject/main/ld/esp32/bootloader.ld    | 52 +++++++++----------
+ components/log/include/esp_log.h              |  4 +-
+ 2 files changed, 28 insertions(+), 28 deletions(-)
+
+diff --git a/components/bootloader/subproject/main/ld/esp32/bootloader.ld b/components/bootloader/subproject/main/ld/esp32/bootloader.ld
+index 30e5a79c45..b235f0438a 100644
+--- a/components/bootloader/subproject/main/ld/esp32/bootloader.ld
++++ b/components/bootloader/subproject/main/ld/esp32/bootloader.ld
+@@ -36,33 +36,33 @@ SECTIONS
+     _loader_text_start = ABSOLUTE(.);
+     *(.stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
+      *(.iram1 .iram1.*) /* catch stray IRAM_ATTR */
+-    *liblog.a:(.literal .text .literal.* .text.*)
++    *components/log/*(.literal .text .literal.* .text.*)
+     *libgcc.a:(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_clock_loader.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_common_loader.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_flash.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_random.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_random*.*(.literal.bootloader_random_disable .text.bootloader_random_disable)
+-    *libesp_common.a:fpga_overrides.*(.literal.bootloader_fill_random .text.bootloader_fill_random)
+-    *libbootloader_support.a:bootloader_efuse_esp32.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_utility.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_sha.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_console_loader.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_panic.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:bootloader_soc.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:esp_image_format.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:flash_encrypt.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:flash_encryption_secure_features.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:flash_partitions.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:secure_boot.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:secure_boot_secure_features.*(.literal .text .literal.* .text.*)
+-    *libbootloader_support.a:secure_boot_signatures_bootloader.*(.literal .text .literal.* .text.*)
+-    *libmicro-ecc.a:*.*(.literal .text .literal.* .text.*)
+-    *libspi_flash.a:*.*(.literal .text .literal.* .text.*)
+-    *libhal.a:wdt_hal_iram.*(.literal .text .literal.* .text.*)
+-    *libesp_hw_support.a:rtc_clk.*(.literal .text .literal.* .text.*)
+-    *libesp_hw_support.a:rtc_time.*(.literal .text .literal.* .text.*)
+-    *libefuse.a:*.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_clock_loader.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_common_loader.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_flash.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_random.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_random*.*(.literal.bootloader_random_disable .text.bootloader_random_disable)
++    *components/esp_common/src/fpga_overrides.*(.literal.bootloader_fill_random .text.bootloader_fill_random)
++    *components/bootloader_support/*/bootloader_efuse_esp32.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_utility.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_sha.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_console_loader.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_panic.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/bootloader_soc.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/esp_image_format.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/flash_encrypt.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/flash_encryption_secure_features.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/flash_partitions.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/secure_boot.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/secure_boot_secure_features.*(.literal .text .literal.* .text.*)
++    *components/bootloader_support/*/secure_boot_signatures_bootloader.*(.literal .text .literal.* .text.*)
++    *components/*/micro-ecc/*(.literal .text .literal.* .text.*)
++    *components/spi_flash/*(.literal .text .literal.* .text.*)
++    *components/hal/wdt_hal_iram.*(.literal .text .literal.* .text.*)
++    *components/esp_hw_support/*/rtc_clk.*(.literal .text .literal.* .text.*)
++    *components/esp_hw_support/*/rtc_time.*(.literal .text .literal.* .text.*)
++    *components/efuse/*(.literal .text .literal.* .text.*)
+     *(.fini.literal)
+     *(.fini)
+     *(.gnu.version)
+diff --git a/components/log/include/esp_log.h b/components/log/include/esp_log.h
+index 5419a623e2..f2b30d7c4c 100644
+--- a/components/log/include/esp_log.h
++++ b/components/log/include/esp_log.h
+@@ -155,7 +155,7 @@ void esp_log_write(esp_log_level_t level, const char* tag, const char* format, .
+  */
+ void esp_log_writev(esp_log_level_t level, const char* tag, const char* format, va_list args);
+ 
+-#if !defined(RIOT_VERSION)
++#if !defined(RIOT_VERSION) || defined(BOOTLOADER_BUILD)
+ 
+ /** @cond */
+ 
+@@ -500,7 +500,7 @@ void esp_log_writev(esp_log_level_t level, const char* tag, const char* format,
+ #endif // !(defined(__cplusplus) && (__cplusplus >  201703L))
+ /** @endcond */
+ 
+-#endif /* !defined(RIOT_VERSION) */
++#endif /* !defined(RIOT_VERSION) || defined(BOOTLOADER_BUILD) */
+ 
+ #ifdef __cplusplus
+ }
+-- 
+2.17.1
+

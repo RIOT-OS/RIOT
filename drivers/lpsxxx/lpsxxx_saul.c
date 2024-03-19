@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief       LPSXXX (LPS331ap/LPS25HB/LPS22HB/LPS22HH) adaption to SAUL
+ * @brief       LPSXXX (LPS331ap/LPS25HB/LPS22HB/LPS22HH/LPS22CH) adaption to SAUL
  *              interface
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
@@ -50,12 +50,12 @@ static int read_temp(const void *dev, phydat_t *res)
 
 const saul_driver_t lpsxxx_saul_pres_driver = {
     .read = read_pres,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_PRESS,
 };
 
 const saul_driver_t lpsxxx_saul_temp_driver = {
     .read = read_temp,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_TEMP,
 };

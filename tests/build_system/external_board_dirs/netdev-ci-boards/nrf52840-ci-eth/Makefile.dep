@@ -1,0 +1,11 @@
+USEMODULE += board_nrf52840_ci_eth
+
+ifneq (,$(filter netdev_default,$(USEMODULE)))
+  USEMODULE += w5100
+  USEMODULE += ethos
+  USEMODULE += dose
+  USEMODULE += encx24j600
+  USEMODULE += enc28j60
+endif
+
+include $(RIOTBOARD)/nrf52840dk/Makefile.dep

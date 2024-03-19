@@ -76,23 +76,17 @@
 
 #include <string.h>
 
+#include "macros/utils.h"
+#include "mutex.h"
 #include "stdio_rtt.h"
 #include "thread.h"
-#include "mutex.h"
-#include "ztimer.h"
-
-#if MODULE_VFS
-#include "vfs.h"
-#endif
+#include "ztimer/periodic.h"
 
 /* This parameter affects the bandwidth of both input and output. Decreasing
    it will significantly improve bandwidth at the cost of CPU time. */
 #ifndef STDIO_POLL_INTERVAL_MS
 #define STDIO_POLL_INTERVAL_MS 50U
 #endif
-
-#define MIN(a, b)        (((a) < (b)) ? (a) : (b))
-#define MAX(a, b)        (((a) > (b)) ? (a) : (b))
 
 #ifndef STDIO_TX_BUFSIZE
 #define STDIO_TX_BUFSIZE    (512)
@@ -102,10 +96,9 @@
 #define STDIO_RX_BUFSIZE    (32)
 #endif
 
-/**
- * @brief use mutex for waiting on stdin being enabled
- */
-static mutex_t _rx_mutex = MUTEX_INIT;
+#if !defined(MODULE_STDIN) && !defined(STDIO_RTT_DISABLE_STDIN)
+#define STDIO_RTT_DISABLE_STDIN 1
+#endif
 
 /**
  * @brief buffer holding stdout
@@ -118,14 +111,11 @@ static char up_buffer   [STDIO_TX_BUFSIZE];
 static char down_buffer [STDIO_RX_BUFSIZE];
 
 /**
- * @brief flag that enables stdin polling
- */
-static char stdin_enabled = 0;
-
-/**
  * @brief flag that enables stdout blocking/polling
  */
-static char blocking_stdout = 0;
+static char blocking_stdout = IS_USED(STDIO_RTT_ENABLE_BLOCKING_STDOUT);
+
+static ztimer_periodic_t stdin_timer;
 
 /**
  * @brief SEGGER's ring buffer implementation
@@ -176,6 +166,22 @@ static segger_rtt_cb_t rtt_cb = {
     {{ "Terminal", &down_buffer[0], sizeof(down_buffer), 0, 0, 0 }},
 };
 
+static int rtt_read_bytes_avail(void)
+{
+    int16_t rd_off;
+    int16_t wr_off;
+
+    rd_off = rtt_cb.down[0].rd_off;
+    wr_off = rtt_cb.down[0].wr_off;
+
+    /* Read from current read position to wrap-around of buffer, first */
+    if (rd_off > wr_off) {
+        return rtt_cb.down[0].buf_size - rd_off;
+    } else {
+        return wr_off - rd_off;
+    }
+}
+
 /**
  * @brief read bytes from the down buffer. This function does not block.
  *        The logic here is unmodified from SEGGER's reference, it is just
@@ -183,7 +189,7 @@ static segger_rtt_cb_t rtt_cb = {
  *
  * @return the number of bytes read
  */
-static int rtt_read(char* buf_ptr, uint16_t buf_size) {
+static int rtt_read(uint8_t* buf_ptr, uint16_t buf_size) {
     int16_t num_bytes_rem;
     uint16_t num_bytes_read;
     int16_t rd_off;
@@ -275,65 +281,64 @@ int rtt_write(const char* buf_ptr, unsigned num_bytes) {
     return num_bytes_written;
 }
 
-void stdio_init(void) {
-    #ifndef STDIO_RTT_DISABLE_STDIN
-    stdin_enabled = 1;
-    #endif
+static bool _rtt_read_cb(void *arg)
+{
+    int bytes = rtt_read_bytes_avail();
+    uint8_t buffer[STDIO_RX_BUFSIZE];
 
-    #ifdef STDIO_RTT_ENABLE_BLOCKING_STDOUT
-    blocking_stdout = 1;
-    #endif
+    if (bytes) {
+        bytes = rtt_read(buffer, sizeof(buffer));
+        isrpipe_write(arg, buffer, bytes);
+    }
 
-#if MODULE_VFS
-    vfs_bind_stdio();
-#endif
-
-    /* the mutex should start locked */
-    mutex_lock(&_rx_mutex);
+    return true;
 }
 
-void rtt_stdio_enable_stdin(void) {
-    stdin_enabled = 1;
-    mutex_unlock(&_rx_mutex);
+static bool _init_done;
+static void _init(void) {
+    if (IS_USED(STDIO_RTT_DISABLE_STDIN)) {
+        return;
+    }
+    if (!thread_getpid()) {
+        /* we can't use ztimer in early init */
+        return;
+    }
+
+    ztimer_periodic_init(ZTIMER_MSEC, &stdin_timer, _rtt_read_cb, &stdin_isrpipe,
+                         STDIO_POLL_INTERVAL_MS);
+    ztimer_periodic_start(&stdin_timer);
+    _init_done = true;
+}
+
+static void _detach(void)
+{
+    if (!IS_USED(STDIO_RTT_DISABLE_STDIN)) {
+        ztimer_periodic_stop(&stdin_timer);
+    }
 }
 
 void rtt_stdio_enable_blocking_stdout(void) {
     blocking_stdout = 1;
 }
 
-/* The reason we have this strange logic is as follows:
-   If we have an RTT console, we are powered, and so don't care
-   that polling uses a lot of power. If however, we do not
-   actually have an RTT console (because we are deployed on
-   a battery somewhere) then we REALLY don't want to poll
-   especially since we are not expecting to EVER get input. */
-ssize_t stdio_read(void* buffer, size_t count) {
-    int res = rtt_read((void *)buffer, (uint16_t)count);
-    if (res == 0) {
-        if (!stdin_enabled) {
-            mutex_lock(&_rx_mutex);
-            /* We only unlock when rtt_stdio_enable_stdin is called
-               Note that we assume only one caller invoked this function */
-        }
-        uint32_t last_wakeup = ztimer_now(ZTIMER_MSEC);
-        while(1) {
-            ztimer_periodic_wakeup(ZTIMER_MSEC, &last_wakeup,
-                                   STDIO_POLL_INTERVAL_MS);
-            res = rtt_read(buffer, count);
-            if (res > 0)
-                return res;
-        }
-    }
-    return (ssize_t)res;
-}
+static ssize_t _write(const void* in, size_t len) {
+    const char *buffer = in;
+    int written = rtt_write(buffer, len);
 
-ssize_t stdio_write(const void* in, size_t len) {
-    const char *buffer = (const char *)in;
-    int written = rtt_write(buffer, (unsigned)len);
-    uint32_t last_wakeup = ztimer_now(ZTIMER_MSEC);
-    while (blocking_stdout && ((size_t)written < len)) {
-        ztimer_periodic_wakeup(ZTIMER_MSEC, &last_wakeup, STDIO_POLL_INTERVAL_MS);
-        written += rtt_write(&buffer[written], len-written);
+    /* we have to postpone ztimer init */
+    if (!_init_done) {
+        _init();
     }
+
+    if (blocking_stdout) {
+        uint32_t last_wakeup = ztimer_now(ZTIMER_MSEC);
+        while ((size_t)written < len) {
+            ztimer_periodic_wakeup(ZTIMER_MSEC, &last_wakeup, STDIO_POLL_INTERVAL_MS);
+            written += rtt_write(&buffer[written], len-written);
+        }
+    }
+
     return (ssize_t)written;
 }
+
+STDIO_PROVIDER(STDIO_RTT, _init, _detach, _write)

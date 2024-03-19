@@ -2,7 +2,7 @@
 /  FatFs - Configuration file
 /---------------------------------------------------------------------------*/
 
-#define FFCONF_DEF	86631	/* Revision ID */
+#define FFCONF_DEF	80286	/* Revision ID */
 
 /*---------------------------------------------------------------------------/
 / Function Configurations
@@ -135,7 +135,7 @@
 
 
 #ifndef FATFS_FFCONF_OPT_USE_LFN
-#define FF_USE_LFN	 0
+#define FF_USE_LFN	 FF_FS_EXFAT
 #else
 #define FF_USE_LFN	 FATFS_FFCONF_OPT_USE_LFN
 #endif

@@ -23,21 +23,14 @@
 #include "nrf_clock.h"
 #include "periph_conf.h"
 
-/* make sure both clocks are configured */
+/* make HFCLK clock is configured */
 #ifndef CLOCK_HFCLK
 #error "Clock init: CLOCK_HFCLK is not defined by your board!"
 #endif
-#ifndef CLOCK_LFCLK
-#error "Clock init: CLOCK_LFCLK is not defined by your board!"
-#endif
 
-/* Add compatibility wrapper defines for nRF9160 */
+/* Add compatibility wrapper defines for nRF families with Cortex-M33 core */
 #ifdef NRF_CLOCK_S
 #define NRF_CLOCK NRF_CLOCK_S
-#endif
-
-#ifdef CLOCK_LFCLKSRC_SRC_LFRC
-#define CLOCK_LFCLKSRC_SRC_RC CLOCK_LFCLKSRC_SRC_LFRC
 #endif
 
 static unsigned _hfxo_requests = 0;
@@ -92,17 +85,9 @@ void clock_start_lf(void)
         return;
     }
 
-#if (CLOCK_LFCLK == 0)
-    NRF_CLOCK->LFCLKSRC = (CLOCK_LFCLKSRC_SRC_RC);
-#elif (CLOCK_LFCLK == 1)
-    NRF_CLOCK->LFCLKSRC = (CLOCK_LFCLKSRC_SRC_Xtal);
-#elif (CLOCK_LFCLK == 2)
-    NRF_CLOCK->LFCLKSRC = (CLOCK_LFCLKSRC_SRC_Synth);
-#elif (CLOCK_LFCLK == 3)
-    NRF_CLOCK->LFCLKSRC = (CLOCK_LFCLKSRC_SRC_LFXO);
-#else
-#error "LFCLK init: CLOCK_LFCLK has invalid value"
-#endif
+    /* Select LFCLK source */
+    NRF_CLOCK->LFCLKSRC = CLOCK_LFCLK;
+
     /* enable LF clock */
     NRF_CLOCK->EVENTS_LFCLKSTARTED = 0;
     NRF_CLOCK->TASKS_LFCLKSTART = 1;

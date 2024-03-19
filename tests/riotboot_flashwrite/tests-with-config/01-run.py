@@ -36,7 +36,7 @@ def make_notify(client_url, slot, version):
         "POST",
         "coap://{}/flashwrite".format(client_url),
         "--payload",
-        "@tests_riotboot_flashwrite-slot{}.{}.riot.bin".format(slot, version),
+        "@riotboot_files/slot{}.{}.bin".format(slot, version),
         "--payload-initial-szx",
         "2",
     ]

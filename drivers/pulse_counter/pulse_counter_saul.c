@@ -33,7 +33,7 @@ static int read_pulse_counter(const void *dev, phydat_t *res)
     return 1;
 }
 
-static int write_pulse_counter(const void *dev, phydat_t *data)
+static int write_pulse_counter(const void *dev, const phydat_t *data)
 {
     /* Using non-const dev !! */
     pulse_counter_t *mydev = (pulse_counter_t *)dev;

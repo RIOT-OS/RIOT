@@ -55,11 +55,6 @@ void heap_stats(void)
  * @name Other system functions
  */
 
-int _rename_r(struct _reent *r, const char *from, const char *to)
-{
-    return 0;
-}
-
 uint32_t system_get_time(void)
 {
     return phy_get_mactime();

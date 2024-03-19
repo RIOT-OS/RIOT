@@ -9,5 +9,14 @@ config PACKAGE_ESP8266_SDK
     bool "ESP8266 RTOS SDK for the ESP8266 MCU support"
     depends on TEST_KCONFIG
     depends on HAS_ARCH_ESP8266
+    select MODULE_ESP_BOOTLOADER
     help
         Vendor SDK with libraries for ESP8266 MCU support by Espressif
+
+config MODULE_ESP_BOOTLOADER
+    bool
+    depends on TEST_KCONFIG
+    depends on HAS_ARCH_ESP8266
+    default y
+    help
+        Bootloader compiled from ESP8266 RTOS SDK code.

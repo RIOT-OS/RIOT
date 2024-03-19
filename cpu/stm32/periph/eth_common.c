@@ -21,15 +21,48 @@
  */
 #include <string.h>
 
+#include "board.h"
 #include "mutex.h"
 #include "net/netdev/eth.h"
 #include "periph/gpio.h"
+#include "periph/gpio_ll.h"
 #include "periph/ptp.h"
 #include "periph_conf.h"
 #include "periph_cpu.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+
+/**
+ * @name    GPIOs to use for tracing STM32 Ethernet state via module
+ *          `stm32_eth_tracing`
+ * @{
+ */
+#ifndef STM32_ETH_TRACING_IRQ_PIN_NUM
+#  if defined(LED0_PIN_NUM) || defined(DOXYGEN)
+/**
+ * @brief   pin to trace IRQs
+ *
+ * This GPIO pin will be toggled every time the Ethernet ISR is executed
+ * (upon entry of the ISR).
+ */
+#    define STM32_ETH_TRACING_IRQ_PIN_NUM LED0_PIN_NUM
+#  else
+#    define STM32_ETH_TRACING_IRQ_PIN_NUM 0
+#  endif
+#endif
+
+#ifndef STM32_ETH_TRACING_IRQ_PORT_NUM
+#  if defined(LED0_PORT_NUM) || defined(DOXYGEN)
+/**
+ * @brief   port to trace IRQs
+ */
+#    define STM32_ETH_TRACING_IRQ_PORT_NUM LED0_PORT_NUM
+#  else
+#    define STM32_ETH_TRACING_IRQ_PORT_NUM 0
+#  endif
+#endif
+/** @} */
 
 void stm32_eth_common_init(void)
 {
@@ -59,6 +92,12 @@ void stm32_eth_common_init(void)
     ETH->DMABMR |= ETH_DMABMR_SR;
     while (ETH->DMABMR & ETH_DMABMR_SR) {}
 
+    if (IS_USED(MODULE_STM32_ETH_TRACING)) {
+        gpio_ll_init(GPIO_PORT(STM32_ETH_TRACING_IRQ_PORT_NUM),
+                     STM32_ETH_TRACING_IRQ_PIN_NUM,
+                     gpio_ll_out);
+    }
+
     if (IS_USED(MODULE_PERIPH_ETH) || IS_USED(MODULE_PERIPH_PTP_TIMER)) {
         NVIC_EnableIRQ(ETH_IRQn);
     }
@@ -68,6 +107,10 @@ void stm32_eth_common_init(void)
 void isr_eth(void)
 {
     DEBUG("[periph_eth_common] isr_eth()\n");
+    if (IS_USED(MODULE_STM32_ETH_TRACING)) {
+        gpio_ll_toggle(GPIO_PORT(STM32_ETH_TRACING_IRQ_PORT_NUM),
+                       (1U << STM32_ETH_TRACING_IRQ_PIN_NUM));
+    }
 
     if (IS_USED(MODULE_PERIPH_PTP_TIMER)) {
         if (ETH->MACSR & ETH_MACSR_TSTS) {
@@ -81,15 +124,15 @@ void isr_eth(void)
         extern netdev_t *stm32_eth_netdev;
         extern mutex_t stm32_eth_tx_completed;
         unsigned tmp = ETH->DMASR;
+        ETH->DMASR = ETH_DMASR_NIS | ETH_DMASR_TS | ETH_DMASR_RS;
+        DEBUG("[periph_eth_common] DMASR = 0x%x\n", tmp);
 
         if ((tmp & ETH_DMASR_TS)) {
-            ETH->DMASR = ETH_DMASR_NIS | ETH_DMASR_TS;
             DEBUG("isr_eth: TX completed\n");
             mutex_unlock(&stm32_eth_tx_completed);
         }
 
         if ((tmp & ETH_DMASR_RS)) {
-            ETH->DMASR = ETH_DMASR_NIS | ETH_DMASR_RS;
             DEBUG("isr_eth: RX completed\n");
             if (stm32_eth_netdev) {
                 netdev_trigger_event_isr(stm32_eth_netdev);

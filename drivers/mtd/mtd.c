@@ -21,12 +21,34 @@
 #include <assert.h>
 #include <errno.h>
 #include <limits.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "bitarithm.h"
 #include "mtd.h"
+#include "xfa.h"
+
+/* Automatic MTD handling */
+XFA_INIT_CONST(mtd_dev_t *, mtd_dev_xfa);
+
+static bool out_of_bounds(mtd_dev_t *mtd, uint32_t page, uint32_t offset, uint32_t len)
+{
+    const uint32_t page_shift = bitarithm_msb(mtd->page_size);
+    const uint32_t pages_numof = mtd->sector_count * mtd->pages_per_sector;
+
+    /* 2 TiB SD cards might be a problem */
+    assert(pages_numof >= mtd->sector_count);
+
+    /* read n byte buffer -> last byte will be at n - 1 */
+    page += (offset + len - 1) >> page_shift;
+    if (page >= pages_numof) {
+        return true;
+    }
+
+    return false;
+}
 
 int mtd_init(mtd_dev_t *mtd)
 {
@@ -38,7 +60,19 @@ int mtd_init(mtd_dev_t *mtd)
 
     if (mtd->driver->init) {
         res = mtd->driver->init(mtd);
+        if (res < 0) {
+            return res;
+        }
     }
+
+    /* Drivers preceding the introduction of write_size need to set it. While
+     * this assert breaks applications that previously worked, it is likely
+     * that these applications silently assumed a certain write size and would
+     * break when switching the MTD backend. When tripping over this assert,
+     * please update your driver to produce a correct value *and* place a check
+     * in your application for whether the backend allows sufficiently small
+     * writes. */
+    assert(mtd->write_size != 0);
 
 #ifdef MODULE_MTD_WRITE_PAGE
     if ((mtd->driver->flags & MTD_DRIVER_FLAG_DIRECT_WRITE) == 0) {
@@ -56,6 +90,10 @@ int mtd_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t count)
 {
     if (!mtd || !mtd->driver) {
         return -ENODEV;
+    }
+
+    if (out_of_bounds(mtd, 0, addr, count)) {
+        return -EOVERFLOW;
     }
 
     if (mtd->driver->read) {
@@ -76,6 +114,10 @@ int mtd_read_page(mtd_dev_t *mtd, void *dest, uint32_t page, uint32_t offset,
         return -ENODEV;
     }
 
+    if (out_of_bounds(mtd, page, offset, count)) {
+        return -EOVERFLOW;
+    }
+
     if (mtd->driver->read_page == NULL) {
         /* TODO: remove when all backends implement read_page */
         if (mtd->driver->read) {
@@ -94,6 +136,7 @@ int mtd_read_page(mtd_dev_t *mtd, void *dest, uint32_t page, uint32_t offset,
     const uint32_t page_shift = bitarithm_msb(mtd->page_size);
     const uint32_t page_mask = mtd->page_size - 1;
 
+    /* ensure offset is within a page */
     page  += offset >> page_shift;
     offset = offset & page_mask;
 
@@ -124,10 +167,6 @@ int mtd_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t count)
 {
     if (!mtd || !mtd->driver) {
         return -ENODEV;
-    }
-
-    if (mtd->driver->write) {
-        return mtd->driver->write(mtd, src, addr, count);
     }
 
     /* page size is always a power of two */
@@ -170,6 +209,12 @@ static size_t _write_sector(mtd_dev_t *mtd, const void *data, uint32_t sector,
         len = sector_size - offset;
     }
 
+    /* fast path: skip reading the sector if we overwrite it completely */
+    if (offset == 0 && len == sector_size) {
+        work = (void *)data;
+        goto write;
+    }
+
     /* copy sector to RAM */
     res = mtd_read_page(mtd, work, sector_page, 0, sector_size);
     if (res < 0) {
@@ -185,6 +230,7 @@ static size_t _write_sector(mtd_dev_t *mtd, const void *data, uint32_t sector,
     /* modify sector in RAM */
     memcpy(work + offset, data, len);
 
+write:
     /* write back modified sector copy */
     res = mtd_write_page_raw(mtd, work, sector_page, 0, sector_size);
     if (res < 0) {
@@ -201,7 +247,15 @@ int mtd_write_page(mtd_dev_t *mtd, const void *data, uint32_t page,
         return -ENODEV;
     }
 
-    if (mtd->work_area == NULL) {
+    if (mtd->driver->write_page == NULL) {
+        return -ENOTSUP;
+    }
+
+    if (out_of_bounds(mtd, page, offset, len)) {
+        return -EOVERFLOW;
+    }
+
+    if (mtd->driver->flags & MTD_DRIVER_FLAG_DIRECT_WRITE) {
         return mtd_write_page_raw(mtd, data, page, offset, len);
     }
 
@@ -234,13 +288,12 @@ int mtd_write_page_raw(mtd_dev_t *mtd, const void *src, uint32_t page, uint32_t 
         return -ENODEV;
     }
 
+    if (out_of_bounds(mtd, page, offset, count)) {
+        return -EOVERFLOW;
+    }
+
     if (mtd->driver->write_page == NULL) {
-        /* TODO: remove when all backends implement write_page */
-        if (mtd->driver->write) {
-            return mtd->driver->write(mtd, src, mtd->page_size * page + offset, count);
-        } else {
-            return -ENOTSUP;
-        }
+        return -ENOTSUP;
     }
 
     /* Implementation assumes page size is <= INT_MAX and a power of two. */
@@ -252,6 +305,7 @@ int mtd_write_page_raw(mtd_dev_t *mtd, const void *src, uint32_t page, uint32_t 
     const uint32_t page_shift = bitarithm_msb(mtd->page_size);
     const uint32_t page_mask = mtd->page_size - 1;
 
+    /* ensure offset is within a page */
     page  += offset >> page_shift;
     offset = offset & page_mask;
 
@@ -307,7 +361,11 @@ int mtd_erase_sector(mtd_dev_t *mtd, uint32_t sector, uint32_t count)
         return -ENODEV;
     }
 
-    if (sector >= mtd->sector_count) {
+    if (sector + count > mtd->sector_count) {
+        return -EOVERFLOW;
+    }
+
+    if (sector + count < sector) {
         return -EOVERFLOW;
     }
 
@@ -324,6 +382,21 @@ int mtd_erase_sector(mtd_dev_t *mtd, uint32_t sector, uint32_t count)
     }
 
     return mtd->driver->erase_sector(mtd, sector, count);
+}
+
+int mtd_write_sector(mtd_dev_t *mtd, const void *data, uint32_t sector,
+                     uint32_t count)
+{
+    if (!(mtd->driver->flags & MTD_DRIVER_FLAG_DIRECT_WRITE)) {
+        int res = mtd_erase_sector(mtd, sector, count);
+        if (res) {
+            return res;
+        }
+    }
+
+    uint32_t page = sector * mtd->pages_per_sector;
+    return mtd_write_page_raw(mtd, data, page, 0,
+                              count * mtd->pages_per_sector * mtd->page_size);
 }
 
 int mtd_power(mtd_dev_t *mtd, enum mtd_power_state power)

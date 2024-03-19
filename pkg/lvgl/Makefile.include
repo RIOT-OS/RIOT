@@ -4,6 +4,9 @@ INCLUDES += -I$(PKGDIRBASE)
 # Don't use relative includes in lvgl
 CFLAGS += -DLV_CONF_INCLUDE_SIMPLE
 
+# fix "cast increases required alignment of target type" raised from a header file
+CFLAGS += -Wno-cast-align
+
 ifneq (,$(filter lvgl_contrib,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/lvgl/contrib
 endif
@@ -16,3 +19,24 @@ PSEUDOMODULES += lvgl
 
 # touch capabilities are available via a pseudomodule
 PSEUDOMODULES += lvgl_contrib_touch
+
+# extra modes for the default theme
+PSEUDOMODULES += lvgl_extra_theme_default_dark
+PSEUDOMODULES += lvgl_extra_theme_default_grow
+
+# extra lvgl widgets defined as pseudomodules
+PSEUDOMODULES += lvgl_widget_arc
+PSEUDOMODULES += lvgl_widget_bar
+PSEUDOMODULES += lvgl_widget_btn
+PSEUDOMODULES += lvgl_widget_btnmatrix
+PSEUDOMODULES += lvgl_widget_canvas
+PSEUDOMODULES += lvgl_widget_checkbox
+PSEUDOMODULES += lvgl_widget_dropdown
+PSEUDOMODULES += lvgl_widget_img
+PSEUDOMODULES += lvgl_widget_label
+PSEUDOMODULES += lvgl_widget_line
+PSEUDOMODULES += lvgl_widget_roller
+PSEUDOMODULES += lvgl_widget_slider
+PSEUDOMODULES += lvgl_widget_switch
+PSEUDOMODULES += lvgl_widget_textarea
+PSEUDOMODULES += lvgl_widget_table

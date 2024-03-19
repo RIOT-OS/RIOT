@@ -28,7 +28,9 @@
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_HINT
 #include "net/gnrc/sixlowpan/frag/hint.h"
 #endif /* MODULE_GNRC_SIXLOWPAN_FRAG_HINT */
+#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR)
 #include "net/gnrc/sixlowpan/frag/sfr_types.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {

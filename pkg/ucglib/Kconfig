@@ -10,8 +10,7 @@ config PACKAGE_UCGLIB
     depends on TEST_KCONFIG
     depends on HAS_PERIPH_GPIO
     select MODULE_PERIPH_GPIO
-    select MODULE_ZTIMER
-    select MODULE_ZTIMER_USEC
+    select ZTIMER_USEC
     select MODULE_UCGLIB_RIOT
     select MODULE_UCGLIB_CSRC
 

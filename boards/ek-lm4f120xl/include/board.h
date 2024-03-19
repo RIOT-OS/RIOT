@@ -62,7 +62,7 @@ extern "C" {
 #define LED2_ON             (LED_PORT |=  LED2_MASK)
 #define LED2_OFF            (LED_PORT &= ~LED2_MASK)
 #define LED2_TOGGLE         (LED_PORT ^=  LED2_MASK)
-/* @} */
+/** @} */
 
 /**
  * @name    ztimer configuration
@@ -72,11 +72,6 @@ extern "C" {
 #define CONFIG_ZTIMER_USEC_DEV     TIMER_DEV(0)
 #define CONFIG_ZTIMER_USEC_MIN     (8)
 /** @} */
-
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-extern void board_init(void);
 
 #ifdef __cplusplus
 }

@@ -1,0 +1,272 @@
+# Copyright (c) 2020 HAW Hamburg
+#               2022 Gunar Schorcht
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config CPU_FAM_ESP32S3
+    bool
+    select CPU_COMMON_ESP32X
+    select CPU_CORE_XTENSA_LX7
+    select HAS_BLE_ADV_EXT
+    select HAS_BLE_NIMBLE
+    select HAS_BLE_NIMBLE_NETIF
+    select HAS_BLE_PHY_2MBIT
+    select HAS_ESP_BLE
+    select HAS_ESP_BLE_ESP32C3
+    select HAS_PERIPH_SDMMC_AUTO_CLK
+    select HAS_PERIPH_SDMMC_AUTO_CMD12
+    select HAS_PERIPH_SDMMC_HS
+    select HAS_PERIPH_SDMMC_MMC
+    select MODULE_USBDEV_SYNOPSYS_DWC2 if MODULE_PERIPH_USBDEV
+    select MODULE_USB_BOARD_RESET if MODULE_USBUS_CDC_ACM || MODULE_TINYUSB_CLASS_CDC
+
+config CPU_FAM
+    default "esp32s3" if CPU_FAM_ESP32S3
+
+## CPU Models
+config CPU_MODEL_ESP32S3
+    bool
+    select CPU_FAM_ESP32S3
+    help
+        Indicates that CPU version ESP32-S3 is used.
+
+config CPU_MODEL_ESP32S3_FN8
+    bool
+    select CPU_FAM_ESP32S3
+    help
+        Indicates that CPU version ESP32-S3FN8 with 8 MB embedded Flash is used.
+
+config CPU_MODEL_ESP32S3_R2
+    bool
+    select CPU_FAM_ESP32S3
+    select HAS_ESP_SPI_RAM
+    help
+        Indicates that CPU version ESP32-S3R2 with 2 MB embedded SPI RAM is used.
+
+config CPU_MODEL_ESP32S3_R8
+    bool
+    select CPU_FAM_ESP32S3
+    select HAS_ESP_SPI_RAM
+    select HAS_ESP_SPI_OCT
+    help
+        Indicates that CPU version ESP32-S3R8 with 8 MB embedded SPI RAM
+        and SPI voltage 3.3 V is used.
+
+config CPU_MODEL_ESP32S3_R8V
+    bool
+    select CPU_FAM_ESP32S3
+    select HAS_ESP_SPI_RAM
+    select HAS_ESP_SPI_OCT
+    help
+        Indicates that CPU version ESP32-S3R8V with 8 MB embedded SPI RAM
+        and SPI voltage 1.8 V  is used.
+
+config CPU_MODEL_ESP32S3_FH4R2
+    bool
+    select CPU_FAM_ESP32S3
+    select HAS_ESP_SPI_RAM
+    help
+        Indicates that CPU version ESP32-S3FH4R2 with 4 MB embedded Flash and
+        2 MB embedded SPI RAM is used.
+
+config CPU_MODEL_ESP32S3_WROOM_1X_N4
+    bool
+    select CPU_FAM_ESP32S3
+    help
+        Indicates that ESP32-S3-WROOM-1-N4 or ESP32-S3-WROOM-1U-N4 module
+        with 4 MB Flash is used.
+
+config CPU_MODEL_ESP32S3_WROOM_1X_N8
+    bool
+    select CPU_FAM_ESP32S3
+    help
+        Indicates that ESP32-S3-WROOM-1-N8 or ESP32-S3-WROOM-1U-N8 module
+        with 8 MB Flash is used.
+
+config CPU_MODEL_ESP32S3_WROOM_1X_N16
+    bool
+    select CPU_FAM_ESP32S3
+    help
+        Indicates that ESP32-S3-WROOM-1-N16 or ESP32-S3-WROOM-1U-N16 module
+        with 16 MB Flash is used.
+
+config CPU_MODEL_ESP32S3_WROOM_1X_H4
+    bool
+    select CPU_FAM_ESP32S3
+    help
+        Indicates that ESP32-S3-WROOM-1-H4 or ESP32-S3-WROOM-1U-H4 module
+        with 4 MB Flash is used.
+
+config CPU_MODEL_ESP32S3_WROOM_1X_N4R2
+    bool
+    select CPU_FAM_ESP32S3
+    select HAS_ESP_SPI_RAM
+    help
+        Indicates that ESP32-S3-WROOM-1-N4R2 or ESP32-S3-WROOM-1U-N4R2 module
+        with 4 MB Flash and 2 MB SPI RAM is used.
+
+config CPU_MODEL_ESP32S3_WROOM_1X_N8R2
+    bool
+    select CPU_FAM_ESP32S3
+    select HAS_ESP_SPI_RAM
+    help
+        Indicates that ESP32-S3-WROOM-1-N8R2 or ESP32-S3-WROOM-1U-N8R2 module
+        with 8 MB Flash and 2 MB SPI RAM is used.
+
+config CPU_MODEL_ESP32S3_WROOM_1X_N16R2
+    bool
+    select CPU_FAM_ESP32S3
+    select HAS_ESP_SPI_RAM
+    help
+        Indicates that ESP32-S3-WROOM-1-N16R2 or ESP32-S3-WROOM-1U-N16R2 module
+        with 16 MB Flash and 2 MB SPI RAM is used.
+
+config CPU_MODEL_ESP32S3_WROOM_1X_N4R8
+    bool
+    select CPU_FAM_ESP32S3
+    select HAS_ESP_SPI_RAM
+    select HAS_ESP_SPI_OCT
+    help
+        Indicates that ESP32-S3-WROOM-1-N4R8 or ESP32-S3-WROOM-1U-N4R8 module
+        with 4 MB Flash and 8 MB SPI RAM (Octal SPI mode) is used.
+
+config CPU_MODEL_ESP32S3_WROOM_1X_N8R8
+    bool
+    select CPU_FAM_ESP32S3
+    select HAS_ESP_SPI_RAM
+    select HAS_ESP_SPI_OCT
+    help
+        Indicates that ESP32-S3-WROOM-1-N8R8 or ESP32-S3-WROOM-1U-N8R8 module
+        with 8 MB Flash and 8 MB SPI RAM (Octal SPI mode) is used.
+
+config CPU_MODEL_ESP32S3_WROOM_1X_N16R8
+    bool
+    select CPU_FAM_ESP32S3
+    select HAS_ESP_SPI_RAM
+    select HAS_ESP_SPI_OCT
+    help
+        Indicates that ESP32-S3-WROOM-1-N16R8 or ESP32-S3-WROOM-1U-N16R8 module
+        with 16 MB Flash and 8 MB SPI RAM (Octal SPI mode) is used.
+
+config CPU_MODEL_ESP32S3_WROOM_2_N16R8V
+    bool
+    select CPU_FAM_ESP32S3
+    select HAS_ESP_SPI_RAM
+    select HAS_ESP_SPI_OCT
+    help
+        Indicates that ESP32-S3-WROOM-2-N16R8V module with 16 MB Flash and
+        8 MB SPI RAM (Octal SPI mode) and 1.8 V SPI voltage is used.
+
+config CPU_MODEL_ESP32S3_WROOM_2_N32R8V
+    bool
+    select CPU_FAM_ESP32S3
+    select HAS_ESP_SPI_RAM
+    select HAS_ESP_SPI_OCT
+    help
+        Indicates that ESP32-S3-WROOM-2-N16R8V module with 32 MB Flash and
+        8 MB SPI RAM (Octal SPI mode) and 1.8 V SPI voltage is used.
+
+config CPU_MODEL_ESP32S3_MINI_1X_N8
+    bool
+    select CPU_FAM_ESP32S3
+    help
+        Indicates that ESP32-S3-MINI-1-N8 or ESP32-S3-MINI-1U-N8 module
+        with 8 MB Flash is used.
+
+config CPU_MODEL_ESP32S3_MINI_1X_N4R2
+    bool
+    select CPU_FAM_ESP32S3
+    select HAS_ESP_SPI_RAM
+    help
+        Indicates that ESP32-S3-MINI-1-N4R2 or ESP32-S3-MINI-1U-N4R2 module
+        with 4 MB Flash and 2 MB SPI RAM is used.
+
+config CPU_MODEL_ESP32S3_MINI_1X_H4R2
+    bool
+    select CPU_FAM_ESP32S3
+    select HAS_ESP_SPI_RAM
+    help
+        Indicates that ESP32-S3-MINI-1-H4R2 or ESP32-S3-MINI-1U-H4R2 module
+        with 4 MB Flash and 2 MB SPI RAM is used.
+
+config CPU_MODEL
+    depends on CPU_FAM_ESP32S3
+    default "esp32s3" if CPU_MODEL_ESP32S3
+    default "esp32s3_fn8" if CPU_MODEL_ESP32S3_FN8
+    default "esp32s3_r2" if CPU_MODEL_ESP32S3_R2
+    default "esp32s3_r8" if CPU_MODEL_ESP32S3_R8
+    default "esp32s3_r8v" if CPU_MODEL_ESP32S3_R3V
+    default "esp32s3_fh4r2" if CPU_MODEL_ESP32S3_FH4R2
+    default "esp32s3_wroom_1x_n4" if CPU_MODEL_ESP32S3_WROOM_1X_N4
+    default "esp32s3_wroom_1x_n8" if CPU_MODEL_ESP32S3_WROOM_1X_N8
+    default "esp32s3_wroom_1x_n16" if CPU_MODEL_ESP32S3_WROOM_1X_N16
+    default "esp32s3_wroom_1x_h4" if CPU_MODEL_ESP32S3_WROOM_1X_H4
+    default "esp32s3_wroom_1x_n4r2" if CPU_MODEL_ESP32S3_WROOM_1X_N4R2
+    default "esp32s3_wroom_1x_n8r2" if CPU_MODEL_ESP32S3_WROOM_1X_N8R2
+    default "esp32s3_wroom_1x_n16r2" if CPU_MODEL_ESP32S3_WROOM_1X_N16R2
+    default "esp32s3_wroom_1x_n4r8" if CPU_MODEL_ESP32S3_WROOM_1X_N4R8
+    default "esp32s3_wroom_1x_n8r8" if CPU_MODEL_ESP32S3_WROOM_1X_N8R8
+    default "esp32s3_wroom_1x_n16r8" if CPU_MODEL_ESP32S3_WROOM_1X_N16R8
+    default "esp32s3_wroom_2_n16r8v" if CPU_MODEL_ESP32S3_WROOM_2_N16R8V
+    default "esp32s3_wroom_2_n32r8v" if CPU_MODEL_ESP32S3_WROOM_2_N32R8V
+    default "esp32s3_mini_1x_n8" if CPU_MODEL_ESP32S3_MINI_1X_N8
+    default "esp32s3_mini_1x_n4r2" if CPU_MODEL_ESP32S3_MINI_1X_N4R2
+    default "esp32s3_mini_1x_h4r2" if CPU_MODEL_ESP32S3_MINI_1X_H4R2
+
+if CPU_FAM_ESP32S3
+
+config MODULE_ESP_SPI_OCT
+    bool
+    default y if MODULE_ESP_SPI_RAM
+    depends on HAS_ESP_SPI_OCT
+    help
+        Octal SPI is used for SPI RAM.
+
+menu "ESP32-S3 specific configurations"
+    depends on TEST_KCONFIG
+    depends on HAS_ARCH_ESP32
+
+    # define configuration menu entries for ESP32-S3 variant (family)
+
+    choice
+        bool "CPU clock frequency"
+        default ESP32S3_DEFAULT_CPU_FREQ_MHZ_80
+        help
+            CPU clock frequency used (default 80 MHz).
+            Please note that peripherals such as I2C or SPI might not work at
+            the specified clock frequency if the selected CPU clock frequency
+            is too low. These peripherals are clocked by the APB clock, which
+            has a clock rate of 80 MHz for CPU clock frequencies greater than
+            or equal to 80 MHz, but is equal to the CPU clock frequency for
+            CPU clock frequencies less than 80 MHz. Thus, for SPI, the APB
+            clock rate must be at least five times the SPI clock rate. For the
+            I2C hardware implementation, the APB clock rate must be at least
+            40 times the I2C clock rate. For the I2C software implementation,
+            the maximum I2C clock rate is 1/200 times the CPU clock rate.
+
+        config ESP32S3_DEFAULT_CPU_FREQ_MHZ_2
+            bool "2 MHz"
+        config ESP32S3_DEFAULT_CPU_FREQ_MHZ_5
+            bool "5 MHz"
+        config ESP32S3_DEFAULT_CPU_FREQ_MHZ_10
+            bool "10 MHz"
+        config ESP32S3_DEFAULT_CPU_FREQ_MHZ_20
+            bool "20 MHz"
+        config ESP32S3_DEFAULT_CPU_FREQ_MHZ_40
+            bool "40 MHz"
+        config ESP32S3_DEFAULT_CPU_FREQ_MHZ_80
+            bool "80 MHz"
+        config ESP32S3_DEFAULT_CPU_FREQ_MHZ_160
+            bool "160 MHz"
+        config ESP32S3_DEFAULT_CPU_FREQ_MHZ_240
+            bool "240 MHz"
+    endchoice
+
+    # import configuration menu entries that are common for all ESP32x SoCs
+    rsource "Kconfig.common"
+
+endmenu
+
+endif # CPU_FAM_ESP32S3

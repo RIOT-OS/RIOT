@@ -14,3 +14,9 @@ config MODULE_PCA9685
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_I2C
     select MODULE_XTIMER
+
+config HAVE_PCA9685
+    bool
+    select MODULE_PCA9685 if MODULE_SAUL_DEFAULT
+    help
+      Indicates that a PCA9685 I2C PWM controller controller is present.

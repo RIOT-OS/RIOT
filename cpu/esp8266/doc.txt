@@ -59,7 +59,7 @@ To build a RIOT application, simply use the `make` command and specify an
 existing ESP8266 board, for example:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-make flash BOARD=esp8266-esp-12x -C tests/shell ...
+make flash BOARD=esp8266-esp-12x -C tests/sys/shell/ ...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For more information about the `make` command variables and specific compile
@@ -283,7 +283,7 @@ directory, a RIOT application can be compiled inside RIOT Docker using the
 make command as usual, for example:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-make BOARD=esp8266-esp-12x -C tests/shell ...
+make BOARD=esp8266-esp-12x -C tests/sys/shell/ ...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This will generate a RIOT binary in ELF format.
 
@@ -295,7 +295,7 @@ of the compilations is also accessible on the host system. On the host system,
 the `flash-only` target can then be used to flash the binary.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-make flash-only BOARD=esp8266-esp-12x -C tests/shell
+make flash-only BOARD=esp8266-esp-12x -C tests/sys/shell/
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 @note Both steps can also be performed with a single command on the host
@@ -717,8 +717,8 @@ Furthermore, the following configuration parameters have to be defined:
 
 Parameter           | Default                   | Description
 :-------------------|:--------------------------|:------------
-#ESP_WIFI_SSID      | "RIOT_AP"                 | SSID of the AP to be used.
-#ESP_WIFI_PASS      | -                         | Passphrase used for the AP as clear text (max. 64 chars).
+#WIFI_SSID          | "RIOT_AP"                 | SSID of the AP to be used.
+#WIFI_PASS          | -                         | Passphrase used for the AP as clear text (max. 64 chars).
 #ESP_WIFI_STACKSIZE | #THREAD_STACKSIZE_DEFAULT |Stack size used for the WiFi netdev driver thread.
 
 </center>
@@ -729,14 +729,14 @@ line, e.g.:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE=esp_wifi \
-CFLAGS='-DESP_WIFI_SSID=\"MySSID\" -DESP_WIFI_PASS=\"MyPassphrase\"' \
+CFLAGS='-DWIFI_SSID=\"MySSID\" -DWIFI_PASS=\"MyPassphrase\"' \
 make -C examples/gnrc_networking BOARD=...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 @note
 - Module `esp_wifi` is not enabled automatically when module
 `netdev_default` is used.
-- Leave `ESP_WIFI_PASS` undefined to connect to an open WiFi access point.
+- Leave `WIFI_PASS` undefined to connect to an open WiFi access point.
 - The Wifi network interface (module `esp_wifi`) and the
 [ESP-NOW network interface](#esp8266_esp_now_network_interface)
 (module `esp_now`) can be used simultaneously, for example, to realize a
@@ -758,8 +758,8 @@ The following parameters can be configured:
 
 Parameter                 | Default                   | Description
 :-------------------------|:--------------------------|:-------------
-#ESP_WIFI_SSID            | "RIOT_AP"                 | Static SSID definition for the SoftAP
-#ESP_WIFI_PASS            | none                      | The password for the WiFi SoftAP network interface.[1]
+#WIFI_SSID                | "RIOT_AP"                 | Static SSID definition for the SoftAP
+#WIFI_PASS                | none                      | The password for the WiFi SoftAP network interface.[1]
 #ESP_WIFI_SSID_DYNAMIC    | 0                         | Defines whether dynamic SSID is used for the SoftAP [2].
 #ESP_WIFI_SSID_HIDDEN     | 0                         | Defines whether the SoftAP SSID should be hidden.
 #ESP_WIFI_MAX_CONN        | 4                         | The maximum number of connections for the SoftAP.
@@ -771,7 +771,7 @@ Parameter                 | Default                   | Description
 [1] If no password is provided, the interface will be "open", otherwise it
     uses WPA2-PSK authentication mode.<br>
 [2] If #ESP_WIFI_SSID_DYNAMIC is set to 1, a dynamic SSID is generated for the
-    SoftAP by extending the defined SSID (`ESP_WIFI_SSID`) with the MAC address
+    SoftAP by extending the defined SSID (`WIFI_SSID`) with the MAC address
     of the SoftAP interface used, e.g.: `RIOT_AP_aabbccddeeff`
 
 These configuration parameter definitions, as well as enabling the `esp_wifi_ap`
@@ -780,7 +780,7 @@ line, for example:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE=esp_wifi_ap \
-CFLAGS='-DESP_WIFI_SSID=\"MySSID\" -DESP_WIFI_PASS=\"MyPassphrase\" -DESP_WIFI_MAX_CONN=1' \
+CFLAGS='-DWIFI_SSID=\"MySSID\" -DWIFI_PASS=\"MyPassphrase\" -DESP_WIFI_MAX_CONN=1' \
 make -C examples/gnrc_networking BOARD=...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1126,7 +1126,7 @@ For debugging purposes, the application should be compiled with debugging
 information. This can either be done by using the `esp_gdb` module, for example:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-USEMODULE=esp_gdb make flash BOARD=esp8266-esp-12x -C tests/shell
+USEMODULE=esp_gdb make flash BOARD=esp8266-esp-12x -C tests/sys/shell/
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 [Back to table of contents](#esp8266_toc)
@@ -1162,7 +1162,7 @@ term1> $QEMU/bin/qemu-system-xtensa -M esp8266 -nographic -serial stdio -monitor
 
 where `/path/to/build/dir` is the path to the application build directory
 `$(BINDIR)` where `$ELFFILE.bin` is generated by the `make` command, for example
-`$(RIOTBASE)/tests/shell/bin/esp8266-esp-12x`. After that you can
+`$(RIOTBASE)/tests/sys/shell//bin/esp8266-esp-12x`. After that you can
 start `GDB` in second terminal window using command:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1203,7 +1203,7 @@ To start debugging, the application has to be compiled using
 module `esp_gdbstub`, for example:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-USEMODULE=esp_gdbstub make flash BOARD=esp8266-esp-12x -C tests/shell
+USEMODULE=esp_gdbstub make flash BOARD=esp8266-esp-12x -C tests/sys/shell/
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Once, the application is flashed to ESP82666, debugging can be started as
@@ -1223,7 +1223,7 @@ term2> xtensa-esp8266-elf-gdb /path/to/the/build/dir/image.elf
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 where `/path/to/build/dir` is the path to the application build directory
 `$(BINDIR)` where `$ELFFILE.bin` is generated by the `make` command, for example
-`$(RIOTBASE)/tests/shell/bin/esp8266-esp-12x`.
+`$(RIOTBASE)/tests/sys/shell//bin/esp8266-esp-12x`.
 
 3. Connect from `GDB` to the ESP8266 module with command:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1250,7 +1250,7 @@ the application stepwise or just continue the execution using the `continue`
 command. Please note the limitations below. Once you have started the execution
 in `GDB`, you can use `Ctrl-C` in `GDB` or the console window to break it anytime.
 
-If your application uses console inputs (stdio), such as the `tests/shell`
+If your application uses console inputs (stdio), such as the `tests/sys/shell/`
 application, you can type characters in the console window that gdbstub will
 forward to the application. However, the echo of these inputs occur in `GDB`.
 

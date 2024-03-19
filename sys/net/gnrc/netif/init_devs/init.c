@@ -171,4 +171,10 @@ void gnrc_netif_init_devs(void)
         extern void auto_init_sx126x(void);
         auto_init_sx126x();
     }
+
+    if (IS_USED(MODULE_TINYUSB_NETDEV)) {
+        extern void auto_init_tinyusb_netdev(void);
+        auto_init_tinyusb_netdev();
+    }
+
 }

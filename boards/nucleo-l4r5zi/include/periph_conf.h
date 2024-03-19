@@ -117,6 +117,100 @@ static const spi_conf_t spi_config[] = {
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
+/**
+ * @brief   ADC configuration
+ *
+ * Note that we do not configure all ADC channels,
+ * and not in the STM32L4R5 order.  Instead, we
+ * just define 6 ADC channels, for the Nucleo
+ * Arduino header pins A0-A5 and the internal VBAT channel.
+ *
+ * To find appropriate device and channel find in the
+ * board manual, table showing pin assignments and
+ * information about ADC - a text similar to ADC[X]_IN[Y],
+ * where:
+ * [X] - describes used device - indexed from 0,
+ * for example ADC1_IN10 is device 0,
+ * [Y] - describes used channel - indexed from 1,
+ * for example ADC1_IN10 is channel 10
+ *
+ * For Nucleo-L4R5ZI this information is in board manual,
+ * Table 11, page 38.
+ *
+ * VBAT is connected ADC1_IN18 and a voltage divider is used,
+ * so that only 1/3 of the actual VBAT is measured. This
+ * allows for a supply voltage higher than the reference voltage.
+ *
+ * For Nucleo-L4R5ZI more information is provided in MCU datasheet,
+ * in section 3.19.3 - Vbat battery voltage monitoring, page 46.
+ * @{
+ */
+static const adc_conf_t adc_config[] = {
+    { .pin = GPIO_PIN(PORT_A, 3), .dev = 0, .chan =  8 }, /* ADC12_IN8   */
+    { .pin = GPIO_PIN(PORT_C, 0), .dev = 0, .chan =  1 }, /* ADC123_IN1  */
+    { .pin = GPIO_PIN(PORT_C, 3), .dev = 0, .chan =  4 }, /* ADC123_IN4  */
+    { .pin = GPIO_PIN(PORT_C, 1), .dev = 0, .chan =  2 }, /* ADC123_IN2  */
+    { .pin = GPIO_PIN(PORT_C, 4), .dev = 0, .chan = 13 }, /* ADC12_IN13  */
+    { .pin = GPIO_PIN(PORT_C, 5), .dev = 0, .chan = 14 }, /* ADC12_IN14  */
+    { .pin = GPIO_UNDEF, .dev = 0, .chan = 18 }, /* VBAT */
+};
+
+/**
+ * @brief Number of ADC devices
+ */
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
+
+/**
+ * @brief VBAT ADC line
+ */
+#define VBAT_ADC            ADC_LINE(6)
+
+/** @} */
+
+/**
+ * @name    PWM configuration
+ *
+ * To find appriopate device and channel find in the MCU datasheet table
+ * concerning "Alternate function AF0 to AF7" a text similar to TIM[X]_CH[Y
+],
+ * where:
+ * TIM[X] - is device,
+ * [Y] - describes used channel (indexed from 0), for example TIM2_CH1 is
+ * channel 0 in configuration structure (cc_chan - field),
+ * Port column in the table describes connected port.
+ *
+ * For Nucleo-L4R5ZI this information is in the datasheet, Table 16, page
+ * 117.
+ *
+ * @{
+ */
+static const pwm_conf_t pwm_config[] = {
+    {
+        .dev      = TIM2,
+        .rcc_mask = RCC_APB1ENR1_TIM2EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_A, 0) /* CN10 D32 */, .cc_chan  = 0},
+                      { .pin = GPIO_PIN(PORT_A, 1) /* CN10  A8 */, .cc_chan  = 1},
+                      { .pin = GPIO_PIN(PORT_A, 2) /* CN10 D26 */, .cc_chan  = 2},
+                      { .pin = GPIO_PIN(PORT_A, 3) /*  CN9  A0 */, .cc_chan  = 3} },
+        .af       = GPIO_AF1,
+        .bus      = APB1
+    },
+    {
+        .dev      = TIM3,
+        .rcc_mask = RCC_APB1ENR1_TIM3EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_B, 4) /*  CN7 D25 */, .cc_chan = 0},
+                      { .pin = GPIO_PIN(PORT_E, 4) /*  CN9 D57 */, .cc_chan = 1},
+                      { .pin = GPIO_PIN(PORT_B, 0) /* CN10 D33 */, .cc_chan = 2},
+                      { .pin = GPIO_PIN(PORT_B, 1) /* CN10  A6 */, .cc_chan = 3} },
+        .af       = GPIO_AF2,
+        .bus      = APB1
+    },
+};
+
+#define PWM_NUMOF              ARRAY_SIZE(pwm_config)
+
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

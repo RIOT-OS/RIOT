@@ -9,8 +9,29 @@ ifneq (,$(filter cryptoauthlib_test,$(USEMODULE)))
   USEMODULE += cryptoauthlib_test_jwt
   USEMODULE += cryptoauthlib_test_tng
   USEMODULE += cryptoauthlib_test_atcacert
+  USEMODULE += cryptoauthlib_test_api_atcab
+  USEMODULE += cryptoauthlib_test_api_calib
+  USEMODULE += cryptoauthlib_test_api_crypto
+  USEMODULE += cryptoauthlib_test_vectors
+  USEMODULE += cryptoauthlib_test_third_party_unity
 endif
 
 # Some EFM32 CPU families define AES_COUNT, which is also defined by this
 # library.
 FEATURES_BLACKLIST += arch_efm32
+
+ifneq (,$(filter psa_crypto,$(USEMODULE)))
+  USEMODULE += psa_atca_driver
+endif
+
+ifneq (,$(filter psa_secure_element_ateccx08a_ecc_p256, $(USEMODULE)))
+  USEMODULE += psa_asymmetric
+endif
+
+ifneq (,$(filter psa_secure_element_ateccx08a_cipher_aes_128, $(USEMODULE)))
+  USEMODULE += psa_cipher
+endif
+
+ifneq (,$(filter psa_secure_element_ateccx08a_hmac_sha256, $(USEMODULE)))
+  USEMODULE += psa_mac
+endif

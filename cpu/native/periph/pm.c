@@ -36,6 +36,8 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+unsigned _native_retval = EXIT_SUCCESS;
+
 static void _native_sleep(void)
 {
     _native_in_syscall++; /* no switching here */
@@ -71,7 +73,11 @@ void pm_off(void)
 #ifdef MODULE_PERIPH_GPIO_LINUX
     gpio_linux_teardown();
 #endif
-    real_exit(EXIT_SUCCESS);
+#ifdef MODULE_VFS_DEFAULT
+    extern void auto_unmount_vfs(void);
+    auto_unmount_vfs();
+#endif
+    real_exit(_native_retval);
 }
 
 void pm_reboot(void)
@@ -84,6 +90,10 @@ void pm_reboot(void)
 #endif
 #ifdef MODULE_PERIPH_GPIO_LINUX
     gpio_linux_teardown();
+#endif
+#ifdef MODULE_VFS_DEFAULT
+    extern void auto_unmount_vfs(void);
+    auto_unmount_vfs();
 #endif
 
     if (real_execve(_native_argv[0], _native_argv, NULL) == -1) {

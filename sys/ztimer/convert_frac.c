@@ -74,6 +74,10 @@ static const ztimer_ops_t ztimer_convert_frac_ops = {
     .set = ztimer_convert_frac_op_set,
     .now = ztimer_convert_frac_op_now,
     .cancel = ztimer_convert_cancel,
+#if MODULE_ZTIMER_ONDEMAND
+    .start = ztimer_convert_start,
+    .stop = ztimer_convert_stop,
+#endif
 };
 
 static void ztimer_convert_frac_compute_scale(ztimer_convert_frac_t *self,
@@ -97,13 +101,18 @@ void ztimer_convert_frac_init(ztimer_convert_frac_t *self,
         .super.super = { .ops = &ztimer_convert_frac_ops, },
         .super.lower = lower,
         .super.lower_entry =
-        { .callback = (void (*)(void *))ztimer_handler, .arg = &self->super, },
+        { .callback = (void (*)(void *)) ztimer_handler, .arg = &self->super, },
     };
 
     ztimer_convert_frac_compute_scale(self, freq_self, freq_lower);
     if (freq_self < freq_lower) {
         self->super.super.max_value = frac_scale(&self->scale_now, UINT32_MAX);
+#if !MODULE_ZTIMER_ONDEMAND
+        /* extend lower clock only if the ondemand driver isn't selected
+         * otherwise, the clock extension will be called with the first
+         * ztimer_acquire() call */
         ztimer_init_extend(&self->super.super);
+#endif
     }
     else {
         DEBUG("ztimer_convert_frac_init: rounding up val:%" PRIu32 "\n",
@@ -111,7 +120,7 @@ void ztimer_convert_frac_init(ztimer_convert_frac_t *self,
         self->round = freq_self / freq_lower;
         self->super.super.max_value = UINT32_MAX;
     }
-#ifdef MODULE_PM_LAYERED
+#if MODULE_PM_LAYERED && !MODULE_ZTIMER_ONDEMAND
     self->super.super.block_pm_mode = ZTIMER_CLOCK_NO_REQUIRED_PM_MODE;
 #endif
 }

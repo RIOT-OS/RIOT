@@ -22,6 +22,7 @@
 #ifdef MODULE_IPV4_ADDR
 #include "net/ipv4/addr.h"
 #endif
+#include "net/dns.h"
 #include "net/sock/tcp.h"
 #include "paho_mqtt.h"
 #include "MQTTClient.h"
@@ -39,11 +40,9 @@
 #define TSRB_MAX_SIZE       (1024)
 #endif
 
-#ifdef MODULE_LWIP
 static uint8_t buffer[TSRB_MAX_SIZE];
 static uint8_t _temp_buf[TSRB_MAX_SIZE];
 static tsrb_t tsrb_lwip_tcp;
-#endif
 
 #ifndef PAHO_MQTT_YIELD_MS
 #define PAHO_MQTT_YIELD_MS  (10)
@@ -75,7 +74,7 @@ static int mqtt_read(struct Network *n, unsigned char *buf, int len,
     uint32_t send_time = ztimer_now(ZTIMER_MSEC) + timeout_ms;
     do {
         rc = sock_tcp_read(&n->sock, _buf, _len, _timeout);
-        if (rc == -EAGAIN) {
+        if ((rc == -EAGAIN) || (rc == -ETIMEDOUT)) {
             rc = 0;
         }
 
@@ -122,18 +121,20 @@ int NetworkConnect(Network *n, char *addr_ip, int port)
 {
     int ret =-1;
     sock_tcp_ep_t remote = SOCK_IPV4_EP_ANY;
-    char _local_ip[IP_MAX_LEN_ADDRESS];
 
-    strncpy(_local_ip, addr_ip, sizeof(_local_ip));
-    if (IS_USED(MODULE_IPV4_ADDR) &&
-        ipv4_addr_from_str((ipv4_addr_t *)&remote.addr, _local_ip)) {
+    ret = dns_query(addr_ip, &remote.addr, AF_UNSPEC);
+    if (ret > 0) {
+        remote.port = port;
+        remote.family = ret == 4 ? AF_INET : AF_INET6;
+    }
+
+    if (IS_USED(MODULE_IPV4_ADDR) && (remote.port == 0) &&
+        ipv4_addr_from_str((ipv4_addr_t *)&remote.addr, addr_ip)) {
             remote.port = port;
     }
 
-    /* ipvN_addr_from_str modifies input buffer */
-    strncpy(_local_ip, addr_ip, sizeof(_local_ip));
-    if (IS_USED(MODULE_IPV6_ADDR) && (remote.port == 0)  &&
-        ipv6_addr_from_str((ipv6_addr_t *)&remote.addr, _local_ip)) {
+    if (IS_USED(MODULE_IPV6_ADDR) && (remote.port == 0) &&
+        ipv6_addr_from_str((ipv6_addr_t *)&remote.addr, addr_ip)) {
             remote.port = port;
             remote.family = AF_INET6;
     }

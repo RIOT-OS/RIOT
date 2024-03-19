@@ -1,3 +1,13 @@
 USEMODULE += boards_common_remote
 
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE += mtd_sdcard_default
+endif
+
+# default to using fatfs on SD card
+ifneq (,$(filter vfs_default,$(USEMODULE)))
+  USEMODULE += fatfs_vfs
+  USEMODULE += mtd
+endif
+
 include $(RIOTBOARD)/common/remote/Makefile.dep

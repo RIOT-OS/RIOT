@@ -1,0 +1,55 @@
+From 27c9da70b2bc80030dd55cc2e449a22c1b290e9d Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Thu, 24 Feb 2022 13:20:46 +0100
+Subject: [PATCH] cose/crypto: add defines for RIOT crypto backend
+
+---
+ include/cose/crypto.h           | 3 +++
+ include/cose/crypto/selectors.h | 6 ++++--
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/include/cose/crypto.h b/include/cose/crypto.h
+index e81fd2c..6df6d14 100644
+--- a/include/cose/crypto.h
++++ b/include/cose/crypto.h
+@@ -48,6 +48,9 @@
+ #if defined(CRYPTO_TINYCRYPT)
+ #include "cose/crypto/tinycrypt.h"
+ #endif
++#ifdef CRYPTO_RIOT
++#include "cose/crypto/riot.h"
++#endif
+ 
+ #include "cose/crypto/selectors.h"
+ 
+diff --git a/include/cose/crypto/selectors.h b/include/cose/crypto/selectors.h
+index 575263a..cc5c786 100644
+--- a/include/cose/crypto/selectors.h
++++ b/include/cose/crypto/selectors.h
+@@ -46,6 +46,8 @@
+ #define CRYPTO_MBEDTLS_INCLUDE_CHACHAPOLY
+ #elif defined(CRYPTO_HACL)
+ #define CRYPTO_HACL_INCLUDE_CHACHAPOLY
++#elif defined(CRYPTO_RIOT)
++#define CRYPTO_RIOT_INCLUDE_CHACHAPOLY
+ #endif
+ /** @} */
+ 
+@@ -61,8 +63,6 @@
+ #endif
+ #endif
+ 
+-#endif /* COSE_CRYPTO_SELECTORS_H */
+-
+ #if defined(HAVE_ALGO_AES128GCM) || \
+     defined(HAVE_ALGO_AES192GCM) || \
+     defined(HAVE_ALGO_AES256GCM)
+@@ -81,3 +81,5 @@
+ #endif
+ 
+ /** @} */
++
++#endif /* COSE_CRYPTO_SELECTORS_H */
+-- 
+2.32.0
+

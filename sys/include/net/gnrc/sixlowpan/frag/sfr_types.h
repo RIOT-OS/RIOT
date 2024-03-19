@@ -22,7 +22,9 @@
 
 #include "bitfield.h"
 #include "clist.h"
+#include "congure.h"
 #include "evtimer_msg.h"
+#include "modules.h"
 #include "msg.h"
 #include "xtimer.h"
 
@@ -43,6 +45,9 @@ typedef union {
  *          fragment recovery
  */
 typedef struct gnrc_sixlowpan_frag_sfr_fb {
+#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE) || DOXYGEN
+    congure_snd_t *congure;     /**< state object for [CongURE](@ref sys_congure) */
+#endif
     /**
      * @brief   Acknowledgment request timeout event
      */
@@ -51,8 +56,6 @@ typedef struct gnrc_sixlowpan_frag_sfr_fb {
                                  *   wait for an RFRAG Acknowledgment */
     uint8_t cur_seq;            /**< Sequence number for next fragment */
     uint8_t frags_sent;         /**< Number of fragments sent */
-    uint8_t window_size;        /**< Current window size in number of
-                                 *   fragments */
     uint8_t retrans;            /**< Datagram retransmissions */
     clist_node_t window;        /**< Sent fragments of the current window */
 } gnrc_sixlowpan_frag_sfr_fb_t;

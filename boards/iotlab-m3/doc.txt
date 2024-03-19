@@ -18,13 +18,11 @@
 
 ## Board HW overview
 
-![IoT-LAB M3 Layout]
-(https://www.iot-lab.info/wp-content/uploads/2013/10/m3opennode.png)
+![IoT-LAB M3 Layout](https://www.iot-lab.info/wp-content/uploads/2013/10/m3opennode.png)
 
 ### Board Architecture
 
-![IoT-LAB M3 Architecture]
-(https://github.com/iot-lab/iot-lab/wiki/Images/archiopenm3.png)
+![IoT-LAB M3 Architecture](https://github.com/iot-lab/iot-lab/wiki/Images/archiopenm3.png)
 
 ### [Board schematics](http://github.com/iot-lab/iot-lab/wiki/Docs/openm3-schematics.pdf)
 , wiring, pinouts, etc...
@@ -43,9 +41,9 @@
 |                   | RTT           | yes           |                       |
 |                   | Timer         | yes           |                       |
 | Radio Chip        | AT86RF231     | yes           |                       |
-| Accelerometer     | L3G4200D      | yes           |                       |
-| Magnetometer      | L3G4200D      | yes           |                       |
-| Gyroscope         | LSM303DLHC    | yes           |                       |
+| Accelerometer     | LSM303DLHC    | yes           |                       |
+| Magnetometer      | LSM303DLHC    | yes           |                       |
+| Gyroscope         | L3G4200D      | yes           |                       |
 | Pressure Sensor   | LPS331AP      | yes           |                       |
 | Light Sensor      | ISL29020      | yes           |                       |
 | SPI Flash         | N25Q128       | yes           |                       |
@@ -78,7 +76,7 @@ b <breakpoint>
 c
 ```
 For best debugging experience also change the `-Os` flag in
-`Makefile.inlcude`'s `CFLAGS` variable to `-O0`.
+`Makefile.include`'s `CFLAGS` variable to `-O0`.
 
 ## Details
 The M3 Open Node can reset, debug and program the STM32 on JTAG through the
@@ -158,7 +156,7 @@ Bash
 
 ## Troubleshooting
 
-For terminal output on OS X (`make term`) you need to install a driver:
+For terminal output on macOS (`make term`) you need to install a driver:
 http://www.ftdichip.com/Drivers/VCP.htm
 http://www.ftdichip.com/Drivers/VCP.htm
  */

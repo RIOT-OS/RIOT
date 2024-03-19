@@ -20,6 +20,7 @@
 #                      `OPENOCD="~/openocd/src/openocd -s ~/openocd/tcl"`.
 # OPENOCD_CONFIG:      OpenOCD configuration file name,
 #                      default: "${BOARDSDIR}/${BOARD}/dist/openocd.cfg"
+# OPENOCD_SERVER_ADDRESS: OpenOCD server bind address, default: "localhost"
 #
 # The script supports the following actions:
 #
@@ -50,6 +51,11 @@
 #               TELNET_PORT:    port opened for telnet connections
 #               DBG:            debugger client command, default: 'gdb -q'
 #               TUI:            if TUI!=null, the -tui option will be used
+# debug-client: debug-client <elffile>
+#               connects to a running debug-server
+#               GDB_PORT:       port opened for GDB connections
+#               DBG:            debugger client command, default: 'gdb -q'
+#               TUI:            if TUI!=null, the -tui option will be used
 #
 # debugr:       debug <elfile>
 #               debug given file on the target but flash it first directly
@@ -71,6 +77,11 @@
 #
 # reset:        triggers a hardware reset of the target board
 #
+# term-rtt:     opens a serial terminal using RTT (Real-Time Transfer)
+#
+#               <options>
+#               RTT_PORT:       port opened for RTT connection
+#
 # @author       Hauke Peteresen <hauke.petersen@fu-berlin.de>
 # @author       Joakim Nohlgård <joakim.nohlgard@eistec.se>
 
@@ -82,6 +93,8 @@
 : ${TELNET_PORT:=4444}
 # Default TCL port, set to 0 to disable
 : ${TCL_PORT:=6333}
+# Default RTT port
+: ${RTT_PORT:=9999}
 # Default OpenOCD command
 : ${OPENOCD:=openocd}
 # Extra board initialization commands to pass to OpenOCD
@@ -90,6 +103,8 @@
 : ${OPENOCD_ADAPTER_INIT:=}
 # If set to 1 'reset_config' will use 'connect_assert_srst' before 'flash' or 'reset.
 : ${OPENOCD_RESET_USE_CONNECT_ASSERT_SRST:=}
+# Default bind address for OpenOCD
+: ${OPENOCD_SERVER_ADDRESS:=localhost}
 # The setsid command is needed so that Ctrl+C in GDB doesn't kill OpenOCD
 : ${SETSID:=setsid}
 # GDB command, usually a separate command for each platform (e.g. arm-none-eabi-gdb)
@@ -97,7 +112,7 @@
 # Debugger client command, can be used to wrap GDB in a front-end
 : ${DBG:=${GDB}}
 # Default debugger flags,
-: ${DBG_DEFAULT_FLAGS:=-q -ex \"tar ext :$(( GDB_PORT + GDB_PORT_CORE_OFFSET ))\"}
+: ${DBG_DEFAULT_FLAGS:=-q -ex \"tar ext ${OPENOCD_SERVER_ADDRESS}:$(( GDB_PORT + GDB_PORT_CORE_OFFSET ))\"}
 # Extra debugger flags, added by the user
 : ${DBG_EXTRA_FLAGS:=}
 # Debugger flags, will be passed to sh -c, remember to escape any quotation signs.
@@ -111,6 +126,8 @@
 : ${OPENOCD_DBG_EXTRA_CMD:=}
 # command used to reset the board
 : ${OPENOCD_CMD_RESET_RUN:="-c 'reset run'"}
+# command used to halt the board
+: ${OPENOCD_CMD_RESET_HALT:="-c 'reset halt'"}
 # Select core on multi-core processors.
 : ${OPENOCD_CORE:=}
 # Set to any value to skip verifying after flashing.
@@ -125,6 +142,10 @@
 # the file (default).
 # Valid values: elf, hex, s19, bin (see OpenOCD manual for more information)
 : ${IMAGE_TYPE:=}
+
+# default terminal frontend
+_OPENOCD_TERMPROG=${RIOTTOOLS}/pyterm/pyterm
+_OPENOCD_TERMFLAGS="-ts ${OPENOCD_SERVER_ADDRESS}:${RTT_PORT} ${PYTERMFLAGS}"
 
 #
 # Examples of alternative debugger configurations
@@ -187,36 +208,15 @@ _is_binfile() {
         [[ -z "${firmware_type}" ]] && _has_bin_extension "${firmware}"; }
 }
 
-# Split bank info on different lines without the '{}'
-_split_banks() {
-    # Input:
-    #   ...
-    #   {name nrf51 base 0 size 0 bus_width 1 chip_width 1} {name nrf51 base 268439552 size 0 bus_width 1 chip_width 1}
-    #   ...
-    #
-    # Output:
-    #   name nrf51 base 0 size 0 bus_width 1 chip_width 1
-    #   name nrf51 base 268439552 size 0 bus_width 1 chip_width 1
-
-    # The following command needs specific osx handling (non gnu):
-    # * Same commands for a pattern should be on different lines
-    # * Cannot use '\n' in the replacement string
-    local sed_escaped_newline=\\$'\n'
-
-    sed -n '
-    /^{.*}$/ {
-        s/\} /\}'"${sed_escaped_newline}"'/g
-        s/[{}]//g
-        p
-    }'
-}
-
-_flash_list_raw() {
-    # Openocd output for 'flash list' is
+_flash_list() {
+    # Openocd output for 'flash list' is either
     # ....
     # {name nrf51 base 0 size 0 bus_width 1 chip_width 1} {name nrf51 base 268439552 size 0 bus_width 1 chip_width 1}
     # ....
-    #
+    # or for newer openocd versions (v0.12.0 or higher)
+    # ...
+    # {name nrf51.flash driver nrf51 base 0 size 0 bus_width 1 chip_width 1 target nrf51.cpu} {name nrf51.uicr ...}
+    # ...
     # Before printing the flash list, try to init and probe the board
     # to get the actual address.
     # Some openocd configuration put an address of 0 and rely on probing to
@@ -235,7 +235,7 @@ _flash_list_raw() {
             ${OPENOCD_EXTRA_RESET_INIT} \
             -c 'init' \
             -c 'targets' \
-            -c 'reset halt' \
+            ${OPENOCD_CMD_RESET_HALT} \
             -c 'flash probe 0' \
             -c 'flash list' \
             -c 'shutdown'" 2>&1 && return
@@ -250,23 +250,10 @@ _flash_list_raw() {
             -c 'shutdown'" 2>&1
 }
 
-# Outputs bank info on different lines without the '{}'
-_flash_list() {
-    # ....
-    # name nrf51 base 0 size 0 bus_width 1 chip_width 1
-    # name nrf51 base 268439552 size 0 bus_width 1 chip_width 1
-    # ....
-    _flash_list_raw | _split_banks
-}
-
-# Print flash address for 'bank_num' num defaults to 1
-# _flash_address  [bank_num:1]
+# Print flash address for 'bank_num' num defaults to 0
+# _flash_address  [bank_num:0]
 _flash_address() {
-    bank_num=${1:-1}
-
-    # extract 'base' value and print as hexadecimal
-    # name nrf51 base 268439552 size 0 bus_width 1 chip_width 1
-    _flash_list | awk "NR==${bank_num}"'{printf "0x%08x\n", $4}'
+    _flash_list | "${RIOTTOOLS}/openocd/openocd_flashinfo.py" --idx "${1:-0}"
 }
 
 do_flashr() {
@@ -286,7 +273,7 @@ do_flashr() {
     # This allows flashing normal binary files without env configuration
     if _is_binfile "${IMAGE_FILE}" "${IMAGE_TYPE}"; then
         # hardwritten to use the first bank
-        FLASH_ADDR=$(_flash_address 1)
+        FLASH_ADDR=$(_flash_address 0)
         echo "Binfile detected, adding ROM base address: ${FLASH_ADDR}"
         IMAGE_TYPE=bin
         IMAGE_OFFSET=$(printf "0x%08x\n" "$((${IMAGE_OFFSET} + ${FLASH_ADDR}))")
@@ -335,7 +322,7 @@ do_flash() {
     # This allows flashing normal binary files without env configuration
     if _is_binfile "${IMAGE_FILE}" "${IMAGE_TYPE}"; then
         # hardwritten to use the first bank
-        FLASH_ADDR=$(_flash_address 1)
+        FLASH_ADDR=$(_flash_address 0)
         echo "Binfile detected, adding ROM base address: ${FLASH_ADDR}"
         IMAGE_TYPE=bin
         IMAGE_OFFSET=$(printf "0x%08x\n" "$((${IMAGE_OFFSET} + ${FLASH_ADDR}))")
@@ -360,7 +347,7 @@ do_flash() {
             -c 'gdb_port 0' \
             -c 'init' \
             -c 'targets' \
-            -c 'reset halt' \
+            ${OPENOCD_CMD_RESET_HALT} \
             ${OPENOCD_PRE_FLASH_CMDS} \
             -c 'flash write_image erase \"${IMAGE_FILE}\" ${IMAGE_OFFSET} ${IMAGE_TYPE}' \
             ${OPENOCD_PRE_VERIFY_CMDS} \
@@ -368,6 +355,21 @@ do_flash() {
             -c 'reset run' \
             -c 'shutdown'" &&
     echo 'Done flashing'
+}
+
+do_debugclient() {
+    ELFFILE=$1
+    test_elffile
+    # Export to be able to access these from the sh -c command lines, may be
+    # useful when using a frontend for GDB
+    export ELFFILE
+    export GDB
+    export GDB_PORT
+    export DBG_FLAGS
+    export DBG_DEFAULT_FLAGS
+    export DBG_EXTRA_FLAGS
+    # Start the debugger and connect to the GDB server
+    sh -c "${DBG} ${DBG_FLAGS} ${ELFFILE}"
 }
 
 do_debug() {
@@ -392,6 +394,7 @@ do_debug() {
             ${OPENOCD_ADAPTER_INIT} \
             -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_INIT} \
+            -c 'bindto ${OPENOCD_SERVER_ADDRESS}' \
             -c 'tcl_port ${TCL_PORT}' \
             -c 'telnet_port ${TELNET_PORT}' \
             -c 'gdb_port ${GDB_PORT}' \
@@ -401,32 +404,41 @@ do_debug() {
             ${OPENOCD_DBG_START_CMD} \
             -l /dev/null & \
             echo \$! > $OCD_PIDFILE" &
-    # Export to be able to access these from the sh -c command lines, may be
-    # useful when using a frontend for GDB
-    export ELFFILE
-    export GDB
-    export GDB_PORT
-    export DBG_FLAGS
-    export DBG_DEFAULT_FLAGS
-    export DBG_EXTRA_FLAGS
-    # Start the debugger and connect to the GDB server
-    sh -c "${DBG} ${DBG_FLAGS} ${ELFFILE}"
+    do_debugclient ${ELFFILE}
 }
 
 do_debugserver() {
     test_config
+    # temporary file that saves OpenOCD pid
+    OCD_PIDFILE=$(mktemp -t "openocd_pid.XXXXXXXXXX")
+    # will be called by trap
+    cleanup() {
+        OCD_PID="$(cat $OCD_PIDFILE)"
+        kill ${OCD_PID}
+        rm -f "$OCD_PIDFILE"
+        exit 0
+    }
+    # cleanup after script terminates
+    trap "cleanup ${OCD_PIDFILE}" EXIT
     # start OpenOCD as GDB server
     sh -c "${OPENOCD} \
             ${OPENOCD_ADAPTER_INIT} \
             -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_INIT} \
+            -c 'bindto ${OPENOCD_SERVER_ADDRESS}' \
             -c 'tcl_port ${TCL_PORT}' \
             -c 'telnet_port ${TELNET_PORT}' \
             -c 'gdb_port ${GDB_PORT}' \
             -c 'init' \
             ${OPENOCD_DBG_EXTRA_CMD} \
             -c 'targets' \
-            -c 'halt'"
+            -c 'halt' & \
+            echo \$! > $OCD_PIDFILE ; \
+            wait \$(cat $OCD_PIDFILE)" &
+
+    while read -r line; do
+        echo "Exit with Ctrl+D"
+    done
 }
 
 do_reset() {
@@ -443,6 +455,45 @@ do_reset() {
             -c 'init' \
             ${OPENOCD_CMD_RESET_RUN} \
             -c 'shutdown'"
+}
+
+do_term() {
+    test_config
+
+    # temporary file that save the OpenOCD pid
+    OPENOCD_PIDFILE=$(mktemp -t "openocd_pid.XXXXXXXXXX")
+    # will be called by trap
+    cleanup() {
+        if [ -f $OPENOCD_PIDFILE ]; then
+            OPENOCD_PID="$(cat ${OPENOCD_PIDFILE})"
+            kill ${OPENOCD_PID}
+            rm -r "${OPENOCD_PIDFILE}"
+        fi
+        exit 0
+    }
+    # cleanup after script terminates
+    trap "cleanup ${OPENOCD_PIDFILE}" EXIT INT
+
+    set -x
+    echo test
+    # start OpenOCD as RTT server for channel 0
+    sh -x -c "${OPENOCD} \
+            ${OPENOCD_ADAPTER_INIT} \
+            -f '${OPENOCD_CONFIG}' \
+            ${OPENOCD_EXTRA_INIT} \
+            -c 'bindto ${OPENOCD_SERVER_ADDRESS}' \
+            -c 'tcl_port 0' \
+            -c 'telnet_port 0' \
+            -c 'gdb_port 3333' \
+            -c init \
+            -c 'rtt setup '${RAM_START_ADDR}' '${RAM_LEN}' \"SEGGER RTT\"' \
+            -c 'rtt start' \
+            -c 'rtt server start '${RTT_PORT}' 0' \
+            >/dev/null & \
+            echo  \$! > $OPENOCD_PIDFILE" &
+    sleep 1
+
+    ${OPENOCD_TERMPROG:-${_OPENOCD_TERMPROG}} ${OPENOCD_TERMFLAGS:-${_OPENOCD_TERMFLAGS}}
 }
 
 #
@@ -473,6 +524,10 @@ case "${ACTION}" in
     echo "### Starting Debugging ###"
     do_debug "$@"
     ;;
+  debug-client)
+    echo "### Attaching to GDB Server ###"
+    do_debugclient "$@"
+    ;;
   debug-server)
     echo "### Starting GDB Server ###"
     do_debugserver
@@ -480,6 +535,10 @@ case "${ACTION}" in
   reset)
     echo "### Resetting Target ###"
     do_reset
+    ;;
+  term-rtt)
+    echo "### Starting RTT terminal ###"
+    do_term
     ;;
   *)
     echo "Usage: $0 {flash|debug|debug-server|reset}"

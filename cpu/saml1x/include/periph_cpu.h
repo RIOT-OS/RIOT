@@ -30,14 +30,8 @@ extern "C" {
  * @name    Power mode configuration
  * @{
  */
-#define PM_NUM_MODES        (1)
+#define PM_NUM_MODES        (2)
 /** @} */
-
-/**
- * @brief   Override the default initial PM blocker
- * @todo   Idle modes are enabled by default, deep sleep mode blocked
- */
-#define PM_BLOCKER_INITIAL  0x00000001
 
 /**
  * @name   SAML1x GCLK definitions
@@ -49,17 +43,41 @@ enum {
 };
 /** @} */
 
-#ifndef DOXYGEN
-#define HAVE_ADC_RES_T
-typedef enum {
-    ADC_RES_6BIT  = 0xff,                       /**< not supported */
-    ADC_RES_8BIT  = ADC_CTRLC_RESSEL_8BIT,      /**< ADC resolution: 8 bit */
-    ADC_RES_10BIT = ADC_CTRLC_RESSEL_10BIT,     /**< ADC resolution: 10 bit */
-    ADC_RES_12BIT = ADC_CTRLC_RESSEL_12BIT,     /**< ADC resolution: 12 bit */
-    ADC_RES_14BIT = 0xfe,                       /**< not supported */
-    ADC_RES_16BIT = 0xfd                        /**< not supported */
-} adc_res_t;
-#endif /* ndef DOXYGEN */
+/**
+ * @brief   Pins that can be used for ADC input
+ */
+static const gpio_t sam0_adc_pins[1][10] = {
+    {
+        GPIO_PIN(PA, 2), GPIO_PIN(PA, 3), GPIO_PIN(PA, 4), GPIO_PIN(PA, 5),
+        GPIO_PIN(PA, 6), GPIO_PIN(PA, 7), GPIO_PIN(PA, 8), GPIO_PIN(PA, 9),
+        GPIO_PIN(PA, 10), GPIO_PIN(PA, 11)
+    }
+};
+
+/**
+ * @brief ADC pin aliases
+ * @{
+ */
+#define ADC_INPUTCTRL_MUXPOS_PA02 ADC_INPUTCTRL_MUXPOS_AIN0 /**< Alias for AIN0 */
+#define ADC_INPUTCTRL_MUXPOS_PA03 ADC_INPUTCTRL_MUXPOS_AIN1 /**< Alias for AIN1 */
+#define ADC_INPUTCTRL_MUXPOS_PA04 ADC_INPUTCTRL_MUXPOS_AIN2 /**< Alias for AIN2 */
+#define ADC_INPUTCTRL_MUXPOS_PA05 ADC_INPUTCTRL_MUXPOS_AIN3 /**< Alias for AIN3 */
+#define ADC_INPUTCTRL_MUXPOS_PA06 ADC_INPUTCTRL_MUXPOS_AIN4 /**< Alias for AIN4 */
+#define ADC_INPUTCTRL_MUXPOS_PA07 ADC_INPUTCTRL_MUXPOS_AIN5 /**< Alias for AIN5 */
+#define ADC_INPUTCTRL_MUXPOS_PA08 ADC_INPUTCTRL_MUXPOS_AIN6 /**< Alias for AIN6 */
+#define ADC_INPUTCTRL_MUXPOS_PA09 ADC_INPUTCTRL_MUXPOS_AIN7 /**< Alias for AIN7 */
+#define ADC_INPUTCTRL_MUXPOS_PA10 ADC_INPUTCTRL_MUXPOS_AIN8 /**< Alias for AIN8 */
+#define ADC_INPUTCTRL_MUXPOS_PA11 ADC_INPUTCTRL_MUXPOS_AIN9 /**< Alias for AIN9 */
+
+#define ADC_INPUTCTRL_MUXNEG_PA02 ADC_INPUTCTRL_MUXPOS_AIN0 /**< Alias for AIN0 */
+#define ADC_INPUTCTRL_MUXNEG_PA03 ADC_INPUTCTRL_MUXPOS_AIN1 /**< Alias for AIN1 */
+#define ADC_INPUTCTRL_MUXNEG_PA04 ADC_INPUTCTRL_MUXPOS_AIN2 /**< Alias for AIN2 */
+#define ADC_INPUTCTRL_MUXNEG_PA05 ADC_INPUTCTRL_MUXPOS_AIN3 /**< Alias for AIN3 */
+#define ADC_INPUTCTRL_MUXNEG_PA06 ADC_INPUTCTRL_MUXPOS_AIN4 /**< Alias for AIN4 */
+#define ADC_INPUTCTRL_MUXNEG_PA07 ADC_INPUTCTRL_MUXPOS_AIN5 /**< Alias for AIN5 */
+#define ADC_INPUTCTRL_MUXNEG_PA08 ADC_INPUTCTRL_MUXPOS_AIN6 /**< Alias for AIN6 */
+#define ADC_INPUTCTRL_MUXNEG_PA09 ADC_INPUTCTRL_MUXPOS_AIN7 /**< Alias for AIN7 */
+/** @} */
 
 /**
  * @brief   The MCU has a 10 bit DAC

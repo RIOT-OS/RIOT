@@ -21,5 +21,6 @@ config BOARD_OPENLABS_KW41Z_MINI
     select HAS_PERIPH_UART
     select HAS_RIOTBOOT
 
+    select HAVE_KW41ZRF
     select HAVE_SAUL_ADC
     select HAVE_SAUL_GPIO

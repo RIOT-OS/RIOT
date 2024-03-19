@@ -7,6 +7,21 @@
  */
 
 /**
+ * @defgroup    drivers_slipdev_stdio   STDIO via SLIP
+ * @ingroup     sys_stdio
+ * @brief       Standard input/output backend multiplexed via SLIP
+ *
+ * This will multiplex STDIO via the Serial Line Internet Protocol.
+ * The shell can be accessed via the `sliptty` tool.
+ *
+ * To enable this stdio implementation, select
+ *
+ *     USEMODULE += slipdev_stdio
+ *
+ * @see         drivers_slipdev
+ */
+
+/**
  * @defgroup    drivers_slipdev SLIP network device
  * @ingroup     drivers_netdev
  * @brief       SLIP network device over @ref drivers_periph_uart
@@ -26,7 +41,7 @@
 #include "cib.h"
 #include "net/netdev.h"
 #include "periph/uart.h"
-#include "tsrb.h"
+#include "chunked_ringbuffer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,8 +57,6 @@ extern "C" {
  *
  * Reduce this value if your expected traffic does not include full IPv6 MTU
  * sized packets.
- *
- * @pre Needs to be power of two and `<= INT_MAX`
  */
 #ifdef CONFIG_SLIPDEV_BUFSIZE_EXP
 #define CONFIG_SLIPDEV_BUFSIZE (1<<CONFIG_SLIPDEV_BUFSIZE_EXP)
@@ -69,9 +82,25 @@ enum {
      */
     SLIPDEV_STATE_NET,
     /**
+     * @brief   Device writes handles data as network device, next byte is escaped
+     */
+    SLIPDEV_STATE_NET_ESC,
+    /**
      * @brief   Device writes received data to stdin
      */
     SLIPDEV_STATE_STDIN,
+    /**
+     * @brief   Device writes received data to stdin, next byte is escaped
+     */
+    SLIPDEV_STATE_STDIN_ESC,
+    /**
+     * @brief   Device is in standby, will wake up when sending data
+     */
+    SLIPDEV_STATE_STANDBY,
+    /**
+     * @brief   Device is in sleep mode
+     */
+    SLIPDEV_STATE_SLEEP,
 };
 /** @} */
 
@@ -91,7 +120,12 @@ typedef struct {
 typedef struct {
     netdev_t netdev;                        /**< parent class */
     slipdev_params_t config;                /**< configuration parameters */
-    tsrb_t inbuf;                           /**< RX buffer */
+    chunk_ringbuf_t rb;                     /**< Ringbuffer to store received frames.       */
+                                            /* Written to from interrupts (with irq_disable */
+                                            /* to prevent any simultaneous writes),         */
+                                            /* consumed exclusively in the network stack's  */
+                                            /* loop at _isr.                                */
+
     uint8_t rxmem[CONFIG_SLIPDEV_BUFSIZE];  /**< memory used by RX buffer */
     /**
      * @brief   Device state

@@ -1,8 +1,56 @@
 # configure the flash tool
-PROGRAMMER ?= uniflash
+ifneq (,$(UNIFLASH_PATH))
+  PROGRAMMER ?= uniflash
+else
+  PROGRAMMER ?= openocd
+endif
 
 # uniflash and openocd programmers are supported
 PROGRAMMERS_SUPPORTED += openocd uniflash
 
-OPENOCD_CONFIG ?= $(RIOTBOARD)/common/cc26xx_cc13xx/dist/openocd.cfg
+# If port selection via ttys.py is enabled by `MOST_RECENT_PORT=1`, filter
+# USB serials to only select the UART bridge of XDS110 debuggers, which is the
+# embedded debugger of these launchpad boards.
+TTY_BOARD_FILTER := --model XDS110 --iface-num 0
+
 UNIFLASH_CONFIG ?= $(RIOTBOARD)/common/cc26xx_cc13xx/dist
+
+OPENOCD_DEBUG_ADAPTER ?= xds110
+# Work around a bug in the CC26xx / CC13xx that is triggered by 'reset halt'.
+# This results in the CC26xx / CC13xx being flash-able again, but it may race
+# against the target firmware installing IRQ handlers that may trigger while
+# the device is being flashed, which is bound to cause unpleasantness. But
+# flashing working fine most of the time is better than flashing working not
+# at all...
+OPENOCD_CMD_RESET_HALT ?= -c 'halt'
+
+ifneq (,$(filter cc13x0%,$(CPU_MODEL)))
+  DEFAULT_OPENOCD_CONFIG := $(RIOTBASE)/boards/common/cc26xx_cc13xx/dist/openocd_cc13x0.cfg
+  DEFAULT_JLINK_DEVICE := CC13xx
+endif
+ifneq (,$(filter cc13x2%,$(CPU_MODEL)))
+  DEFAULT_OPENOCD_CONFIG := $(RIOTBASE)/boards/common/cc26xx_cc13xx/dist/openocd_cc13x2.cfg
+  DEFAULT_JLINK_DEVICE := CC13xx
+endif
+ifneq (,$(filter cc26x0%,$(CPU_MODEL)))
+  DEFAULT_OPENOCD_CONFIG := $(RIOTBASE)/boards/common/cc26xx_cc13xx/dist/openocd_cc26x0.cfg
+  DEFAULT_JLINK_DEVICE := CC26xx
+endif
+ifneq (,$(filter cc26x2%,$(CPU_MODEL)))
+  DEFAULT_OPENOCD_CONFIG := $(RIOTBASE)/boards/common/cc26xx_cc13xx/dist/openocd_cc26x2.cfg
+  DEFAULT_JLINK_DEVICE := CC26xx
+endif
+
+# if no openocd specific configuration file, check for default locations:
+# 1. Using the default dist/openocd.cfg (automatically set by openocd.sh)
+# 2. Using the common cpu specific config file
+ifeq (,$(OPENOCD_CONFIG))
+  # if no openocd default configuration is provided by the board,
+  # use the default cc26xx / cc13xx config
+  ifeq (0,$(words $(wildcard $(BOARDDIR)/dist/openocd.cfg)))
+    OPENOCD_CONFIG := $(DEFAULT_OPENOCD_CONFIG)
+  endif
+endif
+
+JLINK_DEVICE ?= $(DEFAULT_JLINK_DEVICE)
+JLINK_IF ?= jtag

@@ -20,6 +20,8 @@ config BOARD_SAMR34_XPRO
     select HAS_PERIPH_UART
     select HAS_PERIPH_USBDEV
     select HAS_RIOTBOOT
+    select HAS_TINYUSB_DEVICE
 
     select HAVE_SX1276
     select HAVE_SAUL_GPIO
+    select HAVE_MTD_SPI_NOR

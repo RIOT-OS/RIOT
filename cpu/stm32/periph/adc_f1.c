@@ -28,7 +28,7 @@
 /**
  * @brief   Maximum allowed ADC clock speed
  */
-#define MAX_ADC_SPEED           (14000000U)
+#define MAX_ADC_SPEED           MHZ(14)
 
 /**
  * @brief   Allocate locks for all three available ADC devices
@@ -93,7 +93,7 @@ int adc_init(adc_t line)
     }
     /* set clock prescaler to get the maximal possible ADC clock value */
     for (clk_div = 2; clk_div < 8; clk_div += 2) {
-        if ((CLOCK_CORECLOCK / clk_div) <= MAX_ADC_SPEED) {
+        if ((periph_apb_clk(APB2) / clk_div) <= MAX_ADC_SPEED) {
             break;
         }
     }

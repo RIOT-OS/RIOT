@@ -23,13 +23,13 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
-#include <kernel_defines.h>
 
 #include "bitfield.h"
 #include "evtimer_msg.h"
 #include "sched.h"
 #include "mutex.h"
 #include "net/eui64.h"
+#include "kernel_defines.h"
 #include "net/ipv6/addr.h"
 #ifdef MODULE_GNRC_IPV6
 #include "net/gnrc/ipv6.h"
@@ -257,6 +257,51 @@ extern evtimer_msg_t _nib_evtimer;
  * Exposed to be settable by @ref net_gnrc_ipv6_nib_ft.
  */
 extern _nib_dr_entry_t *_prime_def_router;
+
+/**
+ * @brief   Looks up if an event is queued in the event timer
+ *
+ * @param[in] ctx   Context of the event. May be NULL for any event context.
+ * @param[in] type  [Type of the event](@ref net_gnrc_ipv6_nib_msg).
+ *
+ * @return  Milliseconds to the event, if event in queue.
+ * @return  UINT32_MAX, event is not in queue.
+ */
+uint32_t _evtimer_lookup(const void *ctx, uint16_t type);
+
+/**
+ * @brief   Removes an event from the event timer
+ *
+ * @param[in] event Representation of the event.
+ */
+static inline void _evtimer_del(evtimer_msg_event_t *event)
+{
+    evtimer_del(&_nib_evtimer, &event->event);
+}
+
+/**
+ * @brief   Adds an event to the event timer
+ *
+ * @param[in] ctx       The context of the event
+ * @param[in] type      [Type of the event](@ref net_gnrc_ipv6_nib_msg).
+ * @param[in,out] event Representation of the event.
+ * @param[in] offset    Offset in milliseconds to the event.
+ */
+static inline void _evtimer_add(void *ctx, int16_t type,
+                                evtimer_msg_event_t *event, uint32_t offset)
+{
+#ifdef MODULE_GNRC_IPV6
+    kernel_pid_t target_pid = gnrc_ipv6_pid;
+#else
+    kernel_pid_t target_pid = KERNEL_PID_LAST;  /* just for testing */
+#endif
+    _evtimer_del(event);
+    event->event.next = NULL;
+    event->event.offset = offset;
+    event->msg.type = type;
+    event->msg.content.ptr = ctx;
+    evtimer_add_msg(&_nib_evtimer, event, target_pid);
+}
 
 /**
  * @brief   Initializes NIB internally
@@ -733,6 +778,7 @@ static inline _nib_offl_entry_t *_nib_ft_add(const ipv6_addr_t *next_hop,
  */
 static inline void _nib_ft_remove(_nib_offl_entry_t *nib_offl)
 {
+    _evtimer_del(&nib_offl->route_timeout);
     _nib_offl_remove(nib_offl, _FT);
 }
 #endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
@@ -794,6 +840,8 @@ _nib_offl_entry_t *_nib_abr_iter_pfx(const _nib_abr_entry_t *abr,
  * @return  NULL, if @p last is the last ABR in the NIB.
  */
 _nib_abr_entry_t *_nib_abr_iter(const _nib_abr_entry_t *last);
+#else
+#define _nib_abr_iter(abr) NULL
 #endif
 
 /**
@@ -824,44 +872,10 @@ void _nib_ft_get(const _nib_offl_entry_t *dst, gnrc_ipv6_nib_ft_t *fte);
 int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *ctx,
                    gnrc_ipv6_nib_ft_t *entry);
 
-/**
- * @brief   Looks up if an event is queued in the event timer
- *
- * @param[in] ctx   Context of the event. May be NULL for any event context.
- * @param[in] type  [Type of the event](@ref net_gnrc_ipv6_nib_msg).
- *
- * @return  Milliseconds to the event, if event in queue.
- * @return  UINT32_MAX, event is not in queue.
- */
-uint32_t _evtimer_lookup(const void *ctx, uint16_t type);
-
-/**
- * @brief   Adds an event to the event timer
- *
- * @param[in] ctx       The context of the event
- * @param[in] type      [Type of the event](@ref net_gnrc_ipv6_nib_msg).
- * @param[in,out] event Representation of the event.
- * @param[in] offset    Offset in milliseconds to the event.
- */
-static inline void _evtimer_add(void *ctx, int16_t type,
-                                evtimer_msg_event_t *event, uint32_t offset)
-{
-#ifdef MODULE_GNRC_IPV6
-    kernel_pid_t target_pid = gnrc_ipv6_pid;
-#else
-    kernel_pid_t target_pid = KERNEL_PID_LAST;  /* just for testing */
-#endif
-    evtimer_del((evtimer_t *)(&_nib_evtimer), (evtimer_event_t *)event);
-    event->event.next = NULL;
-    event->event.offset = offset;
-    event->msg.type = type;
-    event->msg.content.ptr = ctx;
-    evtimer_add_msg(&_nib_evtimer, event, target_pid);
-}
-
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* PRIV_NIB_INTERNAL_H */
-/** @} */
+/** @internal
+ * @} */

@@ -88,6 +88,9 @@ endif
 ifneq (,$(filter gnrc_rpl_p2p,$(USEMODULE)))
   DIRS += routing/rpl/p2p
 endif
+ifneq (,$(filter gnrc_ipv6_static_addr,$(USEMODULE)))
+  DIRS += network_layer/ipv6/static_addr
+endif
 ifneq (,$(filter gnrc_ipv6_auto_subnets,$(USEMODULE)))
   DIRS += routing/ipv6_auto_subnets
 endif

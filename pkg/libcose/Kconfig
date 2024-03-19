@@ -31,6 +31,21 @@ config MODULE_LIBCOSE_CRYPT_MONOCYPHER
     depends on TEST_KCONFIG
     depends on PACKAGE_MONOCYPHER
 
+config MODULE_LIBCOSE_CRYPT_RIOT
+    bool "COSE use RIOT backend"
+    depends on TEST_KCONFIG
+    select MODULE_CRYPTO
+
+config MODULE_LIBCOSE_CRYPT_INIT
+    bool "LibCose Crypt Initialization functions"
+    default y
+
+config MODULE_AUTO_INIT_LIBCOSE_CRYPT
+    bool "Auto initialize LibCose Crypt"
+    depends on MODULE_AUTO_INIT
+    select MODULE_LIBCOSE_CRYPT_INIT
+    default y
+
 endif # PACKAGE_LIBCOSE
 
 config MODULE_LIBCOSE_CRYPT

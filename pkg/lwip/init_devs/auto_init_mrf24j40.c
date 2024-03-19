@@ -22,20 +22,30 @@
 #include "mrf24j40_params.h"
 
 #include "lwip_init_devs.h"
+#include "bhp/msg.h"
+#include "net/netdev/ieee802154_submac.h"
 
 #define ENABLE_DEBUG    0
 #include "debug.h"
 
 #define NETIF_MRF24J40_NUMOF        ARRAY_SIZE(mrf24j40_params)
 
-static struct netif netif[NETIF_MRF24J40_NUMOF];
+static lwip_netif_t netif[NETIF_MRF24J40_NUMOF];
 static mrf24j40_t mrf24j40_devs[NETIF_MRF24J40_NUMOF];
+static netdev_ieee802154_submac_t mrf24j40_netdev[NETIF_MRF24J40_NUMOF];
 
 static void auto_init_mrf24j40(void)
 {
     for (unsigned i = 0; i < NETIF_MRF24J40_NUMOF; i++) {
-        mrf24j40_setup(&mrf24j40_devs[i], &mrf24j40_params[i], i);
-        if (lwip_add_6lowpan(&netif[i], &mrf24j40_devs[i].netdev.netdev) == NULL) {
+        bhp_msg_init(&netif[i].bhp, &mrf24j40_radio_irq_handler, &mrf24j40_netdev[i].submac.dev);
+        mrf24j40_init(&mrf24j40_devs[i], &mrf24j40_params[i], &mrf24j40_netdev[i].submac.dev,
+                        bhp_msg_isr_cb, &netif[i].bhp);
+
+
+        netdev_register(&mrf24j40_netdev[i].dev.netdev, NETDEV_MRF24J40, i);
+        netdev_ieee802154_submac_init(&mrf24j40_netdev[i]);
+
+        if (lwip_add_6lowpan(&netif[i], &mrf24j40_netdev[i].dev.netdev) == NULL) {
             DEBUG("Could not add mrf24j40 device\n");
             return;
         }

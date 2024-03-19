@@ -9,7 +9,7 @@
 # @author   Martine Lenders <m.lenders@fu-berlin.de>
 
 """
-Script to parse the output of the `pktbuf` (provided by the `gnrc_pktbuf_cmd`
+Script to parse the output of the `pktbuf` (provided by the `shell_cmd_gnrc_pktbuf`
 pseudo-module) command and the `gnrc_pktbuf_stats()` function.
 """
 

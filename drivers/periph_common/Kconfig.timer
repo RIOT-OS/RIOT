@@ -7,7 +7,7 @@
 if TEST_KCONFIG
 
 menuconfig MODULE_PERIPH_TIMER
-    bool "Configure timer peripheral driver"
+    bool "Timer peripheral driver"
     depends on HAS_PERIPH_TIMER
     select MODULE_PERIPH_COMMON
 
@@ -29,6 +29,10 @@ config MODULE_PERIPH_INIT_TIMER_PERIODIC
     bool
     depends on MODULE_PERIPH_TIMER_PERIODIC
     default y if MODULE_PERIPH_INIT
+
+config MODULE_PERIPH_TIMER_QUERY_FREQS
+    bool "Support for querying supported timer frequencies"
+    depends on HAS_PERIPH_TIMER_QUERY_FREQS
 
 endif # MODULE_PERIPH_TIMER
 

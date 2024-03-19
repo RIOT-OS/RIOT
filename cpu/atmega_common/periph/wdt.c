@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2019 Inria
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  * @brief       Implementation of the watchdog peripheral interface
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
@@ -66,13 +68,18 @@ void wdt_setup_reboot(uint32_t min_time, uint32_t max_time)
     /* disable watchdog */
     wdt_disable();
 
+    /* WDTO_8S and WDTO_4S are only available on some devices, we will
+     * test on WDP3 as in avr/wdt.h */
+#ifdef WDP3
     if (max_time >= 8000) {
         wdt_prescaler = WDTO_8S;
     }
     else if (max_time >= 4000) {
         wdt_prescaler = WDTO_4S;
     }
-    else if (max_time >= 2000) {
+    else
+#endif
+    if (max_time >= 2000) {
         wdt_prescaler = WDTO_2S;
     }
     else if (max_time >= 1000) {

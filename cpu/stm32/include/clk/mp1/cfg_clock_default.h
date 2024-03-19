@@ -28,7 +28,7 @@
 #ifndef CONFIG_CLOCK_PLL_M
 #define CONFIG_CLOCK_PLL_M              (2)
 #endif
-#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(24))
+#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CONFIG_CLOCK_HSE == MHZ(24))
 #ifndef CONFIG_CLOCK_PLL_N
 #define CONFIG_CLOCK_PLL_N              (52)
 #endif
@@ -75,19 +75,19 @@
  * @{
  */
 #if IS_ACTIVE(CONFIG_BOARD_HAS_HSE)
-#define CLOCK_PLL_SRC                   (CLOCK_HSE)
-#else /* CLOCK_HSI */
-#define CLOCK_PLL_SRC                   (CLOCK_HSI)
+#define CLOCK_PLL_SRC                   (CONFIG_CLOCK_HSE)
+#else /* CONFIG_CLOCK_HSI */
+#define CLOCK_PLL_SRC                   (CONFIG_CLOCK_HSI)
 #endif
 
 #if IS_ACTIVE(CONFIG_USE_CLOCK_HSI)
-#define CLOCK_CORECLOCK                 (CLOCK_HSI)
+#define CLOCK_CORECLOCK                 (CONFIG_CLOCK_HSI)
 
 #elif IS_ACTIVE(CONFIG_USE_CLOCK_HSE)
 #if !IS_ACTIVE(CONFIG_BOARD_HAS_HSE)
 #error "The board doesn't provide an HSE oscillator"
 #endif
-#define CLOCK_CORECLOCK                 (CLOCK_HSE)
+#define CLOCK_CORECLOCK                 (CONFIG_CLOCK_HSE)
 
 #elif IS_ACTIVE(CONFIG_USE_CLOCK_PLL)
 #define CLOCK_CORECLOCK                 (((CLOCK_PLL_SRC / CONFIG_CLOCK_PLL_M) \

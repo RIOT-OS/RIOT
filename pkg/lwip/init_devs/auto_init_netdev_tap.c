@@ -27,12 +27,15 @@
 
 #define NETIF_TAP_NUMOF        (NETDEV_TAP_MAX)
 
-static struct netif netif[NETIF_TAP_NUMOF];
+static lwip_netif_t netif[NETIF_TAP_NUMOF];
 static netdev_tap_t netdev_taps[NETIF_TAP_NUMOF];
 
 static void auto_init_netdev_tap(void)
 {
     for (unsigned i = 0; i < NETIF_TAP_NUMOF; i++) {
+        if (netdev_tap_params[i].tap_name == NULL) {
+            continue;
+        }
         netdev_tap_setup(&netdev_taps[i], &netdev_tap_params[i], i);
         if (lwip_add_ethernet(&netif[i], &netdev_taps[i].netdev) == NULL) {
             DEBUG("Could not add netdev_tap device\n");

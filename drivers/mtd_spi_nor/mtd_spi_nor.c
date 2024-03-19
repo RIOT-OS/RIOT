@@ -25,11 +25,21 @@
 #include <string.h>
 #include <errno.h>
 
-#include "mtd.h"
-#include "xtimer.h"
-#include "thread.h"
+#include "busy_wait.h"
 #include "byteorder.h"
+#include "kernel_defines.h"
+#include "macros/math.h"
+#include "macros/utils.h"
+#include "mtd.h"
 #include "mtd_spi_nor.h"
+#include "time_units.h"
+#include "thread.h"
+
+#if IS_USED(MODULE_ZTIMER)
+#include "ztimer.h"
+#elif IS_USED(MODULE_XTIMER)
+#include "xtimer.h"
+#endif
 
 #define ENABLE_DEBUG    0
 #include "debug.h"
@@ -55,8 +65,6 @@
 #define MTD_4K_ADDR_MASK    (0xFFF)
 
 #define MBIT_AS_BYTES       ((1024 * 1024) / 8)
-
-#define MIN(a, b) ((a) > (b) ? (b) : (a))
 
 /**
  * @brief   JEDEC memory manufacturer ID codes.
@@ -304,7 +312,8 @@ static uint32_t mtd_spi_nor_get_size(const mtd_jedec_id_t *id)
     if (mtd_spi_manuf_match(id, SPI_NOR_JEDEC_ATMEL) &&
         /* ID 2 is used to encode the product version, usually 1 or 2 */
         (id->device[1] & ~0x3) == 0) {
-        return (0x1F & id->device[0]) * MBIT_AS_BYTES;
+        /* capacity encoded as power of 32k sectors */
+        return (32 * 1024) << (0x1F & id->device[0]);
     }
     if (mtd_spi_manuf_match(id, SPI_NOR_JEDEC_MICROCHIP)) {
         switch (id->device[1]) {
@@ -333,14 +342,29 @@ static uint32_t mtd_spi_nor_get_size(const mtd_jedec_id_t *id)
     return 1 << id->device[1];
 }
 
+static void delay_us(unsigned us)
+{
+#if defined(MODULE_ZTIMER_USEC)
+    ztimer_sleep(ZTIMER_USEC, us);
+#elif defined(MODULE_ZTIMER_MSEC)
+    ztimer_sleep(ZTIMER_MSEC, DIV_ROUND_UP(us, US_PER_MS));
+#else
+    busy_wait_us(us);
+#endif
+}
+
 static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us)
 {
     unsigned i = 0, j = 0;
-    uint32_t div = 2;
+    uint32_t div = 1; /* first wait one full interval */
+#if IS_ACTIVE(ENABLE_DEBUG)
     uint32_t diff = 0;
-    if (IS_ACTIVE(ENABLE_DEBUG) && IS_USED(MODULE_XTIMER)) {
-        diff = xtimer_now_usec();
-    }
+#endif
+#if IS_ACTIVE(ENABLE_DEBUG) && IS_USED(MODULE_ZTIMER_USEC)
+    diff = ztimer_now(ZTIMER_USEC);
+#elif IS_ACTIVE(ENABLE_DEBUG) && IS_USED(MODULE_XTIMER)
+    diff = xtimer_now_usec();
+#endif
     do {
         uint8_t status;
         mtd_spi_cmd_read(dev, dev->params->opcode->rdsr, &status, sizeof(status));
@@ -350,34 +374,31 @@ static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us
             break;
         }
         i++;
-#if MODULE_XTIMER
         if (us) {
-            xtimer_usleep(us);
+            uint32_t wait_us = us / div;
+            uint32_t wait_min = 2;
+
+            wait_us = wait_us > wait_min ? wait_us : wait_min;
+
+            delay_us(wait_us);
             /* reduce the waiting time quickly if the estimate was too short,
              * but still avoid busy (yield) waiting */
-            if (us > 2 * XTIMER_BACKOFF) {
-                us -= (us / div);
-                div++;
-            }
-            else {
-                us = 2 * XTIMER_BACKOFF;
-            }
+            div++;
         }
         else {
             j++;
             thread_yield();
         }
-#else
-        (void)div;
-        (void) us;
-        thread_yield();
-#endif
     } while (1);
     DEBUG("wait loop %u times, yield %u times", i, j);
-    if (IS_ACTIVE(ENABLE_DEBUG) && IS_ACTIVE(MODULE_XTIMER)) {
-        diff = xtimer_now_usec() - diff;
-        DEBUG(", total wait %"PRIu32"us", diff);
-    }
+#if IS_ACTIVE(ENABLE_DEBUG)
+#if IS_USED(MODULE_ZTIMER_USEC)
+    diff = ztimer_now(ZTIMER_USEC) - diff;
+#elif IS_USED(MODULE_XTIMER)
+    diff = xtimer_now_usec() - diff;
+#endif
+    DEBUG(", total wait %"PRIu32"us", diff);
+#endif
     DEBUG("\n");
 }
 
@@ -415,20 +436,22 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
     switch (power) {
         case MTD_POWER_UP:
             mtd_spi_cmd(dev, dev->params->opcode->wake);
-#if defined(MODULE_XTIMER)
-            /* No sense in trying multiple times if no xtimer to wait between
-               reads */
-            uint8_t retries = 0;
+
+            /* fall back to polling if no timer is used */
+            unsigned retries = MTD_POWER_UP_WAIT_FOR_ID;
+            if (!IS_USED(MODULE_ZTIMER) && !IS_USED(MODULE_XTIMER)) {
+                retries *= dev->params->wait_chip_wake_up * 1000;
+            }
+
             int res = 0;
             do {
-                xtimer_usleep(dev->params->wait_chip_wake_up);
+                delay_us(dev->params->wait_chip_wake_up);
                 res = mtd_spi_read_jedec_id(dev, &dev->jedec_id);
-                retries++;
-            } while (res < 0 && retries < MTD_POWER_UP_WAIT_FOR_ID);
+            } while (res < 0 && --retries);
             if (res < 0) {
+                mtd_spi_release(dev);
                 return -EIO;
             }
-#endif
             /* enable 32 bit address mode */
             if (dev->addr_width == 4) {
                 _enable_32bit_addr(dev);
@@ -451,7 +474,7 @@ static void _set_addr_width(mtd_dev_t *mtd)
     uint32_t flash_size = mtd->pages_per_sector * mtd->page_size
                         * mtd->sector_count;
 
-    if (flash_size > 0xFFFFFF) {
+    if (flash_size > (0x1UL << 24)) {
         dev->addr_width = 4;
     } else {
         dev->addr_width = 3;
@@ -470,9 +493,9 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
     _init_pins(dev);
 
     /* power up the MTD device*/
-    DEBUG("mtd_spi_nor_init: power up MTD device");
+    DEBUG_PUTS("mtd_spi_nor_init: power up MTD device");
     if (mtd_spi_nor_power(mtd, MTD_POWER_UP)) {
-        DEBUG("mtd_spi_nor_init: failed to power up MTD device");
+        DEBUG_PUTS("mtd_spi_nor_init: failed to power up MTD device");
         return -EIO;
     }
 
@@ -490,6 +513,9 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
         mtd->sector_count = mtd_spi_nor_get_size(&dev->jedec_id)
                           / (mtd->pages_per_sector * mtd->page_size);
     }
+    /* SPI NOR is byte addressable; instances don't need to configure that */
+    assert(mtd->write_size <= 1);
+    mtd->write_size = 1;
     _set_addr_width(mtd);
 
     DEBUG("mtd_spi_nor_init: %" PRIu32 " bytes "
@@ -573,45 +599,6 @@ static int mtd_spi_nor_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t 
 
     mtd_spi_acquire(dev);
     mtd_spi_cmd_addr_read(dev, dev->params->opcode->read, addr, dest, size);
-    mtd_spi_release(dev);
-
-    return 0;
-}
-
-static int mtd_spi_nor_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t size)
-{
-    uint32_t total_size = mtd->page_size * mtd->pages_per_sector * mtd->sector_count;
-
-    DEBUG("mtd_spi_nor_write: %p, %p, 0x%" PRIx32 ", 0x%" PRIx32 "\n",
-          (void *)mtd, src, addr, size);
-    if (size == 0) {
-        return 0;
-    }
-    const mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
-    if (size > mtd->page_size) {
-        DEBUG("mtd_spi_nor_write: ERR: page program >1 page (%" PRIu32 ")!\n", mtd->page_size);
-        return -EOVERFLOW;
-    }
-    if (dev->page_addr_mask &&
-        ((addr & dev->page_addr_mask) != ((addr + size - 1) & dev->page_addr_mask))) {
-        DEBUG("mtd_spi_nor_write: ERR: page program spans page boundary!\n");
-        return -EOVERFLOW;
-    }
-    if (addr + size > total_size) {
-        return -EOVERFLOW;
-    }
-
-    mtd_spi_acquire(dev);
-
-    /* write enable */
-    mtd_spi_cmd(dev, dev->params->opcode->wren);
-
-    /* Page program */
-    mtd_spi_cmd_addr_write(dev, dev->params->opcode->page_program, addr, src, size);
-
-    /* waiting for the command to complete before returning */
-    wait_for_write_complete(dev, 0);
-
     mtd_spi_release(dev);
 
     return 0;
@@ -725,7 +712,6 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
 const mtd_desc_t mtd_spi_nor_driver = {
     .init = mtd_spi_nor_init,
     .read = mtd_spi_nor_read,
-    .write = mtd_spi_nor_write,
     .write_page = mtd_spi_nor_write_page,
     .erase = mtd_spi_nor_erase,
     .power = mtd_spi_nor_power,

@@ -2,6 +2,15 @@
 PROGRAMMER ?= openocd
 PROGRAMMERS_SUPPORTED += pyocd
 
+# The model text used has double quotes around the name. That's an odd enough
+# choice to warrant making them optional in the detection, in case later
+# programmer firmware revisions "fix" that.
+TTY_BOARD_FILTER := --model ".?BBC micro:bit CMSIS-DAP.?"
+
+# The TTY serial also is the ID of the debug adapter, as the TTY is provided by
+# the debug adapter
+DEBUG_ADAPTER_ID_IS_TTY_SERIAL := 1
+
 # The board is not recognized automatically by pyocd, so the CPU target
 # option is passed explicitly
 PYOCD_FLASH_TARGET_TYPE ?= -t $(CPU)

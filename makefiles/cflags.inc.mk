@@ -57,6 +57,25 @@ ifeq ($(LTO),1)
   LINKFLAGS += $(LTOFLAGS) -ffunction-sections -fdata-sections
 endif
 
+# Cannot test with `BUILD_IN_DOCKER=1`, as this is only the case when the
+# actual build is done in the docker container and we are still running in the
+# host's context.
+ifeq (1,$(BUILD_IN_DOCKER))
+  LINKER_SUPPORTS_NOEXECSTACK := determine-later-inside-docker
+endif
+
+# Check if linker supports `-z noexecstack`. Handle BUILD_IN_DOCKER separately,
+# as this is run in the host environment rather than inside the container. We
+# just hardcode this in the BUILD_IN_DOCKER case for now.
+LINKER_SUPPORTS_NOEXECSTACK ?= $(shell LC_ALL=C $(LINK) $(RIOTTOOLS)/testprogs/minimal_linkable.c -o /dev/null -lc -Wall -Wextra -pedantic -z noexecstack 2> /dev/null && echo 1 || echo 0)
+
+# As we do not use nested functions or other stuff requiring trampoline code,
+# we can safely mark the stack as not executable. This avoids warnings on newer
+# toolchains.
+ifeq (1,$(LINKER_SUPPORTS_NOEXECSTACK))
+  LINKFLAGS += -z noexecstack
+endif
+
 # Forbid common symbols to prevent accidental aliasing.
 CFLAGS += -fno-common
 
@@ -76,6 +95,9 @@ OPTIONAL_CFLAGS += -Wformat=2
 OPTIONAL_CFLAGS += -Wformat-overflow
 OPTIONAL_CFLAGS += -Wformat-truncation
 
+# Don't include absolute path in __FILE__ macro
+OPTIONAL_CFLAGS += -fmacro-prefix-map=$(RIOTBASE)/=
+
 # Warn about casts that increase alignment requirements
 OPTIONAL_CFLAGS += -Wcast-align
 
@@ -87,6 +109,21 @@ ifeq (,$(filter -DDEVELHELP,$(CFLAGS)))
     CFLAGS += -DNDEBUG
   endif
 endif
-
 # Add the optional flags that are not architecture/toolchain blacklisted
 CFLAGS += $(filter-out $(OPTIONAL_CFLAGS_BLACKLIST),$(OPTIONAL_CFLAGS))
+
+# Improve C++ compatibility with our C headers: In C it is both valid and good
+# practise to implicitly initialize struct members with zero by omitting them
+# in a initializer list. The C++ compiler greatly frowns upon this, even within
+# `extern "C" { ... }`. The best would be to configure the C++ compiler to
+# accept good C practises within `extern "C" { ... }` while enforcing good C++
+# practises elsewhere. But in absence of this, we disable the warning for now.
+CXXEXFLAGS += -Wno-missing-field-initializers
+
+# Reformat the RAM region for usage within code and expose them
+ifneq (,$(RAM_START_ADDR))
+  CFLAGS += -DCPU_RAM_BASE=$(RAM_START_ADDR)
+endif
+ifneq (,$(RAM_LEN))
+  CFLAGS += -DCPU_RAM_SIZE=$(shell printf "0x%x" $$(($(RAM_LEN:%K=%*1024))))
+endif

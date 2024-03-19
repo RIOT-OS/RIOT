@@ -211,9 +211,11 @@ static void _isr(netdev_t *netdev)
     netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
 }
 
-static int _init(netdev_t *encdev)
+static int _init(netdev_t *netdev)
 {
-    (void)encdev;
+    /* signal link UP */
+    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+
     return 0;
 }
 
@@ -371,16 +373,17 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void* info)
                 DEBUG("ethos _recv(): inbuf doesn't contain enough bytes.\n");
                 return -EIO;
             }
-            tmp = ethos_unstuff_readbyte(ptr, (uint8_t)byte, &escaped, &frametype);
-            ptr += tmp;
-            res += tmp;
-            if ((unsigned)res > len) {
-                while (byte != (int)ETHOS_FRAME_DELIMITER) {
+            if ((unsigned)res >= len) {
+                while (byte != (int)ETHOS_FRAME_DELIMITER && byte >= 0) {
                     /* clear out unreceived packet */
                     byte = tsrb_get_one(&dev->inbuf);
                 }
                 return -ENOBUFS;
             }
+
+            tmp = ethos_unstuff_readbyte(ptr, (uint8_t)byte, &escaped, &frametype);
+            ptr += tmp;
+            res += tmp;
         } while (byte != ETHOS_FRAME_DELIMITER);
 
         switch (frametype) {

@@ -136,14 +136,59 @@ typedef struct {
  * @brief   Received packet status information for IEEE 802.15.4 radios
  */
 typedef struct netdev_ieee802154_rx_info {
-    uint64_t timestamp;     /**< Timestamp value of a received frame in ns */
     int16_t rssi;           /**< RSSI of a received frame in dBm */
     uint8_t lqi;            /**< LQI of a received frame */
     uint8_t flags;          /**< Flags e.g. used to mark other fields as valid */
-#if IS_USED(MODULE_SOCK_AUX_TIMESTAP)
+#if IS_USED(MODULE_NETDEV_IEEE802154_RX_TIMESTAMP)
     uint64_t timestamp;     /**< Timestamp value of a received frame in ns */
 #endif
 } netdev_ieee802154_rx_info_t;
+
+/**
+ * @brief   Write the given timestamp to the given RX info struct.
+ *
+ * @details This function is safe to call even when module
+ *          `netdev_ieee802154_rx_timestamp` is not used. It will become a
+ *          no-op then.
+ */
+static inline void netdev_ieee802154_rx_info_set_timestamp(
+        netdev_ieee802154_rx_info_t *dest,
+        uint64_t timestamp)
+{
+    (void)dest;
+    (void)timestamp;
+#if IS_USED(MODULE_NETDEV_IEEE802154_RX_TIMESTAMP)
+    dest->timestamp = timestamp;
+    dest->flags |= NETDEV_RX_IEEE802154_INFO_FLAG_TIMESTAMP;
+#endif
+}
+
+/**
+ * @brief   Get the timestamp to from the RX info.
+ *
+ * @details This function is safe to call even when module
+ *          `netdev_ieee802154_rx_timestamp` is not used. It will become a
+ *          no-op then.
+ *
+ * @retval  0   Success
+ * @retval  -1  No timestamp present or module `netdev_ieee802154_rx_timestamp`
+ *              not used
+ */
+static inline int netdev_ieee802154_rx_info_get_timestamp(
+        const netdev_ieee802154_rx_info_t *info,
+        uint64_t *dest)
+{
+    (void)info;
+    (void)dest;
+#if IS_USED(MODULE_NETDEV_IEEE802154_RX_TIMESTAMP)
+    if (info->flags & NETDEV_RX_IEEE802154_INFO_FLAG_TIMESTAMP) {
+        *dest = info->timestamp;
+        return 0;
+    }
+#endif
+
+    return -1;
+}
 
 /**
  * @brief   Reset function for ieee802154 common fields

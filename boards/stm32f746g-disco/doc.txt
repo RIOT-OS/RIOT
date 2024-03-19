@@ -10,7 +10,7 @@ is an evaluation board supporting a ARM Cortex-M7 STM32F746NG microcontroller
 with 340KB of RAM and 1MB of ROM Flash.
 
 As main features, this board provides:
-- a 4"3 RGB 480×272 color LCD-TFT with capacitive touch screen,
+- a 4.3\" RGB 480×272 color LCD-TFT with capacitive touch screen,
 - an ethernet port
 - 2 user USB ports (FS and HS)
 - 2 user digital microphones
@@ -26,12 +26,13 @@ Current hardware support:
 | I2C |  X | I2C1 on PB8/PB9    |
 | Ethernet | X |  |
 | USB OTG FS | X |  |
-| USB OTG HS | - |  |
+| USB OTG HS | X |  |
 | TFT LCD | X |  |
 | Capacitive touch screen | X | |
 | User microphones | - | |
 | External Quad-SPI Flash | - | |
-| External SDRAM | - | |
+| External SDRAM | X | |
+| SD Card Interface | x | SDMMC1 on PC8..PC13 and PD2 |
 
 ## Flashing the device
 

@@ -36,14 +36,10 @@ jobs:
           - riot: dwm1001
             iotlab:
               archi: dwm1001:dw1000
-              site: saclay
+              site: toulouse
           - riot: iotlab-m3
             iotlab:
               archi: m3:at86rf231
-              site: saclay
-          - riot: nrf51dk
-            iotlab:
-              archi: nrf51dk:ble
               site: saclay
           - riot: nrf52dk
             iotlab:
@@ -52,10 +48,6 @@ jobs:
           - riot: nrf52840dk
             iotlab:
               archi: nrf52840dk:multi
-              site: saclay
-          - riot: nrf52832-mdk
-            iotlab:
-              archi: nrf52832mdk:ble
               site: saclay
           - riot: nucleo-wl55jc
             iotlab:
@@ -85,12 +77,12 @@ jobs:
       COMPILE_AND_TEST_FOR_BOARD: ./dist/tools/compile_and_test_for_board/compile_and_test_for_board.py
       COMPILE_AND_TEST_ARGS: --with-test-only --jobs=2 --report-xml
       # Exclude applications that are expected to fail or cannot run on iotlab
-      # - tests/periph_timer_short_relative_set is expected to fail
+      # - tests/periph/timer_short_relative_set is expected to fail
       # - tests/riotboot requires the riotboot feature and provides a test
       #   but flashing at a specific offset is not (yet) supported on IoT-LAB
       #   so it will always fail because of that limitation
-      APPLICATIONS_EXCLUDE: tests/periph_timer_short_relative_set tests/riotboot
-      # Increase tolerance error with `tests/periph_timer_periodic` because
+      APPLICATIONS_EXCLUDE: tests/periph/timer_short_relative_set tests/riotboot
+      # Increase tolerance error with `tests/periph/timer_periodic` because
       # of timing issues with the test script when running in the github
       # actions environment
       TEST_PERIPH_TIMER_PERIODIC_PRECISION: 0.30
@@ -102,7 +94,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install iotlabcli pexpect riotctrl[rapidjson] junit-xml
+          pip install iotlabcli pexpect riotctrl[rapidjson] junit-xml scapy
       - name: Configure credentials
         run: echo '${{ secrets.IOTLABRC }}' > ~/.iotlabrc
       - name: Setup SSH agent
@@ -118,7 +110,7 @@ jobs:
         run: |
           docker pull riot/riotbuild:latest
       - name: Checkout RIOT
-        uses: actions/checkout@v2
+        uses: actions/checkout@main
         with:
           ref: ${{ github.event.inputs.riot_version }}
       - name: Launch IoT-LAB experiment

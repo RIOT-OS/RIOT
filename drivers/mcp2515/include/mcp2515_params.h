@@ -15,7 +15,6 @@
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Wouter Symons <wosym@airsantelmo.com>
- * @}
  */
 
 #ifndef MCP2515_PARAMS_H
@@ -51,7 +50,7 @@ extern "C" {
 #endif
 
 #ifndef MCP2515_PARAM_RST
-#define MCP2515_PARAM_RST GPIO_PIN(0, 0)
+#define MCP2515_PARAM_RST GPIO_UNDEF
 #endif
 
 #ifndef MCP2515_PARAM_INT
@@ -73,7 +72,7 @@ extern "C" {
     .int_pin = MCP2515_PARAM_INT, \
     .clk = MCP2515_PARAM_CLK, \
 }
-/**@*/
+/** @} */
 
 /**
  * @brief   Set default configuration
@@ -96,3 +95,4 @@ static const candev_params_t candev_mcp2515_params[] = {
 #endif
 
 #endif /* MCP2515_PARAMS_H */
+/** @} */

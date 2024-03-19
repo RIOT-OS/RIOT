@@ -18,6 +18,7 @@ USEMODULE += sock_udp
 USEMODULE += gnrc_icmpv6_echo
 
 USEMODULE += nanocoap_sock
+USEMODULE += nanocoap_resources
 
 USEMODULE += xtimer
 
@@ -26,9 +27,6 @@ USEMODULE += fmt
 
 # include sha256 (used by example blockwise handler)
 USEMODULE += hashes
-
-# include this for printing IP addresses
-USEMODULE += shell_commands
 
 # Comment this out to enable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
@@ -43,6 +41,19 @@ ifneq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
   $(info Using low-memory configuration for microcoap_server.)
   ## low-memory tuning values
   USEMODULE += prng_minstd
+endif
+
+# Enable fileserver for boards with plenty of memory
+HIGH_MEMORY_BOARDS := native native64 same54-xpro mcb2388
+
+ifneq (,$(filter $(BOARD),$(HIGH_MEMORY_BOARDS)))
+  USEMODULE += nanocoap_fileserver
+  USEMODULE += vfs_default
+
+  # always enable auto-format for native
+  ifneq (,$(filter native native64,$(BOARD)))
+    USEMODULE += vfs_auto_format
+  endif
 endif
 
 # Change this to 0 show compiler invocation lines by default:

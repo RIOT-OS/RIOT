@@ -16,8 +16,7 @@ USEMODULE += gnrc_ipv6_default
 # Include MQTT-SN
 USEMODULE += asymcute
 # Add also the shell, some shell commands
-USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 # For testing we also include the ping command and some stats
 USEMODULE += gnrc_icmpv6_echo

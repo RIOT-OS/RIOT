@@ -1,0 +1,38 @@
+From 25509b8b61b329d3c4ae5b3874704dae55d62ccd Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Tue, 8 Mar 2022 11:34:13 +0100
+Subject: [PATCH 15/17] driver/i2c: remove the include gpio.h in i2c.h header
+
+Including driver/i2c.h by RIOT code leads to type conflicts with RIOT gpio_t type.
+---
+ components/driver/i2c.c                | 1 +
+ components/driver/include/driver/i2c.h | 1 -
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/components/driver/i2c.c b/components/driver/i2c.c
+index 438d1efc12d..be26fdeffc3 100644
+--- a/components/driver/i2c.c
++++ b/components/driver/i2c.c
+@@ -21,6 +21,7 @@
+ #include "hal/i2c_hal.h"
+ #include "hal/gpio_hal.h"
+ #include "soc/i2c_periph.h"
++#include "driver/gpio.h"
+ #include "driver/i2c.h"
+ #include "driver/periph_ctrl.h"
+ #include "esp_rom_gpio.h"
+diff --git a/components/driver/include/driver/i2c.h b/components/driver/include/driver/i2c.h
+index 22dcc8ab241..e668bba2acd 100644
+--- a/components/driver/include/driver/i2c.h
++++ b/components/driver/include/driver/i2c.h
+@@ -19,7 +19,6 @@ extern "C" {
+ #include "freertos/task.h"
+ #include "freertos/queue.h"
+ #include "freertos/ringbuf.h"
+-#include "driver/gpio.h"
+ #include "soc/soc_caps.h"
+ #include "hal/i2c_types.h"
+ 
+-- 
+2.17.1
+

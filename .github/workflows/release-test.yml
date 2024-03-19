@@ -44,7 +44,7 @@ env:
 # to hit Github Limit of 6h per job.
 jobs:
   tasks:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 360
     strategy:
       fail-fast: false
@@ -78,20 +78,28 @@ jobs:
         ssh -oStrictHostKeyChecking=accept-new \
           ${IOTLAB_USER}@saclay.iot-lab.info exit
     - name: Fetch host key from IoT-LAB lille site
+      # Not being used in the most recent release specs but kept in for
+      # backwords compatibility
       if: ${{ matrix.pytest_mark == 'iotlab_creds' }}
       run: |
         IOTLAB_USER=$(cat ~/.iotlabrc | cut -f1 -d:)
         ssh -oStrictHostKeyChecking=accept-new \
           ${IOTLAB_USER}@lille.iot-lab.info exit
+    - name: Fetch host key from IoT-LAB strasbourg site
+      if: ${{ matrix.pytest_mark == 'iotlab_creds' }}
+      run: |
+        IOTLAB_USER=$(cat ~/.iotlabrc | cut -f1 -d:)
+        ssh -oStrictHostKeyChecking=accept-new \
+          ${IOTLAB_USER}@strasbourg.iot-lab.info exit
     - name: Checkout Release-Specs
-      uses: actions/checkout@v2
+      uses: actions/checkout@main
       with:
         repository: RIOT-OS/Release-Specs
         path: Release-Specs
         fetch-depth: 1
         ref: ${{ github.event.inputs.release_specs_version }}
     - name: Checkout RIOT
-      uses: actions/checkout@v2
+      uses: actions/checkout@main
       with:
         repository: RIOT-OS/RIOT
         path: RIOT
@@ -116,7 +124,13 @@ jobs:
       if: ${{ matrix.pytest_mark == 'not iotlab_creds' }}
       run: |
         sudo RIOT/dist/tools/tapsetup/tapsetup -c 11
+    - name: Install native dependencies
+      if: ${{ matrix.pytest_mark == 'not iotlab_creds' }}
+      run: |
+        sudo apt-get update
+        sudo apt-get install lib32asan6
     - name: Run release tests
+      id: tests
       timeout-minutes: 350
       run: |
         RIOTBASE="$GITHUB_WORKSPACE/RIOT"
@@ -168,6 +182,27 @@ jobs:
         mkdir test-reports/
         junit2html ${REPORT_XML} ${REPORT_NAME}.html
         cp ${REPORT_XML} ${REPORT_NAME}.xml
+    - name: Generate result message
+      if: always()
+      id: generate_results
+      run: |
+        if [ "${{ steps.tests.conclusion }}" == "success" ]; then
+          nice_str="&#x2705; **PASSED**"
+        elif [ "${{ steps.tests.conclusion }}" == "failure" ]; then
+          nice_str="&#x274C; **FAILED**"
+        fi
+        echo "nice_str=${nice_str}" >> ${GITHUB_OUTPUT}
+    - name: Report to Matrix channel
+      if: ${{ always() && steps.generate_results.outputs.nice_str != '' }}
+      uses: s3krit/matrix-message-action@v0.0.3
+      with:
+        room_id: ${{ secrets.RIOT_CI_RELEASE_REPORT_CHANNEL }}
+        access_token: ${{ secrets.MATRIX_RIOT_CI_ACCESS_TOKEN }}
+        server: "matrix.org"
+        message: >
+          ${{ steps.generate_results.outputs.nice_str}}: Release tests
+          `[${{ join(matrix.*, ', ') }}]` on `${{ github.event_name }}`:
+          ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
     - uses: actions/upload-artifact@v2
       if: always()
       with:

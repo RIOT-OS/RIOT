@@ -25,6 +25,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,8 +35,8 @@ extern "C" {
  * @brief The maximum number of chunks that can be stored in a Chunked Ringbuffer
  *
  */
-#ifndef CHUNK_NUM_MAX
-#define CHUNK_NUM_MAX   (4)
+#ifndef CONFIG_CHUNK_NUM_MAX
+#define CONFIG_CHUNK_NUM_MAX   (4)
 #endif
 
 /**
@@ -48,8 +49,8 @@ typedef struct {
     uint8_t *cur;           /**< current write pointer */
     uint8_t *cur_start;     /**< start of the currently written chunk */
     uint8_t *protect;       /**< start of the first valid chunk */
-    uint8_t *chunk_start[CHUNK_NUM_MAX];    /**< Array to hold start of done chunks */
-    uint16_t chunk_len[CHUNK_NUM_MAX];      /**< Length of valid chunks */
+    uint8_t *chunk_start[CONFIG_CHUNK_NUM_MAX];    /**< Array to hold start of done chunks */
+    uint16_t chunk_len[CONFIG_CHUNK_NUM_MAX];      /**< Length of valid chunks */
     uint8_t chunk_cur;                      /**< Index of the first valid chunk */
 } chunk_ringbuf_t;
 

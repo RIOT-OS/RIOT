@@ -1,0 +1,16 @@
+BOARD ?= stm32f746g-disco
+include ../Makefile.drivers_common
+
+FT5X06_POLLING_MODE ?= 0
+FT5X06_POLLING_PERIOD ?= 50
+
+CFLAGS += -DFT5X06_POLLING_MODE=$(FT5X06_POLLING_MODE)
+CFLAGS += -DFT5X06_POLLING_PERIOD=$(FT5X06_POLLING_PERIOD)
+
+USEMODULE += ft5x06
+
+ifneq (0,$(FT5X06_POLLING_MODE))
+  USEMODULE += ztimer_msec
+endif
+
+include $(RIOTBASE)/Makefile.include

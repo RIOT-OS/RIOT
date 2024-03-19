@@ -1,3 +1,5 @@
 include $(RIOTBOARD)/common/remote/Makefile.features
 
-FEATURES_PROVIDED += arduino
+FEATURES_PROVIDED += arduino_analog
+FEATURES_PROVIDED += arduino_pins
+FEATURES_PROVIDED += sdcard_spi

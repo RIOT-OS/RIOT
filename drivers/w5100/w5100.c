@@ -23,9 +23,9 @@
 #include <string.h>
 
 #include "log.h"
-#include "luid.h"
 #include "assert.h"
 
+#include "net/eui_provider.h"
 #include "net/ethernet.h"
 #include "net/netdev/eth.h"
 
@@ -47,13 +47,7 @@ static const netdev_driver_t netdev_driver_w5100;
 
 static inline void send_addr(w5100_t *dev, uint16_t addr)
 {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-    spi_transfer_byte(dev->p.spi, dev->p.cs, true, (addr >> 8));
-    spi_transfer_byte(dev->p.spi, dev->p.cs, true, (addr & 0xff));
-#else
-    spi_transfer_byte(dev->p.spi, dev->p.cs, true, (addr & 0xff));
-    spi_transfer_byte(dev->p.spi, dev->p.cs, true, (addr >> 8));
-#endif
+    spi_transfer_u16_be(dev->p.spi, dev->p.cs, true, addr);
 }
 
 static uint8_t rreg(w5100_t *dev, uint16_t reg)
@@ -110,8 +104,11 @@ static void extint(void *arg)
     netdev_trigger_event_isr(&dev->nd);
 }
 
-void w5100_setup(w5100_t *dev, const w5100_params_t *params)
+void w5100_setup(w5100_t *dev, const w5100_params_t *params, uint8_t index)
 {
+    assert(dev);
+    assert(params);
+
     /* initialize netdev structure */
     dev->nd.driver = &netdev_driver_w5100;
     dev->nd.event_callback = NULL;
@@ -123,13 +120,15 @@ void w5100_setup(w5100_t *dev, const w5100_params_t *params)
     /* initialize the chip select pin and the external interrupt pin */
     spi_init_cs(dev->p.spi, dev->p.cs);
     gpio_init_int(dev->p.evt, GPIO_IN, GPIO_FALLING, extint, dev);
+
+    netdev_register(&dev->nd, NETDEV_W5100, index);
 }
 
 static int init(netdev_t *netdev)
 {
     w5100_t *dev = (w5100_t *)netdev;
     uint8_t tmp;
-    uint8_t hwaddr[ETHERNET_ADDR_LEN];
+    eui48_t hwaddr;
 
     /* get access to the SPI bus for the duration of this function */
     spi_acquire(dev->p.spi, dev->p.cs, SPI_CONF, dev->p.clk);
@@ -147,9 +146,8 @@ static int init(netdev_t *netdev)
     while (rreg(dev, REG_MODE) & MODE_RESET) {}
 
     /* initialize the device, start with writing the MAC address */
-    luid_get(hwaddr, ETHERNET_ADDR_LEN);
-    hwaddr[0] &= ~0x03;         /* no group address and not globally unique */
-    wchunk(dev, REG_SHAR0, hwaddr, ETHERNET_ADDR_LEN);
+    netdev_eui48_get(netdev, &hwaddr);
+    wchunk(dev, REG_SHAR0, hwaddr.uint8, sizeof(hwaddr));
 
     /* configure all memory to be used by socket 0 */
     wreg(dev, REG_RMSR, RMSR_8KB_TO_S0);
@@ -174,6 +172,9 @@ static int init(netdev_t *netdev)
 
     /* release the SPI bus again */
     spi_release(dev->p.spi);
+
+    /* signal link UP */
+    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
 
     return 0;
 }

@@ -4,7 +4,9 @@ INCLUDES += -I$(RIOTBASE)/pkg/u8g2/contrib
 DIRS += $(RIOTBASE)/pkg/u8g2/contrib
 
 # The RIOT-OS interface needs this to store peripheral information.
-CFLAGS += -DU8X8_WITH_USER_PTR
+ifneq (native, $(CPU))
+  CFLAGS += -DU8X8_WITH_USER_PTR
+endif
 
 # Link SDL if enabled.
 ifneq (,$(filter u8g2_sdl,$(USEMODULE)))

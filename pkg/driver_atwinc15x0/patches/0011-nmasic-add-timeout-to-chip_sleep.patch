@@ -1,0 +1,41 @@
+From ed526c48b1d7b127ddeb74970b35aec15481e7d1 Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benjamin.valentin@ml-pa.com>
+Date: Wed, 15 Jun 2022 18:41:52 +0200
+Subject: [PATCH] nmasic: add timeout to chip_sleep()
+
+---
+ src/driver/source/nmasic.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/src/driver/source/nmasic.c b/src/driver/source/nmasic.c
+index bcc766d..14d293e 100644
+--- a/src/driver/source/nmasic.c
++++ b/src/driver/source/nmasic.c
+@@ -279,15 +279,21 @@ void nmi_set_sys_clk_src_to_xo(void)
+ sint8 chip_sleep(void)
+ {
+ 	uint32 reg;
++	uint16 retries = TIMEOUT;
+ 	sint8 ret = M2M_SUCCESS;
+-	
+-	while(1)
++
++	while(--retries)
+ 	{
+ 		ret = nm_read_reg_with_ret(CORT_HOST_COMM,&reg);
+ 		if(ret != M2M_SUCCESS) goto ERR1;
+ 		if((reg & NBIT0) == 0) break;
+ 	}
+-	
++
++	if (retries == 0) {
++		M2M_ERR("Host Comm timeout");
++		return M2M_ERR_TIME_OUT;
++	}
++
+ 	/* Clear bit 1 */
+ 	ret = nm_read_reg_with_ret(WAKE_CLK_REG, &reg);
+ 	if(ret != M2M_SUCCESS)goto ERR1;
+-- 
+2.34.1
+

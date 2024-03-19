@@ -19,6 +19,7 @@
  */
 
 #include "cpu.h"
+#include "kernel_init.h"
 #include "periph_conf.h"
 #include "periph/init.h"
 #include "stdio_base.h"
@@ -117,7 +118,14 @@ static void clk_init(void)
 
     /* adjust NVM wait states */
     PM->APBBMASK.reg |= PM_APBBMASK_NVMCTRL;
-    NVMCTRL->CTRLB.reg |= NVMCTRL_CTRLB_RWS(WAITSTATES);
+    NVMCTRL->CTRLB.reg = NVMCTRL_CTRLB_RWS(WAITSTATES)
+#ifdef CPU_SAMD20
+    /* errata: In Standby, Idle1 and Idle2 Sleep modes,
+               the device might not wake up from sleep. */
+                       | NVMCTRL_CTRLB_SLEEPPRM_DISABLED
+#endif
+    /* errata: Default value of MANW in NVM.CTRLB is 0. */
+                       | NVMCTRL_CTRLB_MANW;
     PM->APBBMASK.reg &= ~PM_APBBMASK_NVMCTRL;
 
 #if CLOCK_8MHZ
@@ -274,7 +282,7 @@ void cpu_init(void)
     dma_init();
 #endif
     /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
-    stdio_init();
+    early_init();
     /* trigger static peripheral initialization */
     periph_init();
 }

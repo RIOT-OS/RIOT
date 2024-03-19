@@ -133,7 +133,7 @@ size_t cc2420_tx_prepare(cc2420_t *dev, const iolist_t *iolist)
             cc2420_fifo_write(dev, iol->iol_base, iol->iol_len);
         }
     }
-    DEBUG("cc2420: tx_prep: loaded %i byte into the TX FIFO\n", (int)pkt_len);
+    DEBUG("cc2420: tx_prep: loaded %" PRIuSIZE " byte into the TX FIFO\n", pkt_len);
 
     return pkt_len;
 }

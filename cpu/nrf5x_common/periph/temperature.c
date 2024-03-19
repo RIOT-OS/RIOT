@@ -63,6 +63,6 @@ const saul_reg_info_t nrf_temperature_saul_info = {
 
 const saul_driver_t nrf_temperature_saul_driver = {
     .read = _read_temperature,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_TEMP,
 };

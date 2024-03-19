@@ -38,7 +38,7 @@ since the RP2040 contains no internal flash.
 | Watchdog   | 1                                                            |
 | SSI/QSPI   | 1 (connected to flash, with XIP support)                     |
 | Vcc        | 1.62V - 3.63V                                                |
-| Datasheet  | [Datasheet](https://www.raspberrypi.org/homepage-9df4b/static/rp2040@2x-d1b9dae9345ad2bd15a23c6a567edb5c.jpg) |
+| Datasheet  | [Datasheet](https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf) |
 
 ### User Interface
 

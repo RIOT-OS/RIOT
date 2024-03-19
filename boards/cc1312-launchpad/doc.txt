@@ -3,20 +3,13 @@
 @ingroup         boards
 @brief           Texas Instruments SimpleLink(TM) CC1312 Wireless MCU LaunchPad(TM) Kit
 
-## <a name="cc1312_launchpad_toc"> Table of Contents </a> &nbsp;[[TOC]](#cc1312_launchpad_toc)
-
-1. [Overview](#cc1312_launchpad_overview)
-2. [Hardware](#cc1312_launchpad_hardware)
-3. [Board pinout](#cc1312_launchpad_pinout)
-4. [Flashing the Device](#cc1312_launchpad_flashing)
-
-## <a name="cc1312_launchpad_overview"> Overview </a> &nbsp;[[TOC]](#cc1312_launchpad_toc)
+## Overview
 
 The [LAUNCHXL-CC1312R1](http://www.ti.com/tool/LAUNCHXL-CC1312R1) is a Texas
 Instrument's development kit for the CC1312R1 SoC MCU which combines a
 Cortex-M4F microcontroller alongside a dedicated Cortex-M0 to control radio.
 
-## <a name="cc1312_launchpad_hardware"> Hardware </a> &nbsp;[[TOC]](#cc1312_launchpad_toc)
+## Hardware
 
 ![LAUNCHXL-CC1312R1](http://www.ti.com/diagrams/launchxl-cc1312r1_cc1312r1-top-prof1.jpg)
 
@@ -37,12 +30,12 @@ Cortex-M4F microcontroller alongside a dedicated Cortex-M0 to control radio.
 | Datasheet         | [Datasheet](http://www.ti.com/lit/ds/symlink/cc1312r.pdf) (pdf file) |
 | Reference Manual  | [Reference Manual](http://www.ti.com/lit/ug/swcu185d/swcu185d.pdf) |
 
-## <a name="cc1312_launchpad_pinout"> Board pinout </a> &nbsp;[[TOC]](#cc1312_launchpad_toc)
+## Board pinout
 
 The [LAUNXHL-CC1312R Quick Start Guide](http://www.ti.com/lit/ml/swru535c/swru535c.pdf)
 provides the default pinout for the board.
 
-## <a name="cc1312_launchpad_flashing"> Flashing the Device </a> &nbsp;[[TOC]](#cc1312_launchpad_toc)
+## Flashing the Device
 
 Flashing RIOT is quite straight forward. The board comes with an XDS110 on-board
 debug probe that provides programming, flashing and debugging capabilities

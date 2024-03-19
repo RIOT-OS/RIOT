@@ -35,6 +35,6 @@ static int _read(const void *dev, phydat_t *data)
 
 const saul_driver_t tsl4531x_saul_driver = {
     .read = _read,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_LIGHT
 };

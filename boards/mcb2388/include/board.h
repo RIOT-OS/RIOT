@@ -20,7 +20,6 @@
 #define BOARD_H
 
 #include "lpc23xx.h"
-#include "mtd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -99,8 +98,8 @@ extern "C" {
 #define HD44780_PARAM_PIN_RS            GPIO_PIN(1, 28)
 #define HD44780_PARAM_PIN_RW            GPIO_PIN(1, 29)
 #define HD44780_PARAM_PIN_ENABLE        GPIO_PIN(1, 31)
-#define HD44780_PARAM_PINS_DATA         {   GPIO_PIN(1,24), GPIO_PIN(1,25), \
-                                            GPIO_PIN(1,26), GPIO_PIN(1,27), \
+#define HD44780_PARAM_PINS_DATA         {   GPIO_PIN(1, 24), GPIO_PIN(1, 25), \
+                                            GPIO_PIN(1, 26), GPIO_PIN(1, 27), \
                                             GPIO_UNDEF,     GPIO_UNDEF,     \
                                             GPIO_UNDEF,     GPIO_UNDEF      }
 /** @} */
@@ -110,8 +109,7 @@ extern "C" {
  * @{
  */
 #ifdef MODULE_MTD_MCI
-extern mtd_dev_t *mtd0;
-#define MTD_0 mtd0
+#define MTD_0 mtd_dev_get(0)
 #endif
 /** @} */
 

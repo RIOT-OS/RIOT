@@ -86,18 +86,18 @@ static int _hum_read(const void *dev, phydat_t *res)
 
 const saul_driver_t scd30_co2_saul_driver = {
     .read = _co2_read,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_CO2,
 };
 
 const saul_driver_t scd30_temp_saul_driver = {
     .read = _temp_read,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_TEMP,
 };
 
 const saul_driver_t scd30_hum_saul_driver = {
     .read = _hum_read,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_HUM,
 };

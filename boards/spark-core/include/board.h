@@ -37,32 +37,17 @@
  * @name    Macros for controlling the on-board LEDs
  * @{
  */
-#define LED0_PIN            GPIO_PIN(PORT_A, 9)
-#define LED1_PIN            GPIO_PIN(PORT_A, 10)
-#define LED2_PIN            GPIO_PIN(PORT_A, 8)
-#define LED3_PIN            GPIO_PIN(PORT_A, 13)
+#define LED0_PIN_NUM        9
+#define LED0_PORT_NUM       PORT_A
 
-#define LED_PORT            (GPIOA)
-#define LED0_MASK           (1 << 9)
-#define LED1_MASK           (1 << 10)
-#define LED2_MASK           (1 << 8)
-#define LED3_MASK           (1 << 13)
+#define LED1_PIN_NUM        10
+#define LED1_PORT_NUM       PORT_A
 
-#define LED0_ON             (LED_PORT->BRR  = LED0_MASK)
-#define LED0_OFF            (LED_PORT->BSRR = LED0_MASK)
-#define LED0_TOGGLE         (LED_PORT->ODR ^= LED0_MASK)
+#define LED2_PIN_NUM        8
+#define LED2_PORT_NUM       PORT_A
 
-#define LED1_ON             (LED_PORT->BRR  = LED1_MASK)
-#define LED1_OFF            (LED_PORT->BSRR = LED1_MASK)
-#define LED1_TOGGLE         (LED_PORT->ODR ^= LED1_MASK)
-
-#define LED2_ON             (LED_PORT->BRR  = LED2_MASK)
-#define LED2_OFF            (LED_PORT->BSRR = LED2_MASK)
-#define LED2_TOGGLE         (LED_PORT->ODR ^= LED2_MASK)
-
-#define LED3_ON             (LED_PORT->BRR  = LED3_MASK)
-#define LED3_OFF            (LED_PORT->BSRR = LED3_MASK)
-#define LED3_TOGGLE         (LED_PORT->ODR ^= LED3_MASK)
+#define LED3_PIN_NUM        13
+#define LED3_PORT_NUM       PORT_A
 /** @} */
 
 /**
@@ -90,14 +75,11 @@
 #define EXTFLASH            GPIO_PIN(PORT_B,9)
 /** @} */
 
-/**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
+
+#include "stm32_leds.h"
 
 #endif /* BOARD_H */
 /** @} */

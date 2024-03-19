@@ -24,6 +24,9 @@
 #include "rmutex.h"
 #include "syscalls.h"
 #include "thread.h"
+#if IS_USED(MODULE_ZTIMER_MSEC)
+#include "ztimer.h"
+#endif
 
 #include "rom/ets_sys.h"
 
@@ -55,7 +58,7 @@ QueueHandle_t xQueueGenericCreate( const UBaseType_t uxQueueLength,
                                    const UBaseType_t uxItemSize,
                                    const uint8_t ucQueueType )
 {
-    DEBUG("%s pid=%d len=%u size=%u type=%u ", __func__,
+    DEBUG("%s pid=%d len=%u size=%u type=%u\n", __func__,
           thread_getpid(), uxQueueLength, uxItemSize, ucQueueType);
 
     uint32_t queue_size = uxQueueLength * uxItemSize;
@@ -92,7 +95,8 @@ QueueHandle_t xQueueCreateCountingSemaphore (const UBaseType_t uxMaxCount,
     queue = xQueueGenericCreate(uxMaxCount, queueSEMAPHORE_QUEUE_ITEM_LENGTH,
                                 queueQUEUE_TYPE_COUNTING_SEMAPHORE);
 
-    DEBUG("%s pid=%d queue=%p\n", __func__, thread_getpid(), queue);
+    DEBUG("%s pid=%d queue=%p max=%d initial=%d\n", __func__,
+          thread_getpid(), queue, uxMaxCount, uxInitialCount);
 
     if (queue != NULL) {
         queue->item_level = uxInitialCount;
@@ -110,14 +114,92 @@ void vQueueDelete( QueueHandle_t xQueue )
     free(xQueue);
 }
 
+BaseType_t IRAM_ATTR xQueueReset( QueueHandle_t xQueue )
+{
+    DEBUG("%s pid=%d queue=%p\n", __func__, thread_getpid(), xQueue);
+
+    assert(xQueue != NULL);
+
+    vTaskEnterCritical(0);
+
+    _queue_t* queue = (_queue_t*)xQueue;
+    queue->item_front = 0;
+    queue->item_tail = 0;
+    queue->item_level = 0;
+
+    /* return if there is no waiting sending thread */
+    if (queue->sending.next == NULL) {
+        DEBUG("%s pid=%d queue=%p return pdPASS\n", __func__,
+              thread_getpid(), xQueue);
+        vTaskExitCritical(0);
+        return pdPASS;
+    }
+
+    /* otherwise unlock the waiting sending thread */
+    list_node_t *next = list_remove_head(&queue->sending);
+    thread_t *proc = container_of((clist_node_t*)next, thread_t, rq_entry);
+    sched_set_status(proc, STATUS_PENDING);
+
+    /* test whether context switch is required */
+    bool ctx_switch = proc->priority < thread_get_priority(thread_get_active());
+
+    DEBUG("%s pid=%d queue=%p unlock waiting pid=%d switch=%d\n",
+          __func__, thread_getpid(), xQueue, proc->pid, ctx_switch);
+
+    if (ctx_switch) {
+        vTaskExitCritical(0);
+        /* sets only the sched_context_switch_request in ISRs */
+        sched_switch(proc->priority);
+    }
+    else {
+        vTaskExitCritical(0);
+    }
+
+    return pdPASS;
+}
+
+#if IS_USED(MODULE_ZTIMER_MSEC)
+
+/* descriptor for timeout handling for a thread that is waiting in a queue */
+typedef struct {
+    thread_t *thread;       /* the thread */
+    list_node_t *queue;     /* the queue in which it is waiting */
+    bool timeout;           /* timeout occurred */
+} _queue_waiting_thread_t;
+
+static void _queue_timeout(void *arg)
+{
+    _queue_waiting_thread_t *wtd = arg;
+
+    assert(wtd != NULL);
+    assert(wtd->queue != NULL);
+    assert(wtd->thread != NULL);
+
+    vTaskEnterCritical(0);
+
+    /* remove the thread from the waiting queue */
+    list_node_t *node = (list_node_t *)&(wtd->thread->rq_entry);
+    list_remove(wtd->queue, node);
+
+    /* unblock the waintg thread */
+    sched_set_status(wtd->thread, STATUS_PENDING);
+    sched_context_switch_request =
+        wtd->thread->priority < thread_get_priority(thread_get_active());
+
+    wtd->timeout = true;
+
+    vTaskExitCritical(0);
+}
+#endif
+
 BaseType_t IRAM_ATTR _queue_generic_send(QueueHandle_t xQueue,
                                          const void * const pvItemToQueue,
                                          const BaseType_t xCopyPosition,
                                          TickType_t xTicksToWait,
                                          BaseType_t * const pxHigherPriorityTaskWoken)
 {
-    DEBUG("%s pid=%d prio=%d queue=%p pos=%d wait=%u woken=%p isr=%d\n", __func__,
-          thread_getpid(), sched_threads[thread_getpid()]->priority,
+    DEBUG("%s pid=%d prio=%d queue=%p pos=%d wait=%"PRIu32" woken=%p isr=%d\n", __func__,
+          thread_getpid(), thread_get_priority(thread_get_active()),
           xQueue, xCopyPosition, xTicksToWait, pxHigherPriorityTaskWoken,
           irq_is_in());
 
@@ -163,7 +245,7 @@ BaseType_t IRAM_ATTR _queue_generic_send(QueueHandle_t xQueue,
                 list_node_t *next = list_remove_head(&queue->receiving);
                 thread_t *proc = container_of((clist_node_t*)next, thread_t, rq_entry);
                 sched_set_status(proc, STATUS_PENDING);
-                ctx_switch = proc->priority < sched_threads[thread_getpid()]->priority;
+                ctx_switch = proc->priority < thread_get_priority(thread_get_active());
 
                 DEBUG("%s pid=%d queue=%p unlock waiting pid=%d switch=%d\n",
                       __func__, thread_getpid(), xQueue, proc->pid, ctx_switch);
@@ -198,16 +280,39 @@ BaseType_t IRAM_ATTR _queue_generic_send(QueueHandle_t xQueue,
         else {
             /* suspend the calling thread to wait for space in the queue */
             thread_t *me = thread_get_active();
-            sched_set_status(me, STATUS_SEND_BLOCKED);
+            sched_set_status(me, STATUS_MUTEX_BLOCKED);
             /* waiting list is sorted by priority */
             thread_add_to_list(&queue->sending, me);
 
             DEBUG("%s pid=%d queue=%p suspended calling thread\n", __func__,
                   thread_getpid(), xQueue);
+
+#if IS_USED(MODULE_ZTIMER_MSEC)
+            _queue_waiting_thread_t wdt = { .queue = &queue->sending,
+                                            .thread = me,
+                                            .timeout = false };
+            ztimer_t tm = { .callback = _queue_timeout,
+                            .arg = &wdt };
+            if (xTicksToWait < portMAX_DELAY) {
+                ztimer_set(ZTIMER_MSEC, &tm, xTicksToWait * portTICK_PERIOD_MS);
+            }
+#else
+            assert((xTicksToWait == 0) || (xTicksToWait == portMAX_DELAY));
+#endif
             vTaskExitCritical(0);
             thread_yield_higher();
 
-            /* TODO timeout handling with xTicksToWait */
+#if IS_USED(MODULE_ZTIMER_MSEC)
+            vTaskEnterCritical(0);
+            if (xTicksToWait < portMAX_DELAY) {
+                ztimer_remove(ZTIMER_MSEC, &tm);
+                if (wdt.timeout) {
+                    vTaskExitCritical(0);
+                    return errQUEUE_FULL;
+                }
+            }
+            vTaskExitCritical(0);
+#endif
             DEBUG("%s pid=%d queue=%p continue calling thread\n", __func__,
                   thread_getpid(), xQueue);
         }
@@ -222,8 +327,8 @@ BaseType_t IRAM_ATTR _queue_generic_recv (QueueHandle_t xQueue,
                                           const BaseType_t xJustPeeking,
                                           BaseType_t * const pxHigherPriorityTaskWoken)
 {
-    DEBUG("%s pid=%d prio=%d queue=%p wait=%u peek=%u woken=%p isr=%d\n", __func__,
-          thread_getpid(), sched_threads[thread_getpid()]->priority,
+    DEBUG("%s pid=%d prio=%d queue=%p wait=%"PRIu32" peek=%u woken=%p isr=%d\n", __func__,
+          thread_getpid(), thread_get_priority(thread_get_active()),
           xQueue, xTicksToWait, xJustPeeking, pxHigherPriorityTaskWoken,
           irq_is_in());
 
@@ -269,7 +374,7 @@ BaseType_t IRAM_ATTR _queue_generic_recv (QueueHandle_t xQueue,
             sched_set_status(proc, STATUS_PENDING);
 
             /* test whether context switch is required */
-            bool ctx_switch = proc->priority < sched_threads[thread_getpid()]->priority;
+            bool ctx_switch = proc->priority < thread_get_priority(thread_get_active());
 
             DEBUG("%s pid=%d queue=%p unlock waiting pid=%d switch=%d\n",
             __func__, thread_getpid(), xQueue, proc->pid, ctx_switch);
@@ -303,17 +408,39 @@ BaseType_t IRAM_ATTR _queue_generic_recv (QueueHandle_t xQueue,
         else {
             /* suspend the calling thread to wait for an item in the queue */
             thread_t *me = thread_get_active();
-            sched_set_status(me, STATUS_RECEIVE_BLOCKED);
+            sched_set_status(me, STATUS_MUTEX_BLOCKED);
             /* waiting list is sorted by priority */
             thread_add_to_list(&queue->receiving, me);
 
             DEBUG("%s pid=%d queue=%p suspended calling thread\n", __func__,
                   thread_getpid(), xQueue);
 
+#if IS_USED(MODULE_ZTIMER_MSEC)
+            _queue_waiting_thread_t wdt = { .queue = &queue->receiving,
+                                            .thread = me,
+                                            .timeout = false };
+            ztimer_t tm = { .callback = _queue_timeout,
+                            .arg = &wdt };
+            if (xTicksToWait < portMAX_DELAY) {
+                ztimer_set(ZTIMER_MSEC, &tm, xTicksToWait * portTICK_PERIOD_MS);
+            }
+#else
+            assert((xTicksToWait == 0) || (xTicksToWait == portMAX_DELAY));
+#endif
             vTaskExitCritical(0);
             thread_yield_higher();
 
-            /* TODO timeout handling with xTicksToWait */
+#if IS_USED(MODULE_ZTIMER_MSEC)
+            vTaskEnterCritical(0);
+            if (xTicksToWait < portMAX_DELAY) {
+                ztimer_remove(ZTIMER_MSEC, &tm);
+                if (wdt.timeout) {
+                    vTaskExitCritical(0);
+                    return errQUEUE_FULL;
+                }
+            }
+            vTaskExitCritical(0);
+#endif
             DEBUG("%s pid=%d queue=%p continue calling thread\n", __func__,
                   thread_getpid(), xQueue);
         }
@@ -326,8 +453,8 @@ BaseType_t IRAM_ATTR xQueueGenericSend( QueueHandle_t xQueue,
                                         TickType_t xTicksToWait,
                                         const BaseType_t xCopyPosition )
 {
-    DEBUG("%s pid=%d prio=%d queue=%p wait=%u pos=%d\n", __func__,
-          thread_getpid(), sched_threads[thread_getpid()]->priority,
+    DEBUG("%s pid=%d prio=%d queue=%p wait=%"PRIu32" pos=%d\n", __func__,
+          thread_getpid(), thread_get_priority(thread_get_active()),
           xQueue, xTicksToWait, xCopyPosition);
 
     return _queue_generic_send(xQueue, pvItemToQueue, xCopyPosition,
@@ -340,7 +467,7 @@ BaseType_t IRAM_ATTR xQueueGenericSendFromISR( QueueHandle_t xQueue,
                                                const BaseType_t xCopyPosition )
 {
     DEBUG("%s pid=%d prio=%d queue=%p pos=%d woken=%p\n", __func__,
-          thread_getpid(), sched_threads[thread_getpid()]->priority,
+          thread_getpid(), thread_get_priority(thread_get_active()),
           xQueue, xCopyPosition, pxHigherPriorityTaskWoken);
 
     return _queue_generic_send(xQueue, pvItemToQueue, xCopyPosition,
@@ -352,8 +479,8 @@ BaseType_t IRAM_ATTR xQueueGenericReceive (QueueHandle_t xQueue,
                                            TickType_t xTicksToWait,
                                            const BaseType_t xJustPeeking)
 {
-    DEBUG("%s pid=%d prio=%d queue=%p wait=%u peek=%d\n", __func__,
-          thread_getpid(), sched_threads[thread_getpid()]->priority,
+    DEBUG("%s pid=%d prio=%d queue=%p wait=%"PRIu32" peek=%d\n", __func__,
+          thread_getpid(), thread_get_priority(thread_get_active()),
           xQueue, xTicksToWait, xJustPeeking);
 
     return _queue_generic_recv(xQueue, pvBuffer, xTicksToWait,
@@ -365,7 +492,7 @@ BaseType_t IRAM_ATTR xQueueReceiveFromISR (QueueHandle_t xQueue,
                                            BaseType_t * const pxHigherPriorityTaskWoken)
 {
     DEBUG("%s pid=%d prio=%d queue=%p woken=%p\n", __func__,
-          thread_getpid(), sched_threads[thread_getpid()]->priority,
+          thread_getpid(), thread_get_priority(thread_get_active()),
           xQueue, pxHigherPriorityTaskWoken);
 
     return _queue_generic_recv(xQueue, pvBuffer, 0,
@@ -383,11 +510,12 @@ UBaseType_t uxQueueMessagesWaiting( QueueHandle_t xQueue )
 BaseType_t xQueueGiveFromISR (QueueHandle_t xQueue,
                               BaseType_t * const pxHigherPriorityTaskWoken)
 {
-    /* this function only satisfies the linker and should not be called */
-    assert(0);
+    DEBUG("%s pid=%d prio=%d queue=%p woken=%p\n", __func__,
+          thread_getpid(), thread_get_priority(thread_get_active()),
+          xQueue, pxHigherPriorityTaskWoken);
 
-    DEBUG("%s\n", __func__);
-    return pdFALSE;
+    return _queue_generic_send(xQueue, NULL, queueSEND_TO_BACK,
+                               0, pxHigherPriorityTaskWoken);
 }
 
 #endif /* DOXYGEN */

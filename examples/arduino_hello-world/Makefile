@@ -1,3 +1,5 @@
+BOARD ?= arduino-zero
+
 # name of your application
 APPLICATION = arduino_hello-world
 

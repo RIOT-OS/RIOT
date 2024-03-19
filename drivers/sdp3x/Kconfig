@@ -6,7 +6,9 @@
 #
 
 menuconfig MODULE_SDP3X
-    bool "SDP3X temperature and differential pressure sensor"
+    bool
+    prompt "SDP3X temperature and differential pressure sensor" if !(MODULE_SAUL_DEFAULT && HAVE_SDP3X)
+    default (MODULE_SAUL_DEFAULT && HAVE_SDP3X)
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
@@ -15,8 +17,21 @@ menuconfig MODULE_SDP3X
 
 config MODULE_SDP3X_IRQ
     bool "GPIO interrupt support"
+    default HAVE_SDP3X_IRQ
     depends on HAS_PERIPH_GPIO
     depends on HAS_PERIPH_GPIO_IRQ
     depends on MODULE_SDP3X
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_GPIO_IRQ
+
+config HAVE_SDP3X
+    bool
+    help
+      Indicates that a SDP3X temperature and differential pressure sensor is present.
+
+config HAVE_SDP3X_IRQ
+    bool
+    select HAVE_SDP3X
+    help
+      Indicates that a SDP3X temperature and differential pressure sensor is
+      present with the interrupt pin wired.

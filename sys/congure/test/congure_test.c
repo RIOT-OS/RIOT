@@ -19,9 +19,9 @@
 #include <stdlib.h>
 
 #include "clist.h"
-#include "fmt.h"
-
 #include "congure/test.h"
+#include "fmt.h"
+#include "shell.h"
 
 static congure_snd_msg_t _msgs_pool[CONFIG_CONGURE_TEST_LOST_MSG_POOL_SIZE];
 static unsigned _msgs_pool_idx;
@@ -44,6 +44,9 @@ int congure_test_clear_state(int argc, char **argv)
     congure_test_msgs_reset(argc, argv);
     return 0;
 }
+
+SHELL_COMMAND(cong_clear, "Clears CongURE state object",
+        congure_test_clear_state);
 
 int congure_test_call_setup(int argc, char **argv)
 {
@@ -69,6 +72,10 @@ int congure_test_call_setup(int argc, char **argv)
     print_str("\"}\n");
     return 0;
 }
+
+SHELL_COMMAND(cong_setup,
+        "Calls the setup function for the CongURE state object",
+        congure_test_call_setup);
 
 static inline bool _check_driver(congure_test_snd_t *c)
 {
@@ -103,6 +110,9 @@ int congure_test_call_init(int argc, char **argv)
     return 0;
 }
 
+SHELL_COMMAND(cong_init, "Calls init method of the CongURE state object",
+        congure_test_call_init);
+
 int congure_test_call_inter_msg_interval(int argc, char **argv)
 {
     congure_test_snd_t *c = congure_test_get_state();
@@ -128,6 +138,10 @@ int congure_test_call_inter_msg_interval(int argc, char **argv)
     print_str("}\n");
     return 0;
 }
+
+SHELL_COMMAND(cong_imi,
+        "Calls inter_message_interval method of the CongURE state object",
+        congure_test_call_inter_msg_interval);
 
 int congure_test_add_msg(int argc, char **argv)
 {
@@ -169,6 +183,11 @@ int congure_test_add_msg(int argc, char **argv)
     return 0;
 }
 
+SHELL_COMMAND(cong_add_msg,
+        "Adds a message to the list of messages to be reported with "
+        "report_msgs_lost or report_msgs_timeout",
+        congure_test_add_msg);
+
 int congure_test_msgs_reset(int argc, char **argv)
 {
     (void)argc;
@@ -178,6 +197,11 @@ int congure_test_msgs_reset(int argc, char **argv)
     print_str("{\"success\":null}\n");
     return 0;
 }
+
+SHELL_COMMAND(cong_msgs_reset,
+        "Resets the list of messages to be reported with report_msgs_lost or "
+        "report_msgs_timeout",
+        congure_test_msgs_reset);
 
 static int _call_report_msg_sent(int argc, char **argv)
 {
@@ -363,5 +387,9 @@ int congure_test_call_report(int argc, char **argv)
     print_str("`\"}\n");
     return 1;
 }
+
+SHELL_COMMAND(cong_report,
+        "Calls a report_* method of the CongURE state object",
+        congure_test_call_report);
 
 /** @} */

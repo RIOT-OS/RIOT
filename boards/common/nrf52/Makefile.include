@@ -8,7 +8,16 @@ ifeq (bmp,$(PROGRAMMER))
   PORT_DARWIN ?= $(wordlist 2, 2, $(sort $(wildcard /dev/tty.usbmodem*)))
 endif
 
-PROGRAMMER ?= jlink
+# set list of supported programmers
+PROGRAMMERS_SUPPORTED += openocd bmp
+# keep name of `JLINK` in sync with script jlink.sh in $(RIOTTOOLS)/jlink
+JLINK ?= JLinkExe
+ifneq (,$(shell command -v $(JLINK)))
+  PROGRAMMER ?= jlink
+else
+  PROGRAMMER ?= openocd
+endif
+
 # setup JLink for flashing
 JLINK_DEVICE = nrf52
 # setup OpenOCD for flashing. Version 0.10 of OpenOCD doesn't contain support
@@ -16,13 +25,3 @@ JLINK_DEVICE = nrf52
 # build from source (master > 2018, August the 13rd) is required.
 OPENOCD_DEBUG_ADAPTER ?= jlink
 OPENOCD_CONFIG = $(RIOTBOARD)/common/nrf52/dist/openocd.cfg
-
-ifneq (,$(filter $(BOARD),ruuvitag thingy52))
-  # openocd doesn't fully work with ruuvitag and thingy52
-  ifeq (openocd,$(PROGRAMMER))
-    $(error Cannot use OpenOCD with $(BOARD) board)
-  endif
-endif
-
-# set list of supported programmers
-PROGRAMMERS_SUPPORTED += bmp openocd

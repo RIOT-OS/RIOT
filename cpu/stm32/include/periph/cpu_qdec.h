@@ -52,7 +52,10 @@ typedef struct {
     uint32_t rcc_mask;              /**< bit in clock enable register */
     qdec_chan_t chan[QDEC_CHAN];    /**< channel mapping, set to {GPIO_UNDEF, 0}
                                      *   if not used */
-#ifndef CPU_FAM_STM32F1
+#ifdef CPU_FAM_STM32F1
+    uint32_t remap;                 /**< AFIO remap mask to route periph to other
+                                         pins (or zero, if not needed) */
+#else
     gpio_af_t af;                   /**< alternate function used */
 #endif
     uint8_t bus;                    /**< APB bus */

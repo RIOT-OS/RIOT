@@ -15,4 +15,4 @@ menuconfig MODULE_ISRPIPE
 config MODULE_ISRPIPE_READ_TIMEOUT
     bool "ISR Pipe read with timeout"
     depends on MODULE_ISRPIPE
-    select MODULE_XTIMER
+    select ZTIMER_USEC

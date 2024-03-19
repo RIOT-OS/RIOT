@@ -1,0 +1,29 @@
+From 9664046ab3fb2355fc3058bef90cc8727a67730b Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benjamin.valentin@ml-pa.com>
+Date: Wed, 15 Jun 2022 18:06:09 +0200
+Subject: [PATCH 1/3] nmasic: always use 2000 retries
+
+---
+ src/driver/source/nmasic.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/src/driver/source/nmasic.c b/src/driver/source/nmasic.c
+index 91c0e5a..9f46398 100644
+--- a/src/driver/source/nmasic.c
++++ b/src/driver/source/nmasic.c
+@@ -59,11 +59,7 @@
+ 
+ 
+ 
+-#ifdef ARDUINO
+-#define TIMEOUT						(2000)
+-#else
+-#define TIMEOUT						(0xfffffffful)
+-#endif
++#define TIMEOUT				(2000)
+ #define WAKUP_TRAILS_TIMEOUT		(4)
+ 
+ sint8 chip_apply_conf(uint32 u32Conf)
+-- 
+2.34.1
+

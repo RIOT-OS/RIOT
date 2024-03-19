@@ -63,3 +63,4 @@ static const lc709203f_params_t params_default[] = {
 }
 #endif
 #endif /* LC709203F_PARAMS_H */
+/** @} */

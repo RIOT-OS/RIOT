@@ -1,0 +1,27 @@
+From 87051385205f8bf4829bfbb8309c8141a6108481 Mon Sep 17 00:00:00 2001
+From: Dylan Laduranty <dylan.laduranty@mesotic.com>
+Date: Fri, 30 Sep 2022 22:07:24 +0200
+Subject: [PATCH 3/3] src/portable/microchip: update header file for RIOT
+ support
+
+Signed-off-by: Dylan Laduranty <dylan.laduranty@mesotic.com>
+---
+ src/portable/microchip/samd/dcd_samd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/portable/microchip/samd/dcd_samd.c b/src/portable/microchip/samd/dcd_samd.c
+index 22fe32407..cf9c1af69 100644
+--- a/src/portable/microchip/samd/dcd_samd.c
++++ b/src/portable/microchip/samd/dcd_samd.c
+@@ -31,7 +31,7 @@
+      CFG_TUSB_MCU == OPT_MCU_SAMD51 || CFG_TUSB_MCU == OPT_MCU_SAME5X || \
+      CFG_TUSB_MCU == OPT_MCU_SAML22 || CFG_TUSB_MCU == OPT_MCU_SAML21)
+ 
+-#include "sam.h"
++#include "cpu_conf.h"
+ #include "device/dcd.h"
+ 
+ /*------------------------------------------------------------------*/
+-- 
+2.17.1
+

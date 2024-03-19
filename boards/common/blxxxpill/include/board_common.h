@@ -32,32 +32,21 @@ extern "C" {
  * @name   Macros for controlling the on-board LED.
  * @{
  */
-#ifndef LED0_PORT
-#define LED0_PORT           GPIOC                                   /**< GPIO-Port the LED is connected to */
+#ifndef LED0_PORT_NUM
+#define LED0_PORT_NUM       PORT_C                                  /**< GPIO Port number the LED is connected to */
 #endif
-#ifndef LED0_PORTNUM
-#define LED0_PORTNUM        PORT_C                                  /**< GPIO Port number the LED is connected to */
+#ifndef LED0_PIN_NUM
+#define LED0_PIN_NUM        (13)                                    /**< Pin number the LED is connected to */
 #endif
-#ifndef LED0_PINNUM
-#define LED0_PINNUM         (13)                                    /**< Pin number the LED is connected to */
+#ifndef LED0_IS_INVERTED
+#define LED0_IS_INVERTED    1
 #endif
-#define LED0_PIN            GPIO_PIN(LED0_PORTNUM, LED0_PINNUM)     /**< GPIO-Pin the LED is connected to */
-#define LED0_MASK           (1 << LED0_PINNUM)
-
-#define LED0_ON             (LED0_PORT->BSRR = (LED0_MASK << 16))   /**< Turn LED0 on */
-#define LED0_OFF            (LED0_PORT->BSRR = LED0_MASK)           /**< Turn LED0 off */
-#define LED0_TOGGLE         (LED0_PORT->ODR  ^= LED0_MASK)          /**< Toggle LED0 */
 /** @} */
 
 /**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
+ * @brief   Use the fist UART for STDIO on this board
  */
-void board_init(void);
-
-/**
- * @brief   Use the 2nd UART for STDIO on this board
- */
-#define STDIO_UART_DEV      UART_DEV(1)
+#define STDIO_UART_DEV      UART_DEV(0)
 
 /**
  * @name    xtimer configuration
@@ -67,17 +56,11 @@ void board_init(void);
 #define XTIMER_BACKOFF      (19)
 /** @} */
 
-/* The boards debug header only exports  SWD, so JTAG-only pins PA15, PB3(*),
- * and PB4 can be remapped as regular GPIOs instead. (Note: PB3 is also used as
- * SWO.  The user needs to take care to not enable SWO with the debugger while
- * at the same time PB3 is used as GPIO. But RIOT does not use SWO in any case,
- * so if a user adds this feature in her/his own code, she/he should be well
- * aware of this.)
- */
-#define STM32F1_DISABLE_JTAG    /**< Disable JTAG to allow pins being used as GPIOs */
 #ifdef __cplusplus
 }
 #endif
+
+#include "stm32_leds.h"
 
 #endif /* BOARD_COMMON_H */
 /** @} */

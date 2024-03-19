@@ -6,9 +6,12 @@
 #
 
 menuconfig MODULE_CC2538_RF
-    bool "CC2538 IEEE 802.15.4 radio"
+    bool
+    prompt "CC2538 IEEE 802.15.4 radio" if !(MODULE_NETDEV_DEFAULT && HAVE_CC2538_RF)
+    default (MODULE_NETDEV_DEFAULT && HAVE_CC2538_RF)
     depends on TEST_KCONFIG
     depends on CPU_FAM_CC2538
+    select HAVE_IEEE802154_RADIO_HAL_INTERFACE
 
 if MODULE_CC2538_RF
 
@@ -25,6 +28,5 @@ endif # MODULE_CC2538_RF
 
 config HAVE_CC2538_RF
     bool
-    select MODULE_CC2538_RF if MODULE_NETDEV_DEFAULT
     help
         Indicates that a cc2538 radio is present.

@@ -28,22 +28,35 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters for the PIR driver
+ * @name    default configuration parameters for the PIR driver
  * @{
  */
 #ifndef PIR_PARAM_GPIO
+/**
+ * @brief   GPIO pin the PIR is connected to
+ */
 #define PIR_PARAM_GPIO             GPIO_PIN(0, 6)
 #endif
 #ifndef PIR_PARAM_ACTIVE_HIGH
+/**
+ * @brief   Signal polarity: 1 means high on active, 0 means low on active
+ */
 #define PIR_PARAM_ACTIVE_HIGH      1
 #endif
 
 #ifndef PIR_PARAMS
+/**
+ * @brief   The PIR configuration parameters
+ */
 #define PIR_PARAMS                 { .gpio = PIR_PARAM_GPIO, \
                                      .active_high = PIR_PARAM_ACTIVE_HIGH }
 #endif
+
 #ifndef PIR_SAUL_INFO
-#define PIR_SAUL_INFO              { .name = "pir" }
+/**
+ * @brief   The SAUL information the PIR devices get registered with
+ */
+#define PIR_SAUL_INFO              { .name = "PIR" }
 #endif
 /**@}*/
 

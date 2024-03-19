@@ -17,9 +17,10 @@
   - "**/*.mk"
 
 "Area: CI":
-  - ".circleci/**/*"
   - ".github/**/*.yml"
   - ".murdock"
+  - ".murdock.yml"
+  - "bors.toml"
 
 "Area: CoAP":
   - "sys/net/application_layer/*coap/**/*"
@@ -117,7 +118,9 @@
 
 "Platform: native":
   - "boards/native/**/*"
+  - "boards/native64/**/*"
   - "cpu/native/**/*"
+  - "makefiles/arch/native.inc.mk"
 
 "Platform: ARM":
   - "cpu/arm7_common/**/*"
@@ -141,10 +144,6 @@
 
 "Platform: ESP":
   - "cpu/esp*/**/*"
-
-"Platform: MIPS":
-  - "cpu/mips*/**/*"
-  - "makefiles/arch/mips.inc.mk"
 
 "Platform: MSP":
   - "cpu/msp*/**/*"

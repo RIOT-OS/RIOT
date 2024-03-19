@@ -21,7 +21,7 @@
 void sixlowpan_print(uint8_t *data, size_t size)
 {
     if (data[0] == SIXLOWPAN_UNCOMP) {
-        puts("Uncompressed IPv6 packet");
+        printf("Uncompressed IPv6 packet\n");
 
         /* might just be the dispatch (or fragmented) so better check */
         if (size > sizeof(ipv6_hdr_t)) {
@@ -32,13 +32,13 @@ void sixlowpan_print(uint8_t *data, size_t size)
         }
     }
     else if (sixlowpan_nalp(data[0])) {
-        puts("Not a LoWPAN (NALP) frame");
+        printf("Not a LoWPAN (NALP) frame\n");
         od_hex_dump(data, size, OD_WIDTH_DEFAULT);
     }
     else if ((data[0] & SIXLOWPAN_FRAG_DISP_MASK) == SIXLOWPAN_FRAG_1_DISP) {
         sixlowpan_frag_t *hdr = (sixlowpan_frag_t *)data;
 
-        puts("Fragmentation Header (first)");
+        printf("Fragmentation Header (first)\n");
         printf("datagram size: %u\n",
                (byteorder_ntohs(hdr->disp_size) & SIXLOWPAN_FRAG_SIZE_MASK));
         printf("tag: 0x%04x\n", byteorder_ntohs(hdr->tag));
@@ -50,7 +50,7 @@ void sixlowpan_print(uint8_t *data, size_t size)
     else if ((data[0] & SIXLOWPAN_FRAG_DISP_MASK) == SIXLOWPAN_FRAG_N_DISP) {
         sixlowpan_frag_n_t *hdr = (sixlowpan_frag_n_t *)data;
 
-        puts("Fragmentation Header (subsequent)");
+        printf("Fragmentation Header (subsequent)\n");
         printf("datagram size: %u\n",
                (byteorder_ntohs(hdr->disp_size) & SIXLOWPAN_FRAG_SIZE_MASK));
         printf("tag: 0x%04x\n", byteorder_ntohs(hdr->tag));
@@ -62,51 +62,51 @@ void sixlowpan_print(uint8_t *data, size_t size)
     }
     else if ((data[0] & SIXLOWPAN_IPHC1_DISP_MASK) == SIXLOWPAN_IPHC1_DISP) {
         uint8_t offset = SIXLOWPAN_IPHC_HDR_LEN;
-        puts("IPHC dispatch");
+        printf("IPHC dispatch\n");
 
         switch (data[0] & SIXLOWPAN_IPHC1_TF) {
             case 0x00:
-                puts("TF: ECN + DSCP + Flow Label (4 bytes)");
+                printf("TF: ECN + DSCP + Flow Label (4 bytes)\n");
                 break;
 
             case 0x08:
-                puts("TF: ECN + Flow Label (3 bytes)");
+                printf("TF: ECN + Flow Label (3 bytes)\n");
                 break;
 
             case 0x10:
-                puts("TF: ECN + DSCP (1 bytes)");
+                printf("TF: ECN + DSCP (1 bytes)\n");
                 break;
 
             case 0x18:
-                puts("TF: traffic class and flow label elided");
+                printf("TF: traffic class and flow label elided\n");
                 break;
         }
 
         switch (data[0] & SIXLOWPAN_IPHC1_NH) {
             case 0x00:
-                puts("NH: inline");
+                printf("NH: inline\n");
                 break;
 
             case 0x04:
-                puts("NH: LOWPAN_NHC");
+                printf("NH: LOWPAN_NHC\n");
                 break;
         }
 
         switch (data[0] & SIXLOWPAN_IPHC1_HL) {
             case 0x00:
-                puts("HLIM: inline");
+                printf("HLIM: inline\n");
                 break;
 
             case 0x01:
-                puts("HLIM: 1");
+                printf("HLIM: 1\n");
                 break;
 
             case 0x02:
-                puts("HLIM: 64");
+                printf("HLIM: 64\n");
                 break;
 
             case 0x03:
-                puts("HLIM: 255");
+                printf("HLIM: 255\n");
                 break;
         }
 
@@ -115,19 +115,19 @@ void sixlowpan_print(uint8_t *data, size_t size)
 
             switch (data[1] & SIXLOWPAN_IPHC2_SAM) {
                 case 0x00:
-                    puts("unspecified address (::)");
+                    printf("unspecified address (::)\n");
                     break;
 
                 case 0x10:
-                    puts("64 bits inline");
+                    printf("64 bits inline\n");
                     break;
 
                 case 0x20:
-                    puts("16 bits inline");
+                    printf("16 bits inline\n");
                     break;
 
                 case 0x30:
-                    puts("elided (use L2 address)");
+                    printf("elided (use L2 address)\n");
                     break;
             }
         }
@@ -136,101 +136,101 @@ void sixlowpan_print(uint8_t *data, size_t size)
 
             switch (data[1] & SIXLOWPAN_IPHC2_SAM) {
                 case 0x00:
-                    puts("128 bits inline");
+                    printf("128 bits inline\n");
                     break;
 
                 case 0x10:
-                    puts("64 bits inline");
+                    printf("64 bits inline\n");
                     break;
 
                 case 0x20:
-                    puts("16 bits inline");
+                    printf("16 bits inline\n");
                     break;
 
                 case 0x30:
-                    puts("elided (use L2 address)");
+                    printf("elided (use L2 address)\n");
                     break;
             }
         }
 
         if (data[1] & SIXLOWPAN_IPHC2_M) {
             if (data[1] & SIXLOWPAN_IPHC2_DAC) {
-                puts("Stateful destinaton multicast address compression:");
+                printf("Stateful destination multicast address compression:\n");
 
                 switch (data[1] & SIXLOWPAN_IPHC2_DAM) {
                     case 0x00:
-                        puts("    48 bits carried inline (Unicast-Prefix-based)");
+                        printf("    48 bits carried inline (Unicast-Prefix-based)\n");
                         break;
 
                     case 0x01:
                     case 0x02:
                     case 0x03:
-                        puts("    reserved");
+                        printf("    reserved\n");
                         break;
                 }
             }
             else {
-                puts("Stateless destinaton multicast address compression:");
+                printf("Stateless destination multicast address compression:\n");
 
                 switch (data[1] & SIXLOWPAN_IPHC2_DAM) {
                     case 0x00:
-                        puts("    128 bits carried inline");
+                        printf("    128 bits carried inline\n");
                         break;
 
                     case 0x01:
-                        puts("    48 bits carried inline");
+                        printf("    48 bits carried inline\n");
                         break;
 
                     case 0x02:
-                        puts("    32 bits carried inline");
+                        printf("    32 bits carried inline\n");
                         break;
 
                     case 0x03:
-                        puts("    8 bits carried inline");
+                        printf("    8 bits carried inline\n");
                         break;
                 }
             }
         }
         else {
             if (data[1] & SIXLOWPAN_IPHC2_DAC) {
-                printf("Stateful destinaton address compression: ");
+                printf("Stateful destination address compression: ");
 
                 switch (data[1] & SIXLOWPAN_IPHC2_DAM) {
                     case 0x00:
-                        puts("reserved");
+                        printf("reserved\n");
                         break;
 
                     case 0x01:
-                        puts("64 bits inline");
+                        printf("64 bits inline\n");
                         break;
 
                     case 0x02:
-                        puts("16 bits inline");
+                        printf("16 bits inline\n");
                         break;
 
                     case 0x03:
-                        puts("elided (use L2 address)");
+                        printf("elided (use L2 address)\n");
                         break;
                 }
             }
             else {
-                printf("Stateless destinaton address compression: ");
+                printf("Stateless destination address compression: ");
 
                 switch (data[1] & SIXLOWPAN_IPHC2_DAM) {
                     case 0x00:
-                        puts("128 bits inline");
+                        printf("128 bits inline\n");
                         break;
 
                     case 0x01:
-                        puts("64 bits inline");
+                        printf("64 bits inline\n");
                         break;
 
                     case 0x02:
-                        puts("16 bits inline");
+                        printf("16 bits inline\n");
                         break;
 
                     case 0x03:
-                        puts("elided (use L2 address)");
+                        printf("elided (use L2 address)\n");
                         break;
                 }
             }

@@ -8,6 +8,7 @@
 
 #include <sht1x.h>
 #include <stdlib.h>
+#include "container.h"
 #include "embUnit/embUnit.h"
 #include "tests-sht1x.h"
 

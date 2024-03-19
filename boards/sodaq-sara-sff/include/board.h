@@ -72,6 +72,7 @@ extern "C" {
 
 /**
  * @name    User button
+ * @{
  */
 #define BTN0_PIN            GPIO_PIN(PB, 8)
 #define BTN0_MODE           GPIO_IN

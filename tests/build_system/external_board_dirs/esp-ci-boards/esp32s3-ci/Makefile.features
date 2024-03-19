@@ -1,0 +1,6 @@
+FEATURES_PROVIDED += esp_jtag
+FEATURES_PROVIDED += esp_rtc_timer_32k
+
+BOARD_VERSION = esp32s3-devkitc-1-n8r8
+
+include $(RIOTBOARD)/esp32s3-devkit/Makefile.features

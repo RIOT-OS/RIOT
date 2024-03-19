@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    drivers_mtd_flashpage   Flashpage MTD
+ * @defgroup    drivers_mtd_flashpage MTD wrapper for Flashpage devices
  * @ingroup     drivers_storage
  * @brief       Driver for internal flash devices implementing flashpage interface
  *
@@ -38,16 +38,29 @@ extern "C"
  * @brief   Macro helper to initialize a mtd_t with flash-age driver
  */
 #define MTD_FLASHPAGE_INIT_VAL(_pages_per_sector) { \
-    .driver = &mtd_flashpage_driver, \
-    .sector_count = FLASHPAGE_NUMOF, \
-    .pages_per_sector = _pages_per_sector,\
-    .page_size = FLASHPAGE_SIZE / _pages_per_sector,\
+    .base = {                                       \
+        .driver = &mtd_flashpage_driver,            \
+        .sector_count = FLASHPAGE_NUMOF,            \
+        .pages_per_sector = _pages_per_sector,      \
+        .page_size = FLASHPAGE_SIZE / _pages_per_sector, \
+        .write_size = 1                             \
+    },                                              \
 }
 
 /**
  * @brief   Flashpage MTD device operations table
  */
 extern const mtd_desc_t mtd_flashpage_driver;
+
+/**
+ * @brief    MTD flashpage descriptor
+ */
+typedef struct {
+    mtd_dev_t base;     /**< MTD generic device */
+    uint32_t offset;    /**< Offset in terms of MTD pages, which must comprise
+                             a whole number of sectors from the start of the
+                             flash */
+} mtd_flashpage_t;
 
 #ifdef __cplusplus
 }

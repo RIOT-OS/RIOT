@@ -23,12 +23,14 @@
 #include <stdint.h>
 #include <inttypes.h>
 
-#include "sched.h"
-#include "clist.h"
+#include "assert.h"
 #include "bitarithm.h"
+#include "clist.h"
 #include "irq.h"
-#include "thread.h"
 #include "log.h"
+#include "sched.h"
+#include "thread.h"
+#include "panic.h"
 
 #ifdef MODULE_MPU_STACK_GUARD
 #include "mpu.h"
@@ -57,6 +59,8 @@
 volatile kernel_pid_t sched_active_pid = KERNEL_PID_UNDEF;
 volatile thread_t *sched_threads[KERNEL_PID_LAST + 1];
 volatile int sched_num_threads = 0;
+
+static_assert(SCHED_PRIO_LEVELS <= 32, "SCHED_PRIO_LEVELS may at most be 32");
 
 FORCE_USED_SECTION
 const uint8_t max_threads = ARRAY_SIZE(sched_threads);
@@ -92,7 +96,7 @@ static inline void _set_runqueue_bit(uint8_t priority)
 #if defined(BITARITHM_HAS_CLZ)
     runqueue_bitcache |= BIT31 >> priority;
 #else
-    runqueue_bitcache |= 1 << priority;
+    runqueue_bitcache |= 1UL << priority;
 #endif
 }
 
@@ -101,7 +105,7 @@ static inline void _clear_runqueue_bit(uint8_t priority)
 #if defined(BITARITHM_HAS_CLZ)
     runqueue_bitcache &= ~(BIT31 >> priority);
 #else
-    runqueue_bitcache &= ~(1 << priority);
+    runqueue_bitcache &= ~(1UL << priority);
 #endif
 }
 
@@ -127,9 +131,10 @@ static void _unschedule(thread_t *active_thread)
      */
     if (*((uintptr_t *)(uintptr_t)active_thread->stack_start) !=
         (uintptr_t)active_thread->stack_start) {
-        LOG_WARNING(
+        LOG_ERROR(
             "scheduler(): stack overflow detected, pid=%" PRIkernel_pid "\n",
             active_thread->pid);
+        core_panic(PANIC_STACK_OVERFLOW, "STACK OVERFLOW");
     }
 #endif
 #ifdef MODULE_SCHED_CB
@@ -303,6 +308,12 @@ NORETURN void sched_task_exit(void)
 {
     DEBUG("sched_task_exit: ending thread %" PRIkernel_pid "...\n",
           thread_getpid());
+
+#if defined(MODULE_TEST_UTILS_PRINT_STACK_USAGE) && defined(DEVELHELP)
+    void print_stack_usage_metric(const char *name, void *stack, unsigned max_size);
+    thread_t *me = thread_get_active();
+    print_stack_usage_metric(me->name, me->stack_start, me->stack_size);
+#endif
 
     (void)irq_disable();
     sched_threads[thread_getpid()] = NULL;

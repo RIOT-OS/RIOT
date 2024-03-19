@@ -10,6 +10,8 @@ menuconfig MODULE_FIDO2_CTAP_TRANSPORT_HID
     depends on TEST_KCONFIG
     select MODULE_ISRPIPE
     select MODULE_USBUS_HID
+    select MODULE_ZTIMER64
+    select MODULE_ZTIMER64_MSEC
     help
         Configure a FIDO2 CTAP authenticator via KConfig.
 

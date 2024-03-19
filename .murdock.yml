@@ -1,0 +1,21 @@
+push:
+  branches:
+    # these two enable potential bors support:
+    - '^staging$'
+    - '^trying$'
+    # github merge trains:
+    - '^gh-readonly-queue/'
+
+pr:
+  enable_comments: true
+  sticky_comment: true
+  comment_artifacts:
+  - name: doc-preview/
+    readable_name: Documentation preview
+
+commit:
+  skip_keywords: ["ci_skip", "murdock_skip", "[ci skip]" ]
+
+artifacts:
+  - output.txt
+  - doc-preview/

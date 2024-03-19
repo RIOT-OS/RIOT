@@ -13,3 +13,8 @@ config MODULE_PCD8544
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_SPI
     select MODULE_XTIMER
+
+config HAVE_PCD8544
+    bool
+    help
+      Indicates that a PCD8544 LCD is present.

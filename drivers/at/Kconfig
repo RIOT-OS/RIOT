@@ -33,9 +33,9 @@ choice
         MODULE_EVENT_THREAD symbol should be set. Choose a priority for the
         thread that processes the URCs.
 
-config MODULE_AT_URC_ISR_LOW
-    bool "Low"
-    select MODULE_EVENT_THREAD_LOW
+config MODULE_AT_URC_ISR_LOWEST
+    bool "Lowest"
+    select MODULE_EVENT_THREAD_LOWEST
 
 config MODULE_AT_URC_ISR_MEDIUM
     bool "Medium"

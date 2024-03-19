@@ -1,6 +1,7 @@
 PKG_NAME=monocypher
 PKG_URL=https://github.com/LoupVaillant/Monocypher
-PKG_VERSION=baca5d31259c598540e4d1284bc8d8f793abf83a # v3.1.2
+# v3.1.2
+PKG_VERSION=baca5d31259c598540e4d1284bc8d8f793abf83a
 PKG_LICENSE=CC-0
 
 include $(RIOTBASE)/pkg/pkg.mk

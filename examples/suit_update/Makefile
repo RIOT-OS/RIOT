@@ -13,19 +13,17 @@ RIOTBASE ?= $(CURDIR)/../..
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 
-# uncomment this to compile in support for a possibly available radio
-#USEMODULE += netdev_default
-
 USEMODULE += auto_init_gnrc_netif
 # Specify the mandatory networking modules for IPv6 and UDP
-USEMODULE += gnrc_ipv6_router_default
+USEMODULE += gnrc_ipv6_default
 USEMODULE += sock_udp
 # Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo
 
 # include this for printing IP addresses
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
+USEMODULE += shell_cmd_suit
 
 # Set this to 1 to enable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
@@ -40,6 +38,11 @@ QUIET ?= 1
 #
 
 USEMODULE += suit suit_transport_coap
+USEMODULE += nanocoap_server_auto_init
+
+# enable VFS transport (only works on boards with external storage)
+USEMODULE += suit_transport_vfs
+USEMODULE += vfs_default
 
 # Display a progress bar during firmware download
 USEMODULE += progress_bar
@@ -53,8 +56,9 @@ CFLAGS += -DSUIT_MANIFEST_RESOURCE=\"$(SUIT_COAP_ROOT)/$(SUIT_NOTIFY_MANIFEST)\"
 # Enable test_utils_interactive_sync, only used when running automatic test
 DEFAULT_MODULE += test_utils_interactive_sync
 
-ifeq ($(BOARD),native)
+ifneq (,$(filter native native64,$(BOARD)))
   USE_ETHOS ?= 0
+  IFACE ?= tapbr0
   # Configure two RAM regions with 2K each
   CFLAGS += -DCONFIG_SUIT_STORAGE_RAM_REGIONS=2 -DCONFIG_SUIT_STORAGE_RAM_SIZE=2048
 endif
@@ -78,9 +82,11 @@ ifeq (1,$(USE_ETHOS))
   #     $ cd dist/tools/ethos; sudo ./setup_network.sh riot0 2001:db8::0/64
   #
   #... in another shell and keep it running.
-  export TAP ?= riot0
+  IFACE ?= riot0
   TERMPROG = $(RIOTTOOLS)/ethos/ethos
-  TERMFLAGS = $(TAP) $(PORT)
+  TERMFLAGS = $(IFACE) $(PORT)
+else
+  USEMODULE += netdev_default
 endif
 
 # Ensure both slot bin files are always generated and linked to avoid compiling
@@ -101,12 +107,20 @@ TESTRUNNER_RESET_AFTER_TERM ?= 1
 # with ed25519 support.
 TEST_ON_CI_BLACKLIST = all
 
+# Add custom SUIT targets
+include $(CURDIR)/Makefile.suit.custom
+
 include $(RIOTBASE)/Makefile.include
+
+# export IFACE for test
+$(call target-export-variables,test-with-config test-with-config/check-config,IFACE)
+# export BOARD
+$(call target-export-variables,test-with-config test-with-config/check-config,BOARD)
 
 # allow to use large blocks to utilize large MTUs (802.15.4g, Ethernet, WiFi)
 LARGE_BLOCKS ?= 0
 ifeq (1, $(LARGE_BLOCKS))
-  CFLAGS += -DCONFIG_SUIT_COAP_BLOCKSIZE=COAP_BLOCKSIZE_1024
+  CFLAGS += -DCONFIG_NANOCOAP_BLOCKSIZE_DEFAULT=COAP_BLOCKSIZE_1024
 else
 # lower pktbuf size to something sufficient for this application
 # Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.

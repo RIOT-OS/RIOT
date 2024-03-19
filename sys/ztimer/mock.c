@@ -23,6 +23,7 @@
 
 #include <stdint.h>
 #include <inttypes.h>
+#include "assert.h"
 #include "ztimer/mock.h"
 
 #define ENABLE_DEBUG 0
@@ -84,6 +85,8 @@ static void ztimer_mock_op_set(ztimer_clock_t *clock, uint32_t val)
 {
     ztimer_mock_t *self = (ztimer_mock_t *)clock;
 
+    assert(self->running == 1);
+
     ++self->calls.set;
     self->target = val & self->mask;
     self->armed = 1;
@@ -107,6 +110,8 @@ static void ztimer_mock_op_cancel(ztimer_clock_t *clock)
 {
     ztimer_mock_t *self = (ztimer_mock_t *)clock;
 
+    assert(self->running == 1);
+
     ++self->calls.cancel;
     DEBUG(
         "zmock_cancel: %3u now=0x%08" PRIx32 ", target=0x%08" PRIx32 " (%u)\n",
@@ -114,10 +119,36 @@ static void ztimer_mock_op_cancel(ztimer_clock_t *clock)
     self->armed = 0;
 }
 
+#if MODULE_ZTIMER_ONDEMAND
+static void ztimer_mock_op_start(ztimer_clock_t *clock)
+{
+    ztimer_mock_t *self = (ztimer_mock_t *)clock;
+
+    ++self->calls.start;
+    DEBUG("zmock_start: %3u\n", self->calls.start);
+    self->running = 1;
+}
+
+static void ztimer_mock_op_stop(ztimer_clock_t *clock)
+{
+    ztimer_mock_t *self = (ztimer_mock_t *)clock;
+
+    assert(self->armed == 0);
+
+    ++self->calls.stop;
+    DEBUG("zmock_stop: %3u\n", self->calls.stop);
+    self->running = 0;
+}
+#endif
+
 static const ztimer_ops_t ztimer_mock_ops = {
     .set = ztimer_mock_op_set,
     .now = ztimer_mock_op_now,
     .cancel = ztimer_mock_op_cancel,
+#if MODULE_ZTIMER_ONDEMAND
+    .start = ztimer_mock_op_start,
+    .stop = ztimer_mock_op_stop,
+#endif
 };
 
 void ztimer_mock_init(ztimer_mock_t *self, unsigned width)
@@ -128,8 +159,14 @@ void ztimer_mock_init(ztimer_mock_t *self, unsigned width)
         .mask = max_value,
         .super = { .ops = &ztimer_mock_ops, .max_value = max_value },
     };
-    DEBUG("zmock_init: %p width=%u mask=0x%08" PRIx32 "\n", (void *)self, width,
-          self->mask);
+
+#if !MODULE_ZTIMER_ONDEMAND
+    /* turn the timer on by default if ondemand feature is not used */
+    self->running = 1;
+#endif
+
+    DEBUG("zmock_init: %p width=%u mask=0x%08" PRIx32 " running=%u\n", (void *)self, width,
+          self->mask, self->running);
     if (max_value < UINT32_MAX) {
         self->super.ops->set(&self->super, self->super.max_value >> 1);
     }

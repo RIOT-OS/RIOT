@@ -31,7 +31,7 @@
 
 #include "net/ipv6/addr.h"
 #include "timex.h"
-#include <kernel_defines.h>
+#include "modules.h"
 
 #ifdef __cplusplus
 extern "C" {

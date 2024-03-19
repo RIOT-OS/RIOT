@@ -38,6 +38,7 @@ config DTLS_CONTEXT_MAX
 
 config DTLS_PEER_MAX
     int "Max number of peers"
+    default 2 if KCONFIG_USEMODULE_GCOAP_DTLS
     default 1
     help
         The maximum number of DTLS peers.

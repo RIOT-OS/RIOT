@@ -53,6 +53,7 @@ int sock_tcp_connect(sock_tcp_t *sock, const sock_tcp_ep_t *remote,
                                 flags, NETCONN_TCP)) == 0) {
         _tcp_sock_init(sock, tmp, NULL);
     }
+
     return res;
 }
 
@@ -70,10 +71,12 @@ int sock_tcp_listen(sock_tcp_queue_t *queue, const sock_tcp_ep_t *local,
     if (queue_len > USHRT_MAX) {
         return -EFAULT;
     }
+
     if ((res = lwip_sock_create(&tmp, (struct _sock_tl_ep *)local, NULL, 0,
                                 flags, NETCONN_TCP)) < 0) {
         return res;
     }
+
     assert(tmp != NULL); /* just in case lwIP is trolling */
     mutex_init(&queue->mutex);
     mutex_lock(&queue->mutex);
@@ -84,20 +87,22 @@ int sock_tcp_listen(sock_tcp_queue_t *queue, const sock_tcp_ep_t *local,
     queue->used = 0;
     memset(queue->array, 0, sizeof(sock_tcp_t) * queue_len);
     mutex_unlock(&queue->mutex);
+
     switch (netconn_listen_with_backlog(queue->base.conn, queue->len)) {
-        case ERR_OK:
-            break;
-        case ERR_MEM:
-            return -ENOMEM;
-        case ERR_USE:
-            return -EADDRINUSE;
-        case ERR_VAL:
-            return -EINVAL;
-        default:
-            assert(false); /* should not happen since queue->base.conn is not
-                            * closed and we have a TCP conn */
-            break;
+    case ERR_OK:
+        break;
+    case ERR_MEM:
+        return -ENOMEM;
+    case ERR_USE:
+        return -EADDRINUSE;
+    case ERR_VAL:
+        return -EINVAL;
+    default:
+        assert(false); /* should not happen since queue->base.conn is not
+                        * closed and we have a TCP conn */
+        break;
     }
+
     return 0;
 }
 
@@ -105,6 +110,7 @@ void sock_tcp_disconnect(sock_tcp_t *sock)
 {
     assert(sock != NULL);
     mutex_lock(&sock->mutex);
+
     if (sock->base.conn != NULL) {
         netconn_close(sock->base.conn);
         netconn_delete(sock->base.conn);
@@ -118,6 +124,7 @@ void sock_tcp_disconnect(sock_tcp_t *sock)
             sock->queue = NULL;
         }
     }
+
     mutex_unlock(&sock->mutex);
     memset(&sock->mutex, 0, sizeof(mutex_t));
 }
@@ -126,6 +133,7 @@ void sock_tcp_stop_listen(sock_tcp_queue_t *queue)
 {
     assert(queue != NULL);
     mutex_lock(&queue->mutex);
+
     if (queue->base.conn != NULL) {
         netconn_close(queue->base.conn);
         netconn_delete(queue->base.conn);
@@ -138,6 +146,7 @@ void sock_tcp_stop_listen(sock_tcp_queue_t *queue)
         queue->len = 0;
         queue->used = 0;
     }
+
     mutex_unlock(&queue->mutex);
     memset(&queue->mutex, 0, sizeof(mutex_t));
 }
@@ -147,12 +156,14 @@ int sock_tcp_get_local(sock_tcp_t *sock, sock_tcp_ep_t *ep)
     int res = 0;
     assert(sock != NULL);
     mutex_lock(&sock->mutex);
+
     if ((sock->base.conn == NULL) || lwip_sock_get_addr(sock->base.conn,
                                                    (struct _sock_tl_ep *)ep,
                                                    1)) {
         res = -EADDRNOTAVAIL;
     }
     mutex_unlock(&sock->mutex);
+
     return res;
 }
 
@@ -161,12 +172,15 @@ int sock_tcp_get_remote(sock_tcp_t *sock, sock_tcp_ep_t *ep)
     int res = 0;
     assert(sock != NULL);
     mutex_lock(&sock->mutex);
+
     if ((sock->base.conn == NULL) || lwip_sock_get_addr(sock->base.conn,
                                                    (struct _sock_tl_ep *)ep,
                                                    0)) {
         res = -ENOTCONN;
     }
+
     mutex_unlock(&sock->mutex);
+
     return res;
 }
 
@@ -176,12 +190,15 @@ int sock_tcp_queue_get_local(sock_tcp_queue_t *queue, sock_tcp_ep_t *ep)
 
     assert(queue != NULL);
     mutex_lock(&queue->mutex);
+
     if ((queue->base.conn == NULL) || lwip_sock_get_addr(queue->base.conn,
                                                     (struct _sock_tl_ep *)ep,
                                                     1)) {
         res = -EADDRNOTAVAIL;
     }
+
     mutex_unlock(&queue->mutex);
+
     return res;
 }
 
@@ -192,9 +209,11 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock,
     int res = 0;
 
     assert((queue != NULL) && (sock != NULL));
+
     if (queue->base.conn == NULL) {
         return -EINVAL;
     }
+
     if (timeout == 0) {
         if (!mutex_trylock(&queue->mutex)) {
             return -EAGAIN;
@@ -203,6 +222,7 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock,
     else if (timeout != 0) {
         mutex_lock(&queue->mutex);
     }
+
     if (queue->used < queue->len) {
 #if LWIP_SO_RCVTIMEO
         if ((timeout != 0) && (timeout != SOCK_NO_TIMEOUT)) {
@@ -214,34 +234,35 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock,
             mutex_unlock(&queue->mutex);
             return -EAGAIN;
         }
+
         switch (netconn_accept(queue->base.conn, &tmp)) {
-            case ERR_OK:
-                for (unsigned short i = 0; i < queue->len; i++) {
-                    sock_tcp_t *s = &queue->array[i];
-                    if (s->base.conn == NULL) {
-                        _tcp_sock_init(s, tmp, queue);
-                        queue->used++;
-                        assert(queue->used > 0);
-                        *sock = s;
-                        break;
-                    }
+        case ERR_OK:
+            for (unsigned short i = 0; i < queue->len; i++) {
+                sock_tcp_t *s = &queue->array[i];
+                if (s->base.conn == NULL) {
+                    _tcp_sock_init(s, tmp, queue);
+                    queue->used++;
+                    assert(queue->used > 0);
+                    *sock = s;
+                    break;
                 }
-                break;
-            case ERR_ABRT:
-                res = -ECONNABORTED;
-                break;
-            case ERR_MEM:
-                res = -ENOMEM;
-                break;
+            }
+            break;
+        case ERR_ABRT:
+            res = -ECONNABORTED;
+            break;
+        case ERR_MEM:
+            res = -ENOMEM;
+            break;
 #if LWIP_SO_RCVTIMEO
-            case ERR_TIMEOUT:
-                res = -ETIMEDOUT;
-                break;
+        case ERR_TIMEOUT:
+            res = -ETIMEDOUT;
+            break;
 #endif
-            default:
-                assert(false);
-                res = -1;
-                break;
+        default:
+            assert(false);
+            res = -1;
+            break;
         }
     }
     else {
@@ -265,18 +286,21 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock,
     }
 #endif
     mutex_unlock(&queue->mutex);
+
     return res;
 }
 
 ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
                       uint32_t timeout)
 {
-    uint8_t *data_ptr = data;
     struct pbuf *buf;
-    ssize_t offset = 0, res = 0;
-    bool done = false;
+    ssize_t recvd = 0;
+    ssize_t res = 0;
 
     assert((sock != NULL) && (data != NULL) && (max_len > 0));
+
+    ssize_t recv_left = (max_len <= SSIZE_MAX) ? (ssize_t)max_len : SSIZE_MAX;
+
     if (sock->base.conn == NULL) {
         return -ENOTCONN;
     }
@@ -288,17 +312,20 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
     else {
         mutex_lock(&sock->mutex);
     }
+
 #if LWIP_SO_RCVTIMEO
     if ((timeout != 0) && (timeout != SOCK_NO_TIMEOUT)) {
         netconn_set_recvtimeout(sock->base.conn, timeout / US_PER_MS);
     }
     else
 #endif
+
     if ((timeout == 0) && !mbox_avail(&sock->base.conn->recvmbox.mbox)) {
         mutex_unlock(&sock->mutex);
         return -EAGAIN;
     }
-    while (!done) {
+
+    while (recv_left > 0) {
         uint16_t copylen, buf_len;
         if (sock->last_buf != NULL) {
             buf = sock->last_buf;
@@ -307,42 +334,43 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
             err_t err;
             if ((err = netconn_recv_tcp_pbuf(sock->base.conn, &buf)) < 0) {
                 switch (err) {
-                    case ERR_ABRT:
-                        res = -ECONNABORTED;
-                        break;
-                    case ERR_CONN:
-                        res = -EADDRNOTAVAIL;
-                        break;
-                    case ERR_RST:
-                    case ERR_CLSD:
-                        res = -ECONNRESET;
-                        break;
-                    case ERR_MEM:
-                        res = -ENOMEM;
-                        break;
+                case ERR_ABRT:
+                    res = -ECONNABORTED;
+                    break;
+                case ERR_CONN:
+                    res = -EADDRNOTAVAIL;
+                    break;
+                case ERR_RST:
+                case ERR_CLSD:
+                    res = -ECONNRESET;
+                    break;
+                case ERR_MEM:
+                    res = -ENOMEM;
+                    break;
 #if LWIP_SO_RCVTIMEO
-                    case ERR_TIMEOUT:
-                        res = -ETIMEDOUT;
-                        break;
+                case ERR_TIMEOUT:
+                    res = -ETIMEDOUT;
+                    break;
 #endif
-                    default:
-                        /* no applicable error */
-                        res = -1;
-                        break;
+                default:
+                    /* no applicable error */
+                    res = -1;
+                    break;
                 }
                 break;
             }
             sock->last_buf = buf;
         }
         buf_len = buf->tot_len - sock->last_offset;
-        copylen = (buf_len > max_len) ? (uint16_t)max_len : buf_len;
-        pbuf_copy_partial(buf, data_ptr + offset, copylen, sock->last_offset);
-        offset += copylen;
-        max_len -= copylen; /* should be 0 at minimum due to copylen setting above */
-        if (max_len == 0) {
-            done = true;
-            res = offset;   /* in case offset == 0 */
+        copylen = (buf_len > recv_left) ? (uint16_t)recv_left : buf_len;
+        pbuf_copy_partial(buf, (uint8_t*)data + recvd, copylen, sock->last_offset);
+        recvd += copylen;
+        recv_left -= copylen; /* should be 0 at minimum due to copylen setting above */
+
+        if (recv_left == 0) {
+            res = recvd;   /* in case recvd == 0 */
         }
+
         /* post-process buf */
         if (buf_len > copylen) {
             /* there is still data in the buffer */
@@ -361,9 +389,11 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
             }
         }
     }
-    if (offset > 0) {
-        res = offset;   /* we received data so return it */
+
+    if (recvd > 0) {
+        res = recvd;   /* we received data so return it */
     }
+
     /* unset flags */
 #if LWIP_SO_RCVTIMEO
     netconn_set_recvtimeout(sock->base.conn, 0);
@@ -381,15 +411,18 @@ ssize_t sock_tcp_write(sock_tcp_t *sock, const void *data, size_t len)
     assert(sock != NULL);
     assert((len == 0) || (data != NULL)); /* (len != 0) => (data != NULL) */
     mutex_lock(&sock->mutex);
+
     if (sock->base.conn == NULL) {
         mutex_unlock(&sock->mutex);
         return -ENOTCONN;
     }
+
     conn = sock->base.conn;
     mutex_unlock(&sock->mutex); /* we won't change anything to sock here
                                    (lwip_sock_send neither, since it remote is
                                    NULL) so we can leave the mutex */
     res = lwip_sock_send(conn, data, len, 0, NULL, NETCONN_TCP);
+
     return res;
 }
 

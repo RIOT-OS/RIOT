@@ -2,6 +2,7 @@
  * Copyright (C) 2015 HAW Hamburg
  *               2016 Freie Universität Berlin
  *               2016 INRIA
+ *               2023 Hugues Larrive
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,6 +19,7 @@
  * @author          René Herthel <rene-herthel@outlook.de>
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Francisco Acosta <francisco.acosta@inria.fr>
+ * @author          Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef PERIPH_CPU_COMMON_H
@@ -56,6 +58,125 @@ typedef uint8_t gpio_t;
  */
 #define GPIO_PIN(x, y)          ((x << 4) | y)
 
+/**
+ * @brief   Base of the GPIO registers as memory address
+ *
+ * Must be identical to the address of `PINA` provided by avr/io.h
+ */
+#if (defined(OCF1A) && defined(OCF1B) && (OCF1A > OCF1B)) \
+    || (defined(PUD) && (PUD != 4)) || (defined(INT0) && (INT0 == 6))
+    /* match with 65 devices against 61 for (PORTB == _SFR_IO8(0x18)) which
+     * did not work here anyway */
+#define GPIO_PORT_DESCENDENT
+#endif
+
+#ifdef GPIO_PORT_DESCENDENT
+#ifdef      _AVR_ATTINY1634_H_INCLUDED
+/*          the only one that requires particular treatment! */
+#define     ATMEGA_GPIO_BASE_A  (0x2F)
+#else
+/*          all other port descendent, including :
+             - _AVR_IO8534_ (only have port A but with 0x1B address) ;
+             - _AVR_IOAT94K_H_ (only have ports D and E) ;
+             - _AVR_IOTN28_H_ (only have ports A and D). */
+#define     ATMEGA_GPIO_BASE_A  (0x39)
+#endif /*   _AVR_ATTINY1634_H_INCLUDED */
+#else /* !GPIO_PORT_DESCENDENT */
+#define     ATMEGA_GPIO_BASE_A  (0x20)
+#endif /* GPIO_PORT_DESCENDENT */
+/**
+ * @brief   Base of the GPIO port G register as memory address
+ *
+ * Must be identical to the address of `PING` provided by avr/io.h
+ */
+#define ATMEGA_GPIO_BASE_G      (ATMEGA_GPIO_BASE_A + ATMEGA_GPIO_SIZE * ('G' - 'A'))
+/**
+ * @brief   Base of the GPIO registers of the second memory region (port >= H)
+ *
+ * Must be identical to the address of `PINH` provided by avr/io.h
+ */
+#define ATMEGA_GPIO_BASE_H      (0x100)
+/**
+ * @brief   sizeof(atmega_gpio_port_t), but preprocessor friendly
+ */
+#define ATMEGA_GPIO_SIZE        (0x03)
+
+#if defined(DOXYGEN)
+/**
+ * @brief     Number of external interrupt vectors
+ */
+#define GPIO_EXT_INT_NUMOF      <CPU_SPECIFIC>
+#elif defined(INT7_vect)
+#define GPIO_EXT_INT_NUMOF      (8U)
+#elif defined(INT6_vect)
+#define GPIO_EXT_INT_NUMOF      (7U)
+#elif defined(INT5_vect)
+#define GPIO_EXT_INT_NUMOF      (6U)
+#elif defined(INT4_vect)
+#define GPIO_EXT_INT_NUMOF      (5U)
+#elif defined(INT3_vect)
+#define GPIO_EXT_INT_NUMOF      (4U)
+#elif defined(INT2_vect)
+#define GPIO_EXT_INT_NUMOF      (3U)
+#else
+#define GPIO_EXT_INT_NUMOF      (2U)
+#endif
+
+/**
+ * @brief   Structure describing the memory layout of the registers of a
+ *          GPIO port on ATmega MCUs.
+ */
+typedef struct {
+    /**
+     * @brief   Toggle bits in the port register
+     * @note    The bits in the port register will be also toggled for inputs.
+     *          This can be both a footgun as well as an efficient way to toggle
+     *          the pull up resistor on inputs
+     *
+     * Referred to as "Input Pins Address" in the datasheet.
+     */
+    volatile uint8_t pin;
+    /**
+     * @brief   Configure pins as output (1) or input (0) using the Data
+     *          Direction Register
+     */
+    volatile uint8_t ddr;
+    /**
+     * @brief   Read/write the state of GPIO pins using the Port Data Register
+     *
+     * @note    When in input mode (see @ref atmega_gpio_port_t::ddr) writing a
+     *          1 will enable the pull up resistor, writing a 0 will put the
+     *          pin in floating mode.
+     */
+    volatile uint8_t port;
+} atmega_gpio_port_t;
+
+/**
+ * @brief       Get the GPIO PORT registers of the given GPIO PORT
+ * @param[in]   port_num    Number of the port to get the registers of
+ * @return      Pointer to the registers controlling the given GPIO PORT
+ */
+static inline atmega_gpio_port_t *atmega_gpio_port(uint8_t port_num)
+{
+    static const uintptr_t base_addr = (uintptr_t)ATMEGA_GPIO_BASE_A;
+#ifdef GPIO_PORT_DESCENDENT
+    uintptr_t res = base_addr - port_num * sizeof(atmega_gpio_port_t);
+#else
+    uintptr_t res = base_addr + port_num * sizeof(atmega_gpio_port_t);
+#endif
+    /* GPIO ports up to (including) G are mapped in the I/O address space,
+     * port H and higher (if present) are mapped in a different contiguous
+     * region afterwards (e.g. 0x100 for ATmega2560). */
+#ifdef PORTH
+    if (port_num > 'G'-'A') {
+        static const uintptr_t offset = ATMEGA_GPIO_BASE_H - ATMEGA_GPIO_BASE_G;
+        res += offset;
+    }
+#endif
+
+    return (atmega_gpio_port_t *)res;
+}
+
 #ifndef DOXYGEN
 /**
  * @brief   Override the GPIO flanks
@@ -75,6 +196,55 @@ typedef enum {
 } gpio_flank_t;
 /** @} */
 #endif /* ndef DOXYGEN */
+
+#ifndef DOXYGEN /* BEGIN: GPIO LL overwrites */
+#define HAVE_GPIO_SLEW_T
+typedef enum {
+    GPIO_SLEW_SLOWEST = 0,
+    GPIO_SLEW_SLOW = 0,
+    GPIO_SLEW_FAST = 0,
+    GPIO_SLEW_FASTEST = 0,
+} gpio_slew_t;
+
+#define HAVE_GPIO_PULL_STRENGTH_T
+typedef enum {
+    GPIO_PULL_WEAKEST = 0,
+    GPIO_PULL_WEAK = 0,
+    GPIO_PULL_STRONG = 0,
+    GPIO_PULL_STRONGEST = 0
+} gpio_pull_strength_t;
+
+#define HAVE_GPIO_DRIVE_STRENGTH_T
+typedef enum {
+    GPIO_DRIVE_WEAKEST = 0,
+    GPIO_DRIVE_WEAK = 0,
+    GPIO_DRIVE_STRONG = 0,
+    GPIO_DRIVE_STRONGEST = 0
+} gpio_drive_strength_t;
+
+#define HAVE_GPIO_IRQ_TRIG_T
+typedef enum {
+    GPIO_TRIGGER_LEVEL_LOW      = 0x00,
+    GPIO_TRIGGER_EDGE_BOTH      = 0x01,
+    GPIO_TRIGGER_EDGE_FALLING   = 0x02,
+    GPIO_TRIGGER_EDGE_RISING    = 0x03,
+    GPIO_TRIGGER_LEVEL_HIGH     = 0xff, /**< not supported */
+} gpio_irq_trig_t;
+
+#define HAVE_GPIO_STATE_T
+typedef enum {
+    GPIO_INPUT,
+    GPIO_OUTPUT_PUSH_PULL,
+    GPIO_OUTPUT_OPEN_DRAIN,     /**< not supported */
+    GPIO_OUTPUT_OPEN_SOURCE,    /**< not supported */
+    GPIO_USED_BY_PERIPHERAL,    /**< not supported */
+    GPIO_DISCONNECT             = GPIO_INPUT,
+} gpio_state_t;
+
+#define HAVE_GPIO_LL_PREPARE_WRITE_ALL_PINS
+#define HAVE_GPIO_LL_PREPARE_WRITE
+
+#endif /* END: GPIO LL overwrites */
 
 /**
  * @brief   Use some common SPI functions

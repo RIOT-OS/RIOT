@@ -63,7 +63,7 @@ static void _stop_radio(void)
 
 static void _sched_next(skald_ctx_t *ctx)
 {
-    ctx->last += CONFIG_SKALD_INTERVAL_MS;
+    ctx->last += ctx->adv_itvl_ms;
     /* schedule next advertising event, adding a random jitter between
      * 0ms and 10ms (see spec v5.0-vol6-b-4.4.2.2.1) */
     ctx->last += random_uint32_range(JITTER_MIN, JITTER_MAX);

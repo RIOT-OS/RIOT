@@ -22,7 +22,7 @@ static const uint8_t block2_intro[] = "This is RIOT (Version: ";
 static const uint8_t block2_board[] = " running on a ";
 static const uint8_t block2_mcu[] = " board with a ";
 
-static ssize_t _echo_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
+static ssize_t _echo_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
 {
     (void)context;
     char uri[CONFIG_NANOCOAP_URI_MAX];
@@ -37,14 +37,14 @@ static ssize_t _echo_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *co
                              (uint8_t *)sub_uri, sub_uri_len);
 }
 
-static ssize_t _riot_board_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
+static ssize_t _riot_board_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
 {
     (void)context;
     return coap_reply_simple(pkt, COAP_CODE_205, buf, len,
             COAP_FORMAT_TEXT, (uint8_t*)RIOT_BOARD, strlen(RIOT_BOARD));
 }
 
-static ssize_t _riot_block2_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
+static ssize_t _riot_block2_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
 {
     (void)context;
     coap_block_slicer_t slicer;
@@ -64,7 +64,7 @@ static ssize_t _riot_block2_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, v
     bufpos += coap_blockwise_put_bytes(&slicer, bufpos, block2_board, sizeof(block2_board)-1);
     bufpos += coap_blockwise_put_bytes(&slicer, bufpos, (uint8_t*)RIOT_BOARD, strlen(RIOT_BOARD));
     bufpos += coap_blockwise_put_bytes(&slicer, bufpos, block2_mcu, sizeof(block2_mcu)-1);
-    bufpos += coap_blockwise_put_bytes(&slicer, bufpos, (uint8_t*)RIOT_MCU, strlen(RIOT_MCU));
+    bufpos += coap_blockwise_put_bytes(&slicer, bufpos, (uint8_t*)RIOT_CPU, strlen(RIOT_CPU));
     /* To demonstrate individual chars */
     bufpos += coap_blockwise_put_char(&slicer, bufpos, ' ');
     bufpos += coap_blockwise_put_char(&slicer, bufpos, 'M');
@@ -77,7 +77,7 @@ static ssize_t _riot_block2_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, v
                                    buf, len, payload_len, &slicer);
 }
 
-static ssize_t _riot_value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
+static ssize_t _riot_value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
 {
     (void) context;
 
@@ -112,7 +112,7 @@ static ssize_t _riot_value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, vo
             COAP_FORMAT_TEXT, (uint8_t*)rsp, p);
 }
 
-ssize_t _sha256_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, void *context)
+ssize_t _sha256_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
 {
     (void)context;
 
@@ -128,8 +128,8 @@ ssize_t _sha256_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, void *context
     coap_block1_t block1;
     int blockwise = coap_get_block1(pkt, &block1);
 
-    printf("_sha256_handler(): received data: offset=%u len=%u blockwise=%i more=%i\n", \
-            (unsigned)block1.offset, pkt->payload_len, blockwise, block1.more);
+    printf("_sha256_handler(): received data: offset=%" PRIuSIZE " len=%u blockwise=%i more=%i\n",
+            block1.offset, pkt->payload_len, blockwise, block1.more);
 
     if (block1.offset == 0) {
         puts("_sha256_handler(): init");
@@ -150,6 +150,10 @@ ssize_t _sha256_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, void *context
     }
 
     ssize_t reply_len = coap_build_reply(pkt, result, buf, len, 0);
+    if (reply_len <= 0) {
+        return reply_len;
+    }
+
     uint8_t *pkt_pos = (uint8_t*)pkt->hdr + reply_len;
     if (blockwise) {
         pkt_pos += coap_opt_put_block1_control(pkt_pos, 0, &block1);
@@ -162,14 +166,38 @@ ssize_t _sha256_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, void *context
     return pkt_pos - (uint8_t*)pkt->hdr;
 }
 
-/* must be sorted by path (ASCII order) */
-const coap_resource_t coap_resources[] = {
-    COAP_WELL_KNOWN_CORE_DEFAULT_HANDLER,
-    { "/echo/", COAP_GET | COAP_MATCH_SUBTREE, _echo_handler, NULL },
-    { "/riot/board", COAP_GET, _riot_board_handler, NULL },
-    { "/riot/value", COAP_GET | COAP_PUT | COAP_POST, _riot_value_handler, NULL },
-    { "/riot/ver", COAP_GET, _riot_block2_handler, NULL },
-    { "/sha256", COAP_POST, _sha256_handler, NULL },
+NANOCOAP_RESOURCE(echo) {
+    .path = "/echo/", .methods = COAP_GET | COAP_MATCH_SUBTREE, .handler = _echo_handler
+};
+NANOCOAP_RESOURCE(board) {
+    .path = "/riot/board", .methods = COAP_GET, .handler = _riot_board_handler
+};
+NANOCOAP_RESOURCE(value) {
+    .path = "/riot/value", .methods = COAP_GET | COAP_PUT | COAP_POST, .handler = _riot_value_handler
+};
+NANOCOAP_RESOURCE(ver) {
+    .path = "/riot/ver", .methods = COAP_GET, .handler = _riot_block2_handler
+};
+NANOCOAP_RESOURCE(sha256) {
+    .path = "/sha256", .methods = COAP_POST, .handler = _sha256_handler
 };
 
-const unsigned coap_resources_numof = ARRAY_SIZE(coap_resources);
+/* we can also include the fileserver module */
+#ifdef MODULE_NANOCOAP_FILESERVER
+#include "net/nanocoap/fileserver.h"
+#include "vfs_default.h"
+
+NANOCOAP_RESOURCE(fileserver) {
+    .path = "/vfs",
+    .methods = COAP_GET
+#if IS_USED(MODULE_NANOCOAP_FILESERVER_PUT)
+      | COAP_PUT
+#endif
+#if IS_USED(MODULE_NANOCOAP_FILESERVER_DELETE)
+      | COAP_DELETE
+#endif
+      | COAP_MATCH_SUBTREE,
+    .handler = nanocoap_fileserver_handler,
+    .context = VFS_DEFAULT_DATA
+};
+#endif

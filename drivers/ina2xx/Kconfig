@@ -5,25 +5,43 @@
 # directory for more details.
 #
 
-choice
-    bool "INA2XX current/power monitor"
-    optional
+menuconfig MODULE_INA2XX
+    bool
+    prompt "INA2XX current/power monitor" if !(MODULE_SAUL_DEFAULT && HAVE_INA2XX)
+    default (MODULE_SAUL_DEFAULT && HAVE_INA2XX)
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
+    select MODULE_PERIPH_I2C
+
+choice INA2XX_VARIANT
+    bool "Variant"
+    depends on MODULE_INA2XX
+    default MODULE_INA219 if HAVE_INA219
+    default MODULE_INA220 if HAVE_INA220
     help
         Select one of the supported models.
 
 config MODULE_INA219
     bool "INA219"
-    select MODULE_INA2XX
 
 config MODULE_INA220
     bool "INA220"
-    select MODULE_INA2XX
 
 endchoice
 
-config MODULE_INA2XX
+config HAVE_INA2XX
     bool
-    depends on HAS_PERIPH_I2C
-    select MODULE_PERIPH_I2C
+    help
+        Indicates that a INA2XX current/power monitor is present.
+
+config HAVE_INA219
+    bool
+    select HAVE_INA2XX
+    help
+        Indicates that a INA219 current/power monitor is present.
+
+config HAVE_INA220
+    bool
+    select HAVE_INA2XX
+    help
+        Indicates that a INA220 current/power monitor is present.

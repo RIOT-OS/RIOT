@@ -85,3 +85,4 @@ extern "C" {
 #endif
 
 #endif /* ATA8520E_INTERNALS_H */
+/** @} */

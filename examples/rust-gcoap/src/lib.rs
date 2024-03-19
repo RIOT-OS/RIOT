@@ -10,6 +10,8 @@ use riot_wrappers::{gcoap, thread, ztimer, gnrc};
 
 use coap_handler_implementations::{ReportingHandlerBuilder, HandlerBuilder};
 
+extern crate rust_riotmodules;
+
 riot_main!(main);
 
 fn main() {
@@ -25,7 +27,7 @@ fn main() {
         .below(&["saul"], riot_coap_handler_demos::saul::SaulHandler::new(&["saul"]))
         .with_wkc()
         ;
-    let mut handler = riot_wrappers::coap_handler::GcoapHandler(handler);
+    let mut handler = riot_wrappers::coap_handler::v0_2::GcoapHandler(handler);
 
     let mut listener = gcoap::SingleHandlerListener::new_catch_all(&mut handler);
 

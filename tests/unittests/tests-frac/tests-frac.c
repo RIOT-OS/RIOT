@@ -121,7 +121,8 @@ static void test_frac_scale32(void)
                 if ((uint32_t)expected != actual) {
                     int32_t diff = actual - expected;
                     DEBUG("%" PRIu32 " * (%" PRIu32 " / %" PRIu32 ")"
-                        " tmp %" PRIu64 " expect %" PRIu32 ", actual %" PRIu32 ", diff = %" PRId32 " shift=%u\n",
+                        " tmp %" PRIu64 " expect %" PRIu32 ", actual %" PRIu32
+                        ", diff = %" PRId32 " shift=%u\n",
                         u32_test_values[i], num, den, tmp, (uint32_t)expected,
                         actual, diff, frac.shift);
 

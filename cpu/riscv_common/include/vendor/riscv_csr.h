@@ -171,6 +171,9 @@
 
 #define PTE_TABLE(PTE) (((PTE) & (PTE_V | PTE_R | PTE_W | PTE_X)) == PTE_V)
 
+#define CSR_PMPCFG0     0x3a0 // PMP configuration base register
+#define CSR_PMPADDR0    0x3b0 // PMP address base register
+
 #ifdef __riscv
 
 #ifdef __riscv64

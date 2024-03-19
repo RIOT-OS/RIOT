@@ -6,14 +6,15 @@
 ## Overview
 
 The Nucleo-F070RB is a board from ST's Nucleo family supporting a ARM Cortex-M0
-STM32F070RB microcontroller with 16Kb of SRAM and 128Kb of ROM Flash.
+STM32F070RB microcontroller with 16KiB of RAM and 128KiB of Flash.
 
 ## Hardware
 
-![Nucleo64 F070RB]
-(http://www.open-electronics.org/wp-content/uploads/2015/08/Figura2-500x467.png)
+![Nucleo64 F070RB](http://www.open-electronics.org/wp-content/uploads/2015/08/Figura2-500x467.png)
 
+## Pinout
 
+@image html pinouts/nucleo-f070rb.svg "Pinout for the nucleo-f070rb" width=50%
 
 ### MCU
 | MCU                   | STM32F070RB                                                                           |
@@ -54,6 +55,9 @@ STM32F070RB microcontroller with 16Kb of SRAM and 128Kb of ROM Flash.
 
 
 ## Flashing the device
+
+### Flashing the Board Using OpenOCD
+
 The ST Nucleo-F070RB board includes an on-board ST-LINK V2 programmer. The
 easiest way to program the board is to use OpenOCD. Once you have installed
 OpenOCD (look [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD) for
@@ -67,6 +71,18 @@ and debug via GDB by simply typing
 make BOARD=nucleo-f070rb debug
 ```
 
+### Flashing the Board Using ST-LINK Removable Media
+
+On-board ST-LINK programmer provides via composite USB device removable media.
+Copying the HEX file causes reprogramming of the board. This task
+could be performed manually; however, the cpy2remed (copy to removable
+media) PROGRAMMER script does this automatically. To program board in
+this manner, use the command:
+```
+make BOARD=nucleo-f070rb PROGRAMMER=cpy2remed flash
+```
+@note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
+could be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
 
 ## Supported Toolchains
 For using the ST Nucleo-F070RB board we strongly recommend the usage of the

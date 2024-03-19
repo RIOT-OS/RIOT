@@ -87,14 +87,14 @@
  * and `bme680_spi`. Several BME680 sensors and a mixed configuration of I2C
  * and SPI can be used in one application.
  * ```
- * USEMODULE='bme680_spi bme680_i2c' make BOARD=... -C tests/driver_bme680
+ * USEMODULE='bme680_spi bme680_i2c' make BOARD=... -C tests/drivers/bme680
  * ```
  *
  * The vendor driver allows the use of floating point conversions. In order
  * to use these floating point conversions, module `bme680_fp` has to
  * be enabled:
  * ```
- * USEMODULE='bme680_fp bme680_i2c' make BOARD=... -C tests/driver_bme680
+ * USEMODULE='bme680_fp bme680_i2c' make BOARD=... -C tests/drivers/bme680
  * ```
  *
  * @{
@@ -281,7 +281,7 @@ int bme680_force_measurement(bme680_t *dev);
  *
  * @param[in,out]   dev     device descriptor of the sensor
  *
- * @return  duration of one THPG measurement cylce in milliseconds.
+ * @return  duration of one THPG measurement cycle in milliseconds.
  * @return  < 0 on error
  */
 int bme680_get_duration(bme680_t* dev);

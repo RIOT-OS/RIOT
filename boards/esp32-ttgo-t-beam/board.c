@@ -33,8 +33,6 @@
 
 void board_init(void)
 {
-    board_init_common();
-
 #if MODULE_ESP32_TTGO_T_BEAM_V1_0
     uint8_t reg;
 

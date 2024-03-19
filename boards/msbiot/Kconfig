@@ -30,6 +30,9 @@ config BOARD_MSBIOT
     select HAVE_MPU9150
     select HAVE_SAUL_GPIO
 
+config CLOCK_HSE
+    default 16000000
+
 config CLOCK_PLL_M
     default 16
 

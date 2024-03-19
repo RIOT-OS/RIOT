@@ -13,6 +13,7 @@
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  *
  * @see http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/fcntl.h.html
+ * @{
  */
 
 #ifndef FCNTL_H

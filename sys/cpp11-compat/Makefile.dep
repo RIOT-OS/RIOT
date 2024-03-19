@@ -1,0 +1,8 @@
+USEMODULE += ztimer64_usec
+USEMODULE += timex
+FEATURES_REQUIRED += cpp
+FEATURES_REQUIRED += libstdcpp
+ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+  # requires 64bit for syscalls
+  USEMODULE += ztimer64_xtimer_compat
+endif

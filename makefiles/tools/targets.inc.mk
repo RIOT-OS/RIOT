@@ -12,15 +12,15 @@ $(RIOTTOOLS)/bossa-$(BOSSA_VERSION)/bossac:
 	@$(MAKE) -C $(RIOTTOOLS)/bossa-$(BOSSA_VERSION)
 	@echo "[INFO] bossac $(BOSSA_VERSION) binary successfully built!"
 
-$(RIOTTOOLS)/pic32prog/pic32prog: $(RIOTTOOLS)/pic32prog/Makefile
-	@echo "[INFO] $(@F) binary not found - building it from source now"
-	$(MAKE) -C $(@D)
-	@echo "[INFO] $(@F) binary successfully built!"
-
 $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py: $(RIOTTOOLS)/cc2538-bsl/Makefile
 	@echo "[INFO] cc2538-bsl.py not found - fetching it from GitHub now"
 	@CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/cc2538-bsl
 	@echo "[INFO] cc2538-bsl.py successfully fetched!"
+
+$(RIOTTOOLS)/bootterm/bt: $(RIOTTOOLS)/bootterm/Makefile
+	@echo "[INFO] bt binary not found - building it from source now"
+	@CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/bootterm
+	@echo "[INFO] bt binary successfully built!"
 
 $(PKGDIRBASE)/cosy/cosy.py: $(RIOTTOOLS)/cosy/Makefile
 	@echo "[INFO] cosy.py not found - fetching it from GitHub now"
@@ -31,6 +31,12 @@ $(RIOTTOOLS)/edbg/edbg: $(RIOTTOOLS)/edbg/Makefile
 	@echo "[INFO] edbg binary not found - building it from source now"
 	CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/edbg
 	@echo "[INFO] edbg binary successfully built!"
+
+$(RIOTTOOLS)/mspdebug/mspdebug: $(RIOTTOOLS)/mspdebug/Makefile
+	@echo "[INFO] mspdebug binary not found - building it from source now"
+	@echo "[INFO] mspdebug requires readline and libusb-compat headers to build"
+	CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/mspdebug
+	@echo "[INFO] mspdebug binary successfully built!"
 
 $(RIOTTOOLS)/mosquitto_rsmb/mosquitto_rsmb:
 	@echo "[INFO] rsmb binary not found - building it from source now"
@@ -64,3 +70,8 @@ $(RIOTTOOLS)/elf2uf2/elf2uf2: $(RIOTTOOLS)/elf2uf2/Makefile
 	@echo "[INFO] elf2uf2 not found - fetching it from GitHub now"
 	CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/elf2uf2
 	@echo "[INFO] elf2uf2 successfully fetched!"
+
+$(RIOTTOOLS)/pioasm/pioasm: $(RIOTTOOLS)/pioasm/Makefile
+	@echo "[INFO] pioasm not found - fetching it from GitHub now"
+	CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/pioasm
+	@echo "[INFO] pioasm successfully fetched!"

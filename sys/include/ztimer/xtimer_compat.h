@@ -7,7 +7,8 @@
  */
 
 /**
- * @ingroup   sys_ztimer_util
+ * @defgroup  sys_ztimer_xtimer_compat ztimer_xtimer_compat: xtimer wrapper
+ * @ingroup   sys_ztimer
  * @{
  * @file
  * @brief   ztimer xtimer wrapper interface
@@ -54,9 +55,28 @@ extern "C" {
 #define XTIMER_WIDTH    (32)
 #define XTIMER_MASK     (0)
 
+/**
+ * a default XTIMER_BACKOFF value, this is not used by ztimer, but other code
+ * uses this value to set timers
+ */
+
+#ifndef XTIMER_BACKOFF
+#define XTIMER_BACKOFF  1
+#endif
+
 typedef ztimer_t xtimer_t;
 typedef uint32_t xtimer_ticks32_t;
 typedef uint64_t xtimer_ticks64_t;
+
+static inline void xtimer_init(void)
+{
+    ztimer_init();
+}
+
+static inline bool xtimer_is_set(const xtimer_t *timer)
+{
+    return ztimer_is_set(ZTIMER_USEC, timer);
+}
 
 static inline xtimer_ticks32_t xtimer_ticks(uint32_t ticks)
 {
@@ -142,16 +162,16 @@ static inline void xtimer_tsleep32(xtimer_ticks32_t ticks)
     xtimer_usleep(xtimer_usec_from_ticks(ticks));
 }
 
-static inline uint64_t xtimer_tsleep64(xtimer_ticks64_t ticks)
+static inline void xtimer_tsleep64(xtimer_ticks64_t ticks)
 {
     const uint32_t max_sleep = UINT32_MAX;
     uint64_t time = xtimer_usec_from_ticks64(ticks);
 
     while (time > max_sleep) {
-        xtimer_usleep(clock, max_sleep);
+        xtimer_usleep(max_sleep);
         time -= max_sleep;
     }
-    xtimer_usleep(clock, time);
+    xtimer_usleep(time);
 }
 
 static inline void xtimer_set(xtimer_t *timer, uint32_t offset)
@@ -191,6 +211,16 @@ static inline int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t us)
 {
     assert(us <= UINT32_MAX);
     if (ztimer_mutex_lock_timeout(ZTIMER_USEC, mutex, (uint32_t)us)) {
+        /* Impedance matching required: Convert -ECANCELED error code to -1: */
+        return -1;
+    }
+    return 0;
+}
+
+static inline int xtimer_rmutex_lock_timeout(rmutex_t *rmutex, uint64_t us)
+{
+    assert(us <= UINT32_MAX);
+    if (ztimer_rmutex_lock_timeout(ZTIMER_USEC, rmutex, us)) {
         /* Impedance matching required: Convert -ECANCELED error code to -1: */
         return -1;
     }

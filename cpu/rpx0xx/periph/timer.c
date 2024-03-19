@@ -88,14 +88,14 @@ static inline void _irq_enable(tim_t dev)
 {
     for (uint8_t i = 0; i < timer_config[dev].ch_numof; i++) {
         NVIC_EnableIRQ(timer_config[dev].ch[i].irqn);
-        io_reg_atomic_set(&DEV(dev)->INTE.reg, (1U << i));
+        io_reg_atomic_set(&DEV(dev)->INTE, (1U << i));
     }
 }
 
 static void _isr(tim_t dev, int channel)
 {
     /* clear latched interrupt */
-    io_reg_atomic_clear(&DEV(dev)->INTR.reg, 1U << channel);
+    io_reg_atomic_clear(&DEV(dev)->INTR, 1U << channel);
 
     if (_timer_is_periodic(dev, channel)) {
         if (_timer_reset_on_match(dev, channel)) {
@@ -118,7 +118,8 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     }
     /* The timer must run at 1000000 Hz (µs precision)
        because the number of cycles per µs is shared with the watchdog.
-       The reference clock (clk_ref) is divided by WATCHDOG->TICK.bits.CYCLES
+       The reference clock (clk_ref) is divided by
+       (WATCHDOG->TICK & WATCHDOC_TICK_CYCLES_Mask)
        to generate µs ticks.
      */
     assert(freq == US_PER_SEC); (void)freq;
@@ -126,7 +127,7 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     _timer_ctx_arg[dev] = arg;
     periph_reset(RESETS_RESET_timer_Msk);
     periph_reset_done(RESETS_RESET_timer_Msk);
-    io_reg_write_dont_corrupt(&WATCHDOG->TICK.reg,
+    io_reg_write_dont_corrupt(&WATCHDOG->TICK,
                               (CLOCK_XOSC / MHZ(1)) << WATCHDOG_TICK_CYCLES_Pos,
                               WATCHDOG_TICK_CYCLES_Msk);
     _irq_enable(dev);
@@ -183,6 +184,9 @@ int timer_set_periodic(tim_t dev, int channel, unsigned int value, uint8_t flags
     if (channel < 0 || channel >= timer_config[dev].ch_numof) {
         return -EINVAL;
     }
+    if (flags & TIM_FLAG_SET_STOPPED) {
+        timer_stop(dev);
+    }
     if (flags & TIM_FLAG_RESET_ON_SET) {
         _timer_reset(dev);
     }
@@ -202,7 +206,7 @@ int timer_clear(tim_t dev, int channel)
         return -EINVAL;
     }
     /* ARMED bits are write clear */
-    io_reg_atomic_set(&DEV(dev)->ARMED.reg, (1 << channel));
+    io_reg_atomic_set(&DEV(dev)->ARMED, (1 << channel));
     unsigned state = irq_disable();
     _timer_disable_periodic(dev, channel);
     irq_restore(state);
@@ -220,13 +224,13 @@ unsigned int timer_read(tim_t dev)
 void timer_start(tim_t dev)
 {
     assert(dev < TIMER_NUMOF);
-    io_reg_atomic_clear(&DEV(dev)->PAUSE.reg, (1 << TIMER_PAUSE_PAUSE_Pos));
+    io_reg_atomic_clear(&DEV(dev)->PAUSE, (1 << TIMER_PAUSE_PAUSE_Pos));
 }
 
 void timer_stop(tim_t dev)
 {
     assert(dev < TIMER_NUMOF);
-    io_reg_atomic_set(&DEV(dev)->PAUSE.reg, (1 << TIMER_PAUSE_PAUSE_Pos));
+    io_reg_atomic_set(&DEV(dev)->PAUSE, (1 << TIMER_PAUSE_PAUSE_Pos));
 }
 
 /* timer 0 IRQ0 */

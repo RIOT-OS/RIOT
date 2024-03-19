@@ -16,6 +16,7 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
+#include <stdint.h>
 #include <stdatomic.h>
 #include <sys/uio.h>
 

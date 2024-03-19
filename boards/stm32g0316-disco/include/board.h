@@ -28,24 +28,17 @@ extern "C" {
 #endif
 
 
-#define LED0_PIN            GPIO_PIN(PORT_A, 12)
-#define LED0_MODE           GPIO_OUT
-#define LED0_MASK           (1 << 12)
-
-#define LED0_ON             (GPIOA->BSRR = LED0_MASK)
-#define LED0_OFF            (GPIOA->BSRR = (LED0_MASK << 16))
-#define LED0_TOGGLE         (GPIOA->ODR  ^= LED0_MASK)
+#define LED0_PIN_NUM        12
+#define LED0_PORT_NUM       PORT_A
 
 #define BTN0_PIN            GPIO_PIN(PORT_A, 0)
 #define BTN0_MODE           GPIO_IN
-/**
- * @brief   Initialize board specific hardware
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }
 #endif
+
+#include "stm32_leds.h"
 
 #endif /* BOARD_H */
 /** @} */

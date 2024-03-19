@@ -11529,8 +11529,8 @@ typedef struct {                                /*!< (@ 0x40002C00) WWDGT Struct
   * @{
   */
 
-//#define ADC0_BASE                   0x40012400UL
-//#define ADC1_BASE                   0x40012800UL
+#define ADC0_BASE                   0x40012400UL
+#define ADC1_BASE                   0x40012800UL
 //#define AFIO_BASE                   0x40010000UL
 //#define BKP_BASE                    0x40006C00UL
 //#define CAN0_BASE                   0x40006400UL
@@ -11549,15 +11549,15 @@ typedef struct {                                /*!< (@ 0x40002C00) WWDGT Struct
 //#define GPIOC_BASE                  0x40011000UL
 //#define GPIOD_BASE                  0x40011400UL
 //#define GPIOE_BASE                  0x40011800UL
-//#define I2C0_BASE                   0x40005400UL
-//#define I2C1_BASE                   0x40005800UL
+#define I2C0_BASE                   0x40005400UL
+#define I2C1_BASE                   0x40005800UL
 //#define ECLIC_BASE                  0xD2000000UL
 //#define PMU_BASE                    0x40007000UL
 //#define RCU_BASE                    0x40021000UL
 //#define RTC_BASE                    0x40002800UL
-//#define SPI0_BASE                   0x40013000UL
-//#define SPI1_BASE                   0x40003800UL
-//#define SPI2_BASE                   0x40003C00UL
+#define SPI0_BASE                   0x40013000UL
+#define SPI1_BASE                   0x40003800UL
+#define SPI2_BASE                   0x40003C00UL
 #define TIMER0_BASE                 0x40012C00UL
 #define TIMER1_BASE                 0x40000000UL
 #define TIMER2_BASE                 0x40000400UL

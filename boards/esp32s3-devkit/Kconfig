@@ -1,0 +1,75 @@
+# Copyright (c) 2020 HAW Hamburg
+#               2022 Gunar Schorcht
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "esp32s3-devkit" if BOARD_ESP32S3_DEVKIT
+
+config BOARD_VERSION
+    string
+    default "esp32s3-devkitc-1-n8" if BOARD_VERSION_ESP32S3_DEVKITC_1_N8
+    default "esp32s3-devkitc-1-n8r2" if BOARD_VERSION_ESP32S3_DEVKITC_1_N8R2
+    default "esp32s3-devkitc-1-n8r8" if BOARD_VERSION_ESP32S3_DEVKITC_1_N8R8
+    default "esp32s3-devkitc-1-n16r8v" if BOARD_VERSION_ESP32S3_DEVKITC_1_N16R8V
+    default "esp32s3-devkitc-1-n32r8v" if BOARD_VERSION_ESP32S3_DEVKITC_1_N32R8V
+    default "esp32s3-devkitc-1u-n8" if BOARD_VERSION_ESP32S3_DEVKITC_1U_N8
+    default "esp32s3-devkitc-1u-n8r2" if BOARD_VERSION_ESP32S3_DEVKITC_1U_N8R2
+    default "esp32s3-devkitc-1u-n8r8" if BOARD_VERSION_ESP32S3_DEVKITC_1U_N8R8
+    default "esp32s3-devkitm-1-n8" if BOARD_VERSION_ESP32S3_DEVKITM_1_N8
+    default "esp32s3-devkitm-1u-n8" if BOARD_VERSION_ESP32S3_DEVKITM_1U_N8
+    help
+        Set variable BOARD_VERSION for the make system.
+
+config BOARD_ESP32S3_DEVKIT
+    bool
+    default y
+    select BOARD_COMMON_ESP32S3
+    select CPU_MODEL_ESP32S3_WROOM_1X_N8 if BOARD_VERSION_ESP32S3_DEVKITC_1_N8
+    select CPU_MODEL_ESP32S3_WROOM_1X_N8R2 if BOARD_VERSION_ESP32S3_DEVKITC_1_N8R2
+    select CPU_MODEL_ESP32S3_WROOM_1X_N8R8 if BOARD_VERSION_ESP32S3_DEVKITC_1_N8R8
+    select CPU_MODEL_ESP32S3_WROOM_1X_N16R8V if BOARD_VERSION_ESP32S3_DEVKITC_1_N16R8V
+    select CPU_MODEL_ESP32S3_WROOM_1X_N32R8V if BOARD_VERSION_ESP32S3_DEVKITC_1_N32R8V
+    select CPU_MODEL_ESP32S3_WROOM_1X_N8 if BOARD_VERSION_ESP32S3_DEVKITC_1U_N8
+    select CPU_MODEL_ESP32S3_WROOM_1X_N8R2 if BOARD_VERSION_ESP32S3_DEVKITC_1U_N8R2
+    select CPU_MODEL_ESP32S3_WROOM_1X_N8R8 if BOARD_VERSION_ESP32S3_DEVKITC_1U_N8R8
+    select CPU_MODEL_ESP32S3_MINI_1X_N8 if BOARD_VERSION_ESP32S3_DEVKITM_1_N8
+    select CPU_MODEL_ESP32S3_MINI_1X_N8 if BOARD_VERSION_ESP32S3_DEVKITM_1U_N8
+    select HAS_ARDUINO_PINS
+    select HAS_ESP_JTAG
+    select HAS_PERIPH_ADC
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_PWM
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_USBDEV
+    select HAS_TINYUSB_DEVICE
+
+    choice
+        bool "ESP32-S3-DevKit board version"
+        default BOARD_VERSION_ESP32S3_DEVKITC_1_N8
+
+        config BOARD_VERSION_ESP32S3_DEVKITC_1_N8
+            bool "ESP32-S3-DevKitC-1-N8"
+        config BOARD_VERSION_ESP32S3_DEVKITC_1_N8R2
+            bool "ESP32-S3-DevKitC-1-N8R2"
+        config BOARD_VERSION_ESP32S3_DEVKITC_1_N8R8
+            bool "ESP32-S3-DevKitC-1-N8R8"
+        config BOARD_VERSION_ESP32S3_DEVKITC_1_N16R8V
+            bool "ESP32-S3-DevKitC-1-N16R8V"
+        config BOARD_VERSION_ESP32S3_DEVKITC_1_N32R8V
+            bool "ESP32-S3-DevKitC-1-N32R8V"
+        config BOARD_VERSION_ESP32S3_DEVKITC_1U_N8
+            bool "ESP32-S3-DevKitC-1U-N8"
+        config BOARD_VERSION_ESP32S3_DEVKITC_1U_N8R2
+            bool "ESP32-S3-DevKitC-1U-N8R2"
+        config BOARD_VERSION_ESP32S3_DEVKITC_1U_N8R8
+            bool "ESP32-S3-DevKitC-1U-N8R8"
+        config BOARD_VERSION_ESP32S3_DEVKITM_1_N8
+            bool "ESP32-S3-DevKitM-1-N8"
+        config BOARD_VERSION_ESP32S3_DEVKITM_1U_N8
+            bool "ESP32-S3-DevKitM-1U-N8"
+    endchoice
+
+source "$(RIOTBOARD)/common/esp32s3/Kconfig"

@@ -1,0 +1,6 @@
+/**
+ * @defgroup pkg_adafruit_sensor Adafruit Unified Sensor Driver
+ * @ingroup  pkg
+ * @brief    Adafruit Unified Sensor Driver
+ * @see      https://github.com/adafruit/Adafruit_Sensor
+ */

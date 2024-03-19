@@ -1,0 +1,6 @@
+PORT_LINUX ?= /dev/ttyACM0
+
+PSEUDOMODULES += esp32c3_wemos_mini_v1_0_0
+PSEUDOMODULES += esp32c3_wemos_mini_v2_1_0
+
+include $(RIOTBOARD)/common/esp32c3/Makefile.include

@@ -57,6 +57,11 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   Maximum bytes per frame for I2C operations
+ */
+#define PERIPH_I2C_MAX_BYTES_PER_FRAME 256
+
+/**
  * @brief   Override GPIO type
  * @{
  */
@@ -121,6 +126,60 @@ typedef enum {
     GPIO_OD_PU = 0xff                   /**< not supported by HW */
 } gpio_mode_t;
 
+#define HAVE_GPIO_SLEW_T
+typedef enum {
+    GPIO_SLEW_SLOWEST = 0,
+    GPIO_SLEW_SLOW = 0,
+    GPIO_SLEW_FAST = 0,
+    GPIO_SLEW_FASTEST = 0,
+} gpio_slew_t;
+
+#define HAVE_GPIO_PULL_STRENGTH_T
+typedef enum {
+    GPIO_PULL_WEAKEST = 0,
+    GPIO_PULL_WEAK = 0,
+    GPIO_PULL_STRONG = 0,
+    GPIO_PULL_STRONGEST = 0
+} gpio_pull_strength_t;
+
+#define HAVE_GPIO_DRIVE_STRENGTH_T
+typedef enum {
+    GPIO_DRIVE_WEAKEST = 0,
+    GPIO_DRIVE_WEAK = 0,
+    GPIO_DRIVE_STRONG = 1,
+    GPIO_DRIVE_STRONGEST = 1
+} gpio_drive_strength_t;
+
+#define HAVE_GPIO_PULL_T
+typedef enum {
+    GPIO_FLOATING,
+    GPIO_PULL_UP,
+    GPIO_PULL_DOWN,
+    GPIO_PULL_KEEP,
+} gpio_pull_t;
+
+#define HAVE_GPIO_STATE_T
+typedef enum {
+    GPIO_OUTPUT_PUSH_PULL,
+    GPIO_OUTPUT_OPEN_DRAIN,
+    GPIO_OUTPUT_OPEN_SOURCE,
+    GPIO_INPUT,
+    GPIO_USED_BY_PERIPHERAL,
+    GPIO_DISCONNECT,
+} gpio_state_t;
+
+#define HAVE_GPIO_IRQ_TRIG_T
+typedef enum {
+    GPIO_TRIGGER_EDGE_RISING    = EIC_CONFIG_SENSE0_RISE_Val,
+    GPIO_TRIGGER_EDGE_FALLING   = EIC_CONFIG_SENSE0_FALL_Val,
+    GPIO_TRIGGER_EDGE_BOTH      = EIC_CONFIG_SENSE0_BOTH_Val,
+    GPIO_TRIGGER_LEVEL_HIGH     = EIC_CONFIG_SENSE0_HIGH_Val,
+    GPIO_TRIGGER_LEVEL_LOW      = EIC_CONFIG_SENSE0_LOW_Val,
+} gpio_irq_trig_t;
+
+#define HAVE_GPIO_CONF_T
+typedef union gpio_conf_sam0 gpio_conf_t;
+
 /**
  * @brief   Override active flank configuration values
  * @{
@@ -133,6 +192,49 @@ typedef enum {
 } gpio_flank_t;
 /** @} */
 #endif /* ndef DOXYGEN */
+
+/**
+ * @brief       GPIO pin configuration for SAM0 MCUs
+ * @ingroup     drivers_periph_gpio_ll
+ */
+union gpio_conf_sam0 {
+    uint8_t bits;  /**< the raw bits */
+    struct {
+        /**
+         * @brief   State of the pin
+         */
+        gpio_state_t state                      : 3;
+        /**
+         * @brief   Pull resistor configuration
+         */
+        gpio_pull_t pull                        : 2;
+        /**
+         * @brief   Drive strength of the GPIO
+         *
+         * @warning If the requested drive strength is not available, the
+         *          closest fit supported will be configured instead.
+         *
+         * This value is ignored when @ref gpio_conf_sam0::state is configured
+         * to @ref GPIO_INPUT or @ref GPIO_DISCONNECT.
+         */
+        gpio_drive_strength_t drive_strength    : 1;
+        /**
+         * @brief   Initial value of the output
+         *
+         * Ignored if @ref gpio_conf_sam0::state is set to @ref GPIO_INPUT or
+         * @ref GPIO_DISCONNECT. If the pin was previously in a high impedance
+         * state, it is guaranteed to directly transition to the given initial
+         * value.
+         *
+         * @ref gpio_ll_query_conf will write the current value of the specified
+         * pin here, which is read from the input register when the state is
+         * @ref GPIO_INPUT, otherwise the state from the output register is
+         * consulted.
+         */
+        bool initial_value                      : 1;
+        uint8_t                                 : 1; /*< padding */
+    };
+};
 
 /**
  * @brief   Available MUX values for configuring a pin's alternate function
@@ -153,6 +255,7 @@ typedef enum {
     GPIO_MUX_L = 0xb,       /**< select peripheral function L */
     GPIO_MUX_M = 0xc,       /**< select peripheral function M */
     GPIO_MUX_N = 0xd,       /**< select peripheral function N */
+    GPIO_MUX_DISABLED = 0xff, /**< Disable  */
 } gpio_mux_t;
 #endif
 
@@ -183,6 +286,7 @@ typedef enum {
     UART_FLAG_NONE            = 0x0,    /**< No flags set */
     UART_FLAG_RUN_STANDBY     = 0x1,    /**< run SERCOM in standby mode */
     UART_FLAG_WAKEUP          = 0x2,    /**< wake from sleep on receive */
+    UART_FLAG_TX_ONDEMAND     = 0x4,    /**< Only enable TX pin on demand */
 } uart_flag_t;
 
 #ifndef DOXYGEN
@@ -719,12 +823,13 @@ static inline void sercom_clk_dis(void *sercom)
 
 #ifdef CPU_COMMON_SAMD5X
 static inline uint8_t _sercom_gclk_id_core(uint8_t sercom_id) {
-    if (sercom_id < 2)
+    if (sercom_id < 2) {
         return sercom_id + 7;
-    if (sercom_id < 4)
+    } else if (sercom_id < 4) {
         return sercom_id + 21;
-    else
+    } else {
         return sercom_id + 30;
+    }
 }
 #endif
 
@@ -772,9 +877,69 @@ static inline bool cpu_woke_from_backup(void)
  * @brief ADC Channel Configuration
  */
 typedef struct {
-    gpio_t pin;            /**< ADC channel pin */
-    uint32_t muxpos;       /**< ADC channel pin multiplexer value */
+    union {
+        uint32_t inputctrl; /**< ADC channel pin multiplexer value  */
+        uint32_t muxpos;    /**< ADC channel pin multiplexer value
+                                 @deprecated, use inputctrl instead */
+    };
+#ifdef ADC0
+    Adc *dev;               /**< ADC device descriptor */
+#endif
 } adc_conf_chan_t;
+
+/**
+ * @brief Compatibility define for muxpos struct member
+ *        Unused on all platforms that have DIFFMODE in CTRLB
+ */
+#ifndef ADC_INPUTCTRL_DIFFMODE
+#define ADC_INPUTCTRL_DIFFMODE  (1 << 7)
+#endif
+
+/**
+ * @brief Pin that can be used for external voltage reference A
+ */
+#define ADC_REFSEL_AREFA_PIN    GPIO_PIN(PA, 3)
+
+/**
+ * @brief Pin that can be used for external voltage reference B
+ */
+#define ADC_REFSEL_AREFB_PIN    GPIO_PIN(PA, 4)
+
+#if defined(ADC_REFCTRL_REFSEL_AREFC) || DOXYGEN
+/**
+ * @brief Pin that can be used for external voltage reference C
+ */
+#define ADC_REFSEL_AREFC_PIN    GPIO_PIN(PA, 6)
+#endif
+
+#ifndef DOXYGEN
+#define HAVE_ADC_RES_T
+typedef enum {
+    ADC_RES_6BIT  = 0xff,                       /**< not supported */
+#if defined(ADC_CTRLB_RESSEL)
+    ADC_RES_8BIT  = ADC_CTRLB_RESSEL_8BIT_Val,  /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = ADC_CTRLB_RESSEL_10BIT_Val, /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = ADC_CTRLB_RESSEL_12BIT_Val, /**< ADC resolution: 12 bit */
+#elif defined(ADC_CTRLC_RESSEL)
+    ADC_RES_8BIT  = ADC_CTRLC_RESSEL_8BIT_Val,  /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = ADC_CTRLC_RESSEL_10BIT_Val, /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = ADC_CTRLC_RESSEL_12BIT_Val, /**< ADC resolution: 12 bit */
+#endif
+    ADC_RES_16BIT_2SAMPL    = ( 0x1 << 2) | 0x1, /**< sum of 2 12 bit samples    */
+    ADC_RES_16BIT_4SAMPL    = ( 0x2 << 2) | 0x1, /**< sum of 4 12 bit samples    */
+    ADC_RES_16BIT_8SAMPL    = ( 0x3 << 2) | 0x1, /**< sum of 8 12 bit samples    */
+    ADC_RES_16BIT_16SAMPL   = ( 0x4 << 2) | 0x1, /**< sum of 16 12 bit samples   */
+    ADC_RES_16BIT_32SAMPL   = ( 0x5 << 2) | 0x1, /**< sum of 32 12 bit samples   */
+    ADC_RES_16BIT_64SAMPL   = ( 0x6 << 2) | 0x1, /**< sum of 64 12 bit samples   */
+    ADC_RES_16BIT_128SAMPL  = ( 0x7 << 2) | 0x1, /**< sum of 128 12 bit samples  */
+    ADC_RES_16BIT_256SAMPL  = ( 0x8 << 2) | 0x1, /**< sum of 256 12 bit samples  */
+    ADC_RES_16BIT_512SAMPL  = ( 0x9 << 2) | 0x1, /**< sum of 512 12 bit samples  */
+    ADC_RES_16BIT_1024SAMPL = ( 0xA << 2) | 0x1, /**< sum of 1024 12 bit samples */
+    ADC_RES_14BIT = 0xfe,                        /**< not supported */
+} adc_res_t;
+
+#define ADC_RES_16BIT   ADC_RES_16BIT_16SAMPL   /**< default to 16x oversampling */
+#endif /* DOXYGEN */
 
 /**
  * @name Ethernet peripheral parameters
@@ -842,6 +1007,25 @@ typedef struct {
 #endif /* USB_INST_NUM */
 
 /**
+ * @brief SDIO/SDMMC buffer alignment for SDHC because of DMA/FIFO buffer restrictions
+ */
+#define SDMMC_CPU_DMA_ALIGNMENT     4
+
+/**
+ * @brief SDIO/SDMMC buffer instantiation requirement for SDHC
+ */
+#define SDMMC_CPU_DMA_REQUIREMENTS  __attribute__((aligned(SDMMC_CPU_DMA_ALIGNMENT)))
+
+/**
+ * @brief SDHC peripheral configuration
+ */
+typedef struct {
+    void *sdhc; /**< SDHC peripheral */
+    gpio_t cd;  /**< Card Detect pin (must be GPIO_UNDEF if not connected) */
+    gpio_t wp;  /**< Write Protect pin (must be GPIO_UNDEF if not connected) */
+} sdhc_conf_t;
+
+/**
  * @name    WDT upper and lower bound times in ms
  * @{
  */
@@ -859,6 +1043,14 @@ typedef struct {
  * @brief Watchdog has to be initialized.
  */
 #define WDT_HAS_INIT                   (1)
+
+/**
+ * @brief   Frequency meter configuration
+ */
+typedef struct {
+    gpio_t pin;             /**< GPIO at which the frequency is to be measured */
+    uint8_t gclk_src;       /**< GCLK source select for reference */
+} freqm_config_t;
 
 #if defined(REV_DMAC) || DOXYGEN
 /**

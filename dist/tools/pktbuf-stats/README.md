@@ -2,7 +2,7 @@
 ===============
 
 This parses the output of the command `pktbuf` provided by the module
-`gnrc_pktbuf_cmd` for the `gnrc_pktbuf_static` implementation.
+`shell_cmd_gnrc_pktbuf` for the `gnrc_pktbuf_static` implementation.
 
 The command expects the ELF file of the binary the `pktbuf` command was executed
 in to get some binary information on structs potentially stored in the packet

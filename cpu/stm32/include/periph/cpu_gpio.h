@@ -117,9 +117,9 @@ typedef enum {
     GPIO_AF14,              /**< use alternate function 14 */
     GPIO_AF15,              /**< use alternate function 15 */
 #endif
+#endif
     GPIO_AF_UNDEF           /** an UNDEF value definition, e.g. for register
                                 based spi */
-#endif
 } gpio_af_t;
 
 #ifdef CPU_FAM_STM32F1

@@ -59,10 +59,10 @@
 #endif
 
 #if IS_ACTIVE(CONFIG_BOARD_HAS_HSE)
-#define PLL_IN                      CLOCK_HSE
+#define PLL_IN                      CONFIG_CLOCK_HSE
 #define PLL_SRC                     RCC_PLLCFGR_PLLSRC_HSE
 #else
-#define PLL_IN                      CLOCK_HSI
+#define PLL_IN                      CONFIG_CLOCK_HSI
 #define PLL_SRC                     RCC_PLLCFGR_PLLSRC_HSI
 #endif
 

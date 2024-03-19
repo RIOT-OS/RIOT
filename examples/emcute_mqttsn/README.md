@@ -62,7 +62,7 @@ sudo ./RIOTDIR/dist/tools/tapsetup/tapsetup
 ```
 
 2. Assign a site-global prefix to the `tapbr0` interface (the name could be
-   different on OSX etc):
+   different on your machine etc):
 ```
 sudo ip a a fec0:affe::1/64 dev tapbr0
 ```

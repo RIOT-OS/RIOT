@@ -30,7 +30,9 @@
 #define CONFIG_BOARD_HAS_HSE            1
 #endif
 
-#define CLOCK_HSE                       MHZ(32)
+#ifndef CONFIG_CLOCK_HSE
+#define CONFIG_CLOCK_HSE                       MHZ(32)
+#endif
 
 #include "periph_cpu.h"
 #include "clk_conf.h"
@@ -143,6 +145,7 @@ static const i2c_conf_t i2c_config[] = {
         .sda_af         = GPIO_AF4,
         .bus            = APB1,
         .rcc_mask       = RCC_APB1ENR1_I2C2EN,
+        .rcc_sw_mask    = RCC_CCIPR_I2C2SEL_1,      /* HSI (16 MHz) */
         .irqn           = I2C2_ER_IRQn,
     }
 };

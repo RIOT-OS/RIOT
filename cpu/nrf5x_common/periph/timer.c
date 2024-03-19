@@ -23,6 +23,7 @@
  * @}
  */
 
+#include "irq.h"
 #include "periph/timer.h"
 
 #define F_TIMER             (16000000U)     /* the timer is clocked at 16MHz */
@@ -42,6 +43,30 @@ static tim_ctx_t ctx[TIMER_NUMOF];
 static inline NRF_TIMER_Type *dev(tim_t tim)
 {
     return timer_config[tim].dev;
+}
+
+uword_t timer_query_freqs_numof(tim_t dev)
+{
+    assert(dev < TIMER_NUMOF);
+    (void)dev;
+    return 10;
+}
+
+uword_t timer_query_channel_numof(tim_t dev)
+{
+    assert(dev < TIMER_NUMOF);
+    return timer_config[dev].channels;
+}
+
+uint32_t timer_query_freqs(tim_t dev, uword_t index)
+{
+    assert(dev < TIMER_NUMOF);
+    (void)dev;
+    if (index >= 10) {
+        return 0;
+    }
+
+    return F_TIMER >> index;
 }
 
 int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
@@ -74,19 +99,21 @@ int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
             dev(tim)->PRESCALER = i;
             break;
         }
-        cando /= 2;
+        cando >>= 1;
     }
     if (i == 10) {
         return -1;
     }
 
     /* reset compare state */
-    dev(tim)->EVENTS_COMPARE[0] = 0;
-    dev(tim)->EVENTS_COMPARE[1] = 0;
-    dev(tim)->EVENTS_COMPARE[2] = 0;
+    for (unsigned i = 0; i < timer_config[tim].channels; i++) {
+        dev(tim)->EVENTS_COMPARE[i] = 0;
+    }
 
     /* enable interrupts */
-    NVIC_EnableIRQ(timer_config[tim].irqn);
+    if (cb != NULL) {
+        NVIC_EnableIRQ(timer_config[tim].irqn);
+    }
     /* start the timer */
     dev(tim)->TASKS_START = 1;
 
@@ -100,9 +127,67 @@ int timer_set_absolute(tim_t tim, int chan, unsigned int value)
         return -1;
     }
 
+    unsigned irq_state = irq_disable();
     ctx[tim].flags |= (1 << chan);
+    ctx[tim].is_periodic &= ~(1 << chan);
+    irq_restore(irq_state);
     dev(tim)->CC[chan] = value;
+
+    /* clear spurious IRQs */
+    dev(tim)->EVENTS_COMPARE[chan] = 0;
+    (void)dev(tim)->EVENTS_COMPARE[chan];
+
+    /* enable IRQ */
     dev(tim)->INTENSET = (TIMER_INTENSET_COMPARE0_Msk << chan);
+
+    return 0;
+}
+
+int timer_set(tim_t tim, int chan, unsigned int timeout)
+{
+    static const uint32_t max_mask[] = {
+        [TIMER_BITMODE_BITMODE_08Bit] = 0x000000ff,
+        [TIMER_BITMODE_BITMODE_16Bit] = 0x0000ffff,
+        [TIMER_BITMODE_BITMODE_24Bit] = 0x00ffffff,
+        [TIMER_BITMODE_BITMODE_32Bit] = 0xffffffff,
+    };
+    /* see if channel is valid */
+    if (chan >= timer_config[tim].channels) {
+        return -1;
+    }
+
+    unsigned value = timer_read(tim) + timeout;
+
+    unsigned irq_state = irq_disable();
+    ctx[tim].flags |= (1 << chan);
+    ctx[tim].is_periodic &= ~(1 << chan);
+    dev(tim)->CC[chan] = value;
+
+    /* clear spurious IRQs */
+    dev(tim)->EVENTS_COMPARE[chan] = 0;
+    (void)dev(tim)->EVENTS_COMPARE[chan];
+
+    /* enable IRQ */
+    dev(tim)->INTENSET = (TIMER_INTENSET_COMPARE0_Msk << chan);
+
+    unsigned expires = value - timer_read(tim);
+    expires &= max_mask[timer_config[tim].bitmode];
+    if (expires > timeout) {
+        /* timer already expired, check if IRQ flag is set */
+        if (!dev(tim)->EVENTS_COMPARE[chan]) {
+            /* timer has expired but IRQ flag is not set. The only way to not
+             * wait *a full period* is now to set a new target to the next tick.
+             * (Setting it to the current timer value will not trigger the IRQ
+             * flag.) We briefly stop the timer to avoid a race, losing one
+             * timer tick in accuracy. But that is better than a timer firing
+             * a whole period too late */
+            dev(tim)->TASKS_STOP = 1;
+            dev(tim)->CC[chan] = timer_read(tim) + 1;
+            dev(tim)->TASKS_START = 1;
+        }
+    }
+
+    irq_restore(irq_state);
 
     return 0;
 }
@@ -114,8 +199,13 @@ int timer_set_periodic(tim_t tim, int chan, unsigned int value, uint8_t flags)
         return -1;
     }
 
+    /* stop timer to avoid race condition */
+    dev(tim)->TASKS_STOP = 1;
+
+    unsigned irq_state = irq_disable();
     ctx[tim].flags |= (1 << chan);
     ctx[tim].is_periodic |= (1 << chan);
+    irq_restore(irq_state);
     dev(tim)->CC[chan] = value;
     if (flags & TIM_FLAG_RESET_ON_MATCH) {
         dev(tim)->SHORTS |= (1 << chan);
@@ -123,9 +213,18 @@ int timer_set_periodic(tim_t tim, int chan, unsigned int value, uint8_t flags)
     if (flags & TIM_FLAG_RESET_ON_SET) {
         dev(tim)->TASKS_CLEAR = 1;
     }
+
+    /* clear spurious IRQs */
+    dev(tim)->EVENTS_COMPARE[chan] = 0;
+    (void)dev(tim)->EVENTS_COMPARE[chan];
+
+    /* enable IRQ */
     dev(tim)->INTENSET = (TIMER_INTENSET_COMPARE0_Msk << chan);
 
-    dev(tim)->TASKS_START = 1;
+    /* re-start timer */
+    if (!(flags & TIM_FLAG_SET_STOPPED)) {
+        dev(tim)->TASKS_START = 1;
+    }
 
     return 0;
 }
@@ -159,7 +258,29 @@ void timer_start(tim_t tim)
 
 void timer_stop(tim_t tim)
 {
-    dev(tim)->TASKS_STOP = 1;
+    /* Errata: [78] TIMER: High current consumption when using
+     *                     timer STOP task only
+     *
+     * # Symptoms
+     *
+     * Increased current consumption when the timer has been running and the
+     * STOP task is used to stop it.
+     *
+     * # Conditions
+     * The timer has been running (after triggering a START task) and then it is
+     * stopped using a STOP task only.
+     *
+     * # Consequences
+     *
+     * Increased current consumption.
+     *
+     * # Workaround
+     *
+     * Use the SHUTDOWN task after the STOP task or instead of the STOP task
+     *
+     * cf. https://infocenter.nordicsemi.com/pdf/nRF52833_Engineering_A_Errata_v1.4.pdf
+     */
+    dev(tim)->TASKS_SHUTDOWN = 1;
 }
 
 static inline void irq_handler(int num)

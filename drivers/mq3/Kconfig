@@ -10,3 +10,8 @@ config MODULE_MQ3
     depends on HAS_PERIPH_ADC
     depends on TEST_KCONFIG
     select MODULE_PERIPH_ADC
+
+config HAVE_MQ3
+    bool
+    help
+      Indicates that a MQ-3 Alcohol Tester is present.

@@ -1,0 +1,38 @@
+From 221c368153f2aaa73f2a474bb39f547835fdaa0d Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benjamin.valentin@ml-pa.com>
+Date: Sat, 11 Jun 2022 14:39:16 +0200
+Subject: [PATCH] cosy: allow to specify port
+
+---
+ cosy.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/cosy.py b/cosy.py
+index b36c28a..6fcb118 100755
+--- a/cosy.py
++++ b/cosy.py
+@@ -28,7 +28,6 @@ import json
+ import frontend_server
+ 
+ ROOT = path.join(Path(path.abspath(__file__)).parent, "root")
+-PORT = 12345
+ 
+ 
+ def add_sym(target, sym):
+@@ -352,6 +351,7 @@ if __name__ == "__main__":
+     p.add_argument("-c", type=argparse.FileType('w'),
+                    help="Write module sizes to cvs file")
+     p.add_argument("-d", action="store_true", help="Don't run as web server")
++    p.add_argument("--port", default="12345", help="Webserver port", type=int)
+     args = p.parse_args()
+ 
+     # extract path to elf and map file
+@@ -407,4 +407,4 @@ if __name__ == "__main__":
+     print(subprocess.check_output((args.p + 'size', elffile)).decode("utf-8"))
+ 
+     if not args.d:
+-        frontend_server.run(ROOT, PORT, 'index.html')
++        frontend_server.run(ROOT, args.port, 'index.html')
+-- 
+2.34.1
+

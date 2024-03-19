@@ -15,9 +15,20 @@
  * ========
  * IPC messages consist of a sender PID, a type, and some content. The sender
  * PID will be set by the IPC internally and is not required to be set by the
- * user. The type helps the receiver to multiplex different message types and
- * should be set to a system-wide unique value. The content can either be
- * provided as a 32-bit integer or a pointer.
+ * user. The type helps the receiver to multiplex different message types.
+ * The content can either be provided as a 32-bit integer or a pointer.
+ *
+ * Some message types are predefined; for example, @ref
+ * GNRC_NETAPI_MSG_TYPE_RCV & co are defined. These are fixed in the sense that
+ * registering for a particular set of messages (for the above, e.g. @ref
+ * gnrc_netreg_register) will use these message types. Threads that do nothing
+ * to receive such messages can safely use the same numbers for other purposes.
+ * The predefined types use non-conflicting ranges (e.g. `0x02NN`) to avoid
+ * ruling out simultaneous use of different components in the same thread.
+ *
+ * In general, threads may consider it an error to send them a message they did
+ * not request. Best practice is to log (but otherwise ignore) unexpected
+ * messages.
  *
  * Blocking vs non-blocking
  * ========================
@@ -359,12 +370,31 @@ int msg_reply(msg_t *m, msg_t *reply);
 int msg_reply_int(msg_t *m, msg_t *reply);
 
 /**
- * @brief Check how many messages are available in the message queue
+ * @brief Check how many messages are available (waiting) in the message queue
+ *        of a specific thread
+ *
+ * @param[in] pid    a PID
+ *
+ * @return Number of messages available in queue of @p pid on success
+ * @return 0, if no caller's message queue is initialized
+ */
+unsigned msg_avail_thread(kernel_pid_t pid);
+
+/**
+ * @brief Check how many messages are available (waiting) in the message queue
  *
  * @return Number of messages available in our queue on success
  * @return 0, if no caller's message queue is initialized
  */
 unsigned msg_avail(void);
+
+/**
+ * @brief Get maximum capacity of a thread's queue length
+ *
+ * @return Number of total messages that fit in the queue of @p pid on success
+ * @return 0, if no caller's message queue is initialized
+ */
+unsigned msg_queue_capacity(kernel_pid_t pid);
 
 /**
  * @brief Initialize the current thread's message queue.

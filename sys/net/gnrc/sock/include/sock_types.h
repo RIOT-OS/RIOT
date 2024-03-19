@@ -28,7 +28,9 @@
 #include "mbox.h"
 #include "net/af.h"
 #include "net/gnrc.h"
+#if IS_USED(MODULE_GNRC_TCP)
 #include "net/gnrc/tcp.h"
+#endif
 #include "net/gnrc/netreg.h"
 #ifdef SOCK_HAS_ASYNC
 #include "net/sock/async/types.h"

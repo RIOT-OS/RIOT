@@ -71,7 +71,8 @@ static void _init_pre(pre_t *data, uint8_t type, uint8_t len)
 }
 
 void skald_eddystone_uid_adv(skald_ctx_t *ctx,
-                             const skald_eddystone_uid_t *uid, uint8_t tx_pwr)
+                             const skald_eddystone_uid_t *uid, uint8_t tx_pwr,
+                             uint32_t adv_itvl_ms)
 {
     assert(ctx && uid);
 
@@ -85,11 +86,13 @@ void skald_eddystone_uid_adv(skald_ctx_t *ctx,
 
     /* start advertising */
     ctx->pkt.len = sizeof(eddy_uid_t);
+    ctx->adv_itvl_ms = adv_itvl_ms;
     skald_adv_start(ctx);
 }
 
 void skald_eddystone_url_adv(skald_ctx_t *ctx,
-                             uint8_t scheme, const char *url, uint8_t tx_pwr)
+                             uint8_t scheme, const char *url, uint8_t tx_pwr,
+                             uint32_t adv_itvl_ms)
 {
     assert(url && ctx);
     size_t len = strlen(url);
@@ -105,5 +108,6 @@ void skald_eddystone_url_adv(skald_ctx_t *ctx,
 
     /* start advertising */
     ctx->pkt.len = (sizeof(pre_t) + 2 + len);
+    ctx->adv_itvl_ms = adv_itvl_ms;
     skald_adv_start(ctx);
 }

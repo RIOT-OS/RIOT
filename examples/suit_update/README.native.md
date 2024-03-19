@@ -48,7 +48,7 @@ $ dist/tools/suit/suit-manifest-generator/bin/suit-tool sign -k keys/default.pem
 
 5. Pull the manifest from the native instance:
 ```
-> suit coap://[2001:db8::1]/suit_manifest.signed
+> suit fetch coap://[2001:db8::1]/suit_manifest.signed
 ```
 
 6. Verify the content of the storage location
@@ -172,14 +172,18 @@ the payloads.
 lsstorage
 RAM slot 0: ".ram.0"
 RAM slot 1: ".ram.1"
+VFS 0: "/nvm0/SLOT0.txt"
+VFS 1: "/nvm0/SLOT1.txt"
 ```
 
-As shown above, two storage locations are available, `.ram.0` and `.ram.1`.
-While two slots are available, in this example only the content of the `.ram.0`
-slot will be updated.
+As shown above, four storage locations are available, RAM based storage: `.ram.0` and `.ram.1`
+as well as VFS based storage: `/nvm0/SLOT0.TXT` and `/nvm0/SLOT1.TXT`.
+While multiple slots are available, in this example only the content of the `.ram.0`
+slot will be updated, but the procedure is the same for any other slot, just replace
+`.ram.0
 
 - The `storage_content` command can be used to display a hex dump command of one
-  of the storage locations. It requires a location string, an offset and a
+  of the RAM storage locations. It requires a location string, an offset and a
   number of bytes to print:
 
 ```console
@@ -187,6 +191,13 @@ slot will be updated.
 
 ```
 As the storage location is empty on boot, nothing is printed.
+
+For VFS based storage the `vfs` command can be used instead:
+```console
+> vfs r /nvm0/SLOT0.txt
+Error opening file "/nvm0/SLOT0.txt": -ENOENT
+```
+But as the file does not initially exist, nothing is printed.
 
 ### Generating the payload and manifest
 [generating-the-payload-and-manifest]: #generating-the-payload-and-manifest
@@ -206,6 +217,12 @@ acts as a template for the real SUIT manifest. Within RIOT, the script
 
 ```console
 $ dist/tools/suit/gen_manifest.py --urlroot coap://[2001:db8::1]/ --seqnr 1 -o suit.tmp coaproot/payload.bin:0:ram:0
+```
+
+or for vfs storage:
+
+```console
+$ dist/tools/suit/gen_manifest.py --urlroot coap://[2001:db8::1]/ --seqnr 1 -o suit.tmp coaproot/payload.bin:0:/nvm0/SLOT0.txt
 ```
 
 This generates a suit manifest template with the sequence number set to `1`, a
@@ -294,7 +311,7 @@ command sequences in the manifest and download the payload when instructed to.
 The URL for the manifest can be supplied to the instance via the command line.
 
 ```console
-> suit coap://[2001:db8::1]/suit_manifest.signed
+> suit fetch coap://[2001:db8::1]/suit_manifest.signed
 ```
 
 The payload is the full URL to the signed manifest. The native instance should
@@ -338,6 +355,14 @@ same payload as suggested above was used, it should look like this:
 41414242434344440A
 ```
 
-The process can be done multiple times with both slot `.ram.0` and `.ram.1` and
+Or for vfs storage:
+
+```
+> vfs r /nvm0/SLOT0.txt
+vfs r /nvm0/SLOT0.txt
+00000000: 4141 4242 4343 4444 0a                   AABBCCDD.
+-- EOF --
+```
+The process can be done multiple times for any of the slots and
 different payloads. Keep in mind that the sequence number is a strict
 monotonically number and must be increased after every update.

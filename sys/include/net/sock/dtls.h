@@ -523,6 +523,7 @@
 #define NET_SOCK_DTLS_H
 
 #include <assert.h>
+#include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -598,7 +599,7 @@ enum {
 /**
  * @brief   Type for a DTLS sock object
  *
- * @note    API implementors: `struct sock_dtls` needs to be defined by
+ * @note    API implementers: `struct sock_dtls` needs to be defined by
  *          an implementation-specific `sock_dtls_types.h`.
  */
 typedef struct sock_dtls sock_dtls_t;
@@ -898,6 +899,44 @@ static inline ssize_t sock_dtls_recv_buf(sock_dtls_t *sock,
 }
 
 /**
+ * @brief Encrypts and sends a message to a remote peer with non-continous payload
+ *
+ * @param[in]   sock    DTLS sock to use
+ * @param[in]   remote  DTLS session to use. A new session will be created
+ *                      if no session exist between client and server.
+ * @param[in]   snips   List of payload chunks, will be processed in order.
+ *                      May be `NULL`.
+ * @param[in]   timeout Handshake timeout in microseconds.
+ *                      If `timeout > 0`, will start a new handshake if no
+ *                      session exists yet. The function will block until
+ *                      handshake completed or timed out.
+ *                      May be SOCK_NO_TIMEOUT to block indefinitely until
+ *                      handshake complete.
+ * @param[out] aux      Auxiliary data about the transmission.
+ *                      May be `NULL`, if it is not required by the application.
+ *
+ * @note    When blocking, we will need an extra thread to call
+ *          @ref sock_dtls_recv() function to handle the incoming handshake
+ *          messages.
+ *
+ * @return The number of bytes sent on success
+ * @return  -ENOTCONN, if `timeout == 0` and no existing session exists with
+ *          @p remote
+ * @return  -EADDRINUSE, if sock_dtls_t::udp_sock has no local end-point.
+ * @return  -EAFNOSUPPORT, if `remote->ep != NULL` and
+ *          sock_dtls_session_t::ep::family of @p remote is != AF_UNSPEC and
+ *          not supported.
+ * @return  -EINVAL, if sock_udp_ep_t::addr of @p remote->ep is an
+ *          invalid address.
+ * @return  -EINVAL, if sock_udp_ep_t::port of @p remote->ep is 0.
+ * @return  -ENOMEM, if no memory was available to send @p data.
+ * @return  -ETIMEDOUT, `0 < timeout < SOCK_NO_TIMEOUT` and timed out.
+ */
+ssize_t sock_dtls_sendv_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
+                            const iolist_t *snips, uint32_t timeout,
+                            sock_dtls_aux_tx_t *aux);
+
+/**
  * @brief Encrypts and sends a message to a remote peer
  *
  * @param[in]   sock    DTLS sock to use
@@ -931,9 +970,19 @@ static inline ssize_t sock_dtls_recv_buf(sock_dtls_t *sock,
  * @return  -ENOMEM, if no memory was available to send @p data.
  * @return  -ETIMEDOUT, `0 < timeout < SOCK_NO_TIMEOUT` and timed out.
  */
-ssize_t sock_dtls_send_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
-                           const void *data, size_t len, uint32_t timeout,
-                           sock_dtls_aux_tx_t *aux);
+static inline ssize_t sock_dtls_send_aux(sock_dtls_t *sock,
+                                         sock_dtls_session_t *remote,
+                                         const void *data, size_t len,
+                                         uint32_t timeout,
+                                         sock_dtls_aux_tx_t *aux)
+{
+    const iolist_t snip = {
+        .iol_base = (void *)data,
+        .iol_len  = len,
+    };
+
+    return sock_dtls_sendv_aux(sock, remote, &snip, timeout, aux);
+}
 
 /**
  * @brief Encrypts and sends a message to a remote peer
@@ -984,6 +1033,54 @@ static inline ssize_t sock_dtls_send(sock_dtls_t *sock,
 }
 
 /**
+ * @brief Encrypts and sends a message to a remote peer with non-continous payload
+ *
+ * @param[in] sock      DTLS sock to use
+ * @param[in] remote    DTLS session to use. A new session will be created
+ *                      if no session exist between client and server.
+ * @param[in] snips     List of payload chunks, will be processed in order.
+ *                      May be `NULL`.
+ * @param[in] timeout   Handshake timeout in microseconds.
+ *                      If `timeout > 0`, will start a new handshake if no
+ *                      session exists yet. The function will block until
+ *                      handshake completed or timed out.
+ *                      May be SOCK_NO_TIMEOUT to block indefinitely until
+ *                      handshake complete.
+ *
+ * @note    When blocking, we will need an extra thread to call
+ *          @ref sock_dtls_recv() function to handle the incoming handshake
+ *          messages.
+ *          An example for a blocking handshake is:
+ *              1. Create an empty @ref sock_dtls_session_t object.
+ *              2. Set the UDP endpoint of the peer you want to connect to in the
+ *                 session object with @ref sock_dtls_session_set_udp_ep().
+ *              3. Call @ref sock_dtls_send() with a timeout greater than 0.
+ *                 The send function blocks until the handshake completes or the
+ *                 timeout expires. If the handshake was successful the data has
+ *                 been sent.
+ *
+ * @return The number of bytes sent on success
+ * @return  -ENOTCONN, if `timeout == 0` and no existing session exists with
+ *          @p remote
+ * @return  -EADDRINUSE, if sock_dtls_t::udp_sock has no local end-point.
+ * @return  -EAFNOSUPPORT, if `remote->ep != NULL` and
+ *          sock_dtls_session_t::ep::family of @p remote is != AF_UNSPEC and
+ *          not supported.
+ * @return  -EINVAL, if sock_udp_ep_t::addr of @p remote->ep is an
+ *          invalid address.
+ * @return  -EINVAL, if sock_udp_ep_t::port of @p remote->ep is 0.
+ * @return  -ENOMEM, if no memory was available to send @p data.
+ * @return  -ETIMEDOUT, `0 < timeout < SOCK_NO_TIMEOUT` and timed out.
+ */
+static inline ssize_t sock_dtls_sendv(sock_dtls_t *sock,
+                                      sock_dtls_session_t *remote,
+                                      const iolist_t *snips,
+                                      uint32_t timeout)
+{
+    return sock_dtls_sendv_aux(sock, remote, snips, timeout, NULL);
+}
+
+/**
  * @brief Closes a DTLS sock
  *
  * Releases any memory allocated by @ref sock_dtls_create(). This function does
@@ -997,7 +1094,9 @@ static inline ssize_t sock_dtls_send(sock_dtls_t *sock,
  */
 void sock_dtls_close(sock_dtls_t *sock);
 
+#ifdef MODULE_SOCK_DTLS
 #include "sock_dtls_types.h"
+#endif
 
 #ifdef __cplusplus
 }

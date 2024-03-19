@@ -6,15 +6,15 @@
 #
 
 menuconfig MODULE_CCS811
-    bool "CCS811 digital gas sensor"
+    bool
+    prompt "CCS811 digital gas sensor" if !(MODULE_SAUL_DEFAULT && HAVE_CCS811)
+    default (MODULE_SAUL_DEFAULT && HAVE_CCS811)
     depends on HAS_PERIPH_GPIO
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_I2C
-    select MODULE_ZTIMER
-    select MODULE_ZTIMER_USEC
-    select MODULE_ZTIMER_PERIPH_TIMER
+    select ZTIMER_USEC
 
 config MODULE_CCS811_FULL
     bool "Full functionalities"
@@ -31,6 +31,5 @@ config MODULE_CCS811_FULL
 
 config HAVE_CCS811
     bool
-    select MODULE_CCS811 if MODULE_SAUL_DEFAULT
     help
         Indicates that a ccs811 sensor is present.

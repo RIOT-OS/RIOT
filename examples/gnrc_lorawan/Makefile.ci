@@ -1,13 +1,14 @@
 BOARD_INSUFFICIENT_MEMORY := \
     arduino-duemilanove \
     arduino-leonardo \
-    arduino-mega2560 \
     arduino-nano \
     arduino-uno \
     atmega328p \
     atmega328p-xplained-mini \
+    atmega8 \
     msb-430 \
     msb-430h \
+    nucleo-c031c6 \
     nucleo-f031k6 \
     nucleo-f042k6 \
     nucleo-l011k4 \
@@ -17,6 +18,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32f030f4-demo \
     stm32f0discovery \
     telosb \
-    waspmote-pro \
+    weact-g030f6 \
     z1 \
     #

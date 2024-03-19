@@ -20,10 +20,10 @@ USEMODULE += gnrc_rpl
 USEMODULE += auto_init_gnrc_rpl
 # Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo
-USEMODULE += gnrc_udp_cmd
+USEMODULE += shell_cmd_gnrc_udp
 # Add also the shell, some shell commands
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 USEMODULE += netstats_l2
 USEMODULE += netstats_ipv6
@@ -47,7 +47,6 @@ USE_ZEP ?= 0
 # set the ZEP port for native
 ZEP_PORT_BASE ?= 17754
 ifeq (1,$(USE_ZEP))
-  TERMFLAGS += -z [::1]:$(ZEP_PORT_BASE)
   USEMODULE += socket_zep
 endif
 
@@ -55,7 +54,7 @@ endif
 # this might be useful for testing, in cases where you cannot or do not want to
 # run a shell with ifconfig to get the real link lokal address.
 #IPV6_STATIC_LLADDR ?= '"fe80::cafe:cafe:cafe:1"'
-#CFLAGS += -DGNRC_IPV6_STATIC_LLADDR=$(IPV6_STATIC_LLADDR)
+#CFLAGS += -DCONFIG_GNRC_IPV6_STATIC_LLADDR=$(IPV6_STATIC_LLADDR)
 
 # Uncomment this to join RPL DODAGs even if DIOs do not contain
 # DODAG Configuration Options (see the doc for more info)
@@ -63,6 +62,8 @@ endif
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
+
+EXTERNAL_BOARD_DIRS += $(RIOTBASE)/tests/build_system/external_board_dirs/esp-ci-boards
 
 include $(RIOTBASE)/Makefile.include
 

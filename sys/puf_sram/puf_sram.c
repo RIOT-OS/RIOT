@@ -16,6 +16,8 @@
  *
  * @}
  */
+#include "cpu_conf.h"
+#include "hashes.h"
 #include "puf_sram.h"
 
 /* Allocation of the PUF seed variable */
@@ -24,7 +26,7 @@ PUF_SRAM_ATTRIBUTES uint32_t puf_sram_seed;
 /* Allocation of the PUF seed state */
 PUF_SRAM_ATTRIBUTES uint32_t puf_sram_state;
 
-/* Allocation of the PUF soft reset conter*/
+/* Allocation of the PUF soft reset counter */
 PUF_SRAM_ATTRIBUTES uint32_t puf_sram_softreset_cnt;
 
 /* Allocation of the memory marker */

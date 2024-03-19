@@ -26,6 +26,9 @@
 #include "periph/qdec.h"
 #include "periph/gpio.h"
 
+#define ENABLE_DEBUG 0
+#include "debug.h"
+
 #ifdef QDEC_NUMOF
 
 /**
@@ -58,6 +61,15 @@ int32_t qdec_init(qdec_t qdec, qdec_mode_t mode, qdec_cb_t cb, void *arg)
 
     /* Power on the used timer */
     periph_clk_en(qdec_config[qdec].bus, qdec_config[qdec].rcc_mask);
+
+    /* Route peripheral to correct pins (STM32F1 only, other MCU families route
+     * pins to peripheral rather than peripheral to pins */
+#ifdef CPU_FAM_STM32F1
+    DEBUG("[qdec] AFIO->MAPR = 0x%" PRIx32 ", |= 0x%" PRIx32 "\n",
+          AFIO->MAPR, qdec_config[qdec].remap);
+    AFIO->MAPR |= qdec_config[qdec].remap;
+    DEBUG("[qdec] AFIO->MAPR = 0x%" PRIx32 "\n", AFIO->MAPR);
+#endif
 
     /* Reset configuration and CC channels */
     dev(qdec)->CR1 = 0;

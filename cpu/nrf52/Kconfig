@@ -9,6 +9,7 @@ config CPU_FAM_NRF52
     select CPU_COMMON_NRF5X
 # The ADC does not depend on any board configuration, so always available
     select HAS_PERIPH_ADC
+    select HAS_BLE_ADV_EXT
 # So far, NimBLE netif does not support nrf51 platforms, so we use a dedicated
 # feature to mark this
     select HAS_BLE_NIMBLE_NETIF
@@ -18,19 +19,18 @@ config CPU_FAM_NRF52
     select HAS_CPU_NRF52
     select HAS_PERIPH_I2C_RECONFIGURE
     select HAS_PERIPH_SPI_GPIO_MODE
+    select HAS_PERIPH_UART_NONBLOCKING
 
 ## CPU Models
 config CPU_MODEL_NRF52805XXAA
     bool
     select CPU_CORE_CORTEX_M4
     select CPU_FAM_NRF52
-    select HAS_PERIPH_UART_NONBLOCKING
 
 config CPU_MODEL_NRF52810XXAA
     bool
     select CPU_CORE_CORTEX_M4
     select CPU_FAM_NRF52
-    select HAS_PERIPH_UART_NONBLOCKING
 
 config CPU_MODEL_NRF52811XXAA
     bool
@@ -38,7 +38,6 @@ config CPU_MODEL_NRF52811XXAA
     select CPU_FAM_NRF52
     select HAS_BLE_PHY_CODED
     select HAS_RADIO_NRF802154
-    select HAS_PERIPH_UART_NONBLOCKING
 
 config CPU_MODEL_NRF52820XXAA
     bool
@@ -46,7 +45,6 @@ config CPU_MODEL_NRF52820XXAA
     select CPU_FAM_NRF52
     select HAS_BLE_PHY_CODED
     select HAS_RADIO_NRF802154
-    select HAS_PERIPH_UART_NONBLOCKING
 
 config CPU_MODEL_NRF52832XXAA
     bool
@@ -59,7 +57,6 @@ config CPU_MODEL_NRF52833XXAA
     select CPU_FAM_NRF52
     select HAS_BLE_PHY_CODED
     select HAS_RADIO_NRF802154
-    select HAS_PERIPH_UART_NONBLOCKING
 
 config CPU_MODEL_NRF52840XXAA
     bool
@@ -67,7 +64,16 @@ config CPU_MODEL_NRF52840XXAA
     select CPU_FAM_NRF52
     select HAS_BLE_PHY_CODED
     select HAS_RADIO_NRF802154
-    select HAS_PERIPH_UART_NONBLOCKING
+    select HAS_PERIPH_HASH_SHA_1
+    select HAS_PERIPH_HASH_SHA_224
+    select HAS_PERIPH_HASH_SHA_256
+    select HAS_PERIPH_HASH_SHA_512
+    select HAS_PERIPH_HMAC_SHA_256
+    select HAS_PERIPH_CIPHER_AES_128_CBC
+    select HAS_PERIPH_ECC_P192R1
+    select HAS_PERIPH_ECC_P256R1
+    select HAS_PERIPH_ECC_ED25519
+    select HAS_PERIPH_CRYPTOCELL_310
 
 ## CPU common symbols
 config CPU_FAM

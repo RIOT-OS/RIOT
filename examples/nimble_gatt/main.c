@@ -162,7 +162,7 @@ static int gatt_svr_chr_access_device_info_model(
 
     snprintf(str_answer, STR_ANSWER_BUFFER_SIZE,
              "You are running RIOT on a(n) %s board, "
-             "which features a(n) %s MCU.", RIOT_BOARD, RIOT_MCU);
+             "which features a(n) %s CPU.", RIOT_BOARD, RIOT_CPU);
     puts(str_answer);
 
     int rc = os_mbuf_append(ctxt->om, str_answer, strlen(str_answer));
@@ -283,12 +283,12 @@ int main(void)
     assert(rc == 0);
 
     /* set the device name */
-    ble_svc_gap_device_name_set(NIMBLE_AUTOADV_DEVICE_NAME);
+    ble_svc_gap_device_name_set(CONFIG_NIMBLE_AUTOADV_DEVICE_NAME);
     /* reload the GATT server to link our added services */
     ble_gatts_start();
 
     /* start to advertise this node */
-    nimble_autoadv_start();
+    nimble_autoadv_start(NULL);
 
     return 0;
 }

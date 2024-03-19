@@ -66,13 +66,15 @@ static const spi_conf_t spi_config[] = {
 static const timer_conf_t timer_config[] = {
     {
         .dev      = NRF_TIMER0_S,
-        .channels = 3,
+        /* using last channel for timer_read(), so only 5 of 6 channels available */
+        .channels = 5,
         .bitmode  = TIMER_BITMODE_BITMODE_32Bit,
         .irqn     = TIMER0_IRQn
     },
     {
         .dev      = NRF_TIMER1_S,
-        .channels = 3,
+        /* using last channel for timer_read(), so only 5 of 6 channels available */
+        .channels = 5,
         .bitmode  = TIMER_BITMODE_BITMODE_08Bit,
         .irqn     = TIMER1_IRQn
     },
@@ -80,6 +82,11 @@ static const timer_conf_t timer_config[] = {
 
 #define TIMER_0_ISR         isr_timer0 /**< Timer0 IRQ*/
 #define TIMER_1_ISR         isr_timer1 /**< Timer1 IRQ */
+
+/** See @ref timer_init */
+#define TIMER_0_MAX_VALUE 0xffffffff
+/** See @ref timer_init */
+#define TIMER_1_MAX_VALUE 0xffffffff
 
 #define TIMER_NUMOF         ARRAY_SIZE(timer_config) /**< Timer configuration NUMOF */
 /** @} */
@@ -111,10 +118,44 @@ static const uart_conf_t uart_config[] = {
     },
 };
 
-#define UART_0_ISR          (isr_uarte0_spim0_spis0_twim0_twis0) /**< UART0_IRQ */
-#define UART_1_ISR          (isr_uarte1_spim1_spis1_twim1_twis1) /**< UART1_IRQ */
+#define UART_NUMOF          ARRAY_SIZE(uart_config) /**< UART configuration NUMOF */
+/** @} */
 
-#define UART_NUMOF          ARRAY_SIZE(uart_config) /**< UART confgiguration NUMOF */
+/**
+ * @name    Real time counter configuration
+ * @{
+ */
+#ifndef RTT_DEV
+#define RTT_DEV             (0)                 /**< NRF_RTC0_S */
+#endif
+
+#define RTT_MAX_VALUE       (0x00ffffff)         /**< 24bit */
+#define RTT_MAX_FREQUENCY   (32768U)             /**< in Hz */
+#define RTT_MIN_FREQUENCY   (8U)                 /**< in Hz */
+#define RTT_CLOCK_FREQUENCY (32768U)             /**< in Hz, LFCLK*/
+
+#ifndef RTT_FREQUENCY
+#define RTT_FREQUENCY       (1024U)              /**< in Hz */
+#endif
+/** @} */
+
+/**
+ * @name   PWM configuration
+ * @{
+ */
+static const pwm_conf_t pwm_config[] = {
+    {
+        .dev = NRF_PWM0_S,
+        .pin = {
+                    LED0_PIN,
+                    LED1_PIN,
+                    LED2_PIN,
+                    LED3_PIN
+               }
+    },
+};
+
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
 /** @} */
 
 #ifdef __cplusplus

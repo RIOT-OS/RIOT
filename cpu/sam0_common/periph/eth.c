@@ -19,6 +19,7 @@
  */
 
 #include "iolist.h"
+#include "mii.h"
 #include "net/eui48.h"
 #include "net/ethernet.h"
 #include "net/netdev/eth.h"
@@ -92,6 +93,8 @@ static uint8_t  rx_buf[ETH_RX_BUFFER_COUNT][ETH_RX_BUFFER_SIZE] __attribute__((a
 static uint8_t  tx_buf[ETH_TX_BUFFER_COUNT][ETH_TX_BUFFER_SIZE] __attribute__((aligned(GMAC_BUF_ALIGNMENT)));
 extern sam0_eth_netdev_t _sam0_eth_dev;
 
+static bool _is_sleeping;
+
 /* Flush our reception buffers and reset reception internal mechanism,
    this function may be call from ISR context */
 void sam0_clear_rx_buffers(void)
@@ -102,6 +105,71 @@ void sam0_clear_rx_buffers(void)
     rx_idx = 0;
     rx_curr = rx_desc;
     GMAC->RBQB.reg = (uint32_t) rx_desc;
+}
+
+static void _enable_clock(void)
+{
+    /* Enable GMAC clocks */
+    MCLK->AHBMASK.reg |= MCLK_AHBMASK_GMAC;
+    MCLK->APBCMASK.reg |= MCLK_APBCMASK_GMAC;
+}
+
+static void _disable_clock(void)
+{
+    /* Disable GMAC clocks */
+    MCLK->AHBMASK.reg &= ~MCLK_AHBMASK_GMAC;
+    MCLK->APBCMASK.reg &= ~MCLK_APBCMASK_GMAC;
+}
+
+unsigned sam0_read_phy(uint8_t phy, uint8_t addr)
+{
+    if (_is_sleeping) {
+        return 0;
+    }
+
+    GMAC->MAN.reg = GMAC_MAN_REGA(addr) | GMAC_MAN_PHYA(phy)
+                  | GMAC_MAN_CLTTO      | GMAC_MAN_WTN(0x2)
+                  | GMAC_MAN_OP(PHY_READ_OP);
+
+    /* Wait for operation completion */
+    while (!GMAC->NSR.bit.IDLE) {}
+    /* return content of shift register */
+    return (GMAC->MAN.reg & GMAC_MAN_DATA_Msk);
+}
+
+void sam0_write_phy(uint8_t phy, uint8_t addr, uint16_t data)
+{
+    if (_is_sleeping) {
+        return;
+    }
+
+    GMAC->MAN.reg = GMAC_MAN_REGA(addr) | GMAC_MAN_PHYA(phy)
+                  | GMAC_MAN_WTN(0x2)   | GMAC_MAN_OP(PHY_WRITE_OP)
+                  | GMAC_MAN_CLTTO      | GMAC_MAN_DATA(data);
+
+    /* Wait for operation completion */
+    while (!GMAC->NSR.bit.IDLE) {}
+}
+
+void sam0_eth_poweron(void)
+{
+    _enable_clock();
+    sam0_clear_rx_buffers();
+
+    /* enable PHY */
+    gpio_set(sam_gmac_config[0].rst_pin);
+    _is_sleeping = false;
+
+    while (MII_BMCR_RESET & sam0_read_phy(0, MII_BMCR)) {}
+}
+
+void sam0_eth_poweroff(void)
+{
+    /* disable PHY */
+    gpio_clear(sam_gmac_config[0].rst_pin);
+
+    _is_sleeping = true;
+    _disable_clock();
 }
 
 static void _init_desc_buf(void)
@@ -130,28 +198,6 @@ static void _init_desc_buf(void)
     GMAC->TBQB.reg = (uint32_t) tx_desc;
 }
 
-int sam0_read_phy(uint8_t phy, uint8_t addr)
-{
-    GMAC->MAN.reg = GMAC_MAN_REGA(addr) | GMAC_MAN_PHYA(phy)
-                  | GMAC_MAN_CLTTO      | GMAC_MAN_WTN(0x2)
-                  | GMAC_MAN_OP(PHY_READ_OP);
-
-    /* Wait for operation completion */
-    while (!GMAC->NSR.bit.IDLE) {}
-    /* return content of shift register */
-    return (GMAC->MAN.reg & GMAC_MAN_DATA_Msk);
-}
-
-void sam0_write_phy(uint8_t phy, uint8_t addr, uint16_t data)
-{
-    GMAC->MAN.reg = GMAC_MAN_REGA(addr) | GMAC_MAN_PHYA(phy)
-                  | GMAC_MAN_WTN(0x2)   | GMAC_MAN_OP(PHY_WRITE_OP)
-                  | GMAC_MAN_CLTTO      | GMAC_MAN_DATA(data);
-
-    /* Wait for operation completion */
-    while (!GMAC->NSR.bit.IDLE) {}
-}
-
 void sam0_eth_set_mac(const eui48_t *mac)
 {
     GMAC->Sa[0].SAT.reg = ((mac->uint8[5] << 8)  | mac->uint8[4]);
@@ -174,6 +220,10 @@ int sam0_eth_send(const struct iolist *iolist)
     unsigned len = iolist_size(iolist);
     unsigned tx_len = 0;
     tx_curr = &tx_desc[tx_idx];
+
+    if (_is_sleeping) {
+        return -ENOTSUP;
+    }
 
     /* load packet data into TX buffer */
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
@@ -290,11 +340,9 @@ int sam0_eth_receive_blocking(char *data, unsigned max_len)
     return _try_receive(data, max_len, 1);
 }
 
-static void _enable_clock(void)
+bool sam0_eth_has_queued_pkt(void)
 {
-    /* Enable GMAC clocks */
-    MCLK->AHBMASK.reg |= MCLK_AHBMASK_GMAC;
-    MCLK->APBCMASK.reg |= MCLK_APBCMASK_GMAC;
+    return _try_receive(NULL, 0, 0) > 0;
 }
 
 int sam0_eth_init(void)
@@ -322,9 +370,6 @@ int sam0_eth_init(void)
     memset(rx_desc, 0, sizeof(rx_desc));
     memset(tx_desc, 0, sizeof(tx_desc));
 
-    /* Enable PHY */
-    gpio_set(sam_gmac_config[0].rst_pin);
-
     /* Initialize buffers descriptor */
     _init_desc_buf();
     /* Disable RX and TX */
@@ -340,11 +385,10 @@ int sam0_eth_init(void)
     /* Enable needed interrupts */
     GMAC->IER.reg = GMAC_IER_RCOMP;
 
-    /* Set TxBase-100-FD by default */
-    /* TODO: implement auto negotiation */
-    GMAC->NCFGR.reg |= (GMAC_NCFGR_SPD | GMAC_NCFGR_FD | GMAC_NCFGR_MTIHEN |
-                        GMAC_NCFGR_RXCOEN | GMAC_NCFGR_MAXFS | GMAC_NCFGR_CAF |
-                        GMAC_NCFGR_LFERD | GMAC_NCFGR_RFCS | GMAC_NCFGR_CLK(3));
+    GMAC->NCFGR.reg = GMAC_NCFGR_MTIHEN
+                    | GMAC_NCFGR_RXCOEN | GMAC_NCFGR_MAXFS | GMAC_NCFGR_CAF
+                    | GMAC_NCFGR_LFERD | GMAC_NCFGR_RFCS | GMAC_NCFGR_CLK(3)
+                    | GMAC_NCFGR_DBW(1);
 
     /* Enable all multicast addresses */
     GMAC->HRB.reg = 0xffffffff;

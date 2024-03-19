@@ -5,126 +5,43 @@
 # and / or
 #export APPS="examples/hello-world tests/unittests"
 
-#
-: ${TEST_BOARDS_AVAILABLE:="esp32-wroom-32 samr21-xpro"}
+QUICKBUILD_BOARDS="
+adafruit-itsybitsy-m4
+atmega256rfr2-xpro
+esp32-wroom-32
+esp32s3-devkit
+frdm-k64f
+hifive1b
+msb-430
+msba2
+native
+native64
+nrf52840dk
+qn9080dk
+samr21-xpro
+stk3200
+stm32f429i-disc1"
+
+# this configures boards that are available via pifleet
+case "${CI_MURDOCK_PROJECT}" in
+    riot)
+        : ${TEST_BOARDS_AVAILABLE:="esp32-wroom-32 samr21-xpro"}
+        ;;
+    riot-staging)
+        : ${TEST_BOARDS_AVAILABLE:=""}
+        ;;
+    *)
+        : ${TEST_BOARDS_AVAILABLE:=""}
+        ;;
+esac
+
+#: ${EMULATED_BOARDS_AVAILABLE:="microbit"}
 
 # temporarily disabling llvm builds until https://github.com/RIOT-OS/RIOT/pull/15595
 # is in
-#: ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
-: ${TEST_BOARDS_LLVM_COMPILE:=""}
+: ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native native64 nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
 
-: ${TEST_KCONFIG_BOARDS_AVAILABLE:="
-adafruit-itsybitsy-m4
-arduino-due
-arduino-leonardo
-arduino-mkrzero
-arduino-mega2560
-arduino-nano
-atxmega-a1-xplained
-atxmega-a3bu-xplained
-avr-rss2
-avsextrem
-bastwan
-bluepill
-b-l475e-iot01a
-cc1352-launchpad
-cc2650-launchpad
-derfmega128
-dwm1001
-esp32-ci
-esp32-heltec-lora32-v2
-esp8266-ci
-esp8266-esp-12x
-hamilton
-hifive1
-mbed_lpc1768
-mega-xplained
-microbit
-mulle
-native
-nrf52840dk
-nrf9160dk
-nucleo-f072rb
-nucleo-f103rb
-nucleo-f207zg
-nucleo-f334r8
-nucleo-f429zi
-nucleo-f767zi
-nucleo-g071rb
-nucleo-g474re
-nucleo-l011k4
-nucleo-l073rz
-nucleo-l152re
-nucleo-l433rc
-nucleo-l552ze-q
-p-nucleo-wb55
-qn9080dk
-remote-revb
-same54-xpro
-samr21-xpro
-seeedstudio-gd32
-slstk3400a
-sltb001a
-slwstk6220a
-stm32f723e-disco
-stm32mp157c-dk2
-waspmote-pro
-weact-f401ce
-z1
-"}
-
-: ${TEST_KCONFIG_ENFORCE_APP_GROUPS:="
-tests/cb_mux*
-tests/congure_*
-tests/driver_b*
-tests/driver_f*
-tests/driver_g*
-tests/driver_h*
-tests/driver_i*
-tests/driver_j*
-tests/driver_l*
-tests/driver_o*
-tests/driver_p*
-tests/driver_q*
-tests/driver_r*
-tests/driver_s*
-tests/driver_t*
-tests/driver_u*
-tests/driver_v*
-tests/external_board_dirs
-tests/periph_*
-tests/pkg_elk
-tests/pkg_uzlib
-tests/prng_*
-tests/trace
-tests/xtimer_*
-tests/ztimer_*
-examples/hello-world
-tests/ieee802154_hal
-"}
-
-# This list prevents boards from being tested by the TEST_KCONFIG_TEST_ALLOWLIST
-# This should only be used for boards that require a lot of work, such as,
-# requiring modelling of a clock tree.
-# As a rule of thumb, only add boards here if there are not differences in
-# modules or packages.
-# Eventually this list will be removed...
-#
-: ${TEST_KCONFIG_BOARD_BLOCKLIST:="
-6lowpan-clicker
-pic32-wifire
-"}
-
-# This list will force all boards that are not in the TEST_KCONFIG_BOARD_BLOCKLIST
-# to be tested on the apps. The purpose is to prevent new boards from skipping
-# the kconfig implementations.
-: ${TEST_KCONFIG_TEST_ALLOWLIST:="
-examples/hello-world
-tests/saul
-tests/mtd_mapper
-"}
-
-: ${TEST_WITH_CONFIG_SUPPORTED:="examples/suit_update tests/driver_at86rf2xx_aes"}
+: ${TEST_WITH_CONFIG_SUPPORTED:="examples/suit_update tests/drivers/at86rf2xx_aes"}
 
 export RIOT_CI_BUILD=1
 export CC_NOCOLOR=1
@@ -133,9 +50,60 @@ export CFLAGS_DBG=""
 export DLCACHE_DIR=${DLCACHE_DIR:-~/.dlcache}
 export ENABLE_TEST_CACHE=${ENABLE_TEST_CACHE:-1}
 export MURDOCK_REDIS_HOST=${MURDOCK_REDIS_HOST:-127.0.0.1}
+
 NIGHTLY=${NIGHTLY:-0}
-RUN_TESTS=${RUN_TESTS:-${NIGHTLY}}
-FULL_BUILD=${FULL_BUILD:-${NIGHTLY}}
+
+check_label() {
+    local label="${1}"
+    [ -z "${CI_PULL_LABELS}" ] && return 1
+    echo "${CI_PULL_LABELS}" | grep -q "${label}"
+    return $?
+}
+
+# true if "$2" starts with "$1", false otherwise
+startswith() {
+  case "${2}" in
+    ${1}*) true ;;
+    *) false ;;
+  esac
+}
+
+# this function returns 0 when this build is building a merge queue branch.
+is_merge_queue_build() {
+    startswith "gh-readonly-queue/" "${CI_BUILD_BRANCH}"
+}
+
+# fullbuild logic
+# non-full-builds are those where can_fast_ci_run might reduce the build
+# automatically
+if [ -z "${FULL_BUILD}" ]; then
+    if [ "${NIGHTLY}" = 1 ]; then
+        FULL_BUILD=1
+    elif check_label "CI: full build"; then
+        # full build if requested by label
+        FULL_BUILD=1
+    else
+        FULL_BUILD=0
+    fi
+    export FULL_BUILD
+fi
+
+
+# quickbuild logic
+# a "quickbuild" is only building a representative subset of all build
+# configurations.
+if [ -z "${QUICK_BUILD}" ]; then
+    export QUICK_BUILD=0
+    if is_merge_queue_build; then
+        # always do full build for merge queue' branches
+        true
+    elif [ ${FULL_BUILD} -eq 1 ]; then
+        # full build if building nightly or full build requested by label
+        true
+    else
+        export QUICK_BUILD=1
+    fi
+fi
 
 # This is a work around for a bug in CCACHE which interacts very badly with
 # some features of RIOT and of murdock. The result is that ccache is
@@ -156,7 +124,8 @@ export OPTIONAL_CFLAGS_BLACKLIST="-gz"
 
 DWQ_ENV="-E BOARDS -E APPS -E NIGHTLY -E RUN_TESTS -E ENABLE_TEST_CACHE
          -E TEST_HASH -E CI_PULL_LABELS -ECI_BASE_BRANCH -ECI_BASE_COMMIT
-         -EPKG_USE_MIRROR -EAPPS_CHANGED -EBOARDS_CHANGED -ESTATIC_TESTS"
+         -EPKG_USE_MIRROR -EAPPS_CHANGED -EBOARDS_CHANGED -ESTATIC_TESTS
+         -E CI_MURDOCK_PROJECT -EFULL_BUILD -EQUICK_BUILD"
 
 if [ ${NIGHTLY} -eq 1 ]; then
     export PKG_USE_MIRROR=0
@@ -164,64 +133,16 @@ fi
 
 CFCR_ARGS="--upstreambranch ${CI_BASE_COMMIT}"
 
-get_supported_kconfig_board_app() {
-    local board=$1
-    local appdir=$2
-    if is_in_list "${board}" "${TEST_KCONFIG_BOARD_BLOCKLIST}"; then
-        return 1
+# if RUN_TESTS is unset (e.g., not passed from the outside),
+# set to 1 if NIGHTLY=1 or if the label "CI: run tests" is set,
+# otherwise set 0.
+if [ -z "$RUN_TESTS" ]; then
+    if [ "$NIGHTLY" = "1" ] || check_label "CI: run tests" ; then
+        RUN_TESTS=1
+    else
+        RUN_TESTS=0
     fi
-
-    # On nightlies run all possible kconfig tests on all boards
-    # Normally we don't want to do this as it adds quite a bit to build time
-    # and the subset of boards we are testing for are pretty good at catching
-    # any bugs...
-    # This will be over one day, I promise.
-    if [ ${NIGHTLY} -eq 1 ]; then
-        if is_in_list "${appdir}" "${TEST_KCONFIG_ENFORCE_APP_GROUPS}"; then
-            return 0
-        fi
-        if [ -f "${appdir}/app.config.test" ]; then
-            return 0
-        fi
-    fi
-    if is_in_list "${appdir}" "${TEST_KCONFIG_TEST_ALLOWLIST}"; then
-        return 0
-    fi
-    if is_in_list "${board}" "${TEST_KCONFIG_BOARDS_AVAILABLE}"; then
-        if is_in_list "${appdir}" "${TEST_KCONFIG_ENFORCE_APP_GROUPS}"; then
-            return 0
-        fi
-        if [ -f "${appdir}/app.config.test" ]; then
-            return 0
-        fi
-    fi
-    return 1
-}
-
-kconfig_module_packages_diff() {
-    local board=$1
-    local appdir=$2
-
-    make clean --no-print-directory -C ${appdir} BOARD=${board}
-    mmp=$(make --no-print-directory info-modules info-packages -C ${appdir} BOARD=${board})
-
-    make clean --no-print-directory -C ${appdir} BOARD=${board}
-    kmp=$(TEST_KCONFIG=1 make --no-print-directory info-modules info-packages -C ${appdir} BOARD=${board})
-
-
-    bash -c "diff <(echo \"${mmp}\") <(echo \"${kmp}\")"
-}
-
-check_label() {
-    local label="${1}"
-    [ -z "${CI_PULL_LABELS}" ] && return 1
-    echo "${CI_PULL_LABELS}" | grep -q "${label}"
-    return $?
-}
-
-[ "$RUN_TESTS" != "1" ] && {
-    check_label "CI: run tests" && RUN_TESTS=1
-}
+fi
 
 [ "$ENABLE_TEST_CACHE" = "1" ] && {
     check_label "CI: disable test cache" && export ENABLE_TEST_CACHE=0
@@ -230,14 +151,6 @@ check_label() {
 error() {
     echo "$@"
     exit 1
-}
-
-# true if "$2" starts with "$1", false otherwise
-startswith() {
-  case "${2}" in
-    ${1}*) true ;;
-    *) false ;;
-  esac
 }
 
 # if MURDOCK_HOOK is set, this function will execute it and pass on all it's
@@ -318,9 +231,14 @@ get_supported_boards() {
         fi
     fi
 
+    BOARDS_=${BOARDS}
     if [ $only_changed -eq 1 ]; then
-        BOARDS_=${BOARDS}
+        # if can_fast_ci_run figured out changes to specific boards,
+        # only consider those
         export BOARDS="$BOARDS_CHANGED"
+    elif [ -z "${BOARDS}" -a ${QUICK_BUILD} -eq 1 ]; then
+        # quickbuild board filter is applied here
+        export BOARDS="${QUICKBUILD_BOARDS}"
     fi
 
     local boards="$(make --no-print-directory -C$appdir info-boards-supported 2>/dev/null || echo broken)"
@@ -362,7 +280,7 @@ get_app_board_toolchain_pairs() {
     local prefix="$*"
 
     if [ "$boards" = makefile_broken ]; then
-        echo "$appdir makefile_broken"
+        echo "$0 error \"error: ${DWQ_WORKER}: get_supported_boards failed in $appdir\""
         return
     fi
 
@@ -442,50 +360,44 @@ compile() {
     [ $# -ne 2 ] && error "$0: compile: invalid parameters (expected \$appdir \$board:\$toolchain)"
     [ ! -d "$appdir" ] && error "$0: compile: error: application directory \"$appdir\" doesn't exist"
 
-    # We compile a first time with Kconfig based dependency
-    # resolution for regression purposes. $TEST_KCONFIG contains a
-    # list of board-application tuples that are currently modeled to
-    # run with Kconfig
+    # use our checkout as ccache temporary folder.
+    # On CI, this is a tmpfs, so using that instead of the `/cache/.ccache` volume
+    # reduces disk IO.
+    export CCACHE_TEMPDIR="$(pwd)/.ccache/tmp"
 
-    should_check_kconfig_hash=0
-
-    if get_supported_kconfig_board_app "${board}" "${appdir}"; then
-        should_check_kconfig_hash=1
-        BOARD=${board} make -C${appdir} clean
-        CCACHE_BASEDIR="$(pwd)" BOARD=${board} TOOLCHAIN=${toolchain} RIOT_CI_BUILD=1 TEST_KCONFIG=1 \
-                        make -C${appdir} all test-input-hash -j${JOBS:-4}
-        RES=$?
-        if [ $RES -eq 0 ]; then
-            kconfig_test_hash=$(test_hash_calc "${BINDIR}")
-        else
-            kconfig_test_hash=0
-            echo "An error occurred while compiling using Kconfig";
-        fi
-    fi
-
-    # compile without Kconfig
+    BOARD=${board} make -C${appdir} clean
     CCACHE_BASEDIR="$(pwd)" BOARD=$board TOOLCHAIN=$toolchain RIOT_CI_BUILD=1 \
-        make -C${appdir} clean all test-input-hash -j${JOBS:-4}
+        make -C${appdir} all test-input-hash -j${JOBS:-4}
     RES=$?
 
+    # test hash is used to cache test results
     test_hash=$(test_hash_calc "$BINDIR")
-
-    if [ ${should_check_kconfig_hash} != 0 ]; then
-        if [ ${kconfig_test_hash} != ${test_hash} ]; then
-            echo "Hashes of binaries with and without Kconfig mismatch for ${appdir} with ${board}";
-            echo "Please check that all used modules are modelled in Kconfig and enabled";
-            kconfig_module_packages_diff ${board} ${appdir}
-            RES=1
-        fi
-    fi
 
     # run tests
     if [ $RES -eq 0 ]; then
-        if [ $RUN_TESTS -eq 1 -o "$board" = "native" ]; then
+        if is_in_list "$board" "$EMULATED_BOARDS_AVAILABLE"; then
+            EMULATED=1
+        else
+            EMULATED=0
+        fi
+
+        if [ $RUN_TESTS -eq 1 -o "$board" = "native" -o "$board" = "native64" -o "$EMULATED" = "1" ]; then
             if [ -f "${BINDIR}/.test" ]; then
-                if [ "$board" = "native" ]; then
-                    BOARD=$board make -C${appdir} test
-                    RES=$?
+                if [ "$board" = "native" -o "$board" = "native64" -o "${EMULATED}" = "1" ]; then
+                    # For native, we can run the test on the worker that also
+                    # compiled it (`make -C${appdir} test`).
+                    # "dwq-localjob" allows using some (locally run) command's
+                    # output as if it was its own CI job.
+                    # We use this here so the output shows up in the Murdock UI
+                    # under the "Tests" tab and not inlined with the "Build"
+                    # output.
+                    # "--command-override" is a hack that makes the job fake the
+                    # command. This is currently needed for the Murdock UI to
+                    # properly categorize the job result.
+                    EMULATE=${EMULATED} BOARD=$board TOOLCHAIN=$toolchain \
+                        dwq-localjob \
+                        --command-override "./.murdock run_test ${appdir} ${board}:${toolchain}" \
+                        -- make -C${appdir} test
                 elif is_in_list "$board" "$TEST_BOARDS_AVAILABLE"; then
                     echo "-- test_hash=$test_hash"
                     if test_cache_get $test_hash; then
@@ -500,10 +412,10 @@ compile() {
         fi
     fi
 
+    # log some build stats
     if [ -d ${BINDIR} ]
     then
-        echo "-- build directory size: $(du -sh ${BINDIR} | cut -f1)"
-
+        echo "{\"build/\": $(du -s ${BINDIR} | cut -f1)}"
         # cleanup
         rm -rf ${BINDIR}
     fi
@@ -516,24 +428,23 @@ test_job() {
     local board=$(echo $2 | cut -f 1 -d':')
     local toolchain=$(echo $2 | cut -f 2 -d':')
 
+    # this points to the dwq checkout root folder
+    local basedir="$(pwd)"
+
     # interpret any extra arguments as file names.
     # They will be sent along with the job to the test worker
     # and stored in the application's binary folder.
     shift 2
     local files=""
     for filename in "$@"; do
-        # check if the file is within $(BINDIR)
-        if startswith "${BINDIR}" "${filename}"; then
-          # get relative (to $(BINDIR) path
-          local relpath="$(realpath --relative-to ${BINDIR} ${filename})"
+        # check if the file is within $(basedir)
+        if startswith "${basedir}" "${filename}"; then
+            filename="$(realpath --relative-to ${basedir} ${filename})"
         else
-          error "$0: error: extra test files not within \${BINDIR}!"
+          error "$0: error: extra test files not within \${basedir}!"
         fi
 
-        # set remote file path.
-        # currently, the test workers build in the default build path.
-        local remote_bindir="${appdir}/bin/${board}"
-        files="${files} --file ${filename}:${remote_bindir}/${relpath}"
+        files="${files} --file ${filename}"
     done
 
     dwqc \
@@ -549,12 +460,20 @@ run_test() {
     local appdir=$1
     local board=$(echo $2 | cut -f 1 -d':')
     local toolchain=$(echo $2 | cut -f 2 -d':')
+
+    # set build directory to match the builder
+    export BINDIR="$(pwd)/build"
+
     print_worker
     echo "-- executing tests for $appdir on $board (compiled with $toolchain toolchain):"
     hook run_test_pre
 
     # do flashing and building of termdeps simultaneously
     BOARD=$board TOOLCHAIN=${toolchain} make -C$appdir flash-only termdeps -j2
+    RES=$?
+    if [ $RES -ne 0 ]; then
+        error "- flashing failed!"
+    fi
 
     # now run the actual test
     if is_in_list "${appdir}" "${TEST_WITH_CONFIG_SUPPORTED}"; then

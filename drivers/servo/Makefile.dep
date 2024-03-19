@@ -1,1 +1,22 @@
-FEATURES_REQUIRED += periph_pwm
+ifneq (,$(filter saul,$(USEMODULE)))
+  DEFAULT_MODULE += servo_saul
+endif
+
+# if no servo driver implementation is chosen, we pick one
+ifeq (,$(filter servo_pwm servo_timer,$(USEMODULE)))
+  # choose servo_pwm except for MCUs known to be incompatible
+  ifneq (,$(filter nrf5% nrf9160, $(CPU_FAM)))
+    USEMODULE += servo_timer
+  else
+    USEMODULE += servo_pwm
+  endif
+endif
+
+ifneq (,$(filter servo_pwm,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_pwm
+endif
+
+ifneq (,$(filter servo_timer,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_timer_periodic
+  FEATURES_REQUIRED += periph_gpio
+endif

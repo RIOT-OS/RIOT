@@ -1,0 +1,141 @@
+From e175ea4902cebfdd5b4edc470feff2dadbec408a Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Wed, 5 Apr 2023 01:17:12 +0200
+Subject: [PATCH 30/30] bt/controller/esp32s3: fix return types in functions
+
+Since the size of int and int32_t is the same, changing int to int32_t and vise versa to fix the compilation issue due to function declaration conflict isn't any risk.
+---
+ components/bt/controller/esp32s3/bt.c | 52 +++++++++++++--------------
+ 1 file changed, 26 insertions(+), 26 deletions(-)
+
+diff --git a/components/bt/controller/esp32s3/bt.c b/components/bt/controller/esp32s3/bt.c
+index 64e10ad4a70..ee68c6b834b 100644
+--- a/components/bt/controller/esp32s3/bt.c
++++ b/components/bt/controller/esp32s3/bt.c
+@@ -268,7 +268,7 @@ extern char _bt_tmp_bss_end;
+  */
+ static void interrupt_set_wrapper(int32_t cpu_no, int32_t intr_source, int32_t intr_num, int32_t intr_prio);
+ static void interrupt_clear_wrapper(int32_t intr_source, int32_t intr_num);
+-static void interrupt_handler_set_wrapper(int n, void *fn, void *arg);
++static void interrupt_handler_set_wrapper(int32_t n, void *fn, void *arg);
+ static void IRAM_ATTR interrupt_disable(void);
+ static void IRAM_ATTR interrupt_restore(void);
+ static void IRAM_ATTR task_yield_from_isr(void);
+@@ -486,28 +486,28 @@ static void semphr_delete_wrapper(void *semphr)
+     vSemaphoreDelete(semphr);
+ }
+ 
+-static int IRAM_ATTR semphr_take_from_isr_wrapper(void *semphr, void *hptw)
++static int32_t IRAM_ATTR semphr_take_from_isr_wrapper(void *semphr, void *hptw)
+ {
+-    return (int)xSemaphoreTakeFromISR(semphr, hptw);
++    return xSemaphoreTakeFromISR(semphr, hptw);
+ }
+ 
+-static int IRAM_ATTR semphr_give_from_isr_wrapper(void *semphr, void *hptw)
++static int32_t IRAM_ATTR semphr_give_from_isr_wrapper(void *semphr, void *hptw)
+ {
+-    return (int)xSemaphoreGiveFromISR(semphr, hptw);
++    return xSemaphoreGiveFromISR(semphr, hptw);
+ }
+ 
+-static int semphr_take_wrapper(void *semphr, uint32_t block_time_ms)
++static int32_t semphr_take_wrapper(void *semphr, uint32_t block_time_ms)
+ {
+     if (block_time_ms == OSI_FUNCS_TIME_BLOCKING) {
+-        return (int)xSemaphoreTake(semphr, portMAX_DELAY);
++        return xSemaphoreTake(semphr, portMAX_DELAY);
+     } else {
+-        return (int)xSemaphoreTake(semphr, block_time_ms / portTICK_PERIOD_MS);
++        return xSemaphoreTake(semphr, block_time_ms / portTICK_PERIOD_MS);
+     }
+ }
+ 
+-static int semphr_give_wrapper(void *semphr)
++static int32_t semphr_give_wrapper(void *semphr)
+ {
+-    return (int)xSemaphoreGive(semphr);
++    return xSemaphoreGive(semphr);
+ }
+ 
+ static void *mutex_create_wrapper(void)
+@@ -520,14 +520,14 @@ static void mutex_delete_wrapper(void *mutex)
+     vSemaphoreDelete(mutex);
+ }
+ 
+-static int mutex_lock_wrapper(void *mutex)
++static int32_t mutex_lock_wrapper(void *mutex)
+ {
+-    return (int)xSemaphoreTake(mutex, portMAX_DELAY);
++    return xSemaphoreTake(mutex, portMAX_DELAY);
+ }
+ 
+-static int mutex_unlock_wrapper(void *mutex)
++static int32_t mutex_unlock_wrapper(void *mutex)
+ {
+-    return (int)xSemaphoreGive(mutex);
++    return xSemaphoreGive(mutex);
+ }
+ 
+ static void *queue_create_wrapper(uint32_t queue_len, uint32_t item_size)
+@@ -540,37 +540,37 @@ static void queue_delete_wrapper(void *queue)
+     vQueueDelete(queue);
+ }
+ 
+-static int queue_send_wrapper(void *queue, void *item, uint32_t block_time_ms)
++static int32_t queue_send_wrapper(void *queue, void *item, uint32_t block_time_ms)
+ {
+     if (block_time_ms == OSI_FUNCS_TIME_BLOCKING) {
+-        return (int)xQueueSend(queue, item, portMAX_DELAY);
++        return xQueueSend(queue, item, portMAX_DELAY);
+     } else {
+-        return (int)xQueueSend(queue, item, block_time_ms / portTICK_PERIOD_MS);
++        return xQueueSend(queue, item, block_time_ms / portTICK_PERIOD_MS);
+     }
+ }
+ 
+-static int IRAM_ATTR queue_send_from_isr_wrapper(void *queue, void *item, void *hptw)
++static int32_t IRAM_ATTR queue_send_from_isr_wrapper(void *queue, void *item, void *hptw)
+ {
+     return (int)xQueueSendFromISR(queue, item, hptw);
+ }
+ 
+-static int queue_recv_wrapper(void *queue, void *item, uint32_t block_time_ms)
++static int32_t queue_recv_wrapper(void *queue, void *item, uint32_t block_time_ms)
+ {
+     if (block_time_ms == OSI_FUNCS_TIME_BLOCKING) {
+-        return (int)xQueueReceive(queue, item, portMAX_DELAY);
++        return xQueueReceive(queue, item, portMAX_DELAY);
+     } else {
+-        return (int)xQueueReceive(queue, item, block_time_ms / portTICK_PERIOD_MS);
++        return xQueueReceive(queue, item, block_time_ms / portTICK_PERIOD_MS);
+     }
+ }
+ 
+-static int IRAM_ATTR queue_recv_from_isr_wrapper(void *queue, void *item, void *hptw)
++static int32_t IRAM_ATTR queue_recv_from_isr_wrapper(void *queue, void *item, void *hptw)
+ {
+-    return (int)xQueueReceiveFromISR(queue, item, hptw);
++    return xQueueReceiveFromISR(queue, item, hptw);
+ }
+ 
+-static int task_create_wrapper(void *task_func, const char *name, uint32_t stack_depth, void *param, uint32_t prio, void *task_handle, uint32_t core_id)
++static int32_t task_create_wrapper(void *task_func, const char *name, uint32_t stack_depth, void *param, uint32_t prio, void *task_handle, uint32_t core_id)
+ {
+-    return (uint32_t)xTaskCreatePinnedToCore(task_func, name, stack_depth, param, prio, task_handle, (core_id < portNUM_PROCESSORS ? core_id : tskNO_AFFINITY));
++    return xTaskCreatePinnedToCore(task_func, name, stack_depth, param, prio, task_handle, (core_id < portNUM_PROCESSORS ? core_id : tskNO_AFFINITY));
+ }
+ 
+ static void task_delete_wrapper(void *task_handle)
+@@ -592,7 +592,7 @@ static void *malloc_internal_wrapper(size_t size)
+     return p;
+ }
+ 
+-static int IRAM_ATTR read_mac_wrapper(uint8_t mac[6])
++static int32_t IRAM_ATTR read_mac_wrapper(uint8_t mac[6])
+ {
+     int ret = esp_read_mac(mac, ESP_MAC_BT);
+     ESP_LOGI(BT_LOG_TAG, "Bluetooth MAC: %02x:%02x:%02x:%02x:%02x:%02x\n",
+-- 
+2.34.1
+

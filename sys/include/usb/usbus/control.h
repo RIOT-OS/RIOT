@@ -21,6 +21,16 @@
 #ifndef USB_USBUS_CONTROL_H
 #define USB_USBUS_CONTROL_H
 
+/**
+ * @brief   Number of IN EPs required for the control interface
+ */
+#define USBUS_CONTROL_EP_IN_REQUIRED_NUMOF  1
+
+/**
+ * @brief   Number of IN EPs required for the control interface
+ */
+#define USBUS_CONTROL_EP_OUT_REQUIRED_NUMOF 1
+
 #include "usb/usbus.h"
 
 #ifdef __cplusplus

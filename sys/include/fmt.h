@@ -22,7 +22,7 @@
  *       This *MUST* be ensured by the caller.
  *
  * @note Each fmt function will not write anything to `out` if it is `NULL`, but
- *       still return the number of bytes that would have been written.
+ *       still return the number of characters that would have been written.
  *       This can be used to ensure the `out` buffer is large enough.
  *
  * @note The print functions in this library do not buffer any output.
@@ -81,7 +81,7 @@ static inline int fmt_is_upper(char c)
  *
  * @param[in] str   String to test, **must be `\0` terminated**
  *
- * @return  true if @p str solely contains digits, false otherwise
+ * @return  true if @p str solely contains decimal digits, false otherwise
  */
 int fmt_is_number(const char *str);
 
@@ -90,8 +90,8 @@ int fmt_is_number(const char *str);
  *
  * E.g., converts byte value 0 to the string 00, 255 to the string FF.
  *
- * Will write two bytes to @p out.
- * If @p out is NULL, will only return the number of bytes that would have
+ * Will write two characters to @p out.
+ * If @p out is NULL, will only return the number of characters that would have
  * been written.
  *
  * @param[out] out  Pointer to output buffer, or NULL
@@ -102,10 +102,10 @@ int fmt_is_number(const char *str);
 size_t fmt_byte_hex(char *out, uint8_t byte);
 
 /**
- * @brief Formats a sequence of bytes as hex bytes
+ * @brief Formats a sequence of bytes as hex characters
  *
- * Will write 2*n bytes to @p out.
- * If @p out is NULL, will only return the number of bytes that would have
+ * Will write 2*n characters to @p out.
+ * If @p out is NULL, will only return the number of characters that would have
  * been written.
  *
  * @param[out] out  Pointer to output buffer, or NULL
@@ -117,10 +117,10 @@ size_t fmt_byte_hex(char *out, uint8_t byte);
 size_t fmt_bytes_hex(char *out, const uint8_t *ptr, size_t n);
 
 /**
- * @brief Formats a sequence of bytes as hex bytes, starting with the last byte
+ * @brief Formats a sequence of bytes as hex characters, starting with the last byte
  *
- * Will write 2*n bytes to @p out.
- * If @p out is NULL, will only return the number of bytes that would have
+ * Will write 2*n characters to @p out.
+ * If @p out is NULL, will only return the number of characters that would have
  * been written.
  *
  * @param[out] out  Pointer to output buffer, or NULL
@@ -143,14 +143,17 @@ size_t fmt_bytes_hex_reverse(char *out, const uint8_t *ptr, size_t n);
 uint8_t fmt_hex_byte(const char *hex);
 
 /**
- * @brief Converts a sequence of hex bytes to an array of bytes
+ * @brief Converts a sequence of hex characters to an array of bytes
  *
  * The sequence of hex characters must have an even length:
  * 2 hex character => 1 byte. If the sequence of hex has an odd length, this
- * function returns 0 and an empty @p out.
+ * function returns 0 and does not write to @p out.
  *
  * The hex characters sequence must contain valid hexadecimal characters
  * otherwise the result in @p out is undefined.
+ *
+ * If @p out is NULL, will only return the number of bytes that would have
+ * been written.
  *
  * @param[out] out  Pointer to converted bytes, or NULL
  * @param[in]  hex  Pointer to input buffer
@@ -162,8 +165,8 @@ size_t fmt_hex_bytes(uint8_t *out, const char *hex);
 /**
  * @brief   Convert a uint16 value to hex string.
  *
- * Will write 4 bytes to @p out.
- * If @p out is NULL, will only return the number of bytes that would have
+ * Will write 4 characters to @p out.
+ * If @p out is NULL, will only return the number of characters that would have
  * been written.
  *
  * @param[out]  out  Pointer to output buffer, or NULL
@@ -176,8 +179,8 @@ size_t fmt_u16_hex(char *out, uint16_t val);
 /**
  * @brief Convert a uint32 value to hex string.
  *
- * Will write 8 bytes to @p out.
- * If @p out is NULL, will only return the number of bytes that would have
+ * Will write 8 characters to @p out.
+ * If @p out is NULL, will only return the number of characters that would have
  * been written.
  *
  * @param[out]  out  Pointer to output buffer, or NULL
@@ -190,8 +193,8 @@ size_t fmt_u32_hex(char *out, uint32_t val);
 /**
  * @brief Convert a uint64 value to hex string.
  *
- * Will write 16 bytes to @p out.
- * If @p out is NULL, will only return the number of bytes that would have
+ * Will write 16 characters to @p out.
+ * If @p out is NULL, will only return the number of characters that would have
  * been written.
  *
  * @param[out]  out  Pointer to output buffer, or NULL
@@ -202,22 +205,35 @@ size_t fmt_u32_hex(char *out, uint32_t val);
 size_t fmt_u64_hex(char *out, uint64_t val);
 
 /**
- * @brief Convert a uint32 value to decimal string.
+ * @brief Convert a uint16 value to decimal string.
  *
- * If @p out is NULL, will only return the number of bytes that would have
+ * If @p out is NULL, will only return the number of characters that would have
  * been written.
  *
  * @param[out]  out  Pointer to output buffer, or NULL
  * @param[in]   val  Value to convert
  *
- * @return      nr of digits written to (or needed in) @p out
+ * @return      nr of characters written to (or needed in) @p out
+ */
+size_t fmt_u16_dec(char *out, uint16_t val);
+
+/**
+ * @brief Convert a uint32 value to decimal string.
+ *
+ * If @p out is NULL, will only return the number of characters that would have
+ * been written.
+ *
+ * @param[out]  out  Pointer to output buffer, or NULL
+ * @param[in]   val  Value to convert
+ *
+ * @return      nr of characters written to (or needed in) @p out
  */
 size_t fmt_u32_dec(char *out, uint32_t val);
 
 /**
  * @brief Convert a uint64 value to decimal string.
  *
- * If @p out is NULL, will only return the number of bytes that would have
+ * If @p out is NULL, will only return the number of characters that would have
  * been written.
  *
  * @note This adds ~400b of code when used.
@@ -225,29 +241,16 @@ size_t fmt_u32_dec(char *out, uint32_t val);
  * @param[out]  out  Pointer to output buffer, or NULL
  * @param[in]   val  Value to convert
  *
- * @return      nr of digits written to (or needed in) @p out
+ * @return      nr of characters written to (or needed in) @p out
  */
 size_t fmt_u64_dec(char *out, uint64_t val);
-
-/**
- * @brief Convert a uint16 value to decimal string.
- *
- * If @p out is NULL, will only return the number of bytes that would have
- * been written.
- *
- * @param[out]  out  Pointer to output buffer, or NULL
- * @param[in]   val  Value to convert
- *
- * @return      nr of digits written to (or needed in) @p out
- */
-size_t fmt_u16_dec(char *out, uint16_t val);
 
 /**
  * @brief Convert a int64 value to decimal string.
  *
  * Will add a leading "-" if @p val is negative.
  *
- * If @p out is NULL, will only return the number of bytes that would have
+ * If @p out is NULL, will only return the number of characters that would have
  * been written.
  *
  * @param[out]  out  Pointer to output buffer, or NULL
@@ -262,7 +265,7 @@ size_t fmt_s64_dec(char *out, int64_t val);
  *
  * Will add a leading "-" if @p val is negative.
  *
- * If @p out is NULL, will only return the number of bytes that would have
+ * If @p out is NULL, will only return the number of characters that would have
  * been written.
  *
  * @param[out]  out  Pointer to output buffer, or NULL
@@ -277,7 +280,7 @@ size_t fmt_s32_dec(char *out, int32_t val);
  *
  * Will add a leading "-" if @p val is negative.
  *
- * If @p out is NULL, will only return the number of bytes that would have
+ * If @p out is NULL, will only return the number of characters that would have
  * been written.
  *
  * @param[out]  out  Pointer to output buffer, or NULL
@@ -324,7 +327,7 @@ size_t fmt_s32_dfp(char *out, int32_t val, int scale);
  *
  * Converts float value @p f to string
  *
- * If @p out is NULL, will only return the number of bytes that would have
+ * If @p out is NULL, will only return the number of characters that would have
  * been written.
  *
  * @attention This function is using floating point math.
@@ -337,20 +340,20 @@ size_t fmt_s32_dfp(char *out, int32_t val, int scale);
  * @param[in]   f           float value to convert
  * @param[in]   precision   number of digits after decimal point
  *
- * @returns     nr of bytes the function did or would write to out
+ * @returns     nr of characters the function did or would write to out
  */
 size_t fmt_float(char *out, float f, unsigned precision);
 
 /**
  * @brief   Copy @p in char to string (without terminating '\0')
  *
- * If @p out is NULL, will only return the number of bytes that would have
+ * If @p out is NULL, will only return the number of characters that would have
  * been written.
  *
  * @param[out]  out     string to write to (or NULL)
  * @param[in]   c       char value to append
  *
- * @return      nr of bytes the function did or would write to out
+ * @return      nr of characters the function did or would write to out
  */
 size_t fmt_char(char *out, char c);
 
@@ -377,7 +380,7 @@ size_t fmt_strnlen(const char *str, size_t maxlen);
 /**
  * @brief Copy null-terminated string (excluding terminating \0)
  *
- * If @p out is NULL, will only return the number of bytes that would have
+ * If @p out is NULL, will only return the number of characters that would have
  * been written.
  *
  * @param[out]  out  Pointer to output buffer, or NULL
@@ -390,13 +393,18 @@ size_t fmt_str(char *out, const char *str);
 /**
  * @brief   Copy null-terminated string to a lowercase string (excluding terminating \0)
  *
+ * If @p out is NULL, will only return the number of characters that would have
+ * been written.
+ *
  * @param[out]  out     Pointer to output buffer, or NULL
  * @param[in]   str     Pointer to null-terminated source string
+ *
+ * @return      nr of characters written to (or needed in) @p out
  */
 size_t fmt_to_lower(char *out, const char *str);
 
 /**
- * @brief Convert digits to uint32
+ * @brief Convert string of decimal digits to uint32
  *
  * Will convert up to @p n digits. Stops at any non-digit or '\0' character.
  *
@@ -408,9 +416,9 @@ size_t fmt_to_lower(char *out, const char *str);
 uint32_t scn_u32_dec(const char *str, size_t n);
 
 /**
- * @brief Convert hexadecimal characters to uin32_t
+ * @brief Convert string hexadecimal digits to uin32_t
  *
- * Will convert up to @p n char. Stop at any non-hexadecimal or '\0' character
+ * Will convert up to @p n digits. Stop at any non-hexadecimal or '\0' character
  *
  * @param[in]   str Pointer to string to read from
  * @param[in]   n   Maximum number of characters to consider
@@ -422,10 +430,10 @@ uint32_t scn_u32_hex(const char *str, size_t n);
 /**
  * @brief Print string to stdout
  *
- * Writes @p n bytes from @p s to STDOUT_FILENO.
+ * Writes @p n characters from @p s to STDOUT_FILENO.
  *
  * @param[out]  s   Pointer to string to print
- * @param[in]   n   Number of bytes to print
+ * @param[in]   n   Number of characters to print
  */
 void print(const char* s, size_t n);
 
@@ -449,6 +457,14 @@ void print_s32_dec(int32_t val);
  * @param[in]  byte Byte value to print
  */
 void print_byte_hex(uint8_t byte);
+
+/**
+ * @brief Print bytes as hex to stdout
+ *
+ * @param[in]  bytes Byte array to print
+ * @param[in]  n     Number of bytes to print
+ */
+void print_bytes_hex(const void *bytes, size_t n);
 
 /**
  * @brief Print uint32 value as hex to stdout

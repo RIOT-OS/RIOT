@@ -31,13 +31,23 @@
 
 /**
  * @name    UART configuration
- *
- *          The CPU only supports one UART device, so we keep it simple
  * @{
  */
-#define UART_NUMOF          (1U)
-#define UART_PIN_RX         17
-#define UART_PIN_TX         18
+static const uart_conf_t uart_config[] = {
+    { /* Mapped to USB virtual COM port */
+        .dev        = NRF_UART0,
+        .rx_pin     = GPIO_PIN(0, 17),
+        .tx_pin     = GPIO_PIN(0, 18),
+#ifdef MODULE_PERIPH_UART_HW_FC
+        .rts_pin    = GPIO_UNDEF,
+        .cts_pin    = GPIO_UNDEF,
+#endif
+        .irqn       = UART0_IRQn,
+    },
+};
+
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
+#define UART_0_ISR          isr_uart0
 /** @} */
 
 /**
@@ -96,3 +106,4 @@ static const adc_conf_t adc_config[] = {3, 4, 5, 6};
 #endif
 
 #endif /* PERIPH_CONF_H */
+/** @} */

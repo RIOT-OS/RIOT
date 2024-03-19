@@ -11,6 +11,3 @@ FEATURES_PROVIDED += periph_uart
 
 # Put other features for this board (in alphabetical order)
 FEATURES_PROVIDED += riotboot
-
-# iotlab boards provide a custom default Kconfig clock configuration
-KCONFIG_BOARD_CONFIG += $(RIOTBOARD)/common/iotlab/clock.config

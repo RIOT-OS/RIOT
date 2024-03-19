@@ -1,5 +1,6 @@
 FEATURES_REQUIRED += periph_gpio
 FEATURES_REQUIRED += periph_uart
+USEMODULE += fmt
+USEMODULE += netdev_legacy_api
 USEMODULE += ztimer
 USEMODULE += ztimer_msec
-USEMODULE += fmt

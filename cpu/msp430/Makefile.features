@@ -1,0 +1,21 @@
+CPU_ARCH = msp430
+CPU_CORE = msp430
+
+ifneq (,$(filter msp430f2% msp430g2%,$(CPU_MODEL)))
+  CPU_FAM := msp430_f2xx_g2xx
+endif
+
+ifneq (,$(filter msp430f1%,$(CPU_MODEL)))
+  CPU_FAM := msp430_x1xx
+endif
+
+FEATURES_PROVIDED += arch_16bit
+FEATURES_PROVIDED += arch_msp430
+FEATURES_PROVIDED += cpu_$(CPU_FAM)
+FEATURES_PROVIDED += dbgpin
+FEATURES_PROVIDED += newlib
+FEATURES_PROVIDED += periph_flashpage
+FEATURES_PROVIDED += periph_flashpage_in_address_space
+FEATURES_PROVIDED += periph_flashpage_pagewise
+FEATURES_PROVIDED += periph_pm
+FEATURES_PROVIDED += periph_timer_query_freqs

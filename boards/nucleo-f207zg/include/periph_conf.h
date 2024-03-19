@@ -228,20 +228,46 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @name    ADC configuration
+ * @brief   ADC configuration
  *
- * We need to define the following fields:
- * PIN, device (ADCx), channel
+ * Note that we do not configure all ADC channels,
+ * and not in the STM32F207ZG order.  Instead, we
+ * just define 6 ADC channels, for the Nucleo
+ * Arduino header pins A0-A5 and the internal VBAT channel.
+ *
+ * To find appropriate device and channel find in the
+ * board manual, table showing pin assignments and
+ * information about ADC - a text similar to ADC[X]_IN[Y],
+ * where:
+ * [X] - describes used device - indexed from 0,
+ * for example ADC1_IN10 is device 0,
+ * [Y] - describes used channel - indexed from 1,
+ * for example ADC1_IN10 is channel 10
+ *
+ * For Nucleo-F207ZG this information is in board manual,
+ * Table 13, page 37.
  * @{
  */
 static const adc_conf_t adc_config[] = {
-    {GPIO_PIN(PORT_A, 3), 0, 3},
-    {GPIO_PIN(PORT_C, 0), 1, 0},
-    {GPIO_UNDEF, 0, 18}, /* VBAT */
+    { .pin = GPIO_PIN(PORT_A, 3), .dev = 0, .chan =  3 }, /* ADC123_IN3  */
+    { .pin = GPIO_PIN(PORT_C, 0), .dev = 0, .chan = 10 }, /* ADC123_IN10 */
+    { .pin = GPIO_PIN(PORT_C, 3), .dev = 0, .chan = 13 }, /* ADC123_IN13 */
+    { .pin = GPIO_PIN(PORT_F, 3), .dev = 2, .chan =  9 }, /* ADC3_IN9  */
+    { .pin = GPIO_PIN(PORT_F, 5), .dev = 2, .chan = 15 }, /* ADC3_IN15   */
+    { .pin = GPIO_PIN(PORT_F, 10), .dev = 2, .chan = 8 }, /* ADC3_IN8    */
+    { .pin = GPIO_UNDEF, .dev = 0, .chan = 18 }, /* VBAT */
 };
 
-#define VBAT_ADC            ADC_LINE(2) /**< VBAT ADC line */
+/**
+ * @brief VBAT ADC line
+ */
+#define VBAT_ADC            ADC_LINE(6)
+
+/**
+ * @brief Number of ADC devices
+ */
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
+
 /** @} */
 
 /**

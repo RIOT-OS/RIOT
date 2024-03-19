@@ -8,6 +8,17 @@ config CPU_ARCH_XTENSA
     bool
     select HAS_ARCH_32BIT
     select HAS_ARCH_ESP
+    select HAS_ARCH_ESP_XTENSA
+    help
+        Xtensa based architecture is used for the ESP8266 or the ESP32x SoC variant
+
+config CPU_ARCH_RISCV
+    bool
+    select HAS_ARCH_32BIT
+    select HAS_ARCH_ESP
+    select HAS_ARCH_ESP_RISCV
+    help
+        RISC-V based architecture is used for the ESP32x SoC variant.
 
 config CPU_COMMON_ESP
     bool
@@ -63,6 +74,16 @@ config HAS_ARCH_ESP
     help
         Indicates that an 'ESP' architecture is being used.
 
+config HAS_ARCH_ESP_XTENSA
+    bool
+    help
+        Indicates that an Xtensa-based 'ESP' architecture is being used.
+
+config HAS_ARCH_ESP_RISCV
+    bool
+    help
+        Indicates that an RISC-V-based 'ESP' architecture is being used.
+
 config HAS_ESP_WIFI_ENTERPRISE
     bool
     help
@@ -72,6 +93,7 @@ config HAS_ESP_WIFI_ENTERPRISE
 ## Common CPU symbols
 config CPU_ARCH
     default "xtensa" if CPU_ARCH_XTENSA
+    default "rv32" if CPU_ARCH_RISCV
 
 config MODULE_ESP_COMMON
     bool
@@ -81,6 +103,7 @@ config MODULE_ESP_COMMON
     select MODULE_LOG # override default log implementation by default
     select MODULE_PERIPH
     select MODULE_ESP_IDF
+    select MODULE_CORE_THREAD_FLAGS if MODULE_ZTIMER_MSEC
     help
       Common code module for ESP SoCs.
 
@@ -109,13 +132,15 @@ config MODULE_ESP_LOG_TAGGED
 config MODULE_ESP_LOG_STARTUP
     bool "Add additional startup information to the log output"
 
-endmenu
-
 config MODULE_ESP_QEMU
     bool "Simulate ESP with QEMU"
 
-endif # TEST_KCONFIG
-
+rsource "esp-riscv/Kconfig"
+rsource "esp-xtensa/Kconfig"
 rsource "freertos/Kconfig"
 rsource "periph/Kconfig"
 rsource "vendor/xtensa/Kconfig"
+
+endmenu
+
+endif # TEST_KCONFIG

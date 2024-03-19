@@ -68,6 +68,17 @@ Connect the device to your Micro-USB cable.
 
 The standard method for flashing RIOT to the saml11-xpro is using EDBG.
 
+## Special case
+
+SERCOM1 (available on EXT1 connector) needs an extra step to be usable.
+By default, this SERCOM is only available in the secure world. As RIOT
+doesn't support it for now, the only option, to use it, is to enable
+SERCOM non-secure mode. To do so, a fuse bit must be set in User ROW
+flash memory. Such action can be done with the following EDBG command:
+'edbg -t saml11 -F w0,194,1'
+or pass it as argument when calling make:
+EDBG_ARGS="-F w0,194,1" BOARD=saml11-xpro make flash term -C tests/periph/uart
+
 ## Supported Toolchains
 
 For using the saml11-xpro board we strongly recommend the usage of the

@@ -1,0 +1,24 @@
+# the board uses a ESP32-S2 with external 4MB QSPI Flash and external 8MB QSPI PSRAM
+CPU_MODEL = esp32s2
+FEATURES_PROVIDED += esp_spi_ram
+
+# common board and CPU features
+include $(RIOTBOARD)/common/esp32s2/Makefile.features
+
+# peripherals provided by the board
+FEATURES_PROVIDED += periph_adc
+FEATURES_PROVIDED += periph_dac
+FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_pwm
+FEATURES_PROVIDED += periph_spi
+FEATURES_PROVIDED += periph_usbdev
+
+# other features provided by the board
+FEATURES_PROVIDED += arduino_pins
+FEATURES_PROVIDED += esp_rtc_timer_32k
+FEATURES_PROVIDED += sdcard_spi
+FEATURES_PROVIDED += tinyusb_device
+
+ifneq (,$(filter esp32s2-lilygo-ttgo-t8-usb,$(USEMODULE)))
+  FEATURES_PROVIDED += highlevel_stdio
+endif

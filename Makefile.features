@@ -13,7 +13,7 @@ include $(BOARDDIR)/Makefile.features
 
 # Sanity check
 ifeq (,$(CPU))
-  $(error CPU must be defined by board / board_common Makefile.features)
+  $(error $(BOARD): CPU must be defined by board / board_common Makefile.features)
 endif
 
 include $(RIOTCPU)/$(CPU)/Makefile.features
@@ -23,4 +23,11 @@ FEATURES_PROVIDED += cpu_$(CPU)
 
 # Features that are conflicting for all architectures
 FEATURES_CONFLICT += picolibc:newlib
-FEATURES_CONFLICT_MSG += "Only one standard C library can be used"
+FEATURES_CONFLICT_MSG += "Only one standard C library can be used."
+
+FEATURES_CONFLICT += periph_gpio_irq:periph_gpio_ll_irq
+FEATURES_CONFLICT_MSG += "Only one GPIO IRQ implementation can be used."
+
+FEATURES_CONFLICT += periph_usbdev:tinyusb_device
+FEATURES_CONFLICT += periph_usbdev:tinyusb_host
+FEATURES_CONFLICT_MSG += "Package tinyUSB is not yet compatible with periph_usbdev."

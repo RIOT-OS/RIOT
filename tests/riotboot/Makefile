@@ -6,9 +6,8 @@ FEATURES_REQUIRED += riotboot
 
 # Include modules to test the bootloader
 USEMODULE += riotboot_slot
-USEMODULE += shell
-# Add shell_commands to use the shell version of `test_utils_interactive_sync`
-USEMODULE += shell_commands
+# Add shell_cmds_default to use the shell version of `test_utils_interactive_sync`
+USEMODULE += shell_cmds_default
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the

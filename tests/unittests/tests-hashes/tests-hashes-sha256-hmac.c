@@ -141,9 +141,11 @@ static void test_hashes_hmac_sha256_hash_PRF5(void)
 static void test_hashes_hmac_sha256_hash_PRF6(void)
 {
     /* Test Case PRF-6: */
-    static const unsigned char strPRF6[] = "This is a test using a larger than block-size key and a "
-                                           "larger than block-size data. The key needs to be hashed "
-                                           "before being used by the HMAC algorithm.";
+    static const unsigned char strPRF6[] =
+        "This is a test using a larger than block-size key and a "
+        "larger than block-size data. The key needs to be hashed "
+        "before being used by the HMAC algorithm.";
+
     unsigned char longKey[131];
     static unsigned char hmac[SHA256_DIGEST_LENGTH];
     memset(longKey, 0xaa, sizeof(longKey));
@@ -287,9 +289,11 @@ static void test_hashes_hmac_sha256_ite_hash_PRF6(void)
 {
     /* Test Case PRF-6: */
     hmac_context_t ctx;
-    static const unsigned char strPRF6[] = "This is a test using a larger than block-size key and a "
-                                           "larger than block-size data. The key needs to be hashed "
-                                           "before being used by the HMAC algorithm.";
+    static const unsigned char strPRF6[] =
+        "This is a test using a larger than block-size key and a "
+        "larger than block-size data. The key needs to be hashed "
+        "before being used by the HMAC algorithm.";
+
     unsigned char longKey[131];
     static unsigned char hmac[SHA256_DIGEST_LENGTH];
     memset(longKey, 0xaa, sizeof(longKey));
@@ -308,9 +312,12 @@ static void test_hashes_hmac_sha256_ite_hash_PRF6_split(void)
 {
     /* Test Case PRF-6: */
     hmac_context_t ctx;
-    static const unsigned char strPRF6_1[] = "This is a test using a larger than block-size key and a ";
-    static const unsigned char strPRF6_2[] = "larger than block-size data. The key needs to be hashed ";
-    static const unsigned char strPRF6_3[] = "before being used by the HMAC algorithm.";
+    static const unsigned char strPRF6_1[] =
+        "This is a test using a larger than block-size key and a ";
+    static const unsigned char strPRF6_2[] =
+        "larger than block-size data. The key needs to be hashed ";
+    static const unsigned char strPRF6_3[] =
+        "before being used by the HMAC algorithm.";
 
     unsigned char longKey[131];
     static unsigned char hmac[SHA256_DIGEST_LENGTH];

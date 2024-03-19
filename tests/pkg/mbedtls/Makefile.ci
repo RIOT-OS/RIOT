@@ -1,0 +1,16 @@
+BOARD_INSUFFICIENT_MEMORY := \
+    arduino-duemilanove \
+    arduino-nano \
+    arduino-uno \
+    atmega328p \
+    atmega328p-xplained-mini \
+    atmega8 \
+    nucleo-f302r8 \
+    nucleo-f303k8 \
+    nucleo-f303re \
+    nucleo-f303ze \
+    nucleo-f334r8 \
+    nucleo-l011k4 \
+    nucleo-l476rg \
+    qn9080dk \
+    #

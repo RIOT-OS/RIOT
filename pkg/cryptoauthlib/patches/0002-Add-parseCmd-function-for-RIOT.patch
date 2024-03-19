@@ -1,0 +1,32 @@
+From b4ed40ad3f474cb26a883f1748643a54ac1695cd Mon Sep 17 00:00:00 2001
+From: Lena Boeckmann <einhornhool@mobi31.inet.haw-hamburg.de>
+Date: Wed, 8 Jun 2022 13:44:59 +0200
+Subject: [PATCH 2/2] Add parseCmd function for RIOT
+
+---
+ test/cmd-processor.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/test/cmd-processor.c b/test/cmd-processor.c
+index 837361d2..a98f3169 100644
+--- a/test/cmd-processor.c
++++ b/test/cmd-processor.c
+@@ -267,6 +267,15 @@ int main(int argc, char* argv[])
+ 
+     return exit_code;
+ }
++#elif defined(RIOT_APPLICATION)
++#include <stdio.h>
++#include <stdlib.h>
++#include "cmd-processor.h"
++
++int atca_run_cmd(char *command, size_t len)
++{
++    return parse_cmd(command, len);
++}
+ #else
+ int processCmd(void)
+ {
+-- 
+2.35.1
+

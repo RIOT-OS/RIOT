@@ -20,6 +20,7 @@
 #include "net/gnrc/ndp.h"
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/netif/internal.h"
+#include "net/gnrc/netreg.h"
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
 #include "net/gnrc/sixlowpan/nd.h"
 #endif  /* MODULE_GNRC_SIXLOWPAN_ND */
@@ -43,7 +44,7 @@ void _snd_ns(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
     _nib_dr_entry_t *dr = _nib_drl_get(NULL, netif->pid);
 
     /* add ARO based on interface */
-    if ((src != NULL) && gnrc_netif_is_6ln(netif) &&
+    if ((src != NULL) && gnrc_netif_is_6ln(netif) && (dr != NULL) &&
         (_nib_onl_get_if(dr->next_hop) == (unsigned)netif->pid) &&
         ipv6_addr_equal(&dr->next_hop->ipv6, dst)) {
         eui64_t eui64;

@@ -70,10 +70,6 @@ config MODULE_UWB-CORE_DSP
 config MODULE_UWB-CORE_RNG_MATH
     bool "uwb-core ranging math utilities"
 
-config MODULE_UWB-CORE_UWBCFG
-    bool "uwb-core configuration module"
-    select MODULE_UWB-CORE_CONFIG
-
 config MODULE_UWB-CORE_EVENT_THREAD
     bool "Use event-thread loop as uwb-core's event loop"
     select MODULE_EVENT_THREAD

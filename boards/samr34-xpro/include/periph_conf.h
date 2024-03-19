@@ -21,6 +21,7 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
+#include "macros/units.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,7 +30,7 @@ extern "C" {
 /**
  * @brief   GCLK reference speed
  */
-#define CLOCK_CORECLOCK     (48000000U)
+#define CLOCK_CORECLOCK     MHZ(48)
 
 /**
  * @brief Enable the internal DC/DC converter
@@ -50,13 +51,24 @@ static const tc32_conf_t timer_config[] = {
         .gclk_id        = TC0_GCLK_ID,
         .gclk_src       = SAM0_GCLK_TIMER,
         .flags          = TC_CTRLA_MODE_COUNT32,
+    },
+    {
+        .dev            = TC2,
+        .irq            = TC2_IRQn,
+        .mclk           = &MCLK->APBCMASK.reg,
+        .mclk_mask      = MCLK_APBCMASK_TC2 | MCLK_APBCMASK_TC3,
+        .gclk_id        = TC2_GCLK_ID,
+        .gclk_src       = SAM0_GCLK_TIMER,
+        .flags          = TC_CTRLA_MODE_COUNT32,
     }
 };
 
 /* Timer 0 configuration */
 #define TIMER_0_CHANNELS    2
 #define TIMER_0_ISR         isr_tc0
-#define TIMER_NUMOF         (sizeof(timer_config)/sizeof(timer_config[0]))
+#define TIMER_1_CHANNELS    2
+#define TIMER_1_ISR         isr_tc2
+#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
 
 /**
@@ -77,13 +89,28 @@ static const uart_conf_t uart_config[] = {
         .tx_pad   = UART_PAD_TX_0,
         .flags    = UART_FLAG_NONE,
         .gclk_src = SAM0_GCLK_MAIN,
+    },
+    {    /* EXT1 */
+        .dev      = &SERCOM3->USART,
+        .rx_pin   = GPIO_PIN(PA, 17),
+        .tx_pin   = GPIO_PIN(PA, 16),
+#ifdef MODULE_PERIPH_UART_HW_FC
+        .rts_pin  = GPIO_UNDEF,
+        .cts_pin  = GPIO_UNDEF,
+#endif
+        .mux      = GPIO_MUX_D,
+        .rx_pad   = UART_PAD_RX_1,
+        .tx_pad   = UART_PAD_TX_0,
+        .flags    = UART_FLAG_NONE,
+        .gclk_src = SAM0_GCLK_MAIN,
     }
 };
 
 /* interrupt function name mapping */
 #define UART_0_ISR          isr_sercom0
+#define UART_1_ISR          isr_sercom3
 
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 /**
@@ -91,7 +118,7 @@ static const uart_conf_t uart_config[] = {
  * @{
  */
 static const spi_conf_t spi_config[] = {
-    {
+    {   /* internal, wired to sx1276 */
         .dev      = &(SERCOM4->SPI),
         .miso_pin = GPIO_PIN(PC, 19),
         .mosi_pin = GPIO_PIN(PB, 30),
@@ -106,10 +133,26 @@ static const spi_conf_t spi_config[] = {
         .tx_trigger = SERCOM4_DMAC_ID_TX,
         .rx_trigger = SERCOM4_DMAC_ID_RX,
 #endif
-    }
+    },
+    {   /* EXT1, EXT3, NOR Flash */
+        .dev      = &(SERCOM5->SPI),
+        .miso_pin = GPIO_PIN(PB, 2),
+        .mosi_pin = GPIO_PIN(PB, 22),
+        .clk_pin  = GPIO_PIN(PB, 23),
+        .miso_mux = GPIO_MUX_D,
+        .mosi_mux = GPIO_MUX_D,
+        .clk_mux  = GPIO_MUX_D,
+        .miso_pad = SPI_PAD_MISO_0,
+        .mosi_pad = SPI_PAD_MOSI_2_SCK_3,
+        .gclk_src = SAM0_GCLK_MAIN,
+#ifdef MODULE_PERIPH_DMA
+        .tx_trigger = DMA_TRIGGER_DISABLED,
+        .rx_trigger = DMA_TRIGGER_DISABLED,
+#endif
+    },
 };
 
-#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 /**
@@ -127,7 +170,7 @@ static const i2c_conf_t i2c_config[] = {
         .flags    = I2C_FLAG_NONE
      }
 };
-#define I2C_NUMOF          (sizeof(i2c_config) / sizeof(i2c_config[0]))
+#define I2C_NUMOF          ARRAY_SIZE(i2c_config)
 /** @} */
 
 /**
@@ -161,8 +204,8 @@ static const i2c_conf_t i2c_config[] = {
 
 static const adc_conf_chan_t adc_channels[] = {
     /* port, pin, muxpos */
-    {GPIO_PIN(PA, 6), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN6)},
-    {GPIO_PIN(PA, 7), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN7)}
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA06 },
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA07 }
 };
 
 #define ADC_NUMOF                               ARRAY_SIZE(adc_channels)

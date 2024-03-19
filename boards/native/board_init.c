@@ -27,15 +27,16 @@ mtd_native_dev_t mtd0_dev = {
         .sector_count = MTD_SECTOR_NUM,
         .pages_per_sector = MTD_SECTOR_SIZE / MTD_PAGE_SIZE,
         .page_size = MTD_PAGE_SIZE,
+        .write_size = MTD_WRITE_SIZE,
     },
     .fname = MTD_NATIVE_FILENAME,
 };
 
-mtd_dev_t *mtd0 = &mtd0_dev.base;
+MTD_XFA_ADD(mtd0_dev.base, 0);
 #endif
 
-#ifdef MODULE_VFS
-#include "vfs.h"
+#ifdef MODULE_VFS_DEFAULT
+#include "vfs_default.h"
 
 /*
  * On `native` we define auto-mounts for every file system.
@@ -47,30 +48,30 @@ mtd_dev_t *mtd0 = &mtd0_dev.base;
 
 /* littlefs support */
 #if defined(MODULE_LITTLEFS)
-
-#include "fs/littlefs_fs.h"
-VFS_AUTO_MOUNT(littlefs, VFS_MTD(mtd0_dev), "/nvm", 0);
+VFS_AUTO_MOUNT(littlefs, VFS_MTD(mtd0_dev), VFS_DEFAULT_NVM(0), 0);
 
 /* littlefs2 support */
 #elif defined(MODULE_LITTLEFS2)
-
-#include "fs/littlefs2_fs.h"
-VFS_AUTO_MOUNT(littlefs2, VFS_MTD(mtd0_dev), "/nvm", 0);
+VFS_AUTO_MOUNT(littlefs2, VFS_MTD(mtd0_dev), VFS_DEFAULT_NVM(0), 0);
 
 /* spiffs support */
 #elif defined(MODULE_SPIFFS)
-
-#include "fs/spiffs_fs.h"
-VFS_AUTO_MOUNT(spiffs, VFS_MTD(mtd0_dev), "/nvm", 0);
+VFS_AUTO_MOUNT(spiffs, VFS_MTD(mtd0_dev), VFS_DEFAULT_NVM(0), 0);
 
 /* FAT support */
 #elif defined(MODULE_FATFS_VFS)
+VFS_AUTO_MOUNT(fatfs, VFS_MTD(mtd0_dev), VFS_DEFAULT_NVM(0), 0);
 
-#include "fs/fatfs.h"
-VFS_AUTO_MOUNT(fatfs, VFS_MTD(mtd0_dev), "/nvm", 0);
+/* ext2/3/4 support */
+#elif defined(MODULE_LWEXT4)
+VFS_AUTO_MOUNT(lwext4, VFS_MTD(mtd0_dev), VFS_DEFAULT_NVM(0), 0);
+
+/* host fs pass-through */
+#elif defined(MODULE_FS_NATIVE)
+VFS_AUTO_MOUNT(native, { .hostpath = FS_NATIVE_DIR }, VFS_DEFAULT_NVM(0), 0);
 
 #endif
-#endif /* MODULE_VFS */
+#endif /* MODULE_VFS_DEFAULT */
 
 /**
  * Nothing to initialize at the moment.

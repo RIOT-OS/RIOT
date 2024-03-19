@@ -30,8 +30,6 @@
  *
  * @author      Joseph Gaeddert
  * @author      Peter Kietzmann <peter.kietzmann@haw.hamburg.de>
- *
- * @}
  */
 
 #ifndef ECC_REPETITION_H

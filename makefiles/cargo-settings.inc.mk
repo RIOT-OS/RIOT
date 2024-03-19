@@ -1,26 +1,8 @@
-# Rust's own version of the target triple / quadruple.
+# The profile with which to build Rust usually `release` or `dev`.
 #
-# This does not have a sane default, and needs to be set in the architecture
-# files.
-# RUST_TARGET = ...
-
-# Flags that need to be added to the RIOT_CFLAGS passed to cargo in order to
-# make bindgen happy
-CARGO_EXTRACFLAGS ?=
-
-# Setting anything other than "debug" or "release" will necessitate additional
-# -Z unstable-options as of 2021-03 nightlies.
+# This needs to be known to the build scripts because the path of the produced
+# binary is derived from this.
 CARGO_PROFILE ?= release
-
-# The Rust version to use.
-#
-# As long as C2Rust and riot-wrappers require nightly, the only alternative
-# here is to pick a particular nightly when something breaks.
-#
-# (Default is empty, because the riotbuild container picks a particular nightly
-# and sets it as a default; users without a nightly default need to either
-# override this here or in rustup)
-CARGO_CHANNEL ?=
 
 # Note that if we did not set this explicitly, CARGO_LIB would have to
 # understand which value cargo uses in absence of CARGO_TARGET_DIR, which would
@@ -40,4 +22,17 @@ CARGO_CHANNEL ?=
 CARGO_TARGET_DIR = $(BINDIR)/target
 
 # The single Rust library to be built.
-CARGO_LIB = $(CARGO_TARGET_DIR)/$(RUST_TARGET)/${CARGO_PROFILE}/lib$(APPLICATION_RUST_MODULE).a
+#
+# The dev->debug and bench->release substitutions represent a historical
+# peculiarity in cargo: "For historical reasons, the `dev` and `test` profiles
+# are stored in the `debug` directory, and the `release` and `bench` profiles
+# are stored in the `release` directory. User-defined profiles are stored in a
+# directory with the same name as the profile".
+CARGO_LIB = $(CARGO_TARGET_DIR)/$(RUST_TARGET)/$(patsubst test,debug,$(patsubst dev,debug,$(patsubst bench,release,${CARGO_PROFILE})))/lib$(APPLICATION_RUST_MODULE).a
+
+# Options passed into all Cargo commands, in particular to the build command.
+#
+# Most of these are populated by RIOT modules that are backed by Rust. Popular
+# options added by the user are `-Zbuild-std=core` (only available on nightly)
+# to apply LTO and profile configuration to the core library.
+CARGO_OPTIONS ?=

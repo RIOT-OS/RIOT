@@ -1,0 +1,60 @@
+# Copyright (c) 2022 Gunar Schorcht
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_TINYUSB_CLASS_NET
+    bool "Network Device Class"
+    depends on MODULE_TINYUSB_DEVICE
+
+if MODULE_TINYUSB_CLASS_NET
+
+config MODULE_TINYUSB_CLASS_NET_CDC_ECM
+    bool "CDC ECM network device"
+    default y
+
+config MODULE_TINYUSB_CLASS_NET_CDC_NCM
+    bool "CDC NCM network device"
+
+config MODULE_TINYUSB_CLASS_NET_RNDIS
+    bool "RNDIS network device"
+    select MODULE_TINYUSB_LIB_NETWORKING
+
+config TUSBD_NET_NUMOF
+    int
+    default 1
+
+if TUSBD_NET_NUMOF > 0
+
+config TUSBD_NET_NOTIF_EP_SIZE
+    int "Net Notification endpoint size [byte]"
+    default 64
+
+config TUSBD_NET_FS_EP_SIZE
+    int "Net Full-Speed endpoint size [byte]"
+    default 64
+
+config TUSBD_NET_HS_EP_SIZE
+    int "Net High-Speed endpoint size [byte]"
+    default 512
+
+config TUSBD_NET_MTU_SIZE
+    int "MTU size [byte]"
+    default 1514
+
+config TUSBD_NET_DESC_STRING
+    string "Class descriptor string"
+    default "TinyUSB Net"
+
+config TUSBD_NET_CUSTOM_MAC
+    bool "Use custom MAC address string"
+
+config TUSBD_NET_MAC_STRING
+    string "MAC address string"
+    depends on TUSBD_ECM_CUSTOM_MAC
+    default "0123456789ab"
+
+endif # TUSBD_NET_NUMOF > 0
+endif # MODULE_TINYUSB_CLASS_NET

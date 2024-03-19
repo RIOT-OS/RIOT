@@ -1,0 +1,27 @@
+;
+; Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
+;
+; SPDX-License-Identifier: BSD-3-Clause
+;
+
+.program set_scl_sda
+.side_set 1 opt
+
+; Assemble a table of instructions which software can select from, and pass
+; into the FIFO, to issue START/STOP/RSTART. This isn't intended to be run as
+; a complete program.
+
+    set pindirs, 0 side 0 [7] ; SCL = 0, SDA = 0
+    set pindirs, 1 side 0 [7] ; SCL = 0, SDA = 1
+    set pindirs, 0 side 1 [7] ; SCL = 1, SDA = 0
+    set pindirs, 1 side 1 [7] ; SCL = 1, SDA = 1
+
+% c-sdk {
+// Define order of our instruction table
+enum {
+    I2C_SC0_SD0 = 0,
+    I2C_SC0_SD1,
+    I2C_SC1_SD0,
+    I2C_SC1_SD1
+};
+%}

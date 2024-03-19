@@ -78,11 +78,6 @@ extern "C" {
 #define LIS2DH12_PARAM_INT_PIN2 GPIO_PIN(0, 6)
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

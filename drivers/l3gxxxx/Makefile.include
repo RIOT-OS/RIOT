@@ -1,0 +1,19 @@
+# include variants of L3Gxxxx driver as pseudo modules
+PSEUDOMODULES += a3g4250d
+PSEUDOMODULES += i3g4250d
+PSEUDOMODULES += l3g4200d_ng
+PSEUDOMODULES += l3gd20
+PSEUDOMODULES += l3gd20h
+
+PSEUDOMODULES += l3gxxxx_i2c
+PSEUDOMODULES += l3gxxxx_spi
+PSEUDOMODULES += l3gxxxx_low_odr
+PSEUDOMODULES += l3gxxxx_fifo
+PSEUDOMODULES += l3gxxxx_irq
+PSEUDOMODULES += l3gxxxx_irq_data
+PSEUDOMODULES += l3gxxxx_irq_event
+PSEUDOMODULES += l3gxxxx_sleep
+PSEUDOMODULES += l3gxxxx_config
+
+USEMODULE_INCLUDES_l3gxxxx := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_l3gxxxx)

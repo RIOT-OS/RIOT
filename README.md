@@ -1,5 +1,4 @@
 [![Nightly CI status master][master-ci-badge]][master-ci-link]
-[![Nightly HiL CI overview][hil-ci-badge]][hil-ci-link]
 [![GitHub release][release-badge]][release-link]
 [![License][license-badge]][license-link]
 [![API docs][api-badge]][api-link]
@@ -53,29 +52,36 @@ indirect business models around the free open-source software platform
 provided by RIOT, e.g. it is possible to link closed-source code with the
 LGPL code.
 
-## FEATURES
+## Features
 
-RIOT is based on a microkernel architecture, and provides features including,
-but not limited to:
+RIOT provides features including, but not limited to:
 
 * a preemptive, tickless scheduler with priorities
 * flexible memory management
 * high resolution, long-term timers
-* support 100+ boards based on AVR, MSP430, ESP8266, ESP32, MIPS, RISC-V,
+* MTD abstraction layer
+* File System integration
+* support 200+ boards based on AVR, MSP430, ESP8266, ESP32, RISC-V,
   ARM7 and ARM Cortex-M
-* the native port allows to run RIOT as-is on Linux, BSD, and MacOS. Multiple
-  instances of RIOT running on a single machine can also be interconnected via
-  a simple virtual Ethernet bridge
+* the native port allows to run RIOT as-is on Linux and BSD.
+  Multiple instances of RIOT running on a single machine can also be
+  interconnected via a simple virtual Ethernet bridge or via a simulated
+  IEEE 802.15.4 network (ZEP)
 * IPv6
 * 6LoWPAN (RFC4944, RFC6282, and RFC6775)
 * UDP
 * RPL (storing mode, P2P mode)
 * CoAP
+* OTA updates via SUIT
+* MQTT
+* USB (device mode)
+* Display / Touchscreen support
 * CCN-Lite
-* Sigfox
 * LoRaWAN
+* UWB
+* Bluetooth (BLE) via [NimBLE](https://github.com/apache/mynewt-nimble)
 
-## GETTING RIOT
+## Getting RIOT
 
 The most convenient way to get RIOT is to clone it via Git
 
@@ -100,7 +106,7 @@ For more details on our release cycle, check our [documentation][release cycle].
 [releases]: https://github.com/RIOT-OS/RIOT/releases
 [release cycle]: https://doc.riot-os.org/release-cycle.html
 
-## GETTING STARTED
+## Getting Started
 * You want to start the RIOT? Just follow our
 [quickstart guide](https://doc.riot-os.org/index.html#the-quickest-start) or
 try this
@@ -111,23 +117,23 @@ For specific toolchain installation, follow instructions in the
   version of the documentation is uploaded daily to
   [doc.riot-os.org](https://doc.riot-os.org).
 
-## FORUM
+## Forum
 Do you have a question, want to discuss a new feature, or just want to present
 your latest project using RIOT? Come over to our [forum] and post to your hearts
 content.
 
 [forum]: https://forum.riot-os.org
 
-## CONTRIBUTE
+## Contribute
 
 To contribute something to RIOT, please refer to our
 [contributing document](CONTRIBUTING.md).
 
-## MAILING LISTS
+## Mailing Lists
 * RIOT commits: [commits@riot-os.org](https://lists.riot-os.org/mailman/listinfo/commits)
 * Github notifications: [notifications@riot-os.org](https://lists.riot-os.org/mailman/listinfo/notifications)
 
-## LICENSE
+## License
 * Most of the code developed by the RIOT community is licensed under the GNU
   Lesser General Public License (LGPL) version 2.1 as published by the Free
   Software Foundation.
@@ -145,8 +151,8 @@ https://www.riot-os.org
 [api-link]: https://doc.riot-os.org/
 [license-badge]: https://img.shields.io/github/license/RIOT-OS/RIOT
 [license-link]: https://github.com/RIOT-OS/RIOT/blob/master/LICENSE
-[master-ci-badge]: https://ci.riot-os.org/RIOT-OS/RIOT/master/latest/badge.svg
-[master-ci-link]: https://ci.riot-os.org/nightlies.html#master
+[master-ci-badge]: https://ci.riot-os.org/job/branch/master/badge
+[master-ci-link]: https://ci.riot-os.org/details/branch/master
 [matrix-badge]: https://img.shields.io/badge/chat-Matrix-brightgreen.svg
 [matrix-link]: https://matrix.to/#/#riot-os:matrix.org
 [merge-chance-link]: https://merge-chance.info/target?repo=RIOT-OS/RIOT
@@ -158,5 +164,3 @@ https://www.riot-os.org
 [twitter-link]: https://twitter.com/RIOT_OS
 [wiki-badge]: https://img.shields.io/badge/docs-Wiki-informational.svg
 [wiki-link]: https://github.com/RIOT-OS/RIOT/wiki
-[hil-ci-link]: https://hil.riot-os.org/results/nightly/latest/overview
-[hil-ci-badge]: https://img.shields.io/badge/CI-HiL-blue

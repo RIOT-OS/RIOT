@@ -15,24 +15,20 @@
  *
  * @note    Experimental and likely to replaced with unified timer API
  *
- * RIOT's main timer subsystem is @ref sys_xtimer "xtimer", but for many
- * applications @ref sys_xtimer "xtimer's" 64-bit absolute time values are
- * wasteful or clumsy to use.
- *
- * Compared to @ref sys_xtimer "xtimer", evtimer offers:
+ * RIOT's main timer subsystem is @ref sys_ztimer "ztimer" but compared to
+ * @ref sys_ztimer "ztimer", evtimer offers:
  *
  * - only relative 32-bit millisecond timer values
  *   Events can be scheduled with a relative offset of up to ~49.7 days in the
  *   future.
- *   **For time-critical stuff, use @ref sys_xtimer "xtimer"!**
+ *   **For time-critical stuff, use @ref sys_ztimer "ztimer"!**
  * - more flexible, "intrusive" timer type @ref evtimer_event_t only contains
  *   the necessary fields, which can be extended as needed, and handlers define
  *   actions taken on timer triggers. Check out @ref evtimer_msg_event_t as
  *   example.
- * - uses @ref sys_xtimer "xtimer" as backend by default. Alternatively, with
- *   the pseudomodule "evtimer_on_ztimer" compiled in, evtimer is backend by
- *   @ref sys_ztimer "ZTIMER_MSEC".
- *
+ * - when a number of timeouts with the same callback function need to be
+ *   scheduled, evtimer is using less RAM (due to storing the callback function
+ *   only once), while each ztimer has a function pointer for the callback.
  * @{
  *
  * @file
@@ -46,15 +42,9 @@
 #define EVTIMER_H
 
 #include <stdint.h>
-#include "kernel_defines.h"
+#include "modules.h"
 
-#if IS_USED(MODULE_EVTIMER_ON_ZTIMER)
 #include "ztimer.h"
-#else
-#include "xtimer.h"
-#endif
-
-#include "timex.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -77,12 +67,8 @@ typedef void(*evtimer_callback_t)(evtimer_event_t* event);
  * @brief   Event timer
  */
 typedef struct {
-#if IS_USED(MODULE_EVTIMER_ON_ZTIMER)
     ztimer_t timer;                 /**< Timer */
     uint32_t base;                  /**< Absolute time the first event is built on */
-#else
-    xtimer_t timer;                 /**< Timer */
-#endif
     evtimer_callback_t callback;    /**< Handler function for this evtimer's
                                          event type */
     evtimer_event_t *events;        /**< Event queue */
@@ -128,11 +114,7 @@ void evtimer_print(const evtimer_t *evtimer);
  */
 static inline uint32_t evtimer_now_msec(void)
 {
-#if IS_USED(MODULE_EVTIMER_ON_ZTIMER)
     return ztimer_now(ZTIMER_MSEC);
-#else
-    return xtimer_now_usec64() / US_PER_MS;
-#endif
 }
 
 #ifdef __cplusplus

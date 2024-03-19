@@ -1,0 +1,17 @@
+# include this module into the build
+INCLUDES += -I$(RIOTBOARD)/common/gd32v/include
+
+# configure the serial interface
+PORT_LINUX ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
+
+# configure the flasher
+PROGRAMMER ?= openocd
+OPENOCD_DEBUG_ADAPTER ?= ftdi
+OPENOCD_FTDI_ADAPTER ?= openocd-usb
+OPENOCD_TRANSPORT ?= jtag
+OPENOCD_RESET_USE_CONNECT_ASSERT_SRST = 1
+
+# DFU programmer specific variables
+DFU_USB_ID ?= 28e9:0189
+DFU_USE_DFUSE ?= 1

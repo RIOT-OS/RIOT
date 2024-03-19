@@ -136,7 +136,7 @@ typedef union { // __I to avoid read-modify-write on write-to-clear register
   struct {
     __I uint8_t ERR:1;                     /**< bit:      0  TrustRAM Readout Error                   */
     __I uint8_t DRP:1;                     /**< bit:      1  Data Remanence Prevention Ended          */
-    __I uint8_t :6;                        /**< bit:   2..7  Reserved */
+    uint8_t :6;                            /**< bit:   2..7  Reserved */
   } bit;                                /**< Structure used for bit  access */
   uint8_t  reg;                         /**< Type used for register access */
 } TRAM_INTFLAG_Type;

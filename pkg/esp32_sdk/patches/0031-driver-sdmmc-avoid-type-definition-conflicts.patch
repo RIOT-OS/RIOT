@@ -1,0 +1,48 @@
+From b00693f50e7f4b8239384c7b06ef1dd5a85f2ca9 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Tue, 27 Jun 2023 16:24:27 +0200
+Subject: [PATCH 31/31] driver/sdmmc: avoid type definition conflicts
+
+---
+ components/driver/include/driver/sdmmc_types.h | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/components/driver/include/driver/sdmmc_types.h b/components/driver/include/driver/sdmmc_types.h
+index cbb796fdbb3..c3d27bec18d 100644
+--- a/components/driver/include/driver/sdmmc_types.h
++++ b/components/driver/include/driver/sdmmc_types.h
+@@ -29,6 +29,7 @@
+ #include "esp_err.h"
+ #include "freertos/FreeRTOS.h"
+ 
++#if !defined(RIOT_VERSION)
+ /**
+  * Decoded values from SD card Card Specific Data register
+  */
+@@ -69,6 +70,8 @@ typedef struct {
+     uint8_t power_class;    /*!< Power class used by the card */
+ } sdmmc_ext_csd_t;
+ 
++#endif /* !defined(RIOT_VERSION) */
++
+ /**
+  * SD/MMC command response buffer
+  */
+@@ -160,6 +163,7 @@ typedef struct {
+     int command_timeout_ms;     /*!< timeout, in milliseconds, of a single command. Set to 0 to use the default value. */
+ } sdmmc_host_t;
+ 
++#if !defined(RIOT_VERSION)
+ /**
+  * SD/MMC card information structure
+  */
+@@ -185,5 +189,6 @@ typedef struct {
+     uint32_t reserved : 23;     /*!< Reserved for future expansion */
+ } sdmmc_card_t;
+ 
++#endif /* !defined(RIOT_VERSION) */
+ 
+ #endif // _SDMMC_TYPES_H_
+-- 
+2.34.1
+

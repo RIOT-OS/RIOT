@@ -1,6 +1,7 @@
 PKG_NAME=openthread
 PKG_URL=https://github.com/openthread/openthread.git
-PKG_VERSION=54b31928cf65803a9cd83c9f97061b64e465aaf7  # thread-reference-20200818
+# thread-reference-20200818
+PKG_VERSION=54b31928cf65803a9cd83c9f97061b64e465aaf7
 PKG_LICENSE=BSD-3-Clause
 
 include $(RIOTBASE)/pkg/pkg.mk
@@ -25,14 +26,25 @@ endif
 OT_COAP ?= ON
 
 OT_C_FLAGS = $(CFLAGS_CPU)
-OT_C_FLAGS += -fdata-sections -ffunction-sections -Os
-OT_C_FLAGS += -Wno-implicit-fallthrough -Wno-unused-parameter
-OT_CXXFLAGS += -Wno-class-memaccess -DOPENTHREAD_TARGET_RIOT
+OT_C_FLAGS += -fdata-sections
+OT_C_FLAGS += -ffunction-sections -Os
+OT_C_FLAGS += -ffunction-sections
+OT_C_FLAGS += -fshort-enums
+OT_C_FLAGS += -Wno-implicit-fallthrough
+OT_C_FLAGS += -Wno-unused-parameter
+OT_CXXFLAGS += -Wno-class-memaccess
+OT_CXXFLAGS += -DOPENTHREAD_TARGET_RIOT
 
 OT_MODULES_ARCHIVES = $(addsuffix .a,$(addprefix $(BINDIR)/,$(OT_MODULES)))
 OT_CORE_LIB_DIR = $(PKG_BUILD_DIR)/src/core
 OT_CLI_LIB_DIR = $(PKG_BUILD_DIR)/src/cli
 OT_MBEDCRYPTO_LIB_DIR = $(PKG_BUILD_DIR)/third_party/mbedtls/repo/library
+
+ifeq (llvm,$(TOOLCHAIN))
+  OT_C_FLAGS += -target $(TARGET_ARCH_LLVM)
+  OT_C_FLAGS += $(GCC_C_INCLUDES)
+  OT_CXXFLAGS += $(GCC_CXX_INCLUDES)
+endif
 
 all: $(OT_MODULES_ARCHIVES)
 	@:

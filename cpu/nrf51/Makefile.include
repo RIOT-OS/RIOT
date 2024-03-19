@@ -1,2 +1,18 @@
+ROM_START_ADDR ?= 0
+
+# Set ROM and RAM lengths according to CPU model
+ifneq (,$(filter nrf51x22xxaa nrf51x22xxab,$(CPU_MODEL)))
+  ROM_LEN ?= 0x40000
+  RAM_LEN ?= 0x4000
+endif
+ifneq (,$(filter nrf51x22xxaa,$(CPU_MODEL)))
+  ROM_LEN ?= 0x20000
+  RAM_LEN ?= 0x4000
+endif
+ifneq (,$(filter nrf51x22xxac,$(CPU_MODEL)))
+  ROM_LEN ?= 0x40000
+  RAM_LEN ?= 0x8000
+endif
+
 include $(RIOTCPU)/nrf5x_common/Makefile.include
 include $(RIOTMAKE)/arch/cortexm.inc.mk

@@ -86,7 +86,7 @@ int pthread_barrier_init(pthread_barrier_t *barrier,
  * @brief     Destroys a pthread_barrier_t
  * @details   To use the barrier again you will need to call pthread_barrier_init() again.
  *            Destroying a barrier while threads are currently waiting for it causes indefined behavior.
- * @param     barrier   Barrier to destoy
+ * @param     barrier   Barrier to destroy
  * @returns   0, the invocation cannot fail
  */
 int pthread_barrier_destroy(pthread_barrier_t *barrier);

@@ -14,6 +14,9 @@ USEMODULE += stdin
 ifeq (nrf52dk,$(BOARD))
   RESET_PIN ?= 21
 endif
+ifeq (dwm1001,$(BOARD))
+  RESET_PIN ?= 21
+endif
 ifeq (nrf52840dk,$(BOARD))
   RESET_PIN ?= 18
 endif

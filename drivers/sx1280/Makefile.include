@@ -1,0 +1,7 @@
+USEMODULE_INCLUDES_sx1280 := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_sx1280)
+
+# Overide defaults see See https://lora-developers.semtech.com/documentation/tech-papers-and-guides/physical-layer-proposal-2.4ghz/
+CFLAGS += -DCONFIG_LORA_BW_DEFAULT_800=1
+CFLAGS += -DCONFIG_LORA_SF_DEFAULT_SF12=1
+CFLAGS += -DCONFIG_LORA_CR_DEFAULT_CR_LI_4_8=1

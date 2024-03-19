@@ -1,0 +1,10 @@
+CPU = efm32
+CPU_FAM = efr32zg23
+CPU_MODEL = efr32zg23a020f512gm48
+
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_adc
+FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_spi
+FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_uart

@@ -29,7 +29,7 @@ static inline int __attribute__((always_inline)) _thread_flags_wake(
     thread_t *thread)
 {
     unsigned wakeup;
-    thread_flags_t mask = (uint16_t)(unsigned)thread->wait_data;
+    thread_flags_t mask = (uint16_t)(uintptr_t)thread->wait_data;
 
     switch (thread->status) {
     case STATUS_FLAG_BLOCKED_ANY:
@@ -76,7 +76,7 @@ static void _thread_flags_wait(thread_flags_t mask, thread_t *thread,
         "_thread_flags_wait: me->flags=0x%08x me->mask=0x%08x. going blocked.\n",
         (unsigned)thread->flags, (unsigned)mask);
 
-    thread->wait_data = (void *)(unsigned)mask;
+    thread->wait_data = (void *)(uintptr_t)mask;
     sched_set_status(thread, threadstate);
     irq_restore(irqstate);
     thread_yield_higher();

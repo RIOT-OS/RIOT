@@ -18,15 +18,15 @@ rsource "kconfigs/Kconfig.errors"
 # For now, get used modules as macros from this file (see kconfig.mk)
 osource "$(KCONFIG_GENERATED_DEPENDENCIES)"
 
-# Load first board configurations, which might override CPU's
+# Load first the application configuration, as it may declare symbols in priority
+osource "$(APPDIR)/Kconfig"
+
+# Load board configurations, which might override CPU's
 orsource "$(BOARDDIR)/Kconfig"
 orsource "$(RIOTCPU)/$(CPU)/Kconfig"
 
 rsource "$(RIOTBOARD)/Kconfig"
 rsource "$(RIOTCPU)/Kconfig"
-
-# The application may declare new symbols as well
-osource "$(APPDIR)/Kconfig"
 
 rsource "core/Kconfig"
 rsource "drivers/Kconfig"

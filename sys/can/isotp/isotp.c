@@ -20,17 +20,17 @@
 #include <errno.h>
 #include <string.h>
 
-#include "net/gnrc/pktbuf.h"
-
-#include "can/isotp.h"
 #include "can/common.h"
+#include "can/isotp.h"
 #include "can/raw.h"
 #include "can/router.h"
-#include "thread.h"
+#include "macros/utils.h"
 #include "mutex.h"
+#include "net/gnrc/pktbuf.h"
+#include "thread.h"
 #include "timex.h"
-#include "ztimer.h"
 #include "utlist.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -87,8 +87,6 @@ enum {
 static kernel_pid_t isotp_pid = KERNEL_PID_UNDEF;
 static struct isotp *isotp_list = NULL;
 static mutex_t lock = MUTEX_INIT;
-
-#define MIN(a, b)   (((a) < (b)) ? (a) : (b))
 
 static void _rx_timeout(void *arg);
 static int _isotp_send_fc(struct isotp *isotp, int ae, uint8_t status);
@@ -499,7 +497,8 @@ static void _isotp_fill_dataframe(struct isotp *isotp, struct can_frame *frame, 
     frame->can_id = isotp->opt.tx_id;
     frame->can_dlc = num_bytes + pci_len;
 
-    DEBUG("_isotp_fill_dataframe: num_bytes=%d, pci_len=%d\n", (unsigned)num_bytes, (unsigned)pci_len);
+    DEBUG("_isotp_fill_dataframe: num_bytes=%" PRIuSIZE ", pci_len=%" PRIuSIZE "\n",
+          num_bytes, pci_len);
 
     if (num_bytes < space) {
         if (isotp->opt.flags & CAN_ISOTP_TX_PADDING) {

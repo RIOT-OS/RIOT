@@ -23,6 +23,7 @@
 #include "cpu.h"
 #include "periph_cpu.h"
 #include "em_cmu.h"
+#include "usbdev_cfg_otg_fs.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -83,6 +84,7 @@ static const adc_chan_conf_t adc_channel_config[] = {
 static const dac_conf_t dac_config[] = {
     {
         .dev = DAC0,
+        .ref = dacRefVDD,
         .cmu = cmuClock_DAC0,
     }
 };
@@ -91,7 +93,6 @@ static const dac_chan_conf_t dac_channel_config[] = {
     {
         .dev = 0,
         .index = 1,
-        .ref = dacRefVDD,
     }
 };
 

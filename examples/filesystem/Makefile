@@ -21,23 +21,15 @@ QUIET ?= 1
 
 # Modules to include:
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 
-# Use MTD (flash layer)
-USEMODULE += mtd
-# USEMODULE += mtd_sdcard
-
-# Use VFS
-USEMODULE += vfs
-
-# Use a file system
-# USEMODULE += littlefs
-USEMODULE += littlefs2
-# USEMODULE += spiffs
-# USEMODULE += fatfs_vfs
-# USEMODULE += fatfs_vfs_format
+# Use the default file system
+USEMODULE += vfs_default
 USEMODULE += constfs
 # USEMODULE += devfs
+
+# Enable to automatically format if mount fails
+#USEMODULE += vfs_auto_format
 
 include $(RIOTBASE)/Makefile.include

@@ -30,56 +30,29 @@ extern "C" {
  * @name Macros for controlling the on-board LEDs.
  * @{
  */
-#define LED0_PIN            GPIO_PIN(PORT_E, 9)
-#define LED1_PIN            GPIO_PIN(PORT_E, 8)
-#define LED2_PIN            GPIO_PIN(PORT_E, 10)
-#define LED3_PIN            GPIO_PIN(PORT_E, 15)
-#define LED4_PIN            GPIO_PIN(PORT_E, 11)
-#define LED5_PIN            GPIO_PIN(PORT_E, 14)
-#define LED6_PIN            GPIO_PIN(PORT_E, 12)
-#define LED7_PIN            GPIO_PIN(PORT_E, 13)
+#define LED0_PIN_NUM        9
+#define LED0_PORT_NUM       PORT_E
 
-#define LED_PORT            GPIOE
-#define LED0_MASK           (1 << 9)
-#define LED1_MASK           (1 << 8)
-#define LED2_MASK           (1 << 10)
-#define LED3_MASK           (1 << 15)
-#define LED4_MASK           (1 << 11)
-#define LED5_MASK           (1 << 14)
-#define LED6_MASK           (1 << 12)
-#define LED7_MASK           (1 << 13)
+#define LED1_PIN_NUM        8
+#define LED1_PORT_NUM       PORT_E
 
-#define LED0_ON             (LED_PORT->BSRR = LED0_MASK)
-#define LED0_OFF            (LED_PORT->BSRR = (LED0_MASK << 16))
-#define LED0_TOGGLE         (LED_PORT->ODR  ^= LED0_MASK)
+#define LED2_PIN_NUM        10
+#define LED2_PORT_NUM       PORT_E
 
-#define LED1_ON             (LED_PORT->BSRR = LED1_MASK)
-#define LED1_OFF            (LED_PORT->BSRR = (LED1_MASK << 16))
-#define LED1_TOGGLE         (LED_PORT->ODR  ^= LED1_MASK)
+#define LED3_PIN_NUM        15
+#define LED3_PORT_NUM       PORT_E
 
-#define LED2_ON             (LED_PORT->BSRR = LED2_MASK)
-#define LED2_OFF            (LED_PORT->BSRR = (LED2_MASK << 16))
-#define LED2_TOGGLE         (LED_PORT->ODR  ^= LED2_MASK)
+#define LED4_PIN_NUM        11
+#define LED4_PORT_NUM       PORT_E
 
-#define LED3_ON             (LED_PORT->BSRR = LED3_MASK)
-#define LED3_OFF            (LED_PORT->BSRR = (LED3_MASK << 16))
-#define LED3_TOGGLE         (LED_PORT->ODR  ^= LED3_MASK)
+#define LED5_PIN_NUM        14
+#define LED5_PORT_NUM       PORT_E
 
-#define LED4_ON             (LED_PORT->BSRR = LED4_MASK)
-#define LED4_OFF            (LED_PORT->BSRR = (LED4_MASK << 16))
-#define LED4_TOGGLE         (LED_PORT->ODR  ^= LED4_MASK)
+#define LED6_PIN_NUM        12
+#define LED6_PORT_NUM       PORT_E
 
-#define LED5_ON             (LED_PORT->BSRR = LED5_MASK)
-#define LED5_OFF            (LED_PORT->BSRR = (LED5_MASK << 16))
-#define LED5_TOGGLE         (LED_PORT->ODR  ^= LED5_MASK)
-
-#define LED6_ON             (LED_PORT->BSRR = LED6_MASK)
-#define LED6_OFF            (LED_PORT->BSRR = (LED6_MASK << 16))
-#define LED6_TOGGLE         (LED_PORT->ODR  ^= LED6_MASK)
-
-#define LED7_ON             (LED_PORT->BSRR = LED7_MASK)
-#define LED7_OFF            (LED_PORT->BSRR = (LED7_MASK << 16))
-#define LED7_TOGGLE         (LED_PORT->ODR  ^= LED7_MASK)
+#define LED7_PIN_NUM        13
+#define LED7_PORT_NUM       PORT_E
 /** @} */
 
 /**
@@ -98,13 +71,20 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
+ * @name L3GD20 (Rev. C01, D01), I3G4250D (Rev. E02)
+ * @{
  */
-void board_init(void);
+#define L3GXXXX_SPI_DEV     SPI_DEV(0)          /**< SPI bus used for L3Gxxxx */
+#define L3GXXXX_SPI_CS      GPIO_PIN(PORT_E, 3) /**< SPI CS pin used for L3Gxxxx */
+#define L3GXXXX_INT1_PIN    GPIO_PIN(PORT_E, 0) /**< INT1 pin used for L3Gxxxx */
+#define L3GXXXX_INT2_PIN    GPIO_PIN(PORT_E, 1) /**< INT2/DRDY pin used for L3Gxxxx */
+/** @} */
 
 #ifdef __cplusplus
 }
 #endif
+
+#include "stm32_leds.h"
 
 #endif /* BOARD_H */
 /** @} */

@@ -118,7 +118,8 @@ _exit(int n)
 {
     LOG_INFO("#! exit %i: powering off\n", n);
     pm_off();
-    while(1);
+    for (;;) {
+    }
 }
 
 /**
@@ -304,6 +305,13 @@ int open(const char *name, int flags, int mode)
 #endif
 }
 
+/*
+ * Picolibc newer than 1.8 uses standard posix types for read/write
+ * return values
+ */
+#if __PICOLIBC_MAJOR__ > 1 || __PICOLIBC_MINOR__ >= 8
+#define _READ_WRITE_RETURN_TYPE ssize_t
+#endif
 /**
  * @brief Read bytes from an open file
  *

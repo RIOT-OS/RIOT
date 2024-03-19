@@ -34,7 +34,6 @@ setup_interface() {
     ip link set "${INTERFACE}" up
     ip a a fe80::1/64 dev "${INTERFACE}"
     ip a a fd00:dead:beef::1/128 dev lo
-    ip route add "${PREFIX}" via fe80::2 dev "${INTERFACE}"
 }
 
 cleanup_interface() {
@@ -57,13 +56,23 @@ cleanup() {
 }
 
 start_uhcpd() {
+    ip route add "${PREFIX}" via fe80::2 dev "${INTERFACE}"
     ${UHCPD} "${INTERFACE}" "${PREFIX}" > /dev/null &
     UHCPD_PID=$!
 }
 
 start_dhcpd() {
+    ip route add "${PREFIX}" via fe80::2 dev "${INTERFACE}"
     DHCPD_PIDFILE=$(mktemp)
     ${DHCPD} -d -p "${DHCPD_PIDFILE}" "${INTERFACE}" "${PREFIX}" 2> /dev/null
+}
+
+start_radvd() {
+    ADDR=$(echo "${PREFIX}" | sed -e 's/::\//::1\//')
+    ip a a "${ADDR}" dev "${INTERFACE}"
+    sysctl net.ipv6.conf."${INTERFACE}".accept_ra=2
+    sysctl net.ipv6.conf."${INTERFACE}".accept_ra_rt_info_max_plen=64
+    ${RADVD} -c "${INTERFACE}" "${PREFIX}"
 }
 
 if [ "$1" = "-d" ] || [ "$1" = "--use-dhcpv6" ]; then
@@ -73,9 +82,16 @@ else
     USE_DHCPV6=0
 fi
 
+if [ "$1" = "-r" ] || [ "$1" = "--use-radvd" ]; then
+    USE_RADVD=1
+    shift 1
+else
+    USE_RADVD=0
+fi
+
 PREFIX=$1
 [ -z "${PREFIX}" ] && {
-    echo "usage: $0 [-d|--use-dhcpv6] <prefix> [<serial-port>]"
+    echo "usage: $0 [-d|--use-dhcpv6] [-r|--use-radvd ] <prefix> [<serial-port>]"
     exit 1
 }
 
@@ -90,6 +106,9 @@ setup_interface
 if [ ${USE_DHCPV6} -eq 1 ]; then
     DHCPD="$(readlink -f "${USB_CDC_ECM_DIR}/../dhcpv6-pd_ia/")/dhcpv6-pd_ia.py"
     start_dhcpd
+elif [ ${USE_RADVD} -eq 1 ]; then
+    RADVD="$(readlink -f "${USB_CDC_ECM_DIR}/../radvd/")/radvd.sh"
+    start_radvd
 else
     UHCPD="$(readlink -f "${USB_CDC_ECM_DIR}/../uhcpd/bin")/uhcpd"
     start_uhcpd

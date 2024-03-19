@@ -26,7 +26,8 @@ XFA_INIT_CONST(xfatest_t, xfatest_use_const);
 
 XFA(xfatest_use, 0) xfatest_t _xfatest_use1 = { .val = 3333, .text = "xfatest_use1" };
 XFA(xfatest_use, 0) xfatest_t _xfatest_use_again = { .val = 555, .text = "xfatest use again" };
-XFA_CONST(xfatest_use_const, 0) xfatest_t _xfatest_use_const1 = { .val = 4444, .text = "xfatest_use_const1" };
+XFA_CONST(xfatest_use_const, 0) xfatest_t _xfatest_use_const1 =
+    { .val = 4444, .text = "xfatest_use_const1" };
 
 int hack1;
 /** @} */

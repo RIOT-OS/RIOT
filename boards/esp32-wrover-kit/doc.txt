@@ -83,7 +83,7 @@ configuration can be overridden by
 
 These abbreviations are used in subsequent tables:
 
-*SDC* = SD-Card interface is used (module **sdcard_spi** is enabled)\n
+*SDC* = SD-Card interface is used (module **periph_sdmmc** is enabled)\n
 *CAM* = Camera is plugged in/used
 
 <center>
@@ -95,12 +95,18 @@ These abbreviations are used in subsequent tables:
 | `ADC_LINE(2)`         | `GPIO36`  | `GPIO36`  | -         | -         | `CAMERA_D4`                   | \ref esp32_adc_channels       |
 | `ADC_LINE(3)`         | `GPIO39`  | `GPIO39`  | -         | -         | `CAMERA_D5`                   | \ref esp32_adc_channels       |
 | `PWM_DEV(0):0 / LED0` | `GPIO0`   | `GPIO0`   | -         | -         | `LED_RED` / `CAMERA_RESET`    | \ref esp32_pwm_channels       |
-| `PWM_DEV(0):2 / LED2` | `GPIO4`   | `GPIO4`   | -         | -         | `LED_BLUE` / `CAMERA_D0`      | \ref esp32_pwm_channels       |
+| `PWM_DEV(0):1 / LED2` | `GPIO4`   | `GPIO4`   | -         | -         | `LED_BLUE` / `CAMERA_D0`      | \ref esp32_pwm_channels       |
 | `LED1`                | `GPIO2`   | `GPIO2`   | `GPIO2`   | `GPIO2`   | `LED_GREEN`                   |                               |
 | `I2C_DEV(0):SCL`      | `GPIO27`  | `GPIO27`  | `GPIO27`  | `GPIO27`  | `CAMERA_SIO_C`                | \ref esp32_i2c_interfaces     |
-| `I2C_DEV(0):SDA`      | `GPIO26`  | `GPIO26`  | `GPIO26`  | `GPIO27`  | `CAMERA_SIO_D`                | \ref esp32_i2c_interfaces     |
+| `I2C_DEV(0):SDA`      | `GPIO26`  | `GPIO26`  | `GPIO26`  | `GPIO26`  | `CAMERA_SIO_D`                | \ref esp32_i2c_interfaces     |
 | `UART_DEV(0):TX`      | `GPIO1`   | `GPIO1`   | `GPIO1`   | `GPIO1`   |                               | \ref esp32_uart_interfaces    |
 | `UART_DEV(0):RX`      | `GPIO3`   | `GPIO3`   | `GPIO3`   | `GPIO3`   |                               | \ref esp32_uart_interfaces    |
+| `SDMMC_DEV(0):CLK`    | `GPIO14`  | `GPIO14`  | -         | -         | SD-Card                       | \ref esp32_sdmmc_interfaces   |
+| `SDMMC_DEV(0):CMD`    | `GPIO15`  | `GPIO`    | -         | -         | SD-Card                       | \ref esp32_sdmmc_interfaces   |
+| `SDMMC_DEV(0):DAT0`   | `GPIO2`   | `GPIO2`   | -         | -         | SD-Card                       | \ref esp32_sdmmc_interfaces   |
+| `SDMMC_DEV(0):DAT1`   | `GPIO4`   | `GPIO4`   | -         | -         | SD-Card                       | \ref esp32_sdmmc_interfaces   |
+| `SDMMC_DEV(0):DAT2`   | `GPIO12`  | `GPIO`    | -         | -         | SD-Card                       | \ref esp32_sdmmc_interfaces   |
+| `SDMMC_DEV(0):DAT3`   | `GPIO13`  | `GPIO`    | -         | -         | SD-Card                       | \ref esp32_sdmmc_interfaces   |
 | `SPI_DEV(0):SCK`      | `GPIO14`  | `GPIO14`  | `GPIO14`  | `GPIO14`  | HSPI: SD-Card / Peripherals   | \ref esp32_spi_interfaces     |
 | `SPI_DEV(0):MOSI`     | `GPIO15`  | `GPIO15`  | `GPIO15`  | `GPIO15`  | HSPI: SD-Card / Peripherals   | \ref esp32_spi_interfaces     |
 | `SPI_DEV(0):CS0`      | `GPIO13`  | `GPIO13`  | `GPIO13`  | `GPIO13`  | HSPI: SD-Card CS              | \ref esp32_spi_interfaces     |
@@ -133,17 +139,18 @@ These abbreviations are used in subsequent tables:
 
 </center>
 
-Following table shows the default board configuration sorted by GPIOs.
+Following table shows the default board configuration sorted by GPIOs depending
+on used hardware.
 
 <center>
 
-| Pin    | None                   | SDC                 | CAM                 | SDC+CAM                    | Remarks |
+| Pin    | None                   | SDC 4-bit           | CAM                 | SDC 1-bit + CAM            | Remarks |
 |:-------|:-----------------------|:--------------------|:--------------------|:---------------------------|:-----|
 | GPIO0  | PWM_DEV(0):0 / LED0    | PWM_DEV(0):0 / LED0 | CAMERA_RESET        | CAMERA_RESET               | |
 | GPIO1  | UART_DEV(0):TX         | UART_DEV(0):TX      | UART_DEV(0):TX      | UART_DEV(0):TX             | |
-| GPIO2  | SPI_DEV(0):MISO / LED1 | SPI_DEV(0):MISO     | SPI_DEV(0):MISO     | SPI_DEV(0):MISO            | HSPI |
+| GPIO2  | SPI_DEV(0):MISO / LED1 | SDMMC_DEV(0):DAT0   | SPI_DEV(0):MISO     | SDMMC_DEV(0):DAT0          | HSPI |
 | GPIO3  | UART_DEV(0):RX         | UART_DEV(0):RX      | UART_DEV(0):RX      | UART_DEV(0):RX             | |
-| GPIO4  | PWM_DEV(0):1 / LED2    | PWM_DEV(0):1 / LED2 | CAMERA_D0           | CAMERA_D0                  | |
+| GPIO4  | PWM_DEV(0):1 / LED2    | SDMMC_DEV(0):DAT1   | CAMERA_D0           | CAMERA_D0                  | |
 | GPIO5  | LCD LED                | LCD_LED             | CAMERA_D1           | CAMERA_D1                  | |
 | GPIO6  | Flash CLK              | Flash CLK           | Flash CLK           | Flash CLK                  | |
 | GPIO7  | Flash SD0              | Flash SD0           | Flash SD0           | Flash SD0                  | |
@@ -151,10 +158,10 @@ Following table shows the default board configuration sorted by GPIOs.
 | GPIO9  |                        |                     |                     |                            | |
 | GPIO10 |                        |                     |                     |                            | |
 | GPIO11 | Flash CMD              | Flash CMD           | Flash CMD           | Flash CMD                  | |
-| GPIO12 |                        |                     |                     |                            | |
-| GPIO13 | SPI_DEV(0):CS0         | SPI_DEV(0):CS0      | SPI_DEV(0):CS0      | SPI_DEV(0):CS0             | HSPI / SD-Card CS |
-| GPIO14 | SPI_DEV(0):SCK         | SPI_DEV(0):SCK      | SPI_DEV(0):SCK      | SPI_DEV(0):SCK             | HSPI |
-| GPIO15 | SPI_DEV(0):MOSI        | SPI_DEV(0):MOSI     | SPI_DEV(0):MOSI     | SPI_DEV(0):MOSI            | HSPI |
+| GPIO12 |                        | SDMMC_DEV(0):DAT2   |                     |                            | |
+| GPIO13 | SPI_DEV(0):CS0         | SDMMC_DEV(0):DAT3   | SPI_DEV(0):CS0      |                            | HSPI / SPI SD-Card CS |
+| GPIO14 | SPI_DEV(0):SCK         | SDMMC_DEV(0):CLK    | SPI_DEV(0):SCK      |                            | HSPI |
+| GPIO15 | SPI_DEV(0):MOSI        | SDMMC_DEV(0):CMD    | SPI_DEV(0):MOSI     |                            | HSPI |
 | GPIO16 | N/A                    | N/A                 | N/A                 | N/A                        | see below |
 | GPIO17 | N/A                    | N/A                 | N/A                 | N/A                        | see below |
 | GPIO18 | LCD_RESET              | LCD_RESET           | LCD_RESET           | CAMERA_D2                  | |
@@ -284,36 +291,54 @@ for ESP32 boards, see \ref esp32_riot.
 ## On-Chip Debugging with the Device {#esp32_wrover_kit_debugging}
 
 Since the USB bridge based on FDI FT2232HL provides a JTAG interface for
-debugging through an USB interface, using ESP-ROVER-KIT is the easiest and most
-convenient way for On-Chip debugging. Please refer the
-[ESP-IDF Programming Guide](https://docs.espressif.com/projects/esp-idf/en/latest/api-guides/jtag-debugging/index.html)
-for details on how to setup and how to use ESP-WROVER-KIT and OpenOCD.
+debugging through an USB interface, using ESP-WROVER-Kit V3 is the easiest
+and most convenient way for On-Chip debugging. Please refer the
+[ESP-IDF Programming Guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/jtag-debugging/index.html)
+for details on how to setup and how to use ESP-WROVER-Kit V3 and OpenOCD.
 
-To use the JTAG interface, the `esp_jtag` module must be enabled.
+To use the JTAG interface, the `esp_jtag` module has to be enabled for
+compilation.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-USEMODULE+=esp_jtag make flash BOARD=esp32-wrover-kit ...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To flash using OpenOCD, install the [openocd-esp32](https://github.com/espressif/openocd-esp32) fork.
-The OpenOCD configuration selected by default is for using JTAG via the FTDI chip.
-Export where openocd is located and then flash with PROGRAMMER set:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-export OPENOCD="~/openocd-esp32/src/openocd -s ~/openocd-esp32/tcl"
-PROGRAMMER=openocd USEMODULE+=esp_jtag make flash BOARD=esp32-wrover-kit
+USEMODULE=esp_jtag make flash BOARD=esp32-wrover-kit ...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To start a debugging session (board will be reset, but not flashed):
+To flash and debug using OpenOCD, the precompiled version of OpenOCD for
+ESP32 has to be installed using the install script while being in RIOT's
+root directory, see also section
+[Using Local Toolchain Installation](#esp32_local_toolchain_installation).
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-export OPENOCD="~/openocd-esp32/src/openocd -s ~/openocd-esp32/tcl"
-PROGRAMMER=openocd USEMODULE+=esp_jtag make debug BOARD=esp32-wrover-kit
+dist/tools/esptool/install.sh openocd
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Before OpenOCD can then be used, the `PATH` variable has to be set correctly
+and the `OPENOCD` variable has to be exported using the following command.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+. dist/tools/esptool/export.sh openocd
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Once the `PATH` variable and the `OPENOCD` variable are set, OpenOCD can be used
+
+- to flash the application using command
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  PROGRAMMER=openocd USEMODULE=esp_jtag make flash BOARD=esp32-wrover-kit ...
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- to start a debugging session (the board will be reset, but not flashed)
+  using command
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  PROGRAMMER=openocd USEMODULE=esp_jtag make debug BOARD=esp32-wrover-kit ...
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+by setting the `PROGRAMMER` variable to `openocd`.
+
+@note Even if the JTAG interface is used for debugging, the ESP32 standard
+method for flashing with `esptool.py` can still be used. In that case, the
+`flash` target is made without setting the `PROGRAMMER` variable.
 
 [Back to table of contents](#esp32_wrover_kit_toc)
 
 ## Other Documentation Resources  {#esp32_wrover_kit_other-resources}
 
 There is a comprehensive
-[Getting Started Guide]
-(https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-wrover-kit-v3.html)
+[Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-wrover-kit-v3.html)
 for the ESP-WROVER-KIT with a lot information about hardware configuration.
  */

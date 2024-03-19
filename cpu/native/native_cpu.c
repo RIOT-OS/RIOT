@@ -39,7 +39,7 @@
 #include <valgrind/valgrind.h>
 #define VALGRIND_DEBUG DEBUG
 #else
-#define VALGRIND_STACK_REGISTER(...)
+#define VALGRIND_STACK_REGISTER(...) (0)
 #define VALGRIND_DEBUG(...)
 #endif
 
@@ -69,10 +69,7 @@ char __end_stack[SIGSTKSZ];
  */
 static void _native_mod_ctx_leave_sigh(ucontext_t *ctx)
 {
-#ifdef __MACH__
-    _native_saved_eip = ((ucontext_t *)ctx)->uc_mcontext->__ss.__eip;
-    ((ucontext_t *)ctx)->uc_mcontext->__ss.__eip = (unsigned int)&_native_sig_leave_handler;
-#elif defined(__FreeBSD__)
+#if defined(__FreeBSD__)
     _native_saved_eip = ((struct sigcontext *)ctx)->sc_eip;
     ((struct sigcontext *)ctx)->sc_eip = (unsigned int)&_native_sig_leave_handler;
 #else /* Linux */
@@ -80,8 +77,13 @@ static void _native_mod_ctx_leave_sigh(ucontext_t *ctx)
     _native_saved_eip = ((ucontext_t *)ctx)->uc_mcontext.arm_pc;
     ((ucontext_t *)ctx)->uc_mcontext.arm_pc = (unsigned int)&_native_sig_leave_handler;
 #else /* Linux/x86 */
+  #ifdef __x86_64__
+    _native_saved_eip = ctx->uc_mcontext.gregs[REG_RIP];
+    ctx->uc_mcontext.gregs[REG_RIP] = (unsigned long)&_native_sig_leave_handler;
+  #else
     _native_saved_eip = ctx->uc_mcontext.gregs[REG_EIP];
     ctx->uc_mcontext.gregs[REG_EIP] = (unsigned int)&_native_sig_leave_handler;
+  #endif
 #endif
 #endif
 }
@@ -102,6 +104,11 @@ int thread_isr_stack_usage(void)
     return -1;
 }
 
+void native_breakpoint(void)
+{
+    raise(SIGTRAP);
+}
+
 static inline void *align_stack(uintptr_t start, int *stacksize)
 {
     const size_t alignment = sizeof(uintptr_t);
@@ -120,9 +127,9 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
 
     stack_start = align_stack((uintptr_t)stack_start, &stacksize);
 
-    VALGRIND_STACK_REGISTER(stack_start, (char *)stack_start + stacksize);
+    (void) VALGRIND_STACK_REGISTER(stack_start, (char *)stack_start + stacksize);
     VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n",
-                   stack_start, (void*)((int)stack_start + stacksize));
+                   stack_start, (void*)((char *)stack_start + stacksize));
 
     DEBUG("thread_stack_init\n");
 
@@ -154,7 +161,8 @@ void isr_cpu_switch_context_exit(void)
     ucontext_t *ctx;
 
     DEBUG("isr_cpu_switch_context_exit\n");
-    if ((sched_context_switch_request == 1) || (thread_get_active() == NULL)) {
+    if (((sched_context_switch_request == 1) || (thread_get_active() == NULL))
+        && IS_USED(MODULE_CORE_THREAD)) {
         sched_run();
     }
 
@@ -208,7 +216,11 @@ void isr_thread_yield(void)
         native_irq_handler();
     }
 
+    if (!IS_USED(MODULE_CORE_THREAD)) {
+        return;
+    }
     sched_run();
+
     /* Use intermediate cast to uintptr_t to silence -Wcast-align.
      * stacks are manually word aligned in thread_static_init() */
     ucontext_t *ctx = (ucontext_t *)(uintptr_t)(thread_get_active()->sp);
@@ -254,9 +266,9 @@ void native_cpu_init(void)
     end_context.uc_stack.ss_size = SIGSTKSZ;
     end_context.uc_stack.ss_flags = 0;
     makecontext(&end_context, sched_task_exit, 0);
-    VALGRIND_STACK_REGISTER(__end_stack, __end_stack + sizeof(__end_stack));
+    (void) VALGRIND_STACK_REGISTER(__end_stack, __end_stack + sizeof(__end_stack));
     VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n",
-                   (void*)__end_stack, (void*)((int)__end_stack + sizeof(__end_stack)));
+                   (void*)__end_stack, (void*)(__end_stack + sizeof(__end_stack)));
 
     DEBUG("RIOT native cpu initialized.\n");
 }

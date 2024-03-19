@@ -1,17 +1,21 @@
 FLASHER ?= $(RIOTTOOLS)/openocd/openocd.sh
 DEBUGGER ?= $(RIOTTOOLS)/openocd/openocd.sh
 DEBUGSERVER ?= $(RIOTTOOLS)/openocd/openocd.sh
+DEBUGCLIENT ?= $(RIOTTOOLS)/openocd/openocd.sh
 RESET ?= $(RIOTTOOLS)/openocd/openocd.sh
 
 FLASHFILE ?= $(ELFFILE)
 FFLAGS ?= flash $(FLASHFILE)
-DEBUGGER_FLAGS ?= debug $(ELFFILE)
+DEBUGGER_FLAGS ?= debug $(DEBUG_ELFFILE)
 DEBUGSERVER_FLAGS ?= debug-server
+DEBUGCLIENT_FLAGS ?= debug-client $(DEBUG_ELFFILE)
 RESET_FLAGS ?= reset
 
 ifneq (,$(OPENOCD_DEBUG_ADAPTER))
   include $(RIOTMAKE)/tools/openocd-adapters/$(OPENOCD_DEBUG_ADAPTER).inc.mk
-  OPENOCD_ADAPTER_INIT += -c 'transport select $(OPENOCD_TRANSPORT)'
+  ifneq (default,$(OPENOCD_TRANSPORT))
+    OPENOCD_ADAPTER_INIT += -c 'transport select $(OPENOCD_TRANSPORT)'
+  endif
 endif
 
 OPENOCD_CONFIG ?= $(BOARDDIR)/dist/openocd.cfg
@@ -33,12 +37,23 @@ $(call target-export-variables,$(OPENOCD_TARGETS),OPENOCD_ADAPTER_INIT)
 # Export OPENOCD_RESET_USE_CONNECT_ASSERT_SRST to required targets
 $(call target-export-variables,$(OPENOCD_TARGETS),OPENOCD_RESET_USE_CONNECT_ASSERT_SRST)
 
+ifneq (,$(OPENOCD_SERVER_ADDRESS))
+# Export OPENOCD_SERVER_ADDRESS to required targets
+  $(call target-export-variables,$(OPENOCD_TARGETS),OPENOCD_SERVER_ADDRESS)
+endif
+
 ifneq (,$(OPENOCD_CMD_RESET_RUN))
   # Export OPENOCD_CMD_RESET_RUN only to the reset target
   $(call target-export-variables,reset,OPENOCD_CMD_RESET_RUN)
 endif
 
-OPENOCD_DEBUG_TARGETS = debug debugr debug-server
+ifneq (,$(OPENOCD_CMD_RESET_HALT))
+  # Export OPENOCD_CMD_RESET_HALT only to the flash targets
+  $(call target-export-variables,flash,OPENOCD_CMD_RESET_HALT)
+  $(call target-export-variables,flash-only,OPENOCD_CMD_RESET_HALT)
+endif
+
+OPENOCD_DEBUG_TARGETS = debug debugr debug-server debug-client
 
 ifneq (,$(OPENOCD_DBG_EXTRA_CMD))
   # Export OPENOCD_DBG_EXTRA_CMD only to the flash/flash-only target

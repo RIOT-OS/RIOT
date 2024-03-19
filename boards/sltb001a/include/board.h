@@ -209,11 +209,6 @@ extern "C" {
 #define SI7210_I2C          I2C_DEV(0)
 /** @} */
 
-/**
- * @brief   Initialize the board (GPIO, sensors, clocks).
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

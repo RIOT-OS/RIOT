@@ -6,18 +6,33 @@ include $(RIOTCPU)/efm32/efm32-info.mk
 # `cpu_$(CPU_FAM)` for something that is MODULE related.
 include $(RIOTCPU)/efm32/families/$(CPU_FAM)/Makefile.include
 
+# Export vars for Gecko SDK librail Makefile
+export EFM32_LIBRAIL_BLOB_NAME
+
+INCLUDES += -I$(RIOTCPU)/efm32/include/vendor
+
 ifeq (,$(EFM32_HEADER))
   $(error Header file for $(CPU_MODEL) is missing)
 endif
 
 # the size of riotboot on the EFM32 exceeds the default value
-RIOTBOOT_LEN ?= 0x2000
+ifneq (,$(filter periph_usbdev,$(USEMODULE)))
+  RIOTBOOT_LEN ?= 0x4000
+else
+  RIOTBOOT_LEN ?= 0x2000
+endif
 
 # the em_device.h header requires a global define with the cpu model
 CFLAGS += -D$(call uppercase_and_underscore,$(CPU_MODEL))
 
+# to be able to use the family as define
+CFLAGS += -DCPU_FAM_$(call uppercase_and_underscore,$(CPU_FAM))
+
 # include EFM32 specific driver headers
 INCLUDES += -I$(RIOTCPU)/efm32/include/drivers
+
+# arm_math.h is required by vendor headers and is located in CMSIS DSP includes
+INCLUDES += -I$(PKGDIRBASE)/cmsis/CMSIS/DSP/Include
 
 # include cortexm_common
 LINKER_SCRIPT = cortexm.ld

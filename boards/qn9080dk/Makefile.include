@@ -4,5 +4,12 @@ CFLAGS += \
   -DCONFIG_BOARD_HAS_XTAL_32M \
   #
 
+QN908X_JLINK ?= $(QN9080DK_JLINK)
+JLINK_DEVICE ?= QN9080A
+
+# The TTY serial also is the ID of the debug adapter, as the TTY is provided by
+# the debug adapter
+DEBUG_ADAPTER_ID_IS_TTY_SERIAL := 1
+
 # Include default QN908x board config
 include $(RIOTBOARD)/common/qn908x/Makefile.include

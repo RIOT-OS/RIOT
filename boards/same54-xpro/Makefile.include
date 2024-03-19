@@ -1,1 +1,13 @@
+# If port selection via ttys.py is enabled by `MOST_RECENT_PORT=1`, filter
+# USB serials to only select the UART bridge of the embedded EDBG CMSIS-DAP
+# debugger.
+TTY_BOARD_FILTER := --model 'EDBG CMSIS-DAP'
+
+# Overwrite GCLK definitions, so that GCLK_IO[2..7] can be connected to GPIOs.
+# This way the frequency of signals, connected to these pins, can be measured
+# with the FREQM peripheral.
+CFLAGS += -DSAM0_GCLK_TIMER=8
+CFLAGS += -DSAM0_GCLK_PERIPH=9
+CFLAGS += -DSAM0_GCLK_100MHZ=10
+
 include $(RIOTMAKE)/boards/sam0.inc.mk

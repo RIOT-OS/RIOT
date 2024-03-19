@@ -48,8 +48,9 @@
 #ifndef SAUL_H
 #define SAUL_H
 
-#include <stdint.h>
 #include <errno.h>
+#include <stdint.h>
+#include <sys/types.h>
 
 #include "phydat.h"
 
@@ -275,7 +276,7 @@ typedef int(*saul_read_t)(const void *dev, phydat_t *res);
  * @return  -ENOTSUP if the device does not support this operation
  * @return  -ECANCELED on other errors
  */
-typedef int(*saul_write_t)(const void *dev, phydat_t *data);
+typedef int(*saul_write_t)(const void *dev, const phydat_t *data);
 
 /**
  * @brief   Definition of the RIOT actuator/sensor interface
@@ -297,19 +298,59 @@ typedef struct {
 void saul_init_devs(void);
 
 /**
- * @brief   Default not supported function
+ * @brief   Fallback function when write is not supported
+ *
+ * @details Returns `-NOTSUP` without evaluating arguments.
  */
-int saul_notsup(const void *dev, phydat_t *dat);
+int saul_write_notsup(const void *dev, const phydat_t *dat);
+
+/**
+ * @brief   Fallback function when read is not supported
+ *
+ * @details Returns `-NOTSUP` without evaluating arguments.
+ */
+int saul_read_notsup(const void *dev, phydat_t *dat);
 
 /**
  * @brief   Helper function converts a class ID to a string
  *
  * @param[in] class_id      device class ID
  *
- * @return      string representation of the device class
- * @return      NULL if class ID is not known
+ * @return          string representation of the device class
+ * @retval  NULL    class ID is not known
+ *
+ * @deprecated  Use @ref saul_class_print or @ref saul_class_write instead
+ *
+ * @warning For classic Harvard architectures a small buffer is used to store
+ *          the string, so that subsequent (or concurrent!) calls will
+ *          overwrite the output.
  */
 const char *saul_class_to_str(const uint8_t class_id);
+
+/**
+ * @brief   Prints the class string of the given class ID
+ *
+ * @param[in] class_id      ID of the device class to print
+ */
+void saul_class_print(uint8_t class_id);
+
+/**
+ * @brief   Write the string representation of the given device class to the
+ *          given buffer
+ *
+ * @param[out]  dest        destination buffer to write to
+ * @param[in]   max_size    size of the buffer at @p dest
+ * @param[in]   class_id    ID of the device class to write
+ *
+ * @return  Number of bytes written
+ * @retval  -EOVERFLOW      buffer at @p dest is too small
+ * @retval  -EINVAL         invalid unit in @p unit
+ *
+ * @warning The function will never write a terminating zero byte
+ * @note    If you pass `NULL` for @p dest, it will return the number of bytes
+ *          it would write (regardless of @p max_size)
+ */
+ssize_t saul_class_write(char *dest, size_t max_size, uint8_t class_id);
 
 #ifdef __cplusplus
 }

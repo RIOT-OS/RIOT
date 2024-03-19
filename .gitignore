@@ -37,7 +37,8 @@ cachegrind.out*
 # Codelite (among others) project files
 *.project
 # Visual Studio Code user settings
-.vscode/
+.vscode/*
+!.vscode/settings.json
 # ctags index files
 tags
 # GDB initialization scripts
@@ -93,3 +94,7 @@ keys/
 
 # custom clang-tidy flags, also used when using clangd language server
 .clang-tidy
+
+# Environments
+.venv
+venv/

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2022 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,20 +18,28 @@
  * @}
  */
 
-#define ENABLE_DEBUG 0
-#include "debug.h"
-
+/* RIOT headers have to be included before ESP-IDF headers! */
 #include "esp_attr.h"
-#include "esp_sleep.h"
 #include "gpio_arch.h"
+#include "irq.h"
+#include "periph/rtc.h"
 #include "rtt_arch.h"
 #include "syscalls.h"
 
 #include "periph/rtc.h"
+#include "periph/uart.h"
+
+/* ESP-IDF headers */
+#include "esp_sleep.h"
 #include "rom/rtc.h"
 #include "rom/uart.h"
 #include "soc/rtc.h"
 #include "soc/rtc_cntl_reg.h"
+
+#include "esp_idf_api/uart.h"
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 extern void rtt_save_counter(void);
 extern void rtt_restore_counter(void);
@@ -60,8 +68,15 @@ static inline void pm_set_lowest_normal(void)
 
 #ifndef MODULE_ESP_QEMU
     /* passive wait for interrupt to leave lowest power mode */
+#if __xtensa__
     __asm__ volatile ("waiti 0");
-
+#else
+    /* This function is entered with interrupts disabled, so we have to enable
+     * interrupts here to wait for an interrupt. */
+    irq_enable();
+    __asm__ volatile ("wfi");
+    irq_disable();
+#endif
     /* reset system watchdog timer */
     system_wdt_feed();
 #endif
@@ -89,9 +104,8 @@ void pm_reboot(void)
         esp_wifi_stop();
     }
 
-    /* suspend and flush UARTs */
-    for (int i = 0; i < 3; ++i) {
-        REG_SET_BIT(UART_FLOW_CONF_REG(i), UART_FORCE_XOFF);
+    /* flush all UARTs of the SoC, there is no problem to do it for uninitialized UARTs */
+    for (int i = 0; i < SOC_UART_NUM; ++i) {
         uart_tx_wait_idle(i);
     }
 
@@ -101,7 +115,7 @@ void pm_reboot(void)
     software_reset();
 }
 
-#ifndef MODULE_PM_LAYERED
+#if !IS_USED(MODULE_PM_LAYERED)
 
 void pm_set_lowest(void)
 {
@@ -117,7 +131,8 @@ void pm_set(unsigned mode)
         return;
     }
 
-    DEBUG ("%s enter to power mode %d @%u\n", __func__, mode, system_get_time());
+    DEBUG ("%s enter to power mode %d @%" PRIu32 "\n",
+           __func__, mode, system_get_time());
 
     /* flush stdout */
     fflush(stdout);
@@ -146,6 +161,16 @@ void pm_set(unsigned mode)
     /* Prepare GPIOs as wakeup source */
     gpio_pm_sleep_enter(mode);
 
+    extern esp_err_t esp_sleep_enable_uart_wakeup(int uart);
+#if (ESP_PM_WUP_UART0 > 2)
+    esp_idf_uart_set_wakeup_threshold(UART_DEV(0), ESP_PM_WUP_UART0);
+    esp_sleep_enable_uart_wakeup(0);
+#endif
+#if (ESP_PM_WUP_UART1 > 2)
+    esp_idf_uart_set_wakeup_threshold(UART_DEV(1), ESP_PM_WUP_UART1);
+    esp_sleep_enable_uart_wakeup(1);
+#endif
+
     if (mode == ESP_PM_DEEP_SLEEP) {
         esp_deep_sleep_start();
         /* waking up from deep-sleep leads to a DEEPSLEEP_RESET */
@@ -163,8 +188,8 @@ void pm_set(unsigned mode)
         gpio_pm_sleep_exit(wakeup_reason);
         rtt_pm_sleep_exit(wakeup_reason);
 
-        DEBUG ("%s exit from power mode %d @%u with reason %d\n", __func__,
-               mode, system_get_time(), wakeup_reason);
+        DEBUG ("%s exit from power mode %d @%" PRIu32 " with reason %d\n",
+               __func__, mode, system_get_time(), wakeup_reason);
 
         /* restart WiFi if necessary */
         if (IS_USED(MODULE_ESP_WIFI_ANY) && (esp_wifi_start() != ESP_OK)) {

@@ -1,0 +1,7 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+endif
+
+ifneq (,$(filter ztimer_msec ztimer_sec,$(USEMODULE)))
+  USEMODULE += ztimer_periph_lptimer
+endif

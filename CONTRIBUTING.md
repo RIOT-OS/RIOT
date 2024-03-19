@@ -195,15 +195,11 @@ into the source repository.
 * Try to answer reviews as quickly as possible to speed up the review process
   and avoid stalled PRs.
 
-You can find more information about RIOT development procedure on this
-[wiki page][development-procedures].
-
 [about-pull-requests]: https://help.github.com/articles/about-pull-requests/
 [development-models]: https://help.github.com/articles/creating-a-pull-request-from-a-fork
 [existing-pull-requests]: https://github.com/RIOT-OS/RIOT/pulls
 [archived-pull-requests]: https://github.com/RIOT-OS/RIOT/pulls?q=is:pr+label:"State:+archived"
 [uncrustify]: http://uncrustify.sourceforge.net
-[development-procedures]: https://github.com/RIOT-OS/RIOT/wiki/Development-procedures
 
 ## Writing Documentation
 [writing-documentation]: #writing-documentation

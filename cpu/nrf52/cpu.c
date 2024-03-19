@@ -23,7 +23,8 @@
 #define DONT_OVERRIDE_NVIC
 
 #include "cpu.h"
-#include "nrfx.h"
+#include "kernel_init.h"
+#include "nrfx_riot.h"
 #include "nrf_clock.h"
 #include "periph_conf.h"
 #include "periph/init.h"
@@ -33,6 +34,15 @@
 static bool ftpan_32(void);
 static bool ftpan_37(void);
 static bool ftpan_36(void);
+
+/**
+ * @brief    LFCLK Clock selection configuration guard
+*/
+#if ((CLOCK_LFCLK != CLOCK_LFCLKSRC_SRC_RC)   && \
+     (CLOCK_LFCLK != CLOCK_LFCLKSRC_SRC_Xtal) && \
+     (CLOCK_LFCLK != CLOCK_LFCLKSRC_SRC_Synth))
+#error "LFCLK init: CLOCK_LFCLK has invalid value"
+#endif
 
 /**
  * @brief   Initialize the CPU, set IRQ priorities
@@ -71,11 +81,8 @@ void cpu_init(void)
     /* call cortexm default initialization */
     cortexm_init();
 
-    /* enable wake up on events for __WFE CPU sleep */
-    SCB->SCR |= SCB_SCR_SEVONPEND_Msk;
-
     /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
-    stdio_init();
+    early_init();
 
     /* trigger static peripheral initialization */
     periph_init();

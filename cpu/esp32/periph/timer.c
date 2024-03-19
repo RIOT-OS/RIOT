@@ -24,148 +24,161 @@
  * WARNING! enable debugging will have timing side effects and can lead
  * to timer underflows, system crashes or system dead locks in worst case.
  */
-#define ENABLE_DEBUG 0
-#include "debug.h"
-
 #include "periph/timer.h"
 
 #include "driver/periph_ctrl.h"
 #include "esp/common_macros.h"
+#include "hal/interrupt_controller_types.h"
+#include "hal/interrupt_controller_ll.h"
+#include "hal/timer_hal.h"
 #include "rom/ets_sys.h"
+#include "soc/periph_defs.h"
 #include "soc/rtc.h"
 #include "soc/timer_group_struct.h"
+
+#if __xtensa__
 #include "xtensa/hal.h"
 #include "xtensa/xtensa_api.h"
+#endif
 
 #include "esp_common.h"
 #include "irq_arch.h"
 #include "syscalls.h"
 
+#define ENABLE_DEBUG 0
+#include "debug.h"
+
 #define RTC_PLL_480M    480 /* PLL with 480 MHz at maximum */
-#define RTC_PLL_320M    320 /* PLL with 480 MHz at maximum */
+#define RTC_PLL_320M    320 /* PLL with 320 MHz at maximum */
 
 #ifndef MODULE_ESP_HW_COUNTER
 
 /* hardware timer modules used */
 
 /**
-  * ESP32 has four 64 bit hardware timers:
-  * two timer groups TMG0 and TMG1 with 2 timers each
-  *
-  * TMG0, timer 0 is used for system time in us and is therefore not
-  * available as low level timer. Timers have only one channel. Timer device
-  * are mapped to hardware timer as following:
-  *
-  *     0 -> TMG0 timer 1
-  *     1 -> TMG1 timer 0
-  *     2 -> TMG1 timer 1
-  *
-  * The reason for this mapping is, that if only one timer is needed,
-  * TMG1 is left disabled. TMG1 is only enabled when more than one
-  * timer device is needed.
-  *
-  * PLEASE NOTE: Don't use ETS timer functions ets_timer_* in and this hardware
-  * timer implementation together!
-  */
+ * ESP32 has four 64 bit hardware timers:
+ * two timer groups TMG0 and TMG1 with 2 timers each
+ *
+ * TMG0, timer 0 is used for system time in us and is therefore not
+ * available as low level timer. Timers have only one channel. Timer devices
+ * are mapped to hardware timer as following:
+ *
+ *     0 -> TMG0 timer 1
+ *     1 -> TMG1 timer 0
+ *     2 -> TMG1 timer 1
+ *
+ * The reason for this mapping is, that if only one timer is needed,
+ * TMG1 is left disabled. TMG1 is only enabled when more than one
+ * timer device is needed.
+ *
+ * ---
+ * ESP32-C3 hast only two 54 bit hardware timers:
+ * two timer groups TMG0 and TMG1 with 1 timer each
+ *
+ * TMG0, timer 0 is used for system time in us and is therefore not
+ * available as low level timer. Timers have only one channel. Timer devices
+ * are mapped to hardware timer as following:
+ *
+ *     0 -> TMG1 timer 0
+ *
+ * PLEASE NOTE: Don't use ETS timer functions ets_timer_* in and this hardware
+ * timer implementation together!
+ */
 
-#define HW_TIMER_NUMOF        3
-#define HW_TIMER_CHANNELS     1
-#define HW_TIMER_CLK_DIV      (rtc_clk_apb_freq_get() / 1000000)
+#if defined(CPU_FAM_ESP32)
+
 #define HW_TIMER_CORRECTION   (RTC_PLL_320M / CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ)
 #define HW_TIMER_DELTA_MIN    (MAX(HW_TIMER_CORRECTION << 1, 5))
-#define HW_TIMER_FREQUENCY    (1000000UL) /* only 1MHz is supported */
 
-struct hw_timer_regs_t {
-    /* see Technical Reference, section 17.4 */
-    struct {
-        uint32_t unused      : 10;
-        uint32_t ALARM_EN    : 1;  /* alarms are enabled */
-        uint32_t LEVEL_INT_EN: 1;  /* alarms will generate level type interrupt */
-        uint32_t EDGE_INT_EN : 1;  /* alarms will generate edge type interrupt */
-        uint32_t DIVIDER     : 16; /* timer clock prescale value (basis is ABP) */
-        uint32_t AUTORELOAD  : 1;  /* auto-reload on alarms */
-        uint32_t INCREASE    : 1;  /* count up */
-        uint32_t EN          : 1;  /* timer is enabled */
-    } CONFIG_REG;
-    uint32_t LO_REG;      /* time-base counter value low 32 bits */
-    uint32_t HI_REG;      /* time-base counter value high 32 bits */
-    uint32_t UPDATE_REG;  /* time-base counter value update trigger */
-    uint32_t ALARMLO_REG; /* alarm trigger time-base counter value, low 32 bits */
-    uint32_t ALARMHI_REG; /* alarm trigger time-base counter value, high 32 bits */
-    uint32_t LOADLO_REG;  /* reload value, low 32 bits */
-    uint32_t LOADHI_REG;  /* reload value, high 32 bits */
-    uint32_t LOAD_REG;    /* reload trigger */
-};
+#elif defined(CPU_FAM_ESP32C3)
 
-struct hw_timer_ints_t {
-    /* see Technical Reference, section 17.4 */
-    uint32_t INT_ENA_REG;    /* interrupt enable bits */
-    uint32_t INT_RAW_REG;    /* raw interrupt status */
-    uint32_t INT_STA_REG;    /* masked interrupt status */
-    uint32_t INT_CLR_REG;    /* interrupt clear bits */
-};
+#define HW_TIMER_CORRECTION   10
+#define HW_TIMER_DELTA_MIN    (MAX(HW_TIMER_CORRECTION << 1, 5))
 
-struct hw_timer_t {
+#elif defined(CPU_FAM_ESP32S2)
+
+#define HW_TIMER_CORRECTION   (RTC_PLL_320M / CONFIG_ESP32S2_DEFAULT_CPU_FREQ_MHZ)
+#define HW_TIMER_DELTA_MIN    (MAX(HW_TIMER_CORRECTION << 1, 5))
+
+#elif defined(CPU_FAM_ESP32S3)
+
+#define HW_TIMER_CORRECTION   (RTC_PLL_320M / CONFIG_ESP32S3_DEFAULT_CPU_FREQ_MHZ)
+#define HW_TIMER_DELTA_MIN    (MAX(HW_TIMER_CORRECTION << 1, 5))
+
+#else
+#error "MCU implementation needed"
+#endif
+
+#define HW_TIMER_NUMOF      ARRAY_SIZE(_timers_desc)
+#define HW_TIMER_CHANNELS   1
+
+struct _hw_timer_t {
     bool  initialized; /* indicates whether timer is already initialized */
     bool  started;     /* indicates whether timer is already started */
 
-    timer_isr_ctx_t isr_ctx;
+    timer_isr_ctx_t isr_ctx;    /* registered ISR */
+    timer_hal_context_t hw;     /* timer hardware reference */
 };
 
-struct hw_timer_hw_t {
-    volatile struct hw_timer_regs_t* regs;     /* timer configuration regs */
-    volatile struct hw_timer_ints_t* int_regs; /* timer interrupt regs */
-    uint8_t int_mask;  /* timer interrupt bit mask in interrupt regs */
-    uint8_t int_src;   /* timer interrupt source */
+struct _hw_timer_desc_t {
+    uint8_t module;         /* hardware module identifier */
+    timer_group_t group;    /* timer group identifier */
+    timer_idx_t index;      /* timer index in timer group */
+    uint8_t int_mask;       /* timer interrupt bit mask in interrupt regs */
+    uint8_t int_src;        /* timer interrupt source */
 };
 
-static struct hw_timer_t timers[HW_TIMER_NUMOF] = { };
-static const struct hw_timer_hw_t timers_hw[HW_TIMER_NUMOF] =
+static const struct _hw_timer_desc_t _timers_desc[] =
 {
+#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3)
     {
-        .regs = (struct hw_timer_regs_t*)&TIMERG0.hw_timer[1],
-        .int_regs = (struct hw_timer_ints_t*)&TIMERG0.int_ena,
-        .int_mask = BIT(1),
-        .int_src  = ETS_TG0_T1_LEVEL_INTR_SOURCE
+        .module = PERIPH_TIMG0_MODULE,
+        .group = TIMER_GROUP_0,
+        .index = TIMER_1,
+        .int_mask = BIT(TIMER_1),
+        .int_src  = ETS_TG0_T1_LEVEL_INTR_SOURCE,
     },
     {
-        .regs = (struct hw_timer_regs_t*)&TIMERG1.hw_timer[0],
-        .int_regs = (struct hw_timer_ints_t*)&TIMERG1.int_ena,
-        .int_mask = BIT(0),
+        .module = PERIPH_TIMG1_MODULE,
+        .group = TIMER_GROUP_1,
+        .index = TIMER_0,
+        .int_mask = BIT(TIMER_0),
+        .int_src  = ETS_TG1_T0_LEVEL_INTR_SOURCE,
+    },
+    {
+        .module = PERIPH_TIMG1_MODULE,
+        .group = TIMER_GROUP_1,
+        .index = TIMER_1,
+        .int_mask = BIT(TIMER_1),
+        .int_src  = ETS_TG1_T1_LEVEL_INTR_SOURCE,
+    }
+#elif defined(CPU_FAM_ESP32C3)
+    {
+        .module = PERIPH_TIMG1_MODULE,
+        .group = TIMER_GROUP_1,
+        .index = TIMER_0,
+        .int_mask = BIT(TIMER_0),
         .int_src  = ETS_TG1_T0_LEVEL_INTR_SOURCE
     },
-    {
-        .regs = (struct hw_timer_regs_t*)&TIMERG1.hw_timer[1],
-        .int_regs = (struct hw_timer_ints_t*)&TIMERG1.int_ena,
-        .int_mask = BIT(1),
-        .int_src  = ETS_TG1_T1_LEVEL_INTR_SOURCE
-    }
+#else
+#error "MCU implementation needed"
+#endif
 };
 
+static struct _hw_timer_t _timers[HW_TIMER_NUMOF] = { };
+
 /** Latches the current counter value and return only the low part */
-static inline uint32_t timer_get_counter_lo(tim_t dev)
+static inline uint32_t _timer_get_counter_lo(tim_t dev)
 {
-    /* latch the current timer value by writing any value to the update reg */
-    timers_hw[dev].regs->UPDATE_REG = 0;
-    /* read high and low part of counter */
-    return timers_hw[dev].regs->LO_REG;
+    /* latch the current timer value and get current timer value */
+    uint64_t value;
+    timer_hal_get_counter_value(&_timers[dev].hw, &value);
+
+    /* return high and low part of timer */
+    return value;
 }
 
-/** Latches the current counter value and return the high and the low part */
-static inline void timer_get_counter(tim_t dev, uint32_t* hi, uint32_t* lo)
-{
-    /* parameter check */
-    if (!hi || !lo) {
-        return;
-    }
-    /* latch the current timer value by writing any value to the update reg */
-    timers_hw[dev].regs->UPDATE_REG = 0;
-    /* read high and low part of counter */
-    *hi = timers_hw[dev].regs->HI_REG;
-    *lo = timers_hw[dev].regs->LO_REG;
-}
-
-void IRAM hw_timer_handler(void* arg)
+void IRAM_ATTR _timer_int_handler(void* arg)
 {
     (void)arg;
 
@@ -176,62 +189,75 @@ void IRAM hw_timer_handler(void* arg)
 
     for (unsigned dev = 0; dev < HW_TIMER_NUMOF; dev++) {
         /* iterate over all devices and check what interrupt flags are set */
-        if (timers_hw[dev].int_regs->INT_STA_REG & timers_hw[dev].int_mask) {
+
+        if (!_timers[dev].initialized) {
+            continue;
+        }
+        uint32_t int_status;
+        timer_hal_get_intr_status(&_timers[dev].hw, &int_status);
+
+        if (int_status & _timers_desc[dev].int_mask) {
             DEBUG("%s dev=%d\n", __func__, dev);
+
             /* disable alarms */
-            timers_hw[dev].regs->CONFIG_REG.LEVEL_INT_EN = 0;
-            timers_hw[dev].regs->CONFIG_REG.ALARM_EN = 0;
-            /* clear the bit in interrupt enable and status register */
-            timers_hw[dev].int_regs->INT_ENA_REG &= ~timers_hw[dev].int_mask;
-            timers_hw[dev].int_regs->INT_CLR_REG |=  timers_hw[dev].int_mask;
+            timer_hal_set_alarm_enable(&_timers[dev].hw, false);
+
+            /* disable interrupt source and clear the bit in interrupt status */
+            timer_hal_set_level_int_enable(&_timers[dev].hw, false);
+            timer_hal_intr_disable(&_timers[dev].hw);
+            timer_hal_clear_intr_status(&_timers[dev].hw);
+
             /* execute the callback function */
-            timers[dev].isr_ctx.cb(timers[dev].isr_ctx.arg, 0);
+            _timers[dev].isr_ctx.cb(_timers[dev].isr_ctx.arg, 0);
         }
     }
 
     irq_isr_exit();
 }
 
-int timer_init (tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
+int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 {
+    _Static_assert(HW_TIMER_NUMOF == TIMER_NUMOF,
+                   "Number of timer descriptors does not match with TIMER_NUMOF");
+
     DEBUG("%s dev=%u freq=%" PRIu32 " cb=%p arg=%p\n",
           __func__, dev, freq, cb, arg);
 
-    CHECK_PARAM_RET (dev  <  HW_TIMER_NUMOF, -1);
-    CHECK_PARAM_RET (freq == HW_TIMER_FREQUENCY, -1);
-    CHECK_PARAM_RET (cb   != NULL, -1);
+    uint32_t clk_div = rtc_clk_apb_freq_get() / freq;
 
-    if (timers[dev].initialized) {
-        DEBUG("%s timer dev=%u is already initialized (used)\n", __func__, dev);
-        return -1;
-    }
+    assert(dev <  HW_TIMER_NUMOF);
+    assert(clk_div >= 2 && clk_div <= 65536);
+    assert(cb != NULL);
 
     /* initialize timer data structure */
-    timers[dev].initialized = true;
-    timers[dev].started     = false;
-    timers[dev].isr_ctx.cb  = cb;
-    timers[dev].isr_ctx.arg = arg;
+    _timers[dev].initialized = true;
+    _timers[dev].started     = false;
+    _timers[dev].isr_ctx.cb  = cb;
+    _timers[dev].isr_ctx.arg = arg;
 
     /* route all timer interrupt sources to the same level type interrupt */
-    intr_matrix_set(PRO_CPU_NUM, timers_hw[dev].int_src, CPU_INUM_TIMER);
+    intr_matrix_set(PRO_CPU_NUM, _timers_desc[dev].int_src, CPU_INUM_TIMER);
 
     /* we have to enable therefore the interrupt here */
-    xt_set_interrupt_handler(CPU_INUM_TIMER, hw_timer_handler, NULL);
-    xt_ints_on(BIT(CPU_INUM_TIMER));
+    intr_cntrl_ll_set_int_handler(CPU_INUM_TIMER, _timer_int_handler, NULL);
+    intr_cntrl_ll_enable_interrupts(BIT(CPU_INUM_TIMER));
 
-    if (dev) {
-        /* if dev > 0 we have to enable TMG1 module */
-        periph_module_enable(PERIPH_TIMG1_MODULE);
-    }
+    /* enable TMG module */
+    periph_module_enable(_timers_desc[dev].module);
 
     /* hardware timer configuration */
-    timers_hw[dev].regs->CONFIG_REG.EN = 0;
-    timers_hw[dev].regs->CONFIG_REG.AUTORELOAD = 0;
-    timers_hw[dev].regs->CONFIG_REG.INCREASE = 1;
-    timers_hw[dev].regs->CONFIG_REG.DIVIDER = HW_TIMER_CLK_DIV;
-    timers_hw[dev].regs->CONFIG_REG.EDGE_INT_EN = 0;
-    timers_hw[dev].regs->CONFIG_REG.LEVEL_INT_EN = 0;
-    timers_hw[dev].regs->CONFIG_REG.ALARM_EN = 0;
+    timer_hal_init(&_timers[dev].hw, _timers_desc[dev].group, _timers_desc[dev].index);
+
+    timer_hal_set_counter_enable(&_timers[dev].hw, false);
+    timer_hal_set_counter_increase(&_timers[dev].hw, true);
+    timer_hal_set_divider(&_timers[dev].hw, clk_div);
+    timer_hal_set_auto_reload(&_timers[dev].hw, false);
+
+    /* disable alarm and interrupt source */
+    timer_hal_set_alarm_enable(&_timers[dev].hw, false);
+    timer_hal_intr_disable(&_timers[dev].hw);
+    timer_hal_set_level_int_enable(&_timers[dev].hw, false);
+    timer_hal_set_edge_int_enable(&_timers[dev].hw, false);
 
     /* start the timer */
     timer_start(dev);
@@ -239,47 +265,45 @@ int timer_init (tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     return 0;
 }
 
-int IRAM timer_set(tim_t dev, int chn, unsigned int delta)
+int IRAM_ATTR timer_set(tim_t dev, int chn, unsigned int delta)
 {
     DEBUG("%s dev=%u channel=%d delta=%u\n", __func__, dev, chn, delta);
 
-    CHECK_PARAM_RET (dev < HW_TIMER_NUMOF, -1);
-    CHECK_PARAM_RET (chn < HW_TIMER_CHANNELS, -1);
+    assert(dev < HW_TIMER_NUMOF);
+
+    if (chn >= HW_TIMER_CHANNELS) {
+        return -1;
+    }
 
     /* disable interrupts */
     int state = irq_disable ();
 
-    /* disable alarms */
-    timers_hw[dev].regs->CONFIG_REG.LEVEL_INT_EN = 0;
-    timers_hw[dev].regs->CONFIG_REG.ALARM_EN = 0;
+    /* disable alarms and interrupt source */
+    timer_hal_set_alarm_enable(&_timers[dev].hw, false);
+    timer_hal_set_level_int_enable(&_timers[dev].hw, false);
+    timer_hal_intr_disable(&_timers[dev].hw);
 
     delta = (delta > HW_TIMER_DELTA_MIN) ? delta : HW_TIMER_DELTA_MIN;
     delta = (delta > HW_TIMER_CORRECTION) ? delta - HW_TIMER_CORRECTION : HW_TIMER_CORRECTION;
 
-    /* read the current value */
-    uint32_t count_lo;
-    uint32_t count_hi;
-    timer_get_counter(dev, &count_hi, &count_lo);
-
-    /* determine the alarm time */
+     /* latch and read current timer value */
     uint64_t alarm;
-    alarm  = count_lo;
-    alarm += ((uint64_t)count_hi) << 32;
+    timer_hal_get_counter_value(&_timers[dev].hw, &alarm);
+
+    /* determine the alarm time and set the alarm */
     alarm += delta;
+    timer_hal_set_alarm_value(&_timers[dev].hw, alarm);
 
-    timers_hw[dev].regs->ALARMHI_REG = (uint32_t)(alarm >> 32);
-    timers_hw[dev].regs->ALARMLO_REG = (uint32_t)(alarm & 0xffffffff);
+    /* enable alarms and interrupt sources */
+    timer_hal_set_alarm_enable(&_timers[dev].hw, true);
 
-    /* enable alarms */
-    timers_hw[dev].regs->CONFIG_REG.LEVEL_INT_EN = 1;
-    timers_hw[dev].regs->CONFIG_REG.ALARM_EN = 1;
+    /* clear possible pending interrupts and enable interrupt source */
+    timer_hal_set_level_int_enable(&_timers[dev].hw, true);
+    timer_hal_intr_enable(&_timers[dev].hw);
+    timer_hal_clear_intr_status(&_timers[dev].hw);
 
-    /* wait until instructions have been finished */
-    timers_hw[dev].regs->CONFIG_REG.EN = 1;
-
-    /* clear the bit in status and set the bit in interrupt enable */
-    timers_hw[dev].int_regs->INT_CLR_REG |= timers_hw[dev].int_mask;
-    timers_hw[dev].int_regs->INT_ENA_REG |= timers_hw[dev].int_mask;
+    /* enable the counter */
+    timer_hal_set_counter_enable(&_timers[dev].hw, true);
 
     /* restore interrupts enabled state */
     irq_restore (state);
@@ -287,63 +311,65 @@ int IRAM timer_set(tim_t dev, int chn, unsigned int delta)
     return 0;
 }
 
-int IRAM timer_set_absolute(tim_t dev, int chn, unsigned int value)
+int IRAM_ATTR timer_set_absolute(tim_t dev, int chn, unsigned int value)
 {
     DEBUG("%s dev=%u channel=%d value=%u\n", __func__, dev, chn, value);
 
-    return timer_set (dev, chn, value - timer_read(dev));
+    return timer_set(dev, chn, value - timer_read(dev));
 }
 
 int timer_clear(tim_t dev, int chn)
 {
     DEBUG("%s dev=%u channel=%d\n", __func__, dev, chn);
 
-    CHECK_PARAM_RET (dev < HW_TIMER_NUMOF, -1);
-    CHECK_PARAM_RET (chn < HW_TIMER_CHANNELS, -1);
+    assert(dev < HW_TIMER_NUMOF);
+
+    if (chn >= HW_TIMER_CHANNELS) {
+        return -1;
+    }
 
     /* disable alarms */
-    timers_hw[dev].regs->CONFIG_REG.LEVEL_INT_EN = 0;
-    timers_hw[dev].regs->CONFIG_REG.ALARM_EN = 0;
-    /* clear the bit in interrupt enable and status register */
-    timers_hw[dev].int_regs->INT_ENA_REG &= ~timers_hw[dev].int_mask;
-    timers_hw[dev].int_regs->INT_CLR_REG |=  timers_hw[dev].int_mask;
+    timer_hal_set_alarm_enable(&_timers[dev].hw, false);
+
+    /* disable interrupt source and clear possible pending interrupts */
+    timer_hal_set_level_int_enable(&_timers[dev].hw, false);
+    timer_hal_intr_disable(&_timers[dev].hw);
+    timer_hal_clear_intr_status(&_timers[dev].hw);
 
     return 0;
 }
 
-unsigned int IRAM timer_read(tim_t dev)
+unsigned int IRAM_ATTR timer_read(tim_t dev)
 {
-    CHECK_PARAM_RET (dev < HW_TIMER_NUMOF, -1);
+    assert(dev < HW_TIMER_NUMOF);
 
     if (IS_ACTIVE(ENABLE_DEBUG)) {
-        uint32_t count_lo = timer_get_counter_lo(dev);
-        DEBUG("%s %u\n", __func__, count_lo);
+        uint32_t count_lo = _timer_get_counter_lo(dev);
+        DEBUG("%s %" PRIu32 "\n", __func__, count_lo);
         return count_lo;
     }
     else {
-        return timer_get_counter_lo(dev);
+        return _timer_get_counter_lo(dev);
     }
 }
 
-void IRAM timer_start(tim_t dev)
+void IRAM_ATTR timer_start(tim_t dev)
 {
-    DEBUG("%s dev=%u @%u\n", __func__, dev, system_get_time());
-
-    CHECK_PARAM (dev < HW_TIMER_NUMOF);
-
-    timers_hw[dev].regs->CONFIG_REG.EN = 1;
+    DEBUG("%s dev=%u @%" PRIu32 "\n", __func__, dev, system_get_time());
+    assert(dev < HW_TIMER_NUMOF);
+    timer_hal_set_counter_enable(&_timers[dev].hw, true);
 }
 
-void IRAM timer_stop(tim_t dev)
+void IRAM_ATTR timer_stop(tim_t dev)
 {
     DEBUG("%s dev=%u\n", __func__, dev);
-
-    CHECK_PARAM (dev < HW_TIMER_NUMOF);
-
-    timers_hw[dev].regs->CONFIG_REG.EN = 0;
+    assert(dev < HW_TIMER_NUMOF);
+    timer_hal_set_counter_enable(&_timers[dev].hw, false);
 }
 
 #else /* MODULE_ESP_HW_COUNTER */
+
+#include "xtensa/config/core-isa.h"
 
 /* hardware counter used as timer */
 
@@ -369,11 +395,29 @@ void IRAM timer_stop(tim_t dev)
 #define HW_TIMER_DELTA_RSHIFT 24
 #define HW_TIMER_FREQUENCY    (1000000UL) /* only 1MHz is supported */
 
+#if defined(CPU_FAM_ESP32)
+
 #define HW_TIMER_CORRECTION   (RTC_PLL_480M / CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ)
 #define HW_TIMER_DELTA_MIN    (MAX(HW_TIMER_CORRECTION, 5))
 
-#define US_TO_HW_TIMER_TICKS(t)    (t * system_get_cpu_freq())
-#define HW_TIMER_TICKS_TO_US(t)    (t / system_get_cpu_freq())
+#elif defined(CPU_FAM_ESP32S2)
+
+#define HW_TIMER_CORRECTION   (RTC_PLL_480M / CONFIG_ESP32S2_DEFAULT_CPU_FREQ_MHZ)
+#define HW_TIMER_DELTA_MIN    (MAX(HW_TIMER_CORRECTION, 5))
+
+#elif defined(CPU_FAM_ESP32S3)
+
+#define HW_TIMER_CORRECTION   (RTC_PLL_480M / CONFIG_ESP32S3_DEFAULT_CPU_FREQ_MHZ)
+#define HW_TIMER_DELTA_MIN    (MAX(HW_TIMER_CORRECTION, 5))
+
+#else
+#error "MCU implementation needed"
+#endif
+
+#define US_TO_HW_TIMER_TICKS(t)     (t * system_get_cpu_freq())
+#define HW_TIMER_TICKS_TO_US(t)     (t / system_get_cpu_freq())
+
+extern int esp_clk_cpu_freq(void);
 
 struct hw_channel_t {
     bool        used;         /* indicates whether the channel is used */
@@ -383,7 +427,7 @@ struct hw_channel_t {
     uint32_t    remainder;    /* remainder timer value */
 };
 
-struct hw_timer_t {
+struct _hw_timer_t {
     tim_t                dev;         /* the timer device num */
     bool                 initialized; /* indicates whether timer is already initialized */
     bool                 started;     /* indicates whether timer is already started */
@@ -391,16 +435,16 @@ struct hw_timer_t {
     struct hw_channel_t  channels[HW_TIMER_CHANNELS];
 };
 
-static struct hw_timer_t timers[HW_TIMER_NUMOF] = { };
+static struct _hw_timer_t _timers[HW_TIMER_NUMOF] = { };
 static const uint8_t timers_int[HW_TIMER_NUMOF] = { XCHAL_TIMER0_INTERRUPT,
                                                     XCHAL_TIMER1_INTERRUPT,
                                                     XCHAL_TIMER2_INTERRUPT };
 
-static void __timer_channel_start (struct hw_timer_t* timer, struct hw_channel_t* channel);
-static void __timer_channel_stop (struct hw_timer_t* timer, struct hw_channel_t* channel);
+static void __timer_channel_start (struct _hw_timer_t* timer, struct hw_channel_t* channel);
+static void __timer_channel_stop (struct _hw_timer_t* timer, struct hw_channel_t* channel);
 
-static uint32_t __hw_timer_ticks_max;
-static uint32_t __hw_timer_ticks_min;
+static uint32_t ___hw_timer_ticks_max;
+static uint32_t ___hw_timer_ticks_min;
 
 void IRAM hw_timer_handler(void* arg)
 {
@@ -415,12 +459,12 @@ void IRAM hw_timer_handler(void* arg)
 
     DEBUG("%s arg=%p\n", __func__, arg);
 
-    struct hw_timer_t*   timer   = &timers[dev];
+    struct _hw_timer_t*   timer   = &_timers[dev];
     struct hw_channel_t* channel = &timer->channels[chn];
 
     if (channel->cycles) {
         channel->cycles--;
-        xthal_set_ccompare(dev, xthal_get_ccount() + __hw_timer_ticks_max);
+        xthal_set_ccompare(dev, xthal_get_ccount() + ___hw_timer_ticks_max);
     }
     else if (channel->remainder >= HW_TIMER_DELTA_MIN) {
         xthal_set_ccompare (dev, xthal_get_ccount() +
@@ -440,29 +484,29 @@ void IRAM hw_timer_handler(void* arg)
 
 int timer_init (tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 {
-    DEBUG("%s dev=%u freq=%u cb=%p arg=%p\n", __func__, dev, freq, cb, arg);
+    DEBUG("%s dev=%u freq=%"PRIu32" cb=%p arg=%p\n", __func__, dev, freq, cb, arg);
 
-    CHECK_PARAM_RET (dev  <  HW_TIMER_NUMOF, -1);
-    CHECK_PARAM_RET (freq == HW_TIMER_FREQUENCY, -1);
-    CHECK_PARAM_RET (cb   != NULL, -1);
+    assert(dev  <  HW_TIMER_NUMOF);
+    assert(freq == HW_TIMER_FREQUENCY);
+    assert(cb   != NULL);
 
-    if (timers[dev].initialized) {
+    if (_timers[dev].initialized) {
         DEBUG("%s timer dev=%u is already initialized (used)\n", __func__, dev);
         return -1;
     }
 
-    timers[dev].dev = dev;
-    timers[dev].initialized = true;
-    timers[dev].started     = false;
-    timers[dev].isr_ctx.cb  = cb;
-    timers[dev].isr_ctx.arg = arg;
+    _timers[dev].dev = dev;
+    _timers[dev].initialized = true;
+    _timers[dev].started     = false;
+    _timers[dev].isr_ctx.cb  = cb;
+    _timers[dev].isr_ctx.arg = arg;
 
     xt_set_interrupt_handler(timers_int[dev], hw_timer_handler, (void *)dev);
 
     for (int i = 0; i < HW_TIMER_CHANNELS; i++) {
-        timers[dev].channels[i].used = false;
-        timers[dev].channels[i].cycles = 0;
-        timers[dev].channels[i].remainder = 0;
+        _timers[dev].channels[i].used = false;
+        _timers[dev].channels[i].cycles = 0;
+        _timers[dev].channels[i].remainder = 0;
     }
 
     timer_start(dev);
@@ -474,12 +518,12 @@ int IRAM timer_set(tim_t dev, int chn, unsigned int delta)
 {
     DEBUG("%s dev=%u channel=%d delta=%u\n", __func__, dev, chn, delta);
 
-    CHECK_PARAM_RET (dev < HW_TIMER_NUMOF, -1);
-    CHECK_PARAM_RET (chn < HW_TIMER_CHANNELS, -1);
+    assert(dev < HW_TIMER_NUMOF);
+    assert(chn < HW_TIMER_CHANNELS);
 
     int state = irq_disable ();
 
-    struct hw_timer_t*   timer   = &timers[dev];
+    struct _hw_timer_t*   timer   = &_timers[dev];
     struct hw_channel_t* channel = &timer->channels[chn];
 
     /* set delta time and channel used flag */
@@ -504,13 +548,13 @@ int timer_clear(tim_t dev, int chn)
 {
     DEBUG("%s dev=%u channel=%d\n", __func__, dev, chn);
 
-    CHECK_PARAM_RET (dev < HW_TIMER_NUMOF, -1);
-    CHECK_PARAM_RET (chn < HW_TIMER_CHANNELS, -1);
+    assert(dev < HW_TIMER_NUMOF);
+    assert(chn < HW_TIMER_CHANNELS);
 
     int state = irq_disable ();
 
     /* stop running timer channel */
-    __timer_channel_stop (&timers[dev], &timers[dev].channels[chn]);
+    __timer_channel_stop (&_timers[dev], &_timers[dev].channels[chn]);
 
     irq_restore (state);
 
@@ -526,17 +570,17 @@ unsigned int IRAM timer_read(tim_t dev)
 
 void IRAM timer_start(tim_t dev)
 {
-    DEBUG("%s dev=%u @%u\n", __func__, dev, system_get_time());
+    DEBUG("%s dev=%u @%"PRIu32"\n", __func__, dev, system_get_time());
 
-    CHECK_PARAM (dev < HW_TIMER_NUMOF);
-    CHECK_PARAM (!timers[dev].started);
+    assert(dev < HW_TIMER_NUMOF);
+    assert(!_timers[dev].started);
 
     int state = irq_disable ();
 
-    __hw_timer_ticks_max = US_TO_HW_TIMER_TICKS(HW_TIMER_DELTA_MAX);
-    __hw_timer_ticks_min = US_TO_HW_TIMER_TICKS(HW_TIMER_DELTA_MIN);
+    ___hw_timer_ticks_max = US_TO_HW_TIMER_TICKS(HW_TIMER_DELTA_MAX);
+    ___hw_timer_ticks_min = US_TO_HW_TIMER_TICKS(HW_TIMER_DELTA_MIN);
 
-    struct hw_timer_t* timer = &timers[dev];
+    struct _hw_timer_t* timer = &_timers[dev];
 
     timer->started = true;
 
@@ -555,7 +599,7 @@ void IRAM timer_stop(tim_t dev)
 
     int state = irq_disable ();
 
-    struct hw_timer_t* timer = &timers[dev];
+    struct _hw_timer_t* timer = &_timers[dev];
 
     timer->started = false;
 
@@ -566,7 +610,7 @@ void IRAM timer_stop(tim_t dev)
     irq_restore (state);
 }
 
-static void IRAM __timer_channel_start (struct hw_timer_t* timer, struct hw_channel_t* channel)
+static void IRAM __timer_channel_start (struct _hw_timer_t* timer, struct hw_channel_t* channel)
 {
     if (!timer->started || !channel->used) {
         return;
@@ -577,13 +621,13 @@ static void IRAM __timer_channel_start (struct hw_timer_t* timer, struct hw_chan
     channel->cycles     = channel->delta_time >> HW_TIMER_DELTA_RSHIFT;
     channel->remainder  = channel->delta_time &  HW_TIMER_DELTA_MASK;
 
-    DEBUG("%s cycles=%u remainder=%u @%u\n",
+    DEBUG("%s cycles=%"PRIu32" remainder=%"PRIu32" @%"PRIu32"\n",
           __func__, channel->cycles, channel->remainder, system_get_time());
 
     /* start timer either with full cycles, remaining or minimum time */
     if (channel->cycles) {
         channel->cycles--;
-        xthal_set_ccompare(timer->dev, xthal_get_ccount() + __hw_timer_ticks_max);
+        xthal_set_ccompare(timer->dev, xthal_get_ccount() + ___hw_timer_ticks_max);
     }
     else if (channel->remainder > HW_TIMER_DELTA_MIN) {
         xthal_set_ccompare(timer->dev, xthal_get_ccount() +
@@ -592,13 +636,13 @@ static void IRAM __timer_channel_start (struct hw_timer_t* timer, struct hw_chan
     }
     else {
         channel->remainder = 0;
-        xthal_set_ccompare(timer->dev, xthal_get_ccount() + __hw_timer_ticks_min);
+        xthal_set_ccompare(timer->dev, xthal_get_ccount() + ___hw_timer_ticks_min);
     }
 
     xt_ints_on(BIT(timers_int[timer->dev]));
 }
 
-static void IRAM __timer_channel_stop (struct hw_timer_t* timer, struct hw_channel_t* channel)
+static void IRAM __timer_channel_stop (struct _hw_timer_t* timer, struct hw_channel_t* channel)
 {
     if (!channel->used) {
         return;

@@ -1,0 +1,44 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+endif
+
+ifneq (,$(filter stdio_uart,$(USEMODULE)))
+  USEMODULE += periph_uart
+endif
+
+ifneq (,$(filter touch_dev,$(USEMODULE)))
+  USEMODULE += ft5x06
+endif
+
+ifneq (,$(filter periph_fmc,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_fmc_16bit
+endif
+
+ifneq (,$(filter periph_uart,$(USEMODULE)))
+  USEMODULE += periph_lpuart
+  ifeq (,$(filter periph_spi_stmod_plus,$(USEMODULE)))
+    # if STMod+ is not used with SPI (default), the UART interface uses HW FC
+    FEATURES_REQUIRED += periph_uart_hw_fc
+  endif
+endif
+
+ifneq (,$(filter disp_dev,$(USEMODULE)))
+  USEMODULE += st7789
+endif
+
+ifneq (,$(filter st7789,$(USEMODULE)))
+  USEMODULE += lcd_parallel_16bit
+  USEMODULE += lcd_parallel_ll_mcu
+  FEATURES_REQUIRED += periph_fmc_nor_sram
+endif
+
+# default to using fatfs on SD card
+ifneq (,$(filter vfs_default,$(USEMODULE)))
+  USEMODULE += fatfs_vfs
+  USEMODULE += mtd
+endif
+
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE += mtd_sdmmc_default
+  USEMODULE += periph_sdmmc
+endif

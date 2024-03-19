@@ -11,13 +11,19 @@ menuconfig KCONFIG_USEMODULE_USBUS_CDC_ACM
     help
         Configure the USBUS CDC ACM module via Kconfig.
 
-if KCONFIG_USEMODULE_USBUS_CDC_ACM
+menuconfig MODULE_USBUS_CDC_ACM
+    bool "Configure USBUS CDC ACM"
+    depends on MODULE_USBUS
+    help
+        Configure the USBUS CDC ACM module via Kconfig.
+
+if MODULE_USBUS_CDC_ACM || KCONFIG_USEMODULE_USBUS_CDC_ACM
 
 config USBUS_CDC_ACM_STDIO_BUF_SIZE_EXP
     int "Buffer size for STDIN and STDOUT data (as exponent of 2^n)"
+    depends on USEMODULE_STDIO_CDC_ACM || MODULE_STDIO_CDC_ACM
     default 7
     range 0 31
-    depends on USEMODULE_STDIO_CDC_ACM
     help
         As buffer size ALWAYS needs to be power of two, this changes this option
         represents the exponent of 2^n, which will be used as the size of the
@@ -44,20 +50,18 @@ config USBUS_CDC_ACM_BULK_EP_SIZE_64
 
 endchoice
 
-endif # KCONFIG_USEMODULE_USBUS_CDC_ACM
-
-config MODULE_USBUS_CDC_ACM
-    bool "USB CDC ACM support"
-    depends on MODULE_USBUS
-    select MODULE_TSRB
+endif # MODULE_USBUS_CDC_ACM
 
 # extend STDIO options
 choice STDIO_IMPLEMENTATION
 
 config MODULE_STDIO_CDC_ACM
     bool "CDC ACM"
-    depends on MODULE_USBUS_CDC_ACM
+    depends on MODULE_USBUS || KCONFIG_USEMODULE_USBUS
+    depends on MODULE_USBUS_CDC_ACM && !MODULE_TINYUSB_DEVICE
     select MODULE_ISRPIPE
     select MODULE_STDIO_AVAILABLE
+    select USE_STDOUT_BUFFERED
+
 
 endchoice

@@ -51,12 +51,24 @@ When the device is attached and in DFU mode (or the current firmware uses the `u
 new firmware can be flashed to slot 0 using:
 
 ```
-$ FEATURES_REQUIRED+=riotboot USEMODULE+=usbus_dfu make -C examples/saul BOARD=particle-xenon PROGRAMMER=dfu-util all riotboot/flash-slot0
+$ FEATURES_REQUIRED+=riotboot USEMODULE+=usbus_dfu make -C examples/saul BOARD=particle-xenon \
+  PROGRAMMER=dfu-util all riotboot/flash-slot0
+```
+
+By default, the VID/PID pair 1209:7d02 is used for the device to be flashed
+in riotboot DFU mode. If necessary, this VID/PID pair can be overwritten with
+the variable `DFU_USB_ID`, e.g. if the RIOT DFU bootloader was compiled for
+a different VID/PID pair.
+
+```
+$ FEATURES_REQUIRED+=riotboot USEMODULE+=usbus_dfu make -C examples/saul BOARD=particle-xenon \
+  PROGRAMMER=dfu-util DFU_USB_ID=1209:7d02 all riotboot/flash-slot0
 ```
 
 Note that when building and flashing a different slot (eg. `flash-slot1`),
 not only is the image built for that slot, but also dfu-util gets passed
 `--alt 1` (via the `DFU_ALT` build variable) to store it in the right place.
+
 # Entering DFU mode
 
 When RIOT applications are built with `USEMODULE+=usbus_dfu`,

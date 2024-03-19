@@ -55,15 +55,9 @@ To create a bridge and two (or count at your option) tap interfaces:
 
     sudo ../../dist/tools/tapsetup/tapsetup [-c [<count>]]
 
-On OSX you need to start the RIOT instance at some point during the script's
-execution. The script will instruct you when to do that.
-
 To delete the bridge and all tap interfaces:
 
     sudo ../../dist/tools/tapsetup/tapsetup -d
-
-For OSX you **have** to run this after killing your RIOT instance and rerun
-`sudo ../../dist/tools/tapsetup [-c [<count>]]` before restarting.
 
 **Please note:** If you want to communicate between RIOT and your host
 operating system, you must not use the `tapsetup` script, but create and

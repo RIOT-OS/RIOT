@@ -19,9 +19,15 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <linux/if.h>
+#include <linux/if_packet.h>
+#include <sys/ioctl.h>
+
 #include "kernel_defines.h"
 #include "topology.h"
 #include "zep_parser.h"
+
+#define ETH_P_IEEE802154 0x00F6
 
 typedef struct {
     list_node_t node;
@@ -89,7 +95,7 @@ static void _send_topology(void *ctx, void *buffer, size_t len,
     topology_send(ctx, sock, src_addr, buffer, len);
 }
 
-static void dispatch_loop(int sock, dispatch_cb_t dispatch, void *ctx)
+static void dispatch_loop(int sock, int tap, dispatch_cb_t dispatch, void *ctx)
 {
     puts("entering loop…");
     while (1) {
@@ -105,29 +111,88 @@ static void dispatch_loop(int sock, dispatch_cb_t dispatch, void *ctx)
             continue;
         }
 
+        /* send packet to virtual 802.15.4 interface */
+        if (tap) {
+            size_t len = bytes_in;
+            const void *payload = zep_get_payload(buffer, &len);
+            if (payload) {
+                if (write(tap, payload, len) < 0) {
+                    puts("Can't write to virtual 802.15.4 device");
+                    close(tap);
+                    tap = 0;
+                }
+            }
+        }
+
+        /* send packet to the topology */
         dispatch(ctx, buffer, bytes_in, sock, &src_addr);
     }
 }
 
 static topology_t topology;
 static const char *graphviz_file = "example.gv";
+static const char *pidfile;
 static void _info_handler(int signal)
 {
-    if (signal != SIGUSR1) {
-        return;
+    switch (signal) {
+    case SIGUSR1:
+        if (topology_print(graphviz_file, &topology)) {
+            fprintf(stderr, "can't open %s\n", graphviz_file);
+        }
+        else {
+            printf("graph written to %s\n", graphviz_file);
+        }
+        break;
+    case SIGUSR2:
+        topology_print_stats(&topology, true);
+        break;
+    case SIGINT:
+    case SIGTERM:
+        if (pidfile) {
+            unlink(pidfile);
+        }
+        exit(0);
+        break;
+    }
+}
+
+/* open mac802154_hwsim device to send frames to it */
+static int _open_mac802154_hwsim(const char *iface)
+{
+    int res;
+    int fd = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_IEEE802154));
+
+    /* get interface index for interface name */
+    struct ifreq ifr;
+    strncpy(ifr.ifr_name, iface, IFNAMSIZ);
+
+    if ((res = ioctl(fd, SIOCGIFINDEX, &ifr)) < 0) {
+        goto error;
     }
 
-    if (topology_print(graphviz_file, &topology)) {
-        fprintf(stderr, "can't open %s\n", graphviz_file);
+    /* bind socket to the device */
+    struct sockaddr_ll sll = {
+        .sll_family = AF_PACKET,
+        .sll_ifindex = ifr.ifr_ifindex,
+        .sll_protocol = htons(ETH_P_IEEE802154),
+    };
+
+    if ((res = bind(fd, (struct sockaddr *)&sll, sizeof(sll))) < 0) {
+        goto error;
     }
-    else {
-        printf("graph written to %s\n", graphviz_file);
-    }
+
+    return fd;
+
+error:
+    close(fd);
+    fprintf(stderr, "open mac802154_hwsim: %s\n", strerror(res));
+    return res;
 }
 
 static void _print_help(const char *progname)
 {
-    fprintf(stderr, "usage: %s [-t topology] [-s seed] [-g graphviz_out] <address> <port>\n",
+    fprintf(stderr, "usage: %s [-t topology] [-s seed] "
+                    "[-g graphviz_out] [-w interface] <address> <port>\n",
             progname);
 
     fprintf(stderr, "\npositional arguments:\n");
@@ -136,18 +201,28 @@ static void _print_help(const char *progname)
 
     fprintf(stderr, "\noptional arguments:\n");
     fprintf(stderr, "\t-t <file>\tLoad toplogy from file\n");
+    fprintf(stderr, "\t-p <file>\tStore PID in file\n");
     fprintf(stderr, "\t-s <seed>\tRandom seed used to simulate packet loss\n");
     fprintf(stderr, "\t-g <file>\tFile to dump topology as Graphviz visualisation on SIGUSR1\n");
+    fprintf(stderr, "\t-w <interface>\tSend frames to virtual 802.15.4 "
+                    "interface (mac802154_hwsim)\n");
 }
 
 int main(int argc, char **argv)
 {
-    int c;
+    int c, tap_fd = 0;
     unsigned int seed = time(NULL);
     const char *topo_file = NULL;
     const char *progname = argv[0];
 
-    while ((c = getopt(argc, argv, "t:s:g:")) != -1) {
+    const struct addrinfo hint = {
+        .ai_family   = AF_UNSPEC,
+        .ai_socktype = SOCK_DGRAM,
+        .ai_protocol = IPPROTO_UDP,
+        .ai_flags    = AI_NUMERICHOST,
+    };
+
+    while ((c = getopt(argc, argv, "t:s:g:w:p:")) != -1) {
         switch (c) {
         case 't':
             topo_file = optarg;
@@ -157,6 +232,15 @@ int main(int argc, char **argv)
             break;
         case 'g':
             graphviz_file = optarg;
+            break;
+        case 'w':
+            tap_fd = _open_mac802154_hwsim(optarg);
+            if (tap_fd < 0) {
+                return tap_fd;
+            }
+            break;
+        case 'p':
+            pidfile = optarg;
             break;
         default:
             _print_help(progname);
@@ -188,13 +272,9 @@ int main(int argc, char **argv)
     if (graphviz_file) {
         signal(SIGUSR1, _info_handler);
     }
-
-    struct addrinfo hint = {
-        .ai_family   = AF_UNSPEC,
-        .ai_socktype = SOCK_DGRAM,
-        .ai_protocol = IPPROTO_UDP,
-        .ai_flags    = AI_NUMERICHOST,
-    };
+    signal(SIGUSR2, _info_handler);
+    signal(SIGTERM, _info_handler);
+    signal(SIGINT, _info_handler);
 
     struct addrinfo *server_addr;
     int res = getaddrinfo(argv[0], argv[1],
@@ -220,11 +300,19 @@ int main(int argc, char **argv)
 
     freeaddrinfo(server_addr);
 
+    if (pidfile) {
+         FILE *pf = fopen(pidfile, "w");
+        if (pf) {
+            fprintf(pf, "%u", getpid());
+            fclose(pf);
+        }
+    }
+
     if (topology.flat) {
-        dispatch_loop(sock, _send_flat, &topology.nodes);
+        dispatch_loop(sock, tap_fd, _send_flat, &topology.nodes);
     }
     else {
-        dispatch_loop(sock, _send_topology, &topology);
+        dispatch_loop(sock, tap_fd, _send_topology, &topology);
     }
 
     close(sock);

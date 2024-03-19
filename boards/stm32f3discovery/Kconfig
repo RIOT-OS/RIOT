@@ -28,4 +28,9 @@ config BOARD_STM32F3DISCOVERY
     select HAVE_SAUL_GPIO
     select HAVE_LSM303DLHC
 
+    # L3Gxxxx gyro
+    select HAVE_L3GXXXX_SPI
+    select HAVE_I3G4250D
+    select HAVE_L3GD20
+
 source "$(RIOTBOARD)/common/stm32/Kconfig"

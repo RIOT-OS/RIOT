@@ -7,8 +7,9 @@
  */
 
 /**
- * @defgroup    net_cord_config CoRE RD Endpoint and Lookup Client Configuration
+ * @defgroup    net_cord_config CoRE RD Configuration
  * @ingroup     net_cord
+ * @ingroup     config
  * @brief       Configuration options for CoRE RD endpoints and lookup clients
  * @{
  *
@@ -27,11 +28,6 @@ extern "C" {
 #endif
 
 /**
- * @defgroup net_cord_conf CoRE RD Client compile configurations
- * @ingroup config
- * @{
- */
-/**
  * @brief   Default lifetime in seconds (the default is 1 day)
  */
 #ifndef CONFIG_CORD_LT
@@ -44,7 +40,6 @@ extern "C" {
 #ifndef CONFIG_CORD_UPDATE_INTERVAL
 #define CONFIG_CORD_UPDATE_INTERVAL    ((CONFIG_CORD_LT / 4) * 3)
 #endif
-/** @} */
 
 /**
  * @brief   Delay until the RD client starts to try registering (in seconds)
@@ -69,13 +64,10 @@ extern "C" {
 #ifndef CONFIG_CORD_EP
 #ifdef DOXYGEN
 /**
- * @ingroup net_cord_conf
  * @brief Endpoint ID definition
- * @{
  */
 #define CONFIG_CORD_EP "MyNewEpName"    //defined for doxygen documentation only
 #endif
-/** @} */
 
 /**
  * @brief   Number of generated hexadecimal characters added to the ep
@@ -94,7 +86,15 @@ extern "C" {
 /**
  * @brief   Extra query parameters added during registration
  *
- * Must be suitable for constructing a static array out of them.
+ * Must be suitable for constructing a static array out of them. Each item of
+ * the array is turned as a Uri-Query option. The [IANA RD Parameters subregistry]
+ * contains usable keys and their descriptions in entries that have an "R" in
+ * their "Use" column. Other keys can be used with known RD implementations.
+ *
+ * The `ep` and `lt` parameters are *not* to be set through this mechanism, but
+ * through @ref CONFIG_CORD_EP and @ref CONFIG_CORD_LT, respectively.
+ *
+ * [IANA RD Parameters subregistry]: https://www.iana.org/assignments/core-parameters/core-parameters.xhtml#rd-parameters
  *
  * Example:
  *
@@ -105,7 +105,6 @@ extern "C" {
 #ifdef DOXYGEN
 #define CONFIG_CORD_EXTRAARGS
 #endif
-/** @} */
 
 #ifdef __cplusplus
 }

@@ -10,6 +10,7 @@
  * @file
  * @brief   POSIX compatible sys/statvfs.h definitions
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @{
  */
 
 /* If building on native we need to use the system libraries instead */

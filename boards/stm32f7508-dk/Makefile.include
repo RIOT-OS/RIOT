@@ -1,0 +1,3 @@
+INCLUDES  += -I$(RIOTBOARD)/stm32f746g-disco/include
+
+include $(RIOTBOARD)/stm32f746g-disco/Makefile.include

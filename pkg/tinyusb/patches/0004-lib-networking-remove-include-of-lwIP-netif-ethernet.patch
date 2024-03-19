@@ -1,0 +1,25 @@
+From dd97024edcb32e1a2c417c5a6aca02994a4277bc Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Thu, 10 Nov 2022 16:40:08 +0100
+Subject: [PATCH 4/4] lib/networking: remove include of lwIP netif/ethernet.h
+
+lwIP is not used in RIOT
+---
+ lib/networking/rndis_reports.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/lib/networking/rndis_reports.c b/lib/networking/rndis_reports.c
+index ee611c883..d1a563f0c 100644
+--- a/lib/networking/rndis_reports.c
++++ b/lib/networking/rndis_reports.c
+@@ -31,7 +31,6 @@
+ #include <string.h>
+ #include "class/net/net_device.h"
+ #include "rndis_protocol.h"
+-#include "netif/ethernet.h"
+ 
+ #define RNDIS_LINK_SPEED 12000000                       /* Link baudrate (12Mbit/s for USB-FS) */
+ #define RNDIS_VENDOR     "TinyUSB"                      /* NIC vendor name */
+-- 
+2.17.1
+

@@ -5,7 +5,6 @@
 # directory for more details.
 #
 
-
 menuconfig MODULE_BMX280
     bool
     prompt "BMx280 Temperature, pressure and humidity sensors" if !(MODULE_SAUL_DEFAULT && HAVE_BMX280)
@@ -52,6 +51,11 @@ endchoice
 
 endif # MODULE_BMX280
 
+config HAVE_BMX280
+    bool
+    help
+        Indicates that a bmx280 sensor is present.
+
 config HAVE_BME280_I2C
     bool
     select HAVE_BMX280
@@ -75,9 +79,3 @@ config HAVE_BMP280_SPI
     select HAVE_BMX280
     help
       Indicates that a bmp280 sensor on the SPI bus is present.
-
-config HAVE_BMX280
-    bool
-    select MODULE_BMX280 if MODULE_SAUL_DEFAULT
-    help
-        Indicates that a bmx280 sensor is present.

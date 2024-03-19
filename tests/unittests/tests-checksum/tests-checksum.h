@@ -37,11 +37,39 @@ void tests_checksum(void);
 Test *tests_checksum_crc8_tests(void);
 
 /**
- * @brief   Generates tests for checksum/crc16_ccitt.h
+ * @brief   Generates tests for crc16-ccitt-kermit from checksum/crc16_ccitt.h
  *
  * @return  embUnit tests if successful, NULL if not.
  */
-Test *tests_checksum_crc16_ccitt_tests(void);
+Test *tests_checksum_crc16_ccitt_kermit_tests(void);
+
+/**
+ * @brief   Generates tests for crc16-ccitt-mcrf4xx from checksum/crc16_ccitt.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_checksum_crc16_ccitt_mcrf4xx_tests(void);
+
+/**
+ * @brief   Generates tests for crc16-ccitt-false from checksum/crc16_ccitt.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_checksum_crc16_ccitt_false_tests(void);
+
+/**
+ * @brief   Generates tests for crc16-ccitt-aug from checksum/crc16_ccitt.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_checksum_crc16_ccitt_aug_tests(void);
+
+/**
+ * @brief   Generates tests for checksum/crc32.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_checksum_crc32_tests(void);
 
 /**
  * @brief   Generates tests for checksum/fletcher16.h

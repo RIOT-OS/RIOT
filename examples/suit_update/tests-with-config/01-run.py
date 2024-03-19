@@ -11,19 +11,40 @@ import subprocess
 import sys
 import tempfile
 import time
+import re
+import random
+from ipaddress import (
+    IPv6Address,
+    IPv6Network,
+)
 
 from testrunner import run
 from testrunner import utils
 
-# Default test over loopback interface
-COAP_HOST = "[fd00:dead:beef::1]"
+COAP_HOST = os.getenv("SUIT_COAP_SERVER", "[fd00:dead:beef::1]")
+BOARD = os.getenv("BOARD", "samr21-xpro")
 
 UPDATING_TIMEOUT = 10
 MANIFEST_TIMEOUT = 15
 
 USE_ETHOS = int(os.getenv("USE_ETHOS", "1"))
-TAP = os.getenv("TAP", "riot0")
+IFACE = os.getenv("IFACE", "tapbr0")
 TMPDIR = tempfile.TemporaryDirectory()
+
+TRIGGER_RECEIVED_MSG = "suit_worker: started."
+REBOOTING_MSG = "suit_worker: rebooting..."
+
+
+def get_iface_addr(iface):
+    out = subprocess.check_output(["ip", "a", "s", "dev", iface]).decode()
+    p = re.compile(
+        r"inet6\s+(?P<global>[0-9a-fA-F:]+:[A-Fa-f:0-9]+/\d+)\s+" r"scope\s+global"
+    )
+    for line in out.splitlines():
+        m = p.search(line)
+        if m is not None:
+            return m.group("global")
+    return None
 
 
 def start_aiocoap_fileserver():
@@ -51,7 +72,7 @@ def notify(coap_server, client_url, version=None):
     assert not subprocess.call(cmd)
 
 
-def publish(server_dir, server_url, app_ver, keys='default', latest_name=None):
+def publish(server_dir, server_url, app_ver, keys="default", latest_name=None):
     cmd = [
         "make",
         "suit/publish",
@@ -68,14 +89,17 @@ def publish(server_dir, server_url, app_ver, keys='default', latest_name=None):
 
 
 def wait_for_update(child):
-    return child.expect([r"Fetching firmware \|[█ ]+\|\s+\d+\%",
-                         "Finalizing payload store"],
-                        timeout=UPDATING_TIMEOUT)
+    return child.expect(
+        [r"Fetching firmware \|[█ ]+\|\s+\d+\%", "Finalizing payload store"],
+        timeout=UPDATING_TIMEOUT,
+    )
 
 
 def get_ipv6_addr(child):
-    child.expect_exact('>')
-    child.sendline('ifconfig')
+    child.expect_exact(">")
+    # give the stack some time to make the address non-tentataive
+    time.sleep(2)
+    child.sendline("ifconfig")
     if USE_ETHOS == 0:
         # Get device global address
         child.expect(
@@ -87,10 +111,9 @@ def get_ipv6_addr(child):
         # Get device local address
         child.expect_exact("Link type: wired")
         child.expect(
-            r"inet6 addr: (?P<lladdr>[0-9a-fA-F:]+:[A-Fa-f:0-9]+)"
-            "  scope: link  VAL"
+            r"inet6 addr: (?P<lladdr>[0-9a-fA-F:]+:[A-Fa-f:0-9]+)" "  scope: link  VAL"
         )
-        addr = "{}%{}".format(child.match.group("lladdr").lower(), TAP)
+        addr = "{}%{}".format(child.match.group("lladdr").lower(), IFACE)
     return addr
 
 
@@ -117,44 +140,56 @@ def get_reachable_addr(child):
     # Give some time for the network interface to be configured
     time.sleep(1)
     # Get address
-    client_addr = get_ipv6_addr(child)
+    if BOARD in ["native", "native64"]:
+        iface_addr = get_iface_addr(IFACE)
+        network = IPv6Network(iface_addr, strict=False)
+        client_addr = iface_addr
+        while iface_addr == client_addr:
+            client_addr = IPv6Address(
+                random.randrange(
+                    int(network.network_address) + 1, int(network.broadcast_address) - 1
+                )
+            )
+        child.sendline(f"ifconfig 5 add {client_addr}/{format(network.prefixlen)}")
+        client_addr = format(client_addr)
+    else:
+        client_addr = get_ipv6_addr(child)
     # Verify address is reachable
     ping6(client_addr)
     return "[{}]".format(client_addr)
 
 
-def app_version(child):
+def seq_no(child):
     utils.test_utils_interactive_sync_shell(child, 5, 1)
     # get version of currently running image
-    # "Image Version: 0x00000000"
-    child.sendline('riotboot-hdr')
-    child.expect(r"Image Version: (?P<app_ver>0x[0-9a-fA-F:]+)\r\n")
-    app_ver = int(child.match.group("app_ver"), 16)
+    # "seq_no: 0x00000000"
+    child.sendline("suit seq_no")
+    child.expect(r"seq_no: (?P<seq_no>0x[0-9a-fA-F:]+)\r\n")
+    app_ver = int(child.match.group("seq_no"), 16)
     return app_ver
 
 
 def running_slot(child):
     utils.test_utils_interactive_sync_shell(child, 5, 1)
-    # get version of currently running image
-    # "Image Version: 0x00000000"
-    child.sendline('current-slot')
+
+    child.sendline("current-slot")
     child.expect(r"Running from slot (\d+)\r\n")
     slot = int(child.match.group(1))
     return slot
 
 
 def _test_invalid_version(child, client, app_ver):
-    publish(TMPDIR.name, COAP_HOST, app_ver - 1)
-    notify(COAP_HOST, client, app_ver - 1)
-    child.expect_exact("suit_coap: trigger received")
+    publish(TMPDIR.name, COAP_HOST, app_ver)
+    notify(COAP_HOST, client, app_ver)
+    child.expect_exact(TRIGGER_RECEIVED_MSG)
     child.expect_exact("suit: verifying manifest signature")
     child.expect_exact("seq_nr <= running image")
 
 
 def _test_invalid_signature(child, client, app_ver):
-    publish(TMPDIR.name, COAP_HOST, app_ver + 1, 'invalid_keys')
+    publish(TMPDIR.name, COAP_HOST, app_ver + 1, "invalid_keys")
     notify(COAP_HOST, client, app_ver + 1)
-    child.expect_exact("suit_coap: trigger received")
+    child.expect_exact(TRIGGER_RECEIVED_MSG)
     child.expect_exact("suit: verifying manifest signature")
     child.expect_exact("Unable to validate signature")
 
@@ -164,34 +199,34 @@ def _test_successful_update(child, client, app_ver):
         # Trigger update process, verify it validates manifest correctly
         publish(TMPDIR.name, COAP_HOST, version)
         notify(COAP_HOST, client, version)
-        child.expect_exact("suit_coap: trigger received")
+        child.expect_exact(TRIGGER_RECEIVED_MSG)
         child.expect_exact("suit: verifying manifest signature")
         child.expect(
-            r"riotboot_flashwrite: initializing update to target slot (\d+)\r\n",
+            r"SUIT policy check OK.\r\n",
             timeout=MANIFEST_TIMEOUT,
         )
-        target_slot = int(child.match.group(1))
         # Wait for update to complete
         while wait_for_update(child) == 0:
             pass
+        # Check successful install
+        child.expect_exact("Install correct payload")
 
-        # Wait for reboot
-        child.expect_exact("suit_coap: rebooting...")
-        # Verify running slot
-        current_slot = running_slot(child)
-        assert target_slot == current_slot, "BOOTED FROM SAME SLOT"
-        # Verify client is reachable and get address
-        client = get_reachable_addr(child)
+        # Wait for reboot on non-native BOARDs
+        if BOARD not in ["native", "native64"]:
+            child.expect_exact(REBOOTING_MSG)
+            # Verify client is reachable and get address
+            client = get_reachable_addr(child)
+        assert seq_no(child) == version
 
 
 def _test_suit_command_is_there(child):
-    child.sendline('suit')
-    child.expect_exact("Usage: suit <manifest url>")
+    child.sendline("suit")
+    child.expect_exact("Usage: suit fetch <manifest url>")
 
 
 def testfunc(child):
     # Get current app_ver
-    current_app_ver = app_version(child)
+    current_app_ver = seq_no(child)
     # Verify client is reachable and get address
     client = get_reachable_addr(child)
 

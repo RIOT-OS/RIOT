@@ -212,10 +212,11 @@ extern "C" {
 #ifndef CONFIG_LWM2M_DEVICE_SW_VERSION
 #define CONFIG_LWM2M_DEVICE_SW_VERSION RIOT_VERSION
 #endif
-/** @} */
 
 /**
  * @brief Device binding and queue mode
+ *
+ * @note Select using CONFIG_LWM2M_DEVICE_BINDING_*
  */
 #if defined(CONFIG_LWM2M_DEVICE_BINDING_U)
 #define CONFIG_LWM2M_DEVICE_BINDINGS "U"
@@ -236,5 +237,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-/** @} */
 #endif /* LWM2M_CLIENT_CONFIG_H */
+/** @} */

@@ -86,7 +86,7 @@ applied. Note that if any dependency issue occurs, warnings will be generated
 ## Application configuration with Kconfig                 {#app-config-kconfig}
 To expose application-specific configuration options a `Kconfig` file can
 be placed in the application's folder. For an example of this you can check
-the [tests/kconfig](https://github.com/RIOT-OS/RIOT/tree/master/tests/kconfig)
+the [tests/build_system/kconfig](https://github.com/RIOT-OS/RIOT/tree/master/tests/build_system/kconfig)
 application.
 
 ## Configuration via environment variables                {#env-config-kconfig}
@@ -108,7 +108,7 @@ please set the configuration via `.config` files.
 
 ## A note on the usage of CFLAGS
 When a certain module is being configured via Kconfig the configuration macro
-will not longer be overridable by means of CFLAGS (e.g. set on the
+will no longer be overridable by means of CFLAGS (e.g. set on the
 compilation command or on a Makefile). Consider this if you are getting a
 'redefined warning'.
 
@@ -315,14 +315,14 @@ CPU family or vendor, it should be placed in the correspondent Kconfig file
 the Kconfig file of that module.
 
 #### Example
-The feature `arduino` is placed in `/kconfigs/Kconfig.features` and modelled
+The feature `arduino_pins` is placed in `/kconfigs/Kconfig.features` and modelled
 like:
 
 ```Kconfig
-config HAS_ARDUINO
+config HAS_ARDUINO_PINS
     bool
     help
-        Indicates that Arduino pins compatibility is supported.
+        Indicates that Arduino digital pins mappings are provided.
 ```
 
 ### CPUs

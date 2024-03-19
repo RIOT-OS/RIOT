@@ -20,13 +20,13 @@ ifneq (llvm,$(TOOLCHAIN))
   endif
 endif
 
-CFLAGS_LINK  = -ffunction-sections -fdata-sections -fno-builtin -fshort-enums
+CFLAGS_LINK  = -ffunction-sections -fdata-sections -fshort-enums
 CFLAGS_DBG  ?= -ggdb -g3
 CFLAGS_OPT  ?= -Os
 
 CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
 
-ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
+ASFLAGS += $(CFLAGS_CPU)
 LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts -L$(RIOTCPU)/cortexm_common/ldscripts
 LINKER_SCRIPT ?= $(CPU_MODEL).ld
 LINKFLAGS += -T$(LINKER_SCRIPT) -Wl,--fatal-warnings
@@ -63,7 +63,7 @@ CFLAGS += -DCPU_CORE_$(call uppercase_and_underscore,$(CPU_CORE))
 
 # Add soft or hard FPU CFLAGS depending on the module
 ifneq (,$(filter cortexm_fpu,$(USEMODULE)))
-  ifeq ($(CPU_CORE),cortex-m7)
+  ifneq (,$(filter $(CPU_CORE),cortex-m33 cortex-m7))
     CFLAGS_FPU ?= -mfloat-abi=hard -mfpu=fpv5-sp-d16
   else
     CFLAGS_FPU ?= -mfloat-abi=hard -mfpu=fpv4-sp-d16

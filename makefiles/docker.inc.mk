@@ -1,4 +1,4 @@
-export DOCKER_IMAGE ?= riot/riotbuild:latest
+export DOCKER_IMAGE ?= docker.io/riot/riotbuild:latest
 export DOCKER_BUILD_ROOT ?= /data/riotbuild
 DOCKER_RIOTBASE ?= $(DOCKER_BUILD_ROOT)/riotbase
 # List of Docker-enabled make goals
@@ -24,6 +24,7 @@ export DOCKER_MAKECMDGOALS ?= all
 # List of all exported environment variables that shall be passed on to the
 # Docker container, they will only be passed if they are set from the
 # environment, not if they are only default Makefile values.
+DOCKER_RIOT_CONFIG_VARIABLES := $(filter RIOT_CONFIG_%,$(.VARIABLES))
 export DOCKER_ENV_VARS += \
   APPDIR \
   AR \
@@ -44,9 +45,10 @@ export DOCKER_ENV_VARS += \
   CXX \
   CXXEXFLAGS \
   CXXUWFLAGS \
+  $(DOCKER_RIOT_CONFIG_VARIABLES) \
   ELFFILE \
-  HEXFILE \
   FLASHFILE \
+  HEXFILE \
   IOTLAB_NODE \
   LINK \
   LINKFLAGPREFIX \
@@ -55,21 +57,36 @@ export DOCKER_ENV_VARS += \
   OBJCOPY \
   OFLAGS \
   PARTICLE_MONOFIRMWARE \
-  PREFIX \
-  QUIET \
-  WERROR \
   PICOLIBC \
+  PREFIX \
   PROGRAMMER \
+  QUIET \
   RIOT_CI_BUILD \
   RIOT_VERSION \
   RIOT_VERSION_CODE \
   SCANBUILD_ARGS \
   SCANBUILD_OUTPUTDIR \
   SIZE \
-  TOOLCHAIN \
   TEST_KCONFIG \
+  TOOLCHAIN \
   UNDEF \
+  WERROR \
   #
+
+# List of all exported environment variables that shall be passed on to the
+# Docker container since they might have been set through the command line
+# and environment.
+# Their origin cannot be checked since they are often redefined or overriden
+# in Makefile/Makefile.include, etc. and their origin is changed to file
+export DOCKER_ENV_VARS_ALWAYS += \
+  DISABLE_MODULE \
+  DEFAULT_MODULE \
+  FEATURES_REQUIRED \
+  FEATURES_BLACKLIST \
+  FEATURES_OPTIONAL \
+  USEMODULE \
+  USEPKG \
+ #
 
 # Find which variables were set using the command line or the environment and
 # pass those to Docker.
@@ -82,6 +99,14 @@ DOCKER_ENVIRONMENT_CMDLINE_AUTO := $(foreach varname,$(DOCKER_ENV_VARS), \
   ))
 DOCKER_ENVIRONMENT_CMDLINE += $(strip $(DOCKER_ENVIRONMENT_CMDLINE_AUTO))
 
+# Pass variables potentially set through command line or environment
+# DOCKER_ENVIRONMENT_CMDLINE_ALWAYS is immediately assigned since this only wants
+# to capture variables set via the environment or command line. This will still
+# include variables set with '=' or '+=' in the application Makefile since these
+# are included before evaluating DOCKER_ENVIRONMENT_CMDLINE_ALWAYS
+DOCKER_ENVIRONMENT_CMDLINE_ALWAYS := $(foreach varname,$(DOCKER_ENV_VARS_ALWAYS), \
+  -e '$(varname)=$(subst ','\'',$(sort $($(varname))))')
+DOCKER_ENVIRONMENT_CMDLINE += $(strip $(DOCKER_ENVIRONMENT_CMDLINE_ALWAYS))
 
 # The variables set on the command line will also be passed on the command line
 # in Docker
@@ -93,13 +118,15 @@ DOCKER_OVERRIDE_CMDLINE += $(strip $(DOCKER_OVERRIDE_CMDLINE_AUTO))
 
 # Overwrite if you want to use `docker` with sudo
 DOCKER ?= docker
+_docker_is_podman = $(shell $(DOCKER) --version | grep podman 2>/dev/null)
 
 # Set default run flags:
 # - allocate a pseudo-tty
 # - remove container on exit
 # - set username/UID to executor
 DOCKER_USER ?= $$(id -u)
-DOCKER_RUN_FLAGS ?= --rm --tty --user $(DOCKER_USER)
+DOCKER_USER_OPT = $(if $(_docker_is_podman),--userns keep-id,--user $(DOCKER_USER))
+DOCKER_RUN_FLAGS ?= --rm --tty $(DOCKER_USER_OPT)
 
 # allow setting make args from command line like '-j'
 DOCKER_MAKE_ARGS ?=

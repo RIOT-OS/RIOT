@@ -23,6 +23,7 @@
 #define USB_H_USER_IS_RIOT_INTERNAL
 
 #include "kernel_defines.h"
+#include "periph_conf.h"
 #include "periph_cpu.h"
 
 #ifdef MODULE_PERIPH_INIT
@@ -53,15 +54,21 @@
 #ifdef MODULE_PERIPH_INIT_VBAT
 #include "periph/vbat.h"
 #endif
+#ifdef MODULE_PERIPH_INIT_PIO
+#include "periph/pio.h"
+#endif
+#ifdef MODULE_PERIPH_INIT_SDMMC
+#include "sdmmc/sdmmc.h"
+#endif
 #endif /* MODULE_PERIPH_INIT */
 
 void periph_init(void)
 {
 #ifdef MODULE_PERIPH_INIT
-    /* initialize leds */
-    if (IS_USED(MODULE_PERIPH_INIT_LEDS)) {
-        extern void led_init(void);
-        led_init();
+    /* initialize buttonss */
+    if (IS_USED(MODULE_PERIPH_INIT_BUTTONS)) {
+        extern void button_init(void);
+        button_init();
     }
     /* initialize configured I2C devices */
 #ifdef MODULE_PERIPH_INIT_I2C
@@ -102,14 +109,42 @@ void periph_init(void)
 
 #if defined(MODULE_PERIPH_INIT_WDT) && WDT_HAS_INIT
     wdt_init();
+
+    if (IS_ACTIVE(MODULE_PERIPH_WDT_AUTO_START)) {
+        wdt_setup_reboot(CONFIG_PERIPH_WDT_WIN_MIN_MS, CONFIG_PERIPH_WDT_WIN_MAX_MS);
+        wdt_start();
+    }
 #endif
 
 #if defined(MODULE_PERIPH_INIT_PTP)
     ptp_init();
 #endif
 
+#if defined(MODULE_PERIPH_INIT_FMC)
+    extern void fmc_init(void);
+    fmc_init();
+#endif
+
 #if defined(MODULE_PERIPH_INIT_VBAT)
     vbat_init();
+#endif
+
+#ifdef MODULE_PERIPH_INIT_PIO
+    for (int i = 0; i < (int)PIO_NUMOF; i++) {
+        pio_init(PIO_DEV(i));
+    }
+#if defined(MODULE_PERIPH_INIT_I2C) && defined(PIO_I2C_NUMOF)
+    for (unsigned i = 0; i < PIO_I2C_NUMOF; i++) {
+        i2c_init(I2C_DEV(I2C_NUMOF + i));
+    }
+#endif
+    pio_start_programs();
+#endif
+
+#if defined(MODULE_PERIPH_INIT_SDMMC)
+    for (unsigned i = 0; i < SDMMC_NUMOF; i++) {
+        sdmmc_init(sdmmc_get_dev(i));
+    }
 #endif
 
 #endif /* MODULE_PERIPH_INIT */

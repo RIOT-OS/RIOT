@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2022 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -22,22 +22,25 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "periph/cpuid.h"
-#include "soc/efuse_reg.h"
+#include "periph_cpu.h"
+#include "esp_mac.h"
+
+/*
+ * ESP32x SoCs don't have a real chip id. The factory-programmed default MAC
+ * address from EFUSE is used instead.
+ */
 
 void cpuid_get(void *id)
 {
-    /* since ESP32 has two cores, the default MAC address is used as CPU id */
-    uint32_t rdata1 = REG_READ(EFUSE_BLK0_RDATA1_REG);
-    uint32_t rdata2 = REG_READ(EFUSE_BLK0_RDATA2_REG);
+#if defined(CPU_FAM_ESP32H2) && defined(CONFIG_IEEE802154_ENABLED)
+    /* ESP32H2 has IEEE802.15.4 radio which has an EUI64 address. Function
+     * esp_efuse_mac_get_default will return this 8 byte address if
+     * CONFIG_IEEE802154_ENABLED */
+    _Static_assert(CPUID_LEN == 8,
+                  "CPUID_LEN hast to be 8 if IEEE 802.15.4 interface enabled");
+#else
+    _Static_assert(CPUID_LEN == 6, "CPU_ID_LEN hast to be 6");
+#endif
 
-    uint8_t *tmp = id;
-
-    tmp[0] = rdata2 >> 16;
-    tmp[1] = rdata2 >> 8;
-    tmp[2] = rdata2;
-    tmp[3] = rdata1 >> 24;
-    tmp[4] = rdata1 >> 16;
-    tmp[5] = rdata1 >> 8;
-    tmp[6] = rdata1;
+    esp_efuse_mac_get_default(id);
 }

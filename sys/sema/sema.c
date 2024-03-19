@@ -22,10 +22,6 @@
 #include "assert.h"
 #include "sema.h"
 
-#if IS_USED(MODULE_XTIMER)
-#include "xtimer.h"
-#endif
-
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
@@ -49,8 +45,8 @@ void sema_destroy(sema_t *sema)
     mutex_unlock(&sema->mutex);
 }
 
-#if IS_USED(MODULE_XTIMER)
-int _sema_wait_xtimer(sema_t *sema, int block, uint64_t us)
+#if IS_USED(MODULE_SEMA_DEPRECATED)
+int _sema_wait_ztimer64(sema_t *sema, int block, ztimer64_clock_t *clock, uint64_t us)
 {
     assert(sema != NULL);
 
@@ -66,9 +62,9 @@ int _sema_wait_xtimer(sema_t *sema, int block, uint64_t us)
             mutex_lock(&sema->mutex);
         }
         else {
-            uint64_t start = xtimer_now_usec64();
-            block = !xtimer_mutex_lock_timeout(&sema->mutex, us);
-            uint64_t elapsed = xtimer_now_usec64() - start;
+            uint64_t start = ztimer64_now(clock);
+            block = !ztimer64_mutex_lock_timeout(clock, &sema->mutex, us);
+            uint64_t elapsed = ztimer64_now(clock) - start;
 
             if (elapsed < us) {
                 us -= elapsed;
@@ -103,7 +99,6 @@ int _sema_wait_xtimer(sema_t *sema, int block, uint64_t us)
 }
 #endif
 
-#if IS_USED(MODULE_ZTIMER)
 int _sema_wait_ztimer(sema_t *sema, int block,
                       ztimer_clock_t *clock, uint32_t timeout)
 {
@@ -156,7 +151,6 @@ int _sema_wait_ztimer(sema_t *sema, int block,
 
     return 0;
 }
-#endif
 
 int sema_post(sema_t *sema)
 {

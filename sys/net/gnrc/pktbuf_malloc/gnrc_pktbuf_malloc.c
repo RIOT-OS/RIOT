@@ -118,9 +118,9 @@ static gnrc_pktsnip_t *_mark(gnrc_pktsnip_t *pkt, size_t size, gnrc_nettype_t ty
     void *header_data, *payload;
 
     if ((size == 0) || (pkt == NULL) || (size > pkt->size) || (pkt->data == NULL)) {
-        DEBUG("pktbuf: size == 0 (was %u) or pkt == NULL (was %p) or "
-              "size > pkt->size (was %u) or pkt->data == NULL (was %p)\n",
-              (unsigned)size, (void *)pkt, (pkt ? (unsigned)pkt->size : 0),
+        DEBUG("pktbuf: size == 0 (was %" PRIuSIZE ") or pkt == NULL (was %p) or "
+              "size > pkt->size (was %" PRIuSIZE ") or pkt->data == NULL (was %p)\n",
+              size, (void *)pkt, (pkt ? pkt->size : 0),
               (pkt ? pkt->data : NULL));
         return NULL;
     }
@@ -286,6 +286,14 @@ void gnrc_pktbuf_free_internal(void *data, size_t size)
 {
     (void)size;
     _free(data);
+}
+
+bool gnrc_pktbuf_contains(void *ptr)
+{
+    (void)ptr;
+    /* tracking the memory areas malloced is to expensive, so this function
+     * only is useful with gnrc_pktbuf_static */
+    return true;
 }
 
 /** @} */

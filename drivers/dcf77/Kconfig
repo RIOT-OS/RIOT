@@ -13,3 +13,8 @@ config MODULE_DCF77
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_GPIO_IRQ
     select MODULE_XTIMER
+
+config HAVE_DCF77
+    bool
+    help
+        Indicates that a dcf77 long wave receiver is present.

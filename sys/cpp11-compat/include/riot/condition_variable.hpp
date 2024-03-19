@@ -25,7 +25,7 @@
 #define RIOT_CONDITION_VARIABLE_HPP
 
 #include "sched.h"
-#include "xtimer.h"
+#include "ztimer64.h"
 #include "priority_queue.h"
 
 #include "riot/mutex.hpp"
@@ -171,20 +171,18 @@ cv_status condition_variable::wait_for(unique_lock<mutex>& lock,
   if (timeout_duration <= timeout_duration.zero()) {
     return cv_status::timeout;
   }
-  timex_t timeout, before, after;
-  auto s = duration_cast<seconds>(timeout_duration);
-  timeout.seconds = s.count();
-  timeout.microseconds
-    = (duration_cast<microseconds>(timeout_duration - s)).count();
-  xtimer_now_timex(&before);
-  xtimer_t timer;
-  xtimer_set_wakeup(&timer, timex_uint64(timeout), thread_getpid());
+  uint64_t timeout, before, after;
+  timeout = (duration_cast<microseconds>(timeout_duration)).count();
+  before = ztimer64_now(ZTIMER64_USEC);
+  ztimer64_t timer;
+  ztimer64_set_wakeup(ZTIMER64_USEC, &timer, timeout, thread_getpid());
   wait(lock);
-  xtimer_now_timex(&after);
-  xtimer_remove(&timer);
-  auto passed = timex_sub(after, before);
-  auto cmp = timex_cmp(passed, timeout);
-  return cmp < 1 ? cv_status::no_timeout : cv_status::timeout;
+  after = ztimer64_now(ZTIMER64_USEC);
+  ztimer64_remove(ZTIMER64_USEC, &timer);
+  if (after - before >= timeout) {
+    return cv_status::timeout;
+  }
+  return cv_status::no_timeout;
 }
 
 template <class Rep, class Period, class Predicate>

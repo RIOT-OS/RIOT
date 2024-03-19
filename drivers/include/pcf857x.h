@@ -36,7 +36,7 @@
  * used pseudomodules. For example, to use a PCF8574A and a PCF8575 I/O
  * expander in one application, the make command would be:
  *
- *      USEMODULE="pcf8574a pcf8575" make -C tests/driver_pcf857x BOARD=...
+ *      USEMODULE="pcf8574a pcf8575" make -C tests/drivers/pcf857x BOARD=...
  *
  * At least one PCF857X I2C I/O expander variant has to be specified. The
  * driver module `pcf857x` is then enabled implicitly.
@@ -156,7 +156,7 @@
  * configuration parameter file or at the command line, for example:
  *
  *      CFLAGS="-DPCF857X_PARAM_INT_PIN=\(GPIO_PIN\(0,6\)\)" \
- *      USEMODULE="pcf8575 pcf857x_irq_medium" make -C tests/driver_pcf857x BOARD=...
+ *      USEMODULE="pcf8575 pcf857x_irq_medium" make -C tests/drivers/pcf857x BOARD=...
  *
  * <br>
  * @note If an output of the expander is connected to an input of the same
@@ -195,7 +195,7 @@
  * @note Module `saul_gpio` has to be added to the
  * project to enable SAUL capabilities of the PCF857X driver, e.g.:
  *
- *      USEMODULE="pcf8575 saul_gpio" make -C tests/saul BOARD=...
+ *      USEMODULE="pcf8575 saul_gpio" make -C tests/drivers/saul BOARD=...
  *
  * ## Using Multiple Devices
  *
@@ -205,7 +205,7 @@
  * used pseudomodules. For example, to use a PCF8574A and a PCF8575 I/O
  * expander in one application, the make command would be:
  *
- *      USEMODULE="pcf8574a pcf8575" make -C tests/driver_pcf857x BOARD=...
+ *      USEMODULE="pcf8574a pcf8575" make -C tests/drivers/pcf857x BOARD=...
  *
  * Furthermore, used devices have to be configured by defining the
  * configuration parameter set `pcf857x_params` of type #pcf857x_params_t.
@@ -221,13 +221,13 @@
  *              .dev = I2C_DEV(0),
  *              .addr = 0,
  *              .exp = PCF857X_EXP_PCF8574A,
- *              .int_pin = GPIO_PIN(0,1),
+ *              .int_pin = GPIO_PIN(0, 1),
  *          },
  *          {
  *              .dev = I2C_DEV(0),
  *              .addr = 0,
  *              .exp = PCF857X_EXP_PCF8575,
- *              .int_pin = GPIO_PIN(0,2),
+ *              .int_pin = GPIO_PIN(0, 2),
  *          },
  *      };
  *
@@ -245,10 +245,10 @@ extern "C"
 {
 #endif
 
+#include <errno.h>
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "kernel_defines.h"
 #include "periph/gpio.h"
 #include "periph/i2c.h"
 
@@ -260,10 +260,6 @@ extern "C"
 #include "event.h"
 #endif /* MODULE_PCF857X_IRQ */
 
-#if !IS_USED(MODULE_PCF8574) && !IS_USED(MODULE_PCF8574A) && !IS_USED(MODULE_PCF8575)
-#error "Please provide a list of pcf857x variants used by the application (pcf8574, pcf8574a or pcf8575)"
-#endif
-
 /**
  * @name    PCF857X I2C slave addresses
  *
@@ -272,15 +268,21 @@ extern "C"
  * of 0 to 7.
  * @{
  */
+#ifndef PCF8575_BASE_ADDR
 #define PCF8575_BASE_ADDR   (0x20)  /**< PCF8575 I2C slave base address.
                                          Addresses are then in range from
                                          0x20 to 0x27 */
+#endif
+#ifndef PCF8574_BASE_ADDR
 #define PCF8574_BASE_ADDR   (0x20)  /**< PCF8574 I2C slave base address.
                                          Addresses are then in range from
                                          0x20 to 0x27 */
+#endif
+#ifndef PCF8574A_BASE_ADDR
 #define PCF8574A_BASE_ADDR  (0x38)  /**< PCF8574A I2C slave base address.
                                          Addresses are then in range from
                                          0x38 to 0x3f */
+#endif
 /** @} */
 
 /**
@@ -324,14 +326,18 @@ typedef uint8_t pcf857x_data_t;     /**< type that can mask all expander pins */
 #endif /* MODULE_PCF8575 || DOXYGEN */
 /** @} */
 
-/** Definition of PCF857X driver error codes */
+/**
+ * @brief       Definition of PCF857X driver error codes
+ *
+ * @deprecated  These are aliases for errno error codes now, use them directly
+ */
 typedef enum {
-    PCF857X_OK,                 /**< success */
-    PCF857X_ERROR_I2C,          /**< I2C communication error */
-    PCF857X_ERROR_INV_EXP,      /**< invalid expander variant */
-    PCF857X_ERROR_INV_MODE,     /**< invalid pin mode */
-    PCF857X_ERROR_INV_FLANK,    /**< invalid interrupt flank */
-    PCF857X_ERROR_INT_PIN,      /**< interrupt pin initialization failed */
+    PCF857X_OK              = 0,        /**< success */
+    PCF857X_ERROR_I2C       = ENXIO,    /**< I2C communication error */
+    PCF857X_ERROR_INV_EXP   = ENOTSUP,  /**< invalid expander variant */
+    PCF857X_ERROR_INV_MODE  = EINVAL,   /**< invalid pin mode */
+    PCF857X_ERROR_INV_FLANK = EINVAL,   /**< invalid interrupt flank */
+    PCF857X_ERROR_INT_PIN   = ENOSYS,   /**< interrupt pin initialization failed */
 } pcf857x_error_codes_t;
 
 /**
@@ -451,9 +457,8 @@ typedef struct {
  *      has to be defined by the default configuration parameter
  *      #PCF857X_PARAM_INT_PIN (pcf857x_params_t::int_pin).
  *
- * @retval  PCF857X_OK      on success
- * @retval  PCF857X_ERROR_* a negative error code on error,
- *                           see #pcf857x_error_codes_t
+ * @retval  0                   on success
+ * @retval  <0                  a negative errno error code on error
  */
 int pcf857x_init(pcf857x_t *dev, const pcf857x_params_t *params);
 
@@ -470,13 +475,12 @@ int pcf857x_init(pcf857x_t *dev, const pcf857x_params_t *params);
  *   the driver physically supports only the modes #GPIO_IN_PU and
  *   #GPIO_OD_PU. The other logically identical modes #GPIO_IN, #GPIO_OUT
  *   and #GPIO_OD are emulated. For the #GPIO_IN_PU mode the function returns
- *   with #PCF857X_ERROR_INV_MODE.
+ *   with `-EINVAL`.
  * - After initialization in #GPIO_OUT mode the pin is actively driven LOW,
  *   after initialization in all other modes the pin is pulled-up to HIGH.
  *
- * @retval  PCF857X_OK          on success
- * @retval  PCF857X_ERROR_*     a negative error code on error,
- *                              see #pcf857x_error_codes_t
+ * @retval  0                   on success
+ * @retval  <0                  a negative errno error code on error
  */
 int pcf857x_gpio_init(pcf857x_t *dev, gpio_t pin, gpio_mode_t mode);
 
@@ -502,7 +506,7 @@ int pcf857x_gpio_init(pcf857x_t *dev, gpio_t pin, gpio_mode_t mode);
  *   the driver physically supports only the modes #GPIO_IN_PU and
  *   #GPIO_OD_PU. The other logically identical modes #GPIO_IN, #GPIO_OUT
  *   and #GPIO_OD are emulated. For the #GPIO_IN_PU mode the function returns
- *   with #PCF857X_ERROR_INV_MODE.
+ *   with `-EINVAL`.
  * - After initialization in #GPIO_OUT mode the pin is actively driven LOW,
  *   after initialization in all other modes the pin is pulled-up to HIGH.
  *
@@ -513,9 +517,8 @@ int pcf857x_gpio_init(pcf857x_t *dev, gpio_t pin, gpio_mode_t mode);
  * @param[in]   isr     ISR that is called back from interrupt context
  * @param[in]   arg     optional argument passed to the callback
  *
- * @retval  PCF857X_OK          on success
- * @retval  PCF857X_ERROR_*     a negative error code on error,
- *                              see #pcf857x_error_codes_t
+ * @retval  0                   on success
+ * @retval  <0                  a negative errno error code on error
  */
 int pcf857x_gpio_init_int(pcf857x_t *dev, gpio_t pin,
                                           gpio_mode_t mode,

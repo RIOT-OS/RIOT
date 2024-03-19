@@ -19,19 +19,30 @@
  * @}
  */
 
+/* RIOT headers have to be included before ESP-IDF headers! */
 #include "cpu.h"
-#include "esp_attr.h"
 #include "esp/common_macros.h"
 #include "esp_common.h"
-#include "esp_sleep.h"
 #include "irq_arch.h"
 #include "log.h"
 #include "periph/rtt.h"
 #include "rtt_arch.h"
-#include "soc/dport_reg.h"
-#include "soc/rtc_cntl_struct.h"
 #include "syscalls.h"
 #include "timex.h"
+
+/* ESP-IDF headers */
+#include "esp_attr.h"
+#include "esp_sleep.h"
+#include "hal/interrupt_controller_types.h"
+#include "hal/interrupt_controller_ll.h"
+#include "rom/ets_sys.h"
+#include "soc/periph_defs.h"
+#include "soc/rtc_cntl_struct.h"
+
+#if __xtensa__
+#include "soc/dport_reg.h"
+#include "xtensa/xtensa_api.h"
+#endif
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -69,30 +80,37 @@ static void _rtc_init(void)
 static void _rtc_poweron(void)
 {
     /* route all interrupt sources to the same RTT level type interrupt */
-    intr_matrix_set(PRO_CPU_NUM, ETS_RTC_CORE_INTR_SOURCE, CPU_INUM_RTC);
+    intr_matrix_set(PRO_CPU_NUM, ETS_RTC_CORE_INTR_SOURCE, CPU_INUM_RTT);
 
     /* set interrupt handler and enable the CPU interrupt */
-    xt_set_interrupt_handler(CPU_INUM_RTC, _rtc_isr, NULL);
-    xt_ints_on(BIT(CPU_INUM_RTC));
+    intr_cntrl_ll_set_int_handler(CPU_INUM_RTT, _rtc_isr, NULL);
+    intr_cntrl_ll_enable_interrupts(BIT(CPU_INUM_RTT));
 }
 
 static void _rtc_poweroff(void)
 {
     /* reset interrupt handler and disable the CPU interrupt */
-    xt_ints_off(BIT(CPU_INUM_RTC));
-    xt_set_interrupt_handler(CPU_INUM_RTC, NULL, NULL);
+    intr_cntrl_ll_disable_interrupts(BIT(CPU_INUM_RTT));
+    intr_cntrl_ll_set_int_handler(CPU_INUM_RTT, NULL, NULL);
 }
 
 uint64_t _rtc_get_counter(void)
 {
     /* trigger timer register update */
     RTCCNTL.time_update.update = 1;
+#if defined(CPU_FAM_ESP32)
     /* wait until values in registers are valid */
     while (!RTCCNTL.time_update.valid) {
         ets_delay_us(1);
     }
     /* read the time from 48-bit counter and return */
     return (((uint64_t)RTCCNTL.time1.val) << 32) + RTCCNTL.time0;
+#elif defined(CPU_FAM_ESP32C3) || defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3)
+    /* read the time from 48-bit counter and return */
+    return (((uint64_t)RTCCNTL.time_high0.val) << 32) + RTCCNTL.time_low0;
+#else
+#error "MCU implementation is missing"
+#endif
 }
 
 static void _rtc_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
@@ -104,8 +122,9 @@ static void _rtc_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
     /* use computed time difference directly to set the RTC counter alarm */
     uint64_t rtc_alarm = (rtc_counter + rtt_diff) & RTT_HW_COUNTER_MAX;
 
-    DEBUG("%s alarm=%u rtt_diff=%u rtc_alarm=%llu @rtc=%llu\n",
-    __func__, alarm, rtt_diff, rtc_alarm, rtc_counter);
+    DEBUG("%s alarm=%" PRIu32 " rtt_diff=%" PRIu32
+          " rtc_alarm=%" PRIu64 " @rtc=%" PRIu64 "\n",
+          __func__, alarm, rtt_diff, rtc_alarm, rtc_counter);
 
     /* save the alarm configuration for interrupt handling */
     _rtc_alarm.alarm_set = alarm;
@@ -117,7 +136,7 @@ static void _rtc_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
     RTCCNTL.slp_timer1.slp_val_hi = rtc_alarm >> 32;
 
     DEBUG("%s %08x%08x \n", __func__,
-          RTCCNTL.slp_timer1.slp_val_hi, RTCCNTL.slp_timer0);
+          (unsigned)RTCCNTL.slp_timer1.slp_val_hi, (unsigned)RTCCNTL.slp_timer0);
 
     /* enable RTC timer alarm */
     RTCCNTL.slp_timer1.main_timer_alarm_en = 1;
@@ -163,10 +182,10 @@ static void IRAM _rtc_isr(void *arg)
     /* save the lower 32 bit of the current counter value */
     uint32_t counter = _rtc_get_counter();
 
-    DEBUG("%s %u\n", __func__, counter);
+    DEBUG("%s %" PRIu32 "\n", __func__, counter);
 
     if (_rtc_alarm.alarm_cb) {
-        DEBUG("%s alarm %u\n", __func__, counter);
+        DEBUG("%s alarm %" PRIu32 "\n", __func__, counter);
 
         rtt_cb_t alarm_cb = _rtc_alarm.alarm_cb;
         void *alarm_arg = _rtc_alarm.alarm_arg;

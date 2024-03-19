@@ -115,10 +115,6 @@ static const uart_conf_t uart_config[] = {
         .dev      = &SERCOM2->USART,
         .rx_pin   = GPIO_PIN(PB, 24),
         .tx_pin   = GPIO_PIN(PB, 25),
-#ifdef MODULE_PERIPH_UART_HW_FC
-        .rts_pin  = GPIO_UNDEF,
-        .cts_pin  = GPIO_UNDEF,
-#endif
         .mux      = GPIO_MUX_D,
         .rx_pad   = UART_PAD_RX_1,
         .tx_pad   = UART_PAD_TX_0,
@@ -130,12 +126,16 @@ static const uart_conf_t uart_config[] = {
         .rx_pin   = GPIO_PIN(PA, 5),
         .tx_pin   = GPIO_PIN(PA, 4),
 #ifdef MODULE_PERIPH_UART_HW_FC
-        .rts_pin  = GPIO_UNDEF,
-        .cts_pin  = GPIO_UNDEF,
+        .rts_pin  = GPIO_PIN(PA, 6),
+        .cts_pin  = GPIO_PIN(PA, 7),
 #endif
         .mux      = GPIO_MUX_D,
         .rx_pad   = UART_PAD_RX_1,
+#ifdef MODULE_PERIPH_UART_HW_FC
+        .tx_pad   = UART_PAD_TX_0_RTS_2_CTS_3,
+#else
         .tx_pad   = UART_PAD_TX_0,
+#endif
         .flags    = UART_FLAG_NONE,
         .gclk_src = SAM0_GCLK_PERIPH,
     },
@@ -143,10 +143,6 @@ static const uart_conf_t uart_config[] = {
         .dev      = &SERCOM5->USART,
         .rx_pin   = GPIO_PIN(PB, 17),
         .tx_pin   = GPIO_PIN(PB, 16),
-#ifdef MODULE_PERIPH_UART_HW_FC
-        .rts_pin  = GPIO_UNDEF,
-        .cts_pin  = GPIO_UNDEF,
-#endif
         .mux      = GPIO_MUX_C,
         .rx_pad   = UART_PAD_RX_1,
         .tx_pad   = UART_PAD_TX_0,
@@ -157,10 +153,6 @@ static const uart_conf_t uart_config[] = {
         .dev      = &SERCOM1->USART,
         .rx_pin   = GPIO_PIN(PC, 23),
         .tx_pin   = GPIO_PIN(PC, 22),
-#ifdef MODULE_PERIPH_UART_HW_FC
-        .rts_pin  = GPIO_UNDEF,
-        .cts_pin  = GPIO_UNDEF,
-#endif
         .mux      = GPIO_MUX_C,
         .rx_pad   = UART_PAD_RX_1,
         .tx_pad   = UART_PAD_TX_0,
@@ -189,25 +181,25 @@ static const uart_conf_t uart_config[] = {
  * @name PWM configuration
  * @{
  */
-#define PWM_0_EN            1
 
-#if PWM_0_EN
 /* PWM0 channels */
 static const pwm_conf_chan_t pwm_chan0_config[] = {
     /* GPIO pin, MUX value, TCC channel */
-    { GPIO_PIN(PC, 18), GPIO_MUX_F, 2 },
+    {
+        .pin  = GPIO_PIN(PC, 18),
+        .mux  = GPIO_MUX_F,
+        .chan = 2
+    },
 };
-#endif
 
 /* PWM device configuration */
 static const pwm_conf_t pwm_config[] = {
-#if PWM_0_EN
-    { .tim  = TCC_CONFIG(TCC0),
-      .chan = pwm_chan0_config,
-      .chan_numof = ARRAY_SIZE(pwm_chan0_config),
-      .gclk_src = SAM0_GCLK_48MHZ,
+    {
+        .tim  = TCC_CONFIG(TCC0),
+        .chan = pwm_chan0_config,
+        .chan_numof = ARRAY_SIZE(pwm_chan0_config),
+        .gclk_src = SAM0_GCLK_48MHZ,
     },
-#endif
 };
 
 /* number of devices that are actually defined */
@@ -337,13 +329,12 @@ static const sam0_common_usb_config_t sam_usbdev_config[] = {
 
 #define ADC_NEG_INPUT                       ADC_INPUTCTRL_MUXNEG(0x18u)
 #define ADC_REF_DEFAULT                     ADC_REFCTRL_REFSEL_INTVCC1
-#define ADC_DEV                             ADC0
 
 static const adc_conf_chan_t adc_channels[] = {
-    /* port, pin, muxpos */
-    {GPIO_PIN(PA, 3), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN1)},
-    {GPIO_PIN(PA, 5), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN5)},
-    {GPIO_PIN(PA, 7), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN7)}
+    /* port, pin, muxpos, dev */
+    { .inputctrl = ADC0_INPUTCTRL_MUXPOS_PA03, .dev = ADC0 },
+    { .inputctrl = ADC0_INPUTCTRL_MUXPOS_PA05, .dev = ADC0 },
+    { .inputctrl = ADC0_INPUTCTRL_MUXPOS_PA07, .dev = ADC0 }
 };
 
 #define ADC_NUMOF                           ARRAY_SIZE(adc_channels)
@@ -359,6 +350,29 @@ static const adc_conf_chan_t adc_channels[] = {
                             /* (You have to manually connect PA03 with Vcc) */
                             /* Internal reference only gives 1V */
 #define DAC_VREF            DAC_CTRLB_REFSEL_VREFPU
+/** @} */
+
+/**
+ * @name SDHC configuration
+ *
+ *       This is entirely optional, but allows us to save a few bytes if only
+ *       a single SDHC instance is used.
+ * @{
+ */
+#define SDHC_DEV            SDHC1       /**< The SDHC instance to use */
+#define SDHC_DEV_ISR        isr_sdhc1   /**< Interrupt service routing for SDHC1 */
+
+/** SDHC devices */
+static const sdhc_conf_t sdhc_config[] = {
+    {
+        .sdhc = SDHC1,
+        .cd = GPIO_PIN(PD, 20),
+        .wp = GPIO_UNDEF,
+    },
+};
+
+/** Number of configured SDHC devices */
+#define SDHC_CONFIG_NUMOF  1
 /** @} */
 
 /**
@@ -382,6 +396,19 @@ static const sam0_common_gmac_config_t sam_gmac_config[] = {
         .int_pin = GPIO_PIN(PD, 12),
     }
 };
+/** @} */
+
+/**
+ * @name FREQM peripheral configuration
+ * @{
+ */
+static const freqm_config_t freqm_config[] = {
+    {
+        .pin = GPIO_PIN(PB, 17),
+        .gclk_src = SAM0_GCLK_32KHZ
+    }
+};
+/** @} */
 
 #ifdef __cplusplus
 }

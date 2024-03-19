@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <avr/io.h>
 
+#include "kernel_init.h"
 #include "stdio_uart.h"
 
 static int _uart_putchar(char c, FILE *stream);
@@ -45,7 +46,7 @@ static int _uart_getchar(FILE *stream)
 
 void avr8_stdio_init(void)
 {
-    stdio_init();
+    early_init();
 
     stdout = &_uart_stdout;
     stdin = &_uart_stdin;

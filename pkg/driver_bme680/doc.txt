@@ -3,4 +3,6 @@
  * @ingroup  pkg
  * @brief    Provides the Bosch Sensortec's BME680 gas sensor API
  * @see      https://github.com/BoschSensortec/BME680_driver
+ *
+ * @include pkg/driver_bme680/README.md
  */

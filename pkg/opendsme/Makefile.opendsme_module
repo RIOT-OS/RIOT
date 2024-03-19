@@ -1,0 +1,9 @@
+MODULE = $(OPENDSME_MODULE)
+
+ifeq (opendsme_adaption_layer_scheduling,$(OPENDSME_MODULE))
+  # Include TPS and StaticScheduling schedulers
+  NO_AUTO_SRC := 1
+  SRCXX += TPS.cc StaticScheduling.cc
+endif
+
+include $(RIOTBASE)/Makefile.base

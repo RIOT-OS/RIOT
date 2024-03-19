@@ -16,11 +16,14 @@ ifneq (,$(filter mtd,$(USEMODULE)))
   USEMODULE += periph_flash
 endif
 
-ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
-  USEMODULE += stdio_uart
+ifeq (xtensa,$(CPU_ARCH))
+  USEMODULE += esp_xtensa
+  USEMODULE += xtensa
 endif
 
-USEMODULE += xtensa
+ifeq (rv32,$(CPU_ARCH))
+  USEMODULE += esp_riscv
+endif
 
 # Features used by ESP*
 
@@ -48,7 +51,7 @@ ifneq (,$(filter netdev_default,$(USEMODULE)))
     endif
   else
     # otherwise use esp_now as default netdev if no other netdev is enabled
-    ifeq (,$(filter esp_wifi esp_eth,$(USEMODULE)))
+    ifeq (,$(filter esp_wifi esp_eth nimble_netif nimble_netif_ext,$(USEMODULE)))
       USEMODULE += esp_now
     endif
   endif
@@ -64,6 +67,11 @@ endif
 
 ifneq (,$(filter 4 5,$(LOG_LEVEL)))
   USEMODULE += esp_log_startup
+endif
+
+# default to using littlefs2 on the SPI flash
+ifneq (,$(filter vfs_default,$(USEMODULE)))
+  USEMODULE += littlefs2
 endif
 
 # each device has SPI flash memory, but it has to be enabled explicitly
@@ -85,6 +93,13 @@ ifneq (,$(filter esp_wifi,$(USEMODULE)))
 endif
 
 ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
+  USEMODULE += netdev_legacy_api
   USEMODULE += netopt
   USEMODULE += ztimer_msec
+endif
+
+ifneq (,$(filter esp_freertos_common,$(USEMODULE)))
+  ifneq (,$(filter ztimer_msec,$(USEMODULE)))
+    USEMODULE += core_thread_flags
+  endif
 endif

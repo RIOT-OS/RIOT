@@ -68,20 +68,20 @@ static int read_rgb(const void *dev, phydat_t *res)
 
 const saul_driver_t apds99xx_saul_prx_driver = {
     .read = read_prx,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_PROXIMITY,
 };
 
 const saul_driver_t apds99xx_saul_als_driver = {
     .read = read_als,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_LIGHT,
 };
 
 #if MODULE_APDS9900 || MODULE_APDS9901 || MODULE_APDS9930
 const saul_driver_t apds99xx_saul_lux_driver = {
     .read = read_lux,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_LIGHT,
 };
 #endif
@@ -89,7 +89,7 @@ const saul_driver_t apds99xx_saul_lux_driver = {
 #if MODULE_APDS9950 || MODULE_APDS9960
 const saul_driver_t apds99xx_saul_rgb_driver = {
     .read = read_rgb,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_LIGHT,
 };
 #endif

@@ -10,7 +10,8 @@ menuconfig MODULE_SLIPDEV
     bool "SLIP over UART network device"
     depends on HAS_PERIPH_UART
     depends on TEST_KCONFIG
-    select MODULE_TSRB
+    select MODULE_NETDEV_LEGACY_API
+    select MODULE_CHUNKED_RINGBUFFER
     select MODULE_PERIPH_UART
 
 menuconfig KCONFIG_USEMODULE_SLIPDEV

@@ -17,13 +17,27 @@ TESTS ?= $(foreach file,$(wildcard $(APPDIR)/tests/*[^~]),\
 # this. In order to make local builds behave similar, add the term deps here.
 # See #11762.
 TEST_DEPS += $(TERMDEPS)
+# these variables can be used to use e.g. pytest to execute the tests instead of
+# executing them as a script
+TEST_EXECUTOR ?=
+TEST_EXECUTOR_FLAGS ?=
 
 test: $(TEST_DEPS)
 	$(Q) for t in $(TESTS); do \
-		$$t || exit 1; \
+		$(TEST_EXECUTOR) $(TEST_EXECUTOR_FLAGS) $$t || exit 1; \
 	done
 
 test/available:
+ifneq (,$(TEST_ON_CI_WHITELIST))
+  ifeq (,$(filter $(BOARD),$(TEST_ON_CI_WHITELIST)))
+	@echo "Board $(BOARD) not in TEST_ON_CI_WHITELIST"
+	$(Q)false
+  endif
+endif
+ifneq (,$(filter $(BOARD) all,$(TEST_ON_CI_BLACKLIST)))
+	@echo "Board $(BOARD) is in TEST_ON_CI_BLACKLIST"
+	$(Q)false
+endif
 	$(Q)test -n "$(strip $(TESTS))"
 
 # Tests that require root privileges
@@ -71,12 +85,43 @@ test-with-config/check-config:
 		done; \
 		${COLOR_ECHO} -n "${COLOR_RESET}"
 
+
+RIOT_TEST_HASH_DIR ?= $(BINDIR)
+
 # this target only makes sense if an ELFFILE is actually created, thus guard by
 # RIOTNOLINK="".
 ifeq (,$(RIOTNOLINK))
-test-input-hash: $(TESTS) $(TESTS_WITH_CONFIG) $(TESTS_AS_ROOT) $(ELFFILE) $(TEST_EXTRA_FILES)
-	sha1sum $^ > $(BINDIR)/test-input-hash.sha1
+  ifeq (,$(HASHFILE))
+    $(error HASHFILE is empty for $(BOARD))
+  endif
+test-input-hash: $(TESTS) $(TESTS_WITH_CONFIG) $(TESTS_AS_ROOT) $(HASHFILE) $(TEST_EXTRA_FILES)
+	sha1sum $^ > $(RIOT_TEST_HASH_DIR)/test-input-hash.sha1
 else
-test-input-hash:
-	true
+# .SECONDARY creates the bin folder, we depend on it to avoid writing to it
+# prior to it being created when concurrent building is used
+test-input-hash: .SECONDARY
+	$(file >$(RIOT_TEST_HASH_DIR)/test-input-hash.sha1,no binary generated due to RIOTNOLINK=1)
 endif
+
+# Helper function to compare two strings
+define compare_strings
+$(and $(filter $1,$2),$(filter $2,$1))
+endef
+
+# Target to test only if the input hash has changed
+.PHONY: test-input-hash-changed
+test-input-hash-changed:
+	@if [ ! -f "$(RIOT_TEST_HASH_DIR)/test-input-hash.sha1" ]; then \
+		echo "Old hash file doesn't exist. Generating hash and running tests..."; \
+		mkdir -p $(RIOT_TEST_HASH_DIR); \
+		$(MAKE) test-input-hash; \
+	else \
+		OLD_HASH=$$(cat $(RIOT_TEST_HASH_DIR)/test-input-hash.sha1); \
+		$(MAKE) test-input-hash; \
+		NEW_HASH=$$(cat $(RIOT_TEST_HASH_DIR)/test-input-hash.sha1); \
+		if [ "$${OLD_HASH}" != "$${NEW_HASH}" ]; then \
+			echo "Hashes do not match."; \
+		else \
+			echo "Hashes match."; \
+		fi; \
+	fi

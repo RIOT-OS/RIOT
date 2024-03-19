@@ -6,4 +6,8 @@ ifneq (,$(filter esp_jtag,$(USEMODULE)))
   OPENOCD_CONFIG ?= board/esp32-ethernet-kit-3.3v.cfg
 endif
 
+# Only consider TTYs matching the following filter when auto-selecting the TTY
+# with `MOST_RECENT_PORT=1`.
+TTY_BOARD_FILTER := --driver 'ftdi_sio' --vendor FTDI --model 'Dual RS232-HS' --iface-num 1
+
 include $(RIOTBOARD)/common/esp32/Makefile.include

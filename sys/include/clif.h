@@ -191,8 +191,28 @@ ssize_t clif_decode_link(clif_t *link, clif_attr_t *attrs, unsigned attrs_len,
  *
  * @pre `target != NULL`
  *
- * @param[in]  target  string containing the path to the resource. Must not be
- *                     NULL.
+ * @param[in]  target       buffer containing the path to the resource.
+ *                          Must not be NULL.
+ * @param[in]  target_len   size of @p target
+ * @param[out] buf          buffer to output the formatted path. Can be NULL
+ * @param[in]  maxlen       size of @p buf
+ *
+ * @note If @p buf is NULL this will return the amount of bytes that would be
+ *       needed
+ *
+ * @return in success the amount of bytes used in the buffer
+ * @return CLIF_NO_SPACE if there is not enough space in the buffer
+ */
+ssize_t clif_add_target_from_buffer(const char *target, size_t target_len,
+                                    char *buf, size_t maxlen);
+
+/**
+ * @brief   Adds a given @p target to a given buffer @p buf using link format
+ *
+ * @pre `target != NULL`
+ *
+ * @param[in]  target  zero terminated string containing the path to the resource.
+ *                     Must not be NULL.
  * @param[out] buf     buffer to output the formatted path. Can be NULL
  * @param[in]  maxlen  size of @p buf
  *
@@ -217,9 +237,7 @@ ssize_t clif_add_target(const char *target, char *buf, size_t maxlen);
  * @note
  *       - If @p buf is NULL this will return the amount of bytes that would be
  *         needed.
- *       - If the lengths of the key or the value of the attribute are not
- *         defined a NULL-terminated string will be assumed, and it will be
- *         calculated.
+ *       - The length of the key must be set in `attr->key_len`.
  *
  * @return amount of bytes used from the buffer if successful
  * @return CLIF_NO_SPACE if there is not enough space in the buffer

@@ -22,6 +22,4 @@ void board_init(void)
 {
     /* The boot pin must be set to input otherwise it may lock the bootloader */
     gpio_init(BOOT_PIN, GPIO_IN);
-
-    gpio_init(BTN0_PIN, BTN0_MODE);
 }

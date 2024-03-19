@@ -9,12 +9,14 @@ on:
   pull_request:
     branches:
       - '*'
+  merge_group:
 
 jobs:
   python-tests:
+    if: github.event_name != 'merge_group'
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@main
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v1
       with:
@@ -24,6 +26,7 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install tox
         python -m pip install kconfiglib
+        sudo apt-get update
         sudo apt-get install gcc-multilib
     - name: Test backport_pr
       run: cd dist/tools/backport_pr && tox
@@ -35,3 +38,5 @@ jobs:
       run: cd dist/pythonlibs/riotctrl_shell && tox
     - name: Test kconfig script
       run: cd dist/tools/kconfiglib/tests && ./test.sh
+    - name: Test compile_like_murdock script
+      run: cd dist/tools/compile_test/tests && ./test.sh

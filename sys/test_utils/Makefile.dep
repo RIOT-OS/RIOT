@@ -1,6 +1,9 @@
 ifneq (,$(filter test_utils_result_output,$(USEMODULE)))
   include $(RIOTBASE)/sys/test_utils/result_output/Makefile.dep
 endif
+ifneq (,$(filter test_utils_netdev_ieee802154_minimal,$(USEMODULE)))
+  include $(RIOTBASE)/sys/test_utils/netdev_ieee802154_minimal/Makefile.dep
+endif
 ifneq (,$(filter test_utils_interactive_sync,$(USEMODULE)))
   USEMODULE += stdin
 endif
@@ -9,4 +12,7 @@ ifneq (,$(filter benchmark_udp,$(USEMODULE)))
   USEMODULE += sema_inv
   USEMODULE += sock_udp
   USEMODULE += xtimer
+endif
+ifneq (,$(filter test_utils_netdev_eth_minimal,$(USEMODULE)))
+  include $(RIOTBASE)/sys/test_utils/netdev_eth_minimal/Makefile.dep
 endif

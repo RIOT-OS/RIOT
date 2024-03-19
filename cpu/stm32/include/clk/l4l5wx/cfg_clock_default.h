@@ -29,7 +29,7 @@ extern "C" {
  * @name    L4/L5/WB clock system configuration
  * @{
  */
-#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE < MHZ(4) || CLOCK_HSE > MHZ(48))
+#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CONFIG_CLOCK_HSE < MHZ(4) || CONFIG_CLOCK_HSE > MHZ(48))
 #error "HSE clock frequency must be between 4MHz and 48MHz"
 #endif
 
@@ -56,23 +56,23 @@ extern "C" {
 #if IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_MSI)
 #define CLOCK_PLL_SRC                   (CONFIG_CLOCK_MSI)
 #elif IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSE)
-#define CLOCK_PLL_SRC                   (CLOCK_HSE)
+#define CLOCK_PLL_SRC                   (CONFIG_CLOCK_HSE)
 #else /* CONFIG_CLOCK_PLL_SRC_ */
-#define CLOCK_PLL_SRC                   (CLOCK_HSI)
+#define CLOCK_PLL_SRC                   (CONFIG_CLOCK_HSI)
 #endif
 #ifndef CONFIG_CLOCK_PLL_M
 #if IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_MSI)
 #define CONFIG_CLOCK_PLL_M              (6)     /* MSI at 48MHz */
-#elif IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSE) && (CLOCK_HSE == MHZ(8))
+#elif IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSE) && (CONFIG_CLOCK_HSE == MHZ(8))
 #define CONFIG_CLOCK_PLL_M              (1)     /* HSE at 8MHz */
-#elif IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSE) && (CLOCK_HSE == MHZ(32))
+#elif IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSE) && (CONFIG_CLOCK_HSE == MHZ(32))
 #define CONFIG_CLOCK_PLL_M              (4)     /* HSE at 32MHz */
 #else
 #define CONFIG_CLOCK_PLL_M              (2)     /* HSI at 16MHz */
 #endif
 #endif
 #ifndef CONFIG_CLOCK_PLL_N
-#if IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSE) && (CLOCK_HSE == MHZ(32))
+#if IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSE) && (CONFIG_CLOCK_HSE == MHZ(32))
 /* For STM32WL, VCO output frequency ((PLL input clock frequency / PLLM ) x PLLN )
    must be between 96 and 344 MHz. PLLN can have values <=127 & >=6 */
 #if IS_ACTIVE(CPU_FAM_STM32WL)
@@ -81,7 +81,7 @@ extern "C" {
 #define CONFIG_CLOCK_PLL_N              (16)
 #endif /* CPU_FAM_STM32WL */
 #elif IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSI) || \
-      (IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSE) && (CLOCK_HSE == MHZ(16)))
+      (IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSE) && (CONFIG_CLOCK_HSE == MHZ(16)))
 #define CONFIG_CLOCK_PLL_N              (32)
 #else
 #if defined(CPU_LINE_STM32L4A6xx) || defined(CPU_LINE_STM32L4P5xx) || \
@@ -105,10 +105,10 @@ extern "C" {
 #endif
 
 #if IS_ACTIVE(CONFIG_USE_CLOCK_HSI)
-#define CLOCK_CORECLOCK                 (CLOCK_HSI)
+#define CLOCK_CORECLOCK                 (CONFIG_CLOCK_HSI)
 
 #elif IS_ACTIVE(CONFIG_USE_CLOCK_HSE)
-#define CLOCK_CORECLOCK                 (CLOCK_HSE)
+#define CLOCK_CORECLOCK                 (CONFIG_CLOCK_HSE)
 
 #elif IS_ACTIVE(CONFIG_USE_CLOCK_MSI)
 #define CLOCK_CORECLOCK                 (CONFIG_CLOCK_MSI)

@@ -14,7 +14,6 @@
   * @brief       Internal constants etc. for the SDS011 laser dust sensor
   *
   * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
-  * @}
   */
 #ifndef SDS011_INTERNAL_H
 #define SDS011_INTERNAL_H

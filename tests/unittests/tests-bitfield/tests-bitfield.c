@@ -197,8 +197,140 @@ static void test_bf_get_unset_lastbyte(void)
     TEST_ASSERT_EQUAL_INT(39, res);
 }
 
-Test *tests_bitfield_tests(void)
+static void test_bf_ops(void)
 {
+    const uint8_t zero[3] = {0};
+    const uint8_t set[3] = { 0xFF, 0xFF, 0xFF };
+
+    uint8_t a[3] = { 0xAA, 0x55, 0xF0 };
+    uint8_t b[3] = { 0x55, 0xAA, 0x0F };
+    uint8_t c[3];
+
+    bf_or(c, a, b, 24);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(c, set, sizeof(c)));
+
+    bf_inv(c, c, 24);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(c, zero, sizeof(c)));
+
+    bf_and(c, a, b, 24);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(c, zero, sizeof(c)));
+
+    bf_inv(c, c, 24);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(c, set, sizeof(c)));
+
+    bf_xor(c, c, a, 24);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(c, b, sizeof(c)));
+}
+
+static void test_bf_find_first_set(void)
+{
+    int res;
+    uint8_t field[5];
+    memset(field, 0, sizeof(field));
+
+    res = bf_find_first_set(field, 40);
+    TEST_ASSERT_EQUAL_INT(-1, res);
+
+    bf_set(field, 23);
+    res = bf_find_first_set(field, 40);
+    TEST_ASSERT_EQUAL_INT(23, res);
+
+    bf_set(field, 24);
+    res = bf_find_first_set(field, 40);
+    TEST_ASSERT_EQUAL_INT(23, res);
+
+    bf_set(field, 13);
+    res = bf_find_first_set(field, 40);
+    TEST_ASSERT_EQUAL_INT(13, res);
+
+    bf_set(field, 3);
+    res = bf_find_first_set(field, 40);
+    TEST_ASSERT_EQUAL_INT(3, res);
+}
+
+static void test_bf_find_first_unset(void)
+{
+    int res;
+    uint8_t field[5];
+    memset(field, 0xff, sizeof(field));
+
+    res = bf_find_first_unset(field, 40);
+    TEST_ASSERT_EQUAL_INT(-1, res);
+
+    bf_unset(field, 23);
+    res = bf_find_first_unset(field, 40);
+    TEST_ASSERT_EQUAL_INT(23, res);
+
+    bf_unset(field, 24);
+    res = bf_find_first_unset(field, 40);
+    TEST_ASSERT_EQUAL_INT(23, res);
+
+    bf_unset(field, 13);
+    res = bf_find_first_unset(field, 40);
+    TEST_ASSERT_EQUAL_INT(13, res);
+
+    bf_unset(field, 3);
+    res = bf_find_first_unset(field, 40);
+    TEST_ASSERT_EQUAL_INT(3, res);
+}
+
+static void test_bf_set_all(void)
+{
+    uint8_t field[5];
+
+    memset(field, 0, sizeof(field));
+    bf_set_all(field, 5);
+    TEST_ASSERT_EQUAL_INT(0xf8, field[0]);
+    TEST_ASSERT_EQUAL_INT(0, field[1]);
+
+    memset(field, 0, sizeof(field));
+    bf_set_all(field, 24);
+    TEST_ASSERT_EQUAL_INT(0xff, field[0]);
+    TEST_ASSERT_EQUAL_INT(0xff, field[1]);
+    TEST_ASSERT_EQUAL_INT(0xff, field[2]);
+    TEST_ASSERT_EQUAL_INT(0, field[3]);
+
+    memset(field, 0, sizeof(field));
+    bf_set_all(field, 30);
+    TEST_ASSERT_EQUAL_INT(0xff, field[0]);
+    TEST_ASSERT_EQUAL_INT(0xff, field[1]);
+    TEST_ASSERT_EQUAL_INT(0xff, field[2]);
+    TEST_ASSERT_EQUAL_INT(0xfc, field[3]);
+    TEST_ASSERT_EQUAL_INT(0, field[4]);
+}
+
+static void test_bf_clear_all(void)
+{
+    uint8_t field[5];
+
+    memset(field, 0xFF, sizeof(field));
+    bf_clear_all(field, 5);
+    TEST_ASSERT_EQUAL_INT(0x7, field[0]);
+    TEST_ASSERT_EQUAL_INT(0xFF, field[1]);
+}
+
+static void test_bf_popcnt(void)
+{
+    uint8_t field[5];
+
+    memset(field, 0xff, sizeof(field));
+    bf_set_all(field, 5);
+    TEST_ASSERT_EQUAL_INT(5, bf_popcnt(field, 5));
+
+    field[0] = 0x1;
+    field[1] = 0x80;
+    TEST_ASSERT_EQUAL_INT(2, bf_popcnt(field, 9));
+
+    field[0] = 0x0;
+    field[1] = 0x0;
+    TEST_ASSERT_EQUAL_INT(0, bf_popcnt(field, 16));
+
+    field[0] = 0xff;
+    field[1] = 0xff;
+    TEST_ASSERT_EQUAL_INT(16, bf_popcnt(field, 16));
+}
+
+Test *tests_bitfield_tests(void) {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_bf_set),
         new_TestFixture(test_bf_unset),
@@ -208,6 +340,12 @@ Test *tests_bitfield_tests(void)
         new_TestFixture(test_bf_get_unset_firstbyte),
         new_TestFixture(test_bf_get_unset_middle),
         new_TestFixture(test_bf_get_unset_lastbyte),
+        new_TestFixture(test_bf_ops),
+        new_TestFixture(test_bf_find_first_set),
+        new_TestFixture(test_bf_find_first_unset),
+        new_TestFixture(test_bf_set_all),
+        new_TestFixture(test_bf_clear_all),
+        new_TestFixture(test_bf_popcnt),
     };
 
     EMB_UNIT_TESTCALLER(bitfield_tests, NULL, NULL, fixtures);

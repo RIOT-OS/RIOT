@@ -2,6 +2,7 @@
  * Copyright (C) 2014-2015 Freie Universität Berlin
  *               2015 Kaspar Schleiser <kaspar@schleiser.de>
  *               2015 FreshTemp, LLC.
+ *               2022 SSV Software Systems GmbH
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -29,6 +30,7 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Juergen Fitschen <me@jue.yt>
  *
  * The GPIO implementation here support the PERIPH_GPIO_FAST_READ pseudomodule
  * on the cortex-m0/m23 based devices.  This trades an increase in power
@@ -48,6 +50,7 @@
 
 #include "cpu.h"
 #include "bitarithm.h"
+#include "pm_layered.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
 
@@ -330,6 +333,10 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
         return -1;
     }
 
+    if (gpio_config[exti].cb) {
+        DEBUG("gpio: Warning - interrupt line %u already in use\n", exti);
+    }
+
     /* save callback */
     gpio_config[exti].cb = cb;
     gpio_config[exti].arg = arg;
@@ -365,6 +372,12 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 #endif
     /* clear interrupt flag and enable the interrupt line and line wakeup */
     _EIC->INTFLAG.reg = (1 << exti);
+#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_GPIO_PM_BLOCK)
+    /* block pm mode if it hasn't been blocked before */
+    if (!(_EIC->INTENSET.reg & (1 << exti))) {
+        pm_block(SAM0_GPIO_PM_BLOCK);
+    }
+#endif
     _EIC->INTENSET.reg = (1 << exti);
 #ifdef CPU_COMMON_SAMD21
     _EIC->WAKEUP.reg |= (1 << exti);
@@ -456,6 +469,13 @@ void gpio_irq_enable(gpio_t pin)
     /* clear stale interrupt */
     _EIC->INTFLAG.reg = 1 << exti;
 
+#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_GPIO_PM_BLOCK)
+    /* unblock power mode */
+    if (!(_EIC->INTENSET.reg & (1 << exti))) {
+        pm_block(SAM0_GPIO_PM_BLOCK);
+    }
+#endif
+
     /* enable interrupt */
     _EIC->INTENSET.reg = 1 << exti;
 
@@ -469,6 +489,13 @@ void gpio_irq_disable(gpio_t pin)
     if (exti == -1) {
         return;
     }
+
+#if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_GPIO_PM_BLOCK)
+    /* unblock power mode */
+    if (_EIC->INTENSET.reg & (1 << exti)) {
+        pm_unblock(SAM0_GPIO_PM_BLOCK);
+    }
+#endif
 
     /* disable interrupt */
     _EIC->INTENCLR.reg = 1 << exti;

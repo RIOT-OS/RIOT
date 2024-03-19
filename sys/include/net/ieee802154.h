@@ -26,7 +26,7 @@
 
 #include "byteorder.h"
 #include "net/eui64.h"
-#include "kernel_defines.h"
+#include "modules.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -113,6 +113,11 @@ extern "C" {
  * @brief Maximum frame size to consider a frame as short.
  */
 #define IEEE802154_SIFS_MAX_FRAME_SIZE  (18U)
+
+/**
+ * @brief ACK Timeout period in symbols
+ */
+#define IEEE802154_ACK_TIMEOUT_SYMS     (54)
 
 /**
  * @brief value of measured power when RSSI is zero.
@@ -302,10 +307,134 @@ extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
 #endif
 
 /**
+ * @brief IEEE802.15.4 default value for maximum frame retries.
+ */
+#ifndef CONFIG_IEEE802154_DEFAULT_MAX_FRAME_RETRANS
+#define CONFIG_IEEE802154_DEFAULT_MAX_FRAME_RETRANS     (4U)
+#endif
+
+/**
  * @brief Disable Auto ACK support
  */
 #ifdef DOXYGEN
 #define CONFIG_IEEE802154_AUTO_ACK_DISABLE 0
+#endif
+
+/**
+ * @brief Request ACKs by default
+ */
+#ifndef CONFIG_IEEE802154_DEFAULT_ACK_REQ
+#define CONFIG_IEEE802154_DEFAULT_ACK_REQ          1
+#endif
+
+/**
+ * @brief   Enable DSME CAP reduction
+ *
+ * @note    For the moment, this is only valid for @ref pkg_opendsme
+ */
+#ifndef CONFIG_IEEE802154_DSME_CAP_REDUCTION
+#define CONFIG_IEEE802154_DSME_CAP_REDUCTION             0
+#endif
+
+/**
+ * @brief   Set the maximum DSME MAC response wait time
+ *
+ * This configuration sets the maximum wait times for MAC commands (association,
+ * DSME GTS allocation, etc).
+ * The unit is "base superframe duration" (60 * symbol_time_us).
+ *
+ * @note    For the moment, this is only valid for @ref pkg_opendsme
+ */
+#ifndef CONFIG_IEEE802154_DSME_MAC_RESPONSE_WAIT_TIME
+#define CONFIG_IEEE802154_DSME_MAC_RESPONSE_WAIT_TIME    (244U)
+#endif
+
+/**
+ * @brief   Set the scan duration
+ *
+ * Set the scan duration for each channel to `60 * symbol_time_us *
+ * (2^scanDuration + 1)`
+ *
+ * @note    For the moment, this is only valid for @ref pkg_opendsme
+ */
+#ifndef CONFIG_IEEE802154_DSME_SCAN_DURATION
+#define CONFIG_IEEE802154_DSME_SCAN_DURATION    (4U)
+#endif
+
+/**
+ * @brief   Set IEEE 802.15.4 DSME Superframe Order (SO)
+ * The SO sets the slot duration to `60 * symbol_time_us * 2^SO` usecs.
+ * E.g for O-QPSK an SO=3 renders a slot duration of `60 * 16 * 8` = 7.6 ms and
+ * a superframe duration of 122.88 ms.
+ *
+ * Settings this value to 3 allows to transmit full IEEE 802.15.4 O-QPSK frames
+ * (127 bytes).
+ *
+ * @note    For the moment, this is only valid for @ref pkg_opendsme
+ */
+#ifndef CONFIG_IEEE802154_DSME_SUPERFRAME_ORDER
+#define CONFIG_IEEE802154_DSME_SUPERFRAME_ORDER      (3U)
+#endif
+
+/**
+ * @brief   Set IEEE 802.15.4 DSME Multisuperframe Order (MO)
+ *
+ * The MO sets the number of superframes per multisuperframe to `2^(MO-SO)`.
+ *
+ * @see @ref CONFIG_IEEE802154_DSME_SUPERFRAME_ORDER
+ *
+ * @note    For the moment, this is only valid for @ref pkg_opendsme
+ */
+#ifndef CONFIG_IEEE802154_DSME_MULTISUPERFRAME_ORDER
+#define CONFIG_IEEE802154_DSME_MULTISUPERFRAME_ORDER (3U)
+#endif
+
+/**
+ * @brief   Set IEEE 802.15.4 DSME Beacon Order (BO)
+ *
+ * The BO sets the beacon interval to `2^(BO-SO)` superframes.
+ *
+ * @see @ref CONFIG_IEEE802154_DSME_SUPERFRAME_ORDER
+ *
+ * @note    For the moment, this is only valid for @ref pkg_opendsme
+ */
+#ifndef CONFIG_IEEE802154_DSME_BEACON_ORDER
+#define CONFIG_IEEE802154_DSME_BEACON_ORDER          (3U)
+#endif
+
+/**
+ * @brief   Use static GTS allocation
+ *
+ * When set, the MAC implementation will not use scheduling functions.
+ * This requires that the upper layer allocates slots manually using @ref NETOPT_GTS_ALLOC.
+ *
+ * @see @ref CONFIG_IEEE802154_DSME_STATIC_GTS
+ *
+ * @note    For the moment, this is only valid for @ref pkg_opendsme
+ */
+#ifdef DOXYGEN
+#define CONFIG_IEEE802154_DSME_STATIC_GTS            0
+#endif
+
+/**
+ * @brief   Set expiration time of DSME GTS slot
+ *
+ * Sets the expiration time of DSME GTS slot (in number of idle slots). If DSME
+ * detects no activity, it will deallocate the GTS slot.
+ *
+ * @note    For the moment, this is only valid for @ref pkg_opendsme
+ */
+#ifndef CONFIG_IEEE802154_DSME_GTS_EXPIRATION
+#define CONFIG_IEEE802154_DSME_GTS_EXPIRATION         (16U)
+#endif
+
+/**
+ * @brief   Set the minimum LQI to consider a beacon from a coordinator valid.
+ *
+ * @note    For the moment, this is only valid for @ref pkg_opendsme
+ */
+#ifndef CONFIG_IEEE802154_DSME_MIN_COORD_LQI
+#define CONFIG_IEEE802154_DSME_MIN_COORD_LQI         (100U)
 #endif
 
 /**

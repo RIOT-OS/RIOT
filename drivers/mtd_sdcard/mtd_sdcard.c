@@ -20,17 +20,16 @@
  */
 #define ENABLE_DEBUG 0
 #include "debug.h"
+#include "kernel_defines.h"
+#include "macros/utils.h"
 #include "mtd.h"
 #include "mtd_sdcard.h"
 #include "sdcard_spi.h"
 #include "sdcard_spi_internal.h"
-#include "kernel_defines.h"
 
 #include <inttypes.h>
 #include <errno.h>
 #include <string.h>
-
-#define MIN(a, b) ((a) > (b) ? (b) : (a))
 
 static int mtd_sdcard_init(mtd_dev_t *dev)
 {
@@ -45,6 +44,7 @@ static int mtd_sdcard_init(mtd_dev_t *dev)
 
         /* sdcard_spi always uses the fixed block size of SD-HC cards */
         dev->page_size        = SD_HC_BLOCK_SIZE;
+        dev->write_size       = SD_HC_BLOCK_SIZE;
         return 0;
     }
     return -EIO;
@@ -132,7 +132,7 @@ static int mtd_sdcard_write_page(mtd_dev_t *dev, const void *buff, uint32_t page
     }
 
     if (err != SD_RW_OK) {
-        printf("err: %d\n", err);
+        DEBUG("mtd_sdcard_write_page: error %d\n", err);
         return -EIO;
     }
     return size;
@@ -157,7 +157,7 @@ static int mtd_sdcard_erase_sector(mtd_dev_t *dev, uint32_t sector, uint32_t cou
                                 dev->work_area, SD_HC_BLOCK_SIZE,
                                 1, &err);
         if (err != SD_RW_OK) {
-            printf("err: %d\n", err);
+            DEBUG("mtd_sdcard_erase_sector: error %d\n", err);
             return -EIO;
         }
         --count;
@@ -198,26 +198,45 @@ static int mtd_sdcard_read(mtd_dev_t *dev, void *buff, uint32_t addr,
     return -EOVERFLOW;
 }
 
-static int mtd_sdcard_write(mtd_dev_t *dev, const void *buff, uint32_t addr,
-                            uint32_t size)
-{
-    int res =  mtd_sdcard_write_page(dev, buff, addr / SD_HC_BLOCK_SIZE,
-                                     addr % SD_HC_BLOCK_SIZE, size);
-    if (res < 0) {
-        return res;
-    }
-    if (res == (int)size) {
-        return 0;
-    }
-    return -EOVERFLOW;
-}
-
 const mtd_desc_t mtd_sdcard_driver = {
     .init = mtd_sdcard_init,
     .read = mtd_sdcard_read,
     .read_page = mtd_sdcard_read_page,
-    .write = mtd_sdcard_write,
     .write_page = mtd_sdcard_write_page,
     .erase_sector = mtd_sdcard_erase_sector,
     .power = mtd_sdcard_power,
 };
+
+#if IS_USED(MODULE_MTD_SDCARD_DEFAULT)
+#include "sdcard_spi_params.h"
+#include "vfs_default.h"
+
+#define SDCARD_NUMOF ARRAY_SIZE(sdcard_spi_params)
+
+#ifndef CONFIG_SDCARD_GENERIC_MTD_OFFSET
+#define CONFIG_SDCARD_GENERIC_MTD_OFFSET 0
+#endif
+
+#define MTD_SDCARD_DEV(n, m)                \
+    mtd_sdcard_t mtd_sdcard_dev ## n = {    \
+        .base = {                           \
+           .driver = &mtd_sdcard_driver,    \
+        },                                  \
+        .sd_card = &sdcard_spi_devs[n],     \
+        .params = &sdcard_spi_params[n]     \
+    };                                      \
+                                            \
+    XFA_CONST(mtd_dev_xfa, m) mtd_dev_t CONCAT(*mtd, m) = (mtd_dev_t *)&mtd_sdcard_dev ## n
+
+#define MTD_SDCARD_DEV_FS(n, m, filesystem) \
+    VFS_AUTO_MOUNT(filesystem, VFS_MTD(mtd_sdcard_dev ## n), VFS_DEFAULT_SD(n), m)
+
+/* this is provided by the sdcard_spi driver see drivers/sdcard_spi/sdcard_spi.c */
+extern sdcard_spi_t sdcard_spi_devs[SDCARD_NUMOF];
+
+MTD_SDCARD_DEV(0, CONFIG_SDCARD_GENERIC_MTD_OFFSET);
+#ifdef MODULE_FATFS_VFS
+MTD_SDCARD_DEV_FS(0, CONFIG_SDCARD_GENERIC_MTD_OFFSET, fatfs);
+#endif
+
+#endif

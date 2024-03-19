@@ -368,8 +368,6 @@ void kw2xrf_set_option(kw2xrf_t *dev, uint16_t option, bool state)
 
     /* set option field */
     if (state) {
-        dev->netdev.flags |= option;
-
         /* trigger option specific actions */
         switch (option) {
             case KW2XRF_OPT_AUTOCCA:
@@ -404,7 +402,6 @@ void kw2xrf_set_option(kw2xrf_t *dev, uint16_t option, bool state)
         }
     }
     else {
-        dev->netdev.flags &= ~(option);
         /* trigger option specific actions */
         switch (option) {
             case KW2XRF_OPT_AUTOCCA:
@@ -416,15 +413,6 @@ void kw2xrf_set_option(kw2xrf_t *dev, uint16_t option, bool state)
                 /* disable promiscuous mode */
                 kw2xrf_clear_dreg_bit(dev, MKW2XDM_PHY_CTRL4,
                     MKW2XDM_PHY_CTRL4_PROMISCUOUS);
-                /* re-enable AUTOACK only if the option is set */
-                if (dev->netdev.flags & KW2XRF_OPT_AUTOACK) {
-                    kw2xrf_set_dreg_bit(dev, MKW2XDM_PHY_CTRL1,
-                        MKW2XDM_PHY_CTRL1_AUTOACK);
-                }
-                if (dev->netdev.flags & KW2XRF_OPT_ACK_REQ) {
-                    kw2xrf_set_dreg_bit(dev, MKW2XDM_PHY_CTRL1,
-                        MKW2XDM_PHY_CTRL1_RXACKRQD);
-                }
                 break;
 
             case KW2XRF_OPT_AUTOACK:

@@ -15,6 +15,7 @@ config BOARD_NUCLEO_F207ZG
     select CPU_MODEL_STM32F207ZG
 
     # Put defined MCU peripherals here (in alphabetical order)
+    select HAS_PERIPH_ADC
     select HAS_PERIPH_DMA
     select HAS_PERIPH_ETH
     select HAS_PERIPH_I2C
@@ -27,5 +28,8 @@ config BOARD_NUCLEO_F207ZG
 
     # Put other features for this board (in alphabetical order)
     select HAS_RIOTBOOT
+    select HAS_TINYUSB_DEVICE
+
+    select HAVE_STM32_ETH
 
 source "$(RIOTBOARD)/common/nucleo144/Kconfig"

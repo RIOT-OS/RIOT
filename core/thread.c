@@ -171,7 +171,6 @@ void thread_add_to_list(list_node_t *list, thread_t *thread)
     list->next = new_node;
 }
 
-#ifdef DEVELHELP
 uintptr_t thread_measure_stack_free(const char *stack)
 {
     /* Alignment of stack has been fixed (if needed) by thread_create(), so
@@ -188,7 +187,6 @@ uintptr_t thread_measure_stack_free(const char *stack)
 
     return space_free;
 }
-#endif
 
 kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
                            int flags, thread_task_func_t function, void *arg,
@@ -228,13 +226,24 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
     thread_t *thread = (thread_t *)(uintptr_t)(stack + stacksize);
 
 #ifdef PICOLIBC_TLS
-    stacksize -= _tls_size();
+#if __PICOLIBC_MAJOR__ > 1 || __PICOLIBC_MINOR__ >= 8
+#define TLS_ALIGN       (alignof(thread_t) > _tls_align() ? alignof(thread_t) : _tls_align())
+#else
+#define TLS_ALIGN       alignof(thread_t)
+#endif
+    char *tls = stack + stacksize - _tls_size();
+    /*
+     * Make sure the TLS area is aligned as required and that the
+     * resulting stack will also be aligned as required
+     */
+    thread->tls = (void *) ((uintptr_t) tls & ~ (TLS_ALIGN - 1));
+    stacksize = (char *) thread->tls - stack;
 
-    thread->tls = stack + stacksize;
     _init_tls(thread->tls);
 #endif
 
-#if defined(DEVELHELP) || IS_ACTIVE(SCHED_TEST_STACK)
+#if defined(DEVELHELP) || defined(SCHED_TEST_STACK) \
+    || defined(MODULE_TEST_UTILS_PRINT_STACK_USAGE)
     if (flags & THREAD_CREATE_STACKTEST) {
         /* assign each int of the stack the value of it's address. Alignment
          * has been handled above, so silence -Wcast-align */

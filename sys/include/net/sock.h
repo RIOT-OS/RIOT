@@ -74,7 +74,7 @@
  * The actual code very much depends on the used `sock` type. Please refer to
  * their documentation for specific examples.
  *
- * Implementor Notes
+ * Implementer Notes
  * =================
  * ### Type definition
  * For simplicity and modularity this API doesn't put any restriction on the
@@ -103,6 +103,8 @@
 #define NET_SOCK_H
 
 #include <stdint.h>
+#include <stddef.h>
+#include "iolist.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -141,7 +143,8 @@ extern "C" {
  * @anchor      net_sock_flags
  * @{
  */
-#define SOCK_FLAGS_REUSE_EP     (0x0001)    /**< allow to reuse end point on bind */
+#define SOCK_FLAGS_REUSE_EP         (0x0001)    /**< allow to reuse end point on bind */
+#define SOCK_FLAGS_CONNECT_REMOTE   (0x0002)    /**< restrict responses to remote address */
 /** @} */
 
 /**
@@ -301,6 +304,36 @@ enum {
      * @ref sock_dtls_aux_rx_t::rssi.
      */
     SOCK_AUX_GET_RSSI = (1LU << 2),
+    /**
+     * @brief   Flag to set the local address/endpoint
+     *
+     * @note    Select module `sock_aux_local` and a compatible network stack
+     *          to use this
+     *
+     * This is the address/endpoint the packet/datagram/segment will be sent from.
+     * This flag will be cleared if the network stack stored the local
+     * address/endpoint as requested, otherwise the bit remains set.
+     *
+     * Depending on the family of the socket, the timestamp will be stored in
+     * @ref sock_udp_aux_tx_t::local, @ref sock_ip_aux_tx_t::local, or in
+     * @ref sock_dtls_aux_tx_t::local.
+     */
+    SOCK_AUX_SET_LOCAL = (1LU << 3),
+    /**
+     * @brief   Flag to request the TTL value of received frame
+     *
+     * @note    Select module `sock_aux_ttl` and a compatible network stack to
+     *          use this
+     *
+     * Set this flag in the auxiliary data structure prior to the call of
+     * @ref sock_udp_recv_aux / @ref sock_ip_recv_aux / etc. to request the
+     * TTL value of a received frame. This flag will be cleared if the
+     * time to live was stored, otherwise it remains set.
+     *
+     * Depending on the family of the socket, the TTL value will be stored in
+     * @ref sock_udp_aux_rx_t::ttl or @ref sock_dtls_aux_rx_t::ttl.
+     */
+    SOCK_AUX_GET_TTL = (1LU << 4),
 };
 
 /**

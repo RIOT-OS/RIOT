@@ -131,8 +131,8 @@
  *                 pkt = msg.content.ptr;
  *                 _handle_outgoing_pkt(pkt);
  *                 break;
- *              case GNRC_NETAPI_MSG_TYPE_SET:
- *              case GNRC_NETAPI_MSG_TYPE_GET:
+ *             case GNRC_NETAPI_MSG_TYPE_SET:
+ *             case GNRC_NETAPI_MSG_TYPE_GET:
  *                 msg_reply(&msg, &reply);
  *                 break;
  *             default:
@@ -183,7 +183,7 @@
  * First, the data to be sent is added to the @ref net_gnrc_pktbuf "packet buffer".
  * This ensures its intactness during the sending process. After the data to be
  * sent has been added to the packet buffer, its parent data structure can safely
- * be freed or re-used.
+ * be freed or reused.
  *
  * Then, the @ref net_gnrc_pkt "pkt" will be sent to all threads that registered
  * for @ref GNRC_NETTYPE_UDP and the demux context `80`. Every registered thread

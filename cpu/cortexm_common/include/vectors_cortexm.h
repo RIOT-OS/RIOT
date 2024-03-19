@@ -80,7 +80,7 @@ void reset_handler_default(void);
  * and can not be masked (surprise surprise...). They can be triggered by
  * software and some peripherals. So far, they are not used in RIOT.
  */
-void nmi_default(void);
+void nmi_handler(void);
 
 /**
  * @brief   Hard fault exception handler

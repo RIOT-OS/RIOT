@@ -1,0 +1,27 @@
+From 1cb888fc95a0374523e164d513952681e4e5847c Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Fri, 8 Apr 2022 16:45:44 +0200
+Subject: [PATCH 21/23] spi_flash: changes for RIOT for esp32s3
+
+Define ARRAY_SIZE in `component/spi_flash/spi_flash_timing_tuning.c` only if it is not yet defined by RIOT macros.
+---
+ components/spi_flash/spi_flash_timing_tuning.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/components/spi_flash/spi_flash_timing_tuning.c b/components/spi_flash/spi_flash_timing_tuning.c
+index 8b2efd1450..de8a0a60e9 100644
+--- a/components/spi_flash/spi_flash_timing_tuning.c
++++ b/components/spi_flash/spi_flash_timing_tuning.c
+@@ -20,7 +20,9 @@
+ #include "esp32s3/rom/cache.h"
+ #endif
+ 
++#ifndef ARRAY_SIZE
+ #define ARRAY_SIZE(arr) (sizeof(arr)/sizeof(*(arr)))
++#endif
+ 
+ #if SPI_TIMING_FLASH_NEEDS_TUNING || SPI_TIMING_PSRAM_NEEDS_TUNING
+ const static char *TAG = "MSPI Timing";
+-- 
+2.17.1
+

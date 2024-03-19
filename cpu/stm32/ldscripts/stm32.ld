@@ -18,22 +18,34 @@
  * @}
  */
 
-ccmram_length = DEFINED( ccmram_len ) ? ccmram_len : 0x0 ;
-sram4_length = DEFINED( sram4_length ) ? sram4_length : 0x0 ;
+ccmram_length = DEFINED( _ccmram_len ) ? _ccmram_len : 0x0 ;
+
+sram4_addr = DEFINED( _sram4_length ) ? 0x28000000 : 0x0 ;
+sram4_length = DEFINED( _sram4_length ) ? _sram4_length : 0x0 ;
+
+fmc_ram_addr = DEFINED( _fmc_ram_addr ) ? _fmc_ram_addr : 0x0 ;
+fmc_ram_len = DEFINED( _fmc_ram_len ) ? _fmc_ram_len : 0x0 ;
 
 MEMORY
 {
     ccmram  : ORIGIN = 0x10000000, LENGTH = ccmram_length
-    sram4   : ORIGIN = 0x28000000, LENGTH = sram4_length
+    sram4   : ORIGIN = sram4_addr, LENGTH = sram4_length
+    fmcram  : ORIGIN = fmc_ram_addr, LENGTH = fmc_ram_len
 }
 
 SECTIONS
 {
     .heap2 ALIGN(4) (NOLOAD) :
     {
-        _sheap2 = . ;
+        _sheap2 = ORIGIN(sram4);
         _eheap2 = ORIGIN(sram4) + LENGTH(sram4);
     } > sram4
+
+    .heap4 ALIGN(4) (NOLOAD) :
+    {
+        _sheap3 = ORIGIN(fmcram);
+        _eheap3 = ORIGIN(fmcram) + LENGTH(fmcram);
+    } > fmcram
 }
 
 INCLUDE cortexm.ld

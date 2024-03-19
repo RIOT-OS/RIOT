@@ -56,7 +56,10 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     bool new_address = false;
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
-    gnrc_netif_ipv6_get_iid(netif, (eui64_t *)&addr.u64[1]);
+    if (gnrc_netif_ipv6_get_iid(netif, (eui64_t *)&addr.u64[1]) < 0) {
+        DEBUG("nib: Can't get IID on interface %u\n", netif->pid);
+        return;
+    }
     ipv6_addr_init_prefix(&addr, pfx, pfx_len);
     if ((idx = gnrc_netif_ipv6_addr_idx(netif, &addr)) < 0) {
         if ((idx = gnrc_netif_ipv6_addr_add_internal(netif, &addr, pfx_len,

@@ -1,0 +1,24 @@
+From e293c603cac41f691bba26cd3973ebe48aae5e0c Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+Date: Thu, 8 Sep 2022 20:38:20 +0200
+Subject: [PATCH] src/PosixSerialPort.cpp: Add missing include
+
+---
+ src/PosixSerialPort.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/PosixSerialPort.cpp b/src/PosixSerialPort.cpp
+index 5da4b42..cf4274b 100644
+--- a/src/PosixSerialPort.cpp
++++ b/src/PosixSerialPort.cpp
+@@ -35,6 +35,7 @@
+ #include <errno.h>
+ #include <termios.h>
+ #include <errno.h>
++#include <sys/select.h>
+ 
+ #include <string>
+ 
+-- 
+2.37.1
+

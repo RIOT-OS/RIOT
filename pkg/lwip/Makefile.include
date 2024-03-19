@@ -17,10 +17,9 @@ PSEUDOMODULES += lwip_udp
 PSEUDOMODULES += lwip_udplite
 PSEUDOMODULES += lwip_sock_async
 
-# lwip's include/lwip/arch.h decides based on existence of SSIZE_MAX whether it
-# should define ssize_t. That doesn't work with the mips toolchain.
-ifneq (, $(filter mips32r2_common,$(USEMODULE)))
-    CFLAGS += -DSSIZE_MAX=INT_MAX
+ifneq (,$(filter arch_64bit,$(FEATURES_USED)))
+# Required for platforms where sizeof(void*) > 4
+    CFLAGS += -DIPV6_FRAG_COPYHEADER=1
 endif
 
 ifneq (,$(filter lwip_contrib,$(USEMODULE)))

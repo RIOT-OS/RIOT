@@ -1,4 +1,5 @@
 USEMODULE += luid
+USEMODULE += netdev_legacy_api
 USEMODULE += netif
 USEMODULE += xtimer
 ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))

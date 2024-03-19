@@ -8,6 +8,8 @@
 use riot_wrappers::riot_main;
 use riot_wrappers::println;
 
+extern crate rust_riotmodules;
+
 riot_main!(main);
 
 fn main() {

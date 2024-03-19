@@ -27,16 +27,21 @@ USEMODULE += uwb-core_twr_ss_ack
 USEMODULE += uwb-core_twr_ss_ext
 USEMODULE += uwb-core_twr_ds
 USEMODULE += uwb-core_twr_ds_ext
+## Uncomment to enable trx info such as rssi, los, fppl calculation
+# USEMODULE += uwb-core_rng_trx_info
 
 # System modules used by this application
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 USEMODULE += l2util
 USEMODULE += event_callback
 USEMODULE += event_timeout_ztimer
 USEMODULE += event_periodic
 USEMODULE += test_utils_result_output
+
+# Collision between defines of Silabs SDK and mynewt-core
+BOARD_BLACKLIST := xg23-pk6068a
 
 # All uwb-core applications need to enable `-fms-extensions`
 CFLAGS += -fms-extensions

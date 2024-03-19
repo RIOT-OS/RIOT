@@ -120,6 +120,7 @@ extern "C" {
 
 /**
  * @name    CONFIG register bitmaps
+ * @{
  */
 #define MASK_RX_DR              0x40
 #define MASK_TX_DS              0x20

@@ -71,13 +71,14 @@ TimerHandle_t xTimerCreate (const char * const pcTimerName,
     timer->ztimer.callback = _ztimer_callback;
     timer->ztimer.arg = timer;
 
-    DEBUG("%s %p %s %d %u\n", __func__, timer, pcTimerName, xTimerPeriod, uxAutoReload);
+    DEBUG("%s %p %s %"PRIu32" %u\n",
+          __func__, timer, pcTimerName, xTimerPeriod, uxAutoReload);
     return timer;
 }
 
 BaseType_t xTimerDelete(TimerHandle_t xTimer, TickType_t xBlockTime)
 {
-    DEBUG("%s %p %d\n", __func__, xTimer, xBlockTime);
+    DEBUG("%s %p %"PRIu32"\n", __func__, xTimer, xBlockTime);
     assert(xTimer != NULL);
 
     freertos_ztimer_t* timer = (freertos_ztimer_t*)xTimer;
@@ -89,7 +90,7 @@ BaseType_t xTimerDelete(TimerHandle_t xTimer, TickType_t xBlockTime)
 
 BaseType_t xTimerStart (TimerHandle_t xTimer, TickType_t xBlockTime)
 {
-    DEBUG("%s %p %d\n", __func__, xTimer, xBlockTime);
+    DEBUG("%s %p %"PRIu32"\n", __func__, xTimer, xBlockTime);
     assert(xTimer != NULL);
 
     freertos_ztimer_t* timer = (freertos_ztimer_t*)xTimer;
@@ -100,7 +101,7 @@ BaseType_t xTimerStart (TimerHandle_t xTimer, TickType_t xBlockTime)
 
 BaseType_t xTimerStop  (TimerHandle_t xTimer, TickType_t xBlockTime)
 {
-    DEBUG("%s %p %d\n", __func__, xTimer, xBlockTime);
+    DEBUG("%s %p %"PRIu32"\n", __func__, xTimer, xBlockTime);
     assert(xTimer != NULL);
 
     freertos_ztimer_t* timer = (freertos_ztimer_t*)xTimer;
@@ -111,7 +112,7 @@ BaseType_t xTimerStop  (TimerHandle_t xTimer, TickType_t xBlockTime)
 
 BaseType_t xTimerReset (TimerHandle_t xTimer, TickType_t xBlockTime)
 {
-    DEBUG("%s %p %d\n", __func__, xTimer, xBlockTime);
+    DEBUG("%s %p %"PRIu32"\n", __func__, xTimer, xBlockTime);
     assert(xTimer != NULL);
 
     freertos_ztimer_t* timer = (freertos_ztimer_t*)xTimer;

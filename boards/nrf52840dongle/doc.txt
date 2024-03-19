@@ -29,14 +29,17 @@ reset button as well as 15 configurable external pins.
 - [nRF52840 web page](https://www.nordicsemi.com/?sc_itemid=%7BCDCCA013-FE4C-4655-B20C-1557AB6568C9%7D)
 - [documentation and hardware description](https://infocenter.nordicsemi.com/topic/ug_nrf52840_dongle/UG/nrf52840_Dongle/intro.html?cp=3_0_5)
 
-### <a name=nrf52840dongle_flash> Flash the board </a>
+### Flash the board {#nrf52840dongle_flash}
 
-The board is flashed using its on-board boot loader; the
-[nrfutil](https://github.com/NordicSemiconductor/pc-nrfutil) program needs to
-be installed. That can turn the binary into a suitable zip file and send it to the
-bootloader.
+The board is flashed using its on-board boot loader; the proprietary
+[nrfutil](https://www.nordicsemi.com/Products/Development-tools/nRF-Util) program needs to
+be installed, and `nrfutil install nrf5sdk-tools` needs to be executed. Note
+that nrfutil, even when not running the "install" command, will install itself
+into `~/.nrfutil`. The older Python based version of nrfutil is no longer
+maintained by Nordic, and has become dysfunctional on Python 3.11.
 
-The process is automated in the usual `make flash` target.
+The nrfutil can turn the binary into a suitable zip file and send it to the
+bootloader. The process is automated in the usual `make flash` target.
 
 If RIOT is already running on the board, it will automatically reset the CPU and enter
 the bootloader.
@@ -44,13 +47,6 @@ If some other firmware is running or RIOT crashed, you need to enter the bootloa
 manually by pressing the board's reset button.
 
 Readiness of the bootloader is indicated by LD2 pulsing in red.
-
-#### nrfutil installation
-
-On systems with Python 2 available, `pip install nrfutil` works.
-
-On systems with Python 3, a recent version of pip is required to install all dependencies;
-you may need to run `pip install --upgrade pip` before being able to run `pip install nrfutil` successfully.
 
 ### Accessing STDIO
 

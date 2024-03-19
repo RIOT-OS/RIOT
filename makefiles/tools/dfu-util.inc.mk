@@ -21,3 +21,7 @@ FFLAGS ?= --device $(DFU_USB_ID) \
 ifeq ($(DFU_USE_DFUSE),1)
   FFLAGS += --dfuse-address $(FLASH_ADDR):leave
 endif
+
+ifneq (,$(DEBUG_ADAPTER_ID))
+  FFLAGS += --serial $(DEBUG_ADAPTER_ID)
+endif

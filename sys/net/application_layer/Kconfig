@@ -14,6 +14,8 @@ endmenu # CoAP
 
 rsource "cord/Kconfig"
 rsource "dhcpv6/Kconfig"
+rsource "dns/Kconfig"
+rsource "sock_dodtls/Kconfig"
 
 menu "MQTT-SN"
 
@@ -21,3 +23,9 @@ rsource "asymcute/Kconfig"
 rsource "emcute/Kconfig"
 
 endmenu # MQTT-SN
+
+menu "Telnet"
+
+rsource "telnet/Kconfig"
+
+endmenu # Telnet

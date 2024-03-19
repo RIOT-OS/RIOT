@@ -1,5 +1,3 @@
-CPU_ARCH = xtensa
-
 # MCU defined features that are provided independent on board definitions
 
 FEATURES_PROVIDED += arch_32bit
@@ -23,6 +21,14 @@ FEATURES_PROVIDED += periph_rtt_set_counter
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart_modecfg
 FEATURES_PROVIDED += ssp
+
+ifeq (xtensa,$(CPU_ARCH))
+  FEATURES_PROVIDED += arch_esp_xtensa
+endif
+
+ifeq (rv32,$(CPU_ARCH))
+  FEATURES_PROVIDED += arch_esp_riscv
+endif
 
 FEATURES_CONFLICT += esp_wifi_ap:esp_now
 FEATURES_CONFLICT_MSG += "ESP_NOW and ESP_WIFI_AP can not be used at the same time."

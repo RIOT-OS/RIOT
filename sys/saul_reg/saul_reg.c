@@ -110,7 +110,7 @@ int saul_reg_read(saul_reg_t *dev, phydat_t *res)
     return dev->driver->read(dev->dev, res);
 }
 
-int saul_reg_write(saul_reg_t *dev, phydat_t *data)
+int saul_reg_write(saul_reg_t *dev, const phydat_t *data)
 {
     if (dev == NULL) {
         return -ENODEV;

@@ -8,7 +8,7 @@
  * directory for more details.
  */
 
-/*
+/**
  * @defgroup    boards_common_arduino-atmega Arduino Atmega Common
  * @ingroup     boards_common
  * @brief       Shared files and configuration for Arduino Atmega boards.
@@ -49,6 +49,9 @@ extern "C" {
 #ifdef CPU_ATMEGA328P
 #define LED0_PIN            GPIO_PIN(1, 5)
 #define LED0_MASK           (1 << DDB5)
+#define LED0_ON             (PORTB |=  LED0_MASK)
+#define LED0_OFF            (PORTB &= ~LED0_MASK)
+#define LED0_TOGGLE         (PORTB ^=  LED0_MASK)
 #endif
 
 #ifdef CPU_ATMEGA32U4
@@ -63,6 +66,9 @@ extern "C" {
 #ifdef CPU_ATMEGA2560
 #define LED0_PIN            GPIO_PIN(1, 7)
 #define LED0_MASK           (1 << DDB7)
+#define LED0_ON             (PORTB |=  LED0_MASK)
+#define LED0_OFF            (PORTB &= ~LED0_MASK)
+#define LED0_TOGGLE         (PORTB ^=  LED0_MASK)
 #endif
 
 #ifdef CPU_ATMEGA32U4
@@ -75,10 +81,6 @@ extern "C" {
 #define LED2_OFF            (PORTD |=  LED2_MASK) /**< TX LED */
 #define LED2_ON             (PORTD &= ~LED2_MASK)
 #define LED2_TOGGLE         (PORTD ^=  LED2_MASK)
-#else
-#define LED0_ON             (PORTD |=  LED0_MASK)
-#define LED0_OFF            (PORTD &= ~LED0_MASK)
-#define LED0_TOGGLE         (PORTD ^=  LED0_MASK)
 #endif
 /** @} */
 
@@ -91,7 +93,7 @@ extern "C" {
 
 /**
  * @name CPU clock scale for arduino boards
- *
+ * @{
  */
 #define CPU_ATMEGA_CLK_SCALE_INIT    CPU_ATMEGA_CLK_SCALE_DIV1
 /** @} */
@@ -120,23 +122,6 @@ extern "C" {
 #define CONFIG_ZTIMER_USEC_ADJUST_SLEEP   (116)
 #endif
 /** @} */
-
-/**
- * @name    Configuration parameters for the W5100 driver
- * @{
- */
-#ifndef W5100_PARAM_CS
-#define W5100_PARAM_CS          (ARDUINO_PIN_10)
-#endif
-#ifndef W5100_PARAM_EVT
-#define W5100_PARAM_EVT         (ARDUINO_PIN_2)
-#endif
-/** @} */
-
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

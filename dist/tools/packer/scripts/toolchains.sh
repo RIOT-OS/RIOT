@@ -8,18 +8,6 @@ cd /opt && wget -nv -O - "${ARM_GCC_ARCHIVE_URL}" | tar -jxf -
 
 echo "export PATH=/opt/gcc-arm-none-eabi-9-2019-q4-major/bin:\$PATH" >> /home/${SSH_USERNAME}/.bashrc
 
-# Install MIPS toolchain
-MIPS_VERSION=2018.09-03
-curl -L "https://codescape.mips.com/components/toolchain/${MIPS_VERSION}/Codescape.GNU.Tools.Package.${MIPS_VERSION}.for.MIPS.MTI.Bare.Metal.CentOS-6.x86_64.tar.gz" -o - \
-    | tar -C /opt -zx
-rm -rf /opt/mips-mti-elf/*/share/{doc,info,man,locale}
-cd /opt/mips-mti-elf/*/mips-mti-elf/bin
-for f in *; do test -f "../../bin/mips-mti-elf-$f" && ln -f "../../bin/mips-mti-elf-$f" "$f"; done
-cd -
-
-echo "export MIPS_ELF_ROOT=/opt/mips-mti-elf/${MIPS_VERSION}" >> /home/${SSH_USERNAME}/.bashrc
-echo "export PATH=\$MIPS_ELF_ROOT/bin:\$PATH" >> /home/${SSH_USERNAME}/.bashrc
-
 # Install MSP430 toolchain
 MSP430_URL=https://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/latest/exports
 MSP430_VERSION=8.3.0.16_linux64

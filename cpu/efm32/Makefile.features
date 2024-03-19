@@ -3,6 +3,9 @@ include $(RIOTCPU)/efm32/efm32-features.mk
 
 CPU_CORE = $(EFM32_ARCHITECTURE)
 
+# allow CPU families to add features individually
+-include $(RIOTCPU)/efm32/families/$(CPU_FAM)/Makefile.features
+
 # families without MPU
 ifeq (,$(filter efm32zg efm32hg, $(CPU_FAM)))
   FEATURES_PROVIDED += cortexm_mpu
@@ -11,20 +14,33 @@ endif
 FEATURES_PROVIDED += arch_efm32
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_flashpage
+FEATURES_PROVIDED += periph_flashpage_in_address_space
 FEATURES_PROVIDED += periph_flashpage_pagewise
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
+FEATURES_PROVIDED += periph_gpio_ll
+FEATURES_PROVIDED += periph_gpio_ll_disconnect
+FEATURES_PROVIDED += periph_gpio_ll_input_pull_down
+FEATURES_PROVIDED += periph_gpio_ll_input_pull_up
+FEATURES_PROVIDED += periph_gpio_ll_open_drain
+FEATURES_PROVIDED += periph_gpio_ll_open_drain_pull_up
+FEATURES_PROVIDED += periph_gpio_ll_open_source
+FEATURES_PROVIDED += periph_gpio_ll_open_source_pull_down
 FEATURES_PROVIDED += periph_rtt_set_counter
 FEATURES_PROVIDED += periph_rtt_overflow
+FEATURES_PROVIDED += periph_uart_modecfg
 FEATURES_PROVIDED += periph_wdt
 
 FEATURES_CONFLICT += periph_rtc:periph_rtt
 FEATURES_CONFLICT_MSG += "On the EFM32, the RTC and RTT map to the same hardware peripheral."
 
+FEATURES_CONFLICT += cortexm_fpu:gecko_sdk_librail_nonfpu
+FEATURES_CONFLICT_MSG += "Using librail with the FPU enabled is not supported on this CPU."
+
 ifeq (1,$(EFM32_TRNG))
   FEATURES_PROVIDED += periph_hwrng
 endif
 
-ifeq (1,$(EFM32_SERIES))
+ifneq (,$(filter $(EFM32_SERIES),1 2))
   FEATURES_PROVIDED += periph_wdt_cb
 endif
 

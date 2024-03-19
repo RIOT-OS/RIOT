@@ -1,6 +1,5 @@
 # include module specific includes
 INCLUDES += -I$(RIOTCPU)/cortexm_common/include
-INCLUDES += -I$(RIOTCPU)/cortexm_common/include/vendor
 
 # All variables must be defined in the CPU configuration when using the common
 # `ldscripts/cortexm.ld`
@@ -70,19 +69,12 @@ else
 endif
 
 # Configure riotboot bootloader and slot lengths
-# 4KB are currently enough, set it to 16KB if USB-DFU is used
-ifneq (,$(filter usbus_dfu,$(USEMODULE)))
+# 4KB are currently enough, set it to 16KB if USB-DFU or tinyUSB DFU is used
+ifneq (,$(filter usbus_dfu tinyusb_dfu,$(USEMODULE)))
   RIOTBOOT_LEN ?= 0x4000
 else
   RIOTBOOT_LEN ?= 0x1000
 endif
-# Currently 2 slots are supported by default, equals in length
-NUM_SLOTS ?= 2
-# Take the whole flash minus RIOTBOOT_LEN and divide it by NUM_SLOTS
-SLOT0_LEN ?= $(shell printf "0x%x" $$((($(ROM_LEN:%K=%*1024)-$(RIOTBOOT_LEN)) / $(NUM_SLOTS))))
-SLOT1_LEN ?= $(SLOT0_LEN)
-SLOT0_LEN := $(SLOT0_LEN)
-SLOT1_LEN := $(SLOT1_LEN)
 
 # JLink is able to flash any ARM CPUs
 PROGRAMMERS_SUPPORTED += jlink

@@ -1,2 +1,6 @@
 USEMODULE += gecko_sdk_emlib
 USEMODULE += gecko_sdk_emlib_extra
+
+ifneq (,$(filter gecko_sdk_librail_pa,$(USEMODULE)))
+  USEMODULE += gecko_sdk_librail
+endif

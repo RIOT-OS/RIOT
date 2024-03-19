@@ -5,6 +5,8 @@ include $(RIOTCPU)/cortexm_common/Makefile.features
 
 FEATURES_PROVIDED += periph_gpio
 FEATURES_PROVIDED += periph_gpio_irq
+FEATURES_PROVIDED += periph_pio
 FEATURES_PROVIDED += periph_timer_periodic
 FEATURES_PROVIDED += periph_uart_reconfigure
 FEATURES_PROVIDED += periph_uart_modecfg
+FEATURES_PROVIDED += pio_i2c

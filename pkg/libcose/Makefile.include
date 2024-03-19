@@ -1,4 +1,7 @@
-INCLUDES += -I$(PKGDIRBASE)/libcose/include
+INCLUDES += -I$(PKGDIRBASE)/libcose/include \
+            -I$(RIOTBASE)/pkg/libcose/include \
+            #
+
 CFLAGS += -DUSE_CBOR_CONTEXT
 
 ifneq (,$(filter libcose_crypt_hacl,$(USEMODULE)))
@@ -10,6 +13,20 @@ endif
 ifneq (,$(filter libcose_crypt_tinycrypt,$(USEMODULE)))
   CFLAGS += -DCRYPTO_TINYCRYPT
 endif
+ifneq (,$(filter libcose_crypt_monocypher,$(USEMODULE)))
+  CFLAGS += -DCRYPTO_MONOCYPHER
+endif
+ifneq (,$(filter libcose_crypt_riot,$(USEMODULE)))
+  CFLAGS += -DCRYPTO_RIOT
+  DIRS += $(RIOTBASE)/pkg/libcose/contrib
+endif
+ifneq (,$(filter libcose_crypt_init,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/libcose/init
+endif
 
 # Declare pseudomodules here to be selfcontained
-PSEUDOMODULES += libcose_crypt_%
+PSEUDOMODULES += libcose_crypt_c25519
+PSEUDOMODULES += libcose_crypt_hacl
+PSEUDOMODULES += libcose_crypt_tinycrypt
+PSEUDOMODULES += libcose_crypt_monocypher
+PSEUDOMODULES += auto_init_libcose_crypt

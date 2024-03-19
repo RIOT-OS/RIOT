@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Gunar Schorcht
+ * Copyright (C) 2022 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -19,14 +19,17 @@
  * @}
  */
 
+/* RIOT headers have to be included before ESP-IDF headers! */
 #include "cpu.h"
-#include "esp_attr.h"
-#include "esp_sleep.h"
 #include "irq_arch.h"
 #include "log.h"
 #include "periph/rtt.h"
 #include "rtt_arch.h"
 #include "syscalls.h"
+
+/* ESP-IDF headers */
+#include "esp_attr.h"
+#include "esp_sleep.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -55,7 +58,7 @@ extern uint32_t rtc_clk_slow_freq_get_hz(void);
 /* forward declaration of functions */
 void rtt_restore_counter(bool sys_time);
 static void _rtt_update_hw_alarm(void);
-static void IRAM_ATTR _rtt_isr(void *arg);
+static void _rtt_isr(void *arg);
 
 /* forward declarations of driver functions */
 uint64_t _rtc_get_counter(void);
@@ -79,7 +82,8 @@ void rtt_init(void)
         }
     }
 
-    DEBUG("%s rtt_offset=%u @rtc=%llu rtc_active=%d @sys_time=%llu\n", __func__,
+    DEBUG("%s rtt_offset=%" PRIu32 " @rtc=%" PRIu64
+          " rtc_active=%d @sys_time=%" PRIi64 "\n", __func__,
           _rtt_offset, _rtc_get_counter(),
           (_rtt_hw == &_rtt_hw_sys_driver) ? 1 : 0, system_get_time_64());
 
@@ -129,7 +133,8 @@ uint32_t rtt_get_counter(void)
 {
     /* we use only the lower 32 bit of the 48-bit RTC counter */
     uint32_t counter = _rtt_hw->get_counter() + _rtt_offset;
-    DEBUG("%s counter=%u @sys_time=%u\n", __func__, counter, system_get_time());
+    DEBUG("%s counter=%" PRIu32 " @sys_time=%" PRIu32" \n",
+          __func__, counter, system_get_time());
     return counter;
 }
 
@@ -138,7 +143,7 @@ void rtt_set_counter(uint32_t counter)
     uint32_t _rtt_current = _rtt_hw->get_counter();
     _rtt_offset = counter - _rtt_current;
 
-    DEBUG("%s set=%u rtt_offset=%u @rtt=%u\n",
+    DEBUG("%s set=%" PRIu32 " rtt_offset=%" PRIu32 " @rtt=%" PRIu32 "\n",
           __func__, counter, _rtt_offset, _rtt_current);
 
     _rtt_update_hw_alarm();
@@ -151,7 +156,7 @@ void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
     rtt_counter.alarm_cb = cb;
     rtt_counter.alarm_arg = arg;
 
-    DEBUG("%s alarm=%u @rtt=%u\n", __func__, alarm, counter);
+    DEBUG("%s alarm=%" PRIu32 " @rtt=%" PRIu32 "\n", __func__, alarm, counter);
 
     _rtt_update_hw_alarm();
 }
@@ -163,7 +168,7 @@ void rtt_clear_alarm(void)
     rtt_counter.alarm_cb = NULL;
     rtt_counter.alarm_arg = NULL;
 
-    DEBUG("%s @rtt=%u\n", __func__, (uint32_t)_rtt_hw->get_counter());
+    DEBUG("%s @rtt=%" PRIu32 "\n", __func__, (uint32_t)_rtt_hw->get_counter());
 
     _rtt_update_hw_alarm();
 }
@@ -194,7 +199,7 @@ uint64_t rtt_pm_sleep_enter(unsigned mode)
     uint32_t counter = rtt_get_counter();
     uint64_t t_diff = RTT_TICKS_TO_US(rtt_counter.alarm_active - counter);
 
-    DEBUG("%s rtt_alarm=%u @rtt=%u t_diff=%llu\n", __func__,
+    DEBUG("%s rtt_alarm=%" PRIu32 " @rtt=%" PRIu32 " t_diff=%llu\n", __func__,
           rtt_counter.alarm_active, counter, t_diff);
 
     if (t_diff) {
@@ -247,7 +252,7 @@ static void IRAM_ATTR _rtt_isr(void *arg)
 
     if (rtt_counter.wakeup) {
         rtt_counter.wakeup = false;
-        DEBUG("%s wakeup alarm alarm=%u rtt_alarm=%u @rtt=%u\n",
+        DEBUG("%s wakeup alarm alarm=%" PRIu32 " rtt_alarm=%" PRIu32 " @rtt=%" PRIu32 "\n",
               __func__, alarm, rtt_counter.alarm_active, rtt_get_counter());
     }
 
@@ -273,7 +278,7 @@ static void IRAM_ATTR _rtt_isr(void *arg)
         }
     }
 
-   DEBUG("%s next rtt=%u\n", __func__, rtt_counter.alarm_active);
+   DEBUG("%s next rtt=%" PRIu32 "\n", __func__, rtt_counter.alarm_active);
 }
 
 uint32_t _rtt_hw_to_rtt_counter(uint32_t hw_counter)

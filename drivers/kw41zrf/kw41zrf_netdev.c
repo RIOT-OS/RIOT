@@ -100,6 +100,9 @@ static int kw41zrf_netdev_init(netdev_t *netdev)
         return -1;
     }
 
+    /* signal link UP */
+    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+
     return 0;
 }
 
@@ -240,14 +243,14 @@ static int kw41zrf_netdev_send(netdev_t *netdev, const iolist_t *iolist)
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
         /* current packet data + FCS too long */
         if ((len + iol->iol_len) > (KW41ZRF_MAX_PKT_LENGTH - IEEE802154_FCS_LEN)) {
-            LOG_ERROR("[kw41zrf] packet too large (%u byte) to fit\n",
-                  (unsigned)len + IEEE802154_FCS_LEN);
+            LOG_ERROR("[kw41zrf] packet too large (%" PRIuSIZE " byte) to fit\n",
+                  len + IEEE802154_FCS_LEN);
             return -EOVERFLOW;
         }
         len = kw41zrf_tx_load(iol->iol_base, iol->iol_len, len);
     }
 
-    DEBUG("[kw41zrf] TX %u bytes\n", len);
+    DEBUG("[kw41zrf] TX %" PRIuSIZE " bytes\n", len);
 
     /*
      * First octet in the TX buffer contains the frame length.
@@ -473,7 +476,6 @@ int kw41zrf_netdev_get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
             return sizeof(netopt_enable_t);
 
         case NETOPT_RX_START_IRQ:
-        case NETOPT_RX_END_IRQ:
         case NETOPT_TX_START_IRQ:
         case NETOPT_TX_END_IRQ:
             assert(len >= sizeof(netopt_enable_t));

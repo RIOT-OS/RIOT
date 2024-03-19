@@ -1,9 +1,9 @@
 /**
-@defgroup pkg_lvgl LittlevGL - Open-Source Embedded GUI Library
+@defgroup pkg_lvgl LVGL - Open-Source Embedded GUI Library
 @ingroup  pkg
-@brief    LittlevGL package for RIOT
+@brief    LVGL package for RIOT
 
-@see      https://github.com/littlevgl/lvgl
+@see      https://github.com/LVGL/lvgl
 
 ## Configuration options
 
@@ -23,7 +23,11 @@ LVGL_TASK_THREAD_PRIO cannot be configured via Kconfig.
 Example of command line for changing the max activity period to 5s:
 
 ```
-CFLAGS=-DCONFIG_LVGL_ACTIVITY_PERIOD=5000 make -C tests/pkg_lvgl
+CFLAGS=-DCONFIG_LVGL_ACTIVITY_PERIOD=5000 make -C tests/pkg/lvgl
 ```
+
+### SDL Usage
+
+See @ref pkg_lv_drivers.
 
  */

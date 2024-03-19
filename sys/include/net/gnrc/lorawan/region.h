@@ -18,7 +18,7 @@
 #ifndef NET_GNRC_LORAWAN_REGION_H
 #define NET_GNRC_LORAWAN_REGION_H
 
-#include "kernel_defines.h"
+#include "modules.h"
 #include "net/gnrc/lorawan.h"
 
 #ifdef __cplusplus
@@ -76,3 +76,4 @@ bool gnrc_lorawan_validate_dr(uint8_t dr);
 #endif
 
 #endif /* NET_GNRC_LORAWAN_REGION_H */
+/** @} */

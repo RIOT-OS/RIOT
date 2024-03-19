@@ -1,0 +1,4 @@
+$(shell $(COLOR_ECHO) "$(COLOR_YELLOW)shell_lock is an experimental feature and only shows as a \
+  proof of concept how the shell could be protected with a password. Do not expect relevant \
+  security from it for production, since Man-in-the-Middle attacks are possible depending on the \
+  used connection method!$(COLOR_RESET)" 1>&2)

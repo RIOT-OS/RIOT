@@ -2,7 +2,7 @@ MODULE = periph
 
 # Select the specific implementation for `periph_i2c`
 ifneq (,$(filter periph_i2c,$(USEMODULE)))
-  ifneq (,$(filter $(CPU_FAM),f0 f3 f7 g0 g4 l0 l4 l5 u5 wb wl))
+  ifneq (,$(filter $(CPU_FAM),f0 f3 f7 g0 g4 l0 l4 l5 u5 wb wl c0))
     SRC += i2c_1.c
   else ifneq (,$(filter $(CPU_FAM),f1 f2 f4 l1))
     SRC += i2c_2.c
@@ -15,8 +15,8 @@ endif
 ifneq (,$(filter periph_adc,$(USEMODULE)))
   ifneq (,$(filter $(CPU_FAM),f4 f7))
     SRC += adc_f4_f7.c
-  else ifneq (,$(filter $(CPU_FAM),f0 g0))
-    SRC += adc_f0_g0.c
+  else ifneq (,$(filter $(CPU_FAM),f0 g0 c0))
+    SRC += adc_f0_g0_c0.c
   else
     SRC += adc_$(CPU_FAM).c
   endif
@@ -51,10 +51,8 @@ endif
 
 # Select the correct implementation for `periph_usbdev`
 ifneq (,$(filter periph_usbdev,$(USEMODULE)))
-  ifeq (wb,$(CPU_FAM))
+  ifeq (,$(filter usbdev_synopsys_dwc2,$(USEMODULE)))
     SRC += usbdev_fs.c
-  else
-    SRC += usbdev_otg.c
   endif
 endif
 

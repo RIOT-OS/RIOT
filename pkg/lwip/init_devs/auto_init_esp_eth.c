@@ -17,7 +17,7 @@
  * @author  Erik Ekman <eekman@google.com>
  */
 
-#include "esp-eth/esp_eth_netdev.h"
+#include "esp_eth_netdev.h"
 
 #include "lwip_init_devs.h"
 
@@ -27,7 +27,7 @@
 extern esp_eth_netdev_t _esp_eth_dev;
 extern void esp_eth_setup(esp_eth_netdev_t* dev);
 
-static struct netif netif;
+static lwip_netif_t netif;
 
 static void auto_init_esp_eth(void)
 {

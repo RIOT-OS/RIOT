@@ -3,10 +3,7 @@ USEMODULE += lua-contrib
 USEMODULE += printf_float
 
 # LUA is only supported by 32-bit architectures
-FEATURES_REQUIRED += arch_32bit
-
-# LUA is not supported on MIPS because of missing stdin over UART
-FEATURES_BLACKLIST += arch_mips32r2
+FEATURES_REQUIRED_ANY += arch_32bit|arch_64bit
 
 # LUA is not supported on RISCV because of build issues with the toolchain
 # (undefined reference to _times, _unlink and _link functions in provided
@@ -17,3 +14,11 @@ FEATURES_BLACKLIST += arch_riscv
 # - lua/liolib.c:671:38: error: '_IOFBF' undeclared (first use in this function)
 # - lua/liolib.c:671:46: error: '_IOLBF' undeclared (first use in this function)
 FEATURES_BLACKLIST += picolibc
+
+ifneq (,$(filter newlib_syscalls_default,$(USEMODULE)))
+  USEMODULE += libc_gettimeofday
+endif
+
+ifneq (,$(filter native,$(CPU)))
+  USEMODULE += libc_gettimeofday
+endif

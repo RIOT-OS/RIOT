@@ -29,13 +29,13 @@ static int read_mag(const void *dev, phydat_t *res)
 
     lis3mdl_read_mag(d, (lis3mdl_3d_data_t *)res);
 
-    res->unit = UNIT_GS;
+    res->unit = UNIT_GAUSS;
     res->scale = -3;
     return 3;
 }
 
 const saul_driver_t lis3mdl_saul_mag_driver = {
     .read = read_mag,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_MAG,
 };

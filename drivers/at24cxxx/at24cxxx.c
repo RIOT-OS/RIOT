@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include "assert.h"
+#include "macros/utils.h"
 #include "xtimer.h"
 
 #include "at24cxxx_defines.h"
@@ -29,10 +30,6 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
-
-#ifndef MIN
-#define MIN(a, b) ((a) > (b) ? (b) : (a))
-#endif
 
 /**
  * @brief Calculate x mod y, if y is a power of 2
@@ -100,8 +97,34 @@ int _read(const at24cxxx_t *dev, uint32_t pos, void *data, size_t len)
         }
         xtimer_usleep(AT24CXXX_POLL_DELAY_US);
     }
+
     DEBUG("[at24cxxx] i2c_read_regs(): %d; polls: %d\n", check, polls);
+
     return check;
+}
+
+static int _read_max(const at24cxxx_t *dev, uint32_t pos, void *data, size_t len)
+{
+#ifdef PERIPH_I2C_MAX_BYTES_PER_FRAME
+    uint8_t *data_p = data;
+
+    while (len) {
+        size_t clen = MIN(len, PERIPH_I2C_MAX_BYTES_PER_FRAME);
+
+        if (_read(dev, pos, data_p, clen) == AT24CXXX_OK) {
+            len -= clen;
+            pos += clen;
+            data_p += clen;
+        }
+        else {
+            return -EIO;
+        }
+    }
+
+    return AT24CXXX_OK;
+#else
+    return _read(dev, pos, data, len);
+#endif
 }
 
 static
@@ -110,7 +133,6 @@ int _write_page(const at24cxxx_t *dev, uint32_t pos, const void *data, size_t le
     int check;
     uint8_t polls = DEV_MAX_POLLS;
     uint8_t dev_addr;
-    uint16_t _pos;
     uint8_t flags = 0;
 
     if (DEV_EEPROM_SIZE > 2048) {
@@ -118,17 +140,17 @@ int _write_page(const at24cxxx_t *dev, uint32_t pos, const void *data, size_t le
            used for addressing */
         /* append page address bits to device address (if any) */
         dev_addr  = (DEV_I2C_ADDR | ((pos & 0xFF0000) >> 16));
-        _pos = (pos & 0xFFFF);
+        pos &= 0xFFFF;
         flags = I2C_REG16;
     }
     else {
         /* append page address bits to device address (if any) */
         dev_addr = (DEV_I2C_ADDR | ((pos & 0xFF00) >> 8));
-        _pos = pos & 0xFF;
+        pos &= 0xFF;
     }
 
     while (-ENXIO == (check = i2c_write_regs(DEV_I2C_BUS, dev_addr,
-                                             _pos, data, len, flags))) {
+                                             pos, data, len, flags))) {
         if (--polls == 0) {
             break;
         }
@@ -212,8 +234,7 @@ int at24cxxx_read_byte(const at24cxxx_t *dev, uint32_t pos, void *dest)
     return check;
 }
 
-int at24cxxx_read(const at24cxxx_t *dev, uint32_t pos, void *data,
-                      size_t len)
+int at24cxxx_read(const at24cxxx_t *dev, uint32_t pos, void *data, size_t len)
 {
     if (pos + len > DEV_EEPROM_SIZE) {
         return -ERANGE;
@@ -222,9 +243,10 @@ int at24cxxx_read(const at24cxxx_t *dev, uint32_t pos, void *data,
     int check = AT24CXXX_OK;
     if (len) {
         i2c_acquire(DEV_I2C_BUS);
-        check = _read(dev, pos, data, len);
+        check = _read_max(dev, pos, data, len);
         i2c_release(DEV_I2C_BUS);
     }
+
     return check;
 }
 
@@ -254,24 +276,6 @@ int at24cxxx_write(const at24cxxx_t *dev, uint32_t pos, const void *data,
         i2c_release(DEV_I2C_BUS);
     }
     return check;
-}
-
-int at24cxxx_write_page(const at24cxxx_t *dev, uint32_t page, uint32_t offset,
-                        const void *data, size_t len)
-{
-    int check;
-
-    assert(offset < DEV_PAGE_SIZE);
-
-    /* write no more than to the end of the current page to prevent wrap-around */
-    size_t remaining = DEV_PAGE_SIZE - offset;
-    len = MIN(len, remaining);
-
-    i2c_acquire(DEV_I2C_BUS);
-    check = _write_page(dev, page * DEV_PAGE_SIZE + offset, data, len);
-    i2c_release(DEV_I2C_BUS);
-
-    return check ? check : (int) len;
 }
 
 int at24cxxx_set(const at24cxxx_t *dev, uint32_t pos, uint8_t val,
@@ -317,3 +321,82 @@ int at24cxxx_disable_write_protect(const at24cxxx_t *dev)
     gpio_clear(DEV_PIN_WP);
     return AT24CXXX_OK;
 }
+
+#ifdef MODULE_MTD_AT24CXXX
+#include "mtd_at24cxxx.h"
+
+#define DEV(mtd_ptr)        (((mtd_at24cxxx_t *)(mtd_ptr))->at24cxxx_eeprom)
+#define PARAMS(mtd_ptr)     (((mtd_at24cxxx_t *)(mtd_ptr))->params)
+
+static int _mtd_at24cxxx_init(mtd_dev_t *mtd)
+{
+    assert(mtd);
+    assert(mtd->driver == &mtd_at24cxxx_driver);
+    assert(DEV(mtd));
+    assert(PARAMS(mtd));
+    int init = at24cxxx_init(DEV(mtd), PARAMS(mtd));
+    if (init != AT24CXXX_OK) {
+        return init;
+    }
+    mtd->page_size = DEV(mtd)->params.page_size;
+    mtd->pages_per_sector = 1;
+    mtd->sector_count = DEV(mtd)->params.eeprom_size /
+                        DEV(mtd)->params.page_size;
+    mtd->write_size = 1;
+    return 0;
+}
+
+static int _mtd_at24cxxx_read_page(mtd_dev_t *mtd, void *dest, uint32_t page,
+                                   uint32_t offset, uint32_t size)
+{
+    const at24cxxx_t *dev = DEV(mtd);
+
+    /* some i2c implementations have a limit on the transfer size */
+#ifdef PERIPH_I2C_MAX_BYTES_PER_FRAME
+    size = MIN(size, PERIPH_I2C_MAX_BYTES_PER_FRAME);
+#endif
+
+    i2c_acquire(DEV_I2C_BUS);
+    int res = _read(dev, page * mtd->page_size + offset, dest, size);
+    i2c_release(DEV_I2C_BUS);
+
+    return res < 0 ? res : (int)size;
+}
+
+static int mtd_at24cxxx_write_page(mtd_dev_t *mtd, const void *src, uint32_t page,
+                                   uint32_t offset, uint32_t size)
+{
+    const at24cxxx_t *dev = DEV(mtd);
+
+    /* write no more than to the end of the current page to prevent wrap-around */
+    size_t remaining = DEV_PAGE_SIZE - offset;
+    size = MIN(size, remaining);
+
+    i2c_acquire(DEV_I2C_BUS);
+    int res = _write_page(dev, page * mtd->page_size + offset, src, size);
+    i2c_release(DEV_I2C_BUS);
+
+    return res < 0 ? res : (int)size;
+}
+
+static int _mtd_at24cxxx_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
+{
+    return at24cxxx_clear(DEV(mtd), addr, size) == AT24CXXX_OK ? 0 : -EIO;
+}
+
+static int _mtd_at24cxxx_power(mtd_dev_t *mtd, enum mtd_power_state power)
+{
+    (void)mtd;
+    (void)power;
+    return -ENOTSUP;
+}
+
+const mtd_desc_t mtd_at24cxxx_driver = {
+    .init = _mtd_at24cxxx_init,
+    .read_page = _mtd_at24cxxx_read_page,
+    .write_page = mtd_at24cxxx_write_page,
+    .erase = _mtd_at24cxxx_erase,
+    .power = _mtd_at24cxxx_power,
+    .flags = MTD_DRIVER_FLAG_DIRECT_WRITE,
+};
+#endif

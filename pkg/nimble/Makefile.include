@@ -48,8 +48,10 @@ ifneq (,$(filter nimble_host_util,$(USEMODULE)))
 endif
 
 # include transport headers
-ifneq (,$(filter nimble_transport_ram,$(USEMODULE)))
-  INCLUDES += $(NIMIBASE)/nimble/transport/ram/include
+INCLUDES += $(NIMIBASE)/nimble/transport/include
+
+ifneq (,$(filter nimble_transport_hci_h4,$(USEMODULE)))
+  INCLUDES += $(NIMIBASE)/nimble/transport/common/hci_h4/include
 endif
 
 # include services
@@ -88,6 +90,7 @@ endif
 
 ifneq (,$(filter nimble_autoadv,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/nimble/autoadv/include
+  DIRS += $(RIOTPKG)/nimble/autoadv
 endif
 
 ifneq (,$(filter nimble_autoconn,$(USEMODULE)))
@@ -95,11 +98,29 @@ ifneq (,$(filter nimble_autoconn,$(USEMODULE)))
 endif
 
 ifneq (,$(filter nimble_adv_ext,$(USEMODULE)))
+  # extended advertising HCI events can be up to 257 bytes
+  CFLAGS += -DMYNEWT_VAL_BLE_TRANSPORT_EVT_SIZE=257
+  CFLAGS += -DMYNEWT_VAL_BLE_TRANSPORT_EVT_COUNT=4
   CFLAGS += -DMYNEWT_VAL_BLE_EXT_ADV=1
   CFLAGS += -DMYNEWT_VAL_BLE_LL_EXT_ADV_AUX_PTR_CNT=2
+  CFLAGS += -DMYNEWT_VAL_BLE_LL_SCAN_AUX_SEGMENT_CNT=1
   ifneq (,$(filter nimble_controller,$(USEMODULE)))
     CFLAGS += -DMYNEWT_VAL_BLE_LL_CFG_FEAT_LL_EXT_ADV=1
   endif
+  ifneq (,$(filter nimble_netif,$(USEMODULE)))
+    $(eval $(call _add_ext_adv_instance,NIMBLE_NETIF_ADV_INSTANCE))
+  endif
+  ifneq (,$(filter nimble_autoadv,$(USEMODULE)))
+    $(eval $(call _add_ext_adv_instance,NIMBLE_AUTOADV_INSTANCE))
+  endif
+  # check that an advertisement instances was configured
+  ifneq (-1,$(BLE_MULTI_ADV_INSTANCES))
+    CFLAGS += -DMYNEWT_VAL_BLE_MULTI_ADV_INSTANCES=$(BLE_MULTI_ADV_INSTANCES)
+  endif
+else
+  # when only using non-extended advertisements the maximum HCI event size is
+  # 45 bytes
+  CFLAGS += -DMYNEWT_VAL_BLE_TRANSPORT_EVT_SIZE=45
 endif
 
 ifneq (,$(filter nimble_netif,$(USEMODULE)))
@@ -117,7 +138,7 @@ ifneq (,$(filter nimble_netif,$(USEMODULE)))
 
   # in order to fit a 251 byte COC data segment into a single mbuf buffer, the
   # used block size must be at least 297 byte (251 data + 48 overhead)
-  CFLAGS += -DMYNEWT_VAL_MSYS_1_BLOCK_SIZE="(MYNEWT_VAL_BLE_L2CAP_COC_MPS + 48)"
+  CFLAGS += -DMYNEWT_VAL_MSYS_1_BLOCK_SIZE='(MYNEWT_VAL_BLE_L2CAP_COC_MPS + 48)'
 
   # in the worst case, NimBLEs internal buffer needs to hold two full IPv6 MTUs
   # per connection (1 TX and 1 RX). But in practice this would be highly over-
@@ -140,7 +161,7 @@ else
 
     # in order to fit a 251 byte COC data segment into a single mbuf buffer, the
     # used block size must be at least 297 byte (251 data + 48 overhead)
-    CFLAGS += -DMYNEWT_VAL_MSYS_1_BLOCK_SIZE="(MYNEWT_VAL_BLE_L2CAP_COC_MPS + 48)"
+    CFLAGS += -DMYNEWT_VAL_MSYS_1_BLOCK_SIZE='(MYNEWT_VAL_BLE_L2CAP_COC_MPS + 48)'
   endif
 endif
 

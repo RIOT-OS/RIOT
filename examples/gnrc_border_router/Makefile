@@ -29,7 +29,7 @@ USEMODULE += gnrc_sixlowpan_border_router_default
 USEMODULE += gnrc_icmpv6_echo
 # Add also the shell, some shell commands
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 
 # Optionally include RPL as a routing protocol. When includede gnrc_uhcpc will
@@ -43,18 +43,35 @@ USEMODULE += ps
 #USEMODULE += gnrc_ipv6_nib_dns     # include RDNSS option handling
 
 # When using a regular network uplink we should use DHCPv6
-ifneq (,$(filter cdc-ecm wifi ethernet,$(UPLINK)))
-  USE_DHCPV6 ?= 1
+ifneq (,$(filter cdc-ecm wifi ethernet,$(UPLINK))$(REUSE_TAP))
+  PREFIX_CONF ?= dhcpv6
 else
-  USE_DHCPV6 ?= 0
+  PREFIX_CONF ?= uhcp
 endif
 
-ifeq (1,$(USE_DHCPV6))
+# Check if the selected method for prefix configuration is valid
+ifeq (,$(filter dhcpv6 uhcp auto_subnets static,$(PREFIX_CONF)))
+  $(error Supported methods for prefix configuration are `dhcpv6`, `uhcp` `static` and `auto_subnets`)
+endif
+
+ifeq (dhcpv6,$(PREFIX_CONF))
   # include DHCPv6 client for 6LoWPAN border router
   USEMODULE += gnrc_dhcpv6_client_6lbr
-else
+else ifeq (uhcp,$(PREFIX_CONF))
   # include UHCP client
   USEMODULE += gnrc_uhcpc
+else ifeq (auto_subnets,$(PREFIX_CONF))
+  USEMODULE += gnrc_ipv6_auto_subnets_simple
+else ifeq (static,$(PREFIX_CONF))
+  IPV6_ADDR ?= 2001:db8:1::1
+# Only set this if the default router does not send router advertisements
+# IPV6_DEFAULT_ROUTER ?= fe80::1
+  USEMODULE += gnrc_ipv6_static_addr
+
+  # configure static DNS server
+  ifneq (,$(filter sock_dns,$(USEMODULE)))
+    USEMODULE += auto_init_sock_dns
+  endif
 endif
 
 # Comment this out to disable code in RIOT that does safety checking
@@ -67,7 +84,7 @@ QUIET ?= 1
 
 # Ethos/native TAP interface and UHCP prefix can be configured from make command
 TAP ?= tap0
-ifeq (1,$(USE_DHCPV6))
+ifneq (,$(filter dhcpv6 auto_subnets,$(PREFIX_CONF)))
   # with DHCPv6 the 64-bit delegated prefixes are generated from a shorter
   # configured prefix.
   IPV6_PREFIX ?= 2001:db8::/32
@@ -81,7 +98,7 @@ endif
 # use ethos (ethernet over serial) or SLIP (serial-line IP) for network
 # communication and stdio over UART, but not on native, as native has a tap
 # interface towards the host.
-ifeq (,$(filter native,$(BOARD)))
+ifeq (,$(filter native native64,$(BOARD)))
   ifeq (slip,$(UPLINK))
     # SLIP baudrate and UART device can be configured from make command
     SLIP_BAUDRATE ?= 115200
@@ -110,7 +127,7 @@ include $(RIOTBASE)/Makefile.include
 
 # Compile-time configuration for DHCPv6 client (needs to come after
 # Makefile.include as this might come from Kconfig)
-ifeq (1,$(USE_DHCPV6))
+ifeq (dhcpv6,$(PREFIX_CONF))
   ifndef CONFIG_GNRC_DHCPV6_CLIENT_6LBR_STATIC_ROUTE
     ifeq (1,$(STATIC_ROUTES))
       CFLAGS += -DCONFIG_GNRC_DHCPV6_CLIENT_6LBR_STATIC_ROUTE=1
@@ -118,6 +135,16 @@ ifeq (1,$(USE_DHCPV6))
       # for `fe80::2`.
       CFLAGS += -DCONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF=3
     endif
+  endif
+else ifeq (static,$(PREFIX_CONF))
+  ifndef CONFIG_GNRC_IPV6_STATIC_ADDR
+    CFLAGS += -DCONFIG_GNRC_IPV6_STATIC_ADDR=\"$(IPV6_ADDR)\"
+  endif
+  ifndef CONFIG_GNRC_IPV6_STATIC_PREFIX
+    CFLAGS += -DCONFIG_GNRC_IPV6_STATIC_PREFIX=\"$(IPV6_PREFIX)\"
+  endif
+  ifndef CONFIG_GNRC_IPV6_STATIC_DEFAULT_ROUTER
+    CFLAGS += -DCONFIG_GNRC_IPV6_STATIC_DEFAULT_ROUTER=\"$(IPV6_DEFAULT_ROUTER)\"
   endif
 endif
 
@@ -128,8 +155,8 @@ host-tools:
 	$(Q)env -u CC -u CFLAGS $(MAKE) -C $(RIOTTOOLS)
 
 # define native specific targets to only run UHCP daemon when required
-ifneq (,$(filter native,$(BOARD)))
-ifneq (1,$(USE_DHCPV6))
+ifneq (,$(filter native native64,$(BOARD)))
+ifeq (uhcp,$(PREFIX_CONF))
 .PHONY: uhcpd-daemon
 
 uhcpd-daemon: host-tools

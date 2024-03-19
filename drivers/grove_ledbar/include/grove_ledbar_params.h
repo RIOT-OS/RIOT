@@ -34,14 +34,14 @@ extern "C"
  * @brief   Clock GPIO pin
  */
 #ifndef GROVE_LEDBAR_CLK
-#define GROVE_LEDBAR_CLK        (GPIO_PIN(0,1))
+#define GROVE_LEDBAR_CLK        (GPIO_PIN(0, 1))
 #endif
 
 /**
  * @brief   Data GPIO pin
  */
 #ifndef GROVE_LEDBAR_DAT
-#define GROVE_LEDBAR_DAT        (GPIO_PIN(0,2))
+#define GROVE_LEDBAR_DAT        (GPIO_PIN(0, 2))
 #endif
 
 /**

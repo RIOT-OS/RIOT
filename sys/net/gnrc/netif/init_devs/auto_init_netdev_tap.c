@@ -21,8 +21,9 @@
 #include "debug.h"
 #include "netdev_tap_params.h"
 #include "net/gnrc/netif/ethernet.h"
+#include "include/init_devs.h"
 
-#define TAP_MAC_STACKSIZE           (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)
+#define TAP_MAC_STACKSIZE           (GNRC_NETIF_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)
 #define TAP_MAC_PRIO                (GNRC_NETIF_PRIO)
 
 static netdev_tap_t netdev_tap[NETDEV_TAP_MAX];
@@ -34,6 +35,10 @@ void auto_init_netdev_tap(void)
 {
     for (unsigned i = 0; i < NETDEV_TAP_MAX; i++) {
         const netdev_tap_params_t *p = &netdev_tap_params[i];
+
+        if (p->tap_name == NULL) {
+            continue;
+        }
 
         LOG_DEBUG("[auto_init_netif] initializing netdev_tap #%u on TAP %s\n",
                   i, *(p->tap_name));

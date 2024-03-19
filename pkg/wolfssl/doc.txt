@@ -107,7 +107,7 @@
  * is also included in the build.
  *
  * Alternatively, to enable full-POSIX TLS/DTLS, select the `wolfssl_socket` module by
- * adding the followint to the application's Makefile:
+ * adding the following to the application's Makefile:
  *
  * ```makefile
  * USEMODULE += wolfssl_socket
@@ -127,7 +127,7 @@
  * platforms.
  *
  * ```makefile
- * cd <path-to>/RIOT/tests/wolfssl-test
+ * cd <path-to>/RIOT/tests/pkg/wolfssl-test
  * make
  * ./bin/native/wolfssl-test.elf # execute native port
  * ```
@@ -138,7 +138,7 @@
  * and memory requirements
  *
  * ```makefile
- * cd <path-to>/RIOT/tests/wolfcrypt-ed25519-verify
+ * cd <path-to>/RIOT/tests/pkg/wolfcrypt-ed25519-verify
  * make
  * ./bin/native/wolfcrypt-ed25519-verify.elf # execute native port
  * ```

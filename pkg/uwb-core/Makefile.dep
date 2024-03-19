@@ -16,14 +16,11 @@ ifneq (,$(filter uwb-core_rng,$(USEMODULE)))
   USEMODULE += uwb-core_dsp
 endif
 
-ifneq (,$(filter uwb-core_uwbcfg,$(USEMODULE)))
-  USEMODULE += uwb-core_config
-endif
-
 ifneq (,$(filter uwb-core_dpl,$(USEMODULE)))
   USEPKG += mynewt-core
   USEMODULE += mynewt-core_os
-  ifneq (,$(filter nrf5%,$(CPU)))
+  # don't pull nrf53 into the list
+  ifneq (,$(filter nrf51 nrf52,$(CPU)))
     USEMODULE += mynewt-core_nrf5x_hal
   endif
 endif

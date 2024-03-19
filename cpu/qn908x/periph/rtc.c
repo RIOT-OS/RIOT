@@ -20,6 +20,7 @@
  * @}
  */
 
+#include <errno.h>
 #include <stdlib.h>
 
 #include "cpu.h"
@@ -104,7 +105,7 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
     if (ts <= RTC->SEC) {
         /* The requested time is in the past at the time of executing this
          * instruction, so we return invalid time. */
-        return -2;
+        return -EINVAL;
     }
 
     /* If the requested time arrives (SEC_INT should have fired) before we get

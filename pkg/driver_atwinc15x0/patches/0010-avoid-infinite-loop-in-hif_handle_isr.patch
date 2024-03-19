@@ -1,0 +1,25 @@
+From dfc5062d0b4b209866dac70c276b3a111ffb0568 Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benjamin.valentin@ml-pa.com>
+Date: Tue, 23 Aug 2022 17:18:33 +0200
+Subject: [PATCH] avoid infinite loop in hif_handle_isr()
+
+---
+ src/driver/source/m2m_hif.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/driver/source/m2m_hif.c b/src/driver/source/m2m_hif.c
+index 95ca997..fe9d5af 100644
+--- a/src/driver/source/m2m_hif.c
++++ b/src/driver/source/m2m_hif.c
+@@ -640,7 +640,7 @@ sint8 hif_handle_isr(void)
+ 		/*must be at that place because of the race of interrupt increment and that decrement*/
+ 		/*when the interrupt enabled*/
+ 		gstrHifCxt.u8Interrupt--;
+-		while(1)
++		for (unsigned i = 0; i < 3; ++i)
+ 		{
+ 			ret = hif_isr();
+ #ifdef ARDUINO
+-- 
+2.34.1
+

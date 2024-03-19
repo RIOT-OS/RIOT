@@ -1,0 +1,1 @@
+include $(RIOTBOARD)/common/nucleo64/Makefile.dep

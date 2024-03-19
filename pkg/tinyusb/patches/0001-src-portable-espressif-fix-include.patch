@@ -1,0 +1,24 @@
+From 1035476b12a4c0e886c3bcf4d73795998f6afe76 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Mon, 5 Sep 2022 23:07:54 +0200
+Subject: [PATCH 1/1] src/portable/espressif: fix include
+
+---
+ src/portable/espressif/esp32sx/dcd_esp32sx.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/portable/espressif/esp32sx/dcd_esp32sx.c b/src/portable/espressif/esp32sx/dcd_esp32sx.c
+index a30fca0d8..e2394813e 100644
+--- a/src/portable/espressif/esp32sx/dcd_esp32sx.c
++++ b/src/portable/espressif/esp32sx/dcd_esp32sx.c
+@@ -31,6 +31,7 @@
+ #if (((CFG_TUSB_MCU == OPT_MCU_ESP32S2) ||  (CFG_TUSB_MCU == OPT_MCU_ESP32S3)) && CFG_TUD_ENABLED)
+ 
+ // Espressif
++#include "freertos/FreeRTOS.h"
+ #include "freertos/xtensa_api.h"
+ #include "esp_intr_alloc.h"
+ #include "esp_log.h"
+-- 
+2.17.1
+

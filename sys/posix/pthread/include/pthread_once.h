@@ -23,15 +23,21 @@ extern "C" {
 
 /**
  * @brief           Datatype to supply to pthread_once().
+ * @details         This data type must be compatible with the one defined
+ *                  in newlib's `include/sys/_pthreadtypes.h`.
  */
-typedef volatile int pthread_once_t;
+typedef struct {
+  int   is_initialized;  /**< initialized */
+  int   init_executed;   /**< init function executed */
+} pthread_once_t;
 
 /**
  * @def             PTHREAD_ONCE_INIT
  * @brief           Initialization for pthread_once_t.
- * @details         A zeroed out pthread_once_t is initialized.
+ * @details         pthread_once_t variables are declared as initialized, but
+ *                  the init function is not yet executed.
  */
-#define PTHREAD_ONCE_INIT 0
+#define PTHREAD_ONCE_INIT  { 1, 0 }
 
 /**
  * @brief           Helper function that ensures that `init_routine` is called at once.

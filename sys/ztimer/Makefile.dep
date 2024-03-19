@@ -11,20 +11,6 @@ ifneq (,$(filter ztimer,$(USEMODULE)))
   DEFAULT_MODULE += ztimer_init
 endif
 
-# unless ztimer_xtimer_compat is used, make xtimer use ztimer_usec as backend.
-ifneq (,$(filter ztimer,$(USEMODULE)))
-  ifneq (,$(filter xtimer,$(USEMODULE)))
-    ifeq (,$(filter ztimer_xtimer_compat ztimer64_xtimer_compat,$(USEMODULE)))
-      USEMODULE += xtimer_on_ztimer
-    else
-      USEMODULE += div
-    endif
-  endif
-  ifneq (,$(filter evtimer,$(USEMODULE)))
-    USEMODULE += evtimer_on_ztimer
-  endif
-endif
-
 ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
   USEMODULE += ztimer_usec
 endif
@@ -34,23 +20,21 @@ ifneq (,$(filter ztimer64_xtimer_compat,$(USEMODULE)))
   USEMODULE += ztimer_xtimer_compat
 endif
 
-# make xtimer use ztimer_usec as low level timer
-ifneq (,$(filter xtimer_on_ztimer,$(USEMODULE)))
-  USEMODULE += ztimer_usec
-endif
-
-# make evtimer use ztimer_msec as low level timer
-ifneq (,$(filter evtimer_on_ztimer,$(USEMODULE)))
-  USEMODULE += ztimer_msec
-endif
-
 ifneq (,$(filter ztimer_%,$(USEMODULE)))
   USEMODULE += ztimer_core
   USEMODULE += ztimer_extend
 endif
 
+ifneq (,$(filter ztimer_ondemand_%,$(USEMODULE)))
+  USEMODULE += ztimer_ondemand
+endif
+
 ifneq (,$(filter ztimer_convert_%,$(USEMODULE)))
   USEMODULE += ztimer_convert
+endif
+
+ifneq (,$(filter ztimer_periph_lptimer,$(USEMODULE)))
+  USEMODULE += ztimer_periph_timer
 endif
 
 ifneq (,$(filter ztimer_periph_timer,$(USEMODULE)))
@@ -81,11 +65,11 @@ endif
 # NOTE: select the module here and not in the CPU so that order of inclusion
 # does not have periph_rtt selected earlier that it should be while at the same
 # time avoiding the module 'ztimer-no_periph_rtt' being included unecesarily.
-# The sam0 rtt busy loops for 180us every time an alarm is set or
+# The samd21 rtt busy loops for 180us every time an alarm is set or
 # the counter is read, this propagates and leads to timing errors
 # on ztimer_msec that are higher than > +-1msec.
 # The same goes for the fe310 rtt.
-ifneq (,$(filter sam% fe310,$(CPU)))
+ifneq (,$(filter samd21 fe310,$(CPU)))
   USEMODULE += ztimer_no_periph_rtt
 endif
 

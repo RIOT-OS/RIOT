@@ -1,0 +1,127 @@
+# tinyUSB mutexes use priority inheritance
+# USEMODULE += core_mutex_priority_inheritance
+
+# tinyUSB modules always needed
+USEMODULE += tinyusb_common
+USEMODULE += tinyusb_contrib
+USEMODULE += tinyusb_hw
+
+DEFAULT_MODULE += auto_init_tinyusb
+
+ifneq (,$(filter riotboot_tinyusb_dfu, $(USEMODULE)))
+  FEATURES_REQUIRED += no_idle_thread
+  FEATURES_REQUIRED += periph_pm
+  USEMODULE += riotboot_flashwrite
+  USEMODULE += tinyusb_dfu
+  USEMODULE += ztimer_sec
+endif
+
+ifneq (,$(filter stdio_tinyusb_cdc_acm, $(USEMODULE)))
+  USEMODULE += stdio_available
+  USEMODULE += tinyusb_class_cdc
+  USEMODULE += tinyusb_device
+endif
+
+ifneq (,$(filter tinyusb_dfu,$(USEMODULE)))
+  ifneq (,$(filter riotboot_tinyusb_dfu,$(USEMODULE)))
+    USEMODULE += tinyusb_class_dfu
+  else
+    USEMODULE += tinyusb_class_dfu_runtime
+  endif
+endif
+
+ifneq (,$(filter tinyusb_class_net_%,$(USEMODULE)))
+  USEMODULE += tinyusb_class_net
+endif
+
+ifneq (,$(filter tinyusb_netdev,$(USEMODULE)))
+  USEMODULE += luid
+  USEMODULE += netdev_eth
+  USEMODULE += tinyusb_device
+  ifeq (,$(filter tinyusb_class_net_%,$(USEMODULE)))
+    # default to CDC ECM
+    USEMODULE += tinyusb_class_net_cdc_ecm
+  endif
+endif
+
+ifneq (,$(filter tinyusb_class_net_rndis,$(USEMODULE)))
+  USEMODULE += tinyusb_lib_networking
+endif
+
+ifeq (,$(filter tinyusb_class_%,$(USEMODULE)))
+  $(error At least one tinyusb_class_* module has to be enabled)
+endif
+
+# tinyUSB device stack has to be supported if tinyusb_device is used
+ifneq (,$(filter tinyusb_device,$(USEMODULE)))
+  FEATURES_REQUIRED += tinyusb_device
+endif
+
+# tinyUSB host stack has to be supported if tinyusb_host is used
+ifneq (,$(filter tinyusb_host,$(USEMODULE)))
+  FEATURES_REQUIRED += tinyusb_host
+endif
+
+# Following device classes work only with tinyUSB device stack
+ifneq (,$(filter tinyusb_class_audio,$(USEMODULE)))
+  USEMODULE += tinyusb_device
+endif
+ifneq (,$(filter tinyusb_class_bth,$(USEMODULE)))
+  USEMODULE += tinyusb_device
+endif
+ifneq (,$(filter tinyusb_class_dfu,$(USEMODULE)))
+  USEMODULE += tinyusb_device
+endif
+ifneq (,$(filter tinyusb_class_dfu_runtime,$(USEMODULE)))
+  USEMODULE += tinyusb_device
+endif
+ifneq (,$(filter tinyusb_class_midi,$(USEMODULE)))
+  USEMODULE += tinyusb_device
+endif
+ifneq (,$(filter tinyusb_class_net,$(USEMODULE)))
+  USEMODULE += tinyusb_device
+endif
+ifneq (,$(filter tinyusb_class_usbtmc,$(USEMODULE)))
+  USEMODULE += tinyusb_device
+endif
+ifneq (,$(filter tinyusb_class_video,$(USEMODULE)))
+  USEMODULE += tinyusb_device
+endif
+
+# tinyUSB hardware driver selection
+ifneq (,$(filter esp32s2 esp32s3,$(CPU_FAM)))
+  USEMODULE += tinyusb_portable_espressif
+else ifeq (nrf52,$(CPU))
+  USEPKG += nrfx
+  USEMODULE += tinyusb_portable_nrf5x
+else ifneq (,$(filter saml21 samd5x samd21,$(CPU)))
+  USEMODULE += tinyusb_portable_microchip
+else ifeq (stm32,$(CPU))
+  ifneq (,$(filter f2 f4 f7 h7 u5,$(CPU_FAM)))
+    # Whole STM32 families F2, F4, F7, H7 and U5 use the Synopsys DWC2 USB OTG core
+    USEMODULE += tinyusb_portable_synopsys_dwc2
+  else ifneq (,$(filter stm32f105% stm32f107%,$(CPU_MODEL)))
+    # STM32F105xx and STM32F107xx also use the Synopsys DWC2 USB OTG core
+    USEMODULE += tinyusb_portable_synopsys_dwc2
+  else ifneq (,$(filter stm32l47% stm32l48% stm32l49%,$(CPU_MODEL)))
+    # STM32L475xx, STM32L476xx, STM32L485xx, STM32L486xx and STM32L496xx
+    # also use the Synopsys DWC2 USB OTG core
+    USEMODULE += tinyusb_portable_synopsys_dwc2
+  else ifneq (,$(filter stm32l4a% stm32l4p% stm32l4q% stm32l4r% stm32l4s%,$(CPU_MODEL)))
+    # STM32L4Axxx, STM32L4Pxxx, STM32L4Qxxx, STM32L4Rxxx and STM32L4Sxxx
+    # also use the Synopsys DWC2 USB OTG core
+    USEMODULE += tinyusb_portable_synopsys_dwc2
+  else
+    # all other STM32 with USB interface use USB FS Device core
+    USEMODULE += tinyusb_portable_stm32_fsdev
+  endif
+else ifeq (gd32v,$(CPU))
+  USEMODULE += tinyusb_portable_synopsys_dwc2
+endif
+
+# other module dependencies
+USEMODULE += fmt
+USEMODULE += luid
+USEMODULE += periph_usbdev_clk
+USEMODULE += sema
+USEMODULE += ztimer_msec

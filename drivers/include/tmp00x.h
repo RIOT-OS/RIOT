@@ -166,6 +166,8 @@ extern "C"
 #define TMP00X_CONFIG_CR_AS8       (0x03)   /**< Conversion Time 2s, AVG Samples: 8 */
 #define TMP00X_CONFIG_CR_AS16      (0x04)   /**< Conversion Time 4s, AVG Samples: 16 */
 #define TMP00X_CONFIG_CR_DEF       TMP00X_CONFIG_CR_AS4 /**< Default for Testing */
+/** @} */
+
 
 /**
  * @name    Constants for TMP00X calibration

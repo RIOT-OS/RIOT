@@ -4,7 +4,7 @@ cmdline2xml.sh
 Export all command line include paths and macro definitions to an XML file
 suitable for import in Eclipse CDT.
 
-Instrucions
+Instructions
 -----------
 
 The Eclipse project must be located at "/RIOT" inside your Eclipse workspace,

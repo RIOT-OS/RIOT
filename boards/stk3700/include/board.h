@@ -96,11 +96,6 @@ extern "C" {
 #define CORETEMP_ADC        ADC_LINE(0)
 /** @} */
 
-/**
- * @brief   Initialize the board (GPIO, sensors, clocks).
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

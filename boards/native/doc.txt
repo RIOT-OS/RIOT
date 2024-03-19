@@ -6,8 +6,7 @@
 [Family: native](https://github.com/RIOT-OS/RIOT/wiki/Family:-native)
 
 # Overview
-![Terminal running RIOT native]
-(https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/Native.jpg)
+![Terminal running RIOT native](https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/Native.jpg)
 
 # Hardware
 - CPU: Host CPU
@@ -26,11 +25,17 @@
 
 # Required packages
 
-The `native` version of RIOT will produce a 32 bit binary.
 On Debian/Ubuntu you can install the required libraries with
 
 ```
 sudo apt install gcc-multilib
+```
+
+Likewise, for the unittest execution, `libasan5` is needed for 32 bit binaries.
+On Debian/Ubuntu you can install the required libraries with
+
+```
+sudo apt install lib32asan5
 ```
 
  */

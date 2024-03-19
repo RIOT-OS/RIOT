@@ -14,7 +14,6 @@
  * @brief       Default configuration for the DAC DDS driver
  *
  * @author      Benjamin Valentin <benpicco@beuth-hochschule.de>
- * @}
  */
 
 #ifndef DAC_DDS_PARAMS_H
@@ -47,7 +46,7 @@ extern "C" {
                                   .timer_hz = DAC_DDS_PARAM_TIMER_HZ, \
                                 }
 #endif
-/**@}*/
+/** @} */
 
 /**
  * @brief   DAC DDS configuration

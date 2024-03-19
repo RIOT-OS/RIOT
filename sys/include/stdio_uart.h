@@ -9,15 +9,47 @@
 
 /**
  * @defgroup    sys_stdio_uart STDIO over UART
- * @ingroup     sys
+ * @ingroup     sys_stdio
  *
  * @brief       Standard input/output backend using UART
+ *
+ * To enable stdio over UART, enable the `stdio_uart` module:
+ *
+ *     USEMODULE += stdio_uart
+ *
+ * @note    For many board, `stdio_uart` is already the default stdio backend
+ *          and therefore already enabled.
+ *
+ * ## Input
  *
  * @warning Standard input is disabled by default on UART. To enable it, load
  *          the `stdin` module in your application:
  * ```
  * USEMODULE += stdin
  * ```
+ *
+ * ## UART Configuration
+ *
+ * @note    Running `make BOARD=<your_board> term` will launch `pyterm` with the
+ *          correct parameters, so mostly you do not really need to care about
+ *          the UART configuration.
+ *
+ * By convention RIOT boards used 8N1 encoding with a symbol rate of 115200 Bd
+ * for the UART used as stdio. However, some boards may have a different
+ * configuration due to hardware limitations. Most notably, many AVR boards use
+ * 9600 Bd as symbol rate instead, as they otherwise frequently loose an input
+ * character due to losing interrupts.
+ *
+ * By default UNIX style line endings (`\n`) are used. However, some terminal
+ * programs default to DOS style line endings (`\r\n`). It usually is better to
+ * configure the terminal program on the host to use UNIX style line endings.
+ * In scenarios this is not possible/desired, you can enable the (pseudo-)
+ * module @ref sys_stdio_uart_onlcr to emit DOS style line endings instead.
+ *
+ * RIOT's shell happily accepts both DOS and UNIX style line endings in any
+ * case, so typically no line ending conversion is needed on the input.
+ *
+ * ## STDIO from ISR
  *
  * @attention   Using STDIO over UART from interrupt context should be avoided,
  *              except for debugging purposes
@@ -77,13 +109,6 @@ extern "C" {
  * @brief Baudrate for STDIO
  */
 #define STDIO_UART_BAUDRATE     (115200)
-#endif
-
-#ifndef STDIO_UART_RX_BUFSIZE
-/**
- * @brief Buffer size for STDIO
- */
-#define STDIO_UART_RX_BUFSIZE   (64)
 #endif
 
 #ifdef __cplusplus

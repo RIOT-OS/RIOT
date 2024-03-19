@@ -26,14 +26,6 @@
 #   include <sys/types.h>
 #endif
 
-#ifdef __MACH__
-/* needed for AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER */
-#include <AvailabilityMacros.h>
-#if !defined(AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER)
-typedef int clockid_t;
-#endif
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif

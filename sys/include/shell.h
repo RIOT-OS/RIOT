@@ -23,8 +23,12 @@
 #include <stdint.h>
 #include "periph/pm.h"
 
-#include "kernel_defines.h"
+#include "modules.h"
 #include "xfa.h"
+
+#ifndef __cplusplus
+#include "flash_utils.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,7 +50,7 @@ extern "C" {
  * Instead terminate RIOT, which is also the behavior a user would
  * expect from a CLI application.
  */
-#  if defined(CPU_NATIVE) && !IS_ACTIVE(KCONFIG_USEMODULE_SHELL)
+#  if defined(CPU_NATIVE) && !IS_ACTIVE(MODULE_SHELL_LOCK)
 #    define CONFIG_SHELL_SHUTDOWN_ON_EXIT 1
 #  else
 #    define CONFIG_SHELL_SHUTDOWN_ON_EXIT 0
@@ -106,16 +110,23 @@ void shell_pre_command_hook(int argc, char **argv);
 void shell_post_command_hook(int ret, int argc, char **argv);
 
 /**
- * @brief           Protype of a shell callback handler.
+ * @brief           Prototype of a shell callback handler.
  * @details         The functions supplied to shell_run() must use this signature.
- *                  The argument list is terminated with a NULL, i.e ``argv[argc] == NULL`.
- *                  ``argv[0]`` is the function name.
+ *                  It is designed to mimic the function signature of `main()`.
+ *                  For this reason, the argument list is terminated with a
+ *                  `NULL`, i.e `argv[argc] == NULL` (which is an ANSI-C
+ *                  requirement, and a detail that newlib's `getopt()`
+ *                  implementation relies on). The function name is passed in
+ *                  `argv[0]`.
  *
  *                  Escape sequences are removed before the function is called.
  *
  *                  The called function may edit `argv` and the contained strings,
  *                  but it must be taken care of not to leave the boundaries of the array.
- *                  This functionality can be used by getopt() or a similar function.
+ *                  This functionality is another property that many `getopt()`
+ *                  implementations rely on to provide their so-called "permute"
+ *                  feature extension.
+ *
  * @param[in]       argc   Number of arguments supplied to the function invocation.
  * @param[in]       argv   The supplied argument list.
  *
@@ -134,6 +145,20 @@ typedef struct shell_command_t {
     const char *desc; /**< Description to print in the "help" command. */
     shell_command_handler_t handler; /**< The callback function. */
 } shell_command_t;
+
+#ifndef __cplusplus
+/**
+ * @brief           A single command in the list of the supported commands.
+ *
+ * This type is used internally by the @ref SHELL_COMMAND macro.
+ */
+typedef struct {
+    FLASH_ATTR const char *name; /**< Name of the function */
+    FLASH_ATTR const char *desc; /**< Description to print in the "help"
+                                  *   command. */
+    shell_command_handler_t handler; /**< The callback function. */
+} shell_command_xfa_t;
+#endif /* __cplusplus */
 
 /**
  * @brief           Start a shell and exit once EOF is reached.
@@ -179,8 +204,12 @@ static inline void shell_run(const shell_command_t *commands,
     shell_run_forever(commands, line_buf, len);
 }
 
+#ifndef __cplusplus
 /**
  * @brief   Define shell command
+ *
+ * @note    This is not available from C++, but a trivial C file can easily
+ *          hook up a `extern "C"` function implemented in C++.
  *
  * This macro is a helper for defining a shell command and adding it to the
  * shell commands XFA (cross file array).
@@ -205,10 +234,17 @@ static inline void shell_run(const shell_command_t *commands,
  * SHELL_COMMAND(my_command, "my command help text", _my_command);
  * ```
  */
-#define SHELL_COMMAND(name, help, func) \
-    XFA_USE_CONST(shell_command_t*, shell_commands_xfa); \
-    static const shell_command_t _xfa_ ## name ## _cmd = { #name, help, &func }; \
-    XFA_ADD_PTR(shell_commands_xfa, name, name, &_xfa_ ## name ## _cmd)
+#define SHELL_COMMAND(cmd, help, func) \
+    XFA_USE_CONST(shell_command_xfa_t*, shell_commands_xfa); \
+    static FLASH_ATTR const char _xfa_ ## cmd ## _cmd_name[] = #cmd; \
+    static FLASH_ATTR const char _xfa_ ## cmd ## _cmd_desc[] = help; \
+    static const shell_command_xfa_t _xfa_ ## cmd ## _cmd = { \
+        .name = _xfa_ ## cmd ## _cmd_name, \
+        .desc = _xfa_ ## cmd ## _cmd_desc, \
+        .handler = &func \
+    }; \
+    XFA_ADD_PTR(shell_commands_xfa, cmd, cmd, &_xfa_ ## cmd ## _cmd)
+#endif /* __cplusplus */
 
 #ifdef __cplusplus
 }

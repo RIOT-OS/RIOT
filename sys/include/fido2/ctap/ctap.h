@@ -55,12 +55,12 @@ extern "C" {
  *
  * @{
  */
-#define CTAP_MAKE_CREDENTIAL                0x01 /**< authenticatorMakeCredential method */
-#define CTAP_GET_ASSERTION                  0x02 /**< authenticatorGetAssertion method */
-#define CTAP_GET_INFO                       0x04 /**< authenticatorGetInfo method */
-#define CTAP_CLIENT_PIN                     0x06 /**< authenticatorClientPIN method */
-#define CTAP_RESET                          0x07 /**< authenticatorReset method */
-#define CTAP_GET_NEXT_ASSERTION             0x08 /**< authenticatorGetNextAssertion method */
+#define CTAP_MAKE_CREDENTIAL                0x01    /**< authenticatorMakeCredential method */
+#define CTAP_GET_ASSERTION                  0x02    /**< authenticatorGetAssertion method */
+#define CTAP_GET_INFO                       0x04    /**< authenticatorGetInfo method */
+#define CTAP_CLIENT_PIN                     0x06    /**< authenticatorClientPIN method */
+#define CTAP_RESET                          0x07    /**< authenticatorReset method */
+#define CTAP_GET_NEXT_ASSERTION             0x08    /**< authenticatorGetNextAssertion method */
 /** @} */
 
 /**
@@ -79,9 +79,9 @@ extern "C" {
  *
  * @{
  */
-#define CTAP_VERSION_FLAG_FIDO_PRE  0x01 /**< FIDO 2.1 flag */
-#define CTAP_VERSION_FLAG_FIDO      0x02 /**< FIDO 2 flag */
-#define CTAP_VERSION_FLAG_U2F_V2    0x04 /**< U2F V2 flag */
+#define CTAP_VERSION_FLAG_FIDO_PRE  0x01    /**< FIDO 2.1 flag */
+#define CTAP_VERSION_FLAG_FIDO      0x02    /**< FIDO 2 flag */
+#define CTAP_VERSION_FLAG_U2F_V2    0x04    /**< U2F V2 flag */
 /** @} */
 
 /**
@@ -103,11 +103,11 @@ extern "C" {
  *
  * @{
  */
-#define CTAP_INFO_OPTIONS_FLAG_PLAT         (1 << 0) /**< platform device flag  */
-#define CTAP_INFO_OPTIONS_FLAG_RK           (1 << 1) /**< resident key flag  */
-#define CTAP_INFO_OPTIONS_FLAG_CLIENT_PIN   (1 << 2) /**< clientPIN flag */
-#define CTAP_INFO_OPTIONS_FLAG_UP           (1 << 3) /**< user presence flag */
-#define CTAP_INFO_OPTIONS_FLAG_UV           (1 << 4) /**< user verification flag */
+#define CTAP_INFO_OPTIONS_FLAG_PLAT         (1 << 0)    /**< platform device flag  */
+#define CTAP_INFO_OPTIONS_FLAG_RK           (1 << 1)    /**< resident key flag  */
+#define CTAP_INFO_OPTIONS_FLAG_CLIENT_PIN   (1 << 2)    /**< clientPIN flag */
+#define CTAP_INFO_OPTIONS_FLAG_UP           (1 << 3)    /**< user presence flag */
+#define CTAP_INFO_OPTIONS_FLAG_UV           (1 << 4)    /**< user verification flag */
 /** @} */
 
 /**
@@ -115,11 +115,11 @@ extern "C" {
  *
  * @{
  */
-#define CTAP_CP_REQ_SUB_COMMAND_GET_RETRIES         0x01 /**< getRetries subCommand */
-#define CTAP_CP_REQ_SUB_COMMAND_GET_KEY_AGREEMENT   0x02 /**< getKeyAgreement subCommand */
-#define CTAP_CP_REQ_SUB_COMMAND_SET_PIN             0x03 /**< setPIN subCommand */
-#define CTAP_CP_REQ_SUB_COMMAND_CHANGE_PIN          0x04 /**< changePIN subCommand */
-#define CTAP_CP_REQ_SUB_COMMAND_GET_PIN_TOKEN       0x05 /**< getPinToken subCommand */
+#define CTAP_CP_REQ_SUB_COMMAND_GET_RETRIES         0x01    /**< getRetries subCommand */
+#define CTAP_CP_REQ_SUB_COMMAND_GET_KEY_AGREEMENT   0x02    /**< getKeyAgreement subCommand */
+#define CTAP_CP_REQ_SUB_COMMAND_SET_PIN             0x03    /**< setPIN subCommand */
+#define CTAP_CP_REQ_SUB_COMMAND_CHANGE_PIN          0x04    /**< changePIN subCommand */
+#define CTAP_CP_REQ_SUB_COMMAND_GET_PIN_TOKEN       0x05    /**< getPinToken subCommand */
 /** @} */
 
 /**
@@ -131,7 +131,6 @@ extern "C" {
 #define CTAP_STACKSIZE 15000
 #endif
 
-#if !IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP)
 /**
  * @brief CTAP user presence button
  */
@@ -142,10 +141,13 @@ extern "C" {
 /* set default button if no button is configured */
 #ifdef BTN0_PIN
 #define CTAP_UP_BUTTON BTN0_PIN
-/* if no button available disable UP test */
 #else
+#define CTAP_UP_BUTTON 0
+/**
+ * @brief Disable user presence test configuration
+ */
 #define CONFIG_FIDO2_CTAP_DISABLE_UP 1
-#endif
+#endif /* BTN0_PIN */
 #endif
 
 /**
@@ -174,7 +176,19 @@ extern "C" {
 #define CTAP_UP_BUTTON_FLANK GPIO_FALLING
 #endif
 
-#endif /* !IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP) */
+/**
+ * @brief Disable user presence test configuration
+ */
+#ifndef CONFIG_FIDO2_CTAP_DISABLE_UP
+#define CONFIG_FIDO2_CTAP_DISABLE_UP 0
+#endif
+
+/**
+ * @brief Disable user LED animation configuration
+ */
+#ifndef CONFIG_FIDO2_CTAP_DISABLE_LED
+#define CONFIG_FIDO2_CTAP_DISABLE_LED 0
+#endif
 
 /**
  * @brief Max size of relying party name
@@ -366,7 +380,7 @@ extern "C" {
 /**
  * @brief Max size of allow list
  */
-#define CTAP_MAX_EXCLUDE_LIST_SIZE 0x10
+#define CTAP_MAX_EXCLUDE_LIST_SIZE 0x14
 
 /**
  * @brief CTAP cred struct forward declaration
@@ -406,6 +420,7 @@ typedef struct {
     uint8_t cred_key[CTAP_CRED_KEY_LEN];        /**< AES CCM encryption key for cred */
     bool cred_key_is_initialized;               /**< AES CCM key initialized flag */
     bool pin_is_set;                            /**< PIN is set or not */
+    uint32_t id_cnt;                            /**< id counter for credential id */
 } ctap_state_t;
 
 /**
@@ -484,12 +499,11 @@ struct __attribute__((packed)) ctap_resident_key {
     uint8_t user_id[CTAP_USER_ID_MAX_SIZE];     /**< id of user */
     uint8_t user_id_len;                        /**< length of the user id */
     uint8_t priv_key[CTAP_CRYPTO_KEY_SIZE];     /**< private key */
+    uint16_t id;                                /**< internal id of key */
     uint32_t sign_count;                        /**< signature counter.
                                                    See webauthn specification
                                                    (version 20190304) section 6.1.1
                                                    for details. */
-    uint32_t creation_time;                     /**< timestamp for when credential
-                                                     was created */
     ctap_cred_desc_t cred_desc;                 /**< credential descriptor */
 };
 
@@ -666,6 +680,13 @@ int fido2_ctap_encrypt_rk(ctap_resident_key_t *rk, uint8_t *nonce,
  * @return false otherwise
  */
 bool fido2_ctap_pin_is_set(void);
+
+/**
+ * @brief Get a pointer to the authenticator state
+ *
+ * @return pointer to @ref ctap_state_t
+ */
+ctap_state_t *fido2_ctap_get_state(void);
 
 #ifdef __cplusplus
 }

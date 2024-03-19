@@ -6,7 +6,9 @@
 #
 
 menuconfig MODULE_PCF857X
-    bool "PCF857x Remote I/O Expander for I2C Bus"
+    bool
+    prompt "PCF857x Remote I/O Expander for I2C Bus" if !(MODULE_SAUL_DEFAULT && HAVE_PCF857X)
+    default (MODULE_SAUL_DEFAULT && HAVE_PCF857X)
     depends on HAS_PERIPH_GPIO
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
@@ -21,16 +23,19 @@ if MODULE_PCF857X
 
 config MODULE_PCF8574
     bool "PCF8574  Remote  8-Bit I/O is used"
+    default HAVE_PCF8574
 
 config MODULE_PCF8574A
     bool "PCF8574A Remote  8-Bit I/O is used"
+    default HAVE_PCF8574A
 
 config MODULE_PCF8575
     bool "PCF8575  Remote 16-Bit I/O is used"
-    default y
+    default (!(HAVE_PCF8574A || HAVE_PCF8574) || HAVE_PCF8575)
 
 config MODULE_PCF857X_IRQ
     bool "Interrupt support for PCF857x I/O Expander pins"
+    default PCF857X_IRQ
     depends on MODULE_PCF857X
     depends on HAS_PERIPH_GPIO_IRQ
     select MODULE_PERIPH_GPIO_IRQ
@@ -63,3 +68,33 @@ config MODULE_PCF857X_IRQ_HIGHEST
 endchoice
 
 endif # MODULE_PCF857X
+
+config HAVE_PCF857X
+    bool
+    help
+      Indicates that a PCF857x Remote I/O Expander is present.
+
+config HAVE_PCF8574
+    bool
+    select HAVE_PCF857X
+    help
+      Indicates that a PCF8574 Remote I/O Expander is present.
+
+config HAVE_PCF8574A
+    bool
+    select HAVE_PCF857X
+    help
+      Indicates that a PCF8574A Remote I/O Expander is present.
+
+config HAVE_PCF8575
+    bool
+    select HAVE_PCF857X
+    help
+      Indicates that a PCF8575 Remote I/O Expander is present.
+
+config HAVE_PCF857X_IRQ
+    bool
+    select HAVE_PCF857X
+    help
+      Indicates that a PCF857x Remote I/O Expander is present with the
+      interrupt pin wired.

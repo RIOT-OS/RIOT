@@ -96,8 +96,7 @@ int at24cxxx_read_byte(const at24cxxx_t *dev, uint32_t pos, void *dest);
  * @return          -ERANGE if @p pos + @p len is out of bounds
  * @return          @see i2c_read_regs
  */
-int at24cxxx_read(const at24cxxx_t *dev, uint32_t pos, void *data,
-                  size_t len);
+int at24cxxx_read(const at24cxxx_t *dev, uint32_t pos, void *data, size_t len);
 
 /**
  * @brief   Write a byte at a given position @p pos
@@ -128,23 +127,6 @@ int at24cxxx_write_byte(const at24cxxx_t *dev, uint32_t pos, uint8_t data);
  */
 int at24cxxx_write(const at24cxxx_t *dev, uint32_t pos, const void *data,
                    size_t len);
-
-/**
- * @brief Sequentially write @p len bytes to a given @p page.
- *        The function will write up to the page boundary and then return
- *        the number of bytes written up to that.
- *
- * @param[in] dev       AT24CXXX device handle
- * @param[in] page      page of EEPROM memory
- * @param[in] offset    offset from the start of the page, must be < page size
- * @param[in] data      write buffer
- * @param[in] len       requested length to be written
- *
- * @return    number of bytes written on success
- * @return    error on failure
- */
-int at24cxxx_write_page(const at24cxxx_t *dev, uint32_t page, uint32_t offset,
-                        const void *data, size_t len);
 
 /**
  * @brief   Set @p len bytes from a given position @p pos to the

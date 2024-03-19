@@ -10,3 +10,8 @@ config MODULE_PCA9633
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
+
+config HAVE_PCA9633
+    bool
+    help
+      Indicates that a PCA9633 I2C PWM controller is present.

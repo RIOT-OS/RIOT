@@ -1,0 +1,6 @@
+# include variants of shtcx drivers as pseudo modules
+PSEUDOMODULES += shtc1
+PSEUDOMODULES += shtc3
+
+USEMODULE_INCLUDES_shtcx := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_shtcx)

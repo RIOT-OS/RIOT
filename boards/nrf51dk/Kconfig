@@ -12,6 +12,13 @@ config BOARD_NRF51DK
     default y
     select BOARD_COMMON_NRF51
     select CPU_MODEL_NRF51X22XXAC
+    select HAS_ARDUINO_ANALOG
+    select HAS_ARDUINO_I2C
+    select HAS_ARDUINO_PINS
+    select HAS_ARDUINO_SHIELD_ISP
+    select HAS_ARDUINO_SHIELD_UNO
+    select HAS_ARDUINO_SPI
+    select HAS_PERIPH_ADC
     select HAS_PERIPH_I2C
     select HAS_PERIPH_SPI
     select HAS_PERIPH_UART
@@ -20,6 +27,6 @@ config BOARD_NRF51DK
 
     select HAVE_SAUL_GPIO
 
-    select MODULE_PERIPH_UART_HW_FC if TEST_KCONFIG && HAS_PERIPH_UART_HW_FC
+    select MODULE_PERIPH_UART_HW_FC if HAS_PERIPH_UART_HW_FC && MODULE_PERIPH_UART
 
 source "$(RIOTBOARD)/common/nrf51/Kconfig"

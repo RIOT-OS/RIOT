@@ -28,9 +28,15 @@
 
 #include "periph/cpuid.h"
 
+typedef struct {
+    uint8_t id[CPUID_LEN];
+} cpuid_t;
+
 #ifdef CPUID_ADDR
 void cpuid_get(void *id)
 {
-    memcpy(id, (void *)CPUID_ADDR, CPUID_LEN);
+    cpuid_t *dest = id;
+    const volatile cpuid_t *src = (const void *)CPUID_ADDR;
+    *dest = *src;
 }
 #endif

@@ -33,6 +33,7 @@
  */
 
 #include "cpu.h"
+#include "kernel_init.h"
 #include "stdio_base.h"
 #include "stmclk.h"
 #include "periph_cpu.h"
@@ -45,7 +46,7 @@
 #if defined (CPU_FAM_STM32L4) || defined (CPU_FAM_STM32G4) || \
     defined(CPU_FAM_STM32L5)
 #define BIT_APB_PWREN       RCC_APB1ENR1_PWREN
-#elif defined (CPU_FAM_STM32G0)
+#elif defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32C0)
 #define BIT_APB_PWREN       RCC_APBENR1_PWREN
 #elif !defined(CPU_FAM_STM32MP1)
 #define BIT_APB_PWREN       RCC_APB1ENR_PWREN
@@ -218,7 +219,7 @@ static inline uint32_t _multi_read_reg32(volatile uint32_t *addr, bool *glitch)
  * Think of this as a STM32-specific version of the Rowhammer attack.
  *
  * RDP may not be set correctly due to manufacturing error, glitch or
- * intentional attack.  It's done thrice to reduce the probablility of a
+ * intentional attack.  It's done thrice to reduce the probability of a
  * glitch attack succeeding amongst all of the multireads desgned to make it
  * tougher.
  *
@@ -332,6 +333,26 @@ void _wlx5xx_init_subghz_debug_pins(void)
 #endif
 }
 
+static void swj_init(void)
+{
+#if defined(CPU_FAM_STM32F1)
+    /* Only if the selected SWJ config differs from the reset value, we
+     * actually need to do something. Since both sides are compile time
+     * constants, this hole code gets optimized out by default */
+    if (CONFIG_AFIO_MAPR_SWJ_CFG != SWJ_CFG_FULL_SWJ) {
+        /* The remapping periph clock must first be enabled */
+        RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
+        /* Handling of the MAPR register is a bit involved due to the
+         * write-only nature of the SWJ_CFG field, which returns undefined
+         * garbage on read. `afio_mapr_read()` will read the current MAPR
+         * value, but clear the SWF_CFG vield. `afio_mapr_wriote()` will then
+         * write the value read back, but apply the `SWF_CFG` configuration
+         * from `CONFIG_AFIO_MAPR_SWJ_CFG` first.*/
+        afio_mapr_write(afio_mapr_read());
+    }
+#endif
+}
+
 void cpu_init(void)
 {
     /* initialize the Cortex-M core */
@@ -359,12 +380,9 @@ void cpu_init(void)
     dma_init();
 #endif
     /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
-    stdio_init();
+    early_init();
 
-#ifdef STM32F1_DISABLE_JTAG
-    RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
-    AFIO->MAPR |= AFIO_MAPR_SWJ_CFG_JTAGDISABLE;
-#endif
+    swj_init();
 
     /* trigger static peripheral initialization */
     periph_init();
@@ -396,6 +414,7 @@ void backup_ram_init(void)
 #define BACKUP_RAM_MAGIC    {'R', 'I', 'O', 'T'}
 #endif
 
+__attribute__((unused))
 static inline bool _backup_battery_connected(void) {
 #if IS_USED(MODULE_PERIPH_VBAT)
     vbat_init(); /* early use of VBAT requires init() */

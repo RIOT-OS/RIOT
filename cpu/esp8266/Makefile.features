@@ -1,4 +1,6 @@
 CPU_FAM = esp8266
+CPU_ARCH = xtensa
+CPU_CORE = xtensa-l106
 
 # MCU defined features that are provided independent on board definitions
 

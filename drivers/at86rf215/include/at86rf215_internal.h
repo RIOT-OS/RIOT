@@ -56,12 +56,6 @@ extern "C" {
 /** An ACK consists of 5 payload bytes */
 #define AT86RF215_ACK_PSDU_BYTES            (5)
 
-/**
- * This is used to calculate the ACK timeout based on the bitrate.
- * AT86RF233 uses an ACK timeout of 54 symbol periods, or 864 µs @ 250 kbit/s
- * -> 864µs * 250kbit/s = 216 bit */
-#define AT86RF215_ACK_PERIOD_IN_SYMBOLS (54U)
-
 #define AT86RF215_OQPSK_MODE_LEGACY           (0x1)                             /**< legacy mode, 250 kbit/s */
 #define AT86RF215_OQPSK_MODE_LEGACY_HDR       (0x3)                             /**< legacy mode, high data rate */
 #define AT86RF215_MR_OQPSK_MODE(n)            ((n) << OQPSKPHRTX_MOD_SHIFT)     /**< MR-QPSK */

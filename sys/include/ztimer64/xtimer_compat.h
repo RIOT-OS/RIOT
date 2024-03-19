@@ -7,7 +7,8 @@
  */
 
 /**
- * @ingroup   sys_ztimer_util
+ * @defgroup  sys_ztimer64_xtimer_compat ztimer64_xtimer_compat: 64 Bit xtimer wrapper
+ * @ingroup   sys_ztimer64
  * @{
  * @file
  * @brief   ztimer64 xtimer wrapper interface
@@ -123,7 +124,7 @@ static inline void xtimer_sleep(uint32_t seconds)
 static inline void xtimer_msleep(uint32_t milliseconds)
 {
     if (IS_ACTIVE(MODULE_ZTIMER_MSEC)) {
-        ztimer_sleep(ZTIMER_USEC, milliseconds);
+        ztimer_sleep(ZTIMER_MSEC, milliseconds);
     }
     else {
         ztimer64_sleep(ZTIMER64_USEC, ((uint64_t)milliseconds) * 1000LLU);
@@ -297,7 +298,7 @@ static inline void xtimer_set_msg64(xtimer_t *timer, uint64_t offset,
 
 static inline int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t timeout)
 {
-    return ztimer64_msg_receive_timeout(ZTIMER64_SEC, msg, timeout);
+    return ztimer64_msg_receive_timeout(ZTIMER64_USEC, msg, timeout);
 }
 
 #endif

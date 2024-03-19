@@ -28,7 +28,7 @@ static int read_acc(const void *dev, phydat_t *res)
 {
     mma7660_read((const mma7660_t *)dev, (mma7660_data_t *)res->val);
 
-    res->unit = UNIT_G;
+    res->unit = UNIT_G_FORCE;
     res->scale = -3;
 
     return 3;
@@ -36,6 +36,6 @@ static int read_acc(const void *dev, phydat_t *res)
 
 const saul_driver_t mma7660_saul_driver = {
     .read = read_acc,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_ACCEL,
 };

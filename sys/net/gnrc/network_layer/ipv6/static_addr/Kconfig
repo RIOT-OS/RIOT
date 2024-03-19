@@ -1,0 +1,34 @@
+# Copyright (c) 2022 ML!PA Consulting GmbH
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEMODULE_GNRC_IPV6_STATIC_ADDR
+    bool "Configure static IPv6 addresses and routes"
+    depends on USEMODULE_GNRC_IPV6_STATIC_ADDR
+    help
+        Configure GNRC IPv6 Whitelisting module using Kconfig.
+
+if KCONFIG_USEMODULE_GNRC_IPV6_STATIC_ADDR
+
+config GNRC_IPV6_STATIC_ADDR
+    string "Static IPv6 address of the upstream interface"
+    default "2001:db8::100"
+
+config GNRC_IPV6_STATIC_ADDR_UPSTREAM
+    int "ID of the upstream interface, use 0 to auto-select wired interface"
+    default 0
+
+config GNRC_IPV6_STATIC_PREFIX
+    string "Static IPv6 prefix for the downstream network"
+    default "2001:db8:8000::/48"
+
+config GNRC_IPV6_STATIC_ADDR_DOWNSTREAM
+    int "ID of the downstream interface, use 0 to auto-select wireless interface"
+    default 0
+
+config GNRC_IPV6_STATIC_DEFAULT_ROUTER
+    string "Static IPv6 address of the default router"
+
+endif # KCONFIG_USEMODULE_GNRC_IPV6_STATIC_ADDR

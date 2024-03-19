@@ -1,6 +1,8 @@
 /*
  * Copyright (C) 2015 HAW Hamburg
  *               2016 INRIA
+ *               2023 Hugues Larrive
+ *               2023 Gerson Fernando Budke
 
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -22,6 +24,8 @@
  * @author      Robert Hartung <hartung@ibr.cs.tu-bs.de>
  * @author      Torben Petersen <petersen@ibr.cs.tu-bs.de>
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
+ * @author      Gerson Fernando Budke <nandojve@gmail.com>
  *
  * @}
  */
@@ -31,6 +35,7 @@
 #include <avr/interrupt.h>
 
 #include "cpu.h"
+#include "irq.h"
 #include "board.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
@@ -41,26 +46,6 @@
 #include "debug.h"
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
-/*
- * @brief     Define GPIO interruptions for an specific atmega CPU, by default
- *            2 (for small atmega CPUs)
- */
-
-#if defined(INT7_vect)
-#define GPIO_EXT_INT_NUMOF      (8U)
-#elif defined(INT6_vect)
-#define GPIO_EXT_INT_NUMOF      (7U)
-#elif defined(INT5_vect)
-#define GPIO_EXT_INT_NUMOF      (6U)
-#elif defined(INT4_vect)
-#define GPIO_EXT_INT_NUMOF      (5U)
-#elif defined(INT3_vect)
-#define GPIO_EXT_INT_NUMOF      (4U)
-#elif defined(INT2_vect)
-#define GPIO_EXT_INT_NUMOF      (3U)
-#else
-#define GPIO_EXT_INT_NUMOF      (2U)
-#endif
 
 static gpio_isr_ctx_t config[GPIO_EXT_INT_NUMOF];
 
@@ -73,23 +58,19 @@ static gpio_isr_ctx_t config[GPIO_EXT_INT_NUMOF];
 
 /* Check which pcints should be enabled */
 #if defined(MODULE_ATMEGA_PCINT0) && !defined(ATMEGA_PCINT_MAP_PCINT0)
-#error \
-    Either mapping for pin change interrupt bank 0 is missing or not supported by the MCU
+#  error "Either mapping for pin change interrupt bank 0 is missing or not supported by the MCU"
 #endif
 
 #if defined(MODULE_ATMEGA_PCINT1) && !defined(ATMEGA_PCINT_MAP_PCINT1)
-#error \
-    Either mapping for pin change interrupt bank 1 is missing or not supported by the MCU
+#  error "Either mapping for pin change interrupt bank 1 is missing or not supported by the MCU"
 #endif
 
 #if defined(MODULE_ATMEGA_PCINT2) && !defined(ATMEGA_PCINT_MAP_PCINT2)
-#error \
-    Either mapping for pin change interrupt bank 2 is missing or not supported by the MCU
+#  error "Either mapping for pin change interrupt bank 2 is missing or not supported by the MCU"
 #endif
 
 #if defined(MODULE_ATMEGA_PCINT3) && !defined(ATMEGA_PCINT_MAP_PCINT3)
-#error \
-    Either mapping for pin change interrupt bank 3 is missing or not supported by the MCU
+#  error "Either mapping for pin change interrupt bank 3 is missing or not supported by the MCU"
 #endif
 
 /**
@@ -333,20 +314,30 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     cli();
 
     /* enable interrupt number int_num */
+#if defined(EIFR) && defined(EIMSK)
     EIFR |= (1 << int_num);
     EIMSK |= (1 << int_num);
+#elif defined(GIFR) && defined(GICR)
+    GIFR |= (1 << (INTF0 + int_num));
+    GICR |= (1 << (INT0 + int_num));
+#endif
 
     /* apply flank to interrupt number int_num */
-    #if defined(EICRB)
+#if defined(EICRB)
     if (int_num >= 4) {
         EICRB &= ~(0x3 << ((int_num % 4) * 2));
         EICRB |= (flank << ((int_num % 4) * 2));
     }
     else
-    #endif
+#endif
     {
+#if defined(EICRA)
         EICRA &= ~(0x3 << (int_num * 2));
         EICRA |= (flank << (int_num * 2));
+#elif defined(MCUCR)
+        MCUCR &= ~(0x3 << (int_num * 2));
+        MCUCR |= (flank << (int_num * 2));
+#endif
     }
 
     /* set callback */
@@ -361,27 +352,33 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 
 void gpio_irq_enable(gpio_t pin)
 {
+#if defined(EIFR) && defined(EIMSK)
     EIFR |= (1 << _int_num(pin));
     EIMSK |= (1 << _int_num(pin));
+#elif defined(GIFR) && defined(GICR)
+    GIFR |= (1 << (INTF0 + _int_num(pin)));
+    GICR |= (1 << (INT0 + _int_num(pin)));
+#endif
 }
 
 void gpio_irq_disable(gpio_t pin)
 {
+#if defined(EIMSK)
     EIMSK &= ~(1 << _int_num(pin));
+#elif defined(GICR)
+    GICR &= ~(1 << (INT0 + _int_num(pin)));
+#endif
 }
 
 static inline void irq_handler(uint8_t int_num)
 {
-    avr8_enter_isr();
     config[int_num].cb(config[int_num].arg);
-    avr8_exit_isr();
 }
 
 #ifdef ENABLE_PCINT
 /* inline function that is used by the PCINT ISR */
 static inline void pcint_handler(uint8_t bank, uint8_t enabled_pcints)
 {
-    avr8_enter_isr();
     /* Find right item */
     uint8_t idx = 0;
 
@@ -410,89 +407,50 @@ static inline void pcint_handler(uint8_t bank, uint8_t enabled_pcints)
         enabled_pcints = enabled_pcints >> 1;
         idx++;
     }
-
-    avr8_exit_isr();
 }
 #ifdef MODULE_ATMEGA_PCINT0
-ISR(PCINT0_vect, ISR_BLOCK)
-{
-    pcint_handler(PCINT0_IDX, PCMSK0);
-}
+AVR8_ISR(PCINT0_vect, pcint_handler, PCINT0_IDX, PCMSK0);
 #endif /* MODULE_ATMEGA_PCINT0 */
 
 #ifdef MODULE_ATMEGA_PCINT1
-ISR(PCINT1_vect, ISR_BLOCK)
-{
-    pcint_handler(PCINT1_IDX, PCMSK1);
-}
+AVR8_ISR(PCINT1_vect, pcint_handler, PCINT1_IDX, PCMSK1);
 #endif  /* MODULE_ATMEGA_PCINT1 */
 
 #ifdef MODULE_ATMEGA_PCINT2
-ISR(PCINT2_vect, ISR_BLOCK)
-{
-    pcint_handler(PCINT2_IDX, PCMSK2);
-}
+AVR8_ISR(PCINT2_vect, pcint_handler, PCINT2_IDX, PCMSK2);
 #endif  /* MODULE_ATMEGA_PCINT2 */
 
 #ifdef MODULE_ATMEGA_PCINT3
-ISR(PCINT3_vect, ISR_BLOCK)
-{
-    pcint_handler(PCINT3_IDX, PCMSK3);
-}
+AVR8_ISR(PCINT3_vect, pcint_handler, PCINT3_IDX, PCMSK3);
 #endif  /* MODULE_ATMEGA_PCINT3 */
 
 #endif  /* ENABLE_PCINT */
 
-ISR(INT0_vect, ISR_BLOCK)
-{
-    irq_handler(0); /**< predefined interrupt pin */
-}
-
-ISR(INT1_vect, ISR_BLOCK)
-{
-    irq_handler(1); /**< predefined interrupt pin */
-}
+AVR8_ISR(INT0_vect, irq_handler, 0); /**< predefined interrupt pin */
+AVR8_ISR(INT1_vect, irq_handler, 1); /**< predefined interrupt pin */
 
 #if defined(INT2_vect)
-ISR(INT2_vect, ISR_BLOCK)
-{
-    irq_handler(2); /**< predefined interrupt pin */
-}
+AVR8_ISR(INT2_vect, irq_handler, 2); /**< predefined interrupt pin */
 #endif
 
 #if defined(INT3_vect)
-ISR(INT3_vect, ISR_BLOCK)
-{
-    irq_handler(3); /**< predefined interrupt pin */
-}
+AVR8_ISR(INT3_vect, irq_handler, 3); /**< predefined interrupt pin */
 #endif
 
 #if defined(INT4_vect)
-ISR(INT4_vect, ISR_BLOCK)
-{
-    irq_handler(4); /**< predefined interrupt pin */
-}
+AVR8_ISR(INT4_vect, irq_handler, 4); /**< predefined interrupt pin */
 #endif
 
 #if defined(INT5_vect)
-ISR(INT5_vect, ISR_BLOCK)
-{
-    irq_handler(5); /**< predefined interrupt pin */
-}
+AVR8_ISR(INT5_vect, irq_handler, 5); /**< predefined interrupt pin */
 #endif
 
 #if defined(INT6_vect)
-ISR(INT6_vect, ISR_BLOCK)
-{
-    irq_handler(6); /**< predefined interrupt pin */
-}
+AVR8_ISR(INT6_vect, irq_handler, 6); /**< predefined interrupt pin */
 #endif
 
 #if defined(INT7_vect)
-ISR(INT7_vect, ISR_BLOCK)
-{
-    irq_handler(7); /**< predefined interrupt pin */
-}
+AVR8_ISR(INT7_vect, irq_handler, 7); /**< predefined interrupt pin */
 #endif
 
 #endif /* MODULE_PERIPH_GPIO_IRQ */

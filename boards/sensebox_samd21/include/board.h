@@ -25,7 +25,6 @@
 #include "cpu.h"
 #include "periph_conf.h"
 #include "periph_cpu.h"
-#include "mtd_sdcard.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,7 +55,6 @@ extern "C" {
  * @name    SW0 (Button) pin definitions
  * @{
  */
-#define BTN0_PORT           PORT->Group[PA]
 #define BTN0_PIN            GPIO_PIN(PA, 20)
 #define BTN0_MODE           GPIO_IN_PU
 /** @} */
@@ -165,35 +163,12 @@ extern "C" {
 
 #if defined(MODULE_MTD_SDCARD) || defined(DOXYGEN)
 /**
- * @brief MTD device 0 (SD Card) definition. mtd0 is defined in board.c
+ * @brief MTD device 0 (SD Card) definition. mtd_dev_get(0) is defined in board.c
  * @{
  */
-extern mtd_dev_t *mtd0;
-#define MTD_0 mtd0
-/** @} */
-
-/**
- * @brief Attributes for the mtd_sdcard driver
- * @{
- */
-#ifndef MTD_SD_CARD_PAGE_SIZE
-#define MTD_SD_CARD_PAGE_SIZE           (512)
-#endif
-
-#ifndef MTD_SD_CARD_PAGES_PER_SECTOR
-#define MTD_SD_CARD_PAGES_PER_SECTOR    (128)
-#endif
-
-#ifndef MTD_SD_CARD_SECTOR_COUNT
-#define MTD_SD_CARD_SECTOR_COUNT        (3921920UL)
-#endif
+#define MTD_0 mtd_dev_get(0)
 /** @} */
 #endif /* MODULE_MTD_SDCARD || DOXYGEN */
-
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

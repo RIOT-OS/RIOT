@@ -194,6 +194,16 @@ static inline void _init_iface_arsm(gnrc_netif_t *netif)
 }
 
 /**
+ * @brief   Deinitializes interface from address registration state machine
+ *
+ * @param[in] netif An interface
+ */
+static inline void _deinit_iface_arsm(gnrc_netif_t *netif)
+{
+    _evtimer_del(&netif->ipv6.recalc_reach_time);
+}
+
+/**
  * @brief   Gets neighbor unreachability state of a neighbor
  *
  * @param[in] nbr   Neighbor cache entry representing the neighbor.
@@ -232,14 +242,14 @@ bool _is_reachable(_nib_onl_entry_t *entry);
 #define _handle_state_timeout(ctx)                  (void)ctx
 #define _probe_nbr(nbr, reset)                      (void)nbr; (void)reset
 #define _init_iface_arsm(netif)                     (void)netif
+#define _deinit_iface_arsm(netif)                   (void)netif
 #define _handle_adv_l2(netif, nce, icmpv6, tl2ao)   (void)netif; (void)nce; \
                                                     (void)icmpv6; (void)tl2ao
 #define _recalc_reach_time(netif)                   (void)netif
 #define _set_reachable(netif, nce)                  (void)netif; (void)nce
-#define _init_iface_arsm(netif)                     (void)netif
 
 #define _get_nud_state(nbr)                 (GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNMANAGED)
-#define _set_nud_state(netif, nce, state)   (void)netif; (void)nbr; (void)state
+#define _set_nud_state(netif, nce, state)   (void)netif; (void)nce; (void)state
 #define _is_reachable(entry)                (true)
 #endif  /* CONFIG_GNRC_IPV6_NIB_ARSM || defined(DOXYGEN) */
 
@@ -248,4 +258,5 @@ bool _is_reachable(_nib_onl_entry_t *entry);
 #endif
 
 #endif /* PRIV_NIB_ARSM_H */
-/** @} */
+/** @internal
+ * @} */

@@ -75,11 +75,6 @@ extern "C"
 #define FXOS8700_PARAM_ADDR         0x1E
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

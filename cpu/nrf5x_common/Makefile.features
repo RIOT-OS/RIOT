@@ -1,16 +1,33 @@
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_flashpage
+FEATURES_PROVIDED += periph_flashpage_in_address_space
 FEATURES_PROVIDED += periph_flashpage_pagewise
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
 FEATURES_PROVIDED += periph_timer_periodic
+FEATURES_PROVIDED += periph_timer_poll
+FEATURES_PROVIDED += periph_timer_query_freqs
 FEATURES_PROVIDED += periph_uart_modecfg
+FEATURES_PROVIDED += periph_wdt periph_wdt_cb
 
-ifneq (nrf9160,$(CPU_MODEL))
+ifeq (,$(filter nrf5340_app,$(CPU_MODEL)))
+  FEATURES_PROVIDED += periph_gpio_ll
+  FEATURES_PROVIDED += periph_gpio_ll_disconnect
+  FEATURES_PROVIDED += periph_gpio_ll_input_pull_down
+  FEATURES_PROVIDED += periph_gpio_ll_input_pull_up
+  FEATURES_PROVIDED += periph_gpio_ll_irq
+  FEATURES_PROVIDED += periph_gpio_ll_irq_unmask
+  FEATURES_PROVIDED += periph_gpio_ll_open_drain
+  FEATURES_PROVIDED += periph_gpio_ll_open_drain_pull_up
+  FEATURES_PROVIDED += periph_gpio_ll_open_source
+  FEATURES_PROVIDED += periph_gpio_ll_open_source_pull_down
+endif
+
+# nRF9160/nRF5340 don't support these drivers right now
+ifeq (,$(filter nrf9160 nrf5340_app,$(CPU_MODEL)))
   FEATURES_PROVIDED += periph_hwrng
   FEATURES_PROVIDED += periph_rtt_overflow
   FEATURES_PROVIDED += periph_temperature
-  FEATURES_PROVIDED += periph_wdt periph_wdt_cb
 
 # Various other features (if any)
   FEATURES_PROVIDED += ble_nimble

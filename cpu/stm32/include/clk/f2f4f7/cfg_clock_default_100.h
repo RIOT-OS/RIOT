@@ -37,30 +37,31 @@ extern "C" {
    decreased to 96MHZ so the PLLQ can output 48MHz.
    */
 #ifndef CONFIG_CLOCK_PLL_M
-#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(25))
+#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CONFIG_CLOCK_HSE == MHZ(25))
 #define CONFIG_CLOCK_PLL_M              (25)
 #else
 #define CONFIG_CLOCK_PLL_M              (4)
 #endif
 #endif
 #ifndef CONFIG_CLOCK_PLL_N
-#if IS_USED(MODULE_PERIPH_USBDEV) && defined(CPU_LINE_STM32F411xE)
-#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(8))
+#if (IS_USED(MODULE_PERIPH_USBDEV_CLK) || IS_USED(MODULE_PERIPH_SDMMC_CLK)) && \
+    defined(CPU_LINE_STM32F411xE)
+#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CONFIG_CLOCK_HSE == MHZ(8))
 #define CONFIG_CLOCK_PLL_N              (96)
-#elif IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(25))
+#elif IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CONFIG_CLOCK_HSE == MHZ(25))
 #define CONFIG_CLOCK_PLL_N              (192)
 #else
 #define CONFIG_CLOCK_PLL_N              (48)
 #endif
 #else
-#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(8))
+#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CONFIG_CLOCK_HSE == MHZ(8))
 #define CONFIG_CLOCK_PLL_N              (100)
-#elif IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(25))
+#elif IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CONFIG_CLOCK_HSE == MHZ(25))
 #define CONFIG_CLOCK_PLL_N              (200)
 #else
 #define CONFIG_CLOCK_PLL_N              (50)
 #endif
-#endif /* MODULE_PERIPH_USBDEV */
+#endif /* MODULE_PERIPH_USBDEV_CLK || MODULE_PERIPH_SDMMC_CLK */
 #endif
 #ifndef CONFIG_CLOCK_PLL_P
 #define CONFIG_CLOCK_PLL_P              (2)

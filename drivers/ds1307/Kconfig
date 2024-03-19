@@ -10,3 +10,8 @@ config MODULE_DS1307
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
     select MODULE_PERIPH_I2C
+
+config HAVE_DS1307
+    bool
+    help
+        Indicates that a DS1307 real-time clock is present.

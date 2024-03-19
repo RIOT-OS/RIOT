@@ -6,23 +6,25 @@
 ## Overview
 
 The [Nucleo-F302R8](http://www.st.com/en/evaluation-tools/nucleo-f302r8.html)
-is
-a board from ST's Nucleo family supporting a ARM Cortex-M4
+is a board from ST's Nucleo family supporting a ARM Cortex-M4
 [STM32F302R8](http://www.st.com/en/microcontrollers/stm32f302r8.html)
-microcontroller with 16KB of RAM and 64KB of ROM.
+microcontroller with 16KiB of RAM and 64KiB of Flash.
 
 ## Hardware
 
 ![nucleo image](http://www.open-electronics.org/wp-content/uploads/2015/08/Figura2-500x467.png)
 
+## Pinout
+
+@image html pinouts/nucleo-f302r8.svg "Pinout for the nucleo-f302r8" width=50%
 
 ### MCU
 | MCU        | STM32F302R8           |
 |:---------- |:--------------------- |
 | Family     | ARM Cortex-M4         |
 | Vendor     | ST Microelectronics   |
-| RAM        | 16KB                  |
-| Flash      | 64KB                  |
+| RAM        | 16KiB                 |
+| Flash      | 64KiB                 |
 | Frequency  | up to 72MHz           |
 | FPU        | yes                   |
 | Timers     | 9 (5x 16-bit, 1x 32-bit [TIM2], 2x watchdog, 1x systick) |
@@ -56,6 +58,8 @@ microcontroller with 16KB of RAM and 64KB of ROM.
 
 ## Flashing the device
 
+### Flashing the Board Using OpenOCD
+
 The ST Nucleo-F302R8 board includes an on-board ST-LINK V2-1 programmer.
 The easiest way to program the board is to use OpenOCD. Once you have
 installed OpenOCD (look [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD)
@@ -68,14 +72,18 @@ and debug via GDB by simply typing
 ```
 make BOARD=nucleo-f302r8 debug
 ```
+### Flashing the Board Using ST-LINK Removable Media
 
-### Troubleshooting
-
-For some reason the ST Link programmer can be outdated, making it impossible
-to
-flash or to access the debug UART via USB. To fix this, please use
-the ST Link firmware update tool following
-[this documentation](http://www.st.com/en/embedded-software/stsw-link007.html).
+On-board ST-LINK programmer provides via composite USB device removable media.
+Copying the HEX file causes reprogramming of the board. This task
+could be performed manually; however, the cpy2remed (copy to removable
+media) PROGRAMMER script does this automatically. To program board in
+this manner, use the command:
+```
+make BOARD=nucleo-f302r8 PROGRAMMER=cpy2remed flash
+```
+@note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
+could be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
 
 ## Supported Toolchains
 For using the ST Nucleo-F302R8 board we strongly recommend the usage of

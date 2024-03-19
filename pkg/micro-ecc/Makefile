@@ -5,5 +5,11 @@ PKG_LICENSE=BSD-2-Clause
 
 include $(RIOTBASE)/pkg/pkg.mk
 
+# With LLVM register allocation fails. We can tell LLVM to spend more time
+# on trying to allocate registers using the following snippet:
+ifeq (llvm,$(TOOLCHAIN))
+  CFLAGS += -mllvm -exhaustive-register-search
+endif
+
 all:
 	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR) -f $(RIOTBASE)/Makefile.base

@@ -1,0 +1,25 @@
+From a2e9f91dfc331f06ae5ac6376102368f5b162a14 Mon Sep 17 00:00:00 2001
+From: Lena Boeckmann <einhornhool@mobi31.inet.haw-hamburg.de>
+Date: Wed, 8 Jun 2022 13:44:46 +0200
+Subject: [PATCH 1/2] Change include dirs to target include dirs
+
+---
+ lib/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/CMakeLists.txt b/lib/CMakeLists.txt
+index 749ee727..1c474a40 100644
+--- a/lib/CMakeLists.txt
++++ b/lib/CMakeLists.txt
+@@ -354,7 +354,7 @@ configure_file(pkcs11/pkcs11_config.h.in pkcs11_config.h @ONLY)
+ set(PKCS11_INC ${PKCS11_INC} ${CMAKE_CURRENT_BINARY_DIR}/pkcs11_config.h)
+ endif()
+ 
+-include_directories(cryptoauth PUBLIC ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ../app/tng ../third_party ../third_party/hidapi/hidapi ${USB_INCLUDE_DIR})
++target_include_directories(cryptoauth PUBLIC ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ../app/tng ../third_party ../third_party/hidapi/hidapi ${USB_INCLUDE_DIR})
+ 
+ if(ATCA_MBEDTLS)
+ target_link_libraries(cryptoauth mbedtls)
+-- 
+2.35.1
+

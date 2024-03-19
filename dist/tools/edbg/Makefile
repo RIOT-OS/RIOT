@@ -1,6 +1,6 @@
 PKG_NAME=edbg
 PKG_URL=https://github.com/ataradov/edbg
-PKG_VERSION=73eb74785d57d7828f0d180b4875146c8e840eba
+PKG_VERSION=7bde7a4168c801746941f8df2fe5849823085545
 PKG_LICENSE=BSD-3-Clause
 
 # manually set some RIOT env vars, so this Makefile can be called stand-alone

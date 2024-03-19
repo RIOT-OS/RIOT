@@ -66,12 +66,12 @@ static int read_eco2(const void *dev, phydat_t *res)
 
 const saul_driver_t ccs811_saul_driver_eco2 = {
     .read = read_eco2,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_CO2
 };
 
 const saul_driver_t ccs811_saul_driver_tvoc = {
     .read = read_tvoc,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_TVOC
 };

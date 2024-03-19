@@ -6,8 +6,11 @@
 
 config MODULE_BOARDS_COMMON_SAMDX1-ARDUINO-BOOTLOADER
     bool
-    default y if MODULE_STDIO_CDC_ACM
+    default y if MODULE_USBUS_CDC_ACM
     imply MODULE_USB_BOARD_RESET
     depends on TEST_KCONFIG
     help
        Common code of samdx1 boards with an arduino bootloader
+
+config FORCE_USB_STDIO
+    default y

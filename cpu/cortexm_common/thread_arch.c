@@ -82,9 +82,6 @@
  * | R8   | <- lowest address (top of stack)
  * --------
  *
- * TODO: Implement handling of FPU registers for Cortex-M4 CPUs
- *
- *
  * @author      Stefan Pfeiffer <stefan.pfeiffer@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
@@ -282,6 +279,16 @@ void *thread_isr_stack_start(void)
 
 void NORETURN cpu_switch_context_exit(void)
 {
+#ifdef MODULE_CORTEXM_FPU
+    /* An exiting thread won't need it's FPU state anymore, so clear it here.
+     * This is important, as `sched_task_exit` clears `sched_active_thread`,
+     * which in turn causes `isr_pendsv` to skip all FPU storing/restoring.
+     * That might lead to this thread's FPU lazy stacking / FPCAR to stay active.
+     */
+    __set_FPSCR(0);
+    __set_CONTROL(__get_CONTROL() & (~(CONTROL_FPCA_Msk)));
+#endif
+
     /* enable IRQs to make sure the PENDSV interrupt is reachable */
     irq_enable();
 

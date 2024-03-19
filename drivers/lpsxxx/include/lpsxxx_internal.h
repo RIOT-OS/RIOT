@@ -168,10 +168,10 @@ extern "C" {
  */
 #define LPSXXX_WHO_AM_I                 (0xb1)
 
-#elif MODULE_LPS22HH
+#elif MODULE_LPS22HH || MODULE_LPS22CH
 
 /**
- * @name    LPS22HH registers
+ * @name    LPS22HH/LPS22CH registers
  * @{
  */
 #define LPSXXX_REG_INT_CFG              (0x0b)
@@ -198,7 +198,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name    LPS22HH CTRL_REG1 bitfields
+ * @name    LPS22HH/LPS22CH CTRL_REG1 bitfields
  * @{
  */
 #define LPSXXX_CTRL_REG1_EN_LPFP        (0x08)
@@ -207,18 +207,18 @@ extern "C" {
 /** @} */
 
 /**
- * @name    LPS22HH CTRL_REG2 bitfields
+ * @name    LPS22HH/LPS22CH CTRL_REG2 bitfields
  * @{
  */
 #define LPSXXX_CTRL_REG2_ID_ADD_INC     (0x10)
 /** @} */
 
 /**
- * @brief   LPS22HH WHO_AM_I register value
+ * @brief   LPS22HH/LPS22CH WHO_AM_I register value
  */
 #define LPSXXX_WHO_AM_I                 (0xb3)
 
-#endif /* MODULE_LPS22HH */
+#endif /* MODULE_LPS22HH/LPS22CH */
 
 #ifdef __cplusplus
 }

@@ -170,6 +170,7 @@ extern "C" {
 
 /* Map TX_END and RX_END to TRX_END to be compatible to SPI Devices */
 #define AT86RF2XX_IRQ_STATUS_MASK__TRX_END                      (0x48)
+/** @} */
 
 /**
  * @name   Bitfield definitions for the IRQ_MASK1/IRQ_STATUS1 register
@@ -532,6 +533,17 @@ extern "C" {
 #define AT86RF2XX_TRX_RPC_MASK__PLL_RPC_EN                      (0x08)
 #define AT86RF2XX_TRX_RPC_MASK__XAH_TX_RPC_EN                   (0x04)
 #define AT86RF2XX_TRX_RPC_MASK__IPAN_RPC_EN                     (0x02)
+/** @} */
+
+/**
+ * @brief   Bits to set to enable smart idle
+ */
+#define AT86RF2XX_TRX_RPC_MASK__RX_RPC__SMART_IDLE \
+        (AT86RF2XX_TRX_RPC_MASK__RX_RPC_EN \
+        | AT86RF2XX_TRX_RPC_MASK__PDT_RPC_EN \
+        | AT86RF2XX_TRX_RPC_MASK__PLL_RPC_EN \
+        | AT86RF2XX_TRX_RPC_MASK__XAH_TX_RPC_EN \
+        | AT86RF2XX_TRX_RPC_MASK__IPAN_RPC_EN)
 
 #ifdef __cplusplus
 }

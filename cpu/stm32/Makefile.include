@@ -57,12 +57,22 @@ info-stm32:
 	@$(COLOR_ECHO) "\tROM size:\t$(ROM_LEN) ($(FLASHSIZE) Bytes)"
 	@$(COLOR_ECHO) "\tRAM size:\t$(RAM_LEN_K)KiB"
 
-
 ifneq (,$(CCMRAM_LEN))
   LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ccmram_length=$(CCMRAM_LEN)
 endif
 ifneq (,$(SRAM4_LEN))
   LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_sram4_length=$(SRAM4_LEN)
+endif
+
+# if the board uses a FMC RAM, all 4 heaps have to be used even if
+# some of them are not available
+ifneq (,$(filter periph_fmc_sdram periph_fmc_nor_sram,$(USEMODULE)))
+  ifneq (,$(FMC_RAM_LEN))
+    LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_fmc_ram_addr=$(FMC_RAM_ADDR)
+    LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_fmc_ram_len=$(FMC_RAM_LEN)
+    CFLAGS += -DCPU_HAS_FMC_RAM=1
+    CFLAGS += -DNUM_HEAPS=4
+  endif
 endif
 
 VECTORS_O ?= $(BINDIR)/stm32_vectors/$(CPU_LINE).o
@@ -76,11 +86,13 @@ $(call target-export-variables,$(VECTORS_O),CPU_LINE)
 # Add this define to skip the inclusion of the system_stm32xxxx.h header files
 # which are only used for STM32 system includes and not of interest for RIOT.
 CFLAGS += -D__SYSTEM_STM32$(call uppercase,$(CPU_FAM))XX_H
+# C0, G0, H7, L5 and U5 use SYSTEM_STM32..XX_H instead
+CFLAGS += -DSYSTEM_STM32$(call uppercase,$(CPU_FAM))XX_H
 
 ifneq (,$(filter STM32F030x4 STM32MP157Cxx,$(CPU_LINE)))
   STM32CMSIS_INCLUDE_DIR = $(RIOTCPU)/stm32/include/vendor/cmsis/$(CPU_FAM)/Include
 else
-  STM32CMSIS_INCLUDE_DIR = $(RIOTBASE)/build/stm32/cmsis/$(CPU_FAM)/Include
+  STM32CMSIS_INCLUDE_DIR = $(BUILD_DIR)/stm32/cmsis/$(CPU_FAM)/Include
   STM32FAM_INCLUDE_FILE = $(STM32CMSIS_INCLUDE_DIR)/stm32$(CPU_FAM)xx.h
   INCLUDES += -I$(STM32CMSIS_INCLUDE_DIR)
 endif

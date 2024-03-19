@@ -21,6 +21,7 @@
 #include "board.h"
 #include "net/gnrc/netif/raw.h"
 #include "net/gnrc.h"
+#include "include/init_devs.h"
 
 #include "slipdev.h"
 #include "slipdev_params.h"
@@ -31,7 +32,7 @@
  * @brief   Define stack parameters for the MAC layer thread
  * @{
  */
-#define SLIPDEV_STACKSIZE       (THREAD_STACKSIZE_DEFAULT)
+#define SLIPDEV_STACKSIZE       (GNRC_NETIF_STACKSIZE_DEFAULT)
 #ifndef SLIPDEV_PRIO
 #define SLIPDEV_PRIO            (GNRC_NETIF_PRIO)
 #endif

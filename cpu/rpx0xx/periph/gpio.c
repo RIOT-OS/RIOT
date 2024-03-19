@@ -42,8 +42,8 @@ static void *_args[GPIO_PIN_NUMOF];
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
     assert(pin < GPIO_PIN_NUMOF);
-    SIO->GPIO_OE_CLR.reg = 1LU << pin;
-    SIO->GPIO_OUT_CLR.reg = 1LU << pin;
+    SIO->GPIO_OE_CLR = 1LU << pin;
+    SIO->GPIO_OUT_CLR = 1LU << pin;
 
     switch (mode) {
     case GPIO_IN:
@@ -98,7 +98,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
             gpio_set_pad_config(pin, pad_config);
             gpio_set_io_config(pin, io_config);
         }
-        SIO->GPIO_OE_SET.reg = 1LU << pin;
+        SIO->GPIO_OE_SET = 1LU << pin;
         break;
     default:
         return -ENOTSUP;
@@ -108,27 +108,27 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 
 int gpio_read(gpio_t pin)
 {
-    if (SIO->GPIO_OE.reg & (1LU << pin)) {
+    if (SIO->GPIO_OE & (1LU << pin)) {
         /* pin is output: */
-        return SIO->GPIO_OUT.reg & (1LU << pin);
+        return SIO->GPIO_OUT & (1LU << pin);
     }
     /* pin is input: */
-    return SIO->GPIO_IN.reg & (1LU << pin);
+    return SIO->GPIO_IN & (1LU << pin);
 }
 
 void gpio_set(gpio_t pin)
 {
-    SIO->GPIO_OUT_SET.reg = 1LU << pin;
+    SIO->GPIO_OUT_SET = 1LU << pin;
 }
 
 void gpio_clear(gpio_t pin)
 {
-    SIO->GPIO_OUT_CLR.reg = 1LU << pin;
+    SIO->GPIO_OUT_CLR = 1LU << pin;
 }
 
 void gpio_toggle(gpio_t pin)
 {
-    SIO->GPIO_OUT_XOR.reg = 1LU << pin;
+    SIO->GPIO_OUT_XOR = 1LU << pin;
 }
 
 void gpio_write(gpio_t pin, int value)
@@ -144,8 +144,8 @@ void gpio_write(gpio_t pin, int value)
 #ifdef MODULE_PERIPH_GPIO_IRQ
 static void _irq_enable(gpio_t pin, unsigned flank)
 {
-    volatile uint32_t *irq_enable_regs = &IO_BANK0->PROC0_INTE0.reg;
-    volatile uint32_t *irq_ack_regs = &IO_BANK0->INTR0.reg;
+    volatile uint32_t *irq_enable_regs = &IO_BANK0->PROC0_INTE0;
+    volatile uint32_t *irq_ack_regs = &IO_BANK0->INTR0;
     /* There are 4 bits to control IRQs per pin, hence the configuration is split across multiple
      * I/O registers. The following calculates the position the four bits matching the given pin,
      * where idx refers to the I/O register and shift_amount to the position in the I/O register.
@@ -201,15 +201,15 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank, gpio_cb_t cb
 void isr_io_bank0(void)
 {
     unsigned offset = 0;
-    volatile uint32_t *irq_status_regs = &IO_BANK0->PROC0_INTS0.reg;
-    volatile uint32_t *irq_ack_regs = &IO_BANK0->INTR0.reg;
+    volatile uint32_t *irq_status_regs = &IO_BANK0->PROC0_INTS0;
+    volatile uint32_t *irq_ack_regs = &IO_BANK0->INTR0;
 
     DEBUG("[rp0x00] GPIO IRQ mask:      %08x, %08x, %08x, %08x\n",
-          (unsigned)IO_BANK0->PROC0_INTE0.reg, (unsigned)IO_BANK0->PROC0_INTE1.reg,
-          (unsigned)IO_BANK0->PROC0_INTE2.reg, (unsigned)IO_BANK0->PROC0_INTE3.reg);
+          (unsigned)IO_BANK0->PROC0_INTE0, (unsigned)IO_BANK0->PROC0_INTE1,
+          (unsigned)IO_BANK0->PROC0_INTE2, (unsigned)IO_BANK0->PROC0_INTE3);
     DEBUG("[rp0x00] GPIO IRQ status:    %08x, %08x, %08x, %08x\n",
-          (unsigned)IO_BANK0->PROC0_INTS0.reg, (unsigned)IO_BANK0->PROC0_INTS1.reg,
-          (unsigned)IO_BANK0->PROC0_INTS2.reg, (unsigned)IO_BANK0->PROC0_INTS3.reg);
+          (unsigned)IO_BANK0->PROC0_INTS0, (unsigned)IO_BANK0->PROC0_INTS1,
+          (unsigned)IO_BANK0->PROC0_INTS2, (unsigned)IO_BANK0->PROC0_INTS3);
 
     /* There are four IRQ status bits per pin, so there is info for 8 pins per I/O register.
      * We will iterate over all IRQ status I/O registers in the outer loop, and over all 8 pins

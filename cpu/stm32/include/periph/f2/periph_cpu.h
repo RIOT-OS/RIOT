@@ -28,7 +28,11 @@ extern "C" {
 /**
  * @brief   Available number of ADC devices
  */
+#if defined (ADC3)
+#define ADC_DEVS            (3U)
+#else
 #define ADC_DEVS            (2U)
+#endif
 
 #ifndef DOXYGEN
 

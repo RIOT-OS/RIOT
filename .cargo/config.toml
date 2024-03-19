@@ -1,0 +1,9 @@
+# Between RIOT releases, this file points all projects in the tree to git
+# versions (still respecting Cargo.lock).
+#
+# Authors of out-of-tree applications can use the same lines in their
+# Cargo.toml, copy this file over, or just use the released versions.
+
+[patch.crates-io]
+riot-sys = { git = "https://github.com/RIOT-OS/rust-riot-sys" }
+riot-wrappers = { git = "https://github.com/RIOT-OS/rust-riot-wrappers" }

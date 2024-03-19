@@ -5,8 +5,10 @@
 # directory for more details.
 #
 
-config MODULE_SGP30
-    bool "SGP30 Particulate Matter Sensor"
+menuconfig MODULE_SGP30
+    bool
+    prompt "SGP30 Particulate Matter Sensor" if !(MODULE_SAUL_DEFAULT && HAVE_SGP30)
+    default (MODULE_SAUL_DEFAULT && HAVE_SGP30)
     depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
     select MODULE_CHECKSUM
@@ -23,3 +25,8 @@ config MODULE_SGP30_STRICT
         If this module is enabled regular measurements will be performed
         every second and no values will be returned before the 15s warmup
         period, see the datasheet for more.
+
+config HAVE_SGP30
+    bool
+    help
+      Indicates that a SGP30 Particulate Matter Sensor is present.

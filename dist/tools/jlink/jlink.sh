@@ -22,12 +22,15 @@
 #
 # The script supports the following actions:
 #
-# flash:        flash <binfile>
+# flash:        flash <binfile/elffile>
 #
-#               flash given binary format file to the target.
+#               flash given file to the target.
 #
 #               options:
-#               <binfile>:      path to the binary file that is flashed
+#               <binfile>:      path to the file in bin format that is flashed
+#               <elffile>:      path to the file in ELF format that is flashed
+#                               NOTE: The file needs to be suffixed `.elf` when
+#                                     in ELF format.
 #
 # debug:        debug <elffile>
 #
@@ -62,6 +65,8 @@
 : ${IMAGE_OFFSET:=0}
 # Allow overwriting the reset commands.
 : ${JLINK_RESET_FILE:=${RIOTTOOLS}/jlink/reset.seg}
+# The setsid command is needed so that Ctrl+C in GDB doesn't kill OpenOCD
+: ${SETSID:=setsid}
 
 # default GDB port
 _GDB_PORT=3333
@@ -176,28 +181,14 @@ test_version() {
     fi
 }
 
-#
-# now comes the actual actions
-#
-do_flash() {
-    BINFILE=$1
+flash_common() {
     test_config
     test_serial
     test_version
-    test_binfile
-    # clear any existing contents in burn file
-    /bin/echo -n "" > ${BINDIR}/burn.seg
-    # create temporary burn file
-    if [ ! -z "${JLINK_PRE_FLASH}" ]; then
-        printf "${JLINK_PRE_FLASH}\n" >> ${BINDIR}/burn.seg
+    if [ -n "${JLINK_POST_FLASH}" ]; then
+        printf "%s\n" "${JLINK_POST_FLASH}" >> "${BINDIR}/burn.seg"
     fi
-    # address to flash is hex formatted, as required by JLink
-    ADDR_TO_FLASH=$(printf "0x%08x\n" "$((${FLASH_ADDR} + ${IMAGE_OFFSET}))")
-    echo "loadbin ${BINFILE} ${ADDR_TO_FLASH}" >> ${BINDIR}/burn.seg
-    if [ ! -z "${JLINK_POST_FLASH}" ]; then
-        printf "${JLINK_POST_FLASH}\n" >> ${BINDIR}/burn.seg
-    fi
-    cat ${JLINK_RESET_FILE} >> ${BINDIR}/burn.seg
+    cat "${JLINK_RESET_FILE}" >> "${BINDIR}/burn.seg"
     # flash device
     sh -c "${JLINK} ${JLINK_SERIAL} \
                     -nogui 1 \
@@ -207,6 +198,37 @@ do_flash() {
                     -if '${JLINK_IF}' \
                     -jtagconf -1,-1 \
                     -commandfile '${BINDIR}/burn.seg'"
+}
+
+#
+# now comes the actual actions
+#
+do_flash_bin() {
+    BINFILE="$1"
+    test_binfile
+    # clear any existing contents in burn file
+    truncate -s 0 "${BINDIR}/burn.seg"
+    # create temporary burn file
+    if [ -n "${JLINK_PRE_FLASH}" ]; then
+        printf "%s\n" "${JLINK_PRE_FLASH}" >> "${BINDIR}/burn.seg"
+    fi
+    # address to flash is hex formatted, as required by JLink
+    ADDR_TO_FLASH="$(printf "0x%08x\n" "$((FLASH_ADDR + IMAGE_OFFSET))")"
+    echo "loadbin ${BINFILE} ${ADDR_TO_FLASH}" >> "${BINDIR}/burn.seg"
+    flash_common
+}
+
+do_flash_elf() {
+    ELFFILE="$1"
+    test_elffile
+    # clear any existing contents in burn file
+    truncate -s 0 "${BINDIR}/burn.seg"
+    # create temporary burn file
+    if [ -n "${JLINK_PRE_FLASH}" ]; then
+        printf "%s\n" "${JLINK_PRE_FLASH}" >> "${BINDIR}/burn.seg"
+    fi
+    echo "loadfile ${ELFFILE}" >> "${BINDIR}/burn.seg"
+    flash_common
 }
 
 do_debug() {
@@ -219,7 +241,7 @@ do_debug() {
     test_tui
     test_dbg
     # start the J-Link GDB server
-    sh -c "${JLINK_SERVER} ${JLINK_SERIAL_SERVER} \
+    ${SETSID} sh -c "${JLINK_SERVER} ${JLINK_SERIAL_SERVER} \
                            -nogui \
                            -silent \
                            -device '${JLINK_DEVICE}' \
@@ -228,7 +250,7 @@ do_debug() {
                            -port '${GDB_PORT}' \
                            -telnetport '${TELNET_PORT}'" &
     # save PID for terminating the server afterwards
-    DBG_PID=$?
+    DBG_PID=$!
     # connect to the GDB server
     ${DBG} -q ${TUI} -ex "tar ext :${GDB_PORT}" ${ELFFILE}
     # clean up
@@ -309,8 +331,15 @@ shift # pop $1 from $@
 case "${ACTION}" in
   flash)
     echo "### Flashing Target ###"
-    echo "### Flashing at base address ${FLASH_ADDR} with offset ${IMAGE_OFFSET} ###"
-    do_flash "$@"
+    case "$1" in
+      *.elf)
+        echo "### Flashing elf file ###"
+        do_flash_elf "$@"
+        ;;
+      *)
+        echo "### Flashing bin file at base address ${FLASH_ADDR} with offset ${IMAGE_OFFSET} ###"
+        do_flash_bin "$@"
+    esac
     ;;
   debug)
     echo "### Starting Debugging ###"

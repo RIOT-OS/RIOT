@@ -22,8 +22,9 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <inttypes.h>
+#include <kernel_defines.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "random.h"
 #include "net/netdev.h"
 #include "net/netopt.h"
@@ -152,7 +153,7 @@ int csma_sender_csma_ca_send(netdev_t *dev, iolist_t *iolist,
 
     /* if we arrive here, then we must perform the CSMA/CA procedure
        ourselves by software */
-    random_init(_xtimer_now());
+    random_init(ztimer_now(ZTIMER_USEC));
     DEBUG("csma: Starting software CSMA/CA....\n");
 
     int nb = 0, be = conf->min_be;
@@ -160,7 +161,7 @@ int csma_sender_csma_ca_send(netdev_t *dev, iolist_t *iolist,
     while (nb <= conf->max_be) {
         /* delay for an adequate random backoff period */
         uint32_t bp = choose_backoff_period(be, conf);
-        xtimer_usleep(bp);
+        ztimer_sleep(ZTIMER_USEC, bp);
 
         /* try to send after a CCA */
         res = send_if_cca(dev, iolist);

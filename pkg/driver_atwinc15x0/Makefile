@@ -1,6 +1,7 @@
 PKG_NAME=driver_atwinc15x0
 PKG_URL=https://github.com/arduino-libraries/WiFi101
-PKG_VERSION=3301d03f82e53f60e07434a9f07ca677d992d121
+# 1.6.1
+PKG_VERSION=0cbee7f6a64a1260b8751d993b75c101ec3084c2
 PKG_LICENSE=LGPL-2.1
 
 include $(RIOTBASE)/pkg/pkg.mk

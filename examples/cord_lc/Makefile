@@ -15,7 +15,7 @@ USEMODULE += gnrc_icmpv6_echo
 USEMODULE += cord_lc
 
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 USEMODULE += ps
 
 # The default size of GCOAP_PDU_BUF_SIZE can be too small for the response

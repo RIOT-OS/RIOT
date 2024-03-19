@@ -1,0 +1,25 @@
+# UART @ 115200 Bd is not reliable with a CPU clock of ~ 5 MHz, occasionally
+# chars get lost. Adding an 8 MHz crystal or an external resistor so that the
+# DCO can reach 8 MHz does yield the speed bump needed for a more reliable
+# UART connection @ 115200 Bd
+BAUD                    ?= 9600
+
+# When freshly plugged in the Olimex MSP430-JTAG-Tiny debugger provides a
+# ttyACM interface, which is only available until the first flashing. A
+# `make term` or even a `make flash term` may pick the JTAG debugger instead
+# of the correct USB TTL adapter when the JTAG programmer is plugged in after
+# the TTL adapter and `MOST_RECENT_PORT=1` is used.
+#
+# To fix that, we filter first by the most common USB TTL adapter drivers and
+# fall back to all TTY when no such TTL adapter is found.
+TTY_BOARD_FILTER := --driver 'cp210x|ch341|ftdi_sio'
+TTY_SELECT_CMD := $(RIOTTOOLS)/usb-serial/ttys.py \
+                  --most-recent \
+                  --format path serial \
+                  $(TTY_BOARD_FILTER) || \
+                  $(RIOTTOOLS)/usb-serial/ttys.py \
+                  --most-recent \
+                  --format path serial
+
+include $(RIOTBOARD)/common/msp430/Makefile.include
+CFLAGS += -DSTDIO_UART_BAUDRATE=$(BAUD)

@@ -1,4 +1,4 @@
-From e5a4be53f1bdc4a3c435ad7a35f2d6333277837e Mon Sep 17 00:00:00 2001
+From 3bcd51536348265cf44ed326ccb568a06f96f761 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?J=2E=20David=20Ib=C3=A1=C3=B1ez?= <jdavid.ibp@gmail.com>
 Date: Tue, 3 Aug 2021 12:19:19 +0200
 Subject: [PATCH 2/3] Integration with RIOT, to support other boards
@@ -19,10 +19,10 @@ Signed-off-by: J. David Ibáñez <jdavid.ibp@gmail.com>
  src/SDI12_boards.h   | 33 ++++++++++++++++++++++++++++++++-
  3 files changed, 50 insertions(+), 3 deletions(-)
 
-diff --git src/SDI12.h src/SDI12.h
-index 6469c7b..b57b5bc 100644
---- src/SDI12.h
-+++ src/SDI12.h
+diff --git a/src/SDI12.h b/src/SDI12.h
+index 9ac77f7..6709771 100644
+--- a/src/SDI12.h
++++ b/src/SDI12.h
 @@ -191,11 +191,19 @@ enum LookaheadMode {
   * processor timer directly.
   */
@@ -44,10 +44,10 @@ index 6469c7b..b57b5bc 100644
  #endif  // defined(ESP32) || defined(ESP8266)
  
  /**
-diff --git src/SDI12_boards.cpp src/SDI12_boards.cpp
+diff --git a/src/SDI12_boards.cpp b/src/SDI12_boards.cpp
 index beb28e8..2159eee 100644
---- src/SDI12_boards.cpp
-+++ src/SDI12_boards.cpp
+--- a/src/SDI12_boards.cpp
++++ b/src/SDI12_boards.cpp
 @@ -275,5 +275,13 @@ sdi12timer_t SDI12Timer::SDI12TimerRead(void) {
  }
  // Unknown board
@@ -63,11 +63,11 @@ index beb28e8..2159eee 100644
 +}
 +
  #endif
-diff --git src/SDI12_boards.h src/SDI12_boards.h
-index a2a533e..ff0e69e 100644
---- src/SDI12_boards.h
-+++ src/SDI12_boards.h
-@@ -387,7 +387,38 @@ class SDI12Timer {
+diff --git a/src/SDI12_boards.h b/src/SDI12_boards.h
+index d91eff4..686444f 100644
+--- a/src/SDI12_boards.h
++++ b/src/SDI12_boards.h
+@@ -511,7 +511,38 @@ class SDI12Timer {
  
  // Unknown board
  #else

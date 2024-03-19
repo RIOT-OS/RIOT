@@ -1,136 +1,99 @@
 # Copyright (c) 2020 HAW Hamburg
-#               2021 Gunar Schorcht
+#               2022 Gunar Schorcht
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-config CPU_CORE_XTENSA_LX6
-    bool
-    select CPU_ARCH_XTENSA
-
-config CPU_FAM_ESP32
-    bool
-    select CPU_COMMON_ESP
-    select CPU_CORE_XTENSA_LX6
-    select HAS_ARCH_ESP32
-    select HAS_CPU_ESP32
-    select HAS_ESP_WIFI_ENTERPRISE
-    select HAS_PERIPH_ADC_CTRL
-    select HAS_PUF_SRAM
-
-    select PACKAGE_ESP32_SDK if TEST_KCONFIG
-    select PACKAGE_ESP32_SDK_LIBS if TEST_KCONFIG
-    select MODULE_PERIPH_RTT if HAS_PERIPH_RTT && MODULE_PM_LAYERED
-    select MODULE_RTT_RTC if HAS_PERIPH_RTT && MODULE_PERIPH_RTC
-    select MODULE_PS if MODULE_SHELL
-    select MODULE_ESP_IDF_DRIVER if TEST_KCONFIG
-    select MODULE_ESP_IDF_ESP32 if TEST_KCONFIG
-    select MODULE_ESP_IDF_SOC if TEST_KCONFIG
-    imply MODULE_NEWLIB_NANO
-
-## CPU Models
-config CPU_MODEL_ESP32_WROOM_32
-    bool
-    select CPU_FAM_ESP32
-
-config CPU_MODEL_ESP32_WROVER
-    bool
-    select CPU_FAM_ESP32
-    select HAS_ESP_SPI_RAM
-
-config CPU_MODEL_ESP32_WROVER_B
-    bool
-    select CPU_FAM_ESP32
-    select HAS_ESP_SPI_RAM
-
-config CPU_MODEL_ESP32_WROVER_E
-    bool
-    select CPU_FAM_ESP32
-    select HAS_ESP_SPI_RAM
-
-config CPU_MODEL_ESP32_D0WD
-    bool
-    select CPU_FAM_ESP32
-
 ## Definition of specific features
 config HAS_ARCH_ESP32
     bool
     help
-        Indicates that the current architecture is ESP32.
+        Indicates that the current architecture is any ESP32x SoC architecture.
 
 config HAS_CPU_ESP32
     bool
     help
-        Indicates that the current CPU is 'esp32'.
+        Indicates that the current CPU belongs to the ESP32x SoC series.
+
+config HAS_ESP_BLE
+    bool
+    help
+        Indicates that the used ESP32x SoC supports Bluetooth LE.
+
+config HAS_ESP_BLE_ESP32
+    bool
+    help
+        Indicates that the ESP32x SoC uses the SDK Bluetooth LE library
+        for the ESP32 variant.
+
+config HAS_ESP_BLE_ESP32C3
+    bool
+    help
+        Indicates that the ESP32x SoC uses the SDK Bluetooth LE library
+        for the ESP32-C3 or ESP32-S3 variant.
+
+config HAS_ESP_HW_COUNTER
+    bool
+    help
+        Indicates that the used ESP32x SoC supports HW counters that can be
+        used as timers.
+
+config HAS_ESP_RMT
+    bool
+    help
+        Indicates that the ESP32x SoC has a RMT peripheral.
 
 config HAS_ESP_RTC_TIMER_32K
     bool
     help
-        Indicates that an external 32.768 kHz crystal is connected to the ESP32
-        in the board.
+        Indicates that an external 32.768 kHz crystal is connected to the
+        ESP32x Soc on the board.
 
 config HAS_ESP_SPI_RAM
     bool
     help
-        Indicates that an external RAM is connected via the FSPI interface in
-        the board.
+        Indicates that an external RAM is connected via the SPI interface to
+        the ESP32x SoC on the board.
 
-config HAS_PERIPH_ADC_CTRL
+config HAS_ESP_SPI_OCT
     bool
     help
-        Indicates that an ESP32 ADC controller peripheral is present.
-
-## Common CPU symbols
-config CPU_CORE
-    default "xtensa-lx6" if CPU_CORE_XTENSA_LX6
-
-config CPU_FAM
-    default "esp32" if CPU_FAM_ESP32
-
-config CPU_MODEL
-    default "esp32-wroom_32" if CPU_MODEL_ESP32_WROOM_32
-    default "esp32-wrover" if CPU_MODEL_ESP32_WROVER
-    default "esp32-wrover" if CPU_MODEL_ESP32_WROVER_B
-    default "esp32-wrover" if CPU_MODEL_ESP32_WROVER_E
-    default "esp32-d0wd" if CPU_MODEL_ESP32_D0WD
+        Indicates that Octal SPI mode is used for Flash and SPI RAM. In this
+        case additional GPIOs are used for the SPI interface and cannot be
+        used for other purposes.
 
 config CPU
-    default "esp32" if CPU_FAM_ESP32
+    default "esp32" if HAS_CPU_ESP32
 
-menu "ESP32 specific configurations"
-    depends on TEST_KCONFIG
-    depends on HAS_ARCH_ESP32
+config CPU_CORE_XTENSA_LX6
+    bool
+    select CPU_ARCH_XTENSA
+    help
+        CPU core of the ESP32x SoC is a Xtensa LX6.
 
-    choice
-        bool "CPU clock frequency"
-        default ESP32_DEFAULT_CPU_FREQ_MHZ_80
+config CPU_CORE_XTENSA_LX7
+    bool
+    select CPU_ARCH_XTENSA
+    help
+        CPU core of the ESP32x SoC is a Xtensa LX7.
 
-        config ESP32_DEFAULT_CPU_FREQ_MHZ_2
-            bool "2 MHz"
-        config ESP32_DEFAULT_CPU_FREQ_MHZ_40
-            bool "40 MHz"
-        config ESP32_DEFAULT_CPU_FREQ_MHZ_80
-            bool "80 MHz"
-        config ESP32_DEFAULT_CPU_FREQ_MHZ_160
-            bool "160 MHz"
-        config ESP32_DEFAULT_CPU_FREQ_MHZ_240
-            bool "240 MHz"
-    endchoice
+config CPU_CORE_RV32IMC
+    bool
+    select CPU_ARCH_RISCV
+    help
+        CPU core of the ESP32x SoC is a RISC-V core.
 
-    config MODULE_ESP_SPI_RAM
-        bool "SPI RAM support"
-        depends on HAS_ESP_SPI_RAM
-        select MODULE_ESP_IDF_HEAP
-        help
-            Say y to use external SPI RAM connected through the FSPI interface.
+config CPU_CORE
+    default "xtensa-lx6" if CPU_CORE_XTENSA_LX6
+    default "xtensa-lx7" if CPU_CORE_XTENSA_LX7
+    default "rv32imc" if CPU_CORE_RV32IMC
 
-    config MODULE_ESP_JTAG
-        bool "Enable JTAG debugging interface"
-        depends on HAS_ESP_JTAG
+rsource "Kconfig.esp32x"
+rsource "Kconfig.esp32"
+rsource "Kconfig.esp32c3"
+rsource "Kconfig.esp32s3"
+rsource "Kconfig.esp32s2"
+rsource "stdio_usb_serial_jtag/Kconfig"
 
-endmenu
-
-rsource "periph/Kconfig"
-rsource "vendor/esp-idf/Kconfig"
 source "$(RIOTCPU)/esp_common/Kconfig"

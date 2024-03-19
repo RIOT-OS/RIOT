@@ -39,8 +39,8 @@
 /**
  * @brief Calculates the maximum of two unsigned numbers.
  *
- * @param[in] x   First comparrison value.
- * @param[in] y   Second comparrison value.
+ * @param[in] x   First comparison value.
+ * @param[in] y   Second comparison value.
  *
  * @returns   X if x is larger than y, if not y is returned.
  */
@@ -349,6 +349,7 @@ uint32_t _gnrc_tcp_pkt_get_seg_len(gnrc_pktsnip_t *pkt)
     uint32_t seq = 0;
     uint16_t ctl = 0;
     gnrc_pktsnip_t *snp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_TCP);
+    assert(snp != NULL);
     tcp_hdr_t *hdr = (tcp_hdr_t *) snp->data;
     ctl = byteorder_ntohs(hdr->off_ctl);
     seq = _gnrc_tcp_pkt_get_pay_len(pkt);
@@ -399,6 +400,12 @@ int _gnrc_tcp_pkt_setup_retransmit(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *pkt,
 
     /* Extract control bits and segment length */
     snp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_TCP);
+    if (snp == NULL) {
+        TCP_DEBUG_ERROR("-EINVAL: snp == NULL.");
+        TCP_DEBUG_LEAVE;
+        return -EINVAL;
+    }
+
     ctl = byteorder_ntohs(((tcp_hdr_t *) snp->data)->off_ctl);
     len = _gnrc_tcp_pkt_get_pay_len(pkt);
 
@@ -465,6 +472,12 @@ int _gnrc_tcp_pkt_acknowledge(gnrc_tcp_tcb_t *tcb, const uint32_t ack)
     }
 
     snp = gnrc_pktsnip_search_type(tcb->pkt_retransmit, GNRC_NETTYPE_TCP);
+    if (snp == NULL) {
+        TCP_DEBUG_ERROR("-EINVAL: snp == NULL.");
+        TCP_DEBUG_LEAVE;
+        return -EINVAL;
+    }
+
     hdr = (tcp_hdr_t *) snp->data;
 
     /* There must be a packet, waiting to be acknowledged. */

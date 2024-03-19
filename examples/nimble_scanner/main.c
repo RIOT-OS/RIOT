@@ -25,7 +25,6 @@
 #include "timex.h"
 #include "ztimer.h"
 #include "shell.h"
-#include "shell_commands.h"
 
 #include "nimble_scanner.h"
 #include "nimble_scanlist.h"

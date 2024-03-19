@@ -1,0 +1,4 @@
+USEMODULE += dns_cache
+USEMODULE += ipv4
+USEMODULE += ipv6
+USEMODULE += ztimer_usec

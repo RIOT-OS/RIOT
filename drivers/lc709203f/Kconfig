@@ -14,3 +14,8 @@ config MODULE_LC709203F
     select MODULE_PERIPH_I2C
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_GPIO_IRQ
+
+config HAVE_LC709203F
+    bool
+    help
+        Indicates that a LC709203F Battery Fuel Gauge is present.

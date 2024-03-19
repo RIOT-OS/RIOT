@@ -35,9 +35,11 @@
 
 #include <stdint.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "list.h"
 #include "net/netopt.h"
+#include "net/ipv6.h"
 
 #ifdef MODULE_NETSTATS_NEIGHBOR
 #include "cib.h"
@@ -102,7 +104,7 @@ netif_t *netif_iter(const netif_t *last);
  * @return  length of @p name on success
  */
 
-int netif_get_name(netif_t *netif, char *name);
+int netif_get_name(const netif_t *netif, char *name);
 
 /**
  * @brief   Gets the numeric identifier of an interface
@@ -168,7 +170,7 @@ netif_t *netif_get_by_id(int16_t id);
  * @return  Number of bytes written to @p value.
  * @return  `< 0` on error, 0 on success.
  */
-int netif_get_opt(netif_t *netif, netopt_t opt, uint16_t context,
+int netif_get_opt(const netif_t *netif, netopt_t opt, uint16_t context,
                   void *value, size_t max_len);
 
 /**
@@ -185,7 +187,7 @@ int netif_get_opt(netif_t *netif, netopt_t opt, uint16_t context,
  * @return Number of bytes used from @p value.
  * @return `< 0` on error, 0 on success.
  */
-int netif_set_opt(netif_t *netif, netopt_t opt, uint16_t context,
+int netif_set_opt(const netif_t *netif, netopt_t opt, uint16_t context,
                   void *value, size_t value_len);
 
 /**
@@ -199,6 +201,65 @@ int netif_set_opt(netif_t *netif, netopt_t opt, uint16_t context,
  * @return  -EINVAL if @p netif is NULL.
  */
 int netif_register(netif_t *netif);
+
+/**
+ * @brief   Get IPv6 address(es) of the given interface
+ * @param[in]   netif       Interface to get the IPv6 address(es) from
+ * @param[out]  dest        Array of IPv6 addresses to write to
+ * @param[in]   numof       Size of @p dest in array elements (not in bytes!)
+ * @retval  -1              Failed
+ * @return      Number of addresses written to @p dest
+ */
+static inline ssize_t netif_get_ipv6(netif_t *netif, ipv6_addr_t *dest,
+                                     size_t numof)
+{
+    int res = netif_get_opt(netif, NETOPT_IPV6_ADDR, 0, dest, sizeof(*dest) * numof);
+    if (res < 0) {
+        /* standard says at ssize_t's value range is [-1, SSIZE_MAX], so do
+         * not rely on smaller numbers that -1 being passed through correctly */
+        return -1;
+    }
+
+    return res / sizeof(*dest);
+}
+
+/**
+ * @brief   Get IPv6 address(es) of **all** interfaces
+ * @param[out]  dest        Array of IPv6 addresses to write to
+ * @param[in]   numof       Size of @p dest in array elements (not in bytes!)
+ * @retval  -1              Failed
+ * @return      Number of addresses written to @p dest
+ */
+ssize_t netifs_get_ipv6(ipv6_addr_t *dest, size_t numof);
+
+/**
+ * @brief   Print the IPv6 address(es) of the given interface
+ * @param[in]   netif       Interface to print the IPv6 address(es) of
+ * @param[in]   separator   Separator to print between the IPv6 addresses
+ *
+ * Usage:
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+ *     // print IPv6 addrs of netif as JSON
+ *     printf("{\"IPv6 addresses\": [\"");
+ *     netif_print_ipv6(netif, "\", \"");
+ *     puts("\"]}");
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
+void netif_print_ipv6(netif_t *netif, const char *separator);
+
+/**
+ * @brief   Print the IPv6 address(es) of **all** interface
+ * @param[in]   separator   Separator to print between the IPv6 addresses
+ *
+ * Usage:
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+ *     // print all IPv6 addrs as JSON
+ *     printf("{\"IPv6 addresses\": [\"");
+ *     netifs_print_ipv6("\", \"");
+ *     puts("\"]}");
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
+void netifs_print_ipv6(const char *separator);
 
 #ifdef __cplusplus
 }

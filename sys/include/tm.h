@@ -21,8 +21,6 @@
 #include <sys/time.h>
 #include <stdint.h>
 
-#include "kernel_defines.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -65,7 +63,7 @@ extern const int16_t TM_MON_DAYS_ACCU[12];
  * @param[in]       year   The year. Probably should be ≥ 1582, but needs to be ≥ 1.
  * @returns         `1` if it is a leap year, `0` if it is a common year.
  */
-int tm_is_leap_year(unsigned year) CONST;
+int tm_is_leap_year(unsigned year);
 
 /**
  * @brief           Returns the congruent weekday of the Doomsday (March 0).
@@ -73,7 +71,7 @@ int tm_is_leap_year(unsigned year) CONST;
  * @param[in]       year   The year. Probably should be ≥ 1582, but needs to be ≥ 1.
  * @returns         The result `% 7` is the weekday of the Doomsday of the given year.
  */
-int tm_doomsday(int year) CONST;
+int tm_doomsday(int year);
 
 /**
  * @brief           Calculates the day of the year and the weekday of a given date.
@@ -107,7 +105,7 @@ void tm_fill_derived_values(struct tm *tm);
  * @param[in]       mday   The day in the month.
  * @returns         0 if the date is invalid.
  */
-int tm_is_valid_date(int year, int mon, int mday) CONST;
+int tm_is_valid_date(int year, int mon, int mday);
 
 /**
  * @brief           Shallow test if a time is valid.
@@ -117,7 +115,7 @@ int tm_is_valid_date(int year, int mon, int mday) CONST;
  * @param[in]       sec    The seconds.
  * @returns         0 if the time is invalid.
  */
-int tm_is_valid_time(int hour, int min, int sec) CONST;
+int tm_is_valid_time(int hour, int min, int sec);
 
 #ifdef __cplusplus
 }

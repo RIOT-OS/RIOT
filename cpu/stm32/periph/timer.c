@@ -36,6 +36,21 @@ static inline TIM_TypeDef *dev(tim_t tim)
     return timer_config[tim].dev;
 }
 
+/**
+ * @brief   Get the number of channels of the timer device
+ */
+static unsigned channel_numof(tim_t tim)
+{
+    if (timer_config[tim].channel_numof) {
+        return timer_config[tim].channel_numof;
+    }
+
+    /* backwards compatibility with older periph_conf.h files when all STM32
+     * had exactly 4 channels */
+    return TIMER_CHANNEL_NUMOF;
+}
+
+
 #ifdef MODULE_PERIPH_TIMER_PERIODIC
 
 /**
@@ -121,13 +136,12 @@ int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
 
 int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 {
-    if (channel >= (int)TIMER_CHANNEL_NUMOF) {
+    if ((unsigned)channel >= channel_numof(tim)) {
         return -1;
     }
 
+    unsigned irqstate = irq_disable();
     set_oneshot(tim, channel);
-
-    TIM_CHAN(tim, channel) = (value & timer_config[tim].max);
 
 #ifdef MODULE_PERIPH_TIMER_PERIODIC
     if (dev(tim)->ARR == TIM_CHAN(tim, channel)) {
@@ -135,7 +149,70 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
     }
 #endif
 
+    /* clear spurious IRQs */
+    dev(tim)->SR &= ~(TIM_SR_CC1IF << channel);
+
+    TIM_CHAN(tim, channel) = (value & timer_config[tim].max);
+
+    /* enable IRQ */
     dev(tim)->DIER |= (TIM_DIER_CC1IE << channel);
+    irq_restore(irqstate);
+
+    return 0;
+}
+
+uword_t timer_query_freqs_numof(tim_t dev)
+{
+    (void)dev;
+    /* Prescaler values from 0 to UINT16_MAX are supported */
+    return UINT16_MAX + 1;
+}
+
+uint32_t timer_query_freqs(tim_t dev, uword_t index)
+{
+
+    if (index > UINT16_MAX) {
+        return 0;
+    }
+
+    return periph_timer_clk(timer_config[dev].bus) / (index + 1);
+}
+
+int timer_set(tim_t tim, int channel, unsigned int timeout)
+{
+    unsigned value = (dev(tim)->CNT + timeout) & timer_config[tim].max;
+
+    if ((unsigned)channel >= channel_numof(tim)) {
+        return -1;
+    }
+
+    unsigned irqstate = irq_disable();
+    set_oneshot(tim, channel);
+
+#ifdef MODULE_PERIPH_TIMER_PERIODIC
+    if (dev(tim)->ARR == TIM_CHAN(tim, channel)) {
+        dev(tim)->ARR = timer_config[tim].max;
+    }
+#endif
+
+    /* clear spurious IRQs */
+    dev(tim)->SR &= ~(TIM_SR_CC1IF << channel);
+
+    TIM_CHAN(tim, channel) = value;
+
+    /* enable IRQ */
+    dev(tim)->DIER |= (TIM_DIER_CC1IE << channel);
+
+    /* calculate time till timeout */
+    value = (value - dev(tim)->CNT) & timer_config[tim].max;
+
+    if (value > timeout) {
+        /* time till timeout is larger than requested --> timer already expired
+         * ==> let's make sure we have an IRQ pending :) */
+        dev(tim)->EGR |= (TIM_EGR_CC1G << channel);
+    }
+
+    irq_restore(irqstate);
 
     return 0;
 }
@@ -143,30 +220,38 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 #ifdef MODULE_PERIPH_TIMER_PERIODIC
 int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags)
 {
-    if (channel >= (int)TIMER_CHANNEL_NUMOF) {
+    if ((unsigned)channel >= channel_numof(tim)) {
         return -1;
     }
 
+    unsigned irqstate = irq_disable();
     clear_oneshot(tim, channel);
+
+    if (flags & TIM_FLAG_SET_STOPPED) {
+        timer_stop(tim);
+    }
 
     if (flags & TIM_FLAG_RESET_ON_SET) {
         /* setting COUNT gives us an interrupt on all channels */
-        unsigned state = irq_disable();
         dev(tim)->CNT = 0;
 
         /* wait for the interrupt & clear it */
         while(dev(tim)->SR == 0) {}
         dev(tim)->SR = 0;
-
-        irq_restore(state);
     }
 
     TIM_CHAN(tim, channel) = value;
+
+    /* clear spurious IRQs */
+    dev(tim)->SR &= ~(TIM_SR_CC1IF << channel);
+
+    /* enable IRQ */
     dev(tim)->DIER |= (TIM_DIER_CC1IE << channel);
 
     if (flags & TIM_FLAG_RESET_ON_MATCH) {
         dev(tim)->ARR = value;
     }
+    irq_restore(irqstate);
 
     return 0;
 }
@@ -174,11 +259,13 @@ int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags
 
 int timer_clear(tim_t tim, int channel)
 {
-    if (channel >= (int)TIMER_CHANNEL_NUMOF) {
+    if ((unsigned)channel >= channel_numof(tim)) {
         return -1;
     }
 
+    unsigned irqstate = irq_disable();
     dev(tim)->DIER &= ~(TIM_DIER_CC1IE << channel);
+    irq_restore(irqstate);
 
 #ifdef MODULE_PERIPH_TIMER_PERIODIC
     if (dev(tim)->ARR == TIM_CHAN(tim, channel)) {
@@ -196,19 +283,28 @@ unsigned int timer_read(tim_t tim)
 
 void timer_start(tim_t tim)
 {
+    unsigned irqstate = irq_disable();
     dev(tim)->CR1 |= TIM_CR1_CEN;
+    irq_restore(irqstate);
 }
 
 void timer_stop(tim_t tim)
 {
+    unsigned irqstate = irq_disable();
     dev(tim)->CR1 &= ~(TIM_CR1_CEN);
+    irq_restore(irqstate);
 }
 
 static inline void irq_handler(tim_t tim)
 {
     uint32_t top = dev(tim)->ARR;
     uint32_t status = dev(tim)->SR & dev(tim)->DIER;
-    dev(tim)->SR = 0;
+
+    /* clear interrupts which we are about to service */
+    /* Note, the flags in the SR register can be cleared by software, but
+     * setting them has no effect on the register. Only the hardware can set
+     * them. */
+    dev(tim)->SR = ~status;
 
     for (unsigned int i = 0; status; i++) {
         uint32_t msk = TIM_SR_CC1IF << i;

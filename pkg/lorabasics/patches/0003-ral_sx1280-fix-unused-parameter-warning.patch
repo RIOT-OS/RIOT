@@ -1,0 +1,34 @@
+From 0606d43c2ea293d4ed96843406736a9b2a159fdd Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benjamin.valentin@ml-pa.com>
+Date: Thu, 18 Aug 2022 01:04:22 +0200
+Subject: [PATCH] ral_sx1280: fix unused parameter warning
+
+---
+ smtc_ral/src/ral_sx1280.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/smtc_ral/src/ral_sx1280.c b/smtc_ral/src/ral_sx1280.c
+index ecd8c03..bc75dff 100644
+--- a/smtc_ral/src/ral_sx1280.c
++++ b/smtc_ral/src/ral_sx1280.c
+@@ -474,11 +474,17 @@ ral_status_t ral_sx1280_setup_tx_flrc( const ral_t* ral, const ral_params_flrc_t
+ 
+ ral_status_t ral_sx1280_setup_tx_lora_e( const ral_t* ral, const ral_params_lora_e_t* params )
+ {
++    (void)ral;
++    (void)params;
++
+     return RAL_STATUS_UNSUPPORTED_FEATURE;
+ }
+ 
+ ral_status_t ral_sx1280_tx_bpsk( const ral_t* ral, const ral_params_bpsk_t* params )
+ {
++    (void)ral;
++    (void)params;
++
+     return RAL_STATUS_UNSUPPORTED_FEATURE;
+ }
+ 
+-- 
+2.34.1
+

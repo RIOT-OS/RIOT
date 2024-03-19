@@ -74,6 +74,7 @@ extern "C" {
 
 /**
  * @name USB CDC descriptor subtypes
+ * @{
  */
 #define USB_CDC_DESCR_SUBTYPE_FUNCTIONAL    0x00 /**< functional
                                                    *  descriptor */
@@ -294,8 +295,6 @@ typedef struct __attribute__((packed)) {
 #define USB_CDC_ACM_CODING_PARITY_EVEN      2 /**< Even parity   */
 #define USB_CDC_ACM_CODING_PARITY_MARK      3 /**< Mark parity   */
 #define USB_CDC_ACM_CODING_PARITY_SPACE     4 /**< Space parity  */
-/** @} */
-
 /** @} */
 
 #ifdef __cplusplus

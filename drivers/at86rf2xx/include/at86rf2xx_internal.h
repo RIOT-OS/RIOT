@@ -28,10 +28,12 @@
 
 #include "at86rf2xx.h"
 
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
 #include <string.h>
-#include "at86rf2xx_registers.h"
+#include "irq.h"
+#include "time_units.h"
 #endif
+#include "at86rf2xx_registers.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -65,7 +67,7 @@ extern "C" {
 
 /**
  * @brief   Minimum reset pulse width, refer p.190. We use 62us so
- *          that it is at least one tick on platforms with coarse xtimers
+ *          that it is at least one tick on platforms with coarse ztimers
  */
 #define AT86RF2XX_RESET_PULSE_WIDTH     (62U)
 
@@ -85,7 +87,7 @@ extern "C" {
  *
  * @return              the value of the specified register
  */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
 static inline uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, volatile uint8_t *addr) {
     (void) dev;
     return *addr;
@@ -101,7 +103,7 @@ uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, uint8_t addr);
  * @param[in] addr      address of the register to write
  * @param[in] value     value to write to the given register
  */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
 static inline void at86rf2xx_reg_write(const at86rf2xx_t *dev, volatile uint8_t *addr,
                                        const uint8_t value) {
     (void) dev;
@@ -119,7 +121,7 @@ void at86rf2xx_reg_write(const at86rf2xx_t *dev, uint8_t addr, uint8_t value);
  * @param[out] data     buffer to read data into
  * @param[in]  len      number of bytes to read from SRAM
  */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
 static inline void at86rf2xx_sram_read(const at86rf2xx_t *dev, uint8_t offset,
                                        uint8_t *data, size_t len) {
     (void)dev;
@@ -137,7 +139,7 @@ void at86rf2xx_sram_read(const at86rf2xx_t *dev, uint8_t offset,
  * @param[in] data      data to copy into SRAM
  * @param[in] len       number of bytes to write to SRAM
  */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
 static inline void at86rf2xx_sram_write(const at86rf2xx_t *dev, uint8_t offset,
                                         const uint8_t *data, size_t len) {
     (void)dev;
@@ -155,7 +157,7 @@ void at86rf2xx_sram_write(const at86rf2xx_t *dev, uint8_t offset,
  *
  * @param[in]  dev      device to start read
  */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
 static inline void at86rf2xx_fb_start(const at86rf2xx_t *dev) {
     (void) dev;
 }
@@ -171,7 +173,7 @@ void at86rf2xx_fb_start(const at86rf2xx_t *dev);
  * @param[out] data     buffer to copy the data to
  * @param[in]  len      number of bytes to read from the frame buffer
  */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
 static inline void at86rf2xx_fb_read(const at86rf2xx_t *dev, uint8_t *data, size_t len) {
     (void)dev;
     memcpy(data, (void*)AT86RF2XX_REG__TRXFBST, len);
@@ -186,7 +188,7 @@ void at86rf2xx_fb_read(const at86rf2xx_t *dev, uint8_t *data, size_t len);
  *
  * @param[in]  dev      device to stop read
  */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
 static inline void at86rf2xx_fb_stop(const at86rf2xx_t *dev) {
     (void) dev;
 }
@@ -220,8 +222,11 @@ void at86rf2xx_hardware_reset(at86rf2xx_t *dev);
  * @brief   Set PHY parameters based on channel and page number
  *
  * @param[in,out] dev   device to configure
+ * @param[in] chan      channel number to be set
+ * @param[in] page      channel page
+ * @param[in] txpower   TX power in dBm
  */
-void at86rf2xx_configure_phy(at86rf2xx_t *dev);
+void at86rf2xx_configure_phy(at86rf2xx_t *dev, uint8_t chan, uint8_t page, int16_t txpower);
 
 #if AT86RF2XX_RANDOM_NUMBER_GENERATOR || defined(DOXYGEN)
 /**
@@ -239,7 +244,95 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev);
  * @param[out] data     buffer to copy the random data to
  * @param[in]  len      number of random bytes to store in data
  */
-void at86rf2xx_get_random(const at86rf2xx_t *dev, uint8_t *data, size_t len);
+void at86rf2xx_get_random(at86rf2xx_t *dev, uint8_t *data, size_t len);
+#endif
+
+/**
+ * @brief Initialize AT86RF2XX SPI communication
+ *
+ * @param[in,out] dev       device to initialize
+ * @param[in] irq_handler   IRQ handler
+ */
+void at86rf2xx_spi_init(at86rf2xx_t *dev, void (*irq_handler)(void *arg));
+
+/**
+ * @brief Get the PSDU length of the received frame.
+ *
+ * @param[in] dev   pointer to the device descriptor
+ *
+ * @return the PSDU length
+ */
+static inline uint8_t at86rf2xx_get_rx_len(at86rf2xx_t *dev)
+{
+    (void) dev;
+#if AT86RF2XX_IS_PERIPH
+    return TST_RX_LENGTH;
+#else
+    uint8_t phr;
+    at86rf2xx_fb_read(dev, &phr, 1);
+    return phr;
+#endif
+}
+
+/**
+ * @brief Get the IRQ flags.
+ *
+ * This function clears the IRQ flags
+ * @param[in,out] dev   pointer to the device descriptor
+ *
+ * @return IRQ flags
+ */
+static inline uint8_t at86rf2xx_get_irq_flags(at86rf2xx_t *dev)
+{
+    (void) dev;
+#if AT86RF2XX_IS_PERIPH
+    uint8_t irq_mask = dev->irq_status;
+    dev->irq_status = 0;
+    return irq_mask;
+#else
+    return at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
+#endif
+
+}
+
+#if AT86RF2XX_IS_PERIPH
+/*
+ * Read a 32 bit register as described in section 10.3 of the datasheet: A read
+ * of the least significant byte causes the current value to be atomically
+ * captured in a temporary 32 bit registers. The remaining reads will access this
+ * register instead. Only a single 32 bit temporary register is used to provide
+ * means to atomically access them. Thus, interrupts must be disabled during the
+ * read sequence in order to prevent other threads (or ISRs) from updating the
+ * temporary 32 bit register before the reading sequence has completed.
+ */
+static inline uint32_t reg32_read(volatile uint8_t *reg_ll)
+{
+    le_uint32_t reg;
+    unsigned state = irq_disable();
+    reg.u8[0] =  reg_ll[0];
+    reg.u8[1] =  reg_ll[1];
+    reg.u8[2] =  reg_ll[2];
+    reg.u8[3] =  reg_ll[3];
+    irq_restore(state);
+    return reg.u32;
+}
+
+/**
+ * @brief Get the timestamp of the packet in symbol counter ticks
+ *
+ * @param[in] dev   pointer to the device descriptor
+ *
+ * @return the symbol counter value
+ */
+static inline uint32_t at86rf2xx_get_sc(const at86rf2xx_t *dev)
+{
+    (void) dev;
+    return reg32_read(&SCCNTLL);
+}
+
+/* Symbol counter frequency is 62500Hz. One symbol counter tick is 16us = 16000 ns*/
+#define SC_TO_NS (16000LU)
+
 #endif
 
 #ifdef __cplusplus

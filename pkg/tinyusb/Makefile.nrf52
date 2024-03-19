@@ -1,0 +1,5 @@
+MODULE = tinyusb_portable_nrf5x
+
+INCLUDES := -I$(RIOTBASE)/pkg/tinyusb/hw/include/nrf52 $(INCLUDES)
+
+include $(RIOTBASE)/Makefile.base

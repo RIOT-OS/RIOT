@@ -75,6 +75,13 @@ menu "ESP8266 specific configurations"
             bool "160 MHz"
     endchoice
 
+    config MODULE_ESP_SW_TIMER
+        bool "Use software timer as low-level timer peripheral"
+        depends on MODULE_PERIPH_TIMER
+
+    rsource "sdk/Kconfig"
+    rsource "vendor/Kconfig"
+
 endmenu
 
 source "$(RIOTCPU)/esp_common/Kconfig"
@@ -83,10 +90,3 @@ config MODULE_ESP_I2C_SW
     bool
     default y if MODULE_PERIPH_I2C
     select MODULE_PERIPH_I2C_SW
-
-config MODULE_ESP_SW_TIMER
-    bool "Use software timer"
-    depends on MODULE_PERIPH_TIMER
-
-rsource "sdk/Kconfig"
-rsource "vendor/Kconfig"

@@ -1,0 +1,122 @@
+LABELS,DEFAULT,TYPE,GROUP,Name, Official Name, GPIO, Analog 1, Analog 2, RTC,  Func 1, Func 2, Func 3
+BORDER COLOR, grey
+BORDER WIDTH, 2
+BORDER OPACITY, 1
+FILL COLOR, white,  white,  white,  deepskyblue,    gray,   green,  purple, yellow, orange, red,    gold,   brown
+OPACITY,    1,      1,      1,      1,              1,      1,      1,      1,      1,      1,      1,      1
+FONT , Rubik, , , Work Sans, Work Sans
+FONT SIZE , 25, , , 25, 25
+FONT COLOR , black, , , , , white
+FONT SLANT , normal , , , , ,
+FONT BOLD , 700 , , , 700
+FONT STRETCH , normal
+FONT OUTLINE , yellow , , , , blue
+FONT OUTLINE THICKNESS, 0.1
+BOXES, STD, , , PIN BOX, NAME BOX, SKEWED, SKEWED, SKEWED, SKEWED, SKEWED, SKEWED, SKEWED
+
+TYPE, IO, black, 1
+TYPE, INPUT, black, 1
+TYPE, OUTPUT, black, 1
+
+WIRE, DIGITAL, black, 1, 5
+WIRE, PWM, black, 1, 5
+WIRE, ANALOG, black, 1, 5
+WIRE, POWER, black, 1, 10
+
+GROUP, NONE, grey, 0.1
+
+BOX, STD, black, 1, white, 0, 1, 100,55,2,2,0,0
+BOX, PIN BOX, black, 1, white, 0, 1, 80, 55, 5, 5, -10, 0
+BOX, NAME BOX, black, 1, white, 0, 1, 125, 55, 5, 5, -10, 0
+BOX, SKEWED, black, 1, white, 0, 1, 125,55,5,5,-10,0
+BOX, PAGE BORDER, black, 1, white, 1, 50, 100,100,0,0,0,0
+BOX, DETAIL BOX, darkblue, 1, white, 0, 3, 250, 200, 15,15,0,0
+
+PAGE, A4-L
+DPI, 300
+
+DRAW
+
+# Add image of board
+ICON, bluepill-top-view.svg, 880, 908, 100%, 100%
+
+BOX, DETAIL BOX, 1800, 100, 1100, 300, , TOP, "Legend"
+ANCHOR, 1820,140
+PINSET, RIGHT, PACKED, CENTER, CENTER, 74.75, 30, 45, 60, 10, 0
+#           wire,       type,   group,  pin-name,   comment,    analog, PWM,    SPI,    I2C,    POWER,  UART,   QDEC
+PIN,        DIGITAL,    INPUT,  NONE,   ,           Input
+PIN,        DIGITAL,    OUTPUT, NONE,   ,           Output
+PIN,        DIGITAL,    IO,     NONE,   ,           "I/O"
+ANCHOR, 2220,140
+PINSET, RIGHT, PACKED, CENTER, CENTER, 74.75, 30, 45, 60, 10, 0
+PIN,        ANALOG,     IO,     NONE,   ,           ,           Analog
+PIN,        PWM,        IO,     NONE,   ,           ,           ,       PWM
+PIN,        DIGITAL,    IO,     NONE,   ,           ,           ,       ,       SPI
+ANCHOR, 2640,140
+PINSET, RIGHT, PACKED, CENTER, CENTER, 74.75, 30, 45, 60, 10, 0
+PIN,        DIGITAL,    IO,     NONE,   ,           ,           ,       ,       ,       I2C
+PIN,        DIGITAL,    IO,     NONE,   ,           ,           ,       ,       ,       ,       ,       UART
+PIN,        POWER,      IO,     NONE,   ,           ,           ,       ,       ,       ,       Power
+
+BOX, DETAIL BOX, 1800, 500, 1100, 220, , TOP, "Internally Connected to ADC"
+ANCHOR, 1820,540
+PINSET, RIGHT, PACKED, CENTER, CENTER, 74.75, 30, 45, 60, 10, 0
+#           wire,       type,   group,  pin-name,   comment,    analog, PWM,    SPI,    I2C,    POWER,  UART,   QDEC
+PIN,        ANALOG,     IO,     NONE,   NTC,        ,           "A6"
+PIN,        ANALOG,     IO,     NONE,   VREF,       ,           "A7"
+
+BOX, DETAIL BOX, 1800, 800, 1100, 220, , TOP, "Default Interface for STDIO"
+MESSAGE, 1820, 860, 48, Name, 36, LEFT, TOP
+TEXT, none, black, "UART for STM32F103C8 (64 KiB flash)", NL
+TEXT, none, black, "USB for STM32F103CB (128 KiB flash)", NL
+
+# Left Side Pins
+ANCHOR, 520,170
+PINSET, LEFT, PACKED, CENTER, CENTER, 74.75, 30, 45, 60, 10, 0
+
+#           wire,       type,   group,  pin-name,   comment,    analog, PWM,    SPI,    I2C,    POWER,  UART,   QDEC
+PIN,        ANALOG,     INPUT,  NONE,   ,           "VAT"
+PIN,        DIGITAL,    OUTPUT, NONE,   "PC 13",    "LED1"
+PIN,        DIGITAL,    IO,     NONE,   "PC 14",    "OSC32"
+PIN,        DIGITAL,    IO,     NONE,   "PC 15",    "OSC32"
+PIN,        ANALOG,     IO,     NONE,   "PA 0",     ,           "A0"
+PIN,        DIGITAL,    IO,     NONE,   "PA 1",     ,           "A1"
+PIN,        DIGITAL,    OUTPUT, NONE,   "PA 2",     ,           ,       ,       ,       ,       ,       "TX1"
+PIN,        DIGITAL,    INPUT,  NONE,   "PA 3",     ,           ,       ,       ,       ,       ,       "RX1"
+PIN,        DIGITAL,    OUTPUT, NONE,   "PA 4",     ,           "A2",   ,       "CS1"
+PIN,        DIGITAL,    OUTPUT, NONE,   "PA 5",     ,           "A3",   ,       "SCLK1"
+PIN,        DIGITAL,    INPUT,  NONE,   "PA 6",     ,           "A4",   ,       "MISO1"
+PIN,        DIGITAL,    OUTPUT, NONE,   "PA 7",     ,           "A5",   ,       "MOSI1"
+PIN,        PWM,        OUTPUT, NONE,   "PB 0",     ,           "A8",   "PWM2"
+PIN,        PWM,        OUTPUT, NONE,   "PB 1",     ,           "A9",   "PWM3"
+PIN,        DIGITAL,    OUTPUT, NONE,   "PB 10",    ,           ,       ,       ,       "SCL1", ,       "TX2"
+PIN,        DIGITAL,    INPUT,  NONE,   "PB 11",    ,           ,       ,       ,       "SDA1", ,       "RX2"
+PIN,        DIGITAL,    INPUT,  NONE,   ,           "RESET"
+PIN,        POWER,      OUTPUT, NONE,   ,           ,           ,       ,       ,       ,       "+3.3V"
+PIN,        POWER,      OUTPUT, NONE,   ,           ,           ,       ,       ,       ,       "GND"
+PIN,        POWER,      OUTPUT, NONE,   ,           ,           ,       ,       ,       ,       "GND"
+
+# Right Side Pins
+ANCHOR, 1235,170
+PINSET, RIGHT, PACKED, CENTER, CENTER, 74.75, 30, 45, 60, 10, 0
+#           wire,       type,   group,  pin-name,   comment,    analog, PWM,    SPI,    I2C,    POWER,  UART,   QDEC
+PIN,        POWER,      OUTPUT, NONE,   ,           ,           ,       ,       ,       ,       "+3.3V"
+PIN,        POWER,      OUTPUT, NONE,   ,           ,           ,       ,       ,       ,       "GND"
+PIN,        POWER,      OUTPUT, NONE,   ,           ,           ,       ,       ,       ,       "+5V"
+PIN,        DIGITAL,    IO,     NONE,   "PB 9",     ,           ,       ,       ,       "SDA0"
+PIN,        DIGITAL,    IO,     NONE,   "PB 8",     ,           ,       ,       ,       "SCL0"
+PIN,        DIGITAL,    INPUT,  NONE,   "PB 7",     ,           ,       ,       ,       ,       ,       ,       "QDEC0-B"
+PIN,        DIGITAL,    INPUT,  NONE,   "PB 6",     ,           ,       ,       ,       ,       ,       ,       "QDEC0-A"
+PIN,        PWM,        OUTPUT, NONE,   "PB 5",     ,           ,       "PWM1"
+PIN,        PWM,        IO,     NONE,   "PB 4",     ,           ,       "PWM0", ,       ,       ,       ,       "QDEC1-A"
+PIN,        DIGITAL,    INPUT,  NONE,   "PB 3",     ,           ,       ,       ,       ,       ,       ,       "QDEC1-B"
+PIN,        DIGITAL,    IO,     NONE,   "PA 15"
+PIN,        DIGITAL,    IO,     NONE,   "PA 12",    "USB D+\\nstdio"
+PIN,        DIGITAL,    IO,     NONE,   "PA 11",    "USB D-\\nstdio"
+PIN,        DIGITAL,    OUTPUT, NONE,   "PA 10",    "stdio",    ,       ,       ,       ,       ,       "RX0"
+PIN,        DIGITAL,    INPUT,  NONE,   "PA 9",     "stdio",    ,       ,       ,       ,       ,       "TX0",  "QDEC2-A"
+PIN,        DIGITAL,    IO,     NONE,   "PA 8",     ,           ,       ,       ,       ,       ,       ,       "QDEC2-B"
+PIN,        DIGITAL,    OUTPUT, NONE,   "PB 15",    ,           ,       ,       "MOSI0"
+PIN,        DIGITAL,    INPUT,  NONE,   "PB 14",    ,           ,       ,       "MISO0"
+PIN,        DIGITAL,    OUTPUT, NONE,   "PB 13",    ,           ,       ,       "SCLK0"
+PIN,        DIGITAL,    OUTPUT, NONE,   "PB 12",    ,           ,       ,       "CS0"

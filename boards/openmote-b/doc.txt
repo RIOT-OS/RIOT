@@ -58,7 +58,7 @@ tool. Once you have this in place, you can simply flash by calling
 
 from your application folder.
 
-Mac OS users may experiment a command line expecting `connect`. Just type it
+macOS users may experiment a command line expecting `connect`. Just type it
 and the process will continue.
 
 ### Debugging

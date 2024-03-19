@@ -49,10 +49,10 @@
 #define SERCOM_I2CM_CTRLA_MODE_I2C_MASTER SERCOM_I2CM_CTRLA_MODE(5)
 #endif
 
-static int _start(SercomI2cm *dev, uint16_t addr);
-static inline int _write(SercomI2cm *dev, const uint8_t *data, int length,
+static int _i2c_start(SercomI2cm *dev, uint16_t addr);
+static inline int _write(SercomI2cm *dev, const uint8_t *data, size_t length,
                          uint8_t stop);
-static inline int _read(SercomI2cm *dev, uint8_t *data, int length,
+static inline int _read(SercomI2cm *dev, uint8_t *data, size_t length,
                         uint8_t stop);
 static inline void _stop(SercomI2cm *dev);
 static inline int _wait_for_response(SercomI2cm *dev,
@@ -248,7 +248,7 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr,
 
     if (!(flags & I2C_NOSTART)) {
         /* start transmission and send slave address */
-        ret = _start(bus(dev), (addr << 1) | I2C_READ);
+        ret = _i2c_start(bus(dev), (addr << 1) | I2C_READ);
         if (ret < 0) {
             DEBUG("Start command failed\n");
             return ret;
@@ -289,7 +289,7 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len,
     }
 
     if (!(flags & I2C_NOSTART)) {
-        ret = _start(bus(dev), (addr<<1));
+        ret = _i2c_start(bus(dev), (addr<<1));
         if (ret < 0) {
             DEBUG("Start command failed\n");
             return ret;
@@ -326,7 +326,7 @@ void _i2c_poweroff(i2c_t dev)
     _syncbusy(bus(dev));
 }
 
-static int _start(SercomI2cm *dev, uint16_t addr)
+static int _i2c_start(SercomI2cm *dev, uint16_t addr)
 {
     /* Wait for hardware module to sync */
     DEBUG("Wait for device to be ready\n");
@@ -373,10 +373,10 @@ static int _start(SercomI2cm *dev, uint16_t addr)
     return 0;
 }
 
-static inline int _write(SercomI2cm *dev, const uint8_t *data, int length,
+static inline int _write(SercomI2cm *dev, const uint8_t *data, size_t length,
                          uint8_t stop)
 {
-    uint8_t count = 0;
+    size_t count = 0;
 
     /* Write data buffer until the end. */
     DEBUG("Looping through bytes\n");
@@ -413,10 +413,10 @@ static inline int _write(SercomI2cm *dev, const uint8_t *data, int length,
     return 0;
 }
 
-static inline int _read(SercomI2cm *dev, uint8_t *data, int length,
+static inline int _read(SercomI2cm *dev, uint8_t *data, size_t length,
                         uint8_t stop)
 {
-    uint8_t count = 0;
+    size_t count = 0;
 
     /* Set action to ack. */
     dev->CTRLB.reg &= ~SERCOM_I2CM_CTRLB_ACKACT;

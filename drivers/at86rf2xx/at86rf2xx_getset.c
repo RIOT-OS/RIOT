@@ -51,130 +51,39 @@ static const uint8_t dbm_to_tx_pow_915[] = { 0x1d, 0x1c, 0x1b, 0x1a, 0x19, 0x17,
                                              0x04, 0x03, 0x02, 0x01, 0x00, 0x86,
                                              0x40, 0x84, 0x83, 0x82, 0x80, 0xc1,
                                              0xc0 };
-static int16_t _tx_pow_to_dbm_212b(uint8_t channel, uint8_t page, uint8_t reg)
-{
-    if (page == 0 || page == 2) {
-        const uint8_t *dbm_to_tx_pow;
-        size_t nelem;
-
-        if (channel == 0) {
-            /* Channel 0 is 868.3 MHz */
-            dbm_to_tx_pow = &dbm_to_tx_pow_868[0];
-            nelem = ARRAY_SIZE(dbm_to_tx_pow_868);
-        }
-        else {
-            /* Channels 1+ are 915 MHz */
-            dbm_to_tx_pow = &dbm_to_tx_pow_915[0];
-            nelem = ARRAY_SIZE(dbm_to_tx_pow_915);
-        }
-
-        for (size_t i = 0; i < nelem; ++i) {
-            if (dbm_to_tx_pow[i] == reg) {
-                return (i - AT86RF2XX_TXPOWER_OFF);
-            }
-        }
-    }
-
-    return 0;
-}
-
 #elif MODULE_AT86RF233
-static const int16_t tx_pow_to_dbm[] = { 4, 4, 3, 3, 2, 2, 1,
-                                         0, -1, -2, -3, -4, -6, -8, -12, -17 };
 static const uint8_t dbm_to_tx_pow[] = { 0x0f, 0x0f, 0x0f, 0x0e, 0x0e, 0x0e,
                                          0x0e, 0x0d, 0x0d, 0x0d, 0x0c, 0x0c,
                                          0x0b, 0x0b, 0x0a, 0x09, 0x08, 0x07,
                                          0x06, 0x05, 0x03, 0x00 };
 #else
-static const int16_t tx_pow_to_dbm[] = { 3, 3, 2, 2, 1, 1, 0,
-                                         -1, -2, -3, -4, -5, -7, -9, -12, -17 };
 static const uint8_t dbm_to_tx_pow[] = { 0x0f, 0x0f, 0x0f, 0x0e, 0x0e, 0x0e,
                                          0x0e, 0x0d, 0x0d, 0x0c, 0x0c, 0x0b,
                                          0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06,
                                          0x05, 0x03, 0x00 };
 #endif
 
-void at86rf2xx_get_addr_short(const at86rf2xx_t *dev, network_uint16_t *addr)
-{
-    memcpy(addr, dev->netdev.short_addr, sizeof(*addr));
-}
-
 void at86rf2xx_set_addr_short(at86rf2xx_t *dev, const network_uint16_t *addr)
 {
-    memcpy(dev->netdev.short_addr, addr, sizeof(*addr));
-#ifdef MODULE_SIXLOWPAN
-    /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
-     * 0 for unicast addresses */
-    dev->netdev.short_addr[0] &= 0x7F;
-#endif
     /* device use lsb first, not network byte order */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__SHORT_ADDR_0,
-                        dev->netdev.short_addr[1]);
+                        addr->u8[1]);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__SHORT_ADDR_1,
-                        dev->netdev.short_addr[0]);
-}
-
-void at86rf2xx_get_addr_long(const at86rf2xx_t *dev, eui64_t *addr)
-{
-    memcpy(addr, dev->netdev.long_addr, sizeof(*addr));
+                        addr->u8[0]);
 }
 
 void at86rf2xx_set_addr_long(at86rf2xx_t *dev, const eui64_t *addr)
 {
-    memcpy(dev->netdev.long_addr, addr, sizeof(*addr));
     for (int i = 0; i < 8; i++) {
         /* device use lsb first, not network byte order */
         at86rf2xx_reg_write(dev, (AT86RF2XX_REG__IEEE_ADDR_0 + i),
-                dev->netdev.long_addr[IEEE802154_LONG_ADDRESS_LEN - 1 - i]);
+                addr->uint8[IEEE802154_LONG_ADDRESS_LEN - 1 - i]);
     }
-}
-
-uint8_t at86rf2xx_get_chan(const at86rf2xx_t *dev)
-{
-    return dev->netdev.chan;
-}
-
-void at86rf2xx_set_chan(at86rf2xx_t *dev, uint8_t channel)
-{
-    if ((channel > AT86RF2XX_MAX_CHANNEL)
-#if AT86RF2XX_MIN_CHANNEL /* is zero for sub-GHz */
-       || (channel < AT86RF2XX_MIN_CHANNEL)
-#endif
-        ) {
-        return;
-    }
-
-    dev->netdev.chan = channel;
-
-    at86rf2xx_configure_phy(dev);
-}
-
-uint8_t at86rf2xx_get_page(const at86rf2xx_t *dev)
-{
-#ifdef MODULE_AT86RF212B
-    return dev->page;
-#else
-    (void) dev;
-    return 0;
-#endif
-}
-
-void at86rf2xx_set_page(at86rf2xx_t *dev, uint8_t page)
-{
-#ifdef MODULE_AT86RF212B
-    if ((page == 0) || (page == 2)) {
-        dev->page = page;
-        at86rf2xx_configure_phy(dev);
-    }
-#else
-    (void) dev;
-    (void) page;
-#endif
 }
 
 uint8_t at86rf2xx_get_phy_mode(at86rf2xx_t *dev)
 {
-#ifdef MODULE_AT86RF212B
+#if AT86RF2XX_HAVE_SUBGHZ
     uint8_t ctrl2;
     ctrl2 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_2);
     if (ctrl2 & AT86RF2XX_TRX_CTRL_2_MASK__BPSK_OQPSK) {
@@ -214,11 +123,6 @@ uint8_t at86rf2xx_get_rate(at86rf2xx_t *dev)
     return rate;
 }
 
-uint16_t at86rf2xx_get_pan(const at86rf2xx_t *dev)
-{
-    return dev->netdev.pan;
-}
-
 void at86rf2xx_set_pan(at86rf2xx_t *dev, uint16_t pan)
 {
     le_uint16_t le_pan = byteorder_htols(pan);
@@ -228,21 +132,9 @@ void at86rf2xx_set_pan(at86rf2xx_t *dev, uint16_t pan)
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__PAN_ID_1, le_pan.u8[1]);
 }
 
-int16_t at86rf2xx_get_txpower(const at86rf2xx_t *dev)
+static inline void _set_txpower(const at86rf2xx_t *dev, int16_t txpower, uint8_t channel)
 {
-#ifdef MODULE_AT86RF212B
-    uint8_t txpower = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_TX_PWR);
-    DEBUG("txpower value: %x\n", txpower);
-    return _tx_pow_to_dbm_212b(dev->netdev.chan, dev->page, txpower);
-#else
-    uint8_t txpower = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_TX_PWR)
-                      & AT86RF2XX_PHY_TX_PWR_MASK__TX_PWR;
-    return tx_pow_to_dbm[txpower];
-#endif
-}
-
-void at86rf2xx_set_txpower(const at86rf2xx_t *dev, int16_t txpower)
-{
+    (void) channel;
     txpower += AT86RF2XX_TXPOWER_OFF;
 
     if (txpower < 0) {
@@ -251,12 +143,12 @@ void at86rf2xx_set_txpower(const at86rf2xx_t *dev, int16_t txpower)
     else if (txpower > AT86RF2XX_TXPOWER_MAX) {
         txpower = AT86RF2XX_TXPOWER_MAX;
     }
-#ifdef MODULE_AT86RF212B
-    if (dev->netdev.chan == 0) {
+#if AT86RF2XX_HAVE_SUBGHZ
+    if (channel == 0) {
         at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,
                             dbm_to_tx_pow_868[txpower]);
     }
-    else if (dev->netdev.chan < 11) {
+    else if (channel < 11) {
         at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,
                             dbm_to_tx_pow_915[txpower]);
     }
@@ -265,6 +157,63 @@ void at86rf2xx_set_txpower(const at86rf2xx_t *dev, int16_t txpower)
                         dbm_to_tx_pow[txpower]);
 #endif
 }
+
+void at86rf2xx_configure_phy(at86rf2xx_t *dev, uint8_t chan, uint8_t page, int16_t txpower)
+{
+    /* we must be in TRX_OFF before changing the PHY configuration */
+    uint8_t prev_state = at86rf2xx_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
+    (void) page;
+    (void) chan;
+    (void) txpower;
+
+#if AT86RF2XX_HAVE_SUBGHZ
+    /* The TX power register must be updated after changing the channel if
+     * moving between bands. */
+
+    uint8_t trx_ctrl2 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_2);
+    uint8_t rf_ctrl0 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__RF_CTRL_0);
+
+    /* Clear previous configuration for PHY mode */
+    trx_ctrl2 &= ~(AT86RF2XX_TRX_CTRL_2_MASK__FREQ_MODE);
+    /* Clear previous configuration for GC_TX_OFFS */
+    rf_ctrl0 &= ~AT86RF2XX_RF_CTRL_0_MASK__GC_TX_OFFS;
+
+    if (chan != 0) {
+        /* Set sub mode bit on 915 MHz as recommended by the data sheet */
+        trx_ctrl2 |= AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE;
+    }
+
+    if (page == 0) {
+        /* BPSK coding */
+        /* Data sheet recommends using a +2 dB setting for BPSK */
+        rf_ctrl0 |= AT86RF2XX_RF_CTRL_0_GC_TX_OFFS__2DB;
+    }
+    else if (page == 2) {
+        /* O-QPSK coding */
+        trx_ctrl2 |= AT86RF2XX_TRX_CTRL_2_MASK__BPSK_OQPSK;
+        /* Data sheet recommends using a +1 dB setting for O-QPSK */
+        rf_ctrl0 |= AT86RF2XX_RF_CTRL_0_GC_TX_OFFS__1DB;
+    }
+
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2, trx_ctrl2);
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__RF_CTRL_0, rf_ctrl0);
+#endif
+
+    uint8_t phy_cc_cca = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_CC_CCA);
+    /* Clear previous configuration for channel number */
+    phy_cc_cca &= ~(AT86RF2XX_PHY_CC_CCA_MASK__CHANNEL);
+
+    /* Update the channel register */
+    phy_cc_cca |= (chan & AT86RF2XX_PHY_CC_CCA_MASK__CHANNEL);
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_CC_CCA, phy_cc_cca);
+
+    /* Update the TX power register to achieve the same power (in dBm) */
+    _set_txpower(dev, txpower, chan);
+
+    /* Return to the state we had before reconfiguring */
+    at86rf2xx_set_state(dev, prev_state);
+}
+
 
 int8_t at86rf2xx_get_rxsensitivity(const at86rf2xx_t *dev)
 {
@@ -389,7 +338,7 @@ int8_t at86rf2xx_get_ed_level(at86rf2xx_t *dev)
 {
     uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_ED_LEVEL);
 
-#if MODULE_AT86RF212B
+#if AT86RF2XX_HAVE_SUBGHZ
     /* AT86RF212B has different scale than the other variants */
     int8_t ed = (int8_t)(((int16_t)tmp * 103) / 100) + RSSI_BASE_VAL;
 #else
@@ -413,8 +362,6 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
             if (state) {
                 DEBUG("[at86rf2xx] opt: enabling CSMA mode" \
                       "(4 retries, min BE: 3 max BE: 5)\n");
-                /* Initialize CSMA seed with hardware address */
-                at86rf2xx_set_csma_seed(dev, dev->netdev.long_addr);
                 at86rf2xx_set_csma_max_retries(dev, 4);
                 at86rf2xx_set_csma_backoff_exp(dev, 3, 5);
             }
@@ -524,7 +471,7 @@ uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
             /* Discard all IRQ flags, framebuffer is lost anyway */
             at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
             /* Go to SLEEP mode from TRX_OFF */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if AT86RF2XX_IS_PERIPH
             /* reset interrupts states in device */
             dev->irq_status = 0;
             /* Setting SLPTR bit brings radio transceiver to sleep in in TRX_OFF*/

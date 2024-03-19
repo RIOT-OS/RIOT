@@ -60,9 +60,10 @@ void auto_init_random(void)
     random_init(seed);
 }
 
-void random_bytes(uint8_t *target, size_t n)
+void random_bytes(void *target, size_t n)
 {
     uint32_t random;
+    uint8_t *dst = target;
     uint8_t *random_pos = (uint8_t*)&random;
     unsigned _n = 0;
 
@@ -71,7 +72,7 @@ void random_bytes(uint8_t *target, size_t n)
             random = random_uint32();
             random_pos = (uint8_t *) &random;
         }
-        *target++ = *random_pos++;
+        *dst++ = *random_pos++;
     }
 }
 

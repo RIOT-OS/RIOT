@@ -36,12 +36,12 @@ config MODULE_LIS2DH12_INT
     bool "Interrupt lines support"
     depends on HAS_PERIPH_GPIO_IRQ
     select MODULE_PERIPH_GPIO_IRQ
+    default HAVE_LIS2DH12_INT
 
 endif # MODULE_LIS2DH12
 
 config HAVE_LIS2DH12
     bool
-    select MODULE_LIS2DH12 if MODULE_SAUL_DEFAULT
     help
       Indicates that a LIS2DH12 Accelerometer is present.
 
@@ -56,3 +56,10 @@ config HAVE_LIS2DH12_SPI
     select HAVE_LIS2DH12
     help
       Indicates that a LIS2DH12 Accelerometer on the SPI bus is present.
+
+config HAVE_LIS2DH12_INT
+    bool
+    select HAVE_LIS2DH12
+    help
+      Indicates that a LIS2DH12 Accelerometer is present with the interrupt
+      pin wired.

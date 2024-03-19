@@ -270,12 +270,12 @@ static const i2c_conf_t i2c_config[] = {
 
 static const adc_conf_chan_t adc_channels[] = {
     /* port, pin, muxpos */
-    {GPIO_PIN(PA, 4), ADC_INPUTCTRL_MUXPOS_PIN4},
-    {GPIO_PIN(PA, 5), ADC_INPUTCTRL_MUXPOS_PIN5},
-    {GPIO_PIN(PA, 6), ADC_INPUTCTRL_MUXPOS_PIN6},
-    {GPIO_PIN(PA, 7), ADC_INPUTCTRL_MUXPOS_PIN7},
-    {GPIO_PIN(PA, 8), ADC_INPUTCTRL_MUXPOS_PIN16},
-    {GPIO_PIN(PA, 9), ADC_INPUTCTRL_MUXPOS_PIN17},
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA04 },
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA05 },
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA06 },
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA07 },
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA08 },
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA09 },
 };
 
 #define ADC_NUMOF           ARRAY_SIZE(adc_channels)

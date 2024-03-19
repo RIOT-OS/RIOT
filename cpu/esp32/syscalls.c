@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
+ * Copyright (C) 2022 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -17,29 +17,39 @@
  *
  * @}
  */
-
-#include <stdlib.h>
-#include <sys/lock.h>
+#include <stdint.h>
 #include <sys/unistd.h>
 #include <sys/time.h>
 
 #include "div.h"
 #include "esp/common_macros.h"
 #include "irq_arch.h"
+#include "mutex.h"
+#include "rmutex.h"
 #include "periph_cpu.h"
 #include "periph/pm.h"
 #include "syscalls.h"
+#include "sys/lock.h"
 #include "timex.h"
 
-#include "macros/units.h"
+#include "esp_rom_caps.h"
+#include "hal/interrupt_controller_types.h"
+#include "hal/interrupt_controller_ll.h"
+#include "hal/timer_hal.h"
+#include "hal/wdt_hal.h"
+#include "hal/wdt_types.h"
 #include "rom/ets_sys.h"
 #include "rom/libc_stubs.h"
+#include "soc/periph_defs.h"
 #include "soc/rtc.h"
+#include "soc/rtc_cntl_reg.h"
 #include "soc/rtc_cntl_struct.h"
 #include "soc/timer_group_reg.h"
 #include "soc/timer_group_struct.h"
-#include "sdk_conf.h"
+#include "sdkconfig.h"
+#if __xtensa__
 #include "xtensa/xtensa_api.h"
+#endif
 
 #ifdef MODULE_ESP_IDF_HEAP
 #include "esp_heap_caps.h"
@@ -48,16 +58,22 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#ifdef MODULE_ESP_IDF_HEAP
+#if IS_USED(MODULE_CPP)
+/* weak function that have to be overridden, otherwise DEFAULT_ARENA_SIZE would
+ * be allocated that would consume the whole heap memory */
+size_t __cxx_eh_arena_size_get(void)
+{
+    return 0;
+}
+#endif
+
+#if IS_USED(MODULE_ESP_IDF_HEAP)
 
 /* if module esp_idf_heap is used, this function has to be defined for ESP32 */
 unsigned int get_free_heap_size(void)
 {
     return heap_caps_get_free_size(MALLOC_CAP_DEFAULT);
 }
-
-/* alias for compatibility with espressif/wifi_libs */
-uint32_t esp_get_free_heap_size( void ) __attribute__((alias("get_free_heap_size")));
 
 /* this function is platform specific if module esp_idf_heap is used */
 void heap_stats(void)
@@ -76,7 +92,7 @@ void heap_stats(void)
                _alloc + _free, _alloc, _free);
 }
 
-#endif /* MODULE_ESP_IDF_HEAP */
+#endif /* IS_USED(MODULE_ESP_IDF_HEAP) */
 
 /**
  * @name Other system functions
@@ -96,7 +112,7 @@ void _exit_r(struct _reent *r, int status)
 
 #if !IS_USED(MODULE_VFS)
 int _fcntl_r(struct _reent *r, int fd, int cmd, int arg)
-                              __attribute__((weak,alias("_no_sys_func")));
+                              __attribute__((weak, alias("_no_sys_func")));
 #endif
 
 #ifndef CLOCK_REALTIME
@@ -143,6 +159,17 @@ int clock_gettime(clockid_t clock_id, struct timespec *tp)
     return clock_gettime_r(_GLOBAL_REENT, clock_id, tp);
 }
 
+#if !IS_USED(MODULE_LIBC_GETTIMEOFDAY)
+int IRAM _gettimeofday_r(struct _reent *r, struct timeval *tv, void *tz)
+{
+    (void) tz;
+    uint64_t now = system_get_time_64();
+    tv->tv_sec = div_u64_by_1000000(now);
+    tv->tv_usec = now - (tv->tv_sec * US_PER_SEC);
+    return 0;
+}
+#endif
+
 static int _no_sys_func(struct _reent *r)
 {
     DEBUG("%s: system function does not exist\n", __func__);
@@ -154,7 +181,7 @@ extern int _printf_float(struct _reent *rptr,
                          void *pdata,
                          FILE * fp,
                          int (*pfunc) (struct _reent *, FILE *,
-                                       _CONST char *, size_t len),
+                                       const char *, size_t len),
                          va_list * ap);
 
 extern int _scanf_float(struct _reent *rptr,
@@ -172,8 +199,8 @@ static struct syscall_stub_table s_stub_table =
     ._calloc_r = &_calloc_r,
     ._sbrk_r = &_sbrk_r,
 
-    ._system_r = (void *)&_no_sys_func,
-    ._raise_r = (void *)&_no_sys_func,
+    ._system_r = (void*)&_no_sys_func,
+    ._raise_r = (void*)&_no_sys_func,
     ._abort = &_abort,
     ._exit_r = &_exit_r,
     ._getpid_r = &_getpid_r,
@@ -190,9 +217,10 @@ static struct syscall_stub_table s_stub_table =
     ._write_r = (int (*)(struct _reent *r, int, const void *, int))&_write_r,
     ._read_r = (int (*)(struct _reent *r, int, void *, int))&_read_r,
     ._unlink_r = &_unlink_r,
-    ._link_r = (void *)&_no_sys_func,
-    ._rename_r = (void *)&_no_sys_func,
+    ._link_r = (void*)&_no_sys_func,
+    ._rename_r = (void*)&_no_sys_func,
 
+#if !defined(ESP_ROM_HAS_RETARGETABLE_LOCKING)
     ._lock_init = &_lock_init,
     ._lock_init_recursive = &_lock_init_recursive,
     ._lock_close = &_lock_close,
@@ -203,33 +231,99 @@ static struct syscall_stub_table s_stub_table =
     ._lock_try_acquire_recursive = &_lock_try_acquire_recursive,
     ._lock_release = &_lock_release,
     ._lock_release_recursive = &_lock_release_recursive,
-
-    #if CONFIG_NEWLIB_NANO_FORMAT
+#else
+    ._retarget_lock_init = &__retarget_lock_init,
+    ._retarget_lock_init_recursive = &__retarget_lock_init_recursive,
+    ._retarget_lock_close = &__retarget_lock_close,
+    ._retarget_lock_close_recursive = &__retarget_lock_close_recursive,
+    ._retarget_lock_acquire = &__retarget_lock_acquire,
+    ._retarget_lock_acquire_recursive = &__retarget_lock_acquire_recursive,
+    ._retarget_lock_try_acquire = &__retarget_lock_try_acquire,
+    ._retarget_lock_try_acquire_recursive = &__retarget_lock_try_acquire_recursive,
+    ._retarget_lock_release = &__retarget_lock_release,
+    ._retarget_lock_release_recursive = &__retarget_lock_release_recursive,
+#endif
+#if CONFIG_NEWLIB_NANO_FORMAT
     ._printf_float = &_printf_float,
     ._scanf_float = &_scanf_float,
-    #else /* CONFIG_NEWLIB_NANO_FORMAT */
+#else /* CONFIG_NEWLIB_NANO_FORMAT */
     ._printf_float = NULL,
     ._scanf_float = NULL,
-    #endif /* CONFIG_NEWLIB_NANO_FORMAT */
+#endif /* CONFIG_NEWLIB_NANO_FORMAT */
 };
+
+timer_hal_context_t sys_timer = {
+    .dev = TIMER_LL_GET_HW(TIMER_SYSTEM_GROUP),
+    .idx = TIMER_SYSTEM_INDEX,
+};
+
+#if defined(_RETARGETABLE_LOCKING)
+
+/* all locking variables share the same mutex respectively the same rmutex */
+static mutex_t  s_shared_mutex = MUTEX_INIT;
+static rmutex_t s_shared_rmutex = RMUTEX_INIT;
+
+/* definition of locks required by the newlib if retargetable locking is used */
+extern struct __lock __attribute__((alias("s_shared_rmutex"))) __lock___sinit_recursive_mutex;
+extern struct __lock __attribute__((alias("s_shared_rmutex"))) __lock___sfp_recursive_mutex;
+extern struct __lock __attribute__((alias("s_shared_rmutex"))) __lock___atexit_recursive_mutex;
+extern struct __lock __attribute__((alias("s_shared_rmutex"))) __lock___malloc_recursive_mutex;
+extern struct __lock __attribute__((alias("s_shared_rmutex"))) __lock___env_recursive_mutex;
+extern struct __lock __attribute__((alias("s_shared_mutex"))) __lock___at_quick_exit_mutex;
+extern struct __lock __attribute__((alias("s_shared_mutex"))) __lock___tz_mutex;
+extern struct __lock __attribute__((alias("s_shared_mutex"))) __lock___dd_hash_mutex;
+extern struct __lock __attribute__((alias("s_shared_mutex"))) __lock___arc4random_mutex;
+
+#endif
 
 void IRAM syscalls_init_arch(void)
 {
-    /* enable the system timer in us (TMG0 is enabled by default) */
-    TIMER_SYSTEM.config.divider = rtc_clk_apb_freq_get() / MHZ(1);
-    TIMER_SYSTEM.config.autoreload = 0;
-    TIMER_SYSTEM.config.enable = 1;
+#if defined(_RETARGETABLE_LOCKING)
+    /* initialization of static locking variables in ROM, different ROM
+     * versions of newlib use different locking variables */
+#if defined(CPU_FAM_ESP32)
+    extern _lock_t __sfp_lock;
+    extern _lock_t __sinit_lock;
+    extern _lock_t __env_lock_object;
+    extern _lock_t __tz_lock_object;
 
+    __sfp_lock = (_lock_t)&s_shared_rmutex;
+    __sinit_lock = (_lock_t)&s_shared_rmutex;
+    __env_lock_object = (_lock_t)&s_shared_mutex;
+    __tz_lock_object = (_lock_t)&s_shared_rmutex;
+#elif defined(CPU_FAM_ESP32S2)
+    extern _lock_t __sinit_recursive_mutex;
+    extern _lock_t __sfp_recursive_mutex;
+
+    __sinit_recursive_mutex = (_lock_t)&s_shared_rmutex;
+    __sfp_recursive_mutex = (_lock_t)&s_shared_rmutex;
+#else
+    /* TODO: Other platforms don't provide access to these ROM variables.
+     * It could be necessary to call `esp_rom_newlib_init_common_mutexes`. For
+     * the moment it doesn't seems to be necessary to call this function. */
+#endif
+#endif /* _RETARGETABLE_LOCKING */
+
+    /* initialize and enable the system timer in us (TMG0 is enabled by default) */
+    timer_hal_init(&sys_timer, TIMER_SYSTEM_GROUP, TIMER_SYSTEM_INDEX);
+    timer_hal_set_divider(&sys_timer, rtc_clk_apb_freq_get() / MHZ);
+    timer_hal_set_counter_increase(&sys_timer, true);
+    timer_hal_set_auto_reload(&sys_timer, false);
+    timer_hal_set_counter_enable(&sys_timer, true);
+
+#if defined(CPU_FAM_ESP32)
     syscall_table_ptr_pro = &s_stub_table;
     syscall_table_ptr_app = &s_stub_table;
+#elif defined(CPU_FAM_ESP32S2)
+    syscall_table_ptr_pro = &s_stub_table;
+#else
+    syscall_table_ptr = &s_stub_table;
+#endif
 }
 
 uint32_t system_get_time(void)
 {
-    /* latch 64 bit timer value before read */
-    TIMER_SYSTEM.update = 0;
-    /* read the current timer value */
-    return TIMER_SYSTEM.cnt_low;
+    return system_get_time_64();
 }
 
 uint32_t system_get_time_ms(void)
@@ -239,83 +333,89 @@ uint32_t system_get_time_ms(void)
 
 int64_t system_get_time_64(void)
 {
-    uint64_t  ret;
-    /* latch 64 bit timer value before read */
-    TIMER_SYSTEM.update = 0;
-    /* read the current timer value */
-    ret  = TIMER_SYSTEM.cnt_low;
-    ret += ((uint64_t)TIMER_SYSTEM.cnt_high) << 32;
+    uint64_t ret;
+    timer_hal_get_counter_value(&sys_timer, &ret);
     return ret;
 }
 
-/* alias for compatibility with espressif/wifi_libs */
-int64_t esp_timer_get_time(void) __attribute__((alias("system_get_time_64")));
+wdt_hal_context_t mwdt;
+wdt_hal_context_t rwdt;
 
 static IRAM void system_wdt_int_handler(void *arg)
 {
-    TIMERG0.int_clr_timers.wdt=1; /* clear interrupt */
-    system_wdt_feed();
+    wdt_hal_handle_intr(&mwdt);
+    wdt_hal_write_protect_disable(&mwdt);
+    wdt_hal_feed(&mwdt);
+    wdt_hal_write_protect_enable(&mwdt);
 }
 
 void IRAM system_wdt_feed(void)
 {
-    DEBUG("%s\n", __func__);
-    TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;  /* disable write protection */
-    TIMERG0.wdt_feed=1;                        /* reset MWDT */
-    TIMERG0.wdt_wprotect=0;                    /* enable write protection */
+    wdt_hal_write_protect_disable(&mwdt);
+    wdt_hal_feed(&mwdt);
+    wdt_hal_write_protect_enable(&mwdt);
 }
 
 void system_wdt_init(void)
 {
-    /* disable boot watchdogs */
-    TIMERG0.wdt_config0.flashboot_mod_en = 0;
-    RTCCNTL.wdt_config0.flashboot_mod_en = 0;
+    /* initialize and disable boot watchdogs MWDT and RWDT (the prescaler for
+     * MWDT is the APB clock in MHz to get a microsecond tick, for RWDT it is
+     * not applicable) */
+    wdt_hal_init(&mwdt, WDT_MWDT0, rtc_clk_apb_freq_get()/MHZ, true);
+    wdt_hal_init(&rwdt, WDT_RWDT, 0, false);
 
-    /* enable system watchdog */
-    TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;  /* disable write protection */
-    TIMERG0.wdt_config0.stg0 = TIMG_WDT_STG_SEL_INT;          /* stage0 timeout: interrupt */
-    TIMERG0.wdt_config0.stg1 = TIMG_WDT_STG_SEL_RESET_SYSTEM; /* stage1 timeout: sys reset */
-    TIMERG0.wdt_config0.sys_reset_length = 7;  /* sys reset signal length: 3.2 us */
-    TIMERG0.wdt_config0.cpu_reset_length = 7;  /* sys reset signal length: 3.2 us */
-    TIMERG0.wdt_config0.edge_int_en = 0;
-    TIMERG0.wdt_config0.level_int_en = 1;
+    /* disable write protection for MWDT and RWDT */
+    wdt_hal_write_protect_disable(&mwdt);
+    wdt_hal_write_protect_disable(&rwdt);
 
-    /* MWDT clock = 80 * 12,5 ns = 1 us */
-    TIMERG0.wdt_config1.clk_prescale = 80;
+    /* configure stages */
+    wdt_hal_config_stage(&mwdt, WDT_STAGE0, 2 * US_PER_SEC, WDT_STAGE_ACTION_INT);
+    wdt_hal_config_stage(&mwdt, WDT_STAGE1, 2 * US_PER_SEC, WDT_STAGE_ACTION_RESET_SYSTEM);
+    wdt_hal_config_stage(&mwdt, WDT_STAGE2, 0, WDT_STAGE_ACTION_OFF);
+    wdt_hal_config_stage(&mwdt, WDT_STAGE3, 0, WDT_STAGE_ACTION_OFF);
 
-    /* define stage timeouts */
-    TIMERG0.wdt_config2 = 2 * US_PER_SEC;  /* stage 0: 2 s (interrupt) */
-    TIMERG0.wdt_config3 = 4 * US_PER_SEC;  /* stage 1: 4 s (sys reset) */
+    /* enable the watchdog */
+    wdt_hal_enable(&mwdt);
 
-    TIMERG0.wdt_config0.en = 1;   /* enable MWDT */
-    TIMERG0.wdt_feed = 1;         /* reset MWDT */
-    TIMERG0.wdt_wprotect = 0;     /* enable write protection */
+    /* enable write protection for MWDT and RWDT */
+    wdt_hal_write_protect_enable(&mwdt);
+    wdt_hal_write_protect_enable(&rwdt);
 
-    DEBUG("%s TIMERG0 wdt_config0=%08x wdt_config1=%08x wdt_config2=%08x\n",
-          __func__, TIMERG0.wdt_config0.val, TIMERG0.wdt_config1.val,
-          TIMERG0.wdt_config2);
+#if defined(CPU_FAM_ESP32)
+    DEBUG("%s TIMERG0 wdtconfig0=%08"PRIx32" wdtconfig1=%08"PRIx32
+          " wdtconfig2=%08"PRIx32" wdtconfig3=%08"PRIx32
+          " wdtconfig4=%08"PRIx32" regclk=%08"PRIx32"\n", __func__,
+          TIMERG0.wdt_config0.val, TIMERG0.wdt_config1.val,
+          TIMERG0.wdt_config2, TIMERG0.wdt_config3,
+          TIMERG0.wdt_config4, TIMERG0.clk.val);
+#else
+    DEBUG("%s TIMERG0 wdtconfig0=%08"PRIx32" wdtconfig1=%08"PRIx32
+          " wdtconfig2=%08"PRIx32" wdtconfig3=%08"PRIx32
+          " wdtconfig4=%08"PRIx32" regclk=%08"PRIx32"\n", __func__,
+          TIMERG0.wdtconfig0.val, TIMERG0.wdtconfig1.val,
+          TIMERG0.wdtconfig2.val, TIMERG0.wdtconfig3.val,
+          TIMERG0.wdtconfig4.val, TIMERG0.regclk.val);
+#endif
 
     /* route WDT peripheral interrupt source to CPU_INUM_WDT */
     intr_matrix_set(PRO_CPU_NUM, ETS_TG0_WDT_LEVEL_INTR_SOURCE, CPU_INUM_WDT);
     /* set the interrupt handler and activate the interrupt */
-    xt_set_interrupt_handler(CPU_INUM_WDT, system_wdt_int_handler, NULL);
-    xt_ints_on(BIT(CPU_INUM_WDT));
+    intr_cntrl_ll_set_int_handler(CPU_INUM_WDT, system_wdt_int_handler, NULL);
+    intr_cntrl_ll_enable_interrupts(BIT(CPU_INUM_WDT));
 }
 
 void system_wdt_stop(void)
 {
-    xt_ints_off(BIT(CPU_INUM_WDT));
-    TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;  /* disable write protection */
-    TIMERG0.wdt_config0.en = 0;   /* disable MWDT */
-    TIMERG0.wdt_feed = 1;         /* reset MWDT */
-    TIMERG0.wdt_wprotect = 0;     /* enable write protection */
+    intr_cntrl_ll_disable_interrupts(BIT(CPU_INUM_WDT));
+    wdt_hal_write_protect_disable(&mwdt);
+    wdt_hal_disable(&mwdt);
+    wdt_hal_write_protect_enable(&mwdt);
 }
 
 void system_wdt_start(void)
 {
-    TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;  /* disable write protection */
-    TIMERG0.wdt_config0.en = 1;   /* disable MWDT */
-    TIMERG0.wdt_feed = 1;         /* reset MWDT */
-    TIMERG0.wdt_wprotect = 0;     /* enable write protection */
-    xt_ints_on(BIT(CPU_INUM_WDT));
+    wdt_hal_write_protect_disable(&mwdt);
+    wdt_hal_enable(&mwdt);
+    wdt_hal_write_protect_enable(&mwdt);
+    intr_cntrl_ll_enable_interrupts(BIT(CPU_INUM_WDT));
 }

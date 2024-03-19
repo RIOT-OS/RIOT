@@ -209,7 +209,8 @@ void reset_handler_default(void)
     kernel_init();
 }
 
-void nmi_default(void)
+__attribute__((weak))
+void nmi_handler(void)
 {
     core_panic(PANIC_NMI_HANDLER, "NMI HANDLER");
 }
@@ -449,7 +450,6 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
             : "r0", "r1", "r2", "r3", "r12"
             );
     }
-    __BKPT(1);
 
     core_panic(PANIC_HARD_FAULT, "HARD FAULT HANDLER");
 }
@@ -506,7 +506,7 @@ ISR_VECTOR(0) const cortexm_base_t cortex_vector_base = {
         /* entry point of the program */
         [ 0] = reset_handler_default,
         /* [-14] non maskable interrupt handler */
-        [ 1] = nmi_default,
+        [ 1] = nmi_handler,
         /* [-13] hard fault exception */
         [ 2] = hard_fault_default,
         /* [-5] SW interrupt, in RIOT used for triggering context switches */

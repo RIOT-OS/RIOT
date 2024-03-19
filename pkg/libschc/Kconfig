@@ -1,0 +1,39 @@
+# Copyright (c) 2022 Freie Universität Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEPKG_LIBSCHC
+    bool "Configure libSCHC"
+    depends on USEPKG_LIBSCHC
+    help
+        Configure libSCHC package via Kconfig.
+
+if KCONFIG_USEPKG_LIBSCHC
+
+config LIBSCHC_STATIC_MEMBUF_LEN
+    int "Static memory allocation buffer length"
+    default 1024
+    help
+        Length of the static memory buffer for fragment data allocation in reassembly buffer in
+        bytes.
+
+config LIBSCHC_MBUF_POOL_SIZE
+    int "Maximum number of mbuf pool entries"
+    default 64
+    help
+        Maximum number of entries in the mbuf used for fragment reassembly.
+
+config LIBSCHC_MAX_RX_CONNS
+    int "Maximum number of incoming connections"
+    default 1
+
+config LIBSCHC_MAX_MTU_LEN
+    int "Maximum transfer unit of the underlying technology"
+    default 242
+
+config LIBSCHC_DEBUG
+    bool "Enable debug output"
+
+endif # KCONFIG_USEPKG_LIBSCHC

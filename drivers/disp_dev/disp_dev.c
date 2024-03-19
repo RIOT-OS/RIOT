@@ -63,12 +63,12 @@ disp_dev_reg_t *disp_dev_reg_find_screen(uint8_t screen_id)
 }
 
 void disp_dev_map(const disp_dev_t *dev,
-                  uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2,
+                  const disp_dev_area_t *area,
                   const uint16_t *color)
 {
     assert(dev);
 
-    dev->driver->map(dev, x1, x2, y1, y2, color);
+    dev->driver->map(dev, area, color);
 }
 
 uint16_t disp_dev_height(const disp_dev_t *dev)

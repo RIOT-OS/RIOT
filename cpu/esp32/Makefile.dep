@@ -3,61 +3,97 @@
 include $(RIOTCPU)/esp_common/Makefile.dep
 
 USEPKG += esp32_sdk
-USEPKG += esp32_sdk_libs
 
-USEMODULE += esp_idf_driver
-USEMODULE += esp_idf_esp32
-USEMODULE += esp_idf_soc
+USEMODULE += esp_idf_api
+USEMODULE += esp_idf_common
+USEMODULE += esp_idf_efuse
+USEMODULE += esp_bootloader
 
 ifneq (,$(filter newlib,$(USEMODULE)))
   DEFAULT_MODULE += newlib_nano
 endif
 
+ifneq (,$(filter cpp,$(USEMODULE)))
+  USEMODULE += pthread
+endif
+
+ifneq (,$(filter esp_ble,$(USEMODULE)))
+  # add additional modules and packages used for any BLE interface
+  FEATURES_REQUIRED += esp_ble
+  USEMODULE += esp_idf_ble
+  USEPKG += esp32_sdk_lib_phy
+  ifeq (esp32,$(CPU_FAM))
+    FEATURES_REQUIRED += esp_ble_esp32
+    USEPKG += esp32_sdk_lib_bt_esp32
+  else ifneq (,$(filter esp32c3 esp32s3,$(CPU_FAM)))
+    FEATURES_REQUIRED += esp_ble_esp32c3
+    USEPKG += esp32_sdk_lib_bt_esp32c3
+  endif
+endif
+
 ifneq (,$(filter esp_eth,$(USEMODULE)))
-  USEMODULE += esp_freertos
+  FEATURES_REQUIRED += esp_eth
   USEMODULE += esp_idf_eth
-  USEMODULE += esp_idf_eth_phy
+  USEMODULE += esp_idf_event
+  USEMODULE += esp_idf_gpio
+  USEMODULE += esp_idf_spi_flash
   USEMODULE += netdev_eth
   USEMODULE += netopt
   USEMODULE += ztimer_msec
 endif
 
 ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
-  # add additional modules used for any WiFi interface
-  USEMODULE += esp_freertos
+  # add additional modules and packages used for any WiFi interface
+  USEPKG += esp32_sdk_lib_phy
+  USEPKG += esp32_sdk_lib_wifi
+  USEMODULE += esp_idf_event
   USEMODULE += esp_idf_heap
   USEMODULE += esp_idf_nvs_flash
-  USEMODULE += esp_idf_wpa_supplicant_crypto
+  USEMODULE += esp_idf_spi_flash
+  USEMODULE += esp_idf_wifi
+  USEMODULE += esp_idf_wpa_supplicant
+  USEMODULE += esp_idf_wpa_supplicant_esp_supplicant
   USEMODULE += esp_idf_wpa_supplicant_port
+  USEMODULE += esp_idf_wpa_supplicant_ap
+  USEMODULE += esp_idf_wpa_supplicant_common
+  USEMODULE += esp_idf_wpa_supplicant_crypto
+  USEMODULE += esp_idf_wpa_supplicant_eap_peer
+  USEMODULE += esp_idf_wpa_supplicant_rsn_supp
+  USEMODULE += esp_idf_wpa_supplicant_tls
+  USEMODULE += esp_idf_wpa_supplicant_utils
+  USEMODULE += esp_idf_wpa_supplicant_wps
+  USEMODULE += pthread
 endif
 
-ifneq (,$(filter esp_wifi_enterprise,$(USEMODULE)))
-  # add additional modules used for WPA2 Enterprise mode
-  USEMODULE += esp_idf_wpa_supplicant_wpa2_eap_peer
-  USEMODULE += esp_idf_wpa_supplicant_wpa2_tls
-  USEMODULE += esp_idf_wpa_supplicant_wpa2_utils
+ifneq (,$(filter esp_hw_counter,$(USEMODULE)))
+  FEATURES_REQUIRED += esp_hw_counter
 endif
 
 ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
   # add additional modules required by esp_idf_nvs_flash
+  USEMODULE += pthread
   USEMODULE += mtd
 endif
 
-ifneq (,$(filter periph_rtc,$(USEMODULE)))
-    FEATURES_OPTIONAL += esp_rtc_timer_32k
+ifneq (,$(filter esp_idf_wifi,$(USEMODULE)))
+  # add additional modules required by esp_idf_wifi
+  USEMODULE += esp_idf_adc
+endif
+
+ifneq (,$(filter periph_rtt,$(USEMODULE)))
+  FEATURES_OPTIONAL += esp_rtc_timer_32k
 endif
 
 ifneq (,$(filter esp_rtc_timer_32k,$(FEATURES_USED)))
-    USEMODULE += esp_rtc_timer_32k
+  USEMODULE += esp_rtc_timer_32k
 endif
 
-ifneq (,$(filter periph_adc periph_dac,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_adc_ctrl
+ifneq (,$(filter periph_gpio,$(USEMODULE)))
+  USEMODULE += esp_idf_gpio
 endif
 
 ifneq (,$(filter periph_i2c,$(USEMODULE)))
   ifneq (,$(filter esp_i2c_hw,$(USEMODULE)))
-    USEMODULE += core_thread_flags
     USEMODULE += ztimer_msec
     USEMODULE += periph_i2c_hw
   else
@@ -69,17 +105,54 @@ ifneq (,$(filter periph_i2c,$(USEMODULE)))
   endif
 endif
 
-ifneq (,$(filter esp_now esp_wifi esp_spi_ram,$(USEMODULE)))
-  # the ESP-IDF heap has to be used if SPI RAM is used
-  USEMODULE += esp_idf_heap
+ifneq (,$(filter periph_sdmmc,$(USEMODULE)))
+  USEMODULE += esp_idf_sdmmc
+  USEMODULE += periph_gpio_irq
 endif
 
 ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
   FEATURES_REQUIRED += esp_spi_ram
+  FEATURES_OPTIONAL += esp_spi_oct
+  USEMODULE += esp_idf_gpio
+  USEMODULE += esp_idf_heap
+  USEMODULE += esp_idf_spi_flash
+  USEMODULE += esp_idf_spi_ram
 endif
 
-ifneq (,$(filter mtd,$(USEMODULE)))
+ifneq (,$(filter esp_spi_oct,$(FEATURES_USED)))
+  USEMODULE += esp_spi_oct
+endif
+
+ifneq (,$(filter esp_idf_heap,$(USEMODULE)))
+  # The ESP-IDF heap component uses the TLSF implementation that is part of
+  # the component. To avoid conflicts with modules and packages that use the
+  # RIOT package `tlsf`, this package is also used for the ESP-IDF heap instead
+  # of its own implementation. There does not seem to be any differences in
+  # the implementations of TLSF with the exception of heap poisoning, which
+  # is not configured.
+  USEPKG += tlsf
+endif
+
+ifneq (,$(filter lcd_parallel_ll_mcu,$(USEMODULE)))
+  USEMODULE += esp_lcd
+  USEMODULE += esp_idf_lcd
+  USEMODULE += esp_idf_heap
+endif
+
+ifneq (,$(filter mtd periph_flashpage,$(USEMODULE)))
   USEMODULE += esp_idf_spi_flash
+endif
+
+ifneq (,$(filter nimble,$(USEPKG)))
+  USEMODULE += esp_ble
+  USEMODULE += esp_ble_nimble
+  USEMODULE += nimble_host
+  USEMODULE += nimble_transport_hci_h4
+  USEMODULE += ztimer_msec
+endif
+
+ifneq (,$(filter periph_adc,$(USEMODULE)))
+  USEMODULE += esp_idf_adc
 endif
 
 ifneq (,$(filter periph_rtc,$(USEMODULE)))
@@ -95,10 +168,35 @@ ifneq (,$(filter periph_rtt,$(USEMODULE)))
   USEMODULE += periph_rtt_hw_rtc
 endif
 
+ifneq (,$(filter periph_usbdev,$(USEMODULE)))
+  USEMODULE += esp_idf_usb
+  USEMODULE += usbdev_synopsys_dwc2
+endif
+
 ifneq (,$(filter shell,$(USEMODULE)))
   USEMODULE += ps
 endif
 
+ifneq (,$(filter stdio_usb_serial_jtag, $(USEMODULE)))
+  USEMODULE += tsrb
+  ifneq (,$(filter stdin,$(USEMODULE)))
+    USEMODULE += stdio_usb_serial_jtag_rx
+  endif
+endif
+ifneq (,$(filter stdio_usb_serial_jtag_rx, $(USEMODULE)))
+  USEMODULE += isrpipe
+  USEMODULE += stdio_available
+endif
+
+ifneq (,$(filter tinyusb_portable_espressif,$(USEMODULE)))
+  USEMODULE += esp_idf_usb
+endif
+
 ifneq (,$(filter esp_jtag,$(USEMODULE)))
   FEATURES_REQUIRED += esp_jtag
+endif
+
+# enable bootloader reset over USB, requires CDC ACM to be used
+ifneq (,$(filter usbus_cdc_acm tinyusb_class_cdc,$(USEMODULE)))
+  USEMODULE += usb_board_reset
 endif

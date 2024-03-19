@@ -59,8 +59,10 @@ typedef struct {
  *
  * @param[out] dev     the handle of the device to initialize
  * @param[in]  params  parameters for device initialization
+ * @param[in]  index   Index of @p params in a global parameter struct array.
+ *                     If initialized manually, pass a unique identifier instead.
  */
-void encx24j600_setup(encx24j600_t *dev, const encx24j600_params_t *params);
+void encx24j600_setup(encx24j600_t *dev, const encx24j600_params_t *params, uint8_t index);
 
 #ifdef __cplusplus
 }

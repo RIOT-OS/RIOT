@@ -143,7 +143,7 @@ extern "C" {
 #define LWIP_NETCONN            0
 #endif /* MODULE_LWIP_SOCK */
 
-#ifdef MODULE_SHELL_COMMANDS
+#ifdef MODULE_SHELL_CMD_LWIP_NETIF
 #define LWIP_DEBUG              1
 #endif
 

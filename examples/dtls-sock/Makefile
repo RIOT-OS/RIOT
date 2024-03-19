@@ -7,15 +7,13 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-# TinyDTLS only has support for 32-bit architectures ATM
-FEATURES_REQUIRED += arch_32bit
-
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 USEMODULE += netdev_default
 USEMODULE += auto_init_gnrc_netif
 # Specify the mandatory networking modules for IPv6 and UDP
 USEMODULE += gnrc_ipv6_default
+USEMODULE += netutils
 
 # Specify DTLS implementation
 USEPKG += tinydtls
@@ -32,7 +30,7 @@ USEMODULE += prng_sha1prng
 
 # Add also the shell, some shell commands
 USEMODULE += shell
-USEMODULE += shell_commands
+USEMODULE += shell_cmds_default
 
 # UDP Port to use (20220 is default for DTLS).
 DTLS_PORT ?= 20220
@@ -48,9 +46,6 @@ CFLAGS += -DDTLS_DEFAULT_PORT=$(DTLS_PORT)
 # Uncomment to enable debug logs
 # CFLAGS += -DCONFIG_DTLS_DEBUG
 
-# FIXME: This is a temporary patch
-CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(2*THREAD_STACKSIZE_LARGE\)
-
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
@@ -59,3 +54,15 @@ DEVELHELP ?= 1
 QUIET ?= 1
 
 include $(RIOTBASE)/Makefile.include
+
+# FIXME: This is a temporary patch
+ifeq (,$(filter arch_avr8,$(FEATURES_USED)))
+  CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(2*THREAD_STACKSIZE_LARGE\)
+else
+  CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(4*THREAD_STACKSIZE_LARGE\)
+endif
+
+# We have two credentials for client and server, each. If we are to run both
+# server and client, we need four slots in total. The default (2) would be
+# sufficient if only client or server is ever run.
+CFLAGS += -DCONFIG_CREDMAN_MAX_CREDENTIALS=4

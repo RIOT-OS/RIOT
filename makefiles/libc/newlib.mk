@@ -2,7 +2,7 @@ ifneq (,$(filter newlib_nano,$(USEMODULE)))
   # Test if nano.specs is available
   ifeq ($(shell $(LINK) -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
     USE_NEWLIB_NANO = 1
-    ifeq ($(shell echo "int main(){} void _exit(int n) {(void)n;while(1);}" | LC_ALL=C $(CC) -xc - -o /dev/null -lc -specs=nano.specs -Wall -Wextra -pedantic 2>&1 | grep -q "use of wchar_t values across objects may fail" ; echo $$?),0)
+    ifeq ($(shell LC_ALL=C $(LINK) $(RIOTTOOLS)/testprogs/minimal_linkable.c -o /dev/null -lc -specs=nano.specs -Wall -Wextra -pedantic 2>&1 | grep -q "use of wchar_t values across objects may fail" ; echo $$?),0)
         CFLAGS += -fshort-wchar
         LINKFLAGS += -Wl,--no-wchar-size-warning
     endif

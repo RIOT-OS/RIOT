@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 Acutam Automation, LLC
+ *               2023 Gerson Fernando Budke
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -19,6 +20,7 @@
  *
  * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
  * @author      Alexander Chudov <chudov@gmail.com>
+ * @author      Gerson Fernando Budke <nandojve@gmail.com>
  *
  * For all atmega except rfa1, rfr2
  * In order to safely sleep when using the RTT:
@@ -48,6 +50,7 @@
 #include "byteorder.h"
 #include "cpu.h"
 #include "irq.h"
+#include "macros/utils.h"
 #include "periph/rtt.h"
 #include "periph_conf.h"
 
@@ -90,11 +93,6 @@ static inline void reg32_write(volatile uint8_t *reg_ll, uint32_t _val)
     reg_ll[0] = val.u8[0];
     irq_restore(state);
 }
-
-/* To build proper register names */
-#ifndef CONCAT
-#define CONCAT(a, b) (a##b)
-#endif
 
 /* To read the whole 32-bit register */
 #define RG_READ32(reg)  (reg32_read(&CONCAT(reg, LL)))
@@ -199,15 +197,15 @@ static inline void _timer_init(void)
 static inline uint8_t _rtt_div(uint16_t freq)
 {
     switch (freq) {
-    case 32768: return 0x1;
-    case  4096: return 0x2;
-    case  1024: return 0x3;
-    case   512: return 0x4;
-    case   256: return 0x5;
-    case   128: return 0x6;
-    case    32: return 0x7;
-    default   : assert(0);
-                return 0;
+        case 32768: return 0x1;
+        case 4096:  return 0x2;
+        case 1024:  return 0x3;
+        case 512:   return 0x4;
+        case 256:   return 0x5;
+        case 128:   return 0x6;
+        case 32:    return 0x7;
+        default:    assert(0);
+                    return 0;
     }
 }
 
@@ -444,22 +442,13 @@ void rtt_poweroff(void)
 #endif
 }
 
-#if RTT_BACKEND_SC
-ISR(SCNT_OVFL_vect)
+static inline void rtt_ovf_handler(void)
 {
-    avr8_enter_isr();
-    /* Execute callback */
+#if RTT_BACKEND_SC
     if (rtt_state.overflow_cb != NULL) {
         rtt_state.overflow_cb(rtt_state.overflow_arg);
     }
-
-    avr8_exit_isr();
-}
 #else
-ISR(TIMER2_OVF_vect)
-{
-    avr8_enter_isr();
-
     ext_cnt++;
 
     /* Enable RTT alarm if overflowed enough times */
@@ -478,18 +467,11 @@ ISR(TIMER2_OVF_vect)
             rtt_state.overflow_cb(rtt_state.overflow_arg);
         }
     }
-
-    avr8_exit_isr();
+#endif
 }
-#endif
 
-#if RTT_BACKEND_SC
-ISR(SCNT_CMP2_vect)
-#else
-ISR(TIMER2_COMPA_vect)
-#endif
+static inline void rtt_cmp_handler(void)
 {
-    avr8_enter_isr();
     /* Disable alarm interrupt */
 #if RTT_BACKEND_SC
     SCIRQM &= ~(1 << IRQMCP2);
@@ -504,6 +486,12 @@ ISR(TIMER2_COMPA_vect)
         /* Execute callback */
         cb(rtt_state.alarm_arg);
     }
-
-    avr8_exit_isr();
 }
+
+#if RTT_BACKEND_SC
+AVR8_ISR(SCNT_OVFL_vect, rtt_ovf_handler);
+AVR8_ISR(SCNT_CMP2_vect, rtt_cmp_handler);
+#else
+AVR8_ISR(TIMER2_OVF_vect, rtt_ovf_handler);
+AVR8_ISR(TIMER2_COMPA_vect, rtt_cmp_handler);
+#endif

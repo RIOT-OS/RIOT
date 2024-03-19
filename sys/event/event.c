@@ -22,7 +22,7 @@
  */
 
 #include <assert.h>
-
+#include <stdbool.h>
 #include <string.h>
 
 #include "event.h"
@@ -60,6 +60,17 @@ void event_cancel(event_queue_t *queue, event_t *event)
     irq_restore(state);
 }
 
+bool event_is_queued(const event_queue_t *queue, const event_t *event)
+{
+    assert(queue);
+    assert(event);
+
+    unsigned state = irq_disable();
+    bool result = clist_find(&queue->event_list, &event->list_node);
+    irq_restore(state);
+    return result;
+}
+
 event_t *event_get(event_queue_t *queue)
 {
     unsigned state = irq_disable();
@@ -80,6 +91,7 @@ event_t *event_wait_multi(event_queue_t *queues, size_t n_queues)
     do {
         unsigned state = irq_disable();
         for (size_t i = 0; i < n_queues; i++) {
+            assert(queues[i].waiter);
             result = container_of(clist_lpop(&queues[i].event_list),
                                   event_t, list_node);
             if (result) {
@@ -100,6 +112,7 @@ event_t *event_wait_multi(event_queue_t *queues, size_t n_queues)
 static event_t *_wait_timeout(event_queue_t *queue)
 {
     assert(queue);
+    assert(queue->waiter);
     event_t *result;
     thread_flags_t flags = 0;
 

@@ -14,23 +14,24 @@
 BOARD=$1
 APPDIR=$2
 ELFFILE=$3
+EMULATOR_TMP_DIR=$5
 
 # GDB command, usually a separate command for each platform (e.g. arm-none-eabi-gdb)
 : ${GDB:=gdb-multiarch}
 # Debugger client command, can be used to wrap GDB in a front-end
 : ${DBG:=${GDB}}
 # Default GDB port, set to 0 to disable, required != 0 for debug and debug-server targets
-: ${GDB_PORT:=$4}
+: ${GDB_REMOTE:=$4}
 # Default debugger flags,
-: ${DBG_DEFAULT_FLAGS:=-q -ex \"target remote :${GDB_PORT}\"}
+: ${DBG_DEFAULT_FLAGS:=-q -ex \"target remote ${GDB_REMOTE}\"}
 # Custom extra debugger flags, depends on the emulator
-: ${DBG_CUSTOM_FLAGS:=$5}
+: ${DBG_CUSTOM_FLAGS:=$6}
 # Debugger flags, will be passed to sh -c, remember to escape any quotation signs.
 # Use ${DBG_DEFAULT_FLAGS} to insert the default flags anywhere in the string
 : ${DBG_FLAGS:=${DBG_DEFAULT_FLAGS} ${DBG_CUSTOM_FLAGS}}
 
 # temporary file that contains the emulator pid
-EMULATOR_PIDFILE=$(mktemp -t "emulator_pid.XXXXXXXXXX")
+EMULATOR_PIDFILE="${EMULATOR_TMP_DIR}/emulator_pid"
 # will be called by trap
 cleanup() {
     kill "$(cat ${EMULATOR_PIDFILE})"
@@ -44,11 +45,13 @@ trap '' INT
 
 # start emulator GDB server
 sh -c "\
-    GDB_PORT=${GDB_PORT} \
+    GDB_REMOTE=${GDB_REMOTE} \
     EMULATE=1 \
+    EMULATOR_TMP_DIR=${EMULATOR_TMP_DIR} \
     EMULATOR_PIDFILE=${EMULATOR_PIDFILE} \
     BOARD=${BOARD} \
     make -C ${APPDIR} debug-server & \
     echo \$! > ${EMULATOR_PIDFILE}" &
 # Start the debugger and connect to the GDB server
+sleep 1
 sh -c "${DBG} ${DBG_FLAGS} ${ELFFILE}"

@@ -27,7 +27,7 @@ static int read(const void *dev, phydat_t *res)
 {
     int ret = qmc5883l_read((const qmc5883l_t *)dev, res->val);
     if ((ret == QMC5883L_OK) || (ret == QMC5883L_OVERFLOW)) {
-        res->unit = UNIT_GS;
+        res->unit = UNIT_GAUSS;
         res->scale = -3;
         return 3;
     }
@@ -36,6 +36,6 @@ static int read(const void *dev, phydat_t *res)
 
 const saul_driver_t qmc5883l_saul_driver = {
     .read = read,
-    .write = saul_notsup,
+    .write = saul_write_notsup,
     .type = SAUL_SENSE_MAG,
 };

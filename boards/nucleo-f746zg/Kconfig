@@ -28,5 +28,7 @@ config BOARD_NUCLEO_F746ZG
 
     # Put other features for this board (in alphabetical order)
     select HAS_RIOTBOOT
+    select HAS_TINYUSB_DEVICE
+    select HAVE_STM32_ETH
 
 source "$(RIOTBOARD)/common/nucleo144/Kconfig"

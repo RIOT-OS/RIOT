@@ -54,8 +54,7 @@ The arm-none-eabi toolchain works fine. You can get it
 
 ## Programming and Debugging
 
-You'll need [debugging hardware]
-(https://processors.wiki.ti.com/index.php?title=CC13xx_CC26xx_Tools_Overview#Debuggers).
+You'll need [debugging hardware](https://processors.wiki.ti.com/index.php?title=CC13xx_CC26xx_Tools_Overview#Debuggers).
 So far, the [XDS110 debug probe](https://www.ti.com/tool/CC-DEVPACK-DEBUG) has
 been tested. That bugger requires you to load a firmware onto it each time it
 powers up. The tool is contained in the Uniflash utility or the `CodeComposer
@@ -70,7 +69,7 @@ On Linux, there's an application called
 [Uniflash](https://www.ti.com/tool/uniflash). Sadly, you'll have to install the
 whole IDE just to get the scripting interface :-[
 
-No idea about MacOSX.
+No idea about macOS.
 
 In order to flash the CC2650STK you need to plug the XDS110 probe through the
 JTAG and so-called "DevPack" connectors. Note that the back of the SensorTag

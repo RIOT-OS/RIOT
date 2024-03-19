@@ -28,7 +28,7 @@
 
 #define NETIF_SOCKET_ZEP_NUMOF        ARRAY_SIZE(socket_zep_params)
 
-static struct netif netif[NETIF_SOCKET_ZEP_NUMOF];
+static lwip_netif_t netif[NETIF_SOCKET_ZEP_NUMOF];
 static socket_zep_t socket_zep_devs[NETIF_SOCKET_ZEP_NUMOF];
 static netdev_ieee802154_submac_t socket_zep_netdev[SOCKET_ZEP_MAX];
 

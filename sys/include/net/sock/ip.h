@@ -268,6 +268,7 @@
 #ifndef NET_SOCK_IP_H
 #define NET_SOCK_IP_H
 
+#include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -288,7 +289,7 @@ extern "C" {
 /**
  * @brief   Type for a raw IPv4/IPv6 sock object
  *
- * @note API implementors: `struct sock_ip` needs to be defined by
+ * @note API implementers: `struct sock_ip` needs to be defined by
  *       implementation-specific `sock_types.h`.
  */
 typedef struct sock_ip sock_ip_t;
@@ -332,6 +333,14 @@ typedef struct {
  * @brief   Auxiliary data provided when sending using an IP sock object
  */
 typedef struct {
+#if defined(MODULE_SOCK_AUX_LOCAL) || defined(DOXYGEN)
+    /**
+     * @brief   The local endpoint from which the datagram will be sent
+     *
+     * @see SOCK_AUX_SET_LOCAL
+     */
+    sock_ip_ep_t local;
+#endif /* MODULE_SOCK_AUX_ENDPOINT */
 #if defined(MODULE_SOCK_AUX_TIMESTAMP) || defined(DOXYGEN)
     /**
      * @brief   System time the packet was send

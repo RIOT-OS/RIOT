@@ -54,24 +54,25 @@ static void _ztimer_periodic_callback(void *arg)
 }
 
 void ztimer_periodic_init(ztimer_clock_t *clock, ztimer_periodic_t *timer,
-                          int (*callback)(
-                              void *), void *arg, uint32_t interval)
+                          bool (*callback)(void *), void *arg, uint32_t interval)
 {
-    *timer =
-        (ztimer_periodic_t){ .clock = clock, .interval = interval,
-                             .callback = callback, .arg = arg,
-                             .timer = {
-                                 .callback = _ztimer_periodic_callback,
-                                 .arg = timer
-                             } };
+    /* check if this is a reinit, ensure timer is stopped in case */
+    if (timer->timer.callback == _ztimer_periodic_callback) {
+        ztimer_periodic_stop(timer);
+    }
+    *timer = (ztimer_periodic_t){
+        .clock = clock, .interval = interval,
+        .callback = callback, .arg = arg,
+        .timer = {
+            .callback = _ztimer_periodic_callback,
+            .arg = timer
+        }
+    };
 }
 
 void ztimer_periodic_start(ztimer_periodic_t *timer)
 {
-    uint32_t now = ztimer_now(timer->clock);
-
-    timer->last = now;
-    _ztimer_periodic_reset(timer, now);
+    timer->last = ztimer_set(timer->clock, &timer->timer, timer->interval) + timer->interval;
 }
 
 void ztimer_periodic_stop(ztimer_periodic_t *timer)

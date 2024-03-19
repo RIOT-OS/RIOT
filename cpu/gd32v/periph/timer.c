@@ -25,12 +25,6 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-/**
- * @brief   Define a macro for accessing a timer channel
- */
-#define TIM_CHAN(tim, chan) *(&dev(tim)->CH0CV + chan)
-#define TIMER_CHANNEL_NUMOF     (4)
-
 static void _timer_isr(unsigned irq);
 
 /**
@@ -117,7 +111,12 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     dev(tim)->CAR = timer_config[tim].max;
 
     /* set prescaler */
-    dev(tim)->PSC = (((periph_apb_clk(timer_config[tim].bus) * 2) / freq) - 1);
+    if (dev(tim) == TIMER0) {
+        dev(tim)->PSC = ((periph_apb_clk(timer_config[tim].bus) / freq) - 1);
+    }
+    else {
+        dev(tim)->PSC = (((periph_apb_clk(timer_config[tim].bus) * 2) / freq) - 1);
+    }
     DEBUG("[timer]: %" PRIu32 "/%lu =  %" PRIu16 "\n",
           periph_apb_clk(timer_config[tim].bus), freq, dev(tim)->PSC);
 
@@ -143,14 +142,16 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 
     set_oneshot(tim, channel);
 
-    TIM_CHAN(tim, channel) = (value & timer_config[tim].max);
+    TIMER_CHANNEL(tim, channel) = (value & timer_config[tim].max);
 
 #ifdef MODULE_PERIPH_TIMER_PERIODIC
-    if (dev(tim)->CAR == TIM_CHAN(tim, channel)) {
+    if (dev(tim)->CAR == TIMER_CHANNEL(tim, channel)) {
         dev(tim)->CAR = timer_config[tim].max;
     }
 #endif
 
+    /* clear a possibly pending interrupt and enable the interrupt */
+    dev(tim)->INTF &= ~(TIMER0_DMAINTEN_CH0IE_Msk << channel);
     dev(tim)->DMAINTEN |= (TIMER0_DMAINTEN_CH0IE_Msk << channel);
 
     return 0;
@@ -162,6 +163,10 @@ int timer_set_periodic(tim_t tim, int channel, unsigned int value,
 {
     if (channel >= (int)TIMER_CHANNEL_NUMOF) {
         return -1;
+    }
+
+    if (flags & TIM_FLAG_SET_STOPPED) {
+        timer_stop(tim);
     }
 
     clear_oneshot(tim, channel);
@@ -178,7 +183,10 @@ int timer_set_periodic(tim_t tim, int channel, unsigned int value,
         irq_restore(state);
     }
 
-    TIM_CHAN(tim, channel) = value;
+    TIMER_CHANNEL(tim, channel) = value;
+
+    /* clear a possibly pending interrupt before the interrupt is enabled */
+    dev(tim)->INTF &= ~(TIMER0_DMAINTEN_CH0IE_Msk << channel);
     dev(tim)->DMAINTEN |= (TIMER0_DMAINTEN_CH0IE_Msk << channel);
 
     if (flags & TIM_FLAG_RESET_ON_MATCH) {
@@ -198,7 +206,7 @@ int timer_clear(tim_t tim, int channel)
     dev(tim)->DMAINTEN &= ~(TIMER0_DMAINTEN_CH0IE_Msk << channel);
 
 #ifdef MODULE_PERIPH_TIMER_PERIODIC
-    if (dev(tim)->CAR == TIM_CHAN(tim, channel)) {
+    if (dev(tim)->CAR == TIMER_CHANNEL(tim, channel)) {
         dev(tim)->CAR = timer_config[tim].max;
     }
 #endif
@@ -238,7 +246,7 @@ static void _irq_handler(tim_t tim)
         status &= ~msk;
 
         /* interrupt flag gets set for all channels > ARR */
-        if (TIM_CHAN(tim, i) > top) {
+        if (TIMER_CHANNEL(tim, i) > top) {
             continue;
         }
 
@@ -272,6 +280,11 @@ static void _timer_isr(unsigned irq)
 #ifdef TIMER_3_IRQN
     case TIMER_3_IRQN:
         _irq_handler(TIMER_DEV(3));
+        break;
+#endif
+#ifdef TIMER_4_IRQN
+    case TIMER_4_IRQN:
+        _irq_handler(TIMER_DEV(4));
         break;
 #endif
     default:

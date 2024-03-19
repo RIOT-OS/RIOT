@@ -1,2 +1,5 @@
 # This package can only be used with the ESP8266 CPU
 FEATURES_REQUIRED += arch_esp8266
+
+# Always include the ESP8266 SDK bootloader.
+USEMODULE += esp_bootloader

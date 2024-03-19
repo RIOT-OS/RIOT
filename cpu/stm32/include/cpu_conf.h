@@ -49,6 +49,9 @@
 #elif CPU_FAM_STM32G0
 #include "stm32g0xx.h"
 #include "irqs/g0/irqs.h"
+#elif CPU_FAM_STM32C0
+#include "stm32c0xx.h"
+#include "irqs/c0/irqs.h"
 #elif CPU_FAM_STM32G4
 #include "stm32g4xx.h"
 #include "irqs/g4/irqs.h"
@@ -78,9 +81,24 @@
 #error Not supported CPU family
 #endif
 
+/* add unused backup RAM as extra heap */
+#if !defined(NUM_HEAPS) && CPU_HAS_BACKUP_RAM
+#define NUM_HEAPS   2
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief   Enable workaround for bug in WFI by issuing an ISB
+ *
+ * This works around a bug on STM32 systems, see [1] for details, or [2] for
+ * an archive.org backup.
+ * [1]: https://cliffle.com/blog/stm32-wfi-bug
+ * [2]: https://web.archive.org/web/20231205101603/https://cliffle.com/blog/stm32-wfi-bug/
+ */
+#define CORTEXM_ISB_REQUIRED_AFTER_WFI  1
 
 /**
  * @brief   ARM Cortex-M specific CPU configuration
@@ -112,7 +130,8 @@ extern "C" {
    || defined(CPU_LINE_STM32F030xC) || defined(CPU_LINE_STM32F103xE) \
    || defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4) \
    || defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) \
-   || defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32WL)
+   || defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32WL) \
+   || defined(CPU_FAM_STM32C0)
 #define FLASHPAGE_SIZE                  (2048U)
 #elif defined(CPU_LINE_STM32F051x8) || defined(CPU_LINE_STM32F042x6) \
    || defined(CPU_LINE_STM32F070xB) || defined(CPU_LINE_STM32F030x8) \
@@ -203,7 +222,7 @@ extern "C" {
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
     defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
-    defined(CPU_FAM_STM32WL)
+    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0)
 #define FLASHPAGE_WRITE_BLOCK_SIZE            (8U)
 typedef uint64_t stm32_flashpage_block_t;
 #elif defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || \
@@ -219,7 +238,7 @@ typedef uint16_t stm32_flashpage_block_t;
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
     defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
-    defined(CPU_FAM_STM32WL)
+    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0)
 #define FLASHPAGE_WRITE_BLOCK_ALIGNMENT       (8U)
 #else
 /* Writing should be always 4 bytes aligned */

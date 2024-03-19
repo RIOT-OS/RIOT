@@ -16,7 +16,7 @@
  * This functions make it easy to create and use new Lua context:
  * It provides:
  *
- * - Easy to use routines for executing modules as scrips.
+ * - Easy to use routines for executing modules as scripts.
  * - Control over which modules get loaded.
  * - Support for using a local heap allocator.
  * - Out of memory handling via setjmp/longjmp.

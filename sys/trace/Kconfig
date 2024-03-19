@@ -8,6 +8,4 @@
 config MODULE_TRACE
     bool "Trace program flows"
     depends on TEST_KCONFIG
-    select MODULE_ZTIMER
-    select MODULE_ZTIMER_USEC
-    select MODULE_ZTIMER_PERIPH_TIMER
+    select ZTIMER_USEC

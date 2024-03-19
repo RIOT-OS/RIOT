@@ -6,7 +6,9 @@
 #
 
 menuconfig MODULE_BME680
-    bool "BME680 Temperature/Humidity/Pressure/Gas sensor"
+    bool
+    prompt "BME680 Temperature/Humidity/Pressure/Gas sensor" if !(MODULE_SAUL_DEFAULT && HAVE_BME680)
+    default (MODULE_SAUL_DEFAULT && HAVE_BME680)
     depends on TEST_KCONFIG
     select PACKAGE_DRIVER_BME680
     select MODULE_ZTIMER if MODULE_SAUL
@@ -14,8 +16,10 @@ menuconfig MODULE_BME680
 
 if MODULE_BME680
 
-choice
+choice BME680_VARIANT
     bool "Device interface"
+    default MODULE_BME680_I2C if HAVE_BME680_I2C
+    default MODULE_BME680_SPI if HAVE_BME680_SPI
     help
         The device can be connected via different buses, select one.
 
@@ -37,3 +41,20 @@ config MODULE_BME680_FP
     bool "Enable floating point"
 
 endif # MODULE_BME680
+
+config HAVE_BME680
+    bool
+    help
+        Indicates that the BME680 Temperature/Humidity/Pressure/Gas sensor is present.
+
+config HAVE_BME680_I2C
+    bool
+    select HAVE_BME680
+    help
+        Indicates that the BME680 Temperature/Humidity/Pressure/Gas sensor is connected with i2c.
+
+config HAVE_BME680_SPI
+    bool
+    select HAVE_BME680
+    help
+        Indicates that the BME680 Temperature/Humidity/Pressure/Gas sensor is connected with spi.

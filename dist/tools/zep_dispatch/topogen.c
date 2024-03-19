@@ -13,6 +13,10 @@
 #include <math.h>
 #include <unistd.h>
 
+#ifndef CONFIG_USE_NUMERIC_NAMES
+#define CONFIG_USE_NUMERIC_NAMES 1
+#endif
+
 struct node {
     char name[8];
     int x;
@@ -27,6 +31,7 @@ struct world {
     unsigned h;
     unsigned num_nodes;
     struct node *nodes;
+    bool grid;
 };
 
 static unsigned random_range(unsigned lower, unsigned upper)
@@ -35,13 +40,31 @@ static unsigned random_range(unsigned lower, unsigned upper)
     return lower + rand() % range;
 }
 
-static struct node *node_generate(struct node *n, const struct world *w,
-                                  unsigned range)
+static struct node *node_generate(struct node *node, const struct world *w,
+                                  unsigned range, unsigned idx)
 {
-    n->x = random_range(0, w->w);
-    n->y = random_range(0, w->h);
-    n->r = range;
-    return n;
+    if (w->grid) {
+        float width  = w->w;
+        float height = w->h;
+        float num    = w->num_nodes;
+
+        /* https://math.stackexchange.com/a/1039514 */
+        float n_x = sqrtf(num * width/height
+                          + powf(width - height, 2)/(4 * height*height))
+                  - (width - height)/2;
+        float n_y = num / n_x;
+
+        unsigned step_x = width / n_x;
+        unsigned step_y = height / n_y;
+
+        node->x = (idx * step_x + step_x / 2) % w->w;
+        node->y = ((idx * step_x + step_x / 2) / w->w) * step_y + step_y / 2;
+    } else {
+        node->x = random_range(0, w->w);
+        node->y = random_range(0, w->h);
+    }
+    node->r = range;
+    return node;
 }
 
 static double node_distance(const struct node *a, const struct node *b)
@@ -51,7 +74,7 @@ static double node_distance(const struct node *a, const struct node *b)
 
 static double node_distance_weight(const struct node *a, const struct node *b)
 {
-    double w = 1 - node_distance(a, b) / a->r;
+    double w = 1 - pow(node_distance(a, b), 2) / pow(a->r, 2);
 
     if (w < 0) {
         return 0;
@@ -61,13 +84,18 @@ static double node_distance_weight(const struct node *a, const struct node *b)
 
 static void node_name(struct node *n, unsigned idx)
 {
+    if (CONFIG_USE_NUMERIC_NAMES) {
+        snprintf(n->name, sizeof(n->name), "n%03u", (uint16_t)idx + 1);
+        return;
+    }
+
     char *s = n->name;
     const char *end = s + sizeof(n->name) - 1;
 
     do {
         uint8_t rem = idx % 26;
+        idx /= 26;
         *s++ = 'A' + rem;
-        idx -= rem;
     } while (idx && s != end);
     *s = 0;
 }
@@ -82,8 +110,14 @@ static void world_gen(struct world *w, unsigned num_nodes,
     w->nodes = calloc(num_nodes, sizeof(*w->nodes));
 
     for (unsigned i = 0; i < num_nodes; ++i) {
-        node_generate(&w->nodes[i], w, random_range(range - var, range + var));
+        node_generate(&w->nodes[i], w, random_range(range - var, range + var), i);
         node_name(&w->nodes[i], i);
+    }
+
+    if (!w->grid) {
+        /* place first node at origin */
+        w->nodes[0].x = 0;
+        w->nodes[0].y = 0;
     }
 }
 
@@ -154,9 +188,15 @@ static void _calc_connections(struct node *nodes, unsigned num)
     }
 }
 
-static void _print_distance(struct node *nodes, unsigned num, bool recursive)
+static void _print_distance(struct node *nodes, unsigned num, bool recursive, bool binary)
 {
     struct node *start = nodes;
+
+    if (recursive) {
+        for (unsigned i = 0; i < num; ++i) {
+            printf("%s\n", nodes[i].name);
+        }
+    }
 
     for (unsigned i = 1; i < num; ++i) {
         struct node *n = &nodes[i];
@@ -164,12 +204,19 @@ static void _print_distance(struct node *nodes, unsigned num, bool recursive)
         double to_node   = node_distance_weight(start, n);
         double from_node = node_distance_weight(n, start);
 
-        if (to_node > 0 || from_node > 0) {
+        if (binary) {
+            if (to_node >= 0.5) {
+                printf("%s\t%s\n", start->name, n->name);
+            }
+            if (from_node >= 0.5) {
+                printf("%s\t%s\n", n->name, start->name);
+            }
+        } else if (to_node > 0 || from_node > 0) {
             printf("%s\t%s\t%.2f\t%.2f\n", start->name, n->name, to_node, from_node);
         }
 
         if (recursive) {
-            _print_distance(n, num - i, false);
+            _print_distance(n, num - i, false, binary);
         }
     }
 }
@@ -183,7 +230,18 @@ static void _print_help(const char *name)
                     " [-r <range>]"
                     " [-v <variance of range>]"
                     " [-n <nodes>]"
+                    " [-b][-g]"
                     "\n", name);
+
+    puts("\nOptions:");
+    puts("\t-s <seed>\trandom seed used for topology generation");
+    puts("\t-w <width>\twidth of the 2D topology");
+    puts("\t-h <height>\theight of the 2D topology");
+    puts("\t-r <range>\tRadio range of the nodes");
+    puts("\t-v <variance>\tmaximal random variance of radio range");
+    puts("\t-n <nodes>\tnumber of nodes in the topology");
+    puts("\t-b\t\tbinary links: link quality is rounded to 100% or 0%");
+    puts("\t-g\t\tnodes are organized as a grid");
 }
 
 int main(int argc, char** argv)
@@ -196,10 +254,18 @@ int main(int argc, char** argv)
     unsigned range  = 25;
     unsigned var    = 0;
     unsigned num    = 10;
+    bool binary     = false;
+    bool grid       = false;
     char c;
 
-    while ((c = getopt(argc, argv, "s:w:h:r:v:n:")) != -1) {
+    while ((c = getopt(argc, argv, "s:w:h:r:v:n:bg")) != -1) {
         switch (c) {
+        case 'b':
+            binary = true;
+            break;
+        case 'g':
+            grid = true;
+            break;
         case 's':
             seed = atoi(optarg);
             break;
@@ -226,12 +292,14 @@ int main(int argc, char** argv)
 
     srand(seed);
 
-    struct world w;
+    struct world w = {
+        .grid = grid,
+    };
     world_gen(&w, num, width, height, range, var);
 
     printf("# seed = %u\n", seed);
     puts("# Connections");
-    _print_distance(w.nodes, w.num_nodes, true);
+    _print_distance(w.nodes, w.num_nodes, true, binary);
     puts("");
     puts("");
     puts("# Node\tX\tY\trange\tcolor");

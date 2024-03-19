@@ -1,0 +1,31 @@
+# Copyright (c) 2022 Benjamin Valentin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "esp32s2-wemos-mini" if BOARD_ESP32S2_WEMOS_MINI
+
+config BOARD_ESP32S2_WEMOS_MINI
+    bool
+    default y
+    select BOARD_COMMON_ESP32S2
+    select CPU_MODEL_ESP32S2_FN4R2
+    select HAS_PERIPH_ADC
+    select HAS_PERIPH_DAC
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_PWM
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_USBDEV
+    select HAS_TINYUSB_DEVICE
+    select HAS_HIGHLEVEL_STDIO
+
+config FORCE_USB_STDIO
+    default y
+
+choice USB_IMPLEMENTATION
+    default PACKAGE_TINYUSB
+endchoice
+
+source "$(RIOTBOARD)/common/esp32s2/Kconfig"

@@ -10,3 +10,8 @@ config MODULE_TPS6274X
     depends on HAS_PERIPH_GPIO
     depends on TEST_KCONFIG
     select MODULE_PERIPH_GPIO
+
+config HAVE_TPS6274X
+    bool
+    help
+      Indicates that a TPS6274x DC-DC converter is present.
