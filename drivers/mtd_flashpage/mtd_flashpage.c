@@ -45,8 +45,9 @@ static int _init(mtd_dev_t *dev)
     assert(!(super->offset % dev->pages_per_sector));
 
     /* Use separate variable to avoid '>= 0 is always true' warning */
+    #ifndef NDEBUG
     static const uintptr_t cpu_flash_base = CPU_FLASH_BASE;
-
+    #endif
     assert((uintptr_t)flashpage_addr(super->offset / dev->pages_per_sector) >= cpu_flash_base);
     assert((uintptr_t)flashpage_addr(super->offset / dev->pages_per_sector)
            + dev->pages_per_sector * dev->page_size * dev->sector_count <= MTD_FLASHPAGE_END_ADDR);
