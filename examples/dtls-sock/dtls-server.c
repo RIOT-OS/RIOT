@@ -14,6 +14,7 @@
  * @brief       DTLS sock server example
  *
  * @author      Aiman Ismail <muhammadaimanbin.ismail@haw-hamburg.de>
+ * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
 
 #include <stdio.h>
@@ -27,59 +28,64 @@
 #include "thread.h"
 #include "timex.h"
 
-#include "tinydtls_keys.h"
+#include "dtls_server_credentials.h"
 
 #ifndef DTLS_DEFAULT_PORT
 #define DTLS_DEFAULT_PORT (20220) /* DTLS default port */
 #endif
 
+static bool _server_credentials_configured = false;
+
+/* Credman tags to select which credentials to use */
 #define SOCK_DTLS_SERVER_TAG_0 (10)
 #define SOCK_DTLS_SERVER_TAG_1 (11)
+
 #define DTLS_STOP_SERVER_MSG 0x4001 /* Custom IPC type msg. */
 #define READER_QUEUE_SIZE (8U)
 
-char _dtls_server_stack[THREAD_STACKSIZE_MAIN +
-                        THREAD_EXTRA_STACKSIZE_PRINTF];
+char _dtls_server_stack[THREAD_STACKSIZE_MAIN + THREAD_EXTRA_STACKSIZE_PRINTF];
 
 static kernel_pid_t _dtls_server_pid = KERNEL_PID_UNDEF;
 
-#ifdef CONFIG_DTLS_ECC
-static const ecdsa_public_key_t other_pubkeys[] = {
-    { .x = ecdsa_pub_key0_x, .y = ecdsa_pub_key0_y },
+static unsigned int _ecc_credential = 0;
+
+/*
+ * Each credman_credential_t acts as a sort of keyring, containing a single
+ * private / public key pair and a list of public keys of clients that are
+ * known.
+*/
+static const ecdsa_public_key_t known_client_pub_keys[] = {
+    { .x = known_client_public_key_0_x, .y = known_client_public_key_0_y }
 };
 
-static const credman_credential_t credential0 = {
+static const credman_credential_t ecc_credential_0 = {
     .type = CREDMAN_TYPE_ECDSA,
     .tag = SOCK_DTLS_SERVER_TAG_0,
     .params = {
         .ecdsa = {
-            .private_key = ecdsa_priv_key0,
+            .private_key = server_private_key_0,
             .public_key = {
-                .x = ecdsa_pub_key0_x,
-                .y = ecdsa_pub_key0_y,
+                .x = server_public_key_0_x,
+                .y = server_public_key_0_y,
             },
-            .client_keys = (ecdsa_public_key_t *)other_pubkeys,
-            .client_keys_size = ARRAY_SIZE(other_pubkeys),
+            .client_keys = (ecdsa_public_key_t *)known_client_pub_keys,
+            .client_keys_size = ARRAY_SIZE(known_client_pub_keys),
         },
     },
 };
 
-static const ecdsa_public_key_t other_pubkeys1[] = {
-    { .x = ecdsa_pub_key1_x, .y = ecdsa_pub_key1_y },
-};
-
-static const credman_credential_t credential1 = {
+static const credman_credential_t ecc_credential_1 = {
     .type = CREDMAN_TYPE_ECDSA,
     .tag = SOCK_DTLS_SERVER_TAG_1,
     .params = {
         .ecdsa = {
-            .private_key = ecdsa_priv_key1,
+            .private_key = server_private_key_1,
             .public_key = {
-                .x = ecdsa_pub_key1_x,
-                .y = ecdsa_pub_key1_y,
+                .x = server_public_key_1_x,
+                .y = server_public_key_1_y,
             },
-            .client_keys = (ecdsa_public_key_t *)other_pubkeys1,
-            .client_keys_size = ARRAY_SIZE(other_pubkeys1),
+            .client_keys = (ecdsa_public_key_t *)known_client_pub_keys,
+            .client_keys_size = ARRAY_SIZE(known_client_pub_keys),
         }
     },
 };
@@ -98,24 +104,53 @@ static credman_tag_t _rpk_cb(sock_dtls_t *sock, sock_udp_ep_t *ep, credman_tag_t
     sock_udp_ep_fmt(ep, addrstr, &port);
     printf("From [%s]:%d\n", addrstr, port);
 
-    return SOCK_DTLS_SERVER_TAG_1;
+    if (!_ecc_credential) {
+        return SOCK_DTLS_SERVER_TAG_0;
+    }
+    else {
+        return SOCK_DTLS_SERVER_TAG_1;
+    }
 }
 
-#else /* #ifdef CONFIG_DTLS_PSK */
-static const uint8_t psk_id_0[] = PSK_DEFAULT_IDENTITY;
-static const uint8_t psk_key_0[] = PSK_DEFAULT_KEY;
+/*
+ * We have a single PSK.
+*/
+static const uint8_t psk_id[] = SERVER_PSK_IDENTITY;
+static const uint8_t psk_key[] = SERVER_PSK_IDENTITY_KEY;
 
-static const credman_credential_t credential0 = {
+static const credman_credential_t psk_credential_0 = {
     .type = CREDMAN_TYPE_PSK,
     .tag = SOCK_DTLS_SERVER_TAG_0,
     .params = {
         .psk = {
-            .key = { .s = psk_key_0, .len = sizeof(psk_key_0) - 1, },
-            .id = { .s = psk_id_0, .len = sizeof(psk_id_0) - 1, },
+            .key = { .s = psk_key, .len = sizeof(psk_key) - 1, },
+            .id = { .s = psk_id, .len = sizeof(psk_id) - 1, },
         },
     },
 };
-#endif
+
+static int _configure_server_credentials(void)
+{
+    /* register the credentials on credman */
+    if (IS_ACTIVE(CONFIG_DTLS_ECC)) {
+        if (credman_add(&ecc_credential_0) != CREDMAN_OK) {
+            puts("Error cannot add ECC credential 0 to system");
+            return -1;
+        }
+
+        if (credman_add(&ecc_credential_1) != CREDMAN_OK) {
+            puts("Error cannot add ECC credential 1 to system");
+            return -1;
+        }
+    }
+    else if (IS_ACTIVE(CONFIG_DTLS_PSK)) {
+        if (credman_add(&psk_credential_0) != CREDMAN_OK) {
+            puts("Error cannot add PSK credential 0 to system");
+            return -1;
+        }
+    }
+    return 0;
+}
 
 void *dtls_server_wrapper(void *arg)
 {
@@ -136,13 +171,11 @@ void *dtls_server_wrapper(void *arg)
     local.port = DTLS_DEFAULT_PORT;
     sock_udp_create(&udp_sock, &local, NULL, 0);
 
-    res = credman_add(&credential0);
-    if (res < 0 && res != CREDMAN_EXIST) {
-        /* ignore duplicate credentials */
-        printf("Error cannot add credential to system: %" PRIdSIZE "\n", res);
-        return NULL;
-    }
-
+    /*
+     * Currently DTLS sock needs one and only one credential for the
+     * initialization. Subsequent credentials are made available to the sock
+     * by means of `sock_dtls_add_credential`.
+     */
     res = sock_dtls_create(&sock, &udp_sock, SOCK_DTLS_SERVER_TAG_0,
                            SOCK_DTLS_1_2, SOCK_DTLS_SERVER);
     if (res < 0) {
@@ -150,32 +183,23 @@ void *dtls_server_wrapper(void *arg)
         return NULL;
     }
 
-    /* set PSK Identity hint, this is optional and application-specific */
-#if IS_ACTIVE(CONFIG_DTLS_PSK)
-    if (sock_dtls_set_server_psk_id_hint(&sock, PSK_DEFAULT_HINT) < 0) {
-        puts("Error setting PSK Identity hint");
-        return NULL;
-    }
-#endif
+    if (IS_ACTIVE(CONFIG_DTLS_ECC)) {
+        /* make the second ECC credential available to the sock */
+        if (sock_dtls_add_credential(&sock, SOCK_DTLS_SERVER_TAG_1) < 0) {
+            puts("Error cannot add second ECC credential to the sock");
+            return NULL;
+        }
 
-#if IS_ACTIVE(CONFIG_DTLS_ECC)
-    /* register a second RPK */
-    res = credman_add(&credential1);
-    if (res < 0 && res != CREDMAN_EXIST) {
-        /* ignore duplicate credentials */
-        printf("Error cannot add credential to system: %" PRIdSIZE "\n", res);
-        return NULL;
+        /* register a callback for RPK credential selection */
+        sock_dtls_set_rpk_cb(&sock, _rpk_cb);
     }
-
-    /* make the new credential available to the sock */
-    if (sock_dtls_add_credential(&sock, SOCK_DTLS_SERVER_TAG_1) < 0) {
-        printf("Error cannot add credential to the sock: %" PRIdSIZE "\n", res);
-        return NULL;
+    else if (IS_ACTIVE(CONFIG_DTLS_PSK)) {
+        /* set PSK Identity hint, this is optional and application-specific */
+        if (sock_dtls_set_server_psk_id_hint(&sock, SERVER_PSK_IDENTITY_HINT) < 0) {
+            puts("Error setting PSK Identity hint");
+            return NULL;
+        }
     }
-
-    /* register a callback for RPK credential selection */
-    sock_dtls_set_rpk_cb(&sock, _rpk_cb);
-#endif
 
     while (active) {
         if ((msg_try_receive(&msg) == 1) &&
@@ -249,20 +273,55 @@ static void stop_server(void)
     puts("Success: DTLS server stopped");
 }
 
+void _print_usage(const char *cmd)
+{
+    if (IS_ACTIVE(CONFIG_DTLS_ECC)) {
+        printf("usage: %s start | stop | ecc <0|1>\n", cmd);
+    }
+    else {
+        printf("usage: %s start | stop\n", cmd);
+    }
+}
+
 int dtls_server_cmd(int argc, char **argv)
 {
     if (argc < 2) {
-        printf("usage: %s start | stop\n", argv[0]);
+        _print_usage(argv[0]);
         return 1;
     }
+
     if (strcmp(argv[1], "start") == 0) {
+        if (!_server_credentials_configured) {
+            int res = _configure_server_credentials();
+            if (res < 0) {
+                return res;
+            }
+            _server_credentials_configured = true;
+        }
         start_server();
     }
     else if (strcmp(argv[1], "stop") == 0) {
         stop_server();
     }
+    else if (IS_ACTIVE(CONFIG_DTLS_ECC) && strcmp(argv[1], "ecc") == 0) {
+        /* if using ECC, allow choosing which key to use on handshakes at runtime */
+        if (argc < 3) {
+            _print_usage(argv[0]);
+            return 1;
+        }
+
+        int value = atoi(argv[2]);
+        if (value != 0 && value != 1) {
+            printf("Error: invalid value, should be 0 or 1, got %i\n", value);
+            return 1;
+        }
+        else {
+            _ecc_credential = value;
+        }
+    }
     else {
-        printf("Error: invalid command. Usage: %s start | stop\n", argv[0]);
+        printf("Error: invalid command.");
+        _print_usage(argv[0]);
         return 1;
     }
     return 0;

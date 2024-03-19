@@ -20,6 +20,7 @@
 #include <assert.h>
 
 #include "dtls.h"
+#include "crypto.h"
 #include "log.h"
 #include "net/sock/dtls.h"
 #include "net/credman.h"
@@ -363,11 +364,59 @@ static int _get_ecdsa_key(struct dtls_context_t *ctx, const session_t *session,
     return 0;
 }
 
+static int _verify_public_ecdsa_key(credman_credential_t *credential,
+                                    const unsigned char *other_pub_x,
+                                    const unsigned char *other_pub_y)
+{
+    /* check if any of the available client keys match the provided one */
+    for (unsigned i = 0; i < credential->params.ecdsa.client_keys_size; i++) {
+        if (memcmp(credential->params.ecdsa.client_keys[i].x, other_pub_x, DTLS_EC_KEY_SIZE) == 0 &&
+            memcmp(credential->params.ecdsa.client_keys[i].y, other_pub_y, DTLS_EC_KEY_SIZE) == 0) {
+            DEBUG("sock_dtls: client key %d matches\n", i);
+            return 0;
+        }
+    }
+
+    DEBUG("sock_dtls: credential does not match\n");
+    return 1;
+}
+
 static int _verify_ecdsa_key(struct dtls_context_t *ctx,
                              const session_t *session,
                              const unsigned char *other_pub_x,
                              const unsigned char *other_pub_y, size_t key_size)
 {
+    if (IS_USED(MODULE_SOCK_DTLS_VERIFY_PUBLIC_KEY)) {
+        int ret;
+        credman_credential_t credential;
+        sock_dtls_t *sock = (sock_dtls_t *)dtls_get_app_data(ctx);
+
+        credential.tag = CREDMAN_TAG_EMPTY;
+        DEBUG("sock_dtls: verifying ECDSA public key of the other peer\n");
+
+        /* first check public key size */
+        if (key_size != DTLS_EC_KEY_SIZE) {
+            DEBUG("sock_dtls: invalid key length: %d (expected %d)\n", key_size, DTLS_EC_KEY_SIZE);
+            return dtls_alert_fatal_create(DTLS_ALERT_BAD_CERTIFICATE);
+        }
+
+        /* check if any of the available credentials match the provided one */
+        for (unsigned i = 0; i < sock->tags_len; i++) {
+            ret = credman_get(&credential, sock->tags[i], CREDMAN_TYPE_ECDSA);
+            if (ret != CREDMAN_OK) {
+                continue;
+            }
+
+            if (!_verify_public_ecdsa_key(&credential, other_pub_x, other_pub_y)) {
+                return 0;
+            }
+        }
+
+        /* we could not find a valid credential */
+        DEBUG("sock_dtls: no valid credential registered\n");
+        return dtls_alert_fatal_create(DTLS_ALERT_BAD_CERTIFICATE);
+    }
+
     (void)ctx;
     (void)session;
     (void)other_pub_y;
