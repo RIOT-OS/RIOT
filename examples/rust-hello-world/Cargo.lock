@@ -558,8 +558,8 @@ checksum = "c08c74e62047bb2de4ff487b251e4a92e24f48745648451635cec7d591162d9f"
 
 [[package]]
 name = "riot-sys"
-version = "0.7.10"
-source = "git+https://github.com/RIOT-OS/rust-riot-sys#297c670d8c674eae20b2b398c4338d27e2d2d346"
+version = "0.7.11"
+source = "git+https://github.com/RIOT-OS/rust-riot-sys#3fcd2c1ac196795496be9962bc31919743a60d9a"
 dependencies = [
  "bindgen",
  "c2rust-asm-casts",
