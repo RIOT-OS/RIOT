@@ -20,6 +20,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -59,12 +60,11 @@ static uint16_t crc_calculate(const uint8_t *buf, size_t len)
 
 static bool crc_check(const uint8_t *buf, size_t len)
 {
+    assert(len > 2);
+
     uint16_t actual = crc_calculate(buf, len - 2);
-
-    //modbus->buffer[modbus->buffer_size++] = (crc >> 0) & 0xff;
-    //modbus->buffer[modbus->buffer_size++] = (crc >> 8) & 0xff;
-
-    uint16_t expected = buf[len - 2] | (buf[len - 1] << 8);
+    uint16_t expected = (buf[len - 2] << 0) |
+                        (buf[len - 1] << 8);
 
     if (actual != expected) {
         DEBUG("[modbus_rtu] crc_check: actual 0x%04x != expected 0x%04x\n", actual, expected);
@@ -184,6 +184,7 @@ static inline int write_request(modbus_rtu_t *modbus, modbus_message_t *message)
     case MODBUS_FC_WRITE_SINGLE_COIL:
         /* id + func + addr + data */
         write_address(modbus, message->addr);
+        assert(message->data_size >= 1);
         modbus->buffer[4] = (message->data[0] & 0x01) ? 0xff : 0x00;
         modbus->buffer[5] = 0;
         modbus->buffer_size = 6;
@@ -195,15 +196,18 @@ static inline int write_request(modbus_rtu_t *modbus, modbus_message_t *message)
         write_address(modbus, message->addr);
         write_count(modbus, message->count);
         write_size(modbus, size, true);
+        assert(message->data_size >= size);
         memcpy(modbus->buffer + 7, message->data, size);
         modbus->buffer_size = 7 + size;
         break;
 
     case MODBUS_FC_WRITE_SINGLE_HOLDING_REGISTER:
         /* id + func + addr + data */
+        size = modbus_reg_count_to_size(1);
         write_address(modbus, message->addr);
-        memcpy(modbus->buffer + 4, message->data, 2);
-        modbus->buffer_size = 6;
+        assert(message->data_size >= size);
+        memcpy(modbus->buffer + 4, message->data, size);
+        modbus->buffer_size = 4 + size;
         break;
 
     case MODBUS_FC_WRITE_MULTIPLE_HOLDING_REGISTERS:
@@ -212,13 +216,14 @@ static inline int write_request(modbus_rtu_t *modbus, modbus_message_t *message)
         write_address(modbus, message->addr);
         write_count(modbus, message->count);
         write_size(modbus, size, true);
+        assert(message->data_size >= size);
         memcpy(modbus->buffer + 7, message->data, size);
         modbus->buffer_size = 7 + size;
         break;
 
     default:
-        /* should not happen if request is checked before sending */
-        modbus->buffer_size = 0;
+        mutex_unlock(&(modbus->buffer_mutex));
+        return MODBUS_ERR_REQUEST;
         break;
     }
 
@@ -233,6 +238,11 @@ static int read_response(modbus_rtu_t *modbus, modbus_message_t *message)
 {
     msg_t msg;
     uint16_t size;
+
+    /* no response is expected for broadcasted requests */
+    if (message->id == MODBUS_ID_BROADCAST) {
+        return MODBUS_OK;
+    }
 
     modbus->buffer_size = 0;
     modbus->pid = thread_getpid();
@@ -259,7 +269,7 @@ static int read_response(modbus_rtu_t *modbus, modbus_message_t *message)
     /* handle exception response */
     if (modbus->buffer[FUNC] & 0x80) {
         message->exc = modbus->buffer[2];
-        return MODBUS_ERR_EXCEPTION;
+        return MODBUS_OK;
     }
 
     /* parse response */
@@ -281,7 +291,15 @@ static int read_response(modbus_rtu_t *modbus, modbus_message_t *message)
             mutex_unlock(&(modbus->buffer_mutex));
             return MODBUS_ERR_RESPONSE;
         }
-        memcpy(message->data, modbus->buffer + 3, size);
+        /* to support zero-copy, point the message data to the buffer at the
+           right index */
+        if (message->data == NULL) {
+            message->data = modbus->buffer + 3;
+        }
+        else {
+            assert(message->data_size >= size);
+            memcpy(message->data, modbus->buffer + 3, size);
+        }
         mutex_unlock(&(modbus->buffer_mutex));
         break;
 
@@ -302,7 +320,15 @@ static int read_response(modbus_rtu_t *modbus, modbus_message_t *message)
             mutex_unlock(&(modbus->buffer_mutex));
             return MODBUS_ERR_RESPONSE;
         }
-        memcpy(message->data, modbus->buffer + 3, size);
+        /* to support zero-copy, point the message data to the buffer at the
+           right index */
+        if (message->data == NULL) {
+            message->data = modbus->buffer + 3;
+        }
+        else {
+            assert(message->data_size >= size);
+            memcpy(message->data, modbus->buffer + 3, size);
+        }
         mutex_unlock(&(modbus->buffer_mutex));
         break;
 
@@ -355,24 +381,10 @@ static int read_response(modbus_rtu_t *modbus, modbus_message_t *message)
 
 static int read_request(modbus_rtu_t *modbus, modbus_message_t *message)
 {
-    msg_t msg;
     uint16_t size;
 
     modbus->buffer_size = 0;
     modbus->pid = thread_getpid();
-
-    while (1) {
-        msg_receive(&msg);
-
-        /* check if message is for this slave */
-        if (modbus->buffer[ID] == modbus->dev.id) {
-            break;
-        }
-
-        /* wait the end of transfer for other slave */
-        while (ztimer_msg_receive_timeout(ZTIMER_USEC, &msg, modbus->rx_timeout) >= 0) {}
-        modbus->buffer_size = 0;
-    }
 
     if (receive(modbus, MODBUS_RTU_PACKET_REQUEST_SIZE_MIN)) {
         return MODBUS_ERR_TIMEOUT;
@@ -474,36 +486,17 @@ static int read_request(modbus_rtu_t *modbus, modbus_message_t *message)
 
 static int handle_request(modbus_rtu_t *modbus, modbus_message_t *message, modbus_request_cb_t cb)
 {
-    int res;
+    int res = cb((modbus_t *)modbus, message);
 
-    /* validate the request before invoking the callback */
-    res = modbus_check_message(message);
-
-    if (res != MODBUS_OK) {
-        message->exc = MODBUS_EXC_ILLEGAL_VALUE;
-        return MODBUS_OK;
+    if (res == MODBUS_DROP) {
+        mutex_unlock(&(modbus->buffer_mutex));
+        DEBUG("[modbus_rtu] handle_request: callback dropped response\n");
+        return MODBUS_DROP;
     }
-
-    /* invoke callback */
-    if (cb != NULL) {
-        res = cb((modbus_t *)modbus, message);
-
-        if (res != MODBUS_OK) {
-            mutex_unlock(&(modbus->buffer_mutex));
-            DEBUG("[modbus_rtu] handle_request: callback failed (%d)\n", res);
-            return res;
-        }
-    }
-
-    /* validate the response after invoking the callback */
-    if (message->exc == MODBUS_EXC_NONE) {
-        res = modbus_check_message(message);
-
-        if (res != MODBUS_OK) {
-            mutex_unlock(&(modbus->buffer_mutex));
-            DEBUG("[modbus_rtu] handle_request: check message failed (%d)\n", res);
-            return res;
-        }
+    else if (res != MODBUS_OK) {
+        mutex_unlock(&(modbus->buffer_mutex));
+        DEBUG("[modbus_rtu] handle_request: callback failed (%d)\n", res);
+        return res;
     }
 
     return MODBUS_OK;
@@ -512,6 +505,16 @@ static int handle_request(modbus_rtu_t *modbus, modbus_message_t *message, modbu
 static inline int write_response(modbus_rtu_t *modbus, modbus_message_t *message)
 {
     uint8_t size;
+
+    /* ensure that response is sent back to requester */
+    if (message->id != modbus->buffer[ID]) {
+        return MODBUS_ERR_RESPONSE;
+    }
+
+    /* ensure that no responses are sent for broadcasted requests */
+    if (message->id == MODBUS_ID_BROADCAST) {
+        return MODBUS_ERR_RESPONSE;
+    }
 
     modbus->buffer[ID] = message->id;
     modbus->buffer[FUNC] = message->func;
@@ -531,8 +534,9 @@ static inline int write_response(modbus_rtu_t *modbus, modbus_message_t *message
             /* id + func + size + data */
             size = modbus_bit_count_to_size(message->count);
             write_size(modbus, size, false);
-            /* copy data is callback provided a different data buffer */
+            /* copy data if callback provided a different data buffer */
             if (message->data != modbus->buffer + 3) {
+                assert(message->data_size >= size);
                 memcpy(modbus->buffer + 3, message->data, size);
             }
             modbus->buffer_size = 3 + size;
@@ -545,6 +549,7 @@ static inline int write_response(modbus_rtu_t *modbus, modbus_message_t *message
             write_size(modbus, size, false);
             /* copy data if callback provided a different data buffer */
             if (message->data != modbus->buffer + 3) {
+                assert(message->data_size >= size);
                 memcpy(modbus->buffer + 3, message->data, size);
             }
             modbus->buffer_size = 3 + size;
@@ -616,15 +621,9 @@ int modbus_rtu_init(modbus_rtu_t *modbus, const modbus_rtu_params_t *params)
 
 int modbus_rtu_send_request(modbus_rtu_t *modbus, modbus_message_t *message)
 {
+    assert(message != NULL);
+
     int res;
-
-    /* check request before sending it */
-    res = modbus_check_message(message);
-
-    if (res != MODBUS_OK) {
-        DEBUG("[modbus_rtu] modbus_rtu_send_request: check request failed (%d)\n", res);
-        return res;
-    }
 
     /* write request to slave */
     res = write_request(modbus, message);
@@ -647,8 +646,12 @@ int modbus_rtu_send_request(modbus_rtu_t *modbus, modbus_message_t *message)
 
 int modbus_rtu_recv_request(modbus_rtu_t *modbus, modbus_message_t *message, modbus_request_cb_t cb)
 {
+    assert(message != NULL);
+    assert(cb != NULL);
+
     int res;
 
+    /* read request from master */
     res = read_request(modbus, message);
 
     if (res != MODBUS_OK) {
@@ -656,13 +659,19 @@ int modbus_rtu_recv_request(modbus_rtu_t *modbus, modbus_message_t *message, mod
         return res;
     }
 
+    /* handle request */
     res = handle_request(modbus, message, cb);
 
-    if (res != MODBUS_OK) {
+    if (res == MODBUS_DROP) {
+        DEBUG("[modbus_rtu] modbus_rtu_recv_request: handle request aborted\n");
+        return MODBUS_OK;
+    }
+    else if (res != MODBUS_OK) {
         DEBUG("[modbus_rtu] modbus_rtu_recv_request: handle request failed (%d)\n", res);
         return res;
     }
 
+    /* write response to master */
     res = write_response(modbus, message);
 
     if (res != MODBUS_OK) {

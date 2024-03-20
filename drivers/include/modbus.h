@@ -12,7 +12,10 @@
  * @ingroup     drivers
  * @brief       Modbus
  *
+ * Low-level Modbus interface definitions.
+ *
  * @{
+ *
  * @file
  * @brief       Modbus interface definitions
  *
@@ -31,16 +34,16 @@ extern "C" {
 #endif
 
 /**
- * @brief   Modbus errors
+ * @brief   Modbus return codes
  */
 enum {
-    MODBUS_OK,
-    MODBUS_ERR_CRC,
-    MODBUS_ERR_EXCEPTION,
-    MODBUS_ERR_MESSAGE,
-    MODBUS_ERR_REQUEST,
-    MODBUS_ERR_RESPONSE,
-    MODBUS_ERR_TIMEOUT,
+    MODBUS_OK,              /**< no error */
+    MODBUS_DROP,            /**< drop message */
+    MODBUS_ERR_CRC,         /**< message CRC error */
+    MODBUS_ERR_MESSAGE,     /**< message not valid */
+    MODBUS_ERR_REQUEST,     /**< request message error */
+    MODBUS_ERR_RESPONSE,    /**< response message error */
+    MODBUS_ERR_TIMEOUT,     /**< timeout while waiting for message */
 };
 
 /**
@@ -76,10 +79,9 @@ enum {
 /**
  * @brief   Modbus address limits
  */
-#define MODBUS_ID_BROADCAST 0
-#define MODBUS_ID_MIN       1
-#define MODBUS_ID_MAX       247
-/** @} */
+#define MODBUS_ID_BROADCAST 0               /**< broadcast identifier */
+#define MODBUS_ID_MIN       1               /**< first slave identifier */
+#define MODBUS_ID_MAX       247             /**< last slave identifier */
 
 /**
  * @brief Size in bytes of a single register
@@ -88,10 +90,10 @@ enum {
 
 /**
  * @brief   Generic structure for a Modbus device
+ *
+ * This structure is intended to be used as a base for specific Modbus device.
  */
-typedef struct {
-    uint8_t id;             /**< ID of the device, 0 is reserved for master. */
-} modbus_t;
+typedef struct {} modbus_t;
 
 /**
  * @brief   Modbus message structure for requests and responses
@@ -110,12 +112,45 @@ typedef struct {
 } modbus_message_t;
 
 /**
- * @brief   Callback function for handling request
+ * @brief   Callback function for handling requests
  *
- * @param[in] modbus    pointer to modbus device
- * @param[in] message   pointer to modbus message
+ * This callback is invoked when a request message is received. The callback
+ * must check if the request message is addressed properly and decide if the
+ * request can be handled.
  *
- * @return              @p MODBUS_OK on success, otherwise error
+ * Read requests must ensure that @p message->data points to the requested
+ * data, so that the implementation can return it in the response. To support
+ * zero-copy, the callback can also write directly to @p message->data
+ * (at most @p message->data_size bytes), but is also valid to point this
+ * pointer to a different application buffer of sufficient size. In that case,
+ * @p message->data_size must be set updated as well.
+ *
+ * Write requests can copy data from @p message->data to application buffers,
+ * taking into account @p message->data_size.
+ *
+ * Note that @p message->data is a raw buffer. Copy registers or bits using
+ * the appropriate helpers in @ref drivers_modbus.
+ *
+ * If the request message SHOULD NOT be handled or if the request message is
+ * broadcasted, the callback must return @p MODBUS_DROP. This will ensure that
+ * no response message is sent back, but will return @p MODBUS_OK to the
+ * caller.
+ *
+ * If the request message CANNOT be handled, @p message->exc must be set and
+ * @p MODBUS_OK must be returned. For example, when the function code is not
+ * supported (see @p MODBUS_EXC_ILLEGAL_FUNCTION), the address range is out
+ * of bounds (see @p MODBUS_EXC_ILLEGAL_ADDRESS), or the data value is invalid
+ * (see @p MODBUS_EXC_ILLEGAL_VALUE). See @p modbus_check_message
+ *
+ * @p MODBUS_OK must be returned on success. Any other error code will be
+ * returned to the caller.
+ *
+ * @param[in] modbus        pointer to Modbus device
+ * @param[in] message       pointer to Modbus message
+ *
+ * @return                  MODBUS_OK on success
+ * @return                  MODBUS_DROP if message should be dropped
+ * @return                  other error code on failure
  */
 typedef int (*modbus_request_cb_t)(modbus_t *modbus, modbus_message_t *message);
 
@@ -193,11 +228,13 @@ void modbus_copy_reg(void *dst, const void *src);
 /**
  * @brief   Validate a message
  *
- * This ensures that the message is valid for further processing.
+ * Check if the message properties are within valid ranges. This ensures that
+ * the message is valid for further processing.
  *
  * @param[in] message       the message to validate
  *
- * @return int              MODBUS_OK if @p is valid, otherwise error
+ * @return                  MODBUS_OK if @p message is valid
+ * @return                  MODBUS_ERR_MESSAGE if @p message is not valid
  */
 int modbus_check_message(const modbus_message_t *message);
 

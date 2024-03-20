@@ -12,7 +12,10 @@
  * @ingroup     drivers
  * @brief       Modbus RTU
  *
+ * Modbus RTU implementation with support for master and slave modes.
+ *
  * @{
+ *
  * @file
  * @brief       Modbus RTU interface definitions
  *
@@ -35,15 +38,12 @@ extern "C" {
 #endif
 
 /**
- * @brief   Modbus RTU sizes
- *
- * @{
+ * @brief   Modbus RTU packet sizes
  */
-#define MODBUS_RTU_PACKET_CRC_SIZE              2
-#define MODBUS_RTU_PACKET_REQUEST_SIZE_MIN      8       /* includes CRC */
-#define MODBUS_RTU_PACKET_RESPONSE_SIZE_MIN     5       /* includes CRC */
-#define MODBUS_RTU_PACKET_SIZE_MAX              256     /* includes CRC */
-/** @} */
+#define MODBUS_RTU_PACKET_CRC_SIZE              2       /**< size of CRC */
+#define MODBUS_RTU_PACKET_REQUEST_SIZE_MIN      8       /**< minimal request size (with CRC) */
+#define MODBUS_RTU_PACKET_RESPONSE_SIZE_MIN     5       /**< minimal response size (with CRC) */
+#define MODBUS_RTU_PACKET_SIZE_MAX              256     /**< maximum response size (with CRC) */
 
 /**
  * @brief   Modbus RTU device parameters
@@ -59,16 +59,15 @@ typedef struct {
  * @brief   Modbus RTU device structure
  */
 typedef struct {
-    modbus_t dev;           /**< @ref modbus_t base class */
-    const modbus_rtu_params_t* params;  /**< device parameters */
-    uint32_t timeout;       /**< amount of time (usec) to wait for a slave to
-                                 begin sending a */
-    uint32_t rx_timeout;    /**< time between two bytes before timeing out */
-    kernel_pid_t pid;       /**< PID of the thread that waits for bytes */
-    uint8_t buffer[MODBUS_RTU_PACKET_SIZE_MAX];     /**< buffer for requests
-                                                         and responses */
-    uint8_t buffer_size;    /**< current size of @p buffer, in bytes */
-    mutex_t buffer_mutex;   /**< mutex for interacting with @p buffer */
+    modbus_t dev;                               /**< @ref modbus_t base class */
+    const modbus_rtu_params_t *params;          /**< device parameters */
+    uint32_t timeout;                           /**< amount of time (usec) to wait for a slave to
+                                                     begin sending */
+    uint32_t rx_timeout;                        /**< timeout between two bytes */
+    kernel_pid_t pid;                           /**< PID of the thread that waits for bytes */
+    uint8_t buffer[MODBUS_RTU_PACKET_SIZE_MAX]; /**< buffer for requests and responses */
+    uint8_t buffer_size;                        /**< current size of @p buffer, in bytes */
+    mutex_t buffer_mutex;                       /**< mutex for interacting with @p buffer */
 } modbus_rtu_t;
 
 /**
@@ -80,18 +79,34 @@ typedef struct {
  * @param[in] params    device initialization parameters
  *
  * @return              MODBUS_OK on success
+ * @return              other error code on failure
  */
 int modbus_rtu_init(modbus_rtu_t *modbus, const modbus_rtu_params_t *params);
 
 /**
  * @brief   Send request to slave
  *
- * Send request to slave. This will block until a response message is received.
+ * Send request to slave and wait for a response message. Request messages
+ * must be valid and have sufficient sized buffer.
+ *
+ * In case of a read request message, @p message->data can be set to @c NULL.
+ * In this case, the response message will modify @p message->data to point
+ * to the response data within the internal buffer, instead of copying the
+ * data.
+ *
+ * This will block until a response message is received, or a timeout occurs.
+ *
+ * Use as master only.
  *
  * @param[in] modbus    pointer modbus
  * @param[in] message   pointer modbus message
  *
+ * @return              MODBUS_ERR_CRC on CRC error
+ * @return              MODBUS_ERR_REQUEST on response message error
+ * @return              MODBUS_ERR_RESPONSE on response message error
+ * @return              MODBUS_ERR_TIMEOUT on timeout
  * @return              MODBUS_OK on success
+ * @return              other error code on failure
  */
 int modbus_rtu_send_request(modbus_rtu_t *modbus,
                             modbus_message_t *message);
@@ -99,39 +114,23 @@ int modbus_rtu_send_request(modbus_rtu_t *modbus,
 /**
  * @brief   Wait and handle request from master
  *
- * Wait for a request from a master device. This will block until a message is
- * received.
+ * Wait for any request message from a master device. Once a request message is
+ * received, the callback will be invoked to handle the request. Depending on
+ * the return value of the callback, a response message will be sent back.
  *
- * Once a request is received, it will be checked and the callback function
- * @p cb will be invoked. It is up to the callback to properly handle the
- * request if deemed supported.
- *
- * Read requests must ensure that @p message->data points to the requested1
- * data, so that the implementation can return it in the response. To support
- * zero-copy, the callback can also write directly to @p message->data
- * (at most @p message->data_size bytes), but is also valid to point this
- * pointer to a different application buffer of sufficient size. In that case,
- * @p message->data_size must be set updated as well.
- *
- * Write requests can copy data from @p message->data to application buffers,
- * taking into account @p message->data_size.
- *
- * If the message cannot be handled, @p message->exc must be set. For example,
- * when the function code is not applicable, or the read/write exceeds bounds.
- *
- * Note that @p message->data is a raw buffer. Copy registers or bits using
- * the appropriate helpers in @ref drivers_modbus.
- *
- * If the callback returns any other code than @p MODBUS_OK, no response will
- * be sent to the master. This also applies to sending exception codes.
+ * This will block until a request message is received.
  *
  * Use as slave only.
+ *
+ * @see @ref modbus_request_cb_t
  *
  * @param[in] modbus    pointer to modbus
  * @param[in] message   pointer to modbus message
  * @param[in] cb        callback function that handles the request
  *
  * @return              MODBUS_OK on success
+ * @return              MODBUS_ERR_CRC on CRC error
+   & @return              other error code on failure
  */
 int modbus_rtu_recv_request(modbus_rtu_t *modbus, modbus_message_t *message,
                             modbus_request_cb_t cb);
