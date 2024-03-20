@@ -19,3 +19,11 @@ codegen-units = 1
 riot-wrappers = { version = "0.8", features = [ "set_panic_handler" ] }
 
 rust_riotmodules = { path = "../rust_riotmodules" }
+
+[features]
+# By having this explicit feature (comapred to what is enabled by the build
+# system as `--features rust_riotmodules/foo`), all possible dependencies are
+# visible to `cargo update` and in `Cargo.lock. This should not be enabled for
+# compilation, as the modules behind it likely have their own RIOT modules they
+# need enabled.
+_all = [ "rust_riotmodules/_all" ]
