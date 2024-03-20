@@ -46,6 +46,7 @@ static int request_cb(modbus_t *dev, modbus_message_t *message)
     (void)message;
 
     phydat_t data = { 0 };
+    uint8_t val;
     saul_reg_t *reg;
 
     DEBUG("[main] request_cb: function = %u, address = %u, count = %u\n",
@@ -77,7 +78,9 @@ static int request_cb(modbus_t *dev, modbus_message_t *message)
         /* read switch status and write it to the message (in-place) */
         saul_reg_read(reg, &data);
 
-        modbus_copy_bit(message->data, 0, &(data.val[0]), 0, true);
+        val = data.val[0];
+
+        modbus_copy_bit(message->data, 0, &val, 0, true);
 
         break;
     case MODBUS_FC_READ_DISCRETE_INPUTS:
@@ -106,7 +109,9 @@ static int request_cb(modbus_t *dev, modbus_message_t *message)
         /* read registration and write it to the message (in-place) */
         saul_reg_read(reg, &data);
 
-        modbus_copy_bit(message->data, 0, &(data.val[0]), 0, true);
+        val = data.val[0];
+
+        modbus_copy_bit(message->data, 0, &val, 0, true);
 
         break;
     case MODBUS_FC_READ_HOLDING_REGISTERS:
