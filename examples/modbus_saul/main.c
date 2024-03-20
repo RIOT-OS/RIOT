@@ -33,6 +33,8 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+#define MODBUS_SLAVE_ID 1
+
 static char stack[THREAD_STACKSIZE_DEFAULT];
 static modbus_rtu_t modbus;
 static modbus_message_t message;
@@ -49,8 +51,17 @@ static int request_cb(modbus_t *dev, modbus_message_t *message)
     uint8_t val;
     saul_reg_t *reg;
 
-    DEBUG("[main] request_cb: function = %u, address = %u, count = %u\n",
-          message->func, message->addr, message->count);
+    DEBUG("[main] request_cb: id = %u, function = %u, address = %u, count = %u\n",
+          message->id, message->func, message->addr, message->count);
+
+    if (message->id != MODBUS_SLAVE_ID) {
+        return MODBUS_DROP;
+    }
+
+    if (modbus_check_message(message) != MODBUS_OK) {
+        return message->exc = MODBUS_EXC_ILLEGAL_VALUE;
+        return MODBUS_OK;
+    }
 
     switch (message->func) {
     case MODBUS_FC_READ_COILS:
@@ -176,8 +187,6 @@ static int request_cb(modbus_t *dev, modbus_message_t *message)
 static void *thread_slave(void *arg)
 {
     (void)arg;
-
-    modbus.dev.id = 1;
 
     /* initialize the driver */
     int res = modbus_rtu_init(&modbus, &(modbus_rtu_params[0]));
