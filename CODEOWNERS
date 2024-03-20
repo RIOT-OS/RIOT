@@ -7,6 +7,9 @@
 
 *.md                                        @jia200x
 
+Cargo.*                                     @chrysn
+*.rs                                        @chrysn
+
 /.murdock                                   @kaspar030
 
 /boards/common/atxmega/                     @nandojve
