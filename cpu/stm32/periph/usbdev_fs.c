@@ -32,6 +32,7 @@
 #include "usbdev_stm32.h"
 #include "pm_layered.h"
 #include "ztimer.h"
+#include "busy_wait.h"
 
 #include <string.h>
 /**
@@ -218,7 +219,15 @@ static void _enable_gpio(const stm32_usbdev_fs_config_t *conf)
         gpio_init(conf->dp, GPIO_OUT);
         gpio_clear(conf->dp);
         /* wait a 1 ms */
-        ztimer_sleep(ZTIMER_MSEC, 1);
+        if (IS_USED(MODULE_ZTIMER_MSEC)) {
+            ztimer_sleep(ZTIMER_MSEC, 1);
+        }
+        else if(IS_USED(MODULE_ZTIMER_USEC)) {
+            ztimer_sleep(ZTIMER_USEC, 1 * US_PER_MS);
+        }
+        else {
+            busy_wait_us(1 * US_PER_MS);
+        }
         gpio_init(conf->dp, GPIO_IN);
     }
     if (conf->af != GPIO_AF_UNDEF) {
