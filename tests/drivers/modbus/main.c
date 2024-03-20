@@ -106,8 +106,17 @@ static int request_cb(modbus_t *dev, modbus_message_t *message)
     (void)dev;
     (void)message;
 
-    printf("Request callback, function = %u, address = %u, count = %u\n",
-           message->func, message->addr, message->count);
+    printf("Request callback, id = %u, function = %u, address = %u, count = %u\n",
+           message->id, message->func, message->addr, message->count);
+
+    if (message->id != slave_id) {
+        return MODBUS_DROP;
+    }
+
+    if (modbus_check_message(message) != MODBUS_OK) {
+        message->exc = MODBUS_EXC_ILLEGAL_VALUE;
+        return MODBUS_OK;
+    }
 
     if (message->addr >= COUNT_REGISTERS) {
         message->exc = MODBUS_EXC_ILLEGAL_ADDRESS;
@@ -565,18 +574,14 @@ static void test_err_exception(uint8_t id, uint16_t addr, uint16_t count)
 
     int res = modbus_rtu_send_request(&master, &message_master);
 
-    if (res != MODBUS_ERR_EXCEPTION) {
+    if (res != MODBUS_OK) {
         printf("Failed, send result is %u\n", res);
     }
+    else if (message_master.exc != MODBUS_EXC_ILLEGAL_ADDRESS) {
+        puts("Failed, response mismatch");
+    }
     else {
-        ztimer_sleep(ZTIMER_USEC, master.rx_timeout * 3);
-
-        if (message_master.exc != MODBUS_EXC_ILLEGAL_ADDRESS) {
-            puts("Failed, response mismatch");
-        }
-        else {
-            puts("OK");
-        }
+        puts("OK");
     }
 
     puts("");
@@ -586,7 +591,6 @@ static void *thread_master(void *arg)
 {
     (void)arg;
 
-    master.dev.id = 0;
     master.timeout = 1000000;
 
     params_master.baudrate = TEST_BAUDRATE;
@@ -640,8 +644,6 @@ static void *thread_master(void *arg)
 static void *thread_slave(void *arg)
 {
     (void)arg;
-
-    slave.dev.id = slave_id;
 
     params_slave.baudrate = TEST_BAUDRATE;
     params_slave.pin_rts = TEST_SLAVE_PIN_RTS;
