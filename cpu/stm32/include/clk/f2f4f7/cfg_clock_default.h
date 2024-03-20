@@ -20,6 +20,7 @@
 #define CLK_F2F4F7_CFG_CLOCK_DEFAULT_H
 
 #include "cfg_clock_common_fx_gx_mp1_c0.h"
+#include "kernel_defines.h"
 
 #if defined(CPU_FAM_STM32F2)
 #include "f2f4f7/cfg_clock_default_120.h"

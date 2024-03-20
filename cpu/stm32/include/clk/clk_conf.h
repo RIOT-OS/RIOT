@@ -19,9 +19,6 @@
 #ifndef CLK_CLK_CONF_H
 #define CLK_CLK_CONF_H
 
-#include "kernel_defines.h"
-#include "macros/units.h"
-
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
     defined(CPU_FAM_STM32F3)
 #include "f0f1f3/cfg_clock_default.h"
