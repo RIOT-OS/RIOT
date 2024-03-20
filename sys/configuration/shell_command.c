@@ -21,6 +21,12 @@
 #include <string.h>
 
 #include "configuration.h"
+#if MODULE_CONFIGURATION_BACKEND_RIOTCONF
+#include "configuration_backend_riotconf.h"
+#endif
+#if MODULE_RIOTCONF_SLOT_PRINT
+#include "riotconf/slot.h"
+#endif
 #include "shell.h"
 
 static int _sc_config_cmd(int argc, char **argv)
@@ -30,6 +36,9 @@ static int _sc_config_cmd(int argc, char **argv)
                "  [load]\n"
                "  [save]\n"
                "  [reset]\n"
+#if MODULE_CONFIGURATION_BACKEND_RIOTCONF && MODULE_RIOTCONF_SLOT_PRINT
+               "  [print]\n"
+#endif
                "\n",
                argv[0]);
         return -1;
@@ -67,6 +76,15 @@ static int _sc_config_cmd(int argc, char **argv)
         }
         puts("data is reset successfully");
     }
+#if MODULE_CONFIGURATION_BACKEND_RIOTCONF && MODULE_RIOTCONF_SLOT_PRINT
+    else if (!strcmp(argv[1], "print")) {
+        riotconf_slot_t slot = configuration_backend_riotconf_slot_current();
+        if (argc >= 3) {
+            slot = atoi(argv[2]);
+        }
+        riotconf_slot_print(slot);
+    }
+#endif
     else {
         printf("unknown configuration subcommand: %s\n", argv[1]);
         return -1;
