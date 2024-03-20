@@ -19,6 +19,8 @@
 #ifndef CLK_F2F4F7_CFG_CLOCK_DEFAULT_H
 #define CLK_F2F4F7_CFG_CLOCK_DEFAULT_H
 
+#include "cfg_clock_common_fx_gx_mp1_c0.h"
+
 #if defined(CPU_FAM_STM32F2)
 #include "f2f4f7/cfg_clock_default_120.h"
 #elif defined(CPU_FAM_STM32F4)

@@ -23,6 +23,8 @@
 #ifndef CLK_G0G4_CFG_CLOCK_DEFAULT_H
 #define CLK_G0G4_CFG_CLOCK_DEFAULT_H
 
+#include "cfg_clock_common_fx_gx_mp1_c0.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

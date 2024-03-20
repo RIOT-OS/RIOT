@@ -21,6 +21,8 @@
 #ifndef CLK_L4L5WX_CFG_CLOCK_DEFAULT_H
 #define CLK_L4L5WX_CFG_CLOCK_DEFAULT_H
 
+#include "cfg_clock_common_lx_u5_wx.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

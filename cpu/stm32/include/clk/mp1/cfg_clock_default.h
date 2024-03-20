@@ -19,6 +19,8 @@
 #ifndef CLK_MP1_CFG_CLOCK_DEFAULT_H
 #define CLK_MP1_CFG_CLOCK_DEFAULT_H
 
+#include "cfg_clock_common_fx_gx_mp1_c0.h"
+
 /**
  * @name    MP1 clock PLL settings (208MHz)
  * @{
