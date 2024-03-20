@@ -37,7 +37,7 @@
 #include "timex.h"
 #include "ztimer.h"
 
-#define ENABLE_DEBUG 1
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifdef MODULE_MODBUS_RTU
@@ -533,7 +533,7 @@ static inline int write_response(modbus_rtu_t *modbus, modbus_message_t *message
             write_size(modbus, size, false);
             /* copy data is callback provided a different data buffer */
             if (message->data != modbus->buffer + 3) {
-                memcpy(message->data, modbus->buffer + 3, size);
+                memcpy(modbus->buffer + 3, message->data, size);
             }
             modbus->buffer_size = 3 + size;
             break;
@@ -545,7 +545,7 @@ static inline int write_response(modbus_rtu_t *modbus, modbus_message_t *message
             write_size(modbus, size, false);
             /* copy data if callback provided a different data buffer */
             if (message->data != modbus->buffer + 3) {
-                memcpy(message->data, modbus->buffer + 3, size);
+                memcpy(modbus->buffer + 3, message->data, size);
             }
             modbus->buffer_size = 3 + size;
             break;
@@ -652,21 +652,21 @@ int modbus_rtu_recv_request(modbus_rtu_t *modbus, modbus_message_t *message, mod
     res = read_request(modbus, message);
 
     if (res != MODBUS_OK) {
-        DEBUG("[modbus_rtu] modbus_rtu_send_request: read request failed (%d)\n", res);
+        DEBUG("[modbus_rtu] modbus_rtu_recv_request: read request failed (%d)\n", res);
         return res;
     }
 
     res = handle_request(modbus, message, cb);
 
     if (res != MODBUS_OK) {
-        DEBUG("[modbus_rtu] modbus_rtu_send_request: handle request failed (%d)\n", res);
+        DEBUG("[modbus_rtu] modbus_rtu_recv_request: handle request failed (%d)\n", res);
         return res;
     }
 
     res = write_response(modbus, message);
 
     if (res != MODBUS_OK) {
-        DEBUG("[modbus_rtu] modbus_rtu_send_request: send response failed (%d)\n", res);
+        DEBUG("[modbus_rtu] modbus_rtu_recv_request: send response failed (%d)\n", res);
         return res;
     }
 
