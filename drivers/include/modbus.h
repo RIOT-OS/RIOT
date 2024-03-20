@@ -74,6 +74,14 @@ enum {
 };
 
 /**
+ * @brief   Modbus address limits
+ */
+#define MODBUS_ID_BROADCAST 0
+#define MODBUS_ID_MIN       1
+#define MODBUS_ID_MAX       247
+/** @} */
+
+/**
  * @brief Size in bytes of a single register
  */
 #define MODBUS_REGISTER_SIZE 2
