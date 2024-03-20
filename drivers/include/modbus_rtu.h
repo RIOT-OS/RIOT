@@ -23,9 +23,10 @@
 #ifndef MODBUS_RTU_H
 #define MODBUS_RTU_H
 
+#include "mutex.h"
+#include "periph/gpio.h"
 #include "periph/uart.h"
 #include "thread.h"
-#include "mutex.h"
 
 #include "modbus.h"
 
@@ -39,85 +40,35 @@ extern "C" {
  * @{
  */
 #define MODBUS_RTU_PACKET_CRC_SIZE              2
-#define MODBUS_RTU_PACKET_REQUEST_SIZE_MIN      8       /**< includes CRC */
-#define MODBUS_RTU_PACKET_RESPONSE_SIZE_MIN     5       /**< includes CRC */
-#define MODBUS_RTU_PACKET_SIZE_MAX              256     /**< includes CRC */
+#define MODBUS_RTU_PACKET_REQUEST_SIZE_MIN      8       /* includes CRC */
+#define MODBUS_RTU_PACKET_RESPONSE_SIZE_MIN     5       /* includes CRC */
+#define MODBUS_RTU_PACKET_SIZE_MAX              256     /* includes CRC */
 /** @} */
 
 /**
  * @brief   Modbus RTU device parameters
  */
 typedef struct {
-    /**
-     * @brief   RTS pin. @p GPIO_UNDEF if not used.
-     */
-    gpio_t pin_rts;
-
-    /**
-     * @brief   RTS state when transmitting.
-     */
-    int pin_rts_enable;
-
-    /**
-     * @brief   UART device to use.
-     */
-    uart_t uart;
-
-    /**
-     * @brief   UART baudrate.
-     */
-    uint32_t baudrate;
+    gpio_t pin_rts;         /**< RTS pin, @p GPIO_UNDEF if not used */
+    int pin_rts_enable;     /**< RTS pin state when transmitting */
+    uart_t uart;            /**< UART device */
+    uint32_t baudrate;      /**< UART Baudrate */
 } modbus_rtu_params_t;
 
 /**
  * @brief   Modbus RTU device structure
  */
 typedef struct {
-    /**
-     * @brief   @ref modbus_t base class
-     */
-    modbus_t dev;
-
-    /**
-     * @brief   Device parameters.
-     */
-    const modbus_rtu_params_t* params;
-
-    /**
-     * @brief   Amount of time (usec) to wait for a slave to begin sending a
-     *          response.
-     */
-    uint32_t timeout;
-
-    /**
-     * @brief   Timeout between bytes.
-     * @internal
-     */
-    uint32_t rx_timeout;
-
-    /**
-     * @brief   PID of the thread that currently waits for bytes.
-     * @internal
-     */
-    kernel_pid_t pid;
-
-    /**
-     * @brief   Buffer for requests and responses.
-     * @internal
-     */
-    uint8_t buffer[MODBUS_RTU_PACKET_SIZE_MAX];
-
-    /**
-     * @brief   Current size of @p buffer in bytes.
-     * @internal
-     */
-    uint8_t buffer_size;
-
-    /**
-     * @brief   Mutex for interacting with @p buffer.
-     * @internal
-     */
-    mutex_t buffer_mutex;
+    modbus_t dev;           /**< @ref modbus_t base class */
+    const modbus_rtu_params_t* params;  /**< device parameters */
+    uint32_t timeout;       /**< amount of time (usec) to wait for a slave to
+                                 begin sending a */
+    uint32_t rx_timeout;    /**< time between two bytes before timeing out */
+    kernel_pid_t pid;       /**< PID of the thread that waits for bytes */
+    uint8_t buffer[MODBUS_RTU_PACKET_SIZE_MAX];     /**< buffer for requests
+                                                         and responses */
+    uint8_t buffer_size;    /**< current size of @p buffer, in bytes */
+    mutex_t buffer_mutex;   /**< mutex for interacting with @p buffer */
 } modbus_rtu_t;
 
 /**
