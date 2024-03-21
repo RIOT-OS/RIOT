@@ -760,6 +760,7 @@ INPUT                  = ../../doc.txt \
                          src/ \
                          src/mainpage.md \
                          src/vision.md \
+                         src/community-processes.md \
                          src/roadmap.md \
                          src/creating-modules.md \
                          src/creating-an-application.md \
