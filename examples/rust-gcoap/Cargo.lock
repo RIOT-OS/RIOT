@@ -147,6 +147,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "05afea1e0a06c9be33d539b876f1ce3692f4afea2cb41f740e7743225ed1c757"
 
 [[package]]
+name = "ciborium-ll"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "57663b653d948a338bfb3eeba9bb2fd5fcfaecb9e199e87e1eda4d9e8b240fd9"
+dependencies = [
+ "ciborium-io",
+ "half 2.4.0",
+]
+
+[[package]]
 name = "clang-sys"
 version = "1.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -291,6 +301,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7059fff8937831a9ae6f0fe4d658ffabf58f2ca96aa9dec1c889f936f705f216"
 
 [[package]]
+name = "crunchy"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7a81dae078cea95a014a339291cec439d2f232ebe854a9d672b796c6afafa9b7"
+
+[[package]]
 name = "crypto-common"
 version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -421,6 +437,16 @@ name = "half"
 version = "1.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1b43ede17f21864e81be2fa654110bf1e793774238d86ef8555c37e6519c0403"
+
+[[package]]
+name = "half"
+version = "2.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b5eceaaeec696539ddaf7b333340f1af35a5aa87ae3e4f3ead0532f72affab2e"
+dependencies = [
+ "cfg-if",
+ "crunchy",
+]
 
 [[package]]
 name = "hash32"
@@ -711,6 +737,8 @@ name = "riot-coap-handler-demos"
 version = "0.2.0"
 source = "git+https://gitlab.com/etonomy/riot-module-examples/#26a7d27b4c0d518be1d26d07403f57261ee37cd5"
 dependencies = [
+ "ciborium-io",
+ "ciborium-ll",
  "coap-handler 0.2.0",
  "coap-handler-implementations",
  "coap-message 0.3.1",
@@ -719,12 +747,24 @@ dependencies = [
  "embedded-graphics",
  "embedded-hal 0.2.7",
  "heapless 0.7.17",
+ "hex",
  "minicbor",
+ "riot-shell-commands",
  "riot-sys",
  "riot-wrappers",
  "serde",
  "serde_bytes",
  "serde_cbor",
+]
+
+[[package]]
+name = "riot-shell-commands"
+version = "0.1.0"
+source = "git+https://gitlab.com/etonomy/riot-module-examples/#26a7d27b4c0d518be1d26d07403f57261ee37cd5"
+dependencies = [
+ "heapless 0.7.17",
+ "riot-sys",
+ "riot-wrappers",
 ]
 
 [[package]]
@@ -856,7 +896,7 @@ version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2bef2ebfde456fb76bbcf9f59315333decc4fda0b2b44b420243c11e0f5ec1f5"
 dependencies = [
- "half",
+ "half 1.8.3",
  "serde",
 ]
 

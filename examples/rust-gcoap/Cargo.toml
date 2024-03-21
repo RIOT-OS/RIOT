@@ -23,7 +23,7 @@ riot-wrappers = { version = "^0.8", features = [ "set_panic_handler", "panic_han
 
 coap-message-demos = { git = "https://gitlab.com/chrysn/coap-message-demos/", default-features = false }
 coap-handler-implementations = "0.5"
-riot-coap-handler-demos = { git = "https://gitlab.com/etonomy/riot-module-examples/", features = [ "vfs" ] }
+riot-coap-handler-demos = { git = "https://gitlab.com/etonomy/riot-module-examples/", features = [ "vfs", "saul" ] }
 
 # While currently this exmple does not use any RIOT modules implemented in
 # Rust, that may change; it is best practice for any RIOT application that has
