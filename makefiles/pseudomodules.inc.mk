@@ -109,37 +109,15 @@ PSEUDOMODULES += gnrc_ipv6_nib_rio
 PSEUDOMODULES += gnrc_ipv6_nib_router
 PSEUDOMODULES += gnrc_ipv6_nib_rtr_adv_pio_cb
 PSEUDOMODULES += gnrc_lorawan_1_1
-## @defgroup net_gnrc_netdev_default  gnrc_netdev_default
-## @ingroup net_gnrc_netif
-## @{
-## @deprecated  Use module `netdev_default` with `gnrc` or a `gnrc` submodule
-##              instead; will be removed after 2022.07 release.
-PSEUDOMODULES += gnrc_netdev_default
-## @}
 PSEUDOMODULES += gnrc_neterr
 PSEUDOMODULES += gnrc_netapi_callbacks
 PSEUDOMODULES += gnrc_netapi_mbox
 PSEUDOMODULES += gnrc_netif_bus
 PSEUDOMODULES += gnrc_netif_timestamp
-## @defgroup net_gnrc_pktbuf_cmd  gnrc_pktbuf_cmd
-## @ingroup net_gnrc_pktbuf
-## @{
-## @deprecated  Use module `shell_cmd_gnrc_pktbuf` instead;
-##              will be removed after 2023.07 release.
-PSEUDOMODULES += gnrc_pktbuf_cmd
-## @}
 PSEUDOMODULES += gnrc_netif_6lo
 PSEUDOMODULES += gnrc_netif_ipv6
 PSEUDOMODULES += gnrc_netif_mac
 PSEUDOMODULES += gnrc_netif_single
-## @defgroup net_gnrc_netif_cmd_lora  gnrc_netif_cmd_lora
-## @ingroup sys_shell_commands
-## @ingroup net_gnrc_netif
-## @{
-## @deprecated  Use module `shell_cmd_gnrc_netif_lorawan` instead;
-##              will be removed after 2023.07 release.
-PSEUDOMODULES += gnrc_netif_cmd_lora
-## @}
 PSEUDOMODULES += gnrc_netif_dedup
 
 
@@ -256,30 +234,9 @@ PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_congure_sfr
 PSEUDOMODULES += gnrc_sixlowpan_iphc_nhc
 PSEUDOMODULES += gnrc_sixlowpan_nd_border_router
 PSEUDOMODULES += gnrc_sixlowpan_router_default
-## @defgroup net_gnrc_udp_cmd  gnrc_udp_cmd
-## @ingroup net_gnrc_udp
-## @{
-## @deprecated  Use module `shell_cmd_gnrc_udp` instead;
-##              will be removed after 2023.07 release.
-PSEUDOMODULES += gnrc_udp_cmd
-## @}
 PSEUDOMODULES += gnrc_sock_async
 PSEUDOMODULES += gnrc_sock_check_reuse
 PSEUDOMODULES += gnrc_txtsnd
-## @defgroup pseudomodule_heap_cmd heap_cmd
-## @ingroup sys_shell_commands
-## @{
-## @deprecated  Use module `shell_cmd_heap` instead;
-##              will be removed after 2023.07 release.
-PSEUDOMODULES += heap_cmd
-## @}
-## @defgroup pseudomodule_i2c_scan i2c_scan
-## @ingroup sys_shell_commands
-## @{
-## @deprecated  Use module `shell_cmd_i2c_scan` instead;
-##              will be removed after 2023.07 release.
-PSEUDOMODULES += i2c_scan
-## @}
 PSEUDOMODULES += ieee802154_security
 PSEUDOMODULES += ieee802154_submac
 PSEUDOMODULES += ipv4
@@ -329,13 +286,6 @@ PSEUDOMODULES += mpu_noexec_ram
 PSEUDOMODULES += pmp_noexec_ram
 ## @}
 
-## @defgroup pseudomodule_md5sum md5sum
-## @ingroup sys_shell_commands
-## @{
-## @deprecated  Use module `shell_cmd_md5sum` instead;
-##              will be removed after 2023.07 release.
-PSEUDOMODULES += md5sum
-## @}
 PSEUDOMODULES += mtd_write_page
 PSEUDOMODULES += nanocoap_%
 PSEUDOMODULES += nanocoap_fileserver_callback
@@ -372,13 +322,6 @@ PSEUDOMODULES += nrfx
 PSEUDOMODULES += newlib
 PSEUDOMODULES += newlib_gnu_source
 PSEUDOMODULES += newlib_nano
-## @defgroup pseudomodule_nice nice
-## @ingroup sys_shell_commands
-## @{
-## @deprecated  Use module `shell_cmd_nice` instead;
-##              will be removed after 2023.07 release.
-PSEUDOMODULES += nice
-## @}
 PSEUDOMODULES += nrf24l01p_ng_diagnostics
 PSEUDOMODULES += opendsme
 PSEUDOMODULES += openthread
@@ -401,13 +344,6 @@ PSEUDOMODULES += psa_riot_hashes_sha_256
 PSEUDOMODULES += psa_riot_hashes_sha_512
 PSEUDOMODULES += psa_riot_hashes_hmac_sha256
 PSEUDOMODULES += fortuna_reseed
-## @defgroup pseudomodule_random_cmd random_cmd
-## @ingroup sys_shell_commands
-## @{
-## @deprecated  Use module `shell_cmd_random` instead;
-##              will be removed after 2023.07 release.
-PSEUDOMODULES += random_cmd
-## @}
 PSEUDOMODULES += riotboot_%
 PSEUDOMODULES += rtt_cmd
 PSEUDOMODULES += saul_adc
@@ -444,20 +380,7 @@ PSEUDOMODULES += servo_timer
 ## @{
 PSEUDOMODULES += servo_saul
 ## @}
-## @defgroup pseudomodule_sha1sum sha1sum
-## @ingroup sys_shell_commands
-## @{
-## @deprecated  Use module `shell_cmd_sha1sum` instead;
-##              will be removed after 2023.07 release.
-PSEUDOMODULES += sha1sum
-## @}
-## @defgroup pseudomodule_sha256sum sha256sum
-## @ingroup sys_shell_commands
-## @{
-## @deprecated  Use module `shell_cmd_sha256sum` instead;
-##              will be removed after 2023.07 release.
-PSEUDOMODULES += sha256sum
-## @}
+
 PSEUDOMODULES += shell_cmd_app_metadata
 PSEUDOMODULES += shell_cmd_at30tse75x
 PSEUDOMODULES += shell_cmd_benchmark_udp
@@ -530,6 +453,7 @@ PSEUDOMODULES += sock_aux_rssi
 PSEUDOMODULES += sock_aux_timestamp
 PSEUDOMODULES += sock_aux_ttl
 PSEUDOMODULES += sock_dtls
+PSEUDOMODULES += sock_dtls_verify_public_key
 PSEUDOMODULES += sock_ip
 PSEUDOMODULES += sock_tcp
 PSEUDOMODULES += sock_udp

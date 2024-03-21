@@ -5,7 +5,4 @@
 # directory for more details.
 #
 
-config MODULE_RGBLED
-    bool "RGB-LED driver"
-    depends on TEST_KCONFIG
-    select MODULE_COLOR
+rsource "Kconfig.light_control"

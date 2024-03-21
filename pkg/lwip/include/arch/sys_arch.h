@@ -101,13 +101,13 @@ typedef struct {
 
 static inline bool sys_mbox_valid(sys_mbox_t *mbox)
 {
-    return (mbox != NULL) && (mbox->mbox.cib.mask != 0);
+    return (mbox != NULL) && (mbox_size(&mbox->mbox) != 0);
 }
 
 static inline void sys_mbox_set_invalid(sys_mbox_t *mbox)
 {
     if (mbox != NULL) {
-        mbox->mbox.cib.mask = 0;
+        mbox_unset(&mbox->mbox);
     }
 }
 

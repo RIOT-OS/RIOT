@@ -161,6 +161,7 @@ static void _gpio_init_ain(void)
  * This very teniously avoids optimization, even optimized it's better than
  * nothing but periodic review should establish that it doesn't get optimized.
  */
+MAYBE_UNUSED
 __attribute__((always_inline))
 static inline uint32_t _multi_read_reg32(volatile uint32_t *addr, bool *glitch)
 {

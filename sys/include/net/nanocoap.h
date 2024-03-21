@@ -500,6 +500,18 @@ static inline unsigned coap_get_code_raw(const coap_pkt_t *pkt)
 }
 
 /**
+ * @brief   Get a request's method type
+ *
+ * @param[in]   pkt   CoAP request packet
+ *
+ * @returns     request method type
+ */
+static inline coap_method_t coap_get_method(const coap_pkt_t *pkt)
+{
+    return pkt->hdr->code;
+}
+
+/**
  * @brief   Get the message ID of the given CoAP packet
  *
  * @param[in]   pkt   CoAP packet

@@ -434,7 +434,7 @@ static ssize_t _delete_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 static ssize_t nanocoap_fileserver_file_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                                              struct requestdata *request)
 {
-    switch (coap_get_code_raw(pdu)) {
+    switch (coap_get_method(pdu)) {
         case COAP_METHOD_GET:
             return _get_file(pdu, buf, len, request);
 #if IS_USED(MODULE_NANOCOAP_FILESERVER_PUT)
@@ -568,7 +568,7 @@ static ssize_t nanocoap_fileserver_directory_handler(coap_pkt_t *pdu, uint8_t *b
                                                   struct requestdata *request,
                                                   const char *root, const char* resource_dir)
 {
-    switch (coap_get_code_raw(pdu)) {
+    switch (coap_get_method(pdu)) {
         case COAP_METHOD_GET:
             return _get_directory(pdu, buf, len, request, root, resource_dir);
 #if IS_USED(MODULE_NANOCOAP_FILESERVER_PUT)

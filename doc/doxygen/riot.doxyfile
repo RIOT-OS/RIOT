@@ -759,6 +759,7 @@ INPUT                  = ../../doc.txt \
                          ../../sys \
                          src/ \
                          src/mainpage.md \
+                         src/vision.md \
                          src/roadmap.md \
                          src/creating-modules.md \
                          src/creating-an-application.md \

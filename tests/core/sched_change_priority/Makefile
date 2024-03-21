@@ -1,6 +1,6 @@
 include ../Makefile.core_common
 
-USEMODULE += nice
+USEMODULE += shell_cmd_nice
 USEMODULE += ps
 USEMODULE += shell_cmds_default
 

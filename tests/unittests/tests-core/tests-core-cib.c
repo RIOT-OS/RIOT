@@ -45,13 +45,12 @@ static void test_cib_get__overflow(void)
     cib.read_count = UINT_MAX;
     cib.write_count = UINT_MAX;
 
-    TEST_ASSERT_EQUAL_INT(3, cib_put(&cib));
-    TEST_ASSERT_EQUAL_INT(3, cib_get(&cib));
+    TEST_ASSERT_EQUAL_INT(TEST_CIB_SIZE-1, cib_put(&cib));
+    TEST_ASSERT_EQUAL_INT(TEST_CIB_SIZE-1, cib_get(&cib));
 }
 
 static void test_cib_peek(void)
 {
-    cib_init(&cib, TEST_CIB_SIZE);
     TEST_ASSERT_EQUAL_INT(-1, cib_peek(&cib));
     TEST_ASSERT_EQUAL_INT(0, cib_put(&cib));
     TEST_ASSERT_EQUAL_INT(0, cib_peek(&cib));
@@ -69,8 +68,85 @@ static void test_cib_peek__overflow(void)
     cib.read_count = UINT_MAX;
     cib.write_count = UINT_MAX;
 
-    TEST_ASSERT_EQUAL_INT(3, cib_put(&cib));
-    TEST_ASSERT_EQUAL_INT(3, cib_peek(&cib));
+    TEST_ASSERT_EQUAL_INT(TEST_CIB_SIZE-1, cib_put(&cib));
+    TEST_ASSERT_EQUAL_INT(TEST_CIB_SIZE-1, cib_peek(&cib));
+}
+
+static void test_cib_peek_at(void)
+{
+    /* Peeking an empty cib should give an error */
+    TEST_ASSERT_EQUAL_INT(-1, cib_peek_at(&cib, 0));
+
+    /* Put 1 item in cib and check that we can peek it */
+    TEST_ASSERT_EQUAL_INT( 0, cib_put(&cib));
+    TEST_ASSERT_EQUAL_INT( 0, cib_peek(&cib));
+    TEST_ASSERT_EQUAL_INT( 0, cib_peek_at(&cib, 0));
+
+    /* Peek past the end should give an error. */
+    TEST_ASSERT_EQUAL_INT(-1, cib_peek_at(&cib, 1));
+
+    /* Put another item in cib. */
+    TEST_ASSERT_EQUAL_INT( 1, cib_put(&cib));
+
+    /* cib should now hold the indices { 0, 1 }. Test this. */
+    TEST_ASSERT_EQUAL_INT( 0, cib_peek(&cib));
+    TEST_ASSERT_EQUAL_INT( 0, cib_peek_at(&cib, 0));
+    TEST_ASSERT_EQUAL_INT( 1, cib_peek_at(&cib, 1));
+    TEST_ASSERT_EQUAL_INT(-1, cib_peek_at(&cib, 2));
+
+    /* Put another item in cib. */
+    TEST_ASSERT_EQUAL_INT( 2, cib_put(&cib));
+
+    /* cib should now hold the indices { 0, 1, 2 }. Test this. */
+    TEST_ASSERT_EQUAL_INT( 0, cib_peek(&cib));
+    TEST_ASSERT_EQUAL_INT( 0, cib_peek_at(&cib, 0));
+    TEST_ASSERT_EQUAL_INT( 1, cib_peek_at(&cib, 1));
+    TEST_ASSERT_EQUAL_INT( 2, cib_peek_at(&cib, 2));
+    TEST_ASSERT_EQUAL_INT(-1, cib_peek_at(&cib, 3));
+
+    /* Put another item in cib. */
+    TEST_ASSERT_EQUAL_INT( 3, cib_put(&cib));
+
+    /* cib should now hold the indices { 0, 1, 2, 3 }. Test this. */
+    TEST_ASSERT_EQUAL_INT( 0, cib_peek(&cib));
+    TEST_ASSERT_EQUAL_INT( 0, cib_peek_at(&cib, 0));
+    TEST_ASSERT_EQUAL_INT( 1, cib_peek_at(&cib, 1));
+    TEST_ASSERT_EQUAL_INT( 2, cib_peek_at(&cib, 2));
+    TEST_ASSERT_EQUAL_INT( 3, cib_peek_at(&cib, 3));
+    TEST_ASSERT_EQUAL_INT(-1, cib_peek_at(&cib, 4));
+
+    /* Remove an item from cib. */
+    TEST_ASSERT_EQUAL_INT( 0, cib_get(&cib));
+
+    /* cib should now hold the indices { 1, 2, 3 }. Test this. */
+    TEST_ASSERT_EQUAL_INT( 1, cib_peek(&cib));
+    TEST_ASSERT_EQUAL_INT( 1, cib_peek_at(&cib, 0));
+    TEST_ASSERT_EQUAL_INT( 2, cib_peek_at(&cib, 1));
+    TEST_ASSERT_EQUAL_INT( 3, cib_peek_at(&cib, 2));
+    TEST_ASSERT_EQUAL_INT(-1, cib_peek_at(&cib, 3));
+
+    /* Remove another item from cib. */
+    TEST_ASSERT_EQUAL_INT( 1, cib_get(&cib));
+
+    /* cib should now hold the indices { 2, 3 }. Test this. */
+    TEST_ASSERT_EQUAL_INT( 2, cib_peek(&cib));
+    TEST_ASSERT_EQUAL_INT( 2, cib_peek_at(&cib, 0));
+    TEST_ASSERT_EQUAL_INT( 3, cib_peek_at(&cib, 1));
+    TEST_ASSERT_EQUAL_INT(-1, cib_peek_at(&cib, 2));
+
+    /* Remove another item from cib. */
+    TEST_ASSERT_EQUAL_INT( 2, cib_get(&cib));
+
+    /* cib should now hold the indices { 3 }. Test this. */
+    TEST_ASSERT_EQUAL_INT( 3, cib_peek(&cib));
+    TEST_ASSERT_EQUAL_INT( 3, cib_peek_at(&cib, 0));
+    TEST_ASSERT_EQUAL_INT(-1, cib_peek_at(&cib, 1));
+
+    /* Remove last item from cib. */
+    TEST_ASSERT_EQUAL_INT( 3, cib_get(&cib));
+
+    /* Peeking an empty cib should give an error */
+    TEST_ASSERT_EQUAL_INT(-1, cib_peek_at(&cib, 0));
 }
 
 static void test_cib_avail(void)
@@ -112,6 +188,7 @@ Test *tests_core_cib_tests(void)
         new_TestFixture(test_singleton_cib),
         new_TestFixture(test_cib_peek),
         new_TestFixture(test_cib_peek__overflow),
+        new_TestFixture(test_cib_peek_at),
     };
 
     EMB_UNIT_TESTCALLER(core_cib_tests, set_up, NULL, fixtures);

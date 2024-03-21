@@ -45,8 +45,9 @@ static int _init(mtd_dev_t *dev)
     assert(!(super->offset % dev->pages_per_sector));
 
     /* Use separate variable to avoid '>= 0 is always true' warning */
+    #ifndef NDEBUG
     static const uintptr_t cpu_flash_base = CPU_FLASH_BASE;
-
+    #endif
     assert((uintptr_t)flashpage_addr(super->offset / dev->pages_per_sector) >= cpu_flash_base);
     assert((uintptr_t)flashpage_addr(super->offset / dev->pages_per_sector)
            + dev->pages_per_sector * dev->page_size * dev->sector_count <= MTD_FLASHPAGE_END_ADDR);
@@ -159,3 +160,13 @@ const mtd_desc_t mtd_flashpage_driver = {
     .write_page = _write_page,
     .erase_sector = _erase_sector,
 };
+
+#if CONFIG_SLOT_AUX_LEN
+mtd_flashpage_t mtd_flash_aux_slot = MTD_FLASHPAGE_AUX_INIT_VAL(CONFIG_SLOT_AUX_OFFSET,
+                                                                CONFIG_SLOT_AUX_LEN);
+MTD_XFA_ADD(mtd_flash_aux_slot, CONFIG_SLOT_AUX_MTD_OFFSET);
+mtd_dev_t *mtd_aux = &mtd_flash_aux_slot.base;
+
+static_assert(CONFIG_SLOT_AUX_OFFSET % FLASHPAGE_SIZE == 0, "AUX slot must align with page");
+static_assert(CONFIG_SLOT_AUX_LEN % FLASHPAGE_SIZE == 0, "AUX slot must align with page");
+#endif

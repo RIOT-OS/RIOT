@@ -330,6 +330,13 @@ static void _rtc_init(void)
     RTC->MODE2.CTRLA.reg = RTC_MODE2_CTRLA_PRESCALER_DIV1024   /* CLK_RTC_CNT = 1KHz / 1024 -> 1Hz */
                          | RTC_MODE2_CTRLA_CLOCKSYNC           /* Clock Read Synchronization Enable */
                          | RTC_MODE2_CTRLA_MODE_CLOCK;
+
+    /* RTC is all 0 after POR, avoid reading invalid date right after boot */
+    if (RTC->MODE2.CLOCK.reg == 0) {
+        RTC->MODE2.CLOCK.reg = RTC_MODE2_CLOCK_MONTH(1)
+                             | RTC_MODE2_CLOCK_DAY(1);
+    }
+
 #ifdef RTC_MODE2_CTRLB_GP2EN
     /* RTC driver does not use COMP[1] or ALARM[1] */
     /* Use second set of Compare registers as general purpose register */

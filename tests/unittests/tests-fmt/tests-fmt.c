@@ -254,7 +254,6 @@ static void test_fmt_u16_hex(void)
     TEST_ASSERT_EQUAL_INT(4, fmt_u16_hex(out, 0));
     TEST_ASSERT(memcmp(out, "0000zzzz", 8) == 0);
 
-
     TEST_ASSERT_EQUAL_INT(4, fmt_u16_hex(out, 0xBEEF));
     TEST_ASSERT(memcmp(out, "BEEFzzzz", 8) == 0);
 }
@@ -852,13 +851,22 @@ static void test_scn_u32_dec(void)
 
 static void test_scn_u32_hex(void)
 {
-    const char *string1 = "aB12cE4F";
-    uint32_t val1 = 0xab12ce4f;
-    uint32_t val2 = 0xab1;
+    /* ´x´ is not a valid hexadecimal character */
+    TEST_ASSERT_EQUAL_INT(0x0, scn_u32_hex("0xABCD", 4));
+    /* so are these: */
+    TEST_ASSERT_EQUAL_INT(0x9, scn_u32_hex("9 ABCD", 4));
+    TEST_ASSERT_EQUAL_INT(0x9, scn_u32_hex("9-ABCD", 4));
+    TEST_ASSERT_EQUAL_INT(0x9, scn_u32_hex("9+ABCD", 4));
+    TEST_ASSERT_EQUAL_INT(0xab, scn_u32_hex("AB_CD", 4));
+    TEST_ASSERT_EQUAL_INT(0x9, scn_u32_hex("9:3kCD", 4));
+    TEST_ASSERT_EQUAL_INT(0x9, scn_u32_hex("9}3kCD", 4));
+    TEST_ASSERT_EQUAL_INT(0x9, scn_u32_hex("9?3kCD", 4));
 
-    TEST_ASSERT_EQUAL_INT(val1, scn_u32_hex(string1, 8));
-    TEST_ASSERT_EQUAL_INT(val2, scn_u32_hex(string1, 3));
-    TEST_ASSERT_EQUAL_INT(val1, scn_u32_hex(string1, 9));
+    /* Stop on the length argument or on the null terminator */
+    TEST_ASSERT_EQUAL_INT(0xab12ce4f, scn_u32_hex("aB12cE4F", 8));
+    TEST_ASSERT_EQUAL_INT(0xab1, scn_u32_hex("aB12cE4F", 3));
+    TEST_ASSERT_EQUAL_INT(0xab12ce4f, scn_u32_hex("aB12cE4F", 9));
+    TEST_ASSERT_EQUAL_INT(0xab, scn_u32_hex("aB", 9));
 }
 
 static void test_fmt_lpad(void)
