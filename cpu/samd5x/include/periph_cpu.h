@@ -25,6 +25,7 @@
 #include "macros/units.h"
 #include "periph_cpu_common.h"
 
+#include "candev_samd5x.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
