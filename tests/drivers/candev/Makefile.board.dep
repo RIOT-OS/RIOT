@@ -5,8 +5,16 @@ endif
 # define the CAN driver you want to use here
 CAN_DRIVER ?= MCP2515
 
+# define the CPU family used
+CPU_USED ?= SAME54
+
 ifeq ($(CAN_DRIVER), PERIPH_CAN)
   FEATURES_REQUIRED += periph_can
+  ifeq (SAME54, $(CPU_USED))
+    # You can increase the number of provided filters using this block. Default number : 3
+    # CFLAGS += "-DCANDEV_SAMD5X_DEFAULT_STD_FILTER_NUM=5"
+    # CFLAGS += "-DCANDEV_SAMD5X_DEFAULT_EXT_FILTER_NUM=5"
+  endif
 else ifeq ($(CAN_DRIVER), MCP2515)
   USEMODULE += mcp2515
   # Uncomment to enable MCP2515 reception filtering

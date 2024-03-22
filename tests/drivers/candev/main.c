@@ -33,6 +33,9 @@
 
 #include "periph/can.h"
 #include "can_params.h"
+#include "board.h"
+#include "periph_conf.h"
+#include "periph/gpio.h"
 
 static can_t periph_dev;
 
@@ -127,7 +130,86 @@ static int _receive(int argc, char **argv)
     return 0;
 }
 
+static int _set_bit_rate(int argc, char **argv)
+{
+    uint32_t bitrate = 250000;
+    uint32_t sample_point = 875;
+    int res = 0;
+
+    if (argc == 2) {
+        bitrate = atoi(argv[1]);
+        if (!bitrate) {
+            puts("Usage error: Invalid bitrate");
+            return -1;
+        }
+    }
+    if (argc == 3) {
+        bitrate = atoi(argv[1]);
+        sample_point = atoi(argv[2]);
+        if (!bitrate || !sample_point) {
+            puts("Usage error: Invalid bitrate or sample point");
+            return -2;
+        }
+    }
+
+    struct can_bittiming bit_timing = {
+        .bitrate = bitrate,
+        .sample_point = sample_point,
+    };
+
+    res = candev->driver->set(candev, CANOPT_BITTIMING, &bit_timing, sizeof(bit_timing));
+
+    return res;
+}
+
+static int _set_can_filter(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+    int res = 0;
+
+    struct can_filter filter = {
+        .can_mask = 0x7FF,
+        .can_id = 0x1aa,
+#if (MODULE_CAN_RX_MAILBOX)
+        .target_mailbox = 1,
+#endif
+    };
+
+    res = candev->driver->set(candev, CANOPT_RX_FILTERS, &filter, sizeof(struct can_filter));
+
+    return res;
+}
+
+static int _power_off(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+    int res = 0;
+
+    canopt_state_t state = CANOPT_STATE_OFF;
+    res = candev->driver->set(candev, CANOPT_STATE, &state, sizeof(canopt_state_t));
+
+    return res;
+}
+
+static int _power_on(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+    int res = 0;
+
+    canopt_state_t state = CANOPT_STATE_ON;
+    res = candev->driver->set(candev, CANOPT_STATE, &state, sizeof(canopt_state_t));
+
+    return res;
+}
+
 static const shell_command_t shell_commands[] = {
+    { "on", "Turn on the CAN controller", _power_on},
+    { "off", "Turn off the CAN controller", _power_off},
+    { "set_filter", "set CAN filters", _set_can_filter},
+    { "set_bit_rate", "set CAN bit rate", _set_bit_rate},
     { "send", "send some data", _send },
     { "receive", "receive some data", _receive },
     { NULL, NULL, NULL }
@@ -157,7 +239,7 @@ static void _can_event_callback(candev_t *dev, candev_event_t event, void *arg)
 
         frame = (struct can_frame *)arg;
 
-        DEBUG("            id: %" PRIx32 " dlc: %" PRIx8 " data: ", frame->can_id & 0x1FFFFFFF,
+        DEBUG("            id: %" PRIx32 " dlc: %u data: ", frame->can_id & 0x1FFFFFFF,
               frame->can_dlc);
         for (uint8_t i = 0; i < frame->can_dlc; i++) {
             DEBUG("0x%X ", frame->data[i]);
@@ -196,9 +278,13 @@ int main(void)
     isrpipe_init(&rxbuf, (uint8_t *)rx_ringbuf, sizeof(rx_ringbuf));
 #if IS_USED(MODULE_PERIPH_CAN)
     puts("Initializing CAN periph device");
-    can_init(&periph_dev, &(candev_conf[0]));    /* vcan0 on native */
-    candev = (candev_t *)&periph_dev;
-#elif  defined(MODULE_MCP2515)
+    can_init(&periph_dev, &(candev_conf[0]));
+    candev = &(periph_dev.candev);
+#if defined(BOARD_SAME54_XPRO)
+    gpio_init(AT6561_STBY_PIN, GPIO_OUT);
+    gpio_clear(AT6561_STBY_PIN);
+#endif
+#elif defined(MODULE_MCP2515)
     puts("Initializing MCP2515");
     candev_mcp2515_init(&mcp2515_dev, &candev_mcp2515_conf[0]);
     candev = (candev_t *)&mcp2515_dev;
@@ -221,34 +307,45 @@ if (IS_ACTIVE(CONFIG_USE_LOOPBACK_MODE)) {
     candev->driver->set(candev, CANOPT_STATE, &mode, sizeof(mode));
 }
 
+/* Depending from the CAN controller used, this test example will provide different results.
+- For MCP2515 standalone CAN controller, the last filter won't be applied
+as the first reception mailbox supports up to two filters
+- For SAMD5x/E5x CAN controller, and with keeping the default parameters in candev_samd5x.h,
+the last filter won't be applied as the CAN controller supports up to 3 standard filters
+- For SAMD5x/E5x CAN controller, if you increase the maximum capacity of the standard
+filters (check Makefile.board.dep), the last filter can be applied correctly. */
+#if defined(MODULE_MCP2515)
     if (IS_ACTIVE(MCP2515_RECV_FILTER_EN)) {
+#endif
         /* CAN filters examples */
         struct can_filter filter[4];
         filter[0].can_mask = 0x7FF;
         filter[0].can_id = 0x001;
-#if defined(MODULE_MCP2515)
-        filter[0].target_mailbox = 0;   /* messages with CAN ID 0x001 will be received in mailbox 0 */
+#if (MODULE_CAN_RX_MAILBOX)
+        filter[0].target_mailbox = 0;
 #endif
         filter[1].can_mask = 0x7FF;
         filter[1].can_id = 0x002;
-#if defined(MODULE_MCP2515)
-        filter[1].target_mailbox = 1;   /* messages with CAN ID 0x002 will be received in mailbox 1 */
+#if (MODULE_CAN_RX_MAILBOX)
+        filter[1].target_mailbox = 1;
 #endif
         filter[2].can_mask = 0x7FF;
         filter[2].can_id = 0x003;
-#if defined(MODULE_MCP2515)
-        filter[2].target_mailbox = 0;   /* messages with CAN ID 0x003 will be received in mailbox 0 */
+#if (MODULE_CAN_RX_MAILBOX)
+        filter[2].target_mailbox = 0;
 #endif
         filter[3].can_mask = 0x7FF;
         filter[3].can_id = 0x004;
-#if defined(MODULE_MCP2515)
-        filter[3].target_mailbox = 0;   /* this filter won't be applied. Reason is no space found in the first mailbox as it supports only two filters */
+#if (MODULE_CAN_RX_MAILBOX)
+        filter[3].target_mailbox = 1;
 #endif
         for (uint8_t i = 0; i < 4; i++) {
             candev->driver->set_filter(candev, &filter[i]);
         }
         /* All other messages won't be received */
+#if defined(MODULE_MCP2515)
     }
+#endif
 
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
