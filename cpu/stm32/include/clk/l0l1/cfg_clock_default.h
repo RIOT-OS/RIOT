@@ -19,6 +19,9 @@
 #ifndef CLK_L0L1_CFG_CLOCK_DEFAULT_H
 #define CLK_L0L1_CFG_CLOCK_DEFAULT_H
 
+#include "cfg_clock_common_lx_u5_wx.h"
+#include "kernel_defines.h"
+#include "macros/units.h"
 #include "periph_cpu.h"
 
 #ifdef __cplusplus

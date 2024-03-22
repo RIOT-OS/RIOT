@@ -23,6 +23,9 @@
 #ifndef CLK_F2F4F7_CFG_CLOCK_DEFAULT_216_H
 #define CLK_F2F4F7_CFG_CLOCK_DEFAULT_216_H
 
+#include "kernel_defines.h"
+#include "macros/units.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

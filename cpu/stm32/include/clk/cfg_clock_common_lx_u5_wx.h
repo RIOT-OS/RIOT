@@ -23,6 +23,8 @@
 #ifndef CLK_CFG_CLOCK_COMMON_LX_U5_WX_H
 #define CLK_CFG_CLOCK_COMMON_LX_U5_WX_H
 
+#include "kernel_defines.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
