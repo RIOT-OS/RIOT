@@ -476,20 +476,16 @@ static int set_extended_filter(FDCAN_GlobalTypeDef *can, uint32_t fr1, uint32_t 
                                    + FDCAN_SRAM_FLE_FILTER_SIZE * filter_id;
     uint32_t *fle_ram_address_f1 = fle_ram_address_f0 + FDCAN_SRAM_FLE_FILTER_SIZE / 2;
 
-    /* Set filter mask and ID*/
-    *fle_ram_address_f0 &= ~FDCAN_SRAM_FLE_F0_EFID1;
-    *fle_ram_address_f0 |= fr1 & CAN_EFF_MASK;
+    /* Reset filter */
+    *fle_ram_address_f0 = 0;
+    *fle_ram_address_f1 = 0;
 
-    *fle_ram_address_f1 &= ~FDCAN_SRAM_FLE_F1_EFID2;
-    *fle_ram_address_f1 |= fr2 & CAN_EFF_MASK;
+    *fle_ram_address_f0 |= (fr1 & CAN_EFF_MASK)                     /* Filter ID */
+                           | (fifo ? FDCAN_SRAM_FLE_F0_EFEC_FIFO1
+                              : FDCAN_SRAM_FLE_F0_EFEC_FIFO0);      /* Filter FIFO configuration */
+    *fle_ram_address_f1 |= (fr2 & CAN_EFF_MASK)                     /* Filter mask */
+                           | FDCAN_SRAM_FLE_F1_EFT_CLASSIC;         /* Set classic filter type */
 
-    /* Set filter type */
-    *fle_ram_address_f1 &= ~FDCAN_SRAM_FLE_F1_EFT;
-    *fle_ram_address_f1 |= FDCAN_SRAM_FLE_F1_EFT_CLASSIC;
-
-    /* Filter FIFO configuration */
-    *fle_ram_address_f0 &= ~FDCAN_SRAM_FLE_F0_EFEC;
-    *fle_ram_address_f0 |= (fifo ? FDCAN_SRAM_FLE_F0_EFEC_FIFO1 : FDCAN_SRAM_FLE_F0_EFEC_FIFO0);
 
     DEBUG("%s: FDCAN%u extended filter %u F0 value is %lx\n",
           __func__, get_channel_id(can),
@@ -684,16 +680,11 @@ static int _init(candev_t *candev)
     NVIC_EnableIRQ(dev->conf->it0_irqn);
     NVIC_EnableIRQ(dev->conf->it1_irqn);
 
-    /* Enable auto retransmission on failure*/
-    can->CCCR &= ~FDCAN_CCCR_DAR;
-    /* Enable FD mode */
-    can->CCCR |= FDCAN_CCCR_FDOE;
-    /* Enable bitrate switching */
-    can->CCCR |= FDCAN_CCCR_BRSE;
-    /* Enable transmit pause */
-    can->CCCR |= FDCAN_CCCR_TXP;
-    /* Enable protocol exception handling */
-    can->CCCR &= ~FDCAN_CCCR_PXHD;
+    can->CCCR &= ~(FDCAN_CCCR_DAR       /* Enable auto retransmission on failure */
+                   | FDCAN_CCCR_PXHD);  /* Enable protocol exception handling */
+    can->CCCR |= (FDCAN_CCCR_FDOE       /* Enable FD mode */
+                  | FDCAN_CCCR_BRSE     /* Enable bitrate switching */
+                  | FDCAN_CCCR_TXP);    /* Enable transmit pause */
 
 #ifdef STM32_PM_STOP
     pm_block(STM32_PM_STOP);
@@ -727,39 +718,32 @@ static inline void set_bit_timing(can_t *dev)
     DEBUG("%s: FDCAN%u setup bittiming\n",
           __func__, get_channel_id(can));
     /* Normal CAN bittiming */
-    /* SJW */
-    can->NBTP &= ~FDCAN_NBTP_NSJW;
-    can->NBTP |= (dev->candev.bittiming.sjw - 1) << FDCAN_NBTP_NSJW_Pos;
-    /* Phase Seg 2 */
-    can->NBTP &= ~FDCAN_NBTP_NTSEG2;
-    can->NBTP |= (dev->candev.bittiming.phase_seg2 - 1) << FDCAN_NBTP_NTSEG2_Pos;
-    /* Phase Seg 1 */
-    can->NBTP &= ~FDCAN_NBTP_NTSEG1;
-    can->NBTP |= (dev->candev.bittiming.phase_seg1
-                 + dev->candev.bittiming.prop_seg - 1) << FDCAN_NBTP_NTSEG1_Pos;
-    /* BRP */
-    can->NBTP &= ~FDCAN_NBTP_NBRP;
-    can->NBTP |= (dev->candev.bittiming.brp - 1) << FDCAN_NBTP_NBRP_Pos;
+    can->NBTP = 0;
+    can->NBTP = (dev->candev.bittiming.sjw - 1)
+                 << FDCAN_NBTP_NSJW_Pos     /* SJW */
+                | (dev->candev.bittiming.phase_seg2 - 1)
+                   << FDCAN_NBTP_NTSEG2_Pos /* Phase Seg 2 */
+                | (dev->candev.bittiming.phase_seg1
+                   + dev->candev.bittiming.prop_seg - 1)
+                   << FDCAN_NBTP_NTSEG1_Pos /* Phase Seg 1 */
+                | (dev->candev.bittiming.brp - 1)
+                   << FDCAN_NBTP_NBRP_Pos;  /* BRP */
 
     DEBUG("%s: FDCAN%u->NBTP = %lx\n",
           __func__, get_channel_id(can), can->NBTP);
 
     /* FD CAN bittiming */
-    /* SJW */
-    can->DBTP &= ~FDCAN_DBTP_DSJW;
-    can->DBTP |= (dev->candev.fd_data_bittiming.sjw - 1) << FDCAN_DBTP_DSJW_Pos;
-    /* Phase Seg 2 */
-    can->DBTP &= ~FDCAN_DBTP_DTSEG2;
-    can->DBTP |= (dev->candev.fd_data_bittiming.phase_seg2 - 1) << FDCAN_DBTP_DTSEG2_Pos;
-    /* Phase Seg 1 */
-    can->DBTP &= ~FDCAN_DBTP_DTSEG1;
-    can->DBTP |= (dev->candev.fd_data_bittiming.phase_seg1
-                 + dev->candev.fd_data_bittiming.prop_seg - 1) << FDCAN_DBTP_DTSEG1_Pos;
-    /* BRP */
-    can->DBTP &= ~FDCAN_DBTP_DBRP;
-    can->DBTP |= (dev->candev.fd_data_bittiming.brp - 1) << FDCAN_DBTP_DBRP_Pos;
-    /* Transceiver delay compensation */
-    can->DBTP |= FDCAN_DBTP_TDC;
+    can->DBTP = 0;
+    can->DBTP = (dev->candev.fd_data_bittiming.sjw - 1)
+                 << FDCAN_DBTP_DSJW_Pos     /* SJW */
+                | (dev->candev.fd_data_bittiming.phase_seg2 - 1)
+                   << FDCAN_DBTP_DTSEG2_Pos /* Phase Seg 2 */
+                | (dev->candev.fd_data_bittiming.phase_seg1
+                   + dev->candev.fd_data_bittiming.prop_seg - 1)
+                   << FDCAN_DBTP_DTSEG1_Pos /* Phase Seg 1 */
+                | (dev->candev.fd_data_bittiming.brp - 1)
+                   << FDCAN_DBTP_DBRP_Pos   /* BRP */
+                | FDCAN_DBTP_TDC;           /* Transceiver delay compensation */
 
     DEBUG("%s: FDCAN%u->DBTP = %lx\n",
           __func__, get_channel_id(can), can->DBTP);
@@ -771,7 +755,7 @@ static inline void set_bit_timing(can_t *dev)
           __func__, get_channel_id(can), can->TDCR);
 }
 
-static uint32_t fddlc_to_dlc(__uint32_t fddlc) {
+static uint32_t dlc_to_len(__uint32_t fddlc) {
     if (fddlc <= 8) {
         return fddlc;
     }
@@ -798,7 +782,7 @@ static uint32_t fddlc_to_dlc(__uint32_t fddlc) {
     }
 }
 
-static uint32_t dlc_to_fddlc(uint32_t dlc) {
+static uint32_t len_to_dlc(uint32_t dlc) {
     DEBUG("%s: dlc = %lu\n", __func__, dlc);
     if (dlc <= 8) {
         return dlc;
@@ -912,26 +896,16 @@ static int _send(candev_t *candev, const can_frame_t *frame)
         return -EINVAL;
     }
 
-    /* ESI bit in CAN FD format transmitted recessive */
-    *tx_buffer_element_t1 &= ~FDCAN_SRAM_TXBUFFER_T1_EFC;
-    *tx_buffer_element_t1 |= FDCAN_SRAM_TXBUFFER_T1_EFC_DISABLE;
-
-    /* Bit Rate Switching */
-    *tx_buffer_element_t1 &= ~FDCAN_SRAM_TXBUFFER_T1_BRS;
-    *tx_buffer_element_t1 |= (frame->flags & CANFD_BRS)
-                             ? FDCAN_SRAM_TXBUFFER_T1_BRS_ON
-                             : FDCAN_SRAM_TXBUFFER_T1_BRS_OFF;
-
-    /* CAN FD frame */
-    *tx_buffer_element_t1 &= ~FDCAN_SRAM_TXBUFFER_T1_FDF;
-    *tx_buffer_element_t1 |= (frame->flags & CANFD_FDF)
-                             ? FDCAN_SRAM_TXBUFFER_T1_FDF_FD
-                             : FDCAN_SRAM_TXBUFFER_T1_FDF_CLASSIC;
-
-
-    /* Data Length Code*/
-    *tx_buffer_element_t1 &= ~FDCAN_SRAM_TXBUFFER_T1_DLC;
-    *tx_buffer_element_t1 |= dlc_to_fddlc(frame->len) << FDCAN_SRAM_TXBUFFER_T1_DLC_Pos;
+    *tx_buffer_element_t1 = 0;
+    *tx_buffer_element_t1 = FDCAN_SRAM_TXBUFFER_T1_EFC_DISABLE          /* ESI bit */
+                            | (frame->flags & CANFD_BRS)
+                              ? FDCAN_SRAM_TXBUFFER_T1_BRS_ON
+                              : FDCAN_SRAM_TXBUFFER_T1_BRS_OFF          /* Bit Rate Switching */
+                            | (frame->flags & CANFD_FDF)
+                              ? FDCAN_SRAM_TXBUFFER_T1_FDF_FD
+                              : FDCAN_SRAM_TXBUFFER_T1_FDF_CLASSIC      /* CAN FD frame */
+                            | len_to_dlc(frame->len)
+                              << FDCAN_SRAM_TXBUFFER_T1_DLC_Pos;        /* Data Length Code*/
 
 
     DEBUG("%s: FDCAN%u *tx_buffer_element_t0 = %lx\n",
@@ -1044,7 +1018,7 @@ static int read_frame(can_t *dev, can_frame_t *frame, int message_ram_rx_fifo)
         frame->flags |= CANFD_BRS;
     }
 
-    frame->len = fddlc_to_dlc((*rx_fifo_element_r1 & FDCAN_SRAM_RXFIFO_R1_DLC)
+    frame->len = dlc_to_len((*rx_fifo_element_r1 & FDCAN_SRAM_RXFIFO_R1_DLC)
                  >> FDCAN_SRAM_RXFIFO_R1_DLC_Pos);
 
     /* Get Data */
