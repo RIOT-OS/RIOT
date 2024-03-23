@@ -99,11 +99,14 @@ typedef uint32_t canid_t;
  * @brief Controller Area Network frame
  */
 struct can_frame {
-    canid_t can_id;  /**< 32 bit CAN_ID + EFF/RTR/ERR flags */
-    uint8_t len; /**< frame payload length in byte (0 .. CAN_MAX_DLEN) */
-    uint8_t __pad;   /**< padding */
-    uint8_t __res0;  /**< reserved / padding */
-    uint8_t __res1;  /**< reserved / padding */
+    canid_t can_id;     /**< 32 bit CAN_ID + EFF/RTR/ERR flags */
+    union {
+        uint8_t len;    /**< frame payload length in byte (0 .. CAN_MAX_DLEN) */
+        uint8_t can_dlc;/**< deprecated - see SocketCAN documentation */
+    };
+    uint8_t __pad;      /**< padding */
+    uint8_t __res0;     /**< reserved / padding */
+    uint8_t __res1;     /**< reserved / padding */
     /** Frame data */
     uint8_t data[CAN_MAX_DLEN] __attribute__((aligned(8)));
 };
