@@ -47,7 +47,7 @@ extern "C" {
 #endif
 #ifndef MOTOR_DRIVER_PARAM_PWM
 /** Default PWM device */
-#define MOTOR_DRIVER_PARAM_PWM              1
+#define MOTOR_DRIVER_PARAM_PWM              0
 #endif
 #ifndef MOTOR_DRIVER_PARAM_PWM_MODE
 /** Default PWM mode */
@@ -131,14 +131,14 @@ extern "C" {
                 .pwm_channel            = MOTOR_DRIVER_PARAM_MOTOR1_PWM_CHANNEL, \
                 .gpio_enable            = MOTOR_DRIVER_PARAM_MOTOR1_GPIO_ENABLE, \
                 .gpio_dir0              = MOTOR_DRIVER_PARAM_MOTOR1_GPIO_DIR0, \
-                .gpio_dir1_or_brake     = MOTOR_DRIVER_PARAM_MOTOR1_GPIO_DIR1_OR_BRAKE, \
+                .gpio_dir1              = MOTOR_DRIVER_PARAM_MOTOR1_GPIO_DIR1_OR_BRAKE, \
                 .gpio_dir_reverse       = MOTOR_DRIVER_PARAM_MOTOR1_GPIO_DIR_REVERSE, \
             }, \
             { \
                 .pwm_channel            = MOTOR_DRIVER_PARAM_MOTOR2_PWM_CHANNEL, \
                 .gpio_enable            = MOTOR_DRIVER_PARAM_MOTOR2_GPIO_ENABLE, \
                 .gpio_dir0              = MOTOR_DRIVER_PARAM_MOTOR2_GPIO_DIR0, \
-                .gpio_dir1_or_brake     = MOTOR_DRIVER_PARAM_MOTOR2_GPIO_DIR1_OR_BRAKE, \
+                .gpio_dir1              = MOTOR_DRIVER_PARAM_MOTOR2_GPIO_DIR1_OR_BRAKE, \
                 .gpio_dir_reverse       = MOTOR_DRIVER_PARAM_MOTOR2_GPIO_DIR_REVERSE, \
             } \
         }, \

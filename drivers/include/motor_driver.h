@@ -133,8 +133,11 @@ typedef enum {
 typedef struct {
     int pwm_channel;            /**< PWM channel the motor is connected to */
     gpio_t gpio_enable;         /**< GPIO to enable/disable motor */
-    gpio_t gpio_dir0;           /**< GPIO to control rotation direction */
-    gpio_t gpio_dir1_or_brake;  /**< GPIO to control rotation direction */
+    gpio_t gpio_dir0;           /**< GPIO to control direction */
+    union {
+        gpio_t gpio_dir1;       /**< GPIO to control direction */
+        gpio_t gpio_brake;      /**< GPIO to control brake */
+    };
     bool gpio_dir_reverse;      /**< flag to reverse direction */
 } motor_t;
 
@@ -183,8 +186,6 @@ typedef struct {
  */
 struct _motor_driver_t {
     const motor_driver_params_t *params;        /**< parameters */
-    motor_set_cb_t motor_set_cb;                /**< callback used by motor_set() to set direction */
-    motor_brake_cb_t motor_brake_cb;            /**< callback used by motor_brake() */
 };
 
 /**
