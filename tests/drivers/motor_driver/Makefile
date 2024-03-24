@@ -6,7 +6,8 @@ include ../Makefile.drivers_common
 
 USEMODULE += motor_driver
 USEMODULE += shell_cmds_default
-USEMODULE += xtimer
+USEMODULE += ztimer
+USEMODULE += ztimer_sec
 
 CFLAGS += -DLOG_LEVEL=LOG_DEBUG
 CFLAGS += -DDEBUG_ASSERT_VERBOSE
