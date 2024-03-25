@@ -119,7 +119,7 @@ static int send_lines(int argc, char **argv)
 
     ssize_t len;
     if ((len = at_send_cmd_get_lines(&at_dev, argv[1], resp, sizeof(resp),
-                                         true, 10 * US_PER_SEC)) < 0) {
+                                         10 * US_PER_SEC)) < 0) {
         puts("Error");
         return 1;
     }
@@ -378,7 +378,7 @@ static int emulate_dce(int argc, char **argv)
     }
 
     res = at_send_cmd_get_lines(&at_dev, "AT+GETTWOLINES", resp_buf,
-                                sizeof(resp_buf), false, US_PER_SEC);
+                                sizeof(resp_buf), US_PER_SEC);
     if (res < 0) {
         printf("%u: Error AT+GETTWOLINES: %d\n", __LINE__, res);
         res = 1;
