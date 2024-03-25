@@ -18,11 +18,9 @@
  * @}
  */
 
-#include <string.h>
 #include <assert.h>
 
 #include "hashes/sha512.h"
-#include "hashes/sha512_common.h"
 
 /* SHA-512 initialization.  Begins a SHA-512 operation. */
 void sha512_init(sha512_context_t *ctx)
@@ -44,6 +42,7 @@ void sha512_init(sha512_context_t *ctx)
 void sha512(const void *data, size_t len, void *digest)
 {
     sha512_context_t c;
+    assert(digest);
 
     sha512_init(&c);
     sha512_update(&c, data, len);

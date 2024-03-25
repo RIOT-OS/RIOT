@@ -18,11 +18,9 @@
  * @}
  */
 
-#include <string.h>
 #include <assert.h>
 
 #include "hashes/sha224.h"
-#include "hashes/sha2xx_common.h"
 
 /* SHA-224 initialization.  Begins a SHA-224 operation. */
 void sha224_init(sha224_context_t *ctx)

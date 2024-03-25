@@ -80,14 +80,14 @@ static const unsigned char hlong_sequence[] =
 
 static int calc_and_compare_hash(const char *str, const unsigned char *expected)
 {
-    static unsigned char hash[28];
+    static unsigned char hash[SHA224_DIGEST_LENGTH];
     sha224_context_t sha224;
 
     sha224_init(&sha224);
     sha224_update(&sha224, (uint8_t*)str, strlen(str));
     sha224_final(&sha224, hash);
 
-    return (memcmp(expected, hash, 28) == 0);
+    return (memcmp(expected, hash, SHA224_DIGEST_LENGTH) == 0);
 }
 
 static int calc_and_compare_hash_wrapper(const char *str, const unsigned char *expected)
@@ -120,7 +120,7 @@ static void test_hashes_sha224_hash_sequence_abc_long(void)
     TEST_ASSERT(calc_and_compare_hash_wrapper(teststring, h_abc_long));
 }
 
-static void test_hashes_sha256_hash_long_sequence(void)
+static void test_hashes_sha224_hash_long_sequence(void)
 {
     static const char *teststring =
         {"RIOT is an open-source microkernel-based operating system, designed"
@@ -139,7 +139,7 @@ Test *tests_hashes_sha224_tests(void)
         new_TestFixture(test_hashes_sha224_hash_sequence_empty),
         new_TestFixture(test_hashes_sha224_hash_sequence_abc),
         new_TestFixture(test_hashes_sha224_hash_sequence_abc_long),
-        new_TestFixture(test_hashes_sha256_hash_long_sequence),
+        new_TestFixture(test_hashes_sha224_hash_long_sequence),
     };
 
     EMB_UNIT_TESTCALLER(hashes_sha224_tests, NULL, NULL,
