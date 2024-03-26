@@ -24,6 +24,7 @@
 
 #include "eagle_soc.h"
 #include "cpu_conf.h"
+#include "macros/units.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -263,6 +264,19 @@ typedef struct {
 typedef enum {
     HSPI = 1,         /**< HSPI interface controller */
 } spi_ctrl_t;
+
+/**
+ * @brief   Override SPI clock speed values
+ * @{
+ */
+#define HAVE_SPI_CLK_T
+typedef enum {
+    SPI_CLK_100KHZ = KHZ(100), /**< drive the SPI bus with 100KHz */
+    SPI_CLK_400KHZ = KHZ(400), /**< drive the SPI bus with 400KHz */
+    SPI_CLK_1MHZ   = MHZ(1),   /**< drive the SPI bus with 1MHz */
+    SPI_CLK_5MHZ   = MHZ(5),   /**< drive the SPI bus with 5MHz */
+    SPI_CLK_10MHZ  = MHZ(10),  /**< drive the SPI bus with 10MHz */
+} spi_clk_t;
 
 /**
  * @brief   SPI configuration structure type
