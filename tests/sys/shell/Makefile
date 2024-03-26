@@ -4,6 +4,7 @@ include ../Makefile.sys_common
 USEMODULE += app_metadata
 USEMODULE += shell_cmds_default
 USEMODULE += ps
+USEMODULE += ztimer_msec
 
 # Use a terminal that does not introduce extra characters into the stream.
 RIOT_TERMINAL ?= socat
@@ -12,6 +13,9 @@ APP_SHELL_FMT ?= NONE
 
 # microbit qemu failing currently
 TEST_ON_CI_BLACKLIST += microbit
+
+# requires #19005
+TEST_ON_CI_BLACKLIST += native native64
 
 include $(RIOTBASE)/Makefile.include
 
