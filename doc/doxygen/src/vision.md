@@ -1,5 +1,7 @@
 # RIOT Vision     {#vision}
 
+![RIOT Vision: From proprietary manufacturer silos to a truly open cyber-physical system](vision.svg)
+
 We expect an evolution in the software platforms powering Internet of Things
 devices that can be compared, to some extent, to the recent evolution of
 software platforms powering smartphones.
