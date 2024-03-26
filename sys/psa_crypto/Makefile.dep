@@ -1,6 +1,6 @@
 ifneq (,$(filter psa_crypto,$(USEMODULE)))
   USEMODULE += random
-  USEMODULE += prng_musl_lcg
+  USEMODULE += prng_sha256prng
 endif
 
 # Asymmetric
