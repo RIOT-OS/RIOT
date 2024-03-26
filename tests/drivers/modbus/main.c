@@ -190,8 +190,6 @@ static void test_write_multiple_holding_registers(uint8_t id, uint16_t addr, uin
         printf("Failed, send result is %u\n", res);
     }
     else {
-        ztimer_sleep(ZTIMER_USEC, master.rx_timeout * 3);
-
         if (loopback && (
                 message_master.func != message_slave.func ||
                 message_master.addr != message_slave.addr ||
@@ -220,8 +218,6 @@ static void test_write_multiple_holding_registers(uint8_t id, uint16_t addr, uin
             printf("Failed, send result is %u\n", res);
         }
         else {
-            ztimer_sleep(ZTIMER_USEC, master.rx_timeout * 3);
-
             if (loopback && (
                     message_master.func != message_slave.func ||
                     message_master.addr != message_slave.addr ||
@@ -261,8 +257,6 @@ static void test_write_single_holding_register(uint8_t id, uint16_t addr)
         printf("Failed, send result is %u\n", res);
     }
     else {
-        ztimer_sleep(ZTIMER_USEC, master.rx_timeout * 3);
-
         if (loopback && (
                 message_master.func != message_slave.func ||
                 message_master.addr != message_slave.addr ||
@@ -291,8 +285,6 @@ static void test_write_single_holding_register(uint8_t id, uint16_t addr)
             printf("Failed, send result is %u\n", res);
         }
         else {
-            ztimer_sleep(ZTIMER_USEC, master.rx_timeout * 3);
-
             if (loopback && (
                     message_master.func != message_slave.func ||
                     message_master.addr != message_slave.addr)) {
@@ -329,8 +321,6 @@ static void test_read_discrete_inputs(uint8_t id, uint16_t addr, uint16_t count)
         printf("Failed, send result is %u\n", res);
     }
     else {
-        ztimer_sleep(ZTIMER_USEC, master.rx_timeout * 3);
-
         if (loopback && (
                 message_master.func != message_slave.func ||
                 message_master.addr != message_slave.addr ||
@@ -368,8 +358,6 @@ static void test_read_input_registers(uint8_t id, uint16_t addr, uint16_t count)
         printf("Failed, send result is %u\n", res);
     }
     else {
-        ztimer_sleep(ZTIMER_USEC, master.rx_timeout * 3);
-
         if (loopback && (
                 message_master.func != message_slave.func ||
                 message_master.addr != message_slave.addr ||
@@ -408,8 +396,6 @@ static void test_write_multiple_coils(uint8_t id, uint16_t addr, uint16_t count)
         printf("Failed, send result is %u\n", res);
     }
     else {
-        ztimer_sleep(ZTIMER_USEC, master.rx_timeout * 3);
-
         if (loopback && (
                 message_master.func != message_slave.func ||
                 message_master.addr != message_slave.addr ||
@@ -438,8 +424,6 @@ static void test_write_multiple_coils(uint8_t id, uint16_t addr, uint16_t count)
             printf("Failed, send result is %u\n", res);
         }
         else {
-            ztimer_sleep(ZTIMER_USEC, master.rx_timeout * 3);
-
             if (loopback && (
                     message_master.func != message_slave.func ||
                     message_master.addr != message_slave.addr ||
@@ -483,8 +467,6 @@ static void test_write_single_coil(uint8_t id, uint16_t addr)
         printf("Failed, send result is %u\n", res);
     }
     else {
-        ztimer_sleep(ZTIMER_USEC, master.rx_timeout * 3);
-
         if (loopback && (
                 message_master.func != message_slave.func ||
                 message_master.addr != message_slave.addr ||
@@ -513,8 +495,6 @@ static void test_write_single_coil(uint8_t id, uint16_t addr)
             printf("Failed, send result is %u\n", res);
         }
         else {
-            ztimer_sleep(ZTIMER_USEC, master.rx_timeout * 3);
-
             if (loopback && (
                     message_master.func != message_slave.func ||
                     message_master.addr != message_slave.addr ||
@@ -590,12 +570,11 @@ static void *thread_master(void *arg)
 {
     (void)arg;
 
-    master.timeout = 1000000;
-
-    params_master.baudrate = TEST_BAUDRATE;
     params_master.pin_rts = TEST_MASTER_PIN_RTS;
     params_master.pin_rts_enable = 1;
     params_master.uart = UART_DEV(TEST_MASTER_UART);
+    params_master.baudrate = TEST_BAUDRATE;
+    params_master.response_timeout = 1000 * US_PER_MS;
 
     /* initialize the driver */
     puts("Initializing driver...");
@@ -634,7 +613,7 @@ static void *thread_master(void *arg)
         test_err_exception(id, addr, count);
 
         /* sleep a little */
-        //ztimer_sleep(ZTIMER_MSEC, 1 * MS_PER_SEC);
+        ztimer_sleep(ZTIMER_MSEC, 1 * MS_PER_SEC);
     }
 
     return NULL;
