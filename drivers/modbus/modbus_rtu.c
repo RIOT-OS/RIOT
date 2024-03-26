@@ -135,7 +135,7 @@ static int receive(modbus_rtu_t *modbus, uint8_t expected_size)
     msg_t msg;
 
     while (modbus->buffer_size < expected_size) {
-        if (ztimer_msg_receive_timeout(ZTIMER_USEC, &msg, modbus->rx_timeout) < 0) {
+        if (ztimer_msg_receive_timeout(ZTIMER_USEC, &msg, modbus->byte_timeout) < 0) {
             return -1;
         }
     }
@@ -248,7 +248,7 @@ static int read_response(modbus_rtu_t *modbus, modbus_message_t *message)
     modbus->pid = thread_getpid();
 
     /* wait for answer */
-    if (ztimer_msg_receive_timeout(ZTIMER_USEC, &msg, modbus->timeout) < 0) {
+    if (ztimer_msg_receive_timeout(ZTIMER_USEC, &msg, modbus->params->response_timeout) < 0) {
         return MODBUS_ERR_TIMEOUT;
     }
 
@@ -595,7 +595,7 @@ int modbus_rtu_init(modbus_rtu_t *modbus, const modbus_rtu_params_t *params)
     mutex_init(&(modbus->buffer_mutex));
 
     /* usec in sec / byte per second * 1.5 */
-    modbus->rx_timeout = US_PER_SEC / (params->baudrate / 10) * 1.5;
+    modbus->byte_timeout = US_PER_SEC / (params->baudrate / 10) * 1.5;
 
     /* initialize GPIO */
     if (gpio_is_valid(modbus->params->pin_rts)) {

@@ -49,20 +49,22 @@ extern "C" {
  * @brief   Modbus RTU device parameters
  */
 typedef struct {
-    gpio_t pin_rts;         /**< RTS pin, @p GPIO_UNDEF if not used */
-    int pin_rts_enable;     /**< RTS pin state when transmitting */
-    uart_t uart;            /**< UART device */
-    uint32_t baudrate;      /**< UART Baudrate */
+    gpio_t pin_rts;             /**< RTS pin, @p GPIO_UNDEF if not used */
+    int pin_rts_enable;         /**< RTS pin state when transmitting */
+    uart_t uart;                /**< UART device */
+    uint32_t baudrate;          /**< UART baudrate */
+    uint32_t response_timeout;  /**< timeout (in usec) when waiting for a response */
 } modbus_rtu_params_t;
 
 /**
  * @brief   Modbus RTU device structure
+ *
+ * These fields are internal to the implementation, and should not be used
+ * directly.
  */
 typedef struct {
     const modbus_rtu_params_t *params;          /**< device parameters */
-    uint32_t timeout;                           /**< amount of time (usec) to wait for a slave to
-                                                     begin sending */
-    uint32_t rx_timeout;                        /**< timeout between two bytes */
+    uint32_t byte_timeout;                      /**< timeout (in usec) between two bytes */
     kernel_pid_t pid;                           /**< PID of the thread that waits for bytes */
     uint8_t buffer[MODBUS_RTU_PACKET_SIZE_MAX]; /**< buffer for requests and responses */
     uint8_t buffer_size;                        /**< current size of @p buffer, in bytes */
