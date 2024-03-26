@@ -1,6 +1,0 @@
-# this file enables modules defined in Kconfig. Do not use this file for
-# application configuration. This is only needed during migration.
-# enable event thread in lowest priority
-CONFIG_MODULE_EVENT=y
-CONFIG_MODULE_EVENT_CALLBACK=y
-CONFIG_MODULE_EVENT_TIMEOUT=y
