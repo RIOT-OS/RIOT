@@ -38,6 +38,7 @@ PSEUDOMODULES += arduino_serial_stdio
 PSEUDOMODULES += can_mbox
 PSEUDOMODULES += can_pm
 PSEUDOMODULES += can_raw
+PSEUDOMODULES += can_rx_mailbox
 PSEUDOMODULES += ccn-lite-utils
 PSEUDOMODULES += cc2538_rf_obs_sig
 PSEUDOMODULES += conn_can_isotp_multi

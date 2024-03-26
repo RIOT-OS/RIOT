@@ -43,6 +43,7 @@ FEATURES_EXISTING := \
     ble_phy_2mbit \
     ble_phy_coded \
     bootloader_stm32 \
+    can_rx_mailbox \
     cortexm_fpu \
     cortexm_mpu \
     cortexm_svc \
