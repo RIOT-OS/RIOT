@@ -13,28 +13,6 @@ config BOARD_P_NUCLEO_WB55
     default y
     select CPU_MODEL_STM32WB55RG
 
-    # Put defined MCU peripherals here (in alphabetical order)
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_LPUART
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-    select HAS_PERIPH_USBDEV
-    select MODULE_PERIPH_LPUART if MODULE_STDIO_UART && HAS_PERIPH_LPUART
-
-    # Put other features for this board (in alphabetical order)
-    select HAS_ARDUINO_ANALOG
-    select HAS_ARDUINO_I2C
-    select HAS_ARDUINO_PINS
-    select HAS_ARDUINO_SHIELD_UNO
-    select HAS_ARDUINO_SPI
-    select HAS_ARDUINO_UART
-    select HAS_RIOTBOOT
-    select HAS_TINYUSB_DEVICE
-
     # Clock configuration
     select BOARD_HAS_HSE
     select BOARD_HAS_LSE

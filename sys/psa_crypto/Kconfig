@@ -5,20 +5,10 @@
 # directory for more details.
 #
 
-menuconfig MODULE_PSA_CRYPTO
-    bool "PSA Crypto"
-    depends on TEST_KCONFIG
-    select MODULE_RANDOM
+if USEMODULE_PSA_CRYPTO
 
-if MODULE_PSA_CRYPTO
-
-rsource "Kconfig.asymmetric"
-rsource "Kconfig.ciphers"
-rsource "Kconfig.hashes"
-rsource "Kconfig.mac"
 rsource "Kconfig.keys"
 
 rsource "psa_se_mgmt/Kconfig"
-rsource "psa_key_slot_mgmt/Kconfig"
 
-endif # MODULE_PSA_CRYPTO
+endif # USEMODULE_PSA_CRYPTO

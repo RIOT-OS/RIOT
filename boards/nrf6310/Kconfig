@@ -12,7 +12,5 @@ config BOARD_NRF6310
     default y
     select BOARD_COMMON_NRF51
     select CPU_MODEL_NRF51X22XXAA
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_UART
 
 source "$(RIOTBOARD)/common/nrf51/Kconfig"

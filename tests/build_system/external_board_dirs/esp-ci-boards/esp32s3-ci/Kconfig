@@ -13,29 +13,5 @@ config BOARD_ESP32S3_CI
     default y
     select BOARD_COMMON_ESP32S3
     select CPU_MODEL_ESP32S3_WROOM_1X_N8R8
-    select HAS_ARDUINO_PINS
-    select HAS_ESP_JTAG
-    select HAS_ESP_RTC_TIMER_32K
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_SPI
-
-    select MODULE_BOARD_ESP32S3-CI
-
-config MODULE_BOARD_ESP32S3-CI
-    bool
-
-if TEST_KCONFIG
-
-choice ESP32_I2C_IMPLEMENTATION
-    default MODULE_ESP_I2C_HW
-endchoice
-
-config MODULE_ESP_HW_COUNTER
-    default y
-    depends on MODULE_PERIPH_TIMER
-
-endif # TEST_KCONFIG
 
 source "$(RIOTBOARD)/common/esp32s3/Kconfig"

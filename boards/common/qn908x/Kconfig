@@ -7,11 +7,4 @@
 config BOARD_COMMON_QN908X
     bool
     depends on CPU_FAM_QN908X
-    select MODULE_BOARD_COMMON_QN908X if TEST_KCONFIG
     # Add common board support here.
-
-config MODULE_BOARDS_COMMON_QN908X
-    bool
-    depends on TEST_KCONFIG
-    help
-      Common code for qn908x boards.

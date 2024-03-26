@@ -12,15 +12,5 @@ config BOARD_ESP32_OLIMEX_EVB
     default y
     select BOARD_COMMON_ESP32
     select CPU_MODEL_ESP32_WROOM_32
-    select HAS_ARDUINO_PINS
-    select HAS_ESP_ETH
-    select HAS_PERIPH_ADC if USEMODULE_OLIMEX_ESP32_GATEWAY
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_SDMMC
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_CAN
-
-    select HAVE_MTD_SDMMC_DEFAULT
 
 source "$(RIOTBOARD)/common/esp32/Kconfig"

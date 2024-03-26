@@ -13,7 +13,4 @@ config BOARD_SODAQ_SARA_AFF
     select BOARD_COMMON_SODAQ
     select CPU_MODEL_SAMD21J18A
 
-config MODULE_PERIPH_INIT_LED0
-    default n if MODULE_PERIPH_SPI
-
 source "$(RIOTBOARD)/common/sodaq/Kconfig"

@@ -6,4 +6,3 @@
 #
 config USEPKG_SEMTECH_LORAMAC
     bool
-    select HAVE_LORAWAN

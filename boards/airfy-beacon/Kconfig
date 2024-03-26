@@ -12,10 +12,5 @@ config BOARD_AIRFY_BEACON
     default y
     select BOARD_COMMON_NRF51
     select CPU_MODEL_NRF51X22XXAA
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_UART
-    select MODULE_BOARDS_COMMON_NRF51 if TEST_KCONFIG
 
 source "$(RIOTBOARD)/common/nrf51/Kconfig"

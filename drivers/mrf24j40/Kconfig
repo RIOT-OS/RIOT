@@ -5,119 +5,11 @@
 # directory for more details.
 #
 
-menuconfig MODULE_MRF24J40
-    bool
-    prompt "MRF24J40 radio" if !(MODULE_NETDEV_DEFAULT && HAVE_MRF24J40)
-    default (MODULE_NETDEV_DEFAULT && HAVE_MRF24J40)
-    depends on TEST_KCONFIG
-    depends on HAS_PERIPH_GPIO
-    depends on HAS_PERIPH_GPIO_IRQ
-    depends on HAS_PERIPH_SPI
-    select MODULE_PERIPH_GPIO
-    select MODULE_PERIPH_GPIO_IRQ
-    select MODULE_PERIPH_SPI
-    select MODULE_IEEE802154
-    select MODULE_ZTIMER_USEC
-    select HAVE_BHP_IRQ_HANDLER
-    select HAVE_IEEE802154_RADIO_HAL_INTERFACE
-    select MRF24J40_OQPSK if MODULE_NETDEV
-
-if MODULE_MRF24J40
-
-choice MRF24J40_VARIANT
-    bool "Variant"
-    default MODULE_MRF24J40MA if HAVE_MRF24J40MA
-    default MODULE_MRF24J40MB if HAVE_MRF24J40MB
-    default MODULE_MRF24J40MC if HAVE_MRF24J40MC
-    default MODULE_MRF24J40MD if HAVE_MRF24J40MD
-    default MODULE_MRF24J40ME if HAVE_MRF24J40ME
-
-# the generic module matches this variant
-config MRF24J40
-    bool "MRF24J40"
-
-config MODULE_MRF24J40MA
-    bool "MRF24J40MA"
-
-config MODULE_MRF24J40MB
-    bool "MRF24J40MB"
-
-config MODULE_MRF24J40MC
-    bool "MRF24J40MC"
-
-config MODULE_MRF24J40MD
-    bool "MRF24J40MD"
-
-config MODULE_MRF24J40ME
-    bool "MRF24J40ME"
-
-endchoice
+menu "MRF24J40 driver"
+    depends on USEMODULE_MRF24J40
 
 config MRF24J40_OQPSK
     bool "OQPSK support"
-    default y if !MRF24J40
-    select MODULE_NETDEV_IEEE802154_OQPSK
-
-config MRF24J40_USE_EXT_PA_LNA
-    bool "Enable external PA/LNA control"
-    default y
-    depends on !MODULE_MRF24J40MA
-    help
-        Increase RSSI for MRF24J40MC/MD/ME devices. No effect on MRF24J40MA.
-        For more information, please refer to section 4.2 of MRF24J40 datasheet.
-
-config MRF24J40_TEST_SPI_CONNECTION
-    bool "Enable basic self-test on init"
-    help
-        Perform a write / read to a known register on startup to detect if the
-        device is connected. Enable this if you want the boot not to hang if the
-        device is not connected / there are SPI errors.
-
-endif # MODULE_MRF24J40
-
-config HAVE_MRF24J40
-    bool
-    help
-        Indicates that a MRF24J40 radio is present.
-
-config HAVE_MRF24J40MA
-    bool
-    select HAVE_MRF24J40
-    help
-        Indicates that a MRF24J40MA radio is present.
-
-config HAVE_MRF24J40MB
-    bool
-    select HAVE_MRF24J40
-    help
-        Indicates that a MRF24J40MB radio is present.
-
-config HAVE_MRF24J40MC
-    bool
-    select HAVE_MRF24J40
-    help
-        Indicates that a MRF24J40MC radio is present.
-
-config HAVE_MRF24J40MD
-    bool
-    select HAVE_MRF24J40
-    help
-        Indicates that a MRF24J40MD radio is present.
-
-config HAVE_MRF24J40ME
-    bool
-    select HAVE_MRF24J40
-    help
-        Indicates that a MRF24J40ME radio is present.
-
-
-menuconfig KCONFIG_USEMODULE_MRF24J40
-    bool "Configure MRF24J40 driver"
-    depends on USEMODULE_MRF24J40
-    help
-        Configure the MRF24J40 driver using Kconfig.
-
-if KCONFIG_USEMODULE_MRF24J40
 
 config MRF24J40_USE_EXT_PA_LNA
     bool "Enable external PA/LNA control"
@@ -134,4 +26,4 @@ config MRF24J40_TEST_SPI_CONNECTION
         device is connected. Enable this if you want the boot not to hang if the
         device is not connected / there are SPI errors.
 
-endif # KCONFIG_USEMODULE_MRF24J40
+endmenu # MRF24J40 driver

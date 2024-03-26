@@ -6,25 +6,8 @@
 # directory for more details.
 #
 
-config MODULE_ISL29020
-    bool "ISL29020 light sensor"
-    depends on HAS_PERIPH_I2C
-    depends on TEST_KCONFIG
-    select MODULE_PERIPH_I2C
-
-config HAVE_ISL29020
-    bool
-    select MODULE_ISL29020 if MODULE_SAUL_DEFAULT
-    help
-        Indicates that a isl29020 sensor is present.
-
-menuconfig KCONFIG_USEMODULE_ISL29020
-    bool "Configure ISL29020 driver"
+menu "ISL29020 driver"
     depends on USEMODULE_ISL29020
-    help
-        Configure the ISL29020 driver using Kconfig.
-
-if KCONFIG_USEMODULE_ISL29020
 
 config ISL29020_DEFAULT_ADDRESS
     hex "Default I2C address"
@@ -35,4 +18,4 @@ config ISL29020_DEFAULT_ADDRESS
         corresponds to A0 connected to GND. For more information refer to the
         section 'I2C Interface' in the datasheet.
 
-endif # KCONFIG_USEMODULE_ISL29020
+endmenu # ISL29020 driver

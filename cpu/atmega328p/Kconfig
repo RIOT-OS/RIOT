@@ -8,20 +8,11 @@
 config CPU_FAM_ATMEGA328
     bool
     select CPU_COMMON_ATMEGA
-    select HAS_ATMEGA_PCINT1
-    select HAS_ATMEGA_PCINT2
 
 ## CPU Models
 config CPU_MODEL_ATMEGA328P
     bool
     select CPU_FAM_ATMEGA328
-    select HAS_CPU_ATMEGA328P
-
-## Definition of specific features
-config HAS_CPU_ATMEGA328P
-    bool
-    help
-        Indicates that a 'atmega328p' cpu is being used.
 
 ## Common CPU symbols
 config CPU_FAM

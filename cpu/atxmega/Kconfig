@@ -6,26 +6,12 @@
 # directory for more details.
 #
 
-config HAS_CPU_CORE_ATXMEGA
-    bool
-    select CPU_ARCH_AVR8
-    select HAS_CPU_ATXMEGA
-    select HAS_CPP
-
 config CPU_COMMON_ATXMEGA
     bool
-    select HAS_CPU_CORE_ATXMEGA
-    select HAS_PERIPH_CPUID
-    select HAS_PERIPH_GPIO
-    select HAS_PERIPH_GPIO_IRQ
-    select HAS_PERIPH_NVM
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_TIMER_PERIODIC
 
 config CPU_CORE_ATXMEGA_A1
     bool
     select CPU_COMMON_ATXMEGA
-    select HAS_ATXMEGA_EBI
 
 config CPU_CORE_ATXMEGA_A3
     bool
@@ -72,15 +58,4 @@ source "$(RIOTCPU)/atxmega/Kconfig.XMEGAC"
 source "$(RIOTCPU)/atxmega/Kconfig.XMEGAD"
 source "$(RIOTCPU)/atxmega/Kconfig.XMEGAE"
 
-## Declaration of specific features
-config HAS_CPU_ATXMEGA
-    bool
-
-config HAS_PERIPH_NVM
-    bool
-    help
-        Indicates that the Non Volatile Memory controller is present.
-
-rsource "ebi/Kconfig"
-rsource "periph/Kconfig"
 source "$(RIOTCPU)/avr8_common/Kconfig"

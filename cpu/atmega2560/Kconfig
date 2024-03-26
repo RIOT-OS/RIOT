@@ -12,15 +12,6 @@ config CPU_FAM_ATMEGA256
 config CPU_MODEL_ATMEGA2560
     bool
     select CPU_FAM_ATMEGA256
-    select HAS_ATMEGA_PCINT1
-    select HAS_ATMEGA_PCINT2
-    select HAS_CPU_ATMEGA2560
-
-## Definition of specific features
-config HAS_CPU_ATMEGA2560
-    bool
-    help
-        Indicates that a 'atmega2560' cpu is being used.
 
 ## Common CPU symbols
 config CPU_FAM

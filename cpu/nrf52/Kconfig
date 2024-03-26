@@ -7,19 +7,6 @@
 config CPU_FAM_NRF52
     bool
     select CPU_COMMON_NRF5X
-# The ADC does not depend on any board configuration, so always available
-    select HAS_PERIPH_ADC
-    select HAS_BLE_ADV_EXT
-# So far, NimBLE netif does not support nrf51 platforms, so we use a dedicated
-# feature to mark this
-    select HAS_BLE_NIMBLE_NETIF
-# All nrf52s support the 2Mbit PHY mode
-    select HAS_BLE_PHY_2MBIT
-    select HAS_CORTEXM_MPU
-    select HAS_CPU_NRF52
-    select HAS_PERIPH_I2C_RECONFIGURE
-    select HAS_PERIPH_SPI_GPIO_MODE
-    select HAS_PERIPH_UART_NONBLOCKING
 
 ## CPU Models
 config CPU_MODEL_NRF52805XXAA
@@ -36,15 +23,11 @@ config CPU_MODEL_NRF52811XXAA
     bool
     select CPU_CORE_CORTEX_M4
     select CPU_FAM_NRF52
-    select HAS_BLE_PHY_CODED
-    select HAS_RADIO_NRF802154
 
 config CPU_MODEL_NRF52820XXAA
     bool
     select CPU_CORE_CORTEX_M4
     select CPU_FAM_NRF52
-    select HAS_BLE_PHY_CODED
-    select HAS_RADIO_NRF802154
 
 config CPU_MODEL_NRF52832XXAA
     bool
@@ -55,25 +38,11 @@ config CPU_MODEL_NRF52833XXAA
     bool
     select CPU_CORE_CORTEX_M4F
     select CPU_FAM_NRF52
-    select HAS_BLE_PHY_CODED
-    select HAS_RADIO_NRF802154
 
 config CPU_MODEL_NRF52840XXAA
     bool
     select CPU_CORE_CORTEX_M4F
     select CPU_FAM_NRF52
-    select HAS_BLE_PHY_CODED
-    select HAS_RADIO_NRF802154
-    select HAS_PERIPH_HASH_SHA_1
-    select HAS_PERIPH_HASH_SHA_224
-    select HAS_PERIPH_HASH_SHA_256
-    select HAS_PERIPH_HASH_SHA_512
-    select HAS_PERIPH_HMAC_SHA_256
-    select HAS_PERIPH_CIPHER_AES_128_CBC
-    select HAS_PERIPH_ECC_P192R1
-    select HAS_PERIPH_ECC_P256R1
-    select HAS_PERIPH_ECC_ED25519
-    select HAS_PERIPH_CRYPTOCELL_310
 
 ## CPU common symbols
 config CPU_FAM
@@ -90,14 +59,5 @@ config CPU_MODEL
 
 config CPU
     default "nrf52" if CPU_FAM_NRF52
-
-## Definition of specific features
-config HAS_CPU_NRF52
-    bool
-    help
-        Indicates that the current cpu is 'nrf52'.
-
-rsource "periph/Kconfig"
-rsource "vectors/Kconfig"
 
 source "$(RIOTCPU)/nrf5x_common/Kconfig"

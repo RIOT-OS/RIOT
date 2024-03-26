@@ -5,19 +5,7 @@
 # directory for more details.
 #
 
-menuconfig PACKAGE_LIBFIXMATH
-    bool "Fixed Point Math package"
-    depends on TEST_KCONFIG
-
-if PACKAGE_LIBFIXMATH
-
-config MODULE_LIBFIXMATH
-    bool "Fixed Point Math module"
-
-config MODULE_LIBFIXMATH_UNITTESTS
-    bool "Fixed Point Math unittests"
-    depends on !HAS_ARCH_8BIT
-    depends on !HAS_MSP430
+if USEPKG_LIBFIXMATH
 
 menu "Accuracy"
 
@@ -79,4 +67,4 @@ config FIXMATH_FAST_SIN
 
 endmenu
 
-endif # PACKAGE_LIBFIXMATH
+endif # USEPKG_LIBFIXMATH

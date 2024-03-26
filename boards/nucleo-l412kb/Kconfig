@@ -14,18 +14,4 @@ config BOARD_NUCLEO_L412KB
     select BOARD_COMMON_NUCLEO32
     select CPU_MODEL_STM32L412KB
 
-    # Put defined MCU peripherals here (in alphabetical order)
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-
-    # Put other features for this board (in alphabetical order)
-    # Note that a recent version of OpenOCD with a slightly patched code is required
-    # for flashing this board. Refer to the following PR for more info:
-    # https://github.com/RIOT-OS/RIOT/pull/12144#issuecomment-527090161
-    select HAS_RIOTBOOT
-
 source "$(RIOTBOARD)/common/nucleo32/Kconfig"

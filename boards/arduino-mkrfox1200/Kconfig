@@ -11,6 +11,5 @@ config BOARD_ARDUINO_MKRFOX1200
     bool
     default y
     select BOARD_COMMON_ARDUINO_MKR
-    select MODULE_BOARDS_COMMON_ARDUINO-MKR if TEST_KCONFIG
 
 source "$(RIOTBOARD)/common/arduino-mkr/Kconfig"

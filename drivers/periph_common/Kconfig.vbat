@@ -5,35 +5,14 @@
 # directory for more details.
 #
 
-menuconfig MODULE_PERIPH_VBAT
-    bool "Backup Battery monitoring driver"
-    depends on HAS_PERIPH_VBAT
-    depends on HAS_PERIPH_ADC
-    depends on TEST_KCONFIG
-    select MODULE_PERIPH_ADC
-
-if MODULE_PERIPH_VBAT
-
-config MODULE_PERIPH_INIT_VBAT
-    bool "Auto initialize VBAT ADC line"
-    default y if MODULE_PERIPH_INIT
-
-config VBAT_ADC_VREF_MV
-    int "ADC reference voltage in mV"
-    default 3300
-
-endif # MODULE_PERIPH_VBAT
-
-menuconfig KCONFIG_USEMODULE_PERIPH_VBAT
-    bool "Configure backup battery monitoring peripheral driver"
+menu "PERIPH_VBAT backup battery monitoring peripheral driver"
     depends on USEMODULE_PERIPH_VBAT
-    help
-        Configure backup battery monitoring peripheral driver using Kconfig.
 
 config VBAT_ADC_VREF_MV
     int "ADC reference voltage in mV"
     default 3300
-    depends on KCONFIG_USEMODULE_PERIPH_VBAT
     help
         This is the reference voltage (VREF) of the ADC.
         Often VREF is connected with VDDA, which is equal to VDD.
+
+endmenu # PERIPH_VBAT backup battery monitoring peripheral driver

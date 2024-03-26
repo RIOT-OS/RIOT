@@ -13,10 +13,4 @@ config BOARD_IOTLAB_M3
     default y
     select BOARD_COMMON_IOTLAB
 
-    select HAS_PERIPH_DMA
-    select HAVE_MTD_SPI_NOR
-    select HAVE_LPS331AP
-    select HAVE_ISL29020
-    select MODULE_BOARDS_COMMON_IOTLAB if TEST_KCONFIG
-
 source "$(RIOTBOARD)/common/iotlab/Kconfig"

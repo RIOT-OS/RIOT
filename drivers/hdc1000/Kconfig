@@ -5,26 +5,8 @@
 # directory for more details.
 #
 
-config MODULE_HDC1000
-    bool "HDC1000 Humidity and Temperature Sensor"
-    depends on HAS_PERIPH_I2C
-    depends on TEST_KCONFIG
-    select MODULE_PERIPH_I2C
-    select MODULE_XTIMER
-
-config HAVE_HDC1000
-    bool
-    select MODULE_HDC1000 if MODULE_SAUL_DEFAULT
-    help
-        Indicates that a HDC1000 humidity and temperature sensor is present.
-
-menuconfig KCONFIG_USEMODULE_HDC1000
-    bool "Configure HDC1000 driver"
+menu "HDC1000 driver"
     depends on USEMODULE_HDC1000
-    help
-        Configure the HDC1000 driver using Kconfig.
-
-if KCONFIG_USEMODULE_HDC1000
 
 config HDC1000_I2C_ADDRESS
     hex "I2C default address"
@@ -43,4 +25,4 @@ config HDC1000_CONVERSION_TIME
         conversions (worst case) to allow for timer imprecision:
         (convert temp + convert hum) * 2 -> (6.5ms + 6.5ms) * 2 := 26ms.
 
-endif # KCONFIG_USEMODULE_HDC1000
+endmenu # HDC1000 driver

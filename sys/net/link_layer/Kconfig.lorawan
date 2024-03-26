@@ -1,22 +1,5 @@
-# Copyright (c) 2020 Freie Universitaet Berlin
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
-#
-config HAVE_LORAWAN
-    bool
-    help
-        Indicates that LoRaWAN support is present.
-
-menuconfig KCONFIG_USEMODULE_LORAWAN
-    bool "Configure LoRaWAN MAC"
-    depends on HAVE_LORAWAN
-    help
-        Configure LoRaWAN module using Kconfig. This may override configurations
-        in LoRa PHY.
-
-if KCONFIG_USEMODULE_LORAWAN
+menu "LoRaWAN MAC"
+    depends on USEMODULE_LORAWAN
 
 choice
     bool "Channel plan"
@@ -588,4 +571,4 @@ config LORAMAC_DEFAULT_REDUNDANCY
          By default, uplinks are sent without retransmissions
          (this means, the device sends only one uplink packet)
 
-endif # KCONFIG_USEMODULE_LORAWAN
+endmenu # LoRaWAN MAC

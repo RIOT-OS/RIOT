@@ -9,11 +9,3 @@ config BOARD_COMMON_MSB_430
     bool
     default y
     select CPU_MODEL_MSP430F1612
-
-config MODULE_BOARDS_COMMON_MSB_430
-    bool
-    default y
-    depends on TEST_KCONFIG
-    depends on BOARD_COMMON_MSB_430
-    help
-        Common code for msb-430 boards.

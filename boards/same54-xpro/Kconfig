@@ -11,30 +11,3 @@ config BOARD_SAME54_XPRO
     bool
     default y
     select CPU_MODEL_SAME54P20A
-    select HAS_PERIPH_DAC
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_ETH
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_FREQM
-    select HAS_PERIPH_SDMMC
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-    select HAS_PERIPH_UART_HW_FC
-    select HAS_PERIPH_USBDEV
-    select HAS_RIOTBOOT
-    select HAS_TINYUSB_DEVICE
-
-    select HAVE_SAUL_GPIO
-    select HAVE_MTD_SPI_NOR
-    select HAVE_AT24MAC
-    select HAVE_SAM0_ETH
-    select HAVE_SAM0_SDHC
-    select HAVE_MTD_AT24CXXX
-    select HAVE_MTD_SDMMC_DEFAULT
-
-    # This specific board requires SPI_ON_QSPI for the MTD_SPI_NOR
-    select MODULE_PERIPH_SPI_ON_QSPI if MODULE_MTD_SPI_NOR

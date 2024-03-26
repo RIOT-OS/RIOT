@@ -10,10 +10,6 @@ config CPU_FAM_CC13X2
     select CPU_COMMON_CC26XX_CC13XX
     select CPU_FAM_CC13XX
     select CPU_CORE_CORTEX_M4F
-    select HAS_CPU_CC26X2_CC13X2
-    select HAS_CORTEXM_MPU
-
-    select MODULE_CC26XX_CC13XX if TEST_KCONFIG
 
 ## CPU Models
 config CPU_MODEL_CC1312R1F3
@@ -27,12 +23,6 @@ config CPU_MODEL_CC1352R1
 config CPU_MODEL_CC1352P1
     bool
     select CPU_FAM_CC13X2
-
-## Definition of specific features
-config HAS_CPU_CC26X2_CC13X2
-    bool
-    help
-        Indicates that a 'cc26x2_cc13x2' cpu is being used.
 
 ## Common CPU symbols
 config CPU_FAM

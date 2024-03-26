@@ -9,15 +9,6 @@ config CPU_FAM_EFM32PG1B
     select CPU_CORE_CORTEX_M4F
     select CPU_COMMON_EFM32
     select CPU_EFM32_SERIES1
-    select HAS_CORTEXM_MPU
-
-config MODULE_CPU_EFM32PG1B
-    bool
-    depends on CPU_FAM_EFM32PG1B
-    depends on TEST_KCONFIG
-    default y
-    help
-        EFM32PG1B family-specific code.
 
 ## CPU Models
 config CPU_MODEL_EFM32PG1B200F256GM48

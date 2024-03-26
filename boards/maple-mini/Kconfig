@@ -13,10 +13,4 @@ config BOARD_MAPLE_MINI
     default y
     select CPU_MODEL_STM32F103CB
 
-    # Put defined MCU peripherals here (in alphabetical order)
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-
 source "$(RIOTBOARD)/common/stm32/Kconfig"

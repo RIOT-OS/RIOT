@@ -11,26 +11,3 @@ config BOARD_ADAFRUIT_GRAND_CENTRAL_M4_EXPRESS
     bool
     default y
     select CPU_MODEL_SAMD51P20A
-    select HAS_ARDUINO_ANALOG
-    select HAS_ARDUINO_PINS
-    select HAS_HIGHLEVEL_STDIO
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_DAC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-    select HAS_PERIPH_USBDEV
-    select HAVE_SAUL_GPIO
-
-    select HAVE_MTD_SPI_NOR
-    # This specific board requires SPI_ON_QSPI for the MTD_SPI_NOR
-    select MODULE_PERIPH_SPI_ON_QSPI if MODULE_MTD_SPI_NOR
-
-    select HAVE_MTD_SDCARD_DEFAULT
-    select MODULE_FATFS_VFS if MODULE_VFS_DEFAULT
-
-source "$(RIOTBOARD)/common/samdx1-arduino-bootloader/Kconfig"

@@ -9,15 +9,6 @@ config CPU_FAM_EFM32GG
     select CPU_CORE_CORTEX_M3
     select CPU_COMMON_EFM32
     select CPU_EFM32_SERIES0
-    select HAS_CORTEXM_MPU
-
-config MODULE_CPU_EFM32GG
-    bool
-    depends on CPU_FAM_EFM32GG
-    depends on TEST_KCONFIG
-    default y
-    help
-        EFM32GG family-specific code.
 
 ## CPU Models
 config CPU_MODEL_EFM32GG330F512

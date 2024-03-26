@@ -5,15 +5,9 @@
 # directory for more details.
 #
 
-if MODULE_ST77XX
+if USEMODULE_ST77XX
 
-config MODULE_ST7789
-    bool "ST7789 display"
-    default y if HAVE_ST7789
-    help
-        ST7789 display controller is used
-
-if MODULE_ST7789
+if USEMODULE_ST7789
 
 menuconfig ST7789_CUSTOM_CONFIG
     bool "ST7789 Custom Configuration"
@@ -106,5 +100,5 @@ config ST7789_VRH
 # TODO  ST7789_VGH and ST7789_VGL (non linear values)
 
 endif # ST7789_CUSTOM_CONFIG
-endif # MODULE_ST7789
-endif # MODULE_ST77XX
+endif # USEMODULE_ST7789
+endif # USEMODULE_ST77XX

@@ -4,16 +4,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_USEMODULE_EMCUTE
-    bool "Configure EMCUTE"
+menu "EMCUTE"
     depends on USEMODULE_EMCUTE
-    help
-        Configure EMCUTE using Kconfig.`EMCUTE` is the implementation of the
-        OASIS MQTT-SN protocol for RIOT. It is designed with a focus on small
-        memory footprint and usability. It is designed to run on top of UDP
-        only, making use of net_sock_udp.
-
-if KCONFIG_USEMODULE_EMCUTE
 
 config EMCUTE_DEFAULT_PORT
     int "Default UDP port to listen on"
@@ -75,4 +67,4 @@ config EMCUTE_N_RETRY
         disconnected. For more information, see MQTT-SN Spec v1.2, section 6.13.
         For default values, see section 7.2 -> Nretry: 3-5.
 
-endif # KCONFIG_USEMODULE_EMCUTE
+endmenu # EMCUTE

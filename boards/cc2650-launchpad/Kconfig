@@ -12,10 +12,3 @@ config BOARD_CC2650_LAUNCHPAD
     bool
     default y
     select CPU_MODEL_CC26X0F128
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_GPIO
-    select HAS_PERIPH_GPIO_IRQ
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-
-    select HAVE_SAUL_GPIO

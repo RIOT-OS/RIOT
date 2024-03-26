@@ -8,17 +8,6 @@ config CPU_FAM_MP1
     bool
     select CPU_STM32
     select CPU_CORE_CORTEX_M4F
-    select HAS_CORTEXM_MPU
-    select HAS_CPU_STM32MP1
-    select HAS_PERIPH_GPIO_LL
-    select HAS_PERIPH_GPIO_LL_IRQ
-    select HAS_PERIPH_GPIO_LL_IRQ_LEVEL_TRIGGERED_HIGH
-    select HAS_PERIPH_GPIO_LL_IRQ_LEVEL_TRIGGERED_LOW
 
 config CPU_FAM
     default "mp1" if CPU_FAM_MP1
-
-config HAS_CPU_STM32MP1
-    bool
-    help
-        Indicates that the cpu being used belongs to the 'stm32mp1' family.

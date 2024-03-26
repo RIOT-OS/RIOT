@@ -12,8 +12,3 @@ config BOARD_HIFIVE1
     bool
     default y
     select CPU_MODEL_FE310_G000
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART

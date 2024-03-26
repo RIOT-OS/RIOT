@@ -6,16 +6,11 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_USEMODULE_MTD_SDMMC
-    bool "Configure MTD_SDMMC driver"
+menu "MTD_SDMMC driver"
     depends on USEMODULE_MTD_SDMMC
-    help
-        Configure the MTD_SDMMC driver using Kconfig.
-
-if KCONFIG_USEMODULE_MTD_SDMMC
 
 config SDMMC_GENERIC_MTD_OFFSET
-    depends on MODULE_MTD_SDMMC_DEFAULT
+    depends on USEMODULE_MTD_SDMMC_DEFAULT
     int "Index of first auto-configured MTD SD/MMC device"
     default 0
     help
@@ -23,4 +18,4 @@ config SDMMC_GENERIC_MTD_OFFSET
         the auto-configured SD Memory Card(s) or MMCs/eMMCs from
         mtd_sdmmc_default will come after them.
 
-endif # KCONFIG_USEMODULE_MTD_SDMMC
+endmenu # MTD_SDMMC driver

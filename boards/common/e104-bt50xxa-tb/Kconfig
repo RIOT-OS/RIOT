@@ -7,32 +7,5 @@
 config BOARD_COMMON_E104_BT50XXA_TB
     bool
     select BOARD_COMMON_NRF52
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_UART
-
-    select HAVE_SAUL_GPIO
-    select MODULE_BOARDS_COMMON_E104_BT50XXA_TB if TEST_KCONFIG
-
-config MODULE_BOARDS_COMMON_E104_BT50XXA_TB
-    bool
-    depends on TEST_KCONFIG
-    help
-       common code of e104-bt50xxa-tb boards
-
-config MODULE_BOARD_SOFTWARE_RESET
-    bool "Enable softare reset button"
-    default y
-    depends on HAS_PERIPH_GPIO
-    depends on HAS_PERIPH_GPIO_IRQ
-    depends on HAS_PERIPH_PM
-    depends on TEST_KCONFIG
-    select MODULE_PERIPH_GPIO
-    select MODULE_PERIPH_GPIO_IRQ
-    select MODULE_PERIPH_PM
-
-choice NRF5X_RADIO_BACKEND
-    default MODULE_NRFMIN
-endchoice
 
 source "$(RIOTBOARD)/common/nrf52/Kconfig"

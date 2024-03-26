@@ -8,31 +8,10 @@
 
 config CPU_ARCH_MSP430
     bool
-    imply MODULE_NEWLIB_NANO
-    select HAS_ARCH_16BIT
-    select HAS_ARCH_MSP430
-    select HAS_CPU_MSP430
-    select HAS_DBGPIN
-    select HAS_NEWLIB
-    select HAS_PERIPH_FLASHPAGE
-    select HAS_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
-    select HAS_PERIPH_FLASHPAGE_PAGEWISE
-    select HAS_PERIPH_PM
-    select HAS_PERIPH_TIMER_QUERY_FREQS
-    select MODULE_MALLOC_THREAD_SAFE if TEST_KCONFIG
-
-config HAS_CPU_MSP430
-    bool
-    help
-        Indicates that an 'MSP430' CPU is being used.
 
 config CPU_MSP430
     bool
     select CPU_ARCH_MSP430
-
-choice LIBC_IMPLEMENTATION
-    default MODULE_NEWLIB
-endchoice
 
 ## Common CPU symbols
 config CPU_ARCH
@@ -44,17 +23,10 @@ config CPU
 config CPU_CORE
     default "msp430" if CPU_MSP430
 
-## Definition of specific features
-config HAS_ARCH_MSP430
-    bool
-    help
-        Indicates that the current architecture is MSP430.
-
 ## Specific default configuration values
 config GNRC_PKTBUF_SIZE
     default 2560
-    depends on KCONFIG_USEMODULE_GNRC_PKTBUF_STATIC
+    depends on USEMODULE_GNRC_PKTBUF_STATIC
 
-source "$(RIOTCPU)/msp430/periph/Kconfig"
 source "$(RIOTCPU)/msp430/kconfigs/x1xx/Kconfig"
 source "$(RIOTCPU)/msp430/kconfigs/f2xx_g2xx/Kconfig"

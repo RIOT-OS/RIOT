@@ -8,16 +8,6 @@
 config CPU_FAM_LPC23XX
     bool
     select CPU_CORE_ARM7TDMI_S
-    select HAS_BACKUP_RAM
-    select HAS_CPU_LPC23XX
-    select HAS_PERIPH_DAC
-    select HAS_PERIPH_FLASHPAGE
-    select HAS_PERIPH_GPIO
-    select HAS_PERIPH_GPIO_IRQ
-    select HAS_PERIPH_TIMER_PERIODIC
-    select HAS_PERIPH_RTC_MS
-
-    select MODULE_BITFIELD if TEST_KCONFIG
 
 ## CPU Models
 config CPU_MODEL_LPC2387
@@ -27,12 +17,6 @@ config CPU_MODEL_LPC2387
 config CPU_MODEL_LPC2388
     bool
     select CPU_FAM_LPC23XX
-
-## Declaration of specific features
-config HAS_CPU_LPC23XX
-    bool
-    help
-        Indicates that an 'lpc23xx' cpu is being used.
 
 ## Common CPU symbols
 config CPU_FAM
@@ -45,5 +29,4 @@ config CPU_MODEL
 config CPU
     default "lpc23xx" if CPU_FAM_LPC23XX
 
-rsource "mci/Kconfig"
 source "$(RIOTCPU)/arm7_common/Kconfig"

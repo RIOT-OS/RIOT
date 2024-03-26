@@ -11,7 +11,5 @@ config BOARD_FIREFLY
     bool
     default y
     select BOARD_COMMON_REMOTE
-    select HAVE_SAUL_ADC
-    select HAVE_SAUL_GPIO
 
 source "$(RIOTBOARD)/common/remote/Kconfig"

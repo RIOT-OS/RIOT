@@ -11,12 +11,5 @@ config BOARD_REMOTE_REVB
     bool
     default y
     select BOARD_COMMON_REMOTE
-    select HAS_ARDUINO_ANALOG
-    select HAS_ARDUINO_PINS
-    select HAVE_SAUL_ADC
-    select HAVE_SAUL_GPIO
-
-    select HAVE_MTD_SDCARD_DEFAULT
-    select MODULE_FATFS_VFS if MODULE_VFS_DEFAULT
 
 source "$(RIOTBOARD)/common/remote/Kconfig"

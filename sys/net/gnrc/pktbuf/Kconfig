@@ -4,13 +4,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_USEMODULE_GNRC_PKTBUF_STATIC
-    bool "Configure the GNRC Packet Buffer"
+menu "GNRC Packet Buffer"
     depends on USEMODULE_GNRC_PKTBUF_STATIC
-    help
-        Configure the GNRC_PKTBUF using Kconfig.
-
-if KCONFIG_USEMODULE_GNRC_PKTBUF_STATIC
 
 config GNRC_PKTBUF_SIZE
     int "Maximum size of the static packet buffer"
@@ -21,4 +16,4 @@ config GNRC_PKTBUF_SIZE
         packets (2 incoming, 2 outgoing; 2 * 2 * 1280 B = 5 KiB) + Meta-Data
         (roughly estimated to 1 KiB; might be smaller).
 
-endif # KCONFIG_USEMODULE_GNRC_PKTBUF_STATIC
+endmenu # GNRC Packet Buffer

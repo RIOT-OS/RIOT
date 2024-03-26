@@ -14,22 +14,4 @@ config BOARD_NUCLEO_L4R5ZI
     select BOARD_COMMON_NUCLEO144
     select CPU_MODEL_STM32L4R5ZI
 
-    # Put defined MCU peripherals here (in alphabetical order)
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_LPUART
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-    select HAS_PERIPH_USBDEV
-
-    select MODULE_PERIPH_LPUART if MODULE_STDIO_UART && HAS_PERIPH_LPUART
-
-    # Put other features for this board (in alphabetical order)
-    select HAS_RIOTBOOT
-    select HAS_TINYUSB_DEVICE
-
 source "$(RIOTBOARD)/common/nucleo144/Kconfig"

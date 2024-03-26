@@ -13,13 +13,6 @@ config CPU_FAM_ATMEGA8
 config CPU_MODEL_ATMEGA8
     bool
     select CPU_FAM_ATMEGA8
-    select HAS_CPU_ATMEGA8
-
-## Definition of specific features
-config HAS_CPU_ATMEGA8
-    bool
-    help
-        Indicates that an 'atmega8' cpu is being used.
 
 ## Common CPU symbols
 config CPU_FAM

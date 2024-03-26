@@ -5,21 +5,7 @@
 # directory for more details.
 #
 
-config HAVE_SHT2X
-    bool
-    select MODULE_SHT2X if MODULE_SAUL_DEFAULT
-    help
-      Indicates that a SHT2x humidity and temperature sensor is present.
-
-menuconfig MODULE_SHT2X
-    bool "SHT2x humidity and temperature sensor"
-    depends on HAS_PERIPH_I2C
-    depends on TEST_KCONFIG
-    select MODULE_CHECKSUM
-    select MODULE_PERIPH_I2C
-    select MODULE_ZTIMER_MSEC
-
-if MODULE_SHT2X
+if USEMODULE_SHT2X
 
 choice
     bool "Measurement Resolution"
@@ -67,4 +53,4 @@ config SHT2X_CRC_MODE
     help
         Enable to check the CRC of measurement data.
 
-endif # MODULE_SHT2X
+endif # USEMODULE_SHT2X

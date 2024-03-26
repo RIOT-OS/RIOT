@@ -4,13 +4,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_USEMODULE_SKALD
-    bool "Configure SKALD"
+menu "SKALD"
     depends on USEMODULE_SKALD
-    help
-        Configure Skald, BLE advertising stack, using Kconfig.
-
-if KCONFIG_USEMODULE_SKALD
 
 config SKALD_ADV_CHANNELS
     string "Advertising channels"
@@ -19,4 +14,4 @@ config SKALD_ADV_CHANNELS
         Configure advertising channels. Default advertising channels are 37, 38
         and 39 which can be customised to upto 40 (0-39) channels.
 
-endif # KCONFIG_USEMODULE_SKALD
+endmenu # SKALD

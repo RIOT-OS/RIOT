@@ -6,13 +6,6 @@
 # directory for more details.
 #
 
-config MODULE_ESP_IDF_WPA_SUPPLICANT
-    bool
-    depends on TEST_KCONFIG
-    depends on MODULE_ESP_IDF
-    help
-        ESP-IDF WPA supplicant.
-
 rsource "esp_supplicant/Kconfig"
 rsource "port/Kconfig"
 rsource "src/ap/Kconfig"

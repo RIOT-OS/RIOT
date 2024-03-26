@@ -8,19 +8,6 @@
 config CPU_FAM_RPX0XX
     bool
     select CPU_CORE_CORTEX_M0PLUS
-    select HAS_CPU_RPX0XX
-    select HAS_PERIPH_GPIO
-    select HAS_PERIPH_GPIO_IRQ
-    select HAS_PERIPH_PIO
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_TIMER_PERIODIC
-    select HAS_PERIPH_UART_MODECFG
-    select HAS_PERIPH_UART_RECONFIGURE
-    select HAS_PIO_I2C
-    select MODULE_PIO_I2C if MODULE_PERIPH_I2C
-    # Since make has a wildcard for anything starting with pio_ we need to
-    # build it as new modules get added
-    select MODULE_PERIPH_PIO if MODULE_PIO_I2C
 
 config CPU_FAM
     default "RPX0XX" if CPU_FAM_RPX0XX
@@ -34,20 +21,6 @@ config CPU_MODEL
 
 config CPU
     default "rpx0xx" if CPU_FAM_RPX0XX
-
-config HAS_CPU_RPX0XX
-    bool
-    help
-        Indicates that a RPX0XX CPU (e.g. the RP2040) is used
-
-config MODULE_PIO_I2C
-    bool "Enable PIO I2C module"
-    depends on HAS_PIO_I2C
-
-config MODULE_PIO_AUTOSTART_I2C
-    bool "Enable PIO I2C module autostart"
-    default y if MODULE_PIO_I2C
-    depends on HAS_PIO_I2C
 
 
 source "$(RIOTCPU)/cortexm_common/Kconfig"

@@ -13,14 +13,6 @@ config BOARD_ESP32C3_WEMOS_MINI
     default y
     select BOARD_COMMON_ESP32C3
     select CPU_MODEL_ESP32C3_FH4
-    select HAS_ARDUINO_PINS
-    select HAS_ESP_JTAG
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_SPI
-    select MODULE_ESP32C3_WEMOS_MINI_V1_0_0 if BOARD_VERSION_ESP32C3_WEMOS_MINI_V1_0_0
-    select MODULE_ESP32C3_WEMOS_MINI_V2_1_0 if BOARD_VERSION_ESP32C3_WEMOS_MINI_V2_1_0
 
     choice
         bool "Wemos ESP32-C3 mini board version"
@@ -37,15 +29,5 @@ config BOARD_ESP32C3_WEMOS_MINI
             board has a RGB LED, it is version 2.1.0 or newer, otherwise it is
             version 1.0.0
     endchoice
-
-config MODULE_ESP32C3_WEMOS_MINI_V1_0_0
-    bool
-    help
-        Indicates that Wemos ESP32-C3 mini board version v1.0.0 is used.
-
-config MODULE_ESP32C3_WEMOS_MINI_V2_1_0
-    bool
-    help
-        Indicates that Wemos ESP32-C3 mini board version v2.1.0 is used.
 
 source "$(RIOTBOARD)/common/esp32c3/Kconfig"

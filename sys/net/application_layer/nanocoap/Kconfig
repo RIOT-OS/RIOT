@@ -5,16 +5,8 @@
 # directory for more details.
 #
 
-# nanoCoAP provides CoAP functionalities
-config USEMODULE_NANOCOAP
-    bool
-    select HAS_PROTOCOL_COAP
-
-menuconfig KCONFIG_USEMODULE_NANOCOAP
-    bool "Configure nanoCoAP module"
+menu "nanoCoAP"
     depends on USEMODULE_NANOCOAP
-
-if KCONFIG_USEMODULE_NANOCOAP
 
 config NANOCOAP_NOPTS_MAX
     int "Maximum number of options in a message"
@@ -35,11 +27,8 @@ config NANOCOAP_QS_MAX
     int "Maximum length of a query string written to a message"
     default 64
 
-menuconfig KCONFIG_USEMODULE_NANOCOAP_CACHE
-    bool "Configure nanoCoAP Cache module"
+menu "nanoCoAP Cache module"
     depends on USEMODULE_NANOCOAP_CACHE
-
-if KCONFIG_USEMODULE_NANOCOAP_CACHE
 
 config NANOCOAP_CACHE_ENTRIES
     int "Number of maximum cache entries"
@@ -53,6 +42,6 @@ config NANOCOAP_CACHE_RESPONSE_SIZE
     int "Size of the buffer to store responses in the cache"
     default 128
 
-endif # KCONFIG_USEMODULE_NANOCOAP_CACHE
+endmenu # nanoCoAP Cache module
 
-endif # KCONFIG_USEMODULE_NANOCOAP
+endmenu # nanoCoAP

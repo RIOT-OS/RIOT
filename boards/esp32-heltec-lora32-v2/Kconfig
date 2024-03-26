@@ -12,13 +12,5 @@ config BOARD_ESP32_HELTEC_LORA32_V2
     default y
     select BOARD_COMMON_ESP32
     select CPU_MODEL_ESP32_D0WD
-    select HAS_ARDUINO_PINS
-    select HAS_ESP_RTC_TIMER_32K
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_SPI
-
-    select HAVE_SX1276
 
 source "$(RIOTBOARD)/common/esp32/Kconfig"

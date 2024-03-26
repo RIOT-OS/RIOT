@@ -14,14 +14,4 @@ config BOARD_NUCLEO_L031K6
     select BOARD_COMMON_NUCLEO32
     select CPU_MODEL_STM32L031K6
 
-    # Put defined MCU peripherals here (in alphabetical order)
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-
 source "$(RIOTBOARD)/common/nucleo32/Kconfig"

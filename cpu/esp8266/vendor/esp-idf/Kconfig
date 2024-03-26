@@ -5,12 +5,6 @@
 # directory for more details.
 #
 
-config MODULE_ESP_IDF
-    bool
-    depends on TEST_KCONFIG
-    depends on HAS_ARCH_ESP8266
-
-rsource "esp8266/source/Kconfig"
 rsource "heap/src/Kconfig"
 rsource "nvs_flash/src/Kconfig"
 rsource "spi_flash/Kconfig"

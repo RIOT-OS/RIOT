@@ -5,18 +5,9 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_USEMODULE_USBUS_DFU
-    bool "Configure USBUS DFU"
+
+menu "USBUS DFU"
     depends on USEMODULE_USBUS_DFU
-    depends on KCONFIG_USEMODULE_USBUS
-
-menuconfig MODULE_USBUS_DFU
-    bool "Configure USBUS DFU"
-    depends on MODULE_USBUS
-    help
-        Configure the USBUS DFU module via Kconfig.
-
-if KCONFIG_USEMODULE_USBUS_DFU || MODULE_USBUS_DFU
 
 config USB_DFU_DETACH_TIMEOUT_MS
     int
@@ -26,7 +17,7 @@ config USB_DFU_DETACH_TIMEOUT_MS
     help
         Indicates the detach timeout USB device should advertise to
         the host USB. Host USB should abort the pending operation if
-        device doesn't detach after this timeout.
+        device doesnt detach after this timeout.
 
 config CUSTOM_RIOTBOOT_MAGIC_ADDR
     bool "Use custom DFU magic address"
@@ -37,4 +28,4 @@ config RIOTBOOT_MAGIC_ADDR
     int "DFU magic address"
     depends on CUSTOM_RIOTBOOT_MAGIC_ADDR
 
-endif # KCONFIG_USEMODULE_USBUS_DFU || MODULE_USBUS_DFU
+endmenu # USBUS DFU

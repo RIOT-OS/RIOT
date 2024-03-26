@@ -13,6 +13,5 @@ config BOARD_BLACKPILL_STM32F103C8
     default y
     select BOARD_COMMON_BLXXXPILL
     select CPU_MODEL_STM32F103C8
-    select MODULE_BOARDS_COMMON_BLXXXPILL if TEST_KCONFIG
 
 source "$(RIOTBOARD)/common/blxxxpill/Kconfig"
