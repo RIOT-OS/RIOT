@@ -1,9 +1,0 @@
-# Copyright (c) 2023 ML!PA Consulting Gmbh
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
-#
-
-config MODULE_L2SCAN_LIST
-    bool "List of scanned Link Layer access points"

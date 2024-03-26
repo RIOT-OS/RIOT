@@ -1,4 +1,0 @@
-config MODULE_CONGURE_QUIC
-    bool "CongURE implementation of QUIC's congestion control"
-    depends on MODULE_CONGURE
-    depends on MODULE_ZTIMER
