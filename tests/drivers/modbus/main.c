@@ -101,10 +101,9 @@ static int compare_bits(const uint8_t *a, const uint8_t *b, uint16_t addr, uint1
 /**
  * @brief   Basic Modbus request handler that copies from/to the slave buffer
  */
-static int request_cb(modbus_t *dev, modbus_message_t *message)
+static int request_cb(modbus_message_t *message, void *arg)
 {
-    (void)dev;
-    (void)message;
+    (void)arg;
 
     printf("Request callback, id = %u, function = %u, address = %u, count = %u\n",
            message->id, message->func, message->addr, message->count);
@@ -667,7 +666,7 @@ static void *thread_slave(void *arg)
     while (1) {
         puts("Waiting for request...");
 
-        res = modbus_rtu_recv_request(&slave, &message_slave, request_cb);
+        res = modbus_rtu_recv_request(&slave, &message_slave, request_cb, NULL);
 
         if (res != 0) {
             printf("Failed, receive result is %u\n", res);
