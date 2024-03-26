@@ -4,12 +4,12 @@ This application is a showcase for RIOT's hardware support. Using it
 for your board, you should be able to interactively use any hardware
 that is supported.
 
-To do this, the application uses the `shell` and `shell_commands`
+To do this, the application uses the `shell` and `shell_cmds_default`
 modules and all the driver modules each board supports.
 
 `shell` is a very simple interactive command interpreter that can be
 used to call functions.  Many of RIOT's modules define some generic
-shell commands. These are included via the `shell_commands` module.
+shell commands. These are included via the `shell_cmds_default` module.
 
 Additionally, the `ps` module which provides the `ps` shell command is
 included.

@@ -13,7 +13,8 @@
  * @file
  * @brief       A shell command to change the niceness (inverse priority) of a thread
  *
- * @note        Enable this by using the modules shell_commands and nice
+ * @note        Enable this by using the modules shell_cmds_default and
+ *              shell_cmd_nice
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  *

@@ -70,7 +70,7 @@ endif
 ifneq (,$(filter nimble_autoadv,$(USEMODULE)))
   USEMODULE += bluetil_ad
   USEMODULE += bluetil_addr
-  ifneq (,$(filter shell_commands,$(USEMODULE)))
+  ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
     DEFAULT_MODULE += nimble_autoadv_shell
   endif
 endif

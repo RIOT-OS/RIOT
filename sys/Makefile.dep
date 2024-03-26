@@ -259,12 +259,6 @@ ifneq (,$(filter posix_sockets,$(USEMODULE)))
   USEMODULE += posix_headers
 endif
 
-ifneq (,$(filter shell_commands,$(USEMODULE)))
-  # shell_commands has been renamed to shell_cmds_default, but let's keep this
-  # for backward compatibility
-  USEMODULE += shell_cmds_default
-endif
-
 ifneq (,$(filter shell_cmd%,$(USEMODULE)))
   # each and every command is a submodule of shell_cmds
   USEMODULE += shell_cmds
