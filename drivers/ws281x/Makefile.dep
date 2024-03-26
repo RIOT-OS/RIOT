@@ -1,7 +1,10 @@
 # Actually |(periph_timer_poll and periph_gpio_ll), but that's too complex for FEATURES_REQUIRED_ANY to express
-FEATURES_REQUIRED_ANY += cpu_core_atmega|arch_esp32|arch_native|periph_timer_poll
+FEATURES_REQUIRED_ANY += cpu_core_atmega|arch_esp32|arch_native|periph_timer_poll|periph_spi
 
 ifeq (,$(filter ws281x_%,$(USEMODULE)))
+  ifneq (,$(filter periph_spi,$(FEATURES_USED)))
+	USEMODULE += ws281x_spi
+  endif
   ifneq (,$(filter cpu_core_atmega,$(FEATURES_USED)))
     USEMODULE += ws281x_atmega
   endif
@@ -31,6 +34,16 @@ ifneq (,$(filter ws281x_esp32%,$(USEMODULE)))
     USEMODULE += esp_idf_rmt
     USEMODULE += ws281x_esp32
     USEMODULE += ws281x_esp32_hw
+  endif
+endif
+
+ifneq (,$(filter ws281x_spi,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_spi
+  USEMODULE += periph_spi
+  ifneq (,$(filter arch_esp8266,$(FEATURES_USED)))
+	CFLAGS += '-DSPI_BLOCK_SIZE=63'
+	CFLAGS += '-DWS281X_SPI_PATTERN_LENGTH=3'
+	CFLAGS += '-DWS281X_SPI_CLK=SPI_CLK_WS281X'
   endif
 endif
 

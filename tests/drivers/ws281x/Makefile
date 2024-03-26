@@ -9,6 +9,12 @@ include ../Makefile.drivers_common
 # TIMER ?= 2
 # FREQ ?= 16000000
 
+# For SPI implementation only
+# DEV ?= 0
+# DMA ?= 0
+# LEN ?= 3
+# CLK ?= 2400000
+
 USEMODULE += ws281x
 USEMODULE += xtimer
 
@@ -18,17 +24,31 @@ BOARD_BLACKLIST := waspmote-pro
 
 EXTERNAL_BOARD_DIRS += $(RIOTBASE)/tests/build_system/external_board_dirs/esp-ci-boards
 
-include $(RIOTBASE)/Makefile.include
-
 ifneq (, $(PIN))
   CFLAGS += '-DWS281X_PARAM_PIN=$(PIN)'
 endif
 ifneq (, $(N))
   CFLAGS += '-DWS281X_PARAM_NUMOF=$(N)'
 endif
+
+ifneq (, $(DEV))
+  CFLAGS += '-DWS281X_SPI_DEV=$(DEV)'
+endif
+ifeq (1, $(DMA))
+  FEATURES_REQUIRED += periph_dma
+endif
+ifneq (, $(LEN))
+  CFLAGS += '-DWS281X_SPI_PATTERN_LENGTH=$(LEN)'
+endif
+ifneq (, $(CLK))
+  CFLAGS += '-DWS281X_SPI_CLK=$(CLK)'
+endif
+
 ifneq (, $(TIMER))
   CFLAGS += '-DWS281X_TIMER_DEV=TIMER_DEV($(TIMER))' '-DWS281X_TIMER_MAX_VALUE=TIMER_$(TIMER)_MAX_VALUE'
 endif
 ifneq (, $(FREQ))
   CFLAGS += '-DWS281X_TIMER_FREQ=$(FREQ)'
 endif
+
+include $(RIOTBASE)/Makefile.include
