@@ -27,10 +27,12 @@
 /* make sure to overwrite potentially conflicting XTIMER_WIDTH definition from
  * board.h by eagerly including it */
 #include "board.h"
+#include "busy_wait.h"
 #include "timex.h"
 #ifdef MODULE_CORE_MSG
 #include "msg.h"
 #endif /* MODULE_CORE_MSG */
+#include "macros/math.h"
 #include "mutex.h"
 #include "sched.h"
 
@@ -105,12 +107,24 @@ static inline xtimer_ticks64_t xtimer_ticks_from_usec64(uint64_t usec)
 
 static inline xtimer_ticks32_t xtimer_now(void)
 {
-    return ztimer_now(ZTIMER_USEC);
+    if (IS_ACTIVE(MODULE_ZTIMER_USEC)) {
+        return ztimer_now(ZTIMER_USEC);
+    } else if (IS_ACTIVE(MODULE_ZTIMER_MSEC)) {
+        return ztimer_now(ZTIMER_MSEC) * US_PER_MS;
+    } else {
+        return 0;
+    }
 }
 
 static inline uint32_t xtimer_now_usec(void)
 {
-    return ztimer_now(ZTIMER_USEC);
+    if (IS_ACTIVE(MODULE_ZTIMER_USEC)) {
+        return ztimer_now(ZTIMER_USEC);
+    } else if (IS_ACTIVE(MODULE_ZTIMER_MSEC)) {
+        return ztimer_now(ZTIMER_MSEC) * US_PER_MS;
+    } else {
+        return 0;
+    }
 }
 
 static inline void _ztimer_sleep_scale(ztimer_clock_t *clock, uint32_t time,
@@ -142,19 +156,27 @@ static inline void xtimer_msleep(uint32_t milliseconds)
     if (IS_ACTIVE(MODULE_ZTIMER_MSEC)) {
         ztimer_sleep(ZTIMER_MSEC, milliseconds);
     }
-    else {
+    else if (IS_ACTIVE(MODULE_ZTIMER_USEC)) {
         _ztimer_sleep_scale(ZTIMER_USEC, milliseconds, US_PER_MS);
+    } else {
+         busy_wait_us(US_PER_MS * milliseconds);
     }
 }
 
 static inline void xtimer_usleep(uint32_t microseconds)
 {
-    ztimer_sleep(ZTIMER_USEC, microseconds);
+    if (IS_ACTIVE(MODULE_ZTIMER_USEC)) {
+        ztimer_sleep(ZTIMER_USEC, microseconds);
+    } else if (IS_ACTIVE(MODULE_ZTIMER_MSEC)) {
+        ztimer_sleep(ZTIMER_MSEC, DIV_ROUND_UP(microseconds, US_PER_MS));
+    } else {
+        busy_wait_us(microseconds);
+    }
 }
 
 static inline void xtimer_nanosleep(uint32_t nanoseconds)
 {
-    ztimer_sleep(ZTIMER_USEC, nanoseconds / NS_PER_US);
+    xtimer_usleep(ZTIMER_USEC, nanoseconds / NS_PER_US);
 }
 
 static inline void xtimer_tsleep32(xtimer_ticks32_t ticks)
@@ -176,18 +198,37 @@ static inline void xtimer_tsleep64(xtimer_ticks64_t ticks)
 
 static inline void xtimer_set(xtimer_t *timer, uint32_t offset)
 {
-    ztimer_set(ZTIMER_USEC, timer, offset);
+    if (IS_ACTIVE(MODULE_ZTIMER_USEC)) {
+        ztimer_set(ZTIMER_USEC, timer, offset);
+    } else if (IS_ACTIVE(MODULE_ZTIMER_MSEC)) {
+        ztimer_set(ZTIMER_MSEC, timer, DIV_ROUND_UP(offset, US_PER_MS));
+    } else {
+        assert(0);
+    }
 }
 
 static inline void xtimer_remove(xtimer_t *timer)
 {
-    ztimer_remove(ZTIMER_USEC, timer);
+    if (IS_ACTIVE(MODULE_ZTIMER_USEC)) {
+        ztimer_remove(ZTIMER_USEC, timer);
+    } else if (IS_ACTIVE(MODULE_ZTIMER_MSEC)) {
+        ztimer_remove(ZTIMER_MSEC, timer);
+    } else {
+        assert(0);
+    }
 }
 
 static inline void xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg,
                                   kernel_pid_t target_pid)
 {
-    ztimer_set_msg(ZTIMER_USEC, timer, offset, msg, target_pid);
+    if (IS_ACTIVE(MODULE_ZTIMER_USEC)) {
+        ztimer_set_msg(ZTIMER_USEC, timer, offset, msg, target_pid);
+    } else if (IS_ACTIVE(MODULE_ZTIMER_MSEC)) {
+        ztimer_set_msg(ZTIMER_MSEC, timer, DIV_ROUND_UP(offset, US_PER_MS),
+                       msg, target_pid);
+    } else {
+        assert(0);
+    }
 }
 
 static inline void xtimer_periodic_wakeup(xtimer_ticks32_t *last_wakeup,
@@ -240,7 +281,11 @@ static inline void xtimer_set_timeout_flag64(xtimer_t *t, uint64_t timeout)
 
 static inline void xtimer_spin(xtimer_ticks32_t ticks)
 {
-    ztimer_spin(ZTIMER_USEC, xtimer_usec_from_ticks(ticks));
+    if (IS_ACTIVE(MODULE_ZTIMER_USEC)) {
+        ztimer_spin(ZTIMER_USEC, xtimer_usec_from_ticks(ticks));
+    } else {
+        busy_wait_us(xtimer_usec_from_ticks(ticks));
+    }
 }
 
 static inline xtimer_ticks32_t xtimer_diff(xtimer_ticks32_t a,
