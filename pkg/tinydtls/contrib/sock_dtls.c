@@ -60,7 +60,8 @@ static int _read(struct dtls_context_t *ctx, session_t *session, uint8_t *buf,
                  size_t len);
 static int _event(struct dtls_context_t *ctx, session_t *session,
                   dtls_alert_level_t level, unsigned short code);
-
+static void _get_user_parameters(struct dtls_context_t *ctx,
+                    session_t *session, dtls_user_parameters_t *user_parameters);
 static void _session_to_ep(const session_t *session, sock_udp_ep_t *ep);
 static void _ep_to_session(const sock_udp_ep_t *ep, session_t *session);
 static uint32_t _update_timeout(uint32_t start, uint32_t timeout);
@@ -69,6 +70,7 @@ static dtls_handler_t _dtls_handler = {
     .event = _event,
     .write = _write,
     .read = _read,
+    .get_user_parameters = _get_user_parameters,
 #ifdef CONFIG_DTLS_PSK
     .get_psk_info = _get_psk_info,
 #endif /* CONFIG_DTLS_PSK */
@@ -174,6 +176,15 @@ static int _event(struct dtls_context_t *ctx, session_t *session,
     }
 #endif
     return 0;
+}
+
+static void _get_user_parameters(struct dtls_context_t *ctx,
+                    session_t *session, dtls_user_parameters_t *user_parameters) {
+  (void) ctx;
+  (void) session;
+
+  user_parameters->force_extended_master_secret = CONFIG_DTLS_FORCE_EXTENDED_MASTER_SECRET;
+  user_parameters->force_renegotiation_info = CONFIG_DTLS_FORCE_RENEGOTIATION_INFO;
 }
 
 #ifdef CONFIG_DTLS_PSK
