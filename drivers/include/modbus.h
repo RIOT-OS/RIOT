@@ -89,13 +89,6 @@ enum {
 #define MODBUS_REGISTER_SIZE 2
 
 /**
- * @brief   Generic structure for a Modbus device
- *
- * This structure is intended to be used as a base for specific Modbus device.
- */
-typedef struct {} modbus_t;
-
-/**
  * @brief   Modbus message structure for requests and responses
  */
 typedef struct {
@@ -145,14 +138,14 @@ typedef struct {
  * @p MODBUS_OK must be returned on success. Any other error code will be
  * returned to the caller.
  *
- * @param[in] modbus        pointer to Modbus device
- * @param[in] message       pointer to Modbus message
+ * @param[in] message       pointer to the request message
+ * @param[in] arg           optional context for the callback
  *
  * @return                  MODBUS_OK on success
  * @return                  MODBUS_DROP if message should be dropped
  * @return                  other error code on failure
  */
-typedef int (*modbus_request_cb_t)(modbus_t *modbus, modbus_message_t *message);
+typedef int (*modbus_request_cb_t)(modbus_message_t *message, void *arg);
 
 /**
  * @brief Compute the size in bytes of a @p count bits

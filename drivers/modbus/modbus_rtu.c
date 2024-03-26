@@ -484,9 +484,10 @@ static int read_request(modbus_rtu_t *modbus, modbus_message_t *message)
     return MODBUS_OK;
 }
 
-static int handle_request(modbus_rtu_t *modbus, modbus_message_t *message, modbus_request_cb_t cb)
+static int handle_request(modbus_rtu_t *modbus, modbus_message_t *message, modbus_request_cb_t cb,
+                          void *arg)
 {
-    int res = cb((modbus_t *)modbus, message);
+    int res = cb(message, arg);
 
     if (res == MODBUS_DROP) {
         mutex_unlock(&(modbus->buffer_mutex));
@@ -644,7 +645,8 @@ int modbus_rtu_send_request(modbus_rtu_t *modbus, modbus_message_t *message)
     return MODBUS_OK;
 }
 
-int modbus_rtu_recv_request(modbus_rtu_t *modbus, modbus_message_t *message, modbus_request_cb_t cb)
+int modbus_rtu_recv_request(modbus_rtu_t *modbus, modbus_message_t *message, modbus_request_cb_t cb,
+                            void *arg)
 {
     assert(message != NULL);
     assert(cb != NULL);
@@ -660,7 +662,7 @@ int modbus_rtu_recv_request(modbus_rtu_t *modbus, modbus_message_t *message, mod
     }
 
     /* handle request */
-    res = handle_request(modbus, message, cb);
+    res = handle_request(modbus, message, cb, arg);
 
     if (res == MODBUS_DROP) {
         DEBUG("[modbus_rtu] modbus_rtu_recv_request: handle request aborted\n");

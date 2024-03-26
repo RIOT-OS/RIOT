@@ -59,7 +59,6 @@ typedef struct {
  * @brief   Modbus RTU device structure
  */
 typedef struct {
-    modbus_t dev;                               /**< @ref modbus_t base class */
     const modbus_rtu_params_t *params;          /**< device parameters */
     uint32_t timeout;                           /**< amount of time (usec) to wait for a slave to
                                                      begin sending */
@@ -127,13 +126,14 @@ int modbus_rtu_send_request(modbus_rtu_t *modbus,
  * @param[in] modbus    pointer to modbus
  * @param[in] message   pointer to modbus message
  * @param[in] cb        callback function that handles the request
+ * @param[in] arg       optional context for the callback
  *
  * @return              MODBUS_OK on success
  * @return              MODBUS_ERR_CRC on CRC error
-   & @return              other error code on failure
+ * @return              other error code on failure
  */
 int modbus_rtu_recv_request(modbus_rtu_t *modbus, modbus_message_t *message,
-                            modbus_request_cb_t cb);
+                            modbus_request_cb_t cb, void *arg);
 
 #ifdef __cplusplus
 }
