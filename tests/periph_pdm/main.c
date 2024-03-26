@@ -69,14 +69,8 @@ int start_recording_cmd(int argc, char **argv)
     (void)argv;
     _main_thread_pid = thread_getpid();
 #if !PDM_DATA_PRINT_BINARY
-    //puts("PDM peripheral driver test\n");
 #endif
 
-/*     msg_t temp;
-    for (unsigned i = 0; i<1; i++)
-    {
-        msg_receive(&temp);
-    }  */
     for (unsigned repeat = 0; repeat < NEW_BUF_SIZE / PDM_BUF_SIZE; repeat++) {
         msg_t msg;
         msg_receive(&msg);
@@ -84,14 +78,6 @@ int start_recording_cmd(int argc, char **argv)
 #if PDM_DATA_PRINT_BINARY
         stdio_write((uint8_t *)buf, PDM_BUF_SIZE >> 2);
 #else
-    /*      printf("Start of the buffer\n");
-        for (unsigned idx = 0; idx < PDM_BUF_SIZE; ++idx) {
-            printf("%i\n", buf[idx]);
-            buf_size = idx;
-        }
-        printf("End of the buffer\n");
-        printf("%d\n", buf_size); */
-
         // Copy PDM_BUF_SIZE to NEW_BUF_SIZE repeatedly
         for (unsigned idx = 0; idx < PDM_BUF_SIZE; idx++) {
             new_buf[repeat*PDM_BUF_SIZE+idx] = buf[idx];
@@ -99,7 +85,6 @@ int start_recording_cmd(int argc, char **argv)
 #endif
     }
     // Parse the new_buf
-    //pdm_stop();
     _main_thread_pid = KERNEL_PID_UNDEF;
     printf("Start of the new buffer\n");
     for (unsigned idx = 0; idx < NEW_BUF_SIZE ; idx++) {
