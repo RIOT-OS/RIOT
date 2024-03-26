@@ -1,0 +1,25 @@
+From 286677362a0f78f799e71e12614f72c02b007640 Mon Sep 17 00:00:00 2001
+From: Frederik Haxel <haxel@fzi.de>
+Date: Mon, 14 Aug 2023 17:32:51 +0200
+Subject: [PATCH] 64 bit fix
+
+---
+ haclnacl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/haclnacl.c b/haclnacl.c
+index 072a2db..e7c25e7 100644
+--- a/haclnacl.c
++++ b/haclnacl.c
+@@ -149,7 +149,7 @@ int crypto_box(unsigned char *cipher, const unsigned char *msg, unsigned long lo
+   return crypto_box_easy(cipher, (unsigned char *)msg, msg_len - 32, (unsigned char *)nonce, (unsigned char *)pk, (unsigned char *)sk);
+ }
+ 
+-int crypto_box_open(uint8_t *msg, const uint8_t *cipher, uint64_t cipher_len, const uint8_t *nonce, const uint8_t *pk, const uint8_t *sk){
++int crypto_box_open(unsigned char *msg, const unsigned char *cipher, unsigned long long cipher_len, const unsigned char *nonce, const unsigned char *pk, const unsigned char *sk){
+   return crypto_box_open_easy(msg, cipher, cipher_len - 32, nonce, pk, sk);
+ }
+ 
+-- 
+2.34.1
+

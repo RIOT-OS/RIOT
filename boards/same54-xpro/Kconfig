@@ -23,6 +23,7 @@ config BOARD_SAME54_XPRO
     select HAS_PERIPH_SPI
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
+    select HAS_PERIPH_UART_HW_FC
     select HAS_PERIPH_USBDEV
     select HAS_RIOTBOOT
     select HAS_TINYUSB_DEVICE

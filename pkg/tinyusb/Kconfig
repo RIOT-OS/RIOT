@@ -32,7 +32,7 @@ choice USB_IMPLEMENTATION
 menuconfig PACKAGE_TINYUSB
     bool "TinyUSB stack package"
     depends on TEST_KCONFIG
-    depends on HAS_ARCH_32BIT
+    depends on HAS_ARCH_32BIT || HAS_ARCH_64BIT
     depends on HAS_TINYUSB_DEVICE || HAS_TINYUSB_HOST
     select MODULE_FMT
     select MODULE_LUID

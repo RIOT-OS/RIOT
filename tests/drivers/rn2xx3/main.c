@@ -214,7 +214,7 @@ int rn2xx3_mac_cmd(int argc, char **argv) {
                 puts("MAC transmission succeeded");
                 puts("Data received:");
                 printf(" -port: %d\n", rn2xx3_mac_get_rx_port(&rn2xx3_dev));
-                printf(" -payload len: %d\n", (uint8_t)strlen((char *)rn2xx3_dev.rx_buf));
+                printf(" -payload len: %" PRIuSIZE "\n", strlen((char *)rn2xx3_dev.rx_buf));
                 printf(" -payload: '%s'\n", rn2xx3_dev.rx_buf);
             }
                 break;

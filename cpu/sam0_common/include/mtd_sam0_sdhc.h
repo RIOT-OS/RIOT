@@ -7,9 +7,10 @@
  */
 
 /**
+ * @defgroup    drivers_mtd_sam0_sdhc MTD wrapper for SAM0 SDHC devices
  * @ingroup     drivers_storage
  * @ingroup     cpu_sam0_common_sdhc
- * @brief       Driver for SD-cards using mtd interface
+ * @brief       Driver for SD Cards connected to the SAM0 SDHC peripheral using the MTD interface
  *
  * @{
  *

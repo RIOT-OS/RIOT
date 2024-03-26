@@ -36,7 +36,7 @@
 
 #if defined(CPU_LINE_STM32L4R5xx) || defined(CPU_FAM_STM32G0) || \
     defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
-    defined(CPU_FAM_STM32WL)
+    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0)
 #define ISR_REG     ISR
 #define ISR_TXE     USART_ISR_TXE_TXFNF
 #define ISR_RXNE    USART_ISR_RXNE_RXFNE
@@ -64,7 +64,7 @@
 
 #if defined(CPU_LINE_STM32L4R5xx) || defined(CPU_FAM_STM32G0) || \
     defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
-    defined(CPU_FAM_STM32WL)
+    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0)
 #define RXENABLE            (USART_CR1_RE | USART_CR1_RXNEIE_RXFNEIE)
 #else
 #define RXENABLE            (USART_CR1_RE | USART_CR1_RXNEIE)
@@ -332,6 +332,10 @@ static inline void uart_init_usart(uart_t uart, uint32_t baudrate)
 #define RCC_CCIPR_LPUART1SEL_0  RCC_CCIPR1_LPUART1SEL_0
 #define RCC_CCIPR_LPUART1SEL_1  RCC_CCIPR1_LPUART1SEL_1
 #define CCIPR                   CCIPR1
+#elif CPU_FAM_STM32U5
+#define RCC_CCIPR_LPUART1SEL_0  RCC_CCIPR3_LPUART1SEL_0
+#define RCC_CCIPR_LPUART1SEL_1  RCC_CCIPR3_LPUART1SEL_1
+#define CCIPR                   CCIPR3
 #endif
 #ifdef MODULE_PERIPH_LPUART
 static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate)
@@ -390,10 +394,8 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     }
 #endif
 #ifdef MODULE_PERIPH_DMA
-    if (!len) {
-        return;
-    }
-    if (uart_config[uart].dma != DMA_STREAM_UNDEF) {
+    if (len > CONFIG_UART_DMA_THRESHOLD_BYTES &&
+        uart_config[uart].dma != DMA_STREAM_UNDEF) {
         if (irq_is_in()) {
             uint16_t todo = 0;
             if (dev(uart)->CR3 & USART_CR3_DMAT) {

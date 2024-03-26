@@ -17,6 +17,7 @@
 #include <errno.h>
 #include <stdbool.h>
 
+#include "architecture.h"
 #include "fmt.h"
 
 #include "ut_process.h"
@@ -71,9 +72,9 @@ int ut_process_expand(const char *ut, size_t ut_len,
                     res = _copy_str(exp_start, (&ut[i] - exp_start),
                                     &uri[uri_idx], uri_len - uri_idx);
                     if (res < 0) {
-                        DEBUG("ut_process: %p(%u) does not fit write-back %.*s "
+                        DEBUG("ut_process: %p(%" PRIuSIZE ") does not fit write-back %.*s "
                               "of template %s\n",
-                              (void *)uri, (unsigned)uri_len,
+                              (void *)uri, uri_len,
                               (int)(&ut[i] - exp_start), exp_start, ut);
                         return res;
                     }
@@ -103,8 +104,8 @@ int ut_process_expand(const char *ut, size_t ut_len,
                 if (!exp_start) {
                     res = _copy_char(ut[i], &uri[uri_idx], uri_len - uri_idx);
                     if (res < 0) {
-                        DEBUG("ut_process: %p(%u) does not fit literal %c of "
-                              "template %s\n", (void *)uri, (unsigned)uri_len,
+                        DEBUG("ut_process: %p(%" PRIuSIZE ") does not fit literal %c of "
+                              "template %s\n", (void *)uri, uri_len,
                               ut[i], ut);
                         return res;
                     }
@@ -119,9 +120,9 @@ int ut_process_expand(const char *ut, size_t ut_len,
         res = _copy_str(exp_start, (&ut[i] - exp_start),
                         &uri[uri_idx], uri_len - uri_idx);
         if (res < 0) {
-            DEBUG("ut_process: %p(%u) does not fit terminal write-back %.*s of "
+            DEBUG("ut_process: %p(%" PRIuSIZE ") does not fit terminal write-back %.*s of "
                   "template %s\n",
-                  (void *)uri, (unsigned)uri_len,
+                  (void *)uri, uri_len,
                   (int)(&ut[i] - exp_start), exp_start, ut);
             return res;
         }
@@ -129,8 +130,8 @@ int ut_process_expand(const char *ut, size_t ut_len,
     }
     res = _copy_char('\0', &uri[uri_idx], uri_len - uri_idx);
     if (res < 0) {
-        DEBUG("ut_process: %p(%u) does not fit terminating '\\0' char\n",
-              (void *)uri, (unsigned)uri_len);
+        DEBUG("ut_process: %p(%" PRIuSIZE ") does not fit terminating '\\0' char\n",
+              (void *)uri, uri_len);
         return res;
     }
     /* do not increment uri_idx. We want the string length so \0 does not count
@@ -353,8 +354,8 @@ static int _set_var(const char *var, size_t var_len,
         if (prefix) {
             res = _copy_char(prefix, &uri[uri_idx], uri_len - uri_idx);
             if (res < 0) {
-                DEBUG("ut_process: %p(%u) does not fit prefix %c\n",
-                      (void *)uri, (unsigned)uri_len, prefix);
+                DEBUG("ut_process: %p(%" PRIuSIZE ") does not fit prefix %c\n",
+                      (void *)uri, uri_len, prefix);
                 return res;
             }
             uri_idx += res;
@@ -364,8 +365,8 @@ static int _set_var(const char *var, size_t var_len,
         assert(sep);    /* all operators have a separator defined */
         res = _copy_char(sep, &uri[uri_idx], uri_len - uri_idx);
         if (res < 0) {
-            DEBUG("ut_process: %p(%u) does not fit separator '%c'\n",
-                  (void *)uri, (unsigned)uri_len, sep);
+            DEBUG("ut_process: %p(%" PRIuSIZE ") does not fit separator '%c'\n",
+                  (void *)uri, uri_len, sep);
             return -ENOBUFS;
         }
         uri_idx += res;
@@ -387,8 +388,8 @@ static int _fill_var(const ut_process_var_t *var, bool has_reserved,
         for (const char *c = var->name; *c != '\0'; c++) {
             res = _copy_char(*c, &uri[uri_idx], uri_len - uri_idx);
             if (res < 0) {
-                DEBUG("ut_process: %p(%u) does not var name %s\n", (void *)uri,
-                      (unsigned)uri_len, var->name);
+                DEBUG("ut_process: %p(%" PRIuSIZE ") does not var name %s\n", (void *)uri,
+                      uri_len, var->name);
                 return res;
             }
             uri_idx += res;
@@ -397,8 +398,8 @@ static int _fill_var(const ut_process_var_t *var, bool has_reserved,
         if ((var->value[0] != '\0') || empty_equal) {
             res = _copy_char('=', &uri[uri_idx], uri_len - uri_idx);
             if (res < 0) {
-                DEBUG("ut_process: %p(%u) does not fit =\n", (void *)uri,
-                      (unsigned)uri_len);
+                DEBUG("ut_process: %p(%" PRIuSIZE ") does not fit =\n", (void *)uri,
+                      uri_len);
                 return res;
             }
             uri_idx += res;
@@ -416,8 +417,8 @@ static int _fill_var(const ut_process_var_t *var, bool has_reserved,
         }
         res = _copy_str(enc, enc_len, &uri[uri_idx], uri_len - uri_idx);
         if (res < 0) {
-            DEBUG("ut_process: %p(%u) does not fit value encoding %.*s\n",
-                  (void *)uri, (unsigned)uri_len, (unsigned)enc_len, enc);
+            DEBUG("ut_process: %p(%" PRIuSIZE ") does not fit value encoding %.*s\n",
+                  (void *)uri, uri_len, (unsigned)enc_len, enc);
             return res;
         }
         uri_idx += res;

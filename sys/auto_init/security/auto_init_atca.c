@@ -50,7 +50,7 @@ void auto_init_atca(void)
         }
         atca_devs_ptr[i] = &atca_devs[i];
 
-        DEBUG("[auto_init_atca] Registering Driver with address: %x and location: %lx\n", atca_params[i].cfg.atcai2c.address, atca_params[i].atca_loc);
+        DEBUG("[auto_init_atca] Registering Driver with address: %x and location: %lx\n", atca_params[i].cfg.atcai2c.address, (unsigned long) atca_params[i].atca_loc);
         status = psa_register_secure_element(atca_params[i].atca_loc,
                                             &atca_methods,
                                             &atca_config_list[i],

@@ -759,6 +759,9 @@ INPUT                  = ../../doc.txt \
                          ../../sys \
                          src/ \
                          src/mainpage.md \
+                         src/vision.md \
+                         src/community-processes.md \
+                         src/roadmap.md \
                          src/creating-modules.md \
                          src/creating-an-application.md \
                          src/porting-boards.md \
@@ -768,6 +771,7 @@ INPUT                  = ../../doc.txt \
                          src/build-in-docker.md \
                          ../../tests/README.md \
                          src/build-system-basics.md \
+                         src/feature_list.md \
                          src/kconfig/kconfig.md \
                          src/using-cpp.md \
                          src/using-rust.md \

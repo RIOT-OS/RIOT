@@ -30,4 +30,4 @@ config MODULE_MALLOC_TRACING
 
         Note that generally dynamic memory management is a bad idea on the
         constrained devices RIOT is targeting. So maybe it is better to just
-        adapt your code to  use static memory management instead.
+        adapt your code to use static memory management instead.

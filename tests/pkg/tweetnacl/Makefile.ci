@@ -3,7 +3,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-leonardo \
     arduino-nano \
     arduino-uno \
-    atmega256rfr2-xpro \
     atmega328p \
     atmega328p-xplained-mini \
     atmega8 \
@@ -13,5 +12,4 @@ BOARD_INSUFFICIENT_MEMORY := \
     samd10-xmini \
     stk3200 \
     stm32f030f4-demo \
-    zigduino \
     #

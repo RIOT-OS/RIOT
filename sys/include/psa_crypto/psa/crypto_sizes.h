@@ -79,28 +79,20 @@ extern "C" {
  * @brief   Number of required allocated asymmetric key pair slots.
  *
  * @details These should be defined by the developer to
- *          fit their requirements. The default number is 5.
+ *          fit their requirements. The default number is 0.
  */
 #ifndef CONFIG_PSA_ASYMMETRIC_KEYPAIR_COUNT
-#if (IS_USED(MODULE_PSA_ASYMMETRIC))
-#define CONFIG_PSA_ASYMMETRIC_KEYPAIR_COUNT  5
-#else
 #define CONFIG_PSA_ASYMMETRIC_KEYPAIR_COUNT  0
-#endif
 #endif
 
 /**
  * @brief   Number of required allocated single key slots.
  *
  * @details These should be defined by the developer to
- *          fit their requirements. The default number is 5.
+ *          fit their requirements. The default number is 0.
  */
 #ifndef CONFIG_PSA_SINGLE_KEY_COUNT
-#if (IS_USED(MODULE_PSA_KEY_SLOT_MGMT))
-#define CONFIG_PSA_SINGLE_KEY_COUNT  5
-#else
 #define CONFIG_PSA_SINGLE_KEY_COUNT  0
-#endif
 #endif
 
 /**
@@ -110,8 +102,8 @@ extern "C" {
  *          fit their requirements. The default number is 5.
  */
 #ifndef CONFIG_PSA_PROTECTED_KEY_COUNT
-#if (IS_USED(MODULE_PSA_SE_MGMT))
-#define CONFIG_PSA_PROTECTED_KEY_COUNT  5
+#if (IS_USED(MODULE_PSA_SECURE_ELEMENT))
+#define CONFIG_PSA_PROTECTED_KEY_COUNT 5
 #else
 #define CONFIG_PSA_PROTECTED_KEY_COUNT  0
 #endif
@@ -991,7 +983,7 @@ extern "C" {
 /**
  * @brief   The maximum size of the used key data.
  */
-#if IS_USED(MODULE_PSA_SECURE_ELEMENT_ASYMMETRIC) || IS_USED(MODULE_PSA_ASYMMETRIC)
+#if IS_USED(MODULE_PSA_ASYMMETRIC)
 #define PSA_MAX_KEY_DATA_SIZE  (PSA_EXPORT_PUBLIC_KEY_MAX_SIZE)
 #else
 #define PSA_MAX_KEY_DATA_SIZE  (CONFIG_PSA_MAX_KEY_SIZE)

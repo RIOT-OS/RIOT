@@ -46,7 +46,7 @@
 #if defined (CPU_FAM_STM32L4) || defined (CPU_FAM_STM32G4) || \
     defined(CPU_FAM_STM32L5)
 #define BIT_APB_PWREN       RCC_APB1ENR1_PWREN
-#elif defined (CPU_FAM_STM32G0)
+#elif defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32C0)
 #define BIT_APB_PWREN       RCC_APBENR1_PWREN
 #elif !defined(CPU_FAM_STM32MP1)
 #define BIT_APB_PWREN       RCC_APB1ENR_PWREN
@@ -161,6 +161,7 @@ static void _gpio_init_ain(void)
  * This very teniously avoids optimization, even optimized it's better than
  * nothing but periodic review should establish that it doesn't get optimized.
  */
+MAYBE_UNUSED
 __attribute__((always_inline))
 static inline uint32_t _multi_read_reg32(volatile uint32_t *addr, bool *glitch)
 {

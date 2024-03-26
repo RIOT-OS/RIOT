@@ -62,7 +62,7 @@ static void callback(event_t *arg)
     order++;
     expect(order == 4);
     expect(arg == &event);
-    printf("triggered 0x%08x\n", (unsigned)arg);
+    printf("triggered 0x%08" PRIxPTR "\n", (uintptr_t)arg);
 }
 
 typedef struct {
@@ -94,7 +94,8 @@ static void timed_callback(void *arg)
     uint32_t now = xtimer_now_usec();
 #endif
     expect((now - before >= 100000LU));
-    printf("triggered timed callback with arg 0x%08x after %" PRIu32 "us\n", (unsigned)arg, now - before);
+    printf("triggered timed callback with arg 0x%08" PRIxPTR " after %" PRIu32 "us\n",
+                                       (uintptr_t)arg, now - before);
     puts("[SUCCESS]");
 }
 
@@ -176,12 +177,12 @@ int main(void)
     /* test posting different kind of events in order to a statically
      * initialized queue */
     event_queue_t queue = EVENT_QUEUE_INIT;
-    printf("posting 0x%08x\n", (unsigned)&event);
+    printf("posting 0x%08" PRIxPTR "\n", (uintptr_t)&event);
     event_post(&queue, &event);
 
-    printf("posting 0x%08x\n", (unsigned)&event2);
+    printf("posting 0x%08" PRIxPTR "\n", (uintptr_t)&event2);
     event_post(&queue, &event2);
-    printf("canceling 0x%08x\n", (unsigned)&event2);
+    printf("canceling 0x%08" PRIxPTR "\n", (uintptr_t)&event2);
     event_cancel(&queue, &event2);
 
     puts("posting custom event");

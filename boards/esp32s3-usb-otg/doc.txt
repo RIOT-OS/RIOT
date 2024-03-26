@@ -21,7 +21,7 @@
     1. [MCU](#esp32s3_usb_otg_mcu)
     2. [Board Configuration](#esp32s3_usb_otg_board_configuration)
 3. [Flashing the Device](#esp32s3_usb_otg_flashing)
-4. [Using STDIO](esp32s3_usb_otg_stdio)
+4. [Using STDIO](#esp32s3_usb_otg_stdio)
 
 ## Overview {#esp32s3_usb_otg_overview}
 

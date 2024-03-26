@@ -24,11 +24,7 @@ PERIPH_IGNORE_MODULES := \
   periph_flash \
   periph_flashpage_in_address_space \
   periph_flexcomm \
-  periph_gpio_ll \
-  periph_gpio_ll_irq \
-  periph_gpio_ll_irq_level_triggered_high \
-  periph_gpio_ll_irq_level_triggered_low \
-  periph_gpio_ll_irq_unmask \
+  periph_gpio_ll% \
   periph_gpio_mux \
   periph_hash_sha_1 \
   periph_hash_sha_224 \
@@ -47,6 +43,8 @@ PERIPH_IGNORE_MODULES := \
   periph_rtt_hw_rtc \
   periph_rtt_hw_sys \
   periph_spi_on_qspi \
+  periph_timer_poll \
+  periph_timer_query_freqs \
   periph_uart_collision \
   periph_uart_rxstart_irq \
   periph_wdog \
@@ -82,7 +80,9 @@ USEMODULE += $(filter cortexm_svc, $(FEATURES_USED))
 
 # select core_idle_thread if the feature no_idle_thread is *not* used
 ifeq (, $(filter no_idle_thread, $(FEATURES_USED)))
-  USEMODULE += core_idle_thread
+  ifneq (,$(filter core_thread, $(USEMODULE)))
+    USEMODULE += core_idle_thread
+  endif
 endif
 
 # use mpu_stack_guard if the feature is used

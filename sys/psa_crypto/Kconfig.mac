@@ -7,8 +7,7 @@
 
 menuconfig MODULE_PSA_MAC
     bool "PSA Message Authenticated Ciphers"
-    select PSA_KEY_CONFIG
-    select MODULE_PSA_KEY_SLOT_MGMT
+    select MODULE_PSA_KEY_MANAGEMENT
 
 if MODULE_PSA_MAC
 

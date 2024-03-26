@@ -44,6 +44,7 @@ kernel_pid_t gnrc_pktdump_pid = KERNEL_PID_UNDEF;
  * @brief   Stack for the pktdump thread
  */
 static char _stack[GNRC_PKTDUMP_STACKSIZE];
+static msg_t _msg_queue[GNRC_PKTDUMP_MSG_QUEUE_SIZE];
 
 static void _dump_snip(gnrc_pktsnip_t *pkt)
 {
@@ -150,8 +151,8 @@ static void _dump(gnrc_pktsnip_t *pkt)
     gnrc_pktsnip_t *snip = pkt;
 
     while (snip != NULL) {
-        printf("~~ SNIP %2i - size: %3u byte, type: ", snips,
-               (unsigned int)snip->size);
+        printf("~~ SNIP %2i - size: %3" PRIuSIZE " byte, type: ", snips,
+               snip->size);
         _dump_snip(snip);
         ++snips;
         size += snip->size;
@@ -166,10 +167,9 @@ static void *_eventloop(void *arg)
 {
     (void)arg;
     msg_t msg, reply;
-    msg_t msg_queue[GNRC_PKTDUMP_MSG_QUEUE_SIZE];
 
     /* setup the message queue */
-    msg_init_queue(msg_queue, GNRC_PKTDUMP_MSG_QUEUE_SIZE);
+    msg_init_queue(_msg_queue, GNRC_PKTDUMP_MSG_QUEUE_SIZE);
 
     reply.content.value = (uint32_t)(-ENOTSUP);
     reply.type = GNRC_NETAPI_MSG_TYPE_ACK;

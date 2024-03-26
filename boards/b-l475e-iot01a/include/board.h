@@ -71,8 +71,8 @@ extern "C" {
  * @name    LSM6DSL accelerometer sensor configuration
  * @{
  */
-#define LSM6DSL_PARAM_I2C   I2C_DEV(1)
-#define LSM6DSL_PARAM_ADDR  (0x6A)
+#define LSM6DSXX_PARAM_I2C   I2C_DEV(1)
+#define LSM6DSXX_PARAM_ADDR  (0x6A)
 /** @} */
 
 #ifdef __cplusplus

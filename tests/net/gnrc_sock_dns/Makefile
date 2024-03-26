@@ -10,8 +10,8 @@ USEMODULE += gnrc_ipv6_nib_dns
 USEMODULE += gnrc_netif_single          # Only one interface used and it makes
                                         # shell commands easier
 # use Ethernet as link-layer protocol
-ifeq (native,$(BOARD))
-  TERMFLAGS ?= $(TAP)
+ifneq (,$(filter native native64,$(BOARD)))
+  PORT ?= $(TAP)
 else
   ETHOS_BAUDRATE ?= 115200
   CFLAGS += -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE)

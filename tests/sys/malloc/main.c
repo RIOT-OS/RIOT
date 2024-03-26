@@ -24,10 +24,11 @@
 #include <string.h>
 #include <inttypes.h>
 
+#include "architecture.h"
 #include "test_utils/expect.h"
 
 #ifndef CHUNK_SIZE
-#ifdef BOARD_NATIVE
+#ifdef CPU_NATIVE
 #define CHUNK_SIZE          (1024 * 1024U)
 #else
 #define CHUNK_SIZE          (128U)
@@ -128,7 +129,7 @@ static void check_calloc_returns_null_on_overflow(void)
      * allocation succeeded. It then optimized out the test `NULL == p` and
      * assumes it to always be false. We just print the address to prevent
      * that from happening */
-    printf("calloc(%zu, %zu) = %p\n", nmemb, size, p);
+    printf("calloc(%" PRIuSIZE ", %" PRIuSIZE ") = %p\n", nmemb, size, p);
     expect(NULL == p);
 #pragma GCC diagnostic pop
 }

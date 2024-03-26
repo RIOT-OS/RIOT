@@ -53,8 +53,6 @@ static inline void _init_iface_router(gnrc_netif_t *netif)
     if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)) {
         netif->flags |= GNRC_NETIF_FLAGS_6LO_ABR;
     }
-
-    gnrc_netif_ipv6_group_join_internal(netif, &ipv6_addr_all_routers_link_local);
 }
 
 /**

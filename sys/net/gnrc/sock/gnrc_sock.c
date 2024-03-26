@@ -17,13 +17,14 @@
 #include <errno.h>
 #include <stdlib.h>
 
+#include "compiler_hints.h"
 #include "log.h"
 #include "net/af.h"
-#include "net/ipv6/hdr.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/ipv6/hdr.h"
 #include "net/gnrc/netreg.h"
 #include "net/gnrc/tx_sync.h"
+#include "net/ipv6/hdr.h"
 #include "net/udp.h"
 #include "utlist.h"
 #if IS_USED(MODULE_ZTIMER_USEC)
@@ -140,6 +141,8 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
         timeout_timer.arg = reg;
         xtimer_set(&timeout_timer, timeout);
     }
+#else
+    assume((timeout == SOCK_NO_TIMEOUT) || (timeout == 0));
 #endif
     if (timeout != 0) {
 #if defined(DEVELHELP) && IS_ACTIVE(SOCK_HAS_ASYNC)

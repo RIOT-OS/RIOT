@@ -162,7 +162,7 @@ static int gatt_svr_chr_access_device_info_model(
 
     snprintf(str_answer, STR_ANSWER_BUFFER_SIZE,
              "You are running RIOT on a(n) %s board, "
-             "which features a(n) %s MCU.", RIOT_BOARD, RIOT_MCU);
+             "which features a(n) %s CPU.", RIOT_BOARD, RIOT_CPU);
     puts(str_answer);
 
     int rc = os_mbuf_append(ctxt->om, str_answer, strlen(str_answer));

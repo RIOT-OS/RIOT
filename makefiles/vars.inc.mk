@@ -17,7 +17,6 @@ export CPU_MODEL             # The specific identifier of the used CPU, used for
 export CPU_CORE              # The specific identifier of the core present in the CPU. Needed for depency resolution.
 export CPU_ARCH              # The specific identifier of the architecture of the core defined in CPU_CORE.
 export CPU_FAM               # An intermediate identifier between CPU and CPU_MODEL that represents a sub-group of a Manufacturers CPU's.
-export MCU                   # The MCU, set by the board's Makefile.include, or defaulted to the same value as CPU.
 export INCLUDES              # The extra include paths, set by the various Makefile.include files.
 export CXXINCLUDES           # The extra include paths for c++, set by the various Makefile.include files.
 export NATIVEINCLUDES        # The native include paths, set by the various native Makefile.include files.
@@ -46,6 +45,7 @@ export RIOTMAKE              # Location of all supplemental Makefiles (such as t
 export RIOTKCONFIG           # Location of all supplemental Kconfig files
 export BINDIRBASE            # This is the folder where the application should be built in. For each BOARD a different subfolder is used.
 export BINDIR                # This is the folder where the application should be built in.
+export RIOT_TEST_HASH_DIR    # The dir to generate the test-input-hash.sha1 file for checking if a test has changed, uses BINDIR by default.
 export CARGO_TARGET_DIR      # This is the folder where Rust parts of the application should be built in.
 export BUILD_DIR             # This is the base folder to store common build files and artifacts, e.g. test results.
 export APPDIR                # The base folder containing the application
@@ -58,7 +58,7 @@ export FEATURES_REQUIRED     # List of required features by the application
 export FEATURES_PROVIDED     # List of provided features by the board
 export FEATURES_OPTIONAL     # List of nice to have features
 export FEATURES_USED         # List of features used
-# TOOLCHAINS_SUPPORTED       # List of supported toolchains by an MCU (gnu/llvm/...).
+# TOOLCHAINS_SUPPORTED       # List of supported toolchains by a CPU (gnu/llvm/...).
 # TOOLCHAINS_BLACKLISTED     # List of unspported toolchains for a module or an application.
 export TOOLCHAIN             # Base build toolchain, i.e. GNU or LLVM
 

@@ -2,7 +2,6 @@ ifeq (FreeBSD,$(OS))
   DISABLE_LIBSTDCPP ?= 1
 endif
 
-FEATURES_PROVIDED += arch_32bit
 FEATURES_PROVIDED += arch_native
 FEATURES_PROVIDED += cpp
 ifneq ($(DISABLE_LIBSTDCPP),1)
@@ -18,6 +17,7 @@ FEATURES_PROVIDED += periph_hwrng
 FEATURES_PROVIDED += periph_pm
 FEATURES_PROVIDED += periph_pwm
 FEATURES_PROVIDED += periph_timer_periodic
+FEATURES_PROVIDED += periph_timer_query_freqs
 ifeq ($(OS) $(OS_ARCH),Linux x86_64)
   FEATURES_PROVIDED += rust_target
 endif

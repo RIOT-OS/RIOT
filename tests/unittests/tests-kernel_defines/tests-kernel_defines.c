@@ -77,7 +77,7 @@ static void test_declare_constant(void)
     static_assert(sizeof(test_array) == 3, "test_array should be 3 bytes long");
 }
 
-#ifdef BOARD_NATIVE
+#ifdef CPU_NATIVE
 /* native compiles with -Og, which does not automatically inline functions.
  * We just turn the function into a macro to get the test also passing on
  * native */

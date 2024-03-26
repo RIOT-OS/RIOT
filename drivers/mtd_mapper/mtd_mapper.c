@@ -102,21 +102,6 @@ static int _init(mtd_dev_t *mtd)
     return res;
 }
 
-static int _write(mtd_dev_t *mtd, const void *src, uint32_t addr,
-                  uint32_t count)
-{
-    mtd_mapper_region_t *region = container_of(mtd, mtd_mapper_region_t, mtd);
-
-    if (addr + count > _region_size(region)) {
-        return -EOVERFLOW;
-    }
-
-    _lock(region);
-    int res = mtd_write(region->parent->mtd, src, addr + _byte_offset(region), count);
-    _unlock(region);
-    return res;
-}
-
 static int _write_page(mtd_dev_t *mtd, const void *src, uint32_t page,
                        uint32_t offset, uint32_t count)
 {
@@ -199,7 +184,6 @@ const mtd_desc_t mtd_mapper_driver = {
     .init = _init,
     .read = _read,
     .read_page = _read_page,
-    .write = _write,
     .write_page = _write_page,
     .erase = _erase,
     .erase_sector = _erase_sector,

@@ -56,7 +56,7 @@ static void *main_trampoline(void *arg)
         auto_init();
     }
 
-    if (!IS_ACTIVE(CONFIG_SKIP_BOOT_MSG)) {
+    if (!IS_ACTIVE(CONFIG_SKIP_BOOT_MSG) && !IS_USED(MODULE_STDIO_NULL)) {
         LOG_INFO(CONFIG_BOOT_MSG_STRING "\n");
     }
 
@@ -74,6 +74,17 @@ static void *main_trampoline(void *arg)
     }
 #endif
 
+#ifdef CPU_NATIVE
+    extern unsigned _native_retval;
+    if (!_native_retval) {
+        _native_retval = res;
+    }
+#endif
+
+    if (IS_ACTIVE(CONFIG_CORE_EXIT_WITH_MAIN)) {
+        pm_off();
+    }
+
     return NULL;
 }
 
@@ -90,6 +101,13 @@ static void *idle_thread(void *arg)
 
 void kernel_init(void)
 {
+    if (!IS_USED(MODULE_CORE_THREAD)) {
+        /* RIOT without threads */
+        main_trampoline(NULL);
+        while (1) {}
+        return;
+    }
+
     irq_disable();
 
     if (IS_USED(MODULE_CORE_IDLE_THREAD)) {
@@ -99,16 +117,10 @@ void kernel_init(void)
                       idle_thread, NULL, "idle");
     }
 
-    if (IS_USED(MODULE_CORE_THREAD)) {
-        thread_create(main_stack, sizeof(main_stack),
-                      THREAD_PRIORITY_MAIN,
-                      THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
-                      main_trampoline, NULL, "main");
-    }
-    else {
-        irq_enable();
-        main_trampoline(NULL);
-    }
+    thread_create(main_stack, sizeof(main_stack),
+                  THREAD_PRIORITY_MAIN,
+                  THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
+                  main_trampoline, NULL, "main");
 
     cpu_switch_context_exit();
 }

@@ -33,6 +33,9 @@
 #include "periph_conf.h"
 #include <stdio.h>
 
+#define ENABLE_DEBUG 0
+#include "debug.h"
+
 #define TIM_CHCTL0_CH0COMCT_0   (0x1U << TIMER0_CHCTL0_Output_CH0COMCTL_Pos)
 #define TIM_CHCTL0_CH0COMCT_1   (0x2U << TIMER0_CHCTL0_Output_CH0COMCTL_Pos)
 #define TIM_CHCTL0_CH0COMCT_2   (0x4U << TIMER0_CHCTL0_Output_CH0COMCTL_Pos)
@@ -61,8 +64,13 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
      * so the resolution had to be divided by 2 */
     res *= (mode == PWM_CENTER) ? 2 : 1;
 
-    /* verify parameters */
-    assert((pwm < PWM_NUMOF) && ((freq * res) <= timer_clk));
+    assert(pwm < PWM_NUMOF);
+    if ((freq * res) > timer_clk) {
+        DEBUG("[pwm] Requested PWM frequency %" PRIu32 " Hz is too large. "
+              "Reducing to %" PRIu32 " Hz per API contract\n",
+              freq, timer_clk / res);
+        freq = timer_clk / res;
+    }
 
     /* power on the used timer */
     periph_clk_en(pwm_config[pwm].bus, pwm_config[pwm].rcu_mask);
@@ -91,21 +99,21 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
     /* set PWM mode */
     switch (mode) {
-        case PWM_LEFT:
-            dev(pwm)->CHCTL0_Output = CHCTL0_MODE0;
-            dev(pwm)->CHCTL1_Output = CHCTL0_MODE0;
-            break;
-        case PWM_RIGHT:
-            dev(pwm)->CHCTL0_Output = CHCTL0_MODE1;
-            dev(pwm)->CHCTL1_Output = CHCTL0_MODE1;
-            /* duty cycle should be reversed */
-            break;
-        case PWM_CENTER:
-            dev(pwm)->CHCTL0_Output = CHCTL0_MODE0;
-            dev(pwm)->CHCTL1_Output = CHCTL0_MODE0;
-            /* center-aligned mode 3 */
-            dev(pwm)->CTL0 |= TIMER0_CTL0_CAM_Msk;
-            break;
+    case PWM_LEFT:
+        dev(pwm)->CHCTL0_Output = CHCTL0_MODE0;
+        dev(pwm)->CHCTL1_Output = CHCTL0_MODE0;
+        break;
+    case PWM_RIGHT:
+        dev(pwm)->CHCTL0_Output = CHCTL0_MODE1;
+        dev(pwm)->CHCTL1_Output = CHCTL0_MODE1;
+        /* duty cycle should be reversed */
+        break;
+    case PWM_CENTER:
+        dev(pwm)->CHCTL0_Output = CHCTL0_MODE0;
+        dev(pwm)->CHCTL1_Output = CHCTL0_MODE0;
+        /* center-aligned mode 3 */
+        dev(pwm)->CTL0 |= TIMER0_CTL0_CAM_Msk;
+        break;
     }
 
     /* enable PWM outputs and start PWM generation */

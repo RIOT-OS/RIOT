@@ -104,7 +104,7 @@ netif_t *netif_iter(const netif_t *last);
  * @return  length of @p name on success
  */
 
-int netif_get_name(netif_t *netif, char *name);
+int netif_get_name(const netif_t *netif, char *name);
 
 /**
  * @brief   Gets the numeric identifier of an interface
@@ -170,7 +170,7 @@ netif_t *netif_get_by_id(int16_t id);
  * @return  Number of bytes written to @p value.
  * @return  `< 0` on error, 0 on success.
  */
-int netif_get_opt(netif_t *netif, netopt_t opt, uint16_t context,
+int netif_get_opt(const netif_t *netif, netopt_t opt, uint16_t context,
                   void *value, size_t max_len);
 
 /**
@@ -187,7 +187,7 @@ int netif_get_opt(netif_t *netif, netopt_t opt, uint16_t context,
  * @return Number of bytes used from @p value.
  * @return `< 0` on error, 0 on success.
  */
-int netif_set_opt(netif_t *netif, netopt_t opt, uint16_t context,
+int netif_set_opt(const netif_t *netif, netopt_t opt, uint16_t context,
                   void *value, size_t value_len);
 
 /**

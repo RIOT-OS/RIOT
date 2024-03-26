@@ -23,12 +23,6 @@
 
 #include "cpu_conf_common.h"
 
-/* Workaround redefinition of LITTLE_ENDIAN macro (part1) */
-#ifdef LITTLE_ENDIAN
-#define __TMP_LITTLE_ENDIAN     LITTLE_ENDIAN
-#undef LITTLE_ENDIAN
-#endif
-
 #if defined(CPU_SAMD10)
 #include "vendor/samd10/include/samd10.h"
 #elif defined(CPU_SAMD20)
@@ -61,15 +55,6 @@
 #include "vendor/samr30/include/samr30.h"
 #elif defined(CPU_SAMR34)
 #include "vendor/samr34/include/samr34.h"
-#endif
-
-/* Workaround redefinition of LITTLE_ENDIAN macro (part2) */
-#ifdef LITTLE_ENDIAN
-#undef LITTLE_ENDIAN
-#endif
-
-#ifdef __TMP_LITTLE_ENDIAN
-#define LITTLE_ENDIAN       __TMP_LITTLE_ENDIAN
 #endif
 
 #ifdef __cplusplus

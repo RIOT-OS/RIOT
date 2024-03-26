@@ -39,7 +39,6 @@
 #include <errno.h>
 
 #include "cpu.h"
-#include "irq.h"
 #include "mutex.h"
 #include "pm_layered.h"
 #include "panic.h"
@@ -48,7 +47,9 @@
 #include "periph/gpio.h"
 #include "periph_conf.h"
 
-/* Some DEBUG statements may cause delays that alter i2c functionality */
+/* Some DEBUG statements may cause delays that alter i2c functionality.
+ * E.g. on STM32F1 the delay can cause issues in the state machine that
+ * prevent communication. Using faster stdio than UART can mitigate this. */
 #define ENABLE_DEBUG        0
 #include "debug.h"
 
@@ -69,6 +70,9 @@ static int _stop(I2C_TypeDef *dev);
 static int _is_sr1_mask_set(I2C_TypeDef *i2c, uint32_t mask, uint8_t flags);
 static inline int _wait_for_bus(I2C_TypeDef *i2c);
 static void _init_pins(i2c_t dev);
+static void _deinit_pins(i2c_t dev);
+static void _disable_periph(i2c_t dev);
+static void _enable_periph(i2c_t dev);
 
 /**
  * @brief Array holding one pre-initialized mutex for each I2C device
@@ -106,13 +110,12 @@ void i2c_init(i2c_t dev)
         _init(dev);
     }
 #endif
+    _disable_periph(dev);
 }
 
 static void _init_pins(i2c_t dev)
 {
     /* configure pins */
-    gpio_init(i2c_config[dev].scl_pin, GPIO_OD_PU);
-    gpio_init(i2c_config[dev].sda_pin, GPIO_OD_PU);
 #ifdef CPU_FAM_STM32F1
     /* This is needed in case the remapped pins are used */
     if (i2c_config[dev].scl_pin == GPIO_PIN(PORT_B, 8) ||
@@ -125,9 +128,59 @@ static void _init_pins(i2c_t dev)
     gpio_init_af(i2c_config[dev].scl_pin, GPIO_AF_OUT_OD);
     gpio_init_af(i2c_config[dev].sda_pin, GPIO_AF_OUT_OD);
 #else
+    gpio_init(i2c_config[dev].scl_pin, GPIO_OD_PU);
+    gpio_init(i2c_config[dev].sda_pin, GPIO_OD_PU);
     gpio_init_af(i2c_config[dev].scl_pin, i2c_config[dev].scl_af);
     gpio_init_af(i2c_config[dev].sda_pin, i2c_config[dev].sda_af);
 #endif
+}
+
+static void _deinit_pins(i2c_t dev)
+{
+    /* Releasing pins as open drain and as set, so that the pull ups can pull
+     * the signal high. If we would release the pins as push-pull output, this
+     * could be unpleasant when an I2C device drives the signal low (e.g. for
+     * clock stretching) while the MCU would driving the same signal high.
+     */
+    gpio_set(i2c_config[dev].scl_pin);
+    gpio_set(i2c_config[dev].sda_pin);
+    gpio_init(i2c_config[dev].scl_pin, GPIO_OD);
+    gpio_init(i2c_config[dev].sda_pin, GPIO_OD);
+}
+
+static void _disable_periph(i2c_t dev)
+{
+    /* Clearing PE will not abort ongoing transfer, but only kick in when any
+     * current transfer is done. So we can do this at any point in time */
+    i2c_config[dev].dev->CR1 &= ~(I2C_CR1_PE);
+
+    /* Wait for bus being cleared */
+    _wait_for_bus(i2c_config[dev].dev);
+
+    /* On STM32F1: Detach pins from I2C peripheral before disabling the clock
+     * to it, otherwise SCL and SDA will be driven down and lots of battery
+     * charge is used to heat up the pull up resistors */
+    if (IS_ACTIVE(CPU_FAM_STM32F1)) {
+        _deinit_pins(dev);
+    }
+
+    /* Finally, disable the clock to the I2C peripheral */
+    periph_clk_dis(i2c_config[dev].bus, i2c_config[dev].rcc_mask);
+}
+
+static void _enable_periph(i2c_t dev)
+{
+    /* First, clock the I2C peripheral so that registers can be written to */
+    periph_clk_en(i2c_config[dev].bus, i2c_config[dev].rcc_mask);
+
+    /* On STM32F1: We had to detach pins to work around a h/w limitations, so
+     * re-attach them now */
+    if (IS_ACTIVE(CPU_FAM_STM32F1)) {
+        _init_pins(dev);
+    }
+
+    /* Finally: Enable peripheral again */
+    i2c_config[dev].dev->CR1 |= I2C_CR1_PE;
 }
 
 static void _i2c_init(I2C_TypeDef *i2c, uint32_t clk, uint32_t ccr)
@@ -179,6 +232,9 @@ static void _init(i2c_t dev)
 
     /* configure device */
     _i2c_init(i2c, i2c_config[dev].clk, ccr);
+
+    /* go to low power */
+    _disable_periph(dev);
 }
 
 void i2c_acquire(i2c_t dev)
@@ -192,22 +248,14 @@ void i2c_acquire(i2c_t dev)
     pm_block(STM32_PM_STOP);
 #endif
 
-    periph_clk_en(i2c_config[dev].bus, i2c_config[dev].rcc_mask);
-
-    /* enable device */
-    i2c_config[dev].dev->CR1 |= I2C_CR1_PE;
+    _enable_periph(dev);
 }
 
 void i2c_release(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
 
-    /* disable device */
-    i2c_config[dev].dev->CR1 &= ~(I2C_CR1_PE);
-
-    _wait_for_bus(i2c_config[dev].dev);
-
-    periph_clk_dis(i2c_config[dev].bus, i2c_config[dev].rcc_mask);
+    _disable_periph(dev);
 
 #ifdef STM32_PM_STOP
     /* unblock STOP mode */
@@ -223,7 +271,7 @@ int i2c_read_bytes(i2c_t dev, uint16_t address, void *data, size_t length,
     assert(dev < I2C_NUMOF);
 
     I2C_TypeDef *i2c = i2c_config[dev].dev;
-    DEBUG("[i2c] read_bytes: Starting\n");
+    DEBUG_PUTS("[i2c] i2c_read_bytes(): Starting");
 
     /* Do not support repeated start reading
      * The repeated start read requires the bus to be busy (I2C_SR2_BUSY == 1)
@@ -260,11 +308,12 @@ int i2c_read_bytes(i2c_t dev, uint16_t address, void *data, size_t length,
         /* Wait for reception to complete */
         ret = _is_sr1_mask_set(i2c, I2C_SR1_RXNE, flags);
         if (ret < 0) {
+            DEBUG_PUTS("[i2c] i2c_read_bytes(): Waiting for I2C_SR1_RXNE failed");
             return ret;
         }
         ((uint8_t*)data)[i] = i2c->DR;
     }
-    DEBUG("[i2c] read_bytes: Finished reading bytes\n");
+    DEBUG_PUTS("[i2c] i2c_read_bytes(): Finished reading bytes");
     if (flags & I2C_NOSTOP) {
         return 0;
     }
@@ -280,7 +329,7 @@ int i2c_write_bytes(i2c_t dev, uint16_t address, const void *data,
 
     I2C_TypeDef *i2c = i2c_config[dev].dev;
     assert(i2c != NULL);
-    DEBUG("[i2c] write_bytes: Starting\n");
+    DEBUG_PUTS("[i2c] i2c_write_bytes(): Starting");
     /* Length is 0 in start since we don't need to preset the stop bit */
     ret = _i2c_start(i2c, (address << 1) | I2C_FLAG_WRITE, flags, 0);
     if (ret < 0) {
@@ -292,17 +341,19 @@ int i2c_write_bytes(i2c_t dev, uint16_t address, const void *data,
 
     /* Send out data bytes */
     for (size_t i = 0; i < length; i++) {
-        DEBUG("[i2c] write_bytes: Waiting for TX reg to be free\n");
+        DEBUG_PUTS("[i2c] i2c_write_bytes(): Waiting for TX reg to be free");
         ret = _is_sr1_mask_set(i2c, I2C_SR1_TXE, flags);
         if (ret < 0) {
+            DEBUG_PUTS("[i2c] i2c_write_bytes(): Waiting for I2C_SR1_TXE failed");
             return ret;
         }
-        DEBUG("[i2c] write_bytes: TX is free so send byte\n");
+        DEBUG_PUTS("[i2c] i2c_write_bytes(): TX is free so send byte");
         i2c->DR = ((uint8_t*)data)[i];
     }
     /* Wait for tx reg to be empty so other calls will no interfere */
     ret = _is_sr1_mask_set(i2c, I2C_SR1_TXE, flags);
     if (ret < 0) {
+        DEBUG_PUTS("[i2c] i2c_write_bytes(): Waiting for I2C_SR1_TXE failed");
         return ret;
     }
     if (flags & I2C_NOSTOP) {
@@ -310,12 +361,12 @@ int i2c_write_bytes(i2c_t dev, uint16_t address, const void *data,
     }
     else {
         /* End transmission */
-        DEBUG("[i2c] write_bytes: Ending transmission\n");
+        DEBUG_PUTS("[i2c] i2c_write_bytes(): Ending transmission");
         ret = _stop(i2c);
         if (ret < 0) {
             return ret;
         }
-        DEBUG("[i2c] write_bytes: STOP condition was send out\n");
+        DEBUG_PUTS("[i2c] i2c_write_bytes(): STOP condition was send out");
     }
 
     return _wait_for_bus(i2c);
@@ -335,18 +386,19 @@ static int _i2c_start(I2C_TypeDef *i2c, uint8_t address_byte, uint8_t flags,
     i2c->SR1 &= ~ERROR_FLAG;
 
     if (!(flags & I2C_NOSTART)) {
-        DEBUG("[i2c] start: Generate start condition\n");
+        DEBUG_PUTS("[i2c] _i2c_start(): Generate start condition");
         /* Generate start condition */
         i2c->CR1 |= I2C_CR1_START | I2C_CR1_ACK;
 
         /* Wait for SB flag to be set */
         int ret = _is_sr1_mask_set(i2c, I2C_SR1_SB, flags & ~I2C_NOSTOP);
         if (ret < 0) {
+            DEBUG_PUTS("[i2c] _i2c_start(): Waiting for I2C_SR1_SB failed");
             return ret;
         }
-        DEBUG("[i2c] start: Start condition generated\n");
+        DEBUG_PUTS("[i2c] _i2c_start(): Start condition generated");
 
-        DEBUG("[i2c] start: Generating address\n");
+        DEBUG_PUTS("[i2c] _i2c_start(): Generating address");
         /* Send address and read/write flag */
         i2c->DR = (address_byte);
         if (!(flags & I2C_NOSTOP) && length == 1) {
@@ -354,8 +406,9 @@ static int _i2c_start(I2C_TypeDef *i2c, uint8_t address_byte, uint8_t flags,
         }
         /* Wait for ADDR flag to be set */
         ret = _is_sr1_mask_set(i2c, I2C_SR1_ADDR, flags & ~I2C_NOSTOP);
-        if (ret == -EIO){
+        if (ret == -EIO) {
             /* Since NACK happened during start it means no device connected */
+            DEBUG_PUTS("[i2c] _i2c_start(): Address NACKED");
             return -ENXIO;
         }
         /* Needed to clear address bit */
@@ -364,7 +417,12 @@ static int _i2c_start(I2C_TypeDef *i2c, uint8_t address_byte, uint8_t flags,
             /* Stop must also be sent before final read */
             i2c->CR1 |= (I2C_CR1_STOP);
         }
-        DEBUG("[i2c] start: Address generated\n");
+        if (ret) {
+            DEBUG_PUTS("[i2c] _i2c_start(): Waiting for I2C_SR1_ADDR failed");
+        }
+        else {
+            DEBUG_PUTS("[i2c] _i2c_start(): Address generated");
+        }
         return ret;
     }
     return 0;
@@ -377,7 +435,7 @@ static int _is_sr1_mask_set(I2C_TypeDef *i2c, uint32_t mask, uint8_t flags)
     while (tick--) {
         uint32_t sr1 = i2c->SR1;
         if (sr1 & I2C_SR1_AF) {
-            DEBUG("[i2c] is_sr1_mask_set: NACK received\n");
+            DEBUG_PUTS("[i2c] _is_sr1_mask_set(): NACK received");
             i2c->SR1 &= ~ERROR_FLAG;
             if (!(flags & I2C_NOSTOP)) {
                 _stop(i2c);
@@ -385,7 +443,7 @@ static int _is_sr1_mask_set(I2C_TypeDef *i2c, uint32_t mask, uint8_t flags)
             return -EIO;
         }
         if ((sr1 & I2C_SR1_ARLO) || (sr1 & I2C_SR1_BERR)) {
-            DEBUG("[i2c] is_sr1_mask_set: arb lost or bus ERROR_FLAG\n");
+            DEBUG_PUTS("[i2c] _is_sr1_mask_set(): arb lost or bus ERROR_FLAG");
             i2c->SR1 &= ~ERROR_FLAG;
             _stop(i2c);
             return -EAGAIN;
@@ -401,25 +459,28 @@ static int _is_sr1_mask_set(I2C_TypeDef *i2c, uint32_t mask, uint8_t flags)
     */
     i2c->SR1 &= ~ERROR_FLAG;
     _stop(i2c);
+    DEBUG_PUTS("[i2c] _is_sr1_mask_set(): Timed out");
     return -ETIMEDOUT;
 }
 
 static int _stop(I2C_TypeDef *i2c)
 {
     /* send STOP condition */
-    DEBUG("[i2c] stop: Generate stop condition\n");
+    DEBUG_PUTS("[i2c] _stop(): Generate stop condition");
     i2c->CR1 &= ~(I2C_CR1_ACK);
     i2c->CR1 |= I2C_CR1_STOP;
     uint16_t tick = TICK_TIMEOUT;
     while ((i2c->CR1 & I2C_CR1_STOP) && tick--) {}
     if (!tick) {
+        DEBUG_PUTS("[i2c] _stop(): Stop condition timed out");
         return -ETIMEDOUT;
     }
-    DEBUG("[i2c] stop: Stop condition succeeded\n");
+    DEBUG_PUTS("[i2c] _stop(): Stop condition succeeded");
     if (_wait_for_bus(i2c) < 0) {
+        DEBUG_PUTS("[i2c] _stop(): Bus free timed out");
         return -ETIMEDOUT;
     }
-    DEBUG("[i2c] stop: Bus is free\n");
+    DEBUG_PUTS("[i2c] _stop(): Bus is free");
     return 0;
 }
 
@@ -428,6 +489,7 @@ static inline int _wait_for_bus(I2C_TypeDef *i2c)
     uint16_t tick = TICK_TIMEOUT;
     while ((i2c->SR2 & I2C_SR2_BUSY) && tick--) {}
     if (!tick) {
+        DEBUG_PUTS("[i2c] _wait_for_bus(): Timed out");
         return -ETIMEDOUT;
     }
     return 0;
@@ -443,28 +505,28 @@ static inline void irq_handler(i2c_t dev)
     assert(i2c != NULL);
 
     unsigned state = i2c->SR1;
-    DEBUG("\n\n### I2C ERROR OCCURRED ###\n");
+    DEBUG_PUTS("\n\n### I2C ERROR OCCURRED ###");
     DEBUG("status: %08x\n", state);
     if (state & I2C_SR1_OVR) {
-        DEBUG("OVR\n");
+        DEBUG_PUTS("OVR");
     }
     if (state & I2C_SR1_AF) {
-        DEBUG("AF\n");
+        DEBUG_PUTS("AF");
     }
     if (state & I2C_SR1_ARLO) {
-        DEBUG("ARLO\n");
+        DEBUG_PUTS("ARLO");
     }
     if (state & I2C_SR1_BERR) {
-        DEBUG("BERR\n");
+        DEBUG_PUTS("BERR");
     }
     if (state & I2C_SR1_PECERR) {
-        DEBUG("PECERR\n");
+        DEBUG_PUTS("PECERR");
     }
     if (state & I2C_SR1_TIMEOUT) {
-        DEBUG("TIMEOUT\n");
+        DEBUG_PUTS("TIMEOUT");
     }
     if (state & I2C_SR1_SMBALERT) {
-        DEBUG("SMBALERT\n");
+        DEBUG_PUTS("SMBALERT");
     }
     core_panic(PANIC_GENERAL_ERROR, "I2C FAULT");
 }

@@ -34,7 +34,12 @@ will also be fine - however, we rely on users to report bugs regarding tooling i
 here. So expect occasional issues for the development branch and please help testing during the
 feature freeze period, if you develop on macOS or BSD.
 
-Native development on Windows and macOS machines is not officially supported. What works well is using Linux
+Windows users can refer to [this guide][dev-setup-windows] to
+[setup the development environment][dev-setup-windows] on Windows.
+
+[dev-setup-windows]: https://github.com/RIOT-OS/RIOT/tree/master/doc/guides/setup-windows
+
+Native development on macOS machines is not officially supported. What works well is using Linux
 in a virtual machine, but at much lower performance than running Linux natively. We also offer Docker images.
 For development on Windows, using the
 [Windows Subsystem for Linux (WSL)](https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux)
@@ -202,7 +207,8 @@ Building and executing an example           {#building-and-executing-an-example}
 ---------------------------------
 RIOT provides a number of examples in the `examples/` directory. Every example
 has a README that documents its usage and its purpose. You can build them by
-typing
+opening a shell, navigating to an example (e.g. `examples/default`), and
+running:
 
 ~~~~~~~~ {.sh}
 make BOARD=samr21-xpro
@@ -214,9 +220,7 @@ or
 make all BOARD=samr21-xpro
 ~~~~~~~~
 
-into your shell.
-
-To flash the application to a board just type
+To flash the application to a board just run:
 
 ~~~~~~~~ {.sh}
 make flash BOARD=samr21-xpro

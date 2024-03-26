@@ -38,7 +38,7 @@ The main features of this board are:
 | SAI audio codec         | - | |
 | External PSRAM          | x | Connected to FMC peripheral |
 | External Quad-SPI Flash | - | QSPI peripheral is not yet supported |
-| SD Card Interface       | - | |
+| SD Card Interface       | - | SDMMC1 on PC8..PC13/PD2 |
 
 ## Board Configuration (sorted by peripheral):
 

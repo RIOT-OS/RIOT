@@ -9,6 +9,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega8 \
     msb-430 \
     msb-430h \
+    nucleo-c031c6 \
     nucleo-f031k6 \
     nucleo-f042k6 \
     nucleo-l011k4 \
@@ -21,5 +22,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32g0316-disco \
     telosb \
     waspmote-pro \
+    weact-g030f6 \
     z1 \
     #

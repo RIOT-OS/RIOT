@@ -161,6 +161,23 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
     return 0;
 }
 
+uword_t timer_query_freqs_numof(tim_t dev)
+{
+    (void)dev;
+    /* Prescaler values from 0 to UINT16_MAX are supported */
+    return UINT16_MAX + 1;
+}
+
+uint32_t timer_query_freqs(tim_t dev, uword_t index)
+{
+
+    if (index > UINT16_MAX) {
+        return 0;
+    }
+
+    return periph_timer_clk(timer_config[dev].bus) / (index + 1);
+}
+
 int timer_set(tim_t tim, int channel, unsigned int timeout)
 {
     unsigned value = (dev(tim)->CNT + timeout) & timer_config[tim].max;

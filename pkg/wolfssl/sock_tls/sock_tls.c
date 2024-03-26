@@ -85,7 +85,7 @@ void sock_dtls_session_destroy(sock_tls_t *sk)
 #endif
 
 #include <ctype.h>
-int strncasecmp(const char *s1, const char * s2, unsigned int sz)
+int strncasecmp(const char *s1, const char * s2, size_t sz)
 {
     unsigned int i;
     for( i = 0; i < sz; i++) {

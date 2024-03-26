@@ -64,7 +64,7 @@ static ssize_t _riot_block2_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, c
     bufpos += coap_blockwise_put_bytes(&slicer, bufpos, block2_board, sizeof(block2_board)-1);
     bufpos += coap_blockwise_put_bytes(&slicer, bufpos, (uint8_t*)RIOT_BOARD, strlen(RIOT_BOARD));
     bufpos += coap_blockwise_put_bytes(&slicer, bufpos, block2_mcu, sizeof(block2_mcu)-1);
-    bufpos += coap_blockwise_put_bytes(&slicer, bufpos, (uint8_t*)RIOT_MCU, strlen(RIOT_MCU));
+    bufpos += coap_blockwise_put_bytes(&slicer, bufpos, (uint8_t*)RIOT_CPU, strlen(RIOT_CPU));
     /* To demonstrate individual chars */
     bufpos += coap_blockwise_put_char(&slicer, bufpos, ' ');
     bufpos += coap_blockwise_put_char(&slicer, bufpos, 'M');
@@ -128,8 +128,8 @@ ssize_t _sha256_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, coap_request_
     coap_block1_t block1;
     int blockwise = coap_get_block1(pkt, &block1);
 
-    printf("_sha256_handler(): received data: offset=%u len=%u blockwise=%i more=%i\n", \
-            (unsigned)block1.offset, pkt->payload_len, blockwise, block1.more);
+    printf("_sha256_handler(): received data: offset=%" PRIuSIZE " len=%u blockwise=%i more=%i\n",
+            block1.offset, pkt->payload_len, blockwise, block1.more);
 
     if (block1.offset == 0) {
         puts("_sha256_handler(): init");
@@ -183,21 +183,21 @@ NANOCOAP_RESOURCE(sha256) {
 };
 
 /* we can also include the fileserver module */
-#ifdef MODULE_GCOAP_FILESERVER
-#include "net/gcoap/fileserver.h"
+#ifdef MODULE_NANOCOAP_FILESERVER
+#include "net/nanocoap/fileserver.h"
 #include "vfs_default.h"
 
 NANOCOAP_RESOURCE(fileserver) {
     .path = "/vfs",
     .methods = COAP_GET
-#if IS_USED(MODULE_GCOAP_FILESERVER_PUT)
+#if IS_USED(MODULE_NANOCOAP_FILESERVER_PUT)
       | COAP_PUT
 #endif
-#if IS_USED(MODULE_GCOAP_FILESERVER_DELETE)
+#if IS_USED(MODULE_NANOCOAP_FILESERVER_DELETE)
       | COAP_DELETE
 #endif
       | COAP_MATCH_SUBTREE,
-    .handler = gcoap_fileserver_handler,
+    .handler = nanocoap_fileserver_handler,
     .context = VFS_DEFAULT_DATA
 };
 #endif

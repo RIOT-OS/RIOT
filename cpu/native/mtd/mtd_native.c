@@ -78,35 +78,6 @@ static int _read(mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size)
     return (nread == size) ? 0 : -EIO;
 }
 
-static int _write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size)
-{
-    mtd_native_dev_t *_dev = (mtd_native_dev_t*) dev;
-    size_t mtd_size = dev->sector_count * dev->pages_per_sector * dev->page_size;
-
-    DEBUG("mtd_native: write from 0x%" PRIx32 " count %" PRIu32 "\n", addr, size);
-
-    if (addr + size > mtd_size) {
-        return -EOVERFLOW;
-    }
-    if (((addr % dev->page_size) + size) > dev->page_size) {
-        return -EOVERFLOW;
-    }
-
-    FILE *f = real_fopen(_dev->fname, "r+");
-    if (!f) {
-        return -EIO;
-    }
-    real_fseek(f, addr, SEEK_SET);
-    for (size_t i = 0; i < size; i++) {
-        uint8_t c = real_fgetc(f);
-        real_fseek(f, -1, SEEK_CUR);
-        real_fputc(c & ((uint8_t*)buff)[i], f);
-    }
-    real_fclose(f);
-
-    return 0;
-}
-
 static int _write_page(mtd_dev_t *dev, const void *buff, uint32_t page, uint32_t offset,
                        uint32_t size)
 {
@@ -181,7 +152,6 @@ static int _power(mtd_dev_t *dev, enum mtd_power_state power)
 const mtd_desc_t native_flash_driver = {
     .read = _read,
     .power = _power,
-    .write = _write,
     .write_page = _write_page,
     .erase = _erase,
     .init = _init,

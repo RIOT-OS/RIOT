@@ -27,7 +27,8 @@
 
 #include "kernel_defines.h"
 #include "fmt.h"
-#include "stdio_base.h"
+
+extern ssize_t stdio_write(const void* buffer, size_t len);
 
 static const char _hex_chars[16] = "0123456789ABCDEF";
 
@@ -85,6 +86,19 @@ size_t fmt_bytes_hex(char *out, const uint8_t *ptr, size_t n)
     return len;
 }
 
+size_t fmt_bytes_hex_reverse(char *out, const uint8_t *ptr, size_t n)
+{
+    size_t len = n * 2;
+
+    if (out) {
+        while (n--) {
+            out += fmt_byte_hex(out, ptr[n]);
+        }
+    }
+
+    return len;
+}
+
 size_t fmt_strlen(const char *str)
 {
     const char *tmp = str;
@@ -120,16 +134,6 @@ size_t fmt_str(char *out, const char *str)
         }
     }
     return len;
-}
-
-size_t fmt_bytes_hex_reverse(char *out, const uint8_t *ptr, size_t n)
-{
-    size_t i = n;
-
-    while (i--) {
-        out += fmt_byte_hex(out, ptr[i]);
-    }
-    return (n << 1);
 }
 
 static uint8_t _byte_mod25(uint8_t x)

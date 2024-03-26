@@ -22,6 +22,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "architecture.h"
 #include "shell.h"
 #include "test_utils/expect.h"
 
@@ -74,7 +75,7 @@ static int cmd_read(int argc, char **argv)
     size_t ret = eeprom_read(pos, (uint8_t *)buffer, count);
     buffer[count] = '\0';
 
-    printf("Data read from EEPROM (%d bytes): %s\n", (int)ret, buffer);
+    printf("Data read from EEPROM (%" PRIuSIZE " bytes): %s\n", ret, buffer);
 
     return 0;
 }
@@ -114,7 +115,7 @@ static int cmd_write(int argc, char **argv)
     }
 
     size_t ret = eeprom_write(pos, (uint8_t *)argv[2], strlen(argv[2]));
-    printf("%d bytes written to EEPROM\n", (int)ret);
+    printf("%" PRIuSIZE " bytes written to EEPROM\n", ret);
 
     return 0;
 }
@@ -162,7 +163,7 @@ static int cmd_set(int argc, char **argv)
     }
 
     size_t ret = eeprom_set(pos, c, count);
-    printf("%d bytes set to %c in EEPROM\n", (int)ret, c);
+    printf("%" PRIuSIZE " bytes set to %c in EEPROM\n", ret, c);
 
     return 0;
 }
@@ -183,7 +184,7 @@ static int cmd_clear(int argc, char **argv)
     }
 
     size_t ret = eeprom_clear(pos, count);
-    printf("%d bytes cleared in EEPROM\n", (int)ret);
+    printf("%" PRIuSIZE " bytes cleared in EEPROM\n", ret);
 
     return 0;
 }

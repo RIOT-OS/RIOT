@@ -204,7 +204,7 @@ include $(RIOTMAKE)/boards.inc.mk
 include $(RIOTMAKE)/dependencies_debug.inc.mk
 
 # Use TOOLCHAIN environment variable to select the toolchain to use.
-ifeq ($(BOARD),native)
+ifneq (,$(filter native native64,$(BOARD)))
   ifeq ($(OS),Darwin)
     $(shell $(COLOR_ECHO) "$(COLOR_RED)"Buildin on macOS is not supported."\
                           "We recommend vagrant for building:$(COLOR_RESET)"\
@@ -493,7 +493,7 @@ ifneq ($(RIOT_CI_BUILD),1)
   ifneq (iotlab,$(PROGRAMMER))
     ifneq (,$(PROGRAMMERS_SUPPORTED))
       ifeq (,$(filter $(PROGRAMMER),$(PROGRAMMERS_SUPPORTED)))
-        $(info '$(PROGRAMMER)' programmer is not supported by this board. \
+        $(warning '$(PROGRAMMER)' programmer is not supported by this board. \
                 Supported programmers: '$(PROGRAMMERS_SUPPORTED)')
       endif
     endif
@@ -505,6 +505,15 @@ endif
 TOOLCHAINS_SUPPORTED ?= gnu
 # Import all toolchain settings
 include $(RIOTMAKE)/toolchain/$(TOOLCHAIN).inc.mk
+
+# Other than on native, RWX segments in ROM are not actually RWX, as regular
+# store instructions won't write to flash.
+ifeq (,$(filter native native64,$(BOARD)))
+  LINKER_SUPPORTS_NOWARNRWX ?= $(shell LC_ALL=C $(LINK) $(RIOTTOOLS)/testprogs/minimal_linkable.c -o /dev/null -lc -Wall -Wextra -pedantic -Wl,--no-warn-rwx-segments 2> /dev/null && echo 1 || echo 0)
+  ifeq (1,$(LINKER_SUPPORTS_NOWARNRWX))
+    LINKFLAGS += -Wl,--no-warn-rwx-segments
+  endif
+endif
 
 # Append ldscript path after importing CPU and board makefiles to allow
 # overriding the core ldscripts
@@ -522,10 +531,6 @@ include $(RIOTMAKE)/ubsan.inc.mk
 # Non cached builds are not affected in any way.
 # For more information, see http://petereisentraut.blogspot.com/2011/09/ccache-and-clang-part-2.html
 export CCACHE_CPP2=yes
-
-ifeq ($(strip $(MCU)),)
-	MCU = $(CPU)
-endif
 
 # set some settings useful for continuous integration builds
 ifeq ($(RIOT_CI_BUILD),1)
@@ -548,11 +553,9 @@ endif
 # if you want to publish the board into the sources as an uppercase #define
 BOARDDEF = $(call uppercase_and_underscore,$(BOARD))
 CPUDEF = $(call uppercase_and_underscore,$(CPU))
-MCUDEF = $(call uppercase_and_underscore,$(MCU))
 CFLAGS += -DRIOT_APPLICATION=\"$(APPLICATION)\"
 CFLAGS += -DBOARD_$(BOARDDEF)=\"$(BOARD)\" -DRIOT_BOARD=BOARD_$(BOARDDEF)
 CFLAGS += -DCPU_$(CPUDEF)=\"$(CPU)\" -DRIOT_CPU=CPU_$(CPUDEF)
-CFLAGS += -DMCU_$(MCUDEF)=\"$(MCU)\" -DRIOT_MCU=MCU_$(MCUDEF)
 
 # Feature test default CFLAGS and LINKFLAGS for the set compiled.
 include $(RIOTMAKE)/cflags.inc.mk
@@ -715,6 +718,12 @@ BUILDDEPS += $(BUILD_DIR)/CACHEDIR.TAG
 # clean removing dependencies that make previously considered as up to date.
 $(BUILDDEPS): $(CLEAN)
 
+# include makefile snippets for packages in $(PKG_PATHS) that modify GENSRC:
+-include $(PKG_PATHS:%=%Makefile.gensrc)
+# remove duplicates & make accessible to subprocesses
+GENSRC := $(sort $(GENSRC))
+export GENSRC
+
 # Save value to verify it is not modified later
 _BASELIBS_VALUE_BEFORE_USAGE := $(BASELIBS)
 
@@ -763,7 +772,7 @@ $(APPLICATION_MODULE).module: FORCE
 
 # Other modules are built by application.inc.mk and packages building
 _SUBMAKE_LIBS = $(filter-out $(APPLICATION_MODULE).module $(APPDEPS), $(BASELIBS) $(ARCHIVES))
-$(_SUBMAKE_LIBS): $(APPLICATION_MODULE).module pkg-build
+$(_SUBMAKE_LIBS): $(APPLICATION_MODULE).module pkg-build $(GENSRC)
 
 # 'print-size' triggers a rebuild. Use 'info-buildsize' if you do not need to rebuild.
 print-size: $(ELFFILE)
@@ -812,17 +821,19 @@ endif
 	$(call check_cmd,$(CC),Compiler)
 
 ..build-message: $(if $(SHOULD_RUN_KCONFIG), check-kconfig-errors)
-	@$(COLOR_ECHO) '$(COLOR_GREEN)Building application "$(APPLICATION)" for "$(BOARD)" with MCU "$(MCU)".$(COLOR_RESET)'
+	@$(COLOR_ECHO) '$(COLOR_GREEN)Building application "$(APPLICATION)" for "$(BOARD)" with CPU "$(CPU)".$(COLOR_RESET)'
 	@$(COLOR_ECHO)
 
 # The `clean` needs to be serialized before everything else.
-all $(BASELIBS) $(ARCHIVES) $(BUILDDEPS) ..in-docker-container: | $(CLEAN)
+all $(BASELIBS) $(ARCHIVES) $(BUILDDEPS) $(GENSRC) ..in-docker-container: | $(CLEAN)
 
 .PHONY: pkg-prepare pkg-build
 pkg-prepare:
 	-@$(foreach dir,$(PKG_PATHS),"$(MAKE)" -C $(dir) prepare $(NEWLINE))
 
-pkg-build: $(BUILDDEPS)
+$(GENSRC): pkg-prepare
+
+pkg-build: $(BUILDDEPS) | $(GENSRC)
 	$(foreach dir,$(PKG_PATHS),$(QQ)"$(MAKE)" -C $(dir) $(NEWLINE))
 
 clean:
@@ -1031,7 +1042,8 @@ ifneq (, $(filter all flash, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
 endif
 
 help:
-	@$(MAKE) -qp | sed -ne 's/\(^[a-z][a-z_-]*\):.*/\1/p' | sort | uniq
+  # filter all targets starting with lowercase and containing lowercase letters, hyphens, or underscores; explicitly include generate-Makefile.ci
+	@$(MAKE) -qp | sed -ne 's/\(^[a-z][a-z_-]*\|generate-Makefile.ci\):.*/\1/p' | sort -u
 
 ifeq (iotlab-m3,$(BOARD))
   ifneq (,$(filter iotlab-%,$(MAKECMDGOALS)))
@@ -1071,6 +1083,9 @@ $(RIOTBUILD_CONFIG_HEADER_C).in: FORCE | $(CLEAN)
 CFLAGS_WITH_MACROS += $(CFLAGS)
 CFLAGS_WITH_MACROS += -DRIOT_VERSION=\"$(RIOT_VERSION)\"
 CFLAGS_WITH_MACROS += -DRIOT_VERSION_CODE=$(RIOT_VERSION_CODE)
+ifneq (,$(RIOT_VERSION_EXTRA))
+  CFLAGS_WITH_MACROS += -DCONFIG_RIOT_VERSION_EXTRA=\""$(RIOT_VERSION_EXTRA)"\"
+endif
 # MODULE_NAME defines. Declared in 'makefiles/modules.inc.mk'
 CFLAGS_WITH_MACROS += $(EXTDEFINES)
 

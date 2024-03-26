@@ -18,10 +18,9 @@
  * @}
  */
 
-#include <string.h>
+#include <assert.h>
 
 #include "hashes/sha224.h"
-#include "hashes/sha2xx_common.h"
 
 /* SHA-224 initialization.  Begins a SHA-224 operation. */
 void sha224_init(sha224_context_t *ctx)
@@ -40,18 +39,12 @@ void sha224_init(sha224_context_t *ctx)
     ctx->state[7] = 0xBEFA4FA4;
 }
 
-void *sha224(const void *data, size_t len, void *digest)
+void sha224(const void *data, size_t len, void *digest)
 {
     sha224_context_t c;
-    static unsigned char m[SHA224_DIGEST_LENGTH];
-
-    if (digest == NULL) {
-        digest = m;
-    }
+    assert(digest);
 
     sha224_init(&c);
     sha224_update(&c, data, len);
     sha224_final(&c, digest);
-
-    return digest;
 }

@@ -7,7 +7,7 @@
 ## Overview
 
 The Nucleo-L476RG is a board from ST's Nucleo family supporting ARM Cortex-M4
-STM32L476RG microcontroller with 128KiB or RAM and 1MiB of Flash.
+STM32L476RG microcontroller with 128KiB of RAM and 1MiB of Flash.
 
 ## Pinout
 

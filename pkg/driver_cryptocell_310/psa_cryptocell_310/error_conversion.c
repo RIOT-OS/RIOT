@@ -133,7 +133,7 @@ psa_status_t CRYS_to_psa_error(CRYSError_t error)
     case CRYS_ECMONT_PKI_ERROR:
     case CRYS_ECMONT_IS_NOT_SUPPORTED:
     case CRYS_ECEDW_IS_NOT_SUPPORTED:
-            return PSA_ERROR_INVALID_ARGUMENT;
+        return PSA_ERROR_INVALID_ARGUMENT;
     default:
         return PSA_ERROR_GENERIC_ERROR;
     }

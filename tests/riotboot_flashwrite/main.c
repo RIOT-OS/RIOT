@@ -28,30 +28,8 @@
 #include "riotboot/slot.h"
 #include "riotboot/flashwrite.h"
 
-#define COAP_INBUF_SIZE (256U)
-
-/* Extend stacksize of nanocoap server thread */
-static char _nanocoap_server_stack[THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE_PRINTF];
-#define NANOCOAP_SERVER_QUEUE_SIZE     (8)
-static msg_t _nanocoap_server_msg_queue[NANOCOAP_SERVER_QUEUE_SIZE];
-
 #define MAIN_QUEUE_SIZE     (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
-
-static void *_nanocoap_server_thread(void *arg)
-{
-    (void)arg;
-
-    /* nanocoap_server uses gnrc sock which uses gnrc which needs a msg queue */
-    msg_init_queue(_nanocoap_server_msg_queue, NANOCOAP_SERVER_QUEUE_SIZE);
-
-    /* initialize nanocoap server instance */
-    uint8_t buf[COAP_INBUF_SIZE];
-    sock_udp_ep_t local = { .port=COAP_PORT, .family=AF_INET6 };
-    nanocoap_server(&local, buf, sizeof(buf));
-
-    return NULL;
-}
 
 static int cmd_print_riotboot_hdr(int argc, char **argv)
 {
@@ -110,12 +88,6 @@ int main(void)
 
     cmd_print_current_slot(0, NULL);
     cmd_print_riotboot_hdr(0, NULL);
-
-    /* start nanocoap server thread */
-    thread_create(_nanocoap_server_stack, sizeof(_nanocoap_server_stack),
-                  THREAD_PRIORITY_MAIN - 1,
-                  THREAD_CREATE_STACKTEST,
-                  _nanocoap_server_thread, NULL, "nanocoap server");
 
     /* the shell contains commands that receive packets via GNRC and thus
        needs a msg queue */

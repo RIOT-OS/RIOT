@@ -10,11 +10,11 @@ BOARD ?= nucleo-f767zi
 # first output pin and the second input pin to the second output pin, e.g. using
 # jumper wires.
 PORT_IN ?= 1
-PORT_OUT ?= 0
+PORT_OUT ?= 1
 PIN_IN_0 ?= 0
 PIN_IN_1 ?= 1
-PIN_OUT_0 ?= 0
-PIN_OUT_1 ?= 1
+PIN_OUT_0 ?= 2
+PIN_OUT_1 ?= 3
 
 # Boards that require tweaking for low ROM
 LOW_ROM_BOARDS := \
@@ -46,7 +46,7 @@ CFLAGS += -DPIN_OUT_0=$(PIN_OUT_0)
 CFLAGS += -DPIN_OUT_1=$(PIN_OUT_1)
 CFLAGS += -DLOW_ROM=$(LOW_ROM)
 
-ifneq ($(MCU),esp32)
+ifneq ($(CPU),esp32)
   # We only need 1 thread (+ the Idle thread on some platforms) and we really
   # want this app working on all boards.
   CFLAGS += -DMAXTHREADS=2

@@ -4,7 +4,7 @@ Using conflicting features provided by boards was invisible for the user until t
 Now, existing and known conflicts can be recorded into `FEATURES_CONFLICT` for each board to inform the user on a conflict situation during compile time.
 
 This test requires conflicting features in its `Makefile`, i.e. `FEATURES_REQUIRED = periph_dac periph_spi`.
-It is expected to be presented with a warning on the conflicts with a short description message during compile time for the [stm32f4discovery](https://github.com/RIOT-OS/RIOT/wiki/Board%3A-STM32F4discovery) by now, i.e. :
+It is expected to be presented with a warning on the conflicts with a short description message during compile time for the [stm32f4discovery](https://doc.riot-os.org/group__boards__stm32f4discovery.html) by now, i.e. :
 
 ```
 $ make BOARD=stm32f4discovery
@@ -23,7 +23,7 @@ Whenever an application, such as this test, requires board features that match a
 
 * Conflicting features are described in groups separated by a `:` (doublecolon) for each feature, e.g.:
 `FEATURES_CONFLICT = periph_spi:periph_dac`, which states that `periph_spi` conflicts with `periph_dac`.
-As seen above, this is the conflict of `SPI_DEV(0)` pinout is shared with `DAC` on the [stm32f4discovery](https://github.com/RIOT-OS/RIOT/wiki/Board%3A-STM32F4discovery) board.
+As seen above, this is the conflict of `SPI_DEV(0)` pinout is shared with `DAC` on the [stm32f4discovery](https://doc.riot-os.org/group__boards__stm32f4discovery.html) board.
 
 * Distinct groups of conflicts are whitespace separated, e.g.:
 `featureA:featureB featureC:featureD`, which states that `featureA` conflicts with `featureB`, and `featureC` conflicts with `featureD`.

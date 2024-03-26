@@ -61,7 +61,7 @@ static const dma_conf_t dma_config[] = {
     { .stream = 6 },    /* DMA1 Stream 6 - USART2_TX */
     { .stream = 3 },    /* DMA1 Stream 3 - SPI2_RX   */
     { .stream = 4 },    /* DMA1 Stream 4 - SPI2_TX   */
-    { .stream = 11 },   /* DMA2 Stream 3 - SPI4_RX   */
+    { .stream = 11 },   /* DMA2 Stream 3 - SPI4_RX Ch5 / SDMMC1 Ch 4 */
     { .stream = 12 },   /* DMA2 Stream 4 - SPI4_TX   */
     { .stream = 8 },    /* DMA2 Stream 0 - ETH_TX    */
 };
@@ -260,7 +260,8 @@ static const ltdc_conf_t ltdc_config = {
     /* values below come from STM32CubeF7 code and differ from the typical
      * values mentioned in the RK043FN48H datasheet. Both sets of values work
      * with the display.
-     * See the discussion in https://community.st.com/s/question/0D50X0000BOvdWP/how-to-set-displays-parameters-
+     * See the discussion in
+     * https://community.st.com/s/question/0D50X0000BOvdWP/how-to-set-displays-parameters-
      */
     .hsync      = 41,
     .vsync      = 10,
@@ -428,6 +429,43 @@ static const fmc_bank_conf_t fmc_bank_config[] = {
  * @brief   Number of configured FMC banks
  */
 #define FMC_BANK_NUMOF  ARRAY_SIZE(fmc_bank_config)
+/** @} */
+
+/**
+ * @name SDIO/SDMMC configuration
+ * @{
+ */
+
+/**
+ * @brief SDIO/SDMMC static configuration struct
+ */
+static const sdmmc_conf_t sdmmc_config[] = {
+    {
+        .dev = SDMMC1,
+        .bus = APB2,
+        .rcc_mask = RCC_APB2ENR_SDMMC1EN,
+        .cd = GPIO_PIN(PORT_C, 13),
+        .cd_active = 0,             /* CD pin is LOW active */
+        .cd_mode = GPIO_IN_PU,      /* Pull-up R12 not soldered by default */
+        .clk = { GPIO_PIN(PORT_C, 12), GPIO_AF12 },
+        .cmd = { GPIO_PIN(PORT_D,  2), GPIO_AF12 },
+        .dat0 = { GPIO_PIN(PORT_C,  8), GPIO_AF12 },
+        .dat1 = { GPIO_PIN(PORT_C,  9), GPIO_AF12 },
+        .dat2 = { GPIO_PIN(PORT_C, 10), GPIO_AF12 },
+        .dat3 = { GPIO_PIN(PORT_C, 11), GPIO_AF12 },
+#ifdef MODULE_PERIPH_DMA
+        .dma = 5,
+        .dma_chan = 4,
+#endif
+        .irqn = SDMMC1_IRQn
+    },
+};
+
+/**
+ * @brief Number of configured SDIO/SDMMC peripherals
+ */
+#define SDMMC_CONFIG_NUMOF  1
+
 /** @} */
 
 #ifdef __cplusplus

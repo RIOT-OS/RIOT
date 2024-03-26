@@ -41,7 +41,7 @@ static const char *_names[] = { "ZTIMER_MSEC", "ZTIMER_USEC" };
 static uint32_t _intervals[] = { 100, 10000 };
 static uint32_t _max_offsets[] = {
     2,
-#ifdef BOARD_NATIVE
+#ifdef CPU_NATIVE
     /* native is running on top of a multi-media OS, not a real-time OS */
     1000
 #else

@@ -76,10 +76,10 @@ int conn_can_raw_set_filter(conn_can_raw_t *conn, struct can_filter *filter, siz
     assert(conn != NULL);
     assert(filter != NULL || count == 0);
 
-    DEBUG("conn_can_raw_set_filter: conn=%p, filter=%p, count=%u\n",
-          (void *)conn, (void *)filter, (unsigned)count);
-    DEBUG("conn_can_raw_set_filter: conn->filter=%p, conn->count=%u\n",
-          (void *)conn->filter, (unsigned)conn->count);
+    DEBUG("conn_can_raw_set_filter: conn=%p, filter=%p, count=%" PRIuSIZE "\n",
+          (void *)conn, (void *)filter, count);
+    DEBUG("conn_can_raw_set_filter: conn->filter=%p, conn->count=%" PRIuSIZE "\n",
+          (void *)conn->filter, conn->count);
 
     /* unset previous filters */
     if (conn->count) {

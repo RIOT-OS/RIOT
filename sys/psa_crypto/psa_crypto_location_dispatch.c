@@ -22,9 +22,11 @@
 #include "kernel_defines.h"
 #include "psa/crypto.h"
 #include "psa_crypto_algorithm_dispatch.h"
-#include "psa_crypto_slot_management.h"
 #include "psa_crypto_se_management.h"
 #include "psa_crypto_se_driver.h"
+
+#if IS_USED(MODULE_PSA_KEY_MANAGEMENT)
+#include "psa_crypto_slot_management.h"
 
 psa_status_t psa_location_dispatch_generate_key(const psa_key_attributes_t *attributes,
                                                 psa_key_slot_t *slot)
@@ -104,7 +106,9 @@ psa_status_t psa_location_dispatch_import_key( const psa_key_attributes_t *attri
         return PSA_ERROR_NOT_SUPPORTED;
     }
 }
+#endif /* MODULE_PSA_KEY_MANAGEMENT */
 
+#if IS_USED(MODULE_PSA_CIPHER)
 psa_status_t psa_location_dispatch_cipher_encrypt_setup(   psa_cipher_operation_t *operation,
                                                            const psa_key_attributes_t *attributes,
                                                            const psa_key_slot_t *slot,
@@ -335,6 +339,9 @@ psa_status_t psa_location_dispatch_cipher_decrypt(  const psa_key_attributes_t *
                                                  output, output_size, output_length);
 }
 
+#endif /* MODULE_PSA_CIPHER */
+
+#if IS_USED(MODULE_PSA_ASYMMETRIC)
 psa_status_t psa_location_dispatch_sign_hash(  const psa_key_attributes_t *attributes,
                                                psa_algorithm_t alg,
                                                const psa_key_slot_t *slot,
@@ -428,7 +435,9 @@ psa_status_t psa_location_dispatch_verify_message(  const psa_key_attributes_t *
     return psa_algorithm_dispatch_verify_message(attributes, alg, slot, input, input_length, signature,
                                               signature_length);
 }
+#endif /* MODULE_PSA_ASYMMETRIC */
 
+#if IS_USED(MODULE_PSA_MAC)
 psa_status_t psa_location_dispatch_mac_compute(const psa_key_attributes_t *attributes,
                                                psa_algorithm_t alg,
                                                const psa_key_slot_t *slot,
@@ -462,6 +471,7 @@ psa_status_t psa_location_dispatch_mac_compute(const psa_key_attributes_t *attri
     return psa_algorithm_dispatch_mac_compute(attributes, alg, slot, input, input_length, mac,
                                               mac_size, mac_length);
 }
+#endif /* MODULE_PSA_MAC */
 
 psa_status_t psa_location_dispatch_generate_random(uint8_t *output,
                                                    size_t output_size)

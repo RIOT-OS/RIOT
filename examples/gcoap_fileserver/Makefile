@@ -21,9 +21,9 @@ USEMODULE += shell_cmds_default
 
 # enable the fileserver module
 USEMODULE += gcoap_fileserver
-USEMODULE += gcoap_fileserver_callback
-USEMODULE += gcoap_fileserver_delete
-USEMODULE += gcoap_fileserver_put
+USEMODULE += nanocoap_fileserver_callback
+USEMODULE += nanocoap_fileserver_delete
+USEMODULE += nanocoap_fileserver_put
 
 # select network modules
 USEMODULE += gnrc_ipv6_default

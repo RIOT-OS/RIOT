@@ -4,7 +4,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-mega2560 \
     arduino-nano \
     arduino-uno \
-    atmega1284p \
     atmega328p \
     atmega328p-xplained-mini \
     atmega8 \
@@ -16,10 +15,10 @@ BOARD_INSUFFICIENT_MEMORY := \
     i-nucleo-lrwan1 \
     im880b \
     m1284p \
-    mega-xplained \
     microduino-corerf \
     msb-430 \
     msb-430h \
+    nucleo-c031c6 \
     nucleo-f030r8 \
     nucleo-f031k6 \
     nucleo-f042k6 \
@@ -43,6 +42,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32l0538-disco \
     telosb \
     waspmote-pro \
+    weact-g030f6 \
     z1 \
     zigduino \
     #

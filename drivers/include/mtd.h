@@ -73,6 +73,7 @@
 #ifndef MTD_H
 #define MTD_H
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -251,25 +252,6 @@ struct mtd_desc {
                      uint32_t size);
 
     /**
-     * @brief   Write to the Memory Technology Device (MTD)
-     *
-     * @p addr + @p size must be inside a page boundary. @p addr can be anywhere
-     * but the buffer cannot overlap two pages.
-     *
-     * @param[in] dev       Pointer to the selected driver
-     * @param[in] buff      Pointer to the data to be written
-     * @param[in] addr      Starting address
-     * @param[in] size      Number of bytes
-     *
-     * @retval 0 on success
-     * @retval <0 value on error
-     */
-    int (*write)(mtd_dev_t *dev,
-                 const void *buff,
-                 uint32_t addr,
-                 uint32_t size);
-
-    /**
      * @brief   Write to the Memory Technology Device (MTD) using
      *          pagewise addressing.
      *
@@ -381,7 +363,7 @@ int mtd_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t count);
  * @param[in]  offset   offset from the start of the page (in bytes)
  * @param[in]  size     the number of bytes to read
  *
- * @retval n number of bytes read on success
+ * @retval 0 on success
  * @retval <0 value on error
  * @retval -ENODEV if @p mtd is not a valid device
  * @retval -ENOTSUP if operation is not supported on @p mtd
@@ -430,7 +412,7 @@ int mtd_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t count);
  * @param[in]  offset   byte offset from the start of the page
  * @param[in]  size     the number of bytes to write
  *
- * @retval n number of bytes written on success
+ * @retval 0 on success
  * @retval <0 value on error
  * @retval -ENODEV if @p mtd is not a valid device
  * @retval -ENOTSUP if operation is not supported on @p mtd
@@ -460,7 +442,7 @@ int mtd_write_page_raw(mtd_dev_t *mtd, const void *src, uint32_t page,
  * @param[in]  offset   byte offset from the start of the page
  * @param[in]  size     the number of bytes to write
  *
- * @retval n number of bytes written on success
+ * @retval 0 on success
  * @retval <0 value on error
  * @retval -ENODEV if @p mtd is not a valid device
  * @retval -ENOTSUP if operation is not supported on @p mtd
@@ -506,6 +488,29 @@ int mtd_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t count);
 int mtd_erase_sector(mtd_dev_t *mtd, uint32_t sector, uint32_t num);
 
 /**
+ * @brief   Write data to a MTD device with whole sector writes
+ *
+ * The MTD layer will take care of splitting up the transaction into multiple
+ * writes if it is required by the underlying storage media.
+ *
+ * The sectors will be erased before writing if needed.
+ *
+ * @param      mtd      Device to write to
+ * @param[in]  src      Buffer to write
+ * @param[in]  sector   Sector number to start writing to
+ * @param[in]  num      Number of sectors to write
+ *
+ * @retval 0 on success
+ * @retval <0 value on error
+ * @retval -ENODEV if @p mtd is not a valid device
+ * @retval -ENOTSUP if operation is not supported on @p mtd
+ * @retval -EOVERFLOW if @p addr or @p count are not valid, i.e. outside memory,
+ * @retval -EIO if I/O error occurred
+ * @retval -EINVAL if parameters are invalid
+ */
+int mtd_write_sector(mtd_dev_t *mtd, const void *src, uint32_t sector, uint32_t num);
+
+/**
  * @brief   Set power mode on a MTD device
  *
  * @param      mtd   the device to access
@@ -529,7 +534,10 @@ int mtd_power(mtd_dev_t *mtd, enum mtd_power_state power);
  */
 static inline mtd_dev_t *mtd_dev_get(unsigned idx)
 {
-    return ((MTD_NUMOF != 0) && (idx < MTD_NUMOF)) ? mtd_dev_xfa[idx] : NULL;
+    assert(MTD_NUMOF != 0);
+    assert(idx < MTD_NUMOF);
+
+    return mtd_dev_xfa[idx];
 }
 
 #ifdef __cplusplus

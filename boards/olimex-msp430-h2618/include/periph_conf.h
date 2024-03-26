@@ -22,6 +22,7 @@
 
 #include "periph_cpu.h"
 #include "macros/units.h"
+#include "cfg_timer_a_smclk_b_aclk.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,33 +44,22 @@ static const msp430_clock_params_t clock_params = {
 };
 
 /**
- * @name    Timer configuration
- * @{
- */
-#define TIMER_NUMOF         (1U)
-#define TIMER_BASE          (&TIMER_A)
-#define TIMER_CHAN          (3)
-#define TIMER_ISR_CC0       (TIMERA0_VECTOR)
-#define TIMER_ISR_CCX       (TIMERA1_VECTOR)
-/** @} */
-
-/**
  * @name    UART configuration
  * @{
  */
 #define UART_NUMOF          (1U)
 
-#define UART_BASE           (&USCI_A0)
-#define UART_IE             (IE2)
-#define UART_IF             (IFG2)
+#define UART_BASE           (&USCI_A1)
+#define UART_IE             (UC1IE)
+#define UART_IF             (UC1IFG)
 #define UART_IE_RX_BIT      (1 << 0)
 #define UART_IE_TX_BIT      (1 << 1)
 #define UART_RX_PORT        (&PORT_3)
-#define UART_RX_PIN         (1 << 5)
+#define UART_RX_PIN         (1 << 7)
 #define UART_TX_PORT        (&PORT_3)
-#define UART_TX_PIN         (1 << 4)
-#define UART_RX_ISR         (USCIAB0RX_VECTOR)
-#define UART_TX_ISR         (USCIAB0TX_VECTOR)
+#define UART_TX_PIN         (1 << 6)
+#define UART_RX_ISR         (USCIAB1RX_VECTOR)
+#define UART_TX_ISR         (USCIAB1TX_VECTOR)
 /** @} */
 
 /**

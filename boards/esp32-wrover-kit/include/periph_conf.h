@@ -46,6 +46,7 @@
 #define PERIPH_CONF_H
 
 #include <stdint.h>
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -109,10 +110,6 @@
  *
  * LEDs are used as PWM channels for device PWM_DEV(0).
  *
- * @note As long as the according PWM device is not initialized with function
- * pwm_init, the GPIOs declared for this device can be used for other
- * purposes.
- *
  * @note As long as the according PWM device is not initialized with
  * the `pwm_init`, the GPIOs declared for this device can be used
  * for other purposes.
@@ -120,13 +117,42 @@
  * @{
  */
 #ifndef PWM0_GPIOS
-#if !MODULE_ESP32_WROVER_KIT_CAMERA || DOXYGEN
+#if (!MODULE_ESP32_WROVER_KIT_CAMERA && !MODULE_PERIPH_SDMMC) || DOXYGEN
 #define PWM0_GPIOS  { GPIO0, GPIO4 } /**< only available when camera is not connected */
+#elif !MODULE_ESP32_WROVER_KIT_CAMERA
+#define PWM0_GPIOS  { GPIO0 }
 #else
 #define PWM0_GPIOS  { }
 #endif
 #endif
 
+/** @} */
+
+/**
+ * @name   SD/MMC host controller configuration
+ *
+ * @warning If the camera is plugged in, the SD Card has to be used in
+ *          1-bit mode.
+ * @{
+ */
+
+/** SDMMC devices */
+static const sdmmc_conf_t sdmmc_config[] = {
+    {
+        .slot = SDMMC_SLOT_1,
+        .cd = GPIO21,
+        .wp = GPIO_UNDEF,
+#if MODULE_ESP32_WROVER_KIT_CAMERA
+        /* if camera used, only DAT0 is available */
+        .bus_width = 1,
+#else
+        .bus_width = 4,
+#endif
+    },
+};
+
+/** Number of configured SDMMC devices */
+#define SDMMC_CONFIG_NUMOF  1
 /** @} */
 
 /**
@@ -136,6 +162,12 @@
  *
  * HSPI is always available and therefore used as SPI_DEV(0)
  * VSPI is only available when the camera is not plugged.
+ *
+ * @warning In order not to change the index of the SPI devices depending on
+ *          the different hardware configuration options including the camera,
+ *          SPI_DEV(0) is also defined in case of using the SD/MMC host
+ *          controller, by default but cannot be used once an SD card is
+ *          inserted. Use SPI_DEV(1) instead in this case.
  *
  * @{
  */

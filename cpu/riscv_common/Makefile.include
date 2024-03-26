@@ -14,10 +14,8 @@ ifneq (,$(ROM_START_ADDR)$(RAM_START_ADDR)$(ROM_LEN)$(RAM_LEN))
   LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ram_start_addr=$(RAM_START_ADDR)
   LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_rom_length=$(ROM_LEN)
   LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ram_length=$(RAM_LEN)
-  LINKFLAGS += $(if $(ROM_OFFSET),$(LINKFLAGPREFIX)--defsym=_rom_offset=$(ROM_OFFSET) \
-                                 ,$(LINKFLAGPREFIX)--defsym=_rom_offset=0x0)
-  LINKFLAGS += $(if $(FW_ROM_LEN),$(LINKFLAGPREFIX)--defsym=_fw_rom_length=$(FW_ROM_LEN) \
-                                 ,$(LINKFLAGPREFIX)--defsym=_fw_rom_length=$(ROM_LEN))
+  LINKFLAGS += $(if $(ROM_OFFSET),$(LINKFLAGPREFIX)--defsym=_rom_offset=$(ROM_OFFSET))
+  LINKFLAGS += $(if $(FW_ROM_LEN),$(LINKFLAGPREFIX)--defsym=_fw_rom_length=$(FW_ROM_LEN))
 endif
 
 ifneq (,$(ITIM_START_ADDR))

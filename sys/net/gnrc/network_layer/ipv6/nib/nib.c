@@ -115,16 +115,18 @@ void gnrc_ipv6_nib_init(void)
 
 static void _add_static_lladdr(gnrc_netif_t *netif)
 {
-#ifdef GNRC_IPV6_STATIC_LLADDR
+#ifdef CONFIG_GNRC_IPV6_STATIC_LLADDR
     /* parse addr from string and explicitly set a link local prefix
      * if ifnum > 1 each interface will get its own link local address
-     * with GNRC_IPV6_STATIC_LLADDR + i
+     * with CONFIG_GNRC_IPV6_STATIC_LLADDR + i
      */
-    char lladdr_str[] = GNRC_IPV6_STATIC_LLADDR;
+    const char lladdr_str[] = CONFIG_GNRC_IPV6_STATIC_LLADDR;
     ipv6_addr_t lladdr;
 
     if (ipv6_addr_from_str(&lladdr, lladdr_str) != NULL) {
-        lladdr.u8[15] += netif->pid;
+        if (!IS_ACTIVE(CONFIG_GNRC_IPV6_STATIC_LLADDR_IS_FIXED)) {
+            lladdr.u8[15] += netif->pid;
+        }
         assert(ipv6_addr_is_link_local(&lladdr));
         gnrc_netif_ipv6_addr_add_internal(
                 netif, &lladdr, 64U, GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID
@@ -143,6 +145,15 @@ void gnrc_ipv6_nib_iface_up(gnrc_netif_t *netif)
     _init_iface_arsm(netif);
     netif->ipv6.rs_sent = 0;
     netif->ipv6.na_sent = 0;
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
+    if (gnrc_netif_ipv6_group_join_internal(netif, &ipv6_addr_all_routers_link_local)) {
+        DEBUG("nib: Can't join link-local all-routers on interface %u\n", netif->pid);
+    }
+#endif
+    if (gnrc_netif_ipv6_group_join_internal(netif, &ipv6_addr_all_nodes_link_local) < 0) {
+        DEBUG("nib: Can't join link-local all-nodes on interface %u\n", netif->pid);
+    }
+    _add_static_lladdr(netif);
     _auto_configure_addr(netif, &ipv6_addr_link_local_prefix, 64U);
     if (_should_search_rtr(netif)) {
         uint32_t next_rs_time = random_uint32_range(0, NDP_MAX_RS_MS_DELAY);
@@ -187,6 +198,10 @@ void gnrc_ipv6_nib_iface_down(gnrc_netif_t *netif, bool send_final_ra)
             gnrc_netif_ipv6_addr_remove_internal(netif, &netif->ipv6.addrs[i]);
         }
     }
+    gnrc_netif_ipv6_group_leave_internal(netif, &ipv6_addr_all_nodes_link_local);
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
+    gnrc_netif_ipv6_group_leave_internal(netif, &ipv6_addr_all_routers_link_local);
+#endif
 
     gnrc_netif_release(netif);
 }
@@ -205,14 +220,6 @@ void gnrc_ipv6_nib_init_iface(gnrc_netif_t *netif)
 #endif  /* CONFIG_GNRC_IPV6_NIB_SLAAC || CONFIG_GNRC_IPV6_NIB_6LN */
     _init_iface_router(netif);
     gnrc_netif_init_6ln(netif);
-    if (gnrc_netif_ipv6_group_join_internal(netif,
-                                            &ipv6_addr_all_nodes_link_local) < 0) {
-        DEBUG("nib: Can't join link-local all-nodes on interface %u\n",
-              netif->pid);
-        gnrc_netif_release(netif);
-        return;
-    }
-    _add_static_lladdr(netif);
 
     gnrc_netif_release(netif);
 }
@@ -544,15 +551,15 @@ static void _handle_rtr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         DEBUG("     - IP Hop Limit: %u (should be %u)\n", ipv6->hl,
               NDP_HOP_LIMIT);
         DEBUG("     - ICMP code: %u (should be 0)\n", rtr_sol->code);
-        DEBUG("     - ICMP length: %u (should > %u)\n", (unsigned)icmpv6_len,
-              (unsigned)sizeof(ndp_rtr_sol_t));
+        DEBUG("     - ICMP length: %" PRIuSIZE " (should > %" PRIuSIZE ")\n",
+              icmpv6_len, sizeof(ndp_rtr_sol_t));
         return;
     }
     /* pre-check option length */
     FOREACH_OPT(rtr_sol, opt, tmp_len) {
         if (tmp_len > icmpv6_len) {
-            DEBUG("nib: Payload length (%u) of RS doesn't align with options\n",
-                  (unsigned)icmpv6_len);
+            DEBUG("nib: Payload length (%" PRIuSIZE ") of RS doesn't align with options\n",
+                  icmpv6_len);
             return;
         }
         if (opt->len == 0U) {
@@ -659,8 +666,8 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         DEBUG("     - IP Hop Limit: %u (should be %u)\n", ipv6->hl,
               NDP_HOP_LIMIT);
         DEBUG("     - ICMP code: %u (should be 0)\n", rtr_adv->code);
-        DEBUG("     - ICMP length: %u (should > %u)\n", (unsigned)icmpv6_len,
-              (unsigned)sizeof(ndp_rtr_adv_t));
+        DEBUG("     - ICMP length: %" PRIuSIZE " (should > %" PRIuSIZE ")\n",
+              icmpv6_len, sizeof(ndp_rtr_adv_t));
         DEBUG("     - Source address: %s (should be link-local)\n",
               ipv6_addr_to_str(addr_str, &ipv6->src, sizeof(addr_str)));
         DEBUG("     - Router lifetime: %u (should be <= 9000 on non-6LN)\n",
@@ -670,8 +677,8 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     /* pre-check option length */
     FOREACH_OPT(rtr_adv, opt, tmp_len) {
         if (tmp_len > icmpv6_len) {
-            DEBUG("nib: Payload length (%u) of RA doesn't align with options\n",
-                  (unsigned)icmpv6_len);
+            DEBUG("nib: Payload length (%" PRIuSIZE ") of RA doesn't align with options\n",
+                  icmpv6_len);
             return;
         }
         if (opt->len == 0U) {
@@ -984,8 +991,8 @@ static void _handle_nbr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         DEBUG("     - IP Hop Limit: %u (should be %u)\n", ipv6->hl,
               NDP_HOP_LIMIT);
         DEBUG("     - ICMP code: %u (should be 0)\n", nbr_sol->code);
-        DEBUG("     - ICMP length: %u (should > %u)\n", (unsigned)icmpv6_len,
-              (unsigned)sizeof(ndp_nbr_sol_t));
+        DEBUG("     - ICMP length: %" PRIuSIZE " (should > %" PRIuSIZE ")\n",
+              icmpv6_len, sizeof(ndp_nbr_sol_t));
         DEBUG("     - Target address: %s (should not be multicast)\n",
               ipv6_addr_to_str(addr_str, &nbr_sol->tgt, sizeof(addr_str)));
         DEBUG("     - Source address: %s\n",
@@ -1005,8 +1012,8 @@ static void _handle_nbr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     /* pre-check option length */
     FOREACH_OPT(nbr_sol, opt, tmp_len) {
         if (tmp_len > icmpv6_len) {
-            DEBUG("nib: Payload length (%u) of NS doesn't align with options\n",
-                  (unsigned)icmpv6_len);
+            DEBUG("nib: Payload length (%" PRIuSIZE ") of NS doesn't align with options\n",
+                  icmpv6_len);
             return;
         }
         if (opt->len == 0U) {
@@ -1140,8 +1147,8 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         DEBUG("     - IP Hop Limit: %u (should be %u)\n", ipv6->hl,
               NDP_HOP_LIMIT);
         DEBUG("     - ICMP code: %u (should be 0)\n", nbr_adv->code);
-        DEBUG("     - ICMP length: %u (should > %u)\n", (unsigned)icmpv6_len,
-              (unsigned)sizeof(ndp_nbr_adv_t));
+        DEBUG("     - ICMP length: %" PRIuSIZE " (should > %" PRIuSIZE ")\n",
+              icmpv6_len, sizeof(ndp_nbr_adv_t));
         DEBUG("     - Target address: %s (should not be multicast)\n",
               ipv6_addr_to_str(addr_str, &nbr_adv->tgt, sizeof(addr_str)));
         DEBUG("     - Destination address: %s\n",
@@ -1155,8 +1162,8 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     /* pre-check option length */
     FOREACH_OPT(nbr_adv, opt, tmp_len) {
         if (tmp_len > icmpv6_len) {
-            DEBUG("nib: Payload length (%u) of NA doesn't align with options\n",
-                  (unsigned)icmpv6_len);
+            DEBUG("nib: Payload length (%" PRIuSIZE ") of NA doesn't align with options\n",
+                  icmpv6_len);
             return;
         }
         if (opt->len == 0U) {
@@ -1614,7 +1621,9 @@ static uint32_t _handle_pio(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
     valid_ltime = byteorder_ntohl(pio->valid_ltime);
     pref_ltime = byteorder_ntohl(pio->pref_ltime);
     if ((pio->len != NDP_OPT_PI_LEN) || (icmpv6->type != ICMPV6_RTR_ADV) ||
-        ipv6_addr_is_link_local(&pio->prefix) || (valid_ltime < pref_ltime)) {
+        ipv6_addr_is_link_local(&pio->prefix) || (valid_ltime < pref_ltime) ||
+        /* https://datatracker.ietf.org/doc/html/rfc6775#section-5.4 */
+        (gnrc_netif_is_6ln(netif) && (pio->flags & NDP_OPT_PI_FLAGS_L))) {
         DEBUG("nib: ignoring PIO with invalid data\n");
         return UINT32_MAX;
     }
@@ -1646,7 +1655,7 @@ static uint32_t _handle_pio(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
 
         if (valid_ltime < UINT32_MAX) { /* UINT32_MAX means infinite lifetime */
             /* the valid lifetime is given in seconds, but our timers work in
-             * microseconds, so we have to scale down to the smallest possible
+             * milliseconds, so we have to scale down to the smallest possible
              * value (UINT32_MAX - 1). This is however alright since we ask for
              * a new router advertisement before this timeout expires */
             valid_ltime = (valid_ltime > (UINT32_MAX / MS_PER_SEC)) ?
@@ -1713,20 +1722,11 @@ static uint32_t _handle_rio(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     DEBUG("     - Route lifetime: %" PRIu32 "\n",
           byteorder_ntohl(rio->route_ltime));
 
-    if (route_ltime < UINT32_MAX) { /* UINT32_MAX means infinite lifetime */
-        /* the valid lifetime is given in seconds, but our timers work in
-         * microseconds, so we have to scale down to the smallest possible
-         * value (UINT32_MAX - 1). This is however alright since we ask for
-         * a new router advertisement before this timeout expires */
-        route_ltime = (route_ltime > (UINT32_MAX / MS_PER_SEC)) ?
-                      (UINT32_MAX - 1) : route_ltime * MS_PER_SEC;
-    }
-
     if (route_ltime == 0) {
         gnrc_ipv6_nib_ft_del(&rio->prefix, rio->prefix_len);
     } else {
         gnrc_ipv6_nib_ft_add(&rio->prefix, rio->prefix_len, &ipv6->src,
-                             netif->pid, route_ltime);
+                             netif->pid, route_ltime == UINT32_MAX ? 0 : route_ltime);
     }
 
     return route_ltime;

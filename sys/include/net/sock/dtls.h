@@ -507,6 +507,13 @@
  * registered credential in the Sock's credential list, that matches the needed type. The first
  * one that matches is used.
  *
+ * #### Public key verification when using ECC
+ *
+ * By enabling the pseudomodule `sock_dtls_verify_public_key` the DTLS sock will verify the
+ * public key of the remote peer. When enabled, the DTLS sock will only accept a connection if
+ * the provided public key is in the list of public keys assigned to the specified sock. This only
+ * applies when using ECC ciphersuites (i.e., not PSK).
+ *
  * @{
  *
  * @file
@@ -517,6 +524,7 @@
  * @author  Raul A. Fuentes Samaniego <raul.fuentes-samaniego@inria.fr>
  * @author  Daniele Lacamera <daniele@wolfssl.com>
  * @author  Ken Bannister <kb2ma@runbox.com>
+ * @author  Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
 
 #ifndef NET_SOCK_DTLS_H

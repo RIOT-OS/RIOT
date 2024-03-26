@@ -27,14 +27,6 @@ ifeq (1,$(USE_PICOLIBC))
     CFLAGS += -DPICOLIBC_INTEGER_PRINTF_SCANF
     LINKFLAGS += -DPICOLIBC_INTEGER_PRINTF_SCANF
   endif
-  # For some reason segments with RWX permissions will be created with
-  # picolibc. But since (as of now) RIOT only supports disabling the execute of
-  # all RAM via the `mpu_noexec_ram` module, permissions of the segments are
-  # ignored anyway. So for now, we just simply disable the warning.
-  LINKER_SUPPORTS_NOWARNRWX ?= $(shell LC_ALL=C $(LINK) $(RIOTTOOLS)/testprogs/minimal_linkable.c -o /dev/null -lc -Wall -Wextra -pedantic -Wl,--no-warn-rwx-segments 2> /dev/null && echo 1 || echo 0)
-  ifeq (1,$(LINKER_SUPPORTS_NOWARNRWX))
-    LINKFLAGS += -Wl,--no-warn-rwx-segments
-  endif
 endif
 
 LINKFLAGS += -lc

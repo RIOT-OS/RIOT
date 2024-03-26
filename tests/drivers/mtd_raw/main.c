@@ -279,7 +279,7 @@ static void _print_info(mtd_dev_t *dev)
 static int cmd_info(int argc, char **argv)
 {
     if (argc < 2) {
-        printf("mtd devices: %d\n", MTD_NUMOF);
+        printf("mtd devices: %d\n", (unsigned)MTD_NUMOF);
 
         for (unsigned i = 0; i < MTD_NUMOF; ++i) {
             printf(" -=[ MTD_%d ]=-\n", i);

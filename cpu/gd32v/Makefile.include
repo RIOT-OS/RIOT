@@ -17,7 +17,7 @@ else
   $(error CPU model $(CPU_MODEL) not supported)
 endif
 
-FW_ROM_LEN ?= $(shell printf "0x%x" $$(($(ROM_LEN:%K=%*1024))))
+ROM_LEN := $(shell printf "0x%x" $$(($(ROM_LEN:%K=%*1024))))
 
 RIOTBOOT_HDR_LEN ?= 0x400
 ifneq (,$(filter usbus_dfu tinyusb_dfu,$(USEMODULE)))

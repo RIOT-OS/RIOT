@@ -4,7 +4,7 @@
 [![API docs][api-badge]][api-link]
 [![Wiki][wiki-badge]][wiki-link]
 [![Stack Overflow questions][stackoverflow-badge]][stackoverflow-link]
-[![Twitter][twitter-badge]][twitter-link]
+[![Mastodon][mastodon-badge]][mastodon-link]
 [![Matrix][matrix-badge]][matrix-link]
 
 <p align="center"><img src="doc/doxygen/src/riot-logo.svg" width="66%"><!--
@@ -52,7 +52,7 @@ indirect business models around the free open-source software platform
 provided by RIOT, e.g. it is possible to link closed-source code with the
 LGPL code.
 
-## FEATURES
+## Features
 
 RIOT provides features including, but not limited to:
 
@@ -81,7 +81,7 @@ RIOT provides features including, but not limited to:
 * UWB
 * Bluetooth (BLE) via [NimBLE](https://github.com/apache/mynewt-nimble)
 
-## GETTING RIOT
+## Getting RIOT
 
 The most convenient way to get RIOT is to clone it via Git
 
@@ -106,7 +106,7 @@ For more details on our release cycle, check our [documentation][release cycle].
 [releases]: https://github.com/RIOT-OS/RIOT/releases
 [release cycle]: https://doc.riot-os.org/release-cycle.html
 
-## GETTING STARTED
+## Getting Started
 * You want to start the RIOT? Just follow our
 [quickstart guide](https://doc.riot-os.org/index.html#the-quickest-start) or
 try this
@@ -117,23 +117,28 @@ For specific toolchain installation, follow instructions in the
   version of the documentation is uploaded daily to
   [doc.riot-os.org](https://doc.riot-os.org).
 
-## FORUM
+Using Windows? Use [this guide][dev-setup-windows] to
+[setup the development environment][dev-setup-windows].
+
+[dev-setup-windows]: doc/guides/setup-windows
+
+## Forum
 Do you have a question, want to discuss a new feature, or just want to present
 your latest project using RIOT? Come over to our [forum] and post to your hearts
 content.
 
 [forum]: https://forum.riot-os.org
 
-## CONTRIBUTE
+## Contribute
 
 To contribute something to RIOT, please refer to our
 [contributing document](CONTRIBUTING.md).
 
-## MAILING LISTS
+## Mailing Lists
 * RIOT commits: [commits@riot-os.org](https://lists.riot-os.org/mailman/listinfo/commits)
 * Github notifications: [notifications@riot-os.org](https://lists.riot-os.org/mailman/listinfo/notifications)
 
-## LICENSE
+## License
 * Most of the code developed by the RIOT community is licensed under the GNU
   Lesser General Public License (LGPL) version 2.1 as published by the Free
   Software Foundation.
@@ -160,7 +165,7 @@ https://www.riot-os.org
 [release-link]: https://github.com/RIOT-OS/RIOT/releases/latest
 [stackoverflow-badge]: https://img.shields.io/badge/stackoverflow-%5Briot--os%5D-yellow
 [stackoverflow-link]: https://stackoverflow.com/questions/tagged/riot-os
-[twitter-badge]: https://img.shields.io/badge/social-Twitter-informational.svg
-[twitter-link]: https://twitter.com/RIOT_OS
+[mastodon-badge]: https://img.shields.io/badge/social-Mastodon-informational.svg
+[mastodon-link]: https://fosstodon.org/@RIOT_OS
 [wiki-badge]: https://img.shields.io/badge/docs-Wiki-informational.svg
 [wiki-link]: https://github.com/RIOT-OS/RIOT/wiki

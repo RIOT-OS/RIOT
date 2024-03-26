@@ -33,7 +33,7 @@
 
 #include "esp_partition.h"
 
-#ifndef MCU_ESP8266
+#ifndef CPU_ESP8266
 
 #include "esp_flash_partitions.h"
 #include "esp_spi_flash.h"
@@ -41,13 +41,13 @@
 #include "rom/spi_flash.h"
 #include "soc/soc.h"
 
-#else /* !MCU_ESP8266 */
+#else /* !CPU_ESP8266 */
 
 #include "esp_flash_data_types.h"
 #include "rom_functions.h"
 #include "spi_flash.h"
 
-#endif /* !MCU_ESP8266 */
+#endif /* !CPU_ESP8266 */
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -68,7 +68,7 @@ MTD_XFA_ADD(_flash_dev, 0);
 VFS_AUTO_MOUNT(littlefs2, { .dev = &_flash_dev }, VFS_DEFAULT_NVM(0), 0);
 #endif
 
-#ifdef MCU_ESP8266
+#ifdef CPU_ESP8266
 
 /* for source code compatibility with ESP32 SDK */
 #define esp_rom_spiflash_chip_t     esp_spi_flash_chip_t
@@ -78,12 +78,11 @@ VFS_AUTO_MOUNT(littlefs2, { .dev = &_flash_dev }, VFS_DEFAULT_NVM(0), 0);
 extern esp_spi_flash_chip_t flashchip;
 extern uint32_t spi_flash_get_id(void);
 
-#endif /* MCU_ESP8266 */
+#endif /* CPU_ESP8266 */
 
 /* forward declaration of mtd functions */
 static int _flash_init(mtd_dev_t *dev);
 static int _flash_read(mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size);
-static int _flash_write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size);
 static int _flash_write_page(mtd_dev_t *dev, const void *buff, uint32_t page,
                               uint32_t offset, uint32_t size);
 static int _flash_erase(mtd_dev_t *dev, uint32_t addr, uint32_t size);
@@ -95,7 +94,7 @@ static uint32_t _flash_size; /* resulting size of the flash drive in SPI flash *
 
 static esp_rom_spiflash_chip_t* _flashchip = NULL;
 
-#ifdef MCU_ESP8266
+#ifdef CPU_ESP8266
 /* flash_id determines the flash size in kByte */
 static const uint32_t flash_sizes[] = {
     256,        /* last byte of id is 0x12 */
@@ -115,7 +114,7 @@ void spi_flash_drive_init(void)
     _flashchip = &g_rom_flashchip;
     assert(_flashchip);
 
-#ifdef MCU_ESP8266
+#ifdef CPU_ESP8266
     _flashchip->deviceId = spi_flash_get_id();
     uint8_t devid_lb = _flashchip->deviceId >> 16 & 0xff;
     if (devid_lb >= 0x12 && devid_lb <= 0x18) {
@@ -126,11 +125,10 @@ void spi_flash_drive_init(void)
                         "4 MBytes are used as default size\n");
         _flashchip->chip_size = 4 << 20;
     }
-#endif /* MCU_ESP8266 */
+#endif /* CPU_ESP8266 */
 
     _flash_driver.init  = &_flash_init;
     _flash_driver.read  = &_flash_read;
-    _flash_driver.write = &_flash_write;
     _flash_driver.write_page = &_flash_write_page;
     _flash_driver.erase = &_flash_erase;
     _flash_driver.power = &_flash_power;
@@ -166,13 +164,13 @@ void spi_flash_drive_init(void)
         }
     }
 
-#ifndef MCU_ESP8266
+#ifndef CPU_ESP8266
     /* map the partition top address to next higher multiple of 0x100000 (1 MB) */
     part_top = (part_top + 0x100000) & ~0xfffff;
-#else /* !MCU_ESP8266 */
+#else /* !CPU_ESP8266 */
     /* map the partition top address to next higher multiple of 0x80000 (512 kB) */
     part_top = (part_top + 0x80000) & ~0x7ffff;
-#endif /* !MCU_ESP8266 */
+#endif /* !CPU_ESP8266 */
 
     /*
      * if flash drive start address is not configured, use the determined
@@ -221,7 +219,7 @@ void spi_flash_drive_init(void)
     DEBUG("\n");
 }
 
-#ifdef MCU_ESP8266
+#ifdef CPU_ESP8266
 const esp_partition_t* esp_partition_find_first(esp_partition_type_t type,
                                                 esp_partition_subtype_t subtype,
                                                 const char* label)
@@ -278,7 +276,7 @@ esp_err_t esp_partition_erase_range(const esp_partition_t* part,
 
     return spi_flash_erase_range(part->address + addr, size);
 }
-#endif /* MCU_ESP8266 */
+#endif /* CPU_ESP8266 */
 
 static int _flash_init(mtd_dev_t *dev)
 {
@@ -307,24 +305,6 @@ static int _flash_read(mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size)
     CHECK_PARAM_RET(_flash_beg + addr + size <= _flash_end, -EOVERFLOW);
 
     return (spi_flash_read(_flash_beg + addr, buff, size) == ESP_OK) ? 0 : -EIO;
-}
-
-static int _flash_write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size)
-{
-    DEBUG("%s dev=%p addr=%08"PRIx32" size=%"PRIu32" buf=%p\n",
-          __func__, dev, addr, size, buff);
-
-    CHECK_PARAM_RET(dev == &_flash_dev, -ENODEV);
-    CHECK_PARAM_RET(buff != NULL, -ENOTSUP);
-
-    /* size must be within the flash address space */
-    CHECK_PARAM_RET(_flash_beg + addr + size <= _flash_end, -EOVERFLOW);
-
-    /* addr + size must be within a page */
-    CHECK_PARAM_RET(size <= _flashchip->page_size, -EOVERFLOW);
-    CHECK_PARAM_RET((addr % _flashchip->page_size) + size <= _flashchip->page_size, -EOVERFLOW);
-
-    return (spi_flash_write(_flash_beg + addr, buff, size) == ESP_OK) ? 0 : -EIO;
 }
 
 static int _flash_write_page(mtd_dev_t *dev, const void *buff, uint32_t page,  uint32_t offset,

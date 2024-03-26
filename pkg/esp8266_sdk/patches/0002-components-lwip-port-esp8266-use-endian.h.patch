@@ -1,0 +1,30 @@
+From 64a9b435bcc38a11568854f31845e58f11a0001e Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@posteo.net>
+Date: Thu, 1 Feb 2024 18:22:27 +0100
+Subject: [PATCH] components/lwip/port/esp8266: use <endian.h>
+
+Now that there is an `<endian.h>`, it can be used :)
+---
+ components/lwip/port/esp8266/include/arch/cc.h | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/components/lwip/port/esp8266/include/arch/cc.h b/components/lwip/port/esp8266/include/arch/cc.h
+index c815a67..1648fc0 100644
+--- a/components/lwip/port/esp8266/include/arch/cc.h
++++ b/components/lwip/port/esp8266/include/arch/cc.h
+@@ -38,11 +38,7 @@
+ 
+ #define LWIP_ERRNO_INCLUDE "sys/errno.h"
+ 
+-#if (1)
+-#define BYTE_ORDER LITTLE_ENDIAN
+-#else
+-#define BYTE_ORDER BIG_ENDIAN
+-#endif
++#include <endian.h>
+ 
+ typedef int sys_prot_t;
+ 
+-- 
+2.43.0
+

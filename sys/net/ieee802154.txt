@@ -66,8 +66,10 @@
  * protocols used on top of it, applications always need to pick their
  * components; that selection is often guided by standards or organizations
  * that pick an interoperable set of components (higher-level protocol, MAC,
- * band and others), like Thread (6LoWPAN, nonbeacon-enabled, 2.4GHz),
+ * band and others), like [Thread] \(6LoWPAN, nonbeacon-enabled, 2.4GHz),
  * WirelessHART (HART, TSCH, 2.4GHz) or 6TiSCH (6LoWPAN, TSCH).
+ *
+ * [Thread]: https://openthread.io/guides/thread-primer
  *
  * Availability in RIOT
  * --------------------

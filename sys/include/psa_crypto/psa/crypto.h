@@ -83,6 +83,7 @@ const char *psa_status_to_humanly_readable(psa_status_t status);
  */
 psa_status_t psa_crypto_init(void);
 
+#if IS_USED(MODULE_PSA_AEAD) || defined(DOXYGEN)
 /**
  * @brief   Process an authenticated encryption operation.
  *
@@ -767,7 +768,9 @@ psa_status_t psa_aead_verify(psa_aead_operation_t *operation,
  *                                                  initialize results in this error code.
  */
 psa_status_t psa_aead_abort(psa_aead_operation_t *operation);
+#endif /* MODULE_PSA_AEAD */
 
+#if IS_USED(MODULE_PSA_ASYMMETRIC) || defined(DOXYGEN)
 /**
  * @brief   Encrypt a short message with a public key.
  *
@@ -890,7 +893,10 @@ psa_status_t psa_asymmetric_decrypt(psa_key_id_t key,
                                     uint8_t *output,
                                     size_t output_size,
                                     size_t *output_length);
+#endif /* MODULE_PSA_ASYMMETRIC */
 
+
+#if IS_USED(MODULE_PSA_CIPHER) || defined(DOXYGEN)
 /**
  * @brief   Abort a cipher operation.
  *
@@ -1385,7 +1391,9 @@ psa_status_t psa_cipher_update(psa_cipher_operation_t *operation,
                                uint8_t *output,
                                size_t output_size,
                                size_t *output_length);
+#endif /* MODULE_PSA_CIPHER */
 
+#if IS_USED(MODULE_PSA_KEY_MANAGEMENT) || defined(DOXYGEN)
 /**
  * @brief   Make a copy of a key.
  *
@@ -1799,6 +1807,7 @@ psa_status_t psa_builtin_generate_key(const psa_key_attributes_t *attributes, ui
  */
 psa_status_t psa_generate_key(const psa_key_attributes_t *attributes,
                               psa_key_id_t *key);
+#endif /* MODULE_PSA_KEY_MANAGEMENT */
 
 /**
  * @brief   Built-in function for random number generation.
@@ -1840,6 +1849,7 @@ psa_status_t psa_builtin_generate_random(   uint8_t *output,
 psa_status_t psa_generate_random(uint8_t *output,
                                  size_t output_size);
 
+#if IS_USED(MODULE_PSA_KEY_MANAGEMENT) || defined(DOXYGEN)
 /**
  * @brief   Declare the permitted algorithm policy for a key.
  *
@@ -2070,7 +2080,9 @@ static inline void psa_reset_key_attributes(psa_key_attributes_t *attributes)
  */
 psa_status_t psa_get_key_attributes(psa_key_id_t key,
                                     psa_key_attributes_t *attributes);
+#endif /* MODULE_PSA_KEY_MANAGEMENT */
 
+#if IS_USED(MODULE_PSA_HASH) || defined(DOXYGEN)
 /**
  * @brief   Abort a hash operation.
  *
@@ -2476,7 +2488,9 @@ psa_status_t psa_hash_update(psa_hash_operation_t *operation,
 psa_status_t psa_hash_verify(psa_hash_operation_t *operation,
                              const uint8_t *hash,
                              size_t hash_length);
+#endif /* MODULE_PSA_HASH */
 
+#if IS_USED(MODULE_PSA_KEY_MANAGEMENT) || defined(DOXYGEN)
 /**
  * @brief   Built-in key import function.
  *
@@ -2619,7 +2633,9 @@ psa_status_t psa_import_key(const psa_key_attributes_t *attributes,
                             const uint8_t *data,
                             size_t data_length,
                             psa_key_id_t *key);
+#endif /* MODULE_PSA_KEY_MANAGEMENT */
 
+#if IS_USED(MODULE_PSA_KEY_DERIVATION) || defined(DOXYGEN)
 /**
  * @brief   Abort a key derivation operation.
  *
@@ -3309,7 +3325,9 @@ psa_status_t psa_key_derivation_verify_bytes(psa_key_derivation_operation_t *ope
  */
 psa_status_t psa_key_derivation_verify_key(psa_key_derivation_operation_t *operation,
                                            psa_key_id_t expected);
+#endif /* PSA_CRYPTO_KEY_DERIVATION */
 
+#if IS_USED(MODULE_PSA_MAC) || defined(DOXYGEN)
 /**
  * @brief   Abort a MAC operation.
  *
@@ -3679,7 +3697,9 @@ psa_status_t psa_mac_verify_finish(psa_mac_operation_t *operation,
 psa_status_t psa_mac_verify_setup(psa_mac_operation_t *operation,
                                   psa_key_id_t key,
                                   psa_algorithm_t alg);
+#endif /* MODULE_PSA_MAC */
 
+#if IS_USED(MODULE_PSA_KEY_MANAGEMENT) || defined(DOXYGEN)
 /**
  * @brief   Remove non-essential copies of key material from memory.
  *
@@ -3707,7 +3727,9 @@ psa_status_t psa_mac_verify_setup(psa_mac_operation_t *operation,
  * @return  @ref PSA_ERROR_DATA_INVALID
  */
 psa_status_t psa_purge_key(psa_key_id_t key);
+#endif /* MODULE_PSA_KEY_MANAGEMENT */
 
+#if IS_USED(MODULE_PSA_KEY_AGREEMENT) || defined(DOXYGEN)
 /**
  * @brief   Perform a key agreement and return the raw shared secret.
  *
@@ -3778,7 +3800,9 @@ psa_status_t psa_raw_key_agreement(psa_algorithm_t alg,
                                    uint8_t *output,
                                    size_t output_size,
                                    size_t *output_length);
+#endif /* MODULE_PSA_KEY_AGREEMENT */
 
+#if IS_USED(MODULE_PSA_ASYMMETRIC) || defined(DOXYGEN)
 /**
  * @brief   Sign an already-calculated hash with a private key.
  *
@@ -4044,6 +4068,7 @@ psa_status_t psa_verify_message(psa_key_id_t key,
                                 size_t input_length,
                                 const uint8_t *signature,
                                 size_t signature_length);
+#endif /* MODULE_PSA_ASYMMETRIC */
 
 #ifdef __cplusplus
 }

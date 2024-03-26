@@ -60,9 +60,11 @@ jobs:
       with:
         cmd: make -C ${{ matrix.tools.path }}/${{ matrix.tools.name }}
   tools-build-success:
-    # this is only run if all jobs in tools-build succeeded
+    if: always()
     needs: tools-build
     runs-on: ubuntu-latest
     steps:
     - name: tools-build succeeded
-      run: exit 0
+      uses: re-actors/alls-green@release/v1
+      with:
+        jobs: ${{ toJSON(needs) }}

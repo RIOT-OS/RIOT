@@ -158,8 +158,8 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
 
         /* current packet data + FCS too long */
         if ((len + iol->iol_len + IEEE802154_FCS_LEN) > AT86RF215_MAX_PKT_LENGTH) {
-            DEBUG("[at86rf215] error: packet too large (%u byte) to be send\n",
-                  (unsigned)len + IEEE802154_FCS_LEN);
+            DEBUG("[at86rf215] error: packet too large (%" PRIuSIZE
+                  " byte) to be send\n", len + IEEE802154_FCS_LEN);
             at86rf215_tx_abort(dev);
             return -EOVERFLOW;
         }

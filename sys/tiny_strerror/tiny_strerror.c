@@ -215,37 +215,35 @@ static FLASH_ATTR const char * FLASH_ATTR const lookup[] = {
 
 const char *tiny_strerror(int errnum)
 {
-    /* dark magic: All error strings start with a "-". For positive error codes
-     * an offset of 1 is added to the address of the string, jumping one char
-     * behind the "-". This way the strings do not have to be allocated twice
-     * (once with and once without minus char).
-     */
-    const char *retval = "-unknown";
-    unsigned offset = 1;
-
     if (IS_USED(MODULE_TINY_STRERROR_MINIMAL)) {
         static char buf[4];
         snprintf(buf, sizeof(buf), "%d", errnum);
         return buf;
     }
 
+    /* dark magic: All error strings start with a "-". For positive error codes
+     * an offset of 1 is added to the address of the string, jumping one char
+     * behind the "-". This way the strings do not have to be allocated twice
+     * (once with and once without minus char).
+     */
+    unsigned offset = 1;
     if (errnum <= 0) {
         offset = 0;
         errnum = -errnum;
     }
 
-    if (((unsigned)errnum < ARRAY_SIZE(lookup))
-            && (lookup[(unsigned)errnum] != NULL)) {
-        retval = lookup[(unsigned)errnum];
+    if (((unsigned)errnum >= ARRAY_SIZE(lookup))
+            || (lookup[(unsigned)errnum] == NULL)) {
+        return "unknown";
     }
 
-    if (IS_ACTIVE(HAS_FLASH_UTILS_ARCH)) {
-        static char buf[16];
-        flash_strncpy(buf, retval + offset, sizeof(buf));
-        return buf;
-    }
-
-    return retval + offset;
+#if IS_ACTIVE(HAS_FLASH_UTILS_ARCH)
+    static char buf[16];
+    flash_strncpy(buf, lookup[(unsigned)errnum] + offset, sizeof(buf));
+    return buf;
+#else
+    return lookup[(unsigned)errnum] + offset;
+#endif
 }
 
 #if IS_USED(MODULE_TINY_STRERROR_AS_STRERROR)

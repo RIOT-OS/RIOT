@@ -149,7 +149,7 @@ static IRQn_Type get_irqn(uint8_t pin)
 #if defined(CPU_FAM_STM32L5) ||  defined(CPU_FAM_STM32U5)
     return EXTI0_IRQn + pin;
 #elif defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || \
-    defined(CPU_FAM_STM32G0)
+    defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32C0)
     if (pin < 2) {
         return EXTI0_1_IRQn;
     }
@@ -316,7 +316,7 @@ void isr_exti(void)
         /* emulate level triggered IRQs by asserting the IRQ again in software, if needed */
         if (level_triggered & (1UL << pin)) {
             /* Trading a couple of CPU cycles to not having to store port connected to EXTI in RAM.
-             * A simple look up table would save ~6 instructions for the cost 64 byte or RAM. */
+             * A simple look up table would save ~6 instructions for the cost 64 bytes of RAM. */
             gpio_port_t port = GPIO_PORT(get_exti_port(pin));
             uint32_t actual_level = gpio_ll_read(port) & (1UL << pin);
             uint32_t trigger_level = EXTI_REG_RTSR & (1UL << pin);

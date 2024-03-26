@@ -80,7 +80,7 @@ make BOARD=olimex-msp430-h1611 flash
 ## Using the shell
 
 stdio is available via the UART interface with `TXD = P3.6`
-(pin 35 on the header) and `RXD = P3.7` (pin 34 on the header) at 115,200 Baud.
+(pin 35 on the header) and `RXD = P3.7` (pin 34 on the header) at 9,600 Baud.
 
 The easiest way is to connect an USB TTL adapter (such as the cheap `cp210x`
 or `ch341` based adapters) as follows:

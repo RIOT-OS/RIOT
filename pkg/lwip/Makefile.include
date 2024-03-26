@@ -17,6 +17,11 @@ PSEUDOMODULES += lwip_udp
 PSEUDOMODULES += lwip_udplite
 PSEUDOMODULES += lwip_sock_async
 
+ifneq (,$(filter arch_64bit,$(FEATURES_USED)))
+# Required for platforms where sizeof(void*) > 4
+    CFLAGS += -DIPV6_FRAG_COPYHEADER=1
+endif
+
 ifneq (,$(filter lwip_contrib,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/lwip/contrib
 endif

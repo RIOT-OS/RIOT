@@ -46,7 +46,7 @@ static int get_dev(i2c_t *dev, int argc, char **argv)
 
 static inline int is_addr_reserved(uint16_t addr)
 {
-    if ((addr < 0x0e) || (addr > 0x77))
+    if ((addr < 0x8) || (addr > 0x77))
         return 1;
 
     return 0;

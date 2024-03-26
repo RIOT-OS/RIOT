@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015-2016 Freie Universität Berlin
+ *               2023 Otto-von-Guericke-Universität Magdeburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -19,32 +20,20 @@
  * devices - one used as UART and one as SPI.
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Marian Buschsieweke <marian.buschsieweke@posteo.net>
  *
  * @}
  */
 
 #include <assert.h>
 
-#include "cpu.h"
-#include "mutex.h"
+#include "compiler_hints.h"
 #include "periph/spi.h"
-
-/**
- * @brief   Mutex for locking the SPI device
- */
-static mutex_t spi_lock = MUTEX_INIT;
+#include "periph_cpu.h"
 
 void spi_init(spi_t bus)
 {
-    assert((unsigned)bus < SPI_NUMOF);
-
-    /* put SPI device in reset state */
-    SPI_BASE->CTL = SWRST;
-    SPI_BASE->CTL |= (CHAR | SYNC | MM);
-    SPI_BASE->RCTL = 0;
-    SPI_BASE->MCTL = 0;
-    /* enable SPI mode */
-    SPI_SFR->ME |= SPI_ME_BIT;
+    assume((unsigned)bus < SPI_NUMOF);
 
     /* trigger the pin configuration */
     spi_init_pins(bus);
@@ -52,53 +41,78 @@ void spi_init(spi_t bus)
 
 void spi_init_pins(spi_t bus)
 {
-    (void)bus;
+    assume((unsigned)bus < SPI_NUMOF);
 
-    gpio_periph_mode(SPI_PIN_MISO, true);
-    gpio_periph_mode(SPI_PIN_MOSI, true);
-    gpio_periph_mode(SPI_PIN_CLK, true);
+    const msp430_usart_spi_params_t *params = spi_config[bus].spi;
+
+    /* set output GPIOs to idle levels of the peripheral */
+    gpio_set(params->mosi);
+    gpio_clear(params->sck);
+
+    /* configure the pins as GPIOs, not attaching to the peripheral as of now */
+    gpio_init(params->miso, GPIO_IN);
+    gpio_init(params->mosi, GPIO_OUT);
+    gpio_init(params->sck, GPIO_OUT);
 }
 
 void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
-    (void)bus;
+    assume((unsigned)bus < SPI_NUMOF);
     (void)cs;
-    assert((unsigned)bus < SPI_NUMOF);
-    assert(clk != SPI_CLK_10MHZ);
 
-    /* lock the bus */
-    mutex_lock(&spi_lock);
+    const msp430_usart_spi_params_t *params = spi_config[bus].spi;
+    msp430_usart_t *dev = params->usart_params.dev;
 
-    /* calculate baudrate */
-    uint32_t br = msp430_submain_clock_freq() / clk;
-    /* make sure the is not smaller then 2 */
-    if (br < 2) {
-        br = 2;
-    }
-    SPI_BASE->BR0 = (uint8_t)br;
-    SPI_BASE->BR1 = (uint8_t)(br >> 8);
+    msp430_usart_conf_t conf = {
+        .prescaler = msp430_usart_prescale(clk, USART_MIN_BR_SPI),
+        .ctl = CHAR | SYNC | MM,
+    };
+    /* get exclusive access to the USART (this will also indirectly ensure
+     * exclusive SPI bus access */
+    msp430_usart_acquire(&params->usart_params, &conf, params->enable_mask);
 
-    /* configure bus mode */
-    /* configure mode */
-    SPI_BASE->TCTL = (UXTCTL_SSEL_SMCLK | STC | mode);
+    /* clock and phase are encoded in mode so that they can be directly be
+     * written into TCTL. TCTL has been initialized by
+     * msp430_usart_acquire(), so we don't need to wipe any previous clock
+     * phase or polarity state.
+     *
+     * STC disables "multi-master" mode, in which the STE pin would be connected
+     * to the CS output of any other SPI controller */
+    dev->TCTL |= STC | mode;
+
     /* release from software reset */
-    SPI_BASE->CTL &= ~(SWRST);
+    dev->CTL &= ~(SWRST);
+
+    /* attach the pins only now after the peripheral is up and running, as
+     * otherwise noise is send out (could be observed on SCK with a logic
+     * analyzer). */
+    gpio_periph_mode(params->miso, true);
+    gpio_periph_mode(params->mosi, true);
+    gpio_periph_mode(params->sck, true);
 }
 
 void spi_release(spi_t bus)
 {
-    (void)bus;
-    /* put SPI device back in reset state */
-    SPI_BASE->CTL |= SWRST;
+    assume((unsigned)bus < SPI_NUMOF);
+    const msp430_usart_spi_params_t *params = spi_config[bus].spi;
 
-    /* release the bus */
-    mutex_unlock(&spi_lock);
+    /* release the pins to avoid sending noise while the peripheral is
+     * reconfigured or used to provide other interfaces */
+    gpio_periph_mode(params->miso, false);
+    gpio_periph_mode(params->mosi, false);
+    gpio_periph_mode(params->sck, false);
+
+    /* release the peripheral */
+    msp430_usart_release(&params->usart_params);
 }
 
 void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
                         const void *out, void *in, size_t len)
 {
-    (void)bus;
+    assume((unsigned)bus < SPI_NUMOF);
+    const msp430_usart_spi_params_t *params = spi_config[bus].spi;
+    const msp430_usart_params_t *usart = &params->usart_params;
+    msp430_usart_t *dev = params->usart_params.dev;
 
     const uint8_t *out_buf = out;
     uint8_t *in_buf = in;
@@ -112,26 +126,36 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
     /* if we only send out data, we do this the fast way... */
     if (!in_buf) {
         for (size_t i = 0; i < len; i++) {
-            while (!(SPI_SFR->IFG & SPI_IE_TX_BIT)) {}
-            SPI_BASE->TXBUF = out_buf[i];
+            while (!msp430_usart_get_tx_irq_flag(usart)) {
+                /* still busy waiting for TX to complete */
+            }
+            dev->TXBUF = out_buf[i];
         }
         /* finally we need to wait, until all transfers are complete */
-        while (!(SPI_SFR->IFG & SPI_IE_TX_BIT) || !(SPI_SFR->IFG & SPI_IE_RX_BIT)) {}
-        SPI_BASE->RXBUF;
+        while (!msp430_usart_are_both_irq_flags_set(usart)) {
+            /* still either TX, or RX, or both not completed */
+        }
+        (void)dev->RXBUF;
     }
     else if (!out_buf) {
         for (size_t i = 0; i < len; i++) {
-            SPI_BASE->TXBUF = 0;
-            while (!(SPI_SFR->IFG & SPI_IE_RX_BIT)) {}
-            in_buf[i] = (char)SPI_BASE->RXBUF;
+            dev->TXBUF = 0;
+            while (!msp430_usart_get_rx_irq_flag(usart)) {
+                /* still busy waiting for RX to complete */
+            }
+            in_buf[i] = dev->RXBUF;
         }
     }
     else {
         for (size_t i = 0; i < len; i++) {
-            while (!(SPI_SFR->IFG & SPI_IE_TX_BIT)) {}
-            SPI_BASE->TXBUF = out_buf[i];
-            while (!(SPI_SFR->IFG & SPI_IE_RX_BIT)) {}
-            in_buf[i] = (char)SPI_BASE->RXBUF;
+            while (!msp430_usart_get_tx_irq_flag(usart)) {
+                /* still busy waiting for TX to complete */
+            }
+            dev->TXBUF = out_buf[i];
+            while (!msp430_usart_get_rx_irq_flag(usart)) {
+                /* still busy waiting for RX to complete */
+            }
+            in_buf[i] = dev->RXBUF;
         }
     }
 

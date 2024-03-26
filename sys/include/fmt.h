@@ -147,10 +147,13 @@ uint8_t fmt_hex_byte(const char *hex);
  *
  * The sequence of hex characters must have an even length:
  * 2 hex character => 1 byte. If the sequence of hex has an odd length, this
- * function returns 0 and an empty @p out.
+ * function returns 0 and does not write to @p out.
  *
  * The hex characters sequence must contain valid hexadecimal characters
  * otherwise the result in @p out is undefined.
+ *
+ * If @p out is NULL, will only return the number of bytes that would have
+ * been written.
  *
  * @param[out] out  Pointer to converted bytes, or NULL
  * @param[in]  hex  Pointer to input buffer
@@ -202,6 +205,19 @@ size_t fmt_u32_hex(char *out, uint32_t val);
 size_t fmt_u64_hex(char *out, uint64_t val);
 
 /**
+ * @brief Convert a uint16 value to decimal string.
+ *
+ * If @p out is NULL, will only return the number of characters that would have
+ * been written.
+ *
+ * @param[out]  out  Pointer to output buffer, or NULL
+ * @param[in]   val  Value to convert
+ *
+ * @return      nr of characters written to (or needed in) @p out
+ */
+size_t fmt_u16_dec(char *out, uint16_t val);
+
+/**
  * @brief Convert a uint32 value to decimal string.
  *
  * If @p out is NULL, will only return the number of characters that would have
@@ -228,19 +244,6 @@ size_t fmt_u32_dec(char *out, uint32_t val);
  * @return      nr of characters written to (or needed in) @p out
  */
 size_t fmt_u64_dec(char *out, uint64_t val);
-
-/**
- * @brief Convert a uint16 value to decimal string.
- *
- * If @p out is NULL, will only return the number of characters that would have
- * been written.
- *
- * @param[out]  out  Pointer to output buffer, or NULL
- * @param[in]   val  Value to convert
- *
- * @return      nr of characters written to (or needed in) @p out
- */
-size_t fmt_u16_dec(char *out, uint16_t val);
 
 /**
  * @brief Convert a int64 value to decimal string.
@@ -390,8 +393,13 @@ size_t fmt_str(char *out, const char *str);
 /**
  * @brief   Copy null-terminated string to a lowercase string (excluding terminating \0)
  *
+ * If @p out is NULL, will only return the number of characters that would have
+ * been written.
+ *
  * @param[out]  out     Pointer to output buffer, or NULL
  * @param[in]   str     Pointer to null-terminated source string
+ *
+ * @return      nr of characters written to (or needed in) @p out
  */
 size_t fmt_to_lower(char *out, const char *str);
 

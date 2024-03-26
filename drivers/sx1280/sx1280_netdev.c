@@ -73,7 +73,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         return 0;
     }
 
-    DEBUG("[sx1280] netdev: sending packet now (size: %d).\n", pos);
+    DEBUG("[sx1280] netdev: sending packet now (size: %" PRIuSIZE ").\n", pos);
     sx1280_set_lora_payload_length(dev, pos);
 
     state = NETOPT_STATE_TX;

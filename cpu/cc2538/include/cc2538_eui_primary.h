@@ -31,15 +31,13 @@ extern "C" {
 /**
  * @brief   Get the primary (burned-in) EUI-64 of the device
  *
- * @param arg       unused
- * @param[out] addr The EUI-64
  * @param index     unused
+ * @param[out] addr The EUI-64
  *
  * @return  0
  */
-static inline int cc2538_get_eui64_primary(const void *arg, eui64_t *addr, uint8_t index)
+static inline int cc2538_get_eui64_primary(uint8_t index, eui64_t *addr)
 {
-    (void)arg;
     (void)index;
 
     /*

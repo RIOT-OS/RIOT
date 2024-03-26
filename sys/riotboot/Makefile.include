@@ -9,7 +9,7 @@ RIOTBOOT_HDR_LEN ?= 0x100
 NUM_SLOTS ?= 2
 
 # Take the whole flash minus RIOTBOOT_LEN and divide it by NUM_SLOTS
-SLOT0_LEN ?= $(shell printf "0x%x" $$((($(ROM_LEN:%K=%*1024)-$(RIOTBOOT_LEN)) / $(NUM_SLOTS))))
+SLOT0_LEN ?= $(shell printf "0x%x" $$((($(ROM_LEN:%K=%*1024)-$(RIOTBOOT_LEN)-$(SLOT_AUX_LEN)) / $(NUM_SLOTS))))
 SLOT1_LEN ?= $(SLOT0_LEN)
 SLOT0_LEN := $(SLOT0_LEN)
 SLOT1_LEN := $(SLOT1_LEN)

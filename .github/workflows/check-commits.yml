@@ -28,8 +28,10 @@ jobs:
         ./dist/tools/${{ matrix.check }}/check.sh "${{ github.base_ref }}"
   check-commits-success:
     needs: check-commits
-    if: github.event_name != 'merge_group'
+    if: always() && github.event_name != 'merge_group'
     runs-on: ubuntu-latest
     steps:
     - name: check-commits succeeded
-      run: exit 0
+      uses: re-actors/alls-green@release/v1
+      with:
+        jobs: ${{ toJSON(needs) }}

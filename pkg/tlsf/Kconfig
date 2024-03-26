@@ -8,7 +8,7 @@
 menuconfig PACKAGE_TLSF
     bool "TLFS malloc/realloc/free/etc package"
     depends on TEST_KCONFIG
-    depends on HAS_ARCH_32BIT
+    depends on HAS_ARCH_32BIT || HAS_ARCH_64BIT
     help
         TLSF provides an implementation of malloc/realloc/free/etc.
 
@@ -16,9 +16,9 @@ if PACKAGE_TLSF
 
 config MODULE_TLSF_MALLOC
     bool "TLSF malloc"
-    depends on MODULE_NEWLIB || BOARD_NATIVE
+    depends on MODULE_NEWLIB || HAS_ARCH_NATIVE
     select MODULE_TLSF_MALLOC_NEWLIB if MODULE_NEWLIB
-    select MODULE_TLSF_MALLOC_NATIVE if BOARD_NATIVE
+    select MODULE_TLSF_MALLOC_NATIVE if HAS_ARCH_NATIVE
 
 config MODULE_TLSF_MALLOC_NEWLIB
     bool

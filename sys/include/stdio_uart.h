@@ -111,13 +111,6 @@ extern "C" {
 #define STDIO_UART_BAUDRATE     (115200)
 #endif
 
-#ifndef STDIO_UART_RX_BUFSIZE
-/**
- * @brief Buffer size for STDIO
- */
-#define STDIO_UART_RX_BUFSIZE   (64)
-#endif
-
 #ifdef __cplusplus
 }
 #endif

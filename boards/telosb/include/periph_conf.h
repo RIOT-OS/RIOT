@@ -23,6 +23,7 @@
 
 #include "macros/units.h"
 #include "periph_cpu.h"
+#include "cfg_timer_a_smclk_b_aclk.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,48 +45,32 @@ static const msp430_clock_params_t clock_params = {
 };
 
 /**
- * @name    Timer configuration
- * @{
- */
-#define TIMER_NUMOF         (1U)
-#define TIMER_BASE          (&TIMER_A)
-#define TIMER_CHAN          (3)
-#define TIMER_ISR_CC0       (TIMERA0_VECTOR)
-#define TIMER_ISR_CCX       (TIMERA1_VECTOR)
-/** @} */
-
-/**
  * @name    UART configuration
  * @{
  */
-#define UART_NUMOF          (1U)
+static const uart_conf_t uart_config[] = {
+    {
+        .uart = &usart1_as_uart,
+    },
+};
 
-#define UART_BASE           (&USART_1)
-#define UART_SFR            (&USART_1_SFR)
-#define UART_IE_RX_BIT      (1 << 4)
-#define UART_IE_TX_BIT      (1 << 5)
-#define UART_ME_BITS        (0x30)
-#define UART_PORT           (&PORT_3)
-#define UART_RX_PIN         (1 << 6)
-#define UART_TX_PIN         (1 << 7)
-#define UART_RX_ISR         (USART1RX_VECTOR)
-#define UART_TX_ISR         (USART1TX_VECTOR)
+#define UART0_RX_ISR        (USART1RX_VECTOR)   /**< RX IRQ vector of UART 0 */
+#define UART0_TX_ISR        (USART1TX_VECTOR)   /**< TX IRQ vector of UART 0 */
+
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 /**
  * @name    SPI configuration
  * @{
  */
-#define SPI_NUMOF           (1U)
+static const spi_conf_t spi_config[] = {
+    {
+        .spi = &usart0_as_spi,
+    },
+};
 
-#define SPI_BASE            (&USART_0)
-#define SPI_SFR             (&USART_0_SFR)
-#define SPI_IE_RX_BIT       (1 << 6)
-#define SPI_IE_TX_BIT       (1 << 7)
-#define SPI_ME_BIT          (1 << 6)
-#define SPI_PIN_MISO        GPIO_PIN(P3, 2)
-#define SPI_PIN_MOSI        GPIO_PIN(P3, 1)
-#define SPI_PIN_CLK         GPIO_PIN(P3, 3)
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 #ifdef __cplusplus

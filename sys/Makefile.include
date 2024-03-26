@@ -110,6 +110,9 @@ ifneq (,$(filter scanf_float,$(USEMODULE)))
   endif
 endif
 
+# we need to include this before the riotboot include
+include $(RIOTBASE)/sys/slot_aux/Makefile.include
+
 ifneq (,$(filter riotboot,$(FEATURES_USED)))
   include $(RIOTBASE)/sys/riotboot/Makefile.include
 endif
@@ -135,7 +138,7 @@ ifneq (,$(filter ssp,$(USEMODULE)))
   include $(RIOTBASE)/sys/ssp/Makefile.include
 endif
 
-ifneq (native,$(BOARD))
+ifneq (native,$(CPU))
   INCLUDES += -I$(RIOTBASE)/sys/libc/include
 endif
 

@@ -5,8 +5,8 @@ RIOTBASE ?= $(CURDIR)/../..
 export TAP ?= tap0
 
 # use Ethernet as link-layer protocol
-ifeq (native,$(BOARD))
-  TERMFLAGS ?= $(TAP)
+ifneq (,$(filter native native64,$(BOARD)))
+  PORT ?= $(TAP)
 else
   ETHOS_BAUDRATE ?= 115200
   CFLAGS += -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE)

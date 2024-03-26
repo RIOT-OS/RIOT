@@ -5,7 +5,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-nano \
     arduino-uno \
     atmega1284p \
-    atmega256rfr2-xpro \
     atmega328p \
     atmega328p-xplained-mini \
     atmega8 \
@@ -19,6 +18,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     i-nucleo-lrwan1 \
     mega-xplained \
     microduino-corerf \
+    nucleo-c031c6 \
     nucleo-f030r8 \
     nucleo-f302r8 \
     nucleo-l011k4 \

@@ -7,4 +7,5 @@
 
 config MODULE_PSA_KEY_SLOT_MGMT
     bool
-    default y if PACKAGE_PSA_ARCH_TESTS
+    help
+        Enable PSA key slot management module

@@ -49,7 +49,7 @@ static void *second_thread(void *arg)
     return NULL;
 }
 
-#ifdef BOARD_NATIVE
+#ifdef CPU_NATIVE
 #define ITERATION_STEPS 100000
 #else
 #define ITERATION_STEPS 10000

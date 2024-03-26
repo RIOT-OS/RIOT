@@ -80,7 +80,7 @@ int main(void)
     puts("Hello riotboot!");
 
     printf("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
-    printf("This board features a(n) %s MCU.\n", RIOT_MCU);
+    printf("This board features a(n) %s CPU.\n", RIOT_CPU);
 
     /* print some information about the running image */
     current_slot = riotboot_slot_current();

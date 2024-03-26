@@ -71,6 +71,14 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Threshold under which polling transfers are used instead of DMA
+ *          TODO: determine at run-time based on baudrate
+ */
+#ifndef CONFIG_UART_DMA_THRESHOLD_BYTES
+#define CONFIG_UART_DMA_THRESHOLD_BYTES 8
+#endif
+
+/**
  * @brief   Define default UART type identifier
  */
 #ifndef HAVE_UART_T
@@ -255,6 +263,31 @@ gpio_t uart_pin_rx(uart_t uart);
 gpio_t uart_pin_tx(uart_t uart);
 
 #endif /* DOXYGEN */
+
+/**
+ * @brief   Get the CTS pin of the given UART.
+ *
+ * @param[in] uart      The device to query
+ *
+ * @note Until this is implemented on all platforms, this requires the
+ *       periph_uart_reconfigure feature to be used.
+ *
+ * @return              The GPIO used for the UART CTS line.
+ */
+gpio_t uart_pin_cts(uart_t uart);
+
+/**
+ * @brief   Get the RTS pin of the given UART.
+ *
+ * @param[in] uart      The device to query
+ *
+ * @note Until this is implemented on all platforms, this requires the
+ *       periph_uart_reconfigure feature to be used.
+ *
+ * @return              The GPIO used for the UART RTS line.
+ */
+gpio_t uart_pin_rts(uart_t uart);
+
 #endif /* MODULE_PERIPH_UART_RECONFIGURE */
 
 #if defined(MODULE_PERIPH_UART_RXSTART_IRQ) || DOXYGEN
@@ -380,6 +413,24 @@ void uart_poweron(uart_t uart);
  * @param[in] uart          the UART device to power off
  */
 void uart_poweroff(uart_t uart);
+
+/**
+ * @brief Enable the TX line one the given UART
+ *
+ * @note requires the `periph_uart_tx_ondemand` feature
+ *
+ * @param[in] uart          the UART device start TX on
+ */
+void uart_enable_tx(uart_t uart);
+
+/**
+ * @brief Disable the TX line one the given UART
+ *
+ * @note requires the `periph_uart_tx_ondemand` feature
+ *
+ * @param[in] uart          the UART device to stop TX on
+ */
+void uart_disable_tx(uart_t uart);
 
 #ifdef __cplusplus
 }

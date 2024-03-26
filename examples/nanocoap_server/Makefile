@@ -44,18 +44,14 @@ ifneq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
 endif
 
 # Enable fileserver for boards with plenty of memory
-HIGH_MEMORY_BOARDS := native same54-xpro mcb2388
+HIGH_MEMORY_BOARDS := native native64 same54-xpro mcb2388
 
 ifneq (,$(filter $(BOARD),$(HIGH_MEMORY_BOARDS)))
-  USEMODULE += gcoap_fileserver
+  USEMODULE += nanocoap_fileserver
   USEMODULE += vfs_default
 
-  # we don't want to run GCoAP
-  CFLAGS += -DCONFIG_GCOAP_NO_AUTO_INIT=1
-  CFLAGS += -DCONFIG_NANOCOAP_SERVER_WELL_KNOWN_CORE=1
-
   # always enable auto-format for native
-  ifeq ($(BOARD),native)
+  ifneq (,$(filter native native64,$(BOARD)))
     USEMODULE += vfs_auto_format
   endif
 endif

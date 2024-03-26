@@ -36,24 +36,33 @@
 #include "periph_cpu.h"
 #include "periph_conf.h"
 
-int gpio_ll_init(gpio_port_t port, uint8_t pin, const gpio_conf_t *conf)
+#ifdef MODULE_FMT
+#include "fmt.h"
+#else
+static inline void print_str(const char *str)
 {
-    if (conf->pull == GPIO_PULL_KEEP) {
+    fputs(str, stdout);
+}
+#endif
+
+int gpio_ll_init(gpio_port_t port, uint8_t pin, gpio_conf_t conf)
+{
+    if (conf.pull == GPIO_PULL_KEEP) {
         return -ENOTSUP;
     }
 
-    uint32_t pin_cnf = conf->pull;
-    switch (conf->state) {
+    uint32_t pin_cnf = (unsigned)conf.pull << GPIO_PIN_CNF_PULL_Pos;
+    switch (conf.state) {
     case GPIO_OUTPUT_PUSH_PULL:
         /* INPUT bit needs to be *CLEARED* in input mode, so set to disconnect input buffer */
         pin_cnf |= GPIO_PIN_CNF_DIR_Msk | GPIO_PIN_CNF_INPUT_Msk;
-        if (conf->drive_strength) {
+        if (conf.drive_strength) {
             pin_cnf |= GPIO_PIN_CNF_DRIVE_H0H1 << GPIO_PIN_CNF_DRIVE_Pos;
         }
         break;
     case GPIO_OUTPUT_OPEN_DRAIN:
         pin_cnf |= GPIO_PIN_CNF_DIR_Msk;
-        if (conf->drive_strength) {
+        if (conf.drive_strength) {
             pin_cnf |= GPIO_PIN_CNF_DRIVE_H0D1 << GPIO_PIN_CNF_DRIVE_Pos;
         }
         else {
@@ -62,7 +71,7 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, const gpio_conf_t *conf)
         break;
     case GPIO_OUTPUT_OPEN_SOURCE:
         pin_cnf |= GPIO_PIN_CNF_DIR_Msk;
-        if (conf->drive_strength) {
+        if (conf.drive_strength) {
             pin_cnf |= GPIO_PIN_CNF_DRIVE_D0H1 << GPIO_PIN_CNF_DRIVE_Pos;
         }
         else {
@@ -78,8 +87,8 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, const gpio_conf_t *conf)
         break;
     }
 
-    if (conf->state != GPIO_OUTPUT_PUSH_PULL) {
-        switch (conf->pull) {
+    if (conf.state != GPIO_OUTPUT_PUSH_PULL) {
+        switch (conf.pull) {
         default:
         case GPIO_FLOATING:
             break;
@@ -93,7 +102,7 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, const gpio_conf_t *conf)
     }
 
     NRF_GPIO_Type *p = (NRF_GPIO_Type *)port;
-    if (conf->initial_value) {
+    if (conf.initial_value) {
         p->OUTSET = 1UL << pin;
     }
     else {
@@ -104,19 +113,11 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, const gpio_conf_t *conf)
     return 0;
 }
 
-void gpio_ll_query_conf(gpio_conf_t *dest, gpio_port_t port, uint8_t pin)
+gpio_conf_t gpio_ll_query_conf(gpio_port_t port, uint8_t pin)
 {
-    assert((dest != NULL)
-            && (NULL == gpio_port_unpack_addr(port))
-            && (pin < 32));
-    memset(dest, 0, sizeof(*dest));
-    /* Searching "Schmitt" in
-     * https://infocenter.nordicsemi.com/pdf/nRF52840_OPS_v0.5.pdf yields
-     * no matches. Assuming Schmitt trigger cannot be disabled for the
-     * nRF5x MCU.
-     */
-    dest->schmitt_trigger = true;
-    dest->state = GPIO_INPUT;
+    gpio_conf_t result = { 0 };
+    assert((NULL == gpio_port_unpack_addr(port)) && (pin < 32));
+    result.state = GPIO_INPUT;
 
     NRF_GPIO_Type *p = (NRF_GPIO_Type *)port;
     uint32_t cnf = p->PIN_CNF[pin];
@@ -134,38 +135,38 @@ void gpio_ll_query_conf(gpio_conf_t *dest, gpio_port_t port, uint8_t pin)
         case GPIO_PIN_CNF_DRIVE_S0S1:
             /* standard drive 0, standard drive 1
              * --> push pull with weak drive */
-            dest->state = GPIO_OUTPUT_PUSH_PULL;
-            dest->drive_strength = GPIO_DRIVE_WEAK;
+            result.state = GPIO_OUTPUT_PUSH_PULL;
+            result.drive_strength = GPIO_DRIVE_WEAK;
             break;
         case GPIO_PIN_CNF_DRIVE_H0H1:
             /* high drive 0, high drive 1
              * --> push pull with high drive */
-            dest->state = GPIO_OUTPUT_PUSH_PULL;
-            dest->drive_strength = GPIO_DRIVE_STRONG;
+            result.state = GPIO_OUTPUT_PUSH_PULL;
+            result.drive_strength = GPIO_DRIVE_STRONG;
             break;
         case GPIO_PIN_CNF_DRIVE_S0D1:
             /* standard drive 0, disconnect at 1
              * --> open drain with weak drive */
-            dest->state = GPIO_OUTPUT_OPEN_DRAIN;
-            dest->drive_strength = GPIO_DRIVE_WEAK;
+            result.state = GPIO_OUTPUT_OPEN_DRAIN;
+            result.drive_strength = GPIO_DRIVE_WEAK;
             break;
         case GPIO_PIN_CNF_DRIVE_H0D1:
             /* high drive 0, disconnect at 1
              * --> open drain with strong drive */
-            dest->state = GPIO_OUTPUT_OPEN_DRAIN;
-            dest->drive_strength = GPIO_DRIVE_STRONG;
+            result.state = GPIO_OUTPUT_OPEN_DRAIN;
+            result.drive_strength = GPIO_DRIVE_STRONG;
             break;
         case GPIO_PIN_CNF_DRIVE_D0S1:
             /* disconnect at 0, standard drive 1
              * --> open emitter with weak drive */
-            dest->state = GPIO_OUTPUT_OPEN_SOURCE;
-            dest->drive_strength = GPIO_DRIVE_WEAK;
+            result.state = GPIO_OUTPUT_OPEN_SOURCE;
+            result.drive_strength = GPIO_DRIVE_WEAK;
             break;
         case GPIO_PIN_CNF_DRIVE_D0H1:
             /* disconnect at 0, high drive 1
              * --> open emitter with strong drive */
-            dest->state = GPIO_OUTPUT_OPEN_SOURCE;
-            dest->drive_strength = GPIO_DRIVE_STRONG;
+            result.state = GPIO_OUTPUT_OPEN_SOURCE;
+            result.drive_strength = GPIO_DRIVE_STRONG;
             break;
         }
     }
@@ -174,26 +175,40 @@ void gpio_ll_query_conf(gpio_conf_t *dest, gpio_port_t port, uint8_t pin)
             /* input buffer is disconnected and pin is not in output mode
              * --> GPIO pin is off
              */
-            dest->state = GPIO_DISCONNECT;
+            result.state = GPIO_DISCONNECT;
         }
     }
 
     switch ((cnf & GPIO_PIN_CNF_PULL_Msk) >> GPIO_PIN_CNF_PULL_Pos) {
     case GPIO_PIN_CNF_PULL_Pullup:
-        dest->pull = GPIO_PULL_UP;
+        result.pull = GPIO_PULL_UP;
         break;
     case GPIO_PIN_CNF_PULL_Pulldown:
-        dest->pull = GPIO_PULL_DOWN;
+        result.pull = GPIO_PULL_DOWN;
         break;
     default:
-        dest->pull = GPIO_FLOATING;
+        result.pull = GPIO_FLOATING;
         break;
     }
 
-    if (dest->state == GPIO_INPUT) {
-        dest->initial_value = (gpio_ll_read(port) >> pin) & 1UL;
+    if (result.state == GPIO_INPUT) {
+        result.initial_value = (gpio_ll_read(port) >> pin) & 1UL;
     }
     else {
-        dest->initial_value = (gpio_ll_read_output(port) >> pin) & 1UL;
+        result.initial_value = (gpio_ll_read_output(port) >> pin) & 1UL;
     }
+
+    return result;
+}
+
+void gpio_ll_print_conf(gpio_conf_t conf)
+{
+    static const char *drive_strs[] = {
+        [GPIO_DRIVE_WEAK] = "weak",
+        [GPIO_DRIVE_STRONG] = "strong",
+    };
+
+    gpio_ll_print_conf_common(conf);
+    print_str(", drive: ");
+    print_str(drive_strs[conf.drive_strength]);
 }

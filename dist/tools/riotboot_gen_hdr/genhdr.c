@@ -112,3 +112,51 @@ int genhdr(int argc, char *argv[])
 
     return 0;
 }
+
+int updatehdr(int argc, char *argv[])
+{
+    if (argc < 3) {
+        fprintf(stderr, "usage: genhdr update <file> <new_version>\n");
+        return -1;
+    }
+    const char *file = argv[1];
+
+    riotboot_hdr_t hdr = { 0 };
+    int res = from_file(file, &hdr, sizeof(hdr));
+    if (res < (int)sizeof(hdr)) {
+        fprintf(stderr, "Can't read header from %s\n", file);
+        return -EIO;
+    }
+
+    if (hdr.magic_number != RIOTBOOT_MAGIC) {
+        fprintf(stderr, "Invalid magic: %x\n", hdr.magic_number);
+        return -EIO;
+    }
+
+    hdr.version = atoi(argv[2]);
+    hdr.chksum = riotboot_hdr_checksum(&hdr);
+    to_file(file, &hdr, sizeof(hdr));
+
+    return 0;
+}
+
+int readhdr(const char *file)
+{
+    riotboot_hdr_t hdr = { 0 };
+    int res = from_file(file, &hdr, sizeof(hdr));
+    if (res < (int)sizeof(hdr)) {
+        fprintf(stderr, "Can't read header from %s\n", file);
+        return -EIO;
+    }
+
+    if (hdr.magic_number != RIOTBOOT_MAGIC) {
+        fprintf(stderr, "Invalid magic: %x\n", hdr.magic_number);
+        return -EIO;
+    }
+
+    printf("version: %u\n", hdr.version);
+    printf("address: 0x%x\n", hdr.start_addr);
+    printf("checksum: %svalid\n", riotboot_hdr_validate(&hdr) ? "in" : "");
+
+    return 0;
+}

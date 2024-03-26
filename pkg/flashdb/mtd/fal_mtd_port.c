@@ -74,8 +74,12 @@ struct fal_flash_dev mtd_flash0 = {
 
 void fdb_mtd_init(mtd_dev_t *mtd)
 {
-    unsigned sector_size;
+    assert(mtd);
 
+    unsigned sector_size;
+    if (_mtd) {
+        return;
+    }
     mtd_init(mtd);
     _mtd = mtd;
 

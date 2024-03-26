@@ -69,13 +69,13 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#if defined(MCU_ESP32)
+#if defined(CPU_ESP32)
 #include "soc/dport_access.h"
 #include "soc/dport_reg.h"
-#elif defined(MCU_ESP8266)
+#elif defined(CPU_ESP8266)
 #include "esp8266/rom_functions.h"
 #include "sdk/sdk.h"
-#endif /* MCU_ESP32 */
+#endif /* CPU_ESP32 */
 
 #include "esp/xtensa_ops.h"
 #include "xtensa/xtensa_context.h"
@@ -215,7 +215,7 @@ char* thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
     return (char*)sp;
 }
 
-#ifdef MCU_ESP8266
+#ifdef CPU_ESP8266
 extern int MacIsrSigPostDefHdl(void);
 unsigned int ets_soft_int_type = ETS_SOFT_INT_NONE;
 #endif
@@ -227,7 +227,7 @@ unsigned int ets_soft_int_type = ETS_SOFT_INT_NONE;
  */
 void IRAM_ATTR thread_yield_isr(void* arg)
 {
-#ifdef MCU_ESP8266
+#ifdef CPU_ESP8266
     ETS_NMI_LOCK();
 
     if (ets_soft_int_type == ETS_SOFT_INT_HDL_MAC) {
@@ -281,7 +281,7 @@ void IRAM_ATTR thread_yield_higher(void)
     }
 #endif
     if (!irq_is_in()) {
-#if defined(MCU_ESP8266)
+#if defined(CPU_ESP8266)
         critical_enter();
         ets_soft_int_type = ETS_SOFT_INT_YIELD;
         WSR(BIT(ETS_SOFT_INUM), interrupt);
@@ -292,7 +292,7 @@ void IRAM_ATTR thread_yield_higher(void)
 #else
         /* generate the software interrupt to switch the context */
         DPORT_WRITE_PERI_REG(SYSTEM_CPU_INTR_FROM_CPU_0_REG, SYSTEM_CPU_INTR_FROM_CPU_0);
-#endif /* MCU_ESP8266 */
+#endif /* CPU_ESP8266 */
     }
     else {
         /* set the context switch flag */

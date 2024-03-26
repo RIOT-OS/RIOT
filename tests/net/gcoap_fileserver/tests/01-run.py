@@ -9,6 +9,7 @@
 import os
 import subprocess
 import time
+import sys
 
 from subprocess import Popen
 from riotctrl_shell.gnrc import GNRCICMPv6Echo, GNRCICMPv6EchoParser
@@ -27,10 +28,11 @@ PARSERS = {
 
 class RIOTCtrlAppFactory(RIOTCtrlBoardFactory):
 
-    def __init__(self):
+    def __init__(self, board='native'):
         super().__init__(board_cls={
-            'native': native.NativeRIOTCtrl,
+            board: native.NativeRIOTCtrl,
         })
+        self.board = board
         self.ctrl_list = list()
 
     def __enter__(self):
@@ -40,7 +42,9 @@ class RIOTCtrlAppFactory(RIOTCtrlBoardFactory):
         for ctrl in self.ctrl_list:
             ctrl.stop_term()
 
-    def get_shell(self, application_directory='.', env={'BOARD': 'native'}):
+    def get_shell(self, application_directory='.', env=None):
+        if env is None:
+            env = {'BOARD': self.board}
         # retrieve a RIOTCtrl Object
         ctrl = super().get_ctrl(
             env=env,
@@ -131,5 +135,11 @@ def run_test(func, factory):
 
 
 if __name__ == "__main__":
-    with RIOTCtrlAppFactory() as factory:
+    board = os.environ.get('BOARD', 'native')
+    if board not in ['native', 'native64']:
+        print('\x1b[1;31mThis test requires a native board.\x1b[0m\n',
+              file=sys.stderr)
+        sys.exit(1)
+
+    with RIOTCtrlAppFactory(board) as factory:
         run_test(test_linear_topology, factory)

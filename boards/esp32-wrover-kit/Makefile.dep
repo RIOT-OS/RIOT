@@ -5,14 +5,17 @@ endif
 # Sets up configuration for openocd
 USEMODULE += esp_jtag
 
-ifneq (,$(filter mtd,$(USEMODULE)))
-  USEMODULE += mtd_sdcard_default
-endif
-
 # default to using fatfs on SD card
 ifneq (,$(filter vfs_default,$(USEMODULE)))
   USEMODULE += fatfs_vfs
   USEMODULE += mtd
+endif
+
+ifneq (,$(filter mtd,$(USEMODULE)))
+  ifeq (,$(filter sdcard_spi,$(USEMODULE)))
+    # use mtd_sdmmc_default if sdcard_spi isn't explicitly enabled
+    USEMODULE += mtd_sdmmc_default
+  endif
 endif
 
 include $(RIOTBOARD)/common/esp32/Makefile.dep

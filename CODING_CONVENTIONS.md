@@ -301,9 +301,7 @@ Some solutions to correctly handle compilation warnings.
 Solution for string formatting errors:
 
 * When printing a `size_t`
-    * use `%u` and cast the variable to `(unsigned)` because `newlib-nano` does
-      not support `%zu`
-      [example](https://github.com/RIOT-OS/RIOT/blob/e19f6463c09fc22c76c5b855799054cf27a697f1/tests/sizeof_tcb/main.c#L34)
+    * use `PRIuSIZE` from `architecture.h` because `newlib-nano` does not support `%zu`
 * When printing an `unsigned char/uint8_t`
     * Use `%u` because `newlib-nano` does not support `%hu/PRIu8`
       [example](https://github.com/RIOT-OS/RIOT/pull/4851)

@@ -38,6 +38,12 @@ static const  saul_gpio_params_t saul_gpio_params[] =
         .flags = SAUL_GPIO_INVERTED
     },
     {
+        .name = "LED(ETH)",
+        .pin = LED1_PIN,
+        .mode = GPIO_OUT,
+        .flags = SAUL_GPIO_INVERTED
+    },
+    {
         .name = "Button(SW0)",
         .pin  = BTN0_PIN,
         .mode = BTN0_MODE,

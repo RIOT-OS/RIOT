@@ -5,14 +5,14 @@ RIOT Documentation                                                  {#mainpage}
 
 RIOT in a nutshell                                        {#riot-in-a-nutshell}
 ==================
-RIOT is an open-source  microkernel-based operating system, designed to match
+RIOT is an open-source microcontroller operating system, designed to match
 the requirements of Internet of Things (IoT) devices and other embedded
 devices. These requirements include a very low memory footprint (on the order
 of a few kilobytes), high energy efficiency, real-time capabilities, support
 for a wide range of low-power hardware, communication stacks for wireless and
 communication stacks for wired networks.
 
-RIOT provides a microkernel, multiple network stacks, and utilities which
+RIOT provides threading, multiple network stacks, and utilities which
 include cryptographic libraries, data structures (bloom filters, hash tables,
 priority queues), a shell and more. RIOT supports a wide range of
 microcontroller architectures, radio drivers, sensors, and configurations for
@@ -38,7 +38,7 @@ RIOT is developed by an open community that anyone is welcome to join:
  - Sign-up to our [forum](https://forum.riot-os.org/) to ask for help using RIOT
    or writing an application for RIOT, discuss kernel and network stack
    development as well as hardware support, or to show-case your latest project.
- - Follow us on [Twitter](https://twitter.com/RIOT_OS) for news from the RIOT
+ - Follow us on [Mastodon][mastodon-link] for news from the RIOT
    community.
  - Regarding critical vulnerabilities we would appreciate if you give us a
    90-days head-start by reporting to security@riot-os.org, before making your
@@ -46,6 +46,7 @@ RIOT is developed by an open community that anyone is welcome to join:
  - Contact us on Matrix for live support and discussions:
    [riot-os:matrix.org](https://matrix.to/#/#riot-os:matrix.org)
 
+[mastodon-link]: https://fosstodon.org/@RIOT_OS
 
 The quickest start                                        {#the-quickest-start}
 ==================
@@ -167,7 +168,7 @@ See @ref drivers for more details.
 
 sys
 ---
-RIOT follows the micro-kernel design paradigm where everything is supposed to
+RIOT follows a modular design paradigm where everything is supposed to
 be a module. All of these modules that are not part of the hardware abstraction
 nor device drivers can be found in this directory. The libraries include data
 structures (e.g. bloom, color), crypto libraries (e.g. hashes, AES) ,

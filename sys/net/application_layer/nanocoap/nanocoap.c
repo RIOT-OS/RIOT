@@ -119,7 +119,7 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
     while (pkt_pos < pkt_end) {
         uint8_t *option_start = pkt_pos;
         uint8_t option_byte = *pkt_pos++;
-        if (option_byte == 0xff) {
+        if (option_byte == COAP_PAYLOAD_MARKER) {
             pkt->payload = pkt_pos;
             pkt->payload_len = buf + len - pkt_pos;
             DEBUG("payload len = %u\n", pkt->payload_len);
@@ -232,7 +232,7 @@ static uint8_t *_parse_option(const coap_pkt_t *pkt,
     uint8_t *hdr_end = pkt->payload;
 
     if ((pkt_pos >= hdr_end)
-            || (((pkt_pos + 1) == hdr_end) && (*pkt_pos == 0xFF))) {
+            || (((pkt_pos + 1) == hdr_end) && (*pkt_pos == COAP_PAYLOAD_MARKER))) {
         return NULL;
     }
 
@@ -439,6 +439,45 @@ int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, uint8_
     return (blkopt & 0x8) ? 1 : 0;
 }
 
+bool coap_find_uri_query(coap_pkt_t *pkt, const char *key, const char **value, size_t *len)
+{
+    uint8_t *opt_pos = NULL;
+
+    while (1) {
+        int len_query;
+        const void *key_data = coap_iterate_option(pkt, COAP_OPT_URI_QUERY,
+                                                   &opt_pos, &len_query);
+        if (key_data == NULL) {
+            return false;
+        }
+
+        const char *separator = memchr(key_data, '=', len_query);
+        size_t len_key = separator
+                       ? (separator - (char *)key_data)
+                       : len_query;
+
+        if (memcmp(key, key_data, len_key)) {
+            continue;
+        }
+
+        if (value == NULL) {
+            return true;
+        }
+
+        assert(len);
+        if (separator) {
+            *value = separator + 1;
+            *len = len_query - len_key - 1;
+        } else {
+            *value = NULL;
+            *len   = 0;
+        }
+        return true;
+    }
+
+    return false;
+}
+
 bool coap_has_unprocessed_critical_options(const coap_pkt_t *pkt)
 {
     for (unsigned i = 0; i < sizeof(pkt->opt_crit); ++i){
@@ -506,29 +545,85 @@ ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_
     return coap_build_reply(pkt, COAP_CODE_404, resp_buf, resp_buf_len, 0);
 }
 
+ssize_t coap_build_reply_header(coap_pkt_t *pkt, unsigned code,
+                                void *buf, size_t len,
+                                int ct,
+                                void **payload, size_t *payload_len_max)
+{
+    uint8_t *bufpos = buf;
+    uint32_t no_response;
+    unsigned tkl = coap_get_token_len(pkt);
+    size_t hdr_len = sizeof(coap_hdr_t) + tkl;
+    uint8_t type = coap_get_type(pkt) == COAP_TYPE_CON
+                 ? COAP_TYPE_ACK
+                 : COAP_TYPE_NON;
+
+    if (hdr_len > len) {
+        return -ENOBUFS;
+    }
+
+    bufpos += coap_build_hdr(buf, type, coap_get_token(pkt), tkl,
+                             code, ntohs(pkt->hdr->id));
+
+    if (coap_opt_get_uint(pkt, COAP_OPT_NO_RESPONSE, &no_response) == 0) {
+        const uint8_t no_response_index = (code >> 5) - 1;
+        /* If the handler code misbehaved here, we'd face UB otherwise */
+        assume(no_response_index < 7);
+
+        const uint8_t mask = 1 << no_response_index;
+        if (no_response & mask) {
+            if (payload) {
+                *payload = NULL;
+                *payload_len_max = 0;
+                payload = NULL;
+            }
+
+            /* no-response requested, only send empty ACK or nothing */
+            if (type != COAP_TYPE_ACK) {
+                return 0;
+            }
+        }
+    }
+
+    if (payload) {
+        if (ct >= 0) {
+            bufpos += coap_put_option_ct(bufpos, 0, ct);
+        }
+        *bufpos++ = COAP_PAYLOAD_MARKER;
+        *payload = bufpos;
+        hdr_len  = bufpos - (uint8_t *)buf;
+        *payload_len_max = len - hdr_len;
+    }
+
+    /* with the nanoCoAP API we can't detect the overflow before it happens */
+    assert(hdr_len <= len);
+
+    return hdr_len;
+}
+
 ssize_t coap_reply_simple(coap_pkt_t *pkt,
                           unsigned code,
                           uint8_t *buf, size_t len,
                           unsigned ct,
                           const void *payload, size_t payload_len)
 {
-    uint8_t *payload_start = buf + coap_get_total_hdr_len(pkt);
-    uint8_t *bufpos = payload_start;
+    void *payload_start;
+    size_t payload_len_max;
 
-    if (payload_len) {
-        bufpos += coap_put_option_ct(bufpos, 0, ct);
-        *bufpos++ = 0xff;
+    ssize_t header_len = coap_build_reply_header(pkt, code, buf, len, ct,
+                                                payload ? &payload_start : NULL,
+                                                &payload_len_max);
+    if (payload == NULL || header_len <= 0) {
+        return header_len;
     }
 
-    ssize_t res = coap_build_reply(pkt, code, buf, len,
-                                   bufpos - payload_start + payload_len);
-
-    if (payload_len && (res > 0)) {
-        assert(payload);
-        memcpy(bufpos, payload, payload_len);
+    if (payload_len > payload_len_max) {
+        return -ENOBUFS;
     }
 
-    return res;
+    memcpy(payload_start, payload, payload_len);
+
+    return header_len + payload_len;
 }
 
 ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
@@ -588,7 +683,7 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
     return len;
 }
 
-ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, uint8_t *token,
+ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, const void *token,
                        size_t token_len, unsigned code, uint16_t id)
 {
     assert(!(type & ~0x3));
@@ -904,6 +999,7 @@ size_t coap_opt_put_uri_pathquery(uint8_t *buf, uint16_t *lastonum, const char *
 {
     size_t len;
     const char *query = strchr(uri, '?');
+    uint16_t _lastonum = lastonum ? *lastonum : 0;
 
     if (query) {
         len = (query == uri) ? 0 : (query - uri - 1);
@@ -911,16 +1007,20 @@ size_t coap_opt_put_uri_pathquery(uint8_t *buf, uint16_t *lastonum, const char *
         len = strlen(uri);
     }
 
-    size_t bytes_out = coap_opt_put_string_with_len(buf, *lastonum,
+    size_t bytes_out = coap_opt_put_string_with_len(buf, _lastonum,
                                                     COAP_OPT_URI_PATH,
                                                     uri, len, '/');
     if (query) {
         buf += bytes_out;
         bytes_out += coap_opt_put_uri_query(buf, COAP_OPT_URI_PATH, query + 1);
-        *lastonum = COAP_OPT_URI_QUERY;
+        _lastonum = COAP_OPT_URI_QUERY;
     }
     else if (bytes_out) {
-        *lastonum = COAP_OPT_URI_PATH;
+        _lastonum = COAP_OPT_URI_PATH;
+    }
+
+    if (lastonum) {
+        *lastonum = _lastonum;
     }
 
     return bytes_out;
@@ -1073,7 +1173,7 @@ ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags)
             return -ENOSPC;
         }
 
-        *pkt->payload++ = 0xFF;
+        *pkt->payload++ = COAP_PAYLOAD_MARKER;
         pkt->payload_len--;
     }
     else {
@@ -1298,7 +1398,7 @@ ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, uint8_t *buf, \
     bufpos += coap_put_option_ct(bufpos, 0, COAP_FORMAT_LINK);
     bufpos += coap_opt_put_block2(bufpos, COAP_OPT_CONTENT_FORMAT, &slicer, 1);
 
-    *bufpos++ = 0xff;
+    *bufpos++ = COAP_PAYLOAD_MARKER;
 
     for (unsigned i = 0; i < coap_resources_numof; i++) {
         if (i) {

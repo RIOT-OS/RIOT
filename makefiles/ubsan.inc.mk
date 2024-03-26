@@ -11,7 +11,7 @@ UBSAN_MODE ?= msg_exit
 CFLAGS_UBSAN = -fsanitize=undefined
 
 ifeq (gnu,$(TOOLCHAIN))
-  ifeq (native,$(BOARD))
+  ifeq (native,$(CPU))
     ifneq (,$(filter msg_%,$(UBSAN_MODE)))
       LINKFLAGS_UBSAN += -lubsan
       ifneq (msg_recover,$(UBSAN_MODE))

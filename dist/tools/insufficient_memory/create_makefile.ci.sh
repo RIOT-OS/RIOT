@@ -56,6 +56,8 @@ for BOARD in $(EXTERNAL_BOARD_DIRS="" make  --no-print-directory info-boards-sup
         if grep -e overflowed \
                 -e "not within region" \
                 -e "wraps around address space" \
+                -e "overlaps section" \
+                -e "does not fit in ROM" \
                 "$TMPFILE" > /dev/null; then
             printf "${CBIG}%s${CRESET}\n" "too big"
             BOARDS="${BOARDS} ${BOARD}"
@@ -80,4 +82,4 @@ for BOARD in $(EXTERNAL_BOARD_DIRS="" make  --no-print-directory info-boards-sup
 done
 
 rm "${APP_DIR}/Makefile.ci"
-make -f "$(dirname "$0")"/Makefile.for_sh DIR="${APP_DIR}" BOARD="${BOARDS}" Makefile.ci > /dev/null
+make -f "$(dirname "$0")"/Makefile.for_sh DIR="${APP_DIR}" ADD_BOARDS="${BOARDS}" Makefile.ci > /dev/null

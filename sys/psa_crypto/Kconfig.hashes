@@ -7,7 +7,6 @@
 
 menuconfig MODULE_PSA_HASH
     bool "PSA Hashes"
-    select PSA_KEY_CONFIG
 
 if MODULE_PSA_HASH
 
@@ -103,6 +102,10 @@ config MODULE_PSA_HASH_SHA_512_BACKEND_PERIPH
     bool "Hardware accelerated"
     depends on HAS_PERIPH_HASH_SHA_512
     select MODULE_PERIPH_HASH_SHA_512
+
+config MODULE_PSA_HASH_SHA_512_BACKEND_RIOT
+    bool "RIOT hash"
+    select MODULE_PSA_RIOT_HASHES_SHA_512
 
 endchoice
 

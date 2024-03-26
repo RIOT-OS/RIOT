@@ -141,8 +141,8 @@ int pthread_cond_timedwait(pthread_cond_t *cond, mutex_t *mutex, const struct ti
 
         mutex_unlock_and_sleep(mutex);
 
-        if (n.data != -1u) {
-            /* on signaling n.data is set to -1u */
+        if (n.data != PRIORITY_QUEUE_DATA_SIGNALING) {
+            /* on signaling n.data is set to PRIORITY_QUEUE_DATA_SIGNALING */
             /* if it isn't set, then the wakeup is either spurious or a timer wakeup */
             unsigned old_state = irq_disable();
             priority_queue_remove(&(cond->queue), &n);
@@ -171,7 +171,7 @@ int pthread_cond_signal(pthread_cond_t *cond)
             other_prio = other_thread->priority;
             sched_set_status(other_thread, STATUS_PENDING);
         }
-        head->data = -1u;
+        head->data = PRIORITY_QUEUE_DATA_SIGNALING;
     }
 
     irq_restore(old_state);
@@ -205,7 +205,7 @@ int pthread_cond_broadcast(pthread_cond_t *cond)
             other_prio = max_prio(other_prio, other_thread->priority);
             sched_set_status(other_thread, STATUS_PENDING);
         }
-        head->data = -1u;
+        head->data = PRIORITY_QUEUE_DATA_SIGNALING;
     }
 
     irq_restore(old_state);

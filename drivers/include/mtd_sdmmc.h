@@ -8,14 +8,14 @@
  */
 
 /**
- * @defgroup    drivers_mtd_sdmmc mtd wrapper for sdmmc
+ * @defgroup    drivers_mtd_sdmmc MTD wrapper for SD/MMC devices
  * @ingroup     drivers_storage
- * @brief       Driver for SD Memory Cards and MMCs/eMMCs using mtd interface
+ * @brief       Driver for SD Memory Cards and MMCs/eMMCs using the MTD interface
  *
  * @{
  *
  * @file
- * @brief       Interface definition for mtd_sdmmc driver
+ * @brief       Interface definition for the mtd_sdmmc driver
  *
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  * @author      Gunar Schorcht <gunar@schorcht.net>
@@ -46,29 +46,7 @@ typedef struct {
 } mtd_sdmmc_t;
 
 /**
- * @defgroup drivers_mtd_sdmmc_config   SD Memory Card driver compile configuration
- * @ingroup config_drivers_storage
- * @{
- */
-/**
- * @brief   Enable SD Memory Card Erase
- *
- * SD Memory Cards and MMCs/eMMCs handle sector erase internally
- * so it's possible to directly write to the card without erasing
- * the sector first.
- *
- * @note An erase call will NOT touch the content if `CONFIG_MTD_SDMMC_ERASE`
- *       is not set, so enable this feature to ensure overriding the data.
- *
- * @pre This feature requires the `mtd_write_page` module.
- */
-#ifdef DOXYGEN
-#define CONFIG_MTD_SDMMC_ERASE
-#endif
-/** @} */
-
-/**
- * @brief   sdcard device operations table for mtd
+ * @brief   SD/MMC device operations table for mtd
  */
 extern const mtd_desc_t mtd_sdmmc_driver;
 

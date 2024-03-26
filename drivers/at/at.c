@@ -6,41 +6,10 @@
  * directory for more details.
  */
 
-/* A note on URCs (Unsolicited Result Codes), regardless of whether URC handling
- * is enabled or not.
- *
- * Some DCEs (Data Circuit-terminating Equipment, aka modem), like the LTE
- * modules from uBlox define a grace period where URCs are guaranteed NOT to be
- * sent as the time span between:
- *  - the command EOL character reception AND command being internally accepted
- *  - the EOL character of the last response line
- *
- * As follows, there is an indeterminate amount of time between:
- *  - the command EOL character being sent
- *  - the command EOL character reception AND command being internally accepted,
- *    i.e. the begin of the grace period
- *
- * In other words, we can get a URC (or more?) just after issuing the command
- * and before the first line of response. The net effect is that such URCs will
- * appear to be the first line of response to the last issued command.
- *
- * The current solution is to skip characters that don't match the expected
- * response, at the expense of losing these URCs. Note, we may already lose URCs
- * when calling at_drain() just before any at_send_cmd(). Success partially
- * depends on whether command echoing is enabled or not:
- *  1. echo enabled: by observation, it seems that the grace period begins
- *   BEFORE the echoed command. This has the advantage that we ALWAYS know what
- *   the first line of response must look like and so if it doesn't, then it's a
- *   URC. Thus, any procedure that calls at_send_cmd() will catch and discard
- *   these URCs.
- *  2. echo disabled: commands that expect a response (e.g. at_send_cmd_get_resp_wait_ok())
- *   will catch and discard any URC (or, if MODULE_AT_URC enabled, hand it over
- *   to the URC callbacks). For the rest, it is the application's responsibility
- *   to handle it.
- */
-
 #include <assert.h>
 #include <errno.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "at.h"
@@ -48,7 +17,6 @@
 #include "isrpipe.h"
 #include "isrpipe/read_timeout.h"
 #include "periph/uart.h"
-#include "event/thread.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -57,59 +25,77 @@
 #define AT_PRINT_INCOMING (0)
 #endif
 
-#if defined(MODULE_AT_URC_ISR_LOWEST)
-#define AT_EVENT_PRIO EVENT_PRIO_LOWEST
-#elif defined(MODULE_AT_URC_ISR_MEDIUM)
-#define AT_EVENT_PRIO EVENT_PRIO_MEDIUM
-#elif defined(MODULE_AT_URC_ISR_HIGHEST)
-#define AT_EVENT_PRIO EVENT_PRIO_HIGHEST
-#endif
 
 #if defined(MODULE_AT_URC)
 static int _check_urc(clist_node_t *node, void *arg);
 #endif
 
-#if defined(MODULE_AT_URC_ISR)
-static void _event_process_urc(event_t *_event)
+static ssize_t at_readline_skip_empty_stop_at_str(at_dev_t *dev, char *resp_buf,
+                                                  size_t len, bool keep_eol,
+                                                  char const *substr, uint32_t timeout);
+static ssize_t at_readline_stop_at_str(at_dev_t *dev, char *resp_buf, size_t len,
+                                      bool keep_eol, char const *substr,
+                                      uint32_t timeout);
+static ssize_t read_line_or_echo(at_dev_t *dev, char const *cmd, char *resp_buf,
+                        size_t len, uint32_t timeout);
+
+static inline bool starts_with(char const *str, char const *prefix)
 {
-    at_dev_t *dev = (at_dev_t *)container_of(_event, at_dev_t, event);
-    at_process_urc(dev, 1000);
+    return strncmp(str, prefix, strlen(prefix)) == 0;
 }
-#endif
 
 static void _isrpipe_write_one_wrapper(void *_dev, uint8_t data)
 {
     at_dev_t *dev = (at_dev_t *) _dev;
     isrpipe_write_one(&dev->isrpipe, data);
-#if defined(MODULE_AT_URC_ISR)
-    if (data == AT_RECV_EOL_2[0] && !dev->awaiting_response) {
-        event_post(AT_EVENT_PRIO, &dev->event);
-    }
-#endif
 }
 
-int at_dev_init(at_dev_t *dev, uart_t uart, uint32_t baudrate, char *buf, size_t bufsize)
+int at_dev_init(at_dev_t *dev, at_dev_init_t const *init)
 {
-    dev->uart = uart;
+    assert(strlen(AT_RECV_EOL) >= 1);
+    assert(init->rp_buf_size >= 16);
 
-#if IS_USED(MODULE_AT_URC_ISR)
-    dev->awaiting_response = false;
-    dev->event.handler = _event_process_urc;
-#endif
+    dev->uart = init->uart;
+    dev->rp_buf = init->rp_buf;
+    dev->rp_buf_size = init->rp_buf_size;
 
-    isrpipe_init(&dev->isrpipe, (uint8_t *)buf, bufsize);
+    isrpipe_init(&dev->isrpipe, (uint8_t *)init->rx_buf, init->rx_buf_size);
 
-    return uart_init(uart, baudrate, _isrpipe_write_one_wrapper, dev);
+    return uart_init(init->uart, init->baudrate, _isrpipe_write_one_wrapper, dev);
+}
+
+int at_parse_resp(at_dev_t *dev, char const *resp)
+{
+    if (*resp == '\0') {
+        return 1;
+    }
+    if (starts_with(resp, CONFIG_AT_RECV_OK)) {
+        dev->rp_buf[0] = '\0';
+        return 0;
+    }
+    if (starts_with(resp, CONFIG_AT_RECV_ERROR)) {
+        return -1;
+    }
+    /* A specific command may return either CME or CMS, we need not differentiate */
+    if (!starts_with(resp, "+CME ERROR: ") &&
+        !starts_with(resp, "+CMS ERROR: ")) {
+        /* neither `OK` nor error, must be a response or URC */
+        return 1;
+    }
+
+    resp += strlen("+CMx ERROR: ");
+    size_t resp_len = strlen(resp);
+    if (resp_len + 1 > dev->rp_buf_size) {
+        return -ENOBUFS;
+    }
+    /* dev->rp_buf and resp may overlap */
+    memmove(dev->rp_buf, resp, resp_len + 1);
+    return -AT_ERR_EXTENDED;
 }
 
 int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout)
 {
-    int res = 0;
-
-#if IS_USED(MODULE_AT_URC_ISR)
-    dev->awaiting_response = true;
-#endif
-
+    ssize_t res = 0;
     while (*bytes) {
         char c;
         if ((res = isrpipe_read_timeout(&dev->isrpipe, (uint8_t *)&c, 1, timeout)) == 1) {
@@ -126,13 +112,8 @@ int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout)
         }
     }
     res = 0;
-
 out:
-#if IS_USED(MODULE_AT_URC_ISR)
-    dev->awaiting_response = false;
-#endif
-
-    return res;
+    return (int)res;
 }
 
 int at_wait_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout)
@@ -152,27 +133,20 @@ void at_send_bytes(at_dev_t *dev, const char *bytes, size_t len)
 ssize_t at_recv_bytes(at_dev_t *dev, char *bytes, size_t len, uint32_t timeout)
 {
     char *resp_pos = bytes;
-
-#if IS_USED(MODULE_AT_URC_ISR)
-    dev->awaiting_response = true;
-#endif
-
     while (len) {
-        int read_res;
-        if ((read_res = isrpipe_read_timeout(&dev->isrpipe, (uint8_t *)resp_pos,
-                                             1, timeout)) == 1) {
-            resp_pos += read_res;
-            len -= read_res;
+        ssize_t res;
+        if ((res = isrpipe_read_timeout(&dev->isrpipe, (uint8_t *)resp_pos,
+                                        1, timeout)) == 1) {
+            if (AT_PRINT_INCOMING) {
+                print(resp_pos, 1);
+            }
+            resp_pos += res;
+            len -= res;
         }
-        else if (read_res == -ETIMEDOUT) {
+        else if (res == -ETIMEDOUT) {
             break;
         }
     }
-
-#if IS_USED(MODULE_AT_URC_ISR)
-    dev->awaiting_response = false;
-#endif
-
     return (resp_pos - bytes);
 }
 
@@ -181,11 +155,7 @@ int at_recv_bytes_until_string(at_dev_t *dev, const char *string,
 {
     size_t len = 0;
     char *_string = (char *)string;
-    int res = 0;
-
-#if IS_USED(MODULE_AT_URC_ISR)
-    dev->awaiting_response = true;
-#endif
+    ssize_t res = 0;
 
     while (*_string && len < *bytes_len) {
         char c;
@@ -204,12 +174,19 @@ int at_recv_bytes_until_string(at_dev_t *dev, const char *string,
         }
     }
     *bytes_len = len;
+    return (int)res;
+}
 
-#if IS_USED(MODULE_AT_URC_ISR)
-    dev->awaiting_response = false;
+static int wait_echo(at_dev_t *dev, char const *command, uint32_t timeout)
+{
+    ssize_t res;
+    while ((res = read_line_or_echo(dev, command, dev->rp_buf, dev->rp_buf_size, timeout)) > 0) {
+        /* keep reading until echo or some error happens. */
+#ifdef MODULE_AT_URC
+        clist_foreach(&dev->urc_list, _check_urc, dev->rp_buf);
 #endif
-
-    return res;
+    }
+    return (int)res;
 }
 
 int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout)
@@ -219,295 +196,406 @@ int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout)
     uart_write(dev->uart, (const uint8_t *)command, cmdlen);
     uart_write(dev->uart, (const uint8_t *)CONFIG_AT_SEND_EOL, AT_SEND_EOL_LEN);
 
-    if (!IS_ACTIVE(CONFIG_AT_SEND_SKIP_ECHO)) {
-        if (at_wait_bytes(dev, command, timeout)) {
-            return -1;
-        }
-
-        if (at_expect_bytes(dev, CONFIG_AT_SEND_EOL AT_RECV_EOL_1 AT_RECV_EOL_2,
-                            timeout)) {
-            return -2;
-        }
+    if (IS_ACTIVE(CONFIG_AT_SEND_SKIP_ECHO)) {
+        return 0;
     }
-
-    return 0;
+    return wait_echo(dev, command, timeout);
 }
 
 void at_drain(at_dev_t *dev)
 {
     uint8_t _tmp[16];
-    int res;
-
-#if IS_USED(MODULE_AT_URC_ISR)
-    dev->awaiting_response = true;
-#endif
+    ssize_t res;
 
     do {
         /* consider no character within 10ms "drained" */
         res = isrpipe_read_timeout(&dev->isrpipe, _tmp, sizeof(_tmp), 10000U);
     } while (res > 0);
+}
 
-#if IS_USED(MODULE_AT_URC_ISR)
-    dev->awaiting_response = false;
-#endif
+static bool is_eol(char p)
+{
+    return p == '\r' || p == '\n';
+}
+
+static char *skip_leading_eol(char *line)
+{
+    while (is_eol(*line)) {
+        line++;
+    }
+    return line;
+}
+
+static size_t trim_leading_eol(char *buf, size_t str_len)
+{
+    char *p = skip_leading_eol(buf);
+    if (p == buf) {
+        /* not sure if memmove is a no-op in this case */
+        return str_len;
+    }
+    size_t size_left = str_len - (size_t)(p - buf);
+    /* +1 for the terminating \0 */
+    memmove(buf, p, size_left + 1);
+    return size_left;
+}
+
+static size_t trim_trailing_eol(char *line, size_t str_len)
+{
+    while (str_len && is_eol(line[str_len - 1])) {
+        line[--str_len] = '\0';
+    }
+    return str_len;
+}
+
+static size_t at_drain_n(at_dev_t *dev, size_t n)
+{
+    unsigned char drain_buf[16];
+    while (n > 0) {
+        size_t const to_read = n > sizeof(drain_buf) ? sizeof(drain_buf) : n;
+        ssize_t res = isrpipe_read_timeout(&dev->isrpipe, drain_buf, to_read, 10000U);
+        if (res < 1) {
+            break;
+        }
+        n -= res;
+    }
+    return n;
+}
+
+/**
+ * @retval  0 if an echo was received and flushed
+ * @retval  length of the line if an URC was intercepted
+ * @retval <0 on error */
+static ssize_t read_line_or_echo(at_dev_t *dev, char const *cmd, char *resp_buf,
+                        size_t len, uint32_t timeout)
+{
+    size_t const cmd_len = strlen(cmd);
+    if (cmd_len == 0 || len == 0) {
+        return -EINVAL;
+    }
+
+    if (len == 1) {
+        return -ENOBUFS;
+    }
+    /* We keep EOL in case the echoed command contains binary data and, by
+     * chance, a EOL sequence. */
+    ssize_t res = at_readline_skip_empty_stop_at_str(dev, resp_buf, len, true,
+                                                     cmd, timeout);
+    bool overflow = false;
+    if (res < 0) {
+        if (res != -ENOBUFS) {
+            return res;
+        }
+        /* fine to overflow when intercepting an echo */
+        overflow = true;
+        res =  len - 1;
+    }
+    if ((unsigned)res > cmd_len) {
+        /* definitely a URC */
+        if (overflow) {
+            /* URC didn't fit into the buffer so it's garbage */
+            return -ENOBUFS;
+        }
+        return res;
+    }
+    /* maybe a URC, but might also be:
+     * 1. the command contained binary data and, by chance, a newline sequence
+     * 2. the command overflowed the resp_buf */
+    if (strncmp(cmd, resp_buf, res)) {
+        /* no match, indeed a URC. */
+        return trim_trailing_eol(resp_buf, res);
+    }
+    /* very good chance this is a echo, flush the rest */
+    size_t const left_in_echo = cmd_len - res + AT_SEND_EOL_LEN;
+    res = at_drain_n(dev, left_in_echo);
+    if (res > 0) {
+        res = -ETIMEDOUT;
+    }
+
+    resp_buf[0] = '\0';
+    return res;
 }
 
 ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command,
                              char *resp_buf, size_t len, uint32_t timeout)
 {
-    ssize_t res;
-
-    at_drain(dev);
-
-    res = at_send_cmd(dev, command, timeout);
+    ssize_t res = at_send_cmd(dev, command, timeout);
     if (res) {
-        goto out;
+        return res;
     }
+    return at_readline_skip_empty(dev, resp_buf, len, false, timeout);
+}
 
-    res = at_readline_skip_empty(dev, resp_buf, len, false, timeout);
-
-out:
+static ssize_t get_resp_with_prefix(at_dev_t *dev, const char *resp_prefix,
+                                    char *resp_buf, size_t len, uint32_t timeout)
+{
+    ssize_t res;
+    /* URCs may occur right after the command has been sent and before the
+     * expected response */
+    while ((res = at_readline_skip_empty(dev, resp_buf, len, false, timeout)) >= 0) {
+        if (!resp_prefix || *resp_prefix == '\0') {
+            break;
+        }
+        /* Strip the expected prefix */
+        size_t prefix_len = strlen(resp_prefix);
+        if (starts_with(resp_buf, resp_prefix)) {
+            size_t remaining_len = strlen(resp_buf) - prefix_len;
+            /* The one extra byte in the copy is the terminating nul byte */
+            memmove(resp_buf, resp_buf + prefix_len, remaining_len + 1);
+            res -= prefix_len;
+            break;
+        }
+        res = at_parse_resp(dev, resp_buf);
+        if (res == 0) {
+            /* empty response */
+            return 0;
+        }
+        if (res < 0) {
+            return res;
+        }
+#if IS_USED(MODULE_AT_URC)
+        else {
+            clist_foreach(&dev->urc_list, _check_urc, resp_buf);
+        }
+#endif
+    }
     return res;
 }
 
 ssize_t at_send_cmd_get_resp_wait_ok(at_dev_t *dev, const char *command, const char *resp_prefix,
                                      char *resp_buf, size_t len, uint32_t timeout)
 {
-    ssize_t res;
-    ssize_t res_ok;
-    char ok_buf[64];
-
-    at_drain(dev);
-
-    res = at_send_cmd(dev, command, timeout);
+    ssize_t res = at_send_cmd(dev, command, timeout);
     if (res) {
-        goto out;
+        return res;
     }
+    res = get_resp_with_prefix(dev, resp_prefix, resp_buf, len, timeout);
+    if (res < 1) {
+        /* error or OK (empty response) */
+        return res;
+    }
+    /* got response, wait for OK */
+    return at_wait_ok(dev, timeout);
+}
 
-    /* URCs may occur right after the command has been sent and before the
-     * expected response */
+#if IS_USED(MODULE_AT_URC)
+static char *next_line(char *p)
+{
+    while (*p && *p != '\r' && *p != '\n') {
+        p++;
+    }
+    return skip_leading_eol(p);
+}
+
+static void handle_urc_lines(at_dev_t *dev, char *resp_buf)
+{
+    char *p = resp_buf;
     do {
-        res = at_readline_skip_empty(dev, resp_buf, len, false, timeout);
+        char *next = next_line(p);
+        clist_foreach(&dev->urc_list, _check_urc, p);
+        p = next;
+    } while (*p);
+}
+#endif
 
-        /* Strip the expected prefix */
-        if (res > 0 && resp_prefix && *resp_prefix) {
-            size_t prefix_len = strlen(resp_prefix);
-            if (strncmp(resp_buf, resp_prefix, prefix_len) == 0) {
-                size_t remaining_len = strlen(resp_buf) - prefix_len;
-                /* The one extra byte in the copy is the terminating nul byte */
-                memmove(resp_buf, resp_buf + prefix_len, remaining_len + 1);
-                res -= prefix_len;
-                break;
+static ssize_t get_lines(at_dev_t *dev, char *resp_buf, size_t len, uint32_t timeout)
+{
+    ssize_t res;
+    char *pos = resp_buf;
+    while ((res = at_readline_skip_empty(dev, pos, len, true, timeout)) > 0) {
+        size_t const line_len = res;
+        res = at_parse_resp(dev, pos);
+
+        len -= line_len;
+        pos += line_len;
+
+        switch (res) {
+        case 0: /* OK */
+            return (size_t)(pos - resp_buf);
+        case 1: /* response or URC */
+            if (len == 0) {
+                return -ENOBUFS;
             }
-        }
-    } while (res >= 0);
-
-    /* wait for OK */
-    if (res >= 0) {
-        res_ok = at_readline_skip_empty(dev, ok_buf, sizeof(ok_buf), false, timeout);
-        if (res_ok < 0) {
-            return -1;
-        }
-        ssize_t len_ok = sizeof(CONFIG_AT_RECV_OK) - 1;
-        if ((len_ok != 0) && (strcmp(ok_buf, CONFIG_AT_RECV_OK) == 0)) {
-        }
-        else {
-            /* Something else than OK */
-            res = -1;
+            continue;
+        default: /* <0 */
+#if IS_USED(MODULE_AT_URC)
+            /* DCE responded with an error. If we got some lines before that,
+             * they must be URCs. */
+            handle_urc_lines(dev, resp_buf);
+#endif
+            return res;
         }
     }
-out:
     return res;
 }
 
-ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command,
-                              char *resp_buf, size_t len, bool keep_eol, uint32_t timeout)
+ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf,
+                              size_t len, uint32_t timeout)
 {
-    const char eol[] = AT_RECV_EOL_1 AT_RECV_EOL_2;
-    assert(sizeof(eol) > 1);
-
-    ssize_t res;
-    size_t bytes_left = len - 1;
-    char *pos = resp_buf;
-
-    at_drain(dev);
-
-    res = at_send_cmd(dev, command, timeout);
+    ssize_t res = at_send_cmd(dev, command, timeout);
     if (res) {
-        goto out;
+        return res;
     }
+    return get_lines(dev, resp_buf, len, timeout);
+}
 
-    memset(resp_buf, '\0', len);
-
-    while (1) {
-        res = at_readline(dev, pos, bytes_left, keep_eol, timeout);
-        if (res == 0) {
-            if (bytes_left) {
-                *pos++ = eol[sizeof(eol) - 2];
-                bytes_left--;
-            }
-            continue;
-        }
-        else if (res > 0) {
-            bytes_left -= res;
-            size_t len_ok = sizeof(CONFIG_AT_RECV_OK) - 1;
-            size_t len_error = sizeof(CONFIG_AT_RECV_ERROR) - 1;
-            if (((size_t )res == (len_ok + keep_eol)) &&
-                (len_ok != 0) &&
-                (strncmp(pos, CONFIG_AT_RECV_OK, len_ok) == 0)) {
-                res = len - bytes_left;
-                break;
-            }
-            else if (((size_t )res == (len_error + keep_eol)) &&
-                     (len_error != 0) &&
-                     (strncmp(pos, CONFIG_AT_RECV_ERROR, len_error) == 0)) {
-                return -1;
-            }
-            else if (strncmp(pos, "+CME ERROR:", 11) == 0) {
-                return -2;
-            }
-            else if (strncmp(pos, "+CMS ERROR:", 11) == 0) {
-                return -2;
-            }
-            else {
-                pos += res;
-                if (bytes_left) {
-                    *pos++ = eol[sizeof(eol) - 2];
-                    bytes_left--;
-                }
-                else {
-                    return -1;
-                }
-            }
-        }
-        else {
+static int wait_prompt(at_dev_t *dev, uint32_t timeout)
+{
+    ssize_t res;
+    do {
+        res = at_readline_skip_empty_stop_at_str(dev, dev->rp_buf, dev->rp_buf_size,
+                                                 false, ">", timeout);
+        if (res < 0) {
             break;
         }
-    }
+        if (strstr(dev->rp_buf, ">")) {
+            return 0;
+        }
+        res = at_parse_resp(dev, dev->rp_buf);
+#ifdef MODULE_AT_URC
+        if (res == 1) {
+            clist_foreach(&dev->urc_list, _check_urc, dev->rp_buf);
+        }
+#endif
+    } while (res >= 0);
 
-out:
-    return res;
+    return (int)res;
 }
 
 int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout)
 {
-    unsigned cmdlen = strlen(command);
-
-    at_drain(dev);
-
-    uart_write(dev->uart, (const uint8_t *)command, cmdlen);
-    uart_write(dev->uart, (const uint8_t *)CONFIG_AT_SEND_EOL, AT_SEND_EOL_LEN);
-
-    if (!IS_ACTIVE(CONFIG_AT_SEND_SKIP_ECHO)) {
-        if (at_wait_bytes(dev, command, timeout)) {
-            return -1;
-        }
-        if (at_expect_bytes(dev, CONFIG_AT_SEND_EOL, timeout)) {
-            return -2;
-        }
+    ssize_t res = at_send_cmd(dev, command, timeout);
+    if (res) {
+        return (int)res;
     }
-
-    return at_wait_bytes(dev, ">", timeout);
+    return wait_prompt(dev, timeout);
 }
 
 int at_send_cmd_wait_ok(at_dev_t *dev, const char *command, uint32_t timeout)
 {
-    int res;
-    char resp_buf[64];
-
-    res = at_send_cmd_get_resp(dev, command, resp_buf, sizeof(resp_buf),
-                               timeout);
-
-    size_t const len_ok = sizeof(CONFIG_AT_RECV_OK) - 1;
-    size_t const len_err = sizeof(CONFIG_AT_RECV_ERROR) - 1;
-    size_t const len_cme_cms = sizeof("+CME ERROR:") - 1;
-
-    while (res >= 0) {
-        if (strncmp(resp_buf, CONFIG_AT_RECV_OK, len_ok) == 0) {
-            return 0;
-        }
-        else if (strncmp(resp_buf, CONFIG_AT_RECV_ERROR, len_err) == 0) {
-            return -1;
-        }
-        else if (strncmp(resp_buf, "+CME ERROR:", len_cme_cms) == 0) {
-            return -2;
-        }
-        else if (strncmp(resp_buf, "+CMS ERROR:", len_cme_cms) == 0) {
-            return -2;
-        }
-        /* probably a sneaky URC */
-#ifdef MODULE_AT_URC
-        clist_foreach(&dev->urc_list, _check_urc, resp_buf);
-#endif
-        res = at_readline_skip_empty(dev, resp_buf, sizeof(resp_buf), false, timeout);
+    int res = at_send_cmd(dev, command, timeout);
+    if (res < 0) {
+        return res;
     }
-
-    return res;
+    return at_wait_ok(dev, timeout);
 }
 
-ssize_t at_readline(at_dev_t *dev, char *resp_buf, size_t len, bool keep_eol, uint32_t timeout)
+/* Used to detect a substring that may happen before the EOL. For example,
+ * Ublox LTE modules don't add EOL after the prompt character `>`. */
+static ssize_t at_readline_stop_at_str(at_dev_t *dev, char *resp_buf, size_t len,
+                                      bool keep_eol, char const *substr,
+                                      uint32_t timeout)
 {
-    const char eol[] = AT_RECV_EOL_1 AT_RECV_EOL_2;
-    assert(sizeof(eol) > 1);
+    ssize_t res = 0;
+    size_t substr_len = 0;
+    if (len < 1) {
+        return -EINVAL;
+    }
 
-    ssize_t res = -1;
+    if (substr) {
+        substr_len = strlen(substr);
+        if (substr_len == 0) {
+            return -EINVAL;
+        }
+    }
+
     char *resp_pos = resp_buf;
-
-#if IS_USED(MODULE_AT_URC_ISR)
-    dev->awaiting_response = true;
-#endif
-
+    char const *substr_p = resp_buf;
     memset(resp_buf, 0, len);
 
-    while (len) {
-        int read_res;
-        if ((read_res = isrpipe_read_timeout(&dev->isrpipe, (uint8_t *)resp_pos,
-                                             1, timeout)) == 1) {
-            if (AT_PRINT_INCOMING) {
-                print(resp_pos, read_res);
-            }
-            if (sizeof(eol) > 2 && *resp_pos == eol[0]) {
-                if (!keep_eol) {
-                    continue;
-                }
-            }
-            if (*resp_pos == eol[sizeof(eol) - 2]) {
-                *resp_pos = '\0';
-                res = resp_pos - resp_buf;
-                goto out;
-            }
-
-            resp_pos += read_res;
-            len -= read_res;
-        }
-        else if (read_res == -ETIMEDOUT) {
+    while (len > 1) {
+        res = isrpipe_read_timeout(&dev->isrpipe, (uint8_t *)resp_pos, 1, timeout);
+        if (res < 1) {
             res = -ETIMEDOUT;
             break;
         }
+        if (AT_PRINT_INCOMING) {
+            print(resp_pos, 1);
+        }
+
+        resp_pos++;
+        len--;
+
+        if ((size_t)(resp_pos - resp_buf) >= strlen(AT_RECV_EOL)) {
+            char *const eol_begin = resp_pos - strlen(AT_RECV_EOL);
+            if (strcmp(eol_begin, AT_RECV_EOL) == 0) {
+                if (keep_eol) {
+                    break;
+                }
+                *eol_begin = '\0';
+                resp_pos -= strlen(AT_RECV_EOL);
+                break;
+            }
+        }
+
+        if (substr && (size_t)(resp_pos - substr_p) >= substr_len) {
+            if (strncmp(substr_p, substr, substr_len) == 0) {
+                break;
+            } else {
+                substr_p++;
+            }
+        }
     }
-
-out:
-#if IS_USED(MODULE_AT_URC_ISR)
-    dev->awaiting_response = false;
-#endif
-
+    if (len <= 1) {
+        return -ENOBUFS;
+    }
     if (res < 0) {
         *resp_buf = '\0';
+    } else {
+        res = resp_pos - resp_buf;
     }
     return res;
 }
 
+ssize_t at_readline(at_dev_t *dev, char *resp_buf, size_t len, bool keep_eol,
+                    uint32_t timeout)
+{
+    return at_readline_stop_at_str(dev, resp_buf, len, keep_eol, NULL, timeout);
+}
+
+static ssize_t at_readline_skip_empty_stop_at_str(at_dev_t *dev, char *resp_buf,
+                                                  size_t len, bool keep_eol,
+                                                  char const *substr, uint32_t timeout)
+{
+    ssize_t res;
+    if (len == 1) {
+        /* Reading in a buffer of length 1 will forever return an empty line */
+        return -ENOBUFS;
+    }
+    do {
+        res = at_readline_stop_at_str(dev, resp_buf, len, keep_eol, substr, timeout);
+        /* Trim any rogue EOL characters */
+        if (res > 0) {
+            res = trim_leading_eol(resp_buf, (size_t)res);
+        } else if (res == -ENOBUFS) {
+            res = trim_leading_eol(resp_buf, len - 1);
+        }
+    } while (res == 0);
+    return res;
+
+}
 ssize_t at_readline_skip_empty(at_dev_t *dev, char *resp_buf, size_t len,
                                bool keep_eol, uint32_t timeout)
 {
-    ssize_t res = at_readline(dev, resp_buf, len, keep_eol, timeout);
-    if (res == 0) {
-        /* skip possible empty line */
-        res = at_readline(dev, resp_buf, len, keep_eol, timeout);
-    }
-    return res;
+    return at_readline_skip_empty_stop_at_str(dev, resp_buf, len, keep_eol, NULL, timeout);
 }
 
+int at_wait_ok(at_dev_t *dev, uint32_t timeout)
+{
+    while (1) {
+        ssize_t res = at_readline_skip_empty(dev, dev->rp_buf, dev->rp_buf_size,
+                                            false, timeout);
+        if (res < 0) {
+            return (int)res;
+        }
+        res = at_parse_resp(dev, dev->rp_buf);
+        if (res < 1) {
+            return (int)res;
+        }
+#ifdef MODULE_AT_URC
+        clist_foreach(&dev->urc_list, _check_urc, dev->rp_buf);
+#endif
+    }
+}
 #ifdef MODULE_AT_URC
 void at_add_urc(at_dev_t *dev, at_urc_t *urc)
 {
@@ -529,9 +617,10 @@ static int _check_urc(clist_node_t *node, void *arg)
     const char *buf = arg;
     at_urc_t *urc = container_of(node, at_urc_t, list_node);
 
-    DEBUG("Trying to match with %s\n", urc->code);
+    DEBUG("Trying to match %s with %s\n", buf, urc->code);
 
-    if (strncmp(buf, urc->code, strlen(urc->code)) == 0) {
+    if (starts_with(buf, urc->code)) {
+        DEBUG("Matched %s\n", urc->code);
         urc->cb(urc->arg, buf);
         return 1;
     }
@@ -541,19 +630,21 @@ static int _check_urc(clist_node_t *node, void *arg)
 
 void at_process_urc(at_dev_t *dev, uint32_t timeout)
 {
-    char buf[AT_BUF_SIZE];
-
     DEBUG("Processing URC (timeout=%" PRIu32 "us)\n", timeout);
 
-    ssize_t res;
-    /* keep reading while received data are shorter than EOL */
-    while ((res = at_readline(dev, buf, sizeof(buf), true, timeout)) <
-           (ssize_t)sizeof(AT_RECV_EOL_1 AT_RECV_EOL_2) - 1) {
-        if (res < 0) {
-            return;
-        }
+    while (at_readline_skip_empty(dev, dev->rp_buf, dev->rp_buf_size, false, timeout) > 0) {
+        clist_foreach(&dev->urc_list, _check_urc, dev->rp_buf);
     }
+}
+
+void at_postprocess_urc(at_dev_t *dev, char *buf)
+{
     clist_foreach(&dev->urc_list, _check_urc, buf);
+}
+
+void at_postprocess_urc_all(at_dev_t *dev, char *buf)
+{
+    handle_urc_lines(dev, buf);
 }
 #endif
 
@@ -566,3 +657,19 @@ void at_dev_poweroff(at_dev_t *dev)
 {
     uart_poweroff(dev->uart);
 }
+
+#ifdef MODULE_EMBUNIT
+/* Exports for unit tests */
+__attribute__((alias("read_line_or_echo")))
+ssize_t _emb_read_line_or_echo(at_dev_t *dev, char const *cmd, char *resp_buf,
+                        size_t len, uint32_t timeout);
+__attribute__((alias("get_lines")))
+ssize_t _emb_get_lines(at_dev_t *dev, char *resp_buf, size_t len, uint32_t timeout);
+__attribute__((alias("get_resp_with_prefix")))
+ssize_t _emb_get_resp_with_prefix(at_dev_t *dev, const char *resp_prefix,
+                                    char *resp_buf, size_t len, uint32_t timeout);
+__attribute__((alias("wait_echo")))
+int _emb_wait_echo(at_dev_t *dev, char const *command, uint32_t timeout);
+__attribute__((alias("wait_prompt")))
+int _emb_wait_prompt(at_dev_t *dev, uint32_t timeout);
+#endif

@@ -115,7 +115,7 @@ static const unsigned char hempty[] =
                                     0xa4, 0x95, 0x99, 0x1b, 0x78, 0x52, 0xb8, 0x55};
 
 /**
- * @brief expected hash for test failing_compare
+ * @brief wrong hash for test failing_compare (changed last byte from 3b to 3c)
  * i.e. c19d3bf8588897076873f1a0a106ba840ca46bd1179d592953acecc4df59593c
  */
 static const unsigned char hfailing_compare[] =

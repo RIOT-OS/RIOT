@@ -7,10 +7,9 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 
 # configure the flasher
 PROGRAMMER ?= openocd
-OPENOCD_CONFIG ?= $(RIOTBOARD)/common/gd32v/dist/openocd.cfg
 OPENOCD_DEBUG_ADAPTER ?= ftdi
 OPENOCD_FTDI_ADAPTER ?= openocd-usb
-OPENOCD_TRANSPORT = jtag
+OPENOCD_TRANSPORT ?= jtag
 OPENOCD_RESET_USE_CONNECT_ASSERT_SRST = 1
 
 # DFU programmer specific variables

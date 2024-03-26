@@ -477,9 +477,9 @@ int gnrc_sixlowpan_frag_sfr_forward(gnrc_pktsnip_t *pkt,
         gnrc_pktbuf_release(pkt);
         return -ENOMEM;
     }
-    DEBUG("6lo sfr: adapting old fragment size (%u) for forwarding to %u\n",
+    DEBUG("6lo sfr: adapting old fragment size (%u) for forwarding to %" PRIuSIZE "\n",
           sixlowpan_sfr_rfrag_get_frag_size(hdrsnip->data),
-          (unsigned)gnrc_pkt_len(pkt));
+          gnrc_pkt_len(pkt));
     /* due to compression, packet length of the original fragment might have
      * changed */
     sixlowpan_sfr_rfrag_set_frag_size(hdrsnip->data, gnrc_pkt_len(pkt));
@@ -1730,8 +1730,8 @@ static void _sched_arq_timeout(gnrc_sixlowpan_frag_fb_t *fbuf, uint32_t offset)
               (uint8_t)fbuf->tag);
         return;
     }
-    DEBUG("6lo sfr: arming ACK timeout in %lums for datagram %u\n",
-          (long unsigned)offset, fbuf->tag);
+    DEBUG("6lo sfr: arming ACK timeout in %" PRIu32 "ms for datagram %u\n",
+          offset, fbuf->tag);
     fbuf->sfr.arq_timeout_event.event.offset = offset;
     fbuf->sfr.arq_timeout_event.msg.content.ptr = fbuf;
     fbuf->sfr.arq_timeout_event.msg.type = GNRC_SIXLOWPAN_FRAG_SFR_ARQ_TIMEOUT_MSG;

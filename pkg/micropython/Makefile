@@ -1,6 +1,6 @@
 PKG_NAME=micropython
 PKG_URL=https://github.com/kaspar030/micropython
-PKG_VERSION=bb8e51f6da3e3e3fc65a8b9abaea1b0ebbbe104d
+PKG_VERSION=4ff7897215b9f8d65e147935949e88cb7cc28652
 PKG_LICENSE=MIT
 
 CFLAGS += -Wno-implicit-fallthrough -Wno-unused-parameter -Wno-error

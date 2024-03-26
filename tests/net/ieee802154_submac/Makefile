@@ -10,6 +10,7 @@ BOARD_WHITELIST += adafruit-clue \
                    cc2538dk \
                    feather-nrf52840 \
                    native \
+                   native64 \
                    nrf52840dk \
                    nrf52840dongle \
                    nrf52840-mdk \
@@ -38,9 +39,8 @@ USEMODULE += ieee802154
 USEMODULE += ieee802154_submac
 USEMODULE += ztimer_usec
 
-ifeq ($(BOARD), native)
-  ZEP_PORT_BASE ?= 17754
-  TERMFLAGS += -z [::1]:$(ZEP_PORT_BASE)
+ifneq (,$(filter native native64,$(BOARD)))
+  USE_ZEP = 1
   USEMODULE += socket_zep
 endif
 

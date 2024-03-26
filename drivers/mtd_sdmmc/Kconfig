@@ -23,13 +23,4 @@ config SDMMC_GENERIC_MTD_OFFSET
         the auto-configured SD Memory Card(s) or MMCs/eMMCs from
         mtd_sdmmc_default will come after them.
 
-config MTD_SDMMC_ERASE
-    bool "Enable SD Memory Card erase"
-    help
-        Enable this to erase sector before a data write operation (SD Memory
-        Cards only).
-        SD Memory Cards and MMCs/eMMCs handle sector erase internally
-        so it's possible to directly write to the card without erasing
-        the sector first hence this feature is disabled by default.
-
 endif # KCONFIG_USEMODULE_MTD_SDMMC

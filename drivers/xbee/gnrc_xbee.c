@@ -111,7 +111,7 @@ static int xbee_adpt_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 
     /* get the payload size and the dst address details */
     size = gnrc_pkt_len(pkt->next);
-    DEBUG("[xbee-gnrc] send: payload of packet is %i\n", (int)size);
+    DEBUG("[xbee-gnrc] send: payload of packet is %" PRIuSIZE "\n", size);
     hdr = (gnrc_netif_hdr_t *)pkt->data;
     if (hdr->flags & BCAST) {
         uint16_t addr = 0xffff;

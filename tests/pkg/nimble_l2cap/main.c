@@ -186,7 +186,7 @@ static void _send(uint32_t type, uint32_t seq, size_t len)
     expect(_coc);
     expect(len >= 8);
     expect(len <= APP_MTU);
-    printf("# Sending: size %5u seq %5u\n", (unsigned)len, (unsigned)seq);
+    printf("# Sending: size %5" PRIuSIZE " seq %5" PRIu32 "\n", len, seq);
 
     _txbuf[POS_TYPE] = type;
     _txbuf[POS_SEQ] = seq;

@@ -35,8 +35,8 @@ static char t4_stack[TEST_THREAD_STACKSIZE];
 /* function for testing threads */
 void *second_thread(void *arg)
 {
-    printf("Thread: %d is starting\n", (int)arg);
-    printf("Thread: %d calls zombify\n", (int)arg);
+    printf("Thread: %" PRIdPTR " is starting\n", (intptr_t)arg);
+    printf("Thread: %" PRIdPTR " calls zombify\n", (intptr_t)arg);
     thread_zombify();
     puts("ERROR zombie runs again!");
     return NULL;

@@ -1,9 +1,6 @@
 # peripheral drivers are linked into the final binary
 USEMODULE += atxmega_periph
 
-# All ATxmega based CPUs provide PM
-USEMODULE += pm_layered
-
 ifneq (,$(filter periph_cpuid,$(USEMODULE)))
   USEMODULE += periph_nvm
 endif

@@ -1,5 +1,5 @@
 # FlashDB is only supported by 32 bit architectures
-FEATURES_REQUIRED += arch_32bit
+FEATURES_REQUIRED_ANY += arch_32bit|arch_64bit
 CFLAGS += -DFDB_USING_NATIVE_ASSERT
 
 ifneq (,$(filter flashdb_tsdb,$(USEMODULE)))
@@ -24,7 +24,7 @@ ifneq (,$(filter flashdb_mtd,$(USEMODULE)))
   USEMODULE += flashdb_fal
   USEMODULE += mtd
 else
-  ifeq (native, $(BOARD))
+  ifeq ($(CPU),native)
     CFLAGS += -DFDB_USING_FILE_POSIX_MODE
   else
     CFLAGS += -DFDB_USING_FILE_LIBC_MODE
