@@ -88,9 +88,9 @@ static const uart_conf_t uart_config[] = {
  * @name    ADC configuration
  *
  * Note that we do not configure all ADC channels,
- * and not in the STM32G071 order.  Instead, we
+ * and not in the STM32C031 order. Instead, we
  * just define 6 ADC channels, for the Nucleo
- * Arduino header pins A0-A5 and the internal VBAT channel.
+ * Arduino header pins A0-A5.
  *
  * To find appropriate device and channel find in the
  * board manual, table showing pin assignments and
@@ -100,29 +100,23 @@ static const uart_conf_t uart_config[] = {
  * [X] - describes used channel - indexed from 1,
  * for example ARD_A5_IN16 is channel 16
  *
- * For Nucleo-G071RB this information is in board manual,
- * Table 12, page 30.
+ * For Nucleo-C031C6 this information is in board manual,
+ * Table 11, page 20.
  *
- * VBAT is connected to an internal input and voltage divider
- * is used, so that only 1/3 of the actual VBAT is measured. This
- * allows for a supply voltage higher than the reference voltage.
+ * STM32C031C6 do not have internal channel for VBAT, more details provided
+ * in the MCU datasheet - section 3.14, page 20.
  *
- * For Nucleo-G071RB more information is provided in MCU datasheet,
- * in section 3.14.3 - Vbat battery voltage monitoring, page 26.
-
  * @{
  */
 static const adc_conf_t adc_config[] = {
     { .pin = GPIO_PIN(PORT_A,  0), .dev = 0, .chan =  0 }, /* ARD_A0_IN0  */
     { .pin = GPIO_PIN(PORT_A,  1), .dev = 0, .chan =  1 }, /* ARD_A1_IN1  */
     { .pin = GPIO_PIN(PORT_A,  4), .dev = 0, .chan =  4 }, /* ARD_A2_IN4  */
-    { .pin = GPIO_PIN(PORT_B,  1), .dev = 0, .chan =  9 }, /* ARD_A3_IN9  */
-    { .pin = GPIO_PIN(PORT_B, 11), .dev = 0, .chan = 15 }, /* ARD_A4_IN15 */
-    { .pin = GPIO_PIN(PORT_B, 12), .dev = 0, .chan = 16 }, /* ARD_A5_IN16 */
-    { .pin = GPIO_UNDEF, .dev = 0, .chan = 14}, /* VBAT */
+    { .pin = GPIO_PIN(PORT_B,  1), .dev = 0, .chan = 18 }, /* ARD_A3_IN18 */
+    { .pin = GPIO_PIN(PORT_A, 11), .dev = 0, .chan = 11 }, /* ARD_A4_IN11 */
+    { .pin = GPIO_PIN(PORT_A, 12), .dev = 0, .chan = 12 }, /* ARD_A5_IN12 */
 };
 
-#define VBAT_ADC            ADC_LINE(6) /**< VBAT ADC line */
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
