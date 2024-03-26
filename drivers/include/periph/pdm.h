@@ -77,6 +77,9 @@ typedef enum {
 #define PDM_BUF_SIZE        (128U)
 #endif
 
+// Define the new buffer size
+#define NEW_BUF_SIZE    (PDM_BUF_SIZE * 5 * 16 * 16)
+
 /**
  * @brief   Signature for data received interrupt callback
  *
@@ -97,7 +100,7 @@ typedef struct {
 
 /**
  * @brief   Initialize the PDM peripheral
- *
+ * @param[in] mode      mode (Mono or Stereo)
  * @param[in] rate      sample rate
  * @param[in] gain      gain
  * @param[in] cb        data received callback function
@@ -106,8 +109,7 @@ typedef struct {
  * @return  0 on successful initialization
  * @return <0 on error
  */
-int pdm_init(pdm_mode_t mode, pdm_sample_rate_t rate, int8_t gain,
-             pdm_data_cb_t cb, void *arg);
+int pdm_init(pdm_mode_t mode, pdm_sample_rate_t rate, int8_t gain, pdm_data_cb_t cb, void *arg);
 
 /**
  * @brief   Start the PDM peripheral
@@ -120,7 +122,7 @@ void pdm_start(void);
 void pdm_stop(void);
 
 #ifdef __cplusplus
-}
+
 #endif
 
 #endif /* PERIPH_PDM_H */

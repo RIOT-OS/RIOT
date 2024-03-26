@@ -85,6 +85,16 @@ static const i2c_conf_t i2c_config[] = {
 #define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */
 
+/**
+ * @name    PDM configuration
+ * @{
+ */
+static const pdm_conf_t pdm_config = {
+    .din_pin = GPIO_PIN(0, 0),
+    .clk_pin = GPIO_PIN(0, 1),
+};
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
