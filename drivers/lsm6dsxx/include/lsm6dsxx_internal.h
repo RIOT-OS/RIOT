@@ -154,7 +154,7 @@ extern "C" {
 /**
  * @brief   WHO_AM_I value for the LSM6DS33
  */
-#define LSM6DSXX_WHO_AM_I                    (0b01101001)
+#define LSM6DSXX_WHO_AM_I                    (0x69)
 
 #endif
 

@@ -24,6 +24,7 @@
 #include <string.h>
 #include <math.h>
 
+#include "kernel_defines.h"
 #include "log.h"
 #include "assert.h"
 #include "bmx280.h"

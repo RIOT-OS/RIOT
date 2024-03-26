@@ -144,13 +144,13 @@ extern "C" {
  * @{
  */
 #define STMPE811_ADC_CTRL1_SAMPLE_TIME_POS          (4)         /**< Sample time bits shift position */
-#define STMPE811_ADC_CTRL1_SAMPLE_TIME_36           (0b000)     /**< Conversion time: 36 cycles */
-#define STMPE811_ADC_CTRL1_SAMPLE_TIME_44           (0b001)     /**< Conversion time: 44 cycles */
-#define STMPE811_ADC_CTRL1_SAMPLE_TIME_56           (0b010)     /**< Conversion time: 56 cycles */
-#define STMPE811_ADC_CTRL1_SAMPLE_TIME_64           (0b011)     /**< Conversion time: 64 cycles */
-#define STMPE811_ADC_CTRL1_SAMPLE_TIME_80           (0b100)     /**< Conversion time: 80 cycles */
-#define STMPE811_ADC_CTRL1_SAMPLE_TIME_96           (0b101)     /**< Conversion time: 96 cycles */
-#define STMPE811_ADC_CTRL1_SAMPLE_TIME_124          (0b110)     /**< Conversion time: 124 cycles */
+#define STMPE811_ADC_CTRL1_SAMPLE_TIME_36           (0x0)       /**< Conversion time: 36 cycles */
+#define STMPE811_ADC_CTRL1_SAMPLE_TIME_44           (0x1)       /**< Conversion time: 44 cycles */
+#define STMPE811_ADC_CTRL1_SAMPLE_TIME_56           (0x2)       /**< Conversion time: 56 cycles */
+#define STMPE811_ADC_CTRL1_SAMPLE_TIME_64           (0x3)       /**< Conversion time: 64 cycles */
+#define STMPE811_ADC_CTRL1_SAMPLE_TIME_80           (0x4)       /**< Conversion time: 80 cycles */
+#define STMPE811_ADC_CTRL1_SAMPLE_TIME_96           (0x5)       /**< Conversion time: 96 cycles */
+#define STMPE811_ADC_CTRL1_SAMPLE_TIME_124          (0x6)       /**< Conversion time: 124 cycles */
 #define STMPE811_ADC_CTRL1_MOD_12B                  (1 << 3)    /**< Enable 12 bit ADC (10bit if 0) */
 /** @} */
 
@@ -158,10 +158,10 @@ extern "C" {
  * @name    ADC_CTRL2 register bitfields
  * @{
  */
-#define STMPE811_ADC_CTRL2_FREQ_1_625MHZ            (0b00)      /**< ADC clock frequency 1.625MHz */
-#define STMPE811_ADC_CTRL2_FREQ_3_25MHZ             (0b01)      /**< ADC clock frequency 3.25MHz */
-#define STMPE811_ADC_CTRL2_FREQ_6_5MHZ              (0b10)      /**< ADC clock frequency 6.5MHz */
-#define STMPE811_ADC_CTRL2_FREQ_6_5_2MHZ            (0b11)      /**< ADC clock frequency 6.5MHz */
+#define STMPE811_ADC_CTRL2_FREQ_1_625MHZ            (0x0)       /**< ADC clock frequency 1.625MHz */
+#define STMPE811_ADC_CTRL2_FREQ_3_25MHZ             (0x1)       /**< ADC clock frequency 3.25MHz */
+#define STMPE811_ADC_CTRL2_FREQ_6_5MHZ              (0x2)       /**< ADC clock frequency 6.5MHz */
+#define STMPE811_ADC_CTRL2_FREQ_6_5_2MHZ            (0x3)       /**< ADC clock frequency 6.5MHz */
 /** @} */
 
 /**
@@ -170,20 +170,20 @@ extern "C" {
  */
 #define STMPE811_TSC_CTRL_EN                        (1 << 0)    /**< Enable touchscreen */
 #define STMPE811_TSC_CTRL_OPMOD_POS                 (1)         /**< Operating mode bit shift position */
-#define STMPE811_TSC_CTRL_OPMOD_XYZ                 (0b000)     /**< X,Y,Z acquisition */
-#define STMPE811_TSC_CTRL_OPMOD_XY_ONLY             (0b001)     /**< X,Y only acquisition */
-#define STMPE811_TSC_CTRL_OPMOD_X_ONLY              (0b010)     /**< X only acquisition */
-#define STMPE811_TSC_CTRL_OPMOD_Y_ONLY              (0b011)     /**< Y only acquisition */
-#define STMPE811_TSC_CTRL_OPMOD_Z_ONLY              (0b100)     /**< Z only acquisition */
+#define STMPE811_TSC_CTRL_OPMOD_XYZ                 (0x0)       /**< X,Y,Z acquisition */
+#define STMPE811_TSC_CTRL_OPMOD_XY_ONLY             (0x1)       /**< X,Y only acquisition */
+#define STMPE811_TSC_CTRL_OPMOD_X_ONLY              (0x2)       /**< X only acquisition */
+#define STMPE811_TSC_CTRL_OPMOD_Y_ONLY              (0x3)       /**< Y only acquisition */
+#define STMPE811_TSC_CTRL_OPMOD_Z_ONLY              (0x4)       /**< Z only acquisition */
 #define STMPE811_TSC_CTRL_TRACK_POS                 (4)         /**< Movement tracking index bit shift position */
-#define STMPE811_TSC_CTRL_TRACK_NO                  (0b000)     /**< No window tracking */
-#define STMPE811_TSC_CTRL_TRACK_4                   (0b001)     /**< Tracking index 4 */
-#define STMPE811_TSC_CTRL_TRACK_8                   (0b010)     /**< Tracking index 8 */
-#define STMPE811_TSC_CTRL_TRACK_16                  (0b011)     /**< Tracking index 16 */
-#define STMPE811_TSC_CTRL_TRACK_32                  (0b100)     /**< Tracking index 32 */
-#define STMPE811_TSC_CTRL_TRACK_64                  (0b101)     /**< Tracking index 64 */
-#define STMPE811_TSC_CTRL_TRACK_92                  (0b110)     /**< Tracking index 92 */
-#define STMPE811_TSC_CTRL_TRACK_127                 (0b111)     /**< Tracking index 127 */
+#define STMPE811_TSC_CTRL_TRACK_NO                  (0x0)       /**< No window tracking */
+#define STMPE811_TSC_CTRL_TRACK_4                   (0x1)       /**< Tracking index 4 */
+#define STMPE811_TSC_CTRL_TRACK_8                   (0x2)       /**< Tracking index 8 */
+#define STMPE811_TSC_CTRL_TRACK_16                  (0x3)       /**< Tracking index 16 */
+#define STMPE811_TSC_CTRL_TRACK_32                  (0x4)       /**< Tracking index 32 */
+#define STMPE811_TSC_CTRL_TRACK_64                  (0x5)       /**< Tracking index 64 */
+#define STMPE811_TSC_CTRL_TRACK_92                  (0x6)       /**< Tracking index 92 */
+#define STMPE811_TSC_CTRL_TRACK_127                 (0x7)       /**< Tracking index 127 */
 #define STMPE811_TSC_CTRL_STA                       (1 << 7)    /**< Touchscreen status (1: touch detected, 0: no touch detected), read-only */
 /** @} */
 
@@ -192,27 +192,27 @@ extern "C" {
  * @{
  */
 #define STMPE811_TSC_CFG_AVE_CTRL_POS               (6)         /**< Average control bit shift position */
-#define STMPE811_TSC_CFG_AVE_CTRL_1                 (0b00)      /**< Average control, 1 sample */
-#define STMPE811_TSC_CFG_AVE_CTRL_2                 (0b01)      /**< Average control, 2 sample */
-#define STMPE811_TSC_CFG_AVE_CTRL_4                 (0b10)      /**< Average control, 4 sample */
-#define STMPE811_TSC_CFG_AVE_CTRL_8                 (0b11)      /**< Average control, 8 sample */
+#define STMPE811_TSC_CFG_AVE_CTRL_1                 (0x0)       /**< Average control, 1 sample */
+#define STMPE811_TSC_CFG_AVE_CTRL_2                 (0x1)       /**< Average control, 2 sample */
+#define STMPE811_TSC_CFG_AVE_CTRL_4                 (0x2)       /**< Average control, 4 sample */
+#define STMPE811_TSC_CFG_AVE_CTRL_8                 (0x3)       /**< Average control, 8 sample */
 #define STMPE811_TSC_CFG_TOUCH_DET_DELAY_POS        (3)         /**< Touch detection delay bit shift position */
-#define STMPE811_TSC_CFG_TOUCH_DET_DELAY_10US       (0b000)     /**< Touch detection 10us delay */
-#define STMPE811_TSC_CFG_TOUCH_DET_DELAY_50US       (0b001)     /**< Touch detection 50us delay */
-#define STMPE811_TSC_CFG_TOUCH_DET_DELAY_100US      (0b010)     /**< Touch detection 100us delay */
-#define STMPE811_TSC_CFG_TOUCH_DET_DELAY_500US      (0b011)     /**< Touch detection 500us delay */
-#define STMPE811_TSC_CFG_TOUCH_DET_DELAY_1MS        (0b100)     /**< Touch detection 1ms delay */
-#define STMPE811_TSC_CFG_TOUCH_DET_DELAY_5MS        (0b101)     /**< Touch detection 5ms delay */
-#define STMPE811_TSC_CFG_TOUCH_DET_DELAY_10MS       (0b110)     /**< Touch detection 10ms delay */
-#define STMPE811_TSC_CFG_TOUCH_DET_DELAY_50MS       (0b111)     /**< Touch detection 50ms delay */
-#define STMPE811_TSC_CFG_SETTLING_10US              (0b000)     /**< Settling time 10us */
-#define STMPE811_TSC_CFG_SETTLING_100US             (0b001)     /**< Settling time 100us */
-#define STMPE811_TSC_CFG_SETTLING_500US             (0b010)     /**< Settling time 500us */
-#define STMPE811_TSC_CFG_SETTLING_1MS               (0b011)     /**< Settling time 1ms */
-#define STMPE811_TSC_CFG_SETTLING_5MS               (0b100)     /**< Settling time 5ms */
-#define STMPE811_TSC_CFG_SETTLING_10MS              (0b101)     /**< Settling time 10ms */
-#define STMPE811_TSC_CFG_SETTLING_50MS              (0b110)     /**< Settling time 50ms */
-#define STMPE811_TSC_CFG_SETTLING_100MS             (0b111)     /**< Settling time 100ms */
+#define STMPE811_TSC_CFG_TOUCH_DET_DELAY_10US       (0x0)       /**< Touch detection 10us delay */
+#define STMPE811_TSC_CFG_TOUCH_DET_DELAY_50US       (0x1)       /**< Touch detection 50us delay */
+#define STMPE811_TSC_CFG_TOUCH_DET_DELAY_100US      (0x2)       /**< Touch detection 100us delay */
+#define STMPE811_TSC_CFG_TOUCH_DET_DELAY_500US      (0x3)       /**< Touch detection 500us delay */
+#define STMPE811_TSC_CFG_TOUCH_DET_DELAY_1MS        (0x4)       /**< Touch detection 1ms delay */
+#define STMPE811_TSC_CFG_TOUCH_DET_DELAY_5MS        (0x5)       /**< Touch detection 5ms delay */
+#define STMPE811_TSC_CFG_TOUCH_DET_DELAY_10MS       (0x6)       /**< Touch detection 10ms delay */
+#define STMPE811_TSC_CFG_TOUCH_DET_DELAY_50MS       (0x7)       /**< Touch detection 50ms delay */
+#define STMPE811_TSC_CFG_SETTLING_10US              (0x0)       /**< Settling time 10us */
+#define STMPE811_TSC_CFG_SETTLING_100US             (0x1)       /**< Settling time 100us */
+#define STMPE811_TSC_CFG_SETTLING_500US             (0x2)       /**< Settling time 500us */
+#define STMPE811_TSC_CFG_SETTLING_1MS               (0x3)       /**< Settling time 1ms */
+#define STMPE811_TSC_CFG_SETTLING_5MS               (0x4)       /**< Settling time 5ms */
+#define STMPE811_TSC_CFG_SETTLING_10MS              (0x5)       /**< Settling time 10ms */
+#define STMPE811_TSC_CFG_SETTLING_50MS              (0x6)       /**< Settling time 50ms */
+#define STMPE811_TSC_CFG_SETTLING_100MS             (0x7)       /**< Settling time 100ms */
 /** @} */
 
 /**
@@ -226,14 +226,14 @@ extern "C" {
  * @name    TSC_FRACTION_Z register bitfields
  * @{
  */
-#define STMPE811_TSC_FRACTION_Z_0_8                 (0b000)     /**< Fractional part is 0, whole part is 8 */
-#define STMPE811_TSC_FRACTION_Z_1_7                 (0b001)     /**< Fractional part is 1, whole part is 7 */
-#define STMPE811_TSC_FRACTION_Z_2_6                 (0b010)     /**< Fractional part is 2, whole part is 6 */
-#define STMPE811_TSC_FRACTION_Z_3_5                 (0b011)     /**< Fractional part is 3, whole part is 5 */
-#define STMPE811_TSC_FRACTION_Z_4_4                 (0b100)     /**< Fractional part is 4, whole part is 4 */
-#define STMPE811_TSC_FRACTION_Z_5_3                 (0b101)     /**< Fractional part is 5, whole part is 3 */
-#define STMPE811_TSC_FRACTION_Z_6_2                 (0b110)     /**< Fractional part is 6, whole part is 2 */
-#define STMPE811_TSC_FRACTION_Z_7_1                 (0b111)     /**< Fractional part is 7, whole part is 1 */
+#define STMPE811_TSC_FRACTION_Z_0_8                 (0x0)       /**< Fractional part is 0, whole part is 8 */
+#define STMPE811_TSC_FRACTION_Z_1_7                 (0x1)       /**< Fractional part is 1, whole part is 7 */
+#define STMPE811_TSC_FRACTION_Z_2_6                 (0x2)       /**< Fractional part is 2, whole part is 6 */
+#define STMPE811_TSC_FRACTION_Z_3_5                 (0x3)       /**< Fractional part is 3, whole part is 5 */
+#define STMPE811_TSC_FRACTION_Z_4_4                 (0x4)       /**< Fractional part is 4, whole part is 4 */
+#define STMPE811_TSC_FRACTION_Z_5_3                 (0x5)       /**< Fractional part is 5, whole part is 3 */
+#define STMPE811_TSC_FRACTION_Z_6_2                 (0x6)       /**< Fractional part is 6, whole part is 2 */
+#define STMPE811_TSC_FRACTION_Z_7_1                 (0x7)       /**< Fractional part is 7, whole part is 1 */
 /** @} */
 
 /**
