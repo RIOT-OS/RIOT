@@ -1,6 +1,6 @@
 /**
 @defgroup   sys_malloc_ts           Thread-safe wrappers for malloc and friends
-@ingroup    sys
+@ingroup    sys_memory_management
 @brief      This module provides wrappers for malloc, calloc, realloc and free
             that provide mutually exclusive access to those functions.
 @warning    This module is automatically selected, if needed. Never add it

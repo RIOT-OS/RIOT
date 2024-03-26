@@ -24,6 +24,7 @@
 #include "cpu.h"
 #include "irq.h"
 #include "kernel_defines.h"
+#include "malloc_monitor_internal.h"
 #include "mutex.h"
 
 extern void *__real_malloc(size_t size);
@@ -41,6 +42,9 @@ void __attribute__((used)) *__wrap_malloc(size_t size)
     assert(!irq_is_in());
     mutex_lock(&_lock);
     void *ptr = __real_malloc(size);
+    if (IS_USED(MODULE_MALLOC_MONITOR)) {
+        malloc_monitor_add(ptr, size, cpu_get_caller_pc(), "m");
+    }
     mutex_unlock(&_lock);
     if (IS_USED(MODULE_MALLOC_TRACING)) {
         printf("malloc(%" PRIuSIZE ") @ 0x%" PRIxTXTPTR " returned %p\n",
@@ -58,6 +62,9 @@ void __attribute__((used)) __wrap_free(void *ptr)
     assert(!irq_is_in());
     mutex_lock(&_lock);
     __real_free(ptr);
+    if (IS_USED(MODULE_MALLOC_MONITOR)) {
+        malloc_monitor_rm(ptr, cpu_get_caller_pc());
+    }
     mutex_unlock(&_lock);
 }
 
@@ -81,6 +88,9 @@ void * __attribute__((used)) __wrap_calloc(size_t nmemb, size_t size)
 
     mutex_lock(&_lock);
     void *res = __real_malloc(total_size);
+    if (IS_USED(MODULE_MALLOC_MONITOR)) {
+        malloc_monitor_add(res, total_size, cpu_get_caller_pc(), "c");
+    }
     mutex_unlock(&_lock);
     if (res) {
         memset(res, 0, total_size);
@@ -104,6 +114,9 @@ void * __attribute__((used))__wrap_realloc(void *ptr, size_t size)
     assert(!irq_is_in());
     mutex_lock(&_lock);
     void *new = __real_realloc(ptr, size);
+    if (IS_USED(MODULE_MALLOC_MONITOR)) {
+        malloc_monitor_mv(ptr, new, size, cpu_get_caller_pc());
+    }
     mutex_unlock(&_lock);
 
     if (IS_USED(MODULE_MALLOC_TRACING)) {

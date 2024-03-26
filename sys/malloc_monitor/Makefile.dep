@@ -1,0 +1,1 @@
+USEMODULE += malloc_thread_safe
