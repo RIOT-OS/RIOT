@@ -42,10 +42,9 @@ static modbus_message_t message;
 /**
  * @brief   Modbus request handler that wraps around SAUL
  */
-static int request_cb(modbus_t *dev, modbus_message_t *message)
+static int request_cb(modbus_message_t *message, void *arg)
 {
-    (void)dev;
-    (void)message;
+    (void)arg;
 
     phydat_t data = { 0 };
     uint8_t val;
@@ -198,7 +197,7 @@ static void *thread_slave(void *arg)
 
     /* keep listening for requests */
     while (1) {
-        res = modbus_rtu_recv_request(&modbus, &message, request_cb);
+        res = modbus_rtu_recv_request(&modbus, &message, request_cb, NULL);
 
         if (res != 0) {
             printf("Receive request failed, result is %u\n", res);
