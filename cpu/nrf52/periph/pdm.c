@@ -34,8 +34,7 @@ int16_t _pdm_buf[PDM_BUF_SIZE * 2] = { 0 };
 static uint8_t _pdm_current_buf = 0;
 static pdm_isr_ctx_t isr_ctx;
 
-int pdm_init(pdm_mode_t mode, pdm_sample_rate_t rate, int8_t gain,
-              pdm_data_cb_t cb, void *arg)
+int pdm_init(pdm_mode_t mode, pdm_sample_rate_t rate, int8_t gain, pdm_data_cb_t cb, void *arg)
 {
     if (NRF_CLOCK->EVENTS_HFCLKSTARTED == 0) {
         NRF_CLOCK->TASKS_HFCLKSTART = 1;
@@ -46,6 +45,7 @@ int pdm_init(pdm_mode_t mode, pdm_sample_rate_t rate, int8_t gain,
     switch (rate) {
         case PDM_SAMPLE_RATE_16KHZ:
 #ifdef CPU_MODEL_NRF52840XXAA
+//#ifdef PDM_PDMCLKCTRL_FREQ_1280K
             NRF_PDM->RATIO = ((PDM_RATIO_RATIO_Ratio80 << PDM_RATIO_RATIO_Pos) & PDM_RATIO_RATIO_Msk);
             NRF_PDM->PDMCLKCTRL = PDM_PDMCLKCTRL_FREQ_1280K;
 #else
@@ -112,8 +112,8 @@ int pdm_init(pdm_mode_t mode, pdm_sample_rate_t rate, int8_t gain,
                         (PDM_INTEN_STARTED_Enabled << PDM_INTEN_STARTED_Pos) |
                         (PDM_INTEN_STOPPED_Enabled << PDM_INTEN_STOPPED_Pos));
 
-    /* Configure internal RAM buffer size, divide by 2 for stereo mode */
-    NRF_PDM->SAMPLE.MAXCNT = (PDM_BUF_SIZE >> mode);
+    /* Configure Length of DMA RAM allocation in number of samples */
+    NRF_PDM->SAMPLE.MAXCNT = (PDM_BUF_SIZE);
 
     isr_ctx.cb = cb;
     isr_ctx.arg = arg;
@@ -142,22 +142,25 @@ void pdm_stop(void)
 
 void isr_pdm(void)
 {
+    /* PDM transfer has started */
     if (NRF_PDM->EVENTS_STARTED == 1) {
         NRF_PDM->EVENTS_STARTED = 0;
         uint8_t next_buf_pos = (_pdm_current_buf + 1) & 0x1;
-        NRF_PDM->SAMPLE.PTR = (uint32_t)&_pdm_buf[next_buf_pos * (PDM_BUF_SIZE >> 1)];
+        NRF_PDM->SAMPLE.PTR = (uint32_t)&_pdm_buf[next_buf_pos * (PDM_BUF_SIZE)];
     }
 
+    /* PDM transfer has finished */
     if (NRF_PDM->EVENTS_STOPPED == 1) {
         NRF_PDM->EVENTS_STOPPED = 0;
         _pdm_current_buf = 0;
     }
 
+    /* Address resolution procedure has completed*/
     if (NRF_PDM->EVENTS_END == 1) {
         NRF_PDM->EVENTS_END = 0;
 
         /* Process received samples frame */
-        isr_ctx.cb(isr_ctx.arg, &_pdm_buf[_pdm_current_buf * (PDM_BUF_SIZE >> 1)]);
+        isr_ctx.cb(isr_ctx.arg, &_pdm_buf[_pdm_current_buf * (PDM_BUF_SIZE)]);
 
         /* Set next buffer */
         _pdm_current_buf = (_pdm_current_buf + 1) & 0x1;
