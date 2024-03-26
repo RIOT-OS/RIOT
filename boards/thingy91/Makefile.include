@@ -13,4 +13,4 @@ endif
 #RIOT_TERMINAL ?= jlink 
 
 # use shared Makefile.include
-include $(RIOTCPU)/nrf9160/Makefile.include
+#include $(RIOTCPU)/nrf9160/Makefile.include

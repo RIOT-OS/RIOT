@@ -2,10 +2,10 @@ CPU_MODEL = nrf9160
 CPU = nrf9160
 
 # Put defined MCU peripherals here (in alphabetical order)
-FEATURES_PROVIDED += periph_i2c
+#FEATURES_PROVIDED += periph_i2c
 FEATURES_PROVIDED += highlevel_stdio
 FEATURES_PROVIDED += periph_timer
-FEATURES_PROVIDED += periph_uart
+#FEATURES_PROVIDED += periph_uart
 
 # This configuration enables modules that are only available when using Kconfig
 # module modelling
