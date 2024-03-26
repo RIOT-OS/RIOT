@@ -93,70 +93,64 @@ extern "C" {
 #define LSM6DSXX_REG_MD2_CFG                (0x5F)
 /** @} */
 
-#if MODULE_LSM6DSL
 /**
- * @name    LSM6DSL specific registers not used in implemnetation
+ * @name    LSM6DSL and LSM6DS3TR-C specific registers
  * @{
  */
-#define LSM6DSXX_REG_SENSOR_SYNC_TIME_FRAME  (0x04)
-#define LSM6DSXX_REG_SENSOR_SYC_RES_RATIO    (0x05)
-#define LSM6DSXX_REG_DRDY_PULSE_CFG_G        (0x0B)
-#define LSM6DSXX_REG_MASTER_CONFIG           (0x1A)
-#define LSM6DSXX_REG_SENSORHUB1_REG          (0x2E)
-#define LSM6DSXX_REG_SENSORHUB2_REG          (0x2F)
-#define LSM6DSXX_REG_SENSORHUB3_REG          (0x30)
-#define LSM6DSXX_REG_SENSORHUB4_REG          (0x31)
-#define LSM6DSXX_REG_SENSORHUB5_REG          (0x32)
-#define LSM6DSXX_REG_SENSORHUB6_REG          (0x33)
-#define LSM6DSXX_REG_SENSORHUB7_REG          (0x34)
-#define LSM6DSXX_REG_SENSORHUB8_REG          (0x35)
-#define LSM6DSXX_REG_SENSORHUB9_REG          (0x36)
-#define LSM6DSXX_REG_SENSORHUB10_REG         (0x37)
-#define LSM6DSXX_REG_SENSORHUB11_REG         (0x38)
-#define LSM6DSXX_REG_SENSORHUB12_REG         (0x39)
-#define LSM6DSXX_REG_SENSORHUB13_REG         (0x4D)
-#define LSM6DSXX_REG_SENSORHUB14_REG         (0x4E)
-#define LSM6DSXX_REG_SENSORHUB15_REG         (0x4F)
-#define LSM6DSXX_REG_SENSORHUB16_REG         (0x50)
-#define LSM6DSXX_REG_SENSORHUB17_REG         (0x51)
-#define LSM6DSXX_REG_SENSORHUB18_REG         (0x52)
-#define LSM6DSXX_REG_FUNC_SRC_2              (0x54)
-#define LSM6DSXX_REG_WRIST_TILT_IA           (0x55)
-#define LSM6DSXX_REG_MASTER_CMD_CODE         (0x60)
-#define LSM6DSXX_REG_SENS_SYNC_SPI_ERR_CODE  (0x61)
-#define LSM6DSXX_REG_OUT_MAG_RAW_X_L         (0x66)
-#define LSM6DSXX_REG_OUT_MAG_RAW_X_H         (0x67)
-#define LSM6DSXX_REG_OUT_MAG_RAW_Y_L         (0x68)
-#define LSM6DSXX_REG_OUT_MAG_RAW_Y_H         (0x69)
-#define LSM6DSXX_REG_OUT_MAG_RAW_Z_L         (0x6A)
-#define LSM6DSXX_REG_OUT_MAG_RAW_Z_H         (0x6B)
-#define LSM6DSXX_REG_X_OFS_USR               (0x73)
-#define LSM6DSXX_REG_Y_OFS_USR               (0x74)
-#define LSM6DSXX_REG_Z_OFS_USR               (0x75)
+#define LSM6DSL_REG_SENSOR_SYNC_TIME_FRAME  (0x04)
+#define LSM6DSL_REG_SENSOR_SYC_RES_RATIO    (0x05)
+#define LSM6DSL_REG_DRDY_PULSE_CFG_G        (0x0B)
+#define LSM6DSL_REG_MASTER_CONFIG           (0x1A)
+#define LSM6DSL_REG_SENSORHUB1_REG          (0x2E)
+#define LSM6DSL_REG_SENSORHUB2_REG          (0x2F)
+#define LSM6DSL_REG_SENSORHUB3_REG          (0x30)
+#define LSM6DSL_REG_SENSORHUB4_REG          (0x31)
+#define LSM6DSL_REG_SENSORHUB5_REG          (0x32)
+#define LSM6DSL_REG_SENSORHUB6_REG          (0x33)
+#define LSM6DSL_REG_SENSORHUB7_REG          (0x34)
+#define LSM6DSL_REG_SENSORHUB8_REG          (0x35)
+#define LSM6DSL_REG_SENSORHUB9_REG          (0x36)
+#define LSM6DSL_REG_SENSORHUB10_REG         (0x37)
+#define LSM6DSL_REG_SENSORHUB11_REG         (0x38)
+#define LSM6DSL_REG_SENSORHUB12_REG         (0x39)
+#define LSM6DSL_REG_SENSORHUB13_REG         (0x4D)
+#define LSM6DSL_REG_SENSORHUB14_REG         (0x4E)
+#define LSM6DSL_REG_SENSORHUB15_REG         (0x4F)
+#define LSM6DSL_REG_SENSORHUB16_REG         (0x50)
+#define LSM6DSL_REG_SENSORHUB17_REG         (0x51)
+#define LSM6DSL_REG_SENSORHUB18_REG         (0x52)
+#define LSM6DSL_REG_FUNC_SRC_2              (0x54)
+#define LSM6DSL_REG_WRIST_TILT_IA           (0x55)
+#define LSM6DSL_REG_MASTER_CMD_CODE         (0x60)
+#define LSM6DSL_REG_SENS_SYNC_SPI_ERR_CODE  (0x61)
+#define LSM6DSL_REG_OUT_MAG_RAW_X_L         (0x66)
+#define LSM6DSL_REG_OUT_MAG_RAW_X_H         (0x67)
+#define LSM6DSL_REG_OUT_MAG_RAW_Y_L         (0x68)
+#define LSM6DSL_REG_OUT_MAG_RAW_Y_H         (0x69)
+#define LSM6DSL_REG_OUT_MAG_RAW_Z_L         (0x6A)
+#define LSM6DSL_REG_OUT_MAG_RAW_Z_H         (0x6B)
+#define LSM6DSL_REG_X_OFS_USR               (0x73)
+#define LSM6DSL_REG_Y_OFS_USR               (0x74)
+#define LSM6DSL_REG_Z_OFS_USR               (0x75)
 /** @} */
 
 /**
- * @brief   WHO_AM_I value for the LSM6DSL
- */
-#define LSM6DSXX_WHO_AM_I                    (0b01101010)
-
-
-
-#elif MODULE_LSM6DS33
-/**
- * @name    LSM6DS33 specific registers not used in implementation
+ * @name    LSM6DS33 specific registers
  * @{
  */
 
-#define LSM6DSXX_REG_ORIENT_CFG_G           (0x0B)
+#define LSM6DS33_REG_ORIENT_CFG_G           (0x0B)
 /** @} */
 
 /**
  * @brief   WHO_AM_I value for the LSM6DS33
  */
-#define LSM6DSXX_WHO_AM_I                    (0b01101001)
+#define LSM6DS33_WHO_AM_I                    (0b01101001)
 
-#endif
+/**
+ * @brief   WHO_AM_I value for the LSM6DSL and LSM6DS3TR-C
+ */
+#define LSM6DSL_WHO_AM_I                     (0b01101010)
 
 /**
  * @name    CTRL_x registers
@@ -183,7 +177,7 @@ extern "C" {
 /**
  * @brief   Offset for temperature calculation
  */
-#define LSM6DSXX_TEMP_OFFSET                 (0x1900)
+#define LSM6DSXX_TEMP_OFFSET                 (25)
 
 /**
  * @brief   Reboot wait interval in ms (15ms)
