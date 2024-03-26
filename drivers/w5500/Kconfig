@@ -1,0 +1,52 @@
+# Copyright (C) 2023 Stefan Schmidt
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_W5500
+    bool "W5500 Ethernet Adapter"
+    depends on HAS_PERIPH_GPIO
+    depends on HAS_PERIPH_GPIO_IRQ
+    depends on HAS_PERIPH_SPI
+    depends on TEST_KCONFIG
+    select MODULE_LUID
+    select MODULE_NETDEV_ETH
+    select MODULE_PERIPH_GPIO
+    select MODULE_PERIPH_GPIO_IRQ
+    select MODULE_PERIPH_SPI
+
+config HAVE_W5500
+    bool
+    select MODULE_W5500 if MODULE_NETDEV_DEFAULT
+    help
+        Indicates that a w5500 ethernet adapter is present.
+
+if MODULE_W5500
+
+config W5500_USE_POLLING
+    bool "Use driver in polling mode"
+    default y
+
+if W5500_USE_POLLING
+
+config W5500_POLLING_INTERVAL
+    int "Polling interval in ms"
+    default 100
+
+#endif # W5500_USE_POLLING
+
+config W5500_MAC_FILTER
+    bool "Enable hardware MAC filter"
+    default n
+
+config W5500_BROADCAST_FILTER
+    bool "Enable hardware broadcast filter"
+    default n
+
+config W5500_MULTICAST_FILTER
+    bool "Enable hardware multicast filter"
+    default n
+
+endif # MODULE_W5500
