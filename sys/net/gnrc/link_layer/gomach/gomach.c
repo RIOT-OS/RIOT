@@ -1788,53 +1788,7 @@ static void gomach_vtdma_end(gnrc_netif_t *netif)
     /* Switch the radio to the public-channel. */
     gnrc_gomach_turn_channel(netif, netif->mac.prot.gomach.cur_pub_channel);
 
-    /* Check if there is packet to send. */
-    if (gnrc_gomach_find_next_tx_neighbor(netif)) {
-        if (netif->mac.tx.current_neighbor == &netif->mac.tx.neighbors[0]) {
-            /* The packet is for broadcasting. */
-            if (!gnrc_gomach_get_unintd_preamble(netif)) {
-                netif->mac.prot.gomach.basic_state = GNRC_GOMACH_TRANSMIT;
-                netif->mac.tx.transmit_state = GNRC_GOMACH_BROADCAST;
-            }
-            else {
-                netif->mac.rx.listen_state = GNRC_GOMACH_LISTEN_SLEEP_INIT;
-            }
-        }
-        else {
-            switch (netif->mac.tx.current_neighbor->mac_type) {
-                /* The packet waiting to be sent is for unicast. */
-                case GNRC_GOMACH_TYPE_UNKNOWN: {
-                    /* The neighbor's phase is unknown yet, try to run t2u (transmission
-                     * to unknown device) procedure to phase-lock the neighbor. */
-                    if (!gnrc_gomach_get_unintd_preamble(netif)) {
-                        netif->mac.prot.gomach.basic_state = GNRC_GOMACH_TRANSMIT;
-                        netif->mac.tx.transmit_state = GNRC_GOMACH_TRANS_TO_UNKNOWN;
-                    }
-                    else {
-                        netif->mac.rx.listen_state = GNRC_GOMACH_LISTEN_SLEEP_INIT;
-                    }
-                } break;
-                case GNRC_GOMACH_TYPE_KNOWN: {
-                    /* If the neighbor's phase is known, go to t2k (transmission
-                     * to known device) procedure. Here, we don't worry that the t2k
-                     * unicast transmission will interrupt with possible ongoing
-                     * preamble transmissions of other devices. */
-                    netif->mac.prot.gomach.basic_state = GNRC_GOMACH_TRANSMIT;
-                    netif->mac.tx.transmit_state = GNRC_GOMACH_TRANS_TO_KNOWN;
-                } break;
-                default: {
-                    LOG_ERROR("ERROR: [GOMACH] vTDMA: unknown MAC type of the neighbor.\n");
-                    break;
-                }
-            }
-        }
-    }
-    else {
-        /* No packet to send, go to sleep. */
-        netif->mac.rx.listen_state = GNRC_GOMACH_LISTEN_SLEEP_INIT;
-    }
-
-    gnrc_gomach_set_update(netif, true);
+    _no_vtdma_after_cp(netif);
 }
 
 static void gomach_sleep_init(gnrc_netif_t *netif)
