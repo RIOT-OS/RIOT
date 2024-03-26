@@ -25,6 +25,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "stdio_base.h"
 #include "kernel_defines.h"
 #include "fmt.h"
 
@@ -527,7 +528,7 @@ void print(const char *s, size_t n)
     /* flush the libc's output buffer so output is not intermingled. */
     fflush(stdout);
 
-    stdio_write(s, n);
+    stdio_write_all(s, n);
 }
 #endif
 
