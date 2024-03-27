@@ -175,6 +175,21 @@ psa_status_t psa_algorithm_dispatch_verify_message( const psa_key_attributes_t *
  */
 psa_status_t psa_algorithm_dispatch_generate_key(   const psa_key_attributes_t *attributes,
                                                     psa_key_slot_t *slot);
+
+/**
+ * @brief   Dispatch the key import function to a specific backend.
+ *          See psa_import_key()
+ *
+ * @param attributes
+ * @param data
+ * @param data_length
+ * @param slot
+ * @param bits
+ * @return psa_status_t
+ */
+psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attributes,
+                                               const uint8_t *data, size_t data_length,
+                                               psa_key_slot_t *slot, size_t *bits);
 #endif
 
 #if IS_USED(MODULE_PSA_CIPHER)
