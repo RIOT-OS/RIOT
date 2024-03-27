@@ -7,7 +7,7 @@ PROGRAMMERS_SUPPORTED += openocd
 OPENOCD_DEBUG_ADAPTER ?= stlink
 
 # default to jlink as programmer, but only if JLinkExe is in $PATH
-ifneq (,$(shell which JLinkExe))
+ifneq (,$(shell command -v JLinkExe))
   PROGRAMMER ?= jlink
 else
   PROGRAMMER ?= openocd

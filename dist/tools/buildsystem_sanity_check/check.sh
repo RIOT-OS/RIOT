@@ -389,6 +389,19 @@ check_tests_application_path() {
     find tests/ -type f "${patterns[@]}" | error_with_message "Invalid application path in tests/"
 }
 
+check_shell_which() {
+    local patterns=()
+    local pathspec=()
+
+    patterns+=(-e '(shell[[:blank:]]\+which')
+
+    pathspec+=('Makefile*')
+    pathspec+=('**/Makefile*')
+    pathspec+=('**/*.mk')
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
+        | error_with_message "Don't use \`which\` in makefiles, use \`command -v\` instead."
+}
+
 error_on_input() {
     ! grep ''
 }
@@ -411,6 +424,7 @@ all_checks() {
     check_no_riot_config
     check_stderr_null
     check_tests_application_path
+    check_shell_which
 }
 
 main() {

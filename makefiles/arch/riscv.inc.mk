@@ -32,7 +32,7 @@ TARGET_ARCH_RISCV ?= \
     $(subst -gcc,,\
       $(notdir \
         $(word 1,\
-          $(shell which $(addsuffix -gcc,$(_TRIPLES_TO_TEST)) 2> /dev/null)))))
+          $(shell echo $(addsuffix -gcc,$(_TRIPLES_TO_TEST)) | xargs -n1 sh -c 'command -v $$0')))))
 
 TARGET_ARCH ?= $(TARGET_ARCH_RISCV)
 
