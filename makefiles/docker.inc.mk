@@ -1,4 +1,5 @@
-export DOCKER_IMAGE ?= docker.io/riot/riotbuild:latest
+DOCKER_IMAGE_DEFAULT := docker.io/riot/riotbuild:latest
+export DOCKER_IMAGE ?= $(DOCKER_IMAGE_DEFAULT)
 export DOCKER_BUILD_ROOT ?= /data/riotbuild
 DOCKER_RIOTBASE ?= $(DOCKER_BUILD_ROOT)/riotbase
 # List of Docker-enabled make goals
@@ -10,6 +11,23 @@ export DOCKER_MAKECMDGOALS_POSSIBLE = \
   tests-% \
   #
 export DOCKER_MAKECMDGOALS = $(filter $(DOCKER_MAKECMDGOALS_POSSIBLE),$(MAKECMDGOALS))
+
+# special version "none" refers to "not existing".
+COMPATIBLE_RIOTBUILD_VERSIONS := \
+	b6af289bf59df73766d685d0df8b8aa98d4fd07b19457699a8a946d204a3405d \
+	#
+
+ifeq (1,$(BUILD_IN_DOCKER))
+  ifeq ($(DOCKER_IMAGE),$(DOCKER_IMAGE_DEFAULT))
+    DOCKER_IMAGE_VERSION := $(shell $(DOCKER) image inspect --format "{{.Id}}" $(DOCKER_IMAGE) 2>/dev/null || echo none)
+    ifeq (none,$(DOCKER_IMAGE_VERSION))
+      $(error Container image $(DOCKER_IMAGE) is not available, try running "$(DOCKER) pull $(DOCKER_IMAGE)" to get it.)
+    endif
+    ifeq (,$(filter $(DOCKER_IMAGE_VERSION),$(COMPATIBLE_RIOTBUILD_VERSIONS)))
+      $(error The container $(DOCKER_IMAGE) in version $(DOCKER_IMAGE_VERSION) is not compatbile with this version of RIOT. Try running "$(DOCKER) pull $(DOCKER_IMAGE)")
+    endif
+  endif
+endif
 
 # Docker creates the files .dockerinit and .dockerenv in the root directory of
 # the container, we check for the files to determine if we are inside a container.
