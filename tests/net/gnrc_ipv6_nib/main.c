@@ -817,11 +817,11 @@ static void test_handle_pkt__rtr_sol(void)
 static size_t _set_rtr_adv(const ipv6_addr_t *ipv6_src,
                            uint8_t ipv6_hl, uint8_t rtr_adv_code,
                            bool set_rtr_adv_fields,
-                           uint8_t rtr_adv_flags,
+                           uint8_t rtr_adv_flags, uint32_t t_rtr_reachable_ms, uint16_t t_rtr_alive_s,
                            const uint8_t *sl2ao_addr, size_t sl2ao_addr_len,
                            uint16_t mtu,
                            const ipv6_addr_t *pfx, unsigned pfx_len,
-                           uint8_t pfx_flags)
+                           uint8_t pfx_flags, uint32_t t_pfx_valid_s, uint32_t t_pfx_pref_s)
 {
     size_t icmpv6_len = sizeof(ndp_rtr_adv_t);
     ndp_rtr_adv_t *rtr_adv = (ndp_rtr_adv_t *)icmpv6;
@@ -835,8 +835,8 @@ static size_t _set_rtr_adv(const ipv6_addr_t *ipv6_src,
     rtr_adv->flags = rtr_adv_flags;
     if (set_rtr_adv_fields) {
         rtr_adv->cur_hl = _CUR_HL,
-        rtr_adv->ltime = byteorder_htons(_RTR_LTIME);
-        rtr_adv->reach_time = byteorder_htonl(_REACH_TIME);
+        rtr_adv->ltime = byteorder_htons(t_rtr_alive_s);
+        rtr_adv->reach_time = byteorder_htonl(t_rtr_reachable_ms);
         rtr_adv->retrans_timer = byteorder_htonl(_RETRANS_TIMER);
     }
 
@@ -857,8 +857,8 @@ static size_t _set_rtr_adv(const ipv6_addr_t *ipv6_src,
         pio->len = NDP_OPT_PI_LEN;
         pio->prefix_len = pfx_len;
         pio->flags = pfx_flags;
-        pio->valid_ltime = byteorder_htonl(_PIO_PFX_LTIME);
-        pio->pref_ltime = byteorder_htonl(_PIO_PFX_LTIME);
+        pio->valid_ltime = byteorder_htonl(t_pfx_valid_s);
+        pio->pref_ltime = byteorder_htonl(t_pfx_pref_s);
         ipv6_addr_init_prefix(&pio->prefix, pfx, pfx_len);
         icmpv6_len += sizeof(ndp_opt_pi_t);
     }
@@ -923,9 +923,11 @@ static void test_handle_pkt__rtr_adv__invalid_src(void)
     void *state = NULL;
     size_t icmpv6_len = _set_rtr_adv(&_rem_gb,
                                      NDP_HOP_LIMIT, 0U, true, 0U,
+                                     _REACH_TIME, _RTR_LTIME,
                                      _loc_l2, sizeof(_loc_l2),
                                      32397U, &_loc_gb, _LOC_GB_PFX_LEN,
-                                     NDP_OPT_PI_FLAGS_L | NDP_OPT_PI_FLAGS_A);
+                                     NDP_OPT_PI_FLAGS_L | NDP_OPT_PI_FLAGS_A,
+                                     _PIO_PFX_LTIME, _PIO_PFX_LTIME);
     _netif_exp_t exp_netif;
 
     _get_netif_exp(_mock_netif, &exp_netif);
@@ -946,9 +948,11 @@ static void test_handle_pkt__rtr_adv__invalid_hl(void)
     void *state = NULL;
     size_t icmpv6_len = _set_rtr_adv(&_rem_ll,
                                      194U, 0U, true, 0U,
+                                     _REACH_TIME, _RTR_LTIME,
                                      _loc_l2, sizeof(_loc_l2),
                                      32397U, &_loc_gb, _LOC_GB_PFX_LEN,
-                                     NDP_OPT_PI_FLAGS_L | NDP_OPT_PI_FLAGS_A);
+                                     NDP_OPT_PI_FLAGS_L | NDP_OPT_PI_FLAGS_A,
+                                     _PIO_PFX_LTIME, _PIO_PFX_LTIME);
     _netif_exp_t exp_netif;
 
     _get_netif_exp(_mock_netif, &exp_netif);
@@ -969,9 +973,11 @@ static void test_handle_pkt__rtr_adv__invalid_code(void)
     void *state = NULL;
     size_t icmpv6_len = _set_rtr_adv(&_rem_ll,
                                      NDP_HOP_LIMIT, 201U, true, 0U,
+                                     _REACH_TIME, _RTR_LTIME,
                                      _loc_l2, sizeof(_loc_l2),
                                      32397U, &_loc_gb, _LOC_GB_PFX_LEN,
-                                     NDP_OPT_PI_FLAGS_L | NDP_OPT_PI_FLAGS_A);
+                                     NDP_OPT_PI_FLAGS_L | NDP_OPT_PI_FLAGS_A,
+                                     _PIO_PFX_LTIME, _PIO_PFX_LTIME);
     _netif_exp_t exp_netif;
 
     _get_netif_exp(_mock_netif, &exp_netif);
@@ -994,9 +1000,11 @@ static void test_handle_pkt__rtr_adv__invalid_icmpv6_len(void)
 
     _get_netif_exp(_mock_netif, &exp_netif);
     _set_rtr_adv(&_rem_ll, NDP_HOP_LIMIT, 201U, true, 0U,
+                 _REACH_TIME, _RTR_LTIME,
                  _loc_l2, sizeof(_loc_l2),
                  32397U, &_loc_gb, _LOC_GB_PFX_LEN,
-                 NDP_OPT_PI_FLAGS_L | NDP_OPT_PI_FLAGS_A);
+                 NDP_OPT_PI_FLAGS_L | NDP_OPT_PI_FLAGS_A,
+                 _PIO_PFX_LTIME, _PIO_PFX_LTIME);
     gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6,
                              sizeof(ndp_rtr_adv_t) - 1);
     TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
@@ -1015,9 +1023,11 @@ static void test_handle_pkt__rtr_adv__invalid_opt_len(void)
     void *state = NULL;
     size_t icmpv6_len = _set_rtr_adv(&_rem_ll,
                                      NDP_HOP_LIMIT, 201U, true, 0U,
+                                     _REACH_TIME, _RTR_LTIME,
                                      _loc_l2, sizeof(_loc_l2),
                                      32397U, &_loc_gb, _LOC_GB_PFX_LEN,
-                                     NDP_OPT_PI_FLAGS_L | NDP_OPT_PI_FLAGS_A);
+                                     NDP_OPT_PI_FLAGS_L | NDP_OPT_PI_FLAGS_A,
+                                     _PIO_PFX_LTIME, _PIO_PFX_LTIME);
     ndp_opt_t *opt = (ndp_opt_t *)&_buffer[icmpv6_len];
     _netif_exp_t exp_netif;
 
@@ -1047,10 +1057,11 @@ static void test_handle_pkt__rtr_adv__success(uint8_t rtr_adv_flags,
     void *state = NULL;
     size_t icmpv6_len = _set_rtr_adv(&_rem_ll, NDP_HOP_LIMIT, 0U,
                                      set_rtr_adv_fields, rtr_adv_flags,
+                                     _REACH_TIME, _RTR_LTIME,
                                      (sl2ao) ? _rem_l2 : NULL, sizeof(_rem_l2),
                                      (mtuo) ? 32397U : 0U,
                                      (pio) ? &_loc_gb : NULL, _LOC_GB_PFX_LEN,
-                                     pio_flags);
+                                     pio_flags, _PIO_PFX_LTIME, _PIO_PFX_LTIME);
     const unsigned exp_addr_count = _netif_addr_count(_mock_netif);
     _netif_exp_t exp_netif;
 
@@ -1279,6 +1290,108 @@ static void test_change_rtr_adv_iface(void)
     TEST_ASSERT_EQUAL_INT(0, msg_avail());
 }
 
+static void test_handle_router_timeout(void)
+{
+    gnrc_ipv6_nib_ft_t route;
+    gnrc_ipv6_nib_pl_t prefix;
+    void *state = NULL;
+    uint32_t t_rtr_alive_s = 5; /* [0, 9000]s, 0: not a default router */
+    size_t icmpv6_len = _set_rtr_adv(&_rem_ll,
+                                     NDP_HOP_LIMIT, 0U, true, 0U,
+                                     _REACH_TIME, t_rtr_alive_s,
+                                     _rem_l2, sizeof(_rem_l2),
+                                     32397U, &_loc_gb, _LOC_GB_PFX_LEN,
+                                     NDP_OPT_PI_FLAGS_L,
+                                     _PIO_PFX_LTIME, _PIO_PFX_LTIME);
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
+    /* check that prefix has been added */
+    bool pfx = false, rtr = false;
+    while (gnrc_ipv6_nib_pl_iter(_mock_netif->pid, &state, &prefix)) {
+        pfx = true;
+        TEST_ASSERT_MESSAGE(ipv6_addr_match_prefix(&prefix.pfx, &_loc_gb) >= _LOC_GB_PFX_LEN,
+                            "Prefix is not the one from the RA");
+    }
+    if (!pfx) {
+        TEST_ASSERT_MESSAGE(false, "Prefix not added");
+    }
+    /* check that router has been added */
+    state = NULL;
+    while (gnrc_ipv6_nib_ft_iter(NULL, 0, &state, &route)) {
+        if (ipv6_addr_is_unspecified(&route.dst)) {
+            rtr = true;
+            TEST_ASSERT_MESSAGE(ipv6_addr_equal(&_rem_ll, &route.next_hop),
+                                "Default route is not via RA source");
+        }
+    }
+    if (!rtr) {
+        TEST_ASSERT_MESSAGE(false, "Default route not added");
+    }
+    /* timeout router by RA with lifetime 0 */
+    icmpv6_len = _set_rtr_adv(&_rem_ll,
+                              NDP_HOP_LIMIT, 0U, true, 0U,
+                              _REACH_TIME, 0,
+                              _rem_l2, sizeof(_rem_l2),
+                              32397U, &_loc_gb, _LOC_GB_PFX_LEN,
+                              NDP_OPT_PI_FLAGS_L,
+                              _PIO_PFX_LTIME, _PIO_PFX_LTIME);
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
+    /* check that default router has been timed out */
+    state = NULL;
+    while (gnrc_ipv6_nib_ft_iter(NULL, 0, &state, &route)) {
+        if (ipv6_addr_is_unspecified(&route.dst)) {
+            TEST_ASSERT_MESSAGE(ipv6_addr_equal(&_rem_ll, &route.next_hop),
+                                "Default route was not deleted");
+        }
+    }
+}
+
+static void test_handle_prefix_timeout(void)
+{
+    gnrc_ipv6_nib_ft_t route;
+    gnrc_ipv6_nib_pl_t prefix;
+    void *state = NULL;
+    uint32_t t_rtr_alive_s = 0; /* [0, 9000]s, 0: not a default router */
+    size_t icmpv6_len = _set_rtr_adv(&_rem_ll,
+                                     NDP_HOP_LIMIT, 0U, true, 0U,
+                                     _REACH_TIME, t_rtr_alive_s,
+                                     _rem_l2, sizeof(_rem_l2),
+                                     32397U, &_loc_gb, _LOC_GB_PFX_LEN,
+                                     NDP_OPT_PI_FLAGS_L,
+                                     _PIO_PFX_LTIME, _PIO_PFX_LTIME);
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
+    /* check that prefix has been added */
+    bool pfx = false;
+    while (gnrc_ipv6_nib_pl_iter(_mock_netif->pid, &state, &prefix)) {
+        pfx = true;
+        TEST_ASSERT_MESSAGE(ipv6_addr_match_prefix(&prefix.pfx, &_loc_gb) >= _LOC_GB_PFX_LEN,
+                            "Prefix is not the one from the RA");
+    }
+    if (!pfx) {
+        TEST_ASSERT_MESSAGE(false, "Prefix not added");
+    }
+    /* check that router has not been added as default router */
+    state = NULL;
+    while (gnrc_ipv6_nib_ft_iter(NULL, 0, &state, &route)) {
+        if (ipv6_addr_is_unspecified(&route.dst)) {
+            TEST_ASSERT_MESSAGE(false, "Router should not have been added as a default router");
+        }
+    }
+    /* timeout router by RA with lifetime 0 */
+    icmpv6_len = _set_rtr_adv(&_rem_ll,
+                              NDP_HOP_LIMIT, 0U, true, 0U,
+                              _REACH_TIME, 0,
+                              _rem_l2, sizeof(_rem_l2),
+                              32397U, &_loc_gb, _LOC_GB_PFX_LEN,
+                              NDP_OPT_PI_FLAGS_L,
+                              0, 0);
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
+    /* check that prefix has been timed out */
+    state = NULL;
+    if (gnrc_ipv6_nib_pl_iter(_mock_netif->pid, &state, &prefix)) {
+        TEST_ASSERT_MESSAGE(false, "Prefix has been timed out but is still in use");
+    }
+}
+
 static Test *tests_gnrc_ipv6_nib(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -1341,6 +1454,8 @@ static Test *tests_gnrc_ipv6_nib(void)
          * we do not have access to the (internally defined) contexts required
          * for it */
         new_TestFixture(test_change_rtr_adv_iface),
+        new_TestFixture(test_handle_router_timeout),
+        new_TestFixture(test_handle_prefix_timeout),
     };
 
     EMB_UNIT_TESTCALLER(tests, _set_up, NULL, fixtures);
