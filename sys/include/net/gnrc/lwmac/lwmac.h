@@ -11,6 +11,8 @@
  * @defgroup    net_gnrc_lwmac LWMAC
  * @ingroup     net_gnrc
  * @brief       A Lightweight duty-cycling 802.15.4 MAC protocol
+ * @deprecated  This module is deprecated and will be removed after the 2024.10 release.
+ *              As an alternative MAC layer for IEEE 802.15.4, you can use @ref pkg_opendsme.
  *
  *
  * ## LWMAC implementation
