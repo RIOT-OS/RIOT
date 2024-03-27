@@ -147,6 +147,15 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    SARA (UBlox) STATUS
+ *
+ * This is the V_INT of the SARA.
+ * @{
+ */
+#define SARA_STATUS_PIN     GPIO_PIN(PA, 28)
+/** @} */
+
+/**
  * @name    INT_MAG
  *
  * The INT_MAG pin of the accelerometer (LSM303AGRTR)
