@@ -22,22 +22,29 @@ int main(void)
     if(status == 0){
         printf("Successfully initalised vcnl40x0 !");
         gpio_init(26, GPIO_OUT);
-        gpio_set(26);
-        //int cycle = 0;
-        /* send something out gpio pins ? to read value ?
-        gpio_init(26, 0);
-        while(cycle < 1000){
+        for(int j = 0; j < 1000; j++){
+            for(long unsigned int i = 0; i < 100 * MHZ(1); i++){
+                    __asm("");
+            }
             gpio_set(26);
-            for(int i = 0; i < 100; i++){
-                __asm("nop");
+            for(long unsigned int i = 0; i < 100 * MHZ(1); i++){
+                    __asm("");
             }
             gpio_clear(26);
-            for(int i = 0; i < 100; i++){
-                __asm("nop");
-            }
-            cycle++;
         }
-        */
+        /* send something out gpio pins ? to read value ?
+        while(1){
+            gpio_set(26);
+            for(long unsigned int i = 0; i < 10*KHZ(1); i++){
+                cycle++;
+            }
+            gpio_clear(26);
+            for(long unsigned int i = 0; i < 10*KHZ(1); i++){
+                cycle--;
+            }
+            gpio_set(26);
+        }*/
+        
 
     }
 }
