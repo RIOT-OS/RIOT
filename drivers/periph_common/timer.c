@@ -39,3 +39,19 @@ uword_t timer_query_channel_numof(tim_t dev)
     return TIMER_CHANNEL_NUMOF;
 }
 #endif
+
+#ifdef MODULE_PERIPH_TIMER_QUERY_FREQS
+__attribute__((weak, pure))
+int timer_capture_channel_first(tim_t dev)
+{
+    assert(dev < TIMER_NUMOF);
+    return 0;
+}
+
+__attribute__((weak, pure))
+int timer_capture_channel_last(tim_t dev)
+{
+    assert(dev < TIMER_NUMOF);
+    return timer_query_channel_numof(dev) - 1;
+}
+#endif
