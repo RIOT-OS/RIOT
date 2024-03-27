@@ -1,0 +1,3 @@
+CPU = gba
+CPU_MODEL = arm7tdmi
+

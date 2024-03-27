@@ -1,0 +1,2 @@
+include $(RIOTCPU)/arm7_common/Makefile.features
+
