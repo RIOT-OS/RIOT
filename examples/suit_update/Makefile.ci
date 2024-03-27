@@ -33,5 +33,4 @@ BOARD_INSUFFICIENT_MEMORY := \
     stk3200 \
     stm32f0discovery \
     telosb \
-    z1 \
     #
