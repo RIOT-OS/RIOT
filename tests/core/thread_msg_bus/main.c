@@ -108,11 +108,11 @@ int main(void)
 
     p_main = thread_getpid();
     p1 = thread_create(t1_stack, sizeof(t1_stack), THREAD_PRIORITY_MAIN - 3,
-                       THREAD_CREATE_STACKTEST, thread1, &my_bus, "nr1");
+                       0, thread1, &my_bus, "nr1");
     p2 = thread_create(t2_stack, sizeof(t2_stack), THREAD_PRIORITY_MAIN - 2,
-                       THREAD_CREATE_STACKTEST, thread2, &my_bus, "nr2");
+                       0, thread2, &my_bus, "nr2");
     p3 = thread_create(t3_stack, sizeof(t3_stack), THREAD_PRIORITY_MAIN - 1,
-                       THREAD_CREATE_STACKTEST, thread3, &my_bus, "nr3");
+                       0, thread3, &my_bus, "nr3");
     puts("THREADS CREATED");
 
     const char hello[] = "Hello Threads!";

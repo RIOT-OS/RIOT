@@ -138,7 +138,7 @@ int main(void)
     /* create and trigger first background thread */
     kernel_pid_t pid1 = thread_create(slacker_stack1, sizeof(slacker_stack1),
                                       THREAD_PRIORITY_MAIN - 1,
-                                      THREAD_CREATE_STACKTEST,
+                                      0,
                                       slacker_thread, NULL, "slacker1");
 
     LOG_DEBUG("+ msg 1");
@@ -152,7 +152,7 @@ int main(void)
     /* create and trigger second background thread */
     kernel_pid_t pid2 = thread_create(slacker_stack2, sizeof(slacker_stack2),
                                       THREAD_PRIORITY_MAIN - 1,
-                                      THREAD_CREATE_STACKTEST,
+                                      0,
                                       slacker_thread, NULL, "slacker2");
 
     LOG_DEBUG("+ msg 3");
@@ -166,7 +166,7 @@ int main(void)
     /* create and trigger worker thread */
     kernel_pid_t pid3 = thread_create(worker_stack, sizeof(worker_stack),
                                       THREAD_PRIORITY_MAIN - 2,
-                                      THREAD_CREATE_STACKTEST,
+                                      0,
                                       worker_thread, NULL, "worker");
 
     puts("[START]\n");

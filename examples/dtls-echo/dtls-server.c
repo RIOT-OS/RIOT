@@ -379,7 +379,7 @@ static void start_server(void)
     _dtls_server_pid = thread_create(_dtls_server_stack,
                                      sizeof(_dtls_server_stack),
                                      THREAD_PRIORITY_MAIN - 1,
-                                     THREAD_CREATE_STACKTEST,
+                                     0,
                                      _dtls_server_wrapper, NULL, "DTLS_Server");
 
     /* Uncommon but better be sure */

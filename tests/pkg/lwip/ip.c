@@ -167,7 +167,7 @@ static int ip_send(char *addr_str, char *port_str, char *data, unsigned int num,
 static int ip_start_server(char *port_str)
 {
     if (thread_create(server_stack, sizeof(server_stack), THREAD_PRIORITY_MAIN - 1,
-                      THREAD_CREATE_STACKTEST, _server_thread, port_str,
+                      0, _server_thread, port_str,
                       "IP server") <= KERNEL_PID_UNDEF) {
         return 1;
     }

@@ -115,13 +115,13 @@ void kernel_init(void)
     if (IS_USED(MODULE_CORE_IDLE_THREAD)) {
         thread_create(idle_stack, sizeof(idle_stack),
                       THREAD_PRIORITY_IDLE,
-                      THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
+                      THREAD_CREATE_WOUT_YIELD,
                       idle_thread, NULL, "idle");
     }
 
     thread_create(main_stack, sizeof(main_stack),
                   THREAD_PRIORITY_MAIN,
-                  THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
+                  THREAD_CREATE_WOUT_YIELD,
                   main_trampoline, NULL, "main");
 
     cpu_switch_context_exit();

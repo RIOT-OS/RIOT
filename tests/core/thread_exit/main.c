@@ -50,7 +50,7 @@ void *second_thread(void *arg)
              third_thread_stack,
              sizeof(third_thread_stack),
              THREAD_PRIORITY_MAIN - 2,
-             THREAD_CREATE_STACKTEST,
+             0,
              third_thread,
              NULL,
              "nr3")
@@ -64,7 +64,7 @@ void *second_thread(void *arg)
              third_thread_stack,
              sizeof(third_thread_stack),
              THREAD_PRIORITY_MAIN - 1,
-             THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
+             THREAD_CREATE_WOUT_YIELD,
              fourth_thread,
              NULL,
              "nr4")
@@ -84,7 +84,7 @@ int main(void)
              second_thread_stack,
              sizeof(second_thread_stack),
              THREAD_PRIORITY_MAIN - 1,
-             THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
+             THREAD_CREATE_WOUT_YIELD,
              second_thread,
              NULL,
              "nr2")

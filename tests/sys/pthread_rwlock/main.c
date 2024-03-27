@@ -159,7 +159,7 @@ int main(void)
         }
 
         thread_create(stacks[i], sizeof(stacks[i]),
-                      prio, THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
+                      prio, THREAD_CREATE_WOUT_YIELD,
                       fun, NULL, name);
     }
 

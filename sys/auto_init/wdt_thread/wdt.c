@@ -52,7 +52,7 @@ static void *_wdt_thread(void *ctx)
 static void auto_init_wdt_thread(void)
 {
     thread_create(wdt_stack, sizeof(wdt_stack), THREAD_PRIORITY_MIN,
-                  THREAD_CREATE_STACKTEST, _wdt_thread, NULL, "watchdog");
+                  0, _wdt_thread, NULL, "watchdog");
 }
 
 AUTO_INIT(auto_init_wdt_thread, AUTO_INIT_PRIO_WDT_THREAD);
