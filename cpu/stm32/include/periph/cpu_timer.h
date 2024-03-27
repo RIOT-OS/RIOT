@@ -24,6 +24,7 @@
 #include <stdint.h>
 
 #include "cpu.h"
+#include "cpu_gpio.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,6 +57,17 @@ typedef struct {
     uint8_t channel_numof;  /**< number of channels, 0 is alias for
                                  @ref TIMER_CHANNEL_NUMOF */
 } timer_conf_t;
+
+typedef struct {
+    gpio_t pin;
+#ifndef CPU_FAM_STM32F1
+    gpio_af_t af;
+#endif
+} timer_capture_input_conf_t;
+
+typedef struct {
+    timer_capture_input_conf_t inputs[TIMER_CHANNEL_NUMOF];
+} timer_capture_conf_t;
 
 #ifdef __cplusplus
 }
