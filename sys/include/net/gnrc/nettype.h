@@ -91,7 +91,12 @@ typedef enum {
 #endif
 
 #if IS_USED(MODULE_GNRC_NETTYPE_LORAWAN) || defined(DOXYGEN)
-    GNRC_NETTYPE_LORAWAN,       /**< Protocol is LoRaWAN */
+/**
+ * @brief       Protocol is LoRaWAN
+ * @deprecated  LoRaWAN payloads do not have a special type anymore and just use
+ *              @ref GNRC_NETTYPE_UNDEF. Will be removed after 2024.10 release.
+ */
+#define GNRC_NETTYPE_LORAWAN    GNRC_NETTYPE_UNDEF
 #endif
 
     /**
