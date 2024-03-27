@@ -30,6 +30,10 @@
 #include "psa_crypto_location_dispatch.h"
 #include "psa_crypto_algorithm_dispatch.h"
 
+#if IS_USED(MODULE_PSA_PERSISTENT_STORAGE)
+#include "psa_crypto_persistent_storage.h"
+#endif /* MODULE_PSA_PERSISTENT_STORAGE */
+
 #include "random.h"
 #include "kernel_defines.h"
 
@@ -394,10 +398,10 @@ static psa_status_t psa_key_policy_permits( const psa_key_policy_t *policy,
  *          @ref PSA_ERROR_NOT_SUPPORTED
  *          @ref PSA_ERROR_CORRUPTION_DETECTED
  */
-static psa_status_t psa_get_and_lock_key_slot_with_policy(  psa_key_id_t id,
-                                                            psa_key_slot_t **p_slot,
-                                                            psa_key_usage_t usage,
-                                                            psa_algorithm_t alg)
+static psa_status_t psa_get_and_lock_key_slot_with_policy(psa_key_id_t id,
+                                                          psa_key_slot_t **p_slot,
+                                                          psa_key_usage_t usage,
+                                                          psa_algorithm_t alg)
 {
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
     psa_key_slot_t *slot;
@@ -1080,11 +1084,13 @@ static psa_status_t psa_validate_key_attributes(const psa_key_attributes_t *attr
             return PSA_ERROR_INVALID_ARGUMENT;
         }
     }
+#if IS_USED(MODULE_PSA_PERSISTENT_STORAGE)
     else {
-        if (!psa_is_valid_key_id(key, 0)) {
+        if (!psa_is_valid_key_id(key, 1)) {
             return PSA_ERROR_INVALID_ARGUMENT;
         }
     }
+#endif /* MODULE_PSA_PERSISTENT_STORAGE */
 
     status = psa_validate_key_policy(&attributes->policy);
     if (status != PSA_SUCCESS) {
@@ -1152,29 +1158,27 @@ static psa_status_t psa_start_key_creation(psa_key_creation_method_t method,
  *
  * @param   slot    Pointer to slot that the key is stored in
  * @param   driver  SE driver, in case the key creation took place on a secure element
- * @param   key     Pointer which will contain the key ID assigned to the key
+ * @param   key_id  Pointer which will contain the key ID assigned to the key
  *
  * @return  @ref psa_status_t
  */
 static psa_status_t psa_finish_key_creation(psa_key_slot_t *slot, psa_se_drv_data_t *driver,
-                                            psa_key_id_t *key)
+                                            psa_key_id_t *key_id)
 {
     psa_status_t status = PSA_SUCCESS;
 
-    *key = PSA_KEY_ID_NULL;
-    /* TODO: Finish persistent key storage */
-    /* TODO: Finish SE key storage with transaction */
-
-    if (status == PSA_SUCCESS) {
-        *key = slot->attr.id;
-        status = psa_unlock_key_slot(slot);
+    if (PSA_KEY_LIFETIME_IS_VOLATILE(slot->attr.lifetime)) {
+        *key_id = slot->attr.id;
     }
+#if IS_USED(MODULE_PSA_PERSISTENT_STORAGE)
     else {
-        (void)slot;
+        status = psa_persist_key_slot_in_storage(slot);
     }
+#endif /* MODULE_PSA_PERSISTENT_STORAGE */
 
     (void)driver;
-    return status;
+    psa_status_t unlock_status = psa_unlock_key_slot(slot);
+    return ((status == PSA_SUCCESS) ? unlock_status : status);
 }
 
 /**
@@ -1216,6 +1220,17 @@ psa_status_t psa_destroy_key(psa_key_id_t key)
     if (slot->lock_count > 1) {
         return PSA_ERROR_CORRUPTION_DETECTED;
     }
+
+#if IS_USED(MODULE_PSA_PERSISTENT_STORAGE)
+    if (!PSA_KEY_LIFETIME_IS_VOLATILE(slot->attr.lifetime)) {
+        status = psa_destroy_persistent_key(key);
+        if (status != PSA_SUCCESS) {
+            DEBUG("PSA destroy key: Persistent key destruction failed: %s\n",
+                                            psa_status_to_humanly_readable(status));
+            return PSA_ERROR_STORAGE_FAILURE;
+        }
+    }
+#endif /* MODULE_PSA_PERSISTENT_STORAGE */
 
     return psa_wipe_key_slot(slot);
 }
@@ -1351,8 +1366,6 @@ psa_status_t psa_generate_key(const psa_key_attributes_t *attributes,
     psa_key_slot_t *slot = NULL;
     psa_se_drv_data_t *driver = NULL;
 
-    *key = PSA_KEY_ID_NULL;
-
     if (!lib_initialized) {
         return PSA_ERROR_BAD_STATE;
     }
@@ -1363,6 +1376,10 @@ psa_status_t psa_generate_key(const psa_key_attributes_t *attributes,
 
     if (psa_get_key_bits(attributes) == 0) {
         return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (PSA_KEY_LIFETIME_IS_VOLATILE(attributes->lifetime)) {
+        *key = PSA_KEY_ID_NULL;
     }
 
     /* Find empty slot */
@@ -1387,7 +1404,6 @@ psa_status_t psa_generate_key(const psa_key_attributes_t *attributes,
     }
 
     status = psa_finish_key_creation(slot, driver, key);
-
     if (status != PSA_SUCCESS) {
         psa_fail_key_creation(slot, driver);
     }
@@ -1485,7 +1501,9 @@ psa_status_t psa_import_key(const psa_key_attributes_t *attributes,
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
-    *key = PSA_KEY_ID_NULL;
+    if (PSA_KEY_LIFETIME_IS_VOLATILE(attributes->lifetime)) {
+        *key = PSA_KEY_ID_NULL;
+    }
 
     /* Find empty slot */
     status = psa_start_key_creation(PSA_KEY_CREATION_IMPORT, attributes, &slot, &driver);

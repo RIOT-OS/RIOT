@@ -3,6 +3,15 @@ ifneq (,$(filter psa_crypto,$(USEMODULE)))
   USEMODULE += prng_sha256prng
 endif
 
+ifneq (,$(filter psa_persistent_storage, $(USEMODULE)))
+  USEPKG += nanocbor
+  USEPKG += littlefs2
+  USEMODULE += vfs
+  USEMODULE += vfs_default
+  USEMODULE += vfs_auto_format
+  USEMODULE += vfs_auto_mount
+endif
+
 # Asymmetric
 ifneq (,$(filter psa_asymmetric,$(USEMODULE)))
   USEMODULE += psa_key_management

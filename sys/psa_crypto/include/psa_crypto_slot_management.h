@@ -86,6 +86,51 @@ typedef struct {
 #endif /* PSA_SINGLE_KEY_COUNT */
 } psa_key_slot_t;
 
+#if PSA_PROTECTED_KEY_COUNT
+/**
+ * @brief   Structure for a protected key slot.
+ *
+ *          These slots hold Slot Numbers for keys in protected storage and, if the key type is an
+ *          asymmetric key pair, the public key.
+ */
+typedef struct {
+    clist_node_t node;
+    size_t lock_count;
+    psa_key_attributes_t attr;
+    struct prot_key_data {
+        psa_key_slot_number_t slot_number;
+#if IS_USED(MODULE_PSA_ASYMMETRIC)
+        uint8_t pubkey_data[PSA_EXPORT_PUBLIC_KEY_MAX_SIZE];
+        size_t pubkey_data_len;
+#endif
+    } key;
+} psa_prot_key_slot_t;
+#endif /* PSA_PROTECTED_KEY_COUNT */
+
+#if PSA_ASYMMETRIC_KEYPAIR_COUNT
+/**
+ * @brief   Structure for asymmetric key pairs.
+ *
+ *          Contains asymmetric private and public key pairs.
+ *
+ */
+typedef struct {
+    clist_node_t node;
+    size_t lock_count;
+    psa_key_attributes_t attr;
+    struct key_pair_data {
+        /**  Contains asymmetric private key*/
+        uint8_t privkey_data[PSA_BITS_TO_BYTES(PSA_MAX_PRIV_KEY_SIZE)];
+        /** Contains actual size of asymmetric private key */
+        size_t privkey_data_len;
+        /** Contains asymmetric public key */
+        uint8_t pubkey_data[PSA_EXPORT_PUBLIC_KEY_MAX_SIZE];
+        /*!< Contains actual size of asymmetric private key */
+        size_t pubkey_data_len;
+    } key;
+} psa_key_pair_slot_t;
+#endif /* PSA_ASYMMETRIC_KEYPAIR_COUNT */
+
 /**
  * @brief   Initializes the allocated key slots and prepares the internal key slot lists.
  */
@@ -164,6 +209,14 @@ void psa_wipe_all_key_slots(void);
  * @return  @ref PSA_ERROR_NOT_SUPPORTED
  */
 psa_status_t psa_get_and_lock_key_slot(psa_key_id_t id, psa_key_slot_t **slot);
+
+/**
+ * @brief   Store a key slot in persistent storage
+ *
+ * @param   slot    Pointer to slot to store in persistent storage
+ * @return  psa_status_t
+ */
+psa_status_t psa_persist_key_slot_in_storage(psa_key_slot_t *slot);
 
 /**
  * @brief   Find a currently empty key slot that is appropriate for the key.

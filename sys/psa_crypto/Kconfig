@@ -20,5 +20,6 @@ rsource "Kconfig.keys"
 
 rsource "psa_se_mgmt/Kconfig"
 rsource "psa_key_slot_mgmt/Kconfig"
+rsource "psa_persistent_storage/Kconfig"
 
 endif # MODULE_PSA_CRYPTO
