@@ -123,12 +123,8 @@ static inline void _set_be_addr(gnrc_lorawan_t *mac, uint8_t *be_addr)
 void gnrc_lorawan_mcps_indication(gnrc_lorawan_t *mac, mcps_indication_t *ind)
 {
     gnrc_netif_t *netif = container_of(mac, gnrc_netif_t, lorawan.mac);
-    gnrc_nettype_t nettype = IS_ACTIVE(CONFIG_GNRC_NETIF_LORAWAN_NETIF_HDR)
-                     ? GNRC_NETTYPE_UNDEF
-                     : GNRC_NETTYPE_LORAWAN;
-    uint32_t demux = IS_ACTIVE(CONFIG_GNRC_NETIF_LORAWAN_NETIF_HDR)
-                     ? GNRC_NETREG_DEMUX_CTX_ALL
-                     : ind->data.port;
+    gnrc_nettype_t nettype = GNRC_NETTYPE_UNDEF;
+    uint32_t demux = GNRC_NETREG_DEMUX_CTX_ALL;
 
     assert(ind->data.port >= LORAMAC_PORT_MIN && ind->data.port <= LORAMAC_PORT_MAX);
 
@@ -141,19 +137,17 @@ void gnrc_lorawan_mcps_indication(gnrc_lorawan_t *mac, mcps_indication_t *ind)
         return;
     }
 
-    if (IS_ACTIVE(CONFIG_GNRC_NETIF_LORAWAN_NETIF_HDR)) {
-        gnrc_pktsnip_t *netif_snip = gnrc_netif_hdr_build(NULL, 0,
-                                                          &ind->data.port,
-                                                          sizeof(ind->data.port));
-        if (netif_snip == NULL) {
-            DEBUG("gnrc_lorawan_netif: no space left in packet buffer\n");
-            goto release;
-        }
-
-        gnrc_netif_hdr_t *hdr = netif_snip->data;
-        gnrc_netif_hdr_set_netif(hdr, netif);
-        pkt = gnrc_pkt_append(pkt, netif_snip);
+    gnrc_pktsnip_t *netif_snip = gnrc_netif_hdr_build(NULL, 0,
+                                                      &ind->data.port,
+                                                      sizeof(ind->data.port));
+    if (netif_snip == NULL) {
+        DEBUG("gnrc_lorawan_netif: no space left in packet buffer\n");
+        goto release;
     }
+
+    gnrc_netif_hdr_t *hdr = netif_snip->data;
+    gnrc_netif_hdr_set_netif(hdr, netif);
+    pkt = gnrc_pkt_append(pkt, netif_snip);
 
     if (!gnrc_netapi_dispatch_receive(nettype, demux, pkt)) {
         DEBUG("gnrc_lorawan_netif: unable to forward packet\n");
@@ -363,6 +357,8 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *payload)
 {
+    gnrc_netif_hdr_t *netif_hdr;
+    const uint8_t *dst;
     mlme_request_t mlme_request;
     mlme_confirm_t mlme_confirm;
 
@@ -371,26 +367,18 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *payload)
 
     assert(payload);
 
-    if (IS_ACTIVE(CONFIG_GNRC_NETIF_LORAWAN_NETIF_HDR)) {
-        gnrc_netif_hdr_t *netif_hdr;
-        const uint8_t *dst;
-        netif_hdr = payload->data;
-        dst = gnrc_netif_hdr_get_dst_addr(netif_hdr);
+    netif_hdr = payload->data;
+    dst = gnrc_netif_hdr_get_dst_addr(netif_hdr);
 
-        assert(payload->type == GNRC_NETTYPE_NETIF);
-        port = dst[0];
+    assert(payload->type == GNRC_NETTYPE_NETIF);
+    port = dst[0];
 
-        if (netif_hdr->dst_l2addr_len != sizeof(port)) {
-            goto end;
-        }
-
-        /* Remove the netif hdr snip and point to the MSDU */
-        payload = gnrc_pktbuf_remove_snip(payload, payload);
-
+    if (netif_hdr->dst_l2addr_len != sizeof(port)) {
+        goto end;
     }
-    else {
-        port = netif->lorawan.port;
-    }
+
+    /* Remove the netif hdr snip and point to the MSDU */
+    payload = gnrc_pktbuf_remove_snip(payload, payload);
 
     if (netif->lorawan.flags & GNRC_NETIF_LORAWAN_FLAGS_LINK_CHECK) {
         mlme_request.type = MLME_LINK_CHECK;
