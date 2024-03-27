@@ -34,6 +34,8 @@
 
 #include "can/can_trx.h"
 
+#define SHELL_BUFSIZE   512 /* Needed for CAN FD frame */
+
 #ifdef MODULE_TJA1042
 #include "tja1042.h"
 tja1042_trx_t tja1042 = { .trx.driver = &tja1042_driver,
@@ -136,7 +138,7 @@ static int _send(int argc, char **argv, bool rtr)
         print_usage();
         return 1;
     }
-    struct can_frame frame;
+    can_frame_t frame;
     int ifnum = strtol(argv[2], NULL, 0);
     if (ifnum >= CAN_DLL_NUMOF) {
         puts("Invalid interface number");
@@ -145,25 +147,28 @@ static int _send(int argc, char **argv, bool rtr)
 
     if (rtr) {
         frame.can_id = CAN_RTR_FLAG | strtoul(argv[3], NULL, 16);
-        frame.can_dlc = strtoul(argv[4], NULL, 10);
+        frame.len = strtoul(argv[4], NULL, 10);
     } else {
         frame.can_id = strtoul(argv[3], NULL, 16);
-        frame.can_dlc = argc - 4;
+        frame.len = argc - 4;
     }
-    if (frame.can_dlc > 8) {
+    if (frame.len > DEFAULT_CAN_MAX_DLEN) {
         puts("Invalid length");
         return 1;
     }
 
     if (rtr) {
-        for (int i = 0; i < frame.can_dlc; i++) {
+        for (int i = 0; i < frame.len; i++) {
             frame.data[i] = 0x0;
         }
     } else {
-        for (int i = 0; i < frame.can_dlc; i++) {
+        for (int i = 0; i < frame.len; i++) {
             frame.data[i] = strtol(argv[4 + i], NULL, 16);
         }
     }
+#ifdef MODULE_FDCAN
+    frame.flags |= CANFD_BRS | CANFD_FDF;
+#endif
 
     conn_can_raw_t conn;
     conn_can_raw_create(&conn, NULL, 0, ifnum, 0);
@@ -593,7 +598,7 @@ static int _can_handler(int argc, char **argv)
 static void *_receive_thread(void *args)
 {
     int thread_nb = (intptr_t)args;
-    struct can_frame frame;
+    can_frame_t frame;
     msg_t msg, msg_queue[RECEIVE_THREAD_MSG_QUEUE_SIZE];
 
     /* setup the device layers message queue */
@@ -609,13 +614,13 @@ static void *_receive_thread(void *args)
             int ret;
             while ((ret = conn_can_raw_recv(&conn[thread_nb], &frame,
                    msg.content.value))
-                   == sizeof(struct can_frame)) {
+                   == sizeof(can_frame_t)) {
                 printf("%d: %-8s %" PRIx32 "  [%x] ",
                        thread_nb,
                        raw_can_get_name_by_ifnum(conn[thread_nb].ifnum),
                        frame.can_id,
-                       frame.can_dlc);
-                for (int i = 0; i < frame.can_dlc; i++) {
+                       frame.len);
+                for (int i = 0; i < frame.len; i++) {
                     printf(" %02X", frame.data[i]);
                 }
                 printf("\n");
@@ -736,8 +741,8 @@ int main(void)
                                        (void*)i, "receive_thread");
     }
 
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    char line_buf[SHELL_BUFSIZE];
+    shell_run(_commands, line_buf, SHELL_BUFSIZE);
 
     return 0;
 }
