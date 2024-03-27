@@ -178,7 +178,7 @@ static int _addrstr2remote(const char *addr_str, sock_udp_ep_t *remote)
     }
 
     if (remote->port == 0) {
-        if (IS_USED(MODULE_GCOAP_DTLS)) {
+        if (IS_USED(MODULE_GCOAP_DTLS) || IS_USED(MODULE_COAP_COAPS_PROXY)) {
             remote->port = CONFIG_GCOAPS_PORT;
         }
         else {
@@ -344,13 +344,22 @@ int gcoap_cli_cmd(int argc, char **argv)
 #endif
             inet_ntop(remote.family, &remote.addr, addrstr, sizeof(addrstr));
 
-            if (remote.family == AF_INET6) {
-                uri_len = snprintf(proxy_uri, sizeof(proxy_uri), "coap://[%s]:%d%s",
-                                   addrstr, remote.port, uri);
-            }
-            else {
-                uri_len = snprintf(proxy_uri, sizeof(proxy_uri), "coap://%s:%d%s",
-                                   addrstr, remote.port, uri);
+            if (IS_USED(MODULE_COAP_COAPS_PROXY)) {
+                if (remote.family == AF_INET6) {
+                    uri_len = snprintf(proxy_uri, sizeof(proxy_uri), "coaps://[%s]:%d%s",
+                           addrstr, remote.port, uri);
+                } else {
+                    uri_len = snprintf(proxy_uri, sizeof(proxy_uri), "coaps://%s:%d%s",
+                           addrstr, remote.port, uri);
+                }
+            } else {
+                if (remote.family == AF_INET6) {
+                    uri_len = snprintf(proxy_uri, sizeof(proxy_uri), "coap://[%s]:%d%s",
+                           addrstr, remote.port, uri);
+                } else {
+                    uri_len = snprintf(proxy_uri, sizeof(proxy_uri), "coap://%s:%d%s",
+                           addrstr, remote.port, uri);
+                }
             }
 
             uri = proxy_uri;

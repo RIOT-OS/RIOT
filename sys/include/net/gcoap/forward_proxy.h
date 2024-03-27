@@ -50,6 +50,20 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief Stack size for the forward proxy thread
+ *
+ */
+#define PROXY_STACK_SIZE (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE \
+                          + sizeof(coap_pkt_t) + GCOAP_DTLS_EXTRA_STACKSIZE)
+
+/**
+ * @brief Definition of forward proxy thread msgs.
+ */
+enum {
+    FORWARD_PROXY_MSG_SEND,
+};
+
+/**
  * @brief Registers a listener for forward proxy operation
  */
 void gcoap_forward_proxy_init(void);

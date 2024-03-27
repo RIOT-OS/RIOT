@@ -75,6 +75,11 @@ ifeq (1,$(GCOAP_ENABLE_DTLS))
   USEMODULE += prng_sha1prng
 endif
 
+COAP_COAPS_PROXY_ENABLE ?= 0
+ifeq (1,$(COAP_COAPS_PROXY_ENABLE))
+  USEMODULE += coap_coaps_proxy
+endif
+
 # Instead of simulating an Ethernet connection, we can also simulate
 # an IEEE 802.15.4 radio using ZEP
 USE_ZEP ?= 0
