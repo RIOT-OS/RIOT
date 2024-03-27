@@ -765,6 +765,6 @@ static ssize_t _send(const void *buf, size_t len, const sock_udp_ep_t *remote,
     if (lock_resp_wait) {
         mutex_lock(&context->resp_wait);
     }
-    return gcoap_req_send_tl(buf, len, remote, _resp_handler, context, tl_type);
+    return gcoap_req_send(buf, len, remote, _resp_handler, context, tl_type);
 }
 /** @} */

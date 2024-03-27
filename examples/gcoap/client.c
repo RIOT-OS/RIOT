@@ -146,7 +146,8 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
 
             int len = coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
             gcoap_req_send((uint8_t *)pdu->hdr, len, remote,
-                           _resp_handler, memo->context);
+                           _resp_handler, memo->context,
+                           GCOAP_SOCKET_TYPE_UNDEF);
         }
         else {
             puts("--- blockwise complete ---");
@@ -158,7 +159,8 @@ static size_t _send(uint8_t *buf, size_t len, sock_udp_ep_t *remote)
 {
     size_t bytes_sent;
 
-    bytes_sent = gcoap_req_send(buf, len, remote, _resp_handler, NULL);
+    bytes_sent = gcoap_req_send(buf, len, remote, _resp_handler, NULL,
+                                GCOAP_SOCKET_TYPE_UNDEF);
     if (bytes_sent > 0) {
         req_count++;
     }
