@@ -19,6 +19,7 @@
 #include "periph/can.h"
 #include "can/device.h"
 #include "can_params.h"
+#include "periph_conf.h"
 
 #define CANDEV_NUMOF (ARRAY_SIZE(candev_params))
 
