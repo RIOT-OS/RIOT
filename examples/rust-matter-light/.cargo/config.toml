@@ -1,0 +1,7 @@
+[env]
+RIOTBUILD_CONFIG_HEADER_C = { value = "bin/native64/riotbuild/riotbuild.h", relative = true }
+RIOT_COMPILE_COMMANDS_JSON = { value = "bin/native64/cargo-compile-commands.json", relative = true }
+
+[build]
+target = "i686-unknown-linux-gnu"
+message-format = "json"
