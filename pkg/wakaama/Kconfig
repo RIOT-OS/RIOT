@@ -4,13 +4,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_USEPKG_WAKAAMA
-    bool "Configure Wakaama LwM2M"
+menu "Wakaama LwM2M"
     depends on USEPKG_WAKAAMA
-    help
-        Configure Wakaama package via Kconfig.
-
-if KCONFIG_USEPKG_WAKAAMA
 
 menu "Remote server"
 
@@ -128,4 +123,4 @@ config LWM2M_TLSF_BUFFER
 
 rsource "contrib/objects/Kconfig"
 
-endif # KCONFIG_USEPKG_WAKAAMA
+endmenu # Wakaama LwM2M

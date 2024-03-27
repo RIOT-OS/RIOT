@@ -1,2 +1,0 @@
-# disable native GPIOs for automatic test
-CONFIG_MODULE_PERIPH_GPIO_MOCK=y

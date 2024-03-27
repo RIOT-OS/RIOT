@@ -7,26 +7,6 @@
 
 config CPU_ARCH_NATIVE
     bool
-    select HAS_ARCH_32BIT if BOARD_NATIVE
-    select HAS_ARCH_64BIT if BOARD_NATIVE64
-    select HAS_ARCH_NATIVE
-    select HAS_CPP
-    select HAS_CPU_NATIVE
-    select HAS_LIBSTDCPP
-    select HAS_PERIPH_CPUID
-    select HAS_PERIPH_EEPROM
-    select HAS_PERIPH_FLASHPAGE
-    select HAS_PERIPH_FLASHPAGE_PAGEWISE
-    select HAS_PERIPH_HWRNG
-    select HAS_PERIPH_PM
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_TIMER_PERIODIC
-    select HAS_SSP
-    select HAVE_MTD_NATIVE
-
-    # needed modules
-    select MODULE_PERIPH if TEST_KCONFIG
-    select MODULE_NATIVE_CLI_EUI_PROVIDER if MODULE_EUI_PROVIDER
 
 config CPU_CORE_NATIVE
     bool
@@ -42,25 +22,9 @@ config CPU_MODEL_NATIVE
     select NATIVE_OS_LINUX if "$(OS)" = "Linux"
     select NATIVE_OS_FREEBSD if "$(OS)" = "FreeBSD"
 
-## Declaration of specific features
-config HAS_ARCH_NATIVE
-    bool
-    help
-        Indicates that the architecture being used is 'native'.
-
-config HAS_CPU_NATIVE
-    bool
-    help
-        Indicates that the cpu being used is 'native'.
-
 ## OS Variants
 config NATIVE_OS_LINUX
     bool
-    select HAS_PERIPH_CAN
-    select HAS_PERIPH_GPIO
-    select HAS_PERIPH_GPIO_IRQ
-    select HAS_PERIPH_SPI
-    select HAS_RUST_TARGET if "$(OS_ARCH)" = "x86_64"
 
 config NATIVE_OS_FREEBSD
     bool
@@ -80,14 +44,3 @@ config CPU_MODEL
 
 config CPU
     default "native" if CPU_MODEL_NATIVE
-
-menu "Native modules"
-    depends on CPU_ARCH_NATIVE
-
-rsource "backtrace/Kconfig"
-rsource "cli_eui_provider/Kconfig"
-
-endmenu # Native modules
-
-rsource "periph/Kconfig"
-rsource "vfs/Kconfig"

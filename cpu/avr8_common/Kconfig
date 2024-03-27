@@ -8,18 +8,6 @@
 
 config CPU_ARCH_AVR8
     bool
-    select HAS_ARCH_8BIT
-    select HAS_ARCH_AVR8
-    select HAS_PERIPH_PM
-
-    select MODULE_AVR8_COMMON_PERIPH if TEST_KCONFIG
-    select MODULE_PM_LAYERED if TEST_KCONFIG
-    select MODULE_MALLOC_THREAD_SAFE if TEST_KCONFIG
-    select MODULE_TINY_STRERROR_AS_STRERROR if TEST_KCONFIG
-    # static C++ constructors need guards for thread safe initialization
-    select MODULE_CXX_CTOR_GUARDS if MODULE_CPP
-    # new and delete operators needed
-    select MODULE_CPP_NEW_DELETE if MODULE_CPP
 
 ## Common CPU symbols
 config CPU_ARCH
@@ -27,34 +15,3 @@ config CPU_ARCH
 
 config CPU_CORE
     default "avr" if CPU_CORE_AVR
-
-## Declaration of specific features
-config HAS_ARCH_AVR8
-    bool
-    help
-        Indicates that the current architecture is Atmel AVR8.
-
-if CPU_ARCH_AVR8
-
-config MODULE_AVR8_COMMON
-    bool
-    depends on TEST_KCONFIG
-    default y
-    help
-        AVR-8 common code.
-
-    config MODULE_AVR8_COMMON_PERIPH
-    bool
-    depends on TEST_KCONFIG
-    default y
-    help
-        Common peripheral drivers used across different AVR-8 MCU families.
-
-# the atmel port uses stdio_uart by default
-choice STDIO_IMPLEMENTATION
-    default MODULE_STDIO_UART
-endchoice
-
-endif # CPU_ARCH_AVR8
-
-rsource "avr_libc_extra/Kconfig"

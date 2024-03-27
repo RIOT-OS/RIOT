@@ -5,11 +5,8 @@
 # directory for more details.
 #
 
-menuconfig KCONFIG_USEMODULE_GNRC_RPL
-    bool "Configure RPL routing protocol"
+menu "RPL routing protocol"
     depends on USEMODULE_GNRC_RPL
-
-if KCONFIG_USEMODULE_GNRC_RPL
 
 menu "Trickle parameters"
 
@@ -151,4 +148,4 @@ config GNRC_RPL_MSG_QUEUE_SIZE_EXP
         represents the exponent of 2^n, which will be used as the size of
         the queue.
 
-endif # KCONFIG_USEMODULE_GNRC_RPL
+endmenu # RPL routing protocol

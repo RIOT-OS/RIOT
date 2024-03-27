@@ -5,13 +5,7 @@
 # directory for more details.
 #
 
-menuconfig MODULE_SHELL_LOCK
-    bool "Shell Locking module"
-    depends on TEST_KCONFIG
-    select MODULE_ZTIMER
-    select MODULE_ZTIMER_MSEC
-
-if MODULE_SHELL_LOCK
+if USEMODULE_SHELL_LOCK
 
 config SHELL_LOCK_PASSWORD
     string "Lock password"
@@ -21,9 +15,4 @@ config SHELL_LOCK_AUTO_LOCK_TIMEOUT_MS
     int "Timeout in ms before automatic locking"
     default 7000
 
-endif # MODULE_SHELL_LOCK
-
-config MODULE_SHELL_LOCK_AUTO_LOCKING
-    bool "Automatic locking of the shell"
-    depends on TEST_KCONFIG
-    select MODULE_SHELL_LOCK
+endif # USEMODULE_SHELL_LOCK

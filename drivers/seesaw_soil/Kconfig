@@ -6,26 +6,8 @@
 # directory for more details.
 #
 
-config MODULE_SEESAW_SOIL
-    bool "Adafruit Seesaw Soil Moisture and Temperature Sensor"
-    depends on HAS_PERIPH_I2C
-    depends on TEST_KCONFIG
-    select MODULE_PERIPH_I2C
-    select MODULE_XTIMER
-
-config HAVE_SEESAW_SOIL
-    bool
-    select MODULE_SEESAW_SOIL if MODULE_SAUL_DEFAULT
-    help
-      Indicates that a Adafruit Seesaw Soil Moisture and Temperature Sensor is present.
-
-menuconfig KCONFIG_MODULE_SEESAW_SOIL
-    bool "Configure SEESAW_SOIL driver"
-    depends on MODULE_SEESAW_SOIL
-    help
-        Configure the SEESAW_SOIL driver using Kconfig.
-
-if KCONFIG_MODULE_SEESAW_SOIL
+menu "SEESAW_SOIL driver"
+    depends on USEMODULE_SEESAW_SOIL
 
 config SEESAW_SOIL_I2C_ADDRESS
     hex "I2C default address"
@@ -35,4 +17,4 @@ config SEESAW_SOIL_I2C_ADDRESS
         SEESAW_SOIL allows for up to 4 devices on single bus. The value depends on
         the state of AD1 and AD0 pins.
 
-endif # KCONFIG_MODULE_SEESAW_SOIL
+endmenu # SEESAW_SOIL driver

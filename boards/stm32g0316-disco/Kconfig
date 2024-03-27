@@ -12,9 +12,3 @@ config  BOARD_STM32G0316_DISCO
     bool
     default y
     select CPU_MODEL_STM32G031J6
-
-    # Put defined MCU peripherals here (in alphabetical order)
-    select HAS_PERIPH_GPIO
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART

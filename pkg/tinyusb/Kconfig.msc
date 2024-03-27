@@ -5,10 +5,7 @@
 # directory for more details.
 #
 
-menuconfig MODULE_TINYUSB_CLASS_MSC
-    bool "Mass Storage Class (MSC)"
-
-if MODULE_TINYUSB_CLASS_MSC && MODULE_TINYUSB_DEVICE
+if USEMODULE_TINYUSB_CLASS_MSC && USEMODULE_TINYUSB_DEVICE
 
 config TUSBD_MSC_NUMOF
     int

@@ -13,9 +13,4 @@ config BOARD_ESP8266_CI
     select BOARD_COMMON_ESP8266
     select CPU_MODEL_ESP8266_ESP_12X
 
-config MODULE_ESP_SW_TIMER
-    default y
-    depends on TEST_KCONFIG
-    depends on MODULE_PERIPH_TIMER
-
 source "$(RIOTBOARD)/common/esp8266/Kconfig"

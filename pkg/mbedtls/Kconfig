@@ -4,12 +4,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-menuconfig KCONFIG_USEPKG_MBEDTLS
-    bool "Configure mbed TLS"
-    help
-        Configure mbed TLS using Kconfig.
-
-if KCONFIG_USEPKG_MBEDTLS
+menu "mbed TLS"
+    depends on USEPKG_MBEDTLS
 
 config MBEDTLS_SELF_TEST
     bool "Enable the checkup functions (*_self_test)"
@@ -63,4 +59,4 @@ config MBEDTLS_THREADING_ALT
 
 rsource "contrib/entropy/Kconfig"
 
-endif # KCONFIG_USEPKG_MBEDTLS
+endmenu # mbed TLS

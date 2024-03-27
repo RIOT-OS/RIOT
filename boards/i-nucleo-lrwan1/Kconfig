@@ -13,18 +13,6 @@ config BOARD_I_NUCLEO_LRWAN1
     default y
     select CPU_MODEL_STM32L052T8
 
-    # Put defined MCU peripherals here (in alphabetical order)
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_LPUART
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_SPI_GPIO_MODE
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-
-    select MODULE_PERIPH_LPUART if MODULE_STDIO_UART && HAS_PERIPH_LPUART
-
     # Clock configuration
     select BOARD_HAS_LSE
 

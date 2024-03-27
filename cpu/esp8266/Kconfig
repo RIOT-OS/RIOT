@@ -12,20 +12,6 @@ config CPU_FAM_ESP8266
     bool
     select CPU_COMMON_ESP
     select CPU_CORE_XTENSA_L106
-    select HAS_ARCH_ESP8266
-    select HAS_CPU_ESP8266
-
-    select PACKAGE_ESP8266_SDK if TEST_KCONFIG
-    select MODULE_ESP_SDK if TEST_KCONFIG
-    select MODULE_ESP_IDF_ESP8266 if TEST_KCONFIG
-    select MODULE_ESP_IDF_NVS_FLASH if TEST_KCONFIG
-    select MODULE_ESP_IDF_SPI_FLASH if TEST_KCONFIG
-    select MODULE_ESP_IDF_UTIL if TEST_KCONFIG
-    select MODULE_ESP_IDF_WPA_SUPPLICANT_CRYPTO if TEST_KCONFIG
-    select MODULE_ESP_SDK if TEST_KCONFIG
-    select MODULE_PERIPH_COMMON if TEST_KCONFIG
-    select MODULE_RTT_RTC if HAS_PERIPH_RTT && MODULE_PERIPH_RTC
-    select MODULE_ZTIMER_NO_PERIPH_RTT if MODULE_ESP_WIFI_ANY
 
 ## CPU Models
 config CPU_MODEL_ESP8266EX
@@ -35,17 +21,6 @@ config CPU_MODEL_ESP8266EX
 config CPU_MODEL_ESP8266_ESP_12X
     bool
     select CPU_FAM_ESP8266
-
-## Definition of specific features
-config HAS_ARCH_ESP8266
-    bool
-    help
-        Indicates that the current architecture is ESP8266.
-
-config HAS_CPU_ESP8266
-    bool
-    help
-        Indicates that the current CPU is 'esp8266'.
 
 ## Common CPU symbols
 config CPU_CORE
@@ -62,7 +37,6 @@ config CPU
     default "esp8266" if CPU_FAM_ESP8266
 
 menu "ESP8266 specific configurations"
-    depends on TEST_KCONFIG
     depends on HAS_ARCH_ESP8266
 
     choice
@@ -75,18 +49,6 @@ menu "ESP8266 specific configurations"
             bool "160 MHz"
     endchoice
 
-    config MODULE_ESP_SW_TIMER
-        bool "Use software timer as low-level timer peripheral"
-        depends on MODULE_PERIPH_TIMER
-
-    rsource "sdk/Kconfig"
-    rsource "vendor/Kconfig"
-
 endmenu
 
 source "$(RIOTCPU)/esp_common/Kconfig"
-
-config MODULE_ESP_I2C_SW
-    bool
-    default y if MODULE_PERIPH_I2C
-    select MODULE_PERIPH_I2C_SW

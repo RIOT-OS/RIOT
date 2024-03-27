@@ -4,12 +4,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-menuconfig KCONFIG_USEMODULE_MBEDTLS_ENTROPY
-    bool "Configure mbed TLS mbedtls entropy"
-    help
-        Configure mbed TLS mbedtls entropy using Kconfig.
-
-if KCONFIG_USEMODULE_MBEDTLS_ENTROPY
+menu "mbed TLS mbedtls entropy"
+    depends on USEMODULE_MBEDTLS_ENTROPY
 
 config MBEDTLS_ENTROPY_HARDWARE_ALT
     bool "Let mbed TLS use your own implementation of a hardware entropy collector"
@@ -40,4 +36,4 @@ config MBEDTLS_ENTROPY_FORCE_SHA256
         can be much faster than SHA-512. Use this option if you
         have performance concerns.
 
-endif # KCONFIG_USEMODULE_MBEDTLS_ENTROPY
+endmenu # mbed TLS mbedtls entropy

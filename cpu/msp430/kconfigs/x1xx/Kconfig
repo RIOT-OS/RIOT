@@ -9,7 +9,6 @@
 config CPU_FAM_MSP430_X1XX
     bool
     select CPU_MSP430
-    select HAS_CPU_MSP430_X1XX
 
 ## CPU Models
 config CPU_MODEL_MSP430F1611
@@ -19,12 +18,6 @@ config CPU_MODEL_MSP430F1611
 config CPU_MODEL_MSP430F1612
     bool
     select CPU_FAM_MSP430_X1XX
-
-## Definition of specific features
-config HAS_CPU_MSP430_X1XX
-    bool
-    help
-        Indicates that an 'MSP430 x1xx' cpu is being used.
 
 ## Common CPU symbols
 config CPU_FAM

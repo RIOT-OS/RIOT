@@ -11,18 +11,3 @@ config BOARD_SAMD10_XMINI
     bool
     default y
     select CPU_MODEL_SAMD10D14AU
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_DAC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-    select HAVE_SAUL_GPIO
-
-choice LIBC_IMPLEMENTATION
-    # Use Picolibc to reduce ROM usage
-    default MODULE_PICOLIBC
-endchoice

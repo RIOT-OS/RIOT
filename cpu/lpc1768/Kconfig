@@ -8,21 +8,11 @@
 config CPU_FAM_LPC176X
     bool
     select CPU_CORE_CORTEX_M3
-    select HAS_CORTEXM_MPU
-    select HAS_PERIPH_CPUID
-    select HAS_PERIPH_PM
 
 ## CPU Models
 config CPU_MODEL_LPC1768
     bool
     select CPU_FAM_LPC176X
-    select HAS_CPU_LPC1768
-
-## Declaration of specific features
-config HAS_CPU_LPC1768
-    bool
-    help
-        Indicates that an 'lpc1768' cpu is being used.
 
 ## Common CPU symbols
 config CPU_FAM

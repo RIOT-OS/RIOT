@@ -5,113 +5,8 @@
 # directory for more details.
 #
 
-config HAVE_L3GD20H
-    bool
-    select MODULE_L3GXXXX if MODULE_SAUL_DEFAULT
-    help
-        Indicates that L3GD20H sensor is present.
+if USEMODULE_L3GXXXX
 
-config HAVE_L3GD20
-    bool
-    select MODULE_L3GXXXX if MODULE_SAUL_DEFAULT
-    help
-        Indicates that L3GD20 sensor is present.
-
-config HAVE_L3G4200D_NG
-    bool
-    select MODULE_L3GXXXX if MODULE_SAUL_DEFAULT
-    help
-        Indicates that L3G4200D sensor is present.
-
-config HAVE_A3G4250D
-    bool
-    select MODULE_L3GXXXX if MODULE_SAUL_DEFAULT
-    help
-        Indicates that A3G4250D sensor is present.
-
-config HAVE_I3G4250D
-    bool
-    select MODULE_L3GXXXX if MODULE_SAUL_DEFAULT
-    help
-        Indicates that A3G4250D sensor is present.
-
-config HAVE_L3GXXXX_I2C
-    bool
-
-config HAVE_L3GXXXX_SPI
-    bool
-
-menuconfig MODULE_L3GXXXX
-    bool "L3GXXX 3-axis gyroscope sensor"
-    depends on TEST_KCONFIG
-    help
-        Driver for ST L3GXXXX 3-axis gyroscope sensor family.
-        The driver supports L3GD20H, L3GD20, L3G4200D, I3G4250D and A3G4250D.
-
-if MODULE_L3GXXXX
-
-menu "Sensor variants used"
-
-    config MODULE_L3GD20H
-        bool "L3GD20H"
-        default y if HAVE_L3GD20H
-        default y if !MODULE_L3GD20 && !MODULE_L3G4200D_NG && !MODULE_A3G4250D && !MODULE_I3G4250D
-
-        help
-            Enables the support for L3GD20H.
-
-    config MODULE_L3GD20
-        bool "L3GD20"
-        default y if HAVE_L3GD20
-        help
-            Enables the support for L3GD20.
-
-    config MODULE_L3G4200D_NG
-        bool "L3G4200D"
-        default y if HAVE_L3G4200D_NG
-        help
-            Enables the support for L3G4200D.
-
-    config MODULE_A3G4250D
-        bool "A3G4250D"
-        default y if HAVE_A3G4250D
-        help
-            Enables the support for A3G4250D.
-
-    config MODULE_I3G4250D
-        bool "I3G4250D"
-        default y if HAVE_I3G4250D
-        help
-            Enables the support for I3G4250D.
-
-endmenu
-
-choice
-    bool "Device interface"
-    default MODULE_L3GXXXX_I2C if  HAVE_L3GXXXX_I2C
-    default MODULE_L3GXXXX_SPI if  HAVE_L3GXXXX_SPI
-    help
-        The device can be connected via I2C or SPI, select the right one.
-
-config MODULE_L3GXXXX_I2C
-    bool "I2C"
-    depends on HAS_PERIPH_I2C
-    select MODULE_PERIPH_I2C
-
-config MODULE_L3GXXXX_SPI
-    bool "SPI"
-    depends on HAS_PERIPH_SPI
-    depends on HAS_PERIPH_GPIO
-    select MODULE_PERIPH_SPI
-    select MODULE_PERIPH_GPIO
-
-endchoice
-
-config MODULE_L3GXXXX_LOW_ODR
-    bool "Support of low output data rates"
-    depends on MODULE_L3GD20H
-    help
-        Low data rates are only supported on L3GD20H.
 
 choice
     bool "Output data rate (ODR)"
@@ -122,45 +17,45 @@ choice
         an the cutoff frequency of the LPF2 filter. The cutoff frequency of
         LPF1 is fix for a given output data rate.
 
-config L3GXXXX_ODR_100_12
-    bool "High ODR 100 Hz, LPF2 cutoff 12.5 Hz (LPF1 cutoff 32 Hz)"
-config L3GXXXX_ODR_100_25
-    bool "High ODR 100 Hz, LPF2 cutoff 25 Hz   (LPF1 cutoff 32 Hz)"
-config L3GXXXX_ODR_200_12
-    bool "High ODR 200 Hz, LPF1 cutoff 63.3 Hz, LPF2 cutoff 12.5 Hz"
-config L3GXXXX_ODR_200_25
-    bool "High ODR 200 Hz, LPF1 cutoff 63.3 Hz, LPF2 cutoff 25 Hz"
-config L3GXXXX_ODR_200_50
-    bool "High ODR 200 Hz, LPF1 cutoff 63.3 Hz, LPF2 cutoff 50 Hz"
-config L3GXXXX_ODR_200_70
-    bool "High ODR 200 Hz, LPF1 cutoff 63.3 Hz, LPF2 cutoff 70 Hz"
-config L3GXXXX_ODR_400_20
-    bool "High ODR 400 Hz, LPF1 cutoff 128 Hz,  LPF2 cutoff 20 Hz"
-config L3GXXXX_ODR_400_25
-    bool "High ODR 400 Hz, LPF1 cutoff 128 Hz,  LPF2 cutoff 25 Hz"
-config L3GXXXX_ODR_400_50
-    bool "High ODR 400 Hz, LPF1 cutoff 128 Hz,  LPF2 cutoff 50 Hz"
-config L3GXXXX_ODR_400_110
-    bool "High ODR 400 Hz, LPF1 cutoff 128 Hz,  LPF2 cutoff 110 Hz"
-config L3GXXXX_ODR_800_30
-    bool "High ODR 800 Hz, LPF1 cutoff 211 Hz,  LPF2 cutoff 30 Hz"
-config L3GXXXX_ODR_800_35
-    bool "High ODR 800 Hz, LPF1 cutoff 211 Hz,  LPF2 cutoff 35 Hz"
-config L3GXXXX_ODR_800_50
-    bool "High ODR 800 Hz, LPF1 cutoff 211 Hz,  LPF2 cutoff 50 Hz"
-config L3GXXXX_ODR_800_100
-    bool "High ODR 800 Hz, LPF1 cutoff 211 Hz,  LPF2 cutoff 100 Hz"
+    config L3GXXXX_ODR_100_12
+        bool "High ODR 100 Hz, LPF2 cutoff 12.5 Hz (LPF1 cutoff 32 Hz)"
+    config L3GXXXX_ODR_100_25
+        bool "High ODR 100 Hz, LPF2 cutoff 25 Hz   (LPF1 cutoff 32 Hz)"
+    config L3GXXXX_ODR_200_12
+        bool "High ODR 200 Hz, LPF1 cutoff 63.3 Hz, LPF2 cutoff 12.5 Hz"
+    config L3GXXXX_ODR_200_25
+        bool "High ODR 200 Hz, LPF1 cutoff 63.3 Hz, LPF2 cutoff 25 Hz"
+    config L3GXXXX_ODR_200_50
+        bool "High ODR 200 Hz, LPF1 cutoff 63.3 Hz, LPF2 cutoff 50 Hz"
+    config L3GXXXX_ODR_200_70
+        bool "High ODR 200 Hz, LPF1 cutoff 63.3 Hz, LPF2 cutoff 70 Hz"
+    config L3GXXXX_ODR_400_20
+        bool "High ODR 400 Hz, LPF1 cutoff 128 Hz,  LPF2 cutoff 20 Hz"
+    config L3GXXXX_ODR_400_25
+        bool "High ODR 400 Hz, LPF1 cutoff 128 Hz,  LPF2 cutoff 25 Hz"
+    config L3GXXXX_ODR_400_50
+        bool "High ODR 400 Hz, LPF1 cutoff 128 Hz,  LPF2 cutoff 50 Hz"
+    config L3GXXXX_ODR_400_110
+        bool "High ODR 400 Hz, LPF1 cutoff 128 Hz,  LPF2 cutoff 110 Hz"
+    config L3GXXXX_ODR_800_30
+        bool "High ODR 800 Hz, LPF1 cutoff 211 Hz,  LPF2 cutoff 30 Hz"
+    config L3GXXXX_ODR_800_35
+        bool "High ODR 800 Hz, LPF1 cutoff 211 Hz,  LPF2 cutoff 35 Hz"
+    config L3GXXXX_ODR_800_50
+        bool "High ODR 800 Hz, LPF1 cutoff 211 Hz,  LPF2 cutoff 50 Hz"
+    config L3GXXXX_ODR_800_100
+        bool "High ODR 800 Hz, LPF1 cutoff 211 Hz,  LPF2 cutoff 100 Hz"
 
-if MODULE_L3GXXXX_LOW_ODR
+if USEMODULE_L3GXXXX_LOW_ODR
 
-config L3GXXXX_ODR_12
-    bool "Low ODR 12.5 Hz, LPF1 cutoff 3.9 Hz,  LPF2 not used"
-config L3GXXXX_ODR_25
-    bool "Low ODR 25 Hz,   LPF1 cutoff 7.8 Hz,  LPF2 not used"
-config L3GXXXX_ODR_50
-    bool "Low ODR 50 Hz,   LPF1 cutoff 16 Hz,   LPF2 cutoff 16.6 Hz"
+    config L3GXXXX_ODR_12
+        bool "Low ODR 12.5 Hz, LPF1 cutoff 3.9 Hz,  LPF2 not used"
+    config L3GXXXX_ODR_25
+        bool "Low ODR 25 Hz,   LPF1 cutoff 7.8 Hz,  LPF2 not used"
+    config L3GXXXX_ODR_50
+        bool "Low ODR 50 Hz,   LPF1 cutoff 16 Hz,   LPF2 cutoff 16.6 Hz"
 
-endif # MODULE_L3GXXXX_LOW_ODR
+endif # USEMODULE_L3GXXXX_LOW_ODR
 
 endchoice
 
@@ -172,24 +67,24 @@ choice
         the range and resolution of the sensor's output data. The resolution
         of the output data is about Full Scale/INT16_MAX.
 
-config L3GXXXX_SCALE_245_DPS
-    bool "±245 dps"
-    help
-        The typical sensitivity is 8.75 mdps.
+    config L3GXXXX_SCALE_245_DPS
+        bool "±245 dps"
+        help
+            The typical sensitivity is 8.75 mdps.
 
-if !MODULE_A3G4250D
+if !USEMODULE_A3G4250D
 
-config L3GXXXX_SCALE_500_DPS
-    bool "±500 dps"
-    help
-        The Typical sensitivity is 17.5 mdps.
+    config L3GXXXX_SCALE_500_DPS
+        bool "±500 dps"
+        help
+            The Typical sensitivity is 17.5 mdps.
 
-config L3GXXXX_SCALE_2000_DPS
-    bool "±2000 dps"
-    help
-        The typical sensitivity is 70 mdps.
+    config L3GXXXX_SCALE_2000_DPS
+        bool "±2000 dps"
+        help
+            The typical sensitivity is 70 mdps.
 
-endif # !MODULE_A3G4250D
+endif # !USEMODULE_A3G4250D
 
 endchoice
 
@@ -209,17 +104,17 @@ choice
         sensor data used for interrupt generation if the LPF2 is enabled for
         interrupt generation.
 
-config L3GXXXX_NO_FILTER
-    bool "HPF and LPF2 are not used"
+    config L3GXXXX_NO_FILTER
+        bool "HPF and LPF2 are not used"
 
-config L3GXXXX_HPF_ONLY
-    bool "only HPF is used"
+    config L3GXXXX_HPF_ONLY
+        bool "only HPF is used"
 
-config L3GXXXX_LPF2_ONLY
-    bool "only LPF2 used"
+    config L3GXXXX_LPF2_ONLY
+        bool "only LPF2 used"
 
-config L3GXXXX_HPF_AND_LPF2
-    bool "HPF and LPF2 are used"
+    config L3GXXXX_HPF_AND_LPF2
+        bool "HPF and LPF2 are used"
 
 endchoice
 
@@ -231,22 +126,22 @@ choice
         The high pass filter (HPF) can be used in different modes. Select
         the right one.
 
-config L3GXXXX_HPF_NORMAL
-    bool "Normal mode"
-    help
-        In Normal mode, the HPF is reset by reading REFERENCE register.
+    config L3GXXXX_HPF_NORMAL
+        bool "Normal mode"
+        help
+            In Normal mode, the HPF is reset by reading REFERENCE register.
 
-config L3GXXXX_HPF_REFERENCE
-    bool "Reference mode"
-    help
-        In Reference mode, the output data are the difference to the
-        value written to the REFERENCE register.
+    config L3GXXXX_HPF_REFERENCE
+        bool "Reference mode"
+        help
+            In Reference mode, the output data are the difference to the
+            value written to the REFERENCE register.
 
-config L3GXXXX_HPF_AUTORESET
-    bool "Autoreset mode"
-    help
-        In Autoreset mode, the HPF is automatically reset when a configured
-        interrupt event occurs.
+    config L3GXXXX_HPF_AUTORESET
+        bool "Autoreset mode"
+        help
+            In Autoreset mode, the HPF is automatically reset when a configured
+            interrupt event occurs.
 
 endchoice
 
@@ -262,13 +157,7 @@ config L3GXXXX_HPF_CUTOFF
 
 endif # L3GXXXX_HPF_ONLY || L3GXXXX_HPF_AND_LPF2 || L3GXXXX_INT1_HPF_ONLY || L3GXXXX_INT1_HPF_AND_LPF2
 
-config MODULE_L3GXXXX_FIFO
-    bool "Support for the 32 level FIFO"
-    help
-        The 32 level FIFO is used to collect a number of sensor
-        data samples before the data have to be fetched by the MCU.
-
-if MODULE_L3GXXXX_FIFO
+if USEMODULE_L3GXXXX_FIFO
 
 choice
     bool "FIFO mode"
@@ -278,45 +167,45 @@ choice
         data samples before the data have to be fetched by the MCU. Select
         the right mode of the FIFO.
 
-config L3GXXXX_FIFO_MODE_BYPASS
-    bool "Bypass mode (FIFO is not used)"
-    help
-        The FIFO is not used.
+    config L3GXXXX_FIFO_MODE_BYPASS
+        bool "Bypass mode (FIFO is not used)"
+        help
+            The FIFO is not used.
 
-config L3GXXXX_FIFO_MODE_FIFO
-    bool "FIFO mode"
-    help
-        Data samples are stored in the FIFO until it is full.
+    config L3GXXXX_FIFO_MODE_FIFO
+        bool "FIFO mode"
+        help
+            Data samples are stored in the FIFO until it is full.
 
-config L3GXXXX_FIFO_MODE_STREAM
-    bool "Stream mode"
-    help
-        The FIFO is used as ring buffer and newest data samples are stored.
-        continuously
+    config L3GXXXX_FIFO_MODE_STREAM
+        bool "Stream mode"
+        help
+            The FIFO is used as ring buffer and newest data samples are stored.
+            continuously
 
-config L3GXXXX_FIFO_MODE_DYNAMIC_STREAM
-    bool "Dynamic Stream mode"
-    help
-        Like the Stream mode, but differs in reading the first data sample
-        after emptying.
+    config L3GXXXX_FIFO_MODE_DYNAMIC_STREAM
+        bool "Dynamic Stream mode"
+        help
+            Like the Stream mode, but differs in reading the first data sample
+            after emptying.
 
-config L3GXXXX_FIFO_MODE_STREAM_TO_FIFO
-    bool "Stream-to-FIFO mode"
-    help
-        The FIFO is used in stream mode until an event interrupt is triggered
-        and then switches to FIFO mode.
+    config L3GXXXX_FIFO_MODE_STREAM_TO_FIFO
+        bool "Stream-to-FIFO mode"
+        help
+            The FIFO is used in stream mode until an event interrupt is triggered
+            and then switches to FIFO mode.
 
-config L3GXXXX_FIFO_MODE_BYPASS_TO_STREAM
-    bool "Bypass-to-Stream mode"
-    help
-        The FIFO is not used until an event interrupt is triggered
-        and then switches to Stream mode
+    config L3GXXXX_FIFO_MODE_BYPASS_TO_STREAM
+        bool "Bypass-to-Stream mode"
+        help
+            The FIFO is not used until an event interrupt is triggered
+            and then switches to Stream mode
 
-config L3GXXXX_FIFO_MODE_BYPASS_TO_FIFO
-    bool "Bypass-to-FIFO mode"
-    help
-        The FIFO is not used until an event interrupt is triggered
-        and then switches to FIFO mode.
+    config L3GXXXX_FIFO_MODE_BYPASS_TO_FIFO
+        bool "Bypass-to-FIFO mode"
+        help
+            The FIFO is not used until an event interrupt is triggered
+            and then switches to FIFO mode.
 
 endchoice
 
@@ -330,17 +219,9 @@ config L3GXXXX_FIFO_WATERMARK
         is set and an interrupt can be triggered on signal INT2/DRDY if data
         ready and FIFO status interrupts is enabled.
 
-endif # MODULE_L3GXXXX_FIFO
+endif # USEMODULE_L3GXXXX_FIFO
 
-config MODULE_L3GXXXX_IRQ_EVENT
-    bool "Support for event interrupts on signal INT1"
-    depends on HAS_PERIPH_GPIO_IRQ
-    select MODULE_PERIPH_GPIO_IRQ
-    help
-        Event interrupts on signal INT2/DRDY can be used to recognize
-        axes movements or wake-up.
-
-if MODULE_L3GXXXX_IRQ_EVENT
+if USEMODULE_L3GXXXX_IRQ_EVENT
 
 config L3GXXXX_INT1_X_THRESH
     int "Threshold for X axis events"
@@ -411,17 +292,17 @@ choice
         for interrupt generation, it is also active for filtering the
         output data if the LPF2 is enabled for output data.
 
-config L3GXXXX_INT1_NO_FILTER
-    bool "HPF and LPF2 are not used"
+    config L3GXXXX_INT1_NO_FILTER
+        bool "HPF and LPF2 are not used"
 
-config L3GXXXX_INT1_HPF_ONLY
-    bool "only HPF is used"
+    config L3GXXXX_INT1_HPF_ONLY
+        bool "only HPF is used"
 
-config L3GXXXX_INT1_LPF2_ONLY
-    bool "only LPF2 used"
+    config L3GXXXX_INT1_LPF2_ONLY
+        bool "only LPF2 used"
 
-config L3GXXXX_INT1_HPF_AND_LPF2
-    bool "HPF and LPF2 are used"
+    config L3GXXXX_INT1_HPF_AND_LPF2
+        bool "HPF and LPF2 are used"
 
 endchoice
 
@@ -439,21 +320,6 @@ config L3GXXXX_INT1_LATCH
         If enabled, the interrupt is latched until the interrupt source has
         been read.
 
-endif # MODULE_L3GXXXX_IRQ_EVENT
+endif # USEMODULE_L3GXXXX_IRQ_EVENT
 
-config MODULE_L3GXXXX_IRQ_DATA
-    bool "Support for data interrupts on signal INT2/DRDY (Data Ready and FIFO status)"
-    depends on HAS_PERIPH_GPIO_IRQ
-    select MODULE_PERIPH_GPIO_IRQ
-    help
-        Data ready and FIFO status interrupts on signal INT2/DRDY
-        can be used to determine when data are ready to be read or when the
-        status of the FIFO changes.
-
-config MODULE_L3GXXXX_SLEEP
-    bool "Support for sleep and wake-up function"
-
-config MODULE_L3GXXXX_CONFIG
-    bool "Support for configuration of the sensor at runtime"
-
-endif # MODULE_L3GXXXX
+endif # USEMODULE_L3GXXXX

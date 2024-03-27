@@ -12,12 +12,5 @@ config BOARD_PINETIME
     default y
     select BOARD_COMMON_NRF52
     select CPU_MODEL_NRF52832XXAA
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_SPI
-    select HAS_VDD_LC_FILTER_REG1
-
-    select HAVE_CST816S
-    select HAVE_ILI9341
-    select HAVE_MTD_SPI_NOR
 
 source "$(RIOTBOARD)/common/nrf52/Kconfig"

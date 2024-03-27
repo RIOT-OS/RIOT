@@ -11,9 +11,3 @@ config BOARD_MBED_LPC1768
     bool
     default y
     select CPU_MODEL_LPC1768
-    select HAS_PERIPH_GPIO
-    select HAS_PERIPH_GPIO_IRQ
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-
-    select HAVE_SAUL_GPIO

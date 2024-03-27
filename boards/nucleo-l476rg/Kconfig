@@ -14,19 +14,4 @@ config BOARD_NUCLEO_L476RG
     select BOARD_COMMON_NUCLEO64
     select CPU_MODEL_STM32L476RG
 
-    # Put defined MCU peripherals here (in alphabetical order)
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_CAN
-    select HAS_PERIPH_DMA
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-
-    # Put other features for this board (in alphabetical order)
-    select HAS_RIOTBOOT
-
 source "$(RIOTBOARD)/common/nucleo64/Kconfig"

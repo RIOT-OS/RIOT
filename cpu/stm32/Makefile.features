@@ -110,10 +110,3 @@ ifneq (,$(filter $(CPU_MODEL),$(STM32_WITH_MPU)))
 endif
 
 include $(RIOTCPU)/cortexm_common/Makefile.features
-
-# Add stm32 configs after including cortexm_common so stm32 takes precedence
-# This configuration enables modules that are only available when using Kconfig
-# module modelling
-ifeq (1, $(TEST_KCONFIG))
-  KCONFIG_CPU_CONFIG += $(RIOTCPU)/stm32/stm32.config
-endif

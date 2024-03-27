@@ -9,8 +9,6 @@ config BOARD_ARDUINO_DUEMILANOVE
     default y
     select BOARD_COMMON_ARDUINO_ATMEGA
     select CPU_MODEL_ATMEGA328P
-    select MODULE_BOARDS_COMMON_ARDUINO-ATMEGA if TEST_KCONFIG
-    select HAS_ARDUINO_SHIELD_UNO
 
 config BOARD
     default "arduino-duemilanove" if BOARD_ARDUINO_DUEMILANOVE

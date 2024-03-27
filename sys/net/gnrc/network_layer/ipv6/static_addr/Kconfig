@@ -4,13 +4,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_USEMODULE_GNRC_IPV6_STATIC_ADDR
-    bool "Configure static IPv6 addresses and routes"
+menu "Static IPv6 addresses and routes"
     depends on USEMODULE_GNRC_IPV6_STATIC_ADDR
-    help
-        Configure GNRC IPv6 Whitelisting module using Kconfig.
-
-if KCONFIG_USEMODULE_GNRC_IPV6_STATIC_ADDR
 
 config GNRC_IPV6_STATIC_ADDR
     string "Static IPv6 address of the upstream interface"
@@ -31,4 +26,4 @@ config GNRC_IPV6_STATIC_ADDR_DOWNSTREAM
 config GNRC_IPV6_STATIC_DEFAULT_ROUTER
     string "Static IPv6 address of the default router"
 
-endif # KCONFIG_USEMODULE_GNRC_IPV6_STATIC_ADDR
+endmenu # Static IPv6 addresses and routes

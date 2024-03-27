@@ -12,6 +12,5 @@ config BOARD_SODAQ_EXPLORER
     default y
     select BOARD_COMMON_SODAQ
     select CPU_MODEL_SAMD21J18A
-    select MODULE_BOARDS_COMMON_SODAQ if TEST_KCONFIG
 
 source "$(RIOTBOARD)/common/sodaq/Kconfig"

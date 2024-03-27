@@ -13,42 +13,11 @@ config BOARD_STM32F723E_DISCO
     default y
     select CPU_MODEL_STM32F723IE
 
-    # Put defined MCU peripherals here (in alphabetical order)
-    select HAS_PERIPH_FMC
-    select HAS_PERIPH_FMC_16BIT
-    select HAS_PERIPH_FMC_NOR_SRAM
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-    select HAS_PERIPH_UART_HW_FC
-    select HAS_PERIPH_USBDEV
-    select HAS_PERIPH_USBDEV_HS
-    select HAS_PERIPH_USBDEV_HS_UTMI
-
-    # Put other features for this board (in alphabetical order)
-    select HAS_TINYUSB_DEVICE
-
     # Clock configuration
     select BOARD_HAS_HSE
     select BOARD_HAS_LSE
 
-    select HAVE_SAUL_GPIO
-    select HAVE_FT5X06
-    select HAVE_ST7789
-    select HAVE_LCD_PARALLEL_16BIT if MODULE_ST7789
-    select HAVE_LCD_PARALLEL_LL_MCU if MODULE_ST7789
-
-    select MODULE_PERIPH_UART_HW_FC if HAS_PERIPH_UART_HW_FC && MODULE_PERIPH_UART
-    # Workaround due to stdout only working with stdin enabled
-    select MODULE_STDIN if TEST_KCONFIG
-
 config CLOCK_HSE
     default 25000000
-
-config MODULE_PERIPH_INIT_LED0
-    default n if MODULE_PERIPH_SPI
 
 source "$(RIOTBOARD)/common/stm32/Kconfig"

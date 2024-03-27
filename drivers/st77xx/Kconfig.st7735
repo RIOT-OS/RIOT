@@ -5,15 +5,9 @@
 # directory for more details.
 #
 
-if MODULE_ST77XX
+if USEMODULE_ST77XX
 
-config MODULE_ST7735
-    bool "ST7735 display"
-    default y if !MODULE_ST7789 && !MODULE_ST7796
-    help
-        ST7735 display controller is used
-
-if MODULE_ST7735
+if USEMODULE_ST7735
 
 menuconfig ST7735_CUSTOM_CONFIG
     bool "ST7735 Custom Configuration"
@@ -80,5 +74,5 @@ config ST7735_VGL
         in steps of 2500.
 
 endif # ST7735_CUSTOM_CONFIG
-endif # MODULE_ST7735
-endif # MODULE_ST77XX
+endif # USEMODULE_ST7735
+endif # USEMODULE_ST77XX

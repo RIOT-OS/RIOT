@@ -5,15 +5,4 @@
 # directory for more details.
 #
 
-if TEST_KCONFIG
-
-config MODULE_BOARDS_COMMON_NUCLEO
-    bool
-    default y
-    select HAVE_SAUL_GPIO
-    help
-        stm32 common nucleo code.
-
-endif # TEST_KCONFIG
-
 rsource "../stm32/Kconfig"

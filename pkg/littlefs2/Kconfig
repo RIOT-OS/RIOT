@@ -1,18 +1,4 @@
-menuconfig PACKAGE_LITTLEFS2
-    bool "littlefs v2.x.y file system"
-    depends on TEST_KCONFIG
-
-menuconfig MODULE_LITTLEFS2_FS
-    bool "VFS/MTD Driver"
-    default y
-    depends on PACKAGE_LITTLEFS2
-    select MODULE_VFS
-    select MODULE_MTD
-    help
-        This module attaches littlefs to RIOT by utilizing the MTD and VFS
-        driver.
-
-if MODULE_LITTLEFS2_FS
+if USEMODULE_LITTLEFS2_FS
 
 config LITTLEFS2_LOOKAHEAD_SIZE
     int "Default lookahead size"
@@ -63,4 +49,4 @@ config LITTLEFS2_MIN_BLOCK_SIZE_EXP
         The actual block size may be larger due to device properties.
         The default value (-1) sets the block size to the smalles possible value.
 
-endif # MODULE_LITTLEFS2_FS
+endif # USEMODULE_LITTLEFS2_FS

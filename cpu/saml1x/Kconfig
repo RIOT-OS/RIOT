@@ -9,11 +9,6 @@ config CPU_COMMON_SAML1X
     bool
     select CPU_COMMON_SAM0
     select CPU_CORE_CORTEX_M23
-    select HAS_CPU_SAML1X
-    select HAS_PERIPH_DMA
-    select HAS_PERIPH_GPIO_FAST_READ
-    select HAS_PERIPH_HWRNG
-    select HAS_PERIPH_UART_COLLISION
 
 config CPU_FAM_SAML10
     bool
@@ -22,12 +17,6 @@ config CPU_FAM_SAML10
 config CPU_FAM_SAML11
     bool
     select CPU_COMMON_SAML1X
-
-## Declaration of specific features
-config HAS_CPU_SAML1X
-    bool
-    help
-        Indicates that a 'saml1x' cpu is being used.
 
 ## Common CPU symbols
 config CPU_FAM

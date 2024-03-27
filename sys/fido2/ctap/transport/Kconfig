@@ -4,9 +4,4 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-menuconfig MODULE_FIDO2_CTAP_TRANSPORT
-    bool "FIDO2 CTAP transport"
-    depends on MODULE_FIDO2_CTAP
-    depends on TEST_KCONFIG
-
 rsource "hid/Kconfig"

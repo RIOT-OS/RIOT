@@ -6,19 +6,8 @@
 # directory for more details.
 #
 
-config MODULE_BMX055
-    bool "BMX055 9-axis sensor"
-    depends on HAS_PERIPH_I2C
-    depends on TEST_KCONFIG
-    select MODULE_PERIPH_I2C
-
-menuconfig KCONFIG_USEMODULE_BMX055
-    bool "Configure BMX055 driver"
+menu "BMX055 driver"
     depends on USEMODULE_BMX055
-    help
-        Configure the BMX055 driver using Kconfig.
-
-if KCONFIG_USEMODULE_BMX055
 
 config BMX055_MAG_ADDR_DEFAULT
     hex "I2C Address of magnetometer"
@@ -47,10 +36,4 @@ config BMX055_GYRO_ADDR_DEFAULT
         For more information refer to the section 'Inter-Integrated
         Circuit (I²C)' in the datasheet.
 
-endif # KCONFIG_USEMODULE_BMX055
-
-config HAVE_BMX055
-    bool
-    select MODULE_BMX055 if MODULE_SAUL_DEFAULT
-    help
-        Indicates that a BMX055 9-axis sensor is present.
+endmenu # BMX055 driver

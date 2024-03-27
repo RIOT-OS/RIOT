@@ -1,3 +1,0 @@
-config MODULE_CONGURE_MOCK
-    bool "CongURE mock implementation for testing"
-    depends on MODULE_CONGURE

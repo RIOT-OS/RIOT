@@ -11,11 +11,5 @@ config BOARD_PHYNODE_KW41Z
     bool
     default y
     select BOARD_COMMON_KW41Z
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_SPI
-
-    select HAVE_CCS811
-    select HAVE_MMA8X5X
-    select HAVE_TCS37727
 
 source "$(RIOTBOARD)/common/kw41z/Kconfig"

@@ -6,26 +6,8 @@
 # directory for more details.
 #
 
-config MODULE_L3G4200D
-    bool
-    prompt "L3G4200D gyroscope" if !(MODULE_SAUL_DEFAULT && HAVE_L3G4200D)
-    default y if (MODULE_SAUL_DEFAULT && HAVE_L3G4200D)
-    depends on HAS_PERIPH_I2C
-    depends on TEST_KCONFIG
-    select MODULE_PERIPH_I2C
-
-config HAVE_L3G4200D
-    bool
-    help
-        Indicates that a l3g4200d sensor is present.
-
-menuconfig KCONFIG_USEMODULE_L3G4200D
-    bool "Configure L3G4200D driver"
+menu "L3G4200D driver"
     depends on USEMODULE_L3G4200D
-    help
-        Configure the L3G4200D driver using Kconfig.
-
-if KCONFIG_USEMODULE_L3G4200D
 
 config L3G4200D_DEFAULT_ADDRESS
     hex "Default I2C address"
@@ -37,4 +19,4 @@ config L3G4200D_DEFAULT_ADDRESS
         information refer to the section 'I2C Operation' in
         the datasheet.
 
-endif # KCONFIG_USEMODULE_L3G4200D
+endmenu # L3G4200D driver

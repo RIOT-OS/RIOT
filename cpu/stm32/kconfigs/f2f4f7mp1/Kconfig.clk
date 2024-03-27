@@ -45,10 +45,4 @@ config CLOCK_PLL_Q
     default 8
     range 2 15
 
-config HAVE_CLOCK_ALT_48MHZ
-    bool
-    help
-        Indicates this CPU has an alternate clock source that can be used to
-        provide 48 MHz for the USB peripheral.
-
 endif # CPU_FAM_F2 || CPU_FAM_F4 || CPU_FAM_F7 || CPU_FAM_MP1
