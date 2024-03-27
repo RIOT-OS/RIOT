@@ -1054,18 +1054,16 @@ static inline void atomic_clear_bit_u64(atomic_bit_u64_t bit)
 
 /* Provide semi_atomic_*() functions on top.
  *
- * - If atomic_<FOO>() is provided: Use this for semi_atomic_<FOO>() as well
- * - Else:
- *      - If matching `atomic_store_u<BITS>()` is provided: Only make final
- *        store atomic, as we can avoid touching the IRQ state register that
- *        way
- *      - Else: We need to disable and re-enable IRQs anyway, we just use the
- *        fallback implementation of `atomic_<FOO>()` for `semi_atomic<FOO>()`
- *        as well
+ * - If matching `atomic_store_u<BITS>()` is provided: Only make final
+ *   store atomic, as we can avoid touching the IRQ state register that
+ *   way
+ * - Otherwise, we need to disable and re-enable IRQs anyway, we just use the
+ *   fallback implementation of `atomic_<FOO>()` for `semi_atomic<FOO>()`
+ *   as well
  */
 
 /* FETCH_ADD */
-#if defined(HAS_ATOMIC_FETCH_ADD_U8) || !defined(HAS_ATOMIC_STORE_U8)
+#if !defined(HAS_ATOMIC_STORE_U8)
 static inline uint8_t semi_atomic_fetch_add_u8(volatile uint8_t *dest,
                                                uint8_t val)
 {
@@ -1079,9 +1077,9 @@ static inline uint8_t semi_atomic_fetch_add_u8(volatile uint8_t *dest,
     atomic_store_u8(dest, result + val);
     return result;
 }
-#endif /* HAS_ATOMIC_FETCH_ADD_U8 || !HAS_ATOMIC_STORE_U8 */
+#endif /* !HAS_ATOMIC_STORE_U8 */
 
-#if defined(HAS_ATOMIC_FETCH_ADD_U16) || !defined(HAS_ATOMIC_STORE_U16)
+#if !defined(HAS_ATOMIC_STORE_U16)
 static inline uint16_t semi_atomic_fetch_add_u16(volatile uint16_t *dest,
                                                  uint16_t val)
 {
@@ -1095,9 +1093,9 @@ static inline uint16_t semi_atomic_fetch_add_u16(volatile uint16_t *dest,
     atomic_store_u16(dest, result + val);
     return result;
 }
-#endif /* HAS_ATOMIC_FETCH_ADD_U16 || !HAS_ATOMIC_STORE_U16 */
+#endif /* !HAS_ATOMIC_STORE_U16 */
 
-#if defined(HAS_ATOMIC_FETCH_ADD_U32) || !defined(HAS_ATOMIC_STORE_U32)
+#if !defined(HAS_ATOMIC_STORE_U32)
 static inline uint32_t semi_atomic_fetch_add_u32(volatile uint32_t *dest,
                                                  uint32_t val)
 {
@@ -1111,9 +1109,9 @@ static inline uint32_t semi_atomic_fetch_add_u32(volatile uint32_t *dest,
     atomic_store_u32(dest, result + val);
     return result;
 }
-#endif /* HAS_ATOMIC_FETCH_ADD_U32 || !HAS_ATOMIC_STORE_U32 */
+#endif /* !HAS_ATOMIC_STORE_U32 */
 
-#if defined(HAS_ATOMIC_FETCH_ADD_U64) || !defined(HAS_ATOMIC_STORE_U64)
+#if !defined(HAS_ATOMIC_STORE_U64)
 static inline uint64_t semi_atomic_fetch_add_u64(volatile uint64_t *dest,
                                                  uint64_t val)
 {
@@ -1125,10 +1123,10 @@ static inline uint64_t semi_atomic_fetch_add_u64(volatile uint64_t *dest,
 {
     atomic_store_u64(dest, *dest + val);
 }
-#endif /* HAS_ATOMIC_FETCH_ADD_U32 || !HAS_ATOMIC_STORE_U32 */
+#endif /* !HAS_ATOMIC_STORE_U32 */
 
 /* FETCH_SUB */
-#if defined(HAS_ATOMIC_FETCH_SUB_U8) || !defined(HAS_ATOMIC_STORE_U8)
+#if !defined(HAS_ATOMIC_STORE_U8)
 static inline uint8_t semi_atomic_fetch_sub_u8(volatile uint8_t *dest,
                                                uint8_t val)
 {
@@ -1142,9 +1140,9 @@ static inline uint8_t semi_atomic_fetch_sub_u8(volatile uint8_t *dest,
     atomic_store_u8(dest, result - val);
     return result;
 }
-#endif /* HAS_ATOMIC_FETCH_SUB_U8 || !HAS_ATOMIC_STORE_U8 */
+#endif /* !HAS_ATOMIC_STORE_U8 */
 
-#if defined(HAS_ATOMIC_FETCH_SUB_U16) || !defined(HAS_ATOMIC_STORE_U16)
+#if !defined(HAS_ATOMIC_STORE_U16)
 static inline uint16_t semi_atomic_fetch_sub_u16(volatile uint16_t *dest,
                                                  uint16_t val)
 {
@@ -1158,9 +1156,9 @@ static inline uint16_t semi_atomic_fetch_sub_u16(volatile uint16_t *dest,
     atomic_store_u16(dest, result - val);
     return result;
 }
-#endif /* HAS_ATOMIC_FETCH_SUB_U16 || !HAS_ATOMIC_STORE_U16 */
+#endif /* !HAS_ATOMIC_STORE_U16 */
 
-#if defined(HAS_ATOMIC_FETCH_SUB_U32) || !defined(HAS_ATOMIC_STORE_U32)
+#if !defined(HAS_ATOMIC_STORE_U32)
 static inline uint32_t semi_atomic_fetch_sub_u32(volatile uint32_t *dest,
                                                  uint32_t val)
 {
@@ -1174,9 +1172,9 @@ static inline uint32_t semi_atomic_fetch_sub_u32(volatile uint32_t *dest,
     atomic_store_u32(dest, result - val);
     return result;
 }
-#endif /* HAS_ATOMIC_FETCH_SUB_U32 || !HAS_ATOMIC_STORE_U64 */
+#endif /* !HAS_ATOMIC_STORE_U64 */
 
-#if defined(HAS_ATOMIC_FETCH_SUB_U64) || !defined(HAS_ATOMIC_STORE_U64)
+#if !defined(HAS_ATOMIC_STORE_U64)
 static inline uint64_t semi_atomic_fetch_sub_u64(volatile uint64_t *dest,
                                                  uint64_t val)
 {
@@ -1190,10 +1188,10 @@ static inline uint64_t semi_atomic_fetch_sub_u64(volatile uint64_t *dest,
     atomic_store_u64(dest, result - val);
     return result;
 }
-#endif /* HAS_ATOMIC_FETCH_SUB_U64 || !HAS_ATOMIC_STORE_U64 */
+#endif /* !HAS_ATOMIC_STORE_U64 */
 
 /* FETCH_OR */
-#if defined(HAS_ATOMIC_FETCH_OR_U8) || !defined(HAS_ATOMIC_STORE_U8)
+#if !defined(HAS_ATOMIC_STORE_U8)
 static inline uint8_t semi_atomic_fetch_or_u8(volatile uint8_t *dest,
                                               uint8_t val)
 {
@@ -1207,9 +1205,9 @@ static inline uint8_t semi_atomic_fetch_or_u8(volatile uint8_t *dest,
     atomic_store_u8(dest, result | val);
     return result;
 }
-#endif /* HAS_ATOMIC_FETCH_OR_U8 || !HAS_ATOMIC_STORE_U8 */
+#endif /* !HAS_ATOMIC_STORE_U8 */
 
-#if defined(HAS_ATOMIC_FETCH_OR_U16) || !defined(HAS_ATOMIC_STORE_U16)
+#if !defined(HAS_ATOMIC_STORE_U16)
 static inline uint16_t semi_atomic_fetch_or_u16(volatile uint16_t *dest,
                                                 uint16_t val)
 {
@@ -1223,9 +1221,9 @@ static inline uint16_t semi_atomic_fetch_or_u16(volatile uint16_t *dest,
     atomic_store_u16(dest, result | val);
     return result;
 }
-#endif /* HAS_ATOMIC_FETCH_OR_U16 || !HAS_ATOMIC_STORE_U16 */
+#endif /* !HAS_ATOMIC_STORE_U16 */
 
-#if defined(HAS_ATOMIC_FETCH_OR_U32) || !defined(HAS_ATOMIC_STORE_U32)
+#if !defined(HAS_ATOMIC_STORE_U32)
 static inline uint32_t semi_atomic_fetch_or_u32(volatile uint32_t *dest,
                                                 uint32_t val)
 {
@@ -1239,9 +1237,9 @@ static inline uint32_t semi_atomic_fetch_or_u32(volatile uint32_t *dest,
     atomic_store_u32(dest, result | val);
     return result;
 }
-#endif /* HAS_ATOMIC_FETCH_OR_U32 || !HAS_ATOMIC_STORE_U32 */
+#endif /* !HAS_ATOMIC_STORE_U32 */
 
-#if defined(HAS_ATOMIC_FETCH_OR_U64) || !defined(HAS_ATOMIC_STORE_U64)
+#if !defined(HAS_ATOMIC_STORE_U64)
 static inline uint64_t semi_atomic_fetch_or_u64(volatile uint64_t *dest,
                                                 uint64_t val)
 {
@@ -1255,10 +1253,10 @@ static inline uint64_t semi_atomic_fetch_or_u64(volatile uint64_t *dest,
     atomic_store_u64(dest, result | val);
     return result;
 }
-#endif /* HAS_ATOMIC_FETCH_OR_U64 || !HAS_ATOMIC_STORE_U64 */
+#endif /* !HAS_ATOMIC_STORE_U64 */
 
 /* FETCH_XOR */
-#if defined(HAS_ATOMIC_FETCH_XOR_U8) || !defined(HAS_ATOMIC_STORE_U8)
+#if !defined(HAS_ATOMIC_STORE_U8)
 static inline uint8_t semi_atomic_fetch_xor_u8(volatile uint8_t *dest,
                                                uint8_t val)
 {
@@ -1272,9 +1270,9 @@ static inline uint8_t semi_atomic_fetch_xor_u8(volatile uint8_t *dest,
     atomic_store_u8(dest, result ^ val);
     return result;
 }
-#endif /* HAS_ATOMIC_FETCH_XOR_U8 || !HAS_ATOMIC_STORE_U8 */
+#endif /* !HAS_ATOMIC_STORE_U8 */
 
-#if defined(HAS_ATOMIC_FETCH_XOR_U16) || !defined(HAS_ATOMIC_STORE_U16)
+#if !defined(HAS_ATOMIC_STORE_U16)
 static inline uint16_t semi_atomic_fetch_xor_u16(volatile uint16_t *dest,
                                                  uint16_t val)
 {
@@ -1288,9 +1286,9 @@ static inline uint16_t semi_atomic_fetch_xor_u16(volatile uint16_t *dest,
     atomic_store_u16(dest, result ^ val);
     return result;
 }
-#endif /* HAS_ATOMIC_FETCH_XOR_U16 || !HAS_ATOMIC_STORE_U16 */
+#endif /* !HAS_ATOMIC_STORE_U16 */
 
-#if defined(HAS_ATOMIC_FETCH_XOR_U32) || !defined(HAS_ATOMIC_STORE_U32)
+#if !defined(HAS_ATOMIC_STORE_U32)
 static inline uint32_t semi_atomic_fetch_xor_u32(volatile uint32_t *dest,
                                                  uint32_t val)
 {
@@ -1304,9 +1302,9 @@ static inline uint32_t semi_atomic_fetch_xor_u32(volatile uint32_t *dest,
     atomic_store_u32(dest, result ^ val);
     return result;
 }
-#endif /* HAS_ATOMIC_FETCH_XOR_U32 || !HAS_ATOMIC_STORE_U32 */
+#endif /* !HAS_ATOMIC_STORE_U32 */
 
-#if defined(HAS_ATOMIC_FETCH_XOR_U64) || !defined(HAS_ATOMIC_STORE_U64)
+#if !defined(HAS_ATOMIC_STORE_U64)
 static inline uint64_t semi_atomic_fetch_xor_u64(volatile uint64_t *dest,
                                                  uint64_t val)
 {
@@ -1320,10 +1318,10 @@ static inline uint64_t semi_atomic_fetch_xor_u64(volatile uint64_t *dest,
     atomic_store_u64(dest, result ^ val);
     return result;
 }
-#endif /* HAS_ATOMIC_FETCH_XOR_U64 || !HAS_ATOMIC_STORE_U64 */
+#endif /* !HAS_ATOMIC_STORE_U64 */
 
 /* FETCH_AND */
-#if defined(HAS_ATOMIC_FETCH_AND_U8) || !defined(HAS_ATOMIC_STORE_U8)
+#if !defined(HAS_ATOMIC_STORE_U8)
 static inline uint8_t semi_atomic_fetch_and_u8(volatile uint8_t *dest,
                                                uint8_t val)
 {
@@ -1337,9 +1335,9 @@ static inline uint8_t semi_atomic_fetch_and_u8(volatile uint8_t *dest,
     atomic_store_u8(dest, result & val);
     return result;
 }
-#endif /* HAS_ATOMIC_FETCH_AND_U8 || !HAS_ATOMIC_STORE_U8 */
+#endif /* !HAS_ATOMIC_STORE_U8 */
 
-#if defined(HAS_ATOMIC_FETCH_AND_U16) || !defined(HAS_ATOMIC_STORE_U16)
+#if !defined(HAS_ATOMIC_STORE_U16)
 static inline uint16_t semi_atomic_fetch_and_u16(volatile uint16_t *dest,
                                                  uint16_t val)
 {
@@ -1353,9 +1351,9 @@ static inline uint16_t semi_atomic_fetch_and_u16(volatile uint16_t *dest,
     atomic_store_u16(dest, result & val);
     return result;
 }
-#endif /* HAS_ATOMIC_FETCH_AND_U16 || !HAS_ATOMIC_STORE_U16 */
+#endif /* !HAS_ATOMIC_STORE_U16 */
 
-#if defined(HAS_ATOMIC_FETCH_AND_U32) || !defined(HAS_ATOMIC_STORE_U32)
+#if !defined(HAS_ATOMIC_STORE_U32)
 static inline uint32_t semi_atomic_fetch_and_u32(volatile uint32_t *dest,
                                                  uint32_t val)
 {
@@ -1369,9 +1367,9 @@ static inline uint32_t semi_atomic_fetch_and_u32(volatile uint32_t *dest,
     atomic_store_u32(dest, result & val);
     return result;
 }
-#endif /* HAS_ATOMIC_FETCH_AND_U32 || !HAS_ATOMIC_STORE_U32 */
+#endif /* !HAS_ATOMIC_STORE_U32 */
 
-#if defined(HAS_ATOMIC_FETCH_AND_U64) || !defined(HAS_ATOMIC_STORE_U64)
+#if !defined(HAS_ATOMIC_STORE_U64)
 static inline uint64_t semi_atomic_fetch_and_u64(volatile uint64_t *dest,
                                                  uint64_t val)
 {
@@ -1385,7 +1383,7 @@ static inline uint64_t semi_atomic_fetch_and_u64(volatile uint64_t *dest,
     atomic_store_u64(dest, result & val);
     return result;
 }
-#endif /* HAS_ATOMIC_FETCH_AND_U64 || !HAS_ATOMIC_STORE_U64 */
+#endif /* !HAS_ATOMIC_STORE_U64 */
 
 #ifdef __cplusplus
 }
