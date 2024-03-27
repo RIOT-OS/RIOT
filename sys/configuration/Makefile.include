@@ -1,0 +1,14 @@
+USEMODULE_INCLUDES_configuration := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_configuration)
+
+# any backend pseudo module
+PSEUDOMODULES += configuration_backend_%
+
+# use if you want to use custom handlers for import, export, delete, encode, decode
+PSEUDOMODULES += configuration_custom_operations
+
+# use if source backend is unequal to destination backend
+PSEUDOMODULES += configuration_destination_backend
+
+# use if you want to construct a string path for a configuration item
+PSEUDOMODULES += configuration_strings
