@@ -121,6 +121,15 @@ static const adc_conf_t adc_config[] = {
 /** @} */
 
 /**
+ * @name    PWM configuration
+ * @{
+ */
+static const pwm_conf_t pwm_config[] = {{}};
+
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
+/** @} */
+
+/**
  * @name   SPI configuration
  * @{
  */
