@@ -433,6 +433,30 @@ typedef struct {
 } timer_conf_t;
 
 /**
+ * @name   Override I2C clock speed values
+ * @{
+ */
+#define HAVE_I2C_SPEED_T
+typedef enum {
+    I2C_SPEED_LOW       = 0x01,     /**< not supported               */
+    I2C_SPEED_NORMAL    = 100000U,  /**< normal mode:    ~100kbit/s  */
+    I2C_SPEED_FAST      = 400000U,  /**< fast mode:      ~400kbit/s  */
+    I2C_SPEED_FAST_PLUS = 1000000U, /**< fast mode plus: ~1000kbit/s */
+    I2C_SPEED_HIGH      = 0x03,     /**< not supported               */
+} i2c_speed_t;
+/** @} */
+
+/**
+ * @brief   I2C configuration options
+ */
+typedef struct {
+    uint64_t* dev; //device pointer should have better type probably
+    i2c_speed_t speed;      /**< baudrate used for the bus */
+    gpio_t scl;         /**< pin used for SCL */
+    gpio_t sda;         /**< pin used for SDA */
+} i2c_conf_t;
+
+/**
  * @brief   PIO configuration type
  */
 typedef struct {

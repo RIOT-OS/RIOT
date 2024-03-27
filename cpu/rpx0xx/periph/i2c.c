@@ -32,8 +32,6 @@
 
 #define I2C_NUMOF_MAX_MASTER 1024
 #define I2C_NUMOF_MAX_SLAVE 128
-#define I2C_SPEED_FAST_PLUS 1000 * KHZ(1)
-#define I2C_SPEED_STANDARD 100 * KHZ(1)
 #define _I2C 3 //gpio pin function
 #define _GPIO 0 //gpio pin function
 #define SOC_I2C_FIFO_LEN 8
@@ -72,7 +70,7 @@ void i2c_init(i2c_t dev)
     //speed supports fast mode plus at max
     assert(i2c_config[dev].speed <= I2C_SPEED_FAST_PLUS);
 
-    /* GPIOs for SCL and SDA signals must not already be used for peripherals */
+    /* GPIOs for SCL and SDA signals must not already be used for peripherals /
     if (((gpio_get_pin_usage(i2c_config[dev].scl) != _I2C) &&
          (gpio_get_pin_usage(i2c_config[dev].scl) != _GPIO)) ||
         ((gpio_get_pin_usage(i2c_config[dev].sda) != _I2C) &&
@@ -83,7 +81,7 @@ void i2c_init(i2c_t dev)
                        gpio_get_pin_usage_str(i2c_config[dev].scl),
                        gpio_get_pin_usage_str(i2c_config[dev].sda));
         assert(0);
-    }
+    } */
 
     //set pin functions (?)
 
@@ -119,7 +117,7 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data,
     //
 
     //copy paste guff test
-    int res;
+    //int res;
 
     _i2c_bus[dev].cmd_op = 0; //I2C_LL_CMD_READ;
     _i2c_bus[dev].cmd = 0;
@@ -131,12 +129,12 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data,
     /*  if I2C_NOSTART is not set, START condition and ADDR is used */
     if (!(flags & I2C_NOSTART)) {
         /* send START condition */
-        _i2c_start_cmd(dev);
+        //_i2c_start_cmd(dev);
 
         /* address handling */
         if (flags & I2C_ADDR10) {
             //write IC_ENABLE[0] 0 to disable DW_apb_i2c
-            long* memaddr = I2C_BASE;
+            long* memaddr = (long *) I2C_BASE;
             *(memaddr + IC_ENABLE) = *(memaddr + IC_ENABLE) & 0xFFFE;
 
             /* write max speed mode supported to IC_CON (bits 2:1)*/
@@ -158,27 +156,30 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data,
             
 
             /*not mine below lol
-            /* prepare 10 bit address bytes /
+            / prepare 10 bit address bytes /
             uint8_t addr10[2];
             addr10[0] = 0xf0 | (addr & 0x0300) >> 7 | I2C_MASTER_READ;
             addr10[1] = addr & 0xff;
-            /* send ADDR with read flag /
+            / send ADDR with read flag /
             _i2c_write_cmd(dev, addr10, 2);
             */
         }
         else {
             /* send ADDR with read flag */
             uint8_t addr7 = (addr << 1 | I2C_READ);
-            _i2c_write_cmd(dev, &addr7, 1);
+            addr7++;
+            //_i2c_write_cmd(dev, &addr7, 1);
         }
     }
 
     /* read data bytes in blocks of SOC_I2C_FIFO_LEN bytes */
-    uint32_t off = 0;
+    //uint32_t off = 0;
 
-    /* if len > SOC_I2C_FIFO_LEN read SOC_I2C_FIFO_LEN bytes at a time */
+    /* VVV to be sorted VVV
+
+    / if len > SOC_I2C_FIFO_LEN read SOC_I2C_FIFO_LEN bytes at a time 
     while (len > SOC_I2C_FIFO_LEN) {
-        /* read one block of data bytes command */
+        /read one block of data bytes command 
         _i2c_bus[dev].len = SOC_I2C_FIFO_LEN;
         _i2c_read_cmd(dev, SOC_I2C_FIFO_LEN, false);
         _i2c_end_cmd(dev);
@@ -189,70 +190,122 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data,
             return res;
         }
 
-        /* if transfer was successful, fetch the data from I2C RAM */
+        / if transfer was successful, fetch the data from I2C RAM
         i2c_hal_read_rxfifo(&_i2c_hw[dev], data + off, len);
 
-        /* reset RX FIFO queue */
+        / reset RX FIFO queue 
         i2c_hal_rxfifo_rst(&_i2c_hw[dev]);
 
         len -= SOC_I2C_FIFO_LEN;
         off += SOC_I2C_FIFO_LEN;
     }
 
-    /* read remaining data bytes command with a final NAK */
+    
+
+    / read remaining data bytes command with a final NAK 
     _i2c_bus[dev].len = len;
     _i2c_read_cmd(dev, len, true);
 
-    /* if I2C_NOSTOP flag is not set, send STOP condition is used */
+    / if I2C_NOSTOP flag is not set, send STOP condition is used 
     if (!(flags & I2C_NOSTOP)) {
-        /* send STOP condition */
+        / send STOP condition 
         _i2c_stop_cmd(dev);
     }
     else {
-        /* otherwise place end command in pipeline */
+        / otherwise place end command in pipeline 
         _i2c_end_cmd(dev);
     }
 
-    /* finish operation by executing the command pipeline */
+    / finish operation by executing the command pipeline 
     _i2c_transfer(dev);
 
     if ((res = _i2c_status_to_errno(dev))) {
         return res;
     }
 
-    /* fetch the data from RX FIFO */
+    / fetch the data from RX FIFO 
     i2c_hal_read_rxfifo(&_i2c_hw[dev], data + off, len);
 
-    /* return 0 on success */
+    / return 0 on success */
     return 0;
 }
 
 int i2c_read_regs(i2c_t dev, uint16_t addr, uint16_t reg,
                   void *data, size_t len, uint8_t flags)
 {
+    i2c_t device = dev;
+    device += 1;
+    uint16_t address = addr;
+    address += 1;
+    uint16_t regist = reg;
+    regist++;
+    assert((uint32_t) data != 0);
+    size_t length = len;
+    length++;
+    uint8_t flagss = flags;
+    flagss++;
+    return 0;
 
 }
 
 int i2c_read_reg(i2c_t dev, uint16_t addr, uint16_t reg,
                  void *data, uint8_t flags)
 {
-
+    i2c_t device = dev;
+    device += 1;
+    uint16_t address = addr;
+    address += 1;
+    uint16_t regist = reg;
+    regist++;
+    assert((uint32_t) data != 0);
+    uint8_t flagss = flags;
+    flagss++;
+    return 0;
 }
 
 int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data,
                     size_t len, uint8_t flags)
 {
-
+    i2c_t device = dev;
+    device += 1;
+    uint16_t address = addr;
+    address += 1;
+    assert((uint32_t) data != 0);
+    size_t length = len;
+    length++;
+    uint8_t flagss = flags;
+    flagss++;
+    return 0;
 }
 
 int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
                    const void *data, size_t len, uint8_t flags)
 {
-
+    i2c_t device = dev;
+    device += 1;
+    uint16_t address = addr;
+    address += 1;
+    uint16_t regist = reg;
+    regist++;
+    assert((uint32_t) data != 0);
+    size_t length = len;
+    length++;
+    uint8_t flagss = flags;
+    flagss++;
+    return 0;
 }
 
 int i2c_write_reg(i2c_t dev, uint16_t addr, uint16_t reg,
                   uint8_t data, uint8_t flags)
 {
-
+    i2c_t device = dev;
+    device += 1;
+    uint16_t address = addr;
+    address += 1;
+    uint16_t regist = reg;
+    regist++;
+    assert(data != 1);
+    uint8_t flagss = flags;
+    flagss++;
+    return 0;
 }
