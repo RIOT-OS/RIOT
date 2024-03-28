@@ -121,6 +121,37 @@ static const adc_conf_t adc_config[] = {
 /** @} */
 
 /**
+ * @name    PWM configuration
+ * @{
+ *
+ * To find appriopate device and channel find in the MCU datasheet table
+ * concerning "Alternate function AF0 to AF7" a text similar to TIM[X]_CH[Y],
+ * where:
+ * TIM[X] - is device,
+ * [Y] - describes used channel (indexed from 0), for example TIM2_CH1 is
+ * channel 0 in configuration structure (cc_chan - field),
+ * Port column in the table describes connected port.
+ *
+ * For Nucleo-c031c6 this information is in the MCU datasheet, Table 13, page 35.
+ *
+ */
+static const pwm_conf_t pwm_config[] = {
+    {
+        .dev      = TIM3,
+        .rcc_mask = RCC_APBENR1_TIM3EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_B, 5) /*CN9  D6 */, .cc_chan = 1 },
+                      { .pin = GPIO_PIN(PORT_B, 0) /*CN5 D10 */, .cc_chan = 2 },
+                      { .pin = GPIO_PIN(PORT_B, 1) /*CN8  A3 */, .cc_chan = 3 },
+                      { .pin = GPIO_UNDEF,                       .cc_chan = 0 } },
+        .af       = GPIO_AF1,
+        .bus      = APB1
+    },
+};
+
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
+/** @} */
+
+/**
  * @name   SPI configuration
  * @{
  */
