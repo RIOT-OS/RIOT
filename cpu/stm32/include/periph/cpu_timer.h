@@ -58,6 +58,9 @@ typedef struct {
                                  @ref TIMER_CHANNEL_NUMOF */
 } timer_conf_t;
 
+/**
+ * @brief   Configuration of an (external) timer capture input
+ */
 typedef struct {
     gpio_t pin;
 #ifndef CPU_FAM_STM32F1
