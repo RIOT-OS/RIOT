@@ -338,7 +338,7 @@ static uint32_t _type_to_reg(usb_ep_type_t type)
         case USB_EP_TYPE_INTERRUPT:
             return DWC2_USB_OTG_EP_TYPE_INTERRUPT;
         default:
-            assert(false);
+            assert_unreachable();
             return 0;
     }
 }
@@ -355,7 +355,7 @@ static uint32_t _ep0_size(size_t size)
         case 8:
             return DWC2_USB_OTG_EP0_SIZE_8;
         default:
-            assert(false);
+            assert_unreachable();
             return 0x00;
     }
 }
@@ -967,7 +967,7 @@ static void _usbdev_init(usbdev_t *dev)
                     USB_HS_PHYC->USB_HS_PHYC_PLL |= USB_HS_PHYC_PLL1_PLLSEL_25MHZ;
                     break;
                 default:
-                    assert(0);
+                    assert_unreachable();
             }
 
             /* configure the tuning interface of the USB HS PHY */
@@ -1157,7 +1157,7 @@ static usb_speed_t _get_enumeration_speed(const usbdev_t *dev)
         case 0x03:
             return USB_SPEED_FULL;
         default:
-            assert(false); /* reserved values by peripheral */
+            assert_unreachable(); /* reserved values by peripheral */
     }
     return USB_SPEED_FULL; /* Should not be reached */
 }

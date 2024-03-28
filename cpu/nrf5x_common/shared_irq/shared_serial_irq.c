@@ -54,7 +54,7 @@ static size_t _spi_dev2num(void *dev)
     }
 #endif
     else {
-        assert(false);
+        assert_unreachable();
         return 0;
     }
 }
@@ -74,7 +74,7 @@ static inline size_t _i2c_dev2num(void *dev)
         return 3;
     }
     else {
-        assert(false);
+        assert_unreachable();
         return 0;
     }
 }

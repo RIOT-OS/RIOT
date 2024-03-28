@@ -604,7 +604,7 @@ static int _confirm_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
         break;
     case IEEE802154_HAL_OP_CCA:
         /* This shouldn't happen! */
-        assert(false);
+        assert_unreachable();
         break;
     }
 

@@ -68,7 +68,7 @@ static void _scsi_write10(usbus_handler_t *handler, msc_cbw_buf_t *cbw, uint8_t 
     }
     else if (mtd_sector_size > 4096) {
         /* TODO: add support */
-        assert(0);
+        assert_unreachable();
     }
     else {
         msc->block = byteorder_ntohl(pkt->blk_addr);
@@ -222,7 +222,7 @@ static void _scsi_read_capacity(usbus_handler_t *handler, uint8_t lun)
     }
     else {
         DEBUG_PUTS("Unsupported pagesize");
-        assert(0);
+        assert_unreachable();
     }
     /* Report the size of the block (mtd sector size) */
     pkt->blk_len.u32 = byteorder_swapl(block_size);

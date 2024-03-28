@@ -292,7 +292,7 @@ void rtc_mem_read(unsigned offset, void *data, size_t len)
     uint32_t tmp[RTC_GPR_NUM_AVAIL];
 
     if (offset + len > RTC_MEM_SIZE) {
-        assert(0);
+        assert_unreachable();
         return;
     }
 
@@ -305,7 +305,7 @@ void rtc_mem_write(unsigned offset, void *data, size_t len)
     uint32_t tmp[RTC_GPR_NUM_AVAIL];
 
     if (offset + len > RTC_MEM_SIZE) {
-        assert(0);
+        assert_unreachable();
         return;
     }
 

@@ -60,26 +60,26 @@ static void user_init_entry(void *param)
 #endif
 
     if (nvs_flash_init() != 0) {
-        assert(0);
+        assert_unreachable();
     }
     if (wifi_nvs_init() != 0) {
-        assert(0);
+        assert_unreachable();
     }
     if (esp_rtc_init() != 0) {
-        assert(0);
+        assert_unreachable();
     }
     if (mac_init() != 0) {
-        assert(0);
+        assert_unreachable();
     }
     if (base_gpio_init() != 0) {
-        assert(0);
+        assert_unreachable();
     };
 
     esp_phy_load_cal_and_init(0);
 
 #ifdef MODULE_ESP_WIFI_ANY
     if (wifi_timer_init() != 0) {
-        assert(0);
+        assert_unreachable();
     }
 #endif
 
@@ -95,7 +95,7 @@ static void user_init_entry(void *param)
 
 #ifdef CONFIG_ENABLE_PTHREAD
     if (esp_pthread_init() != 0) {
-        assert(0);
+        assert_unreachable();
     }
 #endif
 
@@ -163,7 +163,7 @@ void call_user_start(size_t start_addr)
     wifi_os_init();
 
     if (wifi_task_create(user_init_entry, "uiT", CONFIG_MAIN_TASK_STACK_SIZE, NULL, wifi_task_get_max_priority()) == NULL) {
-        assert(0);
+        assert_unreachable();
     }
 
     wifi_os_start();

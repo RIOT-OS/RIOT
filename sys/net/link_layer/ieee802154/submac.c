@@ -397,7 +397,7 @@ ieee802154_fsm_state_t ieee802154_submac_process_ev(ieee802154_submac_t *submac,
 
     if (new_state == IEEE802154_FSM_STATE_INVALID) {
         _print_debug(submac->fsm_state, new_state, ev);
-        assert(false);
+        assert_unreachable();
     }
     submac->fsm_state = new_state;
     return submac->fsm_state;

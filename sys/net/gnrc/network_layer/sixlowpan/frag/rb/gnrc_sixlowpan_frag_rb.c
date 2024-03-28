@@ -333,7 +333,7 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     }
     else {
         /* either one of the if branches above was taken */
-        assert(data != NULL);
+        assert_unreachable();
         gnrc_pktbuf_release(pkt);
         return RBUF_ADD_ERROR;
     }

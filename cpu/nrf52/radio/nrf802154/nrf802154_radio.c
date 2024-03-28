@@ -242,7 +242,7 @@ static int _request_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
         state = STATE_IDLE;
         break;
     default:
-        assert(false);
+        assert_unreachable();
         state = 0;
         break;
     }
@@ -290,7 +290,7 @@ static int _confirm_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
         break;
     default:
         eagain = false;
-        assert(false);
+        assert_unreachable();
         break;
     }
 
@@ -574,7 +574,7 @@ void isr_radio(void)
             _set_ifs_timer(false);
             break;
         default:
-            assert(false);
+            assert_unreachable();
         }
     }
 

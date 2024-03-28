@@ -56,7 +56,7 @@ void DSMEMessage::copyTo(DSMEMessageElement *msg)
 uint8_t DSMEMessage::getMPDUSymbols()
 {
     /* Not used by OpenDSME */
-    assert(false);
+    assert_unreachable();
     return 0;
 }
 

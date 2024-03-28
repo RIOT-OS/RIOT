@@ -427,7 +427,7 @@ static int _request_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
         res = 0;
         break;
     default:
-        assert(false);
+        assert_unreachable();
     }
 
     return res;
@@ -476,7 +476,7 @@ static int _confirm_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
         }
         break;
     default:
-        assert(false);
+        assert_unreachable();
     }
 
     return res;

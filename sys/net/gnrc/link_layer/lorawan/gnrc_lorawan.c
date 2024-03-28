@@ -222,7 +222,7 @@ void gnrc_lorawan_timeout_cb(gnrc_lorawan_t *mac)
         gnrc_lorawan_event_retrans_timeout(mac);
         break;
     default:
-        assert(false);
+        assert_unreachable();
         break;
     }
 }
@@ -266,7 +266,7 @@ void gnrc_lorawan_radio_rx_timeout_cb(gnrc_lorawan_t *mac)
         mac->state = LORAWAN_STATE_IDLE;
         break;
     default:
-        assert(false);
+        assert_unreachable();
         break;
     }
     _sleep_radio(mac);

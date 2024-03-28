@@ -455,7 +455,7 @@ void dma_setup_ext(dma_t dma, dma_burst_t pburst, dma_burst_t mburst,
                 assert((mburst == DMA_BURST_INCR4) || (mburst == DMA_BURST_INCR8));
                 break;
             default:
-                assert(false);  /* all other combinations are invalid) */
+                assert_unreachable();  /* all other combinations are invalid) */
                 break;
             }
             break;

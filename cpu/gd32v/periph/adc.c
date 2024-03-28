@@ -53,7 +53,7 @@ static inline ADC0_Type *dev(adc_t line)
         return (ADC0_Type *)ADC1_BASE;
 #endif
     default:
-        assert(0);
+        assert_unreachable();
         return NULL;
     }
 }

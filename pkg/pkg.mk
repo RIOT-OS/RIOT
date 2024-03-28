@@ -188,3 +188,5 @@ distclean:: clean
 # Reset goal for package
 .DEFAULT_GOAL =
 endif
+
+CFLAGS += -DCOMPILING_RIOT_PKG_CODE=1

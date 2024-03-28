@@ -113,7 +113,7 @@ static int _sock_sendv(nanocoap_sock_t *sock, const iolist_t *snips)
                                CONFIG_SOCK_DTLS_TIMEOUT_MS);
 #endif
     default:
-        assert(0);
+        assert_unreachable();
         return -EINVAL;
     }
 }
@@ -128,7 +128,7 @@ static int _sock_recv_buf(nanocoap_sock_t *sock, void **data, void **ctx, uint32
         return sock_dtls_recv_buf(&sock->dtls, &sock->dtls_session, data, ctx, timeout);
 #endif
     default:
-        assert(0);
+        assert_unreachable();
         return -EINVAL;
    }
 }

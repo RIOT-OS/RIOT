@@ -186,7 +186,7 @@ static bool _wait_for_event(sdhc_state_t *state,
                     DEBUG("reset ALL\n");
                     break;
                 default:
-                    assert(false);
+                    assert_unreachable();
                     break;
                 }
             }

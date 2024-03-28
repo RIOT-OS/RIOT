@@ -548,7 +548,7 @@ static inline unsigned coap_get_token_len(const coap_pkt_t *pkt)
     case 14:
         return tkl + 255 + byteorder_bebuftohs(ext);
     case 15:
-        assert(0);
+        assert_unreachable();
         /* fall-through */
     default:
         return tkl;
@@ -644,7 +644,7 @@ static inline uint8_t coap_hdr_tkl_ext_len(const coap_hdr_t *hdr)
     case 14:
         return 2;
     case 15:
-        assert(0);
+        assert_unreachable();
         /* fall-through */
     default:
         return 0;

@@ -286,7 +286,7 @@ static void _config_sdmmc(sdmmc_dev_t *sdmmc_dev)
     }
     else {
         /* should not happen */
-        assert(false);
+        assert_unreachable();
     }
 #endif
     /* power on SDIO/SD/MMC interface */

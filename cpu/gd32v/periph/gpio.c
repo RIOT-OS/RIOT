@@ -246,7 +246,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     if ((exti_ctx[pin_num].cb != 0) && (exti_line_port[pin_num] != port_num)) {
         LOG_ERROR("EXTI line for GPIO_PIN(%u, %u) is used by GPIO_PIN(%u, %u).\n",
                   port_num, pin_num, exti_line_port[pin_num], pin_num);
-        assert(0);
+        assert_unreachable();
     }
     exti_line_port[pin_num] = port_num;
 #endif

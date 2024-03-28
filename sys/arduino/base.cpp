@@ -31,7 +31,7 @@ void pinMode(int pin, int mode)
 {
     if ((pin > ARDUINO_PIN_LAST) || (pin < 0) ||
             !gpio_is_valid(arduino_pinmap[pin])) {
-        assert(0);
+        assert_unreachable();
         return;
     }
     gpio_mode_t m = GPIO_OUT;

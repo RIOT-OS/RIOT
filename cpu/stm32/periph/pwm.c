@@ -82,7 +82,7 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
             /* OCxN complementary output channel used */
             ccer |= TIM_CCER_CC1NE << ((pwm_config[pwm].chan[i].cc_chan & 0x03) << 2);
 #else
-            assert(false);
+            assert_unreachable();
 #endif
         }
         i++;

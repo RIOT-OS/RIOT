@@ -436,7 +436,7 @@ static void *_pktbuf_alloc(size_t size)
 #ifdef MODULE_OD
         od_hex_dump(ptr, size, 0);
 #endif
-        assert(0);
+        assert_unreachable();
     }
 
     return (void *)ptr;

@@ -288,6 +288,6 @@ static void _timer_isr(unsigned irq)
         break;
 #endif
     default:
-        assert(false);
+        assert_unreachable();
     }
 }

@@ -1115,7 +1115,7 @@ static uint32_t _isr_event_seq_tr(kw41zrf_t *dev, uint32_t irqsts)
                 /* TODO: there is no other error event for TX failures */
                 dev->netdev.netdev.event_callback(&dev->netdev.netdev, NETDEV_EVENT_TX_MEDIUM_BUSY);
                 /* if this does happen in development, it's worth checking why */
-                assert(0);
+                assert_unreachable();
             }
             else if (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_SW_ABORTED_MASK) {
                 DEBUG("[kw41zrf] SW abort (TR)\n");
@@ -1212,7 +1212,7 @@ static void kw41zrf_netdev_isr(netdev_t *netdev)
             break;
 
         default:
-            assert(0);
+            assert_unreachable();
             break;
     }
 

@@ -195,7 +195,7 @@ size_t usbus_max_interrupt_endpoint_size(usbus_t *usbus)
     }
 
     if (res < 0) {
-        assert(false); /* Misbehaving usbdev device not implementing mandatory USBOPTS */
+        assert_unreachable(); /* Misbehaving usbdev device not implementing mandatory USBOPTS */
     }
 
     switch (speed) {

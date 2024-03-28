@@ -178,7 +178,7 @@ static uint8_t _tcc_get_cc_numof(Tcc *tcc)
 #endif
     }
 
-    assert(0);
+    assert_unreachable();
     return 0;
 }
 
@@ -229,7 +229,7 @@ static void _tc_init(Tc *tc, pwm_mode_t mode, uint8_t prescaler, uint8_t res)
             break;
         case PWM_CENTER:        /* currently not supported */
         default:
-            assert(0);
+            assert_unreachable();
             return;
     }
 
@@ -281,7 +281,7 @@ static void _tcc_init(Tcc *tcc, pwm_mode_t mode, uint8_t prescaler, uint16_t res
             break;
         case PWM_CENTER:        /* currently not supported */
         default:
-            assert(0);
+            assert_unreachable();
             return;
     }
     while (tcc->SYNCBUSY.reg & TCC_SYNCBUSY_CTRLB) {}

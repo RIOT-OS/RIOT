@@ -769,7 +769,7 @@ static bool _wait_for_event(sdhc_dev_t *sdhc_dev,
                 DEBUG("reset ALL\n");
                 break;
             default:
-                assert(false);
+                assert_unreachable();
                 break;
             }
         }

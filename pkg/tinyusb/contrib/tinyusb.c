@@ -31,14 +31,14 @@ static void *_tinyusb_thread_impl(void *arg)
 
     if (tinyusb_hw_init() != 0) {
         LOG_ERROR("tinyUSB peripherals couldn't be initialized\n");
-        assert(0);
+        assert_unreachable();
     }
     DEBUG("tinyUSB peripherals initialized\n");
 
     if (IS_USED(MODULE_TINYUSB_DEVICE)) {
         if (!tud_init(TINYUSB_TUD_RHPORT)) {
             LOG_ERROR("tinyUSB device stack couldn't be initialized\n");
-            assert(0);
+            assert_unreachable();
         }
         DEBUG("tinyUSB device stack initialized\n");
     }
@@ -46,7 +46,7 @@ static void *_tinyusb_thread_impl(void *arg)
     if (IS_USED(MODULE_TINYUSB_HOST)) {
         if (!tuh_init(TINYUSB_TUH_RHPORT)) {
             LOG_ERROR("tinyUSB host stack couldn't be initialized\n");
-            assert(0);
+            assert_unreachable();
         }
         DEBUG("tinyUSB host stack initialized\n");
     }

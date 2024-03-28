@@ -98,7 +98,7 @@ int sock_tcp_listen(sock_tcp_queue_t *queue, const sock_tcp_ep_t *local,
     case ERR_VAL:
         return -EINVAL;
     default:
-        assert(false); /* should not happen since queue->base.conn is not
+        assert_unreachable(); /* should not happen since queue->base.conn is not
                         * closed and we have a TCP conn */
         break;
     }
@@ -260,7 +260,7 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock,
             break;
 #endif
         default:
-            assert(false);
+            assert_unreachable();
             res = -1;
             break;
         }

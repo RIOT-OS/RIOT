@@ -24,7 +24,7 @@
 #include "backtrace.h"
 #endif
 
-__NORETURN void _assert_failure(const char *file, unsigned line)
+__NORETURN void _assert_panic_verbose(const char *file, unsigned line)
 {
     printf("%s:%u => ", file, line);
 #if IS_USED(MODULE_BACKTRACE)
@@ -37,7 +37,7 @@ __NORETURN void _assert_failure(const char *file, unsigned line)
     core_panic(PANIC_ASSERT_FAIL, "FAILED ASSERTION.");
 }
 
-__NORETURN void _assert_panic(void)
+__NORETURN void _assert_panic_concise(void)
 {
     printf("%" PRIxTXTPTR "\n", cpu_get_caller_pc());
 #if IS_USED(MODULE_BACKTRACE)

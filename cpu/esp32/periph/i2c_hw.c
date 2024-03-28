@@ -132,7 +132,7 @@ void i2c_init(i2c_t dev)
                        i2c_config[dev].scl, i2c_config[dev].sda,
                        gpio_get_pin_usage_str(i2c_config[dev].scl),
                        gpio_get_pin_usage_str(i2c_config[dev].sda));
-        assert(0);
+        assert_unreachable();
     }
 
     _i2c_bus[dev].cmd = 0;
@@ -169,7 +169,7 @@ void i2c_init(i2c_t dev)
             break;
         default:
             LOG_TAG_ERROR("i2c", "Invalid speed value in %s\n", __func__);
-            assert(0);
+            assert_unreachable();
     }
 
     _i2c_bus[dev].clk_freq = cfg.master.clk_speed;

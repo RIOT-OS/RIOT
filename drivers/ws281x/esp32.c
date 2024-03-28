@@ -62,7 +62,7 @@ static uint8_t _rmt_channel(ws281x_t *dev)
             return rmt_channel_config[i].channel;
         }
     }
-    assert(0);
+    assert_unreachable();
 }
 #endif
 

@@ -86,7 +86,7 @@ static int _on_scan_evt(struct ble_gap_event *event, void *arg)
     default:
         /* this should never happen */
         DEBUG("[scanner] unknown event triggered (%i)\n", (int)event->type);
-        assert(0);
+        assert_unreachable();
     }
 
     return 0;

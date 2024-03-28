@@ -280,7 +280,7 @@ void Storage::debugCheck()
             if (keys.find(keystr) != std::end(keys)) {
                 printf("Duplicate key: %s\n", keystr.c_str());
                 debugDump();
-                assert(0);
+                assert_unreachable();
             }
             keys.insert(std::make_pair(keystr, static_cast<Page*>(p)));
             itemIndex += item.span;

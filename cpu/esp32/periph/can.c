@@ -597,7 +597,7 @@ static void _esp_can_power_up(can_t *dev)
      * pending interrupts cleared */
 
     if (!twai_hal_init(&hw)) {
-        assert(false);
+        assert_unreachable();
     }
 
     /* set bittiming from parameters as given in device data */

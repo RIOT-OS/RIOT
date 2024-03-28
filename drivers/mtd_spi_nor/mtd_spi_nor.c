@@ -695,7 +695,7 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
         }
         else {
             /* no suitable erase block found */
-            assert(0);
+            assert_unreachable();
 
             mtd_spi_release(dev);
             return -EINVAL;

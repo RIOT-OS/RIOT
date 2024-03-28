@@ -173,7 +173,7 @@ static int tinyusb_hw_init_dev(const dwc2_usb_otg_fshs_config_t *conf)
                     USB_HS_PHYC->USB_HS_PHYC_PLL |= USB_HS_PHYC_PLL1_PLLSEL_25MHZ;
                     break;
                 default:
-                    assert(0);
+                    assert_unreachable();
             }
 
             /* configure the tuning interface of the USB HS PHY */

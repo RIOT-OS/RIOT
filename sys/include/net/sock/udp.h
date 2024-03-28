@@ -816,7 +816,7 @@ static inline bool sock_udp_ep_is_multicast(const sock_udp_ep_t *ep)
         return ipv4_addr_is_multicast((const ipv4_addr_t *)&ep->addr.ipv4);
 #endif
     default:
-        assert(0);
+        assert_unreachable();
     }
 
     return false;

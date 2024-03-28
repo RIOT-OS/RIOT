@@ -490,7 +490,7 @@ static int _handle_tr_complete(usbus_t *usbus,
             break;
         default:
             DEBUG("usbus_control: Invalid state\n");
-            assert(false);
+            assert_unreachable();
             break;
     }
     return 0;

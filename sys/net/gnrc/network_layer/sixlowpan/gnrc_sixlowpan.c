@@ -379,7 +379,7 @@ static void _continue_fragmenting(gnrc_sixlowpan_frag_fb_t *fbuf)
 #else   /* MODULE_GNRC_SIXLOWPAN_FRAG */
     (void)fbuf;
     DEBUG("6lo: No fragmentation implementation available to sent\n");
-    assert(false);
+    assert_unreachable();
 #endif  /* MODULE_GNRC_SIXLOWPAN_FRAG */
 }
 #endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_FB */
