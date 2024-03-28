@@ -463,8 +463,6 @@ int timer_capture_channel_last(tim_t dev);
  * @param[in]   flags   Flags modifying how to capture the event, e.g.
  *                      whether to only capture a single event
  *
- * @pre     The timer is currently in capture mode (see @ref timer_capture_init)
- *
  * @retval  0           Success
  * @retval  -ENOTSUP    Given flank or set of flags not supported
  *
