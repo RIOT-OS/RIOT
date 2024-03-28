@@ -24,6 +24,7 @@
 #include <stdint.h>
 
 #include "cpu.h"
+#include "cpu_gpio.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,6 +57,28 @@ typedef struct {
     uint8_t channel_numof;  /**< number of channels, 0 is alias for
                                  @ref TIMER_CHANNEL_NUMOF */
 } timer_conf_t;
+
+/**
+ * @brief   Configuration of an (external) timer capture input
+ */
+typedef struct {
+    gpio_t pin;             /**< GPIO pin to use as trigger source */
+#ifndef CPU_FAM_STM32F1
+    gpio_af_t af;           /**< mux setting to route the GPIO to the timer */
+#endif
+} timer_capture_input_conf_t;
+
+/**
+ * @brief   Type to use by boards to provide the timer capture configuration
+ */
+typedef struct {
+    /**
+     * @brief   The input for each timer channel
+     *
+     * At idx *x* the input of channel *x*.
+     */
+    timer_capture_input_conf_t inputs[TIMER_CHANNEL_NUMOF];
+} timer_capture_conf_t;
 
 #ifdef __cplusplus
 }

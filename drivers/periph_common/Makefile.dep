@@ -13,3 +13,18 @@ ifneq (,$(filter periph_gpio_ll%,$(USEMODULE)))
   FEATURES_OPTIONAL += periph_gpio_ll_open_source_pull_down
   FEATURES_OPTIONAL += periph_gpio_ll_switch_dir
 endif
+
+ifneq (,$(filter periph_timer_capture%,$(USEMODULE)))
+  # periph_timer_capture is implemented by periph_timer
+  FEATURES_REQUIRED += periph_timer
+  # the default implementation of timer_capture_channel_last calls
+  # timer_query_channel_numof() that is only available when
+  # periph_timer_query_freqs is implemented. Since there is no reason to
+  # not implement periph_timer_query_freqs anyway, we can just depend on it.
+  FEATURES_REQUIRED += periph_timer_query_freqs
+
+  # Always pull in all timer capture subfeatures */
+  FEATURES_OPTIONAL += periph_timer_capture_rising
+  FEATURES_OPTIONAL += periph_timer_capture_falling
+  FEATURES_OPTIONAL += periph_timer_capture_both
+endif

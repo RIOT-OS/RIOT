@@ -1,0 +1,5 @@
+# Allow custom pin mapping in Makefile.$(BOARD) files, but those don't need to
+# go upstream
+/Makefile.*
+# but un-ignore Makefile.ci
+!/Makefile.ci

@@ -16,6 +16,7 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      Marian Buschsieweke <marian.buschsieweke@posteo.net>
  *
  * @}
  */
@@ -24,9 +25,14 @@
 #include "periph/timer.h"
 
 /**
- * @brief   Interrupt context for each configured timer
+ * @brief   Interrupt context for each configured timer in compare mode
  */
 static timer_isr_ctx_t isr_ctx[TIMER_NUMOF];
+
+/**
+ * @brief   Interrupt context for each configured timer in capture mode
+ */
+static timer_capture_isr_ctx_t capture_isr_ctx[TIMER_NUMOF];
 
 /**
  * @brief   Get the timer device
@@ -50,14 +56,12 @@ static unsigned channel_numof(tim_t tim)
     return TIMER_CHANNEL_NUMOF;
 }
 
-
-#ifdef MODULE_PERIPH_TIMER_PERIODIC
-
 /**
  * @brief   Helper macro to get channel bit in timer/channel bitmap
  */
 #define CHAN_BIT(tim, chan) (1 << chan) << (TIMER_CHANNEL_NUMOF * (tim & 1))
 
+#if defined(MODULE_PERIPH_TIMER_PERIODIC) || defined(MODULE_PERIPH_TIMER_CAPTURE)
 /**
  * @brief   Bitmap for compare channel disable after match
  */
@@ -102,6 +106,107 @@ static inline bool is_oneshot(tim_t tim, int chan)
 
 #endif /* MODULE_PERIPH_TIMER_PERIODIC */
 
+#if defined(MODULE_PERIPH_TIMER_CAPTURE)
+/**
+ * @brief   Bitmap for capture mode
+ */
+static uint8_t _capture[(TIMER_NUMOF+1)/2];
+
+static void set_capture(tim_t tim, unsigned chan, gpio_flank_t flank)
+{
+    uint32_t tmp, shift;
+
+    /* first write to CCMRx, then to CCER register */
+
+    /* set CCxS field in CCMRx register to input 1 (default external input) */
+    volatile uint32_t *ccmrx = (chan < 2) ? &dev(tim)->CCMR1 : &dev(tim)->CCMR2;
+    shift = (chan & 1) ? TIM_CCMR1_CC2S_Pos : TIM_CCMR1_CC1S_Pos;
+    uint32_t mask = TIM_CCMR1_CC1S_Msk << shift;
+    tmp = *ccmrx;
+    tmp &= ~mask;
+    tmp |= TIM_CCMR1_CC1S_0 << shift;
+    *ccmrx = tmp;
+
+    /* set CCxE field to enable Capture, set CCxP and CCxNP according to flank */
+    volatile uint32_t *ccer = &dev(tim)->CCER;
+    shift = chan * TIM_CCER_CC2E_Pos;
+    tmp = *ccer;
+    /* enable capture */
+    tmp |= (TIM_CCER_CC1E << shift);
+    /* clear previous polarity */
+    tmp &= ~((TIM_CCER_CC1P | TIM_CCER_CC1NP) << shift);
+    /* apply new polarity */
+    switch (flank) {
+    default:
+    case GPIO_RISING:
+        /* keep both CCxP and CCxNP at zero */
+        break;
+    case GPIO_FALLING:
+        tmp |= TIM_CCER_CC1P << shift;
+        break;
+    case GPIO_BOTH:
+        tmp |= (TIM_CCER_CC1P | TIM_CCER_CC1NP) << shift;
+        break;
+    }
+    *ccer = tmp;
+
+    _capture[tim >> 1] |= CHAN_BIT(tim, chan);
+}
+
+static void clear_capture(tim_t tim, unsigned chan)
+{
+    uint32_t tmp, shift;
+
+    /* now reverse order (clearing CCMRx will not work until CCER is cleared):
+     * first write to CCER, then to CCMRx register */
+
+    /* clear CCxE, CCxP and CCxNP fields in CCER register */
+    volatile uint32_t *ccer = &dev(tim)->CCER;
+    shift = chan * TIM_CCER_CC2E_Pos;
+    tmp = *ccer;
+    tmp &= ~((TIM_CCER_CC1E | TIM_CCER_CC1P | TIM_CCER_CC1NP) << shift);
+    *ccer = tmp;
+
+    /* clear CCxS field in CCMRx register */
+    volatile uint32_t *ccmrx = (chan < 2) ? &dev(tim)->CCMR1 : &dev(tim)->CCMR2;
+    shift = (chan & 1) ? TIM_CCMR1_CC2S_Pos : TIM_CCMR1_CC1S_Pos;
+    uint32_t mask = TIM_CCMR1_CC1S_Msk << shift;
+    tmp = *ccmrx;
+    tmp &= ~mask;
+    *ccmrx = tmp;
+
+    _capture[tim >> 1] &= ~CHAN_BIT(tim, chan);
+}
+
+static inline bool is_capture(tim_t tim, int chan)
+{
+    return _capture[tim >> 1] & CHAN_BIT(tim, chan);
+}
+#else
+MAYBE_UNUSED
+static void set_capture(tim_t tim, unsigned chan, gpio_flank_t flank)
+{
+    (void)tim;
+    (void)chan;
+    (void)flank;
+}
+
+MAYBE_UNUSED
+static void clear_capture(tim_t tim, unsigned chan)
+{
+    (void)tim;
+    (void)chan;
+}
+
+MAYBE_UNUSED
+static inline bool is_capture(tim_t tim, int chan)
+{
+    (void)tim;
+    (void)chan;
+    return false;
+}
+#endif
+
 int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
 {
     /* check if device is valid */
@@ -142,6 +247,7 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 
     unsigned irqstate = irq_disable();
     set_oneshot(tim, channel);
+    clear_capture(tim, channel);
 
 #ifdef MODULE_PERIPH_TIMER_PERIODIC
     if (dev(tim)->ARR == TIM_CHAN(tim, channel)) {
@@ -188,6 +294,7 @@ int timer_set(tim_t tim, int channel, unsigned int timeout)
 
     unsigned irqstate = irq_disable();
     set_oneshot(tim, channel);
+    clear_capture(tim, channel);
 
 #ifdef MODULE_PERIPH_TIMER_PERIODIC
     if (dev(tim)->ARR == TIM_CHAN(tim, channel)) {
@@ -226,6 +333,7 @@ int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags
 
     unsigned irqstate = irq_disable();
     clear_oneshot(tim, channel);
+    clear_capture(tim, channel);
 
     if (flags & TIM_FLAG_SET_STOPPED) {
         timer_stop(tim);
@@ -295,6 +403,66 @@ void timer_stop(tim_t tim)
     irq_restore(irqstate);
 }
 
+#if defined(MODULE_PERIPH_TIMER_CAPTURE)
+
+void timer_set_capture_cb(tim_t dev, timer_capture_cb_t cb, void *arg)
+{
+    assert((unsigned)dev < TIMER_NUMOF);
+    capture_isr_ctx[dev].cb = cb;
+    capture_isr_ctx[dev].arg = arg;
+}
+
+int timer_capture_enable(tim_t tim, int chan, gpio_flank_t flank,
+                         timer_capture_flags_t flags)
+{
+    assert((unsigned)chan < channel_numof(tim));
+
+    unsigned irqstate = irq_disable();
+
+#ifdef MODULE_PERIPH_TIMER_PERIODIC
+    dev(tim)->ARR = timer_config[tim].max;
+#endif
+
+    /* configure pin and route it to the peripheral */
+    gpio_init(timer_capture_pin(tim, chan), GPIO_IN);
+#ifndef CPU_FAM_STM32F1
+    gpio_init_af(timer_capture_pin(tim, chan), timer_capture_config[tim].inputs[chan].af);
+#endif
+
+    if (flags & TIM_CAPTURE_FLAG_ONESHOT) {
+        set_oneshot(tim, chan);
+    }
+    else {
+        clear_oneshot(tim, chan);
+    }
+
+    /* enable capture mode */
+    set_capture(tim, chan, flank);
+
+    /* clear spurious IRQs */
+    dev(tim)->SR &= ~(TIM_SR_CC1IF << chan);
+
+    /* enable IRQ */
+    dev(tim)->DIER |= (TIM_DIER_CC1IE << chan);
+    irq_restore(irqstate);
+
+    return 0;
+}
+
+void timer_capture_disable(tim_t dev, int chan)
+{
+    timer_clear(dev, chan);
+}
+
+__attribute__((pure))
+gpio_t timer_capture_pin(tim_t tim, int chan)
+{
+    assert((tim < TIMER_NUMOF) && ((unsigned)chan < channel_numof(tim)));
+
+    return timer_capture_config[tim].inputs[chan].pin;
+}
+#endif /* MODULE_PERIPH_TIMER_CAPTURE */
+
 static inline void irq_handler(tim_t tim)
 {
     uint32_t top = dev(tim)->ARR;
@@ -325,7 +493,13 @@ static inline void irq_handler(tim_t tim)
             dev(tim)->DIER &= ~msk;
         }
 
-        isr_ctx[tim].cb(isr_ctx[tim].arg, i);
+        if (is_capture(tim, i)) {
+            unsigned timestamp = TIM_CHAN(tim, i);
+            capture_isr_ctx[tim].cb(capture_isr_ctx[tim].arg, i, timestamp);
+        }
+        else {
+            isr_ctx[tim].cb(isr_ctx[tim].arg, i);
+        }
     }
     cortexm_isr_end();
 }
