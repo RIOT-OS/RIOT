@@ -54,14 +54,6 @@
 #define VFS_H
 
 #include <stdint.h>
-/* The stdatomic.h in GCC gives compilation errors with C++
- * see: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=60932
- */
-#ifdef __cplusplus
-#include "c11_atomics_compat.hpp"
-#else
-#include <stdatomic.h> /* for atomic_int */
-#endif
 #include <sys/stat.h> /* for struct stat */
 #include <sys/types.h> /* for off_t etc. */
 #include <sys/statvfs.h> /* for struct statvfs */
@@ -383,7 +375,7 @@ struct vfs_mount_struct {
     const vfs_file_system_t *fs; /**< The file system driver for the mount point */
     const char *mount_point;     /**< Mount point, e.g. "/mnt/cdrom" */
     size_t mount_point_len;      /**< Length of mount_point string (set by vfs_mount) */
-    atomic_int open_files;       /**< Number of currently open files and directories */
+    uint16_t open_files;         /**< Number of currently open files and directories */
     void *private_data;          /**< File system driver private data, implementation defined */
 };
 
