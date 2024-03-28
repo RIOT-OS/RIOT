@@ -62,7 +62,7 @@ typedef struct {
  * @brief   Configuration of an (external) timer capture input
  */
 typedef struct {
-    gpio_t pin;
+    gpio_t pin;             /**< GPIO pin to use as trigger source */
 #ifndef CPU_FAM_STM32F1
     gpio_af_t af;
 #endif
