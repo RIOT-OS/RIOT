@@ -64,7 +64,7 @@ typedef struct {
 typedef struct {
     gpio_t pin;             /**< GPIO pin to use as trigger source */
 #ifndef CPU_FAM_STM32F1
-    gpio_af_t af;
+    gpio_af_t af;           /**< mux setting to route the GPIO to the timer */
 #endif
 } timer_capture_input_conf_t;
 
