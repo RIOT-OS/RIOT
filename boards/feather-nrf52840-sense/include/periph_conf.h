@@ -86,7 +86,7 @@ static const i2c_conf_t i2c_config[] = {
 /** @} */
 
 /**
- * @name    PDM configuration
+ * @brief    PDM configuration
  * @{
  */
 static const pdm_conf_t pdm_config = {

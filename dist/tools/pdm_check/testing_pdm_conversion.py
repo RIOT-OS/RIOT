@@ -1,20 +1,15 @@
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-import re
 import numpy as np
-import os
-import csv
 from itertools import groupby
 from operator import itemgetter
 import serial
-import struct
 import wave
-import time
 
 str1 = "Start of the new buffer".encode('ascii')
-str2= "End of the new buffer".encode('ascii')
+str2 = "End of the new buffer".encode('ascii')
 
-start_index_buf = 0    
+start_index_buf = 0
 stop_index_buf = 0
 start_found = False
 buffer_number = 0
@@ -27,7 +22,6 @@ key = 0
 ser.writelines(["start\n".encode('ascii')])
 while start:
     line = ser.readline()
-    #print(line)
     value = line.strip()
     data[key] = value
     if line.find(str1) != -1:
@@ -41,7 +35,7 @@ while start:
             break
     key +=1
 
-print(start_index_buf)     
+print(start_index_buf)
 print(stop_index_buf)
 print(buffer_number)
 ser.close()
@@ -61,23 +55,23 @@ with open("binary_data.bin", "wb") as f:
 samplerate = 16000
 length = 1
 
-# The left channel for 1 second.
+# The left channel for 1 second
 t = np.linspace(0, length, samplerate)
 left_channel = 0.5 * np.sin(2 * np.pi * 440.0 * t)
 
-# Noise on the right channel.
+# Noise on the right channel
 #right_channel = np.random.random(size=samplerate)
 left_channel = data_to_plot/np.max(np.abs(data_to_plot))
 audio = np.array([left_channel]).T
 
-# Convert to (little-endian) 16 bit integers.
+# Convert to (little-endian) 16 bit integers
 audio = (audio * (2 ** 15 - 1)).astype("<h")
 
 # Save the data as a wave format
-with wave.open("sound_new_buf.wav", "w") as f:
+with wave.open("sound.wav", "w") as f:
     # Mono Channel
     f.setnchannels(1)
-    # 2 bytes per sample.
+    # 2 bytes per sample
     f.setsampwidth(2)
     f.setframerate(samplerate)
     f.writeframes(audio.tobytes())

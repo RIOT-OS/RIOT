@@ -77,7 +77,9 @@ typedef enum {
 #define PDM_BUF_SIZE        (128U)
 #endif
 
-// Define the new buffer size
+/**
+ * @brief   Define the new buffer size
+ */
 #define NEW_BUF_SIZE    (PDM_BUF_SIZE * 5 * 16 * 16)
 
 /**
