@@ -278,7 +278,7 @@ uint32_t sam0_gclk_freq(uint8_t id)
         } else if (USE_XOSC) {
             return SAM0_XOSC_FREQ_HZ;
         } else {
-            assert(0);
+            assert_unreachable();
             return 0;
         }
     case SAM0_GCLK_100MHZ:

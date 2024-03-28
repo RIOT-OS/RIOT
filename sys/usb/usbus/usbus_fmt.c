@@ -60,7 +60,7 @@ static uint8_t _type_to_attribute(usbus_endpoint_t *ep)
         case USB_EP_TYPE_INTERRUPT:
             return 0x03;
         default:
-            assert(false);
+            assert_unreachable();
             break;
     }
     return 0x00;

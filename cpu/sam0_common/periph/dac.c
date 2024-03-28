@@ -78,7 +78,7 @@ static uint32_t _get_CCTRL(uint32_t freq)
         return DAC_DACCTRL_CCTRL_CC12M;
     }
 
-    assert(0);
+    assert_unreachable();
     return 0;
 }
 #endif

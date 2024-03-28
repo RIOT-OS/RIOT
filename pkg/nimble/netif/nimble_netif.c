@@ -356,7 +356,7 @@ static int _on_l2cap_client_evt(struct ble_l2cap_event *event, void *arg)
             break;
         case BLE_L2CAP_EVENT_COC_ACCEPT:
             /* this event should never be triggered for the L2CAP client */
-            assert(0);
+            assert_unreachable();
             break;
         case BLE_L2CAP_EVENT_COC_DATA_RECEIVED:
             _on_data(conn, event);

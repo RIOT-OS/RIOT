@@ -685,7 +685,7 @@ static inline void sam0_set_voltage_regulator(sam0_supc_t src)
     while (!SUPC->STATUS.bit.VREGRDY) {}
 #else
     (void) src;
-    assert(0);
+    assert_unreachable();
 #endif
 }
 
@@ -756,7 +756,7 @@ static inline uint8_t sercom_id(const void *sercom)
 #endif
 
     /* should not be reached, so fail with assert */
-    assert(false);
+    assert_unreachable();
 
     return SERCOM_INST_NUM;
 }

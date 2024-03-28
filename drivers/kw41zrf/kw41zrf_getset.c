@@ -197,7 +197,7 @@ void kw41zrf_set_option(kw41zrf_t *dev, uint8_t option, uint8_t state)
             case KW41ZRF_OPT_ACK_PENDING:
                 LOG_ERROR("[kw41zrf] Attempt to modify option %04x while radio is sleeping\n",
                           (unsigned) option);
-                assert(0);
+                assert_unreachable();
                 return;
 
             default:

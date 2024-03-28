@@ -72,7 +72,7 @@ void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
 
     if (RADIOS_NUMOF == 0) {
         puts("Radio is either not supported or not present");
-        assert(false);
+        assert_unreachable();
     }
 
 #ifdef MODULE_CC2538_RF

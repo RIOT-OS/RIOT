@@ -466,7 +466,7 @@ static void _ep_enable(usbdev_ep_t *ep)
         break;
     default:
         /* Must never happen */
-        assert(false);
+        assert_unreachable();
     }
     if (ep->dir == USB_EP_DIR_OUT) {
         ep_reg->EPCFG.bit.EPTYPE0 = type;

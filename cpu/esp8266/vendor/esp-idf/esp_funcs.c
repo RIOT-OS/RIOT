@@ -84,7 +84,7 @@ void IRAM_ATTR _xt_clear_ints(uint32_t mask)
 void IRAM_ATTR _xt_set_xt_ccompare_val(void)
 {
     /* to figure out whether it is called at all, not yet implemented */
-    assert(0);
+    assert_unreachable();
     DEBUG("%s\n", __func__);
 }
 

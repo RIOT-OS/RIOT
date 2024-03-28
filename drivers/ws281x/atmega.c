@@ -173,7 +173,7 @@ void ws281x_write_buffer(ws281x_t *dev, const void *buf, size_t size)
                 }
                 break;
             default:
-                assert(0);
+                assert_unreachable();
                 break;
         }
     }

@@ -54,7 +54,7 @@ static inline uint8_t _dev_to_lcd_fmc_desc(lcd_t *dev)
             return i;
         }
     }
-    assert(false);
+    assert_unreachable();
 }
 #endif
 

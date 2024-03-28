@@ -287,7 +287,7 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_in
     /* The upper layer shouldn't call this function if the RX_DONE event was
      * not triggered */
     if (!(RFCORE_XREG_RXFIFOCNT > 0)) {
-        assert(false);
+        assert_unreachable();
     }
 
     pkt_len = rfcore_read_byte() - IEEE802154_FCS_LEN;
@@ -406,7 +406,7 @@ void cc2538_irq_handler(void)
         default:
             /* This should never happen */
             DEBUG("ERROR: cc2538_state: %i\n", cc2538_state);
-            assert(false);
+            assert_unreachable();
         }
     }
 
@@ -464,7 +464,7 @@ void cc2538_irq_handler(void)
         default:
             /* This should never happen */
             DEBUG("ERROR: cc2538_state: %i\n", cc2538_state);
-            assert(false);
+            assert_unreachable();
             break;
         }
     }

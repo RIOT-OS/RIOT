@@ -204,7 +204,7 @@ static inline uint8_t _rtt_div(uint16_t freq)
         case 256:   return 0x5;
         case 128:   return 0x6;
         case 32:    return 0x7;
-        default:    assert(0);
+        default:    assert_unreachable();
                     return 0;
     }
 }

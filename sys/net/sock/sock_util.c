@@ -309,7 +309,7 @@ int sock_tl_name2ep(struct _sock_tl_ep *ep_out, const char *str)
     } else if (IS_ACTIVE(SOCK_HAS_IPV6)) {
         family = AF_INET6;
     } else {
-        assert(0);
+        assert_unreachable();
         return -EINVAL;
     }
 

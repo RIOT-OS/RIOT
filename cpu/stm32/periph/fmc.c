@@ -529,7 +529,7 @@ void fmc_init_bank(fmc_bank_id_t bank)
     case 5:
     case 6: break;
 #endif
-    default: assert(false);
+    default: assert_unreachable();
     }
 
     if (conf->bank == FMC_BANK_1) {
@@ -556,7 +556,7 @@ void fmc_init_bank(fmc_bank_id_t bank)
 
     else {
         LOG_ERROR("[fmc] Bank %u not supported\n", conf->bank);
-        assert(false);
+        assert_unreachable();
     }
 }
 

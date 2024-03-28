@@ -84,7 +84,7 @@ static size_t _spi_dev2num(void *dev)
     }
 #endif /* NRF_SPIM3 */
     else {
-        assert(false);
+        assert_unreachable();
         return 0;
     }
 }

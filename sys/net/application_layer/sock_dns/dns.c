@@ -58,7 +58,7 @@ void auto_init_sock_dns(void)
         break;
 #endif
     default:
-        assert(0);
+        assert_unreachable();
         return;
     }
 

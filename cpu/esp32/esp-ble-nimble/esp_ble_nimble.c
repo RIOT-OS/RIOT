@@ -185,7 +185,7 @@ static int _esp_hci_h4_frame_cb(uint8_t pkt_type, void *data)
         rc = ble_transport_to_hs_evt(data);
         break;
     default:
-        assert(0);
+        assert_unreachable();
         break;
     }
 
@@ -202,24 +202,24 @@ void esp_ble_nimble_init(void)
         LOG_TAG_ERROR(LOG_TAG,
                       "Bluetooth controller release classic bt memory failed: %s",
                       esp_err_to_name(ret));
-        assert(0);
+        assert_unreachable();
     }
     */
 
     /* init and enable the Bluetooth LE controller */
     if ((ret = esp_bt_controller_init(&bt_cfg)) != ESP_OK) {
         LOG_TAG_ERROR(LOG_TAG, "Bluetooth controller initialize failed: %d", ret);
-        assert(0);
+        assert_unreachable();
     }
 
     if ((ret = esp_bt_controller_enable(ESP_BT_MODE_BLE)) != ESP_OK) {
         LOG_TAG_ERROR(LOG_TAG, "Bluetooth controller enable failed: %d", ret);
-        assert(0);
+        assert_unreachable();
     }
 
     /* register callbacks from Bluetooth LE controller */
     if ((ret = esp_vhci_host_register_callback(&vhci_host_cb)) != ESP_OK) {
-        assert(0);
+        assert_unreachable();
     }
 
     /* init HCI H4 processing */

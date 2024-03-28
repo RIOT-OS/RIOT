@@ -104,7 +104,7 @@ static inline void _atwinc15x0_set_scanning(atwinc15x0_t *dev) {
         dev->state = ATWINC15X0_STATE_DISCONNECTED_SCANNING;
     }
     else {
-        assert(false);
+        assert_unreachable();
     }
 }
 
@@ -135,7 +135,7 @@ static inline void _atwinc15x0_set_connecting(atwinc15x0_t *dev) {
         dev->state = ATWINC15X0_STATE_DISCONNECTED_CONNECTING;
     }
     else {
-        assert(false);
+        assert_unreachable();
     }
 }
 

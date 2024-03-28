@@ -69,7 +69,7 @@ void wdt_start(void)
 void wdt_stop(void)
 {
     DEBUG("[wdt] stopping the watchdog is not supported\n");
-    assert(0);
+    assert_unreachable();
 }
 
 void wdt_kick(void)

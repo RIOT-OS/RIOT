@@ -357,7 +357,7 @@ int lcd_init(lcd_t *dev, const lcd_params_t *params)
 #else /* IS_USED(MODULE_LCD_PARALLEL) */
 
         LOG_ERROR("[lcd] either lcd_parallel or lcd_spi has to be enabled");
-        assert(false);
+        assert_unreachable();
 #endif
 
 #if IS_USED(MODULE_LCD_SPI)

@@ -230,7 +230,7 @@ static void _restart(void)
     }
     default:
         DEBUG("DHCPv6 Client: Invalid configuration mode!");
-        assert(0);
+        assert_unreachable();
         break;
     }
 }
@@ -491,7 +491,7 @@ static inline size_t _add_ia_na(uint8_t *buf, size_t len_max)
     }
 
     if (msg_len > len_max) {
-        assert(0);
+        assert_unreachable();
         return 0;
     }
 
@@ -519,7 +519,7 @@ static inline size_t _add_ia_pd_from_config(uint8_t *buf, size_t len_max)
     }
 
     if (msg_len > len_max) {
-        assert(0);
+        assert_unreachable();
         return 0;
     }
 
