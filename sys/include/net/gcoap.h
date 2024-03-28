@@ -722,7 +722,7 @@ typedef int (*gcoap_request_matcher_t)(gcoap_listener_t *listener,
  * @brief   CoAP socket types
  *
  * May be used as flags for @ref gcoap_listener_t, but must be used numerically
- * with @ref gcoap_req_send_tl().
+ * with @ref gcoap_req_send().
  */
 typedef enum {
     GCOAP_SOCKET_TYPE_UNDEF = 0x0,      /**< undefined */
