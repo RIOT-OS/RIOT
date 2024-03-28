@@ -651,6 +651,8 @@ groups:
     features:
     - name: periph_can
       help: A CAN peripheral is present.
+    - name: can_rx_mailbox
+      help: CAN controller RX mailbox is supported
     - name: periph_eth
       help: An Ethernet peripheral is present.
 

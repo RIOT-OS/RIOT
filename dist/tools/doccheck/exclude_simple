@@ -8460,3 +8460,4 @@ warning: Member LSM6DSL_REG_X_OFS_USR (macro definition) of file lsm6dsxx_intern
 warning: Member LSM6DSL_REG_Y_OFS_USR (macro definition) of file lsm6dsxx_internal.h is not documented.
 warning: Member LSM6DSL_REG_Z_OFS_USR (macro definition) of file lsm6dsxx_internal.h is not documented.
 warning: Member LSM6DS33_REG_ORIENT_CFG_G (macro definition) of file lsm6dsxx_internal.h is not documented.
+warning: Member AT6561_STBY_PIN (macro definition) of file board.h is not documented.

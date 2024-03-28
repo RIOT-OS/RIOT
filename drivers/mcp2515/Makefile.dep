@@ -1,2 +1,3 @@
 USEMODULE += ztimer_usec
+USEMODULE += can_rx_mailbox
 FEATURES_REQUIRED += periph_gpio periph_spi periph_gpio_irq
