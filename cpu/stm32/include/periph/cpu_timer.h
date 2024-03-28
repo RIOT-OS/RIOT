@@ -72,6 +72,11 @@ typedef struct {
  * @brief   Type to use by boards to provide the timer capture configuration
  */
 typedef struct {
+    /**
+     * @brief   The input for each timer channel
+     *
+     * At idx *x* the input of channel *x*.
+     */
     timer_capture_input_conf_t inputs[TIMER_CHANNEL_NUMOF];
 } timer_capture_conf_t;
 
