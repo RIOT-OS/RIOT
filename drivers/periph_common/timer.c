@@ -18,6 +18,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "periph/timer.h"
 #include "irq.h"
 
