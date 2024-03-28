@@ -1,6 +1,0 @@
-CONFIG_MODULE_TEST_UTILS_NETDEV_ETH_MINIMAL=y
-CONFIG_MODULE_DOSE=y
-# Should be autoselecting the MODULE_PRNG_HWRNG if possible
-# Since the makefile cannot we have to override until end of migration
-# Remove when TEST_KCONFIG is complete
-CONFIG_MODULE_PRNG_MUSL_LCG=y

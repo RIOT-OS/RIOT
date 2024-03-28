@@ -12,15 +12,5 @@ config BOARD_ESP32_WEMOS_LOLIN_D32_PRO
     default y
     select BOARD_COMMON_ESP32
     select CPU_MODEL_ESP32_WROVER
-    select HAS_ARDUINO_PINS
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_DAC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_SPI
-    select HAS_SDCARD_SPI
-
-    select HAVE_MTD_SDCARD_DEFAULT
-    select MODULE_FATFS_VFS if MODULE_VFS_DEFAULT
 
 source "$(RIOTBOARD)/common/esp32/Kconfig"

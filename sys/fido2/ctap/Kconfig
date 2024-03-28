@@ -4,39 +4,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-menuconfig MODULE_FIDO2_CTAP
-    bool "FIDO2 CTAP"
-    depends on HAS_PERIPH_FLASHPAGE
-    depends on HAS_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
-    depends on HAS_PERIPH_GPIO
-    depends on HAS_PERIPH_GPIO_IRQ
-    depends on MODULE_FIDO2
-    depends on TEST_KCONFIG
-    select PACKAGE_TINYCBOR
-    select PACKAGE_MICRO-ECC
-    select PACKAGE_TINY-ASN1
-    select MODULE_PERIPH_GPIO
-    select MODULE_PERIPH_GPIO_IRQ
-    select MODULE_EVENT
-    select MODULE_EVENT_TIMEOUT_ZTIMER
-    select MODULE_ZTIMER
-    select MODULE_ZTIMER_MSEC
-    select MODULE_MTD
-    select MODULE_MTD_FLASHPAGE
-    select MODULE_MTD_WRITE_PAGE
-    select MODULE_RANDOM
-    select MODULE_CRYPTO_AES_256
-    select MODULE_CIPHER_MODES
-    select MODULE_HASHES
-    select MODULE_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
-    help
-        Y to enable CTAP protocol support. The Client-to-Authenticator
-        Protocol (CTAP) is an application layer protocol for the communication
-        between an authenticator and a host. CTAP is part of the FIDO2 Project.
-        For more information visit https://fidoalliance.org/fido2.
 
-
-if MODULE_FIDO2_CTAP
+if USEMODULE_FIDO2_CTAP
 
 config FIDO2_CTAP_STACK_SIZE
     int "CTAP thread stack size"
@@ -126,4 +95,4 @@ config FIDO2_CTAP_NUM_FLASHPAGES
 
 rsource "transport/Kconfig"
 
-endif # MODULE_FIDO2_CTAP
+endif # USEMODULE_FIDO2_CTAP

@@ -13,7 +13,7 @@ USEMODULE += psa_secure_element
 USEMODULE += psa_secure_element_ateccx08a
 USEMODULE += psa_secure_element_ateccx08a_ecc_p256
 
-ifneq (1, $(TEST_KCONFIG))
+ifneq (1, $(SHOULD_RUN_KCONFIG))
   CFLAGS += -DCONFIG_PSA_SINGLE_KEY_COUNT=1
   CFLAGS += -DCONFIG_PSA_PROTECTED_KEY_COUNT=1
 endif
@@ -23,6 +23,5 @@ CFLAGS += -DCUSTOM_ATCA_PARAMS
 
 INCLUDES += -I$(APPDIR) # Application specific (not needed by PSA)
 
-SHOULD_RUN_KCONFIG :=
 
 include $(RIOTBASE)/Makefile.include

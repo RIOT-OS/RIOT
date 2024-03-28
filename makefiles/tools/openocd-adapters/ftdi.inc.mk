@@ -11,3 +11,10 @@ OPENOCD_TRANSPORT ?= swd
 ifneq (,$(DEBUG_ADAPTER_ID))
   OPENOCD_ADAPTER_INIT += -c 'ftdi_serial $(DEBUG_ADAPTER_ID)'
 endif
+
+ifeq (swd, $(OPENOCD_TRANSPORT))
+  ifeq (tigard, $(OPENOCD_FTDI_ADAPTER))
+    # Add dummy SWD_EN signal
+    OPENOCD_ADAPTER_INIT += -c 'ftdi layout_signal SWD_EN -data 0'
+  endif
+endif

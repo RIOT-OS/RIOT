@@ -5,30 +5,8 @@
 # directory for more details.
 #
 
-config MODULE_ILI9341
-    bool "ILI9341 display driver"
-    depends on HAS_PERIPH_SPI
-    depends on HAS_PERIPH_GPIO
-    depends on TEST_KCONFIG
-    select MODULE_PERIPH_SPI
-    select MODULE_PERIPH_GPIO
-    select MODULE_LCD
-    select MODULE_ZTIMER
-    select MODULE_ZTIMER_MSEC
-
-config HAVE_ILI9341
-    bool
-    select MODULE_ILI9341 if MODULE_DISP_DEV
-    help
-      Indicates that an ILI9341 display is present.
-
-menuconfig KCONFIG_USEMODULE_ILI9341
-    bool "Configure ILI9341 driver"
+menu "ILI9341 driver"
     depends on USEMODULE_ILI9341
-    help
-        Configure the ILI9341 display driver using Kconfig.
-
-if KCONFIG_USEMODULE_ILI9341
 
 config ILI9341_GVDD
     int "GVDD voltage level (in millivolts)"
@@ -56,4 +34,4 @@ config ILI9341_VCOML
         match the capacitance and performance specifications of the TFT panel to
         maximize contrast and minimize flickering
 
-endif # KCONFIG_USEMODULE_ILI9341
+endmenu # ILI9341 driver

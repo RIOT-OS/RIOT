@@ -1,5 +1,1 @@
 include $(RIOTBOARD)/esp8266-olimex-mod/Makefile.features
-
-ifeq (1, $(TEST_KCONFIG))
-  KCONFIG_ADD_CONFIG += $(BOARDDIR)/$(BOARD).config
-endif

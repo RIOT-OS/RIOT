@@ -9,12 +9,6 @@ mainmenu "RIOT Configuration"
 # Load macro definitions
 rsource "kconfigs/Kconfig.consts"
 
-# Load feature declarations
-rsource "kconfigs/Kconfig.features"
-
-# Load error symbols
-rsource "kconfigs/Kconfig.errors"
-
 # For now, get used modules as macros from this file (see kconfig.mk)
 osource "$(KCONFIG_GENERATED_DEPENDENCIES)"
 
@@ -41,23 +35,5 @@ menu "External Packages"
 osource "$(KCONFIG_EXTERNAL_PKG_CONFIGS)"
 endmenu # External Packages
 
-comment "RIOT is in a migration phase."
 comment "Some configuration options may not be here. Use CFLAGS instead."
-
-comment "!! ERROR: There are conflicting modules active !!"
-    depends on ERROR_MODULES_CONFLICT != ""
-
-config TEST_KCONFIG
-    bool
-    default y if '$(TEST_KCONFIG)' = '1'
-    help
-        This is used during the Kconfig migration to test the module dependency
-        modelling. Don't change the default value unless you know what you are
-        doing.
-
-config DEVELHELP
-    bool "Development Help"
-    help
-        Set to enable code in RIOT that does safety checking which might not be
-        needed in a production environment but helps in the development
-        process.
+comment "Ideally, make a PR to add them to the Kconfig."

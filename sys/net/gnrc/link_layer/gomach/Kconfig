@@ -4,13 +4,9 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_USEMODULE_GNRC_GOMACH
-    bool "Configure GNRC GOMACH"
-    depends on USEMODULE_GNRC_GOMACH
-    help
-        Configure the GNRC GOMACH using Kconfig.
 
-if KCONFIG_USEMODULE_GNRC_GOMACH
+menu "GNRC GOMACH"
+    depends on USEMODULE_GNRC_GOMACH
 
 config GNRC_GOMACH_CP_DURATION_US
     int "Wake-up period (WP) duration in microseconds"
@@ -32,7 +28,7 @@ config GNRC_GOMACH_SUPERFRAME_DURATION_US
         duration, i.e , time between two consecutive wake-ups.
         The configurations should not be shorter than 10 times of
         'CONFIG_GNRC_GOMACH_CP_DURATION_US' and not shorter than the RTT tickle
-        interval.This configuration governs power consumption and GoMacH's
+        interval.This configuration governs power consumption and GoMacHs
         reactiveness to traffic loads.In GoMacH, nodes adopt duty-cycle scheme
         to conserve power. That is, time is divided into repeated cycles
         (superframes), and in each cycle, a node only wakes up for a short
@@ -82,7 +78,7 @@ config GNRC_GOMACH_NO_TX_ISR_US
     help
         Configure 'CONFIG_GNRC_GOMACH_NO_TX_ISR_US',the timeout duration for
         confirming TX-No-ISR event in GoMacH. This configuration is used to
-        confirm/catch a case that a transmission doesn't have its
+        confirm/catch a case that a transmission doesnt have its
         'NETDEV_EVENT_TX_COMPLETE' interrupt event, which is considered as a
         hardware abnormal event. Upon this timeout expiration, GoMach will
         accordingly take actions to maintain its state-machine.
@@ -163,12 +159,12 @@ config GNRC_GOMACH_RX_DUPCHK_UNIT_LIFE
     int "Life time of check-duplicate-packet in cycle count"
     default 30
     help
-        Configure 'CONFIG_GNRC_GOMACH_RX_DUPCHK_UNIT_LIFE', GoMacH's
+        Configure 'CONFIG_GNRC_GOMACH_RX_DUPCHK_UNIT_LIFE', GoMacHs
         check-duplicate-packet unit life time in cycle count. In GoMacH, to
         avoid receiving duplicate-packet, we currently introduce a data type of
-        'gnrc_gomach_dupchk_unit_t' to record the recent senders' information
+        'gnrc_gomach_dupchk_unit_t' to record the recent senders information
         (especially MAC TX sequence). This configuration defines the
-        check-duplicate-packet data unit's life time in cycle count. Once
+        check-duplicate-packet data units life time in cycle count. Once
         expired, the related data unit will be reset. This configuration maybe
         removed in the future.
 
@@ -206,7 +202,7 @@ config GNRC_GOMACH_T2U_RETYR_THRESHOLD
     help
         Configure 'CONFIG_GNRC_GOMACH_T2U_RETYR_THRESHOLD', maximum number of
         t2u attempts before dropping data packet in GoMacH. In case the
-        receiver's phase is unknown to the sender, the sender adopts the t2u
+        receivers phase is unknown to the sender, the sender adopts the t2u
         (transmit-to-unknown) procedure to get phase-locked with the receiver.
         This configuration defines the maximum t2u attempts before dropping the
         data packet in GoMacH.
@@ -224,4 +220,4 @@ config GNRC_GOMACH_MAX_T2U_RETYR_THRESHOLD
         then we re-initiate the radio, trying to re-calibrate the radio for
         bringing it back to normal condition.
 
-endif # KCONFIG_USEMODULE_GNRC_GOMACH
+endmenu # GNRC GOMACH

@@ -13,21 +13,8 @@ config BOARD_OLIMEXINO_STM32
     default y
     select CPU_MODEL_STM32F103RB
 
-    # Put defined MCU peripherals here (in alphabetical order)
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_CAN
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-
     # Clock configuration
     select BOARD_HAS_HSE
     select BOARD_HAS_LSE
-
-    select HAVE_SAUL_GPIO
 
 source "$(RIOTBOARD)/common/stm32/Kconfig"

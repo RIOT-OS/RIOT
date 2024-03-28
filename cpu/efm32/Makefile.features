@@ -49,10 +49,3 @@ ifeq (1,$(EFM32_LEUART_ENABLED))
 endif
 
 include $(RIOTCPU)/cortexm_common/Makefile.features
-
-# Add efm32 configurations after including cortexm_common so efm32 takes precendence
-# This configuration enables modules that are only available when using Kconfig
-# module modelling
-ifeq (1,$(TEST_KCONFIG))
-  KCONFIG_CPU_CONFIG += $(RIOTCPU)/efm32/efm32.config
-endif

@@ -4,10 +4,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_USEMODULE_GNRC_IPV6_NIB
-    bool "Configure GNRC IPv6 NIB"
-
-if KCONFIG_USEMODULE_GNRC_IPV6_NIB
+menu "GNRC IPv6 NIB"
+    depends on USEMODULE_GNRC_IPV6_NIB
 
 config GNRC_IPV6_NIB_6LBR
     bool "6LoWPAN border router features"
@@ -57,7 +55,7 @@ config GNRC_IPV6_NIB_DNS
 
 config GNRC_IPV6_NIB_ADV_ROUTER
     bool "Activate router advertising at interface start-up"
-    default n if MODULE_DHCPV6_CLIENT_IA_PD || USEMODULE_GNRC_UHCPC
+    default n if USEMODULE_DHCPV6_CLIENT_IA_PD || USEMODULE_GNRC_UHCPC
     default n if USEMODULE_GNRC_IPV6_AUTO_SUBNETS
     default y if GNRC_IPV6_NIB_ROUTER && (!GNRC_IPV6_NIB_6LR || GNRC_IPV6_NIB_6LBR)
 
@@ -84,7 +82,7 @@ config GNRC_IPV6_NIB_MULTIHOP_P6C
 config GNRC_IPV6_NIB_NO_RTR_SOL
     bool "Disable router solicitations"
     help
-        @warning Only set this if you know what you're doing.
+        @warning Only set this if you know what youre doing.
 
 if GNRC_IPV6_NIB_NO_RTR_SOL
 comment "Disabling router solicitations will make your host have to wait longer"
@@ -134,4 +132,4 @@ comment "Warning: Behavior for more than 2 Authoritative Border Router entries"
 comment "is currently not specified or tested."
 endif
 
-endif # KCONFIG_USEMODULE_GNRC_IPV6_NIB
+endmenu # GNRC IPv6 NIB

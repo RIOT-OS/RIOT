@@ -4,17 +4,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-menuconfig MODULE_FIDO2
-    bool "FIDO2"
-    help
-        FIDO2 is an authentication standard that seeks to solve the password
-        problem by enabling passwordless authentication. FIDO2 consists of the
-        W3C Web Authentication specification (WebAuthn) and the Client to
-        Authenticator Protocol (CTAP). For more information visit
-        https://fidoalliance.org/fido2.
-
-if MODULE_FIDO2
+if USEMODULE_FIDO2
 
 rsource "ctap/Kconfig"
 
-endif # MODULE_FIDO2
+endif # USEMODULE_FIDO2

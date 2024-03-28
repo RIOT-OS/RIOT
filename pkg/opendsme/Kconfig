@@ -5,12 +5,8 @@
 # directory for more details.
 #
 
-menuconfig KCONFIG_USEPKG_OPENDSME
-    bool "Configure openDSME"
-    help
-        Configure openDSME using Kconfig.
-
-if KCONFIG_USEPKG_OPENDSME
+menu "openDSME"
+    depends on USEPKG_OPENDSME
 
 config OPENDSME_MAX_NEIGHBOURS
     int "Maximum number of DSME neighbours"
@@ -43,4 +39,4 @@ config OPENDSME_CFP_QUEUE_SIZE
         take longer as a result of slot schedules. Therefore, the GTS queue should
         have more capacity than the CAP queue (OPENDSME_CAP_QUEUE_SIZE).
 
-endif # KCONFIG_USEPKG_OPENDSME
+endmenu # openDSME

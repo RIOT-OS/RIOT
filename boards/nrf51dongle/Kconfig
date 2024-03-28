@@ -12,9 +12,5 @@ config BOARD_NRF51DONGLE
     default y
     select BOARD_COMMON_NRF51
     select CPU_MODEL_NRF51X22XXAB
-    select HAS_PERIPH_UART
-    select HAS_PERIPH_UART_HW_FC
-
-    select MODULE_PERIPH_UART_HW_FC if HAS_PERIPH_UART_HW_FC && MODULE_PERIPH_UART
 
 source "$(RIOTBOARD)/common/nrf51/Kconfig"

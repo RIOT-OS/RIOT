@@ -12,12 +12,5 @@ config BOARD_CALLIOPE_MINI
     default y
     select BOARD_COMMON_NRF51
     select CPU_MODEL_NRF51X22XXAB
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_UART
-    select HAS_PERIPH_PWM
 
-    select HAVE_SAUL_GPIO
-    select HAVE_BMX055
-
-source "$(RIOTBOARD)/common/microbit/Kconfig"
 source "$(RIOTBOARD)/common/nrf51/Kconfig"

@@ -1,9 +1,0 @@
-# Copyright (c) 2022 Niklaus Leuenberger
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
-
-config PACKAGE_EXTERNAL_PKG_NOT_USED
-    bool "external_pkg_not_used package"
-    depends on TEST_KCONFIG

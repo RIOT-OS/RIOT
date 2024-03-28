@@ -13,25 +13,9 @@ config BOARD_LORA_E5_DEV
     default y
     select CPU_MODEL_STM32WLE5JC
 
-    # Put defined MCU peripherals here (in alphabetical order)
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_LPUART
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-
-    # Put other features for this board (in alphabetical order)
-    select HAS_ARDUINO_PINS
-    select HAS_RIOTBOOT
-
     # Clock configuration
     select BOARD_HAS_HSE
     select BOARD_HAS_LSE
-
-    select HAVE_SAUL_GPIO
-    select HAVE_LM75A
 
 config CLOCK_HSE
     default 32000000

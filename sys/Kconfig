@@ -6,150 +6,17 @@
 #
 menu "System"
 
-rsource "analog_util/Kconfig"
-rsource "app_metadata/Kconfig"
-rsource "arduino/Kconfig"
 rsource "auto_init/Kconfig"
-rsource "base64/Kconfig"
-rsource "benchmark/Kconfig"
-rsource "bhp/Kconfig"
-rsource "bitfield/Kconfig"
-rsource "bloom/Kconfig"
-rsource "bus/Kconfig"
-rsource "cb_mux/Kconfig"
-rsource "checksum/Kconfig"
 rsource "chunked_ringbuffer/Kconfig"
-rsource "clif/Kconfig"
-rsource "color/Kconfig"
-rsource "crypto/Kconfig"
 rsource "congure/Kconfig"
-rsource "cpp11-compat/Kconfig"
-rsource "cpp_new_delete/Kconfig"
-rsource "cxx_ctor_guards/Kconfig"
 rsource "debug_irq_disable/Kconfig"
-rsource "div/Kconfig"
-rsource "embunit/Kconfig"
 rsource "entropy_source/Kconfig"
-rsource "eepreg/Kconfig"
-rsource "event/Kconfig"
 rsource "fido2/Kconfig"
-rsource "fmt/Kconfig"
-rsource "frac/Kconfig"
-rsource "fs/Kconfig"
-rsource "hashes/Kconfig"
-rsource "iolist/Kconfig"
-rsource "isrpipe/Kconfig"
-rsource "libc/Kconfig"
-
-menu "Libc"
-
-choice LIBC_IMPLEMENTATION
-    bool "Libc implementation"
-    depends on TEST_KCONFIG
-
-config MODULE_NEWLIB
-    bool "NewLib"
-    depends on HAS_NEWLIB
-
-config MODULE_PICOLIBC
-    bool "Picolibc"
-    depends on HAS_PICOLIBC
-endchoice
-
-config MODULE_LIBC_GETTIMEOFDAY
-    bool "Support for gettimeofday()"
-    select ZTIMER64_USEC
-
-rsource "Kconfig.newlib"
-rsource "Kconfig.picolibc"
-
-endmenu # Libc
-
-
-rsource "Kconfig.stdio"
-choice LOG
-    bool "Logging system override"
-    optional
-    #modules log_color and log_printfnoformat describe their options
-endchoice
-
-rsource "coding/Kconfig"
-rsource "ecc/Kconfig"
-rsource "evtimer/Kconfig"
-rsource "log_color/Kconfig"
-rsource "log_printfnoformat/Kconfig"
-rsource "luid/Kconfig"
-rsource "malloc_monitor/Kconfig"
-rsource "malloc_thread_safe/Kconfig"
-rsource "matstat/Kconfig"
-rsource "memarray/Kconfig"
-rsource "mineplex/Kconfig"
 rsource "net/Kconfig"
-rsource "od/Kconfig"
-rsource "oneway-malloc/Kconfig"
-rsource "phydat/Kconfig"
-rsource "pipe/Kconfig"
-rsource "pm_layered/Kconfig"
-rsource "posix/Kconfig"
-rsource "preprocessor/Kconfig"
 rsource "progress_bar/Kconfig"
-rsource "ps/Kconfig"
 rsource "psa_crypto/Kconfig"
-rsource "random/Kconfig"
-rsource "rtc_utils/Kconfig"
-rsource "rust_riotmodules/Kconfig"
-rsource "saul_reg/Kconfig"
-rsource "schedstatistics/Kconfig"
-rsource "sema/Kconfig"
-rsource "sema_inv/Kconfig"
-rsource "senml/Kconfig"
-rsource "seq/Kconfig"
 rsource "shell/Kconfig"
 rsource "shell_lock/Kconfig"
-rsource "ssp/Kconfig"
-rsource "test_utils/Kconfig"
-rsource "timex/Kconfig"
-rsource "tiny_strerror/Kconfig"
-rsource "trace/Kconfig"
-rsource "trickle/Kconfig"
-rsource "tsrb/Kconfig"
-rsource "uri_parser/Kconfig"
 rsource "usb/Kconfig"
-rsource "usb_board_reset/Kconfig"
-rsource "ut_process/Kconfig"
-rsource "uuid/Kconfig"
-rsource "vfs/Kconfig"
-rsource "xtimer/Kconfig"
-rsource "ztimer/Kconfig"
-rsource "ztimer64/Kconfig"
-
-config MODULE_CPP
-    bool "Use CPP compiler"
-    depends on TEST_KCONFIG
-    depends on HAS_CPP
-
-config MODULE_LIBSTDCPP
-    bool "Use the CPP standard library"
-    depends on TEST_KCONFIG
-    depends on HAS_LIBSTDCPP
-    depends on HAS_CPP
-    select MODULE_CPP
-
-config MODULE_ATOMIC_UTILS
-    bool "Atomic access utility functions"
-    depends on TEST_KCONFIG
-
-config MODULE_SYS
-    bool
-    default y
-    depends on TEST_KCONFIG
-    help
-        System module, it serves to pull in all the rest of system modules.
-
-config MODULE_LOG
-    bool
-    help
-        Modules that override the default log implementation should select this.
-        For more information see core/include/log.h.
 
 endmenu # System

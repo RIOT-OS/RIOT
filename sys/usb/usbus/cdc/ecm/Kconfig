@@ -4,20 +4,9 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_USEMODULE_USBUS_CDC_ECM
-    bool "Configure USBUS CDC ECM"
+
+menu "USBUS CDC ECM"
     depends on USEMODULE_USBUS_CDC_ECM
-    depends on KCONFIG_USEMODULE_USBUS
-    help
-        Configure the USBUS CDC ECM module via Kconfig.
-
-menuconfig MODULE_USBUS_CDC_ECM
-    bool "Configure USBUS CDC ECM"
-    depends on MODULE_USBUS
-    help
-        Configure the USBUS CDC ECM module via Kconfig.
-
-if KCONFIG_USEMODULE_USBUS_CDC_ECM || MODULE_USBUS_CDC_ECM
 
 config USBUS_CDC_ECM_CONFIG_SPEED_IND
     bool "Configure upload and download speeds independently"
@@ -47,4 +36,4 @@ config USBUS_CDC_ECM_CONFIG_SPEED_UPSTREAM
         This is the link upload speed, defined in bits/second, that the USB
         peripheral will report to the host.
 
-endif # KCONFIG_USEMODULE_USBUS_CDC_ECM || MODULE_USBUS_CDC_ECM
+endmenu # USBUS CDC ECM

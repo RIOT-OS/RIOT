@@ -5,24 +5,10 @@
 # directory for more details.
 #
 
-menuconfig MODULE_AUTO_INIT
-    bool "Auto-initialization system"
-    default y
-    depends on TEST_KCONFIG
-    select MODULE_PREPROCESSOR_SUCCESSOR
-    help
-        Auto-initialization module. Can be used to initialize modules (such as
-        drivers, or network interfaces) on start-up automatically. Disable if a
-        more custom initialization is required. If unsure, say Y.
-
-if MODULE_AUTO_INIT
+if USEMODULE_AUTO_INIT
 
 config AUTO_INIT_ENABLE_DEBUG
     bool "Print a debug message before a module is initialized"
     default n
 
-rsource "screen/Kconfig"
-rsource "security/Kconfig"
-rsource "multimedia/Kconfig"
-
-endif # MODULE_AUTO_INIT
+endif # USEMODULE_AUTO_INIT

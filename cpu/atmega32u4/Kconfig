@@ -12,13 +12,6 @@ config CPU_FAM_ATMEGA32
 config CPU_MODEL_ATMEGA32U4
     bool
     select CPU_FAM_ATMEGA32
-    select HAS_CPU_ATMEGA32U4
-
-## Definition of specific features
-config HAS_CPU_ATMEGA32U4
-    bool
-    help
-        Indicates that a 'atmega32u4' cpu is being used.
 
 ## Common CPU symbols
 config CPU_FAM

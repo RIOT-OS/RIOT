@@ -45,14 +45,12 @@ config CPU_LINE_STM32F303XB
 config CPU_LINE_STM32F303XC
     bool
     select CPU_FAM_F3
-    select HAS_CORTEXM_MPU
     select CLOCK_HAS_NO_MCO_PRE
     select HAVE_CLOCK_PLL_PREDIV_HARDWIRED_2
 
 config CPU_LINE_STM32F303XE
     bool
     select CPU_FAM_F3
-    select HAS_CORTEXM_MPU
 
 config CPU_LINE_STM32F318XX
     bool

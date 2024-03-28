@@ -208,10 +208,10 @@ static bool _parse_endpoint(sock_udp_ep_t *remote,
 static ssize_t _dispatch_msg(const void *buf, size_t len, sock_udp_ep_t *remote)
 {
     /* Yes it's not a request -- but turns out there is nothing in
-     * gcoap_req_send_tl that is actually request specific, especially if we
+     * gcoap_req_send that is actually request specific, especially if we
      * don't assign a callback. */
-    ssize_t res = gcoap_req_send_tl(buf, len, remote, NULL, NULL,
-                                    GCOAP_SOCKET_TYPE_UDP);
+    ssize_t res = gcoap_req_send(buf, len, remote, NULL, NULL,
+                                 GCOAP_SOCKET_TYPE_UDP);
     if (res <= 0) {
         DEBUG("gcoap_forward_proxy: unable to dispatch message: %d\n", -res);
     }
@@ -440,7 +440,8 @@ static int _gcoap_forward_proxy_via_coap(coap_pkt_t *client_pkt,
 
     len = gcoap_req_send((uint8_t *)pkt.hdr, len,
                          &origin_server_ep,
-                         _forward_resp_handler, (void *)client_ep);
+                         _forward_resp_handler, (void *)client_ep,
+                         GCOAP_SOCKET_TYPE_UNDEF);
     return len;
 }
 

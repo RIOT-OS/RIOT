@@ -13,14 +13,6 @@ config BOARD_IM880B
     default y
     select CPU_MODEL_STM32L151CB
 
-    # Put defined MCU peripherals here (in alphabetical order)
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-
     # Clock configuration
     select BOARD_HAS_HSE
     select BOARD_HAS_LSE

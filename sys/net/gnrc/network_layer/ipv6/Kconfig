@@ -6,13 +6,8 @@
 #
 menu "IPv6"
 
-menuconfig KCONFIG_USEMODULE_GNRC_IPV6
-    bool "Configure GNRC IPv6 module"
+menu "GNRC IPv6 module"
     depends on USEMODULE_GNRC_IPV6
-    help
-        Configure GNRC IPv6 module using Kconfig.
-
-if KCONFIG_USEMODULE_GNRC_IPV6
 
 config GNRC_IPV6_MSG_QUEUE_SIZE_EXP
     int "Exponent for the message queue size used for the IPv6 thread (as 2^n)"
@@ -42,10 +37,10 @@ config GNRC_IPV6_STATIC_LLADDR_IS_FIXED
     bool "Same link-local address on every interface"
     depends on GNRC_IPV6_STATIC_LLADDR_ENABLE
     help
-         Don't add the interface PID to the least significant byte
+         Dont add the interface PID to the least significant byte
          of the address.
 
-endif # KCONFIG_USEMODULE_GNRC_IPV6
+endmenu # GNRC IPv6 module
 
 rsource "blacklist/Kconfig"
 rsource "ext/frag/Kconfig"

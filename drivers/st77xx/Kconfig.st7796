@@ -5,15 +5,9 @@
 # directory for more details.
 #
 
-if MODULE_ST77XX
+if USEMODULE_ST77XX
 
-config MODULE_ST7796
-    bool "ST7796 display"
-    default y if HAVE_ST7796
-    help
-        ST7796 display controller is used
-
-if MODULE_ST7796
+if USEMODULE_ST7796
 
 menuconfig ST7796_CUSTOM_CONFIG
     bool "ST7796 Custom Configuration"
@@ -91,5 +85,5 @@ config ST7796_VRH
 # TODO  ST7796_VGH and ST7796_VGL (non linear values)
 
 endif # ST7796_CUSTOM_CONFIG
-endif # MODULE_ST7796
-endif # MODULE_ST77XX
+endif # USEMODULE_ST7796
+endif # USEMODULE_ST77XX

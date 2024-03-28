@@ -24,5 +24,4 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32l0538-disco \
     telosb \
     weact-g030f6 \
-    z1 \
     #

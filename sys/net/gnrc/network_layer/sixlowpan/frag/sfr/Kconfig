@@ -4,13 +4,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR
-    bool "Configure GNRC 6LoWPAN Selective Fragment Recovery"
+menu "GNRC 6LoWPAN Selective Fragment Recovery"
     depends on USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR
-    help
-        Configure GNRC 6LoWPAN Selective Fragement Recovery using Kconfig.
-
-if KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR
 
 config GNRC_SIXLOWPAN_SFR_MIN_FRAG_SIZE
     int "Default minimum value for fragment size (MinFragmentSize)"
@@ -34,7 +29,7 @@ config GNRC_SIXLOWPAN_SFR_OPT_FRAG_SIZE
 
 config GNRC_SIXLOWPAN_SFR_USE_ECN
     bool "Indicates whether the sender should react to Explicit Content Notification (UseECN)"
-    default true if KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE
+    default true if USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE
     default false
     help
         When the sender reacts to Explicit Congestion Notification (ECN) its
@@ -42,7 +37,7 @@ config GNRC_SIXLOWPAN_SFR_USE_ECN
         CONFIG_GNRC_SIXLOWPAN_SFR_MIN_WIN_SIZE and @ref
         CONFIG_GNRC_SIXLOWPAN_SFR_MAX_WIN_SIZE.
 
-if GNRC_SIXLOWPAN_SFR_USE_ECN && !KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE
+if GNRC_SIXLOWPAN_SFR_USE_ECN && !USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE
 comment "Warning: Reaction to ECN requires module `gnrc_sixlowpan_frag_sfr_congure`"
 endif
 
@@ -99,11 +94,9 @@ config GNRC_SIXLOWPAN_SFR_DG_RETRIES
     int "The maximum number of retries from scratch for a particular datagram (MaxDatagramRetries)"
     default 0
 
-menuconfig KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_IF_IN
-    bool "Configure SFR ECN based on the message queue of the incoming netif"
+menu "SFR ECN based on the message queue of the incoming netif"
     depends on USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_IF_IN
 
-if KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_IF_IN
 config GNRC_SIXLOWPAN_SFR_ECN_IF_IN_NUM
     int "The numerator for the factor for when to mark ECN on incoming netif queue state"
     default 1
@@ -121,13 +114,11 @@ config GNRC_SIXLOWPAN_SFR_ECN_IF_IN_DEN
         ECN bit of an RFRAG header when the message queue of the incoming `netif` is
         filled by
         @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_IN_NUM / @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_IN_DEN
-endif
+endmenu # SFR ECN based on the message queue of the incoming netif
 
-menuconfig KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_IF_OUT
-    bool "Configure SFR ECN based on the output queue of the outgoing netif"
+menu "SFR ECN based on the output queue of the outgoing netif"
     depends on USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_IF_OUT
 
-if KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_IF_OUT
 config GNRC_SIXLOWPAN_SFR_ECN_IF_OUT_NUM
     int "The numerator for the factor for when to mark ECN on the outgoing netif's output queue state"
     default 1
@@ -145,13 +136,11 @@ config GNRC_SIXLOWPAN_SFR_ECN_IF_OUT_DEN
         ECN bit of an RFRAG header when the output queue of the outgoing `netif` is
         filled by
         @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_OUT_NUM / @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_OUT_DEN
-endif
+endmenu # SFR ECN based on the output queue of the outgoing netif
 
-menuconfig KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_FQUEUE
-    bool "Configure SFR ECN based on SFR's frame queue"
+menu "SFR ECN based on SFR's frame queue"
     depends on USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_FQUEUE
 
-if KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_FQUEUE
 config GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_NUM
     int "The numerator for the factor for when to mark ECN on frame queue state"
     default 1
@@ -167,14 +156,13 @@ config GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_DEN
         When `gnrc_sixlowpan_frag_sfr_ecn_fqueue` is compiled in, nodes will set the
         ECN bit of an RFRAG header when the frame queue for SFR is filled by
         @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_NUM / @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_DEN
-endif
+endmenu # SFR ECN based on SFR's frame queue
 
 config GNRC_SIXLOWPAN_SFR_MOCK_ARQ_TIMER
     bool "Deactivate automatic handling of ARQ timer"
-    default n
     help
         This requires an external source (e.g. a test application) to call
         @ref gnrc_sixlowpan_frag_sfr_arq_timeout() for
         @ref net_gnrc_sixlowpan_frag_sfr to still work properly.
 
-endif
+endmenu # GNRC 6LoWPAN Selective Fragment Recovery

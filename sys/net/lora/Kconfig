@@ -5,17 +5,8 @@
 # directory for more details.
 #
 
-config MODULE_LORA
-    bool "LoRa PHY support"
-    depends on TEST_KCONFIG
-
-menuconfig KCONFIG_USEMODULE_LORA
-    bool "Configure LoRa PHY"
+menu "LoRa PHY"
     depends on USEMODULE_LORA
-    help
-        Configure LoRa PHY using Kconfig.
-
-if KCONFIG_USEMODULE_LORA
 
 config LORA_PREAMBLE_LENGTH_DEFAULT
     int "Preamble length"
@@ -157,4 +148,4 @@ config LORA_PAYLOAD_LENGTH_DEFAULT
         Configure the length of payload. The option is unused while using
         explicit header mode as PHDR carries the length information.
 
-endif # KCONFIG_USEMODULE_LORA
+endmenu # LoRa PHY

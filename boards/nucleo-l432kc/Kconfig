@@ -14,20 +14,4 @@ config BOARD_NUCLEO_L432KC
     select BOARD_COMMON_NUCLEO32
     select CPU_MODEL_STM32L432KC
 
-    # Put defined MCU peripherals here (in alphabetical order)
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-
-    # Put other features for this board (in alphabetical order)
-    # Note that a recent version of OpenOCD is required for flashing an image on
-    # the second slot of the flash memory. This version has to be built from source
-    # and at least contains the following commit
-    # https://github.com/ntfreak/openocd/commit/a4d50544de07f13e3f9644d2b48e41ebdc91a7a3
-    select HAS_RIOTBOOT
-
 source "$(RIOTBOARD)/common/nucleo32/Kconfig"

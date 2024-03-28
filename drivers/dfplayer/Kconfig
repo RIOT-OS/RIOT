@@ -1,34 +1,15 @@
-# Copyright (c) 2020 HAW Hamburg
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
-#
-
-menuconfig MODULE_DFPLAYER
-    bool "DFPlayer Mini MP3 Player"
-    depends on HAS_PERIPH_UART
-    depends on HAS_PERIPH_GPIO
-    depends on TEST_KCONFIG
-    select MODULE_PERIPH_UART
-    select MODULE_PERIPH_GPIO
-    select MODULE_XTIMER
-    select HAVE_MULTIMEDIA_DEVICE
-# Perhaps this could be moved to its own symbol to enable the dfplayer commands
-    select MODULE_FMT if MODULE_SHELL_CMDS
+menu "DFPLAYER: MP3 Player"
+    depends on USEMODULE_DFPLAYER
 
 config DFPLAYER_NO_STRERROR
     bool
     prompt "Avoid using strerror in shell command" if !(HAS_ARCH_AVR8 || HAS_ARCH_MSP430)
-    depends on MODULE_DFPLAYER
-    depends on MODULE_SHELL_CMDS
+
+    depends on USEMODULE_SHELL_CMDS
     # no strerror() on AVR and MSP430
     default y if (HAS_ARCH_AVR8 || HAS_ARCH_MSP430)
     help
         Say y to print error codes as numbers when using the shell, instead of the corresponding
         standard error string.
 
-config HAVE_DFPLAYER
-    bool
-    help
-        Indicates that a DFPlayer Mini MP3 Player is present.
+endmenu # DFPLAYER: MP3 Player

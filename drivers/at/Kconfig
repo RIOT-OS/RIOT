@@ -5,57 +5,8 @@
 # directory for more details.
 #
 
-menuconfig MODULE_AT
-    bool "AT (Hayes) command set library"
-    depends on HAS_PERIPH_UART
-    depends on TEST_KCONFIG
-    depends on MODULE_ISRPIPE
-    depends on MODULE_ISRPIPE_READ_TIMEOUT
-    select MODULE_FMT
-    select MODULE_PERIPH_UART
-
-if MODULE_AT
-
-config MODULE_AT_URC
-    bool "Support Unsolicited Result Codes (URC)"
-
-config MODULE_AT_URC_ISR
-    bool "Process URCs when they arrive"
-    depends on MODULE_AT_URC
-    depends on MODULE_EVENT_THREAD
-
-choice
-    bool "Thread priority"
-    depends on MODULE_AT_URC_ISR
-    default MODULE_AT_URC_ISR_MEDIUM
-    help
-        To process URCs upon arrival an event thread is used. The
-        MODULE_EVENT_THREAD symbol should be set. Choose a priority for the
-        thread that processes the URCs.
-
-config MODULE_AT_URC_ISR_LOWEST
-    bool "Lowest"
-    select MODULE_EVENT_THREAD_LOWEST
-
-config MODULE_AT_URC_ISR_MEDIUM
-    bool "Medium"
-    select MODULE_EVENT_THREAD_MEDIUM
-
-config MODULE_AT_URC_ISR_HIGHEST
-    bool "Highest"
-    select MODULE_EVENT_THREAD_HIGHEST
-
-endchoice
-
-endif # MODULE_AT
-
-menuconfig KCONFIG_USEMODULE_AT
-    bool "Configure AT driver"
+menu "AT driver"
     depends on USEMODULE_AT
-    help
-        Configure the AT driver using Kconfig.
-
-if KCONFIG_USEMODULE_AT
 
 choice
     bool "End of line character"
@@ -105,4 +56,4 @@ config AT_BUF_SIZE_EXP
         this option represents the exponent of 2^n, which will be used as the
         size of the buffer.
 
-endif # KCONFIG_USEMODULE_AT
+endmenu # AT driver

@@ -19,6 +19,7 @@ EXPECTED_HELP = (
     'end_test             ends a test',
     'echo                 prints the input command',
     'empty                print nothing on command',
+    'periodic             periodically print command',
     'app_metadata         Returns application metadata',
     'pm                   interact with layered PM subsystem',
     'ps                   Prints information about running threads.',
@@ -205,6 +206,18 @@ def check_control_d(child):
         child.expect_exact(PROMPT)
 
 
+def check_preempt(child):
+    child.expect(PROMPT)
+    child.sendline('periodic 5')
+
+    child.expect_exact('test')
+    child.expect_exact('test')
+    child.expect_exact('test')
+    child.expect_exact('test')
+    child.expect_exact('test')
+    child.sendline('')
+
+
 def testfunc(child):
     # avoid sending an extra empty line on native.
     if BOARD in ['native', 'native64']:
@@ -223,6 +236,8 @@ def testfunc(child):
     check_erase_long_line(child, longline)
 
     check_control_d(child)
+
+    check_preempt(child)
 
     # loop other defined commands and expected output
     for cmd, expected in CMDS:

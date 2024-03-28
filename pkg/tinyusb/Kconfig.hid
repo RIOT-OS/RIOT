@@ -5,10 +5,7 @@
 # directory for more details.
 #
 
-menuconfig MODULE_TINYUSB_CLASS_HID
-    bool "Human Interface Device (HID)"
-
-if MODULE_TINYUSB_CLASS_HID && MODULE_TINYUSB_DEVICE
+if USEMODULE_TINYUSB_CLASS_HID && USEMODULE_TINYUSB_DEVICE
 
 config TUSBD_HID_NUMOF
     int "Number of HID interfaces"

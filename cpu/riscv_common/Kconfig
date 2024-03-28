@@ -6,43 +6,10 @@
 
 config CPU_ARCH_RISCV
     bool
-    select HAS_ARCH_RISCV
-    select HAS_CPP
-    select HAS_LIBSTDCPP
-    select HAS_NEWLIB
-    select HAS_PERIPH_CORETIMER
-    select HAS_PICOLIBC
-    select HAS_PUF_SRAM
-    select HAS_RUST_TARGET
-    select HAS_SSP
-
-    select MODULE_MALLOC_THREAD_SAFE if TEST_KCONFIG
-    imply MODULE_NEWLIB_NANO
 
 config CPU_CORE_RV32IMAC
     bool
     select CPU_ARCH_RISCV
-    select HAS_ARCH_32BIT
-
-## Definition of specific features
-config HAS_ARCH_RISCV
-    bool
-    help
-        Indicates that the current CPU has a RISC-V.
 
 config CPU_ARCH
     default "rv32" if CPU_CORE_RV32IMAC
-
-config MODULE_RISCV_COMMON
-    bool
-    default y
-    depends on TEST_KCONFIG && CPU_ARCH_RISCV
-    select MODULE_MALLOC_THREAD_SAFE
-    help
-        Common code for RISC-V architecture.
-
-rsource "periph/Kconfig"
-
-choice LIBC_IMPLEMENTATION
-    default MODULE_NEWLIB
-endchoice

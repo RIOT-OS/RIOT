@@ -9,15 +9,6 @@ config CPU_FAM_EZR32WG
     select CPU_CORE_CORTEX_M4F
     select CPU_COMMON_EFM32
     select CPU_EFM32_SERIES0
-    select HAS_CORTEXM_MPU
-
-config MODULE_CPU_EZR32WG
-    bool
-    depends on CPU_FAM_EZR32WG
-    depends on TEST_KCONFIG
-    default y
-    help
-        EZR32WG family-specific code.
 
 ## CPU Models
 config CPU_MODEL_EZR32WG230F128R68

@@ -5,41 +5,8 @@
 # directory for more details.
 #
 
-menuconfig KCONFIG_USEPKG_FLASHDB
-    bool "Configure FlashDB"
-    help
-        Configure FlashDB using Kconfig
-
-if KCONFIG_USEPKG_FLASHDB
-
-config MODULE_FLASHDB_MTD
-    bool "Use MTD backend"
-    select MODULE_MTD
-    select MODULE_FLASHDB_FAL
-
-config MODULE_FLASHDB_VFS
-    bool "Use VFS backend"
-    select MODULE_VFS
-    select MODULE_FLASHDB_FAL
-
-config MODULE_FLASHDB_FAL
-    bool "FlashDB flash abstraction layer"
-    depends on MODULE_FLASHDB_MTD
-    default y
-
-config MODULE_FLASHDB_TSDB
-    bool "FlashDB Time Series Database"
-
-config MODULE_FLASHDB_KVDB
-    bool "FlashDB Key-Value Database"
-
-config MODULE_FLASHDB_KVDB_AUTO_UPDATE
-    bool "Enable Key-Value automatic upgrade function"
-    depends on MODULE_FLASHDB_KVDB
-    help
-          When this function is enabled, fdb_kvdb.ver_num stores the version of the current
-          database. If the version changes, it will automatically trigger an upgrade action
-          and update the new default KV collection to the current database.
+menu "FlashDB package"
+    depends on USEPKG_FLASHDB
 
 config FLASHDB_MIN_SECTOR_SIZE_DEFAULT_KiB
     int "Minimal virtual sector size in KiB for FlashDB"
@@ -50,6 +17,4 @@ config FLASHDB_MIN_SECTOR_SIZE_DEFAULT_KiB
         a KV with a length of 10K, you can use the control function to set the sector size to 12K or
         larger.
 
-config MODULE_FLASHDB_MTD
-
-endif # PACKAGE_FLASHDB
+endmenu # FlashDB

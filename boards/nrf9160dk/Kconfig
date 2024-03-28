@@ -11,12 +11,3 @@ config BOARD_NRF9160DK
     bool
     default y
     select CPU_MODEL_NRF9160
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-
-    # Put other features for this board (in alphabetical order)
-    select HAS_RIOTBOOT

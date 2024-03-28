@@ -1,4 +1,0 @@
-# this file enables modules defined in Kconfig. Do not use this file for
-# application configuration. This is only needed during migration.
-CONFIG_MODULE_PERIPH_HWRNG=y
-CONFIG_MODULE_XTIMER=y

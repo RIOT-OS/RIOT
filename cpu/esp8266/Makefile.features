@@ -7,9 +7,3 @@ CPU_CORE = xtensa-l106
 include $(RIOTCPU)/esp_common/Makefile.features
 
 FEATURES_PROVIDED += arch_esp8266
-
-# This configuration enables modules that are only available when using Kconfig
-# module modelling
-ifeq (1, $(TEST_KCONFIG))
-  KCONFIG_ADD_CONFIG += $(RIOTCPU)/esp8266/esp8266.config
-endif

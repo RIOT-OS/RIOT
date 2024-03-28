@@ -3,6 +3,7 @@ CPU_CORE = msp430
 
 ifneq (,$(filter msp430f2% msp430g2%,$(CPU_MODEL)))
   CPU_FAM := msp430_f2xx_g2xx
+  FEATURES_PROVIDED += periph_spi_reconfigure
 endif
 
 ifneq (,$(filter msp430f1%,$(CPU_MODEL)))

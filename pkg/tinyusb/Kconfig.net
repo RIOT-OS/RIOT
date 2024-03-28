@@ -5,22 +5,7 @@
 # directory for more details.
 #
 
-menuconfig MODULE_TINYUSB_CLASS_NET
-    bool "Network Device Class"
-    depends on MODULE_TINYUSB_DEVICE
-
-if MODULE_TINYUSB_CLASS_NET
-
-config MODULE_TINYUSB_CLASS_NET_CDC_ECM
-    bool "CDC ECM network device"
-    default y
-
-config MODULE_TINYUSB_CLASS_NET_CDC_NCM
-    bool "CDC NCM network device"
-
-config MODULE_TINYUSB_CLASS_NET_RNDIS
-    bool "RNDIS network device"
-    select MODULE_TINYUSB_LIB_NETWORKING
+if USEMODULE_TINYUSB_CLASS_NET
 
 config TUSBD_NET_NUMOF
     int
@@ -57,4 +42,4 @@ config TUSBD_NET_MAC_STRING
     default "0123456789ab"
 
 endif # TUSBD_NET_NUMOF > 0
-endif # MODULE_TINYUSB_CLASS_NET
+endif # USEMODULE_TINYUSB_CLASS_NET

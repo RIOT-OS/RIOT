@@ -19,5 +19,4 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32f0discovery \
     telosb \
     weact-g030f6 \
-    z1 \
     #

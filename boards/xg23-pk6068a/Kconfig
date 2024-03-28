@@ -11,14 +11,3 @@ config BOARD_XG23_PK6068A
     bool
     default y
     select CPU_MODEL_EFR32ZG23A020F512GM48
-
-    # Put defined MCU peripherals here (in alphabetical order)
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-
-    # Put other features for this board (in alphabetical order)
-    select HAVE_SAUL_GPIO
-    select HAVE_ZTIMER_PERIPH_LPTIMER

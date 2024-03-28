@@ -13,6 +13,5 @@ config BOARD_RPI_PICO_W
     bool
     default y
     select CPU_MODEL_RP2040
-    select HAS_PERIPH_UART
 
 source "$(RIOTBOARD)/rpi-pico/Kconfig"

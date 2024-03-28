@@ -11,20 +11,3 @@ config BOARD_HAMILTON
     bool
     default y
     select CPU_MODEL_SAMR21E18A
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_GPIO
-    select HAS_PERIPH_GPIO_IRQ
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_RTC
-    select HAS_PERIPH_RTT
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-
-    select HAVE_AT86RF233
-    select HAVE_FXOS8700
-    select HAVE_HDC1000
-    select HAVE_PIR
-    select HAVE_PULSE_COUNTER
-    select HAVE_SAUL_GPIO
-    select HAVE_TMP006

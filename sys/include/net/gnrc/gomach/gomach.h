@@ -10,6 +10,8 @@
  * @defgroup    net_gnrc_gomach GoMacH
  * @ingroup     net_gnrc
  * @brief       A traffic-adaptive multi-channel MAC
+ * @deprecated  This module is deprecated and will be removed after the 2024.10 release.
+ *              As an alternative MAC layer for IEEE 802.15.4, you can use @ref pkg_opendsme.
  *
  *
  * GoMacH is, "a General, nearly Optimal MAC protocol for multi-Hop communications",

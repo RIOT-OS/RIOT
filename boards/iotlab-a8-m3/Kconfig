@@ -12,6 +12,5 @@ config BOARD_IOTLAB_A8_M3
     bool
     default y
     select BOARD_COMMON_IOTLAB
-    select MODULE_BOARDS_COMMON_IOTLAB if TEST_KCONFIG
 
 source "$(RIOTBOARD)/common/iotlab/Kconfig"

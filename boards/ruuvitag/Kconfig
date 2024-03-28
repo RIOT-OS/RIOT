@@ -12,14 +12,5 @@ config BOARD_RUUVITAG
     default y
     select BOARD_COMMON_NRF52
     select CPU_MODEL_NRF52832XXAA
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_UART
-    select HAS_VDD_LC_FILTER_REG1
-
-    select HAVE_SAUL_GPIO
-    select HAVE_BME280_SPI
-    select HAVE_LIS2DH12_SPI
-
-    select MODULE_BOARDS_COMMON_NRF52XXXDK if TEST_KCONFIG
 
 source "$(RIOTBOARD)/common/nrf52xxxdk/Kconfig"

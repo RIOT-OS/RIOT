@@ -9,8 +9,6 @@ config CPU_FAM_ESP32S2
     bool
     select CPU_COMMON_ESP32X
     select CPU_CORE_XTENSA_LX7
-    select MODULE_USBDEV_SYNOPSYS_DWC2 if MODULE_PERIPH_USBDEV
-    select MODULE_USB_BOARD_RESET if MODULE_USBUS_CDC_ACM || MODULE_TINYUSB_CLASS_CDC
 
 config CPU_FAM
     default "esp32s2" if CPU_FAM_ESP32S2
@@ -37,7 +35,6 @@ config CPU_MODEL_ESP32S2_FH4
 config CPU_MODEL_ESP32S2_FN4R2
     bool
     select CPU_FAM_ESP32S2
-    select HAS_ESP_SPI_RAM
     help
         Indicates that CPU version ESP32-S2FN4R2 with 4 MB embedded Flash and
         2 MB embedded SPI RAM is used.
@@ -45,7 +42,6 @@ config CPU_MODEL_ESP32S2_FN4R2
 config CPU_MODEL_ESP32S2_R2
     bool
     select CPU_FAM_ESP32S2
-    select HAS_ESP_SPI_RAM
     help
         Indicates that CPU version ESP32-S2R2 with 2 MB embedded SPI RAM is used.
 
@@ -66,7 +62,6 @@ config CPU_MODEL_ESP32S2_MINI_1X_N4
 config CPU_MODEL_ESP32S2_MINI_1X_N4R2
     bool
     select CPU_FAM_ESP32S2
-    select HAS_ESP_SPI_RAM
     help
         Indicates that ESP32-S2-MINI-1-N4R2 or ESP32-S2-MINI-1U-N4R2 module
         with 4 MB Flash and 2 MB SPI RAM is used.
@@ -88,7 +83,6 @@ config CPU_MODEL_ESP32S2_MINI_2X_N4
 config CPU_MODEL_ESP32S2_MINI_2X_N4R2
     bool
     select CPU_FAM_ESP32S2
-    select HAS_ESP_SPI_RAM
     help
         Indicates that ESP32-S2-MINI-2-N4R2 or ESP32-S2-MINI-2U-N4R2 module
         with 4 MB Flash and 2 MB SPI RAM is used.
@@ -124,7 +118,6 @@ config CPU_MODEL_ESP32S2_SOLO_N16
 config CPU_MODEL_ESP32S2_SOLO_N4R2
     bool
     select CPU_FAM_ESP32S2
-    select HAS_ESP_SPI_RAM
     help
         Indicates that ESP32-S2-SOLO-N4R2 or ESP32-S2-SOLO-U-N4R2 module with
         4 MB Flash and 2 MB SPI RAM is used.
@@ -146,7 +139,6 @@ config CPU_MODEL_ESP32S2_SOLO_2X_N4
 config CPU_MODEL_ESP32S2_SOLO_2X_N4R2
     bool
     select CPU_FAM_ESP32S2
-    select HAS_ESP_SPI_RAM
     help
         Indicates that ESP32-S2-SOLO-2-N4R2 or ESP32-S2-SOLO-2U-N4R2 module with
         4 MB Flash and 2 MB SPI RAM is used.
@@ -161,7 +153,6 @@ config CPU_MODEL_ESP32S2_WROOM
 config CPU_MODEL_ESP32S2_WROVER_N4R2
     bool
     select CPU_FAM_ESP32S2
-    select HAS_ESP_SPI_RAM
     help
         Indicates that ESP32-S2-WROVER-N4R2 or ESP32-S2-WROVER-I-N4R2 module with
         4 MB Flash and 2 MB SPI RAM is used.
@@ -169,7 +160,6 @@ config CPU_MODEL_ESP32S2_WROVER_N4R2
 config CPU_MODEL_ESP32S2_WROVER_N8R2
     bool
     select CPU_FAM_ESP32S2
-    select HAS_ESP_SPI_RAM
     help
         Indicates that ESP32-S2-WROVER-N8R2 or ESP32-S2-WROVER-I-N8R2 module with
         8 MB Flash and 2 MB SPI RAM is used.
@@ -177,7 +167,6 @@ config CPU_MODEL_ESP32S2_WROVER_N8R2
 config CPU_MODEL_ESP32S2_WROVER_N16R2
     bool
     select CPU_FAM_ESP32S2
-    select HAS_ESP_SPI_RAM
     help
         Indicates that ESP32-S2-WROVER-N16R2 or ESP32-S2-WROVER-I-N16R2 module with
         16 MB Flash and 2 MB SPI RAM is used.
@@ -211,7 +200,6 @@ config CPU_MODEL
 if CPU_FAM_ESP32S2
 
 menu "ESP32-S2 specific configurations"
-    depends on TEST_KCONFIG
     depends on HAS_ARCH_ESP32
 
     # define configuration menu entries for ESP32-S3 variant (family)

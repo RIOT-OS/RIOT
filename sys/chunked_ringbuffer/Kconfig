@@ -5,13 +5,7 @@
 # directory for more details.
 #
 
-menuconfig MODULE_CHUNKED_RINGBUFFER
-    bool "Chunked ringbuffer"
-    depends on TEST_KCONFIG
-    help
-        A ringbuffer to store chunks of data.
-
 config CHUNK_NUM_MAX
     int "Maximum number of chunks to store"
-    depends on MODULE_CHUNKED_RINGBUFFER
+    depends on USEMODULE_CHUNKED_RINGBUFFER
     default 4

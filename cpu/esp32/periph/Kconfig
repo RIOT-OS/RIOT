@@ -5,36 +5,10 @@
 # directory for more details.
 #
 
-if TEST_KCONFIG
-
-config MODULE_ESP_RTC_TIMER_32K
-    bool
-    depends on HAS_ESP_RTC_TIMER_32K
-    default y if MODULE_PERIPH_RTT
-    help
-      Use RTC timer with external 32.768 kHz crystal as RTT.
-
-config MODULE_PERIPH_RTT_HW_SYS
-    bool
-    default y if MODULE_PERIPH_RTT
-
-config MODULE_PERIPH_RTT_HW_RTC
-    bool
-    default y if MODULE_PERIPH_RTT
-
-config MODULE_ESP_HW_COUNTER
-    bool "Use hardware counter as low-level timer peripheral"
-    depends on HAS_ESP_HW_COUNTER
-    depends on MODULE_PERIPH_TIMER
-    help
-        ESP SoCs with Xtensa cores typically have a set of CCOUNT and CCOMPARE
-        registers that can be used as low-level timer peripherals. Use this
-        option to enable these CCOUNT and CCOMPARE register as low-level timer.
-
 choice ESP_FLASHPAGE_CAPACITY
     bool "Flashpage capacity"
     default ESP_FLASHPAGE_CAPACITY_512K
-    depends on MODULE_PERIPH_FLASHPAGE
+    depends on USEMODULE_PERIPH_FLASHPAGE
     config ESP_FLASHPAGE_CAPACITY_64K
         bool "64 kByte"
     config ESP_FLASHPAGE_CAPACITY_128K
@@ -48,5 +22,3 @@ choice ESP_FLASHPAGE_CAPACITY
     config ESP_FLASHPAGE_CAPACITY_2M
         bool "2 MByte"
 endchoice
-
-endif # TEST_KCONFIG

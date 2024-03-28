@@ -5,28 +5,8 @@
 # directory for more details.
 #
 
-config MODULE_ADS101X
-    bool "ADS101X Analog-to-Digital converter"
-    depends on HAS_PERIPH_GPIO
-    depends on HAS_PERIPH_GPIO_IRQ
-    depends on HAS_PERIPH_I2C
-    depends on TEST_KCONFIG
-    select MODULE_PERIPH_GPIO
-    select MODULE_PERIPH_GPIO_IRQ
-    select MODULE_PERIPH_I2C
-    select MODULE_ZTIMER
-    select MODULE_ZTIMER_MSEC
-    help
-        This driver works with the ads1013, ads1014, ads1015, ads1113, ads1114
-        and ads1115 models.
-
-menuconfig KCONFIG_USEMODULE_ADS101X
-    bool "Configure ADS101X driver"
+menu "ADS101X driver"
     depends on USEMODULE_ADS101X
-    help
-        Configure the ADS101X driver using Kconfig.
-
-if KCONFIG_USEMODULE_ADS101X
 
 config ADS101X_I2C_ADDRESS
     hex "Default I2C address"
@@ -36,10 +16,5 @@ config ADS101X_I2C_ADDRESS
         ADS101X allows for upto 4 devices on Single Bus. The value depends on
         the state of ADDR Pin. Default value (0x48) corresponds to ADDR pin tied
         to GND. For more information refer I2C Address Selection in Datasheet.
-endif # KCONFIG_USEMODULE_ADS101X
 
-config HAVE_ADS101X
-    bool
-    select MODULE_ADS101X if MODULE_SAUL_DEFAULT
-    help
-        Indicates that an ADS101X Analog-to-Digital converter is present.
+endmenu # ADS101X driver

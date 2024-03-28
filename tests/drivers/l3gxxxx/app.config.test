@@ -1,4 +1,0 @@
-# application configuration. This is only needed during migration.
-CONFIG_MODULE_L3GXXXX=y
-CONFIG_MODULE_ZTIMER=y
-CONFIG_MODULE_ZTIMER_MSEC=y

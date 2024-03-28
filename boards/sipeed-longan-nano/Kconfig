@@ -14,25 +14,5 @@ config BOARD_SIPEED_LONGAN_NANO
     select CPU_MODEL_GD32VF103CBT6
     select BOARD_HAS_HXTAL
     select BOARD_HAS_LXTAL
-    select HAS_HIGHLEVEL_STDIO
-    select HAS_PERIPH_ADC
-    select HAS_PERIPH_DAC
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_PWM
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_TIMER
-    select HAS_PERIPH_UART
-    select HAS_PERIPH_USBDEV
-    select HAS_RIOTBOOT
-    select HAS_TINYUSB_DEVICE
-
-    select HAVE_MTD_SDCARD_DEFAULT
-    select HAVE_SAUL_GPIO
-
-    select MODULE_FATFS_VFS if MODULE_VFS_DEFAULT
-    select MODULE_USB_BOARD_RESET if KCONFIG_USB && TEST_KCONFIG
-
-config FORCE_USB_STDIO
-    default y
 
 source "$(RIOTBOARD)/common/gd32v/Kconfig"

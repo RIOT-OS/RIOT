@@ -262,28 +262,11 @@ void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t cl
      * https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf
      */
 
-    uint32_t spi_clkdiv_pre;
-    uint32_t spi_clkcnt_N;
+    uint32_t spi_clkdiv_pre;    /* 13 bit */
+    uint32_t spi_clkcnt_N;      /*  6 bit */
 
-    switch (clk) {
-        case SPI_CLK_10MHZ:  spi_clkdiv_pre = 2;    /* predivides 80 MHz to 40 MHz */
-                             spi_clkcnt_N = 4;      /* 4 cycles results into 10 MHz */
-                             break;
-        case SPI_CLK_5MHZ:   spi_clkdiv_pre = 2;    /* predivides 80 MHz to 40 MHz */
-                             spi_clkcnt_N = 8;      /* 8 cycles results into 5 MHz */
-                             break;
-        case SPI_CLK_1MHZ:   spi_clkdiv_pre = 2;    /* predivides 80 MHz to 40 MHz */
-                             spi_clkcnt_N = 40;     /* 40 cycles results into 1 MHz */
-                             break;
-        case SPI_CLK_400KHZ: spi_clkdiv_pre = 20;   /* predivides 80 MHz to 4 MHz */
-                             spi_clkcnt_N = 10;     /* 10 cycles results into 400 kHz */
-                             break;
-        case SPI_CLK_100KHZ: spi_clkdiv_pre = 20;   /* predivides 80 MHz to 4 MHz */
-                             spi_clkcnt_N = 40;     /* 20 cycles results into 100 kHz */
-                             break;
-        default: spi_clkdiv_pre = 20;   /* predivides 80 MHz to 4 MHz */
-                 spi_clkcnt_N = 40;     /* 20 cycles results into 100 kHz */
-    }
+    spi_clkcnt_N = 2;
+    spi_clkdiv_pre = (MHZ(80)/spi_clkcnt_N) / clk;
 
     /* register values are set to deviders-1 */
     spi_clkdiv_pre--;

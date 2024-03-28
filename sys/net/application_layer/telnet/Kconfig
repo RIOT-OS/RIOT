@@ -4,14 +4,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_USEMODULE_TELNET
-    bool "Configure telnet server"
+menu "telnet server"
     depends on USEMODULE_TELNET
-    help
-        Configure telnet module using Kconfig. If not set default values and
-        CFLAGS will be used.
-
-if KCONFIG_USEMODULE_TELNET
 
 config TELNET_PORT
     int "Server port"
@@ -25,4 +19,4 @@ config TELNET_TCP_QUEUE_SIZE
     help
         Maximum number of incoming TCP connections.
 
-endif # KCONFIG_USEMODULE_TELNET
+endmenu # telnet server

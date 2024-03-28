@@ -11,7 +11,5 @@ config BOARD_USB_KW41Z
     bool
     default y
     select BOARD_COMMON_KW41Z
-    select HAS_PERIPH_SPI
-    select MODULE_BOARDS_COMMON_KW41Z if TEST_KCONFIG
 
 source "$(RIOTBOARD)/common/kw41z/Kconfig"

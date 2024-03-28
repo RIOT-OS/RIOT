@@ -33,7 +33,7 @@ preflash-delay: preflash
 	sleep $(PREFLASH_DELAY)
 endif
 
-ifneq (,$(filter test term,$(MAKECMDGOALS)))
+ifneq (,$(filter test term test-with-config,$(MAKECMDGOALS)))
 term-delay: $(TERMDELAYDEPS)
 	sleep $(TERM_DELAY)
 endif

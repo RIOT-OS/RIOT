@@ -4,11 +4,7 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-menuconfig PACKAGE_TINYVCDIFF
-    bool "Tiny VCDIFF"
-    depends on TEST_KCONFIG
-
-if PACKAGE_TINYVCDIFF
+if USEPKG_TINYVCDIFF
 
 config TINYVCDIFF_BUFFER_SIZE
     int "Buffer size"
@@ -19,14 +15,7 @@ config TINYVCDIFF_BUFFER_SIZE
         the underlying MTD or VFS backend. But a size of just 1 byte would
         work, too.
 
-menuconfig MODULE_TINYVCDIFF_MTD
-    bool "MTD Backend"
-    depends on MODULE_MTD
-    default y
-    help
-        Use a MTD device as VCDIFF target or source.
-
-if MODULE_TINYVCDIFF_MTD
+if USEMODULE_TINYVCDIFF_MTD
 
 config TINYVCDIFF_MTD_WRITE_SIZE
     int "Write size"
@@ -34,13 +23,6 @@ config TINYVCDIFF_MTD_WRITE_SIZE
     help
         Alignment and minimum size for MTD write access.
 
-endif # MODULE_TINYVCDIFF_MTD
+endif # USEMODULE_TINYVCDIFF_MTD
 
-config MODULE_TINYVCDIFF_VFS
-    bool "VFS Backend"
-    depends on MODULE_VFS
-    default y
-    help
-        Use a VFS file as VCDIFF target or source.
-
-endif # PACKAGE_TINYVCDIFF
+endif # USEPKG_TINYVCDIFF
