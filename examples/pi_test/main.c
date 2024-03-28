@@ -32,19 +32,6 @@ int main(void)
             }
             gpio_clear(26);
         }
-        /* send something out gpio pins ? to read value ?
-        while(1){
-            gpio_set(26);
-            for(long unsigned int i = 0; i < 10*KHZ(1); i++){
-                cycle++;
-            }
-            gpio_clear(26);
-            for(long unsigned int i = 0; i < 10*KHZ(1); i++){
-                cycle--;
-            }
-            gpio_set(26);
-        }*/
-        
 
     }
 }
