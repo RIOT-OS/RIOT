@@ -50,6 +50,9 @@ static const timer_conf_t timer_config[] = {
     }
 };
 
+/**
+ * @brief   Timer capture configuration for above timer
+ */
 static const timer_capture_conf_t timer_capture_config[] = {
     {
         .inputs = {
