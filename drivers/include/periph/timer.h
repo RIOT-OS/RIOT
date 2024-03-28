@@ -386,7 +386,6 @@ typedef uint_fast8_t timer_capture_flags_t;
  * @param[in] arg       argument passed when setting up timer
  * @param[in] channel   timer capture/compare channel that triggered the IRQ
  * @param[in] capture   captured result
- * @param[in] flags     flags with additional info
  */
 typedef void (*timer_capture_cb_t)(void *arg, int channel, unsigned capture);
 
