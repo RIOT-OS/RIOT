@@ -44,18 +44,6 @@ config GNRC_NETIF_NONSTANDARD_6LO_MTU
         This is non compliant with RFC 4944 and RFC 7668 and might not be
         supported by other implementations.
 
-config GNRC_NETIF_LORAWAN_NETIF_HDR
-    bool "Encode LoRaWAN port in GNRC netif header"
-    depends on USEMODULE_GNRC_LORAWAN
-    help
-        When set, GNRC Netif will interpret
-        the destination address of the GNRC netif header as
-        the LoRaWAN port. For downlinks, a GNRC netif header
-        with the received port in destination field will be
-        included in the first snip. From Release 2021.10 all
-        GNRC LoRaWAN packets will include the GNRC Netif
-        header. Therefore this parameter will be removed
-
 config GNRC_NETIF_IPV6_BR_AUTO_6CTX
     bool "Automatically add 6LoWPAN compression at border router"
     default y
