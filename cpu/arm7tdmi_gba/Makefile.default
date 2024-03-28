@@ -1,0 +1,2 @@
+DISABLE_MODULE += periph_init_leds
+DISABLE_MODULE += core_thread
