@@ -722,7 +722,7 @@ typedef int (*gcoap_request_matcher_t)(gcoap_listener_t *listener,
  * @brief   CoAP socket types
  *
  * May be used as flags for @ref gcoap_listener_t, but must be used numerically
- * with @ref gcoap_req_send_tl().
+ * with @ref gcoap_req_send().
  */
 typedef enum {
     GCOAP_SOCKET_TYPE_UNDEF = 0x0,      /**< undefined */
@@ -980,9 +980,9 @@ static inline ssize_t gcoap_request(coap_pkt_t *pdu, uint8_t *buf, size_t len,
  * @return  0 if cannot send
  */
 ssize_t gcoap_req_send(const uint8_t *buf, size_t len,
-                                     const sock_udp_ep_t *remote,
-                                     gcoap_resp_handler_t resp_handler, void *context,
-                                     gcoap_socket_type_t tl_type);
+                       const sock_udp_ep_t *remote,
+                       gcoap_resp_handler_t resp_handler, void *context,
+                       gcoap_socket_type_t tl_type);
 
 /**
  * @brief   Sends a buffer containing a CoAP request to the provided endpoint
@@ -1005,9 +1005,9 @@ ssize_t gcoap_req_send(const uint8_t *buf, size_t len,
  * @return  0 if cannot send
  */
 static inline ssize_t gcoap_req_send_tl(const uint8_t *buf, size_t len,
-                          const sock_udp_ep_t *remote,
-                          gcoap_resp_handler_t resp_handler, void *context,
-                          gcoap_socket_type_t tl_type)
+                                        const sock_udp_ep_t *remote,
+                                        gcoap_resp_handler_t resp_handler, void *context,
+                                        gcoap_socket_type_t tl_type)
 {
     return gcoap_req_send(buf, len, remote, resp_handler, context, tl_type);
 }
