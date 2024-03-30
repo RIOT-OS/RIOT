@@ -6,7 +6,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-l031k6 \
     samd10-xmini \
     stk3200 \
-    stm32g0316-disco \
     stm32f030f4-demo \
+    stm32g0316-disco \
     weact-g030f6 \
     #
