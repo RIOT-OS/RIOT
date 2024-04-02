@@ -136,7 +136,7 @@ int l2util_eui64_from_addr(int dev_type, const uint8_t *addr, size_t addr_len,
             LOG_ERROR("l2util: can't convert hardware address to EUI-64 "
                       "for device type %d\n", dev_type);
 #endif  /* DEVELHELP */
-            assert(false);
+            assert_unreachable();
             break;
     }
     return -ENOTSUP;
@@ -247,7 +247,7 @@ int l2util_ipv6_iid_to_addr(int dev_type, const eui64_t *iid, uint8_t *addr)
             LOG_ERROR("l2util: can't convert IID to hardware address for "
                       "device type %d\n", dev_type);
 #endif  /* DEVELHELP */
-            assert(false);
+            assert_unreachable();
             break;
     }
     return -ENOTSUP;
@@ -308,7 +308,7 @@ int l2util_ndp_addr_len_from_l2ao(int dev_type,
             LOG_ERROR("l2util: can't get address length from NDP link-layer "
                       "address option for device type %d\n", dev_type);
 #endif
-            assert(false);
+            assert_unreachable();
             break;
     }
     return -ENOTSUP;

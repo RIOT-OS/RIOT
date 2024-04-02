@@ -286,7 +286,7 @@ int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags
 
         /* only CC0 can be used to set TOP */
         if (flags & TIM_FLAG_RESET_ON_MATCH) {
-            assert(0);
+            assert_unreachable();
             return -1;
         }
 

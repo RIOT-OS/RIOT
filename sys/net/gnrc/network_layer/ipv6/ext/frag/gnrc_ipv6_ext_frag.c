@@ -353,7 +353,7 @@ static gnrc_pktsnip_t *_determine_last_per_frag(gnrc_pktsnip_t *ptr)
         ptr = ptr->next;
     }
     /* should not be reached */
-    assert(false);
+    assert_unreachable();
     return NULL;
 }
 
@@ -698,7 +698,7 @@ static inline void _set_nh(gnrc_pktsnip_t *hdr_snip, uint8_t nh)
         }
         default:
             /* should not happen */
-            assert(false);
+            assert_unreachable();
             break;
     }
 }

@@ -119,7 +119,7 @@ static int _tm_ctx_nm1(int argc, char **argv)
 static ieee802154_dev_t *_reg_callback(ieee802154_dev_type_t type, void *opaque)
 {
     if (type != IEEE802154_DEV_TYPE_KW2XRF) {
-        assert(false);
+        assert_unreachable();
     }
     int *c = opaque;
     return &kw2xrf_netdev[(*(c))++].submac.dev;

@@ -201,11 +201,11 @@ static void _init(sdmmc_dev_t *sdmmc_dev)
 
     if ((res = sdmmc_host_init())) {
         LOG_ERROR("[sdmmc] Could not initialize SDMMC host controller\n");
-        assert(false);
+        assert_unreachable();
     }
     if ((res = sdmmc_host_init_slot(dev->config->slot, &slot_config))) {
         LOG_ERROR("[sdmmc] Could not initialize SDMMC slot\n");
-        assert(false);
+        assert_unreachable();
     }
 
     if (gpio_is_valid(conf->cd)) {

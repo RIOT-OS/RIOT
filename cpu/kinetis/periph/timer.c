@@ -632,7 +632,7 @@ uword_t timer_query_freqs_numof(tim_t dev)
         }
 #endif
     default:
-        assert(0);
+        assert_unreachable();
         return 0;
     }
 }
@@ -656,7 +656,7 @@ uint32_t timer_query_freqs(tim_t dev, uword_t index)
         return lptmr_config[_lptmr_index(dev)].base_freq >> index;
 #endif
     default:
-        assert(0);
+        assert_unreachable();
         return 0;
     }
 }

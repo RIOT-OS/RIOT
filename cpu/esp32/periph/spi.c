@@ -277,7 +277,7 @@ void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t cl
         LOG_TAG_ERROR("spi",
                       "SPI_DEV(%d) CS signal could not be initialized\n",
                       bus);
-        assert(0);
+        assert_unreachable();
     }
 
     /* lock the bus */
@@ -314,7 +314,7 @@ void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t cl
             LOG_TAG_ERROR("spi", "APB clock rate (%"PRIu32" Hz) has to be at "
                           "least 5 times SPI clock rate (%d Hz)\n",
                           apb_clk, clk);
-            assert(false);
+            assert_unreachable();
         }
 
         /* duty cycle is measured in is 1/256th, 50% = 128 */

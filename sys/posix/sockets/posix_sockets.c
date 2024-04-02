@@ -238,7 +238,7 @@ static int _ep_to_sockaddr(const struct _sock_tl_ep *ep,
 #endif
     default:
         /* should not happen */
-        assert(0);
+        assert_unreachable();
         return 0;
     }
 }

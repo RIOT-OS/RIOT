@@ -164,7 +164,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
         unsigned csid = CS_TO_CSID(cs);
         if (device_state[bus].fd[csid] < 0) {
             DEBUG("spi_acquire: No fd for %u:%u\n", bus, csid);
-            assert(0);
+            assert_unreachable();
         }
         fd = device_state[bus].fd[csid];
         DEBUG("spi_acquire: Using %u:%u with HWCS (-> fd 0x%x)\n", bus, csid, fd);
@@ -173,19 +173,19 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
         fd = spidev_get_first_fd(&(device_state[bus]));
         if (fd < 0) {
             DEBUG("spi_acquire: Invalid CS parameter\n");
-            assert(0);
+            assert_unreachable();
         }
         DEBUG("spi_acquire: Using SPI_CS_UNDEF (-> fd 0x%x)\n", fd);
     }
     else {
         DEBUG("spi_acquire: Invalid CS parameter\n");
-        assert(0);
+        assert_unreachable();
     }
 
     int res = spi_set_params(fd, use_hwcs, mode, clk);
     if (res < 0) {
         DEBUG("spi_acquire: set_params failed\n");
-        assert(0);
+        assert_unreachable();
     }
 
     DEBUG("spi_acquire: bus %u acquired\n", bus);
@@ -210,7 +210,7 @@ void spi_init(spi_t bus)
                     bus,
                     cs
                     );
-                assert(false);
+                assert_unreachable();
             }
             DEBUG("spi_init: %u:%u %s (fd 0x%x)\n", bus, cs,
                   conf->device_filename[cs], fd);

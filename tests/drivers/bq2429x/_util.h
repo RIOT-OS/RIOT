@@ -60,7 +60,7 @@ static inline const char *_util_vlim_to_str(bq2429x_input_voltage_limit_t vlim)
         case BQ2429X_VLIM_5080:
             return "5080 mV";
         default:
-            assert(0);
+            assert_unreachable();
             break;
     }
 
@@ -87,7 +87,7 @@ static inline const char *_util_ilim_to_str(bq2429x_input_current_limit_t vlim)
         case BQ2429X_ILIM_3000:
             return "3000 mA";
         default:
-            assert(0);
+            assert_unreachable();
             break;
     }
 
@@ -110,7 +110,7 @@ static inline const char *_util_ichg_to_str(bq2429x_charge_current_t vlim)
         case BQ2429X_ICHG_4544:
             return "4544 mA";
         default:
-            assert(0);
+            assert_unreachable();
             break;
     }
 
@@ -141,7 +141,7 @@ static inline const char *_util_vreg_to_str(bq2429x_charge_voltage_limit_t vreg)
         case BQ2429X_VREG_4400:
             return "4400 mV";
         default:
-            assert(0);
+            assert_unreachable();
             break;
     }
 
@@ -160,7 +160,7 @@ static inline const char *_util_vbus_stat_to_str(bq2429x_vbus_stat_t stat)
         case BQ2429X_VBUS_OTG:
             return "OTG";
         default:
-            assert(0);
+            assert_unreachable();
             break;
     }
 
@@ -179,7 +179,7 @@ static inline const char *_util_chrg_stat_to_str(bq2429x_chrg_stat_t stat)
         case BQ2429X_CHARGE_DONE:
             return "Charge Done";
         default:
-            assert(0);
+            assert_unreachable();
             break;
     }
 
@@ -198,7 +198,7 @@ static inline const char *_util_chrg_fault_to_str(bq2429x_chrg_fault_t fault)
         case BQ2429x_CHRG_FAULT_CHARGE_TIMER_EXPIRATION:
             return "Charge Timer Expiration";
         default:
-            assert(0);
+            assert_unreachable();
             break;
     }
 

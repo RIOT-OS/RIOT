@@ -972,7 +972,7 @@ static void _ep_to_session(const sock_udp_ep_t *ep, session_t *session)
         break;
 #endif
     default:
-        assert(0);
+        assert_unreachable();
         return;
     }
 }

@@ -33,7 +33,7 @@ static netdev_ieee802154_submac_t mrf24j40_netdev[MRF24J40_NUM];
 static ieee802154_dev_t *_reg_callback(ieee802154_dev_type_t type, void *opaque)
 {
     if (type != IEEE802154_DEV_TYPE_MRF24J40) {
-        assert(false);
+        assert_unreachable();
     }
     int *c = opaque;
     return &mrf24j40_netdev[(*(c))++].submac.dev;

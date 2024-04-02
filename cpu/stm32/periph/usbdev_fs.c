@@ -175,7 +175,7 @@ static uint32_t _type_to_reg(usb_ep_type_t type)
         case USB_EP_TYPE_INTERRUPT:
             return USB_EP_INTERRUPT;
         default:
-            assert(false);
+            assert_unreachable();
             return 0;
     }
 }
@@ -517,7 +517,7 @@ static usbdev_ep_t *_usbdev_new_ep(usbdev_t *dev, usb_ep_type_t type,
             DEBUG("usbdev_fs: %d bytes used\n", usbdev->used);
         }
         else {
-            assert(0);
+            assert_unreachable();
         }
     }
 

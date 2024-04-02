@@ -69,7 +69,7 @@ static inline bool osal_semaphore_post(osal_semaphore_t sem_hdl, bool in_isr)
 TU_ATTR_ALWAYS_INLINE
 static inline bool osal_semaphore_wait(osal_semaphore_t sem_hdl, uint32_t msec)
 {
-    assert(0);
+    assert_unreachable();
     return sema_wait_timed_ztimer(sem_hdl, ZTIMER_MSEC, msec) == 0;
 }
 
@@ -192,7 +192,7 @@ static inline bool osal_queue_send(osal_queue_t qhdl, void const * data, bool in
 #ifdef NDEBUG
         return false;
 #else
-        assert(0);
+        assert_unreachable();
 #endif
     }
 

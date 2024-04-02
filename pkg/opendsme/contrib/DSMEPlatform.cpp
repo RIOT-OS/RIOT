@@ -178,7 +178,7 @@ void DSMEPlatform::processTXDoneEvent()
 void DSMEPlatform::processRxDone()
 {
     if (this->state != STATE_READY) {
-        assert(false);
+        assert_unreachable();
         return;
     }
 

@@ -493,7 +493,7 @@ uint32_t ulTaskNotifyTake(BaseType_t xClearCountOnExit,
     else if (xTicksToWait == 0 || irq_is_in()) {
         /* if delaying is not allowed */
         DEBUG("%s pid=%d delaying not allowed\n", __func__, thread_getpid());
-        assert(0);
+        assert_unreachable();
     }
     else {
         /* suspend the calling thread to wait for notification */

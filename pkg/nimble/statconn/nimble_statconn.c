@@ -154,7 +154,7 @@ static void _on_netif_evt(int handle, nimble_netif_event_t event,
             break;
         default:
             /* this should never happen */
-            assert(0);
+            assert_unreachable();
     }
 
     /* pass events to high-level user if someone registered for them */

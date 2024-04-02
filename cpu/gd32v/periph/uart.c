@@ -264,6 +264,6 @@ static void _uart_isr(unsigned irq)
         break;
 #endif
     default:
-        assert(false);
+        assert_unreachable();
     }
 }

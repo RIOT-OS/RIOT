@@ -188,7 +188,7 @@ void kw41zrf_set_sequence(kw41zrf_t *dev, uint32_t seq)
     uint32_t seq_old = ZLL->PHY_CTRL & ZLL_PHY_CTRL_XCVSEQ_MASK;
     if (seq_old != XCVSEQ_IDLE && seq_old != XCVSEQ_RECEIVE) {
         LOG_ERROR("[kw41zrf] seq not idle: 0x%" PRIu32 "\n", seq_old);
-        assert(0);
+        assert_unreachable();
     }
 
     kw41zrf_abort_sequence(dev);

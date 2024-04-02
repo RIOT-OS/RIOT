@@ -69,7 +69,7 @@ static inline int _adc_resolution(adc_res_t res)
             exp = 16;
             break;
         default:
-            assert(0);
+            assert_unreachable();
             break;
     }
 

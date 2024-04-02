@@ -99,7 +99,7 @@ static void _fail_frame(ethos_t *dev)
         case ETHOS_FRAME_TYPE_ERRORED:
             return;
         default:
-            assert(0);
+            assert_unreachable();
             break;
     }
     dev->frametype = ETHOS_FRAME_TYPE_ERRORED;
@@ -126,7 +126,7 @@ static void _handle_char(ethos_t *dev, char c)
         case ETHOS_FRAME_TYPE_ERRORED:
             break;
         default:
-            assert(0);
+            assert_unreachable();
             break;
 
     }
@@ -144,7 +144,7 @@ static void _end_of_frame(ethos_t *dev)
             break;
         default:
             /* Unexpected frametype */
-            assert(0);
+            assert_unreachable();
             break;
     }
 
