@@ -109,15 +109,19 @@ static value_test_t value_tests[] = {
 void test_phydat_to_senml_float(void)
 {
     senml_value_t res;
+    char unit_buf[10];
+    size_t size = 0;
 
     for (size_t i = 0; i < ARRAY_SIZE(value_tests); i++) {
         senml_value_t *exp = &(value_tests[i].senml1);
 
         phydat_to_senml_float(&res, &(value_tests[i].phydat), value_tests[i].dim);
 
+        size = phydat_unit_write(unit_buf, ARRAY_SIZE(unit_buf), value_tests[i].phydat.unit);
+        unit_buf[size] = 0;
         DEBUG("Float: %" PRIi16 "e%" PRIi16 " %" PRIsflash " -> %.f %s\n",
               value_tests[i].phydat.val[value_tests[i].dim], value_tests[i].phydat.scale,
-              phydat_unit_to_str(value_tests[i].phydat.unit),
+              unit_buf,
               res.value.value.f,
               senml_unit_to_str(res.attr.unit));
 
@@ -132,15 +136,20 @@ void test_phydat_to_senml_float(void)
 void test_phydat_to_senml_decimal(void)
 {
     senml_value_t res;
+    char unit_buf[10];
+    size_t size = 0;
 
     for (size_t i = 0; i < ARRAY_SIZE(value_tests); i++) {
         senml_value_t *exp = &(value_tests[i].senml2);
 
         phydat_to_senml_decimal(&res, &(value_tests[i].phydat), value_tests[i].dim);
 
+        size = phydat_unit_write(unit_buf, ARRAY_SIZE(unit_buf), value_tests[i].phydat.unit);
+        unit_buf[size] = 0;
+
         DEBUG("Decimal: %" PRIi16 "e%" PRIi16 " %s -> %" PRIi32 "e%" PRIi32 " %" PRIsflash"\n",
               value_tests[i].phydat.val[value_tests[i].dim], value_tests[i].phydat.scale,
-              phydat_unit_to_str(value_tests[i].phydat.unit),
+              unit_buf,
               res.value.value.df.m, res.value.value.df.e,
               senml_unit_to_str(res.attr.unit));
 
