@@ -36,11 +36,7 @@ static const timer_conf_t timer_config[] = {
     {
         .dev            = TIM2,
         .max            = 0xffffffff,
-#if defined(RCC_APB1ENR_TIM2EN)
-        .rcc_mask       = RCC_APB1ENR_TIM2EN,
-#else
-        .rcc_mask       = RCC_APB1ENR1_TIM2EN,
-#endif
+        .rcc_dev        = &periph_timer2,
         .bus            = APB1,
         .irqn           = TIM2_IRQn
     },

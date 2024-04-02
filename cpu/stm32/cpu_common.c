@@ -75,6 +75,27 @@ uint32_t periph_timer_clk(bus_t bus)
     return periph_apb_clk(bus) * apbmul[bus];
 }
 
+void periph_clk_en2(const periph_t *periph)
+{
+    assert(periph);
+
+    const int irq_state = irq_disable();
+    *(periph->en_reg) |= periph->en_mask;
+    irq_restore(irq_state);
+
+    /* stm32xx-errata: Delay after a RCC peripheral clock enable */
+    __DSB();
+}
+
+void periph_clk_dis2(const periph_t *periph)
+{
+    assert(periph);
+
+    const int irq_state = irq_disable();
+    *(periph->en_reg) &= ~(periph->en_mask);
+    irq_restore(irq_state);
+}
+
 void periph_clk_en(bus_t bus, uint32_t mask)
 {
     switch (bus) {

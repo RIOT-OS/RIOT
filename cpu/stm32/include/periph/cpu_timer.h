@@ -44,11 +44,25 @@ extern "C" {
  */
 #define TIM_CHAN(tim, chan) *(&dev(tim)->CCR1 + chan)
 
+static const periph_t periph_timer2 = {
+    #if   defined(RCC_APB1ENR_TIM2EN)
+    .en_reg = &RCC->APB1ENR,
+    .en_mask = RCC_APB1ENR_TIM2EN,
+    #elif defined(RCC_APB1ENR1_TIM2EN)
+    .en_reg = &RCC->APB1ENR1,
+    .en_mask = RCC_APB1ENR1_TIM2EN,
+    #elif defined(RCC_MC_APB1ENSETR_TIM2EN)
+    .en_reg = &RCC->MC_APB1ENSETR,
+    .en_mask = RCC_MC_APB1ENSETR_TIM2EN,
+    #endif
+};
+
 /**
  * @brief   Timer configuration
  */
 typedef struct {
     TIM_TypeDef *dev;       /**< timer device */
+    const periph_t *rcc_dev;
     uint32_t max;           /**< maximum value to count to (16/32 bit) */
     uint32_t rcc_mask;      /**< corresponding bit in the RCC register */
     uint8_t bus;            /**< APBx bus the timer is clock from */
