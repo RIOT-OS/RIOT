@@ -20,7 +20,9 @@
 
 #include <stdio.h>
 
+#ifdef MODULE_PERIPH_PM
 #include "periph/pm.h"
+#endif
 #include "shell.h"
 
 #ifdef MODULE_USB_BOARD_RESET
@@ -30,6 +32,7 @@
 #include "riotboot/slot.h"
 #endif
 
+#ifdef MODULE_PERIPH_PM
 static int _reboot_handler(int argc, char **argv)
 {
     (void) argc;
@@ -41,6 +44,7 @@ static int _reboot_handler(int argc, char **argv)
 }
 
 SHELL_COMMAND(reboot, "Reboot the node", _reboot_handler);
+#endif /* MODULE_PERIPH_PM */
 
 #ifdef MODULE_USB_BOARD_RESET
 static int _bootloader_handler(int argc, char **argv)
