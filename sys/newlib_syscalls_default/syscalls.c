@@ -36,7 +36,9 @@
 
 #include "log.h"
 #include "modules.h"
+#ifdef MODULE_PERIPH_PM
 #include "periph/pm.h"
+#endif
 #include "sched.h"
 #include "stdio_base.h"
 #include "thread.h"
@@ -183,7 +185,9 @@ __attribute__((used)) void _fini(void)
 __attribute__((used)) void _exit(int n)
 {
     LOG_INFO("#! exit %i: powering off\n", n);
+#ifdef MODULE_PERIPH_PM
     pm_off();
+#endif
     while (1) {}
 }
 
