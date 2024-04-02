@@ -42,17 +42,20 @@ static void _netif_list_ipv6(struct netif *netif, int addr_index, uint8_t state)
     printf(" scope: ");
     if (ip6_addr_isglobal(netif_ip6_addr(netif, addr_index))) {
         printf("global");
-    } else if (ip6_addr_islinklocal(netif_ip6_addr(netif, addr_index))) {
+    }
+    else if (ip6_addr_islinklocal(netif_ip6_addr(netif, addr_index))) {
         printf("link");
-    } else if (ip6_addr_issitelocal(netif_ip6_addr(netif, addr_index))) {
+    }
+    else if (ip6_addr_issitelocal(netif_ip6_addr(netif, addr_index))) {
         printf("site");
-    } else {
+    }
+    else {
         printf("unknown");
     }
     printf(" state:");
     if (ip6_addr_istentative(state)) {
         printf(" tentative (%u probes send)",
-                (unsigned)(state & IP6_ADDR_TENTATIVE_COUNT_MASK));
+               (unsigned)(state & IP6_ADDR_TENTATIVE_COUNT_MASK));
     }
     if (ip6_addr_isvalid(state)) {
         printf(" valid");
@@ -73,20 +76,21 @@ static void _netif_list(struct netif *netif)
     char name[CONFIG_NETIF_NAMELENMAX];
     struct netdev *dev = netif->state;
     lwip_netif_t *compat = container_of(netif, lwip_netif_t, lwip_netif);
+
     netif_get_name(&compat->common_netif, name);
     printf("Iface %s HWaddr: ", name);
     for (i = 0; i < netif->hwaddr_len; i++) {
         printf("%02x", netif->hwaddr[i]);
-        if ((i+1) < netif->hwaddr_len) {
+        if ((i + 1) < netif->hwaddr_len) {
             printf(":");
         }
     }
     printf(" Link: %s State: %s\n",
-        netif_is_link_up(netif) ? "up" : "down",
-        netif_is_up(netif) ? "up" : "down");
+           netif_is_link_up(netif) ? "up" : "down",
+           netif_is_up(netif) ? "up" : "down");
     printf("        Link type: %s\n",
-        (dev->driver->get(dev, NETOPT_IS_WIRED, &i, sizeof(i)) > 0) ?
-            "wired" : "wireless");
+           (dev->driver->get(dev, NETOPT_IS_WIRED, &i, sizeof(i)) > 0) ?
+           "wired" : "wireless");
 #ifdef MODULE_LWIP_IPV4
     printf("        inet addr: ");
     ip_addr_debug_print(LWIP_DBG_ON, netif_ip_addr4(netif));
@@ -125,12 +129,11 @@ static void _lwip_prefix_to_subnet(int prefix, ip4_addr_t *subnet)
     uint32_t value = 0;
     uint32_t tmp = 0x80000000;
 
-    for (int i = 0; i < prefix; i++)
-        {
+    for (int i = 0; i < prefix; i++) {
         value += tmp;
-     tmp = tmp >> 1;
+        tmp = tmp >> 1;
     }
- subnet->addr = htonl(value);
+    subnet->addr = htonl(value);
 }
 
 static int _lwip_netif_add4(int argc, char **argv)
@@ -141,10 +144,10 @@ static int _lwip_netif_add4(int argc, char **argv)
     int prefix;
 
     if (argc != 4 && argc != 6) {
-            printf("error: invalid number of parameters\n");
-            _usage_add4(argv[0]);
-            return 1;
-        }
+        printf("error: invalid number of parameters\n");
+        _usage_add4(argv[0]);
+        return 1;
+    }
 
     sys_lock_tcpip_core();
     iface = netif_find(argv[2]);
@@ -163,7 +166,7 @@ static int _lwip_netif_add4(int argc, char **argv)
         }
 
         ip_ptr++;
-        }
+    }
     ip_ptr = argv[3];
 
     if (prefix_ptr == NULL) {
@@ -171,42 +174,42 @@ static int _lwip_netif_add4(int argc, char **argv)
         _usage_add4(argv[0]);
         sys_unlock_tcpip_core();
         return 1;
-        }
+    }
 
     if (inet_pton(AF_INET, ip_ptr, &ip.addr) != 1) {
         printf("error:invalid IPv4 address\n");
         sys_unlock_tcpip_core();
         return 1;
-        }
+    }
 
     prefix = atoi(prefix_ptr);
 
-    if ( prefix < 0 || prefix > 32) {
+    if (prefix < 0 || prefix > 32) {
         printf("error:invalid prefix, should be in range <0, 32>\n");
         sys_unlock_tcpip_core();
         return 1;
-        }
+    }
 
-     _lwip_prefix_to_subnet(prefix, &subnet);
+    _lwip_prefix_to_subnet(prefix, &subnet);
 
     if (argc == 4) {
-            netif_set_addr(iface, &ip, &subnet, NULL);
-        }
+        netif_set_addr(iface, &ip, &subnet, NULL);
+    }
     else {
         if (strcmp("gw", argv[4]) != 0) {
-             printf("error: invalid subcommand \"%s\"\n", argv[4]);
-             _usage_add4(argv[0]);
-             sys_unlock_tcpip_core();
+            printf("error: invalid subcommand \"%s\"\n", argv[4]);
+            _usage_add4(argv[0]);
+            sys_unlock_tcpip_core();
             return 1;
-            }
+        }
 
         if (inet_pton(AF_INET, argv[5], &gw.addr) != 1) {
             printf("error: invalid gateway address\n");
             sys_unlock_tcpip_core();
             return 1;
-            }
-        netif_set_addr(iface, &ip, &subnet, &gw);
         }
+        netif_set_addr(iface, &ip, &subnet, &gw);
+    }
 
     sys_unlock_tcpip_core();
     return 0;
@@ -261,24 +264,22 @@ static int _lwip_netif_config(int argc, char **argv)
         return 0;
     }
     else {
-     if (strcmp("help", argv[1]) == 0)
-        {
-         _lwip_netif_help(argv[0]);
+        if (strcmp("help", argv[1]) == 0) {
+            _lwip_netif_help(argv[0]);
         }
 #ifdef MODULE_LWIP_IPV4
-     else if (strcmp("add4", argv[1]) == 0)
-        {
-         _lwip_netif_add4(argc, argv);
+        else if (strcmp("add4", argv[1]) == 0) {
+            _lwip_netif_add4(argc, argv);
         }
 #endif
 #ifdef MODULE_LWIP_IPV6
-     else if (strcmp("add6", argv[1]) == 0)
-        {
-         _lwip_netif_add6(argc, argv);
+        else if (strcmp("add6", argv[1]) == 0) {
+            _lwip_netif_add6(argc, argv);
         }
 #endif
-     else
-        printf("error: invalid subcommand - use help\n");
+        else {
+            printf("error: invalid subcommand - use help\n");
+        }
     }
     return 1;
 }
