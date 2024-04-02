@@ -85,12 +85,8 @@
 #  define SYSFG_CLOCK           APB2
 #  define SYSFG_ENABLE_MASK     RCC_APB2ENR_SYSCFGCOMPEN
 #elif defined(RCC_APB2ENR_SYSCFGEN)
+#  define SYSFG_CLOCK           APB2
 #  define SYSFG_ENABLE_MASK     RCC_APB2ENR_SYSCFGEN
-#  ifdef APB12
-#    define SYSFG_CLOCK         APB12
-#  else
-#    define SYSFG_CLOCK         APB2
-#  endif
 #endif
 
 #ifdef RCC_APB3ENR_SYSCFGEN
