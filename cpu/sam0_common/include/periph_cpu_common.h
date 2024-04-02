@@ -877,11 +877,7 @@ static inline bool cpu_woke_from_backup(void)
  * @brief ADC Channel Configuration
  */
 typedef struct {
-    union {
-        uint32_t inputctrl; /**< ADC channel pin multiplexer value  */
-        uint32_t muxpos;    /**< ADC channel pin multiplexer value
-                                 @deprecated, use inputctrl instead */
-    };
+    uint32_t inputctrl;     /**< ADC channel pin multiplexer value  */
 #ifdef ADC0
     Adc *dev;               /**< ADC device descriptor */
 #endif
