@@ -33,15 +33,6 @@ extern "C" {
 #endif
 
 /**
- * @brief    Start SUIT CoAP thread
- *
- * @deprecated This will be removed after after the 2023.01 release.
- */
-static inline void suit_coap_run(void)
-{
-}
-
-/**
  * @brief SUIT CoAP endpoint entry.
  *
  * In order to use, include this header, then add SUIT_COAP_SUBTREE to the nanocoap endpoint array.
