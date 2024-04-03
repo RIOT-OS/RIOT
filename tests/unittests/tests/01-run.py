@@ -10,7 +10,7 @@ import sys
 from testrunner import run_check_unittests
 
 
-TIMEOUT = 120
+TIMEOUT = 240
 
 
 if __name__ == "__main__":

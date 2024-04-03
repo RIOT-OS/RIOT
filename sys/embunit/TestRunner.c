@@ -47,7 +47,7 @@ static void TestRunner_startTest(TestListner* self,Test* test)
 {
     (void)self;
     (void)test;
-    stdimpl_print(".");
+    stdimpl_print(".\n");
 }
 
 static void TestRunner_endTest(TestListner* self,Test* test)
