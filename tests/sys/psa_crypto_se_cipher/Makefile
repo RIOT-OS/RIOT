@@ -11,9 +11,7 @@ USEMODULE += psa_secure_element
 USEMODULE += psa_secure_element_ateccx08a
 USEMODULE += psa_secure_element_ateccx08a_cipher_aes_128
 
-ifneq (1, $(SHOULD_RUN_KCONFIG))
-  CFLAGS += -DCONFIG_PSA_PROTECTED_KEY_COUNT=1
-endif
+CFLAGS += -DCONFIG_PSA_PROTECTED_KEY_COUNT=1
 
 CFLAGS += -DSECURE_ELEMENT
 CFLAGS += -DCUSTOM_ATCA_PARAMS

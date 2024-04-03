@@ -8,6 +8,4 @@ USEMODULE += psa_crypto
 USEMODULE += psa_hash
 USEMODULE += psa_hash_sha_256
 
-SHOULD_RUN_KCONFIG :=
-
 include $(RIOTBASE)/Makefile.include
