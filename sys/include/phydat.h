@@ -177,33 +177,6 @@ typedef struct {
 void phydat_dump(phydat_t *data, uint8_t dim);
 
 /**
- * @brief   Convert the given unit to a string
- *
- * @param[in]   unit    unit to convert
- *
- * @return  string representation of given unit (e.g. V or m)
- * @return  NULL if unit was not recognized
- *
- * @deprecated  Use @ref phydat_unit_print or @ref phydat_unit_write instead
- *
- * @warning For classic Harvard architectures a small buffer is used to store
- *          the string, so that subsequent (or concurrent!) calls will
- *          overwrite the output.
- */
-const char *phydat_unit_to_str(uint8_t unit);
-
-/**
- * @brief   Same as @ref phydat_unit_to_str
- *
- * In practise all users used the verbose function anyway. Hence,
- * @ref phydat_unit_to_str just covers all units and this is just a backward
- * compatibility wrapper.
- *
- * @deprecated  Use @ref phydat_unit_print or @ref phydat_unit_write instead
- */
-const char *phydat_unit_to_str_verbose(uint8_t unit);
-
-/**
  * @brief   Print a unit
  *
  * @param[in] unit          unit to print
@@ -302,7 +275,7 @@ void phydat_fit(phydat_t *dat, const int32_t *values, unsigned int dim);
  * factor.
  *
  * For encoding the unit, this function uses the extended
- * phydat_unit_to_str_verbose() function to also print units for non-SI types,
+ * phydat_unit_write() function to also print units for non-SI types,
  * e.g. it will produce `..."u":"date"}` for @ref UNIT_DATE or `..."u":"none"}`
  * for @ref UNIT_NONE.
  *
