@@ -11,18 +11,24 @@
 #include "vcnl40x0.h"
 //#include "xtimer.h"
 
+const int PIN = 26;
 
 int main(void)
 {
     //blink if read bytes non-zero
-    vcnl40x0_params_t initParams = {1, 0, 0, 0, 0, 0};
+    const vcnl40x0_params_t initParams = {1, 0, 0, 0, 0, 0};
     vcnl40x0_t dev = {initParams};
 
     uint8_t status = vcnl40x0_init(&dev, &initParams);
     if(status == 0){
         printf("Successfully initalised vcnl40x0 !");
-        gpio_init(26, GPIO_OUT);
-        for(int j = 0; j < 1000; j++){
+        gpio_init(PIN, GPIO_OUT);
+        uint16_t readresp = vcnl40x0_read_ambient_light(&dev);
+        if (readresp > 0){
+            gpio_set(PIN);
+        }
+        // blink loop for testing light
+        /*for(int j = 0; j < 1000; j++){
             for(long unsigned int i = 0; i < 100 * MHZ(1); i++){
                     __asm("");
             }
@@ -31,7 +37,8 @@ int main(void)
                     __asm("");
             }
             gpio_clear(26);
-        }
+        }*/
+
 
     }
 }

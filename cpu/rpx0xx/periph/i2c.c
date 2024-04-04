@@ -233,6 +233,17 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data,
 int i2c_read_regs(i2c_t dev, uint16_t addr, uint16_t reg,
                   void *data, size_t len, uint8_t flags)
 {
+    //read regs, len bytes
+    long* baseaddr = (long *) I2C_BASE;
+    for(uint16_t i = 0; i < len; i++){
+        _i2c_bus[dev].len = 8; //?
+        _i2c_bus[dev].cmd = 1; // send read cmd ?
+        uint8_t* dataAddr = (uint8_t *) data;
+        dataAddr[i] = *(baseaddr + IC_DATA_CMD) & 0xFF;
+    }
+
+    //
+    //throwaway code
     i2c_t device = dev;
     device += 1;
     uint16_t address = addr;
@@ -250,7 +261,10 @@ int i2c_read_regs(i2c_t dev, uint16_t addr, uint16_t reg,
 
 int i2c_read_reg(i2c_t dev, uint16_t addr, uint16_t reg,
                  void *data, uint8_t flags)
-{
+{   
+    //read reg
+
+    //throwaway code
     i2c_t device = dev;
     device += 1;
     uint16_t address = addr;
