@@ -81,7 +81,11 @@
 #include "periph/cpu_wdt.h"
 
 #ifdef MODULE_PERIPH_CAN
+#ifdef MODULE_FDCAN
+#include "fdcandev_stm32.h"
+#else
 #include "candev_stm32.h"
+#endif
 #endif
 
 #ifdef __cplusplus
