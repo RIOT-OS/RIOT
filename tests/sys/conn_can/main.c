@@ -145,22 +145,22 @@ static int _send(int argc, char **argv, bool rtr)
 
     if (rtr) {
         frame.can_id = CAN_RTR_FLAG | strtoul(argv[3], NULL, 16);
-        frame.can_dlc = strtoul(argv[4], NULL, 10);
+        frame.len = strtoul(argv[4], NULL, 10);
     } else {
         frame.can_id = strtoul(argv[3], NULL, 16);
-        frame.can_dlc = argc - 4;
+        frame.len = argc - 4;
     }
-    if (frame.can_dlc > 8) {
+    if (frame.len > 8) {
         puts("Invalid length");
         return 1;
     }
 
     if (rtr) {
-        for (int i = 0; i < frame.can_dlc; i++) {
+        for (int i = 0; i < frame.len; i++) {
             frame.data[i] = 0x0;
         }
     } else {
-        for (int i = 0; i < frame.can_dlc; i++) {
+        for (int i = 0; i < frame.len; i++) {
             frame.data[i] = strtol(argv[4 + i], NULL, 16);
         }
     }
@@ -614,8 +614,8 @@ static void *_receive_thread(void *args)
                        thread_nb,
                        raw_can_get_name_by_ifnum(conn[thread_nb].ifnum),
                        frame.can_id,
-                       frame.can_dlc);
-                for (int i = 0; i < frame.can_dlc; i++) {
+                       frame.len);
+                for (int i = 0; i < frame.len; i++) {
                     printf(" %02X", frame.data[i]);
                 }
                 printf("\n");

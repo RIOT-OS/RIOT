@@ -217,7 +217,7 @@ static int _send(candev_t *candev, const struct can_frame *frame)
 
     nbytes = real_write(dev->sock, frame, sizeof(struct can_frame));
 
-    if (nbytes < frame->can_dlc) {
+    if (nbytes < frame->len) {
         real_printf("CAN write op failed, nbytes=%i\n", nbytes);
         return -1;
     }

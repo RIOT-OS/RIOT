@@ -197,7 +197,7 @@ static int _isotp_rcv_fc(struct isotp *isotp, struct can_frame *frame, int ae)
 
     ztimer_remove(ZTIMER_USEC, &isotp->tx_timer);
 
-    if (frame->can_dlc < ae + FC_CONTENT_SZ) {
+    if (frame->len < ae + FC_CONTENT_SZ) {
         /* Invalid length */
         isotp->tx.state = ISOTP_IDLE;
         return 1;
@@ -260,7 +260,7 @@ static int _isotp_rcv_sf(struct isotp *isotp, struct can_frame *frame, int ae)
     isotp->rx.state = ISOTP_IDLE;
 
     int len = (frame->data[ae] & 0x0F);
-    if (len > frame->can_dlc - (SF_PCI_SZ + ae)) {
+    if (len > frame->len - (SF_PCI_SZ + ae)) {
         return 1;
     }
 
@@ -307,7 +307,7 @@ static int _isotp_rcv_ff(struct isotp *isotp, struct can_frame *frame, int ae)
     isotp->rx.snip = snip;
 
     isotp->rx.idx = 0;
-    for (int i = ae + FF_PCI_SZ; i < frame->can_dlc; i++) {
+    for (int i = ae + FF_PCI_SZ; i < frame->len; i++) {
         ((uint8_t *)isotp->rx.snip->data)[isotp->rx.idx++] = frame->data[i];
     }
 
@@ -352,7 +352,7 @@ static int _isotp_rcv_cf(struct isotp *isotp, struct can_frame *frame, int ae)
     isotp->rx.sn++;
     isotp->rx.sn %= 16;
 
-    for (int i = ae + N_PCI_SZ; i < frame->can_dlc; i++) {
+    for (int i = ae + N_PCI_SZ; i < frame->len; i++) {
         ((uint8_t *)isotp->rx.snip->data)[isotp->rx.idx++] = frame->data[i];
         if (isotp->rx.idx >= isotp->rx.snip->size) {
             break;
@@ -393,7 +393,7 @@ static int _isotp_rcv(struct isotp *isotp, struct can_frame *frame)
 
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         DEBUG("_isotp_rcv: id=%" PRIx32 " data=", frame->can_id);
-        for (int i = 0; i < frame->can_dlc; i++) {
+        for (int i = 0; i < frame->len; i++) {
             DEBUG("%02hhx", frame->data[i]);
         }
         DEBUG("\n");
@@ -431,10 +431,10 @@ static int _isotp_send_fc(struct isotp *isotp, int ae, uint8_t status)
 
     if (isotp->opt.flags & CAN_ISOTP_TX_PADDING) {
         memset(fc.data, isotp->opt.txpad_content, CAN_MAX_DLEN);
-        fc.can_dlc = CAN_MAX_DLEN;
+        fc.len = CAN_MAX_DLEN;
     }
     else {
-        fc.can_dlc = ae + FC_CONTENT_SZ;
+        fc.len = ae + FC_CONTENT_SZ;
     }
 
     fc.data[ae] = N_PCI_FC | status;
@@ -449,7 +449,7 @@ static int _isotp_send_fc(struct isotp *isotp, int ae, uint8_t status)
 
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         DEBUG("_isotp_send_fc: id=%" PRIx32 " data=", fc.can_id);
-        for (int i = 0; i < fc.can_dlc; i++) {
+        for (int i = 0; i < fc.len; i++) {
             DEBUG("%02hhx", fc.data[i]);
         }
         DEBUG("\n");
@@ -472,7 +472,7 @@ static void _isotp_create_ff(struct isotp *isotp, struct can_frame *frame, int a
 {
 
     frame->can_id = isotp->opt.tx_id;
-    frame->can_dlc = CAN_MAX_DLEN;
+    frame->len = CAN_MAX_DLEN;
 
     if (ae) {
         frame->data[0] = isotp->opt.ext_address;
@@ -495,15 +495,15 @@ static void _isotp_fill_dataframe(struct isotp *isotp, struct can_frame *frame, 
     size_t num_bytes = MIN(space, isotp->tx.snip->size - isotp->tx.idx);
 
     frame->can_id = isotp->opt.tx_id;
-    frame->can_dlc = num_bytes + pci_len;
+    frame->len = num_bytes + pci_len;
 
     DEBUG("_isotp_fill_dataframe: num_bytes=%" PRIuSIZE ", pci_len=%" PRIuSIZE "\n",
           num_bytes, pci_len);
 
     if (num_bytes < space) {
         if (isotp->opt.flags & CAN_ISOTP_TX_PADDING) {
-            frame->can_dlc = CAN_MAX_DLEN;
-            memset(frame->data, isotp->opt.txpad_content, frame->can_dlc);
+            frame->len = CAN_MAX_DLEN;
+            memset(frame->data, isotp->opt.txpad_content, frame->len);
         }
     }
 
