@@ -297,7 +297,7 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data,
     length++;
     uint8_t flagss = flags;
     flagss++;
-    return 35;
+    return 0;
 }
 
 int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
@@ -314,7 +314,7 @@ int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
     length++;
     uint8_t flagss = flags;
     flagss++;
-    return 35;
+    return 0;
 }
 
 int i2c_write_reg(i2c_t dev, uint16_t addr, uint16_t reg,
@@ -329,5 +329,5 @@ int i2c_write_reg(i2c_t dev, uint16_t addr, uint16_t reg,
     assert(data != 1);
     uint8_t flagss = flags;
     flagss++;
-    return 35;
+    return 0;
 }
