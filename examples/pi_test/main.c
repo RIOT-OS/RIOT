@@ -11,19 +11,22 @@
 #include "vcnl40x0.h"
 //#include "xtimer.h"
 
-const int PIN = 26;
+const int PIN = 9;
 
 int main(void)
 {
     //blink if read bytes non-zero
-    const vcnl40x0_params_t initParams = {1, 0, 0, 0, 0, 0};
+    const vcnl40x0_params_t initParams = {1, 0, 1, 0, 0, 0};
     vcnl40x0_t dev = {initParams};
 
     uint8_t status = vcnl40x0_init(&dev, &initParams);
     if(status == 0){
         printf("Successfully initalised vcnl40x0 !");
         gpio_init(PIN, GPIO_OUT);
+        gpio_set(PIN);
         uint16_t readresp = vcnl40x0_read_ambient_light(&dev);
+        gpio_init(10, GPIO_OUT);
+        gpio_set(10);
         if (readresp > 0){
             gpio_set(PIN);
         }
@@ -40,5 +43,9 @@ int main(void)
         }*/
 
 
+    }
+    else if (status == 35){
+        gpio_init(PIN-17, GPIO_OUT);
+        gpio_set(PIN-17);
     }
 }

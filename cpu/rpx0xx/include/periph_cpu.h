@@ -433,6 +433,13 @@ typedef struct {
 } timer_conf_t;
 
 /**
+ * @name   I2C bitmasks
+ * @{
+*/
+#define IC_DATA_CMD_CMD 0x08
+/** @} */
+
+/**
  * @name   Override I2C clock speed values
  * @{
  */
