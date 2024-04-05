@@ -1,6 +1,8 @@
 DEVELHELP ?= 0
 include ../Makefile.tests_common
 
+OUTPUT := TEXT
+
 USEMODULE += embunit
 
 ifeq (, $(UNIT_TESTS))

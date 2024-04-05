@@ -11,8 +11,6 @@
 #include "at.h"
 #include "isrpipe/read_timeout.h"
 
-#include "tests-at.h"
-
 #define UNIT_TEST_LONG_URC "+UNITTEST_LONG_URC_VEEERY_LONG"
 #define UNIT_TEST_SHORT_URC "+U"
 #define LONG_COMMAND "AT+COMMAND_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"\
@@ -59,7 +57,7 @@ static void set_up(void)
         .rp_buf_size = sizeof(rp_buf),
         .rx_buf = buf,
         .rx_buf_size = sizeof(buf),
-        .uart = UART_DEV(0),
+        .uart = UART_DEV(1),
     };
     int res = at_dev_init(&at_dev, &at_init_params);
     /* check the UART initialization return value and respond as needed */
@@ -670,7 +668,7 @@ void test_process_urc(void)
 }
 #endif /* MODULE_AT_URC */
 
-void tests_at(void)
+static Test *tests_at(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_readline_or_echo),
@@ -688,5 +686,17 @@ void tests_at(void)
 
     EMB_UNIT_TESTCALLER(at_tests, set_up, tear_down, fixtures);
 
-    TESTS_RUN((Test *)&at_tests);
+    return (Test *)&at_tests;
+}
+
+int main(void)
+{
+
+    puts("AT unit-like test\n");
+
+    TESTS_START();
+    TESTS_RUN(tests_at());
+    TESTS_END();
+
+    return 0;
 }
