@@ -50,71 +50,66 @@ static registry_instance_t test_nested_instance_1 = {
     .commit_cb = NULL,
 };
 
-static int export_parameter_cb(const registry_export_cb_data_t *data,
-                               const registry_export_cb_data_type_t data_type,
+static int export_parameter_cb(const registry_node_t *node,
                                const void *context)
 {
     (void)context;
 
-    if (data_type == REGISTRY_EXPORT_PARAMETER && data != NULL &&
-        data->parameter.data->id == *(registry_parameter_id_t *)context &&
-        data->parameter.instance == &test_nested_instance_1) {
+    if (node->type == REGISTRY_NODE_PARAMETER && node->location.parameter != NULL &&
+        node->location.parameter->id == *(registry_parameter_id_t *)context &&
+        node->instance == &test_nested_instance_1) {
         successful = true;
     }
 
     return 0;
 }
 
-static int export_group_cb(const registry_export_cb_data_t *data,
-                           const registry_export_cb_data_type_t data_type,
-                           const void *context)
-{
-    (void)context;
-
-    if (data_type == REGISTRY_EXPORT_GROUP && data != NULL &&
-        data->group->id == *(registry_group_id_t *)context) {
-        successful = true;
-    }
-
-    return 0;
-}
-
-static int export_instance_cb(const registry_export_cb_data_t *data,
-                              const registry_export_cb_data_type_t data_type,
-                              const void *context)
-{
-    (void)context;
-
-    if (data_type == REGISTRY_EXPORT_INSTANCE && data != NULL &&
-        data->instance == &test_nested_instance_1) {
-        successful = true;
-    }
-
-    return 0;
-}
-
-static int export_schema_cb(const registry_export_cb_data_t *data,
-                            const registry_export_cb_data_type_t data_type,
-                            const void *context)
-{
-    (void)context;
-
-    if (data_type == REGISTRY_EXPORT_SCHEMA && data != NULL &&
-        data->schema == &registry_tests_nested) {
-        successful = true;
-    }
-
-    return 0;
-}
-
-static int export_namespace_cb(const registry_export_cb_data_t *data,
-                               const registry_export_cb_data_type_t data_type,
+static int export_group_cb(const registry_node_t *node,
                                const void *context)
 {
     (void)context;
 
-    if (data_type == REGISTRY_EXPORT_NAMESPACE && data != NULL &&
-        data->namespace == &registry_tests) {
+    if (node->type == REGISTRY_NODE_GROUP && node->location.group != NULL &&
+        node->location.group->id == *(registry_group_id_t *)context) {
+        successful = true;
+    }
+
+    return 0;
+}
+
+static int export_instance_cb(const registry_node_t *node,
+                               const void *context)
+{
+    (void)context;
+
+    if (node->type == REGISTRY_NODE_INSTANCE && node->instance != NULL &&
+        node->instance == &test_nested_instance_1) {
+        successful = true;
+    }
+
+    return 0;
+}
+
+static int export_schema_cb(const registry_node_t *node,
+                               const void *context)
+{
+    (void)context;
+
+    if (node->type == REGISTRY_NODE_SCHEMA && node->location.schema != NULL &&
+        node->location.schema == &registry_tests_nested) {
+        successful = true;
+    }
+
+    return 0;
+}
+
+static int export_namespace_cb(const registry_node_t *node,
+                               const void *context)
+{
+    (void)context;
+
+    if (node->type == REGISTRY_NODE_NAMESPACE && node->location.namespace != NULL &&
+        node->location.namespace == &registry_tests) {
         successful = true;
     }
 
@@ -139,27 +134,37 @@ static void tests_registry_export_parameter(void)
     const registry_parameter_id_t parameter_id = REGISTRY_TESTS_NESTED_PARAMETER;
 
     successful = false;
-    registry_export_parameter(&test_nested_instance_1, &registry_tests_nested_parameter,
-                              &export_parameter_cb, &parameter_id);
+
+    const registry_node_t node = {
+        .type = REGISTRY_NODE_PARAMETER,
+        .location.parameter = &registry_tests_nested_parameter,
+        .instance = &test_nested_instance_1,
+    };
+
+    registry_export(&node, &export_parameter_cb, 0, &parameter_id);
+
     TEST_ASSERT(successful);
 }
 
 static void tests_registry_export_group(void)
 {
+    const registry_node_t node = {
+        .type = REGISTRY_NODE_GROUP,
+        .location.group = &registry_tests_nested_group,
+        .instance = &test_nested_instance_1,
+    };
+
     /* check if group gets exported */
     const registry_group_id_t group_id = REGISTRY_TESTS_NESTED_GROUP;
-
     successful = false;
-    registry_export_group(&test_nested_instance_1, &registry_tests_nested_group, &export_group_cb,
-                          0, &group_id);
+    registry_export(&node, &export_group_cb, 0, &group_id);
     TEST_ASSERT(successful);
 
 
     /* check that siblings get NOT exported */
     const registry_parameter_id_t sibling_parameter_id = REGISTRY_TESTS_NESTED_PARAMETER;
     successful = false;
-    registry_export_group(&test_nested_instance_1, &registry_tests_nested_group,
-                          &export_parameter_cb, 0, &sibling_parameter_id);
+    registry_export(&node, &export_parameter_cb, 0, &sibling_parameter_id);
     TEST_ASSERT_EQUAL_INT(false, successful);
 
 
@@ -168,28 +173,30 @@ static void tests_registry_export_group(void)
 
     /* recursion_depth 0 => infinite => parameter gets exported */
     successful = false;
-    registry_export_group(&test_nested_instance_1, &registry_tests_nested_group,
-                          &export_parameter_cb, 0, &child_parameter_id);
+    registry_export(&node, &export_parameter_cb, 0, &child_parameter_id);
     TEST_ASSERT(successful);
 
     /* recursion_depth 1 => only group => parameter gets NOT exported */
     successful = false;
-    registry_export_group(&test_nested_instance_1, &registry_tests_nested_group,
-                          &export_parameter_cb, 1, &child_parameter_id);
+    registry_export(&node, &export_parameter_cb, 1, &child_parameter_id);
     TEST_ASSERT_EQUAL_INT(false, successful);
 
     /* recursion_depth 2 => group + 1 level more => parameter gets exported */
     successful = false;
-    registry_export_group(&test_nested_instance_1, &registry_tests_nested_group,
-                          &export_parameter_cb, 2, &child_parameter_id);
+    registry_export(&node, &export_parameter_cb, 2, &child_parameter_id);
     TEST_ASSERT(successful);
 }
 
 static void tests_registry_export_instance(void)
 {
+    const registry_node_t node = {
+        .type = REGISTRY_NODE_INSTANCE,
+        .instance = &test_nested_instance_1,
+    };
+
     /* check if instance gets exported */
     successful = false;
-    registry_export_instance(&test_nested_instance_1, &export_instance_cb, 0, NULL);
+    registry_export(&node, &export_instance_cb, 0, NULL);
     TEST_ASSERT(successful);
 
 
@@ -197,7 +204,7 @@ static void tests_registry_export_instance(void)
     const registry_group_id_t group_id = REGISTRY_TESTS_NESTED_GROUP;
 
     successful = false;
-    registry_export_instance(&test_nested_instance_1, &export_group_cb, 0, &group_id);
+    registry_export(&node, &export_group_cb, 0, &group_id);
     TEST_ASSERT(successful);
 
 
@@ -206,30 +213,35 @@ static void tests_registry_export_instance(void)
 
     /* recursion_depth 0 => infinite => parameter gets exported */
     successful = false;
-    registry_export_instance(&test_nested_instance_1, &export_parameter_cb, 0, &child_parameter_id);
+    registry_export(&node, &export_parameter_cb, 0, &child_parameter_id);
     TEST_ASSERT(successful);
 
     /* recursion_depth 2 => only instance and group => parameter gets NOT exported */
     successful = false;
-    registry_export_instance(&test_nested_instance_1, &export_parameter_cb, 2, &child_parameter_id);
+    registry_export(&node, &export_parameter_cb, 2, &child_parameter_id);
     TEST_ASSERT_EQUAL_INT(false, successful);
 
     /* recursion_depth 3 => instance, group and parameter => parameter gets exported */
     successful = false;
-    registry_export_instance(&test_nested_instance_1, &export_parameter_cb, 3, &child_parameter_id);
+    registry_export(&node, &export_parameter_cb, 3, &child_parameter_id);
     TEST_ASSERT(successful);
 }
 
 static void tests_registry_export_schema(void)
 {
+    const registry_node_t node = {
+        .type = REGISTRY_NODE_SCHEMA,
+        .location.schema = &registry_tests_nested,
+    };
+
     /* check if schema gets exported */
     successful = false;
-    registry_export_schema(&registry_tests_nested, &export_schema_cb, 0, NULL);
+    registry_export(&node, &export_schema_cb, 0, NULL);
     TEST_ASSERT(successful);
 
     /* check if instance gets exported */
     successful = false;
-    registry_export_schema(&registry_tests_nested, &export_instance_cb, 0, NULL);
+    registry_export(&node, &export_instance_cb, 0, NULL);
     TEST_ASSERT(successful);
 
 
@@ -237,7 +249,7 @@ static void tests_registry_export_schema(void)
     const registry_group_id_t group_id = REGISTRY_TESTS_NESTED_GROUP;
 
     successful = false;
-    registry_export_schema(&registry_tests_nested, &export_group_cb, 0, &group_id);
+    registry_export(&node, &export_group_cb, 0, &group_id);
     TEST_ASSERT(successful);
 
 
@@ -246,35 +258,40 @@ static void tests_registry_export_schema(void)
 
     /* recursion_depth 0 => infinite => parameter gets exported */
     successful = false;
-    registry_export_schema(&registry_tests_nested, &export_parameter_cb, 0, &child_parameter_id);
+    registry_export(&node, &export_parameter_cb, 0, &child_parameter_id);
     TEST_ASSERT(successful);
 
     /* recursion_depth 3 => only schema, instance and group => parameter gets NOT exported */
     successful = false;
-    registry_export_schema(&registry_tests_nested, &export_parameter_cb, 3, &child_parameter_id);
+    registry_export(&node, &export_parameter_cb, 3, &child_parameter_id);
     TEST_ASSERT_EQUAL_INT(false, successful);
 
     /* recursion_depth 4 => schema, instance, group and parameter => parameter gets exported */
     successful = false;
-    registry_export_schema(&registry_tests_nested, &export_parameter_cb, 4, &child_parameter_id);
+    registry_export(&node, &export_parameter_cb, 4, &child_parameter_id);
     TEST_ASSERT(successful);
 }
 
 static void tests_registry_export_namespace(void)
 {
+    const registry_node_t node = {
+        .type = REGISTRY_NODE_NAMESPACE,
+        .location.namespace = &registry_tests,
+    };
+
     /* check if namespace gets exported */
     successful = false;
-    registry_export_namespace(&registry_tests, &export_namespace_cb, 0, NULL);
+    registry_export(&node, &export_namespace_cb, 0, NULL);
     TEST_ASSERT(successful);
 
     /* check if schema gets exported */
     successful = false;
-    registry_export_namespace(&registry_tests, &export_schema_cb, 0, NULL);
+    registry_export(&node, &export_schema_cb, 0, NULL);
     TEST_ASSERT(successful);
 
     /* check if instance gets exported */
     successful = false;
-    registry_export_namespace(&registry_tests, &export_instance_cb, 0, NULL);
+    registry_export(&node, &export_instance_cb, 0, NULL);
     TEST_ASSERT(successful);
 
 
@@ -282,7 +299,7 @@ static void tests_registry_export_namespace(void)
     const registry_group_id_t group_id = REGISTRY_TESTS_NESTED_GROUP;
 
     successful = false;
-    registry_export_namespace(&registry_tests, &export_group_cb, 0, &group_id);
+    registry_export(&node, &export_group_cb, 0, &group_id);
     TEST_ASSERT(successful);
 
 
@@ -291,17 +308,17 @@ static void tests_registry_export_namespace(void)
 
     /* recursion_depth 0 => infinite => parameter gets exported */
     successful = false;
-    registry_export_namespace(&registry_tests, &export_parameter_cb, 0, &child_parameter_id);
+    registry_export(&node, &export_parameter_cb, 0, &child_parameter_id);
     TEST_ASSERT(successful);
 
     /* recursion_depth 4 => only namespace, schema, instance and group => parameter gets NOT exported */
     successful = false;
-    registry_export_namespace(&registry_tests, &export_parameter_cb, 4, &child_parameter_id);
+    registry_export(&node, &export_parameter_cb, 4, &child_parameter_id);
     TEST_ASSERT_EQUAL_INT(false, successful);
 
     /* recursion_depth 5 => namespace, schema, instance, group and parameter => parameter gets exported */
     successful = false;
-    registry_export_namespace(&registry_tests, &export_parameter_cb, 5, &child_parameter_id);
+    registry_export(&node, &export_parameter_cb, 5, &child_parameter_id);
     TEST_ASSERT(successful);
 }
 
@@ -309,17 +326,17 @@ static void tests_registry_export_all(void)
 {
     /* check if namespace gets exported */
     successful = false;
-    registry_export(&export_namespace_cb, 0, NULL);
+    registry_export(NULL, &export_namespace_cb, 0, NULL);
     TEST_ASSERT(successful);
 
     /* check if schema gets exported */
     successful = false;
-    registry_export( &export_schema_cb, 0, NULL);
+    registry_export(NULL,  &export_schema_cb, 0, NULL);
     TEST_ASSERT(successful);
 
     /* check if instance gets exported */
     successful = false;
-    registry_export( &export_instance_cb, 0, NULL);
+    registry_export(NULL,  &export_instance_cb, 0, NULL);
     TEST_ASSERT(successful);
 
 
@@ -327,7 +344,7 @@ static void tests_registry_export_all(void)
     const registry_group_id_t group_id = REGISTRY_TESTS_NESTED_GROUP;
 
     successful = false;
-    registry_export( &export_group_cb, 0, &group_id);
+    registry_export(NULL,  &export_group_cb, 0, &group_id);
     TEST_ASSERT(successful);
 
 
@@ -336,17 +353,17 @@ static void tests_registry_export_all(void)
 
     /* recursion_depth 0 => infinite => parameter gets exported */
     successful = false;
-    registry_export( &export_parameter_cb, 0, &child_parameter_id);
+    registry_export(NULL, &export_parameter_cb, 0, &child_parameter_id);
     TEST_ASSERT(successful);
 
     /* recursion_depth 4 => only namespace, schema, instance and group => parameter gets NOT exported */
     successful = false;
-    registry_export(&export_parameter_cb, 4, &child_parameter_id);
+    registry_export(NULL, &export_parameter_cb, 4, &child_parameter_id);
     TEST_ASSERT_EQUAL_INT(false, successful);
 
     /* recursion_depth 5 => namespace, schema, instance, group and parameter => parameter gets exported */
     successful = false;
-    registry_export(&export_parameter_cb, 5, &child_parameter_id);
+    registry_export(NULL, &export_parameter_cb, 5, &child_parameter_id);
     TEST_ASSERT(successful);
 }
 

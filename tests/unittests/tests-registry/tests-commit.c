@@ -128,8 +128,15 @@ static void tests_registry_commit_parameter(void)
 {
     successful = false;
     parameter_id = REGISTRY_TESTS_NESTED_PARAMETER;
-    registry_commit_parameter(&test_nested_instance_parameter_test,
-                              &registry_tests_nested_parameter);
+
+    const registry_node_t node = {
+        .type = REGISTRY_NODE_PARAMETER,
+        .location.parameter = &registry_tests_nested_parameter,
+        .instance = &test_nested_instance_parameter_test,
+    };
+
+    registry_commit(&node);
+
     TEST_ASSERT(successful);
 }
 
@@ -137,35 +144,64 @@ static void tests_registry_commit_group(void)
 {
     successful = false;
     group_id = REGISTRY_TESTS_NESTED_GROUP;
-    registry_commit_group(&test_nested_instance_group_test, &registry_tests_nested_group);
+
+    const registry_node_t node = {
+        .type = REGISTRY_NODE_GROUP,
+        .location.group = &registry_tests_nested_group,
+        .instance = &test_nested_instance_group_test,
+    };
+
+    registry_commit(&node);
+
     TEST_ASSERT(successful);
 }
 
 static void tests_registry_commit_instance(void)
 {
     successful = false;
-    registry_commit_instance(&test_nested_instance_instance_test);
+
+    const registry_node_t node = {
+        .type = REGISTRY_NODE_INSTANCE,
+        .instance = &test_nested_instance_instance_test,
+    };
+
+    registry_commit(&node);
+
     TEST_ASSERT(successful);
 }
 
 static void tests_registry_commit_schema(void)
 {
     successful = false;
-    registry_commit_schema(&registry_tests_nested);
+
+    const registry_node_t node = {
+        .type = REGISTRY_NODE_SCHEMA,
+        .location.schema = &registry_tests_nested,
+    };
+
+    registry_commit(&node);
+
     TEST_ASSERT(successful);
 }
 
 static void tests_registry_commit_namespace(void)
 {
     successful = false;
-    registry_commit_namespace(&registry_tests);
+
+    const registry_node_t node = {
+        .type = REGISTRY_NODE_NAMESPACE,
+        .location.namespace = &registry_tests,
+    };
+
+    registry_commit(&node);
+
     TEST_ASSERT(successful);
 }
 
 static void tests_registry_commit_all(void)
 {
     successful = false;
-    registry_commit();
+    registry_commit(NULL);
     TEST_ASSERT(successful);
 }
 
