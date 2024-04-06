@@ -101,7 +101,7 @@ static int print_empty(int argc, char **argv)
     return 0;
 }
 
-static char _stack[THREAD_STACKSIZE_TINY];
+static char _stack[THREAD_STACKSIZE_SMALL];
 static struct {
     uint16_t period_ms;
     uint16_t reps;
