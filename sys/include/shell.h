@@ -11,6 +11,14 @@
  * @ingroup     sys
  * @brief       Simple shell interpreter
  *
+ * ## Security expectations
+ *
+ * Access to the shell grants access to the system that may exercise any power
+ * the firmware can exercise. While some commands only provide limited access
+ * to the system, and it is best practice for commands to validate their input,
+ * there is no expectation of security of the system when an attacker gains
+ * access to the shell.
+ *
  * @{
  *
  * @file
