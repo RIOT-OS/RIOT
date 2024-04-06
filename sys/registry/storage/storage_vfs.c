@@ -38,8 +38,7 @@
 static int load(const registry_storage_instance_t *storage,
                 const load_cb_t load_cb);
 static int save(const registry_storage_instance_t *storage,
-                const registry_instance_t *instance,
-                const registry_parameter_t *parameter,
+                const registry_node_t *node,
                 const registry_value_t *value);
 
 registry_storage_t registry_storage_vfs = {
@@ -186,7 +185,7 @@ static int load(const registry_storage_instance_t *storage,
                                         fd);
                                 }
 
-                                /* convert string path to registry int path (remove mount point and first '/' character) */
+                                /* convert string path of integers to native registry int path format (remove mount point and first '/' character) */
                                 char *ptr = (char *)string_path + mount->mount_point_len + 1;
                                 registry_namespace_id_t namespace_id = strtol(ptr, &ptr, 10);
                                 ptr++;
@@ -196,21 +195,23 @@ static int load(const registry_storage_instance_t *storage,
                                 ptr++;
                                 registry_parameter_id_t parameter_id = strtol(ptr, &ptr, 10);
 
-                                const registry_parameter_int_path_t parameter_path = {
-                                    .namespace_id = namespace_id,
-                                    .schema_id = schema_id,
-                                    .instance_id = instance_id,
-                                    .parameter_id = parameter_id,
+                                const registry_int_path_t int_path = {
+                                    .type = REGISTRY_INT_PATH_TYPE_PARAMETER,
+                                    .value.parameter_path = {
+                                        .namespace_id = namespace_id,
+                                        .schema_id = schema_id,
+                                        .instance_id = instance_id,
+                                        .parameter_id = parameter_id,
+                                    }
                                 };
 
                                 /* get pointer to registry internal configuration parameter */
-                                registry_instance_t *instance;
-                                registry_parameter_t *parameter;
-                                registry_from_parameter_int_path(&parameter_path, NULL, NULL,
-                                                                 &instance, &parameter);
+                                registry_node_t node;
+                                registry_node_from_int_path(&int_path, &node);
 
+                                /* get value from registry to know its size (buf_len) */
                                 registry_value_t value;
-                                registry_get(instance, parameter, &value);
+                                registry_get(&node, &value);
 
                                 /* read value from file */
                                 uint8_t new_value_buf[value.buf_len];
@@ -220,7 +221,7 @@ static int load(const registry_storage_instance_t *storage,
                                 }
                                 else {
                                     /* call callback with value and path */
-                                    load_cb(instance, parameter, new_value_buf, value.buf_len);
+                                    load_cb(&node, new_value_buf, value.buf_len);
                                 }
 
                                 /* close file */
@@ -274,37 +275,41 @@ static int load(const registry_storage_instance_t *storage,
 }
 
 static int save(const registry_storage_instance_t *storage,
-                const registry_instance_t *instance,
-                const registry_parameter_t *parameter,
+                const registry_node_t *node,
                 const registry_value_t *value)
 {
+    assert(node->type == REGISTRY_NODE_PARAMETER);
+    assert(node->location.parameter != NULL);
+    assert(node->instance != NULL);
+    
     vfs_mount_t *mount = storage->data;
 
     /* mount */
     _mount(mount);
 
     /* create dir path */
-    registry_parameter_int_path_t path = registry_to_parameter_int_path(instance, parameter);
+    registry_int_path_t path;
+    int res = registry_node_to_int_path(node, &path);
 
     char string_path[REGISTRY_INT_PATH_STRING_MAX_LEN];
 
     sprintf(string_path, "%s", mount->mount_point);
 
-    _string_path_append_item(string_path, path.namespace_id);
-    int res = vfs_mkdir(string_path, 0);
-
-    if (res < 0 && res != -EEXIST) {
-        DEBUG("[registry storage_vfs] save: Can not make dir: %s\n", string_path);
-    }
-
-    _string_path_append_item(string_path, path.schema_id);
+    _string_path_append_item(string_path, path.value.parameter_path.namespace_id);
     res = vfs_mkdir(string_path, 0);
 
     if (res < 0 && res != -EEXIST) {
         DEBUG("[registry storage_vfs] save: Can not make dir: %s\n", string_path);
     }
 
-    _string_path_append_item(string_path, path.instance_id);
+    _string_path_append_item(string_path, path.value.parameter_path.schema_id);
+    res = vfs_mkdir(string_path, 0);
+
+    if (res < 0 && res != -EEXIST) {
+        DEBUG("[registry storage_vfs] save: Can not make dir: %s\n", string_path);
+    }
+
+    _string_path_append_item(string_path, path.value.parameter_path.instance_id);
     res = vfs_mkdir(string_path, 0);
 
     if (res < 0 && res != -EEXIST) {
@@ -312,7 +317,7 @@ static int save(const registry_storage_instance_t *storage,
     }
 
     /* open file */
-    _string_path_append_item(string_path, path.parameter_id);
+    _string_path_append_item(string_path, path.value.parameter_path.parameter_id);
 
     int fd = vfs_open(string_path, O_CREAT | O_RDWR, 0);
 
