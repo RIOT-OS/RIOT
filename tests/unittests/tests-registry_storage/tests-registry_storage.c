@@ -55,8 +55,7 @@ static registry_instance_t test_nested_instance = {
 static int load(const registry_storage_instance_t *storage,
                 const load_cb_t load_cb);
 static int save(const registry_storage_instance_t *storage,
-                const registry_instance_t *instance,
-                const registry_parameter_t *parameter,
+                const registry_node_t *node,
                 const registry_value_t *value);
 
 static registry_storage_t storage_test = {
@@ -75,21 +74,25 @@ static int load(const registry_storage_instance_t *storage,
                 const load_cb_t load_cb)
 {
     if (storage == &storage_test_instance) {
+        registry_node_t node = {
+            .type = REGISTRY_NODE_PARAMETER,
+            .location.parameter = &registry_tests_nested_parameter,
+            .instance = &test_nested_instance,
+        };
         uint8_t buf = _TESTS_REGISTRY_LOAD_STORED_VALUE;
-        return load_cb(&test_nested_instance, &registry_tests_nested_parameter, &buf, sizeof(buf));
+        return load_cb(&node, &buf, sizeof(buf));
     }
 
     return -EINVAL;
 }
 
 static int save(const registry_storage_instance_t *storage,
-                const registry_instance_t *instance,
-                const registry_parameter_t *parameter,
+                const registry_node_t *node,
                 const registry_value_t *value)
 {
     if (storage == &storage_test_instance &&
-        instance == &test_nested_instance &&
-        parameter == &registry_tests_nested_group_parameter &&
+        node->instance == &test_nested_instance &&
+        node->location.parameter == &registry_tests_nested_group_parameter &&
         value->buf == &test_nested_instance_data.group_parameter &&
         value->buf_len == sizeof(uint8_t) &&
         value->type == REGISTRY_TYPE_UINT8) {
@@ -120,40 +123,66 @@ static void tests_registry_load(void)
     /* check if the load_cb sets the value to the registry */
     registry_value_t output;
 
-    registry_get(&test_nested_instance, &registry_tests_nested_parameter, &output);
+    registry_node_t node = {
+        .type = REGISTRY_NODE_PARAMETER,
+        .location.parameter = &registry_tests_nested_parameter,
+        .instance = &test_nested_instance,
+    };
+
+    registry_get(&node, &output);
     TEST_ASSERT_EQUAL_INT(_TESTS_REGISTRY_LOAD_STORED_VALUE, *(uint8_t *)output.buf);
 }
 
 static void tests_registry_save_parameter(void)
 {
-    TEST_ASSERT_EQUAL_INT(0, registry_save_parameter(&test_nested_instance,
-                                                     &registry_tests_nested_group_parameter));
+    registry_node_t node = {
+        .type = REGISTRY_NODE_PARAMETER,
+        .location.parameter = &registry_tests_nested_group_parameter,
+        .instance = &test_nested_instance,
+    };
+    TEST_ASSERT_EQUAL_INT(0, registry_save(&node));
 }
 
 static void tests_registry_save_group(void)
 {
-    TEST_ASSERT_EQUAL_INT(0, registry_save_group(&test_nested_instance,
-                                                 &registry_tests_nested_group));
+    registry_node_t node = {
+        .type = REGISTRY_NODE_GROUP,
+        .location.group = &registry_tests_nested_group,
+        .instance = &test_nested_instance,
+    };
+    TEST_ASSERT_EQUAL_INT(0, registry_save(&node));
 }
 
 static void tests_registry_save_instance(void)
 {
-    TEST_ASSERT_EQUAL_INT(0, registry_save_instance(&test_nested_instance));
+    registry_node_t node = {
+        .type = REGISTRY_NODE_INSTANCE,
+        .instance = &test_nested_instance,
+    };
+    TEST_ASSERT_EQUAL_INT(0, registry_save(&node));
 }
 
 static void tests_registry_save_schema(void)
 {
-    TEST_ASSERT_EQUAL_INT(0, registry_save_schema(&registry_tests_nested));
+    registry_node_t node = {
+        .type = REGISTRY_NODE_SCHEMA,
+        .location.schema = &registry_tests_nested,
+    };
+    TEST_ASSERT_EQUAL_INT(0, registry_save(&node));
 }
 
 static void tests_registry_save_namespace(void)
 {
-    TEST_ASSERT_EQUAL_INT(0, registry_save_namespace(&registry_tests));
+    registry_node_t node = {
+        .type = REGISTRY_NODE_NAMESPACE,
+        .location.namespace = &registry_tests,
+    };
+    TEST_ASSERT_EQUAL_INT(0, registry_save(&node));
 }
 
 static void tests_registry_save_all(void)
 {
-    TEST_ASSERT_EQUAL_INT(0, registry_save());
+    TEST_ASSERT_EQUAL_INT(0, registry_save(NULL));
 }
 
 Test *tests_registry_storage_tests(void)
