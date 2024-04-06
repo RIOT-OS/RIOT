@@ -38,15 +38,11 @@
 static int load(const registry_storage_instance_t *storage,
                 const load_cb_t load_cb);
 static int save(const registry_storage_instance_t *storage,
-                const registry_instance_t *instance,
-                const registry_parameter_t *parameter,
+                const registry_node_t *node,
                 const registry_value_t *value);
 
 typedef struct {
-    const registry_namespace_t *namespace;
-    const registry_schema_t *schema;
-    const registry_instance_t *instance;
-    const registry_parameter_t *parameter;
+    registry_node_t node;
     void *buf;
     size_t buf_len;
 } heap_storage_t;
@@ -67,25 +63,25 @@ static int load(const registry_storage_instance_t *storage,
     (void)storage;
 
     for (size_t i = 0; i < heap_storage_len; i++) {
-        load_cb(heap_storage[i].instance, heap_storage[i].parameter, heap_storage[i].buf,
-                heap_storage[i].buf_len);
+        load_cb(&heap_storage[i].node, heap_storage[i].buf, heap_storage[i].buf_len);
     }
     return 0;
 }
 
 static int save(const registry_storage_instance_t *storage,
-                const registry_instance_t *instance,
-                const registry_parameter_t *parameter,
+                const registry_node_t *node,
                 const registry_value_t *value)
 {
+    assert(node->type == REGISTRY_NODE_PARAMETER);
+    assert(node->location.parameter != NULL);
+    assert(node->instance != NULL);
+
     (void)storage;
 
     /* Search value in storage */
     for (size_t i = 0; i < heap_storage_len; i++) {
-        if (heap_storage[i].namespace == parameter->schema->namespace &&
-            heap_storage[i].schema == parameter->schema &&
-            heap_storage[i].instance == instance &&
-            heap_storage[i].parameter == parameter) {
+        if (heap_storage[i].node.instance == node->instance &&
+            heap_storage[i].node.location.parameter == node->location.parameter) {
             memcpy(heap_storage[i].buf, value->buf, value->buf_len);
             return 0;
         }
@@ -93,10 +89,7 @@ static int save(const registry_storage_instance_t *storage,
 
     /* Value not found in storage => Append it at the end */
     heap_storage[heap_storage_len] = (heap_storage_t) {
-        .namespace = parameter->schema->namespace,
-        .schema = parameter->schema,
-        .instance = instance,
-        .parameter = parameter,
+        .node = *node,
         .buf = malloc(value->buf_len),
         .buf_len = value->buf_len,
     };
