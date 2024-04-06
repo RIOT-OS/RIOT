@@ -52,13 +52,13 @@ static int _namespace_lookup(const registry_namespace_id_t namespace_id,
 
 static int _schema_lookup(const registry_namespace_t *namespace,
                           const registry_schema_id_t schema_id,
-                          registry_schema_t **schema)
+                          const registry_schema_t **schema)
 {
     assert(schema != NULL);
 
     for (size_t i = 0; i < namespace->schemas_len; i++) {
         if (namespace->schemas[i]->id == schema_id) {
-            *schema = (registry_schema_t *)namespace->schemas[i];
+            *schema = namespace->schemas[i];
             return 0;
         }
     }
@@ -111,19 +111,18 @@ static const registry_group_t *_internal_group_lookup(const registry_group_t *gr
 }
 
 static int _group_lookup(const registry_schema_t *schema, const registry_group_id_t group_id,
-                         registry_group_t **group)
+                         const registry_group_t **group)
 {
     assert(schema != NULL);
     assert(group != NULL);
 
     for (size_t i = 0; i < schema->groups_len; i++) {
         if (schema->groups[i]->id == group_id) {
-            *group = (registry_group_t *)schema->groups[i];
+            *group = schema->groups[i];
             return 0;
         }
         else if (schema->groups[i]->groups_len > 0) {
-            registry_group_t *found_group = (registry_group_t *)_internal_group_lookup(
-                schema->groups[i], group_id);
+            const registry_group_t *found_group = _internal_group_lookup(schema->groups[i], group_id);
             if (found_group != NULL) {
                 *group = found_group;
                 return 0;
@@ -154,22 +153,20 @@ static const registry_parameter_t *_internal_parameter_lookup(const registry_gro
 
 static int _parameter_lookup(const registry_schema_t *schema,
                              const registry_parameter_id_t parameter_id,
-                             registry_parameter_t **parameter)
+                             const registry_parameter_t **parameter)
 {
     assert(schema != NULL);
     assert(parameter != NULL);
 
     for (size_t i = 0; i < schema->parameters_len; i++) {
         if (schema->parameters[i]->id == parameter_id) {
-            *parameter = (registry_parameter_t *)schema->parameters[i];
+            *parameter = schema->parameters[i];
             return 0;
         }
     }
 
     for (size_t i = 0; i < schema->groups_len; i++) {
-        registry_parameter_t *found_parameter = (registry_parameter_t *)_internal_parameter_lookup(
-            schema->groups[i],
-            parameter_id);
+        const registry_parameter_t *found_parameter = _internal_parameter_lookup(schema->groups[i], parameter_id);
         if (found_parameter != NULL) {
             *parameter = found_parameter;
             return 0;
@@ -179,244 +176,164 @@ static int _parameter_lookup(const registry_schema_t *schema,
     return -REGISTRY_ERROR_PARAMETER_NOT_FOUND;
 }
 
-/* to int path */
-registry_namespace_int_path_t registry_to_namespace_int_path(const registry_namespace_t *namespace)
+int registry_node_to_int_path(const registry_node_t *node, registry_int_path_t *path)
 {
-    assert(namespace != NULL);
-
-    return (registry_namespace_int_path_t) {
-               .namespace_id = namespace->id,
-    };
-}
-
-registry_schema_int_path_t registry_to_schema_int_path(const registry_schema_t *schema)
-{
-    assert(schema != NULL);
-
-    return (registry_schema_int_path_t) {
-               .namespace_id = schema->namespace->id,
-               .schema_id = schema->id,
-    };
-}
-
-registry_instance_int_path_t registry_to_instance_int_path(const registry_instance_t *instance)
-{
-    assert(instance != NULL);
-
-    return (registry_instance_int_path_t) {
-               .namespace_id = instance->schema->namespace->id,
-               .schema_id = instance->schema->id,
-               .instance_id = instance->id,
-    };
-}
-
-registry_group_int_path_t registry_to_group_int_path(const registry_instance_t *instance,
-                                                     const registry_group_t *group)
-{
-    assert(instance != NULL);
-    assert(group != NULL);
-
-    return (registry_group_int_path_t) {
-               .namespace_id = instance->schema->namespace->id,
-               .schema_id = instance->schema->id,
-               .instance_id = instance->id,
-               .group_id = group->id,
-    };
-}
-
-registry_parameter_int_path_t registry_to_parameter_int_path(const registry_instance_t *instance,
-                                                             const registry_parameter_t *parameter)
-{
-    assert(instance != NULL);
-    assert(parameter != NULL);
-
-    return (registry_parameter_int_path_t) {
-               .namespace_id = instance->schema->namespace->id,
-               .schema_id = instance->schema->id,
-               .instance_id = instance->id,
-               .parameter_id = parameter->id,
-    };
-}
-
-/* from int path */
-int registry_from_namespace_int_path(const registry_namespace_int_path_t *path,
-                                     registry_namespace_t **namespace)
-{
+    assert(node != NULL);
     assert(path != NULL);
-    assert(namespace != NULL);
 
-    int res = _namespace_lookup(path->namespace_id, namespace);
-
-    return res;
-}
-
-int registry_from_schema_int_path(const registry_schema_int_path_t *path,
-                                  registry_namespace_t **namespace, registry_schema_t **schema)
-{
-    assert(path != NULL);
-    /* leaving namespace NULL is fine */
-    assert(schema != NULL);
-
-    registry_namespace_t *found_namespace;
-    int res = _namespace_lookup(path->namespace_id, &found_namespace);
-    if (namespace != NULL) {
-        *namespace = found_namespace;
+    switch (node->type)
+    {
+    case REGISTRY_NODE_NAMESPACE:
+        path->type = REGISTRY_INT_PATH_TYPE_NAMESPACE;
+        path->value.namespace_path.namespace_id = node->location.namespace->id;
+        break;
+    
+    case REGISTRY_NODE_SCHEMA:
+        path->type = REGISTRY_INT_PATH_TYPE_SCHEMA;
+        path->value.schema_path.namespace_id = node->location.schema->namespace->id;
+        path->value.schema_path.schema_id = node->location.schema->id;
+        break;
+    
+    case REGISTRY_NODE_INSTANCE:
+        path->type = REGISTRY_INT_PATH_TYPE_INSTANCE;
+        path->value.instance_path.namespace_id = node->instance->schema->namespace->id;
+        path->value.instance_path.schema_id = node->instance->schema->id;
+        path->value.instance_path.instance_id = node->instance->id;
+        break;
+    
+    case REGISTRY_NODE_GROUP:
+        path->type = REGISTRY_INT_PATH_TYPE_GROUP;
+        path->value.group_path.namespace_id = node->location.group->schema->namespace->id;
+        path->value.group_path.schema_id = node->location.group->schema->id;
+        path->value.group_path.instance_id = node->instance->id;
+        path->value.group_path.group_id = node->location.group->id;
+        break;
+    
+    case REGISTRY_NODE_PARAMETER:
+        path->type = REGISTRY_INT_PATH_TYPE_PARAMETER;
+        path->value.parameter_path.namespace_id = node->location.parameter->schema->namespace->id;
+        path->value.parameter_path.schema_id = node->location.parameter->schema->id;
+        path->value.parameter_path.instance_id = node->instance->id;
+        path->value.parameter_path.parameter_id = node->location.parameter->id;
+        break;
     }
+
+    return 0;
+}
+
+int registry_node_from_int_path(const registry_int_path_t *path, registry_node_t *node)
+{
+    assert(path != NULL);
+    assert(node != NULL);
+
+    registry_namespace_id_t namespace_id = 0;
+    registry_schema_id_t schema_id = 0;
+    registry_instance_id_t instance_id = 0;
+    registry_group_or_parameter_id_t group_or_parameter_id = 0;
+    registry_parameter_id_t parameter_id = 0;
+    registry_group_id_t group_id = 0;
+
+    switch (path->type)
+    {
+    case REGISTRY_INT_PATH_TYPE_NAMESPACE:
+        namespace_id = path->value.namespace_path.namespace_id;
+        break;
+
+    case REGISTRY_INT_PATH_TYPE_SCHEMA:
+        namespace_id = path->value.schema_path.namespace_id;
+        schema_id = path->value.schema_path.schema_id;
+        break;
+
+    case REGISTRY_INT_PATH_TYPE_INSTANCE:
+        namespace_id = path->value.instance_path.namespace_id;
+        schema_id = path->value.instance_path.schema_id;
+        instance_id = path->value.instance_path.instance_id;
+        break;
+
+    case REGISTRY_INT_PATH_TYPE_GROUP_OR_PARAMETER:
+        namespace_id = path->value.group_or_parameter_path.namespace_id;
+        schema_id = path->value.group_or_parameter_path.schema_id;
+        instance_id = path->value.group_or_parameter_path.instance_id;
+        group_or_parameter_id = path->value.group_or_parameter_path.group_or_parameter_id;
+        break;
+
+    case REGISTRY_INT_PATH_TYPE_GROUP:
+        namespace_id = path->value.group_path.namespace_id;
+        schema_id = path->value.group_path.schema_id;
+        instance_id = path->value.group_path.instance_id;
+        group_id = path->value.group_path.group_id;
+        break;
+
+    case REGISTRY_INT_PATH_TYPE_PARAMETER:
+        namespace_id = path->value.parameter_path.namespace_id;
+        schema_id = path->value.parameter_path.schema_id;
+        instance_id = path->value.parameter_path.instance_id;
+        parameter_id = path->value.parameter_path.parameter_id;
+        break;
+    }
+
+    /* Namespace */
+    registry_namespace_t *namespace;
+    int res = _namespace_lookup(namespace_id, &namespace);
 
     if (res == 0) {
-        res = _schema_lookup(found_namespace, path->schema_id, schema);
-    }
-
-    return res;
-}
-
-int registry_from_instance_int_path(const registry_instance_int_path_t *path,
-                                    registry_namespace_t **namespace, registry_schema_t **schema,
-                                    registry_instance_t **instance)
-{
-    assert(path != NULL);
-    /* leaving namespace or schema NULL is fine */
-    assert(instance != NULL);
-
-    registry_namespace_t *found_namespace;
-    int res = _namespace_lookup(path->namespace_id, &found_namespace);
-    if (namespace != NULL) {
-        *namespace = found_namespace;
-    }
-
-    if (res == 0) {
-        registry_schema_t *found_schema;
-        res = _schema_lookup(found_namespace, path->schema_id, &found_schema);
-        if (schema != NULL) {
-            *schema = found_schema;
+        if (path->type == REGISTRY_INT_PATH_TYPE_NAMESPACE) {
+            node->type = REGISTRY_NODE_NAMESPACE;
+            node->location.namespace = namespace;
+            return res;
         }
+    
+        /* Schema */
+        const registry_schema_t *schema;
+        res = _schema_lookup(namespace, schema_id, &schema);
 
         if (res == 0) {
-            res = _instance_lookup(found_schema, path->instance_id, instance);
-        }
-    }
-
-    return res;
-}
-
-int registry_from_group_int_path(const registry_group_int_path_t *path,
-                                 registry_namespace_t **namespace, registry_schema_t **schema,
-                                 registry_instance_t **instance, registry_group_t **group)
-{
-    assert(path != NULL);
-    /* leaving namespace, schema or instance NULL is fine */
-    assert(group != NULL);
-
-    registry_namespace_t *found_namespace;
-    int res = _namespace_lookup(path->namespace_id, &found_namespace);
-    if (namespace != NULL) {
-        *namespace = found_namespace;
-    }
-
-    if (res == 0) {
-        registry_schema_t *found_schema;
-        res = _schema_lookup(found_namespace, path->schema_id, &found_schema);
-        if (schema != NULL) {
-            *schema = found_schema;
-        }
-
-        if (res == 0) {
-            registry_instance_t *found_instance;
-            res = _instance_lookup(found_schema, path->instance_id, &found_instance);
-            if (instance != NULL) {
-                *instance = found_instance;
+            if (path->type == REGISTRY_INT_PATH_TYPE_SCHEMA) {
+                node->type = REGISTRY_NODE_SCHEMA;
+                node->location.schema = schema;
+                return res;
             }
+            
+            /* Instance */
+            registry_instance_t *instance;
+            res = _instance_lookup(schema, instance_id, &instance);
 
             if (res == 0) {
-                res = _group_lookup(found_schema, path->group_id, group);
-            }
-        }
-    }
-
-    return res;
-}
-
-int registry_from_parameter_int_path(const registry_parameter_int_path_t *path,
-                                     registry_namespace_t **namespace, registry_schema_t **schema,
-                                     registry_instance_t **instance,
-                                     registry_parameter_t **parameter)
-{
-    assert(path != NULL);
-    /* leaving namespace, schema or instance NULL is fine */
-    assert(parameter != NULL);
-
-    registry_namespace_t *found_namespace;
-    int res = _namespace_lookup(path->namespace_id, &found_namespace);
-    if (namespace != NULL) {
-        *namespace = found_namespace;
-    }
-
-    if (res == 0) {
-        registry_schema_t *found_schema;
-        res = _schema_lookup(found_namespace, path->schema_id, &found_schema);
-        if (schema != NULL) {
-            *schema = found_schema;
-        }
-
-        if (res == 0) {
-            registry_instance_t *found_instance;
-            res = _instance_lookup(found_schema, path->instance_id, &found_instance);
-            if (instance != NULL) {
-                *instance = found_instance;
-            }
-
-            if (res == 0) {
-                res = _parameter_lookup(found_schema, path->parameter_id, parameter);
-            }
-        }
-    }
-
-    return res;
-}
-
-int registry_from_group_or_parameter_int_path(const registry_group_or_parameter_int_path_t *path,
-                                              registry_int_path_type_t *path_type,
-                                              registry_namespace_t **namespace,
-                                              registry_schema_t **schema,
-                                              registry_instance_t **instance,
-                                              registry_group_t **group,
-                                              registry_parameter_t **parameter)
-{
-    assert(path != NULL);
-    /* leaving namespace, schema or instance NULL is fine */
-    assert(group != NULL);
-    assert(parameter != NULL);
-
-    registry_namespace_t *found_namespace;
-    int res = _namespace_lookup(path->namespace_id, &found_namespace);
-    if (namespace != NULL) {
-        *namespace = found_namespace;
-    }
-
-    if (res == 0) {
-        registry_schema_t *found_schema;
-        res = _schema_lookup(found_namespace, path->schema_id, &found_schema);
-        if (schema != NULL) {
-            *schema = found_schema;
-        }
-
-        if (res == 0) {
-            registry_instance_t *found_instance;
-            res = _instance_lookup(found_schema, path->instance_id, &found_instance);
-            if (instance != NULL) {
-                *instance = found_instance;
-            }
-
-            if (res == 0) {
-                res = _parameter_lookup(found_schema, path->group_or_parameter_id, parameter);
-                if (res == 0) {
-                    *path_type = REGISTRY_INT_PATH_TYPE_PARAMETER;
+                if (path->type == REGISTRY_INT_PATH_TYPE_INSTANCE) {
+                    node->type = REGISTRY_NODE_INSTANCE;
+                    node->instance = instance;
+                    return res;
                 }
-                else {
-                    res = _group_lookup(found_schema, path->group_or_parameter_id, group);
+
+                /* Group or Parameter */
+                if (path->type == REGISTRY_INT_PATH_TYPE_GROUP_OR_PARAMETER) {
+                    node->instance = instance;
+
+                    res = _group_lookup(schema, group_or_parameter_id, &node->location.group);
                     if (res == 0) {
-                        *path_type = REGISTRY_INT_PATH_TYPE_GROUP;
+                        node->type = REGISTRY_NODE_GROUP;
+                        return res;
                     }
+                    
+                    res = _parameter_lookup(schema, group_or_parameter_id, &node->location.parameter);
+                    if (res == 0) {
+                        node->type = REGISTRY_NODE_PARAMETER;
+                        return res;
+                    }
+                }
+                
+                /* Group */
+                if (path->type == REGISTRY_INT_PATH_TYPE_GROUP) {
+                    node->type = REGISTRY_NODE_GROUP;
+                    node->instance = instance;
+                    return _group_lookup(schema, group_id, &node->location.group);
+                }
+
+                /* Parameter */
+                if (path->type == REGISTRY_INT_PATH_TYPE_PARAMETER) {
+                    node->type = REGISTRY_NODE_PARAMETER;
+                    node->instance = instance;
+                    return _parameter_lookup(schema, parameter_id, &node->location.parameter);
                 }
             }
         }
