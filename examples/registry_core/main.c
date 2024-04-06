@@ -93,11 +93,18 @@ int main(void)
         /* Invert the BOARD LED, to make it turn on and off on each subsequent cycle */
         board_led_enabled = !board_led_enabled;
 
+        /* Create registry_node_t for the board_led_parameter */
+        const registry_node_t parameter_node = {
+            .type = REGISTRY_NODE_PARAMETER,
+            .instance = &board_led_instance,
+            .location.parameter = &registry_sys_board_led_enabled,
+        };
+
         /* Set new registry value */
-        registry_set(&board_led_instance, &registry_sys_board_led_enabled, &board_led_enabled, sizeof(board_led_enabled));
+        registry_set(&parameter_node, &board_led_enabled, sizeof(board_led_enabled));
 
         /* Apply the registry value to change the LED state (calls the commit_cb function implemented by the BOARD for example)*/
-        registry_commit_parameter(&board_led_instance, &registry_sys_board_led_enabled);
+        registry_commit(&parameter_node);
 
         /* Sleep for 1 second and then do it again*/
         ztimer_sleep(ZTIMER_MSEC, 1000);
