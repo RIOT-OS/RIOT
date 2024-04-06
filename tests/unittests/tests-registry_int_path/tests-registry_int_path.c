@@ -63,182 +63,222 @@ static void test_setup(void)
 /* to int_path */
 static void tests_registry_to_parameter_int_path(void)
 {
-    registry_parameter_int_path_t path = registry_to_parameter_int_path(&test_instance,
-                                                                        &registry_tests_nested_parameter);
+    registry_node_t node = {
+        .type = REGISTRY_NODE_PARAMETER,
+        .instance = &test_instance,
+        .location.parameter = &registry_tests_nested_parameter,
+    };
+    registry_int_path_t path;
+    int res = registry_node_to_int_path(&node, &path);
 
-    TEST_ASSERT_EQUAL_INT(registry_tests.id, path.namespace_id);
-    TEST_ASSERT_EQUAL_INT(registry_tests_nested.id, path.schema_id);
-    TEST_ASSERT_EQUAL_INT(test_instance.id, path.instance_id);
-    TEST_ASSERT_EQUAL_INT(registry_tests_nested_parameter.id, path.parameter_id);
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(registry_tests.id, path.value.parameter_path.namespace_id);
+    TEST_ASSERT_EQUAL_INT(registry_tests_nested.id, path.value.parameter_path.schema_id);
+    TEST_ASSERT_EQUAL_INT(test_instance.id, path.value.parameter_path.instance_id);
+    TEST_ASSERT_EQUAL_INT(registry_tests_nested_parameter.id, path.value.parameter_path.parameter_id);
 }
 
 static void tests_registry_to_group_int_path(void)
 {
-    registry_group_int_path_t path = registry_to_group_int_path(&test_instance,
-                                                                &registry_tests_nested_group);
+    registry_node_t node = {
+        .type = REGISTRY_NODE_GROUP,
+        .instance = &test_instance,
+        .location.group = &registry_tests_nested_group,
+    };
+    registry_int_path_t path;
+    int res = registry_node_to_int_path(&node, &path);
 
-    TEST_ASSERT_EQUAL_INT(registry_tests.id, path.namespace_id);
-    TEST_ASSERT_EQUAL_INT(registry_tests_nested.id, path.schema_id);
-    TEST_ASSERT_EQUAL_INT(test_instance.id, path.instance_id);
-    TEST_ASSERT_EQUAL_INT(registry_tests_nested_group.id, path.group_id);
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(registry_tests.id, path.value.group_path.namespace_id);
+    TEST_ASSERT_EQUAL_INT(registry_tests_nested.id, path.value.group_path.schema_id);
+    TEST_ASSERT_EQUAL_INT(test_instance.id, path.value.group_path.instance_id);
+    TEST_ASSERT_EQUAL_INT(registry_tests_nested_group.id, path.value.group_path.group_id);
 }
 
 static void tests_registry_to_instance_int_path(void)
 {
-    registry_instance_int_path_t path = registry_to_instance_int_path(&test_instance);
+    registry_node_t node = {
+        .type = REGISTRY_NODE_INSTANCE,
+        .instance = &test_instance,
+    };
+    registry_int_path_t path;
+    int res = registry_node_to_int_path(&node, &path);
 
-    TEST_ASSERT_EQUAL_INT(registry_tests.id, path.namespace_id);
-    TEST_ASSERT_EQUAL_INT(registry_tests_nested.id, path.schema_id);
-    TEST_ASSERT_EQUAL_INT(test_instance.id, path.instance_id);
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(registry_tests.id, path.value.instance_path.namespace_id);
+    TEST_ASSERT_EQUAL_INT(registry_tests_nested.id, path.value.instance_path.schema_id);
+    TEST_ASSERT_EQUAL_INT(test_instance.id, path.value.instance_path.instance_id);
 }
 
 static void tests_registry_to_schema_int_path(void)
 {
-    registry_schema_int_path_t path = registry_to_schema_int_path(&registry_tests_nested);
+    registry_node_t node = {
+        .type = REGISTRY_NODE_SCHEMA,
+        .location.schema = &registry_tests_nested,
+    };
+    registry_int_path_t path;
+    int res = registry_node_to_int_path(&node, &path);
 
-    TEST_ASSERT_EQUAL_INT(registry_tests.id, path.namespace_id);
-    TEST_ASSERT_EQUAL_INT(registry_tests_nested.id, path.schema_id);
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(registry_tests.id, path.value.schema_path.namespace_id);
+    TEST_ASSERT_EQUAL_INT(registry_tests_nested.id, path.value.schema_path.schema_id);
 }
 
 static void tests_registry_to_namespace_int_path(void)
 {
-    registry_namespace_int_path_t path = registry_to_namespace_int_path(&registry_tests);
+    registry_node_t node = {
+        .type = REGISTRY_NODE_NAMESPACE,
+        .location.namespace = &registry_tests,
+    };
+    registry_int_path_t path;
+    int res = registry_node_to_int_path(&node, &path);
 
-    TEST_ASSERT_EQUAL_INT(registry_tests.id, path.namespace_id);
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(registry_tests.id, path.value.namespace_path.namespace_id);
 }
 
 /* from int_path */
 static void tests_registry_from_group_or_parameter_int_path(void)
 {
-    registry_int_path_type_t path_type;
-    registry_namespace_t *namespace;
-    registry_schema_t *schema;
-    registry_instance_t *instance;
-    registry_group_t *group;
-    registry_parameter_t *parameter;
-
+    registry_node_t node;
 
     /* parameter */
-    const registry_group_or_parameter_int_path_t parameter_path = {
-        .namespace_id = registry_tests.id,
-        .schema_id = registry_tests_nested.id,
-        .instance_id = test_instance.id,
-        .group_or_parameter_id = registry_tests_nested_group_parameter.id,
+    const registry_int_path_t parameter_path = {
+        .type = REGISTRY_INT_PATH_TYPE_GROUP_OR_PARAMETER,
+        .value.group_or_parameter_path = {
+            .namespace_id = registry_tests.id,
+            .schema_id = registry_tests_nested.id,
+            .instance_id = test_instance.id,
+            .group_or_parameter_id = registry_tests_nested_group_parameter.id,
+        },
     };
 
-    registry_from_group_or_parameter_int_path(&parameter_path, &path_type, &namespace, &schema,
-                                              &instance, &group, &parameter);
+    int res = registry_node_from_int_path(&parameter_path, &node);
 
-    TEST_ASSERT_EQUAL_INT(path_type, REGISTRY_INT_PATH_TYPE_PARAMETER);
-    TEST_ASSERT_EQUAL_INT((int)&registry_tests, (int)namespace);
-    TEST_ASSERT_EQUAL_INT((int)&registry_tests_nested, (int)schema);
-    TEST_ASSERT_EQUAL_INT((int)&test_instance, (int)instance);
-    TEST_ASSERT_EQUAL_INT((int)&registry_tests_nested_group_parameter, (int)parameter);
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(REGISTRY_NODE_PARAMETER, node.type);
+    TEST_ASSERT_EQUAL_INT((int)&test_instance, (int)node.instance);
+    TEST_ASSERT_EQUAL_INT((int)&registry_tests_nested_group_parameter, (int)node.location.parameter);
 
 
     /* group */
-    const registry_group_or_parameter_int_path_t group_path = {
-        .namespace_id = registry_tests.id,
-        .schema_id = registry_tests_nested.id,
-        .instance_id = test_instance.id,
-        .group_or_parameter_id = registry_tests_nested_group.id,
+    const registry_int_path_t group_path = {
+        .type = REGISTRY_INT_PATH_TYPE_GROUP_OR_PARAMETER,
+        .value.group_or_parameter_path = {
+            .namespace_id = registry_tests.id,
+            .schema_id = registry_tests_nested.id,
+            .instance_id = test_instance.id,
+            .group_or_parameter_id = registry_tests_nested_group.id,
+        },
     };
 
-    registry_from_group_or_parameter_int_path(&group_path, &path_type, &namespace, &schema,
-                                              &instance, &group, &parameter);
+    res = registry_node_from_int_path(&group_path, &node);
 
-    TEST_ASSERT_EQUAL_INT(path_type, REGISTRY_INT_PATH_TYPE_GROUP);
-    TEST_ASSERT_EQUAL_INT((int)&registry_tests, (int)namespace);
-    TEST_ASSERT_EQUAL_INT((int)&registry_tests_nested, (int)schema);
-    TEST_ASSERT_EQUAL_INT((int)&test_instance, (int)instance);
-    TEST_ASSERT_EQUAL_INT((int)&registry_tests_nested_group, (int)group);
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(REGISTRY_NODE_GROUP, node.type);
+    TEST_ASSERT_EQUAL_INT((int)&test_instance, (int)node.instance);
+    TEST_ASSERT_EQUAL_INT((int)&registry_tests_nested_group, (int)node.location.group);
 }
 
 static void tests_registry_from_parameter_int_path(void)
 {
-    const registry_parameter_int_path_t path = {
-        .namespace_id = registry_tests.id,
-        .schema_id = registry_tests_nested.id,
-        .instance_id = test_instance.id,
-        .parameter_id = registry_tests_nested_group_parameter.id,
+    registry_node_t node;
+
+    const registry_int_path_t path = {
+        .type = REGISTRY_INT_PATH_TYPE_PARAMETER,
+        .value.parameter_path = {
+            .namespace_id = registry_tests.id,
+            .schema_id = registry_tests_nested.id,
+            .instance_id = test_instance.id,
+            .parameter_id = registry_tests_nested_group_parameter.id,
+        },
     };
-    registry_namespace_t *namespace;
-    registry_schema_t *schema;
-    registry_instance_t *instance;
-    registry_parameter_t *parameter;
 
-    registry_from_parameter_int_path(&path, &namespace, &schema, &instance, &parameter);
+    int res = registry_node_from_int_path(&path, &node);
 
-    TEST_ASSERT_EQUAL_INT((int)&registry_tests, (int)namespace);
-    TEST_ASSERT_EQUAL_INT((int)&registry_tests_nested, (int)schema);
-    TEST_ASSERT_EQUAL_INT((int)&test_instance, (int)instance);
-    TEST_ASSERT_EQUAL_INT((int)&registry_tests_nested_group_parameter, (int)parameter);
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(REGISTRY_NODE_PARAMETER, node.type);
+    TEST_ASSERT_EQUAL_INT((int)&test_instance, (int)node.instance);
+    TEST_ASSERT_EQUAL_INT((int)&registry_tests_nested_group_parameter, (int)node.location.parameter);
 }
 
 static void tests_registry_from_group_int_path(void)
 {
-    const registry_group_int_path_t path = {
-        .namespace_id = registry_tests.id,
-        .schema_id = registry_tests_nested.id,
-        .instance_id = test_instance.id,
-        .group_id = registry_tests_nested_group.id,
+    registry_node_t node;
+
+    const registry_int_path_t path = {
+        .type = REGISTRY_INT_PATH_TYPE_GROUP,
+        .value.group_path = {
+            .namespace_id = registry_tests.id,
+            .schema_id = registry_tests_nested.id,
+            .instance_id = test_instance.id,
+            .group_id = registry_tests_nested_group.id,
+        },
     };
-    registry_namespace_t *namespace;
-    registry_schema_t *schema;
-    registry_instance_t *instance;
-    registry_group_t *group;
 
-    registry_from_group_int_path(&path, &namespace, &schema, &instance, &group);
+    int res = registry_node_from_int_path(&path, &node);
 
-    TEST_ASSERT_EQUAL_INT((int)&registry_tests, (int)namespace);
-    TEST_ASSERT_EQUAL_INT((int)&registry_tests_nested, (int)schema);
-    TEST_ASSERT_EQUAL_INT((int)&test_instance, (int)instance);
-    TEST_ASSERT_EQUAL_INT((int)&registry_tests_nested_group, (int)group);
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(REGISTRY_NODE_GROUP, node.type);
+    TEST_ASSERT_EQUAL_INT((int)&test_instance, (int)node.instance);
+    TEST_ASSERT_EQUAL_INT((int)&registry_tests_nested_group, (int)node.location.group);
 }
 
 static void tests_registry_from_instance_int_path(void)
 {
-    const registry_instance_int_path_t path = {
-        .namespace_id = registry_tests.id,
-        .schema_id = registry_tests_nested.id,
-        .instance_id = test_instance.id,
+    registry_node_t node;
+
+    const registry_int_path_t path = {
+        .type = REGISTRY_INT_PATH_TYPE_INSTANCE,
+        .value.instance_path = {
+            .namespace_id = registry_tests.id,
+            .schema_id = registry_tests_nested.id,
+            .instance_id = test_instance.id,
+        },
     };
-    registry_namespace_t *namespace;
-    registry_schema_t *schema;
-    registry_instance_t *instance;
 
-    registry_from_instance_int_path(&path, &namespace, &schema, &instance);
+    int res = registry_node_from_int_path(&path, &node);
 
-    TEST_ASSERT_EQUAL_INT((int)&registry_tests, (int)namespace);
-    TEST_ASSERT_EQUAL_INT((int)&registry_tests_nested, (int)schema);
-    TEST_ASSERT_EQUAL_INT((int)&test_instance, (int)instance);
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(REGISTRY_NODE_INSTANCE, node.type);
+    TEST_ASSERT_EQUAL_INT((int)&test_instance, (int)node.instance);
 }
 
 static void tests_registry_from_schema_int_path(void)
 {
-    const registry_schema_int_path_t path = {
-        .namespace_id = registry_tests.id,
-        .schema_id = registry_tests_nested.id,
+    registry_node_t node;
+
+    const registry_int_path_t path = {
+        .type = REGISTRY_INT_PATH_TYPE_SCHEMA,
+        .value.schema_path = {
+            .namespace_id = registry_tests.id,
+            .schema_id = registry_tests_nested.id,
+        },
     };
-    registry_namespace_t *namespace;
-    registry_schema_t *schema;
 
-    registry_from_schema_int_path(&path, &namespace, &schema);
+    int res = registry_node_from_int_path(&path, &node);
 
-    TEST_ASSERT_EQUAL_INT((int)&registry_tests, (int)namespace);
-    TEST_ASSERT_EQUAL_INT((int)&registry_tests_nested, (int)schema);
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(REGISTRY_NODE_SCHEMA, node.type);
+    TEST_ASSERT_EQUAL_INT((int)&registry_tests_nested, (int)node.location.schema);
 }
 
 static void tests_registry_from_namespace_int_path(void)
 {
-    const registry_namespace_int_path_t path = {
-        .namespace_id = registry_tests.id,
+    registry_node_t node;
+
+    const registry_int_path_t path = {
+        .type = REGISTRY_INT_PATH_TYPE_NAMESPACE,
+        .value.namespace_path = {
+            .namespace_id = registry_tests.id,
+        },
     };
-    registry_namespace_t *namespace;
 
-    registry_from_namespace_int_path(&path, &namespace);
+    int res = registry_node_from_int_path(&path, &node);
 
-    TEST_ASSERT_EQUAL_INT((int)&registry_tests, (int)namespace);
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(REGISTRY_NODE_NAMESPACE, node.type);
+    TEST_ASSERT_EQUAL_INT((int)&registry_tests, (int)node.location.namespace);
 }
 
 Test *tests_registry_int_path_tests(void)
