@@ -37,11 +37,13 @@
 XFA_INIT_CONST(registry_storage_instance_t *, _registry_storage_instances_src_xfa);
 
 /* registry_load */
-static int _registry_load_cb(const registry_instance_t *instance,
-                             const registry_parameter_t *parameter,
-                             const void *buf, const size_t buf_len)
+static int _registry_load_cb(const registry_node_t *node, const void *buf, const size_t buf_len)
 {
-    return registry_set(instance, parameter, buf, buf_len);
+    assert(node->type == REGISTRY_NODE_PARAMETER);
+    assert(node->location.parameter != NULL);
+    assert(node->instance != NULL);
+
+    return registry_set(node, buf, buf_len);
 }
 
 int registry_load(void)
@@ -61,14 +63,12 @@ int registry_load(void)
 }
 
 /* registry_save */
-static int _registry_save_export_cb(const registry_export_cb_data_t *data,
-                                    const registry_export_cb_data_type_t data_type,
-                                    const void *context)
+static int _registry_save_export_cb(const registry_node_t *node, const void *context)
 {
     (void)context;
 
     /* the registry also exports just the namespace or just a schema, but the storage is only interested in configuration parameter values */
-    if (data_type != REGISTRY_EXPORT_PARAMETER) {
+    if (node->type != REGISTRY_NODE_PARAMETER) {
         return 0;
     }
 
@@ -79,16 +79,14 @@ static int _registry_save_export_cb(const registry_export_cb_data_t *data,
 
     /* get value of configuration parameter */
     registry_value_t value;
-    registry_get(data->parameter.instance, data->parameter.data, &value);
+    registry_get(node, &value);
 
     /* save parameter value via the save function of the registered destination storage */
     return _registry_storage_instance_dst->storage->save(_registry_storage_instance_dst,
-                                                         data->parameter.instance,
-                                                         data->parameter.data,
-                                                         &value);
+                                                         node, &value);
 }
 
-int registry_save(void)
+int registry_save(const registry_node_t *node)
 {
     int res;
 
@@ -100,113 +98,7 @@ int registry_save(void)
         _registry_storage_instance_dst->storage->save_start(_registry_storage_instance_dst);
     }
 
-    res = registry_export(_registry_save_export_cb, 0, NULL);
-
-    if (_registry_storage_instance_dst->storage->save_end) {
-        _registry_storage_instance_dst->storage->save_end(_registry_storage_instance_dst);
-    }
-
-    return res;
-}
-
-int registry_save_namespace(const registry_namespace_t *namespace)
-{
-    int res;
-
-    if (!_registry_storage_instance_dst) {
-        return -REGISTRY_ERROR_NO_DST_STORAGE;
-    }
-
-    if (_registry_storage_instance_dst->storage->save_start) {
-        _registry_storage_instance_dst->storage->save_start(_registry_storage_instance_dst);
-    }
-
-    res = registry_export_namespace(namespace, _registry_save_export_cb, 0, NULL);
-
-    if (_registry_storage_instance_dst->storage->save_end) {
-        _registry_storage_instance_dst->storage->save_end(_registry_storage_instance_dst);
-    }
-
-    return res;
-}
-
-int registry_save_schema(const registry_schema_t *schema)
-{
-    int res;
-
-    if (!_registry_storage_instance_dst) {
-        return -REGISTRY_ERROR_NO_DST_STORAGE;
-    }
-
-    if (_registry_storage_instance_dst->storage->save_start) {
-        _registry_storage_instance_dst->storage->save_start(_registry_storage_instance_dst);
-    }
-
-    res = registry_export_schema(schema, _registry_save_export_cb, 0, NULL);
-
-    if (_registry_storage_instance_dst->storage->save_end) {
-        _registry_storage_instance_dst->storage->save_end(_registry_storage_instance_dst);
-    }
-
-    return res;
-}
-
-int registry_save_instance(const registry_instance_t *instance)
-{
-    int res;
-
-    if (!_registry_storage_instance_dst) {
-        return -REGISTRY_ERROR_NO_DST_STORAGE;
-    }
-
-    if (_registry_storage_instance_dst->storage->save_start) {
-        _registry_storage_instance_dst->storage->save_start(_registry_storage_instance_dst);
-    }
-
-    res = registry_export_instance(instance, _registry_save_export_cb, 0, NULL);
-
-    if (_registry_storage_instance_dst->storage->save_end) {
-        _registry_storage_instance_dst->storage->save_end(_registry_storage_instance_dst);
-    }
-
-    return res;
-}
-
-int registry_save_group(const registry_instance_t *instance, const registry_group_t *group)
-{
-    int res;
-
-    if (!_registry_storage_instance_dst) {
-        return -REGISTRY_ERROR_NO_DST_STORAGE;
-    }
-
-    if (_registry_storage_instance_dst->storage->save_start) {
-        _registry_storage_instance_dst->storage->save_start(_registry_storage_instance_dst);
-    }
-
-    res = registry_export_group(instance, group, _registry_save_export_cb, 0, NULL);
-
-    if (_registry_storage_instance_dst->storage->save_end) {
-        _registry_storage_instance_dst->storage->save_end(_registry_storage_instance_dst);
-    }
-
-    return res;
-}
-
-int registry_save_parameter(const registry_instance_t *instance,
-                            const registry_parameter_t *parameter)
-{
-    int res;
-
-    if (!_registry_storage_instance_dst) {
-        return -REGISTRY_ERROR_NO_DST_STORAGE;
-    }
-
-    if (_registry_storage_instance_dst->storage->save_start) {
-        _registry_storage_instance_dst->storage->save_start(_registry_storage_instance_dst);
-    }
-
-    res = registry_export_parameter(instance, parameter, _registry_save_export_cb, NULL);
+    res = registry_export(node, _registry_save_export_cb, 0, NULL);
 
     if (_registry_storage_instance_dst->storage->save_end) {
         _registry_storage_instance_dst->storage->save_end(_registry_storage_instance_dst);

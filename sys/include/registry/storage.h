@@ -29,8 +29,7 @@ extern "C" {
 /**
  * @brief Prototype of a callback function for the load action of a storage interface.
  */
-typedef int (*load_cb_t)(const registry_instance_t *instance, const registry_parameter_t *parameter,
-                         const void *buf, const size_t buf_len);
+typedef int (*load_cb_t)(const registry_node_t *node, const void *buf, const size_t buf_len);
 
 typedef struct _registry_storage_t registry_storage_t;
 
@@ -71,15 +70,13 @@ struct _registry_storage_t {
      * @brief Saves a parameter into storage.
      *
      * @param[in] storage Storage descriptor.
-     * @param[in] instance Pointer to the configuration schema instance.
-     * @param[in] parameter Pointer to the configuration parameter.
+     * @param[in] node A location within the registry configuration tree.
      * @param[in] value Configuration parameter value.
      *
      * @return 0 on success, non-zero on failure.
      */
     int (*save)(const registry_storage_instance_t *storage,
-                const registry_instance_t *instance,
-                const registry_parameter_t *parameter,
+                const registry_node_t *node,
                 const registry_value_t *value);
 
     /**
@@ -101,23 +98,14 @@ struct _registry_storage_t {
 int registry_load(void);
 
 /**
- * @brief Save all configuration parameters to the
- * registered storage.
+ * @brief Save all configuration parameters that are within 
+ * the scope of the to the @p node. to the registered storage.
+ * 
+ * @param[in] node A location within the registry configuration tree.
  *
  * @return 0 on success, non-zero on failure.
  */
-int registry_save(void);
-
-int registry_save_namespace(const registry_namespace_t *namespace);
-
-int registry_save_schema(const registry_schema_t *schema);
-
-int registry_save_instance(const registry_instance_t *instance);
-
-int registry_save_group(const registry_instance_t *instance, const registry_group_t *group);
-
-int registry_save_parameter(const registry_instance_t *instance,
-                            const registry_parameter_t *parameter);
+int registry_save(const registry_node_t *node);
 
 /**
  * @brief Registers a new storage as a source of configurations. Multiple
