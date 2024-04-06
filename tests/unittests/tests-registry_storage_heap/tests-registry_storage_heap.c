@@ -66,21 +66,24 @@ static void test_setup(void)
 
 static void tests_load_and_save(void)
 {
+    registry_node_t node = {
+        .type = REGISTRY_NODE_PARAMETER,
+        .location.parameter = &registry_tests_nested_group_parameter,
+        .instance = &test_nested_instance,
+    };
 
     /* set input to 8 */
     const uint8_t saved_input = 8;
 
-    registry_set(&test_nested_instance, &registry_tests_nested_group_parameter, &saved_input,
-                 sizeof(saved_input));
+    registry_set(&node, &saved_input, sizeof(saved_input));
 
     /* save input to storage */
-    registry_save();
+    registry_save(NULL);
 
     /* override input with the value 20 */
     const uint8_t override_input = 20;
 
-    registry_set(&test_nested_instance, &registry_tests_nested_group_parameter, &override_input,
-                 sizeof(override_input));
+    registry_set(&node, &override_input, sizeof(override_input));
 
     /* load old value from storage */
     registry_load();
@@ -88,7 +91,7 @@ static void tests_load_and_save(void)
     /* check if the value is set back to 8 and not 20 anymore */
     registry_value_t output_value;
 
-    registry_get(&test_nested_instance, &registry_tests_nested_group_parameter, &output_value);
+    registry_get(&node, &output_value);
 
     TEST_ASSERT_EQUAL_INT(saved_input, *(uint8_t *)output_value.buf);
 }
