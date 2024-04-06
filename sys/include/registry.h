@@ -67,6 +67,27 @@ typedef enum {
     REGISTRY_TYPE_FLOAT64,          /**< 64-bits float. */
 } registry_type_t;
 
+// TODO Documentation
+typedef enum {
+    REGISTRY_NODE_NAMESPACE = 0,
+    REGISTRY_NODE_SCHEMA,
+    REGISTRY_NODE_INSTANCE,
+    REGISTRY_NODE_GROUP,
+    REGISTRY_NODE_PARAMETER,
+} registry_node_type_t;
+
+// TODO Documentation
+typedef struct {
+    registry_node_type_t type;
+    union {
+        const registry_namespace_t *namespace;
+        const registry_schema_t *schema;
+        const registry_group_t *group;
+        const registry_parameter_t *parameter;
+    } location;
+    const registry_instance_t *instance;
+} registry_node_t;
+
 /**
  * @brief Basic representation of a configuration parameter value.
  */
@@ -163,8 +184,8 @@ struct _registry_schema_t {
      *
      * @param[in] parameter_id ID of the parameter that contains the value.
      * @param[in] instance Pointer to the instance of the schema, that contains the parameter.
-     * @param[in] val Pointer to buffer containing the new value.
-     * @param[in] val_len Pointer to length of the buffer to store the current value.
+     * @param[out] val Pointer to buffer containing the new value.
+     * @param[out] val_len Pointer to length of the buffer to store the current value.
      */
     void(*const mapping)(const registry_parameter_id_t parameter_id,
                          const registry_instance_t *instance,
@@ -208,209 +229,54 @@ int registry_add_schema_instance(const registry_schema_t *schema,
  * @brief Gets the current value of a parameter that belongs to an instance
  * of a configuration schema.
  *
- * @param[in] instance Pointer to the configuration schema instance.
- * @param[in] parameter Pointer to the configuration parameter.
+ * @param[in]  node A location within the registry configuration tree.
  * @param[out] value Pointer to a uninitialized @ref registry_value_t struct.
  *
  * @return 0 on success, non-zero on failure.
  */
-int registry_get(const registry_instance_t *instance, const registry_parameter_t *parameter,
-                 registry_value_t *value);
+int registry_get(const registry_node_t *node, registry_value_t *value);
 
 /**
  * @brief Sets the value of a configuration parameter that belongs to an instance
  * of a configuration schema.
  *
- * @param[in] instance Pointer to the configuration schema instance.
- * @param[in] parameter Pointer to the configuration parameter.
+ * @param[in] node A location within the registry configuration tree.
  * @param[in] buf Pointer to the new value for the configuration parameter.
  * @param[in] buf_len Length of the buffer.
  *
  * @return 0 on success, non-zero on failure.
  */
-int registry_set(const registry_instance_t *instance, const registry_parameter_t *parameter,
-                 const void *buf, const size_t buf_len);
+int registry_set(const registry_node_t *node, const void *buf, const size_t buf_len);
 
 /**
- * @brief Commits every configuration parameter.
+ * @brief Commits every configuration parameter within the given configuration location (@p node) of the registry configuration tree.
+ *
+ * @param[in] node A location within the registry configuration tree.
  *
  * @return 0 on success, non-zero on failure.
  */
-int registry_commit(void);
+int registry_commit(const registry_node_t *node);
 
-/**
- * @brief Commits every configuration parameter within the given configuration namespace.
- *
- * @param[in] namespace Pointer to the configuration namespace.
- *
- * @return 0 on success, non-zero on failure.
- */
-int registry_commit_namespace(const registry_namespace_t *namespace);
-
-/**
- * @brief Commits every configuration parameter within the given configuration schema.
- *
- * @param[in] schema Pointer to the configuration schema.
- *
- * @return 0 on success, non-zero on failure.
- */
-int registry_commit_schema(const registry_schema_t *schema);
-
-/**
- * @brief Commits every configuration parameter within the given configuration schema instance.
- *
- * @param[in] instance Pointer to the configuration schema instance.
- *
- * @return 0 on success, non-zero on failure.
- */
-int registry_commit_instance(const registry_instance_t *instance);
-
-/**
- * @brief Commits every configuration parameter within the given configuration group.
- *
- * @param[in] instance Pointer to the configuration schema instance of the configuration group.
- * @param[in] group Pointer to the configuration group.
- *
- * @return 0 on success, non-zero on failure.
- */
-int registry_commit_group(const registry_instance_t *instance, const registry_group_t *group);
-
-/**
- * @brief Commits the given configuration parameter.
- *
- * @param[in] instance Pointer to the configuration schema instance of the configuration parameter.
- * @param[in] parameter Pointer to the configuration parameter.
- *
- * @return 0 on success, non-zero on failure.
- */
-int registry_commit_parameter(const registry_instance_t *instance,
-                              const registry_parameter_t *parameter);
-
-typedef const union {
-    const registry_namespace_t *namespace;
-    const registry_schema_t *schema;
-    const registry_instance_t *instance;
-    const registry_group_t *group;
-    const struct {
-        const registry_parameter_t *data;
-        const registry_instance_t *instance;
-    } parameter;
-} registry_export_cb_data_t;
-
-typedef const enum {
-    REGISTRY_EXPORT_NAMESPACE,
-    REGISTRY_EXPORT_SCHEMA,
-    REGISTRY_EXPORT_INSTANCE,
-    REGISTRY_EXPORT_GROUP,
-    REGISTRY_EXPORT_PARAMETER,
-} registry_export_cb_data_type_t;
-
-typedef int (*registry_export_cb_t)(const registry_export_cb_data_t *data,
-                                    const registry_export_cb_data_type_t data_type,
-                                    const void *context);
+typedef int (*registry_export_cb_t)(const registry_node_t *node, const void *context);
 
 #define REGISTRY_EXPORT_ALL = 0;
 #define REGISTRY_EXPORT_SELF = 1;
 #define REGISTRY_EXPORT_WITH_N_LEVELS_OF_CHILDREN(_n) (_n + 1);
 
 /**
- * @brief Exports every configuration parameter.
+ * @brief Exports every configuration parameter within the given configuration location (@p node) of the registry configuration tree.
  *
+ * @param[in] node A location within the registry configuration tree.
  * @param[in] export_cb Exporting callback function will be called for each namespace,
  * schema, instance, group and parameter that are in scope.
- * @param[in] recursion_depth Defines how deeply nested child groups / parameters
+ * @param[in] tree_traversal_depth Defines how deeply nested child groups / parameters
  * will be shown. (0 to show all children, 1 to only show the exact match, n > 1
  * to show the exact match plus n - 1 levels of children).
  * @param[in] context Context that will be passed to @p export_cb.
  *
  * @return 0 on success, non-zero on failure.
  */
-int registry_export(const registry_export_cb_t export_cb,
-                    const uint8_t recursion_depth, const void *context);
-
-/**
- * @brief Exports every configuration parameter within the given configuration namespace.
- *
- * @param[in] namespace Pointer to the configuration namespace.
- * @param[in] export_cb Exporting callback function will be called for the given namespace
- * and each of its schemas, instances, groups and parameters that are in scope.
- * @param[in] recursion_depth Defines how deeply nested child groups / parameters
- * will be shown. (0 to show all children, 1 to only show the exact match, 2 - n
- * to show the exact match plus its children ... plus n levels of children).
- * @param[in] context Context that will be passed to @p export_cb.
- *
- * @return 0 on success, non-zero on failure.
- */
-int registry_export_namespace(const registry_namespace_t *namespace,
-                              const registry_export_cb_t export_cb, const uint8_t recursion_depth,
-                              const void *context);
-
-/**
- * @brief Exports every configuration parameter within the given configuration schema.
- *
- * @param[in] schema Pointer to the configuration schema.
- * @param[in] export_cb Exporting callback function will be called for the given schema
- * and each of its instances, groups and parameters that are in scope.
- * @param[in] recursion_depth Defines how deeply nested child groups / parameters
- * will be shown. (0 to show all children, 1 to only show the exact match, 2 - n
- * to show the exact match plus its children ... plus n levels of children).
- * @param[in] context Context that will be passed to @p export_cb.
- *
- * @return 0 on success, non-zero on failure.
- */
-int registry_export_schema(const registry_schema_t *schema, const registry_export_cb_t export_cb,
-                           const uint8_t recursion_depth, const void *context);
-
-/**
- * @brief Exports every configuration parameter within the given configuration schema instance.
- *
- * @param[in] instance Pointer to the configuration schema instance.
- * @param[in] export_cb Exporting callback function will be called for the given instance
- * and each of its groups and parameters that are in scope.
- * @param[in] recursion_depth Defines how deeply nested child groups / parameters
- * will be shown. (0 to show all children, 1 to only show the exact match, 2 - n
- * to show the exact match plus its children ... plus n levels of children).
- * @param[in] context Context that will be passed to @p export_cb.
- *
- * @return 0 on success, non-zero on failure.
- */
-int registry_export_instance(const registry_instance_t *instance,
-                             const registry_export_cb_t export_cb, const uint8_t recursion_depth,
-                             const void *context);
-
-/**
- * @brief Exports every configuration parameter within the given configuration group.
- *
- * @param[in] instance Pointer to the configuration schema instance.
- * @param[in] group Pointer to the configuration group.
- * @param[in] export_cb Exporting callback function will be called for the given group
- * and each of its subgroups and parameters that are in scope.
- * @param[in] recursion_depth Defines how deeply nested child groups / parameters
- * will be shown. (0 to show all children, 1 to only show the exact match, 2 - n
- * to show the exact match plus its children ... plus n levels of children).
- * @param[in] context Context that will be passed to @p export_cb.
- *
- * @return 0 on success, non-zero on failure.
- */
-int registry_export_group(const registry_instance_t *instance, const registry_group_t *group,
-                          const registry_export_cb_t export_cb, const uint8_t recursion_depth,
-                          const void *context);
-
-/**
- * @brief Exports the given configuration parameter.
- *
- * @param[in] instance Pointer to the configuration schema instance.
- * @param[in] parameter Pointer to the configuration parameter.
- * @param[in] export_cb Exporting callback function will be called for the given parameter.
- * @param[in] context Context that will be passed to @p export_cb.
- *
- * @return 0 on success, non-zero on failure.
- */
-int registry_export_parameter(const registry_instance_t *instance,
-                              const registry_parameter_t *parameter,
-                              const registry_export_cb_t export_cb, const void *context);
-
-
+int registry_export(const registry_node_t *node, const registry_export_cb_t export_cb, const uint8_t tree_traversal_depth, const void *context);
 
 #ifdef __cplusplus
 }

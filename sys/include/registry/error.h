@@ -25,16 +25,17 @@ extern "C" {
 #endif
 
 /**
- * @brief Error codes start at 1_000 to prevent clashing with stdlib error codes.
+ * @brief Registry specific error codes.
  */
 typedef const enum {
-    REGISTRY_ERROR_NONE = 1000,
+    REGISTRY_ERROR_NONE = 1,
     REGISTRY_ERROR_NO_DST_STORAGE,
     REGISTRY_ERROR_NAMESPACE_NOT_FOUND,
     REGISTRY_ERROR_SCHEMA_NOT_FOUND,
     REGISTRY_ERROR_INSTANCE_NOT_FOUND,
     REGISTRY_ERROR_GROUP_NOT_FOUND,
     REGISTRY_ERROR_PARAMETER_NOT_FOUND,
+    REGISTRY_ERROR_NODE_INVALID,
 } registry_error_t;
 
 #ifdef __cplusplus
