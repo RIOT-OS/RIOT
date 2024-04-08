@@ -77,6 +77,17 @@ gcoap_listener_t forward_proxy_listener = {
     _request_matcher_forward_proxy
 };
 
+static void _cep_set_timeout(client_ep_t *cep, ztimer_t *timer, uint32_t timeout_ms,
+                             event_handler_t handler)
+{
+    assert(!ztimer_is_set(ZTIMER_MSEC, timer));
+    timer->callback = gcoap_forward_proxy_post_event;
+    timer->arg = &cep->event;
+    cep->event.handler = handler;
+    ztimer_set(ZTIMER_MSEC, timer, timeout_ms);
+}
+
+
 void gcoap_forward_proxy_init(void)
 {
     gcoap_register_listener(&forward_proxy_listener);
@@ -204,6 +215,9 @@ static bool _parse_endpoint(sock_udp_ep_t *remote,
 
     if (urip->port != 0) {
         remote->port = urip->port;
+    }
+    else if (!strncmp(urip->scheme, "coaps", 5)) {
+        remote->port = COAPS_PORT;
     }
     else {
         remote->port = COAP_PORT;
@@ -424,11 +438,8 @@ static int _gcoap_forward_proxy_via_coap(coap_pkt_t *client_pkt,
     }
 
     if (coap_get_type(client_pkt) == COAP_TYPE_CON) {
-        client_ep->empty_ack_timer.callback = gcoap_forward_proxy_post_event;
-        client_ep->empty_ack_timer.arg = &client_ep->event;
-        client_ep->event.handler = _send_empty_ack;
-        ztimer_set(ZTIMER_MSEC, &client_ep->empty_ack_timer,
-                   CONFIG_GCOAP_FORWARD_PROXY_EMPTY_ACK_MS);
+        _cep_set_timeout(client_ep, &client_ep->empty_ack_timer,
+                         CONFIG_GCOAP_FORWARD_PROXY_EMPTY_ACK_MS, _send_empty_ack);
     }
 
     unsigned token_len = coap_get_token_len(client_pkt);
