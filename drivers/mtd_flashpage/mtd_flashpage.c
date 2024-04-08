@@ -35,11 +35,12 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#define MTD_FLASHPAGE_END_ADDR     ((uintptr_t) CPU_FLASH_BASE + (FLASHPAGE_NUMOF * FLASHPAGE_SIZE))
+#define MTD_FLASHPAGE_END_ADDR     ((uintptr_t)CPU_FLASH_BASE + (FLASHPAGE_NUMOF * FLASHPAGE_SIZE))
 
 static int _init(mtd_dev_t *dev)
 {
     mtd_flashpage_t *super = container_of(dev, mtd_flashpage_t, base);
+
     (void)super;
     assert(dev->pages_per_sector * dev->page_size == FLASHPAGE_SIZE);
     assert(!(super->offset % dev->pages_per_sector));
@@ -66,12 +67,13 @@ static int _read_page(mtd_dev_t *dev, void *buf, uint32_t page,
 
     /* mtd flashpage maps multiple pages to one virtual sector for unknown reason */
     uint32_t fpage = page / dev->pages_per_sector;
+
     offset += (page % dev->pages_per_sector) * dev->page_size;
     uintptr_t addr = (uintptr_t)flashpage_addr(fpage);
 
     addr += offset;
 
-    DEBUG("flashpage: read %"PRIu32" bytes from %p to %p\n", size, (void *)addr, buf);
+    DEBUG("flashpage: read %" PRIu32 " bytes from %p to %p\n", size, (void *)addr, buf);
 
 #ifndef CPU_HAS_UNALIGNED_ACCESS
     if (addr % sizeof(uword_t)) {
@@ -80,7 +82,7 @@ static int _read_page(mtd_dev_t *dev, void *buf, uint32_t page,
         offset = addr % sizeof(uword_t);
         size = MIN(size, sizeof(uword_t) - offset);
 
-        DEBUG("flashpage: read %"PRIu32" unaligned bytes\n", size);
+        DEBUG("flashpage: read %" PRIu32 " unaligned bytes\n", size);
 
         memcpy(&tmp, (uint8_t *)addr - offset, sizeof(tmp));
         memcpy(buf, (uint8_t *)&tmp + offset, size);
@@ -103,24 +105,25 @@ static int _write_page(mtd_dev_t *dev, const void *buf, uint32_t page, uint32_t 
 
     /* mtd flashpage maps multiple pages to one virtual sector for unknown reason */
     uint32_t fpage = page / dev->pages_per_sector;
+
     offset += (page % dev->pages_per_sector) * dev->page_size;
     uintptr_t addr = (uintptr_t)flashpage_addr(fpage);
 
     addr += offset;
 
-    DEBUG("flashpage: write %"PRIu32" bytes from %p to %p\n", size, buf, (void *)addr);
+    DEBUG("flashpage: write %" PRIu32 " bytes from %p to %p\n", size, buf, (void *)addr);
 
     size = MIN(flashpage_size(fpage) - offset, size);
 
     if ((addr % FLASHPAGE_WRITE_BLOCK_ALIGNMENT) || (size < FLASHPAGE_WRITE_BLOCK_SIZE) ||
         ((uintptr_t)buf % FLASHPAGE_WRITE_BLOCK_ALIGNMENT)) {
         uint8_t tmp[FLASHPAGE_WRITE_BLOCK_SIZE]
-                __attribute__ ((aligned (FLASHPAGE_WRITE_BLOCK_ALIGNMENT)));
+        __attribute__ ((aligned(FLASHPAGE_WRITE_BLOCK_ALIGNMENT)));
 
         offset = addr % FLASHPAGE_WRITE_BLOCK_ALIGNMENT;
         size = MIN(size, FLASHPAGE_WRITE_BLOCK_SIZE - offset);
 
-        DEBUG("flashpage: write %"PRIu32" at %p - ""%"PRIu32"\n", size, (void *)addr, offset);
+        DEBUG("flashpage: write %" PRIu32 " at %p - " "%" PRIu32 "\n", size, (void *)addr, offset);
 
         memcpy(&tmp[0], (uint8_t *)addr - offset, sizeof(tmp));
         memcpy(&tmp[offset], buf, size);
@@ -147,7 +150,7 @@ static int _erase_sector(mtd_dev_t *dev, uint32_t sector, uint32_t count)
     sector += (super->offset / dev->pages_per_sector);
 
     while (count--) {
-        DEBUG("flashpage: erase sector %"PRIu32"\n", sector);
+        DEBUG("flashpage: erase sector %" PRIu32 "\n", sector);
         flashpage_erase(sector++);
     }
 
