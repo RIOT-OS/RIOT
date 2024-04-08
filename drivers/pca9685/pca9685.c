@@ -95,7 +95,7 @@ int pca9685_init(pca9685_t *dev, const pca9685_params_t *params)
     dev->powered_on = false;
     dev->params = *params;
 
-    DEBUG_DEV("params=%p", dev, params);
+    DEBUG_DEV("params=%p", dev, (void *)params);
 
     if (gpio_is_valid(dev->params.oe_pin)) {
         /* init the pin an disable outputs first */
@@ -289,7 +289,7 @@ static int _init(pca9685_t *dev)
 
 static int _read(const pca9685_t *dev, uint8_t reg, uint8_t *data, uint32_t len)
 {
-    DEBUG_DEV("reg=%02x data=%p len=%"PRIu32"", dev, reg, data, len);
+    DEBUG_DEV("reg=%02x data=%p len=%"PRIu32"", dev, reg, (void *)data, len);
 
     /* acquire the I2C device */
     i2c_acquire(dev->params.i2c_dev);
@@ -308,7 +308,7 @@ static int _read(const pca9685_t *dev, uint8_t reg, uint8_t *data, uint32_t len)
 
 static int _write(const pca9685_t *dev, uint8_t reg, const uint8_t *data, uint32_t len)
 {
-    DEBUG_DEV("reg=%02x data=%p len=%"PRIu32"", dev, reg, data, len);
+    DEBUG_DEV("reg=%02x data=%p len=%"PRIu32"", dev, reg, (void *)data, len);
 
     i2c_acquire(dev->params.i2c_dev);
 

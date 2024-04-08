@@ -145,12 +145,12 @@ extern "C" {
 /**
  * @brief   WHO_AM_I value for the LSM6DS33
  */
-#define LSM6DS33_WHO_AM_I                    (0b01101001)
+#define LSM6DSXX_WHO_AM_I                    (0x69)
 
 /**
  * @brief   WHO_AM_I value for the LSM6DSL and LSM6DS3TR-C
  */
-#define LSM6DSL_WHO_AM_I                     (0b01101010)
+#define LSM6DSL_WHO_AM_I                     (0x6A)
 
 /**
  * @name    CTRL_x registers

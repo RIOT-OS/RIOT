@@ -816,7 +816,7 @@ inline static void _release(const vl6180x_t *dev)
 }
 
 #define VL6180X_BUFSIZ   32
-static uint8_t _buffer[VL6180X_BUFSIZ] = {};
+static uint8_t _buffer[VL6180X_BUFSIZ] = { 0 };
 
 static int _write(const vl6180x_t *dev,
                   uint16_t reg, const uint8_t *pdata, uint8_t len)
