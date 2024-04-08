@@ -7,6 +7,7 @@ rcv_eol_2=""
 send_eol=""
 
 run_test() {
+	echo "================================="
 	echo "Running test with:"
 	echo "  URC handling = $handle_urc"
 	echo "  echo         = $echo"
@@ -14,12 +15,12 @@ run_test() {
 	echo "  rcv EOL 1    = $rcv_eol_1"
 	echo "  rcv EOL 2    = $rcv_eol_2"
 
-	make -j --silent BOARD=native "HANDLE_URC=$handle_urc" "ECHO_ON=$echo" "SEND_EOL=\"$send_eol\"" "RECV_EOL_1=\"$rcv_eol_1\"" "RECV_EOL_2=\"$rcv_eol_2\"" tests-at
+	make -j --silent BOARD=native "HANDLE_URC=$handle_urc" "ECHO_ON=$echo" "SEND_EOL=\"$send_eol\"" "RECV_EOL_1=\"$rcv_eol_1\"" "RECV_EOL_2=\"$rcv_eol_2\""
 
 	# take /dev/ttyS0 as serial interface. It is only required s.t. UART
 	# initialization succeeds and it gets turned off right away.
 	set +e
-	if ! ./bin/native/tests_unittests.elf -c /dev/ttyS0 <<< "s\n";
+	if ! ./bin/native/tests_at_unit.elf -c /dev/ttyS0 <<< "s\n";
 	then
 		echo "================================================================================"
 		echo "Test failed! Generating compile-commands.json of the last build configuration..."
@@ -32,11 +33,6 @@ run_test() {
 
 # set -x
 set -e
-
-SCRIPT=$(readlink -f "$0")
-BASEDIR=$(dirname "$SCRIPT")/../../../unittests
-
-cd "$BASEDIR"
 
 for urc_i in 0 1; do
 	handle_urc=$urc_i
