@@ -20,9 +20,7 @@
 
 #include <stdio.h>
 
-#ifdef MODULE_PERIPH_PM
 #include "periph/pm.h"
-#endif
 #include "shell.h"
 
 #ifdef MODULE_USB_BOARD_RESET

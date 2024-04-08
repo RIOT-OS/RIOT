@@ -36,9 +36,7 @@
 
 #include "log.h"
 #include "modules.h"
-#ifdef MODULE_PERIPH_PM
 #include "periph/pm.h"
-#endif
 #include "sched.h"
 #include "stdio_base.h"
 #include "thread.h"

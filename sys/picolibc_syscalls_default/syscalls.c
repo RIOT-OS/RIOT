@@ -27,9 +27,7 @@
 
 #include "irq.h"
 #include "log.h"
-#ifdef MODULE_PERIPH_PM
 #include "periph/pm.h"
-#endif
 #include "stdio_base.h"
 
 #ifndef NUM_HEAPS
