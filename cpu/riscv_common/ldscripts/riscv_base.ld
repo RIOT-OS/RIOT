@@ -232,7 +232,9 @@ SECTIONS
   } >ram AT>ram :ram
 
   .flash_writable (NOLOAD) : {
+    _fp_mem_start = . ;
     KEEP(*(SORT(.flash_writable.*)))
+    _fp_mem_end = . ;
   } > flash
 
   .end_fw (NOLOAD) : ALIGN(4) {
