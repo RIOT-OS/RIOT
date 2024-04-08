@@ -50,6 +50,13 @@ at_urc_t urc_short = {
 };
 #endif
 
+#ifdef BOARD_NATIVE
+#define AT_UNIT_UART_DEV 0
+#else
+/* Most non-native boards have stdout mapped to device 0 */
+#define AT_UNIT_UART_DEV 1
+#endif
+
 static void set_up(void)
 {
     at_dev_init_t at_init_params = {
@@ -58,7 +65,7 @@ static void set_up(void)
         .rp_buf_size = sizeof(rp_buf),
         .rx_buf = buf,
         .rx_buf_size = sizeof(buf),
-        .uart = UART_DEV(1),
+        .uart = UART_DEV(AT_UNIT_UART_DEV),
     };
     int res = at_dev_init(&at_dev, &at_init_params);
     /* check the UART initialization return value and respond as needed */
