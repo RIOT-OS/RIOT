@@ -162,6 +162,9 @@ const mtd_desc_t mtd_flashpage_driver = {
 };
 
 #if CONFIG_SLOT_AUX_LEN
+#ifndef MODULE_PERIPH_FLASHPAGE_AUX
+#error "CONFIG_SLOT_AUX_LEN requires the periph_flashpage_aux feature to work"
+#endif
 mtd_flashpage_t mtd_flash_aux_slot = MTD_FLASHPAGE_AUX_INIT_VAL(CONFIG_SLOT_AUX_OFFSET,
                                                                 CONFIG_SLOT_AUX_LEN);
 MTD_XFA_ADD(mtd_flash_aux_slot, CONFIG_SLOT_AUX_MTD_OFFSET);
