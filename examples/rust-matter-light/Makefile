@@ -28,6 +28,10 @@ BASELIBS += $(APPLICATION_RUST_MODULE).module
 
 FEATURES_REQUIRED += rust_target
 
+# Comment this line in to activate storing & loading runtime configurations
+# NOTE: To use this feature, a PersistenceManager (in 'src/persist.rs') must be implemented for the target platform
+#CARGO_OPTIONS += --features psm
+
 USEMODULE += saul
 USEMODULE += saul_default
 USEMODULE += shell
@@ -37,7 +41,6 @@ USEMODULE += ztimer
 USEMODULE += ztimer_msec
 USEMODULE += ztimer_usec
 USEMODULE += ps
-USEMODULE += vfs
 
 # networking
 USEMODULE += netdev_default

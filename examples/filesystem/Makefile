@@ -27,10 +27,12 @@ USEMODULE += ps
 # Use the default file system
 USEMODULE += vfs_default
 USEMODULE += constfs
-# USEMODULE += devfs
+#USEMODULE += devfs
+#USEMODULE += littlefs
+#USEMODULE += littlefs2
 
 # Enable to automatically format if mount fails
-#USEMODULE += vfs_auto_format
+USEMODULE += vfs_auto_format
 
 # For LittleFS on real devices, the main stack size has to be
 # increased:

@@ -12,11 +12,11 @@ impl<'a> Psm<'a> {
     #[inline(always)]
     pub fn new(matter: &'a Matter<'a>) -> Result<Self, Error> {
         let mut buf = [0; 4096];
-        Ok(Self { matter, buf, dir: "test" })
+        Ok(Self { matter, buf, dir: "data" })
     }
 
     pub async fn run(&mut self) -> Result<(), Error> {
-        debug!("PSM running...");
+        debug!("PersistenceManager running...");
         loop {
             self.matter.wait_changed().await;
 

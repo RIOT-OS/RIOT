@@ -215,7 +215,7 @@ fn run_matter() -> Result<(), ()> {
 
     let mdns_service: &'static MdnsService = MDNS.init(MdnsService::new(
         0,
-        "rs-matter-demo",
+        "riot-matter-demo",
         Ipv4Addr::UNSPECIFIED.octets(),
         Some((ipv6_addr.octets(), interface)),
         &DEV_DET,
@@ -245,6 +245,9 @@ fn run_matter() -> Result<(), ()> {
     executor.run(|spawner| {
         spawner.spawn(mdns_task(mdns_service)).unwrap();
         spawner.spawn(matter_task(matter)).unwrap();
+
+        // Run PersistenceManager only if 'psm' feature is activated
+        #[cfg(feature = "psm")]
         spawner.spawn(psm_task(matter)).unwrap();
     });
 }
