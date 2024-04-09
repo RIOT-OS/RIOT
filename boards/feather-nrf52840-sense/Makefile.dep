@@ -5,6 +5,7 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += lsm6dsxx
   USEMODULE += saul_gpio
   USEMODULE += sht3x
+  USEMODULE += ws281x
 endif
 
 # include common nrf52 dependencies
