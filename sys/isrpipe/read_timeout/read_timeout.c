@@ -37,18 +37,20 @@ static void _cb(void *arg)
 
 int isrpipe_read_timeout(isrpipe_t *isrpipe, uint8_t *buffer, size_t count, uint32_t timeout)
 {
-    int res;
+    int res = tsrb_get(&isrpipe->tsrb, buffer, count);
+    if (res > 0) {
+        return res;
+    }
 
     _isrpipe_timeout_t _timeout = { .mutex = &isrpipe->mutex, .flag = 0 };
-
     ztimer_t timer = { .callback = _cb, .arg = &_timeout };
 
     ztimer_set(ZTIMER_USEC, &timer, timeout);
-    while (!(res = tsrb_get(&isrpipe->tsrb, buffer, count))) {
+    while ((res = tsrb_get(&isrpipe->tsrb, buffer, count)) == 0) {
         mutex_lock(&isrpipe->mutex);
         if (_timeout.flag) {
-            res = -ETIMEDOUT;
-            break;
+            /* timer was consumed */
+            return -ETIMEDOUT;
         }
     }
 
