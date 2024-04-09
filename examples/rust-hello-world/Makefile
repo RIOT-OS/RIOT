@@ -2,11 +2,7 @@
 APPLICATION = hello-world
 
 # If no BOARD is found in the environment, use this default:
-BOARD ?= native64
-
-USEMODULE += vfs
-USEMODULE += vfs_default
-USEMODULE += shell_cmds_default
+BOARD ?= native
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
@@ -24,8 +20,6 @@ APPLICATION_RUST_MODULE = rust_hello_world
 BASELIBS += $(APPLICATION_RUST_MODULE).module
 
 FEATURES_REQUIRED += rust_target
-
-
 
 # Currently unknown, something related to the LED_PORT definition that doesn't
 # pass C2Rust's transpilation
