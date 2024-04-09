@@ -81,7 +81,7 @@ static void *main_trampoline(void *arg)
     }
 #endif
 
-    if (IS_ACTIVE(CONFIG_CORE_EXIT_WITH_MAIN)) {
+    if (IS_ACTIVE(CONFIG_CORE_EXIT_WITH_MAIN) && IS_USED(MODULE_PERIPH_PM)) {
         pm_off();
     }
 

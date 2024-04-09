@@ -117,7 +117,9 @@ void __attribute__((__noreturn__))
 _exit(int n)
 {
     LOG_INFO("#! exit %i: powering off\n", n);
+#ifdef MODULE_PERIPH_PM
     pm_off();
+#endif /* MODULE_PERIPH_PM */
     for (;;) {
     }
 }
