@@ -83,6 +83,19 @@ extern "C" {
 
 /**
  * @brief Default shell buffer size (maximum line length shell can handle)
+ *
+ * @warning When terminals that buffer input and send the full command line in
+ *   one go are used on stdin implementations with fast bursts of data,
+ *   it may be necessary to increase the @ref STDIO_RX_BUFSIZE to make
+ *   practical use of this buffer, especially because the current mechanism of
+ *   passing stdin (`isrpipe_t stdin_isrpipe`) does not support backpressure
+ *   and overflows silently. As a consequence, commands through such terminals
+ *   appear to be truncated at @ref STDIO_RX_BUFSIZE bytes (defaulting to 64)
+ *   unless the command is sent in parts (on many terminals, by presing Ctrl-D
+ *   half way through the command).
+ *
+ *   For example, this affects systems with direct USB stdio (@ref
+ *   usbus_cdc_acm_stdio) with the default terminal `pyterm`.
  */
 #define SHELL_DEFAULT_BUFSIZE   (128)
 
