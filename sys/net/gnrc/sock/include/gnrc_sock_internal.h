@@ -56,6 +56,14 @@ extern "C" {
 #define GNRC_SOCK_DYN_PORTRANGE_ERR (0)
 
 /**
+ * @brief   Check if remote address of a UDP packet matches the address the socket
+ *          is bound to.
+ */
+#ifndef CONFIG_GNRC_SOCK_UDP_CHECK_REMOTE_ADDR
+#define CONFIG_GNRC_SOCK_UDP_CHECK_REMOTE_ADDR (1)
+#endif
+
+/**
  * @brief   Structure to retrieve auxiliary data from @ref gnrc_sock_recv
  *
  * @details The members of this function depend on the modules used
