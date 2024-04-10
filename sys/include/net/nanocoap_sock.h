@@ -176,6 +176,18 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Include a random token with block-wise transfers.
+ *
+ * This is a workaround for buggy CoPA implementations (e.g. go-coap) that expect
+ * to identify block-wise transfers based on the token.
+ *
+ * See https://github.com/plgd-dev/go-coap/issues/512
+ */
+#ifndef CONFIG_NANOCOAP_SOCK_BLOCK_TOKEN
+#define CONFIG_NANOCOAP_SOCK_BLOCK_TOKEN        (0)
+#endif
+
+/**
  * @brief   NanoCoAP socket types
  */
 typedef enum {
