@@ -12,6 +12,7 @@ STDIO_MODULES = \
   stdio_telnet \
   stdio_tinyusb_cdc_acm \
   stdio_usb_serial_jtag \
+  stdio_fb \
   #
 
 STDIO_LEGACY_MODULES = \
