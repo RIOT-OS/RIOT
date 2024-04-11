@@ -91,7 +91,6 @@ typedef enum {
 } gpio_flank_t;
 /** @} */
 #endif /* ndef DOXYGEN */
-/** @} */
 
 /**
  * @name   Predefined GPIO names
@@ -115,6 +114,9 @@ typedef enum {
 #define GPIO15      (GPIO_PIN(PORT_GPIO,15))
 #define GPIO16      (GPIO_PIN(PORT_GPIO,16))
 /** @} */
+
+/** @} */
+
 
 /**
  * @name   I2C configuration
@@ -297,6 +299,8 @@ typedef struct {
 #define PERIPH_SPI_NEEDS_TRANSFER_BYTE  /**< requires function spi_transfer_byte */
 #define PERIPH_SPI_NEEDS_TRANSFER_REG   /**< requires function spi_transfer_reg */
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS  /**< requires function spi_transfer_regs */
+/** @} */
+
 /** @} */
 
 /**
