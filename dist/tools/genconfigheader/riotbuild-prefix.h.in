@@ -62,4 +62,23 @@
  */
 #define CPU_RAM_SIZE        /* RAM Size in Bytes */
 #endif /* DOXYGEN */
+
+/**
+ * @brief   Mark a preprocessor macro as deprecated by including this
+ *          macro in the definition
+ *
+ * Usage:
+ * ``` C
+ * /// @deprecated, use @ref BAR instead of FOO
+ * #define FOO          MACRO_DEPRECATED BAR
+ * ```
+ */
+#if defined(DOXYGEN)
+#  define MACRO_DEPRECATED    /* implementation */
+#elif defined(__GNUC__) || defined(__clang__)
+#  define MACRO_DEPRECATED _Pragma("GCC warning \"Code is using a deprecated macro\"")
+#else
+#  define MACRO_DEPRECATED
+#endif
+
 /** @} */
