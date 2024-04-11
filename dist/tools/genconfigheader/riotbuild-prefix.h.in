@@ -81,4 +81,16 @@
 #  define MACRO_DEPRECATED
 #endif
 
+/**
+ * @brief   Name of the MCU the app is compiled for as string literal
+ *
+ * @deprecated  Use @ref RIOT_CPU instead. This will be removed soonest in
+ *              release 2025.04
+ *
+ * This has been renamed to `RIOT_CPU` for consistency. Even though MCU would
+ * technically be the better name, CPU is used every else in the source code
+ * and folder structure.
+ */
+#define RIOT_MCU        MACRO_DEPRECATED RIOT_CPU
+
 /** @} */
