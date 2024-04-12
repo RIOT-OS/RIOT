@@ -40,8 +40,8 @@ XFA_INIT_CONST(registry_storage_instance_t *, _registry_storage_instances_src_xf
 static int _registry_load_cb(const registry_node_t *node, const void *buf, const size_t buf_len)
 {
     assert(node->type == REGISTRY_NODE_PARAMETER);
-    assert(node->location.parameter != NULL);
-    assert(node->instance != NULL);
+    assert(node->value.parameter.parameter != NULL);
+    assert(node->value.parameter.instance != NULL);
 
     return registry_set(node, buf, buf_len);
 }
