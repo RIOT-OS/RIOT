@@ -104,8 +104,8 @@ typedef const enum {
 } registry_commit_cb_scope_t;
 
 /**
- * @brief Callback must be implemented by modules / drivers that integrate a configuration schema.
- * This callback is called when the registry notifies the module / driver, that a configuration
+ * @brief The callback must be implemented by modules that integrate a configuration schema.
+ * This callback is called when the registry notifies the module, that a configuration
  * parameter has changed.
  *
  * @param[in] scope Scope of what will be committed (a parameter, a group or the whole instance).
