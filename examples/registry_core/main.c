@@ -88,8 +88,10 @@ int main(void)
         /* Create registry_node_t for the board_led_parameter */
         const registry_node_t parameter_node = {
             .type = REGISTRY_NODE_PARAMETER,
-            .instance = &board_led_instance,
-            .location.parameter = &registry_sys_board_led_enabled,
+            .value.parameter = {
+                .instance = &board_led_instance,
+                .parameter = &registry_sys_board_led_enabled,
+            },
         };
 
         /* Set new registry value */
