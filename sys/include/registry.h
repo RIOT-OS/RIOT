@@ -67,7 +67,10 @@ typedef enum {
     REGISTRY_TYPE_FLOAT64,          /**< 64-bits float. */
 } registry_type_t;
 
-// TODO Documentation
+/**
+ * @brief The type of a registry node.
+ * A registry node points to a namespace, schema, instance, group or parameter.
+ */
 typedef enum {
     REGISTRY_NODE_NAMESPACE = 0,
     REGISTRY_NODE_SCHEMA,
@@ -76,16 +79,27 @@ typedef enum {
     REGISTRY_NODE_PARAMETER,
 } registry_node_type_t;
 
-// TODO Documentation
+/**
+ * @brief A registry node represents a specific location within the registry configuration tree.
+ * It can point to a namespace, schema, instance, group or parameter.
+ * The configuration group and the configuration parameter contain a pointer to a
+ * schema instance, because they are children of a specific schema instance in the configuration tree.
+ */
 typedef struct {
-    registry_node_type_t type;
-    union {
-        const registry_namespace_t *namespace;
-        const registry_schema_t *schema;
-        const registry_group_t *group;
-        const registry_parameter_t *parameter;
-    } location;
-    const registry_instance_t *instance;
+    registry_node_type_t type;                      /**< The type of the node */
+    union {                                     
+        const registry_namespace_t *namespace;      /**< Pointer to the configuration namespace */
+        const registry_schema_t *schema;            /**< Pointer to a configuration schema */
+        const registry_instance_t *instance;        /**< Pointer to a schema instance */
+        struct {
+            const registry_instance_t *instance;    /**< Pointer to a schema instance */
+            const registry_group_t *group;          /**< Pointer to a configuration group */
+        } group;                                    /**< A configuration group depends on an instance */
+        struct {
+            const registry_instance_t *instance;    /**< Pointer to a schema instance */
+            const registry_parameter_t *parameter;  /**< Pointer to a configuration parameter */
+        } parameter;                                /**< A configuration parameter depends on an instance */
+    } value;                                        /**< The location inside of the configuration tree */
 } registry_node_t;
 
 /**
@@ -97,8 +111,11 @@ typedef struct {
     size_t buf_len;         /**< Length of the buffer. */
 } registry_value_t;
 
+/**
+ * @brief The different scopes of a registry @p commit_cb function.
+ */
 typedef const enum {
-    REGISTRY_COMMIT_INSTANCE,
+    REGISTRY_COMMIT_INSTANCE = 0,
     REGISTRY_COMMIT_GROUP,
     REGISTRY_COMMIT_PARAMETER,
 } registry_commit_cb_scope_t;
@@ -119,10 +136,12 @@ typedef int (*registry_commit_cb_t)(const registry_commit_cb_scope_t scope,
                                     const void *context);
 
 /**
- * @brief Instance of a schema containing its data.
+ * @brief Instance of a schema containing its configuration parameters values.
+ * The instance of a configuration schema is created by the modules that need to expose runtime configurations.
+ * The modules also implement the @p commit_cb function to react to configuration changes.
  */
 struct _registry_instance_t {
-    clist_node_t node;                  /**< Linked list node. */
+    clist_node_t node;                  /**< Linked list node pointing to the next schema instance. */
     const registry_instance_id_t id;    /**< Integer representing the path id of the schema instance. */
 #if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     const char * const name;            /**< String describing the instance. */
@@ -130,10 +149,14 @@ struct _registry_instance_t {
     const void * const data;            /**< Struct containing all configuration parameters of the schema. */
     const registry_schema_t *schema;    /**< Configuration Schema that the Schema Instance belongs to. */
     registry_commit_cb_t commit_cb;     /**< Will be called after @ref registry_commit() was called on this instance. */
-
     void *context;                      /**< Optional context used by the instance */
 };
 
+/**
+ * @brief Data structure of a configuration group.
+ * A configuration group contains further configuration groups and/or configuration parameters.
+ * It has an ID that is unique within the scope of its parent configuration schema.
+ */
 struct _registry_group_t {
     const registry_group_id_t id;                   /**< Integer representing the ID of the configuration group. */
 #if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
@@ -149,6 +172,11 @@ struct _registry_group_t {
     const size_t parameters_len;                    /**< Size of parameters array. */
 };
 
+/**
+ * @brief Data structure of a configuration parameter.
+ * A configuration parameter mostly holds the type information for a configuration value.
+ * It has an ID that is unique within the scope of its parent configuration schema.
+ */
 struct _registry_parameter_t {
     const registry_parameter_id_t id;                       /**< Integer representing the ID of the configuration parameter. */
 #if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
@@ -162,7 +190,10 @@ struct _registry_parameter_t {
 };
 
 /**
- * @brief Schema containing available configuration parameters.
+ * @brief Data structure of a configuration schema.
+ * A configuration schema contains configuration configuration groups and/or configuration parameters.
+ * Besides that it also contains a list of instances that hold the actual configuration parameter values.
+ * It has an ID that is unique within the scope of its parent configuration namespace.
  */
 struct _registry_schema_t {
     const registry_schema_id_t id;                          /**< Integer representing the ID of the schema. */
@@ -193,6 +224,13 @@ struct _registry_schema_t {
                          size_t *val_len);
 };
 
+/**
+ * @brief Data structure of a configuration namespace.
+ * A configuration namespace contains configuration schemas.
+ * It exists to prevent ID collisions between RIOT internal configuration schemas
+ * and schemas defined by applications running on RIOT.
+ * It has an ID that is unique within the scope of the RIOT registry itself.
+ */
 struct _registry_namespace_t {
     const registry_namespace_id_t id;           /**< Integer representing the ID of the namespace. */
 #if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
@@ -257,6 +295,16 @@ int registry_set(const registry_node_t *node, const void *buf, const size_t buf_
  */
 int registry_commit(const registry_node_t *node);
 
+/**
+ * @brief Callback definition of the @p registry_export function.
+ * This callback will be called for each location inside of the configuration tree that is
+ * within the scope of the registry node passed on to the @p registry_export function.
+ * 
+ * @param[in] node A location within the registry configuration tree.
+ * @param[in] context Context that is passed by the @p registry_export function.
+ *
+ * @return 0 on success, non-zero on failure.
+ */
 typedef int (*registry_export_cb_t)(const registry_node_t *node, const void *context);
 
 #define REGISTRY_EXPORT_ALL = 0;
