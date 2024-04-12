@@ -169,7 +169,7 @@ static int _group_or_parameter_lookup(const char *path, const registry_schema_t 
             /* parameter matches => return parameters */
             if (strlen(ptr + path_position) == name_length &&
                 strncmp(ptr + path_position, parameters[i]->name, name_length) == 0) {
-                node->location.parameter = parameters[i];
+                node->value.parameter.parameter = parameters[i];
                 node->type = REGISTRY_NODE_PARAMETER;
                 return path_position + name_length + 1;     /* name_length + `/` character */
             }
@@ -210,7 +210,7 @@ static int _group_or_parameter_lookup(const char *path, const registry_schema_t 
                 /* end of path => return group if it matches */
                 else if (*(ptr + path_position + name_length) == '\0' &&
                          strncmp(ptr + path_position, groups[i]->name, name_length) == 0) {
-                    node->location.group = groups[i];
+                    node->value.group.group = groups[i];
                     node->type = REGISTRY_NODE_GROUP;
                     return path_position + name_length + 1; /* name_length + `/` character */
                 }
@@ -289,42 +289,42 @@ int registry_node_to_string_path(const registry_node_t *node, char *path)
     switch (node->type)
     {
     case REGISTRY_NODE_NAMESPACE:
-        size = snprintf(NULL, 0, "/%s", node->location.namespace->name);
+        size = snprintf(NULL, 0, "/%s", node->value.namespace->name);
 
         if (path != NULL) {
-            return snprintf(path, size + 1, "/%s", node->location.namespace->name);
+            return snprintf(path, size + 1, "/%s", node->value.namespace->name);
         }
         break;
     
     case REGISTRY_NODE_SCHEMA:
-        size = snprintf(NULL, 0, "/%s/%s", node->location.schema->namespace->name, node->location.schema->name);
+        size = snprintf(NULL, 0, "/%s/%s", node->value.schema->namespace->name, node->value.schema->name);
 
         if (path != NULL) {
-            return snprintf(path, size + 1, "/%s/%s", node->location.schema->namespace->name, node->location.schema->name);
+            return snprintf(path, size + 1, "/%s/%s", node->value.schema->namespace->name, node->value.schema->name);
         }
         break;
     
     case REGISTRY_NODE_INSTANCE:
-        size = snprintf(NULL, 0, "/%s/%s/%s", node->instance->schema->namespace->name,
-                        node->instance->schema->name, node->instance->name);
+        size = snprintf(NULL, 0, "/%s/%s/%s", node->value.instance->schema->namespace->name,
+                        node->value.instance->schema->name, node->value.instance->name);
 
         if (path != NULL) {
-            return snprintf(path, size + 1, "/%s/%s/%s", node->instance->schema->namespace->name,
-                            node->instance->schema->name, node->instance->name);
+            return snprintf(path, size + 1, "/%s/%s/%s", node->value.instance->schema->namespace->name,
+                            node->value.instance->schema->name, node->value.instance->name);
         }
         break;
     
     case REGISTRY_NODE_GROUP:
-        size = snprintf(NULL, 0, "/%s/%s/%s", node->instance->schema->namespace->name,
-                        node->instance->schema->name, node->instance->name);
+        size = snprintf(NULL, 0, "/%s/%s/%s", node->value.group.instance->schema->namespace->name,
+                        node->value.group.instance->schema->name, node->value.group.instance->name);
 
         if (path != NULL) {
-            snprintf(path, size + 1, "/%s/%s/%s", node->instance->schema->namespace->name,
-                    node->instance->schema->name, node->instance->name);
+            snprintf(path, size + 1, "/%s/%s/%s", node->value.group.instance->schema->namespace->name,
+                    node->value.group.instance->schema->name, node->value.group.instance->name);
         }
 
-        for (size_t i = 0; i < node->instance->schema->groups_len; i++) {
-            int res = _internal_registry_to_group_string_path(node->instance->schema->groups[i], node->location.group,
+        for (size_t i = 0; i < node->value.group.instance->schema->groups_len; i++) {
+            int res = _internal_registry_to_group_string_path(node->value.group.instance->schema->groups[i], node->value.group.group,
                                                             path != NULL ? path + size : NULL);
             if (res >= 0) {
                 return size += res;
@@ -335,21 +335,21 @@ int registry_node_to_string_path(const registry_node_t *node, char *path)
         break;
     
     case REGISTRY_NODE_PARAMETER:
-        size = snprintf(NULL, 0, "/%s/%s/%s", node->instance->schema->namespace->name,
-                        node->instance->schema->name, node->instance->name);
+        size = snprintf(NULL, 0, "/%s/%s/%s", node->value.parameter.instance->schema->namespace->name,
+                        node->value.parameter.instance->schema->name, node->value.parameter.instance->name);
 
         if (path != NULL) {
-            snprintf(path, size + 1, "/%s/%s/%s", node->instance->schema->namespace->name,
-                    node->instance->schema->name, node->instance->name);
+            snprintf(path, size + 1, "/%s/%s/%s", node->value.parameter.instance->schema->namespace->name,
+                    node->value.parameter.instance->schema->name, node->value.parameter.instance->name);
         }
 
         /* check if the parameter is a child of this schema */
-        for (size_t i = 0; i < node->instance->schema->parameters_len; i++) {
-            if (node->instance->schema->parameters[i] == node->location.parameter) {
-                int sub_size = snprintf(NULL, 0, "/%s", node->instance->schema->parameters[i]->name);
+        for (size_t i = 0; i < node->value.parameter.instance->schema->parameters_len; i++) {
+            if (node->value.parameter.instance->schema->parameters[i] == node->value.parameter.parameter) {
+                int sub_size = snprintf(NULL, 0, "/%s", node->value.parameter.instance->schema->parameters[i]->name);
 
                 if (path != NULL) {
-                    snprintf(path + size, sub_size + 1, "/%s", node->instance->schema->parameters[i]->name);
+                    snprintf(path + size, sub_size + 1, "/%s", node->value.parameter.instance->schema->parameters[i]->name);
                 }
 
                 return size + sub_size;
@@ -357,9 +357,9 @@ int registry_node_to_string_path(const registry_node_t *node, char *path)
         }
 
         /* check if the parameter is the child of a group */
-        for (size_t i = 0; i < node->instance->schema->groups_len; i++) {
-            int res = _internal_registry_to_parameter_string_path(node->instance->schema->groups[i],
-                                                                node->location.parameter,
+        for (size_t i = 0; i < node->value.parameter.instance->schema->groups_len; i++) {
+            int res = _internal_registry_to_parameter_string_path(node->value.parameter.instance->schema->groups[i],
+                                                                node->value.parameter.parameter,
                                                                 path != NULL ? path + size : NULL);
             if (res >= 0) {
                 return size += res;
@@ -384,7 +384,7 @@ int registry_node_from_string_path(const char *path, const size_t path_len, regi
 
     if (res >= 0) {
         node->type = REGISTRY_NODE_NAMESPACE;
-        node->location.namespace = found_namespace;
+        node->value.namespace = found_namespace;
 
         path_position += res;
 
@@ -395,7 +395,7 @@ int registry_node_from_string_path(const char *path, const size_t path_len, regi
 
             if (res >= 0) {
                 node->type = REGISTRY_NODE_SCHEMA;
-                node->location.schema = found_schema;
+                node->value.schema = found_schema;
 
                 path_position += res;
 
@@ -406,14 +406,19 @@ int registry_node_from_string_path(const char *path, const size_t path_len, regi
 
                     if (res >= 0) {
                         node->type = REGISTRY_NODE_INSTANCE;
-                        node->location.schema = NULL;
-                        node->instance = found_instance;
+                        node->value.instance = found_instance;
                     
                         path_position += res;
 
                         if (path_position < path_len - 1)  {
                             /* group or parameter */
                             res = _group_or_parameter_lookup(path + path_position, found_schema, node);
+
+                            if (node->type == REGISTRY_NODE_GROUP) {
+                                node->value.group.instance = found_instance;
+                            } else if (node->type == REGISTRY_NODE_PARAMETER) {
+                                node->value.parameter.instance = found_instance;
+                            }
                         }
                     }
                 }
