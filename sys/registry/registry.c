@@ -63,7 +63,7 @@ int registry_get(const registry_node_t *node, registry_value_t *value)
     assert(node != NULL);
     assert(value != NULL);
 
-    if (node->type != REGISTRY_NODE_PARAMETER || node->instance == NULL) {
+    if (node->type != REGISTRY_NODE_PARAMETER) {
         return -REGISTRY_ERROR_NODE_INVALID;
     }
 
@@ -71,9 +71,9 @@ int registry_get(const registry_node_t *node, registry_value_t *value)
     void *intern_val = NULL;
     size_t intern_val_len;
 
-    const registry_parameter_t *parameter = node->location.parameter;
+    const registry_parameter_t *parameter = node->value.parameter.parameter;
 
-    parameter->schema->mapping(parameter->id, node->instance, &intern_val, &intern_val_len);
+    parameter->schema->mapping(parameter->id, node->value.parameter.instance, &intern_val, &intern_val_len);
 
     /* update buf pointer in registry_value_t to point to the value inside the registry and set buf_len */
     value->type = parameter->type;
@@ -88,7 +88,7 @@ int registry_set(const registry_node_t *node, const void *buf, const size_t buf_
     assert(node != NULL);
     assert(buf != NULL);
 
-    if (node->type != REGISTRY_NODE_PARAMETER || node->instance == NULL) {
+    if (node->type != REGISTRY_NODE_PARAMETER) {
         return -REGISTRY_ERROR_NODE_INVALID;
     }
 
@@ -96,9 +96,9 @@ int registry_set(const registry_node_t *node, const void *buf, const size_t buf_
     void *intern_val = NULL;
     size_t intern_val_len;
 
-    const registry_parameter_t *parameter = node->location.parameter;
+    const registry_parameter_t *parameter = node->value.parameter.parameter;
 
-    parameter->schema->mapping(parameter->id, node->instance, &intern_val, &intern_val_len);
+    parameter->schema->mapping(parameter->id, node->value.parameter.instance, &intern_val, &intern_val_len);
 
     if (buf_len > intern_val_len) {
         return -EINVAL;
@@ -195,19 +195,19 @@ int registry_commit(const registry_node_t *node) {
         switch (node->type)
         {
         case REGISTRY_NODE_NAMESPACE:
-            rc = _registry_commit_namespace(node->location.namespace);
+            rc = _registry_commit_namespace(node->value.namespace);
             break;
         case REGISTRY_NODE_SCHEMA:
-            rc = _registry_commit_schema(node->location.schema);
+            rc = _registry_commit_schema(node->value.schema);
             break;
         case REGISTRY_NODE_INSTANCE:
-            rc = _registry_commit_instance(node->instance);
+            rc = _registry_commit_instance(node->value.instance);
             break;
         case REGISTRY_NODE_GROUP:
-            rc = _registry_commit_group(node->instance, node->location.group);
+            rc = _registry_commit_group(node->value.group.instance, node->value.group.group);
             break;
         case REGISTRY_NODE_PARAMETER:
-            rc = _registry_commit_parameter(node->instance, node->location.parameter);
+            rc = _registry_commit_parameter(node->value.parameter.instance, node->value.parameter.parameter);
             break;
         }
     }
@@ -223,8 +223,10 @@ static int _registry_export_parameter(const registry_instance_t *instance,
 
     const registry_node_t export_node = {
         .type = REGISTRY_NODE_PARAMETER,
-        .instance = instance,
-        .location.parameter = parameter,
+        .value.parameter = {
+            .instance = instance,
+            .parameter = parameter,
+        },
     };
 
     return export_cb(&export_node, context);
@@ -239,8 +241,10 @@ static int _registry_export_group(const registry_instance_t *instance, const reg
     /* export the given configuration group */
     const registry_node_t export_node = {
         .type = REGISTRY_NODE_GROUP,
-        .instance = NULL,
-        .location.group = group,
+        .value.group = {
+            .instance = instance,
+            .group = group,
+        },
     };
     int rc = export_cb(&export_node, context);
 
@@ -288,7 +292,7 @@ static int _registry_export_instance(const registry_instance_t *instance,
     /* export the given configuration schema instance */
     const registry_node_t export_node = {
         .type = REGISTRY_NODE_INSTANCE,
-        .instance = instance,
+        .value.instance = instance,
     };
     int rc = export_cb(&export_node, context);
 
@@ -336,8 +340,7 @@ static int _registry_export_schema(const registry_schema_t *schema, const regist
     /* export the given configuration schema */
     const registry_node_t export_node = {
         .type = REGISTRY_NODE_SCHEMA,
-        .instance = NULL,
-        .location.schema = schema,
+        .value.schema = schema,
     };
     int rc = export_cb(&export_node, context);
 
@@ -385,8 +388,7 @@ static int _registry_export_namespace(const registry_namespace_t *namespace,
     /* export the given namespace */
     const registry_node_t export_node = {
         .type = REGISTRY_NODE_NAMESPACE,
-        .instance = NULL,
-        .location.namespace = namespace,
+        .value.namespace = namespace,
     };
     int rc = export_cb(&export_node, context);
 
@@ -433,19 +435,19 @@ int registry_export(const registry_node_t *node, const registry_export_cb_t expo
         switch (node->type)
         {
         case REGISTRY_NODE_NAMESPACE:
-            rc = _registry_export_namespace(node->location.namespace, export_cb, tree_traversal_depth, context);
+            rc = _registry_export_namespace(node->value.namespace, export_cb, tree_traversal_depth, context);
             break;
         case REGISTRY_NODE_SCHEMA:
-            rc = _registry_export_schema(node->location.schema, export_cb, tree_traversal_depth, context);
+            rc = _registry_export_schema(node->value.schema, export_cb, tree_traversal_depth, context);
             break;
         case REGISTRY_NODE_INSTANCE:
-            rc = _registry_export_instance(node->instance, export_cb, tree_traversal_depth, context);
+            rc = _registry_export_instance(node->value.instance, export_cb, tree_traversal_depth, context);
             break;
         case REGISTRY_NODE_GROUP:
-            rc = _registry_export_group(node->instance, node->location.group, export_cb, tree_traversal_depth, context);
+            rc = _registry_export_group(node->value.group.instance, node->value.group.group, export_cb, tree_traversal_depth, context);
             break;
         case REGISTRY_NODE_PARAMETER:
-            rc = _registry_export_parameter(node->instance, node->location.parameter, export_cb, context);
+            rc = _registry_export_parameter(node->value.parameter.instance, node->value.parameter.parameter, export_cb, context);
             break;
         }
     }
