@@ -185,36 +185,36 @@ int registry_node_to_int_path(const registry_node_t *node, registry_int_path_t *
     {
     case REGISTRY_NODE_NAMESPACE:
         path->type = REGISTRY_INT_PATH_TYPE_NAMESPACE;
-        path->value.namespace_path.namespace_id = node->location.namespace->id;
+        path->value.namespace_path.namespace_id = node->value.namespace->id;
         break;
     
     case REGISTRY_NODE_SCHEMA:
         path->type = REGISTRY_INT_PATH_TYPE_SCHEMA;
-        path->value.schema_path.namespace_id = node->location.schema->namespace->id;
-        path->value.schema_path.schema_id = node->location.schema->id;
+        path->value.schema_path.namespace_id = node->value.schema->namespace->id;
+        path->value.schema_path.schema_id = node->value.schema->id;
         break;
     
     case REGISTRY_NODE_INSTANCE:
         path->type = REGISTRY_INT_PATH_TYPE_INSTANCE;
-        path->value.instance_path.namespace_id = node->instance->schema->namespace->id;
-        path->value.instance_path.schema_id = node->instance->schema->id;
-        path->value.instance_path.instance_id = node->instance->id;
+        path->value.instance_path.namespace_id = node->value.instance->schema->namespace->id;
+        path->value.instance_path.schema_id = node->value.instance->schema->id;
+        path->value.instance_path.instance_id = node->value.instance->id;
         break;
     
     case REGISTRY_NODE_GROUP:
         path->type = REGISTRY_INT_PATH_TYPE_GROUP;
-        path->value.group_path.namespace_id = node->location.group->schema->namespace->id;
-        path->value.group_path.schema_id = node->location.group->schema->id;
-        path->value.group_path.instance_id = node->instance->id;
-        path->value.group_path.group_id = node->location.group->id;
+        path->value.group_path.namespace_id = node->value.group.group->schema->namespace->id;
+        path->value.group_path.schema_id = node->value.group.group->schema->id;
+        path->value.group_path.instance_id = node->value.group.instance->id;
+        path->value.group_path.group_id = node->value.group.group->id;
         break;
     
     case REGISTRY_NODE_PARAMETER:
         path->type = REGISTRY_INT_PATH_TYPE_PARAMETER;
-        path->value.parameter_path.namespace_id = node->location.parameter->schema->namespace->id;
-        path->value.parameter_path.schema_id = node->location.parameter->schema->id;
-        path->value.parameter_path.instance_id = node->instance->id;
-        path->value.parameter_path.parameter_id = node->location.parameter->id;
+        path->value.parameter_path.namespace_id = node->value.parameter.parameter->schema->namespace->id;
+        path->value.parameter_path.schema_id = node->value.parameter.parameter->schema->id;
+        path->value.parameter_path.instance_id = node->value.parameter.instance->id;
+        path->value.parameter_path.parameter_id = node->value.parameter.parameter->id;
         break;
     }
 
@@ -279,7 +279,7 @@ int registry_node_from_int_path(const registry_int_path_t *path, registry_node_t
     if (res == 0) {
         if (path->type == REGISTRY_INT_PATH_TYPE_NAMESPACE) {
             node->type = REGISTRY_NODE_NAMESPACE;
-            node->location.namespace = namespace;
+            node->value.namespace = namespace;
             return res;
         }
     
@@ -290,7 +290,7 @@ int registry_node_from_int_path(const registry_int_path_t *path, registry_node_t
         if (res == 0) {
             if (path->type == REGISTRY_INT_PATH_TYPE_SCHEMA) {
                 node->type = REGISTRY_NODE_SCHEMA;
-                node->location.schema = schema;
+                node->value.schema = schema;
                 return res;
             }
             
@@ -301,23 +301,23 @@ int registry_node_from_int_path(const registry_int_path_t *path, registry_node_t
             if (res == 0) {
                 if (path->type == REGISTRY_INT_PATH_TYPE_INSTANCE) {
                     node->type = REGISTRY_NODE_INSTANCE;
-                    node->instance = instance;
+                    node->value.instance = instance;
                     return res;
                 }
 
                 /* Group or Parameter */
                 if (path->type == REGISTRY_INT_PATH_TYPE_GROUP_OR_PARAMETER) {
-                    node->instance = instance;
-
-                    res = _group_lookup(schema, group_or_parameter_id, &node->location.group);
+                    res = _group_lookup(schema, group_or_parameter_id, &node->value.group.group);
                     if (res == 0) {
                         node->type = REGISTRY_NODE_GROUP;
+                        node->value.group.instance = instance;
                         return res;
                     }
                     
-                    res = _parameter_lookup(schema, group_or_parameter_id, &node->location.parameter);
+                    res = _parameter_lookup(schema, group_or_parameter_id, &node->value.parameter.parameter);
                     if (res == 0) {
                         node->type = REGISTRY_NODE_PARAMETER;
+                        node->value.parameter.instance = instance;
                         return res;
                     }
                 }
@@ -325,15 +325,15 @@ int registry_node_from_int_path(const registry_int_path_t *path, registry_node_t
                 /* Group */
                 if (path->type == REGISTRY_INT_PATH_TYPE_GROUP) {
                     node->type = REGISTRY_NODE_GROUP;
-                    node->instance = instance;
-                    return _group_lookup(schema, group_id, &node->location.group);
+                    node->value.group.instance = instance;
+                    return _group_lookup(schema, group_id, &node->value.group.group);
                 }
 
                 /* Parameter */
                 if (path->type == REGISTRY_INT_PATH_TYPE_PARAMETER) {
                     node->type = REGISTRY_NODE_PARAMETER;
-                    node->instance = instance;
-                    return _parameter_lookup(schema, parameter_id, &node->location.parameter);
+                    node->value.parameter.instance = instance;
+                    return _parameter_lookup(schema, parameter_id, &node->value.parameter.parameter);
                 }
             }
         }
