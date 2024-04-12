@@ -76,8 +76,10 @@ static int load(const registry_storage_instance_t *storage,
     if (storage == &storage_test_instance) {
         registry_node_t node = {
             .type = REGISTRY_NODE_PARAMETER,
-            .location.parameter = &registry_tests_nested_parameter,
-            .instance = &test_nested_instance,
+            .value.parameter = {
+                .instance = &test_nested_instance,
+                .parameter = &registry_tests_nested_parameter,
+            },
         };
         uint8_t buf = _TESTS_REGISTRY_LOAD_STORED_VALUE;
         return load_cb(&node, &buf, sizeof(buf));
@@ -91,8 +93,8 @@ static int save(const registry_storage_instance_t *storage,
                 const registry_value_t *value)
 {
     if (storage == &storage_test_instance &&
-        node->instance == &test_nested_instance &&
-        node->location.parameter == &registry_tests_nested_group_parameter &&
+        node->value.parameter.instance == &test_nested_instance &&
+        node->value.parameter.parameter == &registry_tests_nested_group_parameter &&
         value->buf == &test_nested_instance_data.group_parameter &&
         value->buf_len == sizeof(uint8_t) &&
         value->type == REGISTRY_TYPE_UINT8) {
@@ -125,8 +127,10 @@ static void tests_registry_load(void)
 
     registry_node_t node = {
         .type = REGISTRY_NODE_PARAMETER,
-        .location.parameter = &registry_tests_nested_parameter,
-        .instance = &test_nested_instance,
+        .value.parameter = {
+            .instance = &test_nested_instance,
+            .parameter = &registry_tests_nested_parameter,
+        },
     };
 
     registry_get(&node, &output);
@@ -137,8 +141,10 @@ static void tests_registry_save_parameter(void)
 {
     registry_node_t node = {
         .type = REGISTRY_NODE_PARAMETER,
-        .location.parameter = &registry_tests_nested_group_parameter,
-        .instance = &test_nested_instance,
+        .value.parameter = {
+            .instance = &test_nested_instance,
+            .parameter = &registry_tests_nested_group_parameter,
+        },
     };
     TEST_ASSERT_EQUAL_INT(0, registry_save(&node));
 }
@@ -147,8 +153,10 @@ static void tests_registry_save_group(void)
 {
     registry_node_t node = {
         .type = REGISTRY_NODE_GROUP,
-        .location.group = &registry_tests_nested_group,
-        .instance = &test_nested_instance,
+        .value.group = {
+            .instance = &test_nested_instance,
+            .group = &registry_tests_nested_group,
+        },
     };
     TEST_ASSERT_EQUAL_INT(0, registry_save(&node));
 }
@@ -157,7 +165,7 @@ static void tests_registry_save_instance(void)
 {
     registry_node_t node = {
         .type = REGISTRY_NODE_INSTANCE,
-        .instance = &test_nested_instance,
+        .value.instance = &test_nested_instance,
     };
     TEST_ASSERT_EQUAL_INT(0, registry_save(&node));
 }
@@ -166,7 +174,7 @@ static void tests_registry_save_schema(void)
 {
     registry_node_t node = {
         .type = REGISTRY_NODE_SCHEMA,
-        .location.schema = &registry_tests_nested,
+        .value.schema = &registry_tests_nested,
     };
     TEST_ASSERT_EQUAL_INT(0, registry_save(&node));
 }
@@ -175,7 +183,7 @@ static void tests_registry_save_namespace(void)
 {
     registry_node_t node = {
         .type = REGISTRY_NODE_NAMESPACE,
-        .location.namespace = &registry_tests,
+        .value.namespace = &registry_tests,
     };
     TEST_ASSERT_EQUAL_INT(0, registry_save(&node));
 }
