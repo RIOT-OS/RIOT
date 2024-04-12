@@ -68,8 +68,10 @@ static void tests_load_and_save(void)
 {
     registry_node_t node = {
         .type = REGISTRY_NODE_PARAMETER,
-        .location.parameter = &registry_tests_nested_group_parameter,
-        .instance = &test_nested_instance,
+        .value.parameter = {
+            .instance = &test_nested_instance,
+            .parameter = &registry_tests_nested_group_parameter,
+        },
     };
 
     /* set input to 8 */
