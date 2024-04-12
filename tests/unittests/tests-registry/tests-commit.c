@@ -131,8 +131,10 @@ static void tests_registry_commit_parameter(void)
 
     const registry_node_t node = {
         .type = REGISTRY_NODE_PARAMETER,
-        .location.parameter = &registry_tests_nested_parameter,
-        .instance = &test_nested_instance_parameter_test,
+        .value.parameter = {
+            .instance = &test_nested_instance_parameter_test,
+            .parameter = &registry_tests_nested_parameter,
+        },
     };
 
     registry_commit(&node);
@@ -147,8 +149,10 @@ static void tests_registry_commit_group(void)
 
     const registry_node_t node = {
         .type = REGISTRY_NODE_GROUP,
-        .location.group = &registry_tests_nested_group,
-        .instance = &test_nested_instance_group_test,
+        .value.group = {
+            .instance = &test_nested_instance_group_test,
+            .group = &registry_tests_nested_group,
+        },
     };
 
     registry_commit(&node);
@@ -162,7 +166,7 @@ static void tests_registry_commit_instance(void)
 
     const registry_node_t node = {
         .type = REGISTRY_NODE_INSTANCE,
-        .instance = &test_nested_instance_instance_test,
+        .value.instance = &test_nested_instance_instance_test,
     };
 
     registry_commit(&node);
@@ -176,7 +180,7 @@ static void tests_registry_commit_schema(void)
 
     const registry_node_t node = {
         .type = REGISTRY_NODE_SCHEMA,
-        .location.schema = &registry_tests_nested,
+        .value.schema = &registry_tests_nested,
     };
 
     registry_commit(&node);
@@ -190,7 +194,7 @@ static void tests_registry_commit_namespace(void)
 
     const registry_node_t node = {
         .type = REGISTRY_NODE_NAMESPACE,
-        .location.namespace = &registry_tests,
+        .value.namespace = &registry_tests,
     };
 
     registry_commit(&node);

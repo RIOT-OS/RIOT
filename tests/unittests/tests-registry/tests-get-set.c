@@ -96,14 +96,14 @@ static void tests_registry_min_values(void)
 
     registry_node_t node = {
         .type = REGISTRY_NODE_PARAMETER,
-        .instance = &test_full_instance_1,
+        .value.parameter.instance = &test_full_instance_1,
     };
 
     /* opaque */
     const registry_tests_full_instance_opaque_t input_opaque = {
         .value = 0,
     };
-    node.location.parameter = &registry_tests_full_opaque;
+    node.value.parameter.parameter = &registry_tests_full_opaque;
 
     registry_set(&node, &input_opaque, sizeof(input_opaque));
     registry_get(&node, &output);
@@ -113,7 +113,7 @@ static void tests_registry_min_values(void)
 
     /* string */
     const char input_string[] = "";
-    node.location.parameter = &registry_tests_full_string;
+    node.value.parameter.parameter = &registry_tests_full_string;
 
     registry_set(&node, input_string, sizeof(input_string));
     registry_get(&node, &output);
@@ -123,7 +123,7 @@ static void tests_registry_min_values(void)
 
     /* bool */
     const bool input_bool = false;
-    node.location.parameter = &registry_tests_full_boolean;
+    node.value.parameter.parameter = &registry_tests_full_boolean;
 
     registry_set(&node, &input_bool, sizeof(input_bool));
     registry_get(&node, &output);
@@ -133,7 +133,7 @@ static void tests_registry_min_values(void)
 
     /* u8 */
     const uint8_t input_u8 = 0;
-    node.location.parameter = &registry_tests_full_u8;
+    node.value.parameter.parameter = &registry_tests_full_u8;
 
     registry_set(&node, &input_u8, sizeof(input_u8));
     registry_get(&node, &output);
@@ -143,7 +143,7 @@ static void tests_registry_min_values(void)
 
     /* u16 */
     const uint16_t input_u16 = 0;
-    node.location.parameter = &registry_tests_full_u16;
+    node.value.parameter.parameter = &registry_tests_full_u16;
 
     registry_set(&node, &input_u16, sizeof(input_u16));
     registry_get(&node, &output);
@@ -153,7 +153,7 @@ static void tests_registry_min_values(void)
 
     /* u32 */
     const uint32_t input_u32 = 0;
-    node.location.parameter = &registry_tests_full_u32;
+    node.value.parameter.parameter = &registry_tests_full_u32;
 
     registry_set(&node, &input_u32, sizeof(input_u32));
     registry_get(&node, &output);
@@ -163,7 +163,7 @@ static void tests_registry_min_values(void)
 
     /* u64 */
     const uint64_t input_u64 = 0;
-    node.location.parameter = &registry_tests_full_u64;
+    node.value.parameter.parameter = &registry_tests_full_u64;
 
     registry_set(&node, &input_u64, sizeof(input_u64));
     registry_get(&node, &output);
@@ -173,7 +173,7 @@ static void tests_registry_min_values(void)
 
     /* i8 */
     const int8_t input_i8 = INT8_MIN;
-    node.location.parameter = &registry_tests_full_i8;
+    node.value.parameter.parameter = &registry_tests_full_i8;
 
     registry_set(&node, &input_i8, sizeof(input_i8));
     registry_get(&node, &output);
@@ -183,7 +183,7 @@ static void tests_registry_min_values(void)
 
     /* i16 */
     const int16_t input_i16 = INT16_MIN;
-    node.location.parameter = &registry_tests_full_i16;
+    node.value.parameter.parameter = &registry_tests_full_i16;
 
     registry_set(&node, &input_i16, sizeof(input_i16));
     registry_get(&node, &output);
@@ -193,7 +193,7 @@ static void tests_registry_min_values(void)
 
     /* i32 */
     const int32_t input_i32 = INT32_MIN;
-    node.location.parameter = &registry_tests_full_i32;
+    node.value.parameter.parameter = &registry_tests_full_i32;
 
     registry_set(&node, &input_i32, sizeof(input_i32));
     registry_get(&node, &output);
@@ -203,7 +203,7 @@ static void tests_registry_min_values(void)
 
     /* i64 */
     const int64_t input_i64 = INT64_MIN;
-    node.location.parameter = &registry_tests_full_i64;
+    node.value.parameter.parameter = &registry_tests_full_i64;
 
     registry_set(&node, &input_i64, sizeof(input_i64));
     registry_get(&node, &output);
@@ -213,7 +213,7 @@ static void tests_registry_min_values(void)
 
     /* f32 */
     const float input_f32 = FLT_MIN;
-    node.location.parameter = &registry_tests_full_f32;
+    node.value.parameter.parameter = &registry_tests_full_f32;
 
     registry_set(&node, &input_f32, sizeof(input_f32));
     registry_get(&node, &output);
@@ -228,7 +228,7 @@ static void tests_registry_min_values(void)
 
     /* f64 */
     const double input_f64 = DBL_MIN;
-    node.location.parameter = &registry_tests_full_f64;
+    node.value.parameter.parameter = &registry_tests_full_f64;
 
     registry_set(&node, &input_f64, sizeof(input_f64));
     registry_get(&node, &output);
@@ -247,14 +247,14 @@ static void tests_registry_zero_values(void)
 
     registry_node_t node = {
         .type = REGISTRY_NODE_PARAMETER,
-        .instance = &test_full_instance_1,
+        .value.parameter.instance = &test_full_instance_1,
     };
 
     /* opaque */
     const registry_tests_full_instance_opaque_t input_opaque = {
         .value = 0,
     };
-    node.location.parameter = &registry_tests_full_opaque;
+    node.value.parameter.parameter = &registry_tests_full_opaque;
 
     registry_set(&node, &input_opaque, sizeof(input_opaque));
     registry_get(&node, &output);
@@ -265,7 +265,7 @@ static void tests_registry_zero_values(void)
 
     /* string */
     const char input_string[] = "";
-    node.location.parameter = &registry_tests_full_string;
+    node.value.parameter.parameter = &registry_tests_full_string;
 
     registry_set(&node, input_string, sizeof(input_string));
     registry_get(&node, &output);
@@ -275,7 +275,7 @@ static void tests_registry_zero_values(void)
 
     /* bool */
     const bool input_bool = 0;
-    node.location.parameter = &registry_tests_full_boolean;
+    node.value.parameter.parameter = &registry_tests_full_boolean;
 
     registry_set(&node, &input_bool, sizeof(input_bool));
     registry_get(&node, &output);
@@ -285,7 +285,7 @@ static void tests_registry_zero_values(void)
 
     /* u8 */
     const uint8_t input_u8 = 0;
-    node.location.parameter = &registry_tests_full_u8;
+    node.value.parameter.parameter = &registry_tests_full_u8;
 
     registry_set(&node, &input_u8, sizeof(input_u8));
     registry_get(&node, &output);
@@ -295,7 +295,7 @@ static void tests_registry_zero_values(void)
 
     /* u16 */
     const uint16_t input_u16 = 0;
-    node.location.parameter = &registry_tests_full_u16;
+    node.value.parameter.parameter = &registry_tests_full_u16;
 
     registry_set(&node, &input_u16, sizeof(input_u16));
     registry_get(&node, &output);
@@ -305,7 +305,7 @@ static void tests_registry_zero_values(void)
 
     /* u32 */
     const uint32_t input_u32 = 0;
-    node.location.parameter = &registry_tests_full_u32;
+    node.value.parameter.parameter = &registry_tests_full_u32;
 
     registry_set(&node, &input_u32, sizeof(input_u32));
     registry_get(&node, &output);
@@ -315,7 +315,7 @@ static void tests_registry_zero_values(void)
 
     /* u64 */
     const uint64_t input_u64 = 0;
-    node.location.parameter = &registry_tests_full_u64;
+    node.value.parameter.parameter = &registry_tests_full_u64;
 
     registry_set(&node, &input_u64, sizeof(input_u64));
     registry_get(&node, &output);
@@ -325,7 +325,7 @@ static void tests_registry_zero_values(void)
 
     /* i8 */
     const int8_t input_i8 = 0;
-    node.location.parameter = &registry_tests_full_i8;
+    node.value.parameter.parameter = &registry_tests_full_i8;
 
     registry_set(&node, &input_i8, sizeof(input_i8));
     registry_get(&node, &output);
@@ -335,7 +335,7 @@ static void tests_registry_zero_values(void)
 
     /* i16 */
     const int16_t input_i16 = 0;
-    node.location.parameter = &registry_tests_full_i16;
+    node.value.parameter.parameter = &registry_tests_full_i16;
 
     registry_set(&node, &input_i16, sizeof(input_i16));
     registry_get(&node, &output);
@@ -345,7 +345,7 @@ static void tests_registry_zero_values(void)
 
     /* i32 */
     const int32_t input_i32 = 0;
-    node.location.parameter = &registry_tests_full_i32;
+    node.value.parameter.parameter = &registry_tests_full_i32;
 
     registry_set(&node, &input_i32, sizeof(input_i32));
     registry_get(&node, &output);
@@ -355,7 +355,7 @@ static void tests_registry_zero_values(void)
 
     /* i64 */
     const int64_t input_i64 = 0;
-    node.location.parameter = &registry_tests_full_i64;
+    node.value.parameter.parameter = &registry_tests_full_i64;
 
     registry_set(&node, &input_i64, sizeof(input_i64));
     registry_get(&node, &output);
@@ -365,7 +365,7 @@ static void tests_registry_zero_values(void)
 
     /* f32 */
     const float input_f32 = 0.0;
-    node.location.parameter = &registry_tests_full_f32;
+    node.value.parameter.parameter = &registry_tests_full_f32;
 
     registry_set(&node, &input_f32, sizeof(input_f32));
     registry_get(&node, &output);
@@ -380,7 +380,7 @@ static void tests_registry_zero_values(void)
 
     /* f64 */
     const double input_f64 = 0.0;
-    node.location.parameter = &registry_tests_full_f64;
+    node.value.parameter.parameter = &registry_tests_full_f64;
 
     registry_set(&node, &input_f64, sizeof(input_f64));
     registry_get(&node, &output);
@@ -399,14 +399,14 @@ static void tests_registry_max_values(void)
 
     registry_node_t node = {
         .type = REGISTRY_NODE_PARAMETER,
-        .instance = &test_full_instance_1,
+        .value.parameter.instance = &test_full_instance_1,
     };
 
     /* opaque */
     const registry_tests_full_instance_opaque_t input_opaque = {
         .value = UINT8_MAX,
     };
-    node.location.parameter = &registry_tests_full_opaque;
+    node.value.parameter.parameter = &registry_tests_full_opaque;
 
     registry_set(&node, &input_opaque, sizeof(input_opaque));
     registry_get(&node, &output);
@@ -422,7 +422,7 @@ static void tests_registry_max_values(void)
         input_string[i] = 'a';
     }
 
-    node.location.parameter = &registry_tests_full_string;
+    node.value.parameter.parameter = &registry_tests_full_string;
 
     registry_set(&node, input_string, sizeof(input_string));
     registry_get(&node, &output);
@@ -432,7 +432,7 @@ static void tests_registry_max_values(void)
 
     /* bool */
     const bool input_bool = true;
-    node.location.parameter = &registry_tests_full_boolean;
+    node.value.parameter.parameter = &registry_tests_full_boolean;
 
     registry_set(&node, &input_bool, sizeof(input_bool));
     registry_get(&node, &output);
@@ -442,7 +442,7 @@ static void tests_registry_max_values(void)
 
     /* u8 */
     const uint8_t input_u8 = UINT8_MAX;
-    node.location.parameter = &registry_tests_full_u8;
+    node.value.parameter.parameter = &registry_tests_full_u8;
 
     registry_set(&node, &input_u8, sizeof(input_u8));
     registry_get(&node, &output);
@@ -452,7 +452,7 @@ static void tests_registry_max_values(void)
 
     /* u16 */
     const uint16_t input_u16 = UINT16_MAX;
-    node.location.parameter = &registry_tests_full_u16;
+    node.value.parameter.parameter = &registry_tests_full_u16;
 
     registry_set(&node, &input_u16, sizeof(input_u16));
     registry_get(&node, &output);
@@ -462,7 +462,7 @@ static void tests_registry_max_values(void)
 
     /* u32 */
     const uint32_t input_u32 = UINT32_MAX;
-    node.location.parameter = &registry_tests_full_u32;
+    node.value.parameter.parameter = &registry_tests_full_u32;
 
     registry_set(&node, &input_u32, sizeof(input_u32));
     registry_get(&node, &output);
@@ -472,7 +472,7 @@ static void tests_registry_max_values(void)
 
     /* u64 */
     const uint64_t input_u64 = UINT64_MAX;
-    node.location.parameter = &registry_tests_full_u64;
+    node.value.parameter.parameter = &registry_tests_full_u64;
 
     registry_set(&node, &input_u64, sizeof(input_u64));
     registry_get(&node, &output);
@@ -482,7 +482,7 @@ static void tests_registry_max_values(void)
 
     /* i8 */
     const int8_t input_i8 = INT8_MAX;
-    node.location.parameter = &registry_tests_full_i8;
+    node.value.parameter.parameter = &registry_tests_full_i8;
 
     registry_set(&node, &input_i8, sizeof(input_i8));
     registry_get(&node, &output);
@@ -492,7 +492,7 @@ static void tests_registry_max_values(void)
 
     /* i16 */
     const int16_t input_i16 = INT16_MAX;
-    node.location.parameter = &registry_tests_full_i16;
+    node.value.parameter.parameter = &registry_tests_full_i16;
 
     registry_set(&node, &input_i16, sizeof(input_i16));
     registry_get(&node, &output);
@@ -502,7 +502,7 @@ static void tests_registry_max_values(void)
 
     /* i32 */
     const int32_t input_i32 = INT32_MAX;
-    node.location.parameter = &registry_tests_full_i32;
+    node.value.parameter.parameter = &registry_tests_full_i32;
 
     registry_set(&node, &input_i32, sizeof(input_i32));
     registry_get(&node, &output);
@@ -512,7 +512,7 @@ static void tests_registry_max_values(void)
 
     /* i64 */
     const int64_t input_i64 = INT64_MAX;
-    node.location.parameter = &registry_tests_full_i64;
+    node.value.parameter.parameter = &registry_tests_full_i64;
 
     registry_set(&node, &input_i64, sizeof(input_i64));
     registry_get(&node, &output);
@@ -522,7 +522,7 @@ static void tests_registry_max_values(void)
 
     /* f32 */
     const float input_f32 = FLT_MAX;
-    node.location.parameter = &registry_tests_full_f32;
+    node.value.parameter.parameter = &registry_tests_full_f32;
 
     registry_set(&node, &input_f32, sizeof(input_f32));
     registry_get(&node, &output);
@@ -537,7 +537,7 @@ static void tests_registry_max_values(void)
 
     /* f64 */
     const double input_f64 = DBL_MAX;
-    node.location.parameter = &registry_tests_full_f64;
+    node.value.parameter.parameter = &registry_tests_full_f64;
 
     registry_set(&node, &input_f64, sizeof(input_f64));
     registry_get(&node, &output);

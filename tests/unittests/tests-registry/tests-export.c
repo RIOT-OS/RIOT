@@ -55,9 +55,9 @@ static int export_parameter_cb(const registry_node_t *node,
 {
     (void)context;
 
-    if (node->type == REGISTRY_NODE_PARAMETER && node->location.parameter != NULL &&
-        node->location.parameter->id == *(registry_parameter_id_t *)context &&
-        node->instance == &test_nested_instance_1) {
+    if (node->type == REGISTRY_NODE_PARAMETER && node->value.parameter.parameter != NULL &&
+        node->value.parameter.parameter->id == *(registry_parameter_id_t *)context &&
+        node->value.parameter.instance == &test_nested_instance_1) {
         successful = true;
     }
 
@@ -69,8 +69,8 @@ static int export_group_cb(const registry_node_t *node,
 {
     (void)context;
 
-    if (node->type == REGISTRY_NODE_GROUP && node->location.group != NULL &&
-        node->location.group->id == *(registry_group_id_t *)context) {
+    if (node->type == REGISTRY_NODE_GROUP && node->value.group.group != NULL &&
+        node->value.group.group->id == *(registry_group_id_t *)context) {
         successful = true;
     }
 
@@ -82,8 +82,7 @@ static int export_instance_cb(const registry_node_t *node,
 {
     (void)context;
 
-    if (node->type == REGISTRY_NODE_INSTANCE && node->instance != NULL &&
-        node->instance == &test_nested_instance_1) {
+    if (node->type == REGISTRY_NODE_INSTANCE && node->value.instance == &test_nested_instance_1) {
         successful = true;
     }
 
@@ -95,8 +94,8 @@ static int export_schema_cb(const registry_node_t *node,
 {
     (void)context;
 
-    if (node->type == REGISTRY_NODE_SCHEMA && node->location.schema != NULL &&
-        node->location.schema == &registry_tests_nested) {
+    if (node->type == REGISTRY_NODE_SCHEMA && node->value.schema != NULL &&
+        node->value.schema == &registry_tests_nested) {
         successful = true;
     }
 
@@ -108,8 +107,8 @@ static int export_namespace_cb(const registry_node_t *node,
 {
     (void)context;
 
-    if (node->type == REGISTRY_NODE_NAMESPACE && node->location.namespace != NULL &&
-        node->location.namespace == &registry_tests) {
+    if (node->type == REGISTRY_NODE_NAMESPACE && node->value.namespace != NULL &&
+        node->value.namespace == &registry_tests) {
         successful = true;
     }
 
@@ -137,8 +136,10 @@ static void tests_registry_export_parameter(void)
 
     const registry_node_t node = {
         .type = REGISTRY_NODE_PARAMETER,
-        .location.parameter = &registry_tests_nested_parameter,
-        .instance = &test_nested_instance_1,
+        .value.parameter = {
+            .instance = &test_nested_instance_1,
+            .parameter = &registry_tests_nested_parameter,
+        },
     };
 
     registry_export(&node, &export_parameter_cb, 0, &parameter_id);
@@ -150,8 +151,10 @@ static void tests_registry_export_group(void)
 {
     const registry_node_t node = {
         .type = REGISTRY_NODE_GROUP,
-        .location.group = &registry_tests_nested_group,
-        .instance = &test_nested_instance_1,
+        .value.group = {
+            .instance = &test_nested_instance_1,
+            .group = &registry_tests_nested_group,
+        },
     };
 
     /* check if group gets exported */
@@ -191,7 +194,7 @@ static void tests_registry_export_instance(void)
 {
     const registry_node_t node = {
         .type = REGISTRY_NODE_INSTANCE,
-        .instance = &test_nested_instance_1,
+        .value.instance = &test_nested_instance_1,
     };
 
     /* check if instance gets exported */
@@ -231,7 +234,7 @@ static void tests_registry_export_schema(void)
 {
     const registry_node_t node = {
         .type = REGISTRY_NODE_SCHEMA,
-        .location.schema = &registry_tests_nested,
+        .value.schema = &registry_tests_nested,
     };
 
     /* check if schema gets exported */
@@ -276,7 +279,7 @@ static void tests_registry_export_namespace(void)
 {
     const registry_node_t node = {
         .type = REGISTRY_NODE_NAMESPACE,
-        .location.namespace = &registry_tests,
+        .value.namespace = &registry_tests,
     };
 
     /* check if namespace gets exported */
