@@ -136,23 +136,23 @@ static int _export_cb(const registry_node_t *node, const void *context)
     /* print the path element, that is currently being exported */
     switch (node->type) {
     case REGISTRY_NODE_NAMESPACE:
-        printf("%d %s\n", node->location.namespace->id, node->location.namespace->name);
+        printf("%d %s\n", node->value.namespace->id, node->value.namespace->name);
         break;
 
     case REGISTRY_NODE_SCHEMA:
-        printf("%d %s\n", node->location.schema->id, node->location.schema->name);
+        printf("%d %s\n", node->value.schema->id, node->value.schema->name);
         break;
 
     case REGISTRY_NODE_INSTANCE:
-        printf("%d %s\n", node->instance->id, node->instance->name);
+        printf("%d %s\n", node->value.instance->id, node->value.instance->name);
         break;
 
     case REGISTRY_NODE_GROUP:
-        printf("%d %s (group)\n", node->location.group->id, node->location.group->name);
+        printf("%d %s (group)\n", node->value.group.group->id, node->value.group.group->name);
         break;
 
     case REGISTRY_NODE_PARAMETER:
-        printf("%d %s\n", node->location.parameter->id, node->location.parameter->name);
+        printf("%d %s\n", node->value.parameter.parameter->id, node->value.parameter.parameter->name);
         break;
     }
 
