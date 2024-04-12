@@ -73,15 +73,15 @@ static int save(const registry_storage_instance_t *storage,
                 const registry_value_t *value)
 {
     assert(node->type == REGISTRY_NODE_PARAMETER);
-    assert(node->location.parameter != NULL);
-    assert(node->instance != NULL);
+    assert(node->value.parameter.parameter != NULL);
+    assert(node->value.parameter.instance != NULL);
 
     (void)storage;
 
     /* Search value in storage */
     for (size_t i = 0; i < heap_storage_len; i++) {
-        if (heap_storage[i].node.instance == node->instance &&
-            heap_storage[i].node.location.parameter == node->location.parameter) {
+        if (heap_storage[i].node.value.parameter.instance == node->value.parameter.instance &&
+            heap_storage[i].node.value.parameter.parameter == node->value.parameter.parameter) {
             memcpy(heap_storage[i].buf, value->buf, value->buf_len);
             return 0;
         }
