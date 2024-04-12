@@ -8,7 +8,9 @@ BOARD ?= native
 RIOTBASE ?= $(CURDIR)/../..
 
 # required modules
+# enable board_led schema (sys/board_led) of the riot registry
 USEMODULE += registry_namespace_sys_board_led
+# enable the ztimer to turn the led on and off every second
 USEMODULE += ztimer_msec
 
 # Comment this out to disable code in RIOT that does safety checking

@@ -11,7 +11,8 @@
  * @{
  *
  * @file
- * @brief       RIOT Registry example application
+ * @brief       RIOT registry core minimal example application to demonstrate
+ *              how to use the riot registry without any of its extensions.
  *
  * @author      Lasse Rosenow <lasse.rosenow@haw-hamburg.de>
  *
@@ -30,7 +31,7 @@
 #include "registry/namespace/sys/board_led.h"
 #include "ztimer.h"
 
-int board_led_instance_0_commit_cb(const registry_commit_cb_scope_t scope,
+int board_led_instance_commit_cb(const registry_commit_cb_scope_t scope,
                                  const registry_group_or_parameter_id_t *group_or_parameter_id,
                                  const void *context);
 
@@ -41,35 +42,26 @@ registry_sys_board_led_instance_t board_led_instance_0_data = {
 
 registry_instance_t board_led_instance = {
     .data = &board_led_instance_0_data,
-    .commit_cb = &board_led_instance_0_commit_cb,
+    .commit_cb = &board_led_instance_commit_cb,
 };
 
-int board_led_instance_0_commit_cb(const registry_commit_cb_scope_t scope,
+/* this callback is usually implemented drivers such as an RGB LED driver */
+int board_led_instance_commit_cb(const registry_commit_cb_scope_t scope,
                                  const registry_group_or_parameter_id_t *group_or_parameter_id,
                                  const void *context)
 {
     (void)scope;
     (void)context;
 
-    if (group_or_parameter_id != NULL) {
-        if (*group_or_parameter_id == REGISTRY_SYS_BOARD_LED_ENABLED) {
-            /* The Driver owns the board_led data instance, so we can just get our value from there */
-            bool led_state = board_led_instance_0_data.enabled;
-
-            /* Turn the LED on or off depending on the led_state */
-            if (led_state == true) {
-                /* This is the commit_cb function of instance 0, so we toggle LED 0 as well */
-                LED_ON(0);
-            } else {
-                LED_OFF(0);
-            }
-        }
-    }
-    else {
-        /* The whole instance got committed in one go, so apply all parameters (BOARD_LED has only one anyways)*/
-
+    /* Either commit all parameters of the instance or only the given parameter.
+     * For a single LED there is no difference as it only has one parameter. */
+    if ((group_or_parameter_id == NULL) ||
+        (*group_or_parameter_id == REGISTRY_SYS_BOARD_LED_ENABLED)) {
+        /* The Driver owns the board_led data instance, so we can just get our value from there */
         bool led_state = board_led_instance_0_data.enabled;
+        /* Turn the LED on or off depending on the led_state */
         if (led_state == true) {
+            /* This is the commit_cb function of instance 0, so we toggle LED 0 as well */
             LED_ON(0);
         } else {
             LED_OFF(0);
@@ -103,7 +95,7 @@ int main(void)
         /* Set new registry value */
         registry_set(&parameter_node, &board_led_enabled, sizeof(board_led_enabled));
 
-        /* Apply the registry value to change the LED state (calls the commit_cb function implemented by the BOARD for example)*/
+        /* Apply the registry value to change the LED state (in this case calls the commit_cb function: "board_led_instance_commit_cb")*/
         registry_commit(&parameter_node);
 
         /* Sleep for 1 second and then do it again*/
