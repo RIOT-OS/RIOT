@@ -279,8 +279,8 @@ static int save(const registry_storage_instance_t *storage,
                 const registry_value_t *value)
 {
     assert(node->type == REGISTRY_NODE_PARAMETER);
-    assert(node->location.parameter != NULL);
-    assert(node->instance != NULL);
+    assert(node->value.parameter.parameter != NULL);
+    assert(node->value.parameter.instance != NULL);
     
     vfs_mount_t *mount = storage->data;
 
