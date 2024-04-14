@@ -326,7 +326,7 @@ bool timer_poll_channel(tim_t dev, int channel);
 #endif
 
 #if defined(MODULE_PERIPH_TIMER_POLL)
-#include "timer_arch.h"
+#include "timer_arch.h" /* IWYU pragma: export */
 #endif
 
 #ifdef __cplusplus

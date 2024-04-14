@@ -129,7 +129,7 @@
 #include "thread_flags.h"
 #endif
 
-#include "thread_arch.h"
+#include "thread_arch.h" /* IWYU pragma: export */
 
 #ifdef __cplusplus
 extern "C" {

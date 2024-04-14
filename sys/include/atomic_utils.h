@@ -142,7 +142,7 @@
 #include "macros/utils.h"
 #include "sched.h"
 
-#include "atomic_utils_arch.h"
+#include "atomic_utils_arch.h" /* IWYU pragma: export */
 
 #ifdef __cplusplus
 extern "C" {

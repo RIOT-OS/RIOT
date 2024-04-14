@@ -28,7 +28,7 @@
 #include <inttypes.h>
 #include <limits.h>
 
-#include "architecture_arch.h"
+#include "architecture_arch.h" /* IWYU pragma: export */
 
 #ifdef __cplusplus
 extern "C" {

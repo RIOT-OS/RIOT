@@ -866,7 +866,7 @@ static inline void gpio_ll_switch_dir_input(gpio_port_t port, uword_t inputs)
 
 /* the hardware specific implementation relies on the types such as gpio_port_t
  * to be provided */
-#include "gpio_ll_arch.h"
+#include "gpio_ll_arch.h" /* IWYU pragma: export */
 
 #endif /* PERIPH_GPIO_LL_H */
 /** @} */
