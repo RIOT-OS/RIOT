@@ -188,6 +188,10 @@ uint32_t timer_query_freqs(tim_t dev, uword_t index)
     assume((clock_source == TIMER_CLOCK_SOURCE_AUXILIARY_CLOCK) ||
            (clock_source == TIMER_CLOCK_SOURCE_SUBMAIN_CLOCK));
 
+    if (index > TXID_DIV_MAX) {
+        return 0;
+    }
+
     uint32_t clock_freq;
     switch (clock_source) {
     default:
