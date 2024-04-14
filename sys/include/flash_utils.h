@@ -54,7 +54,7 @@
 #include "kernel_defines.h"
 
 #if IS_ACTIVE(HAS_FLASH_UTILS_ARCH)
-#include "flash_utils_arch.h"
+#include "flash_utils_arch.h" /* IWYU pragma: export */
 #endif
 
 #ifdef __cplusplus
