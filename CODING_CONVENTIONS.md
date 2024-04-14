@@ -189,7 +189,7 @@ common helpers and implementations, but a per platform `foo_arch.h` is included
 from within `foo.h` for platform specific implementations. If in this scenario
 only functions provided by `foo_arch.h` are included, the `#include` of `foo.h`
 is considered as unused. To avoid this, one should add
-`/* IWYU pragma: export */` after `#include "foo_arch.h"` in `foo.h`.
+[`/* IWYU pragma: export */`](https://github.com/include-what-you-use/include-what-you-use/blob/master/docs/IWYUPragmas.md) after `#include "foo_arch.h"` in `foo.h`.
 
 [clangd-include-cleaner]: https://clangd.llvm.org/design/include-cleaner
 
