@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Freie Universität Berlin
+ *               2024 Marian Buschsieweke
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  * @brief       Low-level UART driver implementation
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Marian Buschsieweke <marian.buschsieweke@posteo.net>
  *
  * @}
  */
@@ -128,6 +130,11 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     while (len--) {
         while (!(*usci->interrupt_flag & usci->tx_irq_mask)) { }
         usci->dev->TXBUF = *data++;
+    }
+
+    while (usci->dev->STAT & UCBUSY) {
+        /* busy wait for completion, e.g. to avoid losing chars/bits
+         * before releasing the USCI in TX only mode. */
     }
 
     if (tx_only) {
