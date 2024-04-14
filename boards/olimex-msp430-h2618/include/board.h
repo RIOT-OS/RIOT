@@ -22,6 +22,7 @@
 #define BOARD_H
 
 #include "cpu.h"
+#include "macros/units.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,11 +36,12 @@ extern "C" {
 #endif
 
 /**
- * @name    Xtimer configuration
+ * @name    ztimer configuration
  * @{
  */
-#define XTIMER_WIDTH                (16)
-#define XTIMER_BACKOFF              (40)
+#define CONFIG_ZTIMER_USEC_WIDTH        16      /**< running on a 16-bit timer */
+#define CONFIG_ZTIMER_USEC_BASE_FREQ    MHZ(2)  /**< Cannot divide 16 MHz clock
+                                                     to 1 MHz, go for 2 MHz instead */
 /** @} */
 
 #ifdef __cplusplus
