@@ -437,6 +437,7 @@ typedef struct {
  * @{
 */
 #define IC_DATA_CMD_CMD 0x08
+#define IC_DATA_CMD_STOP 0x10
 /** @} */
 
 /**

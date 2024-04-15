@@ -35,6 +35,7 @@
 #define _I2C 3 //gpio pin function
 #define _GPIO 0 //gpio pin function
 #define SOC_I2C_FIFO_LEN 8
+#define MAX_T_POLL_COUNT 1000
 
 /* select i2c base */
 long I2C_BASE = 0x40044000;
@@ -234,10 +235,7 @@ int i2c_read_regs(i2c_t dev, uint16_t addr, uint16_t reg,
                   void *data, size_t len, uint8_t flags)
 {
     //check validity of args
-    if(len < 1){
-        return EINVAL;
-    }
-    if(data == NULL){
+    if(len < 1 || data == NULL){
         return EINVAL;
     }
     //read regs, len bytes
@@ -248,10 +246,18 @@ int i2c_read_regs(i2c_t dev, uint16_t addr, uint16_t reg,
         //or this sends read cmd ? sets IC_DATA_CMD-CMD to 1 which is read
         *(baseaddr + IC_DATA_CMD) = _i2c_bus[dev].cmd;
         uint8_t* dataAddr = (uint8_t *) data;
+        /* set specified target dataAddr to that which occupies the data bits of 
+           IC_DATA_CMD */
         dataAddr[i] = *(baseaddr + IC_DATA_CMD) & 0xFF;
+
+        //send stop bit
+        if(i == len-1){
+            *(baseaddr + IC_DATA_CMD) = 0xFF & IC_DATA_CMD_STOP;
+        }
     }
     uint8_t* dataAddr2 = (uint8_t *) data;
     dataAddr2[0] = 0xFF;
+
 
     //
     //throwaway code
@@ -271,6 +277,30 @@ int i2c_read_reg(i2c_t dev, uint16_t addr, uint16_t reg,
                  void *data, uint8_t flags)
 {   
     //read reg
+    //check validity of args
+    if(data == NULL){
+        return EINVAL;
+    }
+    //create timer for timeout, 10* highest transfer speed
+    uint16_t timeoutTime = 10*MHZ(1);
+    uint16_t POLL_COUNT = 0;
+
+
+    //read regs, len bytes
+    long* baseaddr = (long *) I2C_BASE;
+    _i2c_bus[dev].len = 8; //?
+    _i2c_bus[dev].cmd = 1; // send read cmd ?
+    //or this sends read cmd ? sets IC_DATA_CMD-CMD to 1 which is read
+    *(baseaddr + IC_DATA_CMD) = _i2c_bus[dev].cmd;
+
+    //actually do the read
+    uint8_t* dataAddr = (uint8_t *) data;
+    dataAddr = *(baseaddr + IC_DATA_CMD) & 0xF;
+
+    //send stop bit
+    *(baseaddr + IC_DATA_CMD) = 0xFF & IC_DATA_CMD_STOP;
+    uint8_t* dataAddr2 = (uint8_t *) data;
+    dataAddr2[0] = 0xFF;
 
     //throwaway code
     i2c_t device = dev;
@@ -320,6 +350,15 @@ int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
 int i2c_write_reg(i2c_t dev, uint16_t addr, uint16_t reg,
                   uint8_t data, uint8_t flags)
 {
+    //write reg lol idk what im doing
+    long* baseaddr = (long *) I2C_BASE;
+    _i2c_bus[dev].len = 8; //?
+    _i2c_bus[dev].cmd = 0; // send rwrite cmd ?
+    *(baseaddr + IC_DATA_CMD) = _i2c_bus[dev].cmd;
+    uint8_t* regAddr = (uint8_t *) reg;
+    *regAddr = data;
+
+
     i2c_t device = dev;
     device += 1;
     uint16_t address = addr;

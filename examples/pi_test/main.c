@@ -9,12 +9,18 @@
 #include "board.h"
 #include "periph/i2c.h"
 #include "vcnl40x0.h"
+#include "test_driver/test_driver.h"
 //#include "xtimer.h"
 
 const int PIN = 9;
 
+int useTestDevice(void);
+
 int main(void)
 {
+    if(1){
+        return useTestDevice();
+    }
     //blink if read bytes non-zero
     const vcnl40x0_params_t initParams = {1, 0, 0, 0, 0, 0};
     vcnl40x0_t dev = {initParams};
@@ -23,11 +29,11 @@ int main(void)
     if(status == 0){
         printf("Successfully initalised vcnl40x0 !");
         gpio_init(PIN, GPIO_OUT);
-        gpio_set(PIN);
+        //gpio_set(PIN);
         uint16_t readresp = vcnl40x0_read_ambient_light(&dev);
-        //if (readresp > 0){
-        //    gpio_set(PIN);
-        //}
+        if (readresp == 0){
+            gpio_set(PIN);
+        }
         // blink loop for testing light
         /*for(int j = 0; j < 1000; j++){
             for(long unsigned int i = 0; i < 100 * MHZ(1); i++){
@@ -58,4 +64,16 @@ int main(void)
         gpio_init(13, GPIO_OUT);
         gpio_set(13);
     }
+}
+
+int useTestDevice(void){
+    gpio_init(PIN-1, GPIO_OUT);
+    gpio_set(PIN-1);
+    test_dev_t device = {2,0};
+    int result = test_driver_read_value(&device);
+    if(result == test_driver_reading){
+        gpio_init(PIN, GPIO_OUT);
+        gpio_set(PIN);
+    }
+    return 0;
 }
