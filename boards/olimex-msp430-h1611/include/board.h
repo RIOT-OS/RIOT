@@ -36,6 +36,26 @@ extern "C" {
 #endif
 
 /**
+ * @name    ztimer configuration
+ * @{
+ */
+#define CONFIG_ZTIMER_USEC_WIDTH        16      /**< running on a 16-bit timer */
+/**
+ * @brief   Configure clock to 1 MHz.
+ */
+#define CONFIG_ZTIMER_USEC_BASE_FREQ    MHZ(1)
+/**
+ * @brief   Force frequency conversion to be used
+ *
+ * Otherwise ztimer would assume that it can run the 1 MHz clock from the timer
+ * configured at 1 MHz without conversion. But the actual frequency the timer
+ * will run at will be detected at runtime and, due to inaccuracy of the
+ * internal oscillator, will indeed require frequency conversion.
+ */
+#define CONFIG_ZTIMER_PERIPH_TIMER_FORCE_CONVERSION     1
+/** @} */
+
+/**
  * @name    Xtimer configuration
  * @{
  */
