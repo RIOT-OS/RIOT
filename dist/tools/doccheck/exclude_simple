@@ -1,4 +1,3 @@
-warning: end of file with unbalanced grouping commands
 warning: explicit link request to 'esp32_application_specific_board_configuration' could not be resolved
 warning: explicit link request to 'esp32_application_specific_configurations' could not be resolved
 warning: explicit link request to 'esp32_heltec_lora32_v2_optional_hardware' could not be resolved
