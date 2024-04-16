@@ -462,6 +462,7 @@ static int _readdir(vfs_DIR *dirp, vfs_dirent_t *entry)
     }
 
     strncpy(entry->d_name, (char *)dirent->name, sizeof(entry->d_name));
+    entry->d_name[sizeof(entry->d_name) - 1] = '\0';
 
     return 1;
 }
