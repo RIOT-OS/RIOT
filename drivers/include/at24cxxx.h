@@ -11,6 +11,51 @@
  * @ingroup     drivers_misc
  * @brief       Device driver interface for the AT24CXXX EEPROM units
  *
+ * @section overview Overview
+ * Various manufacturers such as Atmel/Microchip or ST offer small I2C EEPROMs which usually
+ * come in 8-pin packages and are used for persistent data storage of settings, counters, etc.
+ * This driver adds support for these devices with direct read and write functions.
+ *
+ * The high level wrapper for RIOTs MTD interface to utilize the I2C EEPROMs as MTD storage
+ * is described in drivers_mtd_at24cxxx.
+ *
+ * A list of supported devices can be found in the at24cxxx_defines.h file.
+ *
+ * @section usage Usage
+ *
+ * The preconfigured devices in the at24cxxx_defines.h file devices are easily
+ * accessible as pseudomodules and can be added to the Makefile of your project:
+ *
+ *      USEMODULE += at24c02
+ *
+ * When using one of the pseudomodules, the configuration of the device is already
+ * predefined in the AT24CXXX_PARAMS macro and can be used for the
+ * initialization:
+ *
+ *      at24cxxx_t eeprom_dev;
+ *      at24cxxx_params_t eeprom_params = AT24CXXX_PARAMS;
+ *
+ *      at24cxxx_init(&eeprom_dev, &eeprom_params);
+ *
+ * \n
+ * For other devices that are not yet part of the library, the generic module
+ * has to be added:
+ *
+ *      USEMODULE += at24cxxx
+ *
+ * The predefined macro can not be used in this case, so the parameters of the
+ * device have to be added to the at24cxxx_params_t structure manually with
+ * the values from the corresponding datasheet:
+ *
+ *      at24cxxx_t eeprom_dev;
+ *      at24cxxx_params_t eeprom_params = {
+ *          .i2c = I2C_DEV(0), \
+ *          ...
+ *      };
+ *
+ *      at24cxxx_init(&eeprom_dev, &eeprom_params);
+ *
+ *
  * @{
  *
  * @file

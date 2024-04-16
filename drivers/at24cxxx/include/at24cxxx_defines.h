@@ -11,7 +11,12 @@
  * @{
  *
  * @file
- * @brief       Constants for AT24CXXX EEPROM devices.
+ * @brief       Constants for various I2C EEPROM devices.
+ *
+ * All the devices listed below are accessible as pseudomodules.
+ *
+ * @note Even though the library is called "AT24CXXX", the support for
+ * I2C EEPROMs is not limited to Atmel/Microchip devices.
  *
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
