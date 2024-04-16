@@ -111,7 +111,7 @@ static int prepare(lwext4_desc_t *fs, const char *mount_point)
     memset(&fs->bdev, 0, sizeof(fs->bdev));
     memset(&fs->iface, 0, sizeof(fs->iface));
 
-    strncpy(fs->mp.name, mount_point, CONFIG_EXT4_MAX_MP_NAME);
+    strncpy(fs->mp.name, mount_point, CONFIG_EXT4_MAX_MP_NAME - 1);
     strcat(fs->mp.name, "/");
 
     int res = mtd_init(dev);
