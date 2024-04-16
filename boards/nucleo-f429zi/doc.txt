@@ -23,11 +23,13 @@ STM32F429ZI microcontroller with 256KiB of RAM and 2MiB of Flash.
 | Frequency    | up to 180 MHz       |
 | FPU          | yes                 |
 | Ethernet     | 10/100 Mbps         |
-| Timers       | 17                  |
+| Timers       | 17 (2x watchdog, 1 SysTick, 2x 32bit, 12x 16bit) |
+| ADCs         | 3x 12 bit (up to 24 channels) |
 | UARTs        | 4                   |
-| I2cs         | 3                   |
+| I2Cs         | 3                   |
 | SPIs         | 6                   |
 | CAN          | 2                   |
+| RTC          | 1                   |
 | Datasheet    | [Datasheet](https://www.st.com/resource/en/datasheet/stm32f429zi.pdf)|
 | Reference Manual | [Reference Manual](https://www.st.com/resource/en/reference_manual/rm0090-stm32f405415-stm32f407417-stm32f427437-and-stm32f429439-advanced-armbased-32bit-mcus-stmicroelectronics.pdf)|
 | Programming Manual | [Programming Manual](https://www.st.com/resource/en/programming_manual/pm0214-stm32-cortexm4-mcus-and-mpus-programming-manual-stmicroelectronics.pdf)|
