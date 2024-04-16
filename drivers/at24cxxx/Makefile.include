@@ -1,5 +1,7 @@
 PSEUDOMODULES += at24c%
 PSEUDOMODULES += mtd_at24cxxx
+PSEUDOMODULES += m24c%
+
 # handle at24cxxx being a distinct module
 NO_PSEUDOMODULES += at24cxxx
 

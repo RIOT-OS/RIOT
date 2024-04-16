@@ -104,6 +104,10 @@ ifneq (,$(filter ltc4150_%,$(USEMODULE)))
   USEMODULE += ltc4150
 endif
 
+ifneq (,$(filter m24c%,$(USEMODULE)))
+  USEMODULE += at24cxxx
+endif
+
 ifneq (,$(filter mhz19_%,$(USEMODULE)))
   USEMODULE += mhz19
 endif

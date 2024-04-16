@@ -368,6 +368,29 @@ extern "C" {
 /** @} */
 
 /**
+ * @name M24C01 constants
+ * @{
+ */
+/**
+ * @brief   128 byte memory
+ */
+#define M24C01_EEPROM_SIZE              (128U)
+/**
+ * @brief   16 pages of 16 bytes each
+ */
+#define M24C01_PAGE_SIZE                (16U)
+/**
+ * @brief   Delay to complete write operation
+ */
+#define M24C01_PAGE_WRITE_DELAY_US      (5000U)
+/**
+ * @brief   Number of poll attempts
+ */
+#define M24C01_MAX_POLLS                (1 + (M24C01_PAGE_WRITE_DELAY_US \
+                                         / AT24CXXX_POLL_DELAY_US))
+/** @} */
+
+/**
  * @name Set constants depending on module
  * @{
  */
@@ -427,6 +450,10 @@ extern "C" {
 #define AT24CXXX_EEPROM_SIZE            (AT24MAC_EEPROM_SIZE)
 #define AT24CXXX_PAGE_SIZE              (AT24MAC_PAGE_SIZE)
 #define AT24CXXX_MAX_POLLS              (AT24MAC_MAX_POLLS)
+#elif IS_USED(MODULE_M24C01)
+#define AT24CXXX_EEPROM_SIZE            (M24C01_EEPROM_SIZE)
+#define AT24CXXX_PAGE_SIZE              (M24C01_PAGE_SIZE)
+#define AT24CXXX_MAX_POLLS              (M24C01_MAX_POLLS)
 #else /* minimal */
 #define AT24CXXX_EEPROM_SIZE            (128U)  /**< EEPROM size */
 #define AT24CXXX_PAGE_SIZE              (4U)    /**< page size */
