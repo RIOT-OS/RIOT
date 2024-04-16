@@ -91,29 +91,30 @@ typedef enum {
 } gpio_flank_t;
 /** @} */
 #endif /* ndef DOXYGEN */
-/** @} */
 
 /**
  * @name   Predefined GPIO names
  * @{
  */
-#define GPIO0       (GPIO_PIN(PORT_GPIO,0))
-#define GPIO1       (GPIO_PIN(PORT_GPIO,1))
-#define GPIO2       (GPIO_PIN(PORT_GPIO,2))
-#define GPIO3       (GPIO_PIN(PORT_GPIO,3))
-#define GPIO4       (GPIO_PIN(PORT_GPIO,4))
-#define GPIO5       (GPIO_PIN(PORT_GPIO,5))
-#define GPIO6       (GPIO_PIN(PORT_GPIO,6))
-#define GPIO7       (GPIO_PIN(PORT_GPIO,7))
-#define GPIO8       (GPIO_PIN(PORT_GPIO,8))
-#define GPIO9       (GPIO_PIN(PORT_GPIO,9))
-#define GPIO10      (GPIO_PIN(PORT_GPIO,10))
-#define GPIO11      (GPIO_PIN(PORT_GPIO,11))
-#define GPIO12      (GPIO_PIN(PORT_GPIO,12))
-#define GPIO13      (GPIO_PIN(PORT_GPIO,13))
-#define GPIO14      (GPIO_PIN(PORT_GPIO,14))
-#define GPIO15      (GPIO_PIN(PORT_GPIO,15))
-#define GPIO16      (GPIO_PIN(PORT_GPIO,16))
+#define GPIO0       (GPIO_PIN(PORT_GPIO, 0))
+#define GPIO1       (GPIO_PIN(PORT_GPIO, 1))
+#define GPIO2       (GPIO_PIN(PORT_GPIO, 2))
+#define GPIO3       (GPIO_PIN(PORT_GPIO, 3))
+#define GPIO4       (GPIO_PIN(PORT_GPIO, 4))
+#define GPIO5       (GPIO_PIN(PORT_GPIO, 5))
+#define GPIO6       (GPIO_PIN(PORT_GPIO, 6))
+#define GPIO7       (GPIO_PIN(PORT_GPIO, 7))
+#define GPIO8       (GPIO_PIN(PORT_GPIO, 8))
+#define GPIO9       (GPIO_PIN(PORT_GPIO, 9))
+#define GPIO10      (GPIO_PIN(PORT_GPIO, 10))
+#define GPIO11      (GPIO_PIN(PORT_GPIO, 11))
+#define GPIO12      (GPIO_PIN(PORT_GPIO, 12))
+#define GPIO13      (GPIO_PIN(PORT_GPIO, 13))
+#define GPIO14      (GPIO_PIN(PORT_GPIO, 14))
+#define GPIO15      (GPIO_PIN(PORT_GPIO, 15))
+#define GPIO16      (GPIO_PIN(PORT_GPIO, 16))
+/** @} */
+
 /** @} */
 
 /**
@@ -297,6 +298,8 @@ typedef struct {
 #define PERIPH_SPI_NEEDS_TRANSFER_BYTE  /**< requires function spi_transfer_byte */
 #define PERIPH_SPI_NEEDS_TRANSFER_REG   /**< requires function spi_transfer_reg */
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS  /**< requires function spi_transfer_regs */
+/** @} */
+
 /** @} */
 
 /**
