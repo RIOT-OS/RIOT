@@ -1503,6 +1503,10 @@ psa_status_t psa_copy_key(psa_key_id_t source_key,
  *          If a key is currently in use in a multi-part operation, then destroying the key will
  *          cause the multi-part operation to fail.
  *
+ * @warning This implementation uses a virtual file system for storing and reading persistent keys
+ *          to and from flash. Destroying a key only unlinks the file and does not erase the actual
+ *          key data from flash. Anyone with hardware access can still recover the key material.
+ *
  * @param   key Identifier of the key to erase. If this is @ref PSA_KEY_ID_NULL, do nothing and
  *              return @ref PSA_SUCCESS.
  *
