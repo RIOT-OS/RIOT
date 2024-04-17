@@ -343,4 +343,8 @@ void saul_init_devs(void)
         extern void auto_init_servo(void);
         auto_init_servo();
     }
+    if (IS_USED(MODULE_WS281X)) {
+        extern void auto_init_ws281x(void);
+        auto_init_ws281x();
+    }
 }

@@ -37,3 +37,6 @@ endif
 ifneq (,$(filter ws281x_timer_gpio_ll,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio_ll periph_timer periph_timer_poll
 endif
+
+# It would seem xtimer is always required as it is used in the header...
+USEMODULE += xtimer

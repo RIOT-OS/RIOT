@@ -97,6 +97,9 @@ extern "C" {
 #ifndef WS281X_PARAM_PIN
 #define WS281X_PARAM_PIN    GPIO_PIN(0, 16) /**< GPIO pin connected to the data pin of the first LED */
 #endif
+#ifndef WS281X_PARAM_NUMOF
+#define WS281X_PARAM_NUMOF  (1U)      /**< Number of LEDs chained */
+#endif
 /** @} */
 
 #ifdef __cplusplus
