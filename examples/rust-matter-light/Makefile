@@ -20,13 +20,16 @@ QUIET ?= 1
 # - Packet Buffers: 24 kB
 # - UDP Buffers: 3 kB
 CFLAGS += '-DTHREAD_STACKSIZE_MAIN=(THREAD_STACKSIZE_DEFAULT + 50000)'
-#CFLAGS += '-DISR_STACKSIZE=(THREAD_STACKSIZE_DEFAULT + 20000)'
+CFLAGS += '-DISR_STACKSIZE=2048'
+CFLAGS += '-DGNRC_NETIF_MSG_QUEUE_SIZE=16'
+CFLAGS += '-DCONFIG_GNRC_SOCK_MBOX_SIZE_EXP=8'
 
 # The name of crate (as per Cargo.toml package name, but with '-' replaced with '_')
 APPLICATION_RUST_MODULE = rust_matter_light
 BASELIBS += $(APPLICATION_RUST_MODULE).module
 
 FEATURES_REQUIRED += rust_target
+FEATURES_REQUIRED += periph_rtc
 
 # Comment this line in to activate storing & loading runtime configurations
 # NOTE: To use this feature, a PersistenceManager (in 'src/persist.rs') must be implemented for the target platform
@@ -41,6 +44,7 @@ USEMODULE += ztimer
 USEMODULE += ztimer_msec
 USEMODULE += ztimer_usec
 USEMODULE += ps
+USEMODULE += random
 
 # networking
 USEMODULE += netdev_default

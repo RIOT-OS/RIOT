@@ -17,6 +17,7 @@ mod logging;
 // TODO: Enable attribute or feature to be able to run integration tests inside this module under RIOT OS
 #[allow(unused)]
 mod tests;
+mod utils;
 
 // internal modules imports
 use network::UdpSocketWrapper;
@@ -226,7 +227,7 @@ fn run_matter() -> Result<(), ()> {
     let dev_att: &'static HardCodedDevAtt = DEV_ATT.init(HardCodedDevAtt::new());
 
     // TODO: Provide own epoch and rand functions
-    let epoch = rs_matter::utils::epoch::riot_epoch;
+    let epoch = utils::get_epoch;
     let rand = rs_matter::utils::rand::riot_rand;
 
     let matter: &'static Matter = MATTER.init(Matter::new(
