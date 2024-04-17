@@ -75,7 +75,7 @@ uint32_t periph_timer_clk(bus_t bus)
     return periph_apb_clk(bus) * apbmul[bus];
 }
 
-void periph_clk_en2(const periph_t *periph)
+void periph_clk_en2(const periph_base_t *periph)
 {
     assert(periph);
 
@@ -87,7 +87,7 @@ void periph_clk_en2(const periph_t *periph)
     __DSB();
 }
 
-void periph_clk_dis2(const periph_t *periph)
+void periph_clk_dis2(const periph_base_t *periph)
 {
     assert(periph);
 

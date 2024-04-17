@@ -108,23 +108,23 @@ static const pwm_conf_t pwm_config[] = {
  */
 static const timer_conf_t timer_config[] = {
     {
+        .base     = periph_timer2,
         .dev = TIM2,
         .max = 0x0000ffff,
-        .rcc_mask = RCC_APB1ENR_TIM2EN,
         .bus = APB1,
         .irqn = TIM2_IRQn
     },
     {
+        .base     = periph_timer3,
         .dev = TIM3,
         .max = 0x0000ffff,
-        .rcc_mask = RCC_APB1ENR_TIM3EN,
         .bus = APB1,
         .irqn = TIM3_IRQn
     },
     {
+        .base     = periph_timer4,
         .dev = TIM4,
         .max = 0x0000ffff,
-        .rcc_mask = RCC_APB1ENR_TIM4EN,
         .bus = APB1,
         .irqn = TIM4_IRQn
     }

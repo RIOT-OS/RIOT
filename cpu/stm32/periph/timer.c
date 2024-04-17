@@ -114,7 +114,7 @@ int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
     isr_ctx[tim].arg = arg;
 
     /* enable the peripheral clock */
-    periph_clk_en2(timer_config[tim].rcc_dev);
+    periph_clk_en2(&timer_config[tim].base);
 
     /* configure the timer as upcounter in continuous mode */
     dev(tim)->CR1  = 0;

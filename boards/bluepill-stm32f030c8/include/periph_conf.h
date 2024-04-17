@@ -43,16 +43,16 @@ extern "C" {
  */
 static const timer_conf_t timer_config[] = {
     {
+        .base     = periph_timer1,
         .dev      = TIM1,
         .max      = 0x0000ffff,
-        .rcc_mask = RCC_APB2ENR_TIM1EN,
         .bus      = APB2,
         .irqn     = TIM1_CC_IRQn
     },
     {
+        .base     = periph_timer3,
         .dev      = TIM3,
         .max      = 0x0000ffff,
-        .rcc_mask = RCC_APB1ENR_TIM3EN,
         .bus      = APB1,
         .irqn     = TIM3_IRQn
     },

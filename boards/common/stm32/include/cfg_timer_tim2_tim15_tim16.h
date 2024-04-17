@@ -34,24 +34,24 @@ extern "C" {
  */
 static const timer_conf_t timer_config[] = {
     {
+        .base           = periph_timer2,
         .dev            = TIM2,
         .max            = 0xffffffff,
-        .rcc_dev        = &periph_timer2,
         .bus            = APB1,
         .irqn           = TIM2_IRQn
     },
     {
+        .base           = periph_timer15,
         .dev            = TIM15,
         .max            = 0x0000ffff,
-        .rcc_mask       = RCC_APB2ENR_TIM15EN,
         .bus            = APB2,
         .irqn           = TIM1_BRK_TIM15_IRQn,
         .channel_numof  = 2,
     },
     {
+        .base           = periph_timer16,
         .dev            = TIM16,
         .max            = 0x0000ffff,
-        .rcc_mask       = RCC_APB2ENR_TIM16EN,
         .bus            = APB2,
         .irqn           = TIM1_UP_TIM16_IRQn,
         .channel_numof  = 1,

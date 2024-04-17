@@ -48,9 +48,9 @@ static const dac_conf_t dac_config[] = {
  */
 static const timer_conf_t timer_config[] = {
     {
+        .base     = periph_timer2,
         .dev      = TIM2,
         .max      = 0xffffffff,
-        .rcc_mask = RCC_APB1ENR_TIM2EN,
         .bus      = APB1,
         .irqn     = TIM2_IRQn
     }

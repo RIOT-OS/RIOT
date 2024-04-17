@@ -31,8 +31,8 @@ extern "C" {
  */
 static const timer_conf_t timer_config[] = {
     {
+        .base     = periph_timer2,
         .dev      = TIM2,
-        .rcc_dev  = &periph_timer2,
 #if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
         .max      = 0x0000ffff,
 #else

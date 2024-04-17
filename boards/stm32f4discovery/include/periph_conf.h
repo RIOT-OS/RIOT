@@ -58,16 +58,16 @@ static const dma_conf_t dma_config[] = {
  */
 static const timer_conf_t timer_config[] = {
     {
+        .base     = periph_timer2,
         .dev      = TIM2,
         .max      = 0xffffffff,
-        .rcc_mask = RCC_APB1ENR_TIM2EN,
         .bus      = APB1,
         .irqn     = TIM2_IRQn
     },
     {
+        .base     = periph_timer5,
         .dev      = TIM5,
         .max      = 0xffffffff,
-        .rcc_mask = RCC_APB1ENR_TIM5EN,
         .bus      = APB1,
         .irqn     = TIM5_IRQn
     }
