@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Default configuration for AT24CXXX
+ * @brief       Default configuration for the AT24CXXX driver
  *
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
