@@ -60,6 +60,33 @@ done:
     return CRYS_to_psa_error(ret);
 }
 
+psa_status_t psa_derive_ecc_ed25519_public_key( const uint8_t *priv_key_buffer, uint8_t *pub_key_buffer,
+                                                size_t priv_key_buffer_length,
+                                                size_t *pub_key_buffer_length)
+{
+    CRYS_ECEDW_TempBuff_t tmp;
+    CRYSError_t ret;
+
+    /* contains seed (private key), concatenated with public key */
+    uint8_t secret_key[CRYS_ECEDW_ORD_SIZE_IN_BYTES + CRYS_ECEDW_MOD_SIZE_IN_BYTES] = { 0x0 };
+    size_t secret_key_size = sizeof(secret_key);
+
+    *pub_key_buffer_length = CRYS_ECEDW_MOD_SIZE_IN_BYTES;
+
+    cryptocell_310_enable();
+    ret = CRYS_ECEDW_SeedKeyPair(priv_key_buffer, priv_key_buffer_length, secret_key, &secret_key_size,
+                                            pub_key_buffer, pub_key_buffer_length, &tmp);
+    cryptocell_310_disable();
+    if (ret != CRYS_OK) {
+        DEBUG("CRYS_ECEDW_SeedKeyPair failed with %s\n", cryptocell310_status_to_humanly_readable(ret));
+        goto done;
+    }
+
+done:
+    explicit_bzero(&secret_key, sizeof(secret_key));
+    return CRYS_to_psa_error(ret);
+}
+
 psa_status_t psa_ecc_ed25519_sign_message(const uint8_t *priv_key_buffer,
                                         size_t priv_key_buffer_size,
                                         const uint8_t *pub_key_buffer,
