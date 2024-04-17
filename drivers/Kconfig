@@ -56,7 +56,6 @@ endmenu # Sensor Device Drivers
 
 menu "Storage Device Drivers"
 rsource "mtd_sdcard/Kconfig"
-rsource "mtd_spi_nor/Kconfig"
 endmenu # Storage Device Drivers
 
 endmenu # Drivers

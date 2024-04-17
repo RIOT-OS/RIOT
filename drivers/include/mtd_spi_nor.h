@@ -12,8 +12,33 @@
  * @ingroup     drivers_storage
  * @brief       Driver for serial NOR flash memory technology devices attached via SPI
  *
- * @{
  *
+ * @section mtd_spi_nor_overview Overview
+ * Various manufacturers such as ISSI or Macronix offer small SPI NOR Flash which usually
+ * come in 8-pin packages and are used for persistent data storage.
+ * This driver adds support for these devices with support for RIOT's MTD subsystem.
+ *
+ * @section mtd_spi_nor_usage Usage
+ *
+ * The basic functions of all flash devices can be used by just including the
+ * mtd_spi_nor module.
+ *
+ *      USEMODULE += mtd_spi_nor
+ *
+ * For ISSI and Macronix devices, some security features are provided
+ * to check if program or erase operations were successful.
+ * These features can be activated with the corresponding pseudomodules in the Makefile
+ * of your board or project:
+ *
+ *      USEMODULE += mtd_spi_nor_mx_security
+ *      or
+ *      USEMODULE += mtd_spi_nor_issi_security
+ *
+ * \n
+ * Some examples of how to work with the MTD SPI NOR driver can be found in the test for the
+ * driver or in some board definitions such as for the nRF52840DK.
+ *
+ * @{
  * @file
  * @brief       Interface definition for the serial flash memory driver
  *
@@ -30,29 +55,12 @@
 #include "periph/spi.h"
 #include "periph/gpio.h"
 #include "mtd.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-
-#define STATUS_WIP  0x01u
-#define STATUS_WEL  0x02u
-#define STATUS_BP0  0x04u
-#define STATUS_BP1  0x08u
-#define STATUS_BP2  0x10u
-#define STATUS_BP3  0x20u
-#define STATUS_QE   0x40u
-#define STATUS_SRWD 0x80u
-
-#define SECURITY_SOTP 0x01u
-#define SECURITY_LDSO 0x02u
-#define SECURITY_PSB  0x04u
-#define SECURITY_ESB  0x08u
-#define SECURITY_XXXXX 0x10u
-#define SECURITY_PFAIL 0x20u
-#define SECURITY_EFAIL 0x40u
-#define SECURITY_WPSEL 0x80u
 
 /**
  * @brief   SPI NOR flash opcode table
@@ -71,7 +79,13 @@ typedef struct {
     uint8_t chip_erase;      /**< Chip erase */
     uint8_t sleep;           /**< Deep power down */
     uint8_t wake;            /**< Release from deep power down */
+#if IS_USED(MODULE_MTD_SPI_NOR_MX_SECURITY)
     uint8_t rdscur;          /**< Read security register */
+#elif IS_USED(MODULE_MTD_SPI_NOR_ISSI_SECURITY)
+    uint8_t rderp;           /**< Read extended read parameters register */
+    uint8_t clerp;           /**< Clear extended read parameters register */
+    uint8_t wrdi;            /**< Write disable */
+#endif
 } mtd_spi_nor_opcode_t;
 
 /**
@@ -188,7 +202,12 @@ extern const mtd_desc_t mtd_spi_nor_driver;
  * The numbers were taken from Micron M25P16, but the same opcodes can
  * be found in Macronix MX25L25735E, and multiple other data sheets for
  * different devices, as well as in the Linux kernel, so they seem quite
- * sensible for default values. */
+ * sensible for default values.
+ *
+ * To enable manufacturer specific security functions, the according
+ * pseudomodules have to be used which will activate the corresponding
+ * opcodes.
+ */
 extern const mtd_spi_nor_opcode_t mtd_spi_nor_opcode_default;
 
 /**

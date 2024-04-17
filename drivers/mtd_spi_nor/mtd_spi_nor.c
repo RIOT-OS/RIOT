@@ -35,6 +35,8 @@
 #include "time_units.h"
 #include "thread.h"
 
+#include "include/mtd_spi_nor_defines.h"
+
 #if IS_USED(MODULE_ZTIMER)
 #include "ztimer.h"
 #elif IS_USED(MODULE_XTIMER)
@@ -64,7 +66,7 @@
 #define MTD_4K              (4096ul)
 #define MTD_4K_ADDR_MASK    (0xFFF)
 
-#define MBIT_AS_BYTES       ((1024 * 1024) / 8)
+#define MBIT_AS_BYTES       ((1024UL * 1024UL) / 8)
 
 /**
  * @brief   JEDEC memory manufacturer ID codes.
@@ -75,8 +77,8 @@
 #define JEDEC_BANK(n)   ((n) << 8)
 
 typedef enum {
-    SPI_NOR_JEDEC_ATMEL = 0x1F | JEDEC_BANK(1),
-    SPI_NOR_JEDEC_MICROCHIP = 0xBF | JEDEC_BANK(1),
+    SPI_NOR_JEDEC_ATMEL = 0x1FU | JEDEC_BANK(1),
+    SPI_NOR_JEDEC_MICROCHIP = 0xBFU | JEDEC_BANK(1),
 } jedec_manuf_t;
 /** @} */
 
@@ -232,7 +234,7 @@ static void mtd_spi_cmd(const mtd_spi_nor_t *dev, uint8_t opcode)
 
 static bool mtd_spi_manuf_match(const mtd_jedec_id_t *id, jedec_manuf_t manuf)
 {
-    return manuf == ((id->bank << 8) | id->manuf);
+    return manuf == (uint32_t)((id->bank << 8) | id->manuf);
 }
 
 /**
@@ -314,7 +316,7 @@ static uint32_t mtd_spi_nor_get_size(const mtd_jedec_id_t *id)
         /* ID 2 is used to encode the product version, usually 1 or 2 */
         (id->device[1] & ~0x3) == 0) {
         /* capacity encoded as power of 32k sectors */
-        return (32 * 1024) << (0x1F & id->device[0]);
+        return (32 * (uint32_t)1024) << (0x1F & id->device[0]);
     }
     if (mtd_spi_manuf_match(id, SPI_NOR_JEDEC_MICROCHIP)) {
         switch (id->device[1]) {
@@ -360,8 +362,9 @@ static inline void wait_for_write_enable_cleared(const mtd_spi_nor_t *dev)
         uint8_t status;
         mtd_spi_cmd_read(dev, dev->params->opcode->rdsr, &status, sizeof(status));
 
-        TRACE("mtd_spi_nor: wait device status = 0x%02x, waiting !WEL\n", (unsigned int)status);
-        if ((status & STATUS_WEL) == 0) {
+        TRACE("mtd_spi_nor: wait device status = 0x%02x, waiting !WEL-Flag\n",
+              (unsigned int)status);
+        if ((status & SPI_NOR_STATUS_WEL) == 0) {
             break;
         }
         thread_yield();
@@ -374,8 +377,9 @@ static inline void wait_for_write_enable_set(const mtd_spi_nor_t *dev)
         uint8_t status;
         mtd_spi_cmd_read(dev, dev->params->opcode->rdsr, &status, sizeof(status));
 
-        TRACE("mtd_spi_nor: wait device status = 0x%02x, waiting WEL\n", (unsigned int)status);
-        if (status & STATUS_WEL) {
+        TRACE("mtd_spi_nor: wait device status = 0x%02x, waiting WEL-Flag\n",
+              (unsigned int)status);
+        if (status & SPI_NOR_STATUS_WEL) {
             break;
         }
         thread_yield();
@@ -398,8 +402,9 @@ static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us
         uint8_t status;
         mtd_spi_cmd_read(dev, dev->params->opcode->rdsr, &status, sizeof(status));
 
-        TRACE("mtd_spi_nor: wait device status = 0x%02x, waiting !WIP\n", (unsigned int)status);
-        if ((status & STATUS_WIP) == 0) {
+        TRACE("mtd_spi_nor: wait device status = 0x%02x, waiting !WIP-Flag\n",
+              (unsigned int)status);
+        if ((status & SPI_NOR_STATUS_WIP) == 0) {
             break;
         }
         i++;
@@ -654,7 +659,7 @@ static int mtd_spi_nor_write_page(mtd_dev_t *mtd, const void *src, uint32_t page
     /* write enable */
     mtd_spi_cmd(dev, dev->params->opcode->wren);
 
-    /* Wait for WEL to be set */
+    /* Wait for WEL-Flag to be set */
     wait_for_write_enable_set(dev);
 
     /* Page program */
@@ -663,18 +668,32 @@ static int mtd_spi_nor_write_page(mtd_dev_t *mtd, const void *src, uint32_t page
     /* waiting for the command to complete before returning */
     wait_for_write_complete(dev, 0);
 
-    /* Wait for WEL to be cleared */
-    wait_for_write_enable_cleared(dev);
-
-    if (IS_ACTIVE(CONFIG_MTD_SPI_NOR_RDSCUR)) {
-        /* Read security register */
-        uint8_t rdscur;
-        mtd_spi_cmd_read(dev, dev->params->opcode->rdscur, &rdscur, sizeof(rdscur));
-        if (rdscur & SECURITY_PFAIL) {
-            DEBUG("mtd_spi_nor_write: ERR: page program failed!\n");
-            ret = -EIO;
-        }
+#if IS_USED(MODULE_MTD_SPI_NOR_MX_SECURITY)
+    /* Read security register */
+    uint8_t scur_reg;
+    mtd_spi_cmd_read(dev, dev->params->opcode->rdscur, &scur_reg, sizeof(scur_reg));
+    if (scur_reg & MX_SECURITY_PFAIL) {
+        DEBUG("mtd_spi_nor_write: ERR: page program failed! scur = %02x\n", scur_reg);
+        ret = -EIO;
     }
+#elif IS_USED(MODULE_MTD_SPI_NOR_ISSI_SECURITY)
+    /* Read extended read register for security flags */
+    uint8_t erp_reg;
+    mtd_spi_cmd_read(dev, dev->params->opcode->rderp, &erp_reg, sizeof(erp_reg));
+    if (erp_reg & IS_ERP_P_ERR) {
+        DEBUG("mtd_spi_nor_write: ERR: page program failed! erp = %02x\n", erp_reg);
+        ret = -EIO;
+
+        /* clear the extended read parameters register manually */
+        mtd_spi_cmd(dev, dev->params->opcode->clerp);
+
+        /* ISSI flashs do not reset the WEL-Flag when an operation was not *completed* */
+        mtd_spi_cmd(dev, dev->params->opcode->wrdi);
+    }
+#endif
+
+    /* Wait for WEL-Flag to be cleared */
+    wait_for_write_enable_cleared(dev);
 
     mtd_spi_release(dev);
 
@@ -713,7 +732,7 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
         /* write enable */
         mtd_spi_cmd(dev, dev->params->opcode->wren);
 
-        /* Wait for WEL to be set */
+        /* Wait for WEL-Flag to be set */
         wait_for_write_enable_set(dev);
 
         if (size == total_size) {
@@ -756,18 +775,33 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
         /* waiting for the command to complete before continuing */
         wait_for_write_complete(dev, us);
 
-        /* Wait for WEL to be cleared */
+#if IS_USED(MODULE_MTD_SPI_NOR_MX_SECURITY)
+        /* Read security register */
+        uint8_t scur_reg;
+        mtd_spi_cmd_read(dev, dev->params->opcode->rdscur, &scur_reg, sizeof(scur_reg));
+        if (scur_reg & MX_SECURITY_EFAIL) {
+            DEBUG("mtd_spi_nor_write: ERR: erase failed! scur = %02x\n", scur_reg);
+            ret = -EIO;
+        }
+#elif IS_USED(MODULE_MTD_SPI_NOR_ISSI_SECURITY)
+        /* Read extended read register for security flags */
+        uint8_t erp_reg;
+        mtd_spi_cmd_read(dev, dev->params->opcode->rderp, &erp_reg, sizeof(erp_reg));
+        if (erp_reg & IS_ERP_E_ERR) {
+            DEBUG("mtd_spi_nor_write: ERR: erase failed! erp = %02x\n", erp_reg);
+            ret = -EIO;
+
+            /* clear the extended read parameters register manually */
+            mtd_spi_cmd(dev, dev->params->opcode->clerp);
+
+            /* ISSI flashs do not reset the WEL-Flag when an operation was not *completed* */
+            mtd_spi_cmd(dev, dev->params->opcode->wrdi);
+        }
+#endif
+
+        /* Wait for WEL-Flag to be cleared */
         wait_for_write_enable_cleared(dev);
 
-        if (IS_ACTIVE(CONFIG_MTD_SPI_NOR_RDSCUR)) {
-            /* Read security register */
-            uint8_t rdscur;
-            mtd_spi_cmd_read(dev, dev->params->opcode->rdscur, &rdscur, sizeof(rdscur));
-            if (rdscur & SECURITY_EFAIL) {
-                DEBUG("mtd_spi_nor_erase: ERR: erase failed!\n");
-                ret = -EIO;
-            }
-        }
     }
     mtd_spi_release(dev);
 
