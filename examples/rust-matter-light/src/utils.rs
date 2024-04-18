@@ -1,16 +1,16 @@
 use core::time::Duration;
-use log::info;
-use rs_matter::utils::epoch::MATTER_EPOCH_SECS;
+use riot_wrappers::random::Random;
+use rand_core::RngCore as _;
 
 extern "C" {
-    fn get_seconds_since_matter_epoch() -> u64;
+    fn get_seconds_since_unix_epoch() -> u32;
 }
 
-pub fn get_timestamp() -> u64 {
-    let rtc_seconds = unsafe { get_seconds_since_matter_epoch() };
-    rtc_seconds + MATTER_EPOCH_SECS
+pub fn sys_rand(buf: &mut [u8]) {
+    Random::new().fill_bytes(buf);
 }
 
-pub fn get_epoch() -> Duration {
-    Duration::from_secs(get_timestamp())
+pub fn sys_epoch() -> Duration {
+    let rtc_seconds = unsafe { get_seconds_since_unix_epoch() };
+    Duration::from_secs(rtc_seconds as u64)
 }

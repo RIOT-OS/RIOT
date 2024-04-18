@@ -227,8 +227,8 @@ fn run_matter() -> Result<(), ()> {
     let dev_att: &'static HardCodedDevAtt = DEV_ATT.init(HardCodedDevAtt::new());
 
     // TODO: Provide own epoch and rand functions
-    let epoch = utils::get_epoch;
-    let rand = rs_matter::utils::rand::riot_rand;
+    let epoch = utils::sys_epoch;
+    let rand = utils::sys_rand;
 
     let matter: &'static Matter = MATTER.init(Matter::new(
         // vid/pid should match those in the DAC

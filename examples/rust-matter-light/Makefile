@@ -45,6 +45,8 @@ USEMODULE += ztimer_msec
 USEMODULE += ztimer_usec
 USEMODULE += ps
 USEMODULE += random
+USEMODULE += periph_hwrng
+USEMODULE += prng_sha256prng
 
 # networking
 USEMODULE += netdev_default

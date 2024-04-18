@@ -1747,6 +1747,7 @@ dependencies = [
  "embedded-hal-async",
  "embedded-nal-async 0.7.1",
  "log",
+ "rand_core",
  "riot-sys",
  "riot-wrappers",
  "rs-matter",

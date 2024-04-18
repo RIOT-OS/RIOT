@@ -48,6 +48,7 @@ embassy-executor = { version = "0.5", features = ["nightly"] }
 embedded-hal = "1.0.0"
 embassy-futures = "0.1.1"
 rs-matter = { version = "0.1.0", default-features = false, features = ["riot-os"] }
+rand_core = "0.6.4"
 
 [patch.crates-io]
 #rs-matter = { path = "../../../rs-matter/rs-matter" }
