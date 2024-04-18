@@ -16,6 +16,7 @@
 static int _init(mtd_dev_t *dev)
 {
     mtd_emulated_t *mtd = (mtd_emulated_t *)dev;
+
     assert(mtd);
 
     if (!mtd->init_done) {
@@ -32,7 +33,14 @@ static int _read(mtd_dev_t *dev, void *dest, uint32_t addr, uint32_t count)
     assert(mtd);
     assert(dest);
 
-    if ((addr + count) > mtd->size) {
+    uint32_t addr_count;
+
+    if (__builtin_add_overflow(addr, count, &addr_count)) {
+        /* check for integer overflow */
+        return -EOVERFLOW;
+    }
+
+    if (addr_count > mtd->size) {
         /* addr + count must not exceed the size of memory */
         return -EOVERFLOW;
     }
@@ -51,11 +59,32 @@ static int _read_page(mtd_dev_t *dev, void *dest,
     assert(mtd);
     assert(dest);
 
-    if (((page * mtd->base.page_size) + offset + size) > mtd->size) {
+    uint32_t page_addr;
+
+    if (__builtin_mul_overflow(page, mtd->base.page_size, &page_addr)) {
+        /* check for integer overflow */
+        return -EOVERFLOW;
+    }
+
+    uint32_t offset_size;
+
+    if (__builtin_add_overflow(offset, size, &offset_size)) {
+        /* check for integer overflow */
+        return -EOVERFLOW;
+    }
+
+    uint32_t page_addr_offset_size;
+
+    if (__builtin_add_overflow(page_addr, offset_size, &page_addr_offset_size)) {
+        /* check for integer overflow */
+        return -EOVERFLOW;
+    }
+
+    if (page_addr_offset_size > mtd->size) {
         /* page addr + offset + size must not exceed the size of memory */
         return -EOVERFLOW;
     }
-    memcpy(dest, mtd->memory + (page * mtd->base.page_size) + offset, size);
+    memcpy(dest, mtd->memory + page_addr + offset, size);
 
     return size;
 }
@@ -70,13 +99,37 @@ int _write_page(mtd_dev_t *dev, const void *src,
     assert(mtd);
     assert(src);
 
-    if (/* offset must be smaller than the page size */
-        (offset >= mtd->base.page_size) ||
-        /* page addr + offset + size must not exceed the size of memory */
-        ((page * mtd->base.page_size) + offset + size) > mtd->size) {
+    if (offset >= mtd->base.page_size) {
+        /* offset must be smaller than the page size */
         return -EOVERFLOW;
     }
-    memcpy(mtd->memory + (page * mtd->base.page_size) + offset, src, size);
+
+    uint32_t page_addr;
+
+    if (__builtin_mul_overflow(page, mtd->base.page_size, &page_addr)) {
+        /* check for integer overflow */
+        return -EOVERFLOW;
+    }
+
+    uint32_t offset_size;
+
+    if (__builtin_add_overflow(offset, size, &offset_size)) {
+        /* check for integer overflow */
+        return -EOVERFLOW;
+    }
+
+    uint32_t page_addr_offset_size;
+
+    if (__builtin_add_overflow(page_addr, offset_size, &page_addr_offset_size)) {
+        /* check for integer overflow */
+        return -EOVERFLOW;
+    }
+
+    if (page_addr_offset_size > mtd->size) {
+        /* page addr + offset + size must not exceed the size of memory */
+        return -EOVERFLOW;
+    }
+    memcpy(mtd->memory + page_addr + offset, src, size);
 
     return size;
 }
@@ -88,12 +141,25 @@ static int _erase(mtd_dev_t *dev, uint32_t addr, uint32_t count)
     (void)mtd;
     assert(mtd);
 
-    if (/* addr must be aligned on a sector boundary */
-        (addr % (mtd->base.pages_per_sector * mtd->base.page_size) != 0) ||
+    uint32_t addr_count;
+
+    if (__builtin_add_overflow(addr, count, &addr_count)) {
+        /* check for integer overflow */
+        return -EOVERFLOW;
+    }
+
+    if (addr % (mtd->base.pages_per_sector * mtd->base.page_size) != 0) {
+        /* addr must be aligned on a sector boundary */
+        return -EOVERFLOW;
+    }
+
+    if (count % (mtd->base.pages_per_sector * mtd->base.page_size) != 0) {
         /* count must be a multiple of a sector size. */
-        (count % (mtd->base.pages_per_sector * mtd->base.page_size) != 0) ||
+        return -EOVERFLOW;
+    }
+
+    if (addr_count > mtd->size) {
         /* addr + count must not exceed the size of memory */
-        ((addr + count) > mtd->size)) {
         return -EOVERFLOW;
     }
 
@@ -109,10 +175,20 @@ static int _erase_sector(mtd_dev_t *dev, uint32_t sector, uint32_t num)
     (void)mtd;
     assert(mtd);
 
-    if (/* sector must not exceed the number of sectors */
-        (sector >= mtd->base.sector_count) ||
+    uint32_t sector_num;
+
+    if (__builtin_add_overflow(sector, num, &sector_num)) {
+        /* check for integer overflow */
+        return -EOVERFLOW;
+    }
+
+    if (sector >= mtd->base.sector_count) {
+        /* sector must not exceed the number of sectors */
+        return -EOVERFLOW;
+    }
+
+    if (sector_num > mtd->base.sector_count) {
         /* sector + num must not exceed the number of sectors */
-        ((sector + num) > mtd->base.sector_count)) {
         return -EOVERFLOW;
     }
 
