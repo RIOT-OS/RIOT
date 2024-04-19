@@ -453,7 +453,6 @@ void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
 }
 #endif
 
-#ifdef MODULE_CORTEXM_SVC
 void __attribute__((naked)) __attribute__((used)) isr_svc(void)
 {
     /* these two variants do exactly the same, but Cortex-M3 can use Thumb2
@@ -521,13 +520,6 @@ static void __attribute__((used)) _svc_dispatch(unsigned int *svc_args)
             break;
     }
 }
-
-#else /* MODULE_CORTEXM_SVC */
-void __attribute__((used)) isr_svc(void)
-{
-    SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
-}
-#endif /* MODULE_CORTEXM_SVC */
 
 void sched_arch_idle(void)
 {

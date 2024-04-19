@@ -47,7 +47,6 @@ FEATURES_EXISTING := \
     cortexm_fpu \
     cortexm_mpu \
     cortexm_stack_limit \
-    cortexm_svc \
     cpp \
     cpu_arm7tdmi_gba \
     cpu_atmega1281 \

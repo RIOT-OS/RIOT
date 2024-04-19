@@ -1,6 +1,5 @@
 FEATURES_PROVIDED += arch_32bit
 FEATURES_PROVIDED += arch_arm
-FEATURES_PROVIDED += cortexm_svc
 FEATURES_PROVIDED += cpp
 FEATURES_PROVIDED += cpu_check_address
 FEATURES_PROVIDED += cpu_core_cortexm

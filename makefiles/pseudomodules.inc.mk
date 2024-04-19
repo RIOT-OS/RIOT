@@ -55,7 +55,6 @@ PSEUDOMODULES += conn_can_isotp_multi
 PSEUDOMODULES += cord_ep_standalone
 PSEUDOMODULES += core_%
 PSEUDOMODULES += cortexm_fpu
-PSEUDOMODULES += cortexm_svc
 PSEUDOMODULES += cpp
 PSEUDOMODULES += cpu_check_address
 PSEUDOMODULES += crc16_fast
