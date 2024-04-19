@@ -55,6 +55,7 @@ Popular Boards
 | @ref boards_esp32_wroom-32            | Prototyping           | `+++`         | ✗                     | ✔ (WiFi, BLE, custom)             | ✗             | ✗                     | Custom                    | `-` (1 button)                                        | `+++`                 | `+++`     | Requires proprietary software |
 | @ref boards_microbit_v2               | Education             | `++`          | ✔                     | ✔ (802.15.4, BLE, custom)         | ✗             | ✗                     | micro:bit edge connector  | `+++` (6 buttons, LED matrix, mic, speaker, IMO)      | `--`                  | `++`      | Good education board          |
 | @ref boards_nrf52840dk                | Development           | `++`          | ✔                     | ✔ (802.15.4, BLE, custom)         | ✔             | `+++`(Uno, Mega)      | Custom                    | `+` (4 buttons, 4 LEDs)                               | `+`                   | `+`       | Good wireless dev board       |
+| @ref boards_feather-nrf52840-sense    | Prototyping/Education | `++`          | ✗                     | ✔ (802.15.4, BLE, custom)         | ✔             | ✗                     | Adafruit Feather          | `++` (orientation, air parameters, light/gestures)    | `+++`                 | `+`       | used in [inetrg exercises]    |
 | @ref boards_nrf52840dongle            | Prototyping           | `++`          | ✗                     | ✔ (802.15.4, BLE, custom)         | ✔             | ✗                     | Custom                    |  o  (1 button, 4 LEDs)                                | `++`                  | `++`      | Excellent border router       |
 | @ref boards_nucleo-wl55jc             | Development           | `++`          | ✔                     | ✔ (LoRa)                          | ✗             | `+` (Uno)             | ST Morpho Headers         | `+` (3 buttons, 3 LEDs)                               | `+`                   | `++`      | Good bang for the buck        |
 | @ref boards_pinetime                  | Gadget                | `++`          | ✗                     | ✔ (BLE)                           | ✗             | ✗                     | ✗                         | `+++` (LCD, button, touch screen, IMU, flash, ...)    | `---`                 | `+++`     | Buy two: One with SWD access  |
@@ -63,12 +64,14 @@ Popular Boards
 | @ref boards_weact-f411ce              | Prototyping           | `++`          | ✗                     | ✗                                 | ✔             | ✗                     | Custom                    | `+` (1 button, 1 LED, SPI flash)                      | `+++`                 | `+++`     | Excellent bang for the buck   |
 
 @note       Only boards with mature RIOT support and decent documentation qualify for above list
-@details    This list was last updated in May 2023
+@details    This list was last updated in April 2024
 
 
 <!-- Add when doc is fixed
 | @ref boards_b-l072z-lrwan1            | Development           | `+`           | ✔                     | ✔ (LoRa)                          | ✗             | `++` (Uno, Mega)      | ST Morpho Headers         | `+` (1 button, 4 LEDs)                                | `+`                   | `++`      | Good bang for the buck        |
 -->
+
+[inetrg exercises]: https://github.com/inetrg/exercises
 
 ### Notes on Arduino Compatibility
 
