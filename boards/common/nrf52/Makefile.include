@@ -18,8 +18,6 @@ else
   PROGRAMMER ?= openocd
 endif
 
-# setup JLink for flashing
-JLINK_DEVICE = nrf52
 # setup OpenOCD for flashing. Version 0.10 of OpenOCD doesn't contain support
 # for nrf52dk and nrf52840dk boards. To use OpenOCD with these a version
 # build from source (master > 2018, August the 13rd) is required.
