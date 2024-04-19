@@ -4,6 +4,7 @@ USEMODULE += ztimer_usec
 
 
 #WAMR supports "X86_32/64", "AARCH64", "ARM", "THUMB", "XTENSA" and RISCV
-FEATURES_REQUIRED_ANY += arch_native|arch_esp32|arch_riscv|cortexm_svc
+FEATURES_BLACKLIST += arch_arm7
+FEATURES_REQUIRED_ANY += arch_native|arch_esp32|arch_riscv|arch_arm
 #arch_arm|arch_esp need modified
 #  build/pkg/wamr/core/iwasm/common/arch/invokeNative_<arch>.s
