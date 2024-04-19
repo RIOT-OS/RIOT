@@ -29,7 +29,9 @@ APPLICATION_RUST_MODULE = rust_matter_light
 BASELIBS += $(APPLICATION_RUST_MODULE).module
 
 FEATURES_REQUIRED += rust_target
-FEATURES_REQUIRED += periph_rtc
+
+# Use RTC for sys_epoch, otherwise ztimer
+FEATURES_OPTIONAL += periph_rtc
 
 # Comment this line in to activate storing & loading runtime configurations
 # NOTE: To use this feature, a PersistenceManager (in 'src/persist.rs') must be implemented for the target platform
@@ -43,6 +45,7 @@ USEMODULE += shell_cmd_heap
 USEMODULE += ztimer
 USEMODULE += ztimer_msec
 USEMODULE += ztimer_usec
+USEMODULE += ztimer_sec
 USEMODULE += ps
 USEMODULE += random
 USEMODULE += periph_hwrng
