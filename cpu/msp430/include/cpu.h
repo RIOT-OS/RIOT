@@ -20,14 +20,12 @@
 #ifndef CPU_H
 #define CPU_H
 
-#include <stdio.h>
+#include <stdint.h>
 
 #include <msp430.h>
-#include "board.h"
 
 #include "sched.h"
 #include "thread.h"
-#include "cpu_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -118,12 +116,11 @@ static inline void __attribute__((always_inline)) __exit_isr(void)
 
 /**
  * @brief   Returns the last instruction's address
- *
- * @todo:   Not supported
  */
+__attribute__((always_inline))
 static inline uintptr_t cpu_get_caller_pc(void)
 {
-    return 0;
+    return (uintptr_t)__builtin_return_address(0);
 }
 
 #ifdef __cplusplus
