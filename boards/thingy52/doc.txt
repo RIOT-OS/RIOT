@@ -4,12 +4,12 @@
 @brief       Support for the Nordic Thingy:52 board
 
 ## Overview
-The Nordic Thingy:52 is a battery powered platform with Bluetooth and NFC
+The Nordic Thingy:52 is a battery powered platform with Bluetooth and NFC (only tag emulation, no reader support)
 radio, a wide range of sensors and some output capabilities.
 
 Components:
 
-- nRF52832 main controller (providing Bluetooth and NFC)
+- nRF52832 main controller (providing Bluetooth and NFC tag emulation)
 - an LIS2DH12 low-power three-axis linear accelerometer
 - an MPU-9250 nine-axis motion sensor
 - an LPS22HB air pressure and temperature sensor
