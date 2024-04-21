@@ -61,6 +61,17 @@ static _i2c_bus_t _i2c_bus[32] = { //no idea if its supposed to be 32 or what I2
     }
 };
 
+static inline int delayTimer(){
+    //create timer for timeout, 10* highest transfer speed
+    uint32_t timeoutTime = 10*MHZ(1);
+    uint32_t POLL_COUNT = 0;
+    while(POLL_COUNT < timeoutTime){
+        POLL_COUNT++;
+        //call checking fn ?
+    }
+
+}
+
 void i2c_init(i2c_t dev)
 {
     // does pico have max i2c dev conns?
@@ -281,9 +292,7 @@ int i2c_read_reg(i2c_t dev, uint16_t addr, uint16_t reg,
     if(data == NULL){
         return EINVAL;
     }
-    //create timer for timeout, 10* highest transfer speed
-    uint16_t timeoutTime = 10*MHZ(1);
-    uint16_t POLL_COUNT = 0;
+    
 
 
     //read regs, len bytes
@@ -293,9 +302,10 @@ int i2c_read_reg(i2c_t dev, uint16_t addr, uint16_t reg,
     //or this sends read cmd ? sets IC_DATA_CMD-CMD to 1 which is read
     *(baseaddr + IC_DATA_CMD) = _i2c_bus[dev].cmd;
 
-    //actually do the read
+    /* actually do the read - take addr of where data is to be stored
+       and plonk in TX FIFO data there*/
     uint8_t* dataAddr = (uint8_t *) data;
-    dataAddr = *(baseaddr + IC_DATA_CMD) & 0xF;
+    *dataAddr = *(baseaddr + IC_DATA_CMD) & 0xF;
 
     //send stop bit
     *(baseaddr + IC_DATA_CMD) = 0xFF & IC_DATA_CMD_STOP;
@@ -333,6 +343,31 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data,
 int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
                    const void *data, size_t len, uint8_t flags)
 {
+    //write reg lol idk what im doing
+    long* baseaddr = (long *) I2C_BASE;
+    _i2c_bus[dev].len = 8; //?
+    _i2c_bus[dev].cmd = 0; // send write cmd ?
+    *(baseaddr + IC_DATA_CMD) = _i2c_bus[dev].cmd;
+
+    uint8_t tx_buffer[256] = {};
+    int reg_len = 0; //know register length in bytes
+    //if in 16-bit register addressing mode, split across tx bytes
+    if(flags & I2C_REG16){
+        tx_buffer[0] = reg >> 8;
+        tx_buffer[1] = reg & 0xFF;
+        reg_len = 2;
+    }
+    else {
+        tx_buffer[0] = reg;
+        reg_len = 1;
+    }
+
+    size_t len = reg_len;
+
+    //copy data into txbuffer after the reg
+    memcpy(&tx_buffer[reg_len], data, len);
+    int retval = i2c_write_bytes(dev, addr, tx_buffer, 3, flags);
+
     i2c_t device = dev;
     device += 1;
     uint16_t address = addr;
@@ -344,7 +379,7 @@ int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
     length++;
     uint8_t flagss = flags;
     flagss++;
-    return 0;
+    return retval;
 }
 
 int i2c_write_reg(i2c_t dev, uint16_t addr, uint16_t reg,
@@ -353,10 +388,26 @@ int i2c_write_reg(i2c_t dev, uint16_t addr, uint16_t reg,
     //write reg lol idk what im doing
     long* baseaddr = (long *) I2C_BASE;
     _i2c_bus[dev].len = 8; //?
-    _i2c_bus[dev].cmd = 0; // send rwrite cmd ?
+    _i2c_bus[dev].cmd = 0; // send write cmd ?
     *(baseaddr + IC_DATA_CMD) = _i2c_bus[dev].cmd;
-    uint8_t* regAddr = (uint8_t *) reg;
-    *regAddr = data;
+
+    uint8_t tx_buffer[256] = {};
+    int reg_len = 0; //know register length in bytes
+    //if in 16-bit register addressing mode, split across tx bytes
+    if(flags & I2C_REG16){
+        tx_buffer[0] = reg >> 8;
+        tx_buffer[1] = reg & 0xFF;
+        reg_len = 2;
+    }
+    else {
+        tx_buffer[0] = reg;
+        reg_len = 1;
+    }
+
+    size_t len = reg_len;
+    tx_buffer[reg_len] = data;
+    int retval = i2c_write_bytes(dev, addr, tx_buffer, 3, flags);
+
 
 
     i2c_t device = dev;
@@ -368,5 +419,5 @@ int i2c_write_reg(i2c_t dev, uint16_t addr, uint16_t reg,
     assert(data != 1);
     uint8_t flagss = flags;
     flagss++;
-    return 0;
+    return retval;
 }
