@@ -47,3 +47,9 @@ miniterm                                                             {#miniterm}
     - Start with `--eol CR`parameter.
 - Via RIOT build system:
     - `RIOT_TERMINAL=miniterm make term`
+
+putty
+=====
+- Graphical method:
+    - Go to configuration tree and choose `Terminal` branch.
+    - Enable option `Implicit CR in every LF`.
