@@ -54,11 +54,11 @@ int main(void)
 
 
     }
-    else if (status < 0){
+    else if (status == -1){
         gpio_init(10, GPIO_OUT);
         gpio_set(10);
     }
-    else if (status > 0){
+    else if (status == -2){
         gpio_init(11, GPIO_OUT);
         gpio_set(11);
     }
