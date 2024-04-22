@@ -173,6 +173,10 @@ static MATTER: StaticCell<Matter> = StaticCell::new();
 // Set this to the name of the LED, which should be controlled using SAUL registry
 const ONOFF_LED_NAME: &str = "LD2(blue)";
 
+// TODO: Passcode and discriminator should be provisioned safely during compilation
+const PASSCODE: u32 = 123456;
+const DISCRIMINATOR: u16 = 250;
+
 riot_main!(main);
 
 fn led_onoff(on: bool) {
@@ -193,14 +197,8 @@ fn led_onoff(on: bool) {
 
 fn cmd_matter(_stdio: &mut riot_wrappers::stdio::Stdio, _args: shell::Args<'_>) {
     // TODO: Support some useful commands for this Matter node or interacting with other nodes
-    info!("Endpoint Info:");
-    NODE.endpoints.into_iter().for_each(|ep| {
-        info!("Endpoint No. {} - DeviceType={:#04x}", ep.id, ep.device_type.dtype);
-        ep.clusters.into_iter().for_each(|cluster| {
-            info!("  Cluster ID={:#04x}", cluster.id);
-            cluster.attributes.into_iter().for_each(|attr| info!("    Attribute {:#04x}", attr.id))
-        });
-    });
+    info!("Discover device using discriminator: {}", DISCRIMINATOR);
+    info!("Pair device using passcode: {}", PASSCODE);
 }
 
 static_command!(matter, "matter", "Interact with Matter devices", cmd_matter);
@@ -364,8 +362,8 @@ async fn matter_task(matter: &'static Matter<'_>) {
         &mut matter_packet_buffers,
         CommissioningData {
             // TODO: Hard-coded for now
-            verifier: VerifierData::new_with_pw(123456, *matter.borrow()),
-            discriminator: 250,
+            verifier: VerifierData::new_with_pw(PASSCODE, *matter.borrow()),
+            discriminator: DISCRIMINATOR,
         },
         &handler)
     );
