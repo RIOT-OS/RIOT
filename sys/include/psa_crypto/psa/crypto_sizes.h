@@ -894,30 +894,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Get curve size from ECC public key
- *
- * @details The representation of an ECC public key is dependent on the family:
- *          - for twisted Edwards curves: 32B
- *          - for Weierstrass curves:
- *            - The byte 0x04;
- *            - `x_P` as a `ceiling(m/8)`-byte string, big-endian;
- *            - `y_P` as a `ceiling(m/8)`-byte string, big-endian;
- *            - where m is the bit size associated with the curve.
- *            - 1 byte + 2 * point size.
- */
-#define PSA_ECC_KEY_GET_CURVE_FROM_PUBLIC_KEY(key_type, key_bits)                    \
-    (PSA_KEY_TYPE_ECC_GET_FAMILY(key_type) == PSA_ECC_FAMILY_TWISTED_EDWARDS ? 255 : \
-     ((size_t)((key_bits - 8) / 2)))
-
-/**
- * @brief   Get curve size from ECC key (public or private)
- */
-#define PSA_ECC_KEY_GET_CURVE(key_type, key_bits)                   \
-    (PSA_KEY_TYPE_IS_ECC_PUBLIC_KEY(key_type) ?                     \
-        PSA_ECC_KEY_GET_CURVE_FROM_PUBLIC_KEY(key_type, key_bits) : \
-     (size_t)key_bits)
-
-/**
  * @brief   Maximum size of the export encoding of an ECC public key.
  *
  * @details The representation of an ECC public key is dependent on the family:
@@ -1059,7 +1035,7 @@ extern "C" {
  *          If the parameters are not valid, the return value is unspecified.
  */
 #define PSA_SIGN_OUTPUT_SIZE(key_type, key_bits, alg)        \
-    (PSA_KEY_TYPE_IS_ECC(key_type) ? PSA_ECDSA_SIGNATURE_SIZE(PSA_ECC_KEY_GET_CURVE(key_type, key_bits)) : \
+    (PSA_KEY_TYPE_IS_ECC(key_type) ? PSA_ECDSA_SIGNATURE_SIZE(key_bits) : \
      ((void)alg, 0))
 
 #ifdef __cplusplus
