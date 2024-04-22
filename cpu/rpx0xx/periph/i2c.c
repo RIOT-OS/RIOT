@@ -21,6 +21,7 @@
  */
 
 #include <errno.h>
+#include <string.h> //for memcpy
 
 #include "periph_conf.h"
 #include "periph/i2c.h"
@@ -37,8 +38,8 @@
 #define _GPIO 0 //gpio pin function
 #define SOC_I2C_FIFO_LEN 8
 #define MAX_T_POLL_COUNT 1000
-#define I2C_SDA_PIN i2c_config[dev].sda_pin
-#define I2C_SCL_PIN i2c_config[dev].scl_pin
+#define I2C_SDA_PIN i2c_config[dev].sda
+#define I2C_SCL_PIN i2c_config[dev].scl
 #define I2C_DELAY 10 //potentially adjust
 
 /* select i2c base */
@@ -67,7 +68,7 @@ static _i2c_bus_t _i2c_bus[32] = { //no idea if its supposed to be 32 or what I2
     }
 };
 
-static inline int delayTimer(){
+/*static inline int i2c_delay_timer(){
     //create timer for timeout, 10* highest transfer speed
     uint32_t timeoutTime = 10*MHZ(1);
     uint32_t POLL_COUNT = 0;
@@ -75,8 +76,9 @@ static inline int delayTimer(){
         POLL_COUNT++;
         //call checking fn ?
     }
+    return 0;
 
-}
+}*/
 
 /**
  * @brief delay for ms microseconds for line stability
@@ -84,7 +86,7 @@ static inline int delayTimer(){
 */
 static inline void i2c_delay(uint16_t us){
     for(uint16_t i = 0; i < us; i++){
-        asm volatile("nop"); //busy wait
+        __asm__ volatile("nop"); //busy wait
     }
 }
 
@@ -102,10 +104,14 @@ static inline bool check_received_ack(i2c_t dev){
 /**
  * @brief transmits len bytes across the i2c pins selected in i2c_config[dev]
 */
-int i2c_transmit(uint8_t* data, i2c_t dev, uint16_t addr, uint8_t len){
+int i2c_transmit(const void* data, i2c_t dev, uint16_t addr, uint8_t len){
+
+    //fill data buffer with data
+    uint8_t txbuffer[256];
+    memcpy(txbuffer, data, len);
 
     //if write
-    if(_i2c_bus[dev].cmd_op == 1){
+    if(_i2c_bus[dev].cmd_op == 0){
 
         //start condition
         gpio_write(I2C_SDA_PIN, 1);
@@ -141,7 +147,7 @@ int i2c_transmit(uint8_t* data, i2c_t dev, uint16_t addr, uint8_t len){
         //transmit each byte
         for(int i = 0; i < len; i++){
             for(int j = 7; j >= 0; j--){
-                gpio_write(I2C_SDA_PIN, (data[i] >> j) & 1);
+                gpio_write(I2C_SDA_PIN, (txbuffer[i] >> j) & 1);
                 i2c_delay(I2C_DELAY);
                 gpio_write(I2C_SCL_PIN, 1);
                 i2c_delay(I2C_DELAY);
@@ -173,7 +179,7 @@ int i2c_transmit(uint8_t* data, i2c_t dev, uint16_t addr, uint8_t len){
 
         return 0;
     }
-    else if(_i2c_bus[dev].cmd_op == 0){ //if read
+    else if(_i2c_bus[dev].cmd_op == 1){ //if read
 
         //start condition
         gpio_write(I2C_SDA_PIN, 1);
@@ -200,7 +206,7 @@ int i2c_transmit(uint8_t* data, i2c_t dev, uint16_t addr, uint8_t len){
         for(int i = 0; i < len; i++){
 
             //initialise byte
-            data[i] = 0;
+            txbuffer[i] = 0;
 
             //reinitialise SDA as input for reads
             gpio_init(I2C_SDA_PIN, GPIO_IN);
@@ -210,7 +216,7 @@ int i2c_transmit(uint8_t* data, i2c_t dev, uint16_t addr, uint8_t len){
             for(int j = 7; j >= 0; j--){                
                 gpio_write(I2C_SCL_PIN, 1);
                 i2c_delay(I2C_DELAY);
-                data[i] |= gpio_read(I2C_SDA_PIN) << j;
+                txbuffer[i] |= gpio_read(I2C_SDA_PIN) << j;
                 gpio_write(I2C_SCL_PIN, 0);
                 i2c_delay(I2C_DELAY);
             }
@@ -517,25 +523,10 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data,
     _i2c_bus[dev].cmd = 0; // send write cmd ?
     *(baseaddr + IC_DATA_CMD) = _i2c_bus[dev].cmd;
 
-    //hold return value from transmit
-    int status = 0;
+    //transmit bytes, return value from transmit
+    int status = i2c_transmit(data, dev, addr, len);
 
-    //transmit each byte
-    for(int i = 0; i < len; i++){
-        //send byte ? receive ack ?
-        int status = i2c_transmit(data, dev, addr, len);
-    }
-
-    i2c_t device = dev;
-    device += 1;
-    uint16_t address = addr;
-    address += 1;
-    assert((uint32_t) data != 0);
-    size_t length = len;
-    length++;
-    uint8_t flagss = flags;
-    flagss++;
-    return 0;
+    return status;
 }
 
 int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
@@ -560,23 +551,11 @@ int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
         reg_len = 1;
     }
 
-    size_t len = reg_len;
-
     //copy data into txbuffer after the reg
     memcpy(&tx_buffer[reg_len], data, len);
     int retval = i2c_write_bytes(dev, addr, tx_buffer, 3, flags);
 
-    i2c_t device = dev;
-    device += 1;
-    uint16_t address = addr;
-    address += 1;
-    uint16_t regist = reg;
-    regist++;
-    assert((uint32_t) data != 0);
-    size_t length = len;
-    length++;
-    uint8_t flagss = flags;
-    flagss++;
+
     return retval;
 }
 
@@ -602,20 +581,9 @@ int i2c_write_reg(i2c_t dev, uint16_t addr, uint16_t reg,
         reg_len = 1;
     }
 
-    size_t len = reg_len;
     tx_buffer[reg_len] = data;
     int retval = i2c_write_bytes(dev, addr, tx_buffer, 3, flags);
 
 
-
-    i2c_t device = dev;
-    device += 1;
-    uint16_t address = addr;
-    address += 1;
-    uint16_t regist = reg;
-    regist++;
-    assert(data != 1);
-    uint8_t flagss = flags;
-    flagss++;
     return retval;
 }

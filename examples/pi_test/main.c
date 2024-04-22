@@ -9,7 +9,7 @@
 #include "board.h"
 #include "periph/i2c.h"
 #include "vcnl40x0.h"
-#include "test_driver/test_driver.h"
+//#include "test_driver/test_driver.h"
 //#include "xtimer.h"
 
 const int PIN = 9;
@@ -18,9 +18,9 @@ int useTestDevice(void);
 
 int main(void)
 {
-    if(0){
+    /*if(0){
         return useTestDevice();
-    }
+    }*/
     //blink if read bytes non-zero
     //i2c addr retrived from:
     // https://github.com/sparkfun/SparkFun_VCNL4040_Arduino_Library/blob/master/src/SparkFun_VCNL4040_Arduino_Library.cpp
@@ -31,10 +31,14 @@ int main(void)
     if(status == 0){
         printf("Successfully initalised vcnl40x0 !");
         gpio_init(PIN, GPIO_OUT);
+        gpio_init(PIN-1, GPIO_OUT);
         //gpio_set(PIN);
         uint16_t readresp = vcnl40x0_read_ambient_light(&dev);
-        if (readresp == 0){
+        if (readresp > 0){
             gpio_set(PIN);
+        }
+        else{
+            gpio_set(PIN-1);
         }
         // blink loop for testing light
         /*for(int j = 0; j < 1000; j++){
@@ -68,7 +72,7 @@ int main(void)
     }
 }
 
-int useTestDevice(void){
+/*int useTestDevice(void){
     gpio_init(PIN-1, GPIO_OUT);
     gpio_set(PIN-1);
     test_dev_t device = {2,0};
@@ -78,4 +82,4 @@ int useTestDevice(void){
         gpio_set(PIN);
     }
     return 0;
-}
+}*/

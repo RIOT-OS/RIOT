@@ -10,7 +10,7 @@ RIOTBASE ?= $(CURDIR)/../..
 FEATURES_REQUIRED += periph_i2c
 
 USEMODULE += vcnl40x0
-USEMODULE += test_driver
+#USEMODULE += test_driver
 
 DEVELHELP ?= 1
 QUIET ?= 1
