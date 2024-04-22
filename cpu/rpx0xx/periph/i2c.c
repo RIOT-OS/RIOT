@@ -25,6 +25,7 @@
 #include "periph_conf.h"
 #include "periph/i2c.h"
 #include "periph/pio/i2c.h"
+#include "periph/gpio.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -43,6 +44,7 @@ const long IC_DATA_CMD = 0x10;
 const long IC_ENABLE = 0x6c;
 const long IC_CON = 0x00;
 const long IC_TAR = 0x04;
+
 
 typedef struct {
     i2c_speed_t clk_freq;   /* clock freuency in Hz according to bus speed */
@@ -70,6 +72,20 @@ static inline int delayTimer(){
         //call checking fn ?
     }
 
+}
+
+int i2c_transmit(uint8_t byte, i2c_t dev){
+    //if write
+    if(_i2c_bus[dev].cmd_op == 1){
+        //lock device
+        //mutex_lock(&_i2c_bus[dev].dev_lock);
+
+        return 1;
+    }
+    else{ //if read
+        return 1;
+    }
+    return 0;
 }
 
 void i2c_init(i2c_t dev)
@@ -328,6 +344,30 @@ int i2c_read_reg(i2c_t dev, uint16_t addr, uint16_t reg,
 int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data,
                     size_t len, uint8_t flags)
 {
+
+    assert((dev < I2C_NUMOF) && (data != 0) && (len > 0) && (len < 256));
+
+    if (flags & I2C_NOSTART) { //or I2C_ADDR10 ?
+        return -EOPNOTSUPP;
+    }
+
+    DEBUG("i2c write %d bytes", len);
+
+    //prepare i2c bus
+    long* baseaddr = (long *) I2C_BASE;
+    _i2c_bus[dev].len = 8; //?
+    _i2c_bus[dev].cmd = 0; // send write cmd ?
+    *(baseaddr + IC_DATA_CMD) = _i2c_bus[dev].cmd;
+
+    //hold return value from transmit
+    int status = 0;
+
+    //transmit each byte
+    for(int i = 0; i < len; i++){
+        //send byte ? receive ack ?
+        int status = i2c_transmit(data[i], dev);
+    }
+
     i2c_t device = dev;
     device += 1;
     uint16_t address = addr;

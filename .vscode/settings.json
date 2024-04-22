@@ -7,7 +7,8 @@
     "files.insertFinalNewline": true,
     "files.associations": {
         "Makefile.*": "makefile",
-        "*.mk": "makefile"
+        "*.mk": "makefile",
+        "errno.h": "c"
     },
     "[shellscript][c][cpp]": {
         "editor.tabSize": 4,
