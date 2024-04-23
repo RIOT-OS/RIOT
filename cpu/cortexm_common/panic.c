@@ -39,7 +39,15 @@ void panic_arch(void)
 {
 #ifdef DEVELHELP
     print_ipsr();
-    /* The bkpt instruction will signal to the debugger to break here. */
-    __asm__("bkpt #0");
+    /* CM0+ has a C_DEBUGEN bit but it is NOT accessible by CPU (only by debugger) */
+#ifdef CoreDebug_DHCSR_C_DEBUGEN_Msk
+    if (CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) {
+        /* if Debug session is running, tell the debugger to break here.
+            Skip it otherwise as this instruction will cause either a fault
+            escalation to hardfault or a CPU lockup */
+        __asm__("bkpt #0");
+    }
+#endif /* CoreDebug_DHCSR_C_DEBUGEN_Msk */
+
 #endif
 }
