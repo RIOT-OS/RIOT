@@ -16,13 +16,6 @@ character (0xD, 0xA). See https://en.wikipedia.org/wiki/Newline for background.
 This page tries to collect needed settings for common terminal programs that
 will make them correctly display newlines.
 
-picocom                                                               {#picocom}
-=======
-- Generic method:
-    - Start with `--imap lfcrlf` parameter.
-- Via RIOT build system:
-    - `RIOT_TERMINAL=picocom make term`
-
 gtkterm                                                               {#gtkterm}
 ======
 - Graphical method:
@@ -47,6 +40,13 @@ miniterm                                                             {#miniterm}
     - Start with `--eol CR`parameter.
 - Via RIOT build system:
     - `RIOT_TERMINAL=miniterm make term`
+
+picocom                                                               {#picocom}
+=======
+- Generic method:
+    - Start with `--imap lfcrlf` parameter.
+- Via RIOT build system:
+    - `RIOT_TERMINAL=picocom make term`
 
 putty
 =====
