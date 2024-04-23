@@ -24,7 +24,7 @@ int main(void)
     //blink if read bytes non-zero
     //i2c addr retrived from:
     // https://github.com/sparkfun/SparkFun_VCNL4040_Arduino_Library/blob/master/src/SparkFun_VCNL4040_Arduino_Library.cpp
-    const vcnl40x0_params_t initParams = {0x01, 0x60, 0, 0, 0, 0};
+    const vcnl40x0_params_t initParams = {0x01, 0x20, 0, 0, 0, 0};
     vcnl40x0_t dev = {initParams};
 
     int8_t status = vcnl40x0_init(&dev, &initParams);

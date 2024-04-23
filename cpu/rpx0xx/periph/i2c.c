@@ -111,7 +111,7 @@ int i2c_transmit(const void* data, i2c_t dev, uint16_t addr, uint8_t len){
     memcpy(txbuffer, data, len);
 
     //if write
-    if(_i2c_bus[dev].cmd_op == 0){
+    if(_i2c_bus[dev].cmd == 0){
 
         //start condition
         gpio_write(I2C_SDA_PIN, 1);
@@ -176,10 +176,12 @@ int i2c_transmit(const void* data, i2c_t dev, uint16_t addr, uint8_t len){
         i2c_delay(I2C_DELAY); //not necessary but improves signal integrity
         gpio_write(I2C_SCL_PIN, 0);
 
+        //copy txbuffer into data
+
 
         return 0;
     }
-    else if(_i2c_bus[dev].cmd_op == 1){ //if read
+    else if(_i2c_bus[dev].cmd == 1){ //if read
 
         //start condition
         gpio_write(I2C_SDA_PIN, 1);
@@ -473,35 +475,23 @@ int i2c_read_reg(i2c_t dev, uint16_t addr, uint16_t reg,
         return EINVAL;
     }
     
+    //write reg address first
+    _i2c_bus[dev].cmd = 0;
+    i2c_transmit(reg, dev, addr, sizeof(reg));
 
+    //repeated start to indicate shift to read
+    gpio_write(I2C_SDA_PIN, 1);
+    i2c_delay(I2C_DELAY);
+    gpio_write(I2C_SCL_PIN, 1);
+    i2c_delay(I2C_DELAY);
+    gpio_write(I2C_SCL_PIN, 0);
+    gpio_write(I2C_SDA_PIN, 0);
+    i2c_delay(I2C_DELAY);
 
-    //read regs, len bytes
-    long* baseaddr = (long *) I2C_BASE;
-    _i2c_bus[dev].len = 8; //?
-    _i2c_bus[dev].cmd = 1; // send read cmd ?
-    //or this sends read cmd ? sets IC_DATA_CMD-CMD to 1 which is read
-    *(baseaddr + IC_DATA_CMD) = _i2c_bus[dev].cmd;
+    //read reg data
+    _i2c_bus[dev].cmd = 1;
+    uint8_t ret_data = i2c_read_bytes(data, dev, addr, sizeof(reg), flags);
 
-    /* actually do the read - take addr of where data is to be stored
-       and plonk in TX FIFO data there*/
-    uint8_t* dataAddr = (uint8_t *) data;
-    *dataAddr = *(baseaddr + IC_DATA_CMD) & 0xF;
-
-    //send stop bit
-    *(baseaddr + IC_DATA_CMD) = 0xFF & IC_DATA_CMD_STOP;
-    uint8_t* dataAddr2 = (uint8_t *) data;
-    dataAddr2[0] = 0xFF;
-
-    //throwaway code
-    i2c_t device = dev;
-    device += 1;
-    uint16_t address = addr;
-    address += 1;
-    uint16_t regist = reg;
-    regist++;
-    assert((uint32_t) data != 0);
-    uint8_t flagss = flags;
-    flagss++;
     return 0;
 }
 
