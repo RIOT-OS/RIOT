@@ -37,27 +37,27 @@ extern "C" {
  * @name    LED pin definitions and handlers
  * @{
  */
-#if defined(CPU_MODEL_STM32L496ZG) || defined(CPU_MODEL_STM32L4R5ZI) ||        \
+#if defined(CPU_MODEL_STM32L496ZG) || defined(CPU_MODEL_STM32L4R5ZI) || \
     defined(CPU_MODEL_STM32L552ZE) || defined(CPU_MODEL_STM32U575ZI)
-#define LED0_PIN_NUM 7
-#define LED0_PORT_NUM PORT_C
+#define LED0_PIN_NUM        7
+#define LED0_PORT_NUM       PORT_C
 #else
-#define LED0_PIN_NUM 0
-#define LED0_PORT_NUM PORT_B
+#define LED0_PIN_NUM        0
+#define LED0_PORT_NUM       PORT_B
 #endif
 
-#define LED1_PIN_NUM 7
-#define LED1_PORT_NUM PORT_B
+#define LED1_PIN_NUM        7
+#define LED1_PORT_NUM       PORT_B
 
 #if defined(CPU_MODEL_STM32L552ZE)
-#define LED2_PIN_NUM 9
-#define LED2_PORT_NUM PORT_A
+#define LED2_PIN_NUM        9
+#define LED2_PORT_NUM       PORT_A
 #elif defined(CPU_MODEL_STM32U575ZI)
-#define LED2_PIN_NUM 2
-#define LED2_PORT_NUM PORT_G
+#define LED2_PIN_NUM        2
+#define LED2_PORT_NUM       PORT_G
 #else
-#define LED2_PIN_NUM 14
-#define LED2_PORT_NUM PORT_B
+#define LED2_PIN_NUM        14
+#define LED2_PORT_NUM       PORT_B
 #endif
 /** @} */
 
@@ -65,8 +65,8 @@ extern "C" {
  * @name    User button
  * @{
  */
-#define BTN0_PIN GPIO_PIN(PORT_C, 13)
-#define BTN0_MODE GPIO_IN_PD
+#define BTN0_PIN            GPIO_PIN(PORT_C, 13)
+#define BTN0_MODE           GPIO_IN_PD
 /** @} */
 
 #ifdef __cplusplus
