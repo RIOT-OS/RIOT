@@ -48,7 +48,7 @@ picocom                                                               {#picocom}
 - Via RIOT build system:
     - `RIOT_TERMINAL=picocom make term`
 
-putty
+putty                                                                   {#putty}
 =====
 - Graphical method:
     - Go to configuration tree and choose `Terminal` branch.
