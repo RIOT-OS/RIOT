@@ -632,6 +632,9 @@ enum {
  */
 typedef struct conf_handler {
     list_node_t node;                                   /**< Every node is in a list, managed by its parent */
+#if IS_USED(MODULE_CONFIGURATION_HANDLER_PARENT)
+    struct conf_handler *parent;                        /**< Pointer to the parent node */
+#endif
     struct conf_handler *subnodes;                      /**< Every node has a list of subnodes */
     union {
         const conf_handler_array_id_t *array_id;        /**< Pointer to handler array identification */
@@ -649,7 +652,6 @@ typedef struct conf_handler {
 #endif
     void *data;                                         /**< Pointer to the configuration item data location (may be NULL) */
     uint32_t size;                                      /**< Configuration item size in bytes */
-    unsigned level;                                     /**< Level in the configuration tree (root = 0) */
     conf_handler_flags_t conf_flags;                    /**< Configuration of handler behavior */
     mutex_t mutex;                                      /**< Lock for unique access to the configuration item */
 } conf_handler_t;
