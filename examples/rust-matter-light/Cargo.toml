@@ -28,7 +28,8 @@ debug = true
 opt-level = 3
 
 [dependencies]
-riot-wrappers = { git = "https://github.com/RIOT-OS/rust-riot-wrappers.git", features = [ "set_panic_handler", "panic_handler_format", "panic_handler_crash", "with_embedded_nal_async", "provide_critical_section_1_0", "with_embedded_hal_async" ] }
+#riot-wrappers = { git = "https://github.com/RIOT-OS/rust-riot-wrappers.git", features = [ "set_panic_handler", "panic_handler_format", "panic_handler_crash", "with_embedded_nal_async", "provide_critical_section_1_0", "with_embedded_hal_async" ] }
+riot-wrappers = { git = "https://github.com/maikerlab/rust-riot-wrappers.git", branch = "with_matter", features = [ "set_panic_handler", "panic_handler_format", "panic_handler_crash", "with_embedded_nal_async", "provide_critical_section_1_0", "with_embedded_hal_async", "with_matter" ] }
 riot-sys = "*"
 embedded-nal-async = "0.7.1"
 embedded-hal-async = { version =  "1.0.0"}
@@ -53,3 +54,4 @@ rand_core = "0.6.4"
 [patch.crates-io]
 #rs-matter = { path = "../../../rs-matter/rs-matter" }
 rs-matter = { git = "https://github.com/maikerlab/rs-matter", branch = "feature/RIOT_OS" }
+riot-wrappers = { path = "../../../rust-riot-wrappers" }

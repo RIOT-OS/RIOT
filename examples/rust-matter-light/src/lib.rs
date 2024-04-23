@@ -6,39 +6,27 @@
 #![no_std]
 #![feature(type_alias_impl_trait)]
 
-// declare internal modules
-mod dev_att;
-mod network;
-#[allow(dead_code)]
-mod rgb_led;
-#[allow(unused)]
-mod persist;
-mod logging;
-// TODO: Enable attribute or feature to be able to run integration tests inside this module under RIOT OS
-#[allow(unused)]
-mod tests;
-mod utils;
-
-// internal modules imports
-use network::UdpSocketWrapper;
-use network::utils::initialize_network;
-use logging::init_logger;
-use dev_att::HardCodedDevAtt;
-
-// core library
 use core::{borrow::Borrow, pin::pin};
 use core::cell::Cell;
-
-// external crates
 use static_cell::StaticCell;
 use embedded_nal_async::{Ipv4Addr, UdpStack as _};
 use embedded_alloc::Heap;
 use embedded_hal::delay::DelayNs as _;
 use log::{debug, info, error, LevelFilter, warn};
 
+mod dev_att;
+#[allow(unused)]
+mod persist;
+// TODO: Enable attribute or feature to be able to run integration tests inside this module under RIOT OS
+#[allow(unused)]
+mod tests;
+mod utils;
+
+use dev_att::HardCodedDevAtt;
+use utils::initialize_network;
+
 // RIOT OS modules
 extern crate rust_riotmodules;
-
 use riot_wrappers::{riot_main, static_command};
 use riot_wrappers::ztimer;
 use riot_wrappers::thread;
@@ -47,10 +35,8 @@ use riot_wrappers::cstr::cstr;
 use riot_wrappers::shell::{self, CommandList};
 use riot_wrappers::saul::{ActuatorClass, Class, Phydat, RegistryEntry};
 
-// rs-matter
-#[allow(unused_variables)]
-#[allow(dead_code)]
-extern crate rs_matter;
+// the new 'matter' module in riot-wrappers, enabled by 'with_matter' feature
+use riot_wrappers::matter::{init_logger, UdpSocketWrapper};
 
 use rs_matter::{CommissioningData, MATTER_PORT};
 use rs_matter::transport::network::UdpBuffers;
@@ -72,7 +58,7 @@ use rs_matter::secure_channel::spake2p::VerifierData;
 use rs_matter::tlv::TLVElement;
 use rs_matter::transport::exchange::Exchange;
 
-// Node object with endpoints supporting device type 'OnOff Light'
+// Node object with endpoints supporting device type 'On/Off Light'
 const NODE: Node<'static> = Node {
     id: 0,
     endpoints: &[

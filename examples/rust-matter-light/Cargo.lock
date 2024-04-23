@@ -683,7 +683,7 @@ source = "git+https://gitlab.com/etonomy/riot-module-examples#26a7d27b4c0d518be1
 dependencies = [
  "embassy-executor",
  "riot-sys",
- "riot-wrappers",
+ "riot-wrappers 0.8.3 (git+https://github.com/RIOT-OS/rust-riot-wrappers.git)",
 ]
 
 [[package]]
@@ -1616,7 +1616,7 @@ dependencies = [
 [[package]]
 name = "riot-wrappers"
 version = "0.8.3"
-source = "git+https://github.com/RIOT-OS/rust-riot-wrappers.git#ea8d7fad95c8cb256ba9bc178f7779d266cc0def"
+source = "git+https://github.com/maikerlab/rust-riot-wrappers.git?branch=with_matter#093983d50e9f76be8e810d2f9820761498d00e8e"
 dependencies = [
  "bare-metal",
  "coap-handler 0.1.6",
@@ -1626,6 +1626,10 @@ dependencies = [
  "coap-numbers",
  "critical-section",
  "cstr",
+ "embassy-executor",
+ "embassy-executor-riot",
+ "embassy-futures",
+ "embassy-sync",
  "embedded-graphics",
  "embedded-hal 0.2.7",
  "embedded-hal 1.0.0",
@@ -1633,6 +1637,38 @@ dependencies = [
  "embedded-io-async",
  "embedded-nal-async 0.6.0",
  "embedded-nal-async 0.7.1",
+ "heapless 0.7.17",
+ "hex",
+ "log",
+ "mutex-trait",
+ "nb 0.1.3",
+ "num-traits",
+ "pin-project",
+ "pin-utils",
+ "rand_core",
+ "riot-sys",
+ "rs-matter",
+ "shlex 0.1.1",
+ "switch-hal",
+ "syn 1.0.109",
+]
+
+[[package]]
+name = "riot-wrappers"
+version = "0.8.3"
+source = "git+https://github.com/RIOT-OS/rust-riot-wrappers.git#ea8d7fad95c8cb256ba9bc178f7779d266cc0def"
+dependencies = [
+ "bare-metal",
+ "coap-handler 0.1.6",
+ "coap-handler 0.2.0",
+ "coap-message 0.2.3",
+ "coap-message 0.3.1",
+ "coap-numbers",
+ "cstr",
+ "embedded-graphics",
+ "embedded-hal 0.2.7",
+ "embedded-hal 1.0.0",
+ "embedded-hal-async",
  "heapless 0.7.17",
  "hex",
  "mutex-trait",
@@ -1682,7 +1718,7 @@ dependencies = [
  "portable-atomic",
  "qrcodegen-no-heap",
  "rand_core",
- "riot-wrappers",
+ "riot-wrappers 0.8.3 (git+https://github.com/RIOT-OS/rust-riot-wrappers.git)",
  "rs-matter-macros",
  "safemem",
  "sha2",
@@ -1749,7 +1785,7 @@ dependencies = [
  "log",
  "rand_core",
  "riot-sys",
- "riot-wrappers",
+ "riot-wrappers 0.8.3 (git+https://github.com/maikerlab/rust-riot-wrappers.git?branch=with_matter)",
  "rs-matter",
  "rust_riotmodules",
  "static_cell",
@@ -1782,9 +1818,9 @@ dependencies = [
 
 [[package]]
 name = "rustix"
-version = "0.38.33"
+version = "0.38.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e3cc72858054fcff6d7dea32df2aeaee6a7c24227366d7ea429aada2f26b16ad"
+checksum = "70dc5ec042f7a43c4a73241207cecc9873a06d45debb38b329f8541d85c2730f"
 dependencies = [
  "bitflags 2.5.0",
  "errno",

@@ -7,9 +7,8 @@ use rs_matter::transport::network::{UdpReceive, UdpSend};
 use static_cell::StaticCell;
 use core::str;
 use riot_wrappers::error::{EAGAIN, NumericError};
-use crate::init_logger;
-use crate::network::UdpSocketWrapper;
-use crate::network::utils::initialize_network;
+use riot_wrappers::matter::{init_logger, UdpSocketWrapper};
+use crate::utils::initialize_network;
 
 // Set this as entry point with 'riot_main!' macro to run 'integration tests'
 fn run_tests() -> ! {
