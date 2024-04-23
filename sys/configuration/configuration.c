@@ -164,6 +164,19 @@ static bool _sid_in_array_bounds(const conf_array_handler_t *array, conf_sid_t s
     return _sid_array_index(array, sid) < array->array_size;
 }
 
+#if IS_USED(MODULE_CONFIGURATION_STRINGS)
+static int _handler_level(const conf_handler_t *handler)
+{
+    assert(handler);
+    int level = 0;
+    while (handler->parent) {
+        level++;
+        handler = handler->parent;
+    }
+    return level;
+}
+#endif
+
 static int _configuration_append_segment(const conf_handler_t *next, conf_key_buf_t *key,
                                          char *key_buf, size_t key_buf_len)
 {
@@ -173,7 +186,7 @@ static int _configuration_append_segment(const conf_handler_t *next, conf_key_bu
         char *buf = key_buf;
         size_t size = key_buf_len;
         if (*next->node_id->subtree) {
-            for (int l = 0; l < (int)next->level - 1; l++) {
+            for (int l = 0; l < _handler_level(next) - 1; l++) {
                 if (*buf++ != '/') {
                     return -EINVAL;
                 }
@@ -778,7 +791,9 @@ void configuration_register(conf_handler_t *parent, conf_handler_t *node)
     while (*end) {
         end = (conf_handler_t **)&(*end)->node.next;
     }
-    node->level = parent->level + 1;
+#if IS_USED(MODULE_CONFIGURATION_HANDLER_PARENT)
+    node->parent = parent;
+#endif
     *end = node;
 }
 
@@ -915,6 +930,9 @@ int configuration_decode_internal(conf_path_iterator_t *iter, conf_iterator_rest
 #endif
         bool skip = false; /* skip structure is parsed SID is not known */
         if (!ret) {
+#if IS_USED(MODULE_CONFIGURATION_DELTA_DECODING)
+            key->sid += iter->stack[iter->sp - 1].node->node_id->sid_lower;
+#endif
             key->offset = 0;
             key->sid_normal = key->sid;
             /* for a new SID we must start from the root to get the full key->offset */

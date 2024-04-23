@@ -280,9 +280,13 @@ static int _encode_node_handler_cbor(const conf_handler_t *handler,
 #if IS_USED(MODULE_NANOCBOR)
     nanocbor_encoder_t enc;
     nanocbor_encoder_init(&enc, *enc_data, *enc_size);
-    if (key->sid_normal== handler->node_id->sid_lower) {
+    if (key->sid_normal == handler->node_id->sid_lower) {
         if (*sid_start != key->sid) {
-            if (nanocbor_fmt_uint(&enc, handler->node_id->sid_lower) < 0) {
+            uint64_t sid = key->sid;
+#if IS_USED(MODULE_CONFIGURATION_DELTA_ENCODING)
+            sid = key->sid - handler->parent->node_id->sid_lower;
+#endif
+            if (nanocbor_fmt_uint(&enc, sid) < 0) {
                 DEBUG("configuration: failed to encode node SID %"PRIu64" handler %p\n",
                       key->sid, (const void *)handler);
                 return -ENOBUFS;
@@ -363,7 +367,11 @@ static int _encode_array_handler_cbor(const conf_handler_t *handler,
     nanocbor_encoder_init(&enc, *enc_data, *enc_size);
     if (key->sid_normal == arr_handler->handler.array_id->sid_lower) {
         if (*sid_start != key->sid) {
-            if (nanocbor_fmt_uint(&enc, arr_handler->handler.array_id->sid_lower) < 0) {
+            uint64_t sid = key->sid;
+#if IS_USED(MODULE_CONFIGURATION_DELTA_ENCODING)
+            sid = key->sid - handler->parent->array_id->sid_lower;
+#endif
+            if (nanocbor_fmt_uint(&enc, sid) < 0) {
                 DEBUG("configuration: failed to encode array SID %"PRIu64" handler %p\n",
                       key->sid, (const void *)arr_handler);
                 return -ENOBUFS;
@@ -488,7 +496,11 @@ static int _encode_uint_cbor(const conf_handler_t *handler,
     const void *data = ((const uint8_t *)handler->data) + key->offset;
     nanocbor_encoder_t enc;
     nanocbor_encoder_init(&enc, *enc_data, *enc_size);
-    if (nanocbor_fmt_uint(&enc, key->sid) < 0) {
+    uint64_t sid = key->sid;
+#if IS_USED(MODULE_CONFIGURATION_DELTA_ENCODING)
+    sid = key->sid - handler->parent->node_id->sid_lower;
+#endif
+    if (nanocbor_fmt_uint(&enc, sid) < 0) {
         DEBUG("configuration: failed to encode SID %"PRIu64" for CBOR uint handler %p\n",
               key->sid, (const void *)handler);
         return -ENOBUFS;
@@ -579,7 +591,11 @@ static int _encode_int_cbor(const conf_handler_t *handler,
     const void *data = ((const uint8_t *)handler->data) + key->offset;
     nanocbor_encoder_t enc;
     nanocbor_encoder_init(&enc, *enc_data, *enc_size);
-    if (nanocbor_fmt_uint(&enc, key->sid) < 0) {
+    uint64_t sid = key->sid;
+#if IS_USED(MODULE_CONFIGURATION_DELTA_ENCODING)
+    sid = key->sid - handler->parent->node_id->sid_lower;
+#endif
+    if (nanocbor_fmt_uint(&enc, sid) < 0) {
         DEBUG("configuration: failed to encode SID %"PRIu64" for CBOR int handler %p\n",
               key->sid, (const void *)handler);
         return -ENOBUFS;
@@ -670,7 +686,11 @@ static int _encode_byte_string_cbor(const conf_handler_t *handler,
     const uint8_t *data = ((const uint8_t *)handler->data) + key->offset;
     nanocbor_encoder_t enc;
     nanocbor_encoder_init(&enc, *enc_data, *enc_size);
-    if (nanocbor_fmt_uint(&enc, key->sid) < 0) {
+    uint64_t sid = key->sid;
+#if IS_USED(MODULE_CONFIGURATION_DELTA_ENCODING)
+    sid = key->sid - handler->parent->node_id->sid_lower;
+#endif
+    if (nanocbor_fmt_uint(&enc, sid) < 0) {
         DEBUG("configuration: failed to encode SID %"PRIu64" for CBOR byte string handler %p\n",
               key->sid, (const void *)handler);
         return -ENOBUFS;
@@ -727,7 +747,11 @@ static int _encode_text_string_cbor(const conf_handler_t *handler,
     const char *data = ((const char *)handler->data) + key->offset;
     nanocbor_encoder_t enc;
     nanocbor_encoder_init(&enc, *enc_data, *enc_size);
-    if (nanocbor_fmt_uint(&enc, key->sid) < 0) {
+    uint64_t sid = key->sid;
+#if IS_USED(MODULE_CONFIGURATION_DELTA_ENCODING)
+    sid = key->sid - handler->parent->node_id->sid_lower;
+#endif
+    if (nanocbor_fmt_uint(&enc, sid) < 0) {
         DEBUG("configuration: failed to encode SID %"PRIu64" for CBOR test string handler %p\n",
               key->sid, (const void *)handler);
         return -ENOBUFS;

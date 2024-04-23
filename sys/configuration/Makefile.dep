@@ -22,3 +22,20 @@ ifneq (,$(filter configuration_backend_flashdb%,$(USEMODULE)))
     USEMODULE += flashdb_mtd
   endif
 endif
+
+ifneq (,$(filter configuration_strings,$(USEMODULE)))
+  USEMODULE += configuration_handler_parent
+endif
+
+ifneq (,$(filter configuration_delta_encoding,$(USEMODULE)))
+  USEMODULE += configuration_handler_parent
+endif
+
+ifneq (,$(filter configuration_delta_decoding,$(USEMODULE)))
+  USEMODULE += configuration_handler_parent
+endif
+
+ifneq (,$(filter configuration_delta_encoding_decoding,$(USEMODULE)))
+  USEMODULE += configuration_delta_encoding
+  USEMODULE += configuration_delta_decoding
+endif
