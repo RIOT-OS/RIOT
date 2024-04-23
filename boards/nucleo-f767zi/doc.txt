@@ -8,6 +8,10 @@
 The Nucleo-F767ZI is a board from ST's Nucleo family supporting ARM Cortex-M7
 STM32F767ZI microcontroller with 512KiB of RAM and 2 MiB of Flash.
 
+## Pinout
+
+@image html pinouts/nucleo-f207zg-and-more.svg "Pinout for the nucleo-f767zi (from STM board manual)" width=50%
+
 ### MCU
 
 | MCU          | STM32F767ZI
