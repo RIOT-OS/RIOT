@@ -461,6 +461,30 @@ int32_t adc_continuous_sample(adc_t line)
     return _sample(line) << _shift;
 }
 
+void adc_continuous_sample_multi(adc_t line, uint16_t *buf, size_t len)
+{
+    assert(line < ADC_NUMOF);
+    assert(mutex_trylock(&_lock) == 0);
+
+    Adc *dev = _dev(line);
+    bool diffmode = adc_channels[line].inputctrl & ADC_INPUTCTRL_DIFFMODE;
+
+    /* configure ADC line */
+    _config_line(dev, line, diffmode, 1);
+
+    /* Start the conversion */
+    dev->SWTRIG.reg = ADC_SWTRIG_START;
+
+    while (len--) {
+
+        /* Wait for the result */
+        while (!(dev->INTFLAG.reg & ADC_INTFLAG_RESRDY)) {}
+
+        *buf++ = _sample_dev(dev, diffmode) << _shift;
+        dev->INTFLAG.reg = ADC_INTFLAG_RESRDY;
+    }
+}
+
 void adc_continuous_stop(void)
 {
     bool adc0, adc1;
