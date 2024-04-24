@@ -9,7 +9,7 @@
 /**
  * @defgroup    sys_registry_namespace_tests_full RIOT Registry Schema: Full
  * @ingroup     sys
- * @brief       RIOT Registry Full Schema representing all possible data types of the riot registry
+ * @brief       RIOT Registry Full Schema using all possible data types of the riot registry
  * @{
  *
  * @file
@@ -50,21 +50,17 @@ typedef struct {
 
 typedef struct {
     clist_node_t node;
-
     registry_tests_full_instance_opaque_t opaque;
     char string[50];
     bool boolean;
-
     uint8_t u8;
     uint16_t u16;
     uint32_t u32;
     uint64_t u64;
-
     int8_t i8;
     int16_t i16;
     int32_t i32;
     int64_t i64;
-
     float f32;
     double f64;
 } registry_tests_full_instance_t;
@@ -73,17 +69,14 @@ typedef enum {
     REGISTRY_TESTS_FULL_OPAQUE,
     REGISTRY_TESTS_FULL_STRING,
     REGISTRY_TESTS_FULL_BOOLEAN,
-
     REGISTRY_TESTS_FULL_U8,
     REGISTRY_TESTS_FULL_U16,
     REGISTRY_TESTS_FULL_U32,
     REGISTRY_TESTS_FULL_U64,
-
     REGISTRY_TESTS_FULL_I8,
     REGISTRY_TESTS_FULL_I16,
     REGISTRY_TESTS_FULL_I32,
     REGISTRY_TESTS_FULL_I64,
-
     REGISTRY_TESTS_FULL_F32,
     REGISTRY_TESTS_FULL_F64,
 } registry_tests_full_indices_t;

@@ -9,7 +9,7 @@
 /**
  * @defgroup    sys_registry_namespace_tests_nested RIOT Registry Schema: Nested
  * @ingroup     sys
- * @brief       RIOT Registry Nested Schema representing different nesting level of a configuration schema
+ * @brief       RIOT Registry Nested Schema representing different nesting levels of a configuration schema
  * @{
  *
  * @file

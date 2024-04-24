@@ -9,8 +9,10 @@
 /**
  * @defgroup    sys_registry_namespace_tests RIOT Registry Tests Namespace
  * @ingroup     tests
- * @brief       RIOT Registry Namespace Tests module providing common tests configuration schemas for the RIOT Registry sys module
+ * @brief       RIOT Registry Namespace Tests module
  * @{
+ * 
+ * This module provides common test schemas for the RIOT Registry sys module
  *
  * @file
  *
@@ -28,6 +30,11 @@ extern "C" {
 
 extern registry_namespace_t registry_tests;
 
+/**
+ * @brief This ENUM defines the IDs of configuration schemas in the "tests" namespace.
+ * The IDs are needed by the int_path module to identify schemas using IDs instead
+ * of pointers.
+ */
 typedef enum {
     REGISTRY_TESTS_FULL,
     REGISTRY_TESTS_NESTED,

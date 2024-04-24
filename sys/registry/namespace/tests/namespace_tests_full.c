@@ -9,7 +9,7 @@
 /**
  * @defgroup    sys_registry_namespace_tests_full RIOT Registry Schema: Full
  * @ingroup     sys
- * @brief       RIOT Registry Full Schema representing all possible data types of the riot registry
+ * @brief       RIOT Registry Full Schema using all possible data types of the riot registry
  * @{
  *
  * @file

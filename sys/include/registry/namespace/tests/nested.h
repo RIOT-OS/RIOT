@@ -9,7 +9,7 @@
 /**
  * @defgroup    sys_registry_namespace_tests_nested RIOT Registry Schema: Nested
  * @ingroup     sys
- * @brief       RIOT Registry Nested Schema representing different nesting level of a configuration schema
+ * @brief       RIOT Registry Nested Schema representing different nesting levels of a configuration schema
  * @{
  *
  * @file
@@ -35,12 +35,7 @@ extern const registry_parameter_t registry_tests_nested_group_parameter;
 extern registry_schema_t registry_tests_nested;
 
 typedef struct {
-    uint8_t value;
-} registry_tests_nested_instance_opaque_t;
-
-typedef struct {
     clist_node_t node;
-
     uint8_t parameter;
     uint8_t group_parameter;
 } registry_tests_nested_instance_t;
