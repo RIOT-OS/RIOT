@@ -231,7 +231,9 @@ static bool _accept_remote(const sock_udp_t *sock, const udp_hdr_t *hdr,
               ipv6_addr_to_str(addr_str, (ipv6_addr_t *)&sock->remote.addr, sizeof(addr_str)));
         DEBUG(", source (%s) does not match\n",
               ipv6_addr_to_str(addr_str, (ipv6_addr_t *)&remote->addr, sizeof(addr_str)));
-        return false;
+        if (CONFIG_GNRC_SOCK_UDP_CHECK_REMOTE_ADDR) {
+            return false;
+        }
     }
 
     return true;
