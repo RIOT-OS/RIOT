@@ -30,18 +30,71 @@ extern "C" {
 #include "xfa.h"
 #include "modules.h"
 
+/**
+ * @brief Identifier of a configuration namespace.
+ * It is unique within the scope of the RIOT registry itself.
+ */
 typedef uint8_t registry_namespace_id_t;
+
+/**
+ * @brief Identifier of a configuration schema.
+ * It is unique within the scope of its parent configuration namespace.
+ */
 typedef uint32_t registry_schema_id_t;
+
+/**
+ * @brief Identifier of a schema instance.
+ * It is unique within the scope of its parent configuration schema.
+ */
 typedef uint16_t registry_instance_id_t;
-typedef uint16_t registry_group_or_parameter_id_t;
+
+/**
+ * @brief Identifier of a configuration group or parameter.
+ * It is unique within the scope of its parent schema instance.
+ * Because a configuration group and a configuration parameter share the same
+ * namespace, this type exists for cases where it is not clear if an ID belongs
+ * to a group or a parameter.
+ */
+typedef uint8_t registry_group_or_parameter_id_t;
+
+/**
+ * @brief Identifier of a configuration group.
+ * It is unique within the scope of its parent schema instance.
+ */
 typedef registry_group_or_parameter_id_t registry_group_id_t;
+
+/**
+ * @brief Identifier of a configuration parameter.
+ * It is unique within the scope of its parent schema instance.
+ */
 typedef registry_group_or_parameter_id_t registry_parameter_id_t;
 
+
+/**
+ * @brief Data structure of a configuration namespace see @p _registry_namespace_t.
+ */
 typedef struct _registry_namespace_t registry_namespace_t;
+
+/**
+ * @brief Data structure of a configuration schema see @p _registry_schema_t.
+ */
 typedef struct _registry_schema_t registry_schema_t;
+
+/**
+ * @brief  Instance of a schema containing its configuration parameters values see @p _registry_instance_t.
+ */
 typedef struct _registry_instance_t registry_instance_t;
+
+/**
+ * @brief  Data structure of a configuration group see @p _registry_group_t.
+ */
 typedef struct _registry_group_t registry_group_t;
+
+/**
+ * @brief Data structure of a configuration parameter see @p _registry_parameter_t.
+ */
 typedef struct _registry_parameter_t registry_parameter_t;
+
 
 /**
  * @brief Data types of the registry.
