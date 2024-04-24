@@ -92,7 +92,7 @@ static uint8_t _get_prescaler(const spi_conf_t *conf, uint32_t clock) {
 static inline void enable_spi(spi_t bus) {
   // stm32u5 errata: 2.22.5 SPE may not be cleared upon MODF event
   dev(bus)->IFCR = SPI_IFCR_MODFC;
-  // enable 
+  // enable
   dev(bus)->CR1 |= SPI_CR1_SPE;
 }
 static inline void disable_spi(spi_t bus) {
