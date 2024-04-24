@@ -123,6 +123,14 @@ endif
 # the variable to empty
 SHOULD_RUN_KCONFIG ?=
 
+# Pass through application configuration to the docker container, if
+# BUILD_IN_DOCKER=1 is used:
+DOCKER_ENV_VARS += IPV6_ADDR
+DOCKER_ENV_VARS += IPV6_DEFAULT_ROUTER
+DOCKER_ENV_VARS += IPV6_PREFIX IPV6_DEFAULT_ROUTER
+DOCKER_ENV_VARS += PREFIX_CONF
+DOCKER_ENV_VARS += UPLINK
+
 include $(RIOTBASE)/Makefile.include
 
 # Compile-time configuration for DHCPv6 client (needs to come after
