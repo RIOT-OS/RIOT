@@ -28,17 +28,23 @@ extern "C" {
 
 /**
  * @brief Prototype of a callback function for the load action of a storage interface.
+ * 
+ * @param[in] node A location within the registry configuration tree. (In this case it must be a configuration parameter)
+ * @param[in] buf The saved value of the configuration parameter.
+ * @param[in] buf_len The size of @p buf.
+ * 
+ * @return 0 on success, non-zero on failure.
  */
 typedef int (*load_cb_t)(const registry_node_t *node, const void *buf, const size_t buf_len);
 
 typedef struct _registry_storage_t registry_storage_t;
 
 /**
- * @brief Storage descriptor.
+ * @brief The Storage instance references the @p registry_storage_t and holds configuration data such as mount points.
  */
 typedef struct {
     registry_storage_t *storage;        /**< interface of the storage. */
-    void *data;                         /**< Struct containing all config data for the storage. */
+    void *data;                         /**< Struct containing all config data for the storage (specific to storage implementation). */
 } registry_storage_instance_t;
 
 /**
@@ -48,7 +54,7 @@ struct _registry_storage_t {
     /**
      * @brief Loads all saved parameters and calls the @p load_cb callback function.
      *
-     * @param[in] storage Storage descriptor.
+     * @param[in] storage Storage instance.
      * @param[in] load_cb Callback function to call for every saved parameter.
      *
      * @return 0 on success, non-zero on failure.
@@ -59,6 +65,7 @@ struct _registry_storage_t {
     /**
      * @brief If implemented, it is used for any preparation the storage may
      * need before starting a saving process.
+     * NULL if not implemented
      *
      * @param[in] storage Storage descriptor.
      *
@@ -82,6 +89,7 @@ struct _registry_storage_t {
     /**
      * @brief If implemented, it is used for any tear-down the storage may need
      * after a saving process.
+     * NULL if not implemented
      *
      * @param[in] storage Storage descriptor.
      *
