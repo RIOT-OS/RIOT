@@ -93,40 +93,21 @@ static int _instance_lookup(const registry_schema_t *schema,
     return -REGISTRY_ERROR_INSTANCE_NOT_FOUND;
 }
 
-static const registry_group_t *_internal_group_lookup(const registry_group_t *group,
-                                                      const registry_group_id_t group_id)
-{
-    assert(group != NULL);
-
-    for (size_t i = 0; i < group->groups_len; i++) {
-        if (group->groups[i]->id == group_id) {
-            return group->groups[i];
-        }
-        else if (group->groups[i]->groups_len > 0) {
-            return _internal_group_lookup(group->groups[i], group_id);
-        }
-    }
-
-    return NULL;
-}
-
-static int _group_lookup(const registry_schema_t *schema, const registry_group_id_t group_id,
+static int _group_lookup(const registry_group_t **groups,
+                         const size_t groups_len,
+                         const registry_group_id_t group_id,
                          const registry_group_t **group)
 {
-    assert(schema != NULL);
-    assert(group != NULL);
+    assert(groups != NULL);
+    assert(groups_len > 0);
 
-    for (size_t i = 0; i < schema->groups_len; i++) {
-        if (schema->groups[i]->id == group_id) {
-            *group = schema->groups[i];
+    for (size_t i = 0; i < groups_len; i++) {
+        if ((*groups)[i].id == group_id) {
+            *group = groups[i];
             return 0;
         }
-        else if (schema->groups[i]->groups_len > 0) {
-            const registry_group_t *found_group = _internal_group_lookup(schema->groups[i], group_id);
-            if (found_group != NULL) {
-                *group = found_group;
-                return 0;
-            }
+        else if ((*groups)[i].groups_len > 0) {
+            return _group_lookup((*groups)[i].groups, (*groups)[i].groups_len, group_id, group);
         }
     }
 
@@ -307,7 +288,7 @@ int registry_node_from_int_path(const registry_int_path_t *path, registry_node_t
 
                 /* Group or Parameter */
                 if (path->type == REGISTRY_INT_PATH_TYPE_GROUP_OR_PARAMETER) {
-                    res = _group_lookup(schema, group_or_parameter_id, &node->value.group.group);
+                    res = _group_lookup(schema->groups, schema->groups_len, group_or_parameter_id, &node->value.group.group);
                     if (res == 0) {
                         node->type = REGISTRY_NODE_GROUP;
                         node->value.group.instance = instance;
@@ -326,7 +307,7 @@ int registry_node_from_int_path(const registry_int_path_t *path, registry_node_t
                 if (path->type == REGISTRY_INT_PATH_TYPE_GROUP) {
                     node->type = REGISTRY_NODE_GROUP;
                     node->value.group.instance = instance;
-                    return _group_lookup(schema, group_id, &node->value.group.group);
+                    return _group_lookup(schema->groups, schema->groups_len, group_id, &node->value.group.group);
                 }
 
                 /* Parameter */
