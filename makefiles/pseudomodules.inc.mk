@@ -70,6 +70,7 @@ PSEUDOMODULES += evtimer_mbox
 PSEUDOMODULES += fatfs_vfs_format
 PSEUDOMODULES += fmt_%
 PSEUDOMODULES += gcoap_forward_proxy
+PSEUDOMODULES += gcoap_forward_proxy_thread
 PSEUDOMODULES += gcoap_fileserver
 PSEUDOMODULES += gcoap_dtls
 ## @addtogroup net_gcoap_dns
