@@ -9,8 +9,11 @@
 /**
  * @defgroup    sys_registry_int_path RIOT Registry integer path
  * @ingroup     sys
- * @brief       RIOT Registry integer path module providing functions to convert between registry objects and their integer paths
+ * @brief       RIOT Registry integer path module
  * @{
+ * 
+ * This module provides functions to convert between @ref registry_node_t and
+ * @ref registry_int_path_t.
  *
  * @file
  *
@@ -34,13 +37,16 @@ extern "C" {
 #define REGISTRY_INT_PATH_MAX_LEN 4
 
 /**
- * @brief Maximum length of a configuration path as a string.
- *
- * A int path ID is an uint32_t and uint32_t MAX has 10 digits.
+ * @brief Maximum length of a configuration path as a string of numbers.
+ * 
+ * An int path consists of the following elements:
+ * namespace_id:             8 bits corresponds to a max of  3 characters
+ * schema_id:               32 bits corresponds to a max of 10 characters
+ * instance_id:             16 bits corresponds to a max of  5 characters
+ * group__or_parameter_id:   8 bits corresponds to a max of  3 characters
  * We also need to include the separator. One additional char between each number.
  */
-#define REGISTRY_INT_PATH_STRING_MAX_LEN   ((10 * REGISTRY_INT_PATH_MAX_LEN) + \
-                                            (REGISTRY_INT_PATH_MAX_LEN - 1))
+#define REGISTRY_INT_PATH_STRING_MAX_LEN (3 + 10 + 5 + 3 + (REGISTRY_INT_PATH_MAX_LEN - 1))
 
 /**
  * @brief Integer path representation for a namespace.
