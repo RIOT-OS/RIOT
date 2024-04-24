@@ -47,12 +47,13 @@ pub fn sys_epoch() -> Duration {
 
 #[inline(never)]
 pub fn get_ipv6_address(ifc: &Netif) -> Option<Ipv6Addr> {
-    let all_addresses = ifc.ipv6_addrs();
-    if all_addresses.is_err() {
-        return None;
-    }
+    let all_addresses = ifc.ipv6_addrs().ok()?;
+    info!("Found {} addresses", all_addresses.len());
 
-    return match all_addresses.unwrap().first() {
+    // TODO: Find a suitable IPv6 address for Matter communication
+    // this address will be sent with DNS-SD Reponses
+    let idx = if all_addresses.len() >= 2 { 1 } else { 0 };
+    return match all_addresses.get(idx) {
         Some(a) => {
             let ipv6_raw = a.raw();
             Some(Ipv6Addr::new(

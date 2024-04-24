@@ -17,9 +17,6 @@ use log::{debug, info, error, LevelFilter, warn};
 mod dev_att;
 #[allow(unused)]
 mod persist;
-// TODO: Enable attribute or feature to be able to run integration tests inside this module under RIOT OS
-#[allow(unused)]
-mod tests;
 mod utils;
 
 use dev_att::HardCodedDevAtt;
@@ -36,7 +33,7 @@ use riot_wrappers::shell::{self, CommandList};
 use riot_wrappers::saul::{ActuatorClass, Class, Phydat, RegistryEntry};
 
 // the new 'matter' module in riot-wrappers, enabled by 'with_matter' feature
-use riot_wrappers::matter::{init_logger, UdpSocketWrapper};
+use riot_wrappers::matter::{init_logger, MatterCompatUdpSocket};
 
 use rs_matter::{CommissioningData, MATTER_PORT};
 use rs_matter::transport::network::UdpBuffers;
@@ -301,7 +298,7 @@ async fn mdns_task(mdns: &'static MdnsService<'_>) {
         .bind_single(MDNS_SOCKET_BIND_ADDR)
         .await
         .expect("Can't create a socket");
-    let socket = UdpSocketWrapper::new(mdns_addr, mdns_sock);
+    let socket = MatterCompatUdpSocket::new(mdns_addr, mdns_sock);
     debug!("Created UDP socket for mDNS at {:?}", &mdns_addr);
 
     // Finally run the MDNS service
@@ -332,7 +329,7 @@ async fn matter_task(matter: &'static Matter<'_>) {
         .bind_single(MATTER_SOCKET_BIND_ADDR)
         .await
         .expect("Can't create a socket");
-    let socket = UdpSocketWrapper::new(matter_addr, matter_sock);
+    let socket = MatterCompatUdpSocket::new(matter_addr, matter_sock);
     debug!("Created UDP socket for Matter at {:?}", &matter_addr);
 
     let handler = HandlerCompat(matter_handler(&matter));
