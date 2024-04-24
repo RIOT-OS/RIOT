@@ -9,8 +9,11 @@
 /**
  * @defgroup    sys_registry_int_path RIOT Registry Int Path
  * @ingroup     sys
- * @brief       RIOT Registry Int Path module providing a API to access configuration parameter via an integer path
+ * @brief       RIOT Registry integer path module
  * @{
+ * 
+ * This module provides functions to convert between @ref registry_node_t and
+ * @ref registry_int_path_t.
  *
  * @file
  *
@@ -68,7 +71,7 @@ static int _schema_lookup(const registry_namespace_t *namespace,
 
 static int _instance_lookup(const registry_schema_t *schema,
                             const registry_instance_id_t instance_id,
-                            registry_instance_t **instance)
+                            const registry_instance_t **instance)
 {
     assert(schema != NULL);
     assert(instance != NULL);
@@ -83,9 +86,11 @@ static int _instance_lookup(const registry_schema_t *schema,
     do {
         node = node->next;
 
+        const registry_instance_t *current_instance = container_of(node, registry_instance_t, node);
+
         /* check if index equals instance_id */
-        if (container_of(node, registry_instance_t, node)->id == instance_id) {
-            *instance = container_of(node, registry_instance_t, node);
+        if (current_instance->id == instance_id) {
+            *instance = current_instance;
             return 0;
         }
     } while (node != schema->instances.next);
@@ -276,7 +281,7 @@ int registry_node_from_int_path(const registry_int_path_t *path, registry_node_t
             }
             
             /* Instance */
-            registry_instance_t *instance;
+            const registry_instance_t *instance;
             res = _instance_lookup(schema, instance_id, &instance);
 
             if (res == 0) {
