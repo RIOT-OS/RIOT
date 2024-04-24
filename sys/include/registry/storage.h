@@ -91,7 +91,8 @@ struct _registry_storage_t {
 };
 
 /**
- * @brief Load all configuration parameters from the registered storage.
+ * @brief Load all configuration parameters from the storages that are registered
+ * using @p REGISTRY_ADD_STORAGE_SOURCE.
  *
  * @return 0 on success, non-zero on failure.
  */
@@ -99,7 +100,8 @@ int registry_load(void);
 
 /**
  * @brief Save all configuration parameters that are within 
- * the scope of the to the @p node. to the registered storage.
+ * the scope of the to the @p node. to the storage device, that was registered 
+ * using @p REGISTRY_SET_STORAGE_DESTINATION.
  * 
  * @param[in] node A location within the registry configuration tree.
  *
