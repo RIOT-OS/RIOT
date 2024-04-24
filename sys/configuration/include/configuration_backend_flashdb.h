@@ -23,7 +23,6 @@
 #include "board.h"
 #include "modules.h"
 #include "mtd.h"
-#include "vfs_default.h"
 #include "configuration.h"
 #if IS_USED(MODULE_FLASHDB_KVDB)
 #include "fal_cfg.h"
@@ -75,27 +74,6 @@ mtd_dev_t *configuration_backend_flashdb_mtd_choose_dev(void);
  * @return  FAL partition label to use in the FAL mode of FlashDB
  */
 const char *configuration_backend_flashdb_mtd_choose_partition(void);
-
-/**
- * @brief   __attribute__((weak)) function to select the MTD for FlashDB
- *          when the module configuration_backend_flashdb_vfs is used
- *
- * The default implementation is to return @ref MTD_0.
- *
- * @return  MTD device to use in the VFS mode of FlashDB
- */
-mtd_dev_t *configuration_backend_flashdb_vfs_choose_dev(void);
-
-/**
- * @brief   __attribute__((weak)) function to select the path for FlashDB
- *          when the module configuration_backend_flashdb_vfs is used
- *
- * The default implementation is to return VFS_DEFAULT_DATA"/"CONFIGURATION_FLASHDB_VFS_FOLDER.
- * @ref CONFIGURATION_FLASHDB_VFS_FOLDER
- *
- * @return  Path to use in the VFS mode of FlashDB
- */
-const char *configuration_backend_flashdb_vfs_choose_path(void);
 
 /**
  * @brief   Reset the FlashDB backend, which deletes all configuration data

@@ -20,6 +20,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <stdint.h>
 
 #include "configuration.h"
 #include "configuration_backend_flashdb.h"
@@ -27,7 +28,6 @@
 #include "macros/units.h"
 #include "mutex.h"
 #include "mtd_default.h"
-#include "vfs_default.h"
 #include "fal_cfg.h"
 
 static mutex_t _kvdb_locker = MUTEX_INIT;
@@ -45,18 +45,6 @@ const char *configuration_backend_flashdb_mtd_choose_partition(void)
     return FAL_PART0_LABEL;
 }
 
-__attribute__((weak))
-mtd_dev_t *configuration_backend_flashdb_vfs_choose_dev(void)
-{
-    return mtd_default_get_dev(0);
-}
-
-__attribute__((weak))
-const char *configuration_backend_flashdb_vfs_choose_path(void)
-{
-    return VFS_DEFAULT_DATA"/"CONFIGURATION_FLASHDB_VFS_FOLDER;
-}
-
 static void _lock(fdb_db_t db)
 {
     mutex_lock(db->user_data);
@@ -70,36 +58,16 @@ static void _unlock(fdb_db_t db)
 static int _be_fdb_init(mtd_dev_t *mtd)
 {
     assert(mtd);
-    uint32_t size;
-#if IS_USED(MODULE_CONFIGURATION_BACKEND_FLASHDB_VFS)
-    bool file_mode = true;
-    fdb_kvdb_control(&_kvdb, FDB_KVDB_CTRL_SET_FILE_MODE, &file_mode);
-    int fail;
-    if ((fail = vfs_mkdir(configuration_backend_flashdb_vfs_choose_path(), 0777)) < 0) {
-        if (fail != -EEXIST) {
-            /* probably not mounted (try with vfs_auto_format) */
-            return fail;
-        }
-    }
-#endif
     /* The MTD must be initialized! */
-    size = mtd->pages_per_sector * mtd->page_size;
+    uint32_t size = mtd->pages_per_sector * mtd->page_size;
     size = DIV_ROUND_UP((CONFIGURATION_FLASHDB_MIN_SECTOR_SIZE_DEFAULT_KiB * KiB(1)), size) * size;
     /* sector size must be set before max size */
     fdb_kvdb_control(&_kvdb, FDB_KVDB_CTRL_SET_SEC_SIZE, &size);
-#if IS_USED(MODULE_CONFIGURATION_BACKEND_FLASHDB_VFS)
-    size *= CONFIGURATION_FLASHDB_VFS_MAX_SECTORS;
-    fdb_kvdb_control(&_kvdb, FDB_KVDB_CTRL_SET_MAX_SIZE, &size);
-#endif
     fdb_kvdb_control(&_kvdb, FDB_KVDB_CTRL_SET_LOCK, (void *)(uintptr_t)_lock);
     fdb_kvdb_control(&_kvdb, FDB_KVDB_CTRL_SET_UNLOCK, (void *)(uintptr_t)_unlock);
     if (fdb_kvdb_init(&_kvdb,
                       "kvdb_configuration",
-#if IS_USED(MODULE_CONFIGURATION_BACKEND_FLASHDB_VFS)
-                      configuration_backend_flashdb_vfs_choose_path(),
-#elif IS_USED(MODULE_CONFIGURATION_BACKEND_FLASHDB_MTD)
                       configuration_backend_flashdb_mtd_choose_partition(),
-#endif
                       NULL,
                       &_kvdb_locker) != FDB_NO_ERR) {
         return -EINVAL;
@@ -195,13 +163,9 @@ int configuration_backend_flashdb_init(mtd_dev_t *mtd)
 
 void auto_init_configuration_backend_flashdb(void)
 {
-#if IS_USED(MODULE_CONFIGURATION_BACKEND_FLASHDB_MTD)
     extern void fdb_mtd_init(mtd_dev_t *mtd);
     fdb_mtd_init(configuration_backend_flashdb_mtd_choose_dev());
     int fail = configuration_backend_flashdb_init(configuration_backend_flashdb_mtd_choose_dev());
-#else
-    int fail = configuration_backend_flashdb_init(configuration_backend_flashdb_vfs_choose_dev());
-#endif
     assert(!fail); (void)fail;
 #if (IS_USED(MODULE_CONFIGURATION_BACKEND_RESET_FLASHDB))
     fail = configuration_backend_flashdb_reset();
