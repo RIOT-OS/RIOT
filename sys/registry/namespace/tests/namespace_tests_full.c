@@ -108,7 +108,7 @@ static void mapping(const registry_parameter_id_t parameter_id, const registry_i
     }
 }
 
-/* Schema */
+/* Schema parameters */
 const registry_parameter_t registry_tests_full_opaque = {
     .id = REGISTRY_TESTS_FULL_OPAQUE,
 #if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
@@ -265,6 +265,7 @@ const registry_parameter_t registry_tests_full_f64 = {
     .type = REGISTRY_TYPE_FLOAT64,
 };
 
+/* Schema */
 registry_schema_t registry_tests_full = {
     .id = REGISTRY_TESTS_FULL,
 #if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)

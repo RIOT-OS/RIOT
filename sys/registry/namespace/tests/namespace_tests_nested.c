@@ -53,7 +53,7 @@ static void mapping(const registry_parameter_id_t parameter_id, const registry_i
     }
 }
 
-/* Schema */
+/* Schema parameters */
 const registry_parameter_t registry_tests_nested_parameter = {
     .id = REGISTRY_TESTS_NESTED_PARAMETER,
 #if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
@@ -66,6 +66,19 @@ const registry_parameter_t registry_tests_nested_parameter = {
     .type = REGISTRY_TYPE_UINT8,
 };
 
+const registry_parameter_t registry_tests_nested_group_parameter = {
+    .id = REGISTRY_TESTS_NESTED_GROUP_PARAMETER,
+#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+    .name = "parameter",
+#endif /* CONFIG_REGISTRY_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+    .description = "",
+#endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
+    .schema = &registry_tests_nested,
+    .type = REGISTRY_TYPE_UINT8,
+};
+
+/* Schema groups */
 const registry_group_t registry_tests_nested_group = {
     .id = REGISTRY_TESTS_NESTED_GROUP,
 #if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
@@ -83,18 +96,7 @@ const registry_group_t registry_tests_nested_group = {
     .parameters_len = 1,
 };
 
-const registry_parameter_t registry_tests_nested_group_parameter = {
-    .id = REGISTRY_TESTS_NESTED_GROUP_PARAMETER,
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
-    .name = "parameter",
-#endif /* CONFIG_REGISTRY_ENABLE_META_NAME */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
-    .description = "",
-#endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
-    .schema = &registry_tests_nested,
-    .type = REGISTRY_TYPE_UINT8,
-};
-
+/* Schema */
 registry_schema_t registry_tests_nested = {
     .id = REGISTRY_TESTS_NESTED,
 #if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
