@@ -6,9 +6,10 @@ ifneq (,$(filter registry_storage%,$(USEMODULE)))
   include $(RIOTBASE)/sys/registry/storage/Makefile.dep
 endif
 
+ifneq (,$(filter registry_util%,$(USEMODULE)))
+  USEMODULE += base64
+endif
+
 ifneq (,$(filter registry_%,$(USEMODULE)))
   USEMODULE += registry
 endif
-
-USEMODULE += fmt
-USEMODULE += base64

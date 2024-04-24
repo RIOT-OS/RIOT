@@ -197,17 +197,7 @@ int registry_util_convert_value_to_str(const registry_value_t *src, char *dest,
     }
 
     case REGISTRY_TYPE_UINT64: {
-        str_len = fmt_u64_dec(NULL, *(uint64_t *)src->buf);
-        if (str_len > dest_len - 1) {
-            /* If dest is NULL, the length is returned */
-            if (dest != NULL) {
-                return -EINVAL;
-            }
-        }
-        else {
-            fmt_u64_dec(dest, *(uint64_t *)src->buf);
-            dest[str_len] = '\0';
-        }
+        str_len = snprintf(dest, dest_len, " %" PRIu64, *(uint64_t *)src->buf);
         break;
     }
 
@@ -227,17 +217,7 @@ int registry_util_convert_value_to_str(const registry_value_t *src, char *dest,
     }
 
     case REGISTRY_TYPE_INT64: {
-        str_len = fmt_s64_dec(NULL, *(int64_t *)src->buf);
-        if (str_len > dest_len - 1) {
-            /* If dest is NULL, the length is returned */
-            if (dest != NULL) {
-                return -EINVAL;
-            }
-        }
-        else {
-            fmt_s64_dec(dest, *(int64_t *)src->buf);
-            dest[str_len] = '\0';
-        }
+        str_len = snprintf(dest, dest_len, " %" PRId64, *(int64_t *)src->buf);
         break;
     }
 
