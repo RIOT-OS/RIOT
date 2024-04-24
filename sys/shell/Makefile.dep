@@ -107,6 +107,7 @@ ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
   endif
   ifneq (,$(filter registry,$(USEMODULE)))
     USEMODULE += shell_cmd_registry
+    USEMODULE += registry_util
   endif
   ifneq (,$(filter rtt_rtc periph_rtc,$(USEMODULE)))
     USEMODULE += shell_cmd_rtc
