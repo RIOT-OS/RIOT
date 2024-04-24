@@ -138,11 +138,11 @@ int32_t adc_sample(adc_t line, adc_res_t res);
 void adc_continuous_begin(adc_res_t res);
 
 /**
- * @brief   Sample an ADC line without powering off the ADC afterward
+ * @brief   Sample an ADC line without powering off the ADC afterwards
  *
  * @note requires the `periph_adc_continuous` feature
  *
- * @brief   Sample a value from the given ADC line
+ * @param[in] line          line to sample
  *
  * @return                  the sampled value on success
  */
