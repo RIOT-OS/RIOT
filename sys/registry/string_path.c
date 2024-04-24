@@ -9,8 +9,11 @@
 /**
  * @defgroup    sys_registry_string_path RIOT Registry String Path
  * @ingroup     sys
- * @brief       RIOT Registry String Path module providing a API to access configuration parameter via a string path
+ * @brief       RIOT Registry String Path module
  * @{
+ * 
+ * This module provides functions to convert between @ref registry_node_t and
+ * a string path representation of it.
  *
  * @file
  *
