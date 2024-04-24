@@ -36,37 +36,6 @@
 #include "registry/util.h"
 #include "fmt.h"
 
-void _debug_print_value(const registry_value_t *value)
-{
-    if (ENABLE_DEBUG) {
-        switch (value->type) {
-        case REGISTRY_TYPE_NONE: break;
-        case REGISTRY_TYPE_OPAQUE: {
-            DEBUG("opaque (hex): ");
-            for (size_t i = 0; i < value->buf_len; i++) {
-                DEBUG("%02x", ((uint8_t *)value->buf)[i]);
-            }
-            break;
-        }
-        case REGISTRY_TYPE_STRING: DEBUG("string: %s", (char *)value->buf); break;
-        case REGISTRY_TYPE_BOOL: DEBUG("bool: %d", *(bool *)value->buf); break;
-
-        case REGISTRY_TYPE_UINT8: DEBUG("uint8: %"PRIu8, *(uint8_t *)value->buf); break;
-        case REGISTRY_TYPE_UINT16: DEBUG("uint16: %"PRIu16, *(uint16_t *)value->buf); break;
-        case REGISTRY_TYPE_UINT32: DEBUG("uint32: %"PRIu32, *(uint32_t *)value->buf); break;
-        case REGISTRY_TYPE_UINT64: DEBUG("uint64: %"PRIu64, *(uint64_t *)value->buf); break;
-
-        case REGISTRY_TYPE_INT8: DEBUG("int8: %"PRIu8, *(int8_t *)value->buf); break;
-        case REGISTRY_TYPE_INT16: DEBUG("int16: %"PRIu16, *(int16_t *)value->buf); break;
-        case REGISTRY_TYPE_INT32: DEBUG("int32: %"PRIu32, *(int32_t *)value->buf); break;
-        case REGISTRY_TYPE_INT64: DEBUG("int64: %"PRIu64, *(int64_t *)value->buf); break;
-
-        case REGISTRY_TYPE_FLOAT32: DEBUG("f32: %f", *(float *)value->buf); break;
-        case REGISTRY_TYPE_FLOAT64: DEBUG("f64: %f", *(double *)value->buf); break;
-        }
-    }
-}
-
 int registry_util_convert_str_to_value(const char *src, void *dest, const size_t dest_len,
                                        const registry_type_t dest_type)
 {

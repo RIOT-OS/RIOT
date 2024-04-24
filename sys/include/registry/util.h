@@ -28,8 +28,6 @@ extern "C" {
 
 #include "registry.h"
 
-void _debug_print_value(const registry_value_t *value);
-
 /**
  * @brief Convenience function to parse a configuration parameter value from
  * a string.
