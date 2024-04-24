@@ -44,7 +44,7 @@ int main(void)
         }
     }
 
-    adc_continuous_begin(RES);
+    adc_continuous_begin(RES, 0);
     while (1) {
         for (unsigned i = 0; i < ADC_NUMOF; i++) {
             sample = adc_continuous_sample(ADC_LINE(i));
