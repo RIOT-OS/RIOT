@@ -56,20 +56,10 @@ static void mapping(const registry_parameter_id_t parameter_id, const registry_i
         *val = &_instance->blue;
         *val_len = sizeof(_instance->blue);
         break;
-
-    case REGISTRY_SYS_RGB_LED_BRIGHTNESSES_WHITE:
-        *val = &_instance->white;
-        *val_len = sizeof(_instance->white);
-        break;
-
-    case REGISTRY_SYS_RGB_LED_BRIGHTNESSES_YELLOW:
-        *val = &_instance->yellow;
-        *val_len = sizeof(_instance->yellow);
-        break;
     }
 }
 
-/* Schema */
+/* Schema parameters */
 const registry_parameter_t registry_sys_rgb_led_red = {
     .id = REGISTRY_SYS_RGB_LED_RED,
 #if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
@@ -106,48 +96,7 @@ const registry_parameter_t registry_sys_rgb_led_blue = {
     .type = REGISTRY_TYPE_UINT8,
 };
 
-const registry_parameter_t registry_sys_rgb_led_brightnesses_white = {
-    .id = REGISTRY_SYS_RGB_LED_BRIGHTNESSES_WHITE,
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
-    .name = "white",
-#endif /* CONFIG_REGISTRY_ENABLE_META_NAME */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
-    .description = "",
-#endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
-    .schema = &registry_sys_rgb_led,
-    .type = REGISTRY_TYPE_UINT8,
-};
-
-const registry_parameter_t registry_sys_rgb_led_brightnesses_yellow = {
-    .id = REGISTRY_SYS_RGB_LED_BRIGHTNESSES_YELLOW,
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
-    .name = "yellow",
-#endif /* CONFIG_REGISTRY_ENABLE_META_NAME */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
-    .description = "",
-#endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
-    .schema = &registry_sys_rgb_led,
-    .type = REGISTRY_TYPE_UINT8,
-};
-
-const registry_group_t registry_sys_rgb_led_brightnesses = {
-    .id = REGISTRY_SYS_RGB_LED_BRIGHTNESSES,
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
-    .name = "brightnesses",
-#endif /* CONFIG_REGISTRY_ENABLE_META_NAME */
-#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
-    .description = "",
-#endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
-    .schema = &registry_sys_rgb_led,
-    .groups = NULL,
-    .groups_len = 0,
-    .parameters = (const registry_parameter_t *[]) {
-        &registry_sys_rgb_led_brightnesses_white,
-        &registry_sys_rgb_led_brightnesses_yellow,
-    },
-    .parameters_len = 2,
-};
-
+/* Schema */
 registry_schema_t registry_sys_rgb_led = {
     .id = REGISTRY_SYS_RGB_LED,
 #if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
@@ -158,10 +107,8 @@ registry_schema_t registry_sys_rgb_led = {
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .namespace = &registry_sys,
     .mapping = mapping,
-    .groups = (const registry_group_t *[]) {
-        &registry_sys_rgb_led_brightnesses,
-    },
-    .groups_len = 1,
+    .groups = NULL,
+    .groups_len = 0,
     .parameters = (const registry_parameter_t *[]) {
         &registry_sys_rgb_led_red,
         &registry_sys_rgb_led_green,

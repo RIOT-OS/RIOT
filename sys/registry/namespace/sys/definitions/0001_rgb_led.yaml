@@ -17,24 +17,3 @@ items:
     name: blue
     description: Intensity of the blue color of the rgb lamp.
     type: uint8
-
-  - id: 3
-    name: brightnesses
-    description: Brightness of the rgb lamp.
-    type: group
-    items:
-      - id: 4
-        name: yellow
-        description: Brightness of the yellow color of the rgb lamp.
-        type: uint8
-
-      - id: 5
-        name: white
-        description: Brightness of the white color of the rgb lamp.
-        type: uint8
-
-  - id: 6
-    name: string
-    description: Intensity of the blue color of the rgb lamp.
-    type: string
-    size: 20

@@ -32,9 +32,6 @@ extern "C" {
 extern const registry_parameter_t registry_sys_rgb_led_red;
 extern const registry_parameter_t registry_sys_rgb_led_green;
 extern const registry_parameter_t registry_sys_rgb_led_blue;
-extern const registry_parameter_t registry_sys_rgb_led_brightnesses_white;
-extern const registry_parameter_t registry_sys_rgb_led_brightnesses_yellow;
-extern const registry_group_t registry_sys_rgb_led_brightnesses;
 extern registry_schema_t registry_sys_rgb_led;
 
 typedef struct {
@@ -42,17 +39,12 @@ typedef struct {
     uint8_t red;
     uint8_t green;
     uint8_t blue;
-    uint8_t white;
-    uint8_t yellow;
 } registry_sys_rgb_led_instance_t;
 
 typedef const enum {
     REGISTRY_SYS_RGB_LED_RED,
     REGISTRY_SYS_RGB_LED_GREEN,
     REGISTRY_SYS_RGB_LED_BLUE,
-    REGISTRY_SYS_RGB_LED_BRIGHTNESSES,
-    REGISTRY_SYS_RGB_LED_BRIGHTNESSES_WHITE,
-    REGISTRY_SYS_RGB_LED_BRIGHTNESSES_YELLOW,
 } registry_sys_rgb_led_indices_t;
 
 #endif

@@ -49,7 +49,7 @@ static void mapping(const registry_parameter_id_t parameter_id, const registry_i
     }
 }
 
-/* Schema */
+/* Schema parameters */
 const registry_parameter_t registry_sys_board_led_enabled = {
     .id = REGISTRY_SYS_BOARD_LED_ENABLED,
 #if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
@@ -62,6 +62,7 @@ const registry_parameter_t registry_sys_board_led_enabled = {
     .type = REGISTRY_TYPE_BOOL,
 };
 
+/* Schema */
 registry_schema_t registry_sys_board_led = {
     .id = REGISTRY_SYS_BOARD_LED,
 #if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
