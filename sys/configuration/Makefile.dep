@@ -15,10 +15,7 @@ ifneq (,$(filter configuration_backend_flashdb%,$(USEMODULE)))
   USEMODULE += configuration_strings
   USEMODULE += configuration_backend_flashdb
   USEMODULE += flashdb_kvdb
-  ifneq (,$(filter configuration_backend_flashdb_vfs,$(USEMODULE)))
-    USEMODULE += flashdb_vfs
-    USEMODULE += vfs_default
-  else ifneq (,$(filter configuration_backend_flashdb_mtd,$(USEMODULE)))
+  ifneq (,$(filter configuration_backend_flashdb_mtd,$(USEMODULE)))
     USEMODULE += flashdb_mtd
   endif
 endif
