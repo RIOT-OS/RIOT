@@ -161,6 +161,31 @@ int32_t adc_continuous_sample(adc_t line);
 void adc_continuous_sample_multi(adc_t line, uint16_t *buf, size_t len);
 
 /**
+ * @brief   Configure the ADC with a given resolution for continuous sampling
+ *          on two lines.
+ *
+ * @note requires the `periph_adc_continuous` feature
+ *
+ * @param[in] res           resolution to use for conversion
+ * @param[in] f_adc         frequency to use for conversion, leave 0 for default
+ */
+void adc_dual_continuous_begin(adc_res_t res, uint32_t f_adc);
+
+/**
+ * @brief   Capture multiple ADC samples from two ADC lines at the same time
+ *
+ * @note The hardware needs to be capable of sampling two lines at the same time,
+ *       e.g. they need to be configured to two separate ADC instances.
+ *
+ * @note requires the `periph_adc_continuous` feature
+ *
+ * @param[in]  line         lines to sample
+ * @param[out] buf          target buffers
+ * @param[in]  len          number of samples to sample
+ */
+void adc_dual_continuous_sample_multi(adc_t line[2], uint16_t *buf[2], size_t len);
+
+/**
  * @brief   Disable the ADC to save power
  *
  * @note requires the `periph_adc_continuous` feature
