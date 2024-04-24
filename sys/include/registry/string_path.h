@@ -9,8 +9,11 @@
 /**
  * @defgroup    sys_registry_string_path RIOT Registry String Path
  * @ingroup     sys
- * @brief       RIOT Registry String Path module providing functions to convert between registry objects and their string paths
+ * @brief       RIOT Registry String Path module
  * @{
+ * 
+ * This module provides functions to convert between @ref registry_node_t and
+ * a string path representation of it.
  *
  * @file
  *
@@ -27,7 +30,7 @@ extern "C" {
 #include "registry.h"
 
 /**
- * @brief Converts a registry namespace object to its string path representation.
+ * @brief Converts a registry namespace to its string path representation.
  *
  * @param[in]  node A location within the registry configuration tree.
  * @param[out] path The buffer to store the resulting string path.
@@ -38,7 +41,7 @@ extern "C" {
 int registry_node_to_string_path(const registry_node_t *node, char *path);
 
 /**
- * @brief Converts a string path to a registry namespace object.
+ * @brief Converts a string path to a registry namespace.
  *
  * @param[in]  path The string path to convert.
  * @param[in]  path_len Length of the path.
