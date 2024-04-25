@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Lukas R. Jackson, Vanguard Defense International
+ * Copyright (C) 2023 Lukas R. Jackson, Vanguard Defense International
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,7 +8,7 @@
 #ifndef INCLUDE_LOGISTIC_REGRESSION_H
 #define INCLUDE_LOGISTIC_REGRESSION_H
 
-#include <stdint.h> // For fixed-point arithmetic
+#include <stdint.h> /* For fixed-point arithmetic */
 
 /**
  * @defgroup    lg_reg Logistic Regression
@@ -23,13 +23,13 @@
  */
 
 typedef struct {
-    int32_t x; ///< Feature value (scaled by a factor)
-    int32_t y; ///< Target value (scaled by a factor)
+    int32_t x; /* Feature value (scaled by a factor) */
+    int32_t y; /* Target value (scaled by a factor) */
 } Point;
 
 typedef struct {
-    int32_t slope; ///< Slope parameter of the logistic regression model (scaled by a factor)
-    int32_t intercept; ///< Intercept parameter of the logistic regression model (scaled by a factor)
+    int32_t slope; /* Slope parameter of the logistic regression model (scaled by a factor) */
+    int32_t intercept; /* Intercept parameter of the logistic regression model (scaled by a factor) */
 } Parameters;
 
 /**
