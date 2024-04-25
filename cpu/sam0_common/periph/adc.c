@@ -369,9 +369,6 @@ static inline void _config_line(Adc *dev, adc_t line, bool diffmode, bool freeru
     dev->CTRLC.bit.FREERUN = freerun;
 #endif
     _wait_syncbusy(dev);
-
-    /* clear stale flag */
-    dev->INTFLAG.reg = ADC_INTFLAG_RESRDY;
 }
 
 static int32_t _sample_dev(Adc *dev, bool diffmode)
@@ -396,6 +393,9 @@ static int32_t _sample(adc_t line)
 
     /* configure ADC line */
     _config_line(dev, line, diffmode, 0);
+
+    /* clear stale flag */
+    dev->INTFLAG.reg = ADC_INTFLAG_RESRDY;
 
     /* Start the conversion */
     dev->SWTRIG.reg = ADC_SWTRIG_START;
@@ -436,7 +436,7 @@ static void _get_adcs(bool *adc0, bool *adc1)
 }
 
 static uint8_t _shift;
-void adc_continuous_begin(adc_res_t res, uint32_t f_adc)
+void adc_continuous_begin(adc_res_t res)
 {
     bool adc0, adc1;
     _get_adcs(&adc0, &adc1);
@@ -444,10 +444,10 @@ void adc_continuous_begin(adc_res_t res, uint32_t f_adc)
     mutex_lock(&_lock);
 
     if (adc0) {
-        _adc_configure(_adc(0), res, f_adc);
+        _adc_configure(_adc(0), res, 0);
     }
     if (adc1) {
-        _adc_configure(_adc(1), res, f_adc);
+        _adc_configure(_adc(1), res, 0);
     }
 
     _shift = _shift_from_res(res);

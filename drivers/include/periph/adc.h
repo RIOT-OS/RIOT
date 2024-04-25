@@ -150,9 +150,8 @@ void adc_sample_multi(const adc_t *lines, uint8_t lines_numof,
  * @note requires the `periph_adc_continuous` feature
  *
  * @param[in] res           resolution to use for conversion
- * @param[in] f_adc         frequency to use for conversion, leave 0 for default
  */
-void adc_continuous_begin(adc_res_t res, uint32_t f_adc);
+void adc_continuous_begin(adc_res_t res);
 
 /**
  * @brief   Sample an ADC line without powering off the ADC afterwards
