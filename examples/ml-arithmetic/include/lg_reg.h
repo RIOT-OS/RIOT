@@ -8,70 +8,75 @@
 #ifndef INCLUDE_LOGISTIC_REGRESSION_H
 #define INCLUDE_LOGISTIC_REGRESSION_H
 
+#include <stdint.h> // For fixed-point arithmetic
+
 /**
- * @ingroup     lg_reg.h
+ * @defgroup    lg_reg Logistic Regression
+ * @brief       Functions and structures for logistic regression.
  * @{
- *
+ */
+
+/**
  * @file
  * @brief       Declarations for logistic regression
- *
  * @author      Lukas R. Jackson <LukasJacksonEG@gmail.com>
- *
  */
 
 typedef struct {
-    double x;   ///< Feature value
-    double y;   ///< Target value
+    int32_t x; ///< Feature value (scaled by a factor)
+    int32_t y; ///< Target value (scaled by a factor)
 } Point;
 
 typedef struct {
-    double slope;       ///< Slope parameter of the logistic regression model
-    double intercept;   ///< Intercept parameter of the logistic regression model
+    int32_t slope; ///< Slope parameter of the logistic regression model (scaled by a factor)
+    int32_t intercept; ///< Intercept parameter of the logistic regression model (scaled by a factor)
 } Parameters;
 
 /**
  * @brief Sigmoid function.
- *
- * @param z Input value.
- * @return The sigmoid of the input value.
+ * 
+ * @param z Input value (scaled by a factor).
+ * @return The sigmoid of the input value (scaled by a factor).
  */
-double sigmoid(double z);
+int32_t sigmoid(int32_t z);
 
 /**
  * @brief Hypothesis function.
- *
- * @param x Input feature value.
- * @param params Parameters of the logistic regression model.
- * @return The hypothesis value based on the input feature and model parameters.
+ * 
+ * @param x Input feature value (scaled by a factor).
+ * @param params Parameters of the logistic regression model (scaled by a factor).
+ * @return The hypothesis value based on the input feature and model parameters (scaled by a factor).
  */
-double hypothesis(double x, Parameters params);
+int32_t hypothesis(int32_t x, Parameters params);
 
 /**
  * @brief Cost function for logistic regression.
- *
+ * 
  * @param data Array of points (feature-value pairs).
  * @param num_points Number of points in the dataset.
- * @param params Parameters of the logistic regression model.
- * @return The cost of the model based on the given data and parameters.
+ * @param params Parameters of the logistic regression model (scaled by a factor).
+ * @return The cost of the model based on the given data and parameters (scaled by a factor).
  */
-double cost_function(Point *data, int num_points, Parameters params);
+int32_t cost_function(Point *data, int num_points, Parameters params);
 
 /**
  * @brief Update parameters using gradient descent.
- *
+ * 
  * @param data Array of points (feature-value pairs).
  * @param num_points Number of points in the dataset.
- * @param params Pointer to the parameters of the logistic regression model to be updated.
+ * @param params Pointer to the parameters of the logistic regression model to be updated (scaled by a factor).
  */
 void gradient_descent(Point *data, int num_points, Parameters *params);
 
 /**
  * @brief Perform logistic regression on the given data.
- *
+ * 
  * @param data Array of points (feature-value pairs).
  * @param num_points Number of points in the dataset.
- * @return Parameters of the logistic regression model.
+ * @return Parameters of the logistic regression model (scaled by a factor).
  */
 Parameters logistic_regression(Point *data, int num_points);
+
+/** @} */
 
 #endif /* INCLUDE_LOGISTIC_REGRESSION_H */

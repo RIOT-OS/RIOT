@@ -11,8 +11,8 @@ int main(void)
     Parameters params = logistic_regression(data, num_points);
 
     // Printing the parameters of the model
-    printf("Slope: %f\n", params.slope);
-    printf("Intercept: %f\n", params.intercept);
+    printf("Slope: %d\n", params.slope);
+    printf("Intercept: %d\n", params.intercept);
 
     return 0;
 }
