@@ -1,3 +1,0 @@
-matplotlib==3.8.3
-numpy==1.26.4
-pyserial==3.5

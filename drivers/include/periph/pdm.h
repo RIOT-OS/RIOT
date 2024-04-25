@@ -42,21 +42,6 @@ typedef enum {
 /** @} */
 
 /**
- * @brief   Default PDM sampling rate values
- * @{
- */
-#ifndef HAVE_PDM_SAMPLE_RATE_T
-typedef enum {
-    PDM_SAMPLE_RATE_16KHZ = 0,      /**< 16kHz */
-    PDM_SAMPLE_RATE_20KHZ,          /**< 20kHz */
-    PDM_SAMPLE_RATE_41KHZ,          /**< 41.6kHz */
-    PDM_SAMPLE_RATE_50KHZ,          /**< 50kHz */
-    PDM_SAMPLE_RATE_60KHZ,          /**< 60kHz */
-} pdm_sample_rate_t;
-#endif
-/** @} */
-
-/**
  * @brief   Default PDM min gain values (in dB)
  */
 #ifndef PDM_GAIN_MIN
@@ -74,13 +59,8 @@ typedef enum {
  * @brief   Default PDM samples frame buffer size
  */
 #ifndef PDM_BUF_SIZE
-#define PDM_BUF_SIZE        (128U)
+#define PDM_BUF_SIZE        (64U)
 #endif
-
-/**
- * @brief   Define the new buffer size
- */
-#define NEW_BUF_SIZE    (PDM_BUF_SIZE * 5 * 16 * 16)
 
 /**
  * @brief   Signature for data received interrupt callback
@@ -111,7 +91,7 @@ typedef struct {
  * @return  0 on successful initialization
  * @return <0 on error
  */
-int pdm_init(pdm_mode_t mode, pdm_sample_rate_t rate, int8_t gain, pdm_data_cb_t cb, void *arg);
+int pdm_init(pdm_mode_t mode, uint32_t rate, int8_t gain, pdm_data_cb_t cb, void *arg);
 
 /**
  * @brief   Start the PDM peripheral
@@ -122,6 +102,8 @@ void pdm_start(void);
  * @brief   Stop the PDM peripheral
  */
 void pdm_stop(void);
+
+uint32_t get_pdm_sample_rate(void);
 
 #ifdef __cplusplus
 
